@@ -1,0 +1,24 @@
+#!/usr/bin/ooperl
+
+# Author: Trizen
+# License: GPLv3
+# Date: 26 March 2013
+# http://trizen.googlecode.com
+
+"val"->assign(item);    # item contains "val"
+[item]->pop->print;     # prints "val"
+25->sqrt->to_s->print;  # prints "5"
+
+{
+    "hey"->print;           # should print "hey"
+    -23->abs->to_s->print;  # should print "23"
+}
+->while(false);
+
+{
+    \1->print;      # should print "v"
+}
+->if(item->match(m{^(\w)}i));
+
+
+24->/(6)->print;    # prints "4"
