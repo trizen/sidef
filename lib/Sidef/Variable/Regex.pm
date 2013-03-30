@@ -8,7 +8,7 @@ package Sidef::Variable::Regex;
 use parent qw(Sidef::Types::Regex::Regex);
 
 sub new {
-    my($class, $var) = @_;
+    my ( $class, $var ) = @_;
     bless \$var, $class;
 }
 

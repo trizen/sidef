@@ -13,9 +13,8 @@ package Sidef::Lexer;
 
 use Sidef::Base;
 
-
 sub make_esc_delim {
-    if ($_[0] ne '\\') {
+    if ( $_[0] ne '\\' ) {
         my $delim = quotemeta shift;
         return qr{$delim([^$delim\\]*+(?>\\.|[^$delim\\]+)*+)$delim}s;
     }
@@ -41,7 +40,7 @@ sub new {
     sub parse_expr {
         my (%opt) = @_;
 
-        given ($opt{code}) {
+        given ( $opt{code} ) {
             {
                 when (/\G#.*/gc) {
                     redo;
@@ -92,7 +91,7 @@ sub new {
         my $ref = $struct{main} //= [];
         my $class = 'main';
 
-        given ($opt{code}) {
+        given ( $opt{code} ) {
             {
                 when (/\Gclass\h+/gc) {
                     when (/\G"(.*?)"/gc) {
@@ -110,36 +109,36 @@ sub new {
                     return \%struct;
                 }
 
-                when ( /\G->/gc){
+                when (/\G->/gc) {
 
                     my $method_name;
-                    if(/\G(\w+)/gc){
+                    if (/\G(\w+)/gc) {
                         $method_name = $1;
-                    }elsif(m{\G([-+/*%])}gc){
+                    }
+                    elsif (m{\G([-+/*%])}gc) {
                         $method_name = $1;
                     }
 
-                     #++$#{$struct{$class}[-1]{call}};
-                     #$struct{$class}[-1]{call} =
+                    #++$#{$struct{$class}[-1]{call}};
+                    #$struct{$class}[-1]{call} =
 
-                    my($expr, $pos) = parse_expr
-
-
+                    my ( $expr, $pos ) = parse_expr
 
                 }
 
-                when(/\G/gc){
-                    my $expr = substr($_, pos($_));
-                    my ($obj, $pos) = parse_expr(code => $expr);
+                when (/\G/gc) {
+                    my $expr = substr( $_, pos($_) );
+                    my ( $obj, $pos ) = parse_expr( code => $expr );
                     pos($_) = $pos + pos($_);
 
-
                     ++$ref;
-                    $ref->[-1]
-                    #++$#{$struct{$class}};
-                    #$struct{$class}[-1]{self} = $obj;
+                   # $ref->[-1]
 
-                    redo;
+                      #++$#{$struct{$class}};
+                      #$struct{$class}[-1]{self} = $obj;
+
+                      #redo;
+
                     #push @{$struct{$class}}
                 }
             }
@@ -148,7 +147,6 @@ sub new {
     }
 
 }
-
 
 =cut
 
@@ -215,4 +213,4 @@ my $code = <<'CODE';
 
 CODE
 
-parse_script(code => $code);
+parse_script( code => $code );

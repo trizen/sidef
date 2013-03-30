@@ -5,12 +5,12 @@ use warnings;
 
 package Sidef::Types::String::Single {
 
-    use parent qw(Sidef::Convert::Convert);
+    use parent qw(Sidef::Types::String::String);
 
-sub new{
-    my($class, $str) = @_;
-    bless \$str, $class;
-}
+    sub new {
+        my ( $class, $str ) = @_;
+        bless \$str, $class;
+    }
 
 }
 

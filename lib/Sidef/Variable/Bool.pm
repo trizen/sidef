@@ -8,7 +8,7 @@ package Sidef::Variable::Bool;
 use parent qw(Sidef::Types::Bool::Bool);
 
 sub new {
-    my($class, $var) = @_;
+    my ( $class, $var ) = @_;
     bless \$var, $class;
 }
 

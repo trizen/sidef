@@ -8,7 +8,7 @@ package Sidef::Variable::Array;
 use parent qw(Sidef::Types::Array::Array);
 
 sub new {
-    my($class, $var) = @_;
+    my ( $class, $var ) = @_;
     bless \$var, $class;
 }
 

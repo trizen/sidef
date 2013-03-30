@@ -5,8 +5,7 @@ use warnings;
 
 package Sidef::Types::Number::Integer {
 
-     use parent qw(Sidef::Types::Number::Number);
-
+    use parent qw(Sidef::Types::Number::Number);
 
     sub new {
         my $class = shift;

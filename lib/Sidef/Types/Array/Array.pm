@@ -4,23 +4,24 @@ use strict;
 use warnings;
 
 package Sidef::Types::Array::Array {
-    sub new{
-            my($class, $array) = @_;
-            bless $array, $class;
+
+    sub new {
+        my ( $class, $array ) = @_;
+        bless $array, $class;
     }
 
     {
         no strict 'refs';
-    *{__PACKAGE__ . '::' . '-' } = sub {
-        my($array_1, $array_2) = @_;
+        *{ __PACKAGE__ . '::' . '-' } = sub {
+            my ( $array_1, $array_2 ) = @_;
 
-          use overload q{""} => sub { ${$_[0]} };
-        __PACKAGE__->new([grep { not $_ ~~ $array_2 } @{$array_1}]);
-    };
-}
+            use overload q{""} => sub { ${ $_[0] } };
+            __PACKAGE__->new( [ grep { not $_ ~~ $array_2 } @{$array_1} ] );
+        };
+    }
 
-    sub pop{
-        my($self) = @_;
+    sub pop {
+        my ($self) = @_;
         pop @{$self};
     }
 }

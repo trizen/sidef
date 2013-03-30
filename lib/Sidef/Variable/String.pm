@@ -8,7 +8,7 @@ package Sidef::Variable::String;
 use parent qw(Sidef::Types::String::String);
 
 sub new {
-    my($class, $var) = @_;
+    my ( $class, $var ) = @_;
     bless \$var, $class;
 }
 
