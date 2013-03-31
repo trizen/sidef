@@ -9,27 +9,31 @@ package Sidef::Types::String::String {
 
     sub uc {
         my ($self) = @_;
-        Sidef::Types::String::Single->new( CORE::uc $$self );
+        Sidef::Types::String::Single->new(CORE::uc $$self);
     }
 
     sub lc {
         my ($self) = @_;
-        Sidef::Types::String::Single->new( CORE::lc $$self );
+        Sidef::Types::String::Single->new(CORE::lc $$self);
     }
 
     sub reverse {
         my ($self) = @_;
-        Sidef::Types::String::Single->new( scalar CORE::reverse $$self );
+        Sidef::Types::String::Single->new(scalar CORE::reverse $$self);
     }
 
     sub say {
-        my($self) = @_;
-        ( CORE::say $$self) ? Sidef::Types::Bool::Bool->true : Sidef::Types::Bool::Bool->false;
+        my ($self) = @_;
+        (CORE::say $$self)
+          ? Sidef::Types::Bool::Bool->true
+          : Sidef::Types::Bool::Bool->false;
     }
 
     sub print {
         my ($self) = @_;
-        ( CORE::print $$self) ? Sidef::Types::Bool::Bool->true : Sidef::Types::Bool::Bool->false;
+        (CORE::print $$self)
+          ? Sidef::Types::Bool::Bool->true
+          : Sidef::Types::Bool::Bool->false;
     }
 }
 
