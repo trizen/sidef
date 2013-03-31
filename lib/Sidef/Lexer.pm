@@ -3,28 +3,11 @@ use 5.014;
 use strict;
 use warnings;
 
-BEGIN {
-    use File::Spec::Functions qw(rel2abs);
-}
-
-use lib rel2abs '../../lib';
+use lib '../../lib';    # devel only
 
 package Sidef::Lexer;
 
-use Sidef::Base;
-
-sub make_esc_delim {
-    if ($_[0] ne '\\') {
-        my $delim = quotemeta shift;
-        return qr{$delim([^$delim\\]*+(?>\\.|[^$delim\\]+)*+)$delim}s;
-    }
-    else {
-        return qr{\\(.*?)\\}s;
-    }
-}
-
-my $double_quote = make_esc_delim(q{"});
-my $single_quote = make_esc_delim(q{'});
+use Sidef::Init;
 
 sub new {
     my ($class) = @_;
@@ -32,7 +15,6 @@ sub new {
 }
 
 {
-
     my $line        = 1;
     my $cbracket    = 0;
     my $parentheses = 0;
@@ -51,18 +33,18 @@ sub new {
     };
 
     sub syntax_error {
-        my %opt = @_;
+        my ($self, %opt) = @_;
         die "Syntax error near: --->",
           substr($opt{'code'}, $opt{'pos'}, index($opt{'code'}, "\n", $opt{'pos'}) - $opt{'pos'}),
           "<--- at line $line.\n";
     }
 
     sub get_method_name {
-        my %opt = @_;
+        my ($self, %opt) = @_;
 
         given ($opt{'code'}) {
 
-            if (/\G/gc && defined(my $pos = parse_whitespace(code => substr($_, pos)))) {
+            if (/\G/gc && defined(my $pos = $self->parse_whitespace(code => substr($_, pos)))) {
                 pos($_) = $pos + pos($_);
             }
 
@@ -79,7 +61,7 @@ sub new {
     }
 
     sub parse_whitespace {
-        my (%opt) = @_;
+        my ($self, %opt) = @_;
 
         given ($opt{code}) {
             {
@@ -108,11 +90,14 @@ sub new {
     }
 
     sub parse_expr {
-        my (%opt) = @_;
+        my ($self, %opt) = @_;
+
+        state $double_quote = Sidef::Utils::Regex::make_esc_delim(q{"});
+        state $single_quote = Sidef::Utils::Regex::make_esc_delim(q{'});
 
         given ($opt{code}) {
             {
-                if (/\G/gc && defined(my $pos = parse_whitespace(code => substr($_, pos)))) {
+                if (/\G/gc && defined(my $pos = $self->parse_whitespace(code => substr($_, pos)))) {
                     pos($_) = $pos + pos($_);
                 }
 
@@ -143,14 +128,14 @@ sub new {
     }
 
     sub parse_arguments {
-        my %opt = @_;
+        my ($self, %opt) = @_;
 
         my @arg;
 
         given ($opt{'code'}) {
             {
 
-                if (/\G/gc && defined(my $pos = parse_whitespace(code => substr($_, pos)))) {
+                if (/\G/gc && defined(my $pos = $self->parse_whitespace(code => substr($_, pos)))) {
                     pos($_) = $pos + pos($_);
                 }
 
@@ -173,7 +158,7 @@ sub new {
                     redo;
                 }
                 default {
-                    my ($obj, $pos) = parse_script(code => substr($_, pos));
+                    my ($obj, $pos) = $self->parse_script(code => substr($_, pos));
                     return $obj, $pos;
                 }
 
@@ -183,8 +168,7 @@ sub new {
     }
 
     sub parse_script {
-
-        my %opt = @_;
+        my ($self, %opt) = @_;
 
         my %struct;
         my $class = 'main';
@@ -210,7 +194,7 @@ sub new {
                 }
                 when (/\G->/gc || /\G(?=\s*$operators_re)/) {
 
-                    my ($method_name, $pos) = get_method_name(code => substr($_, pos));
+                    my ($method_name, $pos) = $self->get_method_name(code => substr($_, pos));
                     pos($_) = $pos + pos;
 
                     #die $method_name;
@@ -234,7 +218,7 @@ sub new {
                 }
 
                 when (/\G(?=\()/) {
-                    my ($arg, $pos) = parse_arguments(code => substr($_, pos));
+                    my ($arg, $pos) = $self->parse_arguments(code => substr($_, pos));
                     pos($_) = $pos + pos;
 
                     #push @{$struct{$class}[-1]{arg}}, $arg;
@@ -277,16 +261,14 @@ sub new {
                 # }
 
                 when (/\G/gc) {
+
                     my $expr = substr($_, pos);
-                    my ($obj, $pos) = parse_expr(code => $expr);
+                    my ($obj, $pos) = $self->parse_expr(code => $expr);
                     pos($_) = $pos + pos;
 
                     if (defined $obj) {
-
                         push @{$struct{$class}}, {self => $obj,};
-
                         redo;
-
                     }
                     else {
                         # die "Undefined object, at line $line.\n";
@@ -373,7 +355,8 @@ my $code = <<'CODE';
 
 CODE
 
-my ($struct, $pos) = parse_script(code => $code);
+my $lexer = Sidef::Lexer->new();
+my ($struct, $pos) = $lexer->parse_script(code => $code);
 
 use Data::Dump qw(pp);
 pp $struct;

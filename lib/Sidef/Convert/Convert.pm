@@ -4,14 +4,8 @@ use warnings;
 
 package Sidef::Convert::Convert {
 
+    use Sidef::Init;
     use overload q{""} => sub { ${ $_[0] } };
-
-    require Sidef::Types::Bool::Bool;
-    require Sidef::Types::Array::Array;
-    require Sidef::Types::Number::Float;
-    require Sidef::Types::String::Single;
-    require Sidef::Types::String::Double;
-    require Sidef::Types::Number::Integer;
 
     sub to_s {
         my ($self) = @_;
