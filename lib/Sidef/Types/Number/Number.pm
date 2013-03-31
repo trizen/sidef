@@ -43,7 +43,7 @@ package Sidef::Types::Number::Number {
 
     sub sqrt {
         my ($self) = @_;
-        Number::Float->new( CORE::sqrt $$self );
+        Sidef::Types::Number::Float->new( CORE::sqrt $$self );
     }
 
     sub abs {
@@ -53,22 +53,22 @@ package Sidef::Types::Number::Number {
 
     sub int {
         my ($self) = @_;
-        Number::Integer->new($$self);
+        Sidef::Types::Number::Integer->new($$self);
     }
 
     sub log {
         my ($self) = @_;
-        Number::Float->new( CORE::log $$self );
+        Sidef::Types::Number::Float->new( CORE::log $$self );
     }
 
     sub log10 {
         my ($self) = @_;
-        Number::Float->new( CORE::log($$self) / CORE::log(10) );
+        Sidef::Types::Number::Float->new( CORE::log($$self) / CORE::log(10) );
     }
 
     sub log2 {
         my ($self) = @_;
-        Number::Float->new( CORE::log($$self) / CORE::log(2) );
+        Sidef::Types::Number::Float->new( CORE::log($$self) / CORE::log(2) );
     }
 };
 

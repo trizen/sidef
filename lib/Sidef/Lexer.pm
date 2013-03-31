@@ -340,13 +340,15 @@ sub new {
 
 =cut
 
+=cut
+
 my $code = <<'CODE';
 
 81->sqrt;
 
 #12/(63/(2)/(3))->to_s->print;
 
-24/(18*(3))->to_s(3)->print;   # should print 4
+24/(18*(3))->to_s(3)->print;
 
 "string"->lc->uc->print;
 
@@ -360,6 +362,8 @@ my ($struct, $pos) = $lexer->parse_script(code => $code);
 
 use Data::Dump qw(pp);
 pp $struct;
+
+=cut
 
 __END__
 

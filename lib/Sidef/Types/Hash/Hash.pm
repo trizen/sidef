@@ -3,13 +3,9 @@ use 5.014;
 use strict;
 use warnings;
 
-package Sidef::Types::String::String {
+package Sidef::Types::Hash::Hash {
 
-    use parent qw(
-      Sidef::Convert::Convert
-    );
-
-    require Sidef::Types::Array::Array;
+    use parent qw(Sidef::Convert::Convert);
 
     sub new {
         my ( $class, $hash_ref ) = @_;

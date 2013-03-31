@@ -1,5 +1,97 @@
 #!/usr/bin/perl
 
+# This script will require Lexer.pm
+# and execute the returned data struct.
+
 use 5.014;
 use strict;
 use warnings;
+
+use lib '../lib';    # devel only
+
+use Sidef::Init;
+
+my $code = <<'CODE';
+
+81->sqrt->to_s->say;              # prints 9
+
+24/(18*(3))->to_s->say;           # prints 0.444444444444444
+
+"string"->lc->uc->say;            # prints STRING
+
+44.2->int->log10->to_s->say;      # prints 1.64345267648619
+
+CODE
+
+my $lexer = Sidef::Lexer->new();
+my ($struct, $pos) = $lexer->parse_script(code => $code);
+
+#use Data::Dump qw(pp);
+#pp $struct;
+
+=cut
+    {
+      call => [{ name => "sqrt" }, { name => "to_s" }, { name => "print" }],
+      self => bless(do{\(my $o = 81)}, "Sidef::Types::Number::Integer"),
+    },
+=cut
+
+sub execute_expr {
+    my (%opt) = @_;
+
+    my $expr = $opt{'expr'};
+
+    if (exists $expr->{self}) {
+
+        my $self = $expr->{self};
+
+        if (exists $expr->{call}) {
+            foreach my $call (@{$expr->{call}}) {
+
+                my @arguments;
+                my $method = $call->{name};
+
+                if (exists $call->{arg}) {
+
+                    foreach my $arg (@{$call->{arg}}) {
+
+                        if (exists $arg->{main}) {
+                            foreach my $arg_expr (@{$arg->{main}}) {
+                                my $eval_arg = execute_expr(expr => $arg_expr);
+                                push @arguments, $eval_arg;
+                            }
+                        }
+
+                    }
+
+                    $self = $self->$method(@arguments);
+                }
+                else {
+
+                    $self = $self->$method;
+                }
+            }
+        }
+
+        return $self;
+    }
+    else {
+        die "Struct error!\n";
+    }
+}
+
+sub execute {
+    my (%opt) = @_;
+
+    my $struct = $opt{'struct'};
+
+    foreach my $key (keys %{$struct}) {
+        foreach my $expr (@{$struct->{$key}}) {
+            execute_expr(expr => $expr);
+        }
+
+    }
+
+}
+
+execute(struct => $struct);
