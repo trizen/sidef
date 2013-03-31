@@ -15,9 +15,10 @@ sub new {
 }
 
 {
-    my $line        = 1;
-    my $cbracket    = 0;
-    my $parentheses = 0;
+    my $line          = 1;
+    my $expect_method = 0;
+    my $cbracket      = 0;
+    my $parentheses   = 0;
 
     state $operators_re = do {
         local $" = q{|};
@@ -102,6 +103,7 @@ sub new {
                 }
 
                 when (/\G;/gc || /\G\z/gc) {
+                    $expect_method = 0;
                     return undef, pos;
                 }
                 when (/\G$double_quote/gc) {
@@ -192,7 +194,7 @@ sub new {
                 when (/\G\z/gc) {
                     return \%struct;
                 }
-                when (/\G->/gc || /\G(?=\s*$operators_re)/) {
+                when ($expect_method == 1 && (/\G->/gc || /\G(?=\s*$operators_re)/)) {
 
                     my ($method_name, $pos) = $self->get_method_name(code => substr($_, pos));
                     pos($_) = $pos + pos;
@@ -268,6 +270,7 @@ sub new {
 
                     if (defined $obj) {
                         push @{$struct{$class}}, {self => $obj,};
+                        $expect_method = 1;
                         redo;
                     }
                     else {

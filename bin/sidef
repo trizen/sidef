@@ -13,9 +13,9 @@ use Sidef::Init;
 
 my $code = <<'CODE';
 
-81->sqrt->to_s->say;              # prints 9
+-81->abs->sqrt->to_s->say;        # prints 9
 
-24/(18*(3))->to_s->say;           # prints 0.444444444444444
+24/(18*(3/(1)))->to_s->say;       # prints 0.444444444444444
 
 "string"->lc->uc->say;            # prints STRING
 
