@@ -16,28 +16,28 @@ package Sidef::Types::Number::Number {
         no strict 'refs';
 
         *{ __PACKAGE__ . '::' . '/' } = sub {
-            my ( $self, $div ) = @_;
-            __PACKAGE__->new( $$self / $$div );
+            my ( $self, $arg ) = @_;
+            __PACKAGE__->new( $$self / $$arg );
         };
 
         *{ __PACKAGE__ . '::' . '*' } = sub {
-            my ( $self, $div ) = @_;
-            __PACKAGE__->new( $$self * $$div );
+            my ( $self, $arg ) = @_;
+            __PACKAGE__->new( $$self * $$arg );
         };
 
         *{ __PACKAGE__ . '::' . '+' } = sub {
-            my ( $self, $div ) = @_;
-            __PACKAGE__->new( $$self + $$div );
+            my ( $self, $arg ) = @_;
+            __PACKAGE__->new( $$self + $$arg );
         };
 
         *{ __PACKAGE__ . '::' . '-' } = sub {
-            my ( $self, $div ) = @_;
-            __PACKAGE__->new( $$self - $$div );
+            my ( $self, $arg ) = @_;
+            __PACKAGE__->new( $$self - $$arg );
         };
 
         *{ __PACKAGE__ . '::' . '%' } = sub {
-            my ( $self, $div ) = @_;
-            __PACKAGE__->new( $$self % $$div );
+            my ( $self, $arg ) = @_;
+            __PACKAGE__->new( $$self % $$arg );
         };
     }
 

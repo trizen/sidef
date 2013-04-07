@@ -16,6 +16,7 @@ sub new {
 
 {
     my $line          = 1;
+    my $has_object    = 0;
     my $expect_method = 0;
     my $cbracket      = 0;
     my $parentheses   = 0;
@@ -35,9 +36,8 @@ sub new {
 
     sub syntax_error {
         my ($self, %opt) = @_;
-        die "Syntax error near: --->",
-          substr($opt{'code'}, $opt{'pos'}, index($opt{'code'}, "\n", $opt{'pos'}) - $opt{'pos'}),
-          "<--- at line $line.\n";
+        die "\n** Syntax error at line $line, near:\n\t\"",
+          substr($opt{'code'}, $opt{'pos'}, index($opt{'code'}, "\n", $opt{'pos'}) - $opt{'pos'}), "\"\n";
     }
 
     sub get_method_name {
@@ -49,14 +49,15 @@ sub new {
                 pos($_) = $pos + pos($_);
             }
 
-            when (/\G(\w+)/gc) {
+            when (/\G([a-z]\w+)/gc) {
                 return $1, pos;
             }
             when (m{\G$operators_re}gc) {
                 return $1, pos;
             }
             default {
-                die "Invalid method name, at line $line.\n";
+                warn "Invalid method name!\n";
+                $self->syntax_error(code => $_, pos => pos($_));
             }
         }
     }
@@ -64,8 +65,10 @@ sub new {
     sub parse_whitespace {
         my ($self, %opt) = @_;
 
+        my $found_space = -1;
         given ($opt{code}) {
             {
+                ++$found_space;
                 when (/\G#.*/gc) {
                     redo;
                 }
@@ -81,8 +84,11 @@ sub new {
                         redo;
                     }
                 }
-                default {
+                when ($found_space > 0) {
                     return pos;
+                }
+                default {
+                    return;
                 }
             }
         }
@@ -102,10 +108,13 @@ sub new {
                     pos($_) = $pos + pos($_);
                 }
 
-                when (/\G;/gc || /\G\z/gc) {
+                when (/\G;/gc || /\G\z/) {
+                    $has_object    = 0;
                     $expect_method = 0;
                     return undef, pos;
                 }
+
+                $has_object = 1;
                 when (/\G$double_quote/gc) {
                     return Sidef::Types::String::Double->new($1), pos;
                 }
@@ -115,15 +124,20 @@ sub new {
                 when (/\G((?>true|false))\b/gc) {
                     return Sidef::Types::Bool::Bool->new($1), pos;
                 }
-                when (/\G([+-]?\d+\.\d*)/gc) {
+                when (/\G([+-]?\d+\.\d+)\b/gc) {
                     return Sidef::Types::Number::Float->new($1), pos;
                 }
                 when (/\G([+-]?\d+)\b/gc) {
                     return Sidef::Types::Number::Integer->new($1), pos;
                 }
+                when (/\G(?=\()/) {
+                    my ($obj, $pos) = $self->parse_arguments(code => substr($_, pos));
+                    pos($_) = $pos + pos;
+                    return $obj, pos;
+                }
                 default {
-                    warn "Can't parse expression!\n";
-                    syntax_error(code => $_, pos => pos($_));
+                    warn "Invalid object type!\n";
+                    $self->syntax_error(code => $_, pos => pos($_));
                 }
             }
         }
@@ -132,36 +146,21 @@ sub new {
     sub parse_arguments {
         my ($self, %opt) = @_;
 
-        my @arg;
-
         given ($opt{'code'}) {
             {
-
                 if (/\G/gc && defined(my $pos = $self->parse_whitespace(code => substr($_, pos)))) {
                     pos($_) = $pos + pos($_);
                 }
 
                 when (/\G\(/gc) {
+                    $has_object = 0;
                     $parentheses++;
-                    redo;
-                }
-                when (/\G\)/gc) {
-                    $parentheses--;
-
-                    if ($parentheses == 0) {
-                        return \@arg, pos;
-                    }
-
-                    if ($parentheses < 0) {
-                        warn "Unbalanced parentheses!";
-                        syntax_error(code => $_, pos => pos($_));
-                    }
-
                     redo;
                 }
                 default {
                     my ($obj, $pos) = $self->parse_script(code => substr($_, pos));
-                    return $obj, $pos;
+                    pos($_) = $pos + pos;
+                    return $obj, pos;
                 }
 
             }
@@ -177,8 +176,11 @@ sub new {
 
         given ($opt{code}) {
             {
+                if (/\G/gc && defined(my $pos = $self->parse_whitespace(code => substr($_, pos)))) {
+                    pos($_) = $pos + pos;
+                }
 
-                when (/\Gclass\h+/gc) {
+                when (/\Gclass\h*/gc) {
                     when (/\G"(.*?)"/gc) {
                         $class = $1;
                         redo;
@@ -191,7 +193,7 @@ sub new {
                     die "Expected class name, at line $line.\n";
                 }
 
-                when (/\G\z/gc) {
+                when (/\G\z/) {
                     return \%struct;
                 }
                 when ($expect_method == 1 && (/\G->/gc || /\G(?=\s*$operators_re)/)) {
@@ -199,27 +201,11 @@ sub new {
                     my ($method_name, $pos) = $self->get_method_name(code => substr($_, pos));
                     pos($_) = $pos + pos;
 
-                    #die $method_name;
-
                     push @{$struct{$class}[-1]{call}}, {name => $method_name,};
-
                     redo;
-
-                    #if (/\G(\w+)/gc) {
-                    #     $method_name = $1;
-                    #}
-                    #elsif (m{\G([-+/*%])}gc) {
-                    #    $method_name = $1;
-                    #}
-
-                    #++$#{$struct{$class}[-1]{call}};
-                    #$struct{$class}[-1]{call} =
-
-                    #my ( $expr, $pos ) = parse_expr(code => substr($_, pos));
-
                 }
+                when ($has_object == 1 && /\G(?=\()/) {
 
-                when (/\G(?=\()/) {
                     my ($arg, $pos) = $self->parse_arguments(code => substr($_, pos));
                     pos($_) = $pos + pos;
 
@@ -228,53 +214,53 @@ sub new {
 
                     redo;
                 }
-
-                when (/\G\)/gc) {
-                    --$parentheses;
+                when ($has_object == 1 && /\G\)/gc) {
 
                     if (@{[caller(1)]}) {
+
+                        if (--$parentheses < 0) {    # for some reason, it's not working...
+                            warn "Unbalanced parentheses!\n";
+                            $self->syntax_error(code => $_, pos => pos($_) - 1);
+                        }
+
                         return (\%struct, pos);
                     }
-                    else {
-                        redo;
-                    }
 
-                    #say "->>>>", substr($_, pos);
+                    redo;
 
-                    #if($parentheses == 0){
-                    #    return (\%struct, pos);
-                    #}
-                    #els
-                    #else{
-                    #    return \%struct, pos;
-                    #}
-
-                    # redo;
-                    #--$parentheses;
-
-                    #redo;
                 }
+
+                ## Support for variables
+                ## might be defined bellow.
+
+                #when(/\G\w+/gc){
+                #    warn "Variables not implemented, yet!\n";
+                #      $self->syntax_error(code => $_, pos => pos($_));
+                #}
+
+                ## This code will be used to support
+                ## more than one argument for a method
 
                 #while(/\G\h*,/gc){
                 #        my($obj, $pos) = parse_expr( code => substr($_, pos) );
                 #        pos($_) = $pos + pos;
-
-                # push as argument
                 # }
 
-                when (/\G/gc) {
+                default {
 
                     my $expr = substr($_, pos);
                     my ($obj, $pos) = $self->parse_expr(code => $expr);
                     pos($_) = $pos + pos;
 
                     if (defined $obj) {
-                        push @{$struct{$class}}, {self => $obj,};
+
+                        $has_object    = 1;
                         $expect_method = 1;
+
+                        push @{$struct{$class}}, {self => $obj};
                         redo;
                     }
                     else {
-                        # die "Undefined object, at line $line.\n";
                         redo;
                     }
 
@@ -285,151 +271,4 @@ sub new {
         return \%struct;
 
     }
-
-}
-
-=cut
-
-    {
-    main => [
-      {
-            self => Number->new(81),
-            call => [
-                {
-                name => 'sqrt',
-                arg => [],
-                }
-            ],
-    },
-
-    {
-        self => String->new('string'),
-        call => [
-            {
-                name => 'lc',
-                arg => [],
-            },
-            {
-                name => 'uc',
-                arg => [],
-            },
-            {
-                name => 'print',
-                arg => [],
-            }
-        ],
-
-    },
-
-    {
-    self => Number->new(12);
-    arg => [
-        {
-        self => Number->new(63),
-        arg => [
-            {
-                self => Number->new(2),
-            },
-        ],
-        call => ['/'],
-    }
-    ],
-    call => ['/', 'to_s', 'print'],
-
-    }
-    ],
-    class => [],
-}
-
-=cut
-
-=cut
-
-my $code = <<'CODE';
-
-81->sqrt;
-
-#12/(63/(2)/(3))->to_s->print;
-
-24/(18*(3))->to_s(3)->print;
-
-"string"->lc->uc->print;
-
-
-44.2->int->log10;
-
-CODE
-
-my $lexer = Sidef::Lexer->new();
-my ($struct, $pos) = $lexer->parse_script(code => $code);
-
-use Data::Dump qw(pp);
-pp $struct;
-
-=cut
-
-__END__
-
-BINGO!!!
-
-
-{
-  main => [
-    {
-      call => [{ name => "sqrt" }],
-      self => bless(do{\(my $o = 81)}, "Sidef::Types::Number::Integer"),
-    },
-    {
-      call => [
-                {
-                  arg  => [
-                            {
-                              main => [
-                                {
-                                  call => [
-                                            {
-                                              arg  => [
-                                                        {
-                                                          main => [
-                                                            {
-                                                              self => bless(do{\(my $o = 3)}, "Sidef::Types::Number::Integer"),
-                                                            },
-                                                          ],
-                                                        },
-                                                      ],
-                                              name => "*",
-                                            },
-                                          ],
-                                  self => bless(do{\(my $o = 18)}, "Sidef::Types::Number::Integer"),
-                                },
-                              ],
-                            },
-                          ],
-                  name => "/",
-                },
-                {
-                  arg  => [
-                            {
-                              main => [
-                                {
-                                  self => bless(do{\(my $o = 3)}, "Sidef::Types::Number::Integer"),
-                                },
-                              ],
-                            },
-                          ],
-                  name => "to_s",
-                },
-                { name => "print" },
-              ],
-      self => bless(do{\(my $o = 24)}, "Sidef::Types::Number::Integer"),
-    },
-    {
-      call => [{ name => "lc" }, { name => "uc" }, { name => "print" }],
-      self => bless(do{\(my $o = "string")}, "Sidef::Types::String::Double"),
-    },
-    {
-      call => [{ name => "int" }, { name => "log10" }],
-      self => bless(do{\(my $o = 44.2)}, "Sidef::Types::Number::Float"),
-    },
-  ],
 }

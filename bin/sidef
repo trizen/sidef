@@ -8,21 +8,49 @@ use strict;
 use warnings;
 
 use lib '../lib';    # devel only
+use autouse 'Getopt::Std' => qw(getopts($;$));    # arguments support
 
-use Sidef::Init;
+my %args;
+if (qr/^-/ ~~ \@ARGV) {
+    getopts('E:', \%args);
+}
 
-my $code = <<'CODE';
+# It can be executed as:
+#   perl sidef -E '"test"->say'
+
+my $code = exists $args{E} ? $args{E} : <<'CODE';
+
+###################################
+# Error testing
+###################################
+#test->3;     # Invalid object type!
+#3->5;        # Invalid method name!
+###################################
+
+
+###################################
+# Code testing
+###################################
+
+(42 / ( 3/(1.0) ) )->to_s->say;   # prints 14
+
+((((((60+(40)))))))->to_s->say;   # prints 100
+
+((42-(4.3*(3)))/(6))->to_s->say;  # prints 4.85
 
 -81->abs->sqrt->to_s->say;        # prints 9
 
 24/(18*(3/(1)))->to_s->say;       # prints 0.444444444444444
 
-"string"->lc->uc->say;            # prints STRING
+"StRinG"->lc->uc->say;            # prints STRING
 
 44.2->int->log10->to_s->say;      # prints 1.64345267648619
 
+###################################
+
 CODE
 
+require Sidef::Lexer;
 my $lexer = Sidef::Lexer->new();
 my ($struct, $pos) = $lexer->parse_script(code => $code);
 
@@ -44,6 +72,10 @@ sub execute_expr {
     if (exists $expr->{self}) {
 
         my $self = $expr->{self};
+
+        if (ref $self eq 'HASH') {
+            ($self) = execute(struct => $self);
+        }
 
         if (exists $expr->{call}) {
             foreach my $call (@{$expr->{call}}) {
@@ -85,13 +117,14 @@ sub execute {
 
     my $struct = $opt{'struct'};
 
+    my @results;
     foreach my $key (keys %{$struct}) {
         foreach my $expr (@{$struct->{$key}}) {
-            execute_expr(expr => $expr);
+            push @results, execute_expr(expr => $expr);
         }
-
     }
 
+    return @results;
 }
 
 execute(struct => $struct);
