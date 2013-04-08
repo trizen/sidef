@@ -16,6 +16,7 @@ sub new {
 
 {
     my %variables;
+
     my $class = 'main';
     my $line          = 1;
     my $has_object    = 0;
@@ -137,7 +138,7 @@ sub new {
                     pos($_) = $pos + pos;
                     return $obj, pos;
                 }
-                when (/\G([a-zA-Z]\w+)(?=\s*=)/gc){
+                when (/\G([a-zA-Z]\w+)(?=\s*=\s*\()/gc){
                     my $variable = Sidef::Variable::Variable->new($1);
                     $variables{$class}{$1} = $variable;
                     return $variable, pos;

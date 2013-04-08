@@ -23,7 +23,7 @@ my $code = exists $args{E} ? $args{E} : <<'CODE';
 ###################################
 # Error testing
 ###################################
-# test->3;     # Invalid object type!
+# +->say;      # Invalid object type!
 # 3->5;        # Invalid method name!
 # var->say;    # Attempt to use an uninitialized variable: <var>
 ###################################
@@ -39,8 +39,8 @@ hello->say;                       # prints "Hello, World!" from var 'hello'
 hello = ("Goodbye, World!");      # assign another string to variable 'hello'
 hello->say;                       # prints the last assigned string.
 
-diff = (43-(23));                 # assign value to diff
-diff->to_s->say;                  # print the values assigned to diff (20)
+diff = (43-(23));                 # assign value to 'diff'
+diff->to_s->say;                  # print the value stored into 'diff' (20)
 
 (42 / ( 3/(1.0) ) )->to_s->say;   # prints 14
 
@@ -49,6 +49,8 @@ diff->to_s->say;                  # print the values assigned to diff (20)
 ((42-(4.3*(3)))/(6))->to_s->say;  # prints 4.85
 
 -81->abs->sqrt->to_s->say;        # prints 9
+
+10/(3)->to_s->say;                # prints 3.3333333333333
 
 24/(18*(3/(1)))->to_s->say;       # prints 0.444444444444444
 
@@ -73,8 +75,6 @@ my ($struct, $pos) = $lexer->parse_script(code => $code);
       self => bless(do{\(my $o = 81)}, "Sidef::Types::Number::Integer"),
     },
 =cut
-
-my %variables;
 
 sub execute_expr {
     my (%opt) = @_;
@@ -102,6 +102,7 @@ sub execute_expr {
                             push @arguments, execute(struct => $arg);
                         }
                         else {
+                            die 1;
                             push @arguments, $arg;
                         }
                     }
