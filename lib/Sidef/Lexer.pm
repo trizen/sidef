@@ -153,7 +153,7 @@ sub new {
                     $self->syntax_error(code => $_, pos => (pos($_) - length($1)));
                 }
                 default {
-                    warn "Invalid object type!\n";
+                    warn $expect_method ? "Invalid method caller!\n" : "Invalid object type!\n";
                     $self->syntax_error(code => $_, pos => pos($_));
                 }
             }
