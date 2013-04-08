@@ -17,12 +17,12 @@ sub new {
 {
     my %variables;
 
-    my $class = 'main';
     my $line          = 1;
     my $has_object    = 0;
     my $expect_method = 0;
     my $cbracket      = 0;
     my $parentheses   = 0;
+    my $class         = 'main';
 
     state $operators_re = do {
         local $" = q{|};
@@ -138,14 +138,14 @@ sub new {
                     pos($_) = $pos + pos;
                     return $obj, pos;
                 }
-                when (/\G([a-zA-Z]\w+)(?=\s*=\s*\()/gc){
+                when (/\G([a-zA-Z]\w+)(?=\s*=\s*\()/gc) {
                     my $variable = Sidef::Variable::Variable->new($1);
                     $variables{$class}{$1} = $variable;
                     return $variable, pos;
                 }
-                when (/\G([a-zA-Z]\w+)/gc){
+                when (/\G([a-zA-Z]\w+)/gc) {
 
-                    if(exists $variables{$class}{$1}){
+                    if (exists $variables{$class}{$1}) {
                         return $variables{$class}{$1}, pos;
                     }
 

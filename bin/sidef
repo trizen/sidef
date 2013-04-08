@@ -33,6 +33,9 @@ my $code = exists $args{E} ? $args{E} : <<'CODE';
 # Code testing
 ###################################
 
+init=("^_^ Sidef ^_^")->say;      # assings to variable 'init', and prints it
+init->uc->say;                    # upper cases the variable 'init', and prints it again
+
 hello = ("Hello, World!");        # assign a string value to variable 'hello'
 hello->say;                       # prints "Hello, World!" from var 'hello'
 
@@ -97,13 +100,8 @@ sub execute_expr {
                 if (exists $call->{arg}) {
 
                     foreach my $arg (@{$call->{arg}}) {
-
                         if (ref $arg eq 'HASH') {
                             push @arguments, execute(struct => $arg);
-                        }
-                        else {
-                            die 1;
-                            push @arguments, $arg;
                         }
                     }
 
