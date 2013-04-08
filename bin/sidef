@@ -23,14 +23,24 @@ my $code = exists $args{E} ? $args{E} : <<'CODE';
 ###################################
 # Error testing
 ###################################
-#test->3;     # Invalid object type!
-#3->5;        # Invalid method name!
+# test->3;     # Invalid object type!
+# 3->5;        # Invalid method name!
+# var->say;    # Attempt to use an uninitialized variable: <var>
 ###################################
 
 
 ###################################
 # Code testing
 ###################################
+
+hello = ("Hello, World!");        # assign a string value to variable 'hello'
+hello->say;                       # prints "Hello, World!" from var 'hello'
+
+hello = ("Goodbye, World!");      # assign another string to variable 'hello'
+hello->say;                       # prints the last assigned string.
+
+diff = (43-(23));                 # assign value to diff
+diff->to_s->say;                  # print the values assigned to diff (20)
 
 (42 / ( 3/(1.0) ) )->to_s->say;   # prints 14
 
@@ -64,6 +74,8 @@ my ($struct, $pos) = $lexer->parse_script(code => $code);
     },
 =cut
 
+my %variables;
+
 sub execute_expr {
     my (%opt) = @_;
 
@@ -72,7 +84,6 @@ sub execute_expr {
     if (exists $expr->{self}) {
 
         my $self = $expr->{self};
-
         if (ref $self eq 'HASH') {
             ($self) = execute(struct => $self);
         }
@@ -87,18 +98,21 @@ sub execute_expr {
 
                     foreach my $arg (@{$call->{arg}}) {
 
-                        if (exists $arg->{main}) {
-                            foreach my $arg_expr (@{$arg->{main}}) {
-                                my $eval_arg = execute_expr(expr => $arg_expr);
-                                push @arguments, $eval_arg;
-                            }
+                        if (ref $arg eq 'HASH') {
+                            push @arguments, execute(struct => $arg);
                         }
-
+                        else {
+                            push @arguments, $arg;
+                        }
                     }
 
                     $self = $self->$method(@arguments);
                 }
                 else {
+
+                    if (ref $self eq 'Sidef::Variable::Variable') {
+                        $self = $self->get_value;
+                    }
 
                     $self = $self->$method;
                 }

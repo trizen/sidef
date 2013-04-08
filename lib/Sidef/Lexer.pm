@@ -15,6 +15,8 @@ sub new {
 }
 
 {
+    my %variables;
+    my $class = 'main';
     my $line          = 1;
     my $has_object    = 0;
     my $expect_method = 0;
@@ -135,6 +137,20 @@ sub new {
                     pos($_) = $pos + pos;
                     return $obj, pos;
                 }
+                when (/\G([a-zA-Z]\w+)(?=\s*=)/gc){
+                    my $variable = Sidef::Variable::Variable->new($1);
+                    $variables{$class}{$1} = $variable;
+                    return $variable, pos;
+                }
+                when (/\G([a-zA-Z]\w+)/gc){
+
+                    if(exists $variables{$class}{$1}){
+                        return $variables{$class}{$1}, pos;
+                    }
+
+                    warn "Attempt to use an uninitialized variable: <$1>\n";
+                    $self->syntax_error(code => $_, pos => (pos($_) - length($1)));
+                }
                 default {
                     warn "Invalid object type!\n";
                     $self->syntax_error(code => $_, pos => pos($_));
@@ -172,8 +188,6 @@ sub new {
         my ($self, %opt) = @_;
 
         my %struct;
-        my $class = 'main';
-
         given ($opt{code}) {
             {
                 if (/\G/gc && defined(my $pos = $self->parse_whitespace(code => substr($_, pos)))) {

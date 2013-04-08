@@ -10,26 +10,22 @@ use warnings;
 
 use lib '..';
 
-require Sidef::Convert::Convert       if [caller]->[0] ne q{Sidef::Convert::Convert};
-require Sidef::Base                   if [caller]->[0] ne q{Sidef::Base};
-require Sidef::Init                   if [caller]->[0] ne q{Sidef::Init};
-require Sidef::Utils::Regex           if [caller]->[0] ne q{Sidef::Utils::Regex};
-require Sidef::Types::Hash::Hash      if [caller]->[0] ne q{Sidef::Types::Hash::Hash};
-require Sidef::Types::Array::Array    if [caller]->[0] ne q{Sidef::Types::Array::Array};
+require Sidef::Convert::Convert if [caller]->[0] ne q{Sidef::Convert::Convert};
+require Sidef::Base if [caller]->[0] ne q{Sidef::Base};
+require Sidef::Init if [caller]->[0] ne q{Sidef::Init};
+require Sidef::Utils::Regex if [caller]->[0] ne q{Sidef::Utils::Regex};
+require Sidef::Types::Hash::Hash if [caller]->[0] ne q{Sidef::Types::Hash::Hash};
+require Sidef::Types::Array::Array if [caller]->[0] ne q{Sidef::Types::Array::Array};
 require Sidef::Types::Number::Integer if [caller]->[0] ne q{Sidef::Types::Number::Integer};
-require Sidef::Types::Number::Number  if [caller]->[0] ne q{Sidef::Types::Number::Number};
-require Sidef::Types::Number::Float   if [caller]->[0] ne q{Sidef::Types::Number::Float};
-require Sidef::Types::String::Single  if [caller]->[0] ne q{Sidef::Types::String::Single};
-require Sidef::Types::String::Double  if [caller]->[0] ne q{Sidef::Types::String::Double};
-require Sidef::Types::String::String  if [caller]->[0] ne q{Sidef::Types::String::String};
-require Sidef::Types::Bool::Bool      if [caller]->[0] ne q{Sidef::Types::Bool::Bool};
-require Sidef::Types::Regex::Regex    if [caller]->[0] ne q{Sidef::Types::Regex::Regex};
-require Sidef::Lexer                  if [caller]->[0] ne q{Sidef::Lexer};
-require Sidef::Variable::Number       if [caller]->[0] ne q{Sidef::Variable::Number};
-require Sidef::Variable::String       if [caller]->[0] ne q{Sidef::Variable::String};
-require Sidef::Variable::Bool         if [caller]->[0] ne q{Sidef::Variable::Bool};
-require Sidef::Variable::Array        if [caller]->[0] ne q{Sidef::Variable::Array};
-require Sidef::Variable::Hash         if [caller]->[0] ne q{Sidef::Variable::Hash};
-require Sidef::Variable::Regex        if [caller]->[0] ne q{Sidef::Variable::Regex};
+require Sidef::Types::Number::Number if [caller]->[0] ne q{Sidef::Types::Number::Number};
+require Sidef::Types::Number::Float if [caller]->[0] ne q{Sidef::Types::Number::Float};
+require Sidef::Types::String::Single if [caller]->[0] ne q{Sidef::Types::String::Single};
+require Sidef::Types::String::Double if [caller]->[0] ne q{Sidef::Types::String::Double};
+require Sidef::Types::String::String if [caller]->[0] ne q{Sidef::Types::String::String};
+require Sidef::Types::Bool::Bool if [caller]->[0] ne q{Sidef::Types::Bool::Bool};
+require Sidef::Types::Regex::Regex if [caller]->[0] ne q{Sidef::Types::Regex::Regex};
+require Sidef::Lexer if [caller]->[0] ne q{Sidef::Lexer};
+require Sidef::Variable::Variable if [caller]->[0] ne q{Sidef::Variable::Variable};
+
 
 1;
