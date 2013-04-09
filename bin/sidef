@@ -43,6 +43,7 @@ my $code = exists $args{E} ? $args{E} : <<'CODE';
 
 var x = "RaNdOm StRiNg"->lc;   # WRONG!!!
 var y = ("RaNdOm StRiNg"->lc); # RIGHT!!!
+var z = "\LRaNdOm StRiNg";     # Also, right.
 
 x->say;     # prints 'RaNdOm StRiNg'
 y->say;     # prints 'random string'
@@ -56,19 +57,21 @@ name->say;                 # and print it
 12/3*4->to_s->say;      # Prints 16
 
 ###############################################
-################## OLD STUFF ##################
+################# OTHER STUFF #################
 ###############################################
 
 var init=("^_^ Sidef ^_^")->say;  # assings to variable 'init', and prints it
 init->uc->say;                    # upper cases the variable 'init', and prints it again
 
-var hello = ("Hello, World!");    # assign a string value to variable 'hello'
+"\n\uvariable interpolation ==> \L$init\\\\\E <== is Working\n"->say;
+
+var hello = "Hello, World!";      # assign a string value to variable 'hello'
 hello->say;                       # prints "Hello, World!" from var 'hello'
 
-hello = ("Goodbye, World!");      # assign another string to variable 'hello'
-hello->say;                       # prints the last assigned string.
+hello = ("Goodbye, World!\n");    # assign another string to variable 'hello'
+hello->print;                     # prints the last assigned string.
 
-var diff = (43-(23));             # assign value to 'diff'
+var diff = (43-23);               # assign value to 'diff'
 diff->to_s->say;                  # print the value stored into 'diff' (20)
 
 (42 / ( 3/(1.0) ) )->to_s->say;   # prints 14
@@ -107,6 +110,25 @@ my ($struct, $pos) = $lexer->parse_script(code => $code);
     },
 =cut
 
+my %variables;
+
+sub interpolate {
+    my (%opt) = @_;
+
+    my $self = $opt{self};
+
+    ${$self} =~ s{\$([a-zA-Z_]\w*)\b}{
+                exists $variables{$opt{class}}{$1}
+                    ? $variables{$opt{class}}{$1}
+                    : do{
+                        warn "Use of uninitialized variable <$1> in double quoted string!\n";
+                        q{};
+                    };
+        }eg;
+
+    $self->apply_escapes;
+}
+
 sub execute_expr {
     my (%opt) = @_;
 
@@ -117,6 +139,10 @@ sub execute_expr {
         my $self = $expr->{self};
         if (ref $self eq 'HASH') {
             ($self) = execute(struct => $self);
+        }
+
+        if (ref $self eq 'Sidef::Types::String::Double') {
+            interpolate(self => $self, class => $opt{class});
         }
 
         if (exists $expr->{call}) {
@@ -136,12 +162,20 @@ sub execute_expr {
                         }
                     }
 
+                    foreach my $obj (@arguments) {
+                        if (ref $obj eq 'Sidef::Types::String::Double') {
+                            interpolate(self => $obj, class => $opt{class});
+                        }
+                    }
+
                     $self = $self->$method(@arguments);
                 }
                 else {
 
                     if (ref $self eq 'Sidef::Variable::Variable') {
-                        $self = $self->get_value;
+                        my $value = $self->get_value;
+                        $variables{$opt{class}}{$self->get_name} = $value;
+                        $self = $value;
                     }
 
                     $self = $self->$method;
@@ -164,7 +198,7 @@ sub execute {
     my @results;
     foreach my $key (keys %{$struct}) {
         foreach my $expr (@{$struct->{$key}}) {
-            push @results, execute_expr(expr => $expr);
+            push @results, execute_expr(class => $key, expr => $expr);
         }
     }
 

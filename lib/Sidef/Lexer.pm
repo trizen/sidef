@@ -9,6 +9,8 @@ package Sidef::Lexer;
 
 use Sidef::Init;
 
+our $DEBUG = 0;
+
 sub new {
     my ($class) = @_;
     bless {}, $class;
@@ -37,6 +39,10 @@ sub new {
         qr{(@operators)};
     };
 
+    state $var_re       = qr/[a-zA-Z_]\w*/;
+    state $double_quote = Sidef::Utils::Regex::make_esc_delim(q{"});
+    state $single_quote = Sidef::Utils::Regex::make_esc_delim(q{'});
+
     sub syntax_error {
         my ($self, %opt) = @_;
         die "\n** Syntax error at line $line, near:\n\t\"",
@@ -52,9 +58,12 @@ sub new {
                 pos($_) = $pos + pos($_);
             }
 
+            # Alpha-numeric method name
             when (/\G([a-z]\w+)/gc) {
                 return $1, pos;
             }
+
+            # Operator-like method name
             when (m{\G$operators_re}gc) {
                 return $1, pos;
             }
@@ -72,17 +81,25 @@ sub new {
         given ($opt{code}) {
             {
                 ++$found_space;
+
+                # Comments
                 when (/\G#.*/gc) {
                     redo;
                 }
                 when (/\G(?=[\h\v])/) {
+
+                    # Generic line
                     when (/\G\R/gc) {
                         ++$line;
                         redo;
                     }
+
+                    # Horizontal space
                     when (/\G\h+/gc) {
                         redo;
                     }
+
+                    # Vertical space
                     when (/\G\v+/gc) {
                         redo;
                     }
@@ -102,15 +119,13 @@ sub new {
     sub parse_expr {
         my ($self, %opt) = @_;
 
-        state $double_quote = Sidef::Utils::Regex::make_esc_delim(q{"});
-        state $single_quote = Sidef::Utils::Regex::make_esc_delim(q{'});
-
         given ($opt{code}) {
             {
                 if (/\G/gc && defined(my $pos = $self->parse_whitespace(code => substr($_, pos)))) {
                     pos($_) = $pos + pos($_);
                 }
 
+                # End of the expression (or end of the file)
                 when (/\G;/gc || /\G\z/) {
                     $has_object    = 0;
                     $expect_method = 0;
@@ -118,43 +133,62 @@ sub new {
                 }
 
                 $has_object = 1;
+
+                # Double quoted string
                 when (/\G$double_quote/gc) {
                     return Sidef::Types::String::Double->new($1), pos;
                 }
+
+                # Single quoted string
                 when (/\G$single_quote/gc) {
                     return Sidef::Types::String::Single->new($1), pos;
                 }
+
+                # Boolean value
                 when (/\G((?>true|false))\b/gc) {
                     return Sidef::Types::Bool::Bool->new($1), pos;
                 }
+
+                # Floating point number
                 when (/\G([+-]?\d+\.\d+)\b/gc) {
                     return Sidef::Types::Number::Float->new($1), pos;
                 }
+
+                # Integer number
                 when (/\G([+-]?\d+)\b/gc) {
                     return Sidef::Types::Number::Integer->new($1), pos;
                 }
+
+                # Object as expression
                 when (/\G(?=\()/) {
                     my ($obj, $pos) = $self->parse_arguments(code => substr($_, pos));
                     pos($_) = $pos + pos;
                     return $obj, pos;
                 }
 
+                # Declaration of variables. (with 'var')
                 # Sorry about this. :)
-                when (/\Gvar\h+([a-zA-Z_]\w*)/gc) {    # /\G([a-zA-Z]\w+)(?=\s*=\s*\()/gc
+                when (/\Gvar\h+($var_re)/gc) {    # /\G([a-zA-Z]\w+)(?=\s*=\s*\()/gc
 
                     if (exists $variables{$class}{$1}) {
                         warn "Redeclaration of variable '$1' in same scope, at line $line\n";
                     }
 
                     my $variable = Sidef::Variable::Variable->new($1);
-                    $variables{$class}{$1} = $variable;
+                    $variables{$class}{$1} = {
+                                              obj   => $variable,
+                                              name  => $1,
+                                              count => 0,
+                                             };
                     return $variable, pos;
                 }
 
-                when (/\G([a-zA-Z]\w*)/gc) {
+                # Variable call
+                when (/\G($var_re)/gc) {
 
                     if (exists $variables{$class}{$1}) {
-                        return $variables{$class}{$1}, pos;
+                        $variables{$class}{$1}{count}++;
+                        return $variables{$class}{$1}{obj}, pos;
                     }
 
                     warn "Attempt to use an uninitialized variable: <$1>\n";
@@ -203,12 +237,12 @@ sub new {
                     pos($_) = $pos + pos;
                 }
 
+                # Class declaration
                 when (/\Gclass\h*/gc) {
-                    when (/\G"(.*?)"/gc) {
-                        $class = $1;
-                        redo;
-                    }
-                    when (/\G'(.*?)'/gc) {
+
+                    # Maybe, we should make some function: get_quoted_string()
+                    # which supports q{}, qq{}, '', and ""
+                    when (/\G($double_quote|$single_quote)/gc) {
                         $class = $1;
                         redo;
                     }
@@ -216,9 +250,25 @@ sub new {
                     die "Expected class name, at line $line.\n";
                 }
 
+                # We are at the end of the script file.
+                # We make some checks, and return the \%struct hash ref.
                 when (/\G\z/) {
+
+                    while (my (undef, $class_var) = each %variables) {
+                        while (my (undef, $variable) = each %{$class_var}) {
+                            if ($variable->{count} == 0) {
+                                warn "Variable '$variable->{name}' has been initialized, but not used!\n";
+                            }
+                            elsif ($DEBUG) {
+                                warn "Variable '$variable->{name} is used $variable->{count} times!\n";
+                            }
+                        }
+                    }
+
                     return \%struct;
                 }
+
+                # Method separator '->', or operator-method, like '*'
                 when ($expect_method == 1 && (/\G->/gc || /\G(?=\s*$operators_re)/)) {
 
                     my ($method_name, $pos) = $self->get_method_name(code => substr($_, pos));
@@ -227,6 +277,8 @@ sub new {
                     push @{$struct{$class}[-1]{call}}, {name => $method_name,};
                     redo;
                 }
+
+                # Beginning of an argument expression
                 when ($has_object == 1 && /\G(?=\()/) {
 
                     my ($arg, $pos) = $self->parse_arguments(code => substr($_, pos));
@@ -235,6 +287,8 @@ sub new {
                     push @{$struct{$class}[-1]{call}[-1]{arg}}, $arg;
                     redo;
                 }
+
+                # The end of an argument expression
                 when ($has_object == 1 && /\G\)/gc) {
 
                     if (@{[caller(1)]}) {
@@ -250,6 +304,8 @@ sub new {
                     redo;
 
                 }
+
+                # Argument as object, without parentheses
                 when ($has_object == 1 && $expect_method == 1) {
 
                     my $expr = substr($_, pos);
@@ -274,6 +330,7 @@ sub new {
                 #        pos($_) = $pos + pos;
                 # }
 
+                # Parse expression or object and use it as main object (self)
                 default {
 
                     my $expr = substr($_, pos);
@@ -296,7 +353,7 @@ sub new {
             }
         }
 
-        return \%struct;
+        die "Invalid code or something weird is happening! :)\n";
 
     }
 }
