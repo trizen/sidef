@@ -60,6 +60,8 @@ name->say;                 # and print it
 ################# OTHER STUFF #################
 ###############################################
 
+
+
 var init = "^_^ Sidef ^_^"->say;  # assings to variable 'init', and prints it
 init->uc->say;                    # upper cases the variable 'init', and prints it again
 
@@ -163,12 +165,18 @@ sub execute_expr {
                     }
 
                     foreach my $obj (@arguments) {
+
                         if (ref $obj eq 'Sidef::Types::String::Double') {
                             interpolate(self => $obj, class => $opt{class});
                         }
                     }
 
-                    $self = $self->$method(@arguments);
+                    my $value = $self->$method(@arguments);
+                    if (ref $self eq 'Sidef::Variable::Variable') {
+                        $variables{$opt{class}}{$self->get_name} = $value;
+                    }
+                    $self = $value;
+
                 }
                 else {
 
