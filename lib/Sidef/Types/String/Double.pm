@@ -37,7 +37,9 @@ package Sidef::Types::String::Double {
 
                 $1 eq 'l' ? lc($2) : uc($2);
 
-            }eg;
+            }egs;
+
+            ${$self} =~ s{\\(.)}{$1}gs;
         }
 
         return $self;

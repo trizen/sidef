@@ -45,13 +45,15 @@ var x = "RaNdOm StRiNg"->lc;   # WRONG!!!
 var y = ("RaNdOm StRiNg"->lc); # RIGHT!!!
 var z = "\LRaNdOm StRiNg";     # Also, right.
 
+"\nescaped variable: \$var\n"->say;
+
 #
 ## Single-quoted string to double-quoted string
 #
 
 var single = 'this is a test -- $y -- \n';
 single->say;
-(single->to_sd)->print;
+(single->to_sd)->say;
 
 # -----------------------------------------------
 
@@ -129,7 +131,7 @@ sub interpolate {
 
     my $self = $opt{self};
 
-    ${$self} =~ s{\$([a-zA-Z_]\w*)\b}{
+    ${$self} =~ s{(?<!\\)(?:\\\\)*\$([a-zA-Z_]\w*)\b}{
                 exists $variables{$opt{class}}{$1}
                     ? $variables{$opt{class}}{$1}
                     : do{
