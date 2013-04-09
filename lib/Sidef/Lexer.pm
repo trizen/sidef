@@ -138,12 +138,20 @@ sub new {
                     pos($_) = $pos + pos;
                     return $obj, pos;
                 }
-                when (/\G([a-zA-Z]\w+)(?=\s*=\s*\()/gc) {
+
+                # Sorry about this. :)
+                when (/\Gvar\h+([a-zA-Z_]\w*)/gc) {    # /\G([a-zA-Z]\w+)(?=\s*=\s*\()/gc
+
+                    if (exists $variables{$class}{$1}) {
+                        warn "Redeclaration of variable '$1' in same scope, at line $line\n";
+                    }
+
                     my $variable = Sidef::Variable::Variable->new($1);
                     $variables{$class}{$1} = $variable;
                     return $variable, pos;
                 }
-                when (/\G([a-zA-Z]\w+)/gc) {
+
+                when (/\G([a-zA-Z]\w*)/gc) {
 
                     if (exists $variables{$class}{$1}) {
                         return $variables{$class}{$1}, pos;
@@ -224,16 +232,14 @@ sub new {
                     my ($arg, $pos) = $self->parse_arguments(code => substr($_, pos));
                     pos($_) = $pos + pos;
 
-                    #push @{$struct{$class}[-1]{arg}}, $arg;
                     push @{$struct{$class}[-1]{call}[-1]{arg}}, $arg;
-
                     redo;
                 }
                 when ($has_object == 1 && /\G\)/gc) {
 
                     if (@{[caller(1)]}) {
 
-                        if (--$parentheses < 0) {    # for some reason, it's not working...
+                        if (--$parentheses < 0) {
                             warn "Unbalanced parentheses!\n";
                             $self->syntax_error(code => $_, pos => pos($_) - 1);
                         }
@@ -244,14 +250,21 @@ sub new {
                     redo;
 
                 }
+                when ($has_object == 1 && $expect_method == 1) {
 
-                ## Support for variables
-                ## might be defined bellow.
+                    my $expr = substr($_, pos);
+                    my ($obj, $pos) = $self->parse_expr(code => $expr);
 
-                #when(/\G\w+/gc){
-                #    warn "Variables not implemented, yet!\n";
-                #      $self->syntax_error(code => $_, pos => pos($_));
-                #}
+                    if (defined $obj) {
+                        pos($_) = $pos + pos;
+                        push @{$struct{$class}[-1]{call}[-1]{arg}}, $obj;
+                        redo;
+                    }
+                    else {
+                        continue;
+                    }
+
+                }
 
                 ## This code will be used to support
                 ## more than one argument for a method

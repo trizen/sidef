@@ -33,19 +33,47 @@ my $code = exists $args{E} ? $args{E} : <<'CODE';
 # Code testing
 ###################################
 
-init=("^_^ Sidef ^_^")->say;      # assings to variable 'init', and prints it
+###############################################
+##### NEW WAY TO INITIALIZE THE VARIABLES #####
+###############################################
+#
+# optional parentheses for arguments
+#
+###############################################
+
+var x = "RaNdOm StRiNg"->lc;   # WRONG!!!
+var y = ("RaNdOm StRiNg"->lc); # RIGHT!!!
+
+x->say;     # prints 'RaNdOm StRiNg'
+y->say;     # prints 'random string'
+
+var name = "Trizen";       # initialize variable "name"
+name->say;                 # and print it
+
+6+4/2->to_s->say;       # WRONG!!! Prints 5
+6+(4/2)->to_s->say;     # RIGHT!!! Prints 8
+
+12/3*4->to_s->say;      # Prints 16
+
+###############################################
+################## OLD STUFF ##################
+###############################################
+
+var init=("^_^ Sidef ^_^")->say;  # assings to variable 'init', and prints it
 init->uc->say;                    # upper cases the variable 'init', and prints it again
 
-hello = ("Hello, World!");        # assign a string value to variable 'hello'
+var hello = ("Hello, World!");    # assign a string value to variable 'hello'
 hello->say;                       # prints "Hello, World!" from var 'hello'
 
 hello = ("Goodbye, World!");      # assign another string to variable 'hello'
 hello->say;                       # prints the last assigned string.
 
-diff = (43-(23));                 # assign value to 'diff'
+var diff = (43-(23));             # assign value to 'diff'
 diff->to_s->say;                  # print the value stored into 'diff' (20)
 
 (42 / ( 3/(1.0) ) )->to_s->say;   # prints 14
+
+24 -> / (6)->to_s->say;           # prints 4 ( "/" is a method! )
 
 ((((((60+(40)))))))->to_s->say;   # prints 100
 
@@ -102,6 +130,9 @@ sub execute_expr {
                     foreach my $arg (@{$call->{arg}}) {
                         if (ref $arg eq 'HASH') {
                             push @arguments, execute(struct => $arg);
+                        }
+                        else {
+                            push @arguments, $arg;
                         }
                     }
 
