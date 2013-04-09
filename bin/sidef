@@ -45,6 +45,16 @@ var x = "RaNdOm StRiNg"->lc;   # WRONG!!!
 var y = ("RaNdOm StRiNg"->lc); # RIGHT!!!
 var z = "\LRaNdOm StRiNg";     # Also, right.
 
+#
+## Single-quoted string to double-quoted string
+#
+
+var single = 'this is a test -- $y -- \n';
+single->say;
+(single->to_sd)->print;
+
+# -----------------------------------------------
+
 x->say;     # prints 'RaNdOm StRiNg'
 y->say;     # prints 'random string'
 
