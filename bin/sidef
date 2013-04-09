@@ -131,7 +131,7 @@ sub interpolate {
 
     my $self = $opt{self};
 
-    ${$self} =~ s{(?<!\\)(?:\\\\)*\$([a-zA-Z_]\w*)\b}{
+    ${$self} =~ s{(?<!\\)(?:\\\\)*+\K\$([a-zA-Z_]\w*)\b}{
                 exists $variables{$opt{class}}{$1}
                     ? $variables{$opt{class}}{$1}
                     : do{

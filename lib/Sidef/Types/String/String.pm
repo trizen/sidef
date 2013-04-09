@@ -1,5 +1,5 @@
 
-use 5.016;
+use 5.014;
 use strict;
 use warnings;
 
@@ -24,6 +24,7 @@ package Sidef::Types::String::String {
 
     sub say {
         my ($self) = @_;
+
         (CORE::say $$self)
           ? Sidef::Types::Bool::Bool->true
           : Sidef::Types::Bool::Bool->false;

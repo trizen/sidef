@@ -39,6 +39,11 @@ package Sidef::Types::Number::Number {
             my ( $self, $arg ) = @_;
             __PACKAGE__->new( $$self % $$arg );
         };
+
+        *{ __PACKAGE__ . '::' . '**' } = sub {
+            my ( $self, $arg ) = @_;
+            __PACKAGE__->new( $$self ** $$arg );
+        };
     }
 
     sub sqrt {
