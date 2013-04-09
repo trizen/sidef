@@ -48,8 +48,10 @@ var z = "\LRaNdOm StRiNg";     # Also, right.
 x->say;     # prints 'RaNdOm StRiNg'
 y->say;     # prints 'random string'
 
-var name = "Trizen";       # initialize variable "name"
-name->say;                 # and print it
+var name = "Ioana";       # initialize variable "name"
+
+"Hello, $name! How are you? :)\n"->print;
+name->uc->say;
 
 6+4/2->to_s->say;       # WRONG!!! Prints 5
 6+(4/2)->to_s->say;     # RIGHT!!! Prints 8
@@ -59,8 +61,6 @@ name->say;                 # and print it
 ###############################################
 ################# OTHER STUFF #################
 ###############################################
-
-
 
 var init = "^_^ Sidef ^_^"->say;  # assings to variable 'init', and prints it
 init->uc->say;                    # upper cases the variable 'init', and prints it again
