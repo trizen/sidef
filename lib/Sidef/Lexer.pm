@@ -179,6 +179,7 @@ sub new {
                                               obj   => $variable,
                                               name  => $1,
                                               count => 0,
+                                              line  => $line,
                                              };
                     return $variable, pos;
                 }
@@ -257,7 +258,8 @@ sub new {
                     while (my (undef, $class_var) = each %variables) {
                         while (my (undef, $variable) = each %{$class_var}) {
                             if ($variable->{count} == 0) {
-                                warn "Variable '$variable->{name}' has been initialized, but not used!\n";
+                                warn "Variable '$variable->{name}' has been initialized"
+                                  . " at line $variable->{line}, but not used again!\n";
                             }
                             elsif ($DEBUG) {
                                 warn "Variable '$variable->{name} is used $variable->{count} times!\n";

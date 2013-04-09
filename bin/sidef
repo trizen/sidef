@@ -60,7 +60,7 @@ name->say;                 # and print it
 ################# OTHER STUFF #################
 ###############################################
 
-var init=("^_^ Sidef ^_^")->say;  # assings to variable 'init', and prints it
+var init = "^_^ Sidef ^_^"->say;  # assings to variable 'init', and prints it
 init->uc->say;                    # upper cases the variable 'init', and prints it again
 
 "\n\uvariable interpolation ==> \L$init\\\\\E <== is Working\n"->say;
