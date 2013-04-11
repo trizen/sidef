@@ -36,6 +36,11 @@ package Sidef::Types::String::String {
           ? Sidef::Types::Bool::Bool->true
           : Sidef::Types::Bool::Bool->false;
     }
+
+    sub stat_file {
+        my($self) = @_;
+        Sidef::Types::Glob::File->new($$self);
+    }
 }
 
 1;

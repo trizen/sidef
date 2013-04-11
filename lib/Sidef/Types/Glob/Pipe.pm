@@ -11,8 +11,7 @@ package Sidef::Types::Glob::Pipe {
 
     sub new {
         my ($class, $command) = @_;
-
-        bless {command => $command,}, $class;
+        bless {command => $command}, $class;
     }
 
     sub open {

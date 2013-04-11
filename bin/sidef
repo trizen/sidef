@@ -33,6 +33,34 @@ my $code = exists $args{E} ? $args{E} : <<'CODE';
 # Code testing
 ###################################
 
+###################
+# SUPPORT FOR FILES
+###################
+
+var file = ~sidef~;
+
+var size_kb = (file->size / 1024);
+
+"Size of sidef in bytes: "->print;
+size_kb * 1024 -> to_s -> say;
+
+"size of file 'sidef': $size_kb KB\n"->print;
+
+var fh = (file->open_r);
+"\n** Reading one line from 'sidef':" -> say;
+fh->readline->print;
+
+file = ("sidef"->stat_file);
+
+"\nFile name is: "->print;
+file->name->say;
+
+"Full path is: "->print;
+var abs_path = (file->abs_name)->say;
+
+"Dir name is:  "->print;
+abs_path->stat_file->dirname->say;
+
 ###############################################
 ##### NEW WAY TO INITIALIZE THE VARIABLES #####
 ###############################################
@@ -181,6 +209,12 @@ sub execute_expr {
                         if (ref $obj eq 'Sidef::Types::String::Double') {
                             interpolate(self => $obj, class => $opt{class});
                         }
+                    }
+
+                    if (ref $self eq 'Sidef::Variable::Variable' and $method ne '=') {
+                        my $value = $self->get_value;
+                        $variables{$opt{class}}{$self->get_name} = $value;
+                        $self = $value;
                     }
 
                     my $value = $self->$method(@arguments);

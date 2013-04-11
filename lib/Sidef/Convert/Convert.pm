@@ -27,6 +27,11 @@ package Sidef::Convert::Convert {
         Sidef::Types::Number::Float->new($$self);
     }
 
+    sub to_file {
+        my($self) = @_;
+        Sidef::Types::Glob::File->new($$self);
+    }
+
     sub to_b {
         my ($self) = @_;
         $$self
