@@ -8,11 +8,11 @@ package Sidef::Types::Bool::Bool {
     use parent qw(Sidef::Convert::Convert);
 
     use overload
-      q{bool} => sub { ${ $_[0] } eq ${ __PACKAGE__->true } },
+      q{bool} => sub { ${$_[0]} eq ${__PACKAGE__->true} },
       ;
 
     sub new {
-        my ( $class, $bool ) = @_;
+        my ($class, $bool) = @_;
         bless \$bool, $class;
     }
 
@@ -28,12 +28,12 @@ package Sidef::Types::Bool::Bool {
 
     sub is_true {
         my ($self) = @_;
-        $$self eq ${ $self->true } ? $self->true : $self->false;
+        $$self eq ${$self->true} ? $self->true : $self->false;
     }
 
     sub is_false {
         my ($self) = @_;
-        $$self eq ${ $self->false } ? $self->true : $self->false;
+        $$self eq ${$self->false} ? $self->true : $self->false;
     }
 
 }

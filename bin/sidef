@@ -102,6 +102,10 @@ name->uc->say;
 ################# OTHER STUFF #################
 ###############################################
 
+var num = 42;
+"Next power of two after number $num is: "->print;
+num->next_power_of_two->to_s->say;
+
 var init = "^_^ Sidef ^_^"->say;  # assings to variable 'init', and prints it
 init->uc->say;                    # upper cases the variable 'init', and prints it again
 

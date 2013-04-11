@@ -17,7 +17,7 @@ package Sidef::Types::Glob::FileHandle {
     }
 
     sub write {
-        my($self, $string) = @_;
+        my ($self, $string) = @_;
         print {$self->{fh}} $string;    # auto convert
     }
 
@@ -27,7 +27,7 @@ package Sidef::Types::Glob::FileHandle {
         Sidef::Types::String::Single->new($line);
     }
 
-    *read_line = \&readline;    # alias for readline
+    *read_line = \&readline;            # alias for readline
 
     sub file {
         my ($self) = @_;

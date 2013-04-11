@@ -8,7 +8,7 @@ package Sidef::Types::Number::Float {
     use parent qw(Sidef::Types::Number::Number);
 
     sub new {
-        my ( $class, $float ) = @_;
+        my ($class, $float) = @_;
         bless \$float, $class;
     }
 

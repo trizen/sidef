@@ -14,7 +14,7 @@ package Sidef::Types::Glob::Dir {
 
     # Returns the parent of a directory
     sub parent {
-        my($self) = @_;
+        my ($self) = @_;
 
         require File::Basename;
         __PACKAGE__->new(File::Basename::dirname($$self));
@@ -24,29 +24,29 @@ package Sidef::Types::Glob::Dir {
     sub remove {
         my ($self) = @_;
 
-        (rmdir $$self )
-        ?  Sidef::Types::Bool::Bool->true
-        :  Sidef::Types::Bool::Bool->false;
+        (rmdir $$self)
+          ? Sidef::Types::Bool::Bool->true
+          : Sidef::Types::Bool::Bool->false;
     }
 
     # Remove directory with all its content
     sub remove_tree {
-        my($self) = @_;
+        my ($self) = @_;
 
-        require  File::Path;
+        require File::Path;
         File::Path::remove_tree($$self)
-           ? Sidef::Types::Bool::Bool->true
-           : Sidef::Types::Bool::Bool->false;
+          ? Sidef::Types::Bool::Bool->true
+          : Sidef::Types::Bool::Bool->false;
     }
 
     # Create a directory (with parents, if needed)
     sub create {
-        my($self) = @_;
+        my ($self) = @_;
 
         require File::Path;
-            File::Path::make_path($$self)
-            ? Sidef::Types::Bool::Bool->true
-            : Sidef::Types::Bool::Bool->false;
+        File::Path::make_path($$self)
+          ? Sidef::Types::Bool::Bool->true
+          : Sidef::Types::Bool::Bool->false;
     }
 
 };

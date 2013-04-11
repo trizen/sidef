@@ -5,7 +5,7 @@ use warnings;
 package Sidef::Convert::Convert {
 
     use Sidef::Init;
-    use overload q{""} => sub { ${ $_[0] } };
+    use overload q{""} => sub { ${$_[0]} };
 
     sub to_s {
         my ($self) = @_;
@@ -13,7 +13,7 @@ package Sidef::Convert::Convert {
     }
 
     sub to_sd {
-        my($self) = @_;
+        my ($self) = @_;
         Sidef::Types::String::Double->new("$$self");
     }
 
@@ -28,19 +28,19 @@ package Sidef::Convert::Convert {
     }
 
     sub to_file {
-        my($self) = @_;
+        my ($self) = @_;
         Sidef::Types::Glob::File->new($$self);
     }
 
     sub to_b {
         my ($self) = @_;
         $$self
-        ? Sidef::Types::Bool::Bool->true
-        : Sidef::Types::Bool::Bool->false;
+          ? Sidef::Types::Bool::Bool->true
+          : Sidef::Types::Bool::Bool->false;
     }
 
     sub to_a {
-        my($self) = @_;
+        my ($self) = @_;
         Sidef::Types::Array::Array->new($self);
     }
 }

@@ -45,7 +45,8 @@ sub new {
 sub syntax_error {
     my ($self, %opt) = @_;
     die "\n** Syntax error at line $self->{line}, near:\n\t\"",
-      substr($opt{'code'}, $opt{'pos'}, index($opt{'code'}, "\n", $opt{'pos'}) - $opt{'pos'}), "\"\n";
+      substr($opt{'code'}, $opt{'pos'}, index($opt{'code'}, "\n", $opt{'pos'}) - $opt{'pos'}),
+      "\"\n";
 }
 
 sub get_method_name {
@@ -53,7 +54,8 @@ sub get_method_name {
 
     given ($opt{'code'}) {
 
-        if (/\G/gc && defined(my $pos = $self->parse_whitespace(code => substr($_, pos)))) {
+        if (/\G/gc
+            && defined(my $pos = $self->parse_whitespace(code => substr($_, pos)))) {
             pos($_) = $pos + pos($_);
         }
 
@@ -120,7 +122,8 @@ sub parse_expr {
 
     given ($opt{code}) {
         {
-            if (/\G/gc && defined(my $pos = $self->parse_whitespace(code => substr($_, pos)))) {
+            if (/\G/gc
+                && defined(my $pos = $self->parse_whitespace(code => substr($_, pos)))) {
                 pos($_) = $pos + pos($_);
             }
 
@@ -165,7 +168,8 @@ sub parse_expr {
 
             # Object as expression
             when (/\G(?=\()/) {
-                my ($obj, $pos) = $self->parse_arguments(code => substr($_, pos));
+                my ($obj, $pos) =
+                  $self->parse_arguments(code => substr($_, pos));
                 pos($_) = $pos + pos;
                 return $obj, pos;
             }
@@ -197,10 +201,13 @@ sub parse_expr {
                 }
 
                 warn "Attempt to use an uninitialized variable: <$1>\n";
-                $self->syntax_error(code => $_, pos => (pos($_) - length($1)));
+                $self->syntax_error(code => $_,
+                                    pos  => (pos($_) - length($1)));
             }
             default {
-                warn $self->{expect_method} ? "Invalid method caller!\n" : "Invalid object type!\n";
+                warn $self->{expect_method}
+                  ? "Invalid method caller!\n"
+                  : "Invalid object type!\n";
                 $self->syntax_error(code => $_, pos => pos($_));
             }
         }
@@ -212,7 +219,8 @@ sub parse_arguments {
 
     given ($opt{'code'}) {
         {
-            if (/\G/gc && defined(my $pos = $self->parse_whitespace(code => substr($_, pos)))) {
+            if (/\G/gc
+                && defined(my $pos = $self->parse_whitespace(code => substr($_, pos)))) {
                 pos($_) = $pos + pos($_);
             }
 
@@ -222,7 +230,8 @@ sub parse_arguments {
                 redo;
             }
             default {
-                my ($obj, $pos) = $self->parse_script(code => substr($_, pos));
+                my ($obj, $pos) =
+                  $self->parse_script(code => substr($_, pos));
                 pos($_) = $pos + pos;
                 return $obj, pos;
             }
@@ -238,7 +247,8 @@ sub parse_script {
     my %struct;
     given ($opt{code}) {
         {
-            if (/\G/gc && defined(my $pos = $self->parse_whitespace(code => substr($_, pos)))) {
+            if (/\G/gc
+                && defined(my $pos = $self->parse_whitespace(code => substr($_, pos)))) {
                 pos($_) = $pos + pos;
             }
 
@@ -277,7 +287,8 @@ sub parse_script {
             # Method separator '->', or operator-method, like '*'
             when ($self->{expect_method} == 1 && (/\G->/gc || /\G(?=\s*$self->{re}{operators})/)) {
 
-                my ($method_name, $pos) = $self->get_method_name(code => substr($_, pos));
+                my ($method_name, $pos) =
+                  $self->get_method_name(code => substr($_, pos));
                 pos($_) = $pos + pos;
 
                 push @{$struct{$self->{class}}[-1]{call}}, {name => $method_name,};
@@ -287,7 +298,8 @@ sub parse_script {
             # Beginning of an argument expression
             when ($self->{has_object} == 1 && /\G(?=\()/) {
 
-                my ($arg, $pos) = $self->parse_arguments(code => substr($_, pos));
+                my ($arg, $pos) =
+                  $self->parse_arguments(code => substr($_, pos));
                 pos($_) = $pos + pos;
 
                 push @{$struct{$self->{class}}[-1]{call}[-1]{arg}}, $arg;
