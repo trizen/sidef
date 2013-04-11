@@ -56,10 +56,10 @@ file = ("sidef"->stat_file);
 file->name->say;
 
 "Full path is: "->print;
-var abs_path = (file->abs_name)->say;
+var abs_path = (file->abs_name)->to_s->say;
 
 "Dir name is:  "->print;
-abs_path->stat_file->dirname->say;
+abs_path->dirname->to_s->say;
 
 ###############################################
 ##### NEW WAY TO INITIALIZE THE VARIABLES #####
@@ -205,7 +205,6 @@ sub execute_expr {
                     }
 
                     foreach my $obj (@arguments) {
-
                         if (ref $obj eq 'Sidef::Types::String::Double') {
                             interpolate(self => $obj, class => $opt{class});
                         }

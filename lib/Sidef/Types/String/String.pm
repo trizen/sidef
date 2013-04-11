@@ -41,6 +41,11 @@ package Sidef::Types::String::String {
         my($self) = @_;
         Sidef::Types::Glob::File->new($$self);
     }
+
+    sub stat_dir {
+        my($self) = @_;
+        Sidef::Types::Glob::Dir->new($$self);
+    }
 }
 
 1;

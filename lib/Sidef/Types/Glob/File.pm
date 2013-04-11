@@ -5,53 +5,53 @@ use warnings;
 
 package Sidef::Types::Glob::File {
 
-    use Sidef::Init;
+    use parent qw(Sidef::Convert::Convert);
 
     sub new {
         my ($class, $file) = @_;
-        bless {name => $file}, $class;
+        bless \$file, $class;
     }
 
     sub size {
         my ($self) = @_;
-        Sidef::Types::Number::Number->new(-s $self->{name});
+        Sidef::Types::Number::Number->new(-s $$self);
     }
 
     sub name {
         my ($self) = @_;
-        Sidef::Types::String::Single->new($self->{name});
+        Sidef::Types::String::Single->new($$self);
     }
 
     sub basename {
         my ($self) = @_;
 
         require File::Basename;
-        Sidef::Types::String::Single->new(File::Basename::basename($self->{name}));
+        Sidef::Types::String::Single->new(File::Basename::basename($$self));
     }
 
     sub dirname {
         my ($self) = @_;
 
         require File::Basename;
-        Sidef::Types::String::Single->new(File::Basename::dirname($self->{name}));
+        Sidef::Types::Glob::Dir->new(File::Basename::dirname($$self));
     }
 
     sub abs_name {
         my ($self) = @_;
 
         require Cwd;
-        Sidef::Types::String::Single->new(Cwd::abs_path($self->{name}));
+        __PACKAGE__->new(Cwd::abs_path($$self));
     }
 
     sub open {
         my ($self, $mode) = @_;
         $mode = ${$mode} if ref $mode;
 
-        open my $fh, $mode, $self->{name};
+        open my $fh, $mode, $$self;
         Sidef::Types::Glob::FileHandle->new(
                                             fh   => $fh,
                                             file => $self,
-                                            name => $self->{name},
+                                            name => $$self,
                                            );
     }
 

@@ -16,6 +16,7 @@ require Sidef::Init if [caller]->[0] ne q{Sidef::Init};
 require Sidef::Utils::Regex if [caller]->[0] ne q{Sidef::Utils::Regex};
 require Sidef::Types::Hash::Hash if [caller]->[0] ne q{Sidef::Types::Hash::Hash};
 require Sidef::Types::Array::Array if [caller]->[0] ne q{Sidef::Types::Array::Array};
+require Sidef::Types::Glob::Dir if [caller]->[0] ne q{Sidef::Types::Glob::Dir};
 require Sidef::Types::Glob::File if [caller]->[0] ne q{Sidef::Types::Glob::File};
 require Sidef::Types::Glob::Pipe if [caller]->[0] ne q{Sidef::Types::Glob::Pipe};
 require Sidef::Types::Glob::FileHandle if [caller]->[0] ne q{Sidef::Types::Glob::FileHandle};

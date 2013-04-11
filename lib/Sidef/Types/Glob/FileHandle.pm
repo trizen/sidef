@@ -16,11 +16,9 @@ package Sidef::Types::Glob::FileHandle {
               }, $class;
     }
 
-    sub close {
-        my ($self) = @_;
-        (close $self->{fh})
-          ? Sidef::Types::Bool::Bool->true
-          : Sidef::Types::Bool::Bool->false;
+    sub write {
+        my($self, $string) = @_;
+        print {$self->{fh}} $string;    # auto convert
     }
 
     sub readline {
@@ -38,7 +36,14 @@ package Sidef::Types::Glob::FileHandle {
 
     sub file_name {
         my ($self) = @_;
-        Self::Types::String::Single->new($$self->{name});
+        Self::Types::String::Single->new($self->{name});
+    }
+
+    sub close {
+        my ($self) = @_;
+        (close $self->{fh})
+          ? Sidef::Types::Bool::Bool->true
+          : Sidef::Types::Bool::Bool->false;
     }
 
 };
