@@ -17,6 +17,9 @@ my $builder = Module::Build->new(
     },
     requires => {
         'parent' => 0,
+        'File::Path' => 0,
+        'File::Basename' => 0,
+        'Cwd' => 0,
     },
     add_to_cleanup     => [ 'Sidef-*' ],
     create_makefile_pl => 'traditional',

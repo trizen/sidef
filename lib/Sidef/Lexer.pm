@@ -143,7 +143,7 @@ sub parse_expr {
 
             # Single quoted string
             when (/\G$self->{re}{single_quote}/goc) {
-                return Sidef::Types::String::Single->new($1), pos;
+                return Sidef::Types::String::String->new($1), pos;
             }
 
             # File quoted string
@@ -226,6 +226,7 @@ sub parse_arguments {
 
             when (/\G\(/gc) {
                 $self->{has_object} = 0;
+                $self->{expect_method} = 0;
                 $self->{parentheses}++;
                 redo;
             }
@@ -287,8 +288,7 @@ sub parse_script {
             # Method separator '->', or operator-method, like '*'
             when ($self->{expect_method} == 1 && (/\G->/gc || /\G(?=\s*$self->{re}{operators})/)) {
 
-                my ($method_name, $pos) =
-                  $self->get_method_name(code => substr($_, pos));
+                my ($method_name, $pos) = $self->get_method_name(code => substr($_, pos));
                 pos($_) = $pos + pos;
 
                 push @{$struct{$self->{class}}[-1]{call}}, {name => $method_name,};
@@ -298,8 +298,7 @@ sub parse_script {
             # Beginning of an argument expression
             when ($self->{has_object} == 1 && /\G(?=\()/) {
 
-                my ($arg, $pos) =
-                  $self->parse_arguments(code => substr($_, pos));
+                my ($arg, $pos) = $self->parse_arguments(code => substr($_, pos));
                 pos($_) = $pos + pos;
 
                 push @{$struct{$self->{class}}[-1]{call}[-1]{arg}}, $arg;

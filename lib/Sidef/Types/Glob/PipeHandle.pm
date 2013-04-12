@@ -20,7 +20,7 @@ package Sidef::Types::Glob::PipeHandle {
 
     sub command {
         my ($self) = @_;
-        Sidef::Types::String::Single->new($self->{command});
+        Sidef::Types::String::String->new($self->{command});
     }
 
     sub close {

@@ -13,17 +13,21 @@ package Sidef::Types::Bool::Bool {
 
     sub new {
         my ($class, $bool) = @_;
+
+        # Decide if true or false
+        $bool = $bool ? 'true' : 'false';
+
         bless \$bool, $class;
     }
 
     sub true {
         my ($self) = @_;
-        __PACKAGE__->new('true');
+        __PACKAGE__->new(1);
     }
 
     sub false {
         my ($self) = @_;
-        __PACKAGE__->new('false');
+        __PACKAGE__->new(0);
     }
 
     sub is_true {

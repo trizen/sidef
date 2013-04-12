@@ -17,16 +17,36 @@ package Sidef::Types::Glob::File {
         Sidef::Types::Number::Number->new(-s $$self);
     }
 
+    sub exists {
+        my ($self) = @_;
+        idef::Types::Bool::Bool->new(-e $$self);
+    }
+
+    sub is_binary {
+        my ($self) = @_;
+        Sidef::Types::Bool::Bool->new(-B $$self);
+    }
+
+    sub is_text {
+        my ($self) = @_;
+        Sidef::Types::Bool::Bool->new(not $self->is_binary);
+    }
+
+    sub is_file {
+        my ($self) = @_;
+        Sidef::Types::Bool::Bool->new(-f $$self);
+    }
+
     sub name {
         my ($self) = @_;
-        Sidef::Types::String::Single->new($$self);
+        Sidef::Types::String::String->new($$self);
     }
 
     sub basename {
         my ($self) = @_;
 
         require File::Basename;
-        Sidef::Types::String::Single->new(File::Basename::basename($$self));
+        Sidef::Types::String::String->new(File::Basename::basename($$self));
     }
 
     sub dirname {
@@ -48,11 +68,8 @@ package Sidef::Types::Glob::File {
         $mode = ${$mode} if ref $mode;
 
         open my $fh, $mode, $$self;
-        Sidef::Types::Glob::FileHandle->new(
-                                            fh   => $fh,
-                                            file => $self,
-                                            name => $$self,
-                                           );
+        Sidef::Types::Glob::FileHandle->new(fh   => $fh,
+                                            file => $self,);
     }
 
     sub open_r {

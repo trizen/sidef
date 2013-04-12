@@ -12,7 +12,7 @@ package Sidef::Types::Glob::Dir {
         bless \$dir, $class;
     }
 
-    # Returns the parent of a directory
+    # Returns the parent of the directory
     sub parent {
         my ($self) = @_;
 
@@ -20,7 +20,7 @@ package Sidef::Types::Glob::Dir {
         __PACKAGE__->new(File::Basename::dirname($$self));
     }
 
-    # Remove a directory (works only on empty dirs)
+    # Remove the directory (works only on empty dirs)
     sub remove {
         my ($self) = @_;
 
@@ -29,7 +29,7 @@ package Sidef::Types::Glob::Dir {
           : Sidef::Types::Bool::Bool->false;
     }
 
-    # Remove directory with all its content
+    # Remove the directory with all its content
     sub remove_tree {
         my ($self) = @_;
 
@@ -39,8 +39,17 @@ package Sidef::Types::Glob::Dir {
           : Sidef::Types::Bool::Bool->false;
     }
 
-    # Create a directory (with parents, if needed)
+    # Create directory without parents
     sub create {
+        my ($self) = @_;
+
+        mkdir($$self)
+          ? Sidef::Types::Bool::Bool->true
+          : Sidef::Types::Bool::Bool->false;
+    }
+
+    # Create the directory (with parents, if needed)
+    sub create_tree {
         my ($self) = @_;
 
         require File::Path;

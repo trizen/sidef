@@ -1,3 +1,4 @@
+
 use 5.014;
 use strict;
 use warnings;
@@ -9,7 +10,7 @@ package Sidef::Convert::Convert {
 
     sub to_s {
         my ($self) = @_;
-        Sidef::Types::String::Single->new("$$self");
+        Sidef::Types::String::String->new("$$self");
     }
 
     sub to_sd {
@@ -32,11 +33,14 @@ package Sidef::Convert::Convert {
         Sidef::Types::Glob::File->new($$self);
     }
 
+    sub to_dir {
+        my ($self) = @_;
+        Sidef::Types::Glob::Dir->new($$self);
+    }
+
     sub to_b {
         my ($self) = @_;
-        $$self
-          ? Sidef::Types::Bool::Bool->true
-          : Sidef::Types::Bool::Bool->false;
+        Sidef::Types::Bool::Bool->new($$self);
     }
 
     sub to_a {
