@@ -23,10 +23,7 @@ package Sidef::Types::Glob::Dir {
     # Remove the directory (works only on empty dirs)
     sub remove {
         my ($self) = @_;
-
-        (rmdir $$self)
-          ? Sidef::Types::Bool::Bool->true
-          : Sidef::Types::Bool::Bool->false;
+        Sidef::Types::Bool::Bool->new(rmdir $$self);
     }
 
     # Remove the directory with all its content
@@ -34,18 +31,13 @@ package Sidef::Types::Glob::Dir {
         my ($self) = @_;
 
         require File::Path;
-        File::Path::remove_tree($$self)
-          ? Sidef::Types::Bool::Bool->true
-          : Sidef::Types::Bool::Bool->false;
+        Sidef::Types::Bool::Bool->new( File::Path::remove_tree($$self));
     }
 
     # Create directory without parents
     sub create {
         my ($self) = @_;
-
-        mkdir($$self)
-          ? Sidef::Types::Bool::Bool->true
-          : Sidef::Types::Bool::Bool->false;
+        Sidef::Types::Bool::Bool->new( mkdir($$self));
     }
 
     # Create the directory (with parents, if needed)
@@ -53,9 +45,7 @@ package Sidef::Types::Glob::Dir {
         my ($self) = @_;
 
         require File::Path;
-        File::Path::make_path($$self)
-          ? Sidef::Types::Bool::Bool->true
-          : Sidef::Types::Bool::Bool->false;
+        Sidef::Types::Bool::Bool->new(File::Path::make_path($$self));
     }
 
 };

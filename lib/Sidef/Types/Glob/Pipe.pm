@@ -17,9 +17,7 @@ package Sidef::Types::Glob::Pipe {
     sub open {
         my ($self, $mode) = @_;
         open my $pipe_h, $mode, $self->{command};
-        return
-          Sidef::Types::Glob::PipeHandle->new(pipe_h  => $pipe_h,
-                                              command => $self->{command},);
+        Sidef::Types::Glob::PipeHandle->new(pipe_h  => $pipe_h, command => $self->{command});
     }
 
     sub open_r {

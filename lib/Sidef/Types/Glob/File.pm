@@ -19,7 +19,7 @@ package Sidef::Types::Glob::File {
 
     sub exists {
         my ($self) = @_;
-        idef::Types::Bool::Bool->new(-e $$self);
+        Sidef::Types::Bool::Bool->new(-e $$self);
     }
 
     sub is_binary {
@@ -68,8 +68,7 @@ package Sidef::Types::Glob::File {
         $mode = ${$mode} if ref $mode;
 
         open my $fh, $mode, $$self;
-        Sidef::Types::Glob::FileHandle->new(fh   => $fh,
-                                            file => $self,);
+        Sidef::Types::Glob::FileHandle->new(fh   => $fh,  file => $self);
     }
 
     sub open_r {

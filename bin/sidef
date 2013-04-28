@@ -40,6 +40,7 @@ my $code = exists $args{E} ? $args{E} : <<'CODE';
 
 "a"->join("-", "b"->uc, "c")->say;   # will print a-B-c
 
+
 ###################
 # SUPPORT FOR FILES
 ###################
@@ -114,6 +115,11 @@ name->uc->say;
 ################# OTHER STUFF #################
 ###############################################
 
+var creepy = "\\tthis is a creepy string\\n\n";
+creepy->print;
+creepy->apply_escapes->print;
+
+"Hello, World"->substr(0, 5)->say;
 "Hello, World"->substr( -5 )->say;
 
 var num = 42;

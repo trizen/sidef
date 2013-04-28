@@ -50,7 +50,10 @@ package Sidef::Types::String::String {
         my @str = CORE::split(//, $$self);
         my $str_len = $#str;
 
-        $offs = 1 + $str_len + $$offs if $$offs < 0;
+        $offs = $$offs;
+        $len = $$len if defined $len;
+
+        $offs = 1 + $str_len + $offs if $offs < 0;
         $len = defined $len ? $len < 0 ? $str_len + $len : $offs + $len - 1 : $str_len;
 
         if (defined $repl) {
@@ -60,9 +63,6 @@ package Sidef::Types::String::String {
         __PACKAGE__->new(CORE::join '', @str[$offs .. $len]);
     }
 
-    #
-    # "str1"->join('delim', "str2", "str3", ...);
-    #
     sub join {
         my ($self, $delim, @rest) = @_;
         __PACKAGE__->new(CORE::join($$delim, $$self, map { $$_ } @rest));
