@@ -13,6 +13,7 @@ our $DEBUG = 0;
 
 sub new {
     my ($class) = @_;
+
     bless {
         line          => 1,
         has_object    => 0,
@@ -21,11 +22,12 @@ sub new {
         class         => 'main',
         variables     => {},
         re            => {
-            double_quote => Sidef::Utils::Regex::make_esc_delim(q{"}),
-            single_quote => Sidef::Utils::Regex::make_esc_delim(q{'}),
-            file_quote   => Sidef::Utils::Regex::make_esc_delim(q{~}),
-            var_name     => qr/[a-zA-Z_]\w*/,
-            operators    => do {
+            double_quote  => Sidef::Utils::Regex::make_esc_delim(q{"}),
+            single_quote  => Sidef::Utils::Regex::make_esc_delim(q{'}),
+            file_quote    => Sidef::Utils::Regex::make_esc_delim(q{~}),
+            var_in_string => Sidef::Utils::Regex::variable_in_string(),
+            var_name      => qr/[a-zA-Z_]\w*/,
+            operators     => do {
                 local $" = q{|};
 
                 my @operators = map { quotemeta } qw(
@@ -37,16 +39,16 @@ sub new {
 
                 qr{(@operators)};
             },
-
         },
     }, $class;
 }
 
-sub syntax_error {
+sub fatal_error {
     my ($self, %opt) = @_;
-    die "\n** Syntax error at line $self->{line}, near:\n\t\"",
-      substr($opt{'code'}, $opt{'pos'}, index($opt{'code'}, "\n", $opt{'pos'}) - $opt{'pos'}),
-      "\"\n";
+    my $index = index($opt{'code'}, "\n", $opt{'pos'});
+    $index += ($index == -1) ? (length($opt{'code'})) : -$opt{'pos'};
+
+    die "\n** Syntax error at line $self->{line}, near:\n\t\"", substr($opt{'code'}, $opt{'pos'}, $index), "\"\n";
 }
 
 sub get_method_name {
@@ -70,7 +72,7 @@ sub get_method_name {
         }
         default {
             warn "Invalid method name!\n";
-            $self->syntax_error(code => $_, pos => pos($_));
+            $self->fatal_error(code => $_, pos => pos($_));
         }
     }
 }
@@ -138,7 +140,20 @@ sub parse_expr {
 
             # Double quoted string
             when (/\G$self->{re}{double_quote}/gc) {
-                return Sidef::Types::String::Double->new($1), pos;
+                my $string = $1;
+
+                while ($string =~ /$self->{re}{var_in_string}/go) {
+                    if (exists $self->{variables}{$self->{class}}{$1}) {
+                        $self->{variables}{$self->{class}}{$1}{count}++;
+                    }
+                    else {
+                        warn "Attempt to use an uninitialized variable in double quoted string!\n";
+                        $self->fatal_error(code => $_,
+                                           pos  => pos($_) - length($string) + pos($string) - length($1) - 2);
+                    }
+                }
+
+                return Sidef::Types::String::Double->new($string), pos;
             }
 
             # Single quoted string
@@ -201,14 +216,14 @@ sub parse_expr {
                 }
 
                 warn "Attempt to use an uninitialized variable: <$1>\n";
-                $self->syntax_error(code => $_,
-                                    pos  => (pos($_) - length($1)));
+                $self->fatal_error(code => $_,
+                                   pos  => (pos($_) - length($1)));
             }
             default {
                 warn $self->{expect_method}
                   ? "Invalid method caller!\n"
                   : "Invalid object type!\n";
-                $self->syntax_error(code => $_, pos => pos($_));
+                $self->fatal_error(code => $_, pos => pos($_));
             }
         }
     }
@@ -225,7 +240,7 @@ sub parse_arguments {
             }
 
             when (/\G\(/gc) {
-                $self->{has_object} = 0;
+                $self->{has_object}    = 0;
                 $self->{expect_method} = 0;
                 $self->{parentheses}++;
                 redo;
@@ -266,9 +281,9 @@ sub parse_script {
                 die "Expected class name, at line $self->{line}.\n";
             }
 
-            # We are at the end of the script file.
+            # We are at the end of the script.
             # We make some checks, and return the \%struct hash ref.
-            when (/\G\z/) {
+            when (/\G\z/ || /\G__END__\b/gc) {
 
                 while (my (undef, $class_var) = each %{$self->{variables}}) {
                     while (my (undef, $variable) = each %{$class_var}) {
@@ -312,7 +327,7 @@ sub parse_script {
 
                     if (--$self->{parentheses} < 0) {
                         warn "Unbalanced parentheses!\n";
-                        $self->syntax_error(code => $_, pos => pos($_) - 1);
+                        $self->fatal_error(code => $_, pos => pos($_) - 1);
                     }
 
                     return (\%struct, pos);
@@ -320,6 +335,15 @@ sub parse_script {
 
                 redo;
 
+            }
+
+            # Comma separated arguments for methods
+            when (/\G,/gc) {
+                my ($obj, $pos) = $self->parse_expr(code => substr($_, pos));
+                pos($_) = $pos + pos;
+
+                push @{$struct{$self->{class}}}, {self => $obj};
+                redo;
             }
 
             # Argument as object, without parentheses
@@ -338,14 +362,6 @@ sub parse_script {
                 }
 
             }
-
-            ## This code will be used to support
-            ## more than one argument for a method
-
-            #while(/\G\h*,/gc){
-            #        my($obj, $pos) = parse_expr( code => substr($_, pos) );
-            #        pos($_) = $pos + pos;
-            # }
 
             # Parse expression or object and use it as main object (self)
             default {

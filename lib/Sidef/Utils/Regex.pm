@@ -80,6 +80,10 @@ package Sidef::Utils::Regex {
         }x;
     }
 
+    sub variable_in_string {
+        return qr{(?<!\\)(?:\\\\)*+\K\$([a-zA-Z_]\w*+)\b};
+    }
+
     sub make_double_q_balanced {
         my $name = shift;
         qr{

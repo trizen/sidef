@@ -33,6 +33,13 @@ my $code = exists $args{E} ? $args{E} : <<'CODE';
 # Code testing
 ###################################
 
+
+#
+## Support for multiple arguments
+#
+
+"a"->join("-", "b"->uc, "c")->say;   # will print a-B-c
+
 ###################
 # SUPPORT FOR FILES
 ###################
@@ -75,6 +82,9 @@ var x = "RaNdOm StRiNg"->lc;   # WRONG!!!
 var y = ("RaNdOm StRiNg"->lc); # RIGHT!!!
 var z = "\LRaNdOm StRiNg";     # Also, right.
 
+var jash = "another Sidef";
+"Just $jash hacker,\n"->say;
+
 "\nescaped variable: \$var\n"->say;
 
 #
@@ -105,11 +115,6 @@ name->uc->say;
 ###############################################
 
 "Hello, World"->substr( -5 )->say;
-
-#
-## Support for multiple arguments is not implemented, yet
-#
-  # "a"->join("-", "c", "d")->say;   # will work, someday
 
 var num = 42;
 "Next power of two after number $num is: "->print;
@@ -172,14 +177,14 @@ sub interpolate {
 
     my $self = $opt{self};
 
-    ${$self} =~ s{(?<!\\)(?:\\\\)*+\K\$([a-zA-Z_]\w*)\b}{
+    ${$self} =~ s{$lexer->{re}{var_in_string}}{
                 exists $variables{$opt{class}}{$1}
                     ? $variables{$opt{class}}{$1}
                     : do{
                         warn "Use of uninitialized variable <$1> in double quoted string!\n";
                         q{};
                     };
-        }eg;
+        }ego;
 
     $self->apply_escapes;
 }
