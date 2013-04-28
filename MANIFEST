@@ -1,12 +1,8 @@
 ignore.txt
-MYMETA.json
-Build
 MANIFEST
 README
-MYMETA.yml
 Build.PL
 Changes
-utils.zip
 bin/sidef
 t/manifest.t
 t/pod.t
