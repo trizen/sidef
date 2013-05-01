@@ -28,8 +28,10 @@ require Sidef::Types::String::Double if [caller]->[0] ne q{Sidef::Types::String:
 require Sidef::Types::String::String if [caller]->[0] ne q{Sidef::Types::String::String};
 require Sidef::Types::Bool::Bool if [caller]->[0] ne q{Sidef::Types::Bool::Bool};
 require Sidef::Types::Regex::Regex if [caller]->[0] ne q{Sidef::Types::Regex::Regex};
-require Sidef::Lexer if [caller]->[0] ne q{Sidef::Lexer};
+require Sidef::Exec if [caller]->[0] ne q{Sidef::Exec};
+require Sidef::Parser if [caller]->[0] ne q{Sidef::Parser};
 require Sidef::Variable::Variable if [caller]->[0] ne q{Sidef::Variable::Variable};
+
 
 
 1;

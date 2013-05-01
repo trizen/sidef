@@ -38,7 +38,7 @@ my $code = exists $args{E} ? $args{E} : <<'CODE';
 ## Support for multiple arguments
 #
 
-"a"->join("-", "b"->uc, "c")->say;   # will print a-B-c
+"a"->join("::", "b"->uc, "c")->say;   # will print a::B::c
 
 
 ###################
@@ -162,9 +162,13 @@ diff->to_s->say;                  # print the value stored into 'diff' (20)
 
 CODE
 
-require Sidef::Lexer;
-my $lexer = Sidef::Lexer->new();
-my ($struct, $pos) = $lexer->parse_script(code => $code);
+require Sidef::Parser;
+my $parser = Sidef::Parser->new();
+my ($struct, $pos) = $parser->parse_script(code => $code);
+
+require Sidef::Exec;
+my $executer = Sidef::Exec->new();
+$executer->execute(struct => $struct);
 
 #use Data::Dump qw(pp);
 #pp $struct;
@@ -175,111 +179,3 @@ my ($struct, $pos) = $lexer->parse_script(code => $code);
       self => bless(do{\(my $o = 81)}, "Sidef::Types::Number::Integer"),
     },
 =cut
-
-my %variables;
-
-sub interpolate {
-    my (%opt) = @_;
-
-    my $self = $opt{self};
-
-    ${$self} =~ s{$lexer->{re}{var_in_string}}{
-                exists $variables{$opt{class}}{$1}
-                    ? $variables{$opt{class}}{$1}
-                    : do{
-                        warn "Use of uninitialized variable <$1> in double quoted string!\n";
-                        q{};
-                    };
-        }ego;
-
-    $self->apply_escapes;
-}
-
-sub execute_expr {
-    my (%opt) = @_;
-
-    my $expr = $opt{'expr'};
-
-    if (exists $expr->{self}) {
-
-        my $self = $expr->{self};
-        if (ref $self eq 'HASH') {
-            ($self) = execute(struct => $self);
-        }
-
-        if (ref $self eq 'Sidef::Types::String::Double') {
-            interpolate(self => $self, class => $opt{class});
-        }
-
-        if (exists $expr->{call}) {
-            foreach my $call (@{$expr->{call}}) {
-
-                my @arguments;
-                my $method = $call->{name};
-
-                if (exists $call->{arg}) {
-
-                    foreach my $arg (@{$call->{arg}}) {
-                        if (ref $arg eq 'HASH') {
-                            push @arguments, execute(struct => $arg);
-                        }
-                        else {
-                            push @arguments, $arg;
-                        }
-                    }
-
-                    foreach my $obj (@arguments) {
-                        if (ref $obj eq 'Sidef::Types::String::Double') {
-                            interpolate(self => $obj, class => $opt{class});
-                        }
-                    }
-
-                    if (ref $self eq 'Sidef::Variable::Variable' and $method ne '=') {
-                        my $value = $self->get_value;
-                        $variables{$opt{class}}{$self->get_name} = $value;
-                        $self = $value;
-                    }
-
-                    my $value = $self->$method(@arguments);
-                    if (ref $self eq 'Sidef::Variable::Variable') {
-                        $variables{$opt{class}}{$self->get_name} = $value;
-                    }
-                    $self = $value;
-
-                }
-                else {
-
-                    if (ref $self eq 'Sidef::Variable::Variable') {
-                        my $value = $self->get_value;
-                        $variables{$opt{class}}{$self->get_name} = $value;
-                        $self = $value;
-                    }
-
-                    $self = $self->$method;
-                }
-            }
-        }
-
-        return $self;
-    }
-    else {
-        die "Struct error!\n";
-    }
-}
-
-sub execute {
-    my (%opt) = @_;
-
-    my $struct = $opt{'struct'};
-
-    my @results;
-    foreach my $key (keys %{$struct}) {
-        foreach my $expr (@{$struct->{$key}}) {
-            push @results, execute_expr(class => $key, expr => $expr);
-        }
-    }
-
-    return @results;
-}
-
-execute(struct => $struct);

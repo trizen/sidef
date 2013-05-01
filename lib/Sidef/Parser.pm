@@ -3,11 +3,9 @@ use 5.014;
 use strict;
 use warnings;
 
-use lib '../../lib';    # devel only
+package Sidef::Parser{
 
-package Sidef::Lexer;
-
-use Sidef::Init;
+require Sidef::Init;
 
 our $DEBUG = 0;
 
@@ -389,5 +387,6 @@ sub parse_script {
     die "Invalid code or something weird is happening! :)\n";
 
 }
+};
 
 1;
