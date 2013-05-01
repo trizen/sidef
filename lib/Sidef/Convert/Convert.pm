@@ -6,24 +6,53 @@ use warnings;
 package Sidef::Convert::Convert {
 
     require Sidef::Init;
-    use overload q{""} => sub {
-		my($type) = ref($_[0]);
-		
-		if($type eq 'Sidef::Types::Array::Array'){
-			return $_[0] ;
-			#return Sidef::Types::String::String->new('[' . join(', ', map {$_->{self}} @{$_[0]}) . ']'); #For Debug
-		}
-	 
-		return ${$_[0]}; 
-	};
+
+    use overload
+
+      q{""} => sub {
+        my ($type) = ref($_[0]);
+
+        if ($type eq 'Sidef::Types::Array::Array') {
+            return $_[0];
+
+            #return Sidef::Types::String::String->new('[' . join(', ', map {$_->{self}} @{$_[0]}) . ']'); #For Debug
+        }
+
+        return ${$_[0]};
+      },
+
+      q{eq} => sub {
+        my $type_1 = ref($_[0]);
+        my $type_2 = ref($_[1]);
+
+        if ($type_1 eq 'Sidef::Types::Array::Array' or $type_2 eq 'Sidef::Types::Array::Array') {
+            if ($type_1 eq 'Sidef::Types::Array::Array' and $type_2 eq 'Sidef::Types::Array::Array') {
+
+                foreach my $item (@{$_[0]}) {
+                    foreach my $comp_item (@{$_[1]}) {
+                        $item eq $comp_item or return;
+                    }
+                }
+
+                return 1;
+
+            }
+            else {
+                return;
+            }
+
+        }
+        ${$_[0]} eq ${$_[1]};
+
+      };
 
     sub to_s {
         my ($self) = @_;
-        
-		if(ref $self eq 'Sidef::Types::Array::Array'){
-			return Sidef::Types::String::String->new(join(' ', map {$_->{self}} @{$self}));
-		}
-		
+
+        if (ref $self eq 'Sidef::Types::Array::Array') {
+            return Sidef::Types::String::String->new(join(' ', @{$self}));
+        }
+
         Sidef::Types::String::String->new("$$self");
     }
 

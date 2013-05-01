@@ -4,8 +4,8 @@ use strict;
 use warnings;
 
 package Sidef::Types::Array::Array {
-	
-	use parent qw(Sidef::Convert::Convert);
+
+    use parent qw(Sidef::Convert::Convert);
 
     sub new {
         my ($class) = @_;
@@ -16,21 +16,32 @@ package Sidef::Types::Array::Array {
         no strict 'refs';
         *{__PACKAGE__ . '::' . '-'} = sub {
             my ($array_1, $array_2) = @_;
-            
-				my $new_array = __PACKAGE__->new();
-				#push @{$new_array}, grep { not $_ ~~ $array_2 } @{$array_1};
-				foreach my $item(@{$array_1}){
-					my $exists = 0;
-					foreach my $min_item(@{$array_2}){
-						if($$min_item eq $$item){
-							$exists = 1;
-							last;
-						}
-					}
-					push @{$new_array}, $item if not $exists;
-				}
-				
-				return $new_array;
+
+            my $new_array = __PACKAGE__->new();
+
+            foreach my $item (@{$array_1}) {
+
+                my $exists = 0;
+                foreach my $min_item (@{$array_2}) {
+                    if ($min_item eq $item) {
+                        $exists = 1;
+                        last;
+                    }
+                }
+
+                push @{$new_array}, $item if not $exists;
+            }
+
+            return $new_array;
+        };
+
+        *{__PACKAGE__ . '::' . '+'} = sub {
+            my ($array_1, $array_2) = @_;
+
+            my $new_array = Sidef::Types::Array::Array->new();
+            push @{$new_array}, @{$array_1}, @{$array_2};
+
+            return $new_array;
         };
     }
 
@@ -38,6 +49,18 @@ package Sidef::Types::Array::Array {
         my ($self) = @_;
         pop @{$self};
     }
+
+    sub shift {
+        my ($self) = @_;
+        shift @{$self};
+    }
+
+    sub push {
+        my ($self, @args) = @_;
+        push @{$self}, @args;
+        return $self;
+    }
+
 }
 
 1;

@@ -272,9 +272,8 @@ package Sidef::Parser {
                 when (/\G\[/gc) {
                     $self->{has_object}    = 0;
                     $self->{expect_method} = 0;
-                    $self->{expect_array}  = 1;
                     $self->{right_brackets}++;
-                     my ($obj, $pos) = $self->parse_script(code => substr($_, pos));
+                    my ($obj, $pos) = $self->parse_script(code => substr($_, pos));
                     pos($_) = $pos + pos;
                     return $obj, pos;
                 }
@@ -334,27 +333,8 @@ package Sidef::Parser {
                     push @{$struct{$self->{class}}[-1]{call}}, {name => $method_name,};
                     redo;
                 }
-                
-                when (/\G(?=\[)/){
-#					++$self->{right_brackets};
-					my ($obj, $pos) = $self->parse_array(code => substr($_, pos));
-					
-					
-					pos($_) = $pos + pos;
-					
-					my $array = Sidef::Types::Array::Array->new();
-					push @{$array}, @{$obj->{$self->{class}}};
-					
-					#use Data::Dumper;
-					#die Dumper $array;
-					
-					push @{$struct{$self->{class}}}, {self => $array};
-					redo;
-				}
 
                 when (/\G\]/gc) {
-                    warn "P $self->{right_brackets} \n";
-                    warn "postion : ", pos, "\n";
                     --$self->{right_brackets};
 
                     if (@{[caller(1)]}) {
@@ -364,11 +344,9 @@ package Sidef::Parser {
                             $self->fatal_error(code => $_, pos => pos($_) - 1);
                         }
 
-
-                            $self->{expect_array} = 0;
-                            
-
-                            return (\%struct, pos);
+                        $self->{has_object}    = 1;
+                        $self->{expect_method} = 1;
+                        return (\%struct, pos);
                     }
 
                     redo;
@@ -411,10 +389,9 @@ package Sidef::Parser {
                 }
 
                 # Argument as object, without parentheses
-                when ($self->{has_object} == 1 && $self->{expect_method} == 1 && !$self->{expect_array}) {
+                when ($self->{has_object} == 1 && $self->{expect_method} == 1) {
 
-                    my $expr = substr($_, pos);
-                    my ($obj, $pos) = $self->parse_expr(code => $expr);
+                    my ($obj, $pos) = $self->parse_expr(code => substr($_, pos));
 
                     if (defined $obj) {
                         pos($_) = $pos + pos;
@@ -430,8 +407,7 @@ package Sidef::Parser {
                 # Parse expression or object and use it as main object (self)
                 default {
 
-                    my $expr = substr($_, pos);
-                    my ($obj, $pos) = $self->parse_expr(code => $expr);
+                    my ($obj, $pos) = $self->parse_expr(code => substr($_, pos));
                     pos($_) = $pos + pos;
 
                     if (defined $obj) {

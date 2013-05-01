@@ -164,24 +164,50 @@ const pi = 3.14;                  # print constant value
 #pi = 11;                         # Testing warning
 pi->to_s->say;
 
-["test", 44, 123, ["aa", "bb"], ["x", 4,[32,4],"y"]]->pop->to_s->say;
+["test", 44, 123, ["aa", "bb"], ["x"->uc, 4*3, [32,4+3], "y"->uc]]->pop->to_s->say;
 
-var array = ([1,2,3]); #TODO
-var array2 = ([1,2]);
-var left = ([array ,array2]);
-left->pop->get_value->to_s->say;
+var array = [1,2,3];
+var array2 = [1,2];
+var left = [array ,array2];
+left->pop->to_s->say;
 
-#(["w","x","y"]-(["w"]))->to_s->say;
+array->pop->to_s->say;  # prints '3'
+
+(["x","y","z"])->pop->say;
+
+#####################################################
+
+#
+## Remove from array 1 anything listed in array 2.
+#
+
+["w","x"->uc,"y", 3, [5], "IT"] - ["w", [5], "Y"->lc] -> to_s->say;
+
+#
+## same thing as above:
+#
+
+var arr_1 = ["w","x"->uc,"y", 3, [5], "IT"];
+var arr_2 = ["w", [5], "Y"->lc];
+
+arr_1 - arr_2 -> to_s -> say;
+
+#
+## joining two arrays
+#
+
+["a", "b", "c"] + ["d", "e", "f"] -> to_s -> say;
+
+#####################################################
 
 CODE
-
 
 require Sidef::Parser;
 my $parser = Sidef::Parser->new();
 my ($struct, $pos) = $parser->parse_script(code => $code);
 
-use Data::Dump qw(pp);
-pp $struct;
+#use Data::Dump qw(pp);
+#pp $struct;
 
 require Sidef::Exec;
 my $executer = Sidef::Exec->new();
