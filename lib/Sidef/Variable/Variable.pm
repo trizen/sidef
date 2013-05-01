@@ -6,10 +6,10 @@ use warnings;
 package Sidef::Variable::Variable {
 
     sub new {
-        my ($class, $var, $value) = @_;
+        my ($class, $var, $type) = @_;
         bless {
                name  => $var,
-               value => $value,
+               type => $type,
               }, $class;
     }
 
@@ -27,13 +27,27 @@ package Sidef::Variable::Variable {
         my ($self) = @_;
         return $self->{value};
     }
+    
+     sub get_type {
+        my ($self) = @_;
+        return $self->{type};
+    }
 
     {
         no strict 'refs';
 
         *{__PACKAGE__ . '::' . '='} = sub {
             my ($self, $obj) = @_;
-            return $self->set_value($obj);
+            if ($self->{type} eq "const") {
+				if ( not defined $self->{value} ) {
+					return $self->set_value($obj);
+				}      
+				warn "Constant $self->{name} cannot be changed.\n";
+			} elsif ($self->{type} eq "var") {
+				return $self->set_value($obj);
+			} else {
+				warn "Invalid type: $self->{type}.\n";
+			}
         };
 
     }
