@@ -179,6 +179,8 @@ var new_array = ["test", array, "string"];
 new_array->pop->say;
 new_array->pop->get_value->pop->say;
 
+#["test", 44, 123, ["aa", "bb"], ["x", "y"], 99]->pop->to_s->say;
+
 #["str", "w", "boo"]->pop->to_s->say;
 
 };
