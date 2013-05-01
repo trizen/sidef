@@ -89,6 +89,9 @@ package Sidef::Exec {
                             $self->{variables}{$opt{class}}{$self_obj->get_name} = $value;
                             $self_obj = $value;
                         }
+                        elsif (ref $self_obj eq 'HASH') {
+                            $self_obj = $self->execute_expr(expr => $self_obj, class => $opt{class});
+                        }
 
                         $self_obj = $self_obj->$method;
                     }
