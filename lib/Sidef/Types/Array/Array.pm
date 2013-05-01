@@ -6,8 +6,8 @@ use warnings;
 package Sidef::Types::Array::Array {
 
     sub new {
-        my ($class, $array) = @_;
-        bless $array, $class;
+        my ($class) = @_;
+        bless [], $class;
     }
 
     {

@@ -164,13 +164,19 @@ const pi = 3.14;				  # print constant value
 #pi = 11;						  # Testing warning
 pi->to_s->say;
 
+["test", 44, 123, ["aa", "bb"], ["x", "y"], 99]->pop->to_s->say;
 
 CODE
+
+$code = q{["test", "xz", ["aa", "bb"], 44, 123, ["x", "y"], 99]->pop->to_s->say;};
 
 require Sidef::Parser;
 my $parser = Sidef::Parser->new();
 my ($struct, $pos) = $parser->parse_script(code => $code);
 
+
+use Data::Dump qw(pp);
+pp $struct;
 require Sidef::Exec;
 my $executer = Sidef::Exec->new();
 $executer->execute(struct => $struct);

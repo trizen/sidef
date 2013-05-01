@@ -120,7 +120,7 @@ sub parse_whitespace {
 sub parse_expr {
     my ($self, %opt) = @_;
 
-    given ($opt{code}) {
+    given ($opt{code}) { 
         {
             if (/\G/gc
                 && defined(my $pos = $self->parse_whitespace(code => substr($_, pos)))) {
@@ -186,6 +186,24 @@ sub parse_expr {
                 pos($_) = $pos + pos;
                 return $obj, pos;
             }
+            
+            when (/\G(?=\[)/) {
+				my $array = Sidef::Types::Array::Array->new();
+				
+				my($obj, $pos) = $self->parse_array(code => substr($_,pos));
+				pos($_) = $pos + pos;
+				
+				#use Data::Dumper;
+				#warn "=>> OBJ ARRAY\n", Dumper $obj;
+				#exit;
+				#print "-<<<<<<<<<<<<<<Im here\n";
+				
+				push @{$array}, map {$_->{self} } @{$obj->{main}};
+				
+				#use Data::Dumper;
+				#print "=>> ARRAY\n", Dumper $array;
+				return $array, pos;
+			}
 
             # Declaration of variables or constants. (with 'var' / 'const')
             when (/\G(var|const)\h+($self->{re}{var_name})/goc) {    # /\G([a-zA-Z]\w+)(?=\s*=\s*\()/gc
@@ -256,6 +274,38 @@ sub parse_arguments {
 
 }
 
+sub parse_array {
+	my ($self, %opt) = @_;
+	
+	print "PARSE ARRAY\n\n";
+
+	given($opt{'code'}){
+		{
+			if (/\G/gc
+                && defined(my $pos = $self->parse_whitespace(code => substr($_, pos)))) {
+                pos($_) = $pos + pos($_);
+            }
+            when(/\G\[/gc){
+				# warn "o $self->{has_object}\n";
+				#$self->{has_object}    = 0;
+                #$self->{expect_method} = 0;
+                $self->{expect_array} = 1;
+                $self->{right_brackets}++;
+                #warn "$self->{right_brackets}\n";
+                redo;
+				
+			}default {
+				my ($obj, $pos) = $self->parse_script(code => substr($_, pos));
+				pos($_) = $pos + pos;
+
+				return $obj, $pos;
+			#exit;
+			}
+		}
+
+	}
+}
+
 sub parse_script {
     my ($self, %opt) = @_;
 
@@ -308,6 +358,28 @@ sub parse_script {
                 push @{$struct{$self->{class}}[-1]{call}}, {name => $method_name,};
                 redo;
             }
+            
+
+			when ( /\G\]/gc){
+				warn "P $self->{right_brackets} \n";
+				warn "postion : " ,pos,"\n";
+				--$self->{right_brackets} ;
+				
+				if (@{[caller(1)]}) {
+
+                    if ($self->{right_brackets} < 0) {
+                        warn "Unbalanced right brackets!\n";
+                        $self->fatal_error(code => $_, pos => pos($_) - 1);
+                    }
+
+				if ($self->{right_brackets} == 0) {
+						return (\%struct, pos);
+                    
+				}
+                }
+
+                redo;
+			}
 
             # Beginning of an argument expression
             when ($self->{has_object} == 1 && /\G(?=\()/) {
@@ -340,13 +412,21 @@ sub parse_script {
             when (/\G,/gc) {
                 my ($obj, $pos) = $self->parse_expr(code => substr($_, pos));
                 pos($_) = $pos + pos;
+                
+                
 
                 push @{$struct{$self->{class}}}, {self => $obj};
+                
+                use Data::Dumper;
+                
+                print  "Comma: ", Dumper \%struct;
                 redo;
             }
+            
+
 
             # Argument as object, without parentheses
-            when ($self->{has_object} == 1 && $self->{expect_method} == 1) {
+            when ($self->{has_object} == 1 && $self->{expect_method} == 1 && !$self->{expect_array}) {
 
                 my $expr = substr($_, pos);
                 my ($obj, $pos) = $self->parse_expr(code => $expr);
@@ -364,10 +444,16 @@ sub parse_script {
 
             # Parse expression or object and use it as main object (self)
             default {
+				
+				
 
                 my $expr = substr($_, pos);
                 my ($obj, $pos) = $self->parse_expr(code => $expr);
                 pos($_) = $pos + pos;
+                
+                use Data::Dumper;
+                warn "XX", Dumper $obj;
+               # exit;
 
                 if (defined $obj) {
 
@@ -375,6 +461,9 @@ sub parse_script {
                     $self->{expect_method} = 1;
 
                     push @{$struct{$self->{class}}}, {self => $obj};
+                    
+                    use Data::Dumper;
+				print Dumper \%struct;
                     redo;
                 }
                 else {
