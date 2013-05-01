@@ -5,11 +5,25 @@ use warnings;
 
 package Sidef::Convert::Convert {
 
-    use Sidef::Init;
-    use overload q{""} => sub { ${$_[0]} };
+    require Sidef::Init;
+    use overload q{""} => sub {
+		my($type) = ref($_[0]);
+		
+		if($type eq 'Sidef::Types::Array::Array'){
+			return $_[0] ;
+			#return Sidef::Types::String::String->new('[' . join(', ', map {$_->{self}} @{$_[0]}) . ']'); #For Debug
+		}
+	 
+		return ${$_[0]}; 
+	};
 
     sub to_s {
         my ($self) = @_;
+        
+		if(ref $self eq 'Sidef::Types::Array::Array'){
+			return Sidef::Types::String::String->new(join(' ', map {$_->{self}} @{$self}));
+		}
+		
         Sidef::Types::String::String->new("$$self");
     }
 

@@ -164,33 +164,24 @@ const pi = 3.14;                  # print constant value
 #pi = 11;                         # Testing warning
 pi->to_s->say;
 
-["test", 44, 123, ["aa", "bb"], ["x", "y"], 99]->pop->to_s->say;
+["test", 44, 123, ["aa", "bb"], ["x", 4,[32,4],"y"]]->pop->to_s->say;
+
+var array = ([1,2,3]); #TODO
+var array2 = ([1,2]);
+var left = ([array ,array2]);
+left->pop->get_value->to_s->say;
+
+#(["w","x","y"]-(["w"]))->to_s->say;
 
 CODE
 
-$code = q{
-
-#["test", 44, 123, ["aa", "bb"], ["x", "y"], 99]->pop->to_s->say;
-
-var array = ["ITEM", "yan"->uc];
-array->pop->say;
-
-var new_array = ["test", array, "string"];
-new_array->pop->say;
-new_array->pop->get_value->pop->say;
-
-#["test", 44, 123, ["aa", "bb"], ["x", "y"], 99]->pop->to_s->say;
-
-#["str", "w", "boo"]->pop->to_s->say;
-
-};
 
 require Sidef::Parser;
 my $parser = Sidef::Parser->new();
 my ($struct, $pos) = $parser->parse_script(code => $code);
 
-#use Data::Dump qw(pp);
-#pp $struct;
+use Data::Dump qw(pp);
+pp $struct;
 
 require Sidef::Exec;
 my $executer = Sidef::Exec->new();
