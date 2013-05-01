@@ -187,18 +187,19 @@ sub parse_expr {
                 return $obj, pos;
             }
 
-            # Declaration of variables. (with 'var')
-            # Sorry about this. :)
-            when (/\Gvar\h+($self->{re}{var_name})/goc) {    # /\G([a-zA-Z]\w+)(?=\s*=\s*\()/gc
+            # Declaration of variables or constants. (with 'var' / 'const')
+            when (/\G(var|const)\h+($self->{re}{var_name})/goc) {    # /\G([a-zA-Z]\w+)(?=\s*=\s*\()/gc
+				my $type = $1;
+				my $name = $2;
 
-                if (exists $self->{variables}{$self->{class}}{$1}) {
-                    warn "Redeclaration of variable '$1' in same scope, at line $self->{line}\n";
+                if (exists $self->{variables}{$self->{class}}{$name}) {
+                    warn "Redeclaration of $type '$name' in same scope, at line $self->{line}\n";
                 }
 
-                my $variable = Sidef::Variable::Variable->new($1);
-                $self->{variables}{$self->{class}}{$1} = {
+                my $variable = Sidef::Variable::Variable->new($name, $type);
+                $self->{variables}{$self->{class}}{$name} = {
                                                           obj   => $variable,
-                                                          name  => $1,
+                                                          name  => $name,
                                                           count => 0,
                                                           line  => $self->{line},
                                                          };

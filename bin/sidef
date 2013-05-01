@@ -160,6 +160,11 @@ diff->to_s->say;                  # print the value stored into 'diff' (20)
 
 ###################################
 
+const pi = 3.14;				  # print constant value
+#pi = 11;						  # Testing warning
+pi->to_s->say;
+
+
 CODE
 
 require Sidef::Parser;
