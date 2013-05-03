@@ -8,7 +8,7 @@ package Sidef::Variable::Variable {
     sub new {
         my ($class, $var, $type) = @_;
         bless {
-               name  => $var,
+               name => $var,
                type => $type,
               }, $class;
     }
@@ -27,8 +27,8 @@ package Sidef::Variable::Variable {
         my ($self) = @_;
         return $self->{value};
     }
-    
-     sub get_type {
+
+    sub get_type {
         my ($self) = @_;
         return $self->{type};
     }
@@ -39,15 +39,17 @@ package Sidef::Variable::Variable {
         *{__PACKAGE__ . '::' . '='} = sub {
             my ($self, $obj) = @_;
             if ($self->{type} eq "const") {
-				if ( not defined $self->{value} ) {
-					return $self->set_value($obj);
-				}      
-				warn "Constant $self->{name} cannot be changed.\n";
-			} elsif ($self->{type} eq "var") {
-				return $self->set_value($obj);
-			} else {
-				warn "Invalid type: $self->{type}.\n";
-			}
+                if (not defined $self->{value}) {
+                    return $self->set_value($obj);
+                }
+                warn "Constant $self->{name} cannot be changed.\n";
+            }
+            elsif ($self->{type} eq "var") {
+                return $self->set_value($obj);
+            }
+            else {
+                warn "Invalid type: $self->{type}.\n";
+            }
         };
 
     }

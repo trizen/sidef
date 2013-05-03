@@ -26,8 +26,8 @@ package Sidef::Parser {
                 file_quote         => Sidef::Utils::Regex::make_esc_delim(q{~}),
                 regex              => Sidef::Utils::Regex::make_esc_delim(q{/}),
                 m_regex            => Sidef::Utils::Regex::make_single_q_balanced(q{m}),
-                match_flags        => qr{[msixpogcdual]*},
-                substitution_flags => qr{[msixpogcerdual]*},
+                match_flags        => qr{[msixpogcdual]+},
+                substitution_flags => qr{[msixpogcerdual]+},
                 var_in_string      => Sidef::Utils::Regex::variable_in_string(),
                 var_name           => qr/[a-zA-Z_]\w*/,
                 operators          => do {
@@ -44,6 +44,21 @@ package Sidef::Parser {
                 },
             },
         }, $class;
+    }
+
+    sub check_variables {
+        my ($self, $string) = @_;
+
+        while ($string =~ /$self->{re}{var_in_string}/go) {
+            if (exists $self->{variables}{$self->{class}}{$1}) {
+                $self->{variables}{$self->{class}}{$1}{count}++;
+            }
+            else {
+                warn "Attempt to use an uninitialized variable in double quoted string!\n";
+                $self->fatal_error(code => $_,
+                                   pos  => pos($_) - length($string) + pos($string) - length($1) - 2);
+            }
+        }
     }
 
     sub fatal_error {
@@ -145,18 +160,9 @@ package Sidef::Parser {
 
                 # Double quoted string
                 when (/\G$self->{re}{double_quote}/gc) {
-                    my $string = $1;
 
-                    while ($string =~ /$self->{re}{var_in_string}/go) {
-                        if (exists $self->{variables}{$self->{class}}{$1}) {
-                            $self->{variables}{$self->{class}}{$1}{count}++;
-                        }
-                        else {
-                            warn "Attempt to use an uninitialized variable in double quoted string!\n";
-                            $self->fatal_error(code => $_,
-                                               pos  => pos($_) - length($string) + pos($string) - length($1) - 2);
-                        }
-                    }
+                    my $string = $1;
+                    $self->check_variables($string);
 
                     return Sidef::Types::String::Double->new($string), pos;
                 }
@@ -192,6 +198,7 @@ package Sidef::Parser {
                     my $regex = $1;
                     my ($flags) = (/\G($self->{re}{match_flags})/gc);
 
+                    $self->check_variables($regex);
                     return Sidef::Types::Regex::Regex->new($regex, $flags), pos;
                 }
 

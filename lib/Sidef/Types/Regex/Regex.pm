@@ -5,15 +5,17 @@ use warnings;
 
 package Sidef::Types::Regex::Regex {
 
-    use parent qw(Sidef::Convert::Convert);
+    use parent qw(Sidef::Convert::Convert Sidef::Types::String::Double);
 
     sub new {
         my ($class, $regex, $mod) = @_;
 
         $mod //= q{^};
-        my $qre = qr{(?$mod:$regex)};
+        my $str_re = Sidef::Types::String::String->new("(?$mod:$regex)");
 
-        bless $qre, $class;
+        #$str_re =~ s{\\}{\\\\}g;
+
+        bless \$str_re, $class;
     }
 
     sub matches {
@@ -34,7 +36,7 @@ package Sidef::Types::Regex::Regex {
 
     {
         no strict 'refs';
-        *{__PACKAGE__ . '::' . '=~'} = \&matches;                   # alias to the 'matches' method
+        *{__PACKAGE__ . '::' . '=~'} = \&matches;    # alias to the 'matches' method
     }
 
 }

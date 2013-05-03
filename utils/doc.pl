@@ -50,7 +50,7 @@ for my $d (readdir $dir_h) {
                 my @modules = split(' ', $1);
 
                 foreach my $mod (@modules) {
-                    my ($name) = $mod =~ /::(\w+)\z/;
+                    my ($name) = $mod =~ /(\w+::\w+)\z/;
                     push @{$ref->{inherits}}, $name;
                 }
             }

@@ -14,9 +14,14 @@ package Sidef::Types::String::String {
 
     {
         no strict 'refs';
+
         *{__PACKAGE__ . '::' . '=~'} = sub {
             $_[1]->matches($_[0]);
         };
+
+        *{__PACKAGE__ . '::' . '*'} = sub {
+            __PACKAGE__->new($_[0] x $_[1]);
+          }
     }
 
     sub uc {

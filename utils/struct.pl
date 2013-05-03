@@ -1,19 +1,23 @@
 {
   Array   => {
                Array => {
-                 methods => [
-                   {
-                     args    => ["array"],
-                     doc     => "Substract the I<array> from the self array.",
-                     name    => "-",
-                     returns => "Array::Array",
-                   },
-                   {
-                     args => [],
-                     doc  => "Remove and return the last element from the self array.",
-                     name => "pop",
-                   },
-                 ],
+                 inherits => ["Convert"],
+                 methods  => [
+                               {
+                                 args    => ["array"],
+                                 doc     => "Substract the I<array> from the self array.",
+                                 name    => "-",
+                                 returns => "Array::Array",
+                               },
+                               {
+                                 args => [],
+                                 doc  => "Remove and return the last element from the self array.",
+                                 name => "pop",
+                               },
+                               { name => "+" },
+                               { args => [], name => "shift" },
+                               { args => [", ..."], name => "push", returns => "Array::Array" },
+                             ],
                },
              },
   Bool    => {
@@ -201,7 +205,14 @@
                                         ],
                           },
              },
-  Regex   => { Regex => { inherits => ["Convert"] } },
+  Regex   => {
+               Regex => {
+                 inherits => ["Convert", "String::Double", "Double"],
+                 methods  => [
+                               { args => ["object"], name => "matches", returns => "Bool::Bool" },
+                             ],
+               },
+             },
   String  => {
                Double => {
                            inherits => ["String"],
@@ -260,6 +271,8 @@
                                            returns => "Glob::File",
                                          },
                                          { args => [], name => "stat_dir", returns => "Glob::Dir" },
+                                         { name => "=~" },
+                                         { name => "*" },
                                        ],
                          },
              },
