@@ -12,6 +12,13 @@ package Sidef::Types::String::String {
         bless \$str, $class;
     }
 
+    {
+        no strict 'refs';
+        *{__PACKAGE__ . '::' . '=~'} = sub {
+            $_[1]->matches($_[0]);
+        };
+    }
+
     sub uc {
         my ($self) = @_;
         __PACKAGE__->new(CORE::uc $$self);

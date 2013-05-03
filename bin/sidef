@@ -12,7 +12,7 @@ use autouse 'Getopt::Std' => qw(getopts($;$));    # arguments support
 
 my %args;
 if (qr/^-/ ~~ \@ARGV) {
-    getopts('E:', \%args);
+    getopts('E:dD:', \%args);
 }
 
 # It can be executed as:
@@ -199,6 +199,22 @@ arr_1 - arr_2 -> to_s -> say;
 ["a", "b", "c"] + ["d", "e", "f"] -> to_s -> say;
 
 #####################################################
+
+
+#
+## Regular expressions
+#
+
+/TEST/i -> matches("For testing.")->to_s->say;      # true
+/[123]/ =~ "one two three" -> to_s->say;            # false
+
+"--string--" =~ /(\w+)/ -> to_s -> say;             # true
+
+var regex = /^\d+ \w+ \d+$/;
+"03 May 2013" =~ regex -> to_s->say;                # true
+regex -> to_s -> say;                               # prints the regex
+
+/item/ =~ ["str", [123, ["w", "item", "x"], 6], "boo"] -> to_s -> say;    # matches 'item' in nested array
 
 CODE
 

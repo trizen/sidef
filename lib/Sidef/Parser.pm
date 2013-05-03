@@ -16,21 +16,26 @@ package Sidef::Parser {
             line          => 1,
             has_object    => 0,
             expect_method => 0,
+            expect_arg    => 0,
             parentheses   => 0,
             class         => 'main',
             variables     => {},
             re            => {
-                double_quote  => Sidef::Utils::Regex::make_esc_delim(q{"}),
-                single_quote  => Sidef::Utils::Regex::make_esc_delim(q{'}),
-                file_quote    => Sidef::Utils::Regex::make_esc_delim(q{~}),
-                var_in_string => Sidef::Utils::Regex::variable_in_string(),
-                var_name      => qr/[a-zA-Z_]\w*/,
-                operators     => do {
+                double_quote       => Sidef::Utils::Regex::make_esc_delim(q{"}),
+                single_quote       => Sidef::Utils::Regex::make_esc_delim(q{'}),
+                file_quote         => Sidef::Utils::Regex::make_esc_delim(q{~}),
+                regex              => Sidef::Utils::Regex::make_esc_delim(q{/}),
+                m_regex            => Sidef::Utils::Regex::make_single_q_balanced(q{m}),
+                match_flags        => qr{[msixpogcdual]*},
+                substitution_flags => qr{[msixpogcerdual]*},
+                var_in_string      => Sidef::Utils::Regex::variable_in_string(),
+                var_name           => qr/[a-zA-Z_]\w*/,
+                operators          => do {
                     local $" = q{|};
 
                     my @operators = map { quotemeta } qw(
 
-                      && || // ** << >> ==
+                      && || // ** << >> == =~
                       / + - * % ^ & | :  =
 
                       );
@@ -66,6 +71,7 @@ package Sidef::Parser {
 
             # Operator-like method name
             when (m{\G$self->{re}{operators}}goc) {
+                $self->{expect_arg} = 1;
                 return $1, pos;
             }
             default {
@@ -135,6 +141,7 @@ package Sidef::Parser {
                 }
 
                 $self->{has_object} = 1;
+                $self->{expect_arg} = 0;
 
                 # Double quoted string
                 when (/\G$self->{re}{double_quote}/gc) {
@@ -177,6 +184,15 @@ package Sidef::Parser {
                 # Integer number
                 when (/\G([+-]?\d+)\b/gc) {
                     return Sidef::Types::Number::Integer->new($1), pos;
+                }
+
+                # Regular expression
+                when (/\G$self->{re}{regex}/goc || ($] >= 5.017001 && /\G$self->{re}{m_regex}/goc)) {
+
+                    my $regex = $1;
+                    my ($flags) = (/\G($self->{re}{match_flags})/gc);
+
+                    return Sidef::Types::Regex::Regex->new($regex, $flags), pos;
                 }
 
                 # Object as expression
@@ -325,7 +341,9 @@ package Sidef::Parser {
                 }
 
                 # Method separator '->', or operator-method, like '*'
-                when ($self->{expect_method} == 1 && (/\G->/gc || /\G(?=\s*$self->{re}{operators})/)) {
+                when (   $self->{expect_method} == 1
+                      && !$self->{expect_arg}
+                      && (/\G->/gc || /\G(?=\s*$self->{re}{operators})/)) {
 
                     my ($method_name, $pos) = $self->get_method_name(code => substr($_, pos));
                     pos($_) = $pos + pos;

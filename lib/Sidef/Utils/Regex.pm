@@ -39,7 +39,7 @@ package Sidef::Utils::Regex {
                 (\W)
      )
     )
-        (??{$bdelims{$+} // make_esc_delim($+)})
+        (??{$bdelims{$+} // Sidef::Utils::Regex::make_esc_delim($+)})
     }x;
 
     # Double pairs -- comments
