@@ -80,18 +80,21 @@ package Sidef::Parser {
             }
 
             # Alpha-numeric method name
-            when (/\G([a-z]\w+)/gc) {
-                return $1, pos;
+            when (/\G([a-z]\w*)/gc) {
+                return {self => Sidef::Types::String::String->new($1)}, pos;
             }
 
             # Operator-like method name
             when (m{\G$self->{re}{operators}}goc) {
                 $self->{expect_arg} = 1;
-                return $1, pos;
+                return {self => Sidef::Types::String::String->new($1)}, pos;
             }
-            default {
-                warn "Invalid method name!\n";
-                $self->fatal_error(code => $_, pos => pos($_));
+
+            # Method name as variable
+            when (m{\G\$(?=$self->{re}{var_name})}goc || 1) {
+                my ($obj, $pos) = $self->parse_expr(code => substr($_, pos));
+                pos($_) = $pos + pos;
+                return {self => $obj}, pos;
             }
         }
     }
@@ -216,7 +219,10 @@ package Sidef::Parser {
                     my ($obj, $pos) = $self->parse_array(code => substr($_, pos));
                     pos($_) = $pos + pos;
 
-                    push @{$array}, @{$obj->{main}};
+                    if (ref $obj->{main} eq 'ARRAY') {
+                        push @{$array}, @{$obj->{main}};
+                    }
+
                     return $array, pos;
                 }
 
@@ -334,7 +340,7 @@ package Sidef::Parser {
 
                     while (my (undef, $class_var) = each %{$self->{variables}}) {
                         while (my (undef, $variable) = each %{$class_var}) {
-                            if ($variable->{count} == 0) {
+                            if ($variable->{name} ne uc($variable->{name}) and $variable->{count} == 0) {
                                 warn "Variable '$variable->{name}' has been initialized"
                                   . " at line $variable->{line}, but not used again!\n";
                             }

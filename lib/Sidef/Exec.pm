@@ -64,7 +64,11 @@ package Sidef::Exec {
                     my @arguments;
                     my $method = $call->{name};
 
-                    if (ref $self_obj eq 'Sidef::Variable::Variable' and $method ne '=') {
+                    if (ref $method eq 'HASH') {
+                        $method = $self->execute_expr(expr => $method);
+                    }
+
+                    if (ref $self_obj eq 'Sidef::Variable::Variable' and $$method ne '=') {
                         my $value = $self_obj->get_value;
                         $self->{variables}{$opt{class}}{$self_obj->get_name} = $value;
                         $self_obj = $value;
@@ -102,10 +106,6 @@ package Sidef::Exec {
                     }
                     else {
                         $self_obj = $self_obj->$method;
-                    }
-
-                    if (ref $self_obj eq 'Sidef::Variable::Variable') {
-                        $self->{variables}{$opt{class}}{$self_obj->get_name} = $self_obj;
                     }
                 }
             }

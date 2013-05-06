@@ -5,6 +5,10 @@ use warnings;
 
 package Sidef::Variable::Variable {
 
+    use overload q{""} => sub {
+        return $_[0]->get_value
+    };
+
     sub new {
         my ($class, $var, $type) = @_;
         bless {

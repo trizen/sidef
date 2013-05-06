@@ -210,3 +210,27 @@ var re = '\w';
 '-' * 80 -> say;
 
 "Chinese characters: 文化交流学院"->say;
+
+
+#######################################################
+
+#
+## Support for method calls written as expressions
+#
+
+"\n=>> Methods as expressions:\n" + ('-' * 80) -> say;
+
+("sqrt of 81 is: " + (81->(["sqrt"]->shift)->to_s))->say;
+
+var sqrt_method = "sqrt";
+("sqrt of 25 is: " + (25->$sqrt_method->to_s))->say;
+
+var method_name = "substr";
+"Ioana" + ("Sidef is awesome!"->$method_name(5, 12))->insert("super ", 9)->say;
+
+'-' * 80 -> say;
+
+#######################################################
+
+"Your OS name is: $OSNAME"->say;
+"Name of this script is: $SCRIPT"->say;

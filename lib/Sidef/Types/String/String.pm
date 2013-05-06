@@ -21,7 +21,11 @@ package Sidef::Types::String::String {
 
         *{__PACKAGE__ . '::' . '*'} = sub {
             __PACKAGE__->new($_[0] x $_[1]);
-          }
+        };
+
+        *{__PACKAGE__ . '::' . '+'} = sub {
+            __PACKAGE__->new($_[0] . $_[1]);
+        };
     }
 
     sub uc {
@@ -57,7 +61,7 @@ package Sidef::Types::String::String {
     }
 
     sub substr {
-        my ($self, $offs, $len, $repl) = @_;
+        my ($self, $offs, $len) = @_;
 
         my @str = CORE::split(//, $$self);
         my $str_len = $#str;
@@ -68,11 +72,16 @@ package Sidef::Types::String::String {
         $offs = 1 + $str_len + $offs if $offs < 0;
         $len = defined $len ? $len < 0 ? $str_len + $len : $offs + $len - 1 : $str_len;
 
-        if (defined $repl) {
-            $self = __PACKAGE__->new(CORE::join '', @str[0 .. $offs - 1], $repl, @str[$len + 1 .. $str_len]);
-        }
-
         __PACKAGE__->new(CORE::join '', @str[$offs .. $len]);
+    }
+
+    sub insert {
+        my ($self, $string, $pos, $len) = @_;
+
+        $$len ||= 0;
+        CORE::substr($$self, $$pos, $$len, $$string);
+
+        return $self;
     }
 
     sub join {

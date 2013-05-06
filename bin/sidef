@@ -49,11 +49,14 @@ my $struct;
 
 if (defined $args{d}) {
     require Sidef::Init;
-    $struct = do($args{d}) || die "Can't load the data structure from file '$args{d}': $!\n";
+    $struct = do($args{d})
+      || die "Can't load the data structure from file '$args{d}': $!\n";
 }
 else {
     require Sidef::Parser;
     my $parser = Sidef::Parser->new();
+
+    my $script_name = '';
 
     my $code =
       exists $args{E}
@@ -61,6 +64,7 @@ else {
       : (defined($ARGV[0]) && -f $ARGV[0]) ? do {
 
         my $file = shift;
+        $script_name = $file;
 
         open my $fh, '<:encoding(UTF-8)', $file
           or die qq{Can't open sidef script "$file": $!\n};
@@ -71,7 +75,23 @@ else {
       }
       : join(' ', <>);
 
-    $struct = $parser->parse_script(code => $code);
+    my $arguments = @ARGV ? (q{'} . join(q{','}, (map { s/'/\\'/gr } @ARGV)) . q{'}) : '';
+
+    #
+    ## Predeclared variables and constants
+    #
+
+    my $header = <<"EOH";
+
+const START_TIME = ${\time};
+var   ARGV       = [$arguments];
+const OSNAME     = '$^O';
+const EXEC       = ("\Q$0\E"->stat_file);
+const SCRIPT     = ("\Q$script_name\E"->stat_file);
+
+EOH
+
+    $struct = $parser->parse_script(code => $header . $code);
 }
 
 if ($args{D}) {
@@ -84,7 +104,8 @@ if ($args{D}) {
         my $out_fh = \*STDOUT;
 
         if (defined $args{o}) {
-            open $out_fh, '>:encoding(UTF-8)', $args{o} or die "Can't open file '$args{o}' for write: $!\n";
+            open $out_fh, '>:encoding(UTF-8)', $args{o}
+              or die "Can't open file '$args{o}' for write: $!\n";
         }
 
         print {$out_fh} Data::Dump::pp($struct);
