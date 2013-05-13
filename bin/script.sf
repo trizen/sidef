@@ -233,4 +233,11 @@ var method_name = "substr";
 #######################################################
 
 "Your OS name is: $OSNAME"->say;
-"Name of this script is: $SCRIPT"->say;
+"The name of this script is: $SCRIPT\n"->say;
+
+#######################################################
+
+var range_array = (1..5);
+range_array->reverse->join(', ') + ". BOOM!"->say;
+
+#######################################################

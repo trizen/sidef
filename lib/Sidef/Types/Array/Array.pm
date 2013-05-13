@@ -8,21 +8,21 @@ package Sidef::Types::Array::Array {
     use parent qw(Sidef::Convert::Convert);
 
     sub new {
-        my ($class) = @_;
-        bless [], $class;
+        my ($class, @items) = @_;
+        bless [@items], $class;
     }
 
     {
         no strict 'refs';
         *{__PACKAGE__ . '::' . '-'} = sub {
-            my ($array_1, $array_2) = @_;
+            my ($self, $array) = @_;
 
             my $new_array = __PACKAGE__->new();
 
-            foreach my $item (@{$array_1}) {
+            foreach my $item (@{$self}) {
 
                 my $exists = 0;
-                foreach my $min_item (@{$array_2}) {
+                foreach my $min_item (@{$array}) {
                     if ($min_item eq $item) {
                         $exists = 1;
                         last;
@@ -36,12 +36,8 @@ package Sidef::Types::Array::Array {
         };
 
         *{__PACKAGE__ . '::' . '+'} = sub {
-            my ($array_1, $array_2) = @_;
-
-            my $new_array = Sidef::Types::Array::Array->new();
-            push @{$new_array}, @{$array_1}, @{$array_2};
-
-            return $new_array;
+            my ($self, $array) = @_;
+            __PACKAGE__->new(@{$self}, @{$array});
         };
     }
 
@@ -59,6 +55,16 @@ package Sidef::Types::Array::Array {
         my ($self, @args) = @_;
         push @{$self}, @args;
         return $self;
+    }
+
+    sub join {
+        my($self, $separator) = @_;
+        Sidef::Types::String::String->new(CORE::join($$separator, @{$self}));
+    }
+
+    sub reverse {
+        my($self, $separator) = @_;
+        __PACKAGE__->new(reverse @{$self});
     }
 
 }

@@ -35,7 +35,7 @@ package Sidef::Parser {
 
                     my @operators = map { quotemeta } qw(
 
-                      && || // ** << >> == =~
+                      && || // ** << >> == =~ ..
                       / + - * % ^ & | :  =
 
                       );

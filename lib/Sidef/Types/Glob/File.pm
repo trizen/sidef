@@ -29,7 +29,7 @@ package Sidef::Types::Glob::File {
 
     sub is_text {
         my ($self) = @_;
-        Sidef::Types::Bool::Bool->new(not $self->is_binary);
+        Sidef::Types::Bool::Bool->new(-T $$self);
     }
 
     sub is_file {

@@ -44,6 +44,11 @@ package Sidef::Types::Number::Number {
             my ($self, $arg) = @_;
             __PACKAGE__->new($$self**$$arg);
         };
+
+        *{__PACKAGE__ . '::' . '..'} = sub {
+            my ($self, $arg) = @_;
+            Sidef::Types::Array::Array->new(map {__PACKAGE__->new($_) } $$self .. $$arg);
+        };
     }
 
     sub sqrt {
