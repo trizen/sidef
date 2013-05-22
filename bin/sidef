@@ -89,6 +89,7 @@ const OSNAME     = '$^O';
 const EXEC       = ("\Q$0\E"->stat_file);
 const SCRIPT     = ("\Q$script_name\E"->stat_file);
 
+__RESET_LINE_COUNTER__;
 EOH
 
     $struct = $parser->parse_script(code => $header . $code);

@@ -359,6 +359,11 @@ package Sidef::Parser {
                     return \%struct;
                 }
 
+                when (/\G__RESET_LINE_COUNTER__\b/gc){
+                    $self->{line} = 0;
+                    redo;
+                }
+
                 # Method separator '->', or operator-method, like '*'
                 when (   $self->{expect_method} == 1
                       && !$self->{expect_arg}
