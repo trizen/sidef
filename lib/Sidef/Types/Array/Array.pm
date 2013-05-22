@@ -39,6 +39,37 @@ package Sidef::Types::Array::Array {
             my ($self, $array) = @_;
             __PACKAGE__->new(@{$self}, @{$array});
         };
+
+        *{__PACKAGE__ . '::' . '='} = sub {
+            my($self, $arg) = @_;
+
+            if(ref $arg eq 'Sidef::Types::Array::Array'){
+                foreach my $i(0..$#{$self}){
+                    my $method = '=';
+                    $self->[$i] -> $method($arg->[$i]);
+                }
+            }
+            else{
+                @{$self} = $arg;
+            }
+
+            $self;
+        };
+
+        *{__PACKAGE__ . '::' . '[' } = sub {
+            my($self, $indices) = @_;
+
+            if($#{$indices} == 0){
+                return $self->[$indices->[0]];
+            }else{
+                return __PACKAGE__->new(@{$self}[@{$indices}]);
+            }
+        };
+    }
+
+    sub len {
+        my($self) = @_;
+        Sidef::Types::Number::Integer->new(scalar @{$self});
     }
 
     sub pop {

@@ -6,7 +6,7 @@ use warnings;
 package Sidef::Variable::Variable {
 
     use overload q{""} => sub {
-        return $_[0]->get_value
+        $_[0]->get_value
     };
 
     sub new {
@@ -19,7 +19,7 @@ package Sidef::Variable::Variable {
 
     sub get_name {
         my ($self) = @_;
-        return $self->{name};
+        $self->{name};
     }
 
     sub set_value {
@@ -29,12 +29,12 @@ package Sidef::Variable::Variable {
 
     sub get_value {
         my ($self) = @_;
-        return $self->{value};
+        $self->{value};
     }
 
     sub get_type {
         my ($self) = @_;
-        return $self->{type};
+        $self->{type};
     }
 
     {
@@ -42,6 +42,7 @@ package Sidef::Variable::Variable {
 
         *{__PACKAGE__ . '::' . '='} = sub {
             my ($self, $obj) = @_;
+
             if ($self->{type} eq "const") {
                 if (not defined $self->{value}) {
                     return $self->set_value($obj);
@@ -51,9 +52,23 @@ package Sidef::Variable::Variable {
             elsif ($self->{type} eq "var") {
                 return $self->set_value($obj);
             }
+            elsif ($self->{type} eq "char"){
+                return $self->set_value($obj->to_bytes);
+            }
             else {
                 warn "Invalid type: $self->{type}.\n";
             }
+        };
+
+        *{__PACKAGE__ . '::' . ':='} = sub {
+            my($self, $obj) = @_;
+
+            if(not defined $self->{value} or ref $self->{value} eq 'Sidef::Types::Nil::Nil'){
+                my $method = \&{__PACKAGE__ . '::' . '='};
+                return $self->$method($obj);
+            }
+
+            return $self->{value};
         };
 
     }

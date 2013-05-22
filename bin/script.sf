@@ -237,7 +237,74 @@ var method_name = "substr";
 
 #######################################################
 
+'-' * 80 -> say;
+
 var range_array = (1..5);
 range_array->reverse->join(', ') + ". BOOM!"->say;
+
+#######################################################
+
+'-' * 80 -> say;
+
+var defined = "original";
+defined := "modified";
+
+defined->say;
+
+defined = nil;
+defined := "modified";
+
+defined->say;
+
+#######################################################
+
+'-' * 80 -> say;
+
+char bytes = "sidef";
+"Number of bytes: " + (bytes->len->to_s)->say;
+bytes->to_s->say;
+
+var i = 2;
+"bytes[$i] == " + (bytes[i]->to_s)->say;
+
+'-' * 80 -> say;
+
+var nums = ["zero", "one", "two", "three", "four"];
+
+# Returns an object
+nums[1]->say;
+nums[2]->say;
+
+# Returns an array of objects
+nums[3,4]->to_s->say;
+nums[-1,-2,-3,-4]->to_s->say;
+
+'-' * 80 -> say;
+
+#######################################################
+
+defined[3]->say;
+defined[0,1,1,2,3,-2]->join('')->say;
+
+'-'*80->say;
+
+nums[1]->say;
+nums[1] = "unu" -> say;
+nums[2]->say;
+
+nums[2,3,4] = ["doi", "trei", "patru"];
+
+nums->join(' ')->say;
+
+'-' * 80 -> say;
+
+var nes = ["beg", ["x", "y", "z"], "end"];
+
+nes[1]->to_s->say;
+nes[1] = ["m", "n", "o"];
+nes[1]->to_s->say;
+(nes[1][1]) + (nes[1][2])->say;
+
+nes[0] = ["one", "two", "three"];
 
 #######################################################

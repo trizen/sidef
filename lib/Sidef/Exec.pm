@@ -68,7 +68,7 @@ package Sidef::Exec {
                         $method = $self->execute_expr(expr => $method);
                     }
 
-                    if (ref $self_obj eq 'Sidef::Variable::Variable' and $$method ne '=') {
+                    if (ref $self_obj eq 'Sidef::Variable::Variable' and not $$method ~~ ['=', ':=']) {
                         my $value = $self_obj->get_value;
                         $self->{variables}{$opt{class}}{$self_obj->get_name} = $value;
                         $self_obj = $value;

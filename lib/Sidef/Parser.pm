@@ -36,6 +36,7 @@ package Sidef::Parser {
                     my @operators = map { quotemeta } qw(
 
                       && || // ** << >> == =~ ..
+                      := [
                       / + - * % ^ & | :  =
 
                       );
@@ -185,6 +186,11 @@ package Sidef::Parser {
                     return Sidef::Types::Bool::Bool->new($1), pos;
                 }
 
+                # Undefined value
+                when (/\Gnil\b/gc){
+                    return Sidef::Types::Nil::Nil->new(), pos;
+                }
+
                 # Floating point number
                 when (/\G([+-]?\d+\.\d+)\b/gc) {
                     return Sidef::Types::Number::Float->new($1), pos;
@@ -227,7 +233,7 @@ package Sidef::Parser {
                 }
 
                 # Declaration of variables or constants. (with 'var' / 'const')
-                when (/\G(var|const)\h+($self->{re}{var_name})/goc) {
+                when (/\G(var|const|char)\h+($self->{re}{var_name})/goc) {
                     my $type = $1;
                     my $name = $2;
 
@@ -362,6 +368,22 @@ package Sidef::Parser {
                     pos($_) = $pos + pos;
 
                     push @{$struct{$self->{class}}[-1]{call}}, {name => $method_name,};
+
+                    if(ref $method_name eq 'HASH'
+                    and ref $method_name->{self} eq 'Sidef::Types::String::String'
+                    and ${$method_name->{self}} eq '['){
+
+                            my $array = Sidef::Types::Array::Array->new();
+                            my ($obj, $pos) = $self->parse_array(code => substr($_, pos() - 1));
+                            pos($_) = $pos + pos()-1;
+
+                            if (ref $obj->{main} eq 'ARRAY') {
+                                push @{$array}, @{$obj->{main}};
+                            }
+
+                            push @{$struct{$self->{class}}[-1]{call}[-1]{arg}}, $array
+                    }
+
                     redo;
                 }
 

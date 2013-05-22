@@ -66,7 +66,7 @@ package Sidef::Convert::Convert {
         Sidef::Types::Number::Integer->new($$self);
     }
 
-    sub to_f {
+    sub to_float {
         my ($self) = @_;
         Sidef::Types::Number::Float->new($$self);
     }
@@ -81,12 +81,22 @@ package Sidef::Convert::Convert {
         Sidef::Types::Glob::Dir->new($$self);
     }
 
-    sub to_b {
+    sub to_bool {
         my ($self) = @_;
         Sidef::Types::Bool::Bool->new($$self);
     }
 
-    sub to_a {
+    sub to_byte {
+        my($self) = @_;
+        Sidef::Types::Byte::Byte->new(ord $self);
+    }
+
+    sub to_bytes {
+        my($self) = @_;
+        Sidef::Types::Array::Array->new(map {Sidef::Types::Byte::Byte->new($_)} unpack "C*", $self);
+    }
+
+    sub to_array {
         my ($self) = @_;
         Sidef::Types::Array::Array->new($self);
     }
