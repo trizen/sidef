@@ -9,7 +9,7 @@ package Sidef::Types::Array::Array {
 
     sub new {
         my ($class, @items) = @_;
-        bless [@items], $class;
+        bless \@items, $class;
     }
 
     {
@@ -23,7 +23,7 @@ package Sidef::Types::Array::Array {
 
                 my $exists = 0;
                 foreach my $min_item (@{$array}) {
-                    if ($min_item eq $item) {
+                    if ($min_item->get_value eq $item->get_value) {
                         $exists = 1;
                         last;
                     }
@@ -41,34 +41,23 @@ package Sidef::Types::Array::Array {
         };
 
         *{__PACKAGE__ . '::' . '='} = sub {
-            my($self, $arg) = @_;
+            my ($self, $arg) = @_;
 
-            if(ref $arg eq 'Sidef::Types::Array::Array'){
-                foreach my $i(0..$#{$self}){
-                    my $method = '=';
-                    $self->[$i] -> $method($arg->[$i]);
+            if (ref $arg eq 'Sidef::Types::Array::Array') {
+                foreach my $i (0 .. $#{$self}) {
+                    $self->[$i]->set_value($arg->[$i]);
                 }
             }
-            else{
-                @{$self} = $arg;
+            else {
+                map { $_->set_value($arg) } @{$self};
             }
 
             $self;
         };
-
-        *{__PACKAGE__ . '::' . '[' } = sub {
-            my($self, $indices) = @_;
-
-            if($#{$indices} == 0){
-                return $self->[$indices->[0]];
-            }else{
-                return __PACKAGE__->new(@{$self}[@{$indices}]);
-            }
-        };
     }
 
     sub len {
-        my($self) = @_;
+        my ($self) = @_;
         Sidef::Types::Number::Integer->new(scalar @{$self});
     }
 
@@ -89,12 +78,12 @@ package Sidef::Types::Array::Array {
     }
 
     sub join {
-        my($self, $separator) = @_;
+        my ($self, $separator) = @_;
         Sidef::Types::String::String->new(CORE::join($$separator, @{$self}));
     }
 
     sub reverse {
-        my($self, $separator) = @_;
+        my ($self, $separator) = @_;
         __PACKAGE__->new(reverse @{$self});
     }
 

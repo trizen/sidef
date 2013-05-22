@@ -260,12 +260,19 @@ defined->say;
 
 '-' * 80 -> say;
 
-char bytes = "sidef";
-"Number of bytes: " + (bytes->len->to_s)->say;
-bytes->to_s->say;
+char chars = "sidef";
+"Number of chars: " + (chars->len->to_s)->say;
+chars->to_s->say;
 
 var i = 2;
-"bytes[$i] == " + (bytes[i]->to_s)->say;
+"chars[$i] is '" + (chars[i]->to_s) + "'" ->say;
+
+chars[0] = "g";
+chars[2] = "r";
+chars[3] = "a";
+chars[5] = "f";
+chars[6] = "e";
+chars->join('')->say;
 
 '-' * 80 -> say;
 
@@ -276,25 +283,32 @@ nums[1]->say;
 nums[2]->say;
 
 # Returns an array of objects
-nums[3,4]->to_s->say;
-nums[-1,-2,-3,-4]->to_s->say;
+nums[2,3,4]->to_s->say;
+nums[-1,-2,-3,-4,-5]->to_s->say;
 
 '-' * 80 -> say;
 
 #######################################################
 
-defined[3]->say;
-defined[0,1,1,2,3,-2]->join('')->say;
-
-'-'*80->say;
+#defined[3]->say;
+#defined[0,1,1,2,3,-2]->join('')->say;
+#'-'*80->say;
 
 nums[1]->say;
 nums[1] = "unu" -> say;
 nums[2]->say;
 
-nums[2,3,4] = ["doi", "trei", "patru"];
+nums[5-3] = "doi";
+nums[2+1] = "trei";
+nums[8/2] = "patru";
+
+nums[3]->say;
+
+nums[2,3,4,5,6] = ["doi", "trei", "patru", "cinci", "șase"];
 
 nums->join(' ')->say;
+
+#######################################################
 
 '-' * 80 -> say;
 
@@ -303,8 +317,82 @@ var nes = ["beg", ["x", "y", "z"], "end"];
 nes[1]->to_s->say;
 nes[1] = ["m", "n", "o"];
 nes[1]->to_s->say;
-(nes[1][1]) + (nes[1][2])->say;
+nes[1][1]->to_s->say;
 
+'-' * 80 -> say;
+
+nes[0]->say;
 nes[0] = ["one", "two", "three"];
+
+nes[0]->to_s->say;
+nes[0][1] = "doi";
+nes[0]->to_s->say;
+
+#######################################################
+
+'-' * 80 -> say;
+
+var array_test = [];
+array_test[0] = "elem1";
+array_test[1] = "elem2";
+
+array_test->to_s->say;
+
+array_test[0,1] = "x";      # set both elements to string "x"
+array_test->to_s->say;
+
+array_test[0,1] = ["y"];    # set the first element to string "y", and the second element to undef
+
+#######################################################
+
+'-' * 80 -> say;
+
+"ord('a') ==  " + ("a"->ord->to_s)->say;
+
+#######################################################
+
+#
+## Bytes
+#
+
+'-' * 80 -> say;
+
+var byte = ('c'->ord);
+"byte '$byte' made uppercase, is: " + ( byte - 32 -> chr)->say;
+
+'-' * 80 -> say;
+
+byte bytes = "șarpe";   # splits on bytes!
+
+bytes->join->say;
+"The character 'ș' is composed of two bytes: " + (bytes[0,1]->to_s)->say;
+"Then comes the character 'a', which is: " + (bytes[2]->to_s) + " (" + (bytes[2]->chr) + ")"->say;
+
+bytes[0] = 200;     # Keep the first byte as it is
+bytes[1] = 154;     # and change the 'S' to 'T', resulting in 'Ț'
+bytes->join->say;   # prints: 'Țarpe'
+
+#######################################################
+
+#
+## Characters
+#
+
+'-' * 80 -> say;
+
+char sidef = "șopârlă";     # splits on characters!
+sidef->join('-')->say;
+sidef[1]->say;
+sidef[2]->say;
+sidef[3]->say;
+sidef[4]->say;
+sidef[5]->say;
+sidef[6]->say;
+
+'-' * 80 -> say;
+
+#######################################################
+
+#1..3[0]->to_s->say;    # DOESN'T WORK!!! (but, it should?)
 
 #######################################################

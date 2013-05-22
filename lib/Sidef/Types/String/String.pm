@@ -26,31 +26,6 @@ package Sidef::Types::String::String {
         *{__PACKAGE__ . '::' . '+'} = sub {
             __PACKAGE__->new($_[0] . $_[1]);
         };
-
-        *{__PACKAGE__ . '::' . '='} = sub {
-            my($self, $arg) = @_;
-
-            if(ref($arg) =~ /::String::/){
-                ${$self} = ${arg};
-            }       # TODO: Add more checks here
-            else{
-                ${$self} = $arg;
-#              die "[ERROR] Can't change type '", ref $self, "' with type '", ref $arg, "'\n";
-            }
-
-            $self;
-        };
-
-        *{__PACKAGE__ . '::' . '[' } = sub {
-            my($self, $indices) = @_;
-
-            if($#{$indices} == 0){
-                return __PACKAGE__->new(substr($self, $indices->[0], 1));
-            }else{
-                my @chars = split(//, $self);
-                return Sidef::Types::Array::Array->new(@chars[@{$indices}]);
-            }
-        };
     }
 
     sub uc {
@@ -112,6 +87,11 @@ package Sidef::Types::String::String {
     sub join {
         my ($self, $delim, @rest) = @_;
         __PACKAGE__->new(CORE::join($$delim, $$self, map { $$_ } @rest));
+    }
+
+    sub ord {
+        my ($self) = @_;
+        Sidef::Types::Byte::Byte->new(CORE::ord $$self);
     }
 
     sub reverse {

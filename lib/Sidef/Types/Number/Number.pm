@@ -47,12 +47,7 @@ package Sidef::Types::Number::Number {
 
         *{__PACKAGE__ . '::' . '..'} = sub {
             my ($self, $arg) = @_;
-            Sidef::Types::Array::Array->new(map {__PACKAGE__->new($_) } $$self .. $$arg);
-        };
-
-        *{__PACKAGE__ . '::' . '='} = sub {
-            my($self, $new_self) = @_;
-            ${$self} = ${$new_self};
+            Sidef::Types::Array::Array->new(map { __PACKAGE__->new($_) } $$self .. $$arg);
         };
     }
 
@@ -84,6 +79,11 @@ package Sidef::Types::Number::Number {
     sub log2 {
         my ($self) = @_;
         Sidef::Types::Number::Float->new(CORE::log($$self) / CORE::log(2));
+    }
+
+    sub chr {
+        my ($self) = @_;
+        Sidef::Types::Char::Char->new(CORE::chr $$self);
     }
 
     sub next_power_of_two {

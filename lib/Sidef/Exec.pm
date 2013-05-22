@@ -32,11 +32,12 @@ package Sidef::Exec {
 
     sub eval_array {
         my ($self, %opt) = @_;
-
-        my @items = map { ref eq 'HASH' ? $self->execute_expr(expr => $_, class => $opt{class}) : $_ } @{$opt{array}};
-        my $array = Sidef::Types::Array::Array->new();
-        push @{$array}, @items;
-        return $array;
+        Sidef::Types::Array::Array->new(
+            map { Sidef::Variable::Variable->new($_, 'var', $_) }
+              map {
+                ref eq 'HASH' ? $self->execute_expr(expr => $_, class => $opt{class}) : $_
+              } @{$opt{array}}
+        );
     }
 
     sub execute_expr {
@@ -59,6 +60,29 @@ package Sidef::Exec {
             }
 
             if (exists $expr->{call}) {
+
+                if (exists $expr->{ind}) {
+
+                    foreach my $i (@{$expr->{ind}}) {
+                        if (ref $self_obj eq 'Sidef::Variable::Variable') {
+                            $self_obj = $self_obj->get_value;
+                        }
+
+                        my (@ind) = $self->execute(struct => $i);
+
+                        foreach my $j (@ind) {
+                            $self_obj->[$j] //= Sidef::Variable::Variable->new(rand, 'var');
+                        }
+
+                        if (@ind > 1) {
+                            $self_obj = Sidef::Types::Array::Array->new(@{$self_obj}[@ind]);
+                        }
+                        else {
+                            $self_obj = $self_obj->[$ind[0]];
+                        }
+                    }
+                }
+
                 foreach my $call (@{$expr->{call}}) {
 
                     my @arguments;
@@ -105,6 +129,10 @@ package Sidef::Exec {
 
                     }
                     else {
+                        if (ref $self_obj eq 'Sidef::Variable::Variable') {
+                            $self_obj = $self_obj->get_value;
+                        }
+
                         $self_obj = $self_obj->$method;
                     }
                 }

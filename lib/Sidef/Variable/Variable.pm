@@ -10,10 +10,12 @@ package Sidef::Variable::Variable {
     };
 
     sub new {
-        my ($class, $var, $type) = @_;
+        my ($class, $var, $type, $value) = @_;
+
         bless {
-               name => $var,
-               type => $type,
+               name  => $var,
+               type  => $type,
+               value => $value,
               }, $class;
     }
 
@@ -53,6 +55,9 @@ package Sidef::Variable::Variable {
                 return $self->set_value($obj);
             }
             elsif ($self->{type} eq "char"){
+                return $self->set_value($obj->to_chars);
+            }
+            elsif($self->{type} eq "byte"){
                 return $self->set_value($obj->to_bytes);
             }
             else {
@@ -72,7 +77,6 @@ package Sidef::Variable::Variable {
         };
 
     }
-
 };
 
 1;

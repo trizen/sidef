@@ -187,7 +187,7 @@ package Sidef::Parser {
                 }
 
                 # Undefined value
-                when (/\Gnil\b/gc){
+                when (/\Gnil\b/gc) {
                     return Sidef::Types::Nil::Nil->new(), pos;
                 }
 
@@ -226,14 +226,16 @@ package Sidef::Parser {
                     pos($_) = $pos + pos;
 
                     if (ref $obj->{main} eq 'ARRAY') {
-                        push @{$array}, @{$obj->{main}};
+                        $array->push(@{$obj->{main}});
+
+                        #push @{$array}, @{$obj->{main}};
                     }
 
                     return $array, pos;
                 }
 
-                # Declaration of variables or constants. (with 'var' / 'const')
-                when (/\G(var|const|char)\h+($self->{re}{var_name})/goc) {
+                # Declaration of variable types (var, const, char, etc...)
+                when (/\G(var|const|char|byte)\h+($self->{re}{var_name})/goc) {
                     my $type = $1;
                     my $name = $2;
 
@@ -359,7 +361,7 @@ package Sidef::Parser {
                     return \%struct;
                 }
 
-                when (/\G__RESET_LINE_COUNTER__\b/gc){
+                when (/\G__RESET_LINE_COUNTER__\b/gc) {
                     $self->{line} = 0;
                     redo;
                 }
@@ -372,21 +374,23 @@ package Sidef::Parser {
                     my ($method_name, $pos) = $self->get_method_name(code => substr($_, pos));
                     pos($_) = $pos + pos;
 
-                    push @{$struct{$self->{class}}[-1]{call}}, {name => $method_name,};
+                    if (    ref $method_name eq 'HASH'
+                        and ref $method_name->{self} eq 'Sidef::Types::String::String'
+                        and ${$method_name->{self}} eq '[') {
 
-                    if(ref $method_name eq 'HASH'
-                    and ref $method_name->{self} eq 'Sidef::Types::String::String'
-                    and ${$method_name->{self}} eq '['){
+                        my $array = Sidef::Types::Array::Array->new();
+                        my ($obj, $pos) = $self->parse_array(code => substr($_, pos() - 1));
+                        pos($_) = $pos + pos() - 1;
 
-                            my $array = Sidef::Types::Array::Array->new();
-                            my ($obj, $pos) = $self->parse_array(code => substr($_, pos() - 1));
-                            pos($_) = $pos + pos()-1;
+                        if (ref $obj->{main} eq 'ARRAY') {
+                            $array->push(@{$obj->{main}});
+                        }
 
-                            if (ref $obj->{main} eq 'ARRAY') {
-                                push @{$array}, @{$obj->{main}};
-                            }
+                        push @{$struct{$self->{class}}[-1]{ind}}, {self => $array};
 
-                            push @{$struct{$self->{class}}[-1]{call}[-1]{arg}}, $array
+                    }
+                    else {
+                        push @{$struct{$self->{class}}[-1]{call}}, {name => $method_name};
                     }
 
                     redo;

@@ -5,16 +5,11 @@ use warnings;
 
 package Sidef::Types::Byte::Byte {
 
-    use parent qw(Sidef::Convert::Convert);
+    use parent qw(Sidef::Convert::Convert Sidef::Types::Number::Number);
 
     sub new {
-        my($class, $byte) = @_;
+        my ($class, $byte) = @_;
         bless \$byte, $class;
-    }
-
-    sub chr {
-        my($self) = @_;
-        return Sidef::Types::String::String->new(chr $$self);
     }
 
 }

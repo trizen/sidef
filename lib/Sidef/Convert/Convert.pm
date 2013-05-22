@@ -30,7 +30,7 @@ package Sidef::Convert::Convert {
 
                 foreach my $item (@{$_[0]}) {
                     foreach my $comp_item (@{$_[1]}) {
-                        $item eq $comp_item or return;
+                        $item->get_value eq $comp_item->get_value or return;
                     }
                 }
 
@@ -49,7 +49,7 @@ package Sidef::Convert::Convert {
     sub to_s {
         my ($self) = @_;
 
-        if (ref $self eq 'Sidef::Types::Array::Array') {
+        if (ref $self ~~ ['Sidef::Types::Array::Array', 'Sidef::Types::Bytes::Bytes', 'Sidef::Types::Chars::Chars']) {
             return Sidef::Types::String::String->new(join(' ', @{$self}));
         }
 
@@ -87,13 +87,40 @@ package Sidef::Convert::Convert {
     }
 
     sub to_byte {
-        my($self) = @_;
-        Sidef::Types::Byte::Byte->new(ord $self);
+        my ($self) = @_;
+        Sidef::Types::Byte::Byte->new(CORE::ord $$self);
+    }
+
+    sub to_char {
+        my ($self) = @_;
+        Sidef::Types::Char::Char->new(substr($$self, 0, 1));
     }
 
     sub to_bytes {
-        my($self) = @_;
-        Sidef::Types::Array::Array->new(map {Sidef::Types::Byte::Byte->new($_)} unpack "C*", $self);
+        my ($self) = @_;
+
+        my $bytes = do {
+
+            use bytes;
+            my @b = map { Sidef::Types::Byte::Byte->new(CORE::ord bytes::substr($$self, $_, 1)) }
+              0 .. bytes::length($$self) - 1;
+            no bytes;
+
+            \@b;
+        };
+
+        Sidef::Types::Bytes::Bytes->new(map { Sidef::Variable::Variable->new(rand, 'var', $_) } @{$bytes});
+    }
+
+    sub to_chars {
+        my ($self) = @_;
+
+        Sidef::Types::Chars::Chars->new(
+            map {
+                Sidef::Variable::Variable->new(rand, 'var', Sidef::Types::Char::Char->new($_))
+              } split //,
+            $$self
+                                       );
     }
 
     sub to_array {
