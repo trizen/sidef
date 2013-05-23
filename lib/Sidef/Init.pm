@@ -25,6 +25,7 @@ require Sidef::Types::Glob::File if [caller]->[0] ne q{Sidef::Types::Glob::File}
 require Sidef::Types::Glob::Pipe if [caller]->[0] ne q{Sidef::Types::Glob::Pipe};
 require Sidef::Types::Glob::FileHandle if [caller]->[0] ne q{Sidef::Types::Glob::FileHandle};
 require Sidef::Types::Glob::PipeHandle if [caller]->[0] ne q{Sidef::Types::Glob::PipeHandle};
+require Sidef::Types::Block::Code if [caller]->[0] ne q{Sidef::Types::Block::Code};
 require Sidef::Types::Nil::Nil if [caller]->[0] ne q{Sidef::Types::Nil::Nil};
 require Sidef::Types::Number::Integer if [caller]->[0] ne q{Sidef::Types::Number::Integer};
 require Sidef::Types::Number::Number if [caller]->[0] ne q{Sidef::Types::Number::Number};

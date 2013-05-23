@@ -183,7 +183,7 @@ package Sidef::Parser {
 
                 # Boolean value
                 when (/\G((?>true|false))\b/gc) {
-                    return Sidef::Types::Bool::Bool->new($1), pos;
+                    return Sidef::Types::Bool::Bool->$1, pos;
                 }
 
                 # Undefined value
@@ -232,6 +232,14 @@ package Sidef::Parser {
                     }
 
                     return $array, pos;
+                }
+
+                # Block as object
+                when (/\G(?=\{)/){
+                    my($obj, $pos) = $self->parse_block(code => substr($_, pos));
+                    pos($_) = $pos + pos;
+
+                    Sidef::Types::Block::Code->new($obj), pos;
                 }
 
                 # Declaration of variable types (var, const, char, etc...)
@@ -310,6 +318,27 @@ package Sidef::Parser {
                     $self->{has_object}    = 0;
                     $self->{expect_method} = 0;
                     $self->{right_brackets}++;
+                    my ($obj, $pos) = $self->parse_script(code => substr($_, pos));
+                    pos($_) = $pos + pos;
+                    return $obj, pos;
+                }
+            }
+        }
+    }
+
+    sub parse_block {
+        my ($self, %opt) = @_;
+
+        given ($opt{'code'}) {
+            {
+                if (/\G/gc
+                    && defined(my $pos = $self->parse_whitespace(code => substr($_, pos)))) {
+                    pos($_) = $pos + pos($_);
+                }
+                when (/\G\{/gc) {
+                    $self->{has_object}    = 0;
+                    $self->{expect_method} = 0;
+                    $self->{curly_brackets}++;
                     my ($obj, $pos) = $self->parse_script(code => substr($_, pos));
                     pos($_) = $pos + pos;
                     return $obj, pos;
@@ -402,6 +431,24 @@ package Sidef::Parser {
                     if (@{[caller(1)]}) {
 
                         if ($self->{right_brackets} < 0) {
+                            warn "Unbalanced right brackets!\n";
+                            $self->fatal_error(code => $_, pos => pos($_) - 1);
+                        }
+
+                        $self->{has_object}    = 1;
+                        $self->{expect_method} = 1;
+                        return (\%struct, pos);
+                    }
+
+                    redo;
+                }
+
+                when (/\G\}/gc) {
+                    --$self->{curly_brackets};
+
+                    if (@{[caller(1)]}) {
+
+                        if ($self->{curly_brackets} < 0) {
                             warn "Unbalanced right brackets!\n";
                             $self->fatal_error(code => $_, pos => pos($_) - 1);
                         }

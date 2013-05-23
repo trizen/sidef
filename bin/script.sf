@@ -393,6 +393,18 @@ sidef[6]->say;
 
 #######################################################
 
+var block = {
+    "first"->say;
+    "block"->say;
+};
+
+block->if(true);    # execute block
+block->if(false);   # don't execute block
+
+'-'*80->say;
+
+#######################################################
+
 #1..3[0]->to_s->say;    # DOESN'T WORK!!! (but, it should?)
 
 #######################################################
