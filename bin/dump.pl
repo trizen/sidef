@@ -5,7 +5,7 @@ do {
         call => [
                   {
                     arg  => [
-                              bless(do{\(my $o = 1369304342)}, "Sidef::Types::Number::Integer"),
+                              bless(do{\(my $o = 1369311837)}, "Sidef::Types::Number::Integer"),
                             ],
                     name => {
                               self => bless(do{\(my $o = "=")}, "Sidef::Types::String::String"),
@@ -4158,6 +4158,56 @@ do {
                                             ],
                                     self => bless(do{\(my $o = "block")}, "Sidef::Types::String::Double"),
                                   },
+                                  {
+                                    call => [
+                                              {
+                                                arg  => [
+                                                          bless([
+                                                            {
+                                                              self => bless(do{\(my $o = 1)}, "Sidef::Types::Number::Integer"),
+                                                            },
+                                                            {
+                                                              self => bless(do{\(my $o = 2)}, "Sidef::Types::Number::Integer"),
+                                                            },
+                                                            {
+                                                              self => bless(do{\(my $o = 4)}, "Sidef::Types::Number::Integer"),
+                                                            },
+                                                          ], "Sidef::Types::Array::Array"),
+                                                        ],
+                                                name => {
+                                                          self => bless(do{\(my $o = "=")}, "Sidef::Types::String::String"),
+                                                        },
+                                              },
+                                            ],
+                                    self => bless({ name => "private", type => "var", value => undef }, "Sidef::Variable::Variable"),
+                                  },
+                                  {
+                                    call => [
+                                              {
+                                                name => {
+                                                  self => bless(do{\(my $o = "to_s")}, "Sidef::Types::String::String"),
+                                                },
+                                              },
+                                              {
+                                                name => {
+                                                  self => bless(do{\(my $o = "say")}, "Sidef::Types::String::String"),
+                                                },
+                                              },
+                                            ],
+                                    ind  => [
+                                              {
+                                                self => bless([
+                                                  {
+                                                    self => bless(do{\(my $o = 1)}, "Sidef::Types::Number::Integer"),
+                                                  },
+                                                ], "Sidef::Types::Array::Array"),
+                                              },
+                                            ],
+                                    self => 'fix',
+                                  },
+                                  {
+                                    self => bless(do{\(my $o = "end of block")}, "Sidef::Types::String::Double"),
+                                  },
                                 ],
                               }, "Sidef::Types::Block::Code"),
                             ],
@@ -4205,6 +4255,218 @@ do {
                   },
                 ],
         self => 'fix',
+      },
+      {
+        call => [
+                  {
+                    name => {
+                      self => bless(do{\(my $o = "to_s")}, "Sidef::Types::String::String"),
+                    },
+                  },
+                  {
+                    name => {
+                      self => bless(do{\(my $o = "say")}, "Sidef::Types::String::String"),
+                    },
+                  },
+                ],
+        ind  => [
+                  {
+                    self => bless([
+                      {
+                        self => bless(do{\(my $o = 1)}, "Sidef::Types::Number::Integer"),
+                      },
+                    ], "Sidef::Types::Array::Array"),
+                  },
+                ],
+        self => 'fix',
+      },
+      {
+        call => [
+                  {
+                    arg  => [bless(do{\(my $o = 80)}, "Sidef::Types::Number::Integer")],
+                    name => {
+                              self => bless(do{\(my $o = "*")}, "Sidef::Types::String::String"),
+                            },
+                  },
+                  {
+                    name => {
+                      self => bless(do{\(my $o = "say")}, "Sidef::Types::String::String"),
+                    },
+                  },
+                ],
+        self => bless(do{\(my $o = "-")}, "Sidef::Types::String::String"),
+      },
+      {
+        call => [
+                  {
+                    arg  => [
+                              {
+                                main => [
+                                  {
+                                    call => [
+                                              {
+                                                arg  => [bless(do{\(my $o = 5)}, "Sidef::Types::Number::Integer")],
+                                                name => {
+                                                          self => bless(do{\(my $o = "..")}, "Sidef::Types::String::String"),
+                                                        },
+                                              },
+                                            ],
+                                    self => bless(do{\(my $o = 1)}, "Sidef::Types::Number::Integer"),
+                                  },
+                                ],
+                              },
+                            ],
+                    name => {
+                              self => bless(do{\(my $o = "for")}, "Sidef::Types::String::String"),
+                            },
+                  },
+                ],
+        self => bless({
+                  main => [
+                    {
+                      call => [
+                                {
+                                  name => {
+                                    self => bless(do{\(my $o = "say")}, "Sidef::Types::String::String"),
+                                  },
+                                },
+                              ],
+                      self => bless(do{\(my $o = "Sidef rocks!!!")}, "Sidef::Types::String::Double"),
+                    },
+                  ],
+                }, "Sidef::Types::Block::Code"),
+      },
+      {
+        call => [
+                  {
+                    arg  => [bless(do{\(my $o = 80)}, "Sidef::Types::Number::Integer")],
+                    name => {
+                              self => bless(do{\(my $o = "*")}, "Sidef::Types::String::String"),
+                            },
+                  },
+                  {
+                    name => {
+                      self => bless(do{\(my $o = "say")}, "Sidef::Types::String::String"),
+                    },
+                  },
+                ],
+        self => bless(do{\(my $o = "-")}, "Sidef::Types::String::String"),
+      },
+      {
+        self => bless({ name => "index", type => "var", value => undef }, "Sidef::Variable::Variable"),
+      },
+      {
+        call => [
+                  {
+                    arg  => [
+                              {
+                                main => [
+                                  {
+                                    self => bless({
+                                      main => [
+                                        {
+                                          call => [
+                                                    {
+                                                      arg  => [bless(do{\(my $o = 1)}, "Sidef::Types::Number::Integer")],
+                                                      name => {
+                                                                self => bless(do{\(my $o = "=")}, "Sidef::Types::String::String"),
+                                                              },
+                                                    },
+                                                  ],
+                                          self => 'fix',
+                                        },
+                                        {
+                                          call => [
+                                                    {
+                                                      arg  => [bless(do{\(my $o = 10)}, "Sidef::Types::Number::Integer")],
+                                                      name => {
+                                                                self => bless(do{\(my $o = "<")}, "Sidef::Types::String::String"),
+                                                              },
+                                                    },
+                                                  ],
+                                          self => 'fix',
+                                        },
+                                        {
+                                          call => [
+                                                    {
+                                                      name => {
+                                                        self => bless(do{\(my $o = "++")}, "Sidef::Types::String::String"),
+                                                      },
+                                                    },
+                                                  ],
+                                          self => 'fix',
+                                        },
+                                      ],
+                                    }, "Sidef::Types::Block::Code"),
+                                  },
+                                ],
+                              },
+                            ],
+                    name => {
+                              self => bless(do{\(my $o = "for")}, "Sidef::Types::String::String"),
+                            },
+                  },
+                ],
+        self => bless({
+                  main => [
+                    {
+                      call => [
+                                {
+                                  arg  => [
+                                            {
+                                              main => [
+                                                { self => 'fix' },
+                                                {
+                                                  self => {
+                                                    main => [
+                                                      {
+                                                        call => [
+                                                                  {
+                                                                    arg  => [
+                                                                              {
+                                                                                main => [
+                                                                                  {
+                                                                                    call => [
+                                                                                              {
+                                                                                                arg  => [bless(do{\(my $o = 1)}, "Sidef::Types::Number::Integer")],
+                                                                                                name => {
+                                                                                                          self => bless(do{\(my $o = "+")}, "Sidef::Types::String::String"),
+                                                                                                        },
+                                                                                              },
+                                                                                            ],
+                                                                                    self => 'fix',
+                                                                                  },
+                                                                                ],
+                                                                              },
+                                                                            ],
+                                                                    name => {
+                                                                              self => bless(do{\(my $o = "*")}, "Sidef::Types::String::String"),
+                                                                            },
+                                                                  },
+                                                                  {
+                                                                    arg  => [bless(do{\(my $o = 2)}, "Sidef::Types::Number::Integer")],
+                                                                    name => {
+                                                                              self => bless(do{\(my $o = "/")}, "Sidef::Types::String::String"),
+                                                                            },
+                                                                  },
+                                                                ],
+                                                        self => 'fix',
+                                                      },
+                                                    ],
+                                                  },
+                                                },
+                                              ],
+                                            },
+                                          ],
+                                  name => {
+                                            self => bless(do{\(my $o = "printf")}, "Sidef::Types::String::String"),
+                                          },
+                                },
+                              ],
+                      self => bless(do{\(my $o = "** Sum of 0 to %d is: %d\\n")}, "Sidef::Types::String::Double"),
+                    },
+                  ],
+                }, "Sidef::Types::Block::Code"),
       },
       {
         call => [
@@ -4315,7 +4577,15 @@ do {
   $a->{main}[178]{self} = $a->{main}[173]{self};
   $a->{main}[179]{self} = $a->{main}[173]{self};
   $a->{main}[180]{self} = $a->{main}[173]{self};
+  $a->{main}[182]{call}[0]{arg}[0]{main}[3]{self} = $a->{main}[182]{call}[0]{arg}[0]{main}[2]{self};
   $a->{main}[183]{self} = $a->{main}[182]{self};
   $a->{main}[184]{self} = $a->{main}[182]{self};
+  $a->{main}[185]{self} = $a->{main}[182]{call}[0]{arg}[0]{main}[2]{self};
+  $a->{main}[190]{call}[0]{arg}[0]{main}[0]{self}{main}[0]{self} = $a->{main}[189]{self};
+  $a->{main}[190]{call}[0]{arg}[0]{main}[0]{self}{main}[1]{self} = $a->{main}[189]{self};
+  $a->{main}[190]{call}[0]{arg}[0]{main}[0]{self}{main}[2]{self} = $a->{main}[189]{self};
+  $a->{main}[190]{self}{main}[0]{call}[0]{arg}[0]{main}[0]{self} = $a->{main}[189]{self};
+  $a->{main}[190]{self}{main}[0]{call}[0]{arg}[0]{main}[1]{self}{main}[0]{call}[0]{arg}[0]{main}[0]{self} = $a->{main}[189]{self};
+  $a->{main}[190]{self}{main}[0]{call}[0]{arg}[0]{main}[1]{self}{main}[0]{self} = $a->{main}[189]{self};
   $a;
 }

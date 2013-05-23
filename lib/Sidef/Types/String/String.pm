@@ -109,6 +109,11 @@ package Sidef::Types::String::String {
         Sidef::Types::Bool::Bool->new(CORE::print $$self);
     }
 
+    sub printf {
+        my($self, @arguments) = @_;
+        Sidef::Types::Bool::Bool->new(CORE::printf $$self, @arguments);
+    }
+
     sub stat_file {
         my ($self) = @_;
         Sidef::Types::Glob::File->new($$self);
