@@ -396,12 +396,34 @@ sidef[6]->say;
 var block = {
     "first"->say;
     "block"->say;
+
+    var private = [1,2,4];
+    private[1]->to_s->say;
+
+    "end of block";
 };
 
-block->if(true);    # execute block
-block->if(false);   # don't execute block
+block->if(true);            # execute the block
+block->if(false);           # don't execute the block
+
+private[1]->to_s->say;      # this is a bug which should be fixed!
+
+#######################################################
 
 '-'*80->say;
+
+{
+    "Sidef rocks!!!"->say;
+}
+->for(1..5);
+
+'-' * 80 -> say;
+
+var index;
+{
+    "** Sum of 0 to " + (index -> to_s) + " is: " + (index * (index + 1) / 2) -> say;
+}
+-> for ({index = 1; index < 10; index++});
 
 #######################################################
 

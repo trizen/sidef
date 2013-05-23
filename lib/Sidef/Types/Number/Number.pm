@@ -16,38 +16,64 @@ package Sidef::Types::Number::Number {
         no strict 'refs';
 
         *{__PACKAGE__ . '::' . '/'} = sub {
-            my ($self, $arg) = @_;
-            __PACKAGE__->new($$self / $$arg);
+            my ($self, $num) = @_;
+            __PACKAGE__->new($$self / $$num);
         };
 
         *{__PACKAGE__ . '::' . '*'} = sub {
-            my ($self, $arg) = @_;
-            __PACKAGE__->new($$self * $$arg);
+            my ($self, $num) = @_;
+            __PACKAGE__->new($$self * $$num);
         };
 
         *{__PACKAGE__ . '::' . '+'} = sub {
-            my ($self, $arg) = @_;
-            __PACKAGE__->new($$self + $$arg);
+            my ($self, $num) = @_;
+            __PACKAGE__->new($$self + $$num);
+        };
+
+        *{__PACKAGE__ . '::' . '++'} = sub {
+            my ($self) = @_;
+            ${$self}++;
+            $self;
+        };
+
+        *{__PACKAGE__ . '::' . '<'} = sub {
+            my ($self, $num) = @_;
+            Sidef::Types::Bool::Bool->new($$self < $$num);
+        };
+
+        *{__PACKAGE__ . '::' . '>'} = sub {
+            my ($self, $num) = @_;
+            Sidef::Types::Bool::Bool->new($$self > $$num);
+        };
+
+        *{__PACKAGE__ . '::' . '<='} = sub {
+            my ($self, $num) = @_;
+            Sidef::Types::Bool::Bool->new($$self <= $$num);
+        };
+
+        *{__PACKAGE__ . '::' . '>='} = sub {
+            my ($self, $num) = @_;
+            Sidef::Types::Bool::Bool->new($$self >= $$num);
         };
 
         *{__PACKAGE__ . '::' . '-'} = sub {
-            my ($self, $arg) = @_;
-            __PACKAGE__->new($$self - $$arg);
+            my ($self, $num) = @_;
+            __PACKAGE__->new($$self - $$num);
         };
 
         *{__PACKAGE__ . '::' . '%'} = sub {
-            my ($self, $arg) = @_;
-            __PACKAGE__->new($$self % $$arg);
+            my ($self, $num) = @_;
+            __PACKAGE__->new($$self % $$num);
         };
 
         *{__PACKAGE__ . '::' . '**'} = sub {
-            my ($self, $arg) = @_;
-            __PACKAGE__->new($$self**$$arg);
+            my ($self, $num) = @_;
+            __PACKAGE__->new($$self**$$num);
         };
 
         *{__PACKAGE__ . '::' . '..'} = sub {
-            my ($self, $arg) = @_;
-            Sidef::Types::Array::Array->new(map { __PACKAGE__->new($_) } $$self .. $$arg);
+            my ($self, $num) = @_;
+            Sidef::Types::Array::Array->new(map { __PACKAGE__->new($_) } $$self .. $$num);
         };
     }
 

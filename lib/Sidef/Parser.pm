@@ -36,7 +36,7 @@ package Sidef::Parser {
                     my @operators = map { quotemeta } qw(
 
                       && || // ** << >> == =~ ..
-                      := [
+                      := [ <= >= < > ++
                       / + - * % ^ & | :  =
 
                       );
@@ -235,8 +235,8 @@ package Sidef::Parser {
                 }
 
                 # Block as object
-                when (/\G(?=\{)/){
-                    my($obj, $pos) = $self->parse_block(code => substr($_, pos));
+                when (/\G(?=\{)/) {
+                    my ($obj, $pos) = $self->parse_block(code => substr($_, pos));
                     pos($_) = $pos + pos;
 
                     Sidef::Types::Block::Code->new($obj), pos;
