@@ -40,6 +40,11 @@ package Sidef::Types::Block::Code {
                 foreach my $class (keys %{$arg}) {
 
                     if ($counter++ == 0) {
+
+                        if ((my $argn = scalar(@{$arg->{$class}})) != 3) {
+                            warn "[WARN] The 'for' loop needs exactly three arguments! We got $argn of them.\n";
+                        }
+
                         $exec->execute_expr(expr => splice(@{$arg->{$class}}, 0, 1), class => $class);
                     }
 

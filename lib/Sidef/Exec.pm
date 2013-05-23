@@ -18,6 +18,7 @@ package Sidef::Exec {
 
         my $self_obj = $opt{self};
 
+=for comment
         ${$self_obj} =~ s{$parser->{re}{var_in_string}}{
                 exists $self->{variables}{$opt{class}}{$1}
                     ? $self->{variables}{$opt{class}}{$1}
@@ -26,6 +27,7 @@ package Sidef::Exec {
                         q{};
                     };
         }ego;
+=cut
 
         $self_obj->apply_escapes if ref $self_obj eq 'Sidef::Types::String::Double';
     }
@@ -93,9 +95,10 @@ package Sidef::Exec {
                     }
 
                     if (ref $self_obj eq 'Sidef::Variable::Variable' and not $$method ~~ ['=', ':=']) {
-                        my $value = $self_obj->get_value;
-                        $self->{variables}{$opt{class}}{$self_obj->get_name} = $value;
-                        $self_obj = $value;
+                        #my $value = $self_obj->get_value;
+                        #$self->{variables}{$opt{class}}{$self_obj->get_name} = $value;
+                        #$self_obj = $value;
+                        $self_obj = $self_obj->get_value;
                     }
 
                     if (exists $call->{arg}) {
@@ -121,12 +124,13 @@ package Sidef::Exec {
                             }
                         }
 
-                        my $value = $self_obj->$method(@arguments);
-                        if (ref $self_obj eq 'Sidef::Variable::Variable') {
-                            $self->{variables}{$opt{class}}{$self_obj->get_name} = $value;
-                        }
-                        $self_obj = $value;
+                        #my $value = $self_obj->$method(@arguments);
+                        #if (ref $self_obj eq 'Sidef::Variable::Variable') {
+                        #    $self->{variables}{$opt{class}}{$self_obj->get_name} = $value;
+                        #}
+                        #$self_obj = $value;
 
+                        $self_obj = $self_obj->$method(@arguments);
                     }
                     else {
                         if (ref $self_obj eq 'Sidef::Variable::Variable') {

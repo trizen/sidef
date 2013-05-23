@@ -115,5 +115,5 @@ if ($args{D}) {
 else {
     require Sidef::Exec;
     my $exec = Sidef::Exec->new();
-    $exec->execute(struct => $struct);
+    $exec->execute(struct => $struct, block => 'main');
 }

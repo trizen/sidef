@@ -1,7 +1,7 @@
 {
   Array   => {
                Array => {
-                 inherits => ["Convert"],
+                 inherits => ["Convert", "Convert::Convert"],
                  methods  => [
                                {
                                  args    => ["array"],
@@ -14,15 +14,27 @@
                                  doc  => "Remove and return the last element from the self array.",
                                  name => "pop",
                                },
-                               { name => "+" },
+                               { args => ["array"], name => "+", returns => "Array::Array" },
                                { args => [], name => "shift" },
                                { args => [", ..."], name => "push", returns => "Array::Array" },
+                               { args => ["arg"], name => "=", returns => "Array::Array" },
+                               { args => [], name => "len", returns => "Number::Integer" },
+                               { args => ["separator"], name => "join", returns => "String::String" },
+                               { args => ["separator"], name => "reverse", returns => "Array::Array" },
                              ],
+               },
+             },
+  Block   => {
+               Code => {
+                 methods => [
+                   { args => ["bool"], name => "if", returns => "Block::Code" },
+                   { args => ["arg"], name => "for", returns => "Block::Code" },
+                 ],
                },
              },
   Bool    => {
                Bool => {
-                 inherits => ["Convert"],
+                 inherits => ["Convert", "Convert::Convert"],
                  methods  => [
                                {
                                  args    => [],
@@ -48,6 +60,17 @@
                                },
                              ],
                },
+             },
+  Byte    => {
+               Byte  => { inherits => ["Convert::Convert", "Number::Number"] },
+               Bytes => {
+                          inherits => ["Convert::Convert", "Array::Array"],
+                          methods  => [{ args => [], name => "join", returns => "String::String" }],
+                        },
+             },
+  Char    => {
+               Char  => { inherits => ["Convert::Convert", "String::String"] },
+               Chars => { inherits => ["Convert::Convert", "Array::Array"] },
              },
   Convert => {
                Convert => {
@@ -80,7 +103,7 @@
              },
   Glob    => {
                Dir => {
-                 inherits => ["Convert"],
+                 inherits => ["Convert", "Convert::Convert"],
                  methods  => [
                                {
                                  args    => [],
@@ -115,7 +138,7 @@
                              ],
                },
                File => {
-                 inherits => ["Convert"],
+                 inherits => ["Convert", "Convert::Convert"],
                  methods  => [
                                { args => [], name => "size", returns => "Number::Number" },
                                {
@@ -161,18 +184,19 @@
              },
   Hash    => {
                Hash => {
-                 inherits => ["Convert"],
+                 inherits => ["Convert", "Convert::Convert"],
                  methods  => [
                                { name => "keys", returns => "Array::Array" },
                                { name => "values", returns => "Array::Array" },
                              ],
                },
              },
+  Nil     => { Nil => { inherits => ["Convert::Convert"] } },
   Number  => {
-               Float   => { inherits => ["Number"] },
-               Integer => { inherits => ["Number"] },
+               Float   => { inherits => ["Number", "Number::Number"] },
+               Integer => { inherits => ["Number", "Number::Number"] },
                Number  => {
-                            inherits => ["Convert"],
+                            inherits => ["Convert", "Convert::Convert"],
                             methods  => [
                                           {
                                             args    => ["num"],
@@ -202,12 +226,19 @@
                                             name    => "next_power_of_two",
                                             returns => "Number::Integer",
                                           },
+                                          { args => [], name => "++", returns => "Number::Number" },
+                                          { args => ["num"], name => "<", returns => "Bool::Bool" },
+                                          { args => ["num"], name => ">", returns => "Bool::Bool" },
+                                          { args => ["num"], name => "<=", returns => "Bool::Bool" },
+                                          { args => ["num"], name => ">=", returns => "Bool::Bool" },
+                                          { args => ["num"], name => "..", returns => "Array::Array" },
+                                          { args => [], name => "chr", returns => "Char::Char" },
                                         ],
                           },
              },
   Regex   => {
                Regex => {
-                 inherits => ["Convert", "String::Double", "Double"],
+                 inherits => ["Convert", "String::Double", "Double", "Convert::Convert"],
                  methods  => [
                                { args => ["object"], name => "matches", returns => "Bool::Bool" },
                              ],
@@ -215,13 +246,13 @@
              },
   String  => {
                Double => {
-                           inherits => ["String"],
+                           inherits => ["String", "String::String"],
                            methods  => [
                                          { args => [], name => "apply_escapes", returns => "String::Double" },
                                        ],
                          },
                String => {
-                           inherits => ["Convert"],
+                           inherits => ["Convert", "Convert::Convert"],
                            methods  => [
                                          {
                                            args    => [],
@@ -272,7 +303,15 @@
                                          },
                                          { args => [], name => "stat_dir", returns => "Glob::Dir" },
                                          { name => "=~" },
-                                         { name => "*" },
+                                         { name => "*", returns => "String::String" },
+                                         { name => "+", returns => "String::String" },
+                                         {
+                                           args    => ["string", "pos", "len"],
+                                           name    => "insert",
+                                           returns => "String::String",
+                                         },
+                                         { args => [], name => "ord", returns => "Byte::Byte" },
+                                         { args => [", ..."], name => "printf", returns => "Bool::Bool" },
                                        ],
                          },
              },
