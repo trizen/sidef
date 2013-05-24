@@ -15,8 +15,8 @@ package Sidef::Types::Array::Array {
     {
         no strict 'refs';
         *{__PACKAGE__ . '::' . '-'} = sub {
-            my ($self, $array) = @_;
 
+            my ($self, $array) = @_;
             my $new_array = __PACKAGE__->new();
 
             foreach my $item (@{$self}) {
@@ -29,7 +29,7 @@ package Sidef::Types::Array::Array {
                     }
                 }
 
-                push @{$new_array}, $item if not $exists;
+                $new_array->push($item) if not $exists;
             }
 
             return $new_array;

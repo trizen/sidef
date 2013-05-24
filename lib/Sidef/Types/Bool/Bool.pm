@@ -40,6 +40,22 @@ package Sidef::Types::Bool::Bool {
         $$self eq ${$self->false} ? $self->true : $self->false;
     }
 
+    sub else {
+        my($self, $code) = @_;
+
+        if($self->is_false){
+
+            if(ref $code eq __PACKAGE__){
+                return $code;
+            }
+
+            my $exec = Sidef::Exec->new();
+            $exec->execute(struct => $code);
+        }
+
+        return $self;
+    }
+
 }
 
 1;

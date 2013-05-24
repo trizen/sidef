@@ -1,0 +1,19 @@
+#!/usr/bin/ruby
+
+var i = 0;
+
+{
+    var root   = (i->sqrt);
+    var format = "Door %d is %s\n";
+
+    {
+        format->printf(i, 'open')
+    }
+    -> if (root->int == root)
+
+    -> else
+    {
+        format->printf(i, 'closed')
+    };
+
+} -> for {i = 1; i <= 100; i += 1};

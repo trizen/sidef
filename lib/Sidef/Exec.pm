@@ -15,27 +15,14 @@ package Sidef::Exec {
 
     sub interpolate {
         my ($self, %opt) = @_;
-
         my $self_obj = $opt{self};
-
-=for comment
-        ${$self_obj} =~ s{$parser->{re}{var_in_string}}{
-                exists $self->{variables}{$opt{class}}{$1}
-                    ? $self->{variables}{$opt{class}}{$1}
-                    : do{
-                        warn "Use of uninitialized variable <$1> in double quoted string!\n";
-                        q{};
-                    };
-        }ego;
-=cut
-
         $self_obj->apply_escapes if ref $self_obj eq 'Sidef::Types::String::Double';
     }
 
     sub eval_array {
         my ($self, %opt) = @_;
         Sidef::Types::Array::Array->new(
-            map { Sidef::Variable::Variable->new($_, 'var', $_) }
+            map { Sidef::Variable::Variable->new(rand, 'var', $_) }
               map {
                 ref eq 'HASH' ? $self->execute_expr(expr => $_, class => $opt{class}) : $_
               } @{$opt{array}}
@@ -57,33 +44,33 @@ package Sidef::Exec {
             if (ref $self_obj ~~ ['Sidef::Types::Regex::Regex', 'Sidef::Types::String::Double']) {
                 $self->interpolate(self => $self_obj, class => $opt{class});
             }
-            elsif (ref $self_obj eq 'Sidef::Types::Array::Array') {
-                $self_obj = $self->eval_array(array => $self_obj, class => $opt{class});
-            }
 
-            if (exists $expr->{call}) {
+            if (exists $expr->{ind}) {
 
-                if (exists $expr->{ind}) {
+                if (ref $self_obj eq 'Sidef::Variable::Variable') {
+                    $self_obj = $self_obj->get_value;
+                }
 
+                    my @ind;
                     foreach my $i (@{$expr->{ind}}) {
-                        if (ref $self_obj eq 'Sidef::Variable::Variable') {
-                            $self_obj = $self_obj->get_value;
-                        }
+                        my $ind = $self->execute_expr(expr => $i, class=>$opt{class});
+                        push @ind, $ind;
+                        $self_obj->[$ind] //= Sidef::Variable::Variable->new(rand, 'var');
+                    }
 
-                        my (@ind) = $self->execute(struct => $i);
-
-                        foreach my $j (@ind) {
-                            $self_obj->[$j] //= Sidef::Variable::Variable->new(rand, 'var');
-                        }
-
-                        if (@ind > 1) {
+                     if (@ind > 1) {
                             $self_obj = Sidef::Types::Array::Array->new(@{$self_obj}[@ind]);
                         }
                         else {
-                            $self_obj = $self_obj->[$ind[0]];
-                        }
+                            $self_obj =   $self_obj->[$ind[0]];
                     }
-                }
+            }
+
+            if (ref $self_obj eq 'Sidef::Types::Array::Array') {
+               $self_obj = $self->eval_array(array => $self_obj, class => $opt{class});
+            }
+
+            if (exists $expr->{call}) {
 
                 foreach my $call (@{$expr->{call}}) {
 
@@ -95,9 +82,6 @@ package Sidef::Exec {
                     }
 
                     if (ref $self_obj eq 'Sidef::Variable::Variable' and not $$method ~~ ['=', ':=']) {
-                        #my $value = $self_obj->get_value;
-                        #$self->{variables}{$opt{class}}{$self_obj->get_name} = $value;
-                        #$self_obj = $value;
                         $self_obj = $self_obj->get_value;
                     }
 
@@ -113,24 +97,23 @@ package Sidef::Exec {
                         }
 
                         foreach my $obj (@arguments) {
-                            if (ref $obj ~~ ['Sidef::Types::Regex::Regex', 'Sidef::Types::String::Double']) {
-                                $self->interpolate(self => $obj, class => $opt{class});
-                            }
-                            elsif (ref $obj eq 'Sidef::Types::Array::Array') {
-                                $obj = $self->eval_array(array => $obj, class => $opt{class});
-                            }
-                            elsif (ref $obj eq 'Sidef::Variable::Variable') {
+                            #if (ref $obj ~~ ['Sidef::Types::Regex::Regex', 'Sidef::Types::String::Double']) {
+                               # $self->interpolate(self => $obj, class => $opt{class});
+                            #}
+                            #elsif (ref $obj eq 'Sidef::Types::Array::Array') {
+                               # $obj = $self->eval_array(array => $obj, class => $opt{class});
+                            #}
+                            if (ref $obj eq 'Sidef::Variable::Variable') {
                                 $obj = $obj->get_value;
                             }
                         }
 
-                        #my $value = $self_obj->$method(@arguments);
-                        #if (ref $self_obj eq 'Sidef::Variable::Variable') {
-                        #    $self->{variables}{$opt{class}}{$self_obj->get_name} = $value;
-                        #}
-                        #$self_obj = $value;
-
                         $self_obj = $self_obj->$method(@arguments);
+
+                        if (ref $self_obj eq 'Sidef::Variable::Variable') {
+                            $self_obj = $self_obj->get_value;
+                        }
+
                     }
                     else {
                         if (ref $self_obj eq 'Sidef::Variable::Variable') {
@@ -138,6 +121,10 @@ package Sidef::Exec {
                         }
 
                         $self_obj = $self_obj->$method;
+
+                        if (ref $self_obj eq 'Sidef::Variable::Variable') {
+                            $self_obj = $self_obj->get_value;
+                        }
                     }
                 }
             }

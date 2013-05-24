@@ -42,8 +42,8 @@ package Sidef::Convert::Convert {
             }
 
         }
-        ${$_[0]} eq ${$_[1]};
 
+        ${$_[0]} eq ${$_[1]};
       };
 
     sub to_s {

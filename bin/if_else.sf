@@ -1,0 +1,32 @@
+#!/usr/bin/ruby
+
+#
+## if, else
+#
+
+{
+    "I should not be here!"->say;
+}
+->if(false)
+
+->else( {
+    "Right place (1)!"->say;
+}
+);
+
+#
+## if, else if, else
+#
+
+{
+    "I should not be here!"->say;
+} -> if(false)
+
+->else(
+ {
+    "Right place (2)!"->say;
+ }->if(true)
+)
+->else({
+    "I should not be here!"->say;
+});

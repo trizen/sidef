@@ -13,6 +13,8 @@ package Sidef::Types::Block::Code {
         bless $code, $class;
     }
 
+
+
     sub if {
         my ($self, $bool) = @_;
 
@@ -20,7 +22,7 @@ package Sidef::Types::Block::Code {
             $exec->execute(struct => $self);
         }
 
-        $self;
+        return $bool;
     }
 
     sub for {
@@ -45,12 +47,11 @@ package Sidef::Types::Block::Code {
                             warn "[WARN] The 'for' loop needs exactly three arguments! We got $argn of them.\n";
                         }
 
-                        $exec->execute_expr(expr => splice(@{$arg->{$class}}, 0, 1), class => $class);
+                        $exec->execute_expr(expr => $arg->{$class}[0], class => $class);
                     }
 
-                    my $expr = splice(@{$arg->{$class}}, -1);
-                    my ($bool) = $exec->execute(struct => $arg);
-                    splice @{$arg->{$class}}, scalar(@{$arg->{$class}}), 0, $expr;
+                    my $expr = $arg->{$class}[2];
+                    my ($bool) = $exec->execute_expr(expr => $arg->{$class}[1], class => $class);
 
                     if ($bool->is_true) {
                         $exec->execute(struct => $self);
