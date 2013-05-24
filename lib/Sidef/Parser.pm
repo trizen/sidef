@@ -16,6 +16,7 @@ package Sidef::Parser {
             line          => 1,
             has_object    => 0,
             expect_method => 0,
+            expect_index  => 0,
             expect_arg    => 0,
             parentheses   => 0,
             class         => 'main',
@@ -170,7 +171,7 @@ package Sidef::Parser {
                     redo;
                 }
 
-                when(/\G__END__\b/gc){
+                when (/\G__END__\b/gc) {
                     return undef, length($_);
                 }
 
@@ -393,7 +394,7 @@ package Sidef::Parser {
 
                 # We are at the end of the script.
                 # We make some checks, and return the \%struct hash ref.
-                when (/\G\z/ ) {
+                when (/\G\z/) {
 
                     while (my (undef, $class_var) = each %{$self->{variables}}) {
                         while (my (undef, $variable) = each %{$class_var}) {
@@ -484,22 +485,25 @@ package Sidef::Parser {
                     redo;
                 }
 
-=cut
-                when($self->{expect_index} == 1){
+                when ($self->{expect_index} == 1) {
 
-                        $self->{expect_index} = 0;
+                    $self->{expect_index} = 0;
 
-                        my $array = Sidef::Types::Array::Array->new();
-                        my ($obj, $pos) = $self->parse_array(code => substr($_, pos()));
-                        pos($_) = $pos + pos();
+                    my $array = Sidef::Types::Array::Array->new();
+                    my ($obj, $pos) = $self->parse_array(code => substr($_, pos()));
+                    pos($_) = $pos + pos();
 
-                        if (ref $obj->{main} eq 'ARRAY') {
-                            $array->push(@{$obj->{main}});
-                        }
+                    $self->{expect_index} = /\G(?=\h*\[)/;
 
-                        return $array, pos;
+                    if (ref $obj->{main} eq 'ARRAY') {
+                        $array->push(@{$obj->{main}});
+                    }
+
+                    push @{$self->{last_object}{ind}}, $array;
+                    redo;
+
+                    #return $array, pos;
                 }
-=cut
 
                 # Comma separated arguments for methods
                 when (/\G,/gc) {
@@ -515,33 +519,19 @@ package Sidef::Parser {
 
                     my ($obj, $pos) = $self->parse_expr(code => substr($_, pos));
 
-                    if(not defined $obj and $] < 5.016){
+                    if (not defined $obj and $] < 5.016) {
                         pos($_) = $pos + pos;
                     }
 
                     if (defined $obj) {
 
-                        if($] >= 5.016){
-                            pos($_) = $pos + pos;
-                        }
-
-                       # print substr($_, pos(), 40),$/;
-
+                        pos($_) = $pos + pos;
                         push @{$struct{$self->{class}}[-1]{call}[-1]{arg}}, {$self->{class} => [{self => $obj}]};
 
-                         if ( /\G(?=\h*\[)/) {
-
-                            my $array = Sidef::Types::Array::Array->new();
-                            my ($obj, $pos) = $self->parse_array(code => substr($_, pos()));
-                            pos($_) = $pos + pos();
-
-                            if (ref $obj->{main} eq 'ARRAY') {
-                                $array->push(@{$obj->{main}});
-                            }
-
-                           # $struct{$self->{class}}[-1]{call}[-1]{arg}[-1]{ind} = $array;
-                           $struct{$self->{class}}[-1]{call}[-1]{arg}[-1]{$self->{class}}[-1]{ind} = $array;
-                    }
+                        if (/\G(?=\h*\[)/) {
+                            $self->{last_object}  = $struct{$self->{class}}[-1]{call}[-1]{arg}[-1]{$self->{class}}[-1];
+                            $self->{expect_index} = 1;
+                        }
 
                         redo;
                     }
@@ -564,30 +554,10 @@ package Sidef::Parser {
 
                         push @{$struct{$self->{class}}}, {self => $obj};
 
-=cut
-                        if ( /\G(?=\h*\[)/) {
-
-                            $self->{has_object} = 0;
-                            $self->{expect_method} = 0;
-                            my($obj, $pos) = $self->parse_script(code => substr($_, pos));
-                            pos($_) = $pos + pos;
-                            $struct{$self->{class}}[-1]{ind} = $obj;
-                            $self->{has_object} = 1;
+                        if (/\G(?=\h*\[)/) {
+                            $self->{expect_index} = 1;
+                            $self->{last_object}  = $struct{$self->{class}}[-1];
                         }
-=cut
-                         if ( /\G(?=\h*\[)/) {
-
-                                my $array = Sidef::Types::Array::Array->new();
-                                my ($obj, $pos) = $self->parse_array(code => substr($_, pos()));
-                                pos($_) = $pos + pos();
-
-                                if (ref $obj->{main} eq 'ARRAY') {
-                                    $array->push(@{$obj->{main}});
-                                }
-
-                             $struct{$self->{class}}[-1]{ind} = $array; #$self->parse_script(code => substr($_, pos));
-                    }
-
 
                         redo;
                     }

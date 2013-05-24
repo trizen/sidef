@@ -319,7 +319,7 @@ var nes = ["beg", ["x", "y", "z"], "end"];
 nes[1]->to_s->say;
 nes[1] = ["m", "n", "o"];
 nes[1]->to_s->say;
-#nes[1][1]->to_s->say;
+nes[1][1]->to_s->say;
 
 '-' * 80 -> say;
 
@@ -327,7 +327,7 @@ nes[0]->say;
 nes[0] = ["one", "two", "three"];
 
 nes[0]->to_s->say;
-#nes[0][1] = "doi";
+nes[0][1] = "doi";
 nes[0]->to_s->say;
 
 #######################################################
@@ -430,6 +430,9 @@ var index;
 -> for ({index = 1; index < 10; index++});
 
 '-' * 80 -> say;
+
+var arr_test = [["x", "y", "z"]];
+arr_test[0][1]->say;
 
 #######################################################
 

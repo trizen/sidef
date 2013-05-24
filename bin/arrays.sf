@@ -1,0 +1,15 @@
+#!/usr/bin/ruby
+
+var arr_test = [["x", "y", "z"]];
+
+arr_test[0][1]->say;
+arr_test[0][-1]->say;
+
+arr_test[1] = "x";
+arr_test->to_s->say;
+
+arr_test[0][0,2]->to_s->say;
+
+arr_test[0,1,2] = ["hu","hi","hei"];
+arr_test->to_s->say;
+arr_test->len->to_s->say;

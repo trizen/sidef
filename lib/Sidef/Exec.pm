@@ -24,7 +24,9 @@ package Sidef::Exec {
         Sidef::Types::Array::Array->new(
             map { Sidef::Variable::Variable->new(rand, 'var', $_) }
               map {
-                ref eq 'HASH' ? $self->execute_expr(expr => $_, class => $opt{class}) : $_
+                ref eq 'HASH'
+                  ? $self->execute_expr(expr => $_, class => $opt{class})
+                  : $_
               } @{$opt{array}}
         );
     }
@@ -45,29 +47,41 @@ package Sidef::Exec {
                 $self->interpolate(self => $self_obj, class => $opt{class});
             }
 
+            if (ref $self_obj eq 'Sidef::Types::Array::Array') {
+                $self_obj = $self->eval_array(array => $self_obj, class => $opt{class});
+            }
+
             if (exists $expr->{ind}) {
 
                 if (ref $self_obj eq 'Sidef::Variable::Variable') {
                     $self_obj = $self_obj->get_value;
                 }
 
-                    my @ind;
-                    foreach my $i (@{$expr->{ind}}) {
-                        my $ind = $self->execute_expr(expr => $i, class=>$opt{class});
-                        push @ind, $ind;
-                        $self_obj->[$ind] //= Sidef::Variable::Variable->new(rand, 'var');
-                    }
+                foreach my $l (0 .. $#{$expr->{ind}}) {
+                    my $level = $expr->{ind}[$l];
 
-                     if (@ind > 1) {
-                            $self_obj = Sidef::Types::Array::Array->new(@{$self_obj}[@ind]);
+                    if ($#{$level} > 0) {
+                        my @indices;
+
+                        foreach my $i (@{$level}) {
+                            my $ind = $self->execute_expr(expr => $i, class => $opt{class});
+                            $self_obj->[$ind] //= Sidef::Variable::Variable->new(rand, 'var');
+                            push @indices, $ind;
                         }
-                        else {
-                            $self_obj =   $self_obj->[$ind[0]];
-                    }
-            }
 
-            if (ref $self_obj eq 'Sidef::Types::Array::Array') {
-               $self_obj = $self->eval_array(array => $self_obj, class => $opt{class});
+                        $self_obj = Sidef::Types::Array::Array->new(@{$self_obj}[@indices]);
+
+                    }
+                    else {
+                        my $ind = $self->execute_expr(expr => $level->[0], class => $opt{class});
+                        $self_obj->[$ind] //= Sidef::Variable::Variable->new(rand, 'var');
+                        $self_obj = $self_obj->[$ind];
+                    }
+
+                    if ($l < $#{$expr->{ind}}) {
+                        $self_obj = $self_obj->get_value;
+                    }
+                }
             }
 
             if (exists $expr->{call}) {
@@ -97,11 +111,12 @@ package Sidef::Exec {
                         }
 
                         foreach my $obj (@arguments) {
+
                             #if (ref $obj ~~ ['Sidef::Types::Regex::Regex', 'Sidef::Types::String::Double']) {
-                               # $self->interpolate(self => $obj, class => $opt{class});
+                            # $self->interpolate(self => $obj, class => $opt{class});
                             #}
                             #elsif (ref $obj eq 'Sidef::Types::Array::Array') {
-                               # $obj = $self->eval_array(array => $obj, class => $opt{class});
+                            # $obj = $self->eval_array(array => $obj, class => $opt{class});
                             #}
                             if (ref $obj eq 'Sidef::Variable::Variable') {
                                 $obj = $obj->get_value;
