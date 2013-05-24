@@ -13,3 +13,6 @@ arr_test[0][0,2]->to_s->say;
 arr_test[0,1,2] = ["hu","hi","hei"];
 arr_test->to_s->say;
 arr_test->len->to_s->say;
+
+["zzzz","ioana"][1]->say;
+[[["zzz","trizen","zzz"]]][0][0][1]->say;
