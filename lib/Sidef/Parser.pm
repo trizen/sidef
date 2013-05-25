@@ -53,6 +53,7 @@ package Sidef::Parser {
                       ^= ^
                       *= *
                       != ..
+                      : ?
                       );
 
                     qr{(@operators)};
@@ -261,7 +262,7 @@ package Sidef::Parser {
                     my ($obj, $pos) = $self->parse_block(code => substr($_, pos));
                     pos($_) = $pos + pos;
 
-                    Sidef::Types::Block::Code->new($obj), pos;
+                    return Sidef::Types::Block::Code->new($obj), pos;
                 }
 
                 # Declaration of variable types (var, const, char, etc...)
@@ -450,7 +451,6 @@ package Sidef::Parser {
                             warn "Unbalanced right brackets!\n";
                             $self->fatal_error(code => $_, pos => pos($_) - 1);
                         }
-
                         $self->{has_object}    = 1;
                         $self->{expect_method} = 1;
                         return (\%struct, pos);
@@ -511,7 +511,6 @@ package Sidef::Parser {
                     push @{$struct{$self->{class}}}, {self => $obj};
                     redo;
                 }
-
 
                 # Argument as object, without parentheses
                 when ($self->{has_object} == 1 && $self->{expect_method} == 1) {

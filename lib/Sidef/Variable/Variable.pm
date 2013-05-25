@@ -6,7 +6,7 @@ use warnings;
 package Sidef::Variable::Variable {
 
     use overload q{""} => sub {
-        $_[0]->get_value
+        $_[0]->get_value;
     };
 
     sub new {
@@ -54,10 +54,10 @@ package Sidef::Variable::Variable {
             elsif ($self->{type} eq "var") {
                 return $self->set_value($obj);
             }
-            elsif ($self->{type} eq "char"){
+            elsif ($self->{type} eq "char") {
                 return $self->set_value($obj->to_chars);
             }
-            elsif($self->{type} eq "byte"){
+            elsif ($self->{type} eq "byte") {
                 return $self->set_value($obj->to_bytes);
             }
             else {
@@ -66,14 +66,62 @@ package Sidef::Variable::Variable {
         };
 
         *{__PACKAGE__ . '::' . ':='} = sub {
-            my($self, $obj) = @_;
+            my ($self, $obj) = @_;
 
-            if(not defined $self->{value} or ref $self->{value} eq 'Sidef::Types::Nil::Nil'){
+            if (not defined $self->{value} or ref $self->{value} eq 'Sidef::Types::Nil::Nil') {
                 my $method = \&{__PACKAGE__ . '::' . '='};
                 return $self->$method($obj);
             }
 
             return $self->{value};
+        };
+
+        *{__PACKAGE__ . '::' . '+='} = sub {
+            my ($self, $arg) = @_;
+
+            my ($method) = '+';
+            $self->set_value($self->get_value->$method($arg));
+            $self;
+        };
+
+        *{__PACKAGE__ . '::' . '-='} = sub {
+            my ($self, $arg) = @_;
+
+            my ($method) = '-';
+            $self->set_value($self->get_value->$method($arg));
+            $self;
+        };
+
+        *{__PACKAGE__ . '::' . '%='} = sub {
+            my ($self, $arg) = @_;
+
+            my ($method) = '%';
+            $self->set_value($self->get_value->$method($arg));
+            $self;
+        };
+
+        *{__PACKAGE__ . '::' . '*='} = sub {
+            my ($self, $arg) = @_;
+
+            my ($method) = '*';
+            $self->set_value($self->get_value->$method($arg));
+            $self;
+        };
+
+        *{__PACKAGE__ . '::' . '/='} = sub {
+            my ($self, $arg) = @_;
+
+            my ($method) = '/';
+            $self->set_value($self->get_value->$method($arg));
+            $self;
+        };
+
+        *{__PACKAGE__ . '::' . '**='} = sub {
+            my ($self, $arg) = @_;
+
+            my ($method) = '**';
+            $self->set_value($self->get_value->$method($arg));
+            $self;
         };
 
     }

@@ -35,6 +35,18 @@ package Sidef::Types::Bool::Bool {
 
             __PACKAGE__->false;
         };
+
+        *{__PACKAGE__ . '::' . '?'} = sub {
+            my($self, $code) = @_;
+
+            if($self->is_true){
+                my $exec = Sidef::Exec->new();
+                my @results = $exec->execute(struct => $code);
+                return Sidef::Types::Bool::Ternary->new({code => $results[-1], bool => __PACKAGE__->true});
+            }
+
+            return Sidef::Types::Bool::Ternary->new({code => $code, bool => __PACKAGE__->false});
+        };
     }
 
     sub true {

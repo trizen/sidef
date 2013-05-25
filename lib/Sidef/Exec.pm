@@ -95,7 +95,8 @@ package Sidef::Exec {
                         $method = $self->execute_expr(expr => $method);
                     }
 
-                    if (ref $self_obj eq 'Sidef::Variable::Variable' and not $$method ~~ ['=', ':=']) {
+                    if (ref $self_obj eq 'Sidef::Variable::Variable'
+                        and not $$method ~~ [qw( =  :=  +=  -=  *=  /=  %=  **= )]) {
                         $self_obj = $self_obj->get_value;
                     }
 

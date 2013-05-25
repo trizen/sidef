@@ -20,21 +20,9 @@ package Sidef::Types::Number::Number {
             __PACKAGE__->new($$self / $$num);
         };
 
-        *{__PACKAGE__ . '::' . '/='} = sub {
-            my ($self, $num) = @_;
-            $$self /= $$num;
-            $self;
-        };
-
         *{__PACKAGE__ . '::' . '*'} = sub {
             my ($self, $num) = @_;
             __PACKAGE__->new($$self * $$num);
-        };
-
-        *{__PACKAGE__ . '::' . '*='} = sub {
-            my ($self, $num) = @_;
-            $$self *= $$num;
-            $self;
         };
 
         *{__PACKAGE__ . '::' . '+'} = sub {
@@ -42,21 +30,9 @@ package Sidef::Types::Number::Number {
             __PACKAGE__->new($$self + $$num);
         };
 
-        *{__PACKAGE__ . '::' . '+='} = sub {
-            my ($self, $num) = @_;
-            $$self += $$num;
-            $self;
-        };
-
         *{__PACKAGE__ . '::' . '-'} = sub {
             my ($self, $num) = @_;
             __PACKAGE__->new($$self - $$num);
-        };
-
-        *{__PACKAGE__ . '::' . '-='} = sub {
-            my ($self, $num) = @_;
-            $$self -= $$num;
-            $self;
         };
 
         *{__PACKAGE__ . '::' . '%'} = sub {
@@ -64,21 +40,9 @@ package Sidef::Types::Number::Number {
             __PACKAGE__->new($$self % $$num);
         };
 
-        *{__PACKAGE__ . '::' . '%='} = sub {
-            my ($self, $num) = @_;
-            $$self %= $$num;
-            $self;
-        };
-
         *{__PACKAGE__ . '::' . '**'} = sub {
             my ($self, $num) = @_;
             __PACKAGE__->new($$self**$$num);
-        };
-
-        *{__PACKAGE__ . '::' . '**='} = sub {
-            my ($self, $num) = @_;
-            $$self**= $$num;
-            $self;
         };
 
         *{__PACKAGE__ . '::' . '++'} = sub {

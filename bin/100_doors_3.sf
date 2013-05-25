@@ -1,0 +1,24 @@
+#!/usr/bin/ruby
+
+var i     = 0;
+var pass  = 0;
+var doors = [];
+
+{
+    {
+        {
+            doors[i] := false;
+            doors[i] = (doors[i] ? {false} : {true});
+        } if (i % pass == 0);
+
+    } for {i = 0; i <= 100; i += 1};
+
+} for {pass = 1; pass <= 100; pass += 1};
+
+
+var format = "Doors %d is %s\n";
+{
+
+    format->printf(i, (doors[i] ? {'open'} : {'closed'}));
+
+} for {i = 0; i<= 100; i += 1};
