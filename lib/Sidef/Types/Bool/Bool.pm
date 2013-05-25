@@ -20,6 +20,23 @@ package Sidef::Types::Bool::Bool {
         bless \$bool, $class;
     }
 
+    {
+        no strict 'refs';
+
+        *{__PACKAGE__ . '::' . '&&'} = sub {
+            my ($self, $code) = @_;
+
+            if ($self->is_true) {
+                my $exec = Sidef::Exec->new();
+                my @results = $exec->execute(struct => $code);
+
+                return __PACKAGE__->new($results[-1]->is_true);
+            }
+
+            __PACKAGE__->false;
+        };
+    }
+
     sub true {
         my ($self) = @_;
         __PACKAGE__->new(1);
@@ -41,11 +58,11 @@ package Sidef::Types::Bool::Bool {
     }
 
     sub else {
-        my($self, $code) = @_;
+        my ($self, $code) = @_;
 
-        if($self->is_false){
+        if ($self->is_false) {
 
-            if(ref $code eq __PACKAGE__){
+            if (ref $code eq __PACKAGE__) {
                 return $code;
             }
 

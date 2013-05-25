@@ -26,6 +26,10 @@ package Sidef::Types::String::String {
         *{__PACKAGE__ . '::' . '+'} = sub {
             __PACKAGE__->new($_[0] . $_[1]);
         };
+
+        *{__PACKAGE__ . '::' . '=='} = sub {
+            Sidef::Types::Bool::Bool->new($_[0] eq $_[1]);
+        };
     }
 
     sub uc {
