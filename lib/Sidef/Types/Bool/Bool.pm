@@ -47,7 +47,7 @@ package Sidef::Types::Bool::Bool {
                 return $results[-1];
             }
 
-            __PACKAGE__->false;
+            __PACKAGE__->true;
         };
 
         *{__PACKAGE__ . '::' . '?'} = sub {
