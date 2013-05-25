@@ -8,7 +8,7 @@ package Sidef::Types::Bool::Bool {
     use parent qw(Sidef::Convert::Convert);
 
     use overload
-      q{bool} => sub { ${$_[0]} eq ${__PACKAGE__->true} },
+      q{bool} => sub { ${$_[0]} eq 'true' },
       ;
 
     sub new {
@@ -26,11 +26,25 @@ package Sidef::Types::Bool::Bool {
         *{__PACKAGE__ . '::' . '&&'} = sub {
             my ($self, $code) = @_;
 
-            if ($self->is_true) {
+            if ($self) {
                 my $exec = Sidef::Exec->new();
                 my @results = $exec->execute(struct => $code);
 
-                return __PACKAGE__->new($results[-1]->is_true);
+                #return __PACKAGE__->new($results[-1]->is_true);
+                return $results[-1];
+            }
+
+            __PACKAGE__->false;
+        };
+
+        *{__PACKAGE__ . '::' . '||'} = sub {
+            my ($self, $code) = @_;
+
+            if (not $self) {
+                my $exec = Sidef::Exec->new();
+                my @results = $exec->execute(struct => $code);
+
+                return $results[-1];
             }
 
             __PACKAGE__->false;
@@ -61,12 +75,12 @@ package Sidef::Types::Bool::Bool {
 
     sub is_true {
         my ($self) = @_;
-        $$self eq ${$self->true} ? $self->true : $self->false;
+        __PACKAGE__->new($$self eq 'true');
     }
 
     sub is_false {
         my ($self) = @_;
-        $$self eq ${$self->false} ? $self->true : $self->false;
+        __PACKAGE__->new($$self eq 'false');
     }
 
     sub not {
