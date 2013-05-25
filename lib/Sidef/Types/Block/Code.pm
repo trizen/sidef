@@ -13,8 +13,6 @@ package Sidef::Types::Block::Code {
         bless $code, $class;
     }
 
-
-
     sub if {
         my ($self, $bool) = @_;
 

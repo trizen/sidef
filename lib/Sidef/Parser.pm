@@ -414,7 +414,7 @@ package Sidef::Parser {
                 # Method separator '->', or operator-method, like '*'
                 when (   $self->{expect_method} == 1
                       && !$self->{expect_arg}
-                      && (/\G->/gc || /\G(?=\s*$self->{re}{operators})/)) {
+                      && (/\G(?=[a-z])/ || /\G->/gc || /\G(?=\s*$self->{re}{operators})/ || /\G\./gc)) {
 
                     my ($method_name, $pos) = $self->get_method_name(code => substr($_, pos));
                     pos($_) = $pos + pos;
@@ -501,8 +501,6 @@ package Sidef::Parser {
 
                     push @{$self->{last_object}{ind}}, $array;
                     redo;
-
-                    #return $array, pos;
                 }
 
                 # Comma separated arguments for methods
@@ -513,6 +511,7 @@ package Sidef::Parser {
                     push @{$struct{$self->{class}}}, {self => $obj};
                     redo;
                 }
+
 
                 # Argument as object, without parentheses
                 when ($self->{has_object} == 1 && $self->{expect_method} == 1) {
@@ -538,7 +537,6 @@ package Sidef::Parser {
                     else {
                         continue;
                     }
-
                 }
 
                 # Parse expression or object and use it as main object (self)
@@ -558,13 +556,9 @@ package Sidef::Parser {
                             $self->{expect_index} = 1;
                             $self->{last_object}  = $struct{$self->{class}}[-1];
                         }
-
-                        redo;
-                    }
-                    else {
-                        redo;
                     }
 
+                    redo;
                 }
             }
         }

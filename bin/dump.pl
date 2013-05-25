@@ -5,7 +5,13 @@ do {
         call => [
                   {
                     arg  => [
-                              bless(do{\(my $o = 1369311837)}, "Sidef::Types::Number::Integer"),
+                              {
+                                main => [
+                                  {
+                                    self => bless(do{\(my $o = 1369434950)}, "Sidef::Types::Number::Integer"),
+                                  },
+                                ],
+                              },
                             ],
                     name => {
                               self => bless(do{\(my $o = "=")}, "Sidef::Types::String::String"),
@@ -17,7 +23,9 @@ do {
       {
         call => [
                   {
-                    arg  => [bless([], "Sidef::Types::Array::Array")],
+                    arg  => [
+                              { main => [{ self => bless([], "Sidef::Types::Array::Array") }] },
+                            ],
                     name => {
                               self => bless(do{\(my $o = "=")}, "Sidef::Types::String::String"),
                             },
@@ -29,7 +37,13 @@ do {
         call => [
                   {
                     arg  => [
-                              bless(do{\(my $o = "linux")}, "Sidef::Types::String::String"),
+                              {
+                                main => [
+                                  {
+                                    self => bless(do{\(my $o = "linux")}, "Sidef::Types::String::String"),
+                                  },
+                                ],
+                              },
                             ],
                     name => {
                               self => bless(do{\(my $o = "=")}, "Sidef::Types::String::String"),
@@ -130,7 +144,15 @@ do {
       {
         call => [
                   {
-                    arg  => [bless(do{\(my $o = "sidef")}, "Sidef::Types::Glob::File")],
+                    arg  => [
+                              {
+                                main => [
+                                  {
+                                    self => bless(do{\(my $o = "sidef")}, "Sidef::Types::Glob::File"),
+                                  },
+                                ],
+                              },
+                            ],
                     name => {
                               self => bless(do{\(my $o = "=")}, "Sidef::Types::String::String"),
                             },
@@ -152,7 +174,15 @@ do {
                                                 },
                                               },
                                               {
-                                                arg  => [bless(do{\(my $o = 1024)}, "Sidef::Types::Number::Integer")],
+                                                arg  => [
+                                                          {
+                                                            main => [
+                                                              {
+                                                                self => bless(do{\(my $o = 1024)}, "Sidef::Types::Number::Integer"),
+                                                              },
+                                                            ],
+                                                          },
+                                                        ],
                                                 name => {
                                                           self => bless(do{\(my $o = "/")}, "Sidef::Types::String::String"),
                                                         },
@@ -183,7 +213,15 @@ do {
       {
         call => [
                   {
-                    arg  => [bless(do{\(my $o = 1024)}, "Sidef::Types::Number::Integer")],
+                    arg  => [
+                              {
+                                main => [
+                                  {
+                                    self => bless(do{\(my $o = 1024)}, "Sidef::Types::Number::Integer"),
+                                  },
+                                ],
+                              },
+                            ],
                     name => {
                               self => bless(do{\(my $o = "*")}, "Sidef::Types::String::String"),
                             },
@@ -393,7 +431,13 @@ do {
         call => [
                   {
                     arg  => [
-                              bless(do{\(my $o = "RaNdOm StRiNg")}, "Sidef::Types::String::Double"),
+                              {
+                                main => [
+                                  {
+                                    self => bless(do{\(my $o = "RaNdOm StRiNg")}, "Sidef::Types::String::Double"),
+                                  },
+                                ],
+                              },
                             ],
                     name => {
                               self => bless(do{\(my $o = "=")}, "Sidef::Types::String::String"),
@@ -437,7 +481,13 @@ do {
         call => [
                   {
                     arg  => [
-                              bless(do{\(my $o = "\\LRaNdOm StRiNg")}, "Sidef::Types::String::Double"),
+                              {
+                                main => [
+                                  {
+                                    self => bless(do{\(my $o = "\\LRaNdOm StRiNg")}, "Sidef::Types::String::Double"),
+                                  },
+                                ],
+                              },
                             ],
                     name => {
                               self => bless(do{\(my $o = "=")}, "Sidef::Types::String::String"),
@@ -450,7 +500,13 @@ do {
         call => [
                   {
                     arg  => [
-                              bless(do{\(my $o = "Sidef")}, "Sidef::Types::String::Double"),
+                              {
+                                main => [
+                                  {
+                                    self => bless(do{\(my $o = "Sidef")}, "Sidef::Types::String::Double"),
+                                  },
+                                ],
+                              },
                             ],
                     name => {
                               self => bless(do{\(my $o = "=")}, "Sidef::Types::String::String"),
@@ -483,7 +539,13 @@ do {
         call => [
                   {
                     arg  => [
-                              bless(do{\(my $o = "this is a test -- \$y -- \\n")}, "Sidef::Types::String::String"),
+                              {
+                                main => [
+                                  {
+                                    self => bless(do{\(my $o = "this is a test -- \$y -- \\n")}, "Sidef::Types::String::String"),
+                                  },
+                                ],
+                              },
                             ],
                     name => {
                               self => bless(do{\(my $o = "=")}, "Sidef::Types::String::String"),
@@ -549,7 +611,13 @@ do {
         call => [
                   {
                     arg  => [
-                              bless(do{\(my $o = "Ioana")}, "Sidef::Types::String::Double"),
+                              {
+                                main => [
+                                  {
+                                    self => bless(do{\(my $o = "Ioana")}, "Sidef::Types::String::Double"),
+                                  },
+                                ],
+                              },
                             ],
                     name => {
                               self => bless(do{\(my $o = "=")}, "Sidef::Types::String::String"),
@@ -586,13 +654,29 @@ do {
       {
         call => [
                   {
-                    arg  => [bless(do{\(my $o = 4)}, "Sidef::Types::Number::Integer")],
+                    arg  => [
+                              {
+                                main => [
+                                  {
+                                    self => bless(do{\(my $o = 4)}, "Sidef::Types::Number::Integer"),
+                                  },
+                                ],
+                              },
+                            ],
                     name => {
                               self => bless(do{\(my $o = "+")}, "Sidef::Types::String::String"),
                             },
                   },
                   {
-                    arg  => [bless(do{\(my $o = 2)}, "Sidef::Types::Number::Integer")],
+                    arg  => [
+                              {
+                                main => [
+                                  {
+                                    self => bless(do{\(my $o = 2)}, "Sidef::Types::Number::Integer"),
+                                  },
+                                ],
+                              },
+                            ],
                     name => {
                               self => bless(do{\(my $o = "/")}, "Sidef::Types::String::String"),
                             },
@@ -619,7 +703,15 @@ do {
                                   {
                                     call => [
                                               {
-                                                arg  => [bless(do{\(my $o = 2)}, "Sidef::Types::Number::Integer")],
+                                                arg  => [
+                                                          {
+                                                            main => [
+                                                              {
+                                                                self => bless(do{\(my $o = 2)}, "Sidef::Types::Number::Integer"),
+                                                              },
+                                                            ],
+                                                          },
+                                                        ],
                                                 name => {
                                                           self => bless(do{\(my $o = "/")}, "Sidef::Types::String::String"),
                                                         },
@@ -650,13 +742,29 @@ do {
       {
         call => [
                   {
-                    arg  => [bless(do{\(my $o = 3)}, "Sidef::Types::Number::Integer")],
+                    arg  => [
+                              {
+                                main => [
+                                  {
+                                    self => bless(do{\(my $o = 3)}, "Sidef::Types::Number::Integer"),
+                                  },
+                                ],
+                              },
+                            ],
                     name => {
                               self => bless(do{\(my $o = "/")}, "Sidef::Types::String::String"),
                             },
                   },
                   {
-                    arg  => [bless(do{\(my $o = 4)}, "Sidef::Types::Number::Integer")],
+                    arg  => [
+                              {
+                                main => [
+                                  {
+                                    self => bless(do{\(my $o = 4)}, "Sidef::Types::Number::Integer"),
+                                  },
+                                ],
+                              },
+                            ],
                     name => {
                               self => bless(do{\(my $o = "*")}, "Sidef::Types::String::String"),
                             },
@@ -678,7 +786,13 @@ do {
         call => [
                   {
                     arg  => [
-                              bless(do{\(my $o = "\\\\tthis is a creepy string\\\\n\\n")}, "Sidef::Types::String::Double"),
+                              {
+                                main => [
+                                  {
+                                    self => bless(do{\(my $o = "\\\\tthis is a creepy string\\\\n\\n")}, "Sidef::Types::String::Double"),
+                                  },
+                                ],
+                              },
                             ],
                     name => {
                               self => bless(do{\(my $o = "=")}, "Sidef::Types::String::String"),
@@ -766,7 +880,15 @@ do {
       {
         call => [
                   {
-                    arg  => [bless(do{\(my $o = 42)}, "Sidef::Types::Number::Integer")],
+                    arg  => [
+                              {
+                                main => [
+                                  {
+                                    self => bless(do{\(my $o = 42)}, "Sidef::Types::Number::Integer"),
+                                  },
+                                ],
+                              },
+                            ],
                     name => {
                               self => bless(do{\(my $o = "=")}, "Sidef::Types::String::String"),
                             },
@@ -808,7 +930,13 @@ do {
         call => [
                   {
                     arg  => [
-                              bless(do{\(my $o = "^_^ Sidef ^_^")}, "Sidef::Types::String::Double"),
+                              {
+                                main => [
+                                  {
+                                    self => bless(do{\(my $o = "^_^ Sidef ^_^")}, "Sidef::Types::String::Double"),
+                                  },
+                                ],
+                              },
                             ],
                     name => {
                               self => bless(do{\(my $o = "=")}, "Sidef::Types::String::String"),
@@ -851,7 +979,13 @@ do {
         call => [
                   {
                     arg  => [
-                              bless(do{\(my $o = "Hello, World!")}, "Sidef::Types::String::Double"),
+                              {
+                                main => [
+                                  {
+                                    self => bless(do{\(my $o = "Hello, World!")}, "Sidef::Types::String::Double"),
+                                  },
+                                ],
+                              },
                             ],
                     name => {
                               self => bless(do{\(my $o = "=")}, "Sidef::Types::String::String"),
@@ -908,7 +1042,15 @@ do {
                                   {
                                     call => [
                                               {
-                                                arg  => [bless(do{\(my $o = 23)}, "Sidef::Types::Number::Integer")],
+                                                arg  => [
+                                                          {
+                                                            main => [
+                                                              {
+                                                                self => bless(do{\(my $o = 23)}, "Sidef::Types::Number::Integer"),
+                                                              },
+                                                            ],
+                                                          },
+                                                        ],
                                                 name => {
                                                           self => bless(do{\(my $o = "-")}, "Sidef::Types::String::String"),
                                                         },
@@ -1299,7 +1441,15 @@ do {
       {
         call => [
                   {
-                    arg  => [bless(do{\(my $o = 3.14)}, "Sidef::Types::Number::Float")],
+                    arg  => [
+                              {
+                                main => [
+                                  {
+                                    self => bless(do{\(my $o = 3.14)}, "Sidef::Types::Number::Float"),
+                                  },
+                                ],
+                              },
+                            ],
                     name => {
                               self => bless(do{\(my $o = "=")}, "Sidef::Types::String::String"),
                             },
@@ -1375,7 +1525,15 @@ do {
                       {
                         call => [
                                   {
-                                    arg  => [bless(do{\(my $o = 3)}, "Sidef::Types::Number::Integer")],
+                                    arg  => [
+                                              {
+                                                main => [
+                                                  {
+                                                    self => bless(do{\(my $o = 3)}, "Sidef::Types::Number::Integer"),
+                                                  },
+                                                ],
+                                              },
+                                            ],
                                     name => {
                                               self => bless(do{\(my $o = "*")}, "Sidef::Types::String::String"),
                                             },
@@ -1391,7 +1549,15 @@ do {
                           {
                             call => [
                                       {
-                                        arg  => [bless(do{\(my $o = 3)}, "Sidef::Types::Number::Integer")],
+                                        arg  => [
+                                                  {
+                                                    main => [
+                                                      {
+                                                        self => bless(do{\(my $o = 3)}, "Sidef::Types::Number::Integer"),
+                                                      },
+                                                    ],
+                                                  },
+                                                ],
                                         name => {
                                                   self => bless(do{\(my $o = "+")}, "Sidef::Types::String::String"),
                                                 },
@@ -1419,17 +1585,23 @@ do {
         call => [
                   {
                     arg  => [
-                              bless([
-                                {
-                                  self => bless(do{\(my $o = 1)}, "Sidef::Types::Number::Integer"),
-                                },
-                                {
-                                  self => bless(do{\(my $o = 2)}, "Sidef::Types::Number::Integer"),
-                                },
-                                {
-                                  self => bless(do{\(my $o = 3)}, "Sidef::Types::Number::Integer"),
-                                },
-                              ], "Sidef::Types::Array::Array"),
+                              {
+                                main => [
+                                  {
+                                    self => bless([
+                                      {
+                                        self => bless(do{\(my $o = 1)}, "Sidef::Types::Number::Integer"),
+                                      },
+                                      {
+                                        self => bless(do{\(my $o = 2)}, "Sidef::Types::Number::Integer"),
+                                      },
+                                      {
+                                        self => bless(do{\(my $o = 3)}, "Sidef::Types::Number::Integer"),
+                                      },
+                                    ], "Sidef::Types::Array::Array"),
+                                  },
+                                ],
+                              },
                             ],
                     name => {
                               self => bless(do{\(my $o = "=")}, "Sidef::Types::String::String"),
@@ -1442,14 +1614,20 @@ do {
         call => [
                   {
                     arg  => [
-                              bless([
-                                {
-                                  self => bless(do{\(my $o = 1)}, "Sidef::Types::Number::Integer"),
-                                },
-                                {
-                                  self => bless(do{\(my $o = 2)}, "Sidef::Types::Number::Integer"),
-                                },
-                              ], "Sidef::Types::Array::Array"),
+                              {
+                                main => [
+                                  {
+                                    self => bless([
+                                      {
+                                        self => bless(do{\(my $o = 1)}, "Sidef::Types::Number::Integer"),
+                                      },
+                                      {
+                                        self => bless(do{\(my $o = 2)}, "Sidef::Types::Number::Integer"),
+                                      },
+                                    ], "Sidef::Types::Array::Array"),
+                                  },
+                                ],
+                              },
                             ],
                     name => {
                               self => bless(do{\(my $o = "=")}, "Sidef::Types::String::String"),
@@ -1462,7 +1640,13 @@ do {
         call => [
                   {
                     arg  => [
-                              bless([{ self => 'fix' }, { self => 'fix' }], "Sidef::Types::Array::Array"),
+                              {
+                                main => [
+                                  {
+                                    self => bless([{ self => 'fix' }, { self => 'fix' }], "Sidef::Types::Array::Array"),
+                                  },
+                                ],
+                              },
                             ],
                     name => {
                               self => bless(do{\(my $o = "=")}, "Sidef::Types::String::String"),
@@ -1546,28 +1730,34 @@ do {
         call => [
                   {
                     arg  => [
-                              bless([
-                                {
-                                  self => bless(do{\(my $o = "w")}, "Sidef::Types::String::Double"),
-                                },
-                                {
-                                  self => bless([
-                                    {
-                                      self => bless(do{\(my $o = 5)}, "Sidef::Types::Number::Integer"),
-                                    },
-                                  ], "Sidef::Types::Array::Array"),
-                                },
-                                {
-                                  call => [
-                                            {
-                                              name => {
-                                                self => bless(do{\(my $o = "lc")}, "Sidef::Types::String::String"),
-                                              },
-                                            },
-                                          ],
-                                  self => bless(do{\(my $o = "Y")}, "Sidef::Types::String::Double"),
-                                },
-                              ], "Sidef::Types::Array::Array"),
+                              {
+                                main => [
+                                  {
+                                    self => bless([
+                                      {
+                                        self => bless(do{\(my $o = "w")}, "Sidef::Types::String::Double"),
+                                      },
+                                      {
+                                        self => bless([
+                                          {
+                                            self => bless(do{\(my $o = 5)}, "Sidef::Types::Number::Integer"),
+                                          },
+                                        ], "Sidef::Types::Array::Array"),
+                                      },
+                                      {
+                                        call => [
+                                                  {
+                                                    name => {
+                                                      self => bless(do{\(my $o = "lc")}, "Sidef::Types::String::String"),
+                                                    },
+                                                  },
+                                                ],
+                                        self => bless(do{\(my $o = "Y")}, "Sidef::Types::String::Double"),
+                                      },
+                                    ], "Sidef::Types::Array::Array"),
+                                  },
+                                ],
+                              },
                             ],
                     name => {
                               self => bless(do{\(my $o = "-")}, "Sidef::Types::String::String"),
@@ -1620,37 +1810,43 @@ do {
         call => [
                   {
                     arg  => [
-                              bless([
-                                {
-                                  self => bless(do{\(my $o = "w")}, "Sidef::Types::String::Double"),
-                                },
-                                {
-                                  call => [
-                                            {
-                                              name => {
-                                                self => bless(do{\(my $o = "uc")}, "Sidef::Types::String::String"),
-                                              },
-                                            },
-                                          ],
-                                  self => bless(do{\(my $o = "x")}, "Sidef::Types::String::Double"),
-                                },
-                                {
-                                  self => bless(do{\(my $o = "y")}, "Sidef::Types::String::Double"),
-                                },
-                                {
-                                  self => bless(do{\(my $o = 3)}, "Sidef::Types::Number::Integer"),
-                                },
-                                {
-                                  self => bless([
-                                    {
-                                      self => bless(do{\(my $o = 5)}, "Sidef::Types::Number::Integer"),
-                                    },
-                                  ], "Sidef::Types::Array::Array"),
-                                },
-                                {
-                                  self => bless(do{\(my $o = "IT")}, "Sidef::Types::String::Double"),
-                                },
-                              ], "Sidef::Types::Array::Array"),
+                              {
+                                main => [
+                                  {
+                                    self => bless([
+                                      {
+                                        self => bless(do{\(my $o = "w")}, "Sidef::Types::String::Double"),
+                                      },
+                                      {
+                                        call => [
+                                                  {
+                                                    name => {
+                                                      self => bless(do{\(my $o = "uc")}, "Sidef::Types::String::String"),
+                                                    },
+                                                  },
+                                                ],
+                                        self => bless(do{\(my $o = "x")}, "Sidef::Types::String::Double"),
+                                      },
+                                      {
+                                        self => bless(do{\(my $o = "y")}, "Sidef::Types::String::Double"),
+                                      },
+                                      {
+                                        self => bless(do{\(my $o = 3)}, "Sidef::Types::Number::Integer"),
+                                      },
+                                      {
+                                        self => bless([
+                                          {
+                                            self => bless(do{\(my $o = 5)}, "Sidef::Types::Number::Integer"),
+                                          },
+                                        ], "Sidef::Types::Array::Array"),
+                                      },
+                                      {
+                                        self => bless(do{\(my $o = "IT")}, "Sidef::Types::String::Double"),
+                                      },
+                                    ], "Sidef::Types::Array::Array"),
+                                  },
+                                ],
+                              },
                             ],
                     name => {
                               self => bless(do{\(my $o = "=")}, "Sidef::Types::String::String"),
@@ -1663,28 +1859,34 @@ do {
         call => [
                   {
                     arg  => [
-                              bless([
-                                {
-                                  self => bless(do{\(my $o = "w")}, "Sidef::Types::String::Double"),
-                                },
-                                {
-                                  self => bless([
-                                    {
-                                      self => bless(do{\(my $o = 5)}, "Sidef::Types::Number::Integer"),
-                                    },
-                                  ], "Sidef::Types::Array::Array"),
-                                },
-                                {
-                                  call => [
-                                            {
-                                              name => {
-                                                self => bless(do{\(my $o = "lc")}, "Sidef::Types::String::String"),
-                                              },
-                                            },
-                                          ],
-                                  self => bless(do{\(my $o = "Y")}, "Sidef::Types::String::Double"),
-                                },
-                              ], "Sidef::Types::Array::Array"),
+                              {
+                                main => [
+                                  {
+                                    self => bless([
+                                      {
+                                        self => bless(do{\(my $o = "w")}, "Sidef::Types::String::Double"),
+                                      },
+                                      {
+                                        self => bless([
+                                          {
+                                            self => bless(do{\(my $o = 5)}, "Sidef::Types::Number::Integer"),
+                                          },
+                                        ], "Sidef::Types::Array::Array"),
+                                      },
+                                      {
+                                        call => [
+                                                  {
+                                                    name => {
+                                                      self => bless(do{\(my $o = "lc")}, "Sidef::Types::String::String"),
+                                                    },
+                                                  },
+                                                ],
+                                        self => bless(do{\(my $o = "Y")}, "Sidef::Types::String::Double"),
+                                      },
+                                    ], "Sidef::Types::Array::Array"),
+                                  },
+                                ],
+                              },
                             ],
                     name => {
                               self => bless(do{\(my $o = "=")}, "Sidef::Types::String::String"),
@@ -1696,7 +1898,7 @@ do {
       {
         call => [
                   {
-                    arg  => ['fix'],
+                    arg  => [{ main => [{ self => 'fix' }] }],
                     name => {
                               self => bless(do{\(my $o = "-")}, "Sidef::Types::String::String"),
                             },
@@ -1718,17 +1920,72 @@ do {
         call => [
                   {
                     arg  => [
-                              bless([
-                                {
-                                  self => bless(do{\(my $o = "d")}, "Sidef::Types::String::Double"),
-                                },
-                                {
-                                  self => bless(do{\(my $o = "e")}, "Sidef::Types::String::Double"),
-                                },
-                                {
-                                  self => bless(do{\(my $o = "f")}, "Sidef::Types::String::Double"),
-                                },
-                              ], "Sidef::Types::Array::Array"),
+                              {
+                                main => [
+                                  {
+                                    self => bless([
+                                      {
+                                        self => bless(do{\(my $o = "London")}, "Sidef::Types::String::Double"),
+                                      },
+                                      {
+                                        self => bless(do{\(my $o = "Berlin")}, "Sidef::Types::String::Double"),
+                                      },
+                                    ], "Sidef::Types::Array::Array"),
+                                  },
+                                ],
+                              },
+                            ],
+                    name => {
+                              self => bless(do{\(my $o = "-")}, "Sidef::Types::String::String"),
+                            },
+                  },
+                  {
+                    name => {
+                      self => bless(do{\(my $o = "to_s")}, "Sidef::Types::String::String"),
+                    },
+                  },
+                  {
+                    name => {
+                      self => bless(do{\(my $o = "say")}, "Sidef::Types::String::String"),
+                    },
+                  },
+                ],
+        self => bless([
+                  {
+                    self => bless(do{\(my $o = "Paris")}, "Sidef::Types::String::Double"),
+                  },
+                  {
+                    self => bless(do{\(my $o = "Berlin")}, "Sidef::Types::String::Double"),
+                  },
+                  {
+                    self => bless(do{\(my $o = "Atena")}, "Sidef::Types::String::Double"),
+                  },
+                  {
+                    self => bless(do{\(my $o = "London")}, "Sidef::Types::String::Double"),
+                  },
+                ], "Sidef::Types::Array::Array"),
+      },
+      {
+        call => [
+                  {
+                    arg  => [
+                              {
+                                main => [
+                                  {
+                                    self => bless([
+                                      {
+                                        self => bless(do{\(my $o = "d")}, "Sidef::Types::String::Double"),
+                                      },
+                                      {
+                                        self => bless(do{\(my $o = "e")}, "Sidef::Types::String::Double"),
+                                      },
+                                      {
+                                        self => bless(do{\(my $o = "f")}, "Sidef::Types::String::Double"),
+                                      },
+                                    ], "Sidef::Types::Array::Array"),
+                                  },
+                                ],
+                              },
                             ],
                     name => {
                               self => bless(do{\(my $o = "+")}, "Sidef::Types::String::String"),
@@ -1790,7 +2047,13 @@ do {
         call => [
                   {
                     arg  => [
-                              bless(do{\(my $o = "one two three")}, "Sidef::Types::String::Double"),
+                              {
+                                main => [
+                                  {
+                                    self => bless(do{\(my $o = "one two three")}, "Sidef::Types::String::Double"),
+                                  },
+                                ],
+                              },
                             ],
                     name => {
                               self => bless(do{\(my $o = "=~")}, "Sidef::Types::String::String"),
@@ -1813,7 +2076,13 @@ do {
         call => [
                   {
                     arg  => [
-                              bless(do{\(my $o = bless(do{\(my $o = "(?^:(\\w+))")}, "Sidef::Types::String::String"))}, "Sidef::Types::Regex::Regex"),
+                              {
+                                main => [
+                                  {
+                                    self => bless(do{\(my $o = bless(do{\(my $o = "(?^:(\\w+))")}, "Sidef::Types::String::String"))}, "Sidef::Types::Regex::Regex"),
+                                  },
+                                ],
+                              },
                             ],
                     name => {
                               self => bless(do{\(my $o = "=~")}, "Sidef::Types::String::String"),
@@ -1836,7 +2105,13 @@ do {
         call => [
                   {
                     arg  => [
-                              bless(do{\(my $o = bless(do{\(my $o = "(?^:^\\d+ \\w+ \\d+\$)")}, "Sidef::Types::String::String"))}, "Sidef::Types::Regex::Regex"),
+                              {
+                                main => [
+                                  {
+                                    self => bless(do{\(my $o = bless(do{\(my $o = "(?^:^\\d+ \\w+ \\d+\$)")}, "Sidef::Types::String::String"))}, "Sidef::Types::Regex::Regex"),
+                                  },
+                                ],
+                              },
                             ],
                     name => {
                               self => bless(do{\(my $o = "=")}, "Sidef::Types::String::String"),
@@ -1848,7 +2123,7 @@ do {
       {
         call => [
                   {
-                    arg  => ['fix'],
+                    arg  => [{ main => [{ self => 'fix' }] }],
                     name => {
                               self => bless(do{\(my $o = "=~")}, "Sidef::Types::String::String"),
                             },
@@ -1885,37 +2160,43 @@ do {
         call => [
                   {
                     arg  => [
-                              bless([
-                                {
-                                  self => bless(do{\(my $o = "str")}, "Sidef::Types::String::Double"),
-                                },
-                                {
-                                  self => bless([
-                                    {
-                                      self => bless(do{\(my $o = 123)}, "Sidef::Types::Number::Integer"),
-                                    },
-                                    {
-                                      self => bless([
-                                        {
-                                          self => bless(do{\(my $o = "w")}, "Sidef::Types::String::Double"),
-                                        },
-                                        {
-                                          self => bless(do{\(my $o = "item")}, "Sidef::Types::String::Double"),
-                                        },
-                                        {
-                                          self => bless(do{\(my $o = "x")}, "Sidef::Types::String::Double"),
-                                        },
-                                      ], "Sidef::Types::Array::Array"),
-                                    },
-                                    {
-                                      self => bless(do{\(my $o = 6)}, "Sidef::Types::Number::Integer"),
-                                    },
-                                  ], "Sidef::Types::Array::Array"),
-                                },
-                                {
-                                  self => bless(do{\(my $o = "boo")}, "Sidef::Types::String::Double"),
-                                },
-                              ], "Sidef::Types::Array::Array"),
+                              {
+                                main => [
+                                  {
+                                    self => bless([
+                                      {
+                                        self => bless(do{\(my $o = "str")}, "Sidef::Types::String::Double"),
+                                      },
+                                      {
+                                        self => bless([
+                                          {
+                                            self => bless(do{\(my $o = 123)}, "Sidef::Types::Number::Integer"),
+                                          },
+                                          {
+                                            self => bless([
+                                              {
+                                                self => bless(do{\(my $o = "w")}, "Sidef::Types::String::Double"),
+                                              },
+                                              {
+                                                self => bless(do{\(my $o = "item")}, "Sidef::Types::String::Double"),
+                                              },
+                                              {
+                                                self => bless(do{\(my $o = "x")}, "Sidef::Types::String::Double"),
+                                              },
+                                            ], "Sidef::Types::Array::Array"),
+                                          },
+                                          {
+                                            self => bless(do{\(my $o = 6)}, "Sidef::Types::Number::Integer"),
+                                          },
+                                        ], "Sidef::Types::Array::Array"),
+                                      },
+                                      {
+                                        self => bless(do{\(my $o = "boo")}, "Sidef::Types::String::Double"),
+                                      },
+                                    ], "Sidef::Types::Array::Array"),
+                                  },
+                                ],
+                              },
                             ],
                     name => {
                               self => bless(do{\(my $o = "=~")}, "Sidef::Types::String::String"),
@@ -1947,7 +2228,15 @@ do {
       {
         call => [
                   {
-                    arg  => [bless(do{\(my $o = 80)}, "Sidef::Types::Number::Integer")],
+                    arg  => [
+                              {
+                                main => [
+                                  {
+                                    self => bless(do{\(my $o = 80)}, "Sidef::Types::Number::Integer"),
+                                  },
+                                ],
+                              },
+                            ],
                     name => {
                               self => bless(do{\(my $o = "*")}, "Sidef::Types::String::String"),
                             },
@@ -1963,7 +2252,15 @@ do {
       {
         call => [
                   {
-                    arg  => [bless(do{\(my $o = "\\w")}, "Sidef::Types::String::String")],
+                    arg  => [
+                              {
+                                main => [
+                                  {
+                                    self => bless(do{\(my $o = "\\w")}, "Sidef::Types::String::String"),
+                                  },
+                                ],
+                              },
+                            ],
                     name => {
                               self => bless(do{\(my $o = "=")}, "Sidef::Types::String::String"),
                             },
@@ -1975,7 +2272,13 @@ do {
         call => [
                   {
                     arg  => [
-                              bless(do{\(my $o = bless(do{\(my $o = "(?^:\\d\$re)")}, "Sidef::Types::String::String"))}, "Sidef::Types::Regex::Regex"),
+                              {
+                                main => [
+                                  {
+                                    self => bless(do{\(my $o = bless(do{\(my $o = "(?^:\\d\$re)")}, "Sidef::Types::String::String"))}, "Sidef::Types::Regex::Regex"),
+                                  },
+                                ],
+                              },
                             ],
                     name => {
                               self => bless(do{\(my $o = "=~")}, "Sidef::Types::String::String"),
@@ -1998,7 +2301,13 @@ do {
         call => [
                   {
                     arg  => [
-                              bless(do{\(my $o = bless(do{\(my $o = "(?^:\\d\$re)")}, "Sidef::Types::String::String"))}, "Sidef::Types::Regex::Regex"),
+                              {
+                                main => [
+                                  {
+                                    self => bless(do{\(my $o = bless(do{\(my $o = "(?^:\\d\$re)")}, "Sidef::Types::String::String"))}, "Sidef::Types::Regex::Regex"),
+                                  },
+                                ],
+                              },
                             ],
                     name => {
                               self => bless(do{\(my $o = "=~")}, "Sidef::Types::String::String"),
@@ -2035,7 +2344,15 @@ do {
       {
         call => [
                   {
-                    arg  => [bless(do{\(my $o = 80)}, "Sidef::Types::Number::Integer")],
+                    arg  => [
+                              {
+                                main => [
+                                  {
+                                    self => bless(do{\(my $o = 80)}, "Sidef::Types::Number::Integer"),
+                                  },
+                                ],
+                              },
+                            ],
                     name => {
                               self => bless(do{\(my $o = "*")}, "Sidef::Types::String::String"),
                             },
@@ -2067,7 +2384,15 @@ do {
                                   {
                                     call => [
                                               {
-                                                arg  => [bless(do{\(my $o = 80)}, "Sidef::Types::Number::Integer")],
+                                                arg  => [
+                                                          {
+                                                            main => [
+                                                              {
+                                                                self => bless(do{\(my $o = 80)}, "Sidef::Types::Number::Integer"),
+                                                              },
+                                                            ],
+                                                          },
+                                                        ],
                                                 name => {
                                                           self => bless(do{\(my $o = "*")}, "Sidef::Types::String::String"),
                                                         },
@@ -2154,7 +2479,15 @@ do {
       {
         call => [
                   {
-                    arg  => [bless(do{\(my $o = "sqrt")}, "Sidef::Types::String::Double")],
+                    arg  => [
+                              {
+                                main => [
+                                  {
+                                    self => bless(do{\(my $o = "sqrt")}, "Sidef::Types::String::Double"),
+                                  },
+                                ],
+                              },
+                            ],
                     name => {
                               self => bless(do{\(my $o = "=")}, "Sidef::Types::String::String"),
                             },
@@ -2206,7 +2539,13 @@ do {
         call => [
                   {
                     arg  => [
-                              bless(do{\(my $o = "substr")}, "Sidef::Types::String::Double"),
+                              {
+                                main => [
+                                  {
+                                    self => bless(do{\(my $o = "substr")}, "Sidef::Types::String::Double"),
+                                  },
+                                ],
+                              },
                             ],
                     name => {
                               self => bless(do{\(my $o = "=")}, "Sidef::Types::String::String"),
@@ -2276,7 +2615,15 @@ do {
       {
         call => [
                   {
-                    arg  => [bless(do{\(my $o = 80)}, "Sidef::Types::Number::Integer")],
+                    arg  => [
+                              {
+                                main => [
+                                  {
+                                    self => bless(do{\(my $o = 80)}, "Sidef::Types::Number::Integer"),
+                                  },
+                                ],
+                              },
+                            ],
                     name => {
                               self => bless(do{\(my $o = "*")}, "Sidef::Types::String::String"),
                             },
@@ -2312,7 +2659,15 @@ do {
       {
         call => [
                   {
-                    arg  => [bless(do{\(my $o = 80)}, "Sidef::Types::Number::Integer")],
+                    arg  => [
+                              {
+                                main => [
+                                  {
+                                    self => bless(do{\(my $o = 80)}, "Sidef::Types::Number::Integer"),
+                                  },
+                                ],
+                              },
+                            ],
                     name => {
                               self => bless(do{\(my $o = "*")}, "Sidef::Types::String::String"),
                             },
@@ -2334,7 +2689,15 @@ do {
                                   {
                                     call => [
                                               {
-                                                arg  => [bless(do{\(my $o = 5)}, "Sidef::Types::Number::Integer")],
+                                                arg  => [
+                                                          {
+                                                            main => [
+                                                              {
+                                                                self => bless(do{\(my $o = 5)}, "Sidef::Types::Number::Integer"),
+                                                              },
+                                                            ],
+                                                          },
+                                                        ],
                                                 name => {
                                                           self => bless(do{\(my $o = "..")}, "Sidef::Types::String::String"),
                                                         },
@@ -2375,7 +2738,13 @@ do {
                   },
                   {
                     arg  => [
-                              bless(do{\(my $o = ". BOOM!")}, "Sidef::Types::String::Double"),
+                              {
+                                main => [
+                                  {
+                                    self => bless(do{\(my $o = ". BOOM!")}, "Sidef::Types::String::Double"),
+                                  },
+                                ],
+                              },
                             ],
                     name => {
                               self => bless(do{\(my $o = "+")}, "Sidef::Types::String::String"),
@@ -2392,7 +2761,15 @@ do {
       {
         call => [
                   {
-                    arg  => [bless(do{\(my $o = 80)}, "Sidef::Types::Number::Integer")],
+                    arg  => [
+                              {
+                                main => [
+                                  {
+                                    self => bless(do{\(my $o = 80)}, "Sidef::Types::Number::Integer"),
+                                  },
+                                ],
+                              },
+                            ],
                     name => {
                               self => bless(do{\(my $o = "*")}, "Sidef::Types::String::String"),
                             },
@@ -2409,7 +2786,13 @@ do {
         call => [
                   {
                     arg  => [
-                              bless(do{\(my $o = "original")}, "Sidef::Types::String::Double"),
+                              {
+                                main => [
+                                  {
+                                    self => bless(do{\(my $o = "original")}, "Sidef::Types::String::Double"),
+                                  },
+                                ],
+                              },
                             ],
                     name => {
                               self => bless(do{\(my $o = "=")}, "Sidef::Types::String::String"),
@@ -2422,7 +2805,13 @@ do {
         call => [
                   {
                     arg  => [
-                              bless(do{\(my $o = "modified")}, "Sidef::Types::String::Double"),
+                              {
+                                main => [
+                                  {
+                                    self => bless(do{\(my $o = "modified")}, "Sidef::Types::String::Double"),
+                                  },
+                                ],
+                              },
                             ],
                     name => {
                               self => bless(do{\(my $o = ":=")}, "Sidef::Types::String::String"),
@@ -2444,7 +2833,13 @@ do {
       {
         call => [
                   {
-                    arg  => [bless(do{\(my $o = undef)}, "Sidef::Types::Nil::Nil")],
+                    arg  => [
+                              {
+                                main => [
+                                  { self => bless(do{\(my $o = undef)}, "Sidef::Types::Nil::Nil") },
+                                ],
+                              },
+                            ],
                     name => {
                               self => bless(do{\(my $o = "=")}, "Sidef::Types::String::String"),
                             },
@@ -2456,7 +2851,13 @@ do {
         call => [
                   {
                     arg  => [
-                              bless(do{\(my $o = "modified")}, "Sidef::Types::String::Double"),
+                              {
+                                main => [
+                                  {
+                                    self => bless(do{\(my $o = "modified")}, "Sidef::Types::String::Double"),
+                                  },
+                                ],
+                              },
                             ],
                     name => {
                               self => bless(do{\(my $o = ":=")}, "Sidef::Types::String::String"),
@@ -2478,7 +2879,15 @@ do {
       {
         call => [
                   {
-                    arg  => [bless(do{\(my $o = 80)}, "Sidef::Types::Number::Integer")],
+                    arg  => [
+                              {
+                                main => [
+                                  {
+                                    self => bless(do{\(my $o = 80)}, "Sidef::Types::Number::Integer"),
+                                  },
+                                ],
+                              },
+                            ],
                     name => {
                               self => bless(do{\(my $o = "*")}, "Sidef::Types::String::String"),
                             },
@@ -2495,7 +2904,13 @@ do {
         call => [
                   {
                     arg  => [
-                              bless(do{\(my $o = "sidef")}, "Sidef::Types::String::Double"),
+                              {
+                                main => [
+                                  {
+                                    self => bless(do{\(my $o = "sidef")}, "Sidef::Types::String::Double"),
+                                  },
+                                ],
+                              },
                             ],
                     name => {
                               self => bless(do{\(my $o = "=")}, "Sidef::Types::String::String"),
@@ -2558,7 +2973,15 @@ do {
       {
         call => [
                   {
-                    arg  => [bless(do{\(my $o = 2)}, "Sidef::Types::Number::Integer")],
+                    arg  => [
+                              {
+                                main => [
+                                  {
+                                    self => bless(do{\(my $o = 2)}, "Sidef::Types::Number::Integer"),
+                                  },
+                                ],
+                              },
+                            ],
                     name => {
                               self => bless(do{\(my $o = "=")}, "Sidef::Types::String::String"),
                             },
@@ -2580,11 +3003,7 @@ do {
                                                 },
                                               },
                                             ],
-                                    ind  => [
-                                              {
-                                                self => bless([{ self => 'fix' }], "Sidef::Types::Array::Array"),
-                                              },
-                                            ],
+                                    ind  => [bless([{ self => 'fix' }], "Sidef::Types::Array::Array")],
                                     self => 'fix',
                                   },
                                 ],
@@ -2595,7 +3014,15 @@ do {
                             },
                   },
                   {
-                    arg  => [bless(do{\(my $o = "'")}, "Sidef::Types::String::Double")],
+                    arg  => [
+                              {
+                                main => [
+                                  {
+                                    self => bless(do{\(my $o = "'")}, "Sidef::Types::String::Double"),
+                                  },
+                                ],
+                              },
+                            ],
                     name => {
                               self => bless(do{\(my $o = "+")}, "Sidef::Types::String::String"),
                             },
@@ -2611,100 +3038,130 @@ do {
       {
         call => [
                   {
-                    arg  => [bless(do{\(my $o = "g")}, "Sidef::Types::String::Double")],
+                    arg  => [
+                              {
+                                main => [
+                                  {
+                                    self => bless(do{\(my $o = "g")}, "Sidef::Types::String::Double"),
+                                  },
+                                ],
+                              },
+                            ],
                     name => {
                               self => bless(do{\(my $o = "=")}, "Sidef::Types::String::String"),
                             },
                   },
                 ],
         ind  => [
-                  {
-                    self => bless([
-                      {
-                        self => bless(do{\(my $o = 0)}, "Sidef::Types::Number::Integer"),
-                      },
-                    ], "Sidef::Types::Array::Array"),
-                  },
+                  bless([
+                    {
+                      self => bless(do{\(my $o = 0)}, "Sidef::Types::Number::Integer"),
+                    },
+                  ], "Sidef::Types::Array::Array"),
                 ],
         self => 'fix',
       },
       {
         call => [
                   {
-                    arg  => [bless(do{\(my $o = "r")}, "Sidef::Types::String::Double")],
+                    arg  => [
+                              {
+                                main => [
+                                  {
+                                    self => bless(do{\(my $o = "r")}, "Sidef::Types::String::Double"),
+                                  },
+                                ],
+                              },
+                            ],
                     name => {
                               self => bless(do{\(my $o = "=")}, "Sidef::Types::String::String"),
                             },
                   },
                 ],
         ind  => [
-                  {
-                    self => bless([
-                      {
-                        self => bless(do{\(my $o = 2)}, "Sidef::Types::Number::Integer"),
-                      },
-                    ], "Sidef::Types::Array::Array"),
-                  },
+                  bless([
+                    {
+                      self => bless(do{\(my $o = 2)}, "Sidef::Types::Number::Integer"),
+                    },
+                  ], "Sidef::Types::Array::Array"),
                 ],
         self => 'fix',
       },
       {
         call => [
                   {
-                    arg  => [bless(do{\(my $o = "a")}, "Sidef::Types::String::Double")],
+                    arg  => [
+                              {
+                                main => [
+                                  {
+                                    self => bless(do{\(my $o = "a")}, "Sidef::Types::String::Double"),
+                                  },
+                                ],
+                              },
+                            ],
                     name => {
                               self => bless(do{\(my $o = "=")}, "Sidef::Types::String::String"),
                             },
                   },
                 ],
         ind  => [
-                  {
-                    self => bless([
-                      {
-                        self => bless(do{\(my $o = 3)}, "Sidef::Types::Number::Integer"),
-                      },
-                    ], "Sidef::Types::Array::Array"),
-                  },
+                  bless([
+                    {
+                      self => bless(do{\(my $o = 3)}, "Sidef::Types::Number::Integer"),
+                    },
+                  ], "Sidef::Types::Array::Array"),
                 ],
         self => 'fix',
       },
       {
         call => [
                   {
-                    arg  => [bless(do{\(my $o = "f")}, "Sidef::Types::String::Double")],
+                    arg  => [
+                              {
+                                main => [
+                                  {
+                                    self => bless(do{\(my $o = "f")}, "Sidef::Types::String::Double"),
+                                  },
+                                ],
+                              },
+                            ],
                     name => {
                               self => bless(do{\(my $o = "=")}, "Sidef::Types::String::String"),
                             },
                   },
                 ],
         ind  => [
-                  {
-                    self => bless([
-                      {
-                        self => bless(do{\(my $o = 5)}, "Sidef::Types::Number::Integer"),
-                      },
-                    ], "Sidef::Types::Array::Array"),
-                  },
+                  bless([
+                    {
+                      self => bless(do{\(my $o = 5)}, "Sidef::Types::Number::Integer"),
+                    },
+                  ], "Sidef::Types::Array::Array"),
                 ],
         self => 'fix',
       },
       {
         call => [
                   {
-                    arg  => [bless(do{\(my $o = "e")}, "Sidef::Types::String::Double")],
+                    arg  => [
+                              {
+                                main => [
+                                  {
+                                    self => bless(do{\(my $o = "e")}, "Sidef::Types::String::Double"),
+                                  },
+                                ],
+                              },
+                            ],
                     name => {
                               self => bless(do{\(my $o = "=")}, "Sidef::Types::String::String"),
                             },
                   },
                 ],
         ind  => [
-                  {
-                    self => bless([
-                      {
-                        self => bless(do{\(my $o = 6)}, "Sidef::Types::Number::Integer"),
-                      },
-                    ], "Sidef::Types::Array::Array"),
-                  },
+                  bless([
+                    {
+                      self => bless(do{\(my $o = 6)}, "Sidef::Types::Number::Integer"),
+                    },
+                  ], "Sidef::Types::Array::Array"),
                 ],
         self => 'fix',
       },
@@ -2735,7 +3192,15 @@ do {
       {
         call => [
                   {
-                    arg  => [bless(do{\(my $o = 80)}, "Sidef::Types::Number::Integer")],
+                    arg  => [
+                              {
+                                main => [
+                                  {
+                                    self => bless(do{\(my $o = 80)}, "Sidef::Types::Number::Integer"),
+                                  },
+                                ],
+                              },
+                            ],
                     name => {
                               self => bless(do{\(my $o = "*")}, "Sidef::Types::String::String"),
                             },
@@ -2752,23 +3217,29 @@ do {
         call => [
                   {
                     arg  => [
-                              bless([
-                                {
-                                  self => bless(do{\(my $o = "zero")}, "Sidef::Types::String::Double"),
-                                },
-                                {
-                                  self => bless(do{\(my $o = "one")}, "Sidef::Types::String::Double"),
-                                },
-                                {
-                                  self => bless(do{\(my $o = "two")}, "Sidef::Types::String::Double"),
-                                },
-                                {
-                                  self => bless(do{\(my $o = "three")}, "Sidef::Types::String::Double"),
-                                },
-                                {
-                                  self => bless(do{\(my $o = "four")}, "Sidef::Types::String::Double"),
-                                },
-                              ], "Sidef::Types::Array::Array"),
+                              {
+                                main => [
+                                  {
+                                    self => bless([
+                                      {
+                                        self => bless(do{\(my $o = "zero")}, "Sidef::Types::String::Double"),
+                                      },
+                                      {
+                                        self => bless(do{\(my $o = "one")}, "Sidef::Types::String::Double"),
+                                      },
+                                      {
+                                        self => bless(do{\(my $o = "two")}, "Sidef::Types::String::Double"),
+                                      },
+                                      {
+                                        self => bless(do{\(my $o = "three")}, "Sidef::Types::String::Double"),
+                                      },
+                                      {
+                                        self => bless(do{\(my $o = "four")}, "Sidef::Types::String::Double"),
+                                      },
+                                    ], "Sidef::Types::Array::Array"),
+                                  },
+                                ],
+                              },
                             ],
                     name => {
                               self => bless(do{\(my $o = "=")}, "Sidef::Types::String::String"),
@@ -2786,13 +3257,11 @@ do {
                   },
                 ],
         ind  => [
-                  {
-                    self => bless([
-                      {
-                        self => bless(do{\(my $o = 1)}, "Sidef::Types::Number::Integer"),
-                      },
-                    ], "Sidef::Types::Array::Array"),
-                  },
+                  bless([
+                    {
+                      self => bless(do{\(my $o = 1)}, "Sidef::Types::Number::Integer"),
+                    },
+                  ], "Sidef::Types::Array::Array"),
                 ],
         self => 'fix',
       },
@@ -2805,13 +3274,11 @@ do {
                   },
                 ],
         ind  => [
-                  {
-                    self => bless([
-                      {
-                        self => bless(do{\(my $o = 2)}, "Sidef::Types::Number::Integer"),
-                      },
-                    ], "Sidef::Types::Array::Array"),
-                  },
+                  bless([
+                    {
+                      self => bless(do{\(my $o = 2)}, "Sidef::Types::Number::Integer"),
+                    },
+                  ], "Sidef::Types::Array::Array"),
                 ],
         self => 'fix',
       },
@@ -2829,19 +3296,17 @@ do {
                   },
                 ],
         ind  => [
-                  {
-                    self => bless([
-                      {
-                        self => bless(do{\(my $o = 2)}, "Sidef::Types::Number::Integer"),
-                      },
-                      {
-                        self => bless(do{\(my $o = 3)}, "Sidef::Types::Number::Integer"),
-                      },
-                      {
-                        self => bless(do{\(my $o = 4)}, "Sidef::Types::Number::Integer"),
-                      },
-                    ], "Sidef::Types::Array::Array"),
-                  },
+                  bless([
+                    {
+                      self => bless(do{\(my $o = 2)}, "Sidef::Types::Number::Integer"),
+                    },
+                    {
+                      self => bless(do{\(my $o = 3)}, "Sidef::Types::Number::Integer"),
+                    },
+                    {
+                      self => bless(do{\(my $o = 4)}, "Sidef::Types::Number::Integer"),
+                    },
+                  ], "Sidef::Types::Array::Array"),
                 ],
         self => 'fix',
       },
@@ -2859,32 +3324,38 @@ do {
                   },
                 ],
         ind  => [
-                  {
-                    self => bless([
-                      {
-                        self => bless(do{\(my $o = -1)}, "Sidef::Types::Number::Integer"),
-                      },
-                      {
-                        self => bless(do{\(my $o = -2)}, "Sidef::Types::Number::Integer"),
-                      },
-                      {
-                        self => bless(do{\(my $o = -3)}, "Sidef::Types::Number::Integer"),
-                      },
-                      {
-                        self => bless(do{\(my $o = -4)}, "Sidef::Types::Number::Integer"),
-                      },
-                      {
-                        self => bless(do{\(my $o = -5)}, "Sidef::Types::Number::Integer"),
-                      },
-                    ], "Sidef::Types::Array::Array"),
-                  },
+                  bless([
+                    {
+                      self => bless(do{\(my $o = -1)}, "Sidef::Types::Number::Integer"),
+                    },
+                    {
+                      self => bless(do{\(my $o = -2)}, "Sidef::Types::Number::Integer"),
+                    },
+                    {
+                      self => bless(do{\(my $o = -3)}, "Sidef::Types::Number::Integer"),
+                    },
+                    {
+                      self => bless(do{\(my $o = -4)}, "Sidef::Types::Number::Integer"),
+                    },
+                    {
+                      self => bless(do{\(my $o = -5)}, "Sidef::Types::Number::Integer"),
+                    },
+                  ], "Sidef::Types::Array::Array"),
                 ],
         self => 'fix',
       },
       {
         call => [
                   {
-                    arg  => [bless(do{\(my $o = 80)}, "Sidef::Types::Number::Integer")],
+                    arg  => [
+                              {
+                                main => [
+                                  {
+                                    self => bless(do{\(my $o = 80)}, "Sidef::Types::Number::Integer"),
+                                  },
+                                ],
+                              },
+                            ],
                     name => {
                               self => bless(do{\(my $o = "*")}, "Sidef::Types::String::String"),
                             },
@@ -2906,113 +3377,11 @@ do {
                   },
                 ],
         ind  => [
-                  {
-                    self => bless([
-                      {
-                        self => bless(do{\(my $o = 1)}, "Sidef::Types::Number::Integer"),
-                      },
-                    ], "Sidef::Types::Array::Array"),
-                  },
-                ],
-        self => 'fix',
-      },
-      {
-        call => [
-                  {
-                    arg  => [bless(do{\(my $o = "unu")}, "Sidef::Types::String::Double")],
-                    name => {
-                              self => bless(do{\(my $o = "=")}, "Sidef::Types::String::String"),
-                            },
-                  },
-                  {
-                    name => {
-                      self => bless(do{\(my $o = "say")}, "Sidef::Types::String::String"),
+                  bless([
+                    {
+                      self => bless(do{\(my $o = 1)}, "Sidef::Types::Number::Integer"),
                     },
-                  },
-                ],
-        ind  => [
-                  {
-                    self => bless([
-                      {
-                        self => bless(do{\(my $o = 1)}, "Sidef::Types::Number::Integer"),
-                      },
-                    ], "Sidef::Types::Array::Array"),
-                  },
-                ],
-        self => 'fix',
-      },
-      {
-        call => [
-                  {
-                    name => {
-                      self => bless(do{\(my $o = "say")}, "Sidef::Types::String::String"),
-                    },
-                  },
-                ],
-        ind  => [
-                  {
-                    self => bless([
-                      {
-                        self => bless(do{\(my $o = 2)}, "Sidef::Types::Number::Integer"),
-                      },
-                    ], "Sidef::Types::Array::Array"),
-                  },
-                ],
-        self => 'fix',
-      },
-      {
-        call => [
-                  {
-                    arg  => [bless(do{\(my $o = "doi")}, "Sidef::Types::String::Double")],
-                    name => {
-                              self => bless(do{\(my $o = "=")}, "Sidef::Types::String::String"),
-                            },
-                  },
-                ],
-        ind  => [
-                  {
-                    self => bless([
-                      {
-                        call => [
-                                  {
-                                    arg  => [bless(do{\(my $o = 3)}, "Sidef::Types::Number::Integer")],
-                                    name => {
-                                              self => bless(do{\(my $o = "-")}, "Sidef::Types::String::String"),
-                                            },
-                                  },
-                                ],
-                        self => bless(do{\(my $o = 5)}, "Sidef::Types::Number::Integer"),
-                      },
-                    ], "Sidef::Types::Array::Array"),
-                  },
-                ],
-        self => 'fix',
-      },
-      {
-        call => [
-                  {
-                    arg  => [bless(do{\(my $o = "trei")}, "Sidef::Types::String::Double")],
-                    name => {
-                              self => bless(do{\(my $o = "=")}, "Sidef::Types::String::String"),
-                            },
-                  },
-                ],
-        ind  => [
-                  {
-                    self => bless([
-                      {
-                        call => [
-                                  {
-                                    arg  => [bless(do{\(my $o = 1)}, "Sidef::Types::Number::Integer")],
-                                    name => {
-                                              self => bless(do{\(my $o = "+")}, "Sidef::Types::String::String"),
-                                            },
-                                  },
-                                ],
-                        self => bless(do{\(my $o = 2)}, "Sidef::Types::Number::Integer"),
-                      },
-                    ], "Sidef::Types::Array::Array"),
-                  },
+                  ], "Sidef::Types::Array::Array"),
                 ],
         self => 'fix',
       },
@@ -3020,29 +3389,30 @@ do {
         call => [
                   {
                     arg  => [
-                              bless(do{\(my $o = "patru")}, "Sidef::Types::String::Double"),
+                              {
+                                main => [
+                                  {
+                                    self => bless(do{\(my $o = "unu")}, "Sidef::Types::String::Double"),
+                                  },
+                                ],
+                              },
                             ],
                     name => {
                               self => bless(do{\(my $o = "=")}, "Sidef::Types::String::String"),
                             },
                   },
+                  {
+                    name => {
+                      self => bless(do{\(my $o = "say")}, "Sidef::Types::String::String"),
+                    },
+                  },
                 ],
         ind  => [
-                  {
-                    self => bless([
-                      {
-                        call => [
-                                  {
-                                    arg  => [bless(do{\(my $o = 2)}, "Sidef::Types::Number::Integer")],
-                                    name => {
-                                              self => bless(do{\(my $o = "/")}, "Sidef::Types::String::String"),
-                                            },
-                                  },
-                                ],
-                        self => bless(do{\(my $o = 8)}, "Sidef::Types::Number::Integer"),
-                      },
-                    ], "Sidef::Types::Array::Array"),
-                  },
+                  bless([
+                    {
+                      self => bless(do{\(my $o = 1)}, "Sidef::Types::Number::Integer"),
+                    },
+                  ], "Sidef::Types::Array::Array"),
                 ],
         self => 'fix',
       },
@@ -3055,13 +3425,11 @@ do {
                   },
                 ],
         ind  => [
-                  {
-                    self => bless([
-                      {
-                        self => bless(do{\(my $o = 3)}, "Sidef::Types::Number::Integer"),
-                      },
-                    ], "Sidef::Types::Array::Array"),
-                  },
+                  bless([
+                    {
+                      self => bless(do{\(my $o = 2)}, "Sidef::Types::Number::Integer"),
+                    },
+                  ], "Sidef::Types::Array::Array"),
                 ],
         self => 'fix',
       },
@@ -3069,23 +3437,13 @@ do {
         call => [
                   {
                     arg  => [
-                              bless([
-                                {
-                                  self => bless(do{\(my $o = "doi")}, "Sidef::Types::String::Double"),
-                                },
-                                {
-                                  self => bless(do{\(my $o = "trei")}, "Sidef::Types::String::Double"),
-                                },
-                                {
-                                  self => bless(do{\(my $o = "patru")}, "Sidef::Types::String::Double"),
-                                },
-                                {
-                                  self => bless(do{\(my $o = "cinci")}, "Sidef::Types::String::Double"),
-                                },
-                                {
-                                  self => bless(do{\(my $o = "\x{219}ase")}, "Sidef::Types::String::Double"),
-                                },
-                              ], "Sidef::Types::Array::Array"),
+                              {
+                                main => [
+                                  {
+                                    self => bless(do{\(my $o = "doi")}, "Sidef::Types::String::Double"),
+                                  },
+                                ],
+                              },
                             ],
                     name => {
                               self => bless(do{\(my $o = "=")}, "Sidef::Types::String::String"),
@@ -3093,25 +3451,182 @@ do {
                   },
                 ],
         ind  => [
+                  bless([
+                    {
+                      call => [
+                                {
+                                  arg  => [
+                                            {
+                                              main => [
+                                                {
+                                                  self => bless(do{\(my $o = 3)}, "Sidef::Types::Number::Integer"),
+                                                },
+                                              ],
+                                            },
+                                          ],
+                                  name => {
+                                            self => bless(do{\(my $o = "-")}, "Sidef::Types::String::String"),
+                                          },
+                                },
+                              ],
+                      self => bless(do{\(my $o = 5)}, "Sidef::Types::Number::Integer"),
+                    },
+                  ], "Sidef::Types::Array::Array"),
+                ],
+        self => 'fix',
+      },
+      {
+        call => [
                   {
-                    self => bless([
-                      {
-                        self => bless(do{\(my $o = 2)}, "Sidef::Types::Number::Integer"),
-                      },
-                      {
-                        self => bless(do{\(my $o = 3)}, "Sidef::Types::Number::Integer"),
-                      },
-                      {
-                        self => bless(do{\(my $o = 4)}, "Sidef::Types::Number::Integer"),
-                      },
-                      {
-                        self => bless(do{\(my $o = 5)}, "Sidef::Types::Number::Integer"),
-                      },
-                      {
-                        self => bless(do{\(my $o = 6)}, "Sidef::Types::Number::Integer"),
-                      },
-                    ], "Sidef::Types::Array::Array"),
+                    arg  => [
+                              {
+                                main => [
+                                  {
+                                    self => bless(do{\(my $o = "trei")}, "Sidef::Types::String::Double"),
+                                  },
+                                ],
+                              },
+                            ],
+                    name => {
+                              self => bless(do{\(my $o = "=")}, "Sidef::Types::String::String"),
+                            },
                   },
+                ],
+        ind  => [
+                  bless([
+                    {
+                      call => [
+                                {
+                                  arg  => [
+                                            {
+                                              main => [
+                                                {
+                                                  self => bless(do{\(my $o = 1)}, "Sidef::Types::Number::Integer"),
+                                                },
+                                              ],
+                                            },
+                                          ],
+                                  name => {
+                                            self => bless(do{\(my $o = "+")}, "Sidef::Types::String::String"),
+                                          },
+                                },
+                              ],
+                      self => bless(do{\(my $o = 2)}, "Sidef::Types::Number::Integer"),
+                    },
+                  ], "Sidef::Types::Array::Array"),
+                ],
+        self => 'fix',
+      },
+      {
+        call => [
+                  {
+                    arg  => [
+                              {
+                                main => [
+                                  {
+                                    self => bless(do{\(my $o = "patru")}, "Sidef::Types::String::Double"),
+                                  },
+                                ],
+                              },
+                            ],
+                    name => {
+                              self => bless(do{\(my $o = "=")}, "Sidef::Types::String::String"),
+                            },
+                  },
+                ],
+        ind  => [
+                  bless([
+                    {
+                      call => [
+                                {
+                                  arg  => [
+                                            {
+                                              main => [
+                                                {
+                                                  self => bless(do{\(my $o = 2)}, "Sidef::Types::Number::Integer"),
+                                                },
+                                              ],
+                                            },
+                                          ],
+                                  name => {
+                                            self => bless(do{\(my $o = "/")}, "Sidef::Types::String::String"),
+                                          },
+                                },
+                              ],
+                      self => bless(do{\(my $o = 8)}, "Sidef::Types::Number::Integer"),
+                    },
+                  ], "Sidef::Types::Array::Array"),
+                ],
+        self => 'fix',
+      },
+      {
+        call => [
+                  {
+                    name => {
+                      self => bless(do{\(my $o = "say")}, "Sidef::Types::String::String"),
+                    },
+                  },
+                ],
+        ind  => [
+                  bless([
+                    {
+                      self => bless(do{\(my $o = 3)}, "Sidef::Types::Number::Integer"),
+                    },
+                  ], "Sidef::Types::Array::Array"),
+                ],
+        self => 'fix',
+      },
+      {
+        call => [
+                  {
+                    arg  => [
+                              {
+                                main => [
+                                  {
+                                    self => bless([
+                                      {
+                                        self => bless(do{\(my $o = "doi")}, "Sidef::Types::String::Double"),
+                                      },
+                                      {
+                                        self => bless(do{\(my $o = "trei")}, "Sidef::Types::String::Double"),
+                                      },
+                                      {
+                                        self => bless(do{\(my $o = "patru")}, "Sidef::Types::String::Double"),
+                                      },
+                                      {
+                                        self => bless(do{\(my $o = "cinci")}, "Sidef::Types::String::Double"),
+                                      },
+                                      {
+                                        self => bless(do{\(my $o = "\x{219}ase")}, "Sidef::Types::String::Double"),
+                                      },
+                                    ], "Sidef::Types::Array::Array"),
+                                  },
+                                ],
+                              },
+                            ],
+                    name => {
+                              self => bless(do{\(my $o = "=")}, "Sidef::Types::String::String"),
+                            },
+                  },
+                ],
+        ind  => [
+                  bless([
+                    {
+                      self => bless(do{\(my $o = 2)}, "Sidef::Types::Number::Integer"),
+                    },
+                    {
+                      self => bless(do{\(my $o = 3)}, "Sidef::Types::Number::Integer"),
+                    },
+                    {
+                      self => bless(do{\(my $o = 4)}, "Sidef::Types::Number::Integer"),
+                    },
+                    {
+                      self => bless(do{\(my $o = 5)}, "Sidef::Types::Number::Integer"),
+                    },
+                    {
+                      self => bless(do{\(my $o = 6)}, "Sidef::Types::Number::Integer"),
+                    },
+                  ], "Sidef::Types::Array::Array"),
                 ],
         self => 'fix',
       },
@@ -3142,7 +3657,15 @@ do {
       {
         call => [
                   {
-                    arg  => [bless(do{\(my $o = 80)}, "Sidef::Types::Number::Integer")],
+                    arg  => [
+                              {
+                                main => [
+                                  {
+                                    self => bless(do{\(my $o = 80)}, "Sidef::Types::Number::Integer"),
+                                  },
+                                ],
+                              },
+                            ],
                     name => {
                               self => bless(do{\(my $o = "*")}, "Sidef::Types::String::String"),
                             },
@@ -3159,27 +3682,33 @@ do {
         call => [
                   {
                     arg  => [
-                              bless([
-                                {
-                                  self => bless(do{\(my $o = "beg")}, "Sidef::Types::String::Double"),
-                                },
-                                {
-                                  self => bless([
-                                    {
-                                      self => bless(do{\(my $o = "x")}, "Sidef::Types::String::Double"),
-                                    },
-                                    {
-                                      self => bless(do{\(my $o = "y")}, "Sidef::Types::String::Double"),
-                                    },
-                                    {
-                                      self => bless(do{\(my $o = "z")}, "Sidef::Types::String::Double"),
-                                    },
-                                  ], "Sidef::Types::Array::Array"),
-                                },
-                                {
-                                  self => bless(do{\(my $o = "end")}, "Sidef::Types::String::Double"),
-                                },
-                              ], "Sidef::Types::Array::Array"),
+                              {
+                                main => [
+                                  {
+                                    self => bless([
+                                      {
+                                        self => bless(do{\(my $o = "beg")}, "Sidef::Types::String::Double"),
+                                      },
+                                      {
+                                        self => bless([
+                                          {
+                                            self => bless(do{\(my $o = "x")}, "Sidef::Types::String::Double"),
+                                          },
+                                          {
+                                            self => bless(do{\(my $o = "y")}, "Sidef::Types::String::Double"),
+                                          },
+                                          {
+                                            self => bless(do{\(my $o = "z")}, "Sidef::Types::String::Double"),
+                                          },
+                                        ], "Sidef::Types::Array::Array"),
+                                      },
+                                      {
+                                        self => bless(do{\(my $o = "end")}, "Sidef::Types::String::Double"),
+                                      },
+                                    ], "Sidef::Types::Array::Array"),
+                                  },
+                                ],
+                              },
                             ],
                     name => {
                               self => bless(do{\(my $o = "=")}, "Sidef::Types::String::String"),
@@ -3202,13 +3731,11 @@ do {
                   },
                 ],
         ind  => [
-                  {
-                    self => bless([
-                      {
-                        self => bless(do{\(my $o = 1)}, "Sidef::Types::Number::Integer"),
-                      },
-                    ], "Sidef::Types::Array::Array"),
-                  },
+                  bless([
+                    {
+                      self => bless(do{\(my $o = 1)}, "Sidef::Types::Number::Integer"),
+                    },
+                  ], "Sidef::Types::Array::Array"),
                 ],
         self => 'fix',
       },
@@ -3216,17 +3743,23 @@ do {
         call => [
                   {
                     arg  => [
-                              bless([
-                                {
-                                  self => bless(do{\(my $o = "m")}, "Sidef::Types::String::Double"),
-                                },
-                                {
-                                  self => bless(do{\(my $o = "n")}, "Sidef::Types::String::Double"),
-                                },
-                                {
-                                  self => bless(do{\(my $o = "o")}, "Sidef::Types::String::Double"),
-                                },
-                              ], "Sidef::Types::Array::Array"),
+                              {
+                                main => [
+                                  {
+                                    self => bless([
+                                      {
+                                        self => bless(do{\(my $o = "m")}, "Sidef::Types::String::Double"),
+                                      },
+                                      {
+                                        self => bless(do{\(my $o = "n")}, "Sidef::Types::String::Double"),
+                                      },
+                                      {
+                                        self => bless(do{\(my $o = "o")}, "Sidef::Types::String::Double"),
+                                      },
+                                    ], "Sidef::Types::Array::Array"),
+                                  },
+                                ],
+                              },
                             ],
                     name => {
                               self => bless(do{\(my $o = "=")}, "Sidef::Types::String::String"),
@@ -3234,13 +3767,11 @@ do {
                   },
                 ],
         ind  => [
-                  {
-                    self => bless([
-                      {
-                        self => bless(do{\(my $o = 1)}, "Sidef::Types::Number::Integer"),
-                      },
-                    ], "Sidef::Types::Array::Array"),
-                  },
+                  bless([
+                    {
+                      self => bless(do{\(my $o = 1)}, "Sidef::Types::Number::Integer"),
+                    },
+                  ], "Sidef::Types::Array::Array"),
                 ],
         self => 'fix',
       },
@@ -3258,13 +3789,11 @@ do {
                   },
                 ],
         ind  => [
-                  {
-                    self => bless([
-                      {
-                        self => bless(do{\(my $o = 1)}, "Sidef::Types::Number::Integer"),
-                      },
-                    ], "Sidef::Types::Array::Array"),
-                  },
+                  bless([
+                    {
+                      self => bless(do{\(my $o = 1)}, "Sidef::Types::Number::Integer"),
+                    },
+                  ], "Sidef::Types::Array::Array"),
                 ],
         self => 'fix',
       },
@@ -3282,27 +3811,31 @@ do {
                   },
                 ],
         ind  => [
-                  {
-                    self => bless([
-                      {
-                        self => bless(do{\(my $o = 1)}, "Sidef::Types::Number::Integer"),
-                      },
-                    ], "Sidef::Types::Array::Array"),
-                  },
-                  {
-                    self => bless([
-                      {
-                        self => bless(do{\(my $o = 1)}, "Sidef::Types::Number::Integer"),
-                      },
-                    ], "Sidef::Types::Array::Array"),
-                  },
+                  bless([
+                    {
+                      self => bless(do{\(my $o = 1)}, "Sidef::Types::Number::Integer"),
+                    },
+                  ], "Sidef::Types::Array::Array"),
+                  bless([
+                    {
+                      self => bless(do{\(my $o = 1)}, "Sidef::Types::Number::Integer"),
+                    },
+                  ], "Sidef::Types::Array::Array"),
                 ],
         self => 'fix',
       },
       {
         call => [
                   {
-                    arg  => [bless(do{\(my $o = 80)}, "Sidef::Types::Number::Integer")],
+                    arg  => [
+                              {
+                                main => [
+                                  {
+                                    self => bless(do{\(my $o = 80)}, "Sidef::Types::Number::Integer"),
+                                  },
+                                ],
+                              },
+                            ],
                     name => {
                               self => bless(do{\(my $o = "*")}, "Sidef::Types::String::String"),
                             },
@@ -3324,13 +3857,11 @@ do {
                   },
                 ],
         ind  => [
-                  {
-                    self => bless([
-                      {
-                        self => bless(do{\(my $o = 0)}, "Sidef::Types::Number::Integer"),
-                      },
-                    ], "Sidef::Types::Array::Array"),
-                  },
+                  bless([
+                    {
+                      self => bless(do{\(my $o = 0)}, "Sidef::Types::Number::Integer"),
+                    },
+                  ], "Sidef::Types::Array::Array"),
                 ],
         self => 'fix',
       },
@@ -3338,17 +3869,23 @@ do {
         call => [
                   {
                     arg  => [
-                              bless([
-                                {
-                                  self => bless(do{\(my $o = "one")}, "Sidef::Types::String::Double"),
-                                },
-                                {
-                                  self => bless(do{\(my $o = "two")}, "Sidef::Types::String::Double"),
-                                },
-                                {
-                                  self => bless(do{\(my $o = "three")}, "Sidef::Types::String::Double"),
-                                },
-                              ], "Sidef::Types::Array::Array"),
+                              {
+                                main => [
+                                  {
+                                    self => bless([
+                                      {
+                                        self => bless(do{\(my $o = "one")}, "Sidef::Types::String::Double"),
+                                      },
+                                      {
+                                        self => bless(do{\(my $o = "two")}, "Sidef::Types::String::Double"),
+                                      },
+                                      {
+                                        self => bless(do{\(my $o = "three")}, "Sidef::Types::String::Double"),
+                                      },
+                                    ], "Sidef::Types::Array::Array"),
+                                  },
+                                ],
+                              },
                             ],
                     name => {
                               self => bless(do{\(my $o = "=")}, "Sidef::Types::String::String"),
@@ -3356,13 +3893,11 @@ do {
                   },
                 ],
         ind  => [
-                  {
-                    self => bless([
-                      {
-                        self => bless(do{\(my $o = 0)}, "Sidef::Types::Number::Integer"),
-                      },
-                    ], "Sidef::Types::Array::Array"),
-                  },
+                  bless([
+                    {
+                      self => bless(do{\(my $o = 0)}, "Sidef::Types::Number::Integer"),
+                    },
+                  ], "Sidef::Types::Array::Array"),
                 ],
         self => 'fix',
       },
@@ -3380,40 +3915,42 @@ do {
                   },
                 ],
         ind  => [
-                  {
-                    self => bless([
-                      {
-                        self => bless(do{\(my $o = 0)}, "Sidef::Types::Number::Integer"),
-                      },
-                    ], "Sidef::Types::Array::Array"),
-                  },
+                  bless([
+                    {
+                      self => bless(do{\(my $o = 0)}, "Sidef::Types::Number::Integer"),
+                    },
+                  ], "Sidef::Types::Array::Array"),
                 ],
         self => 'fix',
       },
       {
         call => [
                   {
-                    arg  => [bless(do{\(my $o = "doi")}, "Sidef::Types::String::Double")],
+                    arg  => [
+                              {
+                                main => [
+                                  {
+                                    self => bless(do{\(my $o = "doi")}, "Sidef::Types::String::Double"),
+                                  },
+                                ],
+                              },
+                            ],
                     name => {
                               self => bless(do{\(my $o = "=")}, "Sidef::Types::String::String"),
                             },
                   },
                 ],
         ind  => [
-                  {
-                    self => bless([
-                      {
-                        self => bless(do{\(my $o = 0)}, "Sidef::Types::Number::Integer"),
-                      },
-                    ], "Sidef::Types::Array::Array"),
-                  },
-                  {
-                    self => bless([
-                      {
-                        self => bless(do{\(my $o = 1)}, "Sidef::Types::Number::Integer"),
-                      },
-                    ], "Sidef::Types::Array::Array"),
-                  },
+                  bless([
+                    {
+                      self => bless(do{\(my $o = 0)}, "Sidef::Types::Number::Integer"),
+                    },
+                  ], "Sidef::Types::Array::Array"),
+                  bless([
+                    {
+                      self => bless(do{\(my $o = 1)}, "Sidef::Types::Number::Integer"),
+                    },
+                  ], "Sidef::Types::Array::Array"),
                 ],
         self => 'fix',
       },
@@ -3431,20 +3968,26 @@ do {
                   },
                 ],
         ind  => [
-                  {
-                    self => bless([
-                      {
-                        self => bless(do{\(my $o = 0)}, "Sidef::Types::Number::Integer"),
-                      },
-                    ], "Sidef::Types::Array::Array"),
-                  },
+                  bless([
+                    {
+                      self => bless(do{\(my $o = 0)}, "Sidef::Types::Number::Integer"),
+                    },
+                  ], "Sidef::Types::Array::Array"),
                 ],
         self => 'fix',
       },
       {
         call => [
                   {
-                    arg  => [bless(do{\(my $o = 80)}, "Sidef::Types::Number::Integer")],
+                    arg  => [
+                              {
+                                main => [
+                                  {
+                                    self => bless(do{\(my $o = 80)}, "Sidef::Types::Number::Integer"),
+                                  },
+                                ],
+                              },
+                            ],
                     name => {
                               self => bless(do{\(my $o = "*")}, "Sidef::Types::String::String"),
                             },
@@ -3460,7 +4003,9 @@ do {
       {
         call => [
                   {
-                    arg  => [bless([], "Sidef::Types::Array::Array")],
+                    arg  => [
+                              { main => [{ self => bless([], "Sidef::Types::Array::Array") }] },
+                            ],
                     name => {
                               self => bless(do{\(my $o = "=")}, "Sidef::Types::String::String"),
                             },
@@ -3472,7 +4017,13 @@ do {
         call => [
                   {
                     arg  => [
-                              bless(do{\(my $o = "elem1")}, "Sidef::Types::String::Double"),
+                              {
+                                main => [
+                                  {
+                                    self => bless(do{\(my $o = "elem1")}, "Sidef::Types::String::Double"),
+                                  },
+                                ],
+                              },
                             ],
                     name => {
                               self => bless(do{\(my $o = "=")}, "Sidef::Types::String::String"),
@@ -3480,13 +4031,11 @@ do {
                   },
                 ],
         ind  => [
-                  {
-                    self => bless([
-                      {
-                        self => bless(do{\(my $o = 0)}, "Sidef::Types::Number::Integer"),
-                      },
-                    ], "Sidef::Types::Array::Array"),
-                  },
+                  bless([
+                    {
+                      self => bless(do{\(my $o = 0)}, "Sidef::Types::Number::Integer"),
+                    },
+                  ], "Sidef::Types::Array::Array"),
                 ],
         self => 'fix',
       },
@@ -3494,7 +4043,13 @@ do {
         call => [
                   {
                     arg  => [
-                              bless(do{\(my $o = "elem2")}, "Sidef::Types::String::Double"),
+                              {
+                                main => [
+                                  {
+                                    self => bless(do{\(my $o = "elem2")}, "Sidef::Types::String::Double"),
+                                  },
+                                ],
+                              },
                             ],
                     name => {
                               self => bless(do{\(my $o = "=")}, "Sidef::Types::String::String"),
@@ -3502,51 +4057,11 @@ do {
                   },
                 ],
         ind  => [
-                  {
-                    self => bless([
-                      {
-                        self => bless(do{\(my $o = 1)}, "Sidef::Types::Number::Integer"),
-                      },
-                    ], "Sidef::Types::Array::Array"),
-                  },
-                ],
-        self => 'fix',
-      },
-      {
-        call => [
-                  {
-                    name => {
-                      self => bless(do{\(my $o = "to_s")}, "Sidef::Types::String::String"),
+                  bless([
+                    {
+                      self => bless(do{\(my $o = 1)}, "Sidef::Types::Number::Integer"),
                     },
-                  },
-                  {
-                    name => {
-                      self => bless(do{\(my $o = "say")}, "Sidef::Types::String::String"),
-                    },
-                  },
-                ],
-        self => 'fix',
-      },
-      {
-        call => [
-                  {
-                    arg  => [bless(do{\(my $o = "x")}, "Sidef::Types::String::Double")],
-                    name => {
-                              self => bless(do{\(my $o = "=")}, "Sidef::Types::String::String"),
-                            },
-                  },
-                ],
-        ind  => [
-                  {
-                    self => bless([
-                      {
-                        self => bless(do{\(my $o = 0)}, "Sidef::Types::Number::Integer"),
-                      },
-                      {
-                        self => bless(do{\(my $o = 1)}, "Sidef::Types::Number::Integer"),
-                      },
-                    ], "Sidef::Types::Array::Array"),
-                  },
+                  ], "Sidef::Types::Array::Array"),
                 ],
         self => 'fix',
       },
@@ -3569,11 +4084,13 @@ do {
         call => [
                   {
                     arg  => [
-                              bless([
-                                {
-                                  self => bless(do{\(my $o = "y")}, "Sidef::Types::String::Double"),
-                                },
-                              ], "Sidef::Types::Array::Array"),
+                              {
+                                main => [
+                                  {
+                                    self => bless(do{\(my $o = "x")}, "Sidef::Types::String::Double"),
+                                  },
+                                ],
+                              },
                             ],
                     name => {
                               self => bless(do{\(my $o = "=")}, "Sidef::Types::String::String"),
@@ -3581,15 +4098,28 @@ do {
                   },
                 ],
         ind  => [
+                  bless([
+                    {
+                      self => bless(do{\(my $o = 0)}, "Sidef::Types::Number::Integer"),
+                    },
+                    {
+                      self => bless(do{\(my $o = 1)}, "Sidef::Types::Number::Integer"),
+                    },
+                  ], "Sidef::Types::Array::Array"),
+                ],
+        self => 'fix',
+      },
+      {
+        call => [
                   {
-                    self => bless([
-                      {
-                        self => bless(do{\(my $o = 0)}, "Sidef::Types::Number::Integer"),
-                      },
-                      {
-                        self => bless(do{\(my $o = 1)}, "Sidef::Types::Number::Integer"),
-                      },
-                    ], "Sidef::Types::Array::Array"),
+                    name => {
+                      self => bless(do{\(my $o = "to_s")}, "Sidef::Types::String::String"),
+                    },
+                  },
+                  {
+                    name => {
+                      self => bless(do{\(my $o = "say")}, "Sidef::Types::String::String"),
+                    },
                   },
                 ],
         self => 'fix',
@@ -3597,7 +4127,48 @@ do {
       {
         call => [
                   {
-                    arg  => [bless(do{\(my $o = 80)}, "Sidef::Types::Number::Integer")],
+                    arg  => [
+                              {
+                                main => [
+                                  {
+                                    self => bless([
+                                      {
+                                        self => bless(do{\(my $o = "y")}, "Sidef::Types::String::Double"),
+                                      },
+                                    ], "Sidef::Types::Array::Array"),
+                                  },
+                                ],
+                              },
+                            ],
+                    name => {
+                              self => bless(do{\(my $o = "=")}, "Sidef::Types::String::String"),
+                            },
+                  },
+                ],
+        ind  => [
+                  bless([
+                    {
+                      self => bless(do{\(my $o = 0)}, "Sidef::Types::Number::Integer"),
+                    },
+                    {
+                      self => bless(do{\(my $o = 1)}, "Sidef::Types::Number::Integer"),
+                    },
+                  ], "Sidef::Types::Array::Array"),
+                ],
+        self => 'fix',
+      },
+      {
+        call => [
+                  {
+                    arg  => [
+                              {
+                                main => [
+                                  {
+                                    self => bless(do{\(my $o = 80)}, "Sidef::Types::Number::Integer"),
+                                  },
+                                ],
+                              },
+                            ],
                     name => {
                               self => bless(do{\(my $o = "*")}, "Sidef::Types::String::String"),
                             },
@@ -3649,7 +4220,15 @@ do {
       {
         call => [
                   {
-                    arg  => [bless(do{\(my $o = 80)}, "Sidef::Types::Number::Integer")],
+                    arg  => [
+                              {
+                                main => [
+                                  {
+                                    self => bless(do{\(my $o = 80)}, "Sidef::Types::Number::Integer"),
+                                  },
+                                ],
+                              },
+                            ],
                     name => {
                               self => bless(do{\(my $o = "*")}, "Sidef::Types::String::String"),
                             },
@@ -3697,7 +4276,15 @@ do {
                                   {
                                     call => [
                                               {
-                                                arg  => [bless(do{\(my $o = 32)}, "Sidef::Types::Number::Integer")],
+                                                arg  => [
+                                                          {
+                                                            main => [
+                                                              {
+                                                                self => bless(do{\(my $o = 32)}, "Sidef::Types::Number::Integer"),
+                                                              },
+                                                            ],
+                                                          },
+                                                        ],
                                                 name => {
                                                           self => bless(do{\(my $o = "-")}, "Sidef::Types::String::String"),
                                                         },
@@ -3728,7 +4315,15 @@ do {
       {
         call => [
                   {
-                    arg  => [bless(do{\(my $o = 80)}, "Sidef::Types::Number::Integer")],
+                    arg  => [
+                              {
+                                main => [
+                                  {
+                                    self => bless(do{\(my $o = 80)}, "Sidef::Types::Number::Integer"),
+                                  },
+                                ],
+                              },
+                            ],
                     name => {
                               self => bless(do{\(my $o = "*")}, "Sidef::Types::String::String"),
                             },
@@ -3745,7 +4340,13 @@ do {
         call => [
                   {
                     arg  => [
-                              bless(do{\(my $o = "\x{219}arpe")}, "Sidef::Types::String::Double"),
+                              {
+                                main => [
+                                  {
+                                    self => bless(do{\(my $o = "\x{219}arpe")}, "Sidef::Types::String::Double"),
+                                  },
+                                ],
+                              },
                             ],
                     name => {
                               self => bless(do{\(my $o = "=")}, "Sidef::Types::String::String"),
@@ -3784,16 +4385,14 @@ do {
                                               },
                                             ],
                                     ind  => [
-                                              {
-                                                self => bless([
-                                                  {
-                                                    self => bless(do{\(my $o = 0)}, "Sidef::Types::Number::Integer"),
-                                                  },
-                                                  {
-                                                    self => bless(do{\(my $o = 1)}, "Sidef::Types::Number::Integer"),
-                                                  },
-                                                ], "Sidef::Types::Array::Array"),
-                                              },
+                                              bless([
+                                                {
+                                                  self => bless(do{\(my $o = 0)}, "Sidef::Types::Number::Integer"),
+                                                },
+                                                {
+                                                  self => bless(do{\(my $o = 1)}, "Sidef::Types::Number::Integer"),
+                                                },
+                                              ], "Sidef::Types::Array::Array"),
                                             ],
                                     self => 'fix',
                                   },
@@ -3827,13 +4426,11 @@ do {
                                               },
                                             ],
                                     ind  => [
-                                              {
-                                                self => bless([
-                                                  {
-                                                    self => bless(do{\(my $o = 2)}, "Sidef::Types::Number::Integer"),
-                                                  },
-                                                ], "Sidef::Types::Array::Array"),
-                                              },
+                                              bless([
+                                                {
+                                                  self => bless(do{\(my $o = 2)}, "Sidef::Types::Number::Integer"),
+                                                },
+                                              ], "Sidef::Types::Array::Array"),
                                             ],
                                     self => 'fix',
                                   },
@@ -3845,7 +4442,15 @@ do {
                             },
                   },
                   {
-                    arg  => [bless(do{\(my $o = " (")}, "Sidef::Types::String::Double")],
+                    arg  => [
+                              {
+                                main => [
+                                  {
+                                    self => bless(do{\(my $o = " (")}, "Sidef::Types::String::Double"),
+                                  },
+                                ],
+                              },
+                            ],
                     name => {
                               self => bless(do{\(my $o = "+")}, "Sidef::Types::String::String"),
                             },
@@ -3863,13 +4468,11 @@ do {
                                               },
                                             ],
                                     ind  => [
-                                              {
-                                                self => bless([
-                                                  {
-                                                    self => bless(do{\(my $o = 2)}, "Sidef::Types::Number::Integer"),
-                                                  },
-                                                ], "Sidef::Types::Array::Array"),
-                                              },
+                                              bless([
+                                                {
+                                                  self => bless(do{\(my $o = 2)}, "Sidef::Types::Number::Integer"),
+                                                },
+                                              ], "Sidef::Types::Array::Array"),
                                             ],
                                     self => 'fix',
                                   },
@@ -3881,7 +4484,15 @@ do {
                             },
                   },
                   {
-                    arg  => [bless(do{\(my $o = ")")}, "Sidef::Types::String::Double")],
+                    arg  => [
+                              {
+                                main => [
+                                  {
+                                    self => bless(do{\(my $o = ")")}, "Sidef::Types::String::Double"),
+                                  },
+                                ],
+                              },
+                            ],
                     name => {
                               self => bless(do{\(my $o = "+")}, "Sidef::Types::String::String"),
                             },
@@ -3897,40 +4508,52 @@ do {
       {
         call => [
                   {
-                    arg  => [bless(do{\(my $o = 200)}, "Sidef::Types::Number::Integer")],
+                    arg  => [
+                              {
+                                main => [
+                                  {
+                                    self => bless(do{\(my $o = 200)}, "Sidef::Types::Number::Integer"),
+                                  },
+                                ],
+                              },
+                            ],
                     name => {
                               self => bless(do{\(my $o = "=")}, "Sidef::Types::String::String"),
                             },
                   },
                 ],
         ind  => [
-                  {
-                    self => bless([
-                      {
-                        self => bless(do{\(my $o = 0)}, "Sidef::Types::Number::Integer"),
-                      },
-                    ], "Sidef::Types::Array::Array"),
-                  },
+                  bless([
+                    {
+                      self => bless(do{\(my $o = 0)}, "Sidef::Types::Number::Integer"),
+                    },
+                  ], "Sidef::Types::Array::Array"),
                 ],
         self => 'fix',
       },
       {
         call => [
                   {
-                    arg  => [bless(do{\(my $o = 154)}, "Sidef::Types::Number::Integer")],
+                    arg  => [
+                              {
+                                main => [
+                                  {
+                                    self => bless(do{\(my $o = 154)}, "Sidef::Types::Number::Integer"),
+                                  },
+                                ],
+                              },
+                            ],
                     name => {
                               self => bless(do{\(my $o = "=")}, "Sidef::Types::String::String"),
                             },
                   },
                 ],
         ind  => [
-                  {
-                    self => bless([
-                      {
-                        self => bless(do{\(my $o = 1)}, "Sidef::Types::Number::Integer"),
-                      },
-                    ], "Sidef::Types::Array::Array"),
-                  },
+                  bless([
+                    {
+                      self => bless(do{\(my $o = 1)}, "Sidef::Types::Number::Integer"),
+                    },
+                  ], "Sidef::Types::Array::Array"),
                 ],
         self => 'fix',
       },
@@ -3952,7 +4575,15 @@ do {
       {
         call => [
                   {
-                    arg  => [bless(do{\(my $o = 80)}, "Sidef::Types::Number::Integer")],
+                    arg  => [
+                              {
+                                main => [
+                                  {
+                                    self => bless(do{\(my $o = 80)}, "Sidef::Types::Number::Integer"),
+                                  },
+                                ],
+                              },
+                            ],
                     name => {
                               self => bless(do{\(my $o = "*")}, "Sidef::Types::String::String"),
                             },
@@ -3969,7 +4600,13 @@ do {
         call => [
                   {
                     arg  => [
-                              bless(do{\(my $o = "\x{219}op\xE2rl\x{103}")}, "Sidef::Types::String::Double"),
+                              {
+                                main => [
+                                  {
+                                    self => bless(do{\(my $o = "\x{219}op\xE2rl\x{103}")}, "Sidef::Types::String::Double"),
+                                  },
+                                ],
+                              },
                             ],
                     name => {
                               self => bless(do{\(my $o = "=")}, "Sidef::Types::String::String"),
@@ -4011,13 +4648,11 @@ do {
                   },
                 ],
         ind  => [
-                  {
-                    self => bless([
-                      {
-                        self => bless(do{\(my $o = 1)}, "Sidef::Types::Number::Integer"),
-                      },
-                    ], "Sidef::Types::Array::Array"),
-                  },
+                  bless([
+                    {
+                      self => bless(do{\(my $o = 1)}, "Sidef::Types::Number::Integer"),
+                    },
+                  ], "Sidef::Types::Array::Array"),
                 ],
         self => 'fix',
       },
@@ -4030,13 +4665,11 @@ do {
                   },
                 ],
         ind  => [
-                  {
-                    self => bless([
-                      {
-                        self => bless(do{\(my $o = 2)}, "Sidef::Types::Number::Integer"),
-                      },
-                    ], "Sidef::Types::Array::Array"),
-                  },
+                  bless([
+                    {
+                      self => bless(do{\(my $o = 2)}, "Sidef::Types::Number::Integer"),
+                    },
+                  ], "Sidef::Types::Array::Array"),
                 ],
         self => 'fix',
       },
@@ -4049,13 +4682,11 @@ do {
                   },
                 ],
         ind  => [
-                  {
-                    self => bless([
-                      {
-                        self => bless(do{\(my $o = 3)}, "Sidef::Types::Number::Integer"),
-                      },
-                    ], "Sidef::Types::Array::Array"),
-                  },
+                  bless([
+                    {
+                      self => bless(do{\(my $o = 3)}, "Sidef::Types::Number::Integer"),
+                    },
+                  ], "Sidef::Types::Array::Array"),
                 ],
         self => 'fix',
       },
@@ -4068,13 +4699,11 @@ do {
                   },
                 ],
         ind  => [
-                  {
-                    self => bless([
-                      {
-                        self => bless(do{\(my $o = 4)}, "Sidef::Types::Number::Integer"),
-                      },
-                    ], "Sidef::Types::Array::Array"),
-                  },
+                  bless([
+                    {
+                      self => bless(do{\(my $o = 4)}, "Sidef::Types::Number::Integer"),
+                    },
+                  ], "Sidef::Types::Array::Array"),
                 ],
         self => 'fix',
       },
@@ -4087,13 +4716,11 @@ do {
                   },
                 ],
         ind  => [
-                  {
-                    self => bless([
-                      {
-                        self => bless(do{\(my $o = 5)}, "Sidef::Types::Number::Integer"),
-                      },
-                    ], "Sidef::Types::Array::Array"),
-                  },
+                  bless([
+                    {
+                      self => bless(do{\(my $o = 5)}, "Sidef::Types::Number::Integer"),
+                    },
+                  ], "Sidef::Types::Array::Array"),
                 ],
         self => 'fix',
       },
@@ -4106,20 +4733,26 @@ do {
                   },
                 ],
         ind  => [
-                  {
-                    self => bless([
-                      {
-                        self => bless(do{\(my $o = 6)}, "Sidef::Types::Number::Integer"),
-                      },
-                    ], "Sidef::Types::Array::Array"),
-                  },
+                  bless([
+                    {
+                      self => bless(do{\(my $o = 6)}, "Sidef::Types::Number::Integer"),
+                    },
+                  ], "Sidef::Types::Array::Array"),
                 ],
         self => 'fix',
       },
       {
         call => [
                   {
-                    arg  => [bless(do{\(my $o = 80)}, "Sidef::Types::Number::Integer")],
+                    arg  => [
+                              {
+                                main => [
+                                  {
+                                    self => bless(do{\(my $o = 80)}, "Sidef::Types::Number::Integer"),
+                                  },
+                                ],
+                              },
+                            ],
                     name => {
                               self => bless(do{\(my $o = "*")}, "Sidef::Types::String::String"),
                             },
@@ -4136,80 +4769,90 @@ do {
         call => [
                   {
                     arg  => [
-                              bless({
+                              {
                                 main => [
                                   {
-                                    call => [
-                                              {
-                                                name => {
-                                                  self => bless(do{\(my $o = "say")}, "Sidef::Types::String::String"),
-                                                },
-                                              },
-                                            ],
-                                    self => bless(do{\(my $o = "first")}, "Sidef::Types::String::Double"),
-                                  },
-                                  {
-                                    call => [
-                                              {
-                                                name => {
-                                                  self => bless(do{\(my $o = "say")}, "Sidef::Types::String::String"),
-                                                },
-                                              },
-                                            ],
-                                    self => bless(do{\(my $o = "block")}, "Sidef::Types::String::Double"),
-                                  },
-                                  {
-                                    call => [
-                                              {
-                                                arg  => [
-                                                          bless([
-                                                            {
-                                                              self => bless(do{\(my $o = 1)}, "Sidef::Types::Number::Integer"),
-                                                            },
-                                                            {
-                                                              self => bless(do{\(my $o = 2)}, "Sidef::Types::Number::Integer"),
-                                                            },
-                                                            {
-                                                              self => bless(do{\(my $o = 4)}, "Sidef::Types::Number::Integer"),
-                                                            },
-                                                          ], "Sidef::Types::Array::Array"),
-                                                        ],
-                                                name => {
-                                                          self => bless(do{\(my $o = "=")}, "Sidef::Types::String::String"),
-                                                        },
-                                              },
-                                            ],
-                                    self => bless({ name => "private", type => "var", value => undef }, "Sidef::Variable::Variable"),
-                                  },
-                                  {
-                                    call => [
-                                              {
-                                                name => {
-                                                  self => bless(do{\(my $o = "to_s")}, "Sidef::Types::String::String"),
-                                                },
-                                              },
-                                              {
-                                                name => {
-                                                  self => bless(do{\(my $o = "say")}, "Sidef::Types::String::String"),
-                                                },
-                                              },
-                                            ],
-                                    ind  => [
-                                              {
-                                                self => bless([
-                                                  {
-                                                    self => bless(do{\(my $o = 1)}, "Sidef::Types::Number::Integer"),
-                                                  },
-                                                ], "Sidef::Types::Array::Array"),
-                                              },
-                                            ],
-                                    self => 'fix',
-                                  },
-                                  {
-                                    self => bless(do{\(my $o = "end of block")}, "Sidef::Types::String::Double"),
+                                    self => bless({
+                                      main => [
+                                        {
+                                          call => [
+                                                    {
+                                                      name => {
+                                                        self => bless(do{\(my $o = "say")}, "Sidef::Types::String::String"),
+                                                      },
+                                                    },
+                                                  ],
+                                          self => bless(do{\(my $o = "first")}, "Sidef::Types::String::Double"),
+                                        },
+                                        {
+                                          call => [
+                                                    {
+                                                      name => {
+                                                        self => bless(do{\(my $o = "say")}, "Sidef::Types::String::String"),
+                                                      },
+                                                    },
+                                                  ],
+                                          self => bless(do{\(my $o = "block")}, "Sidef::Types::String::Double"),
+                                        },
+                                        {
+                                          call => [
+                                                    {
+                                                      arg  => [
+                                                                {
+                                                                  main => [
+                                                                    {
+                                                                      self => bless([
+                                                                        {
+                                                                          self => bless(do{\(my $o = 1)}, "Sidef::Types::Number::Integer"),
+                                                                        },
+                                                                        {
+                                                                          self => bless(do{\(my $o = 2)}, "Sidef::Types::Number::Integer"),
+                                                                        },
+                                                                        {
+                                                                          self => bless(do{\(my $o = 4)}, "Sidef::Types::Number::Integer"),
+                                                                        },
+                                                                      ], "Sidef::Types::Array::Array"),
+                                                                    },
+                                                                  ],
+                                                                },
+                                                              ],
+                                                      name => {
+                                                                self => bless(do{\(my $o = "=")}, "Sidef::Types::String::String"),
+                                                              },
+                                                    },
+                                                  ],
+                                          self => bless({ name => "private", type => "var", value => undef }, "Sidef::Variable::Variable"),
+                                        },
+                                        {
+                                          call => [
+                                                    {
+                                                      name => {
+                                                        self => bless(do{\(my $o = "to_s")}, "Sidef::Types::String::String"),
+                                                      },
+                                                    },
+                                                    {
+                                                      name => {
+                                                        self => bless(do{\(my $o = "say")}, "Sidef::Types::String::String"),
+                                                      },
+                                                    },
+                                                  ],
+                                          ind  => [
+                                                    bless([
+                                                      {
+                                                        self => bless(do{\(my $o = 1)}, "Sidef::Types::Number::Integer"),
+                                                      },
+                                                    ], "Sidef::Types::Array::Array"),
+                                                  ],
+                                          self => 'fix',
+                                        },
+                                        {
+                                          self => bless(do{\(my $o = "end of block")}, "Sidef::Types::String::Double"),
+                                        },
+                                      ],
+                                    }, "Sidef::Types::Block::Code"),
                                   },
                                 ],
-                              }, "Sidef::Types::Block::Code"),
+                              },
                             ],
                     name => {
                               self => bless(do{\(my $o = "=")}, "Sidef::Types::String::String"),
@@ -4270,20 +4913,26 @@ do {
                   },
                 ],
         ind  => [
-                  {
-                    self => bless([
-                      {
-                        self => bless(do{\(my $o = 1)}, "Sidef::Types::Number::Integer"),
-                      },
-                    ], "Sidef::Types::Array::Array"),
-                  },
+                  bless([
+                    {
+                      self => bless(do{\(my $o = 1)}, "Sidef::Types::Number::Integer"),
+                    },
+                  ], "Sidef::Types::Array::Array"),
                 ],
         self => 'fix',
       },
       {
         call => [
                   {
-                    arg  => [bless(do{\(my $o = 80)}, "Sidef::Types::Number::Integer")],
+                    arg  => [
+                              {
+                                main => [
+                                  {
+                                    self => bless(do{\(my $o = 80)}, "Sidef::Types::Number::Integer"),
+                                  },
+                                ],
+                              },
+                            ],
                     name => {
                               self => bless(do{\(my $o = "*")}, "Sidef::Types::String::String"),
                             },
@@ -4305,7 +4954,15 @@ do {
                                   {
                                     call => [
                                               {
-                                                arg  => [bless(do{\(my $o = 5)}, "Sidef::Types::Number::Integer")],
+                                                arg  => [
+                                                          {
+                                                            main => [
+                                                              {
+                                                                self => bless(do{\(my $o = 5)}, "Sidef::Types::Number::Integer"),
+                                                              },
+                                                            ],
+                                                          },
+                                                        ],
                                                 name => {
                                                           self => bless(do{\(my $o = "..")}, "Sidef::Types::String::String"),
                                                         },
@@ -4339,7 +4996,15 @@ do {
       {
         call => [
                   {
-                    arg  => [bless(do{\(my $o = 80)}, "Sidef::Types::Number::Integer")],
+                    arg  => [
+                              {
+                                main => [
+                                  {
+                                    self => bless(do{\(my $o = 80)}, "Sidef::Types::Number::Integer"),
+                                  },
+                                ],
+                              },
+                            ],
                     name => {
                               self => bless(do{\(my $o = "*")}, "Sidef::Types::String::String"),
                             },
@@ -4367,7 +5032,15 @@ do {
                                         {
                                           call => [
                                                     {
-                                                      arg  => [bless(do{\(my $o = 1)}, "Sidef::Types::Number::Integer")],
+                                                      arg  => [
+                                                                {
+                                                                  main => [
+                                                                    {
+                                                                      self => bless(do{\(my $o = 1)}, "Sidef::Types::Number::Integer"),
+                                                                    },
+                                                                  ],
+                                                                },
+                                                              ],
                                                       name => {
                                                                 self => bless(do{\(my $o = "=")}, "Sidef::Types::String::String"),
                                                               },
@@ -4378,7 +5051,15 @@ do {
                                         {
                                           call => [
                                                     {
-                                                      arg  => [bless(do{\(my $o = 10)}, "Sidef::Types::Number::Integer")],
+                                                      arg  => [
+                                                                {
+                                                                  main => [
+                                                                    {
+                                                                      self => bless(do{\(my $o = 10)}, "Sidef::Types::Number::Integer"),
+                                                                    },
+                                                                  ],
+                                                                },
+                                                              ],
                                                       name => {
                                                                 self => bless(do{\(my $o = "<")}, "Sidef::Types::String::String"),
                                                               },
@@ -4428,7 +5109,15 @@ do {
                                                                                   {
                                                                                     call => [
                                                                                               {
-                                                                                                arg  => [bless(do{\(my $o = 1)}, "Sidef::Types::Number::Integer")],
+                                                                                                arg  => [
+                                                                                                          {
+                                                                                                            main => [
+                                                                                                              {
+                                                                                                                self => bless(do{\(my $o = 1)}, "Sidef::Types::Number::Integer"),
+                                                                                                              },
+                                                                                                            ],
+                                                                                                          },
+                                                                                                        ],
                                                                                                 name => {
                                                                                                           self => bless(do{\(my $o = "+")}, "Sidef::Types::String::String"),
                                                                                                         },
@@ -4444,7 +5133,15 @@ do {
                                                                             },
                                                                   },
                                                                   {
-                                                                    arg  => [bless(do{\(my $o = 2)}, "Sidef::Types::Number::Integer")],
+                                                                    arg  => [
+                                                                              {
+                                                                                main => [
+                                                                                  {
+                                                                                    self => bless(do{\(my $o = 2)}, "Sidef::Types::Number::Integer"),
+                                                                                  },
+                                                                                ],
+                                                                              },
+                                                                            ],
                                                                     name => {
                                                                               self => bless(do{\(my $o = "/")}, "Sidef::Types::String::String"),
                                                                             },
@@ -4471,7 +5168,15 @@ do {
       {
         call => [
                   {
-                    arg  => [bless(do{\(my $o = 80)}, "Sidef::Types::Number::Integer")],
+                    arg  => [
+                              {
+                                main => [
+                                  {
+                                    self => bless(do{\(my $o = 80)}, "Sidef::Types::Number::Integer"),
+                                  },
+                                ],
+                              },
+                            ],
                     name => {
                               self => bless(do{\(my $o = "*")}, "Sidef::Types::String::String"),
                             },
@@ -4483,6 +5188,61 @@ do {
                   },
                 ],
         self => bless(do{\(my $o = "-")}, "Sidef::Types::String::String"),
+      },
+      {
+        call => [
+                  {
+                    arg  => [
+                              {
+                                main => [
+                                  {
+                                    self => bless([
+                                      {
+                                        self => bless([
+                                          {
+                                            self => bless(do{\(my $o = "x")}, "Sidef::Types::String::Double"),
+                                          },
+                                          {
+                                            self => bless(do{\(my $o = "y")}, "Sidef::Types::String::Double"),
+                                          },
+                                          {
+                                            self => bless(do{\(my $o = "z")}, "Sidef::Types::String::Double"),
+                                          },
+                                        ], "Sidef::Types::Array::Array"),
+                                      },
+                                    ], "Sidef::Types::Array::Array"),
+                                  },
+                                ],
+                              },
+                            ],
+                    name => {
+                              self => bless(do{\(my $o = "=")}, "Sidef::Types::String::String"),
+                            },
+                  },
+                ],
+        self => bless({ name => "arr_test", type => "var", value => undef }, "Sidef::Variable::Variable"),
+      },
+      {
+        call => [
+                  {
+                    name => {
+                      self => bless(do{\(my $o = "say")}, "Sidef::Types::String::String"),
+                    },
+                  },
+                ],
+        ind  => [
+                  bless([
+                    {
+                      self => bless(do{\(my $o = 0)}, "Sidef::Types::Number::Integer"),
+                    },
+                  ], "Sidef::Types::Array::Array"),
+                  bless([
+                    {
+                      self => bless(do{\(my $o = 1)}, "Sidef::Types::Number::Integer"),
+                    },
+                  ], "Sidef::Types::Array::Array"),
+                ],
+        self => 'fix',
       },
     ],
   };
@@ -4508,84 +5268,85 @@ do {
   $a->{main}[52]{self} = $a->{main}[49]{self};
   $a->{main}[54]{self} = $a->{main}[53]{self};
   $a->{main}[64]{self} = $a->{main}[63]{self};
-  $a->{main}[68]{call}[0]{arg}[0][0]{self} = $a->{main}[66]{self};
-  $a->{main}[68]{call}[0]{arg}[0][1]{self} = $a->{main}[67]{self};
+  $a->{main}[68]{call}[0]{arg}[0]{main}[0]{self}[0]{self} = $a->{main}[66]{self};
+  $a->{main}[68]{call}[0]{arg}[0]{main}[0]{self}[1]{self} = $a->{main}[67]{self};
   $a->{main}[69]{self} = $a->{main}[68]{self};
   $a->{main}[70]{self} = $a->{main}[66]{self};
-  $a->{main}[75]{call}[0]{arg}[0] = $a->{main}[74]{self};
+  $a->{main}[75]{call}[0]{arg}[0]{main}[0]{self} = $a->{main}[74]{self};
   $a->{main}[75]{self} = $a->{main}[73]{self};
-  $a->{main}[81]{call}[0]{arg}[0] = $a->{main}[80]{self};
-  $a->{main}[82]{self} = $a->{main}[80]{self};
-  $a->{main}[95]{self}{main}[0]{call}[0]{arg}[0]{main}[0]{call}[0]{name}{self} = $a->{main}[94]{self};
-  $a->{main}[97]{call}[0]{arg}[0]{main}[0]{call}[0]{name}{self} = $a->{main}[96]{self};
-  $a->{main}[103]{self} = $a->{main}[102]{self};
-  $a->{main}[106]{self} = $a->{main}[105]{self};
-  $a->{main}[107]{self} = $a->{main}[105]{self};
-  $a->{main}[108]{self} = $a->{main}[105]{self};
-  $a->{main}[109]{self} = $a->{main}[105]{self};
-  $a->{main}[110]{self} = $a->{main}[105]{self};
-  $a->{main}[113]{call}[0]{arg}[0]{main}[0]{self} = $a->{main}[112]{self};
-  $a->{main}[114]{self} = $a->{main}[112]{self};
-  $a->{main}[116]{call}[0]{arg}[0]{main}[0]{ind}[0]{self}[0]{self} = $a->{main}[115]{self};
-  $a->{main}[116]{call}[0]{arg}[0]{main}[0]{self} = $a->{main}[112]{self};
-  $a->{main}[117]{self} = $a->{main}[112]{self};
-  $a->{main}[118]{self} = $a->{main}[112]{self};
-  $a->{main}[119]{self} = $a->{main}[112]{self};
-  $a->{main}[120]{self} = $a->{main}[112]{self};
-  $a->{main}[121]{self} = $a->{main}[112]{self};
-  $a->{main}[122]{self} = $a->{main}[112]{self};
-  $a->{main}[125]{self} = $a->{main}[124]{self};
-  $a->{main}[126]{self} = $a->{main}[124]{self};
-  $a->{main}[127]{self} = $a->{main}[124]{self};
-  $a->{main}[128]{self} = $a->{main}[124]{self};
-  $a->{main}[130]{self} = $a->{main}[124]{self};
-  $a->{main}[131]{self} = $a->{main}[124]{self};
-  $a->{main}[132]{self} = $a->{main}[124]{self};
-  $a->{main}[133]{self} = $a->{main}[124]{self};
-  $a->{main}[134]{self} = $a->{main}[124]{self};
-  $a->{main}[135]{self} = $a->{main}[124]{self};
-  $a->{main}[136]{self} = $a->{main}[124]{self};
-  $a->{main}[137]{self} = $a->{main}[124]{self};
-  $a->{main}[138]{self} = $a->{main}[124]{self};
-  $a->{main}[141]{self} = $a->{main}[140]{self};
-  $a->{main}[142]{self} = $a->{main}[140]{self};
-  $a->{main}[143]{self} = $a->{main}[140]{self};
-  $a->{main}[144]{self} = $a->{main}[140]{self};
-  $a->{main}[146]{self} = $a->{main}[140]{self};
-  $a->{main}[147]{self} = $a->{main}[140]{self};
-  $a->{main}[148]{self} = $a->{main}[140]{self};
-  $a->{main}[149]{self} = $a->{main}[140]{self};
-  $a->{main}[150]{self} = $a->{main}[140]{self};
-  $a->{main}[153]{self} = $a->{main}[152]{self};
-  $a->{main}[154]{self} = $a->{main}[152]{self};
-  $a->{main}[155]{self} = $a->{main}[152]{self};
-  $a->{main}[156]{self} = $a->{main}[152]{self};
-  $a->{main}[157]{self} = $a->{main}[152]{self};
-  $a->{main}[158]{self} = $a->{main}[152]{self};
-  $a->{main}[163]{call}[0]{arg}[0]{main}[0]{self} = $a->{main}[162]{self};
-  $a->{main}[166]{self} = $a->{main}[165]{self};
-  $a->{main}[167]{call}[0]{arg}[0]{main}[0]{self} = $a->{main}[165]{self};
-  $a->{main}[168]{call}[0]{arg}[0]{main}[0]{self} = $a->{main}[165]{self};
-  $a->{main}[168]{call}[2]{arg}[0]{main}[0]{self} = $a->{main}[165]{self};
-  $a->{main}[169]{self} = $a->{main}[165]{self};
-  $a->{main}[170]{self} = $a->{main}[165]{self};
-  $a->{main}[171]{self} = $a->{main}[165]{self};
-  $a->{main}[174]{self} = $a->{main}[173]{self};
-  $a->{main}[175]{self} = $a->{main}[173]{self};
-  $a->{main}[176]{self} = $a->{main}[173]{self};
-  $a->{main}[177]{self} = $a->{main}[173]{self};
-  $a->{main}[178]{self} = $a->{main}[173]{self};
-  $a->{main}[179]{self} = $a->{main}[173]{self};
-  $a->{main}[180]{self} = $a->{main}[173]{self};
-  $a->{main}[182]{call}[0]{arg}[0]{main}[3]{self} = $a->{main}[182]{call}[0]{arg}[0]{main}[2]{self};
-  $a->{main}[183]{self} = $a->{main}[182]{self};
-  $a->{main}[184]{self} = $a->{main}[182]{self};
-  $a->{main}[185]{self} = $a->{main}[182]{call}[0]{arg}[0]{main}[2]{self};
-  $a->{main}[190]{call}[0]{arg}[0]{main}[0]{self}{main}[0]{self} = $a->{main}[189]{self};
-  $a->{main}[190]{call}[0]{arg}[0]{main}[0]{self}{main}[1]{self} = $a->{main}[189]{self};
-  $a->{main}[190]{call}[0]{arg}[0]{main}[0]{self}{main}[2]{self} = $a->{main}[189]{self};
-  $a->{main}[190]{self}{main}[0]{call}[0]{arg}[0]{main}[0]{self} = $a->{main}[189]{self};
-  $a->{main}[190]{self}{main}[0]{call}[0]{arg}[0]{main}[1]{self}{main}[0]{call}[0]{arg}[0]{main}[0]{self} = $a->{main}[189]{self};
-  $a->{main}[190]{self}{main}[0]{call}[0]{arg}[0]{main}[1]{self}{main}[0]{self} = $a->{main}[189]{self};
+  $a->{main}[82]{call}[0]{arg}[0]{main}[0]{self} = $a->{main}[81]{self};
+  $a->{main}[83]{self} = $a->{main}[81]{self};
+  $a->{main}[96]{self}{main}[0]{call}[0]{arg}[0]{main}[0]{call}[0]{name}{self} = $a->{main}[95]{self};
+  $a->{main}[98]{call}[0]{arg}[0]{main}[0]{call}[0]{name}{self} = $a->{main}[97]{self};
+  $a->{main}[104]{self} = $a->{main}[103]{self};
+  $a->{main}[107]{self} = $a->{main}[106]{self};
+  $a->{main}[108]{self} = $a->{main}[106]{self};
+  $a->{main}[109]{self} = $a->{main}[106]{self};
+  $a->{main}[110]{self} = $a->{main}[106]{self};
+  $a->{main}[111]{self} = $a->{main}[106]{self};
+  $a->{main}[114]{call}[0]{arg}[0]{main}[0]{self} = $a->{main}[113]{self};
+  $a->{main}[115]{self} = $a->{main}[113]{self};
+  $a->{main}[117]{call}[0]{arg}[0]{main}[0]{ind}[0][0]{self} = $a->{main}[116]{self};
+  $a->{main}[117]{call}[0]{arg}[0]{main}[0]{self} = $a->{main}[113]{self};
+  $a->{main}[118]{self} = $a->{main}[113]{self};
+  $a->{main}[119]{self} = $a->{main}[113]{self};
+  $a->{main}[120]{self} = $a->{main}[113]{self};
+  $a->{main}[121]{self} = $a->{main}[113]{self};
+  $a->{main}[122]{self} = $a->{main}[113]{self};
+  $a->{main}[123]{self} = $a->{main}[113]{self};
+  $a->{main}[126]{self} = $a->{main}[125]{self};
+  $a->{main}[127]{self} = $a->{main}[125]{self};
+  $a->{main}[128]{self} = $a->{main}[125]{self};
+  $a->{main}[129]{self} = $a->{main}[125]{self};
+  $a->{main}[131]{self} = $a->{main}[125]{self};
+  $a->{main}[132]{self} = $a->{main}[125]{self};
+  $a->{main}[133]{self} = $a->{main}[125]{self};
+  $a->{main}[134]{self} = $a->{main}[125]{self};
+  $a->{main}[135]{self} = $a->{main}[125]{self};
+  $a->{main}[136]{self} = $a->{main}[125]{self};
+  $a->{main}[137]{self} = $a->{main}[125]{self};
+  $a->{main}[138]{self} = $a->{main}[125]{self};
+  $a->{main}[139]{self} = $a->{main}[125]{self};
+  $a->{main}[142]{self} = $a->{main}[141]{self};
+  $a->{main}[143]{self} = $a->{main}[141]{self};
+  $a->{main}[144]{self} = $a->{main}[141]{self};
+  $a->{main}[145]{self} = $a->{main}[141]{self};
+  $a->{main}[147]{self} = $a->{main}[141]{self};
+  $a->{main}[148]{self} = $a->{main}[141]{self};
+  $a->{main}[149]{self} = $a->{main}[141]{self};
+  $a->{main}[150]{self} = $a->{main}[141]{self};
+  $a->{main}[151]{self} = $a->{main}[141]{self};
+  $a->{main}[154]{self} = $a->{main}[153]{self};
+  $a->{main}[155]{self} = $a->{main}[153]{self};
+  $a->{main}[156]{self} = $a->{main}[153]{self};
+  $a->{main}[157]{self} = $a->{main}[153]{self};
+  $a->{main}[158]{self} = $a->{main}[153]{self};
+  $a->{main}[159]{self} = $a->{main}[153]{self};
+  $a->{main}[164]{call}[0]{arg}[0]{main}[0]{self} = $a->{main}[163]{self};
+  $a->{main}[167]{self} = $a->{main}[166]{self};
+  $a->{main}[168]{call}[0]{arg}[0]{main}[0]{self} = $a->{main}[166]{self};
+  $a->{main}[169]{call}[0]{arg}[0]{main}[0]{self} = $a->{main}[166]{self};
+  $a->{main}[169]{call}[2]{arg}[0]{main}[0]{self} = $a->{main}[166]{self};
+  $a->{main}[170]{self} = $a->{main}[166]{self};
+  $a->{main}[171]{self} = $a->{main}[166]{self};
+  $a->{main}[172]{self} = $a->{main}[166]{self};
+  $a->{main}[175]{self} = $a->{main}[174]{self};
+  $a->{main}[176]{self} = $a->{main}[174]{self};
+  $a->{main}[177]{self} = $a->{main}[174]{self};
+  $a->{main}[178]{self} = $a->{main}[174]{self};
+  $a->{main}[179]{self} = $a->{main}[174]{self};
+  $a->{main}[180]{self} = $a->{main}[174]{self};
+  $a->{main}[181]{self} = $a->{main}[174]{self};
+  $a->{main}[183]{call}[0]{arg}[0]{main}[0]{self}{main}[3]{self} = $a->{main}[183]{call}[0]{arg}[0]{main}[0]{self}{main}[2]{self};
+  $a->{main}[184]{self} = $a->{main}[183]{self};
+  $a->{main}[185]{self} = $a->{main}[183]{self};
+  $a->{main}[186]{self} = $a->{main}[183]{call}[0]{arg}[0]{main}[0]{self}{main}[2]{self};
+  $a->{main}[191]{call}[0]{arg}[0]{main}[0]{self}{main}[0]{self} = $a->{main}[190]{self};
+  $a->{main}[191]{call}[0]{arg}[0]{main}[0]{self}{main}[1]{self} = $a->{main}[190]{self};
+  $a->{main}[191]{call}[0]{arg}[0]{main}[0]{self}{main}[2]{self} = $a->{main}[190]{self};
+  $a->{main}[191]{self}{main}[0]{call}[0]{arg}[0]{main}[0]{self} = $a->{main}[190]{self};
+  $a->{main}[191]{self}{main}[0]{call}[0]{arg}[0]{main}[1]{self}{main}[0]{call}[0]{arg}[0]{main}[0]{self} = $a->{main}[190]{self};
+  $a->{main}[191]{self}{main}[0]{call}[0]{arg}[0]{main}[1]{self}{main}[0]{self} = $a->{main}[190]{self};
+  $a->{main}[194]{self} = $a->{main}[193]{self};
   $a;
 }

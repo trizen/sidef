@@ -6,13 +6,11 @@
 
 {
     "I should not be here!"->say;
-}
-->if(false)
+} if(false)
 
-->else( {
+else {
     "Right place (1)!"->say;
-}
-);
+};
 
 #
 ## if, else if, else
@@ -20,13 +18,14 @@
 
 {
     "I should not be here!"->say;
-} -> if(false)
+} if(false)
 
-->else(
- {
+else (
+  {
     "Right place (2)!"->say;
- }->if(true)
+  } if(true)
 )
-->else({
+
+else {
     "I should not be here!"->say;
-});
+};
