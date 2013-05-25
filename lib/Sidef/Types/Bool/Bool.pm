@@ -30,7 +30,6 @@ package Sidef::Types::Bool::Bool {
                 my $exec = Sidef::Exec->new();
                 my @results = $exec->execute(struct => $code);
 
-                #return __PACKAGE__->new($results[-1]->is_true);
                 return $results[-1];
             }
 
@@ -53,7 +52,7 @@ package Sidef::Types::Bool::Bool {
         *{__PACKAGE__ . '::' . '?'} = sub {
             my ($self, $code) = @_;
 
-            if ($self->is_true) {
+            if ($self) {
                 my $exec = Sidef::Exec->new();
                 my @results = $exec->execute(struct => $code);
                 return Sidef::Types::Bool::Ternary->new({code => $results[-1], bool => __PACKAGE__->true});
@@ -85,7 +84,7 @@ package Sidef::Types::Bool::Bool {
 
     sub not {
         my ($self) = @_;
-        $self->is_true ? __PACKAGE__->false : __PACKAGE__->true;
+        $self ? __PACKAGE__->false : __PACKAGE__->true;
     }
 
     sub else {
