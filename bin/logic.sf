@@ -1,0 +1,11 @@
+#!/usr/bin/ruby
+
+(true  ? {"x"} : {"y"})->say;               # prints "x"
+(false ? {"x"} : {"y"})->say;               # prints "y"
+(false || {false} || {true})->to_s->say;    # prints "true"
+(false || {"hello"}) -> say;                # prints "hello"
+(false || {false} || {"world"}) say;        # prints "world"
+(false || {false} || {false}) -> to_s->say; # prints "false"
+(true  && {true} && {"linux"}) say;         # prints "linux"
+(true  && {false} && {true}) to_s.say;      # prints "false"
+(false && {"perl"} || {"sidef"}) say;       # prints "sidef"
