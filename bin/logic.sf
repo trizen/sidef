@@ -2,6 +2,9 @@
 
 (true  ? {"x"} : {"y"})->say;               # prints "x"
 (false ? {"x"} : {"y"})->say;               # prints "y"
+
+''say;
+
 (false || {false} || {true})->to_s->say;    # prints "true"
 (false || {"hello"}) -> say;                # prints "hello"
 (false || {false} || {"world"}) say;        # prints "world"
@@ -9,3 +12,13 @@
 (true  && {true} && {"linux"}) say;         # prints "linux"
 (true  && {false} && {true}) to_s.say;      # prints "false"
 (false && {"perl"} || {"sidef"}) say;       # prints "sidef"
+
+''say;
+
+({false; true;} && {"&& block"}) say;       # prints "&& block"
+({true; false;} || {"|| block"}) say;       # prints "|| block"
+
+''say;
+
+({false; true;} ? {"one"} : {"zero"}) say;  # prints "one"
+({true; false;} ? {"one"} : {"zero"}) say;  # prints "zero"

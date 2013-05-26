@@ -6,10 +6,10 @@ use warnings;
 package Sidef::Types::Bool::Bool {
 
     use parent qw(Sidef::Convert::Convert);
+    use overload q{bool} => sub { ${$_[0]} eq 'true' };
 
-    use overload
-      q{bool} => sub { ${$_[0]} eq 'true' },
-      ;
+    require Sidef::Exec;
+    my $exec = Sidef::Exec->new();
 
     sub new {
         my ($class, $bool) = @_;
@@ -27,9 +27,7 @@ package Sidef::Types::Bool::Bool {
             my ($self, $code) = @_;
 
             if ($self) {
-                my $exec = Sidef::Exec->new();
                 my @results = $exec->execute(struct => $code);
-
                 return $results[-1];
             }
 
@@ -40,9 +38,7 @@ package Sidef::Types::Bool::Bool {
             my ($self, $code) = @_;
 
             if (not $self) {
-                my $exec = Sidef::Exec->new();
                 my @results = $exec->execute(struct => $code);
-
                 return $results[-1];
             }
 
@@ -53,7 +49,6 @@ package Sidef::Types::Bool::Bool {
             my ($self, $code) = @_;
 
             if ($self) {
-                my $exec = Sidef::Exec->new();
                 my @results = $exec->execute(struct => $code);
                 return Sidef::Types::Bool::Ternary->new({code => $results[-1], bool => __PACKAGE__->true});
             }
@@ -96,7 +91,6 @@ package Sidef::Types::Bool::Bool {
                 return $code;
             }
 
-            my $exec = Sidef::Exec->new();
             $exec->execute(struct => $code);
         }
 

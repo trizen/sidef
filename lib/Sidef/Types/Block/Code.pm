@@ -13,6 +13,37 @@ package Sidef::Types::Block::Code {
         bless $code, $class;
     }
 
+    {
+        no strict 'refs';
+
+        *{__PACKAGE__ . '::' . '||'} = sub {
+            my ($self, $code) = @_;
+
+            my $method = '||';
+            my @results = $exec->execute(struct => $self);
+
+            return $results[-1]->$method($code);
+        };
+
+        *{__PACKAGE__ . '::' . '&&'} = sub {
+            my ($self, $code) = @_;
+
+            my $method = '&&';
+            my @results = $exec->execute(struct => $self);
+
+            return $results[-1]->$method($code);
+        };
+
+        *{__PACKAGE__ . '::' . '?'} = sub {
+            my ($self, $code) = @_;
+
+            my $method = '?';
+            my @results = $exec->execute(struct => $self);
+
+            return $results[-1]->$method($code);
+        };
+    }
+
     sub if {
         my ($self, $bool) = @_;
 

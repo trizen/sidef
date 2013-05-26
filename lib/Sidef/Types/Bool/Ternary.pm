@@ -5,11 +5,11 @@ use warnings;
 
 package Sidef::Types::Bool::Ternary {
 
-    use parent qw(Sidef::Types::Bool::Bool);
+    #use parent qw(Sidef::Types::Bool::Bool);
 
     sub new {
-        my ($class, $val) = @_;
-        bless $val, $class;
+        my ($class, $hash_ref) = @_;
+        bless $hash_ref, $class;
     }
 
     {
