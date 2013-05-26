@@ -42,6 +42,22 @@ package Sidef::Types::Block::Code {
 
             return $results[-1]->$method($code);
         };
+
+        *{__PACKAGE__ . '::' . '*'} = sub {
+            my ($self, $num) = @_;
+
+            foreach my $i(1..${$num}+0){
+                $exec->execute(struct => $self);
+            }
+
+            $self;
+        };
+    }
+
+    sub run {
+       my ($self) = @_;
+       my @results = $exec->execute(struct => $self);
+       return $results[-1];
     }
 
     sub if {

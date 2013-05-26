@@ -199,7 +199,7 @@ regex -> to_s -> say;                               # prints the regex
 /item/ =~ ["str", [123, ["w", "item", "x"], 6], "boo"] -> to_s -> say;    # matches 'item' in nested array
 
 
-"\n=>> Variable interpolation fßr regular expressions:"->say;
+"\n=>> Variable interpolation for regular expressions:"->say;
 
 '-' * 80 -> say;
 
@@ -210,9 +210,6 @@ var re = '\w';
 /\d$re/->to_s->say;                              # prints the regex
 
 '-' * 80 -> say;
-
-"Chinese characters: 文化交流学院"->say;
-
 
 #######################################################
 
@@ -267,7 +264,7 @@ char chars = "sidef";
 chars->to_s->say;
 
 var i = 2;
-"chars[$i] is '" + (chars[i]->to_s) + "'" ->say;
+"chars[%d] is '%s'\n"->printf(i, (chars[i]->to_s));
 
 chars[0] = "g";
 chars[2] = "r";
@@ -353,48 +350,6 @@ array_test[0,1] = ["y"];    # set the first element to string "y", and the secon
 
 #######################################################
 
-#
-## Bytes
-#
-
-'-' * 80 -> say;
-
-var byte = ('c'->ord);
-"byte '$byte' made uppercase, is: " + ( byte - 32 -> chr)->say;
-
-'-' * 80 -> say;
-
-byte bytes = "șarpe";   # splits on bytes!
-
-bytes->join->say;
-"The character 'ș' is composed of two bytes: " + (bytes[0,1]->to_s)->say;
-"Then comes the character 'a', which is: " + (bytes[2]->to_s) + " (" + (bytes[2]->chr) + ")"->say;
-
-bytes[0] = 200;     # Keep the first byte as it is
-bytes[1] = 154;     # and change the 'S' to 'T', resulting in 'Ț'
-bytes->join->say;   # prints: 'Țarpe'
-
-#######################################################
-
-#
-## Characters
-#
-
-'-' * 80 -> say;
-
-char sidef = "șopârlă";     # splits on characters!
-sidef->join('-')->say;
-sidef[1]->say;
-sidef[2]->say;
-sidef[3]->say;
-sidef[4]->say;
-sidef[5]->say;
-sidef[6]->say;
-
-'-' * 80 -> say;
-
-#######################################################
-
 var block = {
     "first"->say;
     "block"->say;
@@ -409,6 +364,8 @@ block->if(true);            # execute the block
 block->if(false);           # don't execute the block
 
 private[1]->to_s->say;      # this is a bug which should be fixed!
+
+block.run.say;
 
 #######################################################
 

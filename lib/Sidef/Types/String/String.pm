@@ -34,6 +34,10 @@ package Sidef::Types::String::String {
         *{__PACKAGE__ . '::' . '--'} = sub {
             __PACKAGE__->new(substr($_[0], 0, -1));
         };
+
+        *{__PACKAGE__ . '::' . '..'} = sub {
+            Sidef::Types::Array::Array->new(${$_[0]} .. ${$_[1]});
+        };
     }
 
     sub uc {

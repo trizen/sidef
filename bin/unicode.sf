@@ -1,0 +1,60 @@
+#!/usr/bin/perl
+
+#
+## Unicode characters in variable name
+#
+
+var îșțh = "- Șe t©t fași băi?
+- ßiene băi „țărane”, î§ în «U€».";
+îșțh.say;
+
+'-' * 80 say;
+
+char chars = îșțh;
+chars->join("_")->say;
+
+#######################################################
+
+#
+## Bytes
+#
+
+'-' * 80 say;
+
+var byte = ('c'->ord);
+"byte '%d' made uppercase, is: %s\n".printf(byte, ( byte - 32 -> chr));
+
+'-' * 80 -> say;
+
+byte bytes = "șarpe";   # splits on bytes!
+
+bytes.join.say;
+"The character 'ș' is composed of two bytes: " + (bytes[0,1]->to_s)->say;
+"Then comes the character 'a', which is: " + (bytes[2]->to_s) + " (" + (bytes[2]->chr) + ")"->say;
+
+bytes[0] = 200;   # Keep the first byte as it is
+bytes[1] = 154;   # and change the 'S' to 'T', resulting in 'Ț'
+bytes.join.say;   # prints: 'Țarpe'
+
+#######################################################
+
+#
+## Characters
+#
+
+'-' * 80 -> say;
+
+char sidef = "șopârlă";     # splits on characters!
+sidef.join('-').say;
+sidef[1]->say;
+sidef[2]->say;
+sidef[3]->say;
+sidef[4]->say;
+sidef[5]->say;
+sidef[6]->say;
+
+'-' * 80 -> say;
+
+#######################################################
+
+"Chinese characters: 文化交流学院"->say;

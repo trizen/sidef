@@ -30,7 +30,7 @@ package Sidef::Parser {
                 match_flags        => qr{[msixpogcdual]+},
                 substitution_flags => qr{[msixpogcerdual]+},
                 var_in_string      => Sidef::Utils::Regex::variable_in_string(),
-                var_name           => qr/[a-zA-Z_]\w*/,
+                var_name           => qr/[[:alpha:]_]\w*/,
                 operators          => do {
                     local $" = q{|};
 

@@ -5,6 +5,7 @@ use warnings;
 
 package Sidef::Types::Bytes::Bytes {
 
+    use Encode qw(decode_utf8);
     use parent qw(Sidef::Convert::Convert Sidef::Types::Array::Array);
 
     sub new {
@@ -14,7 +15,7 @@ package Sidef::Types::Bytes::Bytes {
 
     sub join {
         my ($self) = @_;
-        Sidef::Types::String::String->new(join('', map { $_->get_value->chr } @{$self}));
+        Sidef::Types::String::String->new(decode_utf8(join('', map { $_->get_value->chr } @{$self})));
     }
 
 }
