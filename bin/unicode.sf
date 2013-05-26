@@ -58,3 +58,18 @@ sidef[6]->say;
 #######################################################
 
 "Chinese characters: 文化交流学院"->say;
+
+'-' * 80 say;
+
+char chinese_chars = "文化交流学院";
+chinese_chars.join(" . ").say;
+
+'-' * 80 say;
+
+byte chinese_bytes = (chinese_chars.join '');
+chinese_bytes.join.say;
+"Is composed from %d bytes.\n"->printf(chinese_bytes.len);
+
+'-' * 80 say;
+
+#######################################################

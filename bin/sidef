@@ -1,13 +1,11 @@
 #!/usr/bin/perl
 
-#use utf8;
 use 5.014;
 use strict;
 use warnings;
-#use encoding qw(UTF-8);
 
-binmode (STDOUT, ':encoding(UTF-8)');
-binmode (STDERR, ':encoding(UTF-8)');
+binmode (STDOUT, ':utf8');
+binmode (STDERR, ':utf8');
 
 use lib '../lib';    # devel only
 use autouse 'Getopt::Std' => qw(getopts($;$));    # arguments support
@@ -70,7 +68,7 @@ else {
         my $file = shift;
         $script_name = $file;
 
-        open my $fh, '<:encoding(UTF-8)', $file
+        open my $fh, '<:utf8', $file
           or die qq{Can't open sidef script "$file": $!\n};
 
         local $/;
