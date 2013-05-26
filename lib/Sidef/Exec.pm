@@ -96,7 +96,7 @@ package Sidef::Exec {
                     }
 
                     if (ref $self_obj eq 'Sidef::Variable::Variable'
-                        and not $$method ~~ [qw( =  :=  +=  -=  *=  /=  %=  **= )]) {
+                        and not $$method ~~ [qw( =  :=  +=  -=  *=  /=  %=  **=  ++  --)]) {
                         $self_obj = $self_obj->get_value;
                     }
 
@@ -119,6 +119,7 @@ package Sidef::Exec {
                             #elsif (ref $obj eq 'Sidef::Types::Array::Array') {
                             # $obj = $self->eval_array(array => $obj, class => $opt{class});
                             #}
+
                             if (ref $obj eq 'Sidef::Variable::Variable') {
                                 $obj = $obj->get_value;
                             }
@@ -132,10 +133,6 @@ package Sidef::Exec {
 
                     }
                     else {
-                        if (ref $self_obj eq 'Sidef::Variable::Variable') {
-                            $self_obj = $self_obj->get_value;
-                        }
-
                         $self_obj = $self_obj->$method;
 
                         if (ref $self_obj eq 'Sidef::Variable::Variable') {

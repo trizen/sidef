@@ -124,6 +124,22 @@ package Sidef::Variable::Variable {
             $self;
         };
 
+        *{__PACKAGE__ . '::' . '++'} = sub {
+            my ($self) = @_;
+
+            my ($method) = '+';
+            $self->set_value($self->get_value->$method(Sidef::Types::Number::Number->new(1)));
+            $self;
+        };
+
+        *{__PACKAGE__ . '::' . '--'} = sub {
+            my ($self) = @_;
+
+            my ($method) = '-';
+            $self->set_value($self->get_value->$method(Sidef::Types::Number::Number->new(1)));
+            $self;
+        };
+
     }
 };
 

@@ -45,12 +45,6 @@ package Sidef::Types::Number::Number {
             __PACKAGE__->new($$self**$$num);
         };
 
-        *{__PACKAGE__ . '::' . '++'} = sub {
-            my ($self) = @_;
-            ${$self}++;
-            $self;
-        };
-
         *{__PACKAGE__ . '::' . '<'} = sub {
             my ($self, $num) = @_;
             Sidef::Types::Bool::Bool->new($$self < $$num);
