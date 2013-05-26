@@ -1,0 +1,12 @@
+#!/usr/bin/perl
+
+var array = ["u", "v", "w", "x","y","z"];
+
+array ++ "a";    # add "a" at the end of array
+array.push("a"); # =//=
+
+array.pop; array.pop;   # remove the last two elements from array
+{array.pop} for (1..2); # =//=
+array-- --;             # =//=
+
+array.join(" ").say;    # prints "u v"

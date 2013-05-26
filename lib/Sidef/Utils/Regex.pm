@@ -16,7 +16,7 @@ package Sidef::Utils::Regex {
             $bdelims{$d->[0]} = qr{
             $ed[0]
             (?>
-                [^@ed\\]+
+                [^$ed[0]$ed[1]\\]+
                     |
                 \\.
                     |

@@ -125,18 +125,18 @@ package Sidef::Variable::Variable {
         };
 
         *{__PACKAGE__ . '::' . '++'} = sub {
-            my ($self) = @_;
+            my ($self, $arg) = @_;
 
-            my ($method) = '+';
-            $self->set_value($self->get_value->$method(Sidef::Types::Number::Number->new(1)));
+            my ($method) = '++';
+            $self->set_value($self->get_value->$method($arg));
             $self;
         };
 
         *{__PACKAGE__ . '::' . '--'} = sub {
             my ($self) = @_;
 
-            my ($method) = '-';
-            $self->set_value($self->get_value->$method(Sidef::Types::Number::Number->new(1)));
+            my ($method) = '--';
+            $self->set_value($self->get_value->$method);
             $self;
         };
 

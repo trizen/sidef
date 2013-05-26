@@ -40,6 +40,18 @@ package Sidef::Types::Array::Array {
             __PACKAGE__->new(@{$self}, @{$array});
         };
 
+        *{__PACKAGE__ . '::' . '++'} = sub {
+            my ($self, $obj) = @_;
+            $self->push(ref $obj ? $obj : Sidef::Types::Nil::Nil->new());
+            $self;
+        };
+
+        *{__PACKAGE__ . '::' . '--'} = sub {
+            my ($self) = @_;
+            $self->pop;
+            $self;
+        };
+
         *{__PACKAGE__ . '::' . '='} = sub {
             my ($self, $arg) = @_;
 
