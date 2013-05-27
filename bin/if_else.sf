@@ -51,7 +51,7 @@ or {
 or {
     {
         "I should not be here!"->say;
-    } if(false)
+    } if(true)
 }
 else {
     "I should not be here!"->say;
@@ -73,7 +73,7 @@ or {
 or {
     {
         "I should not be here!"->say;
-    } if(false)
+    } if(true)
 }
 else {
     "I should not be here!"->say;
