@@ -13,7 +13,7 @@ else {
 };
 
 #
-## if, else if, else
+## if, else if, else if, else
 #
 
 {
@@ -21,11 +21,109 @@ else {
 } if(false)
 
 else (
-  {
-    "Right place (2)!"->say;
-  } if(true)
+    {
+        "I should not be here!"->say;
+    } if(false)
 )
-
+else (
+    {
+        "Right place (2)!"->say;
+    } if(true)
+)
 else {
     "I should not be here!"->say;
+};
+
+
+#
+## if, else if, else if, else
+#
+
+{
+    "Right place (3)!"->say;
+} if(true)
+
+or {
+    {
+        "I should not be here!"->say;
+    } if(false)
+}
+or {
+    {
+        "I should not be here!"->say;
+    } if(false)
+}
+else {
+    "I should not be here!"->say;
+};
+
+#
+## if, else if, else if, else
+#
+
+{
+    "I should not be here!"->say;
+} if(false)
+
+or {
+    {
+        "Right place (4)!"->say;
+    } if(true)
+}
+or {
+    {
+        "I should not be here!"->say;
+    } if(false)
+}
+else {
+    "I should not be here!"->say;
+};
+
+#
+## if, else if, else if, else
+#
+
+{
+    "I should not be here!"->say;
+} if(false)
+
+or {
+    {
+        "I should not be here!"->say;
+    } if(false)
+}
+or {
+    {
+        "Right place (5)!"->say;
+    } if(true)
+}
+else {
+    "I should not be here!"->say;
+};
+
+#
+## if, else if, else if, else
+#
+
+{
+    "I should not be here!"->say;
+} if(false)
+
+or {
+    {
+        "I should not be here!"->say;
+    } if(false)
+}
+or {
+    {
+        "I should not be here!"->say;
+    } if(false)
+}
+or {
+    {
+        "I should not be here!"->say;
+    } if(false)
+}
+else {
+    "Right place (6)!"->say;
 };

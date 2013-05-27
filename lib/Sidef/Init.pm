@@ -33,12 +33,12 @@ require Sidef::Types::Number::Float if [caller]->[0] ne q{Sidef::Types::Number::
 require Sidef::Types::String::Double if [caller]->[0] ne q{Sidef::Types::String::Double};
 require Sidef::Types::String::String if [caller]->[0] ne q{Sidef::Types::String::String};
 require Sidef::Types::Bool::Bool if [caller]->[0] ne q{Sidef::Types::Bool::Bool};
+require Sidef::Types::Bool::Or if [caller]->[0] ne q{Sidef::Types::Bool::Or};
 require Sidef::Types::Bool::Ternary if [caller]->[0] ne q{Sidef::Types::Bool::Ternary};
 require Sidef::Types::Regex::Regex if [caller]->[0] ne q{Sidef::Types::Regex::Regex};
 require Sidef::Exec if [caller]->[0] ne q{Sidef::Exec};
 require Sidef::Parser if [caller]->[0] ne q{Sidef::Parser};
 require Sidef::Variable::Variable if [caller]->[0] ne q{Sidef::Variable::Variable};
-
 
 
 1;

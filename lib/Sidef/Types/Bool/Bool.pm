@@ -82,6 +82,22 @@ package Sidef::Types::Bool::Bool {
         $self ? __PACKAGE__->false : __PACKAGE__->true;
     }
 
+    sub or {
+        my ($self, $code) = @_;
+
+        if ($self->is_true) {
+            return $self;
+        }
+
+        my @results = $exec->execute(struct => $code);
+
+        if ($results[-1]->is_true) {
+            return Sidef::Types::Bool::Or->true;
+        }
+
+        return $self;
+    }
+
     sub else {
         my ($self, $code) = @_;
 
