@@ -349,12 +349,12 @@ array_test->to_s->say;
 #######################################################
 
 #
-## Deprecated
+## Slice assignment
 #
 
-#array_test[0,1] = "x";      # set both elements to string "x"
-#array_test->to_s->say;
-#array_test[0,1] = ["y"];    # set the first element to string "y", and the second element to undef
+array_test[0,1] = "x";      # set both elements to string "x"
+array_test->to_s->say;
+array_test[0,1] = ["y"];    # set the first element to string "y", and the second element to undef
 
 #######################################################
 

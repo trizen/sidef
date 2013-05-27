@@ -22,9 +22,11 @@ package Sidef::Exec {
     sub eval_array {
         my ($self, %opt) = @_;
         Sidef::Types::Array::Array->new(
-
-            # map { Sidef::Variable::Variable->new(rand, 'var', $_) }
-            map { ref eq 'HASH' ? $self->execute_expr(expr => $_, class => $opt{class}) : $_ } @{$opt{array}}
+            map {
+                ref eq 'HASH'
+                  ? $self->execute_expr(expr => $_, class => $opt{class})
+                  : $_
+              } @{$opt{array}}
         );
     }
 
