@@ -19,32 +19,32 @@ package Sidef::Types::Number::Number {
 
         *{__PACKAGE__ . '::' . '/'} = sub {
             my ($self, $num) = @_;
-            __PACKAGE__->new($$self / $$num);
+            __PACKAGE__->new($$self / $num->_get_number);
         };
 
         *{__PACKAGE__ . '::' . '*'} = sub {
             my ($self, $num) = @_;
-            __PACKAGE__->new($$self * $$num);
+            __PACKAGE__->new($$self * $num->_get_number);
         };
 
         *{__PACKAGE__ . '::' . '+'} = sub {
             my ($self, $num) = @_;
-            __PACKAGE__->new($$self + $$num);
+            __PACKAGE__->new($$self + $num->_get_number);
         };
 
         *{__PACKAGE__ . '::' . '-'} = sub {
             my ($self, $num) = @_;
-            __PACKAGE__->new($$self - $$num);
+            __PACKAGE__->new($$self - $num->_get_number);
         };
 
         *{__PACKAGE__ . '::' . '%'} = sub {
             my ($self, $num) = @_;
-            __PACKAGE__->new($$self % $$num);
+            __PACKAGE__->new($$self % $num->_get_number);
         };
 
         *{__PACKAGE__ . '::' . '**'} = sub {
             my ($self, $num) = @_;
-            __PACKAGE__->new($$self**$$num);
+            __PACKAGE__->new($$self**$num->_get_number);
         };
 
         *{__PACKAGE__ . '::' . '++'} = sub {
@@ -59,37 +59,37 @@ package Sidef::Types::Number::Number {
 
         *{__PACKAGE__ . '::' . '<'} = sub {
             my ($self, $num) = @_;
-            Sidef::Types::Bool::Bool->new($$self < $$num);
+            Sidef::Types::Bool::Bool->new($$self < $num->_get_number);
         };
 
         *{__PACKAGE__ . '::' . '>'} = sub {
             my ($self, $num) = @_;
-            Sidef::Types::Bool::Bool->new($$self > $$num);
+            Sidef::Types::Bool::Bool->new($$self > $num->_get_number);
         };
 
         *{__PACKAGE__ . '::' . '<='} = sub {
             my ($self, $num) = @_;
-            Sidef::Types::Bool::Bool->new($$self <= $$num);
+            Sidef::Types::Bool::Bool->new($$self <= $num->_get_number);
         };
 
         *{__PACKAGE__ . '::' . '>='} = sub {
             my ($self, $num) = @_;
-            Sidef::Types::Bool::Bool->new($$self >= $$num);
+            Sidef::Types::Bool::Bool->new($$self >= $num->_get_number);
         };
 
         *{__PACKAGE__ . '::' . '=='} = sub {
             my ($self, $num) = @_;
-            Sidef::Types::Bool::Bool->new($$self == $$num);
+            Sidef::Types::Bool::Bool->new($$self == $num->_get_number);
         };
 
         *{__PACKAGE__ . '::' . '!='} = sub {
             my ($self, $num) = @_;
-            Sidef::Types::Bool::Bool->new($$self != $$num);
+            Sidef::Types::Bool::Bool->new($$self != $num->_get_number);
         };
 
         *{__PACKAGE__ . '::' . '..'} = sub {
             my ($self, $num) = @_;
-            Sidef::Types::Array::Array->new(map { __PACKAGE__->new($_) } $$self .. $$num);
+            Sidef::Types::Array::Array->new(map { __PACKAGE__->new($_) } $$self .. $num->_get_number);
         };
     }
 
