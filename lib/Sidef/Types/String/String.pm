@@ -128,6 +128,18 @@ package Sidef::Types::String::String {
         Sidef::Types::Bool::Bool->new(CORE::printf $$self, @arguments);
     }
 
+    sub sprintf {
+        my ($self, @arguments) = @_;
+        __PACKAGE__->new(CORE::sprintf $$self, @arguments);
+    }
+
+    sub length {
+        my($self) = @_;
+        Sidef::Types::Number::Number->new(CORE::length($$self));
+    }
+
+    *len = \&length;    # alias for 'len'
+
     sub stat_file {
         my ($self) = @_;
         Sidef::Types::Glob::File->new($$self);
