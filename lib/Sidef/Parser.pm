@@ -77,9 +77,14 @@ package Sidef::Parser {
     sub find_var {
         my ($self, $var_name) = @_;
 
-        foreach my $var (@{$self->{vars}}, @{$self->{ref_vars_refs}}) {
+        foreach my $var (@{$self->{vars}}) {
             next if ref $var eq 'ARRAY';
-            return $var if $var->{name} eq $var_name;
+            return ($var, 1) if $var->{name} eq $var_name;
+        }
+
+        foreach my $var (@{$self->{ref_vars_refs}}) {
+            next if ref $var eq 'ARRAY';
+            return ($var, 0) if $var->{name} eq $var_name;
         }
 
         return;
@@ -245,7 +250,7 @@ package Sidef::Parser {
                     pos($_) = $pos + pos;
 
                     if (ref $obj->{main} eq 'ARRAY') {
-                        $array->push(@{$obj->{main}});
+                        push @{$array}, (@{$obj->{main}});
                     }
 
                     return $array, pos;
@@ -265,7 +270,9 @@ package Sidef::Parser {
                     my $type = $1;
                     my $name = $2;
 
-                    if (exists $self->{variables}{$self->{class}}{$name}) {
+                    my ($var, $code) = $self->find_var($name);
+
+                    if (defined $var and $code == 1) {
                         warn "Redeclaration of $type '$name' in same scope, at line $self->{line}\n";
                     }
 
@@ -285,7 +292,9 @@ package Sidef::Parser {
                 # Variable call
                 when (/\G($self->{re}{var_name})/goc) {
 
-                    if (defined(my $var = $self->find_var($1))) {
+                    my ($var, $code) = $self->find_var($1);
+
+                    if ($var) {
                         $var->{count}++;
                         return $var->{obj}, pos;
                     }
@@ -369,8 +378,8 @@ package Sidef::Parser {
 
                     $self->{vars} = $self->{vars}[0];
 
-                    my ($obj, $pos) = $self->parse_script(code => substr($_, pos));
-                    pos($_) = $pos + pos;
+                    my ($obj, $pos) = $self->parse_script(code => 'var _;' . substr($_, pos));
+                    pos($_) += $pos - 6;
 
                     splice @{$self->{ref_vars_refs}}, 0, $count;
                     $self->{vars} = $ref;
@@ -518,7 +527,7 @@ package Sidef::Parser {
                     $self->{expect_index} = /\G(?=\h*\[)/;
 
                     if (ref $obj->{main} eq 'ARRAY') {
-                        $array->push(@{$obj->{main}});
+                        push @{$array}, (@{$obj->{main}});
                     }
 
                     push @{$self->{last_object}{ind}}, $array;

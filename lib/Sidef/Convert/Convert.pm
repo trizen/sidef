@@ -109,18 +109,12 @@ package Sidef::Convert::Convert {
             \@b;
         };
 
-        Sidef::Types::Bytes::Bytes->new(map { Sidef::Variable::Variable->new(rand, 'var', $_) } @{$bytes});
+        Sidef::Types::Bytes::Bytes->new($bytes);
     }
 
     sub to_chars {
         my ($self) = @_;
-
-        Sidef::Types::Chars::Chars->new(
-            map {
-                Sidef::Variable::Variable->new(rand, 'var', Sidef::Types::Char::Char->new($_))
-              } split //,
-            $$self
-                                       );
+        Sidef::Types::Chars::Chars->new([map { Sidef::Types::Char::Char->new($_) } split //, $$self]);
     }
 
     sub to_array {

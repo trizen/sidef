@@ -37,8 +37,24 @@ package Sidef::Types::String::String {
             __PACKAGE__->new(substr($_[0]->_get_string, 0, -1));
         };
 
+        *{__PACKAGE__ . '::' . '>'} = sub {
+            Sidef::Types::Bool::Bool->new($_[0]->_get_string gt $_[1]->_get_string);
+        };
+
+        *{__PACKAGE__ . '::' . '<'} = sub {
+            Sidef::Types::Bool::Bool->new($_[0]->_get_string lt $_[1]->_get_string);
+        };
+
+        *{__PACKAGE__ . '::' . '>='} = sub {
+            Sidef::Types::Bool::Bool->new($_[0]->_get_string ge $_[1]->_get_string);
+        };
+
+        *{__PACKAGE__ . '::' . '<='} = sub {
+            Sidef::Types::Bool::Bool->new($_[0]->_get_string le $_[1]->_get_string);
+        };
+
         *{__PACKAGE__ . '::' . '..'} = sub {
-            Sidef::Types::Array::Array->new($_[0]->_get_string .. $_[1]->_get_string);
+            Sidef::Types::Array::Array->new(map { __PACKAGE__->new($_) } $_[0]->_get_string .. $_[1]->_get_string);
         };
     }
 
@@ -134,7 +150,7 @@ package Sidef::Types::String::String {
     }
 
     sub length {
-        my($self) = @_;
+        my ($self) = @_;
         Sidef::Types::Number::Number->new(CORE::length($$self));
     }
 

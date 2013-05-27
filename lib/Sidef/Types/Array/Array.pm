@@ -9,7 +9,7 @@ package Sidef::Types::Array::Array {
 
     sub new {
         my ($class, @items) = @_;
-        bless \@items, $class;
+        bless [map { Sidef::Variable::Variable->new(rand, 'var', $_) } @items], $class;
     }
 
     sub _get_array { [@{$_[0]}] }
@@ -31,7 +31,7 @@ package Sidef::Types::Array::Array {
                     }
                 }
 
-                $new_array->push($item) if not $exists;
+                $new_array->push($item->get_value) if not $exists;
             }
 
             return $new_array;
@@ -39,7 +39,7 @@ package Sidef::Types::Array::Array {
 
         *{__PACKAGE__ . '::' . '+'} = sub {
             my ($self, $array) = @_;
-            __PACKAGE__->new(@{$self}, @{$array->_get_array});
+            __PACKAGE__->new(map { $_->get_value } @{$self}, @{$array->_get_array});
         };
 
         *{__PACKAGE__ . '::' . '++'} = sub {
@@ -59,7 +59,8 @@ package Sidef::Types::Array::Array {
 
             if (ref $arg eq 'Sidef::Types::Array::Array') {
                 foreach my $i (0 .. $#{$self}) {
-                    $self->[$i]->set_value($arg->[$i]);
+                    $arg->[$i] //= Sidef::Variable::Variable->new(rand, 'var', Sidef::Types::Nil::Nil->new);
+                    $self->[$i]->set_value($arg->[$i]->get_value);
                 }
             }
             else {
@@ -68,11 +69,57 @@ package Sidef::Types::Array::Array {
 
             $self;
         };
+
     }
 
-    sub len {
+    sub max {
+        my ($self) = @_;
+
+        my $method   = '>';
+        my $max_item = $self->[0]->get_value;
+
+        foreach my $i (1 .. $#{$self}) {
+            my $val = $self->[$i]->get_value;
+
+            if (defined $val->can($method)) {
+                $max_item = $val if $val->$method($max_item);
+            }
+            else {
+                warn "[WARN] Can't find the method '$method' for object '", ref($self->[$i]->get_value), "'!\n";
+            }
+        }
+
+        return $max_item;
+    }
+
+    sub map {
+        my ($self, $code) = @_;
+
+        my $exec = Sidef::Exec->new();
+        my $variable = $exec->execute_expr(expr => $code->{main}[0], class => 'main');
+
+        __PACKAGE__->new(
+            map {
+                $variable->alias($_);
+                my $val = $_->get_value;
+                $variable->set_value(ref $val eq 'Sidef::Variable::Variable' ? $val->get_value : $val);
+                my @results = $exec->execute(struct => $code);
+                $results[-1];
+              } @{$self}
+        );
+    }
+
+    sub length {
         my ($self) = @_;
         Sidef::Types::Number::Integer->new(scalar @{$self});
+    }
+
+    *len = \&length;    # alias
+
+    sub insert {
+        my ($self, $index, @objects) = @_;
+        splice(@{$self}, $index->_get_number, 0, @{__PACKAGE__->new(@objects)});
+        $self;
     }
 
     sub pop {
@@ -87,7 +134,13 @@ package Sidef::Types::Array::Array {
 
     sub push {
         my ($self, @args) = @_;
-        push @{$self}, @args;
+        push @{$self}, @{__PACKAGE__->new(@args)};
+        return $self;
+    }
+
+    sub unshift {
+        my ($self, @args) = @_;
+        unshift @{$self}, @{__PACKAGE__->new(@args)};
         return $self;
     }
 

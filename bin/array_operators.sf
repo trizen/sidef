@@ -5,9 +5,63 @@ var array = ("a".."z");
 array ++ "a";    # add "a" at the end of array
 array.push("a"); # =//=
 
+array[-1] = "x";
+array[-2] = "y";
+
 array.pop; array.pop;   # remove the last two elements from array
 {array.pop} for (1..2); # =//=
 {array.pop} * 2;        # =//=
 array-- --;             # =//=
 
 array.join(" ").say;
+
+######################################################
+
+'-' * 80 say;
+
+{
+    var array = [0,6,10,12];
+    array.map{ _ += 2 }.to_s.say;     # modifies the array in place
+    array.to_s.say;
+}.run;
+
+######################################################
+
+'-' * 80 say;
+
+{
+    var array = [0,6,10,12];
+    array.map{ _ + 2 }.to_s.say;      # doesn't modifies the array
+    array.to_s.say;
+}.run;
+
+######################################################
+
+'-' * 80 say;
+
+array[0] = "z";
+array[1] = "x";
+
+var m_array = array[1,2,3];
+
+m_array[0] = "a";
+m_array.insert(1, "B");
+m_array[3] = (m_array[3].uc);
+
+m_array.to_s.say;
+
+'-' * 80 say;
+
+######################################################
+
+var new_array = (array.map {
+    _->say;
+});
+
+new_array[0] = "hei";
+new_array[2] = "hu";
+
+var end = 1;
+new_array[end * -1] = "end";
+
+new_array->to_s->say;

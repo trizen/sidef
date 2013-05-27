@@ -305,6 +305,15 @@ nums[3]->say;
 
 nums[2,3,4,5,6] = ["doi", "trei", "patru", "cinci", "șase"];
 
+nums.to_s.say;
+
+var word_nums = ["two", "trei", "four", "cinci", "six"];
+
+(2..6).map {
+    nums[_] = word_nums[_-2];
+};
+
+
 nums->join(' ')->say;
 
 #######################################################
@@ -337,10 +346,15 @@ array_test[1] = "elem2";
 
 array_test->to_s->say;
 
-array_test[0,1] = "x";      # set both elements to string "x"
-array_test->to_s->say;
+#######################################################
 
-array_test[0,1] = ["y"];    # set the first element to string "y", and the second element to undef
+#
+## Deprecated
+#
+
+#array_test[0,1] = "x";      # set both elements to string "x"
+#array_test->to_s->say;
+#array_test[0,1] = ["y"];    # set the first element to string "y", and the second element to undef
 
 #######################################################
 
@@ -367,7 +381,7 @@ block.run.say;
 
 #######################################################
 
-'-'*80->say;
+'-' * 80->say;
 
 {
     "Sidef rocks!!!"->say;

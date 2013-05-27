@@ -88,15 +88,15 @@ package Sidef::Types::Block::Code {
 
                     if ($counter++ == 0) {
 
-                        if ((my $argn = scalar(@{$arg->{$class}})) != 3) {
+                        if ((my $argn = $#{$arg->{$class}}) != 3) {
                             warn "[WARN] The 'for' loop needs exactly three arguments! We got $argn of them.\n";
                         }
 
-                        $exec->execute_expr(expr => $arg->{$class}[0], class => $class);
+                        $exec->execute_expr(expr => $arg->{$class}[1], class => $class);
                     }
 
-                    my $expr = $arg->{$class}[2];
-                    my ($bool) = $exec->execute_expr(expr => $arg->{$class}[1], class => $class);
+                    my $expr = $arg->{$class}[3];
+                    my ($bool) = $exec->execute_expr(expr => $arg->{$class}[2], class => $class);
 
                     if ($bool->is_true) {
                         $exec->execute(struct => $self);

@@ -22,12 +22,9 @@ package Sidef::Exec {
     sub eval_array {
         my ($self, %opt) = @_;
         Sidef::Types::Array::Array->new(
-            map { Sidef::Variable::Variable->new(rand, 'var', $_) }
-              map {
-                ref eq 'HASH'
-                  ? $self->execute_expr(expr => $_, class => $opt{class})
-                  : $_
-              } @{$opt{array}}
+
+            # map { Sidef::Variable::Variable->new(rand, 'var', $_) }
+            map { ref eq 'HASH' ? $self->execute_expr(expr => $_, class => $opt{class}) : $_ } @{$opt{array}}
         );
     }
 
@@ -69,7 +66,11 @@ package Sidef::Exec {
                             push @indices, $ind;
                         }
 
-                        $self_obj = Sidef::Types::Array::Array->new(@{$self_obj}[@indices]);
+                        my $array = Sidef::Types::Array::Array->new();
+                        push @{$array}, @{$self_obj}[@indices];
+                        $self_obj = $array;
+
+                        #$self_obj = Sidef::Types::Array::Array->new(map {$_->get_value} @{$self_obj}[@indices]);
 
                     }
                     else {
@@ -123,6 +124,7 @@ package Sidef::Exec {
                             if (ref $obj eq 'Sidef::Variable::Variable') {
                                 $obj = $obj->get_value;
                             }
+
                         }
 
                         $self_obj = $self_obj->$method(@arguments);
@@ -133,6 +135,10 @@ package Sidef::Exec {
 
                     }
                     else {
+                        if (ref $self_obj eq 'Sidef::Variable::Variable' and not $$method ~~ [qw(-- ++)]) {
+                            $self_obj = $self_obj->get_value;
+                        }
+
                         $self_obj = $self_obj->$method;
 
                         if (ref $self_obj eq 'Sidef::Variable::Variable') {

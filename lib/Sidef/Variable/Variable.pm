@@ -26,6 +26,11 @@ package Sidef::Variable::Variable {
 
     sub set_value {
         my ($self, $value) = @_;
+
+        if (defined $self->{ref}) {
+            $self->{ref}{value} = $value;
+        }
+
         $self->{value} = $value;
     }
 
@@ -37,6 +42,11 @@ package Sidef::Variable::Variable {
     sub get_type {
         my ($self) = @_;
         $self->{type};
+    }
+
+    sub alias {
+        my ($self, $var) = @_;
+        $self->{ref} = $var;
     }
 
     {
