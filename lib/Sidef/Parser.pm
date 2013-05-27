@@ -12,7 +12,7 @@ package Sidef::Parser {
     sub new {
         my ($class) = @_;
 
-        bless {
+        my %options = (
             line          => 1,
             has_object    => 0,
             expect_method => 0,
@@ -20,7 +20,8 @@ package Sidef::Parser {
             expect_arg    => 0,
             parentheses   => 0,
             class         => 'main',
-            variables     => {},
+            vars          => [],
+            ref_vars_refs => [],
             re            => {
                 double_quote       => Sidef::Utils::Regex::make_esc_delim(q{"}),
                 single_quote       => Sidef::Utils::Regex::make_esc_delim(q{'}),
@@ -59,22 +60,10 @@ package Sidef::Parser {
                     qr{(@operators)};
                 },
             },
-        }, $class;
-    }
+        );
 
-    sub check_variables {
-        my ($self, $string) = @_;
-
-        while ($string =~ /$self->{re}{var_in_string}/go) {
-            if (exists $self->{variables}{$self->{class}}{$1}) {
-                $self->{variables}{$self->{class}}{$1}{count}++;
-            }
-            else {
-                warn "Attempt to use an uninitialized variable in double quoted string!\n";
-                $self->fatal_error(code => $_,
-                                   pos  => pos($_) - length($string) + pos($string) - length($1) - 2);
-            }
-        }
+        $options{ref_vars} = $options{vars};
+        bless \%options, $class;
     }
 
     sub fatal_error {
@@ -83,6 +72,17 @@ package Sidef::Parser {
         $index += ($index == -1) ? (length($opt{'code'})) : -$opt{'pos'};
 
         die "\n** Syntax error at line $self->{line}, near:\n\t\"", substr($opt{'code'}, $opt{'pos'}, $index), "\"\n";
+    }
+
+    sub find_var {
+        my ($self, $var_name) = @_;
+
+        foreach my $var (@{$self->{vars}}, @{$self->{ref_vars_refs}}) {
+            next if ref $var eq 'ARRAY';
+            return $var if $var->{name} eq $var_name;
+        }
+
+        return;
     }
 
     sub get_method_name {
@@ -188,11 +188,7 @@ package Sidef::Parser {
 
                 # Double quoted string
                 when (/\G$self->{re}{double_quote}/gc) {
-
-                    my $string = $1;
-                    $self->check_variables($string);
-
-                    return Sidef::Types::String::Double->new($string), pos;
+                    return Sidef::Types::String::Double->new($1), pos;
                 }
 
                 # Single quoted string
@@ -231,7 +227,6 @@ package Sidef::Parser {
                     my $regex = $1;
                     my ($flags) = (/\G($self->{re}{match_flags})/gc);
 
-                    $self->check_variables($regex);
                     return Sidef::Types::Regex::Regex->new($regex, $flags), pos;
                 }
 
@@ -275,21 +270,24 @@ package Sidef::Parser {
                     }
 
                     my $variable = Sidef::Variable::Variable->new($name, $type);
-                    $self->{variables}{$self->{class}}{$name} = {
-                                                                 obj   => $variable,
-                                                                 name  => $name,
-                                                                 count => 0,
-                                                                 line  => $self->{line},
-                                                                };
+
+                    unshift @{$self->{vars}},
+                      {
+                        obj   => $variable,
+                        name  => $name,
+                        count => 0,
+                        line  => $self->{line},
+                      };
+
                     return $variable, pos;
                 }
 
                 # Variable call
                 when (/\G($self->{re}{var_name})/goc) {
 
-                    if (exists $self->{variables}{$self->{class}}{$1}) {
-                        $self->{variables}{$self->{class}}{$1}{count}++;
-                        return $self->{variables}{$self->{class}}{$1}{obj}, pos;
+                    if (defined(my $var = $self->find_var($1))) {
+                        $var->{count}++;
+                        return $var->{obj}, pos;
                     }
 
                     warn "Attempt to use an uninitialized variable: <$1>\n";
@@ -358,11 +356,25 @@ package Sidef::Parser {
                     pos($_) = $pos + pos($_);
                 }
                 when (/\G\{/gc) {
+
                     $self->{has_object}    = 0;
                     $self->{expect_method} = 0;
                     $self->{curly_brackets}++;
+
+                    my $ref   = $self->{vars};
+                    my $count = scalar(@{$self->{vars}});
+
+                    unshift @{$self->{ref_vars_refs}}, @{$ref};
+                    unshift @{$self->{vars}}, [];
+
+                    $self->{vars} = $self->{vars}[0];
+
                     my ($obj, $pos) = $self->parse_script(code => substr($_, pos));
                     pos($_) = $pos + pos;
+
+                    splice @{$self->{ref_vars_refs}}, 0, $count;
+                    $self->{vars} = $ref;
+
                     return $obj, pos;
                 }
             }
@@ -397,9 +409,15 @@ package Sidef::Parser {
                 # We make some checks, and return the \%struct hash ref.
                 when (/\G\z/) {
 
-                    while (my (undef, $class_var) = each %{$self->{variables}}) {
-                        while (my (undef, $variable) = each %{$class_var}) {
-                            if ($variable->{name} ne uc($variable->{name}) and $variable->{count} == 0) {
+                    my $check_vars;
+                    $check_vars = sub {
+                        my ($array_ref) = @_;
+
+                        foreach my $variable (@{$array_ref}) {
+                            if (ref $variable eq 'ARRAY') {
+                                $check_vars->($variable);
+                            }
+                            elsif ($variable->{name} ne uc($variable->{name}) and $variable->{count} == 0) {
                                 warn "Variable '$variable->{name}' has been initialized"
                                   . " at line $variable->{line}, but not used again!\n";
                             }
@@ -407,7 +425,10 @@ package Sidef::Parser {
                                 warn "Variable '$variable->{name} is used $variable->{count} times!\n";
                             }
                         }
-                    }
+
+                    };
+
+                    $check_vars->($self->{ref_vars});
 
                     return \%struct;
                 }
@@ -451,6 +472,7 @@ package Sidef::Parser {
                             warn "Unbalanced right brackets!\n";
                             $self->fatal_error(code => $_, pos => pos($_) - 1);
                         }
+
                         $self->{has_object}    = 1;
                         $self->{expect_method} = 1;
                         return (\%struct, pos);

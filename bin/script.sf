@@ -63,8 +63,8 @@ var x = "RaNdOm StRiNg"->lc;   # WRONG!!!
 var y = ("RaNdOm StRiNg"->lc); # RIGHT!!!
 var z = "\LRaNdOm StRiNg";     # Also, right.
 
-var lang = "Sidef";
-"\nJust another $lang hacker,"->say;
+#var lang = "Sidef";
+#"\nJust another $lang hacker,"->say;
 
 "\nescaped variable: \$var\n"->say;
 
@@ -203,13 +203,13 @@ regex -> to_s -> say;                               # prints the regex
 
 '-' * 80 -> say;
 
-var re = '\w';
-"test" =~ /\d$re/ -> to_s->say;                  # false
-"3d" =~ /\d$re/   -> to_s->say;                  # true
+#var re = '\w';
+#"test" =~ /\d$re/ -> to_s->say;                  # false
+#"3d" =~ /\d$re/   -> to_s->say;                  # true
 
-/\d$re/->to_s->say;                              # prints the regex
+#/\d$re/->to_s->say;                              # prints the regex
 
-'-' * 80 -> say;
+#'-' * 80 -> say;
 
 #######################################################
 
@@ -362,8 +362,6 @@ var block = {
 
 block->if(true);            # execute the block
 block->if(false);           # don't execute the block
-
-private[1]->to_s->say;      # this is a bug which should be fixed!
 
 block.run.say;
 

@@ -12,6 +12,8 @@ package Sidef::Types::Number::Number {
         bless \$num, $class;
     }
 
+    sub _get_number { ${$_[0]} }
+
     {
         no strict 'refs';
 

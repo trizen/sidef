@@ -12,6 +12,8 @@ package Sidef::Types::Array::Array {
         bless \@items, $class;
     }
 
+    sub _get_array { [@{$_[0]}] }
+
     {
         no strict 'refs';
         *{__PACKAGE__ . '::' . '-'} = sub {
@@ -22,7 +24,7 @@ package Sidef::Types::Array::Array {
             foreach my $item (@{$self}) {
 
                 my $exists = 0;
-                foreach my $min_item (@{$array}) {
+                foreach my $min_item (@{$array->_get_array}) {
                     if ($min_item->get_value eq $item->get_value) {
                         $exists = 1;
                         last;
@@ -37,7 +39,7 @@ package Sidef::Types::Array::Array {
 
         *{__PACKAGE__ . '::' . '+'} = sub {
             my ($self, $array) = @_;
-            __PACKAGE__->new(@{$self}, @{$array});
+            __PACKAGE__->new(@{$self}, @{$array->_get_array});
         };
 
         *{__PACKAGE__ . '::' . '++'} = sub {
@@ -91,11 +93,11 @@ package Sidef::Types::Array::Array {
 
     sub join {
         my ($self, $separator) = @_;
-        Sidef::Types::String::String->new(CORE::join($$separator, @{$self}));
+        Sidef::Types::String::String->new(CORE::join($separator->_get_string, @{$self}));
     }
 
     sub reverse {
-        my ($self, $separator) = @_;
+        my ($self) = @_;
         __PACKAGE__->new(reverse @{$self});
     }
 

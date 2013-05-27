@@ -4,11 +4,12 @@ use 5.014;
 use strict;
 use warnings;
 
-binmode (STDOUT, ':utf8');
-binmode (STDERR, ':utf8');
+binmode(STDOUT, ':utf8');
+binmode(STDERR, ':utf8');
 
 use lib '../lib';    # devel only
-use autouse 'Getopt::Std' => qw(getopts($;$));    # arguments support
+use autouse 'Getopt::Std' => qw(getopts($;$));       # arguments support
+use autouse 'Encode'      => qw(decode_utf8($;$));
 
 my %args;
 if (qr/^-/ ~~ \@ARGV) {
@@ -77,7 +78,7 @@ else {
       }
       : join(' ', <>);
 
-    my $arguments = @ARGV ? (q{'} . join(q{','}, (map { s/'/\\'/gr } @ARGV)) . q{'}) : '';
+    my $arguments = @ARGV ? (q{'} . decode_utf8(join(q{','}, (map { s/'/\\'/gr } @ARGV))) . q{'}) : '';
 
     #
     ## Predeclared variables and constants

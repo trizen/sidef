@@ -1,0 +1,17 @@
+#!/usr/bin/ruby
+
+var x = 'o';
+
+{
+    x.say;              # o
+    var x = 'm';
+    x.say;              # m
+    {
+        x.say;          # m
+        var x = 'b';
+        x.say;          # b
+    }.run;
+    x.say;              # m
+}.run;
+
+x.say;                  # o

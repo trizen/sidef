@@ -12,6 +12,8 @@ package Sidef::Types::String::String {
         bless \$str, $class;
     }
 
+    sub _get_string { ${$_[0]} }
+
     {
         no strict 'refs';
 
@@ -20,23 +22,23 @@ package Sidef::Types::String::String {
         };
 
         *{__PACKAGE__ . '::' . '*'} = sub {
-            __PACKAGE__->new($_[0] x $_[1]);
+            __PACKAGE__->new($_[0]->_get_string x $_[1]->_get_number);
         };
 
         *{__PACKAGE__ . '::' . '+'} = sub {
-            __PACKAGE__->new($_[0] . $_[1]);
+            __PACKAGE__->new($_[0] . $_[1]->_get_string);
         };
 
         *{__PACKAGE__ . '::' . '=='} = sub {
-            Sidef::Types::Bool::Bool->new($_[0] eq $_[1]);
+            Sidef::Types::Bool::Bool->new($_[0]->_get_string eq $_[1]->_get_string);
         };
 
         *{__PACKAGE__ . '::' . '--'} = sub {
-            __PACKAGE__->new(substr($_[0], 0, -1));
+            __PACKAGE__->new(substr($_[0]->_get_string, 0, -1));
         };
 
         *{__PACKAGE__ . '::' . '..'} = sub {
-            Sidef::Types::Array::Array->new(${$_[0]} .. ${$_[1]});
+            Sidef::Types::Array::Array->new($_[0]->_get_string .. $_[1]->_get_string);
         };
     }
 
@@ -78,8 +80,8 @@ package Sidef::Types::String::String {
         my @str = CORE::split(//, $$self);
         my $str_len = $#str;
 
-        $offs = $$offs;
-        $len = $$len if defined $len;
+        $offs = $offs->_get_number;
+        $len = $len->_get_number if defined $len;
 
         $offs = 1 + $str_len + $offs if $offs < 0;
         $len = defined $len ? $len < 0 ? $str_len + $len : $offs + $len - 1 : $str_len;
@@ -90,15 +92,15 @@ package Sidef::Types::String::String {
     sub insert {
         my ($self, $string, $pos, $len) = @_;
 
-        $$len ||= 0;
-        CORE::substr($$self, $$pos, $$len, $$string);
+        $len //= Sidef::Types::Number::Number->new(0);
+        CORE::substr($$self, $pos->_get_number, $len->_get_number, $string->_get_string);
 
         return $self;
     }
 
     sub join {
         my ($self, $delim, @rest) = @_;
-        __PACKAGE__->new(CORE::join($$delim, $$self, map { $$_ } @rest));
+        __PACKAGE__->new(CORE::join($delim->_get_string, $$self, map { $_->_get_string } @rest));
     }
 
     sub ord {
@@ -122,7 +124,7 @@ package Sidef::Types::String::String {
     }
 
     sub printf {
-        my($self, @arguments) = @_;
+        my ($self, @arguments) = @_;
         Sidef::Types::Bool::Bool->new(CORE::printf $$self, @arguments);
     }
 
