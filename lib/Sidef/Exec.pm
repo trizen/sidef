@@ -129,6 +129,7 @@ package Sidef::Exec {
 
                         }
 
+                        $self_obj //= Sidef::Types::Nil::Nil->new();
                         $self_obj = $self_obj->$method(@arguments);
 
                         if (ref $self_obj eq 'Sidef::Variable::Variable') {
@@ -141,6 +142,7 @@ package Sidef::Exec {
                             $self_obj = $self_obj->get_value;
                         }
 
+                        $self_obj //= Sidef::Types::Nil::Nil->new();
                         $self_obj = $self_obj->$method;
 
                         if (ref $self_obj eq 'Sidef::Variable::Variable') {

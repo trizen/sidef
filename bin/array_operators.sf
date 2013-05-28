@@ -54,14 +54,30 @@ m_array.to_s.say;
 
 ######################################################
 
-var new_array = (array.map {
-    _->say;
-});
+var new_array = (array.map{ _ <= "h" });
 
 new_array[0] = "hei";
 new_array[2] = "hu";
 
 var end = 1;
-new_array[end * -1] = "end";
+new_array[end * -1] = "The end";
 
-new_array->to_s->say;
+new_array->join(', ')->say;
+
+######################################################
+
+'-' * 80 say;
+
+#
+## Array concatenation
+#
+
+{
+    var array = ["a", "b", "c"];
+    array += ["d", "e", "f"];
+    array.to_s.say;
+}.run;
+
+######################################################
+
+'-' * 80 say;

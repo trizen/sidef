@@ -60,6 +60,37 @@ package Sidef::Types::Block::Code {
         return $results[-1];
     }
 
+    sub call {
+        my ($self, @args) = @_;
+
+        my @results;
+
+        foreach my $class (keys %{$self}) {
+
+            my $argc = 0;
+            my @vars = @{$self->{$class}}[1 .. $#args + 1];
+
+            foreach my $var (@vars) {
+                if (   ref $var ne 'HASH'
+                    or exists $var->{call}
+                    or exists $var->{arg}
+                    or ref $var->{self} ne 'Sidef::Variable::Variable') {
+                    warn
+"[WARN] Too many arguments in function call! Expected $argc, but got ${\(scalar @vars)} of them.\n";
+                    last;
+                }
+
+                ++$argc;
+                my $var_ref = $exec->execute_expr(expr => $var, class => $class);
+                $var_ref->set_value(shift @args);
+            }
+
+            push @results, $exec->execute(struct => $self);
+        }
+
+        return $results[-1];
+    }
+
     sub if {
         my ($self, $bool) = @_;
 

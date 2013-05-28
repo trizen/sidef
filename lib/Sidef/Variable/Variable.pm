@@ -59,7 +59,7 @@ package Sidef::Variable::Variable {
                 if (not defined $self->{value}) {
                     return $self->set_value($obj);
                 }
-                warn "Constant $self->{name} cannot be changed.\n";
+                warn "Constant '$self->{name}' cannot be changed.\n";
             }
             elsif ($self->{type} eq "var") {
                 return $self->set_value($obj);
@@ -70,9 +70,17 @@ package Sidef::Variable::Variable {
             elsif ($self->{type} eq "byte") {
                 return $self->set_value($obj->to_bytes);
             }
-            else {
-                warn "Invalid type: $self->{type}.\n";
+            elsif ($self->{type} eq 'func') {
+                if (ref $obj eq 'Sidef::Types::Block::Code') {
+                    return $self->set_value($obj);
+                }
+                warn "Can't assign object of type '", ref($obj), "' in a function variable!\n";
             }
+            else {
+                warn "Invalid variable type: '$self->{type}'.\n";
+            }
+
+            return $obj;
         };
 
         *{__PACKAGE__ . '::' . ':='} = sub {

@@ -62,7 +62,9 @@ package Sidef::Parser {
             },
         );
 
-        $options{ref_vars} = $options{vars};
+        $options{ref_vars}         = $options{vars};
+        $options{expect_func_call} = 0;
+
         bless \%options, $class;
     }
 
@@ -262,11 +264,11 @@ package Sidef::Parser {
                     my ($obj, $pos) = $self->parse_block(code => substr($_, pos));
                     pos($_) = $pos + pos;
 
-                    return Sidef::Types::Block::Code->new($obj), pos;
+                    return $obj, pos;
                 }
 
                 # Declaration of variable types (var, const, char, etc...)
-                when (/\G(var|const|char|byte)\h+($self->{re}{var_name})/goc) {
+                when (/\G(var|const|char|byte|func)\h+($self->{re}{var_name})/goc) {
                     my $type = $1;
                     my $name = $2;
 
@@ -283,8 +285,26 @@ package Sidef::Parser {
                         obj   => $variable,
                         name  => $name,
                         count => 0,
+                        type  => $type,
                         line  => $self->{line},
                       };
+
+                    if ($type eq 'func') {
+
+                        # Check the declared parameters
+                        if (/\G\s*\(((?:$self->{re}{var_name}(?:\s*,\s*$self->{re}{var_name})*)?)\)\s*\{/gcs) {
+
+                            my $params = join('', map { "var $_;" } split(/\s*,\s*/, $1));
+                            my ($obj, $pos) = $self->parse_block(code => '{' . $params . substr($_, pos));
+                            pos($_) += $pos - (length($params) + 1);
+
+                            $variable->set_value($obj);
+                        }
+                        else {
+                            warn "Invalid declaration of a function! Expected: func $name(...){...}\n";
+                            $self->fatal_error(code => $_, pos => pos($_));
+                        }
+                    }
 
                     return $variable, pos;
                 }
@@ -296,6 +316,13 @@ package Sidef::Parser {
 
                     if ($var) {
                         $var->{count}++;
+
+                        if ($var->{type} eq 'func') {
+                            if (/\G(?=\s*\()/) {
+                                $self->{expect_func_call} = 1;
+                            }
+                        }
+
                         return $var->{obj}, pos;
                     }
 
@@ -384,7 +411,7 @@ package Sidef::Parser {
                     splice @{$self->{ref_vars_refs}}, 0, $count;
                     $self->{vars} = $ref;
 
-                    return $obj, pos;
+                    return Sidef::Types::Block::Code->new($obj), pos;
                 }
             }
         }
@@ -399,6 +426,14 @@ package Sidef::Parser {
                 if (/\G/gc
                     && defined(my $pos = $self->parse_whitespace(code => substr($_, pos)))) {
                     pos($_) = $pos + pos;
+                }
+
+                # Automatically add  the '.call' method when a function is called
+                when ($self->{expect_func_call} == 1) {
+                    my $pos = pos($_);
+                    substr($_, $pos, 0, '.call');
+                    pos($_) = $pos;
+                    continue;
                 }
 
                 # Class declaration
@@ -450,6 +485,14 @@ package Sidef::Parser {
                     my ($method_name, $pos) = $self->get_method_name(code => substr($_, pos));
                     pos($_) = $pos + pos;
                     push @{$struct{$self->{class}}[-1]{call}}, {name => $method_name};
+
+                    # Remove the automatically added '.call' method
+                    if ($self->{expect_func_call} == 1) {
+                        my $old_pos = pos();
+                        substr($_, $old_pos - 5, 5, '');
+                        pos($_) = $old_pos - 5;
+                        $self->{expect_func_call} = 0;
+                    }
 
                     redo;
                 }

@@ -1,0 +1,63 @@
+#!/usr/bin/ruby
+
+func say_hi (greeting) {
+    greeting.say;                   # prints "hello"
+    "world";
+};
+
+
+var result = ( say_hi("hello") );
+result.say;                         # print "world"
+
+##############################################################
+
+#
+## Fibonacci sequence
+#
+
+func fibonacci () {                 # note that () is empty,
+    var i; var j; var count;        # but we can declare the parameters here
+
+    var old_j = j;
+    j = (i+j);
+    i = old_j;
+
+    "%d ".printf(i);
+    count-- > 0 && {fibonacci(i, j)};
+
+    i;
+};
+
+##############################################################
+
+'--------------------------------------------------------------------------------' say;
+
+var fib = ( fibonacci(0, 1, 14) );
+
+"\n" +
+'--------------------------------------------------------------------------------' say;
+
+"Fourteenth number in the fibonacci sequence is: %d\n"->printf(fib);
+
+'--------------------------------------------------------------------------------' say;
+
+fibonacci(0,1, 15).to_s.say;
+
+'--------------------------------------------------------------------------------' say;
+
+##############################################################
+
+#
+## Function overwriting
+#
+
+fibonacci = {
+    var string;
+    string.say;
+};
+
+fibonacci("The fibonacci function has been replaced succesfully.");
+
+'-' * 80 say;
+
+##############################################################
