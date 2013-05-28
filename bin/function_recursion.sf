@@ -1,0 +1,16 @@
+#!/usr/bin/ruby
+
+#
+## Don't change the last value of a variable,
+## when fewer arguments are specified in a function call.
+#
+
+func recurse (i, greeting) {
+
+    greeting.say;
+
+    i-- > 4 && {recurse(i, "Hello Sidef!")} ||              # when i  > 4, print "Hello Sidef"
+    {i >= 0 && {greeting = "Hello to me!"; recurse(i)}};    # when i >= 0, change the greeting var, and recurse with one argument
+};
+
+recurse(10, "Hello world!");
