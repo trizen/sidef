@@ -13,16 +13,17 @@ package Sidef::Parser {
         my ($class) = @_;
 
         my %options = (
-            line          => 1,
-            has_object    => 0,
-            expect_method => 0,
-            expect_index  => 0,
-            expect_arg    => 0,
-            parentheses   => 0,
-            class         => 'main',
-            vars          => [],
-            ref_vars_refs => [],
-            re            => {
+            line             => 1,
+            has_object       => 0,
+            expect_method    => 0,
+            expect_index     => 0,
+            expect_arg       => 0,
+            expect_func_call => 0,
+            parentheses      => 0,
+            class            => 'main',
+            vars             => [],
+            ref_vars_refs    => [],
+            re               => {
                 double_quote       => Sidef::Utils::Regex::make_esc_delim(q{"}),
                 single_quote       => Sidef::Utils::Regex::make_esc_delim(q{'}),
                 file_quote         => Sidef::Utils::Regex::make_esc_delim(q{~}),
@@ -62,8 +63,7 @@ package Sidef::Parser {
             },
         );
 
-        $options{ref_vars}         = $options{vars};
-        $options{expect_func_call} = 0;
+        $options{ref_vars} = $options{vars};
 
         bless \%options, $class;
     }
@@ -301,7 +301,7 @@ package Sidef::Parser {
                             $variable->set_value($obj);
                         }
                         else {
-                            warn "Invalid declaration of a function! Expected: func $name(...){...}\n";
+                            warn "Invalid declaration of function '$name'! Expected: func $name(...){...}\n";
                             $self->fatal_error(code => $_, pos => pos($_));
                         }
                     }

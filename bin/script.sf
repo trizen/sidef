@@ -74,7 +74,7 @@ var z = "\LRaNdOm StRiNg";     # Also, right.
 
 var single = 'this is a test -- $y -- \n';
 single->say;
-(single->to_sd)->say;
+(single->to_sd, "hello".say)->say;
 
 # -----------------------------------------------
 
@@ -355,6 +355,8 @@ array_test->to_s->say;
 array_test[0,1] = "x";      # set both elements to string "x"
 array_test->to_s->say;
 array_test[0,1] = ["y"];    # set the first element to string "y", and the second element to undef
+array_test[123] = "v";
+array_test[120].to_bool.is_true.to_s.say;
 
 #######################################################
 

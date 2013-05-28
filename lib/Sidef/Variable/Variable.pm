@@ -74,7 +74,8 @@ package Sidef::Variable::Variable {
                 if (ref $obj eq 'Sidef::Types::Block::Code') {
                     return $self->set_value($obj);
                 }
-                warn "Can't assign object of type '", ref($obj), "' in a function variable!\n";
+                warn "Can't assign the '", ref($obj), "' object to the function '$self->{name}'!\n"
+                  . "I was expecting an object of type 'Sidef::Types::Block::Code' instead.\n";
             }
             else {
                 warn "Invalid variable type: '$self->{type}'.\n";

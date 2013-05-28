@@ -75,8 +75,8 @@ package Sidef::Types::Block::Code {
                     or exists $var->{call}
                     or exists $var->{arg}
                     or ref $var->{self} ne 'Sidef::Variable::Variable') {
-                    warn
-"[WARN] Too many arguments in function call! Expected $argc, but got ${\(scalar @vars)} of them.\n";
+                    warn "[WARN] Too many arguments in function call!",
+                      " Expected $argc, but got ${\(scalar @vars)} of them.\n";
                     last;
                 }
 

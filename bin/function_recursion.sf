@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## Don't change the last value of a variable,
+## Doesn't change the last value of a variable,
 ## when fewer arguments are specified in a function call.
 #
 
