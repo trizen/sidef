@@ -101,6 +101,21 @@ package Sidef::Types::Block::Code {
         return $bool;
     }
 
+    sub given {
+        my ($self) = @_;
+
+        if (ref $self eq 'Sidef::Types::Block::Code') {
+            my @results = $exec->execute(struct => $self);
+            $self = $results[-1];
+
+            if (ref $self eq 'Sidef::Variable::Variable') {
+                $self = $self->get_value;
+            }
+        }
+
+        Sidef::Types::Block::Switch->new($self);
+    }
+
     sub for {
         my ($self, $arg) = @_;
 

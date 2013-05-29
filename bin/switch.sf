@@ -1,0 +1,82 @@
+#!/usr/bin/perl
+
+var value = "sidef";
+
+{value}.given
+    when ("x") do {
+        "Not the right place! (1)".say;
+    }
+    when ("sidef") do {
+        "Right place! (1)".say;
+    }
+    when ("y") do {
+        "Not the right place! (2)".say;
+    }
+    default {
+        "Not the right place! (3)".say;
+    }
+end;
+
+
+{value}.given
+    when (3) do {
+        "Not the right place! (1)".say;
+    }
+    when ([5,2]) do {
+        "Not the right place! (2)".say;
+    }
+    when ("sidef") do {
+        "Right place! (2)".say;
+    }
+    default {
+        "Not the right place! (3)".say;
+    }
+end;
+
+
+{value}.given
+    when {"x"} do {
+        "Not the right place! (1)".say;
+    }
+    when {"y"} do {
+        "Not the right place! (2)".say;
+    }
+    when ("z") do {
+        "Not the right place! (3)".say;
+    }
+    default {
+        "Right place! (3)".say;
+    }
+end;
+
+
+{value}.given
+    when {"x"} do {
+        "Not the right place! (1)".say;
+    }
+    when "y" do {
+        "Not the right place! (2)".say;
+    }
+    when {"sidef"} do {
+        "Right place! (4)".say;
+    }
+    default {
+        "Not the right place! (3)".say;
+    }
+end;
+
+
+{[8,9,10]}.given
+    when "x" do {
+        "Not the right place! (1)".say;
+    }
+    when [6,7,8] do {
+        "Not the right place! (2)".say;
+    }
+    when [8,9,10] do {
+        "Right place! (5)".say;
+    }
+    when [42] do {
+        "Not the right place! (3)".say;
+    }
+end;

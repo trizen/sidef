@@ -54,6 +54,35 @@ package Sidef::Types::Array::Array {
             $self;
         };
 
+        *{__PACKAGE__ . '::' . '=='} = sub {
+            my ($self, $array) = @_;
+
+            if ($#{$self} != $#{$array->_get_array}) {
+                return Sidef::Types::Bool::Bool->false;
+            }
+
+            foreach my $i (0 .. $#{$self}) {
+
+                my ($x, $y) = ($self->[$i]->get_value, $array->[$i]->get_value);
+
+                if (ref($x) eq ref($y)) {
+                    my $method = '==';
+
+                    if (defined $x->can($method)) {
+                        if (not $x->$method($y)) {
+                            return Sidef::Types::Bool::Bool->false;
+                        }
+                    }
+
+                }
+                else {
+                    return Sidef::Types::Bool::Bool->false;
+                }
+            }
+
+            return Sidef::Types::Bool::Bool->true;
+        };
+
         *{__PACKAGE__ . '::' . '='} = sub {
             my ($self, $arg) = @_;
 
