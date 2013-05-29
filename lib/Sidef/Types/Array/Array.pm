@@ -12,47 +12,84 @@ package Sidef::Types::Array::Array {
         bless [map { Sidef::Variable::Variable->new(rand, 'var', $_) } @items], $class;
     }
 
-    sub _get_array { [@{$_[0]}] }
+    sub _is_array {
+        my ($self, $obj) = @_;
+
+        if (not defined $obj->can('_is_array')) {
+            warn "[WARN] Expected an array object, but got '", ref($obj), "'.\n";
+            return;
+        }
+
+        return 1;
+    }
+
+    sub _grep {
+        my ($self, $array, $bool) = @_;
+        my $new_array = ref($self)->new();
+
+        $self->_is_array($array) || return ($self);
+
+        foreach my $item (@{$self}) {
+
+            my $exists = 0;
+            my $value  = $item->get_value;
+
+            if ($array->contains($value)) {
+                $exists = 1;
+            }
+
+            $new_array->push($value) if ($exists - $bool);
+        }
+
+        $new_array;
+    }
 
     {
         no strict 'refs';
         *{__PACKAGE__ . '::' . '-'} = sub {
-
             my ($self, $array) = @_;
-            my $new_array = __PACKAGE__->new();
+            $self->_grep($array, 1);
+        };
 
-            foreach my $item (@{$self}) {
+        *{__PACKAGE__ . '::' . '&'} = sub {
+            my ($self, $array) = @_;
+            $self->_grep($array, 0);
+        };
 
-                my $exists = 0;
-                foreach my $min_item (@{$array->_get_array}) {
+        *{__PACKAGE__ . '::' . '|'} = sub {
+            my ($self, $array) = @_;
+            my $new_array = ref($self)->new;
 
-                    my ($x, $y) = ($item->get_value, $min_item->get_value);
+            $self->_is_array($array) || return;
 
-                    if (ref($x) eq ref($y)) {
-                        my $method = '==';
-                        if (defined $x->can($method)) {
-                            if ($x->$method($y)) {
-                                $exists = 1;
-                                last;
-                            }
-                        }
-                    }
-                }
+            my $add = '+';
+            my $xor = '^';
+            my $and = '&';
+            $self->$xor($array)->$add($self->$and($array));
+        };
 
-                $new_array->push($item->get_value) if not $exists;
-            }
+        *{__PACKAGE__ . '::' . '^'} = sub {
+            my ($self, $array) = @_;
+            my $new_array = ref($self)->new;
 
-            return $new_array;
+            $self->_is_array($array) || return;
+
+            my $add    = '+';
+            my $and    = '&';
+            my $substr = '-';
+            ($self->$add($array))->$substr($self->$and($array));
         };
 
         *{__PACKAGE__ . '::' . '+'} = sub {
             my ($self, $array) = @_;
-            __PACKAGE__->new(map { $_->get_value } @{$self}, @{$array->_get_array});
+
+            $self->_is_array($array) || return ($self);
+            __PACKAGE__->new(map { $_->get_value } @{$self}, @{$array});
         };
 
         *{__PACKAGE__ . '::' . '++'} = sub {
             my ($self, $obj) = @_;
-            $self->push(ref $obj ? $obj : Sidef::Types::Nil::Nil->new());
+            $self->push($obj);
             $self;
         };
 
@@ -62,12 +99,14 @@ package Sidef::Types::Array::Array {
             $self;
         };
 
-        *{__PACKAGE__ . '::' . '&'} = sub {
+        *{__PACKAGE__ . '::' . '&&'} = sub {
             my ($self, $array) = @_;
 
-            my $min = $#{$self} > $#{$array->_get_array} ? $#{$array} : $#{$self};
+            $self->_is_array($array) || return ($self);
 
-            my $new_array = __PACKAGE__->new();
+            my $min = $#{$self} > $#{$array} ? $#{$array} : $#{$self};
+
+            my $new_array = ref($self)->new();
             foreach my $i (0 .. $min) {
                 $new_array->push($self->[$i]->get_value, $array->[$i]->get_value);
             }
@@ -89,7 +128,9 @@ package Sidef::Types::Array::Array {
         *{__PACKAGE__ . '::' . '=='} = sub {
             my ($self, $array) = @_;
 
-            if ($#{$self} != $#{$array->_get_array}) {
+            $self->_is_array($array) || return ($self);
+
+            if ($#{$self} != $#{$array}) {
                 return Sidef::Types::Bool::Bool->false;
             }
 
@@ -183,6 +224,25 @@ package Sidef::Types::Array::Array {
         $self;
     }
 
+    sub contains {
+        my ($self, $obj) = @_;
+
+        foreach my $var (@{$self}) {
+
+            my $item = $var->get_value;
+            if (ref($item) eq ref($obj)) {
+                my $method = '==';
+                if (defined $item->can($method)) {
+                    if ($item->$method($obj)) {
+                        return Sidef::Types::Bool::Bool->true;
+                    }
+                }
+            }
+        }
+
+        Sidef::Types::Bool::Bool->false;
+    }
+
     sub pop {
         my ($self) = @_;
         pop @{$self};
@@ -212,7 +272,7 @@ package Sidef::Types::Array::Array {
 
     sub reverse {
         my ($self) = @_;
-        __PACKAGE__->new(reverse @{$self});
+        ref($self)->new(reverse map { $_->get_value } @{$self});
     }
 
 }

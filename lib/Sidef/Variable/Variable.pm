@@ -109,62 +109,6 @@ package Sidef::Variable::Variable {
             return $arg;
         };
 
-        *{__PACKAGE__ . '::' . '+='} = sub {
-            my ($self, $arg) = @_;
-
-            my ($method) = '+';
-            $self->set_value($self->get_value->$method($arg));
-            $self;
-        };
-
-        *{__PACKAGE__ . '::' . '-='} = sub {
-            my ($self, $arg) = @_;
-
-            my ($method) = '-';
-            $self->set_value($self->get_value->$method($arg));
-            $self;
-        };
-
-        *{__PACKAGE__ . '::' . '%='} = sub {
-            my ($self, $arg) = @_;
-
-            my ($method) = '%';
-            $self->set_value($self->get_value->$method($arg));
-            $self;
-        };
-
-        *{__PACKAGE__ . '::' . '*='} = sub {
-            my ($self, $arg) = @_;
-
-            my ($method) = '*';
-            $self->set_value($self->get_value->$method($arg));
-            $self;
-        };
-
-        *{__PACKAGE__ . '::' . '/='} = sub {
-            my ($self, $arg) = @_;
-
-            my ($method) = '/';
-            $self->set_value($self->get_value->$method($arg));
-            $self;
-        };
-
-        *{__PACKAGE__ . '::' . '&='} = sub {
-            my ($self, $arg) = @_;
-
-            my ($method) = '&';
-            $self->set_value($self->get_value->$method($arg));
-            $self;
-        };
-
-        *{__PACKAGE__ . '::' . '**='} = sub {
-            my ($self, $arg) = @_;
-
-            my ($method) = '**';
-            $self->set_value($self->get_value->$method($arg));
-            $self;
-        };
-
         *{__PACKAGE__ . '::' . '++'} = sub {
             my ($self, $arg) = @_;
 
@@ -180,6 +124,18 @@ package Sidef::Variable::Variable {
             $self->set_value($self->get_value->$method);
             $self;
         };
+
+        foreach my $operator (qw(+ - % * / & | ^ ** && || )) {
+
+            *{__PACKAGE__ . '::' . $operator . '='} = sub {
+                my ($self, $arg) = @_;
+
+                my ($method) = $operator;
+                $self->set_value($self->get_value->$method($arg));
+                $self;
+            };
+
+        }
 
     }
 };
