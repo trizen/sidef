@@ -1,0 +1,18 @@
+#!/usr/bin/perl
+
+func encipher (msg, key, decode) {
+
+        decode && {key = (26 - key)};           # seems that we need the '=-' operator.
+
+        msg.map {
+            _.ord - 65 + key % 26 + 65 . chr;   # no need to worry about the operators precedence.
+        }.join('').to_chars;
+};
+
+char msg = 'SIDEF';
+
+var enc = ( encipher(msg, 10, false) );
+var dec = ( encipher(enc, 10, true)  );
+
+enc.join('').say;
+dec.join('').say;

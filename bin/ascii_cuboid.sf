@@ -1,0 +1,57 @@
+#!/usr/bin/ruby
+
+# usage: script X Y Z [S]
+
+func cuboid (x, y, z, s) {
+ 
+    var c = '+';
+    var h = '-';
+    var v = '|';
+    var d = '/';
+ 
+    ' ' * (z + 1) + c + (h * x) + c . say;
+
+    {
+        var i = _;
+        ' ' * (z - i + 1) + d + (s * x)
+        + d + (s * (i - (
+        i > y ? {i - y}
+              : {1}
+        ))) + (
+        i - 1 == y ? {c}
+                   : {i > y ? {d}
+                            : {v}
+                      })
+        . say;
+    } for (1 .. z);
+
+    c + (h * x) + c + ((s * (z < y
+        ? {z} : {y})) + (z < y
+        ? {v} : {z == y
+        ? {c} : {d}}))
+    . say;
+
+    {
+        var i = _;
+        v + (s * x) + v + (z > y
+            ? {i >= z
+                ? {s * x + c}
+                : {s * (y - i) + d}}
+            : {y - i > z
+                ? {s * z + v}
+                : {s * (y - i) + (y - i == z
+                    ? {c}
+                    : {d})}
+              })
+        . say
+    } for (1 .. y);
+
+   c + (h * x) + c . say;
+};
+
+var x = (ARGV[0] \\ 2);
+var y = (ARGV[1] \\ 3);
+var z = (ARGV[2] \\ 3);
+var s = (ARGV[3] \\ ' ');
+
+cuboid(x.to_i,y.to_i,z.to_i,s);

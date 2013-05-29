@@ -1,0 +1,8 @@
+#!/usr/bin/perl
+
+func f (i) { i != 0 ? { i * (f(i-1)) } : {1} };
+func c (n) { (f(2*n)) / (f(n)) / (f(n+1)) };
+
+{
+    "%d\t%s\n".printf(_, c(_));
+} for (0..15);

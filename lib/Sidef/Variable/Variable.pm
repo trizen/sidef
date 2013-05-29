@@ -19,6 +19,12 @@ package Sidef::Variable::Variable {
               }, $class;
     }
 
+    sub is_defined {
+        my ($self) = @_;
+        defined $self->{value}
+          and ref $self->{value} ne 'Sidef::Types::Nil::Nil';
+    }
+
     sub get_name {
         my ($self) = @_;
         $self->{name};
@@ -87,12 +93,20 @@ package Sidef::Variable::Variable {
         *{__PACKAGE__ . '::' . ':='} = sub {
             my ($self, $obj) = @_;
 
-            if (not defined $self->{value} or ref $self->{value} eq 'Sidef::Types::Nil::Nil') {
+            if (not $self->is_defined) {
                 my $method = \&{__PACKAGE__ . '::' . '='};
                 return $self->$method($obj);
             }
 
             return $self->{value};
+        };
+
+        *{__PACKAGE__ . '::' . '\\\\'} = sub {
+            my ($self, $arg) = @_;
+            if ($self->is_defined) {
+                return $self;
+            }
+            return $arg;
         };
 
         *{__PACKAGE__ . '::' . '+='} = sub {

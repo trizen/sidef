@@ -121,6 +121,16 @@ package Sidef::Convert::Convert {
         my ($self) = @_;
         Sidef::Types::Array::Array->new($self);
     }
+
+    sub is_type {
+        my ($self, $obj) = @_;
+
+        if (ref $self eq ref $obj) {
+            return Sidef::Types::Bool::Bool->true;
+        }
+
+        Sidef::Types::Bool::Bool->false;
+    }
 }
 
 1;

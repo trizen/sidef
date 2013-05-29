@@ -105,9 +105,13 @@ package Sidef::Types::Block::Code {
         my ($self, $arg) = @_;
 
         if (ref $arg eq 'Sidef::Types::Array::Array') {
-
-            foreach my $i (0 .. $#{$arg}) {
-                $exec->execute(struct => $self);
+            foreach my $class (keys %{$self}) {
+                my $var = $exec->execute_expr(expr => $self->{$class}[0]);
+                foreach my $item (@{$arg}) {
+                    $var->alias($item);
+                    $var->set_value($item->get_value);
+                    $exec->execute(struct => $self);
+                }
             }
 
         }
