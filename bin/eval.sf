@@ -1,0 +1,14 @@
+#!/usr/bin/ruby
+
+
+var evaluated_code = ("
+
+var x = 'Evaluating code...';
+x.say;
+
+'it worked'.uc.lcfirst;
+
+".eval);
+
+
+evaluated_code.say;

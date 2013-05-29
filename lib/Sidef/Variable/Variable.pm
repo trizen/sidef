@@ -149,6 +149,14 @@ package Sidef::Variable::Variable {
             $self;
         };
 
+        *{__PACKAGE__ . '::' . '&='} = sub {
+            my ($self, $arg) = @_;
+
+            my ($method) = '&';
+            $self->set_value($self->get_value->$method($arg));
+            $self;
+        };
+
         *{__PACKAGE__ . '::' . '**='} = sub {
             my ($self, $arg) = @_;
 

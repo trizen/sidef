@@ -54,6 +54,30 @@ package Sidef::Types::Array::Array {
             $self;
         };
 
+        *{__PACKAGE__ . '::' . '&'} = sub {
+            my ($self, $array) = @_;
+
+            my $min = $#{$self} > $#{$array->_get_array} ? $#{$array} : $#{$self};
+
+            my $new_array = __PACKAGE__->new();
+            foreach my $i (0 .. $min) {
+                $new_array->push($self->[$i]->get_value, $array->[$i]->get_value);
+            }
+
+            if ($#{$self} > $#{$array}) {
+                foreach my $i ($min + 1 .. $#{$self}) {
+                    $new_array->push($self->[$i]->get_value);
+                }
+            }
+            else {
+                foreach my $i ($min + 1 .. $#{$array}) {
+                    $new_array->push($array->[$i]->get_value);
+                }
+            }
+
+            $new_array;
+        };
+
         *{__PACKAGE__ . '::' . '=='} = sub {
             my ($self, $array) = @_;
 

@@ -165,6 +165,18 @@ package Sidef::Types::String::String {
         my ($self) = @_;
         Sidef::Types::Glob::Dir->new($$self);
     }
+
+    sub eval {
+        my ($self) = @_;
+
+        my $parser = Sidef::Parser->new();
+        my $struct = $parser->parse_script(code => $$self);
+
+        my $exec = Sidef::Exec->new();
+        my @results = $exec->execute(struct => $struct);
+
+        return $results[-1];
+    }
 }
 
 1;

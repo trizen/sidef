@@ -56,6 +56,8 @@ package Sidef::Parser {
                       *= *
                       != ..
                       \\\\
+                      &=
+                      & |
                       : ?
                       );
 
