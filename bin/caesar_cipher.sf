@@ -6,7 +6,7 @@ func encipher (msg, key, decode) {
 
         msg.map {
             _.ord - 65 + key % 26 + 65 . chr;   # no need to worry about the operators precedence.
-        }.join('').to_chars;
+        };
 };
 
 char msg = 'SIDEF';

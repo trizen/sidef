@@ -7,49 +7,31 @@ package Sidef::Convert::Convert {
 
     require Sidef::Init;
 
-    use overload
+    #<<<
+    my $array_like = [
+        'Sidef::Types::Array::Array',
+        'Sidef::Types::Bytes::Bytes',
+        'Sidef::Types::Chars::Chars',
+    ];
+    #>>>
 
-      q{""} => sub {
+    use overload q{""} => sub {
         my ($type) = ref($_[0]);
 
-        if ($type eq 'Sidef::Types::Array::Array') {
+        if ($type ~~ $array_like) {
+
             return $_[0];
 
             #return Sidef::Types::String::String->new('[' . join(', ', map {$_->{self}} @{$_[0]}) . ']'); #For Debug
         }
 
         return ${$_[0]};
-      },
-
-      q{eq} => sub {
-        my $type_1 = ref($_[0]);
-        my $type_2 = ref($_[1]);
-
-        if ($type_1 eq 'Sidef::Types::Array::Array' or $type_2 eq 'Sidef::Types::Array::Array') {
-            if ($type_1 eq 'Sidef::Types::Array::Array' and $type_2 eq 'Sidef::Types::Array::Array') {
-
-                foreach my $item (@{$_[0]}) {
-                    foreach my $comp_item (@{$_[1]}) {
-                        $item->get_value eq $comp_item->get_value or return;
-                    }
-                }
-
-                return 1;
-
-            }
-            else {
-                return;
-            }
-
-        }
-
-        ${$_[0]} eq ${$_[1]};
-      };
+    };
 
     sub to_s {
         my ($self) = @_;
 
-        if (ref $self ~~ ['Sidef::Types::Array::Array', 'Sidef::Types::Bytes::Bytes', 'Sidef::Types::Chars::Chars']) {
+        if (ref $self ~~ $array_like) {
             return Sidef::Types::String::String->new(join(' ', @{$self}));
         }
 
@@ -99,37 +81,23 @@ package Sidef::Convert::Convert {
     sub to_bytes {
         my ($self) = @_;
 
-        my $bytes = do {
-
+        my @bytes = do {
             use bytes;
-            my @b = map { Sidef::Types::Byte::Byte->new(CORE::ord bytes::substr($$self, $_, 1)) }
+            map { Sidef::Types::Byte::Byte->new(CORE::ord bytes::substr($$self, $_, 1)) }
               0 .. bytes::length($$self) - 1;
-            no bytes;
-
-            \@b;
         };
 
-        Sidef::Types::Bytes::Bytes->new($bytes);
+        Sidef::Types::Bytes::Bytes->new(@bytes);
     }
 
     sub to_chars {
         my ($self) = @_;
-        Sidef::Types::Chars::Chars->new([map { Sidef::Types::Char::Char->new($_) } split //, $$self]);
+        Sidef::Types::Chars::Chars->new(map { Sidef::Types::Char::Char->new($_) } split //, $$self);
     }
 
     sub to_array {
         my ($self) = @_;
         Sidef::Types::Array::Array->new($self);
-    }
-
-    sub is_type {
-        my ($self, $obj) = @_;
-
-        if (ref $self eq ref $obj) {
-            return Sidef::Types::Bool::Bool->true;
-        }
-
-        Sidef::Types::Bool::Bool->false;
     }
 }
 

@@ -25,9 +25,17 @@ package Sidef::Types::Array::Array {
 
                 my $exists = 0;
                 foreach my $min_item (@{$array->_get_array}) {
-                    if ($min_item->get_value eq $item->get_value) {
-                        $exists = 1;
-                        last;
+
+                    my ($x, $y) = ($item->get_value, $min_item->get_value);
+
+                    if (ref($x) eq ref($y)) {
+                        my $method = '==';
+                        if (defined $x->can($method)) {
+                            if ($x->$method($y)) {
+                                $exists = 1;
+                                last;
+                            }
+                        }
                     }
                 }
 
@@ -151,7 +159,7 @@ package Sidef::Types::Array::Array {
         my $exec = Sidef::Exec->new();
         my $variable = $exec->execute_expr(expr => $code->{main}[0], class => 'main');
 
-        __PACKAGE__->new(
+        ref($self)->new(
             map {
                 $variable->alias($_);
                 my $val = $_->get_value;

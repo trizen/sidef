@@ -89,7 +89,7 @@ package Sidef::Types::Number::Number {
 
         *{__PACKAGE__ . '::' . '..'} = sub {
             my ($self, $num) = @_;
-            Sidef::Types::Array::Array->new(map { __PACKAGE__->new($_) } $$self .. $num->_get_number);
+            Sidef::Types::Array::Array->new(map { ref($self)->new($_) } $$self .. $num->_get_number);
         };
     }
 
