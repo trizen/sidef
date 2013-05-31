@@ -5,6 +5,7 @@ use warnings;
 
 package Sidef::Parser {
 
+    require Sidef::Utils::Regex;
     require Sidef::Init;
 
     our $DEBUG = 0;
@@ -222,12 +223,12 @@ package Sidef::Parser {
 
                 # Floating point number
                 when (/\G([+-]?\d+\.\d+)\b/gc) {
-                    return Sidef::Types::Number::Float->new($1), pos;
+                    return Sidef::Types::Number::Number->new($1), pos;
                 }
 
                 # Integer number
                 when (/\G([+-]?\d+)\b/gc) {
-                    return Sidef::Types::Number::Integer->new($1), pos;
+                    return Sidef::Types::Number::Number->new($1), pos;
                 }
 
                 # Regular expression

@@ -213,7 +213,7 @@ package Sidef::Types::Array::Array {
 
     sub length {
         my ($self) = @_;
-        Sidef::Types::Number::Integer->new(scalar @{$self});
+        Sidef::Types::Number::Number->new(scalar @{$self});
     }
 
     *len = \&length;    # alias

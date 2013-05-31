@@ -5,6 +5,7 @@ use warnings;
 
 package Sidef::Types::Bool::Or {
 
+    require Sidef::Exec;
     my $exec = Sidef::Exec->new();
 
     sub new {

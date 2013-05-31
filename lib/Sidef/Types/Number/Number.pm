@@ -95,7 +95,7 @@ package Sidef::Types::Number::Number {
 
     sub sqrt {
         my ($self) = @_;
-        Sidef::Types::Number::Float->new(CORE::sqrt $$self);
+        __PACKAGE__->new(CORE::sqrt $$self);
     }
 
     sub abs {
@@ -105,22 +105,22 @@ package Sidef::Types::Number::Number {
 
     sub int {
         my ($self) = @_;
-        Sidef::Types::Number::Integer->new($$self);
+        __PACKAGE__->new(int $$self);
     }
 
     sub log {
         my ($self) = @_;
-        Sidef::Types::Number::Float->new(CORE::log $$self);
+        __PACKAGE__->new(CORE::log $$self);
     }
 
     sub log10 {
         my ($self) = @_;
-        Sidef::Types::Number::Float->new(CORE::log($$self) / CORE::log(10));
+        __PACKAGE__->new(CORE::log($$self) / CORE::log(10));
     }
 
     sub log2 {
         my ($self) = @_;
-        Sidef::Types::Number::Float->new(CORE::log($$self) / CORE::log(2));
+        __PACKAGE__->new(CORE::log($$self) / CORE::log(2));
     }
 
     sub chr {
@@ -130,7 +130,7 @@ package Sidef::Types::Number::Number {
 
     sub next_power_of_two {
         my ($self) = @_;
-        Sidef::Types::Number::Integer->new(2 << CORE::log($$self) / CORE::log(2));
+        __PACKAGE__->new(2 << CORE::log($$self) / CORE::log(2));
     }
 };
 

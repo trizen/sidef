@@ -45,12 +45,12 @@ package Sidef::Convert::Convert {
 
     sub to_i {
         my ($self) = @_;
-        Sidef::Types::Number::Integer->new($$self);
+        Sidef::Types::Number::Number->int($$self);
     }
 
     sub to_float {
         my ($self) = @_;
-        Sidef::Types::Number::Float->new($$self);
+        Sidef::Types::Number::Number->new(sprintf '%.3f', $$self);
     }
 
     sub to_file {

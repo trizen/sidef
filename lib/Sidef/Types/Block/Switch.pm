@@ -66,6 +66,11 @@ package Sidef::Types::Block::Switch {
         $self;
     }
 
+    sub value {
+        my ($self) = @_;
+        $self->{obj};
+    }
+
 };
 
 1;
