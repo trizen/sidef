@@ -6,7 +6,7 @@
 
 {
     ARGV.shift;
-    ARGV.join(" ").to_sd.apply_escapes.say;
+    ARGV.join(" ").apply_escapes.say;
 }
 if (ARGV.len >= 1 && {ARGV[0] == '-e'})
 

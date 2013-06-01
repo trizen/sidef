@@ -38,19 +38,9 @@ package Sidef::Convert::Convert {
         Sidef::Types::String::String->new("$$self");
     }
 
-    sub to_sd {
-        my ($self) = @_;
-        Sidef::Types::String::Double->new("$$self");
-    }
-
     sub to_i {
         my ($self) = @_;
-        Sidef::Types::Number::Number->int($$self);
-    }
-
-    sub to_float {
-        my ($self) = @_;
-        Sidef::Types::Number::Number->new(sprintf '%.3f', $$self);
+        Sidef::Types::Number::Number->new(int $$self);
     }
 
     sub to_file {

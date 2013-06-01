@@ -13,12 +13,6 @@ package Sidef::Exec {
         bless {}, $class;
     }
 
-    sub interpolate {
-        my ($self, %opt) = @_;
-        my $self_obj = $opt{self};
-        $self_obj->apply_escapes if ref $self_obj eq 'Sidef::Types::String::Double';
-    }
-
     sub eval_array {
         my ($self, %opt) = @_;
         Sidef::Types::Array::Array->new(
@@ -40,10 +34,6 @@ package Sidef::Exec {
             my $self_obj = $expr->{self};
             if (ref $self_obj eq 'HASH') {
                 ($self_obj) = $self->execute(struct => $self_obj);
-            }
-
-            if (ref $self_obj ~~ ['Sidef::Types::Regex::Regex', 'Sidef::Types::String::Double']) {
-                $self->interpolate(self => $self_obj, class => $opt{class});
             }
 
             if (ref $self_obj eq 'Sidef::Types::Array::Array') {

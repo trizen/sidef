@@ -5,15 +5,13 @@ use warnings;
 
 package Sidef::Types::Regex::Regex {
 
-    use parent qw(Sidef::Convert::Convert Sidef::Types::String::Double);
+    use parent qw(Sidef::Convert::Convert);
 
     sub new {
         my ($class, $regex, $mod) = @_;
 
         $mod //= q{^};
         my $str_re = Sidef::Types::String::String->new("(?$mod:$regex)");
-
-        #$str_re =~ s{\\}{\\\\}g;
 
         bless \$str_re, $class;
     }
@@ -23,9 +21,6 @@ package Sidef::Types::Regex::Regex {
 
         if (ref $object eq 'Sidef::Types::Array::Array') {
             foreach my $item (@{$object}) {
-
-                #print "Matching item from array: ", $item, "\n";    # for debug
-
                 my $bool = $self->matches($item);
                 $bool && return $bool;
             }

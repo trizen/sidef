@@ -5,46 +5,62 @@ use warnings;
 
 package Sidef::Types::Number::Number {
 
-    use parent qw(Sidef::Convert::Convert);
+    use parent qw(Sidef Sidef::Convert::Convert);
 
     sub new {
         my ($class, $num) = @_;
         bless \$num, $class;
     }
 
-    sub _get_number { ${$_[0]} }
-
     {
         no strict 'refs';
 
         *{__PACKAGE__ . '::' . '/'} = sub {
             my ($self, $num) = @_;
-            __PACKAGE__->new($$self / $num->_get_number);
+
+            $self->_is_number($num) || return $self;
+
+            __PACKAGE__->new($$self / $$num);
         };
 
         *{__PACKAGE__ . '::' . '*'} = sub {
             my ($self, $num) = @_;
-            __PACKAGE__->new($$self * $num->_get_number);
+
+            $self->_is_number($num) || return $self;
+
+            __PACKAGE__->new($$self * $$num);
         };
 
         *{__PACKAGE__ . '::' . '+'} = sub {
             my ($self, $num) = @_;
-            __PACKAGE__->new($$self + $num->_get_number);
+
+            $self->_is_number($num) || return $self;
+
+            __PACKAGE__->new($$self + $$num);
         };
 
         *{__PACKAGE__ . '::' . '-'} = sub {
             my ($self, $num) = @_;
-            __PACKAGE__->new($$self - $num->_get_number);
+
+            $self->_is_number($num) || return $self;
+
+            __PACKAGE__->new($$self - $$num);
         };
 
         *{__PACKAGE__ . '::' . '%'} = sub {
             my ($self, $num) = @_;
-            __PACKAGE__->new($$self % $num->_get_number);
+
+            $self->_is_number($num) || return $self;
+
+            __PACKAGE__->new($$self % $$num);
         };
 
         *{__PACKAGE__ . '::' . '**'} = sub {
             my ($self, $num) = @_;
-            __PACKAGE__->new($$self**$num->_get_number);
+
+            $self->_is_number($num) || return $self;
+
+            __PACKAGE__->new($$self**$$num);
         };
 
         *{__PACKAGE__ . '::' . '++'} = sub {
@@ -59,37 +75,58 @@ package Sidef::Types::Number::Number {
 
         *{__PACKAGE__ . '::' . '<'} = sub {
             my ($self, $num) = @_;
-            Sidef::Types::Bool::Bool->new($$self < $num->_get_number);
+
+            $self->_is_number($num) || return $self;
+
+            Sidef::Types::Bool::Bool->new($$self < $$num);
         };
 
         *{__PACKAGE__ . '::' . '>'} = sub {
             my ($self, $num) = @_;
-            Sidef::Types::Bool::Bool->new($$self > $num->_get_number);
+
+            $self->_is_number($num) || return $self;
+
+            Sidef::Types::Bool::Bool->new($$self > $$num);
         };
 
         *{__PACKAGE__ . '::' . '<='} = sub {
             my ($self, $num) = @_;
-            Sidef::Types::Bool::Bool->new($$self <= $num->_get_number);
+
+            $self->_is_number($num) || return $self;
+
+            Sidef::Types::Bool::Bool->new($$self <= $$num);
         };
 
         *{__PACKAGE__ . '::' . '>='} = sub {
             my ($self, $num) = @_;
-            Sidef::Types::Bool::Bool->new($$self >= $num->_get_number);
+
+            $self->_is_number($num) || return $self;
+
+            Sidef::Types::Bool::Bool->new($$self >= $$num);
         };
 
         *{__PACKAGE__ . '::' . '=='} = sub {
             my ($self, $num) = @_;
-            Sidef::Types::Bool::Bool->new($$self == $num->_get_number);
+
+            $self->_is_number($num) || return $self;
+
+            Sidef::Types::Bool::Bool->new($$self == $$num);
         };
 
         *{__PACKAGE__ . '::' . '!='} = sub {
             my ($self, $num) = @_;
-            Sidef::Types::Bool::Bool->new($$self != $num->_get_number);
+
+            $self->_is_number($num) || return $self;
+
+            Sidef::Types::Bool::Bool->new($$self != $$num);
         };
 
         *{__PACKAGE__ . '::' . '..'} = sub {
             my ($self, $num) = @_;
-            Sidef::Types::Array::Array->new(map { ref($self)->new($_) } $$self .. $num->_get_number);
+
+            $self->_is_number($num) || return $self;
+
+            Sidef::Types::Array::Array->new(map { ref($self)->new($_) } $$self .. $$num);
         };
     }
 

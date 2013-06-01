@@ -5,6 +5,8 @@ use warnings;
 
 package Sidef::Types::Block::Code {
 
+    use parent qw(Sidef);
+
     require Sidef::Exec;
     my $exec = Sidef::Exec->new();
 
@@ -46,7 +48,9 @@ package Sidef::Types::Block::Code {
         *{__PACKAGE__ . '::' . '*'} = sub {
             my ($self, $num) = @_;
 
-            foreach my $i (1 .. $num->_get_number) {
+            $self->_is_number($num) || return $self;
+
+            foreach my $i (1 .. $num) {
                 $exec->execute(struct => $self);
             }
 

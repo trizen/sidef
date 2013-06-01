@@ -198,7 +198,7 @@ package Sidef::Parser {
 
                 # Double quoted string
                 when (/\G$self->{re}{double_quote}/gc) {
-                    return Sidef::Types::String::Double->new($1), pos;
+                    return Sidef::Types::String::String->new($1)->apply_escapes(), pos;
                 }
 
                 # Single quoted string
@@ -234,10 +234,10 @@ package Sidef::Parser {
                 # Regular expression
                 when (/\G$self->{re}{regex}/goc || ($] >= 5.017001 && /\G$self->{re}{m_regex}/goc)) {
 
-                    my $regex = $1;
+                    my $regex = Sidef::Types::String::String->new($1)->apply_escapes();
                     my ($flags) = (/\G($self->{re}{match_flags})/gc);
 
-                    return Sidef::Types::Regex::Regex->new($regex, $flags), pos;
+                    return Sidef::Types::Regex::Regex->new($$regex, $flags), pos;
                 }
 
                 # Object as expression

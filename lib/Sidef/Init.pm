@@ -30,7 +30,6 @@ require Sidef::Types::Block::Switch if [caller]->[0] ne q{Sidef::Types::Block::S
 require Sidef::Types::Block::Code if [caller]->[0] ne q{Sidef::Types::Block::Code};
 require Sidef::Types::Regex::Regex if [caller]->[0] ne q{Sidef::Types::Regex::Regex};
 require Sidef::Types::Number::Number if [caller]->[0] ne q{Sidef::Types::Number::Number};
-require Sidef::Types::String::Double if [caller]->[0] ne q{Sidef::Types::String::Double};
 require Sidef::Types::String::String if [caller]->[0] ne q{Sidef::Types::String::String};
 require Sidef::Utils::Regex if [caller]->[0] ne q{Sidef::Utils::Regex};
 require Sidef::Init if [caller]->[0] ne q{Sidef::Init};

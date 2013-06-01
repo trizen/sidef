@@ -72,9 +72,9 @@ var z = "\LRaNdOm StRiNg";     # Also, right.
 ## Single-quoted string to double-quoted string
 #
 
-var single = 'this is a test -- $y -- \n';
+var single = 'this \Uis\E a \Utest\n';
 single->say;
-(single->to_sd, "hello".say)->say;
+(single->apply_escapes, "hello".say)->say;
 
 # -----------------------------------------------
 

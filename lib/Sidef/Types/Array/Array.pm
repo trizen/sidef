@@ -5,22 +5,11 @@ use warnings;
 
 package Sidef::Types::Array::Array {
 
-    use parent qw(Sidef::Convert::Convert);
+    use parent qw(Sidef Sidef::Convert::Convert);
 
     sub new {
         my ($class, @items) = @_;
         bless [map { Sidef::Variable::Variable->new(rand, 'var', $_) } @items], $class;
-    }
-
-    sub _is_array {
-        my ($self, $obj) = @_;
-
-        if (not defined $obj->can('_is_array')) {
-            warn "[WARN] Expected an array object, but got '", ref($obj), "'.\n";
-            return;
-        }
-
-        return 1;
     }
 
     sub _grep {
@@ -220,7 +209,8 @@ package Sidef::Types::Array::Array {
 
     sub insert {
         my ($self, $index, @objects) = @_;
-        splice(@{$self}, $index->_get_number, 0, @{__PACKAGE__->new(@objects)});
+        $self->_is_number($index) || return $self;
+        splice(@{$self}, $$index, 0, @{__PACKAGE__->new(@objects)});
         $self;
     }
 
@@ -267,7 +257,8 @@ package Sidef::Types::Array::Array {
 
     sub join {
         my ($self, $separator) = @_;
-        Sidef::Types::String::String->new(CORE::join($separator->_get_string, @{$self}));
+        $self->_is_string($separator) || return $self;
+        Sidef::Types::String::String->new(CORE::join($$separator, @{$self}));
     }
 
     sub reverse {

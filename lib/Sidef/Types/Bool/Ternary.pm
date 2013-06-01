@@ -5,8 +5,6 @@ use warnings;
 
 package Sidef::Types::Bool::Ternary {
 
-    #use parent qw(Sidef::Types::Bool::Bool);
-
     sub new {
         my ($class, $hash_ref) = @_;
         bless $hash_ref, $class;
