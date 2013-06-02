@@ -18,13 +18,13 @@ package Sidef::Types::Glob::FileHandle {
 
     sub write {
         my ($self, $string) = @_;
-        Sidef::Types::Bool::Bool->new(print {$self->{fh}} $string)  ;
+        Sidef::Types::Bool::Bool->new(print {$self->{fh}} $string);
     }
 
     sub readline {
         my ($self) = @_;
         my $line = readline $self->{fh};
-        Sidef::Types::String::String->new($line);
+        defined($line) ? Sidef::Types::String::String->new($line) : Sidef::Types::Nil::Nil->new();
     }
 
     sub file {

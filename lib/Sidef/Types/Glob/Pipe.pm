@@ -7,17 +7,23 @@ use warnings;
 
 package Sidef::Types::Glob::Pipe {
 
-    use Sidef::Init;
-
     sub new {
         my ($class, $command) = @_;
-        bless {command => $command}, $class;
+        $command = $$command if ref $command;
+        bless \$command, $class;
+    }
+
+    sub command {
+        my ($self) = @_;
+        Sidef::Types::String::String->new($$self);
     }
 
     sub open {
         my ($self, $mode) = @_;
-        open my $pipe_h, $mode, $self->{command};
-        Sidef::Types::Glob::PipeHandle->new(pipe_h  => $pipe_h, command => $self->{command});
+        $mode = $$mode if ref($mode);
+
+        open my $pipe_h, $mode, $$self;
+        Sidef::Types::Glob::PipeHandle->new(pipe_h => $pipe_h, pipe => $self);
     }
 
     sub open_r {
@@ -28,6 +34,11 @@ package Sidef::Types::Glob::Pipe {
     sub open_w {
         my ($self) = @_;
         $self->open('|-');
+    }
+
+    sub dump {
+        my ($self) = @_;
+        Sidef::Types::String::String->new('Pipe.new(' . ${Sidef::Types::String::String->new($$self)->dump} . ')');
     }
 
 };

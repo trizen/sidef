@@ -5,7 +5,7 @@ use warnings;
 
 package Sidef::Convert::Convert {
 
-    require Sidef::Init;
+    use parent qw(Sidef);
 
     #<<<
     my $array_like = [
@@ -19,10 +19,7 @@ package Sidef::Convert::Convert {
         my ($type) = ref($_[0]);
 
         if ($type ~~ $array_like) {
-
             return $_[0];
-
-            #return Sidef::Types::String::String->new('[' . join(', ', map {$_->{self}} @{$_[0]}) . ']'); #For Debug
         }
 
         return ${$_[0]};
@@ -45,12 +42,20 @@ package Sidef::Convert::Convert {
 
     sub to_file {
         my ($self) = @_;
+        $self->_is_string($self) || return $self;
         Sidef::Types::Glob::File->new($$self);
     }
 
     sub to_dir {
         my ($self) = @_;
+        $self->_is_string($self) || return $self;
         Sidef::Types::Glob::Dir->new($$self);
+    }
+
+    sub to_pipe {
+        my ($self) = @_;
+        $self->_is_string($self) || return $self;
+        Sidef::Types::Glob::Pipe->new($$self);
     }
 
     sub to_bool {

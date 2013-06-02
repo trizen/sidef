@@ -9,6 +9,7 @@ package Sidef::Types::Number::Number {
 
     sub new {
         my ($class, $num) = @_;
+        $num = $$num if ref $num;
         bless \$num, $class;
     }
 
@@ -168,6 +169,11 @@ package Sidef::Types::Number::Number {
     sub next_power_of_two {
         my ($self) = @_;
         __PACKAGE__->new(2 << CORE::log($$self) / CORE::log(2));
+    }
+
+    sub dump {
+        my ($self) = @_;
+        Sidef::Types::String::String->new($$self);
     }
 };
 

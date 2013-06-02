@@ -93,6 +93,13 @@ package Sidef::Exec {
                         $self_obj = $self_obj->get_value;
                     }
 
+                    $self_obj //= Sidef::Types::Nil::Nil->new();
+
+                    if (not $self_obj->can($method)) {
+                        warn sprintf("[WARN] Inexistent method '%s' for object %s\n", $method, ref($self_obj));
+                        return $self_obj;
+                    }
+
                     if (exists $call->{arg}) {
 
                         foreach my $arg (@{$call->{arg}}) {
@@ -105,39 +112,19 @@ package Sidef::Exec {
                         }
 
                         foreach my $obj (@arguments) {
-
-                            #if (ref $obj ~~ ['Sidef::Types::Regex::Regex', 'Sidef::Types::String::Double']) {
-                            # $self->interpolate(self => $obj, class => $opt{class});
-                            #}
-                            #elsif (ref $obj eq 'Sidef::Types::Array::Array') {
-                            # $obj = $self->eval_array(array => $obj, class => $opt{class});
-                            #}
-
                             if (ref $obj eq 'Sidef::Variable::Variable') {
                                 $obj = $obj->get_value;
                             }
-
                         }
 
-                        $self_obj //= Sidef::Types::Nil::Nil->new();
                         $self_obj = $self_obj->$method(@arguments);
-
-                        if (ref $self_obj eq 'Sidef::Variable::Variable') {
-                            $self_obj = $self_obj->get_value;
-                        }
-
                     }
                     else {
-                        if (ref $self_obj eq 'Sidef::Variable::Variable' and not $$method ~~ [qw(-- ++)]) {
-                            $self_obj = $self_obj->get_value;
-                        }
-
-                        $self_obj //= Sidef::Types::Nil::Nil->new();
                         $self_obj = $self_obj->$method;
+                    }
 
-                        if (ref $self_obj eq 'Sidef::Variable::Variable') {
-                            $self_obj = $self_obj->get_value;
-                        }
+                    if (ref $self_obj eq 'Sidef::Variable::Variable') {
+                        $self_obj = $self_obj->get_value;
                     }
                 }
             }

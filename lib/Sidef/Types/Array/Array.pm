@@ -266,6 +266,27 @@ package Sidef::Types::Array::Array {
         ref($self)->new(reverse map { $_->get_value } @{$self});
     }
 
+    sub dump {
+        my ($self) = @_;
+
+        my $string = Sidef::Types::String::String->new("[");
+
+        foreach my $i (0 .. $#{$self}) {
+            my $item = $self->[$i]->get_value;
+
+            if (defined $item->can('dump')) {
+                $$string .= $item->dump();
+            }
+            else {
+                $$string .= $item;
+            }
+            $$string .= ", " if $i != $#{$self};
+        }
+
+        $$string .= "]";
+        $string;
+    }
+
 }
 
 1;

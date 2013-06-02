@@ -9,6 +9,7 @@ package Sidef::Types::String::String {
 
     sub new {
         my ($class, $str) = @_;
+        $str = $$str if ref $str;
         bless \$str, $class;
     }
 
@@ -33,8 +34,14 @@ package Sidef::Types::String::String {
 
         *{__PACKAGE__ . '::' . '=='} = sub {
             my ($self, $string) = @_;
-            $self->_is_string($string) || return $self;
+            ref($self) ne ref($string) and return Sidef::Types::Bool::Bool->false;
             Sidef::Types::Bool::Bool->new($$self eq $$string);
+        };
+
+        *{__PACKAGE__ . '::' . '!='} = sub {
+            my ($self, $string) = @_;
+            ref($self) ne ref($string) and return Sidef::Types::Bool::Bool->true;
+            Sidef::Types::Bool::Bool->new($$self ne $$string);
         };
 
         *{__PACKAGE__ . '::' . '--'} = sub {
@@ -238,6 +245,11 @@ package Sidef::Types::String::String {
         }
 
         return $self;
+    }
+
+    sub dump {
+        my ($self) = @_;
+        __PACKAGE__->new(q{'} . $$self =~ s{'}{\\'}gr . q{'});
     }
 }
 

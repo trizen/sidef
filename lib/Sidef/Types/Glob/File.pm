@@ -9,6 +9,7 @@ package Sidef::Types::Glob::File {
 
     sub new {
         my ($class, $file) = @_;
+        $file = $$file if ref $file;
         bless \$file, $class;
     }
 
@@ -68,7 +69,7 @@ package Sidef::Types::Glob::File {
         $mode = ${$mode} if ref $mode;
 
         open my $fh, $mode, $$self;
-        Sidef::Types::Glob::FileHandle->new(fh   => $fh,  file => $self);
+        Sidef::Types::Glob::FileHandle->new(fh => $fh, file => $self);
     }
 
     sub open_r {
@@ -86,6 +87,10 @@ package Sidef::Types::Glob::File {
         $self->open('>>');
     }
 
+    sub dump {
+        my ($self) = @_;
+        Sidef::Types::String::String->new('File.new(' . ${Sidef::Types::String::String->new($$self)->dump} . ')');
+    }
 };
 
 1;

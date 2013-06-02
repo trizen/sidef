@@ -1,0 +1,43 @@
+#!/usr/bin/perl
+
+#
+## Dir object
+#
+
+var current_dir = (Dir.new '.');
+"Your CWD is: `%s'\n".printf(current_dir.abs_name);
+
+
+#
+## File object
+#
+
+var file = (File.new(SCRIPT));
+"The size of file '%s' is %.3f KB\n".printf(file.name, file.size / 1024);
+
+
+#
+## Array object
+#
+
+var array = (Array.new("x", "y", "z"));
+array.join(", ").say;
+
+#
+## Number object
+#
+
+var num = (Number.new('0.123'));
+num + 4 to_s.say;
+
+
+#
+## Pipe object
+#
+
+var pipe_h = (Pipe.new("ls -x").open_r);
+
+var line;
+{
+    "'%s': %s".printf(pipe_h.pipe.command, line);
+} while {line = (pipe_h.readline) != nil};

@@ -7,27 +7,29 @@ use warnings;
 
 package Sidef::Types::Glob::PipeHandle {
 
-    use Sidef::Init;
-
     sub new {
         my ($class, %opt) = @_;
 
         bless {
-               pipe_h  => $opt{pipe_h},
-               command => $opt{command},
+               pipe_h => $opt{pipe_h},
+               pipe   => $opt{pipe},
               }, $class;
     }
 
-    sub command {
+    sub pipe {
         my ($self) = @_;
-        Sidef::Types::String::String->new($self->{command});
+        $self->{pipe};
+    }
+
+    sub readline {
+        my ($self) = @_;
+        my $line = readline $self->{pipe_h};
+        defined($line) ? Sidef::Types::String::String->new($line) : Sidef::Types::Nil::Nil->new();
     }
 
     sub close {
         my ($self) = @_;
-        (close $self->{pipe_h})
-          ? Sidef::Types::Bool::Bool->true
-          : Sidef::Types::Bool::Bool->false;
+        Sidef::Types::Bool::Bool->new(close $self->{pipe_h});
     }
 
 };

@@ -113,6 +113,11 @@ package Sidef::Types::Bool::Bool {
         return $self;
     }
 
+    sub dump {
+        my ($self) = @_;
+        Sidef::Types::String::String->new($$self);
+    }
+
 }
 
 1;

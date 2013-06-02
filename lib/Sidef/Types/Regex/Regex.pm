@@ -11,7 +11,7 @@ package Sidef::Types::Regex::Regex {
         my ($class, $regex, $mod) = @_;
 
         $mod //= q{^};
-        my $str_re = Sidef::Types::String::String->new("(?$mod:$regex)");
+        my $str_re = "(?$mod:$regex)";
 
         bless \$str_re, $class;
     }
@@ -34,6 +34,10 @@ package Sidef::Types::Regex::Regex {
         *{__PACKAGE__ . '::' . '=~'} = \&matches;    # alias to the 'matches' method
     }
 
+    sub dump {
+        my ($self) = @_;
+        Sidef::Types::String::String->new('/' . $$self =~ s{/}{\\/}gr . '/');
+    }
 }
 
 1;

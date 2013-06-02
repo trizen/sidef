@@ -5,11 +5,15 @@ use warnings;
 
 package Sidef::Types::Nil::Nil {
 
-    use parent qw(Sidef::Convert::Convert);
+    use parent qw(Sidef::Convert::Convert Sidef::Types::String::String);
 
     sub new {
         my $class = shift;
-        bless \(my $nil = undef), $class;
+        bless \(my $nil = 'nil'), $class;
+    }
+
+    sub dump {
+        Sidef::Types::String::String->new('nil');
     }
 
 }

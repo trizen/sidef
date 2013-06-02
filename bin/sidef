@@ -86,11 +86,10 @@ else {
 
     my $header = <<"EOH";
 
-const START_TIME = ${\time};
 var   ARGV       = [$arguments];
 const OSNAME     = '$^O';
-const EXEC       = ("\Q$0\E"->stat_file);
-const SCRIPT     = ("\Q$script_name\E"->stat_file);
+const EXEC       = (File.new "\Q$0\E");
+const SCRIPT     = (File.new "\Q$script_name\E");
 
 __RESET_LINE_COUNTER__;
 EOH

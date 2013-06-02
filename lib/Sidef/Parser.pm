@@ -196,6 +196,30 @@ package Sidef::Parser {
                 $self->{has_object} = 1;
                 $self->{expect_arg} = 0;
 
+                when (/\GDir\b/gc) {
+                    return 'Sidef::Types::Glob::Dir', pos;
+                }
+
+                when (/\GFile\b/gc) {
+                    return 'Sidef::Types::Glob::File', pos;
+                }
+
+                when (/\GArray\b/gc) {
+                    return 'Sidef::Types::Array::Array', pos;
+                }
+
+                when (/\GString\b/gc) {
+                    return 'Sidef::Types::String::String', pos;
+                }
+
+                when (/\GNumber\b/gc) {
+                    return 'Sidef::Types::Number::Number', pos;
+                }
+
+                when (/\GPipe\b/gc) {
+                    return 'Sidef::Types::Glob::Pipe', pos;
+                }
+
                 # Double quoted string
                 when (/\G$self->{re}{double_quote}/gc) {
                     return Sidef::Types::String::String->new($1)->apply_escapes(), pos;

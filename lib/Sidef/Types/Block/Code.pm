@@ -64,6 +64,40 @@ package Sidef::Types::Block::Code {
         return $results[-1];
     }
 
+    sub exec {
+        my ($self) = @_;
+        $exec->execute(struct => $self);
+        $self;
+    }
+
+    *do = \&exec;
+
+    sub while {
+        my ($self, $condition) = @_;
+
+        if (ref($condition) eq 'Sidef::Types::Block::Code') {
+            {
+                my @results = $exec->execute(struct => $condition);
+
+                if (ref($results[-1]) ne 'Sidef::Types::Bool::Bool') {
+                    warn "[WARN] The 'while' condition is not a boolean object!\n";
+                    return $self;
+                }
+
+                if ($results[-1]) {
+                    $exec->execute(struct => $self);
+                    redo;
+                }
+            }
+        }
+        else {
+            warn "[WARN] The 'while' condition is not a block object!\n";
+            return $self;
+        }
+
+        $self;
+    }
+
     sub call {
         my ($self, @args) = @_;
 

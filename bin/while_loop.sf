@@ -1,0 +1,22 @@
+#!/usr/bin/perl
+
+#
+## The 'while' loop:
+#
+
+var num = 0;
+{
+    "Hello world (%d)!\n".printf(num);
+}
+while {num++ <= 9};
+
+
+
+#
+## The equivalent of a 'do {} while' condition:
+#
+
+{
+    "Hey!".say;
+}
+do while {false};
