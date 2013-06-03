@@ -1,4 +1,4 @@
-#!/usr/bin/perl -X
+#!/usr/bin/perl
 
 use 5.014;
 use strict;
@@ -88,8 +88,8 @@ else {
 
 var   ARGV       = [$arguments];
 const OSNAME     = '$^O';
-const EXEC       = (File.new "\Q$0\E");
-const SCRIPT     = (File.new "\Q$script_name\E");
+const EXEC       = (File.new("\Q$0\E"));
+const SCRIPT     = (File.new("\Q$script_name\E"));
 
 __RESET_LINE_COUNTER__;
 EOH

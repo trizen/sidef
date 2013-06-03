@@ -9,7 +9,8 @@ package Sidef::Types::String::String {
 
     sub new {
         my ($class, $str) = @_;
-        $str = $$str if ref $str;
+        $str   = $$str       if ref $str;
+        $class = ref($class) if ref($class);
         bless \$str, $class;
     }
 
@@ -23,13 +24,13 @@ package Sidef::Types::String::String {
         *{__PACKAGE__ . '::' . '*'} = sub {
             my ($self, $num) = @_;
             $self->_is_number($num) || return $self;
-            ref($self)->new($$self x $$num);
+            $self->new($$self x $$num);
         };
 
         *{__PACKAGE__ . '::' . '+'} = sub {
             my ($self, $string) = @_;
             $self->_is_string($string) || return $self;
-            ref($self)->new($$self . $$string);
+            $self->new($$self . $$string);
         };
 
         *{__PACKAGE__ . '::' . '=='} = sub {
@@ -46,7 +47,7 @@ package Sidef::Types::String::String {
 
         *{__PACKAGE__ . '::' . '--'} = sub {
             my ($self) = @_;
-            ref($self)->new(substr($$self, 0, -1));
+            $self->new(substr($$self, 0, -1));
         };
 
         *{__PACKAGE__ . '::' . '>'} = sub {
@@ -75,7 +76,7 @@ package Sidef::Types::String::String {
 
         *{__PACKAGE__ . '::' . '..'} = sub {
             my ($self, $string) = @_;
-            Sidef::Types::Array::Array->new(map { ref($self)->new($_) } $$self .. $$string);
+            Sidef::Types::Array::Array->new(map { $self->new($_) } $$self .. $$string);
         };
     }
 

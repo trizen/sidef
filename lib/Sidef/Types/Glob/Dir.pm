@@ -9,7 +9,8 @@ package Sidef::Types::Glob::Dir {
 
     sub new {
         my ($class, $dir) = @_;
-        $dir = $$dir if ref $dir;
+        $dir   = $$dir       if ref $dir;
+        $class = ref($class) if ref($class);
         bless \$dir, $class;
     }
 

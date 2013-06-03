@@ -10,8 +10,8 @@ package Sidef::Convert::Convert {
     #<<<
     my $array_like = [
         'Sidef::Types::Array::Array',
-        'Sidef::Types::Bytes::Bytes',
-        'Sidef::Types::Chars::Chars',
+        'Sidef::Types::Byte::Bytes',
+        'Sidef::Types::Char::Chars',
     ];
     #>>>
 
@@ -82,12 +82,12 @@ package Sidef::Convert::Convert {
               0 .. bytes::length($$self) - 1;
         };
 
-        Sidef::Types::Bytes::Bytes->new(@bytes);
+        Sidef::Types::Byte::Bytes->new(@bytes);
     }
 
     sub to_chars {
         my ($self) = @_;
-        Sidef::Types::Chars::Chars->new(map { Sidef::Types::Char::Char->new($_) } split //, $$self);
+        Sidef::Types::Char::Chars->new(map { Sidef::Types::Char::Char->new($_) } split //, $$self);
     }
 
     sub to_array {

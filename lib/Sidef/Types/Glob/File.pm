@@ -9,7 +9,8 @@ package Sidef::Types::Glob::File {
 
     sub new {
         my ($class, $file) = @_;
-        $file = $$file if ref $file;
+        $file  = $$file      if ref $file;
+        $class = ref($class) if ref($class);
         bless \$file, $class;
     }
 

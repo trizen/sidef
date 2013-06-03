@@ -14,6 +14,9 @@ package Sidef::Types::Bool::Bool {
     sub new {
         my ($class, $bool) = @_;
 
+        $bool  = $$bool      if (ref $bool);
+        $class = ref($class) if (ref $class);
+
         # Decide if true or false
         $bool = $bool ? 'true' : 'false';
 

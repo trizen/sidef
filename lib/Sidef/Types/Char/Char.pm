@@ -9,6 +9,8 @@ package Sidef::Types::Char::Char {
 
     sub new {
         my ($class, $char) = @_;
+        $char  = $$char      if ref $char;
+        $class = ref($class) if ref($class);
         bless \$char, $class;
     }
 

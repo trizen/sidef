@@ -9,6 +9,8 @@ package Sidef::Types::Byte::Byte {
 
     sub new {
         my ($class, $byte) = @_;
+        $byte  = $$byte      if ref $byte;
+        $class = ref($class) if ref($class);
         bless \$byte, $class;
     }
 

@@ -35,11 +35,33 @@ package Sidef {
                     warn sprintf("[%s] Object of type '$type' was expected, but got %s.\n",
                                  ($sub eq '__ANON__' ? 'WARN' : $sub), ref($obj) || "an undefined object");
 
-                    if ($obj->isa($types{$type}{type})) {
+                    if (defined $obj and $obj->isa($types{$type}{type})) {
                         return 1;
                     }
                 }
                 return;
+            };
+        }
+
+        foreach my $method (['!=', 1], ['==', 0]) {
+
+            *{__PACKAGE__ . '::' . $method->[0]} = sub {
+                my ($self, $arg) = @_;
+
+                my $call = $method->[0];
+                my $bool = $method->[1];
+
+                ref($self) ne ref($arg)
+                  and return Sidef::Types::Bool::Bool->new($bool);
+
+                if (ref($self) eq 'Sidef::Types::Nil::Nil') {
+                    return Sidef::Types::Bool::Bool->new(!$bool);
+                }
+                elsif (ref($self) eq 'Sidef::Types::Bool::Bool') {
+                    return Sidef::Types::Bool::Bool->new(($$self eq $$arg) - $bool);
+                }
+
+                return Sidef::Types::Bool::Bool->new($bool);
             };
         }
     }

@@ -22,3 +22,11 @@
 
 ({false; true;} ? {"one"} : {"zero"}) say;  # prints "one"
 ({true; false;} ? {"one"} : {"zero"}) say;  # prints "zero"
+
+
+#
+## The ternary operator is, actually, an object:
+#
+
+var ternary = (false ? {"False is true?!".say});
+ternary : {"two".say};

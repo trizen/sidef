@@ -9,12 +9,13 @@ package Sidef::Types::Array::Array {
 
     sub new {
         my ($class, @items) = @_;
+        $class = ref($class) if ref($class);
         bless [map { Sidef::Variable::Variable->new(rand, 'var', $_) } @items], $class;
     }
 
     sub _grep {
         my ($self, $array, $bool) = @_;
-        my $new_array = ref($self)->new();
+        my $new_array = $self->new();
 
         $self->_is_array($array) || return ($self);
 
@@ -47,7 +48,7 @@ package Sidef::Types::Array::Array {
 
         *{__PACKAGE__ . '::' . '|'} = sub {
             my ($self, $array) = @_;
-            my $new_array = ref($self)->new;
+            my $new_array = $self->new;
 
             $self->_is_array($array) || return;
 
@@ -59,7 +60,7 @@ package Sidef::Types::Array::Array {
 
         *{__PACKAGE__ . '::' . '^'} = sub {
             my ($self, $array) = @_;
-            my $new_array = ref($self)->new;
+            my $new_array = $self->new;
 
             $self->_is_array($array) || return;
 
@@ -95,7 +96,7 @@ package Sidef::Types::Array::Array {
 
             my $min = $#{$self} > $#{$array} ? $#{$array} : $#{$self};
 
-            my $new_array = ref($self)->new();
+            my $new_array = $self->new();
             foreach my $i (0 .. $min) {
                 $new_array->push($self->[$i]->get_value, $array->[$i]->get_value);
             }
@@ -163,6 +164,12 @@ package Sidef::Types::Array::Array {
 
     }
 
+    sub make {
+        my ($self, $size, $type) = @_;
+        $self->_is_number($size) || return $self;
+        $self->new(($type) x $$size);
+    }
+
     sub max {
         my ($self) = @_;
 
@@ -189,7 +196,7 @@ package Sidef::Types::Array::Array {
         my $exec = Sidef::Exec->new();
         my $variable = $exec->execute_expr(expr => $code->{main}[0], class => 'main');
 
-        ref($self)->new(
+        $self->new(
             map {
                 $variable->alias($_);
                 my $val = $_->get_value;
@@ -263,7 +270,7 @@ package Sidef::Types::Array::Array {
 
     sub reverse {
         my ($self) = @_;
-        ref($self)->new(reverse map { $_->get_value } @{$self});
+        $self->new(reverse map { $_->get_value } @{$self});
     }
 
     sub dump {

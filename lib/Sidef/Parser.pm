@@ -16,6 +16,7 @@ package Sidef::Parser {
         my %options = (
             line             => 1,
             has_object       => 0,
+            has_method       => 0,
             expect_method    => 0,
             expect_index     => 0,
             expect_arg       => 0,
@@ -32,7 +33,6 @@ package Sidef::Parser {
                 m_regex            => Sidef::Utils::Regex::make_single_q_balanced(q{m}),
                 match_flags        => qr{[msixpogcdual]+},
                 substitution_flags => qr{[msixpogcerdual]+},
-                var_in_string      => Sidef::Utils::Regex::variable_in_string(),
                 var_name           => qr/[[:alpha:]_]\w*/,
                 operators          => do {
                     local $" = q{|};
@@ -100,8 +100,7 @@ package Sidef::Parser {
 
         given ($opt{'code'}) {
 
-            if (/\G/gc
-                && defined(my $pos = $self->parse_whitespace(code => substr($_, pos)))) {
+            if (/\G/gc && defined(my $pos = $self->parse_whitespace(code => substr($_, pos)))) {
                 pos($_) = $pos + pos($_);
             }
 
@@ -172,8 +171,7 @@ package Sidef::Parser {
 
         given ($opt{code}) {
             {
-                if (/\G/gc
-                    && defined(my $pos = $self->parse_whitespace(code => substr($_, pos)))) {
+                if (/\G/gc && defined(my $pos = $self->parse_whitespace(code => substr($_, pos)))) {
                     pos($_) = $pos + pos($_);
                 }
 
@@ -190,34 +188,56 @@ package Sidef::Parser {
                 when (/\G;/gc || /\G\z/) {
                     $self->{has_object}    = 0;
                     $self->{expect_method} = 0;
+                    $self->{has_method}    = 0;
                     return undef, pos;
                 }
 
                 $self->{has_object} = 1;
+                $self->{has_method} = 0;
                 $self->{expect_arg} = 0;
 
                 when (/\GDir\b/gc) {
-                    return 'Sidef::Types::Glob::Dir', pos;
+                    return Sidef::Types::Glob::Dir->new(), pos;
                 }
 
                 when (/\GFile\b/gc) {
-                    return 'Sidef::Types::Glob::File', pos;
+                    return Sidef::Types::Glob::File->new(), pos;
                 }
 
                 when (/\GArray\b/gc) {
-                    return 'Sidef::Types::Array::Array', pos;
+                    return Sidef::Types::Array::Array->new(), pos;
                 }
 
                 when (/\GString\b/gc) {
-                    return 'Sidef::Types::String::String', pos;
+                    return Sidef::Types::String::String->new(), pos;
                 }
 
                 when (/\GNumber\b/gc) {
-                    return 'Sidef::Types::Number::Number', pos;
+                    return Sidef::Types::Number::Number->new(), pos;
                 }
 
                 when (/\GPipe\b/gc) {
-                    return 'Sidef::Types::Glob::Pipe', pos;
+                    return Sidef::Types::Glob::Pipe->new(), pos;
+                }
+
+                when (/\GByte\b/gc) {
+                    return Sidef::Types::Byte::Byte->new(), pos;
+                }
+
+                when (/\GBytes\b/gc) {
+                    return Sidef::Types::Byte::Bytes->new(), pos;
+                }
+
+                when (/\GChar\b/gc) {
+                    return Sidef::Types::Char::Char->new(), pos;
+                }
+
+                when (/\GChar\b/gc) {
+                    return Sidef::Types::Char::Chars->new(), pos;
+                }
+
+                when (/\GBool\b/gc) {
+                    return Sidef::Types::Bool::Bool->new(), pos;
                 }
 
                 # Double quoted string
@@ -358,10 +378,8 @@ package Sidef::Parser {
                                        pos  => (pos($_) - length($1)));
                 }
                 default {
-                    warn $self->{expect_method}
-                      ? "Invalid method caller!\n"
-                      : "Invalid object type!\n";
-                    $self->fatal_error(code => $_, pos => pos($_));
+                    warn "[LINE $self->{line}] Unexpected char: " . substr($_, pos(), 1) . "\n";
+                    return undef, pos() + 1;
                 }
             }
         }
@@ -393,8 +411,7 @@ package Sidef::Parser {
 
         given ($opt{'code'}) {
             {
-                if (/\G/gc
-                    && defined(my $pos = $self->parse_whitespace(code => substr($_, pos)))) {
+                if (/\G/gc && defined(my $pos = $self->parse_whitespace(code => substr($_, pos)))) {
                     pos($_) = $pos + pos($_);
                 }
                 when (/\G\[/gc) {
@@ -414,8 +431,7 @@ package Sidef::Parser {
 
         given ($opt{'code'}) {
             {
-                if (/\G/gc
-                    && defined(my $pos = $self->parse_whitespace(code => substr($_, pos)))) {
+                if (/\G/gc && defined(my $pos = $self->parse_whitespace(code => substr($_, pos)))) {
                     pos($_) = $pos + pos($_);
                 }
                 when (/\G\{/gc) {
@@ -450,8 +466,7 @@ package Sidef::Parser {
         my %struct;
         given ($opt{code}) {
             {
-                if (/\G/gc
-                    && defined(my $pos = $self->parse_whitespace(code => substr($_, pos)))) {
+                if (/\G/gc && defined(my $pos = $self->parse_whitespace(code => substr($_, pos)))) {
                     pos($_) = $pos + pos;
                 }
 
@@ -521,6 +536,8 @@ package Sidef::Parser {
                         $self->{expect_func_call} = 0;
                     }
 
+                    $self->{has_method} = 1;
+
                     redo;
                 }
 
@@ -560,18 +577,8 @@ package Sidef::Parser {
                     redo;
                 }
 
-                # Beginning of an argument expression
-                when ($self->{has_object} == 1 && /\G(?=\()/) {
-
-                    my ($arg, $pos) = $self->parse_arguments(code => substr($_, pos));
-                    pos($_) = $pos + pos;
-
-                    push @{$struct{$self->{class}}[-1]{call}[-1]{arg}}, $arg;
-                    redo;
-                }
-
                 # The end of an argument expression
-                when ($self->{has_object} == 1 && /\G\)/gc) {
+                when (/\G\)/gc) {
 
                     if (@{[caller(1)]}) {
 
@@ -586,19 +593,15 @@ package Sidef::Parser {
                     redo;
                 }
 
+                # Array index
                 when ($self->{expect_index} == 1) {
 
                     $self->{expect_index} = 0;
 
-                    my $array = Sidef::Types::Array::Array->new();
-                    my ($obj, $pos) = $self->parse_array(code => substr($_, pos()));
+                    my ($array, $pos) = $self->parse_expr(code => substr($_, pos()));
                     pos($_) = $pos + pos();
 
                     $self->{expect_index} = /\G(?=\h*\[)/;
-
-                    if (ref $obj->{main} eq 'ARRAY') {
-                        push @{$array}, (@{$obj->{main}});
-                    }
 
                     push @{$self->{last_object}{ind}}, $array;
                     redo;
@@ -606,6 +609,7 @@ package Sidef::Parser {
 
                 # Comma separated arguments for methods
                 when (/\G,/gc) {
+
                     my ($obj, $pos) = $self->parse_expr(code => substr($_, pos));
                     pos($_) = $pos + pos;
 
@@ -613,30 +617,28 @@ package Sidef::Parser {
                     redo;
                 }
 
-                # Argument as object, without parentheses
-                when ($self->{has_object} == 1 && $self->{expect_method} == 1) {
+                # Beginning of an argument expression
+                when ($self->{has_method} == 1) {
 
+                    my $is_arg = /\G(?=\()/;
                     my ($obj, $pos) = $self->parse_expr(code => substr($_, pos));
-
-                    if (not defined $obj and $] < 5.016) {
-                        pos($_) = $pos + pos;
-                    }
+                    pos($_) = $pos + pos;
 
                     if (defined $obj) {
-
-                        pos($_) = $pos + pos;
-                        push @{$struct{$self->{class}}[-1]{call}[-1]{arg}}, {$self->{class} => [{self => $obj}]};
-
-                        if (/\G(?=\h*\[)/) {
-                            $self->{last_object}  = $struct{$self->{class}}[-1]{call}[-1]{arg}[-1]{$self->{class}}[-1];
-                            $self->{expect_index} = 1;
+                        if ($is_arg) {
+                            push @{$struct{$self->{class}}[-1]{call}[-1]{arg}}, $obj;
                         }
+                        else {
+                            push @{$struct{$self->{class}}[-1]{call}[-1]{arg}}, {$self->{class} => [{self => $obj}]};
+                            if (/\G(?=\h*\[)/) {
+                                $self->{last_object} =
+                                  $struct{$self->{class}}[-1]{call}[-1]{arg}[-1]{$self->{class}}[-1];
+                                $self->{expect_index} = 1;
+                            }
+                        }
+                    }
 
-                        redo;
-                    }
-                    else {
-                        continue;
-                    }
+                    redo;
                 }
 
                 # Parse expression or object and use it as main object (self)
