@@ -562,6 +562,8 @@ package Sidef::Parser {
                 when (/\G\}/gc) {
                     --$self->{curly_brackets};
 
+                    $self->{expect_method} = 1;
+
                     if (@{[caller(1)]}) {
 
                         if ($self->{curly_brackets} < 0) {
@@ -579,6 +581,8 @@ package Sidef::Parser {
 
                 # The end of an argument expression
                 when (/\G\)/gc) {
+
+                    $self->{expect_method} = 1;
 
                     if (@{[caller(1)]}) {
 
