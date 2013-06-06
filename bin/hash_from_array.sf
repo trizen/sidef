@@ -1,0 +1,23 @@
+#!/usr/bin/ruby
+
+#
+## Creating an hash from two arrays
+#
+
+var keys = ["a", "b", "c"];
+var vals = [1, 2, 3];
+
+var hash = (Hash.new);
+hash[keys] = vals;          # mapping keys and vals into hash
+
+hash["a", "b"].join(", ").print;
+hash["c"].to_s.say;
+
+
+#
+## Bonus
+#
+
+keys.to_s.say;              # printing the keys
+keys[0..2].to_s.say;        # printing the keys using a number range
+keys[keys.range].to_s.say;  # =//=

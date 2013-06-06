@@ -46,15 +46,18 @@ package Sidef::Exec {
                     $self_obj = $self_obj->get_value;
                 }
 
-                foreach my $l (0 .. $#{$expr->{ind}}) {
+                for (my $l = 0 ; $l <= $#{$expr->{ind}} ; $l++) {
+
                     my $level   = $expr->{ind}[$l];
                     my $is_hash = ref($self_obj) eq 'Sidef::Types::Hash::Hash';
 
                     if ($#{$level} > 0) {
                         my @indices;
 
-                        foreach my $i (@{$level}) {
-                            my $ind = $self->execute_expr(expr => $i, class => $opt{class});
+                        foreach my $ind (@{$level}) {
+                            if (ref $ind eq 'HASH') {
+                                $ind = $self->execute_expr(expr => $ind, class => $opt{class});
+                            }
                             (
                                $is_hash
                              ? $self_obj->{$ind}
@@ -73,6 +76,17 @@ package Sidef::Exec {
                     }
                     else {
                         my $ind = $self->execute_expr(expr => $level->[0], class => $opt{class});
+
+                        if (ref($ind) eq 'Sidef::Variable::Variable') {
+                            $ind = $ind->get_value;
+                        }
+
+                        if (ref($ind) eq 'Sidef::Types::Array::Array') {
+                            $expr->{ind}[$l] = $ind;
+                            --$l;
+                            next;
+                        }
+
                         $self_obj = (
                                      (
                                         $is_hash
@@ -137,7 +151,7 @@ package Sidef::Exec {
                         $self_obj = $self_obj->$method;
                     }
 
-                    if (ref $self_obj eq 'Sidef::Variable::Variable') {
+                    if (ref($self_obj) eq 'Sidef::Variable::Variable') {
                         $self_obj = $self_obj->get_value;
                     }
                 }

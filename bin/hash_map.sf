@@ -45,7 +45,7 @@ var john_info = hash[1];
 
 john_info["occupation", "address"] = ["Computer Scientist", "London, Main Street 142"];
 
-var john_keys   = (john_info.keys);     # john_info is just a referente to hash[1]
+var john_keys   = (john_info.keys);     # john_info is just a reference to hash[1]
 var john_values = (hash[1].values);     # john_info and hash[1] points at the same hash
 
 {
