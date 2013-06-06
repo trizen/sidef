@@ -49,7 +49,9 @@ package Sidef::Exec {
                 foreach my $l (0 .. $#{$expr->{ind}}) {
                     my $level = $expr->{ind}[$l];
 
-                    if (ref($self_obj) eq 'Sidef::Types::Array::Array') {
+                    if (
+                        ref($self_obj) ~~
+                        ['Sidef::Types::Array::Array', 'Sidef::Types::Byte::Bytes', 'Sidef::Types::Char::Chars']) {
 
                         if ($#{$level} > 0) {
                             my @indices;

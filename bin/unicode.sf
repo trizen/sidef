@@ -22,15 +22,15 @@ chars->join("_")->say;
 '-' * 80 say;
 
 var byte = ('c'->ord);
-"byte '%d' made uppercase, is: %s\n".printf(byte, ( byte - 32 -> chr));
+"byte '%d' made uppercase, is: %s\n".printf(byte, (byte - 32 -> chr));
 
 '-' * 80 -> say;
 
-byte bytes = "șarpe";   # splits on bytes!
+byte bytes = "Șarpe";   # splits on bytes!
 
 bytes.join.say;
-"The character 'ș' is composed of two bytes: " + (bytes[0,1]->to_s)->say;
-"Then comes the character 'a', which is: " + (bytes[2]->to_s) + " (" + (bytes[2]->chr) + ")"->say;
+"The character 'Ș' is composed of two bytes: " + (bytes[0,1]->to_s)->say;
+"Then comes the character 'a', which is: " + (bytes[2].to_s) + " (" + (bytes[2].chr.to_s) + ")"->say;
 
 bytes[0] = 200;   # Keep the first byte as it is
 bytes[1] = 154;   # and change the 'S' to 'T', resulting in 'Ț'
