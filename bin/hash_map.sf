@@ -1,0 +1,56 @@
+#!/usr/bin/ruby
+
+#
+## Creating an hash of hashes
+#
+
+var hash = (Hash.new.map(
+       ["name", "age"],
+[
+    1, ["John",    23],
+    2, ["Call",    42],
+    3, ["Carl",    19]
+]));
+
+hash[1]["name"].say;     # prints "John"
+hash[2]["name"].say;     # prints "Call"
+
+
+#
+## Mapping more keys and values into an hash of hashes
+#
+
+hash.map(
+       ["address",                      "phone"],
+[
+    1, ["London, Ave Street 23",    "+00123002"],
+    2, ["Cambridge, LightHouse 12", "+91293422"]
+]
+);
+
+hash[2]["name"].say;
+hash[1]["address"].say;
+hash[2]["address"].say;
+
+
+#
+## Creating a simple hash:
+#
+
+var new_hash = (Hash.new(
+   "google", "www.google.com",
+   "bing",   "www.bing.com"
+));
+
+new_hash["google"].say;
+
+
+#
+## Assigning a new key and value
+#
+
+new_hash["yahoo"] = "www.yahoo.com";
+new_hash["yahoo"].say;
+
+"HASH Keys: %s\n".printf(new_hash.keys.join(", "));
+"HASH Values: %s\n".printf(new_hash.values.join(", "));

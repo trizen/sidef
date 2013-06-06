@@ -136,8 +136,8 @@ package Sidef::Types::String::String {
     sub insert {
         my ($self, $string, $pos, $len) = @_;
 
-        $self->_is_string($string) || return $self;
-        $self->_is_number($pos)    || return $self;
+        ($self->_is_string($string) && $self->_is_number($pos))
+          || return $self;
 
         if (defined $len) {
             $self->_is_number($len) || return $self;
@@ -213,6 +213,20 @@ package Sidef::Types::String::String {
         my @results = $exec->execute(struct => $struct);
 
         return $results[-1];
+    }
+
+    sub contains {
+        my ($self, $string, $start_pos) = @_;
+        $start_pos //= Sidef::Types::Number::Number->new(0);
+
+        ($self->_is_number($start_pos) && $self->_is_string($string))
+          || return Sidef::Types::Bool::Bool->false;
+
+        if ($$start_pos < 0) {
+            $$start_pos = CORE::length($$self) + $$start_pos;
+        }
+
+        Sidef::Types::Bool::Bool->new(CORE::index($$self, $$string, $$start_pos) != -1);
     }
 
     sub apply_escapes {

@@ -208,6 +208,10 @@ package Sidef::Parser {
                     return Sidef::Types::Array::Array->new(), pos;
                 }
 
+                when (/\GHash\b/gc) {
+                    return Sidef::Types::Hash::Hash->new(), pos;
+                }
+
                 when (/\GString\b/gc) {
                     return Sidef::Types::String::String->new(), pos;
                 }
