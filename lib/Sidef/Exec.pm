@@ -47,42 +47,46 @@ package Sidef::Exec {
                 }
 
                 foreach my $l (0 .. $#{$expr->{ind}}) {
-                    my $level = $expr->{ind}[$l];
+                    my $level   = $expr->{ind}[$l];
+                    my $is_hash = ref($self_obj) eq 'Sidef::Types::Hash::Hash';
 
-                    if (
-                        ref($self_obj) ~~
-                        ['Sidef::Types::Array::Array', 'Sidef::Types::Byte::Bytes', 'Sidef::Types::Char::Chars']) {
+                    if ($#{$level} > 0) {
+                        my @indices;
 
-                        if ($#{$level} > 0) {
-                            my @indices;
-
-                            foreach my $i (@{$level}) {
-                                my $ind = $self->execute_expr(expr => $i, class => $opt{class});
-                                $self_obj->[$ind] //= Sidef::Variable::Variable->new(rand, 'var');
-                                push @indices, $ind;
-                            }
-
-                            my $array = Sidef::Types::Array::Array->new();
-                            push @{$array}, @{$self_obj}[@indices];
-                            $self_obj = $array;
-
-                            #$self_obj = Sidef::Types::Array::Array->new(map {$_->get_value} @{$self_obj}[@indices]);
-
-                        }
-                        else {
-                            my $ind = $self->execute_expr(expr => $level->[0], class => $opt{class});
-                            $self_obj->[$ind] //= Sidef::Variable::Variable->new(rand, 'var');
-                            $self_obj = $self_obj->[$ind];
+                        foreach my $i (@{$level}) {
+                            my $ind = $self->execute_expr(expr => $i, class => $opt{class});
+                            (
+                               $is_hash
+                             ? $self_obj->{$ind}
+                             : $self_obj->[$ind]
+                            )
+                              //= Sidef::Variable::Variable->new(rand, 'var');
+                            push @indices, $ind;
                         }
 
+                        my $array = Sidef::Types::Array::Array->new();
+                        push @{$array}, $is_hash ? (@{$self_obj}{@indices}) : (@{$self_obj}[@indices]);
+                        $self_obj = $array;
+
+                        #$self_obj = Sidef::Types::Array::Array->new(map {$_->get_value} @{$self_obj}[@indices]);
+
+                    }
+                    else {
+                        my $ind = $self->execute_expr(expr => $level->[0], class => $opt{class});
+                        $self_obj = (
+                                     (
+                                        $is_hash
+                                      ? $self_obj->{$ind}
+                                      : $self_obj->[$ind]
+                                     )
+                                     //= Sidef::Variable::Variable->new(rand, 'var')
+                                    );
+                    }
+
+                    if (not $is_hash) {
                         if ($l < $#{$expr->{ind}} or ref($expr->{self}) eq 'HASH') {
                             $self_obj = $self_obj->get_value;
                         }
-                    }
-                    elsif (ref($self_obj) eq 'Sidef::Types::Hash::Hash') {
-                        my $ind = $self->execute_expr(expr => $level->[0], class => $opt{class});
-                        $self_obj->{$ind} //= Sidef::Variable::Variable->new(rand, 'var');
-                        $self_obj = $self_obj->{$ind};
                     }
                 }
             }

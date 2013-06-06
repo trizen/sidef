@@ -214,6 +214,11 @@ package Sidef::Types::Array::Array {
 
     *len = \&length;    # alias
 
+    sub range {
+        my ($self) = @_;
+        $self->new(map { Sidef::Types::Number::Number->new($_) } 0 .. $#{$self});
+    }
+
     sub insert {
         my ($self, $index, @objects) = @_;
         $self->_is_number($index) || return $self;

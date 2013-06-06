@@ -31,23 +31,27 @@ hash.map(
 "%s lives on: %s\n".printf(hash[2]["name"], hash[2]["address"]);
 "%s lives on: %s\n".printf(hash[1]["name"], hash[1]["address"]);
 
+'-' * 80 say;
+
 #
 ## Working with an individual user
 #
 
-'-' * 80 say;
+var john_info = hash[1];
 
-var call_info = hash[2];
-call_info["job"]     = "Scientist";
-call_info["address"] = "London, Main Street 142";
+#
+## Hash slice assignment
+#
 
-var call_keys = (hash[2].keys);
-var call_values = (hash[2].values);
+john_info["occupation", "address"] = ["Computer Scientist", "London, Main Street 142"];
+
+var john_keys   = (john_info.keys);     # john_info is just a referente to hash[1]
+var john_values = (hash[1].values);     # john_info and hash[1] points at the same hash
 
 {
-    "%-8s: %s\n".printf(call_keys[_], call_values[_]);
+    "%-11s: %s\n".printf(john_keys[_], john_values[_]);
 }
-->for (0..(call_keys.len-1));
+->for (john_keys.range);
 
 '-' * 80 say;
 
