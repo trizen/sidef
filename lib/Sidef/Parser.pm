@@ -618,10 +618,10 @@ package Sidef::Parser {
                 # Comma separated arguments for methods
                 when (/\G,/gc) {
 
-                    my ($obj, $pos) = $self->parse_expr(code => substr($_, pos));
-                    pos($_) = $pos + pos;
+                    $self->{expect_method} = 0;
+                    $self->{has_object}    = 0;
+                    $self->{has_method}    = 0;
 
-                    push @{$struct{$self->{class}}}, {self => $obj};
                     redo;
                 }
 
