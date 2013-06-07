@@ -1,0 +1,15 @@
+#!/usr/bin/ruby
+
+func leap (year) {
+    year % 100 == 0
+                ? (year % 400 == 0)
+                : (year %   4 == 0);
+};
+
+{
+    (leap(_)
+        ? "%d was a leap year\n"
+        : "%d wasn't a leap year\n"
+    ).printf(_);
+}
+->for(2000..2013);

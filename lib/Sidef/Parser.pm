@@ -59,6 +59,7 @@ package Sidef::Parser {
                       != ..
                       \\\\
                       : ?
+                      !
                       );
 
                     qr{(@operators)};
@@ -277,6 +278,11 @@ package Sidef::Parser {
                 # Integer number
                 when (/\G([+-]?\d+)\b/gc) {
                     return Sidef::Types::Number::Number->new($1), pos;
+                }
+
+                when (/\G!/gc) {
+                    $self->{expect_method} = 1;
+                    return Sidef::Types::Bool::Bool->new(), pos() - 1;
                 }
 
                 # Regular expression

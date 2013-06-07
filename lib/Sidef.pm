@@ -8,6 +8,7 @@ package Sidef {
     {
         my %types = (
             number => {class => [qw(Sidef::Types::Number::Number)], type => 'SCALAR'},
+            bool   => {class => [qw(Sidef::Types::Bool::Bool)]},
             string => {class => [qw(Sidef::Types::String::String)], type => 'SCALAR'},
             array  => {
                 type  => 'ARRAY',
@@ -35,7 +36,7 @@ package Sidef {
                     warn sprintf("[%s] Object of type '$type' was expected, but got %s.\n",
                                  ($sub eq '__ANON__' ? 'WARN' : $sub), ref($obj) || "an undefined object");
 
-                    if (defined $obj and $obj->isa($types{$type}{type})) {
+                    if (defined $obj and exists $types{$type}{type} and $obj->isa($types{$type}{type})) {
                         return 1;
                     }
                 }

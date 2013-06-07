@@ -36,7 +36,11 @@ package Sidef::Types::Bool::Or {
             return Sidef::Types::Bool::Bool->true;
         }
 
-        my @results = $exec->execute(struct => $code);
+        my @results =
+          ref($code) eq 'Sidef::Types::Block::Code'
+          ? $exec->execute(struct => $code)
+          : $code;
+
         return $results[-1];
     }
 

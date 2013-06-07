@@ -21,7 +21,12 @@ package Sidef::Types::Bool::Ternary {
             }
 
             my $exec = Sidef::Exec->new();
-            my @results = $exec->execute(struct => $code);
+
+            my @results =
+              ref($code) eq 'Sidef::Types::Block::Code'
+              ? $exec->execute(struct => $code)
+              : $code;
+
             return $results[-1];
         };
     }

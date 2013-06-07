@@ -26,6 +26,12 @@ package Sidef::Types::Bool::Bool {
     {
         no strict 'refs';
 
+        *{__PACKAGE__ . '::' . '!'} = sub {
+            my ($self, $bool) = @_;
+            $self->_is_bool($bool) || return $self;
+            $self->new(!$bool);
+        };
+
         *{__PACKAGE__ . '::' . '&&'} = sub {
             my ($self, $code) = @_;
 
@@ -34,55 +40,61 @@ package Sidef::Types::Bool::Bool {
                 return $results[-1];
             }
 
-            __PACKAGE__->false;
+            $self->false;
         };
 
         *{__PACKAGE__ . '::' . '||'} = sub {
             my ($self, $code) = @_;
 
             if (not $self) {
-                my @results = $exec->execute(struct => $code);
+                my @results =
+                  ref($code) eq 'Sidef::Types::Block::Code'
+                  ? $exec->execute(struct => $code)
+                  : $code;
                 return $results[-1];
             }
 
-            __PACKAGE__->true;
+            $self->true;
         };
 
         *{__PACKAGE__ . '::' . '?'} = sub {
             my ($self, $code) = @_;
 
             if ($self) {
-                my @results = $exec->execute(struct => $code);
-                return Sidef::Types::Bool::Ternary->new({code => $results[-1], bool => __PACKAGE__->true});
+                my @results =
+                  ref($code) eq 'Sidef::Types::Block::Code'
+                  ? $exec->execute(struct => $code)
+                  : $code;
+                return Sidef::Types::Bool::Ternary->new({code => $results[-1], bool => $self->true});
             }
 
-            return Sidef::Types::Bool::Ternary->new({code => $code, bool => __PACKAGE__->false});
+            return Sidef::Types::Bool::Ternary->new({code => $code, bool => $self->false});
         };
     }
 
     sub true {
         my ($self) = @_;
-        __PACKAGE__->new(1);
+        $self->new(1);
     }
 
     sub false {
         my ($self) = @_;
-        __PACKAGE__->new(0);
+        $self->new(0);
     }
 
     sub is_true {
         my ($self) = @_;
-        __PACKAGE__->new($$self eq 'true');
+        $self->new($$self eq 'true');
     }
 
     sub is_false {
         my ($self) = @_;
-        __PACKAGE__->new($$self eq 'false');
+        $self->new($$self eq 'false');
     }
 
     sub not {
         my ($self) = @_;
-        $self ? __PACKAGE__->false : __PACKAGE__->true;
+        $self ? $self->false : $self->true;
     }
 
     sub or {
@@ -106,7 +118,7 @@ package Sidef::Types::Bool::Bool {
 
         if ($self->is_false) {
 
-            if (ref $code eq __PACKAGE__) {
+            if (ref($code) eq __PACKAGE__) {
                 return $code;
             }
 
