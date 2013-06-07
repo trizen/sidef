@@ -1,0 +1,39 @@
+#!/usr/bin/ruby
+
+var s = "something";
+var ref_s = (\s);     # 'ref_s' points to var 's'
+*ref_s.say;           # prints "something"
+*ref_s = "else";      # changes the 's' variable
+s.say;                # prints "else"
+
+'-' * 80 say;
+
+####################################
+
+var ref_x = (\var x);
+
+x = "Changed x";
+*ref_x.say;
+
+var y = (\ref_x);
+*(*y) = "Changed y (ref of ref)";
+x.say;
+
+*ref_x = "Changed ref_x";
+x.say;
+
+####################################
+
+var text = "Changed x again";
+
+x = text;
+*ref_x.say;
+
+'-' * 80 say;
+
+"** Checking y...".say;
+*(*y) == text
+    ? {"** Passed.".say}
+    : {"** Failed!".say};
+
+'-' * 80 say;

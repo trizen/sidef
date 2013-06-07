@@ -59,7 +59,7 @@ package Sidef::Parser {
                       != ..
                       \\\\
                       : ?
-                      !
+                      ! \\
                       );
 
                     qr{(@operators)};
@@ -290,6 +290,16 @@ package Sidef::Parser {
                     return Sidef::Types::Block::Code->new({}), pos() - 1;
                 }
 
+                when (/\G\\/gc) {
+                    $self->{expect_method} = 1;
+                    return Sidef::Variable::Ref->new(), pos() - 1;
+                }
+
+                when (/\G\*/gc) {
+                    $self->{expect_method} = 1;
+                    return Sidef::Variable::Ref->new(), pos() - 1;
+                }
+
                 # Regular expression
                 when (/\G$self->{re}{regex}/goc || ($] >= 5.017001 && /\G$self->{re}{m_regex}/goc)) {
 
@@ -356,7 +366,7 @@ package Sidef::Parser {
                         # Check the declared parameters
                         if (/\G\s*\(((?:$self->{re}{var_name}(?:\s*,\s*$self->{re}{var_name})*)?)\)\s*\{/gcs) {
 
-                            my $params = join('', map { "var $_;" } split(/\s*,\s*/, $1));
+                            my $params = join('', map { "\\var $_;" } split(/\s*,\s*/, $1));
                             my ($obj, $pos) = $self->parse_block(code => '{' . $params . substr($_, pos));
                             pos($_) += $pos - (length($params) + 1);
 
@@ -463,8 +473,8 @@ package Sidef::Parser {
 
                     $self->{vars} = $self->{vars}[0];
 
-                    my ($obj, $pos) = $self->parse_script(code => 'var _;' . substr($_, pos));
-                    pos($_) += $pos - 6;
+                    my ($obj, $pos) = $self->parse_script(code => '\\var _;' . substr($_, pos));
+                    pos($_) += $pos - 7;
 
                     splice @{$self->{ref_vars_refs}}, 0, $count;
                     $self->{vars} = $ref;

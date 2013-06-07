@@ -2,16 +2,18 @@
 
 # Because everything is an object, we can say:
 
+var i = 3;
+var j = 4;
 var condition = ({1+3}.given);
 
 condition
     when 3 do {
         "Value '%d' is 3.\n".printf(condition.value);
     }
-    when 4 do {
+    when (j) do {
         "Value '%d' is 4.\n".printf(condition.value);
     }
-    when 5 do {
+    when (i) do {
         "Value '%d' is 5.\n".printf(condition.value);
     }
     default {

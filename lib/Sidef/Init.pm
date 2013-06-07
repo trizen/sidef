@@ -34,6 +34,7 @@ require Sidef::Types::String::String if [caller]->[0] ne q{Sidef::Types::String:
 require Sidef::Utils::Regex if [caller]->[0] ne q{Sidef::Utils::Regex};
 require Sidef::Init if [caller]->[0] ne q{Sidef::Init};
 require Sidef::Convert::Convert if [caller]->[0] ne q{Sidef::Convert::Convert};
+require Sidef::Variable::Ref if [caller]->[0] ne q{Sidef::Variable::Ref};
 require Sidef::Variable::Variable if [caller]->[0] ne q{Sidef::Variable::Variable};
 require Sidef::Parser if [caller]->[0] ne q{Sidef::Parser};
 require Sidef::Exec if [caller]->[0] ne q{Sidef::Exec};

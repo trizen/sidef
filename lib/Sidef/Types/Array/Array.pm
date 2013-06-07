@@ -170,10 +170,11 @@ package Sidef::Types::Array::Array {
         $self->new(($type) x $$size);
     }
 
-    sub max {
-        my ($self) = @_;
+    sub _min_max {
+        my ($self, $method) = @_;
 
-        my $method   = '>';
+        $#{$self} >= 0 or return Sidef::Types::Nil::Nil->new();
+
         my $max_item = $self->[0]->get_value;
 
         foreach my $i (1 .. $#{$self}) {
@@ -190,17 +191,24 @@ package Sidef::Types::Array::Array {
         return $max_item;
     }
 
+    sub max {
+        $_[0]->_min_max('>');
+    }
+
+    sub min {
+        $_[0]->_min_max('<');
+    }
+
     sub map {
         my ($self, $code) = @_;
 
         my $exec = Sidef::Exec->new();
-        my $variable = $exec->execute_expr(expr => $code->{main}[0], class => 'main');
+        my $var_ref = $exec->execute_expr(expr => $code->{main}[0], class => 'main');
 
         $self->new(
             map {
-                $variable->alias($_);
                 my $val = $_->get_value;
-                $variable->set_value(ref $val eq 'Sidef::Variable::Variable' ? $val->get_value : $val);
+                $var_ref->get_var->set_value($val);
                 my @results = $exec->execute(struct => $code);
                 $results[-1];
               } @{$self}

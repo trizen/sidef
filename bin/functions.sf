@@ -15,8 +15,8 @@ result.say;                         # print "world"
 ## Fibonacci sequence
 #
 
-func fibonacci () {                 # note that () is empty,
-    var i; var j; var count;        # but we can declare the parameters here
+func fibonacci () {                    # note that () is empty,
+    \var i; \var j; \var count;        # but we can declare the parameters here
 
     var old_j = j;
     j = (i+j);
@@ -52,7 +52,7 @@ fibonacci(0,1, 15).to_s.say;
 #
 
 fibonacci = {
-    var string;
+    \var string;
     string.say;
 };
 

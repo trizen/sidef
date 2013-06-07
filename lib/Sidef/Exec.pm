@@ -19,7 +19,7 @@ package Sidef::Exec {
             map {
                 ref eq 'HASH'
                   ? $self->execute_expr(expr => $_, class => $opt{class})
-                  : $_
+                  : ref($_) eq 'Sidef::Variable::Variable' ? $_->get_value : $_
               } @{$opt{array}}
         );
     }
@@ -132,7 +132,10 @@ package Sidef::Exec {
 
                         foreach my $arg (@{$call->{arg}}) {
                             if (ref $arg eq 'HASH') {
-                                push @arguments, $self->execute(struct => $arg);
+                                push @arguments, $self->execute(
+                                struct => $arg,
+                                var_ref => (ref($self_obj) eq 'Sidef::Variable::Ref') ? 1 : 0,
+                                );
                             }
                             else {
                                 push @arguments, $arg;
@@ -141,7 +144,9 @@ package Sidef::Exec {
 
                         foreach my $obj (@arguments) {
                             if (ref $obj eq 'Sidef::Variable::Variable') {
-                                $obj = $obj->get_value;
+                                if(ref($self_obj) ne 'Sidef::Variable::Ref'){
+                                    $obj = $obj->get_value;
+                                }
                             }
                         }
 
@@ -154,6 +159,10 @@ package Sidef::Exec {
                     if (ref($self_obj) eq 'Sidef::Variable::Variable') {
                         $self_obj = $self_obj->get_value;
                     }
+                }
+            }else{
+                if (ref($self_obj) eq 'Sidef::Variable::Variable' and not $opt{var_ref}) {
+                        $self_obj = $self_obj->get_value;
                 }
             }
 
@@ -172,7 +181,7 @@ package Sidef::Exec {
         my @results;
         foreach my $key (keys %{$struct}) {
             foreach my $expr (@{$struct->{$key}}) {
-                push @results, $self->execute_expr(class => $key, expr => $expr);
+                push @results, $self->execute_expr(%opt, class => $key, expr => $expr);
             }
         }
 

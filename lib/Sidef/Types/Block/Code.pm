@@ -126,10 +126,7 @@ package Sidef::Types::Block::Code {
             my @vars = @{$self->{$class}}[1 .. $#args + 1];
 
             foreach my $var (@vars) {
-                if (   ref $var ne 'HASH'
-                    or exists $var->{call}
-                    or exists $var->{arg}
-                    or ref $var->{self} ne 'Sidef::Variable::Variable') {
+                if ( ref $var->{self} ne 'Sidef::Variable::Ref') {
                     warn "[WARN] Too many arguments in function call!",
                       " Expected $argc, but got ${\(scalar @vars)} of them.\n";
                     last;
@@ -137,7 +134,7 @@ package Sidef::Types::Block::Code {
 
                 ++$argc;
                 my $var_ref = $exec->execute_expr(expr => $var, class => $class);
-                $var_ref->set_value(shift @args);
+                $var_ref->get_var->set_value(shift @args);
             }
 
             push @results, $exec->execute(struct => $self);
@@ -162,10 +159,6 @@ package Sidef::Types::Block::Code {
         if (ref $self eq 'Sidef::Types::Block::Code') {
             my @results = $exec->execute(struct => $self);
             $self = $results[-1];
-
-            if (ref $self eq 'Sidef::Variable::Variable') {
-                $self = $self->get_value;
-            }
         }
 
         Sidef::Types::Block::Switch->new($self);
@@ -176,10 +169,9 @@ package Sidef::Types::Block::Code {
 
         if (ref $arg eq 'Sidef::Types::Array::Array') {
             foreach my $class (keys %{$self}) {
-                my $var = $exec->execute_expr(expr => $self->{$class}[0]);
+                my $var_ref = $exec->execute_expr(expr => $self->{$class}[0]);
                 foreach my $item (@{$arg}) {
-                    $var->alias($item);
-                    $var->set_value($item->get_value);
+                    $var_ref->get_var->set_value($item->get_value);
                     $exec->execute(struct => $self);
                 }
             }
