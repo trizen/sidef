@@ -285,6 +285,11 @@ package Sidef::Parser {
                     return Sidef::Types::Bool::Bool->new(), pos() - 1;
                 }
 
+                when (/\G:/gc) {
+                    $self->{expect_method} = 1;
+                    return Sidef::Types::Block::Code->new({}), pos() - 1;
+                }
+
                 # Regular expression
                 when (/\G$self->{re}{regex}/goc || ($] >= 5.017001 && /\G$self->{re}{m_regex}/goc)) {
 
@@ -529,6 +534,16 @@ package Sidef::Parser {
                     return \%struct;
                 }
 
+                # Comma separated expressions
+                when (/\G(?>,|=>)/gc) {
+
+                    $self->{expect_method} = 0;
+                    $self->{has_object}    = 0;
+                    $self->{has_method}    = 0;
+
+                    redo;
+                }
+
                 # Method separator '->', or operator-method, like '*'
                 when (   $self->{expect_method} == 1
                       && !$self->{expect_arg}
@@ -618,16 +633,6 @@ package Sidef::Parser {
                     $self->{expect_index} = /\G(?=\h*\[)/;
 
                     push @{$self->{last_object}{ind}}, $array;
-                    redo;
-                }
-
-                # Comma separated arguments for methods
-                when (/\G,/gc) {
-
-                    $self->{expect_method} = 0;
-                    $self->{has_object}    = 0;
-                    $self->{has_method}    = 0;
-
                     redo;
                 }
 

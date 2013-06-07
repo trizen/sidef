@@ -18,7 +18,7 @@ package Sidef::Convert::Convert {
     use overload q{""} => sub {
         my ($type) = ref($_[0]);
 
-        if ($type ~~ $array_like) {
+        if ($type ~~ $array_like or $type eq 'Sidef::Types::Hash::Hash') {
             return $_[0];
         }
 

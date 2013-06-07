@@ -56,6 +56,23 @@ package Sidef::Types::Block::Code {
 
             $self;
         };
+
+        *{__PACKAGE__ . '::' . ':'} = sub {
+            my ($self, $code) = @_;
+
+            if (ref($code) eq 'Sidef::Types::Block::Code') {
+                return $code->to_hash;
+            }
+
+            return $self;
+        };
+    }
+
+    sub to_hash {
+        my ($self) = @_;
+        my @results = $exec->execute(struct => $self);
+        shift @results;    # ignore the block private variable (_)
+        Sidef::Types::Hash::Hash->new(@results);
     }
 
     sub run {
