@@ -37,3 +37,19 @@ x = text;
     : {"** Failed!".say};
 
 '-' * 80 say;
+
+
+###################################
+
+{
+    var values = ["Hello", "Perl5", "World"];
+
+    [\var x, \var y, \var z] map {
+        *_ = (values.shift);
+    };
+
+    x.say;
+    y.say;
+    z.say;
+
+}.run;
