@@ -46,6 +46,28 @@ package Sidef::Types::Array::Array {
             $self->_grep($array, 0);
         };
 
+        *{__PACKAGE__ . '::' . '<<'} = sub {
+            my ($self, $number) = @_;
+            $self->_is_number($number, 1, 0) || return $self->new();
+            $number->is_positive()
+              || do {
+                warn "[WARN] Array's method '<<' requires a positive number!\n";
+                return $self->new();
+              };
+            $self->new(map { $_->get_value } CORE::splice(@{$self}, 0, $$number));
+        };
+
+        *{__PACKAGE__ . '::' . '>>'} = sub {
+            my ($self, $number) = @_;
+            $self->_is_number($number, 1, 0) || return $self->new();
+            $number->is_positive()
+              || do {
+                warn "[WARN] Array's method '>>' requires a positive number!\n";
+                return $self->new();
+              };
+            $self->new(map { $_->get_value } CORE::splice(@{$self}, -$$number));
+        };
+
         *{__PACKAGE__ . '::' . '|'} = sub {
             my ($self, $array) = @_;
             my $new_array = $self->new;
@@ -184,7 +206,8 @@ package Sidef::Types::Array::Array {
                 $max_item = $val if $val->$method($max_item);
             }
             else {
-                warn "[WARN] Can't find the method '$method' for object '", ref($self->[$i]->get_value), "'!\n";
+                warn sprintf("[WARN] %s():Can't find the method '$method' for object '%s'!\n",
+                             $method eq '>' ? 'max' : 'min', ref($val));
             }
         }
 
@@ -222,6 +245,11 @@ package Sidef::Types::Array::Array {
 
     *len = \&length;    # alias
 
+    sub offset {
+        my ($self) = @_;
+        Sidef::Types::Number::Number->new($#{$self});
+    }
+
     sub range {
         my ($self) = @_;
         $self->new(map { Sidef::Types::Number::Number->new($_) } 0 .. $#{$self});
@@ -254,24 +282,41 @@ package Sidef::Types::Array::Array {
     }
 
     sub pop {
-        my ($self) = @_;
-        pop @{$self};
+        my ($self, $index) = @_;
+
+        if (defined $index) {
+            if ($self->_is_number($index, 1, 1)) {
+                $$index <= $#{$self} or do {
+                    warn "[WARN] Array index '$$index' is bigger than array's offset '$#{$self}'!\n";
+                    return Sidef::Types::Nil::Nil->new();
+                };
+            }
+            else {
+                warn
+                  sprintf("[WARN] ARRAY's method 'remove' expected a position number object, not '%s'!\n", ref($index));
+                return Sidef::Types::Nil::Nil->new();
+            }
+
+            return ((splice(@{$self}, $$index, 1))->get_value);
+        }
+
+        (pop @{$self})->get_value;
     }
 
     sub shift {
         my ($self) = @_;
-        shift @{$self};
+        (shift @{$self})->get_value;
     }
 
     sub push {
         my ($self, @args) = @_;
-        push @{$self}, @{__PACKAGE__->new(@args)};
+        push @{$self}, @{$self->new(@args)};
         return $self;
     }
 
     sub unshift {
         my ($self, @args) = @_;
-        unshift @{$self}, @{__PACKAGE__->new(@args)};
+        unshift @{$self}, @{$self->new(@args)};
         return $self;
     }
 
@@ -284,6 +329,11 @@ package Sidef::Types::Array::Array {
     sub reverse {
         my ($self) = @_;
         $self->new(reverse map { $_->get_value } @{$self});
+    }
+
+    sub to_hash {
+        my ($self) = @_;
+        Sidef::Types::Hash::Hash->new(map { $_->get_value } @{$self});
     }
 
     sub dump {

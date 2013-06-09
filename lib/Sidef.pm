@@ -10,6 +10,7 @@ package Sidef {
     {
         my %types = (
             bool   => {class => [qw(Sidef::Types::Bool::Bool)]},
+            hash   => {class => [qw(Sidef::Types::Hash::Hash)]},
             number => {class => [qw(Sidef::Types::Number::Number)], type => 'SCALAR'},
             string => {class => [qw(Sidef::Types::String::String)], type => 'SCALAR'},
             array => {

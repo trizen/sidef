@@ -254,7 +254,7 @@ package Sidef::Parser {
 
                 # Single quoted string
                 when (/\G$self->{re}{single_quote}/goc) {
-                    return Sidef::Types::String::String->new($1), pos;
+                    return Sidef::Types::String::String->new($1=~s{\\'}{'}gr), pos;
                 }
 
                 # File quoted string

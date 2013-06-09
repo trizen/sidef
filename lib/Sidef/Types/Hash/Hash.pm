@@ -13,14 +13,24 @@ package Sidef::Types::Hash::Hash {
         bless \%hash, $class;
     }
 
+    {
+        no strict 'refs';
+
+        *{__PACKAGE__ . '::' . '+'} = sub {
+            my ($self, $hash) = @_;
+            $self->_is_hash($hash) || return $self;
+            $self->new(%{$self}, %{$hash});
+        };
+    }
+
     sub keys {
         my ($hash_ref) = @_;
-        return Sidef::Types::Array::Array->new(keys %{$hash_ref});
+        Sidef::Types::Array::Array->new(keys %{$hash_ref});
     }
 
     sub values {
         my ($hash_ref) = @_;
-        return Sidef::Types::Array::Array->new(values %{$hash_ref});
+        Sidef::Types::Array::Array->new(values %{$hash_ref});
     }
 
     sub map {
@@ -36,6 +46,15 @@ package Sidef::Types::Hash::Hash {
         }
 
         return $self;
+    }
+
+    sub flip {
+        my ($self) = @_;
+
+        my $new_hash = $self->new();
+        @{$new_hash}{CORE::values %{$self}} =
+          (map { Sidef::Types::String::String->new($_) } CORE::keys %{$self});
+        $new_hash;
     }
 };
 

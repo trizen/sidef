@@ -9,6 +9,7 @@ package Sidef::Types::Number::Number {
 
     sub new {
         my ($class, $num) = @_;
+        $num += 0;
         $num   = $$num       if ref $num;
         $class = ref($class) if ref($class);
         bless \$num, $class;
@@ -146,6 +147,58 @@ package Sidef::Types::Number::Number {
     sub next_power_of_two {
         my ($self) = @_;
         $self->new(2 << CORE::log($$self) / CORE::log(2));
+    }
+
+    sub is_positive {
+        my ($self) = @_;
+        Sidef::Types::Bool::Bool->new($$self > 0);
+    }
+
+    sub is_negative {
+        my ($self) = @_;
+        Sidef::Types::Bool::Bool->new($$self < 0);
+    }
+
+    sub is_even {
+        my ($self) = @_;
+        Sidef::Types::Bool::Bool->new($$self % 2 == 0);
+    }
+
+    sub is_odd {
+        my ($self) = @_;
+        Sidef::Types::Bool::Bool->new($$self % 2 != 0);
+    }
+
+    sub is_integer {
+        my ($self) = @_;
+        Sidef::Types::Bool::Bool->new($$self - CORE::int($$self) == 0);
+    }
+
+    sub commify {
+        my ($self) = @_;
+
+        my $n = $$self;
+        my $x = $n;
+
+        my $neg = $n =~ s{^-}{};
+        $n =~ /\.|$/;
+
+        if ($-[0] > 3) {
+
+            my $l = $-[0] - 3;
+            my $i = ($l - 1) % 3 + 1;
+
+            $x = substr($n, 0, $i) . ',';
+
+            while ($i < $l) {
+                $x .= substr($n, $i, 3) . ',';
+                $i += 3;
+            }
+
+            $x .= substr($n, $i);
+        }
+
+        Sidef::Types::String::String->new(($neg ? '-' : '') . $x);
     }
 
     sub dump {
