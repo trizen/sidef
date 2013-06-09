@@ -9,9 +9,9 @@ package Sidef::Types::Number::Number {
 
     sub new {
         my ($class, $num) = @_;
-        $num += 0;
         $num   = $$num       if ref $num;
         $class = ref($class) if ref($class);
+        $num += 0;
         bless \$num, $class;
     }
 

@@ -300,11 +300,13 @@ package Sidef::Types::Array::Array {
             return ((splice(@{$self}, $$index, 1))->get_value);
         }
 
+        $#{$self} >= 0 || return Sidef::Types::Nil::Nil->new;
         (pop @{$self})->get_value;
     }
 
     sub shift {
         my ($self) = @_;
+        $#{$self} >= 0 || return Sidef::Types::Nil::Nil->new;
         (shift @{$self})->get_value;
     }
 
