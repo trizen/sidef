@@ -3,7 +3,11 @@ use 5.014;
 use strict;
 use warnings;
 
+no if $] >= 5.018, warnings => "experimental::smartmatch";
+
 package Sidef::Exec {
+
+    use parent qw(Sidef);
 
     require Sidef::Parser;
     my $parser = Sidef::Parser->new();
@@ -17,11 +21,25 @@ package Sidef::Exec {
         my ($self, %opt) = @_;
         Sidef::Types::Array::Array->new(
             map {
-                ref eq 'HASH'
-                  ? $self->execute_expr(expr => $_, class => $opt{class})
-                  : ref($_) eq 'Sidef::Variable::Variable' ? $_->get_value : $_
+                    ref eq 'HASH' ? $self->execute_expr(expr => $_, class => $opt{class})
+                  : ref($_) eq 'Sidef::Variable::Variable' ? $_->get_value
+                  : $_
               } @{$opt{array}}
         );
+    }
+
+    sub valid_index {
+        my ($self, $index) = @_;
+
+        (
+         $self->_is_number($index, 1, 1)
+           || do {
+             warn sprintf("[WARN] Array index must be a number, not '%s'!\n", ref($index));
+             return;
+           }
+        );
+
+        return 1;
     }
 
     sub execute_expr {
@@ -58,6 +76,9 @@ package Sidef::Exec {
                             if (ref $ind eq 'HASH') {
                                 $ind = $self->execute_expr(expr => $ind, class => $opt{class});
                             }
+
+                            !$is_hash && ($self->valid_index($ind) || next);
+
                             (
                                $is_hash
                              ? $self_obj->{$ind}
@@ -82,10 +103,12 @@ package Sidef::Exec {
                         }
 
                         if (ref($ind) eq 'Sidef::Types::Array::Array') {
-                            $expr->{ind}[$l] = $ind;
+                            $expr->{ind}[$l] = [map { $_->get_value } @{$ind}];
                             --$l;
                             next;
                         }
+
+                        !$is_hash && ($self->valid_index($ind) || next);
 
                         $self_obj = (
                                      (
@@ -116,8 +139,16 @@ package Sidef::Exec {
                         $method = $self->execute_expr(expr => $method);
                     }
 
-                    if (ref $self_obj eq 'Sidef::Variable::Variable'
-                        and not $$method ~~ [qw( =  :=  +=  -=  *=  /=  %=  **=  ||=  &&=  |=  ^=  &=  ++  -- \\\\)]) {
+                    if (
+                        ref $self_obj eq 'Sidef::Variable::Variable'
+                        and not $$method ~~ [
+                            qw(
+                              =  :=  +=  -=  *=  /=
+                              %=  **=  ||=  &&=  |=
+                              ^=  &=  ++  -- \\\\
+                              )
+                        ]
+                      ) {
                         $self_obj = $self_obj->get_value;
                     }
 
@@ -132,10 +163,9 @@ package Sidef::Exec {
 
                         foreach my $arg (@{$call->{arg}}) {
                             if (ref $arg eq 'HASH') {
-                                push @arguments, $self->execute(
-                                struct => $arg,
-                                var_ref => (ref($self_obj) eq 'Sidef::Variable::Ref') ? 1 : 0,
-                                );
+                                push @arguments,
+                                  $self->execute(struct  => $arg,
+                                                 var_ref => (ref($self_obj) eq 'Sidef::Variable::Ref') ? 1 : 0,);
                             }
                             else {
                                 push @arguments, $arg;
@@ -144,7 +174,7 @@ package Sidef::Exec {
 
                         foreach my $obj (@arguments) {
                             if (ref $obj eq 'Sidef::Variable::Variable') {
-                                if(ref($self_obj) ne 'Sidef::Variable::Ref'){
+                                if (ref($self_obj) ne 'Sidef::Variable::Ref') {
                                     $obj = $obj->get_value;
                                 }
                             }
@@ -160,9 +190,10 @@ package Sidef::Exec {
                         $self_obj = $self_obj->get_value;
                     }
                 }
-            }else{
+            }
+            else {
                 if (ref($self_obj) eq 'Sidef::Variable::Variable' and not $opt{var_ref}) {
-                        $self_obj = $self_obj->get_value;
+                    $self_obj = $self_obj->get_value;
                 }
             }
 

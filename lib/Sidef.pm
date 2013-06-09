@@ -3,14 +3,16 @@ use 5.006;
 use strict;
 use warnings;
 
+no if $] >= 5.018, warnings => "experimental::smartmatch";
+
 package Sidef {
 
     {
         my %types = (
-            number => {class => [qw(Sidef::Types::Number::Number)], type => 'SCALAR'},
             bool   => {class => [qw(Sidef::Types::Bool::Bool)]},
+            number => {class => [qw(Sidef::Types::Number::Number)], type => 'SCALAR'},
             string => {class => [qw(Sidef::Types::String::String)], type => 'SCALAR'},
-            array  => {
+            array => {
                 type  => 'ARRAY',
                 class => [
                     qw(
@@ -26,18 +28,24 @@ package Sidef {
 
         foreach my $type (keys %types) {
             *{__PACKAGE__ . '::' . '_is_' . $type} = sub {
-                my ($self, $obj) = @_;
+
+                my ($self, $obj, $strict_obj, $dont_warn) = @_;
+
                 if (ref($obj) ~~ $types{$type}{class}) {
                     return 1;
                 }
                 else {
                     my ($sub) = [caller(1)]->[3] =~ /^.+::(.*)/;
 
-                    warn sprintf("[%s] Object of type '$type' was expected, but got %s.\n",
-                                 ($sub eq '__ANON__' ? 'WARN' : $sub), ref($obj) || "an undefined object");
+                    if (!$dont_warn) {
+                        warn sprintf("[%s] Object of type '$type' was expected, but got %s.\n",
+                                     ($sub eq '__ANON__' ? 'WARN' : $sub), ref($obj) || "an undefined object");
+                    }
 
-                    if (defined $obj and exists $types{$type}{type} and $obj->isa($types{$type}{type})) {
-                        return 1;
+                    if (!$strict_obj) {
+                        if (defined $obj and exists $types{$type}{type} and $obj->isa($types{$type}{type})) {
+                            return 1;
+                        }
                     }
                 }
                 return;
@@ -65,6 +73,11 @@ package Sidef {
                 return Sidef::Types::Bool::Bool->new($bool);
             };
         }
+    }
+
+    sub new {
+        my ($class) = @_;
+        bless {}, $class;
     }
 
 };
