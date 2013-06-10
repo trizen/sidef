@@ -260,6 +260,11 @@ package Sidef::Parser {
                     return Sidef::Types::Bool::If->new(), pos;
                 }
 
+                when (/\G(?=while\b)/) {
+                    $self->{expect_method} = 1;
+                    return Sidef::Types::Bool::While->new(), pos;
+                }
+
                 when (/\G(?=continue\b)/) {
                     $self->{expect_method} = 1;
                     return Sidef::Types::Block::Continue->new(), pos;

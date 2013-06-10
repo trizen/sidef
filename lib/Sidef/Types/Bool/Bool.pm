@@ -87,39 +87,8 @@ package Sidef::Types::Bool::Bool {
         $self ? $self->false : $self->true;
     }
 
-    sub or {
-        my ($self, $code) = @_;
-
-        if ($self->is_true) {
-            return $self;
-        }
-
-        $self->_is_code($code) || return $self->false;
-
-        my $bool = $code->run;
-        $self->_is_bool($bool) || return $self->false;
-
-        if ($bool) {
-            return Sidef::Types::Bool::Or->true;
-        }
-
-        return $self;
-    }
-
-    sub else {
-        my ($self, $code) = @_;
-
-        if ($self->is_false) {
-
-            if (ref($code) eq __PACKAGE__) {
-                return $code;
-            }
-
-            $code->run;
-        }
-
-        return $self;
-    }
+    *or  = \&{__PACKAGE__ . '::' . '||'};
+    *and = \&{__PACKAGE__ . '::' . '&&'};
 
     sub dump {
         my ($self) = @_;

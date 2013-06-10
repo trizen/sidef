@@ -11,6 +11,11 @@ var num = 0;
 while {num++ <= 9};
 
 
+var num2 = 0;
+while {num2++ <= 9} do {
+    "Hello world (%d)!\n".printf(num2);
+};
+
 
 #
 ## The equivalent of a 'do {} while' condition:

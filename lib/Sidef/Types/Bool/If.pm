@@ -5,7 +5,7 @@ use warnings;
 
 package Sidef::Types::Bool::If {
 
-    use parent qw(Sidef);
+    use parent qw(Sidef Sidef::Types::Block::Do);
 
     sub new {
         bless {do_block => 0}, __PACKAGE__;
@@ -33,25 +33,6 @@ package Sidef::Types::Bool::If {
         my ($self, $code) = @_;
         $self->{do_block} = 1;
         $self->do($code);
-    }
-
-    sub do {
-        my ($self, $code) = @_;
-
-        $self->_is_code($code) || do {
-            $self->{do_block} = 0;
-            return $self;
-        };
-
-        if ($self->{do_block}) {
-            if(ref($code->run) eq 'Sidef::Types::Block::Continue'){
-                $self->{do_block} = 0;
-                return $self;
-            }
-            return Sidef::Types::Black::Hole->new();
-        }
-
-        $self;
     }
 
 };

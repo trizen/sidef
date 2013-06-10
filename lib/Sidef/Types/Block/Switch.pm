@@ -5,7 +5,7 @@ use warnings;
 
 package Sidef::Types::Block::Switch {
 
-    use parent qw(Sidef);
+    use parent qw(Sidef Sidef::Types::Block::Do);
 
     sub new {
         my (undef, $obj) = @_;
@@ -33,25 +33,6 @@ package Sidef::Types::Block::Switch {
         }
 
         $self;
-    }
-
-    sub do {
-        my ($self, $code) = @_;
-
-        $self->_is_code($code) || do {
-            $self->{do_block} = 0;
-            return $self;
-        };
-
-        if ($self->{do_block}) {
-            if (ref($code->run) eq 'Sidef::Types::Block::Continue') {
-                $self->{do_block} = 0;
-                return $self;
-            }
-            return Sidef::Types::Black::Hole->new();
-        }
-
-        return $self;
     }
 
     sub default {
