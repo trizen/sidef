@@ -225,6 +225,8 @@ package Sidef::Types::Array::Array {
     sub map {
         my ($self, $code) = @_;
 
+        $self->_is_code($code) || return $self;
+
         my $exec = Sidef::Exec->new();
         my $var_ref = $exec->execute_expr(expr => $code->{main}[0], class => 'main');
 
@@ -232,8 +234,7 @@ package Sidef::Types::Array::Array {
             map {
                 my $val = $_->get_value;
                 $var_ref->get_var->set_value($val);
-                my @results = $exec->execute(struct => $code);
-                $results[-1];
+                $code->run;
               } @{$self}
         );
     }

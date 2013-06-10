@@ -5,12 +5,11 @@ use warnings;
 
 package Sidef::Types::Bool::Or {
 
-    require Sidef::Exec;
-    my $exec = Sidef::Exec->new();
+    use parent qw(Sidef);
 
     sub new {
-        my ($class, $val) = @_;
-        bless \$val, $class;
+        my (undef, $val) = @_;
+        bless \$val, __PACKAGE__;
     }
 
     sub true {
@@ -36,12 +35,7 @@ package Sidef::Types::Bool::Or {
             return Sidef::Types::Bool::Bool->true;
         }
 
-        my @results =
-          ref($code) eq 'Sidef::Types::Block::Code'
-          ? $exec->execute(struct => $code)
-          : $code;
-
-        return $results[-1];
+        $self->_is_code($code, 1, 1) ? $code->run() : $code;
     }
 
     sub else {

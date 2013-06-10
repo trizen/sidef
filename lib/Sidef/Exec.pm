@@ -13,8 +13,7 @@ package Sidef::Exec {
     my $parser = Sidef::Parser->new();
 
     sub new {
-        my ($class) = @_;
-        bless {}, $class;
+        bless {}, __PACKAGE__;
     }
 
     sub eval_array {
@@ -154,7 +153,7 @@ package Sidef::Exec {
 
                     $self_obj //= Sidef::Types::Nil::Nil->new();
 
-                    if (not $self_obj->can($method)) {
+                    if (not $self_obj->can('AUTOLOAD') and not $self_obj->can($method)) {
                         warn sprintf("[WARN] Inexistent method '%s' for object %s\n", $method, ref($self_obj));
                         return $self_obj;
                     }

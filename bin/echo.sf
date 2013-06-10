@@ -4,12 +4,10 @@
 #    perl sidef echo.sf -e hello there.\\nHow are you?
 #    perl sidef echo.sf Sidef is awesome.
 
-{
+if (ARGV.len >= 1 && {ARGV[0] == '-e'}) do {
     ARGV.shift;
     ARGV.join(" ").apply_escapes.say;
 }
-if (ARGV.len >= 1 && {ARGV[0] == '-e'})
-
 else {
     ARGV join " " say;
 }

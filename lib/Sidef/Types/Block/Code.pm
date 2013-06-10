@@ -11,8 +11,8 @@ package Sidef::Types::Block::Code {
     my $exec = Sidef::Exec->new();
 
     sub new {
-        my ($class, $code) = @_;
-        bless $code, $class;
+        my (undef, $code) = @_;
+        bless $code, __PACKAGE__;
     }
 
     {
@@ -126,7 +126,7 @@ package Sidef::Types::Block::Code {
             my @vars = @{$self->{$class}}[1 .. $#args + 1];
 
             foreach my $var (@vars) {
-                if ( ref $var->{self} ne 'Sidef::Variable::Ref') {
+                if (ref $var->{self} ne 'Sidef::Variable::Ref') {
                     warn "[WARN] Too many arguments in function call!",
                       " Expected $argc, but got ${\(scalar @vars)} of them.\n";
                     last;
@@ -146,8 +146,10 @@ package Sidef::Types::Block::Code {
     sub if {
         my ($self, $bool) = @_;
 
-        if ($bool->is_true) {
-            $exec->execute(struct => $self);
+        $self->_is_bool($bool) || return Sidef::Types::Bool::Bool->false;
+
+        if ($bool) {
+            $self->run;
         }
 
         return $bool;

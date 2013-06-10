@@ -5,9 +5,11 @@ use warnings;
 
 package Sidef::Types::Bool::Ternary {
 
+    use parent qw(Sidef);
+
     sub new {
-        my ($class, $hash_ref) = @_;
-        bless $hash_ref, $class;
+        my (undef, $hash_ref) = @_;
+        bless $hash_ref, __PACKAGE__;
     }
 
     {
@@ -20,14 +22,7 @@ package Sidef::Types::Bool::Ternary {
                 return $self->{code};
             }
 
-            my $exec = Sidef::Exec->new();
-
-            my @results =
-              ref($code) eq 'Sidef::Types::Block::Code'
-              ? $exec->execute(struct => $code)
-              : $code;
-
-            return $results[-1];
+            $self->_is_code($code, 1, 1) ? $code->run() : $code;
         };
     }
 

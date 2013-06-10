@@ -8,9 +8,6 @@ package Sidef::Types::Bool::Bool {
     use parent qw(Sidef::Convert::Convert);
     use overload q{bool} => sub { ${$_[0]} eq 'true' };
 
-    require Sidef::Exec;
-    my $exec = Sidef::Exec->new();
-
     sub new {
         my ($class, $bool) = @_;
 
@@ -35,9 +32,10 @@ package Sidef::Types::Bool::Bool {
         *{__PACKAGE__ . '::' . '&&'} = sub {
             my ($self, $code) = @_;
 
+            $self->_is_code($code) || return $self->false;
+
             if ($self) {
-                my @results = $exec->execute(struct => $code);
-                return $results[-1];
+                return $code->run;
             }
 
             $self->false;
@@ -47,11 +45,7 @@ package Sidef::Types::Bool::Bool {
             my ($self, $code) = @_;
 
             if (not $self) {
-                my @results =
-                  ref($code) eq 'Sidef::Types::Block::Code'
-                  ? $exec->execute(struct => $code)
-                  : $code;
-                return $results[-1];
+                return $self->_is_code($code, 1, 1) ? $code->run : $code;
             }
 
             $self->true;
@@ -61,11 +55,8 @@ package Sidef::Types::Bool::Bool {
             my ($self, $code) = @_;
 
             if ($self) {
-                my @results =
-                  ref($code) eq 'Sidef::Types::Block::Code'
-                  ? $exec->execute(struct => $code)
-                  : $code;
-                return Sidef::Types::Bool::Ternary->new({code => $results[-1], bool => $self->true});
+                my $result = $self->_is_code($code, 1, 1) ? $code->run : $code;
+                return Sidef::Types::Bool::Ternary->new({code => $result, bool => $self->true});
             }
 
             return Sidef::Types::Bool::Ternary->new({code => $code, bool => $self->false});
@@ -104,9 +95,12 @@ package Sidef::Types::Bool::Bool {
             return $self;
         }
 
-        my @results = $exec->execute(struct => $code);
+        $self->_is_code($code) || return $self->false;
 
-        if ($results[-1]->is_true) {
+        my $bool = $code->run;
+        $self->_is_bool($bool) || return $self->false;
+
+        if ($bool) {
             return Sidef::Types::Bool::Or->true;
         }
 
@@ -122,7 +116,7 @@ package Sidef::Types::Bool::Bool {
                 return $code;
             }
 
-            $exec->execute(struct => $code);
+            $code->run;
         }
 
         return $self;

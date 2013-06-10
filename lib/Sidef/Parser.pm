@@ -13,7 +13,6 @@ package Sidef::Parser {
     our $DEBUG = 0;
 
     sub new {
-        my ($class) = @_;
 
         my %options = (
             line             => 1,
@@ -71,7 +70,7 @@ package Sidef::Parser {
 
         $options{ref_vars} = $options{vars};
 
-        bless \%options, $class;
+        bless \%options, __PACKAGE__;
     }
 
     sub fatal_error {
@@ -130,6 +129,7 @@ package Sidef::Parser {
     sub parse_whitespace {
         my ($self, %opt) = @_;
 
+        my $beg_line    = $self->{line};
         my $found_space = -1;
         given ($opt{code}) {
             {
@@ -158,6 +158,14 @@ package Sidef::Parser {
                     }
                 }
                 when ($found_space > 0) {
+
+                    # End of a statement when two or more new lines has been found
+                    if ($self->{line} - $beg_line >= 2) {
+                        $self->{has_object}    = 0;
+                        $self->{expect_method} = 0;
+                        $self->{has_method}    = 0;
+                    }
+
                     return pos;
                 }
                 default {
@@ -247,6 +255,16 @@ package Sidef::Parser {
                     return Sidef::Types::Bool::Bool->new(), pos;
                 }
 
+                when (/\G(?=if\b)/) {
+                    $self->{expect_method} = 1;
+                    return Sidef::Types::Bool::If->new(), pos;
+                }
+
+                when (/\G(?=continue\b)/) {
+                    $self->{expect_method} = 1;
+                    return Sidef::Types::Block::Continue->new(), pos;
+                }
+
                 # Double quoted string
                 when (/\G$self->{re}{double_quote}/gc) {
                     return Sidef::Types::String::String->new($1)->apply_escapes(), pos;
@@ -254,7 +272,7 @@ package Sidef::Parser {
 
                 # Single quoted string
                 when (/\G$self->{re}{single_quote}/goc) {
-                    return Sidef::Types::String::String->new($1=~s{\\'}{'}gr), pos;
+                    return Sidef::Types::String::String->new($1 =~ s{\\'}{'}gr), pos;
                 }
 
                 # File quoted string
@@ -282,24 +300,24 @@ package Sidef::Parser {
                     return Sidef::Types::Number::Number->new($1), pos;
                 }
 
-                when (/\G!/gc) {
+                when (/\G(?=!)/) {
                     $self->{expect_method} = 1;
-                    return Sidef::Types::Bool::Bool->new(), pos() - 1;
+                    return Sidef::Types::Bool::Bool->new(), pos;
                 }
 
-                when (/\G:/gc) {
+                when (/\G(?=:)/) {
                     $self->{expect_method} = 1;
-                    return Sidef::Types::Block::Code->new({}), pos() - 1;
+                    return Sidef::Types::Block::Code->new({}), pos;
                 }
 
-                when (/\G\\/gc) {
+                when (/\G(?=\\)/) {
                     $self->{expect_method} = 1;
-                    return Sidef::Variable::Ref->new(), pos() - 1;
+                    return Sidef::Variable::Ref->new(), pos;
                 }
 
-                when (/\G\*/gc) {
+                when (/\G(?=\*)/) {
                     $self->{expect_method} = 1;
-                    return Sidef::Variable::Ref->new(), pos() - 1;
+                    return Sidef::Variable::Ref->new(), pos;
                 }
 
                 # Regular expression

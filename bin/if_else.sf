@@ -1,5 +1,13 @@
 #!/usr/bin/ruby
 
+########################################################
+#
+#   Usage of '{} if (expr)' is HIGHLY discouraged!!!
+#                        (use 'if (expr) do {}' instead,
+#                          or    '(expr) && {}')
+#
+########################################################
+
 #
 ## if, else
 #
@@ -7,7 +15,6 @@
 {
     "I should not be here!"->say;
 } if(false)
-
 else {
     "Right place (1)!"->say;
 };
@@ -19,7 +26,6 @@ else {
 {
     "I should not be here!"->say;
 } if(false)
-
 else (
     {
         "I should not be here!"->say;
@@ -42,7 +48,6 @@ else {
 {
     "Right place (3)!"->say;
 } if(true)
-
 or {
     {
         "I should not be here!"->say;
@@ -64,7 +69,6 @@ else {
 {
     "I should not be here!"->say;
 } if(false)
-
 or {
     {
         "Right place (4)!"->say;
@@ -86,7 +90,6 @@ else {
 {
     "I should not be here!"->say;
 } if(false)
-
 or {
     {
         "I should not be here!"->say;
@@ -108,7 +111,6 @@ else {
 {
     "I should not be here!"->say;
 } if(false)
-
 or {
     {
         "I should not be here!"->say;

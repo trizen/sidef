@@ -5,44 +5,50 @@ use warnings;
 
 package Sidef::Types::Block::Switch {
 
-    require Sidef::Exec;
-    my $exec = Sidef::Exec->new();
+    use parent qw(Sidef);
 
     sub new {
-        my ($class, $obj) = @_;
-        bless {obj => $obj, continue => 1, do_block => 0}, $class;
+        my (undef, $obj) = @_;
+        bless {obj => $obj, do_block => 0}, __PACKAGE__;
     }
 
     sub when {
         my ($self, $arg) = @_;
 
-        return $self if not $self->{continue};
-
-        if (ref $arg eq 'Sidef::Types::Block::Code') {
-            my @results = $exec->execute(struct => $arg);
-            $arg = $results[-1];
+        if (ref($arg) eq 'Sidef::Types::Block::Code') {
+            $arg = $arg->run;
         }
 
         if (ref($self->{obj}) eq ref($arg)) {
             my ($method) = '==';
 
-            if ($self->{obj}->$method($arg)) {
-                $self->{continue} = 0;
-                $self->{do_block} = 1;
-                return $self;
+            if ($self->{obj}->can($method)) {
+                if ($self->{obj}->$method($arg)) {
+                    $self->{do_block} = 1;
+                }
+            }
+            else {
+                warn sprintf("[WARN]: when(): Can't find the equal (==) method for object '%s'!\n", ref($self->{obj}));
             }
         }
 
-        $self->{continue} = 1;
-        return $self;
+        $self;
     }
 
     sub do {
-        my ($self, $block) = @_;
+        my ($self, $code) = @_;
+
+        $self->_is_code($code) || do {
+            $self->{do_block} = 0;
+            return $self;
+        };
 
         if ($self->{do_block}) {
-            $self->{do_block} = 0;
-            $exec->execute(struct => $block);
+            if (ref($code->run) eq 'Sidef::Types::Block::Continue') {
+                $self->{do_block} = 0;
+                return $self;
+            }
+            return Sidef::Types::Black::Hole->new();
         }
 
         return $self;
@@ -50,20 +56,13 @@ package Sidef::Types::Block::Switch {
 
     sub default {
         my ($self, $code) = @_;
-
-        if ($self->{continue}) {
-            $self->{continue} = 0;
-            $exec->execute(struct => $code);
-        }
-
-        $self;
+        $self->{do_block} = 1;
+        $self->do($code);
     }
 
     sub end {
         my ($self) = @_;
-        $self->{continue} = 0;
-        $self->{do_block} = 0;
-        $self;
+        Sidef::Types::Black::Hole->new();
     }
 
     sub value {

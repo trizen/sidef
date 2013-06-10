@@ -10,6 +10,7 @@ package Sidef {
     {
         my %types = (
             bool   => {class => [qw(Sidef::Types::Bool::Bool)]},
+            code   => {class => [qw(Sidef::Types::Block::Code)]},
             hash   => {class => [qw(Sidef::Types::Hash::Hash)]},
             number => {class => [qw(Sidef::Types::Number::Number)], type => 'SCALAR'},
             string => {class => [qw(Sidef::Types::String::String)], type => 'SCALAR'},
@@ -39,7 +40,7 @@ package Sidef {
                     my ($sub) = [caller(1)]->[3] =~ /^.+::(.*)/;
 
                     if (!$dont_warn) {
-                        warn sprintf("[%s] Object of type '$type' was expected, but got %s.\n",
+                        warn sprintf("[%s] Object of type '$type' was expected, but got '%s'!\n",
                                      ($sub eq '__ANON__' ? 'WARN' : $sub), ref($obj) || "an undefined object");
                     }
 
@@ -77,8 +78,7 @@ package Sidef {
     }
 
     sub new {
-        my ($class) = @_;
-        bless {}, $class;
+        bless {}, __PACKAGE__;
     }
 
 };

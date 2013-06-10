@@ -102,3 +102,26 @@ end;
         "Not the right place! (3)".say;
     }
 end;
+
+
+{0} given
+    when 1 do {
+        "Not the right place! (1)".say;
+    }
+    when '0' do {
+        "Not the right place! (2)".say;
+    }
+    when 0 do {
+        "Right place! (6)".say;
+        continue;
+    }
+    when 2 do {
+        "Not the right place! (3)".say;
+    }
+    when 0 do {
+        "Right place! (6 - continued)".say;
+    }
+    default {
+        "Not the right place! (4)".say;
+    }
+end;
