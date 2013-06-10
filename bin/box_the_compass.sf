@@ -44,5 +44,5 @@ var angles = [
 
 {
     var i = (_ * 32 / 360 + 0.5 % 32 -> int);
-    "%3d %18s %6.2f°\n".printf(i + 1, names[i], _);
+    "%2d  %-22s  %6.2f°\n".printf(i + 1, names[i], _);
 } for (angles)

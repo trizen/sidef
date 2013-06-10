@@ -1,0 +1,14 @@
+#!/usr/bin/ruby
+
+func array (x,y) {
+    (1..y).map { (1..x).map{0} }
+}
+
+#
+## Creates a two dimensional
+## array with 3 rows and 3 columns
+#
+var square = (array(3,3));
+
+square[1][1] = 1;
+square.dump.say;
