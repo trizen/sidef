@@ -8,10 +8,9 @@ package Sidef::Types::Glob::Dir {
     use parent qw(Sidef::Convert::Convert);
 
     sub new {
-        my ($class, $dir) = @_;
-        $dir   = $$dir       if ref $dir;
-        $class = ref($class) if ref($class);
-        bless \$dir, $class;
+        my (undef, $dir) = @_;
+        $dir = $$dir if ref $dir;
+        bless \$dir, __PACKAGE__;
     }
 
     # Returns the parent of the directory

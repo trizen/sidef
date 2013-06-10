@@ -10,13 +10,14 @@ package Sidef::Variable::Variable {
     };
 
     sub new {
-        my ($class, $var, $type, $value) = @_;
+        my (undef, $var, $type, $value) = @_;
 
         bless {
                name  => $var,
                type  => $type,
                value => $value,
-              }, $class;
+              },
+          __PACKAGE__;
     }
 
     sub is_defined {

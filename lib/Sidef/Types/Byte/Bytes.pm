@@ -9,9 +9,8 @@ package Sidef::Types::Byte::Bytes {
     use parent qw(Sidef::Convert::Convert Sidef::Types::Array::Array);
 
     sub new {
-        my ($class, @bytes) = @_;
-        $class = ref($class) if ref($class);
-        bless [@{Sidef::Types::Array::Array->new(@bytes)}], $class;
+        my (undef, @bytes) = @_;
+        bless [@{Sidef::Types::Array::Array->new(@bytes)}], __PACKAGE__;
     }
 
     sub join {

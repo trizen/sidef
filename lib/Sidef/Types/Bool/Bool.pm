@@ -9,15 +9,14 @@ package Sidef::Types::Bool::Bool {
     use overload q{bool} => sub { ${$_[0]} eq 'true' };
 
     sub new {
-        my ($class, $bool) = @_;
+        my (undef, $bool) = @_;
 
-        $bool  = $$bool      if (ref $bool);
-        $class = ref($class) if (ref $class);
+        $bool = $$bool if (ref $bool);
 
         # Decide if true or false
         $bool = $bool ? 'true' : 'false';
 
-        bless \$bool, $class;
+        bless \$bool, __PACKAGE__;
     }
 
     {

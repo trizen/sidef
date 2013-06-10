@@ -8,10 +8,9 @@ package Sidef::Types::Glob::File {
     use parent qw(Sidef::Convert::Convert);
 
     sub new {
-        my ($class, $file) = @_;
-        $file  = $$file      if ref $file;
-        $class = ref($class) if ref($class);
-        bless \$file, $class;
+        my (undef, $file) = @_;
+        $file = $$file if ref $file;
+        bless \$file, __PACKAGE__;
     }
 
     sub size {

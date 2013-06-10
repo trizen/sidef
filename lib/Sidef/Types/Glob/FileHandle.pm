@@ -8,12 +8,13 @@ package Sidef::Types::Glob::FileHandle {
     use Sidef::Init;
 
     sub new {
-        my ($class, %opt) = @_;
+        my (undef, %opt) = @_;
 
         bless {
                fh   => $opt{fh},
                file => $opt{file},
-              }, $class;
+              },
+          __PACKAGE__;
     }
 
     sub write {

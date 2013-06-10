@@ -8,12 +8,12 @@ package Sidef::Types::Regex::Regex {
     use parent qw(Sidef::Convert::Convert);
 
     sub new {
-        my ($class, $regex, $mod) = @_;
+        my (undef, $regex, $mod) = @_;
 
         $mod //= q{^};
         my $str_re = "(?$mod:$regex)";
 
-        bless \$str_re, $class;
+        bless \$str_re, __PACKAGE__;
     }
 
     sub matches {

@@ -8,9 +8,8 @@ package Sidef::Types::Array::Array {
     use parent qw(Sidef Sidef::Convert::Convert);
 
     sub new {
-        my ($class, @items) = @_;
-        $class = ref($class) if ref($class);
-        bless [map { Sidef::Variable::Variable->new(rand, 'var', $_) } @items], $class;
+        my (undef, @items) = @_;
+        bless [map { Sidef::Variable::Variable->new(rand, 'var', $_) } @items], __PACKAGE__;
     }
 
     sub _grep {

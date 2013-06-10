@@ -8,10 +8,9 @@ package Sidef::Types::String::String {
     use parent qw(Sidef Sidef::Convert::Convert);
 
     sub new {
-        my ($class, $str) = @_;
-        $str   = $$str       if ref $str;
-        $class = ref($class) if ref($class);
-        bless \$str, $class;
+        my (undef, $str) = @_;
+        $str = $$str if ref $str;
+        bless \$str, __PACKAGE__;
     }
 
     {

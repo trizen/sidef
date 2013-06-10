@@ -8,9 +8,8 @@ package Sidef::Types::Hash::Hash {
     use parent qw(Sidef::Convert::Convert);
 
     sub new {
-        my ($class, %hash) = @_;
-        $class = ref($class) if ref($class);
-        bless \%hash, $class;
+        my (undef, %hash) = @_;
+        bless \%hash, __PACKAGE__;
     }
 
     {

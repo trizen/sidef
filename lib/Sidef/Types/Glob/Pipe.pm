@@ -8,10 +8,9 @@ use warnings;
 package Sidef::Types::Glob::Pipe {
 
     sub new {
-        my ($class, $command) = @_;
-        $command = $$command   if ref $command;
-        $class   = ref($class) if ref($class);
-        bless \$command, $class;
+        my (undef, $command) = @_;
+        $command = $$command if ref $command;
+        bless \$command, __PACKAGE__;
     }
 
     sub command {

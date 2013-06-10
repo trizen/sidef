@@ -8,12 +8,13 @@ use warnings;
 package Sidef::Types::Glob::PipeHandle {
 
     sub new {
-        my ($class, %opt) = @_;
+        my (undef, %opt) = @_;
 
         bless {
                pipe_h => $opt{pipe_h},
                pipe   => $opt{pipe},
-              }, $class;
+              },
+          __PACKAGE__;
     }
 
     sub pipe {

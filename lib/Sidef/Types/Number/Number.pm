@@ -8,11 +8,10 @@ package Sidef::Types::Number::Number {
     use parent qw(Sidef Sidef::Convert::Convert);
 
     sub new {
-        my ($class, $num) = @_;
-        $num   = $$num       if ref $num;
-        $class = ref($class) if ref($class);
+        my (undef, $num) = @_;
+        $num = $$num if ref $num;
         $num += 0;
-        bless \$num, $class;
+        bless \$num, __PACKAGE__;
     }
 
     {

@@ -6,9 +6,8 @@ use warnings;
 package Sidef::Variable::Ref {
 
     sub new {
-        my ($class, $var) = @_;
-        $class = ref($class) if ref($class);
-        bless {var => $var}, $class;
+        my (undef, $var) = @_;
+        bless {var => $var}, __PACKAGE__;
     }
 
     {
