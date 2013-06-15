@@ -293,7 +293,7 @@ package Sidef::Types::Array::Array {
             }
             else {
                 warn
-                  sprintf("[WARN] ARRAY's method 'remove' expected a position number object, not '%s'!\n", ref($index));
+                  sprintf("[WARN] ARRAY's method 'pop' expected a position number object, not '%s'!\n", ref($index));
                 return Sidef::Types::Nil::Nil->new();
             }
 

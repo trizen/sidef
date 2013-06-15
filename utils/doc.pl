@@ -1,5 +1,7 @@
 #!/usr/bin/perl
 
+# usage: perl doc.pl  | pod2text
+
 use strict;
 use autodie;
 use warnings;
@@ -41,7 +43,7 @@ for my $d (readdir $dir_h) {
         my $package    = "${basedir}::";
 
         while (<$fh>) {
-            if (/^\h*package Sidef::Types::\w+::(\w+)/) {
+            if (/^\h*package\h+Sidef::Types::\w+::(\w+)/) {
                 $package .= $1;
                 $ref = $ref->{$1} //= {};
             }
@@ -50,7 +52,7 @@ for my $d (readdir $dir_h) {
                 my @modules = split(' ', $1);
 
                 foreach my $mod (@modules) {
-                    my ($name) = $mod =~ /(\w+::\w+)\z/;
+                    my ($name) = $mod =~ /(\w+::\w+|^\w+)\z/;
                     push @{$ref->{inherits}}, $name;
                 }
             }
@@ -61,20 +63,20 @@ for my $d (readdir $dir_h) {
                 push @{$ref->{methods}}, {name => $2};
             }
             elsif (/^\h{$indent_len}\}/) {
-                if ($last_line =~ /^\h*(?:return\h+|:\h+)?Sidef::Types::(\w+)::(\w+)/) {
-                    $ref->{methods}[-1]{returns} = "$1::$2";
+                if ($last_line =~ /^\h*(?:return\h+|:\h+)?Sidef::Types::(\w+::\w+)/) {
+                    $ref->{methods}[-1]{returns} = $1;
                 }
-                elsif ($last_line =~ /^\h*(?:return\h+)?(?:\b__PACKAGE__\b|\$self;)/) {
+                elsif ($last_line =~ /^\h*(?:return\h+)?(?:\b__PACKAGE__\b|\$self(?:;|->new|$))/) {
                     $ref->{methods}[-1]{returns} = $package;
                 }
             }
             elsif (    ref $ref->{methods} eq 'ARRAY'
                    and @{$ref->{methods}}
-                   and /\bmy\h*\(\$self(.*?)\)/s) {
+                   and /\bmy\h*\(\$self(?:,\s*)?(.*?)\)/s) {
                 my $args = $1;
-                my @args = grep { length > 0 } split(/\h*,?\h*\$/, $args);
+                my @args = grep { length() > 0 } split(/\h*,\h*/, $args);
 
-                s{\@.*}{...} for @args;
+                s{\@.*}{...}, s{^\$}{} for @args;
                 $ref->{methods}[-1]{args} = \@args;
             }
             else {
@@ -95,6 +97,12 @@ POD
 
 {
     local $\ = "\n\n";
+
+    my %esc = (
+               '>' => 'gt',
+               '<' => 'lt',
+              );
+
     foreach my $type (sort keys %{$pod}) {
 
         print "=head1 $type";
@@ -108,7 +116,7 @@ POD
 
                 @{$mod->{inherits}} = do {
                     my %seen;
-                    grep { !$seen{$_}++ } @{$mod->{inherits}};
+                    grep { defined($_) and !$seen{$_}++ } @{$mod->{inherits}};
                 };
 
                 print "=head3 Inherits from";
@@ -138,9 +146,21 @@ POD
                     }
                 }
 
+                foreach my $method (@{$mod->{methods}}) {
+                    foreach my $method_2 (@{$mod->{methods}}) {
+                        if ($method->{name} eq $method_2->{name}) {
+                            foreach my $key (keys %{$method}) {
+                                if (not exists $method_2->{$key}) {
+                                    $method_2->{$key} = $method->{$key};
+                                }
+                            }
+                        }
+                    }
+                }
+
                 @{$mod->{methods}} = do {
                     my %seen;
-                    grep { !$seen{$_->{name}}++ } @{$mod->{methods}};
+                    sort { $a->{name} cmp $b->{name} } grep { !$seen{$_->{name}}++ } reverse @{$mod->{methods}};
                 };
 
                 print "=head3 Methods";
@@ -148,7 +168,10 @@ POD
 
                 foreach my $method (sort { $a->{name} cmp $b->{name} } @{$mod->{methods}}) {
 
-                    printf "=item B<S<%-20s>> S<%25s> S<%25s>\n\n", $method->{name},
+                    my $esc_name = $method->{name} =~ s{([<>])}{E<$esc{$1}>}gr;
+
+                    printf "=item B<S<%-*s>> S<%25s> S<%25s>\n\n", 20 + (length($esc_name) - length($method->{name})),
+                      $esc_name,
                       (ref $method->{args} eq 'ARRAY'
                         && @{$method->{args}} ? (" (" . join(', ', @{$method->{args}}) . ")") : "()"),
                       (exists $method->{returns} ? " B<$method->{returns}>" : "");
