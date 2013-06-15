@@ -80,7 +80,7 @@ else {
       }
       : join(' ', <>);
 
-    my $arguments = @ARGV ? (q{'} . decode_utf8(join(q{','}, (map { s/'/\\'/gr } @ARGV))) . q{'}) : '';
+    my $arguments = @ARGV ? (q{'} . decode_utf8(join(q{','}, (map { s/(['\\])/\\$1/gr } @ARGV))) . q{'}) : '';
 
     #
     ## Predeclared variables and constants
