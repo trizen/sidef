@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 func hi (i) {
-    "Parrent function...".say;
+    "Parent function...".say;
 
     func user (user) {
         "Child function...".say;

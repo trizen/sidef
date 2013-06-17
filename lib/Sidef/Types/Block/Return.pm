@@ -10,7 +10,7 @@ package Sidef::Types::Block::Return {
     }
 
     sub return {
-        my($self, $obj) = @_;
+        my ($self, $obj) = @_;
         $self->{obj} = $obj;
         $self;
     }

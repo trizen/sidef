@@ -228,15 +228,15 @@ package Sidef::Exec {
 
                 if (ref($obj) eq 'Sidef::Types::Block::Return') {
 
-                    if ([caller(1)]->[0] eq __PACKAGE__) {
-                        return $obj->{obj};
+                    my $caller = [caller(1)]->[0];
+                    if (defined($caller) and $caller eq __PACKAGE__) {
+                        return $obj->get_obj();
                     }
 
                     return $obj;
                 }
 
                 push @results, $obj;
-
             }
         }
 
