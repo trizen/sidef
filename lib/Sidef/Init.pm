@@ -31,6 +31,7 @@ require Sidef::Types::Black::Hole if [caller]->[0] ne q{Sidef::Types::Black::Hol
 require Sidef::Types::Block::Do if [caller]->[0] ne q{Sidef::Types::Block::Do};
 require Sidef::Types::Block::Switch if [caller]->[0] ne q{Sidef::Types::Block::Switch};
 require Sidef::Types::Block::Code if [caller]->[0] ne q{Sidef::Types::Block::Code};
+require Sidef::Types::Block::Return if [caller]->[0] ne q{Sidef::Types::Block::Return};
 require Sidef::Types::Block::Continue if [caller]->[0] ne q{Sidef::Types::Block::Continue};
 require Sidef::Types::Regex::Regex if [caller]->[0] ne q{Sidef::Types::Regex::Regex};
 require Sidef::Types::Number::Number if [caller]->[0] ne q{Sidef::Types::Number::Number};

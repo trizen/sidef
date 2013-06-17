@@ -5,8 +5,6 @@ use warnings;
 
 package Sidef::Types::Glob::FileHandle {
 
-    use Sidef::Init;
-
     sub new {
         my (undef, %opt) = @_;
 
@@ -24,8 +22,18 @@ package Sidef::Types::Glob::FileHandle {
 
     sub readline {
         my ($self) = @_;
-        my $line = readline $self->{fh};
+        my $line = CORE::readline $self->{fh};
         defined($line) ? Sidef::Types::String::String->new($line) : Sidef::Types::Nil::Nil->new();
+    }
+
+    sub read_all {
+        my ($self) = @_;
+        Sidef::Types::Array::Array->new(map { Sidef::Types::String::String->new($_) } CORE::readline $self->{fh});
+    }
+
+    sub eof {
+        my ($self) = @_;
+        Sidef::Types::Bool::Bool->new(eof $self->{fh});
     }
 
     sub file {

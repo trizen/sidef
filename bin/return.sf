@@ -1,0 +1,32 @@
+#!/usr/bin/perl
+
+func hi (i) {
+    "Parrent function...".say;
+
+    func user (user) {
+        "Child function...".say;
+        return ("Username is '%s'".sprintf(user));      # child function return
+        "THIS SHOULD NOT BE PRINTED!".say;
+    }
+
+    user("trizen").say;
+
+    "Left the child function...".say;
+
+    if (i == 3) do {
+        "If block: i is 3".say;
+
+        return "IF RETURN";                             # parent function return
+
+        "NOT printed".say;
+    }
+    elsif (i == 3) do {
+        "ERROR: re-true elsif!".say;
+    }
+
+    i == 3 && {return "&& RETURN"};                     # parent function return
+    return "FUNC RETURN";                               # =//=
+    "NO RETURN";
+}
+
+hi(3).say;  # should print "IF RETURN"!

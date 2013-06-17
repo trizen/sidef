@@ -20,9 +20,13 @@ package Sidef::Types::Block::Do {
         };
 
         if ($self->{do_block}) {
-            if (ref($code->run) eq 'Sidef::Types::Block::Continue') {
+            my $result = $code->run;
+            if (ref($result) eq 'Sidef::Types::Block::Continue') {
                 $self->{do_block} = 0;
                 return $self;
+            }
+            elsif (ref($result) eq 'Sidef::Types::Block::Return') {
+                return $result;
             }
             return Sidef::Types::Black::Hole->new();
         }

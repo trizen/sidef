@@ -188,12 +188,22 @@ package Sidef::Exec {
                     if (ref($self_obj) eq 'Sidef::Variable::Variable') {
                         $self_obj = $self_obj->get_value;
                     }
+
+                    if (ref($self_obj) eq 'Sidef::Types::Block::Return') {
+                        $self->{expr_i} = $self->{expr_i_max};
+                        return $self_obj;
+                    }
                 }
             }
             else {
                 if (ref($self_obj) eq 'Sidef::Variable::Variable' and not $opt{var_ref}) {
                     $self_obj = $self_obj->get_value;
                 }
+            }
+
+            if (ref($self_obj) eq 'Sidef::Types::Block::Return') {
+                $self->{expr_i} = $self->{expr_i_max};
+                return $self_obj;
             }
 
             return $self_obj;
@@ -210,8 +220,23 @@ package Sidef::Exec {
 
         my @results;
         foreach my $key (keys %{$struct}) {
-            foreach my $expr (@{$struct->{$key}}) {
-                push @results, $self->execute_expr(%opt, class => $key, expr => $expr);
+            local $self->{expr_i_max} = $#{$struct->{$key}};
+            for (local $self->{expr_i} = 0 ; $self->{expr_i} <= $self->{expr_i_max} ; $self->{expr_i} += 1) {
+
+                my $expr = $struct->{$key}[$self->{expr_i}];
+                my $obj = $self->execute_expr(%opt, class => $key, expr => $expr);
+
+                if (ref($obj) eq 'Sidef::Types::Block::Return') {
+
+                    if ([caller(1)]->[0] eq __PACKAGE__) {
+                        return $obj->{obj};
+                    }
+
+                    return $obj;
+                }
+
+                push @results, $obj;
+
             }
         }
 

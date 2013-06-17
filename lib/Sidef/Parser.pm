@@ -270,6 +270,11 @@ package Sidef::Parser {
                     return Sidef::Types::Block::Continue->new(), pos;
                 }
 
+                when (/\G(?=return\b)/) {
+                    $self->{expect_method} = 1;
+                    return Sidef::Types::Block::Return->new(), pos;
+                }
+
                 # Double quoted string
                 when (/\G$self->{re}{double_quote}/gc) {
                     return Sidef::Types::String::String->new($1)->apply_escapes(), pos;
