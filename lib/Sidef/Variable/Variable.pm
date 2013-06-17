@@ -131,8 +131,14 @@ package Sidef::Variable::Variable {
             *{__PACKAGE__ . '::' . $operator . '='} = sub {
                 my ($self, $arg) = @_;
 
-                my ($method) = $operator;
-                $self->set_value($self->get_value->$method($arg));
+                my $value = $self->get_value;
+                if (defined $value and $value->can($operator)) {
+                    $self->set_value($self->get_value->$operator($arg));
+                }
+                else {
+                    warn sprintf("[WARN] Can't find the method $operator= for %s!\n",
+                                 defined($value) ? ('object ' . ref($value)) : 'an undefined object');
+                }
                 $self;
             };
 
