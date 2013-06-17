@@ -1,0 +1,10 @@
+#!/usr/bin/ruby
+
+if (2+1 == 3) {
+    "Hello World".say;
+}
+
+var x = 5;
+while {x-- >= 0} {
+    "Counting: %d\n".printf(x);
+}

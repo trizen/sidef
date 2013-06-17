@@ -14,6 +14,8 @@ package Sidef::Parser {
 
     sub new {
 
+        my (undef, %opts) = @_;
+
         my %options = (
             line             => 1,
             has_object       => 0,
@@ -66,7 +68,8 @@ package Sidef::Parser {
                     qr{(@operators)};
                 },
             },
-        );
+            %opts,
+                      );
 
         $options{ref_vars} = $options{vars};
 
@@ -75,10 +78,19 @@ package Sidef::Parser {
 
     sub fatal_error {
         my ($self, %opt) = @_;
-        my $index = index($opt{'code'}, "\n", $opt{'pos'});
-        $index += ($index == -1) ? (length($opt{'code'})) : -$opt{'pos'};
 
-        die "\n** Syntax error at line $self->{line}, near:\n\t\"", substr($opt{'code'}, $opt{'pos'}, $index), "\"\n";
+        my $index = index($opt{code}, "\n", $opt{pos});
+        $index += ($index == -1) ? (length($opt{code}) + 1) : -$opt{pos};
+
+        my $rindex = rindex($opt{code}, "\n", $opt{pos});
+        $rindex += 1;
+
+        warn +($self->{script_name} // '-') . ':'
+          . $self->{line}
+          . ": syntax error, "
+          . join(', ', grep { defined } $opt{error}, $opt{expected}) . "\n";
+        warn substr($opt{code}, $rindex, ($opt{pos} - $rindex) + $index) . "\n";
+        die ' ' x ($opt{pos} - $rindex), '^', "\n";
     }
 
     sub find_var {
@@ -403,8 +415,12 @@ package Sidef::Parser {
                             $variable->set_value($obj);
                         }
                         else {
-                            warn "Invalid declaration of function '$name'! Expected: func $name(...){...}\n";
-                            $self->fatal_error(code => $_, pos => pos($_));
+                            $self->fatal_error(
+                                               error    => "invalid function declaration",
+                                               expected => "expected: func $name(...){...}",
+                                               code     => $_,
+                                               pos      => pos($_)
+                                              );
                         }
                     }
 
@@ -416,7 +432,7 @@ package Sidef::Parser {
 
                     my ($var, $code) = $self->find_var($1);
 
-                    if ($var) {
+                    if (ref $var) {
                         $var->{count}++;
 
                         if ($var->{type} eq 'func') {
@@ -428,9 +444,11 @@ package Sidef::Parser {
                         return $var->{obj}, pos;
                     }
 
-                    warn "Attempt to use an uninitialized variable: <$1>\n";
-                    $self->fatal_error(code => $_,
-                                       pos  => (pos($_) - length($1)));
+                    $self->fatal_error(
+                                       code  => $_,
+                                       pos   => (pos($_) - length($1)),
+                                       error => "attempt to use an uninitialized variable <$1>",
+                                      );
                 }
                 default {
                     warn "[LINE $self->{line}] Unexpected char: " . substr($_, pos(), 1) . "\n";
@@ -612,8 +630,11 @@ package Sidef::Parser {
                     if (@{[caller(1)]}) {
 
                         if ($self->{right_brackets} < 0) {
-                            warn "Unbalanced right brackets!\n";
-                            $self->fatal_error(code => $_, pos => pos($_) - 1);
+                            $self->fatal_error(
+                                               error => 'unbalanced right brackets',
+                                               code  => $_,
+                                               pos   => pos($_) - 1,
+                                              );
                         }
 
                         $self->{has_object}    = 1;
@@ -632,8 +653,11 @@ package Sidef::Parser {
                     if (@{[caller(1)]}) {
 
                         if ($self->{curly_brackets} < 0) {
-                            warn "Unbalanced right brackets!\n";
-                            $self->fatal_error(code => $_, pos => pos($_) - 1);
+                            $self->fatal_error(
+                                               error => 'unbalanced curly brackets',
+                                               code  => $_,
+                                               pos   => pos($_) - 1,
+                                              );
                         }
 
                         $self->{has_object}    = 1;
@@ -652,8 +676,11 @@ package Sidef::Parser {
                     if (@{[caller(1)]}) {
 
                         if (--$self->{parentheses} < 0) {
-                            warn "Unbalanced parentheses!\n";
-                            $self->fatal_error(code => $_, pos => pos($_) - 1);
+                            $self->fatal_error(
+                                               error => 'unbalanced parentheses',
+                                               code  => $_,
+                                               pos   => pos($_) - 1,
+                                              );
                         }
 
                         return (\%struct, pos);
@@ -703,6 +730,8 @@ package Sidef::Parser {
                 # Parse expression or object and use it as main object (self)
                 default {
 
+                    my ($expect_method, $has_object) = ($self->{expect_method}, $self->{has_object});
+
                     my ($obj, $pos) = $self->parse_expr(code => substr($_, pos));
                     pos($_) = $pos + pos;
 
@@ -711,7 +740,28 @@ package Sidef::Parser {
                         $self->{has_object}    = 1;
                         $self->{expect_method} = 1;
 
-                        push @{$struct{$self->{class}}}, {self => $obj};
+                        if ($expect_method and $has_object) {
+
+                            my $self_obj   = ref($struct{$self->{class}}[-1]{self});
+                            my $method_obj = Sidef::Types::String::String->new('');
+
+                            if ($self_obj ~~ [qw(Sidef::Types::Bool::While Sidef::Types::Bool::If)]) {
+                                $$method_obj = 'do';
+                            }
+                            else {
+                                $self->fatal_error(
+                                                   error => 'expected a method, not an object!',
+                                                   code  => $_,
+                                                   pos   => pos($_) - $pos,
+                                                  );
+                            }
+
+                            push @{$struct{$self->{class}}[-1]{call}}, {name => $method_obj};
+                            push @{$struct{$self->{class}}[-1]{call}[-1]{arg}}, $obj;
+                        }
+                        else {
+                            push @{$struct{$self->{class}}}, {self => $obj};
+                        }
 
                         if (/\G(?=\h*\[)/) {
                             $self->{expect_index} = 1;

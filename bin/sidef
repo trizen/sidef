@@ -59,13 +59,12 @@ if (defined $args{d}) {
 }
 else {
     require Sidef::Parser;
-    my $parser = Sidef::Parser->new();
 
-    my $script_name = '';
+    my $script_name = '-';
 
     my $code =
       exists $args{E}
-      ? $args{E}
+      ? do { $script_name = '-E'; $args{E} }
       : (defined($ARGV[0]) && -f $ARGV[0]) ? do {
 
         my $file = shift;
@@ -96,6 +95,7 @@ const SCRIPT     = (File.new("\Q$script_name\E"));
 __RESET_LINE_COUNTER__;
 EOH
 
+    my $parser = Sidef::Parser->new(script_name => $script_name);
     $struct = $parser->parse_script(code => $header . $code);
 }
 

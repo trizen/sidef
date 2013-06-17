@@ -34,6 +34,11 @@ package Sidef::Types::Block::Do {
         return $self;
     }
 
+    {
+        no strict 'refs';
+        *{__PACKAGE__ . '::' . ':'} = \&do;
+    }
+
 };
 
 1;
