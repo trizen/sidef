@@ -205,11 +205,15 @@ package Sidef::Types::String::String {
     sub eval {
         my ($self) = @_;
 
-        my $parser = Sidef::Parser->new();
-        my $struct = $parser->parse_script(code => $$self);
+        my $parser = Sidef::Parser->new(script_name => '/eval/');
+        my $struct = eval { $parser->parse_script(code => $$self) } // {};
+
+        warn $@ if $@;
 
         my $exec = Sidef::Exec->new();
-        my @results = $exec->execute(struct => $struct);
+        my @results = eval { $exec->execute(struct => $struct) };
+
+        warn $@ if $@;
 
         return $results[-1];
     }

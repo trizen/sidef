@@ -9,9 +9,6 @@ package Sidef::Exec {
 
     use parent qw(Sidef);
 
-    require Sidef::Parser;
-    my $parser = Sidef::Parser->new();
-
     sub new {
         bless {}, __PACKAGE__;
     }
