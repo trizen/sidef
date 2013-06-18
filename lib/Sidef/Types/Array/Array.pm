@@ -194,7 +194,7 @@ package Sidef::Types::Array::Array {
     sub _min_max {
         my ($self, $method) = @_;
 
-        $#{$self} >= 0 or return Sidef::Types::Nil::Nil->new();
+        $#{$self} > -1 or return;
 
         my $max_item = $self->[0]->get_value;
 
@@ -219,6 +219,31 @@ package Sidef::Types::Array::Array {
 
     sub min {
         $_[0]->_min_max('<');
+    }
+
+    sub _op_equal {
+        my ($self, $method) = @_;
+
+        $#{$self} > -1 || return;
+        my $first = $self->[0]->get_value;
+
+        foreach my $i (1 .. $#{$self}) {
+            my $obj = $self->[$i]->get_value;
+
+            if ($obj->can($method)) {
+                $first = $first->$method($obj);
+            }
+        }
+
+        $first;
+    }
+
+    sub sum {
+        $_[0]->_op_equal('+');
+    }
+
+    sub multiply {
+        $_[0]->_op_equal('*');
     }
 
     sub map {
@@ -288,25 +313,24 @@ package Sidef::Types::Array::Array {
             if ($self->_is_number($index, 1, 1)) {
                 $$index <= $#{$self} or do {
                     warn "[WARN] Array index '$$index' is bigger than array's offset '$#{$self}'!\n";
-                    return Sidef::Types::Nil::Nil->new();
+                    return;
                 };
             }
             else {
-                warn
-                  sprintf("[WARN] ARRAY's method 'pop' expected a position number object, not '%s'!\n", ref($index));
-                return Sidef::Types::Nil::Nil->new();
+                warn sprintf("[WARN] ARRAY's method 'pop' expected a position number object, not '%s'!\n", ref($index));
+                return;
             }
 
             return ((splice(@{$self}, $$index, 1))->get_value);
         }
 
-        $#{$self} >= 0 || return Sidef::Types::Nil::Nil->new;
+        $#{$self} > -1 || return;
         (pop @{$self})->get_value;
     }
 
     sub shift {
         my ($self) = @_;
-        $#{$self} >= 0 || return Sidef::Types::Nil::Nil->new;
+        $#{$self} > -1 || return;
         (shift @{$self})->get_value;
     }
 
@@ -332,6 +356,8 @@ package Sidef::Types::Array::Array {
         my ($self) = @_;
         $self->new(reverse map { $_->get_value } @{$self});
     }
+
+    *reversed = \&reverse;    # alias
 
     sub to_hash {
         my ($self) = @_;
