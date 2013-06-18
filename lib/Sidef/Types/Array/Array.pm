@@ -246,6 +246,16 @@ package Sidef::Types::Array::Array {
         $_[0]->_op_equal('*');
     }
 
+    sub divide {
+        $_[0]->_op_equal('/');
+    }
+
+    sub exists {
+        my ($self, $index) = @_;
+        $self->_is_number($index, 1) || return;
+        Sidef::Types::Bool::Bool->new(exists $self->[$$index]);
+    }
+
     sub map {
         my ($self, $code) = @_;
 
@@ -372,7 +382,7 @@ package Sidef::Types::Array::Array {
         foreach my $i (0 .. $#{$self}) {
             my $item = $self->[$i]->get_value;
 
-            if (defined $item->can('dump')) {
+            if (defined $item and defined $item->can('dump')) {
                 $$string .= $item->dump();
             }
             else {

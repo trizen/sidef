@@ -23,13 +23,26 @@ package Sidef::Types::Hash::Hash {
     }
 
     sub keys {
-        my ($hash_ref) = @_;
-        Sidef::Types::Array::Array->new(keys %{$hash_ref});
+        my ($self) = @_;
+        Sidef::Types::Array::Array->new(map { Sidef::Types::String::String->new($_) } keys %{$self});
     }
 
     sub values {
-        my ($hash_ref) = @_;
-        Sidef::Types::Array::Array->new(values %{$hash_ref});
+        my ($self) = @_;
+        Sidef::Types::Array::Array->new(values %{$self});
+    }
+
+    sub exists {
+        my ($self, $key) = @_;
+        $key // do {
+            warn sprintf(
+                           "[exists] %s\n", @_ == 1
+                         ? "No keyword specified!"
+                         : "Invalid keyword: not defined!"
+                        );
+            return;
+        };
+        Sidef::Types::Bool::Bool->new(exists $self->{$key});
     }
 
     sub map {

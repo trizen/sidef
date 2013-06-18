@@ -85,12 +85,27 @@ package Sidef::Parser {
         my $rindex = rindex($opt{code}, "\n", $opt{pos});
         $rindex += 1;
 
-        warn +($self->{script_name} // '-') . ':'
+        my $start = $rindex;
+        my $point = $opt{pos} - $start;
+        my $len   = $point + $index;
+
+        if ($len > 78) {
+            if ($point - $start > 60) {
+                $start = ($point - 60);
+                $point = $point - $start + $rindex;
+                $len   = ($opt{pos} + $index - $start);
+            }
+            $len = 78 if $len > 78;
+        }
+
+        my $error =
+            +($self->{script_name} // '-') . ':'
           . $self->{line}
           . ": syntax error, "
-          . join(', ', grep { defined } $opt{error}, $opt{expected}) . "\n";
-        warn substr($opt{code}, $rindex, ($opt{pos} - $rindex) + $index) . "\n";
-        die ' ' x ($opt{pos} - $rindex), '^', "\n";
+          . join(', ', grep { defined } $opt{error}, $opt{expected}) . "\n"
+          . substr($opt{code}, $start, $len) . "\n";
+
+        die $error, ' ' x ($point), '^', "\n";
     }
 
     sub find_var {
@@ -107,6 +122,16 @@ package Sidef::Parser {
         }
 
         return;
+    }
+
+    sub get_caller_num {
+        for my $z (1 .. 1000) {    # should be enough
+            if (not caller($z)) {
+                return $z - 1;
+            }
+        }
+
+        return -1;
     }
 
     sub get_method_name {
@@ -227,7 +252,7 @@ package Sidef::Parser {
                     return Sidef::Types::Glob::File->new(), pos;
                 }
 
-                when (/\GArray\b/gc) {
+                when (/\GArr(?:ay)?\b/gc) {
                     return Sidef::Types::Array::Array->new(), pos;
                 }
 
@@ -235,11 +260,11 @@ package Sidef::Parser {
                     return Sidef::Types::Hash::Hash->new(), pos;
                 }
 
-                when (/\GString\b/gc) {
+                when (/\GStr(?:ing)?\b/gc) {
                     return Sidef::Types::String::String->new(), pos;
                 }
 
-                when (/\GNumber\b/gc) {
+                when (/\GNum(?:ber)?\b/gc) {
                     return Sidef::Types::Number::Number->new(), pos;
                 }
 
@@ -255,16 +280,20 @@ package Sidef::Parser {
                     return Sidef::Types::Byte::Bytes->new(), pos;
                 }
 
-                when (/\GChar\b/gc) {
+                when (/\GCha?r\b/gc) {
                     return Sidef::Types::Char::Char->new(), pos;
                 }
 
-                when (/\GChar\b/gc) {
+                when (/\GCha?rs\b/gc) {
                     return Sidef::Types::Char::Chars->new(), pos;
                 }
 
                 when (/\GBool\b/gc) {
                     return Sidef::Types::Bool::Bool->new(), pos;
+                }
+
+                when (/\GSys\b/gc) {
+                    return Sidef::Sys::Sys->new(), pos;
                 }
 
                 when (/\G(?=if\b)/) {
@@ -285,6 +314,11 @@ package Sidef::Parser {
                 when (/\G(?=return\b)/) {
                     $self->{expect_method} = 1;
                     return Sidef::Types::Block::Return->new(), pos;
+                }
+
+                when (/\G(?=break\b)/) {
+                    $self->{expect_method} = 1;
+                    return Sidef::Types::Block::Break->new(), pos;
                 }
 
                 # Double quoted string
@@ -699,7 +733,7 @@ package Sidef::Parser {
 
                     $self->{expect_index} = /\G(?=\h*\[)/;
 
-                    push @{$self->{last_object}{ind}}, $array;
+                    push @{$self->{$self->get_caller_num}{last_object}{ind}}, $array;
                     redo;
                 }
 
@@ -717,7 +751,7 @@ package Sidef::Parser {
                         else {
                             push @{$struct{$self->{class}}[-1]{call}[-1]{arg}}, {$self->{class} => [{self => $obj}]};
                             if (/\G(?=\h*\[)/) {
-                                $self->{last_object} =
+                                $self->{$self->get_caller_num}{last_object} =
                                   $struct{$self->{class}}[-1]{call}[-1]{arg}[-1]{$self->{class}}[-1];
                                 $self->{expect_index} = 1;
                             }
@@ -765,7 +799,7 @@ package Sidef::Parser {
 
                         if (/\G(?=\h*\[)/) {
                             $self->{expect_index} = 1;
-                            $self->{last_object}  = $struct{$self->{class}}[-1];
+                            $self->{$self->get_caller_num}{last_object} = $struct{$self->{class}}[-1];
                         }
                     }
 

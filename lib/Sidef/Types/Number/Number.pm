@@ -138,6 +138,11 @@ package Sidef::Types::Number::Number {
         $self->new(CORE::log($$self) / CORE::log(2));
     }
 
+    sub inf {
+        my ($self) = @_;
+        $self->new('inf');
+    }
+
     sub chr {
         my ($self) = @_;
         Sidef::Types::Char::Char->new(CORE::chr $$self);
@@ -171,6 +176,13 @@ package Sidef::Types::Number::Number {
     sub is_integer {
         my ($self) = @_;
         Sidef::Types::Bool::Bool->new($$self - CORE::int($$self) == 0);
+    }
+
+    sub rand {
+        my ($self, $range) = @_;
+        $range = $$range if ref($range);
+        $range //= 1;
+        $self->new($$self + rand($range - $$self));
     }
 
     sub commify {

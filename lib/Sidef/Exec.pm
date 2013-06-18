@@ -151,7 +151,8 @@ package Sidef::Exec {
                     $self_obj //= Sidef::Types::Nil::Nil->new();
 
                     if (not $self_obj->can('AUTOLOAD') and not $self_obj->can($method)) {
-                        warn sprintf("[WARN] Inexistent method '%s' for object %s\n", $method, ref($self_obj));
+                        warn sprintf("[WARN] Inexistent method '%s' for object %s\n",
+                                     $method, ref($self_obj) || '- undefined!');
                         return $self_obj;
                     }
 

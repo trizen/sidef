@@ -1,0 +1,94 @@
+#!/usr/bin/perl
+
+# Dice game solver
+
+var board = [
+             [4, 1, 3, 3, 5, 2],
+             [3, 4, 1, 2, 0, 3],
+             [5, 1, 5, 5, 4, 2],
+             [1, 3, 2, 5, 2, 1],
+             [6, 2, 4, 1, 5, 4],
+             [6, 2, 1, 6, 6, 3],
+            ]
+
+var moves = (:{
+             'up'         => [-1, +0],
+             'up-right'   => [-1, +1],
+             'up-left'    => [-1, -1],
+             'right'      => [+0, +1],
+             'left'       => [+0, -1],
+             'down'       => [+1, +0],
+             'down-left'  => [+1, -1],
+             'down-right' => [+1, +1],
+            });
+
+var directions = (moves.keys);
+
+func valid_move (row, col) {
+
+    if (
+        {row < 0} || {!(board.exists(row))}
+     || {col < 0} || {!(board[row].exists(col))}
+     ) {
+        return(false);
+    }
+
+    return(true);
+}
+
+while {true} {
+
+    var map  = (Hash.new);
+    var seen = (Hash.new);
+    var dirs = (Array.new);
+
+    var current_pos = [board.offset, 0];
+    var current_num = board[current_pos[0]][current_pos[1]];
+
+    var i = 0;
+     {
+        var dir = (
+         map.exists(current_num)
+          ? {map[current_num]}
+          : {
+            var d;
+            { d = directions[directions.len.rand] } do
+                while {map.values.contains(d)};
+            d;
+          }
+        );
+
+        var pos = moves[dir];
+        var row = (current_pos[0] + pos[0]);
+        var col = (current_pos[1] + pos[1]);
+
+        valid_move(row, col) ? {
+
+        dirs.push(:{
+                'dir' => dir,
+                'num' => current_num,
+                'pos' => current_pos,
+            });
+
+        map[current_num] := dir;
+        current_pos = [row, col];
+        current_num = board[current_pos[0]][current_pos[1]];
+
+        seen[current_num] := 0;
+        seen[current_num]++;
+
+        if (current_num == 0) {
+
+            if (seen[board[current_pos[0] - pos[0]][current_pos[1] - pos[1]]] > 1) {
+                dirs.map {
+                    "Go %-40s (from num '%d')\n".printf(_["dir"], _["num"]);
+                };
+                Sys.exit(0);
+            }
+
+            i = (Num.inf);
+        }
+      } : {i = (Num.inf)};
+
+    } for {i = 0; i <= (board.len**2); i++};
+}

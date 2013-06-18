@@ -2,6 +2,7 @@
 use 5.014;
 use strict;
 use warnings;
+no warnings 'recursion';
 
 package Sidef::Types::Bool::While {
 
@@ -18,7 +19,7 @@ package Sidef::Types::Bool::While {
         $self->_is_code($code) || return $self;
         $self->{code} = $code;
 
-        my  $bool = $code->run;
+        my $bool = $code->run;
         $self->_is_bool($bool) || return $self;
 
         $self->{do_block} = $bool ? 1 : 0;
@@ -27,9 +28,9 @@ package Sidef::Types::Bool::While {
     }
 
     sub do {
-        my($self, $code) = @_;
+        my ($self, $code) = @_;
 
-        if($self->{do_block}){
+        if ($self->{do_block}) {
             my $do = Sidef::Types::Block::Do->new;
             $do->{do_block} = $self->{do_block};
             $do->do($code);
