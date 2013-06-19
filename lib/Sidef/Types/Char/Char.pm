@@ -5,7 +5,7 @@ use warnings;
 
 package Sidef::Types::Char::Char {
 
-    use parent qw(Sidef::Convert::Convert Sidef::Types::String::String);
+    use parent qw(Sidef::Types::String::String Sidef::Convert::Convert);
 
     sub new {
         my (undef, $char) = @_;

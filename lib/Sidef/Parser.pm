@@ -723,6 +723,9 @@ package Sidef::Parser {
                                               );
                         }
 
+                        $self->{has_object}    = 1;
+                        $self->{expect_method} = 1;
+                        $self->{has_method}    = 0;
                         return (\%struct, pos);
                     }
 

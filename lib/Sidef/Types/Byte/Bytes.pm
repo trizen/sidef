@@ -6,7 +6,7 @@ use warnings;
 package Sidef::Types::Byte::Bytes {
 
     use autouse 'Encode' => qw(decode_utf8($;$));
-    use parent qw(Sidef::Convert::Convert Sidef::Types::Array::Array);
+    use parent qw(Sidef::Types::Array::Array Sidef::Convert::Convert);
 
     sub new {
         my (undef, @bytes) = @_;

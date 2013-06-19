@@ -347,19 +347,35 @@ package Sidef::Types::Array::Array {
     sub push {
         my ($self, @args) = @_;
         push @{$self}, @{$self->new(@args)};
-        return $self;
+        $self;
     }
 
     sub unshift {
         my ($self, @args) = @_;
         unshift @{$self}, @{$self->new(@args)};
-        return $self;
+        $self;
     }
 
+    # Join the array as string
     sub join {
-        my ($self, $separator) = @_;
-        $self->_is_string($separator) || return $self;
-        Sidef::Types::String::String->new(CORE::join($$separator, @{$self}));
+        my ($self, $delim) = @_;
+        $delim = ref($delim) && $self->_is_string($delim) ? $$delim : '';
+        Sidef::Types::String::String->new(CORE::join($delim, @{$self}));
+    }
+
+    # Insert an object between every element
+    sub join_insert {
+        my ($self, $delim_obj) = @_;
+
+        $#{$self} > -1 || return $self->new();
+
+        my $array = $self->new($self->[0]->get_value);
+
+        foreach my $i (1 .. $#{$self}) {
+            $array->push($delim_obj, $self->[$i]->get_value);
+        }
+
+        $array;
     }
 
     sub reverse {

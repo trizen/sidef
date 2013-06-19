@@ -5,7 +5,7 @@ use warnings;
 
 package Sidef::Types::Byte::Byte {
 
-    use parent qw(Sidef::Convert::Convert Sidef::Types::Number::Number);
+    use parent qw(Sidef::Types::Number::Number Sidef::Convert::Convert);
 
     sub new {
         my (undef, $byte) = @_;

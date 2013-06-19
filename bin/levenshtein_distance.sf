@@ -1,0 +1,68 @@
+#!/usr/bin/ruby
+
+# Translation of: http://rosettacode.org/wiki/Levenshtein_distance#Go
+
+func levenshtein (s, t) {
+
+    ######################################
+    ## This is a valid way of creating a
+    ## two-dimensional array at run-time
+    ######################################
+
+    # var d = (Array.make(s.len+1, []));
+
+    # for (d.range) {
+    #    d[_] = (Array.make(t.len+1, Num));
+    # }
+
+    ######################################
+    ## But I like more the following code:
+    ######################################
+
+    func new_array (type, rows, cols) {
+        (1..rows).map { (1..cols).map{type} }
+    }
+
+    var d = (new_array(Num, s.len+1, t.len+1));
+
+    #########END-OF-MY-LIKED-CODE#########
+
+    for (d.range) {
+        d[_][0] = _;
+    }
+
+    for (d[0].range) {
+        d[0][_] = _;
+    }
+
+    foreach (1 .. (t.len)) {
+        var j = _;
+
+        foreach (1 .. (s.len)) {
+            var i = _;
+
+            if (s[i-1] == t[j-1]) {
+                d[i][j] = d[i-1][j-1];
+            }
+            else {
+                var min = d[i-1][j];
+
+                d[i][j-1] < min && {
+                    min = d[i][j-1];
+                };
+                d[i-1][j-1] < min && {
+                    min = d[i-1][j-1];
+                };
+
+                d[i][j] = (min + 1);
+            }
+        }
+    }
+
+    return(d[s.len][t.len]);
+}
+
+for [["kitten", "sitting"], ["rosettacode", "raisethysword"]] {
+    "Distance between '%s' and '%s' is: %d\n"
+        -> printf(_[0], _[1] => levenshtein(_[0].to_chars, _[1].to_chars));
+}
