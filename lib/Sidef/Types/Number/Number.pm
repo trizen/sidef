@@ -179,10 +179,12 @@ package Sidef::Types::Number::Number {
     }
 
     sub rand {
-        my ($self, $range) = @_;
-        $range = $$range if ref($range);
-        $range //= 1;
-        $self->new($$self + rand($range - $$self));
+        my ($self, $max) = @_;
+
+        my $min = $$self;
+        $max = ref($max) ? $$max : do { $min = 0; $$self };
+
+        $self->new($min + rand($max - $min));
     }
 
     sub commify {

@@ -1,0 +1,12 @@
+#!/usr/bin/ruby
+
+var array = ("a".."z");
+
+{
+    var num = (array.len.rand.int);
+
+    array.offset < num
+        && {"Index overflow!".warn; Sys.exit(1)};
+
+    array.offset == num && {"Got an offset number".say};
+} * 100;

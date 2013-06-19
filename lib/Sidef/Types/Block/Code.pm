@@ -51,7 +51,8 @@ package Sidef::Types::Block::Code {
             $self->_is_number($num) || return $self;
 
             foreach my $i (1 .. $num) {
-                $exec->execute(struct => $self);
+                my $res = $self->_run_code();
+                return $res if defined $res;
             }
 
             $self;

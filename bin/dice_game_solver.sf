@@ -45,14 +45,13 @@ while {true} {
     var current_pos = [board.offset, 0];
     var current_num = board[current_pos[0]][current_pos[1]];
 
-    var i = 0;
-     {
+    {
         var dir = (
          map.exists(current_num)
           ? {map[current_num]}
           : {
             var d;
-            { d = directions[directions.len.rand] } do
+            { d = directions[directions.len.rand.int] } do
                 while {map.values.contains(d)};
             d;
           }
@@ -62,7 +61,7 @@ while {true} {
         var row = (current_pos[0] + pos[0]);
         var col = (current_pos[1] + pos[1]);
 
-        valid_move(row, col) ? {
+        valid_move(row, col) || {break};
 
         dirs.push(:{
                 'dir' => dir,
@@ -75,20 +74,19 @@ while {true} {
         current_num = board[current_pos[0]][current_pos[1]];
 
         seen[current_num] := 0;
-        seen[current_num]++;
+        seen[current_num] += 1;
 
         if (current_num == 0) {
 
             if (seen[board[current_pos[0] - pos[0]][current_pos[1] - pos[1]]] > 1) {
                 dirs.map {
-                    "Go %-40s (from num '%d')\n".printf(_["dir"], _["num"]);
+                    "Go %-40s (from num '%s')\n".printf(_["dir"], _["num"]);
                 };
                 Sys.exit(0);
             }
 
-            i = (Num.inf);
+            break;
         }
-      } : {i = (Num.inf)};
 
-    } for {i = 0; i <= (board.len**2); i++};
+    } * (board.offset**2);
 }

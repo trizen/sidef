@@ -232,6 +232,21 @@ package Sidef::Types::String::String {
         Sidef::Types::Bool::Bool->new(CORE::index($$self, $$string, $$start_pos) != -1);
     }
 
+    sub warn {
+        my ($self) = @_;
+        print STDERR $$self;
+    }
+
+    sub die {
+        my ($self) = @_;
+
+        $self->warn;
+
+        exit $! if $!;              # errno
+        exit $? >> 8 if $? >> 8;    # child exit status
+        exit 255;                   # last resort
+    }
+
     sub apply_escapes {
         my ($self) = @_;
 
