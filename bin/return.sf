@@ -30,3 +30,22 @@ func hi (i) {
 }
 
 hi(3).say;  # should print "IF RETURN"!
+
+
+#
+## Return from 'for' loop
+#
+
+func hello (name) {
+    "\nLet's welcome %s!\n".printf(name);
+
+    for ["a", "z", "f"] {
+        "Returning from loop...".say;
+        return "Bye bye!";
+        "Hello".say;
+    }
+
+    "We don't get here!".say;
+}
+
+hello("Sidef").say;

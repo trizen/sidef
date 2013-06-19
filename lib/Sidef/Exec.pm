@@ -199,7 +199,7 @@ package Sidef::Exec {
                 }
             }
 
-            if (ref($self_obj) eq 'Sidef::Types::Block::Return') {
+            if (ref($self_obj) ~~ ['Sidef::Types::Block::Break', 'Sidef::Types::Block::Return']) {
                 $self->{expr_i} = $self->{expr_i_max};
                 return $self_obj;
             }
@@ -229,6 +229,15 @@ package Sidef::Exec {
                     my $caller = [caller(1)]->[0];
                     if (defined($caller) and $caller eq __PACKAGE__) {
                         return $obj->get_obj();
+                    }
+
+                    return $obj;
+                }
+                elsif (ref($obj) eq 'Sidef::Types::Block::Break') {
+
+                    my $caller = [caller(1)]->[0];
+                    if (defined($caller) and $caller ~~ ['Sidef::Types::Block::Do', 'Sidef::Types::Block::Code']) {
+                        return $obj;
                     }
 
                     return $obj;

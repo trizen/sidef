@@ -1,0 +1,77 @@
+#!/usr/bin/ruby
+
+var i = 15;
+
+#
+## while {bool} {...}
+#
+while {i -= 1 >= 10 } {
+    "Hello".say;
+
+    i == 13
+        && { break; "Don't print this".say };
+
+    "World".say;
+}
+
+#
+## {...} while {bool}
+#
+{
+    "Bau Bau".say, break;
+    "Don't say this".say;
+} while {i-- > 5};
+
+#
+## {...} for (array)
+#
+{
+    "For: " + _.say; break; _.say;
+} for ["a","b","c"];
+
+#
+## {...} for {;;}
+#
+{
+    var i;
+    {
+        i.to_s.say;
+        i == 3 && {break};
+        i >= 3 && {"This should not be printed!".say};
+    } for {i = 1; i<=10; i++};
+}.run;
+
+#
+## Loop inside loop
+#
+for ["a", "b", "c"] {
+
+    "<<<: " + _.say;
+
+    foreach ["d", "e", "f"] {
+        ">>>: " + _.say;
+        break;
+    }
+
+    _ == "b" && {break};
+}
+
+#
+## for {;;} {...}
+#
+{
+    var i;
+    for { i = 0; i<= 10; i++ } {
+        "Last result!".say;
+        break;
+    };
+
+}.run;
+
+
+#
+## for (array) {...}
+#
+for ["a","b","c"] {
+    break; _.say;  # doesn't say it
+}

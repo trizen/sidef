@@ -3,6 +3,8 @@ use 5.014;
 use strict;
 use warnings;
 
+no if $] >= 5.018, warnings => "experimental::smartmatch";
+
 package Sidef::Types::Block::Do {
 
     use parent qw(Sidef);
@@ -25,7 +27,8 @@ package Sidef::Types::Block::Do {
                 $self->{do_block} = 0;
                 return $self;
             }
-            elsif (ref($result) eq 'Sidef::Types::Block::Return') {
+            elsif (ref($result) ~~ ['Sidef::Types::Block::Break', 'Sidef::Types::Block::Return']) {
+                $self->{do_block} = 0;
                 return $result;
             }
             return Sidef::Types::Black::Hole->new();

@@ -75,6 +75,14 @@ package Sidef::Types::Block::Code {
         Sidef::Types::Hash::Hash->new(@results);
     }
 
+    sub _run_code {
+        my ($self) = @_;
+        my $result = $self->run;
+            ref($result) eq 'Sidef::Types::Block::Return' ? $result
+          : ref($result) eq 'Sidef::Types::Block::Break'  ? $self
+          :                                                 ();
+    }
+
     sub run {
         my ($self) = @_;
         my @results = $exec->execute(struct => $self);
@@ -99,7 +107,8 @@ package Sidef::Types::Block::Code {
             $self->_is_bool($bool) || return $self;
 
             if ($bool) {
-                $self->exec;
+                my $res = $self->_run_code();
+                return $res if defined $res;
                 redo;
             }
         }
@@ -166,7 +175,8 @@ package Sidef::Types::Block::Code {
                 my $var_ref = $exec->execute_expr(expr => $self->{$class}[0]);
                 foreach my $item (@{$arg}) {
                     $var_ref->get_var->set_value($item->get_value);
-                    $exec->execute(struct => $self);
+                    my $res = $self->_run_code();
+                    return $res if defined $res;
                 }
             }
 
@@ -190,7 +200,8 @@ package Sidef::Types::Block::Code {
                     my ($bool) = $exec->execute_expr(expr => $arg->{$class}[2], class => $class);
 
                     if ($bool->is_true) {
-                        $exec->execute(struct => $self);
+                        my $res = $self->_run_code();
+                        return $res if defined $res;
                         $exec->execute_expr(expr => $expr, class => $class);
                         redo;
                     }

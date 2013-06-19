@@ -125,12 +125,11 @@ package Sidef::Parser {
     }
 
     sub get_caller_num {
-        for my $z (1 .. 1000) {    # should be enough
+        for (my $z = 1 ; $z < 1000 ; $z++) {    # should be enough
             if (not caller($z)) {
-                return $z - 1;
+                return $z;
             }
         }
-
         return -1;
     }
 
@@ -306,6 +305,11 @@ package Sidef::Parser {
                     return Sidef::Types::Bool::While->new(), pos;
                 }
 
+                when (/\G(?=for(?:each)?\b)/) {
+                    $self->{expect_method} = 1;
+                    return Sidef::Types::Block::For->new(), pos;
+                }
+
                 when (/\G(?=continue\b)/) {
                     $self->{expect_method} = 1;
                     return Sidef::Types::Block::Continue->new(), pos;
@@ -470,7 +474,7 @@ package Sidef::Parser {
                         $var->{count}++;
 
                         if ($var->{type} eq 'func') {
-                            if (/\G(?=\s*\()/) {
+                            if (/\G(?=\h*\()/) {
                                 $self->{expect_func_call} = 1;
                             }
                         }
@@ -673,6 +677,7 @@ package Sidef::Parser {
 
                         $self->{has_object}    = 1;
                         $self->{expect_method} = 1;
+                        $self->{has_method}    = 0;
                         return (\%struct, pos);
                     }
 
@@ -696,6 +701,7 @@ package Sidef::Parser {
 
                         $self->{has_object}    = 1;
                         $self->{expect_method} = 1;
+                        $self->{has_method}    = 0;
                         return (\%struct, pos);
                     }
 
@@ -779,7 +785,8 @@ package Sidef::Parser {
                             my $self_obj   = ref($struct{$self->{class}}[-1]{self});
                             my $method_obj = Sidef::Types::String::String->new('');
 
-                            if ($self_obj ~~ [qw(Sidef::Types::Bool::While Sidef::Types::Bool::If)]) {
+                            if ($self_obj ~~
+                                [qw(Sidef::Types::Block::For Sidef::Types::Bool::While Sidef::Types::Bool::If)]) {
                                 $$method_obj = 'do';
                             }
                             else {
