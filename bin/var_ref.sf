@@ -53,3 +53,23 @@ x = text;
     z.say;
 
 }.run;
+
+'-' * 80 say;
+
+###################################
+
+{
+    func assign2ref (ref, value) {
+        *ref = value;
+        return(ref);
+    }
+
+    var name;
+
+    var name_ref = (assign2ref(\name, "Carl"));
+    *name_ref.say;
+
+    assign2ref(\name, "John");
+    "Assigned name: " + name.say;
+
+}.run;

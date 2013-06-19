@@ -160,9 +160,8 @@ package Sidef::Exec {
 
                         foreach my $arg (@{$call->{arg}}) {
                             if (ref $arg eq 'HASH') {
-                                push @arguments,
-                                  $self->execute(struct  => $arg,
-                                                 var_ref => (ref($self_obj) eq 'Sidef::Variable::Ref') ? 1 : 0,);
+                                local $self->{var_ref} = ref($self_obj) eq 'Sidef::Variable::Ref';
+                                push @arguments, $self->execute(struct => $arg);
                             }
                             else {
                                 push @arguments, $arg;
@@ -194,7 +193,7 @@ package Sidef::Exec {
                 }
             }
             else {
-                if (ref($self_obj) eq 'Sidef::Variable::Variable' and not $opt{var_ref}) {
+                if (ref($self_obj) eq 'Sidef::Variable::Variable' and not $self->{var_ref}) {
                     $self_obj = $self_obj->get_value;
                 }
             }
