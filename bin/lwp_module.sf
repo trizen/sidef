@@ -1,0 +1,22 @@
+#!/usr/bin/perl
+
+var req = (require 'LWP::UserAgent');
+
+if(nil != req){
+
+    var lwp = (req.new(
+        'show_progress' => 1,
+        'timeout'       => 10,
+        'agent'         => 'Mozilla/5.0',
+    ));
+
+    var resp = (lwp->get("http://google.com"));
+
+    if(Bool.new(resp->is_success)){
+        var content = (Str.new(resp->content));
+        "Content length is: %d\n".printf(content.len);
+    }
+    else {
+        "[ERROR] Response: %s\n".sprintf(Str.new(resp->status_line)).warn;
+    }
+}

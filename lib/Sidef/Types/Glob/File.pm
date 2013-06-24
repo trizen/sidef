@@ -13,6 +13,10 @@ package Sidef::Types::Glob::File {
         bless \$file, __PACKAGE__;
     }
 
+    sub get_value {
+        ${$_[0]};
+    }
+
     sub size {
         my ($self) = @_;
         Sidef::Types::Number::Number->new(-s $$self);

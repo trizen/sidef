@@ -13,6 +13,10 @@ package Sidef::Types::String::String {
         bless \$str, __PACKAGE__;
     }
 
+    sub get_value {
+        ${$_[0]};
+    }
+
     {
         no strict 'refs';
 

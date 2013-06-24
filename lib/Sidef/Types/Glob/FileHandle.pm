@@ -15,6 +15,10 @@ package Sidef::Types::Glob::FileHandle {
           __PACKAGE__;
     }
 
+    sub get_value {
+        $_[0]->{fh};
+    }
+
     sub write {
         my ($self, $string) = @_;
         Sidef::Types::Bool::Bool->new(print {$self->{fh}} $string);

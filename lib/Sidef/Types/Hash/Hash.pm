@@ -12,6 +12,17 @@ package Sidef::Types::Hash::Hash {
         bless \%hash, __PACKAGE__;
     }
 
+    sub get_value {
+        my ($self) = @_;
+
+        my %hash;
+        while (my ($k, $v) = each %{$self}) {
+            $hash{$k} = ref($v) && $v->can('get_value') ? $v->get_value : $v;
+        }
+
+        \%hash;
+    }
+
     {
         no strict 'refs';
 

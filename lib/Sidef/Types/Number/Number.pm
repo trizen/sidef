@@ -14,6 +14,10 @@ package Sidef::Types::Number::Number {
         bless \$num, __PACKAGE__;
     }
 
+    sub get_value {
+        ${$_[0]};
+    }
+
     {
         no strict 'refs';
 

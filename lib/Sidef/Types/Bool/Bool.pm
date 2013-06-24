@@ -19,6 +19,10 @@ package Sidef::Types::Bool::Bool {
         bless \$bool, __PACKAGE__;
     }
 
+    sub get_value {
+        ${$_[0]} eq 'true';
+    }
+
     {
         no strict 'refs';
 

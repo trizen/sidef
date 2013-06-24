@@ -11,6 +11,10 @@ package Sidef::Types::Nil::Nil {
         bless \(my $nil = 'nil'), __PACKAGE__;
     }
 
+    sub get_value {
+        undef;
+    }
+
     sub dump {
         Sidef::Types::String::String->new('nil');
     }

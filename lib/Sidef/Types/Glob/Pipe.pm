@@ -13,6 +13,10 @@ package Sidef::Types::Glob::Pipe {
         bless \$command, __PACKAGE__;
     }
 
+    sub get_value {
+        ${$_[0]};
+    }
+
     sub command {
         my ($self) = @_;
         Sidef::Types::String::String->new($$self);

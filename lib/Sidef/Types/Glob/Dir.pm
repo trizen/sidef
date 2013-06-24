@@ -13,6 +13,10 @@ package Sidef::Types::Glob::Dir {
         bless \$dir, __PACKAGE__;
     }
 
+    sub get_value {
+        ${$_[0]};
+    }
+
     # Returns the parent of the directory
     sub parent {
         my ($self) = @_;

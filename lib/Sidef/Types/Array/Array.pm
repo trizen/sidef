@@ -12,6 +12,24 @@ package Sidef::Types::Array::Array {
         bless [map { Sidef::Variable::Variable->new(rand, 'var', $_) } @items], __PACKAGE__;
     }
 
+    sub get_value {
+        my ($self) = @_;
+
+        my @array;
+        foreach my $i (0 .. $#{$self}) {
+            my $item = $self->[$i]->get_value;
+
+            if (defined $item and defined $item->can('get_value')) {
+                push @array, $item->get_value;
+            }
+            else {
+                push @array, $item;
+            }
+        }
+
+        \@array;
+    }
+
     sub _grep {
         my ($self, $array, $bool) = @_;
         my $new_array = $self->new();

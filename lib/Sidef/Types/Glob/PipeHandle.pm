@@ -17,6 +17,10 @@ package Sidef::Types::Glob::PipeHandle {
           __PACKAGE__;
     }
 
+    sub get_value {
+        $_[0]->{pipe_h};
+    }
+
     sub pipe {
         my ($self) = @_;
         $self->{pipe};
