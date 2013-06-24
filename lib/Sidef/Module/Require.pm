@@ -13,7 +13,7 @@ package Sidef::Module::Require {
         my ($self, $module) = @_;
 
         $self->{module_name} = $module->get_value;
-        ($self->{module} = $self->{module_name} . '.pm') =~ s{::}{/};
+        ($self->{module} = $self->{module_name} . '.pm') =~ s{::}{/}g;
 
         eval { require $self->{module} };
 

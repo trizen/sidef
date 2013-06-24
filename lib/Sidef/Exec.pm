@@ -135,9 +135,11 @@ package Sidef::Exec {
                         $method = $self->execute_expr(expr => $method);
                     }
 
+                    $method = $$method if ref($method);
+
                     if (
                         ref $self_obj eq 'Sidef::Variable::Variable'
-                        and not $$method ~~ [
+                        and not $method ~~ [
                             qw(
                               =  :=  +=  -=  *=  /=
                               %=  **=  ||=  &&=  |=
@@ -179,6 +181,7 @@ package Sidef::Exec {
                         $self_obj = $self_obj->$method(@arguments);
                     }
                     else {
+                        $method //= '';
                         $self_obj = $self_obj->$method;
                     }
 

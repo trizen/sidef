@@ -18,13 +18,34 @@ package Sidef::Module::Caller {
         return if $AUTOLOAD =~ /::DESTROY$/;
         (my $method = $AUTOLOAD) =~ s/.*:://;
 
-        my $value = $self->{module}->$method(@arg ? (map { $_->get_value } @arg) : ());
+        if ($method eq '') {
+            return Sidef::Module::Func->_new(module => $self->{module});
+        }
 
-        if (ref($value) && eval { $value->can('can') }) {
-            $self->_new(module => ($value));
+        if ($self->{module}->can($method)) {
+            my $value = $self->{module}->$method(
+                @arg
+                ? (
+                   map {
+                       ref($_) && ref($_) =~ /^Sidef::/ && eval { $_->can('get_value') }
+                         ? $_->get_value
+                         : $_
+                     } @arg
+                  )
+                : ()
+            );
+
+            if (ref($value) && eval { $value->can('can') }) {
+                return $self->_new(module => ($value));
+            }
+            else {
+                return $value;
+            }
         }
         else {
-            return $value;
+            warn sprintf(qq{[WARN] Can't locate object method "$method" via package "%s"\n},
+                         (ref($self->{module}) ? ref($self->{module}) : $self->{module}));
+            return;
         }
     }
 

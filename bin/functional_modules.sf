@@ -1,0 +1,25 @@
+#!/usr/bin/perl
+
+var spec = ( require 'File::Spec::Functions'->() );     # ->() is for functional
+Str.new(spec.catfile(spec.curdir, SCRIPT)).say;
+Str.new(spec.rel2abs(SCRIPT)).say;
+
+
+#
+## Same thing, but with a req check
+#
+
+var req = ( require 'File::Spec::Functions' );
+
+if (nil != req) {
+    var spec = ( req->() );
+    "=> Your root dir is '%s'.\n"printf(spec.rootdir);
+}
+
+__END__
+var ron = ( require 'Lingua::RO::Numbers'->() );
+var num = (Str.new(ron.number_to_ro(123553)));
+
+Str.new(ron.number_to_ro(spec)).say;
+
+num.say;
