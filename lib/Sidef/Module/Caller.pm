@@ -14,8 +14,6 @@ package Sidef::Module::Caller {
 
     sub AUTOLOAD {
         my ($self, @arg) = @_;
-
-        return if $AUTOLOAD =~ /::DESTROY$/;
         (my $method = $AUTOLOAD) =~ s/.*:://;
 
         if ($method eq '') {
@@ -27,7 +25,7 @@ package Sidef::Module::Caller {
                 @arg
                 ? (
                    map {
-                       ref($_) && ref($_) =~ /^Sidef::/ && eval { $_->can('get_value') }
+                       ref($_) =~ /^Sidef::/ && $_->can('get_value')
                          ? $_->get_value
                          : $_
                      } @arg
