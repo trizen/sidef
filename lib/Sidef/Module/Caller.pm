@@ -14,7 +14,8 @@ package Sidef::Module::Caller {
 
     sub AUTOLOAD {
         my ($self, @arg) = @_;
-        (my $method = $AUTOLOAD) =~ s/.*:://;
+
+        my $method = substr($AUTOLOAD, rindex($AUTOLOAD, '::') + 2);
 
         if ($method eq '') {
             return Sidef::Module::Func->_new(module => $self->{module});

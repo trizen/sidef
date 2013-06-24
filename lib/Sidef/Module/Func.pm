@@ -15,7 +15,7 @@ package Sidef::Module::Func {
     sub AUTOLOAD {
         my ($self, @arg) = @_;
 
-        (my $func = $AUTOLOAD) =~ s/.*:://;
+        my $func = substr($AUTOLOAD, rindex($AUTOLOAD, '::') + 2);
         my $sub = \&{$self->{module} . '::' . $func};
 
         if (defined &$sub) {
@@ -25,7 +25,6 @@ package Sidef::Module::Func {
                      ? (map { ref($_) =~ /^Sidef::/ && $_->can('get_value') ? $_->get_value : $_ } @arg)
                      : ()
                     );
-
         }
         else {
             warn qq{[WARN] Can't locate function '$func' via package "$self->{module}"!\n};
