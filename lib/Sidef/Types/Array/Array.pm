@@ -315,6 +315,31 @@ package Sidef::Types::Array::Array {
         $self;
     }
 
+    sub unique {
+        my ($self) = @_;
+
+        my %indices;
+        my $method = '==';
+        my $max    = $#{$self};
+
+        foreach my $i (0 .. $max - 1) {
+            for (my $j = $i + 1 ; $j <= $max ; $j++) {
+                my $diff = ($#{$self} - $max);
+                my ($x, $y) = ($self->[$i + $diff]->get_value, $self->[$j + $diff]->get_value);
+                if (ref($x) eq ref($y) and $x->can($method) and $x->$method($y)) {
+
+                    # {$i + $diff}  -- to keep the last occurred duplicates
+                    undef $indices{$j + $diff};
+
+                    --$max;
+                    --$j;
+                }
+            }
+        }
+
+        $self->new(map { $self->[$_]->get_value } grep { not exists $indices{$_} } 0 .. $#{$self});
+    }
+
     sub contains {
         my ($self, $obj) = @_;
 

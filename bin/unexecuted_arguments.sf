@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/ruby
 
 false
     && ("This should not be printed".say);              # not printed
