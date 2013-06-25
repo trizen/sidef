@@ -40,7 +40,7 @@ package Sidef::Types::Hash::Hash {
 
     sub values {
         my ($self) = @_;
-        Sidef::Types::Array::Array->new(values %{$self});
+        Sidef::Types::Array::Array->new(map { $_->get_value } values %{$self});
     }
 
     sub exists {

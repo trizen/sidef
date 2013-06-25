@@ -291,6 +291,23 @@ package Sidef::Types::Array::Array {
         );
     }
 
+    sub grep {
+        my ($self, $code) = @_;
+
+        $self->_is_code($code) || return $self;
+
+        my $exec = Sidef::Exec->new();
+        my $var_ref = $exec->execute_expr(expr => $code->{main}[0], class => 'main');
+
+        $self->new(
+            grep {
+                my $val = $_->get_value;
+                $var_ref->get_var->set_value($val);
+                $code->run;
+              } @{$self}
+        );
+    }
+
     sub length {
         my ($self) = @_;
         Sidef::Types::Number::Number->new(scalar @{$self});

@@ -391,7 +391,7 @@ package Sidef::Parser {
                 }
 
                 # Regular expression
-                when (/\G$self->{re}{regex}/goc || ($] >= 5.017001 && /\G$self->{re}{m_regex}/goc)) {
+                when (/\G$self->{re}{regex}/goc) {
 
                     my $regex = Sidef::Types::String::String->new($1)->apply_escapes();
                     my ($flags) = (/\G($self->{re}{match_flags})/gc);
