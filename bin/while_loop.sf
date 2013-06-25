@@ -8,12 +8,12 @@ var num = 0;
 {
     "Hello world (%d)!\n".printf(num);
 }
-while {num++ <= 9};
+while (num++ <= 3);
 
 
 var num2 = 0;
-while {num2++ <= 9} do {
-    "Hello world (%d)!\n".printf(num2);
+while (num2++ <= 3) do {
+    "Hello sidef (%d)!\n".printf(num2);
 };
 
 
@@ -23,5 +23,4 @@ while {num2++ <= 9} do {
 
 {
     "Hey!".say;
-}
-do while {false};
+} do while (false);

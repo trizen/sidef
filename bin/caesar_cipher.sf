@@ -2,7 +2,7 @@
 
 func encipher (msg, key, decode) {
 
-        decode && {key = (26 - key)};           # seems that we need the '=-' operator.
+        decode && (key = (26 - key));           # seems that we need the '=-' operator.
 
         msg.map {
             _.ord - 65 + key % 26 + 65 . chr;   # no need to worry about the operators precedence.

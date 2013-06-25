@@ -9,22 +9,22 @@ else {
 }
 
 
-if {
+if (
     var x = 9;
     var y = 3;
     x * y == 27;
-} do {
+) do {
     "Good math!".say;
 }
 
 
-if {false} do {
+if (false) do {
     "False is true? Weird...".say
 }
 elsif (false) do {
     "False is true in elsif? Are you drunk?".say;
 }
-elsif {true} do {
+elsif (true) do {
     "True in elsif. Welcome to life".say;
     continue;
 }

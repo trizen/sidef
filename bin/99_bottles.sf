@@ -4,16 +4,16 @@ var i;
 {
     var bottles  = ('%s bottle%s'.sprintf
         (
-            i == 0 ? {'No'} : {i},
-            i == 1 ? {''}   : {'s'}
+            i == 0 ? 'No' : i,
+            i == 1 ? ''   : 's'
         )
     );
 
     var sentence = ('%s of beer on the wall'.sprintf(bottles)).say;
 
-    i > 0 && {
+    i > 0 && (
         sentence.substr(0, bottles.length + 8)->say;
         "Take one down, pass it around\n"->say;
-    };
+    );
 
-} for {i = 99; i >= 0; i--};
+} for (i = 99; i >= 0; i--);

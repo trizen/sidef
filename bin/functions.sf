@@ -23,7 +23,7 @@ func fibonacci () {                    # note that () is empty,
     i = old_j;
 
     "%d ".printf(i);
-    count-- > 0 && {fibonacci(i, j)};
+    count-- > 0 && (fibonacci(i, j));
 
     i;
 };

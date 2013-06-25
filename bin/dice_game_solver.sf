@@ -27,8 +27,8 @@ var directions = (moves.keys);
 func valid_move (row, col) {
 
     if (
-        {row < 0} || {!(board.exists(row))}
-     || {col < 0} || {!(board[row].exists(col))}
+        (row < 0) || (!(board.exists(row)))
+     || (col < 0) || (!(board[row].exists(col)))
      ) {
         return(false);
     }
@@ -36,7 +36,7 @@ func valid_move (row, col) {
     return(true);
 }
 
-while {true} {
+while (true) {
 
     var map  = (Hash.new);
     var seen = (Hash.new);
@@ -48,20 +48,20 @@ while {true} {
     {
         var dir = (
          map.exists(current_num)
-          ? {map[current_num]}
-          : {
+          ? (map[current_num])
+          : (
             var d;
             { d = directions[directions.len.rand.int] } do
-                while {map.values.contains(d)};
+                while (map.values.contains(d));
             d;
-          }
+          )
         );
 
         var pos = moves[dir];
         var row = (current_pos[0] + pos[0]);
         var col = (current_pos[1] + pos[1]);
 
-        valid_move(row, col) || {break};
+        valid_move(row, col) || (break);
 
         dirs.push(:{
                 'dir' => dir,

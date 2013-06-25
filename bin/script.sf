@@ -199,9 +199,9 @@ regex -> to_s -> say;                               # prints the regex
 /item/ =~ ["str", [123, ["w", "item", "x"], 6], "boo"] -> to_s -> say;    # matches 'item' in nested array
 
 
-"\n=>> Variable interpolation for regular expressions:"->say;
+#"\n=>> Variable interpolation for regular expressions:"->say;
 
-'-' * 80 -> say;
+#'-' * 80 -> say;
 
 #var re = '\w';
 #"test" =~ /\d$re/ -> to_s->say;                  # false
@@ -397,7 +397,7 @@ var index;
 {
     "** Sum of 0 to %d is: %d\n"->printf(index, (index * (index + 1) / 2));
 }
--> for {index = 1; index < 10; index++};
+-> for (index = 1; index < 10; index++);
 
 '-' * 80 -> say;
 

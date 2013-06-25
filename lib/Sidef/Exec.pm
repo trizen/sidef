@@ -135,6 +135,7 @@ package Sidef::Exec {
                         $method = $self->execute_expr(expr => $method);
                     }
 
+                    $method //= '';
                     $method = $$method if ref($method);
 
                     if (
@@ -150,7 +151,9 @@ package Sidef::Exec {
                         $self_obj = $self_obj->get_value;
                     }
 
-                    $self_obj //= Sidef::Types::Nil::Nil->new();
+                    ref($self_obj) && eval { $self_obj->can('can') } || do {
+                        $self_obj = Sidef::Types::Nil::Nil->new();
+                    };
 
                     if (not $self_obj->can('AUTOLOAD') and not $self_obj->can($method)) {
                         warn sprintf("[WARN] Inexistent method '%s' for object %s\n",
@@ -158,10 +161,33 @@ package Sidef::Exec {
                         return $self_obj;
                     }
 
+                    my $type =
+                      ref($self_obj) eq 'Sidef::Variable::Variable' ? ref($self_obj->get_value()) : ref($self_obj);
+
                     if (exists $call->{arg}) {
 
                         foreach my $arg (@{$call->{arg}}) {
-                            if (ref $arg eq 'HASH') {
+                            if (
+                                ref $arg eq 'HASH'
+                                and not(
+                                       ($type eq 'Sidef::Types::Bool::Bool' and $method ~~ [qw(&& || ?)])
+                                    || ($type eq 'Sidef::Types::Block::Code'   and $method ~~ [qw(while)])
+                                    || ($type eq 'Sidef::Types::Bool::While'   and $method ~~ [qw(while)])
+                                    || ($type eq 'Sidef::Types::Bool::Ternary' and $method ~~ [qw(:)])
+                                    || ($type eq 'Sidef::Types::Bool::If'      and $method ~~ [qw(if elsif)])
+                                    || (
+                                        $type ~~ [
+                                            qw(
+                                              Sidef::Types::Block::Code
+                                              Sidef::Types::Block::For
+                                              )
+                                        ]
+                                        and $method ~~ [qw(for foreach)]
+                                        and ref $arg->{$opt{class}} eq 'ARRAY'
+                                        and @{$arg->{$opt{class}}} != 1
+                                       )
+                                )
+                              ) {
                                 local $self->{var_ref} = ref($self_obj) eq 'Sidef::Variable::Ref';
                                 push @arguments, $self->execute(struct => $arg);
                             }

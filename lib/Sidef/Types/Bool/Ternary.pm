@@ -7,6 +7,9 @@ package Sidef::Types::Bool::Ternary {
 
     use parent qw(Sidef);
 
+    require Sidef::Exec;
+    my $exec = Sidef::Exec->new;
+
     sub new {
         my (undef, $hash_ref) = @_;
         bless $hash_ref, __PACKAGE__;
@@ -22,7 +25,8 @@ package Sidef::Types::Bool::Ternary {
                 return $self->{code};
             }
 
-            $self->_is_code($code, 1, 1) ? $code->run() : $code;
+            my @results = $exec->execute(struct => $code);
+            $results[-1];
         };
     }
 

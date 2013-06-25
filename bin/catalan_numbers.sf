@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-func f (i) { i != 0 ? { i * (f(i-1)) } : {1} };
+func f (i) { i != 0 ? ( i * (f(i-1)) ) : 1 };
 func c (n) { (f(2*n)) / (f(n)) / (f(n+1)) };
 
 {

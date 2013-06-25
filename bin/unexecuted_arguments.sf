@@ -1,0 +1,25 @@
+#!/usr/bin/perl
+
+false
+    && ("This should not be printed".say);              # not printed
+
+
+true
+    && false
+        && ("Error!".say);                              # not printed
+
+
+true
+    && true
+        && ("Passed test!".say)                         # printed
+            && false
+                && ("But failed at the end!".say);      # not printed
+
+
+
+
+while (false) {
+    "While fail!".say;                                 # not printed
+}
+
+(false || false || true)->to_s->say;    # prints "true"

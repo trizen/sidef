@@ -5,11 +5,11 @@ var i = 15;
 #
 ## while {bool} {...}
 #
-while {i -= 1 >= 10 } {
+while (i -= 1 >= 10) {
     "Hello".say;
 
     i == 13
-        && { break; "Don't print this".say };
+        && (break; "Don't print this".say);
 
     "World".say;
 }
@@ -20,7 +20,7 @@ while {i -= 1 >= 10 } {
 {
     "Bau Bau".say, break;
     "Don't say this".say;
-} while {i-- > 5};
+} while (i-- > 5);
 
 #
 ## {...} for (array)
@@ -36,9 +36,9 @@ while {i -= 1 >= 10 } {
     var i;
     {
         i.to_s.say;
-        i == 3 && {break};
-        i >= 3 && {"This should not be printed!".say};
-    } for {i = 1; i<=10; i++};
+        i == 3 && (break);
+        i >= 3 && ("This should not be printed!".say);
+    } for (i = 1; i<=10; i++);
 }.run;
 
 #
@@ -53,7 +53,7 @@ for ["a", "b", "c"] {
         break;
     }
 
-    _ == "b" && {break};
+    if(_=="b"){break};
 }
 
 #
@@ -61,7 +61,7 @@ for ["a", "b", "c"] {
 #
 {
     var i;
-    for { i = 0; i<= 10; i++ } {
+    for (i = 0; i<= 10; i++) {
         "Last result!".say;
         break;
     };

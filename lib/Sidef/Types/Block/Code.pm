@@ -18,33 +18,6 @@ package Sidef::Types::Block::Code {
     {
         no strict 'refs';
 
-        *{__PACKAGE__ . '::' . '||'} = sub {
-            my ($self, $code) = @_;
-
-            my $method = '||';
-            my @results = $exec->execute(struct => $self);
-
-            return $results[-1]->$method($code);
-        };
-
-        *{__PACKAGE__ . '::' . '&&'} = sub {
-            my ($self, $code) = @_;
-
-            my $method = '&&';
-            my @results = $exec->execute(struct => $self);
-
-            return $results[-1]->$method($code);
-        };
-
-        *{__PACKAGE__ . '::' . '?'} = sub {
-            my ($self, $code) = @_;
-
-            my $method = '?';
-            my @results = $exec->execute(struct => $self);
-
-            return $results[-1]->$method($code);
-        };
-
         *{__PACKAGE__ . '::' . '*'} = sub {
             my ($self, $num) = @_;
 
@@ -101,10 +74,13 @@ package Sidef::Types::Block::Code {
     sub while {
         my ($self, $condition) = @_;
 
-        $self->_is_code($condition) || return $self;
+        # $self->_is_code($condition) || return $self;
 
         {
-            my $bool = $condition->run;
+            #  my $bool = $condition->run;
+            my (@results) = $exec->execute(struct => $condition);
+            my $bool = $results[-1];
+
             $self->_is_bool($bool) || return $self;
 
             if ($bool) {
@@ -182,7 +158,7 @@ package Sidef::Types::Block::Code {
             }
 
         }
-        elsif (ref $arg eq 'Sidef::Types::Block::Code') {
+        elsif (ref $arg eq 'HASH') {
 
             my $counter = 0;
             {
@@ -190,15 +166,15 @@ package Sidef::Types::Block::Code {
 
                     if ($counter++ == 0) {
 
-                        if ((my $argn = $#{$arg->{$class}}) != 3) {
+                        if ((my $argn = @{$arg->{$class}}) != 3) {
                             warn "[WARN] The 'for' loop needs exactly three arguments! We got $argn of them.\n";
                         }
 
-                        $exec->execute_expr(expr => $arg->{$class}[1], class => $class);
+                        $exec->execute_expr(expr => $arg->{$class}[0], class => $class);
                     }
 
-                    my $expr = $arg->{$class}[3];
-                    my ($bool) = $exec->execute_expr(expr => $arg->{$class}[2], class => $class);
+                    my $expr = $arg->{$class}[2];
+                    my ($bool) = $exec->execute_expr(expr => $arg->{$class}[1], class => $class);
 
                     if ($bool->is_true) {
                         my $res = $self->_run_code();
@@ -206,8 +182,13 @@ package Sidef::Types::Block::Code {
                         $exec->execute_expr(expr => $expr, class => $class);
                         redo;
                     }
+
+                    last;
                 }
             }
+        }
+        else {
+            warn sprintf("[WARN] The 'for' loop expected (;;) or [], but got '%s'!\n", ref($arg));
         }
 
         $self;

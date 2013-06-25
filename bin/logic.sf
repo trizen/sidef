@@ -1,32 +1,32 @@
 #!/usr/bin/ruby
 
-(true  ? {"x"} : {"y"})->say;               # prints "x"
-(false ? {"x"} : {"y"})->say;               # prints "y"
+(true  ? "x" : "y")->say;               # prints "x"
+(false ? "x" : "y")->say;               # prints "y"
 
 ''say;
 
-(false || {false} || {true})->to_s->say;    # prints "true"
-(false || {"hello"}) -> say;                # prints "hello"
-(false || {false} || {"world"}) say;        # prints "world"
-(false || {false} || {false}) -> to_s->say; # prints "false"
-(true  && {true} && {"linux"}) say;         # prints "linux"
-(true  && {false} && {true}) to_s.say;      # prints "false"
-(false && {"perl"} || {"sidef"}) say;       # prints "sidef"
+(false || (false) || (true))->to_s->say;    # prints "true"
+(false || "hello") -> say;                  # prints "hello"
+(false || false || "world") say;            # prints "world"
+(false || false || false) -> to_s->say;     # prints "false"
+(true  && true && "linux") say;             # prints "linux"
+(true  && false && true) to_s.say;          # prints "false"
+(false && "perl" || "sidef") say;           # prints "sidef"
 
 ''say;
 
-({false; true;} && {"&& block"}) say;       # prints "&& block"
-({true; false;} || {"|| block"}) say;       # prints "|| block"
+({false; true}.run && ("&& block")) say;       # prints "&& block"
+({true; false}.run || ("|| block")) say;       # prints "|| block"
 
 ''say;
 
-({false; true;} ? {"one"} : {"zero"}) say;  # prints "one"
-({true; false;} ? {"one"} : {"zero"}) say;  # prints "zero"
+{false; true}.run ? "one" : "zero" -> say;  # prints "one"
+{true; false}.run ? "one" : "zero" -> say;  # prints "zero"
 
 
 #
 ## The ternary operator is, actually, an object:
 #
 
-var ternary = (false ? {"False is true?!".say});
-ternary : {"two".say};
+var ternary = (false ? ("False is true?!".say));
+ternary : ("\nTest passed!".say);

@@ -122,7 +122,7 @@ package Sidef::Variable::Variable {
                 my ($self, $arg) = @_;
 
                 my $value = $self->get_value;
-                if (defined $value and $value->can($operator)) {
+                if (ref($value) and eval {$value->can($operator)}) {
                     $self->set_value($self->get_value->$operator($arg));
                 }
                 else {

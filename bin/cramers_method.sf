@@ -20,18 +20,18 @@ func diag_multiply_sum (matrix, left) {
     var range    = (matrix[0].range);   # range from 0 to len(matrix[0])-1
     var products = (Array.new);         # 'Array.new' is the same thing as '[]'
 
-    {
+    for (left ? (range.reversed) : (range)) {
+
         var x = 0;
         var nums = [];
         var rangex = (_ .. (matrix[0].offset + _));     # range from i to len(matrix[0])-1+i
 
-        (left ? {rangex.reversed} : rangex).map {
+        (left ? (rangex.reversed) : rangex).map {
             nums.push(matrix[_][x]); x++;
         }
 
         products.push(nums.multiply);       # appending the product of 'nums' inside the 'products' array
-
-    } for (left ? {range.reversed} : {range});
+    }
 
     "sum %s\n".printf(products.dump);
     return(products.sum);

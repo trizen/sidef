@@ -8,6 +8,9 @@ package Sidef::Types::Bool::Bool {
     use parent qw(Sidef::Convert::Convert);
     use overload q{bool} => sub { ${$_[0]} eq 'true' };
 
+    require Sidef::Exec;
+    my $exec = Sidef::Exec->new();
+
     sub new {
         my (undef, $bool) = @_;
 
@@ -35,10 +38,9 @@ package Sidef::Types::Bool::Bool {
         *{__PACKAGE__ . '::' . '&&'} = sub {
             my ($self, $code) = @_;
 
-            $self->_is_code($code) || return $self->false;
-
             if ($self) {
-                return $code->run;
+                my (@results) = $exec->execute(struct => $code);
+                return $results[-1];
             }
 
             $self->false;
@@ -48,7 +50,8 @@ package Sidef::Types::Bool::Bool {
             my ($self, $code) = @_;
 
             if (not $self) {
-                return $self->_is_code($code, 1, 1) ? $code->run : $code;
+                my (@results) = $exec->execute(struct => $code);
+                return $results[-1];
             }
 
             $self->true;
@@ -58,8 +61,8 @@ package Sidef::Types::Bool::Bool {
             my ($self, $code) = @_;
 
             if ($self) {
-                my $result = $self->_is_code($code, 1, 1) ? $code->run : $code;
-                return Sidef::Types::Bool::Ternary->new({code => $result, bool => $self->true});
+                my @results = ref($code) eq 'HASH' ? $exec->execute(struct => $code) : $code;
+                return Sidef::Types::Bool::Ternary->new({code => $results[-1], bool => $self->true});
             }
 
             return Sidef::Types::Bool::Ternary->new({code => $code, bool => $self->false});
