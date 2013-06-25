@@ -320,6 +320,11 @@ package Sidef::Parser {
                     return Sidef::Types::Block::Return->new(), pos;
                 }
 
+                when (/\G(?=given\b)/) {
+                    $self->{expect_method} = 1;
+                    return Sidef::Types::Block::Given->new(), pos;
+                }
+
                 when (/\G(?=break\b)/) {
                     $self->{expect_method} = 1;
                     return Sidef::Types::Block::Break->new(), pos;

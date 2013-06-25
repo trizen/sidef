@@ -7,9 +7,6 @@ package Sidef::Types::Bool::If {
 
     use parent qw(Sidef Sidef::Types::Block::Do);
 
-    require Sidef::Exec;
-    my $exec = Sidef::Exec->new();
-
     sub new {
         bless {do_block => 0}, __PACKAGE__;
     }
@@ -17,9 +14,7 @@ package Sidef::Types::Bool::If {
     sub if {
         my ($self, $arg) = @_;
 
-        my @results = $exec->execute(struct => $arg);
-        my $bool = $results[-1];
-
+        my $bool = Sidef::Types::Block::Code->new($arg)->run;
         $self->_is_bool($bool) || return $self;
         $self->{do_block} = $bool ? 1 : 0;
 

@@ -4,7 +4,7 @@
 
 var i = 3;
 var j = 4;
-var condition = ({1+3}.given);
+var condition = ( given(1+3) );
 
 condition
     when 3 do {
@@ -24,7 +24,7 @@ end;
 
 var value = "sidef";
 
-{value}.given
+given (value)
     when ("x") do {
         "Not the right place! (1)".say;
     }
@@ -40,7 +40,7 @@ var value = "sidef";
 end;
 
 
-{value}.given
+given (value)
     when (3) do {
         "Not the right place! (1)".say;
     }
@@ -88,7 +88,7 @@ end;
 end;
 
 
-{[8,9,10]}.given
+given [8,9,10]
     when "x" do {
         "Not the right place! (1)".say;
     }
@@ -104,7 +104,7 @@ end;
 end;
 
 
-{0} given
+given 0
     when 1 do {
         "Not the right place! (1)".say;
     }

@@ -24,7 +24,8 @@ func hi (i) {
         "ERROR: re-true elsif!".say;
     }
 
-    return "FUNC RETURN";
+    i == 3 && (return "&& RETURN");                     # parent function return
+    return "FUNC RETURN";                               # =//=
     "NO RETURN";
 }
 

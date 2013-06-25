@@ -36,6 +36,7 @@ require Sidef::Types::Block::Do if (caller)[0] ne q{Sidef::Types::Block::Do};
 require Sidef::Types::Block::Switch if (caller)[0] ne q{Sidef::Types::Block::Switch};
 require Sidef::Types::Block::Code if (caller)[0] ne q{Sidef::Types::Block::Code};
 require Sidef::Types::Block::Return if (caller)[0] ne q{Sidef::Types::Block::Return};
+require Sidef::Types::Block::Given if (caller)[0] ne q{Sidef::Types::Block::Given};
 require Sidef::Types::Block::Break if (caller)[0] ne q{Sidef::Types::Block::Break};
 require Sidef::Types::Block::Continue if (caller)[0] ne q{Sidef::Types::Block::Continue};
 require Sidef::Types::Regex::Regex if (caller)[0] ne q{Sidef::Types::Regex::Regex};

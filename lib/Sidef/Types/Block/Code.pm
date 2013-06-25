@@ -74,13 +74,8 @@ package Sidef::Types::Block::Code {
     sub while {
         my ($self, $condition) = @_;
 
-        # $self->_is_code($condition) || return $self;
-
         {
-            #  my $bool = $condition->run;
-            my (@results) = $exec->execute(struct => $condition);
-            my $bool = $results[-1];
-
+            my $bool = Sidef::Types::Block::Code->new($condition)->run;
             $self->_is_bool($bool) || return $self;
 
             if ($bool) {
@@ -135,13 +130,7 @@ package Sidef::Types::Block::Code {
 
     sub given {
         my ($self) = @_;
-
-        if (ref $self eq 'Sidef::Types::Block::Code') {
-            my @results = $exec->execute(struct => $self);
-            $self = $results[-1];
-        }
-
-        Sidef::Types::Block::Switch->new($self);
+        Sidef::Types::Block::Switch->new($self->run);
     }
 
     sub for {

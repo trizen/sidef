@@ -214,12 +214,13 @@ package Sidef::Types::String::String {
 
         warn $@ if $@;
 
-        my $exec = Sidef::Exec->new();
-        my @results = eval { $exec->execute(struct => $struct) };
+        my $result = eval { Sidef::Types::Block::Code->new($struct)->run };
 
-        warn $@ if $@;
+        if ($@) {
+            warn $@;
+        }
 
-        return $results[-1];
+        return $result;
     }
 
     sub contains {

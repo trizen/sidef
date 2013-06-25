@@ -162,7 +162,9 @@ package Sidef::Exec {
                     }
 
                     my $type =
-                      ref($self_obj) eq 'Sidef::Variable::Variable' ? ref($self_obj->get_value()) : ref($self_obj);
+                        ref($self_obj) eq 'Sidef::Variable::Variable'
+                      ? ref($self_obj->get_value())
+                      : ref($self_obj);
 
                     if (exists $call->{arg}) {
 
