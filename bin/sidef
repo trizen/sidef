@@ -8,6 +8,7 @@ no if $] >= 5.018, warnings => "experimental::smartmatch";
 
 binmode(STDOUT, ':utf8');
 binmode(STDERR, ':utf8');
+binmode(STDIN,  ':utf8');
 
 use lib '../lib';    # devel only
 use autouse 'Getopt::Std' => qw(getopts($;$));       # arguments support
@@ -64,7 +65,7 @@ else {
 
     my $code =
       exists $args{E}
-      ? do { $script_name = '-E'; $args{E} }
+      ? do { $script_name = '-E'; utf8::decode($args{E}); $args{E} }
       : (defined($ARGV[0]) && -f $ARGV[0]) ? do {
 
         my $file = shift;
