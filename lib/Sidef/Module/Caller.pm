@@ -26,8 +26,8 @@ package Sidef::Module::Caller {
                 @arg
                 ? (
                    map {
-                       ref($_) =~ /^Sidef::/ && $_->can('get_value')
-                         ? $_->get_value
+                           ref($_) =~ /^Sidef::/ && $_->can('get_value') ? $_->get_value
+                         : ref($_) eq 'Sidef::Variable::Ref' ? $_->get_var->get_value
                          : $_
                      } @arg
                   )

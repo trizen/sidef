@@ -19,12 +19,17 @@ package Sidef::Module::Func {
         my $sub = \&{$self->{module} . '::' . $func};
 
         if (defined &$sub) {
-            return
-              $sub->(
-                     @arg
-                     ? (map { ref($_) =~ /^Sidef::/ && $_->can('get_value') ? $_->get_value : $_ } @arg)
-                     : ()
-                    );
+            return $sub->(
+                @arg
+                ? (
+                   map {
+                           ref($_) =~ /^Sidef::/ && $_->can('get_value') ? $_->get_value
+                         : ref($_) eq 'Sidef::Variable::Ref' ? $_->get_var->get_value
+                         : $_
+                     } @arg
+                  )
+                : ()
+            );
         }
         else {
             warn qq{[WARN] Can't locate function '$func' via package "$self->{module}"!\n};
