@@ -218,7 +218,7 @@ package Sidef::Parser {
         for ($opt{code}) {
             {
                 if (/\G/gc && defined(my $pos = $self->parse_whitespace(code => substr($_, pos)))) {
-                    pos($_) = $pos + pos($_);
+                    pos($_) += $pos;
                 }
 
                 when (/\G__RESET_LINE_COUNTER__\b/gc) {
@@ -396,7 +396,7 @@ package Sidef::Parser {
                 # Object as expression
                 when (/\G(?=\()/) {
                     my ($obj, $pos) = $self->parse_arguments(code => substr($_, pos));
-                    pos($_) = $pos + pos;
+                    pos($_) += $pos;
                     return $obj, pos;
                 }
 
@@ -405,7 +405,7 @@ package Sidef::Parser {
                     my $array = Sidef::Types::Array::Array->new();
 
                     my ($obj, $pos) = $self->parse_array(code => substr($_, pos));
-                    pos($_) = $pos + pos;
+                    pos($_) += $pos;
 
                     if (ref $obj->{main} eq 'ARRAY') {
                         push @{$array}, (@{$obj->{main}});
@@ -418,7 +418,7 @@ package Sidef::Parser {
                 when (/\G(?=\{)/) {
 
                     my ($obj, $pos) = $self->parse_block(code => substr($_, pos));
-                    pos($_) = $pos + pos;
+                    pos($_) += $pos;
 
                     return $obj, pos;
                 }
@@ -506,7 +506,7 @@ package Sidef::Parser {
         for ($opt{code}) {
             {
                 if (/\G/gc && defined(my $pos = $self->parse_whitespace(code => substr($_, pos)))) {
-                    pos($_) = $pos + pos($_);
+                    pos($_) += $pos;
                 }
 
                 when (/\G\(/gc) {
@@ -514,7 +514,7 @@ package Sidef::Parser {
                     $self->{expect_method} = 0;
                     $self->{parentheses}++;
                     my ($obj, $pos) = $self->parse_script(code => substr($_, pos));
-                    pos($_) = $pos + pos;
+                    pos($_) += $pos;
                     return $obj, pos;
                 }
             }
@@ -527,14 +527,14 @@ package Sidef::Parser {
         for ($opt{code}) {
             {
                 if (/\G/gc && defined(my $pos = $self->parse_whitespace(code => substr($_, pos)))) {
-                    pos($_) = $pos + pos($_);
+                    pos($_) += $pos;
                 }
                 when (/\G\[/gc) {
                     $self->{has_object}    = 0;
                     $self->{expect_method} = 0;
                     $self->{right_brackets}++;
                     my ($obj, $pos) = $self->parse_script(code => substr($_, pos));
-                    pos($_) = $pos + pos;
+                    pos($_) += $pos;
                     return $obj, pos;
                 }
             }
@@ -547,7 +547,7 @@ package Sidef::Parser {
         for ($opt{code}) {
             {
                 if (/\G/gc && defined(my $pos = $self->parse_whitespace(code => substr($_, pos)))) {
-                    pos($_) = $pos + pos($_);
+                    pos($_) += $pos;
                 }
                 when (/\G\{/gc) {
 
@@ -579,13 +579,10 @@ package Sidef::Parser {
         my ($self, %opt) = @_;
 
         my %struct;
-
-        #given ($opt{code}) {
-        #    my $_ = $_;
         for ($opt{code}) {
             {
                 if (/\G/gc && defined(my $pos = $self->parse_whitespace(code => substr($_, pos)))) {
-                    pos($_) = $pos + pos;
+                    pos($_) += $pos;
                 }
 
                 # Automatically add  the '.call' method when a function is called
@@ -653,7 +650,7 @@ package Sidef::Parser {
                       && (/\G(?=[a-z])/ || /\G->/gc || /\G(?=\s*$self->{re}{operators})/ || /\G\./gc)) {
 
                     my ($method_name, $pos) = $self->get_method_name(code => substr($_, pos));
-                    pos($_) = $pos + pos;
+                    pos($_) += $pos;
                     push @{$struct{$self->{class}}[-1]{call}}, {name => $method_name};
 
                     # Remove the automatically added '.call' method
@@ -745,7 +742,7 @@ package Sidef::Parser {
                     $self->{expect_index} = 0;
 
                     my ($array, $pos) = $self->parse_expr(code => substr($_, pos()));
-                    pos($_) = $pos + pos();
+                    pos($_) += $pos;
 
                     $self->{expect_index} = /\G(?=\h*\[)/;
 
@@ -758,7 +755,7 @@ package Sidef::Parser {
 
                     my $is_arg = /\G(?=\()/;
                     my ($obj, $pos) = $self->parse_expr(code => substr($_, pos));
-                    pos($_) = $pos + pos;
+                    pos($_) += $pos;
 
                     if (defined $obj) {
                         if ($is_arg) {
@@ -783,7 +780,7 @@ package Sidef::Parser {
                     my ($expect_method, $has_object) = ($self->{expect_method}, $self->{has_object});
 
                     my ($obj, $pos) = $self->parse_expr(code => substr($_, pos));
-                    pos($_) = $pos + pos;
+                    pos($_) += $pos;
 
                     if (defined $obj) {
 
