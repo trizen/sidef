@@ -8,7 +8,12 @@
 "Sidef\tis awesome!".split(/\s+/) == ['Sidef', 'is', 'awesome!'] || ("Fail 2!\n".die);
 
 
-var parts = ("key1: value1; key2: value2;".split(/\s*;\s*/).map{_.split(/\s*:\s*/)}.combine.to_hash);
+var parts = (
+              "key1: value1; key2: value2;".split(/\s*;\s*/)
+                                           .map { _.split(/\s*:\s*/) }
+                                           .combine
+                                           .to_hash
+            );
 
 parts['key1'].say;       # value1
 parts['key2'].say;       # value2
