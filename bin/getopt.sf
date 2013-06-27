@@ -1,0 +1,20 @@
+#!/usr/bin/perl
+
+#
+## Can be executed as: sidef getopt.sf -d -e "hello"
+#
+
+var req = ( require 'Getopt::Std'->() );
+
+var hash = (Hash.new);
+req.getopts('de:', \hash);
+
+if (hash.exists('e')) {
+    Str.new(hash['e']).say;            # the value of '-e'
+}
+
+var d_bool = (Bool.new(hash['d']));
+
+if (d_bool) {
+    "-d has been specified!".say;
+}
