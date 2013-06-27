@@ -39,6 +39,7 @@ require Sidef::Types::Block::Return if (caller)[0] ne q{Sidef::Types::Block::Ret
 require Sidef::Types::Block::Given if (caller)[0] ne q{Sidef::Types::Block::Given};
 require Sidef::Types::Block::Break if (caller)[0] ne q{Sidef::Types::Block::Break};
 require Sidef::Types::Block::Continue if (caller)[0] ne q{Sidef::Types::Block::Continue};
+require Sidef::Types::Regex::Matches if (caller)[0] ne q{Sidef::Types::Regex::Matches};
 require Sidef::Types::Regex::Regex if (caller)[0] ne q{Sidef::Types::Regex::Regex};
 require Sidef::Types::Number::Number if (caller)[0] ne q{Sidef::Types::Number::Number};
 require Sidef::Types::String::String if (caller)[0] ne q{Sidef::Types::String::String};

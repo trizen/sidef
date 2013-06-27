@@ -85,6 +85,7 @@ package Sidef::Exec {
                         }
 
                         my $array = Sidef::Types::Array::Array->new();
+
                         push @{$array}, $is_hash ? (@{$self_obj}{@indices}) : (@{$self_obj}[@indices]);
                         $self_obj = $array;
 
@@ -116,10 +117,12 @@ package Sidef::Exec {
                                     );
                     }
 
-                    if (not $is_hash) {
-                        if ($l < $#{$expr->{ind}} or ref($expr->{self}) eq 'HASH') {
-                            $self_obj = $self_obj->get_value;
-                        }
+                    if (
+                        ref($self_obj) eq 'Sidef::Variable::Variable'
+                        and ($l < $#{$expr->{ind}}
+                             or ref($expr->{self}) eq 'HASH')
+                      ) {
+                        $self_obj = $self_obj->get_value;
                     }
                 }
             }

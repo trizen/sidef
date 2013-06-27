@@ -8,7 +8,15 @@ package Sidef::Types::Hash::Hash {
     use parent qw(Sidef::Convert::Convert);
 
     sub new {
-        my (undef, %hash) = @_;
+        my (undef, @pairs) = @_;
+
+        my %hash;
+        my $offset = $#pairs;
+
+        for (my $i = 0 ; $i < $offset ; $i += 2) {
+            $hash{$pairs[$i]} = Sidef::Variable::Variable->new(rand, 'var', $pairs[$i + 1]);
+        }
+
         bless \%hash, __PACKAGE__;
     }
 
@@ -59,12 +67,14 @@ package Sidef::Types::Hash::Hash {
     sub map {
         my ($self, $keys, $struct) = @_;
 
-        for (my $i = 0 ; $i <= $#{$struct} ; $i += 2) {
-            my ($key, $value) = @{$struct}[$i, $i + 1];
+        for (my $i = 0 ; $i < $#{$struct} ; $i += 2) {
+            my ($key, $value) = map { $_->get_value } @{$struct}[$i, $i + 1];
 
-            $self->{$key} //= $self->new();
+            $self->{$key} //= Sidef::Variable::Variable->new(rand, 'var', $self->new());
+
             foreach my $i (0 .. $#{$keys}) {
-                $self->{$key}{$keys->[$i]} = $value->get_value->[$i];
+                my $hash = $self->{$key}->get_value;
+                $hash->{$keys->[$i]} = Sidef::Variable::Variable->new(rand, 'var', $value->[$i]->get_value);
             }
         }
 

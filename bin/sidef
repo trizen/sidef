@@ -11,11 +11,10 @@ binmode(STDERR, ':utf8');
 binmode(STDIN,  ':utf8');
 
 use lib '../lib';    # devel only
-use autouse 'Getopt::Std' => qw(getopts($;$));       # arguments support
-use autouse 'Encode'      => qw(decode_utf8($;$));
+use autouse 'Getopt::Std' => qw(getopts($;$));    # arguments support
 
 my %args;
-if (qr/^-/ ~~ \@ARGV) {
+if (@ARGV and chr ord $ARGV[0] eq '-') {
     getopts('E:d:Dho:', \%args);
 }
 
@@ -80,7 +79,8 @@ else {
       }
       : join(' ', <>);
 
-    my $arguments = @ARGV ? (q{'} . decode_utf8(join(q{','}, (map { s/(['\\])/\\$1/gr } @ARGV))) . q{'}) : '';
+    my $arguments = @ARGV ? (q{'} . join(q{','}, (map { s/(['\\])/\\$1/gr } @ARGV)) . q{'}) : '';
+    utf8::decode($arguments);
 
     #
     ## Predeclared variables and constants

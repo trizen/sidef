@@ -11,7 +11,7 @@ package Sidef::Types::Regex::Regex {
         my (undef, $regex, $mod) = @_;
 
         $mod //= q{^};
-        my $str_re = "(?$mod:$regex)";
+        my $str_re = qr{(?$mod:$regex)};
 
         bless \$str_re, __PACKAGE__;
     }
@@ -21,12 +21,12 @@ package Sidef::Types::Regex::Regex {
 
         if (ref $object eq 'Sidef::Types::Array::Array') {
             foreach my $item (@{$object}) {
-                my $bool = $self->matches($item);
-                $bool && return $bool;
+                my $match = $self->matches($item);
+                $match->matched && return $match;
             }
         }
 
-        Sidef::Types::Bool::Bool->new($object =~ $$self);
+        Sidef::Types::Regex::Matches->new(obj => $object, regex => $$self);
     }
 
     {

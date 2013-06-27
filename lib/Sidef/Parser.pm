@@ -61,8 +61,9 @@ package Sidef::Parser {
                       *= *
                       != ..
                       \\\\
-                      : ?
+                      ?? ?
                       ! \\
+                      :
                       );
 
                     qr{(@operators)};
@@ -149,7 +150,7 @@ package Sidef::Parser {
 
             # Operator-like method name
             when (m{\G$self->{re}{operators}}goc) {
-                $self->{expect_arg} = $1 ~~ ['--', '++'] ? 0 : 1;
+                $self->{expect_arg} = $1 ~~ ['--', '++', '??'] ? 0 : 1;
                 return {self => Sidef::Types::String::String->new($1)}, pos;
             }
 
@@ -337,7 +338,7 @@ package Sidef::Parser {
 
                 # Double quoted string
                 when (/\G$self->{re}{double_quote}/gc) {
-                    return Sidef::Types::String::String->new($1)->apply_escapes(), pos;
+                    return Sidef::Types::String::String->new($1)->apply_escapes()->unescape(), pos;
                 }
 
                 # Single quoted string

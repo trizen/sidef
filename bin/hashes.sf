@@ -1,0 +1,43 @@
+#!/usr/bin/perl
+
+#
+## Array to hash
+#
+
+var array = ["key", "value"];
+var hash = (array.to_hash);
+
+hash["key"] = "changed";
+hash["x"] = "google";
+
+hash["x"] == "google"
+    || ("Can't add a new key to hash 1!\n".die);
+
+array[1] == "value"
+    || ("Array element changed!\n".die);
+
+hash["key"] == "changed"
+    || ("Hash 1 fail!\n".die);
+
+#
+## Block-code to hash
+#
+
+var hash2 = (:{"key" => "value"});
+
+hash2["key"] = "jjj";
+hash2["key"] == "jjj"
+    || ("Hash 2 fail!\n".die);
+
+#
+## Object init hash
+#
+
+var hash3 = (Hash.new("key" => "value"));
+
+hash3["key"] = "zzz";
+hash3["key"] == "zzz"
+    || ("Hash 3 fail!\n".die);
+
+
+"All tests passed!".say;

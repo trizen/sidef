@@ -189,6 +189,28 @@ package Sidef::Types::String::String {
         __PACKAGE__->new(sprintf $$self, @arguments);
     }
 
+    sub glob {
+        my ($self) = @_;
+        Sidef::Types::Array::Array->(map { __PACKAGE__->new($_) } CORE::glob($$self));
+    }
+
+    sub quotemeta {
+        my ($self) = @_;
+        __PACKAGE__->new(CORE::quotemeta($$self));
+    }
+
+    sub split {
+        my ($self, $sep) = @_;
+
+        if (ref($sep) ne 'Sidef::Types::Regex::Regex') {
+            if ($sep->can('quotemeta')) {
+                $sep = $sep->quotemeta();
+            }
+        }
+
+        Sidef::Types::Array::Array->new(map { __PACKAGE__->new($_) } split(/$sep/, $$self));
+    }
+
     sub length {
         my ($self) = @_;
         Sidef::Types::Number::Number->new(CORE::length($$self));
@@ -252,6 +274,12 @@ package Sidef::Types::String::String {
         exit 255;                   # last resort
     }
 
+    sub unescape {
+        my ($self) = @_;
+        ${$self} =~ s{\\(\W)}{$1}gs;
+        $self;
+    }
+
     sub apply_escapes {
         my ($self) = @_;
 
@@ -278,8 +306,6 @@ package Sidef::Types::String::String {
                 $1 eq 'l' ? CORE::lc($2) : CORE::uc($2);
 
             }egs;
-
-            ${$self} =~ s{\\(.)}{$1}gs;
         }
 
         return $self;

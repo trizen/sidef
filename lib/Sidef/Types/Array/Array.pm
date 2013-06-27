@@ -260,6 +260,8 @@ package Sidef::Types::Array::Array {
         $_[0]->_op_equal('+');
     }
 
+    *combine = \&sum;
+
     sub multiply {
         $_[0]->_op_equal('*');
     }
