@@ -25,7 +25,7 @@
 # SUPPORT FOR FILES
 ###################
 
-var file = ~sidef~;
+var file = (File.new('sidef'));
 
 var size_kb = (file->size / 1024);
 
@@ -187,16 +187,16 @@ arr_1 - arr_2 -> to_s -> say;
 ## Regular expressions
 #
 
-/TEST/i -> matches("For testing.")->to_s->say;      # true
-/[123]/ =~ "one two three" -> to_s->say;            # false
+/TEST/i -> matches("For testing.") ?? to_s->say;    # true
+/[123]/ =~ "one two three" ?? to_s->say;            # false
 
-"--string--" =~ /(\w+)/ -> to_s -> say;             # true
+"--string--" =~ /(\w+)/ ?? to_s -> say;             # true
 
 var regex = /^\d+ \w+ \d+$/;
-"03 May 2013" =~ regex -> to_s->say;                # true
+"03 May 2013" =~ regex ?? to_s->say;                # true
 regex -> to_s -> say;                               # prints the regex
 
-/item/ =~ ["str", [123, ["w", "item", "x"], 6], "boo"] -> to_s -> say;    # matches 'item' in nested array
+/item/ =~ ["str", [123, ["w", "item", "x"], 6], "boo"] ?? to_s -> say;    # matches 'item' in nested array
 
 
 #"\n=>> Variable interpolation for regular expressions:"->say;

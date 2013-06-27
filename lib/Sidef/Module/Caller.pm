@@ -12,6 +12,10 @@ package Sidef::Module::Caller {
         bless \%opt, __PACKAGE__;
     }
 
+    sub DESTROY {
+        return;
+    }
+
     sub AUTOLOAD {
         my ($self, @arg) = @_;
 

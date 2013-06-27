@@ -31,9 +31,7 @@ package Sidef::Parser {
             re               => {
                 double_quote       => Sidef::Utils::Regex::make_esc_delim(q{"}),
                 single_quote       => Sidef::Utils::Regex::make_esc_delim(q{'}),
-                file_quote         => Sidef::Utils::Regex::make_esc_delim(q{~}),
                 regex              => Sidef::Utils::Regex::make_esc_delim(q{/}),
-                m_regex            => Sidef::Utils::Regex::make_single_q_balanced(q{m}),
                 match_flags        => qr{[msixpogcdual]+},
                 substitution_flags => qr{[msixpogcerdual]+},
                 var_name           => qr/[[:alpha:]_]\w*/,
@@ -137,10 +135,10 @@ package Sidef::Parser {
     sub get_method_name {
         my ($self, %opt) = @_;
 
-        given ($opt{'code'}) {
+        for ($opt{code}) {
 
             if (/\G/gc && defined(my $pos = $self->parse_whitespace(code => substr($_, pos)))) {
-                pos($_) = $pos + pos($_);
+                pos($_) += $pos;
             }
 
             # Alpha-numeric method name
@@ -157,7 +155,7 @@ package Sidef::Parser {
             # Method name as variable
             when (m{\G\$(?=$self->{re}{var_name})}goc || 1) {
                 my ($obj, $pos) = $self->parse_expr(code => substr($_, pos));
-                pos($_) = $pos + pos;
+                pos($_) += $pos;
                 return {self => $obj}, pos;
             }
         }
@@ -168,7 +166,7 @@ package Sidef::Parser {
 
         my $beg_line    = $self->{line};
         my $found_space = -1;
-        given ($opt{code}) {
+        for ($opt{code}) {
             {
                 ++$found_space;
 
@@ -217,7 +215,7 @@ package Sidef::Parser {
     sub parse_expr {
         my ($self, %opt) = @_;
 
-        given ($opt{code}) {
+        for ($opt{code}) {
             {
                 if (/\G/gc && defined(my $pos = $self->parse_whitespace(code => substr($_, pos)))) {
                     pos($_) = $pos + pos($_);
@@ -344,11 +342,6 @@ package Sidef::Parser {
                 # Single quoted string
                 when (/\G$self->{re}{single_quote}/goc) {
                     return Sidef::Types::String::String->new($1 =~ s{\\(?=['\\])}{}gr), pos;
-                }
-
-                # File quoted string
-                when (/\G$self->{re}{file_quote}/goc) {
-                    return Sidef::Types::Glob::File->new($1), pos;
                 }
 
                 # Boolean value
@@ -510,7 +503,7 @@ package Sidef::Parser {
     sub parse_arguments {
         my ($self, %opt) = @_;
 
-        given ($opt{'code'}) {
+        for ($opt{code}) {
             {
                 if (/\G/gc && defined(my $pos = $self->parse_whitespace(code => substr($_, pos)))) {
                     pos($_) = $pos + pos($_);
@@ -531,7 +524,7 @@ package Sidef::Parser {
     sub parse_array {
         my ($self, %opt) = @_;
 
-        given ($opt{'code'}) {
+        for ($opt{code}) {
             {
                 if (/\G/gc && defined(my $pos = $self->parse_whitespace(code => substr($_, pos)))) {
                     pos($_) = $pos + pos($_);
@@ -551,7 +544,7 @@ package Sidef::Parser {
     sub parse_block {
         my ($self, %opt) = @_;
 
-        given ($opt{'code'}) {
+        for ($opt{code}) {
             {
                 if (/\G/gc && defined(my $pos = $self->parse_whitespace(code => substr($_, pos)))) {
                     pos($_) = $pos + pos($_);
@@ -586,7 +579,10 @@ package Sidef::Parser {
         my ($self, %opt) = @_;
 
         my %struct;
-        given ($opt{code}) {
+
+        #given ($opt{code}) {
+        #    my $_ = $_;
+        for ($opt{code}) {
             {
                 if (/\G/gc && defined(my $pos = $self->parse_whitespace(code => substr($_, pos)))) {
                     pos($_) = $pos + pos;
