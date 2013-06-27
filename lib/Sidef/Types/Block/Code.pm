@@ -3,6 +3,8 @@ use 5.014;
 use strict;
 use warnings;
 
+no if $] >= 5.018, warnings => "experimental::smartmatch";
+
 package Sidef::Types::Block::Code {
 
     use parent qw(Sidef);
@@ -136,7 +138,7 @@ package Sidef::Types::Block::Code {
     sub for {
         my ($self, $arg) = @_;
 
-        if (ref $arg eq 'Sidef::Types::Array::Array') {
+        if (ref $arg ~~ ['Sidef::Types::Array::Array', 'Sidef::Types::Byte::Bytes', 'Sidef::Types::Char::Chars',]) {
             foreach my $class (keys %{$self}) {
                 my $var_ref = $exec->execute_expr(expr => $self->{$class}[0]);
                 foreach my $item (@{$arg}) {

@@ -322,7 +322,7 @@ package Sidef::Types::Array::Array {
 
     sub range {
         my ($self) = @_;
-        $self->new(map { Sidef::Types::Number::Number->new($_) } 0 .. $#{$self});
+        __PACKAGE__->new(map { Sidef::Types::Number::Number->new($_) } 0 .. $#{$self});
     }
 
     sub insert {
