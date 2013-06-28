@@ -238,6 +238,10 @@ package Sidef::Parser {
                     return undef, pos;
                 }
 
+                when (/\G\$/gc) {
+                    redo;
+                }
+
                 $self->{has_object} = 1;
                 $self->{has_method} = 0;
                 $self->{expect_arg} = 0;
@@ -792,8 +796,15 @@ package Sidef::Parser {
                             my $self_obj   = ref($struct{$self->{class}}[-1]{self});
                             my $method_obj = Sidef::Types::String::String->new('');
 
-                            if ($self_obj ~~
-                                [qw(Sidef::Types::Block::For Sidef::Types::Bool::While Sidef::Types::Bool::If)]) {
+                            if (
+                                $self_obj ~~ [
+                                    qw(
+                                      Sidef::Types::Block::For
+                                      Sidef::Types::Bool::While
+                                      Sidef::Types::Bool::If
+                                      )
+                                ]
+                              ) {
                                 $$method_obj = 'do';
                             }
                             else {
