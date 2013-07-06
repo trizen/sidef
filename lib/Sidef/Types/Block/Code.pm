@@ -100,26 +100,6 @@ package Sidef::Types::Block::Code {
             my $argc = 0;
             my @vars = @{$self->{$class}}[1 .. @args * 2];
 
-=for comment
-            for(my $i = 0;$i<$#vars; $i++){
-
-                my $var = $vars[$i+1];
-
-                if (ref($vars[$i]{self}) ne 'Sidef::Variable::Init' and ref ($var->{self}) ne 'Sidef::Variable::Ref') {
-                    warn "[WARN] Too many arguments in function call!",
-                      " Expected $argc, but got ${\(scalar @vars)} of them.\n";
-                    last;
-                }
-
-                ++$argc;
-                #my $var_ref = $exec->execute_expr(expr => $var, class => $class);
-
-                my ($var_ref) = $exec->execute(struct => {$class => [$vars[$i], $vars[$i+1]] });
-                say $var_ref;
-                $var_ref->get_var->set_value(shift @args);
-            }
-=cut
-
             my $i       = 0;
             my $j       = 1;
             my @express = @{$self->{$class}};
@@ -141,6 +121,11 @@ package Sidef::Types::Block::Code {
                       );
                 $j += 2;
                 $i += 2;
+            }
+
+            if ($i < $#vars) {
+                warn "[WARN] Too many arguments in function call!",
+                  " Expected ${\($i/2)}, but got ${\(scalar(@vars)/2)} of them.\n";
             }
 
             push @results, $exec->execute(struct => {$class => \@express});

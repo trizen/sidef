@@ -441,9 +441,9 @@ package Sidef::Parser {
                     require Sidef::Variable::My;
 
                     my $variable =
-                        $type eq 'my'    ? Sidef::Variable::My->new($name)
-                      : $type eq 'local' ? Sidef::Variable::Local->new($name)
-                      :                    Sidef::Variable::Variable->new($name, $type);
+                      $type eq 'my'
+                      ? Sidef::Variable::My->new($name)
+                      : Sidef::Variable::Variable->new($name, $type);
 
                     unshift @{$self->{vars}},
                       {
