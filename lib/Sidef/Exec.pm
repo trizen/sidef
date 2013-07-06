@@ -50,6 +50,10 @@ package Sidef::Exec {
                 ($self_obj) = $self->execute(struct => $self_obj);
             }
 
+            if (ref $self_obj eq 'Sidef::Variable::My') {
+                $self_obj = $self->{vars}{$self_obj->get_name};
+            }
+
             if (ref $self_obj eq 'Sidef::Types::Array::Array') {
                 $self_obj = $self->eval_array(array => $self_obj, class => $opt{class});
             }
@@ -227,8 +231,10 @@ package Sidef::Exec {
                 }
             }
             else {
-                if (ref($self_obj) eq 'Sidef::Variable::Variable' and not $self->{var_ref}) {
-                    $self_obj = $self_obj->get_value;
+                if (not $self->{var_ref}) {
+                    if (ref($self_obj) eq 'Sidef::Variable::Variable') {
+                        $self_obj = $self_obj->get_value;
+                    }
                 }
             }
 
@@ -250,11 +256,25 @@ package Sidef::Exec {
         my $struct = $opt{'struct'};
 
         my @results;
+
         foreach my $key (keys %{$struct}) {
+
+            my $i = -1;
             local $self->{expr_i_max} = $#{$struct->{$key}};
-            for (local $self->{expr_i} = 0 ; $self->{expr_i} <= $self->{expr_i_max} ; $self->{expr_i} += 1) {
+
+          INIT_VAR: ($i++ != -1)
+              && (local $self->{vars}{$struct->{$key}[$i - 1]{self}->get_name} =
+                  Sidef::Variable::Variable->new($struct->{$key}[$i - 1]{self}->get_name, 'var'));
+
+            for (local $self->{expr_i} = $i ; $self->{expr_i} <= $self->{expr_i_max} ; $self->{expr_i}++) {
 
                 my $expr = $struct->{$key}[$self->{expr_i}];
+
+                if (ref($expr->{self}) eq 'Sidef::Variable::InitMy') {
+                    goto INIT_VAR;
+                }
+
+                ++$i;
                 my $obj = $self->execute_expr(%opt, class => $key, expr => $expr);
 
                 if (ref($obj) eq 'Sidef::Types::Block::Return') {

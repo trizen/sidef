@@ -428,7 +428,7 @@ package Sidef::Parser {
                 }
 
                 # Declaration of variable types (var, const, char, etc...)
-                when (/\G(var|const|char|byte|func)\h+($self->{re}{var_name})/goc) {
+                when (/\G(my|var|const|char|byte|func)\h+($self->{re}{var_name})/goc) {
                     my $type = $1;
                     my $name = $2;
 
@@ -438,7 +438,12 @@ package Sidef::Parser {
                         warn "Redeclaration of $type '$name' in same scope, at line $self->{line}\n";
                     }
 
-                    my $variable = Sidef::Variable::Variable->new($name, $type);
+                    require Sidef::Variable::My;
+
+                    my $variable =
+                        $type eq 'my'    ? Sidef::Variable::My->new($name)
+                      : $type eq 'local' ? Sidef::Variable::Local->new($name)
+                      :                    Sidef::Variable::Variable->new($name, $type);
 
                     unshift @{$self->{vars}},
                       {
@@ -449,12 +454,17 @@ package Sidef::Parser {
                         line  => $self->{line},
                       };
 
+                    if ($type eq 'my') {
+                        require Sidef::Variable::InitMy;
+                        return Sidef::Variable::InitMy->new($name), pos($_);
+                    }
+
                     if ($type eq 'func') {
 
                         # Check the declared parameters
                         if (/\G\s*\(((?:$self->{re}{var_name}(?:\s*,\s*$self->{re}{var_name})*)?)\)\s*\{/gcs) {
 
-                            my $params = join('', map { "\\var $_;" } split(/\s*,\s*/, $1));
+                            my $params = join('', map { "my $_;\\$_;" } split(/\s*,\s*/, $1));
                             my ($obj, $pos) = $self->parse_block(code => '{' . $params . substr($_, pos));
                             pos($_) += $pos - (length($params) + 1);
 
@@ -489,7 +499,23 @@ package Sidef::Parser {
 
                         return $var->{obj}, pos;
                     }
+                    else {
+                        require Sidef::Variable::InitMy;
+                        require Sidef::Variable::My;
 
+                        unshift @{$self->{vars}},
+                          {
+                            obj   => Sidef::Variable::My->new($1),
+                            name  => $1,
+                            count => 0,
+                            type  => 'my',
+                            line  => $self->{line},
+                          };
+
+                        return Sidef::Variable::InitMy->new($1), pos($_) - length($1);
+                    }
+
+                    # Ignored, for now
                     $self->fatal_error(
                                        code  => $_,
                                        pos   => (pos($_) - length($1)),
@@ -790,6 +816,12 @@ package Sidef::Parser {
 
                         $self->{has_object}    = 1;
                         $self->{expect_method} = 1;
+
+                        if (ref $obj eq 'Sidef::Variable::InitMy') {
+                            $self->{expect_method} = 0;
+                            $self->{has_object}    = 0;
+                            $self->{has_method}    = 0;
+                        }
 
                         if ($expect_method and $has_object) {
 

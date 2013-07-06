@@ -98,21 +98,52 @@ package Sidef::Types::Block::Code {
         foreach my $class (keys %{$self}) {
 
             my $argc = 0;
-            my @vars = @{$self->{$class}}[1 .. $#args + 1];
+            my @vars = @{$self->{$class}}[1 .. @args * 2];
 
-            foreach my $var (@vars) {
-                if (ref $var->{self} ne 'Sidef::Variable::Ref') {
+=for comment
+            for(my $i = 0;$i<$#vars; $i++){
+
+                my $var = $vars[$i+1];
+
+                if (ref($vars[$i]{self}) ne 'Sidef::Variable::Init' and ref ($var->{self}) ne 'Sidef::Variable::Ref') {
                     warn "[WARN] Too many arguments in function call!",
                       " Expected $argc, but got ${\(scalar @vars)} of them.\n";
                     last;
                 }
 
                 ++$argc;
-                my $var_ref = $exec->execute_expr(expr => $var, class => $class);
+                #my $var_ref = $exec->execute_expr(expr => $var, class => $class);
+
+                my ($var_ref) = $exec->execute(struct => {$class => [$vars[$i], $vars[$i+1]] });
+                say $var_ref;
                 $var_ref->get_var->set_value(shift @args);
             }
+=cut
 
-            push @results, $exec->execute(struct => $self);
+            my $i       = 0;
+            my $j       = 1;
+            my @express = @{$self->{$class}};
+            while (    ref($vars[$i]{self}) eq 'Sidef::Variable::InitMy'
+                   and ref($vars[$i + 1]{self}) eq 'Sidef::Variable::Ref') {
+                splice(
+                       @express,
+                       ++$j,
+                       0,
+                       {
+                        self => Sidef::Variable::My->new($vars[$i]{self}->get_name),
+                        call => [
+                                 {
+                                  name => '=',
+                                  arg  => [shift @args],
+                                 }
+                                ]
+                       }
+                      );
+                $j += 2;
+                $i += 2;
+            }
+
+            push @results, $exec->execute(struct => {$class => \@express});
         }
 
         return $results[-1];

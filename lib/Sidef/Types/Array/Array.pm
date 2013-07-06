@@ -276,6 +276,15 @@ package Sidef::Types::Array::Array {
         Sidef::Types::Bool::Bool->new(exists $self->[$$index]);
     }
 
+    sub ft {
+        my ($self, $from, $to) = @_;
+
+        $from //= 0;
+        $to   //= $#{$self};
+
+        $self->new(map { $_->get_value } @{$self}[$from .. $to]);
+    }
+
     sub map {
         my ($self, $code) = @_;
 
