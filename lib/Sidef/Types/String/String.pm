@@ -77,6 +77,18 @@ package Sidef::Types::String::String {
             Sidef::Types::Bool::Bool->new($$self le $$string);
         };
 
+        *{__PACKAGE__ . '::' . '<<'} = sub {
+            my ($self, $i) = @_;
+            $self->_is_number($i) || return $self;
+            $self->new(CORE::substr($$self, $$i));
+        };
+
+        *{__PACKAGE__ . '::' . '>>'} = sub {
+            my ($self, $i) = @_;
+            $self->_is_number($i) || return $self;
+            $self->new(CORE::substr($$self, 0, -$$i));
+        };
+
         *{__PACKAGE__ . '::' . '..'} = sub {
             my ($self, $string) = @_;
             Sidef::Types::Array::Array->new(map { $self->new($_) } $$self .. $$string);

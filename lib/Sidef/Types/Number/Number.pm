@@ -117,6 +117,17 @@ package Sidef::Types::Number::Number {
         $self->new(CORE::sqrt $$self);
     }
 
+    sub sqrt_n {
+        my ($self, $n) = @_;
+        $self->_is_number($n) || return $self;
+        $self->new($$self**(1 / $$n));
+    }
+
+    sub pi {
+        my ($self) = @_;
+        $self->new(atan2(0, -'inf'));
+    }
+
     sub abs {
         my ($self) = @_;
         $self->new(CORE::abs $$self);

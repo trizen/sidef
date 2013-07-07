@@ -22,7 +22,6 @@ package Sidef::Parser {
             has_method       => 0,
             expect_method    => 0,
             expect_index     => 0,
-            expect_var_name  => 0,
             expect_arg       => 0,
             expect_func_call => 0,
             parentheses      => 0,
