@@ -156,7 +156,9 @@ package Sidef::Types::Block::Code {
 
         if (ref $arg ~~ ['Sidef::Types::Array::Array', 'Sidef::Types::Byte::Bytes', 'Sidef::Types::Char::Chars',]) {
             foreach my $class (keys %{$self}) {
-                my $var_ref = $exec->execute_expr(expr => $self->{$class}[0]);
+
+                my $var_ref = $exec->execute_expr(expr => $self->{$class}[0], class => $class);
+
                 foreach my $item (@{$arg}) {
                     $var_ref->get_var->set_value($item->get_value);
                     my $res = $self->_run_code();

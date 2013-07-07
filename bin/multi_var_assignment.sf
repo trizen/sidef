@@ -1,0 +1,9 @@
+#!/usr/bin/ruby
+
+var (x, y) = ("here", "there".uc);
+
+x == "here"  || ("x error!".die);
+y == "THERE" || ("y error!".die);
+
+"x is " + x -> say;
+"y is " + y -> say;

@@ -22,6 +22,7 @@ package Sidef::Parser {
             has_method       => 0,
             expect_method    => 0,
             expect_index     => 0,
+            expect_var_name  => 0,
             expect_arg       => 0,
             expect_func_call => 0,
             parentheses      => 0,
@@ -427,8 +428,39 @@ package Sidef::Parser {
                     return $obj, pos;
                 }
 
+                when (/\G(var|const|char|byte)(?:\h+($self->{re}{var_name})|\s*\((.*?)\))/sgoc) {
+                    my $type  = $1;
+                    my $names = $+;
+
+                    my @vars = split(/\s*,\s*/, $names);
+
+                    my @var_objs;
+                    foreach my $name (@vars) {
+
+                        my ($var, $code) = $self->find_var($name);
+
+                        if (defined $var and $code == 1) {
+                            warn "Redeclaration of $type '$name' in same scope, at line $self->{line}\n";
+                        }
+
+                        my $obj = Sidef::Variable::Variable->new($name, $type);
+                        push @var_objs, $obj;
+
+                        unshift @{$self->{vars}},
+                          {
+                            obj   => $obj,
+                            name  => $name,
+                            count => 0,
+                            type  => $type,
+                            line  => $self->{line},
+                          };
+                    }
+
+                    return Sidef::Variable::Init->new(@var_objs), pos;
+                }
+
                 # Declaration of variable types (var, const, char, etc...)
-                when (/\G(my|var|const|char|byte|func)\h+($self->{re}{var_name})/goc) {
+                when (/\G(my|func)\h+($self->{re}{var_name})/goc) {
                     my $type = $1;
                     my $name = $2;
 
@@ -437,8 +469,6 @@ package Sidef::Parser {
                     if (defined $var and $code == 1) {
                         warn "Redeclaration of $type '$name' in same scope, at line $self->{line}\n";
                     }
-
-                    require Sidef::Variable::My;
 
                     my $variable =
                       $type eq 'my'
@@ -455,7 +485,6 @@ package Sidef::Parser {
                       };
 
                     if ($type eq 'my') {
-                        require Sidef::Variable::InitMy;
                         return Sidef::Variable::InitMy->new($name), pos($_);
                     }
 
@@ -500,9 +529,6 @@ package Sidef::Parser {
                         return $var->{obj}, pos;
                     }
                     else {
-                        require Sidef::Variable::InitMy;
-                        require Sidef::Variable::My;
-
                         unshift @{$self->{vars}},
                           {
                             obj   => Sidef::Variable::My->new($1),
@@ -593,8 +619,8 @@ package Sidef::Parser {
 
                     $self->{vars} = $self->{vars}[0];
 
-                    my ($obj, $pos) = $self->parse_script(code => '\\var _;' . substr($_, pos));
-                    pos($_) += $pos - 7;
+                    my ($obj, $pos) = $self->parse_script(code => '\\(var _);' . substr($_, pos));
+                    pos($_) += $pos - 9;
 
                     splice @{$self->{ref_vars_refs}}, 0, $count;
                     $self->{vars} = $ref;
@@ -806,7 +832,6 @@ package Sidef::Parser {
 
                 # Parse expression or object and use it as main object (self)
                 default {
-
                     my ($expect_method, $has_object) = ($self->{expect_method}, $self->{has_object});
 
                     my ($obj, $pos) = $self->parse_expr(code => substr($_, pos));

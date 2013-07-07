@@ -211,6 +211,9 @@ package Sidef::Exec {
                                     $obj = $obj->get_value;
                                 }
                             }
+                            elsif (ref $obj eq 'Sidef::Variable::Init') {
+                                $obj = $obj->{vars}[0];
+                            }
                         }
 
                         $self_obj = $self_obj->$method(@arguments);
