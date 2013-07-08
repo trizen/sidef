@@ -43,7 +43,6 @@ require Sidef::Types::Regex::Matches if (caller)[0] ne q{Sidef::Types::Regex::Ma
 require Sidef::Types::Regex::Regex if (caller)[0] ne q{Sidef::Types::Regex::Regex};
 require Sidef::Types::Number::Number if (caller)[0] ne q{Sidef::Types::Number::Number};
 require Sidef::Types::String::String if (caller)[0] ne q{Sidef::Types::String::String};
-require Sidef::Utils::Regex if (caller)[0] ne q{Sidef::Utils::Regex};
 require Sidef::Module::Caller if (caller)[0] ne q{Sidef::Module::Caller};
 require Sidef::Module::Require if (caller)[0] ne q{Sidef::Module::Require};
 require Sidef::Module::Func if (caller)[0] ne q{Sidef::Module::Func};

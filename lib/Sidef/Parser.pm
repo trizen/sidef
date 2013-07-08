@@ -8,10 +8,8 @@ no if $] >= 5.018, warnings => "experimental::smartmatch";
 
 package Sidef::Parser {
 
-    require Sidef::Utils::Regex;
-    require Sidef::Init;
-
     our $DEBUG = 0;
+    require Sidef::Init;
 
     sub new {
 
@@ -29,9 +27,6 @@ package Sidef::Parser {
             vars          => [],
             ref_vars_refs => [],
             re            => {
-                double_quote       => Sidef::Utils::Regex::make_esc_delim(q{"}),
-                single_quote       => Sidef::Utils::Regex::make_esc_delim(q{'}),
-                regex              => Sidef::Utils::Regex::make_esc_delim(q{/}),
                 match_flags        => qr{[msixpogcdual]+},
                 substitution_flags => qr{[msixpogcerdual]+},
                 var_name           => qr/[[:alpha:]_]\w*/,
@@ -134,27 +129,25 @@ package Sidef::Parser {
     }
 
     {
-        my %pairs = qw~
+        my %pairs = qw'
           ( )
           [ ]
           { }
           < >
           « »
           „ ”
-          ~;
+          ';
 
         sub get_quoted_words {
             my ($self, %opt) = @_;
 
             my ($string, $pos) = $self->get_quoted_string(code => $opt{code});
-
-            if ($string =~ /\G/gc && defined(my $pos = $self->parse_whitespace(code => substr($string, pos($string)))))
-            {
+            if (defined(my $pos = $self->parse_whitespace(code => $string))) {
                 pos($string) += $pos;
             }
 
             my @words;
-            while ($string =~ /\G((?>[^\s\\]+|\\.)+)/gcs) {
+            while ($string =~ /\G((?>[^\s\\]+|\\.)++)/gcs) {
                 push @words, $1 =~ s{\\#}{#}gr;
 
                 if (defined(my $pos = $self->parse_whitespace(code => substr($string, pos($string))))) {
@@ -467,6 +460,18 @@ package Sidef::Parser {
                     return Sidef::Types::String::String->new($string)->apply_escapes->unescape(), pos;
                 }
 
+                # Regular expression
+                when (m{\G(?=/)}) {
+
+                    my ($string, $pos) = $self->get_quoted_string(code => (substr($_, pos)));
+                    pos($_) += $pos;
+
+                    my $regex = Sidef::Types::String::String->new($string)->apply_escapes();
+                    my $flags = $1 if /\G($self->{re}{match_flags})/goc;
+
+                    return Sidef::Types::Regex::Regex->new($$regex, $flags), pos;
+                }
+
                 # Boolean value
                 when (/\G((?>true|false))\b/gc) {
                     return Sidef::Types::Bool::Bool->$1, pos;
@@ -513,15 +518,6 @@ package Sidef::Parser {
                 when (/\G(?=\*)/) {
                     $self->{expect_method} = 1;
                     return Sidef::Variable::Ref->new(), pos;
-                }
-
-                # Regular expression
-                when (/\G$self->{re}{regex}/goc) {
-
-                    my $regex = Sidef::Types::String::String->new($1)->apply_escapes();
-                    my ($flags) = (/\G($self->{re}{match_flags})/goc);
-
-                    return Sidef::Types::Regex::Regex->new($$regex, $flags), pos;
                 }
 
                 # Object as expression
@@ -754,18 +750,29 @@ package Sidef::Parser {
                     pos($_) += $pos;
                 }
 
-                # Class declaration
-                when (/\Gclass\h*/gc) {
+=for comment
 
-                    # Maybe, we should make some function: get_quoted_string()
-                    # which supports q{}, qq{}, '', and ""
-                    when (/\G($self->{re}{double_quote}|$self->{re}{single_quote})/goc) {
-                        $self->{class} = $1;
-                        redo;
+                # Class declaration -- needs to be redesigned (or removed completely)
+                when (/\Gclass\b\h*/gc) {
+                    my ($class, $pos) = $self->parse_expr(code => substr($_, pos));
+                    pos($_) += $pos;
+
+                    if (ref($class) eq 'Sidef::Types::String::String') {
+                        $self->{class} = $$class;
+                    }
+                    else {
+                        $self->fatal_error(
+                                           error    => "invalid class name",
+                                           expected => "expected: class 'name';",
+                                           code     => $_,
+                                           pos      => pos($_)
+                                          );
                     }
 
-                    die "Expected class name, at line $self->{line}.\n";
+                    redo;
                 }
+
+=cut
 
                 # We are at the end of the script.
                 # We make some checks, and return the \%struct hash ref.
@@ -784,7 +791,7 @@ package Sidef::Parser {
                                   . " at line $variable->{line}, but not used again!\n";
                             }
                             elsif ($DEBUG) {
-                                warn "Variable '$variable->{name} is used $variable->{count} times!\n";
+                                warn "Variable '$variable->{name}' is used $variable->{count} times!\n";
                             }
                         }
 
