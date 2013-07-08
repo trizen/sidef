@@ -241,8 +241,7 @@ package Sidef::Parser {
             # Method name as variable
             when (m{\G\$(?=$self->{re}{var_name})}goc || 1) {
                 my ($obj, $pos) = $self->parse_expr(code => substr($_, pos));
-                pos($_) += $pos;
-                return {self => $obj}, pos;
+                return {self => $obj}, pos($_) + $pos;
             }
         }
     }
@@ -434,7 +433,6 @@ package Sidef::Parser {
                     my $array = Sidef::Types::Array::Array->new();
 
                     my ($strings, $pos) = $self->get_quoted_words(code => substr($_, pos));
-                    pos($_) += $pos;
 
                     $array->push(
                         map {
@@ -443,21 +441,19 @@ package Sidef::Parser {
                               : Sidef::Types::String::String->new($_)->apply_escapes->unescape()
                           } @{$strings}
                     );
-                    return $array, pos;
+                    return $array, pos($_) + $pos;
                 }
 
                 # Single quoted string
                 when (/\G(?=')/ || /\Gq\b/gc) {
                     my ($string, $pos) = $self->get_quoted_string(code => substr($_, pos));
-                    pos($_) += $pos;
-                    return Sidef::Types::String::String->new($string =~ s{\\\\}{\\}gr), pos;
+                    return Sidef::Types::String::String->new($string =~ s{\\\\}{\\}gr), pos($_) + $pos;
                 }
 
                 # Double quoted string
                 when (/\G(?=["„])/ || /\Gqq\b/gc) {
                     my ($string, $pos) = $self->get_quoted_string(code => (substr($_, pos)));
-                    pos($_) += $pos;
-                    return Sidef::Types::String::String->new($string)->apply_escapes->unescape(), pos;
+                    return Sidef::Types::String::String->new($string)->apply_escapes->unescape(), pos($_) + $pos;
                 }
 
                 # Regular expression
@@ -523,8 +519,7 @@ package Sidef::Parser {
                 # Object as expression
                 when (/\G(?=\()/) {
                     my ($obj, $pos) = $self->parse_arguments(code => substr($_, pos));
-                    pos($_) += $pos;
-                    return $obj, pos;
+                    return $obj, pos($_) + $pos;
                 }
 
                 # Array as object
@@ -532,22 +527,18 @@ package Sidef::Parser {
                     my $array = Sidef::Types::Array::Array->new();
 
                     my ($obj, $pos) = $self->parse_array(code => substr($_, pos));
-                    pos($_) += $pos;
 
                     if (ref $obj->{main} eq 'ARRAY') {
                         push @{$array}, (@{$obj->{main}});
                     }
 
-                    return $array, pos;
+                    return $array, pos($_) + $pos;
                 }
 
                 # Block as object
                 when (/\G(?=\{)/) {
-
                     my ($obj, $pos) = $self->parse_block(code => substr($_, pos));
-                    pos($_) += $pos;
-
-                    return $obj, pos;
+                    return $obj, pos($_) + $pos;
                 }
 
                 when (/\G(var|const|char|byte)(?:\h+($self->{re}{var_name})|\h*$self->{re}{vars})/sgoc) {
@@ -670,12 +661,13 @@ package Sidef::Parser {
 
         for ($opt{code}) {
             if (/\G\(/gc) {
+
                 $self->{has_object}    = 0;
                 $self->{expect_method} = 0;
                 $self->{parentheses}++;
+
                 my ($obj, $pos) = $self->parse_script(code => substr($_, pos));
-                pos($_) += $pos;
-                return $obj, pos;
+                return $obj, pos($_) + $pos;
             }
         }
     }
@@ -685,12 +677,13 @@ package Sidef::Parser {
 
         for ($opt{code}) {
             if (/\G\[/gc) {
+
                 $self->{has_object}    = 0;
                 $self->{expect_method} = 0;
                 $self->{right_brackets}++;
+
                 my ($obj, $pos) = $self->parse_script(code => substr($_, pos));
-                pos($_) += $pos;
-                return $obj, pos;
+                return $obj, pos($_) + $pos;
             }
         }
     }
@@ -714,12 +707,11 @@ package Sidef::Parser {
                 $self->{vars} = $self->{vars}[0];
 
                 my ($obj, $pos) = $self->parse_script(code => '\\var _;' . substr($_, pos));
-                pos($_) += $pos - 7;
 
                 splice @{$self->{ref_vars_refs}}, 0, $count;
                 $self->{vars} = $ref;
 
-                return Sidef::Types::Block::Code->new($obj), pos;
+                return Sidef::Types::Block::Code->new($obj), pos($_) + $pos - 7;
             }
         }
     }
