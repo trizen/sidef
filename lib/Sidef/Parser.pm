@@ -146,48 +146,24 @@ package Sidef::Parser {
         sub get_quoted_words {
             my ($self, %opt) = @_;
 
-            for ($opt{code}) {
-                my @words;
-                my $delim;
-                while (1) {
-                    if (/\G/gc && defined(my $pos = $self->parse_whitespace(code => substr($_, pos)))) {
-                        pos($_) += $pos;
-                        next;
-                    }
+            my ($string, $pos) = $self->get_quoted_string(code => $opt{code});
 
-                    if (not defined $delim) {
-                        if (/\G(.)/gc) {
-                            $delim = quotemeta($pairs{$1} // $1);
-                            next;
-                        }
-                        else {
-                            $self->fatal_error(
-                                               error => qq{can't find string delimitator for "qw"},
-                                               code  => 'qw',
-                                               pos   => 2,
-                                              );
-                        }
-                    }
-
-                    if (/\G((?>\\.|[^\s\\$delim]++)++)/gcs) {
-                        push @words, $1;
-                    }
-                    elsif (/\G$delim/gc) {
-                        last;
-                    }
-                    else {
-                        $self->fatal_error(
-                                           error => sprintf(qq{can't find string terminator "%s" for "qw"}, $delim),
-                                           code  => $_,
-                                           pos   => pos($_)
-                                          );
-                    }
-
-                }
-                return \@words, pos;
-
+            if ($string =~ /\G/gc && defined(my $pos = $self->parse_whitespace(code => substr($string, pos($string)))))
+            {
+                pos($string) += $pos;
             }
 
+            my @words;
+            while ($string =~ /\G((?>[^\s\\]+|\\.)+)/gcs) {
+                push @words, $1 =~ s{\\#}{#}gr;
+
+                if (defined(my $pos = $self->parse_whitespace(code => substr($string, pos($string))))) {
+                    pos($string) += $pos;
+                    next;
+                }
+            }
+
+            return (\@words, $pos);
         }
 
         sub get_quoted_string {
@@ -459,36 +435,36 @@ package Sidef::Parser {
                     return Sidef::Module::Require->new(), pos;
                 }
 
-                when (/\Gqw\b/gc) {
+                # Quoted words (qw/a b c/)
+                when (/\G(qq?w)\b/gc) {
+                    my ($type) = $1;
                     my $array = Sidef::Types::Array::Array->new();
 
                     my ($strings, $pos) = $self->get_quoted_words(code => substr($_, pos));
                     pos($_) += $pos;
 
-                    $array->push(map { Sidef::Types::String::String->new($_)->unescape } @{$strings});
+                    $array->push(
+                        map {
+                            $type eq 'qw'
+                              ? Sidef::Types::String::String->new($_)->unescape()
+                              : Sidef::Types::String::String->new($_)->apply_escapes->unescape()
+                          } @{$strings}
+                    );
                     return $array, pos;
                 }
 
-                when (/\Gq\b/gc) {
+                # Single quoted string
+                when (/\G(?=')/ || /\Gq\b/gc) {
                     my ($string, $pos) = $self->get_quoted_string(code => substr($_, pos));
                     pos($_) += $pos;
-                    return Sidef::Types::String::String->new($string), pos;
-                }
-
-                when (/\Gqq\b/gc) {
-                    my ($string, $pos) = $self->get_quoted_string(code => substr($_, pos));
-                    pos($_) += $pos;
-                    return Sidef::Types::String::String->new($string)->apply_escapes->unescape(), pos;
+                    return Sidef::Types::String::String->new($string =~ s{\\\\}{\\}gr), pos;
                 }
 
                 # Double quoted string
-                when (/\G$self->{re}{double_quote}/goc) {
-                    return Sidef::Types::String::String->new($1)->apply_escapes()->unescape(), pos;
-                }
-
-                # Single quoted string
-                when (/\G$self->{re}{single_quote}/goc) {
-                    return Sidef::Types::String::String->new($1 =~ s{\\(?=['\\])}{}gr), pos;
+                when (/\G(?=["„])/ || /\Gqq\b/gc) {
+                    my ($string, $pos) = $self->get_quoted_string(code => (substr($_, pos)));
+                    pos($_) += $pos;
+                    return Sidef::Types::String::String->new($string)->apply_escapes->unescape(), pos;
                 }
 
                 # Boolean value
@@ -971,11 +947,11 @@ package Sidef::Parser {
 
                         if ($expect_method and $has_object) {
 
-                            my $self_obj   = ref($struct{$self->{class}}[-1]{self});
+                            my $self_obj   = $struct{$self->{class}}[-1]{self};
                             my $method_obj = Sidef::Types::String::String->new('');
 
                             if (
-                                $self_obj ~~ [
+                                ref($self_obj) ~~ [
                                     qw(
                                       Sidef::Types::Block::For
                                       Sidef::Types::Bool::While
@@ -985,8 +961,8 @@ package Sidef::Parser {
                               ) {
                                 $$method_obj = 'do';
                             }
-                            elsif (    $self_obj eq 'Sidef::Variable::Variable'
-                                   and $struct{$self->{class}}[-1]{self}{type} eq 'func') {
+                            elsif (ref($self_obj) eq 'Sidef::Variable::Variable'
+                                   and $self_obj->{type} eq 'func') {
                                 $$method_obj = 'call';
                             }
                             else {
