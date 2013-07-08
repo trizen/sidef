@@ -276,6 +276,12 @@ package Sidef::Types::Array::Array {
         Sidef::Types::Bool::Bool->new(exists $self->[$$index]);
     }
 
+    sub defined {
+        my ($self, $index) = @_;
+        $self->_is_number($index, 1) || return;
+        Sidef::Types::Bool::Bool->new(defined($self->[$$index]) and $self->[$$index]->is_defined);
+    }
+
     sub ft {
         my ($self, $from, $to) = @_;
 

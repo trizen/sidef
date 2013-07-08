@@ -1,0 +1,11 @@
+#!/usr/bin/ruby
+
+var c = [1];
+
+func catalan (n) {
+    c[n-1] := (catalan(n-1) * (4 * n - 2) / (n + 1));
+}
+
+for (0..25) {
+    "%d\t%0.f\n".printf(_, catalan _);
+}

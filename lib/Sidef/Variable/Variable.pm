@@ -23,27 +23,23 @@ package Sidef::Variable::Variable {
     sub is_defined {
         my ($self) = @_;
         defined $self->{value}
-          and ref $self->{value} ne 'Sidef::Types::Nil::Nil';
+          and ref($self->{value}) ne 'Sidef::Types::Nil::Nil';
     }
 
     sub get_name {
-        my ($self) = @_;
-        $self->{name};
+        $_[0]{name};
     }
 
     sub set_value {
-        my ($self, $value) = @_;
-        $self->{value} = $value;
+        $_[0]{value} = $_[1];
     }
 
     sub get_value {
-        my ($self) = @_;
-        $self->{value};
+        $_[0]{value};
     }
 
     sub get_type {
-        my ($self) = @_;
-        $self->{type};
+        $_[0]{type};
     }
 
     {
@@ -51,6 +47,7 @@ package Sidef::Variable::Variable {
 
         *{__PACKAGE__ . '::' . '='} = sub {
             my ($self, $obj) = @_;
+            $#_ > 1 && ($obj = $_[-1]);
 
             if ($self->{type} eq "const") {
                 if (not defined $self->{value}) {
@@ -82,11 +79,11 @@ package Sidef::Variable::Variable {
         };
 
         *{__PACKAGE__ . '::' . ':='} = sub {
-            my ($self, $obj) = @_;
+            my ($self, $code) = @_;
 
             if (not $self->is_defined) {
                 my $method = \&{__PACKAGE__ . '::' . '='};
-                return $self->$method($obj);
+                return $self->$method(Sidef::Types::Block::Code->new($code)->run);
             }
 
             return $self->{value};
@@ -122,7 +119,7 @@ package Sidef::Variable::Variable {
                 my ($self, $arg) = @_;
 
                 my $value = $self->get_value;
-                if (ref($value) and eval {$value->can($operator)}) {
+                if (ref($value) and eval { $value->can($operator) }) {
                     $self->set_value($self->get_value->$operator($arg));
                 }
                 else {

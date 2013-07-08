@@ -12,10 +12,14 @@ package Sidef::Variable::Init {
         bless {vars => \@vars}, __PACKAGE__;
     }
 
+    sub DESTROY {
+
+    }
+
     sub AUTOLOAD {
         my ($self, @args) = @_;
 
-        my ($method) = ($AUTOLOAD =~ /.*[^:]::(.+)$/);
+        my ($method) = ($AUTOLOAD =~ /^.*[^:]::(.+)$/);
 
         my @results;
         if (@{$self->{vars}} && $self->{vars}[0]->can($method)) {

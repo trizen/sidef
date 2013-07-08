@@ -21,7 +21,11 @@ package Sidef::Types::String::String {
         no strict 'refs';
 
         *{__PACKAGE__ . '::' . '=~'} = sub {
-            $_[1]->matches($_[0]);
+            if (ref($_[1]) eq 'Sidef::Types::Regex::Regex') {
+                return $_[1]->matches($_[0]);
+            }
+            warn "[WARN] Expected a regex obj for method =~, not '", ref($_[1]), "'!\n";
+            Sidef::Types::Bool::Bool->false;
         };
 
         *{__PACKAGE__ . '::' . '*'} = sub {
@@ -34,6 +38,15 @@ package Sidef::Types::String::String {
             my ($self, $string) = @_;
             $self->_is_string($string) || return $self;
             $self->new($$self . $$string);
+        };
+
+        *{__PACKAGE__ . '::' . '-'} = sub {
+            my ($self, $string) = @_;
+            $self->_is_string($string) || return $self;
+            if ((my $ind = CORE::index($$self, $$string)) != -1) {
+                return $self->new(CORE::substr($$self, 0, $ind) . CORE::substr($$self, $ind + CORE::length($$string)));
+            }
+            $self;
         };
 
         *{__PACKAGE__ . '::' . '=='} = sub {
@@ -269,6 +282,21 @@ package Sidef::Types::String::String {
         }
 
         Sidef::Types::Bool::Bool->new(CORE::index($$self, $$string, $$start_pos) != -1);
+    }
+
+    sub begins {
+        my ($self, $string) = @_;
+
+        $self->_is_string($string)
+          || return Sidef::Types::Bool::Bool->false;
+
+        CORE::length($$self) < (my $len = CORE::length($$string))
+          && return Sidef::Types::Bool::Bool->false;
+
+        CORE::substr($$self, 0, $len) eq $$string
+          && return Sidef::Types::Bool::Bool->true;
+
+        Sidef::Types::Bool::Bool->false;
     }
 
     sub warn {

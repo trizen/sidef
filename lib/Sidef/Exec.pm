@@ -169,7 +169,7 @@ package Sidef::Exec {
                     }
 
                     my $type =
-                        ref($self_obj) eq 'Sidef::Variable::Variable'
+                      ((ref($self_obj) eq 'Sidef::Variable::Variable') && !($method ~~ [qw(:=)]))
                       ? ref($self_obj->get_value())
                       : ref($self_obj);
 
@@ -177,13 +177,15 @@ package Sidef::Exec {
 
                         foreach my $arg (@{$call->{arg}}) {
                             if (
-                                ref $arg eq 'HASH'
+                                ref($arg) eq 'HASH'
                                 and not(
                                        ($type eq 'Sidef::Types::Bool::Bool' and $method ~~ [qw(&& || ?)])
                                     || ($type eq 'Sidef::Types::Block::Code'   and $method ~~ [qw(while)])
                                     || ($type eq 'Sidef::Types::Bool::While'   and $method ~~ [qw(while)])
                                     || ($type eq 'Sidef::Types::Bool::Ternary' and $method ~~ [qw(:)])
                                     || ($type eq 'Sidef::Types::Bool::If'      and $method ~~ [qw(if elsif)])
+                                    || (    $type ~~ ['Sidef::Variable::Init', 'Sidef::Variable::Variable']
+                                        and $method ~~ [qw(:=)])
                                     || (
                                         $type ~~ [
                                             qw(
@@ -259,7 +261,6 @@ package Sidef::Exec {
         my $struct = $opt{'struct'};
 
         my @results;
-
         foreach my $key (keys %{$struct}) {
 
             my $i = -1;

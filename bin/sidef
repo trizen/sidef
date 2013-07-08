@@ -14,14 +14,18 @@ use lib '../lib';    # devel only
 use autouse 'Getopt::Std' => qw(getopts($;$));        # arguments support
 use autouse 'Encode'      => qw(decode_utf8($;$));    # encoding support
 
+my $name    = 'Sidef';
+my $version = '0.01';
+
 my %args;
 if (@ARGV and chr ord $ARGV[0] eq '-') {
-    getopts('E:d:Dho:', \%args);
+    getopts('E:d:Dho:i', \%args);
 }
 
 if ($args{h}) {
 
     my %switches = (
+                    '-i'             => 'interactive mode',
                     '-d dumped_file' => 'execute a dumped file',
                     '-D'             => 'dump the data structure of a program',
                     '-o output_file' => 'dump the data structure into a file (with -D)',
@@ -51,42 +55,65 @@ END
     exit 0;
 }
 
-my $struct;
-
 if (defined $args{d}) {
     require Sidef::Init;
-    $struct = do($args{d})
+    my $struct = do($args{d})
       || die "Can't load the data structure from file '$args{d}': $!\n";
+    execute_struct($struct);
 }
 else {
     require Sidef::Parser;
 
-    my $script_name = '-';
+    if (defined $args{i}) {
+        require Term::ReadLine;
+        my $term = Term::ReadLine->new('Sidef');
 
-    my $code =
-      exists $args{E}
-      ? do { $script_name = '-E'; decode_utf8($args{E}) }
-      : (defined($ARGV[0]) && -f $ARGV[0]) ? do {
+        print qq{>> $name $version\n};
 
-        my $file = shift;
-        $script_name = $file;
+        {
+            my $line = $term->readline('> ') // do { print "\n"; exit };
 
-        open my $fh, '<:encoding(UTF-8)', $file
-          or die qq{Can't open sidef script "$file": $!\n};
+            my $parser = Sidef::Parser->new(script_name => '-i');
+            my $struct = eval { $parser->parse_script(code => $line) };
 
-        local $/;
-        <$fh>;
+            if ($@) {
+                warn $@;
+                redo;
+            }
 
-      }
-      : join(' ', <>);
+            say for execute_struct($struct);
+            redo;
+        }
 
-    my $arguments = @ARGV ? (q{'} . decode_utf8(join(q{','}, (map { s/(['\\])/\\$1/gr } @ARGV))) . q{'}) : '';
+    }
+    else {
 
-    #
-    ## Predeclared variables and constants
-    #
+        my $script_name = '-';
 
-    my $header = <<"EOH";
+        my $code =
+          exists $args{E}
+          ? do { $script_name = '-E'; decode_utf8($args{E}) }
+          : (defined($ARGV[0]) && -f $ARGV[0]) ? do {
+
+            my $file = shift;
+            $script_name = $file;
+
+            open my $fh, '<:encoding(UTF-8)', $file
+              or die qq{Can't open sidef script "$file": $!\n};
+
+            local $/;
+            <$fh>;
+
+          }
+          : join(' ', <>);
+
+        my $arguments = @ARGV ? (q{'} . decode_utf8(join(q{','}, (map { s/(['\\])/\\$1/gr } @ARGV))) . q{'}) : '';
+
+        #
+        ## Predeclared variables and constants
+        #
+
+        my $header = <<"EOH";
 
 var   ARGV       = [$arguments];
 const OSNAME     = '$^O';
@@ -96,28 +123,35 @@ const SCRIPT     = (File.new("\Q$script_name\E"));
 __RESET_LINE_COUNTER__;
 EOH
 
-    my $parser = Sidef::Parser->new(script_name => $script_name);
-    $struct = $parser->parse_script(code => $header . $code);
-}
+        my $parser = Sidef::Parser->new(script_name => $script_name);
+        my $struct = $parser->parse_script(code => $header . $code);
 
-if ($args{D}) {
-    eval 'use Data::Dump';
+        if ($args{D}) {
+            eval 'use Data::Dump';
 
-    if ($@) {
-        die "Data::Dump module is not installed!\n";
-    }
-    else {
-        my $out_fh = \*STDOUT;
+            if ($@) {
+                die "Data::Dump module is not installed!\n";
+            }
+            else {
+                my $out_fh = \*STDOUT;
 
-        if (defined $args{o}) {
-            open $out_fh, '>:encoding(UTF-8)', $args{o}
-              or die "Can't open file '$args{o}' for write: $!\n";
+                if (defined $args{o}) {
+                    open $out_fh, '>:encoding(UTF-8)', $args{o}
+                      or die "Can't open file '$args{o}' for write: $!\n";
+                }
+
+                print {$out_fh} Data::Dump::pp($struct);
+            }
         }
-
-        print {$out_fh} Data::Dump::pp($struct);
+        else {
+            execute_struct($struct);
+        }
     }
 }
-else {
+
+sub execute_struct {
+    my ($struct) = @_;
+
     require Sidef::Exec;
     my $exec = Sidef::Exec->new();
     $exec->execute(struct => $struct);

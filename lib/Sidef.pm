@@ -37,7 +37,7 @@ package Sidef {
                     return 1;
                 }
                 else {
-                    my ($sub) = [caller(1)]->[3] =~ /^.+::(.*)/;
+                    my ($sub) = [caller(1)]->[3] =~ /^.*[^:]::(.+)$/;
 
                     if (!$dont_warn) {
                         warn sprintf("[%s] Object of type '$type' was expected, but got '%s'!\n",
