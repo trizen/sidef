@@ -466,7 +466,7 @@ package Sidef::Parser {
                     my ($string, $pos) = $self->get_quoted_string(code => (substr($_, pos)));
                     pos($_) += $pos;
 
-                    my $regex = Sidef::Types::String::String->new($string)->apply_escapes();
+                    my $regex = Sidef::Types::String::String->new($string);
                     my $flags = $1 if /\G($self->{re}{match_flags})/goc;
 
                     return Sidef::Types::Regex::Regex->new($$regex, $flags), pos;
