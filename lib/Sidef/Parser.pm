@@ -136,6 +136,7 @@ package Sidef::Parser {
           < >
           « »
           „ ”
+          “ ”
           ';
 
         sub get_quoted_words {
@@ -451,7 +452,7 @@ package Sidef::Parser {
                 }
 
                 # Double quoted string
-                when (/\G(?=["„])/ || /\Gqq\b/gc) {
+                when (/\G(?=["\“„])/ || /\Gqq\b/gc) {
                     my ($string, $pos) = $self->get_quoted_string(code => (substr($_, pos)));
                     return Sidef::Types::String::String->new($string)->apply_escapes->unescape(), pos($_) + $pos;
                 }
