@@ -225,7 +225,9 @@ package Sidef::Types::String::String {
     }
 
     sub split {
-        my ($self, $sep) = @_;
+        my ($self, $sep, $size) = @_;
+
+        $size = defined($size) && ($self->_is_number($size) || return $self) ? $$size : 0;
 
         if (ref($sep) ne 'Sidef::Types::Regex::Regex') {
             if ($sep->can('quotemeta')) {
@@ -233,7 +235,7 @@ package Sidef::Types::String::String {
             }
         }
 
-        Sidef::Types::Array::Array->new(map { __PACKAGE__->new($_) } split(/$sep/, $$self));
+        Sidef::Types::Array::Array->new(map { __PACKAGE__->new($_) } split(/$sep/, $$self, $size));
     }
 
     sub length {
