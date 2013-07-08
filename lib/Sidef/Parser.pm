@@ -142,7 +142,7 @@ package Sidef::Parser {
             my ($self, %opt) = @_;
 
             my ($string, $pos) = $self->get_quoted_string(code => $opt{code});
-            if (defined(my $pos = $self->parse_whitespace(code => $string))) {
+            if ($string =~ /\G/gc && defined(my $pos = $self->parse_whitespace(code => $string))) {
                 pos($string) += $pos;
             }
 
