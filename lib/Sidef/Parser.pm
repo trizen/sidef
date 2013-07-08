@@ -164,7 +164,7 @@ package Sidef::Parser {
 
             for ($opt{code}) {
 
-                if (/\G/gc && defined(my $pos = $self->parse_whitespace(code => substr($_, pos)))) {
+                if (/\G/gc && /\G(?=\s)/ && defined(my $pos = $self->parse_whitespace(code => substr($_, pos)))) {
                     pos($_) += $pos;
                 }
 
@@ -177,7 +177,7 @@ package Sidef::Parser {
                 }
                 else {
                     $self->fatal_error(
-                                       error => qq{can't find the string quote delimitator},
+                                       error => qq{can't find the beginning of a string quote delimitator},
                                        code  => $_,
                                        pos   => pos($_),
                                       );
@@ -669,19 +669,13 @@ package Sidef::Parser {
         my ($self, %opt) = @_;
 
         for ($opt{code}) {
-            {
-                if (/\G/gc && defined(my $pos = $self->parse_whitespace(code => substr($_, pos)))) {
-                    pos($_) += $pos;
-                }
-
-                when (/\G\(/gc) {
-                    $self->{has_object}    = 0;
-                    $self->{expect_method} = 0;
-                    $self->{parentheses}++;
-                    my ($obj, $pos) = $self->parse_script(code => substr($_, pos));
-                    pos($_) += $pos;
-                    return $obj, pos;
-                }
+            if (/\G\(/gc) {
+                $self->{has_object}    = 0;
+                $self->{expect_method} = 0;
+                $self->{parentheses}++;
+                my ($obj, $pos) = $self->parse_script(code => substr($_, pos));
+                pos($_) += $pos;
+                return $obj, pos;
             }
         }
     }
@@ -690,18 +684,13 @@ package Sidef::Parser {
         my ($self, %opt) = @_;
 
         for ($opt{code}) {
-            {
-                if (/\G/gc && defined(my $pos = $self->parse_whitespace(code => substr($_, pos)))) {
-                    pos($_) += $pos;
-                }
-                when (/\G\[/gc) {
-                    $self->{has_object}    = 0;
-                    $self->{expect_method} = 0;
-                    $self->{right_brackets}++;
-                    my ($obj, $pos) = $self->parse_script(code => substr($_, pos));
-                    pos($_) += $pos;
-                    return $obj, pos;
-                }
+            if (/\G\[/gc) {
+                $self->{has_object}    = 0;
+                $self->{expect_method} = 0;
+                $self->{right_brackets}++;
+                my ($obj, $pos) = $self->parse_script(code => substr($_, pos));
+                pos($_) += $pos;
+                return $obj, pos;
             }
         }
     }
@@ -710,32 +699,27 @@ package Sidef::Parser {
         my ($self, %opt) = @_;
 
         for ($opt{code}) {
-            {
-                if (/\G/gc && defined(my $pos = $self->parse_whitespace(code => substr($_, pos)))) {
-                    pos($_) += $pos;
-                }
-                when (/\G\{/gc) {
+            if (/\G\{/gc) {
 
-                    $self->{has_object}    = 0;
-                    $self->{expect_method} = 0;
-                    $self->{curly_brackets}++;
+                $self->{has_object}    = 0;
+                $self->{expect_method} = 0;
+                $self->{curly_brackets}++;
 
-                    my $ref   = $self->{vars};
-                    my $count = scalar(@{$self->{vars}});
+                my $ref   = $self->{vars};
+                my $count = scalar(@{$self->{vars}});
 
-                    unshift @{$self->{ref_vars_refs}}, @{$ref};
-                    unshift @{$self->{vars}}, [];
+                unshift @{$self->{ref_vars_refs}}, @{$ref};
+                unshift @{$self->{vars}}, [];
 
-                    $self->{vars} = $self->{vars}[0];
+                $self->{vars} = $self->{vars}[0];
 
-                    my ($obj, $pos) = $self->parse_script(code => '\\var _;' . substr($_, pos));
-                    pos($_) += $pos - 7;
+                my ($obj, $pos) = $self->parse_script(code => '\\var _;' . substr($_, pos));
+                pos($_) += $pos - 7;
 
-                    splice @{$self->{ref_vars_refs}}, 0, $count;
-                    $self->{vars} = $ref;
+                splice @{$self->{ref_vars_refs}}, 0, $count;
+                $self->{vars} = $ref;
 
-                    return Sidef::Types::Block::Code->new($obj), pos;
-                }
+                return Sidef::Types::Block::Code->new($obj), pos;
             }
         }
     }
