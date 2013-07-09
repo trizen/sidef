@@ -143,7 +143,15 @@ package Sidef::Exec {
                     }
 
                     $method //= '';
-                    $method = $$method if ref($method);
+                    if ((my $ref = ref($method))) {
+                        if ($ref eq 'Sidef::Types::String::String') {
+                            $method = $$method;
+                        }
+                        else {
+                            warn "[WARN] Invalid method of type: '$ref'!\n";
+                            return;
+                        }
+                    }
 
                     if (
                         ref $self_obj eq 'Sidef::Variable::Variable'
