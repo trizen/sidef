@@ -178,7 +178,7 @@ package Sidef::Exec {
                     }
 
                     my $type =
-                      ((ref($self_obj) eq 'Sidef::Variable::Variable') && !($method ~~ [qw(:=)]))
+                      ((ref($self_obj) eq 'Sidef::Variable::Variable') && !($method ~~ [qw(:= ||=  &&=)]))
                       ? ref($self_obj->get_value())
                       : ref($self_obj);
 
@@ -193,8 +193,15 @@ package Sidef::Exec {
                                     || ($type eq 'Sidef::Types::Bool::While'   and $method ~~ [qw(while)])
                                     || ($type eq 'Sidef::Types::Bool::Ternary' and $method ~~ [qw(:)])
                                     || ($type eq 'Sidef::Types::Bool::If'      and $method ~~ [qw(if elsif)])
-                                    || (    $type ~~ ['Sidef::Variable::Init', 'Sidef::Variable::Variable']
-                                        and $method ~~ [qw(:=)])
+                                    || (
+                                        $type ~~ [
+                                            qw(
+                                              Sidef::Variable::Init
+                                              Sidef::Variable::Variable
+                                              )
+                                        ]
+                                        and $method ~~ [qw(:= ||=  &&=)]
+                                       )
                                     || (
                                         $type ~~ [
                                             qw(
