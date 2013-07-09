@@ -177,10 +177,20 @@ package Sidef::Exec {
                         return $self_obj;
                     }
 
+                    #<<<
+
                     my $type =
-                      ((ref($self_obj) eq 'Sidef::Variable::Variable') && !($method ~~ [qw(:= ||=  &&=)]))
-                      ? ref($self_obj->get_value())
+                      (
+                        (ref($self_obj) eq 'Sidef::Variable::Variable')
+                          && (
+                              ref($self_obj->get_value) eq 'Sidef::Types::Bool::Bool'
+                              ? (!($method ~~ [qw(:= ||= &&=)]))
+                              : (!($method ~~ [qw(:=)]))
+                             )
+                      ) ? ref($self_obj->get_value)
                       : ref($self_obj);
+
+                    #>>>
 
                     if (exists $call->{arg}) {
 
