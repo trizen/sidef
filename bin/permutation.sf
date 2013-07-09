@@ -1,0 +1,27 @@
+#!/usr/bin/ruby
+
+func permute (code, arr) {
+    var idx = (arr.range);
+
+    while (true) {
+        code.call(arr[idx]);
+
+        var p = (idx.offset);
+        {p--} while (idx[p - 1] > idx[p]);
+        p == 0 && (return);
+
+        var d = p;
+        idx += (idx.splice(p).sliceReverse);
+
+        {d++} while (idx[p - 1] > idx[d]);
+
+        var a = idx[p-1];
+        var b = idx[d];
+
+        idx[p-1] = b;
+        idx[d]   = a;
+    }
+}
+
+char name = "abc";
+permute(func (list) { list.join(' ').say }, name);

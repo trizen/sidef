@@ -165,9 +165,9 @@ package Sidef::Types::Array::Array {
             my ($self, $arg) = @_;
 
             if (ref $arg eq 'Sidef::Types::Array::Array') {
+                my @values = map { $_->get_value } @{$arg};
                 foreach my $i (0 .. $#{$self}) {
-                    $arg->[$i] //= Sidef::Variable::Variable->new(rand, 'var', Sidef::Types::Nil::Nil->new);
-                    $self->[$i]->set_value($arg->[$i]->get_value);
+                    $self->[$i]->set_value(exists $values[$i] ? $values[$i] : Sidef::Types::Nil::Nil->new);
                 }
             }
             else {
@@ -319,7 +319,9 @@ package Sidef::Types::Array::Array {
             map {
                 my $val = $_->get_value;
                 $var_ref->get_var->set_value($val);
-                $code->run;
+                my $result = $code->run;
+                $_->set_value($var_ref->get_var->get_value);
+                $result;
               } @{$self}
         );
     }
@@ -560,11 +562,27 @@ package Sidef::Types::Array::Array {
                 return;
             }
 
-            return ((splice(@{$self}, $$index, 1))->get_value);
+            return ((CORE::splice(@{$self}, $$index, 1))->get_value);
         }
 
         $#{$self} > -1 || return;
         (pop @{$self})->get_value;
+    }
+
+    sub splice {
+        my ($self, $offset, $length, $array) = @_;
+
+        $offset = defined($offset) && $self->_is_number($offset) ? $$offset : 0;
+        $length = defined($length) && $self->_is_number($length) ? $$length : scalar(@{$self});
+
+        if (defined($array)) {
+            $self->_is_array($array) || return;
+            return $self->new(map { $_->get_value }
+                              CORE::splice(@{$self}, $offset, $length, @{$self->new(map { $_->get_value } @{$array})}));
+        }
+        else {
+            return $self->new(map { $_->get_value } CORE::splice(@{$self}, $offset, $length));
+        }
     }
 
     sub takeRight {
@@ -592,7 +610,7 @@ package Sidef::Types::Array::Array {
             $$amount = $offset + 1;
           };
 
-        $self->new(map { $_->get_value } splice(@{$self}, -$$amount));
+        $self->new(map { $_->get_value } CORE::splice(@{$self}, -$$amount));
     }
 
     sub takeLeft {
@@ -620,7 +638,7 @@ package Sidef::Types::Array::Array {
             $$amount = $offset + 1;
           };
 
-        $self->new(map { $_->get_value } splice(@{$self}, 0, $$amount));
+        $self->new(map { $_->get_value } CORE::splice(@{$self}, 0, $$amount));
     }
 
     sub shift {
@@ -671,6 +689,13 @@ package Sidef::Types::Array::Array {
     }
 
     *reversed = \&reverse;    # alias
+
+    sub sliceReverse {
+        my ($self) = @_;
+        my $array = $self->new();
+        CORE::push(@{$array}, CORE::reverse(@{$self}));
+        $array;
+    }
 
     sub to_hash {
         my ($self) = @_;

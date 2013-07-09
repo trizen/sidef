@@ -60,7 +60,7 @@ package Sidef::Exec {
 
             if (exists $expr->{ind}) {
 
-                if (ref $self_obj eq 'Sidef::Variable::Variable') {
+                if (ref($self_obj) eq 'Sidef::Variable::Variable') {
                     $self_obj = $self_obj->get_value;
                 }
 
@@ -69,7 +69,7 @@ package Sidef::Exec {
                     my $level   = $expr->{ind}[$l];
                     my $is_hash = ref($self_obj) eq 'Sidef::Types::Hash::Hash';
 
-                    if ($#{$level} > 0) {
+                  MULTI_INDEX: if ($#{$level} > 0) {
                         my @indices;
 
                         foreach my $ind (@{$level}) {
@@ -89,7 +89,6 @@ package Sidef::Exec {
                         }
 
                         my $array = Sidef::Types::Array::Array->new();
-
                         push @{$array}, $is_hash ? (@{$self_obj}{@indices}) : (@{$self_obj}[@indices]);
                         $self_obj = $array;
 
@@ -104,9 +103,8 @@ package Sidef::Exec {
                         }
 
                         if (ref($ind) eq 'Sidef::Types::Array::Array') {
-                            $expr->{ind}[$l] = [map { $_->get_value } @{$ind}];
-                            --$l;
-                            next;
+                            $level = [map { $_->get_value } @{$ind}];
+                            goto MULTI_INDEX;
                         }
 
                         !$is_hash && ($self->valid_index($ind) || next);

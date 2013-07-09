@@ -347,6 +347,10 @@ package Sidef::Parser {
                     return Sidef::Types::Glob::File->new(), pos;
                 }
 
+                when (/\GFileHandle\b/gc) {
+                    return Sidef::Types::Glob::FileHandle->new(), pos;
+                }
+
                 when (/\GArr(?:ay)?\b/gc) {
                     return Sidef::Types::Array::Array->new(), pos;
                 }
@@ -581,9 +585,9 @@ package Sidef::Parser {
                 }
 
                 # Declaration of variable types (var, const, char, etc...)
-                when (/\G(my|func)\h+($self->{re}{var_name})/goc) {
+                when (/\G(my)\h+($self->{re}{var_name})/goc || /\G(func)\h+($self->{re}{var_name})?+(?=\h*\()/goc) {
                     my $type = $1;
-                    my $name = $2;
+                    my $name = $2 // '';
 
                     my $variable =
                       $type eq 'my'

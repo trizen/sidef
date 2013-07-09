@@ -321,13 +321,7 @@ package Sidef::Types::String::String {
 
         warn $@ if $@;
 
-        my $result = eval { Sidef::Types::Block::Code->new($struct)->run };
-
-        if ($@) {
-            warn $@;
-        }
-
-        return $result;
+        return scalar eval { Sidef::Types::Block::Code->new($struct)->run };
     }
 
     sub contains {

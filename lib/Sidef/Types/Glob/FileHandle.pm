@@ -19,6 +19,21 @@ package Sidef::Types::Glob::FileHandle {
         $_[0]->{fh};
     }
 
+    sub stdout {
+        __PACKAGE__->new(fh   => \*STDOUT,
+                         file => Sidef::Types::Nil::Nil->new,);
+    }
+
+    sub stderr {
+        __PACKAGE__->new(fh   => \*STDERR,
+                         file => Sidef::Types::Nil::Nil->new,);
+    }
+
+    sub stdin {
+        __PACKAGE__->new(fh   => \*STDIN,
+                         file => Sidef::Types::Nil::Nil->new,);
+    }
+
     sub write {
         my ($self, $string) = @_;
         Sidef::Types::Bool::Bool->new(print {$self->{fh}} $string);

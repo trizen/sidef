@@ -116,6 +116,9 @@ else {
         my $header = <<"EOH";
 
 var   ARGV       = [$arguments];
+var   STDOUT     = (FileHandle.stdout);
+var   STDERR     = (FileHandle.stderr);
+var   STDIN      = (FileHandle.stdin);
 const OSNAME     = '$^O';
 const EXEC       = (File.new("\Q$0\E"));
 const SCRIPT     = (File.new("\Q$script_name\E"));
