@@ -106,6 +106,9 @@ package Sidef::Types::String::String {
             my ($self, $string) = @_;
             Sidef::Types::Array::Array->new(map { $self->new($_) } $$self .. $$string);
         };
+
+        *{__PACKAGE__ . '::' . '^^'} = \&begins_with;
+        *{__PACKAGE__ . '::' . '$$'} = \&ends_with;
     }
 
     sub uc {
@@ -286,7 +289,7 @@ package Sidef::Types::String::String {
         Sidef::Types::Bool::Bool->new(CORE::index($$self, $$string, $$start_pos) != -1);
     }
 
-    sub begins {
+    sub begins_with {
         my ($self, $string) = @_;
 
         $self->_is_string($string)
@@ -296,6 +299,21 @@ package Sidef::Types::String::String {
           && return Sidef::Types::Bool::Bool->false;
 
         CORE::substr($$self, 0, $len) eq $$string
+          && return Sidef::Types::Bool::Bool->true;
+
+        Sidef::Types::Bool::Bool->false;
+    }
+
+    sub ends_with {
+        my ($self, $string) = @_;
+
+        $self->_is_string($string)
+          || return Sidef::Types::Bool::Bool->false;
+
+        CORE::length($$self) < (my $len = CORE::length($$string))
+          && return Sidef::Types::Bool::Bool->false;
+
+        CORE::substr($$self, -$len) eq $$string
           && return Sidef::Types::Bool::Bool->true;
 
         Sidef::Types::Bool::Bool->false;
