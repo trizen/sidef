@@ -113,7 +113,7 @@ package Sidef::Variable::Variable {
             $self;
         };
 
-        foreach my $operator (qw(+ - % * / & | ^ ** && || )) {
+        foreach my $operator (qw(+ - % * / & | ^ ** && || << >>)) {
 
             *{__PACKAGE__ . '::' . $operator . '='} = sub {
                 my ($self, $arg) = @_;

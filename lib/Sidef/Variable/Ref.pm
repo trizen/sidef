@@ -45,8 +45,7 @@ package Sidef::Variable::Ref {
     }
 
     sub get_var {
-        my ($self) = @_;
-        $self->{var};
+        $_[0]{var};
     }
 
 };

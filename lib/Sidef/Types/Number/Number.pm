@@ -79,6 +79,18 @@ package Sidef::Types::Number::Number {
             Sidef::Types::Bool::Bool->new($$self > $$num);
         };
 
+        *{__PACKAGE__ . '::' . '>>'} = sub {
+            my ($self, $num) = @_;
+            $self->_is_number($num) || return $self;
+            $self->new($$self >> $$num);
+        };
+
+        *{__PACKAGE__ . '::' . '<<'} = sub {
+            my ($self, $num) = @_;
+            $self->_is_number($num) || return $self;
+            $self->new($$self << $$num);
+        };
+
         *{__PACKAGE__ . '::' . '<='} = sub {
             my ($self, $num) = @_;
 
