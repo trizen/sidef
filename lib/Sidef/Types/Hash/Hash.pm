@@ -35,9 +35,28 @@ package Sidef::Types::Hash::Hash {
         no strict 'refs';
 
         *{__PACKAGE__ . '::' . '+'} = sub {
-            my ($self, $hash) = @_;
-            $self->_is_hash($hash) || return $self;
-            $self->new(%{$self}, %{$hash});
+            my ($self, $obj) = @_;
+
+            my @list;
+            while (my ($key, $val) = each %{$self}) {
+                push @list, $key, $val->get_value;
+            }
+
+            if ($self->_is_hash($obj, 1, 1)) {
+
+                while (my ($key, $val) = each %{$obj}) {
+                    push @list, $key, $val->get_value;
+                }
+            }
+            elsif ($self->_is_array($obj, 1, 1)) {
+                push @list, map { $_->get_value } @{$obj};
+            }
+            else {
+                warn "[WARN] Invalid object for hash concatenation! Expected hash or array.\n";
+                return $self;
+            }
+
+            $self->new(@list);
         };
     }
 

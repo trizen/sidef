@@ -92,8 +92,12 @@ package Sidef::Types::String::String {
 
         *{__PACKAGE__ . '::' . '<<'} = sub {
             my ($self, $i) = @_;
+
             $self->_is_number($i) || return $self;
-            $self->new(CORE::substr($$self, $$i));
+
+            my $len = CORE::length($$self);
+            $i = $$i > $len ? $len : $$i;
+            $self->new(CORE::substr($$self, $i));
         };
 
         *{__PACKAGE__ . '::' . '>>'} = sub {
@@ -113,34 +117,64 @@ package Sidef::Types::String::String {
 
     sub uc {
         my ($self) = @_;
-        __PACKAGE__->new(CORE::uc $$self);
+        $self->new(CORE::uc $$self);
     }
+
+    *toUpperCase = \&uc;
 
     sub ucfirst {
         my ($self) = @_;
-        __PACKAGE__->new(CORE::ucfirst $$self);
+        $self->new(CORE::ucfirst $$self);
     }
+
+    *tc = \&ucfirst;
 
     sub lc {
         my ($self) = @_;
-        __PACKAGE__->new(CORE::lc $$self);
+        $self->new(CORE::lc $$self);
     }
+
+    *toLowerCase = \&lc;
 
     sub lcfirst {
         my ($self) = @_;
-        __PACKAGE__->new(CORE::lcfirst $$self);
+        $self->new(CORE::lcfirst $$self);
+    }
+
+    sub tclc {
+        my ($self) = @_;
+        $self->new(CORE::ucfirst(CORE::lc($$self)));
+    }
+
+    sub charAt {
+        my ($self, $pos) = @_;
+        $self->_is_number($pos) || return $self;
+        Sidef::Types::Char::Char->new(CORE::substr($$self, $$pos, 1));
+    }
+
+    sub wordcase {
+        my ($self) = @_;
+
+        my $string = $1
+          if ($$self =~ /\G(\s+)/gc);
+
+        while ($$self =~ /\G(\S++)(\s*+)/gc) {
+            $string .= CORE::ucfirst(CORE::lc($1)) . $2;
+        }
+
+        $self->new($string);
     }
 
     sub chop {
         my ($self) = @_;
-        __PACKAGE__->new(CORE::chop $$self);
+        $self->new(CORE::chop $$self);
     }
 
     sub chomp {
         my ($self) = @_;
 
         CORE::chomp($$self) || return $self;
-        __PACKAGE__->new($$self);
+        $self->new($$self);
     }
 
     sub substr {
@@ -163,6 +197,8 @@ package Sidef::Types::String::String {
 
         __PACKAGE__->new(CORE::join '', @str[$offs .. $len]);
     }
+
+    *substring = \&substr;
 
     sub insert {
         my ($self, $string, $pos, $len) = @_;
@@ -187,6 +223,23 @@ package Sidef::Types::String::String {
         __PACKAGE__->new(CORE::join($$delim, $$self, @rest));
     }
 
+    sub index {
+        my ($self, $substr, $pos) = @_;
+        $self->_is_string($substr) || return $self;
+
+        if (defined($pos)) {
+            $self->_is_number($pos) || return $self;
+        }
+
+        Sidef::Types::Number::Number->new(
+                                          defined($pos)
+                                          ? CORE::index($$self, $$substr, $$pos)
+                                          : CORE::index($$self, $$substr)
+                                         );
+    }
+
+    *indexOf = \&index;
+
     sub ord {
         my ($self) = @_;
         Sidef::Types::Byte::Byte->new(CORE::ord($$self));
@@ -201,6 +254,8 @@ package Sidef::Types::String::String {
         my ($self) = @_;
         Sidef::Types::Bool::Bool->new(CORE::say($$self));
     }
+
+    *println = \&say;
 
     sub print {
         my ($self) = @_;
@@ -304,6 +359,9 @@ package Sidef::Types::String::String {
         Sidef::Types::Bool::Bool->false;
     }
 
+    *starts_with = \&begins_with;
+    *startsWith  = \&begins_with;
+
     sub ends_with {
         my ($self, $string) = @_;
 
@@ -318,6 +376,8 @@ package Sidef::Types::String::String {
 
         Sidef::Types::Bool::Bool->false;
     }
+
+    *endsWith = \&ends_with;
 
     sub warn {
         my ($self) = @_;

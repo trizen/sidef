@@ -257,29 +257,38 @@ package Sidef::Parser {
             {
                 ++$found_space;
 
-                # Comments
-                when (/\G#.*/gc) {
+                # One-line comment
+                if (/\G#.*/gc) {
                     redo;
                 }
-                when (/\G(?=\s)/) {
+
+                # Multi-line C comment
+                if (m{\G/\*(.*?)\*/}gsc) {
+                    $self->{line} += ($1 =~ tr/\n//);
+                    redo;
+                }
+
+                # Whitespace
+                if (/\G(?=\s)/) {
 
                     # Generic line
-                    when (/\G\R/gc) {
+                    if (/\G\R/gc) {
                         ++$self->{line};
                         redo;
                     }
 
                     # Horizontal space
-                    when (/\G\h+/gc) {
+                    if (/\G\h+/gc) {
                         redo;
                     }
 
                     # Vertical space
-                    when (/\G\v+/gc) {
+                    if (/\G\v+/gc) {
                         redo;
                     }
                 }
-                when ($found_space > 0) {
+
+                if ($found_space > 0) {
 
                     # End of a statement when two or more new lines has been found
                     if ($self->{line} - $beg_line >= 2) {
@@ -290,13 +299,10 @@ package Sidef::Parser {
 
                     return pos;
                 }
-                default {
-                    return;
-                }
+
+                return;
             }
         }
-
-        return;
     }
 
     sub parse_expr {

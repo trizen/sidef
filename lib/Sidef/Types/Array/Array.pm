@@ -128,31 +128,7 @@ package Sidef::Types::Array::Array {
             $self;
         };
 
-        *{__PACKAGE__ . '::' . '&&'} = sub {
-            my ($self, $array) = @_;
-
-            $self->_is_array($array) || return ($self);
-
-            my $min = $#{$self} > $#{$array} ? $#{$array} : $#{$self};
-
-            my $new_array = $self->new();
-            foreach my $i (0 .. $min) {
-                $new_array->push($self->[$i]->get_value, $array->[$i]->get_value);
-            }
-
-            if ($#{$self} > $#{$array}) {
-                foreach my $i ($min + 1 .. $#{$self}) {
-                    $new_array->push($self->[$i]->get_value);
-                }
-            }
-            else {
-                foreach my $i ($min + 1 .. $#{$array}) {
-                    $new_array->push($array->[$i]->get_value);
-                }
-            }
-
-            $new_array;
-        };
+        *{__PACKAGE__ . '::' . '&&'} = \&mesh;
 
         *{__PACKAGE__ . '::' . '=='} = sub {
             my ($self, $array) = @_;
@@ -202,6 +178,34 @@ package Sidef::Types::Array::Array {
         };
 
     }
+
+    sub mesh {
+        my ($self, $array) = @_;
+
+        $self->_is_array($array) || return ($self);
+
+        my $min = $#{$self} > $#{$array} ? $#{$array} : $#{$self};
+
+        my $new_array = $self->new();
+        foreach my $i (0 .. $min) {
+            $new_array->push($self->[$i]->get_value, $array->[$i]->get_value);
+        }
+
+        if ($#{$self} > $#{$array}) {
+            foreach my $i ($min + 1 .. $#{$self}) {
+                $new_array->push($self->[$i]->get_value);
+            }
+        }
+        else {
+            foreach my $i ($min + 1 .. $#{$array}) {
+                $new_array->push($array->[$i]->get_value);
+            }
+        }
+
+        $new_array;
+    }
+
+    *zip = \&mesh;
 
     sub make {
         my ($self, $size, $type) = @_;
@@ -270,6 +274,18 @@ package Sidef::Types::Array::Array {
         $_[0]->_op_equal('/');
     }
 
+    sub last {
+        my ($self) = @_;
+        $#{$self} >= 0 || return;
+        $self->[-1]->get_value;
+    }
+
+    sub first {
+        my ($self) = @_;
+        $#{$self} >= 0 || return;
+        $self->[0]->get_value;
+    }
+
     sub exists {
         my ($self, $index) = @_;
         $self->_is_number($index, 1) || return;
@@ -325,12 +341,145 @@ package Sidef::Types::Array::Array {
         );
     }
 
+    *filter = \&grep;
+
+    sub find {
+        my ($self, $code) = @_;
+
+        $self->_is_code($code) || return $self;
+
+        my $exec = Sidef::Exec->new();
+        my $var_ref = $exec->execute_expr(expr => $code->{main}[0], class => 'main');
+
+        foreach my $var (@{$self}) {
+            my $val = $var->get_value;
+            $var_ref->get_var->set_value($val);
+            return $val if ($code->run);
+        }
+
+        return;
+    }
+
+    sub all {
+        my ($self, $code) = @_;
+
+        $self->_is_code($code) || return $self;
+
+        my $exec = Sidef::Exec->new();
+        my $var_ref = $exec->execute_expr(expr => $code->{main}[0], class => 'main');
+
+        foreach my $var (@{$self}) {
+            my $val = $var->get_value;
+            $var_ref->get_var->set_value($val);
+            if (not $code->run) {
+                return Sidef::Types::Bool::Bool->false;
+            }
+        }
+
+        Sidef::Types::Bool::Bool->true;
+    }
+
+    sub first_index {
+        my ($self, $code) = @_;
+
+        $self->_is_code($code) || return $self;
+
+        my $exec = Sidef::Exec->new();
+        my $var_ref = $exec->execute_expr(expr => $code->{main}[0], class => 'main');
+
+        foreach my $i (0 .. $#{$self}) {
+            my $var = $self->[$i];
+            my $val = $var->get_value;
+            $var_ref->get_var->set_value($val);
+            if ($code->run) {
+                return Sidef::Types::Number::Number->new($i);
+            }
+        }
+
+        Sidef::Types::Number::Number->new(-1);
+    }
+
+    *indexWhere = \&first_index;
+    *firstIndex = \&first_index;
+
+    sub last_index {
+        my ($self, $code) = @_;
+
+        $self->_is_code($code) || return $self;
+
+        my $exec = Sidef::Exec->new();
+        my $var_ref = $exec->execute_expr(expr => $code->{main}[0], class => 'main');
+
+        my $offset = $#{$self};
+        for (my $i = $offset ; $i >= 0 ; $i--) {
+            my $var = $self->[$i];
+            my $val = $var->get_value;
+            $var_ref->get_var->set_value($val);
+            if ($code->run) {
+                return Sidef::Types::Number::Number->new($i);
+            }
+        }
+
+        Sidef::Types::Number::Number->new(-1);
+    }
+
+    *lastIndexWhere = \&last_index;
+    *lastIndex      = \&last_index;
+
+    sub reducePairs {
+        my ($self, $method) = @_;
+
+        $self->_is_string($method) || return;
+
+        (my $offset = $#{$self}) >= 0 || return;
+
+        my $array = $self->new();
+        for (my $i = 1 ; $i <= $offset ; $i += 2) {
+            my $x = $self->[$i - 1]->get_value;
+
+            if ($x->can($$method)) {
+                $array->push($x->$$method($self->[$i]->get_value));
+            }
+            else {
+                warn "[WARN] Array.reducePairs: can't find method '$$method' for object '", ref($x), "'!\n";
+            }
+        }
+
+        $array;
+    }
+
+    sub shuffle {
+        my ($self) = @_;
+        require List::Util;
+        $self->new(map { $_->get_value } List::Util::shuffle(@{$self}));
+    }
+
+    sub reduce {
+        my ($self, $method) = @_;
+
+        $self->_is_string($method) || return;
+        (my $offset = $#{$self}) >= 0 || return;
+
+        my $x = $self->[0]->get_value;
+        foreach my $i (1 .. $offset) {
+            if ($x->can($$method)) {
+                $x = ($x->$$method($self->[$i]->get_value));
+            }
+            else {
+                warn "[WARN] Array.reducePairs: can't find method '$$method' for object '", ref($x), "'!\n";
+            }
+        }
+
+        $x;
+    }
+
     sub length {
         my ($self) = @_;
         Sidef::Types::Number::Number->new(scalar @{$self});
     }
 
-    *len = \&length;    # alias
+    *len  = \&length;    # alias
+    *size = \&length;
 
     sub offset {
         my ($self) = @_;
@@ -374,6 +523,9 @@ package Sidef::Types::Array::Array {
         $self->new(map { $self->[$_]->get_value } grep { not exists $indices{$_} } 0 .. $#{$self});
     }
 
+    *uniq     = \&unique;
+    *distinct = \&unique;
+
     sub contains {
         my ($self, $obj) = @_;
 
@@ -399,12 +551,12 @@ package Sidef::Types::Array::Array {
         if (defined $index) {
             if ($self->_is_number($index, 1, 1)) {
                 $$index <= $#{$self} or do {
-                    warn "[WARN] Array index '$$index' is bigger than array's offset '$#{$self}'!\n";
+                    warn "[WARN] Array.pop: index '$$index' is bigger than array's offset '$#{$self}'!\n";
                     return;
                 };
             }
             else {
-                warn sprintf("[WARN] ARRAY's method 'pop' expected a position number object, not '%s'!\n", ref($index));
+                warn sprintf("[WARN] Array.pop: expected a position number object, not '%s'!\n", ref($index));
                 return;
             }
 
@@ -413,6 +565,62 @@ package Sidef::Types::Array::Array {
 
         $#{$self} > -1 || return;
         (pop @{$self})->get_value;
+    }
+
+    sub takeRight {
+        my ($self, $amount) = @_;
+        $self->_is_number($amount) || return;
+
+        my $offset = $#{$self};
+        $offset >= ($$amount - 1)
+          || do {
+            warn "[WARN] Array.takeRight: too many elements specified ($$amount)! Array's offset is: $offset\n";
+            $$amount = $offset + 1;
+          };
+
+        $self->new(map { $_->get_value } @{$self}[$offset - $$amount + 1 .. $offset]);
+    }
+
+    sub dropRight {
+        my ($self, $amount) = @_;
+        $self->_is_number($amount) || return;
+
+        my $offset = $#{$self};
+        $offset >= ($$amount - 1)
+          || do {
+            warn "[WARN] Array.dropRight: too many elements specified! ($$amount)! Array's offset is: $offset\n";
+            $$amount = $offset + 1;
+          };
+
+        $self->new(map { $_->get_value } splice(@{$self}, -$$amount));
+    }
+
+    sub takeLeft {
+        my ($self, $amount) = @_;
+        $self->_is_number($amount) || return;
+
+        my $offset = $#{$self};
+        $offset >= ($$amount - 1)
+          || do {
+            warn "[WARN] Array.takeLeft: too many elements specified ($$amount)! Array's offset is: $offset\n";
+            $$amount = $offset + 1;
+          };
+
+        $self->new(map { $_->get_value } @{$self}[0 .. $$amount - 1]);
+    }
+
+    sub dropLeft {
+        my ($self, $amount) = @_;
+        $self->_is_number($amount) || return;
+
+        my $offset = $#{$self};
+        $offset >= ($$amount - 1)
+          || do {
+            warn "[WARN] Array.dropLeft: too many elements specified! ($$amount)! Array's offset is: $offset\n";
+            $$amount = $offset + 1;
+          };
+
+        $self->new(map { $_->get_value } splice(@{$self}, 0, $$amount));
     }
 
     sub shift {
@@ -455,6 +663,8 @@ package Sidef::Types::Array::Array {
         $array;
     }
 
+    *joinInsert = \&join_insert;
+
     sub reverse {
         my ($self) = @_;
         $self->new(reverse map { $_->get_value } @{$self});
@@ -466,6 +676,8 @@ package Sidef::Types::Array::Array {
         my ($self) = @_;
         Sidef::Types::Hash::Hash->new(map { $_->get_value } @{$self});
     }
+
+    *toHash = \&to_hash;
 
     sub dump {
         my ($self) = @_;

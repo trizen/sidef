@@ -117,11 +117,13 @@ package Sidef::Types::Number::Number {
             Sidef::Types::Bool::Bool->new($$self != $$num);
         };
 
-        *{__PACKAGE__ . '::' . '..'} = sub {
-            my ($self, $num) = @_;
-            $self->_is_number($num) || return $self;
-            Sidef::Types::Array::Array->new(map { ref($self)->new($_) } $$self .. $$num);
-        };
+        *{__PACKAGE__ . '::' . '..'} = \&to;
+    }
+
+    sub to {
+        my ($self, $num) = @_;
+        $self->_is_number($num) || return $self;
+        Sidef::Types::Array::Array->new(map { ref($self)->new($_) } $$self .. $$num);
     }
 
     sub sqrt {
@@ -143,6 +145,11 @@ package Sidef::Types::Number::Number {
     sub abs {
         my ($self) = @_;
         $self->new(CORE::abs $$self);
+    }
+
+    sub hex {
+        my ($self) = @_;
+        $self->new(CORE::hex $$self);
     }
 
     sub int {

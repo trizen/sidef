@@ -35,6 +35,8 @@ package Sidef::Types::Glob::FileHandle {
         Sidef::Types::Array::Array->new(map { Sidef::Types::String::String->new($_) } CORE::readline $self->{fh});
     }
 
+    *getLines = \&read_all;
+
     sub eof {
         my ($self) = @_;
         Sidef::Types::Bool::Bool->new(eof $self->{fh});
