@@ -361,49 +361,6 @@ package Sidef::Parser {
                     pos($_) += $pos;
                 }
 
-                when (/\G__RESET_LINE_COUNTER__\b/gc) {
-                    $self->{line} = 0;
-                    redo;
-                }
-
-                when (/\G__STRICT__\b/gc) {
-                    $self->{strict_var} = 1;
-                    redo;
-                }
-
-                when (/\G__NO_STRICT__\b/gc) {
-                    $self->{strict_var} = 0;
-                    redo;
-                }
-
-                when (/\G__END__\b/gc) {
-                    return undef, length($_);
-                }
-
-                when (/\G__BLOCK__\b/gc) {
-                    if (exists $self->{current_block}) {
-                        return $self->{current_block}, pos;
-                    }
-
-                    $self->fatal_error(
-                                       code  => $_,
-                                       pos   => pos($_) - length('__BLOCK__'),
-                                       error => "__BLOCK__ used outside a block!",
-                                      );
-                }
-
-                when (/\G__FUNC__\b/gc) {
-                    if (exists $self->{current_function}) {
-                        return $self->{current_function}, pos;
-                    }
-
-                    $self->fatal_error(
-                                       code  => $_,
-                                       pos   => pos($_) - length('__FUNC__'),
-                                       error => "__FUNC__ used outside a function!",
-                                      );
-                }
-
                 # End of an expression, or end of the script
                 when (/\G;/gc || /\G\z/) {
                     $self->{has_object}    = 0;
@@ -412,130 +369,9 @@ package Sidef::Parser {
                     return undef, pos;
                 }
 
-                when (/\G\$/gc) {
-                    redo;
-                }
-
                 $self->{has_object} = 1;
                 $self->{has_method} = 0;
                 $self->{expect_arg} = 0;
-
-                when (/\GDir\b/gc) {
-                    return Sidef::Types::Glob::Dir->new(), pos;
-                }
-
-                when (/\GFile\b/gc) {
-                    return Sidef::Types::Glob::File->new(), pos;
-                }
-
-                when (/\GFileHandle\b/gc) {
-                    return Sidef::Types::Glob::FileHandle->new(), pos;
-                }
-
-                when (/\GArr(?:ay)?\b/gc) {
-                    return Sidef::Types::Array::Array->new(), pos;
-                }
-
-                when (/\GHash\b/gc) {
-                    return Sidef::Types::Hash::Hash->new(), pos;
-                }
-
-                when (/\GStr(?:ing)?\b/gc) {
-                    return Sidef::Types::String::String->new(), pos;
-                }
-
-                when (/\GNum(?:ber)?\b/gc) {
-                    return Sidef::Types::Number::Number->new(), pos;
-                }
-
-                when (/\GPipe\b/gc) {
-                    return Sidef::Types::Glob::Pipe->new(), pos;
-                }
-
-                when (/\GByte\b/gc) {
-                    return Sidef::Types::Byte::Byte->new(), pos;
-                }
-
-                when (/\GBytes\b/gc) {
-                    return Sidef::Types::Byte::Bytes->new(), pos;
-                }
-
-                when (/\GCha?r\b/gc) {
-                    return Sidef::Types::Char::Char->new(), pos;
-                }
-
-                when (/\GCha?rs\b/gc) {
-                    return Sidef::Types::Char::Chars->new(), pos;
-                }
-
-                when (/\GBool\b/gc) {
-                    return Sidef::Types::Bool::Bool->new(), pos;
-                }
-
-                when (/\GSys\b/gc) {
-                    return Sidef::Sys::Sys->new(), pos;
-                }
-
-                when (/\GRegex\b/gc) {
-                    return Sidef::Types::Regex::Regex->new(''), pos;
-                }
-
-                when (/\G(?=if\b)/) {
-                    $self->{expect_method} = 1;
-                    return Sidef::Types::Bool::If->new(), pos;
-                }
-
-                when (/\G(?=while\b)/) {
-                    $self->{expect_method} = 1;
-                    return Sidef::Types::Bool::While->new(), pos;
-                }
-
-                when (/\G(?=for(?:each)?\b)/) {
-                    $self->{expect_method} = 1;
-                    return Sidef::Types::Block::For->new(), pos;
-                }
-
-                when (/\G(?=continue\b)/) {
-                    $self->{expect_method} = 1;
-                    return Sidef::Types::Block::Continue->new(), pos;
-                }
-
-                when (/\G(?=return\b)/) {
-                    $self->{expect_method} = 1;
-                    return Sidef::Types::Block::Return->new(), pos;
-                }
-
-                when (/\G(?=given\b)/) {
-                    $self->{expect_method} = 1;
-                    return Sidef::Types::Block::Given->new(), pos;
-                }
-
-                when (/\G(?=break\b)/) {
-                    $self->{expect_method} = 1;
-                    return Sidef::Types::Block::Break->new(), pos;
-                }
-
-                when (/\G(?=require\b)/) {
-                    $self->{expect_method} = 1;
-                    return Sidef::Module::Require->new(), pos;
-                }
-
-                # Quoted words (qw/a b c/)
-                when (/\G(qq?w)\b/gc) {
-                    my ($type) = $1;
-                    my $array = Sidef::Types::Array::Array->new();
-
-                    my ($strings, $pos) = $self->get_quoted_words(code => substr($_, pos));
-
-                    $array->push(
-                        map {
-                            $type eq 'qw'
-                              ? Sidef::Types::String::String->new($_)->unescape()
-                              : Sidef::Types::String::String->new($_)->apply_escapes->unescape()
-                          } @{$strings}
-                    );
-                    return $array, pos($_) + $pos;
-                }
 
                 # Single quoted string
                 when (/\G(?=')/ || /\Gq\b/gc) {
@@ -549,69 +385,15 @@ package Sidef::Parser {
                     return Sidef::Types::String::String->new($string)->apply_escapes->unescape(), pos($_) + $pos;
                 }
 
-                # Regular expression
-                when (m{\G(?=/)}) {
-
-                    my ($string, $pos) = $self->get_quoted_string(code => (substr($_, pos)));
-                    pos($_) += $pos;
-
-                    my $regex = Sidef::Types::String::String->new($string);
-                    my $flags = $1 if /\G($self->{re}{match_flags})/goc;
-
-                    return Sidef::Types::Regex::Regex->new($$regex, $flags), pos;
-                }
-
-                # Boolean value
-                when (/\G((?>true|false))\b/gc) {
-                    return Sidef::Types::Bool::Bool->$1, pos;
-                }
-
-                # 'Not initialized' value
-                when (/\Gnil\b/gc) {
-                    return Sidef::Types::Nil::Nil->new(), pos;
-                }
-
-                # Special number
-                when (/\G(?=0)/) {
-
-                    # Binary, hexdecimal and octal numbers
-                    when (/\G0(b[10]*|x[0-9A-Fa-f]*|[0-9]+\b)/gc) {
-                        return Sidef::Types::Number::Number->new(oct($1)), pos;
-                    }
-
-                    continue;
-                }
-
-                # Integer or float number
-                when (/\G([+-]?+(?=\.?[0-9])[0-9]*+(?:\.[0-9]++)?(?:[Ee](?:[+-]?+[0-9]+))?)/gc) {
-                    return Sidef::Types::Number::Number->new($1), pos;
-                }
-
-                # Logical 'not'
-                when (/\G(?=!)/) {
-                    $self->{expect_method} = 1;
-                    return Sidef::Types::Bool::Bool->new(), pos;
-                }
-
-                # New hash-block (:{})
-                when (/\G(?=:)/) {
-                    $self->{expect_method} = 1;
-                    return Sidef::Types::Block::Code->new({}), pos;
-                }
-
-                when (/\G(?=\\)/) {
-                    $self->{expect_method} = 1;
-                    return Sidef::Variable::Ref->new(), pos;
-                }
-
-                when (/\G(?=\*)/) {
-                    $self->{expect_method} = 1;
-                    return Sidef::Variable::Ref->new(), pos;
-                }
-
                 # Object as expression
                 when (/\G(?=\()/) {
                     my ($obj, $pos) = $self->parse_arguments(code => substr($_, pos));
+                    return $obj, pos($_) + $pos;
+                }
+
+                # Block as object
+                when (/\G(?=\{)/) {
+                    my ($obj, $pos) = $self->parse_block(code => substr($_, pos));
                     return $obj, pos($_) + $pos;
                 }
 
@@ -626,12 +408,6 @@ package Sidef::Parser {
                     }
 
                     return $array, pos($_) + $pos;
-                }
-
-                # Block as object
-                when (/\G(?=\{)/) {
-                    my ($obj, $pos) = $self->parse_block(code => substr($_, pos));
-                    return $obj, pos($_) + $pos;
                 }
 
                 # Declaration of variable types
@@ -738,6 +514,226 @@ package Sidef::Parser {
                     return $variable, pos;
                 }
 
+                # Boolean value
+                when (/\G((?>true|false))\b/gc) {
+                    return Sidef::Types::Bool::Bool->$1, pos;
+                }
+
+                # 'Not initialized' value
+                when (/\Gnil\b/gc) {
+                    return Sidef::Types::Nil::Nil->new(), pos;
+                }
+
+                # Special number
+                when (/\G(?=0)/) {
+
+                    # Binary, hexdecimal and octal numbers
+                    when (/\G0(b[10]*|x[0-9A-Fa-f]*|[0-9]+\b)/gc) {
+                        return Sidef::Types::Number::Number->new(oct($1)), pos;
+                    }
+
+                    continue;
+                }
+
+                # Integer or float number
+                when (/\G([+-]?+(?=\.?[0-9])[0-9]*+(?:\.[0-9]++)?(?:[Ee](?:[+-]?+[0-9]+))?)/gc) {
+                    return Sidef::Types::Number::Number->new($1), pos;
+                }
+
+                # Quoted words (qw/a b c/)
+                when (/\G(qq?w)\b/gc) {
+                    my ($type) = $1;
+                    my $array = Sidef::Types::Array::Array->new();
+
+                    my ($strings, $pos) = $self->get_quoted_words(code => substr($_, pos));
+
+                    $array->push(
+                        map {
+                            $type eq 'qw'
+                              ? Sidef::Types::String::String->new($_)->unescape()
+                              : Sidef::Types::String::String->new($_)->apply_escapes->unescape()
+                          } @{$strings}
+                    );
+                    return $array, pos($_) + $pos;
+                }
+
+                when (/\G(?=if\b)/) {
+                    $self->{expect_method} = 1;
+                    return Sidef::Types::Bool::If->new(), pos;
+                }
+
+                when (/\G(?=while\b)/) {
+                    $self->{expect_method} = 1;
+                    return Sidef::Types::Bool::While->new(), pos;
+                }
+
+                when (/\G(?=for(?:each)?\b)/) {
+                    $self->{expect_method} = 1;
+                    return Sidef::Types::Block::For->new(), pos;
+                }
+
+                when (/\G(?=continue\b)/) {
+                    $self->{expect_method} = 1;
+                    return Sidef::Types::Block::Continue->new(), pos;
+                }
+
+                when (/\G(?=return\b)/) {
+                    $self->{expect_method} = 1;
+                    return Sidef::Types::Block::Return->new(), pos;
+                }
+
+                when (/\G(?=given\b)/) {
+                    $self->{expect_method} = 1;
+                    return Sidef::Types::Block::Given->new(), pos;
+                }
+
+                when (/\G(?=break\b)/) {
+                    $self->{expect_method} = 1;
+                    return Sidef::Types::Block::Break->new(), pos;
+                }
+
+                when (/\G(?=require\b)/) {
+                    $self->{expect_method} = 1;
+                    return Sidef::Module::Require->new(), pos;
+                }
+
+                # Regular expression
+                when (m{\G(?=/)}) {
+
+                    my ($string, $pos) = $self->get_quoted_string(code => (substr($_, pos)));
+                    pos($_) += $pos;
+
+                    my $regex = Sidef::Types::String::String->new($string);
+                    my $flags = $1 if /\G($self->{re}{match_flags})/goc;
+
+                    return Sidef::Types::Regex::Regex->new($$regex, $flags), pos;
+                }
+
+                # Logical 'not'
+                when (/\G(?=!)/) {
+                    $self->{expect_method} = 1;
+                    return Sidef::Types::Bool::Bool->new(), pos;
+                }
+
+                # New hash-block (:{})
+                when (/\G(?=:)/) {
+                    $self->{expect_method} = 1;
+                    return Sidef::Types::Block::Code->new({}), pos;
+                }
+
+                when (/\G(?=\\)/) {
+                    $self->{expect_method} = 1;
+                    return Sidef::Variable::Ref->new(), pos;
+                }
+
+                when (/\G(?=\*)/) {
+                    $self->{expect_method} = 1;
+                    return Sidef::Variable::Ref->new(), pos;
+                }
+
+                when (/\GDir\b/gc) {
+                    return Sidef::Types::Glob::Dir->new(), pos;
+                }
+
+                when (/\GFile\b/gc) {
+                    return Sidef::Types::Glob::File->new(), pos;
+                }
+
+                when (/\GFileHandle\b/gc) {
+                    return Sidef::Types::Glob::FileHandle->new(), pos;
+                }
+
+                when (/\GArr(?:ay)?\b/gc) {
+                    return Sidef::Types::Array::Array->new(), pos;
+                }
+
+                when (/\GHash\b/gc) {
+                    return Sidef::Types::Hash::Hash->new(), pos;
+                }
+
+                when (/\GStr(?:ing)?\b/gc) {
+                    return Sidef::Types::String::String->new(), pos;
+                }
+
+                when (/\GNum(?:ber)?\b/gc) {
+                    return Sidef::Types::Number::Number->new(), pos;
+                }
+
+                when (/\GPipe\b/gc) {
+                    return Sidef::Types::Glob::Pipe->new(), pos;
+                }
+
+                when (/\GByte\b/gc) {
+                    return Sidef::Types::Byte::Byte->new(), pos;
+                }
+
+                when (/\GBytes\b/gc) {
+                    return Sidef::Types::Byte::Bytes->new(), pos;
+                }
+
+                when (/\GCha?r\b/gc) {
+                    return Sidef::Types::Char::Char->new(), pos;
+                }
+
+                when (/\GCha?rs\b/gc) {
+                    return Sidef::Types::Char::Chars->new(), pos;
+                }
+
+                when (/\GBool\b/gc) {
+                    return Sidef::Types::Bool::Bool->new(), pos;
+                }
+
+                when (/\GSys\b/gc) {
+                    return Sidef::Sys::Sys->new(), pos;
+                }
+
+                when (/\GRegex\b/gc) {
+                    return Sidef::Types::Regex::Regex->new(''), pos;
+                }
+
+                when (/\G__RESET_LINE_COUNTER__\b/gc) {
+                    $self->{line} = 0;
+                    redo;
+                }
+
+                when (/\G__STRICT__\b/gc) {
+                    $self->{strict_var} = 1;
+                    redo;
+                }
+
+                when (/\G__NO_STRICT__\b/gc) {
+                    $self->{strict_var} = 0;
+                    redo;
+                }
+
+                when (/\G__END__\b/gc) {
+                    return undef, length($_);
+                }
+
+                when (/\G__BLOCK__\b/gc) {
+                    if (exists $self->{current_block}) {
+                        return $self->{current_block}, pos;
+                    }
+
+                    $self->fatal_error(
+                                       code  => $_,
+                                       pos   => pos($_) - length('__BLOCK__'),
+                                       error => "__BLOCK__ used outside a block!",
+                                      );
+                }
+
+                when (/\G__FUNC__\b/gc) {
+                    if (exists $self->{current_function}) {
+                        return $self->{current_function}, pos;
+                    }
+
+                    $self->fatal_error(
+                                       code  => $_,
+                                       pos   => pos($_) - length('__FUNC__'),
+                                       error => "__FUNC__ used outside a function!",
+                                      );
+                }
+
                 # Variable call
                 when (/\G($self->{re}{var_name})/goc) {
 
@@ -767,6 +763,9 @@ package Sidef::Parser {
                                        pos   => (pos($_) - length($name)),
                                        error => "attempt to use an uninitialized variable <$1>",
                                       );
+                }
+                when (/\G\$/gc) {
+                    redo;
                 }
                 default {
                     warn "$self->{script_name}:$self->{line}: unexpected char: " . substr($_, pos(), 1) . "\n";
