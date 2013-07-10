@@ -635,10 +635,9 @@ package Sidef::Parser {
                 }
 
                 # Declaration of variable types
-                when (/\G(var|char|byte|const)\b/sgoc) {
+                when (/\G(var|char|byte|const)\b\h*/sgoc) {
                     my $type = $1;
 
-                    scalar(/\G\h*/gc);
                     my $names =
                         /\G($self->{re}{var_name})/gc ? $1
                       : /\G$self->{re}{vars}/gc       ? $1
