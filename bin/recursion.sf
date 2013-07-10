@@ -2,8 +2,8 @@
 
 var counter = 1;
 
-var func = {
+var f = {
     "Recursing: %d\n".printf(counter);
-    counter++ <= 10 && (func.run);
+    counter++ <= 10 && (f.run);
     "End of recursion..."->say;
 }.run;
