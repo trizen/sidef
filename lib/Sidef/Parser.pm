@@ -400,7 +400,7 @@ package Sidef::Parser {
                     $self->fatal_error(
                                        code  => $_,
                                        pos   => pos($_) - length('__FUNC__'),
-                                       error => "__FUNC__ used outside a block!",
+                                       error => "__FUNC__ used outside a function!",
                                       );
                 }
 
@@ -634,8 +634,8 @@ package Sidef::Parser {
                     return $obj, pos($_) + $pos;
                 }
 
-                # Declaration of variable types (var, const, char, etc...)
-                when (/\G(var|const|char|byte)\b/sgoc) {
+                # Declaration of variable types
+                when (/\G(var|char|byte|const)\b/sgoc) {
                     my $type = $1;
 
                     scalar(/\G\h*/gc);

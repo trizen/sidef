@@ -49,14 +49,14 @@ package Sidef::Variable::Variable {
             my ($self, $obj) = @_;
             $#_ > 1 && ($obj = $_[-1]);
 
-            if ($self->{type} eq "const") {
+            if ($self->{type} eq "var") {
+                return $self->set_value($obj);
+            }
+            elsif ($self->{type} eq "const") {
                 if (not defined $self->{value}) {
                     return $self->set_value($obj);
                 }
                 warn "Constant '$self->{name}' cannot be changed.\n";
-            }
-            elsif ($self->{type} eq "var") {
-                return $self->set_value($obj);
             }
             elsif ($self->{type} eq "char") {
                 return $self->set_value($obj->to_chars);
@@ -69,7 +69,7 @@ package Sidef::Variable::Variable {
                     return $self->set_value($obj);
                 }
                 warn "Can't assign the '", ref($obj), "' object to the function '$self->{name}'!\n"
-                  . "I was expecting an object of type 'Sidef::Types::Block::Code' instead.\n";
+                  . "An object of type 'Sidef::Types::Block::Code' was expected.\n";
             }
             else {
                 warn "Invalid variable type: '$self->{type}'.\n";
@@ -82,7 +82,7 @@ package Sidef::Variable::Variable {
             my ($self, $code) = @_;
 
             if (not $self->is_defined) {
-                my $method = \&{__PACKAGE__ . '::' . '='};
+                my $method = '=';
                 return $self->$method(Sidef::Types::Block::Code->new($code)->run);
             }
 
@@ -97,33 +97,40 @@ package Sidef::Variable::Variable {
             return $arg;
         };
 
-        *{__PACKAGE__ . '::' . '++'} = sub {
-            my ($self, $arg) = @_;
+        foreach my $operator (qw(-- ++)) {
 
-            my ($method) = '++';
-            $self->set_value($self->get_value->$method($arg));
-            $self;
-        };
+            *{__PACKAGE__ . '::' . $operator} = sub {
+                my ($self, $arg) = @_;
 
-        *{__PACKAGE__ . '::' . '--'} = sub {
-            my ($self) = @_;
+                my ($method) = '=';
+                my $value = $self->get_value;
 
-            my ($method) = '--';
-            $self->set_value($self->get_value->$method);
-            $self;
-        };
+                if (ref($value) and eval { $value->can($operator) }) {
+                    $self->$method($self->get_value->$operator($arg));
+                }
+                else {
+                    warn sprintf(qq{[WARN] Can't find the method "$operator" for %s!\n},
+                                 defined($value) ? ('object ' . ref($value)) : 'an undefined object');
+                }
+
+                $self;
+            };
+
+        }
 
         foreach my $operator (qw(+ - % * / & | ^ ** && || << >>)) {
 
             *{__PACKAGE__ . '::' . $operator . '='} = sub {
                 my ($self, $arg) = @_;
 
-                my $value = $self->get_value;
+                my $method = '=';
+                my $value  = $self->get_value;
+
                 if (ref($value) and eval { $value->can($operator) }) {
-                    $self->set_value($self->get_value->$operator($arg));
+                    $self->$method($self->get_value->$operator($arg));
                 }
                 else {
-                    warn sprintf("[WARN] Can't find the method $operator= for %s!\n",
+                    warn sprintf(qq{[WARN] Can't find the method "$operator=" for %s!\n},
                                  defined($value) ? ('object ' . ref($value)) : 'an undefined object');
                 }
                 $self;

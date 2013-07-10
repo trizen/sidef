@@ -32,25 +32,8 @@ package Sidef::Types::Bool::Bool {
             $self->new(!$bool);
         };
 
-        *{__PACKAGE__ . '::' . '&&'} = sub {
-            my ($self, $code) = @_;
-
-            if ($self) {
-                return Sidef::Types::Block::Code->new($code)->run;
-            }
-
-            $self->false;
-        };
-
-        *{__PACKAGE__ . '::' . '||'} = sub {
-            my ($self, $code) = @_;
-
-            if (not $self) {
-                return Sidef::Types::Block::Code->new($code)->run;
-            }
-
-            $self->true;
-        };
+        *{__PACKAGE__ . '::' . '&&'} = \&and;
+        *{__PACKAGE__ . '::' . '||'} = \&or;
 
         *{__PACKAGE__ . '::' . '?'} = sub {
             my ($self, $code) = @_;
@@ -89,8 +72,25 @@ package Sidef::Types::Bool::Bool {
         $self ? $self->false : $self->true;
     }
 
-    *or  = \&{__PACKAGE__ . '::' . '||'};
-    *and = \&{__PACKAGE__ . '::' . '&&'};
+    sub or {
+        my ($self, $code) = @_;
+
+        if (!$self) {
+            return Sidef::Types::Block::Code->new($code)->run;
+        }
+
+        $self->true;
+    }
+
+    sub and {
+        my ($self, $code) = @_;
+
+        if ($self) {
+            return Sidef::Types::Block::Code->new($code)->run;
+        }
+
+        $self->false;
+    }
 
     sub dump {
         my ($self) = @_;
