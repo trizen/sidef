@@ -635,12 +635,12 @@ package Sidef::Parser {
                 }
 
                 # Declaration of variable types
-                when (/\G(var|char|byte|const)\b\h*/sgoc) {
+                when (/\G(var|char|byte|const)\b\h*/sgc) {
                     my $type = $1;
 
                     my $names =
-                        /\G($self->{re}{var_name})/gc ? $1
-                      : /\G$self->{re}{vars}/gc       ? $1
+                        /\G($self->{re}{var_name})/goc ? $1
+                      : /\G$self->{re}{vars}/goc       ? $1
                       : $self->fatal_error(
                                            code  => $_,
                                            pos   => (pos($_)),
@@ -654,10 +654,9 @@ package Sidef::Parser {
 
                         if (exists $self->{keywords}{$name}) {
                             $self->fatal_error(
-                                code  => $_,
-                                pos   => (pos($_) - length($name)),
-                                error => "'$name' is a keyword!",
-
+                                               code  => $_,
+                                               pos   => (pos($_) - length($name)),
+                                               error => "'$name' is a keyword!",
                                               );
                         }
 
