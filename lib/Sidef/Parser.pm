@@ -23,10 +23,57 @@ package Sidef::Parser {
             expect_index  => 0,
             expect_arg    => 0,
             parentheses   => 0,
+            strict_var    => 0,
             class         => 'main',
             vars          => [],
             ref_vars_refs => [],
-            re            => {
+            keywords      => {
+                map { $_ => 1 }
+                  qw(
+                  q qq qw qqw
+                  break
+                  return
+                  for foreach
+                  if while
+                  given
+                  continue
+                  require
+                  true false
+                  nil
+
+                  Array
+                  File
+                  Dir
+                  FileHandle
+                  Arr Array
+                  Hash
+                  Str String
+                  Num Number
+                  Pipe
+                  Byte Bytes
+                  Chr Char
+                  Chrs Chars
+                  Bool
+                  Sys
+                  Regex
+
+                  var
+                  const
+                  byte
+                  char
+                  func
+                  my
+
+                  __FUNC__
+                  __BLOCK__
+                  __RESET_LINE_COUNTER__
+                  __STRICT__
+                  __NO_STRICT__
+                  __END__
+
+                  )
+            },
+            re => {
                 match_flags        => qr{[msixpogcdual]+},
                 substitution_flags => qr{[msixpogcerdual]+},
                 var_name           => qr/[[:alpha:]_]\w*/,
@@ -67,7 +114,7 @@ package Sidef::Parser {
                       );
 
         $options{ref_vars} = $options{vars};
-        $options{re}{vars} = qr{\(((?:$options{re}{var_name}(?:\h*,\h*$options{re}{var_name})*)?)\)}o;
+        $options{re}{vars} = qr{\(((?:$options{re}{var_name}(?:\h*,\h*$options{re}{var_name})*+)?+)\)}o;
 
         bless \%options, __PACKAGE__;
     }
@@ -319,8 +366,42 @@ package Sidef::Parser {
                     redo;
                 }
 
+                when (/\G__STRICT__\b/gc) {
+                    $self->{strict_var} = 1;
+                    redo;
+                }
+
+                when (/\G__NO_STRICT__\b/gc) {
+                    $self->{strict_var} = 0;
+                    redo;
+                }
+
                 when (/\G__END__\b/gc) {
                     return undef, length($_);
+                }
+
+                when (/\G__BLOCK__\b/gc) {
+                    if (exists $self->{current_block}) {
+                        return $self->{current_block}, pos;
+                    }
+
+                    $self->fatal_error(
+                                       code  => $_,
+                                       pos   => pos($_) - length('__BLOCK__'),
+                                       error => "__BLOCK__ used outside a block!",
+                                      );
+                }
+
+                when (/\G__FUNC__\b/gc) {
+                    if (exists $self->{current_function}) {
+                        return $self->{current_function}, pos;
+                    }
+
+                    $self->fatal_error(
+                                       code  => $_,
+                                       pos   => pos($_) - length('__FUNC__'),
+                                       error => "__FUNC__ used outside a block!",
+                                      );
                 }
 
                 # End of an expression, or end of the script
@@ -553,14 +634,33 @@ package Sidef::Parser {
                     return $obj, pos($_) + $pos;
                 }
 
-                when (/\G(var|const|char|byte)(?:\h+($self->{re}{var_name})|\h*$self->{re}{vars})/sgoc) {
-                    my $type  = $1;
-                    my $names = $+;
+                # Declaration of variable types (var, const, char, etc...)
+                when (/\G(var|const|char|byte)\b/sgoc) {
+                    my $type = $1;
+
+                    scalar(/\G\h*/gc);
+                    my $names =
+                        /\G($self->{re}{var_name})/gc ? $1
+                      : /\G$self->{re}{vars}/gc       ? $1
+                      : $self->fatal_error(
+                                           code  => $_,
+                                           pos   => (pos($_)),
+                                           error => "invalid variable name!",
+                                          );
 
                     my @vars = split(/\h*,\h*/, $names);
 
                     my @var_objs;
                     foreach my $name (@vars) {
+
+                        if (exists $self->{keywords}{$name}) {
+                            $self->fatal_error(
+                                code  => $_,
+                                pos   => (pos($_) - length($name)),
+                                error => "'$name' is a keyword!",
+
+                                              );
+                        }
 
                         my ($var, $code) = $self->find_var($name);
 
@@ -584,10 +684,18 @@ package Sidef::Parser {
                     return Sidef::Variable::Init->new(@var_objs), pos;
                 }
 
-                # Declaration of variable types (var, const, char, etc...)
-                when (/\G(my)\h+($self->{re}{var_name})/goc || /\G(func)\h+($self->{re}{var_name})?+(?=\h*\()/goc) {
+                # Declaration of the 'my' special variable and function declaration
+                when (/\G(my)\h+($self->{re}{var_name})/goc || /\G(func)\h+((?:$self->{re}{var_name})?+)(?=\h*\()/goc) {
                     my $type = $1;
-                    my $name = $2 // '';
+                    my $name = $2;
+
+                    if (exists $self->{keywords}{$name}) {
+                        $self->fatal_error(
+                                           code  => $_,
+                                           pos   => (pos($_) - length($name)),
+                                           error => "'$name' is a keyword!",
+                                          );
+                    }
 
                     my $variable =
                       $type eq 'my'
@@ -613,6 +721,7 @@ package Sidef::Parser {
                         if (/\G\h*$self->{re}{vars}\h*\{/gocs) {
 
                             my $params = join('', map { "my $_;\\$_;" } split(/\h*,\h*/, $1));
+                            local $self->{current_function} = $variable;
                             my ($obj, $pos) = $self->parse_block(code => '{' . $params . substr($_, pos));
                             pos($_) += $pos - (length($params) + 1);
 
@@ -634,34 +743,35 @@ package Sidef::Parser {
                 # Variable call
                 when (/\G($self->{re}{var_name})/goc) {
 
-                    my ($var, $code) = $self->find_var($1);
+                    my $name = $1;
+                    my ($var, $code) = $self->find_var($name);
 
                     if (ref $var) {
                         $var->{count}++;
                         return $var->{obj}, pos;
                     }
-                    else {
+                    elsif (not $self->{strict_var}) {
                         unshift @{$self->{vars}},
                           {
-                            obj   => Sidef::Variable::My->new($1),
-                            name  => $1,
+                            obj   => Sidef::Variable::My->new($name),
+                            name  => $name,
                             count => 0,
                             type  => 'my',
                             line  => $self->{line},
                           };
 
-                        return Sidef::Variable::InitMy->new($1), pos($_) - length($1);
+                        return Sidef::Variable::InitMy->new($name), pos($_) - length($name);
                     }
 
                     # Ignored, for now
                     $self->fatal_error(
                                        code  => $_,
-                                       pos   => (pos($_) - length($1)),
+                                       pos   => (pos($_) - length($name)),
                                        error => "attempt to use an uninitialized variable <$1>",
                                       );
                 }
                 default {
-                    warn "[LINE $self->{line}] Unexpected char: " . substr($_, pos(), 1) . "\n";
+                    warn "$self->{script_name}:$self->{line}: unexpected char: " . substr($_, pos(), 1) . "\n";
                     return undef, pos() + 1;
                 }
             }
@@ -718,12 +828,15 @@ package Sidef::Parser {
 
                 $self->{vars} = $self->{vars}[0];
 
+                my $block = Sidef::Types::Block::Code->new({});
+                local $self->{current_block} = $block;
                 my ($obj, $pos) = $self->parse_script(code => '\\var _;' . substr($_, pos));
+                %{$block} = %{$obj};
 
                 splice @{$self->{ref_vars_refs}}, 0, $count;
                 $self->{vars} = $ref;
 
-                return Sidef::Types::Block::Code->new($obj), pos($_) + $pos - 7;
+                return $block, pos($_) + $pos - 7;
             }
         }
     }

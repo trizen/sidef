@@ -21,8 +21,8 @@ chars->join("_")->say;
 
 '-' * 80 say;
 
-var byte = ('c'->ord);
-"byte '%d' made uppercase, is: %s\n".printf(byte, (byte - 32 -> chr));
+var b = ('c'->ord);
+"byte '%d' made uppercase, is: %s\n".printf(b, (b - 32 -> chr));
 
 '-' * 80 -> say;
 

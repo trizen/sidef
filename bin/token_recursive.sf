@@ -1,0 +1,46 @@
+#!/usr/bin/ruby
+
+#
+## Block recursion via __BLOCK__
+#
+
+if ("string".uc == "STRING") {
+
+    "if block".say;
+
+    var x := 3;
+    x -= 1 >= 0 && (__BLOCK__.run);
+
+}
+
+
+#
+## Function recursion via __FUNC__
+#
+
+func hello (name) {
+
+    "Beg of func: %s\n".printf(name);
+
+    var x := 3;
+    while (x -= 1 >= 0) {
+        __FUNC__.call("recurse %d".sprintf(x));
+    }
+
+    "End of func: " + name.say;
+}
+
+hello("hello");
+
+
+
+__END__
+
+#
+## Infinite block recursion
+#
+
+{
+    "Hello world!".say;
+    __BLOCK__.run;
+}.run;
