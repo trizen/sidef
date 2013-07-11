@@ -61,7 +61,7 @@ abs_path->dirname->to_s->say;
 
 var x = "RaNdOm StRiNg"->lc;   # WRONG!!!
 var y = ("RaNdOm StRiNg"->lc); # RIGHT!!!
-var z = "\LRaNdOm StRiNg";     # Also, right.
+#var z = "\LRaNdOm StRiNg";     # Also, right.
 
 #var lang = "Sidef";
 #"\nJust another $lang hacker,"->say;
