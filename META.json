@@ -1,0 +1,186 @@
+{
+   "abstract" : "Sidef Programming Language",
+   "author" : [
+      "Daniel Șuteu, Ioana Fălcușan"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4005, CPAN::Meta::Converter version 2.131560",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Sidef",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Cwd" : "0",
+            "File::Basename" : "0",
+            "File::Path" : "0",
+            "File::Spec" : "0",
+            "perl" : "5.014",
+            "utf8" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Sidef" : {
+         "file" : "lib/Sidef.pm",
+         "version" : "0.01"
+      },
+      "Sidef::Convert::Convert" : {
+         "file" : "lib/Sidef/Convert/Convert.pm"
+      },
+      "Sidef::Exec" : {
+         "file" : "lib/Sidef/Exec.pm"
+      },
+      "Sidef::Init" : {
+         "file" : "lib/Sidef/Init.pm"
+      },
+      "Sidef::Module::Caller" : {
+         "file" : "lib/Sidef/Module/Caller.pm"
+      },
+      "Sidef::Module::Func" : {
+         "file" : "lib/Sidef/Module/Func.pm"
+      },
+      "Sidef::Module::Require" : {
+         "file" : "lib/Sidef/Module/Require.pm"
+      },
+      "Sidef::Parser" : {
+         "file" : "lib/Sidef/Parser.pm"
+      },
+      "Sidef::Sys::Sys" : {
+         "file" : "lib/Sidef/Sys/Sys.pm"
+      },
+      "Sidef::Types::Array::Array" : {
+         "file" : "lib/Sidef/Types/Array/Array.pm"
+      },
+      "Sidef::Types::Black::Hole" : {
+         "file" : "lib/Sidef/Types/Black/Hole.pm"
+      },
+      "Sidef::Types::Block::Break" : {
+         "file" : "lib/Sidef/Types/Block/Break.pm"
+      },
+      "Sidef::Types::Block::Code" : {
+         "file" : "lib/Sidef/Types/Block/Code.pm"
+      },
+      "Sidef::Types::Block::Continue" : {
+         "file" : "lib/Sidef/Types/Block/Continue.pm"
+      },
+      "Sidef::Types::Block::Do" : {
+         "file" : "lib/Sidef/Types/Block/Do.pm"
+      },
+      "Sidef::Types::Block::For" : {
+         "file" : "lib/Sidef/Types/Block/For.pm"
+      },
+      "Sidef::Types::Block::Given" : {
+         "file" : "lib/Sidef/Types/Block/Given.pm"
+      },
+      "Sidef::Types::Block::Return" : {
+         "file" : "lib/Sidef/Types/Block/Return.pm"
+      },
+      "Sidef::Types::Block::Switch" : {
+         "file" : "lib/Sidef/Types/Block/Switch.pm"
+      },
+      "Sidef::Types::Bool::Bool" : {
+         "file" : "lib/Sidef/Types/Bool/Bool.pm"
+      },
+      "Sidef::Types::Bool::If" : {
+         "file" : "lib/Sidef/Types/Bool/If.pm"
+      },
+      "Sidef::Types::Bool::Ternary" : {
+         "file" : "lib/Sidef/Types/Bool/Ternary.pm"
+      },
+      "Sidef::Types::Bool::While" : {
+         "file" : "lib/Sidef/Types/Bool/While.pm"
+      },
+      "Sidef::Types::Byte::Byte" : {
+         "file" : "lib/Sidef/Types/Byte/Byte.pm"
+      },
+      "Sidef::Types::Byte::Bytes" : {
+         "file" : "lib/Sidef/Types/Byte/Bytes.pm"
+      },
+      "Sidef::Types::Char::Char" : {
+         "file" : "lib/Sidef/Types/Char/Char.pm"
+      },
+      "Sidef::Types::Char::Chars" : {
+         "file" : "lib/Sidef/Types/Char/Chars.pm"
+      },
+      "Sidef::Types::Glob::Backtick" : {
+         "file" : "lib/Sidef/Types/Glob/Backtick.pm"
+      },
+      "Sidef::Types::Glob::Dir" : {
+         "file" : "lib/Sidef/Types/Glob/Dir.pm"
+      },
+      "Sidef::Types::Glob::DirHandle" : {
+         "file" : "lib/Sidef/Types/Glob/DirHandle.pm"
+      },
+      "Sidef::Types::Glob::File" : {
+         "file" : "lib/Sidef/Types/Glob/File.pm"
+      },
+      "Sidef::Types::Glob::FileHandle" : {
+         "file" : "lib/Sidef/Types/Glob/FileHandle.pm"
+      },
+      "Sidef::Types::Glob::Pipe" : {
+         "file" : "lib/Sidef/Types/Glob/Pipe.pm"
+      },
+      "Sidef::Types::Glob::PipeHandle" : {
+         "file" : "lib/Sidef/Types/Glob/PipeHandle.pm"
+      },
+      "Sidef::Types::Glob::Stat" : {
+         "file" : "lib/Sidef/Types/Glob/Stat.pm"
+      },
+      "Sidef::Types::Hash::Hash" : {
+         "file" : "lib/Sidef/Types/Hash/Hash.pm"
+      },
+      "Sidef::Types::Nil::Nil" : {
+         "file" : "lib/Sidef/Types/Nil/Nil.pm"
+      },
+      "Sidef::Types::Number::Number" : {
+         "file" : "lib/Sidef/Types/Number/Number.pm"
+      },
+      "Sidef::Types::Regex::Matches" : {
+         "file" : "lib/Sidef/Types/Regex/Matches.pm"
+      },
+      "Sidef::Types::Regex::Regex" : {
+         "file" : "lib/Sidef/Types/Regex/Regex.pm"
+      },
+      "Sidef::Types::String::String" : {
+         "file" : "lib/Sidef/Types/String/String.pm"
+      },
+      "Sidef::Variable::Init" : {
+         "file" : "lib/Sidef/Variable/Init.pm"
+      },
+      "Sidef::Variable::InitMy" : {
+         "file" : "lib/Sidef/Variable/InitMy.pm"
+      },
+      "Sidef::Variable::My" : {
+         "file" : "lib/Sidef/Variable/My.pm"
+      },
+      "Sidef::Variable::Ref" : {
+         "file" : "lib/Sidef/Variable/Ref.pm"
+      },
+      "Sidef::Variable::Variable" : {
+         "file" : "lib/Sidef/Variable/Variable.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://www.perlfoundation.org/artistic_license_2_0"
+      ]
+   },
+   "version" : "0.01"
+}
