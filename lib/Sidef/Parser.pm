@@ -614,7 +614,6 @@ package Sidef::Parser {
 
                 when (/\G(?=`)/) {
                     my ($string, $pos) = $self->get_quoted_string(code => (substr($_, pos)));
-                    require Sidef::Types::Glob::Backtick;
                     return Sidef::Types::Glob::Backtick->new(
                                    Sidef::Types::String::String->new($string)->apply_escapes->unescape), pos($_) + $pos;
                 }

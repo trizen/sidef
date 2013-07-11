@@ -23,9 +23,12 @@ require Sidef::Types::Byte::Bytes if (caller)[0] ne q{Sidef::Types::Byte::Bytes}
 require Sidef::Types::Byte::Byte if (caller)[0] ne q{Sidef::Types::Byte::Byte};
 require Sidef::Types::Glob::Dir if (caller)[0] ne q{Sidef::Types::Glob::Dir};
 require Sidef::Types::Glob::Pipe if (caller)[0] ne q{Sidef::Types::Glob::Pipe};
+require Sidef::Types::Glob::DirHandle if (caller)[0] ne q{Sidef::Types::Glob::DirHandle};
 require Sidef::Types::Glob::FileHandle if (caller)[0] ne q{Sidef::Types::Glob::FileHandle};
+require Sidef::Types::Glob::Backtick if (caller)[0] ne q{Sidef::Types::Glob::Backtick};
 require Sidef::Types::Glob::PipeHandle if (caller)[0] ne q{Sidef::Types::Glob::PipeHandle};
 require Sidef::Types::Glob::File if (caller)[0] ne q{Sidef::Types::Glob::File};
+require Sidef::Types::Glob::Stat if (caller)[0] ne q{Sidef::Types::Glob::Stat};
 require Sidef::Types::Hash::Hash if (caller)[0] ne q{Sidef::Types::Hash::Hash};
 require Sidef::Types::Array::Array if (caller)[0] ne q{Sidef::Types::Array::Array};
 require Sidef::Types::Black::Hole if (caller)[0] ne q{Sidef::Types::Black::Hole};
