@@ -1,0 +1,32 @@
+
+=encoding utf8
+
+=head1 NAME
+
+Sidef::Types::Bool::Ternary
+
+=head1 DESCRIPTION
+
+This object is ...
+
+=head1 SYNOPSIS
+
+var obj = (Ternary.new(...));
+
+
+=head1 INHERITS
+
+Inherits methods from:
+
+	* Sidef
+
+=head1 METHODS
+
+
+=head2 :
+
+I<Num> B<:> I<Num> -> I<Num>
+
+Return the
+
+=cut

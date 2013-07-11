@@ -1,0 +1,104 @@
+
+=encoding utf8
+
+=head1 NAME
+
+Sidef::Convert::Convert
+
+=head1 DESCRIPTION
+
+This object is ...
+
+=head1 SYNOPSIS
+
+var obj = (Convert.new(...));
+
+
+=head1 INHERITS
+
+Inherits methods from:
+
+	* Sidef
+
+=head1 METHODS
+
+
+=head2 to_array
+
+Convert.to_array() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 to_bool
+
+Convert.to_bool() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 to_byte
+
+Convert.to_byte() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 to_bytes
+
+Convert.to_bytes() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 to_char
+
+Convert.to_char() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 to_chars
+
+Convert.to_chars() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 to_dir
+
+Convert.to_dir() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 to_file
+
+Convert.to_file() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 to_i
+
+Convert.to_i() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 to_s
+
+Convert.to_s() -> I<Bool>
+
+Return the
+
+=cut

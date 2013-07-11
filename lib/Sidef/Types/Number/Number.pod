@@ -1,0 +1,337 @@
+
+=encoding utf8
+
+=head1 NAME
+
+Sidef::Types::Number::Number
+
+=head1 DESCRIPTION
+
+This object is ...
+
+=head1 SYNOPSIS
+
+var obj = (Number.new(...));
+
+
+=head1 INHERITS
+
+Inherits methods from:
+
+	* Sidef
+	* Sidef::Convert::Convert
+
+=head1 METHODS
+
+
+=head2 !=
+
+I<Num> B<!=> I<Num> -> I<Num>
+
+Return the
+
+=cut
+
+=head2 %
+
+I<Num> B<%> I<Num> -> I<Num>
+
+Return the
+
+=cut
+
+=head2 *
+
+I<Num> B<*> I<Num> -> I<Num>
+
+Return the
+
+=cut
+
+=head2 **
+
+I<Num> B<**> I<Num> -> I<Num>
+
+Return the
+
+=cut
+
+=head2 +
+
+I<Num> B<+> I<Num> -> I<Num>
+
+Return the
+
+=cut
+
+=head2 ++
+
+I<Num> B<++> I<Num> -> I<Num>
+
+Return the
+
+=cut
+
+=head2 -
+
+I<Num> B<-> I<Num> -> I<Num>
+
+Return the
+
+=cut
+
+=head2 --
+
+I<Num> B<--> I<Num> -> I<Num>
+
+Return the
+
+=cut
+
+=head2 ..
+
+I<Num> B<..> I<Num> -> I<Num>
+
+Return the
+
+=cut
+
+=head2 /
+
+I<Num> B</> I<Num> -> I<Num>
+
+Return the
+
+=cut
+
+=head2 <
+
+I<Num> B<E<lt>> I<Num> -> I<Num>
+
+Return the
+
+=cut
+
+=head2 <<
+
+I<Num> B<E<lt>E<lt>> I<Num> -> I<Num>
+
+Return the
+
+=cut
+
+=head2 <=
+
+I<Num> B<E<lt>=> I<Num> -> I<Num>
+
+Return the
+
+=cut
+
+=head2 ==
+
+I<Num> B<==> I<Num> -> I<Num>
+
+Return the
+
+=cut
+
+=head2 >
+
+I<Num> B<E<gt>> I<Num> -> I<Num>
+
+Return the
+
+=cut
+
+=head2 >=
+
+I<Num> B<E<gt>=> I<Num> -> I<Num>
+
+Return the
+
+=cut
+
+=head2 >>
+
+I<Num> B<E<gt>E<gt>> I<Num> -> I<Num>
+
+Return the
+
+=cut
+
+=head2 abs
+
+Number.abs() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 chr
+
+Number.chr() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 commify
+
+Number.commify() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 dump
+
+Number.dump() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 hex
+
+Number.hex() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 inf
+
+Number.inf() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 int
+
+Number.int() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 is_even
+
+Number.is_even() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 is_integer
+
+Number.is_integer() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 is_negative
+
+Number.is_negative() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 is_odd
+
+Number.is_odd() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 is_positive
+
+Number.is_positive() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 log
+
+Number.log() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 log10
+
+Number.log10() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 log2
+
+Number.log2() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 new
+
+Number.new() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 next_power_of_two
+
+Number.next_power_of_two() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 pi
+
+Number.pi() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 rand
+
+Number.rand() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 sqrt
+
+Number.sqrt() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 sqrt_n
+
+Number.sqrt_n() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 to
+
+Number.to() -> I<Bool>
+
+Return the
+
+=cut

@@ -1,0 +1,544 @@
+
+=encoding utf8
+
+=head1 NAME
+
+Sidef::Types::Glob::File
+
+=head1 DESCRIPTION
+
+This object is ...
+
+=head1 SYNOPSIS
+
+var obj = (File.new(...));
+
+
+=head1 INHERITS
+
+Inherits methods from:
+
+	* Sidef::Convert::Convert
+
+=head1 METHODS
+
+
+=head2 abs_name
+
+File.abs_name() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 accessTimeDaysDiff
+
+File.accessTimeDaysDiff() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 access_time_days_diff
+
+File.access_time_days_diff() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 basename
+
+File.basename() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 changeTimeDaysDiff
+
+File.changeTimeDaysDiff() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 change_time_days_diff
+
+File.change_time_days_diff() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 dirname
+
+File.dirname() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 dump
+
+File.dump() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 exists
+
+File.exists() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 get_value
+
+File.get_value() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 hasSetgidBit
+
+File.hasSetgidBit() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 hasSetuidBit
+
+File.hasSetuidBit() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 hasStickyBit
+
+File.hasStickyBit() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 has_setgid_bit
+
+File.has_setgid_bit() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 has_setuid
+
+File.has_setuid() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 has_setuid_bit
+
+File.has_setuid_bit() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 has_sticky_bit
+
+File.has_sticky_bit() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 isBinary
+
+File.isBinary() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 isBlock
+
+File.isBlock() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 isCharDevice
+
+File.isCharDevice() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 isDir
+
+File.isDir() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 isDirectory
+
+File.isDirectory() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 isEmpty
+
+File.isEmpty() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 isExecutable
+
+File.isExecutable() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 isFile
+
+File.isFile() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 isLink
+
+File.isLink() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 isOwned
+
+File.isOwned() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 isReadable
+
+File.isReadable() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 isRealExecutable
+
+File.isRealExecutable() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 isRealOwned
+
+File.isRealOwned() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 isRealReadable
+
+File.isRealReadable() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 isRealWriteable
+
+File.isRealWriteable() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 isSocket
+
+File.isSocket() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 isText
+
+File.isText() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 isWriteable
+
+File.isWriteable() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 is_binary
+
+File.is_binary() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 is_block
+
+File.is_block() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 is_char_device
+
+File.is_char_device() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 is_dir
+
+File.is_dir() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 is_directory
+
+File.is_directory() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 is_empty
+
+File.is_empty() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 is_executable
+
+File.is_executable() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 is_file
+
+File.is_file() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 is_link
+
+File.is_link() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 is_owned
+
+File.is_owned() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 is_readable
+
+File.is_readable() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 is_real_executable
+
+File.is_real_executable() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 is_real_owned
+
+File.is_real_owned() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 is_real_readable
+
+File.is_real_readable() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 is_real_writeable
+
+File.is_real_writeable() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 is_socket
+
+File.is_socket() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 is_text
+
+File.is_text() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 is_writeable
+
+File.is_writeable() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 lstat
+
+File.lstat() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 modificationTimeDaysDiff
+
+File.modificationTimeDaysDiff() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 modification_time_days_diff
+
+File.modification_time_days_diff() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 name
+
+File.name() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 new
+
+File.new() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 open
+
+File.open() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 open_a
+
+File.open_a() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 open_r
+
+File.open_r() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 open_w
+
+File.open_w() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 size
+
+File.size() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 split
+
+File.split() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 stat
+
+File.stat() -> I<Bool>
+
+Return the
+
+=cut

@@ -1,0 +1,161 @@
+
+=encoding utf8
+
+=head1 NAME
+
+Sidef::Variable::Variable
+
+=head1 DESCRIPTION
+
+This object is ...
+
+=head1 SYNOPSIS
+
+var obj = (Variable.new(...));
+
+=head1 METHODS
+
+
+=head2 %=
+
+I<Num> B<%=> I<Num> -> I<Num>
+
+Return the
+
+=cut
+
+=head2 &&=
+
+I<Num> B<&&=> I<Num> -> I<Num>
+
+Return the
+
+=cut
+
+=head2 &=
+
+I<Num> B<&=> I<Num> -> I<Num>
+
+Return the
+
+=cut
+
+=head2 **=
+
+I<Num> B<**=> I<Num> -> I<Num>
+
+Return the
+
+=cut
+
+=head2 *=
+
+I<Num> B<*=> I<Num> -> I<Num>
+
+Return the
+
+=cut
+
+=head2 ++
+
+I<Num> B<++> I<Num> -> I<Num>
+
+Return the
+
+=cut
+
+=head2 +=
+
+I<Num> B<+=> I<Num> -> I<Num>
+
+Return the
+
+=cut
+
+=head2 --
+
+I<Num> B<--> I<Num> -> I<Num>
+
+Return the
+
+=cut
+
+=head2 -=
+
+I<Num> B<-=> I<Num> -> I<Num>
+
+Return the
+
+=cut
+
+=head2 /=
+
+I<Num> B</=> I<Num> -> I<Num>
+
+Return the
+
+=cut
+
+=head2 :=
+
+I<Num> B<:=> I<Num> -> I<Num>
+
+Return the
+
+=cut
+
+=head2 <<=
+
+I<Num> B<E<lt>E<lt>=> I<Num> -> I<Num>
+
+Return the
+
+=cut
+
+=head2 =
+
+I<Num> B<=> I<Num> -> I<Num>
+
+Return the
+
+=cut
+
+=head2 >>=
+
+I<Num> B<E<gt>E<gt>=> I<Num> -> I<Num>
+
+Return the
+
+=cut
+
+=head2 \\
+
+I<Num> B<\\> I<Num> -> I<Num>
+
+Return the
+
+=cut
+
+=head2 ^=
+
+I<Num> B<^=> I<Num> -> I<Num>
+
+Return the
+
+=cut
+
+=head2 |=
+
+I<Num> B<|=> I<Num> -> I<Num>
+
+Return the
+
+=cut
+
+=head2 ||=
+
+I<Num> B<||=> I<Num> -> I<Num>
+
+Return the
+
+=cut

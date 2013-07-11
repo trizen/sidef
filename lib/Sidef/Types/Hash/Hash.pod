@@ -1,0 +1,88 @@
+
+=encoding utf8
+
+=head1 NAME
+
+Sidef::Types::Hash::Hash
+
+=head1 DESCRIPTION
+
+This object is ...
+
+=head1 SYNOPSIS
+
+var obj = (Hash.new(...));
+
+
+=head1 INHERITS
+
+Inherits methods from:
+
+	* Sidef::Convert::Convert
+
+=head1 METHODS
+
+
+=head2 +
+
+I<Num> B<+> I<Num> -> I<Num>
+
+Return the
+
+=cut
+
+=head2 exists
+
+Hash.exists() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 flip
+
+Hash.flip() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 get_value
+
+Hash.get_value() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 keys
+
+Hash.keys() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 map
+
+Hash.map() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 new
+
+Hash.new() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 values
+
+Hash.values() -> I<Bool>
+
+Return the
+
+=cut

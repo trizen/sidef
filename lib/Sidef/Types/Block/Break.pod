@@ -1,0 +1,25 @@
+
+=encoding utf8
+
+=head1 NAME
+
+Sidef::Types::Block::Break
+
+=head1 DESCRIPTION
+
+This object is ...
+
+=head1 SYNOPSIS
+
+var obj = (Break.new(...));
+
+=head1 METHODS
+
+
+=head2 break
+
+Break.break() -> I<Bool>
+
+Return the
+
+=cut

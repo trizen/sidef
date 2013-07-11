@@ -1,0 +1,585 @@
+
+=encoding utf8
+
+=head1 NAME
+
+Sidef::Types::Array::Array
+
+=head1 DESCRIPTION
+
+This object is ...
+
+=head1 SYNOPSIS
+
+var obj = (Array.new(...));
+
+
+=head1 INHERITS
+
+Inherits methods from:
+
+	* Sidef
+	* Sidef::Convert::Convert
+
+=head1 METHODS
+
+
+=head2 &
+
+I<Num> B<&> I<Num> -> I<Num>
+
+Return the
+
+=cut
+
+=head2 &&
+
+I<Num> B<&&> I<Num> -> I<Num>
+
+Return the
+
+=cut
+
+=head2 +
+
+I<Num> B<+> I<Num> -> I<Num>
+
+Return the
+
+=cut
+
+=head2 ++
+
+I<Num> B<++> I<Num> -> I<Num>
+
+Return the
+
+=cut
+
+=head2 -
+
+I<Num> B<-> I<Num> -> I<Num>
+
+Return the
+
+=cut
+
+=head2 --
+
+I<Num> B<--> I<Num> -> I<Num>
+
+Return the
+
+=cut
+
+=head2 <<
+
+I<Num> B<E<lt>E<lt>> I<Num> -> I<Num>
+
+Return the
+
+=cut
+
+=head2 =
+
+I<Num> B<=> I<Num> -> I<Num>
+
+Return the
+
+=cut
+
+=head2 ==
+
+I<Num> B<==> I<Num> -> I<Num>
+
+Return the
+
+=cut
+
+=head2 >>
+
+I<Num> B<E<gt>E<gt>> I<Num> -> I<Num>
+
+Return the
+
+=cut
+
+=head2 ^
+
+I<Num> B<^> I<Num> -> I<Num>
+
+Return the
+
+=cut
+
+=head2 all
+
+Array.all() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 combine
+
+Array.combine() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 contains
+
+Array.contains() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 defined
+
+Array.defined() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 distinct
+
+Array.distinct() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 divide
+
+Array.divide() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 dropLeft
+
+Array.dropLeft() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 dropRight
+
+Array.dropRight() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 dump
+
+Array.dump() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 exists
+
+Array.exists() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 filter
+
+Array.filter() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 find
+
+Array.find() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 first
+
+Array.first() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 firstIndex
+
+Array.firstIndex() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 first_index
+
+Array.first_index() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 ft
+
+Array.ft() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 get_value
+
+Array.get_value() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 grep
+
+Array.grep() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 indexWhere
+
+Array.indexWhere() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 insert
+
+Array.insert() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 join
+
+Array.join() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 joinInsert
+
+Array.joinInsert() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 join_insert
+
+Array.join_insert() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 last
+
+Array.last() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 lastIndex
+
+Array.lastIndex() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 lastIndexWhere
+
+Array.lastIndexWhere() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 last_index
+
+Array.last_index() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 len
+
+Array.len() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 length
+
+Array.length() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 make
+
+Array.make() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 map
+
+Array.map() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 max
+
+Array.max() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 mesh
+
+Array.mesh() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 min
+
+Array.min() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 multiply
+
+Array.multiply() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 new
+
+Array.new() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 offset
+
+Array.offset() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 pop
+
+Array.pop() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 push
+
+Array.push() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 range
+
+Array.range() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 reduce
+
+Array.reduce() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 reducePairs
+
+Array.reducePairs() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 reverse
+
+Array.reverse() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 reversed
+
+Array.reversed() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 shift
+
+Array.shift() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 shuffle
+
+Array.shuffle() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 size
+
+Array.size() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 sliceReverse
+
+Array.sliceReverse() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 splice
+
+Array.splice() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 sum
+
+Array.sum() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 takeLeft
+
+Array.takeLeft() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 takeRight
+
+Array.takeRight() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 toHash
+
+Array.toHash() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 to_hash
+
+Array.to_hash() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 uniq
+
+Array.uniq() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 unique
+
+Array.unique() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 unshift
+
+Array.unshift() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 zip
+
+Array.zip() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 |
+
+I<Num> B<|> I<Num> -> I<Num>
+
+Return the
+
+=cut

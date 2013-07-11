@@ -1,0 +1,144 @@
+
+=encoding utf8
+
+=head1 NAME
+
+Sidef::Types::Bool::Bool
+
+=head1 DESCRIPTION
+
+This object is ...
+
+=head1 SYNOPSIS
+
+var obj = (Bool.new(...));
+
+
+=head1 INHERITS
+
+Inherits methods from:
+
+	* Sidef::Convert::Convert
+
+=head1 METHODS
+
+
+=head2 !
+
+I<Num> B<!> I<Num> -> I<Num>
+
+Return the
+
+=cut
+
+=head2 &&
+
+I<Num> B<&&> I<Num> -> I<Num>
+
+Return the
+
+=cut
+
+=head2 (bool
+
+Bool.(bool() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 ?
+
+I<Num> B<?> I<Num> -> I<Num>
+
+Return the
+
+=cut
+
+=head2 and
+
+Bool.and() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 dump
+
+Bool.dump() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 false
+
+Bool.false() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 get_value
+
+Bool.get_value() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 is_false
+
+Bool.is_false() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 is_true
+
+Bool.is_true() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 new
+
+Bool.new() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 not
+
+Bool.not() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 or
+
+Bool.or() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 true
+
+Bool.true() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 ||
+
+I<Num> B<||> I<Num> -> I<Num>
+
+Return the
+
+=cut

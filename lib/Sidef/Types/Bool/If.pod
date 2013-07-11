@@ -1,0 +1,49 @@
+
+=encoding utf8
+
+=head1 NAME
+
+Sidef::Types::Bool::If
+
+=head1 DESCRIPTION
+
+This object is ...
+
+=head1 SYNOPSIS
+
+var obj = (If.new(...));
+
+
+=head1 INHERITS
+
+Inherits methods from:
+
+	* Sidef
+	* Sidef::Types::Block::Do
+
+=head1 METHODS
+
+
+=head2 else
+
+If.else() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 elsif
+
+If.elsif() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 if
+
+If.if() -> I<Bool>
+
+Return the
+
+=cut

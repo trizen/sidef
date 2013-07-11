@@ -1,0 +1,57 @@
+
+=encoding utf8
+
+=head1 NAME
+
+Sidef::Types::Block::Switch
+
+=head1 DESCRIPTION
+
+This object is ...
+
+=head1 SYNOPSIS
+
+var obj = (Switch.new(...));
+
+
+=head1 INHERITS
+
+Inherits methods from:
+
+	* Sidef
+	* Sidef::Types::Block::Do
+
+=head1 METHODS
+
+
+=head2 default
+
+Switch.default() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 end
+
+Switch.end() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 value
+
+Switch.value() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 when
+
+Switch.when() -> I<Bool>
+
+Return the
+
+=cut

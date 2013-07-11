@@ -1,0 +1,25 @@
+
+=encoding utf8
+
+=head1 NAME
+
+Sidef::Module::Require
+
+=head1 DESCRIPTION
+
+This object is ...
+
+=head1 SYNOPSIS
+
+var obj = (Require.new(...));
+
+=head1 METHODS
+
+
+=head2 require
+
+Require.require() -> I<Bool>
+
+Return the
+
+=cut

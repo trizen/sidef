@@ -1,0 +1,73 @@
+
+=encoding utf8
+
+=head1 NAME
+
+Sidef::Types::Glob::Pipe
+
+=head1 DESCRIPTION
+
+This object is ...
+
+=head1 SYNOPSIS
+
+var obj = (Pipe.new(...));
+
+=head1 METHODS
+
+
+=head2 command
+
+Pipe.command() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 dump
+
+Pipe.dump() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 get_value
+
+Pipe.get_value() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 new
+
+Pipe.new() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 open
+
+Pipe.open() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 open_r
+
+Pipe.open_r() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 open_w
+
+Pipe.open_w() -> I<Bool>
+
+Return the
+
+=cut

@@ -1,0 +1,112 @@
+
+=encoding utf8
+
+=head1 NAME
+
+Sidef::Types::Glob::DirHandle
+
+=head1 DESCRIPTION
+
+This object is ...
+
+=head1 SYNOPSIS
+
+var obj = (DirHandle.new(...));
+
+
+=head1 INHERITS
+
+Inherits methods from:
+
+	* Sidef
+
+=head1 METHODS
+
+
+=head2 close
+
+DirHandle.close() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 dir
+
+DirHandle.dir() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 getFile
+
+DirHandle.getFile() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 getFiles
+
+DirHandle.getFiles() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 get_file
+
+DirHandle.get_file() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 get_files
+
+DirHandle.get_files() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 lstat
+
+DirHandle.lstat() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 parent
+
+DirHandle.parent() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 seek
+
+DirHandle.seek() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 stat
+
+DirHandle.stat() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 tell
+
+DirHandle.tell() -> I<Bool>
+
+Return the
+
+=cut

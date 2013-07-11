@@ -1,0 +1,153 @@
+
+=encoding utf8
+
+=head1 NAME
+
+Sidef::Types::Glob::Stat
+
+=head1 DESCRIPTION
+
+This object is ...
+
+=head1 SYNOPSIS
+
+var obj = (Stat.new(...));
+
+=head1 METHODS
+
+
+=head2 all
+
+Stat.all() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 atime
+
+Stat.atime() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 blksize
+
+Stat.blksize() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 blocks
+
+Stat.blocks() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 ctime
+
+Stat.ctime() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 dev
+
+Stat.dev() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 gid
+
+Stat.gid() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 ino
+
+Stat.ino() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 lstat
+
+Stat.lstat() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 mode
+
+Stat.mode() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 mtime
+
+Stat.mtime() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 nlink
+
+Stat.nlink() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 parent
+
+Stat.parent() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 rdev
+
+Stat.rdev() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 size
+
+Stat.size() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 stat
+
+Stat.stat() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 uid
+
+Stat.uid() -> I<Bool>
+
+Return the
+
+=cut

@@ -1,0 +1,168 @@
+
+=encoding utf8
+
+=head1 NAME
+
+Sidef::Types::Glob::Dir
+
+=head1 DESCRIPTION
+
+This object is ...
+
+=head1 SYNOPSIS
+
+var obj = (Dir.new(...));
+
+
+=head1 INHERITS
+
+Inherits methods from:
+
+	* Sidef::Convert::Convert
+
+=head1 METHODS
+
+
+=head2 abs_name
+
+Dir.abs_name() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 chdir
+
+Dir.chdir() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 create
+
+Dir.create() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 createTree
+
+Dir.createTree() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 create_tree
+
+Dir.create_tree() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 exists
+
+Dir.exists() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 get_value
+
+Dir.get_value() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 lstat
+
+Dir.lstat() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 make
+
+Dir.make() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 makeTree
+
+Dir.makeTree() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 make_tree
+
+Dir.make_tree() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 new
+
+Dir.new() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 open
+
+Dir.open() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 parent
+
+Dir.parent() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 remove
+
+Dir.remove() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 remove_tree
+
+Dir.remove_tree() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 split
+
+Dir.split() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 stat
+
+Dir.stat() -> I<Bool>
+
+Return the
+
+=cut

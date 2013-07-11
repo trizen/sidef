@@ -1,0 +1,513 @@
+
+=encoding utf8
+
+=head1 NAME
+
+Sidef::Types::String::String
+
+=head1 DESCRIPTION
+
+This object is ...
+
+=head1 SYNOPSIS
+
+var obj = (String.new(...));
+
+
+=head1 INHERITS
+
+Inherits methods from:
+
+	* Sidef
+	* Sidef::Convert::Convert
+
+=head1 METHODS
+
+
+=head2 !=
+
+I<Num> B<!=> I<Num> -> I<Num>
+
+Return the
+
+=cut
+
+=head2 $$
+
+I<Num> B<$$> I<Num> -> I<Num>
+
+Return the
+
+=cut
+
+=head2 *
+
+I<Num> B<*> I<Num> -> I<Num>
+
+Return the
+
+=cut
+
+=head2 +
+
+I<Num> B<+> I<Num> -> I<Num>
+
+Return the
+
+=cut
+
+=head2 -
+
+I<Num> B<-> I<Num> -> I<Num>
+
+Return the
+
+=cut
+
+=head2 --
+
+I<Num> B<--> I<Num> -> I<Num>
+
+Return the
+
+=cut
+
+=head2 ..
+
+I<Num> B<..> I<Num> -> I<Num>
+
+Return the
+
+=cut
+
+=head2 <
+
+I<Num> B<E<lt>> I<Num> -> I<Num>
+
+Return the
+
+=cut
+
+=head2 <<
+
+I<Num> B<E<lt>E<lt>> I<Num> -> I<Num>
+
+Return the
+
+=cut
+
+=head2 <=
+
+I<Num> B<E<lt>=> I<Num> -> I<Num>
+
+Return the
+
+=cut
+
+=head2 ==
+
+I<Num> B<==> I<Num> -> I<Num>
+
+Return the
+
+=cut
+
+=head2 =~
+
+I<Num> B<=~> I<Num> -> I<Num>
+
+Return the
+
+=cut
+
+=head2 >
+
+I<Num> B<E<gt>> I<Num> -> I<Num>
+
+Return the
+
+=cut
+
+=head2 >=
+
+I<Num> B<E<gt>=> I<Num> -> I<Num>
+
+Return the
+
+=cut
+
+=head2 >>
+
+I<Num> B<E<gt>E<gt>> I<Num> -> I<Num>
+
+Return the
+
+=cut
+
+=head2 ^^
+
+I<Num> B<^^> I<Num> -> I<Num>
+
+Return the
+
+=cut
+
+=head2 apply_escapes
+
+String.apply_escapes() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 begins_with
+
+String.begins_with() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 charAt
+
+String.charAt() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 chomp
+
+String.chomp() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 chop
+
+String.chop() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 contains
+
+String.contains() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 die
+
+String.die() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 dump
+
+String.dump() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 endsWith
+
+String.endsWith() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 ends_with
+
+String.ends_with() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 eval
+
+String.eval() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 glob
+
+String.glob() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 index
+
+String.index() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 indexOf
+
+String.indexOf() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 insert
+
+String.insert() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 join
+
+String.join() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 lc
+
+String.lc() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 lcfirst
+
+String.lcfirst() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 len
+
+String.len() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 length
+
+String.length() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 new
+
+String.new() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 ord
+
+String.ord() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 print
+
+String.print() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 printf
+
+String.printf() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 println
+
+String.println() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 quotemeta
+
+String.quotemeta() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 reverse
+
+String.reverse() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 say
+
+String.say() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 split
+
+String.split() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 sprintf
+
+String.sprintf() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 startsWith
+
+String.startsWith() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 starts_with
+
+String.starts_with() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 stat_dir
+
+String.stat_dir() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 stat_file
+
+String.stat_file() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 substr
+
+String.substr() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 substring
+
+String.substring() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 tc
+
+String.tc() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 tclc
+
+String.tclc() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 toLowerCase
+
+String.toLowerCase() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 toUpperCase
+
+String.toUpperCase() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 uc
+
+String.uc() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 ucfirst
+
+String.ucfirst() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 unescape
+
+String.unescape() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 warn
+
+String.warn() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 wordcase
+
+String.wordcase() -> I<Bool>
+
+Return the
+
+=cut

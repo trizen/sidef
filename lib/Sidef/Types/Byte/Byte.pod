@@ -1,0 +1,33 @@
+
+=encoding utf8
+
+=head1 NAME
+
+Sidef::Types::Byte::Byte
+
+=head1 DESCRIPTION
+
+This object is ...
+
+=head1 SYNOPSIS
+
+var obj = (Byte.new(...));
+
+
+=head1 INHERITS
+
+Inherits methods from:
+
+	* Sidef::Types::Number::Number
+	* Sidef::Convert::Convert
+
+=head1 METHODS
+
+
+=head2 new
+
+Byte.new() -> I<Bool>
+
+Return the
+
+=cut

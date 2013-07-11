@@ -1,0 +1,57 @@
+
+=encoding utf8
+
+=head1 NAME
+
+Sidef::Sys::Sys
+
+=head1 DESCRIPTION
+
+This object is ...
+
+=head1 SYNOPSIS
+
+var obj = (Sys.new(...));
+
+=head1 METHODS
+
+
+=head2 exit
+
+Sys.exit() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 new
+
+Sys.new() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 osName
+
+Sys.osName() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 osname
+
+Sys.osname() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 sidef
+
+Sys.sidef() -> I<Bool>
+
+Return the
+
+=cut

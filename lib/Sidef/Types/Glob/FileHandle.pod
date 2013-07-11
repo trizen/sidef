@@ -1,0 +1,184 @@
+
+=encoding utf8
+
+=head1 NAME
+
+Sidef::Types::Glob::FileHandle
+
+=head1 DESCRIPTION
+
+This object is ...
+
+=head1 SYNOPSIS
+
+var obj = (FileHandle.new(...));
+
+
+=head1 INHERITS
+
+Inherits methods from:
+
+	* Sidef
+
+=head1 METHODS
+
+
+=head2 close
+
+FileHandle.close() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 eof
+
+FileHandle.eof() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 file
+
+FileHandle.file() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 getLines
+
+FileHandle.getLines() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 get_lines
+
+FileHandle.get_lines() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 isOnTty
+
+FileHandle.isOnTty() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 is_on_tty
+
+FileHandle.is_on_tty() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 lstat
+
+FileHandle.lstat() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 parent
+
+FileHandle.parent() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 read
+
+FileHandle.read() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 readLine
+
+FileHandle.readLine() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 read_all
+
+FileHandle.read_all() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 readline
+
+FileHandle.readline() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 seek
+
+FileHandle.seek() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 stat
+
+FileHandle.stat() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 stderr
+
+FileHandle.stderr() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 stdin
+
+FileHandle.stdin() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 stdout
+
+FileHandle.stdout() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 tell
+
+FileHandle.tell() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 write
+
+FileHandle.write() -> I<Bool>
+
+Return the
+
+=cut

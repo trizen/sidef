@@ -1,0 +1,25 @@
+
+=encoding utf8
+
+=head1 NAME
+
+Sidef::Types::Block::Return
+
+=head1 DESCRIPTION
+
+This object is ...
+
+=head1 SYNOPSIS
+
+var obj = (Return.new(...));
+
+=head1 METHODS
+
+
+=head2 return
+
+Return.return() -> I<Bool>
+
+Return the
+
+=cut

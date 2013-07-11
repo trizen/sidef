@@ -1,0 +1,33 @@
+
+=encoding utf8
+
+=head1 NAME
+
+Sidef::Types::Bool::While
+
+=head1 DESCRIPTION
+
+This object is ...
+
+=head1 SYNOPSIS
+
+var obj = (While.new(...));
+
+=head1 METHODS
+
+
+=head2 do
+
+While.do() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 while
+
+While.while() -> I<Bool>
+
+Return the
+
+=cut
