@@ -1,9 +1,8 @@
-
-use 5.014;
-use strict;
-use warnings;
-
 package Sidef::Types::Block::Return {
+
+    use 5.014;
+    use strict;
+    use warnings;
 
     sub new {
         bless {}, __PACKAGE__;
@@ -18,6 +17,6 @@ package Sidef::Types::Block::Return {
     sub get_obj {
         $_[0]->{obj};
     }
-};
+}
 
 1;

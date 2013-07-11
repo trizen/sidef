@@ -1,9 +1,8 @@
-
-use 5.014;
-use strict;
-use warnings;
-
 package Sidef::Types::Block::Continue {
+
+    use 5.014;
+    use strict;
+    use warnings;
 
     sub new {
         bless {}, __PACKAGE__;
@@ -12,6 +11,7 @@ package Sidef::Types::Block::Continue {
     sub continue {
         $_[0];
     }
-};
+
+}
 
 1;

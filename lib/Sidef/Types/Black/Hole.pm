@@ -1,9 +1,8 @@
-
-use 5.014;
-use strict;
-use warnings;
-
 package Sidef::Types::Black::Hole {
+
+    use 5.014;
+    use strict;
+    use warnings;
 
     sub new {
         bless {}, __PACKAGE__;
@@ -16,6 +15,6 @@ package Sidef::Types::Black::Hole {
     sub AUTOLOAD {
         return __PACKAGE__->new();
     }
-};
+}
 
 1;

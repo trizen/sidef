@@ -1,11 +1,10 @@
-
-use 5.014;
-use strict;
-use warnings;
-
 package Sidef::Types::Hash::Hash {
 
-    use parent qw(Sidef::Convert::Convert);
+    use 5.014;
+    use strict;
+    use warnings;
+
+    our @ISA = qw(Sidef::Convert::Convert);
 
     sub new {
         my (undef, @pairs) = @_;
@@ -108,6 +107,4 @@ package Sidef::Types::Hash::Hash {
           (map { Sidef::Types::String::String->new($_) } CORE::keys %{$self});
         $new_hash;
     }
-};
-
-1;
+}

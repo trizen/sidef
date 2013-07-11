@@ -1,9 +1,8 @@
-
-use 5.014;
-use strict;
-use warnings;
-
 package Sidef::Module::Func {
+
+    use 5.014;
+    use strict;
+    use warnings;
 
     our $AUTOLOAD;
 
@@ -40,6 +39,6 @@ package Sidef::Module::Func {
             return;
         }
     }
-};
+}
 
 1;

@@ -1,13 +1,10 @@
-
-use 5.014;
-use strict;
-use warnings;
-
-no if $] >= 5.018, warnings => "experimental::smartmatch";
-
 package Sidef::Types::Block::Do {
 
-    use parent qw(Sidef);
+    use 5.014;
+    use strict;
+    use warnings;
+
+    our @ISA = qw(Sidef);
 
     sub new {
         bless {}, __PACKAGE__;
@@ -23,11 +20,12 @@ package Sidef::Types::Block::Do {
 
         if ($self->{do_block}) {
             my $result = $code->run;
-            if (ref($result) eq 'Sidef::Types::Block::Continue') {
+            my $ref    = ref($result);
+            if ($ref eq 'Sidef::Types::Block::Continue') {
                 $self->{do_block} = 0;
                 return $self;
             }
-            elsif (ref($result) ~~ ['Sidef::Types::Block::Break', 'Sidef::Types::Block::Return']) {
+            elsif ($ref eq 'Sidef::Types::Block::Break' or $ref eq 'Sidef::Types::Block::Return') {
                 $self->{do_block} = 0;
                 return $result;
             }
@@ -42,6 +40,4 @@ package Sidef::Types::Block::Do {
         *{__PACKAGE__ . '::' . ':'} = \&do;
     }
 
-};
-
-1;
+}

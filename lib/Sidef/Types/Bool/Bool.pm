@@ -1,12 +1,11 @@
-
-use 5.014;
-use strict;
-use warnings;
-
 package Sidef::Types::Bool::Bool {
 
-    use parent qw(Sidef::Convert::Convert);
+    use 5.014;
+    use strict;
+    use warnings;
     use overload q{bool} => sub { ${$_[0]} eq 'true' };
+
+    our @ISA = qw(Sidef::Convert::Convert);
 
     sub new {
         my (undef, $bool) = @_;
@@ -96,7 +95,4 @@ package Sidef::Types::Bool::Bool {
         my ($self) = @_;
         Sidef::Types::String::String->new($$self);
     }
-
 }
-
-1;

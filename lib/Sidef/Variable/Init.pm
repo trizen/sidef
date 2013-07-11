@@ -1,9 +1,8 @@
-
-use 5.014;
-use strict;
-use warnings;
-
 package Sidef::Variable::Init {
+
+    use 5.014;
+    use strict;
+    use warnings;
 
     our $AUTOLOAD;
 
@@ -13,7 +12,7 @@ package Sidef::Variable::Init {
     }
 
     sub DESTROY {
-
+        return;
     }
 
     sub AUTOLOAD {

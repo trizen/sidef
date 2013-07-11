@@ -1,9 +1,10 @@
-
-use 5.014;
-use strict;
-use warnings;
-
 package Sidef::Types::Glob::FileHandle {
+
+    use 5.014;
+    use strict;
+    use warnings;
+
+    our @ISA = qw(Sidef);
 
     sub new {
         my (undef, %opt) = @_;
@@ -18,6 +19,18 @@ package Sidef::Types::Glob::FileHandle {
     sub get_value {
         $_[0]->{fh};
     }
+
+    sub file {
+        $_[0]{file};
+    }
+
+    *parent = \&file;
+
+    sub is_on_tty {
+        Sidef::Types::Bool::Bool->new(-t $_[0]{fh});
+    }
+
+    *isOnTty = \&is_on_tty;
 
     sub stdout {
         __PACKAGE__->new(fh   => \*STDOUT,
@@ -45,21 +58,34 @@ package Sidef::Types::Glob::FileHandle {
         defined($line) ? Sidef::Types::String::String->new($line) : Sidef::Types::Nil::Nil->new();
     }
 
+    *read     = \&readline;
+    *readLine = \&readline;
+
     sub read_all {
         my ($self) = @_;
-        Sidef::Types::Array::Array->new(map { Sidef::Types::String::String->new($_) } CORE::readline $self->{fh});
+        Sidef::Types::Array::Array->new(map { Sidef::Types::String::String->new($_) } CORE::readline($self->{fh}));
     }
 
-    *getLines = \&read_all;
+    *get_lines = \&read_all;
+    *getLines  = \&read_all;
 
     sub eof {
         my ($self) = @_;
         Sidef::Types::Bool::Bool->new(eof $self->{fh});
     }
 
-    sub file {
+    sub tell {
         my ($self) = @_;
-        $self->{file};
+        Sidef::Types::Number::Number->new(tell($self->{fh}));
+    }
+
+    sub seek {
+        my ($self, $pos, $whence) = @_;
+
+        (not $self->_is_number($pos) or not $self->_is_number($whence))
+          && return Sidef::Types::Bool::Bool->false;
+
+        Sidef::Types::Bool::Bool->new(seek($self->{fh}, $$pos, $$whence));
     }
 
     sub close {
@@ -67,6 +93,13 @@ package Sidef::Types::Glob::FileHandle {
         Sidef::Types::Bool::Bool->new(close $self->{fh});
     }
 
-};
+    sub stat {
+        my ($self) = @_;
+        Sidef::Types::Glob::Stat->stat($self->{fh}, $self);
+    }
 
-1;
+    sub lstat {
+        my ($self) = @_;
+        Sidef::Types::Glob::Stat->lstat($self->{fh}, $self);
+    }
+}

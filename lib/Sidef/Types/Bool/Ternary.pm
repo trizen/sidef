@@ -1,11 +1,10 @@
-
-use 5.014;
-use strict;
-use warnings;
-
 package Sidef::Types::Bool::Ternary {
 
-    use parent qw(Sidef);
+    use 5.014;
+    use strict;
+    use warnings;
+
+    our @ISA = qw(Sidef);
 
     sub new {
         my (undef, $hash_ref) = @_;
@@ -26,6 +25,4 @@ package Sidef::Types::Bool::Ternary {
         };
     }
 
-};
-
-1;
+}

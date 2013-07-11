@@ -1,11 +1,13 @@
-
-use 5.014;
-use strict;
-use warnings;
-
 package Sidef::Types::Array::Array {
 
-    use parent qw(Sidef Sidef::Convert::Convert);
+    use 5.014;
+    use strict;
+    use warnings;
+
+    our @ISA = qw(
+      Sidef
+      Sidef::Convert::Convert
+      );
 
     sub new {
         my (undef, @items) = @_;
@@ -726,5 +728,3 @@ package Sidef::Types::Array::Array {
     }
 
 }
-
-1;

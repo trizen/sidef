@@ -1,13 +1,10 @@
-
-use 5.014;
-use strict;
-use warnings;
-
-no if $] >= 5.018, warnings => "experimental::smartmatch";
-
 package Sidef::Types::Block::Code {
 
-    use parent qw(Sidef);
+    use 5.014;
+    use strict;
+    use warnings;
+
+    our @ISA = qw(Sidef);
 
     require Sidef::Exec;
     my $exec = Sidef::Exec->new();
@@ -154,7 +151,7 @@ package Sidef::Types::Block::Code {
     sub for {
         my ($self, $arg) = @_;
 
-        if (ref $arg ~~ ['Sidef::Types::Array::Array', 'Sidef::Types::Byte::Bytes', 'Sidef::Types::Char::Chars',]) {
+        if ($self->_is_array($arg, 1, 1)) {
             foreach my $class (keys %{$self}) {
 
                 my $var_ref = $exec->execute_expr(expr => $self->{$class}[0], class => $class);
@@ -165,7 +162,6 @@ package Sidef::Types::Block::Code {
                     return $res if defined $res;
                 }
             }
-
         }
         elsif (ref $arg eq 'HASH') {
 
@@ -204,5 +200,3 @@ package Sidef::Types::Block::Code {
     }
 
 }
-
-1;

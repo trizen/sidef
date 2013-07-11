@@ -1,9 +1,8 @@
-
-use 5.014;
-use strict;
-use warnings;
-
 package Sidef::Types::Regex::Matches {
+
+    use 5.014;
+    use strict;
+    use warnings;
 
     sub new {
         my (undef, %hash) = @_;
@@ -47,6 +46,4 @@ package Sidef::Types::Regex::Matches {
         no strict 'refs';
         *{__PACKAGE__ . '::' . '??'} = \&matched;
     }
-};
-
-1;
+}

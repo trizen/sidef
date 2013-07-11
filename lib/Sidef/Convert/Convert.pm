@@ -1,26 +1,23 @@
-
-use 5.014;
-use strict;
-use warnings;
-
-no if $] >= 5.018, warnings => "experimental::smartmatch";
-
 package Sidef::Convert::Convert {
 
-    use parent qw(Sidef);
+    # This module is used only as parent!
 
-    #<<<
-    my $array_like = [
-        'Sidef::Types::Array::Array',
-        'Sidef::Types::Byte::Bytes',
-        'Sidef::Types::Char::Chars',
-    ];
-    #>>>
+    use 5.014;
+    use strict;
+    use warnings;
+
+    our @ISA = qw(Sidef);
+
+    state $array_like = {
+                         'Sidef::Types::Array::Array' => 1,
+                         'Sidef::Types::Byte::Bytes'  => 1,
+                         'Sidef::Types::Char::Chars'  => 1,
+                        };
 
     use overload q{""} => sub {
         my ($type) = ref($_[0]);
 
-        if ($type ~~ $array_like or $type eq 'Sidef::Types::Hash::Hash') {
+        if (exists $array_like->{$type} or $type eq 'Sidef::Types::Hash::Hash') {
             return $_[0];
         }
 
@@ -30,7 +27,7 @@ package Sidef::Convert::Convert {
     sub to_s {
         my ($self) = @_;
 
-        if (ref $self ~~ $array_like) {
+        if (exists $array_like->{ref $self}) {
             return Sidef::Types::String::String->new(join(' ', @{$self}));
         }
 
@@ -52,12 +49,6 @@ package Sidef::Convert::Convert {
         my ($self) = @_;
         $self->_is_string($self) || return $self;
         Sidef::Types::Glob::Dir->new($$self);
-    }
-
-    sub to_pipe {
-        my ($self) = @_;
-        $self->_is_string($self) || return $self;
-        Sidef::Types::Glob::Pipe->new($$self);
     }
 
     sub to_bool {
@@ -97,5 +88,3 @@ package Sidef::Convert::Convert {
         Sidef::Types::Array::Array->new($self);
     }
 }
-
-1;

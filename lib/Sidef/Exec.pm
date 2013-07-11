@@ -1,16 +1,27 @@
-
-use 5.014;
-use strict;
-use warnings;
-
-no if $] >= 5.018, warnings => "experimental::smartmatch";
-
 package Sidef::Exec {
 
-    use parent qw(Sidef);
+    use 5.014;
+    use strict;
+    use warnings;
+
+    no if $] >= 5.018, warnings => "experimental::smartmatch";
+
+    our @ISA = qw(Sidef);
 
     sub new {
-        bless {}, __PACKAGE__;
+        bless {
+            var_methods => {
+                map { $_ => 1 }
+                  qw(
+                  =  :=  +=  -=  *=  /=
+                  %=  **=  ||=  &&=  |=
+                  ^=  &=  ++  -- \\\\
+                  <<= >>=
+                  )
+              }
+
+          },
+          __PACKAGE__;
     }
 
     sub eval_array {
@@ -151,17 +162,8 @@ package Sidef::Exec {
                         }
                     }
 
-                    if (
-                        ref $self_obj eq 'Sidef::Variable::Variable'
-                        and not $method ~~ [
-                            qw(
-                              =  :=  +=  -=  *=  /=
-                              %=  **=  ||=  &&=  |=
-                              ^=  &=  ++  -- \\\\
-                              <<= >>=
-                              )
-                        ]
-                      ) {
+                    if (ref $self_obj eq 'Sidef::Variable::Variable'
+                        and not exists $self->{var_methods}{$method}) {
                         $self_obj = $self_obj->get_value;
                     }
 
@@ -183,7 +185,7 @@ package Sidef::Exec {
                           && (
                               ref($self_obj->get_value) eq 'Sidef::Types::Bool::Bool'
                               ? (!($method ~~ [qw(:= ||= &&=)]))
-                              : (!($method ~~ [qw(:=)]))
+                              : (!($method eq ':='))
                              )
                       ) ? ref($self_obj->get_value)
                       : ref($self_obj);
@@ -267,7 +269,8 @@ package Sidef::Exec {
                 }
             }
 
-            if (ref($self_obj) ~~ ['Sidef::Types::Block::Break', 'Sidef::Types::Block::Return']) {
+            if (   ref($self_obj) eq 'Sidef::Types::Block::Break'
+                or ref($self_obj) eq 'Sidef::Types::Block::Return') {
                 $self->{expr_i} = $self->{expr_i_max};
                 return $self_obj;
             }
@@ -317,7 +320,11 @@ package Sidef::Exec {
                 elsif (ref($obj) eq 'Sidef::Types::Block::Break') {
 
                     my $caller = [caller(1)]->[0];
-                    if (defined($caller) and $caller ~~ ['Sidef::Types::Block::Do', 'Sidef::Types::Block::Code']) {
+                    if (
+                        defined($caller)
+                        and (   $caller eq 'Sidef::Types::Block::Do'
+                             or $caller eq 'Sidef::Types::Block::Code')
+                      ) {
                         return $obj;
                     }
 
@@ -330,6 +337,4 @@ package Sidef::Exec {
 
         return @results;
     }
-};
-
-1;
+}

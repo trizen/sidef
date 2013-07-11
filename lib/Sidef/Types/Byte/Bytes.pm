@@ -1,12 +1,14 @@
-
-use 5.014;
-use strict;
-use warnings;
-
 package Sidef::Types::Byte::Bytes {
 
+    use 5.014;
+    use strict;
+    use warnings;
     use autouse 'Encode' => qw(decode_utf8($;$));
-    use parent qw(Sidef::Types::Array::Array Sidef::Convert::Convert);
+
+    our @ISA = qw(
+      Sidef::Types::Array::Array
+      Sidef::Convert::Convert
+      );
 
     sub new {
         my (undef, @bytes) = @_;
@@ -19,5 +21,3 @@ package Sidef::Types::Byte::Bytes {
     }
 
 }
-
-1;

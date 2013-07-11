@@ -7,6 +7,8 @@ no if $] >= 5.018, warnings => "experimental::smartmatch";
 
 package Sidef {
 
+    our $VERSION = 0.01;
+
     {
         my %types = (
             bool   => {class => [qw(Sidef::Types::Bool::Bool)]},

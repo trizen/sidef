@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use List::Util qw(first);
 
-my @ignored = qw(100_doors_3.sf dice_game_solver.sf);
+my @ignored = qw(100_doors_3.sf dice_game_solver.sf stdin.sf);
 
 foreach my $sidef_script (glob '*.sf') {
 

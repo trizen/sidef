@@ -1,11 +1,13 @@
-
-use 5.014;
-use strict;
-use warnings;
-
 package Sidef::Types::Number::Number {
 
-    use parent qw(Sidef Sidef::Convert::Convert);
+    use 5.014;
+    use strict;
+    use warnings;
+
+    our @ISA = qw(
+      Sidef
+      Sidef::Convert::Convert
+      );
 
     sub new {
         my (undef, $num) = @_;
@@ -252,6 +254,4 @@ package Sidef::Types::Number::Number {
         my ($self) = @_;
         Sidef::Types::String::String->new($$self);
     }
-};
-
-1;
+}

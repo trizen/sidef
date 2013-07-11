@@ -1,11 +1,13 @@
-
-use 5.014;
-use strict;
-use warnings;
-
 package Sidef::Types::Char::Chars {
 
-    use parent qw(Sidef::Types::Array::Array Sidef::Convert::Convert);
+    use 5.014;
+    use strict;
+    use warnings;
+
+    our @ISA = qw(
+      Sidef::Types::Array::Array
+      Sidef::Convert::Convert
+      );
 
     sub new {
         my (undef, @chars) = @_;
@@ -13,5 +15,3 @@ package Sidef::Types::Char::Chars {
     }
 
 }
-
-1;

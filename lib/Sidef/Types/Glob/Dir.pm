@@ -1,11 +1,10 @@
-
-use 5.014;
-use strict;
-use warnings;
-
 package Sidef::Types::Glob::Dir {
 
-    use parent qw(Sidef::Convert::Convert);
+    use 5.014;
+    use strict;
+    use warnings;
+
+    our @ISA = qw(Sidef::Convert::Convert);
 
     sub new {
         my (undef, $dir) = @_;
@@ -15,6 +14,18 @@ package Sidef::Types::Glob::Dir {
 
     sub get_value {
         ${$_[0]};
+    }
+
+    sub exists {
+        my ($self) = @_;
+        Sidef::Types::Bool::Bool->new(-e $$self);
+    }
+
+    sub split {
+        my ($self) = @_;
+
+        require File::Spec;
+        Sidef::Types::Array::Array->new(map { Sidef::Types::String::String->new($_) } File::Spec->splitdir($$self));
     }
 
     # Returns the parent of the directory
@@ -45,6 +56,8 @@ package Sidef::Types::Glob::Dir {
         Sidef::Types::Bool::Bool->new(mkdir($$self));
     }
 
+    *make = \&create;
+
     # Create the directory (with parents, if needed)
     sub create_tree {
         my ($self) = @_;
@@ -53,6 +66,10 @@ package Sidef::Types::Glob::Dir {
         Sidef::Types::Bool::Bool->new(File::Path::make_path($$self));
     }
 
+    *createTree = \&create_tree;
+    *makeTree   = \&create_tree;
+    *make_tree  = \&create_tree;
+
     sub abs_name {
         my ($self) = @_;
 
@@ -60,6 +77,18 @@ package Sidef::Types::Glob::Dir {
         __PACKAGE__->new(File::Spec->rel2abs($$self));
     }
 
-};
+    sub open {
+        my ($self) = @_;
 
-1;
+        opendir(my $dir_h, $$self) or return;
+        Sidef::Types::Glob::DirHandle->new(dir_h => $dir_h, dir => $self);
+    }
+
+    sub chdir {
+        my ($self) = @_;
+        Sidef::Types::Bool::Bool->new(chdir($$self));
+    }
+
+    *stat  = \&Sidef::Types::Glob::File::stat;
+    *lstat = \&Sidef::Types::Glob::File::lstat;
+}

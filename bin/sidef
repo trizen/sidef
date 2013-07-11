@@ -12,10 +12,12 @@ binmode(STDIN,  ':encoding(UTF-8)');
 
 use lib '../lib';    # devel only
 use autouse 'Getopt::Std' => qw(getopts($;$));        # arguments support
-use autouse 'Encode'      => qw(decode_utf8($;$));    # encoding support
+use autouse 'Encode'      => qw(decode_utf8($;$));    # unicode support
+
+require Sidef;
 
 my $name    = 'Sidef';
-my $version = '0.01';
+my $version = $Sidef::VERSION;
 
 my %args;
 if (@ARGV and chr ord $ARGV[0] eq '-') {
@@ -30,6 +32,7 @@ if ($args{h}) {
                     '-D'             => 'dump the data structure of a program',
                     '-o output_file' => 'dump the data structure into a file (with -D)',
                     '-E program'     => 'one line of program',
+                    '-v'             => 'print version',
                    );
 
     print <<"USAGE";
@@ -103,24 +106,11 @@ else {
 
             local $/;
             <$fh>;
-
           }
           : join(' ', <>);
 
-        my $arguments = @ARGV ? (q{'} . decode_utf8(join(q{','}, (map { s/(['\\])/\\$1/gr } @ARGV))) . q{'}) : '';
-
-        #
-        ## Predeclared variables and constants
-        #
-
-        my $header = <<"EOH";
-var(ARGV,STDOUT,STDERR,STDIN)=([$arguments],FileHandle.stdout,FileHandle.stderr,FileHandle.stdin);
-const(OSNAME,EXEC,SCRIPT)=('$^O',File.new("\Q$0\E"),File.new("\Q$script_name\E"));
-__RESET_LINE_COUNTER__;
-EOH
-
         my $parser = Sidef::Parser->new(script_name => $script_name);
-        my $struct = $parser->parse_script(code => $header . $code);
+        my $struct = $parser->parse_script(code => $code);
 
         if ($args{D}) {
             eval 'use Data::Dump';

@@ -1,9 +1,8 @@
-
-use 5.014;
-use strict;
-use warnings;
-
 package Sidef::Types::Block::For {
+
+    use 5.014;
+    use strict;
+    use warnings;
 
     sub new {
         bless {}, __PACKAGE__;
@@ -21,6 +20,4 @@ package Sidef::Types::Block::For {
         my ($self, $code) = @_;
         $code->for($self->{arg});
     }
-};
-
-1;
+}

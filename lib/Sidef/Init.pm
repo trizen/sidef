@@ -1,3 +1,4 @@
+package Sidef::Init;
 
 # This module is used to require all the project modules at once.
 
@@ -8,12 +9,9 @@ use 5.014;
 use strict;
 use warnings;
 
-package Sidef::Init;
-
 use lib '..';
 
 require Sidef::Sys::Sys if (caller)[0] ne q{Sidef::Sys::Sys};
-require Sidef::Base if (caller)[0] ne q{Sidef::Base};
 require Sidef::Types::Nil::Nil if (caller)[0] ne q{Sidef::Types::Nil::Nil};
 require Sidef::Types::Bool::If if (caller)[0] ne q{Sidef::Types::Bool::If};
 require Sidef::Types::Bool::While if (caller)[0] ne q{Sidef::Types::Bool::While};
@@ -54,6 +52,3 @@ require Sidef::Variable::Init if (caller)[0] ne q{Sidef::Variable::Init};
 require Sidef::Variable::Variable if (caller)[0] ne q{Sidef::Variable::Variable};
 require Sidef::Parser if (caller)[0] ne q{Sidef::Parser};
 require Sidef::Exec if (caller)[0] ne q{Sidef::Exec};
-
-
-1;

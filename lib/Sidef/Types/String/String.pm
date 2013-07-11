@@ -1,11 +1,13 @@
-
-use 5.014;
-use strict;
-use warnings;
-
 package Sidef::Types::String::String {
 
-    use parent qw(Sidef Sidef::Convert::Convert);
+    use 5.014;
+    use strict;
+    use warnings;
+
+    our @ISA = qw(
+      Sidef
+      Sidef::Convert::Convert
+      );
 
     sub new {
         my (undef, $str) = @_;
@@ -430,5 +432,3 @@ package Sidef::Types::String::String {
         __PACKAGE__->new(q{'} . $$self =~ s{'}{\\'}gr . q{'});
     }
 }
-
-1;

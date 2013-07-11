@@ -1,9 +1,8 @@
-
-use 5.014;
-use strict;
-use warnings;
-
 package Sidef::Variable::Variable {
+
+    use 5.014;
+    use strict;
+    use warnings;
 
     use overload q{""} => sub {
         $_[0]->get_value;
@@ -135,9 +134,7 @@ package Sidef::Variable::Variable {
                 }
                 $self;
             };
-
         }
-
     }
 };
 

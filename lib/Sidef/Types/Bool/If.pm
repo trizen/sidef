@@ -1,11 +1,13 @@
-
-use 5.014;
-use strict;
-use warnings;
-
 package Sidef::Types::Bool::If {
 
-    use parent qw(Sidef Sidef::Types::Block::Do);
+    use 5.014;
+    use strict;
+    use warnings;
+
+    our @ISA = qw(
+      Sidef
+      Sidef::Types::Block::Do
+      );
 
     sub new {
         bless {do_block => 0}, __PACKAGE__;
@@ -32,6 +34,4 @@ package Sidef::Types::Bool::If {
         $self->do($code);
     }
 
-};
-
-1;
+}

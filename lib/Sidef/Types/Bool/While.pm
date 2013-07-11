@@ -1,9 +1,8 @@
-
-use 5.014;
-use strict;
-use warnings;
-
 package Sidef::Types::Bool::While {
+
+    use 5.014;
+    use strict;
+    use warnings;
 
     sub new {
         bless {}, __PACKAGE__;
@@ -20,6 +19,6 @@ package Sidef::Types::Bool::While {
         $code->while($self->{arg});
     }
 
-};
+}
 
 1;

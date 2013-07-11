@@ -1,11 +1,10 @@
-
-use 5.014;
-use strict;
-use warnings;
-
 package Sidef::Types::Regex::Regex {
 
-    use parent qw(Sidef::Convert::Convert);
+    use 5.014;
+    use strict;
+    use warnings;
+
+    our @ISA = qw(Sidef::Convert::Convert);
 
     sub new {
         my (undef, $regex, $mod) = @_;
@@ -39,5 +38,3 @@ package Sidef::Types::Regex::Regex {
         Sidef::Types::String::String->new('/' . $$self =~ s{/}{\\/}gr . '/');
     }
 }
-
-1;

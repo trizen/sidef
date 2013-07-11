@@ -1,12 +1,12 @@
-
-use utf8;
-use 5.014;
-use strict;
-use warnings;
-
-no if $] >= 5.018, warnings => "experimental::smartmatch";
-
 package Sidef::Parser {
+
+    use utf8;
+    use 5.014;
+    use strict;
+    use warnings;
+
+    no if $] >= 5.018, warnings => "experimental::smartmatch";
+    use autouse 'Encode' => qw(decode_utf8($;$));    # unicode support
 
     our $DEBUG = 0;
     require Sidef::Init;
@@ -44,7 +44,6 @@ package Sidef::Parser {
                   Array
                   File
                   Dir
-                  FileHandle
                   Arr Array
                   Hash
                   Str String
@@ -63,6 +62,10 @@ package Sidef::Parser {
                   char
                   func
                   my
+
+                  STDIN
+                  STDOUT
+                  STDERR
 
                   __FUNC__
                   __BLOCK__
@@ -609,6 +612,13 @@ package Sidef::Parser {
                     return Sidef::Types::Regex::Regex->new($$regex, $flags), pos;
                 }
 
+                when (/\G(?=`)/) {
+                    my ($string, $pos) = $self->get_quoted_string(code => (substr($_, pos)));
+                    require Sidef::Types::Glob::Backtick;
+                    return Sidef::Types::Glob::Backtick->new(
+                                   Sidef::Types::String::String->new($string)->apply_escapes->unescape), pos($_) + $pos;
+                }
+
                 # Logical 'not'
                 when (/\G(?=!)/) {
                     $self->{expect_method} = 1;
@@ -637,10 +647,6 @@ package Sidef::Parser {
 
                 when (/\GFile\b/gc) {
                     return Sidef::Types::Glob::File->new(), pos;
-                }
-
-                when (/\GFileHandle\b/gc) {
-                    return Sidef::Types::Glob::FileHandle->new(), pos;
                 }
 
                 when (/\GArr(?:ay)?\b/gc) {
@@ -732,6 +738,62 @@ package Sidef::Parser {
                                        pos   => pos($_) - length('__FUNC__'),
                                        error => "__FUNC__ used outside a function!",
                                       );
+                }
+
+                when (/\GSTDIN\b/gc) {
+                    return Sidef::Types::Glob::FileHandle->stdin, pos;
+                }
+
+                when (/\GSTDOUT\b/gc) {
+                    return Sidef::Types::Glob::FileHandle->stdout, pos;
+                }
+
+                when (/\GSTDERR\b/gc) {
+                    return Sidef::Types::Glob::FileHandle->stderr, pos;
+                }
+
+                when (/\G((?>ENV|ARGV|SCRIPT))\b/gc) {
+                    my $name = $1;
+                    my $type = 'var';
+
+                    my ($var, $code) = $self->find_var($name);
+
+                    if (ref $var) {
+                        pos($_) -= length($name);
+                        continue;
+                    }
+
+                    my $variable = Sidef::Variable::Variable->new($name, $type);
+
+                    unshift @{$self->{vars}},
+                      {
+                        obj   => $variable,
+                        name  => $name,
+                        count => 0,
+                        type  => $type,
+                        line  => $self->{line},
+                      };
+
+                    if ($name eq 'ARGV') {
+                        my $array =
+                          Sidef::Types::Array::Array->new(map { Sidef::Types::String::String->new(decode_utf8($_)) }
+                                                          @ARGV);
+
+                        $variable->set_value($array);
+                    }
+                    elsif ($name eq 'ENV') {
+                        my $hash =
+                          Sidef::Types::Hash::Hash->new(map { Sidef::Types::String::String->new(decode_utf8($_)) }
+                                                        %ENV);
+
+                        $variable->set_value($hash);
+                    }
+                    elsif ($name eq 'SCRIPT') {
+                        my $string = Sidef::Types::String::String->new($self->{script_name});
+                        $variable->set_value($string);
+                    }
+
+                    return $variable, pos;
                 }
 
                 # Variable call
@@ -1097,8 +1159,5 @@ package Sidef::Parser {
         }
 
         die "Invalid code or something weird is happening! :)\n";
-
     }
-};
-
-1;
+}

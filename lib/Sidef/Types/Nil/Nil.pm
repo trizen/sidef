@@ -1,11 +1,13 @@
-
-use 5.014;
-use strict;
-use warnings;
-
 package Sidef::Types::Nil::Nil {
 
-    use parent qw(Sidef Sidef::Convert::Convert);
+    use 5.014;
+    use strict;
+    use warnings;
+
+    our @ISA = qw(
+      Sidef
+      Sidef::Convert::Convert
+      );
 
     sub new {
         bless \(my $nil = 'nil'), __PACKAGE__;
@@ -20,5 +22,3 @@ package Sidef::Types::Nil::Nil {
     }
 
 }
-
-1;

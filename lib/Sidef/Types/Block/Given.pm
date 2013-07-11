@@ -1,9 +1,8 @@
-
-use 5.014;
-use strict;
-use warnings;
-
 package Sidef::Types::Block::Given {
+
+    use 5.014;
+    use strict;
+    use warnings;
 
     sub new {
         bless {}, __PACKAGE__;
@@ -14,6 +13,6 @@ package Sidef::Types::Block::Given {
         Sidef::Types::Block::Switch->new($expr);
     }
 
-};
+}
 
 1;

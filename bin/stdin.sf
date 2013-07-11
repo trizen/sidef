@@ -1,0 +1,6 @@
+#!/usr/bin/ruby
+
+if (STDIN.isOnTty) {
+    "Your name: ".print;
+    "Hello %s!\n".printf(STDIN.readline.chomp);
+}

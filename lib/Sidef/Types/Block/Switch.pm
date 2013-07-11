@@ -1,11 +1,13 @@
-
-use 5.014;
-use strict;
-use warnings;
-
 package Sidef::Types::Block::Switch {
 
-    use parent qw(Sidef Sidef::Types::Block::Do);
+    use 5.014;
+    use strict;
+    use warnings;
+
+    our @ISA = qw(
+      Sidef
+      Sidef::Types::Block::Do
+      );
 
     sub new {
         my (undef, $obj) = @_;
@@ -51,6 +53,4 @@ package Sidef::Types::Block::Switch {
         $self->{obj};
     }
 
-};
-
-1;
+}
