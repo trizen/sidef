@@ -162,7 +162,6 @@ t/boilerplate.t
 t/manifest.t
 t/pod.t
 talks/alpha-release/sidef.odp
-test.sf
 utils/doc.pl
 utils/pod_generator.pl
 utils/struct.pl

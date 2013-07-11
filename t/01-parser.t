@@ -9,17 +9,11 @@ use Test::More;
 use List::Util qw(first);
 use File::Spec::Functions qw(catfile);
 
-use lib '../lib';
+use lib 'lib';
 require Sidef::Parser;
 
-my %ignored = map { $_ => 1 } qw(
-  100_doors_3.sf
-  dice_game_solver.sf
-  stdin.sf
-  );
-
 opendir(my $dir_h, 'scripts');
-my @scripts = map { catfile('scripts', $_) } grep { not exists $ignored{$_} } grep { /\.sf\z/ } readdir($dir_h);
+my @scripts = map { catfile('scripts', $_) } grep { /\.sf\z/ } readdir($dir_h);
 
 plan tests => scalar(@scripts);
 
