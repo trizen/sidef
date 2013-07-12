@@ -248,6 +248,14 @@ Return the
 
 =cut
 
+=head2 gsub
+
+String.gsub() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 index
 
 String.index() -> I<Bool>
@@ -419,6 +427,14 @@ Return the
 =head2 stat_file
 
 String.stat_file() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 sub
+
+String.sub() -> I<Bool>
 
 Return the
 

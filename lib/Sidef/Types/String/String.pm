@@ -274,6 +274,34 @@ package Sidef::Types::String::String {
         __PACKAGE__->new(sprintf $$self, @arguments);
     }
 
+    sub sub {
+        my ($self, $regex, $str) = @_;
+
+        $self->_is_string($str) || return Sidef::Types::Bool::Bool->false;
+
+        if (ref($regex) ne 'Sidef::Types::Regex::Regex') {
+            if ($regex->can('quotemeta')) {
+                $regex = $regex->quotemeta();
+            }
+        }
+
+        Sidef::Types::Bool::Bool->new($$self =~ s{$regex}{$str});
+    }
+
+    sub gsub {
+        my ($self, $regex, $str) = @_;
+
+        $self->_is_string($str) || return Sidef::Types::Bool::Bool->false;
+
+        if (ref($regex) ne 'Sidef::Types::Regex::Regex') {
+            if ($regex->can('quotemeta')) {
+                $regex = $regex->quotemeta();
+            }
+        }
+
+        Sidef::Types::Bool::Bool->new($$self =~ s{$regex}{$str}g);
+    }
+
     sub glob {
         my ($self) = @_;
         Sidef::Types::Array::Array->(map { __PACKAGE__->new($_) } CORE::glob($$self));
