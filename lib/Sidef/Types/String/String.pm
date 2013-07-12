@@ -32,19 +32,19 @@ package Sidef::Types::String::String {
 
         *{__PACKAGE__ . '::' . '*'} = sub {
             my ($self, $num) = @_;
-            $self->_is_number($num) || return $self;
+            $self->_is_number($num) || return;
             $self->new($$self x $$num);
         };
 
         *{__PACKAGE__ . '::' . '+'} = sub {
             my ($self, $string) = @_;
-            $self->_is_string($string) || return $self;
+            $self->_is_string($string) || return;
             $self->new($$self . $$string);
         };
 
         *{__PACKAGE__ . '::' . '-'} = sub {
             my ($self, $string) = @_;
-            $self->_is_string($string) || return $self;
+            $self->_is_string($string) || return;
             if ((my $ind = CORE::index($$self, $$string)) != -1) {
                 return $self->new(CORE::substr($$self, 0, $ind) . CORE::substr($$self, $ind + CORE::length($$string)));
             }
@@ -70,26 +70,32 @@ package Sidef::Types::String::String {
 
         *{__PACKAGE__ . '::' . '>'} = sub {
             my ($self, $string) = @_;
-            $self->_is_string($string) || return $self;
+            $self->_is_string($string) || return;
             Sidef::Types::Bool::Bool->new($$self gt $$string);
         };
 
         *{__PACKAGE__ . '::' . '<'} = sub {
             my ($self, $string) = @_;
-            $self->_is_string($string) || return $self;
+            $self->_is_string($string) || return;
             Sidef::Types::Bool::Bool->new($$self lt $$string);
         };
 
         *{__PACKAGE__ . '::' . '>='} = sub {
             my ($self, $string) = @_;
-            $self->_is_string($string) || return $self;
+            $self->_is_string($string) || return;
             Sidef::Types::Bool::Bool->new($$self ge $$string);
         };
 
         *{__PACKAGE__ . '::' . '<='} = sub {
             my ($self, $string) = @_;
-            $self->_is_string($string) || return $self;
+            $self->_is_string($string) || return;
             Sidef::Types::Bool::Bool->new($$self le $$string);
+        };
+
+        *{__PACKAGE__ . '::' . '<=>'} = sub {
+            my ($self, $string) = @_;
+            $self->_is_string($string) || return $self;
+            Sidef::Types::Number::Number->new($$self cmp $$string);
         };
 
         *{__PACKAGE__ . '::' . '<<'} = sub {

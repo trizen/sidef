@@ -26,6 +26,7 @@ package Sidef::Exec {
 
     sub eval_array {
         my ($self, %opt) = @_;
+
         Sidef::Types::Array::Array->new(
             map {
                     ref eq 'HASH' ? $self->execute_expr(expr => $_, class => $opt{class})
@@ -121,13 +122,41 @@ package Sidef::Exec {
                         !$is_hash && ($self->valid_index($ind) || next);
 
                         $self_obj = (
-                                     (
-                                        $is_hash
-                                      ? $self_obj->{$ind}
-                                      : $self_obj->[$ind]
-                                     )
-                                     //= Sidef::Variable::Variable->new(rand, 'var')
-                                    );
+                            $is_hash
+                            ? do {
+                                (defined($self_obj) && (ref($self_obj) eq 'HASH' || $self_obj->isa('HASH')))
+                                  || ($self_obj = Sidef::Types::Hash::Hash->new());
+
+                                $self_obj->{$ind} //=
+                                  Sidef::Variable::Variable->new(
+                                                                 rand, 'var',
+                                                                 (
+                                                                  $l < $#{$expr->{ind}}
+                                                                  ? Sidef::Types::Hash::Hash->new
+                                                                  : ()
+                                                                 )
+                                                                );
+                              }
+                            : do {
+                                (defined($self_obj) && (ref($self_obj) eq 'ARRAY' || $self_obj->isa('ARRAY')))
+                                  || ($self_obj = Sidef::Types::Array::Array->new());
+
+                                foreach my $ind (0 .. ($$ind - 1)) {
+                                    $self_obj->[$ind] //=
+                                      Sidef::Variable::Variable->new(rand, 'var', Sidef::Types::Nil::Nil->new);
+                                }
+
+                                $self_obj->[$ind] //=
+                                  Sidef::Variable::Variable->new(
+                                                                 rand, 'var',
+                                                                 (
+                                                                  $l < $#{$expr->{ind}}
+                                                                  ? Sidef::Types::Array::Array->new
+                                                                  : ()
+                                                                 )
+                                                                );
+                              }
+                        );
                     }
 
                     if (
@@ -203,6 +232,16 @@ package Sidef::Exec {
                                     || ($type eq 'Sidef::Types::Bool::While'   and $method ~~ [qw(while)])
                                     || ($type eq 'Sidef::Types::Bool::Ternary' and $method ~~ [qw(:)])
                                     || ($type eq 'Sidef::Types::Bool::If'      and $method ~~ [qw(if elsif)])
+                                    || (
+                                        $type ~~ [
+                                            qw(
+                                              Sidef::Types::Array::Array
+                                              Sidef::Types::Chars::Chars
+                                              Sidef::Types::Bytes::Bytes
+                                              )
+                                        ]
+                                        and $method ~~ [qw(sort)]
+                                       )
                                     || (
                                         $type ~~ [
                                             qw(

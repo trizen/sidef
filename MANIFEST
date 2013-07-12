@@ -97,6 +97,7 @@ scripts/100_doors_2.sf
 scripts/100_doors_3.sf
 scripts/99_bottles.sf
 scripts/accumulator.sf
+scripts/array_autovivification.sf
 scripts/array_operators.sf
 scripts/array_unique.sf
 scripts/arrays.sf
@@ -118,6 +119,7 @@ scripts/function_recursion.sf
 scripts/functional_modules.sf
 scripts/functions.sf
 scripts/getopt.sf
+scripts/hash_autovivification.sf
 scripts/hash_from_array.sf
 scripts/hash_map.sf
 scripts/hashes.sf

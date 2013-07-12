@@ -20,7 +20,7 @@ array.join(" ").say;
 '-' * 80 say;
 
 {
-    var array = [0,6,10,12];
+    var array = (Array.new(0,6,10,12));
     array.map{ _ += 2 }.to_s.say;     # modifies the array in place
     array.to_s.say;
 }.run;
@@ -30,7 +30,7 @@ array.join(" ").say;
 '-' * 80 say;
 
 {
-    var array = [0,6,10,12];
+    var array = (Array.new(0,6,10,12));
     array.map{ _ + 2 }.to_s.say;      # doesn't modifies the array
     array.to_s.say;
 }.run;

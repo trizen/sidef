@@ -1,0 +1,25 @@
+#!/usr/bin/ruby
+
+var v = (Hash.new);
+
+v["x"] = "y";
+v["x"] == 'y'
+    || ("Error! (1)\n".die);
+
+
+v["a"]["b"]["c"] = "d";
+v["a"]["b"]["c"] == "d"
+    || ("Error! (2)\n".die);
+
+
+v["y"]["z"] = (:{"a" => "b"});
+v["y"]["z"]["a"] == "b"
+    || ("Error! (3)\n".die);
+
+
+v["y"]["z"]["b"] = "c";
+v["y"]["z"]["b"] == "c"
+    || ("Error! (4)\n".die);
+
+
+"All tests passed!".say;

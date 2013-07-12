@@ -40,6 +40,14 @@ Return the
 
 =cut
 
+=head2 &
+
+I<Num> B<&> I<Num> -> I<Num>
+
+Return the
+
+=cut
+
 =head2 *
 
 I<Num> B<*> I<Num> -> I<Num>
@@ -123,6 +131,14 @@ Return the
 =head2 <=
 
 I<Num> B<E<lt>=> I<Num> -> I<Num>
+
+Return the
+
+=cut
+
+=head2 <=>
+
+I<Num> B<E<lt>=E<gt>> I<Num> -> I<Num>
 
 Return the
 
@@ -331,6 +347,14 @@ Return the
 =head2 to
 
 Number.to() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 |
+
+I<Num> B<|> I<Num> -> I<Num>
 
 Return the
 
