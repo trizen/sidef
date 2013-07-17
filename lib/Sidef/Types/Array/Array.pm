@@ -313,8 +313,6 @@ package Sidef::Types::Array::Array {
         my ($self, $code) = @_;
 
         $self->_is_code($code) || return $self;
-
-        my $exec = Sidef::Exec->new();
         my ($var_ref) = $code->_get_private_var();
 
         $self->new(
@@ -332,8 +330,6 @@ package Sidef::Types::Array::Array {
         my ($self, $code) = @_;
 
         $self->_is_code($code) || return $self;
-
-        my $exec = Sidef::Exec->new();
         my ($var_ref) = $code->_get_private_var();
 
         $self->new(
@@ -351,8 +347,6 @@ package Sidef::Types::Array::Array {
         my ($self, $code) = @_;
 
         $self->_is_code($code) || return;
-
-        my $exec = Sidef::Exec->new();
         my ($var_ref) = $code->_get_private_var();
 
         foreach my $var (@{$self}) {
@@ -368,8 +362,6 @@ package Sidef::Types::Array::Array {
         my ($self, $code) = @_;
 
         $self->_is_code($code) || return;
-
-        my $exec = Sidef::Exec->new();
         my ($var_ref) = $code->_get_private_var();
 
         foreach my $var (@{$self}) {
@@ -387,8 +379,6 @@ package Sidef::Types::Array::Array {
         my ($self, $code) = @_;
 
         $self->_is_code($code) || return;
-
-        my $exec = Sidef::Exec->new();
         my ($var_ref) = $code->_get_private_var();
 
         foreach my $i (0 .. $#{$self}) {
@@ -410,8 +400,6 @@ package Sidef::Types::Array::Array {
         my ($self, $code) = @_;
 
         $self->_is_code($code) || return;
-
-        my $exec = Sidef::Exec->new();
         my ($var_ref) = $code->_get_private_var();
 
         my $offset = $#{$self};

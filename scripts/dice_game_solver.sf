@@ -11,16 +11,17 @@ var board = [
              [6, 2, 1, 6, 6, 3],
             ]
 
-var moves = (:{
-             'up'         => [-1, +0],
-             'up-right'   => [-1, +1],
-             'up-left'    => [-1, -1],
-             'right'      => [+0, +1],
-             'left'       => [+0, -1],
-             'down'       => [+1, +0],
-             'down-left'  => [+1, -1],
-             'down-right' => [+1, +1],
-            });
+var moves = (:(
+                'up'         => [-1, +0],
+                'up-right'   => [-1, +1],
+                'up-left'    => [-1, -1],
+                'right'      => [+0, +1],
+                'left'       => [+0, -1],
+                'down'       => [+1, +0],
+                'down-left'  => [+1, -1],
+                'down-right' => [+1, +1],
+              )
+            );
 
 var directions = (moves.keys);
 
@@ -63,11 +64,13 @@ while (true) {
 
         valid_move(row, col) || (break);
 
-        dirs.push(:{
-                'dir' => dir,
-                'num' => current_num,
-                'pos' => current_pos,
-            });
+        dirs.push(
+                  :(
+                    'dir' => dir,
+                    'num' => current_num,
+                    'pos' => current_pos,
+                   )
+                );
 
         map[current_num] := dir;
         current_pos = [row, col];

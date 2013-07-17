@@ -79,10 +79,9 @@ package Sidef::Parser {
                   )
             },
             re => {
-                match_flags        => qr{[msixpogcdual]+},
-                substitution_flags => qr{[msixpogcerdual]+},
-                var_name           => qr/[[:alpha:]_]\w*(?>::[[:alpha:]_]\w*)*+/,
-                operators          => do {
+                match_flags => qr{[msixpogcdual]+},
+                var_name    => qr/[[:alpha:]_]\w*(?>::[[:alpha:]_]\w*)*+/,
+                operators   => do {
                     local $" = q{|};
 
                     my @operators = map { quotemeta } qw(
@@ -292,7 +291,7 @@ package Sidef::Parser {
             }
 
             # Alpha-numeric method name
-            when (/\G([a-z]\w*)/gc) {
+            when (/\G([a-z]\w*!?)/gc) {
                 return {self => Sidef::Types::String::String->new($1)}, pos;
             }
 
@@ -325,8 +324,11 @@ package Sidef::Parser {
                 }
 
                 # Multi-line C comment
-                if (m{\G/\*(.*?)\*/}gsc) {
-                    $self->{line} += ($1 =~ tr/\n//);
+                if (m{\G/\*}gc) {
+                    while (1) {
+                        m{\G.*?\*/}gc && last;
+                        /\G.+/gc || (/\G\R/gc ? $self->{line}++ : last);
+                    }
                     redo;
                 }
 
@@ -662,74 +664,90 @@ package Sidef::Parser {
                     return Sidef::Types::Bool::Bool->new(), pos;
                 }
 
-                # New hash-block (:{})
+                # Hash
                 when (/\G(?=:)/) {
                     $self->{expect_method} = 1;
                     return Sidef::Types::Block::Code->new({}), pos;
                 }
 
+                # Defined-or
                 when (/\G(?=\\)/) {
                     $self->{expect_method} = 1;
                     return Sidef::Variable::Ref->new(), pos;
                 }
 
+                # Derefence
                 when (/\G(?=\*)/) {
                     $self->{expect_method} = 1;
                     return Sidef::Variable::Ref->new(), pos;
                 }
 
+                # Dir object
                 when (/\GDir\b/gc) {
                     return Sidef::Types::Glob::Dir->new(), pos;
                 }
 
+                # File object
                 when (/\GFile\b/gc) {
                     return Sidef::Types::Glob::File->new(), pos;
                 }
 
+                # Array object
                 when (/\GArr(?:ay)?\b/gc) {
                     return Sidef::Types::Array::Array->new(), pos;
                 }
 
+                # Hash object
                 when (/\GHash\b/gc) {
                     return Sidef::Types::Hash::Hash->new(), pos;
                 }
 
+                # String object
                 when (/\GStr(?:ing)?\b/gc) {
                     return Sidef::Types::String::String->new(), pos;
                 }
 
+                # Number object
                 when (/\GNum(?:ber)?\b/gc) {
                     return Sidef::Types::Number::Number->new(), pos;
                 }
 
+                # Pipe object
                 when (/\GPipe\b/gc) {
                     return Sidef::Types::Glob::Pipe->new(), pos;
                 }
 
+                # Byte object
                 when (/\GByte\b/gc) {
                     return Sidef::Types::Byte::Byte->new(), pos;
                 }
 
+                # Bytes object
                 when (/\GBytes\b/gc) {
                     return Sidef::Types::Byte::Bytes->new(), pos;
                 }
 
+                # Char object
                 when (/\GCha?r\b/gc) {
                     return Sidef::Types::Char::Char->new(), pos;
                 }
 
+                # Chars object
                 when (/\GCha?rs\b/gc) {
                     return Sidef::Types::Char::Chars->new(), pos;
                 }
 
+                # Bool object
                 when (/\GBool\b/gc) {
                     return Sidef::Types::Bool::Bool->new(), pos;
                 }
 
+                # Sys object
                 when (/\GSys\b/gc) {
                     return Sidef::Sys::Sys->new(), pos;
                 }
 
+                # Regex object
                 when (/\GRegex\b/gc) {
                     return Sidef::Types::Regex::Regex->new(''), pos;
                 }

@@ -107,7 +107,7 @@ package Sidef::Types::Number::Number {
 
         *{__PACKAGE__ . '::' . '<=>'} = sub {
             my ($self, $num) = @_;
-            $self->_is_number($num) || return;
+            $self->_is_number($num) || return Sidef::Types::Number::Number->new(-1);
             Sidef::Types::Number::Number->new($$self <=> $$num);
         };
 

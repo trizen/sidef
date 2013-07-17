@@ -94,7 +94,7 @@ package Sidef::Types::String::String {
 
         *{__PACKAGE__ . '::' . '<=>'} = sub {
             my ($self, $string) = @_;
-            $self->_is_string($string) || return $self;
+            $self->_is_string($string) || return Sidef::Types::Number::Number->new(-1);
             Sidef::Types::Number::Number->new($$self cmp $$string);
         };
 
@@ -121,6 +121,18 @@ package Sidef::Types::String::String {
 
         *{__PACKAGE__ . '::' . '^^'} = \&begins_with;
         *{__PACKAGE__ . '::' . '$$'} = \&ends_with;
+
+        *{__PACKAGE__ . '::' . 'gsub!'} = sub {
+            my ($self, @rest) = @_;
+            $$self = ${$self->gsub(@rest)};
+            $self;
+        };
+
+        *{__PACKAGE__ . '::' . 'sub!'} = sub {
+            my ($self, @rest) = @_;
+            $$self = ${$self->sub(@rest)};
+            $self;
+        };
     }
 
     sub uc {
@@ -301,7 +313,7 @@ package Sidef::Types::String::String {
             }
         }
 
-        Sidef::Types::Bool::Bool->new($$self =~ s{$regex}{$str});
+        $self->new($$self =~ s{$regex}{$str}r);
     }
 
     sub gsub {
@@ -315,7 +327,7 @@ package Sidef::Types::String::String {
             }
         }
 
-        Sidef::Types::Bool::Bool->new($$self =~ s{$regex}{$str}g);
+        $self->new($$self =~ s{$regex}{$str}gr);
     }
 
     sub glob {
