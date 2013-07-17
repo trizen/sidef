@@ -317,7 +317,7 @@ package Sidef::Exec {
         my $struct = $opt{'struct'};
 
         my @results;
-        foreach my $key (keys %{$struct}) {
+        foreach my $key ((grep { $_ ne 'main' } keys %{$struct}), 'main') {
 
             my $i = -1;
             local $self->{expr_i_max} = $#{$struct->{$key}};

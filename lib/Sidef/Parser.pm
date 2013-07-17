@@ -25,8 +25,8 @@ package Sidef::Parser {
             parentheses   => 0,
             strict_var    => 0,
             class         => 'main',
-            vars          => [],
-            ref_vars_refs => [],
+            vars          => {'main' => []},
+            ref_vars_refs => {'main' => []},
             keywords      => {
                 map { $_ => 1 }
                   qw(
@@ -56,12 +56,13 @@ package Sidef::Parser {
                   Sys
                   Regex
 
+                  my
                   var
                   const
                   byte
                   char
                   func
-                  my
+                  class
 
                   STDIN
                   STDOUT
@@ -79,7 +80,7 @@ package Sidef::Parser {
             re => {
                 match_flags        => qr{[msixpogcdual]+},
                 substitution_flags => qr{[msixpogcerdual]+},
-                var_name           => qr/[[:alpha:]_]\w*/,
+                var_name           => qr/[[:alpha:]_]\w*(?>::[[:alpha:]_]\w*)*+/,
                 operators          => do {
                     local $" = q{|};
 
@@ -156,19 +157,28 @@ package Sidef::Parser {
     }
 
     sub find_var {
-        my ($self, $var_name) = @_;
+        my ($self, $var_name, $class) = @_;
 
-        foreach my $var (@{$self->{vars}}) {
+        foreach my $var (@{$self->{vars}{$class}}) {
             next if ref $var eq 'ARRAY';
             return ($var, 1) if $var->{name} eq $var_name;
         }
 
-        foreach my $var (@{$self->{ref_vars_refs}}) {
+        foreach my $var (@{$self->{ref_vars_refs}{$class}}) {
             next if ref $var eq 'ARRAY';
             return ($var, 0) if $var->{name} eq $var_name;
         }
 
         return;
+    }
+
+    sub get_name_and_class {
+        my ($self, $var_name) = @_;
+
+        my $rindex = rindex($var_name, '::');
+        $rindex != -1
+          ? (substr($var_name, $rindex + 2), substr($var_name, 0, $rindex))
+          : ($var_name, $self->{class});
     }
 
     sub get_caller_num {
@@ -433,8 +443,8 @@ package Sidef::Parser {
 
                     my ($obj, $pos) = $self->parse_array(code => substr($_, pos));
 
-                    if (ref $obj->{main} eq 'ARRAY') {
-                        push @{$array}, (@{$obj->{main}});
+                    if (ref $obj->{$self->{class}} eq 'ARRAY') {
+                        push @{$array}, (@{$obj->{$self->{class}}});
                     }
 
                     return $array, pos($_) + $pos;
@@ -456,7 +466,9 @@ package Sidef::Parser {
                     my @vars = split(/\h*,\h*/, $names);
 
                     my @var_objs;
-                    foreach my $name (@vars) {
+                    foreach my $var_name (@vars) {
+
+                        my ($name, $class) = $self->get_name_and_class($var_name);
 
                         if (exists $self->{keywords}{$name}) {
                             $self->fatal_error(
@@ -466,7 +478,7 @@ package Sidef::Parser {
                                               );
                         }
 
-                        my ($var, $code) = $self->find_var($name);
+                        my ($var, $code) = $self->find_var($name, $class);
 
                         if (defined $var and $code == 1) {
                             warn "Redeclaration of $type '$name' in same scope, at line $self->{line}\n";
@@ -475,7 +487,7 @@ package Sidef::Parser {
                         my $obj = Sidef::Variable::Variable->new($name, $type);
                         push @var_objs, $obj;
 
-                        unshift @{$self->{vars}},
+                        unshift @{$self->{vars}{$self->{class}}},
                           {
                             obj   => $obj,
                             name  => $name,
@@ -506,7 +518,7 @@ package Sidef::Parser {
                       ? Sidef::Variable::My->new($name)
                       : Sidef::Variable::Variable->new($name, $type);
 
-                    unshift @{$self->{vars}},
+                    unshift @{$self->{vars}{$self->{class}}},
                       {
                         obj   => $variable,
                         name  => $name,
@@ -782,7 +794,7 @@ package Sidef::Parser {
                     my $name = $1;
                     my $type = 'var';
 
-                    my ($var, $code) = $self->find_var($name);
+                    my ($var, $code) = $self->find_var($name, $self->{class});
 
                     if (ref $var) {
                         pos($_) -= length($name);
@@ -791,7 +803,7 @@ package Sidef::Parser {
 
                     my $variable = Sidef::Variable::Variable->new($name, $type);
 
-                    unshift @{$self->{vars}},
+                    unshift @{$self->{vars}{$self->{class}}},
                       {
                         obj   => $variable,
                         name  => $name,
@@ -825,15 +837,15 @@ package Sidef::Parser {
                 # Variable call
                 when (/\G($self->{re}{var_name})/goc) {
 
-                    my $name = $1;
-                    my ($var, $code) = $self->find_var($name);
+                    my ($name, $class) = $self->get_name_and_class($1);
+                    my ($var, $code) = $self->find_var($name, $class);
 
                     if (ref $var) {
                         $var->{count}++;
                         return $var->{obj}, pos;
                     }
                     elsif (not $self->{strict_var}) {
-                        unshift @{$self->{vars}},
+                        unshift @{$self->{vars}{$self->{class}}},
                           {
                             obj   => Sidef::Variable::My->new($name),
                             name  => $name,
@@ -905,21 +917,21 @@ package Sidef::Parser {
                 $self->{expect_method} = 0;
                 $self->{curly_brackets}++;
 
-                my $ref   = $self->{vars};
-                my $count = scalar(@{$self->{vars}});
+                my $ref   = $self->{vars}{$self->{class}};
+                my $count = scalar(@{$self->{vars}{$self->{class}}});
 
-                unshift @{$self->{ref_vars_refs}}, @{$ref};
-                unshift @{$self->{vars}}, [];
+                unshift @{$self->{ref_vars_refs}{$self->{class}}}, @{$ref};
+                unshift @{$self->{vars}{$self->{class}}}, [];
 
-                $self->{vars} = $self->{vars}[0];
+                $self->{vars}{$self->{class}} = $self->{vars}{$self->{class}}[0];
 
                 my $block = Sidef::Types::Block::Code->new({});
                 local $self->{current_block} = $block;
                 my ($obj, $pos) = $self->parse_script(code => '\\var _;' . substr($_, pos));
                 %{$block} = %{$obj};
 
-                splice @{$self->{ref_vars_refs}}, 0, $count;
-                $self->{vars} = $ref;
+                splice @{$self->{ref_vars_refs}{$self->{class}}}, 0, $count;
+                $self->{vars}{$self->{class}} = $ref;
 
                 return $block, pos($_) + $pos - 7;
             }
@@ -936,29 +948,11 @@ package Sidef::Parser {
                     pos($_) += $pos;
                 }
 
-=for comment
-
-                # Class declaration -- needs to be redesigned (or removed completely)
-                when (/\Gclass\b\h*/gc) {
-                    my ($class, $pos) = $self->parse_expr(code => substr($_, pos));
-                    pos($_) += $pos;
-
-                    if (ref($class) eq 'Sidef::Types::String::String') {
-                        $self->{class} = $$class;
-                    }
-                    else {
-                        $self->fatal_error(
-                                           error    => "invalid class name",
-                                           expected => "expected: class 'name';",
-                                           code     => $_,
-                                           pos      => pos($_)
-                                          );
-                    }
-
+                # Class declaration
+                when (/\Gclass\h+($self->{re}{var_name})/goc) {
+                    $self->{class} = $1;
                     redo;
                 }
-
-=cut
 
                 # We are at the end of the script.
                 # We make some checks, and return the \%struct hash ref.
@@ -966,18 +960,23 @@ package Sidef::Parser {
 
                     my $check_vars;
                     $check_vars = sub {
-                        my ($array_ref) = @_;
+                        my ($hash_ref) = @_;
 
-                        foreach my $variable (@{$array_ref}) {
-                            if (ref $variable eq 'ARRAY') {
-                                $check_vars->($variable);
-                            }
-                            elsif ($variable->{name} ne uc($variable->{name}) and $variable->{count} == 0) {
-                                warn "Variable '$variable->{name}' has been initialized"
-                                  . " at line $variable->{line}, but not used again!\n";
-                            }
-                            elsif ($DEBUG) {
-                                warn "Variable '$variable->{name}' is used $variable->{count} times!\n";
+                        foreach my $class (keys %{$hash_ref}) {
+
+                            my $array_ref = $hash_ref->{$class};
+
+                            foreach my $variable (@{$array_ref}) {
+                                if (ref $variable eq 'ARRAY') {
+                                    $check_vars->({$class => $variable});
+                                }
+                                elsif ($variable->{name} ne uc($variable->{name}) and $variable->{count} == 0) {
+                                    warn "Variable '$variable->{name}' has been initialized"
+                                      . " at line $variable->{line}, but not used again!\n";
+                                }
+                                elsif ($DEBUG) {
+                                    warn "Variable '$variable->{name}' is used $variable->{count} times!\n";
+                                }
                             }
                         }
 

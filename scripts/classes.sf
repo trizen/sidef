@@ -1,0 +1,68 @@
+#!/usr/bin/ruby
+
+class Math;
+
+var public_var  = "This is a public class variable!";
+    private_var = "This is a private class variable!";
+
+private_var != nil
+    || ("Private var fail!\n".die);
+
+func solve (x, y) {
+    x * y
+}
+
+#
+## Function calls for Math::solve()
+#
+
+solve(4, 5) == 20
+    || ("Class call fail!\n".die);
+
+Math::solve(5, 9) == 45
+    || ("Class call fail! (2)\n".die);
+
+#
+## Declaration of the main class
+#
+
+class main;
+
+func solve (x, y) {
+    x + y
+}
+
+#
+## Testing the public variable
+#
+
+Math::public_var != nil
+    || ("public_var is not public!\n".die);
+
+#
+## Testing the private variable
+#
+
+Math::private_var == nil
+    || ("private_var is not private!\n".die);
+
+#
+## Testing the Math::solve() function
+#
+
+Math::solve(3, 4) == 12
+    || ("Math::solve error!\n".die);
+
+#
+## Testing the main::solve() function
+#
+
+solve(3, 4) == 7
+    || ("main::solve error!\n".die);
+
+
+#
+## Everything is OK
+#
+
+"All tests passed!".say;

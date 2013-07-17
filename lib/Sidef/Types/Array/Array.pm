@@ -315,7 +315,9 @@ package Sidef::Types::Array::Array {
         $self->_is_code($code) || return $self;
 
         my $exec = Sidef::Exec->new();
-        my $var_ref = $exec->execute_expr(expr => $code->{main}[0], class => 'main');
+
+        my ($class) = keys %{$code};
+        my $var_ref = $exec->execute_expr(expr => $code->{$class}[0], class => $class);
 
         $self->new(
             map {
@@ -334,7 +336,9 @@ package Sidef::Types::Array::Array {
         $self->_is_code($code) || return $self;
 
         my $exec = Sidef::Exec->new();
-        my $var_ref = $exec->execute_expr(expr => $code->{main}[0], class => 'main');
+
+        my ($class) = keys %{$code};
+        my $var_ref = $exec->execute_expr(expr => $code->{$class}[0], class => $class);
 
         $self->new(
             grep {
@@ -353,7 +357,9 @@ package Sidef::Types::Array::Array {
         $self->_is_code($code) || return;
 
         my $exec = Sidef::Exec->new();
-        my $var_ref = $exec->execute_expr(expr => $code->{main}[0], class => 'main');
+
+        my ($class) = keys %{$code};
+        my $var_ref = $exec->execute_expr(expr => $code->{$class}[0], class => $class);
 
         foreach my $var (@{$self}) {
             my $val = $var->get_value;
@@ -370,7 +376,9 @@ package Sidef::Types::Array::Array {
         $self->_is_code($code) || return;
 
         my $exec = Sidef::Exec->new();
-        my $var_ref = $exec->execute_expr(expr => $code->{main}[0], class => 'main');
+
+        my ($class) = keys %{$code};
+        my $var_ref = $exec->execute_expr(expr => $code->{$class}[0], class => $class);
 
         foreach my $var (@{$self}) {
             my $val = $var->get_value;
@@ -389,7 +397,9 @@ package Sidef::Types::Array::Array {
         $self->_is_code($code) || return;
 
         my $exec = Sidef::Exec->new();
-        my $var_ref = $exec->execute_expr(expr => $code->{main}[0], class => 'main');
+
+        my ($class) = keys %{$code};
+        my $var_ref = $exec->execute_expr(expr => $code->{$class}[0], class => $class);
 
         foreach my $i (0 .. $#{$self}) {
             my $var = $self->[$i];
@@ -412,7 +422,9 @@ package Sidef::Types::Array::Array {
         $self->_is_code($code) || return;
 
         my $exec = Sidef::Exec->new();
-        my $var_ref = $exec->execute_expr(expr => $code->{main}[0], class => 'main');
+
+        my ($class) = keys %{$code};
+        my $var_ref = $exec->execute_expr(expr => $code->{$class}[0], class => $class);
 
         my $offset = $#{$self};
         for (my $i = $offset ; $i >= 0 ; $i--) {

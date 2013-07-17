@@ -167,3 +167,4 @@ talks/alpha-release/sidef.odp
 utils/doc.pl
 utils/pod_generator.pl
 utils/struct.pl
+scripts/classes.sf
