@@ -1,15 +1,15 @@
 #!/usr/bin/ruby
 
 var hash = (
-    :{
+    :(
         "id",    12,
         "stats", [1, 42, 99, Hash.new("status" => "working...")],
-        "info",  :{
+        "info",  :(
                     "price"  => '$49',
                     "amount" => 1200,
                     "name"   => "Google Chrome",
-                 },
-    },
+                  ),
+     ),
 );
 
 hash.keys.to_s.say;

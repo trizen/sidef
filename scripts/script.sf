@@ -40,7 +40,7 @@ fh->readline->print;
 
 # OR:
 
-file = ("sidef"->stat_file);
+file = ("sidef"->to_file);
 
 "\nFile name is: "->print;
 file->name->say;

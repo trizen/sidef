@@ -18,8 +18,8 @@ var obj = (String.new(...));
 
 Inherits methods from:
 
-	* Sidef
-	* Sidef::Convert::Convert
+    * Sidef
+    * Sidef::Convert::Convert
 
 =head1 METHODS
 
@@ -419,22 +419,6 @@ Return the
 =head2 starts_with
 
 String.starts_with() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 stat_dir
-
-String.stat_dir() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 stat_file
-
-String.stat_file() -> I<Bool>
 
 Return the
 

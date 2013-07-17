@@ -213,8 +213,8 @@ package Sidef::Types::Glob::File {
     sub abs_name {
         my ($self) = @_;
 
-        require Cwd;
-        __PACKAGE__->new(Cwd::abs_path($$self));
+        require File::Spec;
+        __PACKAGE__->new(File::Spec->rel2abs($$self));
     }
 
     sub open {
@@ -230,15 +230,27 @@ package Sidef::Types::Glob::File {
         $self->open('<');
     }
 
+    *openR     = \&open_r;
+    *openRead  = \&open_r;
+    *open_read = \&open_r;
+
     sub open_w {
         my ($self) = @_;
         $self->open('>');
     }
 
+    *openW      = \&open_w;
+    *openWrite  = \&open_w;
+    *open_write = \&open_w;
+
     sub open_a {
         my ($self) = @_;
         $self->open('>>');
     }
+
+    *openA       = \&open_a;
+    *openAppend  = \&open_a;
+    *open_append = \&open_a;
 
     sub stat {
         my ($self) = @_;

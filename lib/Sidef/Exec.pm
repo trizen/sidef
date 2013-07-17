@@ -228,20 +228,10 @@ package Sidef::Exec {
                                 ref($arg) eq 'HASH'
                                 and not(
                                        ($type eq 'Sidef::Types::Bool::Bool' and $method ~~ [qw(&& || ?)])
-                                    || ($type eq 'Sidef::Types::Block::Code'   and $method ~~ [qw(while)])
+                                    || ($type eq 'Sidef::Types::Block::Code'   and $method ~~ [qw(while :)])
                                     || ($type eq 'Sidef::Types::Bool::While'   and $method ~~ [qw(while)])
                                     || ($type eq 'Sidef::Types::Bool::Ternary' and $method ~~ [qw(:)])
                                     || ($type eq 'Sidef::Types::Bool::If'      and $method ~~ [qw(if elsif)])
-                                    || (
-                                        $type ~~ [
-                                            qw(
-                                              Sidef::Types::Array::Array
-                                              Sidef::Types::Chars::Chars
-                                              Sidef::Types::Bytes::Bytes
-                                              )
-                                        ]
-                                        and $method ~~ [qw(sort)]
-                                       )
                                     || (
                                         $type ~~ [
                                             qw(

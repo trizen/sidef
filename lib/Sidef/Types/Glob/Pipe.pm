@@ -34,10 +34,18 @@ package Sidef::Types::Glob::Pipe {
         $self->open('-|');
     }
 
+    *openR     = \&open_r;
+    *openRead  = \&open_r;
+    *open_read = \&open_r;
+
     sub open_w {
         my ($self) = @_;
         $self->open('|-');
     }
+
+    *openW      = \&open_w;
+    *openWrite  = \&open_w;
+    *open_write = \&open_w;
 
     sub dump {
         my ($self) = @_;

@@ -61,10 +61,14 @@ package Sidef::Types::Bool::Bool {
         $self->new($$self eq 'true');
     }
 
+    *isTrue = \&is_true;
+
     sub is_false {
         my ($self) = @_;
         $self->new($$self eq 'false');
     }
+
+    *isFalse = \&is_false;
 
     sub not {
         my ($self) = @_;

@@ -135,7 +135,9 @@ package Sidef::Types::String::String {
         $self->new(CORE::ucfirst $$self);
     }
 
-    *tc = \&ucfirst;
+    *tc         = \&ucfirst;
+    *titleCase  = \&ucfirst;
+    *title_case = \&ucfirst;
 
     sub lc {
         my ($self) = @_;
@@ -160,6 +162,8 @@ package Sidef::Types::String::String {
         Sidef::Types::Char::Char->new(CORE::substr($$self, $$pos, 1));
     }
 
+    *char_at = \&charAt;
+
     sub wordcase {
         my ($self) = @_;
 
@@ -172,6 +176,9 @@ package Sidef::Types::String::String {
 
         $self->new($string);
     }
+
+    *wc       = \&wordcase;
+    *wordCase = \&wordcase;
 
     sub chop {
         my ($self) = @_;
@@ -224,6 +231,9 @@ package Sidef::Types::String::String {
         CORE::substr($$self, $$pos, $$len, $$string);
         return $self;
     }
+
+    *insert_at = \&insert;
+    *insertAt  = \&insert;
 
     sub join {
         my ($self, $delim, @rest) = @_;
@@ -337,17 +347,7 @@ package Sidef::Types::String::String {
         Sidef::Types::Number::Number->new(CORE::length($$self));
     }
 
-    *len = \&length;    # alias for 'len'
-
-    sub stat_file {
-        my ($self) = @_;
-        Sidef::Types::Glob::File->new($$self);
-    }
-
-    sub stat_dir {
-        my ($self) = @_;
-        Sidef::Types::Glob::Dir->new($$self);
-    }
+    *len = \&length;
 
     sub eval {
         my ($self) = @_;
@@ -391,6 +391,7 @@ package Sidef::Types::String::String {
 
     *starts_with = \&begins_with;
     *startsWith  = \&begins_with;
+    *beginsWith  = \&begins_with;
 
     sub ends_with {
         my ($self, $string) = @_;

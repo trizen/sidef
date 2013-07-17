@@ -1,4 +1,4 @@
 #!/usr/bin/ruby
 
-((:{2,'A',4,'H',1,'J',3,'S'})[1..4])map{var ß:=['tsu','rehton','fe'
+((:(2,'A',4,'H',1,'J',3,'S'))[1..4])map{var ß:=['tsu','rehton','fe'
 +'di','rekca'];_+=(ß<<1->pop.reverse+(ß.len==0? ',':' '))}join.say;

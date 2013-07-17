@@ -30,7 +30,7 @@ package Sidef::Parser {
             keywords      => {
                 map { $_ => 1 }
                   qw(
-                  q qq qw qqw
+                  q qq qw qqw qf qqf qd qqd
                   break
                   return
                   for foreach
@@ -387,6 +387,32 @@ package Sidef::Parser {
                 when (/\G(?=["\“„])/ || /\Gqq\b/gc) {
                     my ($string, $pos) = $self->get_quoted_string(code => (substr($_, pos)));
                     return Sidef::Types::String::String->new($string)->apply_escapes->unescape(), pos($_) + $pos;
+                }
+
+                # Single quoted filename
+                when (/\Gqf\b/gc) {
+                    my ($string, $pos) = $self->get_quoted_string(code => substr($_, pos));
+                    return Sidef::Types::Glob::File->new($string =~ s{\\\\}{\\}gr), pos($_) + $pos;
+                }
+
+                # Double quoted filename
+                when (/\Gqqf\b/gc) {
+                    my ($string, $pos) = $self->get_quoted_string(code => (substr($_, pos)));
+                    return Sidef::Types::Glob::File->new(
+                                   Sidef::Types::String::String->new($string)->apply_escapes->unescape), pos($_) + $pos;
+                }
+
+                # Single quoted dirname
+                when (/\Gqd\b/gc) {
+                    my ($string, $pos) = $self->get_quoted_string(code => substr($_, pos));
+                    return Sidef::Types::Glob::Dir->new($string =~ s{\\\\}{\\}gr), pos($_) + $pos;
+                }
+
+                # Double quoted dirname
+                when (/\Gqqd\b/gc) {
+                    my ($string, $pos) = $self->get_quoted_string(code => (substr($_, pos)));
+                    return Sidef::Types::Glob::Dir->new(
+                                   Sidef::Types::String::String->new($string)->apply_escapes->unescape), pos($_) + $pos;
                 }
 
                 # Object as expression

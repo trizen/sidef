@@ -33,11 +33,12 @@ package Sidef::Types::Block::Code {
         *{__PACKAGE__ . '::' . ':'} = sub {
             my ($self, $code) = @_;
 
-            if (ref($code) eq 'Sidef::Types::Block::Code') {
-                return $code->to_hash;
+            if (ref($code) eq 'HASH') {
+                return Sidef::Types::Hash::Hash->new($exec->execute(struct => $code));
             }
 
-            return $self;
+            warn "[WARN] Missing argument for hash operator ':'!\n";
+            return;
         };
     }
 
@@ -47,6 +48,17 @@ package Sidef::Types::Block::Code {
         shift @results;    # ignore the block private variable (_)
         Sidef::Types::Hash::Hash->new(@results);
     }
+
+    *toHash = \&to_hash;
+
+    sub to_array {
+        my ($self) = @_;
+        my @results = $exec->execute(struct => $self);
+        shift @results;    # ignore the block private variable (_)
+        Sidef::Types::Array::Array->new(@results);
+    }
+
+    *toArray = \&to_array;
 
     sub _run_code {
         my ($self) = @_;

@@ -76,11 +76,11 @@ var xyz = (Array.new);
     var i = _;
     xyz[i] = (
       calculate_delta(
-                      :{    # it's an HASH (notice the ':')
+                      :(    # it's an HASH (notice the ':')
                         'matrix'     => matrix,
                         'free_terms' => free_terms,
                         'position'   => i,
-                      }
+                       )
                      )
                 )
 } for (free_terms.range);

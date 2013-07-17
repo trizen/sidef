@@ -42,6 +42,8 @@ package Sidef::Types::Regex::Matches {
         $hash;
     }
 
+    *namedMatches = \&named_matches;
+
     {
         no strict 'refs';
         *{__PACKAGE__ . '::' . '??'} = \&matched;

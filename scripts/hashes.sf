@@ -23,7 +23,7 @@ hash["key"] == "changed"
 ## Block-code to hash
 #
 
-var hash2 = (:{"key" => "value"});
+var hash2 = (:("key" => "value"));
 
 hash2["key"] = "jjj";
 hash2["key"] == "jjj"

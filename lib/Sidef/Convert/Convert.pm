@@ -34,37 +34,56 @@ package Sidef::Convert::Convert {
         Sidef::Types::String::String->new("$$self");
     }
 
+    *toString  = \&to_s;
+    *to_string = \&to_s;
+
     sub to_i {
         my ($self) = @_;
+        $self->_is_number($self, 0, 1) || $self->_is_string($self) || return;
         Sidef::Types::Number::Number->new(int $$self);
     }
 
+    *to_integer = \&to_i;
+    *toInt      = \&to_i;
+    *to_int     = \&to_i;
+    *toInteger  = \&to_i;
+
     sub to_file {
         my ($self) = @_;
-        $self->_is_string($self) || return $self;
+        $self->_is_string($self) || return;
         Sidef::Types::Glob::File->new($$self);
     }
 
+    *toFile = \&to_file;
+
     sub to_dir {
         my ($self) = @_;
-        $self->_is_string($self) || return $self;
+        $self->_is_string($self) || return;
         Sidef::Types::Glob::Dir->new($$self);
     }
+
+    *toDir = \&to_dir;
 
     sub to_bool {
         my ($self) = @_;
         Sidef::Types::Bool::Bool->new($$self);
     }
 
+    *toBool = \&to_bool;
+
     sub to_byte {
         my ($self) = @_;
         Sidef::Types::Byte::Byte->new(CORE::ord $$self);
     }
 
+    *toByte = \&to_byte;
+
     sub to_char {
         my ($self) = @_;
         Sidef::Types::Char::Char->new(substr($$self, 0, 1));
     }
+
+    *toChar = \&to_char;
 
     sub to_bytes {
         my ($self) = @_;
@@ -78,13 +97,19 @@ package Sidef::Convert::Convert {
         Sidef::Types::Byte::Bytes->new(@bytes);
     }
 
+    *toBytes = \&to_bytes;
+
     sub to_chars {
         my ($self) = @_;
         Sidef::Types::Char::Chars->new(map { Sidef::Types::Char::Char->new($_) } split //, $$self);
     }
 
+    *toChars = \&to_chars;
+
     sub to_array {
         my ($self) = @_;
         Sidef::Types::Array::Array->new($self);
     }
+
+    *toArray = \&to_array;
 }

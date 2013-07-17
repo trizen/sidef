@@ -108,7 +108,7 @@ package Sidef::Types::Number::Number {
         *{__PACKAGE__ . '::' . '<=>'} = sub {
             my ($self, $num) = @_;
             $self->_is_number($num) || return;
-            Sidef::Types::Bool::Bool->new($$self <=> $$num);
+            Sidef::Types::Number::Number->new($$self <=> $$num);
         };
 
         *{__PACKAGE__ . '::' . '<='} = sub {
@@ -154,6 +154,8 @@ package Sidef::Types::Number::Number {
         $self->_is_number($n) || return $self;
         $self->new($$self**(1 / $$n));
     }
+
+    *sqrtN = \&sqrt_n;
 
     sub pi {
         my ($self) = @_;
@@ -205,30 +207,44 @@ package Sidef::Types::Number::Number {
         $self->new(2 << CORE::log($$self) / CORE::log(2));
     }
 
+    *nextPowerOfTwo = \&next_power_of_two;
+
     sub is_positive {
         my ($self) = @_;
         Sidef::Types::Bool::Bool->new($$self > 0);
     }
+
+    *isPositive = \&is_positive;
 
     sub is_negative {
         my ($self) = @_;
         Sidef::Types::Bool::Bool->new($$self < 0);
     }
 
+    *isNegative = \&is_negative;
+
     sub is_even {
         my ($self) = @_;
         Sidef::Types::Bool::Bool->new($$self % 2 == 0);
     }
+
+    *isEven = \&is_even;
 
     sub is_odd {
         my ($self) = @_;
         Sidef::Types::Bool::Bool->new($$self % 2 != 0);
     }
 
+    *isOdd = \&is_odd;
+
     sub is_integer {
         my ($self) = @_;
         Sidef::Types::Bool::Bool->new($$self - CORE::int($$self) == 0);
     }
+
+    *isInt     = \&is_integer;
+    *is_int    = \&is_integer;
+    *isInteger = \&is_integer;
 
     sub rand {
         my ($self, $max) = @_;

@@ -50,6 +50,8 @@ package Sidef::Types::Glob::Dir {
         Sidef::Types::Bool::Bool->new(File::Path::remove_tree($$self));
     }
 
+    *removeTree = \&remove_tree;
+
     # Create directory without parents
     sub create {
         my ($self) = @_;
@@ -76,6 +78,10 @@ package Sidef::Types::Glob::Dir {
         require File::Spec;
         __PACKAGE__->new(File::Spec->rel2abs($$self));
     }
+
+    *absName  = \&abs_name;
+    *abs_path = \&abs_name;
+    *absPath  = \&abs_name;
 
     sub open {
         my ($self) = @_;

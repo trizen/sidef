@@ -350,7 +350,7 @@ package Sidef::Types::Array::Array {
     sub find {
         my ($self, $code) = @_;
 
-        $self->_is_code($code) || return $self;
+        $self->_is_code($code) || return;
 
         my $exec = Sidef::Exec->new();
         my $var_ref = $exec->execute_expr(expr => $code->{main}[0], class => 'main');
@@ -367,7 +367,7 @@ package Sidef::Types::Array::Array {
     sub all {
         my ($self, $code) = @_;
 
-        $self->_is_code($code) || return $self;
+        $self->_is_code($code) || return;
 
         my $exec = Sidef::Exec->new();
         my $var_ref = $exec->execute_expr(expr => $code->{main}[0], class => 'main');
@@ -386,7 +386,7 @@ package Sidef::Types::Array::Array {
     sub first_index {
         my ($self, $code) = @_;
 
-        $self->_is_code($code) || return $self;
+        $self->_is_code($code) || return;
 
         my $exec = Sidef::Exec->new();
         my $var_ref = $exec->execute_expr(expr => $code->{main}[0], class => 'main');
@@ -409,7 +409,7 @@ package Sidef::Types::Array::Array {
     sub last_index {
         my ($self, $code) = @_;
 
-        $self->_is_code($code) || return $self;
+        $self->_is_code($code) || return;
 
         my $exec = Sidef::Exec->new();
         my $var_ref = $exec->execute_expr(expr => $code->{main}[0], class => 'main');
@@ -502,24 +502,25 @@ package Sidef::Types::Array::Array {
         $self;
     }
 
-    sub unique {
-        my ($self) = @_;
+    sub _unique {
+        my ($self, $last) = @_;
 
         my %indices;
         my $method = '==';
         my $max    = $#{$self};
 
-        foreach my $i (0 .. $max - 1) {
+        for (my $i = 0 ; $i <= ($max - 1) ; $i++) {
             for (my $j = $i + 1 ; $j <= $max ; $j++) {
                 my $diff = ($#{$self} - $max);
                 my ($x, $y) = ($self->[$i + $diff]->get_value, $self->[$j + $diff]->get_value);
+
                 if (ref($x) eq ref($y) and $x->can($method) and $x->$method($y)) {
 
-                    # {$i + $diff}  -- to keep the last occurred duplicates
-                    undef $indices{$j + $diff};
+                    undef $indices{$last ? ($i + $diff) : ($j + $diff)};
 
                     --$max;
                     --$j;
+                    --$i;
                 }
             }
         }
@@ -527,8 +528,22 @@ package Sidef::Types::Array::Array {
         $self->new(map { $self->[$_]->get_value } grep { not exists $indices{$_} } 0 .. $#{$self});
     }
 
+    sub unique {
+        my ($self) = @_;
+        $self->_unique(0);
+    }
+
     *uniq     = \&unique;
     *distinct = \&unique;
+
+    sub uniqueLast {
+        my ($self) = @_;
+        $self->_unique(1);
+    }
+
+    *uniqLast    = \&uniqueLast;
+    *unique_last = \&uniqueLast;
+    *uniq_last   = \&uniqueLast;
 
     sub contains {
         my ($self, $obj) = @_;
@@ -647,6 +662,29 @@ package Sidef::Types::Array::Array {
         my ($self) = @_;
         $#{$self} > -1 || return;
         (shift @{$self})->get_value;
+    }
+
+    sub sort {
+        my ($self, $code) = @_;
+
+        if (defined $code) {
+
+            my ($class) = keys %{$code};
+            my $comp_code = {$class => [@{$code->{$class}}[1 .. $#{$code->{$class}}]],};
+
+            my $exec = Sidef::Exec->new();
+            my $var_ref = $exec->execute_expr(expr => $code->{$class}[0], class => $class);
+
+            return $self->new(
+                sort {
+                    $var_ref->get_var->set_value(Sidef::Types::Array::Array->new($a, $b));
+                    Sidef::Types::Block::Code->new($comp_code)->run;
+                  } map { $_->get_value } @{$self}
+            );
+        }
+
+        my $method = '<=>';
+        $self->new(sort { $a->can($method) && ($a->$method($b) // -1) } map { $_->get_value } @{$self});
     }
 
     sub push {
