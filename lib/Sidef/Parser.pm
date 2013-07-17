@@ -40,6 +40,7 @@ package Sidef::Parser {
                   require
                   true false
                   nil
+                  import
 
                   Array
                   File
@@ -463,10 +464,8 @@ package Sidef::Parser {
                                            error => "invalid variable name!",
                                           );
 
-                    my @vars = split(/\h*,\h*/, $names);
-
                     my @var_objs;
-                    foreach my $var_name (@vars) {
+                    foreach my $var_name (split(/\h*,\h*/, $names)) {
 
                         my ($name, $class) = $self->get_name_and_class($var_name);
 
@@ -951,6 +950,53 @@ package Sidef::Parser {
                 # Class declaration
                 when (/\Gclass\h+($self->{re}{var_name})/goc) {
                     $self->{class} = $1;
+                    redo;
+                }
+
+                when (/\Gimport\b\h*/gc) {
+
+                    my $names =
+                        /\G($self->{re}{var_name})/goc ? $1
+                      : /\G$self->{re}{vars}/goc       ? $1
+                      : $self->fatal_error(
+                                           code  => $_,
+                                           pos   => (pos($_)),
+                                           error => "invalid variable name!",
+                                          );
+
+                    foreach my $var_name (split(/\h*,\h*/, $names)) {
+                        my ($name, $class) = $self->get_name_and_class($var_name);
+
+                        if ($class eq $self->{class}) {
+                            $self->fatal_error(
+                                               code  => $_,
+                                               pos   => pos($_) - length($names),
+                                               error => "can't import '${class}::${name}' inside the same class",
+                                              );
+                        }
+
+                        my ($var, $code) = $self->find_var($name, $class);
+
+                        if (not defined $var) {
+                            $self->fatal_error(
+                                               code  => $_,
+                                               pos   => pos($_) - length($names),
+                                               error => "variable '${class}::${name}' hasn't been declared",
+                                              );
+                        }
+
+                        $var->{count}++;
+
+                        unshift @{$self->{vars}{$self->{class}}},
+                          {
+                            obj   => $var->{obj},
+                            name  => $name,
+                            count => 0,
+                            type  => $var->{type},
+                            line  => $self->{line},
+                          };
+                    }
+
                     redo;
                 }
 

@@ -68,6 +68,13 @@ package Sidef::Types::Block::Code {
           :                                                 ();
     }
 
+    sub _get_private_var {
+        my ($self) = @_;
+
+        my ($class) = keys %{$self};
+        $exec->execute_expr(expr => $self->{$class}[0], class => $class), $class;
+    }
+
     sub run {
         my ($self) = @_;
         my @results = $exec->execute(struct => $self);
@@ -164,15 +171,12 @@ package Sidef::Types::Block::Code {
         my ($self, $arg) = @_;
 
         if ($self->_is_array($arg, 1, 1)) {
-            foreach my $class (keys %{$self}) {
+            my ($var_ref) = $self->_get_private_var();
 
-                my $var_ref = $exec->execute_expr(expr => $self->{$class}[0], class => $class);
-
-                foreach my $item (@{$arg}) {
-                    $var_ref->get_var->set_value($item->get_value);
-                    my $res = $self->_run_code();
-                    return $res if defined $res;
-                }
+            foreach my $item (@{$arg}) {
+                $var_ref->get_var->set_value($item->get_value);
+                my $res = $self->_run_code();
+                return $res if defined $res;
             }
         }
         elsif (ref $arg eq 'HASH') {

@@ -61,6 +61,20 @@ solve(3, 4) == 7
     || ("main::solve error!\n".die);
 
 
+/*
+    Import:
+        Math::solve()    -> solve()
+        Math::public_var -> public_var
+*/
+
+import(Math::solve, Math::public_var);
+
+solve(8, 6) == 48
+    || ("import failed!\n".die);
+
+public_var != nil
+    || ("import failed! (2)".die);
+
 #
 ## Everything is OK
 #
