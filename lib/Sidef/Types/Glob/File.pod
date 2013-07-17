@@ -495,9 +495,65 @@ Return the
 
 =cut
 
+=head2 openA
+
+File.openA() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 openAppend
+
+File.openAppend() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 openR
+
+File.openR() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 openRead
+
+File.openRead() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 openW
+
+File.openW() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 openWrite
+
+File.openWrite() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 open_a
 
 File.open_a() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 open_append
+
+File.open_append() -> I<Bool>
 
 Return the
 
@@ -511,9 +567,25 @@ Return the
 
 =cut
 
+=head2 open_read
+
+File.open_read() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 open_w
 
 File.open_w() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 open_write
+
+File.open_write() -> I<Bool>
 
 Return the
 

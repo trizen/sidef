@@ -22,10 +22,34 @@ Inherits methods from:
 
 =head1 METHODS
 
+=head2 absName
+
+Dir.absName() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 absPath
+
+Dir.absPath() -> I<Bool>
+
+Return the
+
+=cut
+
 
 =head2 abs_name
 
 Dir.abs_name() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 abs_path
+
+Dir.abs_path() -> I<Bool>
 
 Return the
 
@@ -138,6 +162,14 @@ Return the
 =head2 remove
 
 Dir.remove() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 removeTree
+
+Dir.removeTree() -> I<Bool>
 
 Return the
 

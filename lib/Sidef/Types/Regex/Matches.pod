@@ -40,6 +40,14 @@ Return the
 
 =cut
 
+=head2 namedMatches
+
+Matches.namedMatches() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 named_matches
 
 Matches.named_matches() -> I<Bool>

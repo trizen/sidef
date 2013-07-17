@@ -22,6 +22,94 @@ Inherits methods from:
 
 =head1 METHODS
 
+=head2 toArray
+
+Convert.toArray() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 toBool
+
+Convert.toBool() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 toByte
+
+Convert.toByte() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 toBytes
+
+Convert.toBytes() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 toChar
+
+Convert.toChar() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 toChars
+
+Convert.toChars() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 toDir
+
+Convert.toDir() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 toFile
+
+Convert.toFile() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 toInt
+
+Convert.toInt() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 toInteger
+
+Convert.toInteger() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 toString
+
+Convert.toString() -> I<Bool>
+
+Return the
+
+=cut
+
 
 =head2 to_array
 
@@ -95,9 +183,33 @@ Return the
 
 =cut
 
+=head2 to_int
+
+Convert.to_int() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 to_integer
+
+Convert.to_integer() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 to_s
 
 Convert.to_s() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 to_string
+
+Convert.to_string() -> I<Bool>
 
 Return the
 

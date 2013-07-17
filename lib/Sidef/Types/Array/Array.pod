@@ -112,9 +112,25 @@ Return the
 
 =cut
 
+=head2 a
+
+Array.a() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 all
 
 Array.all() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 b
+
+Array.b() -> I<Bool>
 
 Return the
 
@@ -496,6 +512,14 @@ Return the
 
 =cut
 
+=head2 sort
+
+Array.sort() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 splice
 
 Array.splice() -> I<Bool>
@@ -552,9 +576,41 @@ Return the
 
 =cut
 
+=head2 uniqLast
+
+Array.uniqLast() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 uniq_last
+
+Array.uniq_last() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 unique
 
 Array.unique() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 uniqueLast
+
+Array.uniqueLast() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 unique_last
+
+Array.unique_last() -> I<Bool>
 
 Return the
 

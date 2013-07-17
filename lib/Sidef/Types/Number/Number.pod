@@ -232,9 +232,65 @@ Return the
 
 =cut
 
+=head2 isEven
+
+Number.isEven() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 isInt
+
+Number.isInt() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 isInteger
+
+Number.isInteger() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 isNegative
+
+Number.isNegative() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 isOdd
+
+Number.isOdd() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 isPositive
+
+Number.isPositive() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 is_even
 
 Number.is_even() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 is_int
+
+Number.is_int() -> I<Bool>
 
 Return the
 
@@ -304,6 +360,14 @@ Return the
 
 =cut
 
+=head2 nextPowerOfTwo
+
+Number.nextPowerOfTwo() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 next_power_of_two
 
 Number.next_power_of_two() -> I<Bool>
@@ -331,6 +395,14 @@ Return the
 =head2 sqrt
 
 Number.sqrt() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 sqrtN
+
+Number.sqrtN() -> I<Bool>
 
 Return the
 

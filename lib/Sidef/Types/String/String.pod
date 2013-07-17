@@ -168,6 +168,14 @@ Return the
 
 =cut
 
+=head2 beginsWith
+
+String.beginsWith() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 begins_with
 
 String.begins_with() -> I<Bool>
@@ -179,6 +187,14 @@ Return the
 =head2 charAt
 
 String.charAt() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 char_at
+
+String.char_at() -> I<Bool>
 
 Return the
 
@@ -283,6 +299,22 @@ Return the
 =head2 insert
 
 String.insert() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 insertAt
+
+String.insertAt() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 insert_at
+
+String.insert_at() -> I<Bool>
 
 Return the
 
@@ -464,6 +496,22 @@ Return the
 
 =cut
 
+=head2 titleCase
+
+String.titleCase() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 title_case
+
+String.title_case() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 toLowerCase
 
 String.toLowerCase() -> I<Bool>
@@ -507,6 +555,22 @@ Return the
 =head2 warn
 
 String.warn() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 wc
+
+String.wc() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 wordCase
+
+String.wordCase() -> I<Bool>
 
 Return the
 
