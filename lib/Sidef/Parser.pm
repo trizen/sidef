@@ -659,6 +659,7 @@ package Sidef::Parser {
                     return Sidef::Types::Regex::Regex->new($$regex, $flags), pos;
                 }
 
+                # Backtick
                 when (/\G(?=`)/) {
                     my ($string, $pos) = $self->get_quoted_string(code => (substr($_, pos)));
                     return Sidef::Types::Glob::Backtick->new(
@@ -1060,9 +1061,8 @@ package Sidef::Parser {
                                                              . join("', '", @{$self->{inc}}) . "']",
                                                            );
 
-                        open my $fh, '<:encoding(UTF-8)',
-                          $full_path
-                          or $self->fatal_error(
+                        open(my $fh, '<:encoding(UTF-8)', $full_path)
+                          || $self->fatal_error(
                                                 code  => $_,
                                                 pos   => pos($_),
                                                 error => "can't open the file '$full_path': $!"

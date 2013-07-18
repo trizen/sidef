@@ -1,8 +1,8 @@
 package Sidef::Types::Glob::Backtick {
 
-use 5.014;
-use strict;
-use warnings;
+    use 5.014;
+    use strict;
+    use warnings;
 
     our @ISA = qw(Sidef Sidef::Convert::Convert);
 
@@ -12,18 +12,26 @@ use warnings;
     }
 
     sub _run {
-        my($self) = @_;
+        my ($self) = @_;
         `$$self`;
     }
 
     sub getString {
-        my($self) = @_;
+        my ($self) = @_;
         Sidef::Types::String::String->new(scalar($self->_run));
     }
 
+    *get_string = \&getString;
+
     sub getLines {
-        my($self) = @_;
-        Sidef::Types::Array::Array->new(map{Sidef::Types::String::String->new($_)}$self->_run);
+        my ($self) = @_;
+        Sidef::Types::Array::Array->new(map { Sidef::Types::String::String->new($_)->chomp } $self->_run);
     }
 
-}
+    *get_lines = \&getLines;
+    *get_array = \&getLines;
+    *getArray  = \&getLines;
+
+};
+
+1

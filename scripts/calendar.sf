@@ -24,7 +24,7 @@ var year = (t.year + 1900);
 var monName = (t.strftime("%B"));
 
 "%*s\n%s\n".printf(
-                    (5 + (monName.len)) / 2 + 11,
+                    (monName.len + 5) / 2 + 11,
                     "%s %d".sprintf(monName, year),
                     "Su Mo Tu We Th Fr Sa",
                   );
@@ -42,7 +42,7 @@ var st = (1 + year * 365 + (year / 4 -> int) -
 
 
 #
-## Priting the calendar
+## Primting the calendar
 #
 
 q{   } * (st % 7).print;
