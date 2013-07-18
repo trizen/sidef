@@ -6,10 +6,13 @@ package Sidef::Parser {
     use warnings;
 
     no if $] >= 5.018, warnings => "experimental::smartmatch";
-    use autouse 'Encode' => qw(decode_utf8($;$));    # unicode support
+
+    use autouse 'Encode' => qw(decode_utf8($;$));
+
+    require File::Spec;
+    require Sidef::Init;
 
     our $DEBUG = 0;
-    require Sidef::Init;
 
     sub new {
 
@@ -24,6 +27,7 @@ package Sidef::Parser {
             expect_arg    => 0,
             parentheses   => 0,
             strict_var    => 0,
+            inc           => [File::Spec->curdir()],
             class         => 'main',
             vars          => {'main' => []},
             ref_vars_refs => {'main' => []},
@@ -41,6 +45,7 @@ package Sidef::Parser {
                   true false
                   nil
                   import
+                  include
 
                   Array
                   File
@@ -56,6 +61,7 @@ package Sidef::Parser {
                   Bool
                   Sys
                   Regex
+                  Time
 
                   my
                   var
@@ -105,6 +111,7 @@ package Sidef::Parser {
                       %= %
                       ^= ^
                       *= *
+                      ...
                       != ..
                       \\\\
                       ?? ?
@@ -297,7 +304,7 @@ package Sidef::Parser {
 
             # Operator-like method name
             when (m{\G$self->{re}{operators}}goc) {
-                $self->{expect_arg} = $1 ~~ ['--', '++', '??'] ? 0 : 1;
+                $self->{expect_arg} = $1 ~~ ['--', '++', '??', '...'] ? 0 : 1;
                 return {self => Sidef::Types::String::String->new($1)}, pos;
             }
 
@@ -727,6 +734,11 @@ package Sidef::Parser {
                     return Sidef::Types::Byte::Bytes->new(), pos;
                 }
 
+                # Time object
+                when (/\GTime\b/gc) {
+                    return Sidef::Time::Time->new(), pos;
+                }
+
                 # Char object
                 when (/\GCha?r\b/gc) {
                     return Sidef::Types::Char::Char->new(), pos;
@@ -1018,6 +1030,59 @@ package Sidef::Parser {
                     redo;
                 }
 
+                when (/\Ginclude\b\h*/gc) {
+
+                    my $names =
+                        /\G($self->{re}{var_name})/goc ? $1
+                      : /\G$self->{re}{vars}/goc       ? $1
+                      : $self->fatal_error(
+                                           code  => $_,
+                                           pos   => (pos($_)),
+                                           error => "invalid variable name!",
+                                          );
+
+                    foreach my $var_name (split(/\h*,\h*/, $names)) {
+                        my @path = split(/::/, $var_name);
+                        my $mod_path = File::Spec->catfile(@path[0 .. $#path - 1], $path[-1] . '.sm');
+
+                        my ($full_path, $found_module);
+                        foreach my $inc_dir (@{$self->{inc}}) {
+                            if (-e ($full_path = File::Spec->catfile($inc_dir, $mod_path)) and -f _ and -r _) {
+                                $found_module = 1;
+                                last;
+                            }
+                        }
+
+                        $found_module // $self->fatal_error(
+                                                           code  => $_,
+                                                           pos   => pos($_),
+                                                           error => "can't find the module '${mod_path}' anywhere in ['"
+                                                             . join("', '", @{$self->{inc}}) . "']",
+                                                           );
+
+                        open my $fh, '<:encoding(UTF-8)',
+                          $full_path
+                          or $self->fatal_error(
+                                                code  => $_,
+                                                pos   => pos($_),
+                                                error => "can't open the file '$full_path': $!"
+                                               );
+
+                        my $content = do { local $/; <$fh> };
+                        close $fh;
+
+                        my $parser = Sidef::Parser->new(script_name => $full_path);
+                        my $struct = $parser->parse_script(code => $content);
+
+                        foreach my $class (keys %{$struct}) {
+                            $struct{$class} = $struct->{$class};
+                            $self->{ref_vars}{$class} = $parser->{ref_vars}{$class};
+                        }
+                    }
+
+                    redo;
+                }
+
                 # We are at the end of the script.
                 # We make some checks, and return the \%struct hash ref.
                 when (/\G\z/) {
@@ -1026,7 +1091,7 @@ package Sidef::Parser {
                     $check_vars = sub {
                         my ($hash_ref) = @_;
 
-                        foreach my $class (keys %{$hash_ref}) {
+                        foreach my $class (grep { $_ eq 'main' } keys %{$hash_ref}) {
 
                             my $array_ref = $hash_ref->{$class};
 

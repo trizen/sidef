@@ -1,0 +1,128 @@
+
+=encoding utf8
+
+=head1 NAME
+
+Sidef::Time::Localtime
+
+=head1 DESCRIPTION
+
+This object is ...
+
+=head1 SYNOPSIS
+
+var obj = (Localtime.new(...));
+
+
+=head1 INHERITS
+
+Inherits methods from:
+
+    * Sidef
+
+=head1 METHODS
+
+
+=head2 ctime
+
+Localtime.ctime() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 day
+
+Localtime.day() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 hour
+
+Localtime.hour() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 isdst
+
+Localtime.isdst() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 mday
+
+Localtime.mday() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 min
+
+Localtime.min() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 mon
+
+Localtime.mon() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 month
+
+Localtime.month() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 sec
+
+Localtime.sec() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 strftime
+
+Localtime.strftime() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 wday
+
+Localtime.wday() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 yday
+
+Localtime.yday() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 year
+
+Localtime.year() -> I<Bool>
+
+Return the
+
+=cut

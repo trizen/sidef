@@ -12,6 +12,9 @@ use warnings;
 use lib '..';
 
 require Sidef::Sys::Sys if (caller)[0] ne q{Sidef::Sys::Sys};
+require Sidef::Time::Localtime if (caller)[0] ne q{Sidef::Time::Localtime};
+require Sidef::Time::Time if (caller)[0] ne q{Sidef::Time::Time};
+require Sidef::Time::Gmtime if (caller)[0] ne q{Sidef::Time::Gmtime};
 require Sidef::Types::Nil::Nil if (caller)[0] ne q{Sidef::Types::Nil::Nil};
 require Sidef::Types::Bool::If if (caller)[0] ne q{Sidef::Types::Bool::If};
 require Sidef::Types::Bool::While if (caller)[0] ne q{Sidef::Types::Bool::While};

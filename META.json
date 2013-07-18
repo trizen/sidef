@@ -64,6 +64,15 @@
       "Sidef::Sys::Sys" : {
          "file" : "lib/Sidef/Sys/Sys.pm"
       },
+      "Sidef::Time::Gmtime" : {
+         "file" : "lib/Sidef/Time/Gmtime.pm"
+      },
+      "Sidef::Time::Localtime" : {
+         "file" : "lib/Sidef/Time/Localtime.pm"
+      },
+      "Sidef::Time::Time" : {
+         "file" : "lib/Sidef/Time/Time.pm"
+      },
       "Sidef::Types::Array::Array" : {
          "file" : "lib/Sidef/Types/Array/Array.pm"
       },

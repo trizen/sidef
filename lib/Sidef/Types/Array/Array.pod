@@ -72,6 +72,14 @@ Return the
 
 =cut
 
+=head2 ...
+
+I<Num> B<...> I<Num> -> I<Num>
+
+Return the
+
+=cut
+
 =head2 <<
 
 I<Num> B<E<lt>E<lt>> I<Num> -> I<Num>

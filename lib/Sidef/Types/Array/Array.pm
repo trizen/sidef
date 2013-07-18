@@ -65,6 +65,11 @@ package Sidef::Types::Array::Array {
             $self->_grep($array, 0);
         };
 
+        *{__PACKAGE__ . '::' . '...'} = sub {
+            my ($self) = @_;
+            [map { $_->get_value } @{$self}];
+        };
+
         *{__PACKAGE__ . '::' . '<<'} = sub {
             my ($self, $number) = @_;
             $self->_is_number($number, 1, 0) || return $self->new();

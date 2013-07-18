@@ -1,0 +1,97 @@
+
+=encoding utf8
+
+=head1 NAME
+
+Sidef::Time::Time
+
+=head1 DESCRIPTION
+
+This object is ...
+
+=head1 SYNOPSIS
+
+var obj = (Time.new(...));
+
+=head1 METHODS
+
+
+=head2 gm
+
+Time.gm() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 gmTime
+
+Time.gmTime() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 gmtime
+
+Time.gmtime() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 local
+
+Time.local() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 localTime
+
+Time.localTime() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 localtime
+
+Time.localtime() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 new
+
+Time.new() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 time
+
+Time.time() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 timeNow
+
+Time.timeNow() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 time_now
+
+Time.time_now() -> I<Bool>
+
+Return the
+
+=cut

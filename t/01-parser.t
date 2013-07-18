@@ -13,7 +13,7 @@ use lib 'lib';
 require Sidef::Parser;
 
 opendir(my $dir_h, 'scripts');
-my @scripts = map { catfile('scripts', $_) } grep { /\.sf\z/ } readdir($dir_h);
+my @scripts = map { catfile('scripts', $_) } grep { /\.sf\z/ && $_ ne 'include_class.sf' } readdir($dir_h);
 
 plan tests => scalar(@scripts);
 

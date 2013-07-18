@@ -277,6 +277,11 @@ package Sidef::Exec {
                     }
                     else {
                         $method //= '';
+
+                        if ($method eq '...') {
+                            $self->{plain_array} = 1;
+                        }
+
                         $self_obj = $self_obj->$method;
                     }
 
@@ -335,7 +340,14 @@ package Sidef::Exec {
                 }
 
                 ++$i;
+
                 my $obj = $self->execute_expr(%opt, class => $key, expr => $expr);
+
+                $self->{plain_array} && do {
+                    $self->{plain_array} = 0;
+                    push @results, @{$obj};
+                    next;
+                };
 
                 if (ref($obj) eq 'Sidef::Types::Block::Return') {
 

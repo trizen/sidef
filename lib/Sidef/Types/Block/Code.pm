@@ -197,7 +197,7 @@ package Sidef::Types::Block::Code {
                     my $expr = $arg->{$class}[2];
                     my ($bool) = $exec->execute_expr(expr => $arg->{$class}[1], class => $class);
 
-                    if ($bool->is_true) {
+                    if ($bool) {
                         my $res = $self->_run_code();
                         return $res if defined $res;
                         $exec->execute_expr(expr => $expr, class => $class);

@@ -1,0 +1,61 @@
+#!/usr/bin/ruby
+
+var mons = (:(
+                1  => 31,
+                2  => 28,
+                3  => 31,
+                4  => 30,
+                5  => 31,
+                6  => 30,
+                7  => 31,
+                8  => 31,
+                9  => 30,
+                10 => 31,
+                11 => 30,
+                12 => 31,
+           ));
+
+var t = (Time.local);
+
+var day  = (t.day);
+var mon  = (t.mon + 1);
+var year = (t.year + 1900);
+
+var monName = (t.strftime("%B"));
+
+"%*s\n%s\n".printf(
+                    (5 + (monName.len)) / 2 + 11,
+                    "%s %d".sprintf(monName, year),
+                    "Su Mo Tu We Th Fr Sa",
+                  );
+
+if (year % 400 == 0 || (year % 4 == 0 && (year % 100 != 0))) {
+    mons[2] = 29
+}
+
+year--;
+
+var st = (1 + year * 365 + (year / 4 -> int) -
+         (year / 100 -> int) + (year / 400 -> int));
+
+{st += mons[_]} for (1..(mon-1));
+
+
+#
+## Priting the calendar
+#
+
+q{   } * (st % 7).print;
+
+for (var i = 1; i <= mons[mon]; i++) {
+
+    i == day
+        ? ('%s%2d%s '.printf("\e[7m", i, "\e[0m"))
+        : ("%2d ".printf(i));
+
+    if ((st + i) % 7 == 0 && (i != mons[mon])) {
+        "\n".print;
+    }
+}
+
+"\n\n".print;

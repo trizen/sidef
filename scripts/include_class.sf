@@ -1,0 +1,31 @@
+#!/usr/bin/ruby
+
+include Math::Algebra::Matrix;
+
+
+#
+## Test class function
+#
+
+Math::Algebra::Matrix::det(
+    [
+        [4,2,3],
+        [1,5,3],
+        [1,2,3],
+    ]
+) == 27 || ("Matrix error!\n".die);
+
+
+#
+## Test class variable
+#
+
+Math::Algebra::Matrix::VERSION == 0.1
+    || ("Class variable error!\n".die);
+
+
+#
+## Everything is OK
+#
+
+"All tests passed!".say;

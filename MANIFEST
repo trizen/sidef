@@ -15,6 +15,12 @@ lib/Sidef/Module/Require.pod
 lib/Sidef/Parser.pm
 lib/Sidef/Sys/Sys.pm
 lib/Sidef/Sys/Sys.pod
+lib/Sidef/Time/Gmtime.pm
+lib/Sidef/Time/Gmtime.pod
+lib/Sidef/Time/Localtime.pm
+lib/Sidef/Time/Localtime.pod
+lib/Sidef/Time/Time.pm
+lib/Sidef/Time/Time.pod
 lib/Sidef/Types/Array/Array.pm
 lib/Sidef/Types/Array/Array.pod
 lib/Sidef/Types/Black/Hole.pm
@@ -107,8 +113,10 @@ scripts/averages_mode.sf
 scripts/box_the_compass.sf
 scripts/break.sf
 scripts/caesar_cipher.sf
+scripts/calendar.sf
 scripts/catalan_numbers.sf
 scripts/catalan_numbers_recursive.sf
+scripts/classes.sf
 scripts/code_to_hash.sf
 scripts/cramers_method.sf
 scripts/dice_game_solver.sf
@@ -125,12 +133,14 @@ scripts/hash_map.sf
 scripts/hashes.sf
 scripts/if_do_else.sf
 scripts/if_while_standard.sf
+scripts/include_class.sf
 scripts/JASH.sf
 scripts/leap_year.sf
 scripts/levenshtein_distance.sf
 scripts/levenshtein_recursive.sf
 scripts/logic.sf
 scripts/lwp_module.sf
+scripts/Math/Algebra/Matrix.sm
 scripts/matrix_multiplication.sf
 scripts/method_expressions.sf
 scripts/multi_var_assignment.sf
@@ -167,4 +177,3 @@ talks/alpha-release/sidef.odp
 utils/doc.pl
 utils/pod_generator.pl
 utils/struct.pl
-scripts/classes.sf
