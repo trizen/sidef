@@ -168,6 +168,7 @@ scripts/unicode.sf
 scripts/var_ref.sf
 scripts/var_scoping.sf
 scripts/while_loop.sf
+scripts/zig-zag_matrix.sf
 t/00-load.t
 t/01-parser.t
 t/boilerplate.t

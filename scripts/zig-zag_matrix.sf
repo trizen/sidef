@@ -1,0 +1,28 @@
+#!/usr/bin/ruby
+
+# Translation of: http://rosettacode.org/wiki/Zig-zag_matrix#Perl
+
+func zig_zag (w, h) {
+
+    var r = [];
+    var n = 0;
+
+    {r[_[1]][_[0]] = n; n++} for (
+       0..(h-1) -> map {
+            var e = _; 0..(w-1) -> map{ [e, _] }
+    }.combine
+    -> sort {
+        var cmp = (_[0][0] + _[0][1] <=> (_[1][0] + _[1][1])) == 0
+        ? (
+            _[0][0] + _[0][1] -> isOdd
+                ? (_[0][1] <=> _[1][1])
+                : (_[0][0] <=> _[1][0])
+          )
+        : cmp;
+      }
+    );
+
+    return(r);
+}
+
+zig_zag(3,4).map {_.join(' ').say}
