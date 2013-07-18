@@ -7,12 +7,11 @@ Sidef::Time::Localtime
 
 =head1 DESCRIPTION
 
-This object is ...
+Returned values are localized for your current location.
 
 =head1 SYNOPSIS
 
-var obj = (Localtime.new(...));
-
+    var time = (Time.local);
 
 =head1 INHERITS
 
@@ -25,104 +24,110 @@ Inherits methods from:
 
 =head2 ctime
 
-Localtime.ctime() -> I<Bool>
+Time.local.ctime() -> I<String>
 
-Return the
+Return the ctime(3) value:
+
+    Time.local.ctime    # e.g., "Thu Jul 18 20:39:47 2013"
 
 =cut
 
 =head2 day
 
-Localtime.day() -> I<Bool>
+Time.local.day() -> I<Number>
 
-Return the
+Return the day of the month,
 
 =cut
 
 =head2 hour
 
-Localtime.hour() -> I<Bool>
+Time.local.hour() -> I<Number>
 
-Return the
+Return the hours of the specified time.
 
 =cut
 
 =head2 isdst
 
-Localtime.isdst() -> I<Bool>
+Time.local.isdst() -> I<Number>
 
-Return the
+Return 1 if the specified time occurs during Daylight Saving Time, 0 otherwise.
 
 =cut
 
 =head2 mday
 
-Localtime.mday() -> I<Bool>
-
-Return the
+Alias for L<I<day()>|"day">.
 
 =cut
 
 =head2 min
 
-Localtime.min() -> I<Bool>
+Time.local.min() -> I<Number>
 
-Return the
+Return the minutes of the specified time.
 
 =cut
 
 =head2 mon
 
-Localtime.mon() -> I<Bool>
+Time.local.mon() -> I<Number>
 
-Return the
+Return the month in the range 0..11, with 0 indicating January and 11 indicating December.
 
 =cut
 
 =head2 month
 
-Localtime.month() -> I<Bool>
-
-Return the
+Alias for L<I<mon()>|"mon">.
 
 =cut
 
 =head2 sec
 
-Localtime.sec() -> I<Bool>
+Time.local.sec() -> I<Number>
 
-Return the
+Return the seconds of the specified time.
 
 =cut
 
 =head2 strftime
 
-Localtime.strftime() -> I<Bool>
+Time.local.strftime(I<String>) -> I<String>
 
-Return the
+Format the time with I<POSIX::strftime()>.
+
+    Time.local.strftime("%a %b %e %H:%M:%S %Y")    # e.g., "Thu Jul 18 20:45:04 2013"
+
+For more details, see: C<man strftime>
 
 =cut
 
 =head2 wday
 
-Localtime.wday() -> I<Bool>
+Time.local.wday() -> I<Number>
 
-Return the
+Return the day of the week, with 0 indicating Sunday and 3 indicating Wednesday.
 
 =cut
 
 =head2 yday
 
-Localtime.yday() -> I<Bool>
+Time.local.yday() -> I<Number>
 
-Return the
+Return the day of the year, in the range 0..364 (or 0..365 in leap years.)
 
 =cut
 
 =head2 year
 
-Localtime.year() -> I<Bool>
+Time.local.year() -> I<Number>
 
-Return the
+Return the number of years since 1900.
+
+To get a 4-digit year, write:
+
+   var year = (Time.gmtime.year + 1900);
 
 =cut

@@ -7,210 +7,252 @@ Sidef::Convert::Convert
 
 =head1 DESCRIPTION
 
-This object is ...
+This module helps with the conversion between object types.
 
 =head1 SYNOPSIS
 
-var obj = (Convert.new(...));
+This module can only be used as a parent:
+
+        our @ISA = qw(Sidef::Convert::Convert);
+
+or
+
+        use parent qw(Sidef::Convert::Convert);
 
 
 =head1 INHERITS
 
 Inherits methods from:
 
-	* Sidef
+    * Sidef
 
 =head1 METHODS
 
 =head2 toArray
 
-Convert.toArray() -> I<Bool>
+Obj.toArray() -> I<Array>
 
-Return the
+Convert the self object into an array.
+
+    "str".toArray  =>  ["str"]
+
+Returns an object of type: I<Sidef::Types::Array::Array>
 
 =cut
 
 =head2 toBool
 
-Convert.toBool() -> I<Bool>
+Obj.toBool() -> I<Bool>
 
-Return the
+Convert the self object into a boolean value.
+
+      1.toBool   =>   true
+    "0".toBool   =>   false
+
+Returns an object of type: I<Sidef::Types::Bool::Bool>
 
 =cut
 
 =head2 toByte
 
-Convert.toByte() -> I<Bool>
+Obj.toByte() -> I<Byte>
 
-Return the
+Convert the self object into a numeric byte value.
+
+    "a".toByte   =>   97
+
+Returns an object of type: I<Sidef::Types::Byte::Byte>
 
 =cut
 
 =head2 toBytes
 
-Convert.toBytes() -> I<Bool>
+Obj.toBytes() -> I<Bytes>
 
-Return the
+Convert the self object into an array of bytes,
+
+    "abc".toBytes  =>  [97, 98, 99]
+
+Returns an object of type: I<Sidef::Types::Byte::Bytes>
 
 =cut
 
 =head2 toChar
 
-Convert.toChar() -> I<Bool>
+Obj.toChar() -> I<Char>
 
-Return the
+Convert the self object into a character object.
+
+        4.toChar   =>   "4"
+    "xyz".toChar   =>   "x"
+
+
+Returns an object of type: I<Sidef::Types::Char::Char>
 
 =cut
 
 =head2 toChars
 
-Convert.toChars() -> I<Bool>
+Obj.toChars() -> I<Chars>
 
-Return the
+Convert the self object into an array of characters.
+
+    "abc".toChars   => ['a', 'b', 'c']
+
+Returns an object of type: I<Sidef::Types::Char::Chars>
 
 =cut
 
 =head2 toDir
 
-Convert.toDir() -> I<Bool>
+Obj.toDir() -> I<Dir>
 
-Return the
+Convert the self object into a directory type-object.
+
+    '/my/dir'.toDir  =>  qd(/my/dir)
+
+Returns an object of type: I<Sidef::Types::Glob::Dir>
 
 =cut
 
 =head2 toFile
 
-Convert.toFile() -> I<Bool>
+Obj.toFile() -> I<File>
 
-Return the
+Convert the self object into a file type-object.
+
+    '/my/file'.toFile  =>  qf(/my/file)
+
+Returns an object of type: I<Sidef::Types::Glob::File>
 
 =cut
 
 =head2 toInt
 
-Convert.toInt() -> I<Bool>
+Obj.toInt() -> I<Num>
 
-Return the
+Convert the self object into an integer.
+
+    "12.34".toInt  =>  12
+
+Returns an object of type: I<Sidef::Types::Number::Number>
 
 =cut
 
 =head2 toInteger
 
-Convert.toInteger() -> I<Bool>
+Alias for L<I<toInt()>|"toInt">.
 
-Return the
+=cut
+
+=head2 toNum
+
+Obj.toNum() -> I<Num>
+
+Convert the self object into a number type-object.
+
+    "12.34".toNum  =>  12.34
+
+Returns an object of type: I<Sidef::Types::Number::Number>
 
 =cut
 
 =head2 toString
 
-Convert.toString() -> I<Bool>
+Obj.toString() -> I<String>
 
-Return the
+Convert the self object into a string type-object.
+
+When the self object is an array-like object,
+its elements will be joined one-level deep with a space character.
+
+         42.toString  => '42'
+    [1,2,3].toString  => '1 2 3'
+
+Returns an object of type: I<Sidef::Types::String::String>
 
 =cut
 
-
 =head2 to_array
 
-Convert.to_array() -> I<Bool>
-
-Return the
+Alias for L<I<toArray()>|"toArray">.
 
 =cut
 
 =head2 to_bool
 
-Convert.to_bool() -> I<Bool>
-
-Return the
+Alias for L<I<toBool()>|"toBool">.
 
 =cut
 
 =head2 to_byte
 
-Convert.to_byte() -> I<Bool>
-
-Return the
+Alias for L<I<toByte()>|"toByte">.
 
 =cut
 
 =head2 to_bytes
 
-Convert.to_bytes() -> I<Bool>
-
-Return the
+Alias for L<I<toBytes()>|"toBytes">.
 
 =cut
 
 =head2 to_char
 
-Convert.to_char() -> I<Bool>
-
-Return the
+Alias for L<I<toChar()>|"toChar">.
 
 =cut
 
 =head2 to_chars
 
-Convert.to_chars() -> I<Bool>
-
-Return the
+Alias for L<I<toChars()>|"toChars">.
 
 =cut
 
 =head2 to_dir
 
-Convert.to_dir() -> I<Bool>
-
-Return the
+Alias for L<I<toDir()>|"toDir">.
 
 =cut
 
 =head2 to_file
 
-Convert.to_file() -> I<Bool>
-
-Return the
+Alias for L<I<toFile()>|"toFile">.
 
 =cut
 
 =head2 to_i
 
-Convert.to_i() -> I<Bool>
-
-Return the
+Alias for L<I<toInt()>|"toInt">.
 
 =cut
 
 =head2 to_int
 
-Convert.to_int() -> I<Bool>
-
-Return the
+Alias for L<I<toInt()>|"toInt">.
 
 =cut
 
 =head2 to_integer
 
-Convert.to_integer() -> I<Bool>
+Alias for L<I<toInt()>|"toInt">.
 
-Return the
+=cut
+
+=head2 to_num
+
+Alias for L<I<toNum()>|"toNum">.
 
 =cut
 
 =head2 to_s
 
-Convert.to_s() -> I<Bool>
-
-Return the
+Alias for L<I<toString()>|"toString">.
 
 =cut
 
 =head2 to_string
 
-Convert.to_string() -> I<Bool>
-
-Return the
+Alias for L<I<toString()>|"toString">.
 
 =cut

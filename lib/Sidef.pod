@@ -7,27 +7,39 @@ Sidef
 
 =head1 DESCRIPTION
 
-This object is ...
+This module provides some methods for static objects.
 
 =head1 SYNOPSIS
 
-var obj = (Sidef.new(...));
+This module can only be used as a parent:
+
+        our @ISA = qw(Sidef);
+
+or
+
+        use parent qw(Sidef);
 
 =head1 METHODS
 
 
 =head2 !=
 
-I<Num> B<!=> I<Num> -> I<Num>
+I<Obj> B<!=> I<Obj> -> I<Bool>
 
-Return the
+Return true if two objects are not of the same type.
+
+    nil != 4     # True
+    nil != nil   # False
 
 =cut
 
 =head2 ==
 
-I<Num> B<==> I<Num> -> I<Num>
+I<Obj> B<==> I<Obj> -> I<Bool>
 
-Return the
+Return true if two objects are of the same type.
+
+    nil   == nil   # True
+    false == nil   # False
 
 =cut

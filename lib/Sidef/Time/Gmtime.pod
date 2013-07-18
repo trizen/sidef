@@ -7,12 +7,11 @@ Sidef::Time::Gmtime
 
 =head1 DESCRIPTION
 
-This object is ...
+Returned values are localized for the standard Greenwich time zone.
 
 =head1 SYNOPSIS
 
-var obj = (Gmtime.new(...));
-
+    var time = (Time.gmtime);
 
 =head1 INHERITS
 
@@ -25,96 +24,102 @@ Inherits methods from:
 
 =head2 ctime
 
-Gmtime.ctime() -> I<Bool>
+Time.gmtime.ctime() -> I<String>
 
-Return the
+Return the ctime(3) value:
+
+    Time.gmtime.ctime    # e.g., "Thu Jul 18 17:39:28 2013"
 
 =cut
 
 =head2 day
 
-Gmtime.day() -> I<Bool>
+Time.gmtime.day() -> I<Number>
 
-Return the
+Return the day of the month,
 
 =cut
 
 =head2 hour
 
-Gmtime.hour() -> I<Bool>
+Time.gmtime.hour() -> I<Number>
 
-Return the
+Return the hours of the specified time.
 
 =cut
 
 =head2 mday
 
-Gmtime.mday() -> I<Bool>
-
-Return the
+Alias for L<I<day()>|"day">.
 
 =cut
 
 =head2 min
 
-Gmtime.min() -> I<Bool>
+Time.gmtime.min() -> I<Number>
 
-Return the
+Return the minutes of the specified time.
 
 =cut
 
 =head2 mon
 
-Gmtime.mon() -> I<Bool>
+Time.gmtime.mon() -> I<Number>
 
-Return the
+Return the month in the range 0..11, with 0 indicating January and 11 indicating December.
 
 =cut
 
 =head2 month
 
-Gmtime.month() -> I<Bool>
-
-Return the
+Alias for L<I<mon()>|"mon">.
 
 =cut
 
 =head2 sec
 
-Gmtime.sec() -> I<Bool>
+Time.gmtime.sec() -> I<Number>
 
-Return the
+Return the seconds of the specified time.
 
 =cut
 
 =head2 strftime
 
-Gmtime.strftime() -> I<Bool>
+Time.gmtime.strftime(I<String>) -> I<String>
 
-Return the
+Format the time with I<POSIX::strftime()>.
+
+    Time.gmtime.strftime("%a %b %e %H:%M:%S %Y")    # e.g., "Thu Jul 18 17:27:50 2013"
+
+For more details, see: C<man strftime>
 
 =cut
 
 =head2 wday
 
-Gmtime.wday() -> I<Bool>
+Time.gmtime.wday() -> I<Number>
 
-Return the
+Return the day of the week, with 0 indicating Sunday and 3 indicating Wednesday.
 
 =cut
 
 =head2 yday
 
-Gmtime.yday() -> I<Bool>
+Time.gmtime.yday() -> I<Number>
 
-Return the
+Return the day of the year, in the range 0..364 (or 0..365 in leap years.)
 
 =cut
 
 =head2 year
 
-Gmtime.year() -> I<Bool>
+Time.gmtime.year() -> I<Number>
 
-Return the
+Return the number of years since 1900.
+
+To get a 4-digit year, write:
+
+   var year = (Time.gmtime.year + 1900);
 
 =cut

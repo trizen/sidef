@@ -7,51 +7,53 @@ Sidef::Sys::Sys
 
 =head1 DESCRIPTION
 
-This object is ...
+This object provides some methods related to the Sidef working system.
 
 =head1 SYNOPSIS
 
-var obj = (Sys.new(...));
+    Sys.method(arg)
 
 =head1 METHODS
 
 
 =head2 exit
 
-Sys.exit() -> I<Bool>
+Sys.exit(I<Number>)
 
-Return the
+Exit the main program with a given code. If no argument is specified, the code 0 (SUCCESS) is assumed.
 
-=cut
-
-=head2 new
-
-Sys.new() -> I<Bool>
-
-Return the
+    Sys.exit(0)     # exit with success
+    Sys.exit(-1)    # exit with some error
 
 =cut
 
 =head2 osName
 
-Sys.osName() -> I<Bool>
+Sys.osName() -> I<String>
 
-Return the
+Return the name of the current operating system under which Sidef is running.
+
+    Sys.osName    # 'linux'   under Linux
+                  # 'MSWin32' under Windows
+
+Returns an object of type: I<Sidef::Types::String::String>
 
 =cut
 
 =head2 osname
 
-Sys.osname() -> I<Bool>
-
-Return the
+Alias for L<I<osName()>|"osName">.
 
 =cut
 
 =head2 sidef
 
-Sys.sidef() -> I<Bool>
+Sys.sidef() -> I<String>
 
-Return the
+Return the full path of the 'sidef' main program.
+
+    Sys.sidef   # under Linux, normally is '/usr/bin/sidef'
+
+Returns an object of type: I<Sidef::Types::String::String>
 
 =cut

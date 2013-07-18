@@ -67,7 +67,7 @@ package Sidef {
                 ref($self) ne ref($arg)
                   and return Sidef::Types::Bool::Bool->new($bool);
 
-                if (ref($self) eq 'Sidef::Types::Nil::Nil') {
+                if (not defined($self) or ref($self) eq 'Sidef::Types::Nil::Nil') {
                     return Sidef::Types::Bool::Bool->new(!$bool);
                 }
                 elsif (ref($self) eq 'Sidef::Types::Bool::Bool') {

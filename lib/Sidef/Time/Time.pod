@@ -7,91 +7,77 @@ Sidef::Time::Time
 
 =head1 DESCRIPTION
 
-This object is ...
+This modules creates a new I<Time> object.
 
 =head1 SYNOPSIS
 
-var obj = (Time.new(...));
+    var time = (Time.new(sec));
+    var lday = (time.local.day);
 
 =head1 METHODS
 
 
-=head2 gm
-
-Time.gm() -> I<Bool>
-
-Return the
-
-=cut
-
 =head2 gmTime
 
-Time.gmTime() -> I<Bool>
+Time.new.gmTime() -> I<Sidef::Time::Gmtime>
 
-Return the
+Return a I<gmtime> object.
 
 =cut
 
 =head2 gmtime
 
-Time.gmtime() -> I<Bool>
-
-Return the
+Alias for L<I<gmTime()>|"gmTime">.
 
 =cut
 
 =head2 local
 
-Time.local() -> I<Bool>
+Time.new.local() -> I<Sidef::Time::Localtime>
 
-Return the
+Return a I<localtime> object.
 
 =cut
 
 =head2 localTime
 
-Time.localTime() -> I<Bool>
-
-Return the
+Alias for L<I<local()>|"local">.
 
 =cut
 
 =head2 localtime
 
-Time.localtime() -> I<Bool>
-
-Return the
+Alias for L<I<local()>|"local">.
 
 =cut
 
 =head2 new
 
-Time.new() -> I<Bool>
+Time.new(I<number>) -> I<Time>
 
-Return the
+Create a new I<Time> object. The argument is the number of seconds elapsed since the beginning of the current epoch (1900).
+When no argument is specified, the current time is used.
 
 =cut
 
 =head2 time
 
-Time.time() -> I<Bool>
+Time.time() -> I<Number>
 
-Return the
+Return the time value stored inside the I<Time> object.
 
 =cut
 
 =head2 timeNow
 
-Time.timeNow() -> I<Bool>
+Time.timeNow() -> I<Number>
 
-Return the
+Return the number of seconds elapsed since the beginning of the current epoch (1900).
 
 =cut
 
 =head2 time_now
 
-Time.time_now() -> I<Bool>
-
-Return the
+Alias for L<I<timeNow()>|"timeNow">.
 
 =cut

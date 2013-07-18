@@ -46,7 +46,6 @@ package Sidef::Time::Time {
         Sidef::Time::Gmtime->new($self->{sec});
     }
 
-    *gm     = \&gmtime;
     *gmTime = \&gmtime;
 
 };

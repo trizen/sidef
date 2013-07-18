@@ -42,7 +42,7 @@ var st = (1 + year * 365 + (year / 4 -> int) -
 
 
 #
-## Primting the calendar
+## Printing the calendar
 #
 
 q{   } * (st % 7).print;

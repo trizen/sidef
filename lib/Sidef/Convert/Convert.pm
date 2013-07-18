@@ -48,6 +48,14 @@ package Sidef::Convert::Convert {
     *to_int     = \&to_i;
     *toInteger  = \&to_i;
 
+    sub to_num {
+        my ($self) = @_;
+        $self->_is_number($self, 0, 1) || $self->_is_string($self) || return;
+        Sidef::Types::Number::Number->new($$self);
+    }
+
+    *toNum = \&to_num;
+
     sub to_file {
         my ($self) = @_;
         $self->_is_string($self) || return;
@@ -73,6 +81,7 @@ package Sidef::Convert::Convert {
 
     sub to_byte {
         my ($self) = @_;
+        $self->_is_number($self, 0, 1) || $self->_is_string($self) || return;
         Sidef::Types::Byte::Byte->new(CORE::ord $$self);
     }
 
@@ -80,6 +89,7 @@ package Sidef::Convert::Convert {
 
     sub to_char {
         my ($self) = @_;
+        $self->_is_number($self, 0, 1) || $self->_is_string($self) || return;
         Sidef::Types::Char::Char->new(substr($$self, 0, 1));
     }
 
@@ -87,6 +97,8 @@ package Sidef::Convert::Convert {
 
     sub to_bytes {
         my ($self) = @_;
+
+        $self->_is_number($self, 0, 1) || $self->_is_string($self) || return;
 
         my @bytes = do {
             use bytes;
@@ -101,6 +113,7 @@ package Sidef::Convert::Convert {
 
     sub to_chars {
         my ($self) = @_;
+        $self->_is_number($self, 0, 1) || $self->_is_string($self) || return;
         Sidef::Types::Char::Chars->new(map { Sidef::Types::Char::Char->new($_) } split //, $$self);
     }
 
