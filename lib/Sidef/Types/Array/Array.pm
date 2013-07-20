@@ -674,7 +674,8 @@ package Sidef::Types::Array::Array {
         }
 
         my $method = '<=>';
-        $self->new(sort { $a->can($method) && ($a->$method($b) // -1) } map { $_->get_value } @{$self});
+        $self->new(sort { ref($a) eq ref($b) && $a->can($method) ? ($a->$method($b)) : -1 }
+                   map { $_->get_value } @{$self});
     }
 
     sub push {
