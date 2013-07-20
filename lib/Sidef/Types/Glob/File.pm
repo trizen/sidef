@@ -259,8 +259,9 @@ package Sidef::Types::Glob::File {
 
     sub chown {
         my ($self, $uid, $gid) = @_;
-        $self->_is_number($uid, $gid) || return;
-        Sidef::Types::Bool::Bool->new(CORE::chown($$self));
+        $self->_is_number($uid) || do { warn "[WARN] File.chown(): 'uid' is not numeric!\n"; return };
+        $self->_is_number($gid) || do { warn "[WARN] File.chown(): 'gid' is not numeric!\n"; return };
+        Sidef::Types::Bool::Bool->new(CORE::chown($$uid, $$gid, $$self));
     }
 
     sub lstat {
