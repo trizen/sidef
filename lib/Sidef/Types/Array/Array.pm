@@ -120,7 +120,7 @@ package Sidef::Types::Array::Array {
             my ($self, $array) = @_;
 
             $self->_is_array($array) || return ($self);
-            __PACKAGE__->new(map { $_->get_value } @{$self}, @{$array});
+            $self->new(map { $_->get_value } @{$self}, @{$array});
         };
 
         *{__PACKAGE__ . '::' . '++'} = sub {

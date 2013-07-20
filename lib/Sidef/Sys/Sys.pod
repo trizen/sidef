@@ -46,6 +46,42 @@ Alias for L<I<osName()>|"osName">.
 
 =cut
 
+=head2 print
+
+Sys.print(I<obj1>, I<obj2>, I<...>) -> I<Bool>
+
+Print a list of argument to the standard output (STDOUT). Returns true on success.
+
+    Sys.print("hello", "-", "world");
+
+Returns an object of type: I<Sidef::Types::Bool::Bool>
+
+=cut
+
+=head2 printh
+
+Sys.printh(I<handle>, I<obj1>, I<obj2>, I<...>) -> I<Bool>
+
+Print a list of argument into a handle object. The handle object can be of type GLOB or anyother handle which has the I<print> method. Returns true on success.
+
+    Sys.printh(STDERR, "This is a warning!\n");
+
+Returns an object of type: I<Sidef::Types::Bool::Bool>
+
+=cut
+
+=head2 println
+
+Sys.println(I<obj1>, I<obj2>, I<...>) -> I<Bool>
+
+Just like L<I<print()>|"print">, but implicitly appends a newline. Returns true on success.
+
+    Sys.println("Goodbye, World!");
+
+Returns an object of type: I<Sidef::Types::Bool::Bool>
+
+=cut
+
 =head2 sidef
 
 Sys.sidef() -> I<String>

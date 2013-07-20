@@ -47,9 +47,27 @@ package Sidef::Types::Glob::FileHandle {
                          file => Sidef::Types::Nil::Nil->new,);
     }
 
-    sub write {
-        my ($self, $string) = @_;
-        Sidef::Types::Bool::Bool->new(print {$self->{fh}} $string);
+    sub writeString {
+        my ($self, @args) = @_;
+
+        @args <= 3 || do {
+            warn "[WARN] FileHandle.writeString(): Too many arguments! Expected: (str, len, offset).";
+            return;
+        };
+
+        Sidef::Types::Bool::Bool->new(syswrite $self->{fh}, @args);
+    }
+
+    *write_string = \&writeString;
+
+    sub print {
+        my ($self, @args) = @_;
+        Sidef::Types::Bool::Bool->new(print {$self->{fh}} @args);
+    }
+
+    sub println {
+        my ($self, @args) = @_;
+        Sidef::Types::Bool::Bool->new(say {$self->{fh}} @args);
     }
 
     sub readline {
@@ -59,6 +77,7 @@ package Sidef::Types::Glob::FileHandle {
     }
 
     *read     = \&readline;
+    *readln   = \&readline;
     *readLine = \&readline;
 
     sub read_all {

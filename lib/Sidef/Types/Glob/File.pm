@@ -4,7 +4,7 @@ package Sidef::Types::Glob::File {
     use strict;
     use warnings;
 
-    our @ISA = qw(Sidef::Convert::Convert);
+    our @ISA = qw(Sidef Sidef::Convert::Convert);
 
     sub new {
         my (undef, $file) = @_;
@@ -255,6 +255,12 @@ package Sidef::Types::Glob::File {
     sub stat {
         my ($self) = @_;
         Sidef::Types::Glob::Stat->stat($$self, $self);
+    }
+
+    sub chown {
+        my ($self, $uid, $gid) = @_;
+        $self->_is_number($uid, $gid) || return;
+        Sidef::Types::Bool::Bool->new(CORE::chown($$self));
     }
 
     sub lstat {

@@ -91,12 +91,15 @@ package Sidef::Exec {
 
                             !$is_hash && ($self->valid_index($ind) || next);
 
-                            (
-                               $is_hash
-                             ? $self_obj->{$ind}
-                             : $self_obj->[$ind]
-                            )
-                              //= Sidef::Variable::Variable->new(rand, 'var');
+                            $is_hash ? do { $self_obj->{$ind} //= Sidef::Variable::Variable->new(rand, 'var') } : do {
+
+                                foreach my $ind (0 .. ($$ind)) {
+                                    $self_obj->[$ind] //=
+                                      Sidef::Variable::Variable->new(rand, 'var', Sidef::Types::Nil::Nil->new);
+                                }
+
+                            };
+
                             push @indices, $ind;
                         }
 

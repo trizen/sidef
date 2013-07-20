@@ -71,6 +71,14 @@ Return the
 
 =cut
 
+=head2 chown
+
+File.chown() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 dirname
 
 File.dirname() -> I<Bool>

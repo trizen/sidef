@@ -1,8 +1,8 @@
 package Sidef::Types::Glob::DirHandle {
 
-use 5.014;
-use strict;
-use warnings;
+    use 5.014;
+    use strict;
+    use warnings;
 
     our @ISA = qw(Sidef);
 
@@ -10,8 +10,8 @@ use warnings;
         my (undef, %opt) = @_;
 
         bless {
-               dir_h   => $opt{dir_h},
-               dir => $opt{file},
+               dir_h => $opt{dir_h},
+               dir   => $opt{file},
               },
           __PACKAGE__;
     }
@@ -24,14 +24,14 @@ use warnings;
 
     sub get_files {
         my ($self) = @_;
-        Sidef::Types::Array::Array->new(map{Sidef::Types::Glob::File->new($_)} readdir($self->{dir_h}));
+        Sidef::Types::Array::Array->new(map { Sidef::Types::Glob::File->new($_) } readdir($self->{dir_h}));
     }
 
     *getFiles = \&get_files;
 
     sub get_file {
-        my($self) = @_;
-        (my $file = readdir($self->{dir_h}))//return;
+        my ($self) = @_;
+        (my $file = readdir($self->{dir_h})) // return;
         Sidef::Types::Glob::File->new($file);
     }
 
@@ -49,8 +49,13 @@ use warnings;
     }
 
     sub close {
-        my($self) = @_;
+        my ($self) = @_;
         Sidef::Types::Bool::Bool->new(closedir($self->{dir_h}));
+    }
+
+    sub chdir {
+        my ($self) = @_;
+        Sidef::Types::Bool::Bool->new(chdir($self->{dir_h}));
     }
 
     sub stat {

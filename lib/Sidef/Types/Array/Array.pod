@@ -7,92 +7,170 @@ Sidef::Types::Array::Array
 
 =head1 DESCRIPTION
 
-This object is ...
+This module provides the support for arrays.
 
 =head1 SYNOPSIS
 
-var obj = (Array.new(...));
+=over 2
 
+=item * Creating an array
+
+    var array = (Array.new(obj1, obj2, ...));
+
+or
+
+    var array = [obj1, obj2, ...];
+
+or
+
+    var array = qw(word1 word2 ...);
+
+=item * Retrieving elements
+
+    var elem = array[index];
+
+=item * Modifying elements
+
+    array[index] = someObj;
+
+=item * Applying methods on arrays
+
+    array->method(argument1, argument2, ...);
+
+=back
 
 =head1 INHERITS
 
 Inherits methods from:
 
-	* Sidef
-	* Sidef::Convert::Convert
+    * Sidef
+    * Sidef::Convert::Convert
 
 =head1 METHODS
 
 
 =head2 &
 
-I<Num> B<&> I<Num> -> I<Num>
+I<Array> B<&> I<Array> -> I<Array>
 
-Return the
+Return only the elements which exists in both arrays.
+
+    [1, 2, 3] & [1, 3]        # returns [1, 3]
+    [1, 3, 3] & [3, 3, 5]     # returns [3, 3]
+
+Returns an object of the same type as the self object.
 
 =cut
 
 =head2 &&
 
-I<Num> B<&&> I<Num> -> I<Num>
+I<Array> B<&&> I<Array> -> I<Array>
 
-Return the
+Intersect two arrays. The self array is the primary array.
+
+    ['a', 'c'] && ['b', 'd']   # returns ['a', 'b', 'c', 'd']
+
+Returns an object of the same type as the self object.
 
 =cut
 
 =head2 +
 
-I<Num> B<+> I<Num> -> I<Num>
+I<Array> B<+> I<Array> -> I<Array>
 
-Return the
+Concatenate two arrays.
+
+    [1, 2] + [3, 4]   # returns [1, 2, 3, 4]
+
+Returns an object of the same type as the self object.
 
 =cut
 
 =head2 ++
 
-I<Num> B<++> I<Num> -> I<Num>
+I<Array> B<++> I<Obj> -> I<Array>
 
-Return the
+Increase the array's size by appending one element to it. If no argument is passed, the size will be increased anyway.
+
+    array++             # array size is increased by one
+    array ++ "str"      # "str" has been pushed into array
+
+B<WARNING!> This method modifies the array in place.
+
+Returns the self object.
 
 =cut
 
 =head2 -
 
-I<Num> B<-> I<Num> -> I<Num>
+I<Array> B<-> I<Array> -> I<Array>
 
-Return the
+Return the difference between two arrays. This is the opposite of the L<I<&>|"&"> method.
+
+    ["x", "y", "z"] - ["y", "x"]    # returns ["z"]
+
+Returns an object of the same type as the self object.
 
 =cut
 
 =head2 --
 
-I<Num> B<--> I<Num> -> I<Num>
+I<Array>B<--> -> I<Array>
 
-Return the
+Remove the last element from the array.
+
+    [1, 2, 3]--        # returns [1, 2]
+
+B<WARNING!> This method modifies the array in place.
+
+Returns the self object.
 
 =cut
 
 =head2 ...
 
-I<Num> B<...> I<Num> -> I<Num>
+I<Array>B<...> -> I<List>
 
-Return the
+Return the elements of the array as a list. Useful only an array is passed to a function as a list of arguments.
+
+    array = ['x', 'y'];
+    some_func(array...);        # the function receives two arguments: ("x", "y")
+
+Returns a list with the elements from the self array. In scalar context, only the first element is returned.
 
 =cut
 
 =head2 <<
 
-I<Num> B<E<lt>E<lt>> I<Num> -> I<Num>
+I<Array> B<E<lt>E<lt>> I<Number> -> I<Array>
 
-Return the
+Shift the array to the left with I<Number> elements, and return the elements removed.
+
+    array = [1, 2, 3, 4, 5];
+    array << 2                 # returns the first two elements
+
+    # array loses its first two elements, so it contains only: [3, 4, 5]
+
+B<WARNING!> This method modifies the array in place.
+
+Returns the self object.
 
 =cut
 
 =head2 =
 
-I<Num> B<=> I<Num> -> I<Num>
+I<Slice> B<=> I<Array> -> I<Slice>
 
-Return the
+This method is used to change the elements in a slice of array.
+
+    array = ["a", "b", "c"];
+    array[1, 3, 5]  = ["x", "y", "z"]       # changes the slice elements with the elements from the argument array
+
+    # array is now: ['a', 'x', 'c', 'y', nil, 'z']
+
+B<WARNING!> This method modifies the array in place.
+
+Returns the self object.
 
 =cut
 
