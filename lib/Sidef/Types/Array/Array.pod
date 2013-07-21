@@ -58,7 +58,7 @@ Return only the elements which exists in both arrays.
     [1, 2, 3] & [1, 3];        # returns [1, 3]
     [1, 3, 3] & [3, 3, 5];     # returns [3, 3]
 
-Returns an object of the same type as the self object.
+Returns a new object of the same type as the self object.
 
 =cut
 
@@ -70,7 +70,7 @@ Intersect two arrays. The self array is the primary array.
 
     ['a', 'c'] && ['b', 'd'];     # returns ['a', 'b', 'c', 'd']
 
-Returns an object of the same type as the self object.
+Returns a new object of the same type as the self object.
 
 =cut
 
@@ -82,7 +82,7 @@ Concatenate two arrays.
 
     [1, 2] + [3, 4];   # returns [1, 2, 3, 4]
 
-Returns an object of the same type as the self object.
+Returns a new object of the same type as the self object.
 
 =cut
 
@@ -109,7 +109,7 @@ Return the difference between two arrays. This is the opposite of the L<I<&>|"&"
 
     ["x", "y", "z"] - ["y", "x"]    # returns ["z"]
 
-Returns an object of the same type as the self object.
+Returns a new object of the same type as the self object.
 
 =cut
 
@@ -153,7 +153,7 @@ Shift the array to the left with I<Number> elements, and return the elements rem
 
 B<WARNING!> This method modifies the array in place.
 
-Returns an object of the same type as the self object.
+Returns a new object of the same type as the self object.
 
 =cut
 
@@ -200,7 +200,7 @@ Shift the array to the right with I<Number> elements, and return the elements re
 
 B<WARNING!> This method modifies the array in place.
 
-Returns an object of the same type as the self object.
+Returns a new object of the same type as the self object.
 
 =cut
 
@@ -213,125 +213,169 @@ Return only the elements which doesn't exists in both arrays.
     [2,3] ^ [3,1];          # returns: [2,1]
     [1,2] ^ [1,2,3,4];      # returns: [3,4]
 
-Returns an object of the same type as the self object.
+Returns a new object of the same type as the self object.
 
 =cut
 
 =head2 all
 
-Array.all() -> I<Bool>
+Array.all(I<Block>) -> I<Bool>
 
-Return the
+Returns true if all the array's elements passes the block test.
+
+    ["a", "b", "c"].all { _ < "d"  };       # true
+    [0, 2, 4, 6, 8].all { _ % 2 == 0 };     # true
+    [101, 102, 103].all { _ > 102 };        # false
+
+Returns an object of type: I<Sidef::Types::Bool::Bool>
 
 =cut
 
 =head2 combine
 
-Array.combine() -> I<Bool>
+Array.combine() -> I<Obj>
 
-Return the
+Combine all the elements from the array togheter. The '+' method is used to concatenate all the elements together.
+
+    [[1,2],[3,4]].combine;       # returns: [1,2,3,4]
+    [1,2,3,4,5,6].combine;       # returns the sum of the numbers (21)
+
+Returns an object of the same type as the elements of the array.
 
 =cut
 
 =head2 contains
 
-Array.contains() -> I<Bool>
+Array.contains(I<Obj>) -> I<Bool>
 
-Return the
+Returns true if the array contains the argument object.
+
+    ['x','y','z'].contains('y');        # true
+    [1,[2,3],4,5].contains([2,3]);      # true
+    [1,2,[3],4,5].contains(3);          # false
+
+Returns an object of type: I<Sidef::Types::Bool::Bool>
 
 =cut
 
 =head2 defined
 
-Array.defined() -> I<Bool>
+Array.defined(I<Number>) -> I<Bool>
 
-Return the
+Returns true if the element from the I<Number> position is defined.
+
+    [1,2,3,4,5].defined(0);     # true
+    [1, 2, nil].defined(2);     # false
+
+Returns an object of type: I<Sidef::Types::Bool::Bool>
 
 =cut
 
 =head2 distinct
 
-Array.distinct() -> I<Bool>
+Array.distinct() -> I<Array>
 
-Return the
+Returns only the unique objects from the array.
 
-=cut
+    [1,2,2,[3],4,[3],4].distinct;   # returns: [1,2,[3],4]
 
-=head2 divide
-
-Array.divide() -> I<Bool>
-
-Return the
+Returns an object of the same type as the self object.
 
 =cut
 
 =head2 dropLeft
 
-Array.dropLeft() -> I<Bool>
-
-Return the
+Alias for L<I<E<lt>E<lt>>|"E<lt>E<lt>">.
 
 =cut
 
 =head2 dropRight
 
-Array.dropRight() -> I<Bool>
-
-Return the
+Alias for L<I<E<gt>E<gt>>|"E<gt>E<gt>">.
 
 =cut
 
 =head2 dump
 
-Array.dump() -> I<Bool>
+Array.dump() -> I<String>
 
-Return the
+Returns a string representation of the array.
+
+    qw(a b c).dump;     # returns: "['a', 'b', 'c']"
+
+Returns an object of type: I<Sidef::Types::String::String>
 
 =cut
 
 =head2 exists
 
-Array.exists() -> I<Bool>
+Array.exists(I<Number>) -> I<Bool>
 
-Return the
+Returns true if the array has an element on the specified index.
+
+    ['a','b','c'].exists(1);    # true
+    ['a','b','c'].exists(5);    # false
+
+Returns an object of type: I<Sidef::Types::Bool::Bool>
 
 =cut
 
 =head2 filter
 
-Array.filter() -> I<Bool>
+Array.filter(I<Block>) -> I<Array>
 
-Return the
+Filter the array's elements via a block test.
+
+    ['a','b','c'].filter { _ > 'a'};   # returns: ['b', 'c']
+    [1,2,3,4,5,6].filter { _ <= 3};    # returns: [1, 2, 3]
+
+Returns a new object of the same type as the self object.
 
 =cut
 
 =head2 find
 
-Array.find() -> I<Bool>
+Array.find(I<Block>) -> I<Obj>
 
-Return the
+Find an element inside the array.
+
+    [1, 2, 1, 7, 5, 8].find { _ >= 4 };           # returns: 7
+    ['Hello', 'World'].find { _ =~ /^w/i ?? };    # returns: 'World'
+
+Returns the first element found.
 
 =cut
 
 =head2 first
 
-Array.first() -> I<Bool>
+Array.first() -> I<Obj>
 
-Return the
+Returns the first element of the array.
 
 =cut
 
 =head2 firstIndex
 
-Array.firstIndex() -> I<Bool>
+Array.firstIndex(I<Block>) -> I<Number>
 
-Return the
+Returns the index of the first element which passes the block test. Works just like the L<I<find()>|"find"> method, except that it returns the possition of the element, not the element itself.
+
+    ['a','b','c'].firstIndex { _ == 'c' };      # returns: 3
+    [1,2,3,4,5,6].firstIndex { _ >= 100 };      # returns: -1
+
+Returns an object of type: I<Sidef::Types::Number::Number>
 
 =cut
 
 =head2 first_index
 
-Array.first_index() -> I<Bool>
+Alias for L<I<firstIndex()>|"firstIndex">.
+
+=cut
+
+=head2 fromTo
+
+Array.fromTo() -> I<Bool>
 
 Return the
 
@@ -339,73 +383,83 @@ Return the
 
 =head2 ft
 
-Array.ft() -> I<Bool>
+Array.ft(I<Number>, I<Number>) -> I<Array>
 
-Return the
+Returns the element from the array from within a specified range.
 
-=cut
+    array.(from, to);
 
-=head2 get_value
+If the second argument is omitted, will go till the end of the array.
 
-Array.get_value() -> I<Bool>
+    ['w', 'x', 'y', 'z'].ft(2);         # returns ['y', 'z']
+    ['m', 'n', 'o', 'p'].ft(1, 2);      # returns ['n', 'o']
 
-Return the
+Returns an object of the same type as the self object.
 
 =cut
 
 =head2 grep
 
-Array.grep() -> I<Bool>
-
-Return the
+Alias for L<I<filter()>|"filter">.
 
 =cut
 
 =head2 indexWhere
 
-Array.indexWhere() -> I<Bool>
-
-Return the
+Alias for L<I<firstIndex()>|"firstIndex">.
 
 =cut
 
 =head2 insert
 
-Array.insert() -> I<Bool>
+Array.insert(I<Number>, I<Obj1>, I<Obj2>, I<...>) -> I<Array>
 
-Return the
+Insert elements inside the array at a given position.
+
+    array = qw(a b f);
+    array.insert(2, 'c', 'd', 'e');     # returns: ['a', 'b', 'c', 'd', 'e', 'f']
+
+B<WARNING!> This method modifies the array in place.
+
+Returns the self object.
 
 =cut
 
 =head2 join
 
-Array.join() -> I<Bool>
+Array.join(I<String>) -> I<String>
 
-Return the
+Join the array as a string.
+
+    qw(apples pears apricots).join(", ");      # returns: "apples, pears, apricots"
+
+Returns an object of type: I<Sidef::Types::String::String>
 
 =cut
 
 =head2 joinInsert
 
-Array.joinInsert() -> I<Bool>
+Array.joinInsert(I<Object>) -> I<Array>
 
-Return the
+Insert after each element the argument object. The array is B<NOT> modified in place.
+
+    ['a','b','c'].joinInsert('--');     # returns: ['a','--','b','--','c']
+
+Returns a new object of the same type as the self object.
 
 =cut
 
 =head2 join_insert
 
-Array.join_insert() -> I<Bool>
-
-Return the
+Alias for L<I<joinInsert()>|"joinInsert">.
 
 =cut
 
 =head2 last
 
-Array.last() -> I<Bool>
+Array.last() -> I<Obj>
 
-Return the
+Returns the last element of the array.
 
 =cut
 

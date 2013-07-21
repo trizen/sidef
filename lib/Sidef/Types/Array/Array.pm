@@ -70,27 +70,8 @@ package Sidef::Types::Array::Array {
             [map { $_->get_value } @{$self}];
         };
 
-        *{__PACKAGE__ . '::' . '<<'} = sub {
-            my ($self, $number) = @_;
-            $self->_is_number($number, 1, 0) || return $self->new();
-            $number->is_positive()
-              || do {
-                warn "[WARN] Array's method '<<' requires a positive number!\n";
-                return $self->new();
-              };
-            $self->new(map { $_->get_value } CORE::splice(@{$self}, 0, $$number));
-        };
-
-        *{__PACKAGE__ . '::' . '>>'} = sub {
-            my ($self, $number) = @_;
-            $self->_is_number($number, 1, 0) || return $self->new();
-            $number->is_positive()
-              || do {
-                warn "[WARN] Array's method '>>' requires a positive number!\n";
-                return $self->new();
-              };
-            $self->new(map { $_->get_value } CORE::splice(@{$self}, -$$number));
-        };
+        *{__PACKAGE__ . '::' . '<<'} = \&dropLeft;
+        *{__PACKAGE__ . '::' . '>>'} = \&dropRight;
 
         *{__PACKAGE__ . '::' . '|'} = sub {
             my ($self, $array) = @_;
@@ -250,35 +231,14 @@ package Sidef::Types::Array::Array {
         $_[0]->_min_max('<');
     }
 
-    sub _op_equal {
-        my ($self, $method) = @_;
-
-        $#{$self} > -1 || return;
-        my $first = $self->[0]->get_value;
-
-        foreach my $i (1 .. $#{$self}) {
-            my $obj = $self->[$i]->get_value;
-
-            if ($obj->can($method)) {
-                $first = $first->$method($obj);
-            }
-        }
-
-        $first;
-    }
-
     sub sum {
-        $_[0]->_op_equal('+');
+        $_[0]->reduce(Sidef::Types::String::String->new('+'));
     }
 
     *combine = \&sum;
 
     sub multiply {
-        $_[0]->_op_equal('*');
-    }
-
-    sub divide {
-        $_[0]->_op_equal('/');
+        $_[0]->reduce(Sidef::Types::String::String->new('*'));
     }
 
     sub last {
@@ -313,6 +273,8 @@ package Sidef::Types::Array::Array {
 
         $self->new(map { $_->get_value } @{$self}[$from .. $to]);
     }
+
+    *fromTo = \&ft;
 
     sub map {
         my ($self, $code) = @_;
@@ -387,8 +349,7 @@ package Sidef::Types::Array::Array {
         my ($var_ref) = $code->_get_private_var();
 
         foreach my $i (0 .. $#{$self}) {
-            my $var = $self->[$i];
-            my $val = $var->get_value;
+            my $val = $self->[$i]->get_value;
             $var_ref->get_var->set_value($val);
             if ($code->run) {
                 return Sidef::Types::Number::Number->new($i);
@@ -463,7 +424,7 @@ package Sidef::Types::Array::Array {
                 $x = ($x->$$method($self->[$i]->get_value));
             }
             else {
-                warn "[WARN] Array.reducePairs: can't find method '$$method' for object '", ref($x), "'!\n";
+                warn "[WARN] Array.reduce: can't find method '$$method' for object '", ref($x), "'!\n";
             }
         }
 

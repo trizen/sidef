@@ -345,7 +345,10 @@ package Sidef::Types::String::String {
 
         $size = defined($size) && ($self->_is_number($size) || return $self) ? $$size : 0;
 
-        if (ref($sep) ne 'Sidef::Types::Regex::Regex') {
+        if (ref($sep) eq '') {
+            return Sidef::Types::Array::Array->new(map { __PACKAGE__->new($_) } split(' ', $$self, $size));
+        }
+        elsif (ref($sep) ne 'Sidef::Types::Regex::Regex') {
             if ($sep->can('quotemeta')) {
                 $sep = $sep->quotemeta();
             }

@@ -566,12 +566,12 @@ package Sidef::Parser {
 
                 # Boolean value
                 when (/\G((?>true|false))\b/gc) {
-                    return Sidef::Types::Bool::Bool->$1, pos;
+                    return $self->{static_objects}{$1} //= Sidef::Types::Bool::Bool->$1, pos;
                 }
 
                 # 'Not initialized' value
                 when (/\Gnil\b/gc) {
-                    return Sidef::Types::Nil::Nil->new(), pos;
+                    return $self->{static_objects}{nil} //= Sidef::Types::Nil::Nil->new(), pos;
                 }
 
                 # Special number
