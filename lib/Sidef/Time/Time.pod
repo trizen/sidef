@@ -19,7 +19,7 @@ This modules creates a new I<Time> object.
 
 =head2 gmTime
 
-Time.new.gmTime() -> I<Sidef::Time::Gmtime>
+Time.new.gmTime() -> C<Sidef::Time::Gmtime>
 
 Return a I<gmtime> object.
 
@@ -27,13 +27,13 @@ Return a I<gmtime> object.
 
 =head2 gmtime
 
-Alias for L<I<gmTime()>|"gmTime">.
+Alias for L<C<gmTime()>|"gmTime">.
 
 =cut
 
 =head2 local
 
-Time.new.local() -> I<Sidef::Time::Localtime>
+Time.new.local() -> C<Sidef::Time::Localtime>
 
 Return a I<localtime> object.
 
@@ -41,13 +41,13 @@ Return a I<localtime> object.
 
 =head2 localTime
 
-Alias for L<I<local()>|"local">.
+Alias for L<C<local()>|"local">.
 
 =cut
 
 =head2 localtime
 
-Alias for L<I<local()>|"local">.
+Alias for L<C<local()>|"local">.
 
 =cut
 
@@ -78,6 +78,6 @@ Return the number of seconds elapsed since the beginning of the current epoch (1
 
 =head2 time_now
 
-Alias for L<I<timeNow()>|"timeNow">.
+Alias for L<C<timeNow()>|"timeNow">.
 
 =cut

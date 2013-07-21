@@ -58,7 +58,7 @@ Return 1 if the specified time occurs during Daylight Saving Time, 0 otherwise.
 
 =head2 mday
 
-Alias for L<I<day()>|"day">.
+Alias for L<C<day()>|"day">.
 
 =cut
 
@@ -80,7 +80,7 @@ Return the month in the range 0..11, with 0 indicating January and 11 indicating
 
 =head2 month
 
-Alias for L<I<mon()>|"mon">.
+Alias for L<C<mon()>|"mon">.
 
 =cut
 

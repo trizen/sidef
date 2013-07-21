@@ -23,7 +23,7 @@ This module can load a perl module at run-time, via the keyword I<require>.
 
 =head2 require
 
-require(I<String>)  ->  I<Sidef::Module::Caller>
+require(I<String>)  ->  C<Sidef::Module::Caller>
 
 =over 2
 
@@ -31,7 +31,7 @@ require(I<String>)  ->  I<Sidef::Module::Caller>
 
     var req = (require "Some::Perl::Module");
 
-When the Perl module is successfully loaded, it returns a I<Sidef::Module::Caller> object, which can call any method from the required module.
+When the Perl module is successfully loaded, it returns a C<Sidef::Module::Caller> object, which can call any method from the required module.
 
     var oo_mod = (req.new);
     var result = (oo_mod.some_method);
