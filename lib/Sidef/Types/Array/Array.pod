@@ -131,7 +131,7 @@ Returns the self object.
 
 I<Array>B<...> -> I<List>
 
-Return the elements of the array as a list. Useful only an array is passed to a function as a list of arguments.
+Return the elements of the array as a list. Useful only when an array is passed to a function as a list of arguments.
 
     array = ['x', 'y'];
     some_func(array...);        # the function receives two arguments: ("x", "y")
@@ -149,7 +149,7 @@ Shift the array to the left with I<Number> elements, and return the elements rem
     array = [1, 2, 3, 4, 5];
     array << 2;                 # returns the first two elements: [1,2]
 
-    # array loses its first two elements, so it contains only: [3, 4, 5]
+    # The array lost its first two elements, so it contains only: [3, 4, 5]
 
 B<WARNING!> This method modifies the array in place.
 
@@ -196,7 +196,7 @@ Shift the array to the right with I<Number> elements, and return the elements re
     array = [1, 2, 3, 4, 5];
     array >> 2;                 # returns the last two elements: [4, 5]
 
-    # array loses its last two elements, so it contains only: [1,2,3]
+    # The array lost its last two elements, so it contains only: [1,2,3]
 
 B<WARNING!> This method modifies the array in place.
 
@@ -208,7 +208,7 @@ Returns an object of the same type as the self object.
 
 I<Array> B<^> I<Array> -> I<Array>
 
-Return only the elements which don't exists in both arrays.
+Return only the elements which doesn't exists in both arrays.
 
     [2,3] ^ [3,1];          # returns: [2,1]
     [1,2] ^ [1,2,3,4];      # returns: [3,4]
