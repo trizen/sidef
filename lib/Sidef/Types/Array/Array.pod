@@ -53,7 +53,7 @@ Inherits methods from:
 
 I<Array> B<&> I<Array> -> I<Array>
 
-Return only the elements which exists in both arrays.
+Returns a new array with the elements which exists in both arrays.
 
     [1, 2, 3] & [1, 3];        # returns [1, 3]
     [1, 3, 3] & [3, 3, 5];     # returns [3, 3]
@@ -88,12 +88,25 @@ Returns a new object of the same type as the self object.
 
 =head2 ++
 
-I<Array> B<++> I<Obj> -> I<Array>
+=over 2
 
-Increase the array's size by appending one element to it. If no argument is passed, the size will be increased anyway.
+=item * I<Array> B<++> I<Obj> -> I<Array>
+
+Append one element to array.
+
+    array ++ "str";      # "str" has been pushed into array
+
+=back
+
+=over 2
+
+=item * I<Array>B<++> -> I<Array>
+
+Increases the array's size by one element.
 
     array++;             # array size is increased by one
-    array ++ "str";      # "str" has been pushed into array
+
+=back
 
 B<WARNING!> This method modifies the array in place.
 
@@ -105,7 +118,7 @@ Returns the self object.
 
 I<Array> B<-> I<Array> -> I<Array>
 
-Return the difference between two arrays. This is the opposite of the L<I<&>|"&"> method.
+Return the difference between two arrays. This is the opposite of the L<C<&>|"&"> method.
 
     ["x", "y", "z"] - ["y", "x"]    # returns ["z"]
 
@@ -183,7 +196,7 @@ Check to see if two arrays contains the same elements. The arrays are checked re
     [1,[2,3],4]  == [1,[2,3],4];   # true
     [1,[8,9],4]  == [1,[2,3],4];   # false
 
-Returns an object of type: I<Sidef::Types::Bool::Bool>
+Returns an object of type: C<Sidef::Types::Bool::Bool>
 
 =cut
 
@@ -208,7 +221,7 @@ Returns a new object of the same type as the self object.
 
 I<Array> B<^> I<Array> -> I<Array>
 
-Return only the elements which doesn't exists in both arrays.
+Returns a new array with the elements which doesn't exists in both arrays.
 
     [2,3] ^ [3,1];          # returns: [2,1]
     [1,2] ^ [1,2,3,4];      # returns: [3,4]
@@ -227,7 +240,7 @@ Returns true if all the array's elements passes the block test.
     [0, 2, 4, 6, 8].all { _ % 2 == 0 };     # true
     [101, 102, 103].all { _ > 102 };        # false
 
-Returns an object of type: I<Sidef::Types::Bool::Bool>
+Returns an object of type: C<Sidef::Types::Bool::Bool>
 
 =cut
 
@@ -235,7 +248,7 @@ Returns an object of type: I<Sidef::Types::Bool::Bool>
 
 Array.combine() -> I<Obj>
 
-Combine all the elements from the array togheter. The '+' method is used to concatenate all the elements together.
+Combine all the elements from the array togheter. The array's elements must have a C<+> method associated.
 
     [[1,2],[3,4]].combine;       # returns: [1,2,3,4]
     [1,2,3,4,5,6].combine;       # returns the sum of the numbers (21)
@@ -254,7 +267,7 @@ Returns true if the array contains the argument object.
     [1,[2,3],4,5].contains([2,3]);      # true
     [1,2,[3],4,5].contains(3);          # false
 
-Returns an object of type: I<Sidef::Types::Bool::Bool>
+Returns an object of type: C<Sidef::Types::Bool::Bool>
 
 =cut
 
@@ -264,10 +277,10 @@ Array.defined(I<Number>) -> I<Bool>
 
 Returns true if the element from the I<Number> position is defined.
 
-    [1,2,3,4,5].defined(0);     # true
-    [1, 2, nil].defined(2);     # false
+    [1,2,3,4,5,6].defined(0);     # true
+    ['a','b',nil].defined(2);     # false
 
-Returns an object of type: I<Sidef::Types::Bool::Bool>
+Returns an object of type: C<Sidef::Types::Bool::Bool>
 
 =cut
 
@@ -285,13 +298,13 @@ Returns an object of the same type as the self object.
 
 =head2 dropLeft
 
-Alias for L<I<E<lt>E<lt>>|"E<lt>E<lt>">.
+Alias for L<C<E<lt>E<lt>>|"E<lt>E<lt>">.
 
 =cut
 
 =head2 dropRight
 
-Alias for L<I<E<gt>E<gt>>|"E<gt>E<gt>">.
+Alias for L<C<E<gt>E<gt>>|"E<gt>E<gt>">.
 
 =cut
 
@@ -303,7 +316,7 @@ Returns a string representation of the array.
 
     qw(a b c).dump;     # returns: "['a', 'b', 'c']"
 
-Returns an object of type: I<Sidef::Types::String::String>
+Returns an object of type: C<Sidef::Types::String::String>
 
 =cut
 
@@ -316,7 +329,7 @@ Returns true if the array has an element on the specified index.
     ['a','b','c'].exists(1);    # true
     ['a','b','c'].exists(5);    # false
 
-Returns an object of type: I<Sidef::Types::Bool::Bool>
+Returns an object of type: C<Sidef::Types::Bool::Bool>
 
 =cut
 
@@ -358,18 +371,18 @@ Returns the first element of the array.
 
 Array.firstIndex(I<Block>) -> I<Number>
 
-Returns the index of the first element which passes the block test. Works just like the L<I<find()>|"find"> method, except that it returns the possition of the element, not the element itself.
+Returns the index of the first element which passes the block test. Works just like the L<C<find()>|"find"> method, except that it returns the possition of the element, not the element itself.
 
     ['a','b','c'].firstIndex { _ == 'c' };      # returns: 3
     [1,2,3,4,5,6].firstIndex { _ >= 100 };      # returns: -1
 
-Returns an object of type: I<Sidef::Types::Number::Number>
+Returns an object of type: C<Sidef::Types::Number::Number>
 
 =cut
 
 =head2 first_index
 
-Alias for L<I<firstIndex()>|"firstIndex">.
+Alias for L<C<firstIndex()>|"firstIndex">.
 
 =cut
 
@@ -400,13 +413,13 @@ Returns an object of the same type as the self object.
 
 =head2 grep
 
-Alias for L<I<filter()>|"filter">.
+Alias for L<C<filter()>|"filter">.
 
 =cut
 
 =head2 indexWhere
 
-Alias for L<I<firstIndex()>|"firstIndex">.
+Alias for L<C<firstIndex()>|"firstIndex">.
 
 =cut
 
@@ -433,7 +446,7 @@ Join the array as a string.
 
     qw(apples pears apricots).join(", ");      # returns: "apples, pears, apricots"
 
-Returns an object of type: I<Sidef::Types::String::String>
+Returns an object of type: C<Sidef::Types::String::String>
 
 =cut
 
@@ -451,7 +464,7 @@ Returns a new object of the same type as the self object.
 
 =head2 join_insert
 
-Alias for L<I<joinInsert()>|"joinInsert">.
+Alias for L<C<joinInsert()>|"joinInsert">.
 
 =cut
 
@@ -465,137 +478,223 @@ Returns the last element of the array.
 
 =head2 lastIndex
 
-Array.lastIndex() -> I<Bool>
+Array.lastIndex(I<Block>) -> I<Number>
 
-Return the
+Works just like L<C<firstIndex()>|"firstIndex">, except that it searches backwards and returns the index of the last element of the array which passed the block test.
+
+    [1,2,3,4,5,6].firstIndex { _**2 < 20 };     # returns: 3
+
+Returns an object of type: C<Sidef::Types::Number::Number>
 
 =cut
 
 =head2 lastIndexWhere
 
-Array.lastIndexWhere() -> I<Bool>
-
-Return the
+Alias for L<C<lastIndex()>|"lastIndex">.
 
 =cut
 
 =head2 last_index
 
-Array.last_index() -> I<Bool>
-
-Return the
+Alias for L<C<lastIndex()>|"lastIndex">.
 
 =cut
 
 =head2 len
 
-Array.len() -> I<Bool>
+Array.len() -> I<Number>
 
-Return the
+Return the length of the array.
+
+    ['a','b','c'].len;      # returns: 3
+
+Returns an object of type: C<Sidef::Types::Number::Number>
 
 =cut
 
 =head2 length
 
-Array.length() -> I<Bool>
-
-Return the
+Alias for L<C<len()>|"len">.
 
 =cut
 
 =head2 make
 
-Array.make() -> I<Bool>
+Array.make(I<Number>, I<Obj>) -> I<Array>
 
-Return the
+Make a new array of I<Number> size, contaiting the I<Obj> on every position.
+
+    Array.make(3, Num);     # returns: [0,0,0]
+    Array.make(3, "x");     # returns: ['x','x','x']
+
+Returns a new object of the same type as the self object.
 
 =cut
 
 =head2 map
 
-Array.map() -> I<Bool>
+Array.map(I<Block>) -> I<Bool>
 
-Return the
+Evaluates the I<Block> for each element of I<Array> and returns a new array composed of the results of each such evaluation.
+
+    [1,2,3].map { _ + 10 };     # returns: [11, 12, 13]
+
+B<WARNING!> By modifing the C<_> variable, the modification is visible inside the self array.
+
+Returns a new object of the same type as the self object.
 
 =cut
 
 =head2 max
 
-Array.max() -> I<Bool>
+Array.max() -> I<Obj>
 
-Return the
+Returns the greatest element of the list. Each element must have the C<E<gt>> method associated.
+
+    [5,7,8,2,3,1].max;        # returns: 8
+    ['l','w','p'].max;        # returns: 'w'
+
+Returns an object of the same type as the elements of the array.
 
 =cut
 
 =head2 mesh
 
-Array.mesh() -> I<Bool>
-
-Return the
+Alias for L<C<&&>|"&&">.
 
 =cut
 
 =head2 min
 
-Array.min() -> I<Bool>
+Array.min() -> I<Obj>
 
-Return the
+Works just like the L<C<max()>|"max"> method, except that it returns the lower element, instead of the greatest one.
+
+    [4,2,3,5,7,8].min;       # returns: 2
+    ['s','p','d'].min;       # returns: 'd'
+
+Returns an object of the same type as the elements of the array.
 
 =cut
 
 =head2 multiply
 
-Array.multiply() -> I<Bool>
+Array.multiply() -> I<Obj>
 
-Return the
+Works just like the L<C<combine()>|"combine"> method, except that it multiplies each element of the array, using the C<*> method. Useful for working with matrices.
+
+    [5,6,7].multiply;       # returns the product number (210)
+
+Returns an object of the same type as the elements of the array.
 
 =cut
 
 =head2 new
 
-Array.new() -> I<Bool>
+Array.new(I<Obj1>, I<Obj2>, I<...>) -> I<Array>
 
-Return the
+Creates a new array.
+
+    Array.new(1,2,3);       # returns: [1, 2, 3]
+
+Returns a new object of the same type as the self object.
 
 =cut
 
 =head2 offset
 
-Array.offset() -> I<Bool>
+Array.offset() -> I<Number>
 
-Return the
+Returns the last index of the array.
+
+    ['a','b','c'].offset;       # returns: 2
+
+Returns an object of type: C<Sidef::Types::Number::Number>
 
 =cut
 
 =head2 pop
 
-Array.pop() -> I<Bool>
+=over 2
 
-Return the
+=item * Array.pop(I<Number>) -> I<Obj>
+
+Remove the element from the specified position.
+
+    array = qw(a b c);
+    array.pop(1);       # returns the removed element from position 1: 'b'
+
+    # array contains: ['a', 'c']
+
+=back
+
+=over 2
+
+=item * Array.pop() -> I<Obj>
+
+Removes the last element of the array.
+
+    array = qw(a b c);
+    array.pop;          # returns the removed last element: 'c'
+
+    # array contains: ['a', 'b']
+
+=back
+
+B<WARNING!> This method modifies the array in place.
 
 =cut
 
 =head2 push
 
-Array.push() -> I<Bool>
+Array.push(I<Obj1>, I<Obj2>, I<...>) -> I<Array>
 
-Return the
+Append some elements to array.
+
+    array = qw(s i d);
+    array.push("e", "f");      # pushes the element to array and returns: qw(s i d e f)
+
+B<WARNING!> This method modifies the array in place.
+
+Returns the self object.
 
 =cut
 
 =head2 range
 
-Array.range() -> I<Bool>
+Array.range() -> I<Array>
 
-Return the
+Returns a new array with numbers ranging from C<0> to C<array.offset>.
+
+    ['x','y','z'].range;       # returns: [0, 1 ,2]
+
+This method always returns an object of type: C<Sidef::Types::Array::Array>
 
 =cut
 
 =head2 reduce
 
-Array.reduce() -> I<Bool>
+=over 2
 
-Return the
+=item * Array.reduce(I<Block>) -> I<Bool>
+
+Reduces array by calling I<Block>, multiple times, setting C<_[0]> and C<_[1]> each time. The first call will be with C<_[0]> and C<_[1]> set to the first two elements of the list, subsequent calls will be done by setting C<_[0]> to the result of the previous call and C<_[1]> to the next element in the list.
+
+    [1,2,3,4].reduce { _[0] + _[1] };   # returns the sum of array's elements (1+2+3+4 = 10)
+
+=back
+
+=over 2
+
+=item * Array.reduce(I<String>) -> I<Bool>
+
+Almost the same as when it takes a block argument, but much more limited.
+
+    [1,2,3,4].reduce('*');      # returns the product of array's elements (1*2*3*4 = 24)
+
+=back
+
+Returns an object of the same type as the elements of the array.
 
 =cut
 

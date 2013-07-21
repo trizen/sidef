@@ -385,21 +385,34 @@ package Sidef::Types::Array::Array {
     *lastIndex      = \&last_index;
 
     sub reducePairs {
-        my ($self, $method) = @_;
-
-        $self->_is_string($method) || return;
+        my ($self, $obj) = @_;
 
         (my $offset = $#{$self}) >= 0 || return;
-
         my $array = $self->new();
-        for (my $i = 1 ; $i <= $offset ; $i += 2) {
-            my $x = $self->[$i - 1]->get_value;
 
-            if ($x->can($$method)) {
-                $array->push($x->$$method($self->[$i]->get_value));
+        if ($self->_is_string($obj, 1, 1)) {
+            my $method = $$obj;
+            for (my $i = 1 ; $i <= $offset ; $i += 2) {
+                my $x = $self->[$i - 1]->get_value;
+
+                if ($x->can($method)) {
+                    $array->push($x->$method($self->[$i]->get_value));
+                }
+                else {
+                    warn "[WARN] Array.reducePairs: can't find method '$method' for object '", ref($x), "'!\n";
+                }
             }
-            else {
-                warn "[WARN] Array.reducePairs: can't find method '$$method' for object '", ref($x), "'!\n";
+
+        }
+        elsif ($self->_is_code($obj)) {
+            my $code = $obj;
+            my ($var_ref, $class) = $code->_get_private_var();
+            my $comp_code = {$class => [@{$code->{$class}}[1 .. $#{$code->{$class}}]]};
+
+            for (my $i = 1 ; $i <= $offset ; $i += 2) {
+                $var_ref->get_var->set_value(
+                                   Sidef::Types::Array::Array->new($self->[$i - 1]->get_value, $self->[$i]->get_value));
+                $array->push(Sidef::Types::Block::Code->new($comp_code)->run);
             }
         }
 
@@ -413,18 +426,30 @@ package Sidef::Types::Array::Array {
     }
 
     sub reduce {
-        my ($self, $method) = @_;
+        my ($self, $obj) = @_;
 
-        $self->_is_string($method) || return;
         (my $offset = $#{$self}) >= 0 || return;
-
         my $x = $self->[0]->get_value;
-        foreach my $i (1 .. $offset) {
-            if ($x->can($$method)) {
-                $x = ($x->$$method($self->[$i]->get_value));
+
+        if ($self->_is_string($obj, 1, 1)) {
+            my $method = $$obj;
+            foreach my $i (1 .. $offset) {
+                if ($x->can($method)) {
+                    $x = ($x->$method($self->[$i]->get_value));
+                }
+                else {
+                    warn "[WARN] Array.reduce: can't find method '$method' for object '", ref($x), "'!\n";
+                }
             }
-            else {
-                warn "[WARN] Array.reduce: can't find method '$$method' for object '", ref($x), "'!\n";
+        }
+        elsif ($self->_is_code($obj)) {
+            my $code = $obj;
+            my ($var_ref, $class) = $code->_get_private_var();
+            my $comp_code = {$class => [@{$code->{$class}}[1 .. $#{$code->{$class}}]]};
+
+            foreach my $i (1 .. $offset) {
+                $var_ref->get_var->set_value(Sidef::Types::Array::Array->new($x, $self->[$i]->get_value));
+                $x = Sidef::Types::Block::Code->new($comp_code)->run;
             }
         }
 
