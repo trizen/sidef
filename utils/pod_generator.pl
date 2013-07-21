@@ -54,6 +54,7 @@ my %ignored_methods = (
                        'Sidef::Types::Block::Continue'  => [qw(new)],
                        'Sidef::Types::Regex::Matches'   => [qw(new)],
                        'Sidef::Types::Regex::Regex'     => [qw(new)],
+                       'Sidef::Types::Array::Array'     => [qw(get_value a b)],
                        'Sidef::Types::Number::Number'   => [qw(get_value)],
                        'Sidef::Types::String::String'   => [qw(get_value)],
                        'Sidef::Types::Byte::Bytes'      => [qw(decode_utf8)],

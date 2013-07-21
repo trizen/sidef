@@ -55,8 +55,8 @@ I<Array> B<&> I<Array> -> I<Array>
 
 Return only the elements which exists in both arrays.
 
-    [1, 2, 3] & [1, 3]        # returns [1, 3]
-    [1, 3, 3] & [3, 3, 5]     # returns [3, 3]
+    [1, 2, 3] & [1, 3];        # returns [1, 3]
+    [1, 3, 3] & [3, 3, 5];     # returns [3, 3]
 
 Returns an object of the same type as the self object.
 
@@ -68,7 +68,7 @@ I<Array> B<&&> I<Array> -> I<Array>
 
 Intersect two arrays. The self array is the primary array.
 
-    ['a', 'c'] && ['b', 'd']   # returns ['a', 'b', 'c', 'd']
+    ['a', 'c'] && ['b', 'd'];     # returns ['a', 'b', 'c', 'd']
 
 Returns an object of the same type as the self object.
 
@@ -80,7 +80,7 @@ I<Array> B<+> I<Array> -> I<Array>
 
 Concatenate two arrays.
 
-    [1, 2] + [3, 4]   # returns [1, 2, 3, 4]
+    [1, 2] + [3, 4];   # returns [1, 2, 3, 4]
 
 Returns an object of the same type as the self object.
 
@@ -92,8 +92,8 @@ I<Array> B<++> I<Obj> -> I<Array>
 
 Increase the array's size by appending one element to it. If no argument is passed, the size will be increased anyway.
 
-    array++             # array size is increased by one
-    array ++ "str"      # "str" has been pushed into array
+    array++;             # array size is increased by one
+    array ++ "str";      # "str" has been pushed into array
 
 B<WARNING!> This method modifies the array in place.
 
@@ -119,7 +119,7 @@ I<Array>B<--> -> I<Array>
 
 Remove the last element from the array.
 
-    [1, 2, 3]--        # returns [1, 2]
+    [1, 2, 3]--;        # returns [1, 2]
 
 B<WARNING!> This method modifies the array in place.
 
@@ -144,16 +144,16 @@ Returns a list with the elements from the self array. In scalar context, only th
 
 I<Array> B<E<lt>E<lt>> I<Number> -> I<Array>
 
-Shift the array to the left with I<Number> elements, and return the elements removed.
+Shift the array to the left with I<Number> elements, and return the elements removed. The I<Number> must be positive.
 
     array = [1, 2, 3, 4, 5];
-    array << 2                 # returns the first two elements
+    array << 2;                 # returns the first two elements: [1,2]
 
     # array loses its first two elements, so it contains only: [3, 4, 5]
 
 B<WARNING!> This method modifies the array in place.
 
-Returns the self object.
+Returns an object of the same type as the self object.
 
 =cut
 
@@ -164,7 +164,7 @@ I<Slice> B<=> I<Array> -> I<Slice>
 This method is used to change the elements in a slice of array.
 
     array = ["a", "b", "c"];
-    array[1, 3, 5]  = ["x", "y", "z"]       # changes the slice elements with the elements from the argument array
+    array[1, 3, 5]  = ["x", "y", "z"];       # changes the slice elements with the elements from the argument array
 
     # array is now: ['a', 'x', 'c', 'y', nil, 'z']
 
@@ -176,47 +176,50 @@ Returns the self object.
 
 =head2 ==
 
-I<Num> B<==> I<Num> -> I<Num>
+I<Array> B<==> I<Array> -> I<Bool>
 
-Return the
+Check to see if two arrays contains the same elements. The arrays are checked recursively.
+
+    [1,[2,3],4]  == [1,[2,3],4];   # true
+    [1,[8,9],4]  == [1,[2,3],4];   # false
+
+Returns an object of type: I<Sidef::Types::Bool::Bool>
 
 =cut
 
 =head2 >>
 
-I<Num> B<E<gt>E<gt>> I<Num> -> I<Num>
+I<Array> B<E<gt>E<gt>> I<Number> -> I<Array>
 
-Return the
+Shift the array to the right with I<Number> elements, and return the elements removed. The I<Number> must be positive.
+
+    array = [1, 2, 3, 4, 5];
+    array >> 2;                 # returns the last two elements: [4, 5]
+
+    # array loses its last two elements, so it contains only: [1,2,3]
+
+B<WARNING!> This method modifies the array in place.
+
+Returns an object of the same type as the self object.
 
 =cut
 
 =head2 ^
 
-I<Num> B<^> I<Num> -> I<Num>
+I<Array> B<^> I<Array> -> I<Array>
 
-Return the
+Return only the elements which don't exists in both arrays.
 
-=cut
+    [2,3] ^ [3,1];          # returns: [2,1]
+    [1,2] ^ [1,2,3,4];      # returns: [3,4]
 
-=head2 a
-
-Array.a() -> I<Bool>
-
-Return the
+Returns an object of the same type as the self object.
 
 =cut
 
 =head2 all
 
 Array.all() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 b
-
-Array.b() -> I<Bool>
 
 Return the
 
