@@ -217,6 +217,44 @@ package Sidef::Types::Glob::File {
         __PACKAGE__->new(File::Spec->rel2abs($$self));
     }
 
+    sub rename {
+        my ($self, $file) = @_;
+
+        ref($file) eq __PACKAGE__
+          || $self->_is_string($file)
+          || return;
+
+        Sidef::Types::Bool::Bool->new(rename($$self, $$file));
+    }
+
+    sub move {
+        my ($self, $file) = @_;
+
+        ref($file) eq __PACKAGE__
+          || $self->_is_string($file)
+          || return;
+
+        require File::Copy;
+        Sidef::Types::Bool::Bool->new(File::Copy::move($$self, $$file));
+    }
+
+    *mv = \&move;
+
+    sub copy {
+        my ($self, $file) = @_;
+
+             ref($file) eq 'Sidef::Types::Glob::FileHandle'
+          || ref($file) eq __PACKAGE__
+          || $self->_is_string($file)
+          || return;
+
+        require File::Copy;
+        Sidef::Types::Bool::Bool->new(
+                       File::Copy::copy($$self, ref($file) eq 'Sidef::Types::Glob::FileHandle' ? $file->{fh} : $$file));
+    }
+
+    *cp = \&copy;
+
     sub open {
         my ($self, $mode) = @_;
         $mode = ${$mode} if ref $mode;

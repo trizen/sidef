@@ -261,6 +261,11 @@ package Sidef::Types::Number::Number {
         $self->new($min + rand($max - $min));
     }
 
+    sub range {
+        my ($self) = @_;
+        $$self >= 0 ? $self->new(0)->to($self) : $self->to($self->new(0));
+    }
+
     sub commify {
         my ($self) = @_;
 

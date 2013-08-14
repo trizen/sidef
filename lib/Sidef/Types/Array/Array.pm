@@ -670,6 +670,8 @@ package Sidef::Types::Array::Array {
         $self;
     }
 
+    *append = \&push;
+
     sub unshift {
         my ($self, @args) = @_;
         unshift @{$self}, @{$self->new(@args)};
