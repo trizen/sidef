@@ -1,23 +1,15 @@
 #!/usr/bin/ruby
 
-var i     = 0;
-var pass  = 0;
 var doors = [];
 
-{
-    {
-        {
-            doors[i] := false;
-            doors[i] = (doors[i] ? (false) : (true));
-        } if (i % pass == 0);
+for (var pass = 1; pass <= 100; pass++) {
+    for (var i = 1; i <= 100; i++) {
+        i % pass == 0 && (
+            doors[i] = (doors[i] := false -> not);
+        );
+    }
+}
 
-    } for (i = 1; i <= 100; i += 1);
-
-} for (pass = 1; pass <= 100; pass += 1);
-
-
-var format = "Door %d is %s\n";
-{
-    format->printf(i, (doors[i] ? 'open' : 'closed'));
-
-} for (i = 1; i<= 100; i += 1);
+for (var i = 1; i <= 100; i++) {
+    "Door %d is %s\n".printf(i, (doors[i] ? 'open' : 'closed'));
+}

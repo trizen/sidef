@@ -3,7 +3,6 @@ package Sidef::Types::Byte::Bytes {
     use 5.014;
     use strict;
     use warnings;
-    use autouse 'Encode' => qw(decode_utf8($;$));
 
     our @ISA = qw(
       Sidef::Types::Array::Array
@@ -17,7 +16,9 @@ package Sidef::Types::Byte::Bytes {
 
     sub join {
         my ($self) = @_;
-        Sidef::Types::String::String->new(decode_utf8(join('', map { $_->get_value->chr } @{$self})));
+
+        require Encode;
+        Sidef::Types::String::String->new(Encode::decode_utf8(join('', map { $_->get_value->chr } @{$self})));
     }
 
 }

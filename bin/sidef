@@ -4,13 +4,11 @@ use 5.014;
 use strict;
 use warnings;
 
+BEGIN { unshift(@INC, '../lib') }
+
 binmode(STDOUT, ':encoding(UTF-8)');
 binmode(STDERR, ':encoding(UTF-8)');
 binmode(STDIN,  ':encoding(UTF-8)');
-
-use lib '../lib';    # devel only
-use autouse 'Getopt::Std' => qw(getopts($;$));        # arguments support
-use autouse 'Encode'      => qw(decode_utf8($;$));    # unicode support
 
 require Sidef;
 require Sidef::Parser;
@@ -20,7 +18,8 @@ my $version = $Sidef::VERSION;
 
 my %args;
 if (@ARGV and chr ord $ARGV[0] eq '-') {
-    getopts('E:d:Dho:ivH', \%args);
+    require Getopt::Std;
+    Getopt::Std::getopts('E:d:Dho:ivH', \%args);
 }
 
 my %keywords = (
@@ -148,7 +147,7 @@ else {
 
         my $code =
           exists $args{E}
-          ? do { $script_name = '-E'; decode_utf8($args{E}) }
+          ? do { $script_name = '-E'; require Encode; Encode::decode_utf8($args{E}) }
           : (defined($ARGV[0]) && -f $ARGV[0]) ? do {
 
             my $file = shift;

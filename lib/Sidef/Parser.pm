@@ -475,20 +475,6 @@ package Sidef::Parser {
             {
                 ++$found_space;
 
-                # One-line comment
-                if (/\G#.*/gc) {
-                    redo;
-                }
-
-                # Multi-line C comment
-                if (m{\G/\*}gc) {
-                    while (1) {
-                        m{\G.*?\*/}gc && last;
-                        /\G.+/gc || (/\G\R/gc ? $self->{line}++ : last);
-                    }
-                    redo;
-                }
-
                 # Whitespace
                 if (/\G(?=\s)/) {
 
@@ -507,6 +493,20 @@ package Sidef::Parser {
                     if (/\G\v+/gc) {
                         redo;
                     }
+                }
+
+                # One-line comment
+                if (/\G#.*/gc) {
+                    redo;
+                }
+
+                # Multi-line C comment
+                if (m{\G/\*}gc) {
+                    while (1) {
+                        m{\G.*?\*/}gc && last;
+                        /\G.+/gc || (/\G\R/gc ? $self->{line}++ : last);
+                    }
+                    redo;
                 }
 
                 if ($found_space > 0) {
@@ -744,7 +744,7 @@ package Sidef::Parser {
                 }
 
                 foreach my $hash_ref (@{$self->{obj_keys}}) {
-                    if ($_ =~ $hash_ref->{re}) {
+                    if (/$hash_ref->{re}/) {
                         $self->{expect_method} = 1;
 
                         if ($hash_ref->{dynamic}) {

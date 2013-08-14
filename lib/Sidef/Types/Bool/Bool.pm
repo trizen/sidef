@@ -7,15 +7,20 @@ package Sidef::Types::Bool::Bool {
 
     our @ISA = qw(Sidef::Convert::Convert);
 
-    sub new {
-        my (undef, $bool) = @_;
+    {
+        my %bool = (
+                    true  => (bless \(my $t = 'true'),  __PACKAGE__),
+                    false => (bless \(my $f = 'false'), __PACKAGE__),
+                   );
 
-        $bool = $$bool if (ref $bool);
+        sub new {
+            my (undef, $bool) = @_;
+            $bool{$bool ? 'true' : 'false'};
+        }
 
-        # Decide if true or false
-        $bool = $bool ? 'true' : 'false';
+        sub true { $bool{true} }
 
-        bless \$bool, __PACKAGE__;
+        sub false { $bool{false} }
     }
 
     sub get_value {
@@ -44,16 +49,6 @@ package Sidef::Types::Bool::Bool {
 
             return Sidef::Types::Bool::Ternary->new({code => $code, bool => $self->false});
         };
-    }
-
-    sub true {
-        my ($self) = @_;
-        $self->new(1);
-    }
-
-    sub false {
-        my ($self) = @_;
-        $self->new(0);
     }
 
     sub is_true {
