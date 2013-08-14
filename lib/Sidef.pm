@@ -1,9 +1,7 @@
 
-use 5.006;
+use 5.014;
 use strict;
 use warnings;
-
-no if $] >= 5.018, warnings => "experimental::smartmatch";
 
 package Sidef {
 
@@ -11,22 +9,20 @@ package Sidef {
 
     {
         my %types = (
-            bool   => {class => [qw(Sidef::Types::Bool::Bool)]},
-            code   => {class => [qw(Sidef::Types::Block::Code)]},
-            hash   => {class => [qw(Sidef::Types::Hash::Hash)]},
-            number => {class => [qw(Sidef::Types::Number::Number)], type => 'SCALAR'},
-            string => {class => [qw(Sidef::Types::String::String)], type => 'SCALAR'},
-            array => {
-                type  => 'ARRAY',
-                class => [
-                    qw(
-                      Sidef::Types::Array::Array
-                      Sidef::Types::Chars::Chars
-                      Sidef::Types::Bytes::Bytes
-                      )
-                ],
-            },
-        );
+                     bool   => {class => {'Sidef::Types::Bool::Bool'     => 1}},
+                     code   => {class => {'Sidef::Types::Block::Code'    => 1}},
+                     hash   => {class => {'Sidef::Types::Hash::Hash'     => 1}},
+                     number => {class => {'Sidef::Types::Number::Number' => 1}, type => 'SCALAR'},
+                     string => {class => {'Sidef::Types::String::String' => 1}, type => 'SCALAR'},
+                     array => {
+                               type  => 'ARRAY',
+                               class => {
+                                         'Sidef::Types::Array::Array' => 1,
+                                         'Sidef::Types::Chars::Chars' => 1,
+                                         'Sidef::Types::Bytes::Bytes' => 1,
+                                        }
+                              },
+                    );
 
         no strict 'refs';
 
@@ -35,7 +31,7 @@ package Sidef {
 
                 my ($self, $obj, $strict_obj, $dont_warn) = @_;
 
-                if (ref($obj) ~~ $types{$type}{class}) {
+                if (exists $types{$type}{class}{ref($obj)}) {
                     return 1;
                 }
                 else {

@@ -25,11 +25,11 @@ or
 
     var array = qw(word1 word2 ...);
 
-=item * Retrieving elements
+=item * Retrieving an element
 
     var elem = array[index];
 
-=item * Modifying elements
+=item * Modifying an element
 
     array[index] = someObj;
 

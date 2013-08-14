@@ -33,6 +33,7 @@ my %ignored_methods = (
                        'Sidef::Variable::Variable'      => [qw(set_value is_defined get_name get_type get_value new)],
                        'Sidef::Variable::Ref'           => [qw(get_var new)],
                        'Sidef::Variable::My'            => [qw(get_name new)],
+                       'Sidef::Variable::Init'          => [qw(new)],
                        'Sidef::Variable::InitMy'        => [qw(get_name new)],
                        'Sidef::Module::Require'         => [qw(new)],
                        'Sidef::Sys::Sys'                => [qw(new)],

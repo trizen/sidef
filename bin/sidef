@@ -4,8 +4,6 @@ use 5.014;
 use strict;
 use warnings;
 
-no if $] >= 5.018, warnings => "experimental::smartmatch";
-
 binmode(STDOUT, ':encoding(UTF-8)');
 binmode(STDERR, ':encoding(UTF-8)');
 binmode(STDIN,  ':encoding(UTF-8)');

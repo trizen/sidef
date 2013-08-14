@@ -4,12 +4,10 @@ package Sidef::Exec {
     use strict;
     use warnings;
 
-    no if $] >= 5.018, warnings => "experimental::smartmatch";
-
     our @ISA = qw(Sidef);
 
     sub new {
-        bless {
+        my $self = bless {
             var_methods => {
                 map { $_ => 1 }
                   qw(
@@ -18,10 +16,41 @@ package Sidef::Exec {
                   ^=  &=  ++  -- \\\\
                   <<= >>=
                   )
-              }
+            },
+            bool_assign_method => {
+                                   ':='  => 1,
+                                   '||=' => 1,
+                                   '&&=' => 1,
+                                  },
+            types => {
+                'Sidef::Types::Bool::Bool' => {
+                                               '&&' => 1,
+                                               '||' => 1,
+                                               '?'  => 1,
+                                              },
+                'Sidef::Types::Block::Code' => {
+                                                'while' => 1,
+                                                ':'     => 1,
+                                               },
+                'Sidef::Types::Bool::While' => {
+                                                'while' => 1,
+                                               },
+                'Sidef::Types::Bool::Ternary' => {
+                                                  ':' => 1,
+                                                 },
+                'Sidef::Types::Bool::If' => {
+                                             'if'    => 1,
+                                             'elsif' => 1,
+                                            },
 
+                     },
           },
           __PACKAGE__;
+
+        $self->{types}{'Sidef::Variable::Init'}     = $self->{bool_assign_method};
+        $self->{types}{'Sidef::Variable::Variable'} = $self->{bool_assign_method};
+
+        $self;
     }
 
     sub eval_array {
@@ -216,8 +245,8 @@ package Sidef::Exec {
                         (ref($self_obj) eq 'Sidef::Variable::Variable')
                           && (
                               ref($self_obj->get_value) eq 'Sidef::Types::Bool::Bool'
-                              ? (!($method ~~ [qw(:= ||= &&=)]))
-                              : (!($method eq ':='))
+                              ? (not exists $self->{bool_assign_method}{$method})
+                              : ($method ne ':=')
                              )
                       ) ? ref($self_obj->get_value)
                       : ref($self_obj);
@@ -230,32 +259,12 @@ package Sidef::Exec {
                             if (
                                 ref($arg) eq 'HASH'
                                 and not(
-                                       ($type eq 'Sidef::Types::Bool::Bool' and $method ~~ [qw(&& || ?)])
-                                    || ($type eq 'Sidef::Types::Block::Code'   and $method ~~ [qw(while :)])
-                                    || ($type eq 'Sidef::Types::Bool::While'   and $method ~~ [qw(while)])
-                                    || ($type eq 'Sidef::Types::Bool::Ternary' and $method ~~ [qw(:)])
-                                    || ($type eq 'Sidef::Types::Bool::If'      and $method ~~ [qw(if elsif)])
-                                    || (
-                                        $type ~~ [
-                                            qw(
-                                              Sidef::Variable::Init
-                                              Sidef::Variable::Variable
-                                              )
-                                        ]
-                                        and $method ~~ [qw(:= ||=  &&=)]
+                                       (exists($self->{types}{$type}) && exists($self->{types}{$type}{$method}))
+                                       || (($type eq 'Sidef::Types::Block::Code' || $type eq 'Sidef::Types::Block::For')
+                                           and ($method eq 'for' || $method eq 'foreach')
+                                           and ref $arg->{$opt{class}} eq 'ARRAY'
+                                           and @{$arg->{$opt{class}}} != 1)
                                        )
-                                    || (
-                                        $type ~~ [
-                                            qw(
-                                              Sidef::Types::Block::Code
-                                              Sidef::Types::Block::For
-                                              )
-                                        ]
-                                        and $method ~~ [qw(for foreach)]
-                                        and ref $arg->{$opt{class}} eq 'ARRAY'
-                                        and @{$arg->{$opt{class}}} != 1
-                                       )
-                                )
                               ) {
                                 local $self->{var_ref} = ref($self_obj) eq 'Sidef::Variable::Ref';
                                 push @arguments, $self->execute(struct => $arg);

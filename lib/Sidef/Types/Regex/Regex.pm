@@ -25,6 +25,7 @@ package Sidef::Types::Regex::Regex {
             }
         }
 
+        require Sidef::Types::Regex::Matches;
         Sidef::Types::Regex::Matches->new(obj => $object, regex => $$self);
     }
 

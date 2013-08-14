@@ -95,6 +95,12 @@ package Sidef::Types::Bool::Bool {
         $self->false;
     }
 
+    sub flip {
+        my ($self) = @_;
+        $$self = $$self eq 'true' ? 'false' : 'true';
+        $self;
+    }
+
     sub dump {
         my ($self) = @_;
         Sidef::Types::String::String->new($$self);
