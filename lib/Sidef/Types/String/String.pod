@@ -160,6 +160,14 @@ Return the
 
 =cut
 
+=head2 append
+
+String.append() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 apply_escapes
 
 String.apply_escapes() -> I<Bool>
@@ -216,9 +224,25 @@ Return the
 
 =cut
 
+=head2 cmp
+
+String.cmp() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 contains
 
 String.contains() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 crypt
+
+String.crypt() -> I<Bool>
 
 Return the
 
@@ -251,6 +275,14 @@ Return the
 =head2 ends_with
 
 String.ends_with() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 equals
+
+String.equals() -> I<Bool>
 
 Return the
 
@@ -323,6 +355,14 @@ Return the
 =head2 insert_at
 
 String.insert_at() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 is
+
+String.is() -> I<Bool>
 
 Return the
 
@@ -512,6 +552,14 @@ Return the
 
 =cut
 
+=head2 times
+
+String.times() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 titleCase
 
 String.titleCase() -> I<Bool>
@@ -523,6 +571,14 @@ Return the
 =head2 title_case
 
 String.title_case() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 to
+
+String.to() -> I<Bool>
 
 Return the
 

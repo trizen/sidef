@@ -51,6 +51,13 @@ package Sidef::Types::Glob::File {
 
     *isLink = \&is_link;
 
+    sub readlink {
+        my ($self) = @_;
+        Sidef::Types::String::String->new(CORE::readlink($$self));
+    }
+
+    *readLink = \&readlink;
+
     sub is_socket {
         my ($self) = @_;
         Sidef::Types::Bool::Bool->new(-S $$self);
@@ -300,6 +307,31 @@ package Sidef::Types::Glob::File {
         $self->_is_number($uid) || do { warn "[WARN] File.chown(): 'uid' is not numeric!\n"; return };
         $self->_is_number($gid) || do { warn "[WARN] File.chown(): 'gid' is not numeric!\n"; return };
         Sidef::Types::Bool::Bool->new(CORE::chown($$uid, $$gid, $$self));
+    }
+
+    sub chmod {
+        my ($self, $permission) = @_;
+        $self->_is_number($permission) || return;
+        Sidef::Types::Bool::Bool->new(CORE::chmod($$permission, $$self));
+    }
+
+    sub utime {
+        my ($self, $atime, $mtime) = @_;
+
+        ref($atime) eq 'Sidef::Time::Time' || $self->_is_number($atime) || return;
+        ref($mtime) eq 'Sidef::Time::Time' || $self->_is_number($mtime) || return;
+
+        Sidef::Types::Bool::Bool->new(CORE::utime($$atime, $$mtime, $$self));
+    }
+
+    sub unlink {
+        my ($self) = @_;
+        Sidef::Types::Bool::Bool->new(CORE::unlink($$self));
+    }
+
+    sub touch {
+        my ($self) = @_;
+        Sidef::Types::Bool::Bool->new(CORE::open(my $fh, '>>', $$self));
     }
 
     sub lstat {

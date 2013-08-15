@@ -25,7 +25,9 @@ package Sidef::Types::Block::Do {
                 $self->{do_block} = 0;
                 return $self;
             }
-            elsif ($ref eq 'Sidef::Types::Block::Break' or $ref eq 'Sidef::Types::Block::Return') {
+            elsif (   $ref eq 'Sidef::Types::Block::Break'
+                   or $ref eq 'Sidef::Types::Block::Return'
+                   or $ref eq 'Sidef::Types::Block::Next') {
                 $self->{do_block} = 0;
                 return $result;
             }

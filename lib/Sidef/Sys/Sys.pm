@@ -4,6 +4,8 @@ package Sidef::Sys::Sys {
     use strict;
     use warnings;
 
+    our @ISA = qw(Sidef);
+
     sub new {
         bless {}, __PACKAGE__;
     }
@@ -13,12 +15,69 @@ package Sidef::Sys::Sys {
         exit($code // 0);
     }
 
+    sub alarm {
+        my ($self, $sec) = @_;
+        $self->_is_number($sec) || return;
+        Sidef::Types::Bool::Bool->new(CORE::alarm($$sec));
+    }
+
+    sub ualarm {
+        my ($self, $sec) = @_;
+
+        $self->_is_number($sec) || return;
+
+        require Time::HiRes;
+        Sidef::Types::Bool::Bool->new(Time::HiRes::ualarm($$sec));
+    }
+
+    sub sleep {
+        my ($self, $sec) = @_;
+        $self->_is_number($sec) || return;
+        Sidef::Types::Bool::Bool->new(CORE::sleep($$sec));
+    }
+
+    sub nanosleep {
+        my ($self, $sec) = @_;
+
+        $self->_is_number($sec) || return;
+
+        require Time::HiRes;
+        Sidef::Types::Bool::Bool->new(Time::HiRes::nanosleep($$sec));
+    }
+
+    *nanoSleep = \&nanosleep;
+
+    sub usleep {
+        my ($self, $sec) = @_;
+
+        $self->_is_number($sec) || return;
+
+        require Time::HiRes;
+        Sidef::Types::Bool::Bool->new(Time::HiRes::usleep($$sec));
+    }
+
     sub osname {
         my ($self) = @_;
         Sidef::Types::String::String->new($^O);
     }
 
     *osName = \&osname;
+
+    sub user {
+        my ($self) = @_;
+        Sidef::Types::String::String->new(getlogin);
+    }
+
+    sub umask {
+        my ($self, $mode) = @_;
+
+        if (defined($mode)) {
+            $self->_is_number($mode) || return;
+            return Sidef::Types::Number::Number->new(CORE::umask($$mode));
+        }
+
+        Sidef::Types::Number::Number->new(CORE::umask);
+    }
 
     sub sidef {
         my ($self) = @_;
@@ -48,7 +107,7 @@ package Sidef::Sys::Sys {
 
     sub println {
         my ($self, @rest) = @_;
-        say @rest;
+        Sidef::Types::Bool::Bool->new(say @rest);
     }
 
 }

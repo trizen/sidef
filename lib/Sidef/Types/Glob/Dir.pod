@@ -63,6 +63,14 @@ Return the
 
 =cut
 
+=head2 chroot
+
+Dir.chroot() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 create
 
 Dir.create() -> I<Bool>
@@ -159,6 +167,22 @@ Return the
 
 =cut
 
+=head2 readLink
+
+Dir.readLink() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 readlink
+
+Dir.readlink() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 remove
 
 Dir.remove() -> I<Bool>
@@ -194,6 +218,14 @@ Return the
 =head2 stat
 
 Dir.stat() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 utime
+
+Dir.utime() -> I<Bool>
 
 Return the
 

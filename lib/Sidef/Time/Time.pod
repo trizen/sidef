@@ -16,6 +16,14 @@ This modules creates a new I<Time> object.
 
 =head1 METHODS
 
+=head2 dump
+
+Time.dump() -> I<Bool>
+
+Return the
+
+=cut
+
 
 =head2 gmTime
 
@@ -57,6 +65,14 @@ Time.new(I<number>) -> I<Time>
 
 Create a new I<Time> object. The argument is the number of seconds elapsed since the beginning of the current epoch (1900).
 When no argument is specified, the current time is used.
+
+=cut
+
+=head2 now
+
+Time.now() -> I<Bool>
+
+Return the
 
 =cut
 

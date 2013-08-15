@@ -47,6 +47,22 @@ Return the
 
 =cut
 
+=head2 fileno
+
+FileHandle.fileno() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 flock
+
+FileHandle.flock() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 getLines
 
 FileHandle.getLines() -> I<Bool>
@@ -63,6 +79,22 @@ Return the
 
 =cut
 
+=head2 inputSeparator
+
+FileHandle.inputSeparator() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 input_separator
+
+FileHandle.input_separator() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 isOnTty
 
 FileHandle.isOnTty() -> I<Bool>
@@ -74,6 +106,14 @@ Return the
 =head2 is_on_tty
 
 FileHandle.is_on_tty() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 lock
+
+FileHandle.lock() -> I<Bool>
 
 Return the
 
@@ -119,6 +159,14 @@ Return the
 
 =cut
 
+=head2 readChar
+
+FileHandle.readChar() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 readLine
 
 FileHandle.readLine() -> I<Bool>
@@ -130,6 +178,14 @@ Return the
 =head2 read_all
 
 FileHandle.read_all() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 read_char
+
+FileHandle.read_char() -> I<Bool>
 
 Return the
 
@@ -154,6 +210,22 @@ Return the
 =head2 seek
 
 FileHandle.seek() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 sep
+
+FileHandle.sep() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 separator
+
+FileHandle.separator() -> I<Bool>
 
 Return the
 
@@ -191,9 +263,57 @@ Return the
 
 =cut
 
+=head2 sysRead
+
+FileHandle.sysRead() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 sysSeek
+
+FileHandle.sysSeek() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 sysread
+
+FileHandle.sysread() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 sysseek
+
+FileHandle.sysseek() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 tell
 
 FileHandle.tell() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 truncate
+
+FileHandle.truncate() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 unlock
+
+FileHandle.unlock() -> I<Bool>
 
 Return the
 

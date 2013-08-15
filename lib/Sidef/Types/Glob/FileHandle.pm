@@ -70,15 +70,82 @@ package Sidef::Types::Glob::FileHandle {
         Sidef::Types::Bool::Bool->new(say {$self->{fh}} @args);
     }
 
-    sub readline {
-        my ($self) = @_;
-        my $line = CORE::readline $self->{fh};
-        defined($line) ? Sidef::Types::String::String->new($line) : Sidef::Types::Nil::Nil->new();
+    sub read {
+        my ($self, $var_ref, $length, $offset) = @_;
+
+        ref($var_ref) eq 'Sidef::Variable::Ref' || do {
+            warn "[WARN] FileHandle.read(): first argument must be a variable reference!\n";
+            return;
+        };
+
+        $self->_is_number($length) || return;
+
+        my $chunk = $var_ref->get_var->get_value;
+
+        my $size = Sidef::Types::Number::Number->new(
+            defined($offset)
+            ? do {
+                $self->_is_number($offset) || return;
+                CORE::read($self->{fh}, $chunk, $$length, $$offset);
+              }
+            : CORE::read($self->{fh}, $chunk, $$length)
+        );
+
+        $var_ref->get_var->set_value(Sidef::Types::String::String->new($chunk));
+
+        return $size;
     }
 
-    *read     = \&readline;
+    sub sysread {
+        my ($self, $var_ref, $length, $offset) = @_;
+
+        ref($var_ref) eq 'Sidef::Variable::Ref' || do {
+            warn "[WARN] FileHandle.sysread(): first argument must be a variable reference!\n";
+            return;
+        };
+
+        $self->_is_number($length) || return;
+
+        my $chunk = $var_ref->get_var->get_value;
+
+        my $size = Sidef::Types::Number::Number->new(
+            defined($offset)
+            ? do {
+                $self->_is_number($offset) || return;
+                CORE::sysread($self->{fh}, $chunk, $$length, $$offset);
+              }
+            : CORE::sysread($self->{fh}, $chunk, $$length)
+        );
+
+        $var_ref->get_var->set_value(Sidef::Types::String::String->new($chunk));
+
+        return $size;
+    }
+
+    *sysRead = \&sysread;
+
+    sub readline {
+        my ($self) = @_;
+
+        my $line = CORE::readline $self->{fh};
+        defined($line)
+          ? Sidef::Types::String::String->new($line)
+          : Sidef::Types::Nil::Nil->new();
+    }
+
     *readln   = \&readline;
     *readLine = \&readline;
+
+    sub read_char {
+        my ($self) = @_;
+
+        my $char = getc($self->{fh});
+        defined($char)
+          ? Sidef::Types::Char::Char->new($char)
+          : Sidef::Types::Nil::Nil->new();
+    }
+
+    *readChar = \&read_char;
 
     sub read_all {
         my ($self) = @_;
@@ -107,6 +174,42 @@ package Sidef::Types::Glob::FileHandle {
         Sidef::Types::Bool::Bool->new(seek($self->{fh}, $$pos, $$whence));
     }
 
+    sub sysseek {
+        my ($self, $pos, $whence) = @_;
+
+        (not $self->_is_number($pos) or not $self->_is_number($whence))
+          && return Sidef::Types::Bool::Bool->false;
+
+        Sidef::Types::Bool::Bool->new(sysseek($self->{fh}, $$pos, $$whence));
+    }
+
+    *sysSeek = \&sysseek;
+
+    sub fileno {
+        my ($self) = @_;
+        Sidef::Types::Number::Number->new(fileno($self->{fh}));
+    }
+
+    sub lock {
+        my ($self) = @_;
+
+        require Fcntl;
+        $self->flock(Sidef::Types::Number::Number->new(&Fcntl::LOCK_EX));
+    }
+
+    sub unlock {
+        my ($self) = @_;
+
+        require Fcntl;
+        $self->flock(Sidef::Types::Number::Number->new(&Fcntl::LOCK_UN));
+    }
+
+    sub flock {
+        my ($self, $mode) = @_;
+        $self->_is_number($mode) || return;
+        Sidef::Types::Bool::Bool->new(CORE::flock($self->{fh}, $$mode));
+    }
+
     sub close {
         my ($self) = @_;
         Sidef::Types::Bool::Bool->new(close $self->{fh});
@@ -121,4 +224,21 @@ package Sidef::Types::Glob::FileHandle {
         my ($self) = @_;
         Sidef::Types::Glob::Stat->lstat($self->{fh}, $self);
     }
+
+    sub truncate {
+        my ($self, $length) = @_;
+        $self->_is_number($length) || return;
+        Sidef::Types::Bool::Bool->new(CORE::truncate($self->{fh}, $length));
+    }
+
+    sub separator {
+        my ($self, $sep) = @_;
+        $self->_is_string($sep) || return;
+        $/ = $$sep;
+    }
+
+    *sep             = \&separator;
+    *input_separator = \&separator;
+    *inputSeparator  = \&separator;
+
 }

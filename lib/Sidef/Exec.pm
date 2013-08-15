@@ -316,6 +316,7 @@ package Sidef::Exec {
             }
 
             if (   ref($self_obj) eq 'Sidef::Types::Block::Break'
+                or ref($self_obj) eq 'Sidef::Types::Block::Next'
                 or ref($self_obj) eq 'Sidef::Types::Block::Return') {
                 $self->{expr_i} = $self->{expr_i_max};
                 return $self_obj;
@@ -371,16 +372,6 @@ package Sidef::Exec {
                     return $obj;
                 }
                 elsif (ref($obj) eq 'Sidef::Types::Block::Break') {
-
-                    my $caller = [caller(1)]->[0];
-                    if (
-                        defined($caller)
-                        and (   $caller eq 'Sidef::Types::Block::Do'
-                             or $caller eq 'Sidef::Types::Block::Code')
-                      ) {
-                        return $obj;
-                    }
-
                     return $obj;
                 }
 

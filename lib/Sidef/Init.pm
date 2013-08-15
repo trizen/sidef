@@ -39,10 +39,13 @@ require Sidef::Types::Block::Switch if (caller)[0] ne q{Sidef::Types::Block::Swi
 require Sidef::Types::Block::Code if (caller)[0] ne q{Sidef::Types::Block::Code};
 require Sidef::Types::Block::Return if (caller)[0] ne q{Sidef::Types::Block::Return};
 require Sidef::Types::Block::Given if (caller)[0] ne q{Sidef::Types::Block::Given};
+require Sidef::Types::Block::Next if (caller)[0] ne q{Sidef::Types::Block::Next};
 require Sidef::Types::Block::Break if (caller)[0] ne q{Sidef::Types::Block::Break};
 require Sidef::Types::Block::Continue if (caller)[0] ne q{Sidef::Types::Block::Continue};
 require Sidef::Types::Regex::Regex if (caller)[0] ne q{Sidef::Types::Regex::Regex};
+require Sidef::Types::Number::Positive if (caller)[0] ne q{Sidef::Types::Number::Positive};
 require Sidef::Types::Number::Number if (caller)[0] ne q{Sidef::Types::Number::Number};
+require Sidef::Types::Number::Negative if (caller)[0] ne q{Sidef::Types::Number::Negative};
 require Sidef::Types::String::String if (caller)[0] ne q{Sidef::Types::String::String};
 require Sidef::Module::Caller if (caller)[0] ne q{Sidef::Module::Caller};
 require Sidef::Module::Require if (caller)[0] ne q{Sidef::Module::Require};

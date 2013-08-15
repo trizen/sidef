@@ -192,6 +192,14 @@ Return the
 
 =cut
 
+=head2 atan2
+
+Number.atan2() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 chr
 
 Number.chr() -> I<Bool>
@@ -203,6 +211,14 @@ Return the
 =head2 commify
 
 Number.commify() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 cos
+
+Number.cos() -> I<Bool>
 
 Return the
 
@@ -395,6 +411,22 @@ Return the
 =head2 rand
 
 Number.rand() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 range
+
+Number.range() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 sin
+
+Number.sin() -> I<Bool>
 
 Return the
 

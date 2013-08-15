@@ -15,6 +15,14 @@ This object provides some methods related to the Sidef working system.
 
 =head1 METHODS
 
+=head2 alarm
+
+Sys.alarm() -> I<Bool>
+
+Return the
+
+=cut
+
 
 =head2 exit
 
@@ -24,6 +32,22 @@ Exit the main program with a given code. If no argument is specified, the code 0
 
     Sys.exit(0)     # exit with success
     Sys.exit(-1)    # exit with some error
+
+=cut
+
+=head2 nanoSleep
+
+Sys.nanoSleep() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 nanosleep
+
+Sys.nanosleep() -> I<Bool>
+
+Return the
 
 =cut
 
@@ -91,5 +115,45 @@ Return the full path of the 'sidef' main program.
     Sys.sidef   # under Linux, normally is '/usr/bin/sidef'
 
 Returns an object of type: C<Sidef::Types::String::String>
+
+=cut
+
+=head2 sleep
+
+Sys.sleep() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 ualarm
+
+Sys.ualarm() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 umask
+
+Sys.umask() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 user
+
+Sys.user() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 usleep
+
+Sys.usleep() -> I<Bool>
+
+Return the
 
 =cut

@@ -71,9 +71,33 @@ Return the
 
 =cut
 
+=head2 chmod
+
+File.chmod() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 chown
 
 File.chown() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 copy
+
+File.copy() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 cp
+
+File.cp() -> I<Bool>
 
 Return the
 
@@ -479,6 +503,22 @@ Return the
 
 =cut
 
+=head2 move
+
+File.move() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 mv
+
+File.mv() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 name
 
 File.name() -> I<Bool>
@@ -599,6 +639,30 @@ Return the
 
 =cut
 
+=head2 readLink
+
+File.readLink() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 readlink
+
+File.readlink() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 rename
+
+File.rename() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 size
 
 File.size() -> I<Bool>
@@ -618,6 +682,30 @@ Return the
 =head2 stat
 
 File.stat() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 touch
+
+File.touch() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 unlink
+
+File.unlink() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 utime
+
+File.utime() -> I<Bool>
 
 Return the
 

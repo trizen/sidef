@@ -30,17 +30,8 @@ package Sidef::Types::String::String {
             Sidef::Types::Bool::Bool->false;
         };
 
-        *{__PACKAGE__ . '::' . '*'} = sub {
-            my ($self, $num) = @_;
-            $self->_is_number($num) || return;
-            $self->new($$self x $$num);
-        };
-
-        *{__PACKAGE__ . '::' . '+'} = sub {
-            my ($self, $string) = @_;
-            $self->_is_string($string) || return;
-            $self->new($$self . $$string);
-        };
+        *{__PACKAGE__ . '::' . '*'} = \&times;
+        *{__PACKAGE__ . '::' . '+'} = \&append;
 
         *{__PACKAGE__ . '::' . '-'} = sub {
             my ($self, $string) = @_;
@@ -51,11 +42,7 @@ package Sidef::Types::String::String {
             $self;
         };
 
-        *{__PACKAGE__ . '::' . '=='} = sub {
-            my ($self, $string) = @_;
-            ref($self) ne ref($string) and return Sidef::Types::Bool::Bool->false;
-            Sidef::Types::Bool::Bool->new($$self eq $$string);
-        };
+        *{__PACKAGE__ . '::' . '=='} = \&is;
 
         *{__PACKAGE__ . '::' . '!='} = sub {
             my ($self, $string) = @_;
@@ -92,11 +79,7 @@ package Sidef::Types::String::String {
             Sidef::Types::Bool::Bool->new($$self le $$string);
         };
 
-        *{__PACKAGE__ . '::' . '<=>'} = sub {
-            my ($self, $string) = @_;
-            $self->_is_string($string) || return Sidef::Types::Number::Number->new(-1);
-            Sidef::Types::Number::Number->new($$self cmp $$string);
-        };
+        *{__PACKAGE__ . '::' . '<=>'} = \&cmp;
 
         *{__PACKAGE__ . '::' . '<<'} = sub {
             my ($self, $i) = @_;
@@ -114,10 +97,7 @@ package Sidef::Types::String::String {
             $self->new(CORE::substr($$self, 0, -$$i));
         };
 
-        *{__PACKAGE__ . '::' . '..'} = sub {
-            my ($self, $string) = @_;
-            Sidef::Types::Array::Array->new(map { $self->new($_) } $$self .. $$string);
-        };
+        *{__PACKAGE__ . '::' . '..'} = \&to;
 
         *{__PACKAGE__ . '::' . '^^'} = \&begins_with;
         *{__PACKAGE__ . '::' . '$$'} = \&ends_with;
@@ -135,12 +115,43 @@ package Sidef::Types::String::String {
         };
     }
 
+    sub to {
+        my ($self, $string) = @_;
+        Sidef::Types::Array::Array->new(map { $self->new($_) } $$self .. $$string);
+    }
+
+    sub cmp {
+        my ($self, $string) = @_;
+        $self->_is_string($string) || return Sidef::Types::Number::Number->new(-1);
+        Sidef::Types::Number::Number->new($$self cmp $$string);
+    }
+
+    sub times {
+        my ($self, $num) = @_;
+        $self->_is_number($num) || return;
+        $self->new($$self x $$num);
+    }
+
     sub uc {
         my ($self) = @_;
         $self->new(CORE::uc $$self);
     }
 
     *toUpperCase = \&uc;
+
+    sub is {
+        my ($self, $string) = @_;
+        ref($self) ne ref($string) and return Sidef::Types::Bool::Bool->false;
+        Sidef::Types::Bool::Bool->new($$self eq $$string);
+    }
+
+    *equals = \&is;
+
+    sub append {
+        my ($self, $string) = @_;
+        $self->_is_string($string) || return;
+        $self->new($$self . $$string);
+    }
 
     sub ucfirst {
         my ($self) = @_;
@@ -202,6 +213,12 @@ package Sidef::Types::String::String {
 
         CORE::chomp($$self) || return $self;
         $self->new($$self);
+    }
+
+    sub crypt {
+        my ($self, $salt) = @_;
+        $self->_is_string($salt) || return;
+        $self->new(crypt($$self, $$salt));
     }
 
     sub substr {
@@ -332,7 +349,7 @@ package Sidef::Types::String::String {
 
     sub glob {
         my ($self) = @_;
-        Sidef::Types::Array::Array->(map { __PACKAGE__->new($_) } CORE::glob($$self));
+        Sidef::Types::Array::Array->new(map { __PACKAGE__->new($_) } CORE::glob($$self));
     }
 
     sub quotemeta {

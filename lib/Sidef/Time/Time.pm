@@ -19,23 +19,24 @@ package Sidef::Time::Time {
 
         $sec //= time;
 
-        bless {sec => $sec}, __PACKAGE__;
+        bless \$sec, __PACKAGE__;
     }
 
     sub time {
         my ($self) = @_;
-        Sidef::Types::Number::Number->new($self->{sec});
+        Sidef::Types::Number::Number->new($$self);
     }
 
     sub timeNow {
         Sidef::Types::Number::Number->new(CORE::time);
     }
 
+    *now      = \&timeNow;
     *time_now = \&timeNow;
 
     sub localtime {
         my ($self) = @_;
-        Sidef::Time::Localtime->new($self->{sec});
+        Sidef::Time::Localtime->new($$self);
     }
 
     *local     = \&localtime;
@@ -43,10 +44,15 @@ package Sidef::Time::Time {
 
     sub gmtime {
         my ($self) = @_;
-        Sidef::Time::Gmtime->new($self->{sec});
+        Sidef::Time::Gmtime->new($$self);
     }
 
     *gmTime = \&gmtime;
+
+    sub dump {
+        my ($self) = @_;
+        Sidef::Types::String::String->new('Time.new(' . $$self . ')');
+    }
 
 };
 

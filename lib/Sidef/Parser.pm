@@ -161,6 +161,11 @@ package Sidef::Parser {
                           dynamic => 0,
                          },
                          {
+                          sub     => sub { Sidef::Types::Block::Next->new },
+                          re      => qr/\G(?=next\b)/,
+                          dynamic => 0,
+                         },
+                         {
                           sub     => sub { Sidef::Module::Require->new },
                           re      => qr/\G(?=require\b)/,
                           dynamic => 1,
@@ -168,6 +173,16 @@ package Sidef::Parser {
                          {
                           sub     => sub { Sidef::Types::Bool::Bool->new },
                           re      => qr/\G(?=!)/,
+                          dynamic => 0,
+                         },
+                         {
+                          sub     => sub { Sidef::Types::Number::Negative->new },
+                          re      => qr/\G(?=-)/,
+                          dynamic => 0,
+                         },
+                         {
+                          sub     => sub { Sidef::Types::Number::Positive->new },
+                          re      => qr/\G(?=\+)/,
                           dynamic => 0,
                          },
                          {
@@ -185,6 +200,7 @@ package Sidef::Parser {
                 map { $_ => 1 }
                   qw(
                   q qq qw qqw qf qqf qd qqd
+                  next
                   break
                   return
                   for foreach

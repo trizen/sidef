@@ -95,6 +95,16 @@ package Sidef::Types::Glob::Dir {
         Sidef::Types::Bool::Bool->new(chdir($$self));
     }
 
+    sub chroot {
+        my ($self) = @_;
+        Sidef::Types::Bool::Bool->new(chroot($$self));
+    }
+
+    *readlink = \&Sidef::Types::Glob::File::readlink;
+    *readLink = \&readlink;
+
+    *utime = \&Sidef::Types::Glob::File::utime;
+
     *stat  = \&Sidef::Types::Glob::File::stat;
     *lstat = \&Sidef::Types::Glob::File::lstat;
 }

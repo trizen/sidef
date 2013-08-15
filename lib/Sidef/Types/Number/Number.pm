@@ -168,6 +168,12 @@ package Sidef::Types::Number::Number {
         $self->new(atan2(0, -'inf'));
     }
 
+    sub atan2 {
+        my ($self, $x, $y) = @_;
+        ($self->_is_number($x) && $self->_is_number($y)) || return;
+        $self->new(CORE::atan2($$x, $$y));
+    }
+
     sub abs {
         my ($self) = @_;
         $self->new(CORE::abs $$self);
@@ -181,6 +187,16 @@ package Sidef::Types::Number::Number {
     sub int {
         my ($self) = @_;
         $self->new(int $$self);
+    }
+
+    sub cos {
+        my ($self) = @_;
+        $self->new(CORE::cos $$self);
+    }
+
+    sub sin {
+        my ($self) = @_;
+        $self->new(CORE::sin $$self);
     }
 
     sub log {
