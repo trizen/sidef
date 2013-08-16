@@ -37,6 +37,8 @@ lib/Sidef/Types/Block/For.pm
 lib/Sidef/Types/Block/For.pod
 lib/Sidef/Types/Block/Given.pm
 lib/Sidef/Types/Block/Given.pod
+lib/Sidef/Types/Block/Next.pm
+lib/Sidef/Types/Block/Next.pod
 lib/Sidef/Types/Block/Return.pm
 lib/Sidef/Types/Block/Return.pod
 lib/Sidef/Types/Block/Switch.pm
@@ -77,8 +79,12 @@ lib/Sidef/Types/Hash/Hash.pm
 lib/Sidef/Types/Hash/Hash.pod
 lib/Sidef/Types/Nil/Nil.pm
 lib/Sidef/Types/Nil/Nil.pod
+lib/Sidef/Types/Number/Negative.pm
+lib/Sidef/Types/Number/Negative.pod
 lib/Sidef/Types/Number/Number.pm
 lib/Sidef/Types/Number/Number.pod
+lib/Sidef/Types/Number/Positive.pm
+lib/Sidef/Types/Number/Positive.pod
 lib/Sidef/Types/Regex/Matches.pm
 lib/Sidef/Types/Regex/Matches.pod
 lib/Sidef/Types/Regex/Regex.pm
@@ -102,6 +108,7 @@ scripts/100_doors.sf
 scripts/100_doors_2.sf
 scripts/100_doors_3.sf
 scripts/99_bottles.sf
+scripts/9_billion_names.sf
 scripts/accumulator.sf
 scripts/array_autovivification.sf
 scripts/array_operators.sf
@@ -144,6 +151,7 @@ scripts/Math/Algebra/Matrix.sm
 scripts/matrix_multiplication.sf
 scripts/method_expressions.sf
 scripts/multi_var_assignment.sf
+scripts/next.sf
 scripts/objects_init.sf
 scripts/permutation.sf
 scripts/power_numbers.sf
@@ -152,6 +160,7 @@ scripts/rand.sf
 scripts/recursion.sf
 scripts/regex.sf
 scripts/return.sf
+scripts/rock_paper_scissors.sf
 scripts/run_length_encoding.sf
 scripts/run_length_encoding_2.sf
 scripts/script.sf

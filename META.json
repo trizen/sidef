@@ -4,7 +4,7 @@
       "Daniel Șuteu, Ioana Fălcușan"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4005, CPAN::Meta::Converter version 2.131560",
+   "generated_by" : "Module::Build version 0.4007, CPAN::Meta::Converter version 2.131560",
    "license" : [
       "artistic_2"
    ],
@@ -97,6 +97,9 @@
       "Sidef::Types::Block::Given" : {
          "file" : "lib/Sidef/Types/Block/Given.pm"
       },
+      "Sidef::Types::Block::Next" : {
+         "file" : "lib/Sidef/Types/Block/Next.pm"
+      },
       "Sidef::Types::Block::Return" : {
          "file" : "lib/Sidef/Types/Block/Return.pm"
       },
@@ -157,8 +160,14 @@
       "Sidef::Types::Nil::Nil" : {
          "file" : "lib/Sidef/Types/Nil/Nil.pm"
       },
+      "Sidef::Types::Number::Negative" : {
+         "file" : "lib/Sidef/Types/Number/Negative.pm"
+      },
       "Sidef::Types::Number::Number" : {
          "file" : "lib/Sidef/Types/Number/Number.pm"
+      },
+      "Sidef::Types::Number::Positive" : {
+         "file" : "lib/Sidef/Types/Number/Positive.pm"
       },
       "Sidef::Types::Regex::Matches" : {
          "file" : "lib/Sidef/Types/Regex/Matches.pm"

@@ -23,3 +23,11 @@ Given.given() -> I<Bool>
 Return the
 
 =cut
+
+=head2 switch
+
+Given.switch() -> I<Bool>
+
+Return the
+
+=cut

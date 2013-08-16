@@ -448,9 +448,25 @@ Return the
 
 =cut
 
+=head2 printlnf
+
+String.printlnf() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 quotemeta
 
 String.quotemeta() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 repeat
+
+String.repeat() -> I<Bool>
 
 Return the
 
@@ -483,6 +499,14 @@ Return the
 =head2 sprintf
 
 String.sprintf() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 sprintlnf
+
+String.sprintlnf() -> I<Bool>
 
 Return the
 
