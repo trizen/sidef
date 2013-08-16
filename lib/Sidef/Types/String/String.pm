@@ -132,6 +132,12 @@ package Sidef::Types::String::String {
         $self->new($$self x $$num);
     }
 
+    sub repeat {
+        my ($self, $num) = @_;
+        $num //= Sidef::Types::Number::Number->new(1);
+        $self->times($num);
+    }
+
     sub uc {
         my ($self) = @_;
         $self->new(CORE::uc $$self);
@@ -314,9 +320,19 @@ package Sidef::Types::String::String {
         Sidef::Types::Bool::Bool->new(printf $$self, @arguments);
     }
 
+    sub printlnf {
+        my ($self, @arguments) = @_;
+        Sidef::Types::Bool::Bool->new(printf($$self . "\n", @arguments));
+    }
+
     sub sprintf {
         my ($self, @arguments) = @_;
-        __PACKAGE__->new(sprintf $$self, @arguments);
+        __PACKAGE__->new(CORE::sprintf $$self, @arguments);
+    }
+
+    sub sprintlnf {
+        my ($self, @arguments) = @_;
+        __PACKAGE__->new(CORE::sprintf($$self . "\n", @arguments));
     }
 
     sub sub {

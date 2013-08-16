@@ -34,9 +34,10 @@ package Sidef::Parser {
                            '...' => 1,
                           },
             obj_with_do => {
-                            'Sidef::Types::Block::For'  => 1,
-                            'Sidef::Types::Bool::While' => 1,
-                            'Sidef::Types::Bool::If'    => 1,
+                            'Sidef::Types::Block::For'   => 1,
+                            'Sidef::Types::Bool::While'  => 1,
+                            'Sidef::Types::Bool::If'     => 1,
+                            'Sidef::Types::Block::Given' => 1,
                            },
             obj_stat => [
                          {
@@ -152,7 +153,7 @@ package Sidef::Parser {
                          },
                          {
                           sub     => sub { Sidef::Types::Block::Given->new },
-                          re      => qr/\G(?=given\b)/,
+                          re      => qr/\G(?=(?:given|switch)\b)/,
                           dynamic => 1,
                          },
                          {
@@ -205,7 +206,7 @@ package Sidef::Parser {
                   return
                   for foreach
                   if while
-                  given
+                  given switch
                   continue
                   require
                   true false

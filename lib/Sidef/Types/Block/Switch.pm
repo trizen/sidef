@@ -37,6 +37,18 @@ package Sidef::Types::Block::Switch {
         $self;
     }
 
+    sub case {
+        my ($self, $arg) = @_;
+
+        if (ref($arg) eq 'Sidef::Types::Bool::Bool') {
+            if ($arg->is_true) {
+                $self->{do_block} = 1;
+            }
+        }
+
+        $self;
+    }
+
     sub default {
         my ($self, $code) = @_;
         $self->{do_block} = 1;

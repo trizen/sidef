@@ -4,6 +4,8 @@ package Sidef::Types::Bool::If {
     use strict;
     use warnings;
 
+    no warnings 'recursion';
+
     our @ISA = qw(
       Sidef
       Sidef::Types::Block::Do

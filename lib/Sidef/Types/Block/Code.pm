@@ -4,6 +4,8 @@ package Sidef::Types::Block::Code {
     use strict;
     use warnings;
 
+    no warnings 'recursion';
+
     our @ISA = qw(Sidef);
 
     require Sidef::Exec;

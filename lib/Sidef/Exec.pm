@@ -4,6 +4,8 @@ package Sidef::Exec {
     use strict;
     use warnings;
 
+    no warnings 'recursion';
+
     our @ISA = qw(Sidef);
 
     sub new {

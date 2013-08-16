@@ -234,11 +234,17 @@ package Sidef::Types::Glob::FileHandle {
     sub separator {
         my ($self, $sep) = @_;
         $self->_is_string($sep) || return;
+
+        my $old_sep = $/;
         $/ = $$sep;
+
+        Sidef::Types::String::String->new($old_sep);
     }
 
     *sep             = \&separator;
     *input_separator = \&separator;
     *inputSeparator  = \&separator;
 
-}
+};
+
+1

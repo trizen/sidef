@@ -13,6 +13,7 @@ package Sidef::Types::Block::Given {
         Sidef::Types::Block::Switch->new($expr);
     }
 
+    *switch = \&given;
 }
 
 1;

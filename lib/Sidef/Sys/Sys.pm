@@ -110,4 +110,9 @@ package Sidef::Sys::Sys {
         Sidef::Types::Bool::Bool->new(say @rest);
     }
 
+    sub scanln {
+        my ($self) = @_;
+        Sidef::Types::String::String->new(scalar unpack("A*", scalar <STDIN>));
+    }
+
 }

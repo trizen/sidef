@@ -4,6 +4,8 @@ package Sidef::Types::Array::Array {
     use strict;
     use warnings;
 
+    no warnings 'recursion';
+
     our @ISA = qw(
       Sidef
       Sidef::Convert::Convert

@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/ruby
 
 # Because everything is an object, we can say:
 
@@ -21,17 +21,16 @@ condition
     }
 end;
 
-
 var value = "sidef";
 
 given (value)
-    when ("x") do {
+    when ("x") {
         "Not the right place! (1)".say;
     }
-    when ("sidef") do {
+    when ("sidef") {
         "Right place! (1)".say;
     }
-    when ("y") do {
+    when ("y") {
         "Not the right place! (2)".say;
     }
     default {
@@ -104,7 +103,7 @@ given [8,9,10]
 end;
 
 
-given 0
+given(0)
     when 1 do {
         "Not the right place! (1)".say;
     }
@@ -123,5 +122,44 @@ given 0
     }
     default {
         "Not the right place! (4)".say;
+    }
+end;
+
+
+var cond = (switch 0)
+    case (cond.value == 1) do {
+        "Not the right place! (1)".say;
+    }
+    case (cond.value == 0) do {
+        "Right place! (case)".say;
+        continue;
+    }
+    when (false) do {
+        "Not the right place! (2)".say;
+    }
+    when (0) do {
+        "Right place! (when-continued)".say;
+    }
+    default {
+        "Case error!".die;
+    }
+end;
+
+
+given 3
+    when 1 {
+        "Error!".die;
+    }
+    when 2 {
+        "Error!".die;
+    }
+    when 3 {
+        "Right place! (given)".say;
+    }
+    when 3 {
+        "Error!".die;
+    }
+    default {
+        "Error!".die;
     }
 end;

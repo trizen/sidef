@@ -4,6 +4,8 @@ package Sidef::Types::Block::Do {
     use strict;
     use warnings;
 
+    no warnings 'recursion';
+
     our @ISA = qw(Sidef);
 
     sub new {
