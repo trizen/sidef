@@ -1,30 +1,28 @@
 #!/usr/bin/ruby
 
-# usage: script X Y Z [S]
+# usage: scr_pt X Y Z [S]
 
 func cuboid (x, y, z, s) {
 
-    var c = '+';
-    var h = '-';
-    var v = '|';
-    var d = '/';
+    var (c, h, v, d) = (qw '
+         +  -  |  /
+    ' ...);
 
     ' ' * (z + 1) + c + (h * x) + c . say;
 
     {
-        var i = _;
-        ' ' * (z - i + 1) + d + (s * x) + d +
+        ' ' * (z - _ + 1) + d + (s * x) + d +
           (
            s * (
-                i - (
-                     i > y ? (i - y)
+                _ - (
+                     _ > y ? (_ - y)
                            : 1
                     )
                )
           ) + (
-               i - 1 == y ? (c)
+               _ - 1 == y ? (c)
                           : (
-                             i > y ? d
+                             _ > y ? d
                                    : v
                             )
               )
@@ -48,19 +46,18 @@ func cuboid (x, y, z, s) {
       . say;
 
     {
-        var i = _;
         v + (s * x) + v +
           (
            z > y ? (
-                    i >= z ? (s * x + c)
-                           : (s * (y - i) + d)
+                    _ >= z ? (s * x + c)
+                           : (s * (y - _) + d)
                    )
                  : (
-                    y - i > z ? (s * z + v)
+                    y - _ > z ? (s * z + v)
                               : (
-                                 s * (y - i) +
+                                 s * (y - _) +
                                    (
-                                    y - i == z ? c
+                                    y - _ == z ? c
                                                : d
                                    )
                                 )

@@ -1,0 +1,15 @@
+#!/usr/bin/perl
+
+# Translation of: http://rosettacode.org/wiki/Josephus_problem#Perl
+
+var k = 3;
+var prisoner = (0 .. 40);
+
+while (prisoner.len > 1) {
+    prisoner.rotate(k-1).shift;
+}
+
+prisoner[0] == 30
+    || ("Error!".die);
+
+"Prisoner %d survived.\n".printf(prisoner[0]);

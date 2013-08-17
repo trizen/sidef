@@ -478,7 +478,8 @@ package Sidef::Types::Array::Array {
 
     sub each {
         my ($self) = @_;
-        __PACKAGE__->new(map { __PACKAGE__->new(Sidef::Types::Number::Number->new($_), $self->[$_]->get_value) } 0 .. $#{$self});
+        __PACKAGE__->new(map { __PACKAGE__->new(Sidef::Types::Number::Number->new($_), $self->[$_]->get_value) }
+                         0 .. $#{$self});
     }
 
     sub insert {
@@ -682,6 +683,20 @@ package Sidef::Types::Array::Array {
     sub unshift {
         my ($self, @args) = @_;
         unshift @{$self}, @{$self->new(@args)};
+        $self;
+    }
+
+    sub rotate {
+        my ($self, $num) = @_;
+        $self->_is_number($num) || return;
+
+        if ($$num < 0) {
+            CORE::unshift(@{$self}, CORE::pop(@{$self})) for 1 .. abs($$num);
+        }
+        else {
+            CORE::push(@{$self}, CORE::shift(@{$self})) for 1 .. $$num;
+        }
+
         $self;
     }
 
