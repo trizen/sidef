@@ -476,6 +476,11 @@ package Sidef::Types::Array::Array {
         __PACKAGE__->new(map { Sidef::Types::Number::Number->new($_) } 0 .. $#{$self});
     }
 
+    sub each {
+        my ($self) = @_;
+        __PACKAGE__->new(map { __PACKAGE__->new(Sidef::Types::Number::Number->new($_), $self->[$_]->get_value) } 0 .. $#{$self});
+    }
+
     sub insert {
         my ($self, $index, @objects) = @_;
         $self->_is_number($index) || return $self;

@@ -200,7 +200,7 @@ package Sidef::Parser {
             keywords => {
                 map { $_ => 1 }
                   qw(
-                  q qq qw qqw qf qqf qd qqd
+                  q qq qw qqw qf qqf qd qqd qr
                   next
                   break
                   return
@@ -773,7 +773,7 @@ package Sidef::Parser {
                 }
 
                 # Regular expression
-                if (m{\G(?=/)}) {
+                if (m{\G(?=/)} || /\Gqr\b/gc) {
                     my ($string, $pos) = $self->get_quoted_string(code => (substr($_, pos)));
                     pos($_) += $pos;
 

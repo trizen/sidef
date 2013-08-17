@@ -155,7 +155,7 @@ package main {
 
             my $string = $info->{space} x $info->{indent};
 
-            foreach my $i (0 .. $#{$array_ref}) {
+            for (my $i = 0 ; $i <= $#{$array_ref} ; $i++) {
                 my $item = $array_ref->[$i];
 
                 if (ref $item eq 'ARRAY') {
@@ -190,6 +190,9 @@ package main {
                     }
                     elsif ($item eq '{') {
                         $string .= "\n";
+
+                        # remove the block private variable
+                        splice(@{$array_ref->[$i + 1]}, 0, 5);
                     }
 
                 }
@@ -200,7 +203,5 @@ package main {
     }
 
     my $code = make_string($array);
-    $code =~ s<{\K\s*\\\(var _\);><>g;
-
     print $code;
 }

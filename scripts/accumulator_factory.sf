@@ -1,0 +1,18 @@
+#!/usr/bin/ruby
+
+# Translation of: http://rosettacode.org/wiki/Accumulator_factory#Perl
+
+func accumulator () {
+    var sum = _[0];
+    func (num) { sum += num };
+}
+
+for (var i = 0; i < 5; i++) {
+
+    var x = (accumulator(i));
+
+    x.call(5)   == (5+i)     || ("Error!".die);
+    x.call(2.3) == (5+i+2.3) || ("Error!".die);
+}
+
+"Test passed!".say;

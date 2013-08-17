@@ -1,0 +1,26 @@
+#!/usr/bin/ruby
+
+# Approximate translation of: http://rosettacode.org/wiki/Ackermann_function#Perl
+
+func A(m,n) {
+
+    var memo = (Hash.new);
+
+    func (m,n) {
+        m == 0 && (return(n+1));
+
+        (memo[m] := (Hash.new)).exists(n)
+            && (return(memo[m][n]));
+
+        memo[m][n] = (
+            n == 0 ? (__FUNC__(m-1, 1))
+                   : (__FUNC__(m-1, __FUNC__(m, n-1)));
+        );
+    }(m,n);
+}
+
+A(1,4) == 6  || ("Error 1!".die);
+A(2,3) == 9  || ("Error 2!".die);
+A(3,2) == 29 || ("Error 3!".die);
+
+"Test passed!".say;

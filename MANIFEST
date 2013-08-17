@@ -110,6 +110,10 @@ scripts/100_doors_3.sf
 scripts/99_bottles.sf
 scripts/9_billion_names.sf
 scripts/accumulator.sf
+scripts/accumulator_factory.sf
+scripts/ackermann_function.sf
+scripts/ackermann_function_cached.sf
+scripts/align_columns.sf
 scripts/array_autovivification.sf
 scripts/array_operators.sf
 scripts/array_unique.sf
@@ -184,4 +188,5 @@ t/boilerplate.t
 t/manifest.t
 t/pod.t
 talks/alpha-release/sidef.odp
+utils/deparser.pl
 utils/pod_generator.pl
