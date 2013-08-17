@@ -19,18 +19,7 @@ package Sidef::Types::Block::Code {
     {
         no strict 'refs';
 
-        *{__PACKAGE__ . '::' . '*'} = sub {
-            my ($self, $num) = @_;
-
-            $self->_is_number($num) || return $self;
-
-            foreach my $i (1 .. $num) {
-                my $res = $self->_run_code();
-                return $res if defined $res;
-            }
-
-            $self;
-        };
+        *{__PACKAGE__ . '::' . '*'} = \&repeat;
 
         *{__PACKAGE__ . '::' . ':'} = sub {
             my ($self, $code) = @_;
@@ -42,6 +31,24 @@ package Sidef::Types::Block::Code {
             warn "[WARN] Missing argument for hash operator ':'!\n";
             return;
         };
+    }
+
+    sub repeat {
+        my ($self, $num) = @_;
+
+        $num //= Sidef::Types::Number::Number->new(1);
+        $self->_is_number($num) || return $self;
+
+        foreach my $i (1 .. $num) {
+
+            my ($var_ref) = $self->_get_private_var();
+            $var_ref->get_var->set_value(Sidef::Types::Number::Number->new($i));
+
+            my $res = $self->_run_code();
+            return $res if defined $res;
+        }
+
+        $self;
     }
 
     sub to_hash {
