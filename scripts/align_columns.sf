@@ -32,10 +32,11 @@ func newFormatter (text) {
 func print (f,j) {
    for (f['text'].range) {
         for (f['text'][_].each) {
+
             var (i, word) = (_[0], _[1]);
-            "%-*s ".printf(
-                f['width'][i],
-                "%*s".sprintf(word.len+((f['width'][i] - (word.len))*j/2), word)
+
+            "%-*s ".printf(f['width'][i], "%*s".sprintf(
+                word.len+((f['width'][i] - (word.len))*j/2), word)
             );
         };
         ''.say;

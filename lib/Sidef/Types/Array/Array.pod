@@ -328,6 +328,14 @@ Returns an object of type: C<Sidef::Types::String::String>
 
 =cut
 
+=head2 each
+
+Array.each() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 exists
 
 Array.exists(I<Number>) -> I<Bool>
