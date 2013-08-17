@@ -112,6 +112,10 @@ package Sidef::Exec {
                     my $level   = $expr->{ind}[$l];
                     my $is_hash = ref($self_obj) eq 'Sidef::Types::Hash::Hash';
 
+                    if (ref($self_obj) eq 'Sidef::Types::String::String') {
+                        $self_obj = $self_obj->to_chars;
+                    }
+
                   MULTI_INDEX: if ($#{$level} > 0) {
                         my @indices;
 
