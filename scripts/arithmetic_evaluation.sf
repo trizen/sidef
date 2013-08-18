@@ -15,7 +15,7 @@ func evalArithmeticExp(s) {
         }
 
         func subtract(s) {
-            s.gReplace!(/\+-|-\+/,'-');
+            s=(s.gReplace(/(\+-|-\+)/,'-'));
 
             if (s.match(/--/).isSuccessful) {
                 return (add(s.replace(/--/,'+')));
@@ -26,7 +26,7 @@ func evalArithmeticExp(s) {
                 : (operate(s, '-'))
         }
 
-        s.gReplace!(/[()]/,'');
+        s=(s.gReplace(/[()]/,'').gReplace(/-\+/, '-'));
 
         var reM  = /\*/;
         var reMD = /(\d+\.?\d*\s*[*\/]\s*[+-]?\d+\.?\d*)/;
@@ -37,14 +37,14 @@ func evalArithmeticExp(s) {
         var match;
         while (match = (s =~ reMD) -> isSuccessful) {
             cap = (match.captures.first) =~ reM ??
-                ? (s.replace!(cap, operate(cap, '*').to_s))
-                : (s.replace!(cap, operate(cap, '/').to_s))
+                ? (s=(s.replace(reMD, operate(cap, '*').to_s)))
+                : (s=(s.replace(reMD, operate(cap, '/').to_s)))
         }
 
         while (match = (s =~ reAS) -> isSuccessful) {
             cap = (match.captures.first) =~ reA ??
-                ? (s.replace!(cap,      add(cap).to_s))
-                : (s.replace!(cap, subtract(cap).to_s))
+                ? (s=(s.replace(reAS,      add(cap).to_s)))
+                : (s=(s.replace(reAS, subtract(cap).to_s)))
         }
 
         return(s);
@@ -54,7 +54,7 @@ func evalArithmeticExp(s) {
     s = (s.split.join('').replace(/^\+/,''));
 
     while (var match = (s.match(rePara)) -> isSuccessful) {
-        s.replace!(rePara, evalExp(match.captures.first));
+        s=(s.replace(rePara, evalExp(match.captures.first)));
     }
 
     return(Number.new(evalExp(s)));
@@ -68,12 +68,12 @@ func evalArithmeticExp(s) {
 for [
      ['2+3'                                      =>      5],
      ['-4-3',                                    =>     -7],
-     ['2+3/4'                                    =>   2.75],
+     ['-+2+3/4'                                  =>  -1.25],
      ['2*3-4'                                    =>      2],
      ['2*(3+4)+2/4'                              => 2/4+14],
      ['2*-3--4+-0.25'                            =>  -2.25],
      ['2 * (3 + (4 * 5 + (6 * 7) * 8) - 9) * 10' =>   7000],
-     ] {
+    ] {
 
     var num = (evalArithmeticExp(_[0]))
             == _[1] || (
