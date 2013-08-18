@@ -78,7 +78,7 @@ for [
     var num = (evalArithmeticExp(_[0]))
             == _[1] || (
                         "Error occurred on expression: %s\n".sprintf(_[0])
-                                                          .die
+                                                            .die
                        );
 
     "%-45s == %10g\n".printf(_[0], num);
