@@ -1,0 +1,85 @@
+#!/usr/bin/ruby
+
+# Translation of: http://rosettacode.org/wiki/Arithmetic_evaluation#JavaScript
+
+func evalArithmeticExp(s) {
+
+    func evalExp(s) {
+
+        func operate(s, op) {
+            s.split(op).map{Number.new(_)}.reduce(op);
+        }
+
+        func add(s) {
+            operate(s.replace(/^\+/,'').replace(/\++/,'+'), '+');
+        }
+
+        func subtract(s) {
+            s.gReplace!(/\+-|-\+/,'-');
+
+            if (s.match(/--/).isSuccessful) {
+                return (add(s.replace(/--/,'+')));
+            }
+
+            b = (s.split('-')).len == 3
+                ? (-1 * (b[1].toNum) - (b[2].toNum))
+                : (operate(s, '-'))
+        }
+
+        s.gReplace!(/[()]/,'');
+
+        var reM  = /\*/;
+        var reMD = /(\d+\.?\d*\s*[*\/]\s*[+-]?\d+\.?\d*)/;
+
+        var reA  = /\d\+/;
+        var reAS = /(-?\d+\.?\d*\s*[+-]\s*[+-]?\d+\.?\d*)/;
+
+        var match;
+        while (match = (s =~ reMD) -> isSuccessful) {
+            cap = (match.captures.first) =~ reM ??
+                ? (s.replace!(cap, operate(cap, '*').to_s))
+                : (s.replace!(cap, operate(cap, '/').to_s))
+        }
+
+        while (match = (s =~ reAS) -> isSuccessful) {
+            cap = (match.captures.first) =~ reA ??
+                ? (s.replace!(cap,      add(cap).to_s))
+                : (s.replace!(cap, subtract(cap).to_s))
+        }
+
+        return(s);
+    }
+
+    var rePara = /(\([^\(\)]*\))/;
+    s = (s.split.join('').replace(/^\+/,''));
+
+    while (var match = (s.match(rePara)) -> isSuccessful) {
+        s.replace!(rePara, evalExp(match.captures.first));
+    }
+
+    return(Number.new(evalExp(s)));
+}
+
+
+#
+## MAIN
+#
+
+for [
+     ['2+3'                                      =>      5],
+     ['-4-3',                                    =>     -7],
+     ['2+3/4'                                    =>   2.75],
+     ['2*3-4'                                    =>      2],
+     ['2*(3+4)+2/4'                              => 2/4+14],
+     ['2*-3--4+-0.25'                            =>  -2.25],
+     ['2 * (3 + (4 * 5 + (6 * 7) * 8) - 9) * 10' =>   7000],
+     ] {
+
+    var num = (evalArithmeticExp(_[0]))
+            == _[1] || (
+                        "Error occurred on expression: %s\n".sprintf(_[0])
+                                                          .die
+                       );
+
+    "%-45s == %10g\n".printf(_[0], num);
+}
