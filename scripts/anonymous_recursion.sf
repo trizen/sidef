@@ -1,0 +1,10 @@
+#!/usr/bin/ruby
+
+# Translation of: http://rosettacode.org/wiki/Anonymous_recursion#Perl_5.16_and_SUB
+
+for (0..10) {
+    func (n) {
+        n < 2 ? n
+              : ((__FUNC__(n-2)) + (__FUNC__(n-1)));
+    }(_).to_s.say;
+}

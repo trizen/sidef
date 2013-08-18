@@ -72,6 +72,12 @@ package Sidef::Types::Array::Array {
             [map { $_->get_value } @{$self}];
         };
 
+        *{__PACKAGE__ . '::' . '*'} = sub {
+            my ($self, $num) = @_;
+            $self->_is_number($num) || return;
+            $self->new((map { $_->get_value } @{$self}) x $$num);
+        };
+
         *{__PACKAGE__ . '::' . '<<'} = \&dropLeft;
         *{__PACKAGE__ . '::' . '>>'} = \&dropRight;
 
@@ -260,6 +266,8 @@ package Sidef::Types::Array::Array {
         $self->_is_number($index, 1) || return;
         Sidef::Types::Bool::Bool->new(exists $self->[$$index]);
     }
+
+    *existsIndex = \&exists;
 
     sub defined {
         my ($self, $index) = @_;

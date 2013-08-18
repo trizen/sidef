@@ -69,6 +69,15 @@ package Sidef::Types::Hash::Hash {
         Sidef::Types::Array::Array->new(map { $_->get_value } values %{$self});
     }
 
+    sub each {
+        my ($self) = @_;
+        Sidef::Types::Array::Array->new(
+            map {
+                Sidef::Types::Array::Array->new(Sidef::Types::String::String->new($_), $self->{$_}->get_value)
+              } CORE::keys %{$self}
+        );
+    }
+
     sub exists {
         my ($self, $key) = @_;
         $key // do {

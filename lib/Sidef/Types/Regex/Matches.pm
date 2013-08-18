@@ -26,10 +26,17 @@ package Sidef::Types::Regex::Matches {
         Sidef::Types::Bool::Bool->new($_[0]->{matched});
     }
 
+    *to_bool       = \&matched;
+    *toBool        = \&matched;
+    *isSuccessful  = \&matched;
+    *is_successful = \&matched;
+
     sub matches {
         my ($self) = @_;
         Sidef::Types::Array::Array->new(map { Sidef::Types::String::String->new($_) } @{$self->{matches}});
     }
+
+    *captures = \&matches;
 
     sub named_matches {
         my ($self) = @_;
@@ -42,7 +49,9 @@ package Sidef::Types::Regex::Matches {
         $hash;
     }
 
-    *namedMatches = \&named_matches;
+    *namedMatches   = \&named_matches;
+    *namedCaptures  = \&named_matches;
+    *named_captures = \&named_matches;
 
     {
         no strict 'refs';

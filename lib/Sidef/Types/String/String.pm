@@ -22,16 +22,9 @@ package Sidef::Types::String::String {
     {
         no strict 'refs';
 
-        *{__PACKAGE__ . '::' . '=~'} = sub {
-            if (ref($_[1]) eq 'Sidef::Types::Regex::Regex') {
-                return $_[1]->matches($_[0]);
-            }
-            warn "[WARN] Expected a regex obj for method =~, not '", ref($_[1]), "'!\n";
-            Sidef::Types::Bool::Bool->false;
-        };
-
-        *{__PACKAGE__ . '::' . '*'} = \&times;
-        *{__PACKAGE__ . '::' . '+'} = \&append;
+        *{__PACKAGE__ . '::' . '=~'} = \&match;
+        *{__PACKAGE__ . '::' . '*'}  = \&times;
+        *{__PACKAGE__ . '::' . '+'}  = \&append;
 
         *{__PACKAGE__ . '::' . '-'} = sub {
             my ($self, $string) = @_;
@@ -113,6 +106,19 @@ package Sidef::Types::String::String {
             $$self = ${$self->sub(@rest)};
             $self;
         };
+
+        *{__PACKAGE__ . '::' . 'replace!'}  = \&{__PACKAGE__ . '::' . 'sub!'};
+        *{__PACKAGE__ . '::' . 'gSub!'}     = \&{__PACKAGE__ . '::' . 'gsub!'};
+        *{__PACKAGE__ . '::' . 'gReplace!'} = \&{__PACKAGE__ . '::' . 'gsub!'};
+    }
+
+    sub match {
+        if (ref($_[1]) eq 'Sidef::Types::Regex::Regex') {
+            return $_[1]->matches($_[0]);
+        }
+
+        warn "[WARN] Expected a regex obj for method =~, not '", ref($_[1]), "'!\n";
+        Sidef::Types::Bool::Bool->false;
     }
 
     sub to {
@@ -349,6 +355,8 @@ package Sidef::Types::String::String {
         $self->new($$self =~ s{$regex}{$str}r);
     }
 
+    *replace = \&sub;
+
     sub gsub {
         my ($self, $regex, $str) = @_;
 
@@ -362,6 +370,9 @@ package Sidef::Types::String::String {
 
         $self->new($$self =~ s{$regex}{$str}gr);
     }
+
+    *gSub     = \&gsub;
+    *gReplace = \&gsub;
 
     sub glob {
         my ($self) = @_;

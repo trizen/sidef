@@ -277,6 +277,23 @@ package Sidef::Types::Number::Number {
         $self->new($min + rand($max - $min));
     }
 
+    sub round {
+        my ($self, $places) = @_;
+
+        $places //= __PACKAGE__->new(1);
+        $self->_is_number($places) || return;
+
+        my $i = 10**$$places;
+        my $r = $$self % $i;
+
+        if ($i - $r > $r) {
+            return $self->new(CORE::int($$self - $r));
+        }
+        else {
+            return $self->new(CORE::int($$self + ($i - $r)));
+        }
+    }
+
     sub range {
         my ($self) = @_;
         $$self >= 0 ? $self->new(0)->to($self) : $self->to($self->new(0));
