@@ -1,6 +1,6 @@
 #!/usr/bin/ruby
 
-# usage: scr_pt X Y Z [S]
+# usage: script X Y Z [S]
 
 func cuboid (x, y, z, s) {
 
