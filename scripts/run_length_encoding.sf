@@ -14,10 +14,10 @@ func encode (str) {
         var index = _;
 
         if (i > 0 && (chars[index] != lc)) {
-            output ++ (i.to_s + (lc.to_s)); i = 0;
+            output.append(i.to_s + (lc.to_s)); i = 0;
         }
         elsif (chars.offset == index) {
-            output ++ (i + 1 to_s + (chars[index].to_s));
+            output.append(i + 1 to_s + (chars[index].to_s));
             break;
         }
 

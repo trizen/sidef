@@ -138,7 +138,7 @@ package Sidef::Types::Block::Code {
                        ++$j,
                        0,
                        {
-                        self => Sidef::Variable::My->new($vars[$i]{self}->get_name),
+                        self => Sidef::Variable::My->new($vars[$i]{self}->_get_name),
                         call => [
                                  {
                                   name => '=',

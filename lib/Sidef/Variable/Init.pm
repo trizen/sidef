@@ -21,7 +21,7 @@ package Sidef::Variable::Init {
         my ($method) = ($AUTOLOAD =~ /^.*[^:]::(.+)$/);
 
         my @results;
-        if (@{$self->{vars}} && $self->{vars}[0]->can($method)) {
+        if (@{$self->{vars}} && ($self->{vars}[0]->can($method) || $self->{vars}[0]->can('AUTOLOAD'))) {
             foreach my $var (@{$self->{vars}}) {
                 push @results, $var->$method(shift @args);
             }

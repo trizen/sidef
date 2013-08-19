@@ -9,7 +9,7 @@ package Sidef::Variable::InitMy {
         bless {name => $name}, __PACKAGE__;
     }
 
-    sub get_name {
+    sub _get_name {
         $_[0]->{name};
     }
 

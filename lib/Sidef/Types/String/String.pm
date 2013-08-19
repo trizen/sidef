@@ -94,22 +94,6 @@ package Sidef::Types::String::String {
 
         *{__PACKAGE__ . '::' . '^^'} = \&begins_with;
         *{__PACKAGE__ . '::' . '$$'} = \&ends_with;
-
-        *{__PACKAGE__ . '::' . 'gsub!'} = sub {
-            my ($self, @rest) = @_;
-            $$self = ${$self->gsub(@rest)};
-            $self;
-        };
-
-        *{__PACKAGE__ . '::' . 'sub!'} = sub {
-            my ($self, @rest) = @_;
-            $$self = ${$self->sub(@rest)};
-            $self;
-        };
-
-        *{__PACKAGE__ . '::' . 'replace!'}  = \&{__PACKAGE__ . '::' . 'sub!'};
-        *{__PACKAGE__ . '::' . 'gSub!'}     = \&{__PACKAGE__ . '::' . 'gsub!'};
-        *{__PACKAGE__ . '::' . 'gReplace!'} = \&{__PACKAGE__ . '::' . 'gsub!'};
     }
 
     sub match {
@@ -217,14 +201,17 @@ package Sidef::Types::String::String {
 
     sub chop {
         my ($self) = @_;
-        $self->new(CORE::chop $$self);
+        $self->new(CORE::substr($$self, 0, -1));
     }
 
     sub chomp {
         my ($self) = @_;
 
-        CORE::chomp($$self) || return $self;
-        $self->new($$self);
+        if (substr($$self, -1) eq "\n") {
+            return $self->chop;
+        }
+
+        $self;
     }
 
     sub crypt {
@@ -344,7 +331,7 @@ package Sidef::Types::String::String {
     sub sub {
         my ($self, $regex, $str) = @_;
 
-        $self->_is_string($str) || return Sidef::Types::Bool::Bool->false;
+        $self->_is_string($str) || return;
 
         if (ref($regex) ne 'Sidef::Types::Regex::Regex') {
             if ($regex->can('quotemeta')) {
@@ -352,7 +339,7 @@ package Sidef::Types::String::String {
             }
         }
 
-        $self->new($$self =~ s{$regex}{$str}r);
+        $self->new($$self =~ s{$regex}{$$str}r);
     }
 
     *replace = \&sub;
@@ -360,7 +347,7 @@ package Sidef::Types::String::String {
     sub gsub {
         my ($self, $regex, $str) = @_;
 
-        $self->_is_string($str) || return Sidef::Types::Bool::Bool->false;
+        $self->_is_string($str) || return;
 
         if (ref($regex) ne 'Sidef::Types::Regex::Regex') {
             if ($regex->can('quotemeta')) {
@@ -368,7 +355,7 @@ package Sidef::Types::String::String {
             }
         }
 
-        $self->new($$self =~ s{$regex}{$str}gr);
+        $self->new($$self =~ s{$regex}{$$str}gr);
     }
 
     *gSub     = \&gsub;

@@ -94,7 +94,7 @@ package Sidef::Exec {
             }
 
             if (ref $self_obj eq 'Sidef::Variable::My') {
-                $self_obj = $self->{vars}{$self_obj->get_name};
+                $self_obj = $self->{vars}{$self_obj->_get_name};
             }
 
             if (ref $self_obj eq 'Sidef::Types::Array::Array') {
@@ -229,9 +229,15 @@ package Sidef::Exec {
                         }
                     }
 
-                    if (ref $self_obj eq 'Sidef::Variable::Variable'
-                        and not exists $self->{var_methods}{$method}) {
-                        $self_obj = $self_obj->get_value;
+                    # When the variable holds a module, get the
+                    # value of variable and set it to $self_obj;
+                    if (ref $self_obj eq 'Sidef::Variable::Variable') {
+
+                        my $value = $self_obj->get_value;
+                        if (   ref($value) eq 'Sidef::Module::Caller'
+                            or ref($value) eq 'Sidef::Module::Func') {
+                            $self_obj = $value;
+                        }
                     }
 
                     ref($self_obj) && eval { $self_obj->can('can') } || do {
@@ -347,8 +353,8 @@ package Sidef::Exec {
             local $self->{expr_i_max} = $#{$struct->{$key}};
 
           INIT_VAR: ($i++ != -1)
-              && (local $self->{vars}{$struct->{$key}[$i - 1]{self}->get_name} =
-                  Sidef::Variable::Variable->new($struct->{$key}[$i - 1]{self}->get_name, 'var'));
+              && (local $self->{vars}{$struct->{$key}[$i - 1]{self}->_get_name} =
+                  Sidef::Variable::Variable->new($struct->{$key}[$i - 1]{self}->_get_name, 'var'));
 
             for (local $self->{expr_i} = $i ; $self->{expr_i} <= $self->{expr_i_max} ; $self->{expr_i}++) {
 
@@ -371,7 +377,7 @@ package Sidef::Exec {
                 if (ref($obj) eq 'Sidef::Types::Block::Return') {
 
                     my $caller = [caller(1)]->[0];
-                    if (defined($caller) and $caller eq __PACKAGE__) {
+                    if (defined($caller) and ($caller eq __PACKAGE__ or $caller eq 'Sidef::Variable::Variable')) {
                         return $obj->get_obj();
                     }
 

@@ -8,6 +8,8 @@ package Sidef::Variable::Variable {
         $_[0]->get_value;
     };
 
+    our $AUTOLOAD;
+
     sub new {
         my (undef, $var, $type, $value) = @_;
 
@@ -25,7 +27,7 @@ package Sidef::Variable::Variable {
           and ref($self->{value}) ne 'Sidef::Types::Nil::Nil';
     }
 
-    sub get_name {
+    sub _get_name {
         $_[0]{name};
     }
 
@@ -46,6 +48,7 @@ package Sidef::Variable::Variable {
 
         *{__PACKAGE__ . '::' . '='} = sub {
             my ($self, $obj) = @_;
+
             $#_ > 1 && ($obj = $_[-1]);
 
             if ($self->{type} eq "var") {
@@ -55,7 +58,8 @@ package Sidef::Variable::Variable {
                 if (not defined $self->{value}) {
                     return $self->set_value($obj);
                 }
-                warn "Constant '$self->{name}' cannot be changed.\n";
+
+                #warn "Constant '$self->{name}' cannot be changed.\n";
             }
             elsif ($self->{type} eq "char") {
                 return $self->set_value($obj->to_chars);
@@ -97,7 +101,6 @@ package Sidef::Variable::Variable {
         };
 
         foreach my $operator (qw(-- ++)) {
-
             *{__PACKAGE__ . '::' . $operator} = sub {
                 my ($self, $arg) = @_;
 
@@ -114,7 +117,6 @@ package Sidef::Variable::Variable {
 
                 $self;
             };
-
         }
 
         foreach my $operator (qw(+ - % * / & | ^ ** && || << >>)) {
@@ -135,6 +137,39 @@ package Sidef::Variable::Variable {
                 $self;
             };
         }
+
+    }
+
+    sub DESTROY { }
+
+    sub AUTOLOAD {
+        my ($self, @args) = @_;
+
+        if ($AUTOLOAD eq __PACKAGE__ . '::') {
+            return $self;
+        }
+
+        my ($method) = ($AUTOLOAD =~ /^.*[^:]::(.+)$/);
+        my $value = $self->get_value;
+
+        my $change_var = 0;
+        if (substr($method, -1) eq '!') {
+            $change_var = 1;
+            chop $method;
+        }
+
+        if (ref($value) && ($value->can($method) || $value->can('AUTOLOAD'))) {
+            my @results = $value->$method(@args);
+
+            if ($change_var) {
+                my $method = '=';
+                $self->$method(@results);
+            }
+
+            return $results[-1];
+        }
+
+        return;
     }
 };
 
