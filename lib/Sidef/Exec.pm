@@ -10,15 +10,6 @@ package Sidef::Exec {
 
     sub new {
         my $self = bless {
-            var_methods => {
-                map { $_ => 1 }
-                  qw(
-                  =  :=  +=  -=  *=  /=
-                  %=  **=  ||=  &&=  |=
-                  ^=  &=  ++  -- \\\\
-                  <<= >>=
-                  )
-            },
             bool_assign_method => {
                                    ':='  => 1,
                                    '||=' => 1,
