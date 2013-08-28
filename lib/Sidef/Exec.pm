@@ -29,6 +29,7 @@ package Sidef::Exec {
                                                '&&' => 1,
                                                '||' => 1,
                                                '?'  => 1,
+                                               '?:' => 1,
                                               },
                 'Sidef::Types::Block::Code' => {
                                                 'while' => 1,
@@ -147,10 +148,6 @@ package Sidef::Exec {
                     }
                     else {
                         my $ind = $self->execute_expr(expr => $level->[0], class => $opt{class});
-
-                        if (ref($ind) eq 'Sidef::Variable::Variable') {
-                            $ind = $ind->get_value;
-                        }
 
                         if (ref($ind) eq 'Sidef::Types::Array::Array') {
                             $level = [map { $_->get_value } @{$ind}];

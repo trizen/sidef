@@ -26,8 +26,7 @@ func evalArithmeticExp(s) {
                 : (operate(s, '-'))
         }
 
-        s.gReplace!(/[()]/,'');
-        s.gReplace!(/-\+/, '-');
+        s.gReplace!(/[()]/,'').gReplace!(/-\+/, '-');
 
         var reM  = /\*/;
         var reMD = /(\d+\.?\d*\s*[*\/]\s*[+-]?\d+\.?\d*)/;
@@ -36,13 +35,13 @@ func evalArithmeticExp(s) {
         var reAS = /(-?\d+\.?\d*\s*[+-]\s*[+-]?\d+\.?\d*)/;
 
         var match;
-        while (match = (s =~ reMD) -> isSuccessful) {
+        while (match = (s.match(reMD)) -> isSuccessful) {
             cap = (match.captures.first) =~ reM ??
                 ? (s.replace!(reMD, operate(cap, '*').to_s))
                 : (s.replace!(reMD, operate(cap, '/').to_s))
         }
 
-        while (match = (s =~ reAS) -> isSuccessful) {
+        while (match = (s.match(reAS)) -> isSuccessful) {
             cap = (match.captures.first) =~ reA ??
                 ? (s.replace!(reAS,      add(cap).to_s))
                 : (s.replace!(reAS, subtract(cap).to_s))

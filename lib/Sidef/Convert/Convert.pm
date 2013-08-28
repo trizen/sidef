@@ -28,7 +28,7 @@ package Sidef::Convert::Convert {
         my ($self) = @_;
 
         if (exists $array_like->{ref $self}) {
-            return Sidef::Types::String::String->new(join(' ', @{$self}));
+            return Sidef::Types::String::String->new(join(' ', map { $_->get_value } @{$self}));
         }
 
         Sidef::Types::String::String->new("$$self");

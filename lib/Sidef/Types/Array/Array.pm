@@ -57,20 +57,13 @@ package Sidef::Types::Array::Array {
 
     {
         no strict 'refs';
-        *{__PACKAGE__ . '::' . '-'} = sub {
-            my ($self, $array) = @_;
-            $self->_grep($array, 1);
-        };
 
         *{__PACKAGE__ . '::' . '&'} = sub {
             my ($self, $array) = @_;
             $self->_grep($array, 0);
         };
 
-        *{__PACKAGE__ . '::' . '...'} = sub {
-            my ($self) = @_;
-            [map { $_->get_value } @{$self}];
-        };
+        *{__PACKAGE__ . '::' . '...'} = \&to_list;
 
         *{__PACKAGE__ . '::' . '*'} = sub {
             my ($self, $num) = @_;
@@ -93,24 +86,10 @@ package Sidef::Types::Array::Array {
             $self->$xor($array)->$add($self->$and($array));
         };
 
-        *{__PACKAGE__ . '::' . '^'} = sub {
-            my ($self, $array) = @_;
-            my $new_array = $self->new;
+        *{__PACKAGE__ . '::' . '^'} = \&xor;
 
-            $self->_is_array($array) || return;
-
-            my $add    = '+';
-            my $and    = '&';
-            my $substr = '-';
-            ($self->$add($array))->$substr($self->$and($array));
-        };
-
-        *{__PACKAGE__ . '::' . '+'} = sub {
-            my ($self, $array) = @_;
-
-            $self->_is_array($array) || return ($self);
-            $self->new(map { $_->get_value } @{$self}, @{$array});
-        };
+        *{__PACKAGE__ . '::' . '+'} = \&add;
+        *{__PACKAGE__ . '::' . '-'} = \&subtract;
 
         *{__PACKAGE__ . '::' . '++'} = sub {
             my ($self, $obj) = @_;
@@ -125,43 +104,14 @@ package Sidef::Types::Array::Array {
         };
 
         *{__PACKAGE__ . '::' . '&&'} = \&mesh;
-
-        *{__PACKAGE__ . '::' . '=='} = sub {
-            my ($self, $array) = @_;
-
-            $self->_is_array($array) || return ($self);
-
-            if ($#{$self} != $#{$array}) {
-                return Sidef::Types::Bool::Bool->false;
-            }
-
-            foreach my $i (0 .. $#{$self}) {
-
-                my ($x, $y) = ($self->[$i]->get_value, $array->[$i]->get_value);
-
-                if (ref($x) eq ref($y)) {
-                    my $method = '==';
-
-                    if (defined $x->can($method)) {
-                        if (not $x->$method($y)) {
-                            return Sidef::Types::Bool::Bool->false;
-                        }
-                    }
-
-                }
-                else {
-                    return Sidef::Types::Bool::Bool->false;
-                }
-            }
-
-            return Sidef::Types::Bool::Bool->true;
-        };
+        *{__PACKAGE__ . '::' . '=='} = \&equals;
 
         *{__PACKAGE__ . '::' . '='} = sub {
             my ($self, $arg) = @_;
 
-            if (ref $arg eq 'Sidef::Types::Array::Array') {
+            if ($self->_is_array($arg, 1, 1)) {
                 my @values = map { $_->get_value } @{$arg};
+
                 foreach my $i (0 .. $#{$self}) {
                     $self->[$i]->set_value(exists $values[$i] ? $values[$i] : Sidef::Types::Nil::Nil->new);
                 }
@@ -174,6 +124,71 @@ package Sidef::Types::Array::Array {
         };
 
     }
+
+    sub subtract {
+        my ($self, $array) = @_;
+        $self->_grep($array, 1);
+    }
+
+    sub add {
+        my ($self, $array) = @_;
+
+        $self->_is_array($array) || return ($self);
+        $self->new(map { $_->get_value } @{$self}, @{$array});
+    }
+
+    sub to_list {
+        my ($self) = @_;
+        [map { $_->get_value } @{$self}];
+    }
+
+    *toList = \&to_list;
+
+    sub xor {
+        my ($self, $array) = @_;
+        my $new_array = $self->new;
+
+        $self->_is_array($array) || return;
+
+        my $add    = '+';
+        my $and    = '&';
+        my $substr = '-';
+        ($self->$add($array))->$substr($self->$and($array));
+    }
+
+    sub equals {
+        my ($self, $array) = @_;
+
+        $self->_is_array($array) || return ($self);
+
+        if ($#{$self} != $#{$array}) {
+            return Sidef::Types::Bool::Bool->false;
+        }
+
+        foreach my $i (0 .. $#{$self}) {
+
+            my ($x, $y) = ($self->[$i]->get_value, $array->[$i]->get_value);
+
+            if (ref($x) eq ref($y)) {
+                my $method = '==';
+
+                if (defined $x->can($method)) {
+                    if (not $x->$method($y)) {
+                        return Sidef::Types::Bool::Bool->false;
+                    }
+                }
+
+            }
+            else {
+                return Sidef::Types::Bool::Bool->false;
+            }
+        }
+
+        return Sidef::Types::Bool::Bool->true;
+    }
+
+    *is = \&equals;
+    *eq = \&equals;
 
     sub mesh {
         my ($self, $array) = @_;
@@ -286,6 +301,22 @@ package Sidef::Types::Array::Array {
 
     *fromTo = \&ft;
 
+    sub for {
+        my ($self, $code) = @_;
+
+        $self->_is_code($code) || return $self;
+        my ($var_ref) = $code->_get_private_var();
+
+        foreach my $item (@{$self}) {
+            my $val = $item->get_value;
+            $var_ref->get_var->set_value($val);
+            $code->run;
+            $item->set_value($var_ref->get_var->get_value);
+        }
+
+        $self;
+    }
+
     sub map {
         my ($self, $code) = @_;
 
@@ -296,9 +327,7 @@ package Sidef::Types::Array::Array {
             map {
                 my $val = $_->get_value;
                 $var_ref->get_var->set_value($val);
-                my $result = $code->run;
-                $_->set_value($var_ref->get_var->get_value);
-                $result;
+                $code->run;
               } @{$self}
         );
     }
@@ -698,21 +727,22 @@ package Sidef::Types::Array::Array {
         my ($self, $num) = @_;
         $self->_is_number($num) || return;
 
+        my $array = $self->new(map { $_->get_value } @{$self});
         if ($$num < 0) {
-            CORE::unshift(@{$self}, CORE::pop(@{$self})) for 1 .. abs($$num);
+            CORE::unshift(@{$array}, CORE::pop(@{$array})) for 1 .. abs($$num);
         }
         else {
-            CORE::push(@{$self}, CORE::shift(@{$self})) for 1 .. $$num;
+            CORE::push(@{$array}, CORE::shift(@{$array})) for 1 .. $$num;
         }
 
-        $self;
+        $array;
     }
 
     # Join the array as string
     sub join {
         my ($self, $delim) = @_;
         $delim = ref($delim) && $self->_is_string($delim) ? $$delim : '';
-        Sidef::Types::String::String->new(CORE::join($delim, @{$self}));
+        Sidef::Types::String::String->new(CORE::join($delim, map { $_->get_value } @{$self}));
     }
 
     # Insert an object between every element
@@ -738,13 +768,6 @@ package Sidef::Types::Array::Array {
     }
 
     *reversed = \&reverse;    # alias
-
-    sub sliceReverse {
-        my ($self) = @_;
-        my $array = $self->new();
-        CORE::push(@{$array}, CORE::reverse(@{$self}));
-        $array;
-    }
 
     sub to_hash {
         my ($self) = @_;

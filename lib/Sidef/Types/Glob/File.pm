@@ -263,16 +263,29 @@ package Sidef::Types::Glob::File {
     *cp = \&copy;
 
     sub open {
-        my ($self, $mode) = @_;
+        my ($self, $mode, $var_ref) = @_;
         $mode = ${$mode} if ref $mode;
 
-        open(my $fh, $mode, $$self) || return;
-        Sidef::Types::Glob::FileHandle->new(fh => $fh, file => $self);
+        my $success = open(my $fh, $mode, $$self);
+        my $fh_obj = Sidef::Types::Glob::FileHandle->new(fh => $fh, file => $self);
+
+        if (ref($var_ref) eq 'Sidef::Variable::Ref') {
+            $var_ref->get_var->set_value($fh_obj);
+
+            return $success
+              ? Sidef::Types::Bool::Bool->true
+              : Sidef::Types::Bool::Bool->false;
+        }
+        elsif ($success) {
+            return $fh_obj;
+        }
+
+        return;
     }
 
     sub open_r {
-        my ($self) = @_;
-        $self->open('<');
+        my ($self, $var_ref) = @_;
+        $self->open('<', $var_ref);
     }
 
     *openR     = \&open_r;
@@ -280,8 +293,8 @@ package Sidef::Types::Glob::File {
     *open_read = \&open_r;
 
     sub open_w {
-        my ($self) = @_;
-        $self->open('>');
+        my ($self, $var_ref) = @_;
+        $self->open('>', $var_ref);
     }
 
     *openW      = \&open_w;
@@ -289,8 +302,8 @@ package Sidef::Types::Glob::File {
     *open_write = \&open_w;
 
     sub open_a {
-        my ($self) = @_;
-        $self->open('>>');
+        my ($self, $var_ref) = @_;
+        $self->open('>>', $var_ref);
     }
 
     *openA       = \&open_a;

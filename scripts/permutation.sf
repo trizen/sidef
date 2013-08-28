@@ -11,7 +11,7 @@ func permute (code, arr) {
         p == 0 && (return);
 
         var d = p;
-        idx += (idx.splice(p).sliceReverse);
+        idx += (idx.splice(p).reverse);
 
         {d++} while (idx[p - 1] > idx[d]);
 

@@ -146,9 +146,20 @@ package Sidef::Types::Number::Number {
 
     sub to {
         my ($self, $num) = @_;
-        $self->_is_number($num) || return $self;
+        $self->_is_number($num) || return;
         Sidef::Types::Array::Array->new(map { ref($self)->new($_) } $$self .. $$num);
     }
+
+    *upto = \&to;
+    *upTo = \&to;
+
+    sub downto {
+        my ($self, $num) = @_;
+        $self->_is_number($num) || return;
+        Sidef::Types::Array::Array->new(map { ref($self)->new($_) } reverse($$num .. $$self));
+    }
+
+    *downTo = \&downto;
 
     sub sqrt {
         my ($self) = @_;

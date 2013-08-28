@@ -281,6 +281,7 @@ package Sidef::Parser {
                       ...
                       != ..
                       \\\\
+                      ?:
                       ?? ?
                       ! \\
                       :
@@ -465,7 +466,7 @@ package Sidef::Parser {
             }
 
             # Alpha-numeric method name
-            if (/\G([a-z]\w*!?)/gc) {
+            if (/\G([a-z]\w*[!:]?)/gc) {
                 return {self => Sidef::Types::String::String->new($1)}, pos;
             }
 
@@ -841,7 +842,7 @@ package Sidef::Parser {
                 }
 
                 if (
-                    /\G((?>ENV|ARGV|SCRIPT))\b/gc && do {
+                    /\G((?>ENV|ARGV|SCRIPT_NAME))\b/gc && do {
                         ref(($self->find_var($1, $self->{class}))[0]) ? do { pos($_) -= length($1); 0 } : 1;
                     }
                   ) {
@@ -879,7 +880,7 @@ package Sidef::Parser {
 
                         $variable->set_value($hash);
                     }
-                    elsif ($name eq 'SCRIPT') {
+                    elsif ($name eq 'SCRIPT_NAME') {
                         my $string = Sidef::Types::String::String->new($self->{script_name});
                         $variable->set_value($string);
                     }

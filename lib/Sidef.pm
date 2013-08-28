@@ -13,7 +13,13 @@ package Sidef {
                      code   => {class => {'Sidef::Types::Block::Code'    => 1}},
                      hash   => {class => {'Sidef::Types::Hash::Hash'     => 1}},
                      number => {class => {'Sidef::Types::Number::Number' => 1}, type => 'SCALAR'},
-                     string => {class => {'Sidef::Types::String::String' => 1}, type => 'SCALAR'},
+                     string => {
+                                class => {
+                                          'Sidef::Types::String::String' => 1,
+                                          'Sidef::Types::Char::Char'     => 1,
+                                         },
+                                type => 'SCALAR'
+                               },
                      array => {
                                type  => 'ARRAY',
                                class => {
@@ -38,8 +44,12 @@ package Sidef {
                     my ($sub) = [caller(1)]->[3] =~ /^.*[^:]::(.+)$/;
 
                     if (!$dont_warn) {
-                        warn sprintf("[%s] Object of type '$type' was expected, but got '%s'!\n",
-                                     ($sub eq '__ANON__' ? 'WARN' : $sub), ref($obj) || "an undefined object");
+
+                        my $ref_obj = [caller(0)]->[0];
+
+                        warn sprintf("[WARN] %sbject '%s' expected an object of type '$type', but got '%s'!\n",
+                                     ($sub eq '__ANON__' ? 'O' : sprintf("The method '%s' from o", $sub)),
+                                     $ref_obj, ref($obj) || "an undefined object");
                     }
 
                     if (!$strict_obj) {
@@ -48,7 +58,8 @@ package Sidef {
                         }
                     }
                 }
-                return;
+
+                $dont_warn ? (return) : (die "[DIE] Can't continue...\n");
             };
         }
 

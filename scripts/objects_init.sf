@@ -12,7 +12,7 @@ var current_dir = (Dir.new '.');
 ## File object
 #
 
-var file = (File.new(SCRIPT));
+var file = (File.new(SCRIPT_NAME));
 "The size of file '%s' is %.3f KB\n".printf(file.name, file.size / 1024);
 
 

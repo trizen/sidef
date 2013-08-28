@@ -6,7 +6,7 @@ var k = 3;
 var prisoner = (0 .. 40);
 
 while (prisoner.len > 1) {
-    prisoner.rotate(k-1).shift;
+    prisoner.rotate!(k-1).shift;
 }
 
 prisoner[0] == 30

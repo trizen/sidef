@@ -36,7 +36,10 @@ package Sidef::Types::Bool::Bool {
         *{__PACKAGE__ . '::' . '!'} = sub {
             my ($self, $bool) = @_;
             $self->_is_bool($bool) || return $self;
-            $self->new(!$bool);
+
+            $$bool eq 'true'
+              ? $self->false
+              : $self->true;
         };
 
         *{__PACKAGE__ . '::' . '&&'} = \&and;
@@ -45,12 +48,24 @@ package Sidef::Types::Bool::Bool {
         *{__PACKAGE__ . '::' . '?'} = sub {
             my ($self, $code) = @_;
 
-            if ($self) {
+            if ($$self eq 'true') {
                 my $result = Sidef::Types::Block::Code->new($code)->run;
                 return Sidef::Types::Bool::Ternary->new({code => $result, bool => $self->true});
             }
 
             return Sidef::Types::Bool::Ternary->new({code => $code, bool => $self->false});
+        };
+
+        *{__PACKAGE__ . '::' . '?:'} = sub {
+            my ($self, $code) = @_;
+
+            my ($class) = keys %{$code};
+
+            if ($$self eq 'true') {
+                return Sidef::Types::Block::Code->new({$class => [$code->{$class}[0]]})->run;
+            }
+
+            return Sidef::Types::Block::Code->new({$class => [$code->{$class}[1]]})->run;
         };
     }
 
@@ -70,13 +85,13 @@ package Sidef::Types::Bool::Bool {
 
     sub not {
         my ($self) = @_;
-        $self ? $self->false : $self->true;
+        $$self eq 'true' ? $self->false : $self->true;
     }
 
     sub or {
         my ($self, $code) = @_;
 
-        if (!$self) {
+        if ($$self ne 'true') {
             return Sidef::Types::Block::Code->new($code)->run;
         }
 
@@ -86,17 +101,11 @@ package Sidef::Types::Bool::Bool {
     sub and {
         my ($self, $code) = @_;
 
-        if ($self) {
+        if ($$self eq 'true') {
             return Sidef::Types::Block::Code->new($code)->run;
         }
 
         $self->false;
-    }
-
-    sub flip {
-        my ($self) = @_;
-        $$self = $$self eq 'true' ? 'false' : 'true';
-        $self;
     }
 
     sub dump {

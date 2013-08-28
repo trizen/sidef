@@ -145,28 +145,41 @@ package Sidef::Variable::Variable {
     sub AUTOLOAD {
         my ($self, @args) = @_;
 
-        if ($AUTOLOAD eq __PACKAGE__ . '::') {
-            return $self;
-        }
+        #if ($AUTOLOAD eq __PACKAGE__ . '::') {
+        #    return $self;
+        #}
 
         my ($method) = ($AUTOLOAD =~ /^.*[^:]::(.+)$/);
         my $value = $self->get_value;
 
-        my $change_var = 0;
-        if (substr($method, -1) eq '!') {
-            $change_var = 1;
-            chop $method;
+        my $method_type = 0;
+        if ($method =~ /^[[:alpha:]]/) {
+            if (substr($method, -1) eq '!') {
+                $method_type = 1;
+                chop $method;
+            }
+            elsif (substr($method, -1) eq ':') {
+                $method_type = 2;
+                chop $method;
+            }
         }
 
         if (ref($value) && ($value->can($method) || $value->can('AUTOLOAD'))) {
             my @results = $value->$method(@args);
 
-            if ($change_var) {
+            if ($method_type == 1) {
                 my $method = '=';
                 $self->$method(@results);
+                return $self->new(rand, 'var', $self);
+            }
+            elsif ($method_type == 2) {
+                return $self->new(rand, 'var', $self);
             }
 
             return $results[-1];
+        }
+        else {
+            warn qq{[WARN] Inexistent method '$method' for object } . ref($value) . "\n";
         }
 
         return;
