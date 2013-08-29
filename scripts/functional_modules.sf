@@ -1,8 +1,8 @@
 #!/usr/bin/perl
 
 var spec = ( require 'File::Spec::Functions'->() );     # ->() is for functional
-Str.new(spec.catfile(spec.curdir, SCRIPT)).say;
-Str.new(spec.rel2abs(SCRIPT)).say;
+Str.new(spec.catfile(spec.curdir, SCRIPT_NAME)).say;
+Str.new(spec.rel2abs(SCRIPT_NAME)).say;
 
 
 #

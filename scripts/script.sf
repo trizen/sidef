@@ -231,8 +231,8 @@ var method_name = "substr";
 
 #######################################################
 
-"Your OS name is: $OSNAME"->say;
-"The name of this script is: $SCRIPT\n"->say;
+#"Your OS name is: $OSNAME"->say;
+#"The name of this script is: $SCRIPT\n"->say;
 
 #######################################################
 

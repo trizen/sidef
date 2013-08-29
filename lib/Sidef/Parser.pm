@@ -898,7 +898,7 @@ package Sidef::Parser {
                         $var->{count}++;
                         return $var->{obj}, pos;
                     }
-                    elsif (not $self->{strict_var} and /\G(?=\h*\R?\h*:?=(?![=~]))/) {
+                    elsif (not $self->{strict_var} and /\G(?=\h*(?:\R\h*)?:?=(?![=~]))/) {
                         unshift @{$self->{vars}{$self->{class}}},
                           {
                             obj   => Sidef::Variable::My->new($name),
@@ -911,7 +911,6 @@ package Sidef::Parser {
                         return Sidef::Variable::InitMy->new($name), pos($_) - length($name);
                     }
 
-                    # Ignored, for now
                     $self->fatal_error(
                                        code  => $_,
                                        pos   => (pos($_) - length($name)),

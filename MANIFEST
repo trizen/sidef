@@ -107,6 +107,7 @@ README
 scripts/100_doors.sf
 scripts/100_doors_2.sf
 scripts/100_doors_3.sf
+scripts/100_doors_4.sf
 scripts/99_bottles.sf
 scripts/9_billion_names.sf
 scripts/accumulator.sf
@@ -114,6 +115,8 @@ scripts/accumulator_factory.sf
 scripts/ackermann_function.sf
 scripts/ackermann_function_cached.sf
 scripts/align_columns.sf
+scripts/anonymous_recursion.sf
+scripts/arithmetic_evaluation.sf
 scripts/array_autovivification.sf
 scripts/array_operators.sf
 scripts/array_unique.sf
@@ -138,6 +141,7 @@ scripts/function_recursion.sf
 scripts/functional_modules.sf
 scripts/functions.sf
 scripts/getopt.sf
+scripts/hailstone.sf
 scripts/hash_autovivification.sf
 scripts/hash_from_array.sf
 scripts/hash_map.sf
@@ -146,6 +150,8 @@ scripts/if_do_else.sf
 scripts/if_while_standard.sf
 scripts/include_class.sf
 scripts/JASH.sf
+scripts/josephus_problem.sf
+scripts/keyword_object.sf
 scripts/leap_year.sf
 scripts/levenshtein_distance.sf
 scripts/levenshtein_recursive.sf
@@ -157,6 +163,7 @@ scripts/method_expressions.sf
 scripts/multi_var_assignment.sf
 scripts/next.sf
 scripts/objects_init.sf
+scripts/open.sf
 scripts/permutation.sf
 scripts/power_numbers.sf
 scripts/quoted_strings.sf
@@ -165,10 +172,13 @@ scripts/recursion.sf
 scripts/regex.sf
 scripts/return.sf
 scripts/rock_paper_scissors.sf
+scripts/roman_numerals_decoding.sf
+scripts/roman_numerals_encoding.sf
 scripts/run_length_encoding.sf
 scripts/run_length_encoding_2.sf
 scripts/script.sf
 scripts/sierpinski_carpet.sf
+scripts/special_methods.sf
 scripts/split_combine.sf
 scripts/stdin.sf
 scripts/sum_of_squares.sf
@@ -190,3 +200,4 @@ t/pod.t
 talks/alpha-release/sidef.odp
 utils/deparser.pl
 utils/pod_generator.pl
+utils/sidef_concept.pl
