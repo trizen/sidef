@@ -179,7 +179,13 @@ package Sidef::Variable::Variable {
             return $results[-1];
         }
         else {
-            warn qq{[WARN] Inexistent method '$method' for object } . ref($value) . "\n";
+            warn qq{[WARN] Inexistent method '$method' for }
+              . (
+                 ref($value)
+                 ? ("object " . ref($value))
+                 : ("an undefined object!")
+                )
+              . "\n";
         }
 
         return;
