@@ -4,19 +4,16 @@
 
 func A(m,n) {
 
-    var memo = (Hash.new);
+    var memo := (Hash.new);
+    m == 0 && (return(n+1));
 
-    func (m,n) {
-        m == 0 && (return(n+1));
+    (memo[m] := (Hash.new)).exists(n)
+        && (return(memo[m][n]));
 
-        (memo[m] := (Hash.new)).exists(n)
-            && (return(memo[m][n]));
-
-        memo[m][n] = (
-            n == 0 ? (__FUNC__(m-1, 1))
-                   : (__FUNC__(m-1, __FUNC__(m, n-1)));
-        );
-    }(m,n);
+    memo[m][n] = (
+        n == 0 ? (__FUNC__(m-1, 1))
+               : (__FUNC__(m-1, __FUNC__(m, n-1)));
+    );
 }
 
 A(1,4) == 6  || ("Error 1!".die);
