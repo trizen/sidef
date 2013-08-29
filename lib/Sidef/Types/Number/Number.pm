@@ -272,7 +272,7 @@ package Sidef::Types::Number::Number {
 
     sub is_integer {
         my ($self) = @_;
-        Sidef::Types::Bool::Bool->new($$self - CORE::int($$self) == 0);
+        Sidef::Types::Bool::Bool->new($$self == CORE::int($$self));
     }
 
     *isInt     = \&is_integer;
@@ -286,6 +286,20 @@ package Sidef::Types::Number::Number {
         $max = ref($max) ? $$max : do { $min = 0; $$self };
 
         $self->new($min + rand($max - $min));
+    }
+
+    sub ceil {
+        my ($self) = @_;
+
+        require POSIX;
+        $self->new(POSIX::ceil($$self));
+    }
+
+    sub floor {
+        my ($self) = @_;
+
+        require POSIX;
+        $self->new(POSIX::floor($$self));
     }
 
     sub round {
