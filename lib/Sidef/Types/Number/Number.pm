@@ -16,7 +16,13 @@ package Sidef::Types::Number::Number {
     }
 
     sub get_value {
-        join('', @{${$_[0]}->{_m}});
+        my $num = join('', reverse @{${$_[0]}->{_m}});
+
+        if (${$_[0]}->{_e} != 0) {
+            substr($num, -${$_[0]}->{_e}[0], 0, '.');
+        }
+
+        $num + 0;
     }
 
     {
