@@ -1,0 +1,27 @@
+#!/usr/bin/ruby
+
+var req = (require 'LWP::Simple');
+
+if (nil != req) {
+    var lwp = (req->());
+    var words = (Str.new(lwp.get('http://www.puzzlers.org/pub/wordlists/unixdict.txt')).split);
+
+    "** Processing words...".say;
+
+    var anagram = Hash;
+    for (words) {
+        anagram[_.split('').sort.join] := [] -> append(_);
+    }
+
+    var vals = (anagram.values);
+    var best = (vals.map{_.len}.max);
+
+    vals.grep{_.len == best}.for {
+        _.join(', ').say;
+    };
+
+    "** Done!".say;
+}
+else {
+    "\nModule 'LWP::Simple' is not installed!".say;
+}

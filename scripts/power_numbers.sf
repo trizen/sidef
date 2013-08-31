@@ -1,6 +1,6 @@
 #!/usr/bin/ruby
 
-for (1..20) {
+for (1..10) {
     var pow = (1 << (_-1) / _);
 
     var num = (_**_);

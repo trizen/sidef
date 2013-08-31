@@ -1,0 +1,32 @@
+#!/usr/bin/ruby
+
+var req = (require 'Algorithm::Loops');
+
+var code = {
+    var words = (_.map{Str.new(_)});
+
+    var chr = words[0][-1];
+    for (words.ft(1)) {
+        _[0] == chr || (return);
+        chr = _[-1];
+    }
+
+    words.join(" ").say;
+};
+
+if (nil != req) {
+
+    var mod = (req->());
+
+    var array = [
+        qw'the that a',
+        qw'frog elephant thing',
+        qw'walked treaded grows',
+        qw'slowly quickly',
+    ];
+
+    mod.NestedLoops(array, code);
+}
+else {
+    "\n* Module 'Algorithm::Loops' is not installed!".say;
+}

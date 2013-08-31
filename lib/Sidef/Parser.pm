@@ -466,7 +466,7 @@ package Sidef::Parser {
             }
 
             # Alpha-numeric method name
-            if (/\G([a-z]\w*[!:]?)/gc) {
+            if (/\G($self->{re}{var_name} [!:]?)/gxoc) {
                 return {self => Sidef::Types::String::String->new($1)}, pos;
             }
 

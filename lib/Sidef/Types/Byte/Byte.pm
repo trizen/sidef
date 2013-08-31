@@ -11,7 +11,6 @@ package Sidef::Types::Byte::Byte {
 
     sub new {
         my (undef, $byte) = @_;
-        $byte = $$byte if ref $byte;
         bless \$byte, __PACKAGE__;
     }
 

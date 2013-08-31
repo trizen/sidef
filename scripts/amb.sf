@@ -1,0 +1,15 @@
+#!/usr/bin/ruby
+
+# Translation of: http://rosettacode.org/wiki/Amb#Perl
+
+var w = [
+    "the|,that|,a|",
+    "frog|,elephant|,thing|",
+    "walked|,treaded|,grows|",
+    "slowly|,quickly|",
+];
+
+for (w.map{'{'+_+'}'}.join.glob) {
+    _.gsub!('|', ' ') =~
+        /\w+?(\w) \1\w+?(\w) \2\w+?(\w) \3\w+/ ?? && (_.say);
+}

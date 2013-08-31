@@ -263,7 +263,7 @@ package Sidef::Exec {
                                        || (($type eq 'Sidef::Types::Block::Code' || $type eq 'Sidef::Types::Block::For')
                                            and ($method eq 'for' || $method eq 'foreach')
                                            and ref $arg->{$opt{class}} eq 'ARRAY'
-                                           and @{$arg->{$opt{class}}} != 1)
+                                           and @{$arg->{$opt{class}}} == 3)
                                        )
                               ) {
                                 local $self->{var_ref} = ref($self_obj) eq 'Sidef::Variable::Ref';

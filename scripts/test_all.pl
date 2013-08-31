@@ -6,6 +6,9 @@ use List::Util qw(first);
 
 my @ignored = qw(
   100_doors_3.sf
+  A+B.sf
+  anagrams.sf
+  anagrams_deranged_anagrams.sf
   dice_game_solver.sf
   stdin.sf
   rock_paper_scissors.sf

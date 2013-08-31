@@ -11,7 +11,6 @@ package Sidef::Types::String::String {
 
     sub new {
         my (undef, $str) = @_;
-        $str = $$str if ref $str;
         bless \$str, __PACKAGE__;
     }
 

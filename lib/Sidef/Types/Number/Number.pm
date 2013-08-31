@@ -11,13 +11,12 @@ package Sidef::Types::Number::Number {
 
     sub new {
         my (undef, $num) = @_;
-        $num = $$num if ref $num;
-        $num += 0;
-        bless \$num, __PACKAGE__;
+        require Math::BigFloat;
+        bless \Math::BigFloat->new($num), __PACKAGE__;
     }
 
     sub get_value {
-        ${$_[0]};
+        join('', @{${$_[0]}->{_m}});
     }
 
     {
@@ -176,8 +175,10 @@ package Sidef::Types::Number::Number {
 
     sub pi {
         my ($self) = @_;
-        $self->new(atan2(0, -'inf'));
+        $self->new('3.14159265358979323846264338327950288419716939937510582097494459230781640628620899');
     }
+
+    *PI = \&pi;
 
     sub atan2 {
         my ($self, $x, $y) = @_;
@@ -237,7 +238,7 @@ package Sidef::Types::Number::Number {
 
     sub next_power_of_two {
         my ($self) = @_;
-        $self->new(2 << CORE::log($$self) / CORE::log(2));
+        $self->new(2 << CORE::int(CORE::log($$self) / CORE::log(2)));
     }
 
     *nextPowerOfTwo = \&next_power_of_two;

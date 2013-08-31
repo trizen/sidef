@@ -1,0 +1,60 @@
+#!/usr/bin/ruby
+
+# Translation of: http://rosettacode.org/wiki/Anagrams/Deranged_anagrams#Perl
+
+var req = (require 'LWP::Simple');
+
+func deranged (a, b) {    # only anagrams ever get here
+
+    for (a.range) {
+        a[_] == b[_] && (return(false));
+    }
+
+    return(true);
+}
+
+func find_deranged (a) {
+
+    for (a.range => \var i) {
+        for (i+1 .. (a.offset) => \var j) {
+            deranged(a[i,j].map{_.split('')}...) || (next);
+            "length %d: %s => %s\n".printf(a[i].len, a[i,j]...);
+            return(true);
+        }
+    }
+
+    return(false);
+}
+
+if (nil != req) {
+
+    "** Retrieving the wordlist...".say;
+
+    var lwp = (req->());
+    var words = (Str.new(lwp.get('http://www.puzzlers.org/pub/wordlists/unixdict.txt')).split);
+
+    "** Processing the words...".say;
+
+    var time = (Time.now);
+    var letter_list = Hash;
+
+    for (words) {
+        # store anagrams in hash table by letters they contain
+        letter_list[_.split('').sort.join] := [] -> append(_);
+    }
+
+    for ( letter_list.keys
+         .grep{letter_list[_].len > 1}      # take only ones with anagrams
+         .sort{(_[1].len) <=> (_[0].len)}   # sort by length, descending
+        ) {
+
+        # if we find a pair, they are the longested due to the sort before
+        find_deranged(letter_list[_]) && (
+            "** The process took %d seconds!\n".printf(Time.now - time);
+            break;
+        );
+    }
+}
+else {
+    "*Module 'LWP::Simple' is not installed!\n".say;
+}

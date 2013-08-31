@@ -16,6 +16,11 @@ package Sidef::Types::Block::Code {
         bless $code, __PACKAGE__;
     }
 
+    sub get_value {
+        my ($self) = @_;
+        sub { $self->call(@_) };
+    }
+
     {
         no strict 'refs';
 
@@ -180,10 +185,10 @@ package Sidef::Types::Block::Code {
     }
 
     sub for {
-        my ($self, $arg) = @_;
+        my ($self, $arg, $var) = @_;
 
         if ($self->_is_array($arg, 1, 1)) {
-            my ($var_ref) = $self->_get_private_var();
+            my ($var_ref) = ref($var) eq 'Sidef::Variable::Ref' ? $var : $self->_get_private_var();
 
             foreach my $item (@{$arg}) {
                 $var_ref->get_var->set_value($item->get_value);

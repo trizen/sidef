@@ -39,8 +39,10 @@ package Sidef::Convert::Convert {
 
     sub to_i {
         my ($self) = @_;
-        $self->_is_number($self, 0, 1) || $self->_is_string($self) || return;
-        Sidef::Types::Number::Number->new(int $$self);
+
+            $self->_is_number($self, 1, 1) ? $self->int
+          : $self->_is_string($self) ? Sidef::Types::Number::Number->new($$self)->int
+          :                            ();
     }
 
     *to_integer = \&to_i;
@@ -50,8 +52,10 @@ package Sidef::Convert::Convert {
 
     sub to_num {
         my ($self) = @_;
-        $self->_is_number($self, 0, 1) || $self->_is_string($self) || return;
-        Sidef::Types::Number::Number->new($$self);
+
+            $self->_is_number($self, 1, 1) ? $self
+          : $self->_is_string($self) ? Sidef::Types::Number::Number->new($$self)
+          :                            ();
     }
 
     *toNum = \&to_num;

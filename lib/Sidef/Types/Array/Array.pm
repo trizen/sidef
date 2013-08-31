@@ -340,10 +340,9 @@ package Sidef::Types::Array::Array {
 
         $self->new(
             grep {
-                my $val = $_->get_value;
-                $var_ref->get_var->set_value($val);
+                $var_ref->get_var->set_value($_);
                 $code->run;
-              } @{$self}
+              } map { $_->get_value } @{$self}
         );
     }
 
@@ -368,6 +367,9 @@ package Sidef::Types::Array::Array {
         my ($self, $code) = @_;
 
         $self->_is_code($code) || return;
+        $#{$self} == -1
+          && return Sidef::Types::Bool::Bool->false;
+
         my ($var_ref) = $code->_get_private_var();
 
         foreach my $var (@{$self}) {
@@ -705,7 +707,7 @@ package Sidef::Types::Array::Array {
         }
 
         my $method = '<=>';
-        $self->new(sort { ref($a) eq ref($b) && $a->can($method) ? ($a->$method($b)) : -1 }
+        $self->new(sort { ref($a) eq ref($b) && $a->can($method) ? (${$a->$method($b)}) : -1 }
                    map { $_->get_value } @{$self});
     }
 
@@ -784,7 +786,7 @@ package Sidef::Types::Array::Array {
         foreach my $i (0 .. $#{$self}) {
             my $item = $self->[$i]->get_value;
 
-            if (defined $item and defined $item->can('dump')) {
+            if (ref $item and defined eval { $item->can('dump') }) {
                 $$string .= $item->dump();
             }
             else {

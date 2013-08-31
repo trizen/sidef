@@ -9,8 +9,8 @@ package Sidef::Types::Block::For {
     }
 
     sub for {
-        my ($self, $code) = @_;
-        $self->{arg} = $code;
+        my ($self, @args) = @_;
+        $self->{arg} = \@args;
         $self;
     }
 
@@ -18,6 +18,6 @@ package Sidef::Types::Block::For {
 
     sub do {
         my ($self, $code) = @_;
-        $code->for($self->{arg});
+        $code->for(@{$self->{arg}});
     }
 }

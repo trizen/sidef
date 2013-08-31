@@ -1,0 +1,41 @@
+#!/usr/bin/ruby
+
+# Translation of: http://rosettacode.org/wiki/Apply_a_callback_to_an_array#Perl
+
+# creating the array
+var a = [1, 2, 3, 4, 5];
+
+# creating the callback function
+func mycallback (i) {
+    return(2 * i);
+}
+
+# using the array's indices
+for (a.range => \var i) {
+    "mycallback(%d) = %d\n".printf(a[i], mycallback(a[i]));
+}
+
+# using the array's items
+foreach (a => \var item) {
+    "mycallback(%d) = %d\n".printf(item, mycallback(item));
+}
+
+# using map (useful for transforming an array)
+a.map{mycallback(_)} == [2, 4, 6, 8, 10]
+    || ("map(func) error!".die);
+
+
+# and the same using an anonymous function
+a.map { _ * 2 } == [2, 4, 6, 8, 10]
+    || ("map(anonym) error!".die);
+
+
+# use a callback stored in a variable
+var f = mycallback;
+a.map { f.call(_) } ==  [2, 4, 6, 8, 10]
+    || ("map(var_f) error!".die);
+
+
+# filter an array
+a.grep { _ % 2 == 0 } == [2, 4]
+    || ("grep() error!".die);
