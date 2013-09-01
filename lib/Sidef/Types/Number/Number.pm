@@ -189,7 +189,7 @@ package Sidef::Types::Number::Number {
     sub root {
         my ($self, $n) = @_;
         $self->_is_number($n) || return;
-        $self->new($$self->broot($n));
+        $self->new($$self->copy->broot($n));
     }
 
     sub abs {
@@ -340,22 +340,22 @@ package Sidef::Types::Number::Number {
 
     sub ceil {
         my ($self) = @_;
-        $self->new($$self->bceil);
+        $self->new($$self->copy->bceil);
     }
 
     sub floor {
         my ($self) = @_;
-        $self->new($$self->bfloor);
+        $self->new($$self->copy->bfloor);
     }
 
     sub round {
         my ($self, $places) = @_;
-        $self->new($$self->bround(defined($places) ? ($self->_is_number($places)) ? ($$places) : (return) : ()));
+        $self->new($$self->copy->bround(defined($places) ? ($self->_is_number($places)) ? ($$places) : (return) : ()));
     }
 
     sub roundf {
         my ($self, $places) = @_;
-        $self->new($$self->bfround(defined($places) ? ($self->_is_number($places)) ? ($$places) : (return) : ()));
+        $self->new($$self->copy->bfround(defined($places) ? ($self->_is_number($places)) ? ($$places) : (return) : ()));
     }
 
     *fround = \&roundf;
