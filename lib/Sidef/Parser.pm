@@ -65,6 +65,10 @@ package Sidef::Parser {
                           re  => qr/\GNum(?:ber)?\b/,
                          },
                          {
+                          sub => sub { Sidef::Types::Math::Math->new },
+                          re  => qr/\GMath\b/,
+                         },
+                         {
                           sub => sub { Sidef::Types::Glob::Pipe->new },
                           re  => qr/\GPipe\b/,
                          },
@@ -221,6 +225,7 @@ package Sidef::Parser {
                   Hash
                   Str String
                   Num Number
+                  Math
                   Pipe
                   Byte Bytes
                   Chr Char
@@ -793,7 +798,7 @@ package Sidef::Parser {
                 }
 
                 foreach my $hash_ref (@{$self->{obj_stat}}) {
-                    if (/$hash_ref->{re}/gc) {
+                    if (/$hash_ref->{re} (?!::)/gxc) {
                         return (($self->{static_objects}{$hash_ref} //= $hash_ref->{sub}->()), pos);
                     }
                 }

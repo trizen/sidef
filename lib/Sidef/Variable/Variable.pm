@@ -4,6 +4,8 @@ package Sidef::Variable::Variable {
     use strict;
     use warnings;
 
+    no warnings 'recursion';
+
     use overload q{""} => sub {
         $_[0]->get_value;
     };

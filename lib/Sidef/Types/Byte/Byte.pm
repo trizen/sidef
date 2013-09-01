@@ -4,6 +4,8 @@ package Sidef::Types::Byte::Byte {
     use strict;
     use warnings;
 
+    require Math::BigInt;
+
     our @ISA = qw(
       Sidef::Types::Number::Number
       Sidef::Convert::Convert
@@ -11,7 +13,7 @@ package Sidef::Types::Byte::Byte {
 
     sub new {
         my (undef, $byte) = @_;
-        bless \$byte, __PACKAGE__;
+        bless \Math::BigInt->new($byte), __PACKAGE__;
     }
 
 }

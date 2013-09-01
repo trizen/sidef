@@ -701,15 +701,36 @@ package Sidef::Types::Array::Array {
             return $self->new(
                 sort {
                     $var_ref->get_var->set_value(Sidef::Types::Array::Array->new($a, $b));
-                    Sidef::Types::Block::Code->new($comp_code)->run;
+                    Sidef::Types::Block::Code->new($comp_code)->run
                   } map { $_->get_value } @{$self}
             );
         }
 
         my $method = '<=>';
-        $self->new(sort { ref($a) eq ref($b) && $a->can($method) ? (${$a->$method($b)}) : -1 }
+        $self->new(sort { ref($a) eq ref($b) && $a->can($method) ? ($a->$method($b)) : -1 }
                    map { $_->get_value } @{$self});
     }
+
+=for comment
+    sub permute {
+        my ($self, $code) = @_;
+
+        $self->_is_code($code) || return;
+
+        my ($var_ref) = $code->_get_private_var();
+
+        my @idx = 0..$#{$self};
+        while ( $code->(@_[@idx]) ) {
+                my $p = $#idx;
+                --$p while $idx[$p-1] > $idx[$p];
+                my $q = $p or return;
+                push @idx, reverse splice @idx, $p;
+                ++$q while $idx[$p-1] > $idx[$q];
+                @idx[$p-1,$q]=@idx[$q,$p-1];
+        }
+
+    }
+=cut
 
     sub push {
         my ($self, @args) = @_;

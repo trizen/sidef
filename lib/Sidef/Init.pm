@@ -31,6 +31,7 @@ require Sidef::Types::Glob::PipeHandle if (caller)[0] ne q{Sidef::Types::Glob::P
 require Sidef::Types::Glob::File if (caller)[0] ne q{Sidef::Types::Glob::File};
 require Sidef::Types::Glob::Stat if (caller)[0] ne q{Sidef::Types::Glob::Stat};
 require Sidef::Types::Hash::Hash if (caller)[0] ne q{Sidef::Types::Hash::Hash};
+require Sidef::Types::Math::Math if (caller)[0] ne q{Sidef::Types::Math::Math};
 require Sidef::Types::Array::Array if (caller)[0] ne q{Sidef::Types::Array::Array};
 require Sidef::Types::Black::Hole if (caller)[0] ne q{Sidef::Types::Black::Hole};
 require Sidef::Types::Block::For if (caller)[0] ne q{Sidef::Types::Block::For};

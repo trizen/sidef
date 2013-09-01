@@ -59,7 +59,7 @@ package Sidef {
                     }
                 }
 
-                $dont_warn ? (return) : (die "[DIE] Can't continue...\n");
+                $dont_warn ? (return) : (die "[ERROR] Can't continue...\n");
             };
         }
 

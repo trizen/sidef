@@ -6,6 +6,6 @@ func catalan (n) {
     c[n-1] := (catalan(n-1) * (4 * n - 2) / (n + 1));
 }
 
-for (0..25) {
-    "%d\t%0.f\n".printf(_, catalan _);
+for (0..45) {
+    "%d\t%s\n".printf(_, catalan _);
 }

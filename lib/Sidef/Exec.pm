@@ -120,7 +120,7 @@ package Sidef::Exec {
 
                             $is_hash ? do { $self_obj->{$ind} //= Sidef::Variable::Variable->new(rand, 'var') } : do {
 
-                                foreach my $ind (0 .. ($$ind)) {
+                                foreach my $ind (0 .. $ind->get_value) {
                                     $self_obj->[$ind] //=
                                       Sidef::Variable::Variable->new(rand, 'var', Sidef::Types::Nil::Nil->new);
                                 }
@@ -131,7 +131,8 @@ package Sidef::Exec {
                         }
 
                         my $array = Sidef::Types::Array::Array->new();
-                        push @{$array}, $is_hash ? (@{$self_obj}{@indices}) : (@{$self_obj}[@indices]);
+                        push @{$array},
+                          $is_hash ? (@{$self_obj}{@indices}) : (@{$self_obj}[map { $_->get_value } @indices]);
                         $self_obj = $array;
 
                         #$self_obj = Sidef::Types::Array::Array->new(map {$_->get_value} @{$self_obj}[@indices]);
@@ -167,12 +168,12 @@ package Sidef::Exec {
                                 (defined($self_obj) && (ref($self_obj) eq 'ARRAY' || $self_obj->isa('ARRAY')))
                                   || ($self_obj = Sidef::Types::Array::Array->new());
 
-                                foreach my $ind (0 .. ($$ind - 1)) {
+                                foreach my $ind (0 .. $ind->get_value() - 1) {
                                     $self_obj->[$ind] //=
                                       Sidef::Variable::Variable->new(rand, 'var', Sidef::Types::Nil::Nil->new);
                                 }
 
-                                $self_obj->[$ind] //=
+                                $self_obj->[$ind->get_value] //=
                                   Sidef::Variable::Variable->new(
                                                                  rand, 'var',
                                                                  (

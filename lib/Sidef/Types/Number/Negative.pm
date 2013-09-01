@@ -7,7 +7,7 @@ package Sidef::Types::Number::Negative {
     our @ISA = qw(Sidef);
 
     sub new {
-        bless {}, __PACKAGE__
+        bless {}, __PACKAGE__;
     }
 
     {
@@ -15,7 +15,7 @@ package Sidef::Types::Number::Negative {
         *{__PACKAGE__ . '::' . '-'} = sub {
             my ($self, $number) = @_;
             $self->_is_number($number) || return;
-            Sidef::Types::Number::Number->new(-$$number);
+            $number->negate;
         };
     }
 
