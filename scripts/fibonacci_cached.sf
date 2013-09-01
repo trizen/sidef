@@ -1,0 +1,12 @@
+#!/usr/bin/ruby
+
+var c = [];
+
+func fib (n) {
+    n < 2 && (return $n);
+    c[n] := (fib(n-1) + (fib(n-2)));
+}
+
+{
+    "%3d  %s\n".printf(_, fib(_));
+} * 100;

@@ -168,12 +168,14 @@ package Sidef::Exec {
                                 (defined($self_obj) && (ref($self_obj) eq 'ARRAY' || $self_obj->isa('ARRAY')))
                                   || ($self_obj = Sidef::Types::Array::Array->new());
 
-                                foreach my $ind (0 .. $ind->get_value() - 1) {
+                                my $num = $ind->get_value;
+
+                                foreach my $ind (0 .. $num - 1) {
                                     $self_obj->[$ind] //=
                                       Sidef::Variable::Variable->new(rand, 'var', Sidef::Types::Nil::Nil->new);
                                 }
 
-                                $self_obj->[$ind->get_value] //=
+                                $self_obj->[$num] //=
                                   Sidef::Variable::Variable->new(
                                                                  rand, 'var',
                                                                  (
