@@ -18,18 +18,9 @@ var obj = (Math.new(...));
 
 Inherits methods from:
 
-	* Sidef
+    * Sidef
 
 =head1 METHODS
-
-
-=head2 PI
-
-Math.PI() -> I<Bool>
-
-Return the
-
-=cut
 
 =head2 accuracy
 
@@ -66,6 +57,14 @@ Return the
 =head2 new
 
 Math.new() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 PI
+
+Math.PI() -> I<Bool>
 
 Return the
 

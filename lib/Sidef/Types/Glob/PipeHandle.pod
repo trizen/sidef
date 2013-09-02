@@ -24,17 +24,17 @@ Return the
 
 =cut
 
-=head2 getLines
+=head2 get_lines
 
-PipeHandle.getLines() -> I<Bool>
+PipeHandle.get_lines() -> I<Bool>
 
 Return the
 
 =cut
 
-=head2 get_lines
+=head2 getLines
 
-PipeHandle.get_lines() -> I<Bool>
+PipeHandle.getLines() -> I<Bool>
 
 Return the
 
@@ -64,22 +64,6 @@ Return the
 
 =cut
 
-=head2 readAll
-
-PipeHandle.readAll() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 readLine
-
-PipeHandle.readLine() -> I<Bool>
-
-Return the
-
-=cut
-
 =head2 read_all
 
 PipeHandle.read_all() -> I<Bool>
@@ -88,9 +72,25 @@ Return the
 
 =cut
 
+=head2 readAll
+
+PipeHandle.readAll() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 readline
 
 PipeHandle.readline() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 readLine
+
+PipeHandle.readLine() -> I<Bool>
 
 Return the
 

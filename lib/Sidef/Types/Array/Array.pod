@@ -423,6 +423,12 @@ Returns the first element of the array.
 
 =cut
 
+=head2 first_index
+
+Alias for L<C<firstIndex()>|"firstIndex">.
+
+=cut
+
 =head2 firstIndex
 
 Array.firstIndex(I<Block>) -> I<Number>
@@ -433,12 +439,6 @@ Returns the index of the first element which passes the block test. Works just l
     [1,2,3,4,5,6].firstIndex { _ >= 100 };      # returns: -1
 
 Returns an object of type: C<Sidef::Types::Number::Number>
-
-=cut
-
-=head2 first_index
-
-Alias for L<C<firstIndex()>|"firstIndex">.
 
 =cut
 
@@ -522,6 +522,12 @@ Returns an object of type: C<Sidef::Types::String::String>
 
 =cut
 
+=head2 join_insert
+
+Alias for L<C<joinInsert()>|"joinInsert">.
+
+=cut
+
 =head2 joinInsert
 
 Array.joinInsert(I<Object>) -> I<Array>
@@ -534,17 +540,17 @@ Returns a new object of the same type as the self object.
 
 =cut
 
-=head2 join_insert
-
-Alias for L<C<joinInsert()>|"joinInsert">.
-
-=cut
-
 =head2 last
 
 Array.last() -> I<Obj>
 
 Returns the last element of the array.
+
+=cut
+
+=head2 last_index
+
+Alias for L<C<lastIndex()>|"lastIndex">.
 
 =cut
 
@@ -561,12 +567,6 @@ Returns an object of type: C<Sidef::Types::Number::Number>
 =cut
 
 =head2 lastIndexWhere
-
-Alias for L<C<lastIndex()>|"lastIndex">.
-
-=cut
-
-=head2 last_index
 
 Alias for L<C<lastIndex()>|"lastIndex">.
 
@@ -882,22 +882,6 @@ Return the
 
 =cut
 
-=head2 toHash
-
-Array.toHash() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 toList
-
-Array.toList() -> I<Bool>
-
-Return the
-
-=cut
-
 =head2 to_hash
 
 Array.to_hash() -> I<Bool>
@@ -914,17 +898,25 @@ Return the
 
 =cut
 
-=head2 uniq
+=head2 toHash
 
-Array.uniq() -> I<Bool>
+Array.toHash() -> I<Bool>
 
 Return the
 
 =cut
 
-=head2 uniqLast
+=head2 toList
 
-Array.uniqLast() -> I<Bool>
+Array.toList() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 uniq
+
+Array.uniq() -> I<Bool>
 
 Return the
 
@@ -938,6 +930,14 @@ Return the
 
 =cut
 
+=head2 uniqLast
+
+Array.uniqLast() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 unique
 
 Array.unique() -> I<Bool>
@@ -946,17 +946,17 @@ Return the
 
 =cut
 
-=head2 uniqueLast
+=head2 unique_last
 
-Array.uniqueLast() -> I<Bool>
+Array.unique_last() -> I<Bool>
 
 Return the
 
 =cut
 
-=head2 unique_last
+=head2 uniqueLast
 
-Array.unique_last() -> I<Bool>
+Array.uniqueLast() -> I<Bool>
 
 Return the
 

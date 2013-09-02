@@ -176,14 +176,6 @@ Return the
 
 =cut
 
-=head2 beginsWith
-
-String.beginsWith() -> I<Bool>
-
-Return the
-
-=cut
-
 =head2 begins_with
 
 String.begins_with() -> I<Bool>
@@ -192,9 +184,9 @@ Return the
 
 =cut
 
-=head2 charAt
+=head2 beginsWith
 
-String.charAt() -> I<Bool>
+String.beginsWith() -> I<Bool>
 
 Return the
 
@@ -203,6 +195,14 @@ Return the
 =head2 char_at
 
 String.char_at() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 charAt
+
+String.charAt() -> I<Bool>
 
 Return the
 
@@ -264,17 +264,17 @@ Return the
 
 =cut
 
-=head2 endsWith
+=head2 ends_with
 
-String.endsWith() -> I<Bool>
+String.ends_with() -> I<Bool>
 
 Return the
 
 =cut
 
-=head2 ends_with
+=head2 endsWith
 
-String.ends_with() -> I<Bool>
+String.endsWith() -> I<Bool>
 
 Return the
 
@@ -296,22 +296,6 @@ Return the
 
 =cut
 
-=head2 gReplace
-
-String.gReplace() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 gSub
-
-String.gSub() -> I<Bool>
-
-Return the
-
-=cut
-
 =head2 glob
 
 String.glob() -> I<Bool>
@@ -320,9 +304,25 @@ Return the
 
 =cut
 
+=head2 gReplace
+
+String.gReplace() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 gsub
 
 String.gsub() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 gSub
+
+String.gSub() -> I<Bool>
 
 Return the
 
@@ -360,17 +360,17 @@ Return the
 
 =cut
 
-=head2 insertAt
+=head2 insert_at
 
-String.insertAt() -> I<Bool>
+String.insert_at() -> I<Bool>
 
 Return the
 
 =cut
 
-=head2 insert_at
+=head2 insertAt
 
-String.insert_at() -> I<Bool>
+String.insertAt() -> I<Bool>
 
 Return the
 
@@ -544,17 +544,17 @@ Return the
 
 =cut
 
-=head2 startsWith
+=head2 starts_with
 
-String.startsWith() -> I<Bool>
+String.starts_with() -> I<Bool>
 
 Return the
 
 =cut
 
-=head2 starts_with
+=head2 startsWith
 
-String.starts_with() -> I<Bool>
+String.startsWith() -> I<Bool>
 
 Return the
 
@@ -616,17 +616,17 @@ Return the
 
 =cut
 
-=head2 titleCase
+=head2 title_case
 
-String.titleCase() -> I<Bool>
+String.title_case() -> I<Bool>
 
 Return the
 
 =cut
 
-=head2 title_case
+=head2 titleCase
 
-String.title_case() -> I<Bool>
+String.titleCase() -> I<Bool>
 
 Return the
 
@@ -696,17 +696,17 @@ Return the
 
 =cut
 
-=head2 wordCase
+=head2 wordcase
 
-String.wordCase() -> I<Bool>
+String.wordcase() -> I<Bool>
 
 Return the
 
 =cut
 
-=head2 wordcase
+=head2 wordCase
 
-String.wordcase() -> I<Bool>
+String.wordCase() -> I<Bool>
 
 Return the
 

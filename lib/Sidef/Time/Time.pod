@@ -84,16 +84,16 @@ Return the time value stored inside the I<Time> object.
 
 =cut
 
+=head2 time_now
+
+Alias for L<C<timeNow()>|"timeNow">.
+
+=cut
+
 =head2 timeNow
 
 Time.timeNow() -> I<Number>
 
 Return the number of seconds elapsed since the beginning of the current epoch (1900).
-
-=cut
-
-=head2 time_now
-
-Alias for L<C<timeNow()>|"timeNow">.
 
 =cut

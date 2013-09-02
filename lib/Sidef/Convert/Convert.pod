@@ -28,6 +28,90 @@ Inherits methods from:
 
 =head1 METHODS
 
+=head2 to_array
+
+Alias for L<C<toArray()>|"toArray">.
+
+=cut
+
+=head2 to_bool
+
+Alias for L<C<toBool()>|"toBool">.
+
+=cut
+
+=head2 to_byte
+
+Alias for L<C<toByte()>|"toByte">.
+
+=cut
+
+=head2 to_bytes
+
+Alias for L<C<toBytes()>|"toBytes">.
+
+=cut
+
+=head2 to_char
+
+Alias for L<C<toChar()>|"toChar">.
+
+=cut
+
+=head2 to_chars
+
+Alias for L<C<toChars()>|"toChars">.
+
+=cut
+
+=head2 to_dir
+
+Alias for L<C<toDir()>|"toDir">.
+
+=cut
+
+=head2 to_file
+
+Alias for L<C<toFile()>|"toFile">.
+
+=cut
+
+=head2 to_i
+
+Alias for L<C<toInt()>|"toInt">.
+
+=cut
+
+=head2 to_int
+
+Alias for L<C<toInt()>|"toInt">.
+
+=cut
+
+=head2 to_integer
+
+Alias for L<C<toInt()>|"toInt">.
+
+=cut
+
+=head2 to_num
+
+Alias for L<C<toNum()>|"toNum">.
+
+=cut
+
+=head2 to_s
+
+Alias for L<C<toString()>|"toString">.
+
+=cut
+
+=head2 to_string
+
+Alias for L<C<toString()>|"toString">.
+
+=cut
+
 =head2 toArray
 
 Obj.toArray() -> I<Array>
@@ -170,89 +254,5 @@ its elements will be joined one-level deep with a space character.
     [1,2,3].toString  => '1 2 3'
 
 Returns an object of type: C<Sidef::Types::String::String>
-
-=cut
-
-=head2 to_array
-
-Alias for L<C<toArray()>|"toArray">.
-
-=cut
-
-=head2 to_bool
-
-Alias for L<C<toBool()>|"toBool">.
-
-=cut
-
-=head2 to_byte
-
-Alias for L<C<toByte()>|"toByte">.
-
-=cut
-
-=head2 to_bytes
-
-Alias for L<C<toBytes()>|"toBytes">.
-
-=cut
-
-=head2 to_char
-
-Alias for L<C<toChar()>|"toChar">.
-
-=cut
-
-=head2 to_chars
-
-Alias for L<C<toChars()>|"toChars">.
-
-=cut
-
-=head2 to_dir
-
-Alias for L<C<toDir()>|"toDir">.
-
-=cut
-
-=head2 to_file
-
-Alias for L<C<toFile()>|"toFile">.
-
-=cut
-
-=head2 to_i
-
-Alias for L<C<toInt()>|"toInt">.
-
-=cut
-
-=head2 to_int
-
-Alias for L<C<toInt()>|"toInt">.
-
-=cut
-
-=head2 to_integer
-
-Alias for L<C<toInt()>|"toInt">.
-
-=cut
-
-=head2 to_num
-
-Alias for L<C<toNum()>|"toNum">.
-
-=cut
-
-=head2 to_s
-
-Alias for L<C<toString()>|"toString">.
-
-=cut
-
-=head2 to_string
-
-Alias for L<C<toString()>|"toString">.
 
 =cut

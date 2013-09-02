@@ -242,7 +242,7 @@ HEADER
         print {$fh} $header;
     }
 
-    foreach my $method (sort keys %subs) {
+    foreach my $method (sort { lc($a) cmp lc($b) } keys %subs) {
         print {$fh} $subs{$method};
     }
 }

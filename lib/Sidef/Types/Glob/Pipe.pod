@@ -56,38 +56,6 @@ Return the
 
 =cut
 
-=head2 openR
-
-Pipe.openR() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 openRead
-
-Pipe.openRead() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 openW
-
-Pipe.openW() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 openWrite
-
-Pipe.openWrite() -> I<Bool>
-
-Return the
-
-=cut
-
 =head2 open_r
 
 Pipe.open_r() -> I<Bool>
@@ -115,6 +83,38 @@ Return the
 =head2 open_write
 
 Pipe.open_write() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 openR
+
+Pipe.openR() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 openRead
+
+Pipe.openRead() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 openW
+
+Pipe.openW() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 openWrite
+
+Pipe.openWrite() -> I<Bool>
 
 Return the
 

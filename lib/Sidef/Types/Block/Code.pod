@@ -111,22 +111,6 @@ Return the
 
 =cut
 
-=head2 toArray
-
-Code.toArray() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 toHash
-
-Code.toHash() -> I<Bool>
-
-Return the
-
-=cut
-
 =head2 to_array
 
 Code.to_array() -> I<Bool>
@@ -138,6 +122,22 @@ Return the
 =head2 to_hash
 
 Code.to_hash() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 toArray
+
+Code.toArray() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 toHash
+
+Code.toHash() -> I<Bool>
 
 Return the
 

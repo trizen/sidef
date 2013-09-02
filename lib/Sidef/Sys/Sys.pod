@@ -35,17 +35,17 @@ Exit the main program with a given code. If no argument is specified, the code 0
 
 =cut
 
-=head2 nanoSleep
+=head2 nanosleep
 
-Sys.nanoSleep() -> I<Bool>
+Sys.nanosleep() -> I<Bool>
 
 Return the
 
 =cut
 
-=head2 nanosleep
+=head2 nanoSleep
 
-Sys.nanosleep() -> I<Bool>
+Sys.nanoSleep() -> I<Bool>
 
 Return the
 

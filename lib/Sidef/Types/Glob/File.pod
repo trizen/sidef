@@ -31,17 +31,17 @@ Return the
 
 =cut
 
-=head2 accessTimeDaysDiff
+=head2 access_time_days_diff
 
-File.accessTimeDaysDiff() -> I<Bool>
+File.access_time_days_diff() -> I<Bool>
 
 Return the
 
 =cut
 
-=head2 access_time_days_diff
+=head2 accessTimeDaysDiff
 
-File.access_time_days_diff() -> I<Bool>
+File.accessTimeDaysDiff() -> I<Bool>
 
 Return the
 
@@ -55,17 +55,17 @@ Return the
 
 =cut
 
-=head2 changeTimeDaysDiff
+=head2 change_time_days_diff
 
-File.changeTimeDaysDiff() -> I<Bool>
+File.change_time_days_diff() -> I<Bool>
 
 Return the
 
 =cut
 
-=head2 change_time_days_diff
+=head2 changeTimeDaysDiff
 
-File.change_time_days_diff() -> I<Bool>
+File.changeTimeDaysDiff() -> I<Bool>
 
 Return the
 
@@ -135,30 +135,6 @@ Return the
 
 =cut
 
-=head2 hasSetgidBit
-
-File.hasSetgidBit() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 hasSetuidBit
-
-File.hasSetuidBit() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 hasStickyBit
-
-File.hasStickyBit() -> I<Bool>
-
-Return the
-
-=cut
-
 =head2 has_setgid_bit
 
 File.has_setgid_bit() -> I<Bool>
@@ -191,145 +167,25 @@ Return the
 
 =cut
 
-=head2 isBinary
+=head2 hasSetgidBit
 
-File.isBinary() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 isBlock
-
-File.isBlock() -> I<Bool>
+File.hasSetgidBit() -> I<Bool>
 
 Return the
 
 =cut
 
-=head2 isCharDevice
+=head2 hasSetuidBit
 
-File.isCharDevice() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 isDir
-
-File.isDir() -> I<Bool>
+File.hasSetuidBit() -> I<Bool>
 
 Return the
 
 =cut
 
-=head2 isDirectory
+=head2 hasStickyBit
 
-File.isDirectory() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 isEmpty
-
-File.isEmpty() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 isExecutable
-
-File.isExecutable() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 isFile
-
-File.isFile() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 isLink
-
-File.isLink() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 isOwned
-
-File.isOwned() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 isReadable
-
-File.isReadable() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 isRealExecutable
-
-File.isRealExecutable() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 isRealOwned
-
-File.isRealOwned() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 isRealReadable
-
-File.isRealReadable() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 isRealWriteable
-
-File.isRealWriteable() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 isSocket
-
-File.isSocket() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 isText
-
-File.isText() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 isWriteable
-
-File.isWriteable() -> I<Bool>
+File.hasStickyBit() -> I<Bool>
 
 Return the
 
@@ -479,6 +335,150 @@ Return the
 
 =cut
 
+=head2 isBinary
+
+File.isBinary() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 isBlock
+
+File.isBlock() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 isCharDevice
+
+File.isCharDevice() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 isDir
+
+File.isDir() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 isDirectory
+
+File.isDirectory() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 isEmpty
+
+File.isEmpty() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 isExecutable
+
+File.isExecutable() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 isFile
+
+File.isFile() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 isLink
+
+File.isLink() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 isOwned
+
+File.isOwned() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 isReadable
+
+File.isReadable() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 isRealExecutable
+
+File.isRealExecutable() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 isRealOwned
+
+File.isRealOwned() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 isRealReadable
+
+File.isRealReadable() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 isRealWriteable
+
+File.isRealWriteable() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 isSocket
+
+File.isSocket() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 isText
+
+File.isText() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 isWriteable
+
+File.isWriteable() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 lstat
 
 File.lstat() -> I<Bool>
@@ -487,17 +487,17 @@ Return the
 
 =cut
 
-=head2 modificationTimeDaysDiff
+=head2 modification_time_days_diff
 
-File.modificationTimeDaysDiff() -> I<Bool>
+File.modification_time_days_diff() -> I<Bool>
 
 Return the
 
 =cut
 
-=head2 modification_time_days_diff
+=head2 modificationTimeDaysDiff
 
-File.modification_time_days_diff() -> I<Bool>
+File.modificationTimeDaysDiff() -> I<Bool>
 
 Return the
 
@@ -538,54 +538,6 @@ Return the
 =head2 open
 
 File.open() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 openA
-
-File.openA() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 openAppend
-
-File.openAppend() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 openR
-
-File.openR() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 openRead
-
-File.openRead() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 openW
-
-File.openW() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 openWrite
-
-File.openWrite() -> I<Bool>
 
 Return the
 
@@ -634,6 +586,54 @@ Return the
 =head2 open_write
 
 File.open_write() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 openA
+
+File.openA() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 openAppend
+
+File.openAppend() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 openR
+
+File.openR() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 openRead
+
+File.openRead() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 openW
+
+File.openW() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 openWrite
+
+File.openWrite() -> I<Bool>
 
 Return the
 

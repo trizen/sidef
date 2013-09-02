@@ -32,17 +32,17 @@ Return the
 
 =cut
 
-=head2 isSuccessful
+=head2 is_successful
 
-Matches.isSuccessful() -> I<Bool>
+Matches.is_successful() -> I<Bool>
 
 Return the
 
 =cut
 
-=head2 is_successful
+=head2 isSuccessful
 
-Matches.is_successful() -> I<Bool>
+Matches.isSuccessful() -> I<Bool>
 
 Return the
 
@@ -64,22 +64,6 @@ Return the
 
 =cut
 
-=head2 namedCaptures
-
-Matches.namedCaptures() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 namedMatches
-
-Matches.namedMatches() -> I<Bool>
-
-Return the
-
-=cut
-
 =head2 named_captures
 
 Matches.named_captures() -> I<Bool>
@@ -96,9 +80,17 @@ Return the
 
 =cut
 
-=head2 toBool
+=head2 namedCaptures
 
-Matches.toBool() -> I<Bool>
+Matches.namedCaptures() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 namedMatches
+
+Matches.namedMatches() -> I<Bool>
 
 Return the
 
@@ -107,6 +99,14 @@ Return the
 =head2 to_bool
 
 Matches.to_bool() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 toBool
+
+Matches.toBool() -> I<Bool>
 
 Return the
 
