@@ -31,6 +31,14 @@ Return the
 
 =cut
 
+=head2 each
+
+Hash.each() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 exists
 
 Hash.exists() -> I<Bool>

@@ -22,8 +22,6 @@ foreach my $sidef_script (glob '*.sf') {
     next if exists $ignored{$sidef_script};
 
     print "\n\n=>> Executing $sidef_script\n", "-" x 80, "\n";
-    sleep 1;
-
     system $^X, '../bin/sidef', $sidef_script;
 
     if ($? != 0) {

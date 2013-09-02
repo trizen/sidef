@@ -296,6 +296,22 @@ Return the
 
 =cut
 
+=head2 gReplace
+
+String.gReplace() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 gSub
+
+String.gSub() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 glob
 
 String.glob() -> I<Bool>
@@ -408,6 +424,14 @@ Return the
 
 =cut
 
+=head2 match
+
+String.match() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 new
 
 String.new() -> I<Bool>
@@ -467,6 +491,14 @@ Return the
 =head2 repeat
 
 String.repeat() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 replace
+
+String.replace() -> I<Bool>
 
 Return the
 

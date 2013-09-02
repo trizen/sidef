@@ -71,6 +71,14 @@ Return the
 
 =cut
 
+=head2 get_value
+
+Code.get_value() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 given
 
 Code.given() -> I<Bool>
@@ -82,6 +90,14 @@ Return the
 =head2 if
 
 Code.if() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 repeat
+
+Code.repeat() -> I<Bool>
 
 Return the
 

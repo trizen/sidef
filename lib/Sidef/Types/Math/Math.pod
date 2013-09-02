@@ -1,0 +1,88 @@
+
+=encoding utf8
+
+=head1 NAME
+
+Sidef::Types::Math::Math
+
+=head1 DESCRIPTION
+
+This object is ...
+
+=head1 SYNOPSIS
+
+var obj = (Math.new(...));
+
+
+=head1 INHERITS
+
+Inherits methods from:
+
+	* Sidef
+
+=head1 METHODS
+
+
+=head2 PI
+
+Math.PI() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 accuracy
+
+Math.accuracy() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 atan2
+
+Math.atan2() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 gcd
+
+Math.gcd() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 inf
+
+Math.inf() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 new
+
+Math.new() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 pi
+
+Math.pi() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 precision
+
+Math.precision() -> I<Bool>
+
+Return the
+
+=cut

@@ -23,6 +23,14 @@ Inherits methods from:
 
 =head1 METHODS
 
+=head2 !
+
+I<Num> B<!> I<Num> -> I<Num>
+
+Return the
+
+=cut
+
 
 =head2 !=
 
@@ -176,6 +184,14 @@ Return the
 
 =cut
 
+=head2 NaN
+
+Number.NaN() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 ^
 
 I<Num> B<^> I<Num> -> I<Num>
@@ -192,9 +208,25 @@ Return the
 
 =cut
 
+=head2 as_int
+
+Number.as_int() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 atan2
 
 Number.atan2() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 ceil
+
+Number.ceil() -> I<Bool>
 
 Return the
 
@@ -224,9 +256,73 @@ Return the
 
 =cut
 
+=head2 downTo
+
+Number.downTo() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 downto
+
+Number.downto() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 dump
 
 Number.dump() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 exp
+
+Number.exp() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 fRound
+
+Number.fRound() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 fac
+
+Number.fac() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 factorial
+
+Number.factorial() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 floor
+
+Number.floor() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 fround
+
+Number.fround() -> I<Bool>
 
 Return the
 
@@ -280,6 +376,22 @@ Return the
 
 =cut
 
+=head2 isNaN
+
+Number.isNaN() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 isNeg
+
+Number.isNeg() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 isNegative
 
 Number.isNegative() -> I<Bool>
@@ -296,9 +408,25 @@ Return the
 
 =cut
 
+=head2 isPos
+
+Number.isPos() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 isPositive
 
 Number.isPositive() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 is_NaN
+
+Number.is_NaN() -> I<Bool>
 
 Return the
 
@@ -328,6 +456,22 @@ Return the
 
 =cut
 
+=head2 is_nan
+
+Number.is_nan() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 is_neg
+
+Number.is_neg() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 is_negative
 
 Number.is_negative() -> I<Bool>
@@ -344,9 +488,33 @@ Return the
 
 =cut
 
+=head2 is_pos
+
+Number.is_pos() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 is_positive
 
 Number.is_positive() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 len
+
+Number.len() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 length
+
+Number.length() -> I<Bool>
 
 Return the
 
@@ -376,9 +544,49 @@ Return the
 
 =cut
 
+=head2 nan
+
+Number.nan() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 neg
+
+Number.neg() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 negate
+
+Number.negate() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 new
 
 Number.new() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 newInt
+
+Number.newInt() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 new_int
+
+Number.new_int() -> I<Bool>
 
 Return the
 
@@ -395,6 +603,14 @@ Return the
 =head2 next_power_of_two
 
 Number.next_power_of_two() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 not
+
+Number.not() -> I<Bool>
 
 Return the
 
@@ -419,6 +635,38 @@ Return the
 =head2 range
 
 Number.range() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 root
+
+Number.root() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 round
+
+Number.round() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 roundf
+
+Number.roundf() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 sign
+
+Number.sign() -> I<Bool>
 
 Return the
 
@@ -459,6 +707,22 @@ Return the
 =head2 to
 
 Number.to() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 upTo
+
+Number.upTo() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 upto
+
+Number.upto() -> I<Bool>
 
 Return the
 

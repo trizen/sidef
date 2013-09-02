@@ -362,9 +362,10 @@ package Sidef::Parser {
     }
 
     sub get_caller_num {
-        for (my $z = 1 ; $z < 1000 ; $z++) {    # should be enough
-            if (not caller($z)) {
-                return $z;
+        my $i = 0;
+        while (++$i) {
+            if (not caller($i)) {
+                return $i;
             }
         }
         return -1;

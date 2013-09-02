@@ -74,6 +74,14 @@ Returns a new object of the same type as the self object.
 
 =cut
 
+=head2 *
+
+I<Num> B<*> I<Num> -> I<Num>
+
+Return the
+
+=cut
+
 =head2 +
 
 I<Array> B<+> I<Array> -> I<Array>
@@ -230,6 +238,14 @@ Returns a new object of the same type as the self object.
 
 =cut
 
+=head2 add
+
+Array.add() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 all
 
 Array.all(I<Block>) -> I<Bool>
@@ -336,6 +352,22 @@ Return the
 
 =cut
 
+=head2 eq
+
+Array.eq() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 equals
+
+Array.equals() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 exists
 
 Array.exists(I<Number>) -> I<Bool>
@@ -346,6 +378,14 @@ Returns true if the array has an element on the specified index.
     ['a','b','c'].exists(5);    # false
 
 Returns an object of type: C<Sidef::Types::Bool::Bool>
+
+=cut
+
+=head2 existsIndex
+
+Array.existsIndex() -> I<Bool>
+
+Return the
 
 =cut
 
@@ -402,6 +442,14 @@ Alias for L<C<firstIndex()>|"firstIndex">.
 
 =cut
 
+=head2 for
+
+Array.for() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 fromTo
 
 Array.fromTo() -> I<Bool>
@@ -451,6 +499,14 @@ Insert elements inside the array at a given position.
 B<WARNING!> This method modifies the array in place.
 
 Returns the self object.
+
+=cut
+
+=head2 is
+
+Array.is() -> I<Bool>
+
+Return the
 
 =cut
 
@@ -738,6 +794,14 @@ Return the
 
 =cut
 
+=head2 rotate
+
+Array.rotate() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 shift
 
 Array.shift() -> I<Bool>
@@ -786,6 +850,14 @@ Return the
 
 =cut
 
+=head2 subtract
+
+Array.subtract() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 sum
 
 Array.sum() -> I<Bool>
@@ -818,9 +890,25 @@ Return the
 
 =cut
 
+=head2 toList
+
+Array.toList() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 to_hash
 
 Array.to_hash() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 to_list
+
+Array.to_list() -> I<Bool>
 
 Return the
 
@@ -877,6 +965,14 @@ Return the
 =head2 unshift
 
 Array.unshift() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 xor
+
+Array.xor() -> I<Bool>
 
 Return the
 
