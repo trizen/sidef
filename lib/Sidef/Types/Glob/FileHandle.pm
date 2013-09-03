@@ -80,7 +80,8 @@ package Sidef::Types::Glob::FileHandle {
 
         $self->_is_number($length) || return;
 
-        my $chunk = $var_ref->get_var->get_value;
+        my $var   = $var_ref->get_var;
+        my $chunk = $var->get_value;
 
         my $size = Sidef::Types::Number::Number->new(
             defined($offset)
@@ -91,7 +92,7 @@ package Sidef::Types::Glob::FileHandle {
             : CORE::read($self->{fh}, $chunk, $$length)
         );
 
-        $var_ref->get_var->set_value(Sidef::Types::String::String->new($chunk));
+        $var->set_value(Sidef::Types::String::String->new($chunk));
 
         return $size;
     }
@@ -106,7 +107,8 @@ package Sidef::Types::Glob::FileHandle {
 
         $self->_is_number($length) || return;
 
-        my $chunk = $var_ref->get_var->get_value;
+        my $var   = $var_ref->get_var;
+        my $chunk = $var->get_value;
 
         my $size = Sidef::Types::Number::Number->new(
             defined($offset)
@@ -117,7 +119,7 @@ package Sidef::Types::Glob::FileHandle {
             : CORE::sysread($self->{fh}, $chunk, $$length)
         );
 
-        $var_ref->get_var->set_value(Sidef::Types::String::String->new($chunk));
+        $var->set_value(Sidef::Types::String::String->new($chunk));
 
         return $size;
     }

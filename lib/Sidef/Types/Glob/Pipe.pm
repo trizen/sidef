@@ -22,16 +22,29 @@ package Sidef::Types::Glob::Pipe {
     }
 
     sub open {
-        my ($self, $mode) = @_;
+        my ($self, $mode, $var_ref) = @_;
         $mode = $$mode if ref($mode);
 
-        open my $pipe_h, $mode, map { $_->get_value } @{$self};
-        Sidef::Types::Glob::PipeHandle->new(pipe_h => $pipe_h, pipe => $self);
+        my $pid = open(my $pipe_h, $mode, map { $_->get_value } @{$self});
+        my $pipe_obj = Sidef::Types::Glob::PipeHandle->new(pipe_h => $pipe_h, pipe => $self);
+
+        if (ref($var_ref) eq 'Sidef::Variable::Ref') {
+            $var_ref->get_var->set_value($pipe_obj);
+
+            return defined($pid)
+              ? Sidef::Types::Number::Number->new($pid)
+              : ();
+        }
+        elsif (defined($pid)) {
+            return $pipe_obj;
+        }
+
+        return;
     }
 
     sub open_r {
-        my ($self) = @_;
-        $self->open('-|');
+        my ($self, $var_ref) = @_;
+        $self->open('-|', $var_ref);
     }
 
     *openR     = \&open_r;
@@ -39,8 +52,8 @@ package Sidef::Types::Glob::Pipe {
     *open_read = \&open_r;
 
     sub open_w {
-        my ($self) = @_;
-        $self->open('|-');
+        my ($self, $var_ref) = @_;
+        $self->open('|-', $var_ref);
     }
 
     *openW      = \&open_w;

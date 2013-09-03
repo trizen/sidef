@@ -4,6 +4,8 @@ package Sidef::Types::Nil::Nil {
     use strict;
     use warnings;
 
+    use overload 'bool' => sub { };
+
     our @ISA = qw(
       Sidef
       Sidef::Convert::Convert

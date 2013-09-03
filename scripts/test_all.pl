@@ -10,6 +10,7 @@ my %ignored;
       A+B.sf
       anagrams.sf
       anagrams_deranged_anagrams.sf
+      levenshtein_recursive.sf
       fibonacci_validation.sf
       dice_game_solver.sf
       stdin.sf

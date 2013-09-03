@@ -19,9 +19,8 @@ package Sidef::Types::Bool::Ternary {
         *{__PACKAGE__ . '::' . ':'} = sub {
             my ($self, $code) = @_;
 
-            if ($self->{bool}) {
-                return $self->{code};
-            }
+            $self->{bool}
+              && return $self->{code};
 
             Sidef::Types::Block::Code->new($code)->run;
         };

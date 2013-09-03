@@ -42,15 +42,16 @@ package Sidef::Types::Block::Code {
         my ($self, $num) = @_;
 
         $num //= Sidef::Types::Number::Number->new(1);
-        $self->_is_number($num) || return $self;
+        $self->_is_number($num) || return;
+
+        my $var = ($self->_get_private_var)[0]->get_var;
 
         foreach my $i (1 .. $num) {
+            $var->set_value(Sidef::Types::Number::Number->new($i));
 
-            my ($var_ref) = $self->_get_private_var();
-            $var_ref->get_var->set_value(Sidef::Types::Number::Number->new($i));
-
-            my $res = $self->_run_code();
-            return $res if defined $res;
+            if (defined(my $res = $self->_run_code)) {
+                return $res;
+            }
         }
 
         $self;
@@ -107,10 +108,7 @@ package Sidef::Types::Block::Code {
         my ($self, $condition) = @_;
 
         {
-            my $bool = Sidef::Types::Block::Code->new($condition)->run;
-            $self->_is_bool($bool) || return $self;
-
-            if ($bool) {
+            if (Sidef::Types::Block::Code->new($condition)->run) {
                 my $res = $self->_run_code();
                 return $res if defined $res;
                 redo;
@@ -170,8 +168,6 @@ package Sidef::Types::Block::Code {
     sub if {
         my ($self, $bool) = @_;
 
-        $self->_is_bool($bool) || return Sidef::Types::Bool::Bool->false;
-
         if ($bool) {
             $self->exec;
         }
@@ -188,12 +184,13 @@ package Sidef::Types::Block::Code {
         my ($self, $arg, $var) = @_;
 
         if ($self->_is_array($arg, 1, 1)) {
-            my ($var_ref) = ref($var) eq 'Sidef::Variable::Ref' ? $var : $self->_get_private_var();
+            my $var_ref = ref($var) eq 'Sidef::Variable::Ref' ? $var->get_var : ($self->_get_private_var)[0]->get_var;
 
             foreach my $item (@{$arg}) {
-                $var_ref->get_var->set_value($item->get_value);
-                my $res = $self->_run_code();
-                return $res if defined $res;
+                $var_ref->set_value($item->get_value);
+                if (defined(my $res = $self->_run_code)) {
+                    return $res;
+                }
             }
         }
         elsif (ref $arg eq 'HASH') {
@@ -215,8 +212,9 @@ package Sidef::Types::Block::Code {
                     my ($bool) = $exec->execute_expr(expr => $arg->{$class}[1], class => $class);
 
                     if ($bool) {
-                        my $res = $self->_run_code();
-                        return $res if defined $res;
+                        if (defined(my $res = $self->_run_code)) {
+                            return $res;
+                        }
                         $exec->execute_expr(expr => $expr, class => $class);
                         redo;
                     }

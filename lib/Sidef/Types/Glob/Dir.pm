@@ -84,10 +84,23 @@ package Sidef::Types::Glob::Dir {
     *absPath  = \&abs_name;
 
     sub open {
-        my ($self) = @_;
+        my ($self, $var_ref) = @_;
 
-        opendir(my $dir_h, $$self) or return;
-        Sidef::Types::Glob::DirHandle->new(dir_h => $dir_h, dir => $self);
+        my $success = opendir(my $dir_h, $$self);
+        my $dir_obj = Sidef::Types::Glob::DirHandle->new(dir_h => $dir_h, dir => $self);
+
+        if (ref($var_ref) eq 'Sidef::Variable::Ref') {
+            $var_ref->get_var->set_value($dir_obj);
+
+            return $success
+              ? Sidef::Types::Bool::Bool->true
+              : Sidef::Types::Bool::Bool->false;
+        }
+        elsif ($success) {
+            return $dir_obj;
+        }
+
+        return;
     }
 
     sub chdir {

@@ -35,7 +35,7 @@ package Sidef::Types::Bool::Bool {
 
         *{__PACKAGE__ . '::' . '!'} = sub {
             my ($self, $bool) = @_;
-            $self->_is_bool($bool) || return $self;
+            $self->_is_bool($bool) || return;
 
             $$bool eq 'true'
               ? $self->false

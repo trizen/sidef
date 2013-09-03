@@ -17,11 +17,7 @@ package Sidef::Types::Bool::If {
 
     sub if {
         my ($self, $arg) = @_;
-
-        my $bool = Sidef::Types::Block::Code->new($arg)->run;
-        $self->_is_bool($bool) || return $self;
-        $self->{do_block} = $bool ? 1 : 0;
-
+        $self->{do_block} = Sidef::Types::Block::Code->new($arg)->run ? 1 : 0;
         $self;
     }
 

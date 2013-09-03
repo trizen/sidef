@@ -76,7 +76,7 @@ package Sidef::Types::String::String {
         *{__PACKAGE__ . '::' . '<<'} = sub {
             my ($self, $i) = @_;
 
-            $self->_is_number($i) || return $self;
+            $self->_is_number($i) || return;
 
             my $len = CORE::length($$self);
             $i = $$i > $len ? $len : $$i;
@@ -85,7 +85,7 @@ package Sidef::Types::String::String {
 
         *{__PACKAGE__ . '::' . '>>'} = sub {
             my ($self, $i) = @_;
-            $self->_is_number($i) || return $self;
+            $self->_is_number($i) || return;
             $self->new(CORE::substr($$self, 0, -$$i));
         };
 
@@ -111,7 +111,7 @@ package Sidef::Types::String::String {
 
     sub cmp {
         my ($self, $string) = @_;
-        $self->_is_string($string) || return Sidef::Types::Number::Number->new(-1);
+        $self->_is_string($string) || return;
         Sidef::Types::Number::Number->new($$self cmp $$string);
     }
 
@@ -176,7 +176,7 @@ package Sidef::Types::String::String {
 
     sub charAt {
         my ($self, $pos) = @_;
-        $self->_is_number($pos) || return $self;
+        $self->_is_number($pos) || return;
         Sidef::Types::Char::Char->new(CORE::substr($$self, $$pos, 1));
     }
 
@@ -222,7 +222,7 @@ package Sidef::Types::String::String {
     sub substr {
         my ($self, $offs, $len) = @_;
 
-        $self->_is_number($offs) || return $self;
+        $self->_is_number($offs) || return;
 
         my @str = CORE::split(//, $$self);
         my $str_len = $#str;
@@ -230,7 +230,7 @@ package Sidef::Types::String::String {
         $offs = $$offs;
 
         if (defined $len) {
-            $self->_is_number($len) || return $self;
+            $self->_is_number($len) || return;
             $len = $$len;
         }
 
@@ -246,10 +246,10 @@ package Sidef::Types::String::String {
         my ($self, $string, $pos, $len) = @_;
 
         ($self->_is_string($string) && $self->_is_number($pos))
-          || return $self;
+          || return;
 
         if (defined $len) {
-            $self->_is_number($len) || return $self;
+            $self->_is_number($len) || return;
         }
         else {
             $len = Sidef::Types::Number::Number->new(0);
@@ -264,16 +264,16 @@ package Sidef::Types::String::String {
 
     sub join {
         my ($self, $delim, @rest) = @_;
-        $self->_is_string($delim) || return $self;
+        $self->_is_string($delim) || return;
         __PACKAGE__->new(CORE::join($$delim, $$self, @rest));
     }
 
     sub index {
         my ($self, $substr, $pos) = @_;
-        $self->_is_string($substr) || return $self;
+        $self->_is_string($substr) || return;
 
         if (defined($pos)) {
-            $self->_is_number($pos) || return $self;
+            $self->_is_number($pos) || return;
         }
 
         Sidef::Types::Number::Number->new(
@@ -373,7 +373,7 @@ package Sidef::Types::String::String {
     sub split {
         my ($self, $sep, $size) = @_;
 
-        $size = defined($size) && ($self->_is_number($size) || return $self) ? $$size : 0;
+        $size = defined($size) && ($self->_is_number($size) || return) ? $$size : 0;
 
         if (ref($sep) eq '') {
             return Sidef::Types::Array::Array->new(map { __PACKAGE__->new($_) } split(' ', $$self, $size));
@@ -410,7 +410,7 @@ package Sidef::Types::String::String {
         $start_pos //= Sidef::Types::Number::Number->new(0);
 
         ($self->_is_number($start_pos) && $self->_is_string($string))
-          || return Sidef::Types::Bool::Bool->false;
+          || return;
 
         if ($$start_pos < 0) {
             $$start_pos = CORE::length($$self) + $$start_pos;
@@ -423,7 +423,7 @@ package Sidef::Types::String::String {
         my ($self, $string) = @_;
 
         $self->_is_string($string)
-          || return Sidef::Types::Bool::Bool->false;
+          || return;
 
         CORE::length($$self) < (my $len = CORE::length($$string))
           && return Sidef::Types::Bool::Bool->false;
@@ -442,7 +442,7 @@ package Sidef::Types::String::String {
         my ($self, $string) = @_;
 
         $self->_is_string($string)
-          || return Sidef::Types::Bool::Bool->false;
+          || return;
 
         CORE::length($$self) < (my $len = CORE::length($$string))
           && return Sidef::Types::Bool::Bool->false;
