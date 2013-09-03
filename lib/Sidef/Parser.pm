@@ -248,6 +248,7 @@ package Sidef::Parser {
                   STDERR
 
                   __FUNC__
+                  __CLASS__
                   __BLOCK__
                   __RESET_LINE_COUNTER__
                   __STRICT__
@@ -741,13 +742,13 @@ package Sidef::Parser {
                 }
 
                 # Binary, hexdecimal and octal numbers
-                if (/\G0(b[10]*|x[0-9A-Fa-f]*|[0-9]+\b)/gc) {
-                    return Sidef::Types::Number::Number->new(oct($1)), pos;
+                if (/\G0(b[10_]*|x[0-9A-Fa-f_]*|[0-9_]+\b)/gc) {
+                    return Sidef::Types::Number::Number->new(oct($1 =~ tr/_//dr)), pos;
                 }
 
                 # Integer or float number
-                if (/\G([+-]?+(?=\.?[0-9])[0-9]*+(?:\.[0-9]++)?(?:[Ee](?:[+-]?+[0-9]+))?)/gc) {
-                    return Sidef::Types::Number::Number->new($1), pos;
+                if (/\G([+-]?+(?=\.?[0-9])[0-9_]*+(?:\.[0-9_]++)?(?:[Ee](?:[+-]?+[0-9_]+))?)/gc) {
+                    return Sidef::Types::Number::Number->new($1 =~ tr/_//dr), pos;
                 }
 
                 # Quoted words (qw/a b c/)
@@ -809,6 +810,10 @@ package Sidef::Parser {
                     redo;
                 }
 
+                if (/\G__CLASS__\b/gc) {
+                    return Sidef::Types::String::String->new($self->{class}), pos;
+                }
+
                 if (/\G__STRICT__\b/gc) {
                     $self->{strict_var} = 1;
                     redo;
@@ -861,7 +866,7 @@ package Sidef::Parser {
                       {
                         obj   => $variable,
                         name  => $name,
-                        count => 0,
+                        count => 1,
                         type  => $type,
                         line  => $self->{line},
                       };
@@ -904,7 +909,7 @@ package Sidef::Parser {
                         $var->{count}++;
                         return $var->{obj}, pos;
                     }
-                    elsif (not $self->{strict_var} and /\G(?=\h*(?:\R\h*)?:?=(?![=~]))/) {
+                    elsif (not $self->{strict_var} and /\G(?=\h*(?:\R\h*)?:?=(?![=~>]))/) {
                         unshift @{$self->{vars}{$self->{class}}},
                           {
                             obj   => Sidef::Variable::My->new($name),
@@ -1128,7 +1133,7 @@ package Sidef::Parser {
                                 if (ref $variable eq 'ARRAY') {
                                     $check_vars->({$class => $variable});
                                 }
-                                elsif ($variable->{name} ne uc($variable->{name}) and $variable->{count} == 0) {
+                                elsif ($variable->{count} == 0 && $variable->{name} ne '_' && $variable->{name} ne '') {
                                     warn "Variable '$variable->{name}' has been initialized"
                                       . " at line $variable->{line}, but not used again!\n";
                                 }

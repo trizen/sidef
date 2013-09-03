@@ -275,10 +275,18 @@ package Sidef::Types::Number::Number {
 
     sub next_power_of_two {
         my ($self) = @_;
-        $self->new(2 << CORE::int(CORE::log($$self) / CORE::log(2)));
+        $self->new(2 << ($$self->copy->blog(2)->as_int));
     }
 
     *nextPowerOfTwo = \&next_power_of_two;
+
+    sub next_power_of {
+        my ($self, $num) = @_;
+        $self->_is_number($num) || return;
+        $self->new($$num**($$self->copy->blog($$num)->as_int->binc));
+    }
+
+    *nextPowerOf = \&next_power_of;
 
     sub is_nan {
         my ($self) = @_;
@@ -290,16 +298,25 @@ package Sidef::Types::Number::Number {
 
     sub is_positive {
         my ($self) = @_;
-        Sidef::Types::Bool::Bool->new($$self > 0);
+        Sidef::Types::Bool::Bool->new($$self->is_pos);
     }
 
     *isPositive = \&is_positive;
     *isPos      = \&is_positive;
     *is_pos     = \&is_positive;
 
+    sub is_inf {
+        my ($self) = @_;
+        Sidef::Types::Bool::Bool->new($$self->is_inf);
+    }
+
+    *isInf       = \&is_inf;
+    *is_infinite = \&is_inf;
+    *isInfinite  = \&is_inf;
+
     sub is_negative {
         my ($self) = @_;
-        Sidef::Types::Bool::Bool->new($$self < 0);
+        Sidef::Types::Bool::Bool->new($$self->is_neg);
     }
 
     *isNegative = \&is_negative;
@@ -308,14 +325,14 @@ package Sidef::Types::Number::Number {
 
     sub is_even {
         my ($self) = @_;
-        Sidef::Types::Bool::Bool->new($$self % 2 == 0);
+        Sidef::Types::Bool::Bool->new($$self->as_int->is_even);
     }
 
     *isEven = \&is_even;
 
     sub is_odd {
         my ($self) = @_;
-        Sidef::Types::Bool::Bool->new($$self % 2 != 0);
+        Sidef::Types::Bool::Bool->new($$self->as_int->is_odd);
     }
 
     *isOdd = \&is_odd;

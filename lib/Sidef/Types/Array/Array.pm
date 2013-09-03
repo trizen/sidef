@@ -141,7 +141,9 @@ package Sidef::Types::Array::Array {
         [map { $_->get_value } @{$self}];
     }
 
-    *toList = \&to_list;
+    *toList  = \&to_list;
+    *asList  = \&to_list;
+    *as_list = \&to_list;
 
     sub xor {
         my ($self, $array) = @_;

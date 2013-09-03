@@ -8,7 +8,7 @@ if (nil != req) {
 
     "** Processing words...".say;
 
-    var anagram = Hash;
+    var anagram = (Hash.new);
     for (words) {
         anagram[_.split('').sort.join] := [] -> append(_);
     }

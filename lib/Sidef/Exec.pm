@@ -15,6 +15,13 @@ package Sidef::Exec {
                                    '||=' => 1,
                                    '&&=' => 1,
                                   },
+            plain_array_methods => {
+                                    '...'     => 1,
+                                    'asList'  => 1,
+                                    'as_list' => 1,
+                                    'toList'  => 1,
+                                    'to_list' => 1,
+                                   },
             types => {
                 'Sidef::Types::Bool::Bool' => {
                                                '&&' => 1,
@@ -293,7 +300,7 @@ package Sidef::Exec {
                     else {
                         $method //= '';
 
-                        if ($method eq '...') {
+                        if (exists $self->{plain_array_methods}{$method}) {
                             $self->{plain_array} = 1;
                         }
 

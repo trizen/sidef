@@ -21,7 +21,7 @@ func hailstone (n) {
 
 var h = (hailstone(27));
 
-h[0]  ==  27 || ("Item error!"   -> die);
+h[1]  ==  82 || ("Item error!"   -> die);
 h.len == 112 || ("Length error!" -> die);
 
 "Length of hailstone(27) = %s".printlnf(h.len);

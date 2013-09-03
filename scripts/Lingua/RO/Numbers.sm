@@ -1,0 +1,176 @@
+#!/usr/bin/ruby
+
+# AUTHOR: Șuteu "Trizen" Daniel
+# LICENSE: GPLv3
+
+class Lingua::RO::Numbers;
+
+var DIGITS = (Hash.new);
+DIGITS[0 .. 19] = qw„
+  zero unu doi trei patru cinci șase șapte opt nouă zece
+  unsprezece
+  doisprezece
+  treisprezece
+  paisprezece
+  cincisprezece
+  șaisprezece
+  șaptesprezece
+  optsprezece
+  nouăsprezece
+”;
+
+# See: http://ro.wikipedia.org/wiki/Sistem_zecimal#Denumiri_ale_numerelor
+
+var BIGNUMS = (
+            [
+                [ 10**2,        'sută',         'sute',  true],
+                [ 10**3,         'mie',          'mii',  true],
+                [ 10**6,      'milion',     'milioane', false],
+                [ 10**9,     'miliard',     'miliarde', false],
+                [10**12,      'bilion',     'bilioane', false],
+                [10**15,     'biliard',     'biliarde', false],
+                [10**18,     'trilion',    'trilioane', false],
+                [10**21,    'triliard',    'triliarde', false],
+                [10**24,  'cvadrilion', 'cvadrilioane', false],
+                [10**27, 'cvadriliard', 'cvadriliarde', false],
+            ]
+             -> map {
+                 (var h=(Hash.new))[qw(num sg pl fem)] = (_) => h;
+            }
+);
+
+var opts = (:(
+            'diacritics'          => true,
+            'invalid_number'      => nil,
+            'negative_sign'       => 'minus',
+            'decimal_point'       => 'virgulă',
+            'thousands_separator' => '',
+            'infinity'            => 'infinit',
+            'not_a_number'        => 'NaN',
+));
+
+func _number_to_ro (number) {
+
+    words = [];
+    if (DIGITS.exists(number)) {
+        words.append(DIGITS[number]);
+    }
+    elsif (number.to_num! -> is_nan) {
+        return [opts['not_a_number']];
+    }
+    elsif (number.is_negative) {
+        words.append(opts['negative_sign']);
+        words.append(_number_to_ro(number.abs).to_list);
+    }
+    elsif (!(number.isInt)) {
+
+        words.append(_number_to_ro(number.int).to_list);
+        words.append(opts['decimal_point']);
+
+        number -= (number.int);
+
+        while (number != (number.int)) {
+            number *= 10
+                < 1 && (words.append(DIGITS[0]));
+        }
+
+        words.append(_number_to_ro(number.int).to_list);
+    }
+    elsif (number >= BIGNUMS[0]['num']) {
+        my i;   # special
+        for (0 .. (BIGNUMS.offset - 1) => \i) {
+            j = (BIGNUMS.offset - i);
+
+            if (number >= BIGNUMS[j-1]['num'] && (number < BIGNUMS[j]['num'])) {
+                cat = (number / BIGNUMS[j-1]['num'] -> int);
+                number -= (BIGNUMS[j-1]['num'] * (number / BIGNUMS[j-1]['num'] -> int));
+
+                var of = (cat <= 2 ? [] : (
+                    var w = (
+                        DIGITS.exists(cat)
+                            ? [DIGITS[cat]]
+                            : (_number_to_ro(cat) + ['de'])
+                        ) -> len > 2 && (w[-2] == DIGITS[2] && (w[-2] = 'două'));
+                   w;
+                ));
+
+
+                if (cat >= 100 && (cat < 1000)) {
+                    var rest = (cat - (100 * (cat / 100 -> int)));
+                    if (of.len != 0 && (rest != 0 && (DIGITS.exists(rest)))) {
+                        of.dropRight(1);
+                    }
+                }
+
+                words += (
+                    cat == 1 ? ([BIGNUMS[j-1]['fem'] ? 'o' : 'un', BIGNUMS[j-1]['sg']])
+                             : (cat == 2 ? (['două', BIGNUMS[j-1]['pl']])
+                                         : (of + [BIGNUMS[j-1]['pl']]));
+                );
+
+                BIGNUMS[j]['num'] > 1000 && (
+                    words[-1] += opts['thousands_separator']
+                );
+
+                number > 0 && (
+                    words.append(_number_to_ro(number).to_list)
+                );
+
+                break;
+            }
+        }
+    }
+    elsif (number > 19 && (number < 100)) {
+        cat = (number / 10 -> int);
+
+        words.append(
+            (
+             cat == 2 ? 'două'
+                      : (
+                         cat == 6 ? ('șai')
+                                  : (DIGITS[cat])
+                        )
+            ) + 'zeci'
+        );
+
+        if (number % 10 != 0) {
+            words.append('și', DIGITS[number % 10 -> int]);
+        }
+    }
+    elsif (number.isInf) {
+        return [opts['infinity']];
+    }
+    else {
+        return [opts['invalid_number']];
+    }
+
+    return $words;
+}
+
+func number_to_ro (num) {
+
+    for (_.ft(1).to_hash.each => \var kv) {
+
+        opts.exists(kv[0]) || (
+            "[%s] Invalid option: <%s>\n".sprintf(__CLASS__, kv[0]).warn;
+        );
+
+        opts[kv[0]] = kv[1];
+    }
+
+    var word = (_number_to_ro(num).join(" "));
+
+    if (!opts['diacritics']) {
+        word.gsub!('ă','a')
+            .gsub!('â','a')
+            .gsub!('ș','s')
+            .gsub!('ț','t')
+            .gsub!('î','i');
+    }
+
+    if (var t = opts['thousands_separator'] != '') {
+        word.gsub!(Regex.new('(?:' + (t.quotemeta) + ')+$'), '');
+    }
+
+    word;
+}

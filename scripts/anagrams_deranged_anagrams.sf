@@ -36,7 +36,7 @@ if (nil != req) {
     "** Processing the words...".say;
 
     var time = (Time.now);
-    var letter_list = Hash;
+    var letter_list = (Hash.new);
 
     for (words) {
         # store anagrams in hash table by letters they contain
