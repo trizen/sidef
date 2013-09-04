@@ -390,6 +390,21 @@ package Sidef::Types::Number::Number {
 
     *len = \&length;
 
+    sub to_bin {
+        my ($self) = @_;
+
+        my $dec      = Math::BigInt->new($$self);
+        my $reminder = $dec % 2;
+
+        my @bin;
+        while ($dec->is_pos) {
+            unshift @bin, $reminder;
+            $reminder = $dec->brsft(1) % 2;
+        }
+
+        $self->new(join('', @bin));
+    }
+
     sub commify {
         my ($self) = @_;
 

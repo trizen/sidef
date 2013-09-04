@@ -315,6 +315,9 @@ package Sidef::Exec {
                         $self->{expr_i} = $self->{expr_i_max};
                         return $self_obj;
                     }
+                    elsif (ref($self_obj) eq 'Sidef::Types::Block::Break') {
+                        last;
+                    }
                 }
             }
             else {
