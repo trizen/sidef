@@ -402,18 +402,54 @@ package Sidef::Types::String::String {
 
     *len = \&length;
 
-    sub eval {
+    sub parse {
         my ($self, $code) = @_;
+
+        my @warnings;
+        local $SIG{__WARN__} = sub { push @warnings, __PACKAGE__->new($_[0]) };
 
         my $parser = Sidef::Parser->new(script_name => '/eval/');
         my $struct = eval { $parser->parse_script(code => $$self) } // {};
 
-        if ($@ && defined($code)) {
-            $self->_is_code($code) || return;
-            return $code->run;
+        if ($@) {
+            push @warnings, __PACKAGE__->new($@);
+            if (defined($code)) {
+                $self->_is_code($code) || return;
+                my $var = ($code->_get_private_var)[0]->get_var;
+                $var->set_value(Sidef::Types::Array::Array->new(@warnings));
+                $code->run;
+            }
+
+            return;
         }
 
-        return scalar eval { Sidef::Types::Block::Code->new($struct)->run };
+        Sidef::Types::Block::Code->new($struct);
+    }
+
+    sub eval {
+        my ($self, $code) = @_;
+
+        my $block = $self->parse($code) // return;
+
+        my @warnings;
+        local $SIG{__WARN__} = sub { push @warnings, __PACKAGE__->new($_[0]) };
+
+        my $result = eval { $block->run };
+
+        if ($@) {
+            push @warnings, __PACKAGE__->new($@);
+
+            if (defined($code)) {
+                $self->_is_code($code) || return;
+                my $var = ($code->_get_private_var)[0]->get_var;
+                $var->set_value(Sidef::Types::Array::Array->new(@warnings));
+                $code->run;
+            }
+
+            return;
+        }
+
+        $result;
     }
 
     sub contains {
