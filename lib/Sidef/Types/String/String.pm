@@ -389,8 +389,8 @@ package Sidef::Types::String::String {
         my ($self, $orig, $repl, $modes) = @_;
         ($self->_is_string($orig) && $self->_is_string($repl)) || return;
         $self->new(
-                   eval qq{"\Q$$self\E"=~tr/} . $$orig =~ s{/}{\\/}gr . "/" . $$repl =~
-                     s{/}{\\/}gr . "/r" . (defined($modes) ? $self->_is_string($modes) ? $$modes : return : ''));
+                   eval qq{"\Q$$self\E"=~tr/} . $$orig =~ s{([/\\])}{\\$1}gr . "/" . $$repl =~
+                     s{([/\\])}{\\$1}gr . "/r" . (defined($modes) ? $self->_is_string($modes) ? $$modes : return : ''));
     }
 
     *tr = \&translit;
