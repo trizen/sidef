@@ -65,7 +65,7 @@ package Sidef::Parser {
                           re  => qr/\GNum(?:ber)?\b/,
                          },
                          {
-                          sub => sub { Sidef::Types::Math::Math->new },
+                          sub => sub { Sidef::Math::Math->new },
                           re  => qr/\GMath\b/,
                          },
                          {
@@ -156,6 +156,11 @@ package Sidef::Parser {
                           dynamic => 1,
                          },
                          {
+                          sub     => sub { Sidef::Types::Block::Try->new },
+                          re      => qr/\G(?=try\b)/,
+                          dynamic => 1,
+                         },
+                         {
                           sub     => sub { Sidef::Types::Block::Given->new },
                           re      => qr/\G(?=(?:given|switch)\b)/,
                           dynamic => 1,
@@ -210,6 +215,7 @@ package Sidef::Parser {
                   return
                   for foreach
                   if while
+                  try
                   given switch
                   continue
                   require
@@ -250,6 +256,7 @@ package Sidef::Parser {
                   __FUNC__
                   __CLASS__
                   __BLOCK__
+                  __FILE__
                   __RESET_LINE_COUNTER__
                   __STRICT__
                   __NO_STRICT__
@@ -814,6 +821,10 @@ package Sidef::Parser {
                     return Sidef::Types::String::String->new($self->{class}), pos;
                 }
 
+                if (/\G__FILE__\b/gc) {
+                    return Sidef::Types::String::String->new($self->{script_name}), pos;
+                }
+
                 if (/\G__STRICT__\b/gc) {
                     $self->{strict_var} = 1;
                     redo;
@@ -853,7 +864,7 @@ package Sidef::Parser {
                 }
 
                 if (
-                    /\G((?>ENV|ARGV|SCRIPT_NAME))\b/gc && do {
+                    /\G((?>ENV|ARGV))\b/gc && do {
                         ref(($self->find_var($1, $self->{class}))[0]) ? do { pos($_) -= length($1); 0 } : 1;
                     }
                   ) {
@@ -890,10 +901,6 @@ package Sidef::Parser {
                         );
 
                         $variable->set_value($hash);
-                    }
-                    elsif ($name eq 'SCRIPT_NAME') {
-                        my $string = Sidef::Types::String::String->new($self->{script_name});
-                        $variable->set_value($string);
                     }
 
                     return $variable, pos;

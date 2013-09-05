@@ -34,7 +34,7 @@ package Sidef::Types::String::String {
             $self;
         };
 
-        *{__PACKAGE__ . '::' . '=='} = \&is;
+        *{__PACKAGE__ . '::' . '=='} = \&equals;
 
         *{__PACKAGE__ . '::' . '!='} = sub {
             my ($self, $string) = @_;
@@ -134,13 +134,13 @@ package Sidef::Types::String::String {
 
     *toUpperCase = \&uc;
 
-    sub is {
+    sub equals {
         my ($self, $string) = @_;
         ref($self) ne ref($string) and return Sidef::Types::Bool::Bool->false;
         Sidef::Types::Bool::Bool->new($$self eq $$string);
     }
 
-    *equals = \&is;
+    *is = \&equals;
 
     sub append {
         my ($self, $string) = @_;
@@ -255,12 +255,10 @@ package Sidef::Types::String::String {
             $len = Sidef::Types::Number::Number->new(0);
         }
 
-        CORE::substr($$self, $$pos, $$len, $$string);
-        return $self;
+        my $new_str = $self->new($$self);
+        CORE::substr($$new_str, $$pos, $$len, $$string);
+        return $new_str;
     }
-
-    *insert_at = \&insert;
-    *insertAt  = \&insert;
 
     sub join {
         my ($self, $delim, @rest) = @_;
@@ -292,7 +290,7 @@ package Sidef::Types::String::String {
 
     sub reverse {
         my ($self) = @_;
-        __PACKAGE__->new(scalar CORE::reverse($$self));
+        $self->new(scalar CORE::reverse($$self));
     }
 
     sub say {
@@ -387,6 +385,16 @@ package Sidef::Types::String::String {
         Sidef::Types::Array::Array->new(map { __PACKAGE__->new($_) } split(/$sep/, $$self, $size));
     }
 
+    sub translit {
+        my ($self, $orig, $repl, $modes) = @_;
+        ($self->_is_string($orig) && $self->_is_string($repl)) || return;
+        $self->new(
+                   eval qq{"\Q$$self\E"=~tr/} . $$orig =~ s{/}{\\/}gr . "/" . $$repl =~
+                     s{/}{\\/}gr . "/r" . (defined($modes) ? $self->_is_string($modes) ? $$modes : return : ''));
+    }
+
+    *tr = \&translit;
+
     sub length {
         my ($self) = @_;
         Sidef::Types::Number::Number->new(CORE::length($$self));
@@ -457,17 +465,12 @@ package Sidef::Types::String::String {
 
     sub warn {
         my ($self) = @_;
-        print STDERR $$self;
+        warn $$self;
     }
 
     sub die {
         my ($self) = @_;
-
-        $self->warn;
-
-        exit $! if $!;              # errno
-        exit $? >> 8 if $? >> 8;    # child exit status
-        exit 255;                   # last resort
+        die $$self;
     }
 
     sub unescape {

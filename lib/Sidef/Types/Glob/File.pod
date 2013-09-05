@@ -639,17 +639,17 @@ Return the
 
 =cut
 
-=head2 readLink
+=head2 readlink
 
-File.readLink() -> I<Bool>
+File.readlink() -> I<Bool>
 
 Return the
 
 =cut
 
-=head2 readlink
+=head2 readLink
 
-File.readlink() -> I<Bool>
+File.readLink() -> I<Bool>
 
 Return the
 

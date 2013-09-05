@@ -268,6 +268,22 @@ Return the
 
 =cut
 
+=head2 as_list
+
+Array.as_list() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 asList
+
+Array.asList() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 combine
 
 Array.combine() -> I<Obj>
@@ -685,6 +701,14 @@ Returns an object of type: C<Sidef::Types::Number::Number>
 
 =cut
 
+=head2 permute
+
+Array.permute() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 pop
 
 =over 2
@@ -770,6 +794,14 @@ Returns an object of the same type as the elements of the array.
 
 =cut
 
+=head2 reduce_pairs
+
+Array.reduce_pairs() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 reducePairs
 
 Array.reducePairs() -> I<Bool>
@@ -821,14 +853,6 @@ Return the
 =head2 size
 
 Array.size() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 sliceReverse
-
-Array.sliceReverse() -> I<Bool>
 
 Return the
 

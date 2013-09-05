@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-Sidef::Types::Math::Math
+Sidef::Math::Math
 
 =head1 DESCRIPTION
 
@@ -30,9 +30,25 @@ Return the
 
 =cut
 
+=head2 atan
+
+Math.atan() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 atan2
 
 Math.atan2() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 cos
+
+Math.cos() -> I<Bool>
 
 Return the
 
@@ -81,6 +97,14 @@ Return the
 =head2 precision
 
 Math.precision() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 sin
+
+Math.sin() -> I<Bool>
 
 Return the
 

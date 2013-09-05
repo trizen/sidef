@@ -10,6 +10,7 @@ use strict;
 use warnings;
 
 require Sidef::Sys::Sys if (caller)[0] ne q{Sidef::Sys::Sys};
+require Sidef::Math::Math if (caller)[0] ne q{Sidef::Math::Math};
 require Sidef::Time::Localtime if (caller)[0] ne q{Sidef::Time::Localtime};
 require Sidef::Time::Time if (caller)[0] ne q{Sidef::Time::Time};
 require Sidef::Time::Gmtime if (caller)[0] ne q{Sidef::Time::Gmtime};
@@ -31,11 +32,11 @@ require Sidef::Types::Glob::PipeHandle if (caller)[0] ne q{Sidef::Types::Glob::P
 require Sidef::Types::Glob::File if (caller)[0] ne q{Sidef::Types::Glob::File};
 require Sidef::Types::Glob::Stat if (caller)[0] ne q{Sidef::Types::Glob::Stat};
 require Sidef::Types::Hash::Hash if (caller)[0] ne q{Sidef::Types::Hash::Hash};
-require Sidef::Types::Math::Math if (caller)[0] ne q{Sidef::Types::Math::Math};
 require Sidef::Types::Array::Array if (caller)[0] ne q{Sidef::Types::Array::Array};
 require Sidef::Types::Black::Hole if (caller)[0] ne q{Sidef::Types::Black::Hole};
 require Sidef::Types::Block::For if (caller)[0] ne q{Sidef::Types::Block::For};
 require Sidef::Types::Block::Do if (caller)[0] ne q{Sidef::Types::Block::Do};
+require Sidef::Types::Block::Try if (caller)[0] ne q{Sidef::Types::Block::Try};
 require Sidef::Types::Block::Switch if (caller)[0] ne q{Sidef::Types::Block::Switch};
 require Sidef::Types::Block::Code if (caller)[0] ne q{Sidef::Types::Block::Code};
 require Sidef::Types::Block::Return if (caller)[0] ne q{Sidef::Types::Block::Return};

@@ -26,6 +26,8 @@ package Sidef::Types::Bool::If {
         $self->if($code);
     }
 
+    *elseif = \&elsif;
+
     sub else {
         my ($self, $code) = @_;
         $self->{do_block} = 1;

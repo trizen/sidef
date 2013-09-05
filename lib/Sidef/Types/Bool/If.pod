@@ -32,6 +32,14 @@ Return the
 
 =cut
 
+=head2 elseif
+
+If.elseif() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 elsif
 
 If.elsif() -> I<Bool>

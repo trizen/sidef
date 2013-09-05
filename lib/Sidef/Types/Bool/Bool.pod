@@ -39,14 +39,6 @@ Return the
 
 =cut
 
-=head2 (bool
-
-Bool.(bool() -> I<Bool>
-
-Return the
-
-=cut
-
 =head2 ?
 
 I<Num> B<?> I<Num> -> I<Num>
@@ -82,14 +74,6 @@ Return the
 =head2 false
 
 Bool.false() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 flip
-
-Bool.flip() -> I<Bool>
 
 Return the
 

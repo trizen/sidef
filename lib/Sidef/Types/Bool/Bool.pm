@@ -5,7 +5,6 @@ package Sidef::Types::Bool::Bool {
     use warnings;
 
     no warnings 'recursion';
-
     use overload q{bool} => sub { ${$_[0]} eq 'true' };
 
     our @ISA = qw(Sidef::Convert::Convert);

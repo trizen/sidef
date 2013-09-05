@@ -5,9 +5,8 @@ package Sidef::Types::Glob::PipeHandle {
     use warnings;
 
     our @ISA = qw(
-      Sidef
       Sidef::Types::Glob::FileHandle
-      );
+    );
 
     sub new {
         my (undef, %opt) = @_;

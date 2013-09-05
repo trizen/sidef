@@ -1,0 +1,40 @@
+
+=encoding utf8
+
+=head1 NAME
+
+Sidef::Types::Block::Try
+
+=head1 DESCRIPTION
+
+This object is ...
+
+=head1 SYNOPSIS
+
+var obj = (Try.new(...));
+
+
+=head1 INHERITS
+
+Inherits methods from:
+
+	* Sidef
+
+=head1 METHODS
+
+
+=head2 catch
+
+Try.catch() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 try
+
+Try.try() -> I<Bool>
+
+Return the
+
+=cut

@@ -1,4 +1,4 @@
-package Sidef::Types::Math::Math {
+package Sidef::Math::Math {
 
     use 5.014;
     use strict;
@@ -22,10 +22,28 @@ package Sidef::Types::Math::Math {
 
     *PI = \&pi;
 
+    sub atan {
+        my ($self, $x, $places) = @_;
+        $self->_is_number($x) || return;
+        Sidef::Types::Number::Number->new(Math::BigFloat->new($$x)->batan(defined($places) ? ($self->_is_number($places)) ? ($places->get_value) : return : ()));
+    }
+
     sub atan2 {
-        my ($self, $x, $y) = @_;
+        my ($self, $x, $y, $places) = @_;
         ($self->_is_number($x) && $self->_is_number($y)) || return;
-        Sidef::Types::Number::Number->new(Math::BigFloat->batan2($$x, $$y));
+        Sidef::Types::Number::Number->new(Math::BigFloat->new($$x)->batan2($$y, defined($places) ? ($self->_is_number($places)) ? ($places->get_value) : return : ()));
+    }
+
+    sub cos {
+        my ($self, $x, $places) = @_;
+        $self->_is_number($x) || return;
+        Sidef::Types::Number::Number->new(Math::BigFloat->new($$x)->bcos(defined($places) ? $places : ()));
+    }
+
+    sub sin {
+        my ($self, $x, $places) = @_;
+        $self->_is_number($x) || return;
+        Sidef::Types::Number::Number->new(Math::BigFloat->new($$x)->bsin(defined($places) ? $places : ()));
     }
 
     sub gcd {

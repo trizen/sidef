@@ -8,6 +8,8 @@ lib/Sidef/Convert/Convert.pm
 lib/Sidef/Convert/Convert.pod
 lib/Sidef/Exec.pm
 lib/Sidef/Init.pm
+lib/Sidef/Math/Math.pm
+lib/Sidef/Math/Math.pod
 lib/Sidef/Module/Caller.pm
 lib/Sidef/Module/Func.pm
 lib/Sidef/Module/Require.pm
@@ -43,6 +45,8 @@ lib/Sidef/Types/Block/Return.pm
 lib/Sidef/Types/Block/Return.pod
 lib/Sidef/Types/Block/Switch.pm
 lib/Sidef/Types/Block/Switch.pod
+lib/Sidef/Types/Block/Try.pm
+lib/Sidef/Types/Block/Try.pod
 lib/Sidef/Types/Bool/Bool.pm
 lib/Sidef/Types/Bool/Bool.pod
 lib/Sidef/Types/Bool/If.pm
@@ -77,7 +81,6 @@ lib/Sidef/Types/Glob/Stat.pm
 lib/Sidef/Types/Glob/Stat.pod
 lib/Sidef/Types/Hash/Hash.pm
 lib/Sidef/Types/Hash/Hash.pod
-lib/Sidef/Types/Math/Math.pm
 lib/Sidef/Types/Nil/Nil.pm
 lib/Sidef/Types/Nil/Nil.pod
 lib/Sidef/Types/Number/Negative.pm
@@ -143,6 +146,8 @@ scripts/cramers_method.sf
 scripts/dice_game_solver.sf
 scripts/echo.sf
 scripts/eval.sf
+scripts/fibonacci_cached.sf
+scripts/fibonacci_validation.sf
 scripts/for_two_vars.sf
 scripts/function_recursion.sf
 scripts/functional_modules.sf
@@ -162,6 +167,8 @@ scripts/keyword_object.sf
 scripts/leap_year.sf
 scripts/levenshtein_distance.sf
 scripts/levenshtein_recursive.sf
+scripts/Lingua/RO/Numbers.sm
+scripts/lingua_ro.sf
 scripts/logic.sf
 scripts/lwp_module.sf
 scripts/Math/Algebra/Matrix.sm

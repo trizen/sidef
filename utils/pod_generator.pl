@@ -22,6 +22,7 @@ my %ignored_subs = map { $_ => 1 } qw<
   ISA
   (""
   ((
+  (bool
   AUTOLOAD
   DESTROY
   >;
@@ -50,6 +51,7 @@ my %ignored_methods = (
                        'Sidef::Types::Glob::Stat'       => [qw(new)],
                        'Sidef::Types::Block::For'       => [qw(new)],
                        'Sidef::Types::Block::Switch'    => [qw(new)],
+                       'Sidef::Types::Block::Try'       => [qw(new)],
                        'Sidef::Types::Block::Code'      => [qw(new)],
                        'Sidef::Types::Block::Given'     => [qw(new)],
                        'Sidef::Types::Block::Continue'  => [qw(new)],
@@ -190,9 +192,10 @@ __POD2__
         $pod_data = parse_pod_file($pod_file);
     };
 
-    foreach my $key (keys %{$pod_data}) {
-        next if $key eq '__HEADER__';
-        $subs{$key} = $pod_data->{$key};
+    foreach my $key (keys %subs) {
+        if (exists $pod_data->{$key}) {
+            $subs{$key} = $pod_data->{$key};
+        }
     }
 
     open my $fh, '>', $pod_file;

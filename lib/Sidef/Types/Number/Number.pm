@@ -5,6 +5,7 @@ package Sidef::Types::Number::Number {
     use warnings;
 
     require Math::BigFloat;
+    require Math::BigInt::Calc;
 
     our @ISA = qw(
       Sidef
@@ -165,18 +166,36 @@ package Sidef::Types::Number::Number {
     *fac = \&factorial;
 
     sub to {
-        my ($self, $num) = @_;
+        my ($self, $num, $step) = @_;
+
         $self->_is_number($num) || return;
-        Sidef::Types::Array::Array->new(map { $self->new($_) } $$self->numify .. $$num->numify);
+        $step = defined($step) ? $self->_is_number($step) ? ($$step) : return : (Math::BigFloat->new(1));
+
+        my $array = Sidef::Types::Array::Array->new();
+
+        for (my $i = $$self ; $i <= $$num ; $i += $step) {
+            $array->push($self->new($i));
+        }
+
+        $array;
     }
 
     *upto = \&to;
     *upTo = \&to;
 
     sub downto {
-        my ($self, $num) = @_;
+        my ($self, $num, $step) = @_;
+
         $self->_is_number($num) || return;
-        Sidef::Types::Array::Array->new(map { $self->new($_) } reverse($$num->numify .. $$self->numify));
+        $step = defined($step) ? $self->_is_number($step) ? ($$step) : return : (Math::BigFloat->new(1));
+
+        my $array = Sidef::Types::Array::Array->new();
+
+        for (my $i = $$self ; $i >= $$num ; $i -= $step) {
+            $array->push($self->new($i));
+        }
+
+        $array;
     }
 
     *downTo = \&downto;
@@ -231,12 +250,12 @@ package Sidef::Types::Number::Number {
 
     sub log10 {
         my ($self) = @_;
-        $self->new($self->new($$self->copy->blog(10)));
+        $self->new($$self->copy->blog(10));
     }
 
     sub log2 {
         my ($self) = @_;
-        $self->new($self->new($$self->copy->blog(2)));
+        $self->new($$self->copy->blog(2));
     }
 
     sub inf {

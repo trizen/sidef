@@ -208,14 +208,6 @@ Return the
 
 =cut
 
-=head2 atan2
-
-Number.atan2() -> I<Bool>
-
-Return the
-
-=cut
-
 =head2 ceil
 
 Number.ceil() -> I<Bool>
@@ -248,17 +240,17 @@ Return the
 
 =cut
 
-=head2 downTo
+=head2 downto
 
-Number.downTo() -> I<Bool>
+Number.downto() -> I<Bool>
 
 Return the
 
 =cut
 
-=head2 downto
+=head2 downTo
 
-Number.downto() -> I<Bool>
+Number.downTo() -> I<Bool>
 
 Return the
 
@@ -352,6 +344,22 @@ Return the
 
 =cut
 
+=head2 is_inf
+
+Number.is_inf() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 is_infinite
+
+Number.is_infinite() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 is_int
 
 Number.is_int() -> I<Bool>
@@ -368,17 +376,17 @@ Return the
 
 =cut
 
-=head2 is_nan
+=head2 is_NaN
 
-Number.is_nan() -> I<Bool>
+Number.is_NaN() -> I<Bool>
 
 Return the
 
 =cut
 
-=head2 is_NaN
+=head2 is_nan
 
-Number.is_NaN() -> I<Bool>
+Number.is_nan() -> I<Bool>
 
 Return the
 
@@ -427,6 +435,22 @@ Return the
 =head2 isEven
 
 Number.isEven() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 isInf
+
+Number.isInf() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 isInfinite
+
+Number.isInfinite() -> I<Bool>
 
 Return the
 
@@ -592,9 +616,25 @@ Return the
 
 =cut
 
+=head2 next_power_of
+
+Number.next_power_of() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 next_power_of_two
 
 Number.next_power_of_two() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 nextPowerOf
+
+Number.nextPowerOf() -> I<Bool>
 
 Return the
 
@@ -611,14 +651,6 @@ Return the
 =head2 not
 
 Number.not() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 pi
-
-Number.pi() -> I<Bool>
 
 Return the
 
@@ -688,25 +720,17 @@ Return the
 
 =cut
 
-=head2 sqrt_n
-
-Number.sqrt_n() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 sqrtN
-
-Number.sqrtN() -> I<Bool>
-
-Return the
-
-=cut
-
 =head2 to
 
 Number.to() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 to_bin
+
+Number.to_bin() -> I<Bool>
 
 Return the
 

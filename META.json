@@ -49,6 +49,9 @@
       "Sidef::Init" : {
          "file" : "lib/Sidef/Init.pm"
       },
+      "Sidef::Math::Math" : {
+         "file" : "lib/Sidef/Math/Math.pm"
+      },
       "Sidef::Module::Caller" : {
          "file" : "lib/Sidef/Module/Caller.pm"
       },
@@ -106,6 +109,9 @@
       "Sidef::Types::Block::Switch" : {
          "file" : "lib/Sidef/Types/Block/Switch.pm"
       },
+      "Sidef::Types::Block::Try" : {
+         "file" : "lib/Sidef/Types/Block/Try.pm"
+      },
       "Sidef::Types::Bool::Bool" : {
          "file" : "lib/Sidef/Types/Bool/Bool.pm"
       },
@@ -156,9 +162,6 @@
       },
       "Sidef::Types::Hash::Hash" : {
          "file" : "lib/Sidef/Types/Hash/Hash.pm"
-      },
-      "Sidef::Types::Math::Math" : {
-         "file" : "lib/Sidef/Types/Math/Math.pm"
       },
       "Sidef::Types::Nil::Nil" : {
          "file" : "lib/Sidef/Types/Nil/Nil.pm"

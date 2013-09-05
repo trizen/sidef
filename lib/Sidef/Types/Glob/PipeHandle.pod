@@ -13,32 +13,15 @@ This object is ...
 
 var obj = (PipeHandle.new(...));
 
+
+=head1 INHERITS
+
+Inherits methods from:
+
+    * Sidef::Types::Glob::FileHandle
+
+
 =head1 METHODS
-
-
-=head2 close
-
-PipeHandle.close() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 get_lines
-
-PipeHandle.get_lines() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 getLines
-
-PipeHandle.getLines() -> I<Bool>
-
-Return the
-
-=cut
 
 =head2 parent
 
@@ -51,46 +34,6 @@ Return the
 =head2 pipe
 
 PipeHandle.pipe() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 read
-
-PipeHandle.read() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 read_all
-
-PipeHandle.read_all() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 readAll
-
-PipeHandle.readAll() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 readline
-
-PipeHandle.readline() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 readLine
-
-PipeHandle.readLine() -> I<Bool>
 
 Return the
 

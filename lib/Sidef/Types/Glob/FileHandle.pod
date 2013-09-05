@@ -263,17 +263,17 @@ Return the
 
 =cut
 
-=head2 sysread
+=head2 sysRead
 
-FileHandle.sysread() -> I<Bool>
+FileHandle.sysRead() -> I<Bool>
 
 Return the
 
 =cut
 
-=head2 sysRead
+=head2 sysread
 
-FileHandle.sysRead() -> I<Bool>
+FileHandle.sysread() -> I<Bool>
 
 Return the
 
@@ -314,14 +314,6 @@ Return the
 =head2 unlock
 
 FileHandle.unlock() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 write
-
-FileHandle.write() -> I<Bool>
 
 Return the
 

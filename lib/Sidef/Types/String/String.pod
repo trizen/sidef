@@ -312,14 +312,6 @@ Return the
 
 =cut
 
-=head2 gsub
-
-String.gsub() -> I<Bool>
-
-Return the
-
-=cut
-
 =head2 gSub
 
 String.gSub() -> I<Bool>
@@ -328,9 +320,9 @@ Return the
 
 =cut
 
-=head2 gsub!
+=head2 gsub
 
-String.gsub!() -> I<Bool>
+String.gsub() -> I<Bool>
 
 Return the
 
@@ -355,22 +347,6 @@ Return the
 =head2 insert
 
 String.insert() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 insert_at
-
-String.insert_at() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 insertAt
-
-String.insertAt() -> I<Bool>
 
 Return the
 
@@ -568,14 +544,6 @@ Return the
 
 =cut
 
-=head2 sub!
-
-String.sub!() -> I<Bool>
-
-Return the
-
-=cut
-
 =head2 substr
 
 String.substr() -> I<Bool>
@@ -651,6 +619,22 @@ Return the
 =head2 toUpperCase
 
 String.toUpperCase() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 tr
+
+String.tr() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 translit
+
+String.translit() -> I<Bool>
 
 Return the
 

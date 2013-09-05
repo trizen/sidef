@@ -36,7 +36,7 @@ Return the ctime(3) value:
 
 Time.gmtime.day() -> I<Number>
 
-Return the day of the month,
+Return the day of the month.
 
 =cut
 

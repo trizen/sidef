@@ -51,6 +51,12 @@ Return the
 
 =cut
 
+=head2 osname
+
+Alias for L<C<osName()>|"osName">.
+
+=cut
+
 =head2 osName
 
 Sys.osName() -> I<String>
@@ -61,12 +67,6 @@ Return the name of the current operating system under which Sidef is running.
                   # 'MSWin32' under Windows
 
 Returns an object of type: C<Sidef::Types::String::String>
-
-=cut
-
-=head2 osname
-
-Alias for L<C<osName()>|"osName">.
 
 =cut
 

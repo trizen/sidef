@@ -1,6 +1,6 @@
 #!/usr/bin/ruby
 
-var file = (File.new(SCRIPT_NAME));
+var file = (File.new(__FILE__));
 
 if (file.open_r(\var fh)) {
     "File successfully accessed!".say;
