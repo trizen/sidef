@@ -403,12 +403,15 @@ package Sidef::Types::String::String {
     *len = \&length;
 
     sub eval {
-        my ($self) = @_;
+        my ($self, $code) = @_;
 
         my $parser = Sidef::Parser->new(script_name => '/eval/');
         my $struct = eval { $parser->parse_script(code => $$self) } // {};
 
-        warn $@ if $@;
+        if ($@ && defined($code)) {
+            $self->_is_code($code) || return;
+            return $code->run;
+        }
 
         return scalar eval { Sidef::Types::Block::Code->new($struct)->run };
     }
