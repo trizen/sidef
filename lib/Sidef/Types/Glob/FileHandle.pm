@@ -73,12 +73,8 @@ package Sidef::Types::Glob::FileHandle {
     sub read {
         my ($self, $var_ref, $length, $offset) = @_;
 
-        ref($var_ref) eq 'Sidef::Variable::Ref' || do {
-            warn "[WARN] FileHandle.read(): first argument must be a variable reference!\n";
-            return;
-        };
-
-        $self->_is_number($length) || return;
+        $self->_is_var_ref($var_ref) || return;
+        $self->_is_number($length)   || return;
 
         my $var   = $var_ref->get_var;
         my $chunk = $var->get_value;
@@ -100,12 +96,8 @@ package Sidef::Types::Glob::FileHandle {
     sub sysread {
         my ($self, $var_ref, $length, $offset) = @_;
 
-        ref($var_ref) eq 'Sidef::Variable::Ref' || do {
-            warn "[WARN] FileHandle.sysread(): first argument must be a variable reference!\n";
-            return;
-        };
-
-        $self->_is_number($length) || return;
+        $self->_is_var_ref($var_ref) || return;
+        $self->_is_number($length)   || return;
 
         my $var   = $var_ref->get_var;
         my $chunk = $var->get_value;

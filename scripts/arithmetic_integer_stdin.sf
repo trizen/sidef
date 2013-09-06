@@ -1,0 +1,8 @@
+#!/usr/bin/perl
+
+qw(a b).map{Sys.scanln("** Integer " + _ + ": ").toInt}
+       .assignTo(\var a, \var b);
+
+for (qw(+ - * / % ** ^ | & << >>) => \var op) {
+    Sys.printf("%s %s %s = %s\n", a, op, b, a->$op(b));
+}

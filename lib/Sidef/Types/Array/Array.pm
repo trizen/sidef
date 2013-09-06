@@ -381,6 +381,21 @@ package Sidef::Types::Array::Array {
         Sidef::Types::Bool::Bool->true;
     }
 
+    sub assign_to {
+        my ($self, @vars) = @_;
+        $self->_is_var_ref($_) || return for @vars;
+
+        for my $i (0 .. $#vars) {
+            if (exists $self->[$i] and ref($self->[$i]) eq 'Sidef::Variable::Variable') {
+                $vars[$i]->get_var->set_value($self->[$i]->get_value);
+            }
+        }
+
+        $self;
+    }
+
+    *assignTo = \&assign_to;
+
     sub first_index {
         my ($self, $code) = @_;
 

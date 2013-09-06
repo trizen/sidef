@@ -91,6 +91,11 @@ package Sidef::Sys::Sys {
         Sidef::Types::Bool::Bool->new(print @rest);
     }
 
+    sub printf {
+        my ($self, @rest) = @_;
+        Sidef::Types::Bool::Bool->new(printf @rest);
+    }
+
     sub printh {
         my ($self, $fh, @rest) = @_;
 
@@ -111,7 +116,13 @@ package Sidef::Sys::Sys {
     }
 
     sub scanln {
-        my ($self) = @_;
+        my ($self, $text) = @_;
+
+        if (defined($text)) {
+            $self->_is_string($text) || return;
+            $text->print;
+        }
+
         Sidef::Types::String::String->new(scalar unpack("A*", scalar <STDIN>));
     }
 

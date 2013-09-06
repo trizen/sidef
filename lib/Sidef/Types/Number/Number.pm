@@ -96,13 +96,13 @@ package Sidef::Types::Number::Number {
         *{__PACKAGE__ . '::' . '>>'} = sub {
             my ($self, $num, $base) = @_;
             $self->_is_number($num) || return;
-            $self->new($$self->copy->brsft($num, defined($base) ? $self->_is_number($base) ? $$base : return : ()));
+            $self->new($$self->copy->brsft($$num, defined($base) ? $self->_is_number($base) ? $$base : return : ()));
         };
 
         *{__PACKAGE__ . '::' . '<<'} = sub {
             my ($self, $num, $base) = @_;
             $self->_is_number($num) || return;
-            $self->new($$self->copy->blsft($num, defined($base) ? $self->_is_number($base) ? $$base : return : ()));
+            $self->new($$self->copy->blsft($$num, defined($base) ? $self->_is_number($base) ? $$base : return : ()));
         };
 
         *{__PACKAGE__ . '::' . '&'} = sub {
@@ -408,6 +408,12 @@ package Sidef::Types::Number::Number {
     }
 
     *len = \&length;
+
+    sub digit {
+        my ($self, $n) = @_;
+        $self->_is_number($n) || return;
+        $self->new($$self->as_int->digit($$n));
+    }
 
     sub to_bin {
         my ($self) = @_;

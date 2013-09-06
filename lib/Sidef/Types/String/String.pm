@@ -412,8 +412,8 @@ package Sidef::Types::String::String {
         my $struct = eval { $parser->parse_script(code => $$self) } // {};
 
         if ($@) {
-            push @warnings, __PACKAGE__->new($@);
             if (defined($code)) {
+                push @warnings, __PACKAGE__->new($@);
                 $self->_is_code($code) || return;
                 my $var = ($code->_get_private_var)[0]->get_var;
                 $var->set_value(Sidef::Types::Array::Array->new(@warnings));
@@ -437,9 +437,8 @@ package Sidef::Types::String::String {
         my $result = eval { $block->run };
 
         if ($@) {
-            push @warnings, __PACKAGE__->new($@);
-
             if (defined($code)) {
+                push @warnings, __PACKAGE__->new($@);
                 $self->_is_code($code) || return;
                 my $var = ($code->_get_private_var)[0]->get_var;
                 $var->set_value(Sidef::Types::Array::Array->new(@warnings));

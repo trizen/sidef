@@ -25,13 +25,15 @@ package Sidef::Math::Math {
     sub atan {
         my ($self, $x, $places) = @_;
         $self->_is_number($x) || return;
-        Sidef::Types::Number::Number->new(Math::BigFloat->new($$x)->batan(defined($places) ? ($self->_is_number($places)) ? ($places->get_value) : return : ()));
+        Sidef::Types::Number::Number->new(Math::BigFloat->new($$x)
+                         ->batan(defined($places) ? ($self->_is_number($places)) ? ($places->get_value) : return : ()));
     }
 
     sub atan2 {
         my ($self, $x, $y, $places) = @_;
         ($self->_is_number($x) && $self->_is_number($y)) || return;
-        Sidef::Types::Number::Number->new(Math::BigFloat->new($$x)->batan2($$y, defined($places) ? ($self->_is_number($places)) ? ($places->get_value) : return : ()));
+        Sidef::Types::Number::Number->new(Math::BigFloat->new($$x)
+                   ->batan2($$y, defined($places) ? ($self->_is_number($places)) ? ($places->get_value) : return : ()));
     }
 
     sub cos {
@@ -50,6 +52,12 @@ package Sidef::Math::Math {
         my ($self, @list) = @_;
         $self->_is_number($_) || return for @list;
         Sidef::Types::Number::Number->new(Math::BigFloat::bgcd(map { $$_ } @list));
+    }
+
+    sub lcm {
+        my ($self, @list) = @_;
+        $self->_is_number($_) || return for @list;
+        Sidef::Types::Number::Number->new(Math::BigFloat::blcm(map { $$_ } @list));
     }
 
     sub inf {

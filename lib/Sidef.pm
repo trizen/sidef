@@ -9,10 +9,11 @@ package Sidef {
 
     {
         my %types = (
-                     bool   => {class => {'Sidef::Types::Bool::Bool'     => 1}},
-                     code   => {class => {'Sidef::Types::Block::Code'    => 1}},
-                     hash   => {class => {'Sidef::Types::Hash::Hash'     => 1}},
-                     number => {class => {'Sidef::Types::Number::Number' => 1}, type => 'SCALAR'},
+                     bool    => {class => {'Sidef::Types::Bool::Bool'     => 1}},
+                     code    => {class => {'Sidef::Types::Block::Code'    => 1}},
+                     hash    => {class => {'Sidef::Types::Hash::Hash'     => 1}},
+                     number  => {class => {'Sidef::Types::Number::Number' => 1}, type => 'SCALAR'},
+                     var_ref => {class => {'Sidef::Variable::Ref'         => 1}},
                      string => {
                                 class => {
                                           'Sidef::Types::String::String' => 1,
