@@ -192,5 +192,5 @@ sub execute_struct {
 
     require Sidef::Exec;
     my $exec = Sidef::Exec->new();
-    $exec->execute(struct => $struct);
+    $exec->execute($struct);
 }

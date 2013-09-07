@@ -30,7 +30,7 @@ package Sidef::Types::Block::Code {
             my ($self, $code) = @_;
 
             if (ref($code) eq 'HASH') {
-                return Sidef::Types::Hash::Hash->new($exec->execute(struct => $code));
+                return Sidef::Types::Hash::Hash->new($exec->execute($code));
             }
 
             warn "[WARN] Missing argument for hash operator ':'!\n";
@@ -59,7 +59,7 @@ package Sidef::Types::Block::Code {
 
     sub to_hash {
         my ($self) = @_;
-        my @results = $exec->execute(struct => $self);
+        my @results = $exec->execute($self);
         shift @results;    # ignore the block private variable (_)
         Sidef::Types::Hash::Hash->new(@results);
     }
@@ -68,7 +68,7 @@ package Sidef::Types::Block::Code {
 
     sub to_array {
         my ($self) = @_;
-        my @results = $exec->execute(struct => $self);
+        my @results = $exec->execute($self);
         shift @results;    # ignore the block private variable (_)
         Sidef::Types::Array::Array->new(@results);
     }
@@ -87,18 +87,18 @@ package Sidef::Types::Block::Code {
         my ($self) = @_;
 
         my ($class) = keys %{$self};
-        $exec->execute_expr(expr => $self->{$class}[0], class => $class), $class;
+        $exec->execute_expr($self->{$class}[0], $class), $class;
     }
 
     sub run {
         my ($self) = @_;
-        my @results = $exec->execute(struct => $self);
+        my @results = $exec->execute($self);
         return $results[-1];
     }
 
     sub exec {
         my ($self) = @_;
-        $exec->execute(struct => $self);
+        $exec->execute($self);
         $self;
     }
 
@@ -159,7 +159,7 @@ package Sidef::Types::Block::Code {
             #      " Expected ${\($i/2)}, but got ${\(scalar(@vars)/2)} of them.\n";
             #}
 
-            push @results, $exec->execute(struct => {$class => \@express});
+            push @results, $exec->execute({$class => \@express});
         }
 
         return $results[-1];
@@ -205,17 +205,17 @@ package Sidef::Types::Block::Code {
                             warn "[WARN] The 'for' loop needs exactly three arguments! We got $argn of them.\n";
                         }
 
-                        $exec->execute_expr(expr => $arg->{$class}[0], class => $class);
+                        $exec->execute_expr($arg->{$class}[0], $class);
                     }
 
                     my $expr = $arg->{$class}[2];
-                    my ($bool) = $exec->execute_expr(expr => $arg->{$class}[1], class => $class);
+                    my ($bool) = $exec->execute_expr($arg->{$class}[1], $class);
 
                     if ($bool) {
                         if (defined(my $res = $self->_run_code)) {
                             return $res;
                         }
-                        $exec->execute_expr(expr => $expr, class => $class);
+                        $exec->execute_expr($expr, $class);
                         redo;
                     }
 

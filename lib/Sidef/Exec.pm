@@ -55,14 +55,14 @@ package Sidef::Exec {
     }
 
     sub eval_array {
-        my ($self, %opt) = @_;
+        my ($self, $array_ref, $class) = @_;
 
         Sidef::Types::Array::Array->new(
             map {
-                    ref eq 'HASH' ? $self->execute_expr(expr => $_, class => $opt{class})
+                    ref eq 'HASH' ? $self->execute_expr($_, $class)
                   : ref($_) eq 'Sidef::Variable::Variable' ? $_->get_value
                   : $_
-              } @{$opt{array}}
+              } @{$array_ref}
         );
     }
 
@@ -81,172 +81,170 @@ package Sidef::Exec {
     }
 
     sub execute_expr {
-        my ($self, %opt) = @_;
+        my ($self, $expr, $class) = @_;
 
-        my $expr = $opt{'expr'};
+        exists($expr->{self}) || die "Struct error!\n";
 
-        if (exists $expr->{self}) {
+        my $self_obj = $expr->{self};
+        if (ref $self_obj eq 'HASH') {
+            ($self_obj) = $self->execute($self_obj);
+        }
 
-            my $self_obj = $expr->{self};
-            if (ref $self_obj eq 'HASH') {
-                ($self_obj) = $self->execute(struct => $self_obj);
+        if (ref $self_obj eq 'Sidef::Variable::My') {
+            $self_obj = $self->{vars}{$self_obj->_get_name};
+        }
+
+        if (ref $self_obj eq 'Sidef::Types::Array::Array') {
+            $self_obj = $self->eval_array($self_obj, $class);
+        }
+
+        if (exists $expr->{ind}) {
+
+            if (ref($self_obj) eq 'Sidef::Variable::Variable') {
+                $self_obj = $self_obj->get_value;
             }
 
-            if (ref $self_obj eq 'Sidef::Variable::My') {
-                $self_obj = $self->{vars}{$self_obj->_get_name};
-            }
+            for (my $l = 0 ; $l <= $#{$expr->{ind}} ; $l++) {
 
-            if (ref $self_obj eq 'Sidef::Types::Array::Array') {
-                $self_obj = $self->eval_array(array => $self_obj, class => $opt{class});
-            }
+                my $level   = $expr->{ind}[$l];
+                my $is_hash = ref($self_obj) eq 'Sidef::Types::Hash::Hash';
 
-            if (exists $expr->{ind}) {
-
-                if (ref($self_obj) eq 'Sidef::Variable::Variable') {
-                    $self_obj = $self_obj->get_value;
+                if (ref($self_obj) eq 'Sidef::Types::String::String') {
+                    $self_obj = $self_obj->to_chars;
                 }
 
-                for (my $l = 0 ; $l <= $#{$expr->{ind}} ; $l++) {
+              MULTI_INDEX: if ($#{$level} > 0) {
+                    my @indices;
 
-                    my $level   = $expr->{ind}[$l];
-                    my $is_hash = ref($self_obj) eq 'Sidef::Types::Hash::Hash';
-
-                    if (ref($self_obj) eq 'Sidef::Types::String::String') {
-                        $self_obj = $self_obj->to_chars;
-                    }
-
-                  MULTI_INDEX: if ($#{$level} > 0) {
-                        my @indices;
-
-                        foreach my $ind (@{$level}) {
-                            if (ref $ind eq 'HASH') {
-                                $ind = $self->execute_expr(expr => $ind, class => $opt{class});
-                            }
-
-                            !$is_hash && ($self->valid_index($ind) || next);
-
-                            $is_hash ? do { $self_obj->{$ind} //= Sidef::Variable::Variable->new(rand, 'var') } : do {
-
-                                foreach my $ind (0 .. $ind->get_value) {
-                                    $self_obj->[$ind] //=
-                                      Sidef::Variable::Variable->new(rand, 'var', Sidef::Types::Nil::Nil->new);
-                                }
-
-                            };
-
-                            push @indices, $ind;
-                        }
-
-                        my $array = Sidef::Types::Array::Array->new();
-                        push @{$array},
-                          $is_hash ? (@{$self_obj}{@indices}) : (@{$self_obj}[map { $_->get_value } @indices]);
-                        $self_obj = $array;
-
-                        #$self_obj = Sidef::Types::Array::Array->new(map {$_->get_value} @{$self_obj}[@indices]);
-
-                    }
-                    else {
-                        my $ind = $self->execute_expr(expr => $level->[0], class => $opt{class});
-
-                        if (ref($ind) eq 'Sidef::Types::Array::Array') {
-                            $level = [map { $_->get_value } @{$ind}];
-                            goto MULTI_INDEX;
+                    foreach my $ind (@{$level}) {
+                        if (ref $ind eq 'HASH') {
+                            $ind = $self->execute_expr($ind, $class);
                         }
 
                         !$is_hash && ($self->valid_index($ind) || next);
 
-                        $self_obj = (
-                            $is_hash
-                            ? do {
-                                (defined($self_obj) && (ref($self_obj) eq 'HASH' || $self_obj->isa('HASH')))
-                                  || ($self_obj = Sidef::Types::Hash::Hash->new());
+                        $is_hash ? do { $self_obj->{$ind} //= Sidef::Variable::Variable->new(rand, 'var') } : do {
 
-                                $self_obj->{$ind} //=
-                                  Sidef::Variable::Variable->new(
-                                                                 rand, 'var',
-                                                                 (
-                                                                  $l < $#{$expr->{ind}}
-                                                                  ? Sidef::Types::Hash::Hash->new
-                                                                  : ()
-                                                                 )
-                                                                );
-                              }
-                            : do {
-                                (defined($self_obj) && (ref($self_obj) eq 'ARRAY' || $self_obj->isa('ARRAY')))
-                                  || ($self_obj = Sidef::Types::Array::Array->new());
+                            foreach my $ind (0 .. $ind->get_value) {
+                                $self_obj->[$ind] //=
+                                  Sidef::Variable::Variable->new(rand, 'var', Sidef::Types::Nil::Nil->new);
+                            }
 
-                                my $num = $ind->get_value;
+                        };
 
-                                foreach my $ind (0 .. $num - 1) {
-                                    $self_obj->[$ind] //=
-                                      Sidef::Variable::Variable->new(rand, 'var', Sidef::Types::Nil::Nil->new);
-                                }
-
-                                $self_obj->[$num] //=
-                                  Sidef::Variable::Variable->new(
-                                                                 rand, 'var',
-                                                                 (
-                                                                  $l < $#{$expr->{ind}}
-                                                                  ? Sidef::Types::Array::Array->new
-                                                                  : ()
-                                                                 )
-                                                                );
-                              }
-                        );
+                        push @indices, $ind;
                     }
 
-                    if (
-                        ref($self_obj) eq 'Sidef::Variable::Variable'
-                        and ($l < $#{$expr->{ind}}
-                             or ref($expr->{self}) eq 'HASH')
-                      ) {
-                        $self_obj = $self_obj->get_value;
+                    my $array = Sidef::Types::Array::Array->new();
+                    push @{$array},
+                      $is_hash ? (@{$self_obj}{@indices}) : (@{$self_obj}[map { $_->get_value } @indices]);
+                    $self_obj = $array;
+
+                    #$self_obj = Sidef::Types::Array::Array->new(map {$_->get_value} @{$self_obj}[@indices]);
+
+                }
+                else {
+                    my $ind = $self->execute_expr($level->[0], $class);
+
+                    if (ref($ind) eq 'Sidef::Types::Array::Array') {
+                        $level = [map { $_->get_value } @{$ind}];
+                        goto MULTI_INDEX;
                     }
+
+                    !$is_hash && ($self->valid_index($ind) || next);
+
+                    $self_obj = (
+                        $is_hash
+                        ? do {
+                            (defined($self_obj) && (ref($self_obj) eq 'HASH' || $self_obj->isa('HASH')))
+                              || ($self_obj = Sidef::Types::Hash::Hash->new());
+
+                            $self_obj->{$ind} //=
+                              Sidef::Variable::Variable->new(
+                                                             rand, 'var',
+                                                             (
+                                                              $l < $#{$expr->{ind}}
+                                                              ? Sidef::Types::Hash::Hash->new
+                                                              : ()
+                                                             )
+                                                            );
+                          }
+                        : do {
+                            (defined($self_obj) && (ref($self_obj) eq 'ARRAY' || $self_obj->isa('ARRAY')))
+                              || ($self_obj = Sidef::Types::Array::Array->new());
+
+                            my $num = $ind->get_value;
+
+                            foreach my $ind (0 .. $num - 1) {
+                                $self_obj->[$ind] //=
+                                  Sidef::Variable::Variable->new(rand, 'var', Sidef::Types::Nil::Nil->new);
+                            }
+
+                            $self_obj->[$num] //=
+                              Sidef::Variable::Variable->new(
+                                                             rand, 'var',
+                                                             (
+                                                              $l < $#{$expr->{ind}}
+                                                              ? Sidef::Types::Array::Array->new
+                                                              : ()
+                                                             )
+                                                            );
+                          }
+                    );
+                }
+
+                if (
+                    ref($self_obj) eq 'Sidef::Variable::Variable'
+                    and ($l < $#{$expr->{ind}}
+                         or ref($expr->{self}) eq 'HASH')
+                  ) {
+                    $self_obj = $self_obj->get_value;
                 }
             }
+        }
 
-            if (exists $expr->{call}) {
+        if (exists $expr->{call}) {
 
-                foreach my $call (@{$expr->{call}}) {
+            foreach my $call (@{$expr->{call}}) {
 
-                    my @arguments;
-                    my $method = $call->{name};
+                my @arguments;
+                my $method = $call->{name};
 
-                    if (ref $method eq 'HASH') {
-                        $method = $self->execute_expr(expr => $method);
+                if (ref $method eq 'HASH') {
+                    $method = $self->execute_expr($method, $class);
+                }
+
+                $method //= '';
+                if ((my $ref = ref($method))) {
+                    if ($ref eq 'Sidef::Types::String::String') {
+                        $method = $$method;
                     }
-
-                    $method //= '';
-                    if ((my $ref = ref($method))) {
-                        if ($ref eq 'Sidef::Types::String::String') {
-                            $method = $$method;
-                        }
-                        else {
-                            warn "[WARN] Invalid method of type: '$ref'!\n";
-                            return;
-                        }
+                    else {
+                        warn "[WARN] Invalid method of type: '$ref'!\n";
+                        return;
                     }
+                }
 
-                    # When the variable holds a module, get the
-                    # value of variable and set it to $self_obj;
-                    if (ref $self_obj eq 'Sidef::Variable::Variable') {
+                # When the variable holds a module, get the
+                # value of variable and set it to $self_obj;
+                if (ref $self_obj eq 'Sidef::Variable::Variable') {
 
-                        my $value = $self_obj->get_value;
-                        if (   ref($value) eq 'Sidef::Module::Caller'
-                            or ref($value) eq 'Sidef::Module::Func') {
-                            $self_obj = $value;
-                        }
+                    my $value = $self_obj->get_value;
+                    if (   ref($value) eq 'Sidef::Module::Caller'
+                        or ref($value) eq 'Sidef::Module::Func') {
+                        $self_obj = $value;
                     }
+                }
 
-                    ref($self_obj) && eval { $self_obj->can('can') } || do {
-                        $self_obj = Sidef::Types::Nil::Nil->new();
-                    };
+                ref($self_obj) && eval { $self_obj->can('can') } || do {
+                    $self_obj = Sidef::Types::Nil::Nil->new();
+                };
 
-                    if (not $self_obj->can('AUTOLOAD') and not $self_obj->can($method)) {
-                        warn sprintf("[WARN] Inexistent method '%s' for object %s\n",
-                                     $method, ref($self_obj) || '- undefined!');
-                        return $self_obj;
-                    }
+                if (not $self_obj->can('AUTOLOAD') and not $self_obj->can($method)) {
+                    warn sprintf("[WARN] Inexistent method '%s' for object %s\n",
+                                 $method, ref($self_obj) || '- undefined!');
+                    return $self_obj;
+                }
 
                     #<<<
 
@@ -263,103 +261,97 @@ package Sidef::Exec {
 
                     #>>>
 
-                    if (exists $call->{arg}) {
+                if (exists $call->{arg}) {
 
-                        foreach my $arg (@{$call->{arg}}) {
-                            if (
-                                ref($arg) eq 'HASH'
-                                and not(
-                                       (exists($self->{types}{$type}) && exists($self->{types}{$type}{$method}))
-                                       || (($type eq 'Sidef::Types::Block::Code' || $type eq 'Sidef::Types::Block::For')
-                                           and ($method eq 'for' || $method eq 'foreach')
-                                           and ref $arg->{$opt{class}} eq 'ARRAY'
-                                           and @{$arg->{$opt{class}}} == 3)
-                                       )
-                              ) {
-                                local $self->{var_ref} = ref($self_obj) eq 'Sidef::Variable::Ref';
-                                push @arguments, $self->execute(struct => $arg);
-                            }
-                            else {
-                                push @arguments, $arg;
+                    foreach my $arg (@{$call->{arg}}) {
+                        if (
+                            ref($arg) eq 'HASH'
+                            and not(
+                                    (exists($self->{types}{$type}) && exists($self->{types}{$type}{$method}))
+                                    || (($type eq 'Sidef::Types::Block::Code' || $type eq 'Sidef::Types::Block::For')
+                                        and ($method eq 'for' || $method eq 'foreach')
+                                        and ref $arg->{$class} eq 'ARRAY'
+                                        and @{$arg->{$class}} == 3)
+                                   )
+                          ) {
+                            local $self->{var_ref} = ref($self_obj) eq 'Sidef::Variable::Ref';
+                            push @arguments, $self->execute($arg);
+                        }
+                        else {
+                            push @arguments, $arg;
+                        }
+                    }
+
+                    foreach my $obj (@arguments) {
+                        if (ref $obj eq 'Sidef::Variable::Variable') {
+                            if (ref($self_obj) ne 'Sidef::Variable::Ref') {
+                                $obj = $obj->get_value;
                             }
                         }
-
-                        foreach my $obj (@arguments) {
-                            if (ref $obj eq 'Sidef::Variable::Variable') {
-                                if (ref($self_obj) ne 'Sidef::Variable::Ref') {
-                                    $obj = $obj->get_value;
-                                }
-                            }
-                            elsif (ref $obj eq 'Sidef::Variable::Init') {
-                                $obj = $obj->{vars}[0];
-                            }
+                        elsif (ref $obj eq 'Sidef::Variable::Init') {
+                            $obj = $obj->{vars}[0];
                         }
-
-                        $self_obj = $self_obj->$method(@arguments);
-                    }
-                    else {
-                        $method //= '';
-
-                        if (exists $self->{plain_array_methods}{$method}) {
-                            $self->{plain_array} = 1;
-                        }
-
-                        $self_obj = $self_obj->$method;
                     }
 
-                    if (ref($self_obj) eq 'Sidef::Variable::Variable') {
-                        $self_obj = $self_obj->get_value;
+                    $self_obj = $self_obj->$method(@arguments);
+                }
+                else {
+                    $method //= '';
+
+                    if (exists $self->{plain_array_methods}{$method}) {
+                        $self->{plain_array} = 1;
                     }
 
-                    if (ref($self_obj) eq 'Sidef::Types::Block::Return') {
-                        $self->{expr_i} = $self->{expr_i_max};
-                        return $self_obj;
-                    }
-                    elsif (ref($self_obj) eq 'Sidef::Types::Block::Break') {
-                        last;
-                    }
+                    $self_obj = $self_obj->$method;
+                }
+
+                if (ref($self_obj) eq 'Sidef::Variable::Variable') {
+                    $self_obj = $self_obj->get_value;
+                }
+
+                if (ref($self_obj) eq 'Sidef::Types::Block::Return') {
+                    $self->{expr_i} = $self->{expr_i_max};
+                    return $self_obj;
+                }
+                elsif (ref($self_obj) eq 'Sidef::Types::Block::Break') {
+                    last;
                 }
             }
-            else {
-                if (not $self->{var_ref}) {
-                    if (ref($self_obj) eq 'Sidef::Variable::Variable') {
-                        $self_obj = $self_obj->get_value;
-                    }
-                }
-            }
-
-            if (   ref($self_obj) eq 'Sidef::Types::Block::Break'
-                or ref($self_obj) eq 'Sidef::Types::Block::Next'
-                or ref($self_obj) eq 'Sidef::Types::Block::Return') {
-                $self->{expr_i} = $self->{expr_i_max};
-                return $self_obj;
-            }
-
-            return $self_obj;
         }
         else {
-            die "Struct error!\n";
+            if (not $self->{var_ref}) {
+                if (ref($self_obj) eq 'Sidef::Variable::Variable') {
+                    $self_obj = $self_obj->get_value;
+                }
+            }
         }
+
+        if (   ref($self_obj) eq 'Sidef::Types::Block::Break'
+            or ref($self_obj) eq 'Sidef::Types::Block::Next'
+            or ref($self_obj) eq 'Sidef::Types::Block::Return') {
+            $self->{expr_i} = $self->{expr_i_max};
+            return $self_obj;
+        }
+
+        return $self_obj;
     }
 
     sub execute {
-        my ($self, %opt) = @_;
-
-        my $struct = $opt{'struct'};
+        my ($self, $struct) = @_;
 
         my @results;
-        foreach my $key ((grep { $_ ne 'main' } keys %{$struct}), 'main') {
+        foreach my $class ((grep { $_ ne 'main' } keys %{$struct}), 'main') {
 
             my $i = -1;
-            local $self->{expr_i_max} = $#{$struct->{$key}};
+            local $self->{expr_i_max} = $#{$struct->{$class}};
 
           INIT_VAR: ($i++ != -1)
-              && (local $self->{vars}{$struct->{$key}[$i - 1]{self}->_get_name} =
-                  Sidef::Variable::Variable->new($struct->{$key}[$i - 1]{self}->_get_name, 'var'));
+              && (local $self->{vars}{$struct->{$class}[$i - 1]{self}->_get_name} =
+                  Sidef::Variable::Variable->new($struct->{$class}[$i - 1]{self}->_get_name, 'var'));
 
             for (local $self->{expr_i} = $i ; $self->{expr_i} <= $self->{expr_i_max} ; $self->{expr_i}++) {
 
-                my $expr = $struct->{$key}[$self->{expr_i}];
+                my $expr = $struct->{$class}[$self->{expr_i}];
 
                 if (ref($expr->{self}) eq 'Sidef::Variable::InitMy') {
                     goto INIT_VAR;
@@ -367,7 +359,7 @@ package Sidef::Exec {
 
                 ++$i;
 
-                my $obj = $self->execute_expr(%opt, class => $key, expr => $expr);
+                my $obj = $self->execute_expr($expr, $class);
 
                 $self->{plain_array} && do {
                     $self->{plain_array} = 0;
