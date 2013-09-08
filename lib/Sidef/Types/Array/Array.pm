@@ -36,10 +36,10 @@ package Sidef::Types::Array::Array {
 
     sub _grep {
         my ($self, $array, $bool) = @_;
-        my $new_array = $self->new();
 
         $self->_is_array($array) || return;
 
+        my $new_array = $self->new();
         foreach my $item (@{$self}) {
 
             my $exists = 0;
@@ -55,74 +55,29 @@ package Sidef::Types::Array::Array {
         $new_array;
     }
 
-    {
-        no strict 'refs';
+    sub multiply {
+        my ($self, $num) = @_;
+        $self->_is_number($num) || return;
+        $self->new((map { $_->get_value } @{$self}) x $$num);
+    }
 
-        *{__PACKAGE__ . '::' . '&'} = sub {
-            my ($self, $array) = @_;
-            $self->_grep($array, 0);
-        };
+    sub or {
+        my ($self, $array) = @_;
+        my $new_array = $self->new;
+        $self->_is_array($array) || return;
+        $self->xor($array)->concat($self->and($array));
+    }
 
-        *{__PACKAGE__ . '::' . '...'} = \&to_list;
+    sub xor {
+        my ($self, $array) = @_;
+        my $new_array = $self->new;
+        $self->_is_array($array) || return;
+        ($self->concat($array))->subtract($self->and($array));
+    }
 
-        *{__PACKAGE__ . '::' . '*'} = sub {
-            my ($self, $num) = @_;
-            $self->_is_number($num) || return;
-            $self->new((map { $_->get_value } @{$self}) x $$num);
-        };
-
-        *{__PACKAGE__ . '::' . '<<'} = \&dropLeft;
-        *{__PACKAGE__ . '::' . '>>'} = \&dropRight;
-
-        *{__PACKAGE__ . '::' . '|'} = sub {
-            my ($self, $array) = @_;
-            my $new_array = $self->new;
-
-            $self->_is_array($array) || return;
-
-            my $add = '+';
-            my $xor = '^';
-            my $and = '&';
-            $self->$xor($array)->$add($self->$and($array));
-        };
-
-        *{__PACKAGE__ . '::' . '^'} = \&xor;
-
-        *{__PACKAGE__ . '::' . '+'} = \&add;
-        *{__PACKAGE__ . '::' . '-'} = \&subtract;
-
-        *{__PACKAGE__ . '::' . '++'} = sub {
-            my ($self, $obj) = @_;
-            $self->push($obj);
-            $self;
-        };
-
-        *{__PACKAGE__ . '::' . '--'} = sub {
-            my ($self) = @_;
-            $self->pop;
-            $self;
-        };
-
-        *{__PACKAGE__ . '::' . '&&'} = \&mesh;
-        *{__PACKAGE__ . '::' . '=='} = \&equals;
-
-        *{__PACKAGE__ . '::' . '='} = sub {
-            my ($self, $arg) = @_;
-
-            if ($self->_is_array($arg, 1, 1)) {
-                my @values = map { $_->get_value } @{$arg};
-
-                foreach my $i (0 .. $#{$self}) {
-                    $self->[$i]->set_value(exists $values[$i] ? $values[$i] : Sidef::Types::Nil::Nil->new);
-                }
-            }
-            else {
-                map { $_->set_value($arg) } @{$self};
-            }
-
-            $self;
-        };
-
+    sub and {
+        my ($self, $array) = @_;
+        $self->_grep($array, 0);
     }
 
     sub subtract {
@@ -130,7 +85,7 @@ package Sidef::Types::Array::Array {
         $self->_grep($array, 1);
     }
 
-    sub add {
+    sub concat {
         my ($self, $array) = @_;
         $self->_is_array($array) || return;
         $self->new(map { $_->get_value } @{$self}, @{$array});
@@ -144,18 +99,6 @@ package Sidef::Types::Array::Array {
     *toList  = \&to_list;
     *asList  = \&to_list;
     *as_list = \&to_list;
-
-    sub xor {
-        my ($self, $array) = @_;
-        my $new_array = $self->new;
-
-        $self->_is_array($array) || return;
-
-        my $add    = '+';
-        my $and    = '&';
-        my $substr = '-';
-        ($self->$add($array))->$substr($self->$and($array));
-    }
 
     sub equals {
         my ($self, $array) = @_;
@@ -261,9 +204,11 @@ package Sidef::Types::Array::Array {
 
     *combine = \&sum;
 
-    sub multiply {
+    sub prod {
         $_[0]->reduce(Sidef::Types::String::String->new('*'));
     }
+
+    *product = \&prod;
 
     sub last {
         my ($self) = @_;
@@ -853,6 +798,51 @@ package Sidef::Types::Array::Array {
 
         $$string .= "]";
         $string;
+    }
+
+    {
+        no strict 'refs';
+
+        *{__PACKAGE__ . '::' . '&'}   = \&and;
+        *{__PACKAGE__ . '::' . '...'} = \&to_list;
+        *{__PACKAGE__ . '::' . '*'}   = \&multiply;
+        *{__PACKAGE__ . '::' . '<<'}  = \&dropLeft;
+        *{__PACKAGE__ . '::' . '>>'}  = \&dropRight;
+        *{__PACKAGE__ . '::' . '|'}   = \&or;
+        *{__PACKAGE__ . '::' . '^'}   = \&xor;
+        *{__PACKAGE__ . '::' . '+'}   = \&concat;
+        *{__PACKAGE__ . '::' . '-'}   = \&subtract;
+        *{__PACKAGE__ . '::' . '&&'}  = \&mesh;
+        *{__PACKAGE__ . '::' . '=='}  = \&equals;
+
+        *{__PACKAGE__ . '::' . '++'} = sub {
+            my ($self, $obj) = @_;
+            $self->push($obj);
+            $self;
+        };
+
+        *{__PACKAGE__ . '::' . '--'} = sub {
+            my ($self) = @_;
+            $self->pop;
+            $self;
+        };
+
+        *{__PACKAGE__ . '::' . '='} = sub {
+            my ($self, $arg) = @_;
+
+            if ($self->_is_array($arg, 1, 1)) {
+                my @values = map { $_->get_value } @{$arg};
+
+                foreach my $i (0 .. $#{$self}) {
+                    $self->[$i]->set_value(exists $values[$i] ? $values[$i] : Sidef::Types::Nil::Nil->new);
+                }
+            }
+            else {
+                map { $_->set_value($arg) } @{$self};
+            }
+
+            $self;
+        };
     }
 
 };

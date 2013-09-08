@@ -1,9 +1,12 @@
 #!/usr/bin/perl
 
+use utf8;
 use 5.010;
 use strict;
 use autodie;
 use warnings;
+
+use open IO => ':encoding(UTF-8)';
 
 use File::Find qw(find);
 use List::Util qw(first);

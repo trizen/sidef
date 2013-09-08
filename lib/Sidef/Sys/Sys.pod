@@ -82,6 +82,14 @@ Returns an object of type: C<Sidef::Types::Bool::Bool>
 
 =cut
 
+=head2 printf
+
+Sys.printf() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 printh
 
 Sys.printh(I<handle>, I<obj1>, I<obj2>, I<...>) -> I<Bool>

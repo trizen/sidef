@@ -97,6 +97,8 @@ package Sidef::Types::String::String {
         $self->new($$self x $$num);
     }
 
+    *multiply = \&times;
+
     sub repeat {
         my ($self, $num) = @_;
         $num //= Sidef::Types::Number::Number->new(1);
@@ -124,6 +126,8 @@ package Sidef::Types::String::String {
         $self->_is_string($string) || return;
         $self->new($$self . $$string);
     }
+
+    *concat = \&append;
 
     sub ucfirst {
         my ($self) = @_;

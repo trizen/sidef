@@ -152,6 +152,14 @@ Return the
 
 =cut
 
+=head2 =
+
+I<Num> B<=> I<Num> -> I<Num>
+
+Return the
+
+=cut
+
 =head2 ==
 
 I<Num> B<==> I<Num> -> I<Num>
@@ -200,9 +208,33 @@ Return the
 
 =cut
 
+=head2 add
+
+Number.add() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 and
+
+Number.and() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 as_int
 
 Number.as_int() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 bin
+
+Number.bin() -> I<Bool>
 
 Return the
 
@@ -224,6 +256,14 @@ Return the
 
 =cut
 
+=head2 cmp
+
+Number.cmp() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 commify
 
 Number.commify() -> I<Bool>
@@ -240,9 +280,25 @@ Return the
 
 =cut
 
-=head2 downto
+=head2 dec
 
-Number.downto() -> I<Bool>
+Number.dec() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 digit
+
+Number.digit() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 div
+
+Number.div() -> I<Bool>
 
 Return the
 
@@ -256,9 +312,25 @@ Return the
 
 =cut
 
+=head2 downto
+
+Number.downto() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 dump
 
 Number.dump() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 eq
+
+Number.eq() -> I<Bool>
 
 Return the
 
@@ -312,9 +384,33 @@ Return the
 
 =cut
 
+=head2 ge
+
+Number.ge() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 gt
+
+Number.gt() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 hex
 
 Number.hex() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 inc
+
+Number.inc() -> I<Bool>
 
 Return the
 
@@ -376,17 +472,17 @@ Return the
 
 =cut
 
-=head2 is_NaN
+=head2 is_nan
 
-Number.is_NaN() -> I<Bool>
+Number.is_nan() -> I<Bool>
 
 Return the
 
 =cut
 
-=head2 is_nan
+=head2 is_NaN
 
-Number.is_nan() -> I<Bool>
+Number.is_NaN() -> I<Bool>
 
 Return the
 
@@ -520,6 +616,14 @@ Return the
 
 =cut
 
+=head2 le
+
+Number.le() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 len
 
 Number.len() -> I<Bool>
@@ -560,6 +664,30 @@ Return the
 
 =cut
 
+=head2 lt
+
+Number.lt() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 mod
+
+Number.mod() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 multiply
+
+Number.multiply() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 nan
 
 Number.nan() -> I<Bool>
@@ -571,6 +699,14 @@ Return the
 =head2 NaN
 
 Number.NaN() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 ne
+
+Number.ne() -> I<Bool>
 
 Return the
 
@@ -648,9 +784,33 @@ Return the
 
 =cut
 
+=head2 nok
+
+Number.nok() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 not
 
 Number.not() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 or
+
+Number.or() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 pow
+
+Number.pow() -> I<Bool>
 
 Return the
 
@@ -720,6 +880,22 @@ Return the
 
 =cut
 
+=head2 sstr
+
+Number.sstr() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 subtract
+
+Number.subtract() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 to
 
 Number.to() -> I<Bool>
@@ -752,9 +928,49 @@ Return the
 
 =cut
 
+=head2 xor
+
+Number.xor() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 |
 
 I<Num> B<|> I<Num> -> I<Num>
+
+Return the
+
+=cut
+
+=head2 ÷
+
+I<Num> B<÷> I<Num> -> I<Num>
+
+Return the
+
+=cut
+
+=head2 ≠
+
+I<Num> B<≠> I<Num> -> I<Num>
+
+Return the
+
+=cut
+
+=head2 ≤
+
+I<Num> B<≤> I<Num> -> I<Num>
+
+Return the
+
+=cut
+
+=head2 ≥
+
+I<Num> B<≥> I<Num> -> I<Num>
 
 Return the
 

@@ -70,6 +70,14 @@ Return the
 
 =cut
 
+=head2 lcm
+
+Math.lcm() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 new
 
 Math.new() -> I<Bool>

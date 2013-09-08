@@ -238,14 +238,6 @@ Returns a new object of the same type as the self object.
 
 =cut
 
-=head2 add
-
-Array.add() -> I<Bool>
-
-Return the
-
-=cut
-
 =head2 all
 
 Array.all(I<Block>) -> I<Bool>
@@ -257,6 +249,14 @@ Returns true if all the array's elements passes the block test.
     [101, 102, 103].all { _ > 102 };        # false
 
 Returns an object of type: C<Sidef::Types::Bool::Bool>
+
+=cut
+
+=head2 and
+
+Array.and() -> I<Bool>
+
+Return the
 
 =cut
 
@@ -284,6 +284,22 @@ Return the
 
 =cut
 
+=head2 assign_to
+
+Array.assign_to() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 assignTo
+
+Array.assignTo() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 combine
 
 Array.combine() -> I<Obj>
@@ -294,6 +310,14 @@ Combine all the elements from the array togheter. The array's elements must have
     [1,2,3,4,5,6].combine;       # returns the sum of the numbers (21)
 
 Returns an object of the same type as the elements of the array.
+
+=cut
+
+=head2 concat
+
+Array.concat() -> I<Bool>
+
+Return the
 
 =cut
 
@@ -701,6 +725,14 @@ Returns an object of type: C<Sidef::Types::Number::Number>
 
 =cut
 
+=head2 or
+
+Array.or() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 permute
 
 Array.permute() -> I<Bool>
@@ -738,6 +770,22 @@ Removes the last element of the array.
 =back
 
 B<WARNING!> This method modifies the array in place.
+
+=cut
+
+=head2 prod
+
+Array.prod() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 product
+
+Array.product() -> I<Bool>
+
+Return the
 
 =cut
 

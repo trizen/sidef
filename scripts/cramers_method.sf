@@ -30,7 +30,7 @@ func diag_multiply_sum (matrix, left) {
             nums.push(matrix[_][x]); x++;
         }
 
-        products.push(nums.multiply);       # appending the product of 'nums' inside the 'products' array
+        products.push(nums.prod);       # appending the product of 'nums' inside the 'products' array
     }
 
     "sum %s\n".printf(products.dump);
