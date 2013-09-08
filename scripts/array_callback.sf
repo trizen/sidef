@@ -16,7 +16,7 @@ for (a.range => \var i) {
 }
 
 # using the array's items
-foreach (a => \var item) {
+foreach ((a) => \var item) {
     "mycallback(%d) = %d\n".printf(item, mycallback(item));
 }
 

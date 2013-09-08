@@ -246,20 +246,20 @@ package Sidef::Exec {
                     return $self_obj;
                 }
 
-                    #<<<
+                #<<<
 
-                    my $type =
-                      (
-                        (ref($self_obj) eq 'Sidef::Variable::Variable')
-                          && (
-                              ref($self_obj->get_value) eq 'Sidef::Types::Bool::Bool'
-                              ? (not exists $self->{bool_assign_method}{$method})
-                              : ($method ne ':=')
-                             )
-                      ) ? ref($self_obj->get_value)
-                      : ref($self_obj);
+                my $type =
+                    (
+                     (ref($self_obj) eq 'Sidef::Variable::Variable')
+                        && (
+                            ref($self_obj->get_value) eq 'Sidef::Types::Bool::Bool'
+                            ? (not exists $self->{bool_assign_method}{$method})
+                            : ($method ne ':=')
+                            )
+                     ) ? ref($self_obj->get_value)
+                    : ref($self_obj);
 
-                    #>>>
+                #>>>
 
                 if (exists $call->{arg}) {
 

@@ -909,7 +909,13 @@ package Sidef::Parser {
                 # Variable call
                 if (/\G($self->{re}{var_name})/goc) {
 
-                    my ($name, $class) = $self->get_name_and_class($1);
+                    my $var_name = $1;
+
+                    if (/\G(?=\h*=>)/) {
+                        return Sidef::Types::String::String->new($var_name), pos;
+                    }
+
+                    my ($name, $class) = $self->get_name_and_class($var_name);
                     my ($var, $code) = $self->find_var($name, $class);
 
                     if (ref $var) {
@@ -917,7 +923,7 @@ package Sidef::Parser {
                         return $var->{obj}, pos;
                     }
                     elsif (not $self->{strict_var} and /\G(?=\h*(?:\R\h*)?:?=(?![=~>]))/) {
-                        unshift @{$self->{vars}{$self->{class}}},
+                        unshift @{$self->{vars}{$class}},
                           {
                             obj   => Sidef::Variable::My->new($name),
                             name  => $name,
