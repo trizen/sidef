@@ -1,5 +1,6 @@
 package Sidef::Types::Number::Number {
 
+    use utf8;
     use 5.014;
     use strict;
     use warnings;
@@ -32,130 +33,110 @@ package Sidef::Types::Number::Number {
 
     sub get_value { ${$_[0]}->numify }
 
-    {
-        no strict 'refs';
+    sub mod {
+        my ($self, $num) = @_;
+        $self->_is_number($num) || return;
+        $self->new($$self % $$num);
+    }
 
-        *{__PACKAGE__ . '::' . '/'} = sub {
-            my ($self, $num) = @_;
-            $self->_is_number($num) || return;
-            $self->new($$self / $$num);
-        };
+    sub pow {
+        my ($self, $num) = @_;
+        $self->_is_number($num) || return;
+        $self->new($$self**$$num);
+    }
 
-        *{__PACKAGE__ . '::' . '*'} = sub {
-            my ($self, $num) = @_;
-            $self->_is_number($num) || return;
-            $self->new($$self * $$num);
-        };
+    sub inc {
+        my ($self) = @_;
+        $self->new($$self->copy->binc);
+    }
 
-        *{__PACKAGE__ . '::' . '+'} = sub {
-            my ($self, $num) = @_;
-            $self->_is_number($num) || return;
-            $self->new($$self + $$num);
-        };
+    sub dec {
+        my ($self) = @_;
+        $self->new($$self->copy->bdec);
+    }
 
-        *{__PACKAGE__ . '::' . '-'} = sub {
-            my ($self, $num) = @_;
-            $self->_is_number($num) || return;
-            $self->new($$self - $$num);
-        };
+    sub lt {
+        my ($self, $num) = @_;
+        $self->_is_number($num) || return;
+        Sidef::Types::Bool::Bool->new($$self < $$num);
+    }
 
-        *{__PACKAGE__ . '::' . '%'} = sub {
-            my ($self, $num) = @_;
-            $self->_is_number($num) || return;
-            $self->new($$self % $$num);
-        };
+    sub gt {
+        my ($self, $num) = @_;
+        $self->_is_number($num) || return;
+        Sidef::Types::Bool::Bool->new($$self > $$num);
+    }
 
-        *{__PACKAGE__ . '::' . '**'} = sub {
-            my ($self, $num) = @_;
-            $self->_is_number($num) || return;
-            $self->new($$self**$$num);
-        };
+    sub and {
+        my ($self, $num) = @_;
+        $self->_is_number($num) || return;
+        $self->new($$self->as_int->band($$num->as_int));
+    }
 
-        *{__PACKAGE__ . '::' . '++'} = sub {
-            my ($self) = @_;
-            $self->new($$self->copy->binc);
-        };
+    sub or {
+        my ($self, $num) = @_;
+        $self->_is_number($num) || return;
+        $self->new($$self->as_int->bior($$num->as_int));
+    }
 
-        *{__PACKAGE__ . '::' . '--'} = sub {
-            my ($self) = @_;
-            $self->new($$self->copy->bdec);
-        };
+    sub xor {
+        my ($self, $num) = @_;
+        $self->_is_number($num) || return;
+        $self->new($$self->as_int->bxor($$num->as_int));
+    }
 
-        *{__PACKAGE__ . '::' . '<'} = sub {
-            my ($self, $num) = @_;
-            $self->_is_number($num) || return;
-            Sidef::Types::Bool::Bool->new($$self < $$num);
-        };
+    sub eq {
+        my ($self, $num) = @_;
+        ref($self) ne ref($num) and return Sidef::Types::Bool::Bool->false;
+        Sidef::Types::Bool::Bool->new($$self == $$num);
+    }
 
-        *{__PACKAGE__ . '::' . '>'} = sub {
-            my ($self, $num) = @_;
-            $self->_is_number($num) || return;
-            Sidef::Types::Bool::Bool->new($$self > $$num);
-        };
+    sub ne {
+        my ($self, $num) = @_;
+        ref($self) ne ref($num) and return Sidef::Types::Bool::Bool->true;
+        Sidef::Types::Bool::Bool->new($$self != $$num);
+    }
 
-        *{__PACKAGE__ . '::' . '>>'} = sub {
-            my ($self, $num, $base) = @_;
-            $self->_is_number($num) || return;
-            $self->new($$self->copy->brsft($$num, defined($base) ? $self->_is_number($base) ? $$base : return : ()));
-        };
+    sub cmp {
+        my ($self, $num) = @_;
+        $self->_is_number($num) || return;
+        Sidef::Types::Number::Number->new($$self->bcmp($$num));
+    }
 
-        *{__PACKAGE__ . '::' . '<<'} = sub {
-            my ($self, $num, $base) = @_;
-            $self->_is_number($num) || return;
-            $self->new($$self->copy->blsft($$num, defined($base) ? $self->_is_number($base) ? $$base : return : ()));
-        };
+    sub ge {
+        my ($self, $num) = @_;
+        $self->_is_number($num) || return;
+        Sidef::Types::Bool::Bool->new($$self >= $$num);
+    }
 
-        *{__PACKAGE__ . '::' . '&'} = sub {
-            my ($self, $num) = @_;
-            $self->_is_number($num) || return;
-            $self->new($$self->as_int->band($$num->as_int));
-        };
+    sub le {
+        my ($self, $num) = @_;
+        $self->_is_number($num) || return;
+        Sidef::Types::Bool::Bool->new($$self <= $$num);
+    }
 
-        *{__PACKAGE__ . '::' . '|'} = sub {
-            my ($self, $num) = @_;
-            $self->_is_number($num) || return;
-            $self->new($$self->as_int->bior($$num->as_int));
-        };
+    sub subtract {
+        my ($self, $num) = @_;
+        $self->_is_number($num) || return;
+        $self->new($$self - $$num);
+    }
 
-        *{__PACKAGE__ . '::' . '^'} = sub {
-            my ($self, $num) = @_;
-            $self->_is_number($num) || return;
-            $self->new($$self->as_int->bxor($$num->as_int));
-        };
+    sub add {
+        my ($self, $num) = @_;
+        $self->_is_number($num) || return;
+        $self->new($$self + $$num);
+    }
 
-        *{__PACKAGE__ . '::' . '<=>'} = sub {
-            my ($self, $num) = @_;
-            $self->_is_number($num) || return;
-            Sidef::Types::Number::Number->new($$self->bcmp($$num));
-        };
+    sub multiply {
+        my ($self, $num) = @_;
+        $self->_is_number($num) || return;
+        $self->new($$self * $$num);
+    }
 
-        *{__PACKAGE__ . '::' . '<='} = sub {
-            my ($self, $num) = @_;
-            $self->_is_number($num) || return;
-            Sidef::Types::Bool::Bool->new($$self <= $$num);
-        };
-
-        *{__PACKAGE__ . '::' . '>='} = sub {
-            my ($self, $num) = @_;
-            $self->_is_number($num) || return;
-            Sidef::Types::Bool::Bool->new($$self >= $$num);
-        };
-
-        *{__PACKAGE__ . '::' . '=='} = sub {
-            my ($self, $num) = @_;
-            ref($self) ne ref($num) and return Sidef::Types::Bool::Bool->false;
-            Sidef::Types::Bool::Bool->new($$self == $$num);
-        };
-
-        *{__PACKAGE__ . '::' . '!='} = sub {
-            my ($self, $num) = @_;
-            ref($self) ne ref($num) and return Sidef::Types::Bool::Bool->true;
-            Sidef::Types::Bool::Bool->new($$self != $$num);
-        };
-
-        *{__PACKAGE__ . '::' . '..'} = \&to;
-
-        *{__PACKAGE__ . '::' . '!'} = \&factorial;
+    sub div {
+        my ($self, $num) = @_;
+        $self->_is_number($num) || return;
+        $self->new($$self / $$num);
     }
 
     sub factorial {
@@ -218,7 +199,12 @@ package Sidef::Types::Number::Number {
 
     sub hex {
         my ($self) = @_;
-        $self->new(CORE::hex $$self);
+        $self->new(Math::BigInt->new("0x$$self"));
+    }
+
+    sub bin {
+        my ($self) = @_;
+        $self->new(Math::BigInt->new("0b$$self"));
     }
 
     sub exp {
@@ -460,5 +446,47 @@ package Sidef::Types::Number::Number {
     sub dump {
         my ($self) = @_;
         Sidef::Types::String::String->new($$self);
+    }
+
+    {
+        no strict 'refs';
+
+        *{__PACKAGE__ . '::' . '/'}   = \&div;
+        *{__PACKAGE__ . '::' . '÷'}  = \&div;
+        *{__PACKAGE__ . '::' . '*'}   = \&multiply;
+        *{__PACKAGE__ . '::' . '+'}   = \&add;
+        *{__PACKAGE__ . '::' . '-'}   = \&subtract;
+        *{__PACKAGE__ . '::' . '%'}   = \&mod;
+        *{__PACKAGE__ . '::' . '**'}  = \&pow;
+        *{__PACKAGE__ . '::' . '++'}  = \&inc;
+        *{__PACKAGE__ . '::' . '--'}  = \&dec;
+        *{__PACKAGE__ . '::' . '<'}   = \&lt;
+        *{__PACKAGE__ . '::' . '>'}   = \&gt;
+        *{__PACKAGE__ . '::' . '&'}   = \&and;
+        *{__PACKAGE__ . '::' . '|'}   = \&or;
+        *{__PACKAGE__ . '::' . '^'}   = \&xor;
+        *{__PACKAGE__ . '::' . '<=>'} = \&cmp;
+        *{__PACKAGE__ . '::' . '<='}  = \&le;
+        *{__PACKAGE__ . '::' . '≤'} = \&le;
+        *{__PACKAGE__ . '::' . '>='}  = \&ge;
+        *{__PACKAGE__ . '::' . '≥'} = \&ge;
+        *{__PACKAGE__ . '::' . '=='}  = \&eq;
+        *{__PACKAGE__ . '::' . '='}   = \&eq;
+        *{__PACKAGE__ . '::' . '!='}  = \&ne;
+        *{__PACKAGE__ . '::' . '≠'} = \&ne;
+        *{__PACKAGE__ . '::' . '..'}  = \&to;
+        *{__PACKAGE__ . '::' . '!'}   = \&factorial;
+
+        *{__PACKAGE__ . '::' . '>>'} = sub {
+            my ($self, $num, $base) = @_;
+            $self->_is_number($num) || return;
+            $self->new($$self->copy->brsft($$num, defined($base) ? $self->_is_number($base) ? $$base : return : ()));
+        };
+
+        *{__PACKAGE__ . '::' . '<<'} = sub {
+            my ($self, $num, $base) = @_;
+            $self->_is_number($num) || return;
+            $self->new($$self->copy->blsft($$num, defined($base) ? $self->_is_number($base) ? $$base : return : ()));
+        };
     }
 }

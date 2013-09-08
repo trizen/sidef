@@ -1,5 +1,6 @@
 package Sidef::Types::String::String {
 
+    use utf8;
     use 5.014;
     use strict;
     use warnings;
@@ -18,81 +19,56 @@ package Sidef::Types::String::String {
         ${$_[0]};
     }
 
-    {
-        no strict 'refs';
+    sub inc {
+        my ($self) = @_;
+        my $copy = $$self;
+        $self->new(++$copy);
+    }
 
-        *{__PACKAGE__ . '::' . '=~'} = \&match;
-        *{__PACKAGE__ . '::' . '*'}  = \&times;
-        *{__PACKAGE__ . '::' . '+'}  = \&append;
+    sub div {
+        my ($self, $num) = @_;
+        $self->_is_number($num) || return;
+        (my $strlen = int(length($$self) / $$num)) < 1 && return;
+        Sidef::Types::Array::Array->new(map { $self->new($_) } unpack "(a$strlen)*", $$self);
+    }
 
-        *{__PACKAGE__ . '::' . '-'} = sub {
-            my ($self, $string) = @_;
-            $self->_is_string($string) || return;
-            if ((my $ind = CORE::index($$self, $$string)) != -1) {
-                return $self->new(CORE::substr($$self, 0, $ind) . CORE::substr($$self, $ind + CORE::length($$string)));
-            }
-            $self;
-        };
+    sub lt {
+        my ($self, $string) = @_;
+        $self->_is_string($string) || return;
+        Sidef::Types::Bool::Bool->new($$self lt $$string);
+    }
 
-        *{__PACKAGE__ . '::' . '=='} = \&equals;
+    sub gt {
+        my ($self, $string) = @_;
+        $self->_is_string($string) || return;
+        Sidef::Types::Bool::Bool->new($$self gt $$string);
+    }
 
-        *{__PACKAGE__ . '::' . '!='} = sub {
-            my ($self, $string) = @_;
-            ref($self) ne ref($string) and return Sidef::Types::Bool::Bool->true;
-            Sidef::Types::Bool::Bool->new($$self ne $$string);
-        };
+    sub le {
+        my ($self, $string) = @_;
+        $self->_is_string($string) || return;
+        Sidef::Types::Bool::Bool->new($$self le $$string);
+    }
 
-        *{__PACKAGE__ . '::' . '--'} = sub {
-            my ($self) = @_;
-            $self->new(substr($$self, 0, -1));
-        };
+    sub ge {
+        my ($self, $string) = @_;
+        $self->_is_string($string) || return;
+        Sidef::Types::Bool::Bool->new($$self ge $$string);
+    }
 
-        *{__PACKAGE__ . '::' . '>'} = sub {
-            my ($self, $string) = @_;
-            $self->_is_string($string) || return;
-            Sidef::Types::Bool::Bool->new($$self gt $$string);
-        };
+    sub subtract {
+        my ($self, $string) = @_;
+        $self->_is_string($string) || return;
+        if ((my $ind = CORE::index($$self, $$string)) != -1) {
+            return $self->new(CORE::substr($$self, 0, $ind) . CORE::substr($$self, $ind + CORE::length($$string)));
+        }
+        $self;
+    }
 
-        *{__PACKAGE__ . '::' . '<'} = sub {
-            my ($self, $string) = @_;
-            $self->_is_string($string) || return;
-            Sidef::Types::Bool::Bool->new($$self lt $$string);
-        };
-
-        *{__PACKAGE__ . '::' . '>='} = sub {
-            my ($self, $string) = @_;
-            $self->_is_string($string) || return;
-            Sidef::Types::Bool::Bool->new($$self ge $$string);
-        };
-
-        *{__PACKAGE__ . '::' . '<='} = sub {
-            my ($self, $string) = @_;
-            $self->_is_string($string) || return;
-            Sidef::Types::Bool::Bool->new($$self le $$string);
-        };
-
-        *{__PACKAGE__ . '::' . '<=>'} = \&cmp;
-
-        *{__PACKAGE__ . '::' . '<<'} = sub {
-            my ($self, $i) = @_;
-
-            $self->_is_number($i) || return;
-
-            my $len = CORE::length($$self);
-            $i = $$i > $len ? $len : $$i;
-            $self->new(CORE::substr($$self, $i));
-        };
-
-        *{__PACKAGE__ . '::' . '>>'} = sub {
-            my ($self, $i) = @_;
-            $self->_is_number($i) || return;
-            $self->new(CORE::substr($$self, 0, -$$i));
-        };
-
-        *{__PACKAGE__ . '::' . '..'} = \&to;
-
-        *{__PACKAGE__ . '::' . '^^'} = \&begins_with;
-        *{__PACKAGE__ . '::' . '$$'} = \&ends_with;
+    sub ne {
+        my ($self, $string) = @_;
+        ref($self) ne ref($string) and return Sidef::Types::Bool::Bool->true;
+        Sidef::Types::Bool::Bool->new($$self ne $$string);
     }
 
     sub match {
@@ -140,6 +116,7 @@ package Sidef::Types::String::String {
         Sidef::Types::Bool::Bool->new($$self eq $$string);
     }
 
+    *eq = \&equals;
     *is = \&equals;
 
     sub append {
@@ -376,6 +353,9 @@ package Sidef::Types::String::String {
         if (ref($sep) eq '') {
             return Sidef::Types::Array::Array->new(map { __PACKAGE__->new($_) } split(' ', $$self, $size));
         }
+        elsif ($self->_is_number($sep, 1, 1)) {
+            return Sidef::Types::Array::Array->new(map { __PACKAGE__->new($_) } unpack "(a$$sep)*", $$self);
+        }
         elsif (ref($sep) ne 'Sidef::Types::Regex::Regex') {
             if ($sep->can('quotemeta')) {
                 $sep = $sep->quotemeta();
@@ -551,5 +531,47 @@ package Sidef::Types::String::String {
     sub dump {
         my ($self) = @_;
         __PACKAGE__->new(q{'} . $$self =~ s{'}{\\'}gr . q{'});
+    }
+
+    {
+        no strict 'refs';
+
+        *{__PACKAGE__ . '::' . '=~'}  = \&match;
+        *{__PACKAGE__ . '::' . '*'}   = \&times;
+        *{__PACKAGE__ . '::' . '+'}   = \&append;
+        *{__PACKAGE__ . '::' . '++'}  = \&inc;
+        *{__PACKAGE__ . '::' . '-'}   = \&subtract;
+        *{__PACKAGE__ . '::' . '=='}  = \&equals;
+        *{__PACKAGE__ . '::' . '!='}  = \&ne;
+        *{__PACKAGE__ . '::' . '≠'} = \&ne;
+        *{__PACKAGE__ . '::' . '>'}   = \&gt;
+        *{__PACKAGE__ . '::' . '<'}   = \&lt;
+        *{__PACKAGE__ . '::' . '>='}  = \&ge;
+        *{__PACKAGE__ . '::' . '≥'} = \&ge;
+        *{__PACKAGE__ . '::' . '<='}  = \&le;
+        *{__PACKAGE__ . '::' . '≤'} = \&le;
+        *{__PACKAGE__ . '::' . '<=>'} = \&cmp;
+        *{__PACKAGE__ . '::' . '÷'}  = \&div;
+        *{__PACKAGE__ . '::' . '/'}   = \&div;
+
+        *{__PACKAGE__ . '::' . '<<'} = sub {
+            my ($self, $i) = @_;
+
+            $self->_is_number($i) || return;
+
+            my $len = CORE::length($$self);
+            $i = $$i > $len ? $len : $$i;
+            $self->new(CORE::substr($$self, $i));
+        };
+
+        *{__PACKAGE__ . '::' . '>>'} = sub {
+            my ($self, $i) = @_;
+            $self->_is_number($i) || return;
+            $self->new(CORE::substr($$self, 0, -$$i));
+        };
+
+        *{__PACKAGE__ . '::' . '..'} = \&to;
+        *{__PACKAGE__ . '::' . '^^'} = \&begins_with;
+        *{__PACKAGE__ . '::' . '$$'} = \&ends_with;
     }
 }

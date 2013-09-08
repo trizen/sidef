@@ -282,17 +282,17 @@ package Sidef::Parser {
                       == =~
                       := =
                       ^^ $$
-                      <= >= < >
+                      <= ≤ >= ≥ < >
                       ++ --
                       += +
                       -= -
-                      /= /
+                      /= / ÷ ÷=
                       **= **
                       %= %
                       ^= ^
                       *= *
                       ...
-                      != ..
+                      != ≠ ..
                       \\\\
                       ?:
                       ?? ?
@@ -750,7 +750,14 @@ package Sidef::Parser {
 
                 # Binary, hexdecimal and octal numbers
                 if (/\G0(b[10_]*|x[0-9A-Fa-f_]*|[0-9_]+\b)/gc) {
-                    return Sidef::Types::Number::Number->new(oct($1 =~ tr/_//dr)), pos;
+                    my $number = "0" . ($1 =~ tr/_//dr);
+                    return
+                      Sidef::Types::Number::Number->new(
+                                                        $number =~ /^0[0-9]/
+                                                        ? Math::BigInt->from_oct($number)
+                                                        : Math::BigInt->new($number)
+                                                       ),
+                      pos;
                 }
 
                 # Integer or float number
