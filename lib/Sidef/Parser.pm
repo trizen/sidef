@@ -922,7 +922,7 @@ package Sidef::Parser {
                         $var->{count}++;
                         return $var->{obj}, pos;
                     }
-                    elsif (not $self->{strict_var} and /\G(?=\h*(?:\R\h*)?:?=(?![=~>]))/) {
+                    elsif (not $self->{strict_var} and /\G(?=\h*(?:\R\h*)?:?=(?![=~]))/) {
                         unshift @{$self->{vars}{$class}},
                           {
                             obj   => Sidef::Variable::My->new($name),

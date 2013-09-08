@@ -40,13 +40,13 @@ var BIGNUMS = (
 );
 
 var opts = (:(
-            'diacritics'          => true,
-            'invalid_number'      => nil,
-            'negative_sign'       => 'minus',
-            'decimal_point'       => 'virgulă',
-            'thousands_separator' => '',
-            'infinity'            => 'infinit',
-            'not_a_number'        => 'NaN',
+            diacritics            => true,
+            invalid_number        => nil,
+            negative_sign         => 'minus',
+            decimal_point         => 'virgulă',
+            thousands_separator   => '',
+            infinity              => 'infinit',
+            not_a_number          => 'NaN',
 ));
 
 func _number_to_ro (number) {
