@@ -401,6 +401,12 @@ package Sidef::Types::Number::Number {
         $self->new($$self->as_int->digit($$n));
     }
 
+    sub nok {
+        my ($self, $k) = @_;
+        $self->_is_number($k) || return;
+        $self->new($$self->as_int->bnok($$k));
+    }
+
     sub to_bin {
         my ($self) = @_;
 
@@ -446,6 +452,11 @@ package Sidef::Types::Number::Number {
     sub dump {
         my ($self) = @_;
         Sidef::Types::String::String->new($$self);
+    }
+
+    sub sstr {
+        my ($self) = @_;
+        Sidef::Types::String::String->new($$self->bsstr);
     }
 
     {

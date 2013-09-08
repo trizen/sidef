@@ -553,6 +553,9 @@ package Sidef::Types::String::String {
         *{__PACKAGE__ . '::' . '<=>'} = \&cmp;
         *{__PACKAGE__ . '::' . '÷'}  = \&div;
         *{__PACKAGE__ . '::' . '/'}   = \&div;
+        *{__PACKAGE__ . '::' . '..'}  = \&to;
+        *{__PACKAGE__ . '::' . '^^'}  = \&begins_with;
+        *{__PACKAGE__ . '::' . '$$'}  = \&ends_with;
 
         *{__PACKAGE__ . '::' . '<<'} = sub {
             my ($self, $i) = @_;
@@ -569,9 +572,5 @@ package Sidef::Types::String::String {
             $self->_is_number($i) || return;
             $self->new(CORE::substr($$self, 0, -$$i));
         };
-
-        *{__PACKAGE__ . '::' . '..'} = \&to;
-        *{__PACKAGE__ . '::' . '^^'} = \&begins_with;
-        *{__PACKAGE__ . '::' . '$$'} = \&ends_with;
     }
 }

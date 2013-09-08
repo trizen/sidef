@@ -41,12 +41,9 @@ package Sidef::Types::Block::Code {
     sub repeat {
         my ($self, $num) = @_;
 
-        $num //= Sidef::Types::Number::Number->new(1);
-        $self->_is_number($num) || return;
-
         my $var = ($self->_get_private_var)[0]->get_var;
 
-        foreach my $i (1 .. $num) {
+        foreach my $i (1 .. (defined($num) ? $self->_is_number($num) ? ($$num) : return : (1))) {
             $var->set_value(Sidef::Types::Number::Number->new($i));
 
             if (defined(my $res = $self->_run_code)) {
