@@ -1,5 +1,6 @@
 package Sidef::Types::Array::Array {
 
+    use utf8;
     use 5.014;
     use strict;
     use warnings;
@@ -814,6 +815,7 @@ package Sidef::Types::Array::Array {
         *{__PACKAGE__ . '::' . '-'}   = \&subtract;
         *{__PACKAGE__ . '::' . '&&'}  = \&mesh;
         *{__PACKAGE__ . '::' . '=='}  = \&equals;
+        *{__PACKAGE__ . '::' . '»'}  = \&assign_to;
 
         *{__PACKAGE__ . '::' . '++'} = sub {
             my ($self, $obj) = @_;

@@ -227,6 +227,7 @@ package Sidef::Parser {
 
                   Array
                   File
+                  Fcntl
                   Dir
                   Arr Array
                   Hash
@@ -298,7 +299,7 @@ package Sidef::Parser {
                       ?:
                       ?? ?
                       ! \\
-                      :
+                      : »
                       );
 
                     qr{(@operators)};
@@ -674,7 +675,8 @@ package Sidef::Parser {
                         my ($var, $code) = $self->find_var($name, $class);
 
                         if (defined $var and $code == 1) {
-                            warn "Redeclaration of $type '$name' in same scope, at line $self->{line}\n";
+                            warn "Redeclaration of $type '$name' in same scope // "
+                              . "$self->{script_name}, line $self->{line}\n";
                         }
 
                         my $obj = Sidef::Variable::Variable->new($name, $type);
@@ -1155,8 +1157,8 @@ package Sidef::Parser {
                                     $check_vars->({$class => $variable});
                                 }
                                 elsif ($variable->{count} == 0 && $variable->{name} ne '_' && $variable->{name} ne '') {
-                                    warn "Variable '$variable->{name}' has been initialized"
-                                      . " at line $variable->{line}, but not used again!\n";
+                                    warn "Variable '$variable->{name}' has been initialized, but not used again // "
+                                      . "$self->{script_name}, line $variable->{line}\n";
                                 }
                                 elsif ($DEBUG) {
                                     warn "Variable '$variable->{name}' is used $variable->{count} times!\n";
