@@ -249,7 +249,7 @@ HEADER
         print {$fh} $header;
     }
 
-    foreach my $method (sort { lc($a) cmp lc($b) || $a cmp $b } keys %subs) {
+    foreach my $method (sort { (lc($a) cmp lc($b)) || ($a cmp $b) } keys %subs) {
         print {$fh} $subs{$method};
     }
 }

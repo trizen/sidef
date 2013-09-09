@@ -319,7 +319,7 @@ package Sidef::Types::Glob::File {
         $self->_is_var_ref($var_ref) || return;
         $self->_is_number($mode)     || return;
 
-        my $success = sysopen(my $fh, $$self, $$mode, defined($perm) ? $self->_is_number($perm) ? () : return : 0666);
+        my $success = sysopen(my $fh, $$self, $$mode, defined($perm) ? $self->_is_number($perm) ? ($$perm) : return : 0666);
 
         if ($success) {
             $var_ref->get_var->set_value(Sidef::Types::Glob::FileHandle->new(fh => $fh, file => $self));
