@@ -41,12 +41,52 @@ package Sidef::Parser {
                            },
             obj_stat => [
                          {
+                          sub => sub { Sidef::Types::Nil::Nil->new },
+                          re  => qr/\Gnil\b/,
+                         },
+                         {
+                          sub => sub { Sidef::Types::Bool::Bool->true },
+                          re  => qr/\Gtrue\b/,
+                         },
+                         {
+                          sub => sub { Sidef::Types::Bool::Bool->false },
+                          re  => qr/\Gfalse\b/,
+                         },
+                         {
+                          sub => sub { Sidef::Types::Block::Break->new },
+                          re  => qr/\Gbreak\b/,
+                         },
+                         {
+                          sub => sub { Sidef::Types::Block::Next->new },
+                          re  => qr/\Gnext\b/,
+                         },
+                         {
+                          sub => sub { Sidef::Types::Block::Continue->new },
+                          re  => qr/\Gcontinue\b/,
+                         },
+                         {
+                          sub => sub { Sidef::Types::Glob::FileHandle->stdin },
+                          re  => qr/\GSTDIN\b/,
+                         },
+                         {
+                          sub => sub { Sidef::Types::Glob::FileHandle->stdout },
+                          re  => qr/\GSTDOUT\b/,
+                         },
+                         {
+                          sub => sub { Sidef::Types::Glob::FileHandle->stderr },
+                          re  => qr/\GSTDERR\b/,
+                         },
+                         {
                           sub => sub { Sidef::Types::Glob::Dir->new },
                           re  => qr/\GDir\b/,
                          },
                          {
                           sub => sub { Sidef::Types::Glob::File->new },
                           re  => qr/\GFile\b/,
+                         },
+                         {
+                          sub => sub { Sidef::Types::Glob::Fcntl->new },
+                          re  => qr/\GFcntl\b/,
                          },
                          {
                           sub => sub { Sidef::Types::Array::Array->new },
@@ -104,108 +144,69 @@ package Sidef::Parser {
                           sub => sub { Sidef::Types::Regex::Regex->new('') },
                           re  => qr/\GRegex\b/,
                          },
-                         {
-                          sub => sub { Sidef::Types::Glob::FileHandle->stdin },
-                          re  => qr/\GSTDIN\b/,
-                         },
-                         {
-                          sub => sub { Sidef::Types::Glob::FileHandle->stdout },
-                          re  => qr/\GSTDOUT\b/,
-                         },
-                         {
-                          sub => sub { Sidef::Types::Glob::FileHandle->stderr },
-                          re  => qr/\GSTDERR\b/,
-                         },
-                         {
-                          sub => sub { Sidef::Types::Nil::Nil->new },
-                          re  => qr/\Gnil\b/,
-                         },
-                         {
-                          sub => sub { Sidef::Types::Bool::Bool->true },
-                          re  => qr/\Gtrue\b/,
-                         },
-                         {
-                          sub => sub { Sidef::Types::Bool::Bool->false },
-                          re  => qr/\Gfalse\b/,
-                         },
                         ],
-            obj_keys => [
-                         {
-                          sub     => sub { Sidef::Types::Bool::If->new },
-                          re      => qr/\G(?=if\b)/,
-                          dynamic => 1,
-                         },
-                         {
-                          sub     => sub { Sidef::Types::Bool::While->new },
-                          re      => qr/\G(?=while\b)/,
-                          dynamic => 1,
-                         },
-                         {
-                          sub     => sub { Sidef::Types::Block::For->new },
-                          re      => qr/\G(?=for(?:each)?\b)/,
-                          dynamic => 1,
-                         },
-                         {
-                          sub     => sub { Sidef::Types::Block::Continue->new },
-                          re      => qr/\G(?=continue\b)/,
-                          dynamic => 0,
-                         },
-                         {
-                          sub     => sub { Sidef::Types::Block::Return->new },
-                          re      => qr/\G(?=return\b)/,
-                          dynamic => 1,
-                         },
-                         {
-                          sub     => sub { Sidef::Types::Block::Try->new },
-                          re      => qr/\G(?=try\b)/,
-                          dynamic => 1,
-                         },
-                         {
-                          sub     => sub { Sidef::Types::Block::Given->new },
-                          re      => qr/\G(?=(?:given|switch)\b)/,
-                          dynamic => 1,
-                         },
-                         {
-                          sub     => sub { Sidef::Types::Block::Break->new },
-                          re      => qr/\G(?=break\b)/,
-                          dynamic => 0,
-                         },
-                         {
-                          sub     => sub { Sidef::Types::Block::Next->new },
-                          re      => qr/\G(?=next\b)/,
-                          dynamic => 0,
-                         },
-                         {
-                          sub     => sub { Sidef::Module::Require->new },
-                          re      => qr/\G(?=require\b)/,
-                          dynamic => 1,
-                         },
-                         {
-                          sub     => sub { Sidef::Types::Bool::Bool->new },
-                          re      => qr/\G(?=!)/,
-                          dynamic => 0,
-                         },
-                         {
-                          sub     => sub { Sidef::Types::Number::Negative->new },
-                          re      => qr/\G(?=-)/,
-                          dynamic => 0,
-                         },
-                         {
-                          sub     => sub { Sidef::Types::Number::Positive->new },
-                          re      => qr/\G(?=\+)/,
-                          dynamic => 0,
-                         },
-                         {
-                          sub     => sub { Sidef::Types::Block::Code->new({}) },
-                          re      => qr/\G(?=:)/,
-                          dynamic => 0,
-                         },
-                         {
-                          sub     => sub { Sidef::Variable::Ref->new() },
-                          re      => qr/\G(?=[*\\])/,
-                          dynamic => 1,
-                         },
-                        ],
+            obj_keys => [    # this objects can take arguments
+                {
+                 sub     => sub { Sidef::Types::Bool::If->new },
+                 re      => qr/\G(?=if\b)/,
+                 dynamic => 1,
+                },
+                {
+                 sub     => sub { Sidef::Types::Bool::While->new },
+                 re      => qr/\G(?=while\b)/,
+                 dynamic => 1,
+                },
+                {
+                 sub     => sub { Sidef::Types::Block::For->new },
+                 re      => qr/\G(?=for(?:each)?\b)/,
+                 dynamic => 1,
+                },
+                {
+                 sub     => sub { Sidef::Types::Block::Return->new },
+                 re      => qr/\G(?=return\b)/,
+                 dynamic => 1,
+                },
+                {
+                 sub     => sub { Sidef::Types::Block::Try->new },
+                 re      => qr/\G(?=try\b)/,
+                 dynamic => 1,
+                },
+                {
+                 sub     => sub { Sidef::Types::Block::Given->new },
+                 re      => qr/\G(?=(?:given|switch)\b)/,
+                 dynamic => 1,
+                },
+                {
+                 sub     => sub { Sidef::Module::Require->new },
+                 re      => qr/\G(?=require\b)/,
+                 dynamic => 1,
+                },
+                {
+                 sub     => sub { Sidef::Types::Bool::Bool->new },
+                 re      => qr/\G(?=!)/,
+                 dynamic => 0,
+                },
+                {
+                 sub     => sub { Sidef::Types::Number::Negative->new },
+                 re      => qr/\G(?=-)/,
+                 dynamic => 0,
+                },
+                {
+                 sub     => sub { Sidef::Types::Number::Positive->new },
+                 re      => qr/\G(?=\+)/,
+                 dynamic => 0,
+                },
+                {
+                 sub     => sub { Sidef::Types::Block::Code->new({}) },
+                 re      => qr/\G(?=:)/,
+                 dynamic => 0,
+                },
+                {
+                 sub     => sub { Sidef::Variable::Ref->new() },
+                 re      => qr/\G(?=[*\\])/,
+                 dynamic => 1,
+                },
+            ],
             keywords => {
                 map { $_ => 1 }
                   qw(

@@ -35,14 +35,6 @@ Exit the main program with a given code. If no argument is specified, the code 0
 
 =cut
 
-=head2 nanosleep
-
-Sys.nanosleep() -> I<Bool>
-
-Return the
-
-=cut
-
 =head2 nanoSleep
 
 Sys.nanoSleep() -> I<Bool>
@@ -51,9 +43,11 @@ Return the
 
 =cut
 
-=head2 osname
+=head2 nanosleep
 
-Alias for L<C<osName()>|"osName">.
+Sys.nanosleep() -> I<Bool>
+
+Return the
 
 =cut
 
@@ -67,6 +61,12 @@ Return the name of the current operating system under which Sidef is running.
                   # 'MSWin32' under Windows
 
 Returns an object of type: C<Sidef::Types::String::String>
+
+=cut
+
+=head2 osname
+
+Alias for L<C<osName()>|"osName">.
 
 =cut
 

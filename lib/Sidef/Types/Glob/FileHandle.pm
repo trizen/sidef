@@ -124,7 +124,7 @@ package Sidef::Types::Glob::FileHandle {
         my $line = CORE::readline $self->{fh};
         defined($line)
           ? Sidef::Types::String::String->new($line)
-          : Sidef::Types::Nil::Nil->new();
+          : ();
     }
 
     *readln   = \&readline;
@@ -136,7 +136,7 @@ package Sidef::Types::Glob::FileHandle {
         my $char = getc($self->{fh});
         defined($char)
           ? Sidef::Types::Char::Char->new($char)
-          : Sidef::Types::Nil::Nil->new();
+          : ();
     }
 
     *readChar = \&read_char;
@@ -146,6 +146,9 @@ package Sidef::Types::Glob::FileHandle {
         Sidef::Types::Array::Array->new(map { Sidef::Types::String::String->new($_) } CORE::readline($self->{fh}));
     }
 
+    *readAll   = \*read_all;
+    *readall   = \&read_all;
+    *getlines  = \&read_all;
     *get_lines = \&read_all;
     *getLines  = \&read_all;
 

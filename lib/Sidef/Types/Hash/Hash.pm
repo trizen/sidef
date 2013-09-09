@@ -116,4 +116,22 @@ package Sidef::Types::Hash::Hash {
           (map { Sidef::Types::String::String->new($_) } CORE::keys %{$self});
         $new_hash;
     }
+
+    sub dump {
+        my ($self) = @_;
+        Sidef::Types::String::String->new(
+            "Hash.new(\n" . join(
+                ",\n",
+                map {
+                    my $val =
+                      ref($self->{$_}) eq 'Sidef::Variable::Variable'
+                      ? $self->{$_}->get_value
+                      : Sidef::Types::Nil::Nil->new;
+                    "\t${Sidef::Types::String::String->new($_)->dump} => "
+                      . (eval { $val->can('dump') } ? ${$val->dump} : $val)
+                  } sort(CORE::keys(%{$self}))
+              )
+              . "\n)"
+        );
+    }
 }

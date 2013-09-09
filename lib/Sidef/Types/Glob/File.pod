@@ -687,6 +687,22 @@ Return the
 
 =cut
 
+=head2 sysOpen
+
+File.sysOpen() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 sysopen
+
+File.sysopen() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 touch
 
 File.touch() -> I<Bool>

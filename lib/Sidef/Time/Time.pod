@@ -24,18 +24,18 @@ Return the
 
 =cut
 
-=head2 gmtime
-
-Alias for L<C<gmTime()>|"gmTime">.
-
-=cut
-
 
 =head2 gmTime
 
 Time.new.gmTime() -> C<Sidef::Time::Gmtime>
 
 Return a I<gmtime> object.
+
+=cut
+
+=head2 gmtime
+
+Alias for L<C<gmTime()>|"gmTime">.
 
 =cut
 
@@ -47,13 +47,13 @@ Return a I<localtime> object.
 
 =cut
 
-=head2 localtime
+=head2 localTime
 
 Alias for L<C<local()>|"local">.
 
 =cut
 
-=head2 localTime
+=head2 localtime
 
 Alias for L<C<local()>|"local">.
 

@@ -96,6 +96,14 @@ Return the
 
 =cut
 
+=head2 pos
+
+Matches.pos() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 to_bool
 
 Matches.to_bool() -> I<Bool>

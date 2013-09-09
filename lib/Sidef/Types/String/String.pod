@@ -264,6 +264,22 @@ Return the
 
 =cut
 
+=head2 decode
+
+String.decode() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 decode_utf8
+
+String.decode_utf8() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 die
 
 String.die() -> I<Bool>
@@ -283,6 +299,22 @@ Return the
 =head2 dump
 
 String.dump() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 encode
+
+String.encode() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 encode_utf8
+
+String.encode_utf8() -> I<Bool>
 
 Return the
 
@@ -352,17 +384,17 @@ Return the
 
 =cut
 
-=head2 gsub
+=head2 gSub
 
-String.gsub() -> I<Bool>
+String.gSub() -> I<Bool>
 
 Return the
 
 =cut
 
-=head2 gSub
+=head2 gsub
 
-String.gSub() -> I<Bool>
+String.gsub() -> I<Bool>
 
 Return the
 
@@ -784,17 +816,17 @@ Return the
 
 =cut
 
-=head2 wordcase
+=head2 wordCase
 
-String.wordcase() -> I<Bool>
+String.wordCase() -> I<Bool>
 
 Return the
 
 =cut
 
-=head2 wordCase
+=head2 wordcase
 
-String.wordCase() -> I<Bool>
+String.wordcase() -> I<Bool>
 
 Return the
 

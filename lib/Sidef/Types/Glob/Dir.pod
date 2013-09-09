@@ -22,6 +22,14 @@ Inherits methods from:
 
 =head1 METHODS
 
+=head2 +
+
+I<Num> B<+> I<Num> -> I<Num>
+
+Return the
+
+=cut
+
 
 =head2 abs_name
 
@@ -71,6 +79,14 @@ Return the
 
 =cut
 
+=head2 concat
+
+Dir.concat() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 create
 
 Dir.create() -> I<Bool>
@@ -95,6 +111,14 @@ Return the
 
 =cut
 
+=head2 dump
+
+Dir.dump() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 exists
 
 Dir.exists() -> I<Bool>
@@ -106,6 +130,62 @@ Return the
 =head2 get_value
 
 Dir.get_value() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 home
+
+Dir.home() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 is_dir
+
+Dir.is_dir() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 is_directory
+
+Dir.is_directory() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 is_empty
+
+Dir.is_empty() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 isDir
+
+Dir.isDir() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 isDirectory
+
+Dir.isDirectory() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 isEmpty
+
+Dir.isEmpty() -> I<Bool>
 
 Return the
 
@@ -167,17 +247,17 @@ Return the
 
 =cut
 
-=head2 readlink
+=head2 readLink
 
-Dir.readlink() -> I<Bool>
+Dir.readLink() -> I<Bool>
 
 Return the
 
 =cut
 
-=head2 readLink
+=head2 readlink
 
-Dir.readLink() -> I<Bool>
+Dir.readlink() -> I<Bool>
 
 Return the
 

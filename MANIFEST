@@ -69,6 +69,8 @@ lib/Sidef/Types/Glob/Dir.pm
 lib/Sidef/Types/Glob/Dir.pod
 lib/Sidef/Types/Glob/DirHandle.pm
 lib/Sidef/Types/Glob/DirHandle.pod
+lib/Sidef/Types/Glob/Fcntl.pm
+lib/Sidef/Types/Glob/Fcntl.pod
 lib/Sidef/Types/Glob/File.pm
 lib/Sidef/Types/Glob/File.pod
 lib/Sidef/Types/Glob/FileHandle.pm
@@ -155,6 +157,7 @@ scripts/function_recursion.sf
 scripts/functional_modules.sf
 scripts/functions.sf
 scripts/getopt.sf
+scripts/global_regex_matching.sf
 scripts/hailstone.sf
 scripts/hash_autovivification.sf
 scripts/hash_from_array.sf
@@ -199,6 +202,7 @@ scripts/split_combine.sf
 scripts/stdin.sf
 scripts/sum_of_squares.sf
 scripts/switch.sf
+scripts/sysopen_and_sysread.sf
 scripts/test_all.pl
 scripts/token_recursive.sf
 scripts/two_dimensional_array.sf

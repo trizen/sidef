@@ -72,12 +72,9 @@ package Sidef::Types::String::String {
     }
 
     sub match {
-        if (ref($_[1]) eq 'Sidef::Types::Regex::Regex') {
-            return $_[1]->matches($_[0]);
-        }
-
-        warn "[WARN] Expected a regex obj for method =~, not '", ref($_[1]), "'!\n";
-        Sidef::Types::Bool::Bool->false;
+        my ($self, $regex, @rest) = @_;
+        $self->_is_regex($regex) || return;
+        $regex->matches($self, @rest);
     }
 
     sub to {
@@ -493,6 +490,28 @@ package Sidef::Types::String::String {
     sub die {
         my ($self) = @_;
         die $$self;
+    }
+
+    sub encode {
+        my ($self, $enc) = @_;
+        $self->_is_string($enc) || return;
+        $self->new(Encode::encode($$enc, $$self));
+    }
+
+    sub decode {
+        my ($self, $enc) = @_;
+        $self->_is_string($enc) || return;
+        $self->new(Encode::decode($$enc, $$self));
+    }
+
+    sub encode_utf8 {
+        my ($self) = @_;
+        $self->new(Encode::encode_utf8($$self));
+    }
+
+    sub decode_utf8 {
+        my ($self) = @_;
+        $self->new(Encode::decode_utf8($$self));
     }
 
     sub unescape {

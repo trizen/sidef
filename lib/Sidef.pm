@@ -14,6 +14,9 @@ package Sidef {
                      hash    => {class => {'Sidef::Types::Hash::Hash'     => 1}},
                      number  => {class => {'Sidef::Types::Number::Number' => 1}, type => 'SCALAR'},
                      var_ref => {class => {'Sidef::Variable::Ref'         => 1}},
+                     file    => {class => {'Sidef::Types::Glob::File'     => 1}, type => 'SCALAR'},
+                     dir     => {class => {'Sidef::Types::Glob::Dir'      => 1}, type => 'SCALAR'},
+                     regex   => {class => {'Sidef::Types::Regex::Regex'   => 1}},
                      string => {
                                 class => {
                                           'Sidef::Types::String::String' => 1,

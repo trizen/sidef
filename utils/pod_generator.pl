@@ -64,6 +64,7 @@ my %ignored_methods = (
                        'Sidef::Types::Number::Number'   => [qw(get_value)],
                        'Sidef::Types::String::String'   => [qw(get_value)],
                        'Sidef::Types::Byte::Bytes'      => [qw(decode_utf8)],
+                       'Sidef::Types::Glob::Fcntl'      => [qw(new)],
                       );
 
 my %ignored_modules = map { $_ => 1 } qw (
@@ -248,7 +249,7 @@ HEADER
         print {$fh} $header;
     }
 
-    foreach my $method (sort { lc($a) cmp lc($b) } keys %subs) {
+    foreach my $method (sort { lc($a) cmp lc($b) || $a cmp $b } keys %subs) {
         print {$fh} $subs{$method};
     }
 }

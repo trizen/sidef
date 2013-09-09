@@ -7,8 +7,9 @@ package Sidef::Types::Regex::Matches {
     sub new {
         my (undef, %hash) = @_;
 
-        my (@matches) = ($hash{obj} =~ $hash{regex});
+        my (@matches) = (substr($hash{obj}, $hash{pos}) =~ $hash{regex});
         $hash{matched} = (@matches != 0);
+        $hash{match_pos} = $hash{matched} ? [$-[0] + $hash{pos}, $+[0] + $hash{pos}] : [];
 
         if (not defined $1) {
             @matches = ();
@@ -30,6 +31,11 @@ package Sidef::Types::Regex::Matches {
     *toBool        = \&matched;
     *isSuccessful  = \&matched;
     *is_successful = \&matched;
+
+    sub pos {
+        my ($self) = @_;
+        Sidef::Types::Array::Array->new(map { Sidef::Types::Number::Number->new($_) } @{$self->{match_pos}});
+    }
 
     sub matches {
         my ($self) = @_;

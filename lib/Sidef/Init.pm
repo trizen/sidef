@@ -25,6 +25,7 @@ require Sidef::Types::Byte::Bytes if (caller)[0] ne q{Sidef::Types::Byte::Bytes}
 require Sidef::Types::Byte::Byte if (caller)[0] ne q{Sidef::Types::Byte::Byte};
 require Sidef::Types::Glob::Dir if (caller)[0] ne q{Sidef::Types::Glob::Dir};
 require Sidef::Types::Glob::Pipe if (caller)[0] ne q{Sidef::Types::Glob::Pipe};
+require Sidef::Types::Glob::Fcntl if (caller)[0] ne q{Sidef::Types::Glob::Fcntl};
 require Sidef::Types::Glob::DirHandle if (caller)[0] ne q{Sidef::Types::Glob::DirHandle};
 require Sidef::Types::Glob::FileHandle if (caller)[0] ne q{Sidef::Types::Glob::FileHandle};
 require Sidef::Types::Glob::Backtick if (caller)[0] ne q{Sidef::Types::Glob::Backtick};

@@ -1,0 +1,20 @@
+#!/usr/bin/ruby
+
+var str = "regex and sidef";
+
+var res = [];
+var pos = 0;
+
+while (var match = (str.match(/(.{5})/, pos)).isSuccessful) {
+    pos  = (match.pos.last);
+    res += (match.captures);
+}
+
+res == [
+    'regex',
+    ' and ',
+    'sidef',
+] || ("Error!\n".die);
+
+
+"Test passed!".say;

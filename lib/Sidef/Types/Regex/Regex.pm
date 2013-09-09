@@ -4,7 +4,10 @@ package Sidef::Types::Regex::Regex {
     use strict;
     use warnings;
 
-    our @ISA = qw(Sidef::Convert::Convert);
+    our @ISA = qw(
+      Sidef
+      Sidef::Convert::Convert
+      );
 
     sub new {
         my (undef, $regex, $mod) = @_;
@@ -16,7 +19,7 @@ package Sidef::Types::Regex::Regex {
     }
 
     sub matches {
-        my ($self, $object) = @_;
+        my ($self, $object, $pos) = @_;
 
         if (ref $object eq 'Sidef::Types::Array::Array') {
             foreach my $item (@{$object}) {
@@ -26,7 +29,11 @@ package Sidef::Types::Regex::Regex {
         }
 
         require Sidef::Types::Regex::Matches;
-        Sidef::Types::Regex::Matches->new(obj => $object, regex => $$self);
+        Sidef::Types::Regex::Matches->new(
+                                          obj   => $object,
+                                          regex => $$self,
+                                          pos   => defined($pos) ? $self->_is_number($pos) ? $$pos : return : 0
+                                         );
     }
 
     {

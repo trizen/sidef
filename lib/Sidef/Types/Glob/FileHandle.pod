@@ -79,6 +79,14 @@ Return the
 
 =cut
 
+=head2 getlines
+
+FileHandle.getlines() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 input_separator
 
 FileHandle.input_separator() -> I<Bool>
@@ -175,6 +183,22 @@ Return the
 
 =cut
 
+=head2 readAll
+
+FileHandle.readAll() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 readall
+
+FileHandle.readall() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 readChar
 
 FileHandle.readChar() -> I<Bool>
@@ -183,17 +207,17 @@ Return the
 
 =cut
 
-=head2 readline
+=head2 readLine
 
-FileHandle.readline() -> I<Bool>
+FileHandle.readLine() -> I<Bool>
 
 Return the
 
 =cut
 
-=head2 readLine
+=head2 readline
 
-FileHandle.readLine() -> I<Bool>
+FileHandle.readline() -> I<Bool>
 
 Return the
 
@@ -279,17 +303,17 @@ Return the
 
 =cut
 
-=head2 sysseek
+=head2 sysSeek
 
-FileHandle.sysseek() -> I<Bool>
+FileHandle.sysSeek() -> I<Bool>
 
 Return the
 
 =cut
 
-=head2 sysSeek
+=head2 sysseek
 
-FileHandle.sysSeek() -> I<Bool>
+FileHandle.sysseek() -> I<Bool>
 
 Return the
 

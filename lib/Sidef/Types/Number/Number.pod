@@ -472,17 +472,17 @@ Return the
 
 =cut
 
-=head2 is_nan
+=head2 is_NaN
 
-Number.is_nan() -> I<Bool>
+Number.is_NaN() -> I<Bool>
 
 Return the
 
 =cut
 
-=head2 is_NaN
+=head2 is_nan
 
-Number.is_NaN() -> I<Bool>
+Number.is_nan() -> I<Bool>
 
 Return the
 
@@ -688,17 +688,17 @@ Return the
 
 =cut
 
-=head2 nan
+=head2 NaN
 
-Number.nan() -> I<Bool>
+Number.NaN() -> I<Bool>
 
 Return the
 
 =cut
 
-=head2 NaN
+=head2 nan
 
-Number.NaN() -> I<Bool>
+Number.nan() -> I<Bool>
 
 Return the
 
@@ -912,17 +912,17 @@ Return the
 
 =cut
 
-=head2 upto
+=head2 upTo
 
-Number.upto() -> I<Bool>
+Number.upTo() -> I<Bool>
 
 Return the
 
 =cut
 
-=head2 upTo
+=head2 upto
 
-Number.upTo() -> I<Bool>
+Number.upto() -> I<Bool>
 
 Return the
 

@@ -4,7 +4,10 @@ package Sidef::Types::Glob::File {
     use strict;
     use warnings;
 
-    our @ISA = qw(Sidef Sidef::Convert::Convert);
+    our @ISA = qw(
+      Sidef
+      Sidef::Convert::Convert
+      );
 
     sub new {
         my (undef, $file) = @_;
@@ -309,6 +312,23 @@ package Sidef::Types::Glob::File {
     *openA       = \&open_a;
     *openAppend  = \&open_a;
     *open_append = \&open_a;
+
+    sub sysopen {
+        my ($self, $var_ref, $mode, $perm) = @_;
+
+        $self->_is_var_ref($var_ref) || return;
+        $self->_is_number($mode)     || return;
+
+        my $success = sysopen(my $fh, $$self, $$mode, defined($perm) ? $self->_is_number($perm) ? () : return : 0666);
+
+        if ($success) {
+            $var_ref->get_var->set_value(Sidef::Types::Glob::FileHandle->new(fh => $fh, file => $self));
+        }
+
+        Sidef::Types::Bool::Bool->new($success);
+    }
+
+    *sysOpen = \&sysopen;
 
     sub stat {
         my ($self) = @_;

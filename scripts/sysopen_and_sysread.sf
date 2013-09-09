@@ -1,0 +1,36 @@
+#!/usr/bin/ruby
+
+var apps = [];
+var desktopFilesPaths = [qd'/usr/share/applications'];
+
+for (desktopFilesPaths, \var path) {
+
+    path.isDir            || next;
+    path.open(\var dir_h) || next;
+
+    var counter = 0;
+    while (var file = (dir_h.getFile) != nil) {
+
+        var fullpath = (path+file);
+
+        fullpath.to_s =~ /\.desktop\z/      ??    || next;
+        fullpath.sysopen(\var fh, Fcntl.O_RDONLY) || next;
+        fh.sysread(\var content, fullpath.size);
+
+        content = (content.decode_utf8);
+
+        var pos = 0;
+        var fields = (Hash.new);
+
+        while (var match = (content.match(/^(\w.*?)=(.*\S)/m, pos)).isSuccessful) {
+            pos = (match.pos.last);
+            var(key, value) = (match.captures...);
+            fields[key] = value;
+        }
+
+        apps.append(fields);
+        counter++ == 5 && break;
+    }
+}
+
+apps[apps.len.rand.int].dump.join("\n").say;

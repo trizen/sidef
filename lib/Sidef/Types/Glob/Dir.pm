@@ -4,7 +4,10 @@ package Sidef::Types::Glob::Dir {
     use strict;
     use warnings;
 
-    our @ISA = qw(Sidef::Convert::Convert);
+    our @ISA = qw(
+      Sidef
+      Sidef::Convert::Convert
+      );
 
     sub new {
         my (undef, $dir) = @_;
@@ -14,6 +17,18 @@ package Sidef::Types::Glob::Dir {
 
     sub get_value {
         ${$_[0]};
+    }
+
+    sub home {
+        my ($self) = @_;
+
+        my $home =
+             $ENV{HOME}
+          || $ENV{LOGDIR}
+          || (getpwuid($<))[7]
+          || `echo -n ~`;
+
+        defined($home) ? __PACKAGE__->new($home) : ();
     }
 
     sub exists {
@@ -113,6 +128,37 @@ package Sidef::Types::Glob::Dir {
         Sidef::Types::Bool::Bool->new(chroot($$self));
     }
 
+    sub concat {
+        my ($self, $file) = @_;
+
+        require File::Spec;
+        $file->new(
+                     $self->_is_dir($file, 1, 1) ? File::Spec->catdir($$self, $$file)
+                   : $self->_is_file($file) ? File::Spec->catfile($$self, $$file)
+                   :                          return
+                  );
+    }
+
+    sub is_empty {
+        my ($self) = @_;
+
+        opendir(my $dir_h, $$self) || return;
+
+        while (defined(my $file = readdir $dir_h)) {
+            next if $file eq '.' or $file eq '..';
+            return Sidef::Types::Bool::Bool->false;
+        }
+
+        Sidef::Types::Bool::Bool->true;
+    }
+
+    *isEmpty = \&is_empty;
+
+    *is_directory = \&Sidef::Types::Glob::File::is_directory;
+    *is_dir       = \&is_directory;
+    *isDir        = \&is_directory;
+    *isDirectory  = \&is_directory;
+
     *readlink = \&Sidef::Types::Glob::File::readlink;
     *readLink = \&readlink;
 
@@ -120,4 +166,14 @@ package Sidef::Types::Glob::Dir {
 
     *stat  = \&Sidef::Types::Glob::File::stat;
     *lstat = \&Sidef::Types::Glob::File::lstat;
+
+    sub dump {
+        my ($self) = @_;
+        Sidef::Types::String::String->new('Dir.new(' . ${Sidef::Types::String::String->new($$self)->dump} . ')');
+    }
+
+    {
+        no strict 'refs';
+        *{__PACKAGE__ . '::' . '+'} = \&concat;
+    }
 }
