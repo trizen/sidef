@@ -30,7 +30,7 @@ package Sidef::Module::Caller {
             chop $method;
         }
 
-        if ($self->{module}->can($method)) {
+        if ($self->{module}->can($method) || $self->{module}->can('AUTOLOAD')) {
             my @values = $self->{module}->$method(
                 @arg
                 ? (

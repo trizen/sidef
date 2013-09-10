@@ -18,8 +18,9 @@ package Sidef::Module::Func {
     sub AUTOLOAD {
         my ($self, @arg) = @_;
 
-        my ($func) = ($AUTOLOAD =~ /^.*[^:]::(.*)$/);
-        my $sub = \&{$self->{module} . '::' . $func};
+        my ($func)   = ($AUTOLOAD =~ /^.*[^:]::(.*)$/);
+        my $sub      = \&{$self->{module} . '::' . $func};
+        my $autoload = \&{$self->{module} . '::' . 'AUTOLOAD'};
 
         my $return_array = 0;
         if ($func =~ /:\z/) {
@@ -27,7 +28,7 @@ package Sidef::Module::Func {
             chop $func;
         }
 
-        if (defined &$sub) {
+        if (defined(&$sub) or defined(&$autoload)) {
             my @results = $sub->(
                 @arg
                 ? (
