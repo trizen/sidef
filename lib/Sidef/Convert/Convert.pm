@@ -98,6 +98,16 @@ package Sidef::Convert::Convert {
 
     *toChar = \&to_char;
 
+    sub to_regex {
+        my ($self) = @_;
+        $self->_is_number($self, 0, 1) || $self->_is_string($self) || return;
+        Sidef::Types::Regex::Regex->new($$self);
+    }
+
+    *toRe    = \&to_regex;
+    *to_re   = \&to_regex;
+    *toRegex = \&to_regex;
+
     sub to_bytes {
         my ($self) = @_;
 

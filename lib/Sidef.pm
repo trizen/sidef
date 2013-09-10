@@ -28,8 +28,8 @@ package Sidef {
                                type  => 'ARRAY',
                                class => {
                                          'Sidef::Types::Array::Array' => 1,
-                                         'Sidef::Types::Chars::Chars' => 1,
-                                         'Sidef::Types::Bytes::Bytes' => 1,
+                                         'Sidef::Types::Char::Chars'  => 1,
+                                         'Sidef::Types::Byte::Bytes'  => 1,
                                         }
                               },
                     );

@@ -1,0 +1,42 @@
+#!/usr/bin/perl
+
+# Translation of: http://rosettacode.org/wiki/Best_shuffle#Perl
+
+func score(original_word, new_word) {
+    var result = 0;
+
+    for (original_word.range) {
+        original_word[_] == new_word[_] && (
+            result++;
+        );
+    }
+
+    result;
+}
+
+func best_shuffle (original_word) {
+
+    var best_word  = (original_word);
+    var best_score = (original_word.len);
+
+    original_word.permute {
+
+        var curscore = (score(original_word, _)) < best_score && (
+           best_score =  curscore;
+           best_word = _;
+        );
+
+        Bool.new(best_score);
+    };
+
+    printf("%-6s %-6s : %d\n", original_word.join(''), best_word.join(''), best_score);
+}
+
+[
+    "elk",
+    "grrr",
+    "up",
+    "a",
+].for {
+    best_shuffle(_.split(''));
+};

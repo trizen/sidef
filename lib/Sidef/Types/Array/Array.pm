@@ -92,6 +92,24 @@ package Sidef::Types::Array::Array {
         $self->new(map { $_->get_value } @{$self}, @{$array});
     }
 
+    sub count {
+        my ($self, $obj) = @_;
+
+        my $counter = 0;
+        my $method  = '==';
+        foreach my $item (@{$self}) {
+            my $value = $item->get_value;
+            if (ref($value) eq ref($obj) && eval { $value->can($method) }) {
+                $value->$method($obj) && $counter++;
+            }
+        }
+
+        Sidef::Types::Number::Number->new($counter);
+    }
+
+    *countObj  = \&count;
+    *count_obj = \&count;
+
     sub to_list {
         my ($self) = @_;
         [map { $_->get_value } @{$self}];

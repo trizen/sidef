@@ -1,0 +1,23 @@
+#!/usr/bin/perl
+
+# Translation of: http://rosettacode.org/wiki/Averages/Mode#Perl
+
+func mode() {
+    var c = (Hash.new);
+
+    for (_ => \var e) {
+        c[e]:=0++;
+    }
+
+    var best = (c.values.max);
+    c.keys.grep{c[_] == best};
+}
+
+for (
+    [
+        [1, 3, 6, 6, 6, 6, 7, 7, 12, 12, 17],
+        [1, 1, 2, 4, 4],
+    ] => \var array
+){
+    println(mode(array.as_list).join(' '));
+}

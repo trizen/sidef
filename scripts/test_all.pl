@@ -11,6 +11,7 @@ my %ignored;
       anagrams.sf
       anagrams_deranged_anagrams.sf
       arithmetic_integer_stdin.sf
+      benford_s_law.sf
       levenshtein_recursive.sf
       fibonacci_validation.sf
       dice_game_solver.sf

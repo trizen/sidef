@@ -81,7 +81,7 @@ package Sidef::Variable::Variable {
                 warn "Invalid variable type: '$self->{type}'.\n";
             }
 
-            return $obj;
+            $obj;
         };
 
         *{__PACKAGE__ . '::' . ':='} = sub {
@@ -89,10 +89,10 @@ package Sidef::Variable::Variable {
 
             if (not $self->is_defined) {
                 my $method = '=';
-                return $self->$method(Sidef::Types::Block::Code->new($code)->run);
+                $self->$method(Sidef::Types::Block::Code->new($code)->run);
             }
 
-            return $self->{value};
+            $self->new(rand, 'var', $self);
         };
 
         *{__PACKAGE__ . '::' . '\\\\'} = sub {
@@ -100,7 +100,7 @@ package Sidef::Variable::Variable {
             if ($self->is_defined) {
                 return $self;
             }
-            return $arg;
+            $arg;
         };
 
         foreach my $operator (qw(-- ++)) {
