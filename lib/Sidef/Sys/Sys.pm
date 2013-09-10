@@ -115,6 +115,8 @@ package Sidef::Sys::Sys {
         Sidef::Types::Bool::Bool->new(say @rest);
     }
 
+    *say = \&println;
+
     sub scanln {
         my ($self, $text) = @_;
 

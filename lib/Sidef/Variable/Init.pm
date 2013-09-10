@@ -18,7 +18,7 @@ package Sidef::Variable::Init {
     sub AUTOLOAD {
         my ($self, @args) = @_;
 
-        my ($method) = ($AUTOLOAD =~ /^.*[^:]::(.+)$/);
+        my ($method) = ($AUTOLOAD =~ /^.*[^:]::(.*)$/);
 
         my @results;
         if (@{$self->{vars}} && ($self->{vars}[0]->can($method) || $self->{vars}[0]->can('AUTOLOAD'))) {

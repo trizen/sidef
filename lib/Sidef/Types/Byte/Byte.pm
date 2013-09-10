@@ -4,8 +4,6 @@ package Sidef::Types::Byte::Byte {
     use strict;
     use warnings;
 
-    require Math::BigInt;
-
     our @ISA = qw(
       Sidef::Types::Number::Number
       Sidef::Convert::Convert

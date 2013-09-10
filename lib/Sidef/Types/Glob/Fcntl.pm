@@ -18,7 +18,7 @@ package Sidef::Types::Glob::Fcntl {
         sub AUTOLOAD {
             my ($self) = @_;
 
-            my ($sub) = ($AUTOLOAD =~ /^.*[^:]::(.+)$/);
+            my ($sub) = ($AUTOLOAD =~ /^.*[^:]::(.*)$/);
 
             if (exists $CACHE{$sub}) {
                 return $CACHE{$sub};

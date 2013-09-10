@@ -18,7 +18,7 @@ package Sidef::Module::Func {
     sub AUTOLOAD {
         my ($self, @arg) = @_;
 
-        my $func = substr($AUTOLOAD, rindex($AUTOLOAD, '::') + 2);
+        my ($func) = ($AUTOLOAD =~ /^.*[^:]::(.*)$/);
         my $sub = \&{$self->{module} . '::' . $func};
 
         if (defined &$sub) {

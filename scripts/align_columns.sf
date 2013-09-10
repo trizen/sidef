@@ -29,7 +29,7 @@ func newFormatter (text) {
     return(f);
 }
 
-func print (f,j) {
+func output (f,j) {
    for (f['text'].range) {
         for (f['text'][_].each) {
 
@@ -55,7 +55,7 @@ justified,$right$justified,$or$center$justified$within$its$column.};
 
     var f = (newFormatter(text));
 
-    print(f, left);
-    print(f, middle);
-    print(f, right);
+    output(f, left);
+    output(f, middle);
+    output(f, right);
 }.run;

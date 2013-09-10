@@ -182,6 +182,11 @@ package Sidef::Parser {
                  dynamic => 1,
                 },
                 {
+                 sub     => sub { Sidef::Sys::Sys->new },
+                 re      => qr/\G(?=(?:print(?:ln|f)?+|say)\b)/,
+                 dynamic => 0,
+                },
+                {
                  sub     => sub { Sidef::Types::Bool::Bool->new },
                  re      => qr/\G(?=!)/,
                  dynamic => 0,
@@ -224,6 +229,9 @@ package Sidef::Parser {
                   nil
                   import
                   include
+                  printf
+                  print
+                  say
 
                   Array
                   File
@@ -675,7 +683,7 @@ package Sidef::Parser {
                         my ($var, $code) = $self->find_var($name, $class);
 
                         if (defined $var and $code == 1) {
-                            warn "Redeclaration of $type '$name' in same scope // "
+                            warn "Redeclaration of $type '$name' in same scope, at "
                               . "$self->{script_name}, line $self->{line}\n";
                         }
 
@@ -921,10 +929,6 @@ package Sidef::Parser {
 
                     my $var_name = $1;
 
-                    if (/\G(?=\h*=>)/) {
-                        return Sidef::Types::String::String->new($var_name), pos;
-                    }
-
                     my ($name, $class) = $self->get_name_and_class($var_name);
                     my ($var, $code) = $self->find_var($name, $class);
 
@@ -932,7 +936,10 @@ package Sidef::Parser {
                         $var->{count}++;
                         return $var->{obj}, pos;
                     }
-                    elsif (not $self->{strict_var} and /\G(?=\h*(?:\R\h*)?:?=(?![=~]))/) {
+                    elsif (/\G(?=\h*=>)/) {
+                        return Sidef::Types::String::String->new($var_name), pos;
+                    }
+                    elsif (not $self->{strict_var} and /\G(?=\h*(?:\R\h*)?:?=(?![=~>]))/) {
                         unshift @{$self->{vars}{$class}},
                           {
                             obj   => Sidef::Variable::My->new($name),
@@ -1157,7 +1164,7 @@ package Sidef::Parser {
                                     $check_vars->({$class => $variable});
                                 }
                                 elsif ($variable->{count} == 0 && $variable->{name} ne '_' && $variable->{name} ne '') {
-                                    warn "Variable '$variable->{name}' has been initialized, but not used again // "
+                                    warn "Variable '$variable->{name}' has been initialized, but not used again, at "
                                       . "$self->{script_name}, line $variable->{line}\n";
                                 }
                                 elsif ($DEBUG) {

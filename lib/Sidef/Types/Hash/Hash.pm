@@ -71,12 +71,24 @@ package Sidef::Types::Hash::Hash {
 
     sub each {
         my ($self) = @_;
+        my ($key, $value) = each(%{$self});
+
+        $key // return;
+        Sidef::Types::Array::Array->new(Sidef::Types::String::String->new($key), $value->get_value);
+    }
+
+    sub to_a {
+        my ($self) = @_;
         Sidef::Types::Array::Array->new(
             map {
                 Sidef::Types::Array::Array->new(Sidef::Types::String::String->new($_), $self->{$_}->get_value)
               } CORE::keys %{$self}
         );
     }
+
+    *pairs    = \&to_a;
+    *toArray  = \&to_a;
+    *to_array = \&to_a;
 
     sub exists {
         my ($self, $key) = @_;

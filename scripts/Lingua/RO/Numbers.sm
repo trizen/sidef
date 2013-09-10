@@ -149,8 +149,8 @@ func _number_to_ro (number) {
 
 func number_to_ro (num) {
 
-    for (_.ft(1).to_hash.each => \var kv) {
-
+    var args = (_.ft(1).to_hash);
+    while (var kv = (args.each)) {
         opts.exists(kv[0]) || (
             "[%s] Invalid option: <%s>\n".sprintf(__CLASS__, kv[0]).warn;
         );
@@ -161,11 +161,14 @@ func number_to_ro (num) {
     var word = (_number_to_ro(num).join(" "));
 
     if (!opts['diacritics']) {
-        word.gsub!('ă','a')
-            .gsub!('â','a')
-            .gsub!('ș','s')
-            .gsub!('ț','t')
-            .gsub!('î','i');
+
+        #word.gsub!('ă','a')
+            #.gsub!('â','a')
+            #.gsub!('ș','s')
+            #.gsub!('ț','t')
+            #.gsub!('î','i');
+
+        word.tr!('ăâșțî', 'aasti');
     }
 
     if (var t = opts['thousands_separator'] != '') {

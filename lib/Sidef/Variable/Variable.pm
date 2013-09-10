@@ -152,7 +152,7 @@ package Sidef::Variable::Variable {
         #    return $self;
         #}
 
-        my ($method) = ($AUTOLOAD =~ /^.*[^:]::(.+)$/);
+        my ($method) = ($AUTOLOAD =~ /^.*[^:]::(.*)$/);
         my $value = $self->get_value;
 
         my $method_type = 0;

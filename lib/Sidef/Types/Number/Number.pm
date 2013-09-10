@@ -4,6 +4,7 @@ package Sidef::Types::Number::Number {
     use 5.014;
     use strict;
     use warnings;
+    use Math::BigInt try => 'GMP';
 
     require Math::BigFloat;
     require Math::BigInt::Calc;
@@ -150,7 +151,7 @@ package Sidef::Types::Number::Number {
         my ($self, $num, $step) = @_;
 
         $self->_is_number($num) || return;
-        $step = defined($step) ? $self->_is_number($step) ? ($$step) : return : (Math::BigFloat->new(1));
+        $step = defined($step) ? $self->_is_number($step) ? ($$step) : return : 1;
 
         my $array = Sidef::Types::Array::Array->new();
 
@@ -168,7 +169,7 @@ package Sidef::Types::Number::Number {
         my ($self, $num, $step) = @_;
 
         $self->_is_number($num) || return;
-        $step = defined($step) ? $self->_is_number($step) ? ($$step) : return : (Math::BigFloat->new(1));
+        $step = defined($step) ? $self->_is_number($step) ? ($$step) : return : 1;
 
         my $array = Sidef::Types::Array::Array->new();
 
