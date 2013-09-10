@@ -229,9 +229,8 @@ package Sidef::Parser {
                   nil
                   import
                   include
-                  printf
-                  print
-                  say
+                  print printf
+                  println say
 
                   Array
                   File

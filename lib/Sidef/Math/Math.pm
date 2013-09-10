@@ -8,8 +8,6 @@ package Sidef::Math::Math {
       Sidef
       );
 
-    require Math::BigFloat;
-
     sub new {
         bless {}, __PACKAGE__;
     }

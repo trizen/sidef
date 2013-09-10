@@ -4,10 +4,8 @@ package Sidef::Types::Number::Number {
     use 5.014;
     use strict;
     use warnings;
-    use Math::BigInt try => 'GMP';
 
-    require Math::BigFloat;
-    require Math::BigInt::Calc;
+    use Math::BigFloat try => 'GMP,Pari';
 
     our @ISA = qw(
       Sidef
