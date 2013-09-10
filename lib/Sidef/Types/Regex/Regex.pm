@@ -23,7 +23,7 @@ package Sidef::Types::Regex::Regex {
 
         if (ref $object eq 'Sidef::Types::Array::Array') {
             foreach my $item (@{$object}) {
-                my $match = $self->matches($item);
+                my $match = $self->matches($item->get_value);
                 $match->matched && return $match;
             }
         }

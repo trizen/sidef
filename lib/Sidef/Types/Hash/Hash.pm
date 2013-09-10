@@ -103,23 +103,6 @@ package Sidef::Types::Hash::Hash {
         Sidef::Types::Bool::Bool->new(exists $self->{$key});
     }
 
-    sub map {
-        my ($self, $keys, $struct) = @_;
-
-        for (my $i = 0 ; $i < $#{$struct} ; $i += 2) {
-            my ($key, $value) = map { $_->get_value } @{$struct}[$i, $i + 1];
-
-            $self->{$key} //= Sidef::Variable::Variable->new(rand, 'var', $self->new());
-
-            foreach my $i (0 .. $#{$keys}) {
-                my $hash = $self->{$key}->get_value;
-                $hash->{$keys->[$i]} = Sidef::Variable::Variable->new(rand, 'var', $value->[$i]->get_value);
-            }
-        }
-
-        return $self;
-    }
-
     sub flip {
         my ($self) = @_;
 
