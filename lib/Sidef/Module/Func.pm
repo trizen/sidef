@@ -21,8 +21,14 @@ package Sidef::Module::Func {
         my ($func) = ($AUTOLOAD =~ /^.*[^:]::(.*)$/);
         my $sub = \&{$self->{module} . '::' . $func};
 
+        my $return_array = 0;
+        if ($func =~ /:\z/) {
+            $return_array = 1;
+            chop $func;
+        }
+
         if (defined &$sub) {
-            return $sub->(
+            my @results = $sub->(
                 @arg
                 ? (
                    map {
@@ -33,6 +39,12 @@ package Sidef::Module::Func {
                   )
                 : ()
             );
+
+            if ($return_array || @results > 1) {
+                return Sidef::Types::Array::Array->new(@results);
+            }
+
+            $results[0];
         }
         else {
             warn qq{[WARN] Can't locate function '$func' via package "$self->{module}"!\n};

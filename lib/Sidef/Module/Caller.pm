@@ -24,8 +24,14 @@ package Sidef::Module::Caller {
             return Sidef::Module::Func->_new(module => $self->{module});
         }
 
+        my $return_array = 0;
+        if ($method =~ /:\z/) {
+            $return_array = 1;
+            chop $method;
+        }
+
         if ($self->{module}->can($method)) {
-            my $value = $self->{module}->$method(
+            my @values = $self->{module}->$method(
                 @arg
                 ? (
                    map {
@@ -36,6 +42,12 @@ package Sidef::Module::Caller {
                   )
                 : ()
             );
+
+            if ($return_array || @values > 1) {
+                return Sidef::Types::Array::Array->new(@values);
+            }
+
+            my $value = $values[0];
 
             if (ref($value) && eval { $value->can('can') }) {
                 return $self->_new(module => ($value));
