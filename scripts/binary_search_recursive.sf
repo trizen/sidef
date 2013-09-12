@@ -1,0 +1,48 @@
+#!/usr/bin/ruby
+
+# Translation of: http://rosettacode.org/wiki/Binary_search#Perl
+
+func binary_search (array, value, left, right) {
+
+    right < left && (
+        return(false);
+    )
+
+    middle = ((right + left) / 2);
+
+    array[middle] == value && (
+        return(true);
+    )
+
+    binary_search(array, value, value < array[middle] ? ([left, middle - 1])
+                                                      : ([middle + 1, right])...);
+}
+
+var arr = [
+    0,
+    3,
+    5,
+    7,
+    8,
+    12,
+    15,
+    23,
+    55,
+    75,
+    122,
+    345,
+    553,
+    676,
+    883,
+    997,
+];
+
+for ([15, 120, 122, 532, 1235, 8, 0, 12425, 54, 325] => \var value) {
+    var bool = (binary_search(arr, value, 0, arr.offset));
+
+    arr.contains(value) == bool || (
+        "Error on value: %d\n".sprintf(value).die;
+    );
+
+    "%20s -> %s\n".printf(value, bool);
+}
