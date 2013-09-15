@@ -138,6 +138,12 @@ scripts/arrays.sf
 scripts/arrays_intersection.sf
 scripts/ascii_cuboid.sf
 scripts/averages_mode.sf
+scripts/avg_mode.sf
+scripts/balanced_brackets.sf
+scripts/benford_s_law.sf
+scripts/best_shuffle.sf
+scripts/best_shuffle_alg_permute.sf
+scripts/binary_search_recursive.sf
 scripts/box_the_compass.sf
 scripts/break.sf
 scripts/caesar_cipher.sf
@@ -161,7 +167,6 @@ scripts/global_regex_matching.sf
 scripts/hailstone.sf
 scripts/hash_autovivification.sf
 scripts/hash_from_array.sf
-scripts/hash_map.sf
 scripts/hashes.sf
 scripts/if_do_else.sf
 scripts/if_while_standard.sf
@@ -178,6 +183,7 @@ scripts/logic.sf
 scripts/lwp_module.sf
 scripts/Math/Algebra/Matrix.sm
 scripts/matrix_multiplication.sf
+scripts/median.sf
 scripts/method_expressions.sf
 scripts/multi_var_assignment.sf
 scripts/next.sf
@@ -185,6 +191,7 @@ scripts/objects_init.sf
 scripts/open.sf
 scripts/permutation.sf
 scripts/power_numbers.sf
+scripts/pythagorean_means.sf
 scripts/quoted_strings.sf
 scripts/rand.sf
 scripts/recursion.sf
@@ -192,7 +199,9 @@ scripts/regex.sf
 scripts/return.sf
 scripts/rock_paper_scissors.sf
 scripts/roman_numerals_decoding.sf
+scripts/roman_numerals_decoding_2.sf
 scripts/roman_numerals_encoding.sf
+scripts/root_mean_square.sf
 scripts/run_length_encoding.sf
 scripts/run_length_encoding_2.sf
 scripts/script.sf
