@@ -1,7 +1,7 @@
 {
    "abstract" : "Sidef Programming Language",
    "author" : [
-      "Daniel Șuteu, Ioana Fălcușan"
+      "\n                             Daniel Șuteu (trizenx@gmail.com)\n                             Ioana Fălcușan (ioanaflavia@gmail.com)\n                           "
    ],
    "dynamic_config" : 1,
    "generated_by" : "Module::Build version 0.4007, CPAN::Meta::Converter version 2.132140",
