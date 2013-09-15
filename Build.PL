@@ -8,7 +8,7 @@ my $builder = Module::Build->new(
     module_name        => 'Sidef',
     license            => 'Artistic_2_0',
     dist_author        => q{
-                             Daniel Șuteu (trizenx@gmail.com)
+                             Daniel Șuteu   (trizenx@gmail.com)
                              Ioana Fălcușan (ioanaflavia@gmail.com)
                            },
     dist_version_from  => 'lib/Sidef.pm',
