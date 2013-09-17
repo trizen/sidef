@@ -232,13 +232,13 @@ package Sidef::Types::Array::Array {
     sub last {
         my ($self) = @_;
         $#{$self} >= 0 || return;
-        $self->[-1]->get_value;
+        $self->[-1];
     }
 
     sub first {
         my ($self) = @_;
         $#{$self} >= 0 || return;
-        $self->[0]->get_value;
+        $self->[0];
     }
 
     sub exists {
@@ -253,6 +253,12 @@ package Sidef::Types::Array::Array {
         my ($self, $index) = @_;
         $self->_is_number($index, 1) || return;
         Sidef::Types::Bool::Bool->new(defined($self->[$$index]) and $self->[$$index]->is_defined);
+    }
+
+    sub get {
+        my ($self, $index) = @_;
+        $self->_is_number($index, 1) || return;
+        $self->[$$index];
     }
 
     sub ft {

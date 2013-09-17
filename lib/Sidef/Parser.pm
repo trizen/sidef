@@ -316,7 +316,7 @@ package Sidef::Parser {
                       );
 
         $options{ref_vars} = $options{vars};
-        $options{re}{vars} = qr{\(((?:$options{re}{var_name}(?:\h*,\h*$options{re}{var_name})*+)?+)\)}o;
+        $options{re}{vars} = qr{((?:$options{re}{var_name}(?:\h*,\h*$options{re}{var_name})*+)?+)}o;
 
         bless \%options, __PACKAGE__;
     }
@@ -659,7 +659,7 @@ package Sidef::Parser {
 
                     my $names =
                         /\G($self->{re}{var_name})/goc ? $1
-                      : /\G$self->{re}{vars}/goc       ? $1
+                      : /\G\($self->{re}{vars}\)/goc   ? $1
                       : $self->fatal_error(
                                            code  => $_,
                                            pos   => (pos($_)),
@@ -736,7 +736,7 @@ package Sidef::Parser {
                     if ($type eq 'func') {
 
                         # Check the declared parameters
-                        if (/\G\h*$self->{re}{vars}\h*\{/gocs) {
+                        if (/\G\h*\(?$self->{re}{vars}\)?\h*\{/gocs) {
 
                             my $params = join('', map { "my $_;\\$_;" } split(/\h*,\h*/, $1));
                             local $self->{current_function} = $variable;
@@ -1020,13 +1020,25 @@ package Sidef::Parser {
 
                 my $block = Sidef::Types::Block::Code->new({});
                 local $self->{current_block} = $block;
-                my ($obj, $pos) = $self->parse_script(code => '\\var _;' . substr($_, pos));
+
+                if (defined(my $pos = $self->parse_whitespace(code => substr($_, pos)))) {
+                    pos($_) += $pos;
+                }
+
+                my @vars = split(/\h*,\h*/, /\G\|\h*$self->{re}{vars}\h*\|/gc ? ($1) : ('_'));
+
+                my $header =
+                  @vars == 1
+                  ? "\\var $vars[0];"
+                  : '\\var _;' . 'var(' . join(',', @vars) . ')=(_...);';
+
+                my ($obj, $pos) = $self->parse_script(code => $header . substr($_, pos));
                 %{$block} = %{$obj};
 
                 splice @{$self->{ref_vars_refs}{$self->{class}}}, 0, $count;
                 $self->{vars}{$self->{class}} = $ref;
 
-                return $block, pos($_) + $pos - 7;
+                return $block, pos($_) + $pos - length($header);
             }
         }
     }

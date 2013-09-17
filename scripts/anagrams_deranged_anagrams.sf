@@ -4,20 +4,13 @@
 
 var req = (require 'LWP::Simple');
 
-func deranged (a, b) {    # only anagrams ever get here
-
-    for (a.range) {
-        a[_] == b[_] && (return(false));
-    }
-
-    return(true);
-}
-
 func find_deranged (a) {
+
+    var null := (0.chr);
 
     for (a.range => \var i) {
         for (i+1 .. (a.offset) => \var j) {
-            deranged(a[i,j].map{_.split('')}...) || (next);
+            a[i] ^ a[j] -> contains(null) && (next);
             "length %d: %s => %s\n".printf(a[i].len, a[i,j]...);
             return(true);
         }
@@ -43,9 +36,13 @@ if (nil != req) {
         letter_list[_.split('').sort.join] := [] -> append(_);
     }
 
+    "** The hashing took %d seconds!\n".printf(Time.now - time);
+
     for ( letter_list.keys
-         .grep{letter_list[_].len > 1}      # take only ones with anagrams
-         .sort{(_[1].len) <=> (_[0].len)}   # sort by length, descending
+         .grep {letter_list[_].len > 1}      # take only ones with anagrams
+         .map  {[_, _.len]}
+         .sort {_[1][1] <=> _[0][1]}         # sort by length, descending
+         .map  {_[0]}
         ) {
 
         # if we find a pair, they are the longested due to the sort before

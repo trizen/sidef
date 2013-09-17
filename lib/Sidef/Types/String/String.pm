@@ -88,6 +88,24 @@ package Sidef::Types::String::String {
         Sidef::Types::Number::Number->new($$self cmp $$string);
     }
 
+    sub xor {
+        my ($self, $str) = @_;
+        $self->_is_string($str) || return;
+        $self->new($$self ^ $$str);
+    }
+
+    sub or {
+        my ($self, $str) = @_;
+        $self->_is_string($str) || return;
+        $self->new($$self | $$str);
+    }
+
+    sub and {
+        my ($self, $str) = @_;
+        $self->_is_string($str) || return;
+        $self->new($$self & $$str);
+    }
+
     sub times {
         my ($self, $num) = @_;
         $self->_is_number($num) || return;
@@ -577,6 +595,9 @@ package Sidef::Types::String::String {
         *{__PACKAGE__ . '::' . '÷'}  = \&div;
         *{__PACKAGE__ . '::' . '/'}   = \&div;
         *{__PACKAGE__ . '::' . '..'}  = \&to;
+        *{__PACKAGE__ . '::' . '^'}   = \&xor;
+        *{__PACKAGE__ . '::' . '|'}   = \&or;
+        *{__PACKAGE__ . '::' . '&'}   = \&and;
         *{__PACKAGE__ . '::' . '^^'}  = \&begins_with;
         *{__PACKAGE__ . '::' . '$$'}  = \&ends_with;
 
