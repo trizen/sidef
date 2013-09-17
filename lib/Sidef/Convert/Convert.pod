@@ -100,6 +100,22 @@ Alias for L<C<toNum()>|"toNum">.
 
 =cut
 
+=head2 to_re
+
+Convert.to_re() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 to_regex
+
+Convert.to_regex() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 to_s
 
 Alias for L<C<toString()>|"toString">.
@@ -238,6 +254,22 @@ Convert the self object into a number type-object.
     "12.34".toNum  =>  12.34
 
 Returns an object of type: C<Sidef::Types::Number::Number>
+
+=cut
+
+=head2 toRe
+
+Convert.toRe() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 toRegex
+
+Convert.toRegex() -> I<Bool>
+
+Return the
 
 =cut
 

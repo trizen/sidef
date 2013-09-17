@@ -335,6 +335,30 @@ Returns an object of type: C<Sidef::Types::Bool::Bool>
 
 =cut
 
+=head2 count
+
+Array.count() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 count_obj
+
+Array.count_obj() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 countObj
+
+Array.countObj() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 defined
 
 Array.defined(I<Number>) -> I<Bool>
@@ -1061,6 +1085,14 @@ Return the
 =head2 |
 
 I<Num> B<|> I<Num> -> I<Num>
+
+Return the
+
+=cut
+
+=head2 »
+
+I<Num> B<»> I<Num> -> I<Num>
 
 Return the
 

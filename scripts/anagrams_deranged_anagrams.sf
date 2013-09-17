@@ -41,7 +41,7 @@ if (nil != req) {
     for ( letter_list.keys
          .grep {letter_list[_].len > 1}      # take only ones with anagrams
          .map  {[_, _.len]}
-         .sort {_[1][1] <=> _[0][1]}         # sort by length, descending
+         .sort {|a,b| b[1] <=> a[1]}         # sort by length, descending
          .map  {_[0]}
         ) {
 

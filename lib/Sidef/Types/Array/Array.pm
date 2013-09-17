@@ -546,14 +546,14 @@ package Sidef::Types::Array::Array {
     *uniq     = \&unique;
     *distinct = \&unique;
 
-    sub uniqueLast {
+    sub last_unique {
         my ($self) = @_;
         $self->_unique(1);
     }
 
-    *uniqLast    = \&uniqueLast;
-    *unique_last = \&uniqueLast;
-    *uniq_last   = \&uniqueLast;
+    *last_uniq  = \&last_unique;
+    *lastUniq   = \&last_unique;
+    *lastUnique = \&last_unique;
 
     sub contains {
         my ($self, $obj) = @_;

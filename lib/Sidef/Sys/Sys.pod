@@ -114,6 +114,14 @@ Returns an object of type: C<Sidef::Types::Bool::Bool>
 
 =cut
 
+=head2 say
+
+Sys.say() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 scanln
 
 Sys.scanln() -> I<Bool>

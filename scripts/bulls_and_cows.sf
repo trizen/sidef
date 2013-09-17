@@ -4,7 +4,8 @@
 ## http://rosettacode.org/wiki/Bulls_and_cows
 #
 
-var num = ((1..9->shuffle)[0..3]);
+var size = 4;
+var num = (1..9->shuffle.ft(0,size-1));
 
 for (var guesses = 0; true; guesses++) {
 
@@ -18,7 +19,7 @@ for (var guesses = 0; true; guesses++) {
                                        .map  {|d| d.toInt}
                 );
 
-    input.len == 4 || (
+    input.len == size || (
         "Invalid input!\n".warn;
         guesses--;
         next;

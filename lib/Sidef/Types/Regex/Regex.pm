@@ -36,6 +36,8 @@ package Sidef::Types::Regex::Regex {
                                          );
     }
 
+    *match = \&matches;
+
     {
         no strict 'refs';
         *{__PACKAGE__ . '::' . '=~'} = \&matches;    # alias to the 'matches' method

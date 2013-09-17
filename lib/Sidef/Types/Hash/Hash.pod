@@ -79,17 +79,41 @@ Return the
 
 =cut
 
-=head2 map
+=head2 new
 
-Hash.map() -> I<Bool>
+Hash.new() -> I<Bool>
 
 Return the
 
 =cut
 
-=head2 new
+=head2 pairs
 
-Hash.new() -> I<Bool>
+Hash.pairs() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 to_a
+
+Hash.to_a() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 to_array
+
+Hash.to_array() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 toArray
+
+Hash.toArray() -> I<Bool>
 
 Return the
 

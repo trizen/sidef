@@ -12,6 +12,7 @@ my %ignored;
       anagrams_deranged_anagrams.sf
       arithmetic_integer_stdin.sf
       benford_s_law.sf
+      bulls_and_cows.sf
       levenshtein_recursive.sf
       fibonacci_validation.sf
       dice_game_solver.sf
