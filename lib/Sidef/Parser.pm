@@ -703,7 +703,7 @@ package Sidef::Parser {
                 }
 
                 # Declaration of the 'my' special variable and function declaration
-                if (/\G(my)\h+($self->{re}{var_name})/goc || /\G(func)\h+((?:$self->{re}{var_name})?+)(?=\h*\()/goc) {
+                if (/\G(my)\h+($self->{re}{var_name})/goc || /\G(func\b)\h*((?:$self->{re}{var_name})?+)/goc) {
                     my $type = $1;
                     my $name = $2;
 
@@ -1063,7 +1063,7 @@ package Sidef::Parser {
 
                     my $names =
                         /\G($self->{re}{var_name})/goc ? $1
-                      : /\G$self->{re}{vars}/goc       ? $1
+                      : /\G\(?$self->{re}{vars}\)?/goc ? $1
                       : $self->fatal_error(
                                            code  => $_,
                                            pos   => (pos($_)),
@@ -1110,7 +1110,7 @@ package Sidef::Parser {
 
                     my $names =
                         /\G($self->{re}{var_name})/goc ? $1
-                      : /\G$self->{re}{vars}/goc       ? $1
+                      : /\G\(?$self->{re}{vars}\)?/goc ? $1
                       : $self->fatal_error(
                                            code  => $_,
                                            pos   => (pos($_)),
