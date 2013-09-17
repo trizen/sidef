@@ -38,7 +38,13 @@ package Sidef::Types::Bool::Bool {
         };
 
         *{__PACKAGE__ . '::' . '&&'} = \&and;
+        *{__PACKAGE__ . '::' . '&'}  = \&and;
+
         *{__PACKAGE__ . '::' . '||'} = \&or;
+        *{__PACKAGE__ . '::' . '|'}  = \&or;
+
+        *{__PACKAGE__ . '::' . '^'}  = \&xor;
+        *{__PACKAGE__ . '::' . '^^'} = \&xor;
 
         *{__PACKAGE__ . '::' . '?'} = sub {
             my ($self, $code) = @_;
@@ -101,6 +107,16 @@ package Sidef::Types::Bool::Bool {
         }
 
         $self->false;
+    }
+
+    sub xor {
+        my ($self, $val) = @_;
+
+        if (($$self eq 'true' and $val) || ($$self eq 'false' and !$val)) {
+            return $self->false;
+        }
+
+        $self->true;
     }
 
     sub dump {

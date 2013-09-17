@@ -112,6 +112,11 @@ package Sidef::Types::Hash::Hash {
         $new_hash;
     }
 
+    sub copy {
+        my ($self) = @_;
+        $self->new(map { ref($_) ? $_->get_value : $_ } %{$self});
+    }
+
     sub dump {
         my ($self) = @_;
         Sidef::Types::String::String->new(

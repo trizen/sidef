@@ -1,0 +1,24 @@
+#!/usr/bin/ruby
+
+# http://rosettacode.org/wiki/Functional_Composition
+
+func compose {
+    |f,g| func(n){f.call(g.call(n))}
+}
+
+func f(n) {
+    n / 64;
+}
+
+func g(n) {
+    n * 32;
+}
+
+var fg = (compose(f,g));    # fg.call(x) is equivalent with: f(g(x))
+
+fg.call(4) == 2 || (
+    "error!".die
+);
+
+
+"Test passed!".say;

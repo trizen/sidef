@@ -804,6 +804,11 @@ package Sidef::Types::Array::Array {
 
     *toHash = \&to_hash;
 
+    sub copy {
+        my ($self) = @_;
+        $self->new(map { $_->get_value } @{$self});
+    }
+
     sub dump {
         my ($self) = @_;
 

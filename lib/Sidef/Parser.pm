@@ -22,7 +22,6 @@ package Sidef::Parser {
             expect_index  => 0,
             expect_arg    => 0,
             parentheses   => 0,
-            strict_var    => 0,
             inc           => [File::Spec->curdir()],
             class         => 'main',
             vars          => {'main' => []},
@@ -267,7 +266,6 @@ package Sidef::Parser {
                   __BLOCK__
                   __FILE__
                   __RESET_LINE_COUNTER__
-                  __STRICT__
                   __NO_STRICT__
                   __END__
 
@@ -840,16 +838,6 @@ package Sidef::Parser {
                     return Sidef::Types::String::String->new($self->{script_name}), pos;
                 }
 
-                if (/\G__STRICT__\b/gc) {
-                    $self->{strict_var} = 1;
-                    redo;
-                }
-
-                if (/\G__NO_STRICT__\b/gc) {
-                    $self->{strict_var} = 0;
-                    redo;
-                }
-
                 if (/\G__END__\b/gc) {
                     return undef, length($_);
                 }
@@ -936,7 +924,7 @@ package Sidef::Parser {
                     elsif (/\G(?=\h*=>)/) {
                         return Sidef::Types::String::String->new($var_name), pos;
                     }
-                    elsif (not $self->{strict_var} and /\G(?=\h*(?:\R\h*)?:?=(?![=~>]))/) {
+                    elsif (/\G(?=\h*(?:\R\h*)?:?=(?![=~>]))/) {
                         unshift @{$self->{vars}{$class}},
                           {
                             obj   => Sidef::Variable::My->new($name),

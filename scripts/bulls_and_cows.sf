@@ -1,0 +1,42 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Bulls_and_cows
+#
+
+var num = ((1..9->shuffle)[0..3]);
+
+for (var guesses = 0; true; guesses++) {
+
+    var bulls = 0;
+    var cows  = 0;
+
+    var input = (
+                  Sys.scanln("Input: ").split(1)
+                                       .unique()
+                                       .grep {|c| c.match(/^[1-9]$/)??}
+                                       .map  {|d| d.toInt}
+                );
+
+    input.len == 4 || (
+        "Invalid input!\n".warn;
+        guesses--;
+        next;
+    );
+
+    if (input == num) {
+        "You did it in %d attempts!\n".printf(guesses);
+        break;
+    }
+
+    for (num.range => \var i) {
+        if (num[i] == input[i]) {
+            bulls++;
+        }
+        elsif (num.contains(input[i])) {
+            cows++;
+        }
+    }
+
+    "Bulls: %d; Cows: %d\n".printf(bulls, cows);
+}
