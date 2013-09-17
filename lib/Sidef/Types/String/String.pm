@@ -534,40 +534,99 @@ package Sidef::Types::String::String {
 
     sub unescape {
         my ($self) = @_;
-        ${$self} =~ s{\\(\W)}{$1}gs;
-        $self;
+        $self->new($$self =~ s{\\(\W)}{$1}gsr);
     }
 
     sub apply_escapes {
+
         my ($self) = @_;
+        my $str = $$self;
 
         state $esc = {
-                      n => "\n",
-                      f => "\f",
+                      a => "\a",
                       b => "\b",
                       e => "\e",
+                      f => "\f",
+                      n => "\n",
                       r => "\r",
                       t => "\t",
                      };
 
-        {
-            local $" = q{};
-            ${$self} =~ s{(?<!\\)(?:\\\\)*+\K\\([@{[keys %{$esc}]}])}{$esc->{$1}}go;
-            ${$self} =~ s{(?<!\\)(?:\\\\)*+\K\\([LU])((?>[^\\]+|\\[^E])*)(\\E|\z)}{
+        my @chars = split(//, $str);
 
-                $1 eq 'L' ? CORE::lc($2) : CORE::uc($2);
+        ## Known bug: "hell\Uo" returns "hello" instead of "hellO"
+        ##                 /\
+        ##                  `--  in this particular case, "\u" should be used instead!
 
-            }eg;
+        my $spec = 'E';
+        for (my $i = 0 ; $i <= $#chars - 1 ; $i++) {
 
-            ${$self} =~ s{(?<!\\)(?:\\\\)*+\K\\([lu])(.)}{
+            if ($chars[$i] eq '\\') {
+                my $char = $chars[$i + 1];
 
-                $1 eq 'l' ? CORE::lc($2) : CORE::uc($2);
+                if (exists $esc->{$char}) {
+                    splice(@chars, $i--, 2, $esc->{$char});
+                }
+                elsif ($char eq 'L' or $char eq 'U' or $char eq 'E' or $char eq 'Q') {
+                    $spec = $char;
+                    splice(@chars, $i, 2);
+                    $char ne 'Q' && ($i--);
+                    next;
+                }
+                elsif ($char eq 'l') {
+                    if (exists $chars[$i + 2]) {
+                        splice(@chars, $i, 3, CORE::lc($chars[$i + 2]));
+                        next;
+                    }
+                    else {
+                        splice(@chars, $i, 2);
+                    }
+                }
+                elsif ($char eq 'u') {
+                    if (exists $chars[$i + 2]) {
+                        splice(@chars, $i, 3, CORE::uc($chars[$i + 2]));
+                        next;
+                    }
+                    else {
+                        splice(@chars, $i, 2);
+                    }
+                }
+                elsif ($char =~ /^[0-7]/) {
+                    splice(@chars, $i, 2, chr($char));
+                }
+                elsif ($char eq 'd') {
+                    splice(@chars, $i - 1, 3);
+                }
+                elsif ($char eq 'c') {
+                    if (exists $chars[$i + 2]) {    # bug for: "\c\\"
+                        splice(@chars, $i, 3, chr((CORE::ord(CORE::uc($chars[$i + 2])) + 64) % 128));
+                    }
+                    else {
+                        CORE::warn "Missing control char name in \\c, within string\n";
+                        splice(@chars, $i, 2);
+                    }
+                }
+                else {
+                    splice(@chars, $i, 1);
+                }
+            }
 
-            }egs;
+            if ($spec ne 'E') {
+                foreach my $j ($i, ($i == $#chars - 1) ? ($i + 1) : ()) {
+                    if ($spec eq 'U') {
+                        $chars[$j] = CORE::uc($chars[$j]);
+                    }
+                    elsif ($spec eq 'L') {
+                        $chars[$j] = CORE::lc($chars[$j]);
+                    }
+                }
+            }
         }
 
-        return $self;
+        $self->new(CORE::join('', @chars));
     }
+
+    *applyEscapes = \&apply_escapes;
 
     sub dump {
         my ($self) = @_;
