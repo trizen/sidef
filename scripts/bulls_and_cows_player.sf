@@ -1,0 +1,59 @@
+#!/usr/bin/ruby
+#
+## Translation of: http://rosettacode.org/wiki/Bulls_and_cows/Player#Perl
+#
+
+# Build a list of all possible solutions.  The regular expression weeds
+# out numbers containing zeroes or repeated digits.
+
+var candidates = (1234..9876->grep{|i| /0 | (\d) .*? \1 /x->match(i.to_s) ?? not});
+
+
+# Repeatedly prompt for input until the user supplies a reasonable score.
+# The regex validates the user's input and then returns two numbers.
+
+func read_score(guess) {
+    {
+        "My guess: %s   (from %d possibilities)\n"
+            -> printf(guess, candidates.len);
+
+        var match = (
+                     Sys.scanln("bulls cows: ")
+                        .matches(/^\h*(?<BULLS>\d)\h*(?<COWS>\d)\h*$/)
+                    ) ?? && (
+                        var cp = (match.named_captures);
+                        var bc = ([cp['BULLS'], cp['COWS']].map{_->toInt});
+                        bc.sum <= 4 && (return(bc));
+                    );
+
+        say "Please specify the number of bulls and the number of cows";
+
+        __BLOCK__.run;
+    }.run;
+}
+
+func score_correct(a, b, bulls, cows) {
+
+    # Count the positions at which the digits match:
+    var exact = (a ^ b.split(1).count("\0"));
+
+   var loose = 0;
+   for (b.split(1) => \var c) {
+       a.contains(c) && (loose++);
+   }
+
+    bulls == exact && (cows == (loose - exact));
+}
+
+{
+    # Pick a number, display it, get the score, and discard candidates
+    # that don't match the score:
+    var guess = (candidates.rand);
+    var (bulls, cows) = (read_score(guess).as_list);
+    candidates.grep!{|i| score_correct(i.to_s, guess.to_s, bulls, cows)};
+}.do.while (candidates.len > 1);
+
+say (
+     candidates.len == 1 ? ("Your secret number is: %d".sprintf(candidates[0]))
+                         : ("I think you made a mistake with your scoring")
+    );

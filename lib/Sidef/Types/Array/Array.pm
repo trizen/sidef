@@ -494,6 +494,11 @@ package Sidef::Types::Array::Array {
         Sidef::Types::Number::Number->new($#{$self});
     }
 
+    sub rand {
+        my ($self) = @_;
+        $self->[rand($#{$self} + 1)];
+    }
+
     sub range {
         my ($self) = @_;
         __PACKAGE__->new(map { Sidef::Types::Number::Number->new($_) } 0 .. $#{$self});

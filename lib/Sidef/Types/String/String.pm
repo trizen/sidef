@@ -77,6 +77,8 @@ package Sidef::Types::String::String {
         $regex->matches($self, @rest);
     }
 
+    *matches = \&match;
+
     sub to {
         my ($self, $string) = @_;
         Sidef::Types::Array::Array->new(map { $self->new($_) } $$self .. $$string);
@@ -452,16 +454,21 @@ package Sidef::Types::String::String {
 
     sub contains {
         my ($self, $string, $start_pos) = @_;
-        $start_pos //= Sidef::Types::Number::Number->new(0);
 
-        ($self->_is_number($start_pos) && $self->_is_string($string))
-          || return;
+        $self->_is_string($string) || return;
+        $start_pos = (
+                        defined($start_pos)
+                      ? $self->_is_number($start_pos)
+                            ? ($$start_pos)
+                            : (return)
+                      : (0)
+                     );
 
-        if ($$start_pos < 0) {
-            $$start_pos = CORE::length($$self) + $$start_pos;
+        if ($start_pos < 0) {
+            $start_pos = CORE::length($$self) + $start_pos;
         }
 
-        Sidef::Types::Bool::Bool->new(CORE::index($$self, $$string, $$start_pos) != -1);
+        Sidef::Types::Bool::Bool->new(CORE::index($$self, $$string, $start_pos) != -1);
     }
 
     sub begins_with {
