@@ -9,25 +9,20 @@ func fib (n) {
     c[n] := (fib(n-1) + (fib(n-2)));
 }
 
-var srt = 1;
-var max = 9;
+var srt = 2;
 var arr = [];
 var fmt = "%6s %6s %6s\n";
+var max = (ARGV[0] \\ 9 -> to_num);
 
-" " + fmt.printf(qw(pos fib pat)...);
+" " + fmt.printf(qw(pos fib len)...);
 
 for (var i = 0; true; i++) {
 
     arr.push(fib(i) % srt);
 
-    if (var len = (arr.len).isEven && (len > 2)) {
-      if (arr.ft(0, len/2-1) == (arr.ft(len/2, arr.offset))) {
-
-          fmt.printf(srt, fib(srt), len/2);
-
-          srt == max && break;
-          arr=[]; i = 0; srt++;
-      }
-   }
+    arr.ft(-2) == [0,1] && (
+        fmt.printf(srt, fib(srt), arr.len-1);
+        srt >= max && break; arr=[]; i = 0; srt++;
+    );
 
 }

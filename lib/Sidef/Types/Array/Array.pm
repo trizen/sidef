@@ -264,13 +264,32 @@ package Sidef::Types::Array::Array {
     sub ft {
         my ($self, $from, $to) = @_;
 
-        $from //= 0;
-        $to   //= $#{$self};
+        my $max = $#{$self};
+
+        $from = defined($from) ? $self->_is_number($from) ? ($$from) : (return) : 0;
+        $to   = defined($to)   ? $self->_is_number($to)   ? ($$to)   : (return) : $max;
+
+        if ($from < 0) {
+            $from = $max + $from + 1;
+        }
+
+        if ($to < 0) {
+            $to = $max + $to + 1;
+        }
+
+        if (abs($from) > $max) {
+            return $self->new();
+        }
+
+        if (abs($to) > $max) {
+            $to = $max;
+        }
 
         $self->new(map { $_->get_value } @{$self}[$from .. $to]);
     }
 
-    *fromTo = \&ft;
+    *fromTo  = \&ft;
+    *from_to = \&ft;
 
     sub for {
         my ($self, $code) = @_;
