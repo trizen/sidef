@@ -979,6 +979,13 @@ package Sidef::Parser {
                 $self->{parentheses}++;
 
                 my ($obj, $pos) = $self->parse_script(code => substr($_, pos));
+
+                $pos // $self->fatal_error(
+                                           code  => $_,
+                                           pos   => (pos($_) - 1),
+                                           error => "unbalanced parentheses",
+                                          );
+
                 return $obj, pos($_) + $pos;
             }
         }
@@ -995,6 +1002,13 @@ package Sidef::Parser {
                 $self->{right_brackets}++;
 
                 my ($obj, $pos) = $self->parse_script(code => substr($_, pos));
+
+                $pos // $self->fatal_error(
+                                           code  => $_,
+                                           pos   => (pos($_) - 1),
+                                           error => "unbalanced right brackets",
+                                          );
+
                 return $obj, pos($_) + $pos;
             }
         }
@@ -1033,8 +1047,14 @@ package Sidef::Parser {
                   : '\\var _;' . 'var(' . join(',', @vars) . ')=(_...);';
 
                 my ($obj, $pos) = $self->parse_script(code => $header . substr($_, pos));
-                %{$block} = %{$obj};
 
+                $pos // $self->fatal_error(
+                                           code  => $_,
+                                           pos   => (pos($_) - 1),
+                                           error => "unbalanced curly brackets",
+                                          );
+
+                %{$block} = %{$obj};
                 splice @{$self->{ref_vars_refs}{$self->{class}}}, 0, $count;
                 $self->{vars}{$self->{class}} = $ref;
 
