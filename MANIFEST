@@ -26,7 +26,6 @@ lib/Sidef/Time/Time.pod
 lib/Sidef/Types/Array/Array.pm
 lib/Sidef/Types/Array/Array.pod
 lib/Sidef/Types/Black/Hole.pm
-lib/Sidef/Types/Black/Hole.pod
 lib/Sidef/Types/Block/Break.pm
 lib/Sidef/Types/Block/Break.pod
 lib/Sidef/Types/Block/Code.pm
@@ -89,6 +88,7 @@ lib/Sidef/Types/Number/Negative.pm
 lib/Sidef/Types/Number/Negative.pod
 lib/Sidef/Types/Number/Number.pm
 lib/Sidef/Types/Number/Number.pod
+lib/Sidef/Types/Number/NumberFast.pm
 lib/Sidef/Types/Number/Positive.pm
 lib/Sidef/Types/Number/Positive.pod
 lib/Sidef/Types/Regex/Matches.pm
@@ -143,9 +143,12 @@ scripts/balanced_brackets.sf
 scripts/benford_s_law.sf
 scripts/best_shuffle.sf
 scripts/best_shuffle_alg_permute.sf
+scripts/binary_search.sf
 scripts/binary_search_recursive.sf
 scripts/box_the_compass.sf
 scripts/break.sf
+scripts/bulls_and_cows.sf
+scripts/bulls_and_cows_player.sf
 scripts/caesar_cipher.sf
 scripts/calendar.sf
 scripts/catalan_numbers.sf
@@ -157,8 +160,10 @@ scripts/dice_game_solver.sf
 scripts/echo.sf
 scripts/eval.sf
 scripts/fibonacci_cached.sf
+scripts/fibonacci_mystery.sf
 scripts/fibonacci_validation.sf
 scripts/for_two_vars.sf
+scripts/function_composition.sf
 scripts/function_recursion.sf
 scripts/functional_modules.sf
 scripts/functions.sf
@@ -186,6 +191,7 @@ scripts/matrix_multiplication.sf
 scripts/median.sf
 scripts/method_expressions.sf
 scripts/multi_var_assignment.sf
+scripts/named_block_arguments.sf
 scripts/next.sf
 scripts/objects_init.sf
 scripts/open.sf

@@ -1,13 +1,13 @@
 ---
 abstract: 'Sidef Programming Language'
 author:
-  - "\n                             Daniel Șuteu (trizenx@gmail.com)\n                             Ioana Fălcușan (ioanaflavia@gmail.com)\n                           "
+  - "\n                             Daniel Șuteu   (trizenx@gmail.com)\n                             Ioana Fălcușan (ioanaflavia@gmail.com)\n                           "
 build_requires:
   Test::More: 0
 configure_requires:
   Module::Build: 0
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4007, CPAN::Meta::Converter version 2.132140'
+generated_by: 'Module::Build version 0.4007, CPAN::Meta::Converter version 2.132510'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html

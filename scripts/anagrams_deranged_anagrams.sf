@@ -6,11 +6,9 @@ var req = (require 'LWP::Simple');
 
 func find_deranged (a) {
 
-    var null := (0.chr);
-
     for (a.range => \var i) {
         for (i+1 .. (a.offset) => \var j) {
-            a[i] ^ a[j] -> contains(null) && (next);
+            a[i] ^ a[j] -> contains("\0") && (next);
             "length %d: %s => %s\n".printf(a[i].len, a[i,j]...);
             return(true);
         }

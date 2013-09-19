@@ -1,0 +1,33 @@
+#!/usr/bin/ruby
+
+# Inspired by: http://www.youtube.com/watch?v=Nu-lW-Ifyec
+
+var c = [];
+
+func fib (n) {
+    n < 2 && (return $n);
+    c[n] := (fib(n-1) + (fib(n-2)));
+}
+
+var srt = 1;
+var max = 9;
+var arr = [];
+var fmt = "%6s %6s %6s\n";
+
+" " + fmt.printf(qw(pos fib pat)...);
+
+for (var i = 0; true; i++) {
+
+    arr.push(fib(i) % srt);
+
+    if (var len = (arr.len).isEven && (len > 2)) {
+      if (arr.ft(0, len/2-1) == (arr.ft(len/2, arr.offset))) {
+
+          fmt.printf(srt, fib(srt), len/2);
+
+          srt == max && break;
+          arr=[]; i = 0; srt++;
+      }
+   }
+
+}
