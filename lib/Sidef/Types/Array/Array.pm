@@ -281,7 +281,7 @@ package Sidef::Types::Array::Array {
             return $self->new();
         }
 
-        if (abs($to) > $max) {
+        if ($to > $max) {
             $to = $max;
         }
 

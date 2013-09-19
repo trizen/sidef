@@ -576,6 +576,14 @@ Return the
 
 =cut
 
+=head2 from_to
+
+Array.from_to() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 fromTo
 
 Array.fromTo() -> I<Bool>

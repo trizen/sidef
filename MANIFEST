@@ -117,6 +117,7 @@ scripts/100_doors_4.sf
 scripts/99_bottles.sf
 scripts/9_billion_names.sf
 scripts/A+B.sf
+scripts/abs_string.sf
 scripts/accumulator.sf
 scripts/accumulator_factory.sf
 scripts/ackermann_function.sf
