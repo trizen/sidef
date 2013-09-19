@@ -1,20 +1,17 @@
-#!/usr/bin/perl
+#!/usr/bin/ruby
 
 # Translation of: http://rosettacode.org/wiki/Averages/Pythagorean_means#Perl
 
-func A (a) {
+func A(a) {
     a.sum / (a.len);
 }
 
-func G (a) {
-    var p = (a.prod);
-    p.root(a.len);
+func G(a) {
+    a.prod.root(a.len);
 }
 
-func H (a) {
-    var h = 0;
-    a.for {h+=(1/_)};
-    a.len / h;
+func H(a) {
+    a.len / (a.map{|n|1/n}.sum);
 }
 
 var ints = (1..10);

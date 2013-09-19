@@ -67,7 +67,7 @@ package Sidef::Types::String::String {
 
     sub ne {
         my ($self, $string) = @_;
-        ref($self) ne ref($string) and return Sidef::Types::Bool::Bool->true;
+        $self->_is_string($string) || return;
         Sidef::Types::Bool::Bool->new($$self ne $$string);
     }
 
@@ -131,7 +131,7 @@ package Sidef::Types::String::String {
 
     sub equals {
         my ($self, $string) = @_;
-        ref($self) ne ref($string) and return Sidef::Types::Bool::Bool->false;
+        $self->_is_string($string) || return;
         Sidef::Types::Bool::Bool->new($$self eq $$string);
     }
 
