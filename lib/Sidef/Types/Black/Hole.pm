@@ -8,13 +8,8 @@ package Sidef::Types::Black::Hole {
         bless {}, __PACKAGE__;
     }
 
-    sub DESTROY {
-        return;
-    }
-
-    sub AUTOLOAD {
-        return __PACKAGE__->new();
-    }
+    sub DESTROY  { }
+    sub AUTOLOAD { __PACKAGE__->new }
 }
 
 1;

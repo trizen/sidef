@@ -15,13 +15,13 @@ package Sidef::Convert::Convert {
                         };
 
     use overload q{""} => sub {
-        my ($type) = ref($_[0]);
+        my $type = ref($_[0]);
 
         if (exists $array_like->{$type} or $type eq 'Sidef::Types::Hash::Hash') {
             return $_[0];
         }
 
-        return ${$_[0]};
+        ${$_[0]};
     };
 
     sub to_s {
@@ -30,10 +30,15 @@ package Sidef::Convert::Convert {
         if (exists $array_like->{ref $self}) {
             return Sidef::Types::String::String->new(join(' ', map { $_->get_value } @{$self}));
         }
+        elsif (ref $self eq 'Sidef::Types::Hash::Hash') {
+            return Sidef::Types::String::String->new(join(' ', map { $_->to_s } @{$self->to_a}));
+        }
 
         Sidef::Types::String::String->new("$$self");
     }
 
+    *toStr     = \&to_s;
+    *to_str    = \&to_s;
     *toString  = \&to_s;
     *to_string = \&to_s;
 

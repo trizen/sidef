@@ -5,6 +5,8 @@ package Sidef::Types::Number::Number {
     use strict;
     use warnings;
 
+    no warnings 'redefine';
+
     use Math::BigFloat try => 'GMP,Pari';
 
     our @ISA = qw(
@@ -99,7 +101,7 @@ package Sidef::Types::Number::Number {
     sub cmp {
         my ($self, $num) = @_;
         $self->_is_number($num) || return;
-        Sidef::Types::Number::Number->new($$self->bcmp($$num));
+        __PACKAGE__->new($$self->bcmp($$num));
     }
 
     sub ge {
@@ -182,7 +184,7 @@ package Sidef::Types::Number::Number {
 
     sub sqrt {
         my ($self) = @_;
-        $self->new(sqrt $$self);
+        $self->new(CORE::sqrt $$self);
     }
 
     sub root {
@@ -274,7 +276,7 @@ package Sidef::Types::Number::Number {
 
     sub chr {
         my ($self) = @_;
-        Sidef::Types::Char::Char->new(CORE::chr $self->get_value);
+        Sidef::Types::Char::Char->new(CORE::chr $$self);
     }
 
     sub next_power_of_two {
@@ -356,7 +358,7 @@ package Sidef::Types::Number::Number {
         my $min = $$self;
         $max = ref($max) ? $$max : do { $min = 0; $$self };
 
-        $self->new($min + rand($max - $min));
+        $self->new($min + CORE::rand($max - $min));
     }
 
     sub ceil {

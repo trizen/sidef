@@ -13,6 +13,7 @@ my %ignored;
       arithmetic_integer_stdin.sf
       benford_s_law.sf
       bulls_and_cows.sf
+      bulls_and_cows_player.sf
       levenshtein_recursive.sf
       fibonacci_validation.sf
       dice_game_solver.sf
@@ -26,7 +27,7 @@ foreach my $sidef_script (glob '*.sf') {
     next if exists $ignored{$sidef_script};
 
     print "\n\n=>> Executing $sidef_script\n", "-" x 80, "\n";
-    system $^X, '../bin/sidef', $sidef_script;
+    system $^X, '../bin/sidef', @ARGV, $sidef_script;
 
     if ($? != 0) {
         die "Non-zero exit code for script: $sidef_script\n";

@@ -7,7 +7,7 @@ func evalArithmeticExp(s) {
     func evalExp(s) {
 
         func operate(s, op) {
-            s.split(op).map{Number.new(_)}.reduce(op);
+            s.split(op).map{_->toNum}.reduce(op);
         }
 
         func add(s) {
@@ -57,7 +57,7 @@ func evalArithmeticExp(s) {
         s.replace!(rePara, evalExp(match.captures.first));
     }
 
-    return(Number.new(evalExp(s)));
+    return(evalExp(s).toNum);
 }
 
 

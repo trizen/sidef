@@ -11,7 +11,7 @@ package Sidef::Types::Byte::Byte {
 
     sub new {
         my (undef, $byte) = @_;
-        bless \Math::BigInt->new($byte), __PACKAGE__;
+        bless \(my $b = int($byte)), __PACKAGE__;
     }
 
 }

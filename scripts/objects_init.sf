@@ -23,13 +23,6 @@ var file = (File.new(__FILE__));
 var array = (Array.new("x", "y", "z"));
 array.join(", ").say;
 
-#
-## Number object
-#
-
-var num = (Number.new('0.123'));
-num + 4 to_s.say;
-
 
 #
 ## Pipe object

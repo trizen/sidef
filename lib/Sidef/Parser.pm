@@ -268,6 +268,8 @@ package Sidef::Parser {
                   __RESET_LINE_COUNTER__
                   __NO_STRICT__
                   __END__
+                  __NO_BIGNUM__
+                  __USE_BIGNUM__
 
                   )
             },
@@ -840,6 +842,18 @@ package Sidef::Parser {
 
                 if (/\G__END__\b/gc) {
                     return undef, length($_);
+                }
+
+                if (/\G__USE_BIGNUM__\b/gc) {
+                    delete $INC{'Sidef/Types/Number/Number.pm'};
+                    require Sidef::Types::Number::Number;
+                    redo;
+                }
+
+                if (/\G__NO_BIGNUM__\b/gc) {
+                    delete $INC{'Sidef/Types/Number/NumberFast.pm'};
+                    require Sidef::Types::Number::NumberFast;
+                    redo;
                 }
 
                 if (/\G__BLOCK__\b/gc) {

@@ -161,6 +161,8 @@ package Sidef::Types::String::String {
     }
 
     *toLowerCase = \&lc;
+    *downcase    = \&lc;
+    *downCase    = \&lc;
 
     sub lcfirst {
         my ($self) = @_;
@@ -545,7 +547,6 @@ package Sidef::Types::String::String {
     }
 
     sub apply_escapes {
-
         my ($self) = @_;
         my $str = $$self;
 
@@ -574,7 +575,7 @@ package Sidef::Types::String::String {
                 if (exists $esc->{$char}) {
                     splice(@chars, $i--, 2, $esc->{$char});
                 }
-                elsif ($char eq 'L' or $char eq 'U' or $char eq 'E' or $char eq 'Q') {
+                elsif ($char eq 'L' or $char eq 'U' or $char eq 'E') {
                     $spec = $char;
                     splice(@chars, $i, 2);
                     $char ne 'Q' && ($i--);

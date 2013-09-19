@@ -60,6 +60,7 @@ my %ignored_methods = (
                        'Sidef::Types::Block::Continue'  => [qw(new)],
                        'Sidef::Types::Regex::Matches'   => [qw(new)],
                        'Sidef::Types::Regex::Regex'     => [qw(new)],
+                       'Sidef::Types::Black::Hole'      => [qw(new)],
                        'Sidef::Types::Array::Array'     => [qw(get_value a b)],
                        'Sidef::Types::Number::Number'   => [qw(get_value)],
                        'Sidef::Types::String::String'   => [qw(get_value)],
@@ -71,6 +72,7 @@ my %ignored_modules = map { $_ => 1 } qw (
   Sidef::Exec
   Sidef::Init
   Sidef::Parser
+  Sidef::Types::Number::NumberFast
   );
 
 my $name = basename($dir);

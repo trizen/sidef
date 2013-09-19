@@ -19,7 +19,7 @@ my $version = $Sidef::VERSION;
 my %args;
 if (@ARGV and chr ord $ARGV[0] eq '-') {
     require Getopt::Std;
-    Getopt::Std::getopts('E:d:Dho:ivH', \%args);
+    Getopt::Std::getopts('E:d:Dho:ivHB', \%args);
 }
 
 my %keywords = (
@@ -75,6 +75,7 @@ if ($args{h}) {
                     '-o output_file' => 'dump the data structure into a file (with -D)',
                     '-E program'     => 'one line of program',
                     '-H'             => 'interactive help',
+                    '-B'             => q{don't use the Math::BigFloat module for numbers},
                     '-v'             => 'print version',
                    );
 
@@ -99,6 +100,10 @@ Run '$0 -H' for more help with $name.
 END
 
     exit 0;
+}
+
+if ($args{B}) {
+    require Sidef::Types::Number::NumberFast;
 }
 
 if (defined $args{d}) {
