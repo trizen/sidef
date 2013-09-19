@@ -17,10 +17,6 @@ package Sidef::Types::Block::Switch {
     sub when {
         my ($self, $arg) = @_;
 
-        if (ref($arg) eq 'Sidef::Types::Block::Code') {
-            $arg = $arg->run;
-        }
-
         if (ref($self->{obj}) eq ref($arg)) {
             my ($method) = '==';
 
@@ -45,6 +41,9 @@ package Sidef::Types::Block::Switch {
                 $self->{do_block} = 1;
             }
         }
+        else {
+            return $self->when($arg);
+        }
 
         $self;
     }
@@ -56,8 +55,7 @@ package Sidef::Types::Block::Switch {
     }
 
     sub end {
-        my ($self) = @_;
-        Sidef::Types::Black::Hole->new();
+        Sidef::Types::Black::Hole->new;
     }
 
     sub value {

@@ -8,16 +8,16 @@ var condition = ( given(1+3) );
 
 condition
     when 3 do {
-        "Value '%d' is 3.\n".printf(condition.value);
-    }
-    when (j) do {
-        "Value '%d' is 4.\n".printf(condition.value);
+        condition.value == 3 || ("Error(1 - 3)\n".die);
     }
     when (i) do {
-        "Value '%d' is 5.\n".printf(condition.value);
+        condition.value == i || ("Error(1 - i)\n".die);
+    }
+    when (j) do {
+        condition.value == j || ("Error(1 - j)\n".die);
     }
     default {
-        "Can't find what I was looking for...".say;
+        "Can't find what I was looking for...".die;
     }
 end;
 
@@ -25,45 +25,45 @@ var value = "sidef";
 
 given (value)
     when ("x") {
-        "Not the right place! (1)".say;
+        "Not the right place! (1)".die;
     }
     when ("sidef") {
         "Right place! (1)".say;
     }
     when ("y") {
-        "Not the right place! (2)".say;
+        "Not the right place! (2)".die;
     }
     default {
-        "Not the right place! (3)".say;
+        "Not the right place! (3)".die;
     }
 end;
 
 
 given (value)
     when (3) do {
-        "Not the right place! (1)".say;
+        "Not the right place! (1)".die;
     }
     when ([5,2]) do {
-        "Not the right place! (2)".say;
+        "Not the right place! (2)".die;
     }
     when ("sidef") do {
         "Right place! (2)".say;
     }
     default {
-        "Not the right place! (3)".say;
+        "Not the right place! (3)".die;
     }
 end;
 
 
 {value}.given
     when {"x"} do {
-        "Not the right place! (1)".say;
+        "Not the right place! (1)".die;
     }
     when {"y"} do {
-        "Not the right place! (2)".say;
+        "Not the right place! (2)".die;
     }
     when ("z") do {
-        "Not the right place! (3)".say;
+        "Not the right place! (3)".die;
     }
     default {
         "Right place! (3)".say;
@@ -72,73 +72,76 @@ end;
 
 
 {value}.given
-    when {"x"} do {
-        "Not the right place! (1)".say;
+    when "x" do {
+        "Not the right place! (1)".die;
     }
     when "y" do {
-        "Not the right place! (2)".say;
+        "Not the right place! (2)".die;
     }
-    when {"sidef"} do {
+    when "sidef" do {
         "Right place! (4)".say;
     }
     default {
-        "Not the right place! (3)".say;
+        "Not the right place! (3)".die;
     }
 end;
 
 
 given [8,9,10]
     when "x" do {
-        "Not the right place! (1)".say;
+        "Not the right place! (1)".die;
     }
-    when [6,7,8] do {
-        "Not the right place! (2)".say;
+    when [8,10,9] do {
+        "Not the right place! (2)".die;
     }
     when [8,9,10] do {
         "Right place! (5)".say;
     }
     when [42] do {
-        "Not the right place! (3)".say;
+        "Not the right place! (3)".die;
     }
 end;
 
 
 given(0)
     when 1 do {
-        "Not the right place! (1)".say;
+        "Not the right place! (1)".die;
     }
     when '0' do {
-        "Not the right place! (2)".say;
+        "Not the right place! (2)".die;
     }
     when 0 do {
         "Right place! (6)".say;
         continue;
     }
     when 2 do {
-        "Not the right place! (3)".say;
+        "Not the right place! (3)".die;
     }
-    when 0 do {
+    when (1-1) do {
         "Right place! (6 - continued)".say;
     }
     default {
-        "Not the right place! (4)".say;
+        "Not the right place! (4)".die;
     }
 end;
 
 
-var cond = (switch 0)
-    case (cond.value == 1) do {
-        "Not the right place! (1)".say;
+switch(var val = 0)
+    case (val == 1) {
+        "Not the right place! (1)".die;
     }
-    case (cond.value == 0) do {
+    case (val == 0) {
         "Right place! (case)".say;
         continue;
     }
-    when (false) do {
-        "Not the right place! (2)".say;
+    case (false) {
+        "Not the right place! (2)".die;
     }
-    when (0) do {
-        "Right place! (when-continued)".say;
+    when (true) {
+        "Not the right place! (3)".die;
+    }
+    case 0 {
+        "Right place! (case-continued)".say;
     }
     default {
         "Case error!".die;
