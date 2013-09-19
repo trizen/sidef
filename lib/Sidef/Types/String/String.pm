@@ -266,6 +266,18 @@ package Sidef::Types::String::String {
         __PACKAGE__->new(CORE::join($$delim, $$self, @rest));
     }
 
+    sub clear {
+        my ($self) = @_;
+        $self->new('');
+    }
+
+    sub is_empty {
+        my ($self) = @_;
+        Sidef::Types::Bool::Bool->new($$self eq '');
+    }
+
+    *isEmpty = \&is_empty;
+
     sub index {
         my ($self, $substr, $pos) = @_;
         $self->_is_string($substr) || return;

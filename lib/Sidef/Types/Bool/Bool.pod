@@ -31,6 +31,14 @@ Return the
 
 =cut
 
+=head2 &
+
+I<Num> B<&> I<Num> -> I<Num>
+
+Return the
+
+=cut
+
 =head2 &&
 
 I<Num> B<&&> I<Num> -> I<Num>
@@ -50,6 +58,22 @@ Return the
 =head2 ?:
 
 I<Num> B<?:> I<Num> -> I<Num>
+
+Return the
+
+=cut
+
+=head2 ^
+
+I<Num> B<^> I<Num> -> I<Num>
+
+Return the
+
+=cut
+
+=head2 ^^
+
+I<Num> B<^^> I<Num> -> I<Num>
 
 Return the
 
@@ -146,6 +170,22 @@ Return the
 =head2 true
 
 Bool.true() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 xor
+
+Bool.xor() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 |
+
+I<Num> B<|> I<Num> -> I<Num>
 
 Return the
 

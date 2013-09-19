@@ -122,6 +122,14 @@ Alias for L<C<toString()>|"toString">.
 
 =cut
 
+=head2 to_str
+
+Convert.to_str() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 to_string
 
 Alias for L<C<toString()>|"toString">.
@@ -268,6 +276,14 @@ Return the
 =head2 toRegex
 
 Convert.toRegex() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 toStr
+
+Convert.toStr() -> I<Bool>
 
 Return the
 

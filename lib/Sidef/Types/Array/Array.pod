@@ -60,6 +60,8 @@ Returns a new array with the elements which exists in both arrays.
 
 Returns a new object of the same type as the self object.
 
+Alias for: L<C<and()>|"and">
+
 =cut
 
 =head2 &&
@@ -76,9 +78,15 @@ Returns a new object of the same type as the self object.
 
 =head2 *
 
-I<Num> B<*> I<Num> -> I<Num>
+I<Array> B<*> I<Num> -> I<Array>
 
-Return the
+Multiplies the array's elements I<n> times.
+
+    ["x", "y"] * 2;     # returns: ["x", "y", "x", "y"]
+
+Returns a new object of the same type as the self object.
+
+Alias for: L<C<multiply()>|"multiply">
 
 =cut
 
@@ -254,9 +262,7 @@ Returns an object of type: C<Sidef::Types::Bool::Bool>
 
 =head2 and
 
-Array.and() -> I<Bool>
-
-Return the
+Alias for L<C<&>|"&">.
 
 =cut
 
@@ -335,6 +341,14 @@ Returns an object of type: C<Sidef::Types::Bool::Bool>
 
 =cut
 
+=head2 copy
+
+Array.copy() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 count
 
 Array.count() -> I<Bool>
@@ -381,6 +395,54 @@ Returns only the unique objects from the array.
     [1,2,2,[3],4,[3],4].distinct;   # returns: [1,2,[3],4]
 
 Returns an object of the same type as the self object.
+
+=cut
+
+=head2 drop_first
+
+Array.drop_first() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 drop_last
+
+Array.drop_last() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 drop_left
+
+Array.drop_left() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 drop_right
+
+Array.drop_right() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 dropFirst
+
+Array.dropFirst() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 dropLast
+
+Array.dropLast() -> I<Bool>
+
+Return the
 
 =cut
 
@@ -539,6 +601,14 @@ Returns an object of the same type as the self object.
 
 =cut
 
+=head2 get
+
+Array.get() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 grep
 
 Alias for L<C<filter()>|"filter">.
@@ -618,6 +688,22 @@ Alias for L<C<lastIndex()>|"lastIndex">.
 
 =cut
 
+=head2 last_uniq
+
+Array.last_uniq() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 last_unique
+
+Array.last_unique() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 lastIndex
 
 Array.lastIndex(I<Block>) -> I<Number>
@@ -633,6 +719,22 @@ Returns an object of type: C<Sidef::Types::Number::Number>
 =head2 lastIndexWhere
 
 Alias for L<C<lastIndex()>|"lastIndex">.
+
+=cut
+
+=head2 lastUniq
+
+Array.lastUniq() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 lastUnique
+
+Array.lastUnique() -> I<Bool>
+
+Return the
 
 =cut
 
@@ -828,6 +930,14 @@ Returns the self object.
 
 =cut
 
+=head2 rand
+
+Array.rand() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 range
 
 Array.range() -> I<Array>
@@ -962,6 +1072,22 @@ Return the
 
 =cut
 
+=head2 take_left
+
+Array.take_left() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 take_right
+
+Array.take_right() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 takeLeft
 
 Array.takeLeft() -> I<Bool>
@@ -1018,41 +1144,9 @@ Return the
 
 =cut
 
-=head2 uniq_last
-
-Array.uniq_last() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 uniqLast
-
-Array.uniqLast() -> I<Bool>
-
-Return the
-
-=cut
-
 =head2 unique
 
 Array.unique() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 unique_last
-
-Array.unique_last() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 uniqueLast
-
-Array.uniqueLast() -> I<Bool>
 
 Return the
 

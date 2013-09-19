@@ -31,6 +31,14 @@ Return the
 
 =cut
 
+=head2 copy
+
+Hash.copy() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 dump
 
 Hash.dump() -> I<Bool>

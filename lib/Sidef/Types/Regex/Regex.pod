@@ -39,6 +39,14 @@ Return the
 
 =cut
 
+=head2 match
+
+Regex.match() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 matches
 
 Regex.matches() -> I<Bool>

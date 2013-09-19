@@ -40,6 +40,14 @@ Return the
 
 =cut
 
+=head2 &
+
+I<Num> B<&> I<Num> -> I<Num>
+
+Return the
+
+=cut
+
 =head2 *
 
 I<Num> B<*> I<Num> -> I<Num>
@@ -160,9 +168,25 @@ Return the
 
 =cut
 
+=head2 ^
+
+I<Num> B<^> I<Num> -> I<Num>
+
+Return the
+
+=cut
+
 =head2 ^^
 
 I<Num> B<^^> I<Num> -> I<Num>
+
+Return the
+
+=cut
+
+=head2 and
+
+String.and() -> I<Bool>
 
 Return the
 
@@ -179,6 +203,14 @@ Return the
 =head2 apply_escapes
 
 String.apply_escapes() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 applyEscapes
+
+String.applyEscapes() -> I<Bool>
 
 Return the
 
@@ -227,6 +259,14 @@ Return the
 =head2 chop
 
 String.chop() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 clear
+
+String.clear() -> I<Bool>
 
 Return the
 
@@ -291,6 +331,22 @@ Return the
 =head2 div
 
 String.div() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 downCase
+
+String.downCase() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 downcase
+
+String.downcase() -> I<Bool>
 
 Return the
 
@@ -448,6 +504,22 @@ Return the
 
 =cut
 
+=head2 is_empty
+
+String.is_empty() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 isEmpty
+
+String.isEmpty() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 join
 
 String.join() -> I<Bool>
@@ -512,6 +584,14 @@ Return the
 
 =cut
 
+=head2 matches
+
+String.matches() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 multiply
 
 String.multiply() -> I<Bool>
@@ -531,6 +611,14 @@ Return the
 =head2 new
 
 String.new() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 or
+
+String.or() -> I<Bool>
 
 Return the
 
@@ -827,6 +915,22 @@ Return the
 =head2 wordcase
 
 String.wordcase() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 xor
+
+String.xor() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 |
+
+I<Num> B<|> I<Num> -> I<Num>
 
 Return the
 

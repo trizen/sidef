@@ -594,11 +594,11 @@ package Sidef::Types::Array::Array {
                 return;
             }
 
-            return ((CORE::splice(@{$self}, $$index, 1))->get_value);
+            return CORE::splice(@{$self}, $$index, 1);
         }
 
         $#{$self} > -1 || return;
-        (pop @{$self})->get_value;
+        pop @{$self};
     }
 
     sub splice {
@@ -631,6 +631,8 @@ package Sidef::Types::Array::Array {
         $self->new(map { $_->get_value } @{$self}[$offset - $$amount + 1 .. $offset]);
     }
 
+    *take_right = \&takeRight;
+
     sub dropRight {
         my ($self, $amount) = @_;
         $self->_is_number($amount) || return;
@@ -644,6 +646,8 @@ package Sidef::Types::Array::Array {
 
         $self->new(map { $_->get_value } CORE::splice(@{$self}, -$$amount));
     }
+
+    *drop_right = \&dropRight;
 
     sub takeLeft {
         my ($self, $amount) = @_;
@@ -659,6 +663,8 @@ package Sidef::Types::Array::Array {
         $self->new(map { $_->get_value } @{$self}[0 .. $$amount - 1]);
     }
 
+    *take_left = \&takeLeft;
+
     sub dropLeft {
         my ($self, $amount) = @_;
         $self->_is_number($amount) || return;
@@ -673,11 +679,22 @@ package Sidef::Types::Array::Array {
         $self->new(map { $_->get_value } CORE::splice(@{$self}, 0, $$amount));
     }
 
+    *drop_left = \&dropLeft;
+
     sub shift {
         my ($self) = @_;
-        $#{$self} > -1 || return;
-        (shift @{$self})->get_value;
+        shift @{$self};
     }
+
+    *dropFirst  = \&shift;
+    *drop_first = \&shift;
+
+    sub dropLast {
+        my ($self) = @_;
+        CORE::pop @{$self};
+    }
+
+    *drop_last = \&dropLast;
 
     sub sort {
         my ($self, $code) = @_;

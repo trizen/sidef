@@ -15,10 +15,7 @@ package Sidef::Types::Block::Do {
     sub do {
         my ($self, $code) = @_;
 
-        $self->_is_code($code) || do {
-            $self->{do_block} = 0;
-            return $self;
-        };
+        $self->_is_code($code) || return;
 
         if ($self->{do_block}) {
             my $result = $code->run;
@@ -36,7 +33,7 @@ package Sidef::Types::Block::Do {
             return Sidef::Types::Black::Hole->new();
         }
 
-        return $self;
+        $self;
     }
 
     {

@@ -6,6 +6,7 @@ use strict;
 use autodie;
 use warnings;
 
+use lib qw(.);
 use open IO => ':encoding(UTF-8)';
 
 use File::Find qw(find);
@@ -198,7 +199,7 @@ __POD2__
         $pod_data = parse_pod_file($pod_file);
     };
 
-    foreach my $key (keys %subs) {
+    foreach my $key (@keys) {
         if (exists $pod_data->{$key}) {
             $subs{$key} = $pod_data->{$key};
         }
