@@ -191,17 +191,17 @@ package Sidef::Parser {
                  dynamic => 0,
                 },
                 {
-                 sub     => sub { Sidef::Types::Number::Negative->new },
+                 sub     => sub { Sidef::Types::Number::Unary->new },
                  re      => qr/\G(?=-)/,
                  dynamic => 0,
                 },
                 {
-                 sub     => sub { Sidef::Types::Number::Positive->new },
+                 sub     => sub { Sidef::Types::Number::Unary->new },
                  re      => qr/\G(?=\+)/,
                  dynamic => 0,
                 },
                 {
-                 sub     => sub { Sidef::Types::Number::Not->new },
+                 sub     => sub { Sidef::Types::Number::Unary->new },
                  re      => qr/\G(?=~)/,
                  dynamic => 0,
                 },

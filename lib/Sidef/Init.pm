@@ -46,10 +46,8 @@ require Sidef::Types::Block::Next if (caller)[0] ne q{Sidef::Types::Block::Next}
 require Sidef::Types::Block::Break if (caller)[0] ne q{Sidef::Types::Block::Break};
 require Sidef::Types::Block::Continue if (caller)[0] ne q{Sidef::Types::Block::Continue};
 require Sidef::Types::Regex::Regex if (caller)[0] ne q{Sidef::Types::Regex::Regex};
-require Sidef::Types::Number::Positive if (caller)[0] ne q{Sidef::Types::Number::Positive};
-require Sidef::Types::Number::Not if (caller)[0] ne q{Sidef::Types::Number::Not};
 require Sidef::Types::Number::Number if (caller)[0] ne q{Sidef::Types::Number::Number};
-require Sidef::Types::Number::Negative if (caller)[0] ne q{Sidef::Types::Number::Negative};
+require Sidef::Types::Number::Unary if (caller)[0] ne q{Sidef::Types::Number::Unary};
 require Sidef::Types::String::String if (caller)[0] ne q{Sidef::Types::String::String};
 require Sidef::Module::Caller if (caller)[0] ne q{Sidef::Module::Caller};
 require Sidef::Module::Require if (caller)[0] ne q{Sidef::Module::Require};
