@@ -11,7 +11,7 @@ package Sidef::Types::Char::Char {
 
     sub new {
         my (undef, $char) = @_;
-        $char = $$char if ref $char;
+        ref($char) && return $char->to_char;
         bless \$char, __PACKAGE__;
     }
 

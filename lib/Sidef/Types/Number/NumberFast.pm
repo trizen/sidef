@@ -14,6 +14,7 @@ package Sidef::Types::Number::Number {
 
     sub new {
         my (undef, $num) = @_;
+        $num += 0;
         bless \$num, __PACKAGE__;
     }
 

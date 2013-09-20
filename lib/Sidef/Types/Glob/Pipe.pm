@@ -23,7 +23,12 @@ package Sidef::Types::Glob::Pipe {
 
     sub open {
         my ($self, $mode, $var_ref) = @_;
-        $mode = $$mode if ref($mode);
+
+        ref($mode)
+          ? $self->is_string($mode, 1)
+              ? do { $mode = $$mode }
+              : return
+          : ();
 
         my $pid = open(my $pipe_h, $mode, map { $_->get_value } @{$self});
         my $pipe_obj = Sidef::Types::Glob::PipeHandle->new(pipe_h => $pipe_h, pipe => $self);

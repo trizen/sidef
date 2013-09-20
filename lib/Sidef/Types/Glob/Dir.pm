@@ -11,7 +11,7 @@ package Sidef::Types::Glob::Dir {
 
     sub new {
         my (undef, $dir) = @_;
-        $dir = $$dir if ref $dir;
+        ref($dir) && return $dir->to_dir;
         bless \$dir, __PACKAGE__;
     }
 

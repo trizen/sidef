@@ -11,7 +11,7 @@ package Sidef::Types::Glob::File {
 
     sub new {
         my (undef, $file) = @_;
-        $file = $$file if ref $file;
+        ref($file) && return $file->to_file;
         bless \$file, __PACKAGE__;
     }
 
