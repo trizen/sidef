@@ -85,12 +85,11 @@ lib/Sidef/Types/Hash/Hash.pod
 lib/Sidef/Types/Nil/Nil.pm
 lib/Sidef/Types/Nil/Nil.pod
 lib/Sidef/Types/Number/Negative.pm
-lib/Sidef/Types/Number/Negative.pod
+lib/Sidef/Types/Number/Not.pm
 lib/Sidef/Types/Number/Number.pm
 lib/Sidef/Types/Number/Number.pod
 lib/Sidef/Types/Number/NumberFast.pm
 lib/Sidef/Types/Number/Positive.pm
-lib/Sidef/Types/Number/Positive.pod
 lib/Sidef/Types/Regex/Matches.pm
 lib/Sidef/Types/Regex/Matches.pod
 lib/Sidef/Types/Regex/Regex.pm

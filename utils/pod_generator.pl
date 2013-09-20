@@ -74,6 +74,9 @@ my %ignored_modules = map { $_ => 1 } qw (
   Sidef::Init
   Sidef::Parser
   Sidef::Types::Number::NumberFast
+  Sidef::Types::Number::Negative
+  Sidef::Types::Number::Positive
+  Sidef::Types::Number::Not
   );
 
 my $name = basename($dir);

@@ -186,6 +186,9 @@
       "Sidef::Types::Number::Negative" : {
          "file" : "lib/Sidef/Types/Number/Negative.pm"
       },
+      "Sidef::Types::Number::Not" : {
+         "file" : "lib/Sidef/Types/Number/Not.pm"
+      },
       "Sidef::Types::Number::Number" : {
          "file" : "lib/Sidef/Types/Number/Number.pm"
       },

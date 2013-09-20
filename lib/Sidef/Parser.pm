@@ -201,6 +201,11 @@ package Sidef::Parser {
                  dynamic => 0,
                 },
                 {
+                 sub     => sub { Sidef::Types::Number::Not->new },
+                 re      => qr/\G(?=~)/,
+                 dynamic => 0,
+                },
+                {
                  sub     => sub { Sidef::Types::Block::Code->new({}) },
                  re      => qr/\G(?=:)/,
                  dynamic => 0,
@@ -257,6 +262,9 @@ package Sidef::Parser {
                   func
                   class
 
+                  ARGV
+                  ENV
+
                   STDIN
                   STDOUT
                   STDERR
@@ -266,7 +274,6 @@ package Sidef::Parser {
                   __BLOCK__
                   __FILE__
                   __RESET_LINE_COUNTER__
-                  __NO_STRICT__
                   __END__
                   __NO_BIGNUM__
                   __USE_BIGNUM__
@@ -307,6 +314,7 @@ package Sidef::Parser {
                       ?? ?
                       ! \\
                       : »
+                      ~
                       );
 
                     qr{(@operators)};
@@ -673,7 +681,7 @@ package Sidef::Parser {
                             $self->fatal_error(
                                                code  => $_,
                                                pos   => (pos($_) - length($name)),
-                                               error => "'$name' is a keyword!",
+                                               error => "'$name' is either a keyword or a predefined variable!",
                                               );
                         }
 
@@ -709,7 +717,7 @@ package Sidef::Parser {
                         $self->fatal_error(
                                            code  => $_,
                                            pos   => (pos($_) - length($name)),
-                                           error => "'$name' is a keyword!",
+                                           error => "'$name' is either a keyword or a predefined variable!",
                                           );
                     }
 

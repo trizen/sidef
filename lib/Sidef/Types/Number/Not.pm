@@ -1,4 +1,4 @@
-package Sidef::Types::Number::Negative {
+package Sidef::Types::Number::Not {
 
     use 5.014;
     use strict;
@@ -12,10 +12,10 @@ package Sidef::Types::Number::Negative {
 
     {
         no strict 'refs';
-        *{__PACKAGE__ . '::' . '-'} = sub {
+        *{__PACKAGE__ . '::' . '~'} = sub {
             my ($self, $number) = @_;
             $self->_is_number($number, 1) || return;
-            $number->negate;
+            $number->not;
         };
     }
 
