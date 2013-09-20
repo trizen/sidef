@@ -1,0 +1,32 @@
+#!/usr/bin/ruby
+
+# Translation of: http://rosettacode.org/wiki/Combinations#Perl5i
+
+func combine(n, set) {
+
+    set.len == 0 && (
+        return [];
+    );
+
+    n == 1 && (
+        return(set.map{[_]});
+    );
+
+    head   = (set.shift);
+    result = (combine(n-1, set.map{_}));
+
+    for (result => \var subarray) {
+        subarray.unshift(head);
+    }
+
+    return(result + (combine(n, set)));
+}
+
+
+##
+# Testing
+##
+
+for (combine(3, 'a'..'e') => \var arr) {
+    arr.join(' ').say;
+}

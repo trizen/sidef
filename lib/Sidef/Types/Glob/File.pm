@@ -267,7 +267,12 @@ package Sidef::Types::Glob::File {
 
     sub open {
         my ($self, $mode, $var_ref) = @_;
-        $mode = ${$mode} if ref $mode;
+
+        ref($mode)
+          ? $self->is_string($mode, 1)
+              ? do { $mode = $$mode }
+              : return
+          : ();
 
         my $success = open(my $fh, $mode, $$self);
         my $fh_obj = Sidef::Types::Glob::FileHandle->new(fh => $fh, file => $self);

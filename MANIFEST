@@ -153,6 +153,7 @@ scripts/catalan_numbers.sf
 scripts/catalan_numbers_recursive.sf
 scripts/classes.sf
 scripts/code_to_hash.sf
+scripts/combinations.sf
 scripts/cramers_method.sf
 scripts/dice_game_solver.sf
 scripts/echo.sf
