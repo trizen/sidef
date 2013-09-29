@@ -800,6 +800,14 @@ Return the
 
 =cut
 
+=head2 of
+
+Number.of() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 or
 
 Number.or() -> I<Bool>

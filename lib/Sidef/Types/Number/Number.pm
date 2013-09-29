@@ -408,6 +408,26 @@ package Sidef::Types::Number::Number {
         $self->new($$self->as_int->bnok($$k));
     }
 
+    sub of {
+        my ($self, $obj) = @_;
+
+        defined($obj)
+          || $self->_is_code($obj)
+          || return;
+
+        if ($self->_is_code($obj, 1, 1)) {
+            my $array = Sidef::Types::Array::Array->new();
+
+            for my $i (1 .. $$self) {
+                $array->push($obj->run);
+            }
+
+            return $array;
+        }
+
+        Sidef::Types::Array::Array->new(($obj) x $$self);
+    }
+
     sub to_bin {
         my ($self) = @_;
 
