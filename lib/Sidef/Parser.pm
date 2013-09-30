@@ -687,7 +687,7 @@ package Sidef::Parser {
 
                         my ($var, $code) = $self->find_var($name, $class);
 
-                        if (defined $var and $code == 1) {
+                        if (defined($var) && $code) {
                             warn "Redeclaration of $type '$name' in same scope, at "
                               . "$self->{script_name}, line $self->{line}\n";
                         }
@@ -800,7 +800,9 @@ package Sidef::Parser {
 
                 foreach my $hash_ref (@{$self->{obj_keys}}) {
                     if (/$hash_ref->{re}/) {
-                        $self->{expect_method} = 1;
+
+                        $self->{expect_method}     = 1;
+                        $self->{expect_method_arg} = 1;
 
                         if ($hash_ref->{dynamic}) {
                             return $hash_ref->{sub}->(), pos;
@@ -1271,12 +1273,18 @@ package Sidef::Parser {
                 }
 
                 # Method separator '->', or operator-method, like '*'
-                if (   $self->{expect_method} == 1
+                if (   $self->{expect_method}
                     && !$self->{expect_arg}
                     && (/\G(?=[a-z])/ || /\G->/gc || /\G(?=$self->{re}{operators})/o || /\G\./gc)) {
 
                     my ($method, $req_arg, $pos) = $self->get_method_name(code => substr($_, pos));
                     pos($_) += $pos;
+
+                    if ($self->{expect_method_arg}) {
+                        $self->{expect_method_arg} = 0;
+                        $self->{expect_arg}        = 1;
+                    }
+
                     push @{$struct{$self->{class}}[-1]{call}}, {method => $method};
 
                     $self->{has_method} = 1;
@@ -1338,7 +1346,7 @@ package Sidef::Parser {
                 }
 
                 # Array index
-                if ($self->{expect_index} == 1) {
+                if ($self->{expect_index}) {
 
                     $self->{expect_index} = 0;
 
@@ -1352,7 +1360,7 @@ package Sidef::Parser {
                 }
 
                 # Beginning of an argument expression
-                if ($self->{has_method} == 1) {
+                if ($self->{has_method}) {
 
                     my $is_arg = /\G(?=\()/;
                     my ($obj, $pos) =

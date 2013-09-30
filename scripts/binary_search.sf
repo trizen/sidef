@@ -25,8 +25,9 @@ var max = 99;
 
 var a = (min..max);
 
-for (min .. min+5 + max-5..max => \var i) {
+for (min..min+5 + max-5..max => \var i) {
 
+    say $i;
     binary_search(a, i) == i-1 || (
         "Error on number: %d\n".sprintf(i).die;
     );

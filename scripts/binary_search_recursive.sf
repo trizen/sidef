@@ -40,9 +40,8 @@ var arr = [
 for ([15, 120, 122, 532, 1235, 8, 0, 12425, 54, 325] => \var value) {
     var bool = (binary_search(arr, value, 0, arr.offset));
 
-    arr.contains(value) == bool || (
+    arr.contains(value) == bool ||
         "Error on value: %d\n".sprintf(value).die;
-    );
 
     "%20s -> %s\n".printf(value, bool);
 }
