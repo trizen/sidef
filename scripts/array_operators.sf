@@ -21,17 +21,7 @@ array.join(" ").say;
 
 {
     var array = (Array.new(0,6,10,12));
-    array.map{ _ + 2 }.to_s.say;     # modifies the array in place
-    array.to_s.say;
-}.run;
-
-######################################################
-
-'-' * 80 say;
-
-{
-    var array = (Array.new(0,6,10,12));
-    array.map{ _ + 2 }.to_s.say;      # doesn't modifies the array
+    array.map{ _ + 2 }->to_s.say;
     array.to_s.say;
 }.run;
 

@@ -86,11 +86,6 @@ var name = "Ioana";       # initialize variable "name"
 "Hello, $name! How are you? :)\n"->print;
 name->uc->say;
 
-6+4/2->to_s->say;       # WRONG!!! Prints 5
-6+(4/2)->to_s->say;     # RIGHT!!! Prints 8
-
-12/3*4->to_s->say;      # Prints 16
-
 ###############################################
 ################# OTHER STUFF #################
 ###############################################

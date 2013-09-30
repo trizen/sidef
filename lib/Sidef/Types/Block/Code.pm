@@ -141,8 +141,8 @@ package Sidef::Types::Block::Code {
                         self => Sidef::Variable::My->new($vars[$i]{self}->_get_name),
                         call => [
                                  {
-                                  name => '=',
-                                  arg  => [shift @args],
+                                  method => '=',
+                                  arg    => [shift @args],
                                  }
                                 ]
                        }

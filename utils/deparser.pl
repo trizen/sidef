@@ -64,7 +64,7 @@ package Sidef::Deparser {
 
             foreach my $call (@{$expr->{call}}) {
 
-                my $method = $call->{name};
+                my $method = $call->{method};
                 my @method = $self->deparse_obj(ref($method) eq 'HASH' ? $method : {self => $method});
                 chop($_), substr($_, 0, 1, '') for @method;
 

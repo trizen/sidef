@@ -8,17 +8,15 @@ func matrix_multi (a, b) {
 
   var n = (b.len - 1);
 
-    {
-        var r = _;
-        {
-            var c = _;
-            {
+    for (0..rows => \var r) {
+        for (0..cols => \var c) {
+            for (0..n => \var i) {
                 p[r]    := [];
                 p[r][c] := 0;
-                p[r][c] += (a[r][_] * b[_][c]);
-            } for (0 .. n);
-        } for(0 .. cols);
-    } for (0 .. rows);
+                p[r][c] += (a[r][i] * b[i][c]);
+            }
+        }
+    }
 
     p;
 };
@@ -38,4 +36,4 @@ var b = [
 
 var c = (matrix_multi(a, b));
 
-{_.map{"%3d".sprintf(_)}.join(", ").say} for (c);
+{_.map{"%3d".sprintf(_)}->join(", ").say} for (c);

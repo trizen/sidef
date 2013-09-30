@@ -10,7 +10,8 @@ func zig_zag (w, h) {
     {r[_[1]][_[0]] = n; n++} for (
        0..(h-1) -> map {
             var e = _; 0..(w-1) -> map{ [e, _] }
-    }.combine
+    }
+    -> combine
     -> sort {
         var cmp = (_[0][0] + _[0][1] <=> (_[1][0] + _[1][1])) == 0
         ? (

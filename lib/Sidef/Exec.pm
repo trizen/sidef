@@ -208,7 +208,7 @@ package Sidef::Exec {
             foreach my $call (@{$expr->{call}}) {
 
                 my @arguments;
-                my $method = $call->{name};
+                my $method = $call->{method};
 
                 if (ref $method eq 'HASH') {
                     $method = $self->execute_expr($method, $class);

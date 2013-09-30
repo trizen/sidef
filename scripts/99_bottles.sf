@@ -12,8 +12,8 @@ var i;
     var sentence = ('%s of beer on the wall'.sprintf(bottles)).say;
 
     i > 0 && (
-        sentence.substr(0, bottles.length + 8)->say;
-        "Take one down, pass it around\n"->say;
+        sentence.substr(0, bottles.length + 8).say;
+        "Take one down, pass it around\n".say;
     );
 
 } for (i = 99; i >= 0; i--);

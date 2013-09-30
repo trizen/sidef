@@ -11,7 +11,7 @@ var board = [
              [6, 2, 1, 6, 6, 3],
             ]
 
-var moves = (:(
+var moves = :(
                 'up'         => [-1, +0],
                 'up-right'   => [-1, +1],
                 'up-left'    => [-1, -1],
@@ -20,10 +20,9 @@ var moves = (:(
                 'down'       => [+1, +0],
                 'down-left'  => [+1, -1],
                 'down-right' => [+1, +1],
-              )
             );
 
-var directions = (moves.keys);
+var directions = moves.keys;
 
 func valid_move (row, col) {
 
@@ -59,10 +58,10 @@ while (true) {
         );
 
         var pos = moves[dir];
-        var row = (current_pos[0] + pos[0]);
-        var col = (current_pos[1] + pos[1]);
+        var row = current_pos[0]+pos[0];
+        var col = current_pos[1]+pos[1];
 
-        valid_move(row, col) || (break);
+        valid_move(row, col) || break;
 
         dirs.push(
                   :(
@@ -76,8 +75,7 @@ while (true) {
         current_pos = [row, col];
         current_num = board[current_pos[0]][current_pos[1]];
 
-        seen[current_num] := 0;
-        seen[current_num] += 1;
+        seen[current_num] := 0 ++;
 
         if (current_num == 0) {
 
@@ -91,5 +89,5 @@ while (true) {
             break;
         }
 
-    } * (board.offset**2);
+    } * (board.offset);
 }

@@ -35,14 +35,14 @@ func read_score(guess) {
 func score_correct(a, b, bulls, cows) {
 
     # Count the positions at which the digits match:
-    var exact = (a ^ b.split(1).count("\0"));
+    var exact = (a ^ b -> split(1).count("\0"));
 
-   var loose = 0;
-   for (b.split(1) => \var c) {
-       a.contains(c) && (loose++);
-   }
+    var loose = 0;
+    for (b.split(1) => \var c) {
+        a.contains(c) && loose++;
+    }
 
-    bulls == exact && (cows == (loose - exact));
+    bulls == exact && (cows == loose-exact);
 }
 
 {

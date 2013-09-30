@@ -141,7 +141,7 @@ package Sidef::Types::String::String {
     sub append {
         my ($self, $string) = @_;
         $self->_is_string($string) || return;
-        $self->new($$self . $$string);
+        __PACKAGE__->new($$self . $$string);
     }
 
     *concat = \&append;

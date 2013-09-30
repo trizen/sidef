@@ -6,7 +6,7 @@ func binary_search(a,i) {
     var h = (a.offset);
 
     while (h >= l) {
-        var mid = ((h+l) / 2 -> int);
+        var mid = (h+l / 2 -> int);
         a[mid] > i && (h=(mid-1); next);
         a[mid] < i && (l=(mid+1); next);
         return $mid;
@@ -25,9 +25,9 @@ var max = 99;
 
 var a = (min..max);
 
-for (min..(min+5) + (max-5..max) => \var i) {
+for (min .. min+5 + max-5..max => \var i) {
 
-    binary_search(a, i) == (i-1) || (
+    binary_search(a, i) == i-1 || (
         "Error on number: %d\n".sprintf(i).die;
     );
 

@@ -14,9 +14,9 @@ if (nil != req) {
     }
 
     var vals = (anagram.values);
-    var best = (vals.map{_.len}.max);
+    var best = (vals.map{_.len}->max);
 
-    vals.grep{_.len == best}.for {
+    vals.grep{_.len == best}->for {
         _.join(', ').say;
     };
 

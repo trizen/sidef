@@ -2,7 +2,7 @@
 
 var s = "something";
 var ref_s = (\s);     # 'ref_s' points to var 's'
-*ref_s.say;           # prints "something"
+*ref_s->say;          # prints "something"
 *ref_s = "else";      # changes the 's' variable
 s.say;                # prints "else"
 
@@ -13,7 +13,7 @@ s.say;                # prints "else"
 var ref_x = (\var x);
 
 x = "Changed x";
-*ref_x.say;
+*ref_x->say;
 
 var y = (\ref_x);
 *(*y) = "Changed y (ref of ref)";
@@ -27,7 +27,7 @@ x.say;
 var text = "Changed x again";
 
 x = text;
-*ref_x.say;
+*ref_x->say;
 
 '-' * 80 say;
 
@@ -67,9 +67,9 @@ x = text;
     var name;
 
     var name_ref = (assign2ref(\name, "Carl"));
-    *name_ref.say;
+    *name_ref->say;
 
     assign2ref(\name, "John");
-    "Assigned name: " + name.say;
+    "Assigned name: " + name -> say;
 
 }.run;

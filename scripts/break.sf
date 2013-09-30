@@ -26,7 +26,7 @@ while (i -= 1 >= 10) {
 ## {...} for (array)
 #
 {
-    "For: " + _.say; break; _.say;
+    say "For: "+_; break; _.say;
 } for ["a","b","c"];
 
 #
@@ -37,7 +37,7 @@ while (i -= 1 >= 10) {
     {
         i.to_s.say;
         i == 3 && (break);
-        i >= 3 && ("This should not be printed!".say);
+        i >= 3 && ("Error inside the 'for' loop!\n".die);
     } for (i = 1; i<=10; i++);
 }.run;
 
@@ -46,10 +46,10 @@ while (i -= 1 >= 10) {
 #
 for ["a", "b", "c"] {
 
-    "<<<: " + _.say;
+    say "<<<: "+_;
 
     foreach ["d", "e", "f"] {
-        ">>>: " + _.say;
+        say ">>>: "+_;
         break;
     }
 

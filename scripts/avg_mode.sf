@@ -6,7 +6,7 @@ func mode() {
     var c = (Hash.new);
 
     for (_ => \var e) {
-        c[e]:=0++;
+        c[e] := 0 ++;
     }
 
     var best = (c.values.max);

@@ -3,6 +3,8 @@
 use strict;
 use warnings;
 
+my $sidef = '../bin/sidef';
+
 my %ignored;
 @ignored{
     qw(
@@ -27,7 +29,7 @@ foreach my $sidef_script (glob '*.sf') {
     next if exists $ignored{$sidef_script};
 
     print "\n\n=>> Executing $sidef_script\n", "-" x 80, "\n";
-    system $^X, '../bin/sidef', @ARGV, $sidef_script;
+    system $sidef, @ARGV, $sidef_script;
 
     if ($? != 0) {
         die "Non-zero exit code for script: $sidef_script\n";

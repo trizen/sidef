@@ -19,7 +19,7 @@ func cumu (n) {
 
 func row (n) {
     var r = (cumu(n));
-    return (n-1.range.map { r[_+1] - r[_] } );
+    return (n-1->range->map{ r[_+1] - r[_] } );
 }
 
 "rows:".say;

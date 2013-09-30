@@ -11,7 +11,7 @@ func G(a) {
 }
 
 func H(a) {
-    a.len / (a.map{|n|1/n}.sum);
+    a.len / (a.map{|n|1/n}->sum);
 }
 
 var ints = (1..10);

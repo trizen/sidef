@@ -27,7 +27,7 @@ func hello (name) {
         __FUNC__.call("recurse %d".sprintf(x));
     }
 
-    "End of func: " + name.say;
+    "End of func: " + name -> say;
 }
 
 hello("hello");

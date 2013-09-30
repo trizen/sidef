@@ -6,8 +6,8 @@ const ε = 1e-14;
 
 func agm(a, g) {
 
-    while ((a-g.abs) > (a*ε.abs)) {
-        [a+g*.5, a*g.sqrt].assignTo(\a, \g);
+    while (a-g abs > (a*ε abs)) {
+        [a+g * 0.5, a*g sqrt].assignTo(\a, \g);
     }
 
     return $a;
