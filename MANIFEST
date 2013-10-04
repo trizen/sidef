@@ -231,7 +231,6 @@ t/01-parser.t
 t/boilerplate.t
 t/manifest.t
 t/pod.t
-talks/alpha-release/sidef.odp
 utils/deparser.pl
 utils/pod_generator.pl
 utils/sidef_concept.pl
