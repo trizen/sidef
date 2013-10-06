@@ -1,0 +1,13 @@
+#!/usr/bin/ruby
+
+#
+## Code interpolation:
+#
+#         "Hello #{name}"
+## means: "Hello" + ({name}.run.to_s)
+#
+
+for 0..5 { |i|
+    print "#{i} + #{i} == #{i + i}\t";
+    print "2*i == 2*#{i} => #{ 2*i }"+"\n";
+}

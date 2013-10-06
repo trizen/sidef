@@ -605,7 +605,7 @@ package Sidef::Parser {
                 # Double quoted string
                 if (/\G(?=["\“„])/ || /\Gqq\b/gc) {
                     my ($string, $pos) = $self->get_quoted_string(code => (substr($_, pos)));
-                    return Sidef::Types::String::String->new($string)->apply_escapes, pos($_) + $pos;
+                    return Sidef::Types::String::String->new($string)->apply_escapes($self), pos($_) + $pos;
                 }
 
                 # Single quoted filename
@@ -617,7 +617,8 @@ package Sidef::Parser {
                 # Double quoted filename
                 if (/\Gqqf\b/gc) {
                     my ($string, $pos) = $self->get_quoted_string(code => (substr($_, pos)));
-                    return Sidef::Types::Glob::File->new(Sidef::Types::String::String->new($string)->apply_escapes),
+                    return Sidef::Types::Glob::File->new(
+                                                      Sidef::Types::String::String->new($string)->apply_escapes($self)),
                       pos($_) + $pos;
                 }
 
@@ -630,7 +631,8 @@ package Sidef::Parser {
                 # Double quoted dirname
                 if (/\Gqqd\b/gc) {
                     my ($string, $pos) = $self->get_quoted_string(code => (substr($_, pos)));
-                    return Sidef::Types::Glob::Dir->new(Sidef::Types::String::String->new($string)->apply_escapes),
+                    return Sidef::Types::Glob::Dir->new(
+                                                      Sidef::Types::String::String->new($string)->apply_escapes($self)),
                       pos($_) + $pos;
                 }
 
@@ -792,7 +794,7 @@ package Sidef::Parser {
                         map {
                             $type eq 'qw'
                               ? Sidef::Types::String::String->new($_)->unescape
-                              : Sidef::Types::String::String->new($_)->apply_escapes
+                              : Sidef::Types::String::String->new($_)->apply_escapes($self)
                           } @{$strings}
                     );
                     return $array, pos($_) + $pos;
@@ -827,7 +829,8 @@ package Sidef::Parser {
                 if (/\G(?=`)/) {
                     my ($string, $pos) = $self->get_quoted_string(code => (substr($_, pos)));
 
-                    return Sidef::Types::Glob::Backtick->new(Sidef::Types::String::String->new($string)->apply_escapes),
+                    return Sidef::Types::Glob::Backtick->new(
+                                                      Sidef::Types::String::String->new($string)->apply_escapes($self)),
                       pos($_) + $pos;
                 }
 

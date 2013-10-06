@@ -559,7 +559,7 @@ package Sidef::Types::String::String {
     }
 
     sub apply_escapes {
-        my ($self) = @_;
+        my ($self, $parser) = @_;
         my $str = $$self;
 
         state $esc = {
@@ -572,6 +572,7 @@ package Sidef::Types::String::String {
                       t => "\t",
                      };
 
+        my @inline_expressions;
         my @chars = split(//, $str);
 
         ## Known bug: "hell\Uo" returns "hello" instead of "hellO"
@@ -630,6 +631,18 @@ package Sidef::Types::String::String {
                     splice(@chars, $i, 1);
                 }
             }
+            elsif ($chars[$i] eq '#' and exists $chars[$i + 1] and $chars[$i + 1] eq '{') {
+                if (ref $parser eq 'Sidef::Parser') {
+                    my $code = CORE::join('', @chars[$i + 1 .. $#chars]);
+                    my ($block, $pos) = $parser->parse_block(code => $code);
+
+                    push @inline_expressions, [$i, $block];
+                    splice(@chars, $i--, 1 + $pos);
+                }
+                else {
+                    # Can't eval #{} at runtime!
+                }
+            }
 
             if ($spec ne 'E') {
                 foreach my $j ($i, ($i == $#chars - 1) ? ($i + 1) : ()) {
@@ -641,6 +654,50 @@ package Sidef::Types::String::String {
                     }
                 }
             }
+        }
+
+        if (@inline_expressions) {
+
+            foreach my $i (0 .. $#inline_expressions) {
+                my $pair = $inline_expressions[$i];
+                splice @chars, $pair->[0] + $i, 0, $pair->[1];
+            }
+
+            my $expr;
+            my $append_arg = sub {
+                push @{$expr->{main}[0]{call}}, {arg => [$_[0]], method => '+'};
+            };
+
+            my $string = '';
+            foreach my $char (@chars) {
+                if (ref($char) eq 'Sidef::Types::Block::Code') {
+                    my $block = {main => [{self => $char, call => [{method => 'run'}, {method => 'to_s'}]}]};
+
+                    if (not defined $expr) {
+                        $expr = {main => [{self => $string eq '' ? $block : $self->new($string), call => []}]};
+
+                        next if $string eq '';
+                        $append_arg->($block);
+                        $string = '';
+                        next;
+                    }
+
+                    $append_arg->($string eq '' ? $block : $self->new($string));
+
+                    next if $string eq '';
+                    $append_arg->($block);
+                    $string = '';
+                    next;
+                }
+
+                $string .= $char;
+            }
+
+            if ($string ne '') {
+                $append_arg->($self->new($string));
+            }
+
+            return $expr;
         }
 
         $self->new(CORE::join('', @chars));
