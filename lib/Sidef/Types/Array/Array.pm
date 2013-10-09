@@ -261,6 +261,8 @@ package Sidef::Types::Array::Array {
         $self->[$$index];
     }
 
+    *item = \&get;
+
     sub ft {
         my ($self, $from, $to) = @_;
 

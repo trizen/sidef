@@ -77,6 +77,40 @@ package Sidef::Math::Math {
         Sidef::Types::Number::Number->new(Math::BigFloat->accuracy($$n));
     }
 
+    sub range_sum {
+        my ($self, $from, $to, $step) = @_;
+
+        $self->_is_number($from) || return;
+        $self->_is_number($to)   || return;
+
+        defined($step) ? $self->_is_number($step) ? () : return : do {
+            $step = Sidef::Types::Number::Number->new(1);
+        };
+
+        Sidef::Types::Number::Number->new(($$from + $$to) * (($$to - $$from) / $$step + 1) / 2);
+    }
+
+    *rangeSum = \&range_sum;
+
+    sub map {
+        my ($self, $amount, $from, $to) = @_;
+
+        $self->_is_number($amount) || return;
+        $self->_is_number($from)   || return;
+        $self->_is_number($to)     || return;
+
+        my $step  = ($$to - $$from) / $$amount;
+        my $array = Sidef::Types::Array::Array->new();
+
+        return $array if $step == 0;
+
+        for (my $i = $$from ; $i < $$to ; $i += $step) {
+            $array->push(Sidef::Types::Number::Number->new($i));
+        }
+
+        $array;
+    }
+
 };
 
 1
