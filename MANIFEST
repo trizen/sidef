@@ -167,6 +167,7 @@ scripts/function_composition.sf
 scripts/function_recursion.sf
 scripts/functional_modules.sf
 scripts/functions.sf
+scripts/gcd.sf
 scripts/getopt.sf
 scripts/global_regex_matching.sf
 scripts/hailstone.sf

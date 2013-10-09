@@ -92,16 +92,10 @@ package Sidef::Types::Hash::Hash {
 
     sub exists {
         my ($self, $key) = @_;
-        $key // do {
-            warn sprintf(
-                           "[exists] %s\n", @_ == 1
-                         ? "No keyword specified!"
-                         : "Invalid keyword: not defined!"
-                        );
-            return;
-        };
         Sidef::Types::Bool::Bool->new(exists $self->{$key});
     }
+
+    *has_key = \&exists;
 
     sub flip {
         my ($self) = @_;

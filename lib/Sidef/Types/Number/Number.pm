@@ -294,6 +294,13 @@ package Sidef::Types::Number::Number {
 
     *nextPowerOf = \&next_power_of;
 
+    sub is_zero {
+        my ($self) = @_;
+        Sidef::Types::Bool::Bool->new($$self->is_zero);
+    }
+
+    *isZero = \&is_zero;
+
     sub is_nan {
         my ($self) = @_;
         Sidef::Types::Bool::Bool->new($$self->is_nan);

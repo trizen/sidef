@@ -497,7 +497,7 @@ package Sidef::Parser {
             }
 
             # Alpha-numeric method name
-            if (/\G($self->{re}{var_name} [!:]?)/gxoc) {
+            if (/\G($self->{re}{var_name} [!:?]?)/gxoc) {
                 return $1, 0, pos;
             }
 

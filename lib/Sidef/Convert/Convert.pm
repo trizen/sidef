@@ -82,7 +82,7 @@ package Sidef::Convert::Convert {
 
     sub to_bool {
         my ($self) = @_;
-        Sidef::Types::Bool::Bool->new($$self);
+        Sidef::Types::Bool::Bool->new($self);
     }
 
     *toBool = \&to_bool;

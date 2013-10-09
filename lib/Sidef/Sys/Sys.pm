@@ -87,23 +87,23 @@ package Sidef::Sys::Sys {
     }
 
     sub print {
-        my ($self, @rest) = @_;
-        Sidef::Types::Bool::Bool->new(print @rest);
+        my ($self, @args) = @_;
+        Sidef::Types::Bool::Bool->new(print @args);
     }
 
     sub printf {
-        my ($self, @rest) = @_;
-        Sidef::Types::Bool::Bool->new(printf @rest);
+        my ($self, @args) = @_;
+        Sidef::Types::Bool::Bool->new(printf @args);
     }
 
     sub printh {
-        my ($self, $fh, @rest) = @_;
+        my ($self, $fh, @args) = @_;
 
         if (ref($fh) eq 'GLOB') {
-            return Sidef::Types::Bool::Bool->new(print {$fh} @rest);
+            return Sidef::Types::Bool::Bool->new(print {$fh} @args);
         }
         elsif (ref($fh) =~ /^Sidef::Types::Glob::/ and $fh->can('print')) {
-            return $fh->print(@rest);
+            return $fh->print(@args);
         }
 
         warn "[WARN] Sys.printh(): invalid handle object!\n";
@@ -111,8 +111,8 @@ package Sidef::Sys::Sys {
     }
 
     sub println {
-        my ($self, @rest) = @_;
-        Sidef::Types::Bool::Bool->new(say @rest);
+        my ($self, @args) = @_;
+        Sidef::Types::Bool::Bool->new(say @args);
     }
 
     *say = \&println;

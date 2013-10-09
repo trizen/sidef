@@ -165,18 +165,28 @@ package Sidef::Variable::Variable {
                 $method_type = 2;
                 chop $method;
             }
+            elsif (substr($method, -1) eq '?') {
+                $method_type = 3;
+                chop $method;
+            }
         }
 
         if (ref($value) && ($value->can($method) || $value->can('AUTOLOAD'))) {
             my @results = $value->$method(@args);
 
-            if ($method_type == 1) {
+            if ($method_type == 1) {    # (!) modifies the variable in place
                 my $method = '=';
                 $self->$method(@results);
                 return $self->new(rand, 'var', $self);
             }
-            elsif ($method_type == 2) {
+            elsif ($method_type == 2) {    # (:) returns the self variable
                 return $self->new(rand, 'var', $self);
+            }
+            elsif ($method_type == 3) {    # (?) asks for a boolean value
+                my $result = $results[-1];
+                return ref($result) eq 'Sidef::Types::Bool::Bool'
+                  ? $result
+                  : Sidef::Types::Bool::Bool->new($result);
             }
 
             return $results[-1];
