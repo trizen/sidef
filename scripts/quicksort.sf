@@ -1,0 +1,14 @@
+#!/usr/bin/ruby
+
+# Translation of: http://rosettacode.org/wiki/Sorting_algorithms/Quicksort#Perl
+
+func quick_sort (a) {
+    a.len < 2 && (return a);
+    p = a.popRand;          # to avoid the worst cases
+    quick_sort(a.grep{_ < p}) + [p] + (quick_sort(a.grep{_ >= p}));
+}
+
+var a = [4, 65, 2, -31, 0, 99, 83, 782, 1];
+
+say "Unsorted #{a.dump}";
+say "Sorted   #{quick_sort(a.copy).dump}";

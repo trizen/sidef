@@ -517,7 +517,7 @@ package Sidef::Types::Array::Array {
 
     sub rand {
         my ($self) = @_;
-        $self->[rand($#{$self} + 1)];
+        $self->[CORE::rand($#{$self} + 1)];
     }
 
     sub range {
@@ -621,6 +621,15 @@ package Sidef::Types::Array::Array {
         $#{$self} > -1 || return;
         pop @{$self};
     }
+
+    *delete = \&pop;
+
+    sub pop_rand {
+        my ($self) = @_;
+        CORE::splice @{$self}, CORE::rand($#{$self} + 1), 1;
+    }
+
+    *popRand = \&pop_rand;
 
     sub splice {
         my ($self, $offset, $length, $array) = @_;

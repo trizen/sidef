@@ -1081,7 +1081,8 @@ package Sidef::Parser {
 
         for ($opt{code}) {
 
-            my ($obj, $pos) = $self->parse_expr(%opt);
+            pos($_) = 0;
+            my ($obj, $pos) = $self->parse_expr(code => $_);
             pos($_) += $pos;
 
             $obj // return undef, pos($_);
