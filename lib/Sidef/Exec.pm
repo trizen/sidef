@@ -24,10 +24,14 @@ package Sidef::Exec {
                                    },
             types => {
                 'Sidef::Types::Bool::Bool' => {
-                                               '&&' => 1,
-                                               '||' => 1,
-                                               '?'  => 1,
-                                               '?:' => 1,
+                                               '&&'  => 1,
+                                               '&'   => 1,
+                                               'and' => 1,
+                                               '||'  => 1,
+                                               'or'  => 1,
+                                               '|'   => 1,
+                                               '?'   => 1,
+                                               '?:'  => 1,
                                               },
                 'Sidef::Types::Block::Code' => {
                                                 'while' => 1,
