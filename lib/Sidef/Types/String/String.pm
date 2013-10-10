@@ -128,6 +128,8 @@ package Sidef::Types::String::String {
     }
 
     *toUpperCase = \&uc;
+    *upcase      = \&uc;
+    *upCase      = \&uc;
 
     sub equals {
         my ($self, $string) = @_;
@@ -197,6 +199,11 @@ package Sidef::Types::String::String {
 
     *wc       = \&wordcase;
     *wordCase = \&wordcase;
+
+    sub capitalize {
+        my ($self) = @_;
+        $self->new(CORE::ucfirst(CORE::lc($$self)));
+    }
 
     sub chop {
         my ($self) = @_;

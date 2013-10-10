@@ -140,6 +140,12 @@ package Sidef::Types::Number::Number {
         $self->new($$self / $$num);
     }
 
+    sub divmod {
+        my ($self, $num) = @_;
+        $self->_is_number($num) || return;
+        Sidef::Types::Array::Array->new($self->div($num)->int, $self->mod($num));
+    }
+
     sub factorial {
         my ($self) = @_;
         $self->new($$self->copy->bfac);

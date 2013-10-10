@@ -22,7 +22,7 @@ package Sidef::Parser {
             expect_index  => 0,
             expect_arg    => 0,
             parentheses   => 0,
-            inc           => [File::Spec->curdir()],
+            inc           => [File::Spec->curdir()],    # this needs a lot of thinking!
             class         => 'main',
             vars          => {'main' => []},
             ref_vars_refs => {'main' => []},
@@ -286,6 +286,7 @@ package Sidef::Parser {
                 operators   => do {
                     local $" = q{|};
 
+                    # The order matters! (in a way)
                     my @operators = map { quotemeta } qw(
 
                       ||= ||
