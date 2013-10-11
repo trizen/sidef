@@ -407,6 +407,12 @@ package Sidef::Types::String::String {
         Sidef::Types::Array::Array->new(map { __PACKAGE__->new($_) } split(/$sep/, $$self, $size));
     }
 
+    sub each {
+        my ($self, $obj) = @_;
+        $self->_is_code($obj) || return;
+        $obj->for(Sidef::Types::Array::Array->new(map { $self->new($_) } split(//, $$self)));
+    }
+
     sub translit {
         my ($self, $orig, $repl, $modes) = @_;
         ($self->_is_string($orig) && $self->_is_string($repl)) || return;
@@ -491,6 +497,8 @@ package Sidef::Types::String::String {
 
         Sidef::Types::Bool::Bool->new(CORE::index($$self, $$string, $start_pos) != -1);
     }
+
+    *include = \&contains;
 
     sub begins_with {
         my ($self, $string) = @_;

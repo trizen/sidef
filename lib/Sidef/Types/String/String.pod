@@ -232,6 +232,14 @@ Return the
 
 =cut
 
+=head2 capitalize
+
+String.capitalize() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 char_at
 
 String.char_at() -> I<Bool>
@@ -360,6 +368,14 @@ Return the
 
 =cut
 
+=head2 each
+
+String.each() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 encode
 
 String.encode() -> I<Bool>
@@ -467,6 +483,14 @@ Return the
 =head2 inc
 
 String.inc() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 include
+
+String.include() -> I<Bool>
 
 Return the
 
@@ -883,6 +907,22 @@ Return the
 =head2 unescape
 
 String.unescape() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 upCase
+
+String.upCase() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 upcase
+
+String.upcase() -> I<Bool>
 
 Return the
 

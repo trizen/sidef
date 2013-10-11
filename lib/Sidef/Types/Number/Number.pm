@@ -441,6 +441,12 @@ package Sidef::Types::Number::Number {
         Sidef::Types::Array::Array->new(($obj) x $$self);
     }
 
+    sub times {
+        my ($self, $obj) = @_;
+        $self->_is_code($obj) || return;
+        $obj->repeat($self);
+    }
+
     sub to_bin {
         my ($self) = @_;
 

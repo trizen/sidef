@@ -526,7 +526,13 @@ package Sidef::Types::Array::Array {
     }
 
     sub each {
-        my ($self) = @_;
+        my ($self, $obj) = @_;
+
+        if (defined($obj)) {
+            $self->_is_code($obj) || return;
+            return $obj->for($self);
+        }
+
         __PACKAGE__->new(map { __PACKAGE__->new(Sidef::Types::Number::Number->new($_), $self->[$_]->get_value) }
                          0 .. $#{$self});
     }

@@ -70,7 +70,20 @@ package Sidef::Types::Hash::Hash {
     }
 
     sub each {
-        my ($self) = @_;
+        my ($self, $obj) = @_;
+
+        if (defined($obj)) {
+            $self->_is_code($obj) || return;
+
+            my $array = Sidef::Types::Array::Array->new();
+            while (my ($key, $value) = each %{$self}) {
+                $array->push(
+                           Sidef::Types::Array::Array->new(Sidef::Types::String::String->new($key), $value->get_value));
+            }
+
+            return $obj->for($array);
+        }
+
         my ($key, $value) = each(%{$self});
 
         $key // return;

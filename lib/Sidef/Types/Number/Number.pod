@@ -304,6 +304,14 @@ Return the
 
 =cut
 
+=head2 divmod
+
+Number.divmod() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 downTo
 
 Number.downTo() -> I<Bool>
@@ -528,6 +536,14 @@ Return the
 
 =cut
 
+=head2 is_zero
+
+Number.is_zero() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 isEven
 
 Number.isEven() -> I<Bool>
@@ -611,6 +627,14 @@ Return the
 =head2 isPositive
 
 Number.isPositive() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 isZero
+
+Number.isZero() -> I<Bool>
 
 Return the
 
@@ -899,6 +923,14 @@ Return the
 =head2 subtract
 
 Number.subtract() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 times
+
+Number.times() -> I<Bool>
 
 Return the
 

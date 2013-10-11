@@ -78,6 +78,14 @@ Return the
 
 =cut
 
+=head2 map
+
+Math.map() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 new
 
 Math.new() -> I<Bool>
@@ -105,6 +113,22 @@ Return the
 =head2 precision
 
 Math.precision() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 range_sum
+
+Math.range_sum() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 rangeSum
+
+Math.rangeSum() -> I<Bool>
 
 Return the
 

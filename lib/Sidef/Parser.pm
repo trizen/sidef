@@ -1388,6 +1388,8 @@ package Sidef::Parser {
                         }
                     }
 
+                    $self->{expect_method_arg} = 0;
+
                     redo;
                 }
 

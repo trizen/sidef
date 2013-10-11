@@ -79,6 +79,14 @@ Return the
 
 =cut
 
+=head2 has_key
+
+Hash.has_key() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 keys
 
 Hash.keys() -> I<Bool>

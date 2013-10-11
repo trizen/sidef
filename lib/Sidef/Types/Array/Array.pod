@@ -386,6 +386,14 @@ Returns an object of type: C<Sidef::Types::Bool::Bool>
 
 =cut
 
+=head2 delete
+
+Array.delete() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 distinct
 
 Array.distinct() -> I<Array>
@@ -652,6 +660,14 @@ Return the
 
 =cut
 
+=head2 item
+
+Array.item() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 join
 
 Array.join(I<String>) -> I<String>
@@ -904,6 +920,22 @@ Removes the last element of the array.
 =back
 
 B<WARNING!> This method modifies the array in place.
+
+=cut
+
+=head2 pop_rand
+
+Array.pop_rand() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 popRand
+
+Array.popRand() -> I<Bool>
+
+Return the
 
 =cut
 
