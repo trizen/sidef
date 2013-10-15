@@ -1,51 +1,69 @@
 #!/usr/bin/perl
 
 func hi (i) {
-    "Parent function...".say;
 
     func user (user) {
-        "Child function...".say;
         return ("Username is '%s'".sprintf(user));      # child function return
-        "THIS SHOULD NOT BE PRINTED!".say;
+        "Error! (1)".die;
     }
 
-    user("trizen").say;
+    user("sidef");
 
-    "Left the child function...".say;
+    if (i == 3) {
 
-    if (i == 3) do {
-        "If block: i is 3".say;
+        if (i == 1+2) {
+            return "IF(3) RETURN";
+        }
 
-        return "IF RETURN";                             # parent function return
-
-        "NOT printed".say;
+        "Error! (1)".die;
     }
-    elsif (i == 3) do {
-        "ERROR: re-true elsif!".say;
+    elsif (i == 3) {
+        "ERROR: re-true elsif!".die;
+    }
+    elsif (i == 1) {
+        return "ELSIF(1) RETURN";
+        "Error! (2)".die;
     }
 
-    i == 3 && (return "&& RETURN");                     # parent function return
-    return "FUNC RETURN";                               # =//=
-    "NO RETURN";
+    i == 3 && (
+        return "&& RETURN";
+        "Error! (3)".die;
+    );
+
+    if (i == 2) {
+        return "IF(2) RETURN";
+        "Error! (4)".die;
+    }
+
+    return "FUNC RETURN";
+    "ERROR RETURN";
 }
 
-hi(3).say;  # should print "IF RETURN"!
-
+hi(1) == "ELSIF(1) RETURN" || "Error hi(1)!".die;
+hi(2) == "IF(2) RETURN"    || "Error hi(2)!".die;
+hi(3) == "IF(3) RETURN"    || "Error hi(3)!".die;
+hi(4) == "FUNC RETURN"     || "Error hi(4)!".die;
 
 #
 ## Return from 'for' loop
 #
 
-func hello (name) {
-    "\nLet's welcome %s!\n".printf(name);
+func loop {
 
-    for ["a", "z", "f"] {
-        "Returning from loop...".say;
-        return "Bye bye!";
-        "Hello".say;
+    for ["a", "z", "f"] { |c|
+        if (c == "z") {
+            return "LOOP RETURN";
+        }
+
+        if (c == "f") {
+            "LOOP ERROR!".die;
+        }
     }
 
-    "We don't get here!".say;
+    "Error hello(name)!".die;
 }
 
-hello("Sidef").say;
+loop() == "LOOP RETURN" || "Error hello(Sidef)!".die;
+
+
+say "Test passed!";
