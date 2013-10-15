@@ -262,6 +262,7 @@ package Sidef::Parser {
                   func
                   class
 
+                  DATA
                   ARGV
                   ENV
 
@@ -275,6 +276,7 @@ package Sidef::Parser {
                   __FILE__
                   __RESET_LINE_COUNTER__
                   __END__
+                  __DATA__
                   __NO_BIGNUM__
                   __USE_BIGNUM__
 
@@ -854,8 +856,24 @@ package Sidef::Parser {
                     return Sidef::Types::String::String->new($self->{script_name}), pos;
                 }
 
-                if (/\G__END__\b/gc) {
+                if (/\G__(?:END|DATA)__\b\h*\R?/gc) {
+
+                    if (exists $self->{__DATA__}) {
+                        $self->{__DATA__} = substr($_, pos);
+                    }
+
                     return undef, length($_);
+                }
+
+                if (/\GDATA\b/gc) {
+                    return +(
+                        $self->{static_objects}{__DATA__} //= do {
+                            open my $str_fh, '<:encoding(UTF-8)', \$self->{__DATA__};
+                            Sidef::Types::Glob::FileHandle->new(fh   => $str_fh,
+                                                                file => Sidef::Types::Nil::Nil->new);
+                          }
+                      ),
+                      pos;
                 }
 
                 if (/\G__USE_BIGNUM__\b/gc) {

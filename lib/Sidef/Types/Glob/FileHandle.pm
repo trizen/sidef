@@ -151,6 +151,15 @@ package Sidef::Types::Glob::FileHandle {
     *getlines  = \&read_all;
     *get_lines = \&read_all;
     *getLines  = \&read_all;
+    *readlines = \&read_all;
+    *readLines = \&read_all;
+    *lines     = \&read_all;
+
+    sub each {
+        my ($self, $obj) = @_;
+        $self->_is_code($obj) || return;
+        $obj->for($self->read_all);
+    }
 
     sub eof {
         my ($self) = @_;

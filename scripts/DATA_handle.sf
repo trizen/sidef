@@ -1,0 +1,21 @@
+#!/usr/bin/ruby
+
+var str = "sidef";
+
+DATA.each { |line|
+   str = str.(line);
+}
+
+## Seeking the begining of DATA
+DATA.seek(0, 0);
+
+## Storing the DATA inside a variable.
+var dataFh = DATA;
+
+while (var line = dataFh.readline) {
+    say "We have line: <#{line.chomp}>";
+}
+
+__DATA__
+uc
+say

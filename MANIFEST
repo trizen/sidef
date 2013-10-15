@@ -156,6 +156,7 @@ scripts/code_interpolation.sf
 scripts/code_to_hash.sf
 scripts/combinations.sf
 scripts/cramers_method.sf
+scripts/DATA_handle.sf
 scripts/dice_game_solver.sf
 scripts/echo.sf
 scripts/eval.sf
@@ -199,6 +200,7 @@ scripts/open.sf
 scripts/permutation.sf
 scripts/power_numbers.sf
 scripts/pythagorean_means.sf
+scripts/quicksort.sf
 scripts/quoted_strings.sf
 scripts/rand.sf
 scripts/recursion.sf

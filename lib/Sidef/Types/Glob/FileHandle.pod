@@ -31,6 +31,14 @@ Return the
 
 =cut
 
+=head2 each
+
+FileHandle.each() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 eof
 
 FileHandle.eof() -> I<Bool>
@@ -114,6 +122,14 @@ Return the
 =head2 isOnTty
 
 FileHandle.isOnTty() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 lines
+
+FileHandle.lines() -> I<Bool>
 
 Return the
 
@@ -218,6 +234,22 @@ Return the
 =head2 readline
 
 FileHandle.readline() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 readLines
+
+FileHandle.readLines() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 readlines
+
+FileHandle.readlines() -> I<Bool>
 
 Return the
 
