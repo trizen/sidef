@@ -111,22 +111,6 @@ Return the
 
 =cut
 
-=head2 is_false
-
-Bool.is_false() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 is_true
-
-Bool.is_true() -> I<Bool>
-
-Return the
-
-=cut
-
 =head2 isFalse
 
 Bool.isFalse() -> I<Bool>
@@ -135,9 +119,25 @@ Return the
 
 =cut
 
+=head2 is_false
+
+Bool.is_false() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 isTrue
 
 Bool.isTrue() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 is_true
+
+Bool.is_true() -> I<Bool>
 
 Return the
 

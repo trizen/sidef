@@ -440,9 +440,25 @@ Return the
 
 =cut
 
+=head2 isEven
+
+Number.isEven() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 is_even
 
 Number.is_even() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 isInf
+
+Number.isInf() -> I<Bool>
 
 Return the
 
@@ -456,6 +472,14 @@ Return the
 
 =cut
 
+=head2 isInfinite
+
+Number.isInfinite() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 is_infinite
 
 Number.is_infinite() -> I<Bool>
@@ -464,9 +488,25 @@ Return the
 
 =cut
 
+=head2 isInt
+
+Number.isInt() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 is_int
 
 Number.is_int() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 isInteger
+
+Number.isInteger() -> I<Bool>
 
 Return the
 
@@ -488,105 +528,17 @@ Return the
 
 =cut
 
-=head2 is_nan
-
-Number.is_nan() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 is_neg
-
-Number.is_neg() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 is_negative
-
-Number.is_negative() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 is_odd
-
-Number.is_odd() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 is_pos
-
-Number.is_pos() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 is_positive
-
-Number.is_positive() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 is_zero
-
-Number.is_zero() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 isEven
-
-Number.isEven() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 isInf
-
-Number.isInf() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 isInfinite
-
-Number.isInfinite() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 isInt
-
-Number.isInt() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 isInteger
-
-Number.isInteger() -> I<Bool>
-
-Return the
-
-=cut
-
 =head2 isNaN
 
 Number.isNaN() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 is_nan
+
+Number.is_nan() -> I<Bool>
 
 Return the
 
@@ -600,9 +552,25 @@ Return the
 
 =cut
 
+=head2 is_neg
+
+Number.is_neg() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 isNegative
 
 Number.isNegative() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 is_negative
+
+Number.is_negative() -> I<Bool>
 
 Return the
 
@@ -616,9 +584,25 @@ Return the
 
 =cut
 
+=head2 is_odd
+
+Number.is_odd() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 isPos
 
 Number.isPos() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 is_pos
+
+Number.is_pos() -> I<Bool>
 
 Return the
 
@@ -632,9 +616,25 @@ Return the
 
 =cut
 
+=head2 is_positive
+
+Number.is_positive() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 isZero
 
 Number.isZero() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 is_zero
+
+Number.is_zero() -> I<Bool>
 
 Return the
 
@@ -760,14 +760,6 @@ Return the
 
 =cut
 
-=head2 new_int
-
-Number.new_int() -> I<Bool>
-
-Return the
-
-=cut
-
 =head2 newInt
 
 Number.newInt() -> I<Bool>
@@ -776,17 +768,9 @@ Return the
 
 =cut
 
-=head2 next_power_of
+=head2 new_int
 
-Number.next_power_of() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 next_power_of_two
-
-Number.next_power_of_two() -> I<Bool>
+Number.new_int() -> I<Bool>
 
 Return the
 
@@ -800,9 +784,25 @@ Return the
 
 =cut
 
+=head2 next_power_of
+
+Number.next_power_of() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 nextPowerOfTwo
 
 Number.nextPowerOfTwo() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 next_power_of_two
+
+Number.next_power_of_two() -> I<Bool>
 
 Return the
 

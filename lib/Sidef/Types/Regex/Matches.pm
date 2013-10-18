@@ -4,6 +4,8 @@ package Sidef::Types::Regex::Matches {
     use strict;
     use warnings;
 
+    use overload 'bool' => \&to_bool;
+
     sub new {
         my (undef, %hash) = @_;
 

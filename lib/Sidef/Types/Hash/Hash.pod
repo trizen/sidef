@@ -119,17 +119,17 @@ Return the
 
 =cut
 
-=head2 to_array
+=head2 toArray
 
-Hash.to_array() -> I<Bool>
+Hash.toArray() -> I<Bool>
 
 Return the
 
 =cut
 
-=head2 toArray
+=head2 to_array
 
-Hash.toArray() -> I<Bool>
+Hash.to_array() -> I<Bool>
 
 Return the
 

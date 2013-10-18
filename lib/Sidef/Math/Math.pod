@@ -118,17 +118,17 @@ Return the
 
 =cut
 
-=head2 range_sum
+=head2 rangeSum
 
-Math.range_sum() -> I<Bool>
+Math.rangeSum() -> I<Bool>
 
 Return the
 
 =cut
 
-=head2 rangeSum
+=head2 range_sum
 
-Math.rangeSum() -> I<Bool>
+Math.range_sum() -> I<Bool>
 
 Return the
 

@@ -28,9 +28,34 @@ Inherits methods from:
 
 =head1 METHODS
 
+=head2 toArray
+
+Obj.toArray() -> I<Array>
+
+Convert the self object into an array.
+
+    "str".toArray  =>  ["str"]
+
+Returns an object of type: C<Sidef::Types::Array::Array>
+
+=cut
+
 =head2 to_array
 
 Alias for L<C<toArray()>|"toArray">.
+
+=cut
+
+=head2 toBool
+
+Obj.toBool() -> I<Bool>
+
+Convert the self object into a boolean value.
+
+      1.toBool   =>   true
+    "0".toBool   =>   false
+
+Returns an object of type: C<Sidef::Types::Bool::Bool>
 
 =cut
 
@@ -40,9 +65,33 @@ Alias for L<C<toBool()>|"toBool">.
 
 =cut
 
+=head2 toByte
+
+Obj.toByte() -> I<Byte>
+
+Convert the self object into a numeric byte value.
+
+    "a".toByte   =>   97
+
+Returns an object of type: C<Sidef::Types::Byte::Byte>
+
+=cut
+
 =head2 to_byte
 
 Alias for L<C<toByte()>|"toByte">.
+
+=cut
+
+=head2 toBytes
+
+Obj.toBytes() -> I<Bytes>
+
+Convert the self object into an array of bytes,
+
+    "abc".toBytes  =>  [97, 98, 99]
+
+Returns an object of type: C<Sidef::Types::Byte::Bytes>
 
 =cut
 
@@ -52,9 +101,35 @@ Alias for L<C<toBytes()>|"toBytes">.
 
 =cut
 
+=head2 toChar
+
+Obj.toChar() -> I<Char>
+
+Convert the self object into a character object.
+
+        4.toChar   =>   "4"
+    "xyz".toChar   =>   "x"
+
+
+Returns an object of type: C<Sidef::Types::Char::Char>
+
+=cut
+
 =head2 to_char
 
 Alias for L<C<toChar()>|"toChar">.
+
+=cut
+
+=head2 toChars
+
+Obj.toChars() -> I<Chars>
+
+Convert the self object into an array of characters.
+
+    "abc".toChars   => ['a', 'b', 'c']
+
+Returns an object of type: C<Sidef::Types::Char::Chars>
 
 =cut
 
@@ -64,9 +139,33 @@ Alias for L<C<toChars()>|"toChars">.
 
 =cut
 
+=head2 toDir
+
+Obj.toDir() -> I<Dir>
+
+Convert the self object into a directory type-object.
+
+    '/my/dir'.toDir  =>  qd(/my/dir)
+
+Returns an object of type: C<Sidef::Types::Glob::Dir>
+
+=cut
+
 =head2 to_dir
 
 Alias for L<C<toDir()>|"toDir">.
+
+=cut
+
+=head2 toFile
+
+Obj.toFile() -> I<File>
+
+Convert the self object into a file type-object.
+
+    '/my/file'.toFile  =>  qf(/my/file)
+
+Returns an object of type: C<Sidef::Types::Glob::File>
 
 =cut
 
@@ -82,7 +181,25 @@ Alias for L<C<toInt()>|"toInt">.
 
 =cut
 
+=head2 toInt
+
+Obj.toInt() -> I<Num>
+
+Convert the self object into an integer.
+
+    "12.34".toInt  =>  12
+
+Returns an object of type: C<Sidef::Types::Number::Number>
+
+=cut
+
 =head2 to_int
+
+Alias for L<C<toInt()>|"toInt">.
+
+=cut
+
+=head2 toInteger
 
 Alias for L<C<toInt()>|"toInt">.
 
@@ -94,15 +211,43 @@ Alias for L<C<toInt()>|"toInt">.
 
 =cut
 
+=head2 toNum
+
+Obj.toNum() -> I<Num>
+
+Convert the self object into a number type-object.
+
+    "12.34".toNum  =>  12.34
+
+Returns an object of type: C<Sidef::Types::Number::Number>
+
+=cut
+
 =head2 to_num
 
 Alias for L<C<toNum()>|"toNum">.
 
 =cut
 
+=head2 toRe
+
+Convert.toRe() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 to_re
 
 Convert.to_re() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 toRegex
+
+Convert.toRegex() -> I<Bool>
 
 Return the
 
@@ -122,168 +267,17 @@ Alias for L<C<toString()>|"toString">.
 
 =cut
 
-=head2 to_str
-
-Convert.to_str() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 to_string
-
-Alias for L<C<toString()>|"toString">.
-
-=cut
-
-=head2 toArray
-
-Obj.toArray() -> I<Array>
-
-Convert the self object into an array.
-
-    "str".toArray  =>  ["str"]
-
-Returns an object of type: C<Sidef::Types::Array::Array>
-
-=cut
-
-=head2 toBool
-
-Obj.toBool() -> I<Bool>
-
-Convert the self object into a boolean value.
-
-      1.toBool   =>   true
-    "0".toBool   =>   false
-
-Returns an object of type: C<Sidef::Types::Bool::Bool>
-
-=cut
-
-=head2 toByte
-
-Obj.toByte() -> I<Byte>
-
-Convert the self object into a numeric byte value.
-
-    "a".toByte   =>   97
-
-Returns an object of type: C<Sidef::Types::Byte::Byte>
-
-=cut
-
-=head2 toBytes
-
-Obj.toBytes() -> I<Bytes>
-
-Convert the self object into an array of bytes,
-
-    "abc".toBytes  =>  [97, 98, 99]
-
-Returns an object of type: C<Sidef::Types::Byte::Bytes>
-
-=cut
-
-=head2 toChar
-
-Obj.toChar() -> I<Char>
-
-Convert the self object into a character object.
-
-        4.toChar   =>   "4"
-    "xyz".toChar   =>   "x"
-
-
-Returns an object of type: C<Sidef::Types::Char::Char>
-
-=cut
-
-=head2 toChars
-
-Obj.toChars() -> I<Chars>
-
-Convert the self object into an array of characters.
-
-    "abc".toChars   => ['a', 'b', 'c']
-
-Returns an object of type: C<Sidef::Types::Char::Chars>
-
-=cut
-
-=head2 toDir
-
-Obj.toDir() -> I<Dir>
-
-Convert the self object into a directory type-object.
-
-    '/my/dir'.toDir  =>  qd(/my/dir)
-
-Returns an object of type: C<Sidef::Types::Glob::Dir>
-
-=cut
-
-=head2 toFile
-
-Obj.toFile() -> I<File>
-
-Convert the self object into a file type-object.
-
-    '/my/file'.toFile  =>  qf(/my/file)
-
-Returns an object of type: C<Sidef::Types::Glob::File>
-
-=cut
-
-=head2 toInt
-
-Obj.toInt() -> I<Num>
-
-Convert the self object into an integer.
-
-    "12.34".toInt  =>  12
-
-Returns an object of type: C<Sidef::Types::Number::Number>
-
-=cut
-
-=head2 toInteger
-
-Alias for L<C<toInt()>|"toInt">.
-
-=cut
-
-=head2 toNum
-
-Obj.toNum() -> I<Num>
-
-Convert the self object into a number type-object.
-
-    "12.34".toNum  =>  12.34
-
-Returns an object of type: C<Sidef::Types::Number::Number>
-
-=cut
-
-=head2 toRe
-
-Convert.toRe() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 toRegex
-
-Convert.toRegex() -> I<Bool>
-
-Return the
-
-=cut
-
 =head2 toStr
 
 Convert.toStr() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 to_str
+
+Convert.to_str() -> I<Bool>
 
 Return the
 
@@ -302,5 +296,11 @@ its elements will be joined one-level deep with a space character.
     [1,2,3].toString  => '1 2 3'
 
 Returns an object of type: C<Sidef::Types::String::String>
+
+=cut
+
+=head2 to_string
+
+Alias for L<C<toString()>|"toString">.
 
 =cut

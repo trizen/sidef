@@ -71,14 +71,6 @@ Return the
 
 =cut
 
-=head2 get_lines
-
-FileHandle.get_lines() -> I<Bool>
-
-Return the
-
-=cut
-
 =head2 getLines
 
 FileHandle.getLines() -> I<Bool>
@@ -95,9 +87,9 @@ Return the
 
 =cut
 
-=head2 input_separator
+=head2 get_lines
 
-FileHandle.input_separator() -> I<Bool>
+FileHandle.get_lines() -> I<Bool>
 
 Return the
 
@@ -111,9 +103,9 @@ Return the
 
 =cut
 
-=head2 is_on_tty
+=head2 input_separator
 
-FileHandle.is_on_tty() -> I<Bool>
+FileHandle.input_separator() -> I<Bool>
 
 Return the
 
@@ -122,6 +114,14 @@ Return the
 =head2 isOnTty
 
 FileHandle.isOnTty() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 is_on_tty
+
+FileHandle.is_on_tty() -> I<Bool>
 
 Return the
 
@@ -183,22 +183,6 @@ Return the
 
 =cut
 
-=head2 read_all
-
-FileHandle.read_all() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 read_char
-
-FileHandle.read_char() -> I<Bool>
-
-Return the
-
-=cut
-
 =head2 readAll
 
 FileHandle.readAll() -> I<Bool>
@@ -215,9 +199,25 @@ Return the
 
 =cut
 
+=head2 read_all
+
+FileHandle.read_all() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 readChar
 
 FileHandle.readChar() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 read_char
+
+FileHandle.read_char() -> I<Bool>
 
 Return the
 
@@ -375,17 +375,17 @@ Return the
 
 =cut
 
-=head2 write_string
+=head2 writeString
 
-FileHandle.write_string() -> I<Bool>
+FileHandle.writeString() -> I<Bool>
 
 Return the
 
 =cut
 
-=head2 writeString
+=head2 write_string
 
-FileHandle.writeString() -> I<Bool>
+FileHandle.write_string() -> I<Bool>
 
 Return the
 

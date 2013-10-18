@@ -274,14 +274,6 @@ Return the
 
 =cut
 
-=head2 as_list
-
-Array.as_list() -> I<Bool>
-
-Return the
-
-=cut
-
 =head2 asList
 
 Array.asList() -> I<Bool>
@@ -290,9 +282,9 @@ Return the
 
 =cut
 
-=head2 assign_to
+=head2 as_list
 
-Array.assign_to() -> I<Bool>
+Array.as_list() -> I<Bool>
 
 Return the
 
@@ -301,6 +293,14 @@ Return the
 =head2 assignTo
 
 Array.assignTo() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 assign_to
+
+Array.assign_to() -> I<Bool>
 
 Return the
 
@@ -357,17 +357,17 @@ Return the
 
 =cut
 
-=head2 count_obj
+=head2 countObj
 
-Array.count_obj() -> I<Bool>
+Array.countObj() -> I<Bool>
 
 Return the
 
 =cut
 
-=head2 countObj
+=head2 count_obj
 
-Array.countObj() -> I<Bool>
+Array.count_obj() -> I<Bool>
 
 Return the
 
@@ -406,41 +406,17 @@ Returns an object of the same type as the self object.
 
 =cut
 
-=head2 drop_first
-
-Array.drop_first() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 drop_last
-
-Array.drop_last() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 drop_left
-
-Array.drop_left() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 drop_right
-
-Array.drop_right() -> I<Bool>
-
-Return the
-
-=cut
-
 =head2 dropFirst
 
 Array.dropFirst() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 drop_first
+
+Array.drop_first() -> I<Bool>
 
 Return the
 
@@ -454,15 +430,39 @@ Return the
 
 =cut
 
+=head2 drop_last
+
+Array.drop_last() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 dropLeft
 
 Alias for L<C<E<lt>E<lt>>|"E<lt>E<lt>">.
 
 =cut
 
+=head2 drop_left
+
+Array.drop_left() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 dropRight
 
 Alias for L<C<E<gt>E<gt>>|"E<gt>E<gt>">.
+
+=cut
+
+=head2 drop_right
+
+Array.drop_right() -> I<Bool>
+
+Return the
 
 =cut
 
@@ -557,12 +557,6 @@ Returns the first element of the array.
 
 =cut
 
-=head2 first_index
-
-Alias for L<C<firstIndex()>|"firstIndex">.
-
-=cut
-
 =head2 firstIndex
 
 Array.firstIndex(I<Block>) -> I<Number>
@@ -576,6 +570,12 @@ Returns an object of type: C<Sidef::Types::Number::Number>
 
 =cut
 
+=head2 first_index
+
+Alias for L<C<firstIndex()>|"firstIndex">.
+
+=cut
+
 =head2 for
 
 Array.for() -> I<Bool>
@@ -584,17 +584,17 @@ Return the
 
 =cut
 
-=head2 from_to
+=head2 fromTo
 
-Array.from_to() -> I<Bool>
+Array.fromTo() -> I<Bool>
 
 Return the
 
 =cut
 
-=head2 fromTo
+=head2 from_to
 
-Array.fromTo() -> I<Bool>
+Array.from_to() -> I<Bool>
 
 Return the
 
@@ -680,12 +680,6 @@ Returns an object of type: C<Sidef::Types::String::String>
 
 =cut
 
-=head2 join_insert
-
-Alias for L<C<joinInsert()>|"joinInsert">.
-
-=cut
-
 =head2 joinInsert
 
 Array.joinInsert(I<Object>) -> I<Array>
@@ -698,33 +692,17 @@ Returns a new object of the same type as the self object.
 
 =cut
 
+=head2 join_insert
+
+Alias for L<C<joinInsert()>|"joinInsert">.
+
+=cut
+
 =head2 last
 
 Array.last() -> I<Obj>
 
 Returns the last element of the array.
-
-=cut
-
-=head2 last_index
-
-Alias for L<C<lastIndex()>|"lastIndex">.
-
-=cut
-
-=head2 last_uniq
-
-Array.last_uniq() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 last_unique
-
-Array.last_unique() -> I<Bool>
-
-Return the
 
 =cut
 
@@ -737,6 +715,12 @@ Works just like L<C<firstIndex()>|"firstIndex">, except that it searches backwar
     [1,2,3,4,5,6].firstIndex { _**2 < 20 };     # returns: 3
 
 Returns an object of type: C<Sidef::Types::Number::Number>
+
+=cut
+
+=head2 last_index
+
+Alias for L<C<lastIndex()>|"lastIndex">.
 
 =cut
 
@@ -754,9 +738,25 @@ Return the
 
 =cut
 
+=head2 last_uniq
+
+Array.last_uniq() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 lastUnique
 
 Array.lastUnique() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 last_unique
+
+Array.last_unique() -> I<Bool>
 
 Return the
 
@@ -923,17 +923,17 @@ B<WARNING!> This method modifies the array in place.
 
 =cut
 
-=head2 pop_rand
+=head2 popRand
 
-Array.pop_rand() -> I<Bool>
+Array.popRand() -> I<Bool>
 
 Return the
 
 =cut
 
-=head2 popRand
+=head2 pop_rand
 
-Array.popRand() -> I<Bool>
+Array.pop_rand() -> I<Bool>
 
 Return the
 
@@ -1016,17 +1016,17 @@ Returns an object of the same type as the elements of the array.
 
 =cut
 
-=head2 reduce_pairs
+=head2 reducePairs
 
-Array.reduce_pairs() -> I<Bool>
+Array.reducePairs() -> I<Bool>
 
 Return the
 
 =cut
 
-=head2 reducePairs
+=head2 reduce_pairs
 
-Array.reducePairs() -> I<Bool>
+Array.reduce_pairs() -> I<Bool>
 
 Return the
 
@@ -1112,25 +1112,17 @@ Return the
 
 =cut
 
-=head2 take_left
-
-Array.take_left() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 take_right
-
-Array.take_right() -> I<Bool>
-
-Return the
-
-=cut
-
 =head2 takeLeft
 
 Array.takeLeft() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 take_left
+
+Array.take_left() -> I<Bool>
 
 Return the
 
@@ -1144,17 +1136,9 @@ Return the
 
 =cut
 
-=head2 to_hash
+=head2 take_right
 
-Array.to_hash() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 to_list
-
-Array.to_list() -> I<Bool>
+Array.take_right() -> I<Bool>
 
 Return the
 
@@ -1168,9 +1152,25 @@ Return the
 
 =cut
 
+=head2 to_hash
+
+Array.to_hash() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 toList
 
 Array.toList() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 to_list
+
+Array.to_list() -> I<Bool>
 
 Return the
 

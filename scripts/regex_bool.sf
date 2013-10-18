@@ -1,0 +1,14 @@
+#!/usr/bin/ruby
+
+var str = 'hello';
+var re = ('^'+str+'\h+(?i:world)\z' -> to_regex);
+
+if (!'hello  WoRlD'.match(re)) {
+    "Regex didn't matched!\n".die;
+}
+
+if('Hell  WoRlD' =~ re) {
+    "Regex shouldn't match!\n".die;
+}
+
+say "Test passed!";

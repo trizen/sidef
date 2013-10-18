@@ -30,6 +30,14 @@ Return the
 
 =cut
 
+=head2 absName
+
+Dir.absName() -> I<Bool>
+
+Return the
+
+=cut
+
 
 =head2 abs_name
 
@@ -39,25 +47,17 @@ Return the
 
 =cut
 
-=head2 abs_path
-
-Dir.abs_path() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 absName
-
-Dir.absName() -> I<Bool>
-
-Return the
-
-=cut
-
 =head2 absPath
 
 Dir.absPath() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 abs_path
+
+Dir.abs_path() -> I<Bool>
 
 Return the
 
@@ -95,17 +95,17 @@ Return the
 
 =cut
 
-=head2 create_tree
+=head2 createTree
 
-Dir.create_tree() -> I<Bool>
+Dir.createTree() -> I<Bool>
 
 Return the
 
 =cut
 
-=head2 createTree
+=head2 create_tree
 
-Dir.createTree() -> I<Bool>
+Dir.create_tree() -> I<Bool>
 
 Return the
 
@@ -143,33 +143,17 @@ Return the
 
 =cut
 
-=head2 is_dir
-
-Dir.is_dir() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 is_directory
-
-Dir.is_directory() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 is_empty
-
-Dir.is_empty() -> I<Bool>
-
-Return the
-
-=cut
-
 =head2 isDir
 
 Dir.isDir() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 is_dir
+
+Dir.is_dir() -> I<Bool>
 
 Return the
 
@@ -183,9 +167,25 @@ Return the
 
 =cut
 
+=head2 is_directory
+
+Dir.is_directory() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 isEmpty
 
 Dir.isEmpty() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 is_empty
+
+Dir.is_empty() -> I<Bool>
 
 Return the
 
@@ -207,17 +207,17 @@ Return the
 
 =cut
 
-=head2 make_tree
+=head2 makeTree
 
-Dir.make_tree() -> I<Bool>
+Dir.makeTree() -> I<Bool>
 
 Return the
 
 =cut
 
-=head2 makeTree
+=head2 make_tree
 
-Dir.makeTree() -> I<Bool>
+Dir.make_tree() -> I<Bool>
 
 Return the
 
@@ -271,17 +271,17 @@ Return the
 
 =cut
 
-=head2 remove_tree
+=head2 removeTree
 
-Dir.remove_tree() -> I<Bool>
+Dir.removeTree() -> I<Bool>
 
 Return the
 
 =cut
 
-=head2 removeTree
+=head2 remove_tree
 
-Dir.removeTree() -> I<Bool>
+Dir.remove_tree() -> I<Bool>
 
 Return the
 

@@ -200,14 +200,6 @@ Return the
 
 =cut
 
-=head2 apply_escapes
-
-String.apply_escapes() -> I<Bool>
-
-Return the
-
-=cut
-
 =head2 applyEscapes
 
 String.applyEscapes() -> I<Bool>
@@ -216,9 +208,9 @@ Return the
 
 =cut
 
-=head2 begins_with
+=head2 apply_escapes
 
-String.begins_with() -> I<Bool>
+String.apply_escapes() -> I<Bool>
 
 Return the
 
@@ -232,6 +224,14 @@ Return the
 
 =cut
 
+=head2 begins_with
+
+String.begins_with() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 capitalize
 
 String.capitalize() -> I<Bool>
@@ -240,17 +240,17 @@ Return the
 
 =cut
 
-=head2 char_at
+=head2 charAt
 
-String.char_at() -> I<Bool>
+String.charAt() -> I<Bool>
 
 Return the
 
 =cut
 
-=head2 charAt
+=head2 char_at
 
-String.charAt() -> I<Bool>
+String.char_at() -> I<Bool>
 
 Return the
 
@@ -392,17 +392,17 @@ Return the
 
 =cut
 
-=head2 ends_with
+=head2 endsWith
 
-String.ends_with() -> I<Bool>
+String.endsWith() -> I<Bool>
 
 Return the
 
 =cut
 
-=head2 endsWith
+=head2 ends_with
 
-String.endsWith() -> I<Bool>
+String.ends_with() -> I<Bool>
 
 Return the
 
@@ -528,17 +528,17 @@ Return the
 
 =cut
 
-=head2 is_empty
+=head2 isEmpty
 
-String.is_empty() -> I<Bool>
+String.isEmpty() -> I<Bool>
 
 Return the
 
 =cut
 
-=head2 isEmpty
+=head2 is_empty
 
-String.isEmpty() -> I<Bool>
+String.is_empty() -> I<Bool>
 
 Return the
 
@@ -760,17 +760,17 @@ Return the
 
 =cut
 
-=head2 starts_with
+=head2 startsWith
 
-String.starts_with() -> I<Bool>
+String.startsWith() -> I<Bool>
 
 Return the
 
 =cut
 
-=head2 startsWith
+=head2 starts_with
 
-String.startsWith() -> I<Bool>
+String.starts_with() -> I<Bool>
 
 Return the
 
@@ -832,17 +832,17 @@ Return the
 
 =cut
 
-=head2 title_case
+=head2 titleCase
 
-String.title_case() -> I<Bool>
+String.titleCase() -> I<Bool>
 
 Return the
 
 =cut
 
-=head2 titleCase
+=head2 title_case
 
-String.titleCase() -> I<Bool>
+String.title_case() -> I<Bool>
 
 Return the
 

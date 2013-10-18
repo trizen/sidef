@@ -856,7 +856,7 @@ package Sidef::Parser {
                     return Sidef::Types::String::String->new($self->{script_name}), pos;
                 }
 
-                if (/\G__(?:END|DATA)__\b\h*\R?/gc) {
+                if (/\G__(?:END|DATA)__\b\h*+\R?/gc) {
 
                     if (exists $self->{__DATA__}) {
                         $self->{__DATA__} = substr($_, pos);

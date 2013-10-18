@@ -47,22 +47,6 @@ Return the
 
 =cut
 
-=head2 get_file
-
-DirHandle.get_file() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 get_files
-
-DirHandle.get_files() -> I<Bool>
-
-Return the
-
-=cut
-
 =head2 getFile
 
 DirHandle.getFile() -> I<Bool>
@@ -71,9 +55,25 @@ Return the
 
 =cut
 
+=head2 get_file
+
+DirHandle.get_file() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 getFiles
 
 DirHandle.getFiles() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 get_files
+
+DirHandle.get_files() -> I<Bool>
 
 Return the
 

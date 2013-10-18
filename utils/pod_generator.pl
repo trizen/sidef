@@ -104,19 +104,19 @@ sub parse_pod_file {
             my $sec = '';
             $sec .= $line;
 
-            until ($line =~ /^=cut/ or eof($fh)) {
+            until ($line =~ /^=cut\b/ or eof($fh)) {
                 $sec .= ($line = <$fh>);
             }
 
-            if ($sec =~ /^=head2 (.+)/m) {
-                $data{unpack "A*", $1} = $sec;
+            if ($sec =~ /^=head2\h+(.*\S)/m) {
+                $data{$1} = $sec;
             }
         }
         else {
             $data{__HEADER__} .= $line;
         }
 
-        if ($meth == 0 && $line =~ /^=head1 METHODS/) {
+        if ($meth == 0 && $line =~ /^=head1\h+METHODS/) {
             $meth = 1;
         }
     }
@@ -253,7 +253,8 @@ HEADER
         print {$fh} $header;
     }
 
-    foreach my $method (sort { (lc($a) cmp lc($b)) || ($a cmp $b) } keys %subs) {
+    foreach my $method (sort { (lc($a =~ tr/_//dr) cmp lc($b =~ tr/_//dr)) || ($a =~ tr/_//dr cmp $b =~ tr/_//dr) }
+                        keys %subs) {
         print {$fh} $subs{$method};
     }
 }

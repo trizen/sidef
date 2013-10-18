@@ -23,33 +23,17 @@ Inherits methods from:
 
 =head1 METHODS
 
-=head2 get_array
-
-Backtick.get_array() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 get_lines
-
-Backtick.get_lines() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 get_string
-
-Backtick.get_string() -> I<Bool>
-
-Return the
-
-=cut
-
 =head2 getArray
 
 Backtick.getArray() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 get_array
+
+Backtick.get_array() -> I<Bool>
 
 Return the
 
@@ -64,9 +48,25 @@ Return the
 
 =cut
 
+=head2 get_lines
+
+Backtick.get_lines() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 getString
 
 Backtick.getString() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 get_string
+
+Backtick.get_string() -> I<Bool>
 
 Return the
 
