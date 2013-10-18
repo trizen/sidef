@@ -98,6 +98,8 @@ Concatenate two arrays.
 
     [1, 2] + [3, 4];   # returns [1, 2, 3, 4]
 
+Aliases: I<concat()>.
+
 Returns a new object of the same type as the self object.
 
 =cut
@@ -266,14 +268,6 @@ Alias for L<C<&>|"&">.
 
 =cut
 
-=head2 append
-
-Array.append() -> I<Bool>
-
-Return the
-
-=cut
-
 =head2 asList
 
 Array.asList() -> I<Bool>
@@ -319,14 +313,6 @@ Returns an object of the same type as the elements of the array.
 
 =cut
 
-=head2 concat
-
-Array.concat() -> I<Bool>
-
-Return the
-
-=cut
-
 =head2 contains
 
 Array.contains(I<Obj>) -> I<Bool>
@@ -343,33 +329,23 @@ Returns an object of type: C<Sidef::Types::Bool::Bool>
 
 =head2 copy
 
-Array.copy() -> I<Bool>
+Array.copy() -> I<Array>
 
-Return the
+Returns a copy of the self array.
 
 =cut
 
 =head2 count
 
-Array.count() -> I<Bool>
+Array.count(I<Obj>) -> I<Number>
 
-Return the
+Count the number of objects indentical with the argument.
 
-=cut
+    ["x", "y", "y", "z"].count("y");    # returns: 2
 
-=head2 countObj
+Aliases: I<count_obj()>, I<countObj()>.
 
-Array.countObj() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 count_obj
-
-Array.count_obj() -> I<Bool>
-
-Return the
+Returns an object of type: C<Sidef::Types::Number::Number>
 
 =cut
 
@@ -963,6 +939,8 @@ Append some elements to array.
 
     array = qw(s i d);
     array.push("e", "f");      # pushes the element to array and returns: qw(s i d e f)
+
+Aliases: I<append()>.
 
 B<WARNING!> This method modifies the array in place.
 

@@ -155,12 +155,12 @@ sub process_file {
             }
         }
 
-        my $orig_name   = $sub;
-        my $is_operator = lc($sub) ne uc($sub);
+        my $orig_name = $sub;
+        my $is_method = lc($sub) ne uc($sub);
 
         $sub =~ s{([<>])}{E<$esc{$1}>}g;
 
-        my $doc = $is_operator ? <<"__POD__" : <<"__POD2__";
+        my $doc = $is_method ? <<"__POD__" : <<"__POD2__";
 
 =head2 $orig_name
 
@@ -200,9 +200,25 @@ __POD2__
         $pod_data = parse_pod_file($pod_file);
     };
 
+    my %alias_methods;
     foreach my $key (@keys) {
         if (exists $pod_data->{$key}) {
             $subs{$key} = $pod_data->{$key};
+
+            if ($pod_data->{$key} =~ /^Alias(?:es)?:\h*(.*\S)/m) {
+                my @aliases = split(/,\h+/, $1);
+                foreach my $alias (@aliases) {
+                    $alias =~ s{[^>]+\z}{};
+                    if ($alias =~ m{^[A-Z]<(.+)>\z}) {
+                        (my $method = $1) =~ s{\(\)\z}{};
+
+                        $method =~ s{E<lt>}{<}g;
+                        $method =~ s{E<gt>}{>}g;
+
+                        undef $alias_methods{$method};
+                    }
+                }
+            }
         }
     }
 
@@ -253,8 +269,11 @@ HEADER
         print {$fh} $header;
     }
 
-    foreach my $method (sort { (lc($a =~ tr/_//dr) cmp lc($b =~ tr/_//dr)) || ($a =~ tr/_//dr cmp $b =~ tr/_//dr) }
-                        keys %subs) {
+    foreach my $method (
+                        sort { (lc($a =~ tr/_//dr) cmp lc($b =~ tr/_//dr)) || ($a cmp $b) }
+                        grep { not exists $alias_methods{$_} }
+                        keys %subs
+      ) {
         print {$fh} $subs{$method};
     }
 }

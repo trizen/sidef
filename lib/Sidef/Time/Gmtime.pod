@@ -36,6 +36,8 @@ Return the ctime(3) value:
 
 Time.gmtime.day() -> I<Number>
 
+Aliases: I<mday()>.
+
 Return the day of the month.
 
 =cut
@@ -45,12 +47,6 @@ Return the day of the month.
 Time.gmtime.hour() -> I<Number>
 
 Return the hours of the specified time.
-
-=cut
-
-=head2 mday
-
-Alias for L<C<day()>|"day">.
 
 =cut
 
@@ -66,13 +62,9 @@ Return the minutes of the specified time.
 
 Time.gmtime.mon() -> I<Number>
 
+Aliases: I<month()>.
+
 Return the month in the range 0..11, with 0 indicating January and 11 indicating December.
-
-=cut
-
-=head2 month
-
-Alias for L<C<mon()>|"mon">.
 
 =cut
 

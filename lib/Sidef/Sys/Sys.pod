@@ -60,13 +60,9 @@ Return the name of the current operating system under which Sidef is running.
     Sys.osName    # 'linux'   under Linux
                   # 'MSWin32' under Windows
 
+Aliases: I<osname()>.
+
 Returns an object of type: C<Sidef::Types::String::String>
-
-=cut
-
-=head2 osname
-
-Alias for L<C<osName()>|"osName">.
 
 =cut
 

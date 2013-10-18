@@ -79,17 +79,17 @@ Return the
 
 =cut
 
-=head2 getlines
+=head2 get_lines
 
-FileHandle.getlines() -> I<Bool>
+FileHandle.get_lines() -> I<Bool>
 
 Return the
 
 =cut
 
-=head2 get_lines
+=head2 getlines
 
-FileHandle.get_lines() -> I<Bool>
+FileHandle.getlines() -> I<Bool>
 
 Return the
 
@@ -191,17 +191,17 @@ Return the
 
 =cut
 
-=head2 readall
+=head2 read_all
 
-FileHandle.readall() -> I<Bool>
+FileHandle.read_all() -> I<Bool>
 
 Return the
 
 =cut
 
-=head2 read_all
+=head2 readall
 
-FileHandle.read_all() -> I<Bool>
+FileHandle.readall() -> I<Bool>
 
 Return the
 

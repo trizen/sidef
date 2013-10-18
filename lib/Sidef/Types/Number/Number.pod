@@ -520,17 +520,17 @@ Return the
 
 =cut
 
-=head2 is_NaN
+=head2 isNaN
 
-Number.is_NaN() -> I<Bool>
+Number.isNaN() -> I<Bool>
 
 Return the
 
 =cut
 
-=head2 isNaN
+=head2 is_NaN
 
-Number.isNaN() -> I<Bool>
+Number.is_NaN() -> I<Bool>
 
 Return the
 
