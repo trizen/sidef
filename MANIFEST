@@ -174,6 +174,7 @@ scripts/global_regex_matching.sf
 scripts/hailstone.sf
 scripts/hash_autovivification.sf
 scripts/hash_from_array.sf
+scripts/hash_sort.sf
 scripts/hashes.sf
 scripts/if_do_else.sf
 scripts/if_while_standard.sf
@@ -205,6 +206,7 @@ scripts/quoted_strings.sf
 scripts/rand.sf
 scripts/recursion.sf
 scripts/regex.sf
+scripts/regex_bool.sf
 scripts/return.sf
 scripts/rock_paper_scissors.sf
 scripts/roman_numerals_decoding.sf

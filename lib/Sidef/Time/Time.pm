@@ -34,6 +34,18 @@ package Sidef::Time::Time {
     *now      = \&timeNow;
     *time_now = \&timeNow;
 
+    sub microTime {
+        my ($self) = @_;
+        require Time::HiRes;
+        Sidef::Types::Number::Number->new(scalar Time::HiRes::gettimeofday());
+    }
+
+    *micro         = \&microTime;
+    *micro_sec     = \&microTime;
+    *microSec      = \&microTime;
+    *microSeconds  = \&microTime;
+    *micro_seconds = \&microTime;
+
     sub localtime {
         my ($self) = @_;
         Sidef::Time::Localtime->new($$self);

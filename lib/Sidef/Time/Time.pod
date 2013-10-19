@@ -59,6 +59,16 @@ Alias for L<C<local()>|"local">.
 
 =cut
 
+=head2 micro
+
+Time.micro() -> I<Bool>
+
+Aliases: I<microSec()>, I<micro_sec()>, I<microSeconds()>, I<micro_seconds()>, I<microTime()>.
+
+Return the
+
+=cut
+
 =head2 new
 
 Time.new(I<number>) -> I<Time>

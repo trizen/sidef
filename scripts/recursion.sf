@@ -1,9 +1,9 @@
 #!/usr/bin/ruby
 
-var counter = 1;
+func f(x) {
+    x <= 0 && (return x);
+    say "Call: #{f(x-1)}";
+    return x;
+}
 
-var f = {
-    "Recursing: %d\n".printf(counter);
-    counter++ <= 10 && f.run;
-    "End of recursion..."->say;
-}->run;
+f(5);

@@ -13,7 +13,9 @@ package Sidef::Exec {
             bool_assign_method => {
                                    ':='  => 1,
                                    '||=' => 1,
+                                   '|='  => 1,
                                    '&&=' => 1,
+                                   '&='  => 1,
                                   },
             plain_array_methods => {
                                     '...'     => 1,

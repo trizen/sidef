@@ -67,6 +67,7 @@ my %ignored_methods = (
                        'Sidef::Types::String::String'   => [qw(get_value)],
                        'Sidef::Types::Byte::Bytes'      => [qw(decode_utf8)],
                        'Sidef::Types::Glob::Fcntl'      => [qw(new)],
+                       'Sidef::Types::Hash::Hash'       => [qw(a b)],
                       );
 
 my %ignored_modules = map { $_ => 1 } qw (

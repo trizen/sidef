@@ -90,6 +90,23 @@ package Sidef::Types::Hash::Hash {
         Sidef::Types::Array::Array->new(Sidef::Types::String::String->new($key), $value->get_value);
     }
 
+    sub sort_by {
+        my ($self, $block) = @_;
+        $self->_is_code($block) || return;
+
+        my @array;
+        while (my ($key, $value) = CORE::each %{$self}) {
+            push @array, [$key, $block->call(Sidef::Types::String::String->new($key), $value->get_value)];
+        }
+
+        my $method = '<=>';
+        Sidef::Types::Array::Array->new(
+            map {
+                Sidef::Types::Array::Array->new(Sidef::Types::String::String->new($_->[0]), $self->{$_->[0]}->get_value)
+              } (sort { $a->[1]->can($method) ? ($a->[1]->$method($b->[1])) : -1 } @array)
+        );
+    }
+
     sub to_a {
         my ($self) = @_;
         Sidef::Types::Array::Array->new(
