@@ -994,8 +994,16 @@ package Sidef::Parser {
                     redo;
                 }
 
-                warn "$self->{script_name}:$self->{line}: unexpected char: " . substr($_, pos(), 1) . "\n";
-                return undef, pos() + 1;
+                #return undef, pos($_);
+
+                $self->fatal_error(
+                                   code  => $_,
+                                   pos   => pos($_),
+                                   error => "unexpected char: " . substr($_, pos($_), 1),
+                                  );
+
+                #warn "$self->{script_name}:$self->{line}: unexpected char: " . substr($_, pos($_), 1) . "\n";
+                #return undef, pos($_) + 1;
             }
         }
     }
@@ -1376,7 +1384,7 @@ package Sidef::Parser {
 
                     $self->{expect_index} = 0;
 
-                    my ($array, $pos) = $self->parse_expr(code => substr($_, pos()));
+                    my ($array, $pos) = $self->parse_expr(code => substr($_, pos($_)));
                     pos($_) += $pos;
 
                     $self->{expect_index} = /\G(?=\h*\[)/;

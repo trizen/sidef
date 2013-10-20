@@ -6,9 +6,9 @@ var code = {
     var words = (_.map{Str.new(_)});
 
     var chr = words[0][-1];
-    for (words.ft(1)) {
-        _[0] == chr || (return);
-        chr = _[-1];
+    for (words.ft(1)) { |word|
+        word[0] == chr || (return);
+        chr = word[-1];
     }
 
     words.join(" ").say;

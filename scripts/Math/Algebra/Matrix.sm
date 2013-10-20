@@ -10,11 +10,10 @@ var VERSION = 0.1;
 
 var req = (require 'Math::Matrix');
 
-nil == req
-    && (
-        "** Math::Matrix module is not intalled!\n".warn;
-        return;
-       )
+if (nil == req) {
+    "** Math::Matrix module is not intalled!\n".warn;
+    return();
+}
 
 #
 ## Function declaration

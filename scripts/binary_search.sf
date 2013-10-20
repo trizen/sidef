@@ -12,7 +12,7 @@ func binary_search(a,i) {
         return $mid;
     }
 
-    return;
+    return();
 }
 
 
