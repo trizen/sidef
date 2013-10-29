@@ -3,7 +3,7 @@
 var str = "sidef";
 
 DATA.each { |line|
-   str = str.(line);
+   str = (str.(line.chomp));
 }
 
 ## Seeking the begining of DATA

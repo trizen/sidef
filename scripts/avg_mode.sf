@@ -19,5 +19,5 @@ for (
         [1, 1, 2, 4, 4],
     ] => \var array
 ){
-    println(mode(array.as_list).join(' '));
+    println(mode(array->as_list).join(' '));
 }

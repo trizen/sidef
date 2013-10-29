@@ -9,5 +9,5 @@ if (ARGV.len >= 1 && (ARGV[0] == '-e')) {
     ARGV.join(" ").apply_escapes.say;
 }
 else {
-    ARGV join " " say;
+    ARGV join(" ") say;
 }

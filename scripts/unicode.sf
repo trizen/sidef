@@ -66,7 +66,7 @@ chinese_chars.join(" . ").say;
 
 '-' * 80 say;
 
-byte chinese_bytes = (chinese_chars.join '');
+byte chinese_bytes = (chinese_chars.join(''));
 chinese_bytes.join.say;
 "Is composed from %d bytes.\n"->printf(chinese_bytes.len);
 

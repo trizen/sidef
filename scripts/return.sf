@@ -4,10 +4,10 @@ func hi (i) {
 
     func user (user) {
         return ("Username is '%s'".sprintf(user));      # child function return
-        "Error! (1)".die;
+        "Child function error! in #{__FILE__} at line #{__LINE__}\n" -> die;
     }
 
-    user("sidef");
+    user('sidef');
 
     if (i == 3) {
 

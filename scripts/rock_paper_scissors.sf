@@ -44,14 +44,14 @@ var aChoice = (3.rand.int); # ai choice for first play is completely random
     ">> My play: %-8s".printf(rps[aChoice]);
 
     given ((aChoice - pChoice + 3 ) % 3)
-    when 0 {
+    when (0) do {
         "Tie.".say;
     }
-    when 1 {
+    when (1) do {
         "%-*s %s".printlnf(30, msg[aChoice], 'My point');
         aScore++;
     }
-    when 2 {
+    when (2) do {
         "%-*s %s".printlnf(30, msg[pChoice], 'Your point');
         pScore++;
     }
@@ -61,10 +61,10 @@ var aChoice = (3.rand.int); # ai choice for first play is completely random
 
     # compute ai choice for next play
     switch (var rn = (plays.rand.int))
-        case (rn < pcf[0]) {
+        case (rn < pcf[0]) do {
             aChoice = 1;
         }
-        case (pcf[0]+pcf[1] > rn) {
+        case (pcf[0]+pcf[1] > rn) do {
             aChoice = 2;
         }
         default {

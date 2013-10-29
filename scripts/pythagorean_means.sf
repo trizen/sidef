@@ -3,7 +3,7 @@
 # Translation of: http://rosettacode.org/wiki/Averages/Pythagorean_means#Perl
 
 func A(a) {
-    a.sum / (a.len);
+    a.sum / a.len;
 }
 
 func G(a) {
@@ -11,19 +11,15 @@ func G(a) {
 }
 
 func H(a) {
-    a.len / (a.map{|n|1/n}->sum);
+    a.len / a.map{|n|1/n}.sum;
 }
 
-var ints = (1..10);
-
-var a = (A(ints));
-var g = (G(ints));
-var h = (H(ints));
+var ints = 1..10;
 
 [
-    ["A" => a],
-    ["G" => g],
-    ["H" => h],
+    ["A" => A(ints)],
+    ["G" => G(ints)],
+    ["H" => H(ints)],
 ].for {
-    "%s=%s\n".printf(_...)
+    "%s=%s\n".printf(_->...)
 }

@@ -32,7 +32,7 @@ func roman2arabic (roman) {
 ## MAIN
 #
 
-for [['MCMXC',1990], ['MMVIII',2008], ['MDCLXVI',1666]] {
+for ([['MCMXC',1990], ['MMVIII',2008], ['MDCLXVI',1666]]) {
 
     (var arabic = (roman2arabic(_[0]))) == _[1]
         || ("Error occurred on %s\n".sprintf(_[0]).die);

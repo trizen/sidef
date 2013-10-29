@@ -16,12 +16,6 @@ package Sidef::Parser {
 
         my %options = (
             line          => 1,
-            has_object    => 0,
-            has_method    => 0,
-            expect_method => 0,
-            expect_index  => 0,
-            expect_arg    => 0,
-            parentheses   => 0,
             inc           => [File::Spec->curdir()],    # this needs a lot of thinking!
             class         => 'main',
             vars          => {'main' => []},
@@ -33,10 +27,11 @@ package Sidef::Parser {
                            '...' => 1,
                           },
             obj_with_do => {
-                            'Sidef::Types::Block::For'   => 1,
-                            'Sidef::Types::Bool::While'  => 1,
-                            'Sidef::Types::Bool::If'     => 1,
-                            'Sidef::Types::Block::Given' => 1,
+                'Sidef::Types::Block::For'  => 1,
+                'Sidef::Types::Bool::While' => 1,
+                'Sidef::Types::Bool::If'    => 1,
+
+                #'Sidef::Types::Block::Given' => 1,
                            },
             obj_stat => [
                          {
@@ -274,6 +269,7 @@ package Sidef::Parser {
                   __CLASS__
                   __BLOCK__
                   __FILE__
+                  __LINE__
                   __RESET_LINE_COUNTER__
                   __END__
                   __DATA__
@@ -293,6 +289,14 @@ package Sidef::Parser {
 
                       ||= ||
                       &&= &&
+
+                      <?=
+                      >?=
+                      <=?=
+                      >=?=
+                      ^^?=
+                      $$?=
+
                       <=>
                       <<= >>=
                       << >>
@@ -389,16 +393,6 @@ package Sidef::Parser {
           : ($var_name, $self->{class});
     }
 
-    sub get_caller_num {
-        my $i = 0;
-        while (++$i) {
-            if (not caller($i)) {
-                return $i;
-            }
-        }
-        return -1;
-    }
-
     {
         my %pairs = qw'
           ( )
@@ -414,7 +408,7 @@ package Sidef::Parser {
             my ($self, %opt) = @_;
 
             my ($string, $pos) = $self->get_quoted_string(code => $opt{code});
-            if ($string =~ /\G/gc && defined(my $pos = $self->parse_whitespace(code => $string))) {
+            if ($string =~ /\G/gc && (my ($pos) = $self->parse_whitespace(code => $string))[0]) {
                 pos($string) += $pos;
             }
 
@@ -422,7 +416,7 @@ package Sidef::Parser {
             while ($string =~ /\G((?>[^\s\\]+|\\.)++)/gcs) {
                 push @words, $1 =~ s{\\#}{#}gr;
 
-                if (defined(my $pos = $self->parse_whitespace(code => substr($string, pos($string))))) {
+                if ((my ($pos) = $self->parse_whitespace(code => substr($string, pos($string))))[0]) {
                     pos($string) += $pos;
                     next;
                 }
@@ -436,7 +430,7 @@ package Sidef::Parser {
 
             for ($opt{code}) {
 
-                if (/\G/gc && /\G(?=\s)/ && defined(my $pos = $self->parse_whitespace(code => substr($_, pos)))) {
+                if (/\G/gc && /\G(?=\s)/ && (my ($pos) = $self->parse_whitespace(code => substr($_, pos)))[0]) {
                     pos($_) += $pos;
                 }
 
@@ -495,8 +489,9 @@ package Sidef::Parser {
 
         for ($opt{code}) {
 
-            if (/\G/gc && defined(my $pos = $self->parse_whitespace(code => substr($_, pos)))) {
+            if (/\G/gc && (my ($pos, $end) = $self->parse_whitespace(code => substr($_, pos)))[0]) {
                 pos($_) += $pos;
+                $end && return (undef, pos);
             }
 
             # Alpha-numeric method name
@@ -506,13 +501,13 @@ package Sidef::Parser {
 
             # Operator-like method name
             if (m{\G$self->{re}{operators}}goc) {
-                $self->{expect_arg} = exists $self->{lonely_ops}{$1} ? 0 : 1;
                 return $1, (exists $self->{lonely_ops}{$1} ? 0 : 1), pos;
             }
 
             # Method name as variable
             if (m{\G\$(?=$self->{re}{var_name})}goc || 1) {
                 my ($obj, $pos) = $self->parse_expr(code => substr($_, pos));
+                $obj // return undef, 0, pos($_);
                 return {self => $obj}, 0, pos($_) + $pos;
             }
         }
@@ -565,9 +560,7 @@ package Sidef::Parser {
 
                     # End of a statement when two or more new lines has been found
                     if ($self->{line} - $beg_line >= 2) {
-                        $self->{has_object}    = 0;
-                        $self->{expect_method} = 0;
-                        $self->{has_method}    = 0;
+                        return pos, 1;
                     }
 
                     return pos;
@@ -583,21 +576,14 @@ package Sidef::Parser {
 
         for ($opt{code}) {
             {
-                if (/\G/gc && defined(my $pos = $self->parse_whitespace(code => substr($_, pos)))) {
+                if (/\G/gc && (my ($pos) = $self->parse_whitespace(code => substr($_, pos)))[0]) {
                     pos($_) += $pos;
                 }
 
                 # End of an expression, or end of the script
                 if (/\G;/gc || /\G\z/) {
-                    $self->{has_object}    = 0;
-                    $self->{expect_method} = 0;
-                    $self->{has_method}    = 0;
                     return undef, pos;
                 }
-
-                $self->{has_object} = 1;
-                $self->{has_method} = 0;
-                $self->{expect_arg} = 0;
 
                 # Single quoted string
                 if (/\G(?=')/ || /\Gq\b/gc) {
@@ -653,13 +639,15 @@ package Sidef::Parser {
 
                 # Array as object
                 if (/\G(?=\[)/) {
-                    my $array = Sidef::Types::Array::Array->new();
 
+                    my $array = Sidef::Types::Array::HCArray->new();
                     my ($obj, $pos) = $self->parse_array(code => substr($_, pos));
 
                     if (ref $obj->{$self->{class}} eq 'ARRAY') {
                         push @{$array}, (@{$obj->{$self->{class}}});
                     }
+
+                    #push @{$array}, {self => $obj, call => [{method => 'to_list'}]};
 
                     return $array, pos($_) + $pos;
                 }
@@ -749,7 +737,7 @@ package Sidef::Parser {
                         # Check the declared parameters
                         if (/\G\h*\(?$self->{re}{vars}\)?\h*\{/gocs) {
 
-                            my $params = join('', map { "my $_;\\$_;" } split(/\h*,\h*/, $1));
+                            my $params = join('', map { "my $_;$_=_.shift;" } split(/\h*,\h*/, $1));
                             local $self->{current_function} = $variable;
                             my ($obj, $pos) = $self->parse_block(code => '{' . $params . substr($_, pos));
                             pos($_) += $pos - (length($params) + 1);
@@ -805,15 +793,14 @@ package Sidef::Parser {
 
                 foreach my $hash_ref (@{$self->{obj_keys}}) {
                     if (/$hash_ref->{re}/) {
-
-                        $self->{expect_method}     = 1;
-                        $self->{expect_method_arg} = 1;
-
-                        if ($hash_ref->{dynamic}) {
-                            return $hash_ref->{sub}->(), pos;
-                        }
-
-                        return (($self->{static_objects}{$hash_ref} //= $hash_ref->{sub}->()), pos);
+                        return (
+                                (
+                                   $hash_ref->{dynamic}
+                                 ? $hash_ref->{sub}->()
+                                 : ($self->{static_objects}{$hash_ref} //= $hash_ref->{sub}->())
+                                ),
+                                pos, 1
+                               );
                     }
                 }
 
@@ -843,7 +830,7 @@ package Sidef::Parser {
                     }
                 }
 
-                if (/\G__RESET_LINE_COUNTER__\b/gc) {
+                if (/\G__RESET_LINE_COUNTER__\b;*/gc) {
                     $self->{line} = 0;
                     redo;
                 }
@@ -856,10 +843,14 @@ package Sidef::Parser {
                     return Sidef::Types::String::String->new($self->{script_name}), pos;
                 }
 
+                if (/\G__LINE__\b/gc) {
+                    return Sidef::Types::Number::Number->new($self->{line}), pos;
+                }
+
                 if (/\G__(?:END|DATA)__\b\h*+\R?/gc) {
 
-                    if (exists $self->{__DATA__}) {
-                        $self->{__DATA__} = substr($_, pos);
+                    if (exists $self->{'__DATA__'}) {
+                        $self->{'__DATA__'} = substr($_, pos);
                     }
 
                     return undef, length($_);
@@ -867,8 +858,8 @@ package Sidef::Parser {
 
                 if (/\GDATA\b/gc) {
                     return +(
-                        $self->{static_objects}{__DATA__} //= do {
-                            open my $str_fh, '<:encoding(UTF-8)', \$self->{__DATA__};
+                        $self->{static_objects}{'__DATA__'} //= do {
+                            open my $str_fh, '<:encoding(UTF-8)', \$self->{'__DATA__'};
                             Sidef::Types::Glob::FileHandle->new(fh   => $str_fh,
                                                                 file => Sidef::Types::Nil::Nil->new);
                           }
@@ -876,13 +867,13 @@ package Sidef::Parser {
                       pos;
                 }
 
-                if (/\G__USE_BIGNUM__\b/gc) {
+                if (/\G__USE_BIGNUM__\b;*/gc) {
                     delete $INC{'Sidef/Types/Number/Number.pm'};
                     require Sidef::Types::Number::Number;
                     redo;
                 }
 
-                if (/\G__NO_BIGNUM__\b/gc) {
+                if (/\G__NO_BIGNUM__\b;*/gc) {
                     delete $INC{'Sidef/Types/Number/NumberFast.pm'};
                     require Sidef::Types::Number::NumberFast;
                     redo;
@@ -994,7 +985,7 @@ package Sidef::Parser {
                     redo;
                 }
 
-                #return undef, pos($_);
+                return undef, pos($_);
 
                 $self->fatal_error(
                                    code  => $_,
@@ -1014,10 +1005,7 @@ package Sidef::Parser {
         for ($opt{code}) {
             if (/\G\(/gc) {
 
-                $self->{has_object}    = 0;
-                $self->{expect_method} = 0;
                 $self->{parentheses}++;
-
                 my ($obj, $pos) = $self->parse_script(code => substr($_, pos));
 
                 $pos // $self->fatal_error(
@@ -1037,10 +1025,7 @@ package Sidef::Parser {
         for ($opt{code}) {
             if (/\G\[/gc) {
 
-                $self->{has_object}    = 0;
-                $self->{expect_method} = 0;
                 $self->{right_brackets}++;
-
                 my ($obj, $pos) = $self->parse_script(code => substr($_, pos));
 
                 $pos // $self->fatal_error(
@@ -1060,8 +1045,6 @@ package Sidef::Parser {
         for ($opt{code}) {
             if (/\G\{/gc) {
 
-                $self->{has_object}    = 0;
-                $self->{expect_method} = 0;
                 $self->{curly_brackets}++;
 
                 my $ref   = $self->{vars}{$self->{class}};
@@ -1075,7 +1058,7 @@ package Sidef::Parser {
                 my $block = Sidef::Types::Block::Code->new({});
                 local $self->{current_block} = $block;
 
-                if (defined(my $pos = $self->parse_whitespace(code => substr($_, pos)))) {
+                if ((my ($pos) = $self->parse_whitespace(code => substr($_, pos)))[0]) {
                     pos($_) += $pos;
                 }
 
@@ -1084,7 +1067,7 @@ package Sidef::Parser {
                 my $header =
                   @vars == 1
                   ? "\\var $vars[0];"
-                  : '\\var _;' . 'var(' . join(',', @vars) . ')=(_...);';
+                  : '\\var _;' . 'var(' . join(',', @vars) . ')=_...;';
 
                 my ($obj, $pos) = $self->parse_script(code => $header . substr($_, pos));
 
@@ -1103,45 +1086,169 @@ package Sidef::Parser {
         }
     }
 
-    sub parse_obj {
+    sub parse_methods {
         my ($self, %opt) = @_;
 
+        my @methods;
         for ($opt{code}) {
 
             pos($_) = 0;
-            my ($obj, $pos) = $self->parse_expr(code => $_);
-            pos($_) += $pos;
+            {
+                if ((/\G(?![-=]>)/ && /\G(?=$self->{re}{operators})/) || /\G\./goc) {
+                    my ($method, $req_arg, $pos) = $self->get_method_name(code => substr($_, pos));
 
-            $obj // return undef, pos($_);
+                    if (defined($method)) {
+                        pos($_) += $pos;
 
-            my $with_arg;
-            my $expr = {$self->{class} => [{self => $obj}]};
+                        if (/\G\h*(?=[({])/gc || $req_arg) {
+                            my ($arg, $pos) =
+                                /\G(?=\()/ ? $self->parse_arguments(code => substr($_, pos))
+                              : $req_arg ? $self->parse_obj(code => substr($_, pos))
+                              : /\G(?=\{)/ ? $self->parse_block(code => substr($_, pos))
+                              :              die "[PARSING ERROR] Something wrong in the if condition!";
 
-            while (/\G(?!->)/ && (/\G(?=[a-z])/ || /\G(?=$self->{re}{operators})/o || /\G\./gc)) {
+                            if (defined $arg) {
+                                pos($_) += $pos;
+                                push @methods, {method => $method, arg => [$arg]};
+                            }
+                            else {
+                                $self->fatal_error(
+                                                   code  => $_,
+                                                   pos   => pos($_) - 1,
+                                                   error => "operator '$method' requires a right-side argument",
+                                                  );
+                            }
+                        }
+                        else {
+                            push @methods, {method => $method};
+                        }
 
-                my ($method, $req_arg, $pos) = $self->get_method_name(code => substr($_, pos));
-
-                pos($_) += $pos;
-                push @{$expr->{$self->{class}}[-1]{call}}, {method => $method};
-                $self->{has_method} = 1;
-
-                if ($req_arg || /\G(?=\h*\()/) {
-                    my ($arg, $pos) = $self->parse_expr(code => substr($_, pos($_)));
-                    pos($_) += $pos;
-
-                    $arg // $self->fatal_error(
-                                               code  => $_,
-                                               pos   => (pos($_)),
-                                               error => "operator '$method' requires an argument!",
-                                              );
-
-                    push @{$expr->{$self->{class}}[-1]{call}[-1]{arg}}, $arg;
-                    $self->{has_method} = 0;
+                        redo;
+                    }
                 }
-                $with_arg //= 1;
             }
 
-            return ($with_arg ? $expr : $obj, pos($_));
+            return \@methods, pos;
+        }
+    }
+
+    sub parse_obj {
+        my ($self, %opt) = @_;
+
+        my %struct;
+        for ($opt{code}) {
+            pos($_) = 0;
+
+            my ($obj, $pos, $obj_key) = $self->parse_expr(code => substr($_, pos));
+            pos($_) += $pos;
+
+            # This object can't take any method!
+            if (ref $obj eq 'Sidef::Variable::InitMy') {
+                return $obj, pos;
+            }
+
+            if (ref $obj eq 'Sidef::Variable::Variable' and $obj->{type} eq 'func' and /\G\h*(?=\()/gc) {
+                my ($arg, $pos) = $self->parse_arguments(code => substr($_, pos));
+                pos($_) += $pos;
+                $obj = {$self->{class} => [{self => $obj, call => [{method => "call", arg => [$arg]}]}]};
+            }
+
+            if (defined $obj) {
+                push @{$struct{$self->{class}}}, {self => $obj};
+
+                if ($obj_key) {
+                    my ($method, $req_arg, $pos) = $self->get_method_name(code => substr($_, pos));
+                    pos($_) += $pos;
+
+                    if (defined $method) {
+                        my ($arg_obj, $pos) =
+                          /\G\h*(?=\()/gc
+                          ? ($self->parse_arguments(code => substr($_, pos)))
+                          : ($self->parse_obj(code => substr($_, pos)));
+                        pos($_) += $pos;
+
+                        if (defined $arg_obj) {
+                            push @{$struct{$self->{class}}[-1]{call}}, {method => $method, arg => [$arg_obj]};
+                        }
+                    }
+                    else {
+                        die "[PARSER ERROR] The same object needs to be parsed again as a method for itself!";
+                    }
+                }
+
+                while (/\G(?=\[)/) {
+                    my ($ind, $pos) = $self->parse_expr(code => substr($_, pos));
+                    pos($_) += $pos;
+                    push @{$struct{$self->{class}}[-1]{ind}}, $ind;
+                }
+
+                my @methods;
+                {
+
+                    if (/\G(?=\.$self->{re}{var_name})/o) {
+                        my ($methods, $pos) = $self->parse_methods(code => substr($_, pos));
+                        pos($_) += $pos;
+                        push @{$struct{$self->{class}}[-1]{call}}, @{$methods};
+                    }
+
+                    if (/\G(?!\h*[=-]>)/ && /\G(?=$self->{re}{operators})/o) {
+                        my ($method, $req_arg, $pos) = $self->get_method_name(code => substr($_, pos));
+                        pos($_) += $pos;
+
+                        if ($req_arg) {
+                            $struct{$self->{class}}[-1]{self} = {
+                                                               $self->{class} => [
+                                                                   {
+                                                                    self => $struct{$self->{class}}[-1]{self},
+                                                                    exists($struct{$self->{class}}[-1]{call})
+                                                                    ? (call => delete $struct{$self->{class}}[-1]{call})
+                                                                    : (),
+                                                                    exists($struct{$self->{class}}[-1]{ind})
+                                                                    ? (ind => delete $struct{$self->{class}}[-1]{ind})
+                                                                    : (),
+                                                                   }
+                                                               ]
+                            };
+
+                            my ($arg, $pos) = $self->parse_obj(code => substr($_, pos));
+                            pos($_) += $pos;
+
+                            if (defined $arg) {
+                                my ($methods, $pos) = $self->parse_methods(code => substr($_, pos));
+                                pos($_) += $pos;
+
+                                if (ref $arg ne 'HASH') {
+                                    $arg = {$self->{class} => [{self => $arg}]};
+                                }
+
+                                if (@{$methods}) {
+                                    push @{$arg->{$self->{class}}[-1]{call}}, @{$methods};
+                                }
+                            }
+                            else {
+                                $self->fatal_error(
+                                                   code  => $_,
+                                                   pos   => pos($_) - 1,
+                                                   error => "operator '$method' requires a right-side argument",
+                                                  );
+                            }
+
+                            push @{$struct{$self->{class}}[-1]{call}}, {method => $method, arg => [$arg]};
+                        }
+                        else {
+                            push @{$struct{$self->{class}}[-1]{call}}, {method => $method};
+                        }
+
+                        redo;
+                    }
+                }
+            }
+            else {
+                return undef, pos;
+            }
+
+            return \%struct, pos;
+
         }
     }
 
@@ -1150,8 +1257,10 @@ package Sidef::Parser {
 
         my %struct;
         for ($opt{code}) {
-            {
-                if (/\G/gc && defined(my $pos = $self->parse_whitespace(code => substr($_, pos)))) {
+            pos($_) = 0;
+          MAIN: {
+
+                if (/\G/gc && (my ($pos) = $self->parse_whitespace(code => substr($_, pos)))[0]) {
                     pos($_) += $pos;
                 }
 
@@ -1260,6 +1369,70 @@ package Sidef::Parser {
                     redo;
                 }
 
+                if (/\G;+/gc) {
+                    redo MAIN;
+                }
+
+                my ($obj, $pos) = $self->parse_obj(code => substr($_, pos));
+                pos($_) += $pos;
+
+                my $ref_obj = ref($obj) eq 'HASH' ? ref($obj->{$self->{class}}[-1]{self}) : ref($obj);
+
+                if (defined $obj) {
+                    push @{$struct{$self->{class}}}, {self => $obj};
+
+                    if (ref $obj eq 'Sidef::Variable::InitMy') {
+                        /\G\h*;+/gc;
+                        redo MAIN;
+                    }
+
+                  GET_METHOD: {
+                        if ((my ($pos, $end) = $self->parse_whitespace(code => substr($_, pos)))[0]) {
+                            pos($_) += $pos;
+                            $end and redo MAIN;
+                        }
+
+                        if (/\G(?:=>|,)/gc) {
+                            redo MAIN;
+                        }
+
+                        my $is_operator = /\G(?!->)/ && /\G(?=$self->{re}{operators})/o;
+                        if ($is_operator || /\G(?:->|\.)\h*/gc || /\G(?=$self->{re}{var_name})/o) {
+
+                            if ((my ($pos, $end) = $self->parse_whitespace(code => substr($_, pos)))[0]) {
+                                pos($_) += $pos;
+                                $end && redo MAIN;
+                            }
+
+                            my ($methods, $pos) =
+                              $self->parse_methods(
+                                                   code => $is_operator
+                                                   ? substr($_, pos)
+                                                   : ("." . substr($_, pos))
+                                                  );
+
+                            pos($_) += $pos - ($is_operator ? 0 : 1);
+
+                            if (@{$methods}) {
+                                push @{$struct{$self->{class}}[-1]{call}}, @{$methods};
+                            }
+                            else {
+                                $self->fatal_error(
+                                                   error => 'incomplete method name',
+                                                   code  => $_,
+                                                   pos   => pos($_) - 1,
+                                                  );
+                            }
+
+                            redo;
+                        }
+                    }
+                }
+
+                if (/\G;+/gc) {
+                    redo MAIN;
+                }
+
                 # We are at the end of the script.
                 # We make some checks, and return the \%struct hash ref.
                 if (/\G\z/) {
@@ -1296,36 +1469,6 @@ package Sidef::Parser {
                     return \%struct;
                 }
 
-                # Comma separated expressions
-                if (/\G(?>,|=>)/gc) {
-
-                    $self->{expect_method} = 0;
-                    $self->{has_object}    = 0;
-                    $self->{has_method}    = 0;
-
-                    redo;
-                }
-
-                # Method separator '->', or operator-method, like '*'
-                if (   $self->{expect_method}
-                    && !$self->{expect_arg}
-                    && (/\G(?=[a-z])/ || /\G->/gc || /\G(?=$self->{re}{operators})/o || /\G\./gc)) {
-
-                    my ($method, $req_arg, $pos) = $self->get_method_name(code => substr($_, pos));
-                    pos($_) += $pos;
-
-                    if ($self->{expect_method_arg}) {
-                        $self->{expect_method_arg} = 0;
-                        $self->{expect_arg}        = 1;
-                    }
-
-                    push @{$struct{$self->{class}}[-1]{call}}, {method => $method};
-
-                    $self->{has_method} = 1;
-
-                    redo;
-                }
-
                 if (/\G\]/gc) {
 
                     if (--$self->{right_brackets} < 0) {
@@ -1336,15 +1479,10 @@ package Sidef::Parser {
                                           );
                     }
 
-                    $self->{has_object}    = 1;
-                    $self->{expect_method} = 1;
-                    $self->{has_method}    = 0;
                     return (\%struct, pos);
                 }
 
                 if (/\G\}/gc) {
-
-                    $self->{expect_method} = 1;
 
                     if (--$self->{curly_brackets} < 0) {
                         $self->fatal_error(
@@ -1354,16 +1492,11 @@ package Sidef::Parser {
                                           );
                     }
 
-                    $self->{has_object}    = 1;
-                    $self->{expect_method} = 1;
-                    $self->{has_method}    = 0;
                     return (\%struct, pos);
                 }
 
                 # The end of an argument expression
                 if (/\G\)/gc) {
-
-                    $self->{expect_method} = 1;
 
                     if (--$self->{parentheses} < 0) {
                         $self->fatal_error(
@@ -1373,110 +1506,56 @@ package Sidef::Parser {
                                           );
                     }
 
-                    $self->{has_object}    = 1;
-                    $self->{expect_method} = 1;
-                    $self->{has_method}    = 0;
                     return (\%struct, pos);
                 }
 
-                # Array index
-                if ($self->{expect_index}) {
+                # If the object can take an block joined with a 'do' method
+                if (exists $self->{obj_with_do}{$ref_obj}) {
 
-                    $self->{expect_index} = 0;
+                    {
+                        my ($arg, $pos) = $self->parse_expr(code => substr($_, pos));
 
-                    my ($array, $pos) = $self->parse_expr(code => substr($_, pos($_)));
-                    pos($_) += $pos;
+                        if (defined $arg) {
+                            pos($_) += $pos;
+                            push @{$struct{$self->{class}}[-1]{call}}, {method => 'do', arg => [$arg]};
 
-                    $self->{expect_index} = /\G(?=\h*\[)/;
+                            if (/\G\h*(\R\h*)?(?=$self->{re}{var_name})/goc) {
 
-                    push @{$self->{$self->get_caller_num}{last_object}{ind}}, $array;
-                    redo;
-                }
+                                if (defined $1) {
+                                    $self->{line}++;
+                                }
 
-                # Beginning of an argument expression
-                if ($self->{has_method}) {
+                                my ($methods, $pos) = $self->parse_methods(code => "." . substr($_, pos));
 
-                    my $is_arg = /\G(?=\()/;
-                    my ($obj, $pos) =
-                        $is_arg
-                      ? $self->parse_expr(code => substr($_, pos))
-                      : $self->parse_obj(code => substr($_, pos($_)));
-                    pos($_) += $pos;
+                                if (@{$methods}) {
+                                    pos($_) += $pos - 1;
+                                    push @{$struct{$self->{class}}[-1]{call}}, @{$methods};
 
-                    if (defined $obj) {
-                        if ($is_arg) {
-                            push @{$struct{$self->{class}}[-1]{call}[-1]{arg}}, $obj;
-                        }
-                        else {
-                            push @{$struct{$self->{class}}[-1]{call}[-1]{arg}}, {$self->{class} => [{self => $obj}]};
-                            if (/\G(?=\h*\[)/) {
-                                $self->{$self->get_caller_num}{last_object} =
-                                  $struct{$self->{class}}[-1]{call}[-1]{arg}[-1]{$self->{class}}[-1];
-                                $self->{expect_index} = 1;
+                                    if ((my ($pos, $end) = $self->parse_whitespace(code => substr($_, pos)))[0]) {
+                                        pos($_) += $pos;
+                                        $end and redo MAIN;
+                                    }
+
+                                    redo;
+                                }
+                            }
+
+                            if (/\G\h*;/gc) {
+                                redo MAIN;
                             }
                         }
                     }
 
-                    $self->{expect_method_arg} = 0;
-
-                    redo;
+                    redo MAIN;
                 }
 
-                # Parse expression or object and use it as main object (self)
-                my ($expect_method, $has_object) = ($self->{expect_method}, $self->{has_object});
-
-                my ($obj, $pos) = $self->parse_expr(code => substr($_, pos));
-                pos($_) += $pos;
-
-                if (defined $obj) {
-
-                    $self->{has_object}    = 1;
-                    $self->{expect_method} = 1;
-
-                    if (ref $obj eq 'Sidef::Variable::InitMy') {
-                        $self->{expect_method} = 0;
-                        $self->{has_object}    = 0;
-                        $self->{has_method}    = 0;
-                    }
-
-                    if ($expect_method and $has_object) {
-
-                        my $self_obj = $struct{$self->{class}}[-1]{self};
-
-                        my $method;
-                        if (exists $self->{obj_with_do}{ref($self_obj)}) {
-                            $method = 'do';
-                        }
-                        elsif (ref($self_obj) eq 'Sidef::Variable::Variable'
-                               and $self_obj->{type} eq 'func') {
-                            $method = 'call';
-                        }
-                        else {
-                            $self->fatal_error(
-                                               error => 'expected a method, not an object!',
-                                               code  => $_,
-                                               pos   => pos($_) - $pos,
-                                              );
-                        }
-
-                        push @{$struct{$self->{class}}[-1]{call}}, {method => $method};
-                        push @{$struct{$self->{class}}[-1]{call}[-1]{arg}}, $obj;
-                    }
-                    else {
-                        push @{$struct{$self->{class}}}, {self => $obj};
-                    }
-
-                    if (/\G(?=\h*\[)/) {
-                        $self->{expect_index} = 1;
-                        $self->{$self->get_caller_num}{last_object} = $struct{$self->{class}}[-1];
-                    }
-                }
-
-                redo;
+                $self->fatal_error(
+                                   code  => $_,
+                                   pos   => (pos($_)),
+                                   error => "expected a method",
+                                  );
             }
         }
-
-        die "Invalid code or something weird is happening! :)\n";
     }
 };
 

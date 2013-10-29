@@ -1,0 +1,9 @@
+#!/usr/bin/ruby
+
+4 + 2*3 + 2 == 12 ? ".".print : "Err1\n".die;
+4+2*3+2     == 14 ? ".".print : "Err2\n".die;
+4+2 * 3+2   == 30 ? ".".print : "Err3\n".die;
+1+2*3 + 5*4 == 27 ? ".".print : "Err4\n".die;
+1 + 2*3+4*5 == 47 ? ".".print : "Err5\n".die;
+
+"\nTest passed".say;

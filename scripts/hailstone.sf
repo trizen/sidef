@@ -25,4 +25,4 @@ h[1]  ==  82 || ("Item error!"   -> die);
 h.len == 112 || ("Length error!" -> die);
 
 "Length of hailstone(27) = %s".printlnf(h.len);
-"[%s]".printlnf(h[0 .. 3] + ['...'] + h[-4 .. -1].join(', '));
+"[%s]".printlnf((h[0 .. 3] + ['...'] + h[-4 .. -1]).join(', '));

@@ -24,7 +24,7 @@ for (desktopFilesPaths, \var path) {
 
         while (var match = (content.match(/^(\w.*?)=(.*\S)/m, pos)).isSuccessful) {
             pos = (match.pos.last);
-            var(key, value) = (match.captures...);
+            var(key, value) = (match.captures->...);
             fields[key] = value;
         }
 

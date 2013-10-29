@@ -48,10 +48,7 @@ fibonacci(0,1, 20).to_s.say;
 ## Function overwriting
 #
 
-fibonacci = {
-    my string;
-      \string;
-
+fibonacci = { |string, __|
     string.say;
 };
 

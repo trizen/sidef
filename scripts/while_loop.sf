@@ -12,7 +12,7 @@ while (num++ <= 3);
 
 
 var num2 = 0;
-while (num2++ <= 3) do {
+while (num2++ <= 3) {
     "Hello sidef (%d)!\n".printf(num2);
 };
 

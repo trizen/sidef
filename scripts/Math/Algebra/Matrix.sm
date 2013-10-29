@@ -22,7 +22,7 @@ if (nil == req) {
 func det (matrix) {
 
     var math = (
-        req.new(matrix...);
+        req.new(matrix->to_list);
     );
 
     Num.new(math.determinant);

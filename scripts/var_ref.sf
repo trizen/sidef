@@ -6,7 +6,7 @@ var ref_s = (\s);     # 'ref_s' points to var 's'
 *ref_s = "else";      # changes the 's' variable
 s.say;                # prints "else"
 
-'-' * 80 say;
+'-' * 80 -> say;
 
 ####################################
 
@@ -29,14 +29,14 @@ var text = "Changed x again";
 x = text;
 *ref_x->say;
 
-'-' * 80 say;
+'-' * 80 -> say;
 
 "** Checking y...".say;
 *(*y) == text
     ? ("** Passed.".say)
     : ("** Failed!".say);
 
-'-' * 80 say;
+'-' * 80 -> say;
 
 
 ###################################
@@ -54,7 +54,7 @@ x = text;
 
 }.run;
 
-'-' * 80 say;
+'-' * 80 -> say;
 
 ###################################
 

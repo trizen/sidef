@@ -2,8 +2,8 @@
 
 var array = ("a".."z");
 
-array ++ "a";    # add "a" at the end of array
-array.push("a"); # =//=
+array ++ ("a");   # add "a" at the end of array
+array.push("a");  # =//=
 
 array[-1] = "x";
 array[-2] = "y";

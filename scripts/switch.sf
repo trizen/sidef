@@ -7,7 +7,7 @@ var j = 4;
 var condition = ( given(1+3) );
 
 condition
-    when 3 do {
+    when (3) do {
         condition.value == 3 || ("Error(1 - 3)\n".die);
     }
     when (i) do {
@@ -24,13 +24,13 @@ end;
 var value = "sidef";
 
 given (value)
-    when ("x") {
+    when ("x") do {
         "Not the right place! (1)".die;
     }
-    when ("sidef") {
+    when ("sidef") do {
         "Right place! (1)".say;
     }
-    when ("y") {
+    when ("y") do {
         "Not the right place! (2)".die;
     }
     default {
@@ -72,13 +72,13 @@ end;
 
 
 {value}.given
-    when "x" do {
+    when ("x") do {
         "Not the right place! (1)".die;
     }
-    when "y" do {
+    when ("y") do {
         "Not the right place! (2)".die;
     }
-    when "sidef" do {
+    when ("sidef") do {
         "Right place! (4)".say;
     }
     default {
@@ -87,34 +87,34 @@ end;
 end;
 
 
-given [8,9,10]
-    when "x" do {
+given([8,9,10])
+    when ("x") do {
         "Not the right place! (1)".die;
     }
-    when [8,10,9] do {
+    when([8,10,9]) do {
         "Not the right place! (2)".die;
     }
-    when [8,9,10] do {
+    when ([8,9,10]) do {
         "Right place! (5)".say;
     }
-    when [42] do {
+    when ([42]) do {
         "Not the right place! (3)".die;
     }
 end;
 
 
 given(0)
-    when 1 do {
+    when (1) do {
         "Not the right place! (1)".die;
     }
-    when '0' do {
+    when ('0') do {
         "Not the right place! (2)".die;
     }
-    when 0 do {
+    when (0) do {
         "Right place! (6)".say;
         continue;
     }
-    when 2 do {
+    when (2) do {
         "Not the right place! (3)".die;
     }
     when (1-1) do {
@@ -127,20 +127,20 @@ end;
 
 
 switch(var val = 0)
-    case (val == 1) {
+    case (val == 1) do {
         "Not the right place! (1)".die;
     }
-    case (val == 0) {
+    case (val == 0) do {
         "Right place! (case)".say;
         continue;
     }
-    case (false) {
+    case (false) do {
         "Not the right place! (2)".die;
     }
-    when (true) {
+    when (true) do {
         "Not the right place! (3)".die;
     }
-    case 0 {
+    case (0) do {
         "Right place! (case-continued)".say;
     }
     default {
@@ -149,17 +149,17 @@ switch(var val = 0)
 end;
 
 
-given 3
-    when 1 {
+given (3)
+    when (1) do {
         "Error!".die;
     }
-    when 2 {
+    when (2) do {
         "Error!".die;
     }
-    when 3 {
+    when (3) do {
         "Right place! (given)".say;
     }
-    when 3 {
+    when (3) do {
         "Error!".die;
     }
     default {

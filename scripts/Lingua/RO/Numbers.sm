@@ -5,7 +5,7 @@
 
 class Lingua::RO::Numbers;
 
-__USE_BIGNUM__;
+__USE_BIGNUM__
 
 var DIGITS = (Hash.new);
 DIGITS[0 .. 19] = qw„
@@ -37,7 +37,7 @@ var BIGNUMS = (
                 [10**27, 'cvadriliard', 'cvadriliarde', false],
             ]
              -> map {
-                 (var h=(Hash.new))[qw(num sg pl fem)] = (_) => h;
+                 (var h = Hash.new)[qw(num sg pl fem)] = (_) => h;
             }
 );
 
@@ -62,11 +62,11 @@ func _number_to_ro (number) {
     }
     elsif (number.is_negative) {
         words.append(opts['negative_sign']);
-        words.append(_number_to_ro(number.abs).to_list);
+        words.append(_number_to_ro(number.abs)->to_list);
     }
     elsif (!(number.isInt)) {
 
-        words.append(_number_to_ro(number.int).to_list);
+        words.append(_number_to_ro(number.int)->to_list);
         words.append(opts['decimal_point']);
 
         number -= (number.int);
@@ -76,7 +76,7 @@ func _number_to_ro (number) {
                 < 1 && (words.append(DIGITS[0]));
         }
 
-        words.append(_number_to_ro(number.int).to_list);
+        words.append(_number_to_ro(number.int)->to_list);
     }
     elsif (number >= BIGNUMS[0]['num']) {
         my i;   # special
@@ -115,7 +115,7 @@ func _number_to_ro (number) {
                 );
 
                 number > 0 && (
-                    words.append(_number_to_ro(number).to_list)
+                    words.append(_number_to_ro(number)->to_list)
                 );
 
                 break;
@@ -143,10 +143,10 @@ func _number_to_ro (number) {
         return [opts['infinity']];
     }
     else {
-        return [opts['invalid_number']];
+        return([opts['invalid_number']]);
     }
 
-    return $words;
+    return(words);
 }
 
 func number_to_ro (num) {

@@ -84,6 +84,8 @@ package Sidef::Types::Block::Code {
         my ($self) = @_;
 
         my ($class) = keys %{$self};
+
+        #        local $self->{var_ref} = 1;
         $exec->execute_expr($self->{$class}[0], $class), $class;
     }
 
@@ -128,35 +130,13 @@ package Sidef::Types::Block::Code {
             my ($var_ref) = $self->_get_private_var();
             $var_ref->get_var->set_value(Sidef::Types::Array::Array->new(@args));
 
-            my $i       = 0;
-            my $j       = 1;
-            my @express = @{$self->{$class}};
-            while (    ref($vars[$i]{self}) eq 'Sidef::Variable::InitMy'
-                   and ref($vars[$i + 1]{self}) eq 'Sidef::Variable::Ref') {
-                splice(
-                       @express,
-                       ++$j,
-                       0,
-                       {
-                        self => Sidef::Variable::My->new($vars[$i]{self}->_get_name),
-                        call => [
-                                 {
-                                  method => '=',
-                                  arg    => [shift @args],
-                                 }
-                                ]
-                       }
-                      );
-                $j += 2;
-                $i += 2;
+            my $obj = $self->run;
+
+            if (ref $obj eq 'Sidef::Types::Block::Return') {
+                $obj = $obj->_get_obj;
             }
 
-            #if ($i < $#vars) {
-            #    warn "[WARN] Too many arguments in function call!",
-            #      " Expected ${\($i/2)}, but got ${\(scalar(@vars)/2)} of them.\n";
-            #}
-
-            push @results, $exec->execute({$class => \@express});
+            push @results, $obj;
         }
 
         return $results[-1];

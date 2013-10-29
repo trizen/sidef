@@ -3,8 +3,8 @@
 # Translation of: http://rosettacode.org/wiki/Accumulator_factory#Perl
 
 func accumulator () {
-    var sum = _[0];
-    func (num) { sum += num };
+    var sum = _.shift;
+    func (num) { sum += num }
 }
 
 for (var i = 0; i < 5; i++) {

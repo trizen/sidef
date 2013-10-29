@@ -9,8 +9,8 @@ func recurse (i, greeting) {
 
     greeting.say;
 
-    (i-- >= 2) && (recurse(i, "Hello Sidef!")) ||   # when i  > 4, print "Hello Sidef"
-    (i >= 0   && (recurse(i, "Hello to me!")));     # when i >= 0, change the greeting var, and recurse with one argument
+    (i-- >= 2) && (recurse(i, "Hello Sidef!")) ||   # when i >= 2, print "Hello Sidef"
+    (i >= 0   && (recurse(i, "Hello to us!")));     # when i >= 0, change the greeting var, and recurse with one argument
 };
 
 recurse(5, "Hello world!");

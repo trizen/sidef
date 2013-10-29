@@ -6,12 +6,12 @@ func permute (code, arr) {
     while (true) {
         code.call(arr[idx]);
 
-        var p = (idx.offset);
+        var p = idx.offset;
         {p--} while (idx[p - 1] > idx[p]);
         p == 0 && (return);
 
         var d = p;
-        idx += (idx.splice(p).reverse);
+        idx += idx.splice(p).reverse;
 
         {d++} while (idx[p - 1] > idx[d]);
 

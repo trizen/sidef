@@ -8,18 +8,14 @@ true
     && false
         && ("Error!".say);                              # not printed
 
+(false || false || true) == true || "Bool error!\n".die;
+
+while (false) {
+    "While error!\n".die;
+}
 
 true
     && true
         && ("Passed test!".say)                         # printed
             && false
                 && ("But failed at the end!".say);      # not printed
-
-
-
-
-while (false) {
-    "While fail!".say;                                 # not printed
-}
-
-(false || false || true)->to_s->say;    # prints "true"

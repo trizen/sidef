@@ -7,7 +7,7 @@ func evalArithmeticExp(s) {
     func evalExp(s) {
 
         func operate(s, op) {
-            s.split(op).map{|c|c.toNum}->reduce(op);
+           s.split(op).map{|c|c.toNum}.reduce(op);
         }
 
         func add(s) {
@@ -17,34 +17,34 @@ func evalArithmeticExp(s) {
         func subtract(s) {
             s.gReplace!(/(\+-|-\+)/,'-');
 
-            if (s.match(/--/).isSuccessful) {
-                return (add(s.replace(/--/,'+')));
+            if (s.match(/--/)) {
+                return(add(s.replace(/--/,'+')));
             }
 
             b = (s.split('-')).len == 3
-                ? (-1 * (b[1].toNum) - (b[2].toNum))
+                ? (-1 * b[1].toNum - b[2].toNum)
                 : (operate(s, '-'))
         }
 
         s.gReplace!(/[()]/,'').gReplace!(/-\+/, '-');
 
         var reM  = /\*/;
-        var reMD = /(\d+\.?\d*\s*[*\/]\s*[+-]?\d+\.?\d*)/;
+        var reMD = qr"(\d+\.?\d*\s*[*/]\s*[+-]?\d+\.?\d*)";
 
         var reA  = /\d\+/;
         var reAS = /(-?\d+\.?\d*\s*[+-]\s*[+-]?\d+\.?\d*)/;
 
         var match;
-        while (match = (s.match(reMD)) -> isSuccessful) {
+        while (match = s.match(reMD)) {
             cap = (match.captures.first) =~ reM ??
                 ? (s.replace!(reMD, operate(cap, '*').to_s))
                 : (s.replace!(reMD, operate(cap, '/').to_s))
         }
 
-        while (match = (s.match(reAS)) -> isSuccessful) {
+        while (match = s.match(reAS)) {
             cap = (match.captures.first) =~ reA ??
                 ? (s.replace!(reAS,      add(cap).to_s))
-                : (s.replace!(reAS, subtract(cap).to_s))
+                : (s.replace!(reAS, subtract(cap).to_s));
         }
 
         return(s);
@@ -53,7 +53,7 @@ func evalArithmeticExp(s) {
     var rePara = /(\([^\(\)]*\))/;
     s = (s.split.join('').replace(/^\+/,''));
 
-    while (var match = (s.match(rePara)) -> isSuccessful) {
+    while (var match = s.match(rePara)) {
         s.replace!(rePara, evalExp(match.captures.first));
     }
 
@@ -67,19 +67,17 @@ func evalArithmeticExp(s) {
 
 for [
      ['2+3'                                      =>        5],
-     ['-4-3',                                    =>       -7],
+     ['-4-3'                                     =>       -7],
      ['-+2+3/4'                                  =>    -1.25],
      ['2*3-4'                                    =>        2],
      ['2*(3+4)+2/4'                              => 2/4 + 14],
      ['2*-3--4+-0.25'                            =>    -2.25],
      ['2 * (3 + (4 * 5 + (6 * 7) * 8) - 9) * 10' =>     7000],
-    ] {
+    ] { |expr, res|
 
-    var num = (evalArithmeticExp(_[0]))
-            == _[1] || (
-                        "Error occurred on expression: %s\n".sprintf(_[0])
-                                                            .die
-                       );
+    var num = (evalArithmeticExp(expr)) == res || (
+            "Error occurred on expression '#{expr}': got '#{num}' instead of '#{res}'\n".die;
+    );
 
-    "%-45s == %10g\n".printf(_[0], num);
+    "%-45s == %10g\n".printf(expr, num);
 }

@@ -18,24 +18,22 @@ func abs_str (str) {
     for (str.split('') => \var c) {
 
         switch (c)
-            when '{' {
+            when ('{') do {
                 root.append(word);
                 word.clear!;
             }
-            when '}' {
+            when ('}') do {
                 store.call;
                 root.pop;
                 word.clear!;
             }
-            when ',' {
+            when (',') do {
                 store.call;
                 word.clear!;
             }
             default {
                 word += c;
             }
-        end;
-
     }
 
     store.call;
@@ -52,5 +50,5 @@ var strings = [
 
 for (strings => \var str) {
     var array = (abs_str(str));
-    "%-25s" * 3 + "\n" -> printf(array[0..2]...);
+    "%-25s" * 3 + "\n" -> printf(array[0..2]->as_list);
 }

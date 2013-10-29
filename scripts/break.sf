@@ -27,7 +27,7 @@ while (i -= 1 >= 10) {
 #
 {
     say "For: "+_; break; _.say;
-} for ["a","b","c"];
+} for (["a","b","c"]);
 
 #
 ## {...} for {;;}

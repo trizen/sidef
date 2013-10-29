@@ -7,5 +7,5 @@ func catalan (n) {
 }
 
 for (0..45) {
-    "%d\t%s\n".printf(_, catalan _);
+    "%d\t%s\n".printf(_, catalan(_));
 }

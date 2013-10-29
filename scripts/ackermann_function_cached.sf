@@ -16,8 +16,8 @@ func A(m,n) {
     );
 }
 
-A(1,4) == 6  || ("Error 1!".die);
-A(2,3) == 9  || ("Error 2!".die);
-A(3,2) == 29 || ("Error 3!".die);
+A.call(1,4) == 6  || ("Error 1!".die);
+A.call(2,3) == 9  || ("Error 2!".die);
+A.call(3,2) == 29 || ("Error 3!".die);
 
 "Test passed!".say;

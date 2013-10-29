@@ -13,7 +13,7 @@ func combine(n, set) {
     );
 
     head   = (set.shift);
-    result = (combine(n-1, set.map{_}));
+    result = (combine(n-1, set.copy));
 
     for (result => \var subarray) {
         subarray.unshift(head);
