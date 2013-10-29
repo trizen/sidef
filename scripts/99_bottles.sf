@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
-var i;
-{
+99.downto(0).each { |i|
+
     var bottles  = ('%s bottle%s'.sprintf (
             i == 0 ? 'No' : i,
             i == 1 ? ''   : 's'
@@ -15,4 +15,16 @@ var i;
         "Take one down, pass it around\n".say;
     );
 
-} for (i = 99; i >= 0; i--);
+};
+
+
+__END__
+
+## Simpler:
+99.downto(2).each { | n |
+  say "#{n} bottles of beer on the wall, #{n} bottles of beer!";
+  say "Take one down, pass it around, #{n - 1} bottle#{n > 2 ? 's' : ''} of beer on the wall.\n";
+};
+
+say "One bottle of beer on the wall, one bottle of beer!";
+say "Take one down, pass it around, no more bottles of beer on the wall.";

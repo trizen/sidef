@@ -1047,7 +1047,7 @@ package Sidef::Parser {
 
                 $self->{curly_brackets}++;
 
-                my $ref   = $self->{vars}{$self->{class}};
+                my $ref   = $self->{vars}{$self->{class}} //= [];
                 my $count = scalar(@{$self->{vars}{$self->{class}}});
 
                 unshift @{$self->{ref_vars_refs}{$self->{class}}}, @{$ref};

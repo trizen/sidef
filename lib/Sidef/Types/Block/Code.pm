@@ -84,8 +84,6 @@ package Sidef::Types::Block::Code {
         my ($self) = @_;
 
         my ($class) = keys %{$self};
-
-        #        local $self->{var_ref} = 1;
         $exec->execute_expr($self->{$class}[0], $class), $class;
     }
 
@@ -123,9 +121,6 @@ package Sidef::Types::Block::Code {
         my @results;
 
         foreach my $class (keys %{$self}) {
-
-            my $argc = 0;
-            my @vars = @{$self->{$class}}[1 .. @args * 2];
 
             my ($var_ref) = $self->_get_private_var();
             $var_ref->get_var->set_value(Sidef::Types::Array::Array->new(@args));
