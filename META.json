@@ -54,6 +54,9 @@
          "file" : "lib/Sidef.pm",
          "version" : "0.01"
       },
+      "Sidef::Args::Args" : {
+         "file" : "lib/Sidef/Args/Args.pm"
+      },
       "Sidef::Convert::Convert" : {
          "file" : "lib/Sidef/Convert/Convert.pm"
       },
@@ -92,6 +95,9 @@
       },
       "Sidef::Types::Array::Array" : {
          "file" : "lib/Sidef/Types/Array/Array.pm"
+      },
+      "Sidef::Types::Array::HCArray" : {
+         "file" : "lib/Sidef/Types/Array/HCArray.pm"
       },
       "Sidef::Types::Black::Hole" : {
          "file" : "lib/Sidef/Types/Black/Hole.pm"

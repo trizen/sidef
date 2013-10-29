@@ -10,6 +10,7 @@ use strict;
 use warnings;
 
 require Sidef::Sys::Sys if (caller)[0] ne q{Sidef::Sys::Sys};
+require Sidef::Args::Args if (caller)[0] ne q{Sidef::Args::Args};
 require Sidef::Math::Math if (caller)[0] ne q{Sidef::Math::Math};
 require Sidef::Time::Localtime if (caller)[0] ne q{Sidef::Time::Localtime};
 require Sidef::Time::Time if (caller)[0] ne q{Sidef::Time::Time};
@@ -21,7 +22,6 @@ require Sidef::Types::Bool::Bool if (caller)[0] ne q{Sidef::Types::Bool::Bool};
 require Sidef::Types::Bool::Ternary if (caller)[0] ne q{Sidef::Types::Bool::Ternary};
 require Sidef::Types::Char::Char if (caller)[0] ne q{Sidef::Types::Char::Char};
 require Sidef::Types::Char::Chars if (caller)[0] ne q{Sidef::Types::Char::Chars};
-require Sidef::Args::Args if (caller)[0] ne q{Sidef::Args::Args};
 require Sidef::Types::Byte::Bytes if (caller)[0] ne q{Sidef::Types::Byte::Bytes};
 require Sidef::Types::Byte::Byte if (caller)[0] ne q{Sidef::Types::Byte::Byte};
 require Sidef::Types::Glob::Dir if (caller)[0] ne q{Sidef::Types::Glob::Dir};
@@ -34,8 +34,8 @@ require Sidef::Types::Glob::PipeHandle if (caller)[0] ne q{Sidef::Types::Glob::P
 require Sidef::Types::Glob::File if (caller)[0] ne q{Sidef::Types::Glob::File};
 require Sidef::Types::Glob::Stat if (caller)[0] ne q{Sidef::Types::Glob::Stat};
 require Sidef::Types::Hash::Hash if (caller)[0] ne q{Sidef::Types::Hash::Hash};
-require Sidef::Types::Array::Array if (caller)[0] ne q{Sidef::Types::Array::Array};
 require Sidef::Types::Array::HCArray if (caller)[0] ne q{Sidef::Types::Array::HCArray};
+require Sidef::Types::Array::Array if (caller)[0] ne q{Sidef::Types::Array::Array};
 require Sidef::Types::Black::Hole if (caller)[0] ne q{Sidef::Types::Black::Hole};
 require Sidef::Types::Block::For if (caller)[0] ne q{Sidef::Types::Block::For};
 require Sidef::Types::Block::Do if (caller)[0] ne q{Sidef::Types::Block::Do};

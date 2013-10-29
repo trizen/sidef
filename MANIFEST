@@ -4,6 +4,7 @@ Changes
 ignore.txt
 lib/Sidef.pm
 lib/Sidef.pod
+lib/Sidef/Args/Args.pm
 lib/Sidef/Convert/Convert.pm
 lib/Sidef/Convert/Convert.pod
 lib/Sidef/Exec.pm
@@ -25,6 +26,7 @@ lib/Sidef/Time/Time.pm
 lib/Sidef/Time/Time.pod
 lib/Sidef/Types/Array/Array.pm
 lib/Sidef/Types/Array/Array.pod
+lib/Sidef/Types/Array/HCArray.pm
 lib/Sidef/Types/Black/Hole.pm
 lib/Sidef/Types/Block/Break.pm
 lib/Sidef/Types/Block/Break.pod
@@ -171,6 +173,7 @@ scripts/functions.sf
 scripts/gcd.sf
 scripts/getopt.sf
 scripts/global_regex_matching.sf
+scripts/group_precedence.sf
 scripts/hailstone.sf
 scripts/hash_autovivification.sf
 scripts/hash_from_array.sf
