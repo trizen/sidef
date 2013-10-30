@@ -12,7 +12,7 @@ package Sidef::Types::Nil::Nil {
       );
 
     sub new {
-        bless \(my $nil = 'nil'), __PACKAGE__;
+        bless \(my $nil = undef), __PACKAGE__;
     }
 
     sub get_value {

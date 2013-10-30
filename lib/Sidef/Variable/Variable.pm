@@ -122,19 +122,58 @@ package Sidef::Variable::Variable {
             };
         }
 
+        foreach my $operator (qw(< > >= <= ^^ $$)) {
+
+            *{__PACKAGE__ . '::' . '?' . $operator . '='} = sub {
+                my ($self, $arg) = @_;
+
+                if (ref($arg) and eval { $arg->can($operator) }) {
+                    my $method = '=';
+                    if ($arg->$operator($self->get_value)) {
+                        $self->$method($arg);
+                    }
+                }
+                else {
+                    warn sprintf(qq{[WARN] Can't find the method "$operator" for %s!\n},
+                                 defined($arg) ? ('object ' . ref($arg)) : 'an undefined object');
+                }
+
+                $self;
+            };
+
+            *{__PACKAGE__ . '::' . $operator . '?='} = sub {
+                my ($self, $arg) = @_;
+
+                my $value = $self->get_value;
+
+                if (ref($value) and eval { $value->can($operator) }) {
+                    my $method = '=';
+                    if ($value->$operator($arg)) {
+                        $self->$method($arg);
+                    }
+                }
+                else {
+                    warn sprintf(qq{[WARN] Can't find the method "$operator" for %s!\n},
+                                 defined($arg) ? ('object ' . ref($arg)) : 'an undefined object');
+                }
+
+                $self;
+            };
+        }
+
         foreach my $operator (qw(+ - % * / & | ^ ** && || << >> ÷)) {
 
             *{__PACKAGE__ . '::' . $operator . '='} = sub {
                 my ($self, $arg) = @_;
 
-                my $method = '=';
-                my $value  = $self->get_value;
+                my $value = $self->get_value;
 
                 if (ref($value) and eval { $value->can($operator) }) {
+                    my $method = '=';
                     $self->$method($self->get_value->$operator($arg));
                 }
                 else {
-                    warn sprintf(qq{[WARN] Can't find the method "$operator=" for %s!\n},
+                    warn sprintf(qq{[WARN] Can't find the method "$operator" for %s!\n},
                                  defined($value) ? ('object ' . ref($value)) : 'an undefined object');
                 }
                 $self;

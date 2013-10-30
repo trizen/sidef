@@ -118,7 +118,7 @@ package Sidef::Types::Block::Code {
     sub call {
         my ($self, @args) = @_;
 
-        my @results;
+        my $result;
 
         foreach my $class (keys %{$self}) {
 
@@ -128,13 +128,14 @@ package Sidef::Types::Block::Code {
             my $obj = $self->run;
 
             if (ref $obj eq 'Sidef::Types::Block::Return') {
-                $obj = $obj->_get_obj;
+                return $obj->{obj};
             }
-
-            push @results, $obj;
+            else {
+                $result = $obj;
+            }
         }
 
-        return $results[-1];
+        return $result;
     }
 
     sub if {

@@ -244,7 +244,7 @@ package Sidef::Types::String::String {
         $offs = 1 + $str_len + $offs if $offs < 0;
         $len = defined $len ? $len < 0 ? $str_len + $len : $offs + $len - 1 : $str_len;
 
-        __PACKAGE__->new(CORE::join '', @str[$offs .. $len]);
+        __PACKAGE__->new(CORE::join('', grep { defined } @str[$offs .. $len]));
     }
 
     *substring = \&substr;

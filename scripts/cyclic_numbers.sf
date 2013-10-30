@@ -1,0 +1,21 @@
+#!/usr/bin/ruby
+
+## Inspired from: https://www.youtube.com/watch?v=WUlaUalgxqI
+
+__USE_BIGNUM__
+
+const acc = 50;
+Math.accuracy(acc);
+
+{ |i|
+    i % 11 == 0 && next;
+
+    var n = (1/i -> to_s);
+    var s = n.substr(2, i-1);
+
+    s.tr('', '', 'cs').len <= 1 && next;
+
+    if (n.contains(s, i)) {
+        "%3s\t-> %s\n".printf(i.int, s);
+    }
+} * acc/2;

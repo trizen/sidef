@@ -7,8 +7,8 @@ class Lingua::RO::Numbers;
 
 __USE_BIGNUM__
 
-var DIGITS = (Hash.new);
-DIGITS[0 .. 19] = qw„
+var DIGITS = Hash.new;
+DIGITS['0'..'19'] = qw„
   zero unu doi trei patru cinci șase șapte opt nouă zece
   unsprezece
   doisprezece
