@@ -16,7 +16,7 @@ package Sidef::Parser {
 
         my %options = (
             line          => 1,
-            inc           => [File::Spec->curdir()],    # this needs a lot of thinking!
+            inc           => [File::Spec->curdir()],    # this needs some thinking!
             class         => 'main',
             vars          => {'main' => []},
             ref_vars_refs => {'main' => []},
@@ -968,7 +968,7 @@ package Sidef::Parser {
                     elsif (/\G(?=\h*=>)/) {
                         return Sidef::Types::String::String->new($var_name), pos;
                     }
-                    elsif (/\G(?=\h*(?:\R\h*)?:?=(?![=~>]))/) {
+                    elsif (/\G(?=\h*:?=(?![=~>]))/) {
                         unshift @{$self->{vars}{$class}},
                           {
                             obj   => Sidef::Variable::My->new($name),
@@ -1054,7 +1054,7 @@ package Sidef::Parser {
 
                 $self->{curly_brackets}++;
 
-                my $ref   = $self->{vars}{$self->{class}} //= [];
+                my $ref = $self->{vars}{$self->{class}} //= [];
                 my $count = scalar(@{$self->{vars}{$self->{class}}});
 
                 unshift @{$self->{ref_vars_refs}{$self->{class}}}, @{$ref};
@@ -1377,7 +1377,7 @@ package Sidef::Parser {
                 }
 
                 if (/\G;+/gc) {
-                    redo MAIN;
+                    redo;
                 }
 
                 my ($obj, $pos) = $self->parse_obj(code => substr($_, pos));
@@ -1390,10 +1390,10 @@ package Sidef::Parser {
 
                     if (ref $obj eq 'Sidef::Variable::InitMy') {
                         /\G\h*;+/gc;
-                        redo MAIN;
+                        redo;
                     }
 
-                  GET_METHOD: {
+                    {
                         if ((my ($pos, $end) = $self->parse_whitespace(code => substr($_, pos)))[0]) {
                             pos($_) += $pos;
                             $end and redo MAIN;
@@ -1437,7 +1437,7 @@ package Sidef::Parser {
                 }
 
                 if (/\G;+/gc) {
-                    redo MAIN;
+                    redo;
                 }
 
                 # We are at the end of the script.
