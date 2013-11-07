@@ -96,7 +96,6 @@ func _number_to_ro (number) {
                    w;
                 ));
 
-
                 if (cat >= 100 && (cat < 1000)) {
                     var rest = (cat - (100 * (cat / 100 -> int)));
                     if (of.len != 0 && (rest != 0 && (DIGITS.exists(rest)))) {
@@ -110,11 +109,10 @@ func _number_to_ro (number) {
                                          : (of + [BIGNUMS[j-1]['pl']]));
                 );
 
-                BIGNUMS[j]['num'] > 1000 && (
-                    words[-1] += opts['thousands_separator']
-                );
-
                 number > 0 && (
+                    BIGNUMS[j]['num'] > 1000 && (
+                        words[-1] += opts['thousands_separator']
+                    );
                     words.append(_number_to_ro(number)->to_list)
                 );
 
@@ -171,10 +169,6 @@ func number_to_ro (num) {
             #.gsub!('î','i');
 
         word.tr!('ăâșțî', 'aasti');
-    }
-
-    if (var t = opts['thousands_separator'] != '') {
-        word.gsub!(Regex.new('(?:' + (t.quotemeta) + ')+$'), '');
     }
 
     word;
