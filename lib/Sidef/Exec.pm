@@ -64,7 +64,8 @@ package Sidef::Exec {
         my ($self, $index) = @_;
 
         (
-         $self->_is_number($index, 1, 1)
+              $self->_is_number($index, 1, 1)
+           || $self->_is_bool($index, 1, 1)
            || do {
              warn sprintf("[WARN] Array index must be a number, not '%s'!\n", ref($index));
              return;
@@ -136,8 +137,7 @@ package Sidef::Exec {
 
                         $is_hash ? do { $self_obj->{$ind} //= Sidef::Variable::Variable->new(rand, 'var') } : do {
                             foreach my $ind (0 .. $ind) {
-                                $self_obj->[$ind] //=
-                                  Sidef::Variable::Variable->new(rand, 'var', Sidef::Types::Nil::Nil->new);
+                                $self_obj->[$ind] //= Sidef::Variable::Variable->new(rand, 'var', Sidef::Types::Nil::Nil->new);
                             }
                         };
 
@@ -184,8 +184,7 @@ package Sidef::Exec {
                             my $num = $ind->get_value;
 
                             foreach my $j (0 .. $num - 1) {
-                                $self_obj->[$j] //=
-                                  Sidef::Variable::Variable->new(rand, 'var', Sidef::Types::Nil::Nil->new);
+                                $self_obj->[$j] //= Sidef::Variable::Variable->new(rand, 'var', Sidef::Types::Nil::Nil->new);
                             }
 
                             $self_obj->[$num] //=
@@ -254,8 +253,7 @@ package Sidef::Exec {
                 };
 
                 if (not $self_obj->can('AUTOLOAD') and not $self_obj->can($method)) {
-                    warn sprintf("[WARN] Inexistent method '%s' for object %s\n",
-                                 $method, ref($self_obj) || '- undefined!');
+                    warn sprintf("[WARN] Inexistent method '%s' for object %s\n", $method, ref($self_obj) || '- undefined!');
                     return $self_obj;
                 }
 
@@ -281,7 +279,7 @@ package Sidef::Exec {
                             ref($arg) eq 'HASH'
                             and not(
                                     (exists($self->{types}{$type}) && exists($self->{types}{$type}{$method}))
-                                    || (($type eq 'Sidef::Types::Block::Code' || $type eq 'Sidef::Types::Block::For')
+                                    || (    ($type eq 'Sidef::Types::Block::Code' || $type eq 'Sidef::Types::Block::For')
                                         and ($method eq 'for' || $method eq 'foreach')
                                         and ref $arg->{$class} eq 'ARRAY'
                                         and @{$arg->{$class}} == 3)
