@@ -15,7 +15,9 @@ func binary_search (array, value, left, right) {
     )
 
     binary_search(array, value, value < array[middle] ? ([left, middle - 1])
-                                                      : ([middle + 1, right])->...);
+                                                      : ([middle + 1, right])
+                                     -> to_list
+                 );
 }
 
 var arr = [

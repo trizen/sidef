@@ -7,7 +7,7 @@ use warnings;
 BEGIN { unshift(@INC, '../lib') }
 
 binmode(STDOUT, ':encoding(UTF-8)');
-binmode(STDERR, ':encoding(UTF-8)');
+binmode(STDERR, ':encoding(UTF-8)') if $^P == 0;
 binmode(STDIN,  ':encoding(UTF-8)');
 
 require Sidef;
