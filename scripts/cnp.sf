@@ -12,7 +12,7 @@ var cnp = (ARGV[0] \\ '2940823432049');
 
 # Should have length() == 13
 cnp.len == 13
-    || "Invalid CNP: trebuie să aibă exact 13 caractere!\n".die;
+    || "Invalid CNP: trebuie să conțină exact 13 caractere!\n".die;
 
 
 # Should not contains non-digits
@@ -113,7 +113,7 @@ var months = qw(
   Decembrie
 );
 
-(var days = Hash.new)[months] = (
+(var days = Hash.new)[months] = [
   31,
   29,
   31,
@@ -126,7 +126,7 @@ var months = qw(
   31,
   30,
   31,
-);
+];
 
 var magic = [2, 7, 9, 1, 4, 6, 3, 5, 8, 2, 7, 9];
 
