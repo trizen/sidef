@@ -272,7 +272,7 @@ package Sidef::Types::Number::Number {
         my @bin;
         while ($dec > 0) {
             unshift @bin, $reminder;
-            $reminder = ($dec >> 1) % 2;
+            $reminder = ($dec >>= 1) % 2;
         }
 
         $self->new(join('', @bin));
