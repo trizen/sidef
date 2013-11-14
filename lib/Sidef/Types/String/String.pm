@@ -680,16 +680,16 @@ package Sidef::Types::String::String {
 
             my $expr;
             my $append_arg = sub {
-                push @{$expr->{main}[0]{call}}, {arg => [$_[0]], method => '+'};
+                push @{$expr->{$parser->{class}}[0]{call}}, {arg => [$_[0]], method => '+'};
             };
 
             my $string = '';
             foreach my $char (@chars) {
                 if (ref($char) eq 'Sidef::Types::Block::Code') {
-                    my $block = {main => [{self => $char, call => [{method => 'run'}, {method => 'to_s'}]}]};
+                    my $block = {$parser->{class} => [{self => $char, call => [{method => 'run'}, {method => 'to_s'}]}]};
 
                     if (not defined $expr) {
-                        $expr = {main => [{self => $string eq '' ? $block : $self->new($string), call => []}]};
+                        $expr = {$parser->{class} => [{self => $string eq '' ? $block : $self->new($string), call => []}]};
 
                         next if $string eq '';
                         $append_arg->($block);

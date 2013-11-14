@@ -30,33 +30,68 @@ package Sidef::Types::Hash::Hash {
         \%hash;
     }
 
-    {
-        no strict 'refs';
+    sub duplicate_of {
+        my ($self, $obj) = @_;
 
-        *{__PACKAGE__ . '::' . '+'} = sub {
-            my ($self, $obj) = @_;
+        $self->_is_hash($obj);
+        %{$self} eq %{$obj} || return Sidef::Types::Bool::Bool->false;
 
-            my @list;
-            while (my ($key, $val) = each %{$self}) {
+        my $ne_method = '!=';
+        while (my ($key, $value) = each %{$self}) {
+            !exists($obj->{$key})
+              && (return Sidef::Types::Bool::Bool->false);
+
+            $value->get_value->$ne_method($obj->{$key}->get_value)
+              && return (Sidef::Types::Bool::Bool->false);
+        }
+
+        Sidef::Types::Bool::Bool->true;
+    }
+
+    *duplicateOf = \&duplicate_of;
+
+    sub eq {
+        my ($self, $obj) = @_;
+
+        $self->_is_hash($obj);
+        %{$self} eq %{$obj} || return Sidef::Types::Bool::Bool->false;
+
+        while (my ($key) = each %{$self}) {
+            !exists($obj->{$key})
+              && return Sidef::Types::Bool::Bool->false;
+        }
+
+        Sidef::Types::Bool::Bool->true;
+    }
+
+    sub ne {
+        my ($self, $obj) = @_;
+        $self->eq($obj)->not;
+    }
+
+    sub concat {
+        my ($self, $obj) = @_;
+
+        my @list;
+        while (my ($key, $val) = each %{$self}) {
+            push @list, $key, $val->get_value;
+        }
+
+        if ($self->_is_hash($obj, 1, 1)) {
+
+            while (my ($key, $val) = each %{$obj}) {
                 push @list, $key, $val->get_value;
             }
+        }
+        elsif ($self->_is_array($obj, 1, 1)) {
+            push @list, map { $_->get_value } @{$obj};
+        }
+        else {
+            warn "[WARN] Invalid object for hash concatenation! Expected hash or array.\n";
+            return $self;
+        }
 
-            if ($self->_is_hash($obj, 1, 1)) {
-
-                while (my ($key, $val) = each %{$obj}) {
-                    push @list, $key, $val->get_value;
-                }
-            }
-            elsif ($self->_is_array($obj, 1, 1)) {
-                push @list, map { $_->get_value } @{$obj};
-            }
-            else {
-                warn "[WARN] Invalid object for hash concatenation! Expected hash or array.\n";
-                return $self;
-            }
-
-            $self->new(@list);
-        };
+        $self->new(@list);
     }
 
     sub keys {
@@ -77,8 +112,7 @@ package Sidef::Types::Hash::Hash {
 
             my $array = Sidef::Types::Array::Array->new();
             while (my ($key, $value) = each %{$self}) {
-                $array->push(
-                           Sidef::Types::Array::Array->new(Sidef::Types::String::String->new($key), $value->get_value));
+                $array->push(Sidef::Types::Array::Array->new(Sidef::Types::String::String->new($key), $value->get_value));
             }
 
             return $obj->for($array);
@@ -158,4 +192,15 @@ package Sidef::Types::Hash::Hash {
               . "\n)"
         );
     }
-}
+
+    {
+        no strict 'refs';
+
+        *{__PACKAGE__ . '::' . '+'}   = \&concat;
+        *{__PACKAGE__ . '::' . '==='} = \&duplicateOf;
+        *{__PACKAGE__ . '::' . '=='}  = \&eq;
+        *{__PACKAGE__ . '::' . '!='}  = \&ne;
+    }
+};
+
+1

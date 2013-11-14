@@ -11,15 +11,15 @@ package Sidef::Parser {
     our $DEBUG = 0;
 
     sub new {
-
         my (undef, %opts) = @_;
 
         my %options = (
             line          => 1,
-            inc           => [File::Spec->curdir()],    # this needs some thinking!
+            inc           => [File::Spec->curdir()],    # 'include' dirs (TODO: find a better way)
             class         => 'main',
             vars          => {'main' => []},
             ref_vars_refs => {'main' => []},
+            EOT           => [],
             lonely_ops    => {
                            '--'  => 1,
                            '++'  => 1,
@@ -287,6 +287,7 @@ package Sidef::Parser {
                     # The order matters! (in a way)
                     my @operators = map { quotemeta } qw(
 
+                      ===
                       ||= ||
                       &&= &&
 
@@ -535,6 +536,32 @@ package Sidef::Parser {
                     # Generic line
                     if (/\G\R/gc) {
                         ++$self->{line};
+
+                        # Here-document
+                        while ($#{$self->{EOT}} != -1) {
+                            my ($name, $type, $obj) = @{shift @{$self->{EOT}}};
+
+                            my $acc = '';
+                            until (/\G$name(?:\R|\z)/gc) {
+
+                                /\G(.+)/gc
+                                  || die sprintf(qq{%s:%s: can't find string terminator "%s" anywhere before EOF.\n},
+                                                 $self->{script_name}, $beg_line, $name);
+
+                                $acc .= "$1\n";
+
+                                /\G\R/gc && ++$self->{line};
+                            }
+
+                            ++$self->{line};
+                            push @{$obj->{$self->{class}}},
+                              {
+                                  self => $type == 0
+                                ? Sidef::Types::String::String->new($acc =~ s{\\\\}{\\}gr)
+                                : Sidef::Types::String::String->new($acc)->apply_escapes($self)
+                              };
+                        }
+
                         redo;
                     }
 
@@ -613,8 +640,7 @@ package Sidef::Parser {
                 # Double quoted filename
                 if (/\Gqqf\b/gc) {
                     my ($string, $pos) = $self->get_quoted_string(code => (substr($_, pos)));
-                    return Sidef::Types::Glob::File->new(
-                                                      Sidef::Types::String::String->new($string)->apply_escapes($self)),
+                    return Sidef::Types::Glob::File->new(Sidef::Types::String::String->new($string)->apply_escapes($self)),
                       pos($_) + $pos;
                 }
 
@@ -627,8 +653,7 @@ package Sidef::Parser {
                 # Double quoted dirname
                 if (/\Gqqd\b/gc) {
                     my ($string, $pos) = $self->get_quoted_string(code => (substr($_, pos)));
-                    return Sidef::Types::Glob::Dir->new(
-                                                      Sidef::Types::String::String->new($string)->apply_escapes($self)),
+                    return Sidef::Types::Glob::Dir->new(Sidef::Types::String::String->new($string)->apply_escapes($self)),
                       pos($_) + $pos;
                 }
 
@@ -826,8 +851,7 @@ package Sidef::Parser {
                 if (/\G(?=`)/) {
                     my ($string, $pos) = $self->get_quoted_string(code => (substr($_, pos)));
 
-                    return Sidef::Types::Glob::Backtick->new(
-                                                      Sidef::Types::String::String->new($string)->apply_escapes($self)),
+                    return Sidef::Types::Glob::Backtick->new(Sidef::Types::String::String->new($string)->apply_escapes($self)),
                       pos($_) + $pos;
                 }
 
@@ -872,6 +896,30 @@ package Sidef::Parser {
                           }
                       ),
                       pos;
+                }
+
+                # Begining of here-document (<<"EOT", <<'EOT', <<EOT)
+                if (/\G<</gc) {
+                    my ($name, $type) = (undef, 1);
+
+                    if (/\G(?=(['"]))/) {
+                        $type = 0 if $1 eq q{'};
+
+                        my ($str, $pos) = $self->get_quoted_string(code => substr($_, pos));
+                        pos($_) += $pos;
+                        $name = $str;
+                    }
+                    elsif (/\G(\S+)/gc) {
+                        $name = $1;
+                    }
+                    else {
+                        return undef, pos($_) - 2;
+                    }
+
+                    my $obj = {$self->{class} => []};
+                    push @{$self->{EOT}}, [$name, $type, $obj];
+
+                    return $obj, pos($_);
                 }
 
                 if (/\G__USE_BIGNUM__\b;*/gc) {
@@ -931,21 +979,17 @@ package Sidef::Parser {
 
                     if ($name eq 'ARGV') {
                         require Encode;
-                        my $array = Sidef::Types::Array::Array->new(
-                            map {
-                                Sidef::Types::String::String->new(Encode::decode_utf8($_))
-                              } @ARGV
-                        );
+                        my $array =
+                          Sidef::Types::Array::Array->new(map { Sidef::Types::String::String->new(Encode::decode_utf8($_)) }
+                                                          @ARGV);
 
                         $variable->set_value($array);
                     }
                     elsif ($name eq 'ENV') {
                         require Encode;
-                        my $hash = Sidef::Types::Hash::Hash->new(
-                            map {
-                                Sidef::Types::String::String->new(Encode::decode_utf8($_))
-                              } %ENV
-                        );
+                        my $hash =
+                          Sidef::Types::Hash::Hash->new(map { Sidef::Types::String::String->new(Encode::decode_utf8($_)) }
+                                                        %ENV);
 
                         $variable->set_value($hash);
                     }
@@ -1204,18 +1248,18 @@ package Sidef::Parser {
 
                         if ($req_arg) {
                             $struct{$self->{class}}[-1]{self} = {
-                                                               $self->{class} => [
-                                                                   {
-                                                                    self => $struct{$self->{class}}[-1]{self},
-                                                                    exists($struct{$self->{class}}[-1]{call})
-                                                                    ? (call => delete $struct{$self->{class}}[-1]{call})
-                                                                    : (),
-                                                                    exists($struct{$self->{class}}[-1]{ind})
-                                                                    ? (ind => delete $struct{$self->{class}}[-1]{ind})
-                                                                    : (),
-                                                                   }
-                                                               ]
-                            };
+                                                                 $self->{class} => [
+                                                                          {
+                                                                           self => $struct{$self->{class}}[-1]{self},
+                                                                           exists($struct{$self->{class}}[-1]{call})
+                                                                           ? (call => delete $struct{$self->{class}}[-1]{call})
+                                                                           : (),
+                                                                           exists($struct{$self->{class}}[-1]{ind})
+                                                                           ? (ind => delete $struct{$self->{class}}[-1]{ind})
+                                                                           : (),
+                                                                          }
+                                                                 ]
+                                                                };
 
                             my ($arg, $pos) = $self->parse_obj(code => substr($_, pos));
                             pos($_) += $pos;
@@ -1348,10 +1392,10 @@ package Sidef::Parser {
                         }
 
                         $found_module // $self->fatal_error(
-                                                           code  => $_,
-                                                           pos   => pos($_),
-                                                           error => "can't find the module '${mod_path}' anywhere in ['"
-                                                             . join("', '", @{$self->{inc}}) . "']",
+                                                            code  => $_,
+                                                            pos   => pos($_),
+                                                            error => "can't find the module '${mod_path}' anywhere in ['"
+                                                              . join("', '", @{$self->{inc}}) . "']",
                                                            );
 
                         open(my $fh, '<:encoding(UTF-8)', $full_path)
@@ -1516,7 +1560,7 @@ package Sidef::Parser {
                     return (\%struct, pos);
                 }
 
-                # If the object can take an block joined with a 'do' method
+                # If the object can take a block joined with a 'do' method
                 if (exists $self->{obj_with_do}{$ref_obj}) {
 
                     {

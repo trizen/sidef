@@ -96,11 +96,13 @@ package Sidef::Variable::Variable {
         };
 
         *{__PACKAGE__ . '::' . '\\\\'} = sub {
-            my ($self, $arg) = @_;
+            my ($self, $code) = @_;
+
             if ($self->is_defined) {
                 return $self;
             }
-            $arg;
+
+            Sidef::Types::Block::Code->new($code)->run;
         };
 
         foreach my $operator (qw(-- ++)) {

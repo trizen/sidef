@@ -11,11 +11,12 @@ package Sidef::Exec {
     sub new {
         my $self = bless {
             bool_assign_method => {
-                                   ':='  => 1,
-                                   '||=' => 1,
-                                   '|='  => 1,
-                                   '&&=' => 1,
-                                   '&='  => 1,
+                                   ':='   => 1,
+                                   '||='  => 1,
+                                   '|='   => 1,
+                                   '&&='  => 1,
+                                   '&='   => 1,
+                                   '\\\\' => 1,
                                   },
             plain_array_methods => {
                                     '...'     => 1,
@@ -258,18 +259,16 @@ package Sidef::Exec {
                 }
 
                 #<<<
-
                 my $type =
                     (
                      (ref($self_obj) eq 'Sidef::Variable::Variable')
                         && (
                             ref($self_obj->get_value) eq 'Sidef::Types::Bool::Bool'
                             ? (not exists $self->{bool_assign_method}{$method})
-                            : ($method ne ':=')
+                            : ($method ne ':=' and $method ne '\\\\')
                             )
                      ) ? ref($self_obj->get_value)
                     : ref($self_obj);
-
                 #>>>
 
                 if (exists $call->{arg}) {

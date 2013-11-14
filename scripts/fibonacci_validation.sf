@@ -1,12 +1,10 @@
-#!/usr/bin/perl
+#!/usr/bin/ruby
 
 func is_fib (pos, fib) {
-    5->sqrt*fib + (-(1.25.sqrt-0.5)**pos) -> log(1.25.sqrt+0.5)
-                                          -> roundf(-32) == pos
+    5.sqrt*fib + (-(1.25.sqrt-0.5)**pos) log(1.25.sqrt+0.5) round(pos) == pos;
 }
 
-for (
-    [
+for [
       [12  => 144                   => true],
       [12  => 143                   => false],
       [12  => 145                   => false],
@@ -14,10 +12,10 @@ for (
       [49  => 1337                  => false],
       [32  => 2178309               => true],
       [100 => 354224848179261915075 => true],
-    ]
-) {
-    is_fib(_[0], _[1]) == _[2] || ("Validation error!\n".die);
+    ]{|pos,             num,            bool|
+
+    is_fib(pos, num) == bool || ("Validation error!\n".die);
 
     "%21s is on position %3s in the fibonacci sequence: %s\n"
-        -> printf(_[1], _[0], _[2]);
+        -> printf(num, pos, bool);
 }
