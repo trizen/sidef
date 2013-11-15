@@ -8,22 +8,20 @@ var VERSION = 0.1;
 ## Require a Perl module
 #
 
-var req = (require 'Math::Matrix');
-
-if (nil == req) {
-    "** Math::Matrix module is not intalled!\n".warn;
-    return();
-}
+var req = (
+           try   { require 'Math::Matrix' }
+           catch { Sys.warn("** Math::Matrix is not installed!\n"); return }
+);
 
 #
 ## Function declaration
 #
 
-func det (matrix) {
+func det (arr) {
 
-    var math = (
-        req.new(matrix->to_list);
+    var matrix = (
+        req.new(arr->to_list);
     );
 
-    Num.new(math.determinant);
+    Num.new(matrix.determinant);
 }

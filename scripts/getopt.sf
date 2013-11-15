@@ -4,16 +4,19 @@
 ## Can be executed as: sidef getopt.sf -d -e "hello"
 #
 
-var req = ( require 'Getopt::Std'->() );
+var getopt = (
+           try   { require 'Getopt::Std' -> () }
+           catch { Sys.warn("** Getopt::Std is not installed!\n"); return }
+);
 
 var hash = (Hash.new);
-req.getopts('de:', \hash);
+getopt.getopts('de:', \hash);
 
 if (hash.exists('e')) {
     Str.new(hash['e']).say;            # the value of '-e'
 }
 
-var d_bool = (Bool.new(hash['d']));
+var d_bool = Bool.new(hash['d']);
 
 if (d_bool) {
     "-d has been specified!".say;

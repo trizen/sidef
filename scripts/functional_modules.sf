@@ -12,7 +12,7 @@ var req = ( require 'File::Spec::Functions' );
 
 if (nil != req) {
     var spec = ( req->() );
-    "** Root dir: '%s'\n"printf(spec.rootdir);
+    "** Root dir: '%s'\n".printf(spec.rootdir);
 }
 
 __END__

@@ -1,22 +1,32 @@
-#!/usr/bin/perl
+#!/usr/bin/ruby
 
-var req = (require 'LWP::UserAgent');
+func get_response(url) {
 
-if(nil != req){
+    var req = (
+        try   { require 'LWP::UserAgent' }
+        catch { return nil }
+    );
 
-    var lwp = (req.new(
+    var lwp = req.new(
         'show_progress' => 1,
         'timeout'       => 10,
         'agent'         => 'Mozilla/5.0',
-    ));
+    );
 
-    var resp = (lwp->get("http://google.com"));
+    lwp.get(url);
+}
 
-    if(Bool.new(resp->is_success)){
-        var content = (Str.new(resp->content));
-        "Content length is: %d\n".printf(content.len);
-    }
-    else {
-        "[ERROR] Response: %s\n".sprintf(Str.new(resp->status_line)).warn;
-    }
+var resp = get_response("http://www.google.ro");
+
+if (nil == resp) {
+    Sys.warn("** LWP::UserAgent is not installed!\n");
+    Sys.exit;
+}
+
+if (resp.is_success) {
+    var content = Str.new(resp.decoded_content);
+    printf("Content length is: %d\n", content.len);
+}
+else {
+    Sys.warn("[ERROR] Response: %s\n".sprintf(resp.status_line));
 }

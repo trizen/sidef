@@ -2,12 +2,10 @@
 
 # Translation of: http://rosettacode.org/wiki/Best_shuffle#Perl
 
-var permute = (require 'Algorithm::Permute');
-
-if (nil == permute) {
-    "** Algorithm::Permute -- not installed!\n".warn;
-    Sys.exit;
-}
+var permute = (
+           try   { require 'Algorithm::Permute' }
+           catch { Sys.warn("** Algorithm::Permute is not installed!\n"); return }
+);
 
 func score(original_word, new_word) {
     var result = 0;
