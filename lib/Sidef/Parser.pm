@@ -690,7 +690,7 @@ package Sidef::Parser {
 
                     my $names =
                         /\G($self->{re}{var_name})/goc ? $1
-                      : /\G\($self->{re}{vars}\)/goc   ? $1
+                      : /\G\(\h*$self->{re}{vars}\h*\)/goc   ? $1
                       : $self->fatal_error(
                                            code  => $_,
                                            pos   => (pos($_)),
@@ -767,7 +767,7 @@ package Sidef::Parser {
                     if ($type eq 'func') {
 
                         # Check the declared parameters
-                        if (/\G\h*\(?$self->{re}{vars}\)?\h*\{/gocs) {
+                        if (/\G\h*\(\h*$self->{re}{vars}\h*\)\h*\{/goc) {
 
                             my $params = join('', map { "my $_;$_=_.shift;" } split(/\h*,\h*/, $1));
                             local $self->{current_function} = $variable;
