@@ -767,7 +767,7 @@ package Sidef::Parser {
                     if ($type eq 'func') {
 
                         # Check the declared parameters
-                        if (/\G\h*\(\h*$self->{re}{vars}\h*\)\h*\{/goc) {
+                        if (/\G\h*(?:\(\h*)?$self->{re}{vars}(?:\h*\))?\h*\{/goc) {
 
                             my $params = join('', map { "my $_;$_=_.shift;" } split(/\h*,\h*/, $1));
                             local $self->{current_function} = $variable;
