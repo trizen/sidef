@@ -544,11 +544,13 @@ package Sidef::Parser {
                             my $acc = '';
                             until (/\G$name(?:\R|\z)/gc) {
 
-                                /\G(.+)/gc
-                                  || die sprintf(qq{%s:%s: can't find string terminator "%s" anywhere before EOF.\n},
-                                                 $self->{script_name}, $beg_line, $name);
+                                if (/\G(.*)/gc) {
+                                    $acc .= "$1\n";
+                                }
 
-                                $acc .= "$1\n";
+                                /\G\z/
+                                  && die sprintf(qq{%s:%s: can't find string terminator "%s" anywhere before EOF.\n},
+                                                 $self->{script_name}, $beg_line, $name);
 
                                 /\G\R/gc && ++$self->{line};
                             }
@@ -689,8 +691,8 @@ package Sidef::Parser {
                     my $type = $1;
 
                     my $names =
-                        /\G($self->{re}{var_name})/goc ? $1
-                      : /\G\(\h*$self->{re}{vars}\h*\)/goc   ? $1
+                        /\G($self->{re}{var_name})/goc     ? $1
+                      : /\G\(\h*$self->{re}{vars}\h*\)/goc ? $1
                       : $self->fatal_error(
                                            code  => $_,
                                            pos   => (pos($_)),
