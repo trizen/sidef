@@ -1,7 +1,7 @@
 ---
 abstract: 'Sidef Programming Language'
 author:
-  - "\n                     Daniel Șuteu   (trizenx@gmail.com)\n                     Ioana Fălcușan (ioanaflavia@gmail.com)\n                    "
+  - "\n                     Daniel Șuteu   (<trizenx@gmail.com>)\n                     Ioana Fălcușan (<ioanaflavia@gmail.com>)\n                    "
 build_requires:
   Test::More: 0
 configure_requires:

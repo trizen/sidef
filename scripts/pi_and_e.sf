@@ -1,0 +1,25 @@
+#!/usr/bin/ruby
+
+func pi(n) {
+    var pi = 0;
+
+    for ((var i = 1; var j = 0) ; j <= n ; (i += 2; j++)) {
+        pi += (1/i -> (qw(neg pos)[j.isEven]));
+    }
+
+    return (pi * 4);
+}
+
+func e(n) {
+    var e = 1;
+
+    for (1..n) { |i|
+        e += (1 / i.factorial);
+    }
+
+    return e;
+}
+
+
+say pi(120);    # Real PI is Math.pi(n)
+say e(10);

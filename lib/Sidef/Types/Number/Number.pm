@@ -265,6 +265,18 @@ package Sidef::Types::Number::Number {
 
     *negate = \&neg;
 
+    sub pos {
+        my ($self) = @_;
+
+        if ($self->is_negative) {
+            return $self->neg;
+        }
+
+        $self;
+    }
+
+    *positive = \&pos;
+
     sub not {
         my ($self) = @_;
         $self->new($$self->copy->bnot);
