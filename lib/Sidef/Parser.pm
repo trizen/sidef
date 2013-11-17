@@ -548,11 +548,10 @@ package Sidef::Parser {
                                     $acc .= "$1\n";
                                 }
 
-                                /\G\z/
-                                  && die sprintf(qq{%s:%s: can't find string terminator "%s" anywhere before EOF.\n},
-                                                 $self->{script_name}, $beg_line, $name);
-
-                                /\G\R/gc && ++$self->{line};
+                                /\G\R/gc
+                                  ? ++$self->{line}
+                                  : die sprintf(qq{%s:%s: can't find string terminator "%s" anywhere before EOF.\n},
+                                                $self->{script_name}, $beg_line, $name);
                             }
 
                             ++$self->{line};

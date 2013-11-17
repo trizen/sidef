@@ -19,7 +19,7 @@ my $version = $Sidef::VERSION;
 my %args;
 if (@ARGV and chr ord $ARGV[0] eq '-') {
     require Getopt::Std;
-    Getopt::Std::getopts('E:d:Dho:ivHB', \%args);
+    Getopt::Std::getopts('E:d:Dho:ivHN:', \%args);
 }
 
 my %keywords = (
@@ -75,7 +75,7 @@ if ($args{h}) {
                     '-o output_file' => 'dump the data structure into a file (with -D)',
                     '-E program'     => 'one line of program',
                     '-H'             => 'interactive help',
-                    '-B'             => q{don't use the Math::BigFloat module for numbers},
+                    '-N type'        => ["use a specific implementation for numbers", "valid types: perl, float, int, rat"],
                     '-v'             => 'print version',
                    );
 
@@ -90,7 +90,15 @@ USAGE
     $max_width += 4;
 
     foreach my $key (sort { lc($a) cmp lc($b) } keys %switches) {
-        printf "  %-${max_width}s%s\n", $key, $switches{$key};
+        if (ref $switches{$key} eq 'ARRAY') {
+            printf "  %-${max_width}s%s\n", $key, $switches{$key}[0];
+            foreach my $i (1 .. $#{$switches{$key}}) {
+                printf "  %-${max_width}s%s\n", '', $switches{$key}[$i];
+            }
+        }
+        else {
+            printf "  %-${max_width}s%s\n", $key, $switches{$key};
+        }
     }
 
     print <<"END";
@@ -102,8 +110,22 @@ END
     exit 0;
 }
 
-if ($args{B}) {
-    require Sidef::Types::Number::NumberFast;
+if (defined(my $type = $args{N})) {
+    if ($type eq 'perl') {
+        require Sidef::Types::Number::NumberFast;
+    }
+    elsif ($type eq 'rat') {
+        require Sidef::Types::Number::NumberRat;
+    }
+    elsif ($type eq 'int') {
+        require Sidef::Types::Number::NumberInt;
+    }
+    elsif ($type eq 'float') {
+        ## default
+    }
+    else {
+        warn "Invalid type '${type}' for number implementation";
+    }
 }
 
 if (defined $args{d}) {

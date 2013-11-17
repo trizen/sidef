@@ -89,6 +89,8 @@ lib/Sidef/Types/Nil/Nil.pod
 lib/Sidef/Types/Number/Number.pm
 lib/Sidef/Types/Number/Number.pod
 lib/Sidef/Types/Number/NumberFast.pm
+lib/Sidef/Types/Number/NumberInt.pm
+lib/Sidef/Types/Number/NumberRat.pm
 lib/Sidef/Types/Number/Unary.pm
 lib/Sidef/Types/Regex/Matches.pm
 lib/Sidef/Types/Regex/Matches.pod
@@ -166,6 +168,7 @@ scripts/dice_game_solver.sf
 scripts/echo.sf
 scripts/eval.sf
 scripts/fibonacci_cached.sf
+scripts/fibonacci_closed_solution.sf
 scripts/fibonacci_mystery.sf
 scripts/fibonacci_validation.sf
 scripts/for_two_vars.sf

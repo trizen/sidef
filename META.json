@@ -4,7 +4,7 @@
       "\n                     Daniel Șuteu   (trizenx@gmail.com)\n                     Ioana Fălcușan (ioanaflavia@gmail.com)\n                    "
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4008, CPAN::Meta::Converter version 2.132830",
+   "generated_by" : "Module::Build version 0.42",
    "license" : [
       "artistic_2"
    ],
@@ -15,6 +15,10 @@
    "name" : "Sidef",
    "prereqs" : {
       "build" : {
+         "recommends" : {
+            "Math::BigInt::GMP" : "0",
+            "Term::ReadLine::Gnu::XS" : "0"
+         },
          "requires" : {
             "Test::More" : "0"
          }
@@ -25,10 +29,6 @@
          }
       },
       "runtime" : {
-         "recommends" : {
-            "Math::BigInt::GMP" : "0",
-            "Term::ReadLine::Gnu::XS" : "0"
-         },
          "requires" : {
             "Cwd" : "0",
             "Encode" : "0",
@@ -220,7 +220,7 @@
          "file" : "lib/Sidef/Variable/Variable.pm"
       }
    },
-   "release_status" : "stable",
+   "release_status" : "unstable",
    "resources" : {
       "license" : [
          "http://www.perlfoundation.org/artistic_license_2_0"

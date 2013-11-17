@@ -25,9 +25,11 @@ package Sidef::Types::Number::Number {
     sub newInt {
         my (undef, $num) = @_;
 
-            ref($num) eq 'Math::BigInt' ? (bless \$num, __PACKAGE__)
-          : ref($num) eq 'Math::BigFloat' || ref($num) eq __PACKAGE__ ? (bless \Math::BigInt->new($num->as_int))
-          :   (bless \Math::BigInt->new(${__PACKAGE__->new($num)}->as_int), __PACKAGE__);
+        ref($num) eq 'Math::BigInt' ? (bless \$num, __PACKAGE__)
+          : (   ref($num) eq __PACKAGE__
+             || ref($num) eq 'Math::BigFloat'
+             || ref($num) eq 'Math::BigRat') ? (bless \Math::BigInt->new($num->as_int))
+          : (bless \Math::BigInt->new(${__PACKAGE__->new($num)}->as_int), __PACKAGE__);
     }
 
     *new_int = \&newInt;
