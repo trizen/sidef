@@ -840,6 +840,22 @@ Return the
 
 =cut
 
+=head2 pos
+
+Number.pos() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 positive
+
+Number.positive() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 pow
 
 Number.pow() -> I<Bool>

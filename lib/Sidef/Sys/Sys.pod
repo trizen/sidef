@@ -23,6 +23,14 @@ Return the
 
 =cut
 
+=head2 die
+
+Sys.die() -> I<Bool>
+
+Return the
+
+=cut
+
 
 =head2 exit
 
@@ -110,6 +118,14 @@ Returns an object of type: C<Sidef::Types::Bool::Bool>
 
 =cut
 
+=head2 ref
+
+Sys.ref() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 say
 
 Sys.say() -> I<Bool>
@@ -173,6 +189,14 @@ Return the
 =head2 usleep
 
 Sys.usleep() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 warn
+
+Sys.warn() -> I<Bool>
 
 Return the
 

@@ -141,3 +141,11 @@ Math.sin() -> I<Bool>
 Return the
 
 =cut
+
+=head2 sqrt
+
+Math.sqrt() -> I<Bool>
+
+Return the
+
+=cut
