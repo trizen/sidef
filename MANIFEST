@@ -101,6 +101,7 @@ lib/Sidef/Types/String/String.pod
 lib/Sidef/Variable/Init.pm
 lib/Sidef/Variable/Init.pod
 lib/Sidef/Variable/InitMy.pm
+lib/Sidef/Variable/Magic.pm
 lib/Sidef/Variable/My.pm
 lib/Sidef/Variable/Ref.pm
 lib/Sidef/Variable/Ref.pod
@@ -198,6 +199,7 @@ scripts/Lingua/RO/Numbers.sm
 scripts/lingua_ro.sf
 scripts/logic.sf
 scripts/lwp_module.sf
+scripts/magic_vars.sf
 scripts/Math/Algebra/Matrix.sm
 scripts/matrix_multiplication.sf
 scripts/median.sf

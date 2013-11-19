@@ -55,6 +55,7 @@ require Sidef::Module::Caller if (caller)[0] ne q{Sidef::Module::Caller};
 require Sidef::Module::Require if (caller)[0] ne q{Sidef::Module::Require};
 require Sidef::Module::Func if (caller)[0] ne q{Sidef::Module::Func};
 require Sidef::Convert::Convert if (caller)[0] ne q{Sidef::Convert::Convert};
+require Sidef::Variable::Magic if (caller)[0] ne q{Sidef::Variable::Magic};
 require Sidef::Variable::InitMy if (caller)[0] ne q{Sidef::Variable::InitMy};
 require Sidef::Variable::My if (caller)[0] ne q{Sidef::Variable::My};
 require Sidef::Variable::Ref if (caller)[0] ne q{Sidef::Variable::Ref};

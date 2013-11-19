@@ -260,7 +260,7 @@ package Sidef::Types::Glob::File {
 
         require File::Copy;
         Sidef::Types::Bool::Bool->new(
-                       File::Copy::copy($$self, ref($file) eq 'Sidef::Types::Glob::FileHandle' ? $file->{fh} : $$file));
+                              File::Copy::copy($$self, ref($file) eq 'Sidef::Types::Glob::FileHandle' ? $file->{fh} : $$file));
     }
 
     *cp = \&copy;
@@ -269,12 +269,12 @@ package Sidef::Types::Glob::File {
         my ($self, $mode, $var_ref) = @_;
 
         ref($mode)
-          ? $self->is_string($mode, 1)
+          ? $self->_is_string($mode, 1)
               ? do { $mode = $$mode }
               : return
           : ();
 
-        my $success = open(my $fh, $mode, $$self);
+        my $success = CORE::open(my $fh, $mode, $$self);
         my $fh_obj = Sidef::Types::Glob::FileHandle->new(fh => $fh, file => $self);
 
         if (ref($var_ref) eq 'Sidef::Variable::Ref') {
@@ -317,6 +317,20 @@ package Sidef::Types::Glob::File {
     *openA       = \&open_a;
     *openAppend  = \&open_a;
     *open_append = \&open_a;
+
+    sub open_rw {
+        my ($self, $var_ref) = @_;
+        $self->open('+<', $var_ref);
+    }
+
+    *openRW          = \&open_rw;
+    *openReadWrite   = \&open_rw;
+    *open_read_write = \&open_rw;
+
+    sub opendir {
+        my ($self, $var_ref) = @_;
+        Sidef::Types::Glob::Dir->new($$self)->open($var_ref);
+    }
 
     sub sysopen {
         my ($self, $var_ref, $mode, $perm) = @_;

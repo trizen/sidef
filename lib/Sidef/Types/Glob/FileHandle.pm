@@ -140,6 +140,9 @@ package Sidef::Types::Glob::FileHandle {
     }
 
     *readChar = \&read_char;
+    *getc     = \&read_char;
+    *getChar  = \&read_char;
+    *get_char = \&read_char;
 
     sub read_all {
         my ($self) = @_;
@@ -156,9 +159,18 @@ package Sidef::Types::Glob::FileHandle {
     *lines     = \&read_all;
 
     sub each {
-        my ($self, $obj) = @_;
-        $self->_is_code($obj) || return;
-        $obj->for($self->read_all);
+        my ($self, $code) = @_;
+        $self->_is_code($code) || return;
+
+        my $var_ref = ($code->_get_private_var)[0]->get_var;
+        while (defined(my $line = CORE::readline($self->{fh}))) {
+            $var_ref->set_value(Sidef::Types::String::String->new($line));
+            if (defined(my $res = $code->_run_code)) {
+                return $res;
+            }
+        }
+
+        $self;
     }
 
     sub eof {

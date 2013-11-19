@@ -121,6 +121,8 @@ provides:
     file: lib/Sidef/Variable/Init.pm
   Sidef::Variable::InitMy:
     file: lib/Sidef/Variable/InitMy.pm
+  Sidef::Variable::Magic:
+    file: lib/Sidef/Variable/Magic.pm
   Sidef::Variable::My:
     file: lib/Sidef/Variable/My.pm
   Sidef::Variable::Ref:

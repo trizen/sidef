@@ -11,7 +11,7 @@ package Sidef::Types::Glob::DirHandle {
 
         bless {
                dir_h => $opt{dir_h},
-               dir   => $opt{file},
+               dir   => $opt{dir},
               },
           __PACKAGE__;
     }
@@ -24,7 +24,7 @@ package Sidef::Types::Glob::DirHandle {
 
     sub get_files {
         my ($self) = @_;
-        Sidef::Types::Array::Array->new(map { Sidef::Types::Glob::File->new($_) } readdir($self->{dir_h}));
+        Sidef::Types::Array::Array->new(map { Sidef::Types::String::String->new($_) } readdir($self->{dir_h}));
     }
 
     *getFiles = \&get_files;
@@ -66,6 +66,21 @@ package Sidef::Types::Glob::DirHandle {
     sub lstat {
         my ($self) = @_;
         Sidef::Types::Glob::Stat->lstat($self->{dir_h}, $self);
+    }
+
+    sub each {
+        my ($self, $code) = @_;
+        $self->_is_code($code) || return;
+
+        my $var_ref = ($code->_get_private_var)[0]->get_var;
+        while (defined(my $file = CORE::readdir($self->{dir_h}))) {
+            $var_ref->set_value(Sidef::Types::String::String->new($file));
+            if (defined(my $res = $code->_run_code)) {
+                return $res;
+            }
+        }
+
+        $self;
     }
 
 }

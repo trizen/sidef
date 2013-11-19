@@ -18,6 +18,7 @@ my %ignored;
       bulls_and_cows_player.sf
       levenshtein_recursive.sf
       fibonacci_validation.sf
+      fibonacci_closed_solution.sf
       dice_game_solver.sf
       stdin.sf
       rock_paper_scissors.sf

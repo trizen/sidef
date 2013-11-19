@@ -133,9 +133,11 @@ package Sidef::Types::Glob::Dir {
 
         require File::Spec;
         $file->new(
-                     $self->_is_dir($file, 1, 1) ? File::Spec->catdir($$self, $$file)
-                   : $self->_is_file($file) ? File::Spec->catfile($$self, $$file)
-                   :                          return
+                   $self->_is_file($file, 0, 1)
+                     || $self->_is_dir($file, 0, 1)
+                     || $self->_is_string($file)
+                   ? File::Spec->catdir($$self, $$file)
+                   : return
                   );
     }
 

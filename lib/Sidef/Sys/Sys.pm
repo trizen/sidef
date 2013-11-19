@@ -143,4 +143,16 @@ package Sidef::Sys::Sys {
         Sidef::Types::String::String->new(scalar unpack("A*", scalar <STDIN>));
     }
 
-}
+    sub open {
+        my ($self, $var, $mode, $filename) = @_;
+        $filename->to_file->open($mode, $var);
+    }
+
+    sub opendir {
+        my ($self, $var, $dirname) = @_;
+        $dirname->to_dir->open($var);
+    }
+
+};
+
+1
