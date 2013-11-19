@@ -102,6 +102,7 @@ lib/Sidef/Variable/Init.pm
 lib/Sidef/Variable/Init.pod
 lib/Sidef/Variable/InitMy.pm
 lib/Sidef/Variable/Magic.pm
+lib/Sidef/Variable/Magic.pod
 lib/Sidef/Variable/My.pm
 lib/Sidef/Variable/Ref.pm
 lib/Sidef/Variable/Ref.pod
@@ -209,8 +210,10 @@ scripts/named_block_arguments.sf
 scripts/next.sf
 scripts/objects_init.sf
 scripts/open.sf
+scripts/perl_eval.sf
 scripts/permutation.sf
 scripts/pi_and_e.sf
+scripts/pi_machin_like_formula.sf
 scripts/power_numbers.sf
 scripts/pythagorean_means.sf
 scripts/quicksort.sf
