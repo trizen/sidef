@@ -55,6 +55,14 @@ Return the
 
 =cut
 
+=head2 append
+
+Hash.append() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 concat
 
 Hash.concat() -> I<Bool>

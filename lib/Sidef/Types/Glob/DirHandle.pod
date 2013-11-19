@@ -47,6 +47,14 @@ Return the
 
 =cut
 
+=head2 each
+
+DirHandle.each() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 getFile
 
 DirHandle.getFile() -> I<Bool>

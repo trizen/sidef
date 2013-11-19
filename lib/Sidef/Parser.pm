@@ -147,6 +147,18 @@ package Sidef::Parser {
                           re  => qr/\G\$\?/,
                          },
                          {
+                          sub => sub { Sidef::Variable::Magic->new(\$$, 1) },
+                          re  => qr/\G\$\$/,
+                         },
+                         {
+                          sub => sub { Sidef::Variable::Magic->new(\$^T, 1) },
+                          re  => qr/\G\$\^T\b/,
+                         },
+                         {
+                          sub => sub { Sidef::Variable::Magic->new(\$|, 1) },
+                          re  => qr/\G\$\|/,
+                         },
+                         {
                           sub => sub { Sidef::Variable::Magic->new(\$!, 0) },
                           re  => qr/\G\$!/,
                          },
@@ -171,24 +183,12 @@ package Sidef::Parser {
                           re  => qr/\G\$,/,
                          },
                          {
-                          sub => sub { Sidef::Variable::Magic->new(\$$, 1) },
-                          re  => qr/\G\$\$/,
-                         },
-                         {
                           sub => sub { Sidef::Variable::Magic->new(\$^O, 0) },
                           re  => qr/\G\$\^O\b/,
                          },
                          {
                           sub => sub { Sidef::Variable::Magic->new(\$^X, 0) },
                           re  => qr/\G\$\^PERL\b/,
-                         },
-                         {
-                          sub => sub { Sidef::Variable::Magic->new(\$^T, 0) },
-                          re  => qr/\G\$\^T\b/,
-                         },
-                         {
-                          sub => sub { Sidef::Variable::Magic->new(\$|, 1) },
-                          re  => qr/\G\$\|/,
                          },
                         ],
             obj_keys => [    # this objects can take arguments

@@ -1,0 +1,49 @@
+
+=encoding utf8
+
+=head1 NAME
+
+Sidef::Variable::Magic
+
+=head1 DESCRIPTION
+
+This object is ...
+
+=head1 SYNOPSIS
+
+var obj = (Magic.new(...));
+
+=head1 METHODS
+
+
+=head2 =
+
+I<Num> B<=> I<Num> -> I<Num>
+
+Return the
+
+=cut
+
+=head2 get_value
+
+Magic.get_value() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 new
+
+Magic.new() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 set_value
+
+Magic.set_value() -> I<Bool>
+
+Return the
+
+=cut

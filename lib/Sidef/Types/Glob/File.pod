@@ -575,6 +575,14 @@ Return the
 
 =cut
 
+=head2 opendir
+
+File.opendir() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 openR
 
 File.openR() -> I<Bool>
@@ -602,6 +610,38 @@ Return the
 =head2 open_read
 
 File.open_read() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 openReadWrite
+
+File.openReadWrite() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 open_read_write
+
+File.open_read_write() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 openRW
+
+File.openRW() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 open_rw
+
+File.open_rw() -> I<Bool>
 
 Return the
 

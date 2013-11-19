@@ -71,6 +71,30 @@ Return the
 
 =cut
 
+=head2 getc
+
+FileHandle.getc() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 getChar
+
+FileHandle.getChar() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 get_char
+
+FileHandle.get_char() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 getLines
 
 FileHandle.getLines() -> I<Bool>

@@ -31,6 +31,22 @@ Return the
 
 =cut
 
+=head2 eval
+
+Sys.eval() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 exec
+
+Sys.exec() -> I<Bool>
+
+Return the
+
+=cut
+
 
 =head2 exit
 
@@ -54,6 +70,22 @@ Return the
 =head2 nanosleep
 
 Sys.nanosleep() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 open
+
+Sys.open() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 opendir
+
+Sys.opendir() -> I<Bool>
 
 Return the
 
@@ -126,6 +158,14 @@ Return the
 
 =cut
 
+=head2 run
+
+Sys.run() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 say
 
 Sys.say() -> I<Bool>
@@ -157,6 +197,14 @@ Returns an object of type: C<Sidef::Types::String::String>
 =head2 sleep
 
 Sys.sleep() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 system
+
+Sys.system() -> I<Bool>
 
 Return the
 

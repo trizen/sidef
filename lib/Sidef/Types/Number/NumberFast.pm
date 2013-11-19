@@ -251,8 +251,13 @@ package Sidef::Types::Number::Number {
         $self->new(CORE::int($$self));
     }
 
-    sub round  { ... }
-    sub roundf { ... }
+    sub round { ... }
+
+    sub roundf {
+        my ($self, $num) = @_;
+        $self->_is_number($num) || return;
+        $self->new(sprintf "%.*f", $$num * -1, $$self);
+    }
 
     *fround = \&roundf;
     *fRound = \&roundf;
