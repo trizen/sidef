@@ -69,6 +69,11 @@ package Sidef::Types::Hash::Hash {
         $self->eq($obj)->not;
     }
 
+    sub append {
+        my ($self, $key, $value) = @_;
+        $self->{$key} = Sidef::Variable::Variable->new(rand, 'var', $value);
+    }
+
     sub concat {
         my ($self, $obj) = @_;
 

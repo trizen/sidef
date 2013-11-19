@@ -1,0 +1,40 @@
+#!/usr/bin/ruby
+
+
+# Number eval
+var perl_code = <<'EOT';
+    my $x = 12;
+    my $y = 16;
+
+    sqrt($x**2 + $y**2);
+EOT
+
+
+var num = Sys.eval(perl_code);
+say num;
+
+num == 20 || (
+    "Wrong type for number!\n".die;
+);
+
+
+# Array eval
+var array = Sys.eval(<<'EOT');
+    my @factorials;
+
+    sub factorial {
+        my ($n) = @_;
+        return $n if $n <= 1;
+        push @factorials, $n * factorial($n - 1);
+        $factorials[-1];
+    }
+
+    factorial(5);
+    \@factorials;
+EOT
+
+say array.dump;
+
+array == [2, 6, 24, 120] || (
+    "Wrong type for array!\n".die;
+);
