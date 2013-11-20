@@ -7,12 +7,28 @@ Sidef::Math::Math
 
 =head1 DESCRIPTION
 
-This object is ...
+This object is the Math department. It handles various math functions, like I<cos>, I<sin>, I<gcd> and others.
 
 =head1 SYNOPSIS
 
-var obj = (Math.new(...));
+=over 2
 
+=item * Special Numbers
+
+    var pi  = Math.pi;
+    var inf = Math.inf;
+
+=item * Calculation precision
+
+    Math.precision(-32);     # precision to 32 decimal digits
+    Math.accuracy(64);       # accuracy to 64 digits
+
+=item * Math functions
+
+    var sqrt = Math.sqrt(5);
+    var gcd  = Math.gcd(81, 21, 63);
+
+=back
 
 =head1 INHERITS
 
@@ -24,128 +40,168 @@ Inherits methods from:
 
 =head2 accuracy
 
-Math.accuracy() -> I<Bool>
+Math.accuracy() -> I<Num>
 
-Return the
+Set the calculation accuracy at an arbitrary number of digits.
+
+    Math.accuracy(128);     # sets the accurracy to 128 digits
+
+Returns an object of type: C<Sidef::Types::Number::Number>
 
 =cut
 
 =head2 atan
 
-Math.atan() -> I<Bool>
+Math.atan(I<Num>) -> I<Num>
 
-Return the
+This functions takes one arguments and calculcates the arctangent of it in the range -PI to PI.
+
+    Math.atan(1/180);
+
+Returns an object of type: C<Sidef::Types::Number::Number>
 
 =cut
 
 =head2 atan2
 
-Math.atan2() -> I<Bool>
+Math.atan2(I<Num>, I<Num>) -> I<Num>
 
-Return the
+This function works in the same way as the L<C<atan>|"atan"> function, except that it takes two arguments.
+
+    Math.atan2(0, -Math.inf);     # returns PI
+
+Returns an object of type: C<Sidef::Types::Number::Number>
 
 =cut
 
 =head2 cos
 
-Math.cos() -> I<Bool>
+Math.cos(I<Num>) -> I<Num>
 
-Return the
+Returns the cosine of I<Num> (expressed in radians).
+
+    Math.cos(45);
+
+Returns an object of type: C<Sidef::Types::Number::Number>
 
 =cut
 
 =head2 gcd
 
-Math.gcd() -> I<Bool>
+Math.gcd(I<Num>, I<Num>, I<...>) -> I<Num>
 
-Return the
+Returns the greatest common divisor for a list of numbers.
+
+    Math.gcd(64, 40);   # returns 8
+
+Returns an object of type: C<Sidef::Types::Number::Number>
 
 =cut
 
 =head2 inf
 
-Math.inf() -> I<Bool>
+Math.inf() -> I<Num>
 
-Return the
+Returns the logical infinite number.
+
+     Math.inf;   # positive infinity (+1/0)
+    -Math.inf;   # negative infinity (-1/0)
+
+Returns an object of type: C<Sidef::Types::Number::Number>
 
 =cut
 
 =head2 lcm
 
-Math.lcm() -> I<Bool>
+Math.lcm(I<Num>, I<Num>, I<...>) -> I<Num>
 
-Return the
+Returns the least common multiple for a list of numbers.
+
+    Math.lcm(3, 6, 8);  # returns 24
+
+Returns an object of type: C<Sidef::Types::Number::Number>
 
 =cut
 
 =head2 map
 
-Math.map() -> I<Bool>
+Math.map(I<amount>, I<from>, I<to>) -> I<Array>
 
-Return the
+This function returns an I<amount> of numbers mapped between I<from> and I<to>,
+each number having the same distance between each other.
 
-=cut
+    Math.map(8, 1, 3);   # returns: [1, 1.25, 1.5, 1.75, 2, 2.25, 2.5, 2.75]
 
-=head2 new
-
-Math.new() -> I<Bool>
-
-Return the
+Returns an object of type: C<Sidef::Types::Array::Array>
 
 =cut
 
 =head2 PI
 
-Math.PI() -> I<Bool>
+Math.PI(I<Num>) -> I<Num>
 
-Return the
+Returns the PI number. The function can take an optional argument,
+which must be a positive integer, and returns the PI with the I<Num>
+number of digits.
 
-=cut
+    Math.pi;      # returns PI (default: 40 places)
+    Math.pi(320)  # returns PI at 320 places accuracy
 
-=head2 pi
+Aliases: I<pi()>.
 
-Math.pi() -> I<Bool>
-
-Return the
+Returns an object of type: C<Sidef::Types::Number::Number>
 
 =cut
 
 =head2 precision
 
-Math.precision() -> I<Bool>
+Math.precision(I<Num>) -> I<Num>
 
-Return the
+Set the calculation precision. A negative number indicates decimal precision.
+Basically, this functions just rounds all the numbers to the I<Num>th digit.
+
+    Math.precision(1);    # int mode:  10/3 == 3
+    Math.precision(-3);   # mini mode: 10/3 == 3.333
+
+Returns an object of type: C<Sidef::Types::Number::Number>
 
 =cut
 
 =head2 rangeSum
 
-Math.rangeSum() -> I<Bool>
+Math.rangeSum(I<from>, I<to>, I<step>) -> I<Num>
 
-Return the
+Returns the sum for a given range of numbers and an optional step.
 
-=cut
+    Math.rangeSum(1, 9);     # returns: 45 (1+2+3+...+9)
+    Math.rangeSum(1, 9, 2);  # returns: 25 (1+3+5+...+9)
 
-=head2 range_sum
+Aliases: I<range_sum()>.
 
-Math.range_sum() -> I<Bool>
-
-Return the
+Returns an object of type: C<Sidef::Types::Number::Number>
 
 =cut
 
 =head2 sin
 
-Math.sin() -> I<Bool>
+Math.sin(I<Num>) -> I<Num>
 
-Return the
+Returns the sine of I<Num> (expressed in radians).
+
+    Math.sin(90);
+
+Returns an object of type: C<Sidef::Types::Number::Number>
 
 =cut
 
 =head2 sqrt
 
-Math.sqrt() -> I<Bool>
+Math.sqrt(I<Num>) -> I<Num>
 
-Return the
+Returns the positive square root of I<Num>.
+
+    Math.sqrt(25);   # returns: 5
+
+Returns an object of type: C<Sidef::Types::Number::Number>
 
 =cut

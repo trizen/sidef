@@ -174,11 +174,15 @@ Returns an object of type: C<Sidef::Types::Number::Number>
 
 =head2 toRegex
 
-Convert.toRegex() -> I<Bool>
+Obj.toRegex() -> I<Regex>
+
+Convert the self object into a regular expression.
+
+    '([a-z])'.toRegex   =>  qr/([a-z])/
 
 Aliases: I<to_re()>, I<to_regex()>, I<toRe()>.
 
-Return the
+Returns an object of type: C<Sidef::Types::Regex::Regex>
 
 =cut
 

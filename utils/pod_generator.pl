@@ -42,6 +42,7 @@ my %ignored_methods = (
                        'Sidef::Variable::InitMy'        => [qw(new)],
                        'Sidef::Module::Require'         => [qw(new)],
                        'Sidef::Sys::Sys'                => [qw(new)],
+                       'Sidef::Math::Math'              => [qw(new)],
                        'Sidef::Time::Localtime'         => [qw(new)],
                        'Sidef::Time::Gmtime'            => [qw(new)],
                        'Sidef::Types::Nil::Nil'         => [qw(get_value new)],
