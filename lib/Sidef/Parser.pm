@@ -119,6 +119,10 @@ package Sidef::Parser {
                           re  => qr/\GTime\b/,
                          },
                          {
+                          sub => sub { Sidef::Sys::SIG->new },
+                          re  => qr/\GSig\b/,
+                         },
+                         {
                           sub => sub { Sidef::Types::Char::Char->new },
                           re  => qr/\GCha?r\b/,
                          },
@@ -189,6 +193,26 @@ package Sidef::Parser {
                          {
                           sub => sub { Sidef::Variable::Magic->new(\$^X, 0) },
                           re  => qr/\G\$\^PERL\b/,
+                         },
+                         {
+                          sub => sub { Sidef::Variable::Magic->new(\$0, 0) },
+                          re  => qr/\G\$0\b/,
+                         },
+                         {
+                          sub => sub { Sidef::Variable::Magic->new(\$), 0) },
+                          re  => qr/\G\$\)/,
+                         },
+                         {
+                          sub => sub { Sidef::Variable::Magic->new(\$(, 0) },
+                          re  => qr/\G\$\(/,
+                         },
+                         {
+                          sub => sub { Sidef::Variable::Magic->new(\$<, 0) },
+                          re  => qr/\G\$</,
+                         },
+                         {
+                          sub => sub { Sidef::Variable::Magic->new(\$>, 0) },
+                          re  => qr/\G\$>/,
                          },
                         ],
             obj_keys => [    # this objects can take arguments
@@ -564,12 +588,10 @@ package Sidef::Parser {
                 return $1, (exists $self->{lonely_ops}{$1} ? 0 : 1), pos;
             }
 
-            # Method name as variable
-            if (m{\G\$(?=$self->{re}{var_name})}goc || 1) {
-                my ($obj, $pos) = $self->parse_expr(code => substr($_, pos));
-                $obj // return undef, 0, pos($_);
-                return {self => $obj}, 0, pos($_) + $pos;
-            }
+            # Method name as expression
+            my ($obj, $pos) = $self->parse_expr(code => substr($_, pos));
+            $obj // return undef, 0, pos($_);
+            return {self => $obj}, 0, pos($_) + $pos;
         }
     }
 

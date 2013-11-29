@@ -1,7 +1,6 @@
 bin/sidef
 Build.PL
 Changes
-ignore.txt
 lib/Sidef.pm
 lib/Sidef.pod
 lib/Sidef/Args/Args.pm
@@ -16,6 +15,7 @@ lib/Sidef/Module/Func.pm
 lib/Sidef/Module/Require.pm
 lib/Sidef/Module/Require.pod
 lib/Sidef/Parser.pm
+lib/Sidef/Sys/SIG.pm
 lib/Sidef/Sys/Sys.pm
 lib/Sidef/Sys/Sys.pod
 lib/Sidef/Time/Gmtime.pm

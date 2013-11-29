@@ -76,6 +76,7 @@ my %ignored_modules = map { $_ => 1 } qw (
   Sidef::Init
   Sidef::Parser
   Sidef::Args::Args
+  Sidef::Sys::SIG
   Sidef::Types::Array::HCArray
   Sidef::Types::Number::NumberFast
   Sidef::Types::Number::NumberInt

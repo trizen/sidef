@@ -81,6 +81,9 @@
       "Sidef::Parser" : {
          "file" : "lib/Sidef/Parser.pm"
       },
+      "Sidef::Sys::SIG" : {
+         "file" : "lib/Sidef/Sys/SIG.pm"
+      },
       "Sidef::Sys::Sys" : {
          "file" : "lib/Sidef/Sys/Sys.pm"
       },

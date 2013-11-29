@@ -9,6 +9,7 @@ use 5.014;
 use strict;
 use warnings;
 
+require Sidef::Sys::SIG if (caller)[0] ne q{Sidef::Sys::SIG};
 require Sidef::Sys::Sys if (caller)[0] ne q{Sidef::Sys::Sys};
 require Sidef::Args::Args if (caller)[0] ne q{Sidef::Args::Args};
 require Sidef::Math::Math if (caller)[0] ne q{Sidef::Math::Math};
