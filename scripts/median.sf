@@ -1,11 +1,11 @@
 #!/usr/bin/perl
 
-func median() {
-    var a = (_.sort{_[0] <=> _[1]});
+func median(c) {
+    var a = c.sort{|a,b| a <=> b};
     a[a.offset/2] + a[a.len/2] / 2;
 }
 
-printf("Median: %s\n", median(
+"Median: %s\n".printf(median([
     28.207,
     74.916,
     51.694,
@@ -14,4 +14,4 @@ printf("Median: %s\n", median(
     32.421,
     10.801,
     73.807,
-));
+]));

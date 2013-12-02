@@ -2,32 +2,34 @@
 
 # Translation of: http://rosettacode.org/wiki/Anagrams/Deranged_anagrams#Perl
 
-var req = (require 'LWP::Simple');
-
 func find_deranged (a) {
 
     for (a.range => \var i) {
         for (i+1 .. (a.offset) => \var j) {
             a[i] ^ a[j] -> contains("\0") && next;
-            "length %d: %s => %s\n".printf(a[i].len, a[i,j]...);
-            return(true);
+            "length %d: %s => %s\n".printf(a[i].len, a[i], a[j]);
+            return true;
         }
     }
 
-    return(false);
+    return false;
 }
 
-if (nil != req) {
+func main () {
+
+    var lwp = (
+        try   { require 'LWP::Simple'->() }
+        catch { Sys.warn("** LWP::Simple is not installed!\n"); return }
+    );
 
     "** Retrieving the wordlist...".say;
 
-    var lwp = (req->());
     var words = (Str.new(lwp.get('http://www.puzzlers.org/pub/wordlists/unixdict.txt')).split);
 
     "** Processing the words...".say;
 
-    var time = (Time.now);
-    var letter_list = (Hash.new);
+    var time = Time.now;
+    var letter_list = Hash.new;
 
     for (words) {
         # store anagrams in hash table by letters they contain
@@ -50,6 +52,5 @@ if (nil != req) {
         );
     }
 }
-else {
-    "*Module 'LWP::Simple' is not installed!\n".say;
-}
+
+main();
