@@ -476,6 +476,14 @@ package Sidef::Types::Number::Number {
         $self->new(join('', @bin));
     }
 
+    sub is_div {
+        my ($self, $num) = @_;
+        $self->_is_number($num) || return;
+        Sidef::Types::Bool::Bool->new($$self % $$num == 0);
+    }
+
+    *isDiv = \&is_div;
+
     sub commify {
         my ($self) = @_;
 
@@ -541,6 +549,7 @@ package Sidef::Types::Number::Number {
         *{__PACKAGE__ . '::' . '≠'} = \&ne;
         *{__PACKAGE__ . '::' . '..'}  = \&to;
         *{__PACKAGE__ . '::' . '!'}   = \&factorial;
+        *{__PACKAGE__ . '::' . '%%'}  = \&is_div;
 
         *{__PACKAGE__ . '::' . '>>'} = sub {
             my ($self, $num, $base) = @_;

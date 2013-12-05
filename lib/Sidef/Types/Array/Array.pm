@@ -445,16 +445,8 @@ package Sidef::Types::Array::Array {
 
         }
         elsif ($self->_is_code($obj)) {
-            my $code = $obj;
-            my ($var_ref, $class) = $code->_get_private_var();
-            my $comp_code = {$class => [@{$code->{$class}}[1 .. $#{$code->{$class}}]]};
-
-            $var_ref = $var_ref->get_var;
-
             for (my $i = 1 ; $i <= $offset ; $i += 2) {
-                $var_ref->set_value(
-                                   Sidef::Types::Array::Array->new($self->[$i - 1]->get_value, $self->[$i]->get_value));
-                $array->push(Sidef::Types::Block::Code->new($comp_code)->run);
+                $array->push($obj->call($self->[$i - 1]->get_value, $self->[$i]->get_value));
             }
         }
 
@@ -487,15 +479,8 @@ package Sidef::Types::Array::Array {
             }
         }
         elsif ($self->_is_code($obj)) {
-            my $code = $obj;
-            my ($var_ref, $class) = $code->_get_private_var();
-            my $comp_code = {$class => [@{$code->{$class}}[1 .. $#{$code->{$class}}]]};
-
-            $var_ref = $var_ref->get_var;
-
             foreach my $i (1 .. $offset) {
-                $var_ref->set_value(Sidef::Types::Array::Array->new($x, $self->[$i]->get_value));
-                $x = Sidef::Types::Block::Code->new($comp_code)->run;
+                $x = $obj->call($x, $self->[$i]->get_value);
             }
         }
 
@@ -589,6 +574,22 @@ package Sidef::Types::Array::Array {
 
     sub contains {
         my ($self, $obj) = @_;
+
+        if ($self->_is_code($obj, 1, 1)) {
+
+            my $var_ref = ($obj->_get_private_var)[0]->get_var;
+
+            foreach my $var (@{$self}) {
+                my $item = $var->get_value;
+                $var_ref->set_value($item);
+
+                if ($obj->run) {
+                    return Sidef::Types::Bool::Bool->true;
+                }
+            }
+
+            return Sidef::Types::Bool::Bool->false;
+        }
 
         foreach my $var (@{$self}) {
 
@@ -736,18 +737,7 @@ package Sidef::Types::Array::Array {
         my ($self, $code) = @_;
 
         if (defined $code) {
-
-            my ($var_ref, $class) = $code->_get_private_var();
-            my $comp_code = {$class => [@{$code->{$class}}[1 .. $#{$code->{$class}}]]};
-
-            $var_ref = $var_ref->get_var;
-
-            return $self->new(
-                sort {
-                    $var_ref->set_value(Sidef::Types::Array::Array->new($a, $b));
-                    Sidef::Types::Block::Code->new($comp_code)->run
-                  } map { $_->get_value } @{$self}
-            );
+            return $self->new(sort { $code->call($a, $b) } map { $_->get_value } @{$self});
         }
 
         my $method = '<=>';
