@@ -12,6 +12,7 @@ package Sidef::Types::String::String {
 
     sub new {
         my (undef, $str) = @_;
+        $str //= '';
         bless \$str, __PACKAGE__;
     }
 
@@ -210,6 +211,11 @@ package Sidef::Types::String::String {
         $self->new(CORE::substr($$self, 0, -1));
     }
 
+    sub pop {
+        my ($self) = @_;
+        $self->new(CORE::substr($$self, -1));
+    }
+
     sub chomp {
         my ($self) = @_;
 
@@ -247,6 +253,7 @@ package Sidef::Types::String::String {
         __PACKAGE__->new(CORE::join('', grep { defined } @str[$offs .. $len]));
     }
 
+    *ft = \&substr;
     *substring = \&substr;
 
     sub insert {

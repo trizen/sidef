@@ -4,7 +4,7 @@
       "\n                     Daniel Șuteu   (<trizenx@gmail.com>)\n                     Ioana Fălcușan (<ioanaflavia@gmail.com>)\n                    "
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.42",
+   "generated_by" : "Module::Build version 0.4203",
    "license" : [
       "artistic_2"
    ],
@@ -15,10 +15,6 @@
    "name" : "Sidef",
    "prereqs" : {
       "build" : {
-         "recommends" : {
-            "Math::BigInt::GMP" : "0",
-            "Term::ReadLine::Gnu::XS" : "0"
-         },
          "requires" : {
             "Test::More" : "0"
          }
@@ -29,6 +25,10 @@
          }
       },
       "runtime" : {
+         "recommends" : {
+            "Math::BigInt::GMP" : "0",
+            "Term::ReadLine::Gnu::XS" : "0"
+         },
          "requires" : {
             "Cwd" : "0",
             "Encode" : "0",

@@ -4,6 +4,8 @@ package Sidef::Sys::SIG {
     use strict;
     use warnings;
 
+    no warnings 'redefine';
+
     sub new {
         bless {}, __PACKAGE__;
     }

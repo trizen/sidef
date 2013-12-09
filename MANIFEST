@@ -223,6 +223,7 @@ scripts/recursion.sf
 scripts/regex.sf
 scripts/regex_bool.sf
 scripts/return.sf
+scripts/reverse_recursive_general_solution.sf
 scripts/rock_paper_scissors.sf
 scripts/roman_numerals_decoding.sf
 scripts/roman_numerals_decoding_2.sf
