@@ -1,0 +1,35 @@
+#!/usr/bin/ruby
+
+# Inverted syntax:  http://rosettacode.org/wiki/Inverted_syntax
+
+#
+## Variable assignments ('assign_to' == 'assignTo' == '»')
+#
+
+var a = 5;
+[5].assignTo(\var b);
+
+say "A: #{a}";
+say "B: #{b}";
+
+#
+## Multi-variable assignments
+#
+
+var (m, n) = (0, 1);
+[0, 1]»(\var x, \var y);
+
+say "M,N: #{m},#{n}";
+say "X,Y: #{x},#{y}";
+
+#
+## Conditional expressions
+#
+
+var raining = true;
+var needumbrella = false;
+
+if (raining == true) {needumbrella = true};
+{needumbrella = true} if (raining == true);
+
+say "Need umbrella: #{needumbrella}";

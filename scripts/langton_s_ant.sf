@@ -1,0 +1,48 @@
+#!/usr/bin/ruby
+
+# Sidef implementation of Langton's Ant
+# Translation of: http://rosettacode.org/wiki/Langton%27s_ant#Perl
+
+# Using screen coordinates - 0,0 in upper-left, +X right, +Y down -
+# these directions (right, up, left, down) are counterclockwise
+# so advance through the array to turn left, retreat to turn right
+var dirs = [[1,0], [0,-1], [-1,0], [0,1]];
+var size = 15;
+
+# we treat any false as white and true as black, so undef is fine for initial all-white grid
+var plane = [];
+for (0 .. size-1) { plane[_] = [] };
+
+# start out in approximate middle
+var (x, y) = (size/2, size/2);
+
+# pointing in a random direction
+var dir = dirs.len.rand.int;
+
+var move;
+for (move = 0; (x >= 0) && (x < $size) && (y >= 0) && (y < size); move++) {
+
+  # toggle cell's value (white->black or black->white)
+  if (plane[x][y] = (1 - (plane[x][y] := 0))) {
+        # if it's now true (black), then it was white, so turn right
+        dir = ((dir - 1) % dirs.len);
+  } else {
+        # otherwise it was black, so turn left
+        dir = ((dir + 1) % dirs.len);
+  }
+
+  x += dirs[dir][0];
+  y += dirs[dir][1];
+}
+
+{
+    "Out of bounds after %d moves at (%d, %d)\n".printf(move, x, y);
+    for (var y=0; y < size; y++) {
+
+        for (var x=0; x < size; x++) {
+            print (plane[x][y] := 0 == 1 ? '#' : '.');
+        }
+
+        print "\n";
+    }
+}.run;

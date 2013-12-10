@@ -190,9 +190,13 @@ scripts/hashes.sf
 scripts/if_do_else.sf
 scripts/if_while_standard.sf
 scripts/include_class.sf
+scripts/inverted_syntax.sf
 scripts/JASH.sf
+scripts/jensen_s_device.sf
 scripts/josephus_problem.sf
 scripts/keyword_object.sf
+scripts/knuth_shuffle.sf
+scripts/langton_s_ant.sf
 scripts/leap_year.sf
 scripts/levenshtein_distance.sf
 scripts/levenshtein_recursive.sf
@@ -208,6 +212,7 @@ scripts/method_expressions.sf
 scripts/multi_var_assignment.sf
 scripts/named_block_arguments.sf
 scripts/next.sf
+scripts/number_types.sf
 scripts/objects_init.sf
 scripts/open.sf
 scripts/perl_eval.sf

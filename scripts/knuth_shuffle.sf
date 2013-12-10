@@ -1,0 +1,18 @@
+#!/usr/bin/ruby
+
+#
+## Translation of: http://rosettacode.org/wiki/Knuth_shuffle#Perl
+#
+
+func shuffle (a) {
+
+  foreach (1 .. a.offset) { |n|
+    var k = (n + 1 -> rand.int);
+    k == n || (a[k, n] = a[n, k]);
+    a.dump.say;
+  }
+
+  return a;
+}
+
+shuffle(1..10);

@@ -374,9 +374,9 @@ package Sidef::Types::Array::Array {
 
     sub assign_to {
         my ($self, @vars) = @_;
-        $self->_is_var_ref($_) || return for @vars;
 
         for my $i (0 .. $#vars) {
+            $self->_is_var_ref($vars[$i]) || return;
             if (exists $self->[$i] and ref($self->[$i]) eq 'Sidef::Variable::Variable') {
                 $vars[$i]->get_var->set_value($self->[$i]->get_value);
             }

@@ -75,7 +75,7 @@ if ($args{h}) {
                     '-o output_file' => 'dump the data structure into a file (with -D)',
                     '-E program'     => 'one line of program',
                     '-H'             => 'interactive help',
-                    '-N type'        => ["use a specific implementation for numbers", "valid types: perl, float, int, rat"],
+                    '-N type'        => ["use a specific implementation for numbers", "valid types: fast, big, int, rat"],
                     '-v'             => 'print version',
                    );
 
@@ -111,7 +111,7 @@ END
 }
 
 if (defined(my $type = $args{N})) {
-    if ($type eq 'perl') {
+    if ($type eq 'fast' or $type eq 'perl') {
         require Sidef::Types::Number::NumberFast;
     }
     elsif ($type eq 'rat') {
@@ -120,7 +120,7 @@ if (defined(my $type = $args{N})) {
     elsif ($type eq 'int') {
         require Sidef::Types::Number::NumberInt;
     }
-    elsif ($type eq 'float') {
+    elsif ($type eq 'big' or $type eq 'float') {
         ## default
     }
     else {

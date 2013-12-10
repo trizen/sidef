@@ -322,6 +322,7 @@ package Sidef::Parser {
                   Chrs Chars
                   Bool
                   Sys
+                  Sig
                   Regex
                   Time
 
@@ -346,11 +347,15 @@ package Sidef::Parser {
                   __BLOCK__
                   __FILE__
                   __LINE__
-                  __RESET_LINE_COUNTER__
                   __END__
                   __DATA__
-                  __NO_BIGNUM__
+
                   __USE_BIGNUM__
+                  __USE_RATNUM__
+                  __USE_INTNUM__
+                  __USE_FASTNUM__
+
+                  __RESET_LINE_COUNTER__
 
                   )
             },
@@ -1003,9 +1008,21 @@ package Sidef::Parser {
                     redo;
                 }
 
-                if (/\G__NO_BIGNUM__\b;*/gc) {
+                if (/\G__USE_FASTNUM__\b;*/gc) {
                     delete $INC{'Sidef/Types/Number/NumberFast.pm'};
                     require Sidef::Types::Number::NumberFast;
+                    redo;
+                }
+
+                if (/\G__USE_INTNUM__\b;*/gc) {
+                    delete $INC{'Sidef/Types/Number/NumberInt.pm'};
+                    require Sidef::Types::Number::NumberInt;
+                    redo;
+                }
+
+                if (/\G__USE_RATNUM__\b;*/gc) {
+                    delete $INC{'Sidef/Types/Number/NumberRat.pm'};
+                    require Sidef::Types::Number::NumberRat;
                     redo;
                 }
 
@@ -1336,7 +1353,10 @@ package Sidef::Parser {
                                                                  ]
                                                                 };
 
-                            my ($arg, $pos) = $self->parse_obj(code => substr($_, pos));
+                            my ($arg, $pos) =
+                              /\G\h*(?=\()/gc
+                              ? ($self->parse_arguments(code => substr($_, pos)))
+                              : ($self->parse_obj(code => substr($_, pos)));
                             pos($_) += $pos;
 
                             if (defined $arg) {
