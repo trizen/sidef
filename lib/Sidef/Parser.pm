@@ -815,7 +815,7 @@ package Sidef::Parser {
                 }
 
                 # Declaration of the 'my' special variable and function declaration
-                if (/\G(my)\h+($self->{re}{var_name})/goc || /\G(func\b)\h*((?:$self->{re}{var_name})?+)/goc) {
+                if (/\G(my)\h+($self->{re}{var_name})/goc || /\G(func|class)\b\h*((?:$self->{re}{var_name})?+)/goc) {
                     my $type = $1;
                     my $name = $2;
 
@@ -828,9 +828,15 @@ package Sidef::Parser {
                     }
 
                     my $variable =
-                      $type eq 'my'
-                      ? Sidef::Variable::My->new($name)
-                      : Sidef::Variable::Variable->new($name, $type);
+                        $type eq 'my' ? Sidef::Variable::My->new($name)
+                      : $type eq 'func' ? Sidef::Variable::Variable->new($name, $type)
+                      : $type eq 'class' ? Sidef::Variable::ClassInit->__new($name)
+                      : $self->fatal_error(
+                                           error    => "invalid type",
+                                           expected => "(developer fault)",
+                                           code     => $_,
+                                           pos      => pos($_),
+                                          );
 
                     unshift @{$self->{vars}{$self->{class}}},
                       {
@@ -843,6 +849,31 @@ package Sidef::Parser {
 
                     if ($type eq 'my') {
                         return Sidef::Variable::InitMy->new($name), pos($_);
+                    }
+
+                    if ($type eq 'class') {
+
+                        local $self->{class} = $name;
+
+                        # Check the declared parameters
+                        if (/\G\h*(?:\(\h*)?$self->{re}{vars}(?:\h*\))?\h*\{/goc) {
+
+                            my @params = split(/\h*,\h*/, $1);
+
+                            #local $self->{current_class} = $variable;  # useless (for now)
+                            my ($obj, $pos) = $self->parse_block(code => '{' . substr($_, pos));
+                            pos($_) += $pos - 1;
+
+                            $variable->__set_value($obj, @params);
+                        }
+                        else {
+                            $self->fatal_error(
+                                               error    => "invalid class declaration",
+                                               expected => "expected: class $name(...){...}",
+                                               code     => $_,
+                                               pos      => pos($_)
+                                              );
+                        }
                     }
 
                     if ($type eq 'func') {
@@ -1034,7 +1065,7 @@ package Sidef::Parser {
                     $self->fatal_error(
                                        code  => $_,
                                        pos   => pos($_) - length('__BLOCK__'),
-                                       error => "__BLOCK__ used outside a block!",
+                                       error => "__BLOCK__ can't be used outside a block!",
                                       );
                 }
 
@@ -1046,9 +1077,21 @@ package Sidef::Parser {
                     $self->fatal_error(
                                        code  => $_,
                                        pos   => pos($_) - length('__FUNC__'),
-                                       error => "__FUNC__ used outside a function!",
+                                       error => "__FUNC__ can't be used outside a function!",
                                       );
                 }
+
+                #if (/\Gself\b/gc) {
+                #    if (exists $self->{current_class}) {
+                #        return $self->{current_class}, pos;
+                #    }
+
+                #     $self->fatal_error(
+                #                       code  => $_,
+                #                       pos   => pos($_) - length('__FUNC__'),
+                #                       error => "'self' can't be used outside a class!",
+                #                      );
+                #}
 
                 if (
                     /\G((?>ENV|ARGV))\b/gc && do {
@@ -1094,8 +1137,22 @@ package Sidef::Parser {
 
                     my $var_name = $1;
 
-                    my ($name, $class) = $self->get_name_and_class($var_name);
+                    #my ($name, $class) = $self->get_name_and_class($var_name);
+                    #my $name = $var_name;
+                    #my $class = $self->{class};
+
+                    ##if (not exists $self->{ref_vars_refs}{$class} or not exists $self->{ref_vars}{$class} ) {
+                    #   say $class;
+                    #   $name = $var_name;
+                    #   $class = $self->{class};
+                    #}
+
+                    my $name  = $var_name;
+                    my $class = $self->{class};
+
                     my ($var, $code) = $self->find_var($name, $class);
+
+                    #say $class;
 
                     if (ref $var) {
                         $var->{count}++;
@@ -1290,10 +1347,22 @@ package Sidef::Parser {
                 return $obj, pos;
             }
 
-            if (ref $obj eq 'Sidef::Variable::Variable' and $obj->{type} eq 'func' and /\G\h*(?=\()/gc) {
+            if (
+                   (ref($obj) eq 'Sidef::Variable::Variable' and $obj->{type} eq 'func')
+                || (ref($obj) eq 'Sidef::Variable::ClassInit')
+
+                and /\G\h*(?=\()/gc
+              ) {
                 my ($arg, $pos) = $self->parse_arguments(code => substr($_, pos));
                 pos($_) += $pos;
-                $obj = {$self->{class} => [{self => $obj, call => [{method => "call", arg => [$arg]}]}]};
+                $obj = {
+                        $self->{class} => [
+                              {
+                               self => $obj,
+                               call => [{method => ref($obj) eq 'Sidef::Variable::ClassInit' ? 'init' : 'call', arg => [$arg]}]
+                              }
+                        ]
+                       };
             }
 
             if (defined $obj) {
@@ -1411,10 +1480,10 @@ package Sidef::Parser {
                 }
 
                 # Class declaration
-                if (/\Gclass\h+($self->{re}{var_name})/goc) {
-                    $self->{class} = $1;
-                    redo;
-                }
+                #if (/\Gclass\h+($self->{re}{var_name})/goc) {
+                #    $self->{class} = $1;
+                #    redo;
+                #}
 
                 if (/\Gimport\b\h*/gc) {
 
@@ -1597,6 +1666,7 @@ package Sidef::Parser {
                                 }
                                 elsif (   $variable->{count} == 0
                                        && $variable->{name} ne '_'
+                                       && $variable->{type} ne 'class'
                                        && $variable->{name} ne '__'
                                        && $variable->{name} ne '') {
                                     warn "Variable '$variable->{name}' has been initialized, but not used again, at "

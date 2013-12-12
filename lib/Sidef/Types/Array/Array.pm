@@ -235,6 +235,16 @@ package Sidef::Types::Array::Array {
         $self->[-1];
     }
 
+    sub swap {
+        my ($self, $i, $j) = @_;
+
+        $self->_is_number($i) || return;
+        $self->_is_number($j) || return;
+
+        @{$self}[$i, $j] = @{$self}[$j, $i];
+        $self;
+    }
+
     sub first {
         my ($self) = @_;
         $#{$self} >= 0 || return;
@@ -863,7 +873,7 @@ package Sidef::Types::Array::Array {
         my $string = Sidef::Types::String::String->new("[");
 
         foreach my $i (0 .. $#{$self}) {
-            my $item = $self->[$i]->get_value;
+            my $item = defined($self->[$i]) ? $self->[$i]->get_value : 'nil';
 
             if (ref $item and defined eval { $item->can('dump') }) {
                 $$string .= $item->dump();

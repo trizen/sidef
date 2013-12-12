@@ -7,21 +7,15 @@ include Math::Algebra::Matrix;
 ## Test class function
 #
 
-Math::Algebra::Matrix::det(
+var matrix = Math::Algebra::Matrix(
     [
         [4,2,3],
         [1,5,3],
         [1,2,3],
     ]
-) == 27 || ("Matrix error!\n".die);
+);
 
-
-#
-## Test class variable
-#
-
-Math::Algebra::Matrix::VERSION == 0.1
-    || ("Class variable error!\n".die);
+matrix.det() == 27 || ("Matrix error!\n".die);
 
 
 #

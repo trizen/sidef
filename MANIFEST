@@ -98,6 +98,8 @@ lib/Sidef/Types/Regex/Regex.pm
 lib/Sidef/Types/Regex/Regex.pod
 lib/Sidef/Types/String/String.pm
 lib/Sidef/Types/String/String.pod
+lib/Sidef/Variable/Class.pm
+lib/Sidef/Variable/ClassInit.pm
 lib/Sidef/Variable/Init.pm
 lib/Sidef/Variable/Init.pod
 lib/Sidef/Variable/InitMy.pm
@@ -157,6 +159,7 @@ scripts/caesar_cipher.sf
 scripts/calendar.sf
 scripts/catalan_numbers.sf
 scripts/catalan_numbers_recursive.sf
+scripts/class_concept.sf
 scripts/classes.sf
 scripts/cnp.sf
 scripts/code_interpolation.sf

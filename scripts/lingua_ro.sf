@@ -1,7 +1,8 @@
 #!/usr/bin/ruby
 
 include Lingua::RO::Numbers;
-import  Lingua::RO::Numbers::number_to_ro;
+
+var lingua = Lingua::RO::Numbers.new;
 
 for (
 [
@@ -28,7 +29,7 @@ for (
     [-0.688121,       'minus zero virgulă șase sute optzeci și opt de mii o sută douăzeci și unu'],
 ] => \var pair) {
 
-    var num = (number_to_ro(pair[0])) == pair[1]
+    var num = (lingua.number_to_ro(pair[0])) == pair[1]
         || ("Error on number: <%s> -- got: <%s>\n".sprintf(pair[0], num).die);
 
     "%12s -> %s\n".printf(pair[0], num);

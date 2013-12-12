@@ -3,7 +3,7 @@
 # AUTHOR: Șuteu "Trizen" Daniel
 # LICENSE: GPLv3
 
-class Lingua::RO::Numbers;
+class Lingua::RO::Numbers (opts) {
 
 __USE_BIGNUM__
 
@@ -41,7 +41,7 @@ var BIGNUMS = (
             }
 );
 
-var opts = (:(
+var opts = :(
             diacritics            => true,
             invalid_number        => nil,
             negative_sign         => 'minus',
@@ -49,7 +49,7 @@ var opts = (:(
             thousands_separator   => '',
             infinity              => 'infinit',
             not_a_number          => 'NaN',
-));
+);
 
 func _number_to_ro (number) {
 
@@ -147,10 +147,10 @@ func _number_to_ro (number) {
     return(words);
 }
 
-func number_to_ro (num) {
+func number_to_ro (self, num) {
 
-    var args = (_.ft(1).to_hash);
-    while (var kv = (args.each)) {
+    var conf = _.to_hash;
+    while (var kv = (conf.each)) {
         opts.exists(kv[0]) || (
             "[%s] Invalid option: <%s>\n".sprintf(__CLASS__, kv[0]).warn;
         );
@@ -172,4 +172,5 @@ func number_to_ro (num) {
     }
 
     word;
+}
 }

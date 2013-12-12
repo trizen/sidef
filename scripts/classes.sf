@@ -1,5 +1,8 @@
 #!/usr/bin/ruby
 
+# This file is old and need to be corrected!
+
+__END__
 class Math;
 
 var public_var  = "This is a public class variable!";

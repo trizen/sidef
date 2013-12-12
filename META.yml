@@ -119,6 +119,10 @@ provides:
     file: lib/Sidef/Types/Regex/Regex.pm
   Sidef::Types::String::String:
     file: lib/Sidef/Types/String/String.pm
+  Sidef::Variable::Class:
+    file: lib/Sidef/Variable/Class.pm
+  Sidef::Variable::ClassInit:
+    file: lib/Sidef/Variable/ClassInit.pm
   Sidef::Variable::Init:
     file: lib/Sidef/Variable/Init.pm
   Sidef::Variable::InitMy:

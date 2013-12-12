@@ -1,27 +1,29 @@
 #!/usr/bin/ruby
 
-class Math::Algebra::Matrix;
+class Math::Algebra::Matrix (matrix) {
 
-var VERSION = 0.1;
+    var VERSION = 0.1;
 
-#
-## Require a Perl module
-#
+    #
+    ## Require a Perl module
+    #
 
-var req = (
-           try   { require 'Math::Matrix' }
-           catch { Sys.warn("** Math::Matrix is not installed!\n"); return }
-);
-
-#
-## Function declaration
-#
-
-func det (arr) {
-
-    var matrix = (
-        req.new(arr->to_list);
+    var req = (
+            try   { require 'Math::Matrix' }
+            catch { Sys.warn("** Math::Matrix is not installed!\n"); return }
     );
 
-    Num.new(matrix.determinant);
+    #
+    ## Function declaration
+    #
+
+    func det (self) {
+
+        var math_matrix = (
+            req.new(self.matrix->to_list);
+        );
+
+        Num.new(math_matrix.determinant);
+    }
+
 }

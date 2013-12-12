@@ -1,0 +1,40 @@
+#!/usr/bin/ruby
+
+# Test class
+class Test (name) {
+
+    func get_name (self) {
+        self.name;
+    }
+
+    func add(self, a, b) {
+        return a+b;
+    }
+}
+
+
+# Main class
+func main () {
+
+    # Init class
+    var obj_1 = Test("Name");
+
+    say obj_1.name;
+    say obj_1.name('abc');      # change the name and print it
+
+    say ('-' * 5);
+    say (obj_1.add(10, 5));
+    say ('-' * 5);
+
+    # Init again the same class
+    var obj_2 = Test("Sidef");
+
+    say obj_1.name;    # print the name from old class
+    say obj_2.name;    # print the name from new class
+
+    # Calling the get_name() method
+    say obj_2.get_name;
+    say obj_1.get_name;
+}
+
+main();
