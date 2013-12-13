@@ -1,9 +1,8 @@
-
-use 5.014;
-use strict;
-use warnings;
-
 package Sidef {
+
+    use 5.014;
+    use strict;
+    use warnings;
 
     our $VERSION = 0.01;
 

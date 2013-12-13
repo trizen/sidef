@@ -10,8 +10,7 @@ binmode(STDOUT, ':encoding(UTF-8)');
 binmode(STDERR, ':encoding(UTF-8)') if $^P == 0;
 binmode(STDIN,  ':encoding(UTF-8)');
 
-require Sidef;
-require Sidef::Parser;
+require Sidef::Init;
 
 my $name    = 'Sidef';
 my $version = $Sidef::VERSION;
@@ -19,7 +18,7 @@ my $version = $Sidef::VERSION;
 my %args;
 if (@ARGV and chr ord $ARGV[0] eq '-') {
     require Getopt::Std;
-    Getopt::Std::getopts('E:d:Dho:ivHN:Ww', \%args);
+    Getopt::Std::getopts('E:d:Dho:ivHN:Wwc', \%args);
 }
 
 my %keywords = (
@@ -70,6 +69,7 @@ if ($args{h}) {
 
     my %switches = (
                     '-i'             => 'interactive mode',
+                    '-c'             => 'compile the code as a stand-alone perl program',
                     '-d dumped_file' => 'execute a dumped file',
                     '-D'             => 'dump the data structure of a program',
                     '-o output_file' => 'dump the data structure into a file (with -D)',
@@ -144,7 +144,6 @@ if (defined(my $type = $args{N})) {
 }
 
 if (defined $args{d}) {
-    require Sidef::Init;
     my $struct = do($args{d})
       || die "Can't load the data structure from file '$args{d}': $!\n";
     execute_struct($struct);
@@ -222,6 +221,148 @@ else {
                 }
 
                 print {$out_fh} Data::Dump::pp($struct);
+            }
+        }
+        elsif ($args{c}) {
+            eval 'use Data::Dump';
+
+            if ($@) {
+                die "Data::Dump module is not installed!\n";
+            }
+            else {
+                require File::Basename;
+                my $path = File::Basename::dirname($INC{'Sidef.pm'});
+
+                my $package_content = <<"HEAD";
+#!$^X
+
+eval 'exec $^X  -S \$0 \${1+"\$@"}'
+    if 0; # not running under some shell
+
+use utf8;
+use 5.014;
+use warnings;
+
+use File::Temp qw(tempdir);
+use File::Path qw(make_path);
+use File::Spec::Functions qw(catdir catfile);
+
+my \$DIR;
+use lib \$DIR = tempdir(CLEANUP => 1);
+
+binmode(STDOUT, ':encoding(UTF-8)');
+binmode(STDERR, ':encoding(UTF-8)') if \$^P == 0;
+binmode(STDIN,  ':encoding(UTF-8)');
+
+foreach my \$mod (
+HEAD
+
+                require File::Find;
+                File::Find::find(
+                    {
+                     no_chdir => 1,
+                     wanted   => sub {
+                         if (-f and /\.pm\z/) {
+
+                             return if m{\bSidef\W+Init\b};
+
+                             local $/;
+                             open my $fh, '<:encoding(UTF-8)', $_
+                               or die "Can't open file `$_' for reading: $!";
+
+                             my $token = tr/A-Za-z0-9/_/cr;
+
+                             $package_content .= qq{<<'${token}',\n};
+                             $package_content .= <$fh>;
+                             $package_content .= ";\n$token\n";
+
+                             close $fh;
+                         }
+                       }
+                    } => $path
+                );
+
+                $package_content .= <<"FOOT";
+) {
+    if (\$mod =~ /^(?:## )?package\\h+([\\w::]+)/) {
+        my \@parts = split(/::/, \$1);
+
+        my \$name = pop \@parts;
+        my \$dir = catdir(\$DIR, \@parts);
+
+        if (\$#parts != -1 and not -d \$dir) {
+            make_path(\$dir)
+                or die qq{ERROR: Can't create dir \$dir: \$!};
+        }
+
+        my \$filename = catfile(\$dir, \$name . '.pm');
+
+        open my \$fh, '>:encoding(UTF-8)', \$filename
+            or die qq{ERROR: Can't create "\$filename": \$!};
+
+        print {\$fh} \$mod;
+        print {\$fh} ";\n";
+
+        close \$fh
+            or die qq{ERROR: Can't close "\$filename": \$!};
+    }
+    else {
+        die qq{ERROR: can't get the package name!\n};
+    }
+}
+
+FOOT
+
+                if (exists $INC{'Sidef/Init.pm'}) {
+                    my $filename = $INC{'Sidef/Init.pm'};
+
+                    local $/;
+                    open my $fh, '<:encoding(UTF-8)', $filename
+                      or die "Can't open file `$filename' for reading: $!";
+
+                    $package_content .= <$fh>;
+                    $package_content .= "require Sidef;\n\n";
+
+                    if (defined(my $type = $args{N})) {
+                        if ($type eq 'fast' or $type eq 'perl') {
+                            $package_content .= "require Sidef::Types::Number::NumberFast;\n";
+                        }
+                        elsif ($type eq 'rat') {
+                            $package_content .= "require Sidef::Types::Number::NumberRat;\n";
+                        }
+                        elsif ($type eq 'int') {
+                            $package_content .= "require Sidef::Types::Number::NumberInt;\n";
+                        }
+                    }
+
+                    close $fh;
+                }
+                else {
+                    die "ERROR: Can't find the `Sidef::Init' module!\n";
+                }
+
+                my $out_fh = \*STDOUT;
+
+                if (defined $args{o}) {
+                    open $out_fh, '>:encoding(UTF-8)', $args{o}
+                      or die "Can't open file '$args{o}' for write: $!\n";
+                }
+
+                print {$out_fh} $package_content;
+
+                print {$out_fh} "my \$struct = ";
+                print {$out_fh} Data::Dump::pp($struct);
+                print {$out_fh} ";\n";
+
+                print {$out_fh} <<"EXEC";
+
+#
+## Execute the data structure
+#
+
+my \$exec = Sidef::Exec->new();
+\$exec->execute(\$struct);
+EXEC
             }
         }
         else {

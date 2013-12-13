@@ -6,7 +6,7 @@ package Sidef::Parser {
     use warnings;
 
     require File::Spec;
-    require Sidef::Init;
+    #require Sidef::Init;
 
     our $DEBUG = 0;
 

@@ -1,3 +1,4 @@
+## package Sidef::Types::Number::NumberFast
 package Sidef::Types::Number::Number {
 
     use utf8;

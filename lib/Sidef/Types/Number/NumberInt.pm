@@ -1,3 +1,4 @@
+## package Sidef::Types::Number::NumberInt
 package Sidef::Types::Number::Number {
 
     use 5.014;
