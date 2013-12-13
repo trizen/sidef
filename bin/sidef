@@ -201,7 +201,7 @@ else {
             local $/;
             <$fh>;
           }
-          : join(' ', <>);
+          : do { local $/; <> };
 
         my $parser = Sidef::Parser->new(script_name => $script_name);
         my $struct = $parser->parse_script(code => $code);
