@@ -432,6 +432,14 @@ Return the
 
 =cut
 
+=head2 ft
+
+String.ft() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 ge
 
 String.ge() -> I<Bool>
@@ -659,6 +667,14 @@ Return the
 =head2 parse
 
 String.parse() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 pop
+
+String.pop() -> I<Bool>
 
 Return the
 

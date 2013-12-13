@@ -1090,6 +1090,14 @@ Return the
 
 =cut
 
+=head2 swap
+
+Array.swap() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 takeLeft
 
 Array.takeLeft() -> I<Bool>

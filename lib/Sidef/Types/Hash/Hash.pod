@@ -135,6 +135,14 @@ Return the
 
 =cut
 
+=head2 get
+
+Hash.get() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 get_value
 
 Hash.get_value() -> I<Bool>
@@ -154,6 +162,30 @@ Return the
 =head2 keys
 
 Hash.keys() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 merge
+
+Hash.merge() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 mergeValues
+
+Hash.mergeValues() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 merge_values
+
+Hash.merge_values() -> I<Bool>
 
 Return the
 

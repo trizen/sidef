@@ -48,6 +48,14 @@ Return the
 
 =cut
 
+=head2 %%
+
+I<Num> B<%%> I<Num> -> I<Num>
+
+Return the
+
+=cut
+
 =head2 &
 
 I<Num> B<&> I<Num> -> I<Num>
@@ -435,6 +443,22 @@ Return the
 =head2 int
 
 Number.int() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 isDiv
+
+Number.isDiv() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 is_div
+
+Number.is_div() -> I<Bool>
 
 Return the
 
