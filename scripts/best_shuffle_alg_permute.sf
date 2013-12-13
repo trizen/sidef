@@ -4,7 +4,7 @@
 
 var permute = (
            try   { require 'Algorithm::Permute' }
-           catch { Sys.warn("** Algorithm::Permute is not installed!\n"); return }
+           catch { STDERR.print("** Algorithm::Permute is not installed!\n"); return }
 );
 
 func score(original_word, new_word) {

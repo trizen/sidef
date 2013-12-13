@@ -10,7 +10,7 @@ class Math::Algebra::Matrix (matrix) {
 
     var req = (
             try   { require 'Math::Matrix' }
-            catch { Sys.warn("** Math::Matrix is not installed!\n"); return }
+            catch { Sys.die("** Math::Matrix is not installed!\n"); }
     );
 
     #

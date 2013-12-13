@@ -2,21 +2,28 @@
 
 include Math::Algebra::Matrix;
 
-
 #
-## Test class function
+## Init the class object
 #
 
-var matrix = Math::Algebra::Matrix(
-    [
-        [4,2,3],
-        [1,5,3],
-        [1,2,3],
-    ]
+var matrix = (
+    try {
+        Math::Algebra::Matrix(
+            [
+                [4,2,3],
+                [1,5,3],
+                [1,2,3],
+            ]
+        )
+    }
+    catch {
+        STDERR.print("Can't load the 'Math::Algebra::Matrix' sidef module!\n");
+        return;
+    }
 );
 
+# Test the determinant
 matrix.det() == 27 || ("Matrix error!\n".die);
-
 
 #
 ## Everything is OK

@@ -203,6 +203,7 @@ else {
           }
           : do { local $/; <> };
 
+        $code // exit 2;
         my $parser = Sidef::Parser->new(script_name => $script_name);
         my $struct = $parser->parse_script(code => $code);
 

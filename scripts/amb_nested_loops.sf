@@ -1,7 +1,5 @@
 #!/usr/bin/ruby
 
-var req = (require 'Algorithm::Loops');
-
 var code = {
     var words = (_.map{Str.new(_)});
 
@@ -14,9 +12,12 @@ var code = {
     words.join(" ").say;
 };
 
-if (nil != req) {
+func main () {
 
-    var mod = (req->());
+    var alg = (
+        try   { require 'Algorithm::Loops'->() }
+        catch { STDERR.print("** Algorithm::Loops is not installed!\n"); return }
+    );
 
     var array = [
         qw'the that a',
@@ -25,8 +26,7 @@ if (nil != req) {
         qw'slowly quickly',
     ];
 
-    mod.NestedLoops(array, code);
+    alg.NestedLoops(array, code);
 }
-else {
-    "\n* Module 'Algorithm::Loops' is not installed!".say;
-}
+
+main();
