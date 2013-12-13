@@ -373,8 +373,6 @@ EXEC
 
 sub execute_struct {
     my ($struct) = @_;
-
-    require Sidef::Exec;
     my $exec = Sidef::Exec->new();
     $exec->execute($struct);
 }

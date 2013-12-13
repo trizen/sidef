@@ -10,7 +10,7 @@ use List::Util qw(first);
 use File::Spec::Functions qw(catfile);
 
 use lib 'lib';
-require Sidef::Parser;
+require Sidef::Init;
 
 opendir(my $dir_h, 'scripts');
 

@@ -23,8 +23,6 @@ provides:
     file: lib/Sidef/Convert/Convert.pm
   Sidef::Exec:
     file: lib/Sidef/Exec.pm
-  Sidef::Init:
-    file: lib/Sidef/Init.pm
   Sidef::Math::Math:
     file: lib/Sidef/Math/Math.pm
   Sidef::Module::Caller:
