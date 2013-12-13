@@ -109,6 +109,8 @@ package Sidef::Types::Hash::Hash {
         $self->new(@list);
     }
 
+    *merge = \&concat;
+
     sub merge_values {
         my ($self, $obj) = @_;
 

@@ -19,7 +19,7 @@ my $version = $Sidef::VERSION;
 my %args;
 if (@ARGV and chr ord $ARGV[0] eq '-') {
     require Getopt::Std;
-    Getopt::Std::getopts('E:d:Dho:ivHN:', \%args);
+    Getopt::Std::getopts('E:d:Dho:ivHN:Ww', \%args);
 }
 
 my %keywords = (
@@ -77,6 +77,8 @@ if ($args{h}) {
                     '-H'             => 'interactive help',
                     '-N type'        => ["use a specific implementation for numbers", "valid types: fast, big, int, rat"],
                     '-v'             => 'print version',
+                    '-w'             => 'enable warnings with stack backtrace',
+                    '-W'             => 'make warnings fatal (with stack backtrace)',
                    );
 
     print <<"USAGE";
@@ -89,7 +91,7 @@ USAGE
     my $max_width = List::Util::max(map { length } keys %switches);
     $max_width += 4;
 
-    foreach my $key (sort { lc($a) cmp lc($b) } keys %switches) {
+    foreach my $key (sort { lc($a) cmp lc($b) or $b cmp $a } keys %switches) {
         if (ref $switches{$key} eq 'ARRAY') {
             printf "  %-${max_width}s%s\n", $key, $switches{$key}[0];
             foreach my $i (1 .. $#{$switches{$key}}) {
@@ -108,6 +110,19 @@ Run '$0 -H' for more help with $name.
 END
 
     exit 0;
+}
+
+if ($args{w}) {
+    $SIG{__WARN__} = sub {
+        require Carp;
+        Carp::cluck(@_);
+    };
+}
+elsif ($args{W}) {
+    $SIG{__WARN__} = sub {
+        require Carp;
+        Carp::confess(@_);
+    };
 }
 
 if (defined(my $type = $args{N})) {
