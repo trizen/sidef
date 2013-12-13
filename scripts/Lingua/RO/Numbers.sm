@@ -3,7 +3,7 @@
 # AUTHOR: Șuteu "Trizen" Daniel
 # LICENSE: GPLv3
 
-class Lingua::RO::Numbers (opts) {
+class Lingua::RO::Numbers () {
 
 __USE_BIGNUM__
 

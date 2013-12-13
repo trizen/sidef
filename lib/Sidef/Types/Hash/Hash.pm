@@ -30,6 +30,16 @@ package Sidef::Types::Hash::Hash {
         \%hash;
     }
 
+    sub get {
+        my ($self, @keys) = @_;
+
+        if ($#keys == 0) {
+            return $self->{$keys[0]};
+        }
+
+        Sidef::Types::Array::Array->new(map { defined($_) ? $_->get_value : $_ } @{$self}{@keys});
+    }
+
     sub duplicate_of {
         my ($self, $obj) = @_;
 
@@ -98,6 +108,22 @@ package Sidef::Types::Hash::Hash {
 
         $self->new(@list);
     }
+
+    sub merge_values {
+        my ($self, $obj) = @_;
+
+        $self->_is_hash($obj) || return;
+
+        while (my ($key, undef) = each %{$self}) {
+            if (exists $obj->{$key}) {
+                $self->{$key} = $obj->{$key};
+            }
+        }
+
+        $self;
+    }
+
+    *mergeValues = \&merge_values;
 
     sub keys {
         my ($self) = @_;

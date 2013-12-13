@@ -3,8 +3,10 @@
 # Test class
 class Test (name) {
 
+    var prefix = '=>> ';
+
     func get_name (self) {
-        self.name;
+        prefix + self.name;
     }
 
     func add(self, a, b) {

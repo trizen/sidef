@@ -1,0 +1,65 @@
+#!/usr/bin/ruby
+
+# Test class
+class Test (opts) {
+
+    func config (self) {
+        var args = _.toHash;
+
+        self.opts(:(
+                min  => 5,
+                max  => 20,
+                name => "Unknown",
+        ));
+
+        self.opts.mergeValues(args);
+    }
+
+    func get_name (self) {
+        (self.opts)['name'];        # or: self.opts.get('name')
+    }
+
+    func sum (self) {
+        self.opts.get('min') + self.opts.get('max');
+    }
+}
+
+
+# Main class
+func main () {
+
+    # Init class
+    var obj_1 = Test.new;
+
+    # Configure the class values
+    obj_1.config(
+            min => 10,
+            max => 100,
+            name => "Sidef",
+    );
+
+    # Init again the same class
+    var obj_2 = Test.new;
+
+    # Configure the class values:
+    #   change name, but keep the other defaults
+    obj_2.config(
+            name => "Test",
+    );
+
+    say obj_1.get_name;     # prints "Sidef"
+    say obj_2.get_name;     # prints "Test"
+
+    # Change a class value
+    obj_2.config(
+            name => "Classes",
+    );
+
+    say obj_1.get_name;     # prints "Sidef"
+    say obj_2.get_name;     # prints "Classes"
+
+    say obj_1.sum;  # prints: 110 (10 + 100)
+    say obj_2.sum;  # prints:  25 ( 5 +  20) -- (default)
+}
+
+main();

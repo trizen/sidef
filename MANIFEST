@@ -160,6 +160,7 @@ scripts/calendar.sf
 scripts/catalan_numbers.sf
 scripts/catalan_numbers_recursive.sf
 scripts/class_concept.sf
+scripts/class_config.sf
 scripts/classes.sf
 scripts/cnp.sf
 scripts/code_interpolation.sf
