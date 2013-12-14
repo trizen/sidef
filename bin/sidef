@@ -274,7 +274,7 @@ HEAD
 
                              $package_content .= qq{<<'${token}',\n};
                              $package_content .= <$fh>;
-                             $package_content .= ";\n$token\n";
+                             $package_content .= "\n$token\n";
 
                              close $fh;
                          }
@@ -284,7 +284,7 @@ HEAD
 
                 $package_content .= <<"FOOT";
 ) {
-    if (\$mod =~ /^(?:## )?package\\h+([\\w::]+)/) {
+    if (\$mod =~ /^(?>##\\h*)?package\\h+([\\w::]+)/) {
         my \@parts = split(/::/, \$1);
 
         my \$name = pop \@parts;
@@ -301,7 +301,6 @@ HEAD
             or die qq{ERROR: Can't create "\$filename": \$!};
 
         print {\$fh} \$mod;
-        print {\$fh} ";\n";
 
         close \$fh
             or die qq{ERROR: Can't close "\$filename": \$!};
