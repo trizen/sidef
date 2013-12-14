@@ -484,15 +484,24 @@ package Sidef::Parser {
     }
 
     {
-        my %pairs = qw'
+
+        # Reference: http://en.wikipedia.org/wiki/International_variation_in_quotation_marks
+        my %pairs = qw~
           ( )
           [ ]
           { }
           < >
           « »
+          » «
+          ‹ ›
+          › ‹
+         「 」
+         『 』
           „ ”
           “ ”
-          ';
+          ‘ ’
+          ‚ ’
+    ~;
 
         sub get_quoted_words {
             my ($self, %opt) = @_;
@@ -701,13 +710,13 @@ package Sidef::Parser {
                 }
 
                 # Single quoted string
-                if (/\G(?=')/ || /\Gq\b/gc) {
+                if (/\G(?=['‘‚’])/ || /\Gq\b/gc) {
                     my ($string, $pos) = $self->get_quoted_string(code => substr($_, pos));
                     return Sidef::Types::String::String->new($string =~ s{\\\\}{\\}gr), pos($_) + $pos;
                 }
 
                 # Double quoted string
-                if (/\G(?=["\“„])/ || /\Gqq\b/gc) {
+                if (/\G(?=["“„”])/ || /\Gqq\b/gc) {
                     my ($string, $pos) = $self->get_quoted_string(code => (substr($_, pos)));
                     return Sidef::Types::String::String->new($string)->apply_escapes($self), pos($_) + $pos;
                 }

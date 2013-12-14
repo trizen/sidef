@@ -72,7 +72,7 @@ if ($args{h}) {
                     '-c'             => 'compile the code as a stand-alone perl program',
                     '-d dumped_file' => 'execute a dumped file',
                     '-D'             => 'dump the data structure of a program',
-                    '-o output_file' => 'dump the data structure into a file (with -D)',
+                    '-o output_file' => 'file where to dump the output',
                     '-E program'     => 'one line of program',
                     '-H'             => 'interactive help',
                     '-N type'        => ["use a specific implementation for numbers", "valid types: fast, big, int, rat"],
