@@ -1,6 +1,6 @@
 #!/usr/bin/ruby
 
-var mons = (:(
+var mons = :(
                 1  => 31,
                 2  => 28,
                 3  => 31,
@@ -13,9 +13,9 @@ var mons = (:(
                 10 => 31,
                 11 => 30,
                 12 => 31,
-           ));
+           );
 
-var t = (Time.local);
+var t = Time.new.local;
 
 var day  = (t.day);
 var mon  = (t.mon + 1);

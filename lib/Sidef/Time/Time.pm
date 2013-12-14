@@ -7,24 +7,34 @@ package Sidef::Time::Time {
     sub new {
         my (undef, $sec) = @_;
 
-        if (ref($sec)) {
-
-            if (ref($sec) ne 'Sidef::Types::Number::Number') {
-                warn "[WARN] Time.new(): invalid argument: not a number!\n";
-                return;
+        if (defined($sec)) {
+            if ((my $ref = ref($sec)) ne '') {
+                if ($ref eq 'Sidef::Types::Number::Number') {
+                    $sec = $sec->get_value;
+                }
+                else {
+                    warn "[WARN] Time.new(): invalid argument: expected a number, but got '", ref($sec), "'\n";
+                    return;
+                }
             }
-
-            $sec = $$sec;
+            elsif ($sec eq '__INIT__') {
+                undef $sec;
+            }
         }
-
-        $sec //= time;
+        else {
+            $sec = time;
+        }
 
         bless \$sec, __PACKAGE__;
     }
 
+    sub get_value {
+        ${$_[0]} // CORE::time;
+    }
+
     sub time {
         my ($self) = @_;
-        Sidef::Types::Number::Number->new($$self);
+        Sidef::Types::Number::Number->new($self->get_value);
     }
 
     sub timeNow {
@@ -48,7 +58,7 @@ package Sidef::Time::Time {
 
     sub localtime {
         my ($self) = @_;
-        Sidef::Time::Localtime->new($$self);
+        Sidef::Time::Localtime->new($self->get_value);
     }
 
     *local     = \&localtime;
@@ -56,7 +66,7 @@ package Sidef::Time::Time {
 
     sub gmtime {
         my ($self) = @_;
-        Sidef::Time::Gmtime->new($$self);
+        Sidef::Time::Gmtime->new($self->get_value);
     }
 
     *gmTime = \&gmtime;

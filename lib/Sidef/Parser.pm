@@ -115,7 +115,7 @@ package Sidef::Parser {
                           re  => qr/\GBytes\b/,
                          },
                          {
-                          sub => sub { Sidef::Time::Time->new },
+                          sub => sub { Sidef::Time::Time->new('__INIT__') },
                           re  => qr/\GTime\b/,
                          },
                          {
