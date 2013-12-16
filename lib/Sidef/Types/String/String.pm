@@ -33,6 +33,8 @@ package Sidef::Types::String::String {
         Sidef::Types::Array::Array->new(map { $self->new($_) } unpack "(a$strlen)*", $$self);
     }
 
+    *divide = \&div;
+
     sub lt {
         my ($self, $string) = @_;
         $self->_is_string($string) || return;
@@ -172,11 +174,6 @@ package Sidef::Types::String::String {
         $self->new(CORE::lcfirst $$self);
     }
 
-    sub tclc {
-        my ($self) = @_;
-        $self->new(CORE::ucfirst(CORE::lc($$self)));
-    }
-
     sub charAt {
         my ($self, $pos) = @_;
         $self->_is_number($pos) || return;
@@ -205,6 +202,8 @@ package Sidef::Types::String::String {
         my ($self) = @_;
         $self->new(CORE::ucfirst(CORE::lc($$self)));
     }
+
+    *tclc = \&capitalize;
 
     sub chop {
         my ($self) = @_;
@@ -253,7 +252,7 @@ package Sidef::Types::String::String {
         __PACKAGE__->new(CORE::join('', grep { defined } @str[$offs .. $len]));
     }
 
-    *ft = \&substr;
+    *ft        = \&substr;
     *substring = \&substr;
 
     sub insert {
@@ -418,6 +417,11 @@ package Sidef::Types::String::String {
         my ($self, $obj) = @_;
         $self->_is_code($obj) || return;
         $obj->for(Sidef::Types::Array::Array->new(map { $self->new($_) } split(//, $$self)));
+    }
+
+    sub trim {
+        my ($self) = @_;
+        $self->new(unpack('A*', $$self) =~ s/^\s+//r);
     }
 
     sub translit {
