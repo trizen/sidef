@@ -18,7 +18,11 @@ package Sidef::Types::Block::Code {
 
     sub get_value {
         my ($self) = @_;
-        sub { $self->call(@_) };
+        sub {
+            if (defined($a) || defined($b)) { push @_, $a, $b }
+            elsif (defined($_)) { push @_, $_ }
+            $self->call(@_);
+        };
     }
 
     {

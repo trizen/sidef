@@ -15,6 +15,43 @@ package Sidef::Module::Func {
         return;
     }
 
+    sub __locate {
+        my ($self, $name) = @_;
+
+        no strict 'refs';
+        my $mod_space = \%{$self->{module} . '::'};
+
+        if (exists $mod_space->{$name}) {
+            return $self->{module} . '::' . $name;
+        }
+
+        return;
+    }
+
+    sub _var {
+        my ($self, $name) = @_;
+
+        if (defined(my $type = $self->__locate($name))) {
+            no strict 'refs';
+            return ${$type};
+        }
+
+        warn qq{[WARN] Variable '$name' is not exported by module: "$self->{module}"!\n};
+        return;
+    }
+
+    sub _arr {
+        my ($self, $name) = @_;
+
+        if (defined(my $type = $self->__locate($name))) {
+            no strict 'refs';
+            return Sidef::Types::Array::Array->new(@{$type});
+        }
+
+        warn qq{[WARN] Array '$name' is not exported by module: "$self->{module}"!\n};
+        return;
+    }
+
     sub AUTOLOAD {
         my ($self, @arg) = @_;
 

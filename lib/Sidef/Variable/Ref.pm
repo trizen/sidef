@@ -12,7 +12,7 @@ package Sidef::Variable::Ref {
     {
         no strict 'refs';
 
-        *{__PACKAGE__ . '::' . '\\'} = sub {
+        *{__PACKAGE__ . '::' . '\\'} = *{__PACKAGE__ . '::' . '&'} = sub {
             my ($self, $var) = @_;
 
             if (ref $var eq 'Sidef::Variable::Variable') {

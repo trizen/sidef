@@ -1,0 +1,13 @@
+#!/usr/bin/ruby
+
+var f    = (require 'File::Find'->());  # functional module
+var spec = (require 'File::Spec');      # OO module
+
+var dir = spec.rel2abs(spec.curdir);
+
+f.find(
+    func (file) {
+      var absname = f._var('name');
+      "%-40s%s\n".printf(file, absname);
+    } => dir
+);

@@ -6,7 +6,6 @@ package Sidef::Parser {
     use warnings;
 
     require File::Spec;
-    #require Sidef::Init;
 
     our $DEBUG = 0;
 
@@ -283,7 +282,7 @@ package Sidef::Parser {
                 },
                 {
                  sub     => sub { Sidef::Variable::Ref->new() },
-                 re      => qr/\G(?=[*\\])/,
+                 re      => qr/\G(?=[*\\&])/,
                  dynamic => 1,
                 },
             ],
@@ -495,13 +494,13 @@ package Sidef::Parser {
           » «
           ‹ ›
           › ‹
-         「 」
-         『 』
+          「 」
+          『 』
           „ ”
           “ ”
           ‘ ’
           ‚ ’
-    ~;
+          ~;
 
         sub get_quoted_words {
             my ($self, %opt) = @_;
