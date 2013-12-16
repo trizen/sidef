@@ -207,7 +207,7 @@ else {
         my $struct = $parser->parse_script(code => $code);
 
         if ($args{D}) {
-            eval 'use Data::Dump';
+            eval { require Data::Dump };
 
             if ($@) {
                 die "Data::Dump module is not installed!\n";
@@ -224,7 +224,7 @@ else {
             }
         }
         elsif ($args{c}) {
-            eval 'use Data::Dump';
+            eval { require Data::Dump };
 
             if ($@) {
                 die "Data::Dump module is not installed!\n";
