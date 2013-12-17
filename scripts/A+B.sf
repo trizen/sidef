@@ -14,4 +14,4 @@ __END__
 ## Simpler
 #
 
-Sys.println(STDIN.readline.split.map{_.toNum}->sum);
+Sys.println(STDIN.readline.split.map{_.toNum}.sum);

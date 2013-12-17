@@ -2,17 +2,13 @@
 
 # Translation of: http://rosettacode.org/wiki/Accumulator_factory#Perl
 
-func accumulator () {
-    var sum = _.shift;
-    func (num) { sum += num }
+class Accumulator (sum) {
+    func acc (self, num) {
+        self.sum(self.sum + num);
+    }
 }
 
-for (var i = 0; i < 5; i++) {
-
-    var x = (accumulator(i));
-
-    x.call(5)   == (5+i)     || ("Error!".die);
-    x.call(2.3) == (5+i+2.3) || ("Error!".die);
-}
-
-"Test passed!".say;
+var x = Accumulator(1);
+x.acc(5);
+say Accumulator(3);       # prints: Sidef::Variable::Class=HASH(0xa1799f8)
+say x.acc(2.3);           # prints: 8.3

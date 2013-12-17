@@ -24,7 +24,7 @@ var array = Sys.eval(<<'EOT');
 
     sub factorial {
         my ($n) = @_;
-        return $n if $n <= 1;
+        return 1 if $n <= 1;
         push @factorials, $n * factorial($n - 1);
         $factorials[-1];
     }
