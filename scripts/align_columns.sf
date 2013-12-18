@@ -2,36 +2,38 @@
 
 # Translation of: http://rosettacode.org/wiki/Align_columns#Go
 
-func newFormatter (text) {
+func newFormatter (input) {
 
-    var f = (:(
-        'text'  => [],
-        'width' => [],
-    ));
+    # Private class with two var-methods
+    class Formatter(text, width) {};
 
-    for (text.split("\n")) {
+    var textArr = [];
+    var widthArr = [];
 
-        var words = (_.split('$'));
-        f['text'].append(words);
+    for (input.split("\n")) { |line|
+
+        var words = line.split('$');
+        textArr.append(words);
 
         for (words.each) { |i, word|
-            if (i == (f['width'].len)) {
-                f['width'].append(word.len);
+            if (i == widthArr.len) {
+                widthArr.append(word.len);
             }
-            elsif (word.len > f['width'][i]) {
-                f['width'][i] = (word.len);
+            elsif (word.len > widthArr[i]) {
+                widthArr[i] = word.len;
             }
         }
     }
 
-    return(f);
+    return Formatter(textArr, widthArr);
 }
 
-func output (f,j) {
-   for (f['text'].range) {
-        for (f['text'][_].each) { |i, word|
-            "%-*s ".printf(f['width'][i], "%*s".sprintf(
-                word.len+((f['width'][i] - (word.len))*j/2), word)
+func output (f, j) {
+   for (f.text) { |row|
+        for (row.each) { |i, word|
+            "%-*s ".printf((f.width)[i], "%*s".sprintf(
+                    word.len+(((f.width)[i] - (word.len))*j/2), word
+                )
             );
         };
         ''.say;
@@ -40,15 +42,17 @@ func output (f,j) {
 }
 
 {
-    const (left, middle, right) = (0..2->...);
-    const text = q{Given$a$text$file$of$many$lines,$where$fields$within$a$line$
+    const (left, middle, right) = (0..2->toList);
+    const text = <<'EOT';
+Given$a$text$file$of$many$lines,$where$fields$within$a$line$
 are$delineated$by$a$single$'dollar'$character,$write$a$program
 that$aligns$each$column$of$fields$by$ensuring$that$words$in$each$
 column$are$separated$by$at$least$one$space.
 Further,$allow$for$each$word$in$a$column$to$be$either$left$
-justified,$right$justified,$or$center$justified$within$its$column.};
+justified,$right$justified,$or$center$justified$within$its$column.
+EOT
 
-    var f = (newFormatter(text));
+    var f = newFormatter(text);
 
     output(f, left);
     output(f, middle);
