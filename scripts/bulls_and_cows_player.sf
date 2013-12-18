@@ -38,9 +38,9 @@ func score_correct(a, b, bulls, cows) {
     var exact = (a ^ b -> split(1).count("\0"));
 
     var loose = 0;
-    for (b.split(1) => \var c) {
-        a.contains(c) && loose++;
-    }
+    b.each { |c|
+       a.contains(c) && loose++;
+    };
 
     bulls == exact && (cows == loose-exact);
 }

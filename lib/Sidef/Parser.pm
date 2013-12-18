@@ -1358,6 +1358,7 @@ package Sidef::Parser {
             if (
                    (ref($obj) eq 'Sidef::Variable::Variable' and $obj->{type} eq 'func')
                 || (ref($obj) eq 'Sidef::Variable::ClassInit')
+                || (ref($obj) eq 'Sidef::Types::Block::Code')
 
                 and /\G\h*(?=\()/gc
               ) {
