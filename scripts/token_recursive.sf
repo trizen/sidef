@@ -4,34 +4,20 @@
 ## Block recursion via __BLOCK__
 #
 
-if ("string".uc == "STRING") {
-
-    "if block".say;
-
-    var x := 3;
-    x -= 1 >= 0 && (__BLOCK__.run);
-
-}
+{ |n|
+    n > 1 ? (__BLOCK__(n-1) * n)
+          : 1;
+}(5).to_s.say;
 
 
 #
 ## Function recursion via __FUNC__
 #
 
-func hello (name) {
-
-    "Beg of func: %s\n".printf(name);
-
-    var x := 3;
-    while (x -= 1 >= 0) {
-        __FUNC__.call("recurse %d".sprintf(x));
-    }
-
-    "End of func: " + name -> say;
-}
-
-hello("hello");
-
+func (n) {
+    n > 1 ? (__FUNC__(n-2) + __FUNC__(n-1))
+          : (n);
+}(8).to_s.say;
 
 
 __END__

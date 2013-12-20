@@ -162,7 +162,7 @@ package Sidef::Types::Glob::FileHandle {
         my ($self, $code) = @_;
         $self->_is_code($code) || return;
 
-        my $var_ref = ($code->_get_private_var)[0]->get_var;
+        my ($var_ref) = $code->init_block_vars();
         while (defined(my $line = CORE::readline($self->{fh}))) {
             $var_ref->set_value(Sidef::Types::String::String->new($line));
             if (defined(my $res = $code->_run_code)) {

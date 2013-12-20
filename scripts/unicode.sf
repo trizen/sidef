@@ -10,7 +10,7 @@ var îșțh = "- Șe t©t fași băi?
 
 '-' * 80 say;
 
-char chars = îșțh;
+var chars = îșțh.to_chars;
 chars->join("_")->say;
 
 #######################################################
@@ -26,7 +26,7 @@ var b = ('c'->ord);
 
 '-' * 80 -> say;
 
-byte bytes = "Șarpe";   # splits on bytes!
+var bytes = "Șarpe".to_bytes;   # splits on bytes!
 
 bytes.join.say;
 "The character 'Ș' is composed of two bytes: " + (bytes[0,1]->to_s)->say;
@@ -44,7 +44,7 @@ bytes.join.say;   # prints: 'Țarpe'
 
 '-' * 80 -> say;
 
-char sidef = "șopârlă";     # splits on characters!
+var sidef = "șopârlă".to_chars;     # splits on characters!
 sidef.join('-').say;
 sidef[1]->say;
 sidef[2]->say;
@@ -61,12 +61,12 @@ sidef[6]->say;
 
 '-' * 80 say;
 
-char chinese_chars = "文化交流学院";
+var chinese_chars = "文化交流学院".to_chars;
 chinese_chars.join(" . ").say;
 
 '-' * 80 say;
 
-byte chinese_bytes = (chinese_chars.join(''));
+var chinese_bytes = chinese_chars.join('').to_bytes;
 chinese_bytes.join.say;
 "Is composed from %d bytes.\n"->printf(chinese_bytes.len);
 

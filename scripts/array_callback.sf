@@ -11,12 +11,12 @@ func mycallback (i) {
 }
 
 # using the array's indices
-for (a.range => \var i) {
+for (a.range) { |i|
     "mycallback(%d) = %d\n".printf(a[i], mycallback(a[i]));
 }
 
 # using the array's items
-foreach ((a) => \var item) {
+foreach a { |item|
     "mycallback(%d) = %d\n".printf(item, mycallback(item));
 }
 
@@ -39,3 +39,6 @@ a.map { f.call(_) } ==  [2, 4, 6, 8, 10]
 # filter an array
 a.grep { _ % 2 == 0 } == [2, 4]
     || ("grep() error!".die);
+
+
+say "** Test passed! **";

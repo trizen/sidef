@@ -4,7 +4,7 @@
 
 func encode (str) {
 
-    char input = str;
+    var input = str.to_chars;
     var encoding = [];
 
     var count = 1;

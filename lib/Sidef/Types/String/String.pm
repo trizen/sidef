@@ -454,8 +454,8 @@ package Sidef::Types::String::String {
             if (defined($code)) {
                 push @warnings, __PACKAGE__->new($@);
                 $self->_is_code($code) || return;
-                my $var = ($code->_get_private_var)[0]->get_var;
-                $var->set_value(Sidef::Types::Array::Array->new(@warnings));
+                my ($var_ref) = $code->init_block_vars();
+                $var_ref->set_value(Sidef::Types::Array::Array->new(@warnings));
                 $code->run;
             }
 
@@ -479,8 +479,8 @@ package Sidef::Types::String::String {
             if (defined($code)) {
                 push @warnings, __PACKAGE__->new($@);
                 $self->_is_code($code) || return;
-                my $var = ($code->_get_private_var)[0]->get_var;
-                $var->set_value(Sidef::Types::Array::Array->new(@warnings));
+                my ($var_ref) = $code->init_block_vars();
+                $var_ref->set_value(Sidef::Types::Array::Array->new(@warnings));
                 $code->run;
             }
 

@@ -7,7 +7,7 @@ class Lingua::RO::Numbers () {
 
 __USE_BIGNUM__
 
-var DIGITS = Hash.new;
+static DIGITS = Hash.new;
 DIGITS['0'..'19'] = qw„
   zero unu doi trei patru cinci șase șapte opt nouă zece
   unsprezece
@@ -23,7 +23,7 @@ DIGITS['0'..'19'] = qw„
 
 # See: http://ro.wikipedia.org/wiki/Sistem_zecimal#Denumiri_ale_numerelor
 
-var BIGNUMS = (
+static BIGNUMS = (
             [
                 [ 10**2,        'sută',         'sute',  true],
                 [ 10**3,         'mie',          'mii',  true],
@@ -41,7 +41,7 @@ var BIGNUMS = (
             }
 );
 
-var opts = :(
+static opts = :(
             diacritics            => true,
             invalid_number        => nil,
             negative_sign         => 'minus',
@@ -149,7 +149,7 @@ func _number_to_ro (number) {
 
 func number_to_ro (self, num) {
 
-    var conf = _.to_hash;
+    var conf = _.toHash;
     while (var kv = (conf.each)) {
         opts.exists(kv[0]) || (
             "[%s] Invalid option: <%s>\n".sprintf(__CLASS__, kv[0]).warn;
@@ -158,7 +158,7 @@ func number_to_ro (self, num) {
         opts[kv[0]] = kv[1];
     }
 
-    var word = (_number_to_ro(num).join(" "));
+    static word = _number_to_ro(num).join(" ");
 
     if (!opts['diacritics']) {
 

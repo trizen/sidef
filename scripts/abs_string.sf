@@ -15,7 +15,7 @@ func abs_str (str) {
         );
     }
 
-    for (str.split('') => \var c) {
+    for (str.split('')) { |c|
 
         switch (c)
             when ('{') do {
@@ -48,7 +48,7 @@ var strings = [
         "perl-{script-{test,meta}},flash-player",
 ];
 
-for (strings => \var str) {
-    var array = (abs_str(str));
+for (strings) { |str|
+    var array = abs_str(str);
     "%-25s" * 3 + "\n" -> printf(array[0..2]->as_list);
 }

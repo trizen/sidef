@@ -8,6 +8,6 @@ var dir = spec.rel2abs(spec.curdir);
 f.find(
     func (file) {
       var absname = f._var('name');
-      "%-40s%s\n".printf(file, absname);
+      "%-40s%s\n".printf(file[0], absname);
     } => dir
 );

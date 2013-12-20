@@ -4,9 +4,9 @@
 
 func roman2arabic (roman) {
 
-    var romanArr = (roman.uc.split(''));
+    var romanArr = roman.uc.split('');
 
-    var lookup := (:(
+    static lookup := :(
         I =>    1,
         V =>    5,
         X =>   10,
@@ -14,7 +14,7 @@ func roman2arabic (roman) {
         C =>  100,
         D =>  500,
         M => 1000,
-    ));
+    );
 
     var num = 0;
 

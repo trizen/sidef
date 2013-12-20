@@ -3,10 +3,6 @@
 var arr = (1..10 map{10 rand.int});
 var arc = (arr.map{|i|i});
 
-arr.sort { |a,b| b <=> a} == (
-arr.sort { _[1] <=> _[0] }
-) || ("sort error".die);
-
 arr.grep {|n| n > 3} == (
 arr.grep { _ > 3 }
 ) || ("grep error".die);

@@ -4,33 +4,27 @@ package Sidef::Variable::Init {
     use strict;
     use warnings;
 
-    our $AUTOLOAD;
-
     sub new {
         my (undef, @vars) = @_;
         bless {vars => \@vars}, __PACKAGE__;
     }
 
-    sub DESTROY {
-        return;
-    }
-
-    sub AUTOLOAD {
+    sub set_value {
         my ($self, @args) = @_;
 
-        my ($method) = ($AUTOLOAD =~ /^.*[^:]::(.*)$/);
-
         my @results;
-        if (@{$self->{vars}} && ($self->{vars}[0]->can($method) || $self->{vars}[0]->can('AUTOLOAD'))) {
-            foreach my $var (@{$self->{vars}}) {
-                push @results, $var->$method(shift @args);
-            }
-        }
-        else {
-            warn sprintf(qq{Can't locate object method "%s" for object "%s"\n}, $method, ref($self->{vars}[0]));
+        foreach my $var (@{$self->{vars}}) {
+            push @results, $args[0];
+            my $new_var = Sidef::Variable::Variable->new($var->{name}, $var->{type}, shift @args);
+            push @{$var->{stack}}, $new_var;
         }
 
         $results[0];
+    }
+
+    {
+        no strict 'refs';
+        *{__PACKAGE__ . '::' . '='} = \&set_value;
     }
 
 };

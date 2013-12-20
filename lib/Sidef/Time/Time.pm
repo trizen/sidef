@@ -37,6 +37,8 @@ package Sidef::Time::Time {
         Sidef::Types::Number::Number->new($self->get_value);
     }
 
+    *sec = \&time;
+
     sub timeNow {
         Sidef::Types::Number::Number->new(CORE::time);
     }

@@ -3,7 +3,7 @@
 # Translation of: http://rosettacode.org/wiki/Best_shuffle#Perl
 
 func score(original_word, new_word) {
-    var result = 0;
+    static result = 0;
 
     for (original_word.range) {
         original_word[_] == new_word[_] && (

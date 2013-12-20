@@ -3,7 +3,7 @@
 # http://rosettacode.org/wiki/Run-length_encoding
 
 func encode (str) {
-    char chars = str;
+    var chars = str.to_chars;
 
     var i = 0;
     var lc = '';
@@ -28,7 +28,7 @@ func encode (str) {
 }
 
 func decode (str) {
-    char chars = str;
+    var chars = str.to_chars;
 
     var acc = '';
     var output = '';

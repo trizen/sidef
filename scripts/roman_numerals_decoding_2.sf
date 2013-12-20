@@ -7,7 +7,7 @@ func roman2arabic(roman) {
     var arabic = 0;
     var last_digit = 1000;
 
-    var m := (:(
+    static m := :(
         I =>    1,
         V =>    5,
         X =>   10,
@@ -15,7 +15,7 @@ func roman2arabic(roman) {
         C =>  100,
         D =>  500,
         M => 1000,
-    ));
+    );
 
     for (roman.uc.split('').map{m[_]} => \var digit) {
 

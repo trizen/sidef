@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
-var code = {
-    var words = (_.map{Str.new(_)});
+var code = { |arr|
+    var words = (arr.map{Str.new(_)});
 
     var chr = words[0][-1];
     for (words.ft(1)) { |word|

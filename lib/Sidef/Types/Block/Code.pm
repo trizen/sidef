@@ -4,6 +4,7 @@ package Sidef::Types::Block::Code {
     use strict;
     use warnings;
 
+    use List::Util qw(max);
     no warnings 'recursion';
 
     our @ISA = qw(Sidef);
@@ -12,8 +13,12 @@ package Sidef::Types::Block::Code {
     my $exec = Sidef::Exec->new();
 
     sub new {
-        my (undef, $code) = @_;
-        bless $code, __PACKAGE__;
+        $#_ == 1
+          ? (bless {code => $_[1]}, __PACKAGE__)
+          : do {
+            my (undef, %hash) = @_;
+            bless \%hash, __PACKAGE__;
+          };
     }
 
     sub get_value {
@@ -21,7 +26,7 @@ package Sidef::Types::Block::Code {
         sub {
             if (defined($a) || defined($b)) { push @_, $a, $b }
             elsif (defined($_)) { push @_, $_ }
-            $self->call(@_);
+            $self->call(Sidef::Types::Array::Array->new(@_));
         };
     }
 
@@ -45,7 +50,7 @@ package Sidef::Types::Block::Code {
     sub repeat {
         my ($self, $num) = @_;
 
-        my $var = ($self->_get_private_var)[0]->get_var;
+        my ($var) = $self->init_block_vars();
 
         foreach my $i (1 .. (defined($num) ? $self->_is_number($num) ? ($$num) : return : (1))) {
             $var->set_value(Sidef::Types::Number::Number->new($i));
@@ -60,7 +65,7 @@ package Sidef::Types::Block::Code {
 
     sub to_hash {
         my ($self) = @_;
-        my @results = $exec->execute($self);
+        my @results = $exec->execute($self->{code});
         shift @results;    # ignore the block private variable (_)
         Sidef::Types::Hash::Hash->new(@results);
     }
@@ -69,7 +74,7 @@ package Sidef::Types::Block::Code {
 
     sub to_array {
         my ($self) = @_;
-        my @results = $exec->execute($self);
+        my @results = $exec->execute($self->{code});
         shift @results;    # ignore the block private variable (_)
         Sidef::Types::Array::Array->new(@results);
     }
@@ -84,22 +89,16 @@ package Sidef::Types::Block::Code {
           :                                                 ();
     }
 
-    sub _get_private_var {
-        my ($self) = @_;
-
-        my ($class) = keys %{$self};
-        $exec->execute_expr($self->{$class}[0], $class), $class;
-    }
-
     sub run {
         my ($self) = @_;
-        my @results = $exec->execute($self);
+        my @results = $exec->execute($self->{code});
+        $self->pop_stack();
         return $results[-1];
     }
 
     sub exec {
         my ($self) = @_;
-        $exec->execute($self);
+        $exec->execute($self->{code});
         $self;
     }
 
@@ -119,24 +118,47 @@ package Sidef::Types::Block::Code {
         $self;
     }
 
+    sub init_block_vars {
+        my ($self, @args) = @_;
+
+        my $last = $#{$self->{init_vars}};
+        while (my ($i, $var) = each @{$self->{init_vars}}) {
+            $i == $last
+              ? $var->set_value(Sidef::Types::Array::Array->new(@args[$i .. $#args]))
+              : $var->set_value($args[$i]);
+        }
+
+        return $last == 0 ? @{$self->{init_vars}} : @{$self->{init_vars}}[0 .. $last - 1];
+    }
+
+    sub pop_stack {
+        my ($self) = @_;
+
+        my @stack_vars = grep { exists $_->{stack} } @{$self->{vars}};
+        my $max_depth = max(map { $#{$_->{stack}} } @stack_vars);
+
+        foreach my $var (@stack_vars) {
+            if ($#{$var->{stack}} == $max_depth) {
+                pop $var->{stack};
+            }
+        }
+    }
+
     sub call {
         my ($self, @args) = @_;
 
         my $result;
+        $self->init_block_vars(@args);
 
-        foreach my $class (keys %{$self}) {
-
-            my ($var_ref) = $self->_get_private_var();
-            $var_ref->get_var->set_value(Sidef::Types::Array::Array->new(@args));
-
-            my $obj = $self->run;
-
-            if (ref $obj eq 'Sidef::Types::Block::Return') {
-                return $obj->{obj};
-            }
-            else {
-                $result = $obj;
-            }
+        my $obj = $self->run;
+        if (ref $obj eq 'Sidef::Types::Block::Return') {
+            $result = $obj->{obj};
+        }
+        elsif (ref $obj eq 'Sidef::Variable::Variable') {
+            $result = $obj->get_value;
+        }
+        else {
+            $result = $obj;
         }
 
         return $result;
@@ -161,13 +183,29 @@ package Sidef::Types::Block::Code {
         my ($self, $arg, $var) = @_;
 
         if ($self->_is_array($arg, 1, 1)) {
-            my $var_ref = ref($var) eq 'Sidef::Variable::Ref' ? $var->get_var : ($self->_get_private_var)[0]->get_var;
+
+            my (@vars) = (
+                          ref($var) eq 'Sidef::Variable::Ref'
+                          ? $var->get_var
+                          : $self->init_block_vars()
+                         );
+            my $multi_vars = $#vars > 0;
 
             foreach my $item (@{$arg}) {
-                $var_ref->set_value($item->get_value);
+
+                if ($multi_vars) {
+                    foreach my $i (0 .. $#vars) {
+                        $vars[$i]->set_value($item->get_value->[$i]->get_value);
+                    }
+                }
+                else {
+                    $vars[0]->set_value($item->get_value);
+                }
+
                 if (defined(my $res = $self->_run_code)) {
                     return $res;
                 }
+
             }
         }
         elsif (ref $arg eq 'HASH') {

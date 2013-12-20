@@ -26,8 +26,7 @@ package Sidef::Variable::Variable {
 
     sub is_defined {
         my ($self) = @_;
-        defined $self->{value}
-          and ref($self->{value}) ne 'Sidef::Types::Nil::Nil';
+        Sidef::Types::Bool::Bool->new(defined $self->{value} and ref($self->{value}) ne 'Sidef::Types::Nil::Nil');
     }
 
     sub _get_name {
@@ -35,15 +34,33 @@ package Sidef::Variable::Variable {
     }
 
     sub set_value {
-        $_[0]{value} = $_[1];
+        my ($self, $obj) = @_;
+
+        if (exists $self->{stack}) {
+            $self = $self->{stack}[-1];
+        }
+
+        $self->{value} = $obj;
+
+        #$_[0]{value} = $_[1];
     }
 
     sub get_value {
-        $_[0]{value};
+        my ($self) = @_;
+
+        if (exists $self->{stack}) {
+            $self = $self->{stack}[-1];
+        }
+
+        $self->{value};
     }
 
     sub get_type {
-        $_[0]{type};
+        my ($self) = @_;
+        if (exists $self->{stack}) {
+            $self = $self->{stack}[-1];
+        }
+        $self->{type};
     }
 
     {
@@ -54,7 +71,7 @@ package Sidef::Variable::Variable {
 
             $#_ > 1 && ($obj = $_[-1]);
 
-            if ($self->{type} eq "var") {
+            if ($self->{type} eq "var" or $self->{type} eq "static") {
                 return $self->set_value($obj);
             }
             elsif ($self->{type} eq "const") {
@@ -244,6 +261,7 @@ package Sidef::Variable::Variable {
 
         return;
     }
+
 };
 
 1;

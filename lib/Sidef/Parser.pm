@@ -328,8 +328,6 @@ package Sidef::Parser {
                   my
                   var
                   const
-                  byte
-                  char
                   func
                   class
 
@@ -774,7 +772,7 @@ package Sidef::Parser {
                 }
 
                 # Declaration of variable types
-                if (/\G(var|char|byte|const)\b\h*/sgc) {
+                if (/\G(var|static|const)\b\h*/sgc) {
                     my $type = $1;
 
                     my $names =
@@ -817,6 +815,10 @@ package Sidef::Parser {
                             type  => $type,
                             line  => $self->{line},
                           };
+                    }
+
+                    if ($type eq 'static') {
+                        return $var_objs[0], pos;
                     }
 
                     return Sidef::Variable::Init->new(@var_objs), pos;
@@ -889,7 +891,7 @@ package Sidef::Parser {
                         # Check the declared parameters
                         if (/\G\h*(?:\(\h*)?$self->{re}{vars}(?:\h*\))?\h*\{/goc) {
 
-                            my $params = join('', map { "my $_;$_=_.shift;" } split(/\h*,\h*/, $1));
+                            my $params = '|' . $1 . '|';
                             local $self->{current_function} = $variable;
                             my ($obj, $pos) = $self->parse_block(code => '{' . $params . substr($_, pos));
                             pos($_) += $pos - (length($params) + 1);
@@ -1270,14 +1272,32 @@ package Sidef::Parser {
                     pos($_) += $pos;
                 }
 
-                my @vars = split(/\h*,\h*/, /\G\|\h*$self->{re}{vars}\h*\|/gc ? ($1) : ('_'));
+                my @vars = (split(/\h*,\h*/, /\G\|\h*$self->{re}{vars}\h*\|/gc ? $1 : ('')), '_');
 
-                my $header =
-                  @vars == 1
-                  ? "\\var $vars[0];"
-                  : '\\var _;' . 'var(' . join(',', @vars) . ')=_...;';
+                my @block_vars;
+                foreach my $variable (@vars) {
 
-                my ($obj, $pos) = $self->parse_script(code => $header . substr($_, pos));
+                    my $var_obj = Sidef::Variable::Variable->new($variable, 'var');
+                    push @block_vars, $var_obj;
+
+                    unshift @{$self->{vars}{$self->{class}}},
+                      {
+                        obj   => $var_obj,
+                        name  => $variable,
+                        count => 0,
+                        type  => 'var',
+                        line  => $self->{line},
+                        block => 1,
+                      };
+                }
+
+                my ($obj, $pos) = $self->parse_script(code => substr($_, pos));
+
+                $block->{vars} = [map  { $_->{obj} }
+                                  grep { ref($_) eq 'HASH' } @{$self->{vars}{$self->{class}}}
+                                 ];
+
+                $block->{init_vars} = [map { Sidef::Variable::Init->new($_) } @block_vars];
 
                 $pos // $self->fatal_error(
                                            code  => $_,
@@ -1285,11 +1305,11 @@ package Sidef::Parser {
                                            error => "unbalanced curly brackets",
                                           );
 
-                %{$block} = %{$obj};
+                $block->{code} = $obj;
                 splice @{$self->{ref_vars_refs}{$self->{class}}}, 0, $count;
                 $self->{vars}{$self->{class}} = $ref;
 
-                return $block, pos($_) + $pos - length($header);
+                return $block, pos($_) + $pos;
             }
         }
     }

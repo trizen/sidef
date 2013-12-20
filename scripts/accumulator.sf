@@ -5,7 +5,7 @@
 #
 
 var accumulator = {
-    var sum = 5;
+    static sum = 5;
     { sum += (sum/2) };
 };
 

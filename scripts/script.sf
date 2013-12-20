@@ -240,7 +240,7 @@ range_array->reverse->join(', ') + ". BOOM!"->say;
 
 '-' * 80 -> say;
 
-var defined = "original";
+static defined = "original";
 defined := "modified";
 
 defined->say;
@@ -254,7 +254,7 @@ defined->say;
 
 '-' * 80 -> say;
 
-char chars = "sidef";
+var chars = "sidef".to_chars;
 "Number of chars: " + (chars->len->to_s)->say;
 chars->to_s->say;
 

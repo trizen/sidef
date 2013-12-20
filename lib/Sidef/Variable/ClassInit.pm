@@ -27,7 +27,7 @@ package Sidef::Variable::ClassInit {
         $self->{__BLOCK__}->run;
 
         # I don't like this, but... it works!
-        foreach my $function (@{$self->{__BLOCK__}{$self->{name}}}) {
+        foreach my $function (@{$self->{__BLOCK__}{code}{$self->{name}}}) {
             if (    ref $function eq 'HASH'
                 and ref(my $func = $function->{self}{$self->{name}}[0]{self}) eq 'Sidef::Variable::Variable') {
                 if ($func->{type} eq 'func') {

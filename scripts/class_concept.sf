@@ -3,7 +3,7 @@
 # Test class
 class Test (name) {
 
-    var prefix = '=>> ';
+    static prefix = '=>> ';
 
     func get_name (self) {
         prefix + self.name;

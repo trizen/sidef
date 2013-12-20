@@ -9,7 +9,7 @@ func encipher (msg, key, decode) {
         };
 };
 
-char msg = 'SIDEF';
+var msg = 'SIDEF'.to_chars;
 
 var enc = ( encipher(msg, 10, false) );
 var dec = ( encipher(enc, 10, true)  );

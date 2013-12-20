@@ -2,8 +2,10 @@
 
 # http://rosettacode.org/wiki/Functional_Composition
 
-func compose {
-    |f,g| func(n){f.call(g.call(n))}
+func compose (f, g) {
+    static x = f;
+    static y = g;
+    func(n){x.call(y.call(n))}
 }
 
 func f(n) {

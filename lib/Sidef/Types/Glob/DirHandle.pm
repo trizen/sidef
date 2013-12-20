@@ -72,7 +72,7 @@ package Sidef::Types::Glob::DirHandle {
         my ($self, $code) = @_;
         $self->_is_code($code) || return;
 
-        my $var_ref = ($code->_get_private_var)[0]->get_var;
+        my ($var_ref) = $code->init_block_vars();
         while (defined(my $file = CORE::readdir($self->{dir_h}))) {
             $var_ref->set_value(Sidef::Types::String::String->new($file));
             if (defined(my $res = $code->_run_code)) {

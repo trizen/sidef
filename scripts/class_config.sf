@@ -3,8 +3,7 @@
 # Test class
 class Test (opts) {
 
-    func config (self) {
-        var args = _.toHash;
+    func config (self, args) {
 
         self.opts(:(
                 min  => 5,
@@ -32,28 +31,28 @@ func main () {
     var obj_1 = Test.new;
 
     # Configure the class values
-    obj_1.config(
+    obj_1.config(:(
             min => 10,
             max => 100,
             name => "Sidef",
-    );
+    ));
 
     # Init again the same class
     var obj_2 = Test.new;
 
     # Configure the class values:
     #   change name, but keep the other defaults
-    obj_2.config(
+    obj_2.config(:(
             name => "Test",
-    );
+    ));
 
     say obj_1.get_name;     # prints "Sidef"
     say obj_2.get_name;     # prints "Test"
 
     # Change a class value
-    obj_2.config(
+    obj_2.config(:(
             name => "Classes",
-    );
+    ));
 
     say obj_1.get_name;     # prints "Sidef"
     say obj_2.get_name;     # prints "Classes"
