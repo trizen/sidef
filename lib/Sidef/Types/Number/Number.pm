@@ -94,6 +94,8 @@ package Sidef::Types::Number::Number {
         Sidef::Types::Bool::Bool->new($$self == $$num);
     }
 
+    *equals = \&eq;
+
     sub ne {
         my ($self, $num) = @_;
         ref($self) ne ref($num) and return Sidef::Types::Bool::Bool->true;
@@ -104,6 +106,12 @@ package Sidef::Types::Number::Number {
         my ($self, $num) = @_;
         $self->_is_number($num) || return;
         __PACKAGE__->new($$self->bcmp($$num));
+    }
+
+    sub acmp {
+        my ($self, $num) = @_;
+        $self->_is_number($num) || return;
+        __PACKAGE__->new($$self->bacmp($$num));
     }
 
     sub ge {
@@ -192,7 +200,7 @@ package Sidef::Types::Number::Number {
 
     sub sqrt {
         my ($self) = @_;
-        $self->new(CORE::sqrt $$self);
+        $self->new(CORE::sqrt($$self));
     }
 
     sub root {
@@ -203,8 +211,11 @@ package Sidef::Types::Number::Number {
 
     sub abs {
         my ($self) = @_;
-        $self->new(CORE::abs $$self);
+        $self->new(CORE::abs($$self));
     }
+
+    *pos      = \&abs;
+    *positive = \&abs;
 
     sub hex {
         my ($self) = @_;
@@ -218,7 +229,7 @@ package Sidef::Types::Number::Number {
 
     sub exp {
         my ($self) = @_;
-        $self->new(CORE::exp $$self);
+        $self->new(CORE::exp($$self));
     }
 
     sub int {
@@ -230,12 +241,12 @@ package Sidef::Types::Number::Number {
 
     sub cos {
         my ($self) = @_;
-        $self->new(CORE::cos $$self);
+        $self->new(CORE::cos($$self));
     }
 
     sub sin {
         my ($self) = @_;
-        $self->new(CORE::sin $$self);
+        $self->new(CORE::sin($$self));
     }
 
     sub log {
@@ -264,18 +275,6 @@ package Sidef::Types::Number::Number {
     }
 
     *negate = \&neg;
-
-    sub pos {
-        my ($self) = @_;
-
-        if ($self->is_negative) {
-            return $self->neg;
-        }
-
-        $self;
-    }
-
-    *positive = \&pos;
 
     sub not {
         my ($self) = @_;
@@ -521,6 +520,22 @@ package Sidef::Types::Number::Number {
         Sidef::Types::String::String->new($$self->bsstr);
     }
 
+    sub shift_right {
+        my ($self, $num, $base) = @_;
+        $self->_is_number($num) || return;
+        $self->new($$self->copy->brsft($$num, defined($base) ? $self->_is_number($base) ? $$base : return : ()));
+    }
+
+    *shiftRight = \&shift_right;
+
+    sub shift_left {
+        my ($self, $num, $base) = @_;
+        $self->_is_number($num) || return;
+        $self->new($$self->copy->blsft($$num, defined($base) ? $self->_is_number($base) ? $$base : return : ()));
+    }
+
+    *shiftLeft = \&shift_left;
+
     {
         no strict 'refs';
 
@@ -550,17 +565,7 @@ package Sidef::Types::Number::Number {
         *{__PACKAGE__ . '::' . '..'}  = \&to;
         *{__PACKAGE__ . '::' . '!'}   = \&factorial;
         *{__PACKAGE__ . '::' . '%%'}  = \&is_div;
-
-        *{__PACKAGE__ . '::' . '>>'} = sub {
-            my ($self, $num, $base) = @_;
-            $self->_is_number($num) || return;
-            $self->new($$self->copy->brsft($$num, defined($base) ? $self->_is_number($base) ? $$base : return : ()));
-        };
-
-        *{__PACKAGE__ . '::' . '<<'} = sub {
-            my ($self, $num, $base) = @_;
-            $self->_is_number($num) || return;
-            $self->new($$self->copy->blsft($$num, defined($base) ? $self->_is_number($base) ? $$base : return : ()));
-        };
+        *{__PACKAGE__ . '::' . '>>'}  = \&shift_right;
+        *{__PACKAGE__ . '::' . '<<'}  = \&shift_left;
     }
 }

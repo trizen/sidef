@@ -1,7 +1,6 @@
 ## package Sidef::Types::Number::NumberFast
 package Sidef::Types::Number::Number {
 
-    use utf8;
     use 5.014;
     use strict;
     use warnings;
@@ -62,6 +61,12 @@ package Sidef::Types::Number::Number {
         __PACKAGE__->new($$self <=> $$num);
     }
 
+    sub acmp {
+        my ($self, $num) = @_;
+        $self->_is_number($num) || return;
+        __PACKAGE__->new(CORE::abs($$self) <=> CORE::abs($$num));
+    }
+
     sub factorial {
         my ($self) = @_;
         my $fac = 1;
@@ -77,14 +82,9 @@ package Sidef::Types::Number::Number {
         $self->new($$self**(1 / $$n));
     }
 
-    sub abs {
-        my ($self) = @_;
-        $self->new(CORE::abs $$self);
-    }
-
     sub hex {
         my ($self) = @_;
-        $self->new(CORE::hex $$self);
+        $self->new(CORE::hex($$self));
     }
 
     sub bin {
@@ -92,14 +92,9 @@ package Sidef::Types::Number::Number {
         $self->new(oct("b$$self"));
     }
 
-    sub exp {
-        my ($self) = @_;
-        $self->new(CORE::exp $$self);
-    }
-
     sub int {
         my ($self) = @_;
-        $self->new(CORE::int $$self);
+        $self->new(CORE::int($$self));
     }
 
     *as_int = \&int;
@@ -316,45 +311,35 @@ package Sidef::Types::Number::Number {
         Sidef::Types::String::String->new(sprintf "%g", $$self);
     }
 
+    sub shift_right {
+        my ($self, $num) = @_;
+        $self->_is_number($num) || return;
+        $self->new($$self >> $$num);
+    }
+
+    *shiftRight = \&shift_right;
+
+    sub shift_left {
+        my ($self, $num) = @_;
+        $self->_is_number($num) || return;
+        $self->new($$self << $$num);
+    }
+
+    *shiftLeft = \&shift_left;
+
     {
         no strict 'refs';
 
-        *{__PACKAGE__ . '::' . '/'}   = \&div;
-        *{__PACKAGE__ . '::' . '÷'}  = \&div;
-        *{__PACKAGE__ . '::' . '*'}   = \&multiply;
-        *{__PACKAGE__ . '::' . '+'}   = \&add;
-        *{__PACKAGE__ . '::' . '-'}   = \&subtract;
-        *{__PACKAGE__ . '::' . '%'}   = \&mod;
-        *{__PACKAGE__ . '::' . '**'}  = \&pow;
         *{__PACKAGE__ . '::' . '++'}  = \&inc;
         *{__PACKAGE__ . '::' . '--'}  = \&dec;
-        *{__PACKAGE__ . '::' . '<'}   = \&lt;
-        *{__PACKAGE__ . '::' . '>'}   = \&gt;
         *{__PACKAGE__ . '::' . '&'}   = \&and;
         *{__PACKAGE__ . '::' . '|'}   = \&or;
         *{__PACKAGE__ . '::' . '^'}   = \&xor;
         *{__PACKAGE__ . '::' . '<=>'} = \&cmp;
-        *{__PACKAGE__ . '::' . '<='}  = \&le;
-        *{__PACKAGE__ . '::' . '≤'} = \&le;
-        *{__PACKAGE__ . '::' . '>='}  = \&ge;
-        *{__PACKAGE__ . '::' . '≥'} = \&ge;
-        *{__PACKAGE__ . '::' . '=='}  = \&eq;
-        *{__PACKAGE__ . '::' . '='}   = \&eq;
-        *{__PACKAGE__ . '::' . '!='}  = \&ne;
-        *{__PACKAGE__ . '::' . '≠'} = \&ne;
-        *{__PACKAGE__ . '::' . '..'}  = \&to;
         *{__PACKAGE__ . '::' . '!'}   = \&factorial;
-
-        *{__PACKAGE__ . '::' . '>>'} = sub {
-            my ($self, $num) = @_;
-            $self->_is_number($num) || return;
-            $self->new($$self >> $$num);
-        };
-
-        *{__PACKAGE__ . '::' . '<<'} = sub {
-            my ($self, $num) = @_;
-            $self->_is_number($num) || return;
-            $self->new($$self << $$num);
-        };
+        *{__PACKAGE__ . '::' . '>>'}  = \&shift_right;
+        *{__PACKAGE__ . '::' . '<<'}  = \&shift_left;
     }
-}
+};
+
+1
