@@ -124,7 +124,6 @@ scripts/99_bottles.sf
 scripts/9_billion_names.sf
 scripts/A+B.sf
 scripts/abs_string.sf
-scripts/accumulator.sf
 scripts/accumulator_factory.sf
 scripts/ackermann_function.sf
 scripts/ackermann_function_cached.sf
@@ -178,6 +177,7 @@ scripts/fibonacci_cached.sf
 scripts/fibonacci_closed_solution.sf
 scripts/fibonacci_mystery.sf
 scripts/fibonacci_validation.sf
+scripts/file_find_module.sf
 scripts/for_two_vars.sf
 scripts/function_composition.sf
 scripts/function_recursion.sf
@@ -204,6 +204,7 @@ scripts/knuth_shuffle.sf
 scripts/langton_s_ant.sf
 scripts/leap_year.sf
 scripts/levenshtein_distance.sf
+scripts/levenshtein_distance_cached.sf
 scripts/levenshtein_recursive.sf
 scripts/Lingua/RO/Numbers.sm
 scripts/lingua_ro.sf
