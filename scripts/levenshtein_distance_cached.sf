@@ -5,7 +5,7 @@ func leven (s, t) {
         s.isEmpty && (return t.len);
         t.isEmpty && (return s.len);
 
-        static cache := Hash.new;
+        static cache = Hash.new;
         cache[s.join][t.join] := (
 
             var s1 = s.ft(1);

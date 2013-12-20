@@ -7,7 +7,7 @@ func roman2arabic(roman) {
     var arabic = 0;
     var last_digit = 1000;
 
-    static m := :(
+    static m = :(
         I =>    1,
         V =>    5,
         X =>   10,

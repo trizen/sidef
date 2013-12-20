@@ -6,7 +6,7 @@ func roman2arabic (roman) {
 
     var romanArr = roman.uc.split('');
 
-    static lookup := :(
+    static lookup = :(
         I =>    1,
         V =>    5,
         X =>   10,

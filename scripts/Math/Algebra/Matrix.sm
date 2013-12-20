@@ -2,13 +2,13 @@
 
 class Math::Algebra::Matrix (matrix) {
 
-    static VERSION := 0.1;
+    static VERSION = 0.1;
 
     #
     ## Require a Perl module
     #
 
-    static req := (
+    static req = (
             try   { require 'Math::Matrix' }
             catch { Sys.die("** Math::Matrix is not installed!\n"); }
     );

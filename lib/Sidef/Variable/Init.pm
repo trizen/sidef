@@ -14,9 +14,25 @@ package Sidef::Variable::Init {
 
         my @results;
         foreach my $var (@{$self->{vars}}) {
-            push @results, $args[0];
-            my $new_var = Sidef::Variable::Variable->new($var->{name}, $var->{type}, shift @args);
-            push @{$var->{stack}}, $new_var;
+
+            my $arg = shift @args;
+            push @results, $arg;
+
+            my $type = $var->{type};
+
+            if ($type eq 'var') {
+                my $new_var = Sidef::Variable::Variable->new($var->{name}, $var->{type}, $arg);
+                push @{$var->{stack}}, $new_var;
+            }
+            elsif ($type eq 'static' or $type eq 'const') {
+                if (not exists $var->{inited}) {
+                    $var->set_value($arg);
+                    $var->{inited} = 1;
+                }
+            }
+            else {    # actually, this will not happen
+                $var->set_value($arg);
+            }
         }
 
         $results[0];

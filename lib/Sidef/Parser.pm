@@ -817,10 +817,6 @@ package Sidef::Parser {
                           };
                     }
 
-                    if ($type eq 'static') {
-                        return $var_objs[0], pos;
-                    }
-
                     return Sidef::Variable::Init->new(@var_objs), pos;
                 }
 
@@ -1287,7 +1283,6 @@ package Sidef::Parser {
                         count => 0,
                         type  => 'var',
                         line  => $self->{line},
-                        block => 1,
                       };
                 }
 

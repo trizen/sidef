@@ -4,7 +4,7 @@
 
 func A(m,n) {
 
-    static memo := Hash.new;
+    static memo = Hash.new;
     m == 0 && (return(n+1));
 
     (memo[m] := (Hash.new)).exists(n)

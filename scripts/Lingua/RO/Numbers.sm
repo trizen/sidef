@@ -158,7 +158,8 @@ func number_to_ro (self, num) {
         opts[kv[0]] = kv[1];
     }
 
-    static word = _number_to_ro(num).join(" ");
+    var word;
+    word = _number_to_ro(num).join(" ");
 
     if (!opts['diacritics']) {
 

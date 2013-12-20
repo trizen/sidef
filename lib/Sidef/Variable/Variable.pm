@@ -24,8 +24,24 @@ package Sidef::Variable::Variable {
           __PACKAGE__;
     }
 
+    sub _is_defined {    # faster (used internally)
+        my ($self) = @_;
+
+        if (exists $self->{stack}) {
+            $self = $self->{stack}[-1];
+        }
+
+        defined $self->{value}
+          and ref($self->{value}) ne 'Sidef::Types::Nil::Nil';
+    }
+
     sub is_defined {
         my ($self) = @_;
+
+        if (exists $self->{stack}) {
+            $self = $self->{stack}[-1];
+        }
+
         Sidef::Types::Bool::Bool->new(defined $self->{value} and ref($self->{value}) ne 'Sidef::Types::Nil::Nil');
     }
 
@@ -41,8 +57,6 @@ package Sidef::Variable::Variable {
         }
 
         $self->{value} = $obj;
-
-        #$_[0]{value} = $_[1];
     }
 
     sub get_value {
@@ -75,17 +89,11 @@ package Sidef::Variable::Variable {
                 return $self->set_value($obj);
             }
             elsif ($self->{type} eq "const") {
-                if (not defined $self->{value}) {
+                if (not exists $self->{inited}) {
                     return $self->set_value($obj);
                 }
 
                 #warn "Constant '$self->{name}' cannot be changed.\n";
-            }
-            elsif ($self->{type} eq "char") {
-                return $self->set_value($obj->to_chars);
-            }
-            elsif ($self->{type} eq "byte") {
-                return $self->set_value($obj->to_bytes);
             }
             elsif ($self->{type} eq 'func') {
                 if (ref $obj eq 'Sidef::Types::Block::Code') {
@@ -104,7 +112,7 @@ package Sidef::Variable::Variable {
         *{__PACKAGE__ . '::' . ':='} = sub {
             my ($self, $code) = @_;
 
-            if (not $self->is_defined) {
+            if (not $self->_is_defined) {
                 my $method = '=';
                 $self->$method(Sidef::Types::Block::Code->new($code)->run);
             }
@@ -115,7 +123,7 @@ package Sidef::Variable::Variable {
         *{__PACKAGE__ . '::' . '\\\\'} = sub {
             my ($self, $code) = @_;
 
-            if ($self->is_defined) {
+            if ($self->_is_defined) {
                 return $self;
             }
 
