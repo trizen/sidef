@@ -8,14 +8,14 @@ func binary_search (array, value, left, right) {
         return(false);
     )
 
-    middle = ((right + left) / 2);
+    var middle = ((right + left) / 2);
 
     array[middle] == value && (
         return(true);
     )
 
-    binary_search(array, value, value < array[middle] ? ([left, middle - 1])
-                                                      : ([middle + 1, right])
+    binary_search(array, value, value < array[middle] ? [left, middle - 1]
+                                                      : [middle + 1, right]
                                      -> to_list
                  );
 }

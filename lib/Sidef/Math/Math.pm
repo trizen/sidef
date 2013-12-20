@@ -54,6 +54,12 @@ package Sidef::Math::Math {
         Sidef::Types::Number::Number->new(Math::BigFloat::bgcd(map { $$_ } @list));
     }
 
+    sub abs {
+        my ($self, $num) = @_;
+        $self->_is_number($num) || return;
+        $num->abs;
+    }
+
     sub lcm {
         my ($self, @list) = @_;
         $self->_is_number($_) || return for @list;
