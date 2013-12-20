@@ -821,7 +821,7 @@ package Sidef::Parser {
                 }
 
                 # Declaration of the 'my' special variable and function declaration
-                if (/\G(my)\h+($self->{re}{var_name})/goc || /\G(func|class)\b\h*((?:$self->{re}{var_name})?+)/goc) {
+                if (/\G(my)\h+($self->{re}{var_name})/goc || /\G(func|class)\b\h*((?:$self->{re}{var_name}|$self->{re}{operators})?+)/goc) {
                     my $type = $1;
                     my $name = $2;
 
