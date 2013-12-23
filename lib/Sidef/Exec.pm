@@ -86,6 +86,10 @@ package Sidef::Exec {
         if (ref $self_obj eq 'HASH') {
             local $self->{var_ref} = 1;
             ($self_obj) = $self->execute($self_obj);
+
+            if (not exists $expr->{call} and ref($self_obj) eq 'Sidef::Variable::Init') {
+                $self_obj->set_value();
+            }
         }
 
         if (ref $self_obj eq 'Sidef::Variable::My') {

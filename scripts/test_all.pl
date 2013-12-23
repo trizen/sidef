@@ -27,6 +27,10 @@ my %ignored;
       )
 } = ();
 
+if ($] < 5.018) {
+    undef $ignored{'JASH.sf'};
+}
+
 foreach my $sidef_script (glob '*.sf') {
 
     next if exists $ignored{$sidef_script};
