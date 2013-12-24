@@ -27,10 +27,10 @@ var aChoice = (3.rand.int); # ai choice for first play is completely random
 {
     "Play: ".print;
 
-    pi = (Sys.scanln);  # get player choice
+    pi = Sys.scanln;        # get player choice
     pi == 'q' && (break);
 
-    var pChoice = (rps.indexWhere{_ == pi});
+    var pChoice = rps.indexWhere{_ == pi};
 
     if (var block = __BLOCK__; pChoice == -1) {
         "Invalid input!\n".warn;
@@ -44,17 +44,18 @@ var aChoice = (3.rand.int); # ai choice for first play is completely random
     ">> My play: %-8s".printf(rps[aChoice]);
 
     given ((aChoice - pChoice + 3 ) % 3)
-    when (0) do {
-        "Tie.".say;
-    }
-    when (1) do {
-        "%-*s %s".printlnf(30, msg[aChoice], 'My point');
-        aScore++;
-    }
-    when (2) do {
-        "%-*s %s".printlnf(30, msg[pChoice], 'Your point');
-        pScore++;
-    }
+        when (0) do {
+            "Tie.".say;
+        }
+        when (1) do {
+            "%-*s %s".printlnf(30, msg[aChoice], 'My point');
+            aScore++;
+        }
+        when (2) do {
+            "%-*s %s".printlnf(30, msg[pChoice], 'Your point');
+            pScore++;
+        }
+    end;
 
     # show score
     "%-6s".printf("%d:%d".sprintf(pScore, aScore));

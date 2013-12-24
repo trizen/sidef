@@ -360,6 +360,9 @@ package Sidef::Types::String::String {
                 $regex = $regex->quotemeta();
             }
         }
+        else {
+            $regex = $regex->get_value;
+        }
 
         $self->new($$self =~ s{$regex}{$$str}r);
     }
@@ -375,6 +378,9 @@ package Sidef::Types::String::String {
             if ($regex->can('quotemeta')) {
                 $regex = $regex->quotemeta();
             }
+        }
+        else {
+            $regex = $regex->get_value;
         }
 
         $self->new($$self =~ s{$regex}{$$str}gr);

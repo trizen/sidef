@@ -16,5 +16,31 @@ res == [
     'sidef',
 ] || ("Error!\n".die);
 
+{
+    var str = "sidef is awesome";
+    var wanted = str.split;
+
+    var arr1 = [];
+    var arr2 = [];
+
+    while (var match = (str =~ /(\w+)/g)) {
+        var caps = match.captures;
+        arr1.append(caps[0]);
+        say caps[0];
+    }
+
+    var regex = /(\w+)/;
+    while (var gmatch = (regex.gmatch(str))) {
+        var caps = gmatch.captures;
+        arr2.append(caps[0]);
+    }
+
+    arr1 == wanted
+        || "arr1 error!".die;
+
+    arr2 == wanted
+        || "arr2 error!".die;
+
+}.run;
 
 "Test passed!".say;

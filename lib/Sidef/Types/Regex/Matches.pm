@@ -9,19 +9,47 @@ package Sidef::Types::Regex::Matches {
     sub new {
         my (undef, %hash) = @_;
 
-        my (@matches) = (substr($hash{obj}, $hash{pos}) =~ $hash{regex});
-        $hash{matched} = (@matches != 0);
-        $hash{match_pos} = $hash{matched} ? [$-[0] + $hash{pos}, $+[0] + $hash{pos}] : [];
+        my @matches;
+        if ($hash{self}{global}) {
+            pos($hash{obj}) = $hash{self}{pos};
+            my $match = $hash{obj} =~ /$hash{self}{regex}/g;
 
-        if (not defined $1) {
-            @matches = ();
+            if ($match) {
+                $hash{self}{pos} = pos($hash{obj});
+
+                foreach my $i (1 .. $#{+}) {
+                    push @matches, substr($hash{obj}, $-[$i], $+[$i] - $-[$i]);
+                }
+
+                $hash{matched} = 1;
+            }
+            else {
+                $hash{matched} = 0;
+            }
+
+            foreach my $key (keys %+) {
+                $hash{named_matches}{$key} = $+{$key};
+            }
+        }
+        else {
+            @matches =
+              defined($hash{pos})
+              ? (substr($hash{obj}, $hash{pos}) =~ $hash{self}{regex})
+              : ($hash{obj} =~ $hash{self}{regex});
+
+            $hash{matched} = (@matches != 0);
+            $hash{match_pos} = $hash{matched} ? [$-[0] + ($hash{pos} // 0), $+[0] + ($hash{pos} // 0)] : [];
+
+            if (not defined $1) {
+                @matches = ();
+            }
+
+            foreach my $key (keys %+) {
+                $hash{named_matches}{$key} = $+{$key};
+            }
         }
 
         $hash{matches} = \@matches;
-        foreach my $key (keys %+) {
-            $hash{named_matches}{$key} = $+{$key};
-        }
-
         bless \%hash, __PACKAGE__;
     }
 
@@ -45,6 +73,7 @@ package Sidef::Types::Regex::Matches {
     }
 
     *captures = \&matches;
+    *cap      = \&matches;
 
     sub named_matches {
         my ($self) = @_;

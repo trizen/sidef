@@ -12,11 +12,33 @@ package Sidef::Types::Regex::Regex {
     sub new {
         my (undef, $regex, $mod) = @_;
 
-        $mod //= q{^};
+        if (ref($mod) eq 'Sidef::Types::String::String') {
+            $mod = $$mod;
+        }
+
+        my $global_mode = 0;
+        if (defined($mod)) {
+            if (index($mod, 'g') != -1) {
+                $mod =~ tr/g//d;
+                $global_mode = 1;
+            }
+        }
+
+        if (not defined $mod or $mod eq '') {
+            $mod = q{^};
+        }
+
         my $str_re = qr{(?$mod:$regex)};
 
-        bless \$str_re, __PACKAGE__;
+        bless {
+               regex  => $str_re,
+               global => $global_mode,
+               pos    => 0,
+              },
+          __PACKAGE__;
     }
+
+    sub get_value { $_[0]{regex} }
 
     sub matches {
         my ($self, $object, $pos) = @_;
@@ -28,15 +50,24 @@ package Sidef::Types::Regex::Regex {
             }
         }
 
+        $self->_is_string($object) || return;
+        $object = $$object;
+
         require Sidef::Types::Regex::Matches;
         Sidef::Types::Regex::Matches->new(
-                                          obj   => $object,
-                                          regex => $$self,
-                                          pos   => defined($pos) ? $self->_is_number($pos) ? $$pos : return : 0
+                                          obj  => $object,
+                                          self => $self,
+                                          pos  => defined($pos) ? $self->_is_number($pos) ? $$pos : return : undef,
                                          );
     }
 
     *match = \&matches;
+
+    sub gmatch {
+        my ($self, $obj, $pos) = @_;
+        local $self->{global} = 1;
+        $self->matches($obj, $pos);
+    }
 
     {
         no strict 'refs';

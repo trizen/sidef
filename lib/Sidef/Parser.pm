@@ -206,11 +206,11 @@ package Sidef::Parser {
                           re  => qr/\G\$\(/,
                          },
                          {
-                          sub => sub { Sidef::Variable::Magic->new(\$<, 0) },
+                          sub => sub { Sidef::Variable::Magic->new(\$<, 1) },
                           re  => qr/\G\$</,
                          },
                          {
-                          sub => sub { Sidef::Variable::Magic->new(\$>, 0) },
+                          sub => sub { Sidef::Variable::Magic->new(\$>, 1) },
                           re  => qr/\G\$>/,
                          },
                         ],
@@ -821,7 +821,8 @@ package Sidef::Parser {
                 }
 
                 # Declaration of the 'my' special variable and function declaration
-                if (/\G(my)\h+($self->{re}{var_name})/goc || /\G(func|class)\b\h*((?:$self->{re}{var_name}|$self->{re}{operators})?+)/goc) {
+                if (   /\G(my)\h+($self->{re}{var_name})/goc
+                    || /\G(func|class)\b\h*((?:$self->{re}{var_name}|$self->{re}{operators})?+)/goc) {
                     my $type = $1;
                     my $name = $2;
 
@@ -1502,12 +1503,6 @@ package Sidef::Parser {
                 if (/\G/gc && (my ($pos) = $self->parse_whitespace(code => substr($_, pos)))[0]) {
                     pos($_) += $pos;
                 }
-
-                # Class declaration
-                #if (/\Gclass\h+($self->{re}{var_name})/goc) {
-                #    $self->{class} = $1;
-                #    redo;
-                #}
 
                 if (/\Gimport\b\h*/gc) {
 

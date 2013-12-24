@@ -20,6 +20,9 @@ package Sidef::Convert::Convert {
         if (exists $array_like->{$type} or $type eq 'Sidef::Types::Hash::Hash') {
             return $_[0];
         }
+        elsif ($type eq 'Sidef::Types::Regex::Regex') {
+            return $_[0]{regex};
+        }
 
         ${$_[0]};
     };
@@ -32,6 +35,9 @@ package Sidef::Convert::Convert {
         }
         elsif (ref $self eq 'Sidef::Types::Hash::Hash') {
             return Sidef::Types::String::String->new(join(' ', map { $_->to_s } @{$self->to_a}));
+        }
+        elsif (ref $self eq 'Sidef::Types::Regex::Regex') {
+            return Sidef::Types::String::String->new($self->{regex});
         }
 
         Sidef::Types::String::String->new("$$self");
@@ -120,8 +126,7 @@ package Sidef::Convert::Convert {
 
         my @bytes = do {
             use bytes;
-            map { Sidef::Types::Byte::Byte->new(CORE::ord bytes::substr($$self, $_, 1)) }
-              0 .. bytes::length($$self) - 1;
+            map { Sidef::Types::Byte::Byte->new(CORE::ord bytes::substr($$self, $_, 1)) } 0 .. bytes::length($$self) - 1;
         };
 
         Sidef::Types::Byte::Bytes->new(@bytes);

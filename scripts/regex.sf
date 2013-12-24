@@ -22,10 +22,10 @@ else {
 
 var cap = ("12 John Wall Street no. 4" =~ /(?<id>\d+)\s+(?<name>\S+)\s+(?<address>(.+))$/);
 
-cap->matched
-    || ("Named captures failed!\n".die);
+cap.matched
+    || "Named captures failed!\n".die;
 
-var hash = (cap.named_matches);
+var hash = cap.named_matches;
 [
     hash["name"],
     hash["address"],
