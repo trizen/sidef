@@ -40,7 +40,7 @@ package Sidef::Types::Regex::Regex {
 
     sub get_value { $_[0]{regex} }
 
-    sub matches {
+    sub match {
         my ($self, $object, $pos) = @_;
 
         if (ref $object eq 'Sidef::Types::Array::Array') {
@@ -61,13 +61,15 @@ package Sidef::Types::Regex::Regex {
                                          );
     }
 
-    *match = \&matches;
+    *matches = \&match;
 
     sub gmatch {
         my ($self, $obj, $pos) = @_;
         local $self->{global} = 1;
         $self->matches($obj, $pos);
     }
+
+    *gmatches = \&gmatch;
 
     {
         no strict 'refs';

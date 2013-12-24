@@ -77,10 +77,18 @@ package Sidef::Types::String::String {
     sub match {
         my ($self, $regex, @rest) = @_;
         $self->_is_regex($regex) || return;
-        $regex->matches($self, @rest);
+        $regex->match($self, @rest);
     }
 
     *matches = \&match;
+
+    sub gmatch {
+        my ($self, $regex, @rest) = @_;
+        $self->_is_regex($regex) || return;
+        $regex->gmatch($self, @rest);
+    }
+
+    *gmatches = \&gmatch;
 
     sub to {
         my ($self, $string) = @_;
