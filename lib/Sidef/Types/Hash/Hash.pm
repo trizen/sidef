@@ -51,7 +51,6 @@ package Sidef::Types::Hash::Hash {
         }
 
         my $new_hash = $self->new;
-
         while (my ($key, $value) = each %{$self}) {
 
             my $key_obj = Sidef::Types::String::String->new($key);
@@ -61,7 +60,7 @@ package Sidef::Types::Hash::Hash {
             $val_var->set_value($val_obj);
 
             if ($code->run) {
-                $new_hash->append($key_obj, $val_obj);
+                $new_hash->append($key, $val_obj);
             }
         }
 
@@ -114,26 +113,19 @@ package Sidef::Types::Hash::Hash {
         $self->{$key} = Sidef::Variable::Variable->new(rand, 'var', $value);
     }
 
+    *add = \&append;
+
     sub concat {
         my ($self, $obj) = @_;
+        $self->_is_hash($obj) || return;
 
         my @list;
         while (my ($key, $val) = each %{$self}) {
             push @list, $key, $val->get_value;
         }
 
-        if ($self->_is_hash($obj, 1, 1)) {
-
-            while (my ($key, $val) = each %{$obj}) {
-                push @list, $key, $val->get_value;
-            }
-        }
-        elsif ($self->_is_array($obj, 1, 1)) {
-            push @list, map { $_->get_value } @{$obj};
-        }
-        else {
-            warn "[WARN] Invalid object for hash concatenation! Expected hash or array.\n";
-            return $self;
+        while (my ($key, $val) = each %{$obj}) {
+            push @list, $key, $val->get_value;
         }
 
         $self->new(@list);

@@ -1168,6 +1168,9 @@ package Sidef::Parser {
                     elsif (/\G(?=\h*=>)/) {
                         return Sidef::Types::String::String->new($var_name), pos;
                     }
+                    elsif (/\G(?=:(?!=))/) {
+                        return Sidef::Types::String::String->new($var_name), pos;
+                    }
                     elsif (/\G(?=\h*:?=(?![=~>]))/) {
                         unshift @{$self->{vars}{$class}},
                           {

@@ -54,6 +54,8 @@ package Sidef::Types::Block::Switch {
         $self->do($code);
     }
 
+    *else = \&default;
+
     sub end {
         Sidef::Types::Black::Hole->new;
     }

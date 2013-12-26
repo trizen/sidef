@@ -190,6 +190,7 @@ scripts/group_precedence.sf
 scripts/hailstone.sf
 scripts/hash_autovivification.sf
 scripts/hash_from_array.sf
+scripts/hash_grep.sf
 scripts/hash_sort.sf
 scripts/hashes.sf
 scripts/if_do_else.sf

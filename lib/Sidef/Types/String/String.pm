@@ -745,6 +745,30 @@ package Sidef::Types::String::String {
 
     *applyEscapes = \&apply_escapes;
 
+    sub shift_left {
+        my ($self, $i) = @_;
+
+        $self->_is_number($i) || return;
+
+        my $len = CORE::length($$self);
+        $i = $$i > $len ? $len : $$i;
+        $self->new(CORE::substr($$self, $i));
+    }
+
+    *dropLeft  = \&shift_left;
+    *drop_left = \&shift_left;
+    *shiftLeft = \&shift_left;
+
+    sub shift_right {
+        my ($self, $i) = @_;
+        $self->_is_number($i) || return;
+        $self->new(CORE::substr($$self, 0, -$$i));
+    }
+
+    *dropRight  = \&shift_right;
+    *drop_right = \&shift_left;
+    *shiftRight = \&shift_right;
+
     sub dump {
         my ($self) = @_;
         __PACKAGE__->new(q{'} . $$self =~ s{'}{\\'}gr . q{'});
@@ -776,21 +800,11 @@ package Sidef::Types::String::String {
         *{__PACKAGE__ . '::' . '&'}   = \&and;
         *{__PACKAGE__ . '::' . '^^'}  = \&begins_with;
         *{__PACKAGE__ . '::' . '$$'}  = \&ends_with;
+        *{__PACKAGE__ . '::' . '<<'}  = \&shift_left;
+        *{__PACKAGE__ . '::' . '>>'}  = \&shift_right;
 
-        *{__PACKAGE__ . '::' . '<<'} = sub {
-            my ($self, $i) = @_;
-
-            $self->_is_number($i) || return;
-
-            my $len = CORE::length($$self);
-            $i = $$i > $len ? $len : $$i;
-            $self->new(CORE::substr($$self, $i));
-        };
-
-        *{__PACKAGE__ . '::' . '>>'} = sub {
-            my ($self, $i) = @_;
-            $self->_is_number($i) || return;
-            $self->new(CORE::substr($$self, 0, -$$i));
+        *{__PACKAGE__ . '::' . ':'} = sub {
+            Sidef::Types::Hash::Hash->new($_[0], $_[1]);
         };
     }
 }
