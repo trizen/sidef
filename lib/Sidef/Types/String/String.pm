@@ -766,7 +766,7 @@ package Sidef::Types::String::String {
     }
 
     *dropRight  = \&shift_right;
-    *drop_right = \&shift_left;
+    *drop_right = \&shift_right;
     *shiftRight = \&shift_right;
 
     sub dump {
