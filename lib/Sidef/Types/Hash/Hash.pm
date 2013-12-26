@@ -167,6 +167,18 @@ package Sidef::Types::Hash::Hash {
         Sidef::Types::Array::Array->new(map { $_->get_value } values %{$self});
     }
 
+    sub each_value {
+        my ($self, $code) = @_;
+        $self->_is_code($code) || return;
+        $self->values->each($code);
+    }
+
+    sub each_key {
+        my ($self, $code) = @_;
+        $self->_is_code($code) || return;
+        $self->keys->each($code);
+    }
+
     sub each {
         my ($self, $obj) = @_;
 
