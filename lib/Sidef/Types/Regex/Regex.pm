@@ -78,6 +78,6 @@ package Sidef::Types::Regex::Regex {
 
     sub dump {
         my ($self) = @_;
-        Sidef::Types::String::String->new('/' . $$self =~ s{/}{\\/}gr . '/');
+        Sidef::Types::String::String->new('/' . $self->{regex} =~ s{/}{\\/}gr . '/');
     }
 }

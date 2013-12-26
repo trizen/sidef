@@ -97,6 +97,17 @@ package Sidef {
         bless {}, __PACKAGE__;
     }
 
+    sub respond_to {
+        my ($self, $method) = @_;
+        Sidef::Types::Bool::Bool->new($self->can($method));
+    }
+
+    *respondTo = \&respond_to;
+
+    sub is_a {
+        my ($self, $obj) = @_;
+        Sidef::Types::Bool::Bool->new(ref($self) eq ref($obj));
+    }
 };
 
 1;

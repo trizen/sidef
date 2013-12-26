@@ -338,6 +338,8 @@ package Sidef::Types::Array::Array {
         );
     }
 
+    *collect = \&map;
+
     sub grep {
         my ($self, $code) = @_;
 
@@ -353,6 +355,7 @@ package Sidef::Types::Array::Array {
     }
 
     *filter = \&grep;
+    *select = \&grep;
 
     sub find {
         my ($self, $code) = @_;

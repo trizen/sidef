@@ -92,8 +92,19 @@ package Sidef::Types::String::String {
 
     sub to {
         my ($self, $string) = @_;
+        $self->_is_string($string) || return;
         Sidef::Types::Array::Array->new(map { $self->new($_) } $$self .. $$string);
     }
+
+    *upto = \&to;
+    *upTo = \&to;
+
+    sub downto {
+        my ($self, $string) = @_;
+        $string->to($self)->reverse;
+    }
+
+    *downTo = \&downto;
 
     sub cmp {
         my ($self, $string) = @_;
