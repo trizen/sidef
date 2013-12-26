@@ -40,6 +40,36 @@ package Sidef::Types::Hash::Hash {
         Sidef::Types::Array::Array->new(map { defined($_) ? $_->get_value : $_ } @{$self}{@keys});
     }
 
+    sub select {
+        my ($self, $code) = @_;
+
+        $self->_is_code($code) || return;
+        my ($key_var, $val_var) = $code->init_block_vars;
+
+        if (not defined $val_var) {
+            $val_var = Sidef::Types::Black::Hole->new;
+        }
+
+        my $new_hash = $self->new;
+
+        while (my ($key, $value) = each %{$self}) {
+
+            my $key_obj = Sidef::Types::String::String->new($key);
+            my $val_obj = $value->get_value;
+
+            $key_var->set_value($key_obj);
+            $val_var->set_value($val_obj);
+
+            if ($code->run) {
+                $new_hash->append($key_obj, $val_obj);
+            }
+        }
+
+        $new_hash;
+    }
+
+    *grep = \&select;
+
     sub duplicate_of {
         my ($self, $obj) = @_;
 
