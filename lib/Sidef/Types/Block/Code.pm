@@ -244,15 +244,6 @@ package Sidef::Types::Block::Code {
 
         $self;
     }
-
-    {
-        no strict 'refs';
-        require Memoize;
-        foreach my $method ('call') {
-            Memoize::memoize(__PACKAGE__ . '::' . $method);
-        }
-    }
-
 };
 
 1;

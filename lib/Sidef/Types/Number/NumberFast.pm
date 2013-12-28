@@ -339,23 +339,6 @@ package Sidef::Types::Number::Number {
         *{__PACKAGE__ . '::' . '!'}   = \&factorial;
         *{__PACKAGE__ . '::' . '>>'}  = \&shift_right;
         *{__PACKAGE__ . '::' . '<<'}  = \&shift_left;
-
-        my %ignore;
-        @ignore{
-            qw(
-              ISA
-              BEGIN
-              new
-              newInt
-              new_int
-              )
-        } = ();
-
-        foreach my $method (keys %{__PACKAGE__ . '::'}) {
-            next if exists $ignore{$method};
-            Memoize::memoize(__PACKAGE__ . '::' . $method);
-        }
-
     }
 };
 

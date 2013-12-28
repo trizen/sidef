@@ -153,13 +153,6 @@ package Sidef::Convert::Convert {
     }
 
     *toArray = \&to_array;
-
-    {
-        no strict 'refs';
-        foreach my $method ('stringify') {
-            Memoize::memoize(__PACKAGE__ . '::' . $method);
-        }
-    }
 };
 
 1

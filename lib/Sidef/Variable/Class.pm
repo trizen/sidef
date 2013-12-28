@@ -28,7 +28,6 @@ package Sidef::Variable::Class {
         }
 
         if (exists $self->{functions}{$name}) {
-            @args || (@args = rand);
             return $self->{functions}{$name}->call($self, @args);
         }
         elsif (exists $self->{functions}{'AUTOLOAD'}) {

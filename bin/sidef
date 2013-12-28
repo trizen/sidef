@@ -19,7 +19,7 @@ my $version = $Sidef::VERSION;
 my %args;
 if ($#ARGV != -1 and chr ord $ARGV[0] eq '-') {
     require Getopt::Std;
-    Getopt::Std::getopts('E:d:Dho:ivHN:Wwc', \%args);
+    Getopt::Std::getopts('E:d:Dho:ivHN:Wwcm', \%args);
 }
 
 my %keywords = (
@@ -79,6 +79,7 @@ if ($args{h}) {
                     '-E program'     => 'one line of program',
                     '-H'             => 'interactive help',
                     '-N type'        => ["use a specific implementation for numbers", "valid types: fast, big, int, rat"],
+                    '-m'             => 'memoize some expensive method calls',
                     '-v'             => 'print version',
                     '-w'             => 'enable warnings with stack backtrace',
                     '-W'             => 'make warnings fatal (with stack backtrace)',
@@ -143,6 +144,90 @@ if (defined(my $type = $args{N})) {
     }
     else {
         warn "Invalid type '${type}' for number implementation";
+    }
+}
+
+if ($args{m}) {
+
+    {
+        no strict 'refs';
+        require Memoize;
+
+        {
+            my $package = 'Sidef::Types::Number::Number';
+
+            my %ignore;
+            @ignore{
+                qw(
+                  ISA
+                  BEGIN
+                  new
+                  newInt
+                  new_int
+                  )
+            } = ();
+
+            foreach my $method (keys %{$package . '::'}) {
+                next if exists $ignore{$method};
+                Memoize::memoize($package . '::' . $method);
+            }
+        }
+
+        {
+            my $package = 'Sidef::Convert::Convert';
+            foreach my $method (
+                                qw(
+                                stringify
+                                )
+              ) {
+                Memoize::memoize($package . '::' . $method);
+            }
+        }
+
+        {
+            my $package = 'Sidef::Types::String::String';
+
+            my %ignore;
+            @ignore{
+                qw(
+                  ISA
+                  BEGIN
+                  __ANON__
+                  new
+                  say
+                  print
+                  println
+                  printlnf
+                  printf
+                  die
+                  warn
+                  glob
+                  eval
+                  parse
+                  apply_escapes
+                  applyEscapes
+                  dump
+                  split
+                  match
+                  matches
+                  gmatch
+                  gmatches
+                  =~
+                  )
+            } = ();
+
+            foreach my $method (keys %{$package . '::'}) {
+                next if exists $ignore{$method};
+                Memoize::memoize($package . '::' . $method);
+            }
+        }
+
+        {
+            my $package = 'Sidef::Types::Block::Code';
+            foreach my $method ('call') {
+                Memoize::memoize($package . '::' . $method);
+            }
+        }
     }
 }
 
