@@ -5,9 +5,9 @@
 var cache = [[1]];
 
 func cumu (n) {
-    for (cache.len .. n){
+    for (cache.len .. n){ |l|
 
-        var (l, r) = (_, [0]);
+        var r = [0];
         {r.append(r[-1] + cache[l-_][[_, l-_].min])}
             for (1 .. l);
 
@@ -18,7 +18,7 @@ func cumu (n) {
 }
 
 func row (n) {
-    var r = (cumu(n));
+    var r = cumu(n);
     return (n-1->range->map{ r[_+1] - r[_] } );
 }
 

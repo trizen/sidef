@@ -23,12 +23,12 @@ func abs_str (str) {
                 word.clear!;
             }
             when ('}') do {
-                store.call;
+                store.run;
                 root.pop;
                 word.clear!;
             }
             when (',') do {
-                store.call;
+                store.run;
                 word.clear!;
             }
             default {
@@ -36,7 +36,7 @@ func abs_str (str) {
             }
     }
 
-    store.call;
+    store.run;
     return(strs);
 }
 

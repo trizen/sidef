@@ -14,18 +14,23 @@ package Sidef::Convert::Convert {
                          'Sidef::Types::Char::Chars'  => 1,
                         };
 
-    use overload q{""} => sub {
-        my $type = ref($_[0]);
+    use overload q{""} => \&stringify;
 
-        if (exists $array_like->{$type} or $type eq 'Sidef::Types::Hash::Hash') {
-            return $_[0];
-        }
-        elsif ($type eq 'Sidef::Types::Regex::Regex') {
+    sub stringify {
+        require Scalar::Util;
+
+        if (ref($_[0]) eq 'Sidef::Types::Regex::Regex') {
             return $_[0]{regex};
         }
+        else {
+            my $type = Scalar::Util::reftype($_[0]);
+            if ($type eq 'SCALAR' or $type eq 'REF') {
+                return ${$_[0]};
+            }
+        }
 
-        ${$_[0]};
-    };
+        $_[0];
+    }
 
     sub to_s {
         my ($self) = @_;
@@ -148,4 +153,13 @@ package Sidef::Convert::Convert {
     }
 
     *toArray = \&to_array;
-}
+
+    {
+        no strict 'refs';
+        foreach my $method ('stringify') {
+            Memoize::memoize(__PACKAGE__ . '::' . $method);
+        }
+    }
+};
+
+1

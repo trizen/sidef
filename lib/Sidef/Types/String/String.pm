@@ -817,5 +817,45 @@ package Sidef::Types::String::String {
         *{__PACKAGE__ . '::' . ':'} = sub {
             Sidef::Types::Hash::Hash->new($_[0], $_[1]);
         };
+
+        require Memoize;
+
+        my %ignore;
+        @ignore{
+            qw(
+              ISA
+              BEGIN
+              new
+              say
+              print
+              println
+              printlnf
+              printf
+              die
+              warn
+              glob
+              eval
+              parse
+              apply_escapes
+              applyEscapes
+              dump
+              split
+              match
+              matches
+              gmatch
+              gmatches
+              =~
+              )
+        } = ();
+
+        foreach my $method (keys %{__PACKAGE__ . '::'}) {
+            next if exists $ignore{$method};
+            next if CORE::chr CORE::ord $method eq '_';
+
+            #say $method;
+            Memoize::memoize(__PACKAGE__ . '::' . $method);
+        }
     }
-}
+};
+
+1
