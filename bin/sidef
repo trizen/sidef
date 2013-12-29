@@ -19,7 +19,7 @@ my $version = $Sidef::VERSION;
 my %args;
 if ($#ARGV != -1 and chr ord $ARGV[0] eq '-') {
     require Getopt::Std;
-    Getopt::Std::getopts('E:d:Dho:ivHN:Wwcm', \%args);
+    Getopt::Std::getopts('E:d:Dho:ivHN:WwcM:', \%args);
 }
 
 my %keywords = (
@@ -78,8 +78,8 @@ if ($args{h}) {
                     '-o output_file' => 'file where to dump the output',
                     '-E program'     => 'one line of program',
                     '-H'             => 'interactive help',
-                    '-N type'        => ["use a specific implementation for numbers", "valid types: fast, big, int, rat"],
-                    '-m'             => 'memoize some expensive method calls',
+                    '-N type'        => ['use a specific implementation for numbers', 'valid types: fast, big, int, rat'],
+                    '-M type'        => ['memoize some expensive method calls', 'valid types: str, num, block, all'],
                     '-v'             => 'print version',
                     '-w'             => 'enable warnings with stack backtrace',
                     '-W'             => 'make warnings fatal (with stack backtrace)',
@@ -147,13 +147,33 @@ if (defined(my $type = $args{N})) {
     }
 }
 
-if ($args{m}) {
+if (defined(my $memoize = $args{M})) {
 
+    my @types =
+      $memoize eq 'all'
+      ? ()
+      : split(/\s*,\s*/, $memoize);
+
+    my %known_types;
     {
         no strict 'refs';
-        require Memoize;
 
-        {
+        # Init
+        $known_types{_init_} = sub {
+            require Memoize;
+
+            my $package = 'Sidef::Convert::Convert';
+            foreach my $method (
+                                qw(
+                                stringify
+                                )
+              ) {
+                Memoize::memoize($package . '::' . $method);
+            }
+        };
+
+        # Number methods
+        $known_types{num} = sub {
             my $package = 'Sidef::Types::Number::Number';
 
             my %ignore;
@@ -171,20 +191,10 @@ if ($args{m}) {
                 next if exists $ignore{$method};
                 Memoize::memoize($package . '::' . $method);
             }
-        }
+        };
 
-        {
-            my $package = 'Sidef::Convert::Convert';
-            foreach my $method (
-                                qw(
-                                stringify
-                                )
-              ) {
-                Memoize::memoize($package . '::' . $method);
-            }
-        }
-
-        {
+        # String methods
+        $known_types{str} = sub {
             my $package = 'Sidef::Types::String::String';
 
             my %ignore;
@@ -220,15 +230,39 @@ if ($args{m}) {
                 next if exists $ignore{$method};
                 Memoize::memoize($package . '::' . $method);
             }
-        }
+        };
 
-        {
+        # Block methods
+        $known_types{block} = sub {
             my $package = 'Sidef::Types::Block::Code';
             foreach my $method ('call') {
                 Memoize::memoize($package . '::' . $method);
             }
-        }
+        };
     }
+
+    # Get the valid types
+    my @valid_types = @types
+      ? (
+        grep {
+            exists $known_types{$_} || do {
+                warn "$0: unknown type '$_' for option '-m'!\n";
+                0;
+              }
+          } @types
+        )
+      : (grep { $_ ne '_init_' } keys %known_types);
+
+    # Init only if we have some valid types
+    if (@valid_types) {
+        $known_types{_init_}();
+    }
+
+    # Memoize each category
+    foreach my $type (@valid_types) {
+        $known_types{$type}();
+    }
+
 }
 
 if (defined $args{d}) {

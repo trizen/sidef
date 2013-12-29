@@ -22,11 +22,10 @@ package Sidef::Convert::Convert {
         if (ref($_[0]) eq 'Sidef::Types::Regex::Regex') {
             return $_[0]{regex};
         }
-        else {
-            my $type = Scalar::Util::reftype($_[0]);
-            if ($type eq 'SCALAR' or $type eq 'REF') {
-                return ${$_[0]};
-            }
+
+        my $type = Scalar::Util::reftype($_[0]);
+        if ($type eq 'SCALAR' or $type eq 'REF') {
+            return ${$_[0]};
         }
 
         $_[0];

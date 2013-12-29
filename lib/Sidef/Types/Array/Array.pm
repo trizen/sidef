@@ -924,6 +924,17 @@ package Sidef::Types::Array::Array {
             $self;
         };
 
+        *{__PACKAGE__ . '::' . ':'} = sub {
+            my ($self, @args) = @_;
+
+            my $hash = Sidef::Types::Hash::Hash->new;
+            foreach my $i (0 .. $#{$self}) {
+                $hash->append($self->[$i]->get_value, $args[$i % @args]);
+            }
+
+            $hash;
+        };
+
         *{__PACKAGE__ . '::' . '='} = sub {
             my ($self, $arg) = @_;
 
