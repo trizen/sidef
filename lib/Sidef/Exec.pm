@@ -55,9 +55,11 @@ package Sidef::Exec {
           },
           __PACKAGE__;
 
-        $self->{types}{'Sidef::Variable::Init'}     = $self->{bool_assign_method};
-        $self->{types}{'Sidef::Variable::Variable'} = $self->{bool_assign_method};
+        while (my (undef, $value) = each %{$self->{types}}) {
+            @{$self->{short_circuit_methods}}{keys %{$value}} = ();
+        }
 
+        $self->{types}{'Sidef::Variable::Variable'} = $self->{bool_assign_method};
         $self;
     }
 
@@ -262,18 +264,17 @@ package Sidef::Exec {
                     return $self_obj;
                 }
 
-                #<<<
-                my $type =
-                    (
-                     (ref($self_obj) eq 'Sidef::Variable::Variable')
-                        && (
-                            ref($self_obj->get_value) eq 'Sidef::Types::Bool::Bool'
-                            ? (not exists $self->{bool_assign_method}{$method})
-                            : ($method ne ':=' and $method ne '\\\\')
-                            )
-                     ) ? ref($self_obj->get_value)
-                    : ref($self_obj);
-                #>>>
+                my $type = ref($self_obj);
+                if (
+                    $type eq 'Sidef::Variable::Variable'
+                    and (   exists $self->{short_circuit_methods}{$method}
+                         or exists($self->{bool_assign_method}{$method})
+                         && $method ne ':='
+                         && $method ne '\\\\'
+                         && (my $ref_val = ref($self_obj->get_value)) ne 'Sidef::Types::Bool::Bool')
+                  ) {
+                    $type = $ref_val // ref($self_obj->get_value);
+                }
 
                 if (exists $call->{arg}) {
 
