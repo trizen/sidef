@@ -258,6 +258,30 @@ package Sidef::Types::Array::Array {
         $self->[0];
     }
 
+    sub _flatten {    # this exists for performance reasons
+        my ($self) = @_;
+
+        my @array;
+        foreach my $i (0 .. $#{$self}) {
+            my $item = $self->[$i]->get_value;
+            push @array, ref($item) eq ref($self) ? $item->_flatten : $item;
+        }
+
+        @array;
+    }
+
+    sub flatten {
+        my ($self) = @_;
+
+        my $new_array = $self->new;
+        foreach my $i (0 .. $#{$self}) {
+            my $item = $self->[$i]->get_value;
+            $new_array->push(ref($item) eq ref($self) ? ($item->_flatten) : $item);
+        }
+
+        $new_array;
+    }
+
     sub exists {
         my ($self, $index) = @_;
         $self->_is_number($index, 1) || return;

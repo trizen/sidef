@@ -469,7 +469,6 @@ FOOT
                       or die "Can't open file `$filename' for reading: $!";
 
                     $package_content .= <$fh>;
-                    $package_content .= "require Sidef;\n\n";
 
                     if (defined(my $type = $args{N})) {
                         if ($type eq 'fast' or $type eq 'perl') {

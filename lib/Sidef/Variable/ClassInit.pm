@@ -31,6 +31,14 @@ package Sidef::Variable::ClassInit {
             if (    ref $function eq 'HASH'
                 and ref(my $func = $function->{self}{$self->{name}}[0]{self}) eq 'Sidef::Variable::Variable') {
                 if ($func->{type} eq 'func') {
+
+                    # Call the function if its name is 'new';
+                    if ($func->{name} eq 'new') {
+                        $func->call($class, @args);
+                        next;
+                    }
+
+                    # Otherwise, store it.
                     $class->{functions}{$func->{name}} = $func;
                 }
             }

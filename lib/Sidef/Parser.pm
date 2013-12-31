@@ -1165,10 +1165,7 @@ package Sidef::Parser {
                         $var->{count}++;
                         return $var->{obj}, pos;
                     }
-                    elsif (/\G(?=\h*=>)/) {
-                        return Sidef::Types::String::String->new($var_name), pos;
-                    }
-                    elsif (/\G(?=:(?!=))/) {
+                    elsif (/\G(?=\h*(?:=>|:(?!=)))/) {
                         return Sidef::Types::String::String->new($var_name), pos;
                     }
                     elsif (/\G(?=\h*:?=(?![=~>]))/) {
@@ -1464,7 +1461,7 @@ package Sidef::Parser {
                                     $arg = {$self->{class} => [{self => $arg}]};
                                 }
 
-                                if ($#{$methods} != -1) {
+                                if (@{$methods}) {
                                     push @{$arg->{$self->{class}}[-1]{call}}, @{$methods};
                                 }
                             }
@@ -1650,7 +1647,7 @@ package Sidef::Parser {
 
                             pos($_) += $pos - ($is_operator ? 0 : 1);
 
-                            if ($#{$methods} != -1) {
+                            if (@{$methods}) {
                                 push @{$struct{$self->{class}}[-1]{call}}, @{$methods};
                             }
                             else {
@@ -1765,7 +1762,7 @@ package Sidef::Parser {
 
                                 my ($methods, $pos) = $self->parse_methods(code => "." . substr($_, pos));
 
-                                if ($#{$methods} != -1) {
+                                if (@{$methods}) {
                                     pos($_) += $pos - 1;
                                     push @{$struct{$self->{class}}[-1]{call}}, @{$methods};
 
