@@ -40,35 +40,6 @@ package Sidef::Types::Hash::Hash {
         Sidef::Types::Array::Array->new(map { defined($_) ? $_->get_value : $_ } @{$self}{@keys});
     }
 
-    sub select {
-        my ($self, $code) = @_;
-
-        $self->_is_code($code) || return;
-        my ($key_var, $val_var) = $code->init_block_vars;
-
-        if (not defined $val_var) {
-            $val_var = Sidef::Types::Black::Hole->new;
-        }
-
-        my $new_hash = $self->new;
-        while (my ($key, $value) = each %{$self}) {
-
-            my $key_obj = Sidef::Types::String::String->new($key);
-            my $val_obj = $value->get_value;
-
-            $key_var->set_value($key_obj);
-            $val_var->set_value($val_obj);
-
-            if ($code->run) {
-                $new_hash->append($key, $val_obj);
-            }
-        }
-
-        $new_hash;
-    }
-
-    *grep = \&select;
-
     sub duplicate_of {
         my ($self, $obj) = @_;
 
@@ -114,6 +85,69 @@ package Sidef::Types::Hash::Hash {
     }
 
     *add = \&append;
+
+    sub delete {
+        my ($self, $key) = @_;
+        if (exists $self->{$key}) {
+            return (delete $self->{$key})->get_value;
+        }
+        return;
+    }
+
+    sub _iterate {
+        my ($self, $code, $callback) = @_;
+
+        my ($key_var, $val_var) = $code->init_block_vars;
+        if (not defined $val_var) {
+            $val_var = Sidef::Types::Black::Hole->new;
+        }
+
+        while (my ($key, $value) = each %{$self}) {
+            my $key_obj = Sidef::Types::String::String->new($key);
+            my $val_obj = $value->get_value;
+
+            $key_var->set_value($key_obj);
+            $val_var->set_value($val_obj);
+
+            if ($code->run) {
+                $callback->($key, $val_obj);
+            }
+        }
+
+        $self;
+    }
+
+    sub select {
+        my ($self, $code) = @_;
+
+        $self->_is_code($code) || return;
+
+        my $new_hash = $self->new;
+        $self->_iterate(
+            $code,
+            sub {
+                $new_hash->append(@_);
+            }
+        );
+
+        $new_hash;
+    }
+
+    *grep = \&select;
+
+    sub delete_if {
+        my ($self, $code) = @_;
+        $self->_is_code($code) || return;
+        $self->_iterate(
+            $code,
+            sub {
+                delete $self->{$_[0]};
+            }
+        );
+        $self;
+    }
+
+    *deleteIf = \*delete_if;
 
     sub concat {
         my ($self, $obj) = @_;
@@ -191,13 +225,27 @@ package Sidef::Types::Hash::Hash {
         Sidef::Types::Array::Array->new(Sidef::Types::String::String->new($key), $value->get_value);
     }
 
+    *each_pair = \&each;
+
     sub sort_by {
-        my ($self, $block) = @_;
-        $self->_is_code($block) || return;
+        my ($self, $code) = @_;
+
+        $self->_is_code($code) || return;
+
+        my ($key_var, $val_var) = $code->init_block_vars;
+        if (not defined $val_var) {
+            $val_var = Sidef::Types::Black::Hole->new;
+        }
 
         my @array;
         while (my ($key, $value) = CORE::each %{$self}) {
-            push @array, [$key, $block->call(Sidef::Types::String::String->new($key), $value->get_value)];
+            my $key_obj = Sidef::Types::String::String->new($key);
+            my $val_obj = $value->get_value;
+
+            $key_var->set_value($key_obj);
+            $val_var->set_value($val_obj);
+
+            push @array, [$key, $code->run];
         }
 
         my $method = '<=>';

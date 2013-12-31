@@ -15,7 +15,7 @@ var sorted_1 = frequencies.keys.sort({|a,b| frequencies[b] <=> frequencies[a]}).
 sorted_1.dump.say;
 
 # Built-in way
-var sorted_2 = frequencies.sort_by({|__,b| b}).reverse;
+var sorted_2 = frequencies.sort_by({|_,value| value}).reverse;
 sorted_2.dump.say;
 
 
