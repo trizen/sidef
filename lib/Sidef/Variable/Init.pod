@@ -15,10 +15,17 @@ var obj = (Init.new(...));
 
 =head1 METHODS
 
+=head2 =
 
-=head2 new
+I<Num> B<=> I<Num> -> I<Num>
 
-Init.new() -> I<Bool>
+Return the
+
+=cut
+
+=head2 set_value
+
+Init.set_value() -> I<Bool>
 
 Return the
 

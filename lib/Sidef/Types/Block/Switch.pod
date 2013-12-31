@@ -40,6 +40,14 @@ Return the
 
 =cut
 
+=head2 else
+
+Switch.else() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 end
 
 Switch.end() -> I<Bool>

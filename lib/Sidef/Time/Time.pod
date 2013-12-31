@@ -24,6 +24,14 @@ Return the
 
 =cut
 
+=head2 get_value
+
+Time.get_value() -> I<Bool>
+
+Return the
+
+=cut
+
 
 =head2 gmTime
 
@@ -81,6 +89,14 @@ When no argument is specified, the current time is used.
 =head2 now
 
 Time.now() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 sec
+
+Time.sec() -> I<Bool>
 
 Return the
 

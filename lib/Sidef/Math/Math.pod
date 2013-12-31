@@ -38,6 +38,14 @@ Inherits methods from:
 
 =head1 METHODS
 
+=head2 abs
+
+Math.abs() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 accuracy
 
 Math.accuracy() -> I<Num>

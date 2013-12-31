@@ -55,6 +55,14 @@ Return the
 
 =cut
 
+=head2 add
+
+Hash.add() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 append
 
 Hash.append() -> I<Bool>
@@ -74,6 +82,30 @@ Return the
 =head2 copy
 
 Hash.copy() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 delete
+
+Hash.delete() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 deleteIf
+
+Hash.deleteIf() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 delete_if
+
+Hash.delete_if() -> I<Bool>
 
 Return the
 
@@ -106,6 +138,30 @@ Return the
 =head2 each
 
 Hash.each() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 each_key
+
+Hash.each_key() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 each_pair
+
+Hash.each_pair() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 each_value
+
+Hash.each_value() -> I<Bool>
 
 Return the
 
@@ -146,6 +202,14 @@ Return the
 =head2 get_value
 
 Hash.get_value() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 grep
+
+Hash.grep() -> I<Bool>
 
 Return the
 
@@ -210,6 +274,14 @@ Return the
 =head2 pairs
 
 Hash.pairs() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 select
+
+Hash.select() -> I<Bool>
 
 Return the
 

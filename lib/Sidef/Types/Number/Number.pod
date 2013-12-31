@@ -216,6 +216,14 @@ Return the
 
 =cut
 
+=head2 acmp
+
+Number.acmp() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 add
 
 Number.add() -> I<Bool>
@@ -347,6 +355,14 @@ Return the
 =head2 eq
 
 Number.eq() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 equals
+
+Number.equals() -> I<Bool>
 
 Return the
 
@@ -923,6 +939,38 @@ Return the
 =head2 roundf
 
 Number.roundf() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 shiftLeft
+
+Number.shiftLeft() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 shift_left
+
+Number.shift_left() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 shiftRight
+
+Number.shiftRight() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 shift_right
+
+Number.shift_right() -> I<Bool>
 
 Return the
 

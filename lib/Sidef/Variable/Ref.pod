@@ -15,6 +15,14 @@ var obj = (Ref.new(...));
 
 =head1 METHODS
 
+=head2 &
+
+I<Num> B<&> I<Num> -> I<Num>
+
+Return the
+
+=cut
+
 
 =head2 *
 

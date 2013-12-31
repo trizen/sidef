@@ -28,6 +28,14 @@ Inherits methods from:
 
 =head1 METHODS
 
+=head2 stringify
+
+Convert.stringify() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 toArray
 
 Obj.toArray() -> I<Array>

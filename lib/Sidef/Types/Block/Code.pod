@@ -18,7 +18,7 @@ var obj = (Code.new(...));
 
 Inherits methods from:
 
-	* Sidef
+    * Sidef
 
 =head1 METHODS
 
@@ -90,6 +90,22 @@ Return the
 =head2 if
 
 Code.if() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 init_block_vars
+
+Code.init_block_vars() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 pop_stack
+
+Code.pop_stack() -> I<Bool>
 
 Return the
 

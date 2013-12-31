@@ -43,3 +43,27 @@ Return true if two objects are of the same type.
     false == nil   # False
 
 =cut
+
+=head2 is_a
+
+Sidef.is_a() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 respondTo
+
+Sidef.respondTo() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 respond_to
+
+Sidef.respond_to() -> I<Bool>
+
+Return the
+
+=cut

@@ -144,10 +144,9 @@ package Sidef::Types::Hash::Hash {
                 delete $self->{$_[0]};
             }
         );
-        $self;
     }
 
-    *deleteIf = \*delete_if;
+    *deleteIf = \&delete_if;
 
     sub concat {
         my ($self, $obj) = @_;

@@ -171,6 +171,14 @@ Returns a list with the elements from the self array. In scalar context, only th
 
 =cut
 
+=head2 :
+
+I<Num> B<:> I<Num> -> I<Num>
+
+Return the
+
+=cut
+
 =head2 <<
 
 I<Array> B<E<lt>E<lt>> I<Number> -> I<Array>
@@ -295,6 +303,14 @@ Return the
 =head2 assign_to
 
 Array.assign_to() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 collect
+
+Array.collect() -> I<Bool>
 
 Return the
 
@@ -552,6 +568,14 @@ Alias for L<C<firstIndex()>|"firstIndex">.
 
 =cut
 
+=head2 flatten
+
+Array.flatten() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 for
 
 Array.for() -> I<Bool>
@@ -631,6 +655,22 @@ Returns the self object.
 =head2 is
 
 Array.is() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 isEmpty
+
+Array.isEmpty() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 is_empty
+
+Array.is_empty() -> I<Bool>
 
 Return the
 
@@ -1029,6 +1069,14 @@ Return the
 =head2 rotate
 
 Array.rotate() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 select
+
+Array.select() -> I<Bool>
 
 Return the
 

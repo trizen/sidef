@@ -24,6 +24,14 @@ Return the
 
 =cut
 
+=head2 cap
+
+Matches.cap() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 captures
 
 Matches.captures() -> I<Bool>

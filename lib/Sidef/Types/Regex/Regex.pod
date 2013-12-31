@@ -39,6 +39,30 @@ Return the
 
 =cut
 
+=head2 get_value
+
+Regex.get_value() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 gmatch
+
+Regex.gmatch() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 gmatches
+
+Regex.gmatches() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 match
 
 Regex.match() -> I<Bool>

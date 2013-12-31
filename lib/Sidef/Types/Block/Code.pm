@@ -4,7 +4,6 @@ package Sidef::Types::Block::Code {
     use strict;
     use warnings;
 
-    use List::Util qw(max);
     no warnings 'recursion';
 
     our @ISA = qw(Sidef);
@@ -134,8 +133,9 @@ package Sidef::Types::Block::Code {
     sub pop_stack {
         my ($self) = @_;
 
+        require List::Util;
         my @stack_vars = grep { exists $_->{stack} } @{$self->{vars}};
-        my $max_depth = max(map { $#{$_->{stack}} } @stack_vars);
+        my $max_depth = List::Util::max(map { $#{$_->{stack}} } @stack_vars);
 
         foreach my $var (@stack_vars) {
             if ($#{$var->{stack}} == $max_depth) {

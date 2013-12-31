@@ -96,6 +96,14 @@ Return the
 
 =cut
 
+=head2 :
+
+I<Num> B<:> I<Num> -> I<Num>
+
+Return the
+
+=cut
+
 =head2 <
 
 I<Num> B<E<lt>> I<Num> -> I<Num>
@@ -344,6 +352,14 @@ Return the
 
 =cut
 
+=head2 divide
+
+String.divide() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 downCase
 
 String.downCase() -> I<Bool>
@@ -355,6 +371,54 @@ Return the
 =head2 downcase
 
 String.downcase() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 downTo
+
+String.downTo() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 downto
+
+String.downto() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 dropLeft
+
+String.dropLeft() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 drop_left
+
+String.drop_left() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 dropRight
+
+String.dropRight() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 drop_right
+
+String.drop_right() -> I<Bool>
 
 Return the
 
@@ -451,6 +515,22 @@ Return the
 =head2 glob
 
 String.glob() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 gmatch
+
+String.gmatch() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 gmatches
+
+String.gmatches() -> I<Bool>
 
 Return the
 
@@ -752,6 +832,38 @@ Return the
 
 =cut
 
+=head2 shiftLeft
+
+String.shiftLeft() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 shift_left
+
+String.shift_left() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 shiftRight
+
+String.shiftRight() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 shift_right
+
+String.shift_right() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 split
 
 String.split() -> I<Bool>
@@ -904,6 +1016,14 @@ Return the
 
 =cut
 
+=head2 trim
+
+String.trim() -> I<Bool>
+
+Return the
+
+=cut
+
 =head2 uc
 
 String.uc() -> I<Bool>
@@ -939,6 +1059,22 @@ Return the
 =head2 upcase
 
 String.upcase() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 upTo
+
+String.upTo() -> I<Bool>
+
+Return the
+
+=cut
+
+=head2 upto
+
+String.upto() -> I<Bool>
 
 Return the
 
