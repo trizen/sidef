@@ -475,16 +475,15 @@ package Sidef::Types::String::String {
         my $parser = Sidef::Parser->new(script_name => '/eval/');
         my $struct = eval { $parser->parse_script(code => $$self) } // {};
 
-        if ($@) {
+        if ($@ || @warnings) {
+            my $error = $@;
+
             if (defined($code)) {
-                push @warnings, __PACKAGE__->new($@);
                 $self->_is_code($code) || return;
-                my ($var_ref) = $code->init_block_vars();
-                $var_ref->set_value(Sidef::Types::Array::Array->new(@warnings));
-                $code->run;
+                $code->call(Sidef::Types::Array::Array->new(@warnings), __PACKAGE__->new($error));
             }
 
-            return;
+            return if $error;
         }
 
         Sidef::Types::Block::Code->new($struct);
@@ -500,16 +499,15 @@ package Sidef::Types::String::String {
 
         my $result = eval { $block->run };
 
-        if ($@) {
+        if ($@ || @warnings) {
+            my $error = $@;
+
             if (defined($code)) {
-                push @warnings, __PACKAGE__->new($@);
                 $self->_is_code($code) || return;
-                my ($var_ref) = $code->init_block_vars();
-                $var_ref->set_value(Sidef::Types::Array::Array->new(@warnings));
-                $code->run;
+                $code->call(Sidef::Types::Array::Array->new(@warnings), __PACKAGE__->new($error));
             }
 
-            return;
+            return if $error;
         }
 
         $result;

@@ -162,11 +162,9 @@ package Sidef::Types::Glob::FileHandle {
         my ($self, $code) = @_;
         $self->_is_code($code) || return;
 
-        my ($var_ref) = $code->init_block_vars();
         while (defined(my $line = CORE::readline($self->{fh}))) {
-            $var_ref->set_value(Sidef::Types::String::String->new($line));
-            if (defined(my $res = $code->_run_code)) {
-                return $res;
+            if (ref($code->call(Sidef::Types::String::String->new($line))) eq 'Sidef::Types::Block::Break') {
+                last;
             }
         }
 

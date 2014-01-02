@@ -19,11 +19,11 @@ func best_shuffle (original_word) {
     var best_word  = (original_word);
     var best_score = (original_word.len);
 
-    original_word.permute {
+    original_word.permute { |arr|
 
-        var curscore = (score(original_word, _)) < best_score && (
+        var curscore = (score(original_word, arr)) < best_score && (
            best_score =  curscore;
-           best_word = _;
+           best_word = arr;
         );
 
         Bool.new(best_score);
@@ -37,6 +37,6 @@ func best_shuffle (original_word) {
     "grrr",
     "up",
     "a",
-].for {
-    best_shuffle(_.split(''));
+].for { |item|
+    best_shuffle(item.split(''));
 };

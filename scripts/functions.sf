@@ -38,7 +38,7 @@ var fib = ( fibonacci(0, 1, 13) );
 
 '--------------------------------------------------------------------------------' say;
 
-fibonacci(0,1, 20).to_s.say;
+fibonacci(0, 1, 20).to_s.say;
 
 '--------------------------------------------------------------------------------' say;
 
@@ -48,7 +48,7 @@ fibonacci(0,1, 20).to_s.say;
 ## Function overwriting
 #
 
-fibonacci = { |string, __|
+fibonacci = { |string|
     string.say;
 };
 

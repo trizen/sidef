@@ -1686,7 +1686,6 @@ package Sidef::Parser {
                                 elsif (   $variable->{count} == 0
                                        && $variable->{name} ne '_'
                                        && $variable->{type} ne 'class'
-                                       && $variable->{name} ne '__'
                                        && $variable->{name} ne '') {
                                     warn "Variable '$variable->{name}' has been initialized, but not used again, at "
                                       . "$self->{script_name}, line $variable->{line}\n";

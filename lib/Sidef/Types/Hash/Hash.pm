@@ -97,19 +97,11 @@ package Sidef::Types::Hash::Hash {
     sub _iterate {
         my ($self, $code, $callback) = @_;
 
-        my ($key_var, $val_var) = $code->init_block_vars;
-        if (not defined $val_var) {
-            $val_var = Sidef::Types::Black::Hole->new;
-        }
-
         while (my ($key, $value) = each %{$self}) {
             my $key_obj = Sidef::Types::String::String->new($key);
             my $val_obj = $value->get_value;
 
-            $key_var->set_value($key_obj);
-            $val_var->set_value($val_obj);
-
-            if ($code->run) {
+            if ($code->call($key_obj, $val_obj)) {
                 $callback->($key, $val_obj);
             }
         }
@@ -231,20 +223,9 @@ package Sidef::Types::Hash::Hash {
 
         $self->_is_code($code) || return;
 
-        my ($key_var, $val_var) = $code->init_block_vars;
-        if (not defined $val_var) {
-            $val_var = Sidef::Types::Black::Hole->new;
-        }
-
         my @array;
         while (my ($key, $value) = CORE::each %{$self}) {
-            my $key_obj = Sidef::Types::String::String->new($key);
-            my $val_obj = $value->get_value;
-
-            $key_var->set_value($key_obj);
-            $val_var->set_value($val_obj);
-
-            push @array, [$key, $code->run];
+            push @array, [$key, $code->call(Sidef::Types::String::String->new($key), $value->get_value)];
         }
 
         my $method = '<=>';

@@ -342,7 +342,9 @@ package Sidef::Types::Array::Array {
 
         foreach my $item (@{$self}) {
             $var_ref->set_value($item->get_value);
-            $code->run;
+            if (ref($code->run) eq 'Sidef::Types::Block::Break') {
+                last;
+            }
         }
 
         $self;
@@ -457,7 +459,7 @@ package Sidef::Types::Array::Array {
         my $offset = $#{$self};
         for (my $i = $offset ; $i >= 0 ; $i--) {
             $var_ref->set_value($self->[$i]->get_value);
-            i $code->run
+            $code->run
               && return Sidef::Types::Number::Number->new($i);
         }
 
@@ -622,8 +624,7 @@ package Sidef::Types::Array::Array {
             my ($var_ref) = $obj->init_block_vars();
 
             foreach my $var (@{$self}) {
-                my $item = $var->get_value;
-                $var_ref->set_value($item);
+                $var_ref->set_value($var->get_value);
 
                 if ($obj->run) {
                     return Sidef::Types::Bool::Bool->true;
@@ -648,6 +649,20 @@ package Sidef::Types::Array::Array {
 
         Sidef::Types::Bool::Bool->false;
     }
+
+    sub contains_type {
+        my ($self, $obj) = @_;
+
+        foreach my $item (@{$self}) {
+            if (ref($item->get_value) eq ref($obj)) {
+                return Sidef::Types::Bool::Bool->true;
+            }
+        }
+
+        return Sidef::Types::Bool::Bool->false;
+    }
+
+    *containsType = \&contains_type;
 
     sub pop {
         my ($self, $index) = @_;
@@ -794,15 +809,12 @@ package Sidef::Types::Array::Array {
         my @idx = 0 .. $#{$self};
 
         if (defined($code)) {
-
             $self->_is_code($code) || return;
-            my ($var_ref) = $code->init_block_vars();
 
             while (1) {
-                $var_ref->set_value($self->new(map { $_->get_value } @{$self}[@idx]));
 
-                if (ref(my $res = $code->run) eq 'Sidef::Types::Bool::Bool') {
-                    $$res eq 'true' || return $self;
+                if (ref($code->call($self->new(map { $_->get_value } @{$self}[@idx]))) eq 'Sidef::Types::Block::Break') {
+                    return $self;
                 }
 
                 my $p = $#idx;
