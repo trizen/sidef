@@ -152,6 +152,7 @@ package Sidef::Types::String::String {
     *toUpperCase = \&uc;
     *upcase      = \&uc;
     *upCase      = \&uc;
+    *upper       = \&uc;
 
     sub equals {
         my ($self, $string) = @_;
@@ -187,6 +188,7 @@ package Sidef::Types::String::String {
     *toLowerCase = \&lc;
     *downcase    = \&lc;
     *downCase    = \&lc;
+    *lower       = \&lc;
 
     sub lcfirst {
         my ($self) = @_;
@@ -811,6 +813,7 @@ package Sidef::Types::String::String {
         *{__PACKAGE__ . '::' . '$$'}  = \&ends_with;
         *{__PACKAGE__ . '::' . '<<'}  = \&shift_left;
         *{__PACKAGE__ . '::' . '>>'}  = \&shift_right;
+        *{__PACKAGE__ . '::' . '%'}   = \&sprintf;
 
         *{__PACKAGE__ . '::' . ':'} = sub {
             Sidef::Types::Hash::Hash->new($_[0], $_[1]);

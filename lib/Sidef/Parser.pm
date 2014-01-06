@@ -346,6 +346,7 @@ package Sidef::Parser {
                   __LINE__
                   __END__
                   __DATA__
+                  __CLASS_NAME__
 
                   __USE_BIGNUM__
                   __USE_RATNUM__
@@ -867,7 +868,7 @@ package Sidef::Parser {
 
                             my @params = split(/\h*,\h*/, $1);
 
-                            #local $self->{current_class} = $variable;  # useless (for now)
+                            local $self->{current_class} = $variable;
                             my ($obj, $pos) = $self->parse_block(code => '{' . substr($_, pos));
                             pos($_) += $pos - 1;
 
@@ -985,7 +986,7 @@ package Sidef::Parser {
                     redo;
                 }
 
-                if (/\G__CLASS__\b/gc) {
+                if (/\G__CLASS_NAME__\b/gc) {
                     return Sidef::Types::String::String->new($self->{class}), pos;
                 }
 
@@ -1088,17 +1089,17 @@ package Sidef::Parser {
                                       );
                 }
 
-                #if (/\Gself\b/gc) {
-                #    if (exists $self->{current_class}) {
-                #        return $self->{current_class}, pos;
-                #    }
+                if (/\G__CLASS__\b/gc) {
+                    if (exists $self->{current_class}) {
+                        return $self->{current_class}, pos;
+                    }
 
-                #     $self->fatal_error(
-                #                       code  => $_,
-                #                       pos   => pos($_) - length('__FUNC__'),
-                #                       error => "'self' can't be used outside a class!",
-                #                      );
-                #}
+                    $self->fatal_error(
+                                       code  => $_,
+                                       pos   => pos($_) - length('__CLASS__'),
+                                       error => "__CLASS__ can't be used outside a function!",
+                                      );
+                }
 
                 if (
                     /\G((?>ENV|ARGV))\b/gc && do {

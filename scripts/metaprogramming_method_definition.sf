@@ -1,0 +1,35 @@
+#!/usr/bin/ruby
+
+# See: http://en.wikipedia.org/wiki/Ruby_(programming_language)#Metaprogramming
+
+class Color (text) {
+    static COLORS = :(
+           black   => "000",
+           red     => "f00",
+           green   => "0f0",
+           yellow  => "ff0",
+           blue    => "00f",
+           magenta => "f0f",
+           cyan    => "0ff",
+           white   => "fff",
+        );
+
+    COLORS.each { |color, code|
+            __CLASS__.define_method(
+                "in_#{color}", { |self|
+                    "<span style=\"color: ##{code}\">#{self.text}</span>"
+                };
+            );
+        };
+};
+
+var text = Color.new("Hello World");
+
+say text.in_red;
+say text.in_green;
+say text.in_blue;
+
+# Tests
+text.in_red  =~ /#f00/ ?? || Sys.die("in_red  -- error!\n");
+text.in_cyan =~ /#0ff/ ?? || Sys.die("in_cyan -- error!\n");
+text.in_blue =~ /#00f/ ?? || Sys.die("in_blue -- error!\n");

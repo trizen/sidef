@@ -16,6 +16,16 @@ package Sidef::Variable::ClassInit {
         $self;
     }
 
+    sub define_method {
+        my ($self, $method_name, $code) = @_;
+
+        require Data::Dump;
+        push @{$self->{__BLOCK__}{code}{$self->{name}}},
+          {self =>
+            {$self->{name} => [{self => Sidef::Variable::Variable->new($$method_name, 'func', eval Data::Dump::pp($code))}]}
+          };
+    }
+
     sub init {
         my ($self, @args) = @_;
 

@@ -152,7 +152,7 @@ func number_to_ro (self, num) {
     var conf = _.toHash;
     while (var kv = (conf.each)) {
         opts.exists(kv[0]) || (
-            "[%s] Invalid option: <%s>\n".sprintf(__CLASS__, kv[0]).warn;
+            "[%s] Invalid option: <%s>\n".sprintf(__CLASS_NAME__, kv[0]).warn;
         );
 
         opts[kv[0]] = kv[1];

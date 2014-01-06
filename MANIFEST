@@ -215,6 +215,7 @@ scripts/magic_vars.sf
 scripts/Math/Algebra/Matrix.sm
 scripts/matrix_multiplication.sf
 scripts/median.sf
+scripts/metaprogramming_method_definition.sf
 scripts/method_expressions.sf
 scripts/multi_var_assignment.sf
 scripts/named_block_arguments.sf

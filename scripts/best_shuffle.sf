@@ -26,7 +26,7 @@ func best_shuffle (original_word) {
            best_word = arr;
         );
 
-        Bool.new(best_score);
+        best_score == 0 && break;
     };
 
     printf("%-6s %-6s : %d\n", original_word.join(''), best_word.join(''), best_score);
