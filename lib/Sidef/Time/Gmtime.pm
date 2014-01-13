@@ -27,8 +27,16 @@ package Sidef::Time::Gmtime {
             };
         }
 
-        *day   = \&mday;
-        *month = \&mon;
+        *day       = \&mday;
+        *month     = \&mon;
+        *minute    = \&min;
+        *second    = \&sec;
+        *month_day = \&mday;
+        *monthDay  = \&mday;
+        *week_day  = \&wday;
+        *weekDay   = \&wday;
+        *year_day  = \&yday;
+        *yearDay   = \&yday;
     }
 
     sub ctime {
