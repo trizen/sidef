@@ -29,6 +29,13 @@ package Sidef::Types::Block::Code {
         };
     }
 
+    sub copy {
+        my ($self) = @_;
+
+        require Data::Dump;
+        $self->new(eval Data::Dump::pp($self->{code}));
+    }
+
     {
         no strict 'refs';
 
