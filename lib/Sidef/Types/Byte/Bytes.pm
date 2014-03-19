@@ -14,6 +14,8 @@ package Sidef::Types::Byte::Bytes {
         bless [@{Sidef::Types::Array::Array->new(@bytes)}], __PACKAGE__;
     }
 
+    *def_method = \&Sidef::def_method;
+
     sub join {
         my ($self) = @_;
 

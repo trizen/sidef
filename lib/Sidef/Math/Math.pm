@@ -12,6 +12,8 @@ package Sidef::Math::Math {
         bless {}, __PACKAGE__;
     }
 
+    *def_method = \&Sidef::def_method;
+
     sub pi {
         my ($self, $places) = @_;
         Sidef::Types::Number::Number->new(

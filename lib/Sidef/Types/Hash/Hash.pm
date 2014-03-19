@@ -30,6 +30,8 @@ package Sidef::Types::Hash::Hash {
         \%hash;
     }
 
+    *def_method = \&Sidef::def_method;
+
     sub get {
         my ($self, @keys) = @_;
 

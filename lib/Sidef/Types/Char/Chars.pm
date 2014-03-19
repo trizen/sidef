@@ -14,4 +14,6 @@ package Sidef::Types::Char::Chars {
         bless [@{Sidef::Types::Array::Array->new(@chars)}], __PACKAGE__;
     }
 
+    *def_method = \&Sidef::def_method;
+
 }

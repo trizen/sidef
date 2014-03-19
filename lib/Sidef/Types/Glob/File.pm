@@ -21,6 +21,8 @@ package Sidef::Types::Glob::File {
         ${$_[0]};
     }
 
+    *def_method = \&Sidef::def_method;
+
     sub size {
         my ($self) = @_;
         Sidef::Types::Number::Number->new(-s $$self);

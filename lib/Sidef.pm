@@ -91,6 +91,14 @@ package Sidef {
                 return Sidef::Types::Bool::Bool->new($bool);
             };
         }
+
+        sub def_method {
+            my ($self, $name, $block) = @_;
+
+            *{ref($self) . '::' . $name} = sub {
+                $block->call(@_);
+            };
+        }
     }
 
     sub new {
@@ -108,6 +116,7 @@ package Sidef {
         my ($self, $obj) = @_;
         Sidef::Types::Bool::Bool->new(ref($self) eq ref($obj));
     }
+
 };
 
 1;

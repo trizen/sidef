@@ -10,6 +10,8 @@ package Sidef::Sys::Sys {
         bless {}, __PACKAGE__;
     }
 
+    *def_method = \&Sidef::def_method;
+
     sub exit {
         my ($self, $code) = @_;
         exit($code // 0);

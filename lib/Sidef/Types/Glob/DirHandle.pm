@@ -16,11 +16,17 @@ package Sidef::Types::Glob::DirHandle {
           __PACKAGE__;
     }
 
+    sub get_value {
+        $_[0]->{dir_h};
+    }
+
     sub dir {
         $_[0]{dir};
     }
 
     *parent = \&dir;
+
+    *def_method = \&Sidef::def_method;
 
     sub get_files {
         my ($self) = @_;

@@ -13,6 +13,8 @@ package Sidef::Types::Glob::Pipe {
         [map { $_->get_value } @{$_[0]}];
     }
 
+    *def_method = \&Sidef::def_method;
+
     sub command {
         my ($self) = @_;
 

@@ -14,4 +14,6 @@ package Sidef::Types::Byte::Byte {
         bless \(my $b = int($byte)), __PACKAGE__;
     }
 
+    *def_method = \&Sidef::def_method;
+
 }

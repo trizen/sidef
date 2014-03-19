@@ -15,6 +15,8 @@ package Sidef::Types::Char::Char {
         bless \$char, __PACKAGE__;
     }
 
+    *def_method = \&Sidef::def_method;
+
     sub dump {
         my ($self) = @_;
         Sidef::Types::String::String->new(q{Char.new('} . $$self =~ s{'}{\\'}gr . q{')});

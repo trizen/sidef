@@ -29,6 +29,8 @@ package Sidef::Types::Block::Code {
         };
     }
 
+    *def_method = \&Sidef::def_method;
+
     sub copy {
         my ($self) = @_;
 

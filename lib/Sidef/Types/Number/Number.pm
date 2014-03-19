@@ -36,6 +36,8 @@ package Sidef::Types::Number::Number {
 
     sub get_value { ${$_[0]}->numify }
 
+    *def_method = \&Sidef::def_method;
+
     sub mod {
         my ($self, $num) = @_;
         $self->_is_number($num) || return;
