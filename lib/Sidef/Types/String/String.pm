@@ -442,6 +442,11 @@ package Sidef::Types::String::String {
         Sidef::Types::Array::Array->new(map { __PACKAGE__->new($_) } split(/$sep/, $$self, $size));
     }
 
+    sub words {
+        my ($self) = @_;
+        Sidef::Types::Array::Array->new(map { __PACKAGE__->new($_) } CORE::split(' ', $$self));
+    }
+
     sub each {
         my ($self, $obj) = @_;
         $self->_is_code($obj) || return;

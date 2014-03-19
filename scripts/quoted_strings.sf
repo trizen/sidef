@@ -1,10 +1,10 @@
 #!/usr/bin/perl
 
 #
-## qw() with comments and space-escapes
+## %w() with comments and space-escapes
 #
 
-var array = qw(
+var array = %w(
     a b c
     hello\ world       # space escaped
     value(i)           # this is a comment
@@ -17,14 +17,14 @@ array == [
     'value(i)',
     '#not_a_comment'
 ] || (
-    "qw() error!\n".die
+    "%w() error!\n".die
 );
 
 #
 ## Double quoted words
 #
 
-qqw <
+%W <
     tab:\t
     newline:\n
     not\ a\ new_line!:\\n
@@ -33,45 +33,45 @@ qqw <
     "newline:\n",
     'not a new_line!:\n'
 ] || (
-    "qqw<> error!\n".die
+    "%W<> error!\n".die
 );
 
 #
 ## Balanced and escaped delimiter
 #
 
-var single_q = q «Single quo\ted s«tr»ing: Escaping: \\\««\»» \»\» »;
+var single_q = %q «Single quo\ted s«tr»ing: Escaping: \\\««\»» \»\» »;
 
 single_q == 'Single quo\ted s«tr»ing: Escaping: \««»» »» '
-    || ("q«» error!\n".die);
+    || ("%q«» error!\n".die);
 
 
 #
 ## Escaped unary delimited
 #
 
-single_q = q~hello\~world~;
+single_q = %q~hello\~world~;
 
 single_q == 'hello~world'
-    || ("q~~ error!\n".die);
+    || ("%q~~ error!\n".die);
 
 
 #
 ## Backslash delimiter (q\\)
 #
 
-var double_q = qq\#not a comment\;
+var double_q = %Q\#not a comment\;
 
 double_q == '#not a comment'
-    || ("qq\\\\ error!\n".die);
+    || ("%Q\\\\ error!\n".die);
 
 
 #
 ## Balanced brackets
 #
 
-q{g\~o{{\}\{\}{\{}}\\}o\}\{{da\}g}le} ==
- 'g\~o{{}{}{{}}\}o}{{da}g}le'        || ("q{} error!".die);
+%q{g\~o{{\}\{\}{\{}}\\}o\}\{{da\}g}le} ==
+ 'g\~o{{}{}{{}}\}o}{{da}g}le'        || ("%q{} error!".die);
 
 
 #
@@ -85,9 +85,9 @@ q{g\~o{{\}\{\}{\{}}\\}o\}\{{da\}g}le} ==
 ## Unescaping
 #
 
-double_q = qq „tab:\t -- not a tab: \\t”;
+double_q = %Q „tab:\t -- not a tab: \\t”;
 double_q == ('tab:' + "\t" + ' -- not a tab: \\t')
-    || ("qq„” error!\n".die);
+    || ("%Q„” error!\n".die);
 
 
 "All tests passed!".say;

@@ -29,7 +29,7 @@ func evalArithmeticExp(s) {
         s.gReplace!(/[()]/,'').gReplace!(/-\+/, '-');
 
         var reM  = /\*/;
-        var reMD = qr"(\d+\.?\d*\s*[*/]\s*[+-]?\d+\.?\d*)";
+        var reMD = %r"(\d+\.?\d*\s*[*/]\s*[+-]?\d+\.?\d*)";
 
         var reA  = /\d\+/;
         var reAS = /(-?\d+\.?\d*\s*[+-]\s*[+-]?\d+\.?\d*)/;

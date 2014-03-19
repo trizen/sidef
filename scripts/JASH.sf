@@ -1,4 +1,4 @@
 #!/usr/bin/perl
 
-(:qw)2 A 4 H 1 J 3 S)...)[1..4]map{static(ß)=qw;tsu rehton fedi
-rekca;;_+(ß<<1->pop.reverse+(!ß.len->?q\,\ :32.chr))}.'join'say
+(:%W)2 A 4 H 1 J 3 S)...)[1..4]map{static(ß)=+%w;tsu rehton fedi
+rekca;,_+(ß<<1->pop reverse+(!ß.len->?%q\,\ :32.chr))}.'join'say

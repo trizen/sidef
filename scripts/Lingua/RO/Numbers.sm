@@ -8,7 +8,7 @@ class Lingua::RO::Numbers () {
 __USE_BIGNUM__
 
 static DIGITS = Hash.new;
-DIGITS['0'..'19'] = qw„
+DIGITS['0'..'19'] = %w(
   zero unu doi trei patru cinci șase șapte opt nouă zece
   unsprezece
   doisprezece
@@ -19,7 +19,7 @@ DIGITS['0'..'19'] = qw„
   șaptesprezece
   optsprezece
   nouăsprezece
-”;
+);
 
 # See: http://ro.wikipedia.org/wiki/Sistem_zecimal#Denumiri_ale_numerelor
 
@@ -37,7 +37,7 @@ static BIGNUMS = (
                 [10**27, 'cvadriliard', 'cvadriliarde', false],
             ]
              -> map {
-                 (var h = Hash.new)[qw(num sg pl fem)] = (_) => h;
+                 (var h = Hash.new)[%w(num sg pl fem)] = (_) => h;
             }
 );
 

@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 var apps = [];
-var desktopFilesPaths = [qd'/usr/share/applications'];
+var desktopFilesPaths = [%d'/usr/share/applications'];
 
 for (desktopFilesPaths, \var path) {
 

@@ -4,7 +4,7 @@
 
 func cuboid (x, y, z, s) {
 
-    var (c, h, v, d) = (qw '
+    var (c, h, v, d) = (%w'
          +  -  |  /
     ' ...);
 

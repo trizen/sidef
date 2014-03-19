@@ -46,7 +46,7 @@ var monName = (t.strftime("%B"));
                     "Su Mo Tu We Th Fr Sa",
                   );
 
-q{   } * (st % 7).print;
+%q/ / * 3 * (st % 7).print;
 
 for (var i = 1; i <= mons[mon]; i++) {
 

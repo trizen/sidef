@@ -20,10 +20,10 @@ func main () {
     );
 
     var array = [
-        qw'the that a',
-        qw'frog elephant thing',
-        qw'walked treaded grows',
-        qw'slowly quickly',
+        %w'the that a',
+        %w'frog elephant thing',
+        %w'walked treaded grows',
+        %w'slowly quickly',
     ];
 
     alg.NestedLoops(array, code);

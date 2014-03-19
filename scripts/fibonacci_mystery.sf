@@ -14,7 +14,7 @@ var arr = [];
 var fmt = "%6s %6s %6s\n";
 var max = (ARGV[0] \\ 9 -> to_num);
 
-" " + fmt printf(qw(pos fib len)->to_list);
+" " + fmt printf(%w(pos fib len)->to_list);
 
 for (var i = 0; true; i++) {
 

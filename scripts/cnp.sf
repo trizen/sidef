@@ -98,7 +98,7 @@ var juds = :(
           );
 
 
-var months = qw(
+var months = %w(
   Ianuarie
   Februarie
   Martie

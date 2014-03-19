@@ -2,7 +2,7 @@
 
 # Translation of: http://rosettacode.org/wiki/Rock-paper-scissors#Go
 
-const rps = qw(r p s);
+const rps = %w(r p s);
 
 var msg = [
     "Rock breaks scissors",

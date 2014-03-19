@@ -127,8 +127,11 @@ package Sidef::Types::Glob::FileHandle {
           : ();
     }
 
-    *readln   = \&readline;
-    *readLine = \&readline;
+    *readln    = \&readline;
+    *readLine  = \&readline;
+    *read_line = \&readline;
+    *get       = \&readline;
+    *line      = \&readline;
 
     sub read_char {
         my ($self) = @_;

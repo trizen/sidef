@@ -32,7 +32,7 @@ say 'abc'.reverse.dump;
 
 
 # Array
-say reverse(qw(a b c)).dump;
+say reverse(%w(a b c)).dump;
 
 # Array (built-in)
-say qw(a b c).reverse.dump;
+say %w(a b c).reverse.dump;

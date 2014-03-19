@@ -289,7 +289,6 @@ package Sidef::Parser {
             keywords => {
                 map { $_ => 1 }
                   qw(
-                  q qq qw qqw qf qqf qd qqd qr
                   next
                   break
                   return
@@ -708,38 +707,38 @@ package Sidef::Parser {
                 }
 
                 # Single quoted string
-                if (/\G(?=['‘‚’])/ || /\Gq\b/gc) {
+                if (/\G(?=['‘‚’])/ || /\G%q\b/gc) {
                     my ($string, $pos) = $self->get_quoted_string(code => substr($_, pos));
                     return Sidef::Types::String::String->new($string =~ s{\\\\}{\\}gr), pos($_) + $pos;
                 }
 
                 # Double quoted string
-                if (/\G(?=["“„”])/ || /\Gqq\b/gc) {
+                if (/\G(?=["“„”])/ || /\G%Q\b/gc) {
                     my ($string, $pos) = $self->get_quoted_string(code => (substr($_, pos)));
                     return Sidef::Types::String::String->new($string)->apply_escapes($self), pos($_) + $pos;
                 }
 
                 # Single quoted filename
-                if (/\Gqf\b/gc) {
+                if (/\G%f\b/gc) {
                     my ($string, $pos) = $self->get_quoted_string(code => substr($_, pos));
                     return Sidef::Types::Glob::File->new($string =~ s{\\\\}{\\}gr), pos($_) + $pos;
                 }
 
                 # Double quoted filename
-                if (/\Gqqf\b/gc) {
+                if (/\G%F\b/gc) {
                     my ($string, $pos) = $self->get_quoted_string(code => (substr($_, pos)));
                     return Sidef::Types::Glob::File->new(Sidef::Types::String::String->new($string)->apply_escapes($self)),
                       pos($_) + $pos;
                 }
 
                 # Single quoted dirname
-                if (/\Gqd\b/gc) {
+                if (/\G%d\b/gc) {
                     my ($string, $pos) = $self->get_quoted_string(code => substr($_, pos));
                     return Sidef::Types::Glob::Dir->new($string =~ s{\\\\}{\\}gr), pos($_) + $pos;
                 }
 
                 # Double quoted dirname
-                if (/\Gqqd\b/gc) {
+                if (/\G%D\b/gc) {
                     my ($string, $pos) = $self->get_quoted_string(code => (substr($_, pos)));
                     return Sidef::Types::Glob::Dir->new(Sidef::Types::String::String->new($string)->apply_escapes($self)),
                       pos($_) + $pos;
@@ -926,8 +925,8 @@ package Sidef::Parser {
                     return Sidef::Types::Number::Number->new($1 =~ tr/_//dr), pos;
                 }
 
-                # Quoted words (qw/a b c/)
-                if (/\G(qq?w)\b/gc) {
+                # Quoted words (%w/a b c/)
+                if (/\G%(w)\b/gci) {
                     my ($type) = $1;
 
                     my $array = Sidef::Types::Array::Array->new();
@@ -935,7 +934,7 @@ package Sidef::Parser {
 
                     $array->push(
                         map {
-                            $type eq 'qw'
+                            $type eq 'w'
                               ? Sidef::Types::String::String->new($_)->unescape
                               : Sidef::Types::String::String->new($_)->apply_escapes($self)
                           } @{$strings}
@@ -957,14 +956,11 @@ package Sidef::Parser {
                 }
 
                 # Regular expression
-                if (m{\G(?=/)} || /\Gqr\b/gc) {
+                if (m{\G(?=/)} || /\G%r\b/gc) {
                     my ($string, $pos) = $self->get_quoted_string(code => (substr($_, pos)));
                     pos($_) += $pos;
 
-                    my $regex = Sidef::Types::String::String->new($string);
-                    my $flags = $1 if /\G($self->{re}{match_flags})/goc;
-
-                    return Sidef::Types::Regex::Regex->new($$regex, $flags), pos;
+                    return Sidef::Types::Regex::Regex->new($string, /\G($self->{re}{match_flags})/goc ? $1 : undef), pos;
                 }
 
                 # Backtick
