@@ -1,22 +1,23 @@
 ---
 abstract: 'Sidef Programming Language'
 author:
-  - "\n                     Daniel Șuteu   (<trizenx@gmail.com>)\n                     Ioana Fălcușan (<ioanaflavia@gmail.com>)\n                    "
+  - 'Daniel Șuteu   (<trizenx@gmail.com>)'
+  - 'Ioana Fălcușan (<ioanaflavia@gmail.com>)'
 build_requires:
-  Test::More: 0
+  Test::More: '0'
 configure_requires:
-  Module::Build: 0
+  Module::Build: '0'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4203, CPAN::Meta::Converter version 2.133380'
+generated_by: 'Module::Build version 0.4205, CPAN::Meta::Converter version 2.140640'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Sidef
 provides:
   Sidef:
     file: lib/Sidef.pm
-    version: 0.01
+    version: '0.01'
   Sidef::Args::Args:
     file: lib/Sidef/Args/Args.pm
   Sidef::Convert::Convert:
@@ -134,25 +135,25 @@ provides:
   Sidef::Variable::Variable:
     file: lib/Sidef/Variable/Variable.pm
 recommends:
-  Math::BigInt::GMP: 0
-  Term::ReadLine::Gnu::XS: 0
+  Math::BigInt::GMP: '0'
+  Term::ReadLine::Gnu::XS: '0'
 requires:
-  Cwd: 0
-  Encode: 0
-  Fcntl: 0
-  File::Basename: 0
-  File::Copy: 0
-  File::Path: 0
-  File::Spec: 0
-  Getopt::Std: 0
-  List::Util: 0
-  Math::BigFloat: 0
-  Math::BigInt: 0
-  POSIX: 0
-  Term::ReadLine: 0
-  Time::HiRes: 0
-  perl: 5.014
-  utf8: 0
+  Cwd: '0'
+  Encode: '0'
+  Fcntl: '0'
+  File::Basename: '0'
+  File::Copy: '0'
+  File::Path: '0'
+  File::Spec: '0'
+  Getopt::Std: '0'
+  List::Util: '0'
+  Math::BigFloat: '0'
+  Math::BigInt: '0'
+  POSIX: '0'
+  Term::ReadLine: '0'
+  Time::HiRes: '0'
+  perl: '5.014'
+  utf8: '0'
 resources:
   license: http://www.perlfoundation.org/artistic_license_2_0
-version: 0.01
+version: '0.01'

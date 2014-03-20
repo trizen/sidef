@@ -1,10 +1,11 @@
 {
    "abstract" : "Sidef Programming Language",
    "author" : [
-      "\n                     Daniel Șuteu   (<trizenx@gmail.com>)\n                     Ioana Fălcușan (<ioanaflavia@gmail.com>)\n                    "
+      "Daniel Șuteu   (<trizenx@gmail.com>)",
+      "Ioana Fălcușan (<ioanaflavia@gmail.com>)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4203",
+   "generated_by" : "Module::Build version 0.4205",
    "license" : [
       "artistic_2"
    ],
