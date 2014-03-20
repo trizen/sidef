@@ -148,7 +148,7 @@ package Sidef::Types::Block::Code {
 
         foreach my $var (@stack_vars) {
             if ($#{$var->{stack}} == $max_depth) {
-                pop $var->{stack};
+                pop @{$var->{stack}};
             }
         }
     }

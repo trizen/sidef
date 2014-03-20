@@ -636,16 +636,11 @@ package Sidef::Types::Array::Array {
             return Sidef::Types::Bool::Bool->false;
         }
 
+        my $method = '==';
         foreach my $var (@{$self}) {
-
             my $item = $var->get_value;
-            if (ref($item) eq ref($obj)) {
-                my $method = '==';
-                if (defined $item->can($method)) {
-                    if ($item->$method($obj)) {
-                        return Sidef::Types::Bool::Bool->true;
-                    }
-                }
+            if (ref($item) eq ref($obj) and defined $item->can($method) and $item->$method($obj)) {
+                return Sidef::Types::Bool::Bool->true;
             }
         }
 
@@ -688,7 +683,10 @@ package Sidef::Types::Array::Array {
         pop @{$self};
     }
 
-    *delete = \&pop;
+    *delete_index = \&pop;
+    *deleteIndex  = \&pop;
+    *pop_index    = \&pop;
+    *popIndex     = \&pop;
 
     sub pop_rand {
         my ($self) = @_;
@@ -912,6 +910,64 @@ package Sidef::Types::Array::Array {
         my ($self) = @_;
         $self->new(map { $_->get_value } @{$self});
     }
+
+    sub delete_first {
+        my ($self, $obj) = @_;
+
+        my $method = '==';
+        while (my ($i, $var) = CORE::each @{$self}) {
+            my $item = $var->get_value;
+            if (ref($item) eq ref($obj) and defined $item->can($method) and $item->$method($obj)) {
+                return CORE::splice(@{$self}, $i, 1);
+            }
+        }
+
+        return;
+    }
+
+    *deleteFirst = \&delete_first;
+
+    sub delete {
+        my ($self, $obj) = @_;
+
+        my $method = '==';
+        for (my $i = 0 ; $i <= $#{$self} ; $i++) {
+            my $item = $self->[$i]->get_value;
+            if (ref($item) eq ref($obj) and defined $item->can($method) and $item->$method($obj)) {
+                CORE::splice(@{$self}, $i--, 1);
+            }
+        }
+
+        $self;
+    }
+
+    *deleteAll = \&delete_all;
+
+    sub delete_if {
+        my ($self, $block) = @_;
+        $self->_is_code($block) || return;
+
+        for (my $i = 0 ; $i <= $#{$self} ; $i++) {
+            $block->call($self->[$i]->get_value) && CORE::splice(@{$self}, $i--, 1);
+        }
+
+        $self;
+    }
+
+    *deleteIf = \&delete_if;
+
+    sub delete_first_if {
+        my ($self, $block) = @_;
+        $self->_is_code($block) || return;
+
+        while (my ($i, $item) = CORE::each @{$self}) {
+            $block->call($item->get_value) && (return CORE::splice(@{$self}, $i, 1));
+        }
+
+        return;
+    }
+
+    *deleteFirstIf = \&delete_first_if;
 
     sub dump {
         my ($self) = @_;
