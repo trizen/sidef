@@ -926,7 +926,7 @@ package Sidef::Parser {
                 }
 
                 # Quoted words (%w/a b c/)
-                if (/\G%(w)\b/gci) {
+                if (/\G%(w)\b/gci || /\G(?=([«<]))/) {
                     my ($type) = $1;
 
                     my $array = Sidef::Types::Array::Array->new();
@@ -934,7 +934,7 @@ package Sidef::Parser {
 
                     $array->push(
                         map {
-                            $type eq 'w'
+                            $type eq 'w' || $type eq '<'
                               ? Sidef::Types::String::String->new($_)->unescape
                               : Sidef::Types::String::String->new($_)->apply_escapes($self)
                           } @{$strings}
