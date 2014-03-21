@@ -253,6 +253,7 @@ scripts/sum_of_squares.sf
 scripts/switch.sf
 scripts/sylvesters_sequence.sf
 scripts/sysopen_and_sysread.sf
+scripts/tennis_tournament.sf
 scripts/test_all.pl
 scripts/token_recursive.sf
 scripts/two_dimensional_array.sf
