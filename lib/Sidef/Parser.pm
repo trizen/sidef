@@ -925,8 +925,23 @@ package Sidef::Parser {
                     return Sidef::Types::Number::Number->new($1 =~ tr/_//dr), pos;
                 }
 
+                # Implicit method call on special variable: _
+                if (/\G\./) {
+                    my ($var) = $self->find_var('_', $self->{class});
+
+                    if (defined $var) {
+                        return $var->{obj}, pos;
+                    }
+
+                    $self->fatal_error(
+                                       code  => $_,
+                                       pos   => pos($_) - 1,
+                                       error => "attempt to use an implicit method call on the uninitialized variable: \"_\"",
+                                      );
+                }
+
                 # Quoted words (%w/a b c/)
-                if (/\G%(w)\b/gci || /\G(?=([«<]))/) {
+                if (/\G%(w)\b/gci || /\G(?=(«|<(?!<)))/) {
                     my ($type) = $1;
 
                     my $array = Sidef::Types::Array::Array->new();
