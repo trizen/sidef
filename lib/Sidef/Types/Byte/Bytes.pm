@@ -5,9 +5,7 @@ package Sidef::Types::Byte::Bytes {
     use warnings;
 
     our @ISA = qw(
-      Sidef
       Sidef::Types::Array::Array
-      Sidef::Convert::Convert
       );
 
     sub new {

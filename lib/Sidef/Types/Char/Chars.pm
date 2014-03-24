@@ -6,7 +6,6 @@ package Sidef::Types::Char::Chars {
 
     our @ISA = qw(
       Sidef::Types::Array::Array
-      Sidef::Convert::Convert
       );
 
     sub new {

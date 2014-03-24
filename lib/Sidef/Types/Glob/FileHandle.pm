@@ -264,6 +264,28 @@ package Sidef::Types::Glob::FileHandle {
     *input_separator = \&separator;
     *inputSeparator  = \&separator;
 
+    sub read_to {
+        my ($self, $var_ref) = @_;
+        $self->_is_var_ref($var_ref) || return;
+
+        $var_ref->get_var->set_value(Sidef::Types::String::String->new(substr(scalar CORE::readline($self->{fh}), 0, -1)));
+    }
+
+    *readTo = \&read_to;
+
+    sub output_from {
+        my ($self, $string) = @_;
+        say {$self->{fh}} $string;
+    }
+
+    *outputFrom = \&output_from;
+
+    {
+        no strict 'refs';
+        *{__PACKAGE__ . '::' . '>>'} = \&read_to;
+        *{__PACKAGE__ . '::' . '<<'} = \&output_from;
+    }
+
 };
 
 1

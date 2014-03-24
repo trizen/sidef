@@ -155,6 +155,7 @@ scripts/box_the_compass.sf
 scripts/break.sf
 scripts/bulls_and_cows.sf
 scripts/bulls_and_cows_player.sf
+scripts/c_plus_plus_input_output.sf
 scripts/caesar_cipher.sf
 scripts/calendar.sf
 scripts/catalan_numbers.sf
@@ -162,6 +163,7 @@ scripts/catalan_numbers_recursive.sf
 scripts/class_concept.sf
 scripts/class_config.sf
 scripts/classes.sf
+scripts/classes_and_objects.sf
 scripts/cnp.sf
 scripts/code_interpolation.sf
 scripts/code_to_hash.sf

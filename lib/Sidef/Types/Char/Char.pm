@@ -5,9 +5,7 @@ package Sidef::Types::Char::Char {
     use warnings;
 
     our @ISA = qw(
-      Sidef
       Sidef::Types::String::String
-      Sidef::Convert::Convert
       );
 
     sub new {

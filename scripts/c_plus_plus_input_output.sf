@@ -1,0 +1,7 @@
+#!/usr/bin/ruby
+
+DATA >> \var x;
+STDOUT << x;
+
+__DATA__
+Hello, World!
