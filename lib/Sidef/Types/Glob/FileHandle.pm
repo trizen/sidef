@@ -268,7 +268,7 @@ package Sidef::Types::Glob::FileHandle {
         my ($self, $var_ref) = @_;
         $self->_is_var_ref($var_ref) || return;
 
-        $var_ref->get_var->set_value(Sidef::Types::String::String->new(substr(scalar CORE::readline($self->{fh}), 0, -1)));
+        $var_ref->get_var->set_value(Sidef::Types::String::String->new(unpack 'A*', scalar CORE::readline($self->{fh})));
     }
 
     *readTo = \&read_to;
