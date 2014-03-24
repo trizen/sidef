@@ -15,7 +15,7 @@ class Color (text) {
         );
 
     COLORS.each { |color, code|
-            __CLASS__.define_method(
+            __CLASS__.def_method(
                 "in_#{color}", { |self|
                     "<span style=\"color: ##{code}\">#{self.text}</span>"
                 };

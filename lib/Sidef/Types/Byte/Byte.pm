@@ -5,6 +5,7 @@ package Sidef::Types::Byte::Byte {
     use warnings;
 
     our @ISA = qw(
+      Sidef
       Sidef::Types::Number::Number
       Sidef::Convert::Convert
       );
@@ -13,7 +14,5 @@ package Sidef::Types::Byte::Byte {
         my (undef, $byte) = @_;
         bless \(my $b = int($byte)), __PACKAGE__;
     }
-
-    *def_method = \&Sidef::def_method;
 
 }

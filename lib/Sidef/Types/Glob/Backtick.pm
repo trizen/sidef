@@ -4,7 +4,10 @@ package Sidef::Types::Glob::Backtick {
     use strict;
     use warnings;
 
-    our @ISA = qw(Sidef Sidef::Convert::Convert);
+    our @ISA = qw(
+      Sidef
+      Sidef::Convert::Convert
+      );
 
     sub new {
         my (undef, $backtick) = @_;

@@ -26,8 +26,6 @@ package Sidef::Types::Glob::DirHandle {
 
     *parent = \&dir;
 
-    *def_method = \&Sidef::def_method;
-
     sub get_files {
         my ($self) = @_;
         Sidef::Types::Array::Array->new(map { Sidef::Types::String::String->new($_) } readdir($self->{dir_h}));

@@ -19,8 +19,6 @@ package Sidef::Types::Glob::Dir {
         ${$_[0]};
     }
 
-    *def_method = \&Sidef::def_method;
-
     sub home {
         my ($self) = @_;
 

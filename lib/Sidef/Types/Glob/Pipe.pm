@@ -4,6 +4,11 @@ package Sidef::Types::Glob::Pipe {
     use strict;
     use warnings;
 
+    our @ISA = qw(
+      Sidef
+      Sidef::Convert::Convert
+      );
+
     sub new {
         my (undef, @command) = @_;
         bless \@command, __PACKAGE__;
@@ -12,8 +17,6 @@ package Sidef::Types::Glob::Pipe {
     sub get_value {
         [map { $_->get_value } @{$_[0]}];
     }
-
-    *def_method = \&Sidef::def_method;
 
     sub command {
         my ($self) = @_;

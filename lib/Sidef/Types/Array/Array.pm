@@ -35,8 +35,6 @@ package Sidef::Types::Array::Array {
         \@array;
     }
 
-    *def_method = \&Sidef::def_method;
-
     sub _grep {
         my ($self, $array, $bool) = @_;
 

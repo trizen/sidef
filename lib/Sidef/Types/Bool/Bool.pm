@@ -7,7 +7,10 @@ package Sidef::Types::Bool::Bool {
     no warnings 'recursion';
     use overload q{bool} => \&get_value;
 
-    our @ISA = qw(Sidef::Convert::Convert);
+    our @ISA = qw(
+      Sidef
+      Sidef::Convert::Convert
+      );
 
     {
         my %bool = (

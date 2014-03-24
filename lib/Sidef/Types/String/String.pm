@@ -20,8 +20,6 @@ package Sidef::Types::String::String {
         ${$_[0]};
     }
 
-    *def_method = \&Sidef::def_method;
-
     sub inc {
         my ($self) = @_;
         my $copy = $$self;

@@ -19,12 +19,19 @@ package Sidef::Variable::ClassInit {
     sub define_method {
         my ($self, $method_name, $code) = @_;
 
-        require Data::Dump;
         push @{$self->{__BLOCK__}{code}{$self->{name}}},
-          {self =>
-            {$self->{name} => [{self => Sidef::Variable::Variable->new($$method_name, 'func', eval Data::Dump::pp($code))}]}
+          {
+            self => {
+                     $self->{name} => [
+                                       {
+                                        self => Sidef::Variable::Variable->new($$method_name, 'func', $code->copy)
+                                       }
+                                      ]
+                    }
           };
     }
+
+    *def_method = \&define_method;
 
     sub init {
         my ($self, @args) = @_;
@@ -37,21 +44,26 @@ package Sidef::Variable::ClassInit {
         $self->{__BLOCK__}->run;
 
         # I don't like this, but... it works!
+        my @init_methods;
         foreach my $function (@{$self->{__BLOCK__}{code}{$self->{name}}}) {
             if (    ref $function eq 'HASH'
                 and ref(my $func = $function->{self}{$self->{name}}[0]{self}) eq 'Sidef::Variable::Variable') {
                 if ($func->{type} eq 'func') {
 
-                    # Call the function if its name is 'new';
+                    # If the function has a special name, store it as init method
                     if ($func->{name} eq 'new') {
-                        $func->call($class, @args);
+                        push @init_methods, $func;
                         next;
                     }
 
-                    # Otherwise, store it.
+                    # Otherwise, store it as normal method
                     $class->{functions}{$func->{name}} = $func;
                 }
             }
+        }
+
+        foreach my $method (@init_methods) {
+            $method->call($class, @args);
         }
 
         $class;

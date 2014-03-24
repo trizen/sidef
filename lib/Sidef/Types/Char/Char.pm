@@ -5,6 +5,7 @@ package Sidef::Types::Char::Char {
     use warnings;
 
     our @ISA = qw(
+      Sidef
       Sidef::Types::String::String
       Sidef::Convert::Convert
       );
@@ -14,8 +15,6 @@ package Sidef::Types::Char::Char {
         ref($char) && return $char->to_char;
         bless \$char, __PACKAGE__;
     }
-
-    *def_method = \&Sidef::def_method;
 
     sub dump {
         my ($self) = @_;

@@ -5,6 +5,7 @@ package Sidef::Types::Byte::Bytes {
     use warnings;
 
     our @ISA = qw(
+      Sidef
       Sidef::Types::Array::Array
       Sidef::Convert::Convert
       );
@@ -13,8 +14,6 @@ package Sidef::Types::Byte::Bytes {
         my (undef, @bytes) = @_;
         bless [@{Sidef::Types::Array::Array->new(@bytes)}], __PACKAGE__;
     }
-
-    *def_method = \&Sidef::def_method;
 
     sub join {
         my ($self) = @_;

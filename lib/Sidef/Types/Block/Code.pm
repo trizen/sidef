@@ -29,13 +29,11 @@ package Sidef::Types::Block::Code {
         };
     }
 
-    *def_method = \&Sidef::def_method;
-
     sub copy {
         my ($self) = @_;
 
         require Data::Dump;
-        $self->new(eval Data::Dump::pp($self->{code}));
+        eval Data::Dump::pp($self);
     }
 
     {

@@ -40,8 +40,6 @@ package Sidef::Types::Regex::Regex {
 
     sub get_value { $_[0]{regex} }
 
-    *def_method = \&Sidef::def_method;
-
     sub match {
         my ($self, $object, $pos) = @_;
 

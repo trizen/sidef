@@ -4,15 +4,11 @@ package Sidef::Math::Math {
     use strict;
     use warnings;
 
-    our @ISA = qw(
-      Sidef
-      );
+    our @ISA = qw(Sidef);
 
     sub new {
         bless {}, __PACKAGE__;
     }
-
-    *def_method = \&Sidef::def_method;
 
     sub pi {
         my ($self, $places) = @_;
