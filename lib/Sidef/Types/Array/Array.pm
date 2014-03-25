@@ -236,6 +236,50 @@ package Sidef::Types::Array::Array {
 
     *product = \&prod;
 
+    sub max_by {
+        my ($self, $code) = @_;
+        $self->_is_code($code) || return;
+
+        my $max;
+        my $min = Sidef::Math::Math->inf->neg;
+
+        foreach my $item (@{$self}) {
+            my $value  = $item->get_value;
+            my $result = $code->call($value);
+
+            if ($result->gt($min)) {
+                $max = $item->get_value;
+                $min = $result;
+            }
+        }
+
+        return $max;
+    }
+
+    *maxBy = \&max_by;
+
+    sub min_by {
+        my ($self, $code) = @_;
+        $self->_is_code($code) || return;
+
+        my $min;
+        my $max = Sidef::Math::Math->inf;
+
+        foreach my $item (@{$self}) {
+            my $value  = $item->get_value;
+            my $result = $code->call($value);
+
+            if ($result->lt($max)) {
+                $min = $item->get_value;
+                $max = $result;
+            }
+        }
+
+        return $min;
+    }
+
+    *minBy = \&min_by;
+
     sub last {
         my ($self) = @_;
         $#{$self} >= 0 || return;

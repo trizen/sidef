@@ -4,13 +4,9 @@
 
 func mode(array) {
     var c = Hash.new;
-
-    for (array) { |e|
-        c[e] := 0 ++;
-    }
-
-    var best = (c.values.max);
-    c.keys.grep{c[_] == best};
+    array.each{|i| c[i] := 0 ++};
+    var max = c.values.max;
+    c.keys.grep{|i| c[i] == max};
 }
 
 for [
