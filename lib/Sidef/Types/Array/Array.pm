@@ -967,7 +967,9 @@ package Sidef::Types::Array::Array {
         return;
     }
 
-    *deleteFirst = \&delete_first;
+    *remove_first = \&delete_first;
+    *removeFirst  = \&delete_first;
+    *deleteFirst  = \&delete_first;
 
     sub delete {
         my ($self, $obj) = @_;
@@ -983,7 +985,7 @@ package Sidef::Types::Array::Array {
         $self;
     }
 
-    *deleteAll = \&delete_all;
+    *remove = \&delete;
 
     sub delete_if {
         my ($self, $block) = @_;
@@ -996,7 +998,9 @@ package Sidef::Types::Array::Array {
         $self;
     }
 
-    *deleteIf = \&delete_if;
+    *remove_if = \&delete_if;
+    *removeIf  = \&delete_if;
+    *deleteIf  = \&delete_if;
 
     sub delete_first_if {
         my ($self, $block) = @_;
@@ -1009,7 +1013,9 @@ package Sidef::Types::Array::Array {
         return;
     }
 
-    *deleteFirstIf = \&delete_first_if;
+    *remove_first_if = \&delete_first_if;
+    *removeFirstIf   = \&delete_first_if;
+    *deleteFirstIf   = \&delete_first_if;
 
     sub dump {
         my ($self) = @_;
