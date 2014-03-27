@@ -24,7 +24,7 @@ my $builder = Module::Build->new(
                       },
 
     requires => {
-                 'perl'           => 5.014,
+                 'perl'           => '5.14.0',
                  'utf8'           => 0,
                  'Cwd'            => 0,
                  'File::Spec'     => 0,

@@ -195,6 +195,7 @@ scripts/hash_from_array.sf
 scripts/hash_grep.sf
 scripts/hash_sort.sf
 scripts/hashes.sf
+scripts/i_love_you.sf
 scripts/if_do_else.sf
 scripts/if_while_standard.sf
 scripts/implicit_method_call_on_var_.sf

@@ -1,0 +1,5 @@
+#!/usr/bin/ruby
+
+_ = true;
+.def_method('I', {class{func love{class{func you{"Are you sure?"}}.new}}.new});
+say (. I love you);
