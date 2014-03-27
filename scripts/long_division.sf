@@ -1,0 +1,31 @@
+#!/usr/bin/ruby
+
+# Arbitrary long division
+#  usage: divide(x, y, precision)
+
+func divide (x,y,f) {
+
+    var c = 0;
+    var z = '';
+
+    func {
+        var i = (x / y -> int);
+
+        z += i.to_s;
+        x -= (y * i);
+
+        var s = -1;
+        { x *= 10; s++; x.isZero && break }
+            while(y > x);
+
+        c.isZero && (z += '.');
+        s.isPos  && (z += ('0' * s));
+        c += (s + 1);
+
+        c <= f && __FUNC__();
+      }();
+
+    return z;
+}
+
+say divide(42.5, 232.7, 24);

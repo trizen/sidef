@@ -214,6 +214,7 @@ scripts/levenshtein_recursive.sf
 scripts/Lingua/RO/Numbers.sm
 scripts/lingua_ro.sf
 scripts/logic.sf
+scripts/long_division.sf
 scripts/lwp_module.sf
 scripts/magic_vars.sf
 scripts/Math/Algebra/Matrix.sm

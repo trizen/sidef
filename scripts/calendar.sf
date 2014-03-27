@@ -50,4 +50,4 @@ var monName = (t.strftime("%B"));
     st+i %% 7 && ((i != mons[mon]) && ("\n".print));
 } * mons[mon];
 
-"\n\n".print;
+"\n".print;
