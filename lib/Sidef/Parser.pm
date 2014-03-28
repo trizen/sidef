@@ -663,6 +663,13 @@ package Sidef::Parser {
                     }
                 }
 
+                # Embedded comments (http://perlcabal.org/syn/S02.html#Embedded_Comments)
+                if (/\G#`(?=[[:punct:]])/gc) {
+                    my (undef, $pos) = $self->get_quoted_string(code => substr($_, pos));
+                    pos($_) += $pos;
+                    redo;
+                }
+
                 # One-line comment
                 if (/\G#.*/gc) {
                     redo;

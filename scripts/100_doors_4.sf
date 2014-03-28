@@ -1,5 +1,5 @@
 #!/usr/bin/ruby
 
-{
-    "Door %3d is %s\n".printf(_, ["closed", "open"][_**0.5->isInt]);
+{ |i|
+    "Door %3d is %s\n".printf(i, ["closed", "open"][i**0.5->isInt]);
 } * 100;

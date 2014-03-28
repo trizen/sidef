@@ -1,15 +1,15 @@
-#!/usr/bin/ruby
+#!/usr/bin/perl
 
 var doors = [];
 
-for (var pass = 1; pass <= 100; pass++) {
-    for (var i = 1; i <= 100; i++) {
-        i % pass == 0 && (
-            doors[i] = (doors[i] := false -> not);
+{ |pass|
+    { |i|
+        i %% pass && (
+            doors[i] := false -> not!
         );
-    }
-}
+    } * 100;
+} * 100;
 
-for (var i = 1; i <= 100; i++) {
-    "Door %d is %s\n".printf(i, (doors[i] ? 'open' : 'closed'));
-}
+{ |i|
+    "Door %3d is %s\n".printf(i, doors[i] ? 'open' : 'closed');
+} * 100;
