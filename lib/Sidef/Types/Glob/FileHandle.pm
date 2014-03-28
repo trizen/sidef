@@ -267,15 +267,16 @@ package Sidef::Types::Glob::FileHandle {
     sub read_to {
         my ($self, $var_ref) = @_;
         $self->_is_var_ref($var_ref) || return;
-
         $var_ref->get_var->set_value(Sidef::Types::String::String->new(unpack 'A*', scalar CORE::readline($self->{fh})));
+        $self;
     }
 
     *readTo = \&read_to;
 
     sub output_from {
         my ($self, $string) = @_;
-        say {$self->{fh}} $string;
+        print {$self->{fh}} $string;
+        $self;
     }
 
     *outputFrom = \&output_from;

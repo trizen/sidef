@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 DATA >> \var x;
-STDOUT << x;
+STDOUT << x << "\n";
 
 __DATA__
 Hello, World!
