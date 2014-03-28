@@ -99,6 +99,20 @@ package Sidef {
                 $block->call(@_);
             };
         }
+
+        sub METHODS {
+            my ($self) = @_;
+            Sidef::Types::Array::Array->new(
+                map { Sidef::Types::String::String->new($_) }
+                  sort { lc($a =~ tr/_//dr) cmp lc($b =~ tr/_//dr) or $a cmp $b } grep {
+                          $_ ne '__ANON__'
+                      and $_ ne 'ISA'
+                      and $_ ne 'BEGIN'
+                      and $_ ne 'AUTOLOAD'
+                      and $_ ne 'DESTROY'
+                  } keys %{ref($self) . '::'}
+            );
+        }
     }
 
     sub new {

@@ -28,18 +28,56 @@ package Sidef::Types::Glob::DirHandle {
 
     sub get_files {
         my ($self) = @_;
-        Sidef::Types::Array::Array->new(map { Sidef::Types::String::String->new($_) } readdir($self->{dir_h}));
+
+        require Cwd;
+        require File::Spec;
+
+        my $curdir = Cwd::getcwd();
+        CORE::chdir($self->{dir_h});
+
+        my $array = Sidef::Types::Array::Array->new(
+            map {
+                my $file = File::Spec->rel2abs($_);
+                (-d $file)
+                  ? Sidef::Types::Glob::Dir->new($file)
+                  : Sidef::Types::Glob::File->new($file);
+              } readdir($self->{dir_h})
+        );
+
+        CORE::chdir($curdir);
+        $array;
     }
 
     *getFiles = \&get_files;
+    *read_dir = \&get_files;
+    *readdir  = \&get_files;
+    *readDir  = \&get_files;
 
     sub get_file {
         my ($self) = @_;
-        (my $file = readdir($self->{dir_h})) // return;
-        Sidef::Types::Glob::File->new($file);
+
+        my $file;
+        if (defined($file = CORE::readdir($self->{dir_h}))) {
+
+            require Cwd;
+            my $curdir = Cwd::getcwd();
+            CORE::chdir($self->{dir_h});
+
+            require File::Spec;
+            $file = File::Spec->rel2abs($file);
+            $file =
+              (-d $file)
+              ? Sidef::Types::Glob::Dir->new($file)
+              : Sidef::Types::Glob::File->new($file);
+
+            CORE::chdir($curdir);
+        }
+
+        $file;
     }
 
     *getFile = \&get_file;
+    *read    = \&get_file;
 
     sub tell {
         my ($self) = @_;
