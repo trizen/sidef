@@ -23,6 +23,7 @@ my %ignored;
       file_find_module.sf
       dice_game_solver.sf
       stdin.sf
+      multi_file_edit.sf
       rock_paper_scissors.sf
       )
 } = ();

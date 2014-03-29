@@ -6,13 +6,13 @@
 
 func shuffle (a) {
 
-  foreach (1 .. a.offset) { |n|
-    var k = (n + 1 -> rand.int);
-    k == n || (a[k, n] = a[n, k]);
-    a.dump.say;
-  }
+    { |n|
+        var k = (n + 1 -> rand.int);
+        k == n || (a[k, n] = a[n, k]);
+        a.dump.say;
+    } * a.offset;
 
-  return a;
+    return a;
 }
 
 shuffle(1..10);

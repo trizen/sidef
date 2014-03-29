@@ -49,6 +49,18 @@ package Sidef::Variable::Variable {
         $_[0]{name};
     }
 
+    sub _stack_depth {
+        my ($self) = @_;
+        exists($self->{stack}) ? $#{$self->{stack}} + 1 : -1;
+    }
+
+    sub _stack_vals {
+        my ($self) = @_;
+        exists($self->{stack})
+          ? Sidef::Types::Array::Array->new(map { $_->get_value } @{$self->{stack}})
+          : ();
+    }
+
     sub set_value {
         my ($self, $obj) = @_;
 
