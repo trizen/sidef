@@ -65,6 +65,9 @@ package Sidef::Types::Glob::FileHandle {
         Sidef::Types::Bool::Bool->new(print {$self->{fh}} @args);
     }
 
+    *write = \&print;
+    *spurt = \&print;
+
     sub println {
         my ($self, @args) = @_;
         Sidef::Types::Bool::Bool->new(say {$self->{fh}} @args);
@@ -117,6 +120,12 @@ package Sidef::Types::Glob::FileHandle {
     }
 
     *sysRead = \&sysread;
+
+    sub slurp {
+        my ($self) = @_;
+        CORE::sysread($self->{fh}, (my $content), (-s $self->{fh}));
+        Sidef::Types::String::String->new($content);
+    }
 
     sub readline {
         my ($self) = @_;
@@ -246,8 +255,13 @@ package Sidef::Types::Glob::FileHandle {
 
     sub truncate {
         my ($self, $length) = @_;
-        $self->_is_number($length) || return;
-        Sidef::Types::Bool::Bool->new(CORE::truncate($self->{fh}, $length));
+
+        my $len =
+          defined($length)
+          ? ($self->_is_number($length) ? $$length : return)
+          : 0;
+
+        Sidef::Types::Bool::Bool->new(CORE::truncate($self->{fh}, $len));
     }
 
     sub separator {

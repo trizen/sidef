@@ -265,6 +265,31 @@ package Sidef::Types::Glob::File {
 
     *cp = \&copy;
 
+    sub edit {
+        my ($self, $code) = @_;
+        $self->_is_code($code) || return;
+
+        my @lines;
+        open(my $fh, '+<:encoding(UTF-8)', $$self) || return Sidef::Types::Bool::Bool->false;
+        while (defined(my $line = <$fh>)) {
+            push @lines, $code->call(Sidef::Types::String::String->new($line));
+        }
+
+        truncate($fh, 0) || do {
+            warn "Can't truncate file `$$self': $!";
+            return;
+        };
+
+        seek($fh, 0, 0) || do {
+            warn "Can't seek the begining of file `$$self': $!";
+            return;
+        };
+
+        Sidef::Types::Bool::Bool->new(
+                                      do { local $, = q{}; print $fh @lines; close $fh }
+                                     );
+    }
+
     sub open {
         my ($self, $mode, $var_ref) = @_;
 
