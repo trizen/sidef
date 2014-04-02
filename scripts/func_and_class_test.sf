@@ -43,4 +43,10 @@ class Something (sum) {
 var obj = Something(42);
 obj + 21;
 
+# Variable declaration tests
+var (x, y=755, z=777) = (666, 655);
+x == 666 || "x != 666".die;
+y == 655 || "y != 655".die;
+z == 777 || "z != 777".die;
+
 func{"All done".say}();
