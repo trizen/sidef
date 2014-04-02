@@ -1,0 +1,46 @@
+#!/usr/bin/ruby
+
+#
+## This script is used for testing only
+#
+
+# Default parameter value
+func hello (name="Sidef") {
+    say "Hello, #{name}!";
+}
+
+hello();
+hello("World");
+
+# Naked parameter
+func hei name {
+    say name;
+}
+
+hei("Jack");
+
+# Optional argument
+func hello(a, b=2) {
+    b == a+1 || "b != #{a+1}".die;
+    say "a == #{a}";
+}
+
+hello(1);
+hello(42, 43);
+
+# Class + operator-like method
+class Something (sum) {
+    func + (self, val) {
+        say val;
+        say self.sum;
+    }
+
+    func (str) {
+        say str;
+    }("OK: anonymous func()");
+}
+
+var obj = Something(42);
+obj + 21;
+
+func{"All done".say}();

@@ -358,7 +358,7 @@ package Sidef::Parser {
             },
             re => {
                 match_flags => qr{[msixpogcdual]+},
-                var_name    => qr/[[:alpha:]_]\w*(?>::[[:alpha:]_]\w*)*+/,
+                var_name    => qr/[[:alpha:]_]\w*(?>::[[:alpha:]_]\w*)*/,
                 operators   => do {
                     local $" = q{|};
 
@@ -418,8 +418,6 @@ package Sidef::Parser {
                       );
 
         $options{ref_vars} = $options{vars};
-        $options{re}{vars} = qr{((?:$options{re}{var_name}(?:\h*,\h*$options{re}{var_name})*+)?+)}o;
-
         bless \%options, __PACKAGE__;
     }
 
@@ -607,6 +605,111 @@ package Sidef::Parser {
         }
     }
 
+    {
+        my %var_delims = (
+                          '(' => ')',
+                          '|' => '|',
+                         );
+
+        sub get_init_vars {
+            my ($self, %opt) = @_;
+
+            for ($opt{code}) {
+
+                my $end_delim;
+                foreach my $key (keys %var_delims) {
+                    if (/\G\Q$key\E\h*/gc) {
+                        $end_delim = $var_delims{$key};
+                        last;
+                    }
+                }
+
+                my @vars;
+                while (/\G($self->{re}{var_name})/goc) {
+                    push @vars, $1;
+                    if ($opt{with_vals} && defined($end_delim) && /\G=/gc) {
+                        my (undef, $pos) = $self->parse_expr(code => substr($_, pos));
+                        $vars[-1] .= '=' . substr($_, pos($_), $pos);
+                        pos($_) += $pos;
+                    }
+                    defined($end_delim) && (/\G\h*,\h*/gc || last);
+                }
+
+                defined($end_delim) && /\G\h*\Q$end_delim\E/gc;
+                return (\@vars, pos($_) // 0);
+            }
+        }
+
+        sub parse_init_vars {
+            my ($self, %opt) = @_;
+
+            for ($opt{code}) {
+
+                my $end_delim;
+                foreach my $key (keys %var_delims) {
+                    if (/\G\Q$key\E\h*/gc) {
+                        $end_delim = $var_delims{$key};
+                        last;
+                    }
+                }
+
+                my @var_objs;
+                while (/\G($self->{re}{var_name})/goc) {
+                    my $name = $1;
+
+                    if (exists $self->{keywords}{$name}) {
+                        $self->fatal_error(
+                                           code  => $_,
+                                           pos   => (pos($_) - length($name)),
+                                           error => "'$name' is either a keyword or a predefined variable!",
+                                          );
+                    }
+
+                    my ($var, $code) = $self->find_var($name, $self->{class});
+
+                    if (defined($var) && $code) {
+                        warn "Redeclaration of $opt{type} '$name' in same scope, at "
+                          . "$self->{script_name}, line $self->{line}\n";
+                    }
+
+                    my $value;
+                    if (defined($end_delim) && /\G=/gc) {
+                        my ($obj, $pos) = $self->parse_expr(code => substr($_, pos));
+                        pos($_) += $pos;
+                        $value = ref($obj) eq 'HASH' ? Sidef::Types::Block::Code->new($obj)->run : $obj;
+                    }
+
+                    my $obj = Sidef::Variable::Variable->new($name, $opt{type}, $value);
+
+                    unshift @{$self->{vars}{$self->{class}}},
+                      {
+                        obj   => $obj,
+                        name  => $name,
+                        count => 0,
+                        type  => $opt{type},
+                        line  => $self->{line},
+                      };
+
+                    push @var_objs, $obj;
+                    defined($end_delim) && (/\G\h*,\h*/gc || last);
+                }
+
+                defined($end_delim)
+                  && (
+                      /\G\h*\Q$end_delim\E/gc
+                      || $self->fatal_error(
+                                            code  => $_,
+                                            pos   => (pos($_) - 1),
+                                            error => "unbalanced parentheses",
+                                           )
+                     );
+
+                return \@var_objs, pos;
+            }
+        }
+
+    }
+
     sub parse_whitespace {
         my ($self, %opt) = @_;
 
@@ -781,55 +884,16 @@ package Sidef::Parser {
                 # Declaration of variable types
                 if (/\G(var|static|const)\b\h*/sgc) {
                     my $type = $1;
-
-                    my $names =
-                        /\G($self->{re}{var_name})/goc     ? $1
-                      : /\G\(\h*$self->{re}{vars}\h*\)/goc ? $1
-                      : $self->fatal_error(
-                                           code  => $_,
-                                           pos   => (pos($_)),
-                                           error => "invalid variable name!",
-                                          );
-
-                    my @var_objs;
-                    foreach my $var_name (split(/\h*,\h*/, $names)) {
-
-                        my ($name, $class) = $self->get_name_and_class($var_name);
-
-                        if (exists $self->{keywords}{$name}) {
-                            $self->fatal_error(
-                                               code  => $_,
-                                               pos   => (pos($_) - length($name)),
-                                               error => "'$name' is either a keyword or a predefined variable!",
-                                              );
-                        }
-
-                        my ($var, $code) = $self->find_var($name, $class);
-
-                        if (defined($var) && $code) {
-                            warn "Redeclaration of $type '$name' in same scope, at "
-                              . "$self->{script_name}, line $self->{line}\n";
-                        }
-
-                        my $obj = Sidef::Variable::Variable->new($name, $type);
-                        push @var_objs, $obj;
-
-                        unshift @{$self->{vars}{$self->{class}}},
-                          {
-                            obj   => $obj,
-                            name  => $name,
-                            count => 0,
-                            type  => $type,
-                            line  => $self->{line},
-                          };
-                    }
-
-                    return Sidef::Variable::Init->new(@var_objs), pos;
+                    my ($var_objs, $pos) = $self->parse_init_vars(code => substr($_, pos), type => $type);
+                    pos($_) += $pos;
+                    return Sidef::Variable::Init->new(@{$var_objs}), pos;
                 }
 
-                # Declaration of the 'my' special variable and function declaration
+                # Declaration of the 'my' special variable + class and function declarations
                 if (   /\G(my)\h+($self->{re}{var_name})/goc
-                    || /\G(func|class)\b\h*((?:$self->{re}{var_name}|$self->{re}{operators})?+)/goc) {
+                    || /\G(func|class)\b\h*($self->{re}{var_name})\h*/goc
+                    || (defined($self->{current_class}) && /\G(func)\h*($self->{re}{operators})\h*/goc)
+                    || /\G(func|class)\b()\h*/goc) {
                     my $type = $1;
                     my $name = $2;
 
@@ -866,50 +930,44 @@ package Sidef::Parser {
                     }
 
                     if ($type eq 'class') {
+                        my ($var_names, $pos1) = $self->get_init_vars(code => substr($_, pos), with_vals => 0);
+                        pos($_) += $pos1;
 
-                        local $self->{class} = $name;
+                        /\G\h*\{\h*/gc
+                          || $self->fatal_error(
+                                                error    => "invalid class declaration",
+                                                expected => "expected: class $name(...){...}",
+                                                code     => $_,
+                                                pos      => pos($_)
+                                               );
 
-                        # Check the declared parameters
-                        if (/\G\h*(?:\(\h*)?$self->{re}{vars}(?:\h*\))?\h*\{/goc) {
+                        local $self->{class}         = $name;
+                        local $self->{current_class} = $variable;
+                        my ($obj, $pos) = $self->parse_block(code => '{' . substr($_, pos));
+                        pos($_) += $pos - 1;
 
-                            my @params = split(/\h*,\h*/, $1);
-
-                            local $self->{current_class} = $variable;
-                            my ($obj, $pos) = $self->parse_block(code => '{' . substr($_, pos));
-                            pos($_) += $pos - 1;
-
-                            $variable->__set_value($obj, @params);
-                        }
-                        else {
-                            $self->fatal_error(
-                                               error    => "invalid class declaration",
-                                               expected => "expected: class $name(...){...}",
-                                               code     => $_,
-                                               pos      => pos($_)
-                                              );
-                        }
+                        $variable->__set_value($obj, @{$var_names});
                     }
 
                     if ($type eq 'func') {
 
-                        # Check the declared parameters
-                        if (/\G\h*(?:\(\h*)?$self->{re}{vars}(?:\h*\))?\h*\{/goc) {
+                        my ($var_names, $pos1) = $self->get_init_vars(code => substr($_, pos), with_vals => 1);
+                        pos($_) += $pos1;
 
-                            my $params = '|' . $1 . '|';
-                            local $self->{current_function} = $variable;
-                            my ($obj, $pos) = $self->parse_block(code => '{' . $params . substr($_, pos));
-                            pos($_) += $pos - (length($params) + 1);
+                        /\G\h*\{\h*/gc
+                          || $self->fatal_error(
+                                                error    => "invalid function declaration",
+                                                expected => "expected: func $name(...){...}",
+                                                code     => $_,
+                                                pos      => pos($_)
+                                               );
 
-                            $variable->set_value($obj);
-                        }
-                        else {
-                            $self->fatal_error(
-                                               error    => "invalid function declaration",
-                                               expected => "expected: func $name(...){...}",
-                                               code     => $_,
-                                               pos      => pos($_)
-                                              );
-                        }
+                        local $self->{current_function} = $variable;
+                        my $args = '|' . join(',', @{$var_names}) . '|';
+                        my ($obj, $pos) = $self->parse_block(code => '{' . $args . substr($_, pos));
+                        pos($_) += $pos - (length($args) + 1);
+
+                        $variable->set_value($obj);
                     }
 
                     return $variable, pos;
@@ -1288,37 +1346,41 @@ package Sidef::Parser {
                     pos($_) += $pos;
                 }
 
-                my @vars = (split(/\h*,\h*/, /\G\|\h*$self->{re}{vars}\h*\|/gc ? $1 : ('')), '_');
+                my $var_objs = [];
+                if (/\G(?=\|)/) {
+                    my ($vars, $pos) = $self->parse_init_vars(code => substr($_, pos), type => 'var');
+                    pos($_) += $pos;
+                    $var_objs = $vars;
+                }
 
-                my @block_vars;
-                foreach my $variable (@vars) {
+                {    # special '_' variable
+                    state $name = '_';
+                    state $type = 'var';
 
-                    my $var_obj = Sidef::Variable::Variable->new($variable, 'var');
-                    push @block_vars, $var_obj;
-
+                    my $var_obj = Sidef::Variable::Variable->new($name, $type);
+                    push @{$var_objs}, $var_obj;
                     unshift @{$self->{vars}{$self->{class}}},
                       {
                         obj   => $var_obj,
-                        name  => $variable,
+                        name  => $name,
                         count => 0,
-                        type  => 'var',
+                        type  => $type,
                         line  => $self->{line},
                       };
                 }
 
                 my ($obj, $pos) = $self->parse_script(code => substr($_, pos));
-
-                $block->{vars} = [map  { $_->{obj} }
-                                  grep { ref($_) eq 'HASH' } @{$self->{vars}{$self->{class}}}
-                                 ];
-
-                $block->{init_vars} = [map { Sidef::Variable::Init->new($_) } @block_vars];
-
                 $pos // $self->fatal_error(
                                            code  => $_,
                                            pos   => (pos($_) - 1),
                                            error => "unbalanced curly brackets",
                                           );
+
+                $block->{vars} = [map  { $_->{obj} }
+                                  grep { ref($_) eq 'HASH' } @{$self->{vars}{$self->{class}}}
+                                 ];
+
+                $block->{init_vars} = [map { Sidef::Variable::Init->new($_) } @{$var_objs}];
 
                 $block->{code} = $obj;
                 splice @{$self->{ref_vars_refs}{$self->{class}}}, 0, $count;
@@ -1525,22 +1587,23 @@ package Sidef::Parser {
 
                 if (/\Gimport\b\h*/gc) {
 
-                    my $names =
-                        /\G($self->{re}{var_name})/goc ? $1
-                      : /\G\(?$self->{re}{vars}\)?/goc ? $1
-                      : $self->fatal_error(
-                                           code  => $_,
-                                           pos   => (pos($_)),
-                                           error => "invalid variable name!",
-                                          );
+                    my ($var_names, $pos) = $self->get_init_vars(code => substr($_, pos), with_vals => 0);
+                    pos($_) += $pos;
 
-                    foreach my $var_name (split(/\h*,\h*/, $names)) {
+                    @{$var_names}
+                      || $self->fatal_error(
+                                            code  => $_,
+                                            pos   => (pos($_)),
+                                            error => "expected a variable-like name for importing!",
+                                           );
+
+                    foreach my $var_name (@{$var_names}) {
                         my ($name, $class) = $self->get_name_and_class($var_name);
 
                         if ($class eq $self->{class}) {
                             $self->fatal_error(
                                                code  => $_,
-                                               pos   => pos($_) - length($names),
+                                               pos   => pos($_),
                                                error => "can't import '${class}::${name}' inside the same class",
                                               );
                         }
@@ -1550,7 +1613,7 @@ package Sidef::Parser {
                         if (not defined $var) {
                             $self->fatal_error(
                                                code  => $_,
-                                               pos   => pos($_) - length($names),
+                                               pos   => pos($_),
                                                error => "variable '${class}::${name}' hasn't been declared",
                                               );
                         }
@@ -1572,16 +1635,17 @@ package Sidef::Parser {
 
                 if (/\Ginclude\b\h*/gc) {
 
-                    my $names =
-                        /\G($self->{re}{var_name})/goc ? $1
-                      : /\G\(?$self->{re}{vars}\)?/goc ? $1
-                      : $self->fatal_error(
-                                           code  => $_,
-                                           pos   => (pos($_)),
-                                           error => "invalid variable name!",
-                                          );
+                    my ($var_names, $pos) = $self->get_init_vars(code => substr($_, pos), with_vals => 0);
+                    pos($_) += $pos;
 
-                    foreach my $var_name (split(/\h*,\h*/, $names)) {
+                    @{$var_names}
+                      || $self->fatal_error(
+                                            code  => $_,
+                                            pos   => (pos($_)),
+                                            error => "expected a variable-like `Module::Name'!",
+                                           );
+
+                    foreach my $var_name (@{$var_names}) {
                         my @path = split(/::/, $var_name);
                         my $mod_path = File::Spec->catfile(@path[0 .. $#path - 1], $path[-1] . '.sm');
 

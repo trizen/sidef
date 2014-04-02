@@ -181,6 +181,7 @@ scripts/fibonacci_mystery.sf
 scripts/fibonacci_validation.sf
 scripts/file_find_module.sf
 scripts/for_two_vars.sf
+scripts/func_and_class_test.sf
 scripts/function_composition.sf
 scripts/function_recursion.sf
 scripts/functional_modules.sf
@@ -222,6 +223,7 @@ scripts/matrix_multiplication.sf
 scripts/median.sf
 scripts/metaprogramming_method_definition.sf
 scripts/method_expressions.sf
+scripts/multi_file_edit.sf
 scripts/multi_var_assignment.sf
 scripts/named_block_arguments.sf
 scripts/next.sf

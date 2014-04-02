@@ -295,6 +295,7 @@ else {
             elsif ($line eq 'copyright') {
                 print <<'EOT';
 Copyright © 2013 Daniel Șuteu, Ioana Fălcușan
+Copyright © 2014 Daniel Șuteu
 All Rights Reserved.
 EOT
                 redo;
@@ -455,7 +456,7 @@ HEAD
             or die qq{ERROR: Can't close "\$filename": \$!};
     }
     else {
-        die qq{ERROR: can't get the package name!\n};
+        die qq{ERROR: can't get the package name!};
     }
 }
 
@@ -497,7 +498,7 @@ FOOT
 
                 print {$out_fh} $package_content;
 
-                print {$out_fh} "my \$struct = ";
+                print {$out_fh} "\nmy \$struct = ";
                 print {$out_fh} Data::Dump::pp($struct);
                 print {$out_fh} ";\n";
 

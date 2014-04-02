@@ -21,12 +21,12 @@ package Sidef::Variable::Init {
             my $type = $var->{type};
 
             if ($type eq 'var') {
-                my $new_var = Sidef::Variable::Variable->new($var->{name}, $var->{type}, $arg);
+                my $new_var = Sidef::Variable::Variable->new($var->{name}, $var->{type}, $arg // $var->{value});
                 push @{$var->{stack}}, $new_var;
             }
             elsif ($type eq 'static' or $type eq 'const') {
                 if (not exists $var->{inited}) {
-                    $var->set_value($arg);
+                    $var->set_value($arg // $var->{value});
                     $var->{inited} = 1;
                 }
             }
