@@ -6,12 +6,12 @@ package Sidef::Types::Array::Pair {
 
     our @ISA = qw(
       Sidef
-      Sidef::Convert
+      Sidef::Convert::Convert
       );
 
     sub new {
         my (undef, $item1, $item2) = @_;
-        bless [$item1, $item2], __PACKAGE__;
+        bless [$item1 // Sidef::Types::Nil::Nil->new, $item2 // Sidef::Types::Nil::Nil->new], __PACKAGE__;
     }
 
     sub get_value {

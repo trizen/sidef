@@ -10,6 +10,7 @@ package Sidef::Convert::Convert {
 
     state $array_like = {
                          'Sidef::Types::Array::Array' => 1,
+                         'Sidef::Types::Array::Pair'  => 1,
                          'Sidef::Types::Byte::Bytes'  => 1,
                          'Sidef::Types::Char::Chars'  => 1,
                         };
