@@ -797,6 +797,12 @@ package Sidef::Types::String::String {
     *drop_right = \&shift_right;
     *shiftRight = \&shift_right;
 
+    sub pair_with {
+        Sidef::Types::Array::Pair->new($_[0], $_[1]);
+    }
+
+    *pairWith = \&pair_with;
+
     sub dump {
         my ($self) = @_;
         __PACKAGE__->new(q{'} . $$self =~ s{'}{\\'}gr . q{'});
@@ -831,10 +837,7 @@ package Sidef::Types::String::String {
         *{__PACKAGE__ . '::' . '<<'}  = \&shift_left;
         *{__PACKAGE__ . '::' . '>>'}  = \&shift_right;
         *{__PACKAGE__ . '::' . '%'}   = \&sprintf;
-
-        *{__PACKAGE__ . '::' . ':'} = sub {
-            Sidef::Types::Hash::Hash->new($_[0], $_[1]);
-        };
+        *{__PACKAGE__ . '::' . ':'}   = \&pair_with;
     }
 };
 

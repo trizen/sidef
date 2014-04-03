@@ -86,6 +86,10 @@ package Sidef::Parser {
                           re  => qr/\GArr(?:ay)?\b/,
                          },
                          {
+                          sub => sub { Sidef::Types::Array::Pair->new },
+                          re  => qr/\GPair\b/,
+                         },
+                         {
                           sub => sub { Sidef::Types::Hash::Hash->new },
                           re  => qr/\GHash\b/,
                          },
@@ -305,11 +309,10 @@ package Sidef::Parser {
                   print printf
                   println say
 
-                  Array
                   File
                   Fcntl
                   Dir
-                  Arr Array
+                  Arr Array Pair
                   Hash
                   Str String
                   Num Number

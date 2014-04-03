@@ -4,7 +4,10 @@ package Sidef::Time::Localtime {
     use strict;
     use warnings;
 
-    our @ISA = qw(Sidef);
+    our @ISA = qw(
+      Sidef
+      Sidef::Time::Gmtime
+      );
 
     sub new {
         my (undef, $sec) = @_;
@@ -43,8 +46,6 @@ package Sidef::Time::Localtime {
         my ($self) = @_;
         Sidef::Types::String::String->new(scalar localtime($self->{sec}));
     }
-
-    *strftime = \&{Sidef::Time::Gmtime::strftime};
 };
 
 1;

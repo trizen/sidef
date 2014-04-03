@@ -24,7 +24,7 @@ package Sidef::Types::Array::Array {
         foreach my $i (0 .. $#{$self}) {
             my $item = $self->[$i]->get_value;
 
-            if (defined $item and defined $item->can('get_value')) {
+            if (ref $item and defined eval { $item->can('get_value') }) {
                 push @array, $item->get_value;
             }
             else {

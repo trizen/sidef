@@ -27,7 +27,7 @@ package Sidef::Types::Hash::Hash {
 
         my %hash;
         while (my ($k, $v) = each %{$self}) {
-            $hash{$k} = ref($v) && $v->can('get_value') ? $v->get_value : $v;
+            $hash{$k} = (ref($v) && defined eval { $v->can('get_value') }) ? $v->get_value : $v;
         }
 
         \%hash;
