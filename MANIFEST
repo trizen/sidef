@@ -27,6 +27,7 @@ lib/Sidef/Time/Time.pod
 lib/Sidef/Types/Array/Array.pm
 lib/Sidef/Types/Array/Array.pod
 lib/Sidef/Types/Array/HCArray.pm
+lib/Sidef/Types/Array/Pair.pm
 lib/Sidef/Types/Black/Hole.pm
 lib/Sidef/Types/Block/Break.pm
 lib/Sidef/Types/Block/Break.pod
@@ -230,6 +231,7 @@ scripts/next.sf
 scripts/number_types.sf
 scripts/objects_init.sf
 scripts/open.sf
+scripts/pairs_test.sf
 scripts/perl_eval.sf
 scripts/permutation.sf
 scripts/pi_and_e.sf

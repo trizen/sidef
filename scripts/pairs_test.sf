@@ -1,0 +1,19 @@
+#!/usr/bin/ruby
+
+#
+## This script is used for testing only
+#
+
+var tree = 'root':'child':'grandchild':'end';
+
+while (true) {
+    say tree.first;
+    tree.second.is_a(Pair) || break;
+    tree = tree.second;
+}
+
+Pair.new('root',
+    Pair.new('child',
+        Pair.new('grandchild', 'end')
+    )
+).dump.say;

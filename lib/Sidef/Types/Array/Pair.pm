@@ -4,6 +4,11 @@ package Sidef::Types::Array::Pair {
     use strict;
     use warnings;
 
+    our @ISA = qw(
+      Sidef
+      Sidef::Convert
+      );
+
     sub new {
         my (undef, $item1, $item2) = @_;
         bless [$item1, $item2], __PACKAGE__;
