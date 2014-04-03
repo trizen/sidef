@@ -63,10 +63,9 @@ package Sidef::Types::String::String {
         my ($self, $obj) = @_;
 
         if (ref $obj eq 'Sidef::Types::Regex::Regex') {
-            if ($$self =~ $obj->{regex}) {
+            if ($$self =~ /$obj->{regex}/) {
                 return $self->new(CORE::substr($$self, 0, $-[0]) . CORE::substr($$self, $+[0]));
             }
-
             return $self;
         }
 
@@ -466,6 +465,8 @@ package Sidef::Types::String::String {
         my ($self) = @_;
         $self->new(unpack('A*', $$self) =~ s/^\s+//r);
     }
+
+    *strip = \&trim;
 
     sub translit {
         my ($self, $orig, $repl, $modes) = @_;
