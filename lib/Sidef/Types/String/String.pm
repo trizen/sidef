@@ -60,10 +60,19 @@ package Sidef::Types::String::String {
     }
 
     sub subtract {
-        my ($self, $string) = @_;
-        $self->_is_string($string) || return;
-        if ((my $ind = CORE::index($$self, $$string)) != -1) {
-            return $self->new(CORE::substr($$self, 0, $ind) . CORE::substr($$self, $ind + CORE::length($$string)));
+        my ($self, $obj) = @_;
+
+        if (ref $obj eq 'Sidef::Types::Regex::Regex') {
+            if ($$self =~ $obj->{regex}) {
+                return $self->new(CORE::substr($$self, 0, $-[0]) . CORE::substr($$self, $+[0]));
+            }
+
+            return $self;
+        }
+
+        $self->_is_string($obj) || return;
+        if ((my $ind = CORE::index($$self, $$obj)) != -1) {
+            return $self->new(CORE::substr($$self, 0, $ind) . CORE::substr($$self, $ind + CORE::length($$obj)));
         }
         $self;
     }
@@ -374,6 +383,7 @@ package Sidef::Types::String::String {
     sub sub {
         my ($self, $regex, $str) = @_;
 
+        $str //= Sidef::Types::String::String->new('');
         $self->_is_string($str) || return;
 
         if (ref($regex) ne 'Sidef::Types::Regex::Regex') {
@@ -393,6 +403,7 @@ package Sidef::Types::String::String {
     sub gsub {
         my ($self, $regex, $str) = @_;
 
+        $str //= Sidef::Types::String::String->new('');
         $self->_is_string($str) || return;
 
         if (ref($regex) ne 'Sidef::Types::Regex::Regex') {
