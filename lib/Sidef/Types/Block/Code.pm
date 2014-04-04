@@ -141,7 +141,7 @@ package Sidef::Types::Block::Code {
         my ($self) = @_;
 
         require List::Util;
-        my @stack_vars = grep { exists $_->{stack} } @{$self->{vars}};
+        my @stack_vars = grep { ref($_) eq 'HASH' && exists $_->{stack} } @{$self->{vars}};
         my $max_depth = List::Util::max(map { $#{$_->{stack}} } @stack_vars);
 
         foreach my $var (@stack_vars) {

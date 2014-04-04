@@ -332,6 +332,7 @@ package Sidef::Parser {
                   const
                   func
                   class
+                  define
 
                   DATA
                   ARGV
@@ -885,15 +886,49 @@ package Sidef::Parser {
                 }
 
                 # Declaration of variable types
-                if (/\G(var|static|const)\b\h*/sgc) {
+                if (/\G(var|static|const)\b\h*/gc) {
                     my $type = $1;
                     my ($var_objs, $pos) = $self->parse_init_vars(code => substr($_, pos), type => $type);
+
+                    $pos // $self->fatal_error(
+                                               code  => $_,
+                                               pos   => pos,
+                                               error => "expected a variable name after the keyword '$type'!",
+                                              );
+
                     pos($_) += $pos;
                     return Sidef::Variable::Init->new(@{$var_objs}), pos;
                 }
 
+                if (/\Gdefine\b\h*($self->{re}{var_name})\h*/gc) {
+                    my $name = $1;
+
+                    /\G=\h*/gc;    # an optional equal sign is allowed
+                    my ($obj, $pos) = $self->parse_expr(code => substr($_, pos));
+
+                    $obj // $self->fatal_error(
+                                               code  => $_,
+                                               pos   => pos,
+                                               error => "expected an expression after the variable name '$name'!",
+                                              );
+
+                    $obj = ref($obj) eq 'HASH' ? Sidef::Types::Block::Code->new($obj)->run : $obj;
+
+                    pos($_) += $pos;
+                    unshift @{$self->{vars}{$self->{class}}},
+                      {
+                        obj   => $obj,
+                        name  => $name,
+                        count => 0,
+                        type  => 'define',
+                        line  => $self->{line},
+                      };
+
+                    return $obj, pos;
+                }
+
                 # Declaration of the 'my' special variable + class and function declarations
-                if (   /\G(my)\h+($self->{re}{var_name})/goc
+                if (   /\G(my)\h+($self->{re}{var_name})\h*/goc
                     || /\G(func|class)\b\h*($self->{re}{var_name})\h*/goc
                     || (defined($self->{current_class}) && /\G(func)\h*($self->{re}{operators})\h*/goc)
                     || /\G(func|class)\b()\h*/goc) {
@@ -1773,7 +1808,9 @@ package Sidef::Parser {
                                        && $variable->{name} ne '_'
                                        && $variable->{type} ne 'class'
                                        && $variable->{name} ne '') {
-                                    warn "Variable '$variable->{name}' has been initialized, but not used again, at "
+                                    warn +(   $variable->{type} eq 'const'
+                                           || $variable->{type} eq 'define' ? 'Constant' : 'Variable')
+                                      . " '$variable->{name}' has been initialized, but not used again, at "
                                       . "$self->{script_name}, line $variable->{line}\n";
                                 }
                                 elsif ($DEBUG) {
