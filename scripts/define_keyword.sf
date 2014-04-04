@@ -1,0 +1,13 @@
+#!/usr/bin/ruby
+
+#
+## This is just a test
+#
+
+define PHI   (1.25.sqrt + 0.5);
+define IHP (-(1.25.sqrt - 0.5));
+define FIB (PHI**7 - IHP**7 / PHI-IHP);
+
+'%.0f'.sprintf(FIB) == '13' || "Error!".die;
+
+say "FIB == #{FIB}";

@@ -170,9 +170,11 @@ scripts/code_interpolation.sf
 scripts/code_to_hash.sf
 scripts/combinations.sf
 scripts/combinations_with_repetitions.sf
+scripts/cosmic_calendar.sf
 scripts/cramers_method.sf
 scripts/cyclic_numbers.sf
 scripts/DATA_handle.sf
+scripts/define_keyword.sf
 scripts/dice_game_solver.sf
 scripts/echo.sf
 scripts/eval.sf
