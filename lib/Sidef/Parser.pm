@@ -332,6 +332,7 @@ package Sidef::Parser {
                   const
                   func
                   class
+                  static
                   define
 
                   DATA
