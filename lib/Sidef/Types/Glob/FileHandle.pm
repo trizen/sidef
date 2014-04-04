@@ -128,12 +128,16 @@ package Sidef::Types::Glob::FileHandle {
     }
 
     sub readline {
-        my ($self) = @_;
+        my ($self, $var_ref) = @_;
 
-        my $line = CORE::readline $self->{fh};
-        defined($line)
-          ? Sidef::Types::String::String->new($line)
-          : ();
+        if (defined $var_ref) {
+            $self->_is_var_ref($var_ref) || return;
+            my $line = CORE::readline($self->{fh});
+            $var_ref->get_var->set_value(Sidef::Types::String::String->new($line // return Sidef::Types::Bool::Bool->false));
+            return Sidef::Types::Bool::Bool->true;
+        }
+
+        Sidef::Types::String::String->new(CORE::readline($self->{fh}) // return);
     }
 
     *readln    = \&readline;
@@ -141,6 +145,9 @@ package Sidef::Types::Glob::FileHandle {
     *read_line = \&readline;
     *get       = \&readline;
     *line      = \&readline;
+    *get_line  = \&readline;
+    *getLine   = \&readline;
+    *getline   = \&readline;
 
     sub read_char {
         my ($self) = @_;
