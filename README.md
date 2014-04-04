@@ -12,7 +12,7 @@
 * Copyright (C) 2014 Daniel Șuteu
 
 This program is free software; you can redistribute it and/or modify it
-under the terms of the the Artistic License (2.0). You may obtain a
+under the terms of the the *Artistic License (2.0)*. You may obtain a
 copy of the full license at:
 
 http://www.perlfoundation.org/artistic_license_2_0
