@@ -1,0 +1,43 @@
+#!/usr/bin/ruby
+
+# Author: Daniel "Trizen" Șuteu
+# License: GPLv3
+# Date: 04 April 2014
+# http://trizenx.blogspot.com
+
+# Inspired from: Cosmos.A.Space.Time.Odyssey.S01E01
+#                            by Neil deGrasse Tyson
+
+
+# Here is the definition of the cosmic year
+var cosmic_year = [[(13.798 + [+0.037, -0.037][2.rand.int]) * 10**9, 'years']];
+
+cosmic_year.append([cosmic_year[-1][0] / 12,         'months']);
+cosmic_year.append([cosmic_year[-1][0] / 30.4368499, 'days']);
+cosmic_year.append([cosmic_year[-1][0] / 24,         'hours']);
+cosmic_year.append([cosmic_year[-1][0] / 60,         'minutes']);
+cosmic_year.append([cosmic_year[-1][0] / 60,         'seconds']);
+cosmic_year.append([cosmic_year[-1][0] / 1000,       'miliseconds']);
+
+print <<'EOF';
+This program will scale the age of the universe to a normal year.
+
+You can insert any number you want, and the program will map it
+into this cosmic year to have a feeling how long ago it was,
+compared to the age of the universe.
+
+EOF
+
+func output (value, type) {
+    "\n=> In the cosmic scale, that happened about %.2f %s ago!\n\n".printf(value, type);
+}
+
+while (true) {
+    var value = Sys.scanln("How long ago? (any expression, in years): ").eval.toNum;
+
+    cosmic_year.each { |bit|
+        value >= bit[0]
+            && output(value / bit[0], bit[1])
+            && break;
+    }
+}

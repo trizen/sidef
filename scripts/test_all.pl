@@ -24,6 +24,7 @@ my %ignored;
       dice_game_solver.sf
       stdin.sf
       multi_file_edit.sf
+      cosmic_calendar.sf
       rock_paper_scissors.sf
       )
 } = ();
