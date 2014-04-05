@@ -448,6 +448,16 @@ package Sidef::Parser {
             $len = 78 if $len > 78;
         }
 
+        my @lines = (
+                     "HAHA! That's really funny! You got me!",
+                     "I thought that... Oh, you got me!",
+                     "LOL! I expected... Oh, my! This is funny!",
+                     "Oh, oh... Wait a second! Did you mean...? Damn!",
+                     "You're emberesing me! That's not funny!",
+                    );
+
+        warn "sidef: " . $lines[rand @lines] . "\n";
+
         my $error =
             +($self->{script_name} // '-') . ':'
           . $self->{line}
