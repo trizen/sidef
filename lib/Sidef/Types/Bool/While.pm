@@ -16,7 +16,14 @@ package Sidef::Types::Bool::While {
 
     sub do {
         my ($self, $code) = @_;
-        $code->while($self->{arg});
+        $code->while($self->{arg}, $self);
+    }
+
+    sub else {
+        my ($self, $code) = @_;
+        $self->{did_while} // $code->run;
+        undef $self->{did_while};
+        $self;
     }
 
 }

@@ -111,17 +111,18 @@ package Sidef::Types::Block::Code {
     *do = \&exec;
 
     sub while {
-        my ($self, $condition) = @_;
+        my ($self, $condition, $old_self) = @_;
 
         {
             if (Sidef::Types::Block::Code->new($condition)->run) {
+                defined($old_self) && ($old_self->{did_while} //= 1);
                 my $res = $self->_run_code();
-                return $res if defined $res;
+                defined($res) && return(ref($res) eq __PACKAGE__ && defined($old_self) ? $old_self : $res);
                 redo;
             }
         }
 
-        $self;
+        $old_self // $self;
     }
 
     sub init_block_vars {
