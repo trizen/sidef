@@ -275,6 +275,8 @@ package Sidef::Types::Hash::Hash {
 
     sub dump {
         my ($self) = @_;
+        my ($i, $s) = $self->_get_indent_level;
+
         Sidef::Types::String::String->new(
             "Hash.new(\n" . join(
                 ",\n",
@@ -283,11 +285,12 @@ package Sidef::Types::Hash::Hash {
                       ref($self->{$_}) eq 'Sidef::Variable::Variable'
                       ? $self->{$_}->get_value
                       : Sidef::Types::Nil::Nil->new;
-                    "\t${Sidef::Types::String::String->new($_)->dump} => "
+                    $s x $i . "${Sidef::Types::String::String->new($_)->dump} => "
                       . (eval { $val->can('dump') } ? ${$val->dump} : $val)
                   } sort(CORE::keys(%{$self}))
               )
-              . "\n)"
+              . "\n"
+              . $s x $i . ")"
         );
     }
 

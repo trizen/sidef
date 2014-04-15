@@ -57,22 +57,21 @@ package Sidef::Types::Array::Pair {
     sub dump {
         my ($self) = @_;
 
-        my $string = Sidef::Types::String::String->new("Pair.new(");
+        my ($i, $s) = $self->_get_indent_level;
+        my $string = Sidef::Types::String::String->new("Pair.new(\n" . $s x $i);
 
         for my $i (0, 1) {
             my $item = defined($self->[$i]) ? $self->[$i] : 'nil';
 
-            if (ref $item and defined eval { $item->can('dump') }) {
-                $$string .= $item->dump();
-            }
-            else {
-                $$string .= $item;
-            }
+            $$string .=
+              (ref $item and defined eval { $item->can('dump') })
+              ? $item->dump()
+              : $item;
 
             $$string .= ", " if $i != 1;
         }
 
-        $$string .= ")";
+        $$string .= "\n" . $s x $i . ")";
         $string;
     }
 };
