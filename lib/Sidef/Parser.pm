@@ -456,10 +456,10 @@ package Sidef::Parser {
                      "You're emberesing me! That's not funny!",
                     );
 
-        warn "sidef: " . $lines[rand @lines] . "\n";
-
         my $error =
-            +($self->{script_name} // '-') . ':'
+            "$0: "
+          . $lines[rand @lines] . "\n"
+          . ($self->{script_name} // '-') . ':'
           . $self->{line}
           . ": syntax error, "
           . join(', ', grep { defined } $opt{error}, $opt{expected}) . "\n"
