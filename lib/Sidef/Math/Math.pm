@@ -10,6 +10,19 @@ package Sidef::Math::Math {
         bless {}, __PACKAGE__;
     }
 
+    sub e {
+        my ($self, $places) = @_;
+        Sidef::Types::Number::Number->new(
+                            Math::BigFloat->bexp(1, defined($places) ? ($self->_is_number($places)) ? $$places : return : ()));
+    }
+
+    sub exp {
+        my ($self, $x, $places) = @_;
+        $self->_is_number($x) || return;
+        Sidef::Types::Number::Number->new(
+                     Math::BigFloat->new($$x)->bexp(defined($places) ? ($self->_is_number($places)) ? $$places : return : ()));
+    }
+
     sub pi {
         my ($self, $places) = @_;
         Sidef::Types::Number::Number->new(
@@ -53,9 +66,9 @@ package Sidef::Math::Math {
     }
 
     sub abs {
-        my ($self, $num) = @_;
-        $self->_is_number($num) || return;
-        $num->abs;
+        my ($self, $n) = @_;
+        $self->_is_number($n) || return;
+        Sidef::Types::Number::Number->new(Math::BigFloat->new($$n)->babs);
     }
 
     sub lcm {
@@ -82,9 +95,16 @@ package Sidef::Math::Math {
     }
 
     sub sqrt {
-        my ($self, $num) = @_;
-        $self->_is_number($num) || return;
-        $num->sqrt();
+        my ($self, $n) = @_;
+        $self->_is_number($n) || return;
+        Sidef::Types::Number::Number->new(Math::BigFloat->new($$n)->bsqrt);
+    }
+
+    sub pow {
+        my ($self, $n, $pow) = @_;
+        $self->_is_number($n)   || return;
+        $self->_is_number($pow) || return;
+        Sidef::Types::Number::Number->new(Math::BigFloat->new($$n)->bpow($$pow));
     }
 
     sub range_sum {

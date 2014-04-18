@@ -163,14 +163,14 @@ package Sidef::Types::Number::Number {
 
     sub is_zero {
         my ($self) = @_;
-        Sidef::Types::Bool::Bool->new($$self == 0);
+        Sidef::Types::Bool::Bool->new($$self eq 0);    # 'eq' is well intented here
     }
 
     *isZero = \&is_zero;
 
     sub is_nan {
         my ($self) = @_;
-        Sidef::Types::Bool::Bool->new($$self eq 'nan');
+        Sidef::Types::Bool::Bool->new(lc($$self) eq 'nan');
     }
 
     *isNaN  = \&is_nan;
@@ -219,7 +219,9 @@ package Sidef::Types::Number::Number {
 
     sub is_integer {
         my ($self) = @_;
-        Sidef::Types::Bool::Bool->new($$self == CORE::int($$self));
+
+        # 'eq' is well intented here
+        Sidef::Types::Bool::Bool->new($$self eq CORE::int($$self));
     }
 
     *isInt     = \&is_integer;
@@ -237,8 +239,11 @@ package Sidef::Types::Number::Number {
 
     sub ceil {
         my ($self) = @_;
-        CORE::int($$self) == $$self
+
+        # 'eq' is well intended here
+        CORE::int($$self) eq $$self
           && return $self;
+
         $self->new(CORE::int($$self + 1));
     }
 
