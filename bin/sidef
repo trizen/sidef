@@ -434,7 +434,7 @@ HEAD
 
                 $package_content .= <<"FOOT";
 ) {
-    if (\$mod =~ /^(?>##\\h*)?package\\h+([\\w::]+)/) {
+    if (\$mod =~ /^(?>##\\h*)?package\\h+([\\w:]+)/) {
         my \@parts = split(/::/, \$1);
 
         my \$name = pop \@parts;
@@ -442,18 +442,18 @@ HEAD
 
         if (\$#parts != -1 and not -d \$dir) {
             make_path(\$dir)
-                or die qq{ERROR: Can't create dir \$dir: \$!};
+                or die qq{ERROR: Can't create directory "\$dir": \$!};
         }
 
         my \$filename = catfile(\$dir, \$name . '.pm');
 
         open my \$fh, '>:encoding(UTF-8)', \$filename
-            or die qq{ERROR: Can't create "\$filename": \$!};
+            or die qq{ERROR: Can't create file "\$filename": \$!};
 
         print {\$fh} \$mod;
 
         close \$fh
-            or die qq{ERROR: Can't close "\$filename": \$!};
+            or die qq{ERROR: Can't close file "\$filename": \$!};
     }
     else {
         die qq{ERROR: can't get the package name!};
