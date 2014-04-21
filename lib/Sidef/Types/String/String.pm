@@ -468,6 +468,24 @@ package Sidef::Types::String::String {
 
     *strip = \&trim;
 
+    sub strip_beg {
+        my ($self) = @_;
+        $self->new($$self =~ s/^\s+//r);
+    }
+
+    *trim_beg = \&strip_beg;
+    *trimBeg  = \&strip_beg;
+    *stripBeg = \&strip_beg;
+
+    sub strip_end {
+        my ($self) = @_;
+        $self->new(unpack('A*', $$self));
+    }
+
+    *trim_end = \&strip_end;
+    *trimEnd  = \&strip_end;
+    *stripEnd = \&strip_end;
+
     sub translit {
         my ($self, $orig, $repl, $modes) = @_;
         ($self->_is_string($orig) && $self->_is_string($repl)) || return;

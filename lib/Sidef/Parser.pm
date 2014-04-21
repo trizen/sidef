@@ -1818,6 +1818,7 @@ package Sidef::Parser {
                                 elsif (   $variable->{count} == 0
                                        && $variable->{name} ne '_'
                                        && $variable->{type} ne 'class'
+                                       && $variable->{type} ne 'func'
                                        && $variable->{name} ne '') {
                                     warn +(   $variable->{type} eq 'const'
                                            || $variable->{type} eq 'define' ? 'Constant' : 'Variable')

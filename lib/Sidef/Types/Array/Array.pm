@@ -297,7 +297,12 @@ package Sidef::Types::Array::Array {
     }
 
     sub first {
-        my ($self) = @_;
+        my ($self, $block) = @_;
+
+        if (defined $block) {
+            return $self->find($block);
+        }
+
         $#{$self} >= 0 || return;
         $self->[0];
     }

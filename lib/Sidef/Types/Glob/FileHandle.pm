@@ -62,7 +62,7 @@ package Sidef::Types::Glob::FileHandle {
 
     sub print {
         my ($self, @args) = @_;
-        Sidef::Types::Bool::Bool->new(print {$self->{fh}} @args);
+        Sidef::Types::Bool::Bool->new(CORE::print {$self->{fh}} @args);
     }
 
     *write = \&print;
@@ -70,8 +70,10 @@ package Sidef::Types::Glob::FileHandle {
 
     sub println {
         my ($self, @args) = @_;
-        Sidef::Types::Bool::Bool->new(say {$self->{fh}} @args);
+        Sidef::Types::Bool::Bool->new(CORE::say {$self->{fh}} @args);
     }
+
+    *say = \&println;
 
     sub read {
         my ($self, $var_ref, $length, $offset) = @_;
@@ -296,7 +298,7 @@ package Sidef::Types::Glob::FileHandle {
 
     sub output_from {
         my ($self, $string) = @_;
-        print {$self->{fh}} $string;
+        CORE::print {$self->{fh}} $string;
         $self;
     }
 
