@@ -189,6 +189,7 @@ scripts/function_composition.sf
 scripts/function_recursion.sf
 scripts/functional_modules.sf
 scripts/functions.sf
+scripts/gamma_function.sf
 scripts/gcd.sf
 scripts/getopt.sf
 scripts/global_regex_matching.sf
@@ -224,6 +225,7 @@ scripts/magic_vars.sf
 scripts/Math/Algebra/Matrix.sm
 scripts/matrix_multiplication.sf
 scripts/median.sf
+scripts/metaprogramming_2.sf
 scripts/metaprogramming_method_definition.sf
 scripts/method_expressions.sf
 scripts/multi_file_edit.sf
@@ -243,6 +245,9 @@ scripts/pythagorean_means.sf
 scripts/quicksort.sf
 scripts/quoted_strings.sf
 scripts/rand.sf
+'scripts/Real-world problems/Gift match/giftmatch.sf'
+'scripts/Real-world problems/Gift match/input.txt'
+'scripts/Real-world problems/Gift match/output.txt'
 scripts/recursion.sf
 scripts/regex.sf
 scripts/regex_bool.sf
@@ -270,6 +275,7 @@ scripts/token_recursive.sf
 scripts/two_dimensional_array.sf
 scripts/unexecuted_arguments.sf
 scripts/unicode.sf
+scripts/unicode_support.sf
 scripts/var_ref.sf
 scripts/var_scoping.sf
 scripts/while_loop.sf

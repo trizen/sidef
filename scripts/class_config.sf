@@ -15,11 +15,11 @@ class Test (opts) {
     }
 
     func get_name (self) {
-        (self.opts)['name'];        # or: self.opts.get('name')
+        self.opts['name'];        # or: self.opts.get('name')
     }
 
     func sum (self) {
-        self.opts.get('min') + self.opts.get('max');
+        self.opts['min'] + self.opts['max'];
     }
 }
 

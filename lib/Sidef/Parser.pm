@@ -1558,6 +1558,27 @@ package Sidef::Parser {
                         push @{$struct{$self->{class}}[-1]{call}}, @{$methods};
                     }
 
+                    if (/\G(?=\[)/) {
+                        $struct{$self->{class}}[-1]{self} = {
+                            $self->{class} => [
+                                {
+                                 self => $struct{$self->{class}}[-1]{self},
+                                 exists($struct{$self->{class}}[-1]{call}) ? (call => delete $struct{$self->{class}}[-1]{call})
+                                 : (),
+                                 exists($struct{$self->{class}}[-1]{ind})
+                                 ? (ind => delete $struct{$self->{class}}[-1]{ind})
+                                 : (),
+                                }
+                            ]
+                        };
+
+                        while (/\G(?=\[)/) {
+                            my ($ind, $pos) = $self->parse_expr(code => substr($_, pos));
+                            pos($_) += $pos;
+                            push @{$struct{$self->{class}}[-1]{ind}}, $ind;
+                        }
+                    }
+
                     if (/\G(?!\h*[=-]>)/ && /\G(?=$self->{re}{operators})/o) {
                         my ($method, $req_arg, $pos) = $self->get_method_name(code => substr($_, pos));
                         pos($_) += $pos;
