@@ -1,0 +1,137 @@
+#!/usr/bin/ruby
+
+# Author: Daniel "Trizen" Șuteu
+# License: GPLv3
+# Date: 21 April 2014
+# Website: http://github.com/trizen
+
+# Function to parse the input file into a 2D-matrix
+func parse_table(file) {
+
+    file.open_r(\var fh) || return();
+    var table = [fh.readline.trim_end.split("\t")];
+
+    while (fh.readline(\var line)) {
+        line =~ /\S/ ?? || next;
+        table.append(line.trim_end.split("\t"));
+    }
+
+    return table;
+}
+
+# Function to write a tab-delimited file from a 2D-matrix
+func output_table(table, file) {
+
+    file.open_w(\var fh) || return();
+    table.each { |row|
+        fh.say(row.join("\t"));
+    };
+
+    fh.close;
+}
+
+func usage {
+    "usage: #{__FILE__} [input.txt] [output.txt]\n".die;
+}
+
+#
+## The main work starts here
+#
+
+var input_file  = File.new(ARGV[0] \\ usage());
+var output_file = File.new(ARGV[1] \\ usage());
+
+input_file.exists || (
+    "input file `#{input_file}' does not exists!\n".die;
+);
+
+# Parse the input file into a 2D-matrix
+var table = parse_table(input_file);
+
+var cols = table.shift;    # column names
+var lim  = table.pop;      # limit values
+
+var ngifts = (cols.offset - 1);    # the number of gifts
+
+# Map the limit of gifts
+var limit = Hash.new;
+{ |i|
+    limit[cols[i]] = lim[i].to_i;
+} * ngifts;
+
+
+var people = table.range.map { |i|
+    [
+     # [0] == people name
+     table[i][0],
+
+    # [1] == gift preferences
+     1..ngifts map { |j|
+        [
+            cols[j],              # [1][0] == gift name
+            table[i][j].to_i,     # [1][1] == gift rank
+        ]
+     },
+
+    # [2] == weight
+    table[i][-1].to_i,
+    ]
+};
+
+# Put each preference into a distinct group
+var rank = [];
+{ |i|
+    rank.append(
+        # By shuffling the results, we treat everyone equally
+        # (here we can sort by weight, if we provide different weights)
+        people.map { |row|
+            [row[0], row[1].find {|item| item[1] == i}, row[2]]
+        }.shuffle;
+    );
+} * ngifts;
+
+
+var served = Hash.new;
+var matches = Array.new;
+
+# Start from #1 up to the end and assign gifts
+rank.each { |cat|
+    cat.each { |pers|
+        if (!(served.exists(pers[0])) && (limit[pers[1][0]] > 0)) {
+            limit[pers[1][0]]--;
+            served[pers[0]] = 1;
+            matches.append(pers);
+        }
+    }
+}
+
+# Output some info to the STDOUT
+matches.sort {|a,b| a[0] <=> b[0]}.each { |match|
+    say "#{match[0]} got #{match[1][0]} (rank: #{match[1][1]})";
+}
+
+# Output a new table
+{
+    var new_table  = parse_table(input_file);
+    var cols       = new_table[0];
+    var column_pos = Hash.new;
+
+    { |i|
+        column_pos[cols[i]] = i;
+    } * ngifts;
+
+    # Fill in the matches
+    { |i|
+        var match = matches.find {|item| item[0] == new_table[i][0]};
+        var pos = column_pos[match[1][0]];
+        new_table[i][pos] = 'match';
+    } * (new_table.offset - 1);
+
+    # Update the limit number of gifts
+    limit.keys.each { |key|
+        var pos = column_pos[key];
+        new_table[-1][pos] = limit[key];
+    };
+
+    output_table(new_table, output_file);
+}.run;
