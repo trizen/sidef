@@ -841,6 +841,7 @@ package Sidef::Types::Array::Array {
         my ($self, $code) = @_;
 
         if (defined $code) {
+            $self->_is_code($code) || return;
             return $self->new(sort { $code->call($a, $b) } map { $_->get_value } @{$self});
         }
 

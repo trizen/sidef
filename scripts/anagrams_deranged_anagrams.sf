@@ -4,9 +4,9 @@
 
 func find_deranged (a) {
 
-    for (a.range => \var i) {
-        for (i+1 .. (a.offset) => \var j) {
-            a[i] ^ a[j] -> contains("\0") && next;
+    a.range.each { |i|
+        i+1 .. a.offset each { |j|
+            a[i].overlaps(a[j]) && next;
             "length %d: %s => %s\n".printf(a[i].len, a[i], a[j]);
             return true;
         }
@@ -23,30 +23,28 @@ func main () {
     );
 
     "** Retrieving the wordlist...".say;
-
-    var words = (Str.new(lwp.get('http://www.puzzlers.org/pub/wordlists/unixdict.txt')).split);
-
+    var words = Str.new(lwp.get('http://www.puzzlers.org/pub/wordlists/unixdict.txt')).words;
     "** Processing the words...".say;
 
     var time = Time.now;
     var letter_list = Hash.new;
 
-    for (words) {
-        # store anagrams in hash table by letters they contain
-        letter_list[_.split('').sort.join] := [] -> append(_);
+    # Store anagrams in hash table by letters they contain
+    words.each { |word|
+        letter_list[word.sort] := [] append(word);
     }
 
     "** The hashing took %d seconds!\n".printf(Time.now - time);
 
-    for ( letter_list.keys
-         .grep {letter_list[_].len > 1}      # take only ones with anagrams
-         .map  {[_, _.len]}
-         .sort {|a,b| b[1] <=> a[1]}         # sort by length, descending
-         .map  {_[0]}
-        ) {
+    letter_list.keys
+         .grep {|k| letter_list[k].len > 1}      # take only ones with anagrams
+         .map  {|k| [k, k.len]}
+         .sort {|a,b| b[1] <=> a[1]}             # sort by length, descending
+         .map  {|p| p[0]}
+         .each {|key|
 
         # if we find a pair, they are the longested due to the sort before
-        find_deranged(letter_list[_]) && (
+        find_deranged(letter_list[key]) && (
             "** The process took %d seconds!\n".printf(Time.now - time);
             break;
         );

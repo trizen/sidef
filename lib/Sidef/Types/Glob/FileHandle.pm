@@ -179,6 +179,15 @@ package Sidef::Types::Glob::FileHandle {
     *readLines = \&read_all;
     *lines     = \&read_all;
 
+    sub words {
+        my ($self) = @_;
+        Sidef::Types::Array::Array->new(
+            map {
+                map { Sidef::Types::String::String->new($_) } grep { $_ ne '' } split(' ', $_)
+              } CORE::readline($self->{fh})
+        );
+    }
+
     sub each {
         my ($self, $code) = @_;
         $self->_is_code($code) || return;

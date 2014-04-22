@@ -450,6 +450,17 @@ package Sidef::Types::String::String {
         Sidef::Types::Array::Array->new(map { __PACKAGE__->new($_) } split(/$sep/, $$self, $size));
     }
 
+    sub sort {
+        my ($self, $block) = @_;
+
+        if (defined $block) {
+            $self->_is_code($block) || return;
+            return $self->to_chars->sort($block)->join;
+        }
+
+        $self->new(CORE::join('', sort(CORE::split(//, $$self))));
+    }
+
     sub words {
         my ($self) = @_;
         Sidef::Types::Array::Array->new(map { __PACKAGE__->new($_) } CORE::split(' ', $$self));
@@ -458,7 +469,7 @@ package Sidef::Types::String::String {
     sub each {
         my ($self, $obj) = @_;
         $self->_is_code($obj) || return;
-        $obj->for(Sidef::Types::Array::Array->new(map { $self->new($_) } split(//, $$self)));
+        $obj->for(Sidef::Types::Array::Array->new(map { $self->new($_) } CORE::split(//, $$self)));
     }
 
     sub trim {
@@ -570,6 +581,12 @@ package Sidef::Types::String::String {
     }
 
     *include = \&contains;
+
+    sub overlaps {
+        my ($self, $arg) = @_;
+        $self->_is_string($arg) || return;
+        Sidef::Types::Bool::Bool->new(CORE::index($$self ^ $$arg, "\0") != -1);
+    }
 
     sub begins_with {
         my ($self, $string) = @_;
