@@ -291,7 +291,7 @@ package Sidef::Types::Glob::File {
     }
 
     sub open {
-        my ($self, $mode, $var_ref) = @_;
+        my ($self, $mode, $fh_ref, $err_ref) = @_;
 
         ref($mode)
           ? $self->_is_string($mode, 1)
@@ -302,12 +302,19 @@ package Sidef::Types::Glob::File {
         my $success = CORE::open(my $fh, $mode, $$self);
         my $fh_obj = Sidef::Types::Glob::FileHandle->new(fh => $fh, file => $self);
 
-        if (ref($var_ref) eq 'Sidef::Variable::Ref') {
-            $var_ref->get_var->set_value($fh_obj);
+        if (defined $fh_ref) {
+            $self->_is_var_ref($fh_ref) || return;
+            $fh_ref->get_var->set_value($fh_obj);
 
             return $success
               ? Sidef::Types::Bool::Bool->true
-              : Sidef::Types::Bool::Bool->false;
+              : do {
+                defined($err_ref) && do {
+                    $self->_is_var_ref($err_ref) || return;
+                    $err_ref->get_var->set_value(Sidef::Types::String::String->new($!));
+                };
+                Sidef::Types::Bool::Bool->false;
+              };
         }
         elsif ($success) {
             return $fh_obj;
@@ -317,8 +324,8 @@ package Sidef::Types::Glob::File {
     }
 
     sub open_r {
-        my ($self, $var_ref) = @_;
-        $self->open('<', $var_ref);
+        my ($self, @rest) = @_;
+        $self->open('<', @rest);
     }
 
     *openR     = \&open_r;
@@ -326,8 +333,8 @@ package Sidef::Types::Glob::File {
     *open_read = \&open_r;
 
     sub open_w {
-        my ($self, $var_ref) = @_;
-        $self->open('>', $var_ref);
+        my ($self, @rest) = @_;
+        $self->open('>', @rest);
     }
 
     *openW      = \&open_w;
@@ -335,8 +342,8 @@ package Sidef::Types::Glob::File {
     *open_write = \&open_w;
 
     sub open_a {
-        my ($self, $var_ref) = @_;
-        $self->open('>>', $var_ref);
+        my ($self, @rest) = @_;
+        $self->open('>>', @rest);
     }
 
     *openA       = \&open_a;
@@ -344,8 +351,8 @@ package Sidef::Types::Glob::File {
     *open_append = \&open_a;
 
     sub open_rw {
-        my ($self, $var_ref) = @_;
-        $self->open('+<', $var_ref);
+        my ($self, @rest) = @_;
+        $self->open('+<', @rest);
     }
 
     *openRW          = \&open_rw;
@@ -353,8 +360,8 @@ package Sidef::Types::Glob::File {
     *open_read_write = \&open_rw;
 
     sub opendir {
-        my ($self, $var_ref) = @_;
-        Sidef::Types::Glob::Dir->new($$self)->open($var_ref);
+        my ($self, @rest) = @_;
+        Sidef::Types::Glob::Dir->new($$self)->open(@rest);
     }
 
     sub sysopen {
