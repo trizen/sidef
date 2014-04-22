@@ -8,7 +8,7 @@ use warnings;
 BEGIN { unshift(@INC, '../lib') }
 
 binmode(STDOUT, ':encoding(UTF-8)');
-binmode(STDERR, ':encoding(UTF-8)') if $^P == 0;
+binmode(STDERR, ':encoding(UTF-8)') if $^P == 0;    # to work under Devel::* modules
 binmode(STDIN,  ':encoding(UTF-8)');
 
 require Sidef::Init;
@@ -22,54 +22,124 @@ if ($#ARGV != -1 and chr ord $ARGV[0] eq '-') {
     Getopt::Std::getopts('E:d:Dho:ivHN:WwcM:', \%args);
 }
 
-my %keywords = (
-                if   => 'Sidef::Types::Bool::If',
-                '\\' => 'Sidef::Variable::Ref',
-                '*'  => 'Sidef::Variable::Ref',
-               );
-
-sub help_interactive {
-    require Term::ReadLine;
-    my $term = Term::ReadLine->new("$name $version -- help interactive mode");
-
-    print <<"HELP";
-Welcome to $name $version!  This is the interactive help utility.
-
-Enter the name of any object, keyword, or topic to get help on writing
-$name programs and using $name modules.  To quit this help utility, just
-type "quit".
-
-HELP
-
-    {
-        my $line = $term->readline('help> ') // do { print "\n"; return };
-
-        if ($line eq 'quit' or $line eq 'q') {
-            return;
-        }
-
-        my $parser = Sidef::Parser->new(script_name => '-H');
-        my $struct = eval { $parser->parse_script(code => $line) };
-
-        if ($@) {
-            warn $@;
-            redo;
-        }
-
-        my @refs = exists($keywords{$line}) ? $keywords{$line} : (map { ref($_) } execute_struct($struct));
-
-        foreach my $ref (@refs) {
-            $ref eq '' && do { warn "Not an object!\n"; next };
-            system -e '/usr/bin/man' ? '/usr/bin/man' : 'perldoc', $ref;
-        }
-
-        redo;
-    }
-
+# Help
+if (defined $args{h}) {
+    output_usage();
+    exit 0;
 }
 
-if ($args{h}) {
+# Version
+if (defined $args{v}) {
+    output_version();
+    exit 0;
+}
 
+# Warnings
+if (defined $args{w}) {
+    $SIG{__WARN__} = sub {
+        require Carp;
+        Carp::cluck(@_);
+    };
+}
+elsif (defined $args{W}) {
+    $SIG{__WARN__} = sub {
+        require Carp;
+        Carp::confess(@_);
+    };
+}
+
+# Number types
+if (defined(my $type = $args{N})) {
+    if ($type eq 'fast' or $type eq 'perl') {
+        require Sidef::Types::Number::NumberFast;
+    }
+    elsif ($type eq 'rat') {
+        require Sidef::Types::Number::NumberRat;
+    }
+    elsif ($type eq 'int') {
+        require Sidef::Types::Number::NumberInt;
+    }
+    elsif ($type eq 'big' or $type eq 'float') {
+        ## default
+    }
+    else {
+        warn "Invalid type '${type}' for number implementation";
+    }
+}
+
+# Memoization
+if (defined(my $types = $args{M})) {
+    memoize_types($types);
+}
+
+# Dump the data structure
+if (defined $args{d}) {
+    my $struct = do($args{d})
+      || die "Can't load the data structure from file '$args{d}': $!\n";
+    execute_struct($struct);
+}
+
+# Interactive help
+elsif (defined $args{H}) {
+    help_interactive();
+}
+
+# Interactive coding
+elsif (defined $args{i}) {
+    code_interactive();
+}
+else {
+    my $script_name = '-';
+
+    my $code = exists($args{E})
+      ? do {
+        defined($args{E}) || die "No code specified for -E.\n";
+        $script_name = '-E';
+        require Encode;
+        Encode::decode_utf8($args{E});
+      }
+      : defined($ARGV[0]) && (-f $ARGV[0]) ? do {
+        $script_name = shift @ARGV;
+
+        open my $fh, '<:encoding(UTF-8)', $script_name
+          or die qq{Can't open sidef script "$script_name": $!\n};
+
+        local $/;
+        <$fh>;
+      }
+      : do { local $/; <> };
+
+    $code // exit 2;
+    my $parser = Sidef::Parser->new(script_name => $script_name);
+    my $struct = $parser->parse_script(code => $code);
+
+    # Dump the data structure
+    if (defined $args{D}) {
+        dump_structure($struct);
+    }
+
+    # Compile the struct to a Perl program
+    elsif (defined $args{c}) {
+        compile_to_perl($struct);
+    }
+
+    # Execute the struct
+    else {
+        execute_struct($struct);
+    }
+}
+
+#
+## Subroutines
+#
+
+sub execute_struct {
+    my ($struct) = @_;
+    my $exec = Sidef::Exec->new();
+    $exec->execute($struct);
+}
+
+sub output_usage {
     my %switches = (
                     '-i'             => 'interactive mode',
                     '-c'             => 'compile the code as a stand-alone perl program',
@@ -112,47 +182,143 @@ USAGE
 Run '$0 -H' for more help with $name.
 
 END
-
-    exit 0;
 }
 
-if ($args{w}) {
-    $SIG{__WARN__} = sub {
-        require Carp;
-        Carp::cluck(@_);
-    };
-}
-elsif ($args{W}) {
-    $SIG{__WARN__} = sub {
-        require Carp;
-        Carp::confess(@_);
-    };
+sub output_version {
+    print "$name $version\n";
 }
 
-if (defined(my $type = $args{N})) {
-    if ($type eq 'fast' or $type eq 'perl') {
-        require Sidef::Types::Number::NumberFast;
+sub help_interactive {
+
+    my %keywords = (
+                    if   => 'Sidef::Types::Bool::If',
+                    '\\' => 'Sidef::Variable::Ref',
+                    '*'  => 'Sidef::Variable::Ref',
+                   );
+
+    require Term::ReadLine;
+    my $term = Term::ReadLine->new("$name $version -- help interactive mode");
+
+    print <<"HELP";
+Welcome to $name $version!  This is the interactive help utility.
+
+Enter the name of any object, keyword, or topic to get help on writing
+$name programs and using $name modules.  To quit this help utility, just
+type "quit".
+
+HELP
+
+    {
+        my $line = $term->readline('help> ') // do { print "\n"; return };
+
+        if ($line eq 'quit' or $line eq 'q') {
+            return;
+        }
+
+        my $parser = Sidef::Parser->new(script_name => '-H');
+        my $struct = eval { $parser->parse_script(code => $line) };
+
+        if ($@) {
+            warn $@;
+            redo;
+        }
+
+        my @refs = exists($keywords{$line}) ? $keywords{$line} : (map { ref($_) } execute_struct($struct));
+
+        foreach my $ref (@refs) {
+            $ref eq '' && do { warn "Not an object!\n"; next };
+            system -e '/usr/bin/man' ? '/usr/bin/man' : 'perldoc', $ref;
+        }
+
+        redo;
     }
-    elsif ($type eq 'rat') {
-        require Sidef::Types::Number::NumberRat;
+}
+
+sub code_interactive {
+    require Term::ReadLine;
+    my $term = Term::ReadLine->new("$name $version -- interactive mode");
+
+    print qq{$name $version on $^O\n};
+    print qq{Type "help", "copyright" or "license" for more information.\n};
+
+    {
+        my $line = $term->readline('>>> ') // do { print "\n"; exit };
+
+        if ($line eq 'help') {
+            help_interactive();
+            redo;
+        }
+        elsif ($line eq 'q' or $line eq 'quit') {
+            exit;
+        }
+        elsif ($line eq 'copyright') {
+            print <<'EOT';
+Copyright © 2013 Daniel Șuteu, Ioana Fălcușan
+Copyright © 2014 Daniel Șuteu
+All Rights Reserved.
+EOT
+            redo;
+        }
+        elsif ($line eq 'license') {
+            print <<'EOT';
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+EOT
+            redo;
+        }
+
+        my $parser = Sidef::Parser->new(script_name => '-i');
+        my $struct = eval { $parser->parse_script(code => $line) };
+
+        if ($@) {
+            warn $@;
+            redo;
+        }
+
+        say for execute_struct($struct);
+        redo;
     }
-    elsif ($type eq 'int') {
-        require Sidef::Types::Number::NumberInt;
-    }
-    elsif ($type eq 'big' or $type eq 'float') {
-        ## default
+}
+
+sub dump_structure {
+    my ($struct) = @_;
+
+    eval { require Data::Dump };
+
+    if ($@) {
+        die "Data::Dump module is not installed!\n";
     }
     else {
-        warn "Invalid type '${type}' for number implementation";
+        my $out_fh = \*STDOUT;
+
+        if (defined $args{o}) {
+            open $out_fh, '>:encoding(UTF-8)', $args{o}
+              or die "Can't open file '$args{o}' for write: $!\n";
+        }
+
+        print {$out_fh} Data::Dump::pp($struct);
     }
 }
 
-if (defined(my $memoize = $args{M})) {
+sub memoize_types {
+    my ($types) = @_;
 
     my @types =
-      $memoize eq 'all'
+      $types eq 'all'
       ? ()
-      : split(/\s*,\s*/, $memoize);
+      : split(/\s*,\s*/, $types);
 
     my %known_types;
     {
@@ -262,128 +428,21 @@ if (defined(my $memoize = $args{M})) {
     foreach my $type (@valid_types) {
         $known_types{$type}();
     }
-
 }
 
-if (defined $args{d}) {
-    my $struct = do($args{d})
-      || die "Can't load the data structure from file '$args{d}': $!\n";
-    execute_struct($struct);
-}
-elsif (defined $args{H}) {
-    help_interactive();
-}
-elsif (defined $args{v}) {
-    print "$name $version\n";
-    exit;
-}
-else {
-    if (defined $args{i}) {
-        require Term::ReadLine;
-        my $term = Term::ReadLine->new("$name $version -- interactive mode");
+sub compile_to_perl {
+    my ($struct) = @_;
 
-        print qq{$name $version on $^O\n};
-        print qq{Type "help", "copyright" or "license" for more information.\n};
+    eval { require Data::Dump };
 
-        {
-            my $line = $term->readline('>>> ') // do { print "\n"; exit };
-
-            if ($line eq 'help') {
-                help_interactive();
-                redo;
-            }
-            elsif ($line eq 'copyright') {
-                print <<'EOT';
-Copyright © 2013 Daniel Șuteu, Ioana Fălcușan
-Copyright © 2014 Daniel Șuteu
-All Rights Reserved.
-EOT
-                redo;
-            }
-            elsif ($line eq 'license') {
-                print <<'EOT';
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-EOT
-                redo;
-            }
-
-            my $parser = Sidef::Parser->new(script_name => '-i');
-            my $struct = eval { $parser->parse_script(code => $line) };
-
-            if ($@) {
-                warn $@;
-                redo;
-            }
-
-            say for execute_struct($struct);
-            redo;
-        }
-
+    if ($@) {
+        die "Data::Dump module is not installed!\n";
     }
     else {
-        my $script_name = '-';
+        require File::Basename;
+        my $path = File::Basename::dirname($INC{'Sidef.pm'});
 
-        my $code =
-          exists $args{E}
-          ? do { $script_name = '-E'; require Encode; Encode::decode_utf8($args{E}) }
-          : (defined($ARGV[0]) && -f $ARGV[0]) ? do {
-
-            my $file = shift @ARGV;
-            $script_name = $file;
-
-            open my $fh, '<:encoding(UTF-8)', $file
-              or die qq{Can't open sidef script "$file": $!\n};
-
-            local $/;
-            <$fh>;
-          }
-          : do { local $/; <> };
-
-        $code // exit 2;
-        my $parser = Sidef::Parser->new(script_name => $script_name);
-        my $struct = $parser->parse_script(code => $code);
-
-        if ($args{D}) {
-            eval { require Data::Dump };
-
-            if ($@) {
-                die "Data::Dump module is not installed!\n";
-            }
-            else {
-                my $out_fh = \*STDOUT;
-
-                if (defined $args{o}) {
-                    open $out_fh, '>:encoding(UTF-8)', $args{o}
-                      or die "Can't open file '$args{o}' for write: $!\n";
-                }
-
-                print {$out_fh} Data::Dump::pp($struct);
-            }
-        }
-        elsif ($args{c}) {
-            eval { require Data::Dump };
-
-            if ($@) {
-                die "Data::Dump module is not installed!\n";
-            }
-            else {
-                require File::Basename;
-                my $path = File::Basename::dirname($INC{'Sidef.pm'});
-
-                my $package_content = <<"HEAD";
+        my $package_content = <<"HEAD";
 #!$^X
 
 eval 'exec $^X  -S \$0 \${1+"\$@"}'
@@ -407,32 +466,32 @@ binmode(STDIN,  ':encoding(UTF-8)');
 foreach my \$mod (
 HEAD
 
-                require File::Find;
-                File::Find::find(
-                    {
-                     no_chdir => 1,
-                     wanted   => sub {
-                         if (-f and /\.pm\z/) {
+        require File::Find;
+        File::Find::find(
+            {
+             no_chdir => 1,
+             wanted   => sub {
+                 if (-f and /\.pm\z/) {
 
-                             return if m{\bSidef\W+Init\b};
+                     return if m{\bSidef\W+Init\b};
 
-                             local $/;
-                             open my $fh, '<:encoding(UTF-8)', $_
-                               or die "Can't open file `$_' for reading: $!";
+                     local $/;
+                     open my $fh, '<:encoding(UTF-8)', $_
+                       or die "Can't open file `$_' for reading: $!";
 
-                             my $token = tr/A-Za-z0-9/_/cr;
+                     my $token = tr/A-Za-z0-9/_/cr;
 
-                             $package_content .= qq{<<'${token}',\n};
-                             $package_content .= <$fh>;
-                             $package_content .= "\n$token\n";
+                     $package_content .= qq{<<'${token}',\n};
+                     $package_content .= <$fh>;
+                     $package_content .= "\n$token\n";
 
-                             close $fh;
-                         }
-                       }
-                    } => $path
-                );
+                     close $fh;
+                 }
+               }
+            } => $path
+        );
 
-                $package_content .= <<"FOOT";
+        $package_content .= <<"FOOT";
 ) {
     if (\$mod =~ /^(?>##\\h*)?package\\h+([\\w:]+)/) {
         my \@parts = split(/::/, \$1);
@@ -462,47 +521,47 @@ HEAD
 
 FOOT
 
-                if (exists $INC{'Sidef/Init.pm'}) {
-                    my $filename = $INC{'Sidef/Init.pm'};
+        if (exists $INC{'Sidef/Init.pm'}) {
+            my $filename = $INC{'Sidef/Init.pm'};
 
-                    local $/;
-                    open my $fh, '<:encoding(UTF-8)', $filename
-                      or die "Can't open file `$filename' for reading: $!";
+            local $/;
+            open my $fh, '<:encoding(UTF-8)', $filename
+              or die "Can't open file `$filename' for reading: $!";
 
-                    $package_content .= <$fh>;
+            $package_content .= <$fh>;
 
-                    if (defined(my $type = $args{N})) {
-                        if ($type eq 'fast' or $type eq 'perl') {
-                            $package_content .= "require Sidef::Types::Number::NumberFast;\n";
-                        }
-                        elsif ($type eq 'rat') {
-                            $package_content .= "require Sidef::Types::Number::NumberRat;\n";
-                        }
-                        elsif ($type eq 'int') {
-                            $package_content .= "require Sidef::Types::Number::NumberInt;\n";
-                        }
-                    }
-
-                    close $fh;
+            if (defined(my $type = $args{N})) {
+                if ($type eq 'fast' or $type eq 'perl') {
+                    $package_content .= "require Sidef::Types::Number::NumberFast;\n";
                 }
-                else {
-                    die "ERROR: Can't find the `Sidef::Init' module!\n";
+                elsif ($type eq 'rat') {
+                    $package_content .= "require Sidef::Types::Number::NumberRat;\n";
                 }
-
-                my $out_fh = \*STDOUT;
-
-                if (defined $args{o}) {
-                    open $out_fh, '>:encoding(UTF-8)', $args{o}
-                      or die "Can't open file '$args{o}' for write: $!\n";
+                elsif ($type eq 'int') {
+                    $package_content .= "require Sidef::Types::Number::NumberInt;\n";
                 }
+            }
 
-                print {$out_fh} $package_content;
+            close $fh;
+        }
+        else {
+            die "ERROR: Can't find the `Sidef::Init' module!\n";
+        }
 
-                print {$out_fh} "\nmy \$struct = ";
-                print {$out_fh} Data::Dump::pp($struct);
-                print {$out_fh} ";\n";
+        my $out_fh = \*STDOUT;
 
-                print {$out_fh} <<"EXEC";
+        if (defined $args{o}) {
+            open $out_fh, '>:encoding(UTF-8)', $args{o}
+              or die "Can't open file '$args{o}' for write: $!\n";
+        }
+
+        print {$out_fh} $package_content;
+
+        print {$out_fh} "\nmy \$struct = ";
+        print {$out_fh} Data::Dump::pp($struct);
+        print {$out_fh} ";\n";
+
+        print {$out_fh} <<"EXEC";
 
 #
 ## Execute the data structure
@@ -511,16 +570,5 @@ FOOT
 my \$exec = Sidef::Exec->new();
 \$exec->execute(\$struct);
 EXEC
-            }
-        }
-        else {
-            execute_struct($struct);
-        }
     }
-}
-
-sub execute_struct {
-    my ($struct) = @_;
-    my $exec = Sidef::Exec->new();
-    $exec->execute($struct);
 }
