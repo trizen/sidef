@@ -28,22 +28,21 @@ package Sidef::Variable::Variable {
     sub _is_defined {    # faster (used internally)
         my ($self) = @_;
 
-        if (exists $self->{stack}) {
+        exists($self->{stack}) && do {
             $self = $self->{stack}[-1];
-        }
+        };
 
-        defined $self->{value}
-          and ref($self->{value}) ne 'Sidef::Types::Nil::Nil';
+        ref($self->{value}) ne 'Sidef::Types::Nil::Nil';
     }
 
     sub is_defined {
         my ($self) = @_;
 
-        if (exists $self->{stack}) {
+        exists($self->{stack}) && do {
             $self = $self->{stack}[-1];
-        }
+        };
 
-        Sidef::Types::Bool::Bool->new(defined $self->{value} and ref($self->{value}) ne 'Sidef::Types::Nil::Nil');
+        Sidef::Types::Bool::Bool->new(ref($self->{value}) ne 'Sidef::Types::Nil::Nil');
     }
 
     sub _get_name {
@@ -90,6 +89,11 @@ package Sidef::Variable::Variable {
         $self->{type};
     }
 
+    sub _nonexistent_method {
+        my ($self, $method, $obj) = @_;
+        warn sprintf(qq{[WARN] Can't find the method "$method" for object "%s"!\n}, ref($obj));
+    }
+
     {
         no strict 'refs';
 
@@ -126,7 +130,7 @@ package Sidef::Variable::Variable {
             my ($self, $code) = @_;
 
             if (not $self->_is_defined) {
-                my $method = '=';
+                state $method = '=';
                 $self->$method(Sidef::Types::Block::Code->new($code)->run);
             }
 
@@ -147,15 +151,14 @@ package Sidef::Variable::Variable {
             *{__PACKAGE__ . '::' . $operator} = sub {
                 my ($self, $arg) = @_;
 
-                my ($method) = '=';
+                state $method = '=';
                 my $value = $self->get_value;
 
                 if (ref($value) and eval { $value->can($operator) }) {
                     $self->$method($self->get_value->$operator($arg));
                 }
                 else {
-                    warn sprintf(qq{[WARN] Can't find the method "$operator" for %s!\n},
-                                 defined($value) ? ('object ' . ref($value)) : 'an undefined object');
+                    $self->_nonexistent_method($operator, $value);
                 }
 
                 $self;
@@ -168,14 +171,13 @@ package Sidef::Variable::Variable {
                 my ($self, $arg) = @_;
 
                 if (ref($arg) and eval { $arg->can($operator) }) {
-                    my $method = '=';
+                    state $method = '=';
                     if ($arg->$operator($self->get_value)) {
                         $self->$method($arg);
                     }
                 }
                 else {
-                    warn sprintf(qq{[WARN] Can't find the method "$operator" for %s!\n},
-                                 defined($arg) ? ('object ' . ref($arg)) : 'an undefined object');
+                    $self->_nonexistent_method($operator, $arg);
                 }
 
                 $self;
@@ -187,14 +189,13 @@ package Sidef::Variable::Variable {
                 my $value = $self->get_value;
 
                 if (ref($value) and eval { $value->can($operator) }) {
-                    my $method = '=';
+                    state $method = '=';
                     if ($value->$operator($arg)) {
                         $self->$method($arg);
                     }
                 }
                 else {
-                    warn sprintf(qq{[WARN] Can't find the method "$operator" for %s!\n},
-                                 defined($arg) ? ('object ' . ref($arg)) : 'an undefined object');
+                    $self->_nonexistent_method($operator, $arg);
                 }
 
                 $self;
@@ -209,12 +210,11 @@ package Sidef::Variable::Variable {
                 my $value = $self->get_value;
 
                 if (ref($value) and eval { $value->can($operator) }) {
-                    my $method = '=';
+                    state $method = '=';
                     $self->$method($self->get_value->$operator($arg));
                 }
                 else {
-                    warn sprintf(qq{[WARN] Can't find the method "$operator" for %s!\n},
-                                 defined($value) ? ('object ' . ref($value)) : 'an undefined object');
+                    $self->_nonexistent_method($operator, $arg);
                 }
                 $self;
             };
@@ -254,7 +254,7 @@ package Sidef::Variable::Variable {
             my @results = $value->$method(@args);
 
             if ($method_type == 1) {    # (!) modifies the variable in place
-                my $method = '=';
+                state $method = '=';
                 $self->$method(@results);
                 return $self->new(rand, 'var', $self);
             }
@@ -271,13 +271,7 @@ package Sidef::Variable::Variable {
             return $results[-1];
         }
         else {
-            warn qq{[WARN] Inexistent method '$method' for }
-              . (
-                 ref($value)
-                 ? ("object " . ref($value))
-                 : ("an undefined object!")
-                )
-              . "\n";
+            $self->_nonexistent_method($method, $value);
         }
 
         return;
