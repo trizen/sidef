@@ -1,4 +1,5 @@
-**SIDEF**
+Sidef
+=====
 
 *Sidef is a modern object-oriented programming language, written in Perl.*
 
