@@ -18,7 +18,7 @@ package Sidef::Module::Require {
 
         if ($@) {
             warn substr($@, 0, rindex($@, ' at ')), "\n";
-            return Sidef::Types::Nil::Nil->new;
+            return;
         }
 
         Sidef::Module::Caller->_new(module => $self->{module_name});

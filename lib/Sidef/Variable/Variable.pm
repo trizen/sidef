@@ -12,6 +12,7 @@ package Sidef::Variable::Variable {
     #};
 
     our $AUTOLOAD;
+    my $nil = Sidef::Types::Nil::Nil->new;
 
     sub new {
         my (undef, $var, $type, $value) = @_;
@@ -19,7 +20,7 @@ package Sidef::Variable::Variable {
         bless {
                name  => $var,
                type  => $type,
-               value => $value,
+               value => $value // $nil,
               },
           __PACKAGE__;
     }

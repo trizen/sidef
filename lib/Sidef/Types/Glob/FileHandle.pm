@@ -104,8 +104,8 @@ package Sidef::Types::Glob::FileHandle {
         $self->_is_var_ref($var_ref) || return;
         $self->_is_number($length)   || return;
 
-        my $var   = $var_ref->get_var;
-        my $chunk = $var->get_value;
+        my $var = $var_ref->get_var;
+        my $chunk = $var->get_value->get_value // '';
 
         my $size = Sidef::Types::Number::Number->new(
             defined($offset)
@@ -183,7 +183,9 @@ package Sidef::Types::Glob::FileHandle {
         my ($self) = @_;
         Sidef::Types::Array::Array->new(
             map {
-                map { Sidef::Types::String::String->new($_) } grep { $_ ne '' } split(' ', $_)
+                map    { Sidef::Types::String::String->new($_) }
+                  grep { $_ ne '' }
+                  split(' ', $_)
               } CORE::readline($self->{fh})
         );
     }

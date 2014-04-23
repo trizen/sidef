@@ -144,7 +144,7 @@ package Sidef::Exec {
 
                         $is_hash ? do { $self_obj->{$ind} //= Sidef::Variable::Variable->new(rand, 'var') } : do {
                             foreach my $ind (0 .. $ind) {
-                                $self_obj->[$ind] //= Sidef::Variable::Variable->new(rand, 'var', Sidef::Types::Nil::Nil->new);
+                                $self_obj->[$ind] //= Sidef::Variable::Variable->new(rand, 'var');
                             }
                         };
 
@@ -191,7 +191,7 @@ package Sidef::Exec {
                             my $num = $ind->get_value;
 
                             foreach my $j (0 .. $num - 1) {
-                                $self_obj->[$j] //= Sidef::Variable::Variable->new(rand, 'var', Sidef::Types::Nil::Nil->new);
+                                $self_obj->[$j] //= Sidef::Variable::Variable->new(rand, 'var');
                             }
 
                             $self_obj->[$num] //=
@@ -256,7 +256,7 @@ package Sidef::Exec {
                 }
 
                 ref($self_obj) && eval { $self_obj->can('can') } || do {
-                    $self_obj = Sidef::Types::Nil::Nil->new();
+                    $self_obj = $self->{__NIL__} //= Sidef::Types::Nil::Nil->new;
                 };
 
                 if (not $self_obj->can('AUTOLOAD') and not $self_obj->can($method)) {

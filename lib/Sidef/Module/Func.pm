@@ -86,7 +86,7 @@ package Sidef::Module::Func {
         }
         else {
             warn qq{[WARN] Can't locate function '$func' via package "$self->{module}"!\n};
-            return Sidef::Types::Nil::Nil->new;
+            return;
         }
     }
 }
