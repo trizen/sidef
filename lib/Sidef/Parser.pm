@@ -24,6 +24,7 @@ package Sidef::Parser {
                            '++'  => 1,
                            '??'  => 1,
                            '...' => 1,
+                           '!'   => 1,
                           },
             obj_with_do => {
                 'Sidef::Types::Block::For'  => 1,
@@ -267,6 +268,11 @@ package Sidef::Parser {
                 {
                  sub     => sub { Sidef::Types::Number::Unary->new },
                  re      => qr/\G(?=-)/,
+                 dynamic => 0,
+                },
+                {
+                 sub     => sub { Sidef::Types::Number::Unary->new },
+                 re      => qr/\G(?=\?)/,
                  dynamic => 0,
                 },
                 {
@@ -1528,14 +1534,17 @@ package Sidef::Parser {
                     pos($_) += $pos;
 
                     if (defined $method) {
-                        my ($arg_obj, $pos) =
-                          /\G\h*(?=\()/gc
-                          ? ($self->parse_arguments(code => substr($_, pos)))
-                          : ($self->parse_obj(code => substr($_, pos)));
-                        pos($_) += $pos;
 
-                        if (defined $arg_obj) {
-                            push @{$struct{$self->{class}}[-1]{call}}, {method => $method, arg => [$arg_obj]};
+                        if (/\G\h*(?!;)/gc) {
+                            my ($arg_obj, $pos) =
+                              /\G(?=\()/
+                              ? ($self->parse_arguments(code => substr($_, pos)))
+                              : ($self->parse_obj(code => substr($_, pos)));
+                            pos($_) += $pos;
+
+                            if (defined $arg_obj) {
+                                push @{$struct{$self->{class}}[-1]{call}}, {method => $method, arg => [$arg_obj]};
+                            }
                         }
                     }
                     else {

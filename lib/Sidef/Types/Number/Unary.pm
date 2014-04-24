@@ -28,6 +28,11 @@ package Sidef::Types::Number::Unary {
             $self->_is_number($number, 1) || return;
             $number->negate;
         };
+
+        *{__PACKAGE__ . '::' . '?'} = sub {
+            my ($self, $obj) = @_;
+            Sidef::Types::Bool::Bool->new($obj);
+        };
     }
 
 };
