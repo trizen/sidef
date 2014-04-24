@@ -582,6 +582,19 @@ package Sidef::Types::String::String {
 
     *include = \&contains;
 
+    sub count {
+        my ($self, $substr) = @_;
+        $self->_is_string($substr) || return;
+
+        my $pos     = -1;
+        my $counter = 0;
+        while (($pos = CORE::index($$self, $$substr, $pos + 1)) != -1) {
+            ++$counter;
+        }
+
+        Sidef::Types::Number::Number->new($counter);
+    }
+
     sub overlaps {
         my ($self, $arg) = @_;
         $self->_is_string($arg) || return;

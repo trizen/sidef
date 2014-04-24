@@ -918,8 +918,14 @@ package Sidef::Types::Array::Array {
 
     # Join the array as string
     sub join {
-        my ($self, $delim) = @_;
+        my ($self, $delim, $block) = @_;
         $delim = ref($delim) && $self->_is_string($delim) ? $$delim : '';
+
+        if (defined $block) {
+            $self->_is_code($block) || return;
+            return Sidef::Types::String::String->new(CORE::join($delim, map { $block->call($_->get_value) } @{$self}));
+        }
+
         Sidef::Types::String::String->new(CORE::join($delim, map { $_->get_value } @{$self}));
     }
 

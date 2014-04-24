@@ -7,9 +7,9 @@ package Sidef::Variable::Variable {
 
     no warnings 'recursion';
 
-    #use overload q{""} => sub {
-    #    $_[0]->get_value;
-    #};
+    use overload q{""} => sub {
+        $_[0]->get_value;
+    };
 
     our $AUTOLOAD;
     my $nil = Sidef::Types::Nil::Nil->new;
