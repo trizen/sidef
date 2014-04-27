@@ -243,7 +243,7 @@ package Sidef::Types::Hash::Hash {
         my ($self) = @_;
         Sidef::Types::Array::Array->new(
             map {
-                Sidef::Types::Array::Array->new(Sidef::Types::String::String->new($_), $self->{$_}->get_value)
+                Sidef::Types::Array::Pair->new(Sidef::Types::String::String->new($_), $self->{$_}->get_value)
               } CORE::keys %{$self}
         );
     }

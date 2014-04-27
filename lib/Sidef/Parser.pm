@@ -147,6 +147,10 @@ package Sidef::Parser {
                           re  => qr/\GRegex\b/,
                          },
                          {
+                          sub => sub { Sidef->new },
+                          re  => qr/\GSidef\b/,
+                         },
+                         {
                           sub => sub { Sidef::Variable::Magic->new(\$., 1) },
                           re  => qr/\G\$\./,
                          },
@@ -315,6 +319,7 @@ package Sidef::Parser {
                   print printf
                   println say
 
+                  Sidef
                   File
                   Fcntl
                   Dir

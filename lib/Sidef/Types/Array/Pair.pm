@@ -54,6 +54,11 @@ package Sidef::Types::Array::Pair {
         $self;
     }
 
+    sub to_hash {
+        my ($self) = @_;
+        Sidef::Types::Hash::Hash->new(@{$self});
+    }
+
     sub dump {
         my ($self) = @_;
 

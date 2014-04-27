@@ -16,6 +16,7 @@ package Sidef {
                      file    => {class => {'Sidef::Types::Glob::File'     => 1}, type => 'SCALAR'},
                      dir     => {class => {'Sidef::Types::Glob::Dir'      => 1}, type => 'SCALAR'},
                      regex   => {class => {'Sidef::Types::Regex::Regex'   => 1}},
+                     pair    => {class => {'Sidef::Types::Array::Pair'    => 1}, type => 'ARRAY'},
                      string => {
                                 class => {
                                           'Sidef::Types::String::String' => 1,

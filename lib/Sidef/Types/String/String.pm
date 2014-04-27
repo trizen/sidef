@@ -497,8 +497,26 @@ package Sidef::Types::String::String {
     *trimEnd  = \&strip_end;
     *stripEnd = \&strip_end;
 
+    sub trans {
+        my ($self, $orig, $repl) = @_;
+        ($self->_is_array($orig) && $self->_is_array($repl)) || return;
+
+        $#{$orig} == $#{$repl} || do {
+            warn "[WARN] String.trans(): arguments must have the same length! ($#{$orig} != $#{$repl})\n";
+            return;
+        };
+
+        my %map;
+        @map{@{$orig}} = @{$repl};
+        my $chars = CORE::quotemeta(CORE::join('', CORE::keys(%map)));
+
+        $self->new($$self =~ s{([$chars])}{$map{$1}}gr);
+    }
+
     sub translit {
         my ($self, $orig, $repl, $modes) = @_;
+
+        $self->_is_array($orig, 1, 1) && return $self->trans($orig, $repl);
         ($self->_is_string($orig) && $self->_is_string($repl)) || return;
         $self->new(
                    eval qq{"\Q$$self\E"=~tr/} . $$orig =~ s{([/\\])}{\\$1}gr . "/" . $$repl =~
