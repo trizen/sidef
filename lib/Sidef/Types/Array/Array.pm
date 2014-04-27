@@ -443,7 +443,7 @@ package Sidef::Types::Array::Array {
             $var_ref->set_value(my $val = $item->get_value);
             my $key = $code->run;
             exists($hash->{$key}) || $hash->append($key, Sidef::Types::Array::Array->new);
-            $hash->{$key}->append($val);
+            $hash->{$key}->get_value->append($val);
         }
 
         $hash;

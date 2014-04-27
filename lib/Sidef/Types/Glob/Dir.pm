@@ -67,6 +67,17 @@ package Sidef::Types::Glob::Dir {
 
     *removeTree = \&remove_tree;
 
+    # Rename a directory
+    sub rename {
+        my ($self, $dir) = @_;
+
+        ref($dir) eq __PACKAGE__
+          || $self->_is_string($dir)
+          || return;
+
+        Sidef::Types::Bool::Bool->new(CORE::rename($$self, $$dir));
+    }
+
     # Create directory without parents
     sub create {
         my ($self) = @_;

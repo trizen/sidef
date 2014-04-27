@@ -1,27 +1,19 @@
 #!/usr/bin/ruby
 
-var req = (require 'LWP::Simple');
+# http://rosettacode.org/wiki/Anagrams
 
-if (nil != req) {
-    var lwp = (req->());
-    var words = (Str.new(lwp.get('http://www.puzzlers.org/pub/wordlists/unixdict.txt')).split);
+func main() {
+    var lwp = (
+        try   { require 'LWP::Simple'->() }
+        catch { Sys.warn("** LWP::Simple is not installed!\n"); return }
+    );
+
+    var words = Str.new(lwp.get('http://www.puzzlers.org/pub/wordlists/unixdict.txt')).words;
 
     "** Processing words...".say;
-
-    var anagram = (Hash.new);
-    for (words) {
-        anagram[_.split('').sort.join] := [] -> append(_);
-    }
-
-    var vals = (anagram.values);
-    var best = (vals.map{_.len}->max);
-
-    vals.grep{_.len == best}->for {
-        _.join(', ').say;
-    };
-
-    "** Done!".say;
+    var vls = words.group_by{.sort}.values;
+    var max = vls.map{.len}.max;
+    vls.grep{.len == max}.each{.join("\t").say};
 }
-else {
-    "\nModule 'LWP::Simple' is not installed!".say;
-}
+
+main();
