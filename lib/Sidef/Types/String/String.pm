@@ -508,9 +508,9 @@ package Sidef::Types::String::String {
 
         my %map;
         @map{@{$orig}} = @{$repl};
-        my $chars = CORE::quotemeta(CORE::join('', CORE::keys(%map)));
+        my $tries = CORE::join('|', map {CORE::quotemeta($_)} CORE::keys(%map));
 
-        $self->new($$self =~ s{([$chars])}{$map{$1}}gr);
+        $self->new($$self =~ s{($tries)}{$map{$1}}gr);
     }
 
     sub translit {
