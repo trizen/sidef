@@ -432,6 +432,25 @@ package Sidef::Types::Array::Array {
     *filter = \&grep;
     *select = \&grep;
 
+    sub group_by {
+        my ($self, $code) = @_;
+
+        $self->_is_code($code) || return;
+        my ($var_ref) = $code->init_block_vars();
+
+        my $hash = Sidef::Types::Hash::Hash->new;
+        foreach my $item (@{$self}) {
+            $var_ref->set_value(my $val = $item->get_value);
+            my $key = $code->run;
+            exists($hash->{$key}) || $hash->append($key, Sidef::Types::Array::Array->new);
+            $hash->{$key}->append($val);
+        }
+
+        $hash;
+    }
+
+    *groupBy = \&group_by;
+
     sub find {
         my ($self, $code) = @_;
 
