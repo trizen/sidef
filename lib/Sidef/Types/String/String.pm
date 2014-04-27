@@ -502,13 +502,13 @@ package Sidef::Types::String::String {
         ($self->_is_array($orig) && $self->_is_array($repl)) || return;
 
         $#{$orig} == $#{$repl} || do {
-            warn "[WARN] String.trans(): arguments must have the same length! ($#{$orig} != $#{$repl})\n";
+            warn "[WARN] String.trans(): the arguments must have the same length! ($#{$orig} != $#{$repl})\n";
             return;
         };
 
         my %map;
         @map{@{$orig}} = @{$repl};
-        my $tries = CORE::join('|', map {CORE::quotemeta($_)} CORE::keys(%map));
+        my $tries = CORE::join('|', map { CORE::quotemeta($_) } CORE::keys(%map));
 
         $self->new($$self =~ s{($tries)}{$map{$1}}gr);
     }
@@ -524,6 +524,20 @@ package Sidef::Types::String::String {
     }
 
     *tr = \&translit;
+
+    sub unpack {
+        my ($self, $format) = @_;
+        $self->_is_string($format) || return;
+        my @parts = CORE::unpack($$format, $$self);
+        $#parts == 0 ? __PACKAGE__->new($parts[0]) : Sidef::Types::Array::Array->new(map { __PACKAGE__->new($_) } @parts);
+    }
+
+    sub pack {
+        my ($self, $format) = @_;
+        $self->_is_string($format) || return;
+        my @parts = CORE::pack($$format, $$self);
+        $#parts == 0 ? __PACKAGE__->new($parts[0]) : Sidef::Types::Array::Array->new(map { __PACKAGE__->new($_) } @parts);
+    }
 
     sub length {
         my ($self) = @_;
