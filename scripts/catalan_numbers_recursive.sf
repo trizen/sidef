@@ -1,11 +1,10 @@
 #!/usr/bin/ruby
 
-var c = [1];
-
-func catalan (n) {
-    c[n-1] := (catalan(n-1) * (4 * n - 2) / (n + 1));
+func c(n) {
+    static mem = [1];
+    mem[n-1] := (c(n-1) * (4 * n - 2) / (n + 1))
 }
 
-for (0..45) {
-    "%d\t%s\n".printf(_, catalan(_));
+15.times { |i|
+    say "#{i-1}\t#{c(i-1)}";
 }

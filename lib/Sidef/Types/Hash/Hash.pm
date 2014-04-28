@@ -112,6 +112,23 @@ package Sidef::Types::Hash::Hash {
         $self;
     }
 
+    sub mapval {
+        my ($self, $code) = @_;
+        $self->_is_code($code) || return;
+
+        while (my ($key, $value) = each %{$self}) {
+            $self->{$key} = Sidef::Variable::Variable->new(
+                                                           'var', rand,
+                                                           $code->call(
+                                                                       Sidef::Types::String::String->new($key),
+                                                                       $value->get_value
+                                                                      )
+                                                          );
+        }
+
+        $self;
+    }
+
     sub select {
         my ($self, $code) = @_;
 
