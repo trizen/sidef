@@ -1,0 +1,16 @@
+#!/usr/bin/ruby
+
+# 90-degree version of Sierpinski's triangle
+# http://rosettacode.org/wiki/Sierpinski_triangle
+
+func sierpinski_triangle_90(n) {
+    var triangle = ['*'];
+    { |i|
+        var sp = (' ' * Math.pow(2, i-1));
+        triangle = (triangle.map {|x| x + sp*2} +
+                    triangle.map {|x| x + ' ' + x});
+    } * n;
+    triangle.join("\n");
+}
+
+say sierpinski_triangle_90(4);
