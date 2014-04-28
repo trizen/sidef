@@ -908,7 +908,8 @@ package Sidef::Types::Array::Array {
 
     sub pack {
         my ($self, $format) = @_;
-        Sidef::Types::String::String->new(CORE::pack($$format, @{$self}));
+        $self->_is_string($format) || return;
+        Sidef::Types::String::String->new(CORE::pack($$format, map { $_->get_value } @{$self}));
     }
 
     sub push {
