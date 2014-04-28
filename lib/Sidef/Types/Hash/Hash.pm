@@ -129,6 +129,9 @@ package Sidef::Types::Hash::Hash {
         $self;
     }
 
+    *mapVal  = \&mapval;
+    *map_val = \&mapval;
+
     sub select {
         my ($self, $code) = @_;
 
