@@ -535,8 +535,7 @@ package Sidef::Types::String::String {
     sub pack {
         my ($self, $format) = @_;
         $self->_is_string($format) || return;
-        my @parts = CORE::pack($$format, $$self);
-        $#parts == 0 ? __PACKAGE__->new($parts[0]) : Sidef::Types::Array::Array->new(map { __PACKAGE__->new($_) } @parts);
+        __PACKAGE__->new(CORE::pack($$format, $$self));
     }
 
     sub length {

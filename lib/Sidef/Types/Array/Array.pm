@@ -906,6 +906,11 @@ package Sidef::Types::Array::Array {
         }
     }
 
+    sub pack {
+        my ($self, $format) = @_;
+        Sidef::Types::String::String->new(CORE::pack($$format, @{$self}));
+    }
+
     sub push {
         my ($self, @args) = @_;
         push @{$self}, @{$self->new(@args)};
