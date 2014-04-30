@@ -5,12 +5,11 @@
 var cache = [[1]];
 
 func cumu (n) {
-    for (cache.len .. n){ |l|
-
+    cache.len .. n -> each { |l|
         var r = [0];
-        {r.append(r[-1] + cache[l-_][[_, l-_].min])}
-            for (1 .. l);
-
+        { |i|
+            r.append(r[-1] + cache[l-i][[i, l-i].min])
+        } * l;
         cache.append(r);
     }
 
@@ -19,16 +18,16 @@ func cumu (n) {
 
 func row (n) {
     var r = cumu(n);
-    return (n-1->range->map{ r[_+1] - r[_] } );
+    return (n-1 -> range.map{|i| r[i+1] - r[i] });
 }
 
 "rows:".say;
-for (1 .. 10) {
-    "%2d: %s\n".printf(_, row(_).dump);
-}
+{ |i|
+    "%2d: %s\n".printf(i, row(i).dump);
+} * 10;
 
 "\nsums:".say;
 
-for ([2, 5, 23, 32]) {
-    "%2d : %4d\n".printf(_, (cumu(_))[-1]);
+[2, 5, 23, 32].each { |i|
+    "%2d : %4d\n".printf(i, (cumu(i))[-1]);
 }
