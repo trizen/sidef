@@ -17,18 +17,16 @@ func roman2arabic(roman) {
         M => 1000,
     );
 
-    for (roman.uc.split('').map{m[_]} => \var digit) {
-
+    roman.uc.split('').map{m[_] \\ 0}.each { |digit|
         last_digit < digit && (
             arabic -= (2 * last_digit);
         );
-
         arabic += (last_digit = digit);
-    }
+    };
 
-    return(arabic);
+    return arabic;
 }
 
-for (["MCMXC", "MMVIII", "MDCLXVI"] => \var roman_digit) {
-    printf("%-10s == %d\n", roman_digit, roman2arabic(roman_digit));
-}
+%w(MCMXC MMVIII MDCLXVI).each { |roman_digit|
+    "%-10s == %d\n".printf(roman_digit, roman2arabic(roman_digit));
+};

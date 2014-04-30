@@ -282,11 +282,14 @@ package Sidef::Exec {
                         if (
                             ref($arg) eq 'HASH'
                             and not(
-                                    (exists($self->{types}{$type}) && exists($self->{types}{$type}{$method}))
-                                    || (    ($type eq 'Sidef::Types::Block::Code' || $type eq 'Sidef::Types::Block::For')
-                                        and ($method eq 'for' || $method eq 'foreach')
-                                        and ref $arg->{$class} eq 'ARRAY'
-                                        and $#{$arg->{$class}} == 2)
+                                   (exists($self->{types}{$type}) && exists($self->{types}{$type}{$method}))
+                                   || (   ref($self_obj) eq 'Sidef::Variable::Init'
+                                       && ($self_obj->{vars}[0]->{type} eq 'static' || $self_obj->{vars}[0]->{type} eq 'const')
+                                       && exists($self_obj->{vars}[0]->{inited}))
+                                   || (    ($type eq 'Sidef::Types::Block::Code' || $type eq 'Sidef::Types::Block::For')
+                                       and ($method eq 'for' || $method eq 'foreach')
+                                       and ref $arg->{$class} eq 'ARRAY'
+                                       and $#{$arg->{$class}} == 2)
                                    )
                           ) {
                             local $self->{var_ref} = ref($self_obj) eq 'Sidef::Variable::Ref';
