@@ -17,25 +17,22 @@ func roman2arabic (roman) {
     );
 
     var num = 0;
-
     while (romanArr.len > 0) {
         var val = lookup[romanArr.shift];
-
-        num += (val * (romanArr.exists(0) &&
-               (val < lookup[romanArr[0]]) ? -1 : 1));
+        num += val*(romanArr.exists(0) && (val < lookup[romanArr[0]]) ? -1 : 1);
     }
 
-    return(num);
+    return num;
 }
 
 #
 ## MAIN
 #
 
-for ([['MCMXC',1990], ['MMVIII',2008], ['MDCLXVI',1666]]) {
+['MCMXC':1990, 'MMVIII':2008, 'MDCLXVI':1666].each { |pair|
 
-    (var arabic = (roman2arabic(_[0]))) == _[1]
-        || ("Error occurred on %s\n".sprintf(_[0]).die);
+    var arabic = roman2arabic(pair.first) == pair.second
+        || "Error occurred on #{pair.first}\n".die;
 
-    "%s in arabic is %d".printlnf(_[0], arabic);
-}
+    say "#{pair.first} in arabic is #{arabic}";
+};

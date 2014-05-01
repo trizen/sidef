@@ -499,17 +499,27 @@ package Sidef::Types::String::String {
 
     sub trans {
         my ($self, $orig, $repl) = @_;
-        ($self->_is_array($orig) && $self->_is_array($repl)) || return;
-
-        $#{$orig} == $#{$repl} || do {
-            warn "[WARN] String.trans(): the arguments must have the same length! ($#{$orig} != $#{$repl})\n";
-            return;
-        };
 
         my %map;
-        @map{@{$orig}} = @{$repl};
-        my $tries = CORE::join('|', map { CORE::quotemeta($_) } CORE::keys(%map));
+        if (not defined($repl) and defined($orig)) {    # assume an array of pairs
+            $self->_is_array($orig) || return;
+            foreach my $pair (map { $_->get_value } @{$orig}) {
+                $self->_is_pair($pair) || return;
+                $map{$pair->first} = $pair->second->get_value;
+            }
+        }
+        else {
+            ($self->_is_array($orig) && $self->_is_array($repl)) || return;
 
+            $#{$orig} == $#{$repl} || do {
+                warn "[WARN] String.trans(): the arguments must have the same length! ($#{$orig} != $#{$repl})\n";
+                return;
+            };
+
+            @map{@{$orig}} = (map { $_->get_value } @{$repl});
+        }
+
+        my $tries = CORE::join('|', map { CORE::quotemeta($_) } sort { length($b) <=> length($a) } CORE::keys(%map));
         $self->new($$self =~ s{($tries)}{$map{$1}}gr);
     }
 
