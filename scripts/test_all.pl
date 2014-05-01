@@ -17,6 +17,7 @@ my %ignored;
       bulls_and_cows.sf
       bulls_and_cows_player.sf
       langton_s_ant.sf
+      langton_s_ant_2.sf
       levenshtein_recursive.sf
       fibonacci_validation.sf
       fibonacci_closed_solution.sf

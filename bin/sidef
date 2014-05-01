@@ -369,6 +369,8 @@ sub memoize_types {
                   ISA
                   BEGIN
                   __ANON__
+                  a
+                  b
                   new
                   say
                   print
