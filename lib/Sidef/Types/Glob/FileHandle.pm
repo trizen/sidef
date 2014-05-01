@@ -125,7 +125,14 @@ package Sidef::Types::Glob::FileHandle {
 
     sub slurp {
         my ($self) = @_;
-        CORE::sysread($self->{fh}, (my $content), (-s $self->{fh}));
+
+        my $size = (-s $self->{fh});
+        if (not defined($size) or ($size == 0)) {
+            local $/;
+            return Sidef::Types::String::String->new(CORE::readline($self->{fh}));
+        }
+
+        CORE::sysread($self->{fh}, (my $content), $size);
         Sidef::Types::String::String->new($content);
     }
 
@@ -202,6 +209,8 @@ package Sidef::Types::Glob::FileHandle {
 
         $self;
     }
+
+    *each_line = \&each;
 
     sub eof {
         my ($self) = @_;

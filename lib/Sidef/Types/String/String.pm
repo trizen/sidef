@@ -461,16 +461,39 @@ package Sidef::Types::String::String {
         $self->new(CORE::join('', sort(CORE::split(//, $$self))));
     }
 
-    sub words {
-        my ($self) = @_;
-        Sidef::Types::Array::Array->new(map { __PACKAGE__->new($_) } CORE::split(' ', $$self));
+    sub each_word {
+        my ($self, $obj) = @_;
+        my $array = Sidef::Types::Array::Array->new(map { __PACKAGE__->new($_) } CORE::split(' ', $$self));
+        $obj // return $array;
+        $self->_is_code($obj) || return;
+        $obj->for($array);
     }
+
+    *words    = \&each_word;
+    *eachWord = \&each_word;
 
     sub each {
         my ($self, $obj) = @_;
+        my $array = Sidef::Types::Array::Array->new(map { Sidef::Types::Char::Char->new($_) } CORE::split(//, $$self));
+        $obj // return $array;
         $self->_is_code($obj) || return;
-        $obj->for(Sidef::Types::Array::Array->new(map { $self->new($_) } CORE::split(//, $$self)));
+        $obj->for($array);
     }
+
+    *each_char = \&each;
+    *eachChar  = \&each;
+    *chars     = \&each;
+
+    sub each_line {
+        my ($self, $obj) = @_;
+        my $array = Sidef::Types::Array::Array->new(map { __PACKAGE__->new($_) } CORE::split(/\R/, $$self));
+        $obj // return $array;
+        $self->_is_code($obj) || return;
+        $obj->for($array);
+    }
+
+    *lines    = \&each_line;
+    *eachLine = \&each_line;
 
     sub trim {
         my ($self) = @_;
