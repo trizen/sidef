@@ -87,6 +87,10 @@ package Sidef::Parser {
                           re  => qr/\GArr(?:ay)?\b/,
                          },
                          {
+                          sub => sub { Sidef::Types::Array::MultiArray->new },
+                          re  => qr/\GMultiArr(?:ay)?\b/,
+                         },
+                         {
                           sub => sub { Sidef::Types::Array::Pair->new },
                           re  => qr/\GPair\b/,
                          },
@@ -324,6 +328,7 @@ package Sidef::Parser {
                   Fcntl
                   Dir
                   Arr Array Pair
+                  MultiArray MultiArr
                   Hash
                   Str String
                   Num Number
@@ -922,8 +927,17 @@ package Sidef::Parser {
                     return Sidef::Variable::Init->new(@{$var_objs}), pos;
                 }
 
+                # Declaration of compile-time evaluated constants
                 if (/\Gdefine\b\h*($self->{re}{var_name})\h*/gc) {
                     my $name = $1;
+
+                    if (exists $self->{keywords}{$name}) {
+                        $self->fatal_error(
+                                           code  => $_,
+                                           pos   => (pos($_) - length($name)),
+                                           error => "'$name' is either a keyword or a predefined variable!",
+                                          );
+                    }
 
                     /\G=\h*/gc;    # an optional equal sign is allowed
                     my ($obj, $pos) = $self->parse_expr(code => substr($_, pos));
@@ -931,7 +945,7 @@ package Sidef::Parser {
                     $obj // $self->fatal_error(
                                                code  => $_,
                                                pos   => pos,
-                                               error => "expected an expression after the variable name '$name'!",
+                                               error => qq{expected an expression after variable "$name" (near <define>)},
                                               );
 
                     $obj = ref($obj) eq 'HASH' ? Sidef::Types::Block::Code->new($obj)->run : $obj;
@@ -947,6 +961,42 @@ package Sidef::Parser {
                       };
 
                     return $obj, pos;
+                }
+
+                # Declaration of enums
+                if (/\Genum\b\h*/gc) {
+                    my ($vars, $pos) = $self->get_init_vars(code => substr($_, pos));
+                    pos($_) += $pos;
+
+                    @{$vars}
+                      || $self->fatal_error(
+                                            code  => $_,
+                                            pos   => pos,
+                                            error => q{expected one or more variable names after <enum>},
+                                           );
+
+                    foreach my $i (0 .. $#{$vars}) {
+                        my $name = $vars->[$i];
+
+                        if (exists $self->{keywords}{$name}) {
+                            $self->fatal_error(
+                                               code  => $_,
+                                               pos   => (pos($_) - length($name)),
+                                               error => "'$name' is either a keyword or a predefined variable!",
+                                              );
+                        }
+
+                        unshift @{$self->{vars}{$self->{class}}},
+                          {
+                            obj   => Sidef::Types::Number::Number->new($i),
+                            name  => $name,
+                            count => 0,
+                            type  => 'enum',
+                            line  => $self->{line},
+                          };
+                    }
+
+                    return (Sidef::Types::Number::Number->new($#{$vars}), pos);
                 }
 
                 # Declaration of the 'my' special variable + class and function declarations
