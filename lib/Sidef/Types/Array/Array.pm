@@ -574,6 +574,13 @@ package Sidef::Types::Array::Array {
         $self->new(map { $_->get_value } List::Util::shuffle(@{$self}));
     }
 
+    sub pair_with {
+        my ($self, @args) = @_;
+        Sidef::Types::Array::MultiArray->new($self, @args);
+    }
+
+    *pairWith = \&pair_with;
+
     sub reduce {
         my ($self, $obj) = @_;
 
@@ -1089,6 +1096,7 @@ package Sidef::Types::Array::Array {
         *{__PACKAGE__ . '::' . '-'}   = \&subtract;
         *{__PACKAGE__ . '::' . '&&'}  = \&mesh;
         *{__PACKAGE__ . '::' . '=='}  = \&equals;
+        *{__PACKAGE__ . '::' . ':'}   = \&pair_with;
         *{__PACKAGE__ . '::' . '»'}  = \&assign_to;
 
         *{__PACKAGE__ . '::' . '++'} = sub {
@@ -1101,11 +1109,6 @@ package Sidef::Types::Array::Array {
             my ($self) = @_;
             $self->pop;
             $self;
-        };
-
-        *{__PACKAGE__ . '::' . ':'} = sub {
-            my ($self, @args) = @_;
-            Sidef::Types::Array::MultiArray->new($self, @args);
         };
 
         *{__PACKAGE__ . '::' . '='} = sub {
