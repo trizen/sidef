@@ -177,9 +177,11 @@ scripts/DATA_handle.sf
 scripts/define_keyword.sf
 scripts/dice_game_solver.sf
 scripts/echo.sf
+scripts/eq_g2.sf
 scripts/eval.sf
 scripts/fibonacci_cached.sf
 scripts/fibonacci_closed_solution.sf
+scripts/fibonacci_iterative.sf
 scripts/fibonacci_mystery.sf
 scripts/fibonacci_validation.sf
 scripts/file_find_module.sf
@@ -198,8 +200,10 @@ scripts/hailstone.sf
 scripts/hash_autovivification.sf
 scripts/hash_from_array.sf
 scripts/hash_grep.sf
+scripts/hash_join.sf
 scripts/hash_sort.sf
 scripts/hashes.sf
+scripts/huffman_coding.sf
 scripts/i_love_you.sf
 scripts/if_do_else.sf
 scripts/if_while_standard.sf
@@ -213,6 +217,7 @@ scripts/keyword_object.sf
 scripts/knuth_shuffle.sf
 scripts/langton_s_ant.sf
 scripts/leap_year.sf
+scripts/letter_frequency.sf
 scripts/levenshtein_distance.sf
 scripts/levenshtein_distance_cached.sf
 scripts/levenshtein_recursive.sf
@@ -248,22 +253,30 @@ scripts/rand.sf
 'scripts/Real-world problems/Gift match/giftmatch.sf'
 'scripts/Real-world problems/Gift match/input.txt'
 'scripts/Real-world problems/Gift match/output.txt'
+'scripts/Real-world problems/Universe size/baby_size_of_the_universe.sf'
 scripts/recursion.sf
 scripts/regex.sf
 scripts/regex_bool.sf
 scripts/return.sf
 scripts/reverse_recursive_general_solution.sf
+scripts/reverse_words_in_a_string.sf
 scripts/rock_paper_scissors.sf
 scripts/roman_numerals_decoding.sf
 scripts/roman_numerals_decoding_2.sf
+scripts/roman_numerals_decoding_3.sf
 scripts/roman_numerals_encoding.sf
 scripts/root_mean_square.sf
 scripts/run_length_encoding.sf
 scripts/run_length_encoding_2.sf
 scripts/script.sf
+scripts/short_circuit_evaluation.sf
+scripts/sidef_to_json.sf
 scripts/sierpinski_carpet.sf
+scripts/sierpinski_triangle.sf
+scripts/sierpinski_triangle_90.sf
 scripts/special_methods.sf
 scripts/split_combine.sf
+scripts/static_const_lazy_init.sf
 scripts/stdin.sf
 scripts/sum_of_squares.sf
 scripts/switch.sf
@@ -286,4 +299,5 @@ t/manifest.t
 t/pod.t
 utils/deparser.pl
 utils/pod_generator.pl
+utils/regexp_grammars_parser.pl
 utils/sidef_concept.pl
