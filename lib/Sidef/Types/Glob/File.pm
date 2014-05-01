@@ -213,6 +213,10 @@ package Sidef::Types::Glob::File {
         Sidef::Types::String::String->new(File::Basename::basename($$self));
     }
 
+    *base      = \&basename;
+    *base_name = \&basename;
+    *baseName  = \&basename;
+
     sub dirname {
         my ($self) = @_;
 
@@ -220,12 +224,21 @@ package Sidef::Types::Glob::File {
         Sidef::Types::Glob::Dir->new(File::Basename::dirname($$self));
     }
 
+    *dir      = \&dirname;
+    *dir_name = \&dirname;
+    *dirName  = \&dirname;
+
     sub abs_name {
         my ($self) = @_;
 
         require File::Spec;
         __PACKAGE__->new(File::Spec->rel2abs($$self));
     }
+
+    *abs     = \&abs_name;
+    *absname = \&abs_name;
+    *absName = \&abs_name;
+    *rel2abs = \&abs_name;
 
     sub rename {
         my ($self, $file) = @_;
@@ -236,6 +249,9 @@ package Sidef::Types::Glob::File {
 
         Sidef::Types::Bool::Bool->new(rename($$self, $$file));
     }
+
+    *rename_to = \&rename;
+    *renameTo  = \&rename;
 
     sub move {
         my ($self, $file) = @_;
@@ -248,7 +264,9 @@ package Sidef::Types::Glob::File {
         Sidef::Types::Bool::Bool->new(File::Copy::move($$self, $$file));
     }
 
-    *mv = \&move;
+    *mv      = \&move;
+    *move_to = \&move;
+    *moveTo  = \&move;
 
     sub copy {
         my ($self, $file) = @_;
@@ -412,6 +430,9 @@ package Sidef::Types::Glob::File {
         my ($self) = @_;
         Sidef::Types::Bool::Bool->new(CORE::unlink($$self));
     }
+
+    *delete = \&unlink;
+    *remove = \&unlink;
 
     sub touch {
         my ($self) = @_;
