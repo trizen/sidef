@@ -347,6 +347,7 @@ package Sidef::Parser {
                   var
                   const
                   func
+                  enum
                   class
                   static
                   define
@@ -1906,7 +1907,8 @@ package Sidef::Parser {
                                        && $variable->{type} ne 'func'
                                        && $variable->{name} ne '') {
                                     warn +(   $variable->{type} eq 'const'
-                                           || $variable->{type} eq 'define' ? 'Constant' : 'Variable')
+                                           || $variable->{type} eq 'define'
+                                           || $variable->{type} eq 'enum' ? 'Constant' : 'Variable')
                                       . " '$variable->{name}' has been initialized, but not used again, at "
                                       . "$self->{script_name}, line $variable->{line}\n";
                                 }
