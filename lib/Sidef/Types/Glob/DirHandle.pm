@@ -112,11 +112,18 @@ package Sidef::Types::Glob::DirHandle {
 
     sub each {
         my ($self, $code) = @_;
+
         $self->_is_code($code) || return;
+        my ($var_ref) = $code->init_block_vars();
 
         while (defined(my $file = CORE::readdir($self->{dir_h}))) {
-            if (ref($code->call(Sidef::Types::String::String->new($file))) eq 'Sidef::Types::Block::Break') {
+            $var_ref->set_value(Sidef::Types::String::String->new($file));
+            my $resp = $code->run;
+            if (ref($resp) eq 'Sidef::Types::Block::Break') {
                 last;
+            }
+            elsif (ref($resp) eq 'Sidef::Types::Block::Return') {
+                return $resp;
             }
         }
 

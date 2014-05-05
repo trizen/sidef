@@ -597,13 +597,12 @@ package Sidef::Parser {
                 }
 
                 my $end_delim = $pairs{$delim} // $delim;
-                if (not /\G\Q$end_delim\E/gc) {
-                    $self->fatal_error(
-                                       error => sprintf(qq{can't find the quoted string terminator "%s"}, $end_delim),
-                                       code  => $_,
-                                       pos   => pos($_)
-                                      );
-                }
+                /\G\Q$end_delim\E/gc
+                  || $self->fatal_error(
+                                        error => sprintf(qq{can't find the quoted string terminator "%s"}, $end_delim),
+                                        code  => $_,
+                                        pos   => pos($_)
+                                       );
 
                 return $string, pos;
             }

@@ -242,10 +242,11 @@ package Sidef::Types::Array::Array {
 
         my $max;
         my $min = Sidef::Math::Math->inf->neg;
+        my ($var_ref) = $code->init_block_vars();
 
         foreach my $item (@{$self}) {
-            my $value  = $item->get_value;
-            my $result = $code->call($value);
+            $var_ref->set_value($item->get_value);
+            my $result = $code->run;
 
             if ($result->gt($min)) {
                 $max = $item->get_value;
@@ -264,10 +265,11 @@ package Sidef::Types::Array::Array {
 
         my $min;
         my $max = Sidef::Math::Math->inf;
+        my ($var_ref) = $code->init_block_vars();
 
         foreach my $item (@{$self}) {
-            my $value  = $item->get_value;
-            my $result = $code->call($value);
+            $var_ref->set_value($item->get_value);
+            my $result = $code->run;
 
             if ($result->lt($max)) {
                 $min = $item->get_value;
@@ -991,10 +993,15 @@ package Sidef::Types::Array::Array {
     }
 
     *toHash = \&to_hash;
+    *to_h   = \&to_hash;
 
     sub copy {
         my ($self) = @_;
-        $self->new(map { $_->get_value } @{$self});
+        my $new = $self->new;
+        foreach my $item (map { $_->get_value } @{$self}) {
+            $new->append(eval { $item->can('copy') } ? $item->copy : $item);
+        }
+        $new;
     }
 
     sub delete_first {
@@ -1004,11 +1011,12 @@ package Sidef::Types::Array::Array {
         while (my ($i, $var) = CORE::each @{$self}) {
             my $item = $var->get_value;
             if (ref($item) eq ref($obj) and defined $item->can($method) and $item->$method($obj)) {
-                return CORE::splice(@{$self}, $i, 1);
+                CORE::splice(@{$self}, $i, 1);
+                return Sidef::Types::Bool::Bool->true;
             }
         }
 
-        return;
+        Sidef::Types::Bool::Bool->false;
     }
 
     *remove_first = \&delete_first;
@@ -1032,11 +1040,14 @@ package Sidef::Types::Array::Array {
     *remove = \&delete;
 
     sub delete_if {
-        my ($self, $block) = @_;
-        $self->_is_code($block) || return;
+        my ($self, $code) = @_;
+
+        $self->_is_code($code) || return;
+        my ($var_ref) = $code->init_block_vars();
 
         for (my $i = 0 ; $i <= $#{$self} ; $i++) {
-            $block->call($self->[$i]->get_value) && CORE::splice(@{$self}, $i--, 1);
+            $var_ref->set_value($self->[$i]->get_value);
+            $code->run && CORE::splice(@{$self}, $i--, 1);
         }
 
         $self;
@@ -1047,14 +1058,17 @@ package Sidef::Types::Array::Array {
     *deleteIf  = \&delete_if;
 
     sub delete_first_if {
-        my ($self, $block) = @_;
-        $self->_is_code($block) || return;
+        my ($self, $code) = @_;
+
+        $self->_is_code($code) || return;
+        my ($var_ref) = $code->init_block_vars();
 
         while (my ($i, $item) = CORE::each @{$self}) {
-            $block->call($item->get_value) && (return CORE::splice(@{$self}, $i, 1));
+            $var_ref->set_value($item->get_value);
+            $code->run && do { CORE::splice(@{$self}, $i, 1); return Sidef::Types::Bool::Bool->true };
         }
 
-        return;
+        Sidef::Types::Bool::Bool->false;
     }
 
     *remove_first_if = \&delete_first_if;
