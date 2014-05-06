@@ -177,9 +177,7 @@ package Sidef::Types::Block::Code {
         my ($self, $bool) = @_;
 
         if ($bool) {
-            my $resp = $self->run;
-            (ref($resp) eq 'Sidef::Types::Block::Break' || ref($resp) eq 'Sidef::Types::Block::Return')
-              && return $resp;
+            return $self->run;
         }
 
         return $bool;
