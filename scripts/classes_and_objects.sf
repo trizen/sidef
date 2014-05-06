@@ -4,13 +4,13 @@
 
 class Task(callback, dependencies) {
 
-    func new(self) {
+    method new {
         self.dependencies.is_a(nil) && (
             self.dependencies([]);
         );
     }
 
-    func perform(self) {
+    method perform {
         self.dependencies.each {
             .perform;
         }

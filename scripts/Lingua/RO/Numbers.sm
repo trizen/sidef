@@ -147,7 +147,7 @@ func _number_to_ro (number) {
     return(words);
 }
 
-func number_to_ro (self, num) {
+method number_to_ro (num) {
 
     var conf = _.toHash;
     while (var kv = (conf.each)) {

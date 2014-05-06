@@ -17,7 +17,7 @@ class Math::Algebra::Matrix (matrix) {
     ## Function declaration
     #
 
-    func det (self) {
+    method det {
 
         var math_matrix = (
             req.new(self.matrix->to_list);
@@ -25,5 +25,4 @@ class Math::Algebra::Matrix (matrix) {
 
         Num.new(math_matrix.determinant);
     }
-
 }

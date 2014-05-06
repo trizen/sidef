@@ -8,8 +8,8 @@
  class 国際( なまえ, Straße ) {
 
     # Say who am I!
-    func 言え(స్వీయ) {
-        say "I am #{స్వీయ.なまえ} from #{స్వీయ.Straße}";
+    method 言え {
+        say "I am #{self.なまえ} from #{self.Straße}";
     }
 }
 

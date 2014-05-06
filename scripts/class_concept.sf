@@ -5,11 +5,11 @@ class Test (name) {
 
     static prefix = '=>> ';
 
-    func get_name (self) {
+    method get_name {
         prefix + self.name;
     }
 
-    func add(self, a, b) {
+    method add(a, b) {
         return a+b;
     }
 }

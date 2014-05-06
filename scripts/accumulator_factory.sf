@@ -3,12 +3,12 @@
 # Translation of: http://rosettacode.org/wiki/Accumulator_factory#Perl
 
 class Accumulator (sum) {
-    func acc (self, num) {
+    method +(num) {
         self.sum(self.sum + num);
     }
 }
 
 var x = Accumulator(1);
-x.acc(5);
+x + 5;
 say Accumulator(3);       # prints: Sidef::Variable::Class=HASH(0xa1799f8)
-say x.acc(2.3);           # prints: 8.3
+say x+2.3;                # prints: 8.3

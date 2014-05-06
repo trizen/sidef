@@ -10,25 +10,21 @@ package Sidef::Variable::ClassInit {
     }
 
     sub __set_value {
-        my ($self, $block, @names) = @_;
+        my ($self, $block, $names) = @_;
         $self->{__BLOCK__} = $block;
-        $self->{__VARS__}  = \@names;
+        $self->{__VARS__}  = $names;
+        $self;
+    }
+
+    sub __add_method {
+        my ($self, $name, $method) = @_;
+        $self->{__METHODS__}{$name} = $method;
         $self;
     }
 
     sub define_method {
         my ($self, $method_name, $code) = @_;
-
-        push @{$self->{__BLOCK__}{code}{$self->{name}}},
-          {
-            self => {
-                     $self->{name} => [
-                                       {
-                                        self => Sidef::Variable::Variable->new($$method_name, 'func', $code->copy)
-                                       }
-                                      ]
-                    }
-          };
+        $self->__add_method($method_name, $code->copy);
     }
 
     *def_method = \&define_method;
@@ -43,33 +39,25 @@ package Sidef::Variable::ClassInit {
         # Run the auxiliary code of the class
         $self->{__BLOCK__}->run;
 
-        # I don't like this, but... it works!
-        my @init_methods;
-        foreach my $function (@{$self->{__BLOCK__}{code}{$self->{name}}}) {
-            if (    ref $function eq 'HASH'
-                and ref(my $func = $function->{self}{$self->{name}}[0]{self}) eq 'Sidef::Variable::Variable') {
-                if ($func->{type} eq 'func') {
-
-                    # If the function has a special name, store it as init method
-                    if ($func->{name} eq 'new') {
-                        push @init_methods, $func;
-                        next;
-                    }
-
-                    # Otherwise, store it as normal method
-                    $class->{functions}{$func->{name}} = $func;
-                }
-            }
+        # Store the class methods
+        while (my ($key, $value) = each %{$self->{__METHODS__}}) {
+            $class->{method}{$key} = $value;
         }
 
-        foreach my $method (@init_methods) {
-            $method->call($class, @args);
+        # Execute the 'new' method (if exists)
+        if (exists $self->{__METHODS__}{new}) {
+            ($self->{__METHODS__}{new})->call($class, @args);
         }
 
         $class;
     }
 
     *new = \&init;
+
+    {
+        no strict 'refs';
+        *{__PACKAGE__ . '::' . '+='} = \&define_method;
+    }
 };
 
 1;

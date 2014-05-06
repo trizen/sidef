@@ -30,7 +30,7 @@ hello(42, 43);
 
 # Class + operator-like method
 class Something (sum) {
-    func + (self, val) {
+    method + (val) {
         say val;
         say self.sum;
     }

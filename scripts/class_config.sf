@@ -3,8 +3,7 @@
 # Test class
 class Test (opts) {
 
-    func config (self, args) {
-
+    method config (args) {
         self.opts(:(
                 min  => 5,
                 max  => 20,
@@ -14,11 +13,11 @@ class Test (opts) {
         self.opts.mergeValues(args);
     }
 
-    func get_name (self) {
+    method get_name {
         self.opts['name'];        # or: self.opts.get('name')
     }
 
-    func sum (self) {
+    method sum {
         self.opts['min'] + self.opts['max'];
     }
 }
@@ -37,7 +36,7 @@ func main () {
             name => "Sidef",
     ));
 
-    # Init again the same class
+    # Init again another object
     var obj_2 = Test.new;
 
     # Configure the class values:

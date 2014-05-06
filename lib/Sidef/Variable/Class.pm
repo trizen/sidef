@@ -27,14 +27,14 @@ package Sidef::Variable::Class {
             }
         }
 
-        if (exists $self->{functions}{$name}) {
-            return $self->{functions}{$name}->call($self, @args);
+        if (exists $self->{method}{$name}) {
+            return $self->{method}{$name}->call($self, @args);
         }
-        elsif (exists $self->{functions}{'AUTOLOAD'}) {
-            return $self->{functions}{'AUTOLOAD'}->call($self, $name, @args);
+        elsif (exists $self->{method}{'AUTOLOAD'}) {
+            return $self->{method}{'AUTOLOAD'}->call($self, Sidef::Types::String::String->new($name), @args);
         }
         else {
-            warn "No method `$name' for class: $self->{name}\n";
+            warn "Can't find method `$name' for class: $self->{name}\n";
         }
 
         return;

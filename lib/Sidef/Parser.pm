@@ -360,9 +360,6 @@ package Sidef::Parser {
                   STDOUT
                   STDERR
 
-                  __FUNC__
-                  __CLASS__
-                  __BLOCK__
                   __FILE__
                   __LINE__
                   __END__
@@ -928,7 +925,7 @@ package Sidef::Parser {
                 }
 
                 # Declaration of compile-time evaluated constants
-                if (/\Gdefine\b\h*($self->{re}{var_name})\h*/gc) {
+                if (/\Gdefine\h+($self->{re}{var_name})\h*/gc) {
                     my $name = $1;
 
                     if (exists $self->{keywords}{$name}) {
@@ -999,13 +996,19 @@ package Sidef::Parser {
                     return (Sidef::Types::Number::Number->new($#{$vars}), pos);
                 }
 
-                # Declaration of the 'my' special variable + class and function declarations
-                if (   /\G(my)\h+($self->{re}{var_name})\h*/goc
-                    || /\G(func|class)\b\h*($self->{re}{var_name})\h*/goc
-                    || (defined($self->{current_class}) && /\G(func)\h*($self->{re}{operators})\h*/goc)
-                    || /\G(func|class)\b()\h*/goc) {
+                # Declaration of the 'my' special variable + class, method and function declarations
+                if (/\G(my|func|class)\b\h*/gc || (exists($self->{current_class}) && /\G(method)\b\h*/gc)) {
                     my $type = $1;
-                    my $name = $2;
+                    my $name =
+                        /\G($self->{re}{var_name})\h*/goc ? $1
+                      : $type eq 'method' && /\G($self->{re}{operators})\h*/goc ? $1
+                      : $type ne 'my' ? ''
+                      : $self->fatal_error(
+                                           error    => "invalid '$type' declaration",
+                                           expected => "expected a name",
+                                           code     => $_,
+                                           pos      => pos($_)
+                                          );
 
                     if (exists $self->{keywords}{$name}) {
                         $self->fatal_error(
@@ -1015,20 +1018,21 @@ package Sidef::Parser {
                                           );
                     }
 
-                    my $variable =
+                    my $obj =
                         $type eq 'my' ? Sidef::Variable::My->new($name)
-                      : $type eq 'func' ? Sidef::Variable::Variable->new($name, $type)
-                      : $type eq 'class' ? Sidef::Variable::ClassInit->__new($name)
+                      : $type eq 'func'   ? Sidef::Variable::Variable->new($name, $type)
+                      : $type eq 'method' ? Sidef::Variable::Variable->new($name, $type)
+                      : $type eq 'class'  ? Sidef::Variable::ClassInit->__new($name)
                       : $self->fatal_error(
                                            error    => "invalid type",
-                                           expected => "(developer fault)",
+                                           expected => "developer's fault",
                                            code     => $_,
                                            pos      => pos($_),
                                           );
 
                     unshift @{$self->{vars}{$self->{class}}},
                       {
-                        obj   => $variable,
+                        obj   => $obj,
                         name  => $name,
                         count => 0,
                         type  => $type,
@@ -1052,35 +1056,36 @@ package Sidef::Parser {
                                                );
 
                         local $self->{class}         = $name;
-                        local $self->{current_class} = $variable;
-                        my ($obj, $pos) = $self->parse_block(code => '{' . substr($_, pos));
+                        local $self->{current_class} = $obj;
+                        my ($block, $pos) = $self->parse_block(code => '{' . substr($_, pos));
                         pos($_) += $pos - 1;
 
-                        $variable->__set_value($obj, @{$var_names});
+                        $obj->__set_value($block, $var_names);
                     }
 
-                    if ($type eq 'func') {
+                    if ($type eq 'func' or $type eq 'method') {
 
                         my ($var_names, $pos1) = $self->get_init_vars(code => substr($_, pos), with_vals => 1);
                         pos($_) += $pos1;
 
                         /\G\h*\{\h*/gc
                           || $self->fatal_error(
-                                                error    => "invalid function declaration",
-                                                expected => "expected: func $name(...){...}",
+                                                error    => "invalid '$type' declaration",
+                                                expected => "expected: $type $name(...){...}",
                                                 code     => $_,
                                                 pos      => pos($_)
                                                );
 
-                        local $self->{current_function} = $variable;
-                        my $args = '|' . join(',', @{$var_names}) . '|';
-                        my ($obj, $pos) = $self->parse_block(code => '{' . $args . substr($_, pos));
+                        local $self->{$type eq 'func' ? 'current_function' : 'current_method'} = $obj;
+                        my $args = '|' . join(',', $type eq 'method' ? 'self' : (), @{$var_names}) . '|';
+                        my ($block, $pos) = $self->parse_block(code => '{' . $args . substr($_, pos));
                         pos($_) += $pos - (length($args) + 1);
 
-                        $variable->set_value($obj);
+                        $obj->set_value($block);
+                        $self->{current_class}->__add_method($name, $block) if $type eq 'method';
                     }
 
-                    return $variable, pos;
+                    return $obj, pos;
                 }
 
                 # Binary, hexdecimal and octal numbers
@@ -1185,7 +1190,6 @@ package Sidef::Parser {
                 }
 
                 if (/\G__(?:END|DATA)__\b\h*+\R?/gc) {
-
                     if (exists $self->{'__DATA__'}) {
                         $self->{'__DATA__'} = substr($_, pos);
                     }
@@ -1196,7 +1200,7 @@ package Sidef::Parser {
                 if (/\GDATA\b/gc) {
                     return +(
                         $self->{static_objects}{'__DATA__'} //= do {
-                            open my $str_fh, '<:encoding(UTF-8)', \$self->{'__DATA__'};
+                            open my $str_fh, '<:utf8', \$self->{'__DATA__'};
                             Sidef::Types::Glob::FileHandle->new(fh   => $str_fh,
                                                                 file => Sidef::Types::Nil::Nil->new);
                           }
@@ -1205,7 +1209,7 @@ package Sidef::Parser {
                 }
 
                 # Begining of here-document (<<"EOT", <<'EOT', <<EOT)
-                if (/\G<</gc) {
+                if (/\G<<(?=\S)/gc) {
                     my ($name, $type) = (undef, 1);
 
                     if (/\G(?=(['"]))/) {
@@ -1216,9 +1220,6 @@ package Sidef::Parser {
                     }
                     elsif (/\G(\S+)/gc) {
                         $name = $1;
-                    }
-                    else {
-                        return undef, pos($_) - 2;
                     }
 
                     my $obj = {$self->{class} => []};
@@ -1251,44 +1252,24 @@ package Sidef::Parser {
                     redo;
                 }
 
-                if (/\G__BLOCK__\b/gc) {
-                    if (exists $self->{current_block}) {
-                        return $self->{current_block}, pos;
-                    }
-
-                    $self->fatal_error(
-                                       code  => $_,
-                                       pos   => pos($_) - length('__BLOCK__'),
-                                       error => "__BLOCK__ can't be used outside a block!",
-                                      );
+                if (exists($self->{current_block}) && /\G__BLOCK__\b/gc) {
+                    return $self->{current_block}, pos;
                 }
 
-                if (/\G__FUNC__\b/gc) {
-                    if (exists $self->{current_function}) {
-                        return $self->{current_function}, pos;
-                    }
-
-                    $self->fatal_error(
-                                       code  => $_,
-                                       pos   => pos($_) - length('__FUNC__'),
-                                       error => "__FUNC__ can't be used outside a function!",
-                                      );
+                if (exists($self->{current_function}) && /\G__FUNC__\b/gc) {
+                    return $self->{current_function}, pos;
                 }
 
-                if (/\G__CLASS__\b/gc) {
-                    if (exists $self->{current_class}) {
-                        return $self->{current_class}, pos;
-                    }
+                if (exists($self->{current_class}) && /\G__CLASS__\b/gc) {
+                    return $self->{current_class}, pos;
+                }
 
-                    $self->fatal_error(
-                                       code  => $_,
-                                       pos   => pos($_) - length('__CLASS__'),
-                                       error => "__CLASS__ can't be used outside a function!",
-                                      );
+                if (exists($self->{current_method}) && /\G__METHOD__\b/gc) {
+                    return $self->{current_method}, pos;
                 }
 
                 if (
-                    /\G((?>ENV|ARGV))\b/gc && do {
+                    /\G(ENV|ARGV)\b/gc && do {
                         ref(($self->find_var($1, $self->{class}))[0]) ? do { pos($_) -= length($1); 0 } : 1;
                     }
                   ) {
@@ -1375,20 +1356,12 @@ package Sidef::Parser {
                                       );
                 }
 
-                if (/\G\$/gc) {
-                    redo;
-                }
-
-                return undef, pos($_);
-
-                $self->fatal_error(
-                                   code  => $_,
-                                   pos   => pos($_),
-                                   error => "unexpected char: " . substr($_, pos($_), 1),
-                                  );
+                /\G\$/gc && redo;
 
                 #warn "$self->{script_name}:$self->{line}: unexpected char: " . substr($_, pos($_), 1) . "\n";
                 #return undef, pos($_) + 1;
+
+                return undef, pos($_);
             }
         }
     }
@@ -1563,7 +1536,7 @@ package Sidef::Parser {
             }
 
             if (
-                   (ref($obj) eq 'Sidef::Variable::Variable' and $obj->{type} eq 'func')
+                   (ref($obj) eq 'Sidef::Variable::Variable' and ($obj->{type} eq 'func' || $obj->{type} eq 'method'))
                 || (ref($obj) eq 'Sidef::Variable::ClassInit')
                 || (ref($obj) eq 'Sidef::Types::Block::Code')
 
