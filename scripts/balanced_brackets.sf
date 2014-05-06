@@ -6,7 +6,7 @@ func balanced (str) {
 
     var depth = 0;
 
-    for (str.split('') => \var c) {
+    str.each { |c|
            if(c=='['){ depth++ }
         elsif(c==']'){ depth-- < 0 && (return(false)) }
     }

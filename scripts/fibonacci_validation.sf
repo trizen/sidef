@@ -5,13 +5,13 @@ func is_fib (pos, fib) {
 }
 
 for [
-      [12  => 144                   => true],
-      [12  => 143                   => false],
-      [12  => 145                   => false],
-      [13  => 233                   => true],
-      [49  => 1337                  => false],
-      [32  => 2178309               => true],
-      [100 => 354224848179261915075 => true],
+      [12,  144,                   true],
+      [12,  143,                   false],
+      [12,  145,                   false],
+      [13,  233,                   true],
+      [49,  1337,                  false],
+      [32,  2178309,               true],
+      [100, 354224848179261915075, true],
     ]{|pos,             num,            bool|
 
     is_fib(pos, num) == bool || ("Validation error!\n".die);

@@ -3,6 +3,6 @@
 %w(a b).map{Sys.scanln("** Integer " + _ + ": ").toInt}
        .assignTo(\var a, \var b);
 
-for (%w(+ - * / % ** ^ | & << >>) => \var op) {
+for (%w(+ - * / % ** ^ | & << >>)) { |op|
     Sys.printf("%s %s %s = %s\n", a, op, b, a->$op(b));
 }

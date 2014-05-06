@@ -27,6 +27,7 @@ lib/Sidef/Time/Time.pod
 lib/Sidef/Types/Array/Array.pm
 lib/Sidef/Types/Array/Array.pod
 lib/Sidef/Types/Array/HCArray.pm
+lib/Sidef/Types/Array/MultiArray.pm
 lib/Sidef/Types/Array/Pair.pm
 lib/Sidef/Types/Black/Hole.pm
 lib/Sidef/Types/Block/Break.pm
@@ -216,6 +217,7 @@ scripts/josephus_problem.sf
 scripts/keyword_object.sf
 scripts/knuth_shuffle.sf
 scripts/langton_s_ant.sf
+scripts/langton_s_ant_2.sf
 scripts/leap_year.sf
 scripts/letter_frequency.sf
 scripts/levenshtein_distance.sf

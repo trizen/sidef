@@ -5,7 +5,7 @@
 #
 
 var size = 4;
-var num = (1..9->shuffle.ft(0,size-1));
+var num = (1..9->shuffle.ft(0, size-1));
 
 for (var guesses = 0; true; guesses++) {
 
@@ -15,8 +15,8 @@ for (var guesses = 0; true; guesses++) {
     var input = (
                   Sys.scanln("Input: ").split(1)
                                        .unique()
-                                       .grep {|c| c.match(/^[1-9]$/)??}
-                                       .map  {|d| d.toInt}
+                                       .grep {.match(/^[1-9]$/)??}
+                                       .map  {.toInt}
                 );
 
     input.len == size || (
@@ -30,7 +30,7 @@ for (var guesses = 0; true; guesses++) {
         break;
     }
 
-    for (num.range => \var i) {
+    num.range.each { |i|
         if (num[i] == input[i]) {
             bulls++;
         }

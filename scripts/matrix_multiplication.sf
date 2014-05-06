@@ -8,9 +8,9 @@ func matrix_multi (a, b) {
 
   var n = (b.len - 1);
 
-    for (0..rows => \var r) {
-        for (0..cols => \var c) {
-            for (0..n => \var i) {
+    for (0..rows) { |r|
+        for (0..cols) { |c|
+            for (0..n) { |i|
                 p[r]    := [];
                 p[r][c] := 0;
                 p[r][c] += (a[r][i] * b[i][c]);

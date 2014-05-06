@@ -15,7 +15,7 @@ func combine(n, set) {
     head   = (set.shift);
     result = (combine(n-1, set.copy));
 
-    for (result => \var subarray) {
+    result.each { |subarray|
         subarray.unshift(head);
     }
 
@@ -27,6 +27,6 @@ func combine(n, set) {
 # Testing
 ##
 
-for (combine(3, 'a'..'e') => \var arr) {
+combine(3, 'a'..'e').each { |arr|
     arr.join(' ').say;
 }

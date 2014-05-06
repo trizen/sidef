@@ -79,8 +79,7 @@ func _number_to_ro (number) {
         words.append(_number_to_ro(number.int)->to_list);
     }
     elsif (number >= BIGNUMS[0]['num']) {
-        my i;   # special
-        for (0 .. (BIGNUMS.offset - 1) => \i) {
+        for (0 .. (BIGNUMS.offset - 1)) { |i|
             j = (BIGNUMS.offset - i);
 
             if (number >= BIGNUMS[j-1]['num'] && (number < BIGNUMS[j]['num'])) {

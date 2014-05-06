@@ -909,8 +909,8 @@ package Sidef::Parser {
                     return $array, pos($_) + $pos;
                 }
 
-                # Bareword followed by a fat comma
-                if (/\G(\w+)\h*(?==>)/gc) {
+                # Bareword followed by a fat comma or a colon character
+                if (/\G(\w+)(?=\h*=>|:(?!=))/gc) {
                     return Sidef::Types::String::String->new($1), pos;
                 }
 
@@ -1314,8 +1314,7 @@ package Sidef::Parser {
 
                 # Variable call
                 if (/\G($self->{re}{var_name})/goc) {
-
-                    my $var_name = $1;
+                    my $name = $1;
 
                     #my ($name, $class) = $self->get_name_and_class($var_name);
                     #my $name = $var_name;
@@ -1327,19 +1326,12 @@ package Sidef::Parser {
                     #   $class = $self->{class};
                     #}
 
-                    my $name  = $var_name;
                     my $class = $self->{class};
-
                     my ($var, $code) = $self->find_var($name, $class);
-
-                    #say $class;
 
                     if (ref $var) {
                         $var->{count}++;
                         return $var->{obj}, pos;
-                    }
-                    elsif (/\G(?=\h*(?:=>|:(?!=)))/) {
-                        return Sidef::Types::String::String->new($var_name), pos;
                     }
                     elsif (/\G(?=\h*:?=(?![=~>]))/) {
                         unshift @{$self->{vars}{$class}},
