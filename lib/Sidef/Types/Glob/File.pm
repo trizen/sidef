@@ -288,7 +288,7 @@ package Sidef::Types::Glob::File {
         $self->_is_code($code) || return;
 
         my @lines;
-        open(my $fh, '+<:encoding(UTF-8)', $$self) || return Sidef::Types::Bool::Bool->false;
+        open(my $fh, '+<:utf8', $$self) || return Sidef::Types::Bool::Bool->false;
         while (defined(my $line = <$fh>)) {
             push @lines, $code->call(Sidef::Types::String::String->new($line));
         }
@@ -343,7 +343,7 @@ package Sidef::Types::Glob::File {
 
     sub open_r {
         my ($self, @rest) = @_;
-        $self->open('<', @rest);
+        $self->open('<:utf8', @rest);
     }
 
     *openR     = \&open_r;
@@ -352,7 +352,7 @@ package Sidef::Types::Glob::File {
 
     sub open_w {
         my ($self, @rest) = @_;
-        $self->open('>', @rest);
+        $self->open('>:utf8', @rest);
     }
 
     *openW      = \&open_w;
@@ -361,7 +361,7 @@ package Sidef::Types::Glob::File {
 
     sub open_a {
         my ($self, @rest) = @_;
-        $self->open('>>', @rest);
+        $self->open('>>:utf8', @rest);
     }
 
     *openA       = \&open_a;
@@ -370,7 +370,7 @@ package Sidef::Types::Glob::File {
 
     sub open_rw {
         my ($self, @rest) = @_;
-        $self->open('+<', @rest);
+        $self->open('+<:utf8', @rest);
     }
 
     *openRW          = \&open_rw;
