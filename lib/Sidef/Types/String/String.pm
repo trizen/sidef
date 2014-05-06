@@ -472,17 +472,29 @@ package Sidef::Types::String::String {
     *words    = \&each_word;
     *eachWord = \&each_word;
 
+    sub chars {
+        my ($self) = @_;
+        Sidef::Types::Char::Chars->new(map { Sidef::Types::Char::Char->new($_) } CORE::split(//, $$self));
+    }
+
     sub each {
-        my ($self, $obj) = @_;
-        my $array = Sidef::Types::Array::Array->new(map { Sidef::Types::Char::Char->new($_) } CORE::split(//, $$self));
-        $obj // return $array;
-        $self->_is_code($obj) || return;
-        $obj->for($array);
+        my ($self, $code) = @_;
+
+        $self->_is_code($code) || return;
+        my ($var_ref) = $code->init_block_vars();
+
+        foreach my $char (CORE::split(//, $$self)) {
+            $var_ref->set_value(Sidef::Types::String::String->new($char));
+            if (defined(my $res = $code->_run_code)) {
+                return $res;
+            }
+        }
+
+        $self;
     }
 
     *each_char = \&each;
     *eachChar  = \&each;
-    *chars     = \&each;
 
     sub each_line {
         my ($self, $obj) = @_;

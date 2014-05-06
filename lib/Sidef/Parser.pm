@@ -1312,19 +1312,7 @@ package Sidef::Parser {
 
                 # Variable call
                 if (/\G($self->{re}{var_name})/goc) {
-                    my $name = $1;
-
-                    #my ($name, $class) = $self->get_name_and_class($var_name);
-                    #my $name = $var_name;
-                    #my $class = $self->{class};
-
-                    ##if (not exists $self->{ref_vars_refs}{$class} or not exists $self->{ref_vars}{$class} ) {
-                    #   say $class;
-                    #   $name = $var_name;
-                    #   $class = $self->{class};
-                    #}
-
-                    my $class = $self->{class};
+                    my ($name, $class) = $self->get_name_and_class($1);
                     my ($var, $code) = $self->find_var($name, $class);
 
                     if (ref $var) {

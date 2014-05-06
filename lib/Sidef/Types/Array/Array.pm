@@ -385,21 +385,35 @@ package Sidef::Types::Array::Array {
     *fromTo  = \&ft;
     *from_to = \&ft;
 
-    sub for {
+    sub each {
         my ($self, $code) = @_;
 
+        $code // return ($self->pairs);
         $self->_is_code($code) || return;
-        my ($var_ref) = $code->init_block_vars();
+
+        my (@vars) = $code->init_block_vars();
+        my $multi_vars = $#vars > 0;
 
         foreach my $item (@{$self}) {
-            $var_ref->set_value($item->get_value);
-            if (ref($code->run) eq 'Sidef::Types::Block::Break') {
-                last;
+            if ($multi_vars) {
+                foreach my $i (0 .. $#vars) {
+                    $vars[$i]->set_value($item->get_value->[$i]->get_value);
+                }
+            }
+            else {
+                $vars[0]->set_value($item->get_value);
+            }
+
+            if (defined(my $res = $code->_run_code)) {
+                return $res;
             }
         }
 
         $self;
     }
+
+    *for     = \&each;
+    *foreach = \&each;
 
     sub map {
         my ($self, $code) = @_;
@@ -632,14 +646,8 @@ package Sidef::Types::Array::Array {
         __PACKAGE__->new(map { Sidef::Types::Number::Number->new($_) } 0 .. $#{$self});
     }
 
-    sub each {
-        my ($self, $obj) = @_;
-
-        if (defined($obj)) {
-            $self->_is_code($obj) || return;
-            return $obj->for($self);
-        }
-
+    sub pairs {
+        my ($self) = @_;
         __PACKAGE__->new(map { __PACKAGE__->new(Sidef::Types::Number::Number->new($_), $self->[$_]->get_value) }
                          0 .. $#{$self});
     }
@@ -886,11 +894,12 @@ package Sidef::Types::Array::Array {
 
         if (defined($code)) {
             $self->_is_code($code) || return;
+            my ($var_ref) = $code->init_block_vars();
 
             while (1) {
-
-                if (ref($code->call($self->new(map { $_->get_value } @{$self}[@idx]))) eq 'Sidef::Types::Block::Break') {
-                    return $self;
+                $var_ref->set_value($self->new(map { $_->get_value } @{$self}[@idx]));
+                if (defined(my $res = $code->_run_code)) {
+                    return $res;
                 }
 
                 my $p = $#idx;

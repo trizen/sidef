@@ -205,12 +205,8 @@ package Sidef::Types::Glob::FileHandle {
 
         while (defined(my $line = CORE::readline($self->{fh}))) {
             $var_ref->set_value(Sidef::Types::String::String->new($line));
-            my $resp = $code->run;
-            if (ref($resp) eq 'Sidef::Types::Block::Break') {
-                last;
-            }
-            elsif (ref($resp) eq 'Sidef::Types::Block::Return') {
-                return $resp;
+            if (defined(my $res = $code->_run_code)) {
+                return $res;
             }
         }
 

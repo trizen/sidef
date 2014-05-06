@@ -189,46 +189,20 @@ package Sidef::Types::Block::Code {
     }
 
     sub for {
-        my ($self, $arg, $var) = @_;
+        my ($self, $arg, @rest) = @_;
 
-        if ($self->_is_array($arg, 1, 1)) {
+        $self->_is_array($arg, 1, 1)
+          && return $arg->each($self);
 
-            my (@vars) = (
-                          ref($var) eq 'Sidef::Variable::Ref'
-                          ? $var->get_var
-                          : $self->init_block_vars()
-                         );
-            my $multi_vars = $#vars > 0;
-
-            foreach my $item (@{$arg}) {
-
-                if ($multi_vars) {
-                    foreach my $i (0 .. $#vars) {
-                        $vars[$i]->set_value($item->get_value->[$i]->get_value);
-                    }
-                }
-                else {
-                    $vars[0]->set_value($item->get_value);
-                }
-
-                if (defined(my $res = $self->_run_code)) {
-                    return $res;
-                }
-
-            }
-        }
-        elsif (ref $arg eq 'HASH') {
-
+        if (ref $arg eq 'HASH') {
             my $counter = 0;
             {
                 foreach my $class (keys %{$arg}) {
 
                     if ($counter++ == 0) {
-
                         if ((my $argn = @{$arg->{$class}}) != 3) {
                             warn "[WARN] The 'for' loop needs exactly three arguments! We got $argn of them.\n";
                         }
-
                         $exec->execute_expr($arg->{$class}[0], $class);
                     }
 
@@ -248,7 +222,13 @@ package Sidef::Types::Block::Code {
             }
         }
         else {
-            warn sprintf("[WARN] The 'for' loop expected (;;) or [], but got '%s'!\n", ref($arg));
+            my ($var_ref) = $self->init_block_vars();
+            foreach my $item ($arg, @rest) {
+                $var_ref->set_value($item);
+                if (defined(my $res = $self->_run_code)) {
+                    return $res;
+                }
+            }
         }
 
         $self;

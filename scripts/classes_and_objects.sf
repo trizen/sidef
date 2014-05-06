@@ -8,6 +8,7 @@ class Task(callback, dependencies) {
         self.dependencies.is_a(nil) && (
             self.dependencies([]);
         );
+        return self;
     }
 
     method perform {

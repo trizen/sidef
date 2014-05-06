@@ -2,9 +2,8 @@
 
 include Lingua::RO::Numbers;
 
-var lingua = Lingua::RO::Numbers.new;
+var lingua = Lingua_RO_Numbers.new;
 
-for (
 [
     [3,               'trei'],
     [0.001,           'zero virgulă zero zero unu'],
@@ -27,7 +26,7 @@ for (
     [11_983_000_000,  'unsprezece miliarde nouă sute optzeci și trei de milioane'],
     [119_830_000_000, 'o sută nouăsprezece miliarde opt sute treizeci de milioane'],
     [-0.688121,       'minus zero virgulă șase sute optzeci și opt de mii o sută douăzeci și unu'],
-] => \var pair) {
+].each { |pair|
 
     var num = (lingua.number_to_ro(pair[0])) == pair[1]
         || ("Error on number: <%s> -- got: <%s>\n".sprintf(pair[0], num).die);

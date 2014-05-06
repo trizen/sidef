@@ -2,47 +2,45 @@
 
 # Translation of: http://rosettacode.org/wiki/Align_columns#Go
 
-func newFormatter (input) {
-
-    # Private class with two var-methods
-    class Formatter(text, width) {};
-
-    var textArr = [];
-    var widthArr = [];
-
-    for (input.split("\n")) { |line|
-
-        var words = line.split('$');
-        textArr.append(words);
-
-        for (words.each) { |i, word|
-            if (i == widthArr.len) {
-                widthArr.append(word.len);
-            }
-            elsif (word.len > widthArr[i]) {
-                widthArr[i] = word.len;
-            }
-        }
-    }
-
-    return Formatter(textArr, widthArr);
-}
-
-func output (f, j) {
-   for (f.text) { |row|
-        for (row.each) { |i, word|
-            "%-*s ".printf((f.width)[i], "%*s".sprintf(
-                    word.len+(((f.width)[i] - (word.len))*j/2), word
-                )
-            );
+class Format(text, width) {
+    method output(j) {
+        self.text.each { |row|
+            row.pairs.each { |i, word|
+                '%-*s '.printf(self.width[i],
+                    '%*s' % (word.len + (self.width[i]-word.len * j/2), word)
+                );
+            };
+            ''.say;
         };
         ''.say;
-    };
-    ''.say;
+    }
+}
+
+class Formatter(input) {
+    method new {
+        var textArr = [];
+        var widthArr = [];
+
+        self.input.each_line {
+            var words = .split('$');
+            textArr.append(words);
+
+            words.pairs.each { |i, word|
+                if (i == widthArr.len) {
+                    widthArr.append(word.len);
+                }
+                elsif (word.len > widthArr[i]) {
+                    widthArr[i] = word.len;
+                }
+            }
+        }
+
+        return main::Format(textArr, widthArr);
+    }
 }
 
 {
-    const (left, middle, right) = (0..2->toList);
+    enum |left, middle, right|;
     const text = <<'EOT';
 Given$a$text$file$of$many$lines,$where$fields$within$a$line$
 are$delineated$by$a$single$'dollar'$character,$write$a$program
@@ -52,9 +50,9 @@ Further,$allow$for$each$word$in$a$column$to$be$either$left$
 justified,$right$justified,$or$center$justified$within$its$column.
 EOT
 
-    var f = newFormatter(text);
+    var f = Formatter(text);
 
-    output(f, left);
-    output(f, middle);
-    output(f, right);
-}.run;
+    f.output(left);
+    f.output(middle);
+    f.output(right);
+}.exec;

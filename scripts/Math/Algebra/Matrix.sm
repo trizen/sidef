@@ -1,6 +1,6 @@
 #!/usr/bin/ruby
 
-class Math::Algebra::Matrix (matrix) {
+class Math_Algebra_Matrix(matrix) {
 
     static VERSION = 0.1;
 

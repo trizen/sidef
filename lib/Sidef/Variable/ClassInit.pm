@@ -46,7 +46,7 @@ package Sidef::Variable::ClassInit {
 
         # Execute the 'new' method (if exists)
         if (exists $self->{__METHODS__}{new}) {
-            ($self->{__METHODS__}{new})->call($class, @args);
+            return $self->{__METHODS__}{new}->call($class, @args);
         }
 
         $class;
