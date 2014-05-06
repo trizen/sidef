@@ -904,13 +904,11 @@ package Sidef::Parser {
                         push @{$array}, (@{$obj->{$self->{class}}});
                     }
 
-                    #push @{$array}, {self => $obj, call => [{method => 'to_list'}]};
-
                     return $array, pos($_) + $pos;
                 }
 
                 # Bareword followed by a fat comma or a colon character
-                if (/\G(\w+)(?=\h*=>|:(?!=))/gc) {
+                if (/\G(\w+)(?=\h*=>|:(?![=:]))/gc) {
                     return Sidef::Types::String::String->new($1), pos;
                 }
 
