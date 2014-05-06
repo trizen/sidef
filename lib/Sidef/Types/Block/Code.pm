@@ -77,6 +77,7 @@ package Sidef::Types::Block::Code {
     }
 
     *toHash = \&to_hash;
+    *to_h   = \&to_hash;
 
     sub to_array {
         my ($self) = @_;
@@ -117,7 +118,7 @@ package Sidef::Types::Block::Code {
             if (Sidef::Types::Block::Code->new($condition)->run) {
                 defined($old_self) && ($old_self->{did_while} //= 1);
                 my $res = $self->_run_code();
-                defined($res) && return(ref($res) eq __PACKAGE__ && defined($old_self) ? $old_self : $res);
+                defined($res) && return (ref($res) eq __PACKAGE__ && defined($old_self) ? $old_self : $res);
                 redo;
             }
         }
@@ -176,7 +177,9 @@ package Sidef::Types::Block::Code {
         my ($self, $bool) = @_;
 
         if ($bool) {
-            $self->exec;
+            my $resp = $self->run;
+            (ref($resp) eq 'Sidef::Types::Block::Break' || ref($resp) eq 'Sidef::Types::Block::Return')
+              && return $resp;
         }
 
         return $bool;
