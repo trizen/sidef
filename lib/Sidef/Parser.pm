@@ -909,6 +909,11 @@ package Sidef::Parser {
                     return $array, pos($_) + $pos;
                 }
 
+                # Bareword followed by a fat comma
+                if (/\G(\w+)\h*(?==>)/gc) {
+                    return Sidef::Types::String::String->new($1), pos;
+                }
+
                 # Declaration of variable types
                 if (/\G(var|static|const)\b\h*/gc) {
                     my $type = $1;
@@ -1010,7 +1015,7 @@ package Sidef::Parser {
                                            pos      => pos($_)
                                           );
 
-                    if (exists $self->{keywords}{$name}) {
+                    if ($type ne 'method' && exists($self->{keywords}{$name})) {
                         $self->fatal_error(
                                            code  => $_,
                                            pos   => (pos($_) - length($name)),

@@ -28,6 +28,11 @@ package Sidef::Variable::Class {
         }
 
         if (exists $self->{method}{$name}) {
+
+            if (exists $self->{method}{'CHECK'}) {
+                $self->{method}{'CHECK'}->call($self, Sidef::Types::String::String->new($name), @args) || return;
+            }
+
             return $self->{method}{$name}->call($self, @args);
         }
         elsif (exists $self->{method}{'AUTOLOAD'}) {

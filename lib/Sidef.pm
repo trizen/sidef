@@ -101,6 +101,8 @@ package Sidef {
             };
         }
 
+        *define_method = \&def_method;
+
         sub METHODS {
             my ($self) = @_;
             Sidef::Types::Array::Array->new(
@@ -131,6 +133,8 @@ package Sidef {
         my ($self, $obj) = @_;
         Sidef::Types::Bool::Bool->new(ref($self) eq ref($obj));
     }
+
+    *is_an = \&is_a;
 
     sub _get_indent_level {
         my $pkgname = ref(shift());
