@@ -2,7 +2,7 @@
 
 include Lingua::RO::Numbers;
 
-var lingua = Lingua_RO_Numbers.new;
+var lingua = Lingua::RO::Numbers::new();
 
 [
     [3,               'trei'],

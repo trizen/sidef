@@ -1765,6 +1765,7 @@ package Sidef::Parser {
                         close $fh;
 
                         my $parser = __PACKAGE__->new(script_name => $full_path);
+                        local $parser->{class} = $var_name;
                         my $struct = $parser->parse_script(code => $content);
 
                         foreach my $class (keys %{$struct}) {
