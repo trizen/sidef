@@ -636,6 +636,16 @@ package Sidef::Types::Array::Array {
         Sidef::Types::Number::Number->new($#{$self});
     }
 
+    sub resize {
+        my ($self, $num) = @_;
+        $self->_is_number($num) || return;
+        $#{$self} = $$num;
+        $num;
+    }
+
+    *resizeTo  = \&resize;
+    *resize_to = \&resize;
+
     sub rand {
         my ($self) = @_;
         $self->[CORE::rand($#{$self} + 1)];
