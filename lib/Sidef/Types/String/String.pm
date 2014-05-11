@@ -394,6 +394,9 @@ package Sidef::Types::String::String {
     sub sub {
         my ($self, $regex, $str) = @_;
 
+        $self->_is_code($str, 1, 1)
+          && return $self->esub($regex, $str);
+
         $str //= __PACKAGE__->new('');
         $self->_is_string($str) || return;
         $regex = _string_or_regex($regex);
@@ -406,6 +409,9 @@ package Sidef::Types::String::String {
     sub gsub {
         my ($self, $regex, $str) = @_;
 
+        $self->_is_code($str, 1, 1)
+          && return $self->gesub($regex, $str);
+
         $str //= __PACKAGE__->new('');
         $self->_is_string($str) || return;
         $regex = _string_or_regex($regex);
@@ -415,24 +421,37 @@ package Sidef::Types::String::String {
 
     *gReplace = \&gsub;
 
-    sub esub {
-        my ($self, $regex, $str) = @_;
+    sub _get_captures {
+        my ($string) = @_;
+        map { __PACKAGE__->new(CORE::substr($string, $-[$_], $+[$_] - $-[$_])) } 1 .. $#{-};
+    }
 
-        $str //= __PACKAGE__->new('');
-        $self->_is_string($str) || return;
+    sub esub {
+        my ($self, $regex, $code) = @_;
+
+        $code //= __PACKAGE__->new('');
         $regex = _string_or_regex($regex);
 
-        $self->new($$self =~ s{$regex}{$$str}eer);
+        if ($self->_is_string($code, 1, 1)) {
+            return __PACKAGE__->new($$self =~ s{$regex}{$$code}eer);
+        }
+
+        $self->_is_code($code) || return;
+        __PACKAGE__->new($$self =~ s{$regex}{$code->call(_get_captures($$self))}eer);
     }
 
     sub gesub {
-        my ($self, $regex, $str) = @_;
+        my ($self, $regex, $code) = @_;
 
-        $str //= __PACKAGE__->new('');
-        $self->_is_string($str) || return;
+        $code //= __PACKAGE__->new('');
         $regex = _string_or_regex($regex);
 
-        $self->new($$self =~ s{$regex}{$$str}geer);
+        if ($self->_is_string($code, 1, 1)) {
+            return __PACKAGE__->new($$self =~ s{$regex}{$$code}geer);
+        }
+
+        $self->_is_code($code) || return;
+        __PACKAGE__->new($$self =~ s{$regex}{$code->call(_get_captures($$self))}geer);
     }
 
     sub glob {
