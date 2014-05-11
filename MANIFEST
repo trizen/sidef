@@ -143,8 +143,10 @@ scripts/array_callback.sf
 scripts/array_operators.sf
 scripts/array_unique.sf
 scripts/arrays.sf
+scripts/arrays_2.sf
 scripts/arrays_intersection.sf
 scripts/ascii_cuboid.sf
+scripts/AUTOLOAD_and_CHECK_methods.sf
 scripts/averages_mode.sf
 scripts/avg_mode.sf
 scripts/balanced_brackets.sf
@@ -267,6 +269,7 @@ scripts/roman_numerals_decoding.sf
 scripts/roman_numerals_decoding_2.sf
 scripts/roman_numerals_decoding_3.sf
 scripts/roman_numerals_encoding.sf
+scripts/roman_numerals_encoding_2.sf
 scripts/root_mean_square.sf
 scripts/run_length_encoding.sf
 scripts/run_length_encoding_2.sf
@@ -286,6 +289,7 @@ scripts/sylvesters_sequence.sf
 scripts/sysopen_and_sysread.sf
 scripts/tennis_tournament.sf
 scripts/test_all.pl
+scripts/tk_library.sf
 scripts/token_recursive.sf
 scripts/two_dimensional_array.sf
 scripts/unexecuted_arguments.sf
