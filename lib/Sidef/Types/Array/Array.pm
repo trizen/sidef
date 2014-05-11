@@ -514,7 +514,9 @@ package Sidef::Types::Array::Array {
         $self;
     }
 
-    *assignTo = \&assign_to;
+    *unroll_to = \&assign_to;
+    *unrollTo  = \&assign_to;
+    *assignTo  = \&assign_to;
 
     sub first_index {
         my ($self, $code) = @_;
