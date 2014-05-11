@@ -51,6 +51,7 @@ package Sidef::Types::Block::Switch {
     sub default {
         my ($self, $code) = @_;
         $self->{do_block} = 1;
+        $code // return $self;
         $self->do($code);
     }
 

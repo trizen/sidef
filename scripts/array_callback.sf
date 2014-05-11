@@ -22,23 +22,28 @@ foreach a { |item|
 
 # using map (useful for transforming an array)
 a.map{mycallback(_)} == [2, 4, 6, 8, 10]
-    || ("map(func) error!".die);
+    || "map(func) error!".die;
 
 
 # and the same using an anonymous function
 a.map { _ * 2 } == [2, 4, 6, 8, 10]
-    || ("map(anonym) error!".die);
+    || "map(anonym) error!".die;
 
 
 # use a callback stored in a variable
 var f = mycallback;
 a.map { f.call(_) } ==  [2, 4, 6, 8, 10]
-    || ("map(var_f) error!".die);
+    || "map(var_f) error!".die;
 
 
 # filter an array
 a.grep { _ % 2 == 0 } == [2, 4]
-    || ("grep() error!".die);
+    || "grep() error!".die;
 
+
+# callback-function without return
+func callback(i){ i**2 };
+[1,2,3,4].map(callback) == [1,4,9,16]
+    || "map(callback) error!".die;
 
 say "** Test passed! **";
