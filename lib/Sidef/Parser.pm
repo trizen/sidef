@@ -47,10 +47,6 @@ package Sidef::Parser {
                           re  => qr/\Gfalse\b/,
                          },
                          {
-                          sub => sub { Sidef::Types::Block::Break->new },
-                          re  => qr/\Gbreak\b/,
-                         },
-                         {
                           sub => sub { Sidef::Types::Block::Next->new },
                           re  => qr/\Gnext\b/,
                          },
@@ -246,6 +242,11 @@ package Sidef::Parser {
                 {
                  sub     => sub { Sidef::Types::Block::Return->new },
                  re      => qr/\G(?=return\b)/,
+                 dynamic => 1,
+                },
+                {
+                 sub     => sub { Sidef::Types::Block::Break->new },
+                 re      => qr/\G(?=break\b)/,
                  dynamic => 1,
                 },
                 {

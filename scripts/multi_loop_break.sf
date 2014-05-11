@@ -1,0 +1,18 @@
+#!/usr/bin/ruby
+
+# Multi-loop break
+
+func hello(n) {
+    for (1..9){|k|
+        for (1..9) { |i|
+            for (1..9) { |j|
+                say "#{k} #{i} #{j}";
+                break(n);
+            }
+        }
+    }
+}
+
+hello(3);
+say'-'*80;
+hello(2);

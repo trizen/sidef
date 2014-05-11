@@ -91,9 +91,12 @@ package Sidef::Types::Block::Code {
     sub _run_code {
         my ($self) = @_;
         my $result = $self->run;
-            ref($result) eq 'Sidef::Types::Block::Return' ? $result
-          : ref($result) eq 'Sidef::Types::Block::Break'  ? $self
-          :                                                 ();
+        ref($result) eq 'Sidef::Types::Block::Return'
+          ? $result
+          : ref($result) eq 'Sidef::Types::Block::Break' ? --$result->{depth} <= 0
+              ? $self
+              : $result
+          : ();
     }
 
     sub run {

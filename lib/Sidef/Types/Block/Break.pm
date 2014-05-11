@@ -5,11 +5,13 @@ package Sidef::Types::Block::Break {
     use warnings;
 
     sub new {
-        bless {}, __PACKAGE__;
+        bless {depth => 1}, __PACKAGE__;
     }
 
     sub break {
-        $_[0];
+        my ($self, $depth) = @_;
+        $self->{depth} = defined($depth) ? $$depth : 1;
+        $self;
     }
 
 }
