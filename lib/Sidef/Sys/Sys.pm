@@ -7,7 +7,7 @@ package Sidef::Sys::Sys {
     our @ISA = qw(Sidef);
 
     sub new {
-        bless {}, __PACKAGE__;
+        CORE::bless {}, __PACKAGE__;
     }
 
     sub exit {
@@ -117,11 +117,11 @@ package Sidef::Sys::Sys {
         if (CORE::ref($fh) eq 'GLOB') {
             return Sidef::Types::Bool::Bool->new(print {$fh} @args);
         }
-        elsif (CORE::ref($fh) =~ /^Sidef::Types::Glob::/ and $fh->can('print')) {
+        elsif (eval { $fh->can('print') || $fh->can('AUTOLOAD') }) {
             return $fh->print(@args);
         }
 
-        CORE::warn "[WARN] Sys.printh(): invalid handle object!\n";
+        CORE::warn "[WARN] Sys.printh(): invalid object handle: `$fh'\n";
         return;
     }
 
@@ -189,10 +189,15 @@ package Sidef::Sys::Sys {
                 }
             }
 
-            return Sidef::Types::String::String->new($val);
+            return CORE::ref($val) ? $val : Sidef::Types::String::String->new($val);
         };
 
         $guess_type->($result);
+    }
+
+    sub bless {
+        my ($self, $obj, $class) = @_;
+        CORE::bless $obj, $class;
     }
 
     sub system {

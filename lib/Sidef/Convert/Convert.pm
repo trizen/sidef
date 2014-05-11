@@ -153,6 +153,16 @@ package Sidef::Convert::Convert {
     }
 
     *toArray = \&to_array;
+
+    sub to_module {
+        my ($self) = @_;
+        $self->_is_string($self) || return;
+        Sidef::Module::Caller->_new(module => $$self);
+    }
+
+    *to_mod   = \&to_module;
+    *toMod    = \&to_module;
+    *toModule = \&to_module;
 };
 
 1
