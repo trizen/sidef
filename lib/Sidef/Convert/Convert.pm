@@ -154,15 +154,21 @@ package Sidef::Convert::Convert {
 
     *toArray = \&to_array;
 
-    sub to_module {
+    sub to_caller {
         my ($self) = @_;
         $self->_is_string($self) || return;
         Sidef::Module::Caller->_new(module => $$self);
     }
 
-    *to_mod   = \&to_module;
-    *toMod    = \&to_module;
-    *toModule = \&to_module;
+    *toCaller = \&to_caller;
+
+    sub to_fcaller {
+        my ($self) = @_;
+        $self->_is_string($self) || return;
+        Sidef::Module::Func->_new(module => $$self);
+    }
+
+    *toFcaller = \&to_fcaller;
 };
 
 1
