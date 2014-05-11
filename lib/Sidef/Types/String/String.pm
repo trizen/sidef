@@ -379,20 +379,24 @@ package Sidef::Types::String::String {
         __PACKAGE__->new(CORE::sprintf($$self . "\n", @arguments));
     }
 
-    sub sub {
-        my ($self, $regex, $str) = @_;
-
-        $str //= Sidef::Types::String::String->new('');
-        $self->_is_string($str) || return;
+    sub _string_or_regex {
+        my ($regex) = @_;
 
         if (ref($regex) ne 'Sidef::Types::Regex::Regex') {
             if ($regex->can('quotemeta')) {
-                $regex = $regex->quotemeta();
+                return $regex->quotemeta;
             }
         }
-        else {
-            $regex = $regex->get_value;
-        }
+
+        return $regex->get_value;
+    }
+
+    sub sub {
+        my ($self, $regex, $str) = @_;
+
+        $str //= __PACKAGE__->new('');
+        $self->_is_string($str) || return;
+        $regex = _string_or_regex($regex);
 
         $self->new($$self =~ s{$regex}{$$str}r);
     }
@@ -402,23 +406,34 @@ package Sidef::Types::String::String {
     sub gsub {
         my ($self, $regex, $str) = @_;
 
-        $str //= Sidef::Types::String::String->new('');
+        $str //= __PACKAGE__->new('');
         $self->_is_string($str) || return;
-
-        if (ref($regex) ne 'Sidef::Types::Regex::Regex') {
-            if ($regex->can('quotemeta')) {
-                $regex = $regex->quotemeta();
-            }
-        }
-        else {
-            $regex = $regex->get_value;
-        }
+        $regex = _string_or_regex($regex);
 
         $self->new($$self =~ s{$regex}{$$str}gr);
     }
 
-    *gSub     = \&gsub;
     *gReplace = \&gsub;
+
+    sub esub {
+        my ($self, $regex, $str) = @_;
+
+        $str //= __PACKAGE__->new('');
+        $self->_is_string($str) || return;
+        $regex = _string_or_regex($regex);
+
+        $self->new($$self =~ s{$regex}{$$str}eer);
+    }
+
+    sub gesub {
+        my ($self, $regex, $str) = @_;
+
+        $str //= __PACKAGE__->new('');
+        $self->_is_string($str) || return;
+        $regex = _string_or_regex($regex);
+
+        $self->new($$self =~ s{$regex}{$$str}geer);
+    }
 
     sub glob {
         my ($self) = @_;
@@ -441,12 +456,8 @@ package Sidef::Types::String::String {
         elsif ($self->_is_number($sep, 1, 1)) {
             return Sidef::Types::Array::Array->new(map { __PACKAGE__->new($_) } unpack "(a$$sep)*", $$self);
         }
-        elsif (ref($sep) ne 'Sidef::Types::Regex::Regex') {
-            if ($sep->can('quotemeta')) {
-                $sep = $sep->quotemeta();
-            }
-        }
 
+        $sep = _string_or_regex($sep);
         Sidef::Types::Array::Array->new(map { __PACKAGE__->new($_) } split(/$sep/, $$self, $size));
     }
 
@@ -484,7 +495,7 @@ package Sidef::Types::String::String {
         my ($var_ref) = $code->init_block_vars();
 
         foreach my $char (CORE::split(//, $$self)) {
-            $var_ref->set_value(Sidef::Types::String::String->new($char));
+            $var_ref->set_value(__PACKAGE__->new($char));
             if (defined(my $res = $code->_run_code)) {
                 return $res;
             }
