@@ -437,7 +437,7 @@ package Sidef::Types::String::String {
         }
 
         $self->_is_code($code) || return;
-        __PACKAGE__->new($$self =~ s{$regex}{$code->call(_get_captures($$self))}eer);
+        __PACKAGE__->new($$self =~ s{$regex}{$code->call(_get_captures($$self))}er);
     }
 
     sub gesub {
@@ -451,7 +451,7 @@ package Sidef::Types::String::String {
         }
 
         $self->_is_code($code) || return;
-        __PACKAGE__->new($$self =~ s{$regex}{$code->call(_get_captures($$self))}geer);
+        __PACKAGE__->new($$self =~ s{$regex}{$code->call(_get_captures($$self))}ger);
     }
 
     sub glob {
