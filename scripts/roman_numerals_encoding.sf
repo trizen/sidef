@@ -21,9 +21,7 @@ func arabic2roman (num) {
     ];
 
     var roman = '';
-
     for (lookup) { |r, a|
-
         while (num >= a) {
             roman += r;
             num   -= a;
@@ -37,10 +35,8 @@ func arabic2roman (num) {
 ## MAIN
 #
 
-for ([[1990,'MCMXC'], [2008,'MMVIII'], [1666,'MDCLXVI']]) {
-
-    var roman = (arabic2roman(_[0]));
-    roman == _[1] || ("Error occurred on number: %d\n".sprintf(_[0]).die);
-
-    "%s in roman is %s".printlnf(_[0], roman);
+[[1990,'MCMXC'], [2008,'MMVIII'], [1666,'MDCLXVI']].each { |pair|
+    var roman = arabic2roman(pair[0]);
+    roman == pair[1] || "Error occurred on number: #{pair[0]}\n".die;
+    "%s in roman is %s".printlnf(pair[0], roman);
 }

@@ -1,0 +1,11 @@
+#!/usr/bin/ruby
+
+# http://rosettacode.org/wiki/Hello_world/Graphical
+
+var tk = require 'Tk';
+var main = 'MainWindow'.to_caller.new;
+main.Button(
+    '-text'    => 'Goodbye, World!',
+    '-command' => 'exit',
+).pack;
+tk.MainLoop;
