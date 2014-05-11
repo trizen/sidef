@@ -22,9 +22,21 @@ package Sidef::Variable::ClassInit {
         $self;
     }
 
+    sub define_var {
+        my ($self, $name, $value) = @_;
+        $self->{__VALS__}{$name} = $value;
+        $self;
+    }
+
+    *def_var         = \&define_var;
+    *define_variable = \&define_var;
+
     sub define_method {
-        my ($self, $method_name, $code) = @_;
-        $self->__add_method($method_name, $code->copy);
+        my ($self, $name, $value) = @_;
+        if (ref($value) ne 'Sidef::Types::Block::Code') {
+            return $self->define_var($name, $value);
+        }
+        $self->__add_method($name, $value->copy);
     }
 
     *def_method = \&define_method;
@@ -38,6 +50,11 @@ package Sidef::Variable::ClassInit {
 
         # Run the auxiliary code of the class
         $self->{__BLOCK__}->run;
+
+        # Add some new defined values
+        while (my ($key, $value) = each %{$self->{__VALS__}}) {
+            $class->{__NAMES__}{$key} = $value;
+        }
 
         # Store the class methods
         while (my ($key, $value) = each %{$self->{__METHODS__}}) {

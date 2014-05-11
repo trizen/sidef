@@ -1,25 +1,12 @@
 #!/usr/bin/ruby
 
-# Translation of: http://rosettacode.org/wiki/Averages/Pythagorean_means#Perl
+# Translation of: http://rosettacode.org/wiki/Averages/Pythagorean_means#Perl_6
 
-func A(a) {
-    a.sum / a.len;
-}
+func A(a) { a.sum / a.len };
+func G(a) { a.prod.root(a.len) };
+func H(a) { a.len / a.map{1/_}.sum };
 
-func G(a) {
-    a.prod.root(a.len);
-}
-
-func H(a) {
-    a.len / a.map{|n|1/n}.sum;
-}
-
-var ints = 1..10;
-
-[
-    ["A" => A(ints)],
-    ["G" => G(ints)],
-    ["H" => H(ints)],
-].for {
-    "%s=%s\n".printf(_->...)
-}
+static ints = 1..10;
+say("A(1,...,10) = ", A(ints));
+say("G(1,...,10) = ", G(ints));
+say("H(1,...,10) = ", H(ints));
