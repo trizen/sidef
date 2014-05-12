@@ -282,7 +282,8 @@ package Sidef::Exec {
                         if (
                             ref($arg) eq 'HASH'
                             and not(
-                                   (exists($self->{types}{$type}) && exists($self->{types}{$type}{$method}))
+                                      (exists($self->{types}{$type}) && exists($self->{types}{$type}{$method}))
+                                   || (ref($self_obj) eq 'Sidef::Types::Black::Hole')
                                    || (   ref($self_obj) eq 'Sidef::Variable::Init'
                                        && ($self_obj->{vars}[0]->{type} eq 'static' || $self_obj->{vars}[0]->{type} eq 'const')
                                        && exists($self_obj->{vars}[0]->{inited}))
