@@ -230,7 +230,7 @@ package Sidef::Types::Hash::Hash {
                 $array->push(Sidef::Types::Array::Array->new(Sidef::Types::String::String->new($key), $value->get_value));
             }
 
-            return $obj->for($array);
+            return $array->each($obj);
         }
 
         my ($key, $value) = each(%{$self});

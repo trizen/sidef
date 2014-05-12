@@ -496,7 +496,7 @@ package Sidef::Types::String::String {
         my $array = Sidef::Types::Array::Array->new(map { __PACKAGE__->new($_) } CORE::split(' ', $$self));
         $obj // return $array;
         $self->_is_code($obj) || return;
-        $obj->for($array);
+        $array->each($obj);
     }
 
     *words    = \&each_word;
@@ -531,7 +531,7 @@ package Sidef::Types::String::String {
         my $array = Sidef::Types::Array::Array->new(map { __PACKAGE__->new($_) } CORE::split(/\R/, $$self));
         $obj // return $array;
         $self->_is_code($obj) || return;
-        $obj->for($array);
+        $array->each($obj);
     }
 
     *lines    = \&each_line;
