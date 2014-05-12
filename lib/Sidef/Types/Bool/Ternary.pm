@@ -6,11 +6,9 @@ package Sidef::Types::Bool::Ternary {
 
     no warnings 'recursion';
 
-    our @ISA = qw(Sidef);
-
     sub new {
-        my (undef, $hash_ref) = @_;
-        bless $hash_ref, __PACKAGE__;
+        my (undef, %opt) = @_;
+        bless \%opt, __PACKAGE__;
     }
 
     {

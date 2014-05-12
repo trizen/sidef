@@ -1,5 +1,6 @@
 package Sidef::Types::Number::Unary {
 
+    use utf8;
     use 5.014;
     use strict;
     use warnings;
@@ -27,6 +28,12 @@ package Sidef::Types::Number::Unary {
             my ($self, $number) = @_;
             $self->_is_number($number, 1) || return;
             $number->negate;
+        };
+
+        *{__PACKAGE__ . '::' . '√'} = sub {
+            my ($self, $number) = @_;
+            $self->_is_number($number, 1) || return;
+            $number->sqrt;
         };
 
         *{__PACKAGE__ . '::' . '?'} = sub {

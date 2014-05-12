@@ -286,6 +286,11 @@ package Sidef::Parser {
                 },
                 {
                  sub     => sub { Sidef::Types::Number::Unary->new },
+                 re      => qr/\G(?=√)/,
+                 dynamic => 0,
+                },
+                {
+                 sub     => sub { Sidef::Types::Number::Unary->new },
                  re      => qr/\G(?=\+)/,
                  dynamic => 0,
                 },
@@ -428,7 +433,7 @@ package Sidef::Parser {
                       ?? ?
                       ! \\
                       : »
-                      ~
+                      ~ √
                       );
 
                     qr{(@operators)};

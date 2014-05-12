@@ -16,14 +16,19 @@ opendir(my $dir_h, 'scripts');
 
 my @scripts =
   map { catfile('scripts', $_) }
-  grep { /\.sf\z/ && $_ ne 'include_class.sf' && $_ ne 'lingua_ro.sf' } readdir($dir_h);
+  grep {
+    /\.sf\z/
+      && $_ ne 'include_class.sf'
+      && $_ ne 'lingua_ro.sf'
+      && $_ ne 'module_loading.sf'
+} readdir($dir_h);
 
 plan tests => scalar(@scripts);
 
 foreach my $sidef_script (@scripts) {
 
     my $content = do {
-        open my $fh, '<:encoding(UTF-8)', $sidef_script;
+        open my $fh, '<:utf8', $sidef_script;
         local $/;
         <$fh>;
     };

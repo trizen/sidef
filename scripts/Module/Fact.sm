@@ -1,0 +1,5 @@
+#!/usr/bin/ruby
+
+func factorial(n) {
+    n < 1 ? 1 : (n * __FUNC__(n-1));
+}

@@ -54,10 +54,10 @@ package Sidef::Types::Bool::Bool {
 
             if ($$self eq 'true') {
                 my $result = Sidef::Types::Block::Code->new($code)->run;
-                return Sidef::Types::Bool::Ternary->new({code => $result, bool => $self->true});
+                return Sidef::Types::Bool::Ternary->new(code => $result, bool => 1);
             }
 
-            return Sidef::Types::Bool::Ternary->new({code => $code, bool => $self->false});
+            return Sidef::Types::Bool::Ternary->new(code => $code, bool => 0);
         };
 
         *{__PACKAGE__ . '::' . '?:'} = sub {
