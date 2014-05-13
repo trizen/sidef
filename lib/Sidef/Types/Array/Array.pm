@@ -978,7 +978,16 @@ package Sidef::Types::Array::Array {
 
         if (defined $block) {
             $self->_is_code($block) || return;
-            return Sidef::Types::String::String->new(CORE::join($delim, map { $block->call($_->get_value) } @{$self}));
+            my ($var_ref) = $block->init_block_vars();
+            return Sidef::Types::String::String->new(
+                CORE::join(
+                    $delim,
+                    map {
+                        $var_ref->set_value($_->get_value);
+                        $block->run;
+                      } @{$self}
+                )
+            );
         }
 
         Sidef::Types::String::String->new(CORE::join($delim, map { $_->get_value } @{$self}));

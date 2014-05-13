@@ -1,0 +1,40 @@
+#!/usr/bin/ruby
+
+# Merge sort algorithm
+
+func merge(left, right) {
+
+    var array = [];
+    var nL = left.len;
+    var nR = right.len;
+
+    var(i=0, j=0);
+    while (i<nL && j<nR) {
+        array.append(left[i] <= right[j] ? left[i++-1] : right[j++-1]);
+    }
+
+    array += left[i .. left.offset];
+    array += right[j .. right.offset];
+
+    return array;
+}
+
+func merge_sort(array) {
+    var n = array.len
+          < 2 && return;
+
+    var mid   = (n/2 int);
+    var left  = array[0 .. mid-1];
+    var right = array[mid .. array.offset];
+
+    __FUNC__(left);
+    __FUNC__(right);
+
+    array[0..array.offset] = merge(left, right);
+}
+
+var arr = [3,4,7,6,2,5,1,0];
+merge_sort(arr);
+
+arr == (0..7) || "error".die;
+say "Test passed!";

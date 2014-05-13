@@ -122,7 +122,14 @@ package Sidef::Exec {
                     $self_obj = $self_obj->to_chars;
                 }
 
-              MULTI_INDEX: if ($#{$level} > 0) {
+                if (
+                    $#{$level} > 0
+                    || (
+                           $#{$level} == 0
+                        && ref($level->[0]->get_value) eq 'Sidef::Types::Array::Array'
+                        && do { $level = [@{$level->[0]->get_value}]; 1 }
+                       )
+                  ) {
                     my @indices;
 
                     foreach my $ind (@{$level}) {
@@ -159,13 +166,8 @@ package Sidef::Exec {
 
                 }
                 else {
+                    return if not exists $level->[0];
                     my $ind = $level->[0]->get_value;
-
-                    if (ref($ind) eq 'Sidef::Types::Array::Array') {
-                        $level = [map { $_->get_value } @{$ind}];
-                        goto MULTI_INDEX;
-                    }
-
                     !$is_hash && ($self->valid_index($ind) || next);
 
                     $self_obj = (
