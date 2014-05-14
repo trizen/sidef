@@ -355,7 +355,7 @@ package Sidef::Types::Array::Array {
 
     *item = \&get;
 
-    sub ft {
+    sub _slice {
         my ($self, $from, $to) = @_;
 
         my $max = $#{$self};
@@ -372,14 +372,27 @@ package Sidef::Types::Array::Array {
         }
 
         if (abs($from) > $max) {
-            return $self->new();
+            return;
         }
 
         if ($to > $max) {
             $to = $max;
         }
 
-        $self->new(map { $_->get_value } @{$self}[$from .. $to]);
+        @{$self}[$from .. $to];
+    }
+
+    sub slice {
+        my ($self) = @_;
+        my @items  = _slice(@_);
+        my $array  = $self->new;
+        push @{$array}, @items if @items;
+        $array;
+    }
+
+    sub ft {
+        my ($self) = @_;
+        $self->new(map { $_->get_value } _slice(@_));
     }
 
     *fromTo  = \&ft;
