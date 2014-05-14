@@ -23,8 +23,7 @@ package Sidef::Types::Bool::Bool {
             $bool{$bool ? 'true' : 'false'};
         }
 
-        sub true { $bool{true} }
-
+        sub true  { $bool{true} }
         sub false { $bool{false} }
     }
 
