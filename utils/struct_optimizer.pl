@@ -14,16 +14,18 @@ use warnings;
 
 use Data::Dump qw(pp);
 
-sub flatten {
-    my ($arr) = @_;
+sub strip_classes {
+    my ($ref) = @_;
 
-    foreach my $item (@{$arr}) {
-        if (ref $item eq 'ARRAY') {
-            return flatten($item);
+    foreach my $item (@{$ref}) {
+        if (not exists $item->{self}) {
+            foreach my $class (keys %{$item}) {
+                $ref = strip_classes($item->{$class});
+            }
         }
     }
 
-    return $arr;
+    return $ref;
 }
 
 sub class_optimizer {
@@ -31,10 +33,7 @@ sub class_optimizer {
 
     if (not exists $hash->{self}) {
         foreach my $class (keys %{$hash}) {
-            $hash = $hash->{$class} //= [];
-            foreach my $i (0 .. $#{$hash}) {
-                $hash->[$i] = class_optimizer($hash->[$i]);
-            }
+            $hash->{$class} = strip_classes($hash->{$class});
         }
     }
 
@@ -105,4 +104,4 @@ my $struct = {
 #>>>
 
 pp optimize($struct);
-pp flatten(class_optimizer($struct));
+pp class_optimizer($struct);
