@@ -73,7 +73,9 @@ package Sidef::Convert::Convert {
           :                            ();
     }
 
-    *toNum = \&to_num;
+    *toNum    = \&to_num;
+    *to_f     = \&to_num;
+    *to_float = \&to_num;
 
     sub to_file {
         my ($self) = @_;
