@@ -105,24 +105,24 @@ package Sidef::Variable::Variable {
             if ($self->{type} eq "var" or $self->{type} eq "static") {
                 return $self->set_value($obj);
             }
-            elsif ($self->{type} eq "const") {
+
+            if ($self->{type} eq "const") {
                 if (not exists $self->{inited}) {
                     return $self->set_value($obj);
                 }
-
-                #warn "Constant '$self->{name}' cannot be changed.\n";
+                return $self;
             }
-            elsif ($self->{type} eq 'func') {
+
+            if ($self->{type} eq 'func') {
                 if (ref $obj eq 'Sidef::Types::Block::Code') {
                     return $self->set_value($obj);
                 }
-                warn "Can't assign the '", ref($obj), "' object to the function '$self->{name}'!\n"
-                  . "An object of type 'Sidef::Types::Block::Code' was expected.\n";
-            }
-            else {
-                warn "Invalid variable type: '$self->{type}'.\n";
+                warn "WARN: Can't assign the '", ref($obj),
+                  "' object to function '$self->{name}'!\n" . "An object of type 'Sidef::Types::Block::Code' was expected.\n";
+                return $self;
             }
 
+            warn "WARN: Invalid variable type: '$self->{type}'.\n";    # this should not happen
             $obj;
         };
 
@@ -234,38 +234,31 @@ package Sidef::Variable::Variable {
         my ($method) = ($AUTOLOAD =~ /^.*[^:]::(.*)$/);
         my $value = $self->get_value;
 
-        my $method_type = 0;
-        if ($method =~ /^[[:alpha:]]/) {
-            if (substr($method, -1) eq '!') {
-                $method_type = 1;
-                chop $method;
-            }
-            elsif (substr($method, -1) eq ':') {
-                $method_type = 2;
-                chop $method;
-            }
-            elsif (substr($method, -1) eq '?') {
-                $method_type = 3;
-                chop $method;
-            }
+        my $suffix;
+        if ($method =~ /^[[:alpha:]]/ && $method =~ tr/!:?//) {
+            $suffix = chop $method;
         }
 
         if (ref($value) && ($value->can($method) || $value->can('AUTOLOAD'))) {
             my @results = $value->$method(@args);
 
-            if ($method_type == 1) {    # (!) modifies the variable in place
-                state $method = '=';
-                $self->$method(@results);
-                return $self->new('', 'var', $self);
-            }
-            elsif ($method_type == 2) {    # (:) returns the self variable
-                return $self->new('', 'var', $self);
-            }
-            elsif ($method_type == 3) {    # (?) asks for a boolean value
-                my $result = $results[-1];
-                return ref($result) eq 'Sidef::Types::Bool::Bool'
-                  ? $result
-                  : Sidef::Types::Bool::Bool->new($result);
+            if (defined($suffix)) {
+                if ($suffix eq '!') {    # modifies the variable in place
+                    state $method = '=';
+                    $self->$method(@results);
+                    return $self->new('', 'var', $self);
+                }
+
+                if ($suffix eq ':') {    # returns the self variable
+                    return $self->new('', 'var', $self);
+                }
+
+                if ($suffix eq '?') {    # asks for a boolean value
+                    my $result = $results[-1];
+                    return ref($result) eq 'Sidef::Types::Bool::Bool'
+                      ? $result
+                      : Sidef::Types::Bool::Bool->new($result);
+                }
             }
 
             return $results[-1];
@@ -276,7 +269,6 @@ package Sidef::Variable::Variable {
 
         return;
     }
-
-};
+}
 
 1;
