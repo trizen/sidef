@@ -1,5 +1,6 @@
 #!/usr/bin/ruby
 
-_ = true;
-.def_method('I', {class{method love{class{method you{"I hate you!"}}.new}}.new});
-say (. I love you);
+{
+    .def_method('I', {class{method love{class{method you{"I hate you!"}}()}}()});
+    .I love you say;
+}.run;

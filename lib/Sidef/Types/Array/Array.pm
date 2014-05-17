@@ -14,7 +14,7 @@ package Sidef::Types::Array::Array {
 
     sub new {
         my (undef, @items) = @_;
-        bless [map { Sidef::Variable::Variable->new(rand, 'var', $_) } @items], __PACKAGE__;
+        bless [map { Sidef::Variable::Variable->new('', 'var', $_) } @items], __PACKAGE__;
     }
 
     sub get_value {

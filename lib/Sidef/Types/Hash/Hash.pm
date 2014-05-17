@@ -16,7 +16,7 @@ package Sidef::Types::Hash::Hash {
         my $offset = $#pairs;
 
         for (my $i = 0 ; $i < $offset ; $i += 2) {
-            $hash{$pairs[$i]} = Sidef::Variable::Variable->new(rand, 'var', $pairs[$i + 1]);
+            $hash{$pairs[$i]} = Sidef::Variable::Variable->new('', 'var', $pairs[$i + 1]);
         }
 
         bless \%hash, __PACKAGE__;
@@ -84,7 +84,7 @@ package Sidef::Types::Hash::Hash {
 
     sub append {
         my ($self, $key, $value) = @_;
-        $self->{$key} = Sidef::Variable::Variable->new(rand, 'var', $value);
+        $self->{$key} = Sidef::Variable::Variable->new('', 'var', $value);
     }
 
     *add = \&append;
@@ -118,7 +118,7 @@ package Sidef::Types::Hash::Hash {
 
         while (my ($key, $value) = each %{$self}) {
             $self->{$key} = Sidef::Variable::Variable->new(
-                                                           'var', rand,
+                                                           'var', '',
                                                            $code->call(
                                                                        Sidef::Types::String::String->new($key),
                                                                        $value->get_value

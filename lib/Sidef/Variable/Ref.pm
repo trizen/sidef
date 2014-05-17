@@ -33,7 +33,7 @@ package Sidef::Variable::Ref {
             }
 
             if (ref($var_ref) eq ref($self)) {
-                return Sidef::Variable::Variable->new(rand, 'var', $var_ref->{var});
+                return Sidef::Variable::Variable->new('', 'var', $var_ref->{var});
             }
             else {
                 warn sprintf("[WARN] '%s' is not a reference object!\n", ref($var_ref));

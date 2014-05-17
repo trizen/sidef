@@ -134,7 +134,7 @@ package Sidef::Variable::Variable {
                 $self->$method(Sidef::Types::Block::Code->new($code)->run);
             }
 
-            $self->new(rand, 'var', $self);
+            $self->new('', 'var', $self);
         };
 
         *{__PACKAGE__ . '::' . '\\\\'} = sub {
@@ -256,10 +256,10 @@ package Sidef::Variable::Variable {
             if ($method_type == 1) {    # (!) modifies the variable in place
                 state $method = '=';
                 $self->$method(@results);
-                return $self->new(rand, 'var', $self);
+                return $self->new('', 'var', $self);
             }
             elsif ($method_type == 2) {    # (:) returns the self variable
-                return $self->new(rand, 'var', $self);
+                return $self->new('', 'var', $self);
             }
             elsif ($method_type == 3) {    # (?) asks for a boolean value
                 my $result = $results[-1];

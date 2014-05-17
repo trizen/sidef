@@ -149,9 +149,9 @@ package Sidef::Exec {
                             $ind = $ind->get_value;
                         }
 
-                        $is_hash ? do { $self_obj->{$ind} //= Sidef::Variable::Variable->new(rand, 'var') } : do {
+                        $is_hash ? do { $self_obj->{$ind} //= Sidef::Variable::Variable->new('', 'var') } : do {
                             foreach my $ind (0 .. $ind) {
-                                $self_obj->[$ind] //= Sidef::Variable::Variable->new(rand, 'var');
+                                $self_obj->[$ind] //= Sidef::Variable::Variable->new('', 'var');
                             }
                         };
 
@@ -178,7 +178,7 @@ package Sidef::Exec {
 
                             $self_obj->{$ind} //=
                               Sidef::Variable::Variable->new(
-                                                             rand, 'var',
+                                                             '', 'var',
                                                              (
                                                               $l < $#{$expr->{ind}}
                                                               ? Sidef::Types::Hash::Hash->new
@@ -193,7 +193,7 @@ package Sidef::Exec {
                             my $num = $ind->get_value;
 
                             foreach my $j (0 .. $num - 1) {
-                                $self_obj->[$j] //= Sidef::Variable::Variable->new(rand, 'var');
+                                $self_obj->[$j] //= Sidef::Variable::Variable->new('', 'var');
                             }
 
                             $self_obj->[$num] //=
