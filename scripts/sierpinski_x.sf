@@ -1,0 +1,13 @@
+#!/usr/bin/ruby
+
+func sierpinski_x(n) {
+    var triangle = ['*'];
+    {
+        triangle = (triangle.map {|x| x + ' '*(x.len) + x } +
+                    triangle.map {|x| ' '*(x.len) + x + ' '*(x.len) } +
+                    triangle.map {|x| x + ' '*(x.len) + x} );
+    } * n;
+    triangle.join("\n");
+}
+
+say sierpinski_x(3);

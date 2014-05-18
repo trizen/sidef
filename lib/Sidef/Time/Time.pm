@@ -1,8 +1,6 @@
 package Sidef::Time::Time {
 
     use 5.014;
-    use strict;
-    use warnings;
 
     our @ISA = qw(
       Sidef

@@ -1,9 +1,5 @@
 package Sidef::Types::Glob::Stat {
 
-    use 5.014;
-    use strict;
-    use warnings;
-
     sub new {
         my (undef, %opt) = @_;
 
@@ -18,7 +14,6 @@ package Sidef::Types::Glob::Stat {
         # The order matters!
         my @names = qw(dev ino mode nlink uid gid rdev size atime mtime ctime blksize blocks);
 
-        no strict 'refs';
         foreach my $i (0 .. $#names) {
             *{__PACKAGE__ . '::' . $names[$i]} = sub {
                 $_[0]{stat}[$i];

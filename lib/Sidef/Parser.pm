@@ -2,10 +2,6 @@ package Sidef::Parser {
 
     use utf8;
     use 5.014;
-    use strict;
-    use warnings;
-
-    require File::Spec;
 
     our $DEBUG = 0;
 
@@ -14,7 +10,7 @@ package Sidef::Parser {
 
         my %options = (
             line          => 1,
-            inc           => [File::Spec->curdir()],    # 'include' dirs (TODO: find a better way)
+            inc           => [],
             class         => 'main',
             vars          => {'main' => []},
             ref_vars_refs => {'main' => []},
@@ -1100,6 +1096,7 @@ package Sidef::Parser {
                 # Binary, hexdecimal and octal numbers
                 if (/\G0(b[10_]*|x[0-9A-Fa-f_]*|[0-9_]+\b)/gc) {
                     my $number = "0" . ($1 =~ tr/_//dr);
+                    require Math::BigInt;
                     return
                       Sidef::Types::Number::Number->new(
                                                         $number =~ /^0[0-9]/
@@ -1730,7 +1727,6 @@ package Sidef::Parser {
                 }
 
                 if (/\Ginclude\b\h*/gc) {
-
                     my ($var_names, $pos) = $self->get_init_vars(code => substr($_, pos), with_vals => 0);
                     pos($_) += $pos;
 
@@ -1743,7 +1739,16 @@ package Sidef::Parser {
 
                     foreach my $var_name (@{$var_names}) {
                         my @path = split(/::/, $var_name);
+
+                        require File::Spec;
                         my $mod_path = File::Spec->catfile(@path[0 .. $#path - 1], $path[-1] . '.sm');
+
+                        if (@{$self->{inc}} == 0) {
+                            require File::Basename;
+                            push @{$self->{inc}}, split(':', $ENV{SIDEF_INC}) if exists($ENV{SIDEF_INC});
+                            push @{$self->{inc}}, File::Basename::dirname(File::Spec->rel2abs($self->{script_name}));
+                            push @{$self->{inc}}, File::Spec->curdir;
+                        }
 
                         my ($full_path, $found_module);
                         foreach my $inc_dir (@{$self->{inc}}) {
@@ -1760,7 +1765,7 @@ package Sidef::Parser {
                                                               . join("', '", @{$self->{inc}}) . "']",
                                                            );
 
-                        open(my $fh, '<:encoding(UTF-8)', $full_path)
+                        open(my $fh, '<:utf8', $full_path)
                           || $self->fatal_error(
                                                 code  => $_,
                                                 pos   => pos($_),

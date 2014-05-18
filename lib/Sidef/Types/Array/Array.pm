@@ -2,10 +2,6 @@ package Sidef::Types::Array::Array {
 
     use utf8;
     use 5.014;
-    use strict;
-    use warnings;
-
-    no warnings 'recursion';
 
     our @ISA = qw(
       Sidef

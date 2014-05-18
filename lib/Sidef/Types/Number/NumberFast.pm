@@ -2,10 +2,6 @@
 package Sidef::Types::Number::Number {
 
     use 5.014;
-    use strict;
-    use warnings;
-
-    no warnings 'redefine';
 
     our @ISA = qw(
       Sidef

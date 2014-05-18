@@ -1,9 +1,6 @@
 package Sidef::Types::Glob::DirHandle {
 
     use 5.014;
-    use strict;
-    use warnings;
-
     our @ISA = qw(Sidef);
 
     sub new {

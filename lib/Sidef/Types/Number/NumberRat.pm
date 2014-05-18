@@ -2,12 +2,7 @@
 package Sidef::Types::Number::Number {
 
     use 5.014;
-    use strict;
-    use warnings;
-
-    no warnings 'redefine';
-
-    use Math::BigRat try => 'GMP,Pari';
+    use Math::BigRat;
 
     our @ISA = qw(
       Sidef

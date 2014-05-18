@@ -1,8 +1,6 @@
 package Sidef::Types::Array::Pair {
 
     use 5.014;
-    use strict;
-    use warnings;
 
     our @ISA = qw(
       Sidef

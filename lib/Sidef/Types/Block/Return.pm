@@ -1,9 +1,5 @@
 package Sidef::Types::Block::Return {
 
-    use 5.014;
-    use strict;
-    use warnings;
-
     sub new {
         bless {}, __PACKAGE__;
     }

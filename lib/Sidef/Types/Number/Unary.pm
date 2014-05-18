@@ -1,10 +1,6 @@
 package Sidef::Types::Number::Unary {
 
     use utf8;
-    use 5.014;
-    use strict;
-    use warnings;
-
     our @ISA = qw(Sidef);
 
     sub new {
@@ -12,8 +8,6 @@ package Sidef::Types::Number::Unary {
     }
 
     {
-        no strict 'refs';
-
         *{__PACKAGE__ . '::' . '+'} = sub {
             $_[1];
         };

@@ -1,8 +1,6 @@
 package Sidef::Module::Require {
 
     use 5.014;
-    use strict;
-    use warnings;
 
     sub new {
         bless {}, __PACKAGE__;

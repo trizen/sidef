@@ -183,7 +183,7 @@ arr_1 - arr_2 -> to_s -> say;
 #
 
 /TEST/i -> matches("For testing.") ?? to_s->say;    # true
-/[123]/ =~ "one two three" ?? to_s->say;            # false
+"one two three" =~ /[123]/ ?? to_s->say;            # false
 
 "--string--" =~ /(\w+)/ ?? to_s -> say;             # true
 

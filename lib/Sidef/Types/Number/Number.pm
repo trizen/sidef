@@ -2,12 +2,6 @@ package Sidef::Types::Number::Number {
 
     use utf8;
     use 5.014;
-    use strict;
-    use warnings;
-
-    no warnings 'redefine';
-
-    use Math::BigFloat try => 'GMP,Pari';
 
     our @ISA = qw(
       Sidef
@@ -17,6 +11,7 @@ package Sidef::Types::Number::Number {
     sub new {
         my (undef, $num) = @_;
 
+        require Math::BigFloat;
         ref($num) eq 'Math::BigFloat'
           ? (bless \$num, __PACKAGE__)
           : (bless \Math::BigFloat->new($num), __PACKAGE__);
@@ -25,6 +20,7 @@ package Sidef::Types::Number::Number {
     sub newInt {
         my (undef, $num) = @_;
 
+        require Math::BigInt;
         ref($num) eq 'Math::BigInt' ? (bless \$num, __PACKAGE__)
           : (   ref($num) eq __PACKAGE__
              || ref($num) eq 'Math::BigFloat'

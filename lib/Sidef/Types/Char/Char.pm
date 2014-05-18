@@ -1,9 +1,5 @@
 package Sidef::Types::Char::Char {
 
-    use 5.014;
-    use strict;
-    use warnings;
-
     our @ISA = qw(
       Sidef::Types::String::String
       );

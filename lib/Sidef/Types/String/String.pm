@@ -2,8 +2,6 @@ package Sidef::Types::String::String {
 
     use utf8;
     use 5.014;
-    use strict;
-    use warnings;
 
     our @ISA = qw(
       Sidef
@@ -772,6 +770,7 @@ package Sidef::Types::String::String {
 
     sub decode_utf8 {
         my ($self) = @_;
+        require Encode;
         $self->new(Encode::decode_utf8($$self));
     }
 

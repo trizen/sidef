@@ -1,9 +1,5 @@
 package Sidef::Time::Gmtime {
 
-    use 5.014;
-    use strict;
-    use warnings;
-
     our @ISA = qw(Sidef);
 
     sub new {
@@ -20,7 +16,6 @@ package Sidef::Time::Gmtime {
         # The order matters!
         my @names = qw(sec min hour mday mon year wday yday);
 
-        no strict 'refs';
         foreach my $i (0 .. $#names) {
             *{__PACKAGE__ . '::' . $names[$i]} = sub {
                 $_[0]{time}[$i];

@@ -1,9 +1,6 @@
 package Sidef::Variable::Class {
 
     use 5.014;
-    use strict;
-    use warnings;
-
     our $AUTOLOAD;
 
     sub __new {

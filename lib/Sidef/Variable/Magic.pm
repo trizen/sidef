@@ -1,12 +1,9 @@
 package Sidef::Variable::Magic {
 
     use 5.014;
-    use strict;
-    use warnings;
+    our $AUTOLOAD;
 
     use overload q{""} => \&get_value;
-
-    our $AUTOLOAD;
 
     sub new {
         my (undef, $var, $numeric) = @_;
@@ -16,12 +13,6 @@ package Sidef::Variable::Magic {
     sub set_value {
         my ($self, $value) = @_;
         ${$self->{ref}} = $value->get_value;
-    }
-
-    {
-        no strict 'refs';
-
-        *{__PACKAGE__ . '::' . '='} = \&set_value;
     }
 
     sub get_value {
@@ -45,6 +36,10 @@ package Sidef::Variable::Magic {
         $self->get_value->$method(@args);
     }
 
+    {
+        no strict 'refs';
+        *{__PACKAGE__ . '::' . '='} = \&set_value;
+    }
 };
 
 1;

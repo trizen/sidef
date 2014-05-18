@@ -1,12 +1,10 @@
 package Sidef::Math::Math {
 
     use 5.014;
-    use strict;
-    use warnings;
-
     our @ISA = qw(Sidef);
 
     sub new {
+        require Math::BigFloat;
         bless {}, __PACKAGE__;
     }
 

@@ -1,8 +1,6 @@
 package Sidef::Types::Regex::Regex {
 
     use 5.014;
-    use strict;
-    use warnings;
 
     our @ISA = qw(
       Sidef
@@ -70,11 +68,6 @@ package Sidef::Types::Regex::Regex {
     }
 
     *gmatches = \&gmatch;
-
-    {
-        no strict 'refs';
-        *{__PACKAGE__ . '::' . '=~'} = \&matches;    # alias to the 'matches' method
-    }
 
     sub dump {
         my ($self) = @_;

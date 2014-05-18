@@ -1,9 +1,6 @@
 package Sidef::Types::Regex::Matches {
 
     use 5.014;
-    use strict;
-    use warnings;
-
     use overload 'bool' => \&to_bool;
 
     sub new {

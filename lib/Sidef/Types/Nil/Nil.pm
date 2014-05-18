@@ -1,9 +1,5 @@
 package Sidef::Types::Nil::Nil {
 
-    use 5.014;
-    use strict;
-    use warnings;
-
     use overload 'bool' => sub { };
 
     our @ISA = qw(

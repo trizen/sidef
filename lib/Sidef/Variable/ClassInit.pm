@@ -1,8 +1,6 @@
 package Sidef::Variable::ClassInit {
 
     use 5.014;
-    use strict;
-    use warnings;
 
     sub __new {
         my (undef, $name) = @_;

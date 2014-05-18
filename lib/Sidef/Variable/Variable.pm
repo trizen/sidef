@@ -2,10 +2,6 @@ package Sidef::Variable::Variable {
 
     use utf8;
     use 5.014;
-    use strict;
-    use warnings;
-
-    no warnings 'recursion';
 
     use overload q{""} => sub {
         $_[0]->get_value;

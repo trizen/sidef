@@ -1,9 +1,5 @@
 package Sidef::Types::Block::Break {
 
-    use 5.014;
-    use strict;
-    use warnings;
-
     sub new {
         bless {depth => 1}, __PACKAGE__;
     }

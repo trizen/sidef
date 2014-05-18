@@ -1,8 +1,6 @@
 package Sidef::Variable::Ref {
 
     use 5.014;
-    use strict;
-    use warnings;
 
     sub new {
         my (undef, $var) = @_;
@@ -19,7 +17,7 @@ package Sidef::Variable::Ref {
                 return $self->new($var);
             }
             else {
-                warn sprintf("[WARN] '%s' is not a variable object!\n", ref($var));
+                warn sprintf("[WARN] '%s' is not a variable!\n", ref($var));
             }
 
             $self;
@@ -36,7 +34,7 @@ package Sidef::Variable::Ref {
                 return Sidef::Variable::Variable->new('', 'var', $var_ref->{var});
             }
             else {
-                warn sprintf("[WARN] '%s' is not a reference object!\n", ref($var_ref));
+                warn sprintf("[WARN] '%s' is not a variable reference!\n", ref($var_ref));
             }
 
             $self;

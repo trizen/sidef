@@ -286,8 +286,10 @@ scripts/script.sf
 scripts/short_circuit_evaluation.sf
 scripts/sidef_to_json.sf
 scripts/sierpinski_carpet.sf
+scripts/sierpinski_diamond.sf
 scripts/sierpinski_triangle.sf
 scripts/sierpinski_triangle_90.sf
+scripts/sierpinski_x.sf
 scripts/special_methods.sf
 scripts/split_combine.sf
 scripts/static_const_lazy_init.sf

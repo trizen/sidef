@@ -7,7 +7,7 @@ use Module::Build;
 my $builder = Module::Build->new(
 
     module_name => 'Sidef',
-    license     => 'Artistic_2_0',
+    license     => 'perl',
     dist_author => [
                         q{Daniel Șuteu   (<trizenx@gmail.com>)},
                         q{Ioana Fălcușan (<ioanaflavia@gmail.com>)},
@@ -41,11 +41,6 @@ my $builder = Module::Build->new(
                  'Getopt::Std'    => 0,
                  'Term::ReadLine' => 0,
                 },
-
-    recommends => {
-                   'Math::BigInt::GMP'       => 0,
-                   'Term::ReadLine::Gnu::XS' => 0,
-                  },
 
     auto_features => {
                       dump_support => {

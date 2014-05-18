@@ -1,9 +1,6 @@
 package Sidef::Types::Glob::Fcntl {
 
     use 5.014;
-    use strict;
-    use warnings;
-
     our $AUTOLOAD;
 
     sub new {

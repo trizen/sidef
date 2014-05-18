@@ -1,8 +1,6 @@
 package Sidef::Types::Glob::Dir {
 
     use 5.014;
-    use strict;
-    use warnings;
 
     our @ISA = qw(
       Sidef

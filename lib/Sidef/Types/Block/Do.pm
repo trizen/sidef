@@ -1,11 +1,5 @@
 package Sidef::Types::Block::Do {
 
-    use 5.014;
-    use strict;
-    use warnings;
-
-    no warnings 'recursion';
-
     our @ISA = qw(Sidef);
 
     sub new {
@@ -36,9 +30,5 @@ package Sidef::Types::Block::Do {
         $self;
     }
 
-    {
-        no strict 'refs';
-        *{__PACKAGE__ . '::' . ':'} = \&do;
-    }
-
+    *{__PACKAGE__ . '::' . ':'} = \&do;
 }

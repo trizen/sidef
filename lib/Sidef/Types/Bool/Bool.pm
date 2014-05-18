@@ -1,10 +1,5 @@
 package Sidef::Types::Bool::Bool {
 
-    use 5.014;
-    use strict;
-    use warnings;
-
-    no warnings 'recursion';
     use overload q{bool} => \&get_value;
 
     our @ISA = qw(
@@ -32,8 +27,6 @@ package Sidef::Types::Bool::Bool {
     }
 
     {
-        no strict 'refs';
-
         *{__PACKAGE__ . '::' . '!'} = sub {
             my ($self, $bool) = @_;
             $self->new($bool)->not;

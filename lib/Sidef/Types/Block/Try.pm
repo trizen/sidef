@@ -1,9 +1,6 @@
 package Sidef::Types::Block::Try {
 
     use 5.014;
-    use strict;
-    use warnings;
-
     our @ISA = qw(Sidef);
 
     sub new {
@@ -16,6 +13,7 @@ package Sidef::Types::Block::Try {
 
         my $error = 0;
         local $SIG{__WARN__} = sub { $error = 1 };
+        local $SIG{__DIE__}  = sub { $error = 1 };
 
         $self->{val} = eval { $code->run };
 

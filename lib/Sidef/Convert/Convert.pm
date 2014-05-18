@@ -3,9 +3,6 @@ package Sidef::Convert::Convert {
     # This module is used only as parent!
 
     use 5.014;
-    use strict;
-    use warnings;
-
     our @ISA = qw(Sidef);
 
     state $array_like = {
@@ -18,12 +15,11 @@ package Sidef::Convert::Convert {
     use overload q{""} => \&stringify;
 
     sub stringify {
-        require Scalar::Util;
-
         if (ref($_[0]) eq 'Sidef::Types::Regex::Regex') {
             return $_[0]{regex};
         }
 
+        require Scalar::Util;
         my $type = Scalar::Util::reftype($_[0]);
         if ($type eq 'SCALAR' or $type eq 'REF') {
             return ${$_[0]};

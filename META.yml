@@ -7,9 +7,9 @@ build_requires:
   Test::More: '0'
 configure_requires:
   Module::Build: '0'
-dynamic_config: 1
+dynamic_config: 0
 generated_by: 'Module::Build version 0.4205, CPAN::Meta::Converter version 2.140640'
-license: artistic_2
+license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -48,6 +48,10 @@ provides:
     file: lib/Sidef/Types/Array/Array.pm
   Sidef::Types::Array::HCArray:
     file: lib/Sidef/Types/Array/HCArray.pm
+  Sidef::Types::Array::MultiArray:
+    file: lib/Sidef/Types/Array/MultiArray.pm
+  Sidef::Types::Array::Pair:
+    file: lib/Sidef/Types/Array/Pair.pm
   Sidef::Types::Black::Hole:
     file: lib/Sidef/Types/Black/Hole.pm
   Sidef::Types::Block::Break:
@@ -134,9 +138,6 @@ provides:
     file: lib/Sidef/Variable/Ref.pm
   Sidef::Variable::Variable:
     file: lib/Sidef/Variable/Variable.pm
-recommends:
-  Math::BigInt::GMP: '0'
-  Term::ReadLine::Gnu::XS: '0'
 requires:
   Cwd: '0'
   Encode: '0'
@@ -152,8 +153,8 @@ requires:
   POSIX: '0'
   Term::ReadLine: '0'
   Time::HiRes: '0'
-  perl: '5.014'
+  perl: v5.14.0
   utf8: '0'
 resources:
-  license: http://www.perlfoundation.org/artistic_license_2_0
+  license: http://dev.perl.org/licenses/
 version: '0.01'

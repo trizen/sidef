@@ -2,16 +2,25 @@
 
 use utf8;
 use 5.014;
-use strict;
-use warnings;
 
-use File::Spec;
-use File::Basename qw(dirname);
-use lib File::Spec->catfile(dirname(dirname(File::Spec->rel2abs(__FILE__))), 'lib');
+BEGIN {    # support to run sidef from everywhere
+    require File::Spec;
+    require File::Basename;
+    unshift @INC,
+      File::Spec->catdir(
+                         File::Basename::dirname(
+                                                   File::Spec->file_name_is_absolute(__FILE__)
+                                                 ? __FILE__
+                                                 : File::Spec->rel2abs(__FILE__)
+                                                ),
+                         File::Spec->updir,
+                         'lib'
+                        );
+}
 
-binmode(STDOUT, ':encoding(UTF-8)');
-binmode(STDERR, ':encoding(UTF-8)') if $^P == 0;    # to work under Devel::* modules
-binmode(STDIN,  ':encoding(UTF-8)');
+binmode(STDOUT, ':utf8');
+binmode(STDERR, ':utf8') if $^P == 0;    # to work under Devel::* modules
+binmode(STDIN,  ':utf8');
 
 require Sidef::Init;
 
@@ -21,7 +30,7 @@ my $version = $Sidef::VERSION;
 my %args;
 if ($#ARGV != -1 and chr ord $ARGV[0] eq '-') {
     require Getopt::Std;
-    Getopt::Std::getopts('E:d:Dho:ivHN:WwcM:', \%args);
+    Getopt::Std::getopts('E:d:Dho:ivHN:n:WwcM:', \%args);
 }
 
 # Help
@@ -69,6 +78,12 @@ if (defined(my $type = $args{N})) {
     }
 }
 
+# Backend for Math::BigInt
+if (defined(my $type = $args{n})) {
+    require Math::BigInt;
+    Math::BigInt->import(lib => $type);
+}
+
 # Memoization
 if (defined(my $types = $args{M})) {
     memoize_types($types);
@@ -103,7 +118,7 @@ else {
       : defined($ARGV[0]) && (-f $ARGV[0]) ? do {
         $script_name = shift @ARGV;
 
-        open my $fh, '<:encoding(UTF-8)', $script_name
+        open my $fh, '<:utf8', $script_name
           or die qq{Can't open sidef script "$script_name": $!\n};
 
         local $/;
@@ -151,6 +166,7 @@ sub output_usage {
                     '-E program'     => 'one line of program',
                     '-H'             => 'interactive help',
                     '-N type'        => ['use a specific implementation for numbers', 'valid types: fast, big, int, rat'],
+                    '-n type'        => ['try to use a specific backend for Math::BigInt', 'valid types: GMP, Pari, FastCalc'],
                     '-M type'        => ['memoize some expensive method calls', 'valid types: str, num, block, all'],
                     '-v'             => 'print version',
                     '-w'             => 'enable warnings with stack backtrace',
@@ -306,7 +322,7 @@ sub dump_structure {
         my $out_fh = \*STDOUT;
 
         if (defined $args{o}) {
-            open $out_fh, '>:encoding(UTF-8)', $args{o}
+            open $out_fh, '>:utf8', $args{o}
               or die "Can't open file '$args{o}' for write: $!\n";
         }
 
@@ -463,9 +479,9 @@ use File::Spec::Functions qw(catdir catfile);
 my \$DIR;
 use lib \$DIR = tempdir(CLEANUP => 1);
 
-binmode(STDOUT, ':encoding(UTF-8)');
-binmode(STDERR, ':encoding(UTF-8)') if \$^P == 0;
-binmode(STDIN,  ':encoding(UTF-8)');
+binmode(STDOUT, ':utf8');
+binmode(STDERR, ':utf8') if \$^P == 0;
+binmode(STDIN,  ':utf8');
 
 foreach my \$mod (
 HEAD
@@ -480,7 +496,7 @@ HEAD
                      return if m{\bSidef\W+Init\b};
 
                      local $/;
-                     open my $fh, '<:encoding(UTF-8)', $_
+                     open my $fh, '<:utf8', $_
                        or die "Can't open file `$_' for reading: $!";
 
                      my $token = tr/A-Za-z0-9/_/cr;
@@ -510,7 +526,7 @@ HEAD
 
         my \$filename = catfile(\$dir, \$name . '.pm');
 
-        open my \$fh, '>:encoding(UTF-8)', \$filename
+        open my \$fh, '>:utf8', \$filename
             or die qq{ERROR: Can't create file "\$filename": \$!};
 
         print {\$fh} \$mod;
@@ -529,10 +545,11 @@ FOOT
             my $filename = $INC{'Sidef/Init.pm'};
 
             local $/;
-            open my $fh, '<:encoding(UTF-8)', $filename
+            open my $fh, '<:utf8', $filename
               or die "Can't open file `$filename' for reading: $!";
 
             $package_content .= <$fh>;
+            $package_content .= "use Math::BigFloat;\n";
 
             if (defined(my $type = $args{N})) {
                 if ($type eq 'fast' or $type eq 'perl') {
@@ -555,7 +572,7 @@ FOOT
         my $out_fh = \*STDOUT;
 
         if (defined $args{o}) {
-            open $out_fh, '>:encoding(UTF-8)', $args{o}
+            open $out_fh, '>:utf8', $args{o}
               or die "Can't open file '$args{o}' for write: $!\n";
         }
 
