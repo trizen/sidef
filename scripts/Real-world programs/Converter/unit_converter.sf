@@ -33,12 +33,12 @@ Temperature:
 
 Length:
     21.1 in to cm       : convert inches to centimetres
-    a light year to km  : convert light years to km
-    10 light-sec to mi  : convert light seconds to miles
+    5.6 feet to m       : convert feet to meters
+    4 light years to km : convert light years to km
 
 Velocity:
     4444 mph to km/s        : convert miles per hour to km/s
-    50 m/s to km/h          : convert meters to km/h
+    50 m/s to km/h          : convert meters per second to km/h
     speed of sound in mi/s  : convert the speed of sound in mi/s
 
 Time:
@@ -103,7 +103,7 @@ func convert(amount, from, to) {
             :nanometres       => :(:re => /^(?:nanomet(?:er|re)s?|nm)$/i,       :factor => 10.0**9.0),
             :picometres       => :(:re => /^(?:picomet(?:er|re)s?|pm)$/i,       :factor => 10.0**12.0),
             :femtometres      => :(:re => /^(?:femtomet(?:er|re)s?|fm)$/i,      :factor => 10.0**15.0),
-            :feets            => :(:re => /^(?:feets?|ft|foot)$/i,              :factor => 1.0 / 0.304799735),
+            :feet             => :(:re => /^(?:feet|ft|foot)$/i,                :factor => 1.0 / 0.304799735),
             :inches           => :(:re => /^(?:inch(?:es)?|in|")$/i,            :factor => 1.0 / 0.0254),
             :miles            => :(:re => /^(?:miles?|mi)$/i,                   :factor => 1.0 / 1609.344),
             :yards            => :(:re => /^(?:yards?|yd)$/i,                   :factor => 1.0 / 0.9144),
