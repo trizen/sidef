@@ -191,7 +191,7 @@ var regex = /^\d+ \w+ \d+$/;
 "03 May 2013" =~ regex ?? to_s->say;                # true
 regex -> to_s -> say;                               # prints the regex
 
-/item/ =~ ["str", ['123', ["w", "item", "x"], '6'], "boo"] ?? to_s -> say;    # matches 'item' in nested array
+/item/.match(["str", ['123', ["w", "item", "x"], '6'], "boo"]) ?? to_s -> say;    # matches 'item' in nested array
 
 
 #"\n=>> Variable interpolation for regular expressions:"->say;

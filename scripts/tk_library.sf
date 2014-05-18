@@ -2,7 +2,11 @@
 
 # http://rosettacode.org/wiki/Hello_world/Graphical
 
-var tk = require 'Tk';
+var tk = (
+            try   { require 'Tk' }
+            catch { STDERR.print("** Module 'Tk' is not installed!\n"); return }
+         );
+
 var main = 'MainWindow'.to_caller.new;
 main.Button(
     '-text'    => 'Goodbye, World!',
