@@ -173,9 +173,12 @@ sub output_usage {
                     '-W'             => 'make warnings fatal (with stack backtrace)',
                    );
 
+    require File::Basename;
+    my $basename = File::Basename::basename($0);
+
     print <<"USAGE";
 
-Usage: sidef [switches] [--] [programfile] [arguments]
+Usage: $basename [switches] [--] [programfile] [arguments]
 
 USAGE
 
@@ -197,7 +200,7 @@ USAGE
 
     print <<"END";
 
-Run '$0 -H' for more help with $name.
+Run '$basename -H' for interactive help.
 
 END
 }
@@ -255,6 +258,7 @@ HELP
 sub code_interactive {
     require Term::ReadLine;
     my $term = Term::ReadLine->new("$name $version -- interactive mode");
+    my $parser = Sidef::Parser->new(script_name => '-i');
 
     print qq{$name $version on $^O\n};
     print qq{Type "help", "copyright" or "license" for more information.\n};
@@ -297,15 +301,15 @@ EOT
             redo;
         }
 
-        my $parser = Sidef::Parser->new(script_name => '-i');
         my $struct = eval { $parser->parse_script(code => $line) };
 
-        if ($@) {
+        $@ && do {
             warn $@;
+            $parser = Sidef::Parser->new(script_name => '-i');
             redo;
-        }
+        };
 
-        say for execute_struct($struct);
+        say eval { $_->can('dump') } ? $_->dump : $_ for execute_struct($struct);
         redo;
     }
 }

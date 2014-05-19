@@ -472,8 +472,11 @@ package Sidef::Parser {
                      "You're emberesing me! That's not funny!",
                     );
 
+        require File::Basename;
+        my $basename = File::Basename::basename($0);
+
         my $error =
-            "$0: "
+            "$basename: "
           . $lines[rand @lines] . "\n"
           . ($self->{script_name} // '-') . ':'
           . $self->{line}
