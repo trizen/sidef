@@ -26,7 +26,10 @@ package Sidef::Types::Array::MultiArray {
          map {
              [
               map {
-                  ref($_) && defined(eval { $_->can('get_value') }) ? $_->get_value : $_
+                  ref($_)
+                    && defined(eval { $_->can('get_value') })
+                    ? $_->get_value
+                    : $_
                 } @{$_}
              ]
            } @{$self}
@@ -47,6 +50,14 @@ package Sidef::Types::Array::MultiArray {
     *iter    = \&each;
     *iterate = \&each;
 
+    sub append {
+        my ($self, $array) = @_;
+        $self->_is_array($array) || return;
+        push @{$self}, [map { $_->get_value } @{$array}];
+    }
+
+    *push = \&append;
+
     sub dump {
         my ($self) = @_;
         Sidef::Types::String::String->new(
@@ -56,7 +67,10 @@ package Sidef::Types::Array::MultiArray {
                     '[' . join(
                         ", ",
                         map {
-                            ref($_) && defined(eval { $_->can('dump') }) ? $_->dump : $_
+                            ref($_)
+                              && defined(eval { $_->can('dump') })
+                              ? $_->dump
+                              : $_
                           } @{$_}
                       )
                       . ']'
