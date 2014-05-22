@@ -32,7 +32,7 @@ my %ignored_subs = map { $_ => 1 } qw<
   >;
 
 my %ignored_methods = (
-                       'Sidef'                          => [qw(new VERSION Types::)],
+                       'Sidef'                          => [qw(new VERSION Types:: a b)],
                        'Sidef::Types::Block::Return'    => [qw(get_obj new)],
                        'Sidef::Types::Block::Break'     => [qw(new)],
                        'Sidef::Variable::Variable'      => [qw(set_value is_defined get_type get_value new)],
@@ -65,7 +65,7 @@ my %ignored_methods = (
                        'Sidef::Types::Black::Hole'      => [qw(new)],
                        'Sidef::Types::Array::Array'     => [qw(get_value a b)],
                        'Sidef::Types::Number::Number'   => [qw(get_value)],
-                       'Sidef::Types::String::String'   => [qw(get_value)],
+                       'Sidef::Types::String::String'   => [qw(get_value a b)],
                        'Sidef::Types::Byte::Bytes'      => [qw(decode_utf8)],
                        'Sidef::Types::Glob::Fcntl'      => [qw(new)],
                        'Sidef::Types::Hash::Hash'       => [qw(a b)],
