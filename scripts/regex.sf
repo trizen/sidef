@@ -8,8 +8,8 @@ var regex = /^(\d+) (\w+) (\d+)$/;
 var reg = ('26 Iunie 2013' =~ regex);
 
 if (reg.matched) {
-    "Got '%d' captures\n".printf(reg.matches.len);
-    reg.matches.join("--").say;
+    "Got '%d' captures\n".printf(reg.cap.len);
+    reg.cap.join("--").say;
 }
 else {
     "Regex_1 fail!\n".die
@@ -25,7 +25,7 @@ var cap = ("12 John Wall Street no. 4" =~ /(?<id>\d+)\s+(?<name>\S+)\s+(?<addres
 cap.matched
     || "Named captures failed!\n".die;
 
-var hash = cap.named_matches;
+var hash = cap.ncap;
 [
     hash["name"],
     hash["address"],

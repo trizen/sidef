@@ -6,7 +6,7 @@ package Sidef::Types::Regex::Matches {
     sub new {
         my (undef, %hash) = @_;
 
-        my @matches;
+        my @captures;
         if ($hash{self}{global}) {
             pos($hash{obj}) = $hash{self}{pos};
             my $match = $hash{obj} =~ /$hash{self}{regex}/g;
@@ -15,7 +15,7 @@ package Sidef::Types::Regex::Matches {
                 $hash{self}{pos} = pos($hash{obj});
 
                 foreach my $i (1 .. $#{+}) {
-                    push @matches, substr($hash{obj}, $-[$i], $+[$i] - $-[$i]);
+                    push @captures, substr($hash{obj}, $-[$i], $+[$i] - $-[$i]);
                 }
 
                 $hash{matched} = 1;
@@ -25,28 +25,24 @@ package Sidef::Types::Regex::Matches {
             }
 
             foreach my $key (keys %+) {
-                $hash{named_matches}{$key} = $+{$key};
+                $hash{named_captures}{$key} = $+{$key};
             }
         }
         else {
-            @matches =
+            @captures =
               defined($hash{pos})
               ? (substr($hash{obj}, $hash{pos}) =~ $hash{self}{regex})
               : ($hash{obj} =~ $hash{self}{regex});
 
-            $hash{matched} = (@matches != 0);
+            $hash{matched} = (@captures != 0);
             $hash{match_pos} = $hash{matched} ? [$-[0] + ($hash{pos} // 0), $+[0] + ($hash{pos} // 0)] : [];
 
-            if (not defined $1) {
-                @matches = ();
-            }
-
             foreach my $key (keys %+) {
-                $hash{named_matches}{$key} = $+{$key};
+                $hash{named_captures}{$key} = $+{$key};
             }
         }
 
-        $hash{matches} = \@matches;
+        $hash{captures} = \@captures;
         bless \%hash, __PACKAGE__;
     }
 
@@ -64,28 +60,25 @@ package Sidef::Types::Regex::Matches {
         Sidef::Types::Array::Array->new(map { Sidef::Types::Number::Number->new($_) } @{$self->{match_pos}});
     }
 
-    sub matches {
+    sub captures {
         my ($self) = @_;
-        Sidef::Types::Array::Array->new(map { Sidef::Types::String::String->new($_) } @{$self->{matches}});
+        Sidef::Types::Array::Array->new(map { Sidef::Types::String::String->new($_) } @{$self->{captures}});
     }
 
-    *captures = \&matches;
-    *cap      = \&matches;
+    *cap = \&captures;
 
-    sub named_matches {
+    sub named_captures {
         my ($self) = @_;
         my $hash = Sidef::Types::Hash::Hash->new();
 
-        foreach my $key (keys %{$self->{named_matches}}) {
-            $hash->{$key} = Sidef::Types::String::String->new($self->{named_matches}{$key});
+        foreach my $key (keys %{$self->{named_captures}}) {
+            $hash->{$key} = Sidef::Types::String::String->new($self->{named_captures}{$key});
         }
 
         $hash;
     }
 
-    *namedMatches   = \&named_matches;
-    *namedCaptures  = \&named_matches;
-    *named_captures = \&named_matches;
+    *ncap = \&named_captures;
 
     {
         no strict 'refs';
