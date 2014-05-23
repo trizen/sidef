@@ -147,7 +147,7 @@ package Sidef::Types::Number::Number {
         $self->new(2 << CORE::log($$self) / CORE::log(2));
     }
 
-    *nextPowerOfTwo = \&next_power_of_two;
+    *npow2 = \&next_power_of_two;
 
     sub next_power_of {
         my ($self, $num) = @_;
@@ -155,7 +155,7 @@ package Sidef::Types::Number::Number {
         $self->new($$num**(CORE::int(CORE::log($$self) / CORE::log($$num)) + 1));
     }
 
-    *nextPowerOf = \&next_power_of;
+    *npow = \&next_power_of;
 
     sub is_zero {
         my ($self) = @_;

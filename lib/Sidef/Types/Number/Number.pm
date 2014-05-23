@@ -299,7 +299,7 @@ package Sidef::Types::Number::Number {
         $self->new(2 << ($$self->copy->blog(2)->as_int));
     }
 
-    *nextPowerOfTwo = \&next_power_of_two;
+    *npow2 = \&next_power_of_two;
 
     sub next_power_of {
         my ($self, $num) = @_;
@@ -307,7 +307,7 @@ package Sidef::Types::Number::Number {
         $self->new($$num**($$self->copy->blog($$num)->as_int->binc));
     }
 
-    *nextPowerOf = \&next_power_of;
+    *npow = \&next_power_of;
 
     sub is_zero {
         my ($self) = @_;

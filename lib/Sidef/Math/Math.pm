@@ -57,6 +57,46 @@ package Sidef::Math::Math {
                      Math::BigFloat->new($$x)->bsin(defined($places) ? ($self->_is_number($places)) ? $$places : return : ()));
     }
 
+    sub log {
+        my ($self, $n, $base) = @_;
+        $self->_is_number($n) || return;
+        Sidef::Types::Number::Number->new(
+                           Math::BigFloat->new($$n)->blog(defined($base) ? ($self->_is_number($base)) ? $$base : return : ()));
+    }
+
+    sub log2 {
+        my ($self, $n) = @_;
+        $self->_is_number($n) || return;
+        Sidef::Types::Number::Number->new(Math::BigFloat->new($$n)->blog(2));
+    }
+
+    sub log10 {
+        my ($self, $n) = @_;
+        $self->_is_number($n) || return;
+        Sidef::Types::Number::Number->new(Math::BigFloat->new($$n)->blog(10));
+    }
+
+    sub npow2 {
+        my ($self, $x) = @_;
+
+        $self->_is_number($x) || return;
+        $x = Math::BigFloat->new($$x);
+
+        my $y = Math::BigFloat->new(2);
+        Sidef::Types::Number::Number->new($y->blsft($x->blog($y)->as_int));
+    }
+
+    sub npow {
+        my ($self, $x, $y) = @_;
+        $self->_is_number($x) || return;
+        $self->_is_number($y) || return;
+
+        $x = Math::BigFloat->new($$x);
+        $y = Math::BigFloat->new($$y);
+
+        Sidef::Types::Number::Number->new($y->bpow($x->blog($y)->as_int->binc));
+    }
+
     sub gcd {
         my ($self, @list) = @_;
         $self->_is_number($_) || return for @list;
@@ -90,6 +130,18 @@ package Sidef::Math::Math {
         my ($self, $n) = @_;
         $self->_is_number($n) || return;
         Sidef::Types::Number::Number->new(Math::BigFloat->accuracy($$n));
+    }
+
+    sub ceil {
+        my ($self, $n) = @_;
+        $self->_is_number($n) || return;
+        Sidef::Types::Number::Number->new(Math::BigFloat->new($$n)->bceil);
+    }
+
+    sub floor {
+        my ($self, $n) = @_;
+        $self->_is_number($n) || return;
+        Sidef::Types::Number::Number->new(Math::BigFloat->new($$n)->bfloor);
     }
 
     sub sqrt {
