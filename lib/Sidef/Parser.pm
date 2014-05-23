@@ -1231,8 +1231,16 @@ package Sidef::Parser {
                         pos($_) += $pos;
                         $name = $str;
                     }
-                    elsif (/\G(\S+)/gc) {
+                    elsif (/\G(\w+)/gc) {
                         $name = $1;
+                    }
+                    else {
+                        $self->fatal_error(
+                                           error    => "invalid 'here-doc' declaration",
+                                           expected => "expected an alpha-numeric token after '<<'",
+                                           code     => $_,
+                                           pos      => pos($_)
+                                          );
                     }
 
                     my $obj = {$self->{class} => []};
