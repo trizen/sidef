@@ -14,21 +14,15 @@ package Sidef::Module::Caller {
 
     sub AUTOLOAD {
         my ($self, @arg) = @_;
-
         my ($method) = ($AUTOLOAD =~ /^.*[^:]::(.*)$/);
 
         if ($method eq '') {
             return Sidef::Module::Func->_new(module => $self->{module});
         }
 
-        my $return_array = 0;
-        if ($method =~ /:\z/) {
-            $return_array = 1;
-            chop $method;
-        }
-
-        if ($self->{module}->can($method) || $self->{module}->can('AUTOLOAD')) {
-            my @values = $self->{module}->$method(
+        my @results;
+        eval {
+            @results = $self->{module}->$method(
                 @arg
                 ? (
                    map {
@@ -39,25 +33,23 @@ package Sidef::Module::Caller {
                   )
                 : ()
             );
+        };
 
-            if ($return_array || @values > 1) {
-                return Sidef::Types::Array::Array->new(@values);
-            }
-
-            my $value = $values[0];
-
-            if (ref($value) && eval { $value->can('can') }) {
-                return $self->_new(module => ($value));
-            }
-            else {
-                return $value;
-            }
-        }
-        else {
-            warn sprintf(qq{[WARN] Can't locate object method "$method" via package "%s"\n},
-                         (ref($self->{module}) ? ref($self->{module}) : $self->{module}));
+        if ($@) {
+            warn $@;
             return;
         }
+
+        if (@results > 1) {
+            return Sidef::Types::Array::Array->new(map { Sidef::Perl::Perl->to_sidef($_) } @results);
+        }
+
+        my $result = $results[0];
+        if (ref($result) && eval { $result->can('can') }) {
+            return $self->_new(module => ($result));
+        }
+
+        Sidef::Perl::Perl->to_sidef($result);
     }
 }
 

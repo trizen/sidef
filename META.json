@@ -4,7 +4,7 @@
       "Daniel Șuteu   (<trizenx@gmail.com>)",
       "Ioana Fălcușan (<ioanaflavia@gmail.com>)"
    ],
-   "dynamic_config" : 0,
+   "dynamic_config" : 1,
    "generated_by" : "Module::Build version 0.4205",
    "license" : [
       "perl_5"
@@ -74,6 +74,9 @@
       },
       "Sidef::Parser" : {
          "file" : "lib/Sidef/Parser.pm"
+      },
+      "Sidef::Perl::Perl" : {
+         "file" : "lib/Sidef/Perl/Perl.pm"
       },
       "Sidef::Sys::SIG" : {
          "file" : "lib/Sidef/Sys/SIG.pm"

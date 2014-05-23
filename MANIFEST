@@ -15,6 +15,7 @@ lib/Sidef/Module/Func.pm
 lib/Sidef/Module/Require.pm
 lib/Sidef/Module/Require.pod
 lib/Sidef/Parser.pm
+lib/Sidef/Perl/Perl.pm
 lib/Sidef/Sys/SIG.pm
 lib/Sidef/Sys/Sys.pm
 lib/Sidef/Sys/Sys.pod
@@ -207,6 +208,7 @@ scripts/hash_grep.sf
 scripts/hash_join.sf
 scripts/hash_sort.sf
 scripts/hashes.sf
+scripts/http_tiny.sf
 scripts/huffman_coding.sf
 scripts/i_love_you.sf
 scripts/if_do_else.sf
@@ -287,6 +289,7 @@ scripts/short_circuit_evaluation.sf
 scripts/sidef_to_json.sf
 scripts/sierpinski_carpet.sf
 scripts/sierpinski_diamond.sf
+scripts/sierpinski_sidef.sf
 scripts/sierpinski_triangle.sf
 scripts/sierpinski_triangle_90.sf
 scripts/sierpinski_x.sf

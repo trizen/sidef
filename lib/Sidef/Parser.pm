@@ -147,6 +147,10 @@ package Sidef::Parser {
                           re  => qr/\GSidef\b/,
                          },
                          {
+                          sub => sub { Sidef::Perl::Perl->new },
+                          re  => qr/\GPerl\b/,
+                         },
+                         {
                           sub => sub { Sidef::Variable::Magic->new(\$., 1) },
                           re  => qr/\G\$\./,
                          },

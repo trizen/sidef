@@ -7,7 +7,7 @@ build_requires:
   Test::More: '0'
 configure_requires:
   Module::Build: '0'
-dynamic_config: 0
+dynamic_config: 1
 generated_by: 'Module::Build version 0.4205, CPAN::Meta::Converter version 2.140640'
 license: perl
 meta-spec:
@@ -34,6 +34,8 @@ provides:
     file: lib/Sidef/Module/Require.pm
   Sidef::Parser:
     file: lib/Sidef/Parser.pm
+  Sidef::Perl::Perl:
+    file: lib/Sidef/Perl/Perl.pm
   Sidef::Sys::SIG:
     file: lib/Sidef/Sys/SIG.pm
   Sidef::Sys::Sys:

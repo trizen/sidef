@@ -23,7 +23,7 @@ func main () {
     );
 
     "** Retrieving the wordlist...".say;
-    var words = Str.new(lwp.get('http://www.puzzlers.org/pub/wordlists/unixdict.txt')).words;
+    var words = lwp.get('http://www.puzzlers.org/pub/wordlists/unixdict.txt').words;
     "** Processing the words...".say;
 
     var time = Time.now;

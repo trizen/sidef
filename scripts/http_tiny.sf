@@ -1,0 +1,19 @@
+#!/usr/bin/ruby
+
+var req = require 'HTTP::Tiny';
+var http = req.new;
+
+var response = http.get('http://example.com/');
+if (!response[:success]) {
+    "GET failed!\n".die;
+}
+
+say "#{Str.new(response[:status])} #{Str.new(response[:reason])}";
+
+response[:headers].each { |k,v|
+    for (v) { |item|
+        say "#{k}: #{item}";
+    }
+}
+
+response[:content].len? && response[:content].len.to_s.say;

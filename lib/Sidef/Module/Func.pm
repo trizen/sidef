@@ -52,18 +52,12 @@ package Sidef::Module::Func {
     sub AUTOLOAD {
         my ($self, @arg) = @_;
 
-        my ($func)   = ($AUTOLOAD =~ /^.*[^:]::(.*)$/);
-        my $sub      = \&{$self->{module} . '::' . $func};
-        my $autoload = \&{$self->{module} . '::' . 'AUTOLOAD'};
+        my ($func) = ($AUTOLOAD =~ /^.*[^:]::(.*)$/);
+        my $sub = \&{$self->{module} . '::' . $func};
+        my @results;
 
-        my $return_array = 0;
-        if ($func =~ /:\z/) {
-            $return_array = 1;
-            chop $func;
-        }
-
-        if (defined(&$sub) or defined(&$autoload)) {
-            my @results = $sub->(
+        eval {
+            @results = $sub->(
                 @arg
                 ? (
                    map {
@@ -74,17 +68,18 @@ package Sidef::Module::Func {
                   )
                 : ()
             );
+        };
 
-            if ($return_array || @results > 1) {
-                return Sidef::Types::Array::Array->new(@results);
-            }
-
-            $results[0];
-        }
-        else {
-            warn qq{[WARN] Can't locate function '$func' via package "$self->{module}"!\n};
+        if ($@) {
+            warn $@;
             return;
         }
+
+        if (@results > 1) {
+            return Sidef::Types::Array::Array->new(map { Sidef::Perl::Perl->to_sidef($_) } @results);
+        }
+
+        Sidef::Perl::Perl->to_sidef($results[0]);
     }
 }
 
