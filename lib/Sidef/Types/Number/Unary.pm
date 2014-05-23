@@ -12,6 +12,16 @@ package Sidef::Types::Number::Unary {
             $_[1];
         };
 
+        *{__PACKAGE__ . '::' . '++'} = sub {
+            my ($self, $obj) = @_;
+            $obj->inc;
+        };
+
+        *{__PACKAGE__ . '::' . '--'} = sub {
+            my ($self, $obj) = @_;
+            $obj->dec;
+        };
+
         *{__PACKAGE__ . '::' . '~'} = sub {
             my ($self, $number) = @_;
             $self->_is_number($number, 1) || return;
