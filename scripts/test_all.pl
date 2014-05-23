@@ -20,6 +20,7 @@ my %ignored;
       langton_s_ant_2.sf
       levenshtein_recursive.sf
       fibonacci_validation.sf
+      metaprogramming_method_definition.sf
       file_find_module.sf
       dice_game_solver.sf
       stdin.sf
