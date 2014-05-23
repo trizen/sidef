@@ -500,6 +500,11 @@ package Sidef::Types::String::String {
     *words    = \&each_word;
     *eachWord = \&each_word;
 
+    sub bytes {
+        my ($self) = @_;
+        $self->to_bytes;
+    }
+
     sub chars {
         my ($self) = @_;
         Sidef::Types::Char::Chars->new(map { Sidef::Types::Char::Char->new($_) } CORE::split(//, $$self));
