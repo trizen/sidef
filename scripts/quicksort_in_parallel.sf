@@ -1,0 +1,22 @@
+#!/usr/bin/ruby
+
+# quicksort algorithm -- in parallel
+
+func quicksort(arr) {
+    arr.len <= 1 && return arr;
+    var p = arr.pop_rand;
+
+    arr.dump.say;
+
+    var le = arr.grep{ _ <= p};
+    var gt = arr.grep{ _ >  p};
+
+    var forks = [
+        {quicksort(le)}.fork,
+        {quicksort(gt)}.fork,
+    ];
+
+    forks[0].get + [p] + forks[1].get;
+}
+
+quicksort(1..10 shuffle).dump.say;

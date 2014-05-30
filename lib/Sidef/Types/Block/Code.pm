@@ -188,6 +188,45 @@ package Sidef::Types::Block::Code {
         Sidef::Types::Block::Switch->new($self->run);
     }
 
+    sub fork {
+        my ($self) = @_;
+
+        require Data::Dump;
+        require File::Temp;
+
+        my $code = Data::Dump::pp($self);
+        my $lib  = Data::Dump::pp(@INC);
+
+        my ($fh,   $filename) = File::Temp::tempfile(SUFFIX => '.frk');
+        my (undef, $result)   = File::Temp::tempfile(SUFFIX => '.rst');
+
+        my $req = 'use Math::BigFloat;';
+        foreach my $type (qw(Fast Int Rat)) {
+            if (exists $INC{"Sidef/Types/Number/Number$type.pm"}) {
+                $req = "require Sidef::Types::Number::Number$type;";
+                last;
+            }
+        }
+
+        print {$fh} <<"CODE";
+use lib $lib;
+require Sidef::Init;
+require Data::Dump;
+$req
+open my \$fh, '>', q($result);
+print {\$fh} scalar Data::Dump::pp($code->run);
+close \$fh;
+CODE
+        close $fh;
+
+        require Sidef::Types::Block::Fork;
+        my $fork = Sidef::Types::Block::Fork->new(file   => $filename,
+                                                  result => $result,);
+
+        system("$^X \Q$filename\E &");
+        $fork;
+    }
+
     sub for {
         my ($self, $arg, @rest) = @_;
 

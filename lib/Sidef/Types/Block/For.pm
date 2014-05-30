@@ -16,4 +16,6 @@ package Sidef::Types::Block::For {
         my ($self, $code) = @_;
         $code->for(@{$self->{arg}});
     }
-}
+};
+
+1
