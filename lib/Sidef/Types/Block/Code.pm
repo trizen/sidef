@@ -155,22 +155,14 @@ package Sidef::Types::Block::Code {
 
     sub call {
         my ($self, @args) = @_;
-
-        my $result;
         $self->init_block_vars(@args);
 
-        my $obj = $self->run;
-        if (ref $obj eq 'Sidef::Types::Block::Return') {
-            $result = $obj->{obj};
-        }
-        elsif (ref $obj eq 'Sidef::Variable::Variable') {
-            $result = $obj->get_value;
-        }
-        else {
-            $result = $obj;
+        my $result = $self->run;
+        if (ref($result) eq 'Sidef::Types::Block::Return') {
+            $result = $result->{obj};
         }
 
-        return $result;
+        $result;
     }
 
     sub if {
