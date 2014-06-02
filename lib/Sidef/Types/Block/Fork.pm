@@ -1,7 +1,6 @@
 package Sidef::Types::Block::Fork {
 
     use 5.014;
-    use Time::HiRes qw(sleep);
 
     sub new {
         my (undef, %opts) = @_;
@@ -11,9 +10,8 @@ package Sidef::Types::Block::Fork {
     sub get {
         my ($self) = @_;
 
-        while (-z $self->{result}) {
-            sleep 0.01;
-        }
+        # Wait for the process to finish
+        waitpid($self->{pid}, 0);
 
         my $ref = do($self->{result});
         unlink $self->{file};

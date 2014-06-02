@@ -215,7 +215,15 @@ CODE
         my $fork = Sidef::Types::Block::Fork->new(file   => $filename,
                                                   result => $result,);
 
-        system("$^X \Q$filename\E &");
+        my $pid;
+        {
+            $pid = fork() // die "[FATAL ERROR]: cannot fork";
+            if ($pid == 0) {
+                exec $^X, $filename;
+            }
+        }
+
+        $fork->{pid} = $pid;
         $fork;
     }
 
