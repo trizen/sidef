@@ -10,17 +10,15 @@ package Sidef::Types::Block::Fork {
     sub get {
         my ($self) = @_;
 
+        exists($self->{result})
+          or return;
+
         # Wait for the process to finish
         waitpid($self->{pid}, 0);
 
         my $ref = do($self->{result});
-        unlink $self->{file};
+        unlink(delete $self->{result});
         $ref;
-    }
-
-    sub unlink {
-        my ($self) = @_;
-        Sidef::Types::Bool::Bool->new(unlink $self->{result});
     }
 };
 

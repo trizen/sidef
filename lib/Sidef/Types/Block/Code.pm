@@ -186,40 +186,18 @@ package Sidef::Types::Block::Code {
         require Data::Dump;
         require File::Temp;
 
-        my $code = Data::Dump::pp($self);
-        my $lib  = Data::Dump::pp(@INC);
-
-        my ($fh,   $filename) = File::Temp::tempfile(SUFFIX => '.frk');
-        my (undef, $result)   = File::Temp::tempfile(SUFFIX => '.rst');
-
-        my $req = 'use Math::BigFloat;';
-        foreach my $type (qw(Fast Int Rat)) {
-            if (exists $INC{"Sidef/Types/Number/Number$type.pm"}) {
-                $req = "require Sidef::Types::Number::Number$type;";
-                last;
-            }
-        }
-
-        print {$fh} <<"CODE";
-use lib $lib;
-require Sidef::Init;
-require Data::Dump;
-$req
-open my \$fh, '>', q($result);
-print {\$fh} scalar Data::Dump::pp($code->run);
-close \$fh;
-CODE
-        close $fh;
+        my ($fh, $result) = File::Temp::tempfile(SUFFIX => '.rst');
 
         require Sidef::Types::Block::Fork;
-        my $fork = Sidef::Types::Block::Fork->new(file   => $filename,
-                                                  result => $result,);
+        my $fork = Sidef::Types::Block::Fork->new(result => $result);
 
         my $pid;
         {
             $pid = fork() // die "[FATAL ERROR]: cannot fork";
             if ($pid == 0) {
-                exec $^X, $filename;
+                print {$fh} scalar Data::Dump::pp(scalar $self->run);
+                close $fh;
+                exit 0;
             }
         }
 
