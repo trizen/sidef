@@ -20,7 +20,7 @@ var moves = :(
                 'down'       => [+1, +0],
                 'down-left'  => [+1, -1],
                 'down-right' => [+1, +1],
-            );
+             )
 
 var directions = moves.keys;
 
@@ -30,29 +30,32 @@ func valid_move (row, col) {
         (row < 0) || (!(board.exists(row)))
      || (col < 0) || (!(board[row].exists(col)))
      ) {
-        return(false);
+        return false;
     }
 
-    return(true);
+    return true;
 }
 
 while (true) {
 
-    var map  = (Hash.new);
-    var seen = (Hash.new);
-    var dirs = (Array.new);
+    var map  = Hash.new;
+    var seen = Hash.new;
+    var dirs = Array.new;
+    var spos = Hash.new;
 
     var current_pos = [board.offset, 0];
     var current_num = board[current_pos[0]][current_pos[1]];
+
+    spos[current_pos.join(';')] = 1;
 
     {
         var dir = (
          map.exists(current_num)
           ? (map[current_num])
           : (
-            var d;
-            { d = directions[directions.len.rand.int] } do
-                while (map.values.contains(d));
+            var d = '';
+            { d = directions[directions.len.rand.int] }
+                do while (map.values.contains(d));
             d;
           )
         );
@@ -64,10 +67,10 @@ while (true) {
         valid_move(row, col) || break;
 
         dirs.push(
-                  :(
-                    'dir' => dir,
-                    'num' => current_num,
-                    'pos' => current_pos,
+                  Hash.new(
+                        'dir' => dir,
+                        'num' => current_num,
+                        'pos' => current_pos,
                    )
                 );
 
@@ -75,13 +78,17 @@ while (true) {
         current_pos = [row, col];
         current_num = board[current_pos[0]][current_pos[1]];
 
+        if (spos[current_pos.join(';')] := 0 ++ > 1) {
+            break;
+        }
+
         seen[current_num] := 0 ++;
 
         if (current_num == 0) {
 
             if (seen[board[current_pos[0] - pos[0]][current_pos[1] - pos[1]]] > 1) {
-                dirs.map {
-                    "Go %-40s (from num '%s')\n".printf(_["dir"], _["num"]);
+                dirs.each { |hash|
+                    "Go %-40s (from num '%s')\n".printf(hash[:dir], hash[:num]);
                 };
                 Sys.exit(0);
             }
@@ -89,5 +96,5 @@ while (true) {
             break;
         }
 
-    } * (board.offset);
+    } * (board.offset ** 2);
 }

@@ -1,0 +1,14 @@
+#!/usr/bin/ruby
+
+func rec_reverse(array, code) {
+    var len = array.len;
+
+    len == 0 && return;
+    len == 1 && return code.call(array[0]);
+
+    var chunks = array/2;
+    __FUNC__(chunks[1], code);
+    __FUNC__(chunks[0], code);
+}
+
+rec_reverse("fediS".split(1), {|c| say c});

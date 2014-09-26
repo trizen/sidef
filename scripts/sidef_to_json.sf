@@ -15,10 +15,6 @@ Hash.def_method('to_json', func (self) {
     '{ ' + self.pairs.map { .first.to_json + ' : ' + .second.to_json }.join(', ') + ' }'
 });
 
-Pair.def_method('to_json', func (self) {
-    self.to_hash.to_json
-});
-
 Sidef.def_method('to_json', func (self) {
     self.is_defined ? (self.respond_to('dump') ? self.dump : return) : 'null';
 });
@@ -31,7 +27,6 @@ var hash = Hash.new(
                  'null'  => nil,
                  'array' => [["\t"]],
                ),
-    'pair'  => Pair.new('first', 'second'),
 );
 
 say '==> Sidef';

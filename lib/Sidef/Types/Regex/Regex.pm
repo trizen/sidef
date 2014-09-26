@@ -1,6 +1,7 @@
 package Sidef::Types::Regex::Regex {
 
     use 5.014;
+    use re 'eval';
 
     our @ISA = qw(
       Sidef
@@ -8,30 +9,25 @@ package Sidef::Types::Regex::Regex {
       );
 
     sub new {
-        my (undef, $regex, $mod) = @_;
+        my (undef, $regex, $mode, $parser) = @_;
 
-        if (ref($mod) eq 'Sidef::Types::String::String') {
-            $mod = $$mod;
+        if (ref($mode) eq 'Sidef::Types::String::String') {
+            $mode = $mode->get_value;
         }
 
-        my $global_mode = 0;
-        if (defined($mod)) {
-            if (index($mod, 'g') != -1) {
-                $mod =~ tr/g//d;
-                $global_mode = 1;
-            }
+        my $global_mode = defined($mode) && $mode =~ tr/g//d;
+
+        if (not defined $mode or $mode eq '') {
+            $mode = q{^};
         }
 
-        if (not defined $mod or $mod eq '') {
-            $mod = q{^};
-        }
-
-        my $str_re = qr{(?$mod:$regex)};
+        my $compiled_re = qr{(?$mode:$regex)};
 
         bless {
-               regex  => $str_re,
+               regex  => $compiled_re,
                global => $global_mode,
                pos    => 0,
+               parser => $parser,
               },
           __PACKAGE__;
     }
@@ -53,9 +49,10 @@ package Sidef::Types::Regex::Regex {
 
         require Sidef::Types::Regex::Matches;
         Sidef::Types::Regex::Matches->new(
-                                          obj  => $object,
-                                          self => $self,
-                                          pos  => defined($pos) ? $self->_is_number($pos) ? $$pos : return : undef,
+                                          obj    => $object,
+                                          self   => $self,
+                                          parser => $self->{parser},
+                                          pos    => defined($pos) ? $self->_is_number($pos) ? $$pos : return : undef,
                                          );
     }
 
@@ -73,4 +70,7 @@ package Sidef::Types::Regex::Regex {
         my ($self) = @_;
         Sidef::Types::String::String->new('/' . $self->{regex} =~ s{/}{\\/}gr . '/');
     }
-}
+
+};
+
+1

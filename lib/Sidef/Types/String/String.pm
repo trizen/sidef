@@ -76,7 +76,8 @@ package Sidef::Types::String::String {
 
     sub ne {
         my ($self, $string) = @_;
-        $self->_is_string($string, 1, 1) || return (Sidef::Types::Bool::Bool->true);
+        $self->_is_string($string, 1, 1)
+          || return (Sidef::Types::Bool::Bool->true);
         Sidef::Types::Bool::Bool->new($$self ne $$string);
     }
 
@@ -136,6 +137,11 @@ package Sidef::Types::String::String {
         $self->new($$self & $$str);
     }
 
+    sub not {
+        my ($self) = @_;
+        $self->new(~$$self);
+    }
+
     sub times {
         my ($self, $num) = @_;
         $self->_is_number($num) || return;
@@ -162,7 +168,8 @@ package Sidef::Types::String::String {
 
     sub equals {
         my ($self, $string) = @_;
-        $self->_is_string($string, 1, 1) || return (Sidef::Types::Bool::Bool->false);
+        $self->_is_string($string, 1, 1)
+          || return (Sidef::Types::Bool::Bool->false);
         Sidef::Types::Bool::Bool->new($$self eq $$string);
     }
 
@@ -263,20 +270,11 @@ package Sidef::Types::String::String {
 
         $self->_is_number($offs) || return;
 
-        my @str = CORE::split(//, $$self);
-        my $str_len = $#str;
-
-        $offs = $$offs;
-
-        if (defined $len) {
-            $self->_is_number($len) || return;
-            $len = $$len;
-        }
-
-        $offs = 1 + $str_len + $offs if $offs < 0;
-        $len = defined $len ? $len < 0 ? $str_len + $len : $offs + $len - 1 : $str_len;
-
-        __PACKAGE__->new(CORE::join('', grep { defined } @str[$offs .. $len]));
+        __PACKAGE__->new(
+                         defined($len)
+                         ? CORE::substr($$self, $$offs, $$len)
+                         : CORE::substr($$self, $$offs)
+                        );
     }
 
     *ft        = \&substr;
@@ -285,19 +283,13 @@ package Sidef::Types::String::String {
     sub insert {
         my ($self, $string, $pos, $len) = @_;
 
-        ($self->_is_string($string) && $self->_is_number($pos))
-          || return;
+        $self->_is_string($string) || return;
+        $self->_is_number($pos)    || return;
 
-        if (defined $len) {
-            $self->_is_number($len) || return;
-        }
-        else {
-            $len = Sidef::Types::Number::Number->new(0);
-        }
+        $len = defined($len) ? $self->_is_number($len) ? $$len : (return) : 0;
 
-        my $new_str = $self->new($$self);
-        CORE::substr($$new_str, $$pos, $$len, $$string);
-        return $new_str;
+        CORE::substr(my $copy_str = $$self, $$pos, $len, $$string);
+        __PACKAGE__->new($copy_str);
     }
 
     sub join {
@@ -369,6 +361,11 @@ package Sidef::Types::String::String {
 
     sub sprintf {
         my ($self, @arguments) = @_;
+
+        if (@arguments == 1 and ref($arguments[0]) eq 'Sidef::Types::Array::Array') {
+            @arguments = map { $_->get_value } @{$arguments[0]};
+        }
+
         __PACKAGE__->new(CORE::sprintf $$self, @arguments);
     }
 
@@ -386,7 +383,7 @@ package Sidef::Types::String::String {
             }
         }
 
-        return $regex->get_value;
+        $regex->get_value;
     }
 
     sub sub {
@@ -462,20 +459,30 @@ package Sidef::Types::String::String {
         __PACKAGE__->new(CORE::quotemeta($$self));
     }
 
+    sub scan {
+        my ($self, $regex) = @_;
+        $self->_is_regex($regex) || return;
+        Sidef::Types::Array::Array->new(map { Sidef::Types::String::String->new($_) } $$self =~ /$regex->{regex}/g);
+    }
+
     sub split {
         my ($self, $sep, $size) = @_;
 
-        $size = defined($size) && ($self->_is_number($size) || return) ? $$size : 0;
+        $size =
+          defined($size) && ($self->_is_number($size) || return) ? $$size : 0;
 
         if (ref($sep) eq '') {
-            return Sidef::Types::Array::Array->new(map { __PACKAGE__->new($_) } split(' ', $$self, $size));
+            return
+              Sidef::Types::Array::Array->new(map { __PACKAGE__->new($_) }
+                                                split(' ', $$self, $size));
         }
         elsif ($self->_is_number($sep, 1, 1)) {
             return Sidef::Types::Array::Array->new(map { __PACKAGE__->new($_) } unpack "(a$$sep)*", $$self);
         }
 
         $sep = _string_or_regex($sep);
-        Sidef::Types::Array::Array->new(map { __PACKAGE__->new($_) } split(/$sep/, $$self, $size));
+        Sidef::Types::Array::Array->new(map { __PACKAGE__->new($_) }
+                                          split(/$sep/, $$self, $size));
     }
 
     sub sort {
@@ -519,10 +526,12 @@ package Sidef::Types::String::String {
         foreach my $char (CORE::split(//, $$self)) {
             $var_ref->set_value(__PACKAGE__->new($char));
             if (defined(my $res = $code->_run_code)) {
+                $code->pop_stack();
                 return $res;
             }
         }
 
+        $code->pop_stack();
         $self;
     }
 
@@ -569,7 +578,7 @@ package Sidef::Types::String::String {
         my ($self, $orig, $repl) = @_;
 
         my %map;
-        if (not defined($repl) and defined($orig)) {    # assume an array of pairs
+        if (CORE::not defined($repl) and defined($orig)) {    # assume an array of pairs
             $self->_is_array($orig) || return;
             foreach my $pair (map { $_->get_value } @{$orig}) {
                 $self->_is_pair($pair) || return;
@@ -587,7 +596,8 @@ package Sidef::Types::String::String {
             @map{@{$orig}} = (map { $_->get_value } @{$repl});
         }
 
-        my $tries = CORE::join('|', map { CORE::quotemeta($_) } sort { length($b) <=> length($a) } CORE::keys(%map));
+        my $tries = CORE::join('|', map { CORE::quotemeta($_) }
+                                 sort { length($b) <=> length($a) } CORE::keys(%map));
         $self->new($$self =~ s{($tries)}{$map{$1}}gr);
     }
 
@@ -597,23 +607,33 @@ package Sidef::Types::String::String {
         $self->_is_array($orig, 1, 1) && return $self->trans($orig, $repl);
         ($self->_is_string($orig) && $self->_is_string($repl)) || return;
         $self->new(
-                   eval qq{"\Q$$self\E"=~tr/} . $$orig =~ s{([/\\])}{\\$1}gr . "/" . $$repl =~
-                     s{([/\\])}{\\$1}gr . "/r" . (defined($modes) ? $self->_is_string($modes) ? $$modes : return : ''));
+                       eval qq{"\Q$$self\E"=~tr/}
+                     . $$orig =~ s{([/\\])}{\\$1}gr . "/"
+                     . $$repl =~ s{([/\\])}{\\$1}gr . "/r"
+                     . (
+                          defined($modes)
+                        ? $self->_is_string($modes)
+                              ? $$modes
+                              : return
+                        : ''
+                       )
+                  );
     }
 
     *tr = \&translit;
 
     sub unpack {
-        my ($self, $format) = @_;
-        $self->_is_string($format) || return;
-        my @parts = CORE::unpack($$format, $$self);
-        $#parts == 0 ? __PACKAGE__->new($parts[0]) : Sidef::Types::Array::Array->new(map { __PACKAGE__->new($_) } @parts);
+        my ($self, $argv) = @_;
+        $self->_is_string($argv) || return;
+        my @parts = CORE::unpack($$self, $$argv);
+        $#parts == 0
+          ? __PACKAGE__->new($parts[0])
+          : Sidef::Types::Array::Array->new(map { __PACKAGE__->new($_) } @parts);
     }
 
     sub pack {
-        my ($self, $format) = @_;
-        $self->_is_string($format) || return;
-        __PACKAGE__->new(CORE::pack($$format, $$self));
+        my ($self, @list) = @_;
+        __PACKAGE__->new(CORE::pack($$self, @list));
     }
 
     sub length {
@@ -622,53 +642,6 @@ package Sidef::Types::String::String {
     }
 
     *len = \&length;
-
-    sub parse {
-        my ($self, $code) = @_;
-
-        my @warnings;
-        local $SIG{__WARN__} = sub { push @warnings, __PACKAGE__->new($_[0]) };
-
-        my $parser = Sidef::Parser->new(script_name => '/eval/');
-        my $struct = eval { $parser->parse_script(code => $$self) } // {};
-
-        if ($@ || @warnings) {
-            my $error = $@;
-
-            if (defined($code)) {
-                $self->_is_code($code) || return;
-                $code->call(Sidef::Types::Array::Array->new(@warnings), __PACKAGE__->new($error));
-            }
-
-            return if $error;
-        }
-
-        Sidef::Types::Block::Code->new($struct);
-    }
-
-    sub eval {
-        my ($self, $code) = @_;
-
-        my $block = $self->parse($code) // return;
-
-        my @warnings;
-        local $SIG{__WARN__} = sub { push @warnings, __PACKAGE__->new($_[0]) };
-
-        my $result = eval { $block->run };
-
-        if ($@ || @warnings) {
-            my $error = $@;
-
-            if (defined($code)) {
-                $self->_is_code($code) || return;
-                $code->call(Sidef::Types::Array::Array->new(@warnings), __PACKAGE__->new($error));
-            }
-
-            return if $error;
-        }
-
-        $result;
-    }
 
     sub contains {
         my ($self, $string, $start_pos) = @_;
@@ -801,23 +774,22 @@ package Sidef::Types::String::String {
         my @inline_expressions;
         my @chars = split(//, $str);
 
-        ## Known bug: "hell\Uo" returns "hello" instead of "hellO"
-        ##                 /\
-        ##                  `--  in this particular case, "\u" should be used instead!
-
         my $spec = 'E';
-        for (my $i = 0 ; $i <= $#chars - 1 ; $i++) {
+        for (my $i = 0 ; $i <= $#chars ; $i++) {
 
-            if ($chars[$i] eq '\\') {
+            if ($chars[$i] eq '\\' and exists $chars[$i + 1]) {
                 my $char = $chars[$i + 1];
 
                 if (exists $esc->{$char}) {
                     splice(@chars, $i--, 2, $esc->{$char});
+                    next;
                 }
-                elsif ($char eq 'L' or $char eq 'U' or $char eq 'E') {
+                elsif (   $char eq 'L'
+                       or $char eq 'U'
+                       or $char eq 'E'
+                       or $char eq 'Q') {
                     $spec = $char;
-                    splice(@chars, $i, 2);
-                    $char ne 'Q' && ($i--);
+                    splice(@chars, $i--, 2);
                     next;
                 }
                 elsif ($char eq 'l') {
@@ -838,8 +810,61 @@ package Sidef::Types::String::String {
                         splice(@chars, $i, 2);
                     }
                 }
+                elsif ($char eq 'N') {
+                    if (exists $chars[$i + 2] and $chars[$i + 2] eq '{') {
+                        my $str = CORE::join('', @chars[$i + 2 .. $#chars]);
+                        if ($str =~ /^\{(.*?)\}/) {
+                            require charnames;
+                            my $char = charnames::string_vianame($1);
+                            if (defined $char) {
+                                splice(@chars, $i--, 2 + $+[0], $char);
+                                next;
+                            }
+                        }
+                        else {
+                            CORE::warn("Missing right brace on \\N{, within string!\n");
+                        }
+                    }
+                    else {
+                        CORE::warn("Missing braces on \\N{}, within string!\n");
+                    }
+                    splice(@chars, $i, 1);
+                }
+                elsif ($char eq 'x') {
+                    if (exists $chars[$i + 2]) {
+                        my $str = CORE::join('', @chars[$i + 2 .. $#chars]);
+                        if ($str =~ /^\{([[:xdigit:]]+)\}/) {
+                            splice(@chars, $i, 2 + $+[0], chr(hex($1)));
+                            next;
+                        }
+                        elsif ($str =~ /^([[:xdigit:]]{1,2})/) {
+                            splice(@chars, $i, 2 + $+[0], chr(hex($1)));
+                            next;
+                        }
+                    }
+                    splice(@chars, $i, 1);
+                }
+                elsif ($char eq 'o') {
+                    if (exists $chars[$i + 2] and $chars[$i + 2] eq '{') {
+                        my $str = CORE::join('', @chars[$i + 2 .. $#chars]);
+                        if ($str =~ /^\{(.*?)\}/) {
+                            splice(@chars, $i--, 2 + $+[0], chr(oct($1)));
+                            next;
+                        }
+                        else {
+                            CORE::warn("Missing right brace on \\o{, within string!\n");
+                        }
+                    }
+                    else {
+                        CORE::warn("Missing braces on \\o{}, within string!\n");
+                    }
+                    splice(@chars, $i, 1);
+                }
                 elsif ($char =~ /^[0-7]/) {
-                    splice(@chars, $i, 2, chr($char));
+                    my $str = CORE::join('', @chars[$i + 1 .. $#chars]);
+                    if ($str =~ /^(0[0-7]{1,2}|[0-7]{1,2})/) {
+                        splice @chars, $i, 1 + $+[0], chr(oct($1));
+                    }
                 }
                 elsif ($char eq 'd') {
                     splice(@chars, $i - 1, 3);
@@ -849,7 +874,7 @@ package Sidef::Types::String::String {
                         splice(@chars, $i, 3, chr((CORE::ord(CORE::uc($chars[$i + 2])) + 64) % 128));
                     }
                     else {
-                        CORE::warn "Missing control char name in \\c, within string\n";
+                        CORE::warn "[WARN] Missing control char name in \\c, within string\n";
                         splice(@chars, $i, 2);
                     }
                 }
@@ -857,7 +882,9 @@ package Sidef::Types::String::String {
                     splice(@chars, $i, 1);
                 }
             }
-            elsif ($chars[$i] eq '#' and exists $chars[$i + 1] and $chars[$i + 1] eq '{') {
+            elsif (    $chars[$i] eq '#'
+                   and exists $chars[$i + 1]
+                   and $chars[$i + 1] eq '{') {
                 if (ref $parser eq 'Sidef::Parser') {
                     my $code = CORE::join('', @chars[$i + 1 .. $#chars]);
                     my ($block, $pos) = $parser->parse_block(code => $code);
@@ -871,13 +898,14 @@ package Sidef::Types::String::String {
             }
 
             if ($spec ne 'E') {
-                foreach my $j ($i, ($i == $#chars - 1) ? ($i + 1) : ()) {
-                    if ($spec eq 'U') {
-                        $chars[$j] = CORE::uc($chars[$j]);
-                    }
-                    elsif ($spec eq 'L') {
-                        $chars[$j] = CORE::lc($chars[$j]);
-                    }
+                if ($spec eq 'U') {
+                    $chars[$i] = CORE::uc($chars[$i]);
+                }
+                elsif ($spec eq 'L') {
+                    $chars[$i] = CORE::lc($chars[$i]);
+                }
+                elsif ($spec eq 'Q') {
+                    $chars[$i] = CORE::quotemeta($chars[$i]);
                 }
             }
         }
@@ -897,10 +925,26 @@ package Sidef::Types::String::String {
             my $string = '';
             foreach my $char (@chars) {
                 if (ref($char) eq 'Sidef::Types::Block::Code') {
-                    my $block = {$parser->{class} => [{self => $char, call => [{method => 'run'}, {method => 'to_s'}]}]};
+                    my $block = {
+                                 $parser->{class} => [
+                                                      {
+                                                       self => $char,
+                                                       call => [{method => 'run'}, {method => 'to_s'}]
+                                                      }
+                                                     ]
+                                };
 
-                    if (not defined $expr) {
-                        $expr = {$parser->{class} => [{self => $string eq '' ? $block : $self->new($string), call => []}]};
+                    if (CORE::not defined $expr) {
+                        $expr = {
+                                 $parser->{class} => [
+                                                      {
+                                                       self => $string eq ''
+                                                       ? $block
+                                                       : $self->new($string),
+                                                       call => []
+                                                      }
+                                                     ]
+                                };
 
                         next if $string eq '';
                         $append_arg->($block);
@@ -961,6 +1005,16 @@ package Sidef::Types::String::String {
 
     *pairWith = \&pair_with;
 
+    sub inspect {
+        my ($self) = @_;
+
+        require Data::Dump;
+        local $Data::Dump::TRY_BASE64 = 0;
+
+        my $copy = $$self;
+        $self->new(Data::Dump::pp($copy));
+    }
+
     sub dump {
         my ($self) = @_;
         __PACKAGE__->new(q{'} . $$self =~ s{'}{\\'}gr . q{'});
@@ -997,6 +1051,7 @@ package Sidef::Types::String::String {
         *{__PACKAGE__ . '::' . '>>'}  = \&shift_right;
         *{__PACKAGE__ . '::' . '%'}   = \&sprintf;
         *{__PACKAGE__ . '::' . ':'}   = \&pair_with;
+        *{__PACKAGE__ . '::' . '~'}   = \&not;
     }
 };
 

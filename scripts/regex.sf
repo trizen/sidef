@@ -26,11 +26,9 @@ cap.matched
     || "Named captures failed!\n".die;
 
 var hash = cap.ncap;
-[
-    hash["name"],
-    hash["address"],
-]
--> join(" -- ").say;
+[hash["name"], hash["address"]]
+    == ['John', 'Wall Street no. 4']
+        || "ncap error".die;
 
 #
 ## Other tests

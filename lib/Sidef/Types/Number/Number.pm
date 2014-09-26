@@ -140,6 +140,8 @@ package Sidef::Types::Number::Number {
         $self->new($$self * $$num);
     }
 
+    *x = \&multiply;
+
     sub div {
         my ($self, $num) = @_;
         $self->_is_number($num) || return;
@@ -157,7 +159,7 @@ package Sidef::Types::Number::Number {
         $self->new($$self->copy->bfac);
     }
 
-    *fac = \&factorial;
+    *fact = \&factorial;
 
     sub to {
         my ($self, $num, $step) = @_;
@@ -202,7 +204,7 @@ package Sidef::Types::Number::Number {
     sub root {
         my ($self, $n) = @_;
         $self->_is_number($n) || return;
-        $self->new($$self->copy->broot($n));
+        $self->new($$self->copy->broot($$n));
     }
 
     sub abs {
@@ -247,7 +249,15 @@ package Sidef::Types::Number::Number {
 
     sub log {
         my ($self, $base) = @_;
-        $self->new($$self->copy->blog(defined($base) ? $self->_is_number($base) ? ($$base) : return : ()));
+        $self->new(
+                   $$self->copy->blog(
+                                        defined($base)
+                                      ? $self->_is_number($base)
+                                            ? ($$base)
+                                            : return
+                                      : ()
+                                     )
+                  );
     }
 
     sub log10 {
@@ -376,11 +386,11 @@ package Sidef::Types::Number::Number {
 
     sub rand {
         my ($self, $max) = @_;
-
-        my $min = $$self;
-        $max = ref($max) ? $$max : do { $min = 0; $$self };
-
-        $self->new($min + CORE::rand($max - $min));
+        defined($max)
+          ? $self->_is_number($max)
+              ? $self->new($$self + CORE::rand($$max - $$self))
+              : ()
+          : $self->new(CORE::rand($$self));
     }
 
     sub ceil {
@@ -395,12 +405,28 @@ package Sidef::Types::Number::Number {
 
     sub round {
         my ($self, $places) = @_;
-        $self->new($$self->copy->bround(defined($places) ? ($self->_is_number($places)) ? ($$places) : (return) : ()));
+        $self->new(
+                   $$self->copy->bround(
+                                          defined($places)
+                                        ? ($self->_is_number($places))
+                                              ? ($$places)
+                                              : (return)
+                                        : ()
+                                       )
+                  );
     }
 
     sub roundf {
         my ($self, $places) = @_;
-        $self->new($$self->copy->bfround(defined($places) ? ($self->_is_number($places)) ? ($$places) : (return) : ()));
+        $self->new(
+                   $$self->copy->bfround(
+                                           defined($places)
+                                         ? ($self->_is_number($places))
+                                               ? ($$places)
+                                               : (return)
+                                         : ()
+                                        )
+                  );
     }
 
     *fround = \&roundf;

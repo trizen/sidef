@@ -6,6 +6,7 @@ lib/Sidef.pod
 lib/Sidef/Args/Args.pm
 lib/Sidef/Convert/Convert.pm
 lib/Sidef/Convert/Convert.pod
+lib/Sidef/Eval/Eval.pm
 lib/Sidef/Exec.pm
 lib/Sidef/Init.pm
 lib/Sidef/Math/Math.pm
@@ -41,6 +42,7 @@ lib/Sidef/Types/Block/Do.pm
 lib/Sidef/Types/Block/Do.pod
 lib/Sidef/Types/Block/For.pm
 lib/Sidef/Types/Block/For.pod
+lib/Sidef/Types/Block/Fork.pm
 lib/Sidef/Types/Block/Given.pm
 lib/Sidef/Types/Block/Given.pod
 lib/Sidef/Types/Block/Next.pm
@@ -112,6 +114,7 @@ lib/Sidef/Variable/Magic.pod
 lib/Sidef/Variable/My.pm
 lib/Sidef/Variable/Ref.pm
 lib/Sidef/Variable/Ref.pod
+lib/Sidef/Variable/Struct.pm
 lib/Sidef/Variable/Variable.pm
 lib/Sidef/Variable/Variable.pod
 Makefile.PL
@@ -151,6 +154,7 @@ scripts/AUTOLOAD_and_CHECK_methods.sf
 scripts/averages_mode.sf
 scripts/avg_mode.sf
 scripts/balanced_brackets.sf
+scripts/base64_decoder.sf
 scripts/benford_s_law.sf
 scripts/best_shuffle.sf
 scripts/best_shuffle_alg_permute.sf
@@ -167,6 +171,7 @@ scripts/catalan_numbers.sf
 scripts/catalan_numbers_recursive.sf
 scripts/class_concept.sf
 scripts/class_config.sf
+scripts/class_inheritance.sf
 scripts/classes.sf
 scripts/classes_and_objects.sf
 scripts/cnp.sf
@@ -177,6 +182,7 @@ scripts/combinations_with_repetitions.sf
 scripts/cosmic_calendar.sf
 scripts/count_in_factors.sf
 scripts/cramers_method.sf
+scripts/cutting_edge_features.sf
 scripts/cyclic_numbers.sf
 scripts/DATA_handle.sf
 scripts/define_keyword.sf
@@ -203,6 +209,7 @@ scripts/global_regex_matching.sf
 scripts/group_precedence.sf
 scripts/hailstone.sf
 scripts/hash_autovivification.sf
+scripts/hash_default_value.sf
 scripts/hash_from_array.sf
 scripts/hash_grep.sf
 scripts/hash_join.sf
@@ -230,6 +237,7 @@ scripts/levenshtein_distance_cached.sf
 scripts/levenshtein_recursive.sf
 scripts/Lingua/RO/Numbers.sm
 scripts/lingua_ro.sf
+scripts/lingua_ro_numbers.sf
 scripts/logic.sf
 scripts/long_division.sf
 scripts/look_and_say_seq.sf
@@ -245,6 +253,7 @@ scripts/metaprogramming_method_definition.sf
 scripts/method_expressions.sf
 scripts/Module/Fact.sm
 scripts/Module/Fib.sm
+scripts/module_definition.sf
 scripts/module_loading.sf
 scripts/multi_file_edit.sf
 scripts/multi_loop_break.sf
@@ -262,13 +271,19 @@ scripts/pi_machin_like_formula.sf
 scripts/power_numbers.sf
 scripts/pythagorean_means.sf
 scripts/quicksort.sf
+scripts/quicksort_in_parallel.sf
 scripts/quoted_strings.sf
 scripts/rand.sf
+scripts/range_expansion.sf
+'scripts/Real-world programs/Any to MP3/sany2mp3.sf'
+'scripts/Real-world programs/ASCII Planes/asciiplanes.sf'
 'scripts/Real-world programs/Converter/unit_converter.sf'
+'scripts/Real-world programs/Factorial Approximations/factorial_approximations.sf'
 'scripts/Real-world programs/Gift match/giftmatch.sf'
 'scripts/Real-world programs/Gift match/input.txt'
 'scripts/Real-world programs/Gift match/output.txt'
 'scripts/Real-world programs/Universe size/baby_size_of_the_universe.sf'
+scripts/rec_reverse.sf
 scripts/recursion.sf
 scripts/regex.sf
 scripts/regex_bool.sf
@@ -289,14 +304,19 @@ scripts/short_circuit_evaluation.sf
 scripts/sidef_to_json.sf
 scripts/sierpinski_carpet.sf
 scripts/sierpinski_diamond.sf
+scripts/sierpinski_penta.sf
 scripts/sierpinski_sidef.sf
 scripts/sierpinski_triangle.sf
 scripts/sierpinski_triangle_90.sf
 scripts/sierpinski_x.sf
+scripts/smart_match_operator.sf
+scripts/smart_word_wrap.sf
 scripts/special_methods.sf
 scripts/split_combine.sf
 scripts/static_const_lazy_init.sf
 scripts/stdin.sf
+scripts/string_escapes.sf
+scripts/struct_definition.sf
 scripts/sum_of_squares.sf
 scripts/switch.sf
 scripts/sylvesters_sequence.sf
@@ -305,6 +325,7 @@ scripts/tennis_tournament.sf
 scripts/test_all.pl
 scripts/tk_library.sf
 scripts/token_recursive.sf
+scripts/trizen's_pair_numbers.sf
 scripts/two_dimensional_array.sf
 scripts/unexecuted_arguments.sf
 scripts/unicode.sf
@@ -312,15 +333,21 @@ scripts/unicode_support.sf
 scripts/var_ref.sf
 scripts/var_scoping.sf
 scripts/while_loop.sf
+scripts/word_roots.sf
 scripts/zig-zag_matrix.sf
 t/00-load.t
 t/01-parser.t
 t/manifest.t
 t/pod.t
+utils/auto_perltidy.sh
+utils/bak_cleaner.sh
 utils/deparser.pl
+utils/Experiments/Range.pm
+utils/find_invalid_types.pl
 utils/pod_generator.pl
 utils/regexp_grammars_parser.pl
 utils/Sidef/Tidy.pm
 utils/sidef_concept.pl
+utils/sidef_in_perl.pl
 utils/struct_optimizer.pl
 utils/tidy.pl

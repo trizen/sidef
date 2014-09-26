@@ -20,7 +20,7 @@ package Sidef::Types::Block::Code {
         sub {
             if (defined($a) || defined($b)) { push @_, $a, $b }
             elsif (defined($_)) { push @_, $_ }
-            $self->call(Sidef::Types::Array::Array->new(@_));
+            $self->call(@_);
         };
     }
 
@@ -59,18 +59,18 @@ package Sidef::Types::Block::Code {
             $var->set_value(Sidef::Types::Number::Number->new($i));
 
             if (defined(my $res = $self->_run_code)) {
+                $self->pop_stack();
                 return $res;
             }
         }
 
+        $self->pop_stack();
         $self;
     }
 
     sub to_hash {
         my ($self) = @_;
-        my @results = $exec->execute($self->{code});
-        shift @results;    # ignore the block private variable (_)
-        Sidef::Types::Hash::Hash->new(@results);
+        Sidef::Types::Hash::Hash->new($exec->execute($self->{code}));
     }
 
     *toHash = \&to_hash;
@@ -78,9 +78,7 @@ package Sidef::Types::Block::Code {
 
     sub to_array {
         my ($self) = @_;
-        my @results = $exec->execute($self->{code});
-        shift @results;    # ignore the block private variable (_)
-        Sidef::Types::Array::Array->new(@results);
+        Sidef::Types::Array::Array->new($exec->execute($self->{code}));
     }
 
     *toArray = \&to_array;
@@ -100,7 +98,7 @@ package Sidef::Types::Block::Code {
         my ($self) = @_;
         my @results = $exec->execute($self->{code});
         $self->pop_stack();
-        return $results[-1];
+        $results[-1];
     }
 
     sub exec {
@@ -118,33 +116,68 @@ package Sidef::Types::Block::Code {
             if (Sidef::Types::Block::Code->new($condition)->run) {
                 defined($old_self) && ($old_self->{did_while} //= 1);
                 my $res = $self->_run_code();
-                defined($res) && return (ref($res) eq __PACKAGE__ && defined($old_self) ? $old_self : $res);
+                if (defined($res)) {
+                    $self->pop_stack();
+                    return (ref($res) eq __PACKAGE__ && defined($old_self) ? $old_self : $res);
+                }
                 redo;
             }
         }
 
+        $self->pop_stack();
         $old_self // $self;
     }
 
     sub init_block_vars {
         my ($self, @args) = @_;
 
+        # varName => value
+        my %named_vars;
+
+        # Init the arguments
         my $last = $#{$self->{init_vars}};
         while (my ($i, $var) = each @{$self->{init_vars}}) {
-            $i == $last
-              ? $var->set_value(Sidef::Types::Array::Array->new(@args[$i .. $#args]))
-              : $var->set_value($args[$i]);
+            if (ref $args[$i] eq 'Sidef::Types::Array::Pair') {
+                $named_vars{$args[$i]->first->get_value} = $args[$i]->second->get_value;
+            }
+            else {
+                !$#{$var->{vars}} && exists($var->{vars}[0]{in_use}) or next;
+                $i == $last
+                  ? $var->set_value(Sidef::Types::Array::Array->new(@args[$i .. $#args]))
+                  : $var->set_value($args[$i]);
+            }
         }
 
-        return $last == 0 ? @{$self->{init_vars}} : @{$self->{init_vars}}[0 .. $last - 1];
+        # Set the named arguments
+        foreach my $key (keys %named_vars) {
+
+            my $found = 0;
+            foreach my $var (@{$self->{init_vars}}) {
+                if ($var->{vars}[0]{name} eq $key) {
+                    $var->set_value($named_vars{$key}->get_value);
+                    $found = 1;
+                    last;
+                }
+            }
+
+            if (not $found) {
+                warn "[WARN] No such named argument: '$key'\n";
+            }
+        }
+
+        $last == 0
+          ? @{$self->{init_vars}}
+          : @{$self->{init_vars}}[0 .. $last - 1];
     }
 
     sub pop_stack {
         my ($self) = @_;
 
         require List::Util;
-        my @stack_vars = grep { ref($_) eq 'Sidef::Variable::Variable' && exists $_->{stack} } @{$self->{vars}};
-        my $max_depth = List::Util::max(map { $#{$_->{stack}} } @stack_vars);
+        my @stack_vars =
+          grep { ref($_) eq 'Sidef::Variable::Variable' && exists $_->{stack} } @{$self->{vars}};
+        my $max_depth =
+          List::Util::max(map { $#{$_->{stack}} } @stack_vars);
 
         foreach my $var (@stack_vars) {
             if ($#{$var->{stack}} == $max_depth) {
@@ -224,7 +257,8 @@ package Sidef::Types::Block::Code {
                     }
 
                     my $expr = $arg->{$class}[2];
-                    my ($bool) = $exec->execute_expr($arg->{$class}[1], $class);
+                    my ($bool) =
+                      $exec->execute_expr($arg->{$class}[1], $class);
 
                     if ($bool) {
                         if (defined(my $res = $self->_run_code)) {

@@ -13,13 +13,16 @@ package Sidef::Variable::Init {
         my @results;
         foreach my $var (@{$self->{vars}}) {
 
+            exists $var->{in_use} or next;
+
             my $arg = shift @args;
             push @results, $arg;
 
             my $type = $var->{type};
 
             if ($type eq 'var') {
-                my $new_var = Sidef::Variable::Variable->new($var->{name}, $var->{type}, $arg // $var->{value});
+                my $new_var =
+                  Sidef::Variable::Variable->new(name => $var->{name}, type => $var->{type}, value => $arg // $var->{value});
                 push @{$var->{stack}}, $new_var;
             }
             elsif ($type eq 'static' or $type eq 'const') {

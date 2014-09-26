@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/ruby
 
 # Translation of: http://rosettacode.org/wiki/Align_columns#Go
 
@@ -35,7 +35,7 @@ class Formatter(input) {
             }
         }
 
-        return main::Format(textArr, widthArr);
+        return Format(textArr, widthArr);
     }
 }
 

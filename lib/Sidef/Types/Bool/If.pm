@@ -30,4 +30,6 @@ package Sidef::Types::Bool::If {
         $self->do($code);
     }
 
-}
+};
+
+1

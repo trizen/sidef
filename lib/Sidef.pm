@@ -5,15 +5,24 @@ package Sidef {
 
     {
         my %types = (
-                     bool    => {class => {'Sidef::Types::Bool::Bool'     => 1}},
-                     code    => {class => {'Sidef::Types::Block::Code'    => 1}},
-                     hash    => {class => {'Sidef::Types::Hash::Hash'     => 1}},
-                     number  => {class => {'Sidef::Types::Number::Number' => 1}, type => 'SCALAR'},
-                     var_ref => {class => {'Sidef::Variable::Ref'         => 1}},
-                     file    => {class => {'Sidef::Types::Glob::File'     => 1}, type => 'SCALAR'},
-                     dir     => {class => {'Sidef::Types::Glob::Dir'      => 1}, type => 'SCALAR'},
-                     regex   => {class => {'Sidef::Types::Regex::Regex'   => 1}},
-                     pair    => {class => {'Sidef::Types::Array::Pair'    => 1}, type => 'ARRAY'},
+                     bool   => {class => {'Sidef::Types::Bool::Bool'  => 1}},
+                     code   => {class => {'Sidef::Types::Block::Code' => 1}},
+                     hash   => {class => {'Sidef::Types::Hash::Hash'  => 1}},
+                     number => {
+                                class => {'Sidef::Types::Number::Number' => 1},
+                                type  => 'SCALAR'
+                               },
+                     var_ref => {class => {'Sidef::Variable::Ref' => 1}},
+                     file    => {
+                              class => {'Sidef::Types::Glob::File' => 1},
+                              type  => 'SCALAR'
+                             },
+                     dir   => {class => {'Sidef::Types::Glob::Dir'    => 1}, type => 'SCALAR'},
+                     regex => {class => {'Sidef::Types::Regex::Regex' => 1}},
+                     pair  => {
+                              class => {'Sidef::Types::Array::Pair' => 1},
+                              type  => 'ARRAY'
+                             },
                      string => {
                                 class => {
                                           'Sidef::Types::String::String' => 1,
@@ -48,19 +57,28 @@ package Sidef {
 
                         my $ref_obj = [caller(0)]->[0];
 
-                        warn sprintf("[WARN] %sbject '%s' expected an object of type '$type', but got '%s'!\n",
-                                     ($sub eq '__ANON__' ? 'O' : sprintf("The method '%s' from o", $sub)),
-                                     $ref_obj, ref($obj) || "an undefined object");
+                        warn sprintf(
+                                     "[WARN] %sbject '%s' expected an object of type '$type', but got '%s'!\n",
+                                     (
+                                      $sub eq '__ANON__'
+                                      ? 'O'
+                                      : sprintf("The method '%s' from o", $sub)
+                                     ),
+                                     $ref_obj,
+                                     ref($obj) || "an undefined object"
+                                    );
                     }
 
                     if (!$strict_obj) {
-                        if (defined $obj and exists $types{$type}{type} and $obj->isa($types{$type}{type})) {
+                        if (    defined $obj
+                            and exists $types{$type}{type}
+                            and $obj->isa($types{$type}{type})) {
                             return 1;
                         }
                     }
                 }
 
-                $dont_warn ? (return) : (die "[ERROR] Can't continue...\n");
+                $dont_warn ? () : (die "[ERROR] Can't continue...\n");
             };
         }
 
@@ -72,14 +90,16 @@ package Sidef {
                 my $call = $method->[0];
                 my $bool = $method->[1];
 
-                if (not defined($arg) and ref($self) eq 'Sidef::Types::Nil::Nil') {
+                if (not defined($arg)
+                    and ref($self) eq 'Sidef::Types::Nil::Nil') {
                     return Sidef::Types::Bool::Bool->new(!$bool);
                 }
 
                 ref($self) ne ref($arg)
                   and return Sidef::Types::Bool::Bool->new($bool);
 
-                if (not defined($arg) or ref($self) eq 'Sidef::Types::Nil::Nil') {
+                if (not defined($arg)
+                    or ref($self) eq 'Sidef::Types::Nil::Nil') {
                     return Sidef::Types::Bool::Bool->new(!$bool);
                 }
                 elsif (ref($self) eq 'Sidef::Types::Bool::Bool') {
@@ -113,6 +133,98 @@ package Sidef {
                   } keys %{ref($self) . '::'}
             );
         }
+
+        # Smart match operator
+        *{__PACKAGE__ . '::' . '~~'} = sub {
+            my ($first, $second) = @_;
+
+            my $f_type = ref($first);
+            my $s_type = ref($second);
+
+            # First is String
+            if ($f_type eq 'Sidef::Types::String::String') {
+
+                # String ~~ Array
+                if ($s_type eq 'Sidef::Types::Array::Array') {
+                    return $second->contains($first);
+                }
+
+                # String ~~ Hash
+                if ($s_type eq 'Sidef::Types::Hash::Hash') {
+                    return $second->exists($first);
+                }
+
+                # String ~~ String
+                if ($s_type eq 'Sidef::Types::String::String') {
+                    return $first->contains($second);
+                }
+            }
+
+            # First is Array
+            if ($f_type eq 'Sidef::Types::Array::Array') {
+
+                # Array ~~ Array
+                if ($s_type eq 'Sidef::Types::Array::Array') {
+                    return $first->contains_all($second);
+                }
+
+                # Array ~~ Regex
+                if ($s_type eq 'Sidef::Types::Regex::Regex') {
+                    return $second->match($first);
+                }
+
+                # Array ~~ Hash
+                if ($s_type eq 'Sidef::Types::Hash::Hash') {
+                    return $second->keys->contains_any($first);
+                }
+
+                # Array ~~ Any
+                return $first->contains($second);
+            }
+
+            # First is Hash
+            if ($f_type eq 'Sidef::Types::Hash::Hash') {
+
+                # Hash ~~ Array
+                if ($s_type eq 'Sidef::Types::Array::Array') {
+                    return $first->keys->contains_all($second);
+                }
+
+                # Hash ~~ Hash
+                if ($s_type eq 'Sidef::Types::Hash::Hash') {
+                    return $first->keys->contains_all($second->keys);
+                }
+
+                # Hash ~~ Any
+                return $first->exists($second);
+            }
+
+            # First is Regex
+            if ($f_type eq 'Sidef::Types::Regex::Regex') {
+
+                # Regex ~~ Array
+                if ($s_type eq 'Sidef::Types::Array::Array') {
+                    return $first->match($second);
+                }
+
+                # Regex ~~ Hash
+                if ($s_type eq 'Sidef::Types::Hash::Hash') {
+                    return $first->match($second->keys);
+                }
+
+                # Regex ~~ Any
+                return $first->match($second);
+            }
+
+            # Second is Array
+            if ($s_type eq 'Sidef::Types::Array::Array') {
+
+                # Any ~~ Array
+                return $second->contains($first);
+            }
+
+            Sidef::Types::Bool::Bool->false;
+        };
     }
 
     sub new {

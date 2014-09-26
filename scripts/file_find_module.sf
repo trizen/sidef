@@ -6,8 +6,8 @@ var spec = (require 'File::Spec');      # OO module
 var dir = spec.rel2abs(spec.curdir);
 
 f.find(
-    func (file) {
+    func(file) {
       var absname = f._var('name');
-      "%-40s%s\n".printf(file[0], absname);
+      "%-40s%s\n".printf(file, absname);
     } => dir
 );

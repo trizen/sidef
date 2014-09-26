@@ -124,7 +124,7 @@ package Sidef::Sys::Sys {
 
     sub println {
         my ($self, @args) = @_;
-        Sidef::Types::Bool::Bool->new(say @args);
+        Sidef::Types::Bool::Bool->new(CORE::say @args);
     }
 
     *say = \&println;
@@ -161,13 +161,13 @@ package Sidef::Sys::Sys {
         CORE::bless $obj, $class;
     }
 
+    sub select {
+        my ($self, $fh) = @_;
+        CORE::select(CORE::ref($fh) eq 'GLOB' ? $fh : $fh->get_value);
+    }
+
     sub system {
         my ($self, @args) = @_;
-
-        foreach my $cmd (@args) {
-            $self->_is_string($cmd) || return;
-        }
-
         Sidef::Types::Number::Number->new(CORE::system(@args));
     }
 

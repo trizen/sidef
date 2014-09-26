@@ -20,6 +20,8 @@ package Sidef::Types::Block::Fork {
         unlink(delete $self->{result});
         $ref;
     }
+
+    *wait = \&get;
 };
 
 1

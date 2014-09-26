@@ -28,12 +28,12 @@ compared to the age of the universe.
 
 EOF
 
-func output (value, type) {
+func output(value, type) {
     "\n=> In the cosmic scale, that happened about %.2f %s ago!\n\n".printf(value, type);
 }
 
 while (true) {
-    var value = Sys.scanln("How long ago? (any expression, in years): ").eval.toNum;
+    var value = eval(Sys.scanln("How long ago? (any expression, in years): ")).to_num;
 
     cosmic_year.each { |bit|
         value >= bit[0]

@@ -10,7 +10,7 @@ package Sidef::Types::Array::Array {
 
     sub new {
         my (undef, @items) = @_;
-        bless [map { Sidef::Variable::Variable->new('', 'var', $_) } @items], __PACKAGE__;
+        bless [map { Sidef::Variable::Variable->new(name => '', type => 'var', value => $_) } @items], __PACKAGE__;
     }
 
     sub get_value {
@@ -57,6 +57,30 @@ package Sidef::Types::Array::Array {
         $self->_is_number($num) || return;
         $self->new((map { $_->get_value } @{$self}) x $$num);
     }
+
+    sub divide {
+        my ($self, $num) = @_;
+        $self->_is_number($num) || return;
+
+        my @obj = map { $_->get_value } @{$self};
+
+        my $array = $self->new;
+        my $len   = @obj / $$num;
+
+        my $i   = 1;
+        my $pos = $len;
+        while (@obj) {
+            my $j = $pos - $i * int($len);
+            $pos -= $j if $j >= 1;
+            $array->push($self->new(splice @obj, 0, $len + $j));
+            $pos += $len;
+            $i++;
+        }
+
+        $array;
+    }
+
+    *div = \&divide;
 
     sub or {
         my ($self, $array) = @_;
@@ -279,8 +303,15 @@ package Sidef::Types::Array::Array {
     *minBy = \&min_by;
 
     sub last {
-        my ($self) = @_;
+        my ($self, $arg) = @_;
         $#{$self} >= 0 || return;
+
+        if (defined $arg) {
+            $self->_is_number($arg) || return;
+            my $from = @{$self} - $$arg;
+            return $self->new(map { $_->get_value } @{$self}[($from < 0 ? 0 : $from) .. $#{$self}]);
+        }
+
         $self->[-1];
     }
 
@@ -295,10 +326,16 @@ package Sidef::Types::Array::Array {
     }
 
     sub first {
-        my ($self, $block) = @_;
+        my ($self, $arg) = @_;
 
-        defined($block)
-          && return $self->find($block);
+        if (defined $arg) {
+            if (ref($arg) eq 'Sidef::Types::Block::Code') {
+                return return $self->find($arg);
+            }
+
+            $self->_is_number($arg) || return;
+            return $self->new(map { $_->get_value } @{$self}[0 .. $$arg - 1]);
+        }
 
         $self->[0];
     }
@@ -412,10 +449,12 @@ package Sidef::Types::Array::Array {
             }
 
             if (defined(my $res = $code->_run_code)) {
+                $code->pop_stack();
                 return $res;
             }
         }
 
+        $code->pop_stack();
         $self;
     }
 
@@ -465,8 +504,8 @@ package Sidef::Types::Array::Array {
         foreach my $item (@{$self}) {
             $var_ref->set_value(my $val = $item->get_value);
             my $key = $code->run;
-            exists($hash->{$key}) || $hash->append($key, Sidef::Types::Array::Array->new);
-            $hash->{$key}->get_value->append($val);
+            exists($hash->{data}{$key}) || $hash->append($key, Sidef::Types::Array::Array->new);
+            $hash->{data}{$key}->get_value->append($val);
         }
 
         $hash;
@@ -513,7 +552,8 @@ package Sidef::Types::Array::Array {
 
         for my $i (0 .. $#vars) {
             $self->_is_var_ref($vars[$i]) || return;
-            if (exists $self->[$i] and ref($self->[$i]) eq 'Sidef::Variable::Variable') {
+            if (exists $self->[$i]
+                and ref($self->[$i]) eq 'Sidef::Variable::Variable') {
                 $vars[$i]->get_var->set_value($self->[$i]->get_value);
             }
         }
@@ -690,7 +730,9 @@ package Sidef::Types::Array::Array {
                 my $diff = ($#{$self} - $max);
                 my ($x, $y) = ($self->[$i + $diff]->get_value, $self->[$j + $diff]->get_value);
 
-                if (ref($x) eq ref($y) and $x->can($method) and $x->$method($y)) {
+                if (    ref($x) eq ref($y)
+                    and $x->can($method)
+                    and $x->$method($y)) {
 
                     undef $indices{$last ? ($i + $diff) : ($j + $diff)};
 
@@ -701,7 +743,8 @@ package Sidef::Types::Array::Array {
             }
         }
 
-        $self->new(map { $self->[$_]->get_value } grep { not exists $indices{$_} } 0 .. $#{$self});
+        $self->new(map  { $self->[$_]->get_value }
+                   grep { not exists $indices{$_} } 0 .. $#{$self});
     }
 
     sub unique {
@@ -724,7 +767,7 @@ package Sidef::Types::Array::Array {
     sub contains {
         my ($self, $obj) = @_;
 
-        if ($self->_is_code($obj, 1, 1)) {
+        if (ref($obj) eq 'Sidef::Types::Block::Code') {
             my ($var_ref) = $obj->init_block_vars();
 
             foreach my $var (@{$self}) {
@@ -738,10 +781,12 @@ package Sidef::Types::Array::Array {
             return Sidef::Types::Bool::Bool->false;
         }
 
-        my $method = '==';
+        state $method = '==';
         foreach my $var (@{$self}) {
             my $item = $var->get_value;
-            if (ref($item) eq ref($obj) and defined $item->can($method) and $item->$method($obj)) {
+            if (    ref($item) eq ref($obj)
+                and defined $item->can($method)
+                and $item->$method($obj)) {
                 return Sidef::Types::Bool::Bool->true;
             }
         }
@@ -762,6 +807,32 @@ package Sidef::Types::Array::Array {
     }
 
     *containsType = \&contains_type;
+
+    sub contains_any {
+        my ($self, $array) = @_;
+
+        $self->_is_array($array) || return;
+
+        foreach my $item (@{$array}) {
+            return Sidef::Types::Bool::Bool->true if $self->contains($item->get_value);
+        }
+
+        Sidef::Types::Bool::Bool->false;
+    }
+
+    *containsAny = \&contains_any;
+
+    sub contains_all {
+        my ($self, $array) = @_;
+
+        foreach my $item (@{$array}) {
+            return Sidef::Types::Bool::Bool->false unless $self->contains($item->get_value);
+        }
+
+        Sidef::Types::Bool::Bool->true;
+    }
+
+    *containsAll = \&contains_all;
 
     sub pop {
         my ($self, $index) = @_;
@@ -798,15 +869,14 @@ package Sidef::Types::Array::Array {
     *popRand = \&pop_rand;
 
     sub splice {
-        my ($self, $offset, $length, $array) = @_;
+        my ($self, $offset, $length, @objects) = @_;
 
         $offset = defined($offset) && $self->_is_number($offset) ? $$offset : 0;
-        $length = defined($length) && $self->_is_number($length) ? $$length : scalar(@{$self});
+        $length = defined($length)
+          && $self->_is_number($length) ? $$length : scalar(@{$self});
 
-        if (defined($array)) {
-            $self->_is_array($array) || return;
-            return $self->new(map { $_->get_value }
-                              CORE::splice(@{$self}, $offset, $length, @{$self->new(map { $_->get_value } @{$array})}));
+        if (@objects) {
+            return $self->new(map { $_->get_value } CORE::splice(@{$self}, $offset, $length, @{__PACKAGE__->new(@objects)}));
         }
         else {
             return $self->new(map { $_->get_value } CORE::splice(@{$self}, $offset, $length));
@@ -897,7 +967,9 @@ package Sidef::Types::Array::Array {
 
         if (defined $code) {
             $self->_is_code($code) || return;
-            return $self->new(sort { $code->call($a, $b) } map { $_->get_value } @{$self});
+            return
+              $self->new(sort { $code->call($a, $b) }
+                         map { $_->get_value } @{$self});
         }
 
         my $method = '<=>';
@@ -918,6 +990,7 @@ package Sidef::Types::Array::Array {
             while (1) {
                 $var_ref->set_value($self->new(map { $_->get_value } @{$self}[@idx]));
                 if (defined(my $res = $code->_run_code)) {
+                    $code->pop_stack();
                     return $res;
                 }
 
@@ -928,6 +1001,8 @@ package Sidef::Types::Array::Array {
                 ++$q while $idx[$p - 1] > $idx[$q];
                 @idx[$p - 1, $q] = @idx[$q, $p - 1];
             }
+
+            $code->pop_stack();
         }
 
         my $array = $self->new;
@@ -1047,7 +1122,9 @@ package Sidef::Types::Array::Array {
         my $method = '==';
         while (my ($i, $var) = CORE::each @{$self}) {
             my $item = $var->get_value;
-            if (ref($item) eq ref($obj) and defined $item->can($method) and $item->$method($obj)) {
+            if (    ref($item) eq ref($obj)
+                and defined $item->can($method)
+                and $item->$method($obj)) {
                 CORE::splice(@{$self}, $i, 1);
                 return Sidef::Types::Bool::Bool->true;
             }
@@ -1066,7 +1143,9 @@ package Sidef::Types::Array::Array {
         my $method = '==';
         for (my $i = 0 ; $i <= $#{$self} ; $i++) {
             my $item = $self->[$i]->get_value;
-            if (ref($item) eq ref($obj) and defined $item->can($method) and $item->$method($obj)) {
+            if (    ref($item) eq ref($obj)
+                and defined $item->can($method)
+                and $item->$method($obj)) {
                 CORE::splice(@{$self}, $i--, 1);
             }
         }
@@ -1102,7 +1181,10 @@ package Sidef::Types::Array::Array {
 
         while (my ($i, $item) = CORE::each @{$self}) {
             $var_ref->set_value($item->get_value);
-            $code->run && do { CORE::splice(@{$self}, $i, 1); return Sidef::Types::Bool::Bool->true };
+            $code->run && do {
+                CORE::splice(@{$self}, $i, 1);
+                return Sidef::Types::Bool::Bool->true;
+            };
         }
 
         Sidef::Types::Bool::Bool->false;
@@ -1148,6 +1230,7 @@ package Sidef::Types::Array::Array {
         *{__PACKAGE__ . '::' . '&&'}  = \&mesh;
         *{__PACKAGE__ . '::' . '=='}  = \&equals;
         *{__PACKAGE__ . '::' . ':'}   = \&pair_with;
+        *{__PACKAGE__ . '::' . '/'}   = \&divide;
         *{__PACKAGE__ . '::' . '»'}  = \&assign_to;
 
         *{__PACKAGE__ . '::' . '++'} = sub {
@@ -1169,11 +1252,58 @@ package Sidef::Types::Array::Array {
                 my @values = map { $_->get_value } @{$arg};
 
                 foreach my $i (0 .. $#{$self}) {
-                    $self->[$i]->set_value(exists $values[$i] ? $values[$i] : Sidef::Types::Nil::Nil->new);
+                    $self->[$i]->set_value(
+                                           exists $values[$i]
+                                           ? $values[$i]
+                                           : Sidef::Types::Nil::Nil->new
+                                          );
                 }
             }
             else {
                 map { $_->set_value($arg) } @{$self};
+            }
+
+            $self;
+        };
+
+        *{__PACKAGE__ . '::' . '+='} = sub {
+            my ($self, $arg) = @_;
+
+            if ($self->_is_array($arg, 1, 1)) {
+                my @values = map { $_->get_value } @{$arg};
+
+                foreach my $i (0 .. $#{$self}) {
+                    my $value = $self->[$i]->get_value;
+                    ref($value) eq ref($self) || do {
+                        $self->[$i]->set_value(
+                                               $self->new(
+                                                          ref($value) eq 'Sidef::Types::Nil::Nil'
+                                                          ? ()
+                                                          : $value
+                                                         )
+                                              );
+                    };
+                    $self->[$i]->get_value->append(
+                                                   exists $values[$i]
+                                                   ? $values[$i]
+                                                   : Sidef::Types::Nil::Nil->new
+                                                  );
+                }
+            }
+            else {
+                map {
+                    my $value = $_->get_value;
+                    ref($value) eq ref($self) || do {
+                        $_->set_value(
+                                      $self->new(
+                                                 ref($value) eq 'Sidef::Types::Nil::Nil'
+                                                 ? ()
+                                                 : $value
+                                                )
+                                     );
+                    };
+                    $_->get_value->append($arg)
+                } @{$self};
             }
 
             $self;

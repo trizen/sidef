@@ -292,18 +292,23 @@ package Sidef::Types::Glob::File {
         }
 
         truncate($fh, 0) || do {
-            warn "Can't truncate file `$$self': $!";
+            warn "[WARN] Can't truncate file `$$self': $!";
             return;
         };
 
         seek($fh, 0, 0) || do {
-            warn "Can't seek the begining of file `$$self': $!";
+            warn "[WARN] Can't seek the begining of file `$$self': $!";
             return;
         };
 
         Sidef::Types::Bool::Bool->new(
-                                      do { local $, = q{}; print $fh @lines; close $fh }
-                                     );
+            do {
+                local $, = q{};
+                local $\ = q{};
+                print $fh @lines;
+                close $fh;
+              }
+        );
     }
 
     sub open {
@@ -446,4 +451,7 @@ package Sidef::Types::Glob::File {
         my ($self) = @_;
         Sidef::Types::String::String->new('File.new(' . ${Sidef::Types::String::String->new($$self)->dump} . ')');
     }
-}
+
+};
+
+1

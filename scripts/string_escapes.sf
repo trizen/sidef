@@ -1,0 +1,36 @@
+#!/usr/bin/ruby
+
+# String escapes
+
+func is(x, y) {
+    x == y || (
+        "** Error: #{x} != #{y}\n".die;
+    );
+}
+
+is("\U\N{LATIN SMALL LETTER DZ}ur",'ǱUR');
+is("\L\N{LATIN CAPITAL LETTER DZ}UR",'ǳur');
+is("\x{5c}U!", '\U!');
+is("\x{99F1}\x{99DD}", '駱駝');
+is("side\Uf", 'sideF');
+is("\LSID\Uef", 'sidEF');
+is("\lSidef",'sidef');
+is("Sid\lEf", 'Sidef');
+is("\U\lTest\E", 'tEST');
+is("\Ute\Est", 'TEst');
+is("TE\LST\E", 'TEst');
+is("\U\N{GREEK SMALL LETTER GAMMA}\E(f)", 'Γ(f)');
+is("tes\lT", 'test');
+is("\LTEST\E", 'test');
+is("\U\N{BLACK SMILING FACE}\L", '☻');
+is("\x41", 'A');
+is("\c1", 'q');
+is("\046", '&');
+is("\41", '!');
+is("\0", "\x0");
+is("\x{262f}", "\N{U+262F}");
+is("\o{33}", "\033");
+is("\o{52}", '*');
+is("\052", '*');
+
+say "** Test passed!";

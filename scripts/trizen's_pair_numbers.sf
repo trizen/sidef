@@ -1,0 +1,10 @@
+#!/usr/bin/ruby
+
+for (0.to(6, 2)) {|n|
+        var pairs = [
+                Math.pow(n**2, n**2 + 1) * Math.pow(n**2 + 1, n**2),
+                Math.pow(n**2 - 1, n**2) * Math.pow(n**2, n**2 - 1),
+        ];
+
+        "(%d, %d)\n -> %s\n -> %s\n\n".printf(n**2, n**2 - 1, pairs.map{.sqrt}...);
+}

@@ -58,6 +58,14 @@ package Sidef::Types::Array::MultiArray {
 
     *push = \&append;
 
+    sub to_array {
+        my ($self) = @_;
+        Sidef::Types::Array::Array->new(map { Sidef::Types::Array::Array->new(@{$_}) } @{$self});
+    }
+
+    *to_a    = \&to_array;
+    *toArray = \&to_array;
+
     sub dump {
         my ($self) = @_;
         Sidef::Types::String::String->new(

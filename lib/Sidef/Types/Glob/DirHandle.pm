@@ -116,11 +116,15 @@ package Sidef::Types::Glob::DirHandle {
         while (defined(my $file = CORE::readdir($self->{dir_h}))) {
             $var_ref->set_value(Sidef::Types::String::String->new($file));
             if (defined(my $res = $code->_run_code)) {
+                $code->pop_stack();
                 return $res;
             }
         }
 
+        $code->pop_stack();
         $self;
     }
 
-}
+};
+
+1

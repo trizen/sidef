@@ -20,6 +20,7 @@ my @scripts =
     /\.sf\z/
       && $_ ne 'include_class.sf'
       && $_ ne 'lingua_ro.sf'
+      && $_ ne 'lingua_ro_numbers.sf'
       && $_ ne 'module_loading.sf'
 } readdir($dir_h);
 

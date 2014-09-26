@@ -9,7 +9,7 @@ package Sidef::Types::Array::Pair {
 
     sub new {
         my (undef, $item1, $item2) = @_;
-        bless [map { Sidef::Variable::Variable->new('', 'var', $_) } ($item1, $item2)], __PACKAGE__;
+        bless [map { Sidef::Variable::Variable->new(name => '', type => 'var', value => $_) } ($item1, $item2)], __PACKAGE__;
     }
 
     sub get_value {
@@ -30,20 +30,17 @@ package Sidef::Types::Array::Pair {
         \@array;
     }
 
-    sub first {
-        my ($self, $arg) = @_;
-        if (@_ > 1) {
-            return $self->[0] = Sidef::Variable::Variable->new('', 'var', $arg);
+    {
+        no strict 'refs';
+        foreach my $pair ([first => 0], [second => 1]) {
+            *{__PACKAGE__ . '::' . $pair->[0]} = sub {
+                my ($self, $arg) = @_;
+                if (@_ > 1) {
+                    $self->[$pair->[1]] = Sidef::Variable::Variable->new(name => '', type => 'var', value => $arg);
+                }
+                Sidef::Variable::Variable->new(name => '', type => 'var', value => $self->[$pair->[1]]);
+            };
         }
-        $self->[0];
-    }
-
-    sub second {
-        my ($self, $arg) = @_;
-        if (@_ > 1) {
-            return $self->[1] = $arg;
-        }
-        $self->[1];
     }
 
     sub swap {
@@ -57,7 +54,16 @@ package Sidef::Types::Array::Pair {
         Sidef::Types::Hash::Hash->new(map { $_->get_value } @{$self});
     }
 
-    *to_h = \&to_hash;
+    *to_h   = \&to_hash;
+    *toHash = \&to_hash;
+
+    sub to_array {
+        my ($self) = @_;
+        Sidef::Types::Array::Array->new(map { $_->get_value } @{$self});
+    }
+
+    *to_a    = \&to_array;
+    *toArray = \&to_array;
 
     sub dump {
         my ($self) = @_;

@@ -23,9 +23,9 @@ func binary_search(a,i) {
 var min = 1;
 var max = 99;
 
-var a = (min..max);
+var a = min..max;
 
-for ((min..(min+5)) + ((max-5)..max)) { |i|
+for ((min .. min+5) + (max-5 .. max)) { |i|
 
     say i;
     binary_search(a, i) == i-1 || (

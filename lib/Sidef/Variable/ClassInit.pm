@@ -44,14 +44,33 @@ package Sidef::Variable::ClassInit {
 
         require Sidef::Variable::Class;
         my $class = Sidef::Variable::Class->__new($self->{name});
-        @{$class->{__NAMES__}}{@{$self->{__VARS__}}} = @args;
+
+        # Init the class variables
+        @{$class->{__VARS__}}{map { $_->{name} } @{$self->{__VARS__}}} =
+          map { $_->{value} } @{$self->{__VARS__}};
+
+        # Set the class arguments
+        while (my ($i, $arg) = each @args) {
+            if (ref($arg) eq 'Sidef::Types::Array::Pair') {
+                foreach my $pair (@args[$i .. $#args]) {
+                    ref($pair) eq 'Sidef::Types::Array::Pair' || do {
+                        warn "[WARN]: Class init error -- expected a Pair type argument, but got: ", ref($pair), "\n";
+                        last;
+                    };
+                    $class->{__VARS__}{$pair->first->get_value} = $pair->second->get_value;
+                }
+                last;
+            }
+
+            $class->{__VARS__}{$self->{__VARS__}[$i]{name}} = $args[$i];
+        }
 
         # Run the auxiliary code of the class
         $self->{__BLOCK__}->run;
 
         # Add some new defined values
         while (my ($key, $value) = each %{$self->{__VALS__}}) {
-            $class->{__NAMES__}{$key} = $value;
+            $class->{__VARS__}{$key} = $value;
         }
 
         # Store the class methods

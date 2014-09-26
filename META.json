@@ -5,7 +5,7 @@
       "Ioana Fălcușan (<ioanaflavia@gmail.com>)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4205",
+   "generated_by" : "Module::Build version 0.421",
    "license" : [
       "perl_5"
    ],
@@ -29,11 +29,14 @@
          "requires" : {
             "Cwd" : "0",
             "Encode" : "0",
+            "Encode::Locale" : "0",
             "Fcntl" : "0",
             "File::Basename" : "0",
             "File::Copy" : "0",
+            "File::Find" : "0",
             "File::Path" : "0",
             "File::Spec" : "0",
+            "File::Temp" : "0",
             "Getopt::Std" : "0",
             "List::Util" : "0",
             "Math::BigFloat" : "0",
@@ -56,6 +59,9 @@
       },
       "Sidef::Convert::Convert" : {
          "file" : "lib/Sidef/Convert/Convert.pm"
+      },
+      "Sidef::Eval::Eval" : {
+         "file" : "lib/Sidef/Eval/Eval.pm"
       },
       "Sidef::Exec" : {
          "file" : "lib/Sidef/Exec.pm"
@@ -122,6 +128,9 @@
       },
       "Sidef::Types::Block::For" : {
          "file" : "lib/Sidef/Types/Block/For.pm"
+      },
+      "Sidef::Types::Block::Fork" : {
+         "file" : "lib/Sidef/Types/Block/Fork.pm"
       },
       "Sidef::Types::Block::Given" : {
          "file" : "lib/Sidef/Types/Block/Given.pm"
@@ -230,6 +239,9 @@
       },
       "Sidef::Variable::Ref" : {
          "file" : "lib/Sidef/Variable/Ref.pm"
+      },
+      "Sidef::Variable::Struct" : {
+         "file" : "lib/Sidef/Variable/Struct.pm"
       },
       "Sidef::Variable::Variable" : {
          "file" : "lib/Sidef/Variable/Variable.pm"

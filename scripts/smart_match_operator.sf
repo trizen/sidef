@@ -1,0 +1,61 @@
+#!/usr/bin/ruby
+
+var hash = :(
+              red    => 1, blue   => 2, green  => 3,
+              orange => 4, yellow => 5, purple => 6,
+              black  => 7, grey   => 8, white  => 9
+            );
+
+var array = <red blue green>;
+
+#
+## Array ~~ Hash
+#
+if (array ~~ hash) {
+    say "some array elements in hash keys";
+} else {
+    "a ~~ h error".die;
+}
+
+#
+## Any ~~ Array
+#
+if ("red" ~~ array) {
+    say "red in array";
+} else {
+    "s ~~ a error".die;
+}
+
+#
+## Regex ~~ Hash
+#
+if (/e$/ ~~ hash) {
+    say "some keys end in e";
+} else {
+    "r ~~ h error".die;
+}
+
+#
+## Hash ~~ Hash
+#
+var sub_h = :(red => 5, :white => 1);
+if (hash ~~ sub_h) {
+    say "sub-hash contained in larger hash";
+} else {
+    "h ~~ h error".die;
+}
+
+#
+## Array ~~ Array
+#
+var arr1 = [1,2,3];
+var arr2 = [3,2];
+
+if (arr1 ~~ arr2) {
+    say "sub-array contained in larger array";
+} else {
+    "a ~~ a error".die;
+}
+
+arr2.append(0);
+arr1 ~~ arr2 && "a ~~ a error(2)".die;

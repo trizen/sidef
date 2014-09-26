@@ -12,14 +12,15 @@ func combine(n, set) {
         return(set.map{[_]});
     );
 
-    head   = (set.shift);
-    result = (combine(n-1, set.copy));
+    var(head, result);
+    head   = set.shift;
+    result = combine(n-1, set.copy);
 
     result.each { |subarray|
         subarray.unshift(head);
     }
 
-    return(result + (combine(n, set)));
+    return(result + combine(n, set));
 }
 
 

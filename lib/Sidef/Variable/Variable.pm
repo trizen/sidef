@@ -11,14 +11,9 @@ package Sidef::Variable::Variable {
     my $nil = Sidef::Types::Nil::Nil->new;
 
     sub new {
-        my (undef, $var, $type, $value) = @_;
-
-        bless {
-               name  => $var,
-               type  => $type,
-               value => $value // $nil,
-              },
-          __PACKAGE__;
+        my (undef, %opt) = @_;
+        $opt{value} //= $nil;
+        bless \%opt, __PACKAGE__;
     }
 
     sub _is_defined {    # faster (used internally)
@@ -113,24 +108,13 @@ package Sidef::Variable::Variable {
                 if (ref $obj eq 'Sidef::Types::Block::Code') {
                     return $self->set_value($obj);
                 }
-                warn "WARN: Can't assign the '", ref($obj),
+                warn "[WARN] Can't assign the '", ref($obj),
                   "' object to function '$self->{name}'!\n" . "An object of type 'Sidef::Types::Block::Code' was expected.\n";
                 return $self;
             }
 
-            warn "WARN: Invalid variable type: '$self->{type}'.\n";    # this should not happen
+            warn "[WARN] Invalid variable type: '$self->{type}'.\n";    # this should not happen
             $obj;
-        };
-
-        *{__PACKAGE__ . '::' . ':='} = sub {
-            my ($self, $code) = @_;
-
-            if (not $self->_is_defined) {
-                state $method = '=';
-                $self->$method(Sidef::Types::Block::Code->new($code)->run);
-            }
-
-            $self->new('', 'var', $self);
         };
 
         *{__PACKAGE__ . '::' . '\\\\'} = sub {
@@ -143,77 +127,37 @@ package Sidef::Variable::Variable {
             Sidef::Types::Block::Code->new($code)->run;
         };
 
-        foreach my $operator (qw(-- ++)) {
+        foreach my $operator (qw(:= \\\\=)) {
             *{__PACKAGE__ . '::' . $operator} = sub {
-                my ($self, $arg) = @_;
+                my ($self, $code) = @_;
 
-                state $method = '=';
-                my $value = $self->get_value;
-
-                if (ref($value) and eval { $value->can($operator) }) {
-                    $self->$method($self->get_value->$operator($arg));
-                }
-                else {
-                    $self->_nonexistent_method($operator, $value);
+                if (not $self->_is_defined) {
+                    state $method = '=';
+                    $self->$method(Sidef::Types::Block::Code->new($code)->run);
                 }
 
-                $self;
+                $operator eq ':=' ? $self->new(name => '', type => 'var', value => $self) : $self;
             };
         }
 
-        foreach my $operator (qw(< > >= <= ^^ $$)) {
+        {
+            my @operators = qw(++ -- + - % * / & | ^ ** && || << >> ÷);
+            while (my ($i, $operator) = each @operators) {
+                *{__PACKAGE__ . '::' . $operator . ($i > 1 ? '=' : '')} = sub {
+                    my ($self, $arg) = @_;
 
-            *{__PACKAGE__ . '::' . '?' . $operator . '='} = sub {
-                my ($self, $arg) = @_;
-
-                if (ref($arg) and eval { $arg->can($operator) }) {
                     state $method = '=';
-                    if ($arg->$operator($self->get_value)) {
-                        $self->$method($arg);
+                    my $value = $self->get_value;
+
+                    if (ref($value) and defined(my $sub = eval { $value->can($operator) })) {
+                        $self->$method($value->$sub($arg));
                     }
-                }
-                else {
-                    $self->_nonexistent_method($operator, $arg);
-                }
-
-                $self;
-            };
-
-            *{__PACKAGE__ . '::' . $operator . '?='} = sub {
-                my ($self, $arg) = @_;
-
-                my $value = $self->get_value;
-
-                if (ref($value) and eval { $value->can($operator) }) {
-                    state $method = '=';
-                    if ($value->$operator($arg)) {
-                        $self->$method($arg);
+                    else {
+                        $self->_nonexistent_method($operator, $arg);
                     }
-                }
-                else {
-                    $self->_nonexistent_method($operator, $arg);
-                }
-
-                $self;
-            };
-        }
-
-        foreach my $operator (qw(+ - % * / & | ^ ** && || << >> ÷)) {
-
-            *{__PACKAGE__ . '::' . $operator . '='} = sub {
-                my ($self, $arg) = @_;
-
-                my $value = $self->get_value;
-
-                if (ref($value) and eval { $value->can($operator) }) {
-                    state $method = '=';
-                    $self->$method($self->get_value->$operator($arg));
-                }
-                else {
-                    $self->_nonexistent_method($operator, $arg);
-                }
-                $self;
-            };
+                    $self;
+                };
+            }
         }
 
     }
@@ -235,18 +179,19 @@ package Sidef::Variable::Variable {
             $suffix = chop $method;
         }
 
-        if (ref($value) && ($value->can($method) || $value->can('AUTOLOAD'))) {
-            my @results = $value->$method(@args);
+        if (ref($value)
+            && (defined(my $sub = $value->can($method) // ($value->can('AUTOLOAD') ? $method : ())))) {
+            my @results = $value->$sub(@args);
 
             if (defined($suffix)) {
                 if ($suffix eq '!') {    # modifies the variable in place
                     state $method = '=';
                     $self->$method(@results);
-                    return $self->new('', 'var', $self);
+                    return $self->new(name => '', type => 'var', value => $self);
                 }
 
                 if ($suffix eq ':') {    # returns the self variable
-                    return $self->new('', 'var', $self);
+                    return $self->new(name => '', type => 'var', value => $self);
                 }
 
                 if ($suffix eq '?') {    # asks for a boolean value
@@ -255,6 +200,13 @@ package Sidef::Variable::Variable {
                       ? $result
                       : Sidef::Types::Bool::Bool->new($result);
                 }
+            }
+
+            if ($self->{type} eq 'func' and exists $self->{returns}) {
+                ref($results[-1]) eq ref($self->{returns}) || do {
+                    die "[ERROR] Return-type error from function '$self->{name}': returned '", ref($results[-1]),
+                      "', but expected '", ref($self->{returns}), "'!\n";
+                };
             }
 
             return $results[-1];

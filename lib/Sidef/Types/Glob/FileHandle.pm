@@ -30,18 +30,21 @@ package Sidef::Types::Glob::FileHandle {
     *isOnTty = \&is_on_tty;
 
     sub stdout {
-        __PACKAGE__->new(fh   => \*STDOUT,
-                         file => Sidef::Types::Nil::Nil->new,);
+        __PACKAGE__->new(fh => \*STDOUT);
     }
 
     sub stderr {
-        __PACKAGE__->new(fh   => \*STDERR,
-                         file => Sidef::Types::Nil::Nil->new,);
+        __PACKAGE__->new(fh => \*STDERR);
     }
 
     sub stdin {
-        __PACKAGE__->new(fh   => \*STDIN,
-                         file => Sidef::Types::Nil::Nil->new,);
+        __PACKAGE__->new(fh => \*STDIN);
+    }
+
+    sub binmode {
+        my ($self, $encoding) = @_;
+        $self->_is_string($encoding) || return;
+        CORE::binmode($self->{fh}, $$encoding);
     }
 
     sub writeString {
@@ -203,10 +206,12 @@ package Sidef::Types::Glob::FileHandle {
         while (defined(my $line = CORE::readline($self->{fh}))) {
             $var_ref->set_value(Sidef::Types::String::String->new($line));
             if (defined(my $res = $code->_run_code)) {
+                $code->pop_stack();
                 return $res;
             }
         }
 
+        $code->pop_stack();
         $self;
     }
 

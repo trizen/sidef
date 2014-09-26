@@ -1,14 +1,12 @@
-#!/usr/bin/ruby
+#!/usr/bin/perl
 
+var x = '** Evaluating...';
+x == eval "x" || "var error".die;
 
-var evaluated_code = ("
-
-var x = 'Evaluating code...';
+var evaluated_code = eval <<'CODE';
 x.say;
+'** ' + 'it works'.uc + '!';
+CODE
 
-'it worked'.uc.lcfirst;
-
-".eval);
-
-
+evaluated_code == '** IT WORKS!' || "error".die;
 evaluated_code.say;

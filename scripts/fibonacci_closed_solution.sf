@@ -2,8 +2,8 @@
 
 func fibonacci (n) {
 
-    static S = (1.25.sqrt + 0.5);
-    static T = (-S + 1);
+    define S (1.25.sqrt + 0.5);
+    define T (-S + 1);
 
     (S**n - T**n) / (-T + S) -> roundf(0);
 }

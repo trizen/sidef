@@ -10,8 +10,9 @@ package Sidef::Parser {
 
         my %options = (
             line          => 1,
+            strict        => 1,
             inc           => [],
-            class         => 'main',
+            class         => 'main',           # a.k.a. namespace
             vars          => {'main' => []},
             ref_vars_refs => {'main' => []},
             EOT           => [],
@@ -49,6 +50,10 @@ package Sidef::Parser {
                          {
                           sub => sub { Sidef::Types::Block::Continue->new },
                           re  => qr/\Gcontinue\b/,
+                         },
+                         {
+                          sub => sub { Sidef::Types::Glob::FileHandle->new(fh => \*ARGV) },
+                          re  => qr/\GARGF\b/,
                          },
                          {
                           sub => sub { Sidef::Types::Glob::FileHandle->stdin },
@@ -120,7 +125,7 @@ package Sidef::Parser {
                          },
                          {
                           sub => sub { Sidef::Sys::SIG->new },
-                          re  => qr/\GSig\b/,
+                          re  => qr/\G(?:Sig|SIG)\b/,
                          },
                          {
                           sub => sub { Sidef::Types::Char::Char->new },
@@ -270,7 +275,7 @@ package Sidef::Parser {
                  dynamic => 0,
                 },
                 {
-                 sub     => sub { Sidef::Types::Bool::Bool->new },
+                 sub     => sub { Sidef::Types::Number::Unary->new },
                  re      => qr/\G(?=!)/,
                  dynamic => 0,
                 },
@@ -345,7 +350,7 @@ package Sidef::Parser {
                   Chrs Chars
                   Bool
                   Sys
-                  Sig
+                  Sig SIG
                   Regex
                   Time
 
@@ -357,9 +362,13 @@ package Sidef::Parser {
                   class
                   static
                   define
+                  struct
+                  module
+                  eval
 
                   DATA
                   ARGV
+                  ARGF
                   ENV
 
                   STDIN
@@ -370,13 +379,16 @@ package Sidef::Parser {
                   __LINE__
                   __END__
                   __DATA__
-                  __CLASS_NAME__
+                  __TIME__
+                  __DATE__
+                  __NAMESPACE__
 
                   __USE_BIGNUM__
                   __USE_RATNUM__
                   __USE_INTNUM__
                   __USE_FASTNUM__
 
+                  __NO_STRICT__
                   __RESET_LINE_COUNTER__
 
                   )
@@ -394,21 +406,8 @@ package Sidef::Parser {
                       ||= ||
                       &&= &&
 
-                      <?=
-                      >?=
-                      <=?=
-                      >=?=
-                      ^^?=
-                      $$?=
-
-                      ?<==
-                      ?<=
-                      ?>==
-                      ?>=
-                      ?^^=
-                      ?$$=
-
                       %%
+                      ~~
                       <=>
                       <<= >>=
                       << >>
@@ -428,7 +427,7 @@ package Sidef::Parser {
                       *= *
                       ...
                       != ≠ ..
-                      \\\\
+                      \\\\= \\\\
                       ?:
                       ?? ?
                       ! \\
@@ -439,10 +438,33 @@ package Sidef::Parser {
                     qr{(@operators)};
                 },
             },
+
+            # Reference: http://en.wikipedia.org/wiki/International_variation_in_quotation_marks
+            delim_pairs => {
+                qw~
+                  ( )
+                  [ ]
+                  { }
+                  < >
+                  « »
+                  » «
+                  ‹ ›
+                  › ‹
+                  「 」
+                  『 』
+                  „ ”
+                  “ ”
+                  ‘ ’
+                  ‚ ’
+                  ~
+            },
             %opts,
                       );
 
         $options{ref_vars} = $options{vars};
+        $options{file_name}   //= '-';
+        $options{script_name} //= '-';
+
         bless \%options, __PACKAGE__;
     }
 
@@ -482,13 +504,14 @@ package Sidef::Parser {
         my $error =
             "$basename: "
           . $lines[rand @lines] . "\n"
-          . ($self->{script_name} // '-') . ':'
+          . ($self->{file_name} // '-') . ':'
           . $self->{line}
           . ": syntax error, "
           . join(', ', grep { defined } $opt{error}, $opt{expected}) . "\n"
           . substr($opt{code}, $start, $len) . "\n";
 
-        die $error, ' ' x ($point), '^', "\n";
+        my $pointer = ' ' x ($point) . '^' . "\n";
+        $self->{strict} ? (die $error, $pointer) : (warn $error, $pointer);
     }
 
     sub find_var {
@@ -516,102 +539,93 @@ package Sidef::Parser {
           : ($var_name, $self->{class});
     }
 
-    {
+    sub get_quoted_words {
+        my ($self, %opt) = @_;
 
-        # Reference: http://en.wikipedia.org/wiki/International_variation_in_quotation_marks
-        my %pairs = qw~
-          ( )
-          [ ]
-          { }
-          < >
-          « »
-          » «
-          ‹ ›
-          › ‹
-          「 」
-          『 』
-          „ ”
-          “ ”
-          ‘ ’
-          ‚ ’
-          ~;
-
-        sub get_quoted_words {
-            my ($self, %opt) = @_;
-
-            my ($string, $pos) = $self->get_quoted_string(code => $opt{code});
-            if ($string =~ /\G/gc && (my ($pos) = $self->parse_whitespace(code => $string))[0]) {
-                pos($string) += $pos;
-            }
-
-            my @words;
-            while ($string =~ /\G((?>[^\s\\]+|\\.)++)/gcs) {
-                push @words, $1 =~ s{\\#}{#}gr;
-
-                if ((my ($pos) = $self->parse_whitespace(code => substr($string, pos($string))))[0]) {
-                    pos($string) += $pos;
-                    next;
-                }
-            }
-
-            return (\@words, $pos);
+        my ($string, $pos) = $self->get_quoted_string(code => $opt{code}, no_count_line => 1);
+        if ($string =~ /\G/gc
+            && (my ($pos) = $self->parse_whitespace(code => $string))[0]) {
+            pos($string) += $pos;
         }
 
-        sub get_quoted_string {
-            my ($self, %opt) = @_;
+        my @words;
+        while ($string =~ /\G((?>[^\s\\]+|\\.)++)/gcs) {
+            push @words, $1 =~ s{\\#}{#}gr;
 
-            for ($opt{code}) {
-
-                if (/\G/gc && /\G(?=\s)/ && (my ($pos) = $self->parse_whitespace(code => substr($_, pos)))[0]) {
-                    pos($_) += $pos;
-                }
-
-                my $delim;
-                if (/\G(.)/gc) {
-                    $delim = $1;
-                    if ($delim eq '\\' && /\G(.*?)\\/gsc) {
-                        return $1, pos;
-                    }
-                }
-                else {
-                    $self->fatal_error(
-                                       error => qq{can't find the beginning of a string quote delimitator},
-                                       code  => $_,
-                                       pos   => pos($_),
-                                      );
-                }
-
-                my $re_delim = quotemeta(exists($pairs{$delim}) ? ($delim . $pairs{$delim}) : $delim);
-
-                my $string = '';
-                while (/\G([^$re_delim\\]+)/gc || /\G\\([$re_delim])/gc || /\G(\\.)/gcs) {
-                    $string .= $1;
-                }
-
-                if (exists $pairs{$delim}) {
-                    while (/\G(?=\Q$delim\E)/) {
-
-                        $string .= $delim;
-                        my ($str, $pos) = $self->get_quoted_string(code => substr($_, pos));
-                        pos($_) += $pos;
-                        $string .= $str . $pairs{$delim};
-
-                        while (/\G([^$re_delim\\]+)/gc || /\G\\([$re_delim])/gc || /\G(\\.)/gcs) {
-                            $string .= $1;
-                        }
-                    }
-                }
-
-                my $end_delim = $pairs{$delim} // $delim;
-                /\G\Q$end_delim\E/gc
-                  || $self->fatal_error(
-                                        error => sprintf(qq{can't find the quoted string terminator "%s"}, $end_delim),
-                                        code  => $_,
-                                        pos   => pos($_)
-                                       );
-
-                return $string, pos;
+            if ((my ($pos) = $self->parse_whitespace(code => substr($string, pos($string))))[0]) {
+                pos($string) += $pos;
+                next;
             }
+        }
+
+        return (\@words, $pos);
+    }
+
+    sub get_quoted_string {
+        my ($self, %opt) = @_;
+
+        for ($opt{code}) {
+
+            if (   /\G/gc
+                && /\G(?=\s)/
+                && (my ($pos) = $self->parse_whitespace(code => substr($_, pos)))[0]) {
+                pos($_) += $pos;
+            }
+
+            my $delim;
+            if (/\G(.)/gc) {
+                $delim = $1;
+                if ($delim eq '\\' && /\G(.*?)\\/gsc) {
+                    return $1, pos;
+                }
+            }
+            else {
+                $self->fatal_error(
+                                   error => qq{can't find the beginning of a string quote delimitator},
+                                   code  => $_,
+                                   pos   => pos($_),
+                                  );
+            }
+
+            my $re_delim = quotemeta(
+                                     exists($self->{delim_pairs}{$delim})
+                                     ? ($delim . $self->{delim_pairs}{$delim})
+                                     : $delim
+                                    );
+
+            my $string = '';
+            while (   /\G([^$re_delim\\]+)/gc
+                   || /\G\\([$re_delim])/gc
+                   || /\G(\\.)/gcs) {
+                $string .= $1;
+            }
+
+            if (exists $self->{delim_pairs}{$delim}) {
+                while (/\G(?=\Q$delim\E)/) {
+
+                    $string .= $delim;
+                    my ($str, $pos) = $self->get_quoted_string(code => substr($_, pos));
+                    pos($_) += $pos;
+                    $string .= $str . $self->{delim_pairs}{$delim};
+
+                    while (   /\G([^$re_delim\\]+)/gc
+                           || /\G\\([$re_delim])/gc
+                           || /\G(\\.)/gcs) {
+                        $string .= $1;
+                    }
+                }
+            }
+
+            my $end_delim = $self->{delim_pairs}{$delim} // $delim;
+            /\G\Q$end_delim\E/gc
+              || $self->fatal_error(
+                                    error => sprintf(qq{can't find the quoted string terminator "%s"}, $end_delim),
+                                    code  => $_,
+                                    pos   => pos($_)
+                                   );
+
+            $self->{line} += $string =~ s/\R\K//g if not $opt{no_count_line};
+            return $string, pos;
         }
     }
 
@@ -620,7 +634,8 @@ package Sidef::Parser {
 
         for ($opt{code}) {
 
-            if (/\G/gc && (my ($pos, $end) = $self->parse_whitespace(code => substr($_, pos)))[0]) {
+            if (/\G/gc
+                && (my ($pos, $end) = $self->parse_whitespace(code => substr($_, pos)))[0]) {
                 pos($_) += $pos;
                 $end && return (undef, pos);
             }
@@ -642,82 +657,84 @@ package Sidef::Parser {
         }
     }
 
-    {
-        my %var_delims = (
-                          '(' => ')',
-                          '|' => '|',
-                         );
+    sub get_init_vars {
+        my ($self, %opt) = @_;
 
-        sub get_init_vars {
-            my ($self, %opt) = @_;
+        for ($opt{code}) {
 
-            for ($opt{code}) {
-
-                my $end_delim;
-                foreach my $key (keys %var_delims) {
-                    if (/\G\Q$key\E\h*/gc) {
-                        $end_delim = $var_delims{$key};
-                        last;
-                    }
+            my $end_delim;
+            foreach my $key ('|', (keys %{$self->{delim_pairs}})) {
+                next if exists $opt{ignore_delim} and exists $opt{ignore_delim}{$key};
+                if (/\G\Q$key\E\h*(?(?=\R)\R\h*(?{++$self->{line}}))/gc) {
+                    $end_delim = $self->{delim_pairs}{$key} // '|';
+                    last;
                 }
-
-                my @vars;
-                while (/\G($self->{re}{var_name})/goc) {
-                    push @vars, $1;
-                    if ($opt{with_vals} && defined($end_delim) && /\G=/gc) {
-                        my (undef, $pos) = $self->parse_expr(code => substr($_, pos));
-                        $vars[-1] .= '=' . substr($_, pos($_), $pos);
-                        pos($_) += $pos;
-                    }
-                    defined($end_delim) && (/\G\h*,\h*/gc || last);
-                }
-
-                defined($end_delim) && /\G\h*\Q$end_delim\E/gc;
-                return (\@vars, pos($_) // 0);
             }
+
+            my @vars;
+            while (/\G($self->{re}{var_name})/goc) {
+                push @vars, $1;
+                if ($opt{with_vals} && defined($end_delim) && /\G\h*=\h*/gc) {
+                    my (undef, $pos) = $self->parse_obj(code => substr($_, pos));
+                    $vars[-1] .= '=' . substr($_, pos($_), $pos);
+                    pos($_) += $pos;
+                }
+                defined($end_delim)
+                  && (/\G\h*,\h*(?(?=\R)\R\h*(?{++$self->{line}}))/gc
+                      || last);
+            }
+
+            defined($end_delim) && /\G\h*(?(?=\R)\R\h*(?{++$self->{line}}))\h*\Q$end_delim\E/gc;
+            return (\@vars, pos($_) // 0);
         }
+    }
 
-        sub parse_init_vars {
-            my ($self, %opt) = @_;
+    sub parse_init_vars {
+        my ($self, %opt) = @_;
 
-            for ($opt{code}) {
+        for ($opt{code}) {
 
-                my $end_delim;
-                foreach my $key (keys %var_delims) {
-                    if (/\G\Q$key\E\h*/gc) {
-                        $end_delim = $var_delims{$key};
-                        last;
-                    }
+            my $end_delim;
+            foreach my $key ('|', (keys %{$self->{delim_pairs}})) {
+                next if exists $opt{ignore_delim} and exists $opt{ignore_delim}{$key};
+                if (/\G\Q$key\E\h*(?(?=\R)\R\h*(?{++$self->{line}}))/gc) {
+                    $end_delim = $self->{delim_pairs}{$key} // '|';
+                    last;
+                }
+            }
+
+            my @var_objs;
+            while (/\G($self->{re}{var_name})/goc) {
+                my $name = $1;
+
+                if (exists $self->{keywords}{$name}) {
+                    $self->fatal_error(
+                                       code  => $_,
+                                       pos   => (pos($_) - length($name)),
+                                       error => "'$name' is either a keyword or a predefined variable!",
+                                      );
                 }
 
-                my @var_objs;
-                while (/\G($self->{re}{var_name})/goc) {
-                    my $name = $1;
+                my ($var, $code) = $self->find_var($name, $self->{class});
 
-                    if (exists $self->{keywords}{$name}) {
-                        $self->fatal_error(
-                                           code  => $_,
-                                           pos   => (pos($_) - length($name)),
-                                           error => "'$name' is either a keyword or a predefined variable!",
-                                          );
-                    }
+                if (defined($var) && $code) {
+                    warn "[WARN] Redeclaration of $opt{type} '$name' in same scope, at "
+                      . "$self->{file_name}, line $self->{line}\n";
+                }
 
-                    my ($var, $code) = $self->find_var($name, $self->{class});
+                my $value;
+                if (defined($end_delim) && /\G\h*=\h*/gc) {
+                    my ($obj, $pos) = $self->parse_obj(code => substr($_, pos));
+                    pos($_) += $pos;
+                    $value =
+                      ref($obj) eq 'HASH'
+                      ? Sidef::Types::Block::Code->new($obj)->run
+                      : $obj;
+                }
 
-                    if (defined($var) && $code) {
-                        warn "Redeclaration of $opt{type} '$name' in same scope, at "
-                          . "$self->{script_name}, line $self->{line}\n";
-                    }
+                my $obj = Sidef::Variable::Variable->new(name => $name, type => $opt{type}, value => $value);
 
-                    my $value;
-                    if (defined($end_delim) && /\G=/gc) {
-                        my ($obj, $pos) = $self->parse_expr(code => substr($_, pos));
-                        pos($_) += $pos;
-                        $value = ref($obj) eq 'HASH' ? Sidef::Types::Block::Code->new($obj)->run : $obj;
-                    }
-
-                    my $obj = Sidef::Variable::Variable->new($name, $opt{type}, $value);
-
+                if (!$opt{private}) {
                     unshift @{$self->{vars}{$self->{class}}},
                       {
                         obj   => $obj,
@@ -726,25 +743,26 @@ package Sidef::Parser {
                         type  => $opt{type},
                         line  => $self->{line},
                       };
-
-                    push @var_objs, $obj;
-                    defined($end_delim) && (/\G\h*,\h*/gc || last);
                 }
 
+                push @var_objs, $obj;
                 defined($end_delim)
-                  && (
-                      /\G\h*\Q$end_delim\E/gc
-                      || $self->fatal_error(
-                                            code  => $_,
-                                            pos   => (pos($_) - 1),
-                                            error => "unbalanced parentheses",
-                                           )
-                     );
-
-                return \@var_objs, pos;
+                  && (/\G\h*,\h*(?(?=\R)\R\h*(?{++$self->{line}}))/gc
+                      || last);
             }
-        }
 
+            defined($end_delim)
+              && (
+                  /\G\h*(?(?=\R)\R\h*(?{++$self->{line}}))\h*\Q$end_delim\E/gc
+                  || $self->fatal_error(
+                                        code  => $_,
+                                        pos   => (pos($_) - 1),
+                                        error => "unbalanced parentheses",
+                                       )
+                 );
+
+            return \@var_objs, pos;
+        }
     }
 
     sub parse_whitespace {
@@ -777,7 +795,7 @@ package Sidef::Parser {
                                 /\G\R/gc
                                   ? ++$self->{line}
                                   : die sprintf(qq{%s:%s: can't find string terminator "%s" anywhere before EOF.\n},
-                                                $self->{script_name}, $beg_line, $name);
+                                                $self->{file_name}, $beg_line, $name);
                             }
 
                             ++$self->{line};
@@ -844,7 +862,8 @@ package Sidef::Parser {
 
         for ($opt{code}) {
             {
-                if (/\G/gc && (my ($pos) = $self->parse_whitespace(code => substr($_, pos)))[0]) {
+                if (/\G/gc
+                    && (my ($pos) = $self->parse_whitespace(code => substr($_, pos)))[0]) {
                     pos($_) += $pos;
                 }
 
@@ -860,7 +879,7 @@ package Sidef::Parser {
                 }
 
                 # Double quoted string
-                if (/\G(?=["“„”])/ || /\G%Q\b/gc) {
+                if (/\G(?=["“„”])/ || /\G%Q\b/gc || /\G%(?![[:alpha:]])/gc) {
                     my ($string, $pos) = $self->get_quoted_string(code => (substr($_, pos)));
                     return Sidef::Types::String::String->new($string)->apply_escapes($self), pos($_) + $pos;
                 }
@@ -917,14 +936,17 @@ package Sidef::Parser {
                 }
 
                 # Bareword followed by a fat comma or a colon character
-                if (/\G:([[:alpha:]_]\w*)/gc || /\G([[:alpha:]_]\w*)(?=\h*=>|:(?![=:]))/gc) {
+                if (   /\G:([[:alpha:]_]\w*)/gc
+                    || /\G([[:alpha:]_]\w*)(?=\h*=>|:(?![=:]))/gc) {
                     return Sidef::Types::String::String->new($1), pos;
                 }
 
                 # Declaration of variable types
                 if (/\G(var|static|const)\b\h*/gc) {
                     my $type = $1;
-                    my ($var_objs, $pos) = $self->parse_init_vars(code => substr($_, pos), type => $type);
+                    my ($var_objs, $pos) =
+                      $self->parse_init_vars(code => substr($_, pos),
+                                             type => $type);
 
                     $pos // $self->fatal_error(
                                                code  => $_,
@@ -937,7 +959,7 @@ package Sidef::Parser {
                 }
 
                 # Declaration of compile-time evaluated constants
-                if (/\Gdefine\h+($self->{re}{var_name})\h*/gc) {
+                if (/\Gdefine\h+($self->{re}{var_name})\h*/goc) {
                     my $name = $1;
 
                     if (exists $self->{keywords}{$name}) {
@@ -957,7 +979,10 @@ package Sidef::Parser {
                                                error => qq{expected an expression after variable "$name" (near <define>)},
                                               );
 
-                    $obj = ref($obj) eq 'HASH' ? Sidef::Types::Block::Code->new($obj)->run : $obj;
+                    $obj =
+                      ref($obj) eq 'HASH'
+                      ? Sidef::Types::Block::Code->new($obj)->run
+                      : $obj;
 
                     pos($_) += $pos;
                     unshift @{$self->{vars}{$self->{class}}},
@@ -970,6 +995,47 @@ package Sidef::Parser {
                       };
 
                     return $obj, pos;
+                }
+
+                # Struct declaration
+                if (/\Gstruct\b\h*/gc) {
+
+                    my $name;
+                    if (/\G($self->{re}{var_name})\h*/goc) {
+                        $name = $1;
+                    }
+
+                    if (defined $name and exists $self->{keywords}{$name}) {
+                        $self->fatal_error(
+                                           code  => $_,
+                                           pos   => (pos($_) - length($name)),
+                                           error => "'$name' is either a keyword or a predefined variable!",
+                                          );
+                    }
+
+                    my ($vars, $pos) =
+                      $self->parse_init_vars(
+                                             code      => substr($_, pos),
+                                             with_vals => 1,
+                                             private   => 1,
+                                             type      => 'var',
+                                            );
+                    pos($_) += $pos;
+
+                    my $struct = Sidef::Variable::Struct->__new($vars);
+
+                    if (defined $name) {
+                        unshift @{$self->{vars}{$self->{class}}},
+                          {
+                            obj   => $struct,
+                            name  => $name,
+                            count => 0,
+                            type  => 'struct',
+                            line  => $self->{line},
+                          };
+                    }
+
+                    return $struct, pos;
                 }
 
                 # Declaration of enums
@@ -1009,7 +1075,11 @@ package Sidef::Parser {
                 }
 
                 # Declaration of the 'my' special variable + class, method and function declarations
-                if (/\G(my|func|class)\b\h*/gc || (exists($self->{current_class}) && /\G(method)\b\h*/gc)) {
+                if (
+                    /\G(my|func|class)\b\h*/gc
+                    || (exists($self->{current_class})
+                        && /\G(method)\b\h*/gc)
+                  ) {
                     my $type = $1;
                     my $name =
                         /\G($self->{re}{var_name})\h*/goc ? $1
@@ -1022,7 +1092,8 @@ package Sidef::Parser {
                                            pos      => pos($_)
                                           );
 
-                    if ($type ne 'method' && exists($self->{keywords}{$name})) {
+                    if ($type ne 'method'
+                        && exists($self->{keywords}{$name})) {
                         $self->fatal_error(
                                            code  => $_,
                                            pos   => (pos($_) - length($name)),
@@ -1032,12 +1103,12 @@ package Sidef::Parser {
 
                     my $obj =
                         $type eq 'my' ? Sidef::Variable::My->new($name)
-                      : $type eq 'func'   ? Sidef::Variable::Variable->new($name, $type)
-                      : $type eq 'method' ? Sidef::Variable::Variable->new($name, $type)
+                      : $type eq 'func'   ? Sidef::Variable::Variable->new(name => $name, type => $type)
+                      : $type eq 'method' ? Sidef::Variable::Variable->new(name => $name, type => $type)
                       : $type eq 'class'  ? Sidef::Variable::ClassInit->__new($name)
                       : $self->fatal_error(
                                            error    => "invalid type",
-                                           expected => "developer's fault",
+                                           expected => "a magic thing to happen",
                                            code     => $_,
                                            pos      => pos($_),
                                           );
@@ -1056,8 +1127,42 @@ package Sidef::Parser {
                     }
 
                     if ($type eq 'class') {
-                        my ($var_names, $pos1) = $self->get_init_vars(code => substr($_, pos), with_vals => 0);
-                        pos($_) += $pos1;
+                        my ($var_names, $pos1) =
+                          $self->parse_init_vars(
+                                                 code         => substr($_, pos),
+                                                 with_vals    => 1,
+                                                 private      => 1,
+                                                 ignore_delim => {
+                                                                  '{' => 1,
+                                                                  '<' => 1,
+                                                                 },
+                                                );
+                        pos($_) += $pos1 if defined $pos1;
+
+                        # Class inheritance (class Name(...) << Name1, Name2)
+                        if (/\G\h*<<?\h*/gc) {
+                            while (/\G($self->{re}{var_name})\h*/gco) {
+                                my ($name) = $1;
+                                my ($class, $code) = $self->find_var($name, $self->{class});
+                                if (ref $class) {
+                                    if ($class->{type} eq 'class') {
+                                        while (my ($name, $method) = each %{$class->{obj}{__METHODS__}}) {
+                                            $obj->__add_method($name, $method);
+                                        }
+                                    }
+                                    else {
+                                        $self->fatal_error(
+                                                           error    => "this is not a class",
+                                                           expected => "expected a class name",
+                                                           code     => $_,
+                                                           pos      => pos($_) - length($name),
+                                                          );
+                                    }
+                                }
+
+                                /\G,\h*/gc;
+                            }
+                        }
 
                         /\G\h*\{\h*/gc
                           || $self->fatal_error(
@@ -1067,7 +1172,7 @@ package Sidef::Parser {
                                                 pos      => pos($_)
                                                );
 
-                        local $self->{class}         = $name;
+                        local $self->{class_name}    = $name;
                         local $self->{current_class} = $obj;
                         my ($block, $pos) = $self->parse_block(code => '{' . substr($_, pos));
                         pos($_) += $pos - 1;
@@ -1077,8 +1182,33 @@ package Sidef::Parser {
 
                     if ($type eq 'func' or $type eq 'method') {
 
-                        my ($var_names, $pos1) = $self->get_init_vars(code => substr($_, pos), with_vals => 1);
+                        my ($var_names, $pos1) =
+                          $self->get_init_vars(
+                                               code         => substr($_, pos),
+                                               with_vals    => 1,
+                                               ignore_delim => {
+                                                                '{' => 1,
+                                                                '-' => 1,
+                                                               }
+                                              );
                         pos($_) += $pos1;
+
+                        # Function return type (func name(...) -> Type {...})
+                        # XXX: [KNOWN BUG] It doesn't check the returned type from method calls
+                        if (/\G\h*(?:->|returns\b)\h*/gc) {
+                            my ($r_obj, $pos) = $self->parse_expr(code => substr($_, pos));
+                            pos($_) += $pos;
+
+                            ref($r_obj) eq 'HASH'
+                              and $self->fatal_error(
+                                                     error    => "invalid return-type for function '$obj->{name}'",
+                                                     expected => "expected a valid type, such as: Str, Num, Arr, etc...",
+                                                     code     => $_,
+                                                     pos      => pos($_) - $pos
+                                                    );
+
+                            $obj->{returns} = $r_obj;
+                        }
 
                         /\G\h*\{\h*/gc
                           || $self->fatal_error(
@@ -1089,7 +1219,7 @@ package Sidef::Parser {
                                                );
 
                         local $self->{$type eq 'func' ? 'current_function' : 'current_method'} = $obj;
-                        my $args = '|' . join(',', $type eq 'method' ? 'self' : (), @{$var_names}) . '|';
+                        my $args = '|' . join(',', $type eq 'method' ? 'self' : (), @{$var_names}) . ' |';
                         my ($block, $pos) = $self->parse_block(code => '{' . $args . substr($_, pos));
                         pos($_) += $pos - (length($args) + 1);
 
@@ -1123,6 +1253,10 @@ package Sidef::Parser {
                     my ($var) = $self->find_var('_', $self->{class});
 
                     if (defined $var) {
+                        $var->{count}++;
+                        ref($var->{obj}) eq 'Sidef::Variable::Variable' && do {
+                            $var->{obj}{in_use} = 1;
+                        };
                         return $var->{obj}, pos;
                     }
 
@@ -1163,18 +1297,26 @@ package Sidef::Parser {
                     }
                 }
 
+                # Eval keyword
+                if (/\G(?=eval\b)/) {
+                    return Sidef::Eval::Eval->new($self, {$self->{class} => [@{$self->{vars}{$self->{class}}}]}), pos, 1;
+                }
+
+                if (/\GParser\b/gc) {
+                    return $self, pos;
+                }
+
                 # Regular expression
                 if (m{\G(?=/)} || /\G%r\b/gc) {
                     my ($string, $pos) = $self->get_quoted_string(code => (substr($_, pos)));
                     pos($_) += $pos;
-
-                    return Sidef::Types::Regex::Regex->new($string, /\G($self->{re}{match_flags})/goc ? $1 : undef), pos;
+                    return Sidef::Types::Regex::Regex->new($string, /\G($self->{re}{match_flags})/goc ? $1 : undef, $self),
+                      pos;
                 }
 
                 # Backtick
                 if (/\G(?=`)/) {
                     my ($string, $pos) = $self->get_quoted_string(code => (substr($_, pos)));
-
                     return Sidef::Types::Glob::Backtick->new(Sidef::Types::String::String->new($string)->apply_escapes($self)),
                       pos($_) + $pos;
                 }
@@ -1190,12 +1332,23 @@ package Sidef::Parser {
                     redo;
                 }
 
-                if (/\G__CLASS_NAME__\b/gc) {
-                    return Sidef::Types::String::String->new($self->{class}), pos;
+                if (/\G__MAIN__\b/gc) {
+                    return Sidef::Types::String::String->new($self->{script_name}), pos;
                 }
 
                 if (/\G__FILE__\b/gc) {
-                    return Sidef::Types::String::String->new($self->{script_name}), pos;
+                    return Sidef::Types::String::String->new($self->{file_name}), pos;
+                }
+
+                if (/\G__DATE__\b/gc) {
+                    my (undef, undef, undef, $day, $mon, $year) = localtime;
+                    return Sidef::Types::String::String->new(
+                                                      join('-', $year + 1900, map { sprintf "%02d", $_ } $mon + 1, $day)), pos;
+                }
+
+                if (/\G__TIME__\b/gc) {
+                    my ($sec, $min, $hour) = localtime;
+                    return Sidef::Types::String::String->new(join(':', map { sprintf "%02d", $_ } $hour, $min, $sec)), pos;
                 }
 
                 if (/\G__LINE__\b/gc) {
@@ -1277,27 +1430,36 @@ package Sidef::Parser {
                     return $self->{current_block}, pos;
                 }
 
-                if (exists($self->{current_function}) && /\G__FUNC__\b/gc) {
-                    return $self->{current_function}, pos;
+                if (/\G__NAMESPACE__\b/gc) {
+                    return Sidef::Types::String::String->new($self->{class}), pos;
                 }
 
-                if (exists($self->{current_class}) && /\G__CLASS__\b/gc) {
-                    return $self->{current_class}, pos;
+                if (exists($self->{current_function})) {
+                    return ($self->{current_function},                                          pos) if /\G__FUNC__\b/gc;
+                    return (Sidef::Types::String::String->new($self->{current_function}{name}), pos) if /\G__FUNC_NAME__\b/gc;
                 }
 
-                if (exists($self->{current_method}) && /\G__METHOD__\b/gc) {
-                    return $self->{current_method}, pos;
+                if (exists($self->{current_class})) {
+                    return ($self->{current_class},                                 pos) if /\G__CLASS__\b/gc;
+                    return (Sidef::Types::String::String->new($self->{class_name}), pos) if /\G__CLASS_NAME__\b/gc;
+                }
+
+                if (exists($self->{current_method})) {
+                    return ($self->{current_method},                                          pos) if /\G__METHOD__\b/gc;
+                    return (Sidef::Types::String::String->new($self->{current_method}{name}), pos) if /\G__METHOD_NAME__\b/gc;
                 }
 
                 if (
                     /\G(ENV|ARGV)\b/gc && do {
-                        ref(($self->find_var($1, $self->{class}))[0]) ? do { pos($_) -= length($1); 0 } : 1;
+                        ref(($self->find_var($1, $self->{class}))[0])
+                          ? do { pos($_) -= length($1); 0 }
+                          : 1;
                     }
                   ) {
                     my $name = $1;
                     my $type = 'var';
 
-                    my $variable = Sidef::Variable::Variable->new($name, $type);
+                    my $variable = Sidef::Variable::Variable->new(name => $name, type => $type);
 
                     unshift @{$self->{vars}{$self->{class}}},
                       {
@@ -1310,18 +1472,18 @@ package Sidef::Parser {
 
                     if ($name eq 'ARGV') {
                         require Encode;
-                        my $array =
-                          Sidef::Types::Array::Array->new(map { Sidef::Types::String::String->new(Encode::decode_utf8($_)) }
-                                                          @ARGV);
-
+                        my $array = Sidef::Types::Array::Array->new(
+                            map {
+                                Sidef::Types::String::String->new(Encode::decode(locale => $_))
+                              } @ARGV
+                        );
                         $variable->set_value($array);
                     }
                     elsif ($name eq 'ENV') {
                         require Encode;
                         my $hash =
-                          Sidef::Types::Hash::Hash->new(map { Sidef::Types::String::String->new(Encode::decode_utf8($_)) }
+                          Sidef::Types::Hash::Hash->new(map { Sidef::Types::String::String->new(Encode::decode(locale => $_)) }
                                                         %ENV);
-
                         $variable->set_value($hash);
                     }
 
@@ -1335,9 +1497,14 @@ package Sidef::Parser {
 
                     if (ref $var) {
                         $var->{count}++;
+                        ref($var->{obj}) eq 'Sidef::Variable::Variable' && do {
+                            $var->{obj}{in_use} = 1;
+                        };
                         return $var->{obj}, pos;
                     }
                     elsif (/\G(?=\h*:?=(?![=~>]))/) {
+
+                        #warn qq{[!] Implicit declaration of variable "$name", at line $self->{line}\n};
                         unshift @{$self->{vars}{$class}},
                           {
                             obj   => Sidef::Variable::My->new($name),
@@ -1355,6 +1522,11 @@ package Sidef::Parser {
                                        pos   => (pos($_) - length($name)),
                                        error => "attempt to use an uninitialized variable <$1>",
                                       );
+                }
+
+                # Regex variables ($1, $2, ...)
+                if (/\G\$([0-9]+)\b/gc) {
+                    return ($self->{regexp_vars}{$1} //= Sidef::Variable::Variable->new(name => $1, type => 'var'), pos);
                 }
 
                 /\G\$/gc && redo;
@@ -1432,7 +1604,9 @@ package Sidef::Parser {
 
                 my $var_objs = [];
                 if (/\G(?=\|)/) {
-                    my ($vars, $pos) = $self->parse_init_vars(code => substr($_, pos), type => 'var');
+                    my ($vars, $pos) =
+                      $self->parse_init_vars(code => substr($_, pos),
+                                             type => 'var');
                     pos($_) += $pos;
                     $var_objs = $vars;
                 }
@@ -1441,7 +1615,7 @@ package Sidef::Parser {
                     state $name = '_';
                     state $type = 'var';
 
-                    my $var_obj = Sidef::Variable::Variable->new($name, $type);
+                    my $var_obj = Sidef::Variable::Variable->new(name => $name, type => $type);
                     push @{$var_objs}, $var_obj;
                     unshift @{$self->{vars}{$self->{class}}},
                       {
@@ -1483,7 +1657,8 @@ package Sidef::Parser {
 
             pos($_) = 0;
             {
-                if ((/\G(?![-=]>)/ && /\G(?=$self->{re}{operators})/) || /\G\./goc) {
+                if ((/\G(?![-=]>)/ && /\G(?=$self->{re}{operators})/o)
+                    || /\G\./goc) {
                     my ($method, $req_arg, $pos) = $self->get_method_name(code => substr($_, pos));
 
                     if (defined($method)) {
@@ -1547,11 +1722,18 @@ package Sidef::Parser {
                 pos($_) += $pos;
                 $obj = {
                         $self->{class} => [
-                              {
-                               self => $obj,
-                               call => [{method => ref($obj) eq 'Sidef::Variable::ClassInit' ? 'init' : 'call', arg => [$arg]}]
-                              }
-                        ]
+                                           {
+                                            self => $obj,
+                                            call => [
+                                                     {
+                                                      method => ref($obj) eq 'Sidef::Variable::ClassInit'
+                                                      ? 'init'
+                                                      : 'call',
+                                                      arg => [$arg]
+                                                     }
+                                                    ]
+                                           }
+                                          ]
                        };
             }
 
@@ -1567,8 +1749,8 @@ package Sidef::Parser {
                         if (/\G\h*(?!;)/gc) {
                             my ($arg_obj, $pos) =
                               /\G(?=\()/
-                              ? ($self->parse_arguments(code => substr($_, pos)))
-                              : ($self->parse_obj(code => substr($_, pos)));
+                              ? $self->parse_arguments(code => substr($_, pos))
+                              : $self->parse_obj(code => substr($_, pos));
                             pos($_) += $pos;
 
                             if (defined $arg_obj) {
@@ -1590,7 +1772,7 @@ package Sidef::Parser {
                 my @methods;
                 {
 
-                    if (/\G(?=\.$self->{re}{var_name})/o) {
+                    if (/\G(?=\.(?:$self->{re}{var_name}|\())/o) {
                         my ($methods, $pos) = $self->parse_methods(code => substr($_, pos));
                         pos($_) += $pos;
                         push @{$struct{$self->{class}}[-1]{call}}, @{$methods};
@@ -1638,8 +1820,8 @@ package Sidef::Parser {
 
                             my ($arg, $pos) =
                               /\G\h*(?=\()/gc
-                              ? ($self->parse_arguments(code => substr($_, pos)))
-                              : ($self->parse_obj(code => substr($_, pos)));
+                              ? $self->parse_arguments(code => substr($_, pos))
+                              : $self->parse_obj(code => substr($_, pos));
                             pos($_) += $pos;
 
                             if (defined $arg) {
@@ -1684,18 +1866,70 @@ package Sidef::Parser {
     sub parse_script {
         my ($self, %opt) = @_;
 
+        if ($opt{code} =~ /\G/gc && (my ($pos) = $self->parse_whitespace(code => $opt{code}))[0]) {
+            pos($opt{code}) += $pos;
+        }
+
+        # Locally deactivate some restrictions
+        local $self->{strict} = 0 if $opt{code} =~ /\G__NO_STRICT__\b;*/gc;
+
+        my $pos = pos($opt{code});
+
         my %struct;
         for ($opt{code}) {
-            pos($_) = 0;
+            pos($_) = $pos;
           MAIN: {
-
-                if (/\G/gc && (my ($pos) = $self->parse_whitespace(code => substr($_, pos)))[0]) {
+                if ((my ($pos) = $self->parse_whitespace(code => substr($_, pos)))[0]) {
                     pos($_) += $pos;
+                }
+
+                # Module declaration
+                if (/\Gmodule\b\h*/gc) {
+                    my $name =
+                      /\G($self->{re}{var_name})\h*/goc
+                      ? $1
+                      : $self->fatal_error(
+                                           error    => "invalid 'module' declaration",
+                                           expected => "expected a name",
+                                           code     => $_,
+                                           pos      => pos($_)
+                                          );
+
+                    /\G\h*\{\h*/gc
+                      || $self->fatal_error(
+                                            error    => "invalid module declaration",
+                                            expected => "expected: module $name {...}",
+                                            code     => $_,
+                                            pos      => pos($_)
+                                           );
+
+                    my $parser = __PACKAGE__->new(
+                                                  file_name   => $self->{file_name},
+                                                  script_name => $self->{script_name},
+                                                  strict      => $self->{strict},
+                                                 );
+                    local $parser->{line}  = $self->{line};
+                    local $parser->{class} = $name;
+                    my ($struct, $pos) = $parser->parse_block(code => '{' . substr($_, pos));
+                    pos($_) += $pos - 1;
+                    $self->{line} = $parser->{line};
+
+                    foreach my $class (keys %{$struct->{code}}) {
+                        $struct{$class} = $struct->{code}{$class};
+                        $self->{ref_vars}{$class} =
+                            $#{$parser->{ref_vars}{$class}} == 0
+                          ? $parser->{ref_vars}{$class}[0]
+                          : $parser->{ref_vars}{$class};
+                    }
+
+                    redo;
                 }
 
                 if (/\Gimport\b\h*/gc) {
 
-                    my ($var_names, $pos) = $self->get_init_vars(code => substr($_, pos), with_vals => 0);
+                    my ($var_names, $pos) =
+                      $self->get_init_vars(code      => substr($_, pos),
+                                           with_vals => 0);
                     pos($_) += $pos;
 
                     @{$var_names}
@@ -1742,7 +1976,9 @@ package Sidef::Parser {
                 }
 
                 if (/\Ginclude\b\h*/gc) {
-                    my ($var_names, $pos) = $self->get_init_vars(code => substr($_, pos), with_vals => 0);
+                    my ($var_names, $pos) =
+                      $self->get_init_vars(code      => substr($_, pos),
+                                           with_vals => 0);
                     pos($_) += $pos;
 
                     @{$var_names}
@@ -1767,7 +2003,9 @@ package Sidef::Parser {
 
                         my ($full_path, $found_module);
                         foreach my $inc_dir (@{$self->{inc}}) {
-                            if (-e ($full_path = File::Spec->catfile($inc_dir, $mod_path)) and -f _ and -r _) {
+                            if (    -e ($full_path = File::Spec->catfile($inc_dir, $mod_path))
+                                and -f _
+                                and -r _ ) {
                                 $found_module = 1;
                                 last;
                             }
@@ -1790,7 +2028,12 @@ package Sidef::Parser {
                         my $content = do { local $/; <$fh> };
                         close $fh;
 
-                        my $parser = __PACKAGE__->new(script_name => $full_path);
+                        my $parser = __PACKAGE__->new(
+                                                      file_name   => $full_path,
+                                                      script_name => $self->{script_name},
+                                                      strict      => $self->{strict},
+                                                     );
+
                         local $parser->{class} = $var_name;
                         my $struct = $parser->parse_script(code => $content);
 
@@ -1810,7 +2053,10 @@ package Sidef::Parser {
                 my ($obj, $pos) = $self->parse_obj(code => substr($_, pos));
                 pos($_) += $pos;
 
-                my $ref_obj = ref($obj) eq 'HASH' ? ref($obj->{$self->{class}}[-1]{self}) : ref($obj);
+                my $ref_obj =
+                    ref($obj) eq 'HASH'
+                  ? ref($obj->{$self->{class}}[-1]{self})
+                  : ref($obj);
 
                 if (defined $obj) {
                     push @{$struct{$self->{class}}}, {self => $obj};
@@ -1831,7 +2077,9 @@ package Sidef::Parser {
                         }
 
                         my $is_operator = /\G(?!->)/ && /\G(?=$self->{re}{operators})/o;
-                        if ($is_operator || /\G(?:->|\.)\h*/gc || /\G(?=$self->{re}{var_name})/o) {
+                        if (   $is_operator
+                            || /\G(?:->|\.)\h*/gc
+                            || /\G(?=$self->{re}{var_name})/o) {
 
                             if ((my ($pos, $end) = $self->parse_whitespace(code => substr($_, pos)))[0]) {
                                 pos($_) += $pos;
@@ -1884,18 +2132,24 @@ package Sidef::Parser {
                                     $check_vars->({$class => $variable});
                                 }
                                 elsif (   $variable->{count} == 0
-                                       && $variable->{name} ne '_'
                                        && $variable->{type} ne 'class'
                                        && $variable->{type} ne 'func'
-                                       && $variable->{name} ne '') {
-                                    warn +(   $variable->{type} eq 'const'
-                                           || $variable->{type} eq 'define'
-                                           || $variable->{type} eq 'enum' ? 'Constant' : 'Variable')
+                                       && $variable->{type} ne 'method'
+                                       && $variable->{name} ne 'self'
+                                       && $variable->{name} ne ''
+                                       && chr(ord $variable->{name}) ne '_') {
+                                    warn '[WARN] '
+                                      . (
+                                         $variable->{type} eq 'const'
+                                           || $variable->{type} eq 'define' || $variable->{type} eq 'enum'
+                                         ? 'Constant'
+                                         : 'Variable'
+                                        )
                                       . " '$variable->{name}' has been initialized, but not used again, at "
-                                      . "$self->{script_name}, line $variable->{line}\n";
+                                      . "$self->{file_name}, line $variable->{line}\n";
                                 }
                                 elsif ($DEBUG) {
-                                    warn "Variable '$variable->{name}' is used $variable->{count} times!\n";
+                                    warn "[WARN] Variable '$variable->{name}' is used $variable->{count} times!\n";
                                 }
                             }
                         }
@@ -1992,6 +2246,9 @@ package Sidef::Parser {
                                    pos   => (pos($_)),
                                    error => "expected a method",
                                   );
+
+                pos($_) += 1;
+                redo;
             }
         }
     }

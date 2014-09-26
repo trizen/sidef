@@ -1,0 +1,93 @@
+#!/usr/bin/ruby
+
+func usage(code=0) {
+    <<"USAGE".say;
+#{__FILE__}: convert any file to MP3 by running multiple instances
+             of ffmpeg at the same time in a controllable way.
+
+Date: 17 June 2014
+License: GPLv3
+Website: http://github.com/trizen
+
+Usage:
+      ./#{__FILE__} [options] -f [files]
+
+Options:
+       -t int         : use this many threads (default: 2)
+       -o str         : output directory (default: .)
+       -f f1 f2 [...] : input files
+USAGE
+
+    Sys.exit(code);
+}
+
+func executeCmd(cmd, arg) {
+    Sys.system(cmd, arg...);
+}
+
+func wait_th(forks) {
+    say "** Running threads: #{forks.len}";
+    say "** FFmpeg exit-code: #{forks.shift.get}";
+}
+
+func main() {
+    const remFormat = %r/\.\w{1,5}\z/;
+    const outputFormat = "mp3";
+
+    const ffmpegCmd = "ffmpeg";
+    var ffmpegArg = ["-y", "-vn", "-ac", "2", "-ab", "192K", "-ar", "48000", "-f", outputFormat];
+
+    var files = [];
+    var maxThreads = 2;
+    var outputDir = Dir.cwd;
+
+    # Command-line flags
+    var glong = (require('Getopt::Long')->());
+    glong.GetOptionsFromArray(ARGV,
+        'output-dir|o=s' => func(_, val) { outputDir  = Dir.new(val) },
+        'threads|t=i'    => func(_, val) { maxThreads = Num.new(val) },
+        'files|f=s{1,}'  => func(_, val) { files.push(File.new(val)) },
+        'help|h'         => func         { usage()                   },
+    );
+
+    files.len == 0 && (
+        Sys.warn("\n[!] No input file has been provided!\n\n");
+        usage(2);
+    );
+
+    var forks = [];
+    var counter = 0;
+    files.each { |file|
+
+        file.exists || (
+            "File `#{file}' does not exists! Skipping file...\n".warn;
+            next;
+        );
+
+        # Basename only
+        var outputFile = file.basename;
+
+        # Remove the format suffix
+        outputFile.sub!(remFormat);
+
+        outputFile = (outputDir.concat(outputFile + "." + outputFormat));
+        printf("[%2d] %s -> %s\n", counter++, file, outputFile);
+
+        var args = ['-i', file.to_s, ffmpegArg..., outputFile];
+        forks.append({executeCmd(ffmpegCmd, args)}.fork);
+
+        if (forks.len >= maxThreads) {
+            wait_th(forks);
+        }
+    }
+
+    while (forks.len > 0) {
+        wait_th(forks);
+    }
+
+    if (counter > 0) {
+        say "** All done!";
+    }
+}
+
+main();

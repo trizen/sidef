@@ -31,7 +31,7 @@ func main () {
 
     # Store anagrams in hash table by letters they contain
     words.each { |word|
-        letter_list[word.sort] := [] append(word);
+        letter_list[word.sort] \\= [] append(word);
     }
 
     "** The hashing took %d seconds!\n".printf(Time.now - time);

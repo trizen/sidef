@@ -19,4 +19,4 @@ func quicksort(arr) {
     forks[0].get + [p] + forks[1].get;
 }
 
-quicksort(1..10 shuffle).dump.say;
+quicksort(1..50 shuffle).dump.say;

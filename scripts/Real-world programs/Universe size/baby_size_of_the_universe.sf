@@ -5,7 +5,7 @@ func m_to_light_years(meters) {
 }
 
 var hidrogen_atoms  = (10**80);                                                # the total number of hidrogen atoms in the observable universe
-var planck_length   = (1.61619926 * 10**(-35));                                # the smallest length possible? (open question)
+var planck_length   = (1.61619926 * 10**(-35));                                # the shortest length possible? (open question)
 var electron_radius = (2.817940326727 * 10**(-15));                            # assume this to be the size of an elementary particle
 var elem_particles  = (hidrogen_atoms * (3 #`[quarks] + 1 #`[electrons]));     # the total number of elementary particles in the observable universe
 
@@ -22,8 +22,8 @@ has 1 proton and 1 electron, but a proton is composed of 3 quarks, so an
 hidrogen atom has four elementary particles (3 quarks + 1 electron).
 
 The particle radius used by this program is the classical electron radius.
-It may not be wise to use this length for quarks, but lacking to a definite
-size, it may give you an intuition.
+It may not be wise to use this length for quarks, but lacking of a definite
+size, this may give us a basic intuition.
 
 The second length, which is the Planck length, is used for compressing a
 particle to a diameter equal to the Planck length.
@@ -35,8 +35,6 @@ Uncompressed particles:
 Compressed particles to the Planck length:
 #{compressed_universe.commify} meters
 #{m_to_light_years(compressed_universe).commify} light years
-
-Question: can you believe the Universe has been much smaller than this?
 
 EOT
 

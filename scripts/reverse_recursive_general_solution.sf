@@ -6,10 +6,10 @@ func reverse (data) {
 
     # Create a new object of the same
     # type as the data provided as argument
-    rev = data.get_value.new;
+    var rev = data.get_value.new;
 
     # Cut the last item from data
-    last = data.pop;
+    var last = data.pop;
     data = data.ft(0, -1);
 
     # Append it to our reversed object

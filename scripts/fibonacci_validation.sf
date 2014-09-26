@@ -1,7 +1,10 @@
 #!/usr/bin/ruby
 
-func is_fib (pos, fib) {
-    5.sqrt*fib + (-(1.25.sqrt-0.5)**pos) log(1.25.sqrt+0.5) round(pos) == pos;
+var S = Math.sqrt(1.25)+0.5;
+var T = Math.sqrt(1.25)-0.5;
+
+func is_fib (i, fib) {
+    (((fib * S+T) + Math.pow(-T, i)).log(S) -> round(i)) == i;
 }
 
 for [

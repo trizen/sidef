@@ -23,7 +23,7 @@ hash["key"] == "changed"
 ## Block-code to hash
 #
 
-var hash2 = (:("key" => "value"));
+var hash2 = :("key" => "value");
 
 hash2["key"] = "jjj";
 hash2["key"] == "jjj"
@@ -33,11 +33,26 @@ hash2["key"] == "jjj"
 ## Object init hash
 #
 
-var hash3 = (Hash.new("key" => "value"));
+var hash3 = Hash.new("key" => "value");
 
-hash3["key"] = "zzz";
-hash3["key"] == "zzz"
-    || ("Hash 3 fail!\n".die);
+hash3["key"]  = "zzz";
+hash3["key"] == "zzz" || "Hash 3 fail!\n".die;
 
 
-"All tests passed!".say;
+#
+## Hash from pairs
+#
+
+var hash4 = Hash.new(
+    a: 1,
+    b: 2,
+    c: 3,
+);
+
+hash4[:c] == 3 || "hash4 error (c)!".die;
+hash4[:a] == 1 || "hash4 error (a)!".die;
+
+#
+## All done
+#
+"Test passed!".say;

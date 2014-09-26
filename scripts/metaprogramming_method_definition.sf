@@ -2,7 +2,7 @@
 
 # See: http://en.wikipedia.org/wiki/Ruby_(programming_language)#Metaprogramming
 
-class Color (text) {
+class Color(text) {
     static COLORS = :(
            black   => "000",
            red     => "f00",
@@ -22,7 +22,7 @@ class Color (text) {
         };
 };
 
-var text = Color.new("Hello World");
+var text = Color("Hello World");
 
 say text.in_red;
 say text.in_green;

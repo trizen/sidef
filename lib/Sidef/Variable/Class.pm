@@ -15,19 +15,18 @@ package Sidef::Variable::Class {
 
         my ($name) = ($AUTOLOAD =~ /^.*[^:]::(.*)$/);
 
-        if (exists $self->{__NAMES__}{$name}) {
+        if (exists $self->{__VARS__}{$name}) {
             if (@args) {
-                return $self->{__NAMES__}{$name} = $args[0];
+                return $self->{__VARS__}{$name} = $args[0];
             }
-            else {
-                return $self->{__NAMES__}{$name};
-            }
+            return $self->{__VARS__}{$name};
         }
 
         if (exists $self->{method}{$name}) {
 
             if (exists $self->{method}{'CHECK'}) {
-                $self->{method}{'CHECK'}->call($self, Sidef::Types::String::String->new($name), @args) || return;
+                $self->{method}{'CHECK'}->call($self, Sidef::Types::String::String->new($name), @args)
+                  || return;
             }
 
             return $self->{method}{$name}->call($self, @args);
@@ -36,7 +35,7 @@ package Sidef::Variable::Class {
             return $self->{method}{'AUTOLOAD'}->call($self, Sidef::Types::String::String->new($name), @args);
         }
         else {
-            warn "Can't find method `$name' for class: $self->{name}\n";
+            warn "[WARN] Can't find method `$name' for class: $self->{name}\n";
         }
 
         return;

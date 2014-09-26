@@ -7,7 +7,7 @@ class Sierpinski {
     #  **
     method letter_s(n) {
         var c = ['*'];
-        { |i|
+        {
             c = (c.map{|x| ' '.times(x.len*2) + x*2 + ' '.times(x.len*1)   } +
                  c.map{|x| x + ' '.times(x.len) + x + ' '.times(x.len) + x } +
                  c.map{|x| ' '.times(x.len*1) + x*2 + ' '.times(x.len*2)   }
@@ -21,7 +21,7 @@ class Sierpinski {
     # *
     method letter_i(n) {
         var c = ['*'];
-        { |i|
+        {
             c = (c.map{|x| x*n } +
                  c.map{|x| x*n } +
                  c.map{|x| x*n }
@@ -35,7 +35,7 @@ class Sierpinski {
     # ***
     method letter_d(n) {
         var c = ['*'];
-        { |i|
+        {
             c = (c.map{|x| x*1 + ' '.times(x.len*2) } +
                  c.map{|x| x*2 + ' '.times(x.len*1) } +
                  c.map{|x| x*3                      }
@@ -49,7 +49,7 @@ class Sierpinski {
     # ***
     method letter_e(n) {
         var c = ['*'];
-        { |i|
+        {
             c = (c.map{|x| x*3                    } +
                  c.map{|x| x*2 + ' '.times(x.len) } +
                  c.map{|x| x*3                    }
@@ -63,7 +63,7 @@ class Sierpinski {
     # *
     method letter_f(n) {
         var c = ['*'];
-        { |i|
+        {
             c = (c.map{|x| x*3                      } +
                  c.map{|x| x*2 + ' '.times(x.len*1) } +
                  c.map{|x| x*1 + ' '.times(x.len*2) }

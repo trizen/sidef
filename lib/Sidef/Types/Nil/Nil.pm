@@ -19,4 +19,6 @@ package Sidef::Types::Nil::Nil {
         Sidef::Types::String::String->new('nil');
     }
 
-}
+};
+
+1

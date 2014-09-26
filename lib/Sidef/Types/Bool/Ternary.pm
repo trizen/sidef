@@ -16,4 +16,6 @@ package Sidef::Types::Bool::Ternary {
         };
     }
 
-}
+};
+
+1

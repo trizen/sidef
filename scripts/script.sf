@@ -74,7 +74,7 @@ var y = ("RaNdOm StRiNg"->lc); # RIGHT!!!
 
 var single = 'this \Uis\E a \Utest\n';
 single->say;
-(single->apply_escapes, "hello".say)->say;
+single.apply_escapes.say;
 
 # -----------------------------------------------
 

@@ -43,6 +43,13 @@ package Sidef::Types::Regex::Matches {
         }
 
         $hash{captures} = \@captures;
+
+        if (defined $hash{parser}) {
+            while (my ($key, $value) = each %{$hash{parser}{regexp_vars}}) {
+                $value->set_value(Sidef::Types::String::String->new($captures[$key - 1]));
+            }
+        }
+
         bless \%hash, __PACKAGE__;
     }
 
@@ -65,23 +72,27 @@ package Sidef::Types::Regex::Matches {
         Sidef::Types::Array::Array->new(map { Sidef::Types::String::String->new($_) } @{$self->{captures}});
     }
 
-    *cap = \&captures;
+    *cap  = \&captures;
+    *caps = \&captures;
 
     sub named_captures {
         my ($self) = @_;
         my $hash = Sidef::Types::Hash::Hash->new();
 
         foreach my $key (keys %{$self->{named_captures}}) {
-            $hash->{$key} = Sidef::Types::String::String->new($self->{named_captures}{$key});
+            $hash->{data}{$key} = Sidef::Types::String::String->new($self->{named_captures}{$key});
         }
 
         $hash;
     }
 
-    *ncap = \&named_captures;
+    *ncap  = \&named_captures;
+    *ncaps = \&named_captures;
 
     {
         no strict 'refs';
         *{__PACKAGE__ . '::' . '??'} = \&matched;
     }
-}
+};
+
+1

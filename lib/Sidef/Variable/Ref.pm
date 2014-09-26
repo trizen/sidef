@@ -16,10 +16,8 @@ package Sidef::Variable::Ref {
             if (ref $var eq 'Sidef::Variable::Variable') {
                 return $self->new($var);
             }
-            else {
-                warn sprintf("[WARN] '%s' is not a variable!\n", ref($var));
-            }
 
+            warn sprintf("[WARN] '%s' is not a variable!\n", ref($var));
             $self;
         };
 
@@ -31,14 +29,19 @@ package Sidef::Variable::Ref {
             }
 
             if (ref($var_ref) eq ref($self)) {
-                return Sidef::Variable::Variable->new('', 'var', $var_ref->{var});
-            }
-            else {
-                warn sprintf("[WARN] '%s' is not a variable reference!\n", ref($var_ref));
+                return Sidef::Variable::Variable->new(name => '', type => 'var', value => $var_ref->{var});
             }
 
+            warn sprintf("[WARN] '%s' is not a variable reference!\n", ref($var_ref));
             $self;
         };
+
+        foreach my $method (qw(-- ++)) {
+            *{__PACKAGE__ . '::' . $method} = sub {
+                $_[0]->{var}->$method;
+            };
+        }
+
     }
 
     sub get_var {

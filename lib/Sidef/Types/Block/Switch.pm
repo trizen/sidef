@@ -64,4 +64,6 @@ package Sidef::Types::Block::Switch {
         $self->{obj};
     }
 
-}
+};
+
+1

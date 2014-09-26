@@ -16,7 +16,6 @@ use warnings;
 use open IO     => 'utf8';
 use open ':std' => 'utf8';
 
-use File::Slurp qw(read_file);
 use Sidef::Tidy qw(sf_beautify);
 use Getopt::Std qw(getopts);
 

@@ -1,0 +1,29 @@
+#!/usr/bin/ruby
+
+func base64_decode(str) {
+
+    str.tr!('A-Za-z0-9+=', '', 'cd');
+    str.sub!(/=+\z/, '');
+    str.tr!('A-Za-z0-9+', %q[ -_]);
+
+    str.split(60).map { |chunk|
+        'u'.unpack('C'.pack(32 + (chunk.len * 3/4 -> int)) + chunk);
+    }.join;
+}
+
+var base64_text = <<'BASE64';
+QmFzZTY0IGVuY29kaW5nIGNhbiBiZSBoZWxwZnVsIHdoZW4gZmFpcmx5IGxlbmd0aHkgaWRlbnRp
+ZnlpbmcgaW5mb3JtYXRpb24gaXMgdXNlZCBpbiBhbiBIVFRQIGVudmlyb25tZW50LiBGb3IgZXhh
+bXBsZSwgYSBkYXRhYmFzZSBwZXJzaXN0ZW5jZSBmcmFtZXdvcmsgZm9yIEphdmEgb2JqZWN0cyBt
+aWdodCB1c2UgQmFzZTY0IGVuY29kaW5nIHRvIGVuY29kZSBhIHJlbGF0aXZlbHkgbGFyZ2UgdW5p
+cXVlIGlkIChnZW5lcmFsbHkgMTI4LWJpdCBVVUlEcykgaW50byBhIHN0cmluZyBmb3IgdXNlIGFz
+IGFuIEhUVFAgcGFyYW1ldGVyIGluIEhUVFAgZm9ybXMgb3IgSFRUUCBHRVQgVVJMcy4gQWxzbywg
+bWFueSBhcHBsaWNhdGlvbnMgbmVlZCB0byBlbmNvZGUgYmluYXJ5IGRhdGEgaW4gYSB3YXkgdGhh
+dCBpcyBjb252ZW5pZW50IGZvciBpbmNsdXNpb24gaW4gVVJMcywgaW5jbHVkaW5nIGluIGhpZGRl
+biB3ZWIgZm9ybSBmaWVsZHMsIGFuZCBCYXNlNjQgaXMgYSBjb252ZW5pZW50IGVuY29kaW5nIHRv
+IHJlbmRlciB0aGVtIGluIG5vdCBvbmx5IGEgY29tcGFjdCB3YXksIGJ1dCBpbiBhIHJlbGF0aXZl
+bHkgdW5yZWFkYWJsZSBvbmUgd2hlbiB0cnlpbmcgdG8gb2JzY3VyZSB0aGUgbmF0dXJlIG9mIGRh
+dGEgZnJvbSBhIGNhc3VhbCBodW1hbiBvYnNlcnZlci4K
+BASE64
+
+print base64_decode(base64_text);

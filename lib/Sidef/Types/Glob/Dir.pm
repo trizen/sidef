@@ -29,6 +29,18 @@ package Sidef::Types::Glob::Dir {
         defined($home) ? __PACKAGE__->new($home) : ();
     }
 
+    sub cwd {
+        my ($self) = @_;
+
+        require Cwd;
+        __PACKAGE__->new(Cwd::getcwd());
+    }
+
+    *cur_dir           = \&cwd;
+    *cur               = \&cwd;
+    *current_directory = \&cwd;
+    *current_dir       = \&cwd;
+
     sub exists {
         my ($self) = @_;
         Sidef::Types::Bool::Bool->new(-e $$self);
@@ -150,6 +162,8 @@ package Sidef::Types::Glob::Dir {
                   );
     }
 
+    *catfile = \&concat;
+
     sub is_empty {
         my ($self) = @_;
 
@@ -187,4 +201,7 @@ package Sidef::Types::Glob::Dir {
         no strict 'refs';
         *{__PACKAGE__ . '::' . '+'} = \&concat;
     }
-}
+
+};
+
+1

@@ -27,11 +27,6 @@ package Sidef::Types::Bool::Bool {
     }
 
     {
-        *{__PACKAGE__ . '::' . '!'} = sub {
-            my ($self, $bool) = @_;
-            $self->new($bool)->not;
-        };
-
         *{__PACKAGE__ . '::' . '&&'} = \&and;
         *{__PACKAGE__ . '::' . '&'}  = \&and;
 
@@ -46,7 +41,9 @@ package Sidef::Types::Bool::Bool {
 
             if ($$self eq 'true') {
                 my $result = Sidef::Types::Block::Code->new($code)->run;
-                return Sidef::Types::Bool::Ternary->new(code => $result, bool => 1);
+                return
+                  Sidef::Types::Bool::Ternary->new(code => $result,
+                                                   bool => 1);
             }
 
             return Sidef::Types::Bool::Ternary->new(code => $code, bool => 0);
@@ -118,4 +115,7 @@ package Sidef::Types::Bool::Bool {
         my ($self) = @_;
         Sidef::Types::String::String->new($$self);
     }
-}
+
+};
+
+1

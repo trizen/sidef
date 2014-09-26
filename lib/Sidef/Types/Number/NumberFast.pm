@@ -70,7 +70,7 @@ package Sidef::Types::Number::Number {
         $self->new($fac);
     }
 
-    *fac = \&factorial;
+    *fact = \&factorial;
 
     sub root {
         my ($self, $n) = @_;
@@ -159,7 +159,7 @@ package Sidef::Types::Number::Number {
 
     sub is_zero {
         my ($self) = @_;
-        Sidef::Types::Bool::Bool->new($$self eq 0);    # 'eq' is well intented here
+        Sidef::Types::Bool::Bool->new($$self eq '0');    # 'eq' is well intented here
     }
 
     *isZero = \&is_zero;

@@ -1,0 +1,197 @@
+#!/usr/bin/ruby
+
+define DPI   (2 * Math.pi);
+define NAMES (%w(Unknown Ramanujan Trizen Stirling Stirling+Laplace Ramanujan2 Batir Batir2));
+
+# Unknown
+func f1(n) {
+    define w = ((3 - 3.sqrt) / 6);
+    define d = (DPI * Math.e sqrt * Math.exp(-w));
+    d * (Math.pow((n+w) / Math.e, n + 1/2));
+}
+
+# S. Ramanujan's formula
+func f2(n) {
+    define d = (Math.pi.log / 2);
+    Math.exp(n * n.log - n + (n * (1 + (4*n * (1 + 2*n))) log / 6) + d);
+}
+
+# Trizen's formula
+func f3(n) {
+    n**n / n.exp * (Math.e / n.sqrt) / Math.e.root((12 + 1/n.root(Math.e + (1 / (n - ((n*2).log(n+1)))))) * Math.e.root(n));
+}
+
+# Stirling's formula
+func f4(n) {
+    DPI * n sqrt * Math.pow(n / Math.e, n);
+}
+
+# Stirling's formula + Laplace's method (1)
+func f5(n) {
+    DPI * n sqrt * Math.pow(n / Math.e, n) * (1 + 1/(12*n));
+}
+
+# S. Ramanujan (2)
+func f6(n) {
+    define w = (Math.pi.sqrt);
+    w * Math.pow(n, n) * Math.exp(-n) * Math.pow(((8 * n**3) + (4 * n**2) + n + 1/30), 1/6);
+}
+
+# N. Batir
+func f7(n) {
+    define w = (DPI.sqrt);
+    w * Math.pow(n, n) * Math.exp(-n) * (n + 1/2 -> sqrt) * Math.exp(-(1 / (6 * (n + 3/8))));
+}
+
+# N. Batir (2)
+func f8(n) {
+    define w = (DPI.sqrt);
+    w * Math.pow(n, n) * Math.exp(-n) * (n + 1/6 + 1/(72*n) - 31/(6480 * n**2) - 139/(155520 * n**3) + 9871/(6531840 * n**4) -> sqrt);
+}
+
+#
+## TESTS
+#
+
+var report = Hash.new;
+for (1..10) { |x|
+    var xfact = x!;
+    report[NAMES] += [f1(x), f2(x), f3(x+1), f4(x), f5(x), f6(x), f7(x), f8(x)];
+
+    "\n%-22d%s\n".printf(x, xfact);
+    NAMES.each { |name|
+        "%20s: %s\n".printf(name, report[name][-1]);
+    };
+
+    report[:REAL] \\= [];
+    report[:REAL].append(xfact);
+}
+
+func A(a) { a.sum / a.len };
+func G(a) { a.prod.root(a.len) };
+func H(a) { a.len / a.map{1/_}.sum };
+
+var r1 = Hash.new;
+var r2 = Hash.new;
+var r3 = Hash.new;
+
+NAMES.each {|name|
+    var arr = report[name].range.map {|i| report[:REAL][i] - report[name][i] -> abs};
+    r1[name] = A(arr);
+    r2[name] = G(arr);
+    r3[name] = H(arr);
+}
+
+func print_report(h) {
+    h.keys.sort {|a, b| h[a] <=> h[b]}.each {|key|
+        "%20s: %s\n".printf(key, h[key]);
+    }
+}
+
+say ("\n", '-'*80);
+
+say "\n=>> A <<=";
+print_report(r1);
+
+say "\n=>> G <<=";
+print_report(r2)
+
+say "\n=>> H <<=";
+print_report(r3);
+
+say ("\n", '-'*80);
+
+__END__
+
+# n**n / Math.e**n * (Math.e / n.sqrt) / Math.e.root((12 + 1/n.root(Math.e + 1/n)) * Math.e.root(n))
+
+=>> A <<=
+           Ramanujan: 17227.35975752306879979364386289094736049
+    Stirling+Laplace: 1374152.686316984184789558611239316241081
+                   X: 3258272.402889078597332677782581156859957
+              Trizen: 8745124.382320569853902921429974795542898
+            Stirling: 520291054.0437034308450234613424874455778
+
+=>> G <<=
+           Ramanujan: 0.2382035468119453515277743628077925778953
+    Stirling+Laplace: 9.048822304635244205170836420825635110329
+              Trizen: 13.27990802841799962953167489346047852653
+                   X: 23.47851162581646932771914971567218716071
+            Stirling: 1730.473353373642035138653405003415998973
+
+=>> H <<=
+           Ramanujan: 0.0003518638691865450758519988503392493423625
+    Stirling+Laplace: 0.005208775156751485074590224507088179620533
+                   X: 0.01699145650956935694728542551623779084417
+              Trizen: 0.02907198647486457713154386016008401959684
+            Stirling: 0.4418923153662317458634522411809580876667
+
+# n**n / Math.e**n * (Math.e / n.sqrt) / Math.e.root((12 + 1/n.root(Math.e + (1 / (n - ((n+1).log(n)))))) * Math.e.root(n))
+
+=>> A <<=
+           Ramanujan: 17227.35975752306879979364386289094736049
+    Stirling+Laplace: 1374152.686316984184789558611239316241081
+                   X: 3258272.402889078597332677782581156859957
+              Trizen: 8418525.228730599176631410423414791160427
+            Stirling: 520291054.0437034308450234613424874455778
+
+=>> G <<=
+           Ramanujan: 0.2382035468119453515277743628077925778953
+    Stirling+Laplace: 9.048822304635244205170836420825635110329
+              Trizen: 10.16899677263594598237180084844605882699
+                   X: 23.47851162581646932771914971567218716071
+            Stirling: 1730.473353373642035138653405003415998973
+
+=>> H <<=
+           Ramanujan: 0.0003518638691865450758519988503392493423625
+    Stirling+Laplace: 0.005208775156751485074590224507088179620533
+                   X: 0.01699145650956935694728542551623779084417
+              Trizen: 0.02546215826601973613259829626597286892227
+            Stirling: 0.4418923153662317458634522411809580876667
+
+#   n**n / Math.e**n * (Math.e / n.sqrt) / Math.e.root((12 + 1/n.root(Math.e + (1 / (n - ((n*2).log(n+1)))))) * Math.e.root(n))
+
+=>> A <<=
+           Ramanujan: 17227.35975752306879979364386289094736049
+    Stirling+Laplace: 1374152.686316984184789558611239316241081
+                   X: 3258272.402889078597332677782581156859957
+              Trizen: 8348835.979056423073726691010038113564631
+            Stirling: 520291054.0437034308450234613424874455778
+
+=>> G <<=
+           Ramanujan: 0.2382035468119453515277743628077925778953
+    Stirling+Laplace: 9.048822304635244205170836420825635110329
+              Trizen: 9.747187919620121519070100835139887071518
+                   X: 23.47851162581646932771914971567218716071
+            Stirling: 1730.473353373642035138653405003415998973
+
+=>> H <<=
+           Ramanujan: 0.0003518638691865450758519988503392493423625
+    Stirling+Laplace: 0.005208775156751485074590224507088179620533
+                   X: 0.01699145650956935694728542551623779084417
+              Trizen: 0.0274253575001141475168921757413664330416
+            Stirling: 0.4418923153662317458634522411809580876667
+
+
+#   n**n / Math.e**n * (Math.e / n.sqrt) / Math.e.root((12 + 1/n.root(Math.e + (1 / (n / n.sqrt.root(Math.pi))))) * Math.e.root(n))
+
+=>> A <<=
+           Ramanujan: 17227.35975752306879979364386289094736049
+    Stirling+Laplace: 1374152.686316984184789558611239316241081
+                   X: 3258272.402889078597332677782581156859957
+              Trizen: 6126490.447897013063547306801678570204269
+            Stirling: 520291054.0437034308450234613424874455778
+
+=>> G <<=
+           Ramanujan: 0.2382035468119453515277743628077925778953
+    Stirling+Laplace: 9.048822304635244205170836420825635110329
+              Trizen: 14.47810173352987437580539206932826232305
+                   X: 23.47851162581646932771914971567218716071
+            Stirling: 1730.473353373642035138653405003415998973
+
+=>> H <<=
+           Ramanujan: 0.0003518638691865450758519988503392493423625
+    Stirling+Laplace: 0.005208775156751485074590224507088179620533
+                   X: 0.01699145650956935694728542551623779084417
+              Trizen: 0.02816847014363832267723451525071788442495
+            Stirling: 0.4418923153662317458634522411809580876667

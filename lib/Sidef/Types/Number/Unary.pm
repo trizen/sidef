@@ -12,21 +12,11 @@ package Sidef::Types::Number::Unary {
             $_[1];
         };
 
-        *{__PACKAGE__ . '::' . '++'} = sub {
-            my ($self, $obj) = @_;
-            $obj->inc;
-        };
-
-        *{__PACKAGE__ . '::' . '--'} = sub {
-            my ($self, $obj) = @_;
-            $obj->dec;
-        };
-
-        *{__PACKAGE__ . '::' . '~'} = sub {
-            my ($self, $number) = @_;
-            $self->_is_number($number, 1) || return;
-            $number->not;
-        };
+        foreach my $method (qw(++ -- ~)) {
+            *{__PACKAGE__ . '::' . $method} = sub {
+                $_[1]->$method;
+            };
+        }
 
         *{__PACKAGE__ . '::' . '-'} = sub {
             my ($self, $number) = @_;
@@ -43,6 +33,11 @@ package Sidef::Types::Number::Unary {
         *{__PACKAGE__ . '::' . '?'} = sub {
             my ($self, $obj) = @_;
             Sidef::Types::Bool::Bool->new($obj);
+        };
+
+        *{__PACKAGE__ . '::' . '!'} = sub {
+            my ($self, $bool) = @_;
+            Sidef::Types::Bool::Bool->new(!$bool);
         };
     }
 

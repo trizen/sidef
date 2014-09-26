@@ -2,8 +2,9 @@
 
 use utf8;
 use 5.014;
+use Encode::Locale qw();
 
-BEGIN {    # support to run sidef from everywhere
+BEGIN {    # support for running sidef locally from everywhere
     require File::Spec;
     require File::Basename;
     unshift @INC,
@@ -18,9 +19,9 @@ BEGIN {    # support to run sidef from everywhere
                         );
 }
 
-binmode(STDOUT, ':utf8');
-binmode(STDERR, ':utf8') if $^P == 0;    # to work under Devel::* modules
-binmode(STDIN,  ':utf8');
+binmode STDIN,  ":encoding(console_in)"  if (-t STDIN);
+binmode STDOUT, ":encoding(console_out)" if (-t STDOUT);
+binmode STDERR, ":encoding(console_out)" if (-t STDERR and $^P == 0);    # to work under Devel::* modules
 
 require Sidef::Init;
 
@@ -30,7 +31,7 @@ my $version = $Sidef::VERSION;
 my %args;
 if ($#ARGV != -1 and chr ord $ARGV[0] eq '-') {
     require Getopt::Std;
-    Getopt::Std::getopts('E:d:Dho:ivHN:n:WwcM:', \%args);
+    Getopt::Std::getopts('E:d:Dho:ivHN:n:WwcM:S', \%args);
 }
 
 # Help
@@ -74,7 +75,7 @@ if (defined(my $type = $args{N})) {
         ## default
     }
     else {
-        warn "Invalid type '${type}' for number implementation";
+        die "Invalid value '${type}' for option '-N'!";
     }
 }
 
@@ -89,8 +90,10 @@ if (defined(my $types = $args{M})) {
     memoize_types($types);
 }
 
-# Dump the data structure
+# Code from a dumped parse-tree
 if (defined $args{d}) {
+    require Math::BigFloat;
+    Math::BigFloat->import;
     my $struct = do($args{d})
       || die "Can't load the data structure from file '$args{d}': $!\n";
     execute_struct($struct);
@@ -113,7 +116,7 @@ else {
         defined($args{E}) || die "No code specified for -E.\n";
         $script_name = '-E';
         require Encode;
-        Encode::decode_utf8($args{E});
+        Encode::decode(locale => $args{E});
       }
       : defined($ARGV[0]) && (-f $ARGV[0]) ? do {
         $script_name = shift @ARGV;
@@ -127,7 +130,11 @@ else {
       : do { local $/; <> };
 
     $code // exit 2;
-    my $parser = Sidef::Parser->new(script_name => $script_name);
+    my $parser = Sidef::Parser->new(
+                                    file_name   => $script_name,
+                                    script_name => $script_name,
+                                    strict      => !$args{S},
+                                   );
     my $struct = $parser->parse_script(code => $code);
 
     # Dump the data structure
@@ -167,8 +174,9 @@ sub output_usage {
                     '-H'             => 'interactive help',
                     '-N type'        => ['use a specific implementation for numbers', 'valid types: fast, big, int, rat'],
                     '-n type'        => ['try to use a specific backend for Math::BigInt', 'valid types: GMP, Pari, FastCalc'],
-                    '-M type'        => ['memoize some expensive method calls', 'valid types: str, num, block, all'],
-                    '-v'             => 'print version',
+                    '-M type,type'   => ['memoize some expensive method calls', 'valid types: str, num, block, all'],
+                    '-S'             => 'disable strictures and ignore any errors',
+                    '-v'             => 'print version number and exit',
                     '-w'             => 'enable warnings with stack backtrace',
                     '-W'             => 'make warnings fatal (with stack backtrace)',
                    );
@@ -236,7 +244,11 @@ HELP
             return;
         }
 
-        my $parser = Sidef::Parser->new(script_name => '-H');
+        my $parser = Sidef::Parser->new(
+                                        file_name   => '-H',
+                                        script_name => '-H',
+                                        strict      => !$args{S},
+                                       );
         my $struct = eval { $parser->parse_script(code => $line) };
 
         if ($@) {
@@ -258,7 +270,11 @@ HELP
 sub code_interactive {
     require Term::ReadLine;
     my $term = Term::ReadLine->new("$name $version -- interactive mode");
-    my $parser = Sidef::Parser->new(script_name => '-i');
+    my $parser = Sidef::Parser->new(
+                                    file_name   => '-i',
+                                    script_name => '-i',
+                                    strict      => !$args{S},
+                                   );
 
     print qq{$name $version on $^O\n};
     print qq{Type "help", "copyright" or "license" for more information.\n};
@@ -305,7 +321,11 @@ EOT
 
         $@ && do {
             warn $@;
-            $parser = Sidef::Parser->new(script_name => '-i');
+            $parser = Sidef::Parser->new(
+                                         file_name   => '-i',
+                                         script_name => '-i',
+                                         strict      => !$args{S},
+                                        );
             redo;
         };
 
@@ -436,7 +456,7 @@ sub memoize_types {
       ? (
         grep {
             exists $known_types{$_} || do {
-                warn "$0: unknown type '$_' for option '-m'!\n";
+                die "Invalid value '$_' for option '-M'!";
                 0;
               }
           } @types
@@ -460,7 +480,7 @@ sub compile_to_perl {
     eval { require Data::Dump };
 
     if ($@) {
-        die "Data::Dump module is not installed!\n";
+        die "Data::Dump module is not installed!";
     }
     else {
         require File::Basename;
@@ -476,6 +496,11 @@ use utf8;
 use 5.014;
 use warnings;
 
+# For `inf` and `nan` barewords
+no strict 'subs';
+no warnings 'reserved';
+
+use Encode::Locale qw();
 use File::Temp qw(tempdir);
 use File::Path qw(make_path);
 use File::Spec::Functions qw(catdir catfile);
@@ -483,9 +508,9 @@ use File::Spec::Functions qw(catdir catfile);
 my \$DIR;
 use lib \$DIR = tempdir(CLEANUP => 1);
 
-binmode(STDOUT, ':utf8');
-binmode(STDERR, ':utf8') if \$^P == 0;
-binmode(STDIN,  ':utf8');
+binmode STDIN,  ":encoding(console_in)"  if (-t STDIN);
+binmode STDOUT, ":encoding(console_out)" if (-t STDOUT);
+binmode STDERR, ":encoding(console_out)" if (-t STDERR and \$^P == 0);    # to work under Devel::* modules
 
 foreach my \$mod (
 HEAD
@@ -495,7 +520,7 @@ HEAD
             {
              no_chdir => 1,
              wanted   => sub {
-                 if (-f and /\.pm\z/) {
+                 if (/\.pm\z/ and -f) {
 
                      return if m{\bSidef\W+Init\b};
 
@@ -577,7 +602,7 @@ FOOT
 
         if (defined $args{o}) {
             open $out_fh, '>:utf8', $args{o}
-              or die "Can't open file '$args{o}' for write: $!\n";
+              or die "Can't open file '$args{o}' for write: $!";
         }
 
         print {$out_fh} $package_content;
@@ -592,8 +617,7 @@ FOOT
 ## Execute the data structure
 #
 
-my \$exec = Sidef::Exec->new();
-\$exec->execute(\$struct);
+Sidef::Exec->new->execute(\$struct);
 EXEC
     }
 }

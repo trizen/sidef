@@ -21,9 +21,9 @@ func evalArithmeticExp(s) {
                 return(add(s.replace(/--/,'+')));
             }
 
-            b = (s.split('-')).len == 3
-                ? (-1 * b[1].toNum - b[2].toNum)
-                : (operate(s, '-'))
+            var b = s.split('-') -> len == 3
+                    ? (-1 * b[1].toNum - b[2].toNum)
+                    : (operate(s, '-'));
         }
 
         s.gReplace!(/[()]/,'').gReplace!(/-\+/, '-');
@@ -36,13 +36,13 @@ func evalArithmeticExp(s) {
 
         var match;
         while (match = s.match(reMD)) {
-            cap = (match.captures.first) =~ reM ??
+            var cap = match.captures.first -> =~ reM ??
                 ? (s.replace!(reMD, operate(cap, '*').to_s))
-                : (s.replace!(reMD, operate(cap, '/').to_s))
+                : (s.replace!(reMD, operate(cap, '/').to_s));
         }
 
         while (match = s.match(reAS)) {
-            cap = (match.captures.first) =~ reA ??
+            var cap = match.captures.first -> =~ reA ??
                 ? (s.replace!(reAS,      add(cap).to_s))
                 : (s.replace!(reAS, subtract(cap).to_s));
         }

@@ -31,4 +31,6 @@ package Sidef::Types::Block::Do {
     }
 
     *{__PACKAGE__ . '::' . ':'} = \&do;
-}
+};
+
+1
