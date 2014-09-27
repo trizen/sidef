@@ -2,71 +2,30 @@
 
 # usage: script X Y Z [S]
 
-func cuboid (x, y, z, s) {
+func cuboid(x=1,y=1,z=1,s=' ',c='+',h='-',v='|',d='/') {
+    say("cuboid %d %d %d:" % [x, y, z]);
+    ' ' * z+1 + c + h*x + c -> say;
 
-    var (c, h, v, d) = (%w'
-         +  -  |  /
-    ' ...);
-
-    ' ' * (z + 1) + c + (h * x) + c . say;
-
-    {
-        ' ' * (z - _ + 1) + d + (s * x) + d +
-          (
-           s * (
-                _ - (
-                     _ > y ? (_ - y)
-                           : 1
-                    )
-               )
-          ) + (
-               _ - 1 == y ? (c)
-                          : (
-                             _ > y ? d
-                                   : v
-                            )
-              )
-          . say;
+    { |i|
+        ' ' * (z - i + 1) + d + s*x + d
+            + (s * (i - (i > y ? i-y : 1)))
+            + (i - 1 == y ? c : (i > y ? d : v)) -> say
     } * z;
 
-    c + (h * x) + c + (
-                        (
-                         s * (
-                              z < y ? z
-                                    : y
-                             )
-                        ) + (
-                             z < y ? v
-                                   : (
-                                      z == y ? c
-                                             : d
-                                     )
-                            )
-                      )
-      . say;
+    c + h*x + c + (s * (z < y ? z : y)
+        + (z < y ? v : (z == y ? c : d))) -> say;
 
-    {
-        v + (s * x) + v +
-          (
-           z > y ? (
-                    _ >= z ? (s * x + c)
-                           : (s * (y - _) + d)
-                   )
-                 : (
-                    y - _ > z ? (s * z + v)
-                              : (
-                                 s * (y - _) +
-                                   (
-                                    y - _ == z ? c
-                                               : d
-                                   )
-                                )
-                   )
-          )
-          . say;
+    { |i|
+        v + s*x + v + (z > y
+            ? (i >= z ? (s*x + c) : (s * y-i + d))
+            : (y - i > z
+                ? (s * z + v)
+                : (s * y-i + (y-i == z ? c : d))
+               )
+        ) -> say;
     } * y;
 
-    c + (h * x) + c . say;
+    c + h*x + c -> say;
 };
 
 var x = (ARGV[0] \\ 9);
