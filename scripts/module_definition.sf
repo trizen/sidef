@@ -7,9 +7,9 @@
 ## Module + func
 #
 module Fibonacci {
-        func nth(n) {
-                n > 1 ? (nth(n-2) + nth(n-1)) : n;
-        }
+    func nth(n) {
+        n > 1 ? (nth(n-2) + nth(n-1)) : n;
+    }
 }
 
 Fibonacci::nth(5) == 5 || "Fib error!".die;
@@ -19,10 +19,10 @@ Fibonacci::nth(5) == 5 || "Fib error!".die;
 ## Module + static var + func
 #
 module Google::Chrome {
-        static version = 41;
-        func info {
-                return "Developed by Google inc.";
-        }
+    static version = 41;
+    func info {
+        return "Developed by Google inc.";
+    }
 }
 
 Google::Chrome::version += 1;
@@ -35,11 +35,11 @@ Google::Chrome::info().contains("Google") || "Info error!".die;
 ## Module + (class + method)
 #
 module Foo {
-        class Bar {
-                method Zoe {
-                        return "All good!";
-                }
+    class Bar {
+        method Zoe {
+            return "All good!";
         }
+    }
 }
 
 Foo::Bar().Zoe == "All good!" || "module+class error!".die;
@@ -49,18 +49,18 @@ Foo::Bar().Zoe == "All good!" || "module+class error!".die;
 ## Class + (module + func + func) + method
 #
 class Test {
-        module Foo {            # module redeclaration
-                func Bingo {
-                        return "Bingo!";
-                };
-                func Yay {
-                        return "Yay!";
-                };
+    module Foo {            # module redeclaration
+        func Bingo {
+            return "Bingo!";
         };
+        func Yay {
+            return "Yay!";
+        };
+    };
 
-        method Bar {
-                Foo::Bingo() == "Bingo!" || "method call error!".die;
-        };
+    method Bar {
+        Foo::Bingo() == "Bingo!" || "method call error!".die;
+    };
 }
 
 Test().Bar;
@@ -72,15 +72,15 @@ Foo::Yay()   == "Yay!"   || "Yay error!".die;
 ## Module + (module + func) + func
 #
 module Hi {
-        module Hello {
-                func hello {
-                        "Hello";
-                }
-        };
-        func hi {
-                Hello::hello() == "Hello" || "Inner hello error!".die;
-                "Hi";
-        };
+    module Hello {
+        func hello {
+            "Hello";
+        }
+    };
+    func hi {
+        Hello::hello() == "Hello" || "Inner hello error!".die;
+        "Hi";
+    };
 }
 
 Hi::hi()           == "Hi"    || "Hi error!".die;

@@ -589,6 +589,7 @@ package Sidef::Types::Number::Number {
         *{__PACKAGE__ . '::' . '%%'}  = \&is_div;
         *{__PACKAGE__ . '::' . '>>'}  = \&shift_right;
         *{__PACKAGE__ . '::' . '<<'}  = \&shift_left;
+        *{__PACKAGE__ . '::' . '~'}   = \&not;
     }
 };
 

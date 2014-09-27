@@ -334,7 +334,6 @@ package Sidef::Parser {
                   print printf
                   println say
 
-                  Sidef
                   File
                   Fcntl
                   Dir
@@ -353,6 +352,8 @@ package Sidef::Parser {
                   Sig SIG
                   Regex
                   Time
+                  Sidef
+                  Parser
 
                   my
                   var

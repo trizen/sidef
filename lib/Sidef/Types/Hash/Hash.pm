@@ -15,9 +15,8 @@ package Sidef::Types::Hash::Hash {
 
         # Default value only for: Hash.new(obj);
         if (    @pairs == 1
-                and ref($class) eq __PACKAGE__
-                and ref($pairs[0]) ne 'Sidef::Types::Array::Pair'
-            ) {
+            and ref($class) eq __PACKAGE__
+            and ref($pairs[0]) ne 'Sidef::Types::Array::Pair') {
             $self->default(shift @pairs);
             return $self;
         }
@@ -306,6 +305,8 @@ package Sidef::Types::Hash::Hash {
     *pairs    = \&to_a;
     *toArray  = \&to_a;
     *to_array = \&to_a;
+    *to_pairs = \&to_a;
+    *toPairs  = \&to_a;
 
     sub exists {
         my ($self, $key) = @_;
