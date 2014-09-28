@@ -1713,11 +1713,11 @@ package Sidef::Parser {
             }
 
             if (
-                   (ref($obj) eq 'Sidef::Variable::Variable' and ($obj->{type} eq 'func' || $obj->{type} eq 'method'))
-                || (ref($obj) eq 'Sidef::Variable::ClassInit')
-                || (ref($obj) eq 'Sidef::Types::Block::Code')
-
-                and /\G\h*(?=\()/gc
+                #    (ref($obj) eq 'Sidef::Variable::Variable' and ($obj->{type} eq 'func' || $obj->{type} eq 'method'))
+                # || (ref($obj) eq 'Sidef::Variable::ClassInit')
+                # || (ref($obj) eq 'Sidef::Types::Block::Code')
+                #  and
+                /\G\h*(?=\()/gc
               ) {
                 my ($arg, $pos) = $self->parse_arguments(code => substr($_, pos));
                 pos($_) += $pos;
