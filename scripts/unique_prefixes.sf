@@ -1,0 +1,60 @@
+#!/usr/bin/ruby
+
+# Author: Daniel "Trizen" Șuteu
+# License: GPLv3
+# Date: 28 September 2014
+# Website: http://github.com/trizen
+
+# Find the unique prefixes for an array of arrays of strings
+
+func abbrev(array, code) {
+
+    var END  = Time.sec.rand.to_s;                     # some unique value
+    var CALL = code.is_a({});
+
+    var table = Hash.new;
+    array.each { |sub_array|
+        var ref = table;
+        sub_array.each { |item|
+            ref = (ref[item] \\= Hash.new);
+        };
+        ref[END] = sub_array;
+    }
+
+    var abbrevs = [];
+    func(hash) {
+        var keys = hash.keys.sort -> each { |key|
+            key != END && __FUNC__(hash[key]);
+
+            if (keys.len > 1) {
+                var count = 1;
+                var ref = (var val = hash.delete(key));
+                while (var key = ref.keys[0]  -> is_a(nil).not) {
+                    key == END
+                        ? (
+                            var arr = ref[key].ft(0, -count);
+                            CALL ? (code(arr)) : abbrevs.append(arr);
+                            break;
+                           )
+                        : (ref = (val = ref[key]));
+                    count++;
+                }
+            }
+        }
+      }(table);
+
+    return abbrevs;
+}
+
+#
+## Example: find the common directory from a list of dirs
+#
+
+var dirs = %w(
+  /home/user1/tmp/coverage/test
+  /home/user1/tmp/covert/operator
+  /home/user1/tmp/coven/members
+);
+
+var uniq = abbrev(dirs.map{.split('/')}).min_by{.len};
+uniq.pop:.join('/').say;

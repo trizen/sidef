@@ -331,6 +331,7 @@ scripts/two_dimensional_array.sf
 scripts/unexecuted_arguments.sf
 scripts/unicode.sf
 scripts/unicode_support.sf
+scripts/unique_prefixes.sf
 scripts/var_ref.sf
 scripts/var_scoping.sf
 scripts/while_loop.sf
