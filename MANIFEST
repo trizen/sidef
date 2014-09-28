@@ -179,6 +179,7 @@ scripts/code_interpolation.sf
 scripts/code_to_hash.sf
 scripts/combinations.sf
 scripts/combinations_with_repetitions.sf
+scripts/common_directory.sf
 scripts/cosmic_calendar.sf
 scripts/count_in_factors.sf
 scripts/cramers_method.sf

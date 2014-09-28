@@ -261,7 +261,7 @@ package Sidef::Types::Array::Array {
         $self->_is_code($code) || return;
 
         my $max;
-        my $min = Sidef::Math::Math->inf->neg;
+        my $min = Sidef::Types::Number::Number->inf->neg;
         my ($var_ref) = $code->init_block_vars();
 
         foreach my $item (@{$self}) {
@@ -284,7 +284,7 @@ package Sidef::Types::Array::Array {
         $self->_is_code($code) || return;
 
         my $min;
-        my $max = Sidef::Math::Math->inf;
+        my $max = Sidef::Types::Number::Number->inf;
         my ($var_ref) = $code->init_block_vars();
 
         foreach my $item (@{$self}) {
@@ -795,6 +795,59 @@ package Sidef::Types::Array::Array {
     *last_uniq  = \&last_unique;
     *lastUniq   = \&last_unique;
     *lastUnique = \&last_unique;
+
+    sub abbrev {
+        my ($self, $code) = @_;
+
+        my $__END__ = {};                                                             # some unique value
+        my $__CALL__ = defined($code) && ref($code) eq 'Sidef::Types::Block::Code';
+
+        my %table;
+        foreach my $sub_array (map { $_->get_value } @{$self}) {
+            my $ref = \%table;
+            $self->_is_array($sub_array) || return;
+            foreach my $item (@{$sub_array}) {
+                $ref = $ref->{$item->get_value} //= {};
+            }
+            $ref->{$__END__} = $sub_array;
+        }
+
+        my $abbrevs = $__CALL__ ? undef : $self->new();
+        my $callback = sub {
+            $abbrevs->append($self->new(map { $_->get_value } @_));
+        };
+
+        my $traverse;
+        (
+         $traverse = sub {
+             my ($hash) = @_;
+
+             foreach my $key (my @keys = sort keys %{$hash}) {
+                 $traverse->($hash->{$key}) if $key ne $__END__;
+
+                 if ($#keys > 0) {
+                     my $count = 0;
+                     my $ref = my $val = delete $hash->{$key};
+                     while (my ($key) = each %{$ref}) {
+                         defined($key) && $key eq $__END__
+                           ? (
+                                $__CALL__
+                              ? $code->call($self->new(map { $_->get_value } @{$ref->{$key}}[0 .. $#{$ref->{$key}} - $count]))
+                              : $callback->(@{$ref->{$key}}[0 .. $#{$ref->{$key}} - $count]),
+                              last
+                             )
+                           : ($ref = $val = $ref->{$key // last});
+                         ++$count;
+                     }
+                 }
+             }
+         }
+        )->(\%table);
+
+        $abbrevs;
+    }
+
+    *abbreviations = \&abbrev;
 
     sub contains {
         my ($self, $obj) = @_;
