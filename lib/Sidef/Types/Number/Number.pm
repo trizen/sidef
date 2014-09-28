@@ -25,7 +25,7 @@ package Sidef::Types::Number::Number {
           : (   ref($num) eq __PACKAGE__
              || ref($num) eq 'Math::BigFloat'
              || ref($num) eq 'Math::BigRat') ? (bless \Math::BigInt->new($num->as_int))
-          : (bless \Math::BigInt->new(${__PACKAGE__->new($num)}->as_int), __PACKAGE__);
+          : (bless \Math::BigInt->new(index($num, '.') > 0 ? __PACKAGE__->new($num)->as_int : $num), __PACKAGE__);
     }
 
     *new_int = \&newInt;
@@ -220,10 +220,21 @@ package Sidef::Types::Number::Number {
         $self->new(Math::BigInt->new("0x$$self"));
     }
 
+    *from_hex = \&hex;
+
+    sub oct {
+        my ($self) = @_;
+        __PACKAGE__->new(Math::BigInt->from_oct($$self));
+    }
+
+    *from_oct = \&oct;
+
     sub bin {
         my ($self) = @_;
         $self->new(Math::BigInt->new("0b$$self"));
     }
+
+    *from_bin = \&bin;
 
     sub exp {
         my ($self) = @_;
@@ -484,18 +495,24 @@ package Sidef::Types::Number::Number {
 
     sub to_bin {
         my ($self) = @_;
-
-        my $dec      = Math::BigInt->new($$self);
-        my $reminder = $dec % 2;
-
-        my @bin;
-        while ($dec->is_pos) {
-            unshift @bin, $reminder;
-            $reminder = $dec->brsft(1) % 2;
-        }
-
-        $self->new(join('', @bin));
+        __PACKAGE__->new(substr(Math::BigInt->new($$self)->as_bin, 2));
     }
+
+    *as_bin = \&to_bin;
+
+    sub to_oct {
+        my ($self) = @_;
+        __PACKAGE__->new(substr(Math::BigInt->new($$self)->as_oct, 1));
+    }
+
+    *as_oct = \&to_oct;
+
+    sub to_hex {
+        my ($self) = @_;
+        __PACKAGE__->new(substr(Math::BigInt->new($$self)->as_hex, 2));
+    }
+
+    *as_hex = \&to_hex;
 
     sub is_div {
         my ($self, $num) = @_;
