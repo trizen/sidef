@@ -30,8 +30,6 @@ package Sidef::Types::Glob::Dir {
     }
 
     sub cwd {
-        my ($self) = @_;
-
         require Cwd;
         __PACKAGE__->new(Cwd::getcwd());
     }
