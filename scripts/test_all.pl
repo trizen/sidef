@@ -39,6 +39,7 @@ my %ignored;
 
 if ($] < 5.018) {
     undef $ignored{'JASH.sf'};
+    undef $ignored{'unicode_support.sf'};
 }
 
 my $regex_filter;

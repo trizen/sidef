@@ -787,6 +787,12 @@ package Sidef::Parser {
                         while ($#{$self->{EOT}} != -1) {
                             my ($name, $type, $obj) = @{shift @{$self->{EOT}}};
 
+                            my ($indent, $spaces);
+                            if (chr ord $name eq '-') {
+                                $name = substr($name, 1);
+                                $indent = 1;
+                            }
+
                             my $acc = '';
                             until (/\G$name(?:\R|\z)/gc) {
 
@@ -794,10 +800,21 @@ package Sidef::Parser {
                                     $acc .= "$1\n";
                                 }
 
+                                # Indentation is true
+                                if ($indent && /\G\R(\h+)$name(?:\R|\z)/gc) {
+                                    ++$self->{line};
+                                    $spaces = length($1);
+                                    last;
+                                }
+
                                 /\G\R/gc
                                   ? ++$self->{line}
                                   : die sprintf(qq{%s:%s: can't find string terminator "%s" anywhere before EOF.\n},
                                                 $self->{file_name}, $beg_line, $name);
+                            }
+
+                            if ($indent) {
+                                $acc =~ s/^\h{1,$spaces}//gm;
                             }
 
                             ++$self->{line};
@@ -1386,7 +1403,7 @@ package Sidef::Parser {
                         pos($_) += $pos;
                         $name = $str;
                     }
-                    elsif (/\G(\w+)/gc) {
+                    elsif (/\G(-?\w+)/gc) {
                         $name = $1;
                     }
                     else {
