@@ -17,6 +17,15 @@ package Sidef::Types::Glob::Dir {
         ${$_[0]};
     }
 
+    sub root {
+        my ($self) = @_;
+
+        require File::Spec;
+        __PACKAGE__->new(File::Spec->rootdir);
+    }
+
+    *rootdir = \&root;
+
     sub home {
         my ($self) = @_;
 
@@ -64,6 +73,9 @@ package Sidef::Types::Glob::Dir {
         my ($self) = @_;
         Sidef::Types::Bool::Bool->new(rmdir $$self);
     }
+
+    *delete = \&remove;
+    *unlink = \&remove;
 
     # Remove the directory with all its content
     sub remove_tree {

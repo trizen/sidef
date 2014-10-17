@@ -48,6 +48,9 @@ package Sidef::Time::Gmtime {
         Sidef::Types::String::String->new(POSIX::strftime($format, @{$self->{time}}));
     }
 
+    *format = \&strftime;
+    *strf   = \&strftime;
+
 };
 
 1;
