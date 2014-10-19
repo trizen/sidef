@@ -140,6 +140,27 @@ package Sidef::Sys::Sys {
         Sidef::Types::String::String->new(scalar unpack("A*", scalar <STDIN>));
     }
 
+    *readln = \&scanln;
+
+    sub read {
+        my ($self, $type, @vars) = @_;
+
+        if (@vars) {
+            foreach my $var_ref (@vars) {
+                $self->_is_var_ref($var_ref) || return;
+                my $var = $var_ref->get_var;
+                print "$var->{name}: ";
+                chomp(my $input = <STDIN>);
+                $var->set_value($type->new($input));
+            }
+
+            return $self;
+        }
+
+        chomp(my $input = <STDIN>);
+        $type->new($input);
+    }
+
     sub open {
         my ($self, $var, $mode, $filename) = @_;
         $filename->to_file->open($mode, $var);
