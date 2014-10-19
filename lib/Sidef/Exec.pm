@@ -113,6 +113,10 @@ package Sidef::Exec {
 
             for (my $l = 0 ; $l <= $#{$expr->{ind}} ; $l++) {
 
+                if (ref($self_obj) eq 'Sidef::Variable::ClassVar') {
+                    $self_obj = $self_obj->get_value;
+                }
+
                 my $level = do {
                     local $self->{var_ref} = 0;
                     $self->execute_expr({self => $expr->{ind}[$l]}, $class);
@@ -187,6 +191,10 @@ package Sidef::Exec {
                 else {
                     return if not exists $level->[0];
                     my $ind = $level->[0]->get_value;
+
+                    if (ref($self_obj) eq 'Sidef::Variable::ClassVar') {
+                        $self_obj = $self_obj->get_value;
+                    }
 
                     if (ref($self_obj) eq 'Sidef::Variable::Class') {
                         $self_obj = $self_obj->{__VARS__}{$ind};
@@ -342,7 +350,8 @@ package Sidef::Exec {
                     while (@arguments) {
                         my $obj = shift @arguments;
 
-                        if (ref $obj eq 'Sidef::Variable::Variable') {
+                        my $ref = ref($obj);
+                        if ($ref eq 'Sidef::Variable::Variable') {
                             if (ref($self_obj) ne 'Sidef::Variable::Ref') {
                                 push @args, $obj->get_value;
                             }
@@ -350,11 +359,14 @@ package Sidef::Exec {
                                 push @args, $obj;
                             }
                         }
-                        elsif (ref $obj eq 'Sidef::Variable::Init') {
+                        elsif ($ref eq 'Sidef::Variable::Init') {
                             push @args, $obj->{vars}[0];
                         }
-                        elsif (ref $obj eq 'Sidef::Args::Args') {
+                        elsif ($ref eq 'Sidef::Args::Args') {
                             push @args, @{$obj};
+                        }
+                        elsif ($ref eq 'Sidef::Variable::ClassVar') {
+                            push @args, $obj->get_value;
                         }
                         else {
                             push @args, $obj;

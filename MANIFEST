@@ -106,6 +106,7 @@ lib/Sidef/Types/String/String.pod
 lib/Sidef/Variable/Class.pm
 lib/Sidef/Variable/ClassInit.pm
 lib/Sidef/Variable/ClassInit.pod
+lib/Sidef/Variable/ClassVar.pm
 lib/Sidef/Variable/Init.pm
 lib/Sidef/Variable/Init.pod
 lib/Sidef/Variable/InitMy.pm

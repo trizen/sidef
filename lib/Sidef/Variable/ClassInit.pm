@@ -57,7 +57,7 @@ package Sidef::Variable::ClassInit {
                         warn "[WARN]: Class init error -- expected a Pair type argument, but got: ", ref($pair), "\n";
                         last;
                     };
-                    $class->{__VARS__}{$pair->first->get_value} = $pair->second->get_value;
+                    $class->{__VARS__}{$pair->first->get_value->get_value} = $pair->second->get_value->get_value;
                 }
                 last;
             }

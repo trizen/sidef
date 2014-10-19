@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   Module::Build: '0'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.421, CPAN::Meta::Converter version 2.142060'
+generated_by: 'Module::Build version 0.421, CPAN::Meta::Converter version 2.142690'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -132,6 +132,8 @@ provides:
     file: lib/Sidef/Variable/Class.pm
   Sidef::Variable::ClassInit:
     file: lib/Sidef/Variable/ClassInit.pm
+  Sidef::Variable::ClassVar:
+    file: lib/Sidef/Variable/ClassVar.pm
   Sidef::Variable::Init:
     file: lib/Sidef/Variable/Init.pm
   Sidef::Variable::InitMy:

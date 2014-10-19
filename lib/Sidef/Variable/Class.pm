@@ -17,9 +17,10 @@ package Sidef::Variable::Class {
 
         if (exists $self->{__VARS__}{$name}) {
             if (@args) {
-                return $self->{__VARS__}{$name} = $args[0];
+                return $self->{__VARS__}{$name} = $args[-1];
             }
-            return $self->{__VARS__}{$name};
+            require Sidef::Variable::ClassVar;
+            return Sidef::Variable::ClassVar->__new(class => $self, name => $name);
         }
 
         if (exists $self->{method}{$name}) {

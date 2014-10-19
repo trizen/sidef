@@ -225,6 +225,9 @@
       "Sidef::Variable::ClassInit" : {
          "file" : "lib/Sidef/Variable/ClassInit.pm"
       },
+      "Sidef::Variable::ClassVar" : {
+         "file" : "lib/Sidef/Variable/ClassVar.pm"
+      },
       "Sidef::Variable::Init" : {
          "file" : "lib/Sidef/Variable/Init.pm"
       },
