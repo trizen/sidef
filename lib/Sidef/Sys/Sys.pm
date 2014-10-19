@@ -157,8 +157,13 @@ package Sidef::Sys::Sys {
             return $self;
         }
 
+        if (defined $type) {
+            chomp(my $input = <STDIN>);
+            return $type->new($input);
+        }
+
         chomp(my $input = <STDIN>);
-        $type->new($input);
+        Sidef::Types::String::String->new($input);
     }
 
     sub open {
