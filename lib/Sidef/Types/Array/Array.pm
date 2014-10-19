@@ -728,9 +728,16 @@ package Sidef::Types::Array::Array {
     *resize_to = \&resize;
 
     sub rand {
-        my ($self) = @_;
+        my ($self, $amount) = @_;
+        if (defined $amount) {
+            $self->_is_number($amount) || return;
+            return $self->new(map { $self->[CORE::rand($#{$self} + 1)]->get_value } 1 .. $amount);
+        }
         $self->[CORE::rand($#{$self} + 1)];
     }
+
+    *pick   = \&rand;
+    *sample = \&rand;
 
     sub range {
         my ($self) = @_;
@@ -829,7 +836,7 @@ package Sidef::Types::Array::Array {
                      my $count = 0;
                      my $ref = my $val = delete $hash->{$key};
                      while (my ($key) = CORE::each %{$ref}) {
-                        $key eq $__END__
+                         $key eq $__END__
                            ? (
                                 $__CALL__
                               ? $code->call($self->new(map { $_->get_value } @{$ref->{$key}}[0 .. $#{$ref->{$key}} - $count]))
