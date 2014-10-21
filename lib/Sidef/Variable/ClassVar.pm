@@ -3,8 +3,6 @@ package Sidef::Variable::ClassVar {
     use 5.014;
     our $AUTOLOAD;
 
-    use overload q{""} => \&get_value;
-
     sub __new {
         my (undef, %opt) = @_;
         bless \%opt, __PACKAGE__;
@@ -13,11 +11,6 @@ package Sidef::Variable::ClassVar {
     sub get_value {
         my ($self) = @_;
         $self->{class}{__VARS__}{$self->{name}};
-    }
-
-    sub dump {
-        my ($self) = @_;
-        $self->get_value->dump;
     }
 
     sub DESTROY { }

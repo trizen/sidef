@@ -197,7 +197,7 @@ package Sidef::Exec {
                     }
 
                     if (ref($self_obj) eq 'Sidef::Variable::Class') {
-                        $self_obj = $self_obj->{__VARS__}{$ind};
+                        $self_obj = $self_obj->$ind;
                     }
                     else {
 
@@ -399,7 +399,7 @@ package Sidef::Exec {
         }
         else {
             if (not $self->{var_ref}) {
-                if (ref($self_obj) eq 'Sidef::Variable::Variable') {
+                if (ref($self_obj) eq 'Sidef::Variable::Variable' or ref($self_obj) eq 'Sidef::Variable::ClassVar') {
                     $self_obj = $self_obj->get_value;
                 }
             }
