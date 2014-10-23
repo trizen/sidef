@@ -104,7 +104,8 @@ package Sidef::Types::Glob::Dir {
         Sidef::Types::Bool::Bool->new(mkdir($$self));
     }
 
-    *make = \&create;
+    *make  = \&create;
+    *mkdir = \&create;
 
     # Create the directory (with parents, if needed)
     sub create_tree {
@@ -117,6 +118,9 @@ package Sidef::Types::Glob::Dir {
     *createTree = \&create_tree;
     *makeTree   = \&create_tree;
     *make_tree  = \&create_tree;
+    *mktree     = \&create_tree;
+    *make_path  = \&create_tree;
+    *mkpath     = \&create_tree;
 
     sub abs_name {
         my ($self) = @_;

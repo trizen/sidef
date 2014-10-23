@@ -19,6 +19,15 @@ package Sidef::Types::Glob::File {
         ${$_[0]};
     }
 
+    sub touch {
+        my ($self) = @_;
+        Sidef::Types::Bool::Bool->new(CORE::open(my $fh, '>>', $$self));
+    }
+
+    *make   = \&touch;
+    *mkfile = \&touch;
+    *create = \&touch;
+
     sub size {
         my ($self) = @_;
         Sidef::Types::Number::Number->new(-s $$self);
@@ -436,11 +445,6 @@ package Sidef::Types::Glob::File {
 
     *delete = \&unlink;
     *remove = \&unlink;
-
-    sub touch {
-        my ($self) = @_;
-        Sidef::Types::Bool::Bool->new(CORE::open(my $fh, '>>', $$self));
-    }
 
     sub lstat {
         my ($self) = @_;
