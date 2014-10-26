@@ -53,6 +53,10 @@ package Sidef::Parser {
                           re  => qr/\Gcontinue\b/,
                          },
                          {
+                          sub => sub { Sidef::Types::Black::Hole->new },
+                          re  => qr/\GBlackHole\b/,
+                         },
+                         {
                           sub => sub { Sidef::Types::Glob::FileHandle->new(fh => \*ARGV) },
                           re  => qr/\GARGF\b/,
                          },
