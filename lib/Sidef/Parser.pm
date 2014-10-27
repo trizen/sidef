@@ -933,6 +933,31 @@ package Sidef::Parser {
                       pos($_) + $pos;
                 }
 
+                # Backtick
+                if (/\G%X\b/gc || /\G(?=`)/) {
+                    my ($string, $pos) = $self->get_quoted_string(code => (substr($_, pos)));
+                    return {
+                            $self->{class} => [
+                                               {
+                                                self =>
+                                                  Sidef::Types::Glob::Backtick->new(
+                                                               Sidef::Types::String::String->new($string)->apply_escapes($self)
+                                                  ),
+                                                call => [{method => '`'}]
+                                               }
+                                              ]
+                           },
+                      pos($_) + $pos;
+                }
+
+                if (/\G%x\b/gc) {
+                    my ($string, $pos) = $self->get_quoted_string(code => (substr($_, pos)));
+                    return {$self->{class} =>
+                            [{self => Sidef::Types::Glob::Backtick->new($string =~ s{\\\\}{\\}gr), call => [{method => '`'}]}]
+                           },
+                      pos($_) + $pos;
+                }
+
                 # Object as expression
                 if (/\G(?=\()/) {
                     my ($obj, $pos) = $self->parse_arguments(code => substr($_, pos));
@@ -1335,13 +1360,6 @@ package Sidef::Parser {
                     pos($_) += $pos;
                     return Sidef::Types::Regex::Regex->new($string, /\G($self->{re}{match_flags})/goc ? $1 : undef, $self),
                       pos;
-                }
-
-                # Backtick
-                if (/\G(?=`)/) {
-                    my ($string, $pos) = $self->get_quoted_string(code => (substr($_, pos)));
-                    return Sidef::Types::Glob::Backtick->new(Sidef::Types::String::String->new($string)->apply_escapes($self)),
-                      pos($_) + $pos;
                 }
 
                 foreach my $hash_ref (@{$self->{obj_stat}}) {

@@ -307,7 +307,7 @@ package Sidef::Exec {
 
                 my $type = ref($self_obj);
                 if (
-                    $type eq 'Sidef::Variable::Variable' or $type eq 'Sidef::Variable::ClassVar'
+                    ($type eq 'Sidef::Variable::Variable' or $type eq 'Sidef::Variable::ClassVar')
                     and (   exists $self->{short_circuit_methods}{$method}
                          or exists($self->{bool_assign_method}{$method})
                          && $method ne ':='
