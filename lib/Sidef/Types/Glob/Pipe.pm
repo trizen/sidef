@@ -33,7 +33,7 @@ package Sidef::Types::Glob::Pipe {
               : return
           : ();
 
-        my $pid = open(my $pipe_h, $mode, map { $_->get_value } @{$self});
+        my $pid = open(my $pipe_h, $mode, @{$self});
         my $pipe_obj = Sidef::Types::Glob::PipeHandle->new(pipe_h => $pipe_h, pipe => $self);
 
         if (ref($var_ref) eq 'Sidef::Variable::Ref') {

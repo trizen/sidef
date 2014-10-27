@@ -922,7 +922,7 @@ package Sidef::Parser {
                 # Double quoted filename
                 if (/\G%F\b/gc) {
                     my ($string, $pos) = $self->get_quoted_string(code => (substr($_, pos)));
-                    return Sidef::Types::Glob::File->new(Sidef::Types::String::String->new($string)->apply_escapes($self)),
+                    return Sidef::Types::Glob::File->new(${Sidef::Types::String::String->new($string)->apply_escapes($self)}),
                       pos($_) + $pos;
                 }
 
@@ -935,7 +935,20 @@ package Sidef::Parser {
                 # Double quoted dirname
                 if (/\G%D\b/gc) {
                     my ($string, $pos) = $self->get_quoted_string(code => (substr($_, pos)));
-                    return Sidef::Types::Glob::Dir->new(Sidef::Types::String::String->new($string)->apply_escapes($self)),
+                    return Sidef::Types::Glob::Dir->new(${Sidef::Types::String::String->new($string)->apply_escapes($self)}),
+                      pos($_) + $pos;
+                }
+
+                # Single quoted pipe obj
+                if (/\G%p\b/gc) {
+                    my ($string, $pos) = $self->get_quoted_string(code => (substr($_, pos)));
+                    return Sidef::Types::Glob::Pipe->new($string =~ s{\\\\}{\\}gr), pos($_) + $pos;
+                }
+
+                # Double quoted pipe obj
+                if (/\G%P\b/gc) {
+                    my ($string, $pos) = $self->get_quoted_string(code => (substr($_, pos)));
+                    return Sidef::Types::Glob::Pipe->new(${Sidef::Types::String::String->new($string)->apply_escapes($self)}),
                       pos($_) + $pos;
                 }
 
@@ -947,7 +960,7 @@ package Sidef::Parser {
                                                {
                                                 self =>
                                                   Sidef::Types::Glob::Backtick->new(
-                                                               Sidef::Types::String::String->new($string)->apply_escapes($self)
+                                                            ${Sidef::Types::String::String->new($string)->apply_escapes($self)}
                                                   ),
                                                 call => [{method => '`'}]
                                                }
