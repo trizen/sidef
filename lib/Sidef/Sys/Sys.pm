@@ -200,9 +200,8 @@ package Sidef::Sys::Sys {
     *run = \&system;
 
     sub exec {
-        my ($self, $command) = @_;
-        $self->_is_string($command) || return;
-        CORE::exec($$command);
+        my ($self, @args) = @_;
+        CORE::exec(@args);
     }
 
 };
