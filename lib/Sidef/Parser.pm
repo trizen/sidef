@@ -57,6 +57,10 @@ package Sidef::Parser {
                           re  => qr/\GBlackHole\b/,
                          },
                          {
+                          sub => sub { Sidef::Types::Block::Code->new },
+                          re  => qr/\GBlock\b/,
+                         },
+                         {
                           sub => sub { Sidef::Types::Glob::FileHandle->new(fh => \*ARGV) },
                           re  => qr/\GARGF\b/,
                          },
@@ -359,6 +363,8 @@ package Sidef::Parser {
                   Time
                   Sidef
                   Parser
+                  Block
+                  BlackHole
 
                   my
                   var
