@@ -44,10 +44,11 @@ package Sidef::Types::Hash::Hash {
 
         my %hash;
         while (my ($k, $v) = each %{$self->{data}}) {
+            my $rv = $v->get_value;
             $hash{$k} =
-              (ref($v) && defined eval { $v->can('get_value') })
-              ? $v->get_value
-              : $v;
+              (ref($rv) && defined eval { $v->can('get_value') })
+              ? $rv->get_value
+              : $rv;
         }
 
         \%hash;

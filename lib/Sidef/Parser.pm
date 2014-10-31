@@ -955,16 +955,15 @@ package Sidef::Parser {
                 # Backtick
                 if (/\G%X\b/gc || /\G(?=`)/) {
                     my ($string, $pos) = $self->get_quoted_string(code => (substr($_, pos)));
+
+                    my $obj = Sidef::Types::String::String->new($string)->apply_escapes($self);
                     return {
                             $self->{class} => [
-                                               {
-                                                self =>
-                                                  Sidef::Types::Glob::Backtick->new(
-                                                            ${Sidef::Types::String::String->new($string)->apply_escapes($self)}
-                                                  ),
-                                                call => [{method => '`'}]
-                                               }
-                                              ]
+                                              {
+                                               self => Sidef::Types::Glob::Backtick->new(ref($obj) eq 'HASH' ? $obj : ${$obj}),
+                                               call => [{method => '`'}]
+                                              }
+                            ]
                            },
                       pos($_) + $pos;
                 }
@@ -1345,7 +1344,10 @@ package Sidef::Parser {
                         map {
                             $type eq 'w' || $type eq '<'
                               ? Sidef::Types::String::String->new($_)->unescape
-                              : Sidef::Types::String::String->new($_)->apply_escapes($self)
+                              : do {
+                                my $item = Sidef::Types::String::String->new($_)->apply_escapes($self);
+                                ref($item) eq 'HASH' ? Sidef::Types::Block::Code->new($item)->run : $item;
+                              }
                           } @{$strings}
                     );
                     return $array, pos($_) + $pos;

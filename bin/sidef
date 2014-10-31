@@ -159,8 +159,7 @@ else {
 
 sub execute_struct {
     my ($struct) = @_;
-    my $exec = Sidef::Exec->new();
-    $exec->execute($struct);
+    Sidef::Types::Block::Code->new($struct)->run;
 }
 
 sub output_usage {

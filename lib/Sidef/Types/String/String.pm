@@ -769,6 +769,8 @@ package Sidef::Types::String::String {
                       n => "\n",
                       r => "\r",
                       t => "\t",
+                      s => ' ',
+                      v => chr(11),
                      };
 
         my @inline_expressions;

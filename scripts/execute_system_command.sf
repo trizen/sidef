@@ -1,0 +1,15 @@
+#!/usr/bin/ruby
+
+# Pipe in read-only mode
+%p(uname -r).open_r.each { |line|
+    print line;
+};
+
+var str1 = `uname -r`;         # backtick: returns a string
+var str2 = %x(uname -r);       # ditto, alternative syntax
+
+print str1;
+print str2;
+
+Sys.system('uname -r');   # system: executes a command and prints the result
+Sys.exec('uname -r');     # replaces current process with another

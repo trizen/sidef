@@ -217,6 +217,7 @@ package Sidef::Types::Number::Number {
 
     sub hex {
         my ($self) = @_;
+        require Math::BigInt;
         $self->new(Math::BigInt->new("0x$$self"));
     }
 
@@ -224,6 +225,7 @@ package Sidef::Types::Number::Number {
 
     sub oct {
         my ($self) = @_;
+        require Math::BigInt;
         __PACKAGE__->new(Math::BigInt->from_oct($$self));
     }
 
@@ -231,6 +233,7 @@ package Sidef::Types::Number::Number {
 
     sub bin {
         my ($self) = @_;
+        require Math::BigInt;
         $self->new(Math::BigInt->new("0b$$self"));
     }
 
@@ -495,21 +498,24 @@ package Sidef::Types::Number::Number {
 
     sub to_bin {
         my ($self) = @_;
-        __PACKAGE__->new(substr(Math::BigInt->new($$self)->as_bin, 2));
+        require Math::BigInt;
+        Sidef::Types::String::String->new(Math::BigInt->new($$self)->as_bin);
     }
 
     *as_bin = \&to_bin;
 
     sub to_oct {
         my ($self) = @_;
-        __PACKAGE__->new(substr(Math::BigInt->new($$self)->as_oct, 1));
+        require Math::BigInt;
+        Sidef::Types::String::String->new(Math::BigInt->new($$self)->as_oct);
     }
 
     *as_oct = \&to_oct;
 
     sub to_hex {
         my ($self) = @_;
-        __PACKAGE__->new(substr(Math::BigInt->new($$self)->as_hex, 2));
+        require Math::BigInt;
+        Sidef::Types::String::String->new(Math::BigInt->new($$self)->as_hex);
     }
 
     *as_hex = \&to_hex;

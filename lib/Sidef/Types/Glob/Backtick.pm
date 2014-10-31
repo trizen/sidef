@@ -12,8 +12,7 @@ package Sidef::Types::Glob::Backtick {
         *{__PACKAGE__ . '::' . '`'} = sub {
             my ($self) = @_;
             if (ref $$self eq 'HASH') {
-                state $exec = Sidef::Exec->new;
-                $self = $exec->execute($$self);
+                $self = Sidef::Types::Block::Code->new($$self)->run;
             }
             Sidef::Types::String::String->new(scalar `$$self`);
         };

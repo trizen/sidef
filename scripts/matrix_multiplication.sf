@@ -34,6 +34,5 @@ var b = [
           [4, 5, 6]
         ];
 
-var c = (matrix_multi(a, b));
-
+var c = matrix_multi(a, b);
 {_.map{"%3d".sprintf(_)}->join(", ").say} for (c);

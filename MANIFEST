@@ -192,6 +192,7 @@ scripts/dice_game_solver.sf
 scripts/echo.sf
 scripts/eq_g2.sf
 scripts/eval.sf
+scripts/execute_system_command.sf
 scripts/fibonacci_cached.sf
 scripts/fibonacci_closed_solution.sf
 scripts/fibonacci_iterative.sf

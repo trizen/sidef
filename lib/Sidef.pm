@@ -120,6 +120,12 @@ package Sidef {
 
         *define_method = \&def_method;
 
+        sub method {
+            my ($self, $method) = @_;
+
+            #Sidef::Types::Block::Code->new(\&{$self . '::' . $method });
+        }
+
         sub METHODS {
             my ($self) = @_;
             Sidef::Types::Array::Array->new(

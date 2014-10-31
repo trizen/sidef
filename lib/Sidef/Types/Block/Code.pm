@@ -96,9 +96,12 @@ package Sidef::Types::Block::Code {
 
     sub run {
         my ($self) = @_;
-        my @results = $exec->execute($self->{code});
+        my $result = ($exec->execute($self->{code}))[-1];
+        if (ref $result eq 'Sidef::Variable::Variable') {
+            $result = $result->get_value;
+        }
         $self->pop_stack();
-        $results[-1];
+        $result;
     }
 
     sub exec {
