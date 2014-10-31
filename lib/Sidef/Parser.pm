@@ -1334,7 +1334,7 @@ package Sidef::Parser {
                 }
 
                 # Quoted words (%w/a b c/)
-                if (/\G%(w)\b/gci || /\G(?=(«|<(?!<)))/) {
+                if (/\G%([wW])\b/gc || /\G(?=(«|<(?!<)))/) {
                     my ($type) = $1;
 
                     my $array = Sidef::Types::Array::Array->new();
@@ -1346,7 +1346,7 @@ package Sidef::Parser {
                               ? Sidef::Types::String::String->new($_)->unescape
                               : do {
                                 my $item = Sidef::Types::String::String->new($_)->apply_escapes($self);
-                                ref($item) eq 'HASH' ? Sidef::Types::Block::Code->new($item)->run : $item;
+                                ref($item) eq 'HASH' ? Sidef::Types::Block::Code->new($item) : $item;
                               }
                           } @{$strings}
                     );
