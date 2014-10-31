@@ -1,0 +1,9 @@
+#!/usr/bin/ruby
+
+var lc = "TEST".method(:lc);
+var cos = Math.method(:cos);
+
+say lc();                  # => "TEST".lc;
+say lc.index('e');         # => "TEST".lc.index('e');
+say "SIDEF".(lc);          # => "SIDEF".lc
+say cos(5);                # => Math.cos(5)

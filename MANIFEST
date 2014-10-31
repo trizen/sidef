@@ -233,6 +233,7 @@ scripts/keyword_object.sf
 scripts/knuth_shuffle.sf
 scripts/langton_s_ant.sf
 scripts/langton_s_ant_2.sf
+scripts/lazy_methods.sf
 scripts/leap_year.sf
 scripts/letter_frequency.sf
 scripts/levenshtein_distance.sf

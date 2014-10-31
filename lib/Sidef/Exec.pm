@@ -276,6 +276,7 @@ package Sidef::Exec {
                     if ($ref eq 'Sidef::Types::String::String') {
                         $method = $$method;
                     }
+                    elsif ($ref eq 'Sidef::LazyMethod') { }    # ok
                     else {
                         warn "[WARN] Invalid method of type: '$ref'!\n";
                         return;

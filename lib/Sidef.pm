@@ -123,7 +123,34 @@ package Sidef {
         sub method {
             my ($self, $method) = @_;
 
-            #Sidef::Types::Block::Code->new(\&{$self . '::' . $method });
+            package Sidef::LazyMethod {
+
+                use overload q{""} => sub { ${$_[0]->{method}} };
+                our $AUTOLOAD;
+
+                sub new {
+                    my (undef, %hash) = @_;
+                    bless \%hash;
+                }
+
+                sub DESTROY {
+
+                }
+
+                sub AUTOLOAD {
+                    my ($self, @args) = @_;
+
+                    my ($method) = ($AUTOLOAD =~ /^.*[^:]::(.*)$/);
+                    if ($method eq 'call') {
+                        return $self->{obj}->${$self->{method}}(@args);
+                    }
+
+                    $self->{obj}->${$self->{method}}->$method(@args);
+                }
+
+            }
+
+            Sidef::LazyMethod->new(obj => $self, method => $method);
         }
 
         sub METHODS {
