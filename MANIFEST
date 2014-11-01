@@ -260,6 +260,7 @@ scripts/Module/Fact.sm
 scripts/Module/Fib.sm
 scripts/module_definition.sf
 scripts/module_loading.sf
+scripts/multi_argument_var.sf
 scripts/multi_file_edit.sf
 scripts/multi_loop_break.sf
 scripts/multi_var_assignment.sf

@@ -1,0 +1,27 @@
+#!/usr/bin/ruby
+
+#
+## Test variable init
+#
+var (a, *b) = (1, 2, 3);
+
+a == 1      || "error: a != 1".die;
+b == [2, 3] || "error: b != [2, 3]".die;
+
+
+#
+## Test function params
+#
+func test(a, *b) {
+    a == b || "error: #{a.dump} != #{b.dump}".die;
+}
+
+test([]);
+test([1], 1);
+test([1, 2], 1, 2);
+
+
+#
+## All OK!
+#
+say "** Test passed!";

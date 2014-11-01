@@ -689,7 +689,7 @@ package Sidef::Parser {
             }
 
             my @vars;
-            while (/\G($self->{re}{var_name})/goc) {
+            while (/\G(\*?$self->{re}{var_name})/goc) {
                 push @vars, $1;
                 if ($opt{with_vals} && defined($end_delim) && /\G\h*=\h*/gc) {
                     my (undef, $pos) = $self->parse_obj(code => substr($_, pos));
@@ -721,8 +721,8 @@ package Sidef::Parser {
             }
 
             my @var_objs;
-            while (/\G($self->{re}{var_name})/goc) {
-                my $name = $1;
+            while (/\G(\*?)($self->{re}{var_name})/goc) {
+                my ($attr, $name) = ($1, $2);
 
                 if (exists $self->{keywords}{$name}) {
                     $self->fatal_error(
@@ -749,7 +749,12 @@ package Sidef::Parser {
                       : $obj;
                 }
 
-                my $obj = Sidef::Variable::Variable->new(name => $name, type => $opt{type}, value => $value);
+                my $obj = Sidef::Variable::Variable->new(
+                                                         name  => $name,
+                                                         type  => $opt{type},
+                                                         value => $value,
+                                                         $attr eq '*' ? (multi => 1) : ()
+                                                        );
 
                 if (!$opt{private}) {
                     unshift @{$self->{vars}{$self->{class}}},
