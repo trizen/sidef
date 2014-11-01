@@ -110,6 +110,7 @@ lib/Sidef/Variable/ClassVar.pm
 lib/Sidef/Variable/Init.pm
 lib/Sidef/Variable/Init.pod
 lib/Sidef/Variable/InitMy.pm
+lib/Sidef/Variable/LazyMethod.pm
 lib/Sidef/Variable/Magic.pm
 lib/Sidef/Variable/Magic.pod
 lib/Sidef/Variable/My.pm

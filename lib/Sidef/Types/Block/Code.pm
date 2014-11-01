@@ -50,6 +50,21 @@ package Sidef::Types::Block::Code {
         };
     }
 
+    sub capture {
+        my ($self) = @_;
+
+        open my $str_h, '>:utf8', \my $str;
+        if (defined(my $old_h = select($str_h))) {
+            $self->run;
+            close $str_h;
+            select $old_h;
+        }
+
+        Sidef::Types::String::String->new($str)->decode_utf8;
+    }
+
+    *cap = \&capture;
+
     sub repeat {
         my ($self, $num) = @_;
 

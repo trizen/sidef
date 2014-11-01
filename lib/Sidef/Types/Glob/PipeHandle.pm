@@ -4,7 +4,7 @@ package Sidef::Types::Glob::PipeHandle {
 
     our @ISA = qw(
       Sidef::Types::Glob::FileHandle
-    );
+      );
 
     sub new {
         my (undef, %opt) = @_;

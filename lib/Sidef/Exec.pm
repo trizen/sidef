@@ -276,7 +276,6 @@ package Sidef::Exec {
                     if ($ref eq 'Sidef::Types::String::String') {
                         $method = $$method;
                     }
-                    elsif ($ref eq 'Sidef::LazyMethod') { }    # ok
                     else {
                         warn "[WARN] Invalid method of type: '$ref'!\n";
                         return;
@@ -319,16 +318,17 @@ package Sidef::Exec {
                     $type = $ref_val // ref($self_obj->get_value);
                 }
 
+                last if $type eq 'Sidef::Types::Black::Hole';
+
                 if (exists $call->{arg}) {
 
                     foreach my $arg (@{$call->{arg}}) {
                         if (
                             ref($arg) eq 'HASH'
                             and not(
-                                       (exists($self->{types}{$type}) && exists($self->{types}{$type}{$method}))
-                                    || (ref($self_obj) eq 'Sidef::Types::Black::Hole')
+                                    (exists($self->{types}{$type}) && exists($self->{types}{$type}{$method}))
                                     || (
-                                        ref($self_obj) eq 'Sidef::Variable::Init'
+                                        $type eq 'Sidef::Variable::Init'
                                         && (   $self_obj->{vars}[0]->{type} eq 'static'
                                             || $self_obj->{vars}[0]->{type} eq 'const')
                                         && exists($self_obj->{vars}[0]->{inited})
@@ -406,11 +406,11 @@ package Sidef::Exec {
             }
         }
 
-        if (   ref($self_obj) eq 'Sidef::Types::Block::Break'
-            or ref($self_obj) eq 'Sidef::Types::Block::Next'
-            or ref($self_obj) eq 'Sidef::Types::Block::Return') {
+        my $ref = ref($self_obj);
+        if (   $ref eq 'Sidef::Types::Block::Break'
+            or $ref eq 'Sidef::Types::Block::Next'
+            or $ref eq 'Sidef::Types::Block::Return') {
             $self->{expr_i} = $self->{expr_i_max};
-            return $self_obj;
         }
 
         $self_obj;

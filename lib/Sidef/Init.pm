@@ -60,6 +60,7 @@ require Sidef::Types::String::String;
 require Sidef::Variable::ClassInit;
 require Sidef::Variable::Init;
 require Sidef::Variable::InitMy;
+require Sidef::Variable::LazyMethod;
 require Sidef::Variable::Magic;
 require Sidef::Variable::My;
 require Sidef::Variable::Ref;

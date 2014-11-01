@@ -125,6 +125,10 @@ package Sidef::Parser {
                           re  => qr/\GByte\b/,
                          },
                          {
+                          sub => sub { Sidef::Variable::LazyMethod->new },
+                          re  => qr/\GLazyMethod\b/,
+                         },
+                         {
                           sub => sub { Sidef::Types::Byte::Bytes->new },
                           re  => qr/\GBytes\b/,
                          },
@@ -365,6 +369,7 @@ package Sidef::Parser {
                   Parser
                   Block
                   BlackHole
+                  LazyMethod
 
                   my
                   var

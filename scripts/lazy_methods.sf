@@ -1,9 +1,37 @@
 #!/usr/bin/ruby
 
+func m_exec(arg) {
+    if (arg.is_a(LazyMethod)) {
+        arg();
+    } else {
+        "[ERROR] Argument `#{arg}' is not a LazyMethod".die;
+    }
+}
+
+# Create some simple lazy-methods
 var lc = "TEST".method(:lc);
 var cos = Math.method(:cos);
 
-say lc();                  # => "TEST".lc;
-say lc.index('e');         # => "TEST".lc.index('e');
-say "SIDEF".(lc);          # => "SIDEF".lc
-say cos(5);                # => Math.cos(5)
+# Create some complex lazy-methods
+var lz1 = "h€llo".method(:ucfirst).method(:concat, '!').method(:say);
+var lz2 = Sys.method(:print, "World");
+var lz3 = "".method(:concat, '!').method(:say);
+
+# Test the simple lazy-methods
+lc()          == "test"          || "error lc()".die;
+lc.index('e') == 1               || "error .index()".die;
+cos(5)        == Math.cos(5)     || "Error cos()".die;
+
+say "----BEGIN----";
+
+# Display "H€llo!\nWorld!"
+m_exec(lz1);
+m_exec(lz2);
+m_exec(lz3);
+
+say "-----END-----";
+
+# Test the complex lazy-methods
+{lz1()}.capture.chomp == "H€llo!" || "lz1 error".die;
+{lz2()}.capture.chomp == "World"  || "lz2 error".die;
+{lz3()}.capture.chomp == "!"      || "lz3 error".die;

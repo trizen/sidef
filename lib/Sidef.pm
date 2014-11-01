@@ -121,36 +121,8 @@ package Sidef {
         *define_method = \&def_method;
 
         sub method {
-            my ($self, $method) = @_;
-
-            package Sidef::LazyMethod {
-
-                use overload q{""} => sub { ${$_[0]->{method}} };
-                our $AUTOLOAD;
-
-                sub new {
-                    my (undef, %hash) = @_;
-                    bless \%hash;
-                }
-
-                sub DESTROY {
-
-                }
-
-                sub AUTOLOAD {
-                    my ($self, @args) = @_;
-
-                    my ($method) = ($AUTOLOAD =~ /^.*[^:]::(.*)$/);
-                    if ($method eq 'call') {
-                        return $self->{obj}->${$self->{method}}(@args);
-                    }
-
-                    $self->{obj}->${$self->{method}}->$method(@args);
-                }
-
-            }
-
-            Sidef::LazyMethod->new(obj => $self, method => $method);
+            my ($self, $method, @args) = @_;
+            Sidef::Variable::LazyMethod->new(obj => $self, method => $method, args => \@args);
         }
 
         sub METHODS {

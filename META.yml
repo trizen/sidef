@@ -138,6 +138,8 @@ provides:
     file: lib/Sidef/Variable/Init.pm
   Sidef::Variable::InitMy:
     file: lib/Sidef/Variable/InitMy.pm
+  Sidef::Variable::LazyMethod:
+    file: lib/Sidef/Variable/LazyMethod.pm
   Sidef::Variable::Magic:
     file: lib/Sidef/Variable/Magic.pm
   Sidef::Variable::My:
