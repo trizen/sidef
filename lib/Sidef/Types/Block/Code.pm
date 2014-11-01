@@ -163,8 +163,6 @@ package Sidef::Types::Block::Code {
                     my $v = $var->{vars}[0];
                     exists($v->{in_use}) || next;
                     exists($v->{multi}) && do {
-
-                        #$var->set_value(Sidef::Types::Array::Array->new(@args[$i .. $#args]));
                         $var->set_value(@args[$i .. $#args]);
                         next;
                     };

@@ -1346,21 +1346,32 @@ package Sidef::Parser {
                 # Quoted words (%w/a b c/)
                 if (/\G%([wW])\b/gc || /\G(?=(«|<(?!<)))/) {
                     my ($type) = $1;
-
-                    my $array = Sidef::Types::Array::Array->new();
                     my ($strings, $pos) = $self->get_quoted_words(code => substr($_, pos));
 
-                    $array->push(
-                        map {
-                            $type eq 'w' || $type eq '<'
-                              ? Sidef::Types::String::String->new($_)->unescape
-                              : do {
-                                my $item = Sidef::Types::String::String->new($_)->apply_escapes($self);
-                                ref($item) eq 'HASH' ? Sidef::Types::Block::Code->new($item) : $item;
-                              }
-                          } @{$strings}
-                    );
-                    return $array, pos($_) + $pos;
+                    if ($type eq 'w' or $type eq '<') {
+                        return (
+                                Sidef::Types::Array::Array->new(
+                                                            map { Sidef::Types::String::String->new($_)->unescape } @{$strings}
+                                ),
+                                pos($_) + $pos
+                               );
+                    }
+
+                    my ($inline_expression, @objs);
+                    foreach my $item (@{$strings}) {
+                        my $str = Sidef::Types::String::String->new($item)->apply_escapes($self);
+                        if (!$inline_expression and ref $str eq 'HASH') {
+                            $inline_expression = 1;
+                        }
+                        push @objs, $str;
+                    }
+
+                    return (
+                            $inline_expression
+                            ? Sidef::Types::Array::HCArray->new(map { {self => $_} } @objs)
+                            : Sidef::Types::Array::Array->new(@objs),
+                            pos($_) + $pos
+                           );
                 }
 
                 foreach my $hash_ref (@{$self->{obj_keys}}) {
