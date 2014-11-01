@@ -1351,7 +1351,7 @@ package Sidef::Parser {
                     if ($type eq 'w' or $type eq '<') {
                         return (
                                 Sidef::Types::Array::Array->new(
-                                                     map { Sidef::Types::String::String->new($_ =~ s{\\\\}{\\}gr) } @{$strings}
+                                              map { Sidef::Types::String::String->new($_ =~ s{\\(?=[\\#\s])}{}gr) } @{$strings}
                                 ),
                                 pos($_) + $pos
                                );
