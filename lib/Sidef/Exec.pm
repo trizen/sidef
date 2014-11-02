@@ -34,7 +34,6 @@ package Sidef::Exec {
                                               },
                 'Sidef::Types::Block::Code' => {
                                                 'while' => 1,
-                                                ':'     => 1,
                                                },
                 'Sidef::Types::Bool::While' => {
                                                 'while' => 1,

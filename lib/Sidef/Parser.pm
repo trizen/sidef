@@ -25,11 +25,10 @@ package Sidef::Parser {
                            '!'   => 1,
                           },
             obj_with_do => {
-                'Sidef::Types::Block::For'  => 1,
-                'Sidef::Types::Bool::While' => 1,
-                'Sidef::Types::Bool::If'    => 1,
-
-                #'Sidef::Types::Block::Given' => 1,
+                            'Sidef::Types::Block::For'   => 1,
+                            'Sidef::Types::Bool::While'  => 1,
+                            'Sidef::Types::Bool::If'     => 1,
+                            'Sidef::Types::Block::Given' => 1,
                            },
             obj_stat => [
                          {
@@ -318,7 +317,7 @@ package Sidef::Parser {
                  dynamic => 0,
                 },
                 {
-                 sub     => sub { Sidef::Types::Block::Code->new({}) },
+                 sub     => sub { Sidef::Types::Hash::Hash->new },
                  re      => qr/\G(?=:)/,
                  dynamic => 0,
                 },

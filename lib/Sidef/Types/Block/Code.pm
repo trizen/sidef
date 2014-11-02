@@ -35,19 +35,7 @@ package Sidef::Types::Block::Code {
 
     {
         no strict 'refs';
-
         *{__PACKAGE__ . '::' . '*'} = \&repeat;
-
-        *{__PACKAGE__ . '::' . ':'} = sub {
-            my ($self, $code) = @_;
-
-            if (ref($code) eq 'HASH') {
-                return Sidef::Types::Hash::Hash->new($exec->execute($code));
-            }
-
-            warn "[WARN] Missing argument for hash operator ':'!\n";
-            return;
-        };
     }
 
     sub capture {

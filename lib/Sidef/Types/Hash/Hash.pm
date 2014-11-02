@@ -360,6 +360,13 @@ package Sidef::Types::Hash::Hash {
         *{__PACKAGE__ . '::' . '==='} = \&duplicateOf;
         *{__PACKAGE__ . '::' . '=='}  = \&eq;
         *{__PACKAGE__ . '::' . '!='}  = \&ne;
+
+        *{__PACKAGE__ . '::' . ':'} = sub {
+            shift;    # ignore self
+            @_ == 1 && ref($_[0]) eq 'Sidef::Types::Block::Code'
+              ? $_[0]->to_hash
+              : __PACKAGE__->new(@_);
+        };
     }
 };
 

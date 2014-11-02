@@ -166,3 +166,20 @@ given (3)
         "Error!".die;
     }
 end;
+
+#
+## 'given' stripped down without a required 'do' keyword
+#
+given(var n = 1)
+    case (n < 0) {
+        "it's negative".die;
+    }
+    when (0) {
+        "it's zero".die;
+    }
+    when (1) {
+        say "it's a one";
+    }
+    default {
+        "Greater than one...".die;
+    };
