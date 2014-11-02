@@ -968,11 +968,14 @@ package Sidef::Parser {
                     my $obj = Sidef::Types::String::String->new($string)->apply_escapes($self);
                     return {
                             $self->{class} => [
-                                              {
-                                               self => Sidef::Types::Glob::Backtick->new(ref($obj) eq 'HASH' ? $obj : ${$obj}),
-                                               call => [{method => '`'}]
-                                              }
-                            ]
+                                               {
+                                                self =>
+                                                  Sidef::Types::Glob::Backtick->new(
+                                                           ref($obj) eq 'HASH' ? Sidef::Types::Block::Code->new($obj) : ${$obj}
+                                                  ),
+                                                call => [{method => '`'}]
+                                               }
+                                              ]
                            },
                       pos($_) + $pos;
                 }
