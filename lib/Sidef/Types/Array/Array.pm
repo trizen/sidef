@@ -671,6 +671,29 @@ package Sidef::Types::Array::Array {
         $self->new(map { $_->get_value } List::Util::shuffle(@{$self}));
     }
 
+    sub best_shuffle {
+        my ($s) = @_;
+        my ($t) = $s->shuffle;
+
+        my $not_equals = '!=';
+        foreach my $i (0 .. $#{$s}) {
+            foreach my $j (0 .. $#{$s}) {
+                     $i != $j
+                  && $t->[$i]->get_value->$not_equals($s->[$j]->get_value)
+                  && $t->[$j]->get_value->$not_equals($s->[$i]->get_value)
+                  && do {
+                    @{$t}[$i, $j] = @{$t}[$j, $i];
+                    last;
+                  }
+            }
+        }
+
+        $t;
+    }
+
+    *bshuffle    = \&best_shuffle;
+    *bestShuffle = \&best_shuffle;
+
     sub pair_with {
         my ($self, @args) = @_;
         Sidef::Types::Array::MultiArray->new($self, @args);
