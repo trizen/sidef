@@ -159,6 +159,7 @@ scripts/balanced_brackets.sf
 scripts/base64_decoder.sf
 scripts/benford_s_law.sf
 scripts/best_shuffle.sf
+scripts/best_shuffle_2.sf
 scripts/best_shuffle_alg_permute.sf
 scripts/binary_search.sf
 scripts/binary_search_recursive.sf

@@ -115,7 +115,6 @@ else {
       ? do {
         defined($args{E}) || die "No code specified for -E.\n";
         $script_name = '-E';
-        require Encode;
         Encode::decode(locale => $args{E});
       }
       : defined($ARGV[0]) && (-f $ARGV[0]) ? do {

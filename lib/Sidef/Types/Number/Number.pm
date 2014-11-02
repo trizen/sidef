@@ -391,7 +391,7 @@ package Sidef::Types::Number::Number {
 
     sub is_integer {
         my ($self) = @_;
-        Sidef::Types::Bool::Bool->new($$self == $$self->as_int);
+        Sidef::Types::Bool::Bool->new($$self->is_int);
     }
 
     *isInt     = \&is_integer;
