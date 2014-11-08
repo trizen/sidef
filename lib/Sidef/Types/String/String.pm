@@ -732,17 +732,20 @@ package Sidef::Types::String::String {
     sub encode {
         my ($self, $enc) = @_;
         $self->_is_string($enc) || return;
+        require Encode;
         $self->new(Encode::encode($$enc, $$self));
     }
 
     sub decode {
         my ($self, $enc) = @_;
         $self->_is_string($enc) || return;
+        require Encode;
         $self->new(Encode::decode($$enc, $$self));
     }
 
     sub encode_utf8 {
         my ($self) = @_;
+        require Encode;
         $self->new(Encode::encode_utf8($$self));
     }
 

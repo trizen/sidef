@@ -2,7 +2,6 @@
 
 use utf8;
 use 5.014;
-use Encode::Locale qw();
 
 BEGIN {    # support for running sidef locally from everywhere
     require File::Spec;
@@ -115,6 +114,7 @@ else {
       ? do {
         defined($args{E}) || die "No code specified for -E.\n";
         $script_name = '-E';
+        require Encode::Locale;
         Encode::decode(locale => $args{E});
       }
       : defined($ARGV[0]) && (-f $ARGV[0]) ? do {
