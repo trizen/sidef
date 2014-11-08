@@ -19,9 +19,9 @@ BEGIN {    # support for running sidef locally from everywhere
                         );
 }
 
-binmode STDIN,  ":encoding(console_in)"  if (-t STDIN);
-binmode STDOUT, ":encoding(console_out)" if (-t STDOUT);
-binmode STDERR, ":encoding(console_out)" if (-t STDERR and $^P == 0);    # to work under Devel::* modules
+binmode STDIN,  ":encoding(UTF-8)";
+binmode STDOUT, ":encoding(UTF-8)";
+binmode STDERR, ":encoding(UTF-8)" if ($^P == 0);    # to work under Devel::* modules
 
 require Sidef::Init;
 
