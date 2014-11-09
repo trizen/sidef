@@ -1235,7 +1235,8 @@ package Sidef::Types::Array::Array {
         my ($self, $obj) = @_;
 
         my $method = '==';
-        while (my ($i, $var) = CORE::each @{$self}) {
+        foreach my $i (0 .. $#{$self}) {
+            my $var  = $self->[$i];
             my $item = $var->get_value;
             if (    ref($item) eq ref($obj)
                 and defined $item->can($method)
@@ -1294,7 +1295,8 @@ package Sidef::Types::Array::Array {
         $self->_is_code($code) || return;
         my ($var_ref) = $code->init_block_vars();
 
-        while (my ($i, $item) = CORE::each @{$self}) {
+        foreach my $i (0 .. $#{$self}) {
+            my $item = $self->[$i];
             $var_ref->set_value($item->get_value);
             $code->run && do {
                 CORE::splice(@{$self}, $i, 1);

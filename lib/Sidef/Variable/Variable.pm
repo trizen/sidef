@@ -142,7 +142,8 @@ package Sidef::Variable::Variable {
 
         {
             my @operators = qw(++ -- + - % * / & | ^ ** && || << >> ÷);
-            while (my ($i, $operator) = each @operators) {
+            foreach my $i (0 .. $#operators) {
+                my $operator = $operators[$i];
                 *{__PACKAGE__ . '::' . $operator . ($i > 1 ? '=' : '')} = sub {
                     my ($self, $arg) = @_;
 

@@ -1,0 +1,47 @@
+#!/usr/bin/ruby
+
+# http://rosettacode.org/wiki/Extend_your_language#Sidef
+
+class if2(cond1, cond2) {
+
+    method else1(block) {
+        if (self.cond1 && !self.cond2) {
+            block.run;
+        };
+        return self;
+    }
+
+    method else2(block) {
+        if (self.cond2 && !self.cond1) {
+            block.run;
+        };
+        return self;
+    }
+
+    method else(block) {
+        if (!self.cond1 && !self.cond2) {
+            block.run;
+        };
+        return self;
+    }
+
+    method do(block) {
+        if (self.cond1 && self.cond2) {
+            block.run;
+        };
+        return self;
+    }
+}
+
+if2(false, true) do {
+    "error 1".die;
+}
+else1 {
+    "error 2".die;
+}
+else2 {
+    say "Test passed!";        # <- this is printed
+}
+else {
+    "error 3".die;
+};

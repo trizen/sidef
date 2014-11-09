@@ -48,7 +48,7 @@ hi(4) == "FUNC RETURN"     || "Error hi(4)!".die;
 ## Return from 'for' loop
 #
 
-func loop {
+func for_loop {
 
     for ["a", "z", "f"] { |c|
         if (c == "z") {
@@ -63,7 +63,7 @@ func loop {
     "Error hello(name)!".die;
 }
 
-loop() == "LOOP RETURN" || "Error hello(Sidef)!".die;
+for_loop() == "LOOP RETURN" || "Error hello(Sidef)!".die;
 
 
 say "Test passed!";

@@ -50,7 +50,8 @@ package Sidef::Variable::ClassInit {
           map { $_->{value} } @{$self->{__VARS__}};
 
         # Set the class arguments
-        while (my ($i, $arg) = each @args) {
+        foreach my $i (0 .. $#args) {
+            my $arg = $args[$i];
             if (ref($arg) eq 'Sidef::Types::Array::Pair') {
                 foreach my $pair (@args[$i .. $#args]) {
                     ref($pair) eq 'Sidef::Types::Array::Pair' || do {

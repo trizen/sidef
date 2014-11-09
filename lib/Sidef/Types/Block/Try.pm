@@ -18,6 +18,7 @@ package Sidef::Types::Block::Try {
         $self->{val} = eval { $code->run };
 
         if ($@ || $error) {
+            $self->{error} = $@;
             $self->{catch} = 1;
         }
 
@@ -27,7 +28,7 @@ package Sidef::Types::Block::Try {
     sub catch {
         my ($self, $code) = @_;
         $self->_is_code($code) || return;
-        $self->{catch} ? $code->run : $self->{val};
+        $self->{catch} ? $code->call(Sidef::Types::String::String->new($self->{error})->chomp) : $self->{val};
     }
 
 };

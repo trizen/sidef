@@ -56,14 +56,33 @@ package Sidef::Types::Block::Code {
     sub repeat {
         my ($self, $num) = @_;
 
+        $num =
+            defined($num)
+          ? $self->_is_number($num)
+              ? $$num
+              : return ()
+          : 1;
+
         my ($var) = $self->init_block_vars();
 
-        foreach my $i (1 .. (defined($num) ? $self->_is_number($num) ? ($$num) : return : (1))) {
-            $var->set_value(Sidef::Types::Number::Number->new($i));
+        if ($num > (-1 >> 1)) {
+            for (my $i = 1 ; $i <= $num ; $i++) {
+                $var->set_value(Sidef::Types::Number::Number->new($i));
 
-            if (defined(my $res = $self->_run_code)) {
-                $self->pop_stack();
-                return $res;
+                if (defined(my $res = $self->_run_code)) {
+                    $self->pop_stack();
+                    return $res;
+                }
+            }
+        }
+        else {
+            foreach my $i (1 .. $num) {
+                $var->set_value(Sidef::Types::Number::Number->new($i));
+
+                if (defined(my $res = $self->_run_code)) {
+                    $self->pop_stack();
+                    return $res;
+                }
             }
         }
 
@@ -121,8 +140,7 @@ package Sidef::Types::Block::Code {
         {
             if (Sidef::Types::Block::Code->new($condition)->run) {
                 defined($old_self) && ($old_self->{did_while} //= 1);
-                my $res = $self->_run_code();
-                if (defined($res)) {
+                if (defined(my $res = $self->_run_code)) {
                     $self->pop_stack();
                     return (ref($res) eq __PACKAGE__ && defined($old_self) ? $old_self : $res);
                 }
@@ -134,48 +152,66 @@ package Sidef::Types::Block::Code {
         $old_self // $self;
     }
 
+    sub loop {
+        my ($self, $code) = @_;
+
+        $self->_is_code($code) || return;
+
+        while (1) {
+            if (defined(my $res = $code->_run_code)) {
+                $code->pop_stack();
+                return $res;
+            }
+        }
+
+        $code->pop_stack();
+        $code;
+    }
+
     sub init_block_vars {
         my ($self, @args) = @_;
+
+        my $check_type = sub {
+            my ($var, $value) = @_;
+            ref($var->{value}) eq ref($value)
+              || die "[ERROR] Type mismatch error in variable '$var->{name}': got '", ref($value),
+              "', but expected '", ref($var->{value}), "'!\n";
+        };
 
         # varName => value
         my %named_vars;
 
         # Init the arguments
         my $last = $#{$self->{init_vars}};
-        while (my ($i, $var) = each @{$self->{init_vars}}) {
+        foreach my $i (0 .. $last) {
+            my $var = $self->{init_vars}[$i];
             if (ref $args[$i] eq 'Sidef::Types::Array::Pair') {
-                $named_vars{$args[$i]->first->get_value} = $args[$i]->second->get_value;
+                $named_vars{$args[$i]->first->get_value->get_value} = $args[$i]->second->get_value->get_value;
             }
             else {
-                if (!$#{$var->{vars}}) {
-                    my $v = $var->{vars}[0];
-                    exists($v->{in_use}) || next;
-                    exists($v->{multi}) && do {
-                        $var->set_value(@args[$i .. $#args]);
-                        next;
-                    };
-                }
+                my $v = $var->{vars}[0];
+                exists($v->{in_use}) || next;
+                exists($v->{multi}) && do {
+                    $var->set_value(@args[$i .. $#args]);
+                    next;
+                };
+                exists($v->{def_value}) && exists($args[$i]) && $check_type->($v, $args[$i]);
                 $i == $last
                   ? $var->set_value(Sidef::Types::Array::Array->new(@args[$i .. $#args]))
-                  : $var->set_value($args[$i]);
+                  : $var->set_value(exists($args[$i]) ? $args[$i] : ());
             }
         }
 
-        # Set the named arguments
+        foreach my $init_var (@{$self->{init_vars}}) {
+            my $var = $init_var->{vars}[0];
+            if (exists $named_vars{$var->{name}}) {
+                exists($var->{def_value}) && $check_type->($var, $named_vars{$var->{name}});
+                $init_var->set_value(delete($named_vars{$var->{name}}));
+            }
+        }
+
         foreach my $key (keys %named_vars) {
-
-            my $found = 0;
-            foreach my $var (@{$self->{init_vars}}) {
-                if ($var->{vars}[0]{name} eq $key) {
-                    $var->set_value($named_vars{$key}->get_value);
-                    $found = 1;
-                    last;
-                }
-            }
-
-            if (not $found) {
-                warn "[WARN] No such named argument: '$key'\n";
-            }
+            warn "[WARN] No such named argument: '$key'\n";
         }
 
         $last == 0

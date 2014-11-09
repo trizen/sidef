@@ -50,7 +50,7 @@ package Sidef::Exec {
           },
           __PACKAGE__;
 
-        while (my (undef, $value) = each %{$self->{types}}) {
+        foreach my $value (values %{$self->{types}}) {
             @{$self->{short_circuit_methods}}{keys %{$value}} = ();
         }
 

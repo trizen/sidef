@@ -287,6 +287,11 @@ package Sidef::Parser {
                  dynamic => 0,
                 },
                 {
+                 sub     => sub { Sidef::Types::Block::Code->new },
+                 re      => qr/\G(?=loop\b)/,
+                 dynamic => 0,
+                },
+                {
                  sub     => sub { Sidef::Types::Number::Unary->new },
                  re      => qr/\G(?=!)/,
                  dynamic => 0,
@@ -335,7 +340,7 @@ package Sidef::Parser {
                   return
                   for foreach
                   if while
-                  try
+                  try loop
                   given switch
                   continue
                   require
@@ -749,10 +754,10 @@ package Sidef::Parser {
                 }
 
                 my $obj = Sidef::Variable::Variable->new(
-                                                         name  => $name,
-                                                         type  => $opt{type},
-                                                         value => $value,
-                                                         $attr eq '*' ? (multi => 1) : ()
+                                                         name => $name,
+                                                         type => $opt{type},
+                                                         defined($value) ? (value => $value, def_value => 1) : (),
+                                                         $attr eq '*' ? (multi => 1) : (),
                                                         );
 
                 if (!$opt{private}) {
@@ -1154,7 +1159,8 @@ package Sidef::Parser {
 
                 # Declaration of the 'my' special variable + class, method and function declarations
                 if (
-                    /\G(my|func|class)\b\h*/gc
+                       /\G(my|func|class)\b\h*/gc
+                    || /\G(->)\h*/gc
                     || (exists($self->{current_class})
                         && /\G(method)\b\h*/gc)
                   ) {
@@ -1169,6 +1175,10 @@ package Sidef::Parser {
                                            code     => $_,
                                            pos      => pos($_)
                                           );
+
+                    if ($type eq '->') {
+                        $type = 'func';
+                    }
 
                     if ($type ne 'method'
                         && exists($self->{keywords}{$name})) {
@@ -1557,11 +1567,9 @@ package Sidef::Parser {
 
                     if ($name eq 'ARGV') {
                         require Encode;
-                        my $array = Sidef::Types::Array::Array->new(
-                            map {
-                                Sidef::Types::String::String->new(Encode::decode_utf8($_))
-                              } @ARGV
-                        );
+                        my $array =
+                          Sidef::Types::Array::Array->new(map { Sidef::Types::String::String->new(Encode::decode_utf8($_)) }
+                                                          @ARGV);
                         $variable->set_value($array);
                     }
                     elsif ($name eq 'ENV') {

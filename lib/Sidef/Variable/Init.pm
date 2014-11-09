@@ -10,8 +10,9 @@ package Sidef::Variable::Init {
     sub set_value {
         my ($self, @args) = @_;
 
-        while (my ($i, $var) = each @{$self->{vars}}) {
+        foreach my $i (0 .. $#{$self->{vars}}) {
 
+            my $var = $self->{vars}[$i];
             exists($var->{in_use}) || next;
 
             my $type = $var->{type};
@@ -22,13 +23,13 @@ package Sidef::Variable::Init {
                                                  type  => $var->{type},
                                                  value => exists($var->{multi})
                                                  ? Sidef::Types::Array::Array->new(@args[$i .. $#args])
-                                                 : ($args[$i] // $var->{value})
+                                                 : (exists($args[$i]) ? $args[$i] : $var->{value})
                                                 );
                 push @{$var->{stack}}, $new_var;
             }
             elsif ($type eq 'static' or $type eq 'const') {
                 if (not exists $var->{inited}) {
-                    $var->set_value($args[$i] // $var->{value});
+                    $var->set_value(exists($args[$i]) ? $args[$i] : $var->{value});
                     $var->{inited} = 1;
                 }
             }
