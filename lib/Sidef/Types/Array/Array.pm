@@ -993,9 +993,8 @@ package Sidef::Types::Array::Array {
         if (@objects) {
             return $self->new(map { $_->get_value } CORE::splice(@{$self}, $offset, $length, @{__PACKAGE__->new(@objects)}));
         }
-        else {
-            return $self->new(map { $_->get_value } CORE::splice(@{$self}, $offset, $length));
-        }
+
+        $self->new(map { $_->get_value } CORE::splice(@{$self}, $offset, $length));
     }
 
     sub takeRight {

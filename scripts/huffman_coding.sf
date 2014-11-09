@@ -1,20 +1,18 @@
 #!/usr/bin/ruby
 
-#
-## Translation of: http://rosettacode.org/wiki/Huffman_coding#Perl
-#
+# http://rosettacode.org/wiki/Huffman_coding#Sidef
 
-func walk(n, s, h) {
+func walk(n=Hash, s=String, h=Hash) -> true {
     n.exists('a') && (
         h[n['a']] = s;
         say "#{n['a']}: #{s}";
-        return;
+        return true;
     );
     walk(n['0'], s+'0', h);
     walk(n['1'], s+'1', h);
 }
 
-func make_tree(text) {
+func make_tree(text=String) -> Hash {
     var letters = Hash.new;
     text.each { |c| letters[c] := 0 ++ };
     var nodes = letters.keys.map { |l|
@@ -32,12 +30,12 @@ func make_tree(text) {
     return n;
 }
 
-func encode(s, t) {
+func encode(s=String, t=Hash) -> String {
     t = t['tree'];
     s.split(1).join('' => {t[_]});
 }
 
-func decode (enc, tree) {
+func decode (enc=String, tree=Hash) -> String {
     var n = tree;
     var out = '';
 
