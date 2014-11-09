@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   Module::Build: '0'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.421, CPAN::Meta::Converter version 2.142690'
+generated_by: 'Module::Build version 0.4205, CPAN::Meta::Converter version 2.140640'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -153,7 +153,6 @@ provides:
 requires:
   Cwd: '0'
   Encode: '0'
-  Encode::Locale: '0'
   Fcntl: '0'
   File::Basename: '0'
   File::Copy: '0'

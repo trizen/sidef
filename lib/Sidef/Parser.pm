@@ -1556,18 +1556,18 @@ package Sidef::Parser {
                       };
 
                     if ($name eq 'ARGV') {
-                        require Encode::Locale;
+                        require Encode;
                         my $array = Sidef::Types::Array::Array->new(
                             map {
-                                Sidef::Types::String::String->new(Encode::decode(locale => $_))
+                                Sidef::Types::String::String->new(Encode::decode_utf8($_))
                               } @ARGV
                         );
                         $variable->set_value($array);
                     }
                     elsif ($name eq 'ENV') {
-                        require Encode::Locale;
+                        require Encode;
                         my $hash =
-                          Sidef::Types::Hash::Hash->new(map { Sidef::Types::String::String->new(Encode::decode(locale => $_)) }
+                          Sidef::Types::Hash::Hash->new(map { Sidef::Types::String::String->new(Encode::decode_utf8($_)) }
                                                         %ENV);
                         $variable->set_value($hash);
                     }

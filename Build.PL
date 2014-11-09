@@ -38,7 +38,6 @@ my $builder = Module::Build->new(
                  'Math::BigFloat' => 0,
                  'Fcntl'          => 0,
                  'Encode'         => 0,
-                 'Encode::Locale' => 0,
                  'POSIX'          => 0,
                  'Time::HiRes'    => 0,
                  'Getopt::Std'    => 0,

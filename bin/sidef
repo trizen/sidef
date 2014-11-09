@@ -18,9 +18,9 @@ BEGIN {    # support for running sidef locally from everywhere
                         );
 }
 
-binmode STDIN,  ":encoding(UTF-8)";
-binmode STDOUT, ":encoding(UTF-8)";
-binmode STDERR, ":encoding(UTF-8)" if ($^P == 0);    # to work under Devel::* modules
+binmode STDIN,  ":utf8";
+binmode STDOUT, ":utf8";
+binmode STDERR, ":utf8" if ($^P == 0);    # to work under Devel::* modules
 
 require Sidef::Init;
 
@@ -115,7 +115,7 @@ else {
         defined($args{E}) || die "No code specified for -E.\n";
         $script_name = '-E';
         require Encode::Locale;
-        Encode::decode(locale => $args{E});
+        Encode::decode_utf8($args{E});
       }
       : defined($ARGV[0]) && (-f $ARGV[0]) ? do {
         $script_name = shift @ARGV;

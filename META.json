@@ -5,7 +5,7 @@
       "Ioana Fălcușan (<ioanaflavia@gmail.com>)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.421",
+   "generated_by" : "Module::Build version 0.4205",
    "license" : [
       "perl_5"
    ],
@@ -29,7 +29,6 @@
          "requires" : {
             "Cwd" : "0",
             "Encode" : "0",
-            "Encode::Locale" : "0",
             "Fcntl" : "0",
             "File::Basename" : "0",
             "File::Copy" : "0",
