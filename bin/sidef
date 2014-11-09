@@ -20,7 +20,7 @@ BEGIN {    # support for running sidef locally from everywhere
 
 binmode STDIN,  ":utf8";
 binmode STDOUT, ":utf8";
-binmode STDERR, ":utf8" if ($^P == 0);    # to work under Devel::* modules
+binmode STDERR, ":utf8" if $^P == 0;    # to work under Devel::* modules
 
 require Sidef::Init;
 
@@ -114,7 +114,7 @@ else {
       ? do {
         defined($args{E}) || die "No code specified for -E.\n";
         $script_name = '-E';
-        require Encode::Locale;
+        require Encode;
         Encode::decode_utf8($args{E});
       }
       : defined($ARGV[0]) && (-f $ARGV[0]) ? do {
@@ -498,7 +498,6 @@ use warnings;
 no strict 'subs';
 no warnings 'reserved';
 
-use Encode::Locale qw();
 use File::Temp qw(tempdir);
 use File::Path qw(make_path);
 use File::Spec::Functions qw(catdir catfile);
@@ -506,9 +505,9 @@ use File::Spec::Functions qw(catdir catfile);
 my \$DIR;
 use lib \$DIR = tempdir(CLEANUP => 1);
 
-binmode STDIN,  ":encoding(console_in)"  if (-t STDIN);
-binmode STDOUT, ":encoding(console_out)" if (-t STDOUT);
-binmode STDERR, ":encoding(console_out)" if (-t STDERR and \$^P == 0);    # to work under Devel::* modules
+binmode STDIN,  ":utf8";
+binmode STDOUT, ":utf8";
+binmode STDERR, ":utf8" if \$^P == 0;    # to work under Devel::* modules
 
 foreach my \$mod (
 HEAD
