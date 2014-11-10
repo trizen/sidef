@@ -2,7 +2,7 @@
 
 # http://rosettacode.org/wiki/Huffman_coding#Sidef
 
-func walk(n=Hash, s=String, h=Hash) -> true {
+func walk(n is Hash, s is String, h is Hash) -> true {
     n.exists('a') && (
         h[n['a']] = s;
         say "#{n['a']}: #{s}";
@@ -12,7 +12,7 @@ func walk(n=Hash, s=String, h=Hash) -> true {
     walk(n['1'], s+'1', h);
 }
 
-func make_tree(text=String) -> Hash {
+func make_tree(text is String) -> Hash {
     var letters = Hash.new;
     text.each { |c| letters[c] := 0 ++ };
     var nodes = letters.keys.map { |l|
@@ -30,12 +30,12 @@ func make_tree(text=String) -> Hash {
     return n;
 }
 
-func encode(s=String, t=Hash) -> String {
+func encode(s is String, t is Hash) -> String {
     t = t['tree'];
     s.split(1).join('' => {t[_]});
 }
 
-func decode (enc=String, tree=Hash) -> String {
+func decode (enc is String, tree is Hash) -> String {
     var n = tree;
     var out = '';
 

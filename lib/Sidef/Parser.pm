@@ -695,7 +695,7 @@ package Sidef::Parser {
             my @vars;
             while (/\G(\*?$self->{re}{var_name})/goc) {
                 push @vars, $1;
-                if ($opt{with_vals} && defined($end_delim) && /\G\h*=\h*/gc) {
+                if ($opt{with_vals} && defined($end_delim) && /\G\h*(?:=\h*|\bis\b\h*)/gc) {
                     my (undef, $pos) = $self->parse_obj(code => substr($_, pos));
                     $vars[-1] .= '=' . substr($_, pos($_), $pos);
                     pos($_) += $pos;
@@ -744,7 +744,7 @@ package Sidef::Parser {
                 }
 
                 my $value;
-                if (defined($end_delim) && /\G\h*=\h*/gc) {
+                if (defined($end_delim) && /\G\h*(?:=\h*|\bis\b\h*)/gc) {
                     my ($obj, $pos) = $self->parse_obj(code => substr($_, pos));
                     pos($_) += $pos;
                     $value =
