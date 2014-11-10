@@ -239,6 +239,7 @@ scripts/langton_s_ant_2.sf
 scripts/lazy_methods.sf
 scripts/leap_year.sf
 scripts/letter_frequency.sf
+scripts/lev_fast.sf
 scripts/levenshtein_distance.sf
 scripts/levenshtein_distance_cached.sf
 scripts/levenshtein_recursive.sf
