@@ -326,6 +326,7 @@ scripts/static_const_lazy_init.sf
 scripts/stdin.sf
 scripts/string_escapes.sf
 scripts/struct_definition.sf
+scripts/sudoku_solver.sf
 scripts/sum_of_squares.sf
 scripts/switch.sf
 scripts/sylvesters_sequence.sf

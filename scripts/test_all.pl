@@ -33,6 +33,7 @@ my %ignored;
       multi_file_edit.sf
       cosmic_calendar.sf
       rock_paper_scissors.sf
+      sudoku_solver.sf
       tk_library.sf
       )
 } = ();
