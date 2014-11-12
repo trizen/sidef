@@ -165,6 +165,7 @@ scripts/binary_search.sf
 scripts/binary_search_recursive.sf
 scripts/box_the_compass.sf
 scripts/break.sf
+scripts/built_in_classes.sf
 scripts/bulls_and_cows.sf
 scripts/bulls_and_cows_player.sf
 scripts/c_plus_plus_input_output.sf

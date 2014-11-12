@@ -3,32 +3,32 @@ require 5.014000;
 use ExtUtils::MakeMaker;
 WriteMakefile
 (
-  'NAME' => 'Sidef',
-  'INSTALLDIRS' => 'site',
-  'PL_FILES' => {},
   'EXE_FILES' => [
                    'bin/sidef'
                  ],
-  'VERSION_FROM' => 'lib/Sidef.pm',
   'PREREQ_PM' => {
-                   'List::Util' => 0,
+                   'File::Basename' => 0,
                    'Test::More' => 0,
                    'Term::ReadLine' => 0,
-                   'File::Path' => 0,
+                   'File::Spec' => 0,
+                   'List::Util' => 0,
+                   'utf8' => 0,
+                   'Encode' => 0,
                    'Fcntl' => 0,
+                   'Getopt::Std' => 0,
+                   'File::Copy' => 0,
                    'File::Find' => 0,
+                   'File::Temp' => 0,
+                   'POSIX' => 0,
                    'Cwd' => 0,
                    'Math::BigFloat' => 0,
-                   'File::Spec' => 0,
-                   'utf8' => 0,
-                   'File::Basename' => 0,
-                   'Encode' => 0,
-                   'POSIX' => 0,
-                   'File::Copy' => 0,
-                   'Time::HiRes' => 0,
+                   'File::Path' => 0,
                    'Math::BigInt' => 0,
-                   'File::Temp' => 0,
-                   'Getopt::Std' => 0
-                 }
+                   'Time::HiRes' => 0
+                 },
+  'NAME' => 'Sidef',
+  'VERSION_FROM' => 'lib/Sidef.pm',
+  'PL_FILES' => {},
+  'INSTALLDIRS' => 'site'
 )
 ;

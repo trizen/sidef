@@ -118,6 +118,7 @@ package Sidef {
             };
         }
 
+        *__add_method  = \&def_method;
         *define_method = \&def_method;
 
         sub method {

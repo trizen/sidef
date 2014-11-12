@@ -18,6 +18,7 @@ my %ignored;
       benford_s_law.sf
       bulls_and_cows.sf
       bulls_and_cows_player.sf
+      built_in_classes.sf
       http_tiny.sf
       langton_s_ant.sf
       langton_s_ant_2.sf

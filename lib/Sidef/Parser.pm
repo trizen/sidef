@@ -1176,17 +1176,26 @@ package Sidef::Parser {
                                            pos      => pos($_)
                                           );
 
+                    my $len = $-[0];
                     if ($type eq '->') {
                         $type = 'func';
                     }
 
+                    my $built_in_obj;
                     if ($type ne 'method'
                         && exists($self->{keywords}{$name})) {
-                        $self->fatal_error(
-                                           code  => $_,
-                                           pos   => (pos($_) - length($name)),
-                                           error => "'$name' is either a keyword or a predefined variable!",
-                                          );
+
+                        if ($type eq 'class') {
+                            my ($obj, $pos) = $self->parse_expr(code => substr($_, $len));
+                            $built_in_obj = $obj;
+                        }
+                        else {
+                            $self->fatal_error(
+                                               code  => $_,
+                                               pos   => $len,
+                                               error => "'$name' is either a keyword or a predefined variable!",
+                                              );
+                        }
                     }
 
                     my $obj =
@@ -1235,7 +1244,7 @@ package Sidef::Parser {
                                 if (ref $class) {
                                     if ($class->{type} eq 'class') {
                                         while (my ($name, $method) = each %{$class->{obj}{__METHODS__}}) {
-                                            $obj->__add_method($name, $method);
+                                            ($built_in_obj // $obj)->__add_method($name, $method);
                                         }
                                     }
                                     else {
@@ -1246,6 +1255,14 @@ package Sidef::Parser {
                                                            pos      => pos($_) - length($name),
                                                           );
                                     }
+                                }
+                                else {
+                                    $self->fatal_error(
+                                                       error    => "can't find '$name' class",
+                                                       expected => "expected an existent class name",
+                                                       code     => $_,
+                                                       pos      => pos($_) - length($name),
+                                                      );
                                 }
 
                                 /\G,\h*/gc;
@@ -1260,8 +1277,8 @@ package Sidef::Parser {
                                                 pos      => pos($_)
                                                );
 
-                        local $self->{class_name}    = $name;
-                        local $self->{current_class} = $obj;
+                        local $self->{class_name} = $name;
+                        local $self->{current_class} = $built_in_obj // $obj;
                         my ($block, $pos) = $self->parse_block(code => '{' . substr($_, pos));
                         pos($_) += $pos - 1;
 
@@ -1316,6 +1333,46 @@ package Sidef::Parser {
                     }
 
                     return $obj, pos;
+                }
+
+                if (exists $self->{current_class} and /\Gdefine_method\b/gc) {
+                    my ($name, $pos) = $self->parse_expr(code => substr($_, pos($_)));
+                    pos($_) += $pos;
+
+                    my ($method, $pos2) = $self->parse_expr(code => 'method ' . substr($_, pos($_)));
+                    pos($_) += $pos2 - 7;
+
+                    return scalar {
+                        $self->{class} => [
+                                           {
+                                            self => $self->{current_class},
+                                            call => [
+                                                     {
+                                                      method => 'define_method',
+                                                      arg    => [
+                                                              {
+                                                               $self->{class} => [{self => $name},
+                                                                                  {
+                                                                                   self => {
+                                                                                            $self->{class} => [
+                                                                                                 {
+                                                                                                  call => [{method => 'copy'}],
+                                                                                                  self => $method,
+                                                                                                 },
+                                                                                            ],
+                                                                                           },
+                                                                                  }
+                                                                                 ],
+                                                              }
+                                                             ]
+                                                     }
+                                                    ]
+                                           }
+                                          ]
+
+                                  },
+                      pos($_);
+
                 }
 
                 # Binary, hexdecimal and octal numbers
