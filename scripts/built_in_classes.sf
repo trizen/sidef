@@ -32,7 +32,7 @@ var COLORS = :{
 
 # Redefine the String class and define new methods in it with 'define_method' keyword
 # Inspired from: http://en.wikipedia.org/wiki/Ruby_(programming_language)#Metaprogramming
-class String {
+class "" {
     COLORS.each { |color,code|
        define_method "in_#{color}" {
             "<span style=\"color: ##{code}\">#{self}</span>"

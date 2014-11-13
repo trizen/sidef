@@ -1172,7 +1172,7 @@ package Sidef::Parser {
                       : $1;
 
                     my $built_in_obj;
-                    if ($type eq 'class') {
+                    if ($type eq 'class' and /\G(?!\{)/) {
                         my ($obj, $pos) = eval { $self->parse_expr(code => substr($_, pos($_))) };
                         if (not $@ and defined $obj) {
                             pos($_) += $pos;
