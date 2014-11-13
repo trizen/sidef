@@ -1,7 +1,7 @@
 package Sidef::Types::Black::Hole {
 
     sub new {
-        bless {}, __PACKAGE__;
+        bless {value => $_[1]}, __PACKAGE__;
     }
 
     sub DESTROY  { }

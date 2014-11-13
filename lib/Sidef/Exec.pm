@@ -446,6 +446,10 @@ package Sidef::Exec {
                     return $obj;
                 }
 
+                if (ref($obj) eq 'Sidef::Types::Black::Hole') {
+                    $obj = $obj->{value};
+                }
+
                 if (wantarray and ref($obj) eq 'Sidef::Args::Args') {
                     push @results, @{$obj};
                 }

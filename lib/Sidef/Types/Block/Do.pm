@@ -24,7 +24,7 @@ package Sidef::Types::Block::Do {
                 $self->{do_block} = 0;
                 return $result;
             }
-            return Sidef::Types::Black::Hole->new();
+            return Sidef::Types::Black::Hole->new($result);
         }
 
         $self;
