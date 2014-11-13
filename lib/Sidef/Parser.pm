@@ -1164,38 +1164,43 @@ package Sidef::Parser {
                     || (exists($self->{current_class})
                         && /\G(method)\b\h*/gc)
                   ) {
-                    my $type = $1;
-                    my $name =
-                        /\G($self->{re}{var_name})\h*/goc ? $1
-                      : $type eq 'method' && /\G($self->{re}{operators})\h*/goc ? $1
-                      : $type ne 'my' ? ''
-                      : $self->fatal_error(
-                                           error    => "invalid '$type' declaration",
-                                           expected => "expected a name",
-                                           code     => $_,
-                                           pos      => pos($_)
-                                          );
-
-                    my $len = $-[0];
-                    if ($type eq '->') {
-                        $type = 'func';
-                    }
+                    my $type =
+                        $1 eq '->'
+                      ? exists($self->{current_class}) && !(exists($self->{current_method}))
+                          ? 'method'
+                          : 'func'
+                      : $1;
 
                     my $built_in_obj;
+                    if ($type eq 'class') {
+                        my ($obj, $pos) = eval { $self->parse_expr(code => substr($_, pos($_))) };
+                        if (not $@ and defined $obj) {
+                            pos($_) += $pos;
+                            $built_in_obj = ref($obj) eq 'HASH' ? Sidef::Types::Block::Code->new($obj)->run : $obj;
+                        }
+                    }
+
+                    my $name = '';
+                    if (not defined $built_in_obj) {
+                        $name =
+                            /\G($self->{re}{var_name})\h*/goc ? $1
+                          : $type eq 'method' && /\G($self->{re}{operators})\h*/goc ? $1
+                          : $type ne 'my' ? ''
+                          : $self->fatal_error(
+                                               error    => "invalid '$type' declaration",
+                                               expected => "expected a name",
+                                               code     => $_,
+                                               pos      => pos($_)
+                                              );
+                    }
+
                     if ($type ne 'method'
                         && exists($self->{keywords}{$name})) {
-
-                        if ($type eq 'class') {
-                            my ($obj, $pos) = $self->parse_expr(code => substr($_, $len));
-                            $built_in_obj = $obj;
-                        }
-                        else {
-                            $self->fatal_error(
-                                               code  => $_,
-                                               pos   => $len,
-                                               error => "'$name' is either a keyword or a predefined variable!",
-                                              );
-                        }
+                        $self->fatal_error(
+                                           code  => $_,
+                                           pos   => $-[0],
+                                           error => "'$name' is either a keyword or a predefined variable!",
+                                          );
                     }
 
                     my $obj =
