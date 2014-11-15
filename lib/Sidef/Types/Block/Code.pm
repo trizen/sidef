@@ -15,6 +15,11 @@ package Sidef::Types::Block::Code {
           };
     }
 
+    sub _execute {
+        my ($self) = @_;
+        $exec->execute($self->{code});
+    }
+
     sub get_value {
         my ($self) = @_;
         sub {
@@ -92,7 +97,7 @@ package Sidef::Types::Block::Code {
 
     sub to_hash {
         my ($self) = @_;
-        Sidef::Types::Hash::Hash->new($exec->execute($self->{code}));
+        Sidef::Types::Hash::Hash->new($self->_execute);
     }
 
     *toHash = \&to_hash;
@@ -100,7 +105,7 @@ package Sidef::Types::Block::Code {
 
     sub to_array {
         my ($self) = @_;
-        Sidef::Types::Array::Array->new($exec->execute($self->{code}));
+        Sidef::Types::Array::Array->new($self->_execute);
     }
 
     *toArray = \&to_array;
@@ -118,7 +123,7 @@ package Sidef::Types::Block::Code {
 
     sub run {
         my ($self) = @_;
-        my $result = ($exec->execute($self->{code}))[-1];
+        my $result = ($self->_execute)[-1];
         if (ref $result eq 'Sidef::Variable::Variable') {
             $result = $result->get_value;
         }
@@ -128,7 +133,7 @@ package Sidef::Types::Block::Code {
 
     sub exec {
         my ($self) = @_;
-        $exec->execute($self->{code});
+        $self->_execute;
         $self;
     }
 

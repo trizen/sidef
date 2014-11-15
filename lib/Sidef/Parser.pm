@@ -2131,47 +2131,75 @@ package Sidef::Parser {
                 }
 
                 if (/\Ginclude\b\h*/gc) {
-                    my ($var_names, $pos) =
-                      $self->get_init_vars(code      => substr($_, pos),
-                                           with_vals => 0);
-                    pos($_) += $pos;
+                    my ($expr, $pos) = eval { $self->parse_expr(code => substr($_, pos)) };
 
-                    @{$var_names}
-                      || $self->fatal_error(
-                                            code  => $_,
-                                            pos   => (pos($_)),
-                                            error => "expected a variable-like `Module::Name'!",
-                                           );
+                    my @abs_filenames;
+                    if ($@) {    # an error occured
 
-                    foreach my $var_name (@{$var_names}) {
-                        my @path = split(/::/, $var_name);
+                        # Try to get variable-like values (e.g.: include Some::Module::Name)
+                        my ($var_names, $pos) =
+                          $self->get_init_vars(code      => substr($_, pos),
+                                               with_vals => 0);
+                        pos($_) += $pos;
 
-                        require File::Spec;
-                        my $mod_path = File::Spec->catfile(@path[0 .. $#path - 1], $path[-1] . '.sm');
+                        @{$var_names}
+                          || $self->fatal_error(
+                                                code  => $_,
+                                                pos   => (pos($_)),
+                                                error => "expected a variable-like `Module::Name'!",
+                                               );
 
-                        if (@{$self->{inc}} == 0) {
-                            require File::Basename;
-                            push @{$self->{inc}}, split(':', $ENV{SIDEF_INC}) if exists($ENV{SIDEF_INC});
-                            push @{$self->{inc}}, File::Basename::dirname(File::Spec->rel2abs($self->{script_name}));
-                            push @{$self->{inc}}, File::Spec->curdir;
-                        }
+                        foreach my $var_name (@{$var_names}) {
+                            my @path = split(/::/, $var_name);
 
-                        my ($full_path, $found_module);
-                        foreach my $inc_dir (@{$self->{inc}}) {
-                            if (    -e ($full_path = File::Spec->catfile($inc_dir, $mod_path))
-                                and -f _
-                                and -r _ ) {
-                                $found_module = 1;
-                                last;
+                            require File::Spec;
+                            my $mod_path = File::Spec->catfile(@path[0 .. $#path - 1], $path[-1] . '.sm');
+
+                            if (@{$self->{inc}} == 0) {
+                                require File::Basename;
+                                push @{$self->{inc}}, split(':', $ENV{SIDEF_INC}) if exists($ENV{SIDEF_INC});
+                                push @{$self->{inc}}, File::Basename::dirname(File::Spec->rel2abs($self->{script_name}));
+                                push @{$self->{inc}}, File::Spec->curdir;
                             }
-                        }
 
-                        $found_module // $self->fatal_error(
-                                                            code  => $_,
-                                                            pos   => pos($_),
-                                                            error => "can't find the module '${mod_path}' anywhere in ['"
-                                                              . join("', '", @{$self->{inc}}) . "']",
-                                                           );
+                            my ($full_path, $found_module);
+                            foreach my $inc_dir (@{$self->{inc}}) {
+                                if (    -e ($full_path = File::Spec->catfile($inc_dir, $mod_path))
+                                    and -f _
+                                    and -r _ ) {
+                                    $found_module = 1;
+                                    last;
+                                }
+                            }
+
+                            $found_module // $self->fatal_error(
+                                                                code  => $_,
+                                                                pos   => pos($_),
+                                                                error => "can't find the module '${mod_path}' anywhere in ['"
+                                                                  . join("', '", @{$self->{inc}}) . "']",
+                                                               );
+
+                            push @abs_filenames, [$full_path, $var_name];
+                        }
+                    }
+                    else {
+                        pos($_) += $pos;
+                        my @files = ref($expr) eq 'HASH' ? Sidef::Types::Block::Code->new($expr)->_execute : $expr;
+                        push @abs_filenames, map {
+                            my $value = $_->get_value;
+                            ref($value) ne ''
+                              ? $self->fatal_error(
+                                              code  => $_,
+                                              pos   => pos($_),
+                                              error => 'invalid value of type "' . ref($value) . '" (expected a plain-string)',
+                              )
+                              : [$value];
+                        } @files;
+                    }
+
+                    foreach my $pair (@abs_filenames) {
+
+                        my ($full_path, $var_name) = @{$pair};
 
                         open(my $fh, '<:utf8', $full_path)
                           || $self->fatal_error(
@@ -2189,7 +2217,7 @@ package Sidef::Parser {
                                                       strict      => $self->{strict},
                                                      );
 
-                        local $parser->{class} = $var_name;
+                        local $parser->{class} = $var_name if defined $var_name;
                         my $struct = $parser->parse_script(code => $content);
 
                         foreach my $class (keys %{$struct}) {
