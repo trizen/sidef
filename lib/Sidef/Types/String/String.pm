@@ -1022,7 +1022,7 @@ package Sidef::Types::String::String {
 
     sub dump {
         my ($self) = @_;
-        __PACKAGE__->new(q{'} . $$self =~ s{'}{\\'}gr . q{'});
+        __PACKAGE__->new(q{'} . $$self =~ s{([\\'])}{\\$1}gr . q{'});
     }
 
     {

@@ -15,6 +15,18 @@ package Sidef::Types::Block::Code {
           };
     }
 
+    sub dump {
+        my ($self) = @_;
+        require Data::Dump;
+        Sidef::Types::String::String->new(
+                                          'Sys.eval('
+                                            . Sidef::Types::String::String->new(
+                                                'Sidef::Types::Block::Code->new(' . scalar(Data::Dump::pp($self->{code})) . ')'
+                                            )->dump
+                                            . ')'
+                                         );
+    }
+
     sub _execute {
         my ($self) = @_;
         $exec->execute($self->{code});
