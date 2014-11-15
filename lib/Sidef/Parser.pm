@@ -2138,8 +2138,7 @@ package Sidef::Parser {
 
                         # Try to get variable-like values (e.g.: include Some::Module::Name)
                         my ($var_names, $pos) =
-                          $self->get_init_vars(code      => substr($_, pos),
-                                               with_vals => 0);
+                          $self->get_init_vars(code => substr($_, pos), with_vals => 0);
                         pos($_) += $pos;
 
                         @{$var_names}
@@ -2221,8 +2220,15 @@ package Sidef::Parser {
                         my $struct = $parser->parse_script(code => $content);
 
                         foreach my $class (keys %{$struct}) {
-                            $struct{$class} = $struct->{$class};
-                            $self->{ref_vars}{$class} = $parser->{ref_vars}{$class};
+                            if (defined $var_name) {
+                                $struct{$class} = $struct->{$class};
+                                $self->{ref_vars}{$class} = $parser->{ref_vars}{$class};
+                            }
+                            else {
+                                push @{$struct{$class}}, @{$struct->{$class}};
+                                push @{$self->{ref_vars}{$class}}, @{$parser->{ref_vars}{$class}};
+                            }
+
                         }
                     }
 
