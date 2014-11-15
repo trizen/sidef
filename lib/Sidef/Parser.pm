@@ -2182,18 +2182,25 @@ package Sidef::Parser {
                         }
                     }
                     else {
-                        pos($_) += $pos;
+
                         my @files = ref($expr) eq 'HASH' ? Sidef::Types::Block::Code->new($expr)->_execute : $expr;
                         push @abs_filenames, map {
-                            my $value = $_->get_value;
+                            my $value = $_;
+                            do {
+                                $value = $value->get_value;
+                            } while (ref($value) and eval { $value->can('get_value') });
+
                             ref($value) ne ''
                               ? $self->fatal_error(
-                                              code  => $_,
-                                              pos   => pos($_),
-                                              error => 'invalid value of type "' . ref($value) . '" (expected a plain-string)',
-                              )
+                                                   code  => $_,
+                                                   pos   => pos($_),
+                                                   error => 'include-error: invalid value of type "'
+                                                     . ref($value)
+                                                     . '" (expected a plain-string)',
+                                                  )
                               : [$value];
                         } @files;
+                        pos($_) += $pos;
                     }
 
                     foreach my $pair (@abs_filenames) {
@@ -2204,7 +2211,7 @@ package Sidef::Parser {
                           || $self->fatal_error(
                                                 code  => $_,
                                                 pos   => pos($_),
-                                                error => "can't open the file '$full_path': $!"
+                                                error => "can't open file '$full_path': $!"
                                                );
 
                         my $content = do { local $/; <$fh> };
