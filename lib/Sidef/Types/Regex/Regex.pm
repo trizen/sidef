@@ -46,7 +46,7 @@ package Sidef::Types::Regex::Regex {
             return $match // $self->matches(Sidef::Types::String::String->new);
         }
 
-        $self->_is_string($object) || return;
+        $self->_is_string($object, 0, 1) || return;
         $object = $$object;
 
         require Sidef::Types::Regex::Matches;
@@ -71,6 +71,11 @@ package Sidef::Types::Regex::Regex {
     sub dump {
         my ($self) = @_;
         Sidef::Types::String::String->new('/' . $self->{regex} =~ s{/}{\\/}gr . '/');
+    }
+
+    {
+        no strict 'refs';
+        *{__PACKAGE__ . '::' . '=~'} = \&match;
     }
 
 };
