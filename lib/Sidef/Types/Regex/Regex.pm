@@ -38,10 +38,12 @@ package Sidef::Types::Regex::Regex {
         my ($self, $object, $pos) = @_;
 
         if (ref $object eq 'Sidef::Types::Array::Array') {
+            my $match;
             foreach my $item (@{$object}) {
-                my $match = $self->matches($item->get_value);
+                $match = $self->matches($item->get_value);
                 $match->matched && return $match;
             }
+            return $match // $self->matches(Sidef::Types::String::String->new);
         }
 
         $self->_is_string($object) || return;

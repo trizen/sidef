@@ -164,6 +164,11 @@ package Sidef {
                 if ($s_type eq 'Sidef::Types::String::String') {
                     return $first->contains($second);
                 }
+
+                # String ~~ Regex
+                if ($s_type eq 'Sidef::Types::Regex::Regex') {
+                    return $second->match($first)->is_successful;
+                }
             }
 
             # First is Array
@@ -176,7 +181,7 @@ package Sidef {
 
                 # Array ~~ Regex
                 if ($s_type eq 'Sidef::Types::Regex::Regex') {
-                    return $second->match($first);
+                    return $second->match($first)->is_successful;
                 }
 
                 # Array ~~ Hash
@@ -210,16 +215,16 @@ package Sidef {
 
                 # Regex ~~ Array
                 if ($s_type eq 'Sidef::Types::Array::Array') {
-                    return $first->match($second);
+                    return $first->match($second)->is_successful;
                 }
 
                 # Regex ~~ Hash
                 if ($s_type eq 'Sidef::Types::Hash::Hash') {
-                    return $first->match($second->keys);
+                    return $first->match($second->keys)->is_successful;
                 }
 
                 # Regex ~~ Any
-                return $first->match($second);
+                return $first->match($second)->is_successful;
             }
 
             # Second is Array
@@ -230,6 +235,12 @@ package Sidef {
             }
 
             Sidef::Types::Bool::Bool->false;
+        };
+
+        *{__PACKAGE__ . '::' . '!~'} = sub {
+            my ($first, $second) = @_;
+            state $smart_op = '~~';
+            $first->$smart_op($second)->not;
         };
     }
 
