@@ -857,7 +857,7 @@ package Sidef::Types::Array::Array {
 
                  if ($#keys > 0) {
                      my $count = 0;
-                     my $ref = my $val = delete $hash->{$key};
+                     ref(my $ref = my $val = delete $hash->{$key}) eq 'HASH' || next;
                      while (my ($key) = CORE::each %{$ref}) {
                          $key eq $__END__
                            ? (
