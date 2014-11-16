@@ -24,11 +24,12 @@ func abbrev(array, code) {
     var abbrevs = [];
     func(hash) {
         var keys = hash.keys.sort -> each { |key|
-            key != END && __FUNC__(hash[key]);
+            key == END && next;
+            __FUNC__(hash[key]);
 
             if (keys.len > 1) {
                 var count = 1;
-                var ref = (var val = hash.delete(key)) -> is_a(Hash) || next;
+                var ref = (var val = hash.delete(key));
                 while (var key = ref.keys[0]  -> is_a(nil).not) {
                     key == END
                         ? (
