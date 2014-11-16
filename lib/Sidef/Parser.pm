@@ -1340,7 +1340,7 @@ package Sidef::Parser {
                     return $obj, pos;
                 }
 
-                if (exists $self->{current_class} and /\Gdefine_method\b/gc) {
+                if (exists $self->{current_class} and /\Gdefine_method\b\h*/gc) {
                     my ($name, $pos) = $self->parse_expr(code => substr($_, pos($_)));
                     pos($_) += $pos;
 

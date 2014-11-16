@@ -194,6 +194,7 @@ scripts/define_keyword.sf
 scripts/dice_game_solver.sf
 scripts/echo.sf
 scripts/eq_g2.sf
+scripts/escape_unescape.sf
 scripts/eval.sf
 scripts/execute_system_command.sf
 scripts/extend_language.sf

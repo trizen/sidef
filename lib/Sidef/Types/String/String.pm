@@ -757,7 +757,7 @@ package Sidef::Types::String::String {
 
     sub unescape {
         my ($self) = @_;
-        $self->new($$self =~ s{\\(?=\W)}{}gr);
+        $self->new($$self =~ s{\\(.)}{$1}grs);
     }
 
     sub apply_escapes {
