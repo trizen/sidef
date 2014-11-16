@@ -28,7 +28,7 @@ func abbrev(array, code) {
 
             if (keys.len > 1) {
                 var count = 1;
-                var ref = (var val = hash.delete(key));
+                var ref = (var val = hash.delete(key)) -> is_a(Hash) || next;
                 while (var key = ref.keys[0]  -> is_a(nil).not) {
                     key == END
                         ? (
@@ -58,3 +58,17 @@ var dirs = %w(
 
 var uniq = abbrev(dirs.map{.split('/')}).min_by{.len};
 uniq.pop:.join('/').say;
+
+
+var words = %w(
+    deodorant
+    decor
+    decorat
+    decadere
+    plecare
+    placere
+    plecat
+    jaguar
+);
+
+abbrev(words.map{.split(1)}, func(a) { say a.join });
