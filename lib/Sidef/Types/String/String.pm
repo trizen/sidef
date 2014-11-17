@@ -459,6 +459,8 @@ package Sidef::Types::String::String {
         __PACKAGE__->new(CORE::quotemeta($$self));
     }
 
+    *escape = \&quotemeta;
+
     sub scan {
         my ($self, $regex) = @_;
         $self->_is_regex($regex) || return;

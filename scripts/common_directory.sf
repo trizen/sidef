@@ -9,3 +9,16 @@ var dirs = %w(
 var unique_pref = dirs.map{.split('/')}.abbrev.min_by{.len};
 var common_dir  = unique_pref.pop:.join('/');
 say common_dir;                           # => /home/user1/tmp
+
+var words = %w(
+    deodorant
+    decor
+    decorat
+    decadere
+    plecare
+    placere
+    plecat
+    jaguar
+);
+
+words.map{.split(1)}.abbrev(func(a) { say a.join });

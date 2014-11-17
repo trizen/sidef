@@ -10,7 +10,7 @@
 func abbrev(array, code) {
 
     var END  = Time.sec.rand.to_s;                     # some unique value
-    var CALL = code.is_a({});
+    var CALL = code.is_a(Block);
 
     var table = Hash.new;
     array.each { |sub_array|
@@ -29,15 +29,14 @@ func abbrev(array, code) {
 
             if (keys.len > 1) {
                 var count = 1;
-                var ref = (var val = hash.delete(key));
-                while (var key = ref.keys[0]  -> is_a(nil).not) {
-                    key == END
-                        ? (
-                            var arr = ref[key].ft(0, -count);
-                            CALL ? (code(arr)) : abbrevs.append(arr);
-                            break;
-                           )
-                        : (ref = (val = ref[key]));
+                var ref = hash.delete(key);
+                while (var key = ref.keys[0]  -> is_a(String)) {
+                    key == END && (
+                        var arr = ref[key].ft(0, -count);
+                        CALL ? code.call(arr) : abbrevs.append(arr);
+                        break;
+                    );
+                    ref = ref[key];
                     count++;
                 }
             }

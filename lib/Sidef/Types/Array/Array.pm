@@ -858,17 +858,16 @@ package Sidef::Types::Array::Array {
 
                  if ($#keys > 0) {
                      my $count = 0;
-                     my $ref = my $val = delete $hash->{$key};
+                     my $ref   = delete $hash->{$key};
                      while (my ($key) = CORE::each %{$ref}) {
-                         $key eq $__END__
-                           ? (
-                                $__CALL__
-                              ? $code->call($self->new(map { $_->get_value } @{$ref->{$key}}[0 .. $#{$ref->{$key}} - $count]))
-                              : $callback->(@{$ref->{$key}}[0 .. $#{$ref->{$key}} - $count]),
-                              last
-                             )
-                           : ($ref = $val = $ref->{$key});
-                         ++$count;
+                         if ($key eq $__END__) {
+                             $__CALL__
+                               ? $code->call($self->new(map { $_->get_value } @{$ref->{$key}}[0 .. $#{$ref->{$key}} - $count]))
+                               : $callback->(@{$ref->{$key}}[0 .. $#{$ref->{$key}} - $count]);
+                             last;
+                         }
+                         $ref = $ref->{$key};
+                         $count++;
                      }
                  }
              }
