@@ -233,8 +233,6 @@ package Sidef::Types::Block::Code {
     sub pop_stack {
         my ($self) = @_;
 
-        exists($self->{vars}) or return;
-
         require List::Util;
         my @stack_vars =
           grep { ref($_) eq 'Sidef::Variable::Variable' && exists $_->{stack} } @{$self->{vars}};
