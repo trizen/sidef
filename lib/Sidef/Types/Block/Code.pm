@@ -233,11 +233,12 @@ package Sidef::Types::Block::Code {
     sub pop_stack {
         my ($self) = @_;
 
+        exists($self->{vars}) or return;
+
         require List::Util;
         my @stack_vars =
           grep { ref($_) eq 'Sidef::Variable::Variable' && exists $_->{stack} } @{$self->{vars}};
-        my $max_depth =
-          List::Util::max(map { $#{$_->{stack}} } @stack_vars);
+        my $max_depth = List::Util::max(map { $#{$_->{stack}} } @stack_vars);
 
         foreach my $var (@stack_vars) {
             if ($#{$var->{stack}} == $max_depth) {
