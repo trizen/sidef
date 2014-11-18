@@ -1,24 +1,15 @@
-#!/usr/bin/perl
+#!/usr/bin/ruby
 
-func matrix_multi (a, b) {
-
-  var p = [[]];
-  var rows = (a.len - 1);
-  var cols = (b[0].len - 1);
-
-  var n = (b.len - 1);
-
-    for (0..rows) { |r|
-        for (0..cols) { |c|
-            for (0..n) { |i|
-                p[r]    := [];
-                p[r][c] := 0;
-                p[r][c] += (a[r][i] * b[i][c]);
+func matrix_multi(a, b) {
+    var m = [[]];
+    a.range.each { |r|
+        b.first.range.each { |c|
+            b.range.each { |i|
+                m[r][c] := 0 += (a[r][i] * b[i][c]);
             }
         }
-    }
-
-    p;
+    };
+    return m;
 };
 
 var a = [
@@ -28,11 +19,11 @@ var a = [
           [7, 8]
         ];
 
-
 var b = [
           [1, 2, 3],
           [4, 5, 6]
         ];
 
-var c = matrix_multi(a, b);
-{_.map{"%3d".sprintf(_)}->join(", ").say} for (c);
+matrix_multi(a, b).each {|line|
+    say line.map{|i|'%3d'.sprintf(i)}.join(', ');
+};

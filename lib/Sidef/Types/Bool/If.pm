@@ -12,14 +12,15 @@ package Sidef::Types::Bool::If {
     }
 
     sub if {
-        my ($self, $arg) = @_;
-        $self->{do_block} = Sidef::Types::Block::Code->new($arg)->run ? 1 : 0;
+        my ($self, @args) = @_;
+        $self->{do_block} = $args[-1] ? 1 : 0;
         $self;
     }
 
     sub elsif {
         my ($self, $code) = @_;
-        $self->if($code);
+        $self->{do_block} = Sidef::Types::Block::Code->new($code)->run ? 1 : 0;
+        $self;
     }
 
     *elseif = \&elsif;
