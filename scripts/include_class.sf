@@ -2,6 +2,9 @@
 
 include Math::Algebra::Matrix;
 
+# Test module version
+Math::Algebra::Matrix::VERSION == 0.1 || "version error".die;
+
 #
 ## Init the class object
 #

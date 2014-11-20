@@ -1,8 +1,8 @@
 #!/usr/bin/ruby
 
-class new(matrix) {
+static VERSION = 0.1;
 
-    static VERSION = 0.1;
+class new(matrix) {
 
     #
     ## Require a Perl module
@@ -20,9 +20,9 @@ class new(matrix) {
     method det {
 
         var math_matrix = (
-            req.new(self.matrix->to_list);
+            req.new(self.matrix...);
         );
 
-        Num.new(math_matrix.determinant);
+        math_matrix.determinant;
     }
 }

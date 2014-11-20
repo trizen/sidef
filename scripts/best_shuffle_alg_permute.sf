@@ -28,7 +28,7 @@ func best_shuffle (chrs) {
     var iterator = (permute->new(orig_word));
 
     while (var word = (iterator->next:).len) {
-        word = (word.map{Str.new(_)});
+        word = word.map{Str.new(_)};
 
         var curscore = (score(orig_word, word)) < best_score && (
            best_score =  curscore;

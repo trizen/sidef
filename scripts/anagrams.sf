@@ -8,7 +8,7 @@ func main() {
         catch { Sys.warn("** LWP::Simple is not installed!\n"); return }
     );
 
-    var words = Str.new(lwp.get('http://www.puzzlers.org/pub/wordlists/unixdict.txt')).words;
+    var words = lwp.get('http://www.puzzlers.org/pub/wordlists/unixdict.txt').words;
 
     "** Processing words...".say;
     var vls = words.group_by{.sort}.values;

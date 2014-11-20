@@ -1,6 +1,9 @@
 #!/usr/bin/ruby
 
-var arr = {
+#
+## Module redeclaration
+#
+{
     module main { say "main module" };
     module A { say "a" };
     module B { say "b" };
@@ -15,11 +18,7 @@ var arr = {
     };
     C::e();
     C::f();
-}.capture.lines;
-
-arr.join("\n").say;
-
-arr == [
+}.capture.lines == [
     'a',
     'b',
     'c',
@@ -29,3 +28,71 @@ arr == [
     'e',
     'f',
 ] || "error".die;
+
+#
+## Redeclaring functions
+#
+{
+    module Z {
+        func f {say "x"};
+    }
+
+    module Z {
+        f();
+        func f() {say "y"};
+        func g() {say "z"};
+    };
+
+    Z::f();
+    Z::g();
+}.capture.lines == <x y z> || "error-2".die;
+
+#
+## Module inside module
+#
+{
+    module O {
+        say "inO";
+        module P {
+            say "inP";
+            func f{say "P::f()" };
+        };
+        say "afterP";
+        P::f();
+    };
+    P::f();
+}.capture.lines
+    == <inO afterP P::f() inP P::f()>
+        || "error-3".die;
+
+#
+## Changing module vars
+#
+module Test {
+    var hello = 23;
+}
+
+module Test {
+    hello += 1;
+}
+
+Test::hello == 24 || "Test::hello != 24".die;
+
+#
+## Test order of module execution
+#
+module Order {      #1
+    var x = 23;
+}
+
+Order::x == 25      #3
+    || "order-error".die;
+
+module Order {      #2
+    x += 2;
+}
+
+#
+## Everything is OK!
+#
+say "** Test passed!";

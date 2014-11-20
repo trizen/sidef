@@ -117,7 +117,7 @@ else {
         require Encode;
         Encode::decode_utf8($args{E});
       }
-      : defined($ARGV[0]) && (-f $ARGV[0]) ? do {
+      : defined($ARGV[0]) && (-t STDIN or -f $ARGV[0]) ? do {
         $script_name = shift @ARGV;
 
         open my $fh, '<:utf8', $script_name
@@ -126,7 +126,7 @@ else {
         local $/;
         <$fh>;
       }
-      : do { local $/; <> };
+      : do { local $/; <STDIN> };
 
     $code // exit 2;
     my $parser = Sidef::Parser->new(

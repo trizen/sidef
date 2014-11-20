@@ -2065,6 +2065,8 @@ package Sidef::Parser {
                                                  );
                     local $parser->{line}  = $self->{line};
                     local $parser->{class} = $name;
+                    local $parser->{ref_vars}{$name} = $self->{ref_vars}{$name} if exists($self->{ref_vars}{$name});
+
                     if ($name ne 'main' and not grep $_ eq $name, @Sidef::Exec::NAMESPACES) {
                         push @Sidef::Exec::NAMESPACES, $name;
                     }
@@ -2074,12 +2076,17 @@ package Sidef::Parser {
 
                     foreach my $class (keys %{$struct->{code}}) {
                         push @{$struct{$class}}, @{$struct->{code}{$class}};
-                        push @{$self->{ref_vars}{$class}},
-                          @{
-                              $#{$parser->{ref_vars}{$class}} == 0
-                            ? $parser->{ref_vars}{$class}[0]
-                            : $parser->{ref_vars}{$class}
-                           };
+                        if (exists $self->{ref_vars}{$class}) {
+                            unshift @{$self->{ref_vars}{$class}}, @{$parser->{ref_vars}{$class}[0]};
+                        }
+                        else {
+                            push @{$self->{ref_vars}{$class}},
+                              @{
+                                  $#{$parser->{ref_vars}{$class}} == 0 && ref($parser->{ref_vars}{$class}[0]) eq 'ARRAY'
+                                ? $parser->{ref_vars}{$class}[0]
+                                : $parser->{ref_vars}{$class}
+                               };
+                        }
                     }
 
                     redo;
@@ -2241,7 +2248,7 @@ package Sidef::Parser {
                             }
                             else {
                                 push @{$struct{$class}}, @{$struct->{$class}};
-                                push @{$self->{ref_vars}{$class}}, @{$parser->{ref_vars}{$class}};
+                                unshift @{$self->{ref_vars}{$class}}, @{$parser->{ref_vars}{$class}};
                             }
                         }
                     }

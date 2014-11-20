@@ -24,7 +24,7 @@ if (nil == resp) {
 }
 
 if (resp.is_success) {
-    var content = Str.new(resp.decoded_content);
+    var content = resp.decoded_content;
     printf("Content length is: %d\n", content.len);
 }
 else {
