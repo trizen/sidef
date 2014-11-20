@@ -4,7 +4,8 @@ package Sidef::Sys::Sys {
     our @ISA = qw(Sidef);
 
     sub new {
-        CORE::bless {}, __PACKAGE__;
+        my (undef, %opt) = @_;
+        CORE::bless \%opt, __PACKAGE__;
     }
 
     sub exit {
@@ -90,12 +91,22 @@ package Sidef::Sys::Sys {
 
     sub die {
         my ($self, @args) = @_;
-        CORE::die(@args);
+        if (exists $self->{file_name}) {
+            CORE::die(@args, " at $self->{file_name} line $self->{line}.\n");
+        }
+        else {
+            CORE::die(@args, "\n");
+        }
     }
 
     sub warn {
         my ($self, @args) = @_;
-        CORE::warn(@args);
+        if (exists $self->{file_name}) {
+            CORE::warn(@args, " at $self->{file_name} line $self->{line}.\n");
+        }
+        else {
+            CORE::warn(@args, "\n");
+        }
     }
 
     sub print {

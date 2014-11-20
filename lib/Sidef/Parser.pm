@@ -283,8 +283,13 @@ package Sidef::Parser {
                 },
                 {
                  sub     => sub { Sidef::Sys::Sys->new },
-                 re      => qr/\G(?=(?:print(?:ln|f)?+|say)\b)/,
+                 re      => qr/\G(?=(?:print(?:ln|f)?+|say|exit)\b)/,
                  dynamic => 0,
+                },
+                {
+                 sub => sub { Sidef::Sys::Sys->new(line => $_[0]->{line}, file_name => $_[0]->{file_name}) },
+                 re      => qr/\G(?=(?:die|warn)\b)/,
+                 dynamic => 1,
                 },
                 {
                  sub     => sub { Sidef::Types::Block::Code->new },
@@ -386,6 +391,9 @@ package Sidef::Parser {
                   struct
                   module
                   eval
+                  die
+                  warn
+                  exit
 
                   DATA
                   ARGV
@@ -1453,7 +1461,7 @@ package Sidef::Parser {
                         return (
                                 (
                                    $hash_ref->{dynamic}
-                                 ? $hash_ref->{sub}->()
+                                 ? $hash_ref->{sub}->($self)
                                  : ($self->{static_objects}{$hash_ref} //= $hash_ref->{sub}->())
                                 ),
                                 pos, 1
