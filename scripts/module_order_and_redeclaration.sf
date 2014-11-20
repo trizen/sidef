@@ -1,0 +1,31 @@
+#!/usr/bin/ruby
+
+var arr = {
+    module main { say "main module" };
+    module A { say "a" };
+    module B { say "b" };
+    module C {
+        say "c";
+        func e {say "e"};
+    };
+    module D { say "after first C" };
+    module C {
+        say "C redeclared";
+        func f {say "f"};
+    };
+    C::e();
+    C::f();
+}.capture.lines;
+
+arr.join("\n").say;
+
+arr == [
+    'a',
+    'b',
+    'c',
+    'C redeclared',
+    'after first C',
+    'main module',
+    'e',
+    'f',
+] || "error".die;

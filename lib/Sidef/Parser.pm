@@ -2065,17 +2065,21 @@ package Sidef::Parser {
                                                  );
                     local $parser->{line}  = $self->{line};
                     local $parser->{class} = $name;
-                    push @Sidef::Exec::NAMESPACES, $name;
+                    if ($name ne 'main' and not grep $_ eq $name, @Sidef::Exec::NAMESPACES) {
+                        push @Sidef::Exec::NAMESPACES, $name;
+                    }
                     my ($struct, $pos) = $parser->parse_block(code => '{' . substr($_, pos));
                     pos($_) += $pos - 1;
                     $self->{line} = $parser->{line};
 
                     foreach my $class (keys %{$struct->{code}}) {
-                        $struct{$class} = $struct->{code}{$class};
-                        $self->{ref_vars}{$class} =
-                            $#{$parser->{ref_vars}{$class}} == 0
-                          ? $parser->{ref_vars}{$class}[0]
-                          : $parser->{ref_vars}{$class};
+                        push @{$struct{$class}}, @{$struct->{code}{$class}};
+                        push @{$self->{ref_vars}{$class}},
+                          @{
+                              $#{$parser->{ref_vars}{$class}} == 0
+                            ? $parser->{ref_vars}{$class}[0]
+                            : $parser->{ref_vars}{$class}
+                           };
                     }
 
                     redo;
@@ -2206,7 +2210,7 @@ package Sidef::Parser {
 
                     foreach my $pair (@abs_filenames) {
 
-                        my ($full_path, $var_name) = @{$pair};
+                        my ($full_path, $name) = @{$pair};
 
                         open(my $fh, '<:utf8', $full_path)
                           || $self->fatal_error(
@@ -2224,12 +2228,14 @@ package Sidef::Parser {
                                                       strict      => $self->{strict},
                                                      );
 
-                        local $parser->{class} = $var_name if defined $var_name;
-                        push @Sidef::Exec::NAMESPACES, $var_name if defined $var_name;
+                        local $parser->{class} = $name if defined $name;
+                        if (defined $name and $name ne 'main' and not grep $_ eq $name, @Sidef::Exec::NAMESPACES) {
+                            push @Sidef::Exec::NAMESPACES, $name;
+                        }
                         my $struct = $parser->parse_script(code => $content);
 
                         foreach my $class (keys %{$struct}) {
-                            if (defined $var_name) {
+                            if (defined $name) {
                                 $struct{$class} = $struct->{$class};
                                 $self->{ref_vars}{$class} = $parser->{ref_vars}{$class};
                             }
@@ -2237,7 +2243,6 @@ package Sidef::Parser {
                                 push @{$struct{$class}}, @{$struct->{$class}};
                                 push @{$self->{ref_vars}{$class}}, @{$parser->{ref_vars}{$class}};
                             }
-
                         }
                     }
 
