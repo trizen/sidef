@@ -74,6 +74,8 @@ package Sidef::Types::Block::Code {
               : return ()
           : 1;
 
+        return if $num < 1;
+
         my ($var) = $self->init_block_vars();
 
         if ($num > (-1 >> 1)) {
@@ -133,7 +135,7 @@ package Sidef::Types::Block::Code {
         if (ref $result eq 'Sidef::Variable::Variable') {
             $result = $result->get_value;
         }
-        $self->pop_stack();
+        $self->pop_stack() if exists($self->{vars});
         $result;
     }
 

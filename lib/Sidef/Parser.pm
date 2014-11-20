@@ -2065,6 +2065,7 @@ package Sidef::Parser {
                                                  );
                     local $parser->{line}  = $self->{line};
                     local $parser->{class} = $name;
+                    push @Sidef::Exec::NAMESPACES, $name;
                     my ($struct, $pos) = $parser->parse_block(code => '{' . substr($_, pos));
                     pos($_) += $pos - 1;
                     $self->{line} = $parser->{line};
@@ -2224,6 +2225,7 @@ package Sidef::Parser {
                                                      );
 
                         local $parser->{class} = $var_name if defined $var_name;
+                        push @Sidef::Exec::NAMESPACES, $var_name if defined $var_name;
                         my $struct = $parser->parse_script(code => $content);
 
                         foreach my $class (keys %{$struct}) {

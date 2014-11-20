@@ -3,6 +3,8 @@ package Sidef::Exec {
     use 5.014;
     our @ISA = qw(Sidef);
 
+    our @NAMESPACES;
+
     sub new {
         my $self = bless {
             bool_assign_method => {
@@ -418,9 +420,7 @@ package Sidef::Exec {
         my ($self, $struct) = @_;
 
         my @results;
-        foreach my $class ((grep { $_ ne 'main' } keys %{$struct}), 'main') {
-
-            exists $struct->{$class} || next;
+        foreach my $class (grep exists $struct->{$_}, @NAMESPACES, 'main') {
 
             my $i = -1;
             local $self->{expr_i_max} = $#{$struct->{$class}};
@@ -460,4 +460,6 @@ package Sidef::Exec {
 
         wantarray ? @results : $results[-1];
     }
-}
+};
+
+1
