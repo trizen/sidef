@@ -28,5 +28,5 @@ if (resp.is_success) {
     printf("Content length is: %d\n", content.len);
 }
 else {
-    Sys.warn("[ERROR] Response: %s\n".sprintf(resp.status_line));
+    Sys.warn("[ERROR] Response: %s".sprintf(resp.status_line));
 }

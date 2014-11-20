@@ -14,6 +14,5 @@ var s = quicksort(a.copy);
 say "Unsorted #{a.dump}";
 say "Sorted   #{s.dump}";
 
-a.sort == s || (
-    Sys.die("The array is not sorted!\n")
-);
+a.sort == s
+    || die "The array is not sorted!";

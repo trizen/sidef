@@ -1,29 +1,28 @@
 #!/usr/bin/ruby
 
 # Implicit method call on the special '_' variable via the unary operator: '.'
-<a b c>.map{.uc} == <A B C> || (
-    Sys.die(".uc error");
-);  # ['A', 'B', 'C']
+<a b c>.map{.uc} == <A B C>
+    || die(".uc error");
+# ['A', 'B', 'C']
 
 # Numbers preeceded by a dot ('.') are still floating point numbers:
-.42 == 0.42 || (
-        Sys.die(".42 error");
-);    # prints 0.42
+.42 == 0.42
+    || die ".42 error";
+# prints 0.42
 
 # However, a method CAN be stored inside a variable or CAN be an expression
 var method = 'uc';
-<a b c>.map{.$method} == «A B C» || (
-    Sys.die(".$method error");
-);     # ['A', 'B', 'C']
+<a b c>.map{.$method} == «A B C»
+    || die ".$method error";
+# ['A', 'B', 'C']
 
 # Call on user-defined '_' method
 var _ = 'ok';
-.uc == "OK" || (
-    Sys.die(".uc error");
-);
+.uc == "OK"
+    || die(".uc error");
 
-<a b c>.map{.('u'+'c')} == %w(A B C) || (
-    Sys.die(".(expr) error");
-);   # ['A', 'B', 'C']
+<a b c>.map{.('u'+'c')} == %w(A B C)
+    || die ".(expr) error";
+# ['A', 'B', 'C']
 
 say "All is OK!"

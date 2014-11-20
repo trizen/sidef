@@ -10,7 +10,7 @@ class new(matrix) {
 
     static req = (
             try   { require 'Math::Matrix' }
-            catch { Sys.die("** Math::Matrix is not installed!\n"); }
+            catch { die "** Math::Matrix is not installed!"; }
     );
 
     #

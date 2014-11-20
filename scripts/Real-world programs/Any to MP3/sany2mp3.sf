@@ -51,7 +51,7 @@ func main() {
     );
 
     files.len == 0 && (
-        Sys.warn("\n[!] No input file has been provided!\n\n");
+        Sys.warn("\n[!] No input file has been provided!\n");
         usage(2);
     );
 

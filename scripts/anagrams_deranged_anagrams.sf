@@ -20,7 +20,7 @@ func main () {
 
     var lwp = (
         try   { require 'LWP::Simple'->() }
-        catch { Sys.warn("** LWP::Simple is not installed!\n"); return }
+        catch { warn("** LWP::Simple is not installed!"); return }
     );
 
     "** Retrieving the wordlist...".say;

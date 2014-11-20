@@ -29,6 +29,6 @@ say text.in_green;
 say text.in_blue;
 
 # Tests
-text.in_red  =~ /#f00/ ?? || Sys.die("in_red  -- error!\n");
-text.in_cyan =~ /#0ff/ ?? || Sys.die("in_cyan -- error!\n");
-text.in_blue =~ /#00f/ ?? || Sys.die("in_blue -- error!\n");
+text.in_red  =~ /#f00/ ?? || die "in_red  -- error!";
+text.in_cyan =~ /#0ff/ ?? || die "in_cyan -- error!";
+text.in_blue =~ /#00f/ ?? || die "in_blue -- error!";

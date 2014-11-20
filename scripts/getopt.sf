@@ -6,7 +6,7 @@
 
 var getopt = (
            try   { require 'Getopt::Std' -> () }
-           catch { Sys.warn("** Getopt::Std is not installed!\n"); return }
+           catch { warn("** Getopt::Std is not installed!"); return }
 );
 
 var hash = (Hash.new);
