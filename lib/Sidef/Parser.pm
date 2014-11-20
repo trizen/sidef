@@ -283,7 +283,7 @@ package Sidef::Parser {
                 },
                 {
                  sub     => sub { Sidef::Sys::Sys->new },
-                 re      => qr/\G(?=(?:print(?:ln|f)?+|say|exit)\b)/,
+                 re      => qr/\G(?=(?:print(?:ln|f)?+|say|exit|read)\b)/,
                  dynamic => 0,
                 },
                 {
@@ -391,6 +391,7 @@ package Sidef::Parser {
                   struct
                   module
                   eval
+                  read
                   die
                   warn
                   exit
