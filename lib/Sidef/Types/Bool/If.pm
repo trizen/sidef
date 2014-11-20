@@ -17,6 +17,8 @@ package Sidef::Types::Bool::If {
         $self;
     }
 
+    *call = \&if;
+
     sub elsif {
         my ($self, $code) = @_;
         $self->{do_block} = Sidef::Types::Block::Code->new($code)->run ? 1 : 0;
