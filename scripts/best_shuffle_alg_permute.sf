@@ -10,8 +10,8 @@ var permute = (
 func score(original_word, new_word) {
     static result = 0;
 
-    for (original_word.range) {
-        original_word[_] == new_word[_] && (
+    original_word.range.each { |i|
+        original_word[i] == new_word[i] && (
             result++;
         );
     }
@@ -21,31 +21,21 @@ func score(original_word, new_word) {
 
 func best_shuffle (chrs) {
 
-    var orig_word  = (chrs);
-    var best_word  = (orig_word);
-    var best_score = (orig_word.len);
+    var orig_word  = chrs;
+    var best_word  = orig_word;
+    var best_score = orig_word.len;
 
-    var iterator = (permute->new(orig_word));
-
-    while (var word = (iterator->next:).len) {
-        word = word.map{Str.new(_)};
-
-        var curscore = (score(orig_word, word)) < best_score && (
+    var iterator = permute.new(orig_word);
+    while (var word = iterator.next != nil) {
+        var curscore = score(orig_word, word) < best_score && (
            best_score =  curscore;
            best_word = word;
         );
-
-        Bool.new(best_score);
     };
 
     printf("%-6s %-6s : %d\n", orig_word.join(''), best_word.join(''), best_score);
 }
 
-[
-    "elk",
-    "grrr",
-    "up",
-    "a",
-].for {
-    best_shuffle(_.split(''));
+<elk grrr up a>.each { |item|
+    best_shuffle(item.split(''));
 };

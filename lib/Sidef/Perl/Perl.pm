@@ -9,29 +9,45 @@ package Sidef::Perl::Perl {
     sub to_sidef {
         my ($self, $data) = @_;
 
+        my %refs;
+
         my $guess_type;
         $guess_type = sub {
             my ($val) = @_;
 
             my $ref = CORE::ref($val);
+            if (not defined $val) {
+                return Sidef::Types::Nil::Nil->new;
+            }
+
             if ($ref eq 'ARRAY') {
-                my $array = Sidef::Types::Array::Array->new;
+                my $array = $refs{$val} //= Sidef::Types::Array::Array->new;
                 foreach my $item (@{$val}) {
-                    $array->push($guess_type->($item));
+                    $array->push(ref($item) eq 'ARRAY' && $item eq $val
+                                 ? Sidef::Variable::Variable->new(type => 'var', name => '', value => $array)
+                                 : $guess_type->($item));
                 }
                 return $array;
             }
-            elsif ($ref eq 'HASH') {
-                my $hash = Sidef::Types::Hash::Hash->new;
+
+            if ($ref eq 'HASH') {
+                my $hash = $refs{$val} //= Sidef::Types::Hash::Hash->new;
                 while (my ($key, $value) = each %{$val}) {
-                    $hash->append($key, $guess_type->($value));
+                    $hash->append(
+                                  $key,
+                                  ref($value) eq 'HASH' && $value eq $val
+                                  ? Sidef::Variable::Variable->new(type => 'var', name => '', value => $hash)
+                                  : $guess_type->($value)
+                                 );
                 }
                 return $hash;
             }
-            elsif ($ref eq 'Regexp') {
+
+            if ($ref eq 'Regexp') {
                 return Sidef::Types::Regex::Regex->new($val);
             }
-            elsif ($ref eq '') {
+
+            if ($ref eq '') {
                 require Scalar::Util;
 
                 if (Scalar::Util::looks_like_number($val)) {

@@ -9,7 +9,7 @@ var getopt = (
            catch { warn("** Getopt::Std is not installed!"); return }
 );
 
-var hash = (Hash.new);
+var hash = Hash.new;
 getopt.getopts('de:', \hash);
 
 if (hash.exists('e')) {

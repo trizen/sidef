@@ -61,8 +61,12 @@ package Sidef::Module::Func {
                 @arg
                 ? (
                    map {
-                           ref($_) =~ /^Sidef::/ && $_->can('get_value') ? $_->get_value
-                         : ref($_) eq 'Sidef::Variable::Ref' ? $_->get_var->get_value
+                       ref($_) =~ /^Sidef::/ && $_->can('get_value')
+                         ? $_->get_value
+                         : ref($_) eq 'Sidef::Variable::Ref' ? do {
+                           my $obj = $_->get_var->get_value;
+                           ref $obj eq 'Sidef::Types::Hash::Hash' ? $obj->{data} //= {} : $obj;
+                         }
                          : $_
                      } @arg
                   )
