@@ -10,33 +10,36 @@ package Sidef {
                      hash   => {class => {'Sidef::Types::Hash::Hash'  => 1}},
                      number => {
                                 class => {'Sidef::Types::Number::Number' => 1},
-                                type  => 'SCALAR'
+                                type  => 'SCALAR',
                                },
                      var_ref => {class => {'Sidef::Variable::Ref' => 1}},
                      file    => {
                               class => {'Sidef::Types::Glob::File' => 1},
-                              type  => 'SCALAR'
+                              type  => 'SCALAR',
                              },
-                     dir   => {class => {'Sidef::Types::Glob::Dir'    => 1}, type => 'SCALAR'},
+                     dir => {
+                             class => {'Sidef::Types::Glob::Dir' => 1},
+                             type  => 'SCALAR',
+                            },
                      regex => {class => {'Sidef::Types::Regex::Regex' => 1}},
                      pair  => {
                               class => {'Sidef::Types::Array::Pair' => 1},
-                              type  => 'ARRAY'
+                              type  => 'ARRAY',
                              },
                      string => {
                                 class => {
                                           'Sidef::Types::String::String' => 1,
                                           'Sidef::Types::Char::Char'     => 1,
                                          },
-                                type => 'SCALAR'
+                                type => 'SCALAR',
                                },
                      array => {
-                               type  => 'ARRAY',
                                class => {
                                          'Sidef::Types::Array::Array' => 1,
                                          'Sidef::Types::Char::Chars'  => 1,
                                          'Sidef::Types::Byte::Bytes'  => 1,
-                                        }
+                                        },
+                               type => 'ARRAY',
                               },
                     );
 
@@ -44,37 +47,32 @@ package Sidef {
 
         foreach my $type (keys %types) {
             *{__PACKAGE__ . '::' . '_is_' . $type} = sub {
+                return 1 if exists $types{$type}{class}{ref($_[1])};
 
                 my ($self, $obj, $strict_obj, $dont_warn) = @_;
+                if (!$dont_warn) {
+                    my ($sub) = +(caller(1))[3] =~ /^.*[^:]::(.+)$/;
 
-                if (exists $types{$type}{class}{ref($obj)}) {
-                    return 1;
+                    warn sprintf(
+                                 "[WARN] %sbject '%s' expected an object of type '$type', but got '%s'!\n",
+                                 (
+                                  $sub eq '__ANON__'
+                                  ? 'O'
+                                  : sprintf("The method '%s' from o", $sub)
+                                 ),
+                                 ref($self),
+                                 ref($obj) || "an undefined object"
+                                );
                 }
-                else {
-                    my ($sub) = [caller(1)]->[3] =~ /^.*[^:]::(.+)$/;
 
-                    if (!$dont_warn) {
-
-                        my $ref_obj = [caller(0)]->[0];
-
-                        warn sprintf(
-                                     "[WARN] %sbject '%s' expected an object of type '$type', but got '%s'!\n",
-                                     (
-                                      $sub eq '__ANON__'
-                                      ? 'O'
-                                      : sprintf("The method '%s' from o", $sub)
-                                     ),
-                                     $ref_obj,
-                                     ref($obj) || "an undefined object"
-                                    );
-                    }
-
-                    if (!$strict_obj) {
-                        if (    defined $obj
-                            and exists $types{$type}{type}
-                            and $obj->isa($types{$type}{type})) {
-                            return 1;
-                        }
+                if (!$strict_obj) {
+                    if (
+                            defined $obj
+                        and exists $types{$type}{type}
+                        and ($obj->isa($types{$type}{type})
+                             || ($types{$type}{type} eq 'SCALAR' and ref($obj) eq 'Sidef::Types::Number::Number'))
+                      ) {
+                        return 1;
                     }
                 }
 

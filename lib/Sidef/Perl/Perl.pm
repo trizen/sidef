@@ -37,9 +37,11 @@ package Sidef::Perl::Perl {
                 if (Scalar::Util::looks_like_number($val)) {
                     return Sidef::Types::Number::Number->new($val);
                 }
+
+                return Sidef::Types::String::String->new($val);
             }
 
-            return CORE::ref($val) ? $val : Sidef::Types::String::String->new($val);
+            $val;
         };
 
         $guess_type->($data);
