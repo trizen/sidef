@@ -15,8 +15,11 @@ package Sidef::Sys::Sys {
 
     sub alarm {
         my ($self, $sec) = @_;
+
         $self->_is_number($sec) || return;
-        Sidef::Types::Bool::Bool->new(CORE::alarm($$sec));
+
+        require Time::HiRes;
+        Sidef::Types::Bool::Bool->new(Time::HiRes::alarm($$sec));
     }
 
     sub ualarm {
@@ -30,8 +33,11 @@ package Sidef::Sys::Sys {
 
     sub sleep {
         my ($self, $sec) = @_;
+
         $self->_is_number($sec) || return;
-        Sidef::Types::Bool::Bool->new(CORE::sleep($$sec));
+
+        require Time::HiRes;
+        Sidef::Types::Bool::Bool->new(Time::HiRes::sleep($$sec));
     }
 
     sub nanosleep {

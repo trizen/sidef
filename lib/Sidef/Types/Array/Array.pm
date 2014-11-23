@@ -1087,8 +1087,15 @@ package Sidef::Types::Array::Array {
         }
 
         my $method = '<=>';
-        $self->new(sort { $a->can($method) ? ($a->$method($b)) : -1 }
-                   map { $_->get_value } @{$self});
+        $self->new(
+            sort {
+                $a->can($method)
+                  || (ref($a) eq 'Sidef::Variable::Class' && exists $a->{method}{$method})
+                  ? ($a->$method($b))
+                  : -1
+              }
+              map { $_->get_value } @{$self}
+        );
     }
 
     sub permute {

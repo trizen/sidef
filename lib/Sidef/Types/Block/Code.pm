@@ -277,8 +277,8 @@ package Sidef::Types::Block::Code {
     sub fork {
         my ($self) = @_;
 
-        state $code = eval { require Data::Dump; \&Data::Dump::pp };
-        $code // return $self->thread;
+        state $can_dump = eval { require Data::Dump };
+        $can_dump // return $self->thread;
 
         require File::Temp;
         my ($fh, $result) = File::Temp::tempfile(SUFFIX => '.rst');
