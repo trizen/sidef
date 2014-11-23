@@ -277,9 +277,10 @@ package Sidef::Types::Block::Code {
     sub fork {
         my ($self) = @_;
 
-        require Data::Dump;
-        require File::Temp;
+        state $code = eval { require Data::Dump; \&Data::Dump::pp };
+        $code // return $self->thread;
 
+        require File::Temp;
         my ($fh, $result) = File::Temp::tempfile(SUFFIX => '.rst');
 
         require Sidef::Types::Block::Fork;
@@ -298,6 +299,19 @@ package Sidef::Types::Block::Code {
         $fork->{pid} = $pid;
         $fork;
     }
+
+    sub thread {
+        my ($self) = @_;
+        require threads;
+        state $aliases = do {
+            *threads::get  = \&threads::join;
+            *threads::wait = \&threads::join;
+            1;
+        };
+        threads->create(sub { $self->run });
+    }
+
+    *thr = \&thread;
 
     sub for {
         my ($self, $arg, @rest) = @_;

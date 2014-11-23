@@ -22,6 +22,7 @@ package Sidef::Types::Block::Fork {
     }
 
     *wait = \&get;
+    *join = \&get;
 };
 
 1
