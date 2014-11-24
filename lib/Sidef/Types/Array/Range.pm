@@ -102,27 +102,20 @@ package Sidef::Types::Array::Range {
         my ($name) = ($AUTOLOAD =~ /^.*[^:]::(.*)$/);
 
         my $array;
+        my $method = $self->{direction} eq 'up' ? 'to' : 'downto';
         if ($self->{type} eq 'number') {
 
-            my $step  = $self->{step};
-            my $from  = $self->{from};
-            my $limit = $self->{to};
-
-            $array = Sidef::Types::Array::Array->new();
-            for (my $i = $from ;
-                 $self->{direction} eq 'up' ? ($i <= $limit) : ($i >= $limit) ;
-                 $self->{direction} eq 'up' ? ($i += $step) : ($i -= $step)) {
-                $array->push(Sidef::Types::Number::Number->new($i));
-            }
-        }
-        else {
-
+            my $step = $self->{step};
             my $from = $self->{from};
             my $to   = $self->{to};
 
-            my @range = ($from .. $to);
-            $array = Sidef::Types::Array::Array->new(map { Sidef::Types::String::String->new($_) }
-                                                     $self->{direction} eq 'down' ? reverse(@range) : @range);
+            $array = Sidef::Types::Number::Number->new($from)
+              ->$method(Sidef::Types::Number::Number->new($to), $step != 1 ? Sidef::Types::Number::Number->new($step) : ());
+        }
+        else {
+            my $from = $self->{from};
+            my $to   = $self->{to};
+            $array = Sidef::Types::String::String->new($from)->$method(Sidef::Types::String::String->new($to));
         }
 
         $name eq '' ? $array : $array->$name(@args);

@@ -1847,8 +1847,7 @@ package Sidef::Parser {
                                 push @methods, {method => $method, arg => [$arg]};
                             }
                             elsif (exists($self->{binpost_ops}{$method})) {
-
-                                # it's a postfix operator
+                                ## it's a postfix operator
                             }
                             else {
                                 $self->fatal_error(
@@ -2016,8 +2015,7 @@ package Sidef::Parser {
                                 push @{$struct{$self->{class}}[-1]{call}}, {method => $method, arg => [$arg]};
                             }
                             elsif (exists $self->{binpost_ops}{$method}) {
-
-                                # it's a postfix operator
+                                ## it's a postfix operator
                             }
                             else {
                                 $self->fatal_error(
