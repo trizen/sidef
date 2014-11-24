@@ -100,6 +100,9 @@ package Sidef::Types::String::String {
     sub to {
         my ($self, $string) = @_;
         $self->_is_string($string) || return;
+        if (length($$self) == 1 and length($$string) == 1) {
+            return Sidef::Types::Array::Array->new(map { $self->new(chr($_)) } ord($$self) .. ord($$string));
+        }
         Sidef::Types::Array::Array->new(map { $self->new($_) } $$self .. $$string);
     }
 

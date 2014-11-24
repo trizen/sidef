@@ -244,6 +244,11 @@ package Sidef::Types::Array::Array {
         $_[0]->_min_max('<');
     }
 
+    sub minmax {
+        my ($self) = @_;
+        $self->new($self->min, $self->max);
+    }
+
     sub sum {
         $_[0]->reduce(Sidef::Types::String::String->new('+'));
     }

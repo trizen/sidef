@@ -63,7 +63,6 @@ package Sidef::Convert::Convert {
 
     sub to_num {
         my ($self) = @_;
-
             $self->_is_number($self, 1, 1) ? $self
           : $self->_is_string($self) ? Sidef::Types::Number::Number->new($$self)
           :                            ();
