@@ -323,6 +323,7 @@ scripts/sierpinski_triangle_90.sf
 scripts/sierpinski_x.sf
 scripts/smart_match_operator.sf
 scripts/smart_word_wrap.sf
+scripts/soundex.sf
 scripts/special_methods.sf
 scripts/split_combine.sf
 scripts/static_const_lazy_init.sf
