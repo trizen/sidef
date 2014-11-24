@@ -81,7 +81,7 @@ var play_board = 1.to(BOARD_SIZE).map { [nil] * BOARD_SIZE };
 var info_board = 1.to(BOARD_SIZE).map { [' '] * BOARD_SIZE };
 
 var letters = Hash.new;
-0 .. play_board.offset -> each { |i|
+0 ... play_board.offset -> each { |i|
     static char = 'a';
     letters[char] = i;
     char++;
@@ -167,7 +167,7 @@ func assign(change=false, plane=[], data=[]) {
         }
     );
 
-    0 .. plane.offset -> each { |i|
+    0 ... plane.offset -> each { |i|
         *plane[i] = data[i];
     }
 

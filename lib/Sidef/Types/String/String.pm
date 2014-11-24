@@ -116,6 +116,18 @@ package Sidef::Types::String::String {
 
     *downTo = \&downto;
 
+    sub range_to {
+        my ($self, $string) = @_;
+        $self->_is_string($string) || return;
+        Sidef::Types::Array::Range->new(from => $$self, to => $$string, type => 'string', direction => 'up');
+    }
+
+    sub range_downto {
+        my ($self, $string) = @_;
+        $self->_is_string($string) || return;
+        Sidef::Types::Array::Range->new(from => $$self, to => $$string, type => 'string', direction => 'down');
+    }
+
     sub cmp {
         my ($self, $string) = @_;
         $self->_is_string($string) || return;
@@ -1052,6 +1064,9 @@ package Sidef::Types::String::String {
         *{__PACKAGE__ . '::' . '÷'}  = \&div;
         *{__PACKAGE__ . '::' . '/'}   = \&div;
         *{__PACKAGE__ . '::' . '..'}  = \&to;
+        *{__PACKAGE__ . '::' . '...'} = \&range_to;
+        *{__PACKAGE__ . '::' . '..^'} = \&range_to;
+        *{__PACKAGE__ . '::' . '^..'} = \&range_downto;
         *{__PACKAGE__ . '::' . '^'}   = \&xor;
         *{__PACKAGE__ . '::' . '|'}   = \&or;
         *{__PACKAGE__ . '::' . '&'}   = \&and;

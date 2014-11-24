@@ -31,6 +31,7 @@ lib/Sidef/Types/Array/Array.pod
 lib/Sidef/Types/Array/HCArray.pm
 lib/Sidef/Types/Array/MultiArray.pm
 lib/Sidef/Types/Array/Pair.pm
+lib/Sidef/Types/Array/Range.pm
 lib/Sidef/Types/Black/Hole.pm
 lib/Sidef/Types/Block/Break.pm
 lib/Sidef/Types/Block/Break.pod
@@ -120,7 +121,7 @@ lib/Sidef/Variable/Struct.pm
 lib/Sidef/Variable/Variable.pm
 lib/Sidef/Variable/Variable.pod
 Makefile.PL
-MANIFEST			This list of files
+MANIFEST            This list of files
 META.json
 META.yml
 README.md
@@ -357,7 +358,6 @@ t/pod.t
 utils/auto_perltidy.sh
 utils/bak_cleaner.sh
 utils/deparser.pl
-utils/Experiments/Range.pm
 utils/find_invalid_types.pl
 utils/pod_generator.pl
 utils/regexp_grammars_parser.pl

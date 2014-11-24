@@ -325,21 +325,14 @@ package Sidef::Types::Block::Code {
                 foreach my $class (keys %{$arg}) {
 
                     if ($counter++ == 0) {
-                        if ((my $argn = @{$arg->{$class}}) != 3) {
-                            warn "[WARN] The 'for' loop needs exactly three arguments! We got $argn of them.\n";
-                        }
                         $exec->execute_expr($arg->{$class}[0], $class);
                     }
 
-                    my $expr = $arg->{$class}[2];
-                    my ($bool) =
-                      $exec->execute_expr($arg->{$class}[1], $class);
-
-                    if ($bool) {
+                    if ($exec->execute_expr($arg->{$class}[1], $class)) {
                         if (defined(my $res = $self->_run_code)) {
                             return $res;
                         }
-                        $exec->execute_expr($expr, $class);
+                        $exec->execute_expr($arg->{$class}[2], $class);
                         redo;
                     }
 

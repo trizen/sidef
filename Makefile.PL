@@ -3,32 +3,32 @@ require 5.014000;
 use ExtUtils::MakeMaker;
 WriteMakefile
 (
-  'PL_FILES' => {},
-  'PREREQ_PM' => {
-                   'File::Basename' => 0,
-                   'Test::More' => 0,
-                   'Fcntl' => 0,
-                   'POSIX' => 0,
-                   'File::Path' => 0,
-                   'Math::BigFloat' => 0,
-                   'Cwd' => 0,
-                   'File::Temp' => 0,
-                   'Getopt::Std' => 0,
-                   'Time::HiRes' => 0,
-                   'File::Spec' => 0,
-                   'Encode' => 0,
-                   'File::Copy' => 0,
-                   'Math::BigInt' => 0,
-                   'utf8' => 0,
-                   'File::Find' => 0,
-                   'Term::ReadLine' => 0,
-                   'List::Util' => 0
-                 },
   'INSTALLDIRS' => 'site',
   'NAME' => 'Sidef',
   'EXE_FILES' => [
                    'bin/sidef'
                  ],
-  'VERSION_FROM' => 'lib/Sidef.pm'
+  'VERSION_FROM' => 'lib/Sidef.pm',
+  'PREREQ_PM' => {
+                   'utf8' => 0,
+                   'File::Copy' => 0,
+                   'File::Temp' => 0,
+                   'Math::BigInt' => 0,
+                   'Cwd' => 0,
+                   'Term::ReadLine' => 0,
+                   'POSIX' => 0,
+                   'Encode' => 0,
+                   'Test::More' => 0,
+                   'File::Spec' => 0,
+                   'Time::HiRes' => 0,
+                   'File::Path' => 0,
+                   'Math::BigFloat' => 0,
+                   'File::Find' => 0,
+                   'Getopt::Std' => 0,
+                   'Fcntl' => 0,
+                   'File::Basename' => 0,
+                   'List::Util' => 0
+                 },
+  'PL_FILES' => {}
 )
 ;

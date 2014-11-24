@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   Module::Build: '0'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.421, CPAN::Meta::Converter version 2.142690'
+generated_by: 'Module::Build version 0.421, CPAN::Meta::Converter version 2.143240'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -56,6 +56,8 @@ provides:
     file: lib/Sidef/Types/Array/MultiArray.pm
   Sidef::Types::Array::Pair:
     file: lib/Sidef/Types/Array/Pair.pm
+  Sidef::Types::Array::Range:
+    file: lib/Sidef/Types/Array/Range.pm
   Sidef::Types::Black::Hole:
     file: lib/Sidef/Types/Black/Hole.pm
   Sidef::Types::Block::Break:

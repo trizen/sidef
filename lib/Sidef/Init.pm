@@ -23,6 +23,7 @@ require Sidef::Types::Array::Array;
 require Sidef::Types::Array::HCArray;
 require Sidef::Types::Array::MultiArray;
 require Sidef::Types::Array::Pair;
+require Sidef::Types::Array::Range;
 require Sidef::Types::Black::Hole;
 require Sidef::Types::Block::Break;
 require Sidef::Types::Block::Code;

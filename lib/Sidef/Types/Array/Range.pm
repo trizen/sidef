@@ -3,9 +3,6 @@ package Sidef::Types::Array::Range {
     use 5.014;
     our @ISA = qw(Sidef);
 
-    # use overload '@{}' => \&to_array,
-    #               '""' => \&to_array;
-
     sub new {
         my (undef, %opt) = @_;
         bless \%opt;
@@ -29,7 +26,6 @@ package Sidef::Types::Array::Range {
                  $self->{direction} eq 'up' ? ($i <= $limit) : ($i >= $limit) ;
                  $self->{direction} eq 'up' ? ($i += $step) : ($i -= $step)) {
                 $var_ref->set_value(Sidef::Types::Number::Number->new($i));
-
                 if (defined(my $res = $code->_run_code)) {
                     $code->pop_stack();
                     return $res;
@@ -44,25 +40,45 @@ package Sidef::Types::Array::Range {
             my $to   = $self->{to};
 
             if ($self->{direction} eq 'up') {
-                foreach my $str ($from .. $to) {    # this is lazy
-                    $var_ref->set_value(Sidef::Types::String::String->new($str));
-
-                    if (defined(my $res = $code->_run_code)) {
-                        $code->pop_stack();
-                        return $res;
+                if (length($from) == 1 and length($to) == 1) {
+                    foreach my $i (ord($from) .. ord($to)) {
+                        $var_ref->set_value(Sidef::Types::String::String->new(chr($i)));
+                        if (defined(my $res = $code->_run_code)) {
+                            $code->pop_stack();
+                            return $res;
+                        }
                     }
-
+                }
+                else {
+                    foreach my $str ($from .. $to) {    # this is lazy
+                        $var_ref->set_value(Sidef::Types::String::String->new($str));
+                        if (defined(my $res = $code->_run_code)) {
+                            $code->pop_stack();
+                            return $res;
+                        }
+                    }
                 }
             }
             else {
-                foreach my $str (reverse($from .. $to)) {    # this is not lazy
-                    $var_ref->set_value(Sidef::Types::String::String->new($str));
-
-                    if (defined(my $res = $code->_run_code)) {
-                        $code->pop_stack();
-                        return $res;
+                if (length($from) == 1 and length($to) == 1) {
+                    my $f = ord($from);
+                    my $t = ord($to);
+                    for (; $f >= $t ; $f--) {
+                        $var_ref->set_value(Sidef::Types::String::String->new(chr($f)));
+                        if (defined(my $res = $code->_run_code)) {
+                            $code->pop_stack();
+                            return $res;
+                        }
                     }
-
+                }
+                else {
+                    foreach my $str (reverse($from .. $to)) {    # this is not lazy
+                        $var_ref->set_value(Sidef::Types::String::String->new($str));
+                        if (defined(my $res = $code->_run_code)) {
+                            $code->pop_stack();
+                            return $res;
+                        }
+                    }
                 }
             }
         }
@@ -74,6 +90,8 @@ package Sidef::Types::Array::Range {
         my ($self) = @_;
         $self->AUTOLOAD();
     }
+
+    *to_a = \&to_array;
 
     our $AUTOLOAD;
     sub DESTROY { }

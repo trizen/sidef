@@ -17,13 +17,16 @@ package Sidef::Parser {
             vars          => {'main' => []},
             ref_vars_refs => {'main' => []},
             EOT           => [],
-            lonely_ops    => {
-                           '--'  => 1,
-                           '++'  => 1,
-                           '??'  => 1,
-                           '...' => 1,
-                           '!'   => 1,
-                          },
+            postfix_ops   => {                 # postfix operators
+                             '--'  => 1,
+                             '++'  => 1,
+                             '??'  => 1,
+                             '...' => 1,
+                             '!'   => 1,
+                           },
+            binpost_ops => {                   # binary + postfix operators
+                             '...' => 1,
+                           },
             obj_with_do => {
                             'Sidef::Types::Block::For'   => 1,
                             'Sidef::Types::Bool::While'  => 1,
@@ -436,6 +439,8 @@ package Sidef::Parser {
                       ||= ||
                       &&= &&
 
+                      ^.. ..^
+
                       %%
                       ~~ !~
                       <=>
@@ -677,7 +682,7 @@ package Sidef::Parser {
 
             # Operator-like method name
             if (m{\G$self->{re}{operators}}goc) {
-                return $1, (exists $self->{lonely_ops}{$1} ? 0 : 1), pos;
+                return $1, (exists $self->{postfix_ops}{$1} ? 0 : 1), pos;
             }
 
             # Method name as expression
@@ -1828,16 +1833,22 @@ package Sidef::Parser {
                     if (defined($method)) {
                         pos($_) += $pos;
 
-                        if (/\G\h*(?=[({])/gc || $req_arg) {
+                        my $has_arg;
+                        if (/\G\h*(?=[({])/gc || $req_arg || exists($self->{binpost_ops}{$method})) {
                             my ($arg, $pos) =
                                 /\G(?=\()/ ? $self->parse_arguments(code => substr($_, pos))
-                              : $req_arg ? $self->parse_obj(code => substr($_, pos))
+                              : $req_arg || exists($self->{binpost_ops}{$method}) ? $self->parse_obj(code => substr($_, pos))
                               : /\G(?=\{)/ ? $self->parse_block(code => substr($_, pos))
                               :              die "[PARSING ERROR] Something wrong in the if condition!";
 
                             if (defined $arg) {
+                                $has_arg = 1;
                                 pos($_) += $pos;
                                 push @methods, {method => $method, arg => [$arg]};
+                            }
+                            elsif (exists($self->{binpost_ops}{$method})) {
+
+                                # it's a postfix operator
                             }
                             else {
                                 $self->fatal_error(
@@ -1847,10 +1858,10 @@ package Sidef::Parser {
                                                   );
                             }
                         }
-                        else {
-                            push @methods, {method => $method};
-                        }
 
+                        $has_arg || do {
+                            push @methods, {method => $method};
+                        };
                         redo;
                     }
                 }
@@ -1967,28 +1978,15 @@ package Sidef::Parser {
                         my ($method, $req_arg, $pos) = $self->get_method_name(code => substr($_, pos));
                         pos($_) += $pos;
 
-                        if ($req_arg) {
-                            $struct{$self->{class}}[-1]{self} = {
-                                                                 $self->{class} => [
-                                                                          {
-                                                                           self => $struct{$self->{class}}[-1]{self},
-                                                                           exists($struct{$self->{class}}[-1]{call})
-                                                                           ? (call => delete $struct{$self->{class}}[-1]{call})
-                                                                           : (),
-                                                                           exists($struct{$self->{class}}[-1]{ind})
-                                                                           ? (ind => delete $struct{$self->{class}}[-1]{ind})
-                                                                           : (),
-                                                                          }
-                                                                 ]
-                                                                };
-
+                        my $has_arg;
+                        if ($req_arg or exists $self->{binpost_ops}{$method}) {
                             my ($arg, $pos) =
                               /\G\h*(?=\()/gc
                               ? $self->parse_arguments(code => substr($_, pos))
                               : $self->parse_obj(code => substr($_, pos));
-                            pos($_) += $pos;
 
                             if (defined $arg) {
+                                pos($_) += $pos;
                                 my ($methods, $pos) = $self->parse_methods(code => substr($_, pos));
                                 pos($_) += $pos;
 
@@ -1999,6 +1997,27 @@ package Sidef::Parser {
                                 if (@{$methods}) {
                                     push @{$arg->{$self->{class}}[-1]{call}}, @{$methods};
                                 }
+
+                                $has_arg = 1;
+                                $struct{$self->{class}}[-1]{self} = {
+                                                                     $self->{class} => [
+                                                                          {
+                                                                           self => $struct{$self->{class}}[-1]{self},
+                                                                           exists($struct{$self->{class}}[-1]{call})
+                                                                           ? (call => delete $struct{$self->{class}}[-1]{call})
+                                                                           : (),
+                                                                           exists($struct{$self->{class}}[-1]{ind})
+                                                                           ? (ind => delete $struct{$self->{class}}[-1]{ind})
+                                                                           : (),
+                                                                          }
+                                                                     ]
+                                                                    };
+
+                                push @{$struct{$self->{class}}[-1]{call}}, {method => $method, arg => [$arg]};
+                            }
+                            elsif (exists $self->{binpost_ops}{$method}) {
+
+                                # it's a postfix operator
                             }
                             else {
                                 $self->fatal_error(
@@ -2008,12 +2027,11 @@ package Sidef::Parser {
                                                   );
                             }
 
-                            push @{$struct{$self->{class}}[-1]{call}}, {method => $method, arg => [$arg]};
-                        }
-                        else {
-                            push @{$struct{$self->{class}}[-1]{call}}, {method => $method};
                         }
 
+                        $has_arg || do {
+                            push @{$struct{$self->{class}}[-1]{call}}, {method => $method};
+                        };
                         redo;
                     }
                 }

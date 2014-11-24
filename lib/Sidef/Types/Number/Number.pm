@@ -168,11 +168,9 @@ package Sidef::Types::Number::Number {
         $step = defined($step) ? $self->_is_number($step) ? ($$step) : return : 1;
 
         my $array = Sidef::Types::Array::Array->new();
-
         for (my $i = $$self ; $i <= $$num ; $i += $step) {
             $array->push($self->new($i));
         }
-
         $array;
     }
 
@@ -186,15 +184,27 @@ package Sidef::Types::Number::Number {
         $step = defined($step) ? $self->_is_number($step) ? ($$step) : return : 1;
 
         my $array = Sidef::Types::Array::Array->new();
-
         for (my $i = $$self ; $i >= $$num ; $i -= $step) {
             $array->push($self->new($i));
         }
-
         $array;
     }
 
     *downTo = \&downto;
+
+    sub range_to {
+        my ($self, $num, $step) = @_;
+        $self->_is_number($num) || return;
+        $step = defined($step) ? $self->_is_number($step) ? ($$step) : return : 1;
+        Sidef::Types::Array::Range->new(from => $$self, to => $$num, step => $step, type => 'number', direction => 'up');
+    }
+
+    sub range_downto {
+        my ($self, $num, $step) = @_;
+        $self->_is_number($num) || return;
+        $step = defined($step) ? $self->_is_number($step) ? ($$step) : return : 1;
+        Sidef::Types::Array::Range->new(from => $$self, to => $$num, step => $step, type => 'number', direction => 'down');
+    }
 
     sub sqrt {
         my ($self) = @_;
@@ -608,6 +618,9 @@ package Sidef::Types::Number::Number {
         *{__PACKAGE__ . '::' . '!='}  = \&ne;
         *{__PACKAGE__ . '::' . '≠'} = \&ne;
         *{__PACKAGE__ . '::' . '..'}  = \&to;
+        *{__PACKAGE__ . '::' . '...'} = \&range_to;
+        *{__PACKAGE__ . '::' . '..^'} = \&range_to;
+        *{__PACKAGE__ . '::' . '^..'} = \&range_downto;
         *{__PACKAGE__ . '::' . '!'}   = \&factorial;
         *{__PACKAGE__ . '::' . '%%'}  = \&is_div;
         *{__PACKAGE__ . '::' . '>>'}  = \&shift_right;
