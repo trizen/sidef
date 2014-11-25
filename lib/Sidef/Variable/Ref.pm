@@ -11,7 +11,7 @@ package Sidef::Variable::Ref {
         no strict 'refs';
 
         *{__PACKAGE__ . '::' . '\\'} = *{__PACKAGE__ . '::' . '&'} = sub {
-            my ($self, $var) = @_;
+            my ($self, $var) = ($_[0], $_[-1]);
 
             if (ref $var eq 'Sidef::Variable::Variable') {
                 return $self->new($var);
@@ -22,7 +22,7 @@ package Sidef::Variable::Ref {
         };
 
         *{__PACKAGE__ . '::' . '*'} = sub {
-            my ($self, $var_ref) = @_;
+            my ($self, $var_ref) = ($_[0], $_[-1]);
 
             if (ref($var_ref) eq 'Sidef::Variable::Variable') {
                 $var_ref = $var_ref->get_value;

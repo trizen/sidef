@@ -119,6 +119,31 @@ package Sidef::Types::Array::Array {
         $self->new(map { $_->get_value } @{$self}, @{$array});
     }
 
+    sub _combinations {
+        my ($n, @set) = @_;
+
+        @set || return;
+        $n == 1 && return map { [$_] } @set;
+
+        my $head = shift @set;
+        my @result = _combinations($n - 1, @set);
+        foreach my $subarray (@result) {
+            unshift @{$subarray}, $head;
+        }
+        @result, _combinations($n, @set);
+    }
+
+    sub combinations {
+        my ($self, $n) = @_;
+        $self->_is_number($n) || return;
+        Sidef::Types::Array::Array->new(
+            map {
+                Sidef::Types::Array::Array->new(map { $_->get_value } @{$_})
+              } _combinations($$n, @{$self})
+        );
+    }
+    *combination = \&combinations;
+
     sub count {
         my ($self, $obj) = @_;
 
