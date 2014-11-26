@@ -513,6 +513,21 @@ package Sidef::Types::String::String {
         $self->new(CORE::join('', sort(CORE::split(//, $$self))));
     }
 
+    sub format {
+        my ($self) = @_;
+        CORE::chomp(my $text = 'format __MY_FORMAT__ = ' . "\n" . $$self);
+        eval($text . "\n.");
+
+        open my $str_h, '>', \my $acc;
+        my $old_h = select($str_h);
+        local $~ = '__MY_FORMAT__';
+        write;
+        select($old_h);
+        close $str_h;
+
+        Sidef::Types::String::String->new($acc);
+    }
+
     sub each_word {
         my ($self, $obj) = @_;
         my $array = Sidef::Types::Array::Array->new(map { __PACKAGE__->new($_) } CORE::split(' ', $$self));
