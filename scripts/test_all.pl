@@ -23,6 +23,7 @@ my %ignored;
       langton_s_ant.sf
       langton_s_ant_2.sf
       levenshtein_recursive.sf
+      haversine_formula.sf
       lwp_module.sf
       fibonacci_validation.sf
       quicksort_in_parallel.sf

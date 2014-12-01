@@ -121,7 +121,7 @@ lib/Sidef/Variable/Struct.pm
 lib/Sidef/Variable/Variable.pm
 lib/Sidef/Variable/Variable.pod
 Makefile.PL
-MANIFEST            This list of files
+MANIFEST			This list of files
 META.json
 META.yml
 README.md
@@ -224,6 +224,7 @@ scripts/hash_grep.sf
 scripts/hash_join.sf
 scripts/hash_sort.sf
 scripts/hashes.sf
+scripts/haversine_formula.sf
 scripts/http_tiny.sf
 scripts/huffman_coding.sf
 scripts/i_love_you.sf
