@@ -57,6 +57,19 @@ package Sidef::Math::Math {
                      Math::BigFloat->new($$x)->bsin(defined($places) ? ($self->_is_number($places)) ? $$places : return : ()));
     }
 
+    sub asin {
+        my ($self, $x, $places) = @_;
+        $self->_is_number($x) || return;
+        $self->atan2(
+                     $x,
+                     $self->sqrt(
+                                 Sidef::Types::Number::Number->new(1)
+                                   ->subtract($self->pow($x, Sidef::Types::Number::Number->new(2))),
+                                 $places
+                                )
+                    );
+    }
+
     sub log {
         my ($self, $n, $base) = @_;
         $self->_is_number($n) || return;

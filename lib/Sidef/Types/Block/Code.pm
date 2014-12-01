@@ -186,9 +186,16 @@ package Sidef::Types::Block::Code {
 
         my $check_type = sub {
             my ($var, $value) = @_;
-            ref($var->{value}) eq ref($value)
-              || die "[ERROR] Type mismatch error in variable '$var->{name}': got '", ref($value),
-              "', but expected '", ref($var->{value}), "'!\n";
+
+            my ($r1, $r2) = (ref($var->{value}), ref($value));
+            foreach my $item ([\$r1, $var->{value}], [\$r2, $value]) {
+                if (${$item->[0]} eq 'Sidef::Variable::Class' or ${$item->[0]} eq 'Sidef::Variable::ClassInit') {
+                    ${$item->[0]} = $item->[1]->{name};
+                }
+            }
+            $r1 eq $r2
+              || die "[ERROR] Type mismatch error in variable '$var->{name}': got '", $r2,
+              "', but expected '", $r1, "'!\n";
         };
 
         # varName => value
