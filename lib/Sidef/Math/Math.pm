@@ -63,10 +63,9 @@ package Sidef::Math::Math {
         $self->atan2(
                      $x,
                      $self->sqrt(
-                                 Sidef::Types::Number::Number->new(1)
-                                   ->subtract($self->pow($x, Sidef::Types::Number::Number->new(2))),
-                                 $places
-                                )
+                           Sidef::Types::Number::Number->new(1)->subtract($self->pow($x, Sidef::Types::Number::Number->new(2)))
+                     ),
+                     $places
                     );
     }
 
