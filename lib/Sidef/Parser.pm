@@ -608,9 +608,9 @@ package Sidef::Parser {
             }
 
             my $delim;
-            if (/\G(.)/gc) {
+            if (/\G(?=(.))/) {
                 $delim = $1;
-                if ($delim eq '\\' && /\G(.*?)\\/gsc) {
+                if ($delim eq '\\' && /\G\\(.*?)\\/gsc) {
                     return $1, pos;
                 }
             }
@@ -622,39 +622,24 @@ package Sidef::Parser {
                                   );
             }
 
-            my $re_delim = quotemeta(
-                                     exists($self->{delim_pairs}{$delim})
-                                     ? ($delim . $self->{delim_pairs}{$delim})
-                                     : $delim
-                                    );
+            my $beg_delim = quotemeta $delim;
+            my $pair_delim = exists($self->{delim_pairs}{$delim}) ? $self->{delim_pairs}{$delim} : ();
 
             my $string = '';
-            while (   /\G([^$re_delim\\]+)/gc
-                   || /\G\\([$re_delim])/gc
-                   || /\G(\\.)/gcs) {
-                $string .= $1;
-            }
-
-            if (exists $self->{delim_pairs}{$delim}) {
-                while (/\G(?=\Q$delim\E)/) {
-
-                    $string .= $delim;
-                    my ($str, $pos) = $self->get_quoted_string(code => substr($_, pos));
-                    pos($_) += $pos;
-                    $string .= $str . $self->{delim_pairs}{$delim};
-
-                    while (   /\G([^$re_delim\\]+)/gc
-                           || /\G\\([$re_delim])/gc
-                           || /\G(\\.)/gcs) {
-                        $string .= $1;
-                    }
+            if (defined $pair_delim) {
+                my $end_delim = quotemeta $pair_delim;
+                my $re_delim  = $beg_delim . $end_delim;
+                if (m{\G(?<main>$beg_delim((?>[^$re_delim\\]+|\\.|(?&main))*+)$end_delim)}sgc) {
+                    $string = $2 =~ s/\\([$re_delim])/$1/gr;
                 }
             }
+            elsif (m{\G$beg_delim([^\\$beg_delim]*+(?>\\.[^\\$beg_delim]*)*)}sgc) {
+                $string = $1 =~ s/\\([$beg_delim])/$1/gr;
+            }
 
-            my $end_delim = $self->{delim_pairs}{$delim} // $delim;
-            /\G\Q$end_delim\E/gc
+            (defined($pair_delim) ? /\G(?<=\Q$pair_delim\E)/ : /\G$beg_delim/gc)
               || $self->fatal_error(
-                                    error => sprintf(qq{can't find the quoted string terminator "%s"}, $end_delim),
+                                    error => sprintf(qq{can't find the quoted string terminator <%s>}, $pair_delim // $delim),
                                     code  => $_,
                                     pos   => pos($_)
                                    );

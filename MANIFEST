@@ -358,6 +358,7 @@ t/manifest.t
 t/pod.t
 utils/auto_perltidy.sh
 utils/bak_cleaner.sh
+utils/C-inline-function-call.pl
 utils/deparser.pl
 utils/find_invalid_types.pl
 utils/pod_generator.pl
