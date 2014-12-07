@@ -12,11 +12,9 @@ package Sidef::Types::Number::Unary {
             $_[1];
         };
 
-        foreach my $method (qw(++ -- ~)) {
-            *{__PACKAGE__ . '::' . $method} = sub {
-                $_[1]->$method;
-            };
-        }
+        *{__PACKAGE__ . '::' . '~'} = sub {
+            $_[1]->not;
+        };
 
         *{__PACKAGE__ . '::' . '-'} = sub {
             my ($self, $number) = @_;

@@ -44,7 +44,7 @@ package Sidef::Parser {
                          },
                          {
                           sub => sub { Sidef::Types::Bool::Bool->false },
-                          re  => qr/\Gfalse\b/,
+                          re  => qr/\G(?:false|Bool)\b/,
                          },
                          {
                           sub => sub { Sidef::Types::Block::Next->new },
@@ -149,10 +149,6 @@ package Sidef::Parser {
                          {
                           sub => sub { Sidef::Types::Char::Chars->new },
                           re  => qr/\GCha?rs\b/,
-                         },
-                         {
-                          sub => sub { Sidef::Types::Bool::Bool->new },
-                          re  => qr/\GBool\b/,
                          },
                          {
                           sub => sub { Sidef::Sys::Sys->new },
@@ -300,44 +296,19 @@ package Sidef::Parser {
                  dynamic => 0,
                 },
                 {
-                 sub     => sub { Sidef::Types::Number::Unary->new },
-                 re      => qr/\G(?=!)/,
-                 dynamic => 0,
+                 sub     => sub { Sidef::Variable::Ref->new() },
+                 re      => qr/\G(?=[*\\&]|\+\+|--)/,
+                 dynamic => 1,
                 },
                 {
                  sub     => sub { Sidef::Types::Number::Unary->new },
-                 re      => qr/\G(?=-)/,
-                 dynamic => 0,
-                },
-                {
-                 sub     => sub { Sidef::Types::Number::Unary->new },
-                 re      => qr/\G(?=\?)/,
-                 dynamic => 0,
-                },
-                {
-                 sub     => sub { Sidef::Types::Number::Unary->new },
-                 re      => qr/\G(?=√)/,
-                 dynamic => 0,
-                },
-                {
-                 sub     => sub { Sidef::Types::Number::Unary->new },
-                 re      => qr/\G(?=\+)/,
-                 dynamic => 0,
-                },
-                {
-                 sub     => sub { Sidef::Types::Number::Unary->new },
-                 re      => qr/\G(?=~)/,
+                 re      => qr/\G(?=[?√+~!-])/,
                  dynamic => 0,
                 },
                 {
                  sub     => sub { Sidef::Types::Hash::Hash->new },
                  re      => qr/\G(?=:)/,
                  dynamic => 0,
-                },
-                {
-                 sub     => sub { Sidef::Variable::Ref->new() },
-                 re      => qr/\G(?=[*\\&])/,
-                 dynamic => 1,
                 },
             ],
             keywords => {

@@ -35,7 +35,10 @@ package Sidef::Variable::Ref {
 
         foreach my $method (qw(-- ++)) {
             *{__PACKAGE__ . '::' . $method} = sub {
-                $_[0]->{var}->$method;
+                my ($self, $var) = @_;
+                $var = $var->{var}
+                  if ref($var) eq __PACKAGE__;
+                $var->$method;
             };
         }
 
