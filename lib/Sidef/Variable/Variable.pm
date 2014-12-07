@@ -142,21 +142,29 @@ package Sidef::Variable::Variable {
             };
         }
 
-        {
-            my @operators = qw(++ -- + - % * / & | ^ ** && || << >> ÷);
-            foreach my $i (0 .. $#operators) {
-                my $operator = $operators[$i];
-                *{__PACKAGE__ . '::' . $operator . ($i > 1 ? '=' : '')} = sub {
-                    my ($self, $arg) = @_;
-                    my $value = $self->get_value;
-                    my $sub;
-                    ref($value) && defined($sub = $value->can($operator))
-                      ? $self->__set_value($value->$sub($arg))
-                      : $self->__nonexistent_method($operator, $arg);
-                };
-            }
+        foreach my $operator (qw(++ --)) {
+            *{__PACKAGE__ . '::' . $operator} = sub {
+                my ($self, $arg) = @_;
+                my $value = $self->get_value;
+                my $sub;
+                ref($value) && defined($sub = $value->can($operator))
+                  ? $self->__set_value($value->$sub($arg))
+                  : $self->__nonexistent_method($operator, $arg);
+                $value;
+
+            };
         }
 
+        foreach my $operator (qw(+ - % * / & | ^ ** && || << >> ÷)) {
+            *{__PACKAGE__ . '::' . $operator . '='} = sub {
+                my ($self, $arg) = @_;
+                my $value = $self->get_value;
+                my $sub;
+                ref($value) && defined($sub = $value->can($operator))
+                  ? $self->__set_value($value->$sub($arg))
+                  : $self->__nonexistent_method($operator, $arg);
+            };
+        }
     }
 
     sub DESTROY { }

@@ -39,6 +39,7 @@ package Sidef::Variable::Ref {
                 $var = $var->{var}
                   if ref($var) eq __PACKAGE__;
                 $var->$method;
+                $var->get_value;
             };
         }
 

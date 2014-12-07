@@ -1,0 +1,13 @@
+#!/usr/bin/ruby
+
+var num = 41;
+
+num++ == 41 || die 'postfix ++ error';
+num   == 42 || die 'postfix ++ doesn\'t work';
+num-- == 42 || die 'postfix -- error';
+num   == 41 || die 'postfix -- doesn\'t work';
+++num == 42 || die 'prefix ++ error';
+--num == 41 || die 'prefix -- error';
+num   == 41 || die 'final error';
+
+say "** Test passed";

@@ -344,6 +344,7 @@ scripts/tk_library.sf
 scripts/token_recursive.sf
 scripts/trizen's_pair_numbers.sf
 scripts/two_dimensional_array.sf
+scripts/unary_inc_dec.sf
 scripts/unexecuted_arguments.sf
 scripts/unicode.sf
 scripts/unicode_support.sf

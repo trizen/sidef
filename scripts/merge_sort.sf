@@ -10,7 +10,7 @@ func merge(left, right) {
 
     var(i=0, j=0);
     while (i<nL && j<nR) {
-        array.append(left[i] <= right[j] ? left[i++-1] : right[j++-1]);
+        array.append(left[i] <= right[j] ? left[i++] : right[j++]);
     }
 
     array += left[i .. left.offset];
