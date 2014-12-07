@@ -206,7 +206,7 @@ package Sidef::Types::Block::Code {
         foreach my $i (0 .. $last) {
             my $var = $self->{init_vars}[$i];
             if (ref $args[$i] eq 'Sidef::Types::Array::Pair') {
-                $named_vars{$args[$i]->first->get_value->get_value} = $args[$i]->second->get_value->get_value;
+                $named_vars{$args[$i][0]->get_value} = $args[$i][1]->get_value;
             }
             else {
                 my $v = $var->{vars}[0];
@@ -332,14 +332,14 @@ package Sidef::Types::Block::Code {
                 foreach my $class (keys %{$arg}) {
 
                     if ($counter++ == 0) {
-                        $exec->execute_expr($arg->{$class}[0], $class);
+                        $exec->execute_expr($arg->{$class}[0]);
                     }
 
-                    if ($exec->execute_expr($arg->{$class}[1], $class)) {
+                    if ($exec->execute_expr($arg->{$class}[1])) {
                         if (defined(my $res = $self->_run_code)) {
                             return $res;
                         }
-                        $exec->execute_expr($arg->{$class}[2], $class);
+                        $exec->execute_expr($arg->{$class}[2]);
                         redo;
                     }
 

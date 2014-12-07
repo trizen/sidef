@@ -80,42 +80,45 @@ package Sidef::Variable::Variable {
         $self->{type};
     }
 
-    sub _nonexistent_method {
+    sub __nonexistent_method {
         my ($self, $method, $obj) = @_;
         warn sprintf(qq{[WARN] Can't find the method "$method" for object "%s"!\n}, ref($obj));
+        return;
+    }
+
+    sub __set_value {
+        my ($self, $obj) = @_;
+
+        $#_ > 1 && ($obj = $_[-1]);
+
+        if ($self->{type} eq "var" or $self->{type} eq "static") {
+            return $self->set_value($obj);
+        }
+
+        if ($self->{type} eq "const") {
+            if (not exists $self->{inited}) {
+                return $self->set_value($obj);
+            }
+            return $self->get_value;
+        }
+
+        if ($self->{type} eq 'func') {
+            if (ref $obj eq 'Sidef::Types::Block::Code') {
+                return $self->set_value($obj);
+            }
+            warn "[WARN] Can't assign the '", ref($obj),
+              "' object to function '$self->{name}'!\n" . "An object of type 'Sidef::Types::Block::Code' was expected.\n";
+            return $self->get_value;
+        }
+
+        warn "[WARN] Invalid variable type: '$self->{type}'.\n";    # this should not happen
+        $obj;
     }
 
     {
         no strict 'refs';
 
-        *{__PACKAGE__ . '::' . '='} = sub {
-            my ($self, $obj) = @_;
-
-            $#_ > 1 && ($obj = $_[-1]);
-
-            if ($self->{type} eq "var" or $self->{type} eq "static") {
-                return $self->set_value($obj);
-            }
-
-            if ($self->{type} eq "const") {
-                if (not exists $self->{inited}) {
-                    return $self->set_value($obj);
-                }
-                return $self;
-            }
-
-            if ($self->{type} eq 'func') {
-                if (ref $obj eq 'Sidef::Types::Block::Code') {
-                    return $self->set_value($obj);
-                }
-                warn "[WARN] Can't assign the '", ref($obj),
-                  "' object to function '$self->{name}'!\n" . "An object of type 'Sidef::Types::Block::Code' was expected.\n";
-                return $self;
-            }
-
-            warn "[WARN] Invalid variable type: '$self->{type}'.\n";    # this should not happen
-            $obj;
-        };
+        *{__PACKAGE__ . '::' . '='} = \&__set_value;
 
         *{__PACKAGE__ . '::' . '\\\\'} = sub {
             my ($self, $code) = @_;
@@ -132,11 +135,10 @@ package Sidef::Variable::Variable {
                 my ($self, $code) = @_;
 
                 if (not $self->_is_defined) {
-                    state $method = '=';
-                    $self->$method(Sidef::Types::Block::Code->new($code)->run);
+                    $self->__set_value(Sidef::Types::Block::Code->new($code)->run);
                 }
 
-                $operator eq ':=' ? $self->new(name => '', type => 'var', value => $self) : $self;
+                $operator eq ':=' ? $self : $self->get_value;
             };
         }
 
@@ -146,17 +148,11 @@ package Sidef::Variable::Variable {
                 my $operator = $operators[$i];
                 *{__PACKAGE__ . '::' . $operator . ($i > 1 ? '=' : '')} = sub {
                     my ($self, $arg) = @_;
-
-                    state $method = '=';
                     my $value = $self->get_value;
-
-                    if (ref($value) and defined(my $sub = eval { $value->can($operator) })) {
-                        $self->$method($value->$sub($arg));
-                    }
-                    else {
-                        $self->_nonexistent_method($operator, $arg);
-                    }
-                    $self;
+                    my $sub;
+                    ref($value) && defined($sub = $value->can($operator))
+                      ? $self->__set_value($value->$sub($arg))
+                      : $self->__nonexistent_method($operator, $arg);
                 };
             }
         }
@@ -180,23 +176,20 @@ package Sidef::Variable::Variable {
             $suffix = chop $method;
         }
 
-        if (ref($value)
-            && (defined(my $sub = $value->can($method) // ($value->can('AUTOLOAD') ? $method : ())))) {
-            my @results = $value->$sub(@args);
+        if (ref($value) && (defined(my $sub = $value->can($method) // ($value->can('AUTOLOAD') ? $method : ())))) {
+            my $result = $value->$sub(@args);
 
             if (defined($suffix)) {
                 if ($suffix eq '!') {    # modifies the variable in place
-                    state $method = '=';
-                    $self->$method(@results);
-                    return $self->new(name => '', type => 'var', value => $self);
+                    $self->__set_value($result);
+                    return $self;
                 }
 
                 if ($suffix eq ':') {    # returns the self variable
-                    return $self->new(name => '', type => 'var', value => $self);
+                    return $self;
                 }
 
                 if ($suffix eq '?') {    # asks for a boolean value
-                    my $result = $results[-1];
                     return ref($result) eq 'Sidef::Types::Bool::Bool'
                       ? $result
                       : Sidef::Types::Bool::Bool->new($result);
@@ -204,16 +197,16 @@ package Sidef::Variable::Variable {
             }
 
             if ($self->{type} eq 'func' and exists $self->{returns}) {
-                ref($results[-1]) eq ref($self->{returns}) || do {
-                    die "[ERROR] Return-type error from function '$self->{name}': returned '", ref($results[-1]),
+                ref($result) eq ref($self->{returns}) || do {
+                    die "[ERROR] Return-type error from function '$self->{name}': returned '", ref($result),
                       "', but expected '", ref($self->{returns}), "'!\n";
                 };
             }
 
-            return $results[-1];
+            return $result;
         }
         else {
-            $self->_nonexistent_method($method, $value);
+            $self->__nonexistent_method($method, $value);
         }
 
         return;

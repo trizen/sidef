@@ -73,3 +73,47 @@ x = text;
     "Assigned name: " + name -> say;
 
 }.run;
+
+
+#
+## More testing
+#
+
+{
+    func is(a, b) {
+        a == b || die "#{a} != #{b}";
+    }
+
+    class Test(hello) {
+        method changeTo(arg) {
+            var ref = \self.hello;
+            *ref = "x";
+            is(self.hello, "x");
+            *ref = arg;
+            self.hello;
+        }
+    }
+
+    var obj = Test(42);
+    is(obj.hello, 42);
+
+    is(obj.changeTo(15), 15);
+    is(obj.hello, 15);
+
+    var r = \obj.hello;
+    *r += 23;
+
+    is(*r, 38);
+    is(obj.hello, 38);
+
+    obj.hello = 44;
+    is(*r, 44);
+    is(obj.hello, 44);
+
+    var value = 12;
+    var rv = \value;
+    *rv = 20;
+    is(*rv, value);
+    is(*rv, 20);
+    is(20, value);
+}.run;

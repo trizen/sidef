@@ -75,7 +75,7 @@ package Sidef::Exec {
     }
 
     sub execute_expr {
-        my ($self, $expr, $class) = @_;
+        my ($self, $expr) = @_;
 
         exists($expr->{self}) || die "Struct error!\n";
 
@@ -99,7 +99,7 @@ package Sidef::Exec {
             local $self->{var_ref} = 0;
             $self_obj = Sidef::Types::Array::Array->new(
                 map {
-                    my $val = $self->execute_expr($_, $class);
+                    my $val = $self->execute_expr($_);
                     ref($val) eq 'Sidef::Args::Args' ? @{$val} : $val
                   } @{$self_obj}
             );
@@ -107,29 +107,31 @@ package Sidef::Exec {
 
         if (exists $expr->{ind}) {
 
-            if (ref($self_obj) eq 'Sidef::Variable::Variable') {
+            my $ref = ref($self_obj);
+            if ($ref eq 'Sidef::Variable::Variable' or $ref eq 'Sidef::Variable::ClassVar') {
                 $self_obj = $self_obj->get_value;
             }
 
             for (my $l = 0 ; $l <= $#{$expr->{ind}} ; $l++) {
 
-                if (ref($self_obj) eq 'Sidef::Variable::ClassVar') {
-                    $self_obj = $self_obj->get_value;
-                }
-
-                my $level = do {
-                    local $self->{var_ref} = 0;
-                    $self->execute_expr({self => $expr->{ind}[$l]}, $class);
-                };
-
-                my $is_hash = ref($self_obj) eq 'Sidef::Types::Hash::Hash';
-
                 if (ref($self_obj) eq 'Sidef::Types::String::String') {
                     $self_obj = $self_obj->to_chars;
                 }
 
+                my $level = do {
+                    local $self->{var_ref} = 0;
+                    $self->execute_expr({self => $expr->{ind}[$l]});
+                };
+
+                my $is_hash = ref($self_obj) eq 'Sidef::Types::Hash::Hash';
+
                 if (
-                    $#{$level} > 0
+                    (
+                     $#{$level} > 0 && do {
+                         $level = [map { $_->get_value } @{$level}];
+                         1;
+                     }
+                    )
                     || (
                         $#{$level} == 0
                         && do {
@@ -144,17 +146,7 @@ package Sidef::Exec {
                        )
                   ) {
                     my @indices;
-
                     foreach my $ind (@{$level}) {
-
-                        if (ref $ind eq 'HASH') {
-                            local $self->{var_ref} = 0;
-                            $ind = $self->execute_expr($ind, $class);
-                        }
-
-                        if (ref $ind eq 'Sidef::Variable::Variable') {
-                            $ind = $ind->get_value;
-                        }
 
                         if (ref $self_obj eq 'Sidef::Variable::Class') {
                             die "[ERROR]: Can't fetch multiple class values at once!";
@@ -191,10 +183,6 @@ package Sidef::Exec {
                 else {
                     return if not exists $level->[0];
                     my $ind = $level->[0]->get_value;
-
-                    if (ref($self_obj) eq 'Sidef::Variable::ClassVar') {
-                        $self_obj = $self_obj->get_value;
-                    }
 
                     if (ref($self_obj) eq 'Sidef::Variable::Class') {
                         $self_obj = $self_obj->$ind;
@@ -266,7 +254,7 @@ package Sidef::Exec {
                 my $method = $call->{method};
 
                 if (ref $method eq 'HASH') {
-                    $method = $self->execute_expr($method, $class) // '';
+                    $method = $self->execute_expr($method) // '';
                     if (ref $method eq 'Sidef::Variable::Variable') {
                         $method = $method->get_value;
                     }
@@ -287,21 +275,20 @@ package Sidef::Exec {
                 if (ref $self_obj eq 'Sidef::Variable::Variable') {
 
                     my $value = $self_obj->get_value;
-                    if (   ref($value) eq 'Sidef::Module::Caller'
-                        or ref($value) eq 'Sidef::Module::Func') {
+                    my $ref   = ref($value);
+                    if (   $ref eq 'Sidef::Module::Caller'
+                        or $ref eq 'Sidef::Module::Func') {
                         $self_obj = $value;
                     }
                 }
 
-                ref($self_obj) && eval { $self_obj->can('can') } || do {
-                    $self_obj = $self->{__NIL__} //= Sidef::Types::Nil::Nil->new;
-                };
+                $self_obj //= $self->{__NIL__} //= Sidef::Types::Nil::Nil->new;
 
                 my $sub = $self_obj->can($method) // (
                     $self_obj->can('AUTOLOAD') ? $method : do {
                         warn
-                          sprintf("[WARN] Inexistent method '%s' for object %s\n", $method, ref($self_obj) || '- undefined!');
-                        return $self_obj;
+                          sprintf("[WARN] Inexistent method '%s' for object: %s\n", $method, ref($self_obj) || "`$self_obj'");
+                        return;
                       }
                 );
 
@@ -326,20 +313,25 @@ package Sidef::Exec {
                         if (
                             ref($arg) eq 'HASH'
                             and not(
-                                    (exists($self->{types}{$type}) && exists($self->{types}{$type}{$method}))
-                                    || (
-                                        $type eq 'Sidef::Variable::Init'
-                                        && (   $self_obj->{vars}[0]->{type} eq 'static'
-                                            || $self_obj->{vars}[0]->{type} eq 'const')
-                                        && exists($self_obj->{vars}[0]->{inited})
-                                       )
-                                    || (    ($type eq 'Sidef::Types::Block::Code' || $type eq 'Sidef::Types::Block::For')
-                                        and ($method eq 'for' || $method eq 'foreach')
-                                        and ref $arg->{$class} eq 'ARRAY'
-                                        and $#{$arg->{$class}} == 2)
+                                (exists($self->{types}{$type}) && exists($self->{types}{$type}{$method}))
+                                || (
+                                    $type eq 'Sidef::Variable::Init'
+                                    && (   $self_obj->{vars}[0]->{type} eq 'static'
+                                        || $self_obj->{vars}[0]->{type} eq 'const')
+                                    && exists($self_obj->{vars}[0]->{inited})
                                    )
+                                || (
+                                        ($type eq 'Sidef::Types::Block::Code' || $type eq 'Sidef::Types::Block::For')
+                                    and ($method eq 'for' || $method eq 'foreach')
+                                    and do {
+                                        my ($class) = keys %{$arg};
+                                        ref $arg->{$class} eq 'ARRAY'
+                                          and $#{$arg->{$class}} == 2;
+                                    }
+                                   )
+                            )
                           ) {
-                            local $self->{var_ref} = ref($self_obj) eq 'Sidef::Variable::Ref';
+                            local $self->{var_ref} = ref($self_obj) eq 'Sidef::Variable::Ref' && $method ne '*';
                             push @arguments, $self->execute($arg);
                         }
                         else {
@@ -352,7 +344,7 @@ package Sidef::Exec {
                         my $obj = shift @arguments;
 
                         my $ref = ref($obj);
-                        if ($ref eq 'Sidef::Variable::Variable') {
+                        if ($ref eq 'Sidef::Variable::Variable' or $ref eq 'Sidef::Variable::ClassVar') {
                             if (ref($self_obj) ne 'Sidef::Variable::Ref') {
                                 push @args, $obj->get_value;
                             }
@@ -365,9 +357,6 @@ package Sidef::Exec {
                         }
                         elsif ($ref eq 'Sidef::Args::Args') {
                             push @args, @{$obj};
-                        }
-                        elsif ($ref eq 'Sidef::Variable::ClassVar') {
-                            push @args, $obj->get_value;
                         }
                         else {
                             push @args, $obj;
@@ -383,10 +372,6 @@ package Sidef::Exec {
                     if (exists $self->{plain_array_methods}{$method}) {
                         return Sidef::Args::Args->new(@{$self_obj});
                     }
-                }
-
-                if (ref($self_obj) eq 'Sidef::Variable::Variable') {
-                    $self_obj = $self_obj->get_value;
                 }
 
                 if (ref($self_obj) eq 'Sidef::Types::Block::Return') {
@@ -438,7 +423,7 @@ package Sidef::Exec {
                 }
 
                 ++$i;
-                my $obj = $self->execute_expr($expr, $class);
+                my $obj = $self->execute_expr($expr);
 
                 if (   ref($obj) eq 'Sidef::Types::Block::Return'
                     or ref($obj) eq 'Sidef::Types::Block::Break') {

@@ -334,7 +334,6 @@ package Sidef::Types::Array::Array {
 
     sub last {
         my ($self, $arg) = @_;
-        $#{$self} >= 0 || return;
 
         if (defined $arg) {
             $self->_is_number($arg) || return;
@@ -342,7 +341,7 @@ package Sidef::Types::Array::Array {
             return $self->new(map { $_->get_value } @{$self}[($from < 0 ? 0 : $from) .. $#{$self}]);
         }
 
-        $self->[-1];
+        $#{$self} == -1 ? () : $self->[-1]->get_value;
     }
 
     sub swap {
@@ -367,7 +366,7 @@ package Sidef::Types::Array::Array {
             return $self->new(map { $_->get_value } @{$self}[0 .. $$arg - 1]);
         }
 
-        $self->[0];
+        $#{$self} == -1 ? () : $self->[0]->get_value;
     }
 
     sub _flatten {    # this exists for performance reasons
@@ -411,7 +410,7 @@ package Sidef::Types::Array::Array {
     sub get {
         my ($self, $index) = @_;
         $self->_is_number($index, 1) || return;
-        $self->[$$index];
+        exists($self->[$$index]) ? $self->[$$index]->get_value : ();
     }
 
     *item = \&get;
@@ -614,8 +613,7 @@ package Sidef::Types::Array::Array {
 
         for my $i (0 .. $#vars) {
             $self->_is_var_ref($vars[$i]) || return;
-            if (exists $self->[$i]
-                and ref($self->[$i]) eq 'Sidef::Variable::Variable') {
+            if (exists $self->[$i]) {
                 $vars[$i]->get_var->set_value($self->[$i]->get_value);
             }
         }
@@ -651,8 +649,7 @@ package Sidef::Types::Array::Array {
         $self->_is_code($code) || return;
         my ($var_ref) = $code->init_block_vars();
 
-        my $offset = $#{$self};
-        for (my $i = $offset ; $i >= 0 ; $i--) {
+        for (my $i = $#{$self} ; $i >= 0 ; $i--) {
             $var_ref->set_value($self->[$i]->get_value);
             $code->run
               && return Sidef::Types::Number::Number->new($i);

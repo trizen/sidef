@@ -17,10 +17,10 @@ package Sidef::Variable::Struct {
 
         # Variable autovification
         if (not exists $self->{$name}) {
-            $self->{$name} = Sidef::Variable::Variable->new(name => '', type => 'var', value => $argv);
+            return $self->{$name} = Sidef::Variable::Variable->new(name => '', type => 'var', value => $argv);
         }
 
-        Sidef::Variable::Variable->new(name => '', type => 'var', value => $self->{$name});
+        $self->{$name};
     }
 }
 

@@ -36,9 +36,9 @@ package Sidef::Types::Array::Pair {
             *{__PACKAGE__ . '::' . $pair->[0]} = sub {
                 my ($self, $arg) = @_;
                 if (@_ > 1) {
-                    $self->[$pair->[1]] = Sidef::Variable::Variable->new(name => '', type => 'var', value => $arg);
+                    $self->[$pair->[1]] = $arg;
                 }
-                Sidef::Variable::Variable->new(name => '', type => 'var', value => $self->[$pair->[1]]);
+                $self->[$pair->[1]];
             };
         }
     }
