@@ -132,7 +132,8 @@ package Sidef::Types::Block::Code {
     sub run {
         my ($self) = @_;
         my $result = ($self->_execute)[-1];
-        if (ref $result eq 'Sidef::Variable::Variable') {
+        my $ref    = ref($result);
+        if ($ref eq 'Sidef::Variable::Variable' or $ref eq 'Sidef::Variable::ClassVar') {
             $result = $result->get_value;
         }
         $self->pop_stack() if exists($self->{vars});
