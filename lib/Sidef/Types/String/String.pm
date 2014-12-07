@@ -61,6 +61,9 @@ package Sidef::Types::String::String {
         my ($self, $obj) = @_;
 
         if (ref $obj eq 'Sidef::Types::Regex::Regex') {
+            if (exists $obj->{global}) {
+                return $self->new($$self =~ s/$obj->{regex}//gr);
+            }
             if ($$self =~ /$obj->{regex}/) {
                 return $self->new(CORE::substr($$self, 0, $-[0]) . CORE::substr($$self, $+[0]));
             }
