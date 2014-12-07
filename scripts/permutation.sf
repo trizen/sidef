@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 func permute (code, arr) {
-    var idx = (arr.range);
+    var idx = arr.range.to_a;
 
     while (true) {
         code.call(arr[idx]);

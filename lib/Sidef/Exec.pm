@@ -194,10 +194,7 @@ package Sidef::Exec {
                         $self_obj = (
                             $is_hash
                             ? do {
-                                (
-                                 defined($self_obj) && (ref($self_obj) eq 'HASH'
-                                                        || $self_obj->isa('HASH'))
-                                )
+                                (ref($self_obj) && $self_obj->isa('HASH'))
                                   || ($self_obj = Sidef::Types::Hash::Hash->new);
 
                                 $self_obj->{data}{$ind} //=
@@ -210,10 +207,7 @@ package Sidef::Exec {
                                                                 );
                               }
                             : do {
-                                (
-                                 defined($self_obj) && (ref($self_obj) eq 'ARRAY'
-                                                        || $self_obj->isa('ARRAY'))
-                                )
+                                (ref($self_obj) && $self_obj->isa('ARRAY'))
                                   || ($self_obj = Sidef::Types::Array::Array->new());
 
                                 my $num = $ind->get_value;

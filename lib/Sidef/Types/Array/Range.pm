@@ -22,13 +22,35 @@ package Sidef::Types::Array::Range {
             my $from  = $self->{from};
             my $limit = $self->{to};
 
-            for (my $i = $from ;
-                 $self->{direction} eq 'up' ? ($i <= $limit) : ($i >= $limit) ;
-                 $self->{direction} eq 'up' ? ($i += $step) : ($i -= $step)) {
-                $var_ref->set_value(Sidef::Types::Number::Number->new($i));
-                if (defined(my $res = $code->_run_code)) {
-                    $code->pop_stack();
-                    return $res;
+            if ($self->{direction} eq 'up') {
+                if ($step == 1 and not $limit > (-1 >> 1) and not $from > (-1 >> 1)) {
+                    foreach my $i ($from .. $limit) {
+                        $var_ref->set_value(Sidef::Types::Number::Number->new($i));
+                        if (defined(my $res = $code->_run_code)) {
+                            $code->pop_stack();
+                            return $res;
+                        }
+                    }
+
+                }
+                else {
+                    for (my $i = $from ; $i <= $limit ; $i += $step) {
+                        $var_ref->set_value(Sidef::Types::Number::Number->new($i));
+                        if (defined(my $res = $code->_run_code)) {
+                            $code->pop_stack();
+                            return $res;
+                        }
+                    }
+                }
+            }
+            else {
+
+                for (my $i = $from ; $i >= $limit ; $i -= $step) {
+                    $var_ref->set_value(Sidef::Types::Number::Number->new($i));
+                    if (defined(my $res = $code->_run_code)) {
+                        $code->pop_stack();
+                        return $res;
+                    }
                 }
             }
 

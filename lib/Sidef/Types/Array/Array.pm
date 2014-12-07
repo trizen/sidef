@@ -791,7 +791,7 @@ package Sidef::Types::Array::Array {
 
     sub range {
         my ($self) = @_;
-        __PACKAGE__->new(map { Sidef::Types::Number::Number->new($_) } 0 .. $#{$self});
+        Sidef::Types::Array::Range->new(from => 0, to => $#{$self}, step => 1, type => 'number', direction => 'up');
     }
 
     sub pairs {
