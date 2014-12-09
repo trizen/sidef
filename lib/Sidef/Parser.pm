@@ -400,6 +400,7 @@ package Sidef::Parser {
             re => {
                 match_flags => qr{[msixpogcdual]+},
                 var_name    => qr/[[:alpha:]_]\w*(?>::[[:alpha:]_]\w*)*/,
+                method_name => qr/[[:alpha:]_]\w*[!:?]?/,
                 operators   => do {
                     local $" = q{|};
 
@@ -632,7 +633,7 @@ package Sidef::Parser {
             }
 
             # Alpha-numeric method name
-            if (/\G($self->{re}{var_name} [!:?]?)/gxoc) {
+            if (/\G($self->{re}{method_name})/gxoc) {
                 return $1, 0, pos;
             }
 
@@ -1902,7 +1903,7 @@ package Sidef::Parser {
                 my @methods;
                 {
 
-                    if (/\G(?=\.(?:$self->{re}{var_name}|\())/o) {
+                    if (/\G(?=\.(?:$self->{re}{method_name}|\())/o) {
                         my ($methods, $pos) = $self->parse_methods(code => substr($_, pos));
                         pos($_) += $pos;
                         push @{$struct{$self->{class}}[-1]{call}}, @{$methods};
@@ -2270,7 +2271,7 @@ package Sidef::Parser {
                         my $is_operator = /\G(?!->)/ && /\G(?=$self->{re}{operators})/o;
                         if (   $is_operator
                             || /\G(?:->|\.)\h*/gc
-                            || /\G(?=$self->{re}{var_name})/o) {
+                            || /\G(?=$self->{re}{method_name})/o) {
 
                             if ((my ($pos, $end) = $self->parse_whitespace(code => substr($_, pos)))[0]) {
                                 pos($_) += $pos;
@@ -2402,7 +2403,7 @@ package Sidef::Parser {
                             pos($_) += $pos;
                             push @{$struct{$self->{class}}[-1]{call}}, {method => 'do', arg => [$arg]};
 
-                            if (/\G\h*(\R\h*)?(?=$self->{re}{var_name})/goc) {
+                            if (/\G\h*(\R\h*)?(?=$self->{re}{method_name})/goc) {
 
                                 if (defined $1) {
                                     $self->{line}++;
