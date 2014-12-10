@@ -36,6 +36,18 @@ package Sidef::Types::Array::MultiArray {
         ];
     }
 
+    sub map {
+        my ($self, $code) = @_;
+        $self->_is_code($code) || return;
+
+        my @arr;
+        foreach my $i (0 .. $#{$self->[0]}) {
+            push @arr, scalar $code->call(map { $_->[$i] } @{$self});
+        }
+
+        Sidef::Types::Array::Array->new(@arr);
+    }
+
     sub each {
         my ($self, $code) = @_;
         $self->_is_code($code) || return;

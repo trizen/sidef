@@ -500,14 +500,11 @@ package Sidef::Types::Array::Array {
         my $multi_vars = $#vars > 0;
 
         foreach my $item (@{$self}) {
-            if ($multi_vars) {
-                foreach my $i (0 .. $#vars) {
-                    $vars[$i]->set_value($item->get_value->[$i]->get_value);
-                }
-            }
-            else {
-                $vars[0]->set_value($item->get_value);
-            }
+            $multi_vars
+              ? do {
+                $vars[$_]->set_value($item->get_value->[$_]->get_value) for 0 .. $#vars;
+              }
+              : $vars[0]->set_value($item->get_value);
 
             if (defined(my $res = $code->_run_code)) {
                 $code->pop_stack();
@@ -526,11 +523,18 @@ package Sidef::Types::Array::Array {
         my ($self, $code) = @_;
 
         $self->_is_code($code) || return;
-        my ($var_ref) = $code->init_block_vars();
+
+        my (@vars) = $code->init_block_vars();
+        my $multi_vars = $#vars > 0;
 
         $self->new(
             map {
-                $var_ref->set_value($_->get_value);
+                my $item = $_->get_value;
+                $multi_vars
+                  ? do {
+                    $vars[$_]->set_value($item->[$_]->get_value) for 0 .. $#vars;
+                  }
+                  : $vars[0]->set_value($item);
                 $code->run;
               } @{$self}
         );
