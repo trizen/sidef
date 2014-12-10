@@ -393,15 +393,14 @@ package Sidef::Types::String::String {
     }
 
     sub _string_or_regex {
-        my ($regex) = @_;
+        my ($self, $obj) = @_;
 
-        if (ref($regex) ne 'Sidef::Types::Regex::Regex') {
-            if ($regex->can('quotemeta')) {
-                return $regex->quotemeta;
-            }
+        if (ref($obj) eq 'Sidef::Types::Regex::Regex') {
+            return $obj->{regex};
         }
 
-        $regex->get_value;
+        $self->_is_string($obj) || return;
+        CORE::quotemeta($$obj);
     }
 
     sub sub {
@@ -412,7 +411,7 @@ package Sidef::Types::String::String {
 
         $str //= __PACKAGE__->new('');
         $self->_is_string($str) || return;
-        $regex = _string_or_regex($regex);
+        $regex = $self->_string_or_regex($regex);
 
         $self->new($$self =~ s{$regex}{$$str}r);
     }
@@ -427,7 +426,7 @@ package Sidef::Types::String::String {
 
         $str //= __PACKAGE__->new('');
         $self->_is_string($str) || return;
-        $regex = _string_or_regex($regex);
+        $regex = $self->_string_or_regex($regex);
 
         $self->new($$self =~ s{$regex}{$$str}gr);
     }
@@ -443,7 +442,7 @@ package Sidef::Types::String::String {
         my ($self, $regex, $code) = @_;
 
         $code //= __PACKAGE__->new('');
-        $regex = _string_or_regex($regex);
+        $regex = $self->_string_or_regex($regex);
 
         if ($self->_is_string($code, 1, 1)) {
             return __PACKAGE__->new($$self =~ s{$regex}{$$code}eer);
@@ -457,7 +456,7 @@ package Sidef::Types::String::String {
         my ($self, $regex, $code) = @_;
 
         $code //= __PACKAGE__->new('');
-        $regex = _string_or_regex($regex);
+        $regex = $self->_string_or_regex($regex);
 
         if ($self->_is_string($code, 1, 1)) {
             return __PACKAGE__->new($$self =~ s{$regex}{$$code}geer);
@@ -500,7 +499,7 @@ package Sidef::Types::String::String {
             return Sidef::Types::Array::Array->new(map { __PACKAGE__->new($_) } unpack "(a$$sep)*", $$self);
         }
 
-        $sep = _string_or_regex($sep);
+        $sep = $self->_string_or_regex($sep);
         Sidef::Types::Array::Array->new(map { __PACKAGE__->new($_) }
                                           split(/$sep/, $$self, $size));
     }
