@@ -52,7 +52,7 @@ package Sidef::Types::Glob::Pipe {
 
     sub open_r {
         my ($self, $var_ref) = @_;
-        $self->open('-|', $var_ref);
+        $self->open('-|:utf8', $var_ref);
     }
 
     *openR     = \&open_r;
@@ -61,7 +61,7 @@ package Sidef::Types::Glob::Pipe {
 
     sub open_w {
         my ($self, $var_ref) = @_;
-        $self->open('|-', $var_ref);
+        $self->open('|-:utf8', $var_ref);
     }
 
     *openW      = \&open_w;

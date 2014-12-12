@@ -14,7 +14,7 @@ package Sidef::Types::Glob::Backtick {
             if (ref $$self eq 'Sidef::Types::Block::Code') {
                 $self = $$self->run;
             }
-            Sidef::Types::String::String->new(scalar `$$self`);
+            Sidef::Types::String::String->new(scalar `$$self`)->decode_utf8;
         };
     }
 };
