@@ -52,7 +52,7 @@ package Sidef::Convert::Convert {
     sub to_i {
         my ($self) = @_;
         $self->_is_number($self, 1, 1) || $self->_is_string($self)
-          ? Sidef::Types::Number::Number->newInt($$self)
+          ? Sidef::Types::Number::Number->new_int($$self)
           : ();
     }
 
@@ -61,6 +61,18 @@ package Sidef::Convert::Convert {
     *to_int     = \&to_i;
     *toInteger  = \&to_i;
 
+    sub to_rat {
+        my ($self) = @_;
+        $self->_is_number($self, 1, 1) || $self->_is_string($self)
+          ? Sidef::Types::Number::Number->new_rat($$self)
+          : ();
+    }
+
+    *to_rational = \&to_rat;
+    *to_r        = \&to_rat;
+    *toRat       = \&to_rat;
+    *toRational  = \&to_rat;
+
     sub to_num {
         my ($self) = @_;
             $self->_is_number($self, 1, 1) ? $self
@@ -68,9 +80,19 @@ package Sidef::Convert::Convert {
           :                            ();
     }
 
-    *toNum    = \&to_num;
-    *to_f     = \&to_num;
-    *to_float = \&to_num;
+    *toNum     = \&to_num;
+    *to_number = \&to_num;
+    *toNumber  = \&to_num;
+
+    sub to_float {
+        my ($self) = @_;
+            $self->_is_number($self, 1, 1) ? $self
+          : $self->_is_string($self) ? Sidef::Types::Number::Number->new_float($$self)
+          :                            ();
+    }
+
+    *to_f    = \&to_float;
+    *toFloat = \&to_float;
 
     sub to_file {
         my ($self) = @_;

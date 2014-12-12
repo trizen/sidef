@@ -14,12 +14,14 @@ package Sidef::Types::Number::Number {
         bless \$num, __PACKAGE__;
     }
 
-    sub newInt {
+    *new_float = \&new;
+
+    sub new_int {
         my (undef, $num) = @_;
         __PACKAGE__->new(CORE::int($num));
     }
 
-    *new_int = \&newInt;
+    sub new_rat { ... }
 
     sub get_value { ${$_[0]} }
 

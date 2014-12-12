@@ -1365,8 +1365,15 @@ package Sidef::Parser {
                 }
 
                 # Integer or float number
-                if (/\G([+-]?+(?=\.?[0-9])[0-9_]*+(?:\.[0-9_]++)?(?:[Ee](?:[+-]?+[0-9_]+))?)/gc) {
-                    return Sidef::Types::Number::Number->new($1 =~ tr/_//dr), pos;
+                if (/\G([+-]?+(?=\.?[0-9])[0-9_]*+(?:\.[0-9_]++)?(?:[Ee](?:[+-]?+[0-9_]+))?)([rif]\b|)/gc) {
+                    my $num = $1 =~ tr/_//dr;
+                    return (
+                              $2 eq 'f' ? Sidef::Types::Number::Number->new_float($num)
+                            : $2 eq 'i' ? Sidef::Types::Number::Number->new_int($num)
+                            : $2 eq 'r' ? Sidef::Types::Number::Number->new_rat($num)
+                            : Sidef::Types::Number::Number->new($num),
+                            pos
+                           );
                 }
 
                 # Implicit method call on special variable: _

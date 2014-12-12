@@ -8,27 +8,46 @@ package Sidef::Types::Number::Number {
       Sidef::Convert::Convert
       );
 
-    sub new {
+    sub new_float {
         my (undef, $num) = @_;
 
         require Math::BigFloat;
         ref($num) eq 'Math::BigFloat'
-          ? (bless \$num, __PACKAGE__)
-          : (bless \Math::BigFloat->new($num), __PACKAGE__);
+          ? (bless \$num)
+          : (
+            bless \do {
+                eval { Math::BigFloat->new($num) } // Math::BigFloat->new(Math::BigInt->new($num));
+              }
+            );
     }
 
-    sub newInt {
+    *new = \&new_float;
+
+    sub new_int {
         my (undef, $num) = @_;
 
         require Math::BigInt;
-        ref($num) eq 'Math::BigInt' ? (bless \$num, __PACKAGE__)
-          : (   ref($num) eq __PACKAGE__
-             || ref($num) eq 'Math::BigFloat'
-             || ref($num) eq 'Math::BigRat') ? (bless \Math::BigInt->new($num->as_int))
-          : (bless \Math::BigInt->new(index($num, '.') > 0 ? __PACKAGE__->new($num)->as_int : $num), __PACKAGE__);
+        my $ref = ref($num);
+        $ref eq 'Math::BigInt' ? (bless \$num)
+          : (   $ref eq 'Math::BigFloat'
+             || $ref eq 'Math::BigRat'
+             || $ref eq __PACKAGE__) ? (bless \Math::BigInt->new($num->as_int))
+          : (bless \Math::BigInt->new(index($num, '.') > 0 ? CORE::int($num) : $num));
     }
 
-    *new_int = \&newInt;
+    sub new_rat {
+        my (undef, $num) = @_;
+
+        require Math::BigRat;
+        ref($num) eq 'Math::BigRat'
+          ? (bless \$num)
+          : (
+            bless \do {
+                eval { Math::BigRat->new($num) }
+                  // eval { Math::BigRat->new(Math::BigFloat->new($num)) } // Math::BigRat->new(Math::BigInt->new($num));
+              }
+            );
+    }
 
     sub get_value { ${$_[0]}->numify }
 
