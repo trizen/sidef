@@ -19,6 +19,11 @@ package Sidef::Types::Glob::File {
         ${$_[0]};
     }
 
+    sub get_const {
+        my ($self, $name) = @_;
+        Sidef::Types::Glob::Fcntl->$name;
+    }
+
     sub touch {
         my ($self) = @_;
         Sidef::Types::Bool::Bool->new(CORE::open(my $fh, '>>', $$self));
@@ -350,7 +355,7 @@ package Sidef::Types::Glob::File {
             return $fh_obj;
         }
 
-        return;
+        ();
     }
 
     sub open_r {

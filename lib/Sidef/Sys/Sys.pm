@@ -105,6 +105,8 @@ package Sidef::Sys::Sys {
         }
     }
 
+    *raise = \&die;
+
     sub warn {
         my ($self, @args) = @_;
         if (exists $self->{file_name}) {

@@ -1635,7 +1635,8 @@ package Sidef::Parser {
                         };
                         return $var->{obj}, pos;
                     }
-                    elsif (/\G(?=\h*:?=(?![=~>]))/) {
+
+                    if (/\G(?=\h*:?=(?![=~>]))/) {
 
                         #warn qq{[!] Implicit declaration of variable "$name", at line $self->{line}\n};
                         unshift @{$self->{vars}{$class}},
@@ -1648,6 +1649,27 @@ package Sidef::Parser {
                           };
 
                         return Sidef::Variable::InitMy->new($name), pos($_) - length($name);
+                    }
+
+                    my $obj;
+                    if (    $class ne $self->{class}
+                        and index($class, '::') == -1
+                        and eval { ($obj) = $self->parse_expr(code => $class); }) {
+                        return
+                          scalar {
+                                  $self->{class} => [
+                                                     {
+                                                      self => $obj,
+                                                      call => [
+                                                               {
+                                                                method => 'get_const',
+                                                                arg    => [Sidef::Types::String::String->new($name)]
+                                                               }
+                                                              ]
+                                                     }
+                                                    ]
+                                 },
+                          pos;
                     }
 
                     $self->fatal_error(
