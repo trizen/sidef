@@ -351,6 +351,7 @@ scripts/unicode_support.sf
 scripts/unique_prefixes.sf
 scripts/var_ref.sf
 scripts/var_scoping.sf
+scripts/vector_products.sf
 scripts/while_loop.sf
 scripts/word_roots.sf
 scripts/zig-zag_matrix.sf
