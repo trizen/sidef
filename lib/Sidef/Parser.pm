@@ -423,7 +423,7 @@ package Sidef::Parser {
                       == =~
                       := =
                       ^^ $$
-                      <= ≤ >= ≥ < >
+                      <= >= < >
                       ++ --
                       += +
                       -= -
@@ -433,16 +433,15 @@ package Sidef::Parser {
                       ^= ^
                       *= *
                       ...
-                      != ≠ ..
+                      != ..
                       \\\\= \\\\
                       ?:
                       ?? ?
                       ! \\
-                      : »
-                      ~ √
+                      : » ~
                       );
 
-                    qr{(@operators)};
+                    qr{(@operators|\p{Block: Mathematical_Operators}|\p{Block: Supplemental_Mathematical_Operators})};
                 },
             },
 
@@ -1662,7 +1661,7 @@ package Sidef::Parser {
                                                       self => $obj,
                                                       call => [
                                                                {
-                                                                method => 'get_const',
+                                                                method => 'get_constant',
                                                                 arg    => [Sidef::Types::String::String->new($name)]
                                                                }
                                                               ]

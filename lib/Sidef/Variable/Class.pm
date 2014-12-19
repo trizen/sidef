@@ -15,6 +15,10 @@ package Sidef::Variable::Class {
 
         my ($name) = ($AUTOLOAD =~ /^.*[^:]::(.*)$/);
 
+        $] < 5.015001 && do {    # bug fixed in perl 5.16
+            utf8::decode($name);
+        };
+
         if (exists $self->{__VARS__}{$name}) {
             if (@args) {
                 return $self->{__VARS__}{$name} = $args[-1];

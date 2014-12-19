@@ -19,7 +19,7 @@ package Sidef::Types::Glob::File {
         ${$_[0]};
     }
 
-    sub get_const {
+    sub get_constant {
         my ($self, $name) = @_;
         Sidef::Types::Glob::Fcntl->$name;
     }
