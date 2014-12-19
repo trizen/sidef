@@ -149,7 +149,8 @@ package Sidef::Exec {
                     foreach my $ind (@{$level}) {
 
                         if (ref $self_obj eq 'Sidef::Variable::Class') {
-                            die "[ERROR]: Can't fetch multiple class values at once!";
+                            push @indices, $ind;
+                            next;
                         }
 
                         !$is_hash && ($self->valid_index($ind) || next);
@@ -171,14 +172,18 @@ package Sidef::Exec {
                         push @indices, $ind;
                     }
 
-                    my $array = Sidef::Types::Array::Array->new();
-                    push @{$array}, $is_hash
-                      ? (@{$self_obj->{data}}{@indices})
-                      : (@{$self_obj}[@indices]);
-                    $self_obj = $array;
+                    if (ref $self_obj eq 'Sidef::Variable::Class') {
+                        $self_obj = Sidef::Types::Array::Array->new(map { $self_obj->$_->get_value } @indices);
+                    }
+                    else {
+                        my $array = Sidef::Types::Array::Array->new();
+                        push @{$array}, $is_hash
+                          ? (@{$self_obj->{data}}{@indices})
+                          : (@{$self_obj}[@indices]);
+                        $self_obj = $array;
 
-                    #$self_obj = Sidef::Types::Array::Array->new(map {$_->get_value} @{$self_obj}[@indices]);
-
+                        #$self_obj = Sidef::Types::Array::Array->new(map {$_->get_value} @{$self_obj}[@indices]);
+                    }
                 }
                 else {
                     return if not exists $level->[0];

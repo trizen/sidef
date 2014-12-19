@@ -441,7 +441,17 @@ package Sidef::Parser {
                       : » ~
                       );
 
-                    qr{(@operators|\p{Block: Mathematical_Operators}|\p{Block: Supplemental_Mathematical_Operators})};
+                    qr{
+                      »(?<uop>[[:alpha:]_]\w*|(?&op))«          # unroll method + op (e.g.: »add« or »+«)
+                    | >(?<uop>[[:alpha:]_]\w*|(?&op))<          # unroll method + op (e.g.: >add< or >+<)
+                    | \[(?<rop>(?&op))\]                        # reduce operator    (e.g.: [+])
+                    | <(?<rop>[[:alpha:]_]\w*)>                 # reduce method      (e.g.: <add>)
+                    | «(?<rop>[[:alpha:]_]\w*|(?&op))»          # reduce method + op (e.g.: «add» or «+»)
+                    | (?<op>@operators
+                        | \p{Block: Mathematical_Operators}
+                        | \p{Block: Supplemental_Mathematical_Operators}
+                      )
+                }x;
                 },
             },
 
@@ -620,6 +630,11 @@ package Sidef::Parser {
         }
     }
 
+    ## get_method_name() returns the following values:
+    # 1st: method/operator (or undef)
+    # 2nd: does operator require and argument (0 or 1)
+    # 3rd: type of operator (e.g.: »+« is "uop", [+] is "rop")
+    # 4th: the position after match
     sub get_method_name {
         my ($self, %opt) = @_;
 
@@ -633,18 +648,21 @@ package Sidef::Parser {
 
             # Alpha-numeric method name
             if (/\G($self->{re}{method_name})/gxoc) {
-                return $1, 0, pos;
+                return $1, 0, '', pos;
             }
 
             # Operator-like method name
             if (m{\G$self->{re}{operators}}goc) {
-                return $1, (exists $self->{postfix_ops}{$1} ? 0 : 1), pos;
+                my $uop = exists($+{uop});
+                my $rop = exists($+{rop});
+                return $+, ($uop ? 1 : $rop ? 0 : not exists $self->{postfix_ops}{$+}),
+                  ($uop ? 'uop' : $rop ? 'rop' : ''), pos;
             }
 
             # Method name as expression
             my ($obj, $pos) = $self->parse_expr(code => substr($_, pos));
-            $obj // return undef, 0, pos($_);
-            return {self => $obj}, 0, pos($_) + $pos;
+            $obj // return undef, 0, '', pos($_);
+            return {self => $obj}, 0, '', pos($_) + $pos;
         }
     }
 
@@ -1154,7 +1172,7 @@ package Sidef::Parser {
                     if (not defined $built_in_obj) {
                         $name =
                             /\G($self->{re}{var_name})\h*/goc ? $1
-                          : $type eq 'method' && /\G($self->{re}{operators})\h*/goc ? $1
+                          : $type eq 'method' && /\G($self->{re}{operators})\h*/goc ? $+
                           : $type ne 'my' ? ''
                           : $self->fatal_error(
                                                error    => "invalid '$type' declaration",
@@ -1803,6 +1821,27 @@ package Sidef::Parser {
         }
     }
 
+    sub append_method {
+        my ($self, %opt) = @_;
+
+        if ($opt{op_type} eq '') {
+            push @{$opt{array}}, {method => $opt{method}};
+        }
+        elsif ($opt{op_type} eq 'uop') {
+            push @{$opt{array}}, {method => 'unroll_operator', arg => [Sidef::Types::String::String->new($opt{method})]};
+        }
+        elsif ($opt{op_type} eq 'rop') {
+            push @{$opt{array}}, {method => 'reduce_operator', arg => [Sidef::Types::String::String->new($opt{method})]};
+        }
+        else {
+            die "[PARSER ERROR] Invalid operator of type '$opt{op_type}'...";
+        }
+
+        if (exists $opt{arg}) {
+            push @{$opt{array}[-1]{arg}}, $opt{arg};
+        }
+    }
+
     sub parse_methods {
         my ($self, %opt) = @_;
 
@@ -1813,7 +1852,7 @@ package Sidef::Parser {
             {
                 if ((/\G(?![-=]>)/ && /\G(?=$self->{re}{operators})/o)
                     || /\G\./goc) {
-                    my ($method, $req_arg, $pos) = $self->get_method_name(code => substr($_, pos));
+                    my ($method, $req_arg, $op_type, $pos) = $self->get_method_name(code => substr($_, pos));
 
                     if (defined($method)) {
                         pos($_) += $pos;
@@ -1824,12 +1863,17 @@ package Sidef::Parser {
                                 /\G(?=\()/ ? $self->parse_arguments(code => substr($_, pos))
                               : $req_arg || exists($self->{binpost_ops}{$method}) ? $self->parse_obj(code => substr($_, pos))
                               : /\G(?=\{)/ ? $self->parse_block(code => substr($_, pos))
-                              :              die "[PARSING ERROR] Something wrong in the if condition!";
+                              :              die "[PARSING ERROR] Something is wrong in the if condition";
 
                             if (defined $arg) {
                                 $has_arg = 1;
                                 pos($_) += $pos;
-                                push @methods, {method => $method, arg => [$arg]};
+                                $self->append_method(
+                                                     array   => \@methods,
+                                                     method  => $method,
+                                                     arg     => $arg,
+                                                     op_type => $op_type,
+                                                    );
                             }
                             elsif (exists($self->{binpost_ops}{$method})) {
                                 ## it's a postfix operator
@@ -1844,7 +1888,11 @@ package Sidef::Parser {
                         }
 
                         $has_arg || do {
-                            push @methods, {method => $method};
+                            $self->append_method(
+                                                 array   => \@methods,
+                                                 method  => $method,
+                                                 op_type => $op_type,
+                                                );
                         };
                         redo;
                     }
@@ -1900,7 +1948,7 @@ package Sidef::Parser {
                 push @{$struct{$self->{class}}}, {self => $obj};
 
                 if ($obj_key) {
-                    my ($method, $req_arg, $pos) = $self->get_method_name(code => substr($_, pos));
+                    my ($method, undef, undef, $pos) = $self->get_method_name(code => substr($_, pos));
                     pos($_) += $pos;
 
                     if (defined $method) {
@@ -1959,7 +2007,7 @@ package Sidef::Parser {
                     }
 
                     if (/\G(?!\h*[=-]>)/ && /\G(?=$self->{re}{operators})/o) {
-                        my ($method, $req_arg, $pos) = $self->get_method_name(code => substr($_, pos));
+                        my ($method, $req_arg, $op_type, $pos) = $self->get_method_name(code => substr($_, pos));
                         pos($_) += $pos;
 
                         my $has_arg;
@@ -1997,7 +2045,12 @@ package Sidef::Parser {
                                                                      ]
                                                                     };
 
-                                push @{$struct{$self->{class}}[-1]{call}}, {method => $method, arg => [$arg]};
+                                $self->append_method(
+                                                     array   => \@{$struct{$self->{class}}[-1]{call}},
+                                                     method  => $method,
+                                                     arg     => $arg,
+                                                     op_type => $op_type,
+                                                    );
                             }
                             elsif (exists $self->{binpost_ops}{$method}) {
                                 ## it's a postfix operator
@@ -2013,7 +2066,11 @@ package Sidef::Parser {
                         }
 
                         $has_arg || do {
-                            push @{$struct{$self->{class}}[-1]{call}}, {method => $method};
+                            $self->append_method(
+                                                 array   => \@{$struct{$self->{class}}[-1]{call}},
+                                                 method  => $method,
+                                                 op_type => $op_type,
+                                                );
                         };
                         redo;
                     }

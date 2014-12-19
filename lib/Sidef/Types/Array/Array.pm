@@ -31,6 +31,51 @@ package Sidef::Types::Array::Array {
         \@array;
     }
 
+    sub unroll_operator {
+        my ($self, $operator, $arg) = @_;
+
+        $self->_is_string($operator) || return;
+
+        my @array;
+        my $method = $$operator;
+
+        if (defined $arg) {
+            $self->_is_array($arg) || return;
+            foreach my $i (0 .. $#{$self}) {
+                push @array, $self->[$i]->get_value->$method($arg->[$i]->get_value);
+            }
+        }
+        else {
+            foreach my $i (0 .. $#{$self}) {
+                push @array, $self->[$i]->get_value->$method;
+            }
+        }
+
+        $self->new(@array);
+    }
+
+    sub reduce_operator {
+        my ($self, $operator) = @_;
+
+        my $method =
+            defined($operator)
+          ? ref($operator)
+              ? $self->_is_string($operator)
+                  ? $$operator
+                  : return
+              : $operator
+          : return;
+
+        (my $offset = $#{$self}) >= 0 || return;
+
+        my $x = $self->[0]->get_value;
+        foreach my $i (1 .. $offset) {
+            $x = ($x->$method($self->[$i]->get_value));
+        }
+
+        $x;
+    }
+
     sub _grep {
         my ($self, $array, $bool) = @_;
 
@@ -275,13 +320,13 @@ package Sidef::Types::Array::Array {
     }
 
     sub sum {
-        $_[0]->reduce(Sidef::Types::String::String->new('+'));
+        $_[0]->reduce_operator('+');
     }
 
     *combine = \&sum;
 
     sub prod {
-        $_[0]->reduce(Sidef::Types::String::String->new('*'));
+        $_[0]->reduce_operator('*');
     }
 
     *product = \&prod;
@@ -668,30 +713,23 @@ package Sidef::Types::Array::Array {
     sub reducePairs {
         my ($self, $obj) = @_;
 
-        my $array = $self->new();
-        (my $offset = $#{$self}) == -1 && return $array;
+        (my $offset = $#{$self}) == -1 && return $self->new;
 
+        my @array;
         if ($self->_is_string($obj, 1, 1)) {
             my $method = $$obj;
             for (my $i = 1 ; $i <= $offset ; $i += 2) {
                 my $x = $self->[$i - 1]->get_value;
-
-                if ($x->can($method)) {
-                    $array->push($x->$method($self->[$i]->get_value));
-                }
-                else {
-                    warn "[WARN] Array.reducePairs: can't find method '$method' for object '", ref($x), "'!\n";
-                }
+                push @array, $x->$method($self->[$i]->get_value);
             }
-
         }
         elsif ($self->_is_code($obj)) {
             for (my $i = 1 ; $i <= $offset ; $i += 2) {
-                $array->push($obj->call($self->[$i - 1]->get_value, $self->[$i]->get_value));
+                push @array, $obj->call($self->[$i - 1]->get_value, $self->[$i]->get_value);
             }
         }
 
-        $array;
+        $self->new(@array);
     }
 
     *reduce_pairs = \&reducePairs;
@@ -741,12 +779,7 @@ package Sidef::Types::Array::Array {
         if ($self->_is_string($obj, 1, 1)) {
             my $method = $$obj;
             foreach my $i (1 .. $offset) {
-                if ($x->can($method)) {
-                    $x = ($x->$method($self->[$i]->get_value));
-                }
-                else {
-                    warn "[WARN] Array.reduce: can't find method '$method' for object '", ref($x), "'!\n";
-                }
+                $x = ($x->$method($self->[$i]->get_value));
             }
         }
         elsif ($self->_is_code($obj)) {
