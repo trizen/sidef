@@ -18,6 +18,28 @@ package Sidef::Types::String::String {
         ${$_[0]};
     }
 
+    sub unroll_operator {
+        my ($self, $operator, $arg) = @_;
+        Sidef::Types::Array::Array->new(map { __PACKAGE__->new($_) } split(//, $$self))->unroll_operator(
+
+            # The operator, followed by...
+            $operator,
+
+            # ...an optional argument
+            defined($arg)
+            ? $self->_is_string($arg)
+                  ? Sidef::Types::Array::Array->new(map { __PACKAGE__->new($_) } split(//, $$arg))
+                  : return
+            : ()
+
+        )->join;
+    }
+
+    sub reduce_operator {
+        my ($self, $operator) = @_;
+        Sidef::Types::Array::Array->new(map { __PACKAGE__->new($_) } split(//, $$self))->reduce_operator($operator);
+    }
+
     sub inc {
         my ($self) = @_;
         my $copy = $$self;
