@@ -214,6 +214,7 @@ scripts/functional_modules.sf
 scripts/functions.sf
 scripts/gamma_function.sf
 scripts/gcd.sf
+scripts/gd_sierpinsky_triangle.sf
 scripts/getopt.sf
 scripts/global_regex_matching.sf
 scripts/group_precedence.sf

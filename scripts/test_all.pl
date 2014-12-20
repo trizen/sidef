@@ -19,6 +19,7 @@ my %ignored;
       bulls_and_cows.sf
       bulls_and_cows_player.sf
       built_in_classes.sf
+      gd_sierpinsky_triangle.sf
       http_tiny.sf
       langton_s_ant.sf
       langton_s_ant_2.sf
@@ -42,7 +43,6 @@ my %ignored;
 
 if ($] < 5.018) {
     undef $ignored{'JASH.sf'};
-    undef $ignored{'unicode_support.sf'};
 }
 
 my $regex_filter;
