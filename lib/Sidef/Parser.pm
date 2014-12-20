@@ -33,284 +33,79 @@ package Sidef::Parser {
                             'Sidef::Types::Bool::If'     => 1,
                             'Sidef::Types::Block::Given' => 1,
                            },
-            obj_stat => [
-                         {
-                          sub => sub { Sidef::Types::Nil::Nil->new },
-                          re  => qr/\Gnil\b/,
-                         },
-                         {
-                          sub => sub { Sidef::Types::Bool::Bool->true },
-                          re  => qr/\Gtrue\b/,
-                         },
-                         {
-                          sub => sub { Sidef::Types::Bool::Bool->false },
-                          re  => qr/\G(?:false|Bool)\b/,
-                         },
-                         {
-                          sub => sub { Sidef::Types::Block::Next->new },
-                          re  => qr/\Gnext\b/,
-                         },
-                         {
-                          sub => sub { Sidef::Types::Block::Continue->new },
-                          re  => qr/\Gcontinue\b/,
-                         },
-                         {
-                          sub => sub { Sidef::Types::Black::Hole->new },
-                          re  => qr/\GBlackHole\b/,
-                         },
-                         {
-                          sub => sub { Sidef::Types::Block::Code->new },
-                          re  => qr/\GBlock\b/,
-                         },
-                         {
-                          sub => sub { Sidef::Types::Glob::FileHandle->new(fh => \*ARGV) },
-                          re  => qr/\GARGF\b/,
-                         },
-                         {
-                          sub => sub { Sidef::Types::Glob::FileHandle->stdin },
-                          re  => qr/\GSTDIN\b/,
-                         },
-                         {
-                          sub => sub { Sidef::Types::Glob::FileHandle->stdout },
-                          re  => qr/\GSTDOUT\b/,
-                         },
-                         {
-                          sub => sub { Sidef::Types::Glob::FileHandle->stderr },
-                          re  => qr/\GSTDERR\b/,
-                         },
-                         {
-                          sub => sub { Sidef::Types::Glob::Dir->new },
-                          re  => qr/\GDir\b/,
-                         },
-                         {
-                          sub => sub { Sidef::Types::Glob::File->new },
-                          re  => qr/\GFile\b/,
-                         },
-                         {
-                          sub => sub { Sidef::Types::Glob::Fcntl->new },
-                          re  => qr/\GFcntl\b/,
-                         },
-                         {
-                          sub => sub { Sidef::Types::Array::Array->new },
-                          re  => qr/\GArr(?:ay)?\b/,
-                         },
-                         {
-                          sub => sub { Sidef::Types::Array::MultiArray->new },
-                          re  => qr/\GMultiArr(?:ay)?\b/,
-                         },
-                         {
-                          sub => sub { Sidef::Types::Array::Pair->new },
-                          re  => qr/\GPair\b/,
-                         },
-                         {
-                          sub => sub { Sidef::Types::Hash::Hash->new },
-                          re  => qr/\GHash\b/,
-                         },
-                         {
-                          sub => sub { Sidef::Types::String::String->new },
-                          re  => qr/\GStr(?:ing)?\b/,
-                         },
-                         {
-                          sub => sub { Sidef::Types::Number::Number->new },
-                          re  => qr/\GNum(?:ber)?\b/,
-                         },
-                         {
-                          sub => sub { Sidef::Math::Math->new },
-                          re  => qr/\GMath\b/,
-                         },
-                         {
-                          sub => sub { Sidef::Types::Glob::Pipe->new },
-                          re  => qr/\GPipe\b/,
-                         },
-                         {
-                          sub => sub { Sidef::Types::Byte::Byte->new },
-                          re  => qr/\GByte\b/,
-                         },
-                         {
-                          sub => sub { Sidef::Variable::LazyMethod->new },
-                          re  => qr/\GLazyMethod\b/,
-                         },
-                         {
-                          sub => sub { Sidef::Types::Byte::Bytes->new },
-                          re  => qr/\GBytes\b/,
-                         },
-                         {
-                          sub => sub { Sidef::Time::Time->new('__INIT__') },
-                          re  => qr/\GTime\b/,
-                         },
-                         {
-                          sub => sub { Sidef::Sys::SIG->new },
-                          re  => qr/\G(?:Sig|SIG)\b/,
-                         },
-                         {
-                          sub => sub { Sidef::Types::Char::Char->new },
-                          re  => qr/\GCha?r\b/,
-                         },
-                         {
-                          sub => sub { Sidef::Types::Char::Chars->new },
-                          re  => qr/\GCha?rs\b/,
-                         },
-                         {
-                          sub => sub { Sidef::Sys::Sys->new },
-                          re  => qr/\GSys\b/,
-                         },
-                         {
-                          sub => sub { Sidef::Types::Regex::Regex->new('') },
-                          re  => qr/\GRegex\b/,
-                         },
-                         {
-                          sub => sub { Sidef->new },
-                          re  => qr/\GSidef\b/,
-                         },
-                         {
-                          sub => sub { Sidef::Perl::Perl->new },
-                          re  => qr/\GPerl\b/,
-                         },
-                         {
-                          sub => sub { Sidef::Variable::Magic->new(\$., 1) },
-                          re  => qr/\G\$\./,
-                         },
-                         {
-                          sub => sub { Sidef::Variable::Magic->new(\$?, 1) },
-                          re  => qr/\G\$\?/,
-                         },
-                         {
-                          sub => sub { Sidef::Variable::Magic->new(\$$, 1) },
-                          re  => qr/\G\$\$/,
-                         },
-                         {
-                          sub => sub { Sidef::Variable::Magic->new(\$^T, 1) },
-                          re  => qr/\G\$\^T\b/,
-                         },
-                         {
-                          sub => sub { Sidef::Variable::Magic->new(\$|, 1) },
-                          re  => qr/\G\$\|/,
-                         },
-                         {
-                          sub => sub { Sidef::Variable::Magic->new(\$!, 0) },
-                          re  => qr/\G\$!/,
-                         },
-                         {
-                          sub => sub { Sidef::Variable::Magic->new(\$", 0) },
-                          re  => qr/\G\$"/,
-                         },
-                         {
-                          sub => sub { Sidef::Variable::Magic->new(\$\, 0) },
-                          re  => qr/\G\$\\/,
-                         },
-                         {
-                          sub => sub { Sidef::Variable::Magic->new(\$/, 0) },
-                          re  => qr{\G\$/},
-                         },
-                         {
-                          sub => sub { Sidef::Variable::Magic->new(\$;, 0) },
-                          re  => qr/\G\$;/,
-                         },
-                         {
-                          sub => sub { Sidef::Variable::Magic->new(\$,, 0) },
-                          re  => qr/\G\$,/,
-                         },
-                         {
-                          sub => sub { Sidef::Variable::Magic->new(\$^O, 0) },
-                          re  => qr/\G\$\^O\b/,
-                         },
-                         {
-                          sub => sub { Sidef::Variable::Magic->new(\$^X, 0) },
-                          re  => qr/\G\$\^PERL\b/,
-                         },
-                         {
-                          sub => sub { Sidef::Variable::Magic->new(\$0, 0) },
-                          re  => qr/\G\$0\b/,
-                         },
-                         {
-                          sub => sub { Sidef::Variable::Magic->new(\$), 0) },
-                          re  => qr/\G\$\)/,
-                         },
-                         {
-                          sub => sub { Sidef::Variable::Magic->new(\$(, 0) },
-                          re  => qr/\G\$\(/,
-                         },
-                         {
-                          sub => sub { Sidef::Variable::Magic->new(\$<, 1) },
-                          re  => qr/\G\$</,
-                         },
-                         {
-                          sub => sub { Sidef::Variable::Magic->new(\$>, 1) },
-                          re  => qr/\G\$>/,
-                         },
-                        ],
-            obj_keys => [    # this objects can take arguments
-                {
-                 sub     => sub { Sidef::Types::Bool::If->new },
-                 re      => qr/\G(?=if\b)/,
-                 dynamic => 1,
-                },
-                {
-                 sub     => sub { Sidef::Types::Bool::While->new },
-                 re      => qr/\G(?=while\b)/,
-                 dynamic => 1,
-                },
-                {
-                 sub     => sub { Sidef::Types::Block::For->new },
-                 re      => qr/\G(?=for(?:each)?\b)/,
-                 dynamic => 1,
-                },
-                {
-                 sub     => sub { Sidef::Types::Block::Return->new },
-                 re      => qr/\G(?=return\b)/,
-                 dynamic => 1,
-                },
-                {
-                 sub     => sub { Sidef::Types::Block::Break->new },
-                 re      => qr/\G(?=break\b)/,
-                 dynamic => 1,
-                },
-                {
-                 sub     => sub { Sidef::Types::Block::Try->new },
-                 re      => qr/\G(?=try\b)/,
-                 dynamic => 1,
-                },
-                {
-                 sub     => sub { Sidef::Types::Block::Given->new },
-                 re      => qr/\G(?=(?:given|switch)\b)/,
-                 dynamic => 1,
-                },
-                {
-                 sub     => sub { Sidef::Module::Require->new },
-                 re      => qr/\G(?=require\b)/,
-                 dynamic => 1,
-                },
-                {
-                 sub     => sub { Sidef::Sys::Sys->new },
-                 re      => qr/\G(?=(?:print(?:ln|f)?+|say|exit|read)\b)/,
-                 dynamic => 0,
-                },
-                {
-                 sub => sub { Sidef::Sys::Sys->new(line => $_[0]->{line}, file_name => $_[0]->{file_name}) },
-                 re      => qr/\G(?=(?:die|warn)\b)/,
-                 dynamic => 1,
-                },
-                {
-                 sub     => sub { Sidef::Types::Block::Code->new },
-                 re      => qr/\G(?=loop\b)/,
-                 dynamic => 0,
-                },
-                {
-                 sub     => sub { Sidef::Variable::Ref->new() },
-                 re      => qr/\G(?=[*\\&]|\+\+|--)/,
-                 dynamic => 1,
-                },
-                {
-                 sub     => sub { Sidef::Types::Number::Unary->new },
-                 re      => qr/\G(?=[?√+~!-])/,
-                 dynamic => 0,
-                },
-                {
-                 sub     => sub { Sidef::Types::Hash::Hash->new },
-                 re      => qr/\G(?=:)/,
-                 dynamic => 0,
-                },
-            ],
+            static_obj => qr{\G
+                (?>
+                       nil\b                          (?{ sub { Sidef::Types::Nil::Nil->new }})
+                     | true\b                         (?{ sub { Sidef::Types::Bool::Bool->true }})
+                     | (?:false|Bool)\b               (?{ sub { Sidef::Types::Bool::Bool->false }})
+                     | next\b                         (?{ sub { Sidef::Types::Block::Next->new }})
+                     | continue\b                     (?{ sub { Sidef::Types::Block::Continue->new }})
+                     | BlackHole\b                    (?{ sub { Sidef::Types::Black::Hole->new }})
+                     | Block\b                        (?{ sub { Sidef::Types::Block::Code->new }})
+                     | ARGF\b                         (?{ sub { Sidef::Types::Glob::FileHandle->new(fh => \*ARGV) }})
+                     | STDIN\b                        (?{ sub { Sidef::Types::Glob::FileHandle->stdin }})
+                     | STDOUT\b                       (?{ sub { Sidef::Types::Glob::FileHandle->stdout }})
+                     | STDERR\b                       (?{ sub { Sidef::Types::Glob::FileHandle->stderr }})
+                     | Dir\b                          (?{ sub { Sidef::Types::Glob::Dir->new }})
+                     | File\b                         (?{ sub { Sidef::Types::Glob::File->new }})
+                     | Fcntl\b                        (?{ sub { Sidef::Types::Glob::Fcntl->new }})
+                     | Arr(?:ay)?+\b                  (?{ sub { Sidef::Types::Array::Array->new }})
+                     | MultiArr(?:ay)?+\b             (?{ sub { Sidef::Types::Array::MultiArray->new }})
+                     | Pair\b                         (?{ sub { Sidef::Types::Array::Pair->new }})
+                     | Hash\b                         (?{ sub { Sidef::Types::Hash::Hash->new }})
+                     | Str(?:ing)?+\b                 (?{ sub { Sidef::Types::String::String->new }})
+                     | Num(?:ber)?+\b                 (?{ sub { Sidef::Types::Number::Number->new }})
+                     | Math\b                         (?{ sub { Sidef::Math::Math->new }})
+                     | Pipe\b                         (?{ sub { Sidef::Types::Glob::Pipe->new }})
+                     | Byte\b                         (?{ sub { Sidef::Types::Byte::Byte->new }})
+                     | LazyMethod\b                   (?{ sub { Sidef::Variable::LazyMethod->new }})
+                     | Bytes\b                        (?{ sub { Sidef::Types::Byte::Bytes->new }})
+                     | Time\b                         (?{ sub { Sidef::Time::Time->new('__INIT__') }})
+                     | (?:Sig|SIG)\b                  (?{ sub { Sidef::Sys::SIG->new }})
+                     | Cha?r\b                        (?{ sub { Sidef::Types::Char::Char->new }})
+                     | Cha?rs\b                       (?{ sub { Sidef::Types::Char::Chars->new }})
+                     | Sys\b                          (?{ sub { Sidef::Sys::Sys->new }})
+                     | Regex\b                        (?{ sub { Sidef::Types::Regex::Regex->new('') }})
+                     | Sidef\b                        (?{ sub { Sidef->new }})
+                     | Perl\b                         (?{ sub { Sidef::Perl::Perl->new }})
+                     | \$\.                           (?{ sub { Sidef::Variable::Magic->new(\$., 1) }})
+                     | \$\?                           (?{ sub { Sidef::Variable::Magic->new(\$?, 1) }})
+                     | \$\$                           (?{ sub { Sidef::Variable::Magic->new(\$$, 1) }})
+                     | \$\^T\b                        (?{ sub { Sidef::Variable::Magic->new(\$^T, 1) }})
+                     | \$\|                           (?{ sub { Sidef::Variable::Magic->new(\$|, 1) }})
+                     | \$!                            (?{ sub { Sidef::Variable::Magic->new(\$!, 0) }})
+                     | \$"                            (?{ sub { Sidef::Variable::Magic->new(\$", 0) }})
+                     | \$\\                           (?{ sub { Sidef::Variable::Magic->new(\$\, 0) }})
+                     | \$/                            (?{ sub { Sidef::Variable::Magic->new(\$/, 0) }})
+                     | \$;                            (?{ sub { Sidef::Variable::Magic->new(\$;, 0) }})
+                     | \$,                            (?{ sub { Sidef::Variable::Magic->new(\$,, 0) }})
+                     | \$\^O\b                        (?{ sub { Sidef::Variable::Magic->new(\$^O, 0) }})
+                     | \$\^PERL\b                     (?{ sub { Sidef::Variable::Magic->new(\$^X, 0) }})
+                     | \$0\b                          (?{ sub { Sidef::Variable::Magic->new(\$0, 0) }})
+                     | \$\)                           (?{ sub { Sidef::Variable::Magic->new(\$), 0) }})
+                     | \$\(                           (?{ sub { Sidef::Variable::Magic->new(\$(, 0) }})
+                     | \$<                            (?{ sub { Sidef::Variable::Magic->new(\$<, 1) }})
+                     | \$>                            (?{ sub { Sidef::Variable::Magic->new(\$>, 1) }})
+                ) (?!::)
+            }x,
+            prefix_obj => qr{\G
+              (?:
+                  if\b                                    (?{ [1, sub { Sidef::Types::Bool::If->new }]})
+                | while\b                                 (?{ [1, sub { Sidef::Types::Bool::While->new }]})
+                | for(?:each)?+\b                         (?{ [1, sub { Sidef::Types::Block::For->new }]})
+                | return\b                                (?{ [1, sub { Sidef::Types::Block::Return->new }]})
+                | break\b                                 (?{ [1, sub { Sidef::Types::Block::Break->new }]})
+                | try\b                                   (?{ [1, sub { Sidef::Types::Block::Try->new }]})
+                | (?:given|switch)\b                      (?{ [1, sub { Sidef::Types::Block::Given->new }]})
+                | require\b                               (?{ [1, sub { Sidef::Module::Require->new }]})
+                | (?:print(?>ln|f)?+|say|exit|read)\b     (?{ [0, sub { Sidef::Sys::Sys->new }]})
+                | (?:die|warn)\b                          (?{ [1, sub { Sidef::Sys::Sys->new(line => $_[0]->{line}, file_name => $_[0]->{file_name}) }]})
+                | loop\b                                  (?{ [0, sub { Sidef::Types::Block::Code->new }]})
+                | (?:[*\\&]|\+\+|--)                      (?{ [1, sub { Sidef::Variable::Ref->new() }]})
+                | [?√+~!-]                                (?{ [0, sub { Sidef::Types::Number::Unary->new }]})
+                | :                                       (?{ [0, sub { Sidef::Types::Hash::Hash->new }]})
+              )
+            }x,
             keywords => {
                 map { $_ => 1 }
                   qw(
@@ -1443,17 +1238,8 @@ package Sidef::Parser {
                            );
                 }
 
-                foreach my $hash_ref (@{$self->{obj_keys}}) {
-                    if (/$hash_ref->{re}/) {
-                        return (
-                                (
-                                   $hash_ref->{dynamic}
-                                 ? $hash_ref->{sub}->($self)
-                                 : ($self->{static_objects}{$hash_ref} //= $hash_ref->{sub}->())
-                                ),
-                                pos, 1
-                               );
-                    }
+                if (/$self->{prefix_obj}/goc) {
+                    return (($^R->[0] ? $^R->[1]($self) : ($self->{static_objects}{$^R->[1]} //= $^R->[1]())), $-[0], 1);
                 }
 
                 # Eval keyword
@@ -1473,10 +1259,9 @@ package Sidef::Parser {
                       pos;
                 }
 
-                foreach my $hash_ref (@{$self->{obj_stat}}) {
-                    if (/$hash_ref->{re} (?!::)/gxc) {
-                        return (($self->{static_objects}{$hash_ref} //= $hash_ref->{sub}->()), pos);
-                    }
+                # Static object (like String or nil)
+                if (/$self->{static_obj}/goc) {
+                    return (($self->{static_objects}{$^R} //= $^R->()), pos);
                 }
 
                 if (/\G__RESET_LINE_COUNTER__\b;*/gc) {
