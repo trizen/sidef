@@ -433,9 +433,13 @@ package Sidef::Types::String::String {
 
         $str //= __PACKAGE__->new('');
         $self->_is_string($str) || return;
-        $regex = $self->_string_or_regex($regex);
+        my $search = $self->_string_or_regex($regex);
 
-        $self->new($$self =~ s{$regex}{$$str}r);
+        if (ref $regex eq 'Sidef::Types::Regex::Regex') {
+            $regex->match($self)->to_bool or return $self;
+        }
+
+        $self->new($$self =~ s{$search}{$$str}r);
     }
 
     *replace = \&sub;
@@ -448,9 +452,13 @@ package Sidef::Types::String::String {
 
         $str //= __PACKAGE__->new('');
         $self->_is_string($str) || return;
-        $regex = $self->_string_or_regex($regex);
+        my $search = $self->_string_or_regex($regex);
 
-        $self->new($$self =~ s{$regex}{$$str}gr);
+        if (ref $regex eq 'Sidef::Types::Regex::Regex') {
+            $regex->match($self)->to_bool or return $self;
+        }
+
+        $self->new($$self =~ s{$search}{$$str}gr);
     }
 
     *gReplace = \&gsub;
@@ -464,28 +472,36 @@ package Sidef::Types::String::String {
         my ($self, $regex, $code) = @_;
 
         $code //= __PACKAGE__->new('');
-        $regex = $self->_string_or_regex($regex);
+        my $search = $self->_string_or_regex($regex);
+
+        if (ref $regex eq 'Sidef::Types::Regex::Regex') {
+            $regex->match($self)->to_bool or return $self;
+        }
 
         if ($self->_is_string($code, 1, 1)) {
-            return __PACKAGE__->new($$self =~ s{$regex}{$$code}eer);
+            return __PACKAGE__->new($$self =~ s{$search}{$$code}eer);
         }
 
         $self->_is_code($code) || return;
-        __PACKAGE__->new($$self =~ s{$regex}{$code->call(_get_captures($$self))}er);
+        __PACKAGE__->new($$self =~ s{$search}{$code->call(_get_captures($$self))}er);
     }
 
     sub gesub {
         my ($self, $regex, $code) = @_;
 
         $code //= __PACKAGE__->new('');
-        $regex = $self->_string_or_regex($regex);
+        my $search = $self->_string_or_regex($regex);
+
+        if (ref $regex eq 'Sidef::Types::Regex::Regex') {
+            $regex->match($self)->to_bool or return $self;
+        }
 
         if ($self->_is_string($code, 1, 1)) {
-            return __PACKAGE__->new($$self =~ s{$regex}{$$code}geer);
+            return __PACKAGE__->new($$self =~ s{$search}{$$code}geer);
         }
 
         $self->_is_code($code) || return;
-        __PACKAGE__->new($$self =~ s{$regex}{$code->call(_get_captures($$self))}ger);
+        __PACKAGE__->new($$self =~ s{$search}{$code->call(_get_captures($$self))}ger);
     }
 
     sub glob {
