@@ -605,6 +605,20 @@ package Sidef::Types::String::String {
     *lines    = \&each_line;
     *eachLine = \&each_line;
 
+    sub open_r {
+        my ($self, @rest) = @_;
+        require Encode;
+        my $string = Encode::encode_utf8($$self);
+        Sidef::Types::Glob::File->new(\$string)->open_r(@rest);
+    }
+
+    sub open {
+        my ($self, @rest) = @_;
+        require Encode;
+        my $string = Encode::encode_utf8($$self);
+        Sidef::Types::Glob::File->new(\$string)->open(@rest);
+    }
+
     sub trim {
         my ($self) = @_;
         $self->new(unpack('A*', $$self) =~ s/^\s+//r);

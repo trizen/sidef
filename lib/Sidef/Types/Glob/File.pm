@@ -9,7 +9,7 @@ package Sidef::Types::Glob::File {
 
     sub new {
         my (undef, $file) = @_;
-        ref($file) && return $file->to_file;
+        ref($file) && ref($file) ne 'SCALAR' && return $file->to_file;
         bless \$file, __PACKAGE__;
     }
 

@@ -205,6 +205,7 @@ scripts/fibonacci_iterative.sf
 scripts/fibonacci_mystery.sf
 scripts/fibonacci_validation.sf
 scripts/file_find_module.sf
+scripts/floyds_triangle.sf
 scripts/for_two_vars.sf
 scripts/func_and_class_test.sf
 scripts/function_composition.sf
@@ -342,6 +343,7 @@ scripts/tennis_tournament.sf
 scripts/test_all.pl
 scripts/tk_library.sf
 scripts/token_recursive.sf
+scripts/triangle_path.sf
 scripts/trizen's_pair_numbers.sf
 scripts/two_dimensional_array.sf
 scripts/unary_inc_dec.sf
