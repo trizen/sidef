@@ -91,8 +91,6 @@ if (defined(my $types = $args{M})) {
 
 # Code from a dumped parse-tree
 if (defined $args{d}) {
-    require Math::BigFloat;
-    Math::BigFloat->import;
     my $struct = do($args{d})
       || die "Can't load the data structure from file '$args{d}': $!\n";
     execute_struct($struct);
@@ -332,6 +330,29 @@ EOT
     }
 }
 
+sub _get_namespaces {
+    @Sidef::Exec::NAMESPACES
+      ? ('push(@Sidef::Exec::NAMESPACES, ' . join(', ', map { qq{"\Q$_\E"} } @Sidef::Exec::NAMESPACES) . ");\n")
+      : '';
+}
+
+sub _get_number_type {
+    my $code = "use Math::BigFloat;\n";
+
+    if (defined(my $type = $args{N})) {
+        if ($type eq 'fast' or $type eq 'perl') {
+            $code .= "require Sidef::Types::Number::NumberFast;\n";
+        }
+        elsif ($type eq 'rat') {
+            $code .= "require Sidef::Types::Number::NumberRat;\n";
+        }
+        elsif ($type eq 'int') {
+            $code .= "require Sidef::Types::Number::NumberInt;\n";
+        }
+    }
+    $code;
+}
+
 sub dump_structure {
     my ($struct) = @_;
 
@@ -347,7 +368,8 @@ sub dump_structure {
             open $out_fh, '>:utf8', $args{o}
               or die "Can't open file '$args{o}' for write: $!\n";
         }
-
+        print {$out_fh} _get_namespaces();
+        print {$out_fh} _get_number_type();
         print {$out_fh} Data::Dump::pp($struct);
     }
 }
@@ -496,7 +518,7 @@ use warnings;
 
 # For `inf` and `nan` barewords
 no strict 'subs';
-no warnings 'reserved';
+no warnings 'reserved', 'once';
 
 use File::Temp qw(tempdir);
 use File::Path qw(make_path);
@@ -575,19 +597,7 @@ FOOT
               or die "Can't open file `$filename' for reading: $!";
 
             $package_content .= <$fh>;
-            $package_content .= "use Math::BigFloat;\n";
-
-            if (defined(my $type = $args{N})) {
-                if ($type eq 'fast' or $type eq 'perl') {
-                    $package_content .= "require Sidef::Types::Number::NumberFast;\n";
-                }
-                elsif ($type eq 'rat') {
-                    $package_content .= "require Sidef::Types::Number::NumberRat;\n";
-                }
-                elsif ($type eq 'int') {
-                    $package_content .= "require Sidef::Types::Number::NumberInt;\n";
-                }
-            }
+            $package_content .= _get_number_type();
 
             close $fh;
         }
@@ -604,6 +614,7 @@ FOOT
 
         print {$out_fh} $package_content;
 
+        print {$out_fh} _get_namespaces;
         print {$out_fh} "\nmy \$struct = ";
         print {$out_fh} Data::Dump::pp($struct);
         print {$out_fh} ";\n";
