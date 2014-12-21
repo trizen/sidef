@@ -5,7 +5,7 @@ var str = "regex and sidef";
 var res = [];
 var pos = 0;
 
-while (var match = (str.match(/(.{5})/, pos)).isSuccessful) {
+while (var match = (str.match(/(.{5})/, pos)) -> isSuccessful) {
     pos  = (match.pos.last);
     res += (match.captures);
 }

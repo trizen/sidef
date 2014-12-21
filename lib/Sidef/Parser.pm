@@ -2,7 +2,6 @@ package Sidef::Parser {
 
     use utf8;
     use 5.014;
-    use re 'eval';
 
     our $DEBUG = 0;
 
@@ -98,7 +97,7 @@ package Sidef::Parser {
                 | try\b                                   (?{ [1, sub { Sidef::Types::Block::Try->new }]})
                 | (?:given|switch)\b                      (?{ [1, sub { Sidef::Types::Block::Given->new }]})
                 | require\b                               (?{ [1, sub { Sidef::Module::Require->new }]})
-                | (?:print(?>ln|f)?+|say|exit|read)\b     (?{ [0, sub { Sidef::Sys::Sys->new }]})
+                | (?:print(?:ln|f)?+|say|exit|read)\b     (?{ [0, sub { Sidef::Sys::Sys->new }]})
                 | (?:die|warn)\b                          (?{ [1, sub { Sidef::Sys::Sys->new(line => $_[0]->{line}, file_name => $_[0]->{file_name}) }]})
                 | loop\b                                  (?{ [0, sub { Sidef::Types::Block::Code->new }]})
                 | (?:[*\\&]|\+\+|--)                      (?{ [1, sub { Sidef::Variable::Ref->new() }]})
@@ -469,8 +468,9 @@ package Sidef::Parser {
             my $end_delim;
             foreach my $key ('|', (keys %{$self->{delim_pairs}})) {
                 next if exists $opt{ignore_delim} and exists $opt{ignore_delim}{$key};
-                if (/\G\Q$key\E\h*(?(?=\R)\R\h*(?{++$self->{line}}))/gc) {
+                if (/\G\Q$key\E\h*/gc) {
                     $end_delim = $self->{delim_pairs}{$key} // '|';
+                    /\G\R\h*/gc && ++$self->{line};
                     last;
                 }
             }
@@ -483,12 +483,22 @@ package Sidef::Parser {
                     $vars[-1] .= '=' . substr($_, pos($_), $pos);
                     pos($_) += $pos;
                 }
-                defined($end_delim)
-                  && (/\G\h*,\h*(?(?=\R)\R\h*(?{++$self->{line}}))/gc
-                      || last);
+
+                defined($end_delim) && (/\G\h*,\h*/gc || last);
+                /\G\h*\R\h*/gc && ++$self->{line};
             }
 
-            defined($end_delim) && /\G\h*(?(?=\R)\R\h*(?{++$self->{line}}))\h*\Q$end_delim\E/gc;
+            /\G\h*\R/gc && ++$self->{line};
+            defined($end_delim)
+              && (
+                  /\G\h*\Q$end_delim\E/gc
+                  || $self->fatal_error(
+                                        code  => $_,
+                                        pos   => pos,
+                                        error => "can't find the closing delimiter: '$end_delim'",
+                                       )
+                 );
+
             return (\@vars, pos($_) // 0);
         }
     }
@@ -501,8 +511,9 @@ package Sidef::Parser {
             my $end_delim;
             foreach my $key ('|', (keys %{$self->{delim_pairs}})) {
                 next if exists $opt{ignore_delim} and exists $opt{ignore_delim}{$key};
-                if (/\G\Q$key\E\h*(?(?=\R)\R\h*(?{++$self->{line}}))/gc) {
+                if (/\G\Q$key\E\h*/gc) {
                     $end_delim = $self->{delim_pairs}{$key} // '|';
+                    /\G\R\h*/gc && ++$self->{line};
                     last;
                 }
             }
@@ -514,7 +525,7 @@ package Sidef::Parser {
                 if (exists $self->{keywords}{$name}) {
                     $self->fatal_error(
                                        code  => $_,
-                                       pos   => (pos($_) - length($name)),
+                                       pos   => $-[2],
                                        error => "'$name' is either a keyword or a predefined variable!",
                                       );
                 }
@@ -555,18 +566,18 @@ package Sidef::Parser {
                 }
 
                 push @var_objs, $obj;
-                defined($end_delim)
-                  && (/\G\h*,\h*(?(?=\R)\R\h*(?{++$self->{line}}))/gc
-                      || last);
+                defined($end_delim) && (/\G\h*,\h*/gc || last);
+                /\G\h*\R\h*/gc && ++$self->{line};
             }
 
+            /\G\h*\R/gc && ++$self->{line};
             defined($end_delim)
               && (
-                  /\G\h*(?(?=\R)\R\h*(?{++$self->{line}}))\h*\Q$end_delim\E/gc
+                  /\G\h*\Q$end_delim\E/gc
                   || $self->fatal_error(
                                         code  => $_,
-                                        pos   => (pos($_) - 1),
-                                        error => "unbalanced parentheses",
+                                        pos   => pos,
+                                        error => "can't find the closing delimiter: '$end_delim'",
                                        )
                  );
 
