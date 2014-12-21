@@ -478,7 +478,7 @@ package Sidef::Parser {
             my @vars;
             while (/\G(\*?$self->{re}{var_name})/goc) {
                 push @vars, $1;
-                if ($opt{with_vals} && defined($end_delim) && /\G\h*(?:=|\bis\b)\h*/gc) {
+                if ($opt{with_vals} && defined($end_delim) && /\G\h*(?:[=:]|\bis\b)\h*/gc) {
                     my (undef, $pos) = $self->parse_obj(code => substr($_, pos));
                     $vars[-1] .= '=' . substr($_, pos($_), $pos);
                     pos($_) += $pos;
@@ -538,7 +538,7 @@ package Sidef::Parser {
                 }
 
                 my $value;
-                if (defined($end_delim) && /\G\h*(?:=|\bis\b)\h*/gc) {
+                if (defined($end_delim) && /\G\h*(?:[=:]|\bis\b)\h*/gc) {
                     my ($obj, $pos) = $self->parse_obj(code => substr($_, pos));
                     pos($_) += $pos;
                     $value =
@@ -1254,8 +1254,8 @@ package Sidef::Parser {
                 }
 
                 # Eval keyword
-                if (/\G(?=eval\b)/) {
-                    return Sidef::Eval::Eval->new($self, {$self->{class} => [@{$self->{vars}{$self->{class}}}]}), pos, 1;
+                if (/\Geval\b/) {
+                    return Sidef::Eval::Eval->new($self, {$self->{class} => [@{$self->{vars}{$self->{class}}}]}), $-[0], 1;
                 }
 
                 if (/\GParser\b/gc) {
