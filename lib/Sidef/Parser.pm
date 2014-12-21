@@ -597,6 +597,11 @@ package Sidef::Parser {
                 # Whitespace
                 if (/\G(?=\s)/) {
 
+                    # Horizontal space
+                    if (/\G\h+/gc) {
+                        redo;
+                    }
+
                     # Generic line
                     if (/\G\R/gc) {
                         ++$self->{line};
@@ -647,13 +652,8 @@ package Sidef::Parser {
                         redo;
                     }
 
-                    # Horizontal space
-                    if (/\G\h+/gc) {
-                        redo;
-                    }
-
                     # Vertical space
-                    if (/\G\v+/gc) {
+                    if (/\G\v+/gc) {    # should not reach here
                         redo;
                     }
                 }

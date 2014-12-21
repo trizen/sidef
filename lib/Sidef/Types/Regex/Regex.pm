@@ -1,7 +1,8 @@
 package Sidef::Types::Regex::Regex {
 
     use 5.014;
-    use re 'eval';
+
+    use re 'eval';    # XXX: do we really want this?
 
     our @ISA = qw(
       Sidef
