@@ -124,7 +124,7 @@ package Sidef::Variable::Variable {
             my ($self, $code) = @_;
 
             if ($self->_is_defined) {
-                return $self;
+                return $self->get_value;
             }
 
             Sidef::Types::Block::Code->new($code)->run;
