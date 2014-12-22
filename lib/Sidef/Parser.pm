@@ -85,6 +85,7 @@ package Sidef::Parser {
                      | \$\(                           (?{ sub { Sidef::Variable::Magic->new(\$(, 0) }})
                      | \$<                            (?{ sub { Sidef::Variable::Magic->new(\$<, 1) }})
                      | \$>                            (?{ sub { Sidef::Variable::Magic->new(\$>, 1) }})
+                     | ∞                              (?{ sub { require Math::BigFloat; Sidef::Math::Math->inf }})
                 ) (?!::)
             }x,
             prefix_obj => qr{\G
