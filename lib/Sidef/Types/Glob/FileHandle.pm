@@ -47,6 +47,15 @@ package Sidef::Types::Glob::FileHandle {
         CORE::binmode($self->{fh}, $$encoding);
     }
 
+    sub compare {
+        my ($self, $fh) = @_;
+        $self->_is_fh($fh) || return;
+        require File::Compare;
+        Sidef::Types::Number::Number->new(File::Compare::compare($self->{fh}, $fh->{fh}));
+    }
+
+    *cmp = \&compare;
+
     sub writeString {
         my ($self, @args) = @_;
 
@@ -331,8 +340,9 @@ package Sidef::Types::Glob::FileHandle {
 
     {
         no strict 'refs';
-        *{__PACKAGE__ . '::' . '>>'} = \&read_to;
-        *{__PACKAGE__ . '::' . '<<'} = \&output_from;
+        *{__PACKAGE__ . '::' . '>>'}  = \&read_to;
+        *{__PACKAGE__ . '::' . '<<'}  = \&output_from;
+        *{__PACKAGE__ . '::' . '<=>'} = \&compare;
     }
 
 };

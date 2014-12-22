@@ -13,7 +13,7 @@ package Sidef::Types::Glob::File {
         bless \$file, __PACKAGE__;
     }
 
-    *split = \&Sidef::Types::Glob::Dir::split;
+    *call = \&new;
 
     sub get_value {
         ${$_[0]};
@@ -37,6 +37,15 @@ package Sidef::Types::Glob::File {
         my ($self) = @_;
         Sidef::Types::Number::Number->new(-s $$self);
     }
+
+    sub compare {
+        my ($self, $file) = @_;
+        $self->_is_file($file) || return;
+        require File::Compare;
+        Sidef::Types::Number::Number->new(File::Compare::compare($$self, $$file));
+    }
+
+    *cmp = \&compare;
 
     sub exists {
         my ($self) = @_;
@@ -240,17 +249,41 @@ package Sidef::Types::Glob::File {
     *dir_name = \&dirname;
     *dirName  = \&dirname;
 
+    sub is_absolute {
+        my ($self) = @_;
+        require File::Spec;
+        Sidef::Types::Bool::Bool->new(File::Spec->file_name_is_absolute($$self));
+    }
+
+    *is_abs = \&is_absolute;
+
     sub abs_name {
         my ($self) = @_;
 
         require File::Spec;
-        __PACKAGE__->new(File::Spec->rel2abs($$self));
+        $self->new(File::Spec->rel2abs($$self));
     }
 
     *abs     = \&abs_name;
     *absname = \&abs_name;
     *absName = \&abs_name;
     *rel2abs = \&abs_name;
+
+    sub rel_name {
+        my ($self, $base) = @_;
+        require File::Spec;
+        $self->new(
+               File::Spec->rel2abs(
+                    $$self,
+                    defined($base) ? ref($base) eq 'Sidef::Types::Glob::Dir' || $self->_is_string($base) ? $$base : return : ()
+               )
+        );
+    }
+
+    *rel     = \&rel_name;
+    *relname = \&rel_name;
+    *relName = \&rel_name;
+    *abs2rel = \&rel_name;
 
     sub rename {
         my ($self, $file) = @_;
@@ -423,8 +456,8 @@ package Sidef::Types::Glob::File {
 
     sub chown {
         my ($self, $uid, $gid) = @_;
-        $self->_is_number($uid) || do { warn "[WARN] File.chown(): 'uid' is not numeric!\n"; return };
-        $self->_is_number($gid) || do { warn "[WARN] File.chown(): 'gid' is not numeric!\n"; return };
+        $self->_is_number($uid) || return;
+        $self->_is_number($gid) || return;
         Sidef::Types::Bool::Bool->new(CORE::chown($$uid, $$gid, $$self));
     }
 
@@ -459,6 +492,14 @@ package Sidef::Types::Glob::File {
     sub dump {
         my ($self) = @_;
         Sidef::Types::String::String->new('File.new(' . ${Sidef::Types::String::String->new($$self)->dump} . ')');
+    }
+
+    # Path split
+    *split = \&Sidef::Types::Glob::Dir::split;
+
+    {
+        no strict 'refs';
+        *{__PACKAGE__ . '::' . '<=>'} = \&compare;
     }
 
 };

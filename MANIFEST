@@ -92,6 +92,7 @@ lib/Sidef/Types/Hash/Hash.pm
 lib/Sidef/Types/Hash/Hash.pod
 lib/Sidef/Types/Nil/Nil.pm
 lib/Sidef/Types/Nil/Nil.pod
+lib/Sidef/Types/Number/Complex.pm
 lib/Sidef/Types/Number/Number.pm
 lib/Sidef/Types/Number/Number.pod
 lib/Sidef/Types/Number/NumberFast.pm

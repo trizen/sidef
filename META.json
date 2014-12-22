@@ -206,6 +206,9 @@
       "Sidef::Types::Nil::Nil" : {
          "file" : "lib/Sidef/Types/Nil/Nil.pm"
       },
+      "Sidef::Types::Number::Complex" : {
+         "file" : "lib/Sidef/Types/Number/Complex.pm"
+      },
       "Sidef::Types::Number::Number" : {
          "file" : "lib/Sidef/Types/Number/Number.pm"
       },

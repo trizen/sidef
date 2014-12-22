@@ -35,8 +35,25 @@ package Sidef::Types::Glob::Dir {
           || (getpwuid($<))[7]
           || `echo -n ~`;
 
-        defined($home) ? __PACKAGE__->new($home) : ();
+        defined($home) ? __PACKAGE__->new($home) : do {
+            require File::HomeDir;
+            __PACKAGE__->new(File::HomeDir->my_home);
+        };
     }
+
+    *homedir  = \&home;
+    *home_dir = \&home;
+
+    sub tmp {
+        require File::Spec;
+        __PACKAGE__->new(File::Spec->tmpdir);
+    }
+
+    *tmpdir   = \&tmp;
+    *tempdir  = \&tmp;
+    *temp     = \&tmp;
+    *temp_dir = \&tmp;
+    *tmp_dir  = \&tmp;
 
     sub cwd {
         require Cwd;
@@ -47,6 +64,11 @@ package Sidef::Types::Glob::Dir {
     *cur               = \&cwd;
     *current_directory = \&cwd;
     *current_dir       = \&cwd;
+
+    sub pwd {
+        require File::Spec;
+        __PACKAGE__->new(File::Spec->curdir);
+    }
 
     sub exists {
         my ($self) = @_;
@@ -193,18 +215,40 @@ package Sidef::Types::Glob::Dir {
 
     *isEmpty = \&is_empty;
 
+    # is_dir
     *is_directory = \&Sidef::Types::Glob::File::is_directory;
     *is_dir       = \&is_directory;
     *isDir        = \&is_directory;
     *isDirectory  = \&is_directory;
 
+    # readlink
     *readlink = \&Sidef::Types::Glob::File::readlink;
     *readLink = \&readlink;
 
+    # utime
     *utime = \&Sidef::Types::Glob::File::utime;
 
+    # stat/lstat
     *stat  = \&Sidef::Types::Glob::File::stat;
     *lstat = \&Sidef::Types::Glob::File::lstat;
+
+    # rel_name
+    *rel_name = \&Sidef::Types::Glob::File::rel_name;
+    *rel      = \&rel_name;
+    *relname  = \&rel_name;
+    *relName  = \&rel_name;
+    *abs2rel  = \&rel_name;
+
+    # abs_name
+    *abs_name = \&Sidef::Types::Glob::File::abs_name;
+    *abs      = \&abs_name;
+    *absname  = \&abs_name;
+    *absName  = \&abs_name;
+    *rel2abs  = \&abs_name;
+
+    # is abs
+    *is_absolute = \&Sidef::Types::Glob::File::is_absolute;
+    *is_abs      = \&is_absolute;
 
     sub dump {
         my ($self) = @_;

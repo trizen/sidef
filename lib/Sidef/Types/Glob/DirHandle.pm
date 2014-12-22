@@ -87,6 +87,11 @@ package Sidef::Types::Glob::DirHandle {
         Sidef::Types::Bool::Bool->new(seekdir($self->{dir_h}, $$pos));
     }
 
+    sub rewind {
+        my ($self) = @_;
+        Sidef::Types::Bool::Bool->new(rewinddir($self->{dir_h}));
+    }
+
     sub close {
         my ($self) = @_;
         Sidef::Types::Bool::Bool->new(closedir($self->{dir_h}));

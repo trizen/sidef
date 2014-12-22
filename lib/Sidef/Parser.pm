@@ -60,6 +60,7 @@ package Sidef::Parser {
                      | LazyMethod\b                   (?{ sub { Sidef::Variable::LazyMethod->new }})
                      | Bytes\b                        (?{ sub { Sidef::Types::Byte::Bytes->new }})
                      | Time\b                         (?{ sub { Sidef::Time::Time->new('__INIT__') }})
+                     | Complex\b                      (?{ sub { Sidef::Types::Number::Complex->new }})
                      | (?:Sig|SIG)\b                  (?{ sub { Sidef::Sys::SIG->new }})
                      | Cha?r\b                        (?{ sub { Sidef::Types::Char::Char->new }})
                      | Cha?rs\b                       (?{ sub { Sidef::Types::Char::Chars->new }})
@@ -1189,12 +1190,13 @@ package Sidef::Parser {
                 }
 
                 # Integer or float number
-                if (/\G([+-]?+(?=\.?[0-9])[0-9_]*+(?:\.[0-9_]++)?(?:[Ee](?:[+-]?+[0-9_]+))?)([rif]\b|)/gc) {
+                if (/\G([+-]?+(?=\.?[0-9])[0-9_]*+(?:\.[0-9_]++)?(?:[Ee](?:[+-]?+[0-9_]+))?)([rifc]\b|)/gc) {
                     my $num = $1 =~ tr/_//dr;
                     return (
                               $2 eq 'f' ? Sidef::Types::Number::Number->new_float($num)
                             : $2 eq 'i' ? Sidef::Types::Number::Number->new_int($num)
                             : $2 eq 'r' ? Sidef::Types::Number::Number->new_rat($num)
+                            : $2 eq 'c' ? Sidef::Types::Number::Complex->new($num)
                             : Sidef::Types::Number::Number->new($num),
                             pos
                            );

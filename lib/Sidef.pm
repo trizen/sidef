@@ -9,14 +9,18 @@ package Sidef {
                      code   => {class => {'Sidef::Types::Block::Code' => 1}},
                      hash   => {class => {'Sidef::Types::Hash::Hash'  => 1}},
                      number => {
-                                class => {'Sidef::Types::Number::Number' => 1},
-                                type  => 'SCALAR',
+                                class => {
+                                          'Sidef::Types::Number::Number'  => 1,
+                                          'Sidef::Types::Number::Complex' => 1,
+                                         },
+                                type => 'SCALAR',
                                },
                      var_ref => {class => {'Sidef::Variable::Ref' => 1}},
                      file    => {
                               class => {'Sidef::Types::Glob::File' => 1},
                               type  => 'SCALAR',
                              },
+                     fh  => {class => {'Sidef::Types::Glob::FileHandle' => 1}},
                      dir => {
                              class => {'Sidef::Types::Glob::Dir' => 1},
                              type  => 'SCALAR',

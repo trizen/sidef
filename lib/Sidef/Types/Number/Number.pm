@@ -637,6 +637,11 @@ package Sidef::Types::Number::Number {
 
     *shiftLeft = \&shift_left;
 
+    sub complex {
+        my ($self, $num) = @_;
+        Sidef::Types::Number::Complex->new($self, $num);
+    }
+
     {
         no strict 'refs';
 
@@ -672,6 +677,7 @@ package Sidef::Types::Number::Number {
         *{__PACKAGE__ . '::' . '>>'}  = \&shift_right;
         *{__PACKAGE__ . '::' . '<<'}  = \&shift_left;
         *{__PACKAGE__ . '::' . '~'}   = \&not;
+        *{__PACKAGE__ . '::' . ':'}   = \&complex;
     }
 };
 

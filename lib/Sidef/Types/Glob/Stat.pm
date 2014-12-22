@@ -39,6 +39,6 @@ package Sidef::Types::Glob::Stat {
         $self->new(stat => [lstat($arg)], obj => $obj);
     }
 
-}
+};
 
-1;
+1

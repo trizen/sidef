@@ -54,6 +54,7 @@ require Sidef::Types::Glob::PipeHandle;
 require Sidef::Types::Glob::Stat;
 require Sidef::Types::Hash::Hash;
 require Sidef::Types::Nil::Nil;
+require Sidef::Types::Number::Complex;
 require Sidef::Types::Number::Number;
 require Sidef::Types::Number::Unary;
 require Sidef::Types::Regex::Regex;

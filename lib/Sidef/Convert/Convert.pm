@@ -73,6 +73,16 @@ package Sidef::Convert::Convert {
     *toRat       = \&to_rat;
     *toRational  = \&to_rat;
 
+    sub to_complex {
+        my ($self) = @_;
+        $self->_is_number($self, 1, 1) || $self->_is_string($self)
+          ? Sidef::Types::Number::Complex->new($self)
+          : ();
+    }
+
+    *toComplex = \&to_complex;
+    *to_c      = \&to_complex;
+
     sub to_num {
         my ($self) = @_;
             $self->_is_number($self, 1, 1) ? $self
