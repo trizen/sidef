@@ -30,7 +30,7 @@ my $version = $Sidef::VERSION;
 my %args;
 if ($#ARGV != -1 and chr ord $ARGV[0] eq '-') {
     require Getopt::Std;
-    Getopt::Std::getopts('E:d:Dho:ivHN:n:WwcM:S', \%args);
+    Getopt::Std::getopts('e:E:d:Dho:ivHN:n:WwcM:S', \%args);
 }
 
 # Help
@@ -107,7 +107,7 @@ elsif (defined $args{i}) {
 }
 else {
     my $script_name = '-';
-
+    $args{E} = $args{e} if exists($args{e});
     my $code = exists($args{E})
       ? do {
         defined($args{E}) || die "No code specified for -E.\n";

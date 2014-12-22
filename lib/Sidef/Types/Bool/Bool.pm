@@ -81,6 +81,9 @@ package Sidef::Types::Bool::Bool {
         $$self eq 'true' ? $self->false : $self->true;
     }
 
+    *flip   = \&not;
+    *toggle = \&not;
+
     sub or {
         my ($self, $code) = @_;
 

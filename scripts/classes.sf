@@ -5,34 +5,47 @@ class FIFO(*array) {
         self.empty && die "underflow";
         self[:array].shift;
     };
-    method push(item) {
-        self[:array].push(item);
+    method push(*items) {
+        self[:array] += items;
+        self;
     };
     method empty {
         self[:array].len == 0;
     };
-}
+};
 
 var f1 = FIFO();
 var f2 = FIFO();
 
-f1.push("a");
-f2.push("b");
+f1.push('a');
+f2.push('b');
 
-f1[:array] == %w(a) || die "1-f1";
-f2[:array] == %w(b) || die "1-f2";
+f1[:array] == %w(a) || die '1-f1';
+f2[:array] == %w(b) || die '1-f2';
 
-f1.push("a");
-f2.push("b");
+f1.push('a');
+f2.push('b');
 
-f1[:array] == %w(a a) || die "2-f1";
-f2[:array] == %w(b b) || die "2-f2";
+f1[:array] == %w(a a) || die '2-f1';
+f2[:array] == %w(b b) || die '2-f2';
 
 f1.pop;
 f2.pop;
 
-f1[:array] == %w(a) || die "3-f1";
-f2[:array] == %w(b) || die "3-f2";
+f1[:array] == %w(a) || die '3-f1';
+f2[:array] == %w(b) || die '3-f2';
+
+var f = FIFO();
+f.empty   == true        || die '1-f';
+f.push('foo');
+f.push('bar', 'baz');
+f.pop     == 'foo'       || die '2-f';
+f[:array] == %w(bar baz) || die '3-f';
+
+var g = FIFO('xxx', 'yyy');
+g.pop     == 'xxx'       || die '1-g';
+f.pop     == 'bar'       || die '4-f';
+g[:array] == ['yyy']     || die '2-g';
 
 say "** Test passed!";
 
