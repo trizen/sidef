@@ -1,8 +1,47 @@
 #!/usr/bin/ruby
 
-# This file is old and need to be corrected!
+class FIFO(*array) {
+    method pop {
+        self.empty && die "underflow";
+        self[:array].shift;
+    };
+    method push(item) {
+        self[:array].push(item);
+    };
+    method empty {
+        self[:array].len == 0;
+    };
+}
+
+var f1 = FIFO();
+var f2 = FIFO();
+
+f1.push("a");
+f2.push("b");
+
+f1[:array] == %w(a) || die "1-f1";
+f2[:array] == %w(b) || die "1-f2";
+
+f1.push("a");
+f2.push("b");
+
+f1[:array] == %w(a a) || die "2-f1";
+f2[:array] == %w(b b) || die "2-f2";
+
+f1.pop;
+f2.pop;
+
+f1[:array] == %w(a) || die "3-f1";
+f2[:array] == %w(b) || die "3-f2";
+
+say "** Test passed!";
 
 __END__
+
+#
+## The code from bellow is old and needs to be corrected!
+#
+
 class Math;
 
 var public_var  = "This is a public class variable!";

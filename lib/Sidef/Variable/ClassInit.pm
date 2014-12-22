@@ -50,9 +50,8 @@ package Sidef::Variable::ClassInit {
           map { $_->{value} } @{$self->{__VARS__}};
 
         # Set the class arguments
-        foreach my $i (0 .. $#args) {
-            my $arg = $args[$i];
-            if (ref($arg) eq 'Sidef::Types::Array::Pair') {
+        foreach my $i (0 .. $#{$self->{__VARS__}}) {
+            if (ref($args[$i]) eq 'Sidef::Types::Array::Pair') {
                 foreach my $pair (@args[$i .. $#args]) {
                     ref($pair) eq 'Sidef::Types::Array::Pair' || do {
                         warn "[WARN]: Class init error -- expected a Pair type argument, but got: ", ref($pair), "\n";
@@ -63,7 +62,12 @@ package Sidef::Variable::ClassInit {
                 last;
             }
 
-            $class->{__VARS__}{$self->{__VARS__}[$i]{name}} = $args[$i];
+            exists($self->{__VARS__}[$i]->{multi}) && do {
+                $class->{__VARS__}{$self->{__VARS__}[$i]{name}} = Sidef::Types::Array::Array->new(@args[$i .. $#args]);
+                next;
+            };
+
+            $class->{__VARS__}{$self->{__VARS__}[$i]{name}} = exists($args[$i]) ? $args[$i] : $self->{__VARS__}[$i]->{value};
         }
 
         # Run the auxiliary code of the class

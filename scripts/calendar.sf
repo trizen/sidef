@@ -43,7 +43,7 @@ var monName = (t.strftime("%B"));
                     "Su Mo Tu We Th Fr Sa",
                   );
 
-' ' * 3 * (st % 7).print;
+' ' * 3 * (st % 7) -> print;
 
 { |i|
     printf(i == day ? "\e[7m%2d\e[0m " : "%2d ", i);
