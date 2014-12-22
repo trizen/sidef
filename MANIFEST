@@ -180,6 +180,7 @@ scripts/class_inheritance.sf
 scripts/classes.sf
 scripts/classes_and_objects.sf
 scripts/cnp.sf
+scripts/cocktailsort.sf
 scripts/code_interpolation.sf
 scripts/code_to_hash.sf
 scripts/combinations.sf
