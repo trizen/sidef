@@ -1013,36 +1013,45 @@ package Sidef::Types::Array::Array {
 
     *containsAll = \&contains_all;
 
-    sub pop {
-        my ($self, $index) = @_;
+    sub shift {
+        my ($self, $num) = @_;
 
-        if (defined $index) {
-            if ($self->_is_number($index, 1, 1)) {
-                $$index <= $#{$self} or do {
-                    warn "[WARN] Array.pop: index '$$index' is bigger than array's offset '$#{$self}'!\n";
-                    return;
-                };
-            }
-            else {
-                warn sprintf("[WARN] Array.pop: expected a position number object, not '%s'!\n", ref($index));
-                return;
-            }
-
-            return CORE::splice(@{$self}, $$index, 1);
+        if (defined $num) {
+            $self->_is_number($num) || return;
+            return $self->new(map { $_->get_value } CORE::splice(@{$self}, 0, $$num));
         }
 
         $#{$self} > -1 || return;
-        pop @{$self};
+        shift(@{$self})->get_value;
     }
 
-    *delete_index = \&pop;
-    *deleteIndex  = \&pop;
-    *pop_index    = \&pop;
-    *popIndex     = \&pop;
+    *dropFirst  = \&shift;
+    *drop_first = \&shift;
+    *dropLeft   = \&shift;
+    *drop_left  = \&shift;
+
+    sub pop {
+        my ($self, $num) = @_;
+
+        if (defined $num) {
+            $self->_is_number($num) || return;
+            $num = $$num > $#{$self} ? 0 : @{$self} - $$num;
+            return $self->new(map { $_->get_value } CORE::splice(@{$self}, $num));
+        }
+
+        $#{$self} > -1 || return;
+        pop(@{$self})->get_value;
+    }
+
+    *drop_last  = \&pop;
+    *dropLast   = \&pop;
+    *drop_right = \&pop;
+    *dropRight  = \&pop;
 
     sub pop_rand {
         my ($self) = @_;
-        CORE::splice @{$self}, CORE::rand($#{$self} + 1), 1;
+        $#{$self} > -1 || return;
+        CORE::splice(@{$self}, CORE::rand($#{$self} + 1), 1)->get_value;
     }
 
     *popRand = \&pop_rand;
@@ -1051,8 +1060,7 @@ package Sidef::Types::Array::Array {
         my ($self, $offset, $length, @objects) = @_;
 
         $offset = defined($offset) && $self->_is_number($offset) ? $$offset : 0;
-        $length = defined($length)
-          && $self->_is_number($length) ? $$length : scalar(@{$self});
+        $length = defined($length) && $self->_is_number($length) ? $$length : scalar(@{$self});
 
         if (@objects) {
             return $self->new(map { $_->get_value } CORE::splice(@{$self}, $offset, $length, @{__PACKAGE__->new(@objects)}));
@@ -1064,81 +1072,21 @@ package Sidef::Types::Array::Array {
     sub takeRight {
         my ($self, $amount) = @_;
         $self->_is_number($amount) || return;
-
         my $offset = $#{$self};
-        $offset >= ($$amount - 1)
-          || do {
-            warn "[WARN] Array.takeRight: too many elements specified ($$amount)! Array's offset is: $offset\n";
-            $$amount = $offset + 1;
-          };
-
-        $self->new(map { $_->get_value } @{$self}[$offset - $$amount + 1 .. $offset]);
+        $amount = $offset > ($$amount - 1) ? $$amount - 1 : $offset;
+        $self->new(map { $_->get_value } @{$self}[$offset - $amount .. $offset]);
     }
 
     *take_right = \&takeRight;
 
-    sub dropRight {
-        my ($self, $amount) = @_;
-        $self->_is_number($amount) || return;
-
-        my $offset = $#{$self};
-        $offset >= ($$amount - 1)
-          || do {
-            warn "[WARN] Array.dropRight: too many elements specified! ($$amount)! Array's offset is: $offset\n";
-            $$amount = $offset + 1;
-          };
-
-        $self->new(map { $_->get_value } CORE::splice(@{$self}, -$$amount));
-    }
-
-    *drop_right = \&dropRight;
-
     sub takeLeft {
         my ($self, $amount) = @_;
         $self->_is_number($amount) || return;
-
-        my $offset = $#{$self};
-        $offset >= ($$amount - 1)
-          || do {
-            warn "[WARN] Array.takeLeft: too many elements specified ($$amount)! Array's offset is: $offset\n";
-            $$amount = $offset + 1;
-          };
-
-        $self->new(map { $_->get_value } @{$self}[0 .. $$amount - 1]);
+        $amount = $#{$self} > ($$amount - 1) ? $$amount - 1 : $#{$self};
+        $self->new(map { $_->get_value } @{$self}[0 .. $amount]);
     }
 
     *take_left = \&takeLeft;
-
-    sub dropLeft {
-        my ($self, $amount) = @_;
-        $self->_is_number($amount) || return;
-
-        my $offset = $#{$self};
-        $offset >= ($$amount - 1)
-          || do {
-            warn "[WARN] Array.dropLeft: too many elements specified! ($$amount)! Array's offset is: $offset\n";
-            $$amount = $offset + 1;
-          };
-
-        $self->new(map { $_->get_value } CORE::splice(@{$self}, 0, $$amount));
-    }
-
-    *drop_left = \&dropLeft;
-
-    sub shift {
-        my ($self) = @_;
-        shift @{$self};
-    }
-
-    *dropFirst  = \&shift;
-    *drop_first = \&shift;
-
-    sub dropLast {
-        my ($self) = @_;
-        CORE::pop @{$self};
-    }
-
-    *drop_last = \&dropLast;
 
     sub sort {
         my ($self, $code) = @_;
