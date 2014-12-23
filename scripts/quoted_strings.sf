@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/ruby
 
 #
 ## %w() with comments and space-escapes
@@ -89,5 +89,20 @@ double_q = %Q „tab:\t -- not a tab: \\t”;
 double_q == ('tab:' + "\t" + ' -- not a tab: \\t')
     || ("%Q„” error!\n".die);
 
+var str = 'h€ll©';
+%B"#{str}".join == 'h€ll©'      || die "%B() error";
+%B"#{str}" == str.to_bytes      || die "%B() conversion error";
+%B'ab#{str}'.join == "ab#{str}" || die "%B() ab-pre error";
+%B'#{str}cd'.join = "#{str}cd"  || die "%B() cd-post error";
+%B«literal».join == "literal"   || die "%B() literal error";
+%B(h€ll©).join == str           || die "%B() unicode literal error";
+%C"x=#{1+2};".join == %(x=3;)   || die "%C() error";
+%C"blah" == "blah".to_chars     || die "%C() conversion error";
+
+%C"blah=#{'a'+'b' -> uc}".join =='blah=AB'       || die "%C() complex error";
+%D"#{Dir.root}home" == Dir.root.concat(%d(home)) || die "%D() error";
+%b(Copyright © 2014) == %B(Copyright © 2014)     || die "%b() <=> %B() error";
+%b(copy-©-).join == 'copy-©-'                    || die "%b() join error";
+%C"#{str}".join == str                           || die "%C() str error";
 
 "All tests passed!".say;

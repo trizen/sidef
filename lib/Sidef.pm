@@ -91,26 +91,20 @@ package Sidef {
             *{__PACKAGE__ . '::' . $method->[0]} = sub {
                 my ($self, $arg) = @_;
 
-                my $call = $method->[0];
-                my $bool = $method->[1];
-
                 if (not defined($arg)
                     and ref($self) eq 'Sidef::Types::Nil::Nil') {
-                    return Sidef::Types::Bool::Bool->new(!$bool);
+                    return Sidef::Types::Bool::Bool->new(!$method->[1]);
                 }
 
                 ref($self) ne ref($arg)
-                  and return Sidef::Types::Bool::Bool->new($bool);
+                  and return Sidef::Types::Bool::Bool->new($method->[1]);
 
-                if (not defined($arg)
-                    or ref($self) eq 'Sidef::Types::Nil::Nil') {
-                    return Sidef::Types::Bool::Bool->new(!$bool);
-                }
-                elsif (ref($self) eq 'Sidef::Types::Bool::Bool') {
-                    return Sidef::Types::Bool::Bool->new(($$self eq $$arg) - $bool);
+                require Scalar::Util;
+                if (Scalar::Util::reftype($self) eq 'SCALAR') {
+                    return Sidef::Types::Bool::Bool->new(($$self eq $$arg) - $method->[1]);
                 }
 
-                return Sidef::Types::Bool::Bool->new($bool);
+                return Sidef::Types::Bool::Bool->new($method->[1]);
             };
         }
 
@@ -256,10 +250,9 @@ package Sidef {
         my ($self, @args) = @_;
         $self->new(
             CORE::join(
-                '', $$self,
+                '',
                 map {
-                    eval { ${$_->to_s} }
-                      // $_
+                    eval { ${$_->to_s} } // $_
                   } @args
             )
         );

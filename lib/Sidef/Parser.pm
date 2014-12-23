@@ -129,12 +129,12 @@ package Sidef::Parser {
                 | (?: %X\b. | ` )                                          (?{ [qw(1 new Sidef::Types::Glob::Backtick)] })
 
                 # Bytes
-                | %b\b.                                                    (?{ [qw(0 call Sidef::Types::Byte::Bytes)] })
-                | %B\b.                                                    (?{ [qw(1 call Sidef::Types::Byte::Bytes)] })
+                | %b\b.                                                    (?{ [qw(0 to_bytes Sidef::Types::Byte::Bytes)] })
+                | %B\b.                                                    (?{ [qw(1 to_bytes Sidef::Types::Byte::Bytes)] })
 
                 # Chars
-                | %c\b.                                                    (?{ [qw(0 call Sidef::Types::Char::Chars)] })
-                | %C\b.                                                    (?{ [qw(1 call Sidef::Types::Char::Chars)] })
+                | %c\b.                                                    (?{ [qw(0 to_chars Sidef::Types::Char::Chars)] })
+                | %C\b.                                                    (?{ [qw(1 to_chars Sidef::Types::Char::Chars)] })
              )
             }xs,
             keywords => {
@@ -745,6 +745,14 @@ package Sidef::Parser {
                     my $old_pos = pos($_) - 1;
                     my ($string, $pos) = $self->get_quoted_string(code => (substr($_, $old_pos)));
 
+                    # Special case for array-like objects (bytes and chars)
+                    my @array_like;
+                    if ($method ne 'new') {
+                        @array_like = ($package, $method);
+                        $package    = 'Sidef::Types::String::String';
+                        $method     = 'new';
+                    }
+
                     my $obj =
                       $double_quoted
                       ? Sidef::Types::String::String::apply_escapes($package->$method($string), $self)
@@ -766,6 +774,14 @@ package Sidef::Parser {
 
                         push @{$struct->{$self->{class}}[-1]{call}}, {method => '`'};
                         $obj = $struct;
+                    }
+                    elsif (@array_like) {
+                        if ($double_quoted and ref($obj) eq 'HASH') {
+                            push @{$obj->{$self->{class}}[-1]{call}}, {method => $array_like[1]};
+                        }
+                        else {
+                            $obj = $array_like[0]->call($obj);
+                        }
                     }
 
                     return ($obj, $old_pos + $pos);
