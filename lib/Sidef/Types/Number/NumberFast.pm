@@ -9,9 +9,7 @@ package Sidef::Types::Number::Number {
       );
 
     sub new {
-        my (undef, $num) = @_;
-        $num += 0;
-        bless \$num, __PACKAGE__;
+        bless \($_[1] + 0), __PACKAGE__;
     }
 
     *new_float = \&new;
@@ -21,7 +19,10 @@ package Sidef::Types::Number::Number {
         __PACKAGE__->new(CORE::int($num));
     }
 
-    sub new_rat { ... }
+    sub new_rat {
+        require Math::BigRat;
+        __PACKAGE__->new(Math::BigRat->new(ref($_[1]) ? ${$_[1]} : $_[1]));
+    }
 
     sub get_value { ${$_[0]} }
 

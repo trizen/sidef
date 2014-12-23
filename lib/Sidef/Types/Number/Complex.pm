@@ -23,7 +23,7 @@ package Sidef::Types::Number::Complex {
             $x = $$x;
         }
 
-        if (ref($x) eq 'Math::Complex') {
+        if (not defined $y and ref($x) eq 'Math::Complex') {
             return bless \$x, __PACKAGE__;
         }
 
@@ -31,7 +31,16 @@ package Sidef::Types::Number::Complex {
             if ($rx eq 'Math::BigFloat' or $rx eq 'Math::BigInt') {
                 ## ok
             }
-            else { $x = 0 }
+            elsif ($rx eq 'Math::BigRat') {
+                $x = $x->as_float;
+            }
+            elsif ($rx eq 'Math::Complex') {
+                $x = Math::Complex::Re($x);
+            }
+            elsif ($self->_is_number($x)) {
+                $x = $$x;
+            }
+            else { return }
         }
 
         #
@@ -45,7 +54,16 @@ package Sidef::Types::Number::Complex {
             if ($ry eq 'Math::BigFloat' or $ry eq 'Math::BigInt') {
                 ## ok
             }
-            else { $y = 0 }
+            elsif ($ry eq 'Math::BigRat') {
+                $y = $y->as_float;
+            }
+            elsif ($ry eq 'Math::Complex') {
+                $y = Math::Complex::Im($y);
+            }
+            elsif ($self->_is_number($y)) {
+                $y = $$y;
+            }
+            else { return }
         }
 
         #if (not defined(&Math::BigFloat::_cartesian)) {
@@ -69,7 +87,15 @@ package Sidef::Types::Number::Complex {
               :                            'fast';
 
             if ($type ne 'fast') {
-                delete $INC{'Sidef/Types/Number/Number.pm'};
+                delete @INC{'Sidef/Types/Number/Number.pm', 'Sidef/Types/Number/NumberFast.pm'};
+
+                if ($type eq 'int') {
+                    delete $INC{'Sidef/Types/Number/NumberInt.pm'};
+                }
+                elsif ($type eq 'rat') {
+                    delete $INC{'Sidef/Types/Number/NumberRat.pm'};
+                }
+
                 require Sidef::Types::Number::NumberFast;
             }
 
@@ -89,16 +115,22 @@ package Sidef::Types::Number::Complex {
                         };
                     }
                 }
+
+                *conjugated = \&Sidef::Types::Number::Complex::not;
+                *conj       = \&Sidef::Types::Number::Complex::not;
             }
+
+            #delete @Sidef::Types::Number::Number::{keys %Sidef::Types::Number::Number::};
 
             if ($type ne 'fast') {
                 delete $INC{'Sidef/Types/Number/Number.pm'};
+                delete $INC{'Sidef/Types/Number/NumberFast.pm'};
             }
 
-            if ($type eq 'float') {
-                require Sidef::Types::Number::Number;
-            }
-            elsif ($type eq 'int') {
+            delete $Sidef::Types::Number::Number::{can};    # weird fix
+            require Sidef::Types::Number::Number;
+
+            if ($type eq 'int') {
                 require Sidef::Types::Number::NumberInt;
             }
             elsif ($type eq 'rat') {
@@ -142,6 +174,10 @@ package Sidef::Types::Number::Complex {
 
     *im = \&imaginary;
     *Im = \&imaginary;
+
+    sub reciprocal {
+        __PACKAGE__->new(1)->div($_[0]);
+    }
 
     sub get_constant {
         my ($self, $name) = @_;

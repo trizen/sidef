@@ -1,0 +1,24 @@
+#!/usr/bin/ruby
+
+# http://rosettacode.org/wiki/Arithmetic/Complex#Sidef
+
+var a = 1:1;                         # same as: Complex(1, 1)
+var b = Complex(3.14159, 1.25);
+
+[   a + b,                  # addition
+    a * b,                  # multiplication
+    -a,                     # negation
+    a.reciprocal,           # multiplicative inverse
+    ~a,                     # complex conjugate
+    a.abs,                  # abs
+    a.sqrt.cartesian,       # sqrt
+    b.re,                   # real part
+    b.im,                   # imaginary part
+].each { |c| say c };
+
+Complex(3, 4) == 3:4        || die "error 1";
+Complex(0, 4) == 4.i        || die "error 2";
+Complex(3, 0) == 3.c        || die "error 3";
+Complex(0, 1) == Complex::i || die "error 4";
+
+Complex(3, 4).conj == ~(3:4)  || die "error 5";

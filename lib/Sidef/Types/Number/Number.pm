@@ -642,6 +642,13 @@ package Sidef::Types::Number::Number {
         Sidef::Types::Number::Complex->new($self, $num);
     }
 
+    *c = \&complex;
+
+    sub i {
+        my ($self, $num) = @_;
+        Sidef::Types::Number::Complex->new($self)->multiply(Sidef::Types::Number::Complex->get_constant('i'));
+    }
+
     {
         no strict 'refs';
 
