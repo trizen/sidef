@@ -88,7 +88,7 @@ package Sidef::Types::Number::Number {
 
     sub bin {
         my ($self) = @_;
-        $self->new(oct("b$$self"));
+        $self->new(CORE::oct("b$$self"));
     }
 
     sub int {

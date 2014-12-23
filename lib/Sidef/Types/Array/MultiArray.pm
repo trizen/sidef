@@ -9,11 +9,6 @@ package Sidef::Types::Array::MultiArray {
 
     sub new {
         my (undef, @args) = @_;
-
-        foreach my $arg (@args) {
-            Sidef->_is_array($arg) || return;
-        }
-
         my @array = map {
             [map { $_->get_value } @{$_}]
         } @args;

@@ -252,6 +252,19 @@ package Sidef {
         bless {}, __PACKAGE__;
     }
 
+    sub super_join {
+        my ($self, @args) = @_;
+        $self->new(
+            CORE::join(
+                '', $$self,
+                map {
+                    eval { ${$_->to_s} }
+                      // $_
+                  } @args
+            )
+        );
+    }
+
     sub respond_to {
         my ($self, $method) = @_;
         Sidef::Types::Bool::Bool->new($self->can($method));

@@ -144,17 +144,6 @@ package Sidef::Types::Glob::Dir {
     *make_path  = \&create_tree;
     *mkpath     = \&create_tree;
 
-    sub abs_name {
-        my ($self) = @_;
-
-        require File::Spec;
-        __PACKAGE__->new(File::Spec->rel2abs($$self));
-    }
-
-    *absName  = \&abs_name;
-    *abs_path = \&abs_name;
-    *absPath  = \&abs_name;
-
     sub open {
         my ($self, $var_ref) = @_;
 
@@ -245,6 +234,8 @@ package Sidef::Types::Glob::Dir {
     *absname  = \&abs_name;
     *absName  = \&abs_name;
     *rel2abs  = \&abs_name;
+    *abs_path = \&abs_name;
+    *absPath  = \&abs_name;
 
     # is abs
     *is_absolute = \&Sidef::Types::Glob::File::is_absolute;

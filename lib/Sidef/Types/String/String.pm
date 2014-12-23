@@ -1008,9 +1008,17 @@ package Sidef::Types::String::String {
                 splice @chars, $pair->[0] + $i, 0, $pair->[1];
             }
 
-            my $expr;
+            my $expr = {
+                        $parser->{class} => [
+                                             {
+                                              self => $self->new,
+                                              call => [{method => 'super_join'}]
+                                             }
+                                            ]
+                       };
+
             my $append_arg = sub {
-                push @{$expr->{$parser->{class}}[0]{call}}, {arg => [$_[0]], method => '+'};
+                push @{$expr->{$parser->{class}}[0]{call}[-1]{arg}}, $_[0];
             };
 
             my $string = '';
@@ -1020,42 +1028,24 @@ package Sidef::Types::String::String {
                                  $parser->{class} => [
                                                       {
                                                        self => $char,
-                                                       call => [{method => 'run'}, {method => 'to_s'}]
+                                                       call => [{method => 'run'}]
                                                       }
                                                      ]
                                 };
 
-                    if (CORE::not defined $expr) {
-                        $expr = {
-                                 $parser->{class} => [
-                                                      {
-                                                       self => $string eq ''
-                                                       ? $block
-                                                       : $self->new($string),
-                                                       call => []
-                                                      }
-                                                     ]
-                                };
-
-                        next if $string eq '';
-                        $append_arg->($block);
+                    if ($string ne '') {
+                        $append_arg->($string);
                         $string = '';
-                        next;
                     }
-
-                    $append_arg->($string eq '' ? $block : $self->new($string));
-
-                    next if $string eq '';
                     $append_arg->($block);
-                    $string = '';
-                    next;
                 }
-
-                $string .= $char;
+                else {
+                    $string .= $char;
+                }
             }
 
             if ($string ne '') {
-                $append_arg->($self->new($string));
+                $append_arg->($string);
             }
 
             return $expr;

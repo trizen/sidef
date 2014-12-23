@@ -47,7 +47,12 @@ sub process_file {
             my $module = join('/', split(/::/, $name)) . '.pm';
             my $status = eval { require $module };
             if ($@) {
-                warn "=> Invalid type name `$name', in file `$file', at line $.\n";
+                if (defined &$name) {
+                    warn "=> Plain usage of function: $name\n";
+                }
+                else {
+                    warn "=> Invalid type name `$name', in file `$file', at line $.\n";
+                }
             }
             elsif ($status ne '1') {
                 warn "=> Dubious return-value from: ", catfile($dir, $INC{$module}), "\n";

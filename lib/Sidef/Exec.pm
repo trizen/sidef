@@ -363,7 +363,6 @@ package Sidef::Exec {
                     }
 
                     $self_obj = $self_obj->$sub(@args);
-
                 }
                 else {
                     $self_obj = $self_obj->$sub;

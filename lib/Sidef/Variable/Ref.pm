@@ -38,8 +38,13 @@ package Sidef::Variable::Ref {
                 my ($self, $var) = @_;
                 $var = $var->{var}
                   if ref($var) eq __PACKAGE__;
-                $var->$method;
-                $var->get_value;
+                if (ref($var) eq 'Sidef::Variable::Variable' or ref($var) eq 'Sidef::Variable::ClassVar') {
+                    $var->$method;
+                    $var->get_value;
+                }
+                else {
+                    $var->$method;
+                }
             };
         }
 

@@ -49,6 +49,14 @@ package Sidef::Convert::Convert {
     *toString  = \&to_s;
     *to_string = \&to_s;
 
+    sub to_obj {
+        my ($self, $obj) = @_;
+        return $self if ref($self) eq ref($obj);
+        $obj->new($self);
+    }
+
+    *to_object = \&to_obj;
+
     sub to_i {
         my ($self) = @_;
         $self->_is_number($self, 1, 1) || $self->_is_string($self)
