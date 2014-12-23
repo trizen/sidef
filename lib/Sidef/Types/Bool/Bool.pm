@@ -18,6 +18,8 @@ package Sidef::Types::Bool::Bool {
             $bool{$bool ? 'true' : 'false'};
         }
 
+        *call = \&new;
+
         sub true  { $bool{true} }
         sub false { $bool{false} }
     }

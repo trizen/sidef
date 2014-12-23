@@ -10,9 +10,15 @@ package Sidef::Types::Char::Char {
         bless \$char, __PACKAGE__;
     }
 
+    sub call {
+        my ($self, $char) = @_;
+        $self->new(chr ord $char);
+    }
+
     sub dump {
         my ($self) = @_;
         Sidef::Types::String::String->new(q{Char.new('} . $$self =~ s{'}{\\'}gr . q{')});
     }
+};
 
-}
+1

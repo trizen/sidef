@@ -762,7 +762,7 @@ package Sidef::Parser {
                       pos($_) + $pos;
                 }
 
-                # Backtick
+                # Double quoted backtick
                 if (/\G%X\b/gc || /\G(?=`)/) {
                     my ($string, $pos) = $self->get_quoted_string(code => (substr($_, pos)));
 
@@ -781,11 +781,40 @@ package Sidef::Parser {
                       pos($_) + $pos;
                 }
 
+                # Single quoted backtick
                 if (/\G%x\b/gc) {
                     my ($string, $pos) = $self->get_quoted_string(code => (substr($_, pos)));
                     return {$self->{class} =>
                             [{self => Sidef::Types::Glob::Backtick->new($string =~ s{\\\\}{\\}gr), call => [{method => '`'}]}]
                            },
+                      pos($_) + $pos;
+                }
+
+                # Single quoted bytes sequence
+                if (/\G%b\b/gc) {
+                    my ($string, $pos) = $self->get_quoted_string(code => (substr($_, pos)));
+                    return Sidef::Types::Byte::Bytes->call($string =~ s{\\\\}{\\}gr), pos($_) + $pos;
+                }
+
+                # Single quoted bytes sequence
+                if (/\G%B\b/gc) {
+                    my ($string, $pos) = $self->get_quoted_string(code => (substr($_, pos)));
+                    return Sidef::Types::Byte::Bytes->call(
+                                                          ${Sidef::Types::String::String->new($string)->apply_escapes($self)}),
+                      pos($_) + $pos;
+                }
+
+                # Single quoted bytes sequence
+                if (/\G%c\b/gc) {
+                    my ($string, $pos) = $self->get_quoted_string(code => (substr($_, pos)));
+                    return Sidef::Types::Char::Chars->call($string =~ s{\\\\}{\\}gr), pos($_) + $pos;
+                }
+
+                # Single quoted bytes sequence
+                if (/\G%C\b/gc) {
+                    my ($string, $pos) = $self->get_quoted_string(code => (substr($_, pos)));
+                    return Sidef::Types::Char::Chars->call(
+                                                          ${Sidef::Types::String::String->new($string)->apply_escapes($self)}),
                       pos($_) + $pos;
                 }
 

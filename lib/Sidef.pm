@@ -12,6 +12,7 @@ package Sidef {
                                 class => {
                                           'Sidef::Types::Number::Number'  => 1,
                                           'Sidef::Types::Number::Complex' => 1,
+                                          'Sidef::Types::Byte::Byte'      => 1,
                                          },
                                 type => 'SCALAR',
                                },

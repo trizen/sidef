@@ -6,7 +6,11 @@ package Sidef::Types::Byte::Byte {
 
     sub new {
         my (undef, $byte) = @_;
-        bless \(my $b = int($byte)), __PACKAGE__;
+        require Math::BigInt;
+        bless \Math::BigInt->new($byte), __PACKAGE__;
     }
 
-}
+    *call = \&new;
+};
+
+1
