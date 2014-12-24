@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
-var f    = (require 'File::Find'->());  # functional module
-var spec = (require 'File::Spec');      # OO module
+var f    = require('File::Find').();  # functional module
+var spec = require('File::Spec');     # OO module
 
 var dir = spec.rel2abs(spec.curdir);
 
@@ -10,4 +10,18 @@ f.find(
       var absname = f._var('name');
       "%-40s%s\n".printf(file, absname);
     } => dir
+);
+
+# Filtering with wanted sub
+f.find(
+    Hash.new(
+        no_chdir => 1,
+        wanted => { |file|
+            if (file = File.new(file); file.is_file) {
+                if (/complex/i ~~ file) {
+                    say "** Found: #{file}";
+                }
+            }
+        },
+    ) => dir,
 );

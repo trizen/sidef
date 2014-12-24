@@ -19,7 +19,6 @@ my %ignored;
       metaprogramming_2.sf
       file_find_module.sf
       multi_file_edit.sf
-      tk_library.sf
       )
 } = ();
 

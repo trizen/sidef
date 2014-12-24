@@ -104,7 +104,12 @@ elsif (defined $args{t}) {
         my $code   = read_script($script_name);
         my $parser = new_parser(name => $script_name);
         my $struct = $parser->parse_script(code => $code);
-        Sidef::Exec->new()->execute($struct);
+        eval { Sidef::Exec->new()->execute($struct) };
+
+        if ($@) {
+            warn "[ERROR] Error encountered on script `$script_name': $@\n";
+            sleep 2;
+        }
 
         if (@argv) {
             unload_numbers();

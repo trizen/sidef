@@ -126,10 +126,6 @@ MANIFEST			This list of files
 META.json
 META.yml
 README.md
-scripts/100_doors.sf
-scripts/100_doors_2.sf
-scripts/100_doors_4.sf
-scripts/99_bottles.sf
 scripts/9_billion_names.sf
 scripts/abs_string.sf
 scripts/accumulator_factory.sf
@@ -233,6 +229,8 @@ scripts/gamma_function.sf
 scripts/gcd.sf
 scripts/getopt.sf
 scripts/global_regex_matching.sf
+scripts/Graphical/gtk2_tutorial.pl
+scripts/Graphical/tk_library.sf
 scripts/group_precedence.sf
 scripts/hailstone.sf
 scripts/hash_autovivification.sf
@@ -320,6 +318,10 @@ scripts/roman_numerals_decoding_3.sf
 scripts/roman_numerals_encoding.sf
 scripts/roman_numerals_encoding_2.sf
 scripts/root_mean_square.sf
+scripts/Rosettacode/100_doors.sf
+scripts/Rosettacode/100_doors_2.sf
+scripts/Rosettacode/100_doors_4.sf
+scripts/Rosettacode/99_bottles.sf
 scripts/Rosettacode/flatten_a_list.sf
 scripts/Rosettacode/hash_from_two_arrays.sf
 scripts/Rosettacode/hickerson_series_of_almost_integers.sf
@@ -360,7 +362,6 @@ scripts/sylvesters_sequence.sf
 scripts/sysopen_and_sysread.sf
 scripts/tennis_tournament.sf
 scripts/test_all.pl
-scripts/tk_library.sf
 scripts/token_recursive.sf
 scripts/triangle_path.sf
 scripts/trizen's_pair_numbers.sf
