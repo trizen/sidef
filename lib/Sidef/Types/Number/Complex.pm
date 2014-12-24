@@ -120,14 +120,10 @@ package Sidef::Types::Number::Complex {
                 *conj       = \&Sidef::Types::Number::Complex::not;
             }
 
-            #delete @Sidef::Types::Number::Number::{keys %Sidef::Types::Number::Number::};
+            delete @Sidef::Types::Number::Number::{keys %Sidef::Types::Number::Number::};
+            delete $INC{'Sidef/Types/Number/Number.pm'};
+            delete $INC{'Sidef/Types/Number/NumberFast.pm'};
 
-            if ($type ne 'fast') {
-                delete $INC{'Sidef/Types/Number/Number.pm'};
-                delete $INC{'Sidef/Types/Number/NumberFast.pm'};
-            }
-
-            delete $Sidef::Types::Number::Number::{can};    # weird fix
             require Sidef::Types::Number::Number;
 
             if ($type eq 'int') {
@@ -135,6 +131,9 @@ package Sidef::Types::Number::Complex {
             }
             elsif ($type eq 'rat') {
                 require Sidef::Types::Number::NumberRat;
+            }
+            elsif ($type eq 'fast') {
+                require Sidef::Types::Number::NumberFast;
             }
 
             $inherited = 1;

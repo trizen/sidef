@@ -1,0 +1,12 @@
+#!/usr/bin/ruby
+
+func first(f) {
+  return f.call();
+}
+
+func second {
+  return "second";
+}
+
+say first(second);              # => "second"
+say first(func { "third" });    # => "third"

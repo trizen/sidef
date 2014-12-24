@@ -30,7 +30,7 @@ my $version = $Sidef::VERSION;
 my %args;
 if ($#ARGV != -1 and chr ord $ARGV[0] eq '-') {
     require Getopt::Std;
-    Getopt::Std::getopts('e:E:d:Dho:ivHN:n:WwcM:S', \%args);
+    Getopt::Std::getopts('e:E:d:Dho:ivHN:n:WwcM:St', \%args);
 }
 
 # Help
@@ -61,21 +61,7 @@ elsif (defined $args{W}) {
 
 # Number types
 if (defined(my $type = $args{N})) {
-    if ($type eq 'fast' or $type eq 'perl') {
-        require Sidef::Types::Number::NumberFast;
-    }
-    elsif ($type eq 'rat') {
-        require Sidef::Types::Number::NumberRat;
-    }
-    elsif ($type eq 'int') {
-        require Sidef::Types::Number::NumberInt;
-    }
-    elsif ($type eq 'big' or $type eq 'float') {
-        ## default
-    }
-    else {
-        die "Invalid value '${type}' for option '-N'!";
-    }
+    load_numbers($type);
 }
 
 # Backend for Math::BigInt
@@ -105,6 +91,29 @@ elsif (defined $args{H}) {
 elsif (defined $args{i}) {
     code_interactive();
 }
+
+# Test mode
+elsif (defined $args{t}) {
+    my @argv = splice(@ARGV);
+    while (defined(my $script_name = shift @argv)) {
+
+        say "\n** Executing: $script_name";
+        say "-" x 80;
+
+        splice(@Sidef::Exec::NAMESPACES);
+        my $code   = read_script($script_name);
+        my $parser = new_parser(name => $script_name);
+        my $struct = $parser->parse_script(code => $code);
+        Sidef::Exec->new()->execute($struct);
+
+        if (@argv) {
+            unload_numbers();
+            load_numbers($args{N} // 'float');
+        }
+    }
+}
+
+# Default
 else {
     my $script_name = '-';
     $args{E} = $args{e} if exists($args{e});
@@ -117,21 +126,12 @@ else {
       }
       : defined($ARGV[0]) && (-t STDIN or -f $ARGV[0]) ? do {
         $script_name = shift @ARGV;
-
-        open my $fh, '<:utf8', $script_name
-          or die qq{Can't open sidef script "$script_name": $!\n};
-
-        local $/;
-        <$fh>;
+        read_script($script_name);
       }
       : do { local $/; <STDIN> };
 
     $code // exit 2;
-    my $parser = Sidef::Parser->new(
-                                    file_name   => $script_name,
-                                    script_name => $script_name,
-                                    strict      => !$args{S},
-                                   );
+    my $parser = new_parser(name => $script_name);
     my $struct = $parser->parse_script(code => $code);
 
     # Dump the data structure
@@ -154,6 +154,58 @@ else {
 ## Subroutines
 #
 
+sub read_script {
+    my ($script_name) = @_;
+    open my $fh, '<:utf8', $script_name
+      or die qq{Can't open sidef script "$script_name": $!\n};
+    local $/;
+    <$fh>;
+}
+
+sub new_parser {
+    my (%opt) = @_;
+    Sidef::Parser->new(
+                       file_name   => $opt{name},
+                       script_name => $opt{name},
+                       strict      => !$args{S},
+                      );
+}
+
+sub load_numbers {
+    my ($type) = @_;
+
+    require Sidef::Types::Number::Number;
+    if ($type eq 'fast' or $type eq 'perl') {
+        require Sidef::Types::Number::NumberFast;
+    }
+    elsif ($type eq 'rat') {
+        require Sidef::Types::Number::NumberRat;
+    }
+    elsif ($type eq 'int') {
+        require Sidef::Types::Number::NumberInt;
+    }
+    elsif ($type eq 'big' or $type eq 'float') {
+        ## default
+    }
+    else {
+        die "Invalid value '${type}' for option '-N'!";
+    }
+}
+
+sub unload_numbers {
+    delete @INC{
+        qw(
+          Math/BigInt.pm
+          Math/BigFloat.pm
+          Math/BigRat.pm
+          Sidef/Types/Number/Number.pm
+          Sidef/Types/Number/NumberInt.pm
+          Sidef/Types/Number/NumberFast.pm
+          Sidef/Types/Number/NumberRat.pm
+          )
+    };
+}
+
 sub execute_struct {
     my ($struct) = @_;
     Sidef::Types::Block::Code->new($struct)->exec;
@@ -173,6 +225,7 @@ sub output_usage {
                     '-M type,type'   => ['memoize some expensive method calls', 'valid types: str, num, block, all'],
                     '-S'             => 'disable strictures and ignore any errors',
                     '-v'             => 'print version number and exit',
+                    '-t'             => 'treat all command-line arguments as scripts',
                     '-w'             => 'enable warnings with stack backtrace',
                     '-W'             => 'make warnings fatal (with stack backtrace)',
                    );
@@ -190,7 +243,7 @@ USAGE
     my $max_width = List::Util::max(map { length } keys %switches);
     $max_width += 4;
 
-    foreach my $key (sort { lc($a) cmp lc($b) or $b cmp $a } keys %switches) {
+    foreach my $key (sort { lc($a) cmp lc($b) or lc($b) cmp lc($a) or $b cmp $a } keys %switches) {
         if (ref $switches{$key} eq 'ARRAY') {
             printf "  %-${max_width}s%s\n", $key, $switches{$key}[0];
             foreach my $i (1 .. $#{$switches{$key}}) {
@@ -240,11 +293,7 @@ HELP
             return;
         }
 
-        my $parser = Sidef::Parser->new(
-                                        file_name   => '-H',
-                                        script_name => '-H',
-                                        strict      => !$args{S},
-                                       );
+        my $parser = new_parser(name => '-H');
         my $struct = eval { $parser->parse_script(code => $line) };
 
         if ($@) {
@@ -266,11 +315,7 @@ HELP
 sub code_interactive {
     require Term::ReadLine;
     my $term = Term::ReadLine->new("$name $version -- interactive mode");
-    my $parser = Sidef::Parser->new(
-                                    file_name   => '-i',
-                                    script_name => '-i',
-                                    strict      => !$args{S},
-                                   );
+    my $parser = new_parser(name => '-i');
 
     print qq{$name $version on $^O\n};
     print qq{Type "help", "copyright" or "license" for more information.\n};
@@ -317,11 +362,7 @@ EOT
 
         $@ && do {
             warn $@;
-            $parser = Sidef::Parser->new(
-                                         file_name   => '-i',
-                                         script_name => '-i',
-                                         strict      => !$args{S},
-                                        );
+            $parser = new_parser(name => '-i');
             redo;
         };
 

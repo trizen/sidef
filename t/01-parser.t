@@ -6,23 +6,25 @@ use autodie;
 use warnings FATAL => 'all';
 use Test::More;
 
+use File::Find qw(find);
 use List::Util qw(first);
-use File::Spec::Functions qw(catfile);
+use File::Spec::Functions qw(catfile catdir);
 
 use lib 'lib';
 require Sidef::Init;
 
-opendir(my $dir_h, 'scripts');
+my $scripts_dir = 'scripts';
+local $ENV{SIDEF_INC} = $scripts_dir;
 
-my @scripts =
-  map { catfile('scripts', $_) }
-  grep {
-    /\.sf\z/
-      && $_ ne 'include_class.sf'
-      && $_ ne 'lingua_ro.sf'
-      && $_ ne 'lingua_ro_numbers.sf'
-      && $_ ne 'module_loading.sf'
-} readdir($dir_h);
+my @scripts;
+find {
+    no_chdir => 1,
+    wanted   => sub {
+        if (/\.sf\z/) {
+            push @scripts, $_;
+        }
+    },
+} => $scripts_dir;
 
 plan tests => scalar(@scripts);
 

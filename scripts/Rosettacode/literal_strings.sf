@@ -1,0 +1,34 @@
+#!/usr/bin/ruby
+
+#
+## Quotes that do not interpolate:
+#
+'single quotes with \'embedded quote\' and \\backslash';
+‚unicode single quoted’;
+%q(not interpolating with (nested) parentheses
+and newline);
+
+#
+## Quotes that interpolate:
+#
+var a = 42;
+"double \Uquotes\E with \"embedded quote\"\nnewline and variable interpolation: #{a} % 10 = #{a % 10}";
+„same as above”;
+%Q(same as above);
+
+#
+## Heredocs:
+#
+print <<EOT
+Implicit double-quoted (interpolates):
+a = #{a}
+EOT
+
+print <<"EOD"
+Explicit double-quoted with interpolation:
+a = #{a}
+EOD
+
+print <<'NON_INTERPOLATING'
+This will not interpolate: #{a}
+NON_INTERPOLATING

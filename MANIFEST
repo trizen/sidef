@@ -128,11 +128,9 @@ META.yml
 README.md
 scripts/100_doors.sf
 scripts/100_doors_2.sf
-scripts/100_doors_3.sf
 scripts/100_doors_4.sf
 scripts/99_bottles.sf
 scripts/9_billion_names.sf
-scripts/A+B.sf
 scripts/abs_string.sf
 scripts/accumulator_factory.sf
 scripts/ackermann_function.sf
@@ -140,12 +138,14 @@ scripts/ackermann_function_cached.sf
 scripts/align_columns.sf
 scripts/amb.sf
 scripts/amb_nested_loops.sf
-scripts/anagrams.sf
-scripts/anagrams_deranged_anagrams.sf
 scripts/anonymous_recursion.sf
+'scripts/Applications/Gift match/giftmatch.sf'
+'scripts/Applications/Gift match/input.txt'
+'scripts/Applications/Gift match/output.txt'
+scripts/Applications/sany2mp3.sf
+scripts/Applications/unit_converter.sf
 scripts/arithmetic_evaluation.sf
 scripts/arithmetic_geometric_mean.sf
-scripts/arithmetic_integer_stdin.sf
 scripts/array_autovivification.sf
 scripts/array_callback.sf
 scripts/array_operators.sf
@@ -159,7 +159,6 @@ scripts/averages_mode.sf
 scripts/avg_mode.sf
 scripts/balanced_brackets.sf
 scripts/base64_decoder.sf
-scripts/benford_s_law.sf
 scripts/best_shuffle.sf
 scripts/best_shuffle_2.sf
 scripts/best_shuffle_alg_permute.sf
@@ -168,8 +167,6 @@ scripts/binary_search_recursive.sf
 scripts/box_the_compass.sf
 scripts/break.sf
 scripts/built_in_classes.sf
-scripts/bulls_and_cows.sf
-scripts/bulls_and_cows_player.sf
 scripts/c_plus_plus_input_output.sf
 scripts/caesar_cipher.sf
 scripts/calendar.sf
@@ -188,25 +185,38 @@ scripts/combinations.sf
 scripts/combinations_with_repetitions.sf
 scripts/common_directory.sf
 scripts/complex_numbes.sf
-scripts/cosmic_calendar.sf
 scripts/count_in_factors.sf
 scripts/cramers_method.sf
 scripts/cutting_edge_features.sf
 scripts/cyclic_numbers.sf
 scripts/DATA_handle.sf
 scripts/define_keyword.sf
-scripts/dice_game_solver.sf
 scripts/echo.sf
 scripts/eq_g2.sf
 scripts/escape_unescape.sf
 scripts/eval.sf
 scripts/execute_system_command.sf
+scripts/Expensive/100_doors_3.sf
+scripts/Expensive/anagrams.sf
+scripts/Expensive/anagrams_deranged_anagrams.sf
+scripts/Expensive/baby_size_of_the_universe.sf
+scripts/Expensive/benford_s_law.sf
+scripts/Expensive/dice_game_solver.sf
+scripts/Expensive/factorial_approximations.sf
+scripts/Expensive/fibonacci_validation.sf
+scripts/Expensive/gd_sierpinsky_triangle.sf
+scripts/Expensive/haversine_formula.sf
+scripts/Expensive/langton_s_ant.sf
+scripts/Expensive/langton_s_ant_2.sf
+scripts/Expensive/levenshtein_recursive.sf
+scripts/Expensive/longest_common_subsequence.sf
+scripts/Expensive/sudoku_solver.sf
+scripts/Expensive/time_a_function.sf
 scripts/extend_language.sf
 scripts/fibonacci_cached.sf
 scripts/fibonacci_closed_solution.sf
 scripts/fibonacci_iterative.sf
 scripts/fibonacci_mystery.sf
-scripts/fibonacci_validation.sf
 scripts/file_find_module.sf
 scripts/floyds_triangle.sf
 scripts/for_two_vars.sf
@@ -215,9 +225,12 @@ scripts/function_composition.sf
 scripts/function_recursion.sf
 scripts/functional_modules.sf
 scripts/functions.sf
+scripts/Games/asciiplanes.sf
+scripts/Games/bulls_and_cows.sf
+scripts/Games/bulls_and_cows_player.sf
+scripts/Games/rock_paper_scissors.sf
 scripts/gamma_function.sf
 scripts/gcd.sf
-scripts/gd_sierpinsky_triangle.sf
 scripts/getopt.sf
 scripts/global_regex_matching.sf
 scripts/group_precedence.sf
@@ -229,7 +242,6 @@ scripts/hash_grep.sf
 scripts/hash_join.sf
 scripts/hash_sort.sf
 scripts/hashes.sf
-scripts/haversine_formula.sf
 scripts/http_tiny.sf
 scripts/huffman_coding.sf
 scripts/i_love_you.sf
@@ -238,21 +250,22 @@ scripts/if_do_else.sf
 scripts/if_while_standard.sf
 scripts/implicit_method_call_on_var_.sf
 scripts/include_class.sf
+scripts/Interactive/A+B.sf
+scripts/Interactive/arithmetic_integer_stdin.sf
+scripts/Interactive/cosmic_calendar.sf
+scripts/Interactive/stdin.sf
 scripts/inverted_syntax.sf
 scripts/JASH.sf
 scripts/jensen_s_device.sf
 scripts/josephus_problem.sf
 scripts/keyword_object.sf
 scripts/knuth_shuffle.sf
-scripts/langton_s_ant.sf
-scripts/langton_s_ant_2.sf
 scripts/lazy_methods.sf
 scripts/leap_year.sf
 scripts/letter_frequency.sf
 scripts/lev_fast.sf
 scripts/levenshtein_distance.sf
 scripts/levenshtein_distance_cached.sf
-scripts/levenshtein_recursive.sf
 scripts/Lingua/RO/Numbers.sm
 scripts/lingua_ro.sf
 scripts/lingua_ro_numbers.sf
@@ -294,15 +307,6 @@ scripts/quicksort.sf
 scripts/quicksort_in_parallel.sf
 scripts/quoted_strings.sf
 scripts/rand.sf
-scripts/range_expansion.sf
-'scripts/Real-world programs/Any to MP3/sany2mp3.sf'
-'scripts/Real-world programs/ASCII Planes/asciiplanes.sf'
-'scripts/Real-world programs/Converter/unit_converter.sf'
-'scripts/Real-world programs/Factorial Approximations/factorial_approximations.sf'
-'scripts/Real-world programs/Gift match/giftmatch.sf'
-'scripts/Real-world programs/Gift match/input.txt'
-'scripts/Real-world programs/Gift match/output.txt'
-'scripts/Real-world programs/Universe size/baby_size_of_the_universe.sf'
 scripts/rec_reverse.sf
 scripts/recursion.sf
 scripts/regex.sf
@@ -310,13 +314,26 @@ scripts/regex_bool.sf
 scripts/return.sf
 scripts/reverse_recursive_general_solution.sf
 scripts/reverse_words_in_a_string.sf
-scripts/rock_paper_scissors.sf
 scripts/roman_numerals_decoding.sf
 scripts/roman_numerals_decoding_2.sf
 scripts/roman_numerals_decoding_3.sf
 scripts/roman_numerals_encoding.sf
 scripts/roman_numerals_encoding_2.sf
 scripts/root_mean_square.sf
+scripts/Rosettacode/flatten_a_list.sf
+scripts/Rosettacode/hash_from_two_arrays.sf
+scripts/Rosettacode/hickerson_series_of_almost_integers.sf
+scripts/Rosettacode/higher_order_functions.sf
+scripts/Rosettacode/JSON.sf
+scripts/Rosettacode/literal_strings.sf
+scripts/Rosettacode/named_parameters.sf
+scripts/Rosettacode/program_name.sf
+scripts/Rosettacode/queue_definition.sf
+scripts/Rosettacode/quickselect_algorithm.sf
+scripts/Rosettacode/range_expansion.sf
+scripts/Rosettacode/runtime_evaluation.sf
+scripts/Rosettacode/runtime_evaluation_in_an_environment.sf
+scripts/Rosettacode/vector_products.sf
 scripts/run_length_encoding.sf
 scripts/run_length_encoding_2.sf
 scripts/script.sf
@@ -335,10 +352,8 @@ scripts/soundex.sf
 scripts/special_methods.sf
 scripts/split_combine.sf
 scripts/static_const_lazy_init.sf
-scripts/stdin.sf
 scripts/string_escapes.sf
 scripts/struct_definition.sf
-scripts/sudoku_solver.sf
 scripts/sum_of_squares.sf
 scripts/switch.sf
 scripts/sylvesters_sequence.sf
@@ -357,7 +372,6 @@ scripts/unicode_support.sf
 scripts/unique_prefixes.sf
 scripts/var_ref.sf
 scripts/var_scoping.sf
-scripts/vector_products.sf
 scripts/while_loop.sf
 scripts/word_roots.sf
 scripts/zig-zag_matrix.sf

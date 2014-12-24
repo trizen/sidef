@@ -12,4 +12,4 @@ print str1;
 print str2;
 
 Sys.system('uname -r');   # system: executes a command and prints the result
-Sys.exec('uname -r');     # replaces current process with another
+#Sys.exec('uname -r');     # replaces current process with another
