@@ -2,28 +2,28 @@
 
 var S = Math.sqrt(1.25)+0.5;
 var T = Math.sqrt(1.25)-0.5;
+var W = S+T;    #=> sqrt(5);
 
 func fib(n) {
-    Math.pow(S, n) - Math.pow(-T, n) / S+T -> roundf(0);
+    Math.pow(S, n) - Math.pow(-T, n) / W -> roundf(0);
 }
 
 func is_fib (i, fib) {
-    (((fib * S+T) + Math.pow(-T, i)).log(S) -> round(i)) == i;
+    (((fib * W) + Math.pow(-T, i)).log(S) -> round(i)) == i;
 }
 
 #
 ## log(n*sqrt(5) + (((1-sqrt(5))/2) ^ ((log(n)+(log(5))/2) / (log(1+sqrt(5))-log(2))))) / (log(1+sqrt(5))-log(2))
 #
 func fib_pos(n) {
-    (Math.log((S+T)*n + ((0.5 * (1-(S+T)))**((Math.log(n) + (Math.log(5)/2)) / (Math.log(1+(S+T))-Math.log(2)))))) /
-                                (Math.log(1+(S+T))-Math.log(2)) -> floor;
+    (W*n + ((-T)**((5 * n**2).log / (W+1)))).log(S).floor;
 }
 
 #
 ## (log(n*sqrt(5) + (((1-sqrt(5))/2) ^ (log(n * sqrt(5)) / log((1+sqrt(5))/2))))) / log((1+sqrt(5))/2)
 #
 func fib_position(n) {
-    ((n * S+T) + Math.pow(-T, (((n * S+T)).log(S)))).log(S) -> floor;
+    ((n * W) + Math.pow(-T, (((n * W)).log(S)))).log(S).floor;
 }
 
 func is_prob_fib(n) {
@@ -47,4 +47,14 @@ for [
 
     "%21s is on position %3s in the fibonacci sequence: %s\n"
         -> printf(num, pos, bool);
+}
+
+__END__
+
+#
+## (W*n + ((-T)**((n.log + 5.log/2) / S))).log(S).floor
+#
+func fib_pos(n) {
+    (Math.log((S+T)*n + ((0.5 * (1-(S+T)))**((Math.log(n) + (Math.log(5)/2)) / (Math.log(1+(S+T))-Math.log(2)))))) /
+                                (Math.log(1+(S+T))-Math.log(2)) -> floor;
 }
