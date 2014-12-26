@@ -1056,6 +1056,16 @@ package Sidef::Types::Array::Array {
 
     *popRand = \&pop_rand;
 
+    sub delete_index {
+        my ($self, $offset) = @_;
+        $self->_is_number($offset) || return;
+        CORE::splice(@{$self}, $$offset, 1)->get_value;
+    }
+
+    *pop_at      = \&delete_index;
+    *deleteIndex = \&delete_index;
+    *popAt       = \&delete_index;
+
     sub splice {
         my ($self, $offset, $length, @objects) = @_;
 
