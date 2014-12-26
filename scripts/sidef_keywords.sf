@@ -1,0 +1,21 @@
+#!/usr/bin/ruby
+
+Sys.eval(<<'CODE');
+package Perl2Sidef {
+    sub fetch_hash {
+        my ($hash, $key) = @_;
+        $hash->{$key};
+    }
+}
+CODE
+
+var obj = 'Perl2Sidef'.to_fcaller;
+var hash = obj.fetch_hash(Parser, 'keywords');
+
+var keys = hash.keys.sort;
+var max = keys.map{.len}.max;
+
+var cols = 3;
+0 ..^ (keys.offset, cols).each { |i|
+    %(#{"%-#{max+2}s" * cols-1}%s\n) -> printf(keys[i .. (i + cols-1)]...);
+}

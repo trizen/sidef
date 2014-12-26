@@ -155,6 +155,11 @@ package Sidef::Parser {
                   include
                   print printf
                   println say
+                  eval
+                  read
+                  die
+                  warn
+                  exit
 
                   File
                   Fcntl
@@ -164,6 +169,7 @@ package Sidef::Parser {
                   Hash
                   Str String
                   Num Number
+                  Complex
                   Math
                   Pipe
                   Byte Bytes
@@ -190,11 +196,6 @@ package Sidef::Parser {
                   define
                   struct
                   module
-                  eval
-                  read
-                  die
-                  warn
-                  exit
 
                   DATA
                   ARGV
