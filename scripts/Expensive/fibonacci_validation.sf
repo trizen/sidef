@@ -3,29 +3,31 @@
 var S = Math.sqrt(1.25)+0.5;
 var T = Math.sqrt(1.25)-0.5;
 
+func fib(n) {
+    Math.pow(S, n) - Math.pow(-T, n) / S+T -> roundf(0);
+}
+
 func is_fib (i, fib) {
     (((fib * S+T) + Math.pow(-T, i)).log(S) -> round(i)) == i;
 }
 
+#
+## log(n*sqrt(5) + (((1-sqrt(5))/2) ^ ((log(n)+(log(5))/2) / (log(1+sqrt(5))-log(2))))) / (log(1+sqrt(5))-log(2))
+#
 func fib_pos(n) {
+    (Math.log((S+T)*n + ((0.5 * (1-(S+T)))**((Math.log(n) + (Math.log(5)/2)) / (Math.log(1+(S+T))-Math.log(2)))))) /
+                                (Math.log(1+(S+T))-Math.log(2)) -> floor;
+}
+
+#
+## (log(n*sqrt(5) + (((1-sqrt(5))/2) ^ (log(n * sqrt(5)) / log((1+sqrt(5))/2))))) / log((1+sqrt(5))/2)
+#
+func fib_position(n) {
     ((n * S+T) + Math.pow(-T, (((n * S+T)).log(S)))).log(S) -> floor;
 }
 
-#
-## 1) log(n*sqrt(5) + (((1-sqrt(5))/2) ^ (log(n*sqrt(5))       / log((1+sqrt(5))/2))))      / log((1+sqrt(5))/2)
-## 2) log(n*sqrt(5) + (((1-sqrt(5))/2) ^ ((log(n)+(log(5))/2) / (log(1+sqrt(5))-log(2))))) / (log(1+sqrt(5))-log(2))
-#
-
-func fib_position(n) {
-    (Math.log(Math.sqrt(5)*n +
-        ((1/2 * (1-Math.sqrt(5)))**((Math.log(n) + (Math.log(5)/2)) /
-                                    (Math.log(1+Math.sqrt(5))-Math.log(2)))))) /
-            (Math.log(1+Math.sqrt(5))-Math.log(2)) -> floor;
-}
-
 func is_prob_fib(n) {
-    var w = fib_position(n);
-    S**w + T**w / S+T -> roundf(0) == n;
+    fib(fib_pos(n)) == n;
 }
 
 for [
