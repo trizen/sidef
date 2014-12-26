@@ -679,6 +679,7 @@ package Sidef::Parser {
                               };
                         }
 
+                        /\G\h+/gc;
                         redo;
                     }
 
@@ -2135,6 +2136,51 @@ package Sidef::Parser {
                   ? ref($obj->{$self->{class}}[-1]{self})
                   : ref($obj);
 
+                my $collect_methods;
+                $collect_methods = sub {
+                    if ((my ($pos, $end) = $self->parse_whitespace(code => substr($_, pos)))[0]) {
+                        pos($_) += $pos;
+                        $end and redo MAIN;
+                    }
+
+                    if (/\G(?:=>|,)/gc) {
+                        redo MAIN;
+                    }
+
+                    my $is_operator = /\G(?!->)/ && /\G(?=$self->{operators_re})/o;
+                    if (   $is_operator
+                        || /\G(?:->|\.)\h*/gc
+                        || /\G(?=$self->{method_name_re})/o) {
+
+                        if ((my ($pos, $end) = $self->parse_whitespace(code => substr($_, pos)))[0]) {
+                            pos($_) += $pos;
+                            $end && redo MAIN;
+                        }
+
+                        my ($methods, $pos) =
+                          $self->parse_methods(
+                                               code => $is_operator
+                                               ? substr($_, pos)
+                                               : ("." . substr($_, pos))
+                                              );
+
+                        pos($_) += $pos - ($is_operator ? 0 : 1);
+
+                        if (@{$methods}) {
+                            push @{$struct{$self->{class}}[-1]{call}}, @{$methods};
+                        }
+                        else {
+                            $self->fatal_error(
+                                               error => 'incomplete method name',
+                                               code  => $_,
+                                               pos   => pos($_) - 1,
+                                              );
+                        }
+
+                        $collect_methods->();
+                    }
+                };
+
                 if (defined $obj) {
                     push @{$struct{$self->{class}}}, {self => $obj};
 
@@ -2143,49 +2189,7 @@ package Sidef::Parser {
                         redo;
                     }
 
-                    {
-                        if ((my ($pos, $end) = $self->parse_whitespace(code => substr($_, pos)))[0]) {
-                            pos($_) += $pos;
-                            $end and redo MAIN;
-                        }
-
-                        if (/\G(?:=>|,)/gc) {
-                            redo MAIN;
-                        }
-
-                        my $is_operator = /\G(?!->)/ && /\G(?=$self->{operators_re})/o;
-                        if (   $is_operator
-                            || /\G(?:->|\.)\h*/gc
-                            || /\G(?=$self->{method_name_re})/o) {
-
-                            if ((my ($pos, $end) = $self->parse_whitespace(code => substr($_, pos)))[0]) {
-                                pos($_) += $pos;
-                                $end && redo MAIN;
-                            }
-
-                            my ($methods, $pos) =
-                              $self->parse_methods(
-                                                   code => $is_operator
-                                                   ? substr($_, pos)
-                                                   : ("." . substr($_, pos))
-                                                  );
-
-                            pos($_) += $pos - ($is_operator ? 0 : 1);
-
-                            if (@{$methods}) {
-                                push @{$struct{$self->{class}}[-1]{call}}, @{$methods};
-                            }
-                            else {
-                                $self->fatal_error(
-                                                   error => 'incomplete method name',
-                                                   code  => $_,
-                                                   pos   => pos($_) - 1,
-                                                  );
-                            }
-
-                            redo;
-                        }
-                    }
+                    $collect_methods->();
                 }
 
                 if (/\G;+/gc) {
@@ -2316,6 +2320,20 @@ package Sidef::Parser {
                     }
 
                     redo MAIN;
+                }
+
+                if (exists $struct{$self->{class}}[-1]{call}) {
+                    $struct{$self->{class}}[-1]{self}{$self->{class}}[-1]{call} = delete $struct{$self->{class}}[-1]{call};
+                }
+
+                if (exists $struct{$self->{class}}[-1]{self}{$self->{class}}[-1]{call}) {
+                    my ($obj, $pos) = $self->parse_obj(code => substr($_, pos));
+                    pos($_) += $pos;
+                    if (defined $obj) {
+                        push @{$struct{$self->{class}}[-1]{self}{$self->{class}}[-1]{call}[-1]{arg}}, $obj;
+                        $collect_methods->();
+                        redo MAIN;
+                    }
                 }
 
                 $self->fatal_error(
