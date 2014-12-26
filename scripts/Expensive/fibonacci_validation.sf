@@ -7,6 +7,27 @@ func is_fib (i, fib) {
     (((fib * S+T) + Math.pow(-T, i)).log(S) -> round(i)) == i;
 }
 
+func fib_pos(n) {
+    ((n * S+T) + Math.pow(-T, (((n * S+T)).log(S)))).log(S) -> floor;
+}
+
+#
+## 1) log(n*sqrt(5) + (((1-sqrt(5))/2) ^ (log(n*sqrt(5))       / log((1+sqrt(5))/2))))      / log((1+sqrt(5))/2)
+## 2) log(n*sqrt(5) + (((1-sqrt(5))/2) ^ ((log(n)+(log(5))/2) / (log(1+sqrt(5))-log(2))))) / (log(1+sqrt(5))-log(2))
+#
+
+func fib_position(n) {
+    (Math.log(Math.sqrt(5)*n +
+        ((1/2 * (1-Math.sqrt(5)))**((Math.log(n) + (Math.log(5)/2)) /
+                                    (Math.log(1+Math.sqrt(5))-Math.log(2)))))) /
+            (Math.log(1+Math.sqrt(5))-Math.log(2)) -> floor;
+}
+
+func is_prob_fib(n) {
+    var w = fib_position(n);
+    S**w + T**w / S+T -> roundf(0) == n;
+}
+
 for [
       [12,  144,                   true],
       [12,  143,                   false],
@@ -17,7 +38,10 @@ for [
       [100, 354224848179261915075, true],
     ]{|pos,             num,            bool|
 
-    is_fib(pos, num) == bool || ("Validation error!\n".die);
+    is_fib(pos, num) == bool || die "Validation error (1)!";
+    is_prob_fib(num) == bool || die "Validation error (2)!";
+
+    fib_pos(num) == fib_position(num) || die "pos error";
 
     "%21s is on position %3s in the fibonacci sequence: %s\n"
         -> printf(num, pos, bool);
