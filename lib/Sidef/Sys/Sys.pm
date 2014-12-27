@@ -196,9 +196,8 @@ package Sidef::Sys::Sys {
     }
 
     sub eval {
-        my ($self, $perl_code) = @_;
-        $self->_is_string($perl_code) || return;
-        Sidef::Perl::Perl->to_sidef(eval $$perl_code);
+        my ($self, @args) = @_;
+        Sidef::Perl::Perl->eval(@args);
     }
 
     sub bless {
