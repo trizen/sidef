@@ -135,6 +135,7 @@ scripts/align_columns.sf
 scripts/amb.sf
 scripts/amb_nested_loops.sf
 scripts/anonymous_recursion.sf
+scripts/Applications/fdf.sf
 'scripts/Applications/Gift match/giftmatch.sf'
 'scripts/Applications/Gift match/input.txt'
 'scripts/Applications/Gift match/output.txt'
