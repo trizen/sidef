@@ -2220,6 +2220,13 @@ package Sidef::Parser {
                                        && $variable->{name} ne 'self'
                                        && $variable->{name} ne ''
                                        && chr(ord $variable->{name}) ne '_') {
+
+                                    # Expection for interactive mode
+                                    if ($self->{interactive}) {
+                                        ++$variable->{obj}{in_use};
+                                        next;
+                                    }
+
                                     warn '[WARN] '
                                       . (
                                          $variable->{type} eq 'const'
@@ -2323,11 +2330,11 @@ package Sidef::Parser {
                     redo MAIN;
                 }
 
-                if (exists $struct{$self->{class}}[-1]{call}) {
+                if (exists($struct{$self->{class}}) and exists $struct{$self->{class}}[-1]{call}) {
                     $struct{$self->{class}}[-1]{self}{$self->{class}}[-1]{call} = delete $struct{$self->{class}}[-1]{call};
                 }
 
-                if (exists $struct{$self->{class}}[-1]{self}{$self->{class}}[-1]{call}) {
+                if (exists $struct{$self->{class}} and exists $struct{$self->{class}}[-1]{self}{$self->{class}}[-1]{call}) {
                     my ($obj, $pos) = $self->parse_obj(code => substr($_, pos));
                     pos($_) += $pos;
                     if (defined $obj) {

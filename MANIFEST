@@ -207,6 +207,7 @@ scripts/Expensive/langton_s_ant.sf
 scripts/Expensive/langton_s_ant_2.sf
 scripts/Expensive/levenshtein_recursive.sf
 scripts/Expensive/longest_common_subsequence.sf
+scripts/Expensive/root_of_a_function.sf
 scripts/Expensive/sudoku_solver.sf
 scripts/Expensive/time_a_function.sf
 scripts/extend_language.sf
@@ -335,7 +336,6 @@ scripts/Rosettacode/program_name.sf
 scripts/Rosettacode/queue_definition.sf
 scripts/Rosettacode/quickselect_algorithm.sf
 scripts/Rosettacode/range_expansion.sf
-scripts/Rosettacode/root_of_a_function.sf
 scripts/Rosettacode/runtime_evaluation.sf
 scripts/Rosettacode/runtime_evaluation_in_an_environment.sf
 scripts/Rosettacode/vector_products.sf

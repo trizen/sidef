@@ -213,7 +213,7 @@ sub unload_numbers {
 
 sub execute_struct {
     my ($struct) = @_;
-    Sidef::Types::Block::Code->new($struct)->exec;
+    Sidef::Types::Block::Code->new($struct)->run;
 }
 
 sub output_usage {
@@ -299,6 +299,7 @@ HELP
         }
 
         my $parser = new_parser(name => '-H');
+        $parser->{interactive} = 1;
         my $struct = eval { $parser->parse_script(code => $line) };
 
         if ($@) {
@@ -306,7 +307,7 @@ HELP
             redo;
         }
 
-        my @refs = exists($keywords{$line}) ? $keywords{$line} : (map { ref($_) } execute_struct($struct));
+        my @refs = exists($keywords{$line}) ? $keywords{$line} : (map { ref($_) } eval { execute_struct($struct) });
 
         foreach my $ref (@refs) {
             $ref eq '' && do { warn "Not an object!\n"; next };
@@ -321,6 +322,7 @@ sub code_interactive {
     require Term::ReadLine;
     my $term = Term::ReadLine->new("$name $version -- interactive mode");
     my $parser = new_parser(name => '-i');
+    $parser->{interactive} = 1;
 
     print qq{$name $version on $^O\n};
     print qq{Type "help", "copyright" or "license" for more information.\n};
@@ -368,10 +370,12 @@ EOT
         $@ && do {
             warn $@;
             $parser = new_parser(name => '-i');
+            $parser->{interactive} = 1;
             redo;
         };
 
-        say eval { $_->can('dump') } ? $_->dump : $_ for execute_struct($struct);
+        say ref($_) ne 'Sidef::Types::Block::Code' && eval { $_->can('dump') } ? $_->dump : $_
+          for eval { execute_struct($struct) };
         redo;
     }
 }
@@ -601,7 +605,7 @@ HEAD
 
                      close $fh;
                  }
-               }
+             }
             } => $path
         );
 
