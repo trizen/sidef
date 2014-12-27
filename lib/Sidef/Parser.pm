@@ -2221,7 +2221,7 @@ package Sidef::Parser {
                                        && $variable->{name} ne ''
                                        && chr(ord $variable->{name}) ne '_') {
 
-                                    # Expection for interactive mode
+                                    # Minor exception for interactive mode
                                     if ($self->{interactive}) {
                                         ++$variable->{obj}{in_use};
                                         next;

@@ -326,6 +326,8 @@ scripts/Rosettacode/100_doors_2.sf
 scripts/Rosettacode/100_doors_4.sf
 scripts/Rosettacode/99_bottles.sf
 scripts/Rosettacode/bubble_sort.sf
+scripts/Rosettacode/fizz_buzz.sf
+scripts/Rosettacode/fizz_buzz_2.sf
 scripts/Rosettacode/flatten_a_list.sf
 scripts/Rosettacode/hash_from_two_arrays.sf
 scripts/Rosettacode/hickerson_series_of_almost_integers.sf

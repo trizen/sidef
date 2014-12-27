@@ -19,6 +19,7 @@ package Sidef::Types::Nil::Nil {
         Sidef::Types::String::String->new('nil');
     }
 
+    *{__PACKAGE__ . '::' . '\\\\'} = sub { $_[1] };
 };
 
 1

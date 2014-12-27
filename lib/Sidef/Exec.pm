@@ -372,11 +372,12 @@ package Sidef::Exec {
                     }
                 }
 
-                if (ref($self_obj) eq 'Sidef::Types::Block::Return') {
+                my $ref = ref($self_obj);
+                if ($ref eq 'Sidef::Types::Block::Return') {
                     $self->{expr_i} = $self->{expr_i_max};
                     return $self_obj;
                 }
-                elsif (ref($self_obj) eq 'Sidef::Types::Block::Break') {
+                elsif ($ref eq 'Sidef::Types::Block::Break' or $ref eq 'Sidef::Types::Block::Next') {
                     last;
                 }
             }

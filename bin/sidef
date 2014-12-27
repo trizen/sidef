@@ -273,6 +273,9 @@ sub output_version {
 
 sub help_interactive {
 
+    require File::Basename;
+    require File::Spec;
+
     my %keywords = (
                     if   => 'Sidef::Types::Bool::If',
                     '\\' => 'Sidef::Variable::Ref',
@@ -311,7 +314,16 @@ HELP
 
         foreach my $ref (@refs) {
             $ref eq '' && do { warn "Not an object!\n"; next };
-            system -e '/usr/bin/man' ? '/usr/bin/man' : 'perldoc', $ref;
+            my $name = $ref =~ s{::}{/}gr;
+            my $file = $INC{$name . '.pm'};
+            my $pod;
+            foreach my $dir (@INC) {
+                if (-e (my $f = File::Spec->catfile($dir, $name . '.pod'))) {
+                    $pod = $f;
+                    last;
+                }
+            }
+            system 'perldoc', defined($pod) ? $pod : $ref;
         }
 
         redo;
