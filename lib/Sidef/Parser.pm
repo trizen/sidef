@@ -675,7 +675,7 @@ package Sidef::Parser {
                             push @{$obj->{$self->{class}}},
                               {
                                   self => $type == 0
-                                ? Sidef::Types::String::String->new($acc =~ s{\\\\}{\\}gr)
+                                ? Sidef::Types::String::String->new($acc)
                                 : Sidef::Types::String::String->new($acc)->apply_escapes($self)
                               };
                         }
