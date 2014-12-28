@@ -333,18 +333,43 @@ HELP
 sub code_interactive {
     require Term::ReadLine;
     my $term = Term::ReadLine->new("$name $version -- interactive mode");
+
+    my $exec = Sidef::Exec->new;
     my $parser = new_parser(name => '-i');
     $parser->{interactive} = 1;
 
     print qq{$name $version on $^O\n};
     print qq{Type "help", "copyright" or "license" for more information.\n};
 
+    my $last_line = '';
     {
-        my $line = $term->readline('>>> ') // do { print "\n"; exit };
+        my $line = do {
+            @ARGV
+              ? do {
+                my $file = shift(@ARGV);
+                open my $fh, '<:utf8', $file or do {
+                    warn "Can't open file `$file': $!\n";
+                    next;
+                };
+                local $/;
+                <$fh>;
+              }
+              : (
+                $term->readline('>>> ')
+                  // do { print "\n"; exit }
+                );
+        };
 
         if ($line eq 'help') {
             help_interactive();
             redo;
+        }
+        elsif ($line eq '^') {
+            say $last_line;
+            redo;
+        }
+        elsif ($line eq '&') {
+            $line = $last_line;
         }
         elsif ($line eq 'q' or $line eq 'quit') {
             exit;
@@ -377,6 +402,8 @@ EOT
             redo;
         }
 
+        $last_line = $line;
+
         my $struct = eval { $parser->parse_script(code => $line) };
 
         $@ && do {
@@ -387,7 +414,7 @@ EOT
         };
 
         say ref($_) ne 'Sidef::Types::Block::Code' && eval { $_->can('dump') } ? $_->dump : $_
-          for eval { execute_struct($struct) };
+          for eval { $exec->execute($struct) };
         redo;
     }
 }
@@ -617,7 +644,7 @@ HEAD
 
                      close $fh;
                  }
-             }
+               }
             } => $path
         );
 
