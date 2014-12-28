@@ -33,6 +33,8 @@ package Sidef::Types::Regex::Regex {
           __PACKAGE__;
     }
 
+    *call = \&new;
+
     sub get_value { $_[0]{regex} }
 
     sub match {

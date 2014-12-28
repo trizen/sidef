@@ -12,6 +12,8 @@ package Sidef::Types::Glob::Pipe {
         bless \@command, __PACKAGE__;
     }
 
+    *call = \&new;
+
     sub get_value {
         [map { $_->get_value } @{$_[0]}];
     }

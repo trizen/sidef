@@ -6,7 +6,7 @@ func find_deranged (a) {
 
     a.range.each { |i|
         i+1 ... a.offset -> each { |j|
-            a(i).overlaps(a(j)) || (
+            a[i].overlaps(a[j]) || (
                 "length %d: %s => %s\n".printf(a[i].len, a[i], a[j]);
                 return true;
             );

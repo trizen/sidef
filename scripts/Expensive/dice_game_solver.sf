@@ -90,7 +90,7 @@ while (true) {
                 dirs.each { |hash|
                     "Go %-40s (from num '%s')\n".printf(hash[:dir], hash[:num]);
                 };
-                Sys.exit(0);
+                break(2);
             }
 
             break;

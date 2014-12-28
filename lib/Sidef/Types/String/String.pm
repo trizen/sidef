@@ -14,6 +14,8 @@ package Sidef::Types::String::String {
         bless \$str, __PACKAGE__;
     }
 
+    *call = \&new;
+
     sub get_value {
         ${$_[0]};
     }

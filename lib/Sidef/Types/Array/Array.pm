@@ -13,6 +13,8 @@ package Sidef::Types::Array::Array {
         bless [map { Sidef::Variable::Variable->new(name => '', type => 'var', value => $_) } @items], __PACKAGE__;
     }
 
+    *call = \&new;
+
     sub get_value {
         my ($self) = @_;
 
@@ -459,38 +461,6 @@ package Sidef::Types::Array::Array {
     }
 
     *item = \&get;
-
-    sub call {
-        my ($self, @idx) = @_;
-        return if @idx == 0;
-
-        my $array = $self->new;
-        foreach my $index (@idx) {
-            if (ref($index) eq __PACKAGE__) {
-                $array->append(
-                               @{$self}[
-                                 map  { $_->get_value }
-                                 grep { $self->_is_number($_) }
-                                 map  { $_->get_value } @{$index}
-                               ]
-                              );
-            }
-            else {
-                $self->_is_number($index) || return;
-                $index = $index->get_value;
-                $index = @{$self} + $index if $index < 0;
-                $array->append(
-                                 $index < 0 || !exists($self->[$index])
-                               ? @idx == 1
-                                     ? return ()
-                                     : undef
-                               : @idx == 1 ? return ($self->[$index]->get_value)
-                               :             $self->[$index]->get_value
-                              );
-            }
-        }
-        $array;
-    }
 
     sub _slice {
         my ($self, $from, $to) = @_;

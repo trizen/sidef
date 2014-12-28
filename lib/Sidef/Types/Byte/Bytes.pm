@@ -10,7 +10,8 @@ package Sidef::Types::Byte::Bytes {
     }
 
     sub call {
-        my ($self, $string) = @_;
+        my ($self, @strings) = @_;
+        my $string = CORE::join('', @strings);
         my @bytes = do {
             use bytes;
             map { Sidef::Types::Byte::Byte->new(CORE::ord bytes::substr($string, $_, 1)) } 0 .. bytes::length($string) - 1;

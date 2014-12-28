@@ -39,6 +39,8 @@ package Sidef::Types::Hash::Hash {
         $self;
     }
 
+    *call = \&new;
+
     sub get_value {
         my ($self) = @_;
 

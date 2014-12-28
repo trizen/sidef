@@ -31,6 +31,8 @@ package Sidef::Time::Time {
         bless \$sec, __PACKAGE__;
     }
 
+    *call = \&new;
+
     sub get_value {
         ${$_[0]} // CORE::time;
     }

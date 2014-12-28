@@ -13,6 +13,8 @@ package Sidef::Types::Glob::Dir {
         bless \$dir, __PACKAGE__;
     }
 
+    *call = \&new;
+
     sub get_value {
         ${$_[0]};
     }
