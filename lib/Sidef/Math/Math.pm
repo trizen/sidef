@@ -203,6 +203,25 @@ package Sidef::Math::Math {
         $array;
     }
 
+    sub number_to_percentage {
+        my ($self, $num, $from, $to) = @_;
+
+        $self->_is_number($num)  || return;
+        $self->_is_number($from) || return;
+        $self->_is_number($to)   || return;
+
+        $num  = $$num;
+        $to   = $$to;
+        $from = $$from;
+
+        my $sum  = CORE::abs($to - $from);
+        my $dist = CORE::abs($num - $to);
+
+        Sidef::Types::Number::Number->new(($sum - $dist) / $sum * 100);
+    }
+
+    *num2percent = \&number_to_percentage;
+
     {
         no strict 'refs';
         foreach my $f (
