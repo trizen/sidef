@@ -321,6 +321,10 @@ package Sidef::Types::Glob::FileHandle {
     *input_separator = \&separator;
     *inputSeparator  = \&separator;
 
+    # File copy
+    *copy = \&Sidef::Types::Glob::File::copy;
+    *cp   = \&copy;
+
     sub read_to {
         my ($self, $var_ref) = @_;
         $self->_is_var_ref($var_ref) || return;

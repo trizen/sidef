@@ -111,17 +111,6 @@ package Sidef::Types::Glob::Dir {
 
     *removeTree = \&remove_tree;
 
-    # Rename a directory
-    sub rename {
-        my ($self, $dir) = @_;
-
-        ref($dir) eq __PACKAGE__
-          || $self->_is_string($dir)
-          || return;
-
-        Sidef::Types::Bool::Bool->new(CORE::rename($$self, $$dir));
-    }
-
     # Create directory without parents
     sub create {
         my ($self) = @_;
@@ -242,6 +231,11 @@ package Sidef::Types::Glob::Dir {
     # is abs
     *is_absolute = \&Sidef::Types::Glob::File::is_absolute;
     *is_abs      = \&is_absolute;
+
+    # rename
+    *rename    = \&Sidef::Types::Glob::File::rename;
+    *rename_to = \&rename;
+    *renameTo  = \&rename;
 
     sub dump {
         my ($self) = @_;

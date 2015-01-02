@@ -41,6 +41,10 @@ package Sidef::Types::Glob::File {
     sub compare {
         my ($self, $file) = @_;
         $self->_is_file($file) || return;
+        if (@_ == 3) {
+            $self->_is_file($_[-1]) || return;
+            ($self, $file) = ($file, $_[-1]);
+        }
         require File::Compare;
         Sidef::Types::Number::Number->new(File::Compare::compare($$self, $$file));
     }
@@ -288,11 +292,18 @@ package Sidef::Types::Glob::File {
     sub rename {
         my ($self, $file) = @_;
 
-        ref($file) eq __PACKAGE__
+        ref($file) eq ref($self)
           || $self->_is_string($file)
           || return;
 
-        Sidef::Types::Bool::Bool->new(rename($$self, $$file));
+        if (@_ == 3) {
+            ref($_[-1]) eq ref($self)
+              || $self->_is_string($_[-1])
+              || return;
+            ($self, $file) = ($file, $_[-1]);
+        }
+
+        Sidef::Types::Bool::Bool->new(CORE::rename($$self, $$file));
     }
 
     *rename_to = \&rename;
@@ -301,9 +312,16 @@ package Sidef::Types::Glob::File {
     sub move {
         my ($self, $file) = @_;
 
-        ref($file) eq __PACKAGE__
+        ref($file) eq ref($self)
           || $self->_is_string($file)
           || return;
+
+        if (@_ == 3) {
+            ref($_[-1]) eq ref($self)
+              || $self->_is_string($_[-1])
+              || return;
+            ($self, $file) = ($file, $_[-1]);
+        }
 
         require File::Copy;
         Sidef::Types::Bool::Bool->new(File::Copy::move($$self, $$file));
@@ -317,13 +335,21 @@ package Sidef::Types::Glob::File {
         my ($self, $file) = @_;
 
              ref($file) eq 'Sidef::Types::Glob::FileHandle'
-          || ref($file) eq __PACKAGE__
+          || ref($file) eq ref($self)
           || $self->_is_string($file)
           || return;
 
+        if (@_ == 3) {
+                 ref($_[-1]) eq 'Sidef::Types::Glob::FileHandle'
+              || ref($_[-1]) eq ref($self)
+              || $self->_is_string($_[-1])
+              || return;
+            ($self, $file) = ($file, $_[-1]);
+        }
+
         require File::Copy;
         Sidef::Types::Bool::Bool->new(
-                              File::Copy::copy($$self, ref($file) eq 'Sidef::Types::Glob::FileHandle' ? $file->{fh} : $$file));
+                          File::Copy::copy(map { ref($_) eq 'Sidef::Types::Glob::FileHandle' ? $_->{fh} : $$_ } $self, $file));
     }
 
     *cp = \&copy;
