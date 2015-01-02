@@ -17,7 +17,7 @@ name: Sidef
 provides:
   Sidef:
     file: lib/Sidef.pm
-    version: '0.02'
+    version: '0.03'
   Sidef::Args::Args:
     file: lib/Sidef/Args/Args.pm
   Sidef::Convert::Convert:
@@ -175,4 +175,4 @@ requires:
   utf8: '0'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.02'
+version: '0.03'
