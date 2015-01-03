@@ -232,7 +232,7 @@ scripts/gamma_function.sf
 scripts/gcd.sf
 scripts/getopt.sf
 scripts/global_regex_matching.sf
-scripts/Graphical/gtk2_tutorial.pl
+scripts/Graphical/gtk2_tutorial.sf
 scripts/Graphical/tk_library.sf
 scripts/group_precedence.sf
 scripts/hailstone.sf
