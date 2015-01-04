@@ -296,8 +296,7 @@ package Sidef::Math::Math {
             *{__PACKAGE__ . '::' . $f} = sub {
                 my ($self, @rest) = @_;
                 require Math::Trig;
-                my $func = \&{'Math::Trig::' . $f};
-                Sidef::Types::Number::Number->new($func->(map { $_->get_value } @rest));
+                Sidef::Types::Number::Number->new((\&{'Math::Trig::' . $f})->(map { $_->get_value } @rest));
             };
         }
     }

@@ -53,11 +53,10 @@ package Sidef::Module::Func {
         my ($self, @arg) = @_;
 
         my ($func) = ($AUTOLOAD =~ /^.*[^:]::(.*)$/);
-        my $sub = \&{$self->{module} . '::' . $func};
         my @results;
 
         eval {
-            @results = $sub->(
+            @results = (\&{$self->{module} . '::' . $func})->(
                 @arg
                 ? (
                    map {

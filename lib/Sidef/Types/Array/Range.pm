@@ -5,7 +5,7 @@ package Sidef::Types::Array::Range {
 
     sub new {
         my (undef, %opt) = @_;
-        bless \%opt;
+        bless \%opt, __PACKAGE__;
     }
 
     sub each {

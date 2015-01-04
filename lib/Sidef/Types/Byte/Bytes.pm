@@ -6,7 +6,7 @@ package Sidef::Types::Byte::Bytes {
 
     sub new {
         my (undef, @bytes) = @_;
-        bless [@{Sidef::Types::Array::Array->new(@bytes)}];
+        bless [@{Sidef::Types::Array::Array->new(@bytes)}], __PACKAGE__;
     }
 
     sub call {

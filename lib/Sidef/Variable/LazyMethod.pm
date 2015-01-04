@@ -5,12 +5,10 @@ package Sidef::Variable::LazyMethod {
 
     sub new {
         my (undef, %hash) = @_;
-        bless \%hash;
+        bless \%hash, __PACKAGE__;
     }
 
-    sub DESTROY {
-
-    }
+    sub DESTROY { }
 
     sub AUTOLOAD {
         my ($self, @args) = @_;

@@ -6,7 +6,7 @@ package Sidef::Types::Char::Chars {
 
     sub new {
         my (undef, @chars) = @_;
-        bless [@{Sidef::Types::Array::Array->new(@chars)}];
+        bless [@{Sidef::Types::Array::Array->new(@chars)}], __PACKAGE__;
     }
 
     sub call {

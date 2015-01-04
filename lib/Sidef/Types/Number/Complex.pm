@@ -11,7 +11,7 @@ package Sidef::Types::Number::Complex {
     sub new {
         my (undef, $x, $y) = @_;
 
-        my $self = bless {};
+        my $self = bless({}, __PACKAGE__);
         defined($x) || return $self;
 
         require Math::Complex;

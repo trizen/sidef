@@ -13,11 +13,12 @@ package Sidef::Types::Number::Number {
 
         require Math::BigFloat;
         ref($num) eq 'Math::BigFloat'
-          ? (bless \$num)
+          ? (bless \$num, __PACKAGE__)
           : (
             bless \do {
                 eval { Math::BigFloat->new($num) } // Math::BigFloat->new(Math::BigInt->new($num));
-              }
+            },
+            __PACKAGE__
             );
     }
 
@@ -28,11 +29,11 @@ package Sidef::Types::Number::Number {
 
         require Math::BigInt;
         my $ref = ref($num);
-        $ref eq 'Math::BigInt' ? (bless \$num)
+        $ref eq 'Math::BigInt' ? (bless \$num, __PACKAGE__)
           : (   $ref eq 'Math::BigFloat'
              || $ref eq 'Math::BigRat'
-             || $ref eq __PACKAGE__) ? (bless \Math::BigInt->new($num->as_int))
-          : (bless \Math::BigInt->new(index($num, '.') > 0 ? CORE::int($num) : $num));
+             || $ref eq __PACKAGE__) ? (bless \Math::BigInt->new($num->as_int), __PACKAGE__)
+          : (bless \Math::BigInt->new(index($num, '.') > 0 ? CORE::int($num) : $num), __PACKAGE__);
     }
 
     sub new_rat {
@@ -40,12 +41,13 @@ package Sidef::Types::Number::Number {
 
         require Math::BigRat;
         ref($num) eq 'Math::BigRat'
-          ? (bless \$num)
+          ? (bless \$num, __PACKAGE__)
           : (
             bless \do {
                 eval { Math::BigRat->new($num) }
                   // eval { Math::BigRat->new(Math::BigFloat->new($num)) } // Math::BigRat->new(Math::BigInt->new($num));
-              }
+            },
+            __PACKAGE__
             );
     }
 

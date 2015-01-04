@@ -473,21 +473,21 @@ package Sidef::Parser {
 
             # Alpha-numeric method name
             if (/\G($self->{method_name_re})/gxoc) {
-                return $1, 0, '', pos;
+                return ($1, 0, '', pos);
             }
 
             # Operator-like method name
             if (m{\G$self->{operators_re}}goc) {
                 my $uop = exists($+{uop});
                 my $rop = exists($+{rop});
-                return $+, ($uop ? 1 : $rop ? 0 : not exists $self->{postfix_ops}{$+}),
-                  ($uop ? 'uop' : $rop ? 'rop' : ''), pos;
+                return ($+, ($uop ? 1 : $rop ? 0 : not exists $self->{postfix_ops}{$+}),
+                        ($uop ? 'uop' : $rop ? 'rop' : ''), pos);
             }
 
             # Method name as expression
             my ($obj, $pos) = $self->parse_expr(code => substr($_, pos));
-            $obj // return undef, 0, '', pos($_);
-            return {self => $obj}, 0, '', pos($_) + $pos;
+            $obj // return (undef, 0, '', pos($_));
+            return ({self => $obj}, 0, '', pos($_) + $pos);
         }
     }
 

@@ -4,7 +4,7 @@ package Sidef::Eval::Eval {
 
     sub new {
         my (undef, $parser, $vars) = @_;
-        bless {parser => $parser, ref_vars => $vars};
+        bless {parser => $parser, ref_vars => $vars}, __PACKAGE__;
     }
 
     sub eval {
