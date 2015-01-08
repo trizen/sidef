@@ -80,12 +80,6 @@ package Sidef::Variable::Variable {
         $self->{type};
     }
 
-    sub __nonexistent_method {
-        my ($self, $method, $obj) = @_;
-        warn sprintf(qq{[WARN] Can't find the method "$method" for object "%s"!\n}, ref($obj));
-        return;
-    }
-
     sub __set_value {
         my ($self, $obj) = @_;
 
@@ -146,23 +140,14 @@ package Sidef::Variable::Variable {
             *{__PACKAGE__ . '::' . $operator} = sub {
                 my ($self, $arg) = @_;
                 my $value = $self->get_value;
-                my $sub;
-                ref($value) && defined($sub = $value->can($operator))
-                  ? $self->__set_value($value->$sub($arg))
-                  : $self->__nonexistent_method($operator, $arg);
+                $self->__set_value($value->$operator($arg));
                 $value;
-
             };
         }
 
         foreach my $operator (qw(+ - % * / & | ^ ** && || << >> ÷)) {
             *{__PACKAGE__ . '::' . $operator . '='} = sub {
-                my ($self, $arg) = @_;
-                my $value = $self->get_value;
-                my $sub;
-                ref($value) && defined($sub = $value->can($operator))
-                  ? $self->__set_value($value->$sub($arg))
-                  : $self->__nonexistent_method($operator, $arg);
+                $_[0]->__set_value($_[0]->get_value->$operator($_[1]));
             };
         }
     }
@@ -184,40 +169,33 @@ package Sidef::Variable::Variable {
             $suffix = chop $method;
         }
 
-        if (ref($value) && (defined(my $sub = $value->can($method) // ($value->can('AUTOLOAD') ? $method : ())))) {
-            my $result = $value->$sub(@args);
+        my $result = $value->$method(@args);
 
-            if (defined($suffix)) {
-                if ($suffix eq '!') {    # modifies the variable in place
-                    $self->__set_value($result);
-                    return $self;
-                }
-
-                if ($suffix eq ':') {    # returns the self variable
-                    return $self;
-                }
-
-                if ($suffix eq '?') {    # asks for a boolean value
-                    return ref($result) eq 'Sidef::Types::Bool::Bool'
-                      ? $result
-                      : Sidef::Types::Bool::Bool->new($result);
-                }
+        if (defined($suffix)) {
+            if ($suffix eq '!') {    # modifies the variable in place
+                $self->__set_value($result);
+                return $self;
             }
 
-            if ($self->{type} eq 'func' and exists $self->{returns}) {
-                ref($result) eq ref($self->{returns}) || do {
-                    die "[ERROR] Return-type error from function '$self->{name}': returned '", ref($result),
-                      "', but expected '", ref($self->{returns}), "'!\n";
-                };
+            if ($suffix eq ':') {    # returns the self variable
+                return $self;
             }
 
-            return $result;
-        }
-        else {
-            $self->__nonexistent_method($method, $value);
+            if ($suffix eq '?') {    # asks for a boolean value
+                return ref($result) eq 'Sidef::Types::Bool::Bool'
+                  ? $result
+                  : Sidef::Types::Bool::Bool->new($result);
+            }
         }
 
-        return;
+        if ($self->{type} eq 'func' and exists $self->{returns}) {
+            ref($result) eq ref($self->{returns}) || do {
+                die "[ERROR] Return-type error from function '$self->{name}': returned '", ref($result),
+                  "', but expected '", ref($self->{returns}), "'!\n";
+            };
+        }
+
+        $result;
     }
 }
 

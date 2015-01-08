@@ -5,16 +5,10 @@ package Sidef::Types::Bool::Ternary {
         bless \%opt, __PACKAGE__;
     }
 
-    {
-        *{__PACKAGE__ . '::' . ':'} = sub {
-            my ($self, $code) = @_;
-
-            $self->{bool}
-              && return $self->{code};
-
-            Sidef::Types::Block::Code->new($code)->run;
-        };
-    }
+    *{__PACKAGE__ . '::' . ':'} = sub {
+        my ($self, $code) = @_;
+        Sidef::Types::Block::Code->new($self->{bool} ? $self->{code} : $code)->run;
+    };
 
 };
 

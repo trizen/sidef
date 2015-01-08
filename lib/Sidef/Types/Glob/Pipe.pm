@@ -3,8 +3,7 @@ package Sidef::Types::Glob::Pipe {
     use 5.014;
 
     our @ISA = qw(
-      Sidef
-      Sidef::Convert::Convert
+      Sidef::Object::Object
       );
 
     sub new {
@@ -29,27 +28,22 @@ package Sidef::Types::Glob::Pipe {
     sub open {
         my ($self, $mode, $var_ref) = @_;
 
-        ref($mode)
-          ? $self->is_string($mode, 1)
-              ? do { $mode = $$mode }
-              : return
-          : ();
+        if (ref $mode) {
+            $mode = $mode->get_value;
+        }
 
         my $pid = open(my $pipe_h, $mode, @{$self});
         my $pipe_obj = Sidef::Types::Glob::PipeHandle->new(pipe_h => $pipe_h, pipe => $self);
 
-        if (ref($var_ref) eq 'Sidef::Variable::Ref') {
+        if (defined($var_ref)) {
             $var_ref->get_var->set_value($pipe_obj);
 
             return defined($pid)
               ? Sidef::Types::Number::Number->new($pid)
               : ();
         }
-        elsif (defined($pid)) {
-            return $pipe_obj;
-        }
 
-        return;
+        defined($pid) ? $pipe_obj : ();
     }
 
     sub open_r {

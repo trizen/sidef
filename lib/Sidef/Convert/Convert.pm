@@ -5,13 +5,6 @@ package Sidef::Convert::Convert {
     use 5.014;
     our @ISA = qw(Sidef);
 
-    state $array_like = {
-                         'Sidef::Types::Array::Array' => 1,
-                         'Sidef::Types::Array::Pair'  => 1,
-                         'Sidef::Types::Byte::Bytes'  => 1,
-                         'Sidef::Types::Char::Chars'  => 1,
-                        };
-
     use overload q{""} => \&stringify;
 
     sub stringify {
@@ -19,9 +12,7 @@ package Sidef::Convert::Convert {
             return $_[0]{regex};
         }
 
-        require Scalar::Util;
-        my $type = Scalar::Util::reftype($_[0]);
-        if ($type eq 'SCALAR' or $type eq 'REF') {
+        if ($_[0]->isa('SCALAR') || $_[0]->isa('REF')) {
             return ${$_[0]};
         }
 
@@ -31,13 +22,15 @@ package Sidef::Convert::Convert {
     sub to_s {
         my ($self) = @_;
 
-        if (exists $array_like->{ref $self}) {
+        if (Sidef->_is_array($self)) {
             return Sidef::Types::String::String->new(join(' ', map { $_->get_value } @{$self}));
         }
-        elsif (ref $self eq 'Sidef::Types::Hash::Hash') {
+
+        if (Sidef->_is_hash($self)) {
             return Sidef::Types::String::String->new(join(' ', map { $_->to_s } @{$self->to_a}));
         }
-        elsif (ref $self eq 'Sidef::Types::Regex::Regex') {
+
+        if (Sidef->_is_regex($self)) {
             return Sidef::Types::String::String->new($self->{regex});
         }
 
@@ -58,10 +51,7 @@ package Sidef::Convert::Convert {
     *to_object = \&to_obj;
 
     sub to_i {
-        my ($self) = @_;
-        $self->_is_number($self, 1, 1) || $self->_is_string($self)
-          ? Sidef::Types::Number::Number->new_int($$self)
-          : ();
+        Sidef::Types::Number::Number->new_int($_[0]->get_value);
     }
 
     *to_integer = \&to_i;
@@ -70,10 +60,7 @@ package Sidef::Convert::Convert {
     *toInteger  = \&to_i;
 
     sub to_rat {
-        my ($self) = @_;
-        $self->_is_number($self, 1, 1) || $self->_is_string($self)
-          ? Sidef::Types::Number::Number->new_rat($$self)
-          : ();
+        Sidef::Types::Number::Number->new_rat($_[0]->get_value);
     }
 
     *to_rational = \&to_rat;
@@ -82,20 +69,14 @@ package Sidef::Convert::Convert {
     *toRational  = \&to_rat;
 
     sub to_complex {
-        my ($self) = @_;
-        $self->_is_number($self, 1, 1) || $self->_is_string($self)
-          ? Sidef::Types::Number::Complex->new($self)
-          : ();
+        Sidef::Types::Number::Complex->new($_[0]->get_value);
     }
 
     *toComplex = \&to_complex;
     *to_c      = \&to_complex;
 
     sub to_num {
-        my ($self) = @_;
-            $self->_is_number($self, 1, 1) ? $self
-          : $self->_is_string($self) ? Sidef::Types::Number::Number->new($$self)
-          :                            ();
+        Sidef::Types::Number::Number->new($_[0]->get_value);
     }
 
     *toNum     = \&to_num;
@@ -103,57 +84,44 @@ package Sidef::Convert::Convert {
     *toNumber  = \&to_num;
 
     sub to_float {
-        my ($self) = @_;
-            $self->_is_number($self, 1, 1) ? $self
-          : $self->_is_string($self) ? Sidef::Types::Number::Number->new_float($$self)
-          :                            ();
+        Sidef::Types::Number::Number->new_float($_[0]->get_value);
     }
 
     *to_f    = \&to_float;
     *toFloat = \&to_float;
 
     sub to_file {
-        my ($self) = @_;
-        $self->_is_string($self) || return;
-        Sidef::Types::Glob::File->new($$self);
+        Sidef::Types::Glob::File->new($_[0]->get_value);
     }
 
     *toFile = \&to_file;
 
     sub to_dir {
-        my ($self) = @_;
-        $self->_is_string($self) || return;
-        Sidef::Types::Glob::Dir->new($$self);
+        Sidef::Types::Glob::Dir->new($_[0]->get_value);
     }
 
     *toDir = \&to_dir;
 
     sub to_bool {
-        my ($self) = @_;
-        Sidef::Types::Bool::Bool->new($self);
+        Sidef::Types::Bool::Bool->new($_[0]->get_value);
     }
 
     *toBool = \&to_bool;
 
     sub to_byte {
-        my ($self) = @_;
-        $self->_is_number($self, 0, 1) || $self->_is_string($self) || return;
-        Sidef::Types::Byte::Byte->new(CORE::ord $$self);
+        Sidef::Types::Byte::Byte->new(CORE::ord($_[0]->get_value));
     }
 
     *toByte = \&to_byte;
 
     sub to_char {
-        my ($self) = @_;
-        Sidef::Types::Char::Char->call($self);
+        Sidef::Types::Char::Char->call($_[0]->get_value);
     }
 
     *toChar = \&to_char;
 
     sub to_regex {
-        my ($self) = @_;
-        $self->_is_number($self, 0, 1) || $self->_is_string($self) || return;
-        Sidef::Types::Regex::Regex->new($$self);
+        Sidef::Types::Regex::Regex->new($_[0]->get_value);
     }
 
     *toRe    = \&to_regex;
@@ -161,38 +129,31 @@ package Sidef::Convert::Convert {
     *toRegex = \&to_regex;
 
     sub to_bytes {
-        my ($self) = @_;
-        Sidef::Types::Byte::Bytes->call($self);
+        Sidef::Types::Byte::Bytes->call($_[0]->get_value);
     }
 
     *toBytes = \&to_bytes;
 
     sub to_chars {
-        my ($self) = @_;
-        Sidef::Types::Char::Chars->call($self);
+        Sidef::Types::Char::Chars->call($_[0]->get_value);
     }
 
     *toChars = \&to_chars;
 
     sub to_array {
-        my ($self) = @_;
-        Sidef::Types::Array::Array->new($self);
+        Sidef::Types::Array::Array->new($_[0]);
     }
 
     *toArray = \&to_array;
 
     sub to_caller {
-        my ($self) = @_;
-        $self->_is_string($self) || return;
-        Sidef::Module::Caller->_new(module => $$self);
+        Sidef::Module::Caller->_new(module => $_[0]->get_value);
     }
 
     *toCaller = \&to_caller;
 
     sub to_fcaller {
-        my ($self) = @_;
-        $self->_is_string($self) || return;
-        Sidef::Module::Func->_new(module => $$self);
+        Sidef::Module::Func->_new(module => $_[0]->get_value);
     }
 
     *toFcaller = \&to_fcaller;

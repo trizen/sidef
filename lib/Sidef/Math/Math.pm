@@ -16,50 +16,43 @@ package Sidef::Math::Math {
 
     sub exp {
         my ($self, $x, $places) = @_;
-        $self->_is_number($x) || return;
         Sidef::Types::Number::Number->new(
-                     Math::BigFloat->new($$x)->bexp(defined($places) ? ($self->_is_number($places)) ? $$places : return : ()));
+                                         Math::BigFloat->new($x->get_value)->bexp(defined($places) ? $places->get_value : ()));
     }
 
     sub pi {
         my ($self, $places) = @_;
-        Sidef::Types::Number::Number->new(
-                        Math::BigFloat->new(0)->bpi(defined($places) ? ($self->_is_number($places)) ? $$places : return : ()));
+        Sidef::Types::Number::Number->new(Math::BigFloat->new(0)->bpi(defined($places) ? $places->get_value : ()));
     }
 
     *PI = \&pi;
 
     sub atan {
         my ($self, $x, $places) = @_;
-        $self->_is_number($x) || return;
         Sidef::Types::Number::Number->new(
-                    Math::BigFloat->new($$x)->batan(defined($places) ? ($self->_is_number($places)) ? $$places : return : ()));
+                                        Math::BigFloat->new($x->get_value)->batan(defined($places) ? $places->get_value : ()));
     }
 
     sub atan2 {
         my ($self, $x, $y, $places) = @_;
-        ($self->_is_number($x) && $self->_is_number($y)) || return;
         Sidef::Types::Number::Number->new(
-              Math::BigFloat->new($$x)->batan2($$y, defined($places) ? ($self->_is_number($places)) ? $$places : return : ()));
+                        Math::BigFloat->new($x->get_value)->batan2($y->get_value, defined($places) ? $places->get_value : ()));
     }
 
     sub cos {
         my ($self, $x, $places) = @_;
-        $self->_is_number($x) || return;
         Sidef::Types::Number::Number->new(
-                     Math::BigFloat->new($$x)->bcos(defined($places) ? ($self->_is_number($places)) ? $$places : return : ()));
+                                         Math::BigFloat->new($x->get_value)->bcos(defined($places) ? $places->get_value : ()));
     }
 
     sub sin {
         my ($self, $x, $places) = @_;
-        $self->_is_number($x) || return;
         Sidef::Types::Number::Number->new(
-                     Math::BigFloat->new($$x)->bsin(defined($places) ? ($self->_is_number($places)) ? $$places : return : ()));
+                                         Math::BigFloat->new($x->get_value)->bsin(defined($places) ? $places->get_value : ()));
     }
 
     sub asin {
         my ($self, $x, $places) = @_;
-        $self->_is_number($x) || return;
         $self->atan2(
                      $x,
                      $self->sqrt(
@@ -71,115 +64,91 @@ package Sidef::Math::Math {
 
     sub log {
         my ($self, $n, $base) = @_;
-        $self->_is_number($n) || return;
-        Sidef::Types::Number::Number->new(
-                           Math::BigFloat->new($$n)->blog(defined($base) ? ($self->_is_number($base)) ? $$base : return : ()));
+        Sidef::Types::Number::Number->new(Math::BigFloat->new($n->get_value)->blog(defined($base) ? $base->get_value : ()));
     }
 
     sub log2 {
         my ($self, $n) = @_;
-        $self->_is_number($n) || return;
-        Sidef::Types::Number::Number->new(Math::BigFloat->new($$n)->blog(2));
+        Sidef::Types::Number::Number->new(Math::BigFloat->new($n->get_value)->blog(2));
     }
 
     sub log10 {
         my ($self, $n) = @_;
-        $self->_is_number($n) || return;
-        Sidef::Types::Number::Number->new(Math::BigFloat->new($$n)->blog(10));
+        Sidef::Types::Number::Number->new(Math::BigFloat->new($n->get_value)->blog(10));
     }
 
     sub npow2 {
         my ($self, $x) = @_;
-
-        $self->_is_number($x) || return;
-        $x = Math::BigFloat->new($$x);
-
         my $y = Math::BigFloat->new(2);
-        Sidef::Types::Number::Number->new($y->blsft($x->blog($y)->as_int));
+        Sidef::Types::Number::Number->new($y->blsft(Math::BigFloat->new($x->get_value)->blog($y)->as_int));
     }
 
     sub npow {
         my ($self, $x, $y) = @_;
-        $self->_is_number($x) || return;
-        $self->_is_number($y) || return;
 
-        $x = Math::BigFloat->new($$x);
-        $y = Math::BigFloat->new($$y);
+        $x = Math::BigFloat->new($x->get_value);
+        $y = Math::BigFloat->new($y->get_value);
 
         Sidef::Types::Number::Number->new($y->bpow($x->blog($y)->as_int->binc));
     }
 
     sub gcd {
         my ($self, @list) = @_;
-        $self->_is_number($_) || return for @list;
-        Sidef::Types::Number::Number->new(Math::BigFloat::bgcd(map { $$_ } @list));
+        Sidef::Types::Number::Number->new(Math::BigFloat::bgcd(map { $_->get_value } @list));
     }
 
     sub abs {
         my ($self, $n) = @_;
-        $self->_is_number($n) || return;
-        Sidef::Types::Number::Number->new(Math::BigFloat->new($$n)->babs);
+        Sidef::Types::Number::Number->new(Math::BigFloat->new($n->get_value)->babs);
     }
 
     sub lcm {
         my ($self, @list) = @_;
-        $self->_is_number($_) || return for @list;
-        Sidef::Types::Number::Number->new(Math::BigFloat::blcm(map { $$_ } @list));
+        Sidef::Types::Number::Number->new(Math::BigFloat::blcm(map { $_->get_value } @list));
     }
 
     sub inf {
-        my ($self) = @_;
         Sidef::Types::Number::Number->new(Math::BigFloat->binf);
     }
 
     sub precision {
         my ($self, $n) = @_;
-        $self->_is_number($n) || return;
-        Sidef::Types::Number::Number->new(Math::BigFloat->precision($$n));
+        Sidef::Types::Number::Number->new(Math::BigFloat->precision($n->get_value));
     }
 
     sub accuracy {
         my ($self, $n) = @_;
-        $self->_is_number($n) || return;
-        Sidef::Types::Number::Number->new(Math::BigFloat->accuracy($$n));
+        Sidef::Types::Number::Number->new(Math::BigFloat->accuracy($n->get_value));
     }
 
     sub ceil {
         my ($self, $n) = @_;
-        $self->_is_number($n) || return;
-        Sidef::Types::Number::Number->new(Math::BigFloat->new($$n)->bceil);
+        Sidef::Types::Number::Number->new(Math::BigFloat->new($n->get_value)->bceil);
     }
 
     sub floor {
         my ($self, $n) = @_;
-        $self->_is_number($n) || return;
-        Sidef::Types::Number::Number->new(Math::BigFloat->new($$n)->bfloor);
+        Sidef::Types::Number::Number->new(Math::BigFloat->new($n->get_value)->bfloor);
     }
 
     sub sqrt {
         my ($self, $n) = @_;
-        $self->_is_number($n) || return;
-        Sidef::Types::Number::Number->new(Math::BigFloat->new($$n)->bsqrt);
+        Sidef::Types::Number::Number->new(Math::BigFloat->new($n->get_value)->bsqrt);
     }
 
     sub pow {
         my ($self, $n, $pow) = @_;
-        $self->_is_number($n)   || return;
-        $self->_is_number($pow) || return;
-        Sidef::Types::Number::Number->new(Math::BigFloat->new($$n)->bpow($$pow));
+        Sidef::Types::Number::Number->new(Math::BigFloat->new($n->get_value)->bpow($pow->get_value));
     }
 
     sub range_sum {
         my ($self, $from, $to, $step) = @_;
 
-        $self->_is_number($from) || return;
-        $self->_is_number($to)   || return;
+        $from = $from->get_value;
+        $to   = $to->get_value;
+        $step = defined($step) ? $step->get_value : 1;
 
-        defined($step) ? $self->_is_number($step) ? () : return : do {
-            $step = Sidef::Types::Number::Number->new(1);
-        };
-
-        Sidef::Types::Number::Number->new(($$from + $$to) * (($$to - $$from) / $$step + 1) / 2);
+        Sidef::Types::Number::Number->new(($from + $to) * (($to - $from) / $step + 1) / 2);
     }
 
     *rangeSum = \&range_sum;
@@ -187,16 +156,16 @@ package Sidef::Math::Math {
     sub map {
         my ($self, $amount, $from, $to) = @_;
 
-        $self->_is_number($amount) || return;
-        $self->_is_number($from)   || return;
-        $self->_is_number($to)     || return;
+        $amount = $amount->get_value;
+        $from   = $from->get_value;
+        $to     = $to->get_value;
 
-        my $step  = ($$to - $$from) / $$amount;
+        my $step  = ($to - $from) / $amount;
         my $array = Sidef::Types::Array::Array->new();
 
         return $array if $step == 0;
 
-        for (my $i = $$from ; $i < $$to ; $i += $step) {
+        for (my $i = $from ; $i < $to ; $i += $step) {
             $array->push(Sidef::Types::Number::Number->new($i));
         }
 
@@ -206,13 +175,9 @@ package Sidef::Math::Math {
     sub number_to_percentage {
         my ($self, $num, $from, $to) = @_;
 
-        $self->_is_number($num)  || return;
-        $self->_is_number($from) || return;
-        $self->_is_number($to)   || return;
-
-        $num  = $$num;
-        $to   = $$to;
-        $from = $$from;
+        $num  = $num->get_value;
+        $to   = $to->get_value;
+        $from = $from->get_value;
 
         my $sum  = CORE::abs($to - $from);
         my $dist = CORE::abs($num - $to);

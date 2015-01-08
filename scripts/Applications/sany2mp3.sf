@@ -10,7 +10,7 @@ License: GPLv3
 Website: http://github.com/trizen
 
 Usage:
-      ./#{__FILE__} [options] -f [files]
+      #{__FILE__} [options] -f [files]
 
 Options:
        -t int         : use this many threads (default: 2)
@@ -55,12 +55,21 @@ func main() {
         usage(2);
     );
 
+    outputDir.exists || (
+        outputDir.create || die "Can't create dir `#{outputDir}': #{$!}";
+    );
+
     var forks = [];
     var counter = 0;
     files.each { |file|
 
         file.exists || (
             "File `#{file}' does not exists! Skipping file...\n".warn;
+            next;
+        );
+
+        file.is_file || (
+            "File `#{file}' is not a plain file! Skipping it...\n".warn;
             next;
         );
 

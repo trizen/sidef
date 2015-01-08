@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 func gcd(a,b) {
-    b.isZero ?: (Math.abs(a), gcd(b, a % b));
+    b.isZero ? Math.abs(a) : gcd(b, a % b);
 }
 
 for 12..15 {     |x|

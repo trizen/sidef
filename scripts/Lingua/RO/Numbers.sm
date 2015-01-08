@@ -250,11 +250,11 @@ class new(diacritics            = true,
         }
         elsif (number.is_negative) {
             words.append(self[:negative_sign]);
-            words.append(__METHOD__(self, number.abs)->to_list);
+            words.append(__METHOD__(self, number.abs)...);
         }
         elsif (!(number.isInt)) {
 
-            words.append(__METHOD__(self, number.int)->to_list);
+            words.append(__METHOD__(self, number.int)...);
             words.append(self[:decimal_point]);
 
             number -= (number.int);
@@ -264,7 +264,7 @@ class new(diacritics            = true,
                     < 1 && (words.append(DIGITS[0]));
             }
 
-            words.append(__METHOD__(self, number.int)->to_list);
+            words.append(__METHOD__(self, number.int)...);
         }
         elsif (number >= BIGNUMS[0]['num']) {
             for (0 .. (BIGNUMS.offset - 1)) { |i|
@@ -300,7 +300,7 @@ class new(diacritics            = true,
                         BIGNUMS[j]['num'] > 1000 && (
                             words[-1] += self[:thousands_separator]
                         );
-                        words.append(__METHOD__(self, number)->to_list)
+                        words.append(__METHOD__(self, number)...)
                     );
 
                     break;

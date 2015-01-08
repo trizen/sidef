@@ -3,8 +3,7 @@ package Sidef::Types::Hash::Hash {
     use 5.014;
 
     our @ISA = qw(
-      Sidef
-      Sidef::Convert::Convert
+      Sidef::Object::Object
       );
 
     sub new {
@@ -84,7 +83,6 @@ package Sidef::Types::Hash::Hash {
     sub duplicate_of {
         my ($self, $obj) = @_;
 
-        $self->_is_hash($obj);
         %{$self->{data}} eq %{$obj->{data}} || return Sidef::Types::Bool::Bool->false;
 
         my $ne_method = '!=';
@@ -104,7 +102,6 @@ package Sidef::Types::Hash::Hash {
     sub eq {
         my ($self, $obj) = @_;
 
-        $self->_is_hash($obj);
         %{$self->{data}} eq %{$obj->{data}} || return Sidef::Types::Bool::Bool->false;
 
         while (my ($key) = each %{$self->{data}}) {
@@ -152,7 +149,6 @@ package Sidef::Types::Hash::Hash {
 
     sub mapval {
         my ($self, $code) = @_;
-        $self->_is_code($code) || return;
 
         while (my ($key, $value) = each %{$self->{data}}) {
             $self->{data}{$key} =
@@ -171,8 +167,6 @@ package Sidef::Types::Hash::Hash {
 
     sub select {
         my ($self, $code) = @_;
-
-        $self->_is_code($code) || return;
 
         my $new_hash = $self->new;
         $self->_iterate(

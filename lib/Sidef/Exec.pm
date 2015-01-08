@@ -6,72 +6,35 @@ package Sidef::Exec {
     our @NAMESPACES;
 
     sub new {
-        my $self = bless {
-            bool_assign_method => {
-                                   ':='    => 1,
-                                   '||='   => 1,
-                                   '|='    => 1,
-                                   '&&='   => 1,
-                                   '&='    => 1,
-                                   '\\\\'  => 1,
-                                   '\\\\=' => 1,
-                                  },
-            plain_array_methods => {
-                                    '...'     => 1,
-                                    'asList'  => 1,
-                                    'as_list' => 1,
-                                    'toList'  => 1,
-                                    'to_list' => 1,
-                                   },
-            types => {
-                'Sidef::Types::Bool::Bool' => {
-                                               '&&'  => 1,
-                                               '&'   => 1,
-                                               'and' => 1,
-                                               '||'  => 1,
-                                               'or'  => 1,
-                                               '|'   => 1,
-                                               '?'   => 1,
-                                               '?:'  => 1,
-                                              },
-                'Sidef::Types::Block::Code' => {
-                                                'while' => 1,
-                                               },
-                'Sidef::Types::Bool::While' => {
-                                                'while' => 1,
-                                               },
-                'Sidef::Types::Bool::Ternary' => {
-                                                  ':' => 1,
-                                                 },
-                'Sidef::Types::Bool::If' => {
-                                             'elsif' => 1,
-                                            },
-
-                     },
-          },
+        bless {
+               lazy_ops => {
+                            '||'    => 1,
+                            '&&'    => 1,
+                            ':='    => 1,
+                            '||='   => 1,
+                            '&&='   => 1,
+                            '\\\\'  => 1,
+                            '\\\\=' => 1,
+                           },
+               types => {
+                         'Sidef::Types::Block::Code' => {
+                                                         'while' => 1,
+                                                        },
+                         'Sidef::Types::Bool::While' => {
+                                                         'while' => 1,
+                                                        },
+                         'Sidef::Types::Bool::Ternary' => {
+                                                           ':' => 1,
+                                                          },
+                         'Sidef::Types::Bool::If' => {
+                                                      'elsif' => 1,
+                                                     },
+                         'Sidef::Types::Bool::Bool' => {
+                                                        '?' => 1,
+                                                       },
+                        },
+              },
           __PACKAGE__;
-
-        foreach my $value (values %{$self->{types}}) {
-            @{$self->{short_circuit_methods}}{keys %{$value}} = ();
-        }
-
-        $self->{types}{'Sidef::Variable::Variable'} = $self->{bool_assign_method};
-        $self;
-    }
-
-    sub valid_index {
-        my ($self, $index) = @_;
-
-        (
-              $self->_is_number($index, 1, 1)
-           || $self->_is_bool($index, 1, 1)
-           || do {
-             warn sprintf("[WARN] Array index must be a number, not '%s'!\n", ref($index));
-             return;
-           }
-        );
-
-        1;
     }
 
     sub execute_expr {
@@ -153,16 +116,12 @@ package Sidef::Exec {
                             next;
                         }
 
-                        !$is_hash && ($self->valid_index($ind) || next);
-
-                        if (ref $ind ne '') {
+                        if (ref $ind) {
                             $ind = $ind->get_value;
                         }
 
                         $is_hash
-                          ? do {
-                            $self_obj->{data}{$ind} //= Sidef::Variable::Variable->new(name => '', type => 'var');
-                          }
+                          ? ($self_obj->{data}{$ind} //= Sidef::Variable::Variable->new(name => '', type => 'var'))
                           : do {
                             foreach my $ind (0 .. $ind) {
                                 $self_obj->[$ind] //= Sidef::Variable::Variable->new(name => '', type => 'var');
@@ -193,16 +152,13 @@ package Sidef::Exec {
                         $self_obj = $self_obj->$ind;
                     }
                     else {
-
-                        !$is_hash && ($self->valid_index($ind) || next);
-
                         $self_obj = (
                             $is_hash
                             ? do {
                                 (ref($self_obj) && $self_obj->isa('HASH'))
                                   || ($self_obj = Sidef::Types::Hash::Hash->new);
 
-                                $self_obj->{data}{$ind} //=
+                                $self_obj->{data}{$ind->get_value} //=
                                   Sidef::Variable::Variable->new(
                                                                  name  => '',
                                                                  type  => 'var',
@@ -216,7 +172,6 @@ package Sidef::Exec {
                                   || ($self_obj = Sidef::Types::Array::Array->new());
 
                                 my $num = $ind->get_value;
-
                                 foreach my $j (0 .. $num - 1) {
                                     $self_obj->[$j] //= Sidef::Variable::Variable->new(name => '', type => 'var');
                                 }
@@ -269,50 +224,34 @@ package Sidef::Exec {
                     }
                 }
 
+                $self_obj //= $self->{__NIL__} //= Sidef::Types::Nil::Nil->new;
+
+                my $type = ref($self_obj);
+                last if $type eq 'Sidef::Types::Black::Hole';
+
                 # When the variable holds a module, get the
                 # value of variable and set it to $self_obj;
-                if (ref $self_obj eq 'Sidef::Variable::Variable') {
-
+                if ($type eq 'Sidef::Variable::Variable') {
                     my $value = $self_obj->get_value;
-                    my $ref   = ref($value);
-                    if (   $ref eq 'Sidef::Module::Caller'
-                        or $ref eq 'Sidef::Module::Func') {
+                    $type = ref($value);
+                    if (   $type eq 'Sidef::Module::Caller'
+                        or $type eq 'Sidef::Module::Func') {
                         $self_obj = $value;
                     }
                 }
-
-                $self_obj //= $self->{__NIL__} //= Sidef::Types::Nil::Nil->new;
-
-                my $sub = $self_obj->can($method) // (
-                    $self_obj->can('AUTOLOAD') ? $method : do {
-                        warn
-                          sprintf("[WARN] Inexistent method '%s' for object: %s\n", $method, ref($self_obj) || "`$self_obj'");
-                        return;
-                      }
-                );
-
-                my $type = ref($self_obj);
-                if (
-                    ($type eq 'Sidef::Variable::Variable' or $type eq 'Sidef::Variable::ClassVar')
-                    and (   exists $self->{short_circuit_methods}{$method}
-                         or exists($self->{bool_assign_method}{$method})
-                         && $method ne ':='
-                         && $method ne '\\\\'
-                         && $method ne '\\\\='
-                         && (my $ref_val = ref($self_obj->get_value)) ne 'Sidef::Types::Bool::Bool')
-                  ) {
-                    $type = $ref_val // ref($self_obj->get_value);
+                elsif ($type eq 'Sidef::Variable::ClassVar') {
+                    $type = ref($self_obj->get_value);
                 }
 
-                last if $type eq 'Sidef::Types::Black::Hole';
-
                 if (exists $call->{arg}) {
-
                     foreach my $arg (@{$call->{arg}}) {
                         if (
                             ref($arg) eq 'HASH'
                             and not(
-                                (exists($self->{types}{$type}) && exists($self->{types}{$type}{$method}))
+                                (
+                                 exists($self->{lazy_ops}{$method})
+                                 or (exists($self->{types}{$type}) && exists($self->{types}{$type}{$method}))
+                                )
                                 || (
                                     $type eq 'Sidef::Variable::Init'
                                     && (   $self_obj->{vars}[0]->{type} eq 'static'
@@ -362,12 +301,12 @@ package Sidef::Exec {
                         }
                     }
 
-                    $self_obj = $self_obj->$sub(@args);
+                    $self_obj = $self_obj->$method(@args);
                 }
                 else {
-                    $self_obj = $self_obj->$sub;
+                    $self_obj = $self_obj->$method;
 
-                    if (exists $self->{plain_array_methods}{$method}) {
+                    if ($method eq '...') {
                         return Sidef::Args::Args->new(@{$self_obj});
                     }
                 }

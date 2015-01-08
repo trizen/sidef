@@ -3,8 +3,7 @@ package Sidef::Types::Glob::Dir {
     use 5.014;
 
     our @ISA = qw(
-      Sidef
-      Sidef::Convert::Convert
+      Sidef::Types::String::String
       );
 
     sub new {
@@ -72,30 +71,26 @@ package Sidef::Types::Glob::Dir {
         __PACKAGE__->new(File::Spec->curdir);
     }
 
-    sub exists {
-        my ($self) = @_;
-        Sidef::Types::Bool::Bool->new(-e $$self);
-    }
-
     sub split {
         my ($self) = @_;
-
+        @_ == 2 && ($self = $_[1]);
         require File::Spec;
-        Sidef::Types::Array::Array->new(map { Sidef::Types::String::String->new($_) } File::Spec->splitdir($$self));
+        Sidef::Types::Array::Array->new(map { Sidef::Types::String::String->new($_) } File::Spec->splitdir($self->get_value));
     }
 
     # Returns the parent of the directory
     sub parent {
         my ($self) = @_;
-
+        @_ == 2 && ($self = $_[1]);
         require File::Basename;
-        __PACKAGE__->new(File::Basename::dirname($$self));
+        __PACKAGE__->new(File::Basename::dirname($self->get_value));
     }
 
     # Remove the directory (works only on empty dirs)
     sub remove {
         my ($self) = @_;
-        Sidef::Types::Bool::Bool->new(rmdir $$self);
+        @_ == 2 && ($self = $_[1]);
+        Sidef::Types::Bool::Bool->new(rmdir $self->get_value);
     }
 
     *delete = \&remove;
@@ -104,9 +99,9 @@ package Sidef::Types::Glob::Dir {
     # Remove the directory with all its content
     sub remove_tree {
         my ($self) = @_;
-
+        @_ == 2 && ($self = $_[1]);
         require File::Path;
-        Sidef::Types::Bool::Bool->new(File::Path::remove_tree($$self));
+        Sidef::Types::Bool::Bool->new(File::Path::remove_tree($self->get_value));
     }
 
     *removeTree = \&remove_tree;
@@ -114,7 +109,8 @@ package Sidef::Types::Glob::Dir {
     # Create directory without parents
     sub create {
         my ($self) = @_;
-        Sidef::Types::Bool::Bool->new(mkdir($$self));
+        @_ == 2 && ($self = $_[1]);
+        Sidef::Types::Bool::Bool->new(mkdir($self->get_value));
     }
 
     *make  = \&create;
@@ -123,9 +119,9 @@ package Sidef::Types::Glob::Dir {
     # Create the directory (with parents, if needed)
     sub create_tree {
         my ($self) = @_;
-
+        @_ == 2 && ($self = $_[1]);
         require File::Path;
-        Sidef::Types::Bool::Bool->new(File::Path::make_path($$self));
+        Sidef::Types::Bool::Bool->new(File::Path::make_path($self->get_value));
     }
 
     *createTree = \&create_tree;
@@ -138,62 +134,64 @@ package Sidef::Types::Glob::Dir {
     sub open {
         my ($self, $var_ref) = @_;
 
-        my $success = opendir(my $dir_h, $$self);
+        if (@_ == 3) {
+            ($self, $var_ref) = ($var_ref, $_[2]);
+        }
+
+        my $success = opendir(my $dir_h, $self->get_value);
         my $dir_obj = Sidef::Types::Glob::DirHandle->new(dir_h => $dir_h, dir => $self);
 
-        if (ref($var_ref) eq 'Sidef::Variable::Ref') {
+        if (defined $var_ref) {
             $var_ref->get_var->set_value($dir_obj);
 
             return $success
               ? Sidef::Types::Bool::Bool->true
               : Sidef::Types::Bool::Bool->false;
         }
-        elsif ($success) {
-            return $dir_obj;
-        }
 
-        return;
+        $success ? $dir_obj : ();
     }
 
     sub chdir {
         my ($self) = @_;
-        Sidef::Types::Bool::Bool->new(chdir($$self));
+        @_ == 2 && ($self = $_[1]);
+        Sidef::Types::Bool::Bool->new(chdir($self->get_value));
     }
 
     sub chroot {
         my ($self) = @_;
-        Sidef::Types::Bool::Bool->new(chroot($$self));
+        @_ == 2 && ($self = $_[1]);
+        Sidef::Types::Bool::Bool->new(chroot($self->get_value));
     }
 
     sub concat {
         my ($self, $file) = @_;
 
+        if (@_ == 3) {
+            ($self, $file) = ($file, $_[2]);
+        }
+
         require File::Spec;
-        $file->new(
-                   $self->_is_file($file, 0, 1)
-                     || $self->_is_dir($file, 0, 1)
-                     || $self->_is_string($file)
-                   ? File::Spec->catdir($$self, $$file)
-                   : return
-                  );
+        $file->new(File::Spec->catdir($self->get_value, $file->get_value));
     }
 
     *catfile = \&concat;
 
     sub is_empty {
         my ($self) = @_;
-
-        opendir(my $dir_h, $$self) || return;
-
-        while (defined(my $file = readdir $dir_h)) {
+        @_ == 2 && ($self = $_[1]);
+        CORE::opendir(my $dir_h, $self->get_value) || return;
+        while (defined(my $file = CORE::readdir $dir_h)) {
             next if $file eq '.' or $file eq '..';
             return Sidef::Types::Bool::Bool->false;
         }
-
         Sidef::Types::Bool::Bool->true;
     }
 
     *isEmpty = \&is_empty;
+
+    # exists
+    *exists = \&Sidef::Types::Glob::File::exists;
 
     # is_dir
     *is_directory = \&Sidef::Types::Glob::File::is_directory;
@@ -239,7 +237,7 @@ package Sidef::Types::Glob::Dir {
 
     sub dump {
         my ($self) = @_;
-        Sidef::Types::String::String->new('Dir.new(' . ${Sidef::Types::String::String->new($$self)->dump} . ')');
+        Sidef::Types::String::String->new('Dir.new(' . ${Sidef::Types::String::String->new($self->get_value)->dump} . ')');
     }
 
     {

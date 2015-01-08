@@ -4,8 +4,7 @@ package Sidef::Types::Number::Number {
     use 5.014;
 
     our @ISA = qw(
-      Sidef
-      Sidef::Convert::Convert
+      Sidef::Object::Object
       );
 
     sub new_float {
@@ -51,64 +50,61 @@ package Sidef::Types::Number::Number {
             );
     }
 
-    sub get_value { ${$_[0]}->numify }
+    sub get_value {
+        rindex((caller(1))[3], '::get_value') > 0
+          ? ${$_[0]}->numify
+          : ${$_[0]};
+    }
 
     sub mod {
         my ($self, $num) = @_;
-        $self->_is_number($num) || return;
-        $self->new($$self % $$num);
+        $self->new($self->get_value % $num->get_value);
     }
 
     sub pow {
         my ($self, $num) = @_;
-        $self->_is_number($num) || return;
-        $self->new($$self**$$num);
+        $self->new($self->get_value**$num->get_value);
     }
 
     sub inc {
         my ($self) = @_;
-        $self->new($$self->copy->binc);
+        $self->new($self->get_value->copy->binc);
     }
 
     sub dec {
         my ($self) = @_;
-        $self->new($$self->copy->bdec);
+        $self->new($self->get_value->copy->bdec);
     }
 
     sub lt {
         my ($self, $num) = @_;
-        $self->_is_number($num) || return;
-        Sidef::Types::Bool::Bool->new($$self < $$num);
+        Sidef::Types::Bool::Bool->new($self->get_value < $num->get_value);
     }
 
     sub gt {
         my ($self, $num) = @_;
-        $self->_is_number($num) || return;
-        Sidef::Types::Bool::Bool->new($$self > $$num);
+        Sidef::Types::Bool::Bool->new($self->get_value > $num->get_value);
     }
 
     sub and {
         my ($self, $num) = @_;
-        $self->_is_number($num) || return;
-        $self->new($$self->as_int->band($$num->as_int));
+        $self->new($self->get_value->as_int->band($num->get_value->as_int));
     }
 
     sub or {
         my ($self, $num) = @_;
-        $self->_is_number($num) || return;
-        $self->new($$self->as_int->bior($$num->as_int));
+        $self->new($self->get_value->as_int->bior($num->get_value->as_int));
     }
 
     sub xor {
         my ($self, $num) = @_;
-        $self->_is_number($num) || return;
-        $self->new($$self->as_int->bxor($$num->as_int));
+        $self->new($self->get_value->as_int->bxor($num->get_value->as_int));
     }
 
     sub eq {
         my ($self, $num) = @_;
         ref($self) ne ref($num) and return Sidef::Types::Bool::Bool->false;
-        Sidef::Types::Bool::Bool->new($$self == $$num);
+        Sidef::Types::Bool::Bool->new($self->get_value == $num->get_value);
     }
 
     *equals = \&eq;
@@ -116,68 +112,59 @@ package Sidef::Types::Number::Number {
     sub ne {
         my ($self, $num) = @_;
         ref($self) ne ref($num) and return Sidef::Types::Bool::Bool->true;
-        Sidef::Types::Bool::Bool->new($$self != $$num);
+        Sidef::Types::Bool::Bool->new($self->get_value != $num->get_value);
     }
 
     sub cmp {
         my ($self, $num) = @_;
-        $self->_is_number($num) || return;
-        __PACKAGE__->new($$self->bcmp($$num));
+        __PACKAGE__->new($self->get_value->bcmp($num->get_value));
     }
 
     sub acmp {
         my ($self, $num) = @_;
-        $self->_is_number($num) || return;
-        __PACKAGE__->new($$self->bacmp($$num));
+        __PACKAGE__->new($self->get_value->bacmp($num->get_value));
     }
 
     sub ge {
         my ($self, $num) = @_;
-        $self->_is_number($num) || return;
-        Sidef::Types::Bool::Bool->new($$self >= $$num);
+        Sidef::Types::Bool::Bool->new($self->get_value >= $num->get_value);
     }
 
     sub le {
         my ($self, $num) = @_;
-        $self->_is_number($num) || return;
-        Sidef::Types::Bool::Bool->new($$self <= $$num);
+        Sidef::Types::Bool::Bool->new($self->get_value <= $num->get_value);
     }
 
     sub subtract {
         my ($self, $num) = @_;
-        $self->_is_number($num) || return;
-        $self->new($$self - $$num);
+        $self->new($self->get_value - $num->get_value);
     }
 
     sub add {
         my ($self, $num) = @_;
-        $self->_is_number($num) || return;
-        $self->new($$self + $$num);
+        $self->new($self->get_value + $num->get_value);
     }
 
     sub multiply {
         my ($self, $num) = @_;
-        $self->_is_number($num) || return;
-        $self->new($$self * $$num);
+        $self->new($self->get_value * $num->get_value);
     }
 
     *x = \&multiply;
 
     sub div {
         my ($self, $num) = @_;
-        $self->_is_number($num) || return;
-        $self->new($$self / $$num);
+        $self->new($self->get_value / $num->get_value);
     }
 
     sub divmod {
         my ($self, $num) = @_;
-        $self->_is_number($num) || return;
         Sidef::Types::Array::Array->new($self->div($num)->int, $self->mod($num));
     }
 
     sub factorial {
         my ($self) = @_;
-        $self->new($$self->copy->bfac);
+        $self->new($self->get_value->copy->bfac);
     }
 
     *fact = \&factorial;
@@ -185,10 +172,8 @@ package Sidef::Types::Number::Number {
     sub comb {
         my ($self, $num) = @_;
 
-        $self->_is_number($num) || return;
-
-        my $k = $$self;
-        my $n = $$num;
+        my $k = $self->get_value;
+        my $n = $num->get_value;
         my @c = 0 .. $k - 1;
 
         my @bag;
@@ -212,11 +197,10 @@ package Sidef::Types::Number::Number {
     sub to {
         my ($self, $num, $step) = @_;
 
-        $self->_is_number($num) || return;
-        $step = defined($step) ? $self->_is_number($step) ? ($$step) : return : 1;
+        $step = defined($step) ? $self->_is_number($step) ? ($step->get_value) : return : 1;
 
         my $array = Sidef::Types::Array::Array->new();
-        for (my $i = $$self ; $i <= $$num ; $i += $step) {
+        for (my $i = $self->get_value ; $i <= $num->get_value ; $i += $step) {
             $array->push($self->new($i));
         }
         $array;
@@ -227,12 +211,9 @@ package Sidef::Types::Number::Number {
 
     sub downto {
         my ($self, $num, $step) = @_;
-
-        $self->_is_number($num) || return;
-        $step = defined($step) ? $self->_is_number($step) ? ($$step) : return : 1;
-
+        $step = defined($step) ? $step->get_value : 1;
         my $array = Sidef::Types::Array::Array->new();
-        for (my $i = $$self ; $i >= $$num ; $i -= $step) {
+        for (my $i = $self->get_value ; $i >= $num->get_value ; $i -= $step) {
             $array->push($self->new($i));
         }
         $array;
@@ -242,32 +223,41 @@ package Sidef::Types::Number::Number {
 
     sub range_to {
         my ($self, $num, $step) = @_;
-        $self->_is_number($num) || return;
-        $step = defined($step) ? $self->_is_number($step) ? ($$step) : return : 1;
-        Sidef::Types::Array::Range->new(from => $$self, to => $$num, step => $step, type => 'number', direction => 'up');
+        $step = defined($step) ? $step->get_value : 1;
+        Sidef::Types::Array::Range->new(
+                                        from      => $self->get_value,
+                                        to        => $num->get_value,
+                                        step      => $step,
+                                        type      => 'number',
+                                        direction => 'up'
+                                       );
     }
 
     sub range_downto {
         my ($self, $num, $step) = @_;
-        $self->_is_number($num) || return;
-        $step = defined($step) ? $self->_is_number($step) ? ($$step) : return : 1;
-        Sidef::Types::Array::Range->new(from => $$self, to => $$num, step => $step, type => 'number', direction => 'down');
+        $step = defined($step) ? $step->get_value : 1;
+        Sidef::Types::Array::Range->new(
+                                        from      => $self->get_value,
+                                        to        => $num->get_value,
+                                        step      => $step,
+                                        type      => 'number',
+                                        direction => 'down'
+                                       );
     }
 
     sub sqrt {
         my ($self) = @_;
-        $self->new(CORE::sqrt($$self));
+        $self->new(CORE::sqrt($self->get_value));
     }
 
     sub root {
         my ($self, $n) = @_;
-        $self->_is_number($n) || return;
-        $self->new($$self->copy->broot($$n));
+        $self->new($self->get_value->copy->broot($n->get_value));
     }
 
     sub abs {
         my ($self) = @_;
-        $self->new(CORE::abs($$self));
+        $self->new(CORE::abs($self->get_value));
     }
 
     *pos      = \&abs;
@@ -276,7 +266,7 @@ package Sidef::Types::Number::Number {
     sub hex {
         my ($self) = @_;
         require Math::BigInt;
-        $self->new(Math::BigInt->new("0x$$self"));
+        $self->new(Math::BigInt->new("0x$self->get_value"));
     }
 
     *from_hex = \&hex;
@@ -284,7 +274,7 @@ package Sidef::Types::Number::Number {
     sub oct {
         my ($self) = @_;
         require Math::BigInt;
-        __PACKAGE__->new(Math::BigInt->from_oct($$self));
+        __PACKAGE__->new(Math::BigInt->from_oct($self->get_value));
     }
 
     *from_oct = \&oct;
@@ -292,76 +282,68 @@ package Sidef::Types::Number::Number {
     sub bin {
         my ($self) = @_;
         require Math::BigInt;
-        $self->new(Math::BigInt->new("0b$$self"));
+        $self->new(Math::BigInt->new("0b$self->get_value"));
     }
 
     *from_bin = \&bin;
 
     sub exp {
         my ($self) = @_;
-        $self->new(CORE::exp($$self));
+        $self->new(CORE::exp($self->get_value));
     }
 
     sub int {
         my ($self) = @_;
-        $self->new($$self->as_int);
+        $self->new($self->get_value->as_int);
     }
 
     *as_int = \&int;
 
     sub cos {
         my ($self) = @_;
-        $self->new(CORE::cos($$self));
+        $self->new(CORE::cos($self->get_value));
     }
 
     sub sin {
         my ($self) = @_;
-        $self->new(CORE::sin($$self));
+        $self->new(CORE::sin($self->get_value));
     }
 
     sub log {
         my ($self, $base) = @_;
-        $self->new(
-                   $$self->copy->blog(
-                                        defined($base)
-                                      ? $self->_is_number($base)
-                                            ? ($$base)
-                                            : return
-                                      : ()
-                                     )
-                  );
+        $self->new($self->get_value->copy->blog(defined($base) ? $base->get_value : ()));
     }
 
     sub log10 {
         my ($self) = @_;
-        $self->new($$self->copy->blog(10));
+        $self->new($self->get_value->copy->blog(10));
     }
 
     sub log2 {
         my ($self) = @_;
-        $self->new($$self->copy->blog(2));
+        $self->new($self->get_value->copy->blog(2));
     }
 
     sub inf {
         my ($self) = @_;
-        $self->new('inf');
+        $self->new(Math::BigFloat->binf);
     }
 
     sub neg {
         my ($self) = @_;
-        $self->new($$self->copy->bneg);
+        $self->new($self->get_value->copy->bneg);
     }
 
     *negate = \&neg;
 
     sub not {
         my ($self) = @_;
-        $self->new($$self->copy->bnot);
+        $self->new($self->get_value->copy->bnot);
     }
 
     sub sign {
         my ($self) = @_;
-        Sidef::Types::String::String->new($$self->sign);
+        Sidef::Types::String::String->new($self->get_value->sign);
     }
 
     sub nan {
@@ -373,34 +355,33 @@ package Sidef::Types::Number::Number {
 
     sub chr {
         my ($self) = @_;
-        Sidef::Types::Char::Char->new(CORE::chr $$self);
+        Sidef::Types::Char::Char->new(CORE::chr $self->get_value);
     }
 
     sub next_power_of_two {
         my ($self) = @_;
-        $self->new(2 << ($$self->copy->blog(2)->as_int));
+        $self->new(2 << ($self->get_value->copy->blog(2)->as_int));
     }
 
     *npow2 = \&next_power_of_two;
 
     sub next_power_of {
         my ($self, $num) = @_;
-        $self->_is_number($num) || return;
-        $self->new($$num**($$self->copy->blog($$num)->as_int->binc));
+        $self->new($num->get_value**($self->get_value->copy->blog($num->get_value)->as_int->binc));
     }
 
     *npow = \&next_power_of;
 
     sub is_zero {
         my ($self) = @_;
-        Sidef::Types::Bool::Bool->new($$self->is_zero);
+        Sidef::Types::Bool::Bool->new($self->get_value->is_zero);
     }
 
     *isZero = \&is_zero;
 
     sub is_nan {
         my ($self) = @_;
-        Sidef::Types::Bool::Bool->new($$self->is_nan);
+        Sidef::Types::Bool::Bool->new($self->get_value->is_nan);
     }
 
     *isNaN  = \&is_nan;
@@ -408,7 +389,7 @@ package Sidef::Types::Number::Number {
 
     sub is_positive {
         my ($self) = @_;
-        Sidef::Types::Bool::Bool->new($$self->is_pos);
+        Sidef::Types::Bool::Bool->new($self->get_value->is_pos);
     }
 
     *isPositive = \&is_positive;
@@ -417,7 +398,7 @@ package Sidef::Types::Number::Number {
 
     sub is_inf {
         my ($self) = @_;
-        Sidef::Types::Bool::Bool->new($$self->is_inf);
+        Sidef::Types::Bool::Bool->new($self->get_value->is_inf);
     }
 
     *isInf       = \&is_inf;
@@ -426,7 +407,7 @@ package Sidef::Types::Number::Number {
 
     sub is_negative {
         my ($self) = @_;
-        Sidef::Types::Bool::Bool->new($$self->is_neg);
+        Sidef::Types::Bool::Bool->new($self->get_value->is_neg);
     }
 
     *isNegative = \&is_negative;
@@ -435,21 +416,21 @@ package Sidef::Types::Number::Number {
 
     sub is_even {
         my ($self) = @_;
-        Sidef::Types::Bool::Bool->new($$self->as_int->is_even);
+        Sidef::Types::Bool::Bool->new($self->get_value->as_int->is_even);
     }
 
     *isEven = \&is_even;
 
     sub is_odd {
         my ($self) = @_;
-        Sidef::Types::Bool::Bool->new($$self->as_int->is_odd);
+        Sidef::Types::Bool::Bool->new($self->get_value->as_int->is_odd);
     }
 
     *isOdd = \&is_odd;
 
     sub is_integer {
         my ($self) = @_;
-        Sidef::Types::Bool::Bool->new($$self->is_int);
+        Sidef::Types::Bool::Bool->new($self->get_value->is_int);
     }
 
     *isInt     = \&is_integer;
@@ -459,45 +440,39 @@ package Sidef::Types::Number::Number {
     sub rand {
         my ($self, $max) = @_;
         defined($max)
-          ? $self->_is_number($max)
-              ? $self->new($$self + CORE::rand($$max - $$self))
-              : ()
-          : $self->new(CORE::rand($$self));
+          ? $self->new($self->get_value + CORE::rand($max->get_value - $self->get_value))
+          : $self->new(CORE::rand($self->get_value));
     }
 
     sub ceil {
         my ($self) = @_;
-        $self->new($$self->copy->bceil);
+        $self->new($self->get_value->copy->bceil);
     }
 
     sub floor {
         my ($self) = @_;
-        $self->new($$self->copy->bfloor);
+        $self->new($self->get_value->copy->bfloor);
     }
 
     sub round {
         my ($self, $places) = @_;
         $self->new(
-                   $$self->copy->bround(
-                                          defined($places)
-                                        ? ($self->_is_number($places))
-                                              ? ($$places)
-                                              : (return)
-                                        : ()
-                                       )
+                   $self->get_value->copy->bround(
+                                                  defined($places)
+                                                  ? $places->get_value
+                                                  : ()
+                                                 )
                   );
     }
 
     sub roundf {
         my ($self, $places) = @_;
         $self->new(
-                   $$self->copy->bfround(
-                                           defined($places)
-                                         ? ($self->_is_number($places))
-                                               ? ($$places)
-                                               : (return)
-                                         : ()
-                                        )
+                   $self->get_value->copy->bfround(
+                                                   defined($places)
+                                                   ? $places->get_value
+                                                   : ()
+                                                  )
                   );
     }
 
@@ -506,58 +481,51 @@ package Sidef::Types::Number::Number {
 
     sub range {
         my ($self) = @_;
-        $$self >= 0 ? $self->new(0)->to($self) : $self->to($self->new(0));
+        $self->get_value >= 0 ? $self->new(0)->to($self) : $self->to($self->new(0));
     }
 
     sub length {
         my ($self) = @_;
-        $self->new($$self->length);
+        $self->new($self->get_value->length);
     }
 
     *len = \&length;
 
     sub digit {
         my ($self, $n) = @_;
-        $self->_is_number($n) || return;
-        $self->new($$self->as_int->digit($$n));
+        $self->new($self->get_value->as_int->digit($n->get_value));
     }
 
     sub nok {
         my ($self, $k) = @_;
-        $self->_is_number($k) || return;
-        $self->new($$self->as_int->bnok($$k));
+        $self->new($self->get_value->as_int->bnok($k->get_value));
     }
 
     sub of {
         my ($self, $obj) = @_;
 
-        defined($obj)
-          || $self->_is_code($obj)
-          || return;
-
-        if ($self->_is_code($obj, 1, 1)) {
+        if ($self->_is_code($obj)) {
             my $array = Sidef::Types::Array::Array->new();
 
-            for my $i (1 .. $$self) {
+            for my $i (1 .. $self->get_value) {
                 $array->push($obj->run);
             }
 
             return $array;
         }
 
-        Sidef::Types::Array::Array->new(($obj) x $$self);
+        Sidef::Types::Array::Array->new(($obj) x $self->get_value);
     }
 
     sub times {
         my ($self, $obj) = @_;
-        $self->_is_code($obj) || return;
         $obj->repeat($self);
     }
 
     sub to_bin {
         my ($self) = @_;
         require Math::BigInt;
-        Sidef::Types::String::String->new(Math::BigInt->new($$self)->as_bin);
+        Sidef::Types::String::String->new(Math::BigInt->new($self->get_value)->as_bin);
     }
 
     *as_bin = \&to_bin;
@@ -565,7 +533,7 @@ package Sidef::Types::Number::Number {
     sub to_oct {
         my ($self) = @_;
         require Math::BigInt;
-        Sidef::Types::String::String->new(Math::BigInt->new($$self)->as_oct);
+        Sidef::Types::String::String->new(Math::BigInt->new($self->get_value)->as_oct);
     }
 
     *as_oct = \&to_oct;
@@ -573,15 +541,15 @@ package Sidef::Types::Number::Number {
     sub to_hex {
         my ($self) = @_;
         require Math::BigInt;
-        Sidef::Types::String::String->new(Math::BigInt->new($$self)->as_hex);
+        Sidef::Types::String::String->new(Math::BigInt->new($self->get_value)->as_hex);
     }
 
     *as_hex = \&to_hex;
 
     sub is_div {
         my ($self, $num) = @_;
-        $self->_is_number($num) || return;
-        Sidef::Types::Bool::Bool->new($$self % $$num == 0);
+
+        Sidef::Types::Bool::Bool->new($self->get_value % $num->get_value == 0);
     }
 
     *isDiv = \&is_div;
@@ -589,7 +557,7 @@ package Sidef::Types::Number::Number {
     sub commify {
         my ($self) = @_;
 
-        my $n = $$self->bstr;
+        my $n = $self->get_value->bstr;
         my $x = $n;
 
         my $neg = $n =~ s{^-}{};
@@ -615,26 +583,30 @@ package Sidef::Types::Number::Number {
 
     sub dump {
         my ($self) = @_;
-        Sidef::Types::String::String->new($$self);
+        Sidef::Types::String::String->new($self->get_value);
     }
 
     sub sstr {
         my ($self) = @_;
-        Sidef::Types::String::String->new($$self->bsstr);
+        Sidef::Types::String::String->new($self->get_value->bsstr);
     }
 
     sub shift_right {
         my ($self, $num, $base) = @_;
-        $self->_is_number($num) || return;
-        $self->new($$self->copy->brsft($$num, defined($base) ? $self->_is_number($base) ? $$base : return : ()));
+
+        $self->new(
+                   $self->get_value->copy->brsft(
+                                                 $num->get_value,
+                                                 defined($base) ? $self->_is_number($base) ? $base->get_value : return : ()
+                                                )
+                  );
     }
 
     *shiftRight = \&shift_right;
 
     sub shift_left {
         my ($self, $num, $base) = @_;
-        $self->_is_number($num) || return;
-        $self->new($$self->copy->blsft($$num, defined($base) ? $self->_is_number($base) ? $$base : return : ()));
+        $self->new($self->get_value->copy->blsft($num->get_value, defined($base) ? $base->get_value : ()));
     }
 
     *shiftLeft = \&shift_left;

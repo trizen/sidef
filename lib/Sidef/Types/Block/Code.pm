@@ -1,7 +1,9 @@
 package Sidef::Types::Block::Code {
 
     use 5.014;
-    our @ISA = qw(Sidef);
+    our @ISA = qw(
+      Sidef::Object::Object
+      );
 
     require Sidef::Exec;
     my $exec = Sidef::Exec->new();

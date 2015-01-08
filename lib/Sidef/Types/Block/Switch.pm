@@ -17,14 +17,8 @@ package Sidef::Types::Block::Switch {
 
         if (ref($self->{obj}) eq ref($arg)) {
             state $method = '==';
-
-            if ($self->{obj}->can($method)) {
-                if ($self->{obj}->$method($arg)) {
-                    $self->{do_block} = 1;
-                }
-            }
-            else {
-                warn sprintf("[WARN]: when(): Can't find the equal (==) method for object '%s'!\n", ref($self->{obj}));
+            if ($self->{obj}->$method($arg)->get_value) {
+                $self->{do_block} = 1;
             }
         }
 
@@ -35,7 +29,7 @@ package Sidef::Types::Block::Switch {
         my ($self, $arg) = @_;
 
         if (ref($arg) eq 'Sidef::Types::Bool::Bool') {
-            if ($arg->is_true) {
+            if ($arg->get_value) {
                 $self->{do_block} = 1;
             }
         }

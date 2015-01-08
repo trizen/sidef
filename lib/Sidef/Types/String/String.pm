@@ -4,8 +4,7 @@ package Sidef::Types::String::String {
     use 5.014;
 
     our @ISA = qw(
-      Sidef
-      Sidef::Convert::Convert
+      Sidef::Object::Object
       );
 
     sub new {
@@ -22,16 +21,14 @@ package Sidef::Types::String::String {
 
     sub unroll_operator {
         my ($self, $operator, $arg) = @_;
-        Sidef::Types::Array::Array->new(map { __PACKAGE__->new($_) } split(//, $$self))->unroll_operator(
+        $self->to_chars->unroll_operator(
 
             # The operator, followed by...
             $operator,
 
             # ...an optional argument
             defined($arg)
-            ? $self->_is_string($arg)
-                  ? Sidef::Types::Array::Array->new(map { __PACKAGE__->new($_) } split(//, $$arg))
-                  : return
+            ? $arg->to_chars
             : ()
 
         )->join;
@@ -39,78 +36,70 @@ package Sidef::Types::String::String {
 
     sub reduce_operator {
         my ($self, $operator) = @_;
-        Sidef::Types::Array::Array->new(map { __PACKAGE__->new($_) } split(//, $$self))->reduce_operator($operator);
+        Sidef::Types::Array::Array->new(map { __PACKAGE__->new($_) } split(//, $self->get_value))->reduce_operator($operator);
     }
 
     sub inc {
         my ($self) = @_;
-        my $copy = $$self;
+        my $copy = $self->get_value;
         $self->new(++$copy);
     }
 
     sub div {
         my ($self, $num) = @_;
-        $self->_is_number($num) || return;
-        (my $strlen = int(length($$self) / $$num)) < 1 && return;
-        Sidef::Types::Array::Array->new(map { $self->new($_) } unpack "(a$strlen)*", $$self);
+        (my $strlen = int(length($self->get_value) / $num->get_value)) < 1 && return;
+        Sidef::Types::Array::Array->new(map { $self->new($_) } unpack "(a$strlen)*", $self->get_value);
     }
 
     *divide = \&div;
 
     sub lt {
         my ($self, $string) = @_;
-        $self->_is_string($string) || return;
-        Sidef::Types::Bool::Bool->new($$self lt $$string);
+        Sidef::Types::Bool::Bool->new($self->get_value lt $string->get_value);
     }
 
     sub gt {
         my ($self, $string) = @_;
-        $self->_is_string($string) || return;
-        Sidef::Types::Bool::Bool->new($$self gt $$string);
+        Sidef::Types::Bool::Bool->new($self->get_value gt $string->get_value);
     }
 
     sub le {
         my ($self, $string) = @_;
-        $self->_is_string($string) || return;
-        Sidef::Types::Bool::Bool->new($$self le $$string);
+        Sidef::Types::Bool::Bool->new($self->get_value le $string->get_value);
     }
 
     sub ge {
         my ($self, $string) = @_;
-        $self->_is_string($string) || return;
-        Sidef::Types::Bool::Bool->new($$self ge $$string);
+        Sidef::Types::Bool::Bool->new($self->get_value ge $string->get_value);
     }
 
     sub subtract {
         my ($self, $obj) = @_;
 
-        if (ref $obj eq 'Sidef::Types::Regex::Regex') {
+        if ($self->_is_regex($obj)) {
             if (exists $obj->{global}) {
-                return $self->new($$self =~ s/$obj->{regex}//gr);
+                return $self->new($self->get_value =~ s/$obj->{regex}//gr);
             }
-            if ($$self =~ /$obj->{regex}/) {
-                return $self->new(CORE::substr($$self, 0, $-[0]) . CORE::substr($$self, $+[0]));
+            if ($self->get_value =~ /$obj->{regex}/) {
+                return $self->new(CORE::substr($self->get_value, 0, $-[0]) . CORE::substr($self->get_value, $+[0]));
             }
             return $self;
         }
 
-        $self->_is_string($obj) || return;
-        if ((my $ind = CORE::index($$self, $$obj)) != -1) {
-            return $self->new(CORE::substr($$self, 0, $ind) . CORE::substr($$self, $ind + CORE::length($$obj)));
+        if ((my $ind = CORE::index($self->get_value, $obj->get_value)) != -1) {
+            return $self->new(  CORE::substr($self->get_value, 0, $ind)
+                              . CORE::substr($self->get_value, $ind + CORE::length($obj->get_value)));
         }
         $self;
     }
 
     sub ne {
         my ($self, $string) = @_;
-        $self->_is_string($string, 1, 1)
-          || return (Sidef::Types::Bool::Bool->true);
-        Sidef::Types::Bool::Bool->new($$self ne $$string);
+        Sidef::Types::Bool::Bool->new($self->get_value ne $string->get_value);
     }
 
     sub match {
         my ($self, $regex, @rest) = @_;
-        $self->_is_regex($regex) || return;
         $regex->match($self, @rest);
     }
 
@@ -118,7 +107,6 @@ package Sidef::Types::String::String {
 
     sub gmatch {
         my ($self, $regex, @rest) = @_;
-        $self->_is_regex($regex) || return;
         $regex->gmatch($self, @rest);
     }
 
@@ -126,11 +114,12 @@ package Sidef::Types::String::String {
 
     sub to {
         my ($self, $string) = @_;
-        $self->_is_string($string) || return;
-        if (length($$self) == 1 and length($$string) == 1) {
-            return Sidef::Types::Array::Array->new(map { $self->new(chr($_)) } ord($$self) .. ord($$string));
+
+        if (length($self->get_value) == 1 and length($string->get_value) == 1) {
+            return Sidef::Types::Array::Array->new(map { $self->new(chr($_)) }
+                                                   ord($self->get_value) .. ord($string->get_value));
         }
-        Sidef::Types::Array::Array->new(map { $self->new($_) } $$self .. $$string);
+        Sidef::Types::Array::Array->new(map { $self->new($_) } $self->get_value .. $string->get_value);
     }
 
     *upto = \&to;
@@ -145,49 +134,53 @@ package Sidef::Types::String::String {
 
     sub range_to {
         my ($self, $string) = @_;
-        $self->_is_string($string) || return;
-        Sidef::Types::Array::Range->new(from => $$self, to => $$string, type => 'string', direction => 'up');
+        Sidef::Types::Array::Range->new(
+                                        from      => $self->get_value,
+                                        to        => $string->get_value,
+                                        type      => 'string',
+                                        direction => 'up'
+                                       );
     }
 
     sub range_downto {
         my ($self, $string) = @_;
-        $self->_is_string($string) || return;
-        Sidef::Types::Array::Range->new(from => $$self, to => $$string, type => 'string', direction => 'down');
+        Sidef::Types::Array::Range->new(
+                                        from      => $self->get_value,
+                                        to        => $string->get_value,
+                                        type      => 'string',
+                                        direction => 'down'
+                                       );
     }
 
     sub cmp {
         my ($self, $string) = @_;
-        $self->_is_string($string) || return;
-        Sidef::Types::Number::Number->new($$self cmp $$string);
+
+        Sidef::Types::Number::Number->new($self->get_value cmp $string->get_value);
     }
 
     sub xor {
         my ($self, $str) = @_;
-        $self->_is_string($str) || return;
-        $self->new($$self ^ $$str);
+        $self->new($self->get_value ^ $str->get_value);
     }
 
     sub or {
         my ($self, $str) = @_;
-        $self->_is_string($str) || return;
-        $self->new($$self | $$str);
+        $self->new($self->get_value | $str->get_value);
     }
 
     sub and {
         my ($self, $str) = @_;
-        $self->_is_string($str) || return;
-        $self->new($$self & $$str);
+        $self->new($self->get_value & $str->get_value);
     }
 
     sub not {
         my ($self) = @_;
-        $self->new(~$$self);
+        $self->new(~$self->get_value);
     }
 
     sub times {
         my ($self, $num) = @_;
-        $self->_is_number($num) || return;
-        $self->new($$self x $$num);
+        $self->new($self->get_value x $num->get_value);
     }
 
     *multiply = \&times;
@@ -200,7 +193,7 @@ package Sidef::Types::String::String {
 
     sub uc {
         my ($self) = @_;
-        $self->new(CORE::uc $$self);
+        $self->new(CORE::uc $self->get_value);
     }
 
     *toUpperCase = \&uc;
@@ -210,9 +203,7 @@ package Sidef::Types::String::String {
 
     sub equals {
         my ($self, $string) = @_;
-        $self->_is_string($string, 1, 1)
-          || return (Sidef::Types::Bool::Bool->false);
-        Sidef::Types::Bool::Bool->new($$self eq $$string);
+        Sidef::Types::Bool::Bool->new($self->get_value eq $string->get_value);
     }
 
     *eq = \&equals;
@@ -220,15 +211,14 @@ package Sidef::Types::String::String {
 
     sub append {
         my ($self, $string) = @_;
-        $self->_is_string($string) || return;
-        __PACKAGE__->new($$self . $$string);
+        __PACKAGE__->new($self->get_value . $string->get_value);
     }
 
     *concat = \&append;
 
     sub ucfirst {
         my ($self) = @_;
-        $self->new(CORE::ucfirst $$self);
+        $self->new(CORE::ucfirst $self->get_value);
     }
 
     *tc         = \&ucfirst;
@@ -237,7 +227,7 @@ package Sidef::Types::String::String {
 
     sub lc {
         my ($self) = @_;
-        $self->new(CORE::lc $$self);
+        $self->new(CORE::lc $self->get_value);
     }
 
     *toLowerCase = \&lc;
@@ -247,13 +237,12 @@ package Sidef::Types::String::String {
 
     sub lcfirst {
         my ($self) = @_;
-        $self->new(CORE::lcfirst $$self);
+        $self->new(CORE::lcfirst $self->get_value);
     }
 
     sub charAt {
         my ($self, $pos) = @_;
-        $self->_is_number($pos) || return;
-        Sidef::Types::Char::Char->new(CORE::substr($$self, $$pos, 1));
+        Sidef::Types::Char::Char->new(CORE::substr($self->get_value, $pos->get_value, 1));
     }
 
     *char_at = \&charAt;
@@ -262,9 +251,9 @@ package Sidef::Types::String::String {
         my ($self) = @_;
 
         my $string = $1
-          if ($$self =~ /\G(\s+)/gc);
+          if ($self->get_value =~ /\G(\s+)/gc);
 
-        while ($$self =~ /\G(\S++)(\s*+)/gc) {
+        while ($self->get_value =~ /\G(\S++)(\s*+)/gc) {
             $string .= CORE::ucfirst(CORE::lc($1)) . $2;
         }
 
@@ -276,25 +265,25 @@ package Sidef::Types::String::String {
 
     sub capitalize {
         my ($self) = @_;
-        $self->new(CORE::ucfirst(CORE::lc($$self)));
+        $self->new(CORE::ucfirst(CORE::lc($self->get_value)));
     }
 
     *tclc = \&capitalize;
 
     sub chop {
         my ($self) = @_;
-        $self->new(CORE::substr($$self, 0, -1));
+        $self->new(CORE::substr($self->get_value, 0, -1));
     }
 
     sub pop {
         my ($self) = @_;
-        $self->new(CORE::substr($$self, -1));
+        $self->new(CORE::substr($self->get_value, -1));
     }
 
     sub chomp {
         my ($self) = @_;
 
-        if (substr($$self, -1) eq "\n") {
+        if (substr($self->get_value, -1) eq "\n") {
             return $self->chop;
         }
 
@@ -303,19 +292,15 @@ package Sidef::Types::String::String {
 
     sub crypt {
         my ($self, $salt) = @_;
-        $self->_is_string($salt) || return;
-        $self->new(crypt($$self, $$salt));
+        $self->new(crypt($self->get_value, $salt->get_value));
     }
 
     sub substr {
         my ($self, $offs, $len) = @_;
-
-        $self->_is_number($offs) || return;
-
         __PACKAGE__->new(
                          defined($len)
-                         ? CORE::substr($$self, $$offs, $$len)
-                         : CORE::substr($$self, $$offs)
+                         ? CORE::substr($self->get_value, $offs->get_value, $len->get_value)
+                         : CORE::substr($self->get_value, $offs->get_value)
                         );
     }
 
@@ -324,20 +309,14 @@ package Sidef::Types::String::String {
 
     sub insert {
         my ($self, $string, $pos, $len) = @_;
-
-        $self->_is_string($string) || return;
-        $self->_is_number($pos)    || return;
-
-        $len = defined($len) ? $self->_is_number($len) ? $$len : (return) : 0;
-
-        CORE::substr(my $copy_str = $$self, $$pos, $len, $$string);
+        CORE::substr(my $copy_str = $self->get_value, $pos->get_value,
+                     (defined($len) ? $len->get_value : 0), $string->get_value);
         __PACKAGE__->new($copy_str);
     }
 
     sub join {
         my ($self, $delim, @rest) = @_;
-        $self->_is_string($delim) || return;
-        __PACKAGE__->new(CORE::join($$delim, $$self, @rest));
+        __PACKAGE__->new(CORE::join($delim->get_value, $self->get_value, @rest));
     }
 
     sub clear {
@@ -347,23 +326,17 @@ package Sidef::Types::String::String {
 
     sub is_empty {
         my ($self) = @_;
-        Sidef::Types::Bool::Bool->new($$self eq '');
+        Sidef::Types::Bool::Bool->new($self->get_value eq '');
     }
 
     *isEmpty = \&is_empty;
 
     sub index {
         my ($self, $substr, $pos) = @_;
-        $self->_is_string($substr) || return;
-
-        if (defined($pos)) {
-            $self->_is_number($pos) || return;
-        }
-
         Sidef::Types::Number::Number->new(
                                           defined($pos)
-                                          ? CORE::index($$self, $$substr, $$pos)
-                                          : CORE::index($$self, $$substr)
+                                          ? CORE::index($self->get_value, $substr->get_value, $pos->get_value)
+                                          : CORE::index($self->get_value, $substr->get_value)
                                          );
     }
 
@@ -371,77 +344,75 @@ package Sidef::Types::String::String {
 
     sub ord {
         my ($self) = @_;
-        Sidef::Types::Byte::Byte->new(CORE::ord($$self));
+        Sidef::Types::Byte::Byte->new(CORE::ord($self->get_value));
     }
 
     sub reverse {
         my ($self) = @_;
-        $self->new(scalar CORE::reverse($$self));
+        $self->new(scalar CORE::reverse($self->get_value));
     }
 
     sub say {
         my ($self) = @_;
-        Sidef::Types::Bool::Bool->new(CORE::say($$self));
+        Sidef::Types::Bool::Bool->new(CORE::say($self->get_value));
     }
 
     *println = \&say;
 
     sub print {
         my ($self) = @_;
-        Sidef::Types::Bool::Bool->new(print $$self);
+        Sidef::Types::Bool::Bool->new(print $self->get_value);
     }
 
     sub printf {
         my ($self, @arguments) = @_;
-        Sidef::Types::Bool::Bool->new(printf $$self, @arguments);
+        Sidef::Types::Bool::Bool->new(printf $self->get_value, @arguments);
     }
 
     sub printlnf {
         my ($self, @arguments) = @_;
-        Sidef::Types::Bool::Bool->new(printf($$self . "\n", @arguments));
+        Sidef::Types::Bool::Bool->new(printf($self->get_value . "\n", @arguments));
     }
 
     sub sprintf {
         my ($self, @arguments) = @_;
 
-        if (@arguments == 1 and ref($arguments[0]) eq 'Sidef::Types::Array::Array') {
+        if (@arguments == 1 and $self->_is_array($arguments[0])) {
             @arguments = map { $_->get_value } @{$arguments[0]};
         }
 
-        __PACKAGE__->new(CORE::sprintf $$self, @arguments);
+        __PACKAGE__->new(CORE::sprintf $self->get_value, @arguments);
     }
 
     sub sprintlnf {
         my ($self, @arguments) = @_;
-        __PACKAGE__->new(CORE::sprintf($$self . "\n", @arguments));
+        __PACKAGE__->new(CORE::sprintf($self->get_value . "\n", @arguments));
     }
 
     sub _string_or_regex {
         my ($self, $obj) = @_;
 
-        if (ref($obj) eq 'Sidef::Types::Regex::Regex') {
+        if ($self->_is_regex($obj)) {
             return $obj->{regex};
         }
 
-        $self->_is_string($obj) || return;
-        CORE::quotemeta($$obj);
+        CORE::quotemeta($obj->get_value);
     }
 
     sub sub {
         my ($self, $regex, $str) = @_;
 
-        $self->_is_code($str, 1, 1)
+        $self->_is_code($str)
           && return $self->esub($regex, $str);
 
         $str //= __PACKAGE__->new('');
-        $self->_is_string($str) || return;
-        my $search = $self->_string_or_regex($regex);
 
-        if (ref $regex eq 'Sidef::Types::Regex::Regex') {
+        if ($self->_is_regex($regex)) {
             $regex->match($self)->to_bool or return $self;
         }
 
-        $self->new($$self =~ s{$search}{$$str}r);
+        my $search = $self->_string_or_regex($regex);
+        $self->new($self->get_value =~ s{$search}{${\$str->get_value}}r);
     }
 
     *replace = \&sub;
@@ -453,14 +424,13 @@ package Sidef::Types::String::String {
           && return $self->gesub($regex, $str);
 
         $str //= __PACKAGE__->new('');
-        $self->_is_string($str) || return;
-        my $search = $self->_string_or_regex($regex);
 
-        if (ref $regex eq 'Sidef::Types::Regex::Regex') {
+        if ($self->_is_regex($regex)) {
             $regex->match($self)->to_bool or return $self;
         }
 
-        $self->new($$self =~ s{$search}{$$str}gr);
+        my $search = $self->_string_or_regex($regex);
+        $self->new($self->get_value =~ s{$search}{${\$str->get_value}}gr);
     }
 
     *gReplace = \&gsub;
@@ -476,16 +446,15 @@ package Sidef::Types::String::String {
         $code //= __PACKAGE__->new('');
         my $search = $self->_string_or_regex($regex);
 
-        if (ref $regex eq 'Sidef::Types::Regex::Regex') {
+        if ($self->_is_regex($regex)) {
             $regex->match($self)->to_bool or return $self;
         }
 
-        if ($self->_is_string($code, 1, 1)) {
-            return __PACKAGE__->new($$self =~ s{$search}{$$code}eer);
+        if ($self->_is_string($code)) {
+            return __PACKAGE__->new($self->get_value =~ s{$search}{$code->get_value}eer);
         }
 
-        $self->_is_code($code) || return;
-        __PACKAGE__->new($$self =~ s{$search}{$code->call(_get_captures($$self))}er);
+        __PACKAGE__->new($self->get_value =~ s{$search}{$code->call(_get_captures($self->get_value))}er);
     }
 
     sub gesub {
@@ -494,70 +463,69 @@ package Sidef::Types::String::String {
         $code //= __PACKAGE__->new('');
         my $search = $self->_string_or_regex($regex);
 
-        if (ref $regex eq 'Sidef::Types::Regex::Regex') {
+        if ($self->_is_regex($regex)) {
             $regex->match($self)->to_bool or return $self;
         }
 
-        if ($self->_is_string($code, 1, 1)) {
-            return __PACKAGE__->new($$self =~ s{$search}{$$code}geer);
+        if ($self->_is_string($code)) {
+            return __PACKAGE__->new($self->get_value =~ s{$search}{$code->get_value}geer);
         }
 
-        $self->_is_code($code) || return;
-        __PACKAGE__->new($$self =~ s{$search}{$code->call(_get_captures($$self))}ger);
+        __PACKAGE__->new($self->get_value =~ s{$search}{$code->call(_get_captures($self->get_value))}ger);
     }
 
     sub glob {
         my ($self) = @_;
-        Sidef::Types::Array::Array->new(map { __PACKAGE__->new($_) } CORE::glob($$self));
+        Sidef::Types::Array::Array->new(map { __PACKAGE__->new($_) } CORE::glob($self->get_value));
     }
 
     sub quotemeta {
         my ($self) = @_;
-        __PACKAGE__->new(CORE::quotemeta($$self));
+        __PACKAGE__->new(CORE::quotemeta($self->get_value));
     }
 
     *escape = \&quotemeta;
 
     sub scan {
         my ($self, $regex) = @_;
-        $self->_is_regex($regex) || return;
-        Sidef::Types::Array::Array->new(map { Sidef::Types::String::String->new($_) } $$self =~ /$regex->{regex}/g);
+        Sidef::Types::Array::Array->new(map { Sidef::Types::String::String->new($_) } $self->get_value =~ /$regex->{regex}/g);
     }
 
     sub split {
         my ($self, $sep, $size) = @_;
 
-        $size =
-          defined($size) && ($self->_is_number($size) || return) ? $$size : 0;
+        $size = defined($size) ? $size->get_value : 0;
 
-        if (ref($sep) eq '') {
+        if (not defined $sep) {
             return
               Sidef::Types::Array::Array->new(map { __PACKAGE__->new($_) }
-                                                split(' ', $$self, $size));
+                                                split(' ', $self->get_value, $size));
         }
-        elsif ($self->_is_number($sep, 1, 1)) {
-            return Sidef::Types::Array::Array->new(map { __PACKAGE__->new($_) } unpack "(a$$sep)*", $$self);
+
+        if ($self->_is_number($sep)) {
+            return
+              Sidef::Types::Array::Array->new(map { __PACKAGE__->new($_) } unpack '(a' . $sep->get_value . ')*',
+                                              $self->get_value);
         }
 
         $sep = $self->_string_or_regex($sep);
         Sidef::Types::Array::Array->new(map { __PACKAGE__->new($_) }
-                                          split(/$sep/, $$self, $size));
+                                          split(/$sep/, $self->get_value, $size));
     }
 
     sub sort {
         my ($self, $block) = @_;
 
         if (defined $block) {
-            $self->_is_code($block) || return;
             return $self->to_chars->sort($block)->join;
         }
 
-        $self->new(CORE::join('', sort(CORE::split(//, $$self))));
+        $self->new(CORE::join('', sort(CORE::split(//, $self->get_value))));
     }
 
     sub format {
         my ($self) = @_;
-        CORE::chomp(my $text = 'format __MY_FORMAT__ = ' . "\n" . $$self);
+        CORE::chomp(my $text = 'format __MY_FORMAT__ = ' . "\n" . $self->get_value);
         eval($text . "\n.");
 
         open my $str_h, '>', \my $acc;
@@ -572,9 +540,8 @@ package Sidef::Types::String::String {
 
     sub each_word {
         my ($self, $obj) = @_;
-        my $array = Sidef::Types::Array::Array->new(map { __PACKAGE__->new($_) } CORE::split(' ', $$self));
+        my $array = Sidef::Types::Array::Array->new(map { __PACKAGE__->new($_) } CORE::split(' ', $self->get_value));
         $obj // return $array;
-        $self->_is_code($obj) || return;
         $array->each($obj);
     }
 
@@ -588,16 +555,15 @@ package Sidef::Types::String::String {
 
     sub chars {
         my ($self) = @_;
-        Sidef::Types::Char::Chars->new(map { Sidef::Types::Char::Char->new($_) } CORE::split(//, $$self));
+        Sidef::Types::Char::Chars->new(map { Sidef::Types::Char::Char->new($_) } CORE::split(//, $self->get_value));
     }
 
     sub each {
         my ($self, $code) = @_;
 
-        $self->_is_code($code) || return;
         my ($var_ref) = $code->init_block_vars();
 
-        foreach my $char (CORE::split(//, $$self)) {
+        foreach my $char (CORE::split(//, $self->get_value)) {
             $var_ref->set_value(__PACKAGE__->new($char));
             if (defined(my $res = $code->_run_code)) {
                 $code->pop_stack();
@@ -614,9 +580,8 @@ package Sidef::Types::String::String {
 
     sub each_line {
         my ($self, $obj) = @_;
-        my $array = Sidef::Types::Array::Array->new(map { __PACKAGE__->new($_) } CORE::split(/\R/, $$self));
+        my $array = Sidef::Types::Array::Array->new(map { __PACKAGE__->new($_) } CORE::split(/\R/, $self->get_value));
         $obj // return $array;
-        $self->_is_code($obj) || return;
         $array->each($obj);
     }
 
@@ -626,27 +591,27 @@ package Sidef::Types::String::String {
     sub open_r {
         my ($self, @rest) = @_;
         require Encode;
-        my $string = Encode::encode_utf8($$self);
+        my $string = Encode::encode_utf8($self->get_value);
         Sidef::Types::Glob::File->new(\$string)->open_r(@rest);
     }
 
     sub open {
         my ($self, @rest) = @_;
         require Encode;
-        my $string = Encode::encode_utf8($$self);
+        my $string = Encode::encode_utf8($self->get_value);
         Sidef::Types::Glob::File->new(\$string)->open(@rest);
     }
 
     sub trim {
         my ($self) = @_;
-        $self->new(unpack('A*', $$self) =~ s/^\s+//r);
+        $self->new(unpack('A*', $self->get_value) =~ s/^\s+//r);
     }
 
     *strip = \&trim;
 
     sub strip_beg {
         my ($self) = @_;
-        $self->new($$self =~ s/^\s+//r);
+        $self->new($self->get_value =~ s/^\s+//r);
     }
 
     *trim_beg = \&strip_beg;
@@ -655,7 +620,7 @@ package Sidef::Types::String::String {
 
     sub strip_end {
         my ($self) = @_;
-        $self->new(unpack('A*', $$self));
+        $self->new(unpack('A*', $self->get_value));
     }
 
     *trim_end = \&strip_end;
@@ -667,42 +632,30 @@ package Sidef::Types::String::String {
 
         my %map;
         if (CORE::not defined($repl) and defined($orig)) {    # assume an array of pairs
-            $self->_is_array($orig) || return;
             foreach my $pair (map { $_->get_value } @{$orig}) {
-                $self->_is_pair($pair) || return;
                 $map{$pair->first} = $pair->second->get_value;
             }
         }
         else {
-            ($self->_is_array($orig) && $self->_is_array($repl)) || return;
-
-            $#{$orig} == $#{$repl} || do {
-                warn "[WARN] String.trans(): the arguments must have the same length! ($#{$orig} != $#{$repl})\n";
-                return;
-            };
-
-            @map{@{$orig}} = (map { $_->get_value } @{$repl});
+            @map{@{$orig}} = map { $_->get_value } @{$repl};
         }
 
         my $tries = CORE::join('|', map { CORE::quotemeta($_) }
                                  sort { length($b) <=> length($a) } CORE::keys(%map));
-        $self->new($$self =~ s{($tries)}{$map{$1}}gr);
+        $self->new($self->get_value =~ s{($tries)}{$map{$1}}gr);
     }
 
     sub translit {
         my ($self, $orig, $repl, $modes) = @_;
 
-        $self->_is_array($orig, 1, 1) && return $self->trans($orig, $repl);
-        ($self->_is_string($orig) && $self->_is_string($repl)) || return;
+        $self->_is_array($orig) && return $self->trans($orig, $repl);
         $self->new(
-                       eval qq{"\Q$$self\E"=~tr/}
-                     . $$orig =~ s{([/\\])}{\\$1}gr . "/"
-                     . $$repl =~ s{([/\\])}{\\$1}gr . "/r"
+                       eval qq{"\Q${\$self->get_value}\E"=~tr/}
+                     . $orig->get_value =~ s{([/\\])}{\\$1}gr . "/"
+                     . $repl->get_value =~ s{([/\\])}{\\$1}gr . "/r"
                      . (
-                          defined($modes)
-                        ? $self->_is_string($modes)
-                              ? $$modes
-                              : return
+                        defined($modes)
+                        ? $modes->get_value
                         : ''
                        )
                   );
@@ -712,8 +665,7 @@ package Sidef::Types::String::String {
 
     sub unpack {
         my ($self, $argv) = @_;
-        $self->_is_string($argv) || return;
-        my @parts = CORE::unpack($$self, $$argv);
+        my @parts = CORE::unpack($self->get_value, $argv->get_value);
         $#parts == 0
           ? __PACKAGE__->new($parts[0])
           : Sidef::Types::Array::Array->new(map { __PACKAGE__->new($_) } @parts);
@@ -721,12 +673,12 @@ package Sidef::Types::String::String {
 
     sub pack {
         my ($self, @list) = @_;
-        __PACKAGE__->new(CORE::pack($$self, @list));
+        __PACKAGE__->new(CORE::pack($self->get_value, @list));
     }
 
     sub length {
         my ($self) = @_;
-        Sidef::Types::Number::Number->new(CORE::length($$self));
+        Sidef::Types::Number::Number->new(CORE::length($self->get_value));
     }
 
     *len = \&length;
@@ -734,31 +686,26 @@ package Sidef::Types::String::String {
     sub contains {
         my ($self, $string, $start_pos) = @_;
 
-        $self->_is_string($string) || return;
-        $start_pos = (
-                        defined($start_pos)
-                      ? $self->_is_number($start_pos)
-                            ? ($$start_pos)
-                            : (return)
-                      : (0)
-                     );
+        $start_pos =
+          defined($start_pos)
+          ? $start_pos->get_value
+          : 0;
 
         if ($start_pos < 0) {
-            $start_pos = CORE::length($$self) + $start_pos;
+            $start_pos = CORE::length($self->get_value) + $start_pos;
         }
 
-        Sidef::Types::Bool::Bool->new(CORE::index($$self, $$string, $start_pos) != -1);
+        Sidef::Types::Bool::Bool->new(CORE::index($self->get_value, $string->get_value, $start_pos) != -1);
     }
 
     *include = \&contains;
 
     sub count {
         my ($self, $substr) = @_;
-        $self->_is_string($substr) || return;
 
         my $pos     = -1;
         my $counter = 0;
-        while (($pos = CORE::index($$self, $$substr, $pos + 1)) != -1) {
+        while (($pos = CORE::index($self->get_value, $substr->get_value, $pos + 1)) != -1) {
             ++$counter;
         }
 
@@ -767,20 +714,16 @@ package Sidef::Types::String::String {
 
     sub overlaps {
         my ($self, $arg) = @_;
-        $self->_is_string($arg) || return;
-        Sidef::Types::Bool::Bool->new(CORE::index($$self ^ $$arg, "\0") != -1);
+        Sidef::Types::Bool::Bool->new(CORE::index($self->get_value ^ $arg->get_value, "\0") != -1);
     }
 
     sub begins_with {
         my ($self, $string) = @_;
 
-        $self->_is_string($string)
-          || return;
-
-        CORE::length($$self) < (my $len = CORE::length($$string))
+        CORE::length($self->get_value) < (my $len = CORE::length($string->get_value))
           && return Sidef::Types::Bool::Bool->false;
 
-        CORE::substr($$self, 0, $len) eq $$string
+        CORE::substr($self->get_value, 0, $len) eq $string->get_value
           && return Sidef::Types::Bool::Bool->true;
 
         Sidef::Types::Bool::Bool->false;
@@ -793,13 +736,10 @@ package Sidef::Types::String::String {
     sub ends_with {
         my ($self, $string) = @_;
 
-        $self->_is_string($string)
-          || return;
-
-        CORE::length($$self) < (my $len = CORE::length($$string))
+        CORE::length($self->get_value) < (my $len = CORE::length($string->get_value))
           && return Sidef::Types::Bool::Bool->false;
 
-        CORE::substr($$self, -$len) eq $$string
+        CORE::substr($self->get_value, -$len) eq $string->get_value
           && return Sidef::Types::Bool::Bool->true;
 
         Sidef::Types::Bool::Bool->false;
@@ -809,48 +749,48 @@ package Sidef::Types::String::String {
 
     sub warn {
         my ($self) = @_;
-        warn $$self;
+        warn $self->get_value;
     }
 
     sub die {
         my ($self) = @_;
-        die $$self;
+        die $self->get_value;
     }
 
     sub encode {
         my ($self, $enc) = @_;
-        $self->_is_string($enc) || return;
+
         require Encode;
-        $self->new(Encode::encode($$enc, $$self));
+        $self->new(Encode::encode($enc->get_value, $self->get_value));
     }
 
     sub decode {
         my ($self, $enc) = @_;
-        $self->_is_string($enc) || return;
+
         require Encode;
-        $self->new(Encode::decode($$enc, $$self));
+        $self->new(Encode::decode($enc->get_value, $self->get_value));
     }
 
     sub encode_utf8 {
         my ($self) = @_;
         require Encode;
-        $self->new(Encode::encode_utf8($$self));
+        $self->new(Encode::encode_utf8($self->get_value));
     }
 
     sub decode_utf8 {
         my ($self) = @_;
         require Encode;
-        $self->new(Encode::decode_utf8($$self));
+        $self->new(Encode::decode_utf8($self->get_value));
     }
 
     sub unescape {
         my ($self) = @_;
-        $self->new($$self =~ s{\\(.)}{$1}grs);
+        $self->new($self->get_value =~ s{\\(.)}{$1}grs);
     }
 
     sub apply_escapes {
         my ($self, $parser) = @_;
-        my $str = $$self;
+        my $str = $self->get_value;
 
         state $esc = {
                       a => "\a",
@@ -1060,12 +1000,9 @@ package Sidef::Types::String::String {
 
     sub shift_left {
         my ($self, $i) = @_;
-
-        $self->_is_number($i) || return;
-
-        my $len = CORE::length($$self);
-        $i = $$i > $len ? $len : $$i;
-        $self->new(CORE::substr($$self, $i));
+        my $len = CORE::length($self->get_value);
+        $i = $i->get_value > $len ? $len : $i->get_value;
+        $self->new(CORE::substr($self->get_value, $i));
     }
 
     *dropLeft  = \&shift_left;
@@ -1074,8 +1011,7 @@ package Sidef::Types::String::String {
 
     sub shift_right {
         my ($self, $i) = @_;
-        $self->_is_number($i) || return;
-        $self->new(CORE::substr($$self, 0, -$$i));
+        $self->new(CORE::substr($self->get_value, 0, -$i->get_value));
     }
 
     *dropRight  = \&shift_right;
@@ -1094,13 +1030,13 @@ package Sidef::Types::String::String {
         require Data::Dump;
         local $Data::Dump::TRY_BASE64 = 0;
 
-        my $copy = $$self;
+        my $copy = $self->get_value;
         $self->new(Data::Dump::pp($copy));
     }
 
     sub dump {
         my ($self) = @_;
-        __PACKAGE__->new(q{'} . $$self =~ s{([\\'])}{\\$1}gr . q{'});
+        __PACKAGE__->new(q{'} . $self->get_value =~ s{([\\'])}{\\$1}gr . q{'});
     }
 
     {

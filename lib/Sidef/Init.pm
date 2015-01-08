@@ -4,6 +4,7 @@
 # echo "require Sidef;" && find . | perl -nE 'no warnings "experimental"; chomp; if(s/\.pm\z//){s{^\./}{};s{/}{::}g; next if $_ ~~ ["Types::Block::Fork", qr/^Variable::Class(?:Var)?\z/,  "Init", "Types::Regex::Matches", qr/^Types::Number::Number(?:Fast|Int|Rat)\z/]; say "require Sidef::$_;"}' | sort
 
 require Sidef;
+require Sidef::Object::Object;
 require Sidef::Args::Args;
 require Sidef::Convert::Convert;
 require Sidef::Eval::Eval;

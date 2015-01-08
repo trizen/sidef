@@ -5,8 +5,7 @@ package Sidef::Types::Regex::Regex {
     use re 'eval';    # XXX: do we really want this?
 
     our @ISA = qw(
-      Sidef
-      Sidef::Convert::Convert
+      Sidef::Object::Object
       );
 
     sub new {
@@ -49,15 +48,12 @@ package Sidef::Types::Regex::Regex {
             return $match // $self->matches(Sidef::Types::String::String->new);
         }
 
-        $self->_is_string($object, 0, 1) || return;
-        $object = $$object;
-
         require Sidef::Types::Regex::Matches;
         Sidef::Types::Regex::Matches->new(
-                                          obj    => $object,
+                                          obj    => $object->get_value,
                                           self   => $self,
                                           parser => $self->{parser},
-                                          pos    => defined($pos) ? $self->_is_number($pos) ? $$pos : return : undef,
+                                          pos    => defined($pos) ? $pos->get_value : undef,
                                          );
     }
 

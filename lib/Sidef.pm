@@ -3,6 +3,13 @@ package Sidef {
     use 5.014;
     our $VERSION = 0.03;
 
+    package UNIVERSAL {
+
+        sub get_value {
+            $_[0];
+        }
+    }
+
     {
         my %types = (
                      bool   => {class => {'Sidef::Types::Bool::Bool'  => 1}},
@@ -53,36 +60,7 @@ package Sidef {
 
         foreach my $type (keys %types) {
             *{__PACKAGE__ . '::' . '_is_' . $type} = sub {
-                return 1 if exists $types{$type}{class}{ref($_[1])};
-
-                my ($self, $obj, $strict_obj, $dont_warn) = @_;
-                if (!$dont_warn) {
-                    my ($sub) = +(caller(1))[3] =~ /^.*[^:]::(.+)$/;
-
-                    warn sprintf(
-                                 "[WARN] %sbject '%s' expected an object of type '$type', but got '%s'!\n",
-                                 (
-                                  $sub eq '__ANON__'
-                                  ? 'O'
-                                  : sprintf("The method '%s' from o", $sub)
-                                 ),
-                                 ref($self),
-                                 ref($obj) || "an undefined object"
-                                );
-                }
-
-                if (!$strict_obj) {
-                    if (
-                            defined $obj
-                        and exists $types{$type}{type}
-                        and ($obj->isa($types{$type}{type})
-                             || ($types{$type}{type} eq 'SCALAR' and ref($obj) eq 'Sidef::Types::Number::Number'))
-                      ) {
-                        return 1;
-                    }
-                }
-
-                $dont_warn ? () : (die "[ERROR] Can't continue...\n");
+                exists($types{$type}{class}{ref($_[1])}) ? 1 : 0;
             };
         }
 
@@ -110,7 +88,6 @@ package Sidef {
 
         sub def_method {
             my ($self, $name, $block) = @_;
-
             *{ref($self) . '::' . $name} = sub {
                 $block->call(@_);
             };
@@ -137,109 +114,6 @@ package Sidef {
                   } keys %{ref($self) . '::'}
             );
         }
-
-        # Smart match operator
-        *{__PACKAGE__ . '::' . '~~'} = sub {
-            my ($first, $second) = @_;
-
-            my $f_type = ref($first);
-            my $s_type = ref($second);
-
-            # First is String
-            if ($f_type eq 'Sidef::Types::String::String') {
-
-                # String ~~ Array
-                if ($s_type eq 'Sidef::Types::Array::Array') {
-                    return $second->contains($first);
-                }
-
-                # String ~~ Hash
-                if ($s_type eq 'Sidef::Types::Hash::Hash') {
-                    return $second->exists($first);
-                }
-
-                # String ~~ String
-                if ($s_type eq 'Sidef::Types::String::String') {
-                    return $first->contains($second);
-                }
-
-                # String ~~ Regex
-                if ($s_type eq 'Sidef::Types::Regex::Regex') {
-                    return $second->match($first)->is_successful;
-                }
-            }
-
-            # First is Array
-            if ($f_type eq 'Sidef::Types::Array::Array') {
-
-                # Array ~~ Array
-                if ($s_type eq 'Sidef::Types::Array::Array') {
-                    return $first->contains_all($second);
-                }
-
-                # Array ~~ Regex
-                if ($s_type eq 'Sidef::Types::Regex::Regex') {
-                    return $second->match($first)->is_successful;
-                }
-
-                # Array ~~ Hash
-                if ($s_type eq 'Sidef::Types::Hash::Hash') {
-                    return $second->keys->contains_any($first);
-                }
-
-                # Array ~~ Any
-                return $first->contains($second);
-            }
-
-            # First is Hash
-            if ($f_type eq 'Sidef::Types::Hash::Hash') {
-
-                # Hash ~~ Array
-                if ($s_type eq 'Sidef::Types::Array::Array') {
-                    return $first->keys->contains_all($second);
-                }
-
-                # Hash ~~ Hash
-                if ($s_type eq 'Sidef::Types::Hash::Hash') {
-                    return $first->keys->contains_all($second->keys);
-                }
-
-                # Hash ~~ Any
-                return $first->exists($second);
-            }
-
-            # First is Regex
-            if ($f_type eq 'Sidef::Types::Regex::Regex') {
-
-                # Regex ~~ Array
-                if ($s_type eq 'Sidef::Types::Array::Array') {
-                    return $first->match($second)->is_successful;
-                }
-
-                # Regex ~~ Hash
-                if ($s_type eq 'Sidef::Types::Hash::Hash') {
-                    return $first->match($second->keys)->is_successful;
-                }
-
-                # Regex ~~ Any
-                return $first->match($second)->is_successful;
-            }
-
-            # Second is Array
-            if ($s_type eq 'Sidef::Types::Array::Array') {
-
-                # Any ~~ Array
-                return $second->contains($first);
-            }
-
-            Sidef::Types::Bool::Bool->false;
-        };
-
-        *{__PACKAGE__ . '::' . '!~'} = sub {
-            my ($first, $second) = @_;
-            state $smart_op = '~~';
-            $first->$smart_op($second)->not;
-        };
     }
 
     sub new {
@@ -252,7 +126,8 @@ package Sidef {
             CORE::join(
                 '',
                 map {
-                    eval { ${$_->to_s} } // $_
+                    eval { ${ref($_) eq 'Sidef::Variable::Class' ? $_->to_s : $_} }
+                      // $_
                   } @args
             )
         );

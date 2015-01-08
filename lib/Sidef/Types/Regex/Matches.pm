@@ -61,6 +61,7 @@ package Sidef::Types::Regex::Matches {
     *toBool        = \&matched;
     *isSuccessful  = \&matched;
     *is_successful = \&matched;
+    *get_value     = \&matched;
 
     sub pos {
         my ($self) = @_;

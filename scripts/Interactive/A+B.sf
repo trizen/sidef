@@ -5,7 +5,7 @@ while (
         var ab = (STDIN.readline.split)
               -> len == 2
       ) {
-    "%s + %s = %s\n".printf(ab->to_list, ab.map{_.toNum}.sum);
+    "%s + %s = %s\n".printf(ab..., ab.map{_.toNum}.sum);
 }
 
 __END__

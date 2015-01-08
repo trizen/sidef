@@ -3,7 +3,6 @@ package Sidef::Types::Bool::If {
     use 5.014;
 
     our @ISA = qw(
-      Sidef
       Sidef::Types::Block::Do
       );
 

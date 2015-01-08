@@ -47,13 +47,13 @@ if (defined $args{v}) {
 
 # Warnings
 if (defined $args{w}) {
-    $SIG{__WARN__} = sub {
+    $SIG{__DIE__} =  $SIG{__WARN__} = sub {
         require Carp;
         Carp::cluck(@_);
     };
 }
 elsif (defined $args{W}) {
-    $SIG{__WARN__} = sub {
+    $SIG{__DIE__} = $SIG{__WARN__} = sub {
         require Carp;
         Carp::confess(@_);
     };
@@ -66,8 +66,7 @@ if (defined(my $type = $args{N})) {
 
 # Backend for Math::BigInt
 if (defined(my $type = $args{n})) {
-    require Math::BigInt;
-    Math::BigInt->import(lib => $type);
+    load_math_backend($type);
 }
 
 # Memoization
@@ -114,6 +113,7 @@ elsif (defined $args{t}) {
         if (@argv) {
             unload_numbers();
             load_numbers($args{N} // 'float');
+            load_math_backend($args{n}) if defined($args{n});
         }
     }
 }
@@ -195,6 +195,13 @@ sub load_numbers {
     else {
         die "Invalid value '${type}' for option '-N'!";
     }
+}
+
+sub load_math_backend {
+    my ($type) = @_;
+
+    require Math::BigInt;
+    Math::BigInt->import(lib => $type);
 }
 
 sub unload_numbers {

@@ -1,15 +1,11 @@
 package Sidef::Types::Block::Do {
 
-    our @ISA = qw(Sidef);
-
     sub new {
         bless {}, __PACKAGE__;
     }
 
     sub do {
         my ($self, $code) = @_;
-
-        $self->_is_code($code) || return;
 
         if ($self->{do_block}) {
             my $result = $code->run;

@@ -8,6 +8,10 @@ package Sidef::Types::Glob::Backtick {
         bless \$backtick, __PACKAGE__;
     }
 
+    sub get_value {
+        ${$_[0]};
+    }
+
     {
         no strict 'refs';
         *{__PACKAGE__ . '::' . '`'} = sub {

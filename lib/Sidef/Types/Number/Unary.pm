@@ -17,28 +17,21 @@ package Sidef::Types::Number::Unary {
         };
 
         *{__PACKAGE__ . '::' . '-'} = sub {
-            my ($self, $number) = @_;
-            $self->_is_number($number, 1) || return;
-            $number->negate;
+            $_[1]->negate;
         };
 
         *{__PACKAGE__ . '::' . '√'} = sub {
-            my ($self, $number) = @_;
-            $self->_is_number($number, 1) || return;
-            $number->sqrt;
+            $_[1]->sqrt;
         };
 
         *{__PACKAGE__ . '::' . '?'} = sub {
-            my ($self, $obj) = @_;
-            Sidef::Types::Bool::Bool->new($obj);
+            Sidef::Types::Bool::Bool->new($_[1]->get_value);
         };
 
         *{__PACKAGE__ . '::' . '!'} = sub {
-            my ($self, $bool) = @_;
-            Sidef::Types::Bool::Bool->new(!$bool);
+            Sidef::Types::Bool::Bool->new(not $_[1]->get_value);
         };
     }
-
 };
 
 1;

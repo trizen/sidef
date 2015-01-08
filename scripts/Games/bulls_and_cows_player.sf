@@ -49,7 +49,7 @@ func score_correct(a, b, bulls, cows) {
     # Pick a number, display it, get the score, and discard candidates
     # that don't match the score:
     var guess = (candidates.rand);
-    var (bulls, cows) = (read_score(guess)->as_list);
+    var (bulls, cows) = (read_score(guess)...);
     candidates.grep!{|i| score_correct(i.to_s, guess.to_s, bulls, cows)};
 }.do.while (candidates.len > 1);
 

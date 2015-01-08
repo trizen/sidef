@@ -4,8 +4,7 @@ package Sidef::Types::Number::Complex {
     use 5.014;
 
     our @ISA = qw(
-      Sidef
-      Sidef::Convert::Convert
+      Sidef::Object::Object
       );
 
     sub new {

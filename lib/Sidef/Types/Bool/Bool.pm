@@ -1,16 +1,17 @@
 package Sidef::Types::Bool::Bool {
 
-    use overload q{bool} => \&get_value;
+    use overload
+      q{bool} => \&get_value,
+      q{""}   => sub { ${$_[0]} ? 'true' : 'false' };
 
     our @ISA = qw(
-      Sidef
-      Sidef::Convert::Convert
+      Sidef::Object::Object
       );
 
     {
         my %bool = (
-                    true  => (bless \(my $t = 'true'),  __PACKAGE__),
-                    false => (bless \(my $f = 'false'), __PACKAGE__),
+                    true  => (bless \(my $t = 1),  __PACKAGE__),
+                    false => (bless \(my $f = ''), __PACKAGE__),
                    );
 
         sub new {
@@ -25,100 +26,34 @@ package Sidef::Types::Bool::Bool {
     }
 
     sub get_value {
-        ${$_[0]} eq 'true';
-    }
-
-    {
-        *{__PACKAGE__ . '::' . '&&'} = \&and;
-        *{__PACKAGE__ . '::' . '&'}  = \&and;
-
-        *{__PACKAGE__ . '::' . '||'} = \&or;
-        *{__PACKAGE__ . '::' . '|'}  = \&or;
-
-        *{__PACKAGE__ . '::' . '^'}  = \&xor;
-        *{__PACKAGE__ . '::' . '^^'} = \&xor;
-
-        *{__PACKAGE__ . '::' . '?'} = sub {
-            my ($self, $code) = @_;
-
-            if ($$self eq 'true') {
-                my $result = Sidef::Types::Block::Code->new($code)->run;
-                return
-                  Sidef::Types::Bool::Ternary->new(code => $result,
-                                                   bool => 1);
-            }
-
-            return Sidef::Types::Bool::Ternary->new(code => $code, bool => 0);
-        };
-
-        *{__PACKAGE__ . '::' . '?:'} = sub {
-            my ($self, $code) = @_;
-
-            my ($class) = keys %{$code};
-
-            if ($$self eq 'true') {
-                return Sidef::Types::Block::Code->new({$class => [$code->{$class}[0]]})->run;
-            }
-
-            return Sidef::Types::Block::Code->new({$class => [$code->{$class}[1]]})->run;
-        };
+        ${$_[0]};
     }
 
     sub is_true {
-        my ($self) = @_;
-        $self->new($$self eq 'true');
+        $_[0];
     }
 
     *isTrue = \&is_true;
 
-    sub is_false {
-        my ($self) = @_;
-        $self->new($$self eq 'false');
-    }
-
-    *isFalse = \&is_false;
-
     sub not {
         my ($self) = @_;
-        $$self eq 'true' ? $self->false : $self->true;
+        $self->get_value ? $self->false : $self->true;
     }
 
-    *flip   = \&not;
-    *toggle = \&not;
+    *is_false = \&not;
+    *isFalse  = \&not;
+    *flip     = \&not;
+    *toggle   = \&not;
 
-    sub or {
+    # Ternary operator (BOOL ? TrueExpr : FalseExpr)
+    *{__PACKAGE__ . '::' . '?'} = sub {
         my ($self, $code) = @_;
-
-        if ($$self ne 'true') {
-            return Sidef::Types::Block::Code->new($code)->run;
-        }
-
-        $self->true;
-    }
-
-    sub and {
-        my ($self, $code) = @_;
-
-        if ($$self eq 'true') {
-            return Sidef::Types::Block::Code->new($code)->run;
-        }
-
-        $self->false;
-    }
-
-    sub xor {
-        my ($self, $val) = @_;
-
-        if (($$self eq 'true' and $val) || ($$self eq 'false' and !$val)) {
-            return $self->false;
-        }
-
-        $self->true;
-    }
+        Sidef::Types::Bool::Ternary->new(code => $code, bool => $self->get_value);
+    };
 
     sub dump {
         my ($self) = @_;
-        Sidef::Types::String::String->new($$self);
+        Sidef::Types::String::String->new($self->get_value ? 'true' : 'false');
     }
 
 };

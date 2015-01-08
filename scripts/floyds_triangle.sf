@@ -4,7 +4,7 @@ func floyd(rows, n=1) {
     var max = Math.range_sum(1, rows);
     var widths = (max-rows .. max-1 -> map{(.+n).to_s.len});
     { |r|
-        say %'#{1..r -> map{|i| "%#{widths[i-1]}d" % n++}}';
+        say %'#{1..r -> map{|i| "%#{widths[i-1]}d" % n++}.to_s}';
     } * rows;
 }
 
