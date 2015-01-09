@@ -8,6 +8,29 @@ package Sidef {
         sub get_value {
             $_[0];
         }
+
+        our $AUTOLOAD;
+        sub DESTROY { }
+
+        sub AUTOLOAD {
+            my ($self, @args) = @_;
+
+            $self = ref($self) if ref($self);
+            $self =~ /^Sidef::/ or return;
+            eval { require $self =~ s{::}{/}rg . '.pm' };
+
+            if ($@) {
+                die "[AUTOLOAD] $@";
+            }
+
+            my $func = \&{$AUTOLOAD};
+            if (defined(&$func)) {
+                return $func->($self, @args);
+            }
+
+            warn "[AUTOLOAD] Undefined function: $AUTOLOAD";
+            return;
+        }
     }
 
     {

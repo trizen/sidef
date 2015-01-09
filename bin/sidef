@@ -22,7 +22,7 @@ binmode STDIN,  ":utf8";
 binmode STDOUT, ":utf8";
 binmode STDERR, ":utf8" if $^P == 0;    # to work under Devel::* modules
 
-require Sidef::Init;
+require Sidef;
 
 my $name    = 'Sidef';
 my $version = $Sidef::VERSION;
@@ -449,6 +449,16 @@ sub _get_number_type {
     $code;
 }
 
+sub _get_loaded_modules {
+    my $modules = '';
+    foreach my $key(sort {length($a) <=> length($b) || $a cmp $b} keys %INC) {
+        if ($key =~ /^Sidef\b/) {
+            $modules .= "require '$key';\n";
+        }
+    }
+    $modules;
+}
+
 sub dump_structure {
     my ($struct) = @_;
 
@@ -466,6 +476,7 @@ sub dump_structure {
         }
         print {$out_fh} _get_namespaces();
         print {$out_fh} _get_number_type();
+        print {$out_fh} _get_loaded_modules();
         print {$out_fh} Data::Dump::pp($struct);
     }
 }
@@ -685,21 +696,8 @@ HEAD
 
 FOOT
 
-        if (exists $INC{'Sidef/Init.pm'}) {
-            my $filename = $INC{'Sidef/Init.pm'};
-
-            local $/;
-            open my $fh, '<:utf8', $filename
-              or die "Can't open file `$filename' for reading: $!";
-
-            $package_content .= <$fh>;
-            $package_content .= _get_number_type();
-
-            close $fh;
-        }
-        else {
-            die "ERROR: Can't find the `Sidef::Init' module!\n";
-        }
+        $package_content .= _get_number_type();
+        $package_content .= _get_loaded_modules();
 
         my $out_fh = \*STDOUT;
 

@@ -4,7 +4,7 @@ package Sidef::Types::Nil::Nil {
       'bool' => sub { },
       q{""}  => sub { '' };
 
-    our @ISA = qw(
+    use parent qw(
       Sidef::Object::Object
       );
 

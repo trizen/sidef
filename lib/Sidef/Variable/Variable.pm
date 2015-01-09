@@ -8,12 +8,15 @@ package Sidef::Variable::Variable {
     };
 
     our $AUTOLOAD;
-    my $nil = Sidef::Types::Nil::Nil->new;
 
-    sub new {
-        my (undef, %opt) = @_;
-        $opt{value} //= $nil;
-        bless \%opt, __PACKAGE__;
+    {
+        my %cache;
+
+        sub new {
+            my (undef, %opt) = @_;
+            $opt{value} //= $cache{nil} //= Sidef::Types::Nil::Nil->new;
+            bless \%opt, __PACKAGE__;
+        }
     }
 
     sub _is_defined {    # faster (used internally)

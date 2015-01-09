@@ -1,9 +1,7 @@
 package Sidef::Types::Block::Switch {
 
     use 5.014;
-
-    our @ISA = qw(
-      Sidef
+    use parent qw(
       Sidef::Types::Block::Do
       );
 

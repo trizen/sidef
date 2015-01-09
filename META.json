@@ -77,6 +77,9 @@
       "Sidef::Module::Require" : {
          "file" : "lib/Sidef/Module/Require.pm"
       },
+      "Sidef::Object::Object" : {
+         "file" : "lib/Sidef/Object/Object.pm"
+      },
       "Sidef::Parser" : {
          "file" : "lib/Sidef/Parser.pm"
       },
@@ -256,6 +259,9 @@
       },
       "Sidef::Variable::Variable" : {
          "file" : "lib/Sidef/Variable/Variable.pm"
+      },
+      "UNIVERSAL" : {
+         "file" : "lib/Sidef.pm"
       }
    },
    "release_status" : "unstable",

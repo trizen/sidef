@@ -3,7 +3,7 @@ package Sidef::Types::String::String {
     use utf8;
     use 5.014;
 
-    our @ISA = qw(
+    use parent qw(
       Sidef::Object::Object
       );
 
@@ -496,7 +496,7 @@ package Sidef::Types::String::String {
 
         $size = defined($size) ? $size->get_value : 0;
 
-        if (not defined $sep) {
+        if (CORE::not defined $sep) {
             return
               Sidef::Types::Array::Array->new(map { __PACKAGE__->new($_) }
                                                 split(' ', $self->get_value, $size));

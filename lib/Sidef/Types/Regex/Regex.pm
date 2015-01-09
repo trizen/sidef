@@ -4,7 +4,7 @@ package Sidef::Types::Regex::Regex {
 
     use re 'eval';    # XXX: do we really want this?
 
-    our @ISA = qw(
+    use parent qw(
       Sidef::Object::Object
       );
 

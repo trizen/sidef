@@ -1,7 +1,7 @@
 package Sidef::Types::Glob::DirHandle {
 
     use 5.014;
-    our @ISA = qw(
+    use parent qw(
       Sidef::Object::Object
       );
 

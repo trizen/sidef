@@ -34,6 +34,8 @@ provides:
     file: lib/Sidef/Module/Func.pm
   Sidef::Module::Require:
     file: lib/Sidef/Module/Require.pm
+  Sidef::Object::Object:
+    file: lib/Sidef/Object/Object.pm
   Sidef::Parser:
     file: lib/Sidef/Parser.pm
   Sidef::Perl::Perl:
@@ -154,6 +156,8 @@ provides:
     file: lib/Sidef/Variable/Struct.pm
   Sidef::Variable::Variable:
     file: lib/Sidef/Variable/Variable.pm
+  UNIVERSAL:
+    file: lib/Sidef.pm
 requires:
   Cwd: '0'
   Encode: '0'

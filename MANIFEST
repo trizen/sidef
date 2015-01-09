@@ -15,6 +15,7 @@ lib/Sidef/Module/Caller.pm
 lib/Sidef/Module/Func.pm
 lib/Sidef/Module/Require.pm
 lib/Sidef/Module/Require.pod
+lib/Sidef/Object/Object.pm
 lib/Sidef/Parser.pm
 lib/Sidef/Perl/Perl.pm
 lib/Sidef/Sys/SIG.pm

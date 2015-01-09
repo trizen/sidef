@@ -2,7 +2,7 @@ package Sidef::Types::Hash::Hash {
 
     use 5.014;
 
-    our @ISA = qw(
+    use parent qw(
       Sidef::Object::Object
       );
 

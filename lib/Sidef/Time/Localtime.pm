@@ -1,7 +1,6 @@
 package Sidef::Time::Localtime {
 
-    our @ISA = qw(
-      Sidef
+    use parent qw(
       Sidef::Time::Gmtime
       );
 

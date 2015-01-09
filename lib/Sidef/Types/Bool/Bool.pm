@@ -4,7 +4,7 @@ package Sidef::Types::Bool::Bool {
       q{bool} => \&get_value,
       q{""}   => sub { ${$_[0]} ? 'true' : 'false' };
 
-    our @ISA = qw(
+    use parent qw(
       Sidef::Object::Object
       );
 
