@@ -98,16 +98,35 @@ package Sidef::Types::String::String {
         Sidef::Types::Bool::Bool->new($self->get_value ne $string->get_value);
     }
 
-    sub match {
-        my ($self, $regex, @rest) = @_;
-        $regex->match($self, @rest);
+    {
+        my %cache;
+
+        sub match {
+            my ($self, $regex, @rest) = @_;
+            (
+             $self->_is_regex($regex) ? $regex : do {
+                 require Scalar::Util;
+                 $cache{Scalar::Util::refaddr($regex)} //= Sidef::Types::Regex::Regex->new($regex);
+               }
+            )->match($self, @rest);
+        }
     }
 
     *matches = \&match;
 
-    sub gmatch {
-        my ($self, $regex, @rest) = @_;
-        $regex->gmatch($self, @rest);
+    {
+        my %cache;
+
+        sub gmatch {
+            my ($self, $regex, @rest) = @_;
+            (
+             $self->_is_regex($regex) ? $regex : do {
+                 require Scalar::Util;
+                 $cache{Scalar::Util::refaddr($regex)} //=
+                   Sidef::Types::Regex::Regex->new($regex);
+               }
+            )->gmatch($self, @rest);
+        }
     }
 
     *gmatches = \&gmatch;

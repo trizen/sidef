@@ -272,7 +272,7 @@ package Sidef::Parser {
                     | \[(?<rop>(?&op))\]                        # reduce operator    (e.g.: [+])
                     | <(?<rop>[[:alpha:]_]\w*)>                 # reduce method      (e.g.: <add>)
                     | «(?<rop>[[:alpha:]_]\w*|(?&op))»          # reduce method + op (e.g.: «add» or «+»)
-                    | \^(?<mop>[[:alpha:]_]\w*[!:?]?)\^         # method-like operator
+                    | \h*\^(?<mop>[[:alpha:]_]\w*[!:?]?)\^\h*   # method-like operator
                     | (?<op>@operators
                         | \p{Block: Mathematical_Operators}
                         | \p{Block: Supplemental_Mathematical_Operators}
