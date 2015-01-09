@@ -22,10 +22,6 @@ my %ignored;
       )
 } = ();
 
-if ($] < 5.018) {
-    undef $ignored{'JASH.sf'};
-}
-
 my $regex_filter;
 if (@ARGV and $ARGV[0] =~ m{^/(.+)/$}) {
     $regex_filter = qr/$1/i;

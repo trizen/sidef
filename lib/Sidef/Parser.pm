@@ -312,24 +312,9 @@ package Sidef::Parser {
     sub fatal_error {
         my ($self, %opt) = @_;
 
-        my $index = index($opt{code}, "\n", $opt{pos});
-        $index += ($index == -1) ? (length($opt{code}) + 1) : -$opt{pos};
-
-        my $rindex = rindex($opt{code}, "\n", $opt{pos});
-        $rindex += 1;
-
-        my $start = $rindex;
-        my $point = $opt{pos} - $start;
-        my $len   = $point + $index;
-
-        if ($len > 78) {
-            if ($point - $start > 60) {
-                $start = ($point - 60);
-                $point = $point - $start + $rindex;
-                $len   = ($opt{pos} + $index - $start);
-            }
-            $len = 78 if $len > 78;
-        }
+        my $start      = rindex($opt{code}, "\n", $opt{pos}) + 1;
+        my $point      = $opt{pos} - $start;
+        my $error_line = (split(/\R/, substr($opt{code}, $start, 80)))[0];
 
         my @lines = (
                      "HAHA! That's really funny! You got me!",
@@ -337,19 +322,36 @@ package Sidef::Parser {
                      "LOL! I expected... Oh, my! This is funny!",
                      "Oh, oh... Wait a second! Did you mean...? Damn!",
                      "You're emberesing me! That's not funny!",
+                     "My brain just exploded.",
+                     "Sorry, I don’t know how to help in this situation.",
+                     "I'm broken. Fix me, or show this to someone who can fix",
+                     "Huh?",
+                     "Out of order",
+                     "You must be joking.",
+                     "Ouch, That HURTS!",
+                     "Who are you!?",
+                     "Death before dishonour?",
+                     "Good afternoon, gentelman, I’m a HAL 9000 Computer",
+                     "Okie dokie, I'm dead",
+                     "Help is not available for you.",
+                     "Your expression has defeated me",
+                     "Your code has defeated me",
+                     "Your logic has defeated me",
+                     "Weird magic happens here",
+                     "I give up... dumping core now!",
+                     "Okie dokie, core dumped.bash",
+                     "You made me die. Shame on you!",
+                     "Invalid code. Feel ashamed for yourself and try again.",
                     );
 
         require File::Basename;
         my $basename = File::Basename::basename($0);
 
-        my $error =
-            "$basename: "
-          . $lines[rand @lines] . "\n"
-          . ($self->{file_name} // '-') . ':'
-          . $self->{line}
-          . ": syntax error, "
-          . join(', ', grep { defined } $opt{error}, $opt{expected}) . "\n"
-          . substr($opt{code}, $start, $len) . "\n";
+        my $error = sprintf("%s: %s\n%s:%s: syntax error, %s\n%s\n",
+                            $basename,
+                            $lines[rand @lines],
+                            $self->{file_name} // '-',
+                            $self->{line}, join(', ', grep { defined } $opt{error}, $opt{expected}), $error_line,);
 
         my $pointer = ' ' x ($point) . '^' . "\n";
         $self->{strict} ? (die $error, $pointer) : (warn $error, $pointer);
