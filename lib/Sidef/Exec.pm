@@ -40,8 +40,6 @@ package Sidef::Exec {
     sub execute_expr {
         my ($self, $expr) = @_;
 
-        exists($expr->{self}) || die "Struct error!\n";
-
         my $self_obj = $expr->{self};
 
         if (ref $self_obj eq 'HASH') {
@@ -54,10 +52,6 @@ package Sidef::Exec {
             }
         }
 
-        if (ref $self_obj eq 'Sidef::Variable::My') {
-            $self_obj = $self->{vars}{$self_obj->_get_name};
-        }
-
         if (ref $self_obj eq 'Sidef::Types::Array::HCArray') {
             local $self->{var_ref} = 0;
             $self_obj = Sidef::Types::Array::Array->new(
@@ -66,6 +60,9 @@ package Sidef::Exec {
                     ref($val) eq 'Sidef::Args::Args' ? @{$val} : $val
                   } @{$self_obj}
             );
+        }
+        elsif (ref $self_obj eq 'Sidef::Variable::My') {
+            $self_obj = $self->{vars}{$self_obj->_get_name};
         }
 
         if (exists $expr->{ind}) {

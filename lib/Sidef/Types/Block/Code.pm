@@ -272,11 +272,11 @@ package Sidef::Types::Block::Code {
     sub if {
         my ($self, $bool) = @_;
 
-        if ($bool) {
+        if (defined($bool) && $bool->get_value) {
             return $self->run;
         }
 
-        return $bool;
+        $bool;
     }
 
     sub given {

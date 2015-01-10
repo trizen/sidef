@@ -135,8 +135,7 @@ package Sidef::Object::Object {
     # Negation of smart match
     *{__PACKAGE__ . '::' . '!~'} = sub {
         my ($first, $second) = @_;
-        state $smart_op = '~~';
-        $first->$smart_op($second)->not;
+        $first->${\'~~'}($second)->not;
     };
 };
 

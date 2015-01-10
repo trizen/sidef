@@ -11,7 +11,7 @@ package Sidef::Types::Bool::If {
 
     sub if {
         my ($self, @args) = @_;
-        $self->{do_block} = $args[-1] ? 1 : 0;
+        $self->{do_block} = defined($args[-1]) && $args[-1]->get_value ? 1 : 0;
         $self;
     }
 
