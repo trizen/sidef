@@ -1,6 +1,6 @@
 package Sidef::Types::Byte::Byte {
 
-    our @ISA = qw(
+    use parent qw(
       Sidef::Types::Number::Number
       );
 

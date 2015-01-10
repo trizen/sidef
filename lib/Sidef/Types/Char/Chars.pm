@@ -1,6 +1,6 @@
 package Sidef::Types::Char::Chars {
 
-    our @ISA = qw(
+    use parent qw(
       Sidef::Types::Array::Array
       );
 

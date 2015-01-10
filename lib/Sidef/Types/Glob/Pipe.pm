@@ -13,7 +13,7 @@ package Sidef::Types::Glob::Pipe {
     *call = \&new;
 
     sub get_value {
-        [map { $_->get_value } @{$_[0]}];
+        join(' ', @{$_[0]});
     }
 
     sub command {
@@ -65,7 +65,8 @@ package Sidef::Types::Glob::Pipe {
 
     sub dump {
         my ($self) = @_;
-        Sidef::Types::String::String->new('Pipe.new(' . join(', ', map { $_->dump } @{$self}) . ')');
+        Sidef::Types::String::String->new(
+                                 'Pipe.new(' . join(', ', map { Sidef::Types::String::String->new($_)->dump } @{$self}) . ')');
     }
 }
 

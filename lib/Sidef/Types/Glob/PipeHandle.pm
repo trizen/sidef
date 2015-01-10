@@ -1,8 +1,7 @@
 package Sidef::Types::Glob::PipeHandle {
 
     use 5.014;
-
-    our @ISA = qw(
+    use parent qw(
       Sidef::Types::Glob::FileHandle
       );
 

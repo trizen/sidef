@@ -71,5 +71,5 @@ f.find(
             }
         },
         no_chdir => 1,
-    ) => dir
+    ) => dir.to_dir.rel2abs
 );

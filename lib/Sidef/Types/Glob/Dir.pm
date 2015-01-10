@@ -2,7 +2,7 @@ package Sidef::Types::Glob::Dir {
 
     use 5.014;
 
-    our @ISA = qw(
+    use parent qw(
       Sidef::Types::String::String
       );
 

@@ -757,9 +757,11 @@ package Sidef::Parser {
                         $method     = 'new';
                     }
 
-                    my $obj =
-                      $double_quoted
-                      ? Sidef::Types::String::String::apply_escapes($package->$method($string), $self)
+                    my $obj = $double_quoted
+                      ? do {
+                        require Sidef::Types::String::String;
+                        Sidef::Types::String::String::apply_escapes($package->$method($string), $self);
+                      }
                       : $package->$method($string =~ s{\\\\}{\\}gr);
 
                     # Special case for backticks (add method '`')
