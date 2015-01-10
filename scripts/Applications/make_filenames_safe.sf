@@ -1,0 +1,75 @@
+#!/usr/bin/ruby
+
+# Make the filenames portable to almost any filesystem
+
+SIG.__WARN__ { |msg| die msg };     # make warnings fatal
+
+var f = require('File::Find').();
+var u = require('Text::Unidecode').();
+
+var rename = false;
+
+# Check first argument
+ARGV[0] == '-r' && (
+    ARGV.shift;
+    rename = true;
+);
+
+var dir = ARGV[0] \\ "usage: #{__MAIN__} [-r] [dir]\n".die;
+
+f.find(
+    Hash.new(
+        wanted => func(arg) {
+            var file = File.new(arg);
+            if (file.is_file) {
+
+                # Get dirname and basename
+                var basename = file.basename;
+                var dirname = file.dirname;
+
+                # Unidecode and remove unsafe characters
+                basename = u.unidecode(basename).to_s;
+                basename.gsub!(/[^A-Za-z0-9_.-]+/, ' ');
+                basename.tr('_.-', '_.-', 's');
+
+                # Get away the extension (if any)
+                var ext = '';
+                if (basename =~ /(\.\w{1,5})\z/) {
+                    ext = $1;
+                    basename.substr!(0, -ext.len);
+                };
+
+                # Replace any dot sequence with a space
+                basename.gsub!(/\./, ' ');
+
+                # Squeeze more spaces into one space char
+                basename = basename.words.join(' ');
+
+                # Trim filename to 255 characters (if longer)
+                if (basename.length > (255 - ext.len)) {
+                    basename.substr!(0, 255 - ext.len).trim_end!;
+                };
+
+                # Append back the extension
+                basename += ext;
+
+                # Create the new filename
+                var new_file = dirname+basename;
+
+                # Rename the old filename to the new filename
+                if (new_file != file) {
+                    say "Renaming: `#{file}' -> `#{new_file}'";
+                    if (File.exists(new_file)) {
+                        STDERR.print("\t...file already exists!\n");
+                    }
+                    elsif (rename) {
+                       File.rename(file, new_file) || (
+                            STDERR.print("\tcan't rename it: #{$!}\n");
+                       );
+                    }
+                }
+            }
+        },
+        no_chdir => 1,
+    ) => dir
+);

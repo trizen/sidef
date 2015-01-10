@@ -3,6 +3,8 @@ package Sidef::Types::Number::Number {
     use utf8;
     use 5.014;
 
+    our $GET_PERL_VALUE = 0;
+
     use parent qw(
       Sidef::Object::Object
       );
@@ -51,9 +53,7 @@ package Sidef::Types::Number::Number {
     }
 
     sub get_value {
-        rindex((caller(1))[3], '::get_value') > 0
-          ? ${$_[0]}->numify
-          : ${$_[0]};
+        $GET_PERL_VALUE ?  ${$_[0]}->numify : ${$_[0]};
     }
 
     sub mod {

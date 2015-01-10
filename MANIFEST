@@ -140,6 +140,7 @@ scripts/Applications/fdf.sf
 'scripts/Applications/Gift match/giftmatch.sf'
 'scripts/Applications/Gift match/input.txt'
 'scripts/Applications/Gift match/output.txt'
+scripts/Applications/make_filenames_safe.sf
 scripts/Applications/perl_obfuscation.sf
 scripts/Applications/sany2mp3.sf
 scripts/Applications/unit_converter.sf

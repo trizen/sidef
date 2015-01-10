@@ -60,6 +60,7 @@ package Sidef::Module::Func {
                 @arg
                 ? (
                    map {
+                       local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
                        ref($_) =~ /^Sidef::/ && $_->can('get_value')
                          ? $_->get_value
                          : ref($_) eq 'Sidef::Variable::Ref' ? do {
