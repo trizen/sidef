@@ -69,15 +69,9 @@ package Sidef::Types::Block::Code {
     sub repeat {
         my ($self, $num) = @_;
 
-        $num =
-            defined($num)
-          ? $self->_is_number($num)
-              ? $$num
-              : return ()
-          : 1;
+        $num = defined($num) ? $num->get_value : 1;
 
         return if $num < 1;
-
         my ($var) = $self->init_block_vars();
 
         if ($num > (-1 >> 1)) {

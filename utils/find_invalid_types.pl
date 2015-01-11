@@ -42,7 +42,7 @@ sub process_file {
     open my $fh, '<', $file or return;
     while (defined(my $line = <$fh>)) {
         if (   $line =~ /(?<quote>['"])(?<name>$root_re [:;].*?)\g{quote}/xo
-            || $line =~ /(?<![*&@])\b(?<name>$root_re(?>::\w+)+)\b/o) {
+            || $line =~ /(?<![*&@\$])\b(?<name>$root_re(?>::\w+)+)\b/o) {
             my $name   = $+{name};
             my $module = join('/', split(/::/, $name)) . '.pm';
             my $status = eval { require $module };

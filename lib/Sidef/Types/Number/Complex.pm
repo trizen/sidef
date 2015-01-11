@@ -1,8 +1,10 @@
 package Sidef::Types::Number::Complex {
 
+    use utf8;
     use 5.014;
+
     use parent qw(
-      Sidef::Object::Object
+      Sidef::Types::Number::Number
       );
 
     sub new {
@@ -34,10 +36,15 @@ package Sidef::Types::Number::Complex {
             elsif ($rx eq 'Math::Complex') {
                 $x = Math::Complex::Re($x);
             }
-            elsif ($self->_is_number($x)) {
-                $x = $$x;
+            else {
+                $x = $x->get_value;
             }
-            else { return }
+        }
+
+        if (not defined(&Math::BigFloat::_cartesian)) {
+            *Math::BigFloat::_cartesian = sub {
+                Math::Complex->make($_[0], 0)->_cartesian;
+            };
         }
 
         #
@@ -57,83 +64,9 @@ package Sidef::Types::Number::Complex {
             elsif ($ry eq 'Math::Complex') {
                 $y = Math::Complex::Im($y);
             }
-            elsif ($self->_is_number($y)) {
-                $y = $$y;
+            else {
+                $y = $y->get_value;
             }
-            else { return }
-        }
-
-        #if (not defined(&Math::BigFloat::_cartesian)) {
-        #    *Math::BigFloat::_cartesian = sub {
-        #        Math::Complex->make($_[0], 0)->_cartesian;
-        #    };
-        #}
-
-        #
-        ## Inherit methods from Number/NumberFast
-        #
-        state $inherited = 0;
-
-        if (not $inherited) {
-            my $ref = ref(${Sidef::Types::Number::Number->new(0)});
-
-            my $type =
-                $ref eq 'Math::BigInt'   ? 'int'
-              : $ref eq 'Math::BigFloat' ? 'float'
-              : $ref eq 'Math::BigRat'   ? 'rat'
-              :                            'fast';
-
-            if ($type ne 'fast') {
-                delete @INC{'Sidef/Types/Number/Number.pm', 'Sidef/Types/Number/NumberFast.pm'};
-
-                if ($type eq 'int') {
-                    delete $INC{'Sidef/Types/Number/NumberInt.pm'};
-                }
-                elsif ($type eq 'rat') {
-                    delete $INC{'Sidef/Types/Number/NumberRat.pm'};
-                }
-
-                require Sidef::Types::Number::NumberFast;
-            }
-
-            {
-                no strict 'refs';
-                while (my ($key, $value) = each %{'Sidef::Types::Number::Number::'}) {
-                    my $func = \&{'Sidef::Types::Number::Number' . '::' . $key};
-                    if (defined &{$func}) {
-                        next if ($key eq 'new' or $key eq 'call');
-                        *{__PACKAGE__ . '::' . $key} = sub {
-                            $func->(
-                                $_[0],
-                                map {
-                                    ref($_) eq __PACKAGE__ ? $_ : do { bless \($_->get_value) }
-                                  } @_[1 .. $#_]
-                            );
-                        };
-                    }
-                }
-
-                *conjugated = \&Sidef::Types::Number::Complex::not;
-                *conj       = \&Sidef::Types::Number::Complex::not;
-            }
-
-            delete @Sidef::Types::Number::Number::{keys %Sidef::Types::Number::Number::};
-            delete $INC{'Sidef/Types/Number/Number.pm'};
-            delete $INC{'Sidef/Types/Number/NumberFast.pm'};
-
-            require Sidef::Types::Number::Number;
-
-            if ($type eq 'int') {
-                require Sidef::Types::Number::NumberInt;
-            }
-            elsif ($type eq 'rat') {
-                require Sidef::Types::Number::NumberRat;
-            }
-            elsif ($type eq 'fast') {
-                require Sidef::Types::Number::NumberFast;
-            }
-
-            $inherited = 1;
         }
 
         bless \Math::Complex->make($x, $y), __PACKAGE__;
@@ -184,6 +117,172 @@ package Sidef::Types::Number::Complex {
         state $table = {i => sub { __PACKAGE__->new(Math::Complex->i) },};
 
         $cache{lc($name)} //= $table->{lc($name)}->();
+    }
+
+    sub get_value {
+        ${$_[0]};
+    }
+
+    sub inc {
+        my ($self) = @_;
+        $self->new($self->get_value + 1);
+    }
+
+    sub dec {
+        my ($self) = @_;
+        $self->new($self->get_value - 1);
+    }
+
+    sub cmp {
+        my ($self, $num) = @_;
+        Sidef::Types::Number::Number->new($self->get_value <=> $num->get_value);
+    }
+
+    sub factorial {
+        my ($self) = @_;
+        my $fac = 1;
+        $fac *= $_ for (2 .. $self->get_value);
+        $self->new($fac);
+    }
+
+    *fact = \&factorial;
+
+    sub int {
+        my ($self) = @_;
+        $self->new(CORE::int($self->get_value));
+    }
+
+    *as_int = \&int;
+
+    sub neg {
+        my ($self) = @_;
+        $self->new(-$self->get_value);
+    }
+
+    *negate = \&neg;
+
+    sub not {
+        my ($self) = @_;
+        $self->new(-$self->get_value - 1);
+    }
+
+    *conjugated = \&not;
+    *conj       = \&not;
+
+    sub sign {
+        my ($self) = @_;
+        Sidef::Types::String::String->new($self->get_value >= 0 ? '+' : '-');
+    }
+
+    sub is_zero {
+        my ($self) = @_;
+        Sidef::Types::Bool::Bool->new($self->get_value == 0);
+    }
+
+    *isZero = \&is_zero;
+
+    sub is_nan {
+        my ($self) = @_;
+        Sidef::Types::Bool::Bool->false;
+    }
+
+    *isNaN  = \&is_nan;
+    *is_NaN = \&is_nan;
+
+    sub is_positive {
+        my ($self) = @_;
+        Sidef::Types::Bool::Bool->new($self->get_value >= 0);
+    }
+
+    *isPositive = \&is_positive;
+    *isPos      = \&is_positive;
+    *is_pos     = \&is_positive;
+
+    sub is_inf {
+        my ($self) = @_;
+        Sidef::Types::Bool::Bool->new($self->get_value == 'inf');
+    }
+
+    *isInf       = \&is_inf;
+    *is_infinite = \&is_inf;
+    *isInfinite  = \&is_inf;
+
+    sub is_negative {
+        my ($self) = @_;
+        Sidef::Types::Bool::Bool->new($self->get_value < 0);
+    }
+
+    *isNegative = \&is_negative;
+    *isNeg      = \&is_negative;
+    *is_neg     = \&is_negative;
+
+    sub is_even {
+        my ($self) = @_;
+        Sidef::Types::Bool::Bool->new($self->get_value % 2 == 0);
+    }
+
+    *isEven = \&is_even;
+
+    sub is_integer {
+        my ($self) = @_;
+        Sidef::Types::Bool::Bool->new($self->get_value == CORE::int($self->get_value));
+    }
+
+    *isInt     = \&is_integer;
+    *is_int    = \&is_integer;
+    *isInteger = \&is_integer;
+
+    sub rand {
+        my ($self, $max) = @_;
+
+        my $min = $self->get_value;
+        $max = ref($max) ? $max->get_value : do { $min = 0; $self->get_value };
+
+        $self->new($min + CORE::rand($max - $min));
+    }
+
+    sub ceil {
+        my ($self) = @_;
+
+        CORE::int($self->get_value) == $self->get_value
+          && return $self;
+
+        $self->new(CORE::int($self->get_value + 1));
+    }
+
+    sub floor {
+        my ($self) = @_;
+        $self->new(CORE::int($self->get_value));
+    }
+
+    sub round { ... }
+
+    sub roundf {
+        my ($self, $num) = @_;
+        $self->new(sprintf "%.*f", $num->get_value * -1, $self->get_value);
+    }
+
+    *fround = \&roundf;
+    *fRound = \&roundf;
+
+    sub digit  { ... }
+    sub nok    { ... }
+    sub length { ... }
+
+    *len = \&length;
+
+    sub sstr {
+        my ($self) = @_;
+        Sidef::Types::String::String->new($self->get_value);
+    }
+
+    {
+        no strict 'refs';
+
+        *{__PACKAGE__ . '::' . '++'}  = \&inc;
+        *{__PACKAGE__ . '::' . '--'}  = \&dec;
+        *{__PACKAGE__ . '::' . '<=>'} = \&cmp;
+        *{__PACKAGE__ . '::' . '!'}   = \&factorial;
     }
 };
 

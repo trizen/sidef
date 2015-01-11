@@ -47,7 +47,7 @@ if (defined $args{v}) {
 
 # Warnings
 if (defined $args{w}) {
-    $SIG{__DIE__} =  $SIG{__WARN__} = sub {
+    $SIG{__DIE__} = $SIG{__WARN__} = sub {
         require Carp;
         Carp::cluck(@_);
     };
@@ -234,7 +234,7 @@ sub output_usage {
                     '-H'             => 'interactive help',
                     '-N type'        => ['use a specific implementation for numbers', 'valid types: fast, big, int, rat'],
                     '-n type'        => ['try to use a specific backend for Math::BigInt', 'valid types: GMP, Pari, FastCalc'],
-                    '-M type,type'   => ['memoize some expensive method calls', 'valid types: str, num, block, all'],
+                    '-M type,type'   => ['memoize some expensive method calls', 'valid types: num, block, all'],
                     '-S'             => 'disable strictures and ignore any errors',
                     '-v'             => 'print version number and exit',
                     '-t'             => 'treat all command-line arguments as scripts',
@@ -451,7 +451,7 @@ sub _get_number_type {
 
 sub _get_loaded_modules {
     my $modules = '';
-    foreach my $key(sort {length($a) <=> length($b) || $a cmp $b} keys %INC) {
+    foreach my $key (sort { length($a) <=> length($b) || $a cmp $b } keys %INC) {
         if ($key =~ /^Sidef\b/) {
             $modules .= "require '$key';\n";
         }
@@ -497,6 +497,7 @@ sub memoize_types {
         $known_types{_init_} = sub {
             require Memoize;
 
+            require Sidef::Convert::Convert;
             my $package = 'Sidef::Convert::Convert';
             foreach my $method (
                                 qw(
@@ -509,6 +510,7 @@ sub memoize_types {
 
         # Number methods
         $known_types{num} = sub {
+            require Sidef::Types::Number::Number;
             my $package = 'Sidef::Types::Number::Number';
 
             my %ignore;
@@ -516,50 +518,8 @@ sub memoize_types {
                 qw(
                   ISA
                   BEGIN
-                  new
-                  newInt
-                  new_int
-                  )
-            } = ();
-
-            foreach my $method (keys %{$package . '::'}) {
-                next if exists $ignore{$method};
-                Memoize::memoize($package . '::' . $method);
-            }
-        };
-
-        # String methods
-        $known_types{str} = sub {
-            my $package = 'Sidef::Types::String::String';
-
-            my %ignore;
-            @ignore{
-                qw(
-                  ISA
-                  BEGIN
-                  __ANON__
-                  a
-                  b
-                  new
-                  say
-                  print
-                  println
-                  printlnf
-                  printf
-                  die
-                  warn
-                  glob
-                  eval
-                  parse
-                  apply_escapes
-                  applyEscapes
-                  dump
-                  split
-                  match
-                  matches
-                  gmatch
-                  gmatches
-                  =~
+                  get_value
+                  GET_PERL_VALUE
                   )
             } = ();
 
@@ -571,6 +531,7 @@ sub memoize_types {
 
         # Block methods
         $known_types{block} = sub {
+            require Sidef::Types::Block::Code;
             my $package = 'Sidef::Types::Block::Code';
             foreach my $method ('call') {
                 Memoize::memoize($package . '::' . $method);
@@ -592,12 +553,12 @@ sub memoize_types {
 
     # Init only if we have some valid types
     if (@valid_types) {
-        $known_types{_init_}();
+        $known_types{_init_}->();
     }
 
     # Memoize each category
     foreach my $type (@valid_types) {
-        $known_types{$type}();
+        $known_types{$type}->();
     }
 }
 

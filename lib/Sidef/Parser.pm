@@ -370,7 +370,48 @@ package Sidef::Parser {
             return ($var, 0) if $var->{name} eq $var_name;
         }
 
-        return;
+        ();
+    }
+
+    sub check_declarations {
+        my ($self, $hash_ref) = @_;
+
+        foreach my $class (grep { $_ eq 'main' } keys %{$hash_ref}) {
+
+            my $array_ref = $hash_ref->{$class};
+
+            foreach my $variable (@{$array_ref}) {
+                if (ref $variable eq 'ARRAY') {
+                    $self->check_declarations({$class => $variable});
+                }
+                elsif (   $variable->{count} == 0
+                       && $variable->{type} ne 'class'
+                       && $variable->{type} ne 'func'
+                       && $variable->{type} ne 'method'
+                       && $variable->{name} ne 'self'
+                       && $variable->{name} ne ''
+                       && chr(ord $variable->{name}) ne '_') {
+
+                    # Minor exception for interactive mode
+                    if ($self->{interactive}) {
+                        ++$variable->{obj}{in_use};
+                        next;
+                    }
+
+                    warn '[WARN] '
+                      . (
+                         $variable->{type} eq 'const' || $variable->{type} eq 'define' || $variable->{type} eq 'enum'
+                         ? 'Constant'
+                         : 'Variable'
+                        )
+                      . " '$variable->{name}' has been initialized, but not used again, at "
+                      . "$self->{file_name}, line $variable->{line}\n";
+                }
+                elsif ($DEBUG) {
+                    warn "[WARN] Variable '$variable->{name}' is used $variable->{count} times!\n";
+                }
+            }
+        }
     }
 
     sub get_name_and_class {
@@ -401,7 +442,7 @@ package Sidef::Parser {
             }
         }
 
-        return (\@words, $pos);
+        (\@words, $pos);
     }
 
     sub get_quoted_string {
@@ -453,7 +494,7 @@ package Sidef::Parser {
                                    );
 
             $self->{line} += $string =~ s/\R\K//g if not $opt{no_count_line};
-            return $string, pos;
+            return ($string, pos);
         }
     }
 
@@ -614,7 +655,7 @@ package Sidef::Parser {
                                        )
                  );
 
-            return \@var_objs, pos;
+            return (\@var_objs, pos);
         }
     }
 
@@ -1532,7 +1573,7 @@ package Sidef::Parser {
                                            error => "unbalanced parentheses",
                                           );
 
-                return $obj, pos($_) + $pos;
+                return ($obj, pos($_) + $pos);
             }
         }
     }
@@ -1552,7 +1593,7 @@ package Sidef::Parser {
                                            error => "unbalanced right brackets",
                                           );
 
-                return $obj, pos($_) + $pos;
+                return ($obj, pos($_) + $pos);
             }
         }
     }
@@ -1887,7 +1928,6 @@ package Sidef::Parser {
             }
 
             return \%struct, pos;
-
         }
     }
 
@@ -2141,51 +2181,6 @@ package Sidef::Parser {
                   ? ref($obj->{$self->{class}}[-1]{self})
                   : ref($obj);
 
-                my $collect_methods;
-                $collect_methods = sub {
-                    if ((my ($pos, $end) = $self->parse_whitespace(code => substr($_, pos)))[0]) {
-                        pos($_) += $pos;
-                        $end and redo MAIN;
-                    }
-
-                    if (/\G(?:=>|,)/gc) {
-                        redo MAIN;
-                    }
-
-                    my $is_operator = /\G(?!->)/ && /\G(?=$self->{operators_re})/o;
-                    if (   $is_operator
-                        || /\G(?:->|\.)\h*/gc
-                        || /\G(?=$self->{method_name_re})/o) {
-
-                        if ((my ($pos, $end) = $self->parse_whitespace(code => substr($_, pos)))[0]) {
-                            pos($_) += $pos;
-                            $end && redo MAIN;
-                        }
-
-                        my ($methods, $pos) =
-                          $self->parse_methods(
-                                               code => $is_operator
-                                               ? substr($_, pos)
-                                               : ("." . substr($_, pos))
-                                              );
-
-                        pos($_) += $pos - ($is_operator ? 0 : 1);
-
-                        if (@{$methods}) {
-                            push @{$struct{$self->{class}}[-1]{call}}, @{$methods};
-                        }
-                        else {
-                            $self->fatal_error(
-                                               error => 'incomplete method name',
-                                               code  => $_,
-                                               pos   => pos($_) - 1,
-                                              );
-                        }
-
-                        $collect_methods->();
-                    }
-                };
-
                 if (defined $obj) {
                     push @{$struct{$self->{class}}}, {self => $obj};
 
@@ -2194,7 +2189,49 @@ package Sidef::Parser {
                         redo;
                     }
 
-                    $collect_methods->();
+                    {
+                        if ((my ($pos, $end) = $self->parse_whitespace(code => substr($_, pos)))[0]) {
+                            pos($_) += $pos;
+                            $end and redo MAIN;
+                        }
+
+                        if (/\G(?:=>|,)/gc) {
+                            redo MAIN;
+                        }
+
+                        my $is_operator = /\G(?!->)/ && /\G(?=$self->{operators_re})/o;
+                        if (   $is_operator
+                            || /\G(?:->|\.)\h*/gc
+                            || /\G(?=$self->{method_name_re})/o) {
+
+                            if ((my ($pos, $end) = $self->parse_whitespace(code => substr($_, pos)))[0]) {
+                                pos($_) += $pos;
+                                $end && redo MAIN;
+                            }
+
+                            my ($methods, $pos) =
+                              $self->parse_methods(
+                                                   code => $is_operator
+                                                   ? substr($_, pos)
+                                                   : ("." . substr($_, pos))
+                                                  );
+
+                            pos($_) += $pos - ($is_operator ? 0 : 1);
+
+                            if (@{$methods}) {
+                                push @{$struct{$self->{class}}[-1]{call}}, @{$methods};
+                            }
+                            else {
+                                $self->fatal_error(
+                                                   error => 'incomplete method name',
+                                                   code  => $_,
+                                                   pos   => pos($_) - 1,
+                                                  );
+                            }
+
+                            redo;
+                        }
+                    }
                 }
 
                 if (/\G;+/gc) {
@@ -2204,53 +2241,7 @@ package Sidef::Parser {
                 # We are at the end of the script.
                 # We make some checks, and return the \%struct hash ref.
                 if (/\G\z/) {
-
-                    my $check_vars;
-                    $check_vars = sub {
-                        my ($hash_ref) = @_;
-
-                        foreach my $class (grep { $_ eq 'main' } keys %{$hash_ref}) {
-
-                            my $array_ref = $hash_ref->{$class};
-
-                            foreach my $variable (@{$array_ref}) {
-                                if (ref $variable eq 'ARRAY') {
-                                    $check_vars->({$class => $variable});
-                                }
-                                elsif (   $variable->{count} == 0
-                                       && $variable->{type} ne 'class'
-                                       && $variable->{type} ne 'func'
-                                       && $variable->{type} ne 'method'
-                                       && $variable->{name} ne 'self'
-                                       && $variable->{name} ne ''
-                                       && chr(ord $variable->{name}) ne '_') {
-
-                                    # Minor exception for interactive mode
-                                    if ($self->{interactive}) {
-                                        ++$variable->{obj}{in_use};
-                                        next;
-                                    }
-
-                                    warn '[WARN] '
-                                      . (
-                                         $variable->{type} eq 'const'
-                                           || $variable->{type} eq 'define' || $variable->{type} eq 'enum'
-                                         ? 'Constant'
-                                         : 'Variable'
-                                        )
-                                      . " '$variable->{name}' has been initialized, but not used again, at "
-                                      . "$self->{file_name}, line $variable->{line}\n";
-                                }
-                                elsif ($DEBUG) {
-                                    warn "[WARN] Variable '$variable->{name}' is used $variable->{count} times!\n";
-                                }
-                            }
-                        }
-
-                    };
-
-                    $check_vars->($self->{ref_vars});
-
+                    $self->check_declarations($self->{ref_vars});
                     return \%struct;
                 }
 
@@ -2332,20 +2323,6 @@ package Sidef::Parser {
                     }
 
                     redo MAIN;
-                }
-
-                if (exists($struct{$self->{class}}) and exists $struct{$self->{class}}[-1]{call}) {
-                    $struct{$self->{class}}[-1]{self}{$self->{class}}[-1]{call} = delete $struct{$self->{class}}[-1]{call};
-                }
-
-                if (exists $struct{$self->{class}} and exists $struct{$self->{class}}[-1]{self}{$self->{class}}[-1]{call}) {
-                    my ($obj, $pos) = $self->parse_obj(code => substr($_, pos));
-                    pos($_) += $pos;
-                    if (defined $obj) {
-                        push @{$struct{$self->{class}}[-1]{self}{$self->{class}}[-1]{call}[-1]{arg}}, $obj;
-                        $collect_methods->();
-                        redo MAIN;
-                    }
                 }
 
                 $self->fatal_error(

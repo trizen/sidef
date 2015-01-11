@@ -113,16 +113,24 @@ package Sidef::Exec {
                             next;
                         }
 
-                        if (ref $ind) {
-                            $ind = $ind->get_value;
-                        }
-
                         $is_hash
                           ? ($self_obj->{data}{$ind} //= Sidef::Variable::Variable->new(name => '', type => 'var'))
                           : do {
-                            foreach my $ind (0 .. $ind) {
-                                $self_obj->[$ind] //= Sidef::Variable::Variable->new(name => '', type => 'var');
+                            my $num = do {
+                                local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
+                                $ind->get_value;
+                            };
+
+                            if (ref $num) {
+                                warn "[WARN] Invalid array index of type '", ref($ind), "'!\n";
+                                next;
                             }
+
+                            foreach my $ind (0 .. $num) {
+                                $self_obj->[$num] //= Sidef::Variable::Variable->new(name => '', type => 'var');
+                            }
+
+                            $ind = $num;
                           };
 
                         push @indices, $ind;
@@ -168,7 +176,16 @@ package Sidef::Exec {
                                 (ref($self_obj) && $self_obj->isa('ARRAY'))
                                   || ($self_obj = Sidef::Types::Array::Array->new());
 
-                                my $num = $ind->get_value;
+                                my $num = do {
+                                    local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
+                                    $ind->get_value;
+                                };
+
+                                if (ref $num) {
+                                    warn "[WARN] Invalid array index of type '", ref($ind), "'!\n";
+                                    return;
+                                }
+
                                 foreach my $j (0 .. $num - 1) {
                                     $self_obj->[$j] //= Sidef::Variable::Variable->new(name => '', type => 'var');
                                 }
