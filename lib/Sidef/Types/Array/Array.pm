@@ -310,7 +310,7 @@ package Sidef::Types::Array::Array {
         my ($self, $code) = @_;
 
         my $max;
-        my $min = Sidef::Types::Number::Number->inf->neg;
+        my $min = Sidef::Types::Number::Number->new->inf->neg;
         my ($var_ref) = $code->init_block_vars();
 
         foreach my $item (@{$self}) {
@@ -332,7 +332,7 @@ package Sidef::Types::Array::Array {
         my ($self, $code) = @_;
 
         my $min;
-        my $max = Sidef::Types::Number::Number->inf;
+        my $max = Sidef::Types::Number::Number->new->inf;
         my ($var_ref) = $code->init_block_vars();
 
         foreach my $item (@{$self}) {

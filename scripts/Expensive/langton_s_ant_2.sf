@@ -3,38 +3,24 @@
 # Sidef implementation of Langton's Ant
 # Translation of: http://rosettacode.org/wiki/Langton%27s_ant#Perl
 
-# Using screen coordinates - 0,0 in upper-left, +X right, +Y down -
-# these directions (right, up, left, down) are counterclockwise
-# so advance through the array to turn left, retreat to turn right
 const dirs = [[1,0], [0,-1], [-1,0], [0,1]];
-const size = 15;
+const size = 100;
 
 enum |White, Black|;
 
-# we treat any false as white and true as black, so undef is fine for initial all-white grid
 var plane = [];
 {|i| plane[i-1] = [White]*size} * size;
 
-# start out in approximate middle
-[size/2->to_i]*2 » (\var x, \var y);
-
-# pointing in a random direction
+var (x, y) = ([size/2 int] * 2 ...);
 var dir = dirs.len.rand.int;
 
-# initialize the moves counter
 var moves = 0;
-
-while true {
+loop {
     (x >= 0) && (y >= 0) && (x < size) && (y < size) || break;
 
     given(plane[x][y])
-        when (White) do {
-            dir--; plane[x][y] = Black;
-        }
-        when (Black) do {
-            dir++; plane[x][y] = White;
-        }
-    end;
+        when (White) { dir--; plane[x][y] = Black }
+        when (Black) { dir++; plane[x][y] = White };
 
     moves++;
     [\x, \y]:dirs[dir %= dirs.len] each {|a,b| *a += b };

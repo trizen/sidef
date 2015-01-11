@@ -210,6 +210,7 @@ scripts/Expensive/langton_s_ant.sf
 scripts/Expensive/langton_s_ant_2.sf
 scripts/Expensive/levenshtein_recursive.sf
 scripts/Expensive/longest_common_subsequence.sf
+scripts/Expensive/mutual_recursion.sf
 scripts/Expensive/root_of_a_function.sf
 scripts/Expensive/sudoku_solver.sf
 scripts/Expensive/time_a_function.sf
@@ -328,6 +329,8 @@ scripts/Rosettacode/100_doors_2.sf
 scripts/Rosettacode/100_doors_4.sf
 scripts/Rosettacode/99_bottles.sf
 scripts/Rosettacode/bubble_sort.sf
+scripts/Rosettacode/draw_cuboid.sf
+scripts/Rosettacode/find_common_directory_path.sf
 scripts/Rosettacode/fizz_buzz.sf
 scripts/Rosettacode/fizz_buzz_2.sf
 scripts/Rosettacode/flatten_a_list.sf
@@ -336,6 +339,7 @@ scripts/Rosettacode/hickerson_series_of_almost_integers.sf
 scripts/Rosettacode/higher_order_functions.sf
 scripts/Rosettacode/JSON.sf
 scripts/Rosettacode/literal_strings.sf
+scripts/Rosettacode/loop_over_multiple_arrays_simultaneously.sf
 scripts/Rosettacode/named_parameters.sf
 scripts/Rosettacode/program_name.sf
 scripts/Rosettacode/queue_definition.sf
