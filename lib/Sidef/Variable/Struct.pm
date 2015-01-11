@@ -3,7 +3,7 @@ package Sidef::Variable::Struct {
     use 5.014;
     our $AUTOLOAD;
 
-    sub __new {
+    sub __new__ {
         my (undef, $vars) = @_;
         bless {map { $_->{name} => $_ } @{$vars}}, __PACKAGE__;
     }

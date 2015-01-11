@@ -2,19 +2,19 @@ package Sidef::Variable::ClassInit {
 
     use 5.014;
 
-    sub __new {
+    sub __new__ {
         my (undef, $name) = @_;
         bless {name => $name}, __PACKAGE__;
     }
 
-    sub __set_value {
+    sub __set_value__ {
         my ($self, $block, $names) = @_;
         $self->{__BLOCK__} = $block;
         $self->{__VARS__}  = $names;
         $self;
     }
 
-    sub __add_method {
+    sub __add_method__ {
         my ($self, $name, $method) = @_;
         $self->{__METHODS__}{$name} = $method;
         $self;
@@ -34,16 +34,40 @@ package Sidef::Variable::ClassInit {
         if (ref($value) ne 'Sidef::Types::Block::Code') {
             return $self->define_var($name, $value);
         }
-        $self->__add_method($name, $value->copy);
+        $self->__add_method__($name, $value->copy);
     }
 
     *def_method = \&define_method;
+
+    sub inherit {
+        my ($self, $class) = @_;
+        my $name = $self->{name};
+        foreach my $type (qw(__METHODS__ __VALS__)) {
+            foreach my $key (keys %{$class->{$type}}) {
+                if (not exists $self->{$type}{$key}) {
+                    $self->{$type}{$key} = $class->{$type}{$key};
+                }
+            }
+        }
+        push @{$self->{__VARS__}}, @{$class->{__VARS__}};
+        $self->{name} = $name;
+        $self;
+    }
+
+    sub replace {
+        my ($self, $class) = @_;
+        my $name = $self->{name};
+        delete @{$self}{keys %{$self}};
+        %{$self} = %{$class};
+        $self->{name} = $name;
+        $self;
+    }
 
     sub init {
         my ($self, @args) = @_;
 
         require Sidef::Variable::Class;
-        my $class = Sidef::Variable::Class->__new($self->{name});
+        my $class = Sidef::Variable::Class->__new__($self->{name});
 
         # Init the class variables
         @{$class->{__VARS__}}{map { $_->{name} } @{$self->{__VARS__}}} =
@@ -96,6 +120,9 @@ package Sidef::Variable::ClassInit {
     {
         no strict 'refs';
         *{__PACKAGE__ . '::' . '+='} = \&define_method;
+        *{__PACKAGE__ . '::' . '='}  = \&replace;
+        *{__PACKAGE__ . '::' . '<'}  = \&inherit;
+        *{__PACKAGE__ . '::' . '<<'} = \&inherit;
     }
 };
 

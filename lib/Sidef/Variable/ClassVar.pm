@@ -3,7 +3,7 @@ package Sidef::Variable::ClassVar {
     use 5.014;
     our $AUTOLOAD;
 
-    sub __new {
+    sub __new__ {
         my (undef, %opt) = @_;
         bless \%opt, __PACKAGE__;
     }

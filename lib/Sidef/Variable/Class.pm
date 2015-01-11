@@ -3,9 +3,14 @@ package Sidef::Variable::Class {
     use 5.014;
     our $AUTOLOAD;
 
-    sub __new {
+    sub __new__ {
         my (undef, $name) = @_;
         bless {name => $name}, __PACKAGE__;
+    }
+
+    sub __name__ {
+        my ($self) = @_;
+        Sidef::Types::String::String->new($self->{name});
     }
 
     sub DESTROY { }
@@ -24,7 +29,7 @@ package Sidef::Variable::Class {
                 return $self->{__VARS__}{$name} = $args[-1];
             }
             require Sidef::Variable::ClassVar;
-            return Sidef::Variable::ClassVar->__new(class => $self, name => $name);
+            return Sidef::Variable::ClassVar->__new__(class => $self, name => $name);
         }
 
         if (exists $self->{method}{$name}) {

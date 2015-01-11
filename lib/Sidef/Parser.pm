@@ -946,7 +946,7 @@ package Sidef::Parser {
                                             );
                     pos($_) += $pos;
 
-                    my $struct = Sidef::Variable::Struct->__new($vars);
+                    my $struct = Sidef::Variable::Struct->__new__($vars);
 
                     if (defined $name) {
                         unshift @{$self->{vars}{$self->{class}}},
@@ -1048,10 +1048,10 @@ package Sidef::Parser {
                         $type eq 'my' ? Sidef::Variable::My->new($name)
                       : $type eq 'func'   ? Sidef::Variable::Variable->new(name => $name, type => $type)
                       : $type eq 'method' ? Sidef::Variable::Variable->new(name => $name, type => $type)
-                      : $type eq 'class'  ? Sidef::Variable::ClassInit->__new($name)
+                      : $type eq 'class'  ? Sidef::Variable::ClassInit->__new__($name)
                       : $self->fatal_error(
                                            error    => "invalid type",
-                                           expected => "a magic thing to happen",
+                                           expected => "expected a magic thing to happen",
                                            code     => $_,
                                            pos      => pos($_),
                                           );
@@ -1090,7 +1090,7 @@ package Sidef::Parser {
                                 if (ref $class) {
                                     if ($class->{type} eq 'class') {
                                         while (my ($name, $method) = each %{$class->{obj}{__METHODS__}}) {
-                                            ($built_in_obj // $obj)->__add_method($name, $method);
+                                            ($built_in_obj // $obj)->__add_method__($name, $method);
                                         }
                                     }
                                     else {
@@ -1098,7 +1098,7 @@ package Sidef::Parser {
                                                            error    => "this is not a class",
                                                            expected => "expected a class name",
                                                            code     => $_,
-                                                           pos      => pos($_) - length($name),
+                                                           pos      => pos($_) - length($name) - 1,
                                                           );
                                     }
                                 }
@@ -1107,7 +1107,7 @@ package Sidef::Parser {
                                                        error    => "can't find '$name' class",
                                                        expected => "expected an existent class name",
                                                        code     => $_,
-                                                       pos      => pos($_) - length($name),
+                                                       pos      => pos($_) - length($name) - 1,
                                                       );
                                 }
 
@@ -1128,7 +1128,7 @@ package Sidef::Parser {
                         my ($block, $pos) = $self->parse_block(code => '{' . substr($_, pos));
                         pos($_) += $pos - 1;
 
-                        $obj->__set_value($block, $var_names);
+                        $obj->__set_value__($block, $var_names);
                     }
 
                     if ($type eq 'func' or $type eq 'method') {
@@ -1175,7 +1175,7 @@ package Sidef::Parser {
                         pos($_) += $pos - (length($args) + 1);
 
                         $obj->set_value($block);
-                        $self->{current_class}->__add_method($name, $block) if $type eq 'method';
+                        $self->{current_class}->__add_method__($name, $block) if $type eq 'method';
                     }
 
                     return $obj, pos;

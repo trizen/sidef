@@ -116,8 +116,8 @@ package Sidef {
             };
         }
 
-        *__add_method  = \&def_method;
-        *define_method = \&def_method;
+        *__add_method__ = \&def_method;
+        *define_method  = \&def_method;
 
         sub method {
             my ($self, $method, @args) = @_;

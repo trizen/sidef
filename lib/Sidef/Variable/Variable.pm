@@ -83,7 +83,7 @@ package Sidef::Variable::Variable {
         $self->{type};
     }
 
-    sub __set_value {
+    sub __set_value__ {
         my ($self, $obj) = @_;
 
         $#_ > 1 && ($obj = $_[-1]);
@@ -115,7 +115,7 @@ package Sidef::Variable::Variable {
     {
         no strict 'refs';
 
-        *{__PACKAGE__ . '::' . '='} = \&__set_value;
+        *{__PACKAGE__ . '::' . '='} = \&__set_value__;
 
         *{__PACKAGE__ . '::' . '\\\\'} = sub {
             my ($self, $code) = @_;
@@ -132,7 +132,7 @@ package Sidef::Variable::Variable {
                 my ($self, $code) = @_;
 
                 if (not $self->_is_defined) {
-                    $self->__set_value(Sidef::Types::Block::Code->new($code)->run);
+                    $self->__set_value__(Sidef::Types::Block::Code->new($code)->run);
                 }
 
                 $operator eq ':=' ? $self : $self->get_value;
@@ -143,14 +143,14 @@ package Sidef::Variable::Variable {
             *{__PACKAGE__ . '::' . $operator} = sub {
                 my ($self, $arg) = @_;
                 my $value = $self->get_value;
-                $self->__set_value($value->$operator($arg));
+                $self->__set_value__($value->$operator($arg));
                 $value;
             };
         }
 
         foreach my $operator (qw(+ - % * / & | ^ ** && || << >> ÷)) {
             *{__PACKAGE__ . '::' . $operator . '='} = sub {
-                $_[0]->__set_value($_[0]->get_value->$operator($_[1]));
+                $_[0]->__set_value__($_[0]->get_value->$operator($_[1]));
             };
         }
     }
@@ -176,7 +176,7 @@ package Sidef::Variable::Variable {
 
         if (defined($suffix)) {
             if ($suffix eq '!') {    # modifies the variable in place
-                $self->__set_value($result);
+                $self->__set_value__($result);
                 return $self;
             }
 
