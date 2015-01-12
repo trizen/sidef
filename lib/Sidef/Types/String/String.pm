@@ -272,7 +272,8 @@ package Sidef::Types::String::String {
         my $string = $1
           if ($self->get_value =~ /\G(\s+)/gc);
 
-        while ($self->get_value =~ /\G(\S++)(\s*+)/gc) {
+        my $str = $self->get_value;
+        while ($str =~ /\G(\S++)(\s*+)/gc) {
             $string .= CORE::ucfirst(CORE::lc($1)) . $2;
         }
 
