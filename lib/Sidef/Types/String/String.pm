@@ -702,6 +702,14 @@ package Sidef::Types::String::String {
 
     *len = \&length;
 
+    sub graphs {
+        my ($self) = @_;
+        Sidef::Types::Array::Array->new(map { __PACKAGE__->new($_) } $self->get_value =~ /\X/g);
+    }
+
+    *graphemes    = \&graphs;
+    *to_graphemes = \&graphs;
+
     sub contains {
         my ($self, $string, $start_pos) = @_;
 

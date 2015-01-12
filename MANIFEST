@@ -258,6 +258,7 @@ scripts/include_class.sf
 scripts/Interactive/A+B.sf
 scripts/Interactive/arithmetic_integer_stdin.sf
 scripts/Interactive/cosmic_calendar.sf
+'scripts/Interactive/guess the number_player.sf'
 scripts/Interactive/stdin.sf
 scripts/inverted_syntax.sf
 scripts/JASH.sf
@@ -368,6 +369,7 @@ scripts/soundex.sf
 scripts/special_methods.sf
 scripts/split_combine.sf
 scripts/static_const_lazy_init.sf
+scripts/string_encodings.sf
 scripts/string_escapes.sf
 scripts/struct_definition.sf
 scripts/sum_of_squares.sf

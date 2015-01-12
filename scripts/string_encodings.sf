@@ -1,0 +1,30 @@
+#!/usr/bin/ruby
+
+func ok(a, b) {
+    a == b || die "error: #{a} != #{b}";
+}
+
+var str = "J\x{332}o\x{332}s\x{332}e\x{301}\x{332}";
+ok(str.bytes.len, 14);
+ok(str.encode('UTF-8').bytes.len, 14);
+ok(str.encode('UTF-16').bytes.len, 20);
+ok(str.chars.len, 9);
+ok(str.graphs.len, 4);
+ok(str.encode('UTF-16').bytes.encode('UTF-16'), str);
+ok(str.chars.join, str);
+ok(str.bytes.join, str);
+ok(str.encode('UTF-8').bytes.encode, str);
+
+var str_2 = "𝔘𝔫𝔦𝔠𝔬𝔡𝔢";
+ok(str_2.chars.len, 7);
+ok(str_2.bytes.len, 28);
+ok(str_2.bytes.join, str_2);
+ok(str_2.encode('UTF-16').bytes.encode('UTF-16'), str_2);
+
+var str_3 = "møøse";
+ok(str_3.chars.len, 5);
+ok(str_3.bytes.len, 7);
+ok(str_3.bytes.join, str_3);
+ok(str_3.encode('UTF-16').bytes.encode('UTF-16'), str_3);
+
+say "** All tests passed!";
