@@ -78,7 +78,8 @@ package Sidef::Types::String::String {
 
         if ($self->_is_regex($obj)) {
             if (exists $obj->{global}) {
-                return $self->new($self->get_value =~ s/$obj->{regex}//gr);
+                my $str = $self->get_value;
+                return $self->new($str =~ s/$obj->{regex}//gr);
             }
             if ($self->get_value =~ /$obj->{regex}/) {
                 return $self->new(CORE::substr($self->get_value, 0, $-[0]) . CORE::substr($self->get_value, $+[0]));
@@ -269,10 +270,13 @@ package Sidef::Types::String::String {
     sub wordcase {
         my ($self) = @_;
 
-        my $string = $1
-          if ($self->get_value =~ /\G(\s+)/gc);
+        my $str    = $self->get_value;
+        my $string = '';
 
-        my $str = $self->get_value;
+        if ($str =~ /\G(\s+)/gc) {
+            $string = $1;
+        }
+
         while ($str =~ /\G(\S++)(\s*+)/gc) {
             $string .= CORE::ucfirst(CORE::lc($1)) . $2;
         }
@@ -508,7 +512,8 @@ package Sidef::Types::String::String {
 
     sub scan {
         my ($self, $regex) = @_;
-        Sidef::Types::Array::Array->new(map { Sidef::Types::String::String->new($_) } $self->get_value =~ /$regex->{regex}/g);
+        my $str = $self->get_value;
+        Sidef::Types::Array::Array->new(map { Sidef::Types::String::String->new($_) } $str =~ /$regex->{regex}/g);
     }
 
     sub split {
@@ -705,7 +710,8 @@ package Sidef::Types::String::String {
 
     sub graphs {
         my ($self) = @_;
-        Sidef::Types::Array::Array->new(map { __PACKAGE__->new($_) } $self->get_value =~ /\X/g);
+        my $str = $self->get_value;
+        Sidef::Types::Array::Array->new(map { __PACKAGE__->new($_) } $str =~ /\X/g);
     }
 
     *graphemes    = \&graphs;

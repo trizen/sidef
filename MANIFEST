@@ -349,6 +349,7 @@ scripts/Rosettacode/quickselect_algorithm.sf
 scripts/Rosettacode/range_expansion.sf
 scripts/Rosettacode/runtime_evaluation.sf
 scripts/Rosettacode/runtime_evaluation_in_an_environment.sf
+scripts/Rosettacode/van_der_corput_seq.sf
 scripts/Rosettacode/vector_products.sf
 scripts/run_length_encoding.sf
 scripts/run_length_encoding_2.sf

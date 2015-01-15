@@ -38,6 +38,10 @@ class new(diacritics            = true,
     WORDS[DIGITS.values.map {|v|_remove_diacritics(v)}] = DIGITS.keys.map{.toNum};
     WORDS[%w(o un doua sai)] = [1, 1, 2, 6];
 
+    # Colocvial
+    WORDS[%w(unspe doispe treispe paispe cinspe cinsprezece saispe saptespe saptuspe optspe nouaspe)] =
+    [11, 12, 13, 14, 15, 15, 16, 17, 17, 18, 19];
+
     # This array contains number greater than 1000 and it's used to convert numbers into text
     # See: http://ro.wikipedia.org/wiki/Sistem_zecimal#Denumiri_ale_numerelor
     static BIGNUMS = (
@@ -52,6 +56,7 @@ class new(diacritics            = true,
                     [10**21,    'triliard',    'triliarde', false],
                     [10**24,  'cvadrilion', 'cvadrilioane', false],
                     [10**27, 'cvadriliard', 'cvadriliarde', false],
+                    [Math.inf,  'inifinit',      'infinit', false],
                 ]
                  -> map { |v|
                      (var h = Hash.new)[%w(num sg pl fem)] = (v) => h;
@@ -267,8 +272,8 @@ class new(diacritics            = true,
             words.append(__METHOD__(self, number.int)...);
         }
         elsif (number >= BIGNUMS[0]['num']) {
-            for (0 .. (BIGNUMS.offset - 1)) { |i|
-                var j = (BIGNUMS.offset - i);
+            0 ... BIGNUMS.offset-1 -> each { |i|
+                var j = BIGNUMS.offset-i;
 
                 if (number >= BIGNUMS[j-1]['num'] && (number < BIGNUMS[j]['num'])) {
                     var cat = (number / BIGNUMS[j-1]['num'] -> int);
