@@ -319,6 +319,11 @@ package Sidef::Types::String::String {
         $self->new(crypt($self->get_value, $salt->get_value));
     }
 
+    sub hex {
+        my ($self) = @_;
+        Sidef::Types::Number::Number->new(hex($self->get_value));
+    }
+
     sub substr {
         my ($self, $offs, $len) = @_;
         __PACKAGE__->new(
