@@ -1,0 +1,19 @@
+#!/usr/bin/ruby
+
+var url = 'http://foo bar/';
+
+func urlencode(str) {
+    str.gsub!(%r"([^-A-Za-z0-9_.!~*'() ])", {|a| "%%%02X" % a.ord});
+    str.gsub!(' ', '+');
+    return str;
+}
+
+func urldecode(str) {
+    str.gsub!('+', ' ');
+    str.gsub!(/\%([A-Fa-f0-9]{2})/, {|a| 'C'.pack(a.hex)});
+    return str;
+}
+
+urldecode(urlencode(url)) == url || die "error!";
+
+say "** Test passed!";

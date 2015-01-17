@@ -224,10 +224,11 @@ package Sidef::Parser {
 
                   )
             },
-            match_flags_re => qr{[msixpogcdual]+},
-            var_name_re    => qr/[[:alpha:]_]\w*(?>::[[:alpha:]_]\w*)*/,
-            method_name_re => qr/[[:alpha:]_]\w*[!:?]?/,
-            operators_re   => do {
+            match_flags_re  => qr{[msixpogcdual]+},
+            var_name_re     => qr/[[:alpha:]_]\w*(?>::[[:alpha:]_]\w*)*/,
+            method_name_re  => qr/[[:alpha:]_]\w*[!:?]?/,
+            var_init_sep_re => qr/\G\h*(?:=>|[=:]|\bis\b)\h*/,
+            operators_re    => do {
                 local $" = q{|};
 
                 # The order matters! (in a way)
@@ -552,7 +553,7 @@ package Sidef::Parser {
             my @vars;
             while (/\G(\*?$self->{var_name_re})/goc) {
                 push @vars, $1;
-                if ($opt{with_vals} && defined($end_delim) && /\G\h*(?:[=:]|\bis\b)\h*/gc) {
+                if ($opt{with_vals} && defined($end_delim) && /$self->{var_init_sep_re}/goc) {
                     my (undef, $pos) = $self->parse_obj(code => substr($_, pos));
                     $vars[-1] .= '=' . substr($_, pos($_), $pos);
                     pos($_) += $pos;
@@ -612,7 +613,7 @@ package Sidef::Parser {
                 }
 
                 my $value;
-                if (defined($end_delim) && /\G\h*(?:[=:]|\bis\b)\h*/gc) {
+                if (defined($end_delim) && /$self->{var_init_sep_re}/goc) {
                     my ($obj, $pos) = $self->parse_obj(code => substr($_, pos));
                     pos($_) += $pos;
                     $value =

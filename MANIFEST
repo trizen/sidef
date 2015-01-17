@@ -388,6 +388,7 @@ scripts/unexecuted_arguments.sf
 scripts/unicode.sf
 scripts/unicode_support.sf
 scripts/unique_prefixes.sf
+scripts/url_encoding_decoding.sf
 scripts/var_ref.sf
 scripts/var_scoping.sf
 scripts/while_loop.sf
