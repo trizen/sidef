@@ -24,7 +24,7 @@ package Sidef::Types::Byte::Bytes {
         require Encode;
         Sidef::Types::String::String->new(
             eval {
-                Encode::decode_utf8(join('', map { CORE::chr($_->get_value) } @{$self}));
+                Encode::decode_utf8(CORE::join('', map { CORE::chr($_->get_value) } @{$self}));
               } // return
         );
     }
@@ -35,7 +35,7 @@ package Sidef::Types::Byte::Bytes {
         $encoding = defined($encoding) ? $encoding->get_value : 'UTF-8';
         Sidef::Types::String::String->new(
             eval {
-                Encode::decode($encoding, join('', map { CORE::chr($_->get_value) } @{$self}));
+                Encode::decode($encoding, CORE::join('', map { CORE::chr($_->get_value) } @{$self}));
               } // return
         );
     }

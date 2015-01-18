@@ -80,6 +80,9 @@
       "Sidef::Object::Object" : {
          "file" : "lib/Sidef/Object/Object.pm"
       },
+      "Sidef::Object::Unary" : {
+         "file" : "lib/Sidef/Object/Unary.pm"
+      },
       "Sidef::Parser" : {
          "file" : "lib/Sidef/Parser.pm"
       },
@@ -214,9 +217,6 @@
       },
       "Sidef::Types::Number::Number" : {
          "file" : "lib/Sidef/Types/Number/Number.pm"
-      },
-      "Sidef::Types::Number::Unary" : {
-         "file" : "lib/Sidef/Types/Number/Unary.pm"
       },
       "Sidef::Types::Regex::Matches" : {
          "file" : "lib/Sidef/Types/Regex/Matches.pm"

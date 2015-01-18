@@ -1,4 +1,4 @@
-package Sidef::Types::Number::Unary {
+package Sidef::Object::Unary {
 
     use utf8;
     our @ISA = qw(Sidef);

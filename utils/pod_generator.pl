@@ -81,7 +81,7 @@ my %ignored_modules = map { $_ => 1 } qw (
   Sidef::Types::Number::NumberFast
   Sidef::Types::Number::NumberInt
   Sidef::Types::Number::NumberRat
-  Sidef::Types::Number::Unary
+  Sidef::Object::Unary
   );
 
 my $name = basename($dir);

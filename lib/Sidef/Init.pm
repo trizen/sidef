@@ -5,6 +5,7 @@
 
 require Sidef;
 require Sidef::Object::Object;
+require Sidef::Object::Unary;
 require Sidef::Args::Args;
 require Sidef::Convert::Convert;
 require Sidef::Eval::Eval;
@@ -57,7 +58,6 @@ require Sidef::Types::Hash::Hash;
 require Sidef::Types::Nil::Nil;
 require Sidef::Types::Number::Number;
 require Sidef::Types::Number::Complex;
-require Sidef::Types::Number::Unary;
 require Sidef::Types::Regex::Regex;
 require Sidef::Types::String::String;
 require Sidef::Variable::ClassInit;

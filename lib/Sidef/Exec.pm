@@ -178,7 +178,7 @@ package Sidef::Exec {
 
                                 my $num = do {
                                     local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
-                                    $ind->get_value;
+                                    $ind->get_value || 0;
                                 };
 
                                 if (ref $num) {

@@ -16,6 +16,7 @@ lib/Sidef/Module/Func.pm
 lib/Sidef/Module/Require.pm
 lib/Sidef/Module/Require.pod
 lib/Sidef/Object/Object.pm
+lib/Sidef/Object/Unary.pm
 lib/Sidef/Parser.pm
 lib/Sidef/Perl/Perl.pm
 lib/Sidef/Sys/SIG.pm
@@ -99,7 +100,6 @@ lib/Sidef/Types/Number/Number.pod
 lib/Sidef/Types/Number/NumberFast.pm
 lib/Sidef/Types/Number/NumberInt.pm
 lib/Sidef/Types/Number/NumberRat.pm
-lib/Sidef/Types/Number/Unary.pm
 lib/Sidef/Types/Regex/Matches.pm
 lib/Sidef/Types/Regex/Matches.pod
 lib/Sidef/Types/Regex/Regex.pm

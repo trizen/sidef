@@ -102,7 +102,7 @@ package Sidef::Parser {
                 | (?:print(?:ln|f)?+|say|exit|read)\b     (?{ state $x = Sidef::Sys::Sys->new })
                 | loop\b                                  (?{ state $x = Sidef::Types::Block::Code->new })
                 | (?:[*\\&]|\+\+|--)                      (?{ Sidef::Variable::Ref->new() })
-                | [?√+~!-]                                (?{ state $x = Sidef::Types::Number::Unary->new })
+                | [?√+~!-]                                (?{ state $x = Sidef::Object::Unary->new })
                 | :                                       (?{ state $x = Sidef::Types::Hash::Hash->new })
               )
             }x,
@@ -284,20 +284,19 @@ package Sidef::Parser {
             # Reference: http://en.wikipedia.org/wiki/International_variation_in_quotation_marks
             delim_pairs => {
                 qw~
-                  ( )
-                  [ ]
-                  { }
-                  < >
-                  « »
-                  » «
-                  ‹ ›
-                  › ‹
-                  「 」
-                  『 』
-                  „ ”
-                  “ ”
-                  ‘ ’
-                  ‚ ’
+              ( )       [ ]       { }       < >
+              « »       » «       ‹ ›       › ‹
+              „ ”       “ ”       ‘ ’       ‚ ’
+              〈 〉     ﴾ ﴿       〈 〉     《 》
+              「 」     『 』     【 】     〔 〕
+              〖 〗     〘 〙     〚 〛     ⸨ ⸩
+              ⌈ ⌉       ⌊ ⌋       〈 〉     ❨ ❩
+              ❪ ❫       ❬ ❭       ❮ ❯       ❰ ❱
+              ❲ ❳       ❴ ❵       ⟅ ⟆       ⟦ ⟧
+              ⟨ ⟩       ⟪ ⟫       ⟬ ⟭       ⟮ ⟯
+              ⦃ ⦄       ⦅ ⦆       ⦇ ⦈       ⦉ ⦊
+              ⦋ ⦌       ⦍ ⦎       ⦏ ⦐       ⦑ ⦒
+              ⦗ ⦘       ⧘ ⧙       ⧚ ⧛       ⧼ ⧽
                   ~
             },
             %opts,

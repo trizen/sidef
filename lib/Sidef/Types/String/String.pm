@@ -321,7 +321,7 @@ package Sidef::Types::String::String {
 
     sub hex {
         my ($self) = @_;
-        Sidef::Types::Number::Number->new(hex($self->get_value));
+        Sidef::Types::Number::Number->new(CORE::hex($self->get_value));
     }
 
     sub substr {
@@ -906,11 +906,11 @@ package Sidef::Types::String::String {
                     if (exists $chars[$i + 2]) {
                         my $str = CORE::join('', @chars[$i + 2 .. $#chars]);
                         if ($str =~ /^\{([[:xdigit:]]+)\}/) {
-                            splice(@chars, $i, 2 + $+[0], chr(hex($1)));
+                            splice(@chars, $i, 2 + $+[0], chr(CORE::hex($1)));
                             next;
                         }
                         elsif ($str =~ /^([[:xdigit:]]{1,2})/) {
-                            splice(@chars, $i, 2 + $+[0], chr(hex($1)));
+                            splice(@chars, $i, 2 + $+[0], chr(CORE::hex($1)));
                             next;
                         }
                     }
