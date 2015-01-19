@@ -9,14 +9,12 @@ package Sidef::Variable::Variable {
 
     our $AUTOLOAD;
 
-    {
-        my %cache;
+    my %cache;
 
-        sub new {
-            my (undef, %opt) = @_;
-            $opt{value} //= $cache{nil} //= Sidef::Types::Nil::Nil->new;
-            bless \%opt, __PACKAGE__;
-        }
+    sub new {
+        my (undef, %opt) = @_;
+        $opt{value} //= $cache{nil} //= Sidef::Types::Nil::Nil->new;
+        bless \%opt, __PACKAGE__;
     }
 
     sub _is_defined {    # faster (used internally)
@@ -62,7 +60,7 @@ package Sidef::Variable::Variable {
             $self = $self->{stack}[-1];
         }
 
-        $self->{value} = $obj;
+        $self->{value} = $obj // ($cache{nil} //= Sidef::Types::Nil::Nil->new);
     }
 
     sub get_value {

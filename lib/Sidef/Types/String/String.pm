@@ -77,13 +77,18 @@ package Sidef::Types::String::String {
         my ($self, $obj) = @_;
 
         if ($self->_is_regex($obj)) {
+
+            $obj->match($self)->to_bool or return $self;
+
+            my $str = $self->get_value;
             if (exists $obj->{global}) {
-                my $str = $self->get_value;
                 return $self->new($str =~ s/$obj->{regex}//gr);
             }
-            if ($self->get_value =~ /$obj->{regex}/) {
-                return $self->new(CORE::substr($self->get_value, 0, $-[0]) . CORE::substr($self->get_value, $+[0]));
+
+            if ($str =~ /$obj->{regex}/) {
+                return $self->new(CORE::substr($str, 0, $-[0]) . CORE::substr($str, $+[0]));
             }
+
             return $self;
         }
 

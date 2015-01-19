@@ -257,6 +257,7 @@ scripts/implicit_method_call_on_var_.sf
 scripts/include_class.sf
 scripts/Interactive/A+B.sf
 scripts/Interactive/arithmetic_integer_stdin.sf
+scripts/Interactive/brainf___.sf
 scripts/Interactive/cosmic_calendar.sf
 'scripts/Interactive/guess the number_player.sf'
 scripts/Interactive/stdin.sf

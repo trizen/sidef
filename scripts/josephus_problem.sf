@@ -1,15 +1,24 @@
-#!/usr/bin/perl
+#!/usr/bin/ruby
 
-# Translation of: http://rosettacode.org/wiki/Josephus_problem#Perl
+# http://rosettacode.org/wiki/Josephus_problem
 
-var k = 3;
-var prisoner = (0 .. 40);
+func josephus_i(n, k) {
+    var prisoners = (0 .. n-1);
+    while (prisoners.len > 1) {
+        prisoners.rotate!(k - 1).shift;
+    };
+    return prisoners[0];
+};
 
-while (prisoner.len > 1) {
-    prisoner.rotate!(k-1).shift;
-}
+func josephus_r(n, k) {
+    n == 1 ? 0 : ((__FUNC__(n-1, k) + k) % n)
+};
 
-prisoner[0] == 30
-    || ("Error!".die);
 
-"Prisoner %d survived.\n".printf(prisoner[0]);
+var i = josephus_i(41, 3);
+var j = josephus_r(41, 3);
+
+i == j  || die "error: #{i} != #{j}";
+i == 30 || die "#{i} != 30";
+
+say "** Test passed!";

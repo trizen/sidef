@@ -53,7 +53,7 @@ package Sidef::Types::Number::Number {
     }
 
     sub get_value {
-        $GET_PERL_VALUE ?  ${$_[0]}->numify : ${$_[0]};
+        $GET_PERL_VALUE ? ${$_[0]}->numify : ${$_[0]};
     }
 
     sub mod {
@@ -505,13 +505,7 @@ package Sidef::Types::Number::Number {
         my ($self, $obj) = @_;
 
         if ($self->_is_code($obj)) {
-            my $array = Sidef::Types::Array::Array->new();
-
-            for my $i (1 .. $self->get_value) {
-                $array->push($obj->run);
-            }
-
-            return $array;
+            return Sidef::Types::Array::Array->new(map { $obj->run } 1 .. $self->get_value);
         }
 
         Sidef::Types::Array::Array->new(($obj) x $self->get_value);
