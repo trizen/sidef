@@ -222,6 +222,12 @@ package Sidef::Sys::Sys {
         CORE::exec(@args);
     }
 
+    {
+        no strict 'refs';
+        *{__PACKAGE__ . '::' . '>'}  = \&println;
+        *{__PACKAGE__ . '::' . '>>'} = \&print;
+    }
+
 };
 
 1

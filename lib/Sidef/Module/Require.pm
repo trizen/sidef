@@ -9,17 +9,17 @@ package Sidef::Module::Require {
     sub require {
         my ($self, $module) = @_;
 
-        $self->{module_name} = $module->get_value;
-        ($self->{module} = $self->{module_name} . '.pm') =~ s{::}{/}g;
+        my $module_name = $module->get_value;
+        ($module = $module_name . '.pm') =~ s{::}{/}g;
 
-        eval { require $self->{module} };
+        eval { require $module };
 
         if ($@) {
             warn substr($@, 0, rindex($@, ' at ')), "\n";
             return;
         }
 
-        Sidef::Module::Caller->_new(module => $self->{module_name});
+        Sidef::Module::Caller->_new(module => $module_name);
     }
 }
 

@@ -26,6 +26,7 @@ package Sidef::Types::Block::Do {
         $self;
     }
 
+    *then = \&do;
     *{__PACKAGE__ . '::' . ':'} = \&do;
 };
 

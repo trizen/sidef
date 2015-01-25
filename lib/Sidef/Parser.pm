@@ -91,19 +91,19 @@ package Sidef::Parser {
             }x,
             prefix_obj_re => qr{\G
               (?:
-                  if\b                                    (?{ Sidef::Types::Bool::If->new })
-                | while\b                                 (?{ Sidef::Types::Bool::While->new })
-                | for(?:each)?+\b                         (?{ Sidef::Types::Block::For->new })
-                | return\b                                (?{ Sidef::Types::Block::Return->new })
-                | break\b                                 (?{ Sidef::Types::Block::Break->new })
-                | try\b                                   (?{ Sidef::Types::Block::Try->new })
-                | (?:given|switch)\b                      (?{ Sidef::Types::Block::Given->new })
-                | require\b                               (?{ Sidef::Module::Require->new })
-                | (?:print(?:ln|f)?+|say|exit|read)\b     (?{ state $x = Sidef::Sys::Sys->new })
-                | loop\b                                  (?{ state $x = Sidef::Types::Block::Code->new })
-                | (?:[*\\&]|\+\+|--)                      (?{ Sidef::Variable::Ref->new() })
-                | [?√+~!-]                                (?{ state $x = Sidef::Object::Unary->new })
-                | :                                       (?{ state $x = Sidef::Types::Hash::Hash->new })
+                  if\b                                            (?{ Sidef::Types::Bool::If->new })
+                | while\b                                         (?{ Sidef::Types::Bool::While->new })
+                | for(?:each)?+\b                                 (?{ Sidef::Types::Block::For->new })
+                | return\b                                        (?{ Sidef::Types::Block::Return->new })
+                | break\b                                         (?{ Sidef::Types::Block::Break->new })
+                | try\b                                           (?{ Sidef::Types::Block::Try->new })
+                | (?:given|switch)\b                              (?{ Sidef::Types::Block::Given->new })
+                | require\b                                       (?{ state $x = Sidef::Module::Require->new })
+                | (?:(?:print(?:ln|f)?+|say|exit|read)\b|>>?)     (?{ state $x = Sidef::Sys::Sys->new })
+                | loop\b                                          (?{ state $x = Sidef::Types::Block::Code->new })
+                | (?:[*\\&]|\+\+|--)                              (?{ Sidef::Variable::Ref->new() })
+                | [?√+~!-]                                        (?{ state $x = Sidef::Object::Unary->new })
+                | :                                               (?{ state $x = Sidef::Types::Hash::Hash->new })
               )
             }x,
             quote_operators_re => qr{\G
@@ -284,19 +284,19 @@ package Sidef::Parser {
             # Reference: http://en.wikipedia.org/wiki/International_variation_in_quotation_marks
             delim_pairs => {
                 qw~
-              ( )       [ ]       { }       < >
-              « »       » «       ‹ ›       › ‹
-              „ ”       “ ”       ‘ ’       ‚ ’
-              〈 〉     ﴾ ﴿       〈 〉     《 》
-              「 」     『 』     【 】     〔 〕
-              〖 〗     〘 〙     〚 〛     ⸨ ⸩
-              ⌈ ⌉       ⌊ ⌋       〈 〉     ❨ ❩
-              ❪ ❫       ❬ ❭       ❮ ❯       ❰ ❱
-              ❲ ❳       ❴ ❵       ⟅ ⟆       ⟦ ⟧
-              ⟨ ⟩       ⟪ ⟫       ⟬ ⟭       ⟮ ⟯
-              ⦃ ⦄       ⦅ ⦆       ⦇ ⦈       ⦉ ⦊
-              ⦋ ⦌       ⦍ ⦎       ⦏ ⦐       ⦑ ⦒
-              ⦗ ⦘       ⧘ ⧙       ⧚ ⧛       ⧼ ⧽
+                  ( )       [ ]       { }       < >
+                  « »       » «       ‹ ›       › ‹
+                  „ ”       “ ”       ‘ ’       ‚ ’
+                  〈 〉     ﴾ ﴿       〈 〉     《 》
+                  「 」     『 』     【 】     〔 〕
+                  〖 〗     〘 〙     〚 〛     ⸨ ⸩
+                  ⌈ ⌉       ⌊ ⌋       〈 〉     ❨ ❩
+                  ❪ ❫       ❬ ❭       ❮ ❯       ❰ ❱
+                  ❲ ❳       ❴ ❵       ⟅ ⟆       ⟦ ⟧
+                  ⟨ ⟩       ⟪ ⟫       ⟬ ⟭       ⟮ ⟯
+                  ⦃ ⦄       ⦅ ⦆       ⦇ ⦈       ⦉ ⦊
+                  ⦋ ⦌       ⦍ ⦎       ⦏ ⦐       ⦑ ⦒
+                  ⦗ ⦘       ⧘ ⧙       ⧚ ⧛       ⧼ ⧽
                   ~
             },
             %opts,
