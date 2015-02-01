@@ -4,7 +4,7 @@
 # Translation of: http://rosettacode.org/wiki/Langton%27s_ant#Perl
 
 const dirs = [[1,0], [0,-1], [-1,0], [0,1]];
-const size = 100;
+const size = 15;
 
 enum |White, Black|;
 

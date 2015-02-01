@@ -30,7 +30,7 @@ my $version = $Sidef::VERSION;
 my %args;
 if ($#ARGV != -1 and chr ord $ARGV[0] eq '-') {
     require Getopt::Std;
-    Getopt::Std::getopts('e:E:d:Dho:ivHN:n:WwcM:St', \%args);
+    Getopt::Std::getopts('e:E:d:Dho:ivHN:n:WwcM:rSt', \%args);
 }
 
 # Help
@@ -144,6 +144,11 @@ else {
         dump_structure($struct);
     }
 
+    # Deparse code
+    elsif (defined $args{r}) {
+        deparse_structure($struct);
+    }
+
     # Compile the struct to a Perl program
     elsif (defined $args{c}) {
         compile_to_perl($struct);
@@ -238,6 +243,7 @@ sub output_usage {
                     '-S'             => 'disable strictures and ignore any errors',
                     '-v'             => 'print version number and exit',
                     '-t'             => 'treat all command-line arguments as scripts',
+                    '-r'             => 'deparse a Sidef script',
                     '-w'             => 'enable warnings with stack backtrace',
                     '-W'             => 'make warnings fatal (with stack backtrace)',
                    );
@@ -457,6 +463,16 @@ sub _get_loaded_modules {
         }
     }
     $modules;
+}
+
+sub deparse_structure {
+    my ($struct) = @_;
+
+    require Sidef::Deparser;
+
+    my $deparser = Sidef::Deparser->new;
+    my @statements = $deparser->deparse($struct);
+    say join(";\n", @statements);
 }
 
 sub dump_structure {
