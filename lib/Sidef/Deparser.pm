@@ -2,6 +2,7 @@ package Sidef::Deparser {
 
     use 5.014;
     our @ISA = qw(Sidef);
+    use Scalar::Util qw(refaddr);
 
     # This module is under development...
 
@@ -10,18 +11,26 @@ package Sidef::Deparser {
         bless \%opts, __PACKAGE__;
     }
 
+    my %addr;
+
     sub deparse_expr {
         my ($self, $expr) = @_;
 
         my $self_obj = $expr->{self};
 
+        # Self obj
         my $ref = ref($self_obj);
         if ($ref eq 'HASH') {
             $self_obj = join(', ', $self->deparse($self_obj));
         }
         elsif ($ref eq "Sidef::Variable::Variable") {
             if ($self_obj->{type} eq 'func') {
-                $self_obj = "func $self_obj->{name} " . $self->deparse_expr({self => $self_obj->{value}});
+                if ($addr{refaddr($self_obj)}++) {
+                    $self_obj = $self_obj->{name};
+                }
+                else {
+                    $self_obj = ("func $self_obj->{name} " . $self->deparse_expr({self => $self_obj->{value}}));
+                }
             }
         }
         elsif ($ref eq 'Sidef::Variable::Init') {
@@ -34,8 +43,23 @@ package Sidef::Deparser {
             $self_obj = '{' . join(";\n", $self->deparse($self_obj->{code})) . '}';
         }
 
+        # Method call on the self obj (+optional arguments)
         if (exists $expr->{call}) {
-            $self_obj .= " +some-method-call";
+            foreach my $call (@{$expr->{call}}) {
+                if ($call->{method} eq 'HASH') {
+
+                }
+                elsif ($call->{method} =~ /^[[:alpha:]_]/) {
+                    $self_obj .= ".$call->{method}";
+                }
+                else {
+                    $self_obj .= "$call->{method}";
+                }
+
+                if (exists $call->{arg}) {
+                    $self_obj .= " +some-arguments";
+                }
+            }
         }
 
         $self_obj;
