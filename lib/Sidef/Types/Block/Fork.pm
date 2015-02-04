@@ -23,6 +23,11 @@ package Sidef::Types::Block::Fork {
 
     *wait = \&get;
     *join = \&get;
+
+    sub kill {
+        my ($self, $signal) = @_;
+        kill(defined($signal) ? $signal->get_value : 'KILL', $self->{pid});
+    }
 };
 
 1
