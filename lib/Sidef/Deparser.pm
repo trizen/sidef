@@ -11,15 +11,20 @@ package Sidef::Deparser {
         bless \%opts, __PACKAGE__;
     }
 
-    sub _indent {
-        my $i = 4;
-        1 while (caller($i++));
-        ' ' x (2 * log($i) / log(2));    # needs work
+    sub _dump_init_vars {
+        my ($self, @init_vars) = @_;
+        $self->_dump_vars(map { @{$_->{vars}} } @init_vars);
     }
 
     sub _dump_vars {
-        my (@vars) = @_;
-        join(', ', map { $_->{name} } map { @{$_->{vars}} } @vars);
+        my ($self, @vars) = @_;
+        join(
+            ', ',
+            map {
+                $_->{name}
+                  . (ref($_->{value}) eq 'Sidef::Types::Nil::Nil' ? '' : ('=' . $self->deparse_expr({self => $_->{value}})))
+              } @vars
+            );
     }
 
     my %addr;
@@ -39,21 +44,33 @@ package Sidef::Deparser {
             if ($obj->{type} eq 'var') {
                 $code = $obj->{name};
             }
-            elsif ($obj->{type} eq 'func') {
+            elsif ($obj->{type} eq 'func' or $obj->{type} eq 'method') {
                 if ($addr{refaddr($obj)}++) {
                     $code = $obj->{name};
                 }
                 else {
                     my $block = $obj->{value};
-                    $code = "func $obj->{name}";
+                    $code = "$obj->{type} $obj->{name}";
                     my $vars = delete $block->{init_vars};
-                    $code .= '(' . _dump_vars(@{$vars}[0 .. $#{$vars} - 1]) . ')';
+                    $code .= '(' . $self->_dump_init_vars(@{$vars}[($obj->{type} eq 'method' ? 1 : 0) .. $#{$vars} - 1]) . ')';
                     $code .= $self->deparse_expr({self => $block});
                 }
             }
         }
         elsif ($ref eq 'Sidef::Variable::Init') {
-            $code = 'var(' . join(', ', map { $_->{name} } @{$obj->{vars}}) . ')';
+            $code = 'var(' . $self->_dump_init_vars($obj) . ')';
+        }
+        elsif ($ref eq 'Sidef::Variable::ClassInit') {
+            if ($addr{refaddr($obj)}++) {
+                $code = $obj->{name};
+            }
+            else {
+                my $block = $obj->{__BLOCK__};
+                $code = "class $obj->{name}";
+                my $vars = $obj->{__VARS__};
+                $code .= '(' . $self->_dump_vars(@{$vars}) . ')';
+                $code .= $self->deparse_expr({self => $block});
+            }
         }
         elsif ($ref eq 'Sidef::Variable::Ref') {
             ## ok
@@ -65,19 +82,22 @@ package Sidef::Deparser {
             $code = '{';
             if (exists($obj->{init_vars}) and @{$obj->{init_vars}} > 1) {
                 my $vars = $obj->{init_vars};
-                $code .= '|' . _dump_vars(@{$vars}[0 .. $#{$vars} - 1]) . "|";
+                $code .= '|' . $self->_dump_init_vars(@{$vars}[0 .. $#{$vars} - 1]) . "|";
             }
             $code .= "\n";
-            my $space      = pop @{$self->{spaces}};
+            $self->{spaces} += 4;
             my @statements = $self->deparse($obj->{code});
-            my $sp         = pop @{$self->{spaces}};
-            $code .= $sp . join(";\n" . pop(@{$self->{spaces}}), @statements) . "\n" . $space . '}';
+            $code .=
+                (" " x $self->{spaces})
+              . join(";\n" . (" " x $self->{spaces}), @statements) . "\n"
+              . (" " x ($self->{spaces} -= 4)) . '}';
         }
         elsif ($ref eq 'Sidef::Types::Number::Number') {
-            $code = $obj->dump;
+            local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
+            $code = $obj->get_value;
         }
         elsif (reftype($obj) eq 'SCALAR') {
-            $code = $obj->dump;
+            $code = $obj->dump->get_value;
         }
 
         # Method call on the self obj (+optional arguments)
@@ -87,27 +107,32 @@ package Sidef::Deparser {
 
                 }
                 elsif ($call->{method} =~ /^[[:alpha:]_]/) {
-                    $code .= ".$call->{method}";
+                    $code .= '.' if $code ne '';
+                    $code .= $call->{method};
                 }
                 else {
                     $code .= "$call->{method}";
                 }
 
                 if (exists $call->{arg}) {
-                    $code .= '('
-                      . join(', ', map { ref($_) eq 'HASH' ? $self->deparse($_) : $self->deparse_expr($_) } @{$call->{arg}})
+                    $code .= '(' . join(
+                        ', ',
+                        map {
+                                ref($_) eq 'HASH' ? $self->deparse($_)
+                              : ref($_) ? $self->deparse_expr({self => $_})
+                              : Sidef::Types::String::String->new($_)->dump
+                          } @{$call->{arg}}
+                      )
                       . ')';
                 }
             }
         }
 
-        $code;
+        ref($code) ? '###' . $code . '###' : $code eq '' ? '#~#' . $obj . '#~#' : $code;
     }
 
     sub deparse {
         my ($self, $struct) = @_;
-
-        push @{$self->{spaces}}, _indent();
 
         my @results;
         foreach my $class (grep exists $struct->{$_}, @{$self->{namespaces}}, 'main') {

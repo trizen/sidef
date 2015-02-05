@@ -27,7 +27,8 @@ package Sidef::Exec {
                                                            ':' => 1,
                                                           },
                          'Sidef::Types::Bool::If' => {
-                                                      'elsif' => 1,
+                                                      'elsif'  => 1,
+                                                      'elseif' => 1,
                                                      },
                          'Sidef::Types::Bool::Bool' => {
                                                         '?' => 1,
