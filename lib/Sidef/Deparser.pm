@@ -100,6 +100,11 @@ package Sidef::Deparser {
             $code = $obj->dump->get_value;
         }
 
+        # Indices
+        if (exists $expr->{ind}) {
+            $code .= "#[#indices#]#";    # needs work
+        }
+
         # Method call on the self obj (+optional arguments)
         if (exists $expr->{call}) {
             foreach my $call (@{$expr->{call}}) {
@@ -111,7 +116,7 @@ package Sidef::Deparser {
                     $code .= $call->{method};
                 }
                 else {
-                    $code .= "$call->{method}";
+                    $code .= $call->{method};
                 }
 
                 if (exists $call->{arg}) {

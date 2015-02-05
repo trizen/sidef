@@ -6,6 +6,7 @@ lib/Sidef.pod
 lib/Sidef/Args/Args.pm
 lib/Sidef/Convert/Convert.pm
 lib/Sidef/Convert/Convert.pod
+lib/Sidef/Deparser.pm
 lib/Sidef/Eval/Eval.pm
 lib/Sidef/Exec.pm
 lib/Sidef/Init.pm
