@@ -232,8 +232,8 @@ sub output_usage {
     my %switches = (
                     '-i'             => 'interactive mode',
                     '-c'             => 'compile the code as a stand-alone perl program',
-                    '-d dumped_file' => 'execute a dumped file',
-                    '-D'             => 'dump the data structure of a program',
+                    '-d dumped_file' => 'execute a syntax tree dumped file',
+                    '-D'             => 'dump the syntax tree of a program',
                     '-o output_file' => 'file where to dump the output',
                     '-E program'     => 'one line of program',
                     '-H'             => 'interactive help',
@@ -243,7 +243,7 @@ sub output_usage {
                     '-S'             => 'disable strictures and ignore any errors',
                     '-v'             => 'print version number and exit',
                     '-t'             => 'treat all command-line arguments as scripts',
-                    '-r'             => 'deparse a Sidef script',
+                    '-r'             => 'deparse a Sidef program',
                     '-w'             => 'enable warnings with stack backtrace',
                     '-W'             => 'make warnings fatal (with stack backtrace)',
                    );
@@ -470,7 +470,7 @@ sub deparse_structure {
 
     require Sidef::Deparser;
 
-    my $deparser = Sidef::Deparser->new;
+    my $deparser   = Sidef::Deparser->new;
     my @statements = $deparser->deparse($struct);
     say join(";\n", @statements);
 }
