@@ -48,7 +48,7 @@ sub process_file {
             my $status = eval { require $module };
             if ($@) {
                 if (defined &$name) {
-                    warn "=> Plain usage of function: $name\n";
+                    warn "=> Plain usage of function `$name', in file `$file', at line $.\n";
                 }
                 else {
                     warn "=> Invalid type name `$name', in file `$file', at line $.\n";
