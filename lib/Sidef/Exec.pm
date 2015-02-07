@@ -187,7 +187,7 @@ package Sidef::Exec {
                                     return;
                                 }
 
-                                foreach my $j (0 .. $num - 1) {
+                                foreach my $j ($#{$self_obj}+1 .. $num - 1) {
                                     $self_obj->[$j] //= Sidef::Variable::Variable->new(name => '', type => 'var');
                                 }
 
