@@ -1,4 +1,4 @@
-package Sidef::Deparser {
+package Sidef::Deparse::Sidef {
 
     use 5.014;
     our @ISA = qw(Sidef);

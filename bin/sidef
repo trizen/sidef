@@ -30,7 +30,7 @@ my $version = $Sidef::VERSION;
 my %args;
 if ($#ARGV != -1 and chr ord $ARGV[0] eq '-') {
     require Getopt::Std;
-    Getopt::Std::getopts('e:E:d:Dho:ivHN:n:WwcM:rSt', \%args);
+    Getopt::Std::getopts('e:E:d:Dho:ivHN:n:WwcM:rR:St', \%args);
 }
 
 # Help
@@ -145,7 +145,7 @@ else {
     }
 
     # Deparse code
-    elsif (defined $args{r}) {
+    elsif (defined($args{r}) or defined($args{R})) {
         deparse_structure($struct);
     }
 
@@ -244,6 +244,7 @@ sub output_usage {
                     '-v'             => 'print version number and exit',
                     '-t'             => 'treat all command-line arguments as scripts',
                     '-r'             => 'deparse a Sidef program',
+                    '-R lang'        => ['deparse a Sidef program to a given language', 'valid values: sidef, perl'],
                     '-w'             => 'enable warnings with stack backtrace',
                     '-W'             => 'make warnings fatal (with stack backtrace)',
                    );
@@ -468,11 +469,22 @@ sub _get_loaded_modules {
 sub deparse_structure {
     my ($struct) = @_;
 
-    require Sidef::Deparser;
+    my $lang = defined($args{R}) ? $args{R} : 'Sidef';
 
-    my $deparser   = Sidef::Deparser->new;
+    my $module = "Sidef::Deparse::\u\L$lang";
+    my $pm     = ($module =~ s{::}{/}gr . '.pm');
+    require $pm;
+    my $deparser   = $module->new;
     my @statements = $deparser->deparse($struct);
-    say join(";\n", @statements);
+
+    my $out_fh = \*STDOUT;
+
+    if (defined $args{o}) {
+        open $out_fh, '>:utf8', $args{o}
+          or die "Can't open file '$args{o}' for write: $!\n";
+    }
+
+    say {$out_fh} join(";\n", @statements);
 }
 
 sub dump_structure {
@@ -639,7 +651,7 @@ HEAD
 
                      close $fh;
                  }
-               }
+             }
             } => $path
         );
 

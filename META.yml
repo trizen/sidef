@@ -22,8 +22,10 @@ provides:
     file: lib/Sidef/Args/Args.pm
   Sidef::Convert::Convert:
     file: lib/Sidef/Convert/Convert.pm
-  Sidef::Deparser:
-    file: lib/Sidef/Deparser.pm
+  Sidef::Deparse::Perl:
+    file: lib/Sidef/Deparse/Perl.pm
+  Sidef::Deparse::Sidef:
+    file: lib/Sidef/Deparse/Sidef.pm
   Sidef::Eval::Eval:
     file: lib/Sidef/Eval/Eval.pm
   Sidef::Exec:
