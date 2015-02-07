@@ -152,6 +152,9 @@
       "Sidef::Types::Block::Next" : {
          "file" : "lib/Sidef/Types/Block/Next.pm"
       },
+      "Sidef::Types::Block::PerlCode" : {
+         "file" : "lib/Sidef/Types/Block/PerlCode.pm"
+      },
       "Sidef::Types::Block::Return" : {
          "file" : "lib/Sidef/Types/Block/Return.pm"
       },

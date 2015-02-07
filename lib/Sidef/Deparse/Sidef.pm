@@ -7,7 +7,16 @@ package Sidef::Deparse::Sidef {
     # This module is under development...
 
     sub new {
-        my (undef, %opts) = @_;
+        my (undef, %args) = @_;
+
+        my %opts = (
+                    before     => '',
+                    between    => ";\n",
+                    after      => ";\n",
+                    spaces_num => 4,
+                    %args,
+                   );
+
         bless \%opts, __PACKAGE__;
     }
 
@@ -85,12 +94,12 @@ package Sidef::Deparse::Sidef {
                 $code .= '|' . $self->_dump_init_vars(@{$vars}[0 .. $#{$vars} - 1]) . "|";
             }
             $code .= "\n";
-            $self->{spaces} += 4;
+            $self->{spaces} += $self->{spaces_num};
             my @statements = $self->deparse($obj->{code});
             $code .=
                 (" " x $self->{spaces})
               . join(";\n" . (" " x $self->{spaces}), @statements) . "\n"
-              . (" " x ($self->{spaces} -= 4)) . '}';
+              . (" " x ($self->{spaces} -= $self->{spaces_num})) . '}';
         }
         elsif ($ref eq 'Sidef::Types::Number::Number') {
             local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
@@ -108,15 +117,16 @@ package Sidef::Deparse::Sidef {
         # Method call on the self obj (+optional arguments)
         if (exists $expr->{call}) {
             foreach my $call (@{$expr->{call}}) {
-                if ($call->{method} eq 'HASH') {
+                my $method = $call->{method};
+                if (ref($method) eq 'HASH') {
 
                 }
-                elsif ($call->{method} =~ /^[[:alpha:]_]/) {
+                elsif ($method =~ /^[[:alpha:]_]/) {
                     $code .= '.' if $code ne '';
-                    $code .= $call->{method};
+                    $code .= $method;
                 }
                 else {
-                    $code .= $call->{method};
+                    $code .= $method;
                 }
 
                 if (exists $call->{arg}) {
