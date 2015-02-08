@@ -15,6 +15,7 @@ package Sidef::Deparse::Perl {
                 <<"HEADER";
 use lib qw(@INC);
 use 5.014;
+use autobox;
 use Sidef;
 HEADER
             },
@@ -44,15 +45,10 @@ HEADER
             );
     }
 
-    my %req;
-
-    sub _require {
-        my ($self, $module) = @_;
-        if (not exists $req{$module}) {
-            undef $req{$module};
-            return "require $module;";
-        }
-        '';
+    sub _dump_array {
+        my ($self, $array) = @_;
+        use Data::Dump qw(pp);
+        '[' . join(', ', map { $self->deparse_expr(ref($_) eq 'HASH' ? $_ : {self => $_->get_value}) } @{$array}) . ']';
     }
 
     my %func;
@@ -107,17 +103,7 @@ HEADER
         elsif ($ref eq 'Sidef::Sys::Sys') {
             $code .= $ref . '->new';
         }
-        elsif ($ref eq 'Sidef::Types::Bool::If') {    # this needs special conversion
-                                                      #$code .= $ref . '->new';
-
-            # if (exists $expr->{call}) {
-            #     foreach my $call (@{$expr->{call}}) {
-            #         my $method = $call->{method};
-            #         next if $method eq 'do';
-            #         $code .= $method;
-            #     }
-            # }
-
+        elsif ($ref eq 'Sidef::Types::Bool::If') {
             $self->{if_condition} = 1;
         }
         elsif ($ref eq 'Sidef::Types::Block::Switch') {    # special conversion needed
@@ -150,6 +136,9 @@ HEADER
             #$code = $ref . '->new(' . $obj->get_value . ')';
             $code = $obj->get_value;
         }
+        elsif ($ref eq 'Sidef::Types::Array::Array' or $ref eq 'Sidef::Types::Array::HCArray') {
+            $code .= $self->_dump_array($obj);
+        }
         elsif (reftype($obj) eq 'SCALAR') {
 
             #$code = $ref.'->new('.$obj->dump->get_value.')';
@@ -158,7 +147,9 @@ HEADER
 
         # Indices
         if (exists $expr->{ind}) {
-            $code .= "#[#indices#]#";    # needs work
+            foreach my $ind (@{$expr->{ind}}) {
+                $code .= '->' . $self->_dump_array($ind);
+            }
         }
 
         # Method call on the self obj (+optional arguments)
@@ -173,15 +164,13 @@ HEADER
                     }
 
                     if (exists $call->{arg}) {
-
                         local $self->{plain_code} = 1;
-
                         $code .= join(
                             ', ',
                             map {
                                 ref($_) eq 'HASH'
                                   ? '(' . do { ++$self->{if_condition}; $self->deparse($_) }
-                                    . ')'
+                                  . ')'
                                   : ref($_) ? $self->deparse_expr({self => $_})
                                   : Sidef::Types::String::String->new($_)->dump
                               } @{$call->{arg}}
@@ -213,13 +202,7 @@ HEADER
                     };
                 }
                 else {
-                    #if ($method eq '=' or $method eq '?' or $method eq ':') {
                     $code .= $method;
-
-                    #}
-                    #else{
-                    #    $code .= '->${\\\'' . $method . '\'}';
-                    #}
                 }
 
                 if (exists $call->{arg}) {

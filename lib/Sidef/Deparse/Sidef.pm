@@ -36,6 +36,12 @@ package Sidef::Deparse::Sidef {
             );
     }
 
+    sub _dump_array {
+        my ($self, $array) = @_;
+        use Data::Dump qw(pp);
+        '[' . join(', ', map { $self->deparse_expr(ref($_) eq 'HASH' ? $_ : {self => $_->get_value}) } @{$array}) . ']';
+    }
+
     my %addr;
 
     sub deparse_expr {
@@ -105,13 +111,18 @@ package Sidef::Deparse::Sidef {
             local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
             $code = $obj->get_value;
         }
+        elsif ($ref eq 'Sidef::Types::Array::Array' or $ref eq 'Sidef::Types::Array::HCArray') {
+            $code .= $self->_dump_array($obj);
+        }
         elsif (reftype($obj) eq 'SCALAR') {
             $code = $obj->dump->get_value;
         }
 
         # Indices
         if (exists $expr->{ind}) {
-            $code .= "#[#indices#]#";    # needs work
+            foreach my $ind (@{$expr->{ind}}) {
+                $code .= $self->_dump_array($ind);
+            }
         }
 
         # Method call on the self obj (+optional arguments)
