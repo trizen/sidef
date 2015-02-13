@@ -1859,22 +1859,27 @@ package Sidef::Parser {
 
                         my $has_arg;
                         if ($req_arg or exists $self->{binpost_ops}{$method}) {
+
+                            my $lonely_obj = /\G\h*(?=\()/gc;
                             my ($arg, $pos) =
-                              /\G\h*(?=\()/gc
+                                $lonely_obj
                               ? $self->parse_arguments(code => substr($_, pos))
                               : $self->parse_obj(code => substr($_, pos));
 
                             if (defined $arg) {
-                                pos($_) += $pos;
-                                my ($methods, $pos) = $self->parse_methods(code => substr($_, pos));
                                 pos($_) += $pos;
 
                                 if (ref $arg ne 'HASH') {
                                     $arg = {$self->{class} => [{self => $arg}]};
                                 }
 
-                                if (@{$methods}) {
-                                    push @{$arg->{$self->{class}}[-1]{call}}, @{$methods};
+                                if (not $lonely_obj) {
+                                    my ($methods, $pos) = $self->parse_methods(code => substr($_, pos));
+                                    pos($_) += $pos;
+
+                                    if (@{$methods}) {
+                                        push @{$arg->{$self->{class}}[-1]{call}}, @{$methods};
+                                    }
                                 }
 
                                 $has_arg = 1;
