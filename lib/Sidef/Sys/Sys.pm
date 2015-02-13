@@ -190,6 +190,18 @@ package Sidef::Sys::Sys {
         $filename->to_file->open($mode, $var);
     }
 
+    sub stdin {
+        Sidef::Types::Glob::FileHandle->stdin;
+    }
+
+    sub stdout {
+        Sidef::Types::Glob::FileHandle->stdout;
+    }
+
+    sub stderr {
+        Sidef::Types::Glob::FileHandle->stderr;
+    }
+
     sub opendir {
         my ($self, $var, $dirname) = @_;
         $dirname->to_dir->open($var);
