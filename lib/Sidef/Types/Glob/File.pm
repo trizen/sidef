@@ -24,8 +24,8 @@ package Sidef::Types::Glob::File {
     }
 
     sub touch {
-        my ($self) = @_;
-        Sidef::Types::Bool::Bool->new(CORE::open(my $fh, '>>', $self->get_value));
+        my ($self, @args) = @_;
+        $self->open('>>', @args);
     }
 
     *make   = \&touch;

@@ -51,6 +51,7 @@ package Sidef::Types::Glob::DirHandle {
     *read_dir = \&get_files;
     *readdir  = \&get_files;
     *readDir  = \&get_files;
+    *entries  = \&get_files;
 
     sub get_file {
         my ($self) = @_;
