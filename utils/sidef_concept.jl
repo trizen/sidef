@@ -46,17 +46,17 @@ end
 #########################################
 
 {
-    div = symbol("/");
-    x   = S_Number(12);
-    y   = S_Number(4);
-    println("$x / $y == ", eval(:($div(x, y))));
+    d = symbol("/");
+    x = S_Number(12);
+    y = S_Number(4);
+    println("$x / $y == ", eval(:($d(x, y))));
 }
 
 code = "25.3->int->sqrt";
 
 if (m = match(r"\G(\d+(?:\.\d+)?)", code)) != nothing
     str = m.captures[1];
-    num = S_Number(float(str));
+    n = S_Number(float(str));
     pos = length(str)+1;
 
     while (m = match(r"\G(->|\.)", code, pos)) != nothing
@@ -65,9 +65,9 @@ if (m = match(r"\G(\d+(?:\.\d+)?)", code)) != nothing
             cap = m.captures[1];
             pos += length(cap);
             method = symbol(cap);
-            print(num, "->", cap);
-            num = eval(:($method(num)));
-            println(" == ", num);
+            print(n, "->", cap);
+            n = eval(:($method(n)));
+            println(" == ", n);
         end
     end
 
