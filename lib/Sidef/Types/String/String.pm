@@ -140,11 +140,12 @@ package Sidef::Types::String::String {
     sub to {
         my ($self, $string) = @_;
 
-        if (length($self->get_value) == 1 and length($string->get_value) == 1) {
-            return Sidef::Types::Array::Array->new(map { $self->new(chr($_)) }
-                                                   ord($self->get_value) .. ord($string->get_value));
+        my ($s1, $s2) = ($self->get_value, $string->get_value);
+
+        if (length($s1) == 1 and length($s2) == 1) {
+            return Sidef::Types::Array::Array->new(map { $self->new(chr($_)) } ord($s1) .. ord($s2));
         }
-        Sidef::Types::Array::Array->new(map { $self->new($_) } $self->get_value .. $string->get_value);
+        Sidef::Types::Array::Array->new(map { $self->new($_) } $s1 .. $s2);
     }
 
     *upto = \&to;
