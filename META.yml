@@ -42,6 +42,8 @@ provides:
     file: lib/Sidef/Object/Object.pm
   Sidef::Object::Unary:
     file: lib/Sidef/Object/Unary.pm
+  Sidef::Optimizer:
+    file: lib/Sidef/Optimizer.pm
   Sidef::Parser:
     file: lib/Sidef/Parser.pm
   Sidef::Perl::Perl:

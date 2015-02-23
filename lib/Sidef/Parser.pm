@@ -1377,7 +1377,7 @@ package Sidef::Parser {
                 if (/\G<<(?=\S)/gc) {
                     my ($name, $type) = (undef, 1);
 
-                    if (/\G(?=(['"]))/) {
+                    if (/\G(?=(['"„]))/) {
                         $type = 0 if $1 eq q{'};
                         my ($str, $pos) = $self->get_quoted_string(code => substr($_, pos));
                         pos($_) += $pos;

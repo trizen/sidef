@@ -19,6 +19,7 @@ lib/Sidef/Module/Require.pm
 lib/Sidef/Module/Require.pod
 lib/Sidef/Object/Object.pm
 lib/Sidef/Object/Unary.pm
+lib/Sidef/Optimizer.pm
 lib/Sidef/Parser.pm
 lib/Sidef/Perl/Perl.pm
 lib/Sidef/Sys/SIG.pm
@@ -410,6 +411,7 @@ utils/find_invalid_types.pl
 utils/pod_generator.pl
 utils/regexp_grammars_parser.pl
 utils/Sidef/Tidy.pm
+utils/sidef_concept.jl
 utils/sidef_concept.pl
 utils/sidef_in_perl.pl
 utils/struct_optimizer.pl

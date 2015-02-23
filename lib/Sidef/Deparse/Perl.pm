@@ -22,6 +22,7 @@ HEADER
             between    => ";\n",
             after      => ";\n",
             spaces_num => 4,
+            namespaces => [],
             %args,
                    );
 

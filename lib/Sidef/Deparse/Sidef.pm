@@ -14,6 +14,7 @@ package Sidef::Deparse::Sidef {
                     between    => ";\n",
                     after      => ";\n",
                     spaces_num => 4,
+                    namespaces => [],
                     %args,
                    );
 
@@ -38,7 +39,6 @@ package Sidef::Deparse::Sidef {
 
     sub _dump_array {
         my ($self, $array) = @_;
-        use Data::Dump qw(pp);
         '[' . join(', ', map { $self->deparse_expr(ref($_) eq 'HASH' ? $_ : {self => $_->get_value}) } @{$array}) . ']';
     }
 

@@ -474,7 +474,7 @@ sub deparse_structure {
     my $module = "Sidef::Deparse::\u\L$lang";
     my $pm     = ($module =~ s{::}{/}gr . '.pm');
     require $pm;
-    my $deparser   = $module->new;
+    my $deparser = $module->new(namespaces => [@Sidef::Exec::NAMESPACES],);
     my @statements = $deparser->deparse($struct);
 
     my $out_fh = \*STDOUT;
