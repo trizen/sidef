@@ -404,7 +404,7 @@ package Sidef::Parser {
                          ? 'Constant'
                          : 'Variable'
                         )
-                      . " '$variable->{name}' has been initialized, but not used again, at "
+                      . " '$variable->{name}' has been declared, but not used again, at "
                       . "$self->{file_name}, line $variable->{line}\n";
                 }
                 elsif ($DEBUG) {

@@ -30,7 +30,7 @@ my $version = $Sidef::VERSION;
 my %args;
 if ($#ARGV != -1 and chr ord $ARGV[0] eq '-') {
     require Getopt::Std;
-    Getopt::Std::getopts('e:E:d:Dho:ivHN:n:WwcM:rR:St', \%args);
+    Getopt::Std::getopts('e:E:d:Dho:ivHN:n:WwcM:rR:StO:', \%args);
 }
 
 # Help
@@ -100,10 +100,11 @@ elsif (defined $args{t}) {
         say "-" x 80;
 
         splice(@Sidef::Exec::NAMESPACES);
+        my $exec   = Sidef::Exec->new();
         my $code   = read_script($script_name);
         my $parser = new_parser(name => $script_name);
-        my $struct = $parser->parse_script(code => $code);
-        eval { Sidef::Exec->new()->execute($struct) };
+        my $struct = parse_code($parser, $code);
+        eval { $exec->execute($struct) };
 
         if ($@) {
             warn "[ERROR] Error encountered on script `$script_name': $@\n";
@@ -137,7 +138,7 @@ else {
 
     $code // exit 2;
     my $parser = new_parser(name => $script_name);
-    my $struct = $parser->parse_script(code => $code);
+    my $struct = parse_code($parser, $code);
 
     # Dump the data structure
     if (defined $args{D}) {
@@ -179,6 +180,30 @@ sub new_parser {
                        script_name => $opt{name},
                        strict      => !$args{S},
                       );
+}
+
+sub optimize_struct {
+    my ($struct) = @_;
+
+    my $optimizer  = Sidef::Optimizer->new;
+    my %opt_struct = $optimizer->optimize($struct);
+
+    return \%opt_struct;
+}
+
+sub parse_code {
+    my ($parser, $code) = @_;
+
+    my $struct = $parser->parse_script(code => $code);
+
+    # Check for optimization
+    if (defined($args{O})) {
+        if ($args{O} >= 1) {
+            $struct = optimize_struct($struct);
+        }
+    }
+
+    return $struct;
 }
 
 sub load_numbers {
@@ -240,6 +265,7 @@ sub output_usage {
                     '-N type'        => ['use a specific implementation for numbers', 'valid types: fast, big, int, rat'],
                     '-n type'        => ['try to use a specific backend for Math::BigInt', 'valid types: GMP, Pari, FastCalc'],
                     '-M type,type'   => ['memoize some expensive method calls', 'valid types: num, block, all'],
+                    '-O level'       => ['optimize the syntax-tree of a program', 'valid optimization levels: 0, 1'],
                     '-S'             => 'disable strictures and ignore any errors',
                     '-v'             => 'print version number and exit',
                     '-t'             => 'treat all command-line arguments as scripts',
@@ -651,7 +677,7 @@ HEAD
 
                      close $fh;
                  }
-               }
+             }
             } => $path
         );
 

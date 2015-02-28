@@ -253,6 +253,7 @@ package Sidef::Types::Block::Code {
 
     sub call {
         my ($self, @args) = @_;
+
         $self->init_block_vars(@args);
 
         my $result = $self->run;

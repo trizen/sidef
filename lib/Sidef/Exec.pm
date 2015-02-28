@@ -45,7 +45,12 @@ package Sidef::Exec {
 
         if (ref $self_obj eq 'HASH') {
             local $self->{var_ref} = 1;
-            $self_obj = $self->execute($self_obj);
+            if (exists $self_obj->{self}) {
+                $self_obj = $self->execute_expr($self_obj);
+            }
+            else {
+                $self_obj = $self->execute($self_obj);
+            }
 
             if (not exists $expr->{call}
                 and ref($self_obj) eq 'Sidef::Variable::Init') {
@@ -57,8 +62,16 @@ package Sidef::Exec {
             local $self->{var_ref} = 0;
             $self_obj = Sidef::Types::Array::Array->new(
                 map {
-                    my $val = $self->execute_expr($_);
-                    ref($val) eq 'Sidef::Args::Args' ? @{$val} : $val
+                    my $val =
+                        ref($_) eq 'HASH'
+                      ? exists($_->{self})
+                          ? $self->execute_expr($_)
+                          : $self->execute($_)
+                      : ref($_) eq 'Sidef::Types::Array::HCArray' ? $self->execute_expr({self => $_})
+                      :                                             $_;
+                    (ref($val) eq 'Sidef::Variable::Variable' || ref($val) eq 'Sidef::Variable::ClassVar') ? $val->get_value
+                      : ref($val) eq 'Sidef::Args::Args' ? @{$val}
+                      : $val
                   } @{$self_obj}
             );
         }
@@ -81,22 +94,30 @@ package Sidef::Exec {
 
                 my $level = do {
                     local $self->{var_ref} = 0;
-                    $self->execute_expr({self => $expr->{ind}[$l]});
+                    [
+                     map {
+                         my $result =
+                             ref($_) eq 'HASH' ? $self->execute_expr($_)
+                           : ref($_) eq 'Sidef::Types::Array::HCArray' ? $self->execute_expr({self => $_})
+                           :                                             $_;
+                         (ref($result) eq 'Sidef::Variable::Variable' || ref($result) eq 'Sidef::Variable::ClassVar')
+                           ? $result->get_value
+                           : $result;
+                       } @{$expr->{ind}[$l]}
+                    ];
                 };
+
+                # use Data::Dump qw(pp);
+                ## pp $level;
 
                 my $is_hash = ref($self_obj) eq 'Sidef::Types::Hash::Hash';
 
                 if (
-                    (
-                     $#{$level} > 0 && do {
-                         $level = [map { $_->get_value } @{$level}];
-                         1;
-                     }
-                    )
+                    $#{$level} > 0
                     || (
                         $#{$level} == 0
                         && do {
-                            my $obj = $level->[0]->get_value;
+                            my $obj = $level->[0];
                             ref($obj) eq 'Sidef::Types::Array::Array'
                               ? do {
                                 $level = [map { $_->get_value } @{$obj}];
@@ -152,7 +173,7 @@ package Sidef::Exec {
                 }
                 else {
                     return if not exists $level->[0];
-                    my $ind = $level->[0]->get_value;
+                    my $ind = $level->[0];
 
                     if (ref($self_obj) eq 'Sidef::Variable::Class') {
                         $self_obj = $self_obj->$ind;
@@ -187,7 +208,7 @@ package Sidef::Exec {
                                     return;
                                 }
 
-                                foreach my $j ($#{$self_obj}+1 .. $num - 1) {
+                                foreach my $j ($#{$self_obj} + 1 .. $num - 1) {
                                     $self_obj->[$j] //= Sidef::Variable::Variable->new(name => '', type => 'var');
                                 }
 
@@ -371,12 +392,16 @@ package Sidef::Exec {
 
                 my $expr = $struct->{$class}[$self->{expr_i}];
 
-                if (ref($expr->{self}) eq 'Sidef::Variable::InitMy') {
+                if (ref($expr) eq 'HASH' and ref($expr->{self}) eq 'Sidef::Variable::InitMy') {
                     goto INIT_VAR;
                 }
 
                 ++$i;
-                my $obj = $self->execute_expr($expr);
+                my $obj =
+                    ref($expr) eq 'HASH' ? $self->execute_expr($expr)
+                  : ref($expr) eq 'Sidef::Types::Array::HCArray' ? $self->execute_expr({self => $expr})
+                  : ref($expr) eq 'Sidef::Variable::Init' ? do { $expr->set_value; $expr }
+                  :                                         $expr;
 
                 if (   ref($obj) eq 'Sidef::Types::Block::Return'
                     or ref($obj) eq 'Sidef::Types::Block::Break') {

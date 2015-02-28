@@ -1,21 +1,9 @@
-use utf8;
-use 5.014;
-use strict;
-use warnings;
-
-# The directory where Sidef lives
-use lib qw(..);
-
-# Load the Sidef main module
-use Sidef;
-
 package Sidef::Optimizer {
 
-    use Scalar::Util qw(refaddr);
+    use 5.014;
 
     sub new {
-        my (undef, %args) = @_;
-        my %opts = (%args);
+        my (undef, %opts) = @_;
         bless \%opts, __PACKAGE__;
     }
 
@@ -36,7 +24,8 @@ package Sidef::Optimizer {
                 ## ok
             }
             elsif ($obj->{type} eq 'func' or $obj->{type} eq 'method') {
-                if ($addr{refaddr($obj)}++) {
+                require Scalar::Util;
+                if ($addr{Scalar::Util::refaddr($obj)}++) {
                     ## ok
                 }
                 else {
@@ -45,7 +34,8 @@ package Sidef::Optimizer {
             }
         }
         elsif ($ref eq 'Sidef::Variable::ClassInit') {
-            if ($addr{refaddr($obj)}++) {
+            require Scalar::Util;
+            if ($addr{Scalar::Util::refaddr($obj)}++) {
                 ## ok
             }
             else {
@@ -56,40 +46,51 @@ package Sidef::Optimizer {
             my %code = $self->optimize($obj->{code});
             $obj->{code} = \%code;
         }
+        elsif ($ref eq 'Sidef::Types::Array::HCArray') {
+            foreach my $i (0 .. $#{$obj}) {
+                if (ref($obj->[$i]) eq 'HASH') {
+                    $obj->[$i] = $self->optimize_expr($obj->[$i]);
+                }
+            }
+        }
+
+        if (not exists $expr->{ind} and not exists $expr->{call}) {
+            return $obj;
+        }
+
+        $obj = {
+                self => $obj,
+                (exists($expr->{ind})  ? (ind  => []) : ()),
+                (exists($expr->{call}) ? (call => []) : ()),
+               };
 
         # Indices
         if (exists $expr->{ind}) {
-            $obj = {self => $obj, ind => []};
-            foreach my $ind (@{$expr->{ind}}) {
-                push @{$obj->{ind}}, map { $self->optimize_expr(ref($_) eq 'HASH' ? $_ : {self => $_->get_value}) } @{$ind};
+            foreach my $i (0 .. $#{$expr->{ind}}) {
+                $obj->{ind}[$i] =
+                  [map { $self->optimize_expr(ref($_) eq 'HASH' ? $_ : {self => $_->get_value}) } @{$expr->{ind}[$i]}];
             }
         }
 
         # Method call on the self obj (+optional arguments)
         if (exists $expr->{call}) {
-            if (ref($obj) eq 'HASH') {
-                $obj->{call} = [];
-            }
-            else {
-                $obj = {self => $obj, call => []};
-            }
-            foreach my $call (@{$expr->{call}}) {
+            foreach my $i (0 .. $#{$expr->{call}}) {
+                my $call = $expr->{call}[$i];
 
                 # Method call
                 my $method = $call->{method};
                 if (ref($method) eq 'HASH') {
                     $method = $self->optimize_expr($method);
                 }
-                push @{$obj->{call}}, {method => $method};
+
+                $obj->{call}[$i] = {method => $method};
 
                 # Method arguments
                 if (exists $call->{arg}) {
-                    foreach my $i (0 .. $#{$call->{arg}}) {
-                        my $arg = $call->{arg}[$i];
-                        if (ref $arg eq 'HASH') {
-                            $arg = $self->optimize($arg);
-                        }
-                        push @{$obj->{call}[-1]{arg}}, $arg;
+                    foreach my $j (0 .. $#{$call->{arg}}) {
+                        my $arg = $call->{arg}[$j];
+                        push @{$obj->{call}[$i]{arg}},
+                          ref $arg eq 'HASH' ? do { my %arg = $self->optimize($arg); \%arg } : $arg;
                     }
                 }
             }
@@ -105,16 +106,30 @@ package Sidef::Optimizer {
         my @classes = keys %{$struct};
         foreach my $class (@classes) {
             foreach my $i (0 .. $#{$struct->{$class}}) {
-                my $expr = $struct->{$class}[$i];
-                my $obj  = $self->optimize_expr($expr);
-                push @{$opt_struct{$class}}, $obj;
+                push @{$opt_struct{$class}}, scalar $self->optimize_expr($struct->{$class}[$i]);
             }
         }
 
-        wantarray ? %opt_struct : $opt_struct{$classes[-1]}[-1];
+        wantarray ? %opt_struct : $#{$opt_struct{$classes[-1]}} > 0 ? \%opt_struct : $opt_struct{$classes[-1]}[-1];
     }
+};
 
-}
+1;
+
+__END__
+
+use utf8;
+use 5.014;
+use strict;
+use warnings;
+
+# The directory where Sidef lives
+use lib qw(..);
+
+# Load the Sidef main module
+use Sidef;
+
+#$SIG{__WARN__} = sub {die @_};
 
 # Initialize a new parser
 my $parser = Sidef::Parser->new();
@@ -122,7 +137,60 @@ my $parser = Sidef::Parser->new();
 # Parse some code and store the returned parse-tree
 my $struct = $parser->parse_script(code => <<'SIDEF_CODE');
 
-say((((("test")))));
+
+var arr = [[1],2,3];
+say arr[0][0];
+say arr[1];
+say arr[2];
+
+say arr[[1, 2]].dump;
+
+say arr[4..1].dump;
+
+var x = -1;
+say [1,2,3,4,5][++x];
+say [1,2,3,4,5][x++];
+say [1,2,3,4,5][x];
+say [1,2,3,4,5][x++];
+say [1,2,3,4,5][++x];
+
+say(((("hello"))));
+[((((("hi".say; "kitty")))))].dump.say;
+["a","b",("c".uc, "d")].dump.say;
+
+[["a","b","c"]].dump.say;
+
+func factorial(n is Num) {
+    n > 0 ? (factorial.call(n-1) * n) : 1;
+};
+
+say factorial(5);
+say (((("hello world"))));
+((((("Hello"))))).say;
+
+var x = 10;
+while(x > 1) {
+    say x;
+    x -= 1;
+};
+
+if (false) {
+    say "first true";
+}
+elsif ("y".say) {
+    say "second true";
+};
+
+
+func A(m, n) {
+    m == 0 ? (n + 1)
+           : (n == 0 ? A(m - 1, 1)
+                     : A(m - 1, A(m, n - 1)));
+};
+
+say A(1,4);
+
+say "All done!";
 
 SIDEF_CODE
 
