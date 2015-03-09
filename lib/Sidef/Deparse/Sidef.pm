@@ -10,11 +10,16 @@ package Sidef::Deparse::Sidef {
         my (undef, %args) = @_;
 
         my %opts = (
-                    before     => '',
-                    between    => ";\n",
-                    after      => ";\n",
-                    spaces_num => 4,
-                    namespaces => [],
+                    before         => '',
+                    between        => ";\n",
+                    after          => ";\n",
+                    spaces_num     => 4,
+                    namespaces     => [],
+                    obj_with_block => {
+                                       'Sidef::Types::Bool::While' => {
+                                                                       while => 1,
+                                                                      },
+                                      },
                     %args,
                    );
 
@@ -99,6 +104,9 @@ package Sidef::Deparse::Sidef {
         elsif ($ref eq 'Sidef::Types::Block::Next') {
             $code = 'next';
         }
+        elsif ($ref eq 'Sidef::Types::Block::Continue') {
+            $code = 'continue';
+        }
         elsif ($ref eq 'Sidef::Types::Hash::Hash') {
             $code = $obj->dump->get_value;
         }
@@ -156,8 +164,10 @@ package Sidef::Deparse::Sidef {
                     $code .= '(' . join(
                         ', ',
                         map {
-                                ref($_) eq 'HASH' ? $self->deparse($_)
-                              : ref($_) ? $self->deparse_expr({self => $_})
+                            ref($_) eq 'HASH' ? $self->deparse($_)
+                              : exists($self->{obj_with_block}{$ref})
+                              && exists($self->{obj_with_block}{$ref}{$method}) ? $self->deparse_expr({self => $_->{code}})
+                              : ref($_)                                         ? $self->deparse_expr({self => $_})
                               : Sidef::Types::String::String->new($_)->dump
                           } @{$call->{arg}}
                       )

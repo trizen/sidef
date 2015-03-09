@@ -1075,13 +1075,13 @@ package Sidef::Types::String::String {
         require Data::Dump;
         local $Data::Dump::TRY_BASE64 = 0;
 
-        my $copy = $self->get_value;
-        $self->new(Data::Dump::pp($copy));
+        $self->new(Data::Dump::pp($self->get_value));
     }
 
     sub dump {
         my ($self) = @_;
-        __PACKAGE__->new(q{'} . $self->get_value =~ s{([\\'])}{\\$1}gr . q{'});
+        my $pretty_dump = eval { $self->inspect };
+        $@ ? __PACKAGE__->new(q{'} . $self->get_value =~ s{([\\'])}{\\$1}gr . q{'}) : $pretty_dump;
     }
 
     {

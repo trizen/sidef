@@ -15,7 +15,7 @@ func cocktailsort(a) {
         { |i| cmpsw(i-1) } * max;
         swapped.not! && break;
         { |i| cmpsw(max-i) } * max;
-    } do while (swapped);
+    } do while {swapped};
     return a;
 }
 

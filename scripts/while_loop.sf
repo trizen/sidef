@@ -5,22 +5,6 @@
 #
 
 var num = 0;
-{
-    "Hello world (%d)!\n".printf(num);
-}
-while (num++ <= 3);
-
-
-var num2 = 0;
-while (num2++ <= 3) {
-    "Hello sidef (%d)!\n".printf(num2);
+while (++num <= 3) {
+    "Hello sidef (%d)!\n".printf(num);
 };
-
-
-#
-## The equivalent of a 'do {} while' condition:
-#
-
-{
-    "Hey!".say;
-} do while (false);

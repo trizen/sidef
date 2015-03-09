@@ -11,15 +11,15 @@ package Sidef::Types::Bool::If {
 
     sub if {
         my ($self, @args) = @_;
-        $self->{do_block} = defined($args[-1]) && $args[-1] ? 1 : 0;
+        $self->{do_block} = $args[-1] ? 1 : 0;
         $self;
     }
 
     *call = \&if;
 
     sub elsif {
-        my ($self, $code) = @_;
-        $self->{do_block} = Sidef::Types::Block::Code->new($code)->run ? 1 : 0;
+        my ($self, @args) = @_;
+        $self->{do_block} = $args[-1] ? 1 : 0;
         $self;
     }
 

@@ -20,7 +20,7 @@ while (i -= 1 >= 10) {
 {
     "Bau Bau".say, break;
     "Don't say this".say;
-} while (i-- > 5);
+} while {i-- > 5};
 
 #
 ## {...} for (array)

@@ -22,7 +22,7 @@ class Counter {
 
     method next_prime(p) {
         { p == 2 ? (p = 3) : (p += 2) }
-            do while(!self.is_prime(p));
+            do while {!self.is_prime(p)};
         return p;
     }
 }

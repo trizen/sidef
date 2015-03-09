@@ -32,6 +32,9 @@ package Sidef::Parser {
                             'Sidef::Types::Bool::If'     => 1,
                             'Sidef::Types::Block::Given' => 1,
                            },
+            obj_with_block => {
+                               'Sidef::Types::Bool::While' => 1,
+                              },
             static_obj_re => qr{\G
                 (?>
                        nil\b                          (?{ state $x = Sidef::Types::Nil::Nil->new })
@@ -1021,7 +1024,8 @@ package Sidef::Parser {
                         }
                     }
 
-                    my $name = '';
+                    my $name       = '';
+                    my $class_name = $self->{class};
                     if (not defined $built_in_obj) {
                         $name =
                             /\G($self->{var_name_re})\h*/goc ? $1
@@ -1034,6 +1038,8 @@ package Sidef::Parser {
                                                pos      => pos($_)
                                               );
                     }
+
+                    ($name, $class_name) = $self->get_name_and_class($name);
 
                     if ($type ne 'method'
                         && exists($self->{keywords}{$name})) {
@@ -1056,7 +1062,16 @@ package Sidef::Parser {
                                            pos      => pos($_),
                                           );
 
-                    unshift @{$self->{vars}{$self->{class}}},
+                    if (($type eq 'method' or $type eq 'func') and $name ne '') {
+                        my ($var) = $self->find_var($name, $class_name);
+
+                        # Redeclaration of a function or a method in the same scope
+                        if (ref $var) {
+
+                        }
+                    }
+
+                    unshift @{$self->{vars}{$class_name}},
                       {
                         obj   => $obj,
                         name  => $name,
@@ -1086,7 +1101,7 @@ package Sidef::Parser {
                         if (/\G\h*<<?\h*/gc) {
                             while (/\G($self->{var_name_re})\h*/gco) {
                                 my ($name) = $1;
-                                my ($class, $code) = $self->find_var($name, $self->{class});
+                                my ($class, $code) = $self->find_var($name, $class_name);
                                 if (ref $class) {
                                     if ($class->{type} eq 'class') {
                                         while (my ($name, $method) = each %{$class->{obj}{__METHODS__}}) {
@@ -1490,7 +1505,7 @@ package Sidef::Parser {
                 # Variable call
                 if (/\G($self->{var_name_re})/goc) {
                     my ($name, $class) = $self->get_name_and_class($1);
-                    my ($var, $code) = $self->find_var($name, $class);
+                    my ($var) = $self->find_var($name, $class);
 
                     if (ref $var) {
                         $var->{count}++;
@@ -1802,12 +1817,22 @@ package Sidef::Parser {
 
                         if (/\G\h*(?!;)/gc) {
                             my ($arg_obj, $pos) =
-                              /\G(?=\()/
-                              ? $self->parse_arguments(code => substr($_, pos))
+                              /\G(?=\()/ ? $self->parse_arguments(code => substr($_, pos))
+                              : exists($self->{obj_with_block}{ref $struct{$self->{class}}[-1]{self}})
+                              && /\G(?=\{)/ ? $self->parse_block(code => substr($_, pos))
                               : $self->parse_obj(code => substr($_, pos));
                             pos($_) += $pos;
 
                             if (defined $arg_obj) {
+
+                                #say $struct{$self->{class}}[-1]{self};
+                                #say ref $arg_obj;
+
+                                if (exists $self->{obj_with_block}{ref $struct{$self->{class}}[-1]{self}}
+                                    and ref $arg_obj eq 'HASH') {
+                                    $arg_obj = Sidef::Types::Block::Code->new($arg_obj);
+                                }
+
                                 push @{$struct{$self->{class}}[-1]{call}}, {method => $method, arg => [$arg_obj]};
                             }
                         }

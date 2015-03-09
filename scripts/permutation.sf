@@ -7,13 +7,13 @@ func permute (code, arr) {
         code.call(arr[idx]);
 
         var p = idx.offset;
-        {p--} while (idx[p - 1] > idx[p]);
+        while (idx[p - 1] > idx[p]) {p--};
         p == 0 && (return);
 
         var d = p;
         idx += idx.splice(p).reverse;
 
-        {d++} while (idx[p - 1] > idx[d]);
+        while (idx[p - 1] > idx[d]) {d++};
 
         var a = idx[p-1];
         var b = idx[d];

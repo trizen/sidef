@@ -147,14 +147,11 @@ package Sidef::Types::Block::Code {
     sub while {
         my ($self, $condition, $old_self) = @_;
 
-        {
-            if (Sidef::Types::Block::Code->new($condition)->run) {
-                defined($old_self) && ($old_self->{did_while} //= 1);
-                if (defined(my $res = $self->_run_code)) {
-                    $self->pop_stack();
-                    return (ref($res) eq __PACKAGE__ && defined($old_self) ? $old_self : $res);
-                }
-                redo;
+        while ($condition->run) {
+            defined($old_self) && ($old_self->{did_while} //= 1);
+            if (defined(my $res = $self->_run_code)) {
+                $self->pop_stack();
+                return (ref($res) eq ref($self) && defined($old_self) ? $old_self : $res);
             }
         }
 

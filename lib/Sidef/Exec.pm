@@ -16,24 +16,6 @@ package Sidef::Exec {
                             '\\\\'  => 1,
                             '\\\\=' => 1,
                            },
-               types => {
-                         'Sidef::Types::Block::Code' => {
-                                                         'while' => 1,
-                                                        },
-                         'Sidef::Types::Bool::While' => {
-                                                         'while' => 1,
-                                                        },
-                         'Sidef::Types::Bool::Ternary' => {
-                                                           ':' => 1,
-                                                          },
-                         'Sidef::Types::Bool::If' => {
-                                                      'elsif'  => 1,
-                                                      'elseif' => 1,
-                                                     },
-                         'Sidef::Types::Bool::Bool' => {
-                                                        '?' => 1,
-                                                       },
-                        },
               },
           __PACKAGE__;
     }
@@ -106,9 +88,6 @@ package Sidef::Exec {
                        } @{$expr->{ind}[$l]}
                     ];
                 };
-
-                # use Data::Dump qw(pp);
-                ## pp $level;
 
                 my $is_hash = ref($self_obj) eq 'Sidef::Types::Hash::Hash';
 
@@ -285,8 +264,9 @@ package Sidef::Exec {
                             ref($arg) eq 'HASH'
                             and not(
                                 (
-                                 exists($self->{lazy_ops}{$method})
-                                 or (exists($self->{types}{$type}) && exists($self->{types}{$type}{$method}))
+                                    exists($self->{lazy_ops}{$method})
+                                 || ($type eq 'Sidef::Types::Bool::Ternary' && $method eq ':')
+                                 || $method eq '?' && $type->can($method) eq Sidef::Object::Object->can($method)
                                 )
                                 || (
                                     $type eq 'Sidef::Variable::Init'

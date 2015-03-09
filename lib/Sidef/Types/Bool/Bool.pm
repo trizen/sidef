@@ -45,12 +45,6 @@ package Sidef::Types::Bool::Bool {
     *flip     = \&not;
     *toggle   = \&not;
 
-    # Ternary operator (BOOL ? TrueExpr : FalseExpr)
-    *{__PACKAGE__ . '::' . '?'} = sub {
-        my ($self, $code) = @_;
-        Sidef::Types::Bool::Ternary->new(code => $code, bool => $self->get_value);
-    };
-
     sub dump {
         my ($self) = @_;
         Sidef::Types::String::String->new($self->get_value ? 'true' : 'false');

@@ -55,7 +55,7 @@ while (true) {
           : (
             var d = '';
             { d = directions[directions.len.rand.int] }
-                do while (map.values.contains(d));
+                do while {map.values.contains(d)};
             d;
           )
         );

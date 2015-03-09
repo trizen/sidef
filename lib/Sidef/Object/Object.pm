@@ -5,10 +5,14 @@ package Sidef::Object::Object {
       Sidef::Convert::Convert
       );
 
+    my $get_value = sub {
+        $_[0]->isa('ARRAY') ? ($#{$_[0]} + 1) : $_[0]->get_value;
+    };
+
     # Logical AND
     *{__PACKAGE__ . '::' . '&&'} = sub {
         my ($self, $code) = @_;
-        $self->get_value
+        $get_value->($self)
           ? Sidef::Types::Block::Code->new($code)->run
           : $self;
     };
@@ -16,7 +20,7 @@ package Sidef::Object::Object {
     # Logical OR
     *{__PACKAGE__ . '::' . '||'} = sub {
         my ($self, $code) = @_;
-        $self->get_value
+        $get_value->($self)
           ? $self
           : Sidef::Types::Block::Code->new($code)->run;
     };
@@ -24,7 +28,7 @@ package Sidef::Object::Object {
     # Logical XOR
     *{__PACKAGE__ . '::' . '^'} = sub {
         my ($self, $val) = @_;
-        Sidef::Types::Bool::Bool->new($self->get_value xor $val->get_value);
+        Sidef::Types::Bool::Bool->new($get_value->($self) xor $get_value->($val));
     };
 
     # Defined-OR
@@ -34,6 +38,20 @@ package Sidef::Object::Object {
           ? Sidef::Types::Block::Code->new($code)->run
           : $self;
     };
+
+    # Ternary operator (Obj ? TrueExpr : FalseExpr)
+    *{__PACKAGE__ . '::' . '?'} = sub {
+        my ($self, $code) = @_;
+
+      #CORE::say ref $self;
+      #$get_value->($self)
+      #? Sidef::Types::Block::Code->new($code)->run #Sidef::Types::Black::Hole->new(Sidef::Types::Block::Code->new($code)->run)
+        Sidef::Types::Bool::Ternary->new(code => $code, bool => $get_value->($self));
+    };
+
+    #
+    # *{__PACKAGE__ . '::' . '?'} = \&{__PACKAGE__ . '::' . '&&'};
+    # *{__PACKAGE__ . '::' . ':'} = \&{__PACKAGE__ . '::' . '||'};
 
     # Smart match operator
     *{__PACKAGE__ . '::' . '~~'} = sub {

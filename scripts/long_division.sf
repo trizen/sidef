@@ -15,8 +15,9 @@ func divide (x,y,f) {
         x -= (y * i);
 
         var s = -1;
-        { x *= 10; s++; x.isZero && break }
-            while(y > x);
+        while (y > x) {
+            x *= 10; s++; x.isZero && break
+        }
 
         c.isZero && (z += '.');
         s.isPos  && (z += ('0' * s));

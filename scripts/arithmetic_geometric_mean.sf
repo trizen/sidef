@@ -9,7 +9,7 @@ func agm0(a0, g0) {
         $g1 = Math.sqrt($a0 * $g0);
         $a0 = ($a1+$g1 /2);
         $g0 = Math.sqrt($a1 * $g1);
-    } do while ($a0 != $a1);
+    } do while {$a0 != $a1};
     return $a0;
 }
 
