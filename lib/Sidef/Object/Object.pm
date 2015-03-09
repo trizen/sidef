@@ -42,16 +42,8 @@ package Sidef::Object::Object {
     # Ternary operator (Obj ? TrueExpr : FalseExpr)
     *{__PACKAGE__ . '::' . '?'} = sub {
         my ($self, $code) = @_;
-
-      #CORE::say ref $self;
-      #$get_value->($self)
-      #? Sidef::Types::Block::Code->new($code)->run #Sidef::Types::Black::Hole->new(Sidef::Types::Block::Code->new($code)->run)
         Sidef::Types::Bool::Ternary->new(code => $code, bool => $get_value->($self));
     };
-
-    #
-    # *{__PACKAGE__ . '::' . '?'} = \&{__PACKAGE__ . '::' . '&&'};
-    # *{__PACKAGE__ . '::' . ':'} = \&{__PACKAGE__ . '::' . '||'};
 
     # Smart match operator
     *{__PACKAGE__ . '::' . '~~'} = sub {

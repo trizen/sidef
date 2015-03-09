@@ -1825,9 +1825,6 @@ package Sidef::Parser {
 
                             if (defined $arg_obj) {
 
-                                #say $struct{$self->{class}}[-1]{self};
-                                #say ref $arg_obj;
-
                                 if (exists $self->{obj_with_block}{ref $struct{$self->{class}}[-1]{self}}
                                     and ref $arg_obj eq 'HASH') {
                                     $arg_obj = Sidef::Types::Block::Code->new($arg_obj);

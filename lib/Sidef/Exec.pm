@@ -266,7 +266,7 @@ package Sidef::Exec {
                                 (
                                     exists($self->{lazy_ops}{$method})
                                  || ($type eq 'Sidef::Types::Bool::Ternary' && $method eq ':')
-                                 || $method eq '?' && $type->can($method) eq Sidef::Object::Object->can($method)
+                                 || ($method eq '?' && $type->can($method) eq Sidef::Object::Object->can($method))
                                 )
                                 || (
                                     $type eq 'Sidef::Variable::Init'
