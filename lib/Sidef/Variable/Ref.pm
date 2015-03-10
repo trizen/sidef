@@ -53,6 +53,18 @@ package Sidef::Variable::Ref {
         $_[0]{var};
     }
 
+    sub lvalue {
+        my ($self, $var) = @_;
+
+        my $ref = ref($var);
+        if ($ref eq 'Sidef::Variable::Variable' or $ref eq 'Sidef::Variable::ClassVar') {
+            return $var->new(name => $var->{name}, type => $var->{type}, value => $var);
+        }
+
+        warn sprintf("[WARN] '%s' is not a variable!\n", $ref);
+        $var;
+    }
+
 };
 
 1;

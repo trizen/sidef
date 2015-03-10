@@ -104,7 +104,7 @@ package Sidef::Parser {
                 | require\b                                       (?{ state $x = Sidef::Module::Require->new })
                 | (?:(?:print(?:ln|f)?+|say|exit|read)\b|>>?)     (?{ state $x = Sidef::Sys::Sys->new })
                 | loop\b                                          (?{ state $x = Sidef::Types::Block::Code->new })
-                | (?:[*\\&]|\+\+|--)                              (?{ Sidef::Variable::Ref->new() })
+                | (?:[*\\&]|\+\+|--|lvalue\b)                     (?{ Sidef::Variable::Ref->new })
                 | [?√+~!-]                                        (?{ state $x = Sidef::Object::Unary->new })
                 | :                                               (?{ state $x = Sidef::Types::Hash::Hash->new })
               )
@@ -607,11 +607,13 @@ package Sidef::Parser {
                                       );
                 }
 
-                my ($var, $code) = $self->find_var($name, $self->{class});
+                if (!$opt{private}) {
+                    my ($var, $code) = $self->find_var($name, $self->{class});
 
-                if (defined($var) && $code) {
-                    warn "[WARN] Redeclaration of $opt{type} '$name' in same scope, at "
-                      . "$self->{file_name}, line $self->{line}\n";
+                    if (defined($var) && $code) {
+                        warn "[WARN] Redeclaration of $opt{type} '$name' in same scope, at "
+                          . "$self->{file_name}, line $self->{line}\n";
+                    }
                 }
 
                 my $value;

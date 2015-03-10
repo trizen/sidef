@@ -27,11 +27,6 @@ package Sidef::Variable::Variable {
         ref($self->{value}) ne 'Sidef::Types::Nil::Nil';
     }
 
-    sub lvalue {
-        my ($self) = @_;
-        $self->new(name => $self->{name}, type => $self->{type}, value => $self);
-    }
-
     sub is_defined {
         my ($self) = @_;
 
