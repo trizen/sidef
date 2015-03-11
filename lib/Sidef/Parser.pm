@@ -1827,12 +1827,18 @@ package Sidef::Parser {
 
                             if (defined $arg_obj) {
 
+                                my @arg = $arg_obj;
                                 if (exists $self->{obj_with_block}{ref $struct{$self->{class}}[-1]{self}}
                                     and ref $arg_obj eq 'HASH') {
-                                    $arg_obj = Sidef::Types::Block::Code->new($arg_obj);
+                                    @arg = Sidef::Types::Block::Code->new($arg_obj);
+                                }
+                                elsif (    ref($struct{$self->{class}}[-1]{self}) eq 'Sidef::Types::Block::For'
+                                       and ref $arg_obj eq 'HASH'
+                                       and $#{$arg_obj->{$self->{class}}} == 2) {
+                                    @arg = map { Sidef::Types::Block::Code->new($_) } @{$arg_obj->{$self->{class}}};
                                 }
 
-                                push @{$struct{$self->{class}}[-1]{call}}, {method => $method, arg => [$arg_obj]};
+                                push @{$struct{$self->{class}}[-1]{call}}, {method => $method, arg => [@arg]};
                             }
                         }
                     }

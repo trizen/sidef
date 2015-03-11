@@ -263,27 +263,18 @@ package Sidef::Exec {
                         if (
                             ref($arg) eq 'HASH'
                             and not(
-                                (
-                                    exists($self->{lazy_ops}{$method})
-                                 || ($type eq 'Sidef::Types::Bool::Ternary' && $method eq ':')
-                                 || ($method eq '?' && $type->can($method) eq Sidef::Object::Object->can($method))
-                                )
-                                || (
-                                    $type eq 'Sidef::Variable::Init'
-                                    && (   $self_obj->{vars}[0]->{type} eq 'static'
-                                        || $self_obj->{vars}[0]->{type} eq 'const')
-                                    && exists($self_obj->{vars}[0]->{inited})
+                                    (
+                                        exists($self->{lazy_ops}{$method})
+                                     || ($type eq 'Sidef::Types::Bool::Ternary' && $method eq ':')
+                                     || ($method eq '?' && $type->can($method) eq Sidef::Object::Object->can($method))
+                                    )
+                                    || (
+                                        $type eq 'Sidef::Variable::Init'
+                                        && (   $self_obj->{vars}[0]->{type} eq 'static'
+                                            || $self_obj->{vars}[0]->{type} eq 'const')
+                                        && exists($self_obj->{vars}[0]->{inited})
+                                       )
                                    )
-                                || (
-                                        ($type eq 'Sidef::Types::Block::Code' || $type eq 'Sidef::Types::Block::For')
-                                    and ($method eq 'for' || $method eq 'foreach')
-                                    and do {
-                                        my ($class) = keys %{$arg};
-                                        ref $arg->{$class} eq 'ARRAY'
-                                          and $#{$arg->{$class}} == 2;
-                                    }
-                                   )
-                            )
                           ) {
                             local $self->{var_ref} = ref($self_obj) eq 'Sidef::Variable::Ref' && $method ne '*';
                             push @arguments, $self->execute($arg);

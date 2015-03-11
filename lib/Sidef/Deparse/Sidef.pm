@@ -150,7 +150,7 @@ package Sidef::Deparse::Sidef {
             foreach my $call (@{$expr->{call}}) {
                 my $method = $call->{method};
                 if (ref($method) eq 'HASH') {
-
+                    $code .= '.(' . $self->deparse_expr($method) . ')';
                 }
                 elsif ($method =~ /^[[:alpha:]_]/) {
                     $code .= '.' if $code ne '';
@@ -167,7 +167,10 @@ package Sidef::Deparse::Sidef {
                             ref($_) eq 'HASH' ? $self->deparse($_)
                               : exists($self->{obj_with_block}{$ref})
                               && exists($self->{obj_with_block}{$ref}{$method}) ? $self->deparse_expr({self => $_->{code}})
-                              : ref($_)                                         ? $self->deparse_expr({self => $_})
+                              : $ref eq 'Sidef::Types::Block::For'
+                              && $#{$call->{arg}} == 2
+                              && ref($_) eq 'Sidef::Types::Block::Code' ? $self->deparse_expr($_->{code})
+                              : ref($_) ? $self->deparse_expr({self => $_})
                               : Sidef::Types::String::String->new($_)->dump
                           } @{$call->{arg}}
                       )

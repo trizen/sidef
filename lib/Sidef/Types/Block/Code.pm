@@ -28,6 +28,11 @@ package Sidef::Types::Block::Code {
         $exec->execute($self->{code});
     }
 
+    sub _execute_expr {
+        my ($self) = @_;
+        $exec->execute_expr($self->{code});
+    }
+
     sub get_value {
         my ($self) = @_;
         sub {
@@ -318,29 +323,20 @@ package Sidef::Types::Block::Code {
     sub for {
         my ($self, $arg, @rest) = @_;
 
-        $self->_is_array($arg, 1, 1)
-          && return $arg->each($self);
-
-        if (ref $arg eq 'HASH') {
-            my $counter = 0;
-            {
-                foreach my $class (keys %{$arg}) {
-
-                    if ($counter++ == 0) {
-                        $exec->execute_expr($arg->{$class}[0]);
-                    }
-
-                    if ($exec->execute_expr($arg->{$class}[1])) {
-                        if (defined(my $res = $self->_run_code)) {
-                            return $res;
-                        }
-                        $exec->execute_expr($arg->{$class}[2]);
-                        redo;
-                    }
-
-                    last;
+        if (    @_ == 4
+            and ref($_[1]) eq __PACKAGE__
+            and ref($_[2]) eq __PACKAGE__
+            and ref($_[3]) eq __PACKAGE__) {
+            my ($one, $two, $three) = ($_[1], $_[2], $_[3]);
+            for ($one->_execute_expr ; $two->_execute_expr ; $three->_execute_expr) {
+                if (defined(my $res = $self->_run_code)) {
+                    return $res;
                 }
             }
+            $self;
+        }
+        elsif (@_ == 2 and $arg->can('each')) {
+            $arg->each($self);
         }
         else {
             my ($var_ref) = $self->init_block_vars();
@@ -350,9 +346,8 @@ package Sidef::Types::Block::Code {
                     return $res;
                 }
             }
+            $self;
         }
-
-        $self;
     }
 };
 
