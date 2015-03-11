@@ -1075,7 +1075,7 @@ package Sidef::Types::String::String {
         require Data::Dump;
         local $Data::Dump::TRY_BASE64 = 0;
 
-        $self->new(Data::Dump::pp($self->get_value));
+        $self->new(Data::Dump::quote($self->get_value));
     }
 
     sub dump {

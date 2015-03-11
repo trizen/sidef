@@ -112,6 +112,9 @@ package Sidef::Deparse::Sidef {
                 $code = 'return';
             }
         }
+        elsif ($ref eq 'Sidef::Math::Math') {
+            $code = 'Math';
+        }
         elsif ($ref eq 'Sidef::Types::Glob::FileHandle') {
             if ($obj->{fh} eq \*STDIN) {
                 $code = 'STDIN';
@@ -126,8 +129,35 @@ package Sidef::Deparse::Sidef {
                 $code = 'ARGF';
             }
         }
+        elsif ($ref eq 'Sidef::Variable::Magic') {
+
+            state $magic_vars = {
+                                 \$.  => '$.',
+                                 \$?  => '$?',
+                                 \$$  => '$$',
+                                 \$^T => '$^T',
+                                 \$|  => '$|',
+                                 \$!  => '$!',
+                                 \$"  => '$"',
+                                 \$\  => '$\\',
+                                 \$/  => '$/',
+                                 \$;  => '$;',
+                                 \$,  => '$,',
+                                 \$^O => '$^O',
+                                 \$^X => '$^PERL',
+                                 \$0  => '$0',
+                                 \$(  => '$(',
+                                 \$)  => '$)',
+                                 \$<  => '$<',
+                                 \$>  => '$>',
+                                };
+
+            if (exists $magic_vars->{$obj->{ref}}) {
+                $code = $magic_vars->{$obj->{ref}};
+            }
+        }
         elsif ($ref eq 'Sidef::Types::Hash::Hash') {
-            $code = $obj->dump->get_value;
+            $code = 'Hash.new()';
         }
         elsif ($ref eq 'Sidef::Types::Regex::Regex') {
             $code .= $obj->dump->get_value;
