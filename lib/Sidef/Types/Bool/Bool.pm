@@ -29,6 +29,16 @@ package Sidef::Types::Bool::Bool {
         ${$_[0]};
     }
 
+    *{__PACKAGE__ . '::' . '|'} = sub {
+        my ($self, $arg) = @_;
+        $self->get_value ? $self : $arg;
+    };
+
+    *{__PACKAGE__ . '::' . '&'} = sub {
+        my ($self, $arg) = @_;
+        $self->get_value ? $arg : $self;
+    };
+
     sub is_true {
         $_[0];
     }
