@@ -1,22 +1,24 @@
 #!/usr/bin/perl
 
-var spec = ( require 'File::Spec::Functions'->() );     # ->() is for functional
-"** This file: %s\n".printf(Str.new(spec.catfile(spec.curdir, __FILE__)));
-"** Full path: %s\n".printf(Str.new(spec.rel2abs(__FILE__)));
+var spec = frequire('File::Spec::Functions');
+"** This file: %s\n".printf(spec.catfile(spec.curdir, __FILE__));
+"** Full path: %s\n".printf(spec.rel2abs(__FILE__));
 
 #
 ## Same thing, but with a req check
 #
 
-var req = ( require 'File::Spec::Functions' );
+var sf = (
+            try   { frequire 'File::Spec::Functions' }
+            catch { nil }
+         );
 
-if (nil != req) {
-    var spec = ( req->() );
-    "** Root dir: '%s'\n".printf(spec.rootdir);
+if (nil != sf) {
+    "** Root dir: '%s'\n".printf(sf.rootdir);
 }
 
 __END__
-var ron = ( require 'Lingua::RO::Numbers'->() );
-var num = (Str.new(ron.number_to_ro(123553)));
+var ron = frequire 'Lingua::RO::Numbers';
+var num = ron.number_to_ro(123553);
 
 num.say;

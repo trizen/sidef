@@ -15,11 +15,16 @@ package Sidef::Module::Require {
         eval { require $module };
 
         if ($@) {
-            warn substr($@, 0, rindex($@, ' at ')), "\n";
-            return;
+            die substr($@, 0, rindex($@, ' at ')), "\n";
         }
 
-        Sidef::Module::Caller->_new(module => $module_name);
+        Sidef::Module::Caller->__NEW__(module => $module_name);
+    }
+
+    sub frequire {
+        my ($self, $module) = @_;
+        my $caller = $self->require($module);
+        Sidef::Module::Func->__NEW__(module => $caller->{module});
     }
 }
 

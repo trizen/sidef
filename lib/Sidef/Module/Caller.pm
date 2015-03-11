@@ -3,7 +3,7 @@ package Sidef::Module::Caller {
     use 5.014;
     our $AUTOLOAD;
 
-    sub _new {
+    sub __NEW__ {
         my (undef, %opt) = @_;
         bless \%opt, __PACKAGE__;
     }
@@ -17,7 +17,7 @@ package Sidef::Module::Caller {
         my ($method) = ($AUTOLOAD =~ /^.*[^:]::(.*)$/);
 
         if ($method eq '') {
-            return Sidef::Module::Func->_new(module => $self->{module});
+            return Sidef::Module::Func->__NEW__(module => $self->{module});
         }
 
         my @results;
@@ -26,10 +26,10 @@ package Sidef::Module::Caller {
                 @arg
                 ? (
                    map {
-                        local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
-                           ref($_) =~ /^Sidef::/ && $_->can('get_value') ? $_->get_value
+                       local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
+                           ref($_) eq __PACKAGE__            ? $_->{module}
                          : ref($_) eq 'Sidef::Variable::Ref' ? $_->get_var->get_value
-                         : ref($_) eq __PACKAGE__            ? $_->{module}
+                         : ref($_) =~ /^Sidef::/ && $_->can('get_value') ? $_->get_value
                          : $_
                      } @arg
                   )
@@ -48,7 +48,7 @@ package Sidef::Module::Caller {
 
         my $result = $results[0];
         if (ref($result) && eval { $result->can('can') }) {
-            return $self->_new(module => ($result));
+            return $self->__NEW__(module => ($result));
         }
 
         Sidef::Perl::Perl->to_sidef($result);

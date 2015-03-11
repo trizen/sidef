@@ -3,7 +3,7 @@ package Sidef::Module::Func {
     use 5.014;
     our $AUTOLOAD;
 
-    sub _new {
+    sub __NEW__ {
         my (undef, %opt) = @_;
         bless \%opt, __PACKAGE__;
     }
@@ -12,7 +12,7 @@ package Sidef::Module::Func {
         return;
     }
 
-    sub __locate {
+    sub __LOCATE__ {
         my ($self, $name) = @_;
 
         no strict 'refs';
@@ -28,7 +28,7 @@ package Sidef::Module::Func {
     sub _var {
         my ($self, $name) = @_;
 
-        if (defined(my $type = $self->__locate($name))) {
+        if (defined(my $type = $self->__LOCATE__($name))) {
             no strict 'refs';
             return ${$type};
         }
@@ -40,7 +40,7 @@ package Sidef::Module::Func {
     sub _arr {
         my ($self, $name) = @_;
 
-        if (defined(my $type = $self->__locate($name))) {
+        if (defined(my $type = $self->__LOCATE__($name))) {
             no strict 'refs';
             return Sidef::Types::Array::Array->new(@{$type});
         }
@@ -61,12 +61,12 @@ package Sidef::Module::Func {
                 ? (
                    map {
                        local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
-                       ref($_) =~ /^Sidef::/ && $_->can('get_value')
-                         ? $_->get_value
-                         : ref($_) eq 'Sidef::Variable::Ref' ? do {
+                       ref($_) eq 'Sidef::Variable::Ref'
+                         ? do {
                            my $obj = $_->get_var->get_value;
                            ref $obj eq 'Sidef::Types::Hash::Hash' ? $obj->{data} //= {} : $obj;
                          }
+                         : ref($_) =~ /^Sidef::/ && $_->can('get_value') ? $_->get_value
                          : $_
                      } @arg
                   )

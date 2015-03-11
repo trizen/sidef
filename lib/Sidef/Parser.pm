@@ -101,7 +101,7 @@ package Sidef::Parser {
                 | break\b                                         (?{ Sidef::Types::Block::Break->new })
                 | try\b                                           (?{ Sidef::Types::Block::Try->new })
                 | (?:given|switch)\b                              (?{ Sidef::Types::Block::Given->new })
-                | require\b                                       (?{ state $x = Sidef::Module::Require->new })
+                | f?require\b                                     (?{ state $x = Sidef::Module::Require->new })
                 | (?:(?:print(?:ln|f)?+|say|exit|read)\b|>>?)     (?{ state $x = Sidef::Sys::Sys->new })
                 | loop\b                                          (?{ state $x = Sidef::Types::Block::Code->new })
                 | (?:[*\\&]|\+\+|--|lvalue\b)                     (?{ Sidef::Variable::Ref->new })
@@ -151,7 +151,7 @@ package Sidef::Parser {
                   try loop
                   given switch
                   continue
-                  require
+                  require frequire
                   true false
                   nil
                   import

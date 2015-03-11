@@ -8,12 +8,10 @@ if (!response[:success]) {
     "GET failed!\n".die;
 }
 
-say "#{Str.new(response[:status])} #{Str.new(response[:reason])}";
+say "#{response[:status]} #{response[:reason]}";
 
 response[:headers].each { |k,v|
-    for (v) { |item|
-        say "#{k}: #{item}";
-    }
+    say "#{k}: #{v}";
 }
 
 response[:content].len? && response[:content].len.to_s.say;

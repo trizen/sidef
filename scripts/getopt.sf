@@ -5,9 +5,9 @@
 #
 
 var getopt = (
-           try   { require 'Getopt::Std' -> () }
+           try   { frequire 'Getopt::Std' }
            catch { warn("** Getopt::Std is not installed!"); return }
-);
+        );
 
 var hash = Hash.new;
 getopt.getopts('de:', \hash);

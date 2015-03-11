@@ -147,13 +147,13 @@ package Sidef::Convert::Convert {
     *toArray = \&to_array;
 
     sub to_caller {
-        Sidef::Module::Caller->_new(module => $_[0]->get_value);
+        Sidef::Module::Caller->__NEW__(module => $_[0]->get_value);
     }
 
     *toCaller = \&to_caller;
 
     sub to_fcaller {
-        Sidef::Module::Func->_new(module => $_[0]->get_value);
+        Sidef::Module::Func->__NEW__(module => $_[0]->get_value);
     }
 
     *toFcaller = \&to_fcaller;
