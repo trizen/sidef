@@ -39,7 +39,7 @@
 
     module Z {
         f();
-        func f() {say "y"};
+        f = func {say "y"};
         func g() {say "z"};
     };
 

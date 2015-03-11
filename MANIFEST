@@ -299,7 +299,9 @@ scripts/module_loading.sf
 scripts/module_order_and_redeclaration.sf
 scripts/multi_argument_var.sf
 scripts/multi_file_edit.sf
+scripts/multi_functions.sf
 scripts/multi_loop_break.sf
+scripts/multi_methods.sf
 scripts/multi_var_assignment.sf
 scripts/named_block_arguments.sf
 scripts/next.sf

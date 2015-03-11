@@ -253,10 +253,38 @@ package Sidef::Types::Block::Code {
         }
     }
 
+    sub _check_function {
+        my ($self, @args) = @_;
+
+        my @candidates;
+        my @possible_candidates;
+        foreach my $f ($self, map { $_->get_value } @{$self->{kids}}) {
+            if ($#{$f->{init_vars}} - 1 == $#args) {
+                push @candidates, $f;
+            }
+            else {
+                push @possible_candidates, $f;
+            }
+        }
+
+        foreach my $f (@candidates, @possible_candidates) {
+            eval { $f->init_block_vars(@args) };
+            !$@ && return $f;
+        }
+
+        $self->init_block_vars(@args);
+        $self;
+    }
+
     sub call {
         my ($self, @args) = @_;
 
-        $self->init_block_vars(@args);
+        if (exists $self->{kids}) {
+            $self = $self->_check_function(@args);
+        }
+        else {
+            $self->init_block_vars(@args);
+        }
 
         my $result = $self->run;
         if (ref($result) eq 'Sidef::Types::Block::Return') {

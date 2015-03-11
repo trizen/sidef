@@ -1,0 +1,27 @@
+#!/usr/bin/ruby
+
+func test(a is String){
+    say "got a string: #{a}";
+};
+
+func test(n is Number) {
+    say "got a number: #{n}";
+};
+
+func test(n is Number, m is Array) {
+    say "got a number: #{n} and an array: #{m.dump}";
+};
+
+func test(s is String, p is Number) {
+    say "Got a string: #{s} and a number: #{p}";
+};
+
+test("hello", 21);
+test("sidef");
+test(12, [1,1]);
+test(42);
+
+test(12, [1,1]);
+test(42);
+test("hello", 21);
+test("sidef");

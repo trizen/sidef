@@ -1064,23 +1064,27 @@ package Sidef::Parser {
                                            pos      => pos($_),
                                           );
 
+                    my $private = 0;
                     if (($type eq 'method' or $type eq 'func') and $name ne '') {
                         my ($var) = $self->find_var($name, $class_name);
 
                         # Redeclaration of a function or a method in the same scope
                         if (ref $var) {
-
+                            push @{$var->{obj}{value}{kids}}, $obj;
+                            $private = 1;
                         }
                     }
 
-                    unshift @{$self->{vars}{$class_name}},
-                      {
-                        obj   => $obj,
-                        name  => $name,
-                        count => 0,
-                        type  => $type,
-                        line  => $self->{line},
-                      };
+                    if (not $private) {
+                        unshift @{$self->{vars}{$class_name}},
+                          {
+                            obj   => $obj,
+                            name  => $name,
+                            count => 0,
+                            type  => $type,
+                            line  => $self->{line},
+                          };
+                    }
 
                     if ($type eq 'my') {
                         return Sidef::Variable::InitMy->new($name), pos($_);
@@ -1192,7 +1196,9 @@ package Sidef::Parser {
                         pos($_) += $pos - (length($args) + 1);
 
                         $obj->set_value($block);
-                        $self->{current_class}->__add_method__($name, $block) if $type eq 'method';
+                        if (not $private) {
+                            $self->{current_class}->__add_method__($name, $block) if $type eq 'method';
+                        }
                     }
 
                     return $obj, pos;
