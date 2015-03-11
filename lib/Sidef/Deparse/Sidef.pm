@@ -61,7 +61,7 @@ package Sidef::Deparse::Sidef {
             $code = join(', ', $self->deparse($obj));
         }
         elsif ($ref eq "Sidef::Variable::Variable") {
-            if ($obj->{type} eq 'var' or $obj->{type} eq 'static') {
+            if ($obj->{type} eq 'var' or $obj->{type} eq 'static' or $obj->{type} eq 'const') {
                 $code = $obj->{name} =~ /^[0-9]+\z/ ? ('$' . $obj->{name}) : $obj->{name};
             }
             elsif ($obj->{type} eq 'func' or $obj->{type} eq 'method') {
