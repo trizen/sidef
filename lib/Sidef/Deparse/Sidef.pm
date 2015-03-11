@@ -107,6 +107,25 @@ package Sidef::Deparse::Sidef {
         elsif ($ref eq 'Sidef::Types::Block::Continue') {
             $code = 'continue';
         }
+        elsif ($ref eq 'Sidef::Types::Block::Return') {
+            if (not exists $expr->{call}) {
+                $code = 'return';
+            }
+        }
+        elsif ($ref eq 'Sidef::Types::Glob::FileHandle') {
+            if ($obj->{fh} eq \*STDIN) {
+                $code = 'STDIN';
+            }
+            elsif ($obj->{fh} eq \*STDOUT) {
+                $code = 'STDOUT';
+            }
+            elsif ($obj->{fh} eq \*STDERR) {
+                $code = 'STDERR';
+            }
+            elsif ($obj->{fh} eq \*ARGV) {
+                $code = 'ARGF';
+            }
+        }
         elsif ($ref eq 'Sidef::Types::Hash::Hash') {
             $code = $obj->dump->get_value;
         }
@@ -179,7 +198,7 @@ package Sidef::Deparse::Sidef {
             }
         }
 
-        ref($code) ? '###' . $code . '###' : $code eq '' ? '#~#' . $obj . '#~#' : $code;
+        ref($code) ? '###' . $code . '###' : $code;
     }
 
     sub deparse {
