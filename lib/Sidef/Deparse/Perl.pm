@@ -5,6 +5,7 @@ package Sidef::Deparse::Perl {
     use Scalar::Util qw(refaddr reftype);
 
     # This module is under development...
+    # This module is very likely to be a failed experiment...
 
     sub new {
         my (undef, %args) = @_;
@@ -12,12 +13,57 @@ package Sidef::Deparse::Perl {
         my %opts = (
             before => do {
                 local $" = "\n           ";
-                <<"HEADER";
+                <<"HEADER" . <<'CODE';
 use lib qw(@INC);
 use 5.014;
-use autobox;
 use Sidef;
+
 HEADER
+package Sidef::Types::Block::PerlCode {
+
+    use 5.014;
+    use parent qw(
+      Sidef::Types::Block::Code
+      );
+
+    use overload '*' => \&repeat;
+
+    sub new {
+        my (undef, $sub) = @_;
+        bless {code => $sub}, __PACKAGE__;
+    }
+
+    sub _execute {
+        my ($self, @args) = @_;
+        $self->{code}->(@args);
+    }
+
+    sub repeat {
+        my ($self, $num) = @_;
+        foreach my $i (1 .. $num) {
+            local $_ = $i;
+            $self->_execute;
+        }
+        $self;
+    }
+
+    sub run {
+        my ($self) = @_;
+        $self->_execute;
+    }
+
+    sub call {
+        my ($self, @args) = @_;
+        $self->_execute(@args);
+    }
+
+    {
+        no strict 'refs';
+        *{__PACKAGE__ . '::' . '*'} = \&repeat;
+    }
+
+};
+CODE
             },
             between    => ";\n",
             after      => ";\n",
@@ -107,6 +153,9 @@ HEADER
         elsif ($ref eq 'Sidef::Types::Bool::If') {
             $self->{if_condition} = 1;
         }
+        elsif ($ref eq 'Sidef::Types::Block::For') {
+            $self->{for_loop} = 1;
+        }
         elsif ($ref eq 'Sidef::Types::Block::Switch') {    # special conversion needed
 
         }
@@ -129,21 +178,24 @@ HEADER
         elsif ($ref eq 'Sidef::Types::Number::Number') {
             local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
 
-            #$code = $ref. '->new(' . $obj->get_value . ')';
-            $code = $obj->get_value;
+            $code = $ref . '->new(' . $obj->get_value . ')';
+
+            #$code = $obj->get_value;
         }
         elsif ($ref eq 'Sidef::Types::Bool::Bool') {
 
-            #$code = $ref . '->new(' . $obj->get_value . ')';
-            $code = $obj->get_value;
+            $code = $ref . '->new(' . $obj->get_value . ')';
+
+            #$code = $obj->get_value;
         }
         elsif ($ref eq 'Sidef::Types::Array::Array' or $ref eq 'Sidef::Types::Array::HCArray') {
             $code .= $self->_dump_array($obj);
         }
         elsif (reftype($obj) eq 'SCALAR') {
 
-            #$code = $ref.'->new('.$obj->dump->get_value.')';
-            $code = $obj->dump->get_value;
+            $code = $ref . '->new(' . $obj->dump->get_value . ')';
+
+            #$code = $obj->dump->get_value;
         }
 
         # Indices
@@ -171,6 +223,31 @@ HEADER
                             map {
                                 ref($_) eq 'HASH'
                                   ? '(' . do { ++$self->{if_condition}; $self->deparse($_) }
+                                  . ')'
+                                  : ref($_) ? $self->deparse_expr({self => $_})
+                                  : Sidef::Types::String::String->new($_)->dump
+                              } @{$call->{arg}}
+                        );
+                    }
+                }
+                return $code;
+            }
+
+            if ($self->{for_loop}-- > 0) {
+                foreach my $call (@{$expr->{call}}) {
+                    my $method = $call->{method};
+
+                    if ($method ne 'do') {
+                        $code .= $method;
+                    }
+
+                    if (exists $call->{arg}) {
+                        local $self->{plain_code} = 1;
+                        $code .= join(
+                            ', ',
+                            map {
+                                ref($_) eq 'HASH'
+                                  ? '(' . do { ++$self->{for_loop}; $self->deparse($_) }
                                   . ')'
                                   : ref($_) ? $self->deparse_expr({self => $_})
                                   : Sidef::Types::String::String->new($_)->dump
