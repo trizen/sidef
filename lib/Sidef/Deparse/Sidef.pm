@@ -36,7 +36,8 @@ package Sidef::Deparse::Sidef {
         join(
             ', ',
             map {
-                $_->{name}
+                    (exists($_->{multi}) ? '*' : '')
+                  . $_->{name}
                   . (ref($_->{value}) eq 'Sidef::Types::Nil::Nil' ? '' : ('=' . $self->deparse_expr({self => $_->{value}})))
               } @vars
             );
@@ -231,7 +232,7 @@ package Sidef::Deparse::Sidef {
             }
         }
 
-        ref($code) ? '###' . $code . '###' : $code;
+        ref($code) ? '#`{' . $code . '}' : $code;
     }
 
     sub deparse {
