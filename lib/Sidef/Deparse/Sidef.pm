@@ -159,6 +159,9 @@ package Sidef::Deparse::Sidef {
         elsif ($ref eq 'Sidef::Types::Hash::Hash') {
             $code = 'Hash.new()';
         }
+        elsif ($ref eq 'Sidef::Types::Glob::Socket') {
+            $code = 'Socket';
+        }
         elsif ($ref eq 'Sidef::Types::Regex::Regex') {
             $code .= $obj->dump->get_value;
         }

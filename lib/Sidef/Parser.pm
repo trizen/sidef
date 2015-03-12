@@ -58,6 +58,7 @@ package Sidef::Parser {
                      | Str(?:ing)?+\b                 (?{ state $x = Sidef::Types::String::String->new })
                      | Num(?:ber)?+\b                 (?{ state $x = Sidef::Types::Number::Number->new })
                      | Math\b                         (?{ state $x = Sidef::Math::Math->new })
+                     | Socket\b                       (?{ state $x = Sidef::Types::Glob::Socket->new })
                      | Pipe\b                         (?{ state $x = Sidef::Types::Glob::Pipe->new })
                      | Byte\b                         (?{ state $x = Sidef::Types::Byte::Byte->new })
                      | LazyMethod\b                   (?{ state $x = Sidef::Variable::LazyMethod->new })
@@ -175,6 +176,7 @@ package Sidef::Parser {
                   Complex
                   Math
                   Pipe
+                  Socket
                   Byte Bytes
                   Chr Char
                   Chrs Chars

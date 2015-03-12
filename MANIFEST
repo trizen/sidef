@@ -91,6 +91,8 @@ lib/Sidef/Types/Glob/Pipe.pm
 lib/Sidef/Types/Glob/Pipe.pod
 lib/Sidef/Types/Glob/PipeHandle.pm
 lib/Sidef/Types/Glob/PipeHandle.pod
+lib/Sidef/Types/Glob/Socket.pm
+lib/Sidef/Types/Glob/SocketHandle.pm
 lib/Sidef/Types/Glob/Stat.pm
 lib/Sidef/Types/Glob/Stat.pod
 lib/Sidef/Types/Hash/Hash.pm
