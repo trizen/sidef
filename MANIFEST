@@ -265,6 +265,7 @@ scripts/Interactive/arithmetic_integer_stdin.sf
 scripts/Interactive/brainf___.sf
 scripts/Interactive/cosmic_calendar.sf
 scripts/Interactive/guess_the_number_player.sf
+scripts/Interactive/socket.sf
 scripts/Interactive/stdin.sf
 scripts/inverted_syntax.sf
 scripts/JASH.sf
