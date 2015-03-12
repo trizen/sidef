@@ -236,6 +236,7 @@ scripts/functions.sf
 scripts/Games/asciiplanes.sf
 scripts/Games/bulls_and_cows.sf
 scripts/Games/bulls_and_cows_player.sf
+scripts/Games/game_of_life.sf
 scripts/Games/rock_paper_scissors.sf
 scripts/gamma_function.sf
 scripts/gcd.sf

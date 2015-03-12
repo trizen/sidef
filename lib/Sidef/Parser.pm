@@ -44,6 +44,7 @@ package Sidef::Parser {
                      | continue\b                     (?{ state $x = Sidef::Types::Block::Continue->new })
                      | BlackHole\b                    (?{ state $x = Sidef::Types::Black::Hole->new })
                      | Block\b                        (?{ state $x = Sidef::Types::Block::Code->new })
+                     | Backtick\b                     (?{ state $x = Sidef::Types::Glob::Backtick->new })
                      | ARGF\b                         (?{ state $x = Sidef::Types::Glob::FileHandle->new(fh => \*ARGV) })
                      | STDIN\b                        (?{ state $x = Sidef::Types::Glob::FileHandle->stdin })
                      | STDOUT\b                       (?{ state $x = Sidef::Types::Glob::FileHandle->stdout })
@@ -189,6 +190,7 @@ package Sidef::Parser {
                   Parser
                   Block
                   BlackHole
+                  Backtick
                   LazyMethod
 
                   my
@@ -826,7 +828,7 @@ package Sidef::Parser {
                                                ]
                             };
 
-                        push @{$struct->{$self->{class}}[-1]{call}}, {method => '`'};
+                        push @{$struct->{$self->{class}}[-1]{call}}, {method => 'exec'};
                         $obj = $struct;
                     }
                     elsif (@array_like) {

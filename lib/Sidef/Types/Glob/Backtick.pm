@@ -1,7 +1,8 @@
 package Sidef::Types::Glob::Backtick {
 
-    use 5.014;
-    our @ISA = qw(Sidef);
+    use parent qw(
+      Sidef::Object::Object
+      );
 
     sub new {
         my (undef, $backtick) = @_;
@@ -12,12 +13,20 @@ package Sidef::Types::Glob::Backtick {
         ${$_[0]};
     }
 
-    {
-        no strict 'refs';
-        *{__PACKAGE__ . '::' . '`'} = sub {
-            my ($self) = @_;
-            Sidef::Types::String::String->new(scalar `$$self`)->decode_utf8;
-        };
+    sub run {
+        my ($self) = @_;
+        Sidef::Types::String::String->new(scalar `$$self`)->decode_utf8;
+    }
+
+    *execute = \&run;
+    *exec    = \&run;
+
+    *{__PACKAGE__ . '::' . '`'} = \&run;
+
+    sub dump {
+        my ($self) = @_;
+        Sidef::Types::String::String->new(
+                                 'Backtick.new(' . Sidef::Types::String::String->new($self->get_value)->dump->get_value . ')');
     }
 };
 
