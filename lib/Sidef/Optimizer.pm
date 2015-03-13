@@ -2,12 +2,13 @@ package Sidef::Optimizer {
 
     use 5.014;
 
+    my %addr;
+
     sub new {
         my (undef, %opts) = @_;
+        %addr = ();
         bless \%opts, __PACKAGE__;
     }
-
-    my %addr;
 
     sub optimize_expr {
         my ($self, $expr) = @_;
@@ -43,8 +44,14 @@ package Sidef::Optimizer {
             }
         }
         elsif ($ref eq 'Sidef::Types::Block::Code') {
-            my %code = $self->optimize($obj->{code});
-            $obj->{code} = \%code;
+            require Scalar::Util;
+            if ($addr{Scalar::Util::refaddr($obj)}++) {
+                ## ok
+            }
+            else {
+                my %code = $self->optimize($obj->{code});
+                $obj->{code} = \%code;
+            }
         }
         elsif ($ref eq 'Sidef::Types::Array::HCArray') {
             foreach my $i (0 .. $#{$obj}) {

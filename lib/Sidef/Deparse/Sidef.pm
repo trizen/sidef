@@ -6,6 +6,8 @@ package Sidef::Deparse::Sidef {
 
     # This module is under development...
 
+    my %addr;
+
     sub new {
         my (undef, %args) = @_;
 
@@ -23,6 +25,7 @@ package Sidef::Deparse::Sidef {
                     %args,
                    );
 
+        %addr = ();    # reset the addr map
         bless \%opts, __PACKAGE__;
     }
 
@@ -48,8 +51,6 @@ package Sidef::Deparse::Sidef {
         '[' . join(', ', map { $self->deparse_expr(ref($_) eq 'HASH' ? $_ : {self => $_->get_value}) } @{$array}) . ']';
     }
 
-    my %addr;
-
     sub deparse_expr {
         my ($self, $expr) = @_;
 
@@ -61,7 +62,7 @@ package Sidef::Deparse::Sidef {
         if ($ref eq 'HASH') {
             $code = join(', ', $self->deparse($obj));
         }
-        elsif ($ref eq "Sidef::Variable::Variable") {
+        elsif ($ref eq 'Sidef::Variable::Variable') {
             if ($obj->{type} eq 'var' or $obj->{type} eq 'static' or $obj->{type} eq 'const') {
                 $code = $obj->{name} =~ /^[0-9]+\z/ ? ('$' . $obj->{name}) : $obj->{name};
             }
@@ -78,6 +79,25 @@ package Sidef::Deparse::Sidef {
                 }
             }
         }
+        elsif ($ref eq 'Sidef::Variable::Struct') {
+            if ($addr{refaddr($obj)}++) {
+                $code = $obj->{__NAME__};
+            }
+            else {
+                my @vars;
+                foreach my $key (sort keys %{$obj}) {
+                    next if $key eq '__NAME__';
+                    push @vars, $obj->{$key};
+                }
+                $code = "struct $obj->{__NAME__} {" . $self->_dump_vars(@vars) . '}';
+            }
+        }
+        elsif ($ref eq 'Sidef::Variable::InitMy') {
+            $code = "my $obj->{name}";
+        }
+        elsif ($ref eq 'Sidef::Variable::My') {
+            $code = "$obj->{name}";
+        }
         elsif ($ref eq 'Sidef::Variable::Init') {
             $code = "$obj->{vars}[0]{type}\(" . $self->_dump_init_vars($obj) . ')';
         }
@@ -93,14 +113,44 @@ package Sidef::Deparse::Sidef {
                 $code .= $self->deparse_expr({self => $block});
             }
         }
+        elsif ($ref eq 'Sidef::Types::Block::Code') {
+            if ($addr{refaddr($obj)}++) {
+                $code = '__BLOCK__';
+            }
+            else {
+                $code = '{';
+                if (exists($obj->{init_vars}) and @{$obj->{init_vars}} > 1) {
+                    my $vars = $obj->{init_vars};
+                    $code .= '|' . $self->_dump_init_vars(@{$vars}[0 .. $#{$vars} - 1]) . "|";
+                }
+                $code .= "\n";
+                $self->{spaces} += $self->{spaces_num};
+                my @statements = $self->deparse($obj->{code});
+                $code .=
+                    (" " x $self->{spaces})
+                  . join(";\n" . (" " x $self->{spaces}), @statements) . "\n"
+                  . (" " x ($self->{spaces} -= $self->{spaces_num})) . '}';
+            }
+        }
         elsif ($ref eq 'Sidef::Variable::Ref') {
             ## ok
         }
         elsif ($ref eq 'Sidef::Sys::Sys') {
             $code = 'Sys';
         }
+        elsif ($ref eq 'Sidef::Parser') {
+            $code = 'Parser';
+        }
+        elsif ($ref eq 'Sidef') {
+            $code = 'Sidef';
+        }
+        elsif ($ref eq 'Sidef::Types::Glob::Fcntl') {
+            $code = 'Fcntl';
+        }
         elsif ($ref eq 'Sidef::Types::Block::Break') {
-            $code = 'break';
+            if (not exists $expr->{call}) {
+                $code = 'break';
+            }
         }
         elsif ($ref eq 'Sidef::Types::Block::Next') {
             $code = 'next';
@@ -128,6 +178,9 @@ package Sidef::Deparse::Sidef {
             }
             elsif ($obj->{fh} eq \*ARGV) {
                 $code = 'ARGF';
+            }
+            else {
+                $code = 'DATA';
             }
         }
         elsif ($ref eq 'Sidef::Variable::Magic') {
@@ -158,27 +211,28 @@ package Sidef::Deparse::Sidef {
             }
         }
         elsif ($ref eq 'Sidef::Types::Hash::Hash') {
-            $code = 'Hash.new()';
+            $code = 'Hash';
         }
         elsif ($ref eq 'Sidef::Types::Glob::Socket') {
             $code = 'Socket';
         }
+        elsif ($ref eq 'Sidef::Perl::Perl') {
+            $code = 'Perl';
+        }
+        elsif ($ref eq 'Sidef::Time::Time') {
+            $code = 'Time';
+        }
+        elsif ($ref eq 'Sidef::Sys::SIG') {
+            $code = 'SIG';
+        }
+        elsif ($ref eq 'Sidef::Types::Number::Complex') {
+            $code = 'Complex';
+        }
+        elsif ($ref eq 'Sidef::Types::Array::Pair') {
+            $code = 'Pair';
+        }
         elsif ($ref eq 'Sidef::Types::Regex::Regex') {
             $code .= $obj->dump->get_value;
-        }
-        elsif ($ref eq 'Sidef::Types::Block::Code') {
-            $code = '{';
-            if (exists($obj->{init_vars}) and @{$obj->{init_vars}} > 1) {
-                my $vars = $obj->{init_vars};
-                $code .= '|' . $self->_dump_init_vars(@{$vars}[0 .. $#{$vars} - 1]) . "|";
-            }
-            $code .= "\n";
-            $self->{spaces} += $self->{spaces_num};
-            my @statements = $self->deparse($obj->{code});
-            $code .=
-                (" " x $self->{spaces})
-              . join(";\n" . (" " x $self->{spaces}), @statements) . "\n"
-              . (" " x ($self->{spaces} -= $self->{spaces_num})) . '}';
         }
         elsif ($ref eq 'Sidef::Types::Number::Number') {
             local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
@@ -187,8 +241,44 @@ package Sidef::Deparse::Sidef {
         elsif ($ref eq 'Sidef::Types::Array::Array' or $ref eq 'Sidef::Types::Array::HCArray') {
             $code .= $self->_dump_array($obj);
         }
-        elsif (reftype($obj) eq 'SCALAR') {
+        elsif ($obj->can('dump')) {
             $code = $obj->dump->get_value;
+
+            if ($ref eq 'Sidef::Types::Glob::Backtick') {
+                if (${$obj} eq '') {
+                    $code = 'Backtick';
+                }
+            }
+            elsif ($ref eq 'Sidef::Types::Glob::File') {
+                if (${$obj} eq '') {
+                    $code = 'File';
+                }
+            }
+            elsif ($ref eq 'Sidef::Types::Glob::Dir') {
+                if (${$obj} eq '') {
+                    $code = 'Dir';
+                }
+            }
+            elsif ($ref eq 'Sidef::Types::Char::Char') {
+                if (${$obj} eq '') {
+                    $code = 'Char';
+                }
+            }
+            elsif ($ref eq 'Sidef::Types::String::String') {
+                if (${$obj} eq '') {
+                    $code = 'String';
+                }
+            }
+            elsif ($ref eq 'Sidef::Types::Array::MultiArray') {
+                if ($#{$obj} == -1) {
+                    $code = 'MultiArr';
+                }
+            }
+            elsif ($ref eq 'Sidef::Types::Glob::Pipe') {
+                if ($#{$obj} == -1) {
+                    $code = 'Pipe';
+                }
+            }
         }
 
         # Indices
@@ -202,6 +292,17 @@ package Sidef::Deparse::Sidef {
         if (exists $expr->{call}) {
             foreach my $call (@{$expr->{call}}) {
                 my $method = $call->{method};
+
+                if ($code eq 'Hash' and $method eq ':') {
+                    $method = 'new';
+                }
+                elsif ($code =~ /\.\w+\z/ && $method eq '?') {
+                    $code = '(' . $code . ')';
+                }
+                elsif ($code =~ /^\w+\z/ and $method eq ':') {
+                    $code = '(' . $code . ')';
+                }
+
                 if (ref($method) eq 'HASH') {
                     $code .= '.(' . $self->deparse_expr($method) . ')';
                 }
@@ -232,7 +333,7 @@ package Sidef::Deparse::Sidef {
             }
         }
 
-        ref($code) ? '#`{' . $code . '}' : $code;
+        $code;
     }
 
     sub deparse {

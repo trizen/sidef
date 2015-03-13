@@ -418,6 +418,7 @@ utils/sidef_concept.jl
 utils/sidef_concept.pl
 utils/sidef_in_perl.pl
 utils/struct_optimizer.pl
+utils/test_deparser.pl
 utils/tidy.pl
 'utils/Web interface/css/main.css'
 'utils/Web interface/index.cgi'

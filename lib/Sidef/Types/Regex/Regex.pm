@@ -69,7 +69,17 @@ package Sidef::Types::Regex::Regex {
 
     sub dump {
         my ($self) = @_;
-        Sidef::Types::String::String->new('/' . $self->{regex} =~ s{/}{\\/}gr . '/' . ($self->{global} ? 'g' : ''));
+
+        my $str = "$self->{regex}";
+
+        my $flags = '';
+        if ($str =~ s/\(\?\^u:\(\?(?:\^|(.*?))://) {
+            $flags = $1;
+            chop $str;
+            chop $str;
+        }
+
+        Sidef::Types::String::String->new('/' . $str =~ s{/}{\\/}gr . '/' . $flags . ($self->{global} ? 'g' : ''));
     }
 
     {

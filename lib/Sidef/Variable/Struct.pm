@@ -4,8 +4,12 @@ package Sidef::Variable::Struct {
     our $AUTOLOAD;
 
     sub __new__ {
-        my (undef, $vars) = @_;
-        bless {map { $_->{name} => $_ } @{$vars}}, __PACKAGE__;
+        my (undef, $name, $vars) = @_;
+        bless {
+               __NAME__ => $name,
+               map { $_->{name} => $_ } @{$vars}
+              },
+          __PACKAGE__;
     }
 
     sub DESTROY { }

@@ -23,7 +23,7 @@ package Sidef::Parser {
                              '...' => 1,
                              '!'   => 1,
                            },
-            binpost_ops => {                   # binary + postfix operators
+            binpost_ops => {                   # infix + postfix operators
                              '...' => 1,
                            },
             obj_with_do => {
@@ -955,7 +955,7 @@ package Sidef::Parser {
                                             );
                     pos($_) += $pos;
 
-                    my $struct = Sidef::Variable::Struct->__new__($vars);
+                    my $struct = Sidef::Variable::Struct->__new__($name, $vars);
 
                     if (defined $name) {
                         unshift @{$self->{vars}{$self->{class}}},

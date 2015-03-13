@@ -24,7 +24,7 @@ func agm1(a, g) {
 func agm2(a, g) {
     while (true) {
         .=  [a+g / 2, Math.sqrt(a*g)];
-        .== [a,g]  ? return a : .»(\a, \g);
+        .== [a,g]  ? return(a) : (_»(\a, \g));
     }
 }
 

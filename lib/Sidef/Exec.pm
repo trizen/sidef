@@ -224,9 +224,10 @@ package Sidef::Exec {
 
                 if (ref $method eq 'HASH') {
                     $method = $self->execute_expr($method) // '';
-                    if (ref $method eq 'Sidef::Variable::Variable') {
-                        $method = $method->get_value;
-                    }
+                }
+
+                if (ref $method eq 'Sidef::Variable::Variable') {
+                    $method = $method->get_value;
                 }
 
                 if ((my $ref = ref($method))) {
@@ -293,6 +294,9 @@ package Sidef::Exec {
                             if (ref($self_obj) ne 'Sidef::Variable::Ref') {
                                 push @args, $obj->get_value;
                             }
+                            elsif (ref($self_obj) eq 'Sidef::Variable::Ref' and $method eq '*') {
+                                push @args, $obj->get_value;
+                            }
                             else {
                                 push @args, $obj;
                             }
@@ -356,14 +360,24 @@ package Sidef::Exec {
             local $self->{expr_i_max} = $#{$struct->{$class}};
 
           INIT_VAR: ($i++ != -1)
-              && (local $self->{vars}{$struct->{$class}[$i - 1]{self}->_get_name} =
-                  Sidef::Variable::Variable->new(name => $struct->{$class}[$i - 1]{self}->_get_name, type => 'var'));
+              && (
+                  local $self->{vars}{
+                      ref($struct->{$class}[$i - 1]) eq 'HASH' ? $struct->{$class}[$i - 1]{self}->_get_name
+                      : $struct->{$class}[$i - 1]->_get_name
+                  }
+                  = Sidef::Variable::Variable->new(
+                                  name => ref($struct->{$class}[$i - 1]) eq 'HASH' ? $struct->{$class}[$i - 1]{self}->_get_name
+                                  : $struct->{$class}[$i - 1]->_get_name,
+                                  type => 'var'
+                  )
+                 );
 
             for (local $self->{expr_i} = $i ; $self->{expr_i} <= $self->{expr_i_max} ; $self->{expr_i}++) {
 
                 my $expr = $struct->{$class}[$self->{expr_i}];
 
-                if (ref($expr) eq 'HASH' and ref($expr->{self}) eq 'Sidef::Variable::InitMy') {
+                if ((ref($expr) eq 'HASH' and ref($expr->{self}) eq 'Sidef::Variable::InitMy')
+                    or ref($expr) eq 'Sidef::Variable::InitMy') {
                     goto INIT_VAR;
                 }
 
@@ -372,6 +386,7 @@ package Sidef::Exec {
                     ref($expr) eq 'HASH' ? $self->execute_expr($expr)
                   : ref($expr) eq 'Sidef::Types::Array::HCArray' ? $self->execute_expr({self => $expr})
                   : ref($expr) eq 'Sidef::Variable::Init' ? do { $expr->set_value; $expr }
+                  : ref($expr) eq 'Sidef::Variable::My'   ? $self->{vars}{$expr->_get_name}
                   :                                         $expr;
 
                 if (   ref($obj) eq 'Sidef::Types::Block::Return'

@@ -67,8 +67,7 @@ package Sidef::Types::Array::Pair {
     sub dump {
         my ($self) = @_;
 
-        my ($i, $s) = $self->_get_indent_level;
-        my $string = Sidef::Types::String::String->new("Pair.new(\n" . $s x $i);
+        my $string = Sidef::Types::String::String->new("Pair.new(");
 
         for my $i (0, 1) {
             my $item = $self->[$i]->get_value // 'nil';
@@ -81,7 +80,7 @@ package Sidef::Types::Array::Pair {
             $$string .= ", " if $i != 1;
         }
 
-        $$string .= "\n" . $s x $i . ")";
+        $$string .= ")";
         $string;
     }
 };

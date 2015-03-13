@@ -170,18 +170,6 @@ package Sidef {
 
     *is_an = \&is_a;
 
-    sub _get_indent_level {
-        my $pkgname = ref(shift());
-
-        my ($j, $i) = (1, 0);
-        while (1) {
-            last unless defined caller($i);
-            ++$j if (scalar caller($i++) eq $pkgname);
-        }
-
-        return ($j, " " x 2);
-    }
-
 };
 
 1;
