@@ -39,10 +39,104 @@ package Sidef::Types::Glob::Socket {
         Sidef::Types::Glob::SocketHandle->new(fh => $fh);
     }
 
-    sub getprotobyname {
-        my ($self, @args) = @_;
-        Sidef::Types::Number::Number->new(scalar CORE::getprotobyname(map { $_->get_value } @args));
+    #
+    ## gethost*
+    #
+    sub gethostbyname {
+        my ($self, $name) = @_;
+        Sidef::Types::String::String->new(CORE::gethostbyname($name->get_value) // return);
     }
+
+    sub gethostbyaddr {
+        my ($self, $addr, $addrtype) = @_;
+        Sidef::Types::String::String->new(CORE::gethostbyaddr($addr->get_value, $addrtype->get_value) // return);
+    }
+
+    sub gethostent {
+        my ($self) = @_;
+        Sidef::Types::String::String->new(CORE::gethostent() // return);
+    }
+
+    #
+    ## getnet*
+    #
+    sub getnetbyname {
+        my ($self, $name) = @_;
+        Sidef::Types::String::String->new(CORE::getnetbyname($name->get_value) // return);
+    }
+
+    sub getnetbyaddr {
+        my ($self, $addr, $addrtype) = @_;
+        Sidef::Types::String::String->new(CORE::getnetbyaddr($addr->get_value, $addrtype->get_value) // return);
+    }
+
+    sub getnetent {
+        my ($self) = @_;
+        Sidef::Types::String::String->new(CORE::getnetent() // return);
+    }
+
+    #
+    ## getserv*
+    #
+    sub getservbyname {
+        my ($self, $name, $proto) = @_;
+        Sidef::Types::String::String->new(CORE::getservbyname($name->get_value, $proto->get_value) // return);
+    }
+
+    sub getservbyport {
+        my ($self, $port, $proto) = @_;
+        Sidef::Types::String::String->new(CORE::getservbyport($port->get_value, $proto->get_value) // return);
+    }
+
+    sub getservent {
+        my ($self) = @_;
+        Sidef::Types::String::String->new(CORE::getservent() // return);
+    }
+
+    #
+    ## getproto*
+    #
+    sub getprotobynumber {
+        my ($self, $num) = @_;
+        Sidef::Types::String::String->new(CORE::getprotobynumber($num->get_value) // return);
+    }
+
+    sub getprotobyname {
+        my ($self, $name) = @_;
+        Sidef::Types::Number::Number->new(CORE::getprotobyname($name->get_value) // return);
+    }
+
+    sub getprotoent {
+        my ($self) = @_;
+        Sidef::Types::Number::Number->new(CORE::getprotoent() // return);
+    }
+
+    #
+    ## set*
+    #
+    sub sethostent {
+        my ($self, $stayopen) = @_;
+        Sidef::Types::Bool::Bool->new(CORE::sethostent($stayopen->get_value));
+    }
+
+    sub setnetent {
+        my ($self, $stayopen) = @_;
+        Sidef::Types::Bool::Bool->new(CORE::setnetent($stayopen->get_value));
+    }
+
+    sub setprotoent {
+        my ($self, $stayopen) = @_;
+        Sidef::Types::Bool::Bool->new(CORE::setprotoent($stayopen->get_value));
+    }
+
+    sub setservent {
+        my ($self, $stayopen) = @_;
+        Sidef::Types::Bool::Bool->new(CORE::setservent($stayopen->get_value));
+    }
+
+    #
+    ## Socket::* functions
+    #
 
     sub DESTROY { }
 

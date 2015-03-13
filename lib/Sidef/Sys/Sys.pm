@@ -69,8 +69,10 @@ package Sidef::Sys::Sys {
 
     sub user {
         my ($self) = @_;
-        Sidef::Types::String::String->new(getlogin);
+        Sidef::Types::String::String->new(CORE::getlogin);
     }
+
+    *getlogin = \&user;
 
     sub umask {
         my ($self, $mode) = @_;
@@ -232,6 +234,231 @@ package Sidef::Sys::Sys {
     sub exec {
         my ($self, @args) = @_;
         CORE::exec(@args);
+    }
+
+    sub __GETPW__ {
+        my ($self, $name, $passwd, $uid, $gid, $quota, $comment, $gcos, $dir, $shell) = @_;
+        $name // return;
+        Sidef::Types::Array::Array->new(
+                                        Sidef::Types::String::String->new($name),
+                                        Sidef::Types::String::String->new($passwd),
+                                        Sidef::Types::Number::Number->new($uid),
+                                        Sidef::Types::Number::Number->new($gid),
+                                        Sidef::Types::String::String->new($quota),
+                                        Sidef::Types::String::String->new($comment),
+                                        Sidef::Types::String::String->new($gcos),
+                                        Sidef::Types::String::String->new($shell),
+                                       );
+    }
+
+    sub setpwent {
+        my ($self) = @_;
+        Sidef::Types::Bool::Bool->new(CORE::setpwent);
+    }
+
+    sub getpwuid {
+        my ($self, $uid) = @_;
+        $self->__GETPW__(CORE::getpwuid($uid->get_value));
+    }
+
+    sub getpwnam {
+        my ($self, $name) = @_;
+        $self->__GETPW__(CORE::getpwnam($name->get_value));
+    }
+
+    sub getpwent {
+        my ($self) = @_;
+        $self->__GETPW__(CORE::getpwent);
+    }
+
+    sub __GETGR__ {
+        my ($self, $name, $passwd, $gid, $members) = @_;
+        $name // return
+          Sidef::Types::Array::Array->new(
+                                          Sidef::Types::String::String->new($name),
+                                          Sidef::Types::String::String->new($passwd),
+                                          Sidef::Types::Number::Number->new($gid),
+                                          Sidef::Types::Array::Array->new(
+                                                             map { Sidef::Types::String::String->new($_) } split(' ', $members)
+                                          ),
+                                         );
+    }
+
+    sub setgrent {
+        my ($self) = @_;
+        Sidef::Types::Bool::Bool->new(CORE::setgrent);
+    }
+
+    sub getgrent {
+        my ($self) = @_;
+        $self->__GETGR__(CORE::getgrent);
+    }
+
+    sub getgrgid {
+        my ($self, $gid) = @_;
+        $self->__GETGR__(CORE::getgrgid($gid->get_value));
+    }
+
+    sub getgrnam {
+        my ($self, $name) = @_;
+        $self->__GETGR__(CORE::getgrnam($name->get_value));
+    }
+
+    sub __GETHOST__ {
+        my ($self, $name, $aliases, $addrtype, $length, @addrs) = @_;
+        $name // return;
+        Sidef::Types::Array::Array->new(
+                                        Sidef::Types::String::String->new($name),
+                                        Sidef::Types::String::String->new($aliases),
+                                        Sidef::Types::String::String->new($addrtype),
+                                        Sidef::Types::Number::Number->new($length),
+                                        Sidef::Types::Array::Array->new(map { Sidef::Types::String::String->new($_) } @addrs),
+                                       );
+    }
+
+    sub sethostent {
+        my ($self, $stayopen) = @_;
+        Sidef::Types::Bool::Bool->new(CORE::sethostent($stayopen->get_value));
+    }
+
+    sub gethostbyaddr {
+        my ($self, $addr, $addrtype) = @_;
+        $self->__GETHOST__(CORE::gethostbyaddr($addr->get_value, $addrtype->get_value));
+    }
+
+    sub gethostbyname {
+        my ($self, $name) = @_;
+        $self->__GETHOST__(CORE::gethostbyname($name->get_value));
+    }
+
+    sub gethostent {
+        my ($self) = @_;
+        $self->__GETHOST__(CORE::gethostent);
+    }
+
+    sub __GETNET__ {
+        my ($self, $name, $aliases, $addrtype, $net) = @_;
+        $name // return;
+        Sidef::Types::Array::Array->new(
+                                        Sidef::Types::String::String->new($name),
+                                        Sidef::Types::String::String->new($aliases),
+                                        Sidef::Types::String::String->new($addrtype),
+                                        Sidef::Types::String::String->new($net),
+                                       );
+    }
+
+    sub setnetent {
+        my ($self, $stayopen) = @_;
+        Sidef::Types::Bool::Bool->new(CORE::setnetent($stayopen->get_value));
+    }
+
+    sub getnetbyaddr {
+        my ($self, $addr, $addrtype) = @_;
+        $self->__GETNET__(CORE::getnetbyaddr($addr->get_value, $addrtype->get_value));
+    }
+
+    sub getnetbyname {
+        my ($self, $name) = @_;
+        $self->__GETNET__(CORE::getnetbyname($name->get_value));
+    }
+
+    sub getnetent {
+        my ($self) = @_;
+        $self->__GETNET__(CORE::getnetent);
+    }
+
+    sub __GETPROTO__ {
+        my ($self, $name, $aliases, $proto) = @_;
+        $name // return;
+        Sidef::Types::Array::Array->new(
+                                        Sidef::Types::String::String->new($name),
+                                        Sidef::Types::String::String->new($aliases),
+                                        Sidef::Types::String::String->new($proto),
+                                       );
+    }
+
+    sub setprotoent {
+        my ($self, $stayopen) = @_;
+        Sidef::Types::Bool::Bool->new(CORE::setprotoent($stayopen->get_value));
+    }
+
+    sub getprotobyname {
+        my ($self, $name) = @_;
+        $self->__GETPROTO__(CORE::getprotobyname($name->get_value));
+    }
+
+    sub getprotobynumber {
+        my ($self, $num) = @_;
+        $self->__GETPROTO__(CORE::getprotobynumber($num->get_value));
+    }
+
+    sub getprotoent {
+        my ($self) = @_;
+        $self->__GETPROTO__(CORE::getprotoent);
+    }
+
+    sub __GETSERV__ {
+        my ($self, $name, $aliases, $port, $proto) = @_;
+        $name // return;
+        Sidef::Types::Array::Array->new(
+                                        Sidef::Types::String::String->new($name),
+                                        Sidef::Types::String::String->new($aliases),
+                                        Sidef::Types::Number::Number->new($port),
+                                        Sidef::Types::String::String->new($proto),
+                                       );
+    }
+
+    sub setservent {
+        my ($self, $stayopen) = @_;
+        Sidef::Types::Bool::Bool->new(CORE::setservent($stayopen->get_value));
+    }
+
+    sub getservbyname {
+        my ($self, $name, $proto) = @_;
+        $self->__GETSERV__(CORE::getservbyname($name->get_value, $proto->get_value));
+    }
+
+    sub getservbyport {
+        my ($self, $port, $proto) = @_;
+        $self->__GETSERV__(CORE::getservbyport($port->get_value, $proto->get_value));
+    }
+
+    sub getservent {
+        my ($self) = @_;
+        $self->__GETSERV__(CORE::getservent);
+    }
+
+    #
+    ## get/set priority
+    #
+    sub getpriority {
+        my ($self, $which, $who) = @_;
+        Sidef::Types::Number::Number->new(CORE::getpriority($which->get_value, $who->get_value));
+    }
+
+    sub setpriority {
+        my ($self, $which, $who, $priority) = @_;
+        Sidef::Types::Number::Number->new(CORE::setpriority($which->get_value, $who->get_value, $priority->get_value));
+    }
+
+    sub getppid {
+        my ($self) = @_;
+        Sidef::Types::Number::Number->new(CORE::getppid);
+    }
+
+    #
+    ## get/set the process group of a process
+    #
+    sub getpgrp {
+        my ($self, $pid) = @_;
+        Sidef::Types::Number::Number->new(CORE::getpgrp(defined($pid) ? $pid->get_value : ()));
+    }
+
+    sub setpgrp {
+        my ($self, $pid, $pgrp) = @_;
+        $pid  = defined($pid)  ? $pid->get_value  : 0;
+        $pgrp = defined($pgrp) ? $pgrp->get_value : 0;
+        Sidef::Types::Number::Number->new(CORE::setpgrp($pid, $pgrp));
     }
 
     {

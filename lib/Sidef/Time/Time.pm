@@ -9,14 +9,8 @@ package Sidef::Time::Time {
         my (undef, $sec) = @_;
 
         if (defined($sec)) {
-            if ((my $ref = ref($sec)) ne '') {
-                if ($ref eq 'Sidef::Types::Number::Number') {
-                    $sec = $sec->get_value;
-                }
-                else {
-                    warn "[WARN] Time.new(): invalid argument: expected a number, but got '", ref($sec), "'\n";
-                    return;
-                }
+            if (ref($sec)) {
+                $sec = $sec->get_value;
             }
             elsif ($sec eq '__INIT__') {
                 undef $sec;
