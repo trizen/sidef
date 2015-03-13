@@ -6,7 +6,6 @@ lib/Sidef.pod
 lib/Sidef/Args/Args.pm
 lib/Sidef/Convert/Convert.pm
 lib/Sidef/Convert/Convert.pod
-lib/Sidef/Deparse/Perl.pm
 lib/Sidef/Deparse/Sidef.pm
 lib/Sidef/Eval/Eval.pm
 lib/Sidef/Exec.pm
@@ -411,7 +410,6 @@ t/pod.t
 utils/auto_perltidy.sh
 utils/bak_cleaner.sh
 utils/C-inline-function-call.pl
-utils/deparser.pl
 utils/find_invalid_types.pl
 utils/pod_generator.pl
 utils/regexp_grammars_parser.pl

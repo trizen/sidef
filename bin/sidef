@@ -270,7 +270,7 @@ sub output_usage {
                     '-v'             => 'print version number and exit',
                     '-t'             => 'treat all command-line arguments as scripts',
                     '-r'             => 'deparse a Sidef program',
-                    '-R lang'        => ['deparse a Sidef program to a given language', 'valid values: sidef, perl'],
+                    '-R lang'        => ['deparse a Sidef program to a given language', 'valid values: sidef'],
                     '-w'             => 'enable warnings with stack backtrace',
                     '-W'             => 'make warnings fatal (with stack backtrace)',
                    );

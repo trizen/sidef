@@ -67,7 +67,7 @@ package Sidef::Deparse::Sidef {
             }
             elsif ($obj->{type} eq 'func' or $obj->{type} eq 'method') {
                 if ($addr{refaddr($obj)}++) {
-                    $code = $obj->{name};
+                    $code = $obj->{name} eq '' ? '__FUNC__' : $obj->{name};
                 }
                 else {
                     my $block = $obj->{value};

@@ -59,9 +59,6 @@
       "Sidef::Convert::Convert" : {
          "file" : "lib/Sidef/Convert/Convert.pm"
       },
-      "Sidef::Deparse::Perl" : {
-         "file" : "lib/Sidef/Deparse/Perl.pm"
-      },
       "Sidef::Deparse::Sidef" : {
          "file" : "lib/Sidef/Deparse/Sidef.pm"
       },
@@ -154,9 +151,6 @@
       },
       "Sidef::Types::Block::Next" : {
          "file" : "lib/Sidef/Types/Block/Next.pm"
-      },
-      "Sidef::Types::Block::PerlCode" : {
-         "file" : "lib/Sidef/Deparse/Perl.pm"
       },
       "Sidef::Types::Block::Return" : {
          "file" : "lib/Sidef/Types/Block/Return.pm"
