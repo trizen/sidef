@@ -73,7 +73,6 @@ my %ignored_methods = (
 
 my %ignored_modules = map { $_ => 1 } qw (
   Sidef::Exec
-  Sidef::Init
   Sidef::Parser
   Sidef::Args::Args
   Sidef::Sys::SIG

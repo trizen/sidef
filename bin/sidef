@@ -663,8 +663,6 @@ HEAD
              wanted   => sub {
                  if (/\.pm\z/ and -f) {
 
-                     return if m{\bSidef\W+Init\b};
-
                      local $/;
                      open my $fh, '<:utf8', $_
                        or die "Can't open file `$_' for reading: $!";

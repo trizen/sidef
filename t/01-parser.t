@@ -11,7 +11,7 @@ use List::Util qw(first);
 use File::Spec::Functions qw(catfile catdir);
 
 use lib 'lib';
-require Sidef::Init;
+require Sidef;
 
 my $scripts_dir = 'scripts';
 local $ENV{SIDEF_INC} = $scripts_dir;
