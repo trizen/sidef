@@ -379,7 +379,7 @@ package Sidef::Types::String::String {
 
     sub ord {
         my ($self) = @_;
-        Sidef::Types::Byte::Byte->new(CORE::ord($self->get_value));
+        Sidef::Types::Number::Number->new(CORE::ord($self->get_value));
     }
 
     sub reverse {
