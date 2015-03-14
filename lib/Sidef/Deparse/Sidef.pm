@@ -223,7 +223,7 @@ package Sidef::Deparse::Sidef {
             $code = 'Time';
         }
         elsif ($ref eq 'Sidef::Sys::SIG') {
-            $code = 'SIG';
+            $code = 'Sig';
         }
         elsif ($ref eq 'Sidef::Types::Number::Complex') {
             $code = 'Complex';

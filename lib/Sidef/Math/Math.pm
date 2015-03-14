@@ -141,6 +141,32 @@ package Sidef::Math::Math {
         Sidef::Types::Number::Number->new(Math::BigFloat->new($n->get_value)->bpow($pow->get_value));
     }
 
+    sub sum {
+        my ($self, @nums) = @_;
+
+        require List::Util;
+        Sidef::Types::Number::Number->new(List::Util::sum(map { $_->get_value } @nums));
+    }
+
+    sub max {
+        my ($self, @nums) = @_;
+
+        require List::Util;
+        Sidef::Types::Number::Number->new(List::Util::max(map { $_->get_value } @nums));
+    }
+
+    sub min {
+        my ($self, @nums) = @_;
+
+        require List::Util;
+        Sidef::Types::Number::Number->new(List::Util::min(map { $_->get_value } @nums));
+    }
+
+    sub avg {
+        my ($self, @nums) = @_;
+        Sidef::Types::Number::Number->new($self->sum(@nums)->get_value / @nums);
+    }
+
     sub range_sum {
         my ($self, $from, $to, $step) = @_;
 
