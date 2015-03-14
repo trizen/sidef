@@ -43,6 +43,12 @@ package Sidef::Types::Glob::FileHandle {
         __PACKAGE__->new(fh => \*STDIN);
     }
 
+    sub autoflush {
+        my ($self, $bool) = @_;
+        select((select($self->{fh}), $| = $bool->get_value)[0]);
+        $bool;
+    }
+
     sub binmode {
         my ($self, $encoding) = @_;
         $self->_is_string($encoding) || return;
