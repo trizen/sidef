@@ -299,6 +299,18 @@ package Sidef::Types::Number::Number {
 
     *as_int = \&int;
 
+    sub max {
+        my ($self, $num) = @_;
+        my ($x, $y) = ($self->get_value, $num->get_value);
+        $self->new($x > $y ? $x : $y);
+    }
+
+    sub min {
+        my ($self, $num) = @_;
+        my ($x, $y) = ($self->get_value, $num->get_value);
+        $self->new($x < $y ? $x : $y);
+    }
+
     sub cos {
         my ($self) = @_;
         $self->new(CORE::cos($self->get_value));
