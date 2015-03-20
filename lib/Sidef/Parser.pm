@@ -1330,7 +1330,11 @@ package Sidef::Parser {
 
                 # Eval keyword
                 if (/\Geval\b/gc) {
-                    return Sidef::Eval::Eval->new($self, {$self->{class} => [@{$self->{vars}{$self->{class}}}]}), $-[0], 1;
+                    return
+                      Sidef::Eval::Eval->new($self,
+                                             {$self->{class} => [@{$self->{vars}{$self->{class}}}]},
+                                             {$self->{class} => [@{$self->{ref_vars_refs}{$self->{class}}}]}),
+                      $-[0], 1;
                 }
 
                 if (/\G(?:die|warn)\b/gc) {
