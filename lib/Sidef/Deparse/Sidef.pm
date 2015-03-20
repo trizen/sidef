@@ -118,18 +118,23 @@ package Sidef::Deparse::Sidef {
                 $code = '__BLOCK__';
             }
             else {
-                $code = '{';
-                if (exists($obj->{init_vars}) and @{$obj->{init_vars}} > 1) {
-                    my $vars = $obj->{init_vars};
-                    $code .= '|' . $self->_dump_init_vars(@{$vars}[0 .. $#{$vars} - 1]) . "|";
+                if (exists($obj->{code}) && %{$obj->{code}}) {
+                    $code = '{';
+                    if (exists($obj->{init_vars}) and @{$obj->{init_vars}} > 1) {
+                        my $vars = $obj->{init_vars};
+                        $code .= '|' . $self->_dump_init_vars(@{$vars}[0 .. $#{$vars} - 1]) . "|";
+                    }
+                    $code .= "\n";
+                    $self->{spaces} += $self->{spaces_num};
+                    my @statements = $self->deparse($obj->{code});
+                    $code .=
+                        (" " x $self->{spaces})
+                      . join(";\n" . (" " x $self->{spaces}), @statements) . "\n"
+                      . (" " x ($self->{spaces} -= $self->{spaces_num})) . '}';
                 }
-                $code .= "\n";
-                $self->{spaces} += $self->{spaces_num};
-                my @statements = $self->deparse($obj->{code});
-                $code .=
-                    (" " x $self->{spaces})
-                  . join(";\n" . (" " x $self->{spaces}), @statements) . "\n"
-                  . (" " x ($self->{spaces} -= $self->{spaces_num})) . '}';
+                else {
+                    $code = 'Block';
+                }
             }
         }
         elsif ($ref eq 'Sidef::Variable::Ref') {

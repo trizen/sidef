@@ -1521,11 +1521,13 @@ package Sidef::Parser {
                 # Variable call
                 if (/\G($self->{var_name_re})/goc) {
                     my ($name, $class) = $self->get_name_and_class($1);
-                    my ($var) = $self->find_var($name, $class);
+                    my ($var, $code) = $self->find_var($name, $class);
 
                     if (ref $var) {
                         $var->{count}++;
                         ref($var->{obj}) eq 'Sidef::Variable::Variable' && do {
+
+                            #$var->{closure} = 1 if $code == 0;  # it might be a closure
                             $var->{obj}{in_use} = 1;
                         };
                         return $var->{obj}, pos;
@@ -1684,8 +1686,9 @@ package Sidef::Parser {
                                            error => "unbalanced curly brackets",
                                           );
 
-                $block->{vars} = [map  { $_->{obj} }
-                                  grep { ref($_) eq 'HASH' } @{$self->{vars}{$self->{class}}}
+                $block->{vars} = [map { $_->{obj} }
+                                    grep { ref($_) eq 'HASH' and ref($_->{obj}) eq 'Sidef::Variable::Variable' }
+                                    @{$self->{vars}{$self->{class}}}
                                  ];
 
                 $block->{init_vars} = [map { Sidef::Variable::Init->new($_) } @{$var_objs}];
