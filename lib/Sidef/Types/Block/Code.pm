@@ -44,11 +44,9 @@ package Sidef::Types::Block::Code {
 
     sub copy {
         my ($self) = @_;
-        state $code = eval { require Data::Dump; \&Data::Dump::pp } // do {
-            print STDERR "** Data::Dump is not installed!\n";
-            return $self;
-        };
-        eval $code->($self);
+
+        require Storable;
+        Storable::dclone($self);
     }
 
     {
