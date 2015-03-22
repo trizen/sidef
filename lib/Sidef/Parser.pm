@@ -10,7 +10,6 @@ package Sidef::Parser {
 
         my %options = (
             line          => 1,
-            strict        => 1,
             inc           => [],
             class         => 'main',           # a.k.a. namespace
             vars          => {'main' => []},
@@ -226,7 +225,6 @@ package Sidef::Parser {
                   __USE_INTNUM__
                   __USE_FASTNUM__
 
-                  __NO_STRICT__
                   __RESET_LINE_COUNTER__
 
                   )
@@ -361,7 +359,7 @@ package Sidef::Parser {
                             $self->{line}, join(', ', grep { defined } $opt{error}, $opt{expected}), $error_line,);
 
         my $pointer = ' ' x ($point) . '^' . "\n";
-        $self->{strict} ? (die $error, $pointer) : (warn $error, $pointer);
+        die $error, $pointer;
     }
 
     sub find_var {
@@ -1990,9 +1988,6 @@ package Sidef::Parser {
             pos($opt{code}) += $pos;
         }
 
-        # Locally deactivate some restrictions
-        local $self->{strict} = 0 if $opt{code} =~ /\G__NO_STRICT__\b;*/gc;
-
         my $pos = pos($opt{code});
 
         my %struct;
@@ -2023,11 +2018,8 @@ package Sidef::Parser {
                                             pos      => pos($_)
                                            );
 
-                    my $parser = __PACKAGE__->new(
-                                                  file_name   => $self->{file_name},
-                                                  script_name => $self->{script_name},
-                                                  strict      => $self->{strict},
-                                                 );
+                    my $parser = __PACKAGE__->new(file_name   => $self->{file_name},
+                                                  script_name => $self->{script_name},);
                     local $parser->{line}  = $self->{line};
                     local $parser->{class} = $name;
                     local $parser->{ref_vars}{$name} = $self->{ref_vars}{$name} if exists($self->{ref_vars}{$name});
@@ -2194,11 +2186,8 @@ package Sidef::Parser {
                         my $content = do { local $/; <$fh> };
                         close $fh;
 
-                        my $parser = __PACKAGE__->new(
-                                                      file_name   => $full_path,
-                                                      script_name => $self->{script_name},
-                                                      strict      => $self->{strict},
-                                                     );
+                        my $parser = __PACKAGE__->new(file_name   => $full_path,
+                                                      script_name => $self->{script_name},);
 
                         local $parser->{class} = $name if defined $name;
                         if (defined $name and $name ne 'main' and not grep $_ eq $name, @Sidef::Exec::NAMESPACES) {

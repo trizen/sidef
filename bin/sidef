@@ -30,7 +30,7 @@ my $version = $Sidef::VERSION;
 my %args;
 if ($#ARGV != -1 and chr ord $ARGV[0] eq '-') {
     require Getopt::Std;
-    Getopt::Std::getopts('e:E:d:Dho:ivHN:n:WwcM:rR:StO:', \%args);
+    Getopt::Std::getopts('e:E:d:Dho:ivHN:n:WwcM:rR:tO:', \%args);
 }
 
 # Help
@@ -175,11 +175,8 @@ sub read_script {
 
 sub new_parser {
     my (%opt) = @_;
-    Sidef::Parser->new(
-                       file_name   => $opt{name},
-                       script_name => $opt{name},
-                       strict      => !$args{S},
-                      );
+    Sidef::Parser->new(file_name   => $opt{name},
+                       script_name => $opt{name},);
 }
 
 sub optimize_struct {
@@ -207,7 +204,6 @@ sub parse_code {
             $struct = Sidef::Parser->new(
                                          file_name   => $parser->{file_name},
                                          script_name => $parser->{script_name},
-                                         strict      => $parser->{strict},
                                         )->parse_script(code => $deparsed);
         }
 
@@ -280,7 +276,6 @@ sub output_usage {
                     '-n type'        => ['try to use a specific backend for Math::BigInt', 'valid types: GMP, Pari, FastCalc'],
                     '-M type,type'   => ['memoize some expensive method calls', 'valid types: num, block, all'],
                     '-O level'       => ['optimize the syntax-tree of a program', 'valid optimization levels: 0, 1, 2'],
-                    '-S'             => 'disable strictures and ignore any errors',
                     '-v'             => 'print version number and exit',
                     '-t'             => 'treat all command-line arguments as scripts',
                     '-r'             => 'deparse a Sidef program',
