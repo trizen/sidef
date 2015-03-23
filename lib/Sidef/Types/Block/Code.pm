@@ -142,7 +142,7 @@ package Sidef::Types::Block::Code {
 
     sub exec {
         my ($self) = @_;
-        $self->_execute;
+        $self->run;
         $self;
     }
 

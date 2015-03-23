@@ -82,7 +82,7 @@ package Sidef::Exec {
                              ref($_) eq 'HASH' ? $self->execute_expr($_)
                            : ref($_) eq 'Sidef::Types::Array::HCArray' ? $self->execute_expr({self => $_})
                            :                                             $_;
-                         (ref($result) eq 'Sidef::Variable::Variable' || ref($result) eq 'Sidef::Variable::ClassVar')
+                         (ref($result) eq 'Sidef::Variable::Variable' or ref($result) eq 'Sidef::Variable::ClassVar')
                            ? $result->get_value
                            : $result;
                        } @{$expr->{ind}[$l]}
@@ -208,7 +208,7 @@ package Sidef::Exec {
                 }
 
                 if (
-                    ref($self_obj) eq 'Sidef::Variable::Variable'
+                    (ref($self_obj) eq 'Sidef::Variable::Variable' or ref($self_obj) eq 'Sidef::Variable::ClassVar')
                     and ($l < $#{$expr->{ind}}
                          or ref($expr->{self}) eq 'HASH')
                   ) {

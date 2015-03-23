@@ -12,12 +12,18 @@ package Sidef::Types::Hash::Hash {
         my %hash;
         my $self = bless \%hash, __PACKAGE__;
 
-        # Default value only for: Hash.new(obj);
-        if (    @pairs == 1
-            and ref($class) eq __PACKAGE__
-            and ref($pairs[0]) ne 'Sidef::Types::Array::Pair') {
-            $self->default(shift @pairs);
-            return $self;
+        if (@pairs == 1) {
+
+            # Block to hash
+            if (ref($pairs[0]) eq 'Sidef::Types::Block::Code') {
+                return $pairs[0]->to_hash;
+            }
+
+            # Default value only for: Hash.new(obj);
+            if (ref($pairs[0]) ne 'Sidef::Types::Array::Pair') {
+                $self->default(shift @pairs);
+                return $self;
+            }
         }
 
         # Add hash key/value pairs
@@ -353,13 +359,7 @@ package Sidef::Types::Hash::Hash {
         *{__PACKAGE__ . '::' . '==='} = \&duplicateOf;
         *{__PACKAGE__ . '::' . '=='}  = \&eq;
         *{__PACKAGE__ . '::' . '!='}  = \&ne;
-
-        *{__PACKAGE__ . '::' . ':'} = sub {
-            shift;    # ignore self
-            @_ == 1 && ref($_[0]) eq 'Sidef::Types::Block::Code'
-              ? $_[0]->to_hash
-              : __PACKAGE__->new(@_);
-        };
+        *{__PACKAGE__ . '::' . ':'}   = \&new;
     }
 };
 

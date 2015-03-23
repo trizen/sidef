@@ -51,6 +51,11 @@ package Sidef::Deparse::Sidef {
         '[' . join(', ', map { $self->deparse_expr(ref($_) eq 'HASH' ? $_ : {self => $_->get_value}) } @{$array}) . ']';
     }
 
+    sub _dump_class_name {
+        my ($self, $name) = @_;
+        ref($name) ? $self->deparse_expr({self => $name}) : $name;
+    }
+
     sub deparse_expr {
         my ($self, $expr) = @_;
 
@@ -103,11 +108,11 @@ package Sidef::Deparse::Sidef {
         }
         elsif ($ref eq 'Sidef::Variable::ClassInit') {
             if ($addr{refaddr($obj)}++) {
-                $code = $obj->{name};
+                $code = $self->_dump_class_name($obj->{name});
             }
             else {
                 my $block = $obj->{__BLOCK__};
-                $code = "class $obj->{name}";
+                $code = "class " . $self->_dump_class_name($obj->{name});
                 my $vars = $obj->{__VARS__};
                 $code .= '(' . $self->_dump_vars(@{$vars}) . ')';
                 if (exists $obj->{inherit}) {

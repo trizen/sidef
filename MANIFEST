@@ -194,6 +194,7 @@ scripts/cramers_method.sf
 scripts/cutting_edge_features.sf
 scripts/cyclic_numbers.sf
 scripts/DATA_handle.sf
+scripts/def_class_variables.sf
 scripts/define_keyword.sf
 scripts/echo.sf
 scripts/eq_g2.sf

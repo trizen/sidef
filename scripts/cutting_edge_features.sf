@@ -139,7 +139,7 @@ module New::Features {
             n > 1 ? (__METHOD__(self, n-2) + __METHOD__(self, n-1)) : n;
         }
 
-        __CLASS__ += ('Metaprogramming', {|self| "Welcome to metaprogramming!"});
+        def_method 'Metaprogramming' {"Welcome to metaprogramming!"};
 
         method Info {
             :(

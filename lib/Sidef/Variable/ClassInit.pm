@@ -3,8 +3,8 @@ package Sidef::Variable::ClassInit {
     use 5.014;
 
     sub __new__ {
-        my (undef, $name) = @_;
-        bless {name => $name}, __PACKAGE__;
+        my (undef, %opt) = @_;
+        bless \%opt, __PACKAGE__;
     }
 
     sub __set_value__ {
@@ -20,24 +20,25 @@ package Sidef::Variable::ClassInit {
         $self;
     }
 
-    sub define_var {
+    sub __add_vars__ {
+        my ($self, $vars) = @_;
+        push @{$self->{__DEF_VARS__}}, @{$vars};
+        $self;
+    }
+
+    sub def_var {
         my ($self, $name, $value) = @_;
         $self->{__VALS__}{$name} = $value;
         $self;
     }
 
-    *def_var         = \&define_var;
-    *define_variable = \&define_var;
-
-    sub define_method {
+    sub def_method {
         my ($self, $name, $value) = @_;
         if (ref($value) ne 'Sidef::Types::Block::Code') {
-            return $self->define_var($name, $value);
+            return $self->def_var($name, $value);
         }
-        $self->__add_method__($name, $value->copy);
+        $self->__add_method__($name, $value);
     }
-
-    *def_method = \&define_method;
 
     sub inherit {
         my ($self, $class) = @_;
@@ -96,6 +97,11 @@ package Sidef::Variable::ClassInit {
         # Run the auxiliary code of the class
         $self->{__BLOCK__}->run;
 
+        # Add 'var' defined variables
+        foreach my $var (@{$self->{__DEF_VARS__}}) {
+            $class->{__VARS__}{$var->{name}} = $var->get_value;
+        }
+
         # Add some new defined values
         while (my ($key, $value) = each %{$self->{__VALS__}}) {
             $class->{__VARS__}{$key} = $value;
@@ -108,7 +114,7 @@ package Sidef::Variable::ClassInit {
 
         # Execute the 'new' method (if exists)
         if (exists $self->{__METHODS__}{new}) {
-            return $self->{__METHODS__}{new}->call($class, @args);
+            $self->{__METHODS__}{new}->call($class, @args);
         }
 
         $class;
@@ -118,7 +124,6 @@ package Sidef::Variable::ClassInit {
 
     {
         no strict 'refs';
-        *{__PACKAGE__ . '::' . '+='} = \&define_method;
         *{__PACKAGE__ . '::' . '='}  = \&replace;
         *{__PACKAGE__ . '::' . '<'}  = \&inherit;
         *{__PACKAGE__ . '::' . '<<'} = \&inherit;

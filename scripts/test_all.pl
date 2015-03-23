@@ -11,12 +11,9 @@ my $sidef = '../bin/sidef';
 my %ignored;
 @ignored{
     qw(
-      built_in_classes.sf
       http_tiny.sf
       lwp_module.sf
       quicksort_in_parallel.sf
-      metaprogramming_method_definition.sf
-      metaprogramming_2.sf
       file_find_module.sf
       multi_file_edit.sf
       )

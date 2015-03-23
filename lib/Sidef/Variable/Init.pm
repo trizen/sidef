@@ -33,7 +33,7 @@ package Sidef::Variable::Init {
                     $var->{inited} = 1;
                 }
             }
-            else {    # actually, this will not happen
+            else {    # other types of variables
                 $var->set_value($args[$i]);
             }
         }

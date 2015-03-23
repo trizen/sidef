@@ -15,11 +15,10 @@ class Color(text) {
         );
 
     COLORS.each { |color, code|
-            __CLASS__ += ("in_#{color}", method {
-                    "<span style=\"color: ##{code}\">#{self.text}</span>"
-                };
-            );
-        };
+        def_method "in_#{color}" {
+            "<span style=\"color: ##{code}\">#{self.text}</span>"
+        }
+    }
 };
 
 var text = Color("Hello World");

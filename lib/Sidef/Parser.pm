@@ -875,9 +875,10 @@ package Sidef::Parser {
                 # Declaration of variable types
                 if (/\G(var|static|const)\b\h*/gc) {
                     my $type = $1;
+
                     my ($var_objs, $pos) =
                       $self->parse_init_vars(code => substr($_, pos),
-                                             type => $type);
+                                             type => $type,);
 
                     $pos // $self->fatal_error(
                                                code  => $_,
@@ -885,8 +886,7 @@ package Sidef::Parser {
                                                error => "expected a variable name after the keyword '$type'!",
                                               );
 
-                    pos($_) += $pos;
-                    return Sidef::Variable::Init->new(@{$var_objs}), pos;
+                    return Sidef::Variable::Init->new(@{$var_objs}), $pos + pos;
                 }
 
                 # Declaration of compile-time evaluated constants
@@ -1041,9 +1041,8 @@ package Sidef::Parser {
                                                code     => $_,
                                                pos      => pos($_)
                                               );
+                        ($name, $class_name) = $self->get_name_and_class($name);
                     }
-
-                    ($name, $class_name) = $self->get_name_and_class($name);
 
                     if ($type ne 'method'
                         && exists($self->{keywords}{$name})) {
@@ -1058,7 +1057,7 @@ package Sidef::Parser {
                         $type eq 'my' ? Sidef::Variable::My->new($name)
                       : $type eq 'func'   ? Sidef::Variable::Variable->new(name => $name, type => $type)
                       : $type eq 'method' ? Sidef::Variable::Variable->new(name => $name, type => $type)
-                      : $type eq 'class'  ? Sidef::Variable::ClassInit->__new__($name)
+                      : $type eq 'class' ? Sidef::Variable::ClassInit->__new__(name => ($built_in_obj // $name))
                       : $self->fatal_error(
                                            error    => "invalid type",
                                            expected => "expected a magic thing to happen",
@@ -1112,9 +1111,7 @@ package Sidef::Parser {
                                 my ($class, $code) = $self->find_var($name, $class_name);
                                 if (ref $class) {
                                     if ($class->{type} eq 'class') {
-                                        if (not defined $built_in_obj) {
-                                            push @{$obj->{inherit}}, $name;
-                                        }
+                                        push @{$obj->{inherit}}, $name;
                                         while (my ($name, $method) = each %{$class->{obj}{__METHODS__}}) {
                                             ($built_in_obj // $obj)->__add_method__($name, $method);
                                         }
@@ -1209,44 +1206,73 @@ package Sidef::Parser {
                     return $obj, pos;
                 }
 
-                if (exists $self->{current_class} and /\Gdefine_method\b\h*/gc) {
-                    my ($name, $pos) = $self->parse_expr(code => substr($_, pos($_)));
-                    pos($_) += $pos;
+                # Inside a class context
+                if (exists $self->{current_class}) {
 
-                    my ($method, $pos2) = $self->parse_expr(code => 'method ' . substr($_, pos($_)));
-                    pos($_) += $pos2 - 7;
+                    # Method declaration
+                    if (/\Gdef_method\b\h*/gc) {
+                        my ($name, $pos) = $self->parse_expr(code => substr($_, pos($_)));
+                        pos($_) += $pos;
 
-                    return scalar {
-                        $self->{class} => [
-                                           {
-                                            self => $self->{current_class},
-                                            call => [
-                                                     {
-                                                      method => 'define_method',
-                                                      arg    => [
+                        my ($method, $pos2) = $self->parse_expr(code => 'method ' . substr($_, pos($_)));
+                        pos($_) += $pos2 - 7;
+
+                        return scalar {
+                            $self->{class} => [
+                                {
+                                 self => $self->{current_class},
+                                 call => [
+                                     {
+                                      method => 'def_method',
+                                      arg    => [
+                                          $name,
+
+                                          {
+                                           $self->{class} => [
                                                               {
-                                                               $self->{class} => [{self => $name},
-                                                                                  {
-                                                                                   self => {
-                                                                                            $self->{class} => [
-                                                                                                 {
-                                                                                                  call => [{method => 'copy'}],
-                                                                                                  self => $method,
-                                                                                                 },
-                                                                                            ],
-                                                                                           },
-                                                                                  }
-                                                                                 ],
-                                                              }
+                                                               call => [{method => 'copy'}],
+                                                               self => $method,
+                                                              },
                                                              ]
-                                                     }
-                                                    ]
-                                           }
-                                          ]
+                                          }
 
-                                  },
-                      pos($_);
+                                      ]
+                                     }
+                                 ]
+                                }
+                              ]
 
+                          },
+                          pos($_);
+                    }
+
+                    # Declaration of class variables
+                    elsif (/\Gdef(?:_var)?\b\h*/gc) {
+
+                        my ($var_objs, $pos) =
+                          $self->parse_init_vars(
+                                                 code    => substr($_, pos),
+                                                 type    => 'def',
+                                                 private => 1,
+                                                );
+
+                        $pos // $self->fatal_error(
+                                                   code  => $_,
+                                                   pos   => pos,
+                                                   error => "expected a variable name after the keyword 'def'!",
+                                                  );
+
+                        # Mark all variables as 'in_use'
+                        foreach my $var (@{$var_objs}) {
+                            $var->{in_use} = 1;
+                        }
+
+                        # Store them inside the class
+                        $self->{current_class}->__add_vars__($var_objs);
+
+                        # Return a 'Sidef::Variable::Init' object
+                        return Sidef::Variable::Init->new(@{$var_objs}), pos($_) + $pos;
+                    }
                 }
 
                 # Binary, hexdecimal and octal numbers
