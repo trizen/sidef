@@ -138,6 +138,7 @@ package Sidef::Exec {
                     }
 
                     if (ref $self_obj eq 'Sidef::Variable::Class') {
+                        local $self_obj->{index_access} = 1;
                         $self_obj = Sidef::Types::Array::Array->new(map { $self_obj->$_->get_value } @indices);
                     }
                     else {
@@ -155,6 +156,7 @@ package Sidef::Exec {
                     my $ind = $level->[0];
 
                     if (ref($self_obj) eq 'Sidef::Variable::Class') {
+                        local $self_obj->{index_access} = 1;
                         $self_obj = $self_obj->$ind;
                     }
                     else {

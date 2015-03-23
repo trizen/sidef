@@ -1078,10 +1078,14 @@ package Sidef::Types::String::String {
         $self->new(Data::Dump::quote($self->get_value) =~ s<(#\{)>{\\$1}gr);
     }
 
+    sub basic_dump {
+        my ($self) = @_;
+        __PACKAGE__->new(q{'} . $self->get_value =~ s{([\\'])}{\\$1}gr . q{'});
+    }
+
     sub dump {
         my ($self) = @_;
-        my $pretty_dump = eval { $self->inspect };
-        $@ ? __PACKAGE__->new(q{'} . $self->get_value =~ s{([\\'])}{\\$1}gr . q{'}) : $pretty_dump;
+        eval { $self->inspect } // $self->basic_dump;
     }
 
     {

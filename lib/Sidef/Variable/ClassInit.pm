@@ -66,7 +66,6 @@ package Sidef::Variable::ClassInit {
     sub init {
         my ($self, @args) = @_;
 
-        require Sidef::Variable::Class;
         my $class = Sidef::Variable::Class->__new__($self->{name});
 
         # Init the class variables

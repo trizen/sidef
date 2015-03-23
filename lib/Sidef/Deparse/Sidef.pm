@@ -118,7 +118,7 @@ package Sidef::Deparse::Sidef {
                 $code = '__BLOCK__';
             }
             else {
-                if (exists($obj->{code}) && %{$obj->{code}}) {
+                if (%{$obj}) {
                     $code = '{';
                     if (exists($obj->{init_vars}) and @{$obj->{init_vars}} > 1) {
                         my $vars = $obj->{init_vars};

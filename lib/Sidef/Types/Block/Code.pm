@@ -20,7 +20,8 @@ package Sidef::Types::Block::Code {
     sub dump {
         my ($self) = @_;
         require Data::Dump;
-        Sidef::Types::String::String->new('Perl.eval(' . Sidef::Types::String::String->new(Data::Dump::pp($self))->dump . ')');
+        Sidef::Types::String::String->new(
+                                    'Perl.eval(' . Sidef::Types::String::String->new(Data::Dump::pp($self))->basic_dump . ')');
     }
 
     sub _execute {
@@ -317,8 +318,6 @@ package Sidef::Types::Block::Code {
 
         require File::Temp;
         my ($fh, $result) = File::Temp::tempfile(SUFFIX => '.rst');
-
-        require Sidef::Types::Block::Fork;
         my $fork = Sidef::Types::Block::Fork->new(result => $result);
 
         my $pid;
