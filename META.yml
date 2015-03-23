@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   Module::Build: '0'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4211, CPAN::Meta::Converter version 2.143240'
+generated_by: 'Module::Build version 0.4211, CPAN::Meta::Converter version 2.150001'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -180,7 +180,13 @@ requires:
   List::Util: '0'
   Math::BigFloat: '0'
   Math::BigInt: '0'
+  Math::BigRat: '0'
+  Math::Complex: '0'
+  Math::Trig: '0'
   POSIX: '0'
+  Scalar::Util: '0'
+  Socket: '0'
+  Storable: '0'
   Term::ReadLine: '0'
   Time::HiRes: '0'
   perl: v5.14.0
