@@ -22,7 +22,8 @@ desktopFilesPaths.each { |path|
         var fields = Hash.new;
         var regex = Regex.new(/^(\w.*?)=(.*\S)/m);
 
-        while (var match = content.gmatch(regex)) {
+        var match;
+        while (match = content.gmatch(regex)) {
             var (key, value) = match.captures...;
             fields[key] = value;
         }
