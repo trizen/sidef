@@ -22,7 +22,7 @@ func fibonacci (i, j, count) {
     i = old_j;
 
     "%d ".printf(i);
-    count-- > 0 && (return(fibonacci(i, j, count))) || j;
+    count-- > 0 ? (return(fibonacci(i, j, count))) : j;
 };
 
 ##############################################################

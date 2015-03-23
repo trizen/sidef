@@ -110,12 +110,15 @@ package Sidef::Deparse::Sidef {
                 $code = "class $obj->{name}";
                 my $vars = $obj->{__VARS__};
                 $code .= '(' . $self->_dump_vars(@{$vars}) . ')';
+                if (exists $obj->{inherit}) {
+                    $code .= ' << ' . join(', ', @{$obj->{inherit}}) . ' ';
+                }
                 $code .= $self->deparse_expr({self => $block});
             }
         }
         elsif ($ref eq 'Sidef::Types::Block::Code') {
             if ($addr{refaddr($obj)}++) {
-                $code = '__BLOCK__';
+                $code = %{$obj} ? '__BLOCK__' : 'Block';
             }
             else {
                 if (%{$obj}) {
@@ -148,6 +151,9 @@ package Sidef::Deparse::Sidef {
         }
         elsif ($ref eq 'Sidef') {
             $code = 'Sidef';
+        }
+        elsif ($ref eq 'Sidef::Variable::LazyMethod') {
+            $code = 'LazyMethod';
         }
         elsif ($ref eq 'Sidef::Types::Glob::Fcntl') {
             $code = 'Fcntl';
@@ -301,7 +307,7 @@ package Sidef::Deparse::Sidef {
                 if ($code eq 'Hash' and $method eq ':') {
                     $method = 'new';
                 }
-                elsif ($code =~ /\.\w+\z/ && $method eq '?') {
+                elsif ($code =~ /\.\w+\z/ && $method =~ /^[?!:]/) {
                     $code = '(' . $code . ')';
                 }
                 elsif ($code =~ /^\w+\z/ and $method eq ':') {

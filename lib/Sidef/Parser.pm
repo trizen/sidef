@@ -1112,6 +1112,9 @@ package Sidef::Parser {
                                 my ($class, $code) = $self->find_var($name, $class_name);
                                 if (ref $class) {
                                     if ($class->{type} eq 'class') {
+                                        if (not defined $built_in_obj) {
+                                            push @{$obj->{inherit}}, $name;
+                                        }
                                         while (my ($name, $method) = each %{$class->{obj}{__METHODS__}}) {
                                             ($built_in_obj // $obj)->__add_method__($name, $method);
                                         }
