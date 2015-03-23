@@ -1024,7 +1024,8 @@ package Sidef::Parser {
                         my ($obj, $pos) = eval { $self->parse_expr(code => substr($_, pos($_))) };
                         if (not $@ and defined $obj) {
                             pos($_) += $pos;
-                            $built_in_obj = ref($obj) eq 'HASH' ? Sidef::Types::Block::Code->new($obj)->run : $obj;
+                            $built_in_obj =
+                              Sidef::Types::Block::Code->new(ref($obj) eq 'HASH' ? $obj : {self => $obj})->_execute_expr;
                         }
                     }
 
