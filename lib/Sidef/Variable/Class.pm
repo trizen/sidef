@@ -24,7 +24,7 @@ package Sidef::Variable::Class {
             utf8::decode($name);
         };
 
-        if (exists $self->{__VARS__}{$name}) {
+        if (exists $self->{__VARS__}{$name} or exists $self->{index_access}) {
             if (@args) {
                 return $self->{__VARS__}{$name} = $args[-1];
             }
@@ -42,9 +42,6 @@ package Sidef::Variable::Class {
         }
         elsif (exists $self->{method}{'AUTOLOAD'}) {
             return $self->{method}{'AUTOLOAD'}->call($self, Sidef::Types::String::String->new($name), @args);
-        }
-        elsif (exists $self->{index_access}) {
-            return Sidef::Variable::ClassVar->__new__(class => $self, name => $name);
         }
         else {
             warn "[WARN] Can't find method `$name' for class: $self->{name}\n";
