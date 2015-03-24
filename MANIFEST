@@ -246,6 +246,7 @@ scripts/Graphical/gtk2_tutorial.sf
 scripts/Graphical/tk_library.sf
 scripts/group_precedence.sf
 scripts/hailstone.sf
+scripts/happy_2_years_old.sf
 scripts/hash_autovivification.sf
 scripts/hash_default_value.sf
 scripts/hash_from_array.sf
