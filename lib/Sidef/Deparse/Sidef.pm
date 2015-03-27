@@ -149,7 +149,7 @@ package Sidef::Deparse::Sidef {
             ## ok
         }
         elsif ($ref eq 'Sidef::Sys::Sys') {
-            $code = 'Sys';
+            $code = exists($obj->{file_name}) ? '' : 'Sys';
         }
         elsif ($ref eq 'Sidef::Parser') {
             $code = 'Parser';

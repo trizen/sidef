@@ -5,7 +5,7 @@
 #
 
 var size = 4;
-var num = (1..9->shuffle.ft(0, size-1));
+var num = (1..9 shuffle.ft(0, size-1));
 
 for (var guesses = 0; true; guesses++) {
 
@@ -14,9 +14,9 @@ for (var guesses = 0; true; guesses++) {
 
     var input = (
                   Sys.scanln("Input: ").split(1)
-                                       .unique()
-                                       .grep {.match(/^[1-9]$/)??}
-                                       .map  {.toInt}
+                                       .unique
+                                       .grep {.~~/^[1-9]$/}
+                                       .map  {.to_i}
                 );
 
     input.len == size || (

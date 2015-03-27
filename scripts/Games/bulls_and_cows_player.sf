@@ -5,55 +5,46 @@
 
 # Build a list of all possible solutions.  The regular expression weeds
 # out numbers containing zeroes or repeated digits.
-
-var candidates = (1234..9876->grep{|i| /0 | (\d) .*? \1 /x->match(i.to_s) ?? not});
-
+var candidates = ('1234'..'9876' grep {|n| n !~ /0 | (\d) .*? \1 /x});
 
 # Repeatedly prompt for input until the user supplies a reasonable score.
 # The regex validates the user's input and then returns two numbers.
-
 func read_score(guess) {
-    {
+    loop {
         "My guess: %s   (from %d possibilities)\n"
             -> printf(guess, candidates.len);
 
-        var match = (
-                     Sys.scanln("bulls cows: ")
-                        .matches(/^\h*(?<BULLS>\d)\h*(?<COWS>\d)\h*$/)
-                    ) ?? && (
-                        var cp = (match.named_captures);
-                        var bc = ([cp['BULLS'], cp['COWS']].map{_->toInt});
-                        bc.sum <= 4 && (return(bc));
-                    );
+        if (Sys.scanln("bulls cows: ") ~~ /^\h*(\d)\h*(\d)\h*$/) {
+            var (bulls, cows) = ($1.to_i, $2.to_i);
+            bulls+cows <= 4 && return [bulls, cows];
+        }
 
         say "Please specify the number of bulls and the number of cows";
-
-        __BLOCK__.run;
-    }.run;
+    };
 }
 
 func score_correct(a, b, bulls, cows) {
+    var (exact, loose) = (0, 0);
 
-    # Count the positions at which the digits match:
-    var exact = (a ^ b -> split(1).count("\0"));
+    0...3 each { |i|
+        a[i] == b[i] ? ++exact
+                     : (b.contains(a[i]) && ++loose);
+    }
 
-    var loose = 0;
-    b.each { |c|
-       a.contains(c) && loose++;
-    };
-
-    bulls == exact && (cows == loose-exact);
+    (bulls == exact) && (cows == loose);
 }
 
-{
-    # Pick a number, display it, get the score, and discard candidates
-    # that don't match the score:
-    var guess = (candidates.rand);
-    var (bulls, cows) = (read_score(guess)...);
-    candidates.grep!{|i| score_correct(i.to_s, guess.to_s, bulls, cows)};
-}.do.while (candidates.len > 1);
+# Pick a number, display it, get the score, and discard candidates
+# that don't match the score:
+loop {
+    var guess = candidates.pick;
+    var (bulls, cows) = read_score(guess)...;
+    candidates.grep!{|n| score_correct(n, guess, bulls, cows)};
+    candidates.len > 1 || break;
+}
 
+# Print the secret number or the error message
 say (
-     candidates.len == 1 ? ("Your secret number is: %d".sprintf(candidates[0]))
+     candidates.len == 1 ? ("Your secret number is: %d" % candidates[0])
                          : ("I think you made a mistake with your scoring")
     );
