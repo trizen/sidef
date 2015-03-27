@@ -1468,6 +1468,7 @@ package Sidef::Parser {
 
                 if (/\G__USE_FASTNUM__\b;*/gc) {
                     delete $INC{'Sidef/Types/Number/NumberFast.pm'};
+                    require Sidef::Types::Number::Number;
                     require Sidef::Types::Number::NumberFast;
                     redo;
                 }
