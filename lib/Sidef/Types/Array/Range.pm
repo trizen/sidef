@@ -8,6 +8,27 @@ package Sidef::Types::Array::Range {
         bless \%opt, __PACKAGE__;
     }
 
+    sub min {
+        my ($self) = @_;
+        Sidef::Types::Number::Number->new($self->{from});
+    }
+
+    sub max {
+        my ($self) = @_;
+        Sidef::Types::Number::Number->new($self->{to});
+    }
+
+    sub step {
+        my ($self) = @_;
+        Sidef::Types::Number::Number->new($self->{step});
+    }
+
+    sub bounds {
+        my ($self) = @_;
+        Sidef::Types::Array::Array->new(Sidef::Types::Number::Number->new($self->{from}),
+                                        Sidef::Types::Number::Number->new($self->{to}));
+    }
+
     sub each {
         my ($self, $code) = @_;
 

@@ -215,6 +215,7 @@ scripts/Expensive/langton_s_ant.sf
 scripts/Expensive/langton_s_ant_2.sf
 scripts/Expensive/levenshtein_recursive.sf
 scripts/Expensive/longest_common_subsequence.sf
+scripts/Expensive/mandelbrot_set.sf
 scripts/Expensive/mutual_recursion.sf
 scripts/Expensive/root_of_a_function.sf
 scripts/Expensive/sudoku_solver.sf
