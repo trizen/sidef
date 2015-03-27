@@ -966,7 +966,9 @@ package Sidef::Types::String::String {
                 if (ref $parser eq 'Sidef::Parser') {
                     my $code = CORE::join('', @chars[$i + 1 .. $#chars]);
                     my ($block, $pos) = $parser->parse_block(code => $code);
-
+                    if (@{$block->{vars}} == 1) {
+                        $block = $block->{code};
+                    }
                     push @inline_expressions, [$i, $block];
                     splice(@chars, $i--, 1 + $pos);
                 }
@@ -1010,15 +1012,17 @@ package Sidef::Types::String::String {
 
             my $string = '';
             foreach my $char (@chars) {
-                if (ref($char) eq 'Sidef::Types::Block::Code') {
-                    my $block = {
-                                 $parser->{class} => [
-                                                      {
-                                                       self => $char,
-                                                       call => [{method => 'run'}]
-                                                      }
-                                                     ]
-                                };
+                if (ref($char)) {
+                    my $block = ref($char) eq 'HASH'
+                      ? $char
+                      : {
+                         $parser->{class} => [
+                                              {
+                                               self => $char,
+                                               call => [{method => 'run'}]
+                                              }
+                                             ]
+                        };
 
                     if ($string ne '') {
                         $append_arg->($string);
