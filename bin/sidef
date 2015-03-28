@@ -30,7 +30,7 @@ my $version = $Sidef::VERSION;
 my %args;
 if ($#ARGV != -1 and chr ord $ARGV[0] eq '-') {
     require Getopt::Std;
-    Getopt::Std::getopts('e:E:d:Dho:ivHN:n:WwcM:rR:tO:', \%args);
+    Getopt::Std::getopts('e:E:d:Dho:ivHN:n:WwcM:rR:tO:s:', \%args);
 }
 
 # Help
@@ -67,6 +67,11 @@ if (defined(my $type = $args{N})) {
 # Backend for Math::BigInt
 if (defined(my $type = $args{n})) {
     load_math_backend($type);
+}
+
+# Number of spaces for indentation
+if (defined(my $num = $args{s})) {
+    $Sidef::SPACES_INCR = int($num);
 }
 
 # Memoization
@@ -276,6 +281,7 @@ sub output_usage {
                     '-n type'        => ['try to use a specific backend for Math::BigInt', 'valid types: GMP, Pari, FastCalc'],
                     '-M type,type'   => ['memoize some expensive method calls', 'valid types: num, block, all'],
                     '-O level'       => ['optimize the syntax-tree of a program', 'valid optimization levels: 0, 1, 2'],
+                    '-s int'         => 'the number of spaces used in code indentation',
                     '-v'             => 'print version number and exit',
                     '-t'             => 'treat all command-line arguments as scripts',
                     '-r'             => 'deparse a Sidef program',
@@ -685,7 +691,7 @@ HEAD
 
                      close $fh;
                  }
-             }
+               }
             } => $path
         );
 
