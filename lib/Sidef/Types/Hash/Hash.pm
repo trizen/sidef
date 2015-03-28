@@ -336,17 +336,32 @@ package Sidef::Types::Hash::Hash {
     sub dump {
         my ($self) = @_;
 
-        Sidef::Types::String::String->new(
-            "Hash.new(" . join(
-                ", ",
-                map {
-                    my $val =
-                      ref($self->{data}{$_}) eq 'Sidef::Variable::Variable'
-                      ? $self->{data}{$_}->get_value
-                      : Sidef::Types::Nil::Nil->new;
+        $Sidef::SPACES += $Sidef::SPACES_INCR;
 
-                    "${Sidef::Types::String::String->new($_)->dump} => " . (eval { $val->can('dump') } ? ${$val->dump} : $val)
-                  } sort(CORE::keys(%{$self->{data}}))
+        # Sort the keys case insensitively
+        my @keys = sort { lc($a) cmp lc($b) } CORE::keys(%{$self->{data}});
+
+        Sidef::Types::String::String->new(
+            "Hash.new(" . (
+                @keys
+                ? (
+                   "\n" . join(
+                       ",\n",
+                       map {
+                           my $val =
+                             ref($self->{data}{$_}) eq 'Sidef::Variable::Variable'
+                             ? $self->{data}{$_}->get_value
+                             : Sidef::Types::Nil::Nil->new;
+
+                           (' ' x $Sidef::SPACES)
+                             . "${Sidef::Types::String::String->new($_)->dump} => "
+                             . (eval { $val->can('dump') } ? ${$val->dump} : $val)
+                         } @keys
+                     )
+                     . "\n"
+                     . (' ' x ($Sidef::SPACES -= $Sidef::SPACES_INCR))
+                  )
+                : ""
               )
               . ")"
         );

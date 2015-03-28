@@ -198,13 +198,13 @@ sub parse_code {
 
         # Deparse the AST into code, then parse the code again
         if ($args{O} >= 2) {
-            my $deparser   = Sidef::Deparse::Sidef->new(namespaces => [@Sidef::Exec::NAMESPACES]);
-            my @statements = $deparser->deparse($struct);
-            my $deparsed   = $deparser->{before} . join($deparser->{between}, @statements) . $deparser->{after};
+            my $deparser = Sidef::Deparse::Sidef->new(namespaces => [@Sidef::Exec::NAMESPACES]);
+            my $code = $deparser->deparse($struct);
+
             $struct = Sidef::Parser->new(
                                          file_name   => $parser->{file_name},
                                          script_name => $parser->{script_name},
-                                        )->parse_script(code => $deparsed);
+                                        )->parse_script(code => $code);
         }
 
         # Optimize the AST
@@ -508,9 +508,10 @@ sub deparse_structure {
 
     my $module = "Sidef::Deparse::\u\L$lang";
     my $pm     = ($module =~ s{::}{/}gr . '.pm');
+
     require $pm;
     my $deparser = $module->new(namespaces => [@Sidef::Exec::NAMESPACES],);
-    my @statements = $deparser->deparse($struct);
+    my $code = $deparser->deparse($struct);
 
     my $out_fh = \*STDOUT;
 
@@ -519,7 +520,7 @@ sub deparse_structure {
           or die "Can't open file '$args{o}' for write: $!\n";
     }
 
-    print {$out_fh} $deparser->{before} . join($deparser->{between}, @statements) . $deparser->{after};
+    print {$out_fh} $code;
 }
 
 sub dump_structure {

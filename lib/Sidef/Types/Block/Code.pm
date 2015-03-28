@@ -19,9 +19,8 @@ package Sidef::Types::Block::Code {
 
     sub dump {
         my ($self) = @_;
-        require Data::Dump;
-        Sidef::Types::String::String->new(
-                                    'Perl.eval(' . Sidef::Types::String::String->new(Data::Dump::pp($self))->basic_dump . ')');
+        my $deparser = Sidef::Deparse::Sidef->new(namespaces => [@Sidef::Exec::NAMESPACES]);
+        Sidef::Types::String::String->new($deparser->deparse_expr({self => $self}));
     }
 
     sub _execute {

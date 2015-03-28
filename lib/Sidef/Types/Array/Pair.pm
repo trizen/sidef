@@ -67,21 +67,25 @@ package Sidef::Types::Array::Pair {
     sub dump {
         my ($self) = @_;
 
-        my $string = Sidef::Types::String::String->new("Pair.new(");
+        Sidef::Types::String::String->new(
+            "Pair.new(" . "\n" . join(
+                ",\n",
 
-        for my $i (0, 1) {
-            my $item = $self->[$i]->get_value // 'nil';
+                (' ' x ($Sidef::SPACES += $Sidef::SPACES_INCR)) . join(
+                    " => ",
+                    map {
+                        my $val =
+                          ref($_) eq 'Sidef::Variable::Variable'
+                          ? $_->get_value
+                          : Sidef::Types::Nil::Nil->new;
 
-            $$string .=
-              (ref $item and defined eval { $item->can('dump') })
-              ? $item->dump()
-              : $item;
-
-            $$string .= ", " if $i != 1;
-        }
-
-        $$string .= ")";
-        $string;
+                        eval { $val->can('dump') } ? ${$val->dump} : $val
+                      } @{$self}
+                )
+              )
+              . "\n"
+              . (' ' x ($Sidef::SPACES -= $Sidef::SPACES_INCR)) . ")"
+        );
     }
 };
 

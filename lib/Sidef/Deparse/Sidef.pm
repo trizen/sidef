@@ -15,7 +15,6 @@ package Sidef::Deparse::Sidef {
                     before         => '',
                     between        => ";\n",
                     after          => ";\n",
-                    spaces_num     => 4,
                     namespaces     => [],
                     obj_with_block => {
                                        'Sidef::Types::Bool::While' => {
@@ -24,7 +23,6 @@ package Sidef::Deparse::Sidef {
                                       },
                     %args,
                    );
-
         %addr = ();    # reset the addr map
         bless \%opts, __PACKAGE__;
     }
@@ -65,7 +63,7 @@ package Sidef::Deparse::Sidef {
         # Self obj
         my $ref = ref($obj);
         if ($ref eq 'HASH') {
-            $code = join(', ', $self->deparse($obj));
+            $code = join(', ', $self->deparse_script($obj));
         }
         elsif ($ref eq 'Sidef::Variable::Variable') {
             if ($obj->{type} eq 'var' or $obj->{type} eq 'static' or $obj->{type} eq 'const') {
@@ -133,12 +131,12 @@ package Sidef::Deparse::Sidef {
                         $code .= '|' . $self->_dump_init_vars(@{$vars}[0 .. $#{$vars} - 1]) . "|";
                     }
                     $code .= "\n";
-                    $self->{spaces} += $self->{spaces_num};
-                    my @statements = $self->deparse($obj->{code});
+                    $Sidef::SPACES += $Sidef::SPACES_INCR;
+                    my @statements = $self->deparse_script($obj->{code});
                     $code .=
-                        (" " x $self->{spaces})
-                      . join(";\n" . (" " x $self->{spaces}), @statements) . "\n"
-                      . (" " x ($self->{spaces} -= $self->{spaces_num})) . '}';
+                        (" " x $Sidef::SPACES)
+                      . join(";\n" . (" " x $Sidef::SPACES), @statements) . "\n"
+                      . (" " x ($Sidef::SPACES -= $Sidef::SPACES_INCR)) . '}';
                 }
                 else {
                     $code = 'Block';
@@ -334,7 +332,7 @@ package Sidef::Deparse::Sidef {
                     $code .= '(' . join(
                         ', ',
                         map {
-                            ref($_) eq 'HASH' ? $self->deparse($_)
+                            ref($_) eq 'HASH' ? $self->deparse_script($_)
                               : exists($self->{obj_with_block}{$ref})
                               && exists($self->{obj_with_block}{$ref}{$method}) ? $self->deparse_expr({self => $_->{code}})
                               : $ref eq 'Sidef::Types::Block::For'
@@ -352,7 +350,7 @@ package Sidef::Deparse::Sidef {
         $code;
     }
 
-    sub deparse {
+    sub deparse_script {
         my ($self, $struct) = @_;
 
         my @results;
@@ -364,6 +362,12 @@ package Sidef::Deparse::Sidef {
         }
 
         wantarray ? @results : $results[-1];
+    }
+
+    sub deparse {
+        my ($self, $struct) = @_;
+        my @statements = $self->deparse_script($struct);
+        $self->{before} . join($self->{between}, @statements) . $self->{after};
     }
 };
 
