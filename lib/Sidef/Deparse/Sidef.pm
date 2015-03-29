@@ -78,6 +78,9 @@ package Sidef::Deparse::Sidef {
                     $code = "$obj->{type} $obj->{name}";
                     my $vars = delete $block->{init_vars};
                     $code .= '(' . $self->_dump_init_vars(@{$vars}[($obj->{type} eq 'method' ? 1 : 0) .. $#{$vars} - 1]) . ')';
+                    if (exists $obj->{returns}) {
+                        $code .= ' -> ' . $self->deparse_expr({self => $obj->{returns}});
+                    }
                     $code .= $self->deparse_expr({self => $block});
                 }
             }

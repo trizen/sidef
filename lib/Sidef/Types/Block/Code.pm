@@ -212,7 +212,7 @@ package Sidef::Types::Block::Code {
                     $var->set_value(@args[$i .. $#args]);
                     next;
                 };
-                exists($v->{def_value}) && exists($args[$i]) && $check_type->($v, $args[$i]);
+                exists($v->{has_value}) && exists($args[$i]) && $check_type->($v, $args[$i]);
                 $i == $last
                   ? $var->set_value(Sidef::Types::Array::Array->new(@args[$i .. $#args]))
                   : $var->set_value(exists($args[$i]) ? $args[$i] : ());
@@ -222,7 +222,7 @@ package Sidef::Types::Block::Code {
         foreach my $init_var (@{$self->{init_vars}}) {
             my $var = $init_var->{vars}[0];
             if (exists $named_vars{$var->{name}}) {
-                exists($var->{def_value}) && $check_type->($var, $named_vars{$var->{name}});
+                exists($var->{has_value}) && $check_type->($var, $named_vars{$var->{name}});
                 $init_var->set_value(delete($named_vars{$var->{name}}));
             }
         }

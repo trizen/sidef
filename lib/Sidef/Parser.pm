@@ -631,7 +631,7 @@ package Sidef::Parser {
                 my $obj = Sidef::Variable::Variable->new(
                                                          name => $name,
                                                          type => $opt{type},
-                                                         defined($value) ? (value => $value, def_value => 1) : (),
+                                                         defined($value) ? (value => $value, has_value => 1) : (),
                                                          $attr eq '*' ? (multi => 1) : (),
                                                         );
 
@@ -1025,7 +1025,9 @@ package Sidef::Parser {
                         if (not $@ and defined $obj) {
                             pos($_) += $pos;
                             $built_in_obj =
-                              Sidef::Types::Block::Code->new(ref($obj) eq 'HASH' ? $obj : {self => $obj})->_execute_expr;
+                              ref($obj) eq 'HASH'
+                              ? Sidef::Types::Block::Code->new($obj)->run
+                              : Sidef::Types::Block::Code->new({self => $obj})->_execute_expr;
                         }
                     }
 
@@ -1171,18 +1173,22 @@ package Sidef::Parser {
                         # Function return type (func name(...) -> Type {...})
                         # XXX: [KNOWN BUG] It doesn't check the returned type from method calls
                         if (/\G\h*(?:->|returns\b)\h*/gc) {
-                            my ($r_obj, $pos) = $self->parse_expr(code => substr($_, pos));
-                            pos($_) += $pos;
-
-                            ref($r_obj) eq 'HASH'
-                              and $self->fatal_error(
-                                                     error    => "invalid return-type for function '$obj->{name}'",
-                                                     expected => "expected a valid type, such as: Str, Num, Arr, etc...",
-                                                     code     => $_,
-                                                     pos      => pos($_) - $pos
-                                                    );
-
-                            $obj->{returns} = $r_obj;
+                            my ($return_obj, $pos) = eval { $self->parse_expr(code => substr($_, pos($_))) };
+                            if (not $@ and defined $return_obj) {
+                                pos($_) += $pos;
+                                $obj->{returns} =
+                                  ref($return_obj) eq 'HASH'
+                                  ? Sidef::Types::Block::Code->new($return_obj)->run
+                                  : Sidef::Types::Block::Code->new({self => $return_obj})->_execute_expr;
+                            }
+                            else {
+                                $self->fatal_error(
+                                                   error    => "invalid return-type for function '$name'",
+                                                   expected => "expected a valid type, such as: Str, Num, Arr, etc...",
+                                                   code     => $_,
+                                                   pos      => pos($_) - $pos
+                                                  );
+                            }
                         }
 
                         /\G\h*\{\h*/gc

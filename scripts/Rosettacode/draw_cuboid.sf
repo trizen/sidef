@@ -15,12 +15,12 @@ func cuboid(nx, ny, nz) {
     };
   };
 
-  0 .. nz-1 -> each {|i| line.call(x,       0,     4*i, "-")};
-  0 .. ny   -> each {|i| line.call(x,     2*i, z + 2*i, "-")};
-  0 .. nx-1 -> each {|i| line.call(z,     8*i,       0, "|")};
-  0 .. ny   -> each {|i| line.call(z, x + 2*i,     2*i, "|")};
-  0 .. nz-1 -> each {|i| line.call(y,       x,     4*i, "/")};
-  0 .. nx   -> each {|i| line.call(y,     8*i,       z, "/")};
+  0 ... nz-1 -> each {|i| line.call(x,       0,     4*i, "-")};
+  0 ... ny   -> each {|i| line.call(x,     2*i, z + 2*i, "-")};
+  0 ... nx-1 -> each {|i| line.call(z,     8*i,       0, "|")};
+  0 ... ny   -> each {|i| line.call(z, x + 2*i,     2*i, "|")};
+  0 ... nz-1 -> each {|i| line.call(y,       x,     4*i, "/")};
+  0 ... nx   -> each {|i| line.call(y,     8*i,       z, "/")};
 
   area.reverse.each { |line|
      say line.join('');
