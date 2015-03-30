@@ -125,6 +125,7 @@ package Sidef::Variable::ClassInit {
     {
         no strict 'refs';
         *{__PACKAGE__ . '::' . '='}  = \&replace;
+        *{__PACKAGE__ . '::' . '+='} = \&inherit;
         *{__PACKAGE__ . '::' . '<'}  = \&inherit;
         *{__PACKAGE__ . '::' . '<<'} = \&inherit;
     }
