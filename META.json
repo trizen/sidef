@@ -57,7 +57,7 @@
    "provides" : {
       "Sidef" : {
          "file" : "lib/Sidef.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       },
       "Sidef::Args::Args" : {
          "file" : "lib/Sidef/Args/Args.pm"
@@ -288,5 +288,5 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.03"
+   "version" : "0.04"
 }
