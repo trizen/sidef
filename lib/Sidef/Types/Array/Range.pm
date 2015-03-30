@@ -8,6 +8,12 @@ package Sidef::Types::Array::Range {
         bless \%opt, __PACKAGE__;
     }
 
+    sub by {
+        my ($self, $step) = @_;
+        $self->{step} = $step->get_value;
+        $self;
+    }
+
     sub min {
         my ($self) = @_;
         Sidef::Types::Number::Number->new($self->{from});
