@@ -2,6 +2,11 @@ package Sidef::Module::Require {
 
     use 5.014;
 
+    use parent qw(
+      Sidef::Module::Func
+      Sidef::Module::Caller
+      );
+
     sub new {
         bless {}, __PACKAGE__;
     }

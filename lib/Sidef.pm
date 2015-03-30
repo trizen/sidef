@@ -23,7 +23,12 @@ package Sidef {
             eval { require $self =~ s{::}{/}rg . '.pm' };
 
             if ($@) {
-                die "[AUTOLOAD] $@";
+                if (defined &main::load_module) {
+                    main::load_module($self);
+                }
+                else {
+                    die "[AUTOLOAD] $@";
+                }
             }
 
             my $func = \&{$AUTOLOAD};

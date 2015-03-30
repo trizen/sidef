@@ -30,7 +30,7 @@ my $version = $Sidef::VERSION;
 my %args;
 if ($#ARGV != -1 and chr ord $ARGV[0] eq '-') {
     require Getopt::Std;
-    Getopt::Std::getopts('e:E:d:Dho:ivHN:n:WwcM:rR:tO:s:', \%args);
+    Getopt::Std::getopts('e:E:d:Dho:ivHN:n:WwbcM:rR:tO:s:', \%args);
 }
 
 # Help
@@ -142,27 +142,36 @@ else {
       : do { local $/; <STDIN> };
 
     $code // exit 2;
-    my $parser = new_parser(name => $script_name);
-    my $struct = parse_code($parser, $code);
 
-    # Dump the data structure
-    if (defined $args{D}) {
-        dump_structure($struct);
+    # Bundle the code as a Perl program (without parsing it)
+    if (defined $args{b}) {
+        compile_to_perl($code, $script_name);
     }
-
-    # Deparse code
-    elsif (defined($args{r}) or defined($args{R})) {
-        deparse_structure($struct);
-    }
-
-    # Compile the struct to a Perl program
-    elsif (defined $args{c}) {
-        compile_to_perl($struct);
-    }
-
-    # Execute the struct
     else {
-        execute_struct($struct);
+
+        # Parse the code
+        my $parser = new_parser(name => $script_name);
+        my $struct = parse_code($parser, $code);
+
+        # Dump the data structure
+        if (defined $args{D}) {
+            dump_structure($struct);
+        }
+
+        # Deparse code
+        elsif (defined($args{r}) or defined($args{R})) {
+            deparse_structure($struct);
+        }
+
+        # Compile the struct to a Perl program
+        elsif (defined $args{c}) {
+            compile_to_perl($struct);
+        }
+
+        # Execute the struct
+        else {
+            execute_struct($struct);
+        }
     }
 }
 
@@ -271,6 +280,7 @@ sub execute_struct {
 sub output_usage {
     my %switches = (
                     '-i'             => 'interactive mode',
+                    '-b'             => 'bundle the code as a stand-alone perl program',
                     '-c'             => 'compile the code as a stand-alone perl program',
                     '-d dumped_file' => 'execute a syntax tree dumped file',
                     '-D'             => 'dump the syntax tree of a program',
@@ -480,31 +490,32 @@ sub _get_namespaces {
       : '';
 }
 
-sub _get_number_type {
-    my $code = "use Math::BigFloat;\n";
+sub _get_number_modules {
+    my @modules;
 
     if (defined(my $type = $args{N})) {
         if ($type eq 'fast' or $type eq 'perl') {
-            $code .= "require Sidef::Types::Number::NumberFast;\n";
+            push @modules, 'Sidef::Types::Number::NumberFast';
         }
         elsif ($type eq 'rat') {
-            $code .= "require Sidef::Types::Number::NumberRat;\n";
+            push @modules, 'Sidef::Types::Number::NumberRat';
         }
         elsif ($type eq 'int') {
-            $code .= "require Sidef::Types::Number::NumberInt;\n";
+            push @modules, 'Sidef::Types::Number::NumberInt';
         }
     }
-    $code;
+
+    return @modules;
 }
 
 sub _get_loaded_modules {
-    my $modules = '';
+    my @modules;
     foreach my $key (sort { length($a) <=> length($b) || $a cmp $b } keys %INC) {
-        if ($key =~ /^Sidef\b/) {
-            $modules .= "require '$key';\n";
+        if ($key =~ /^(Sidef\b.*)\.pm\z/) {
+            push @modules, $1 =~ s{/}{::}gr;
         }
     }
-    $modules;
+    return @modules;
 }
 
 sub deparse_structure {
@@ -535,7 +546,7 @@ sub dump_structure {
     eval { require Data::Dump };
 
     if ($@) {
-        die "Data::Dump module is not installed!\n";
+        die qq{** "Data::Dump" is not installed!\n};
     }
     else {
         my $out_fh = \*STDOUT;
@@ -544,9 +555,15 @@ sub dump_structure {
             open $out_fh, '>:utf8', $args{o}
               or die "Can't open file '$args{o}' for write: $!\n";
         }
+
+        my $requirify = sub {
+            join('', map { "require '" . (s{::}{/}gr) . ".pm';\n" } @_);
+        };
+
         print {$out_fh} _get_namespaces();
-        print {$out_fh} _get_number_type();
-        print {$out_fh} _get_loaded_modules();
+        print {$out_fh} "use Math::BigFloat;\n";
+        print {$out_fh} $requirify->(_get_loaded_modules());
+        print {$out_fh} $requirify->(_get_number_modules());
         print {$out_fh} Data::Dump::pp($struct);
     }
 }
@@ -633,116 +650,137 @@ sub memoize_types {
 }
 
 sub compile_to_perl {
-    my ($struct) = @_;
+    my ($code, $script_name) = @_;
 
-    eval { require Data::Dump };
+    my $is_ast = ref($code) ? 1 : 0;
 
-    if ($@) {
-        die "Data::Dump module is not installed!";
+    if ($is_ast) {
+        eval { require Data::Dump };
+        if ($@) {
+            die qq{** "Data::Dump" is not installed!\n};
+        }
     }
-    else {
-        require File::Basename;
-        my $path = File::Basename::dirname($INC{'Sidef.pm'});
 
-        my $package_content = <<"HEAD";
+    require File::Basename;
+    my $path = File::Basename::dirname($INC{'Sidef.pm'});
+
+    my $package_content = <<"HEAD";
 #!$^X
 
 eval 'exec $^X  -S \$0 \${1+"\$@"}'
     if 0; # not running under some shell
 
-use utf8;
-use 5.014;
-use warnings;
-
-# For `inf` and `nan` barewords
-no strict 'subs';
-no warnings 'reserved', 'once';
-
-use File::Temp qw(tempdir);
-use File::Path qw(make_path);
-use File::Spec::Functions qw(catdir catfile);
-
-my \$DIR;
-use lib \$DIR = tempdir(CLEANUP => 1);
-
 binmode STDIN,  ":utf8";
 binmode STDOUT, ":utf8";
 binmode STDERR, ":utf8" if \$^P == 0;    # to work under Devel::* modules
 
-foreach my \$mod (
+my %REQ;
+my %MODULE = (
 HEAD
 
-        require File::Find;
-        File::Find::find(
-            {
-             no_chdir => 1,
-             wanted   => sub {
-                 if (/\.pm\z/ and -f) {
+    require File::Find;
+    File::Find::find(
+        {
+         no_chdir => 1,
+         wanted   => sub {
+             if (/\.pm\z/ and -f) {
 
-                     local $/;
-                     open my $fh, '<:utf8', $_
-                       or die "Can't open file `$_' for reading: $!";
+                 local $/;
+                 open my $fh, '<:utf8', $_
+                   or die "Can't open file `$_' for reading: $!";
 
-                     my $token = tr/A-Za-z0-9/_/cr;
+                 my $token   = tr/A-Za-z0-9/_/cr;
+                 my $content = <$fh>;
 
-                     $package_content .= qq{<<'${token}',\n};
-                     $package_content .= <$fh>;
-                     $package_content .= "\n$token\n";
-
-                     close $fh;
+                 if ($content =~ /^(?>##\h*)?package\h+([\w:]+)/) {
+                     $package_content .= qq{'$1' => };
                  }
-               }
-            } => $path
-        );
+                 else {
+                     die qq{ERROR: can't get the package name!};
+                 }
 
-        $package_content .= <<"FOOT";
-) {
-    if (\$mod =~ /^(?>##\\h*)?package\\h+([\\w:]+)/) {
-        my \@parts = split(/::/, \$1);
+                 $package_content .= qq{<<'${token}',\n};
+                 $package_content .= $content;
+                 $package_content .= "\n$token\n";
 
-        my \$name = pop \@parts;
-        my \$dir = catdir(\$DIR, \@parts);
+                 close $fh;
+             }
+           }
+        } => $path
+    );
 
-        if (\$#parts != -1 and not -d \$dir) {
-            make_path(\$dir)
-                or die qq{ERROR: Can't create directory "\$dir": \$!};
+    $package_content .= <<'FOOT';
+);
+
+sub load_module {
+    my ($name) = @_;
+    if (not exists $REQ{$name}) {
+        my $module = $name =~ s{::}{/}gr . '.pm';
+        if (exists $MODULE{$name} and not exists $INC{$module}) {
+             if ($MODULE{$name} =~ /^\h*use parent\s+qw\((.*?)\)/sm) {
+                load_module($_) for split(' ', $1);
+            }
+            $INC{$module} = 1;
+            eval($MODULE{$name});
         }
-
-        my \$filename = catfile(\$dir, \$name . '.pm');
-
-        open my \$fh, '>:utf8', \$filename
-            or die qq{ERROR: Can't create file "\$filename": \$!};
-
-        print {\$fh} \$mod;
-
-        close \$fh
-            or die qq{ERROR: Can't close file "\$filename": \$!};
+        else {
+            require $module;
+        }
+        $REQ{$name} = 1;
     }
-    else {
-        die qq{ERROR: can't get the package name!};
-    }
+    return 1;
 }
 
 FOOT
 
-        $package_content .= _get_number_type();
-        $package_content .= _get_loaded_modules();
+    my $requirify = sub {
+        join('', map { "load_module('$_');\n" } @_);
+    };
 
-        my $out_fh = \*STDOUT;
+    if ($is_ast) {
+        $package_content .= "use Math::BigFloat;\n";
+        $package_content .= $requirify->(_get_loaded_modules());
+    }
+    else {
+        $package_content .= $requirify->('Sidef', 'Sidef::Parser', 'Sidef::Exec');
+    }
 
-        if (defined $args{o}) {
-            open $out_fh, '>:utf8', $args{o}
-              or die "Can't open file '$args{o}' for write: $!";
-        }
+    if ((my @num_modules = _get_number_modules())) {
+        $package_content .= $requirify->('Sidef::Types::Number::Number', @num_modules);
+    }
 
-        print {$out_fh} $package_content;
+    my $out_fh = \*STDOUT;
 
+    if (defined $args{o}) {
+        open $out_fh, '>:utf8', $args{o}
+          or die "Can't open file '$args{o}' for write: $!";
+    }
+
+    print {$out_fh} $package_content;
+
+    if ($is_ast) {
         print {$out_fh} _get_namespaces;
         print {$out_fh} "\nmy \$struct = ";
-        print {$out_fh} Data::Dump::pp($struct);
+        print {$out_fh} Data::Dump::pp($code);
         print {$out_fh} ";\n";
 
-        print {$out_fh} <<"EXEC";
+    }
+    else {
+        print {$out_fh} <<"EOT"
+
+chomp(my \$code = <<'~/////////////////END-OF-CODE/////////////////~');
+$code
+~/////////////////END-OF-CODE/////////////////~
+
+my \$parser = Sidef::Parser->new(file_name   => "\Q$script_name\E",
+                                script_name => "\Q$script_name\E",);
+
+my \$struct = \$parser->parse_script(code => \$code);
+EOT
+
+    }
+
+    print {$out_fh} <<"EXEC";
 
 #
 ## Execute the data structure
@@ -750,5 +788,4 @@ FOOT
 
 Sidef::Exec->new->execute(\$struct);
 EXEC
-    }
 }
