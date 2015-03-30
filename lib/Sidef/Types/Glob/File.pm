@@ -394,7 +394,8 @@ package Sidef::Types::Glob::File {
         }
 
         my $success = CORE::open(my $fh, $mode, $self->get_value);
-        my $fh_obj = Sidef::Types::Glob::FileHandle->new(fh => $fh, file => $self);
+        my $error   = $!;
+        my $fh_obj  = Sidef::Types::Glob::FileHandle->new(fh => $fh, file => $self);
 
         if (defined $fh_ref) {
             $fh_ref->get_var->set_value($fh_obj);
@@ -402,7 +403,7 @@ package Sidef::Types::Glob::File {
             return $success
               ? Sidef::Types::Bool::Bool->true
               : do {
-                defined($err_ref) && $err_ref->get_var->set_value(Sidef::Types::String::String->new($!));
+                defined($err_ref) && $err_ref->get_var->set_value(Sidef::Types::String::String->new($error));
                 Sidef::Types::Bool::Bool->false;
               };
         }
