@@ -1255,7 +1255,7 @@ package Sidef::Types::Array::Array {
         my ($self) = @_;
 
         Sidef::Types::String::String->new(
-            '[' . join(
+            '[' . CORE::join(
                 ', ',
                 map {
                     my $item = defined($self->[$_]) ? $self->[$_]->get_value : 'nil';
