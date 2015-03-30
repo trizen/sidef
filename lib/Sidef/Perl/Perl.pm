@@ -68,8 +68,7 @@ package Sidef::Perl::Perl {
 
     sub eval {
         my ($self, $perl_code) = @_;
-        $self->_is_string($perl_code) || return;
-        $self->to_sidef(eval $$perl_code);
+        $self->to_sidef(eval $perl_code->get_value);
     }
 };
 

@@ -72,7 +72,7 @@ package Sidef::Time::Time {
 
     sub dump {
         my ($self) = @_;
-        Sidef::Types::String::String->new('Time.new(' . $$self . ')');
+        Sidef::Types::String::String->new('Time.new(' . $self->get_value . ')');
     }
 
 };

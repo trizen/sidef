@@ -6,7 +6,7 @@ package Sidef::Types::Block::Break {
 
     sub break {
         my ($self, $depth) = @_;
-        $self->{depth} = defined($depth) ? $$depth : 1;
+        $self->{depth} = ref($depth) ? $depth->get_value : 1;
         $self;
     }
 

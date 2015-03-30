@@ -86,8 +86,7 @@ package Sidef::Types::Glob::DirHandle {
 
     sub seek {
         my ($self, $pos) = @_;
-        $self->_is_number($pos) || return;
-        Sidef::Types::Bool::Bool->new(seekdir($self->{dir_h}, $$pos));
+        Sidef::Types::Bool::Bool->new(seekdir($self->{dir_h}, $pos->get_value));
     }
 
     sub rewind {

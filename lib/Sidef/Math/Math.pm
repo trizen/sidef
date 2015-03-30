@@ -10,8 +10,7 @@ package Sidef::Math::Math {
 
     sub e {
         my ($self, $places) = @_;
-        Sidef::Types::Number::Number->new(
-                            Math::BigFloat->bexp(1, defined($places) ? ($self->_is_number($places)) ? $$places : return : ()));
+        Sidef::Types::Number::Number->new(Math::BigFloat->bexp(1, defined($places) ? $places->get_value : ()));
     }
 
     sub exp {

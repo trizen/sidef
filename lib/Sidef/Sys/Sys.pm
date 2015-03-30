@@ -16,37 +16,29 @@ package Sidef::Sys::Sys {
     sub alarm {
         my ($self, $sec) = @_;
 
-        $self->_is_number($sec) || return;
-
         require Time::HiRes;
-        Sidef::Types::Bool::Bool->new(Time::HiRes::alarm($$sec));
+        Sidef::Types::Bool::Bool->new(Time::HiRes::alarm($sec->get_value));
     }
 
     sub ualarm {
         my ($self, $sec) = @_;
 
-        $self->_is_number($sec) || return;
-
         require Time::HiRes;
-        Sidef::Types::Bool::Bool->new(Time::HiRes::ualarm($$sec));
+        Sidef::Types::Bool::Bool->new(Time::HiRes::ualarm($sec->get_value));
     }
 
     sub sleep {
         my ($self, $sec) = @_;
 
-        $self->_is_number($sec) || return;
-
         require Time::HiRes;
-        Sidef::Types::Bool::Bool->new(Time::HiRes::sleep($$sec));
+        Sidef::Types::Bool::Bool->new(Time::HiRes::sleep($sec->get_value));
     }
 
     sub nanosleep {
         my ($self, $sec) = @_;
 
-        $self->_is_number($sec) || return;
-
         require Time::HiRes;
-        Sidef::Types::Bool::Bool->new(Time::HiRes::nanosleep($$sec));
+        Sidef::Types::Bool::Bool->new(Time::HiRes::nanosleep($sec->get_value));
     }
 
     *nanoSleep = \&nanosleep;
@@ -54,10 +46,8 @@ package Sidef::Sys::Sys {
     sub usleep {
         my ($self, $sec) = @_;
 
-        $self->_is_number($sec) || return;
-
         require Time::HiRes;
-        Sidef::Types::Bool::Bool->new(Time::HiRes::usleep($$sec));
+        Sidef::Types::Bool::Bool->new(Time::HiRes::usleep($sec->get_value));
     }
 
     sub osname {
@@ -78,8 +68,7 @@ package Sidef::Sys::Sys {
         my ($self, $mode) = @_;
 
         if (defined($mode)) {
-            $self->_is_number($mode) || return;
-            return Sidef::Types::Number::Number->new(CORE::umask($$mode));
+            return Sidef::Types::Number::Number->new(CORE::umask($mode->get_value));
         }
 
         Sidef::Types::Number::Number->new(CORE::umask);

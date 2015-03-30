@@ -13,6 +13,12 @@ package Sidef::Variable::Class {
         Sidef::Types::String::String->new($self->{name});
     }
 
+    sub get_value {
+        my $self = shift;
+        $AUTOLOAD = __PACKAGE__ . '::' . 'get_value';
+        $self->AUTOLOAD(@_);
+    }
+
     sub DESTROY { }
 
     sub AUTOLOAD {

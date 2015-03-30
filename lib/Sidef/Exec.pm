@@ -232,14 +232,8 @@ package Sidef::Exec {
                     $method = $method->get_value;
                 }
 
-                if ((my $ref = ref($method))) {
-                    if ($ref eq 'Sidef::Types::String::String') {
-                        $method = $$method;
-                    }
-                    else {
-                        warn "[WARN] Invalid method of type: '$ref'!\n";
-                        return;
-                    }
+                if (ref $method) {
+                    $method = $method->get_value;
                 }
 
                 $self_obj //= $self->{__NIL__} //= Sidef::Types::Nil::Nil->new;

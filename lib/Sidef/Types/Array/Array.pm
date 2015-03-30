@@ -1254,22 +1254,17 @@ package Sidef::Types::Array::Array {
     sub dump {
         my ($self) = @_;
 
-        my $string = Sidef::Types::String::String->new("[");
+        Sidef::Types::String::String->new(
+            '[' . join(
+                ', ',
+                map {
+                    my $item = defined($self->[$_]) ? $self->[$_]->get_value : 'nil';
+                    ref($item) && defined(eval { $item->can('dump') }) ? $item->dump() : $item;
+                  } 0 .. $#{$self}
+              )
+              . ']'
+        );
 
-        foreach my $i (0 .. $#{$self}) {
-            my $item = defined($self->[$i]) ? $self->[$i]->get_value : 'nil';
-
-            if (ref $item and defined eval { $item->can('dump') }) {
-                $$string .= $item->dump();
-            }
-            else {
-                $$string .= $item;
-            }
-            $$string .= ", " if $i != $#{$self};
-        }
-
-        $$string .= "]";
-        $string;
     }
 
     {

@@ -51,8 +51,7 @@ package Sidef::Types::Glob::FileHandle {
 
     sub binmode {
         my ($self, $encoding) = @_;
-        $self->_is_string($encoding) || return;
-        CORE::binmode($self->{fh}, $$encoding);
+        CORE::binmode($self->{fh}, $encoding->get_value);
     }
 
     sub compare {
@@ -95,20 +94,14 @@ package Sidef::Types::Glob::FileHandle {
     sub read {
         my ($self, $var_ref, $length, $offset) = @_;
 
-        $self->_is_var_ref($var_ref) || return;
-        $self->_is_number($length)   || return;
-
         my $var = $var_ref->get_var;
         my $chunk = $var->get_value->get_value // '';
 
         my $size = Sidef::Types::Number::Number->new(
-            defined($offset)
-            ? do {
-                $self->_is_number($offset) || return;
-                CORE::read($self->{fh}, $chunk, $$length, $$offset);
-              }
-            : CORE::read($self->{fh}, $chunk, $$length)
-        );
+                                                     defined($offset)
+                                                     ? CORE::read($self->{fh}, $chunk, $length->get_value, $offset->get_value)
+                                                     : CORE::read($self->{fh}, $chunk, $length->get_value)
+                                                    );
 
         $var->set_value(Sidef::Types::String::String->new($chunk));
 
@@ -118,19 +111,13 @@ package Sidef::Types::Glob::FileHandle {
     sub sysread {
         my ($self, $var_ref, $length, $offset) = @_;
 
-        $self->_is_var_ref($var_ref) || return;
-        $self->_is_number($length)   || return;
-
         my $var = $var_ref->get_var;
         my $chunk = $var->get_value->get_value // '';
 
         my $size = Sidef::Types::Number::Number->new(
-            defined($offset)
-            ? do {
-                $self->_is_number($offset) || return;
-                CORE::sysread($self->{fh}, $chunk, $$length, $$offset);
-              }
-            : CORE::sysread($self->{fh}, $chunk, $$length)
+                                                   defined($offset)
+                                                   ? CORE::sysread($self->{fh}, $chunk, $length->get_value, $offset->get_value)
+                                                   : CORE::sysread($self->{fh}, $chunk, $length->get_value)
         );
 
         $var->set_value(Sidef::Types::String::String->new($chunk));
@@ -246,20 +233,12 @@ package Sidef::Types::Glob::FileHandle {
 
     sub seek {
         my ($self, $pos, $whence) = @_;
-
-        (not $self->_is_number($pos) or not $self->_is_number($whence))
-          && return Sidef::Types::Bool::Bool->false;
-
-        Sidef::Types::Bool::Bool->new(seek($self->{fh}, $$pos, $$whence));
+        Sidef::Types::Bool::Bool->new(seek($self->{fh}, $pos->get_value, $whence->get_value));
     }
 
     sub sysseek {
         my ($self, $pos, $whence) = @_;
-
-        (not $self->_is_number($pos) or not $self->_is_number($whence))
-          && return Sidef::Types::Bool::Bool->false;
-
-        Sidef::Types::Bool::Bool->new(sysseek($self->{fh}, $$pos, $$whence));
+        Sidef::Types::Bool::Bool->new(sysseek($self->{fh}, $pos->get_value, $whence->get_value));
     }
 
     *sysSeek = \&sysseek;
@@ -285,8 +264,7 @@ package Sidef::Types::Glob::FileHandle {
 
     sub flock {
         my ($self, $mode) = @_;
-        $self->_is_number($mode) || return;
-        Sidef::Types::Bool::Bool->new(CORE::flock($self->{fh}, $$mode));
+        Sidef::Types::Bool::Bool->new(CORE::flock($self->{fh}, $mode->get_value));
     }
 
     sub close {
@@ -306,21 +284,15 @@ package Sidef::Types::Glob::FileHandle {
 
     sub truncate {
         my ($self, $length) = @_;
-
-        my $len =
-          defined($length)
-          ? ($self->_is_number($length) ? $$length : return)
-          : 0;
-
+        my $len = defined($length) ? $length->get_value : 0;
         Sidef::Types::Bool::Bool->new(CORE::truncate($self->{fh}, $len));
     }
 
     sub separator {
         my ($self, $sep) = @_;
-        $self->_is_string($sep) || return;
 
         my $old_sep = $/;
-        $/ = $$sep;
+        $/ = $sep->get_value if defined($sep);
 
         Sidef::Types::String::String->new($old_sep);
     }
