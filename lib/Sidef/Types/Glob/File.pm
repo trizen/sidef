@@ -20,8 +20,8 @@ package Sidef::Types::Glob::File {
 
     sub get_constant {
         my ($self, $name) = @_;
-        Sidef::Types::Glob::Fcntl->new;
-        Sidef::Types::Glob::Fcntl->$name;
+        state $fcntl = Sidef::Types::Glob::Fcntl->new;
+        $fcntl->$name;
     }
 
     sub touch {

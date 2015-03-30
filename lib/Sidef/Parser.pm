@@ -807,7 +807,7 @@ package Sidef::Parser {
 
                     my $obj = $double_quoted
                       ? do {
-                        Sidef::Types::String::String->new;    # load the string module
+                        state $str = Sidef::Types::String::String->new;    # load the string module
                         Sidef::Types::String::String::apply_escapes($package->$method($string), $self);
                       }
                       : $package->$method($string =~ s{\\\\}{\\}gr);
