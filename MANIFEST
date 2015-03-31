@@ -294,6 +294,7 @@ scripts/lwp_module.sf
 scripts/magic_vars.sf
 scripts/Math/Algebra/Matrix.sm
 scripts/matrix_multiplication.sf
+scripts/maze_generation.sf
 scripts/median.sf
 scripts/merge_sort.sf
 scripts/merge_sort_2.sf
