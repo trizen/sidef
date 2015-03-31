@@ -549,7 +549,9 @@ package Sidef::Parser {
                 next if exists $opt{ignore_delim} and exists $opt{ignore_delim}{$key};
                 if (/\G\Q$key\E\h*/gc) {
                     $end_delim = $self->{delim_pairs}{$key} // '|';
-                    /\G\R\h*/gc && ++$self->{line};
+                    if ((my ($pos) = $self->parse_whitespace(code => substr($_, pos)))[0]) {
+                        pos($_) += $pos;
+                    }
                     last;
                 }
             }
@@ -564,10 +566,14 @@ package Sidef::Parser {
                 }
 
                 defined($end_delim) && (/\G\h*,\h*/gc || last);
-                /\G\h*\R\h*/gc && ++$self->{line};
+                if ((my ($pos) = $self->parse_whitespace(code => substr($_, pos)))[0]) {
+                    pos($_) += $pos;
+                }
             }
 
-            /\G\h*\R/gc && ++$self->{line};
+            if ((my ($pos) = $self->parse_whitespace(code => substr($_, pos)))[0]) {
+                pos($_) += $pos;
+            }
             defined($end_delim)
               && (
                   /\G\h*\Q$end_delim\E/gc
@@ -592,7 +598,9 @@ package Sidef::Parser {
                 next if exists $opt{ignore_delim} and exists $opt{ignore_delim}{$key};
                 if (/\G\Q$key\E\h*/gc) {
                     $end_delim = $self->{delim_pairs}{$key} // '|';
-                    /\G\R\h*/gc && ++$self->{line};
+                    if ((my ($pos) = $self->parse_whitespace(code => substr($_, pos)))[0]) {
+                        pos($_) += $pos;
+                    }
                     last;
                 }
             }
@@ -648,10 +656,15 @@ package Sidef::Parser {
 
                 push @var_objs, $obj;
                 defined($end_delim) && (/\G\h*,\h*/gc || last);
-                /\G\h*\R\h*/gc && ++$self->{line};
+                if ((my ($pos) = $self->parse_whitespace(code => substr($_, pos)))[0]) {
+                    pos($_) += $pos;
+                }
             }
 
-            /\G\h*\R/gc && ++$self->{line};
+            if ((my ($pos) = $self->parse_whitespace(code => substr($_, pos)))[0]) {
+                pos($_) += $pos;
+            }
+
             defined($end_delim)
               && (
                   /\G\h*\Q$end_delim\E/gc
@@ -971,7 +984,13 @@ package Sidef::Parser {
 
                 # Declaration of enums
                 if (/\Genum\b\h*/gc) {
-                    my ($vars, $pos) = $self->get_init_vars(code => substr($_, pos));
+                    my ($vars, $pos) =
+                      $self->parse_init_vars(
+                                             code      => substr($_, pos),
+                                             with_vals => 1,
+                                             private   => 1,
+                                             type      => 'var',
+                                            );
                     pos($_) += $pos;
 
                     @{$vars}
@@ -981,8 +1000,15 @@ package Sidef::Parser {
                                             error => q{expected one or more variable names after <enum>},
                                            );
 
-                    foreach my $i (0 .. $#{$vars}) {
-                        my $name = $vars->[$i];
+                    my $value = Sidef::Types::Number::Number->new(-1);
+
+                    foreach my $var (@{$vars}) {
+                        my $name = $var->{name};
+
+                        $value =
+                            $var->{has_value}
+                          ? $var->{value}
+                          : $value->inc;
 
                         if (exists $self->{keywords}{$name}) {
                             $self->fatal_error(
@@ -994,7 +1020,7 @@ package Sidef::Parser {
 
                         unshift @{$self->{vars}{$self->{class}}},
                           {
-                            obj   => Sidef::Types::Number::Number->new($i),
+                            obj   => $value,
                             name  => $name,
                             count => 0,
                             type  => 'enum',
@@ -1100,6 +1126,7 @@ package Sidef::Parser {
                                                  code         => substr($_, pos),
                                                  with_vals    => 1,
                                                  private      => 1,
+                                                 type         => 'var',
                                                  ignore_delim => {
                                                                   '{' => 1,
                                                                   '<' => 1,
