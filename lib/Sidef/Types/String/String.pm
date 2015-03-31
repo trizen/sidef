@@ -748,12 +748,11 @@ package Sidef::Types::String::String {
     sub count {
         my ($self, $substr) = @_;
 
-        my $pos     = -1;
-        my $counter = 0;
-        while (($pos = CORE::index($self->get_value, $substr->get_value, $pos + 1)) != -1) {
-            ++$counter;
-        }
+        my $s  = $self->get_value;
+        my $ss = $substr->get_value;
 
+        my $counter = 0;
+        ++$counter while $s =~ /\Q$ss\E/g;
         Sidef::Types::Number::Number->new($counter);
     }
 
@@ -1013,7 +1012,8 @@ package Sidef::Types::String::String {
             my $string = '';
             foreach my $char (@chars) {
                 if (ref($char)) {
-                    my $block = ref($char) eq 'HASH'
+                    my $block =
+                      ref($char) eq 'HASH'
                       ? $char
                       : {
                          $parser->{class} => [
