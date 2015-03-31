@@ -307,6 +307,11 @@ package Sidef::Types::Number::Number {
         Sidef::Types::String::String->new(($neg ? '-' : '') . $x);
     }
 
+    sub dump {
+        my ($self) = @_;
+        Sidef::Types::String::String->new($self->get_value);
+    }
+
     sub sstr {
         my ($self) = @_;
         Sidef::Types::String::String->new(sprintf "%g", $self->get_value);

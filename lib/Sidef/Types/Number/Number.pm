@@ -593,7 +593,7 @@ package Sidef::Types::Number::Number {
 
     sub dump {
         my ($self) = @_;
-        Sidef::Types::String::String->new($self->get_value);
+        Sidef::Types::String::String->new($self->get_value->bstr);
     }
 
     sub sstr {
