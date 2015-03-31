@@ -243,7 +243,7 @@ package Sidef::Deparse::Sidef {
             $code = 'Sig';
         }
         elsif ($ref eq 'Sidef::Types::Number::Complex') {
-            $code = 'Complex';
+            $code = reftype($obj) eq 'HASH' ? 'Complex' : "Complex.new(" . $obj->get_value . ")";
         }
         elsif ($ref eq 'Sidef::Types::Array::Pair') {
             $code = 'Pair';
@@ -252,8 +252,8 @@ package Sidef::Deparse::Sidef {
             $code .= $obj->dump->get_value;
         }
         elsif ($ref eq 'Sidef::Types::Number::Number') {
-            local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
-            $code = $obj->get_value;
+            my $value = $obj->get_value;
+            $code .= ref($value) ? ref($value) eq 'Math::BigRat' ? $value->numify : $value->bstr : $value;
         }
         elsif ($ref eq 'Sidef::Types::Array::Array' or $ref eq 'Sidef::Types::Array::HCArray') {
             $code .= $self->_dump_array($obj);

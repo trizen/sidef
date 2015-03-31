@@ -26,6 +26,11 @@ package Sidef::Types::Number::Number {
         ${$_[0]};
     }
 
+    sub modpow {
+        my ($self, $y, $mod) = @_;
+        $self->new(($self->get_value**$y->get_value) % $mod->get_value);
+    }
+
     sub inc {
         my ($self) = @_;
         $self->new($self->get_value + 1);

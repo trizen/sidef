@@ -32,8 +32,7 @@ package Sidef::Types::Number::Number {
         my $ref = ref($num);
         $ref eq 'Math::BigInt' ? (bless \$num, __PACKAGE__)
           : (   $ref eq 'Math::BigFloat'
-             || $ref eq 'Math::BigRat'
-             || $ref eq __PACKAGE__) ? (bless \Math::BigInt->new($num->as_int), __PACKAGE__)
+             || $ref eq 'Math::BigRat') ? (bless \($num->as_int), __PACKAGE__)
           : (bless \Math::BigInt->new(index($num, '.') > 0 ? CORE::int($num) : $num), __PACKAGE__);
     }
 
@@ -59,6 +58,11 @@ package Sidef::Types::Number::Number {
     sub mod {
         my ($self, $num) = @_;
         $self->new($self->get_value % $num->get_value);
+    }
+
+    sub modpow {
+        my ($self, $y, $mod) = @_;
+        $self->new($self->get_value->copy->bmodpow($y->get_value, $mod->get_value));
     }
 
     sub pow {
