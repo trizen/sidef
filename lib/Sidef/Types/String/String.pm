@@ -9,6 +9,12 @@ package Sidef::Types::String::String {
 
     sub new {
         my (undef, $str) = @_;
+        if (@_ > 2) {
+            $str = CORE::join('', map { ref($_) ? $_->to_s->get_value : $_ } @_[1 .. $#_]);
+        }
+        elsif (ref $str) {
+            return $str->to_s;
+        }
         $str //= '';
         bless \$str, __PACKAGE__;
     }

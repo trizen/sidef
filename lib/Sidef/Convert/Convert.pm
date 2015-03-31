@@ -26,15 +26,13 @@ package Sidef::Convert::Convert {
             return Sidef::Types::String::String->new(join(' ', map { $_->get_value } @{$self}));
         }
 
-        if (Sidef->_is_hash($self)) {
-            return Sidef::Types::String::String->new(join(' ', map { $_->to_s } @{$self->to_a}));
-        }
-
         if (Sidef->_is_regex($self)) {
-            return Sidef::Types::String::String->new($self->{regex});
+            return $self->dump;
         }
 
-        Sidef::Types::String::String->new("$$self");
+        $self->isa('SCALAR') || $self->isa('REF')
+          ? Sidef::Types::String::String->new("$$self")
+          : $self;
     }
 
     *toStr     = \&to_s;
