@@ -2,30 +2,27 @@
 
 # Translation of: http://rosettacode.org/wiki/Zig-zag_matrix#Perl
 
-func zig_zag (w, h) {
+func zig_zag(w, h) {
 
     var r = [];
     var n = 0;
 
-    { |a|
-
-    r[a[1]][a[0]] = n; n++;} for (
-       0..(h-1) -> map { |e|
-       0..(w-1) -> map { [e, _] }
+    0 .. h-1 map { |e|
+        0 .. w-1 map { |f|
+            [e, f]
+        }
     }
-    -> combine
+    -> reduce('+')
     -> sort { |a, b|
-        var cmp = ((a[0] + a[1]) <=> (b[0] + b[1])) == 0
-        ? (
-            a[0] + a[1] -> isOdd
-                ? (a[1] <=> b[1])
-                : (a[0] <=> b[0])
-          )
-        : (cmp);
-      }
-    );
+           (a[0]+a[1] <=> b[0]+b[1])
+        || (a[0]+a[1] %% 2 ? a[0]<=>b[0]
+                           : a[1]<=>b[1])
+    }
+    -> each { |a|
+       r[a[1]][a[0]] = n++;
+    };
 
-    return(r);
+    return r;
 }
 
-zig_zag(3,4).map {|a| a.join(' ').say}
+zig_zag(4, 4).each {.join('', {|i| "%4i" % i}).say};
