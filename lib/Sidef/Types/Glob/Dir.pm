@@ -8,7 +8,13 @@ package Sidef::Types::Glob::Dir {
 
     sub new {
         my (undef, $dir) = @_;
-        ref($dir) && return $dir->to_dir;
+        if (@_ > 2) {
+            require File::Spec;
+            $dir = File::Spec->catdir(map { ref($_) ? $_->to_dir->get_value : $_ } @_[1 .. $#_]);
+        }
+        elsif (ref($dir)) {
+            return $dir->to_dir;
+        }
         bless \$dir, __PACKAGE__;
     }
 
@@ -121,7 +127,10 @@ package Sidef::Types::Glob::Dir {
         my ($self) = @_;
         @_ == 2 && ($self = $_[1]);
         require File::Path;
-        Sidef::Types::Bool::Bool->new(File::Path::make_path($self->get_value));
+        my $path = $self->get_value;
+        -d $path
+          ? Sidef::Types::Bool::Bool->true
+          : Sidef::Types::Bool::Bool->new(File::Path::make_path($path));
     }
 
     *createTree = \&create_tree;

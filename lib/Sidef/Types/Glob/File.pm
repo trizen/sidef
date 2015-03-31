@@ -8,7 +8,13 @@ package Sidef::Types::Glob::File {
 
     sub new {
         my (undef, $file) = @_;
-        ref($file) && ref($file) ne 'SCALAR' && return $file->to_file;
+        if (@_ > 2) {
+            require File::Spec;
+            $file = File::Spec->catfile(map { ref($_) ? $_->to_file->get_value : $_ } @_[1 .. $#_]);
+        }
+        elsif (ref($file) && ref($file) ne 'SCALAR') {
+            return $file->to_file;
+        }
         bless \$file, __PACKAGE__;
     }
 
