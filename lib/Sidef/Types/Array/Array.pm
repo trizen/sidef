@@ -61,11 +61,11 @@ package Sidef::Types::Array::Array {
         }
 
         (my $offset = $#{$self}) >= 0 || return;
+
         my $x = $self->[0]->get_value;
         foreach my $i (1 .. $offset) {
             $x = ($x->$operator($self->[$i]->get_value));
         }
-
         $x;
     }
 
@@ -698,21 +698,16 @@ package Sidef::Types::Array::Array {
     sub reduce {
         my ($self, $obj) = @_;
 
-        (my $offset = $#{$self}) >= 0 || return;
-        my $x = $self->[0]->get_value;
-
         if ($self->_is_string($obj)) {
-            my $method = $obj->get_value;
-            foreach my $i (1 .. $offset) {
-                $x = ($x->$method($self->[$i]->get_value));
-            }
-        }
-        elsif ($self->_is_code($obj)) {
-            foreach my $i (1 .. $offset) {
-                $x = $obj->call($x, $self->[$i]->get_value);
-            }
+            return $self->reduce_operator($obj->get_value);
         }
 
+        (my $offset = $#{$self}) >= 0 || return;
+
+        my $x = $self->[0]->get_value;
+        foreach my $i (1 .. $offset) {
+            $x = $obj->call($x, $self->[$i]->get_value);
+        }
         $x;
     }
 
