@@ -915,7 +915,7 @@ package Sidef::Parser {
                     }
 
                     /\G=\h*/gc;    # an optional equal sign is allowed
-                    my ($obj, $pos) = $self->parse_expr(code => substr($_, pos));
+                    my ($obj, $pos) = $self->parse_obj(code => substr($_, pos));
 
                     $obj // $self->fatal_error(
                                                code  => $_,
