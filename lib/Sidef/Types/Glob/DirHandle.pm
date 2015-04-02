@@ -28,23 +28,17 @@ package Sidef::Types::Glob::DirHandle {
     sub get_files {
         my ($self) = @_;
 
-        require Cwd;
+        require Encode;
         require File::Spec;
 
-        my $curdir = Cwd::getcwd();
-        CORE::chdir($self->{dir_h});
-
-        my $array = Sidef::Types::Array::Array->new(
+        Sidef::Types::Array::Array->new(
             map {
-                my $file = File::Spec->rel2abs($_);
-                (-d $file)
-                  ? Sidef::Types::Glob::Dir->new($file)
-                  : Sidef::Types::Glob::File->new($file);
+                my $dir = File::Spec->catdir($self->{dir}, $_);
+                (-d $dir)
+                  ? Sidef::Types::Glob::Dir->new(Encode::decode_utf8($dir))
+                  : Sidef::Types::Glob::File->new(Encode::decode_utf8(File::Spec->catfile($self->{dir}, $_)));
               } readdir($self->{dir_h})
         );
-
-        CORE::chdir($curdir);
-        $array;
     }
 
     *getFiles = \&get_files;
@@ -56,24 +50,19 @@ package Sidef::Types::Glob::DirHandle {
     sub get_file {
         my ($self) = @_;
 
-        my $file;
-        if (defined($file = CORE::readdir($self->{dir_h}))) {
+        if (defined(my $file = CORE::readdir($self->{dir_h}))) {
 
-            require Cwd;
-            my $curdir = Cwd::getcwd();
-            CORE::chdir($self->{dir_h});
-
+            require Encode;
             require File::Spec;
-            $file = File::Spec->rel2abs($file);
-            $file =
-              (-d $file)
-              ? Sidef::Types::Glob::Dir->new($file)
-              : Sidef::Types::Glob::File->new($file);
-
-            CORE::chdir($curdir);
+            my $dir = File::Spec->catdir($self->{dir}, $file);
+            return (
+                    (-d $dir)
+                    ? Sidef::Types::Glob::Dir->new(Encode::decode_utf8($dir))
+                    : Sidef::Types::Glob::File->new(Encode::decode_utf8(File::Spec->catfile($self->{dir}, $file)))
+                   );
         }
 
-        $file;
+        return;
     }
 
     *getFile = \&get_file;
@@ -120,8 +109,9 @@ package Sidef::Types::Glob::DirHandle {
         $self->_is_code($code) || return;
         my ($var_ref) = $code->init_block_vars();
 
+        require Encode;
         while (defined(my $file = CORE::readdir($self->{dir_h}))) {
-            $var_ref->set_value(Sidef::Types::String::String->new($file));
+            $var_ref->set_value(Sidef::Types::String::String->new(Encode::decode_utf8($file)));
             if (defined(my $res = $code->_run_code)) {
                 $code->pop_stack();
                 return $res;

@@ -3,6 +3,7 @@ package Sidef::Types::Glob::Dir {
     use 5.014;
 
     use parent qw(
+      Sidef::Types::Glob::File
       Sidef::Types::String::String
       );
 
@@ -198,51 +199,6 @@ package Sidef::Types::Glob::Dir {
     }
 
     *isEmpty = \&is_empty;
-
-    # exists
-    *exists = \&Sidef::Types::Glob::File::exists;
-
-    # is_dir
-    *is_directory = \&Sidef::Types::Glob::File::is_directory;
-    *is_dir       = \&is_directory;
-    *isDir        = \&is_directory;
-    *isDirectory  = \&is_directory;
-
-    # readlink
-    *readlink = \&Sidef::Types::Glob::File::readlink;
-    *readLink = \&readlink;
-
-    # utime
-    *utime = \&Sidef::Types::Glob::File::utime;
-
-    # stat/lstat
-    *stat  = \&Sidef::Types::Glob::File::stat;
-    *lstat = \&Sidef::Types::Glob::File::lstat;
-
-    # rel_name
-    *rel_name = \&Sidef::Types::Glob::File::rel_name;
-    *rel      = \&rel_name;
-    *relname  = \&rel_name;
-    *relName  = \&rel_name;
-    *abs2rel  = \&rel_name;
-
-    # abs_name
-    *abs_name = \&Sidef::Types::Glob::File::abs_name;
-    *abs      = \&abs_name;
-    *absname  = \&abs_name;
-    *absName  = \&abs_name;
-    *rel2abs  = \&abs_name;
-    *abs_path = \&abs_name;
-    *absPath  = \&abs_name;
-
-    # is abs
-    *is_absolute = \&Sidef::Types::Glob::File::is_absolute;
-    *is_abs      = \&is_absolute;
-
-    # rename
-    *rename    = \&Sidef::Types::Glob::File::rename;
-    *rename_to = \&rename;
-    *renameTo  = \&rename;
 
     sub dump {
         my ($self) = @_;

@@ -66,7 +66,7 @@ package Sidef::Types::Glob::Pipe {
     sub dump {
         my ($self) = @_;
         Sidef::Types::String::String->new(
-                                 'Pipe.new(' . join(', ', map { Sidef::Types::String::String->new($_)->dump } @{$self}) . ')');
+                      'Pipe.new(' . join(', ', map { Sidef::Types::String::String->new($_)->dump->get_value } @{$self}) . ')');
     }
 }
 

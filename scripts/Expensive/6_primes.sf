@@ -1,0 +1,11 @@
+#!/usr/bin/ruby
+
+# An interesting way of generating 6 primes.
+
+func fib (n) {
+    n > 1 ? fib(n-1)+(fib(n-2)!) : n;
+}
+
+{ |i|
+    say fib(i+1);
+} * 6;
