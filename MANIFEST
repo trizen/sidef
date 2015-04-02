@@ -202,6 +202,7 @@ scripts/escape_unescape.sf
 scripts/eval.sf
 scripts/execute_system_command.sf
 scripts/Expensive/100_doors_3.sf
+scripts/Expensive/6_primes.sf
 scripts/Expensive/anagrams.sf
 scripts/Expensive/anagrams_deranged_anagrams.sf
 scripts/Expensive/baby_size_of_the_universe.sf

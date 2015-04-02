@@ -517,7 +517,8 @@ package Sidef::Types::String::String {
 
     sub glob {
         my ($self) = @_;
-        Sidef::Types::Array::Array->new(map { __PACKAGE__->new($_) } CORE::glob($self->get_value));
+        require Encode;
+        Sidef::Types::Array::Array->new(map { __PACKAGE__->new(Encode::decode_utf8($_)) } CORE::glob($self->get_value));
     }
 
     sub quotemeta {
