@@ -27,6 +27,10 @@ require Sidef;
 my $name    = 'Sidef';
 my $version = $Sidef::VERSION;
 
+sub DUMP ()   { 0 }
+sub BUNDLE () { 1 }
+sub NATIVE () { 2 }
+
 my %args;
 if ($#ARGV != -1 and chr ord $ARGV[0] eq '-') {
     require Getopt::Std;
@@ -145,7 +149,7 @@ else {
 
     # Bundle the code as a Perl program (without parsing it)
     if (defined $args{b}) {
-        compile_to_perl($code, $script_name);
+        compile_to_perl(code => $code, type => BUNDLE, script_name => $script_name);
     }
     else {
 
@@ -153,24 +157,47 @@ else {
         my $parser = new_parser(name => $script_name);
         my $struct = parse_code($parser, $code);
 
+        # Is structure actually Perl code?
+        my $is_perl_code = defined($args{O}) && $args{O} == 3;
+
         # Dump the data structure
         if (defined $args{D}) {
-            dump_structure($struct);
+            if ($is_perl_code) {
+                output($struct);
+            }
+            else {
+                dump_structure($struct);
+            }
         }
 
         # Deparse code
         elsif (defined($args{r}) or defined($args{R})) {
-            deparse_structure($struct);
+            if ($is_perl_code) {
+                output($struct);
+            }
+            else {
+                deparse_structure($struct);
+            }
         }
 
         # Compile the struct to a Perl program
         elsif (defined $args{c}) {
-            compile_to_perl($struct);
+            if ($is_perl_code) {
+                compile_to_perl(code => $struct, type => NATIVE);
+            }
+            else {
+                compile_to_perl(ast => $struct, type => DUMP);
+            }
         }
 
         # Execute the struct
         else {
-            execute_struct($struct);
+            if ($is_perl_code) {
+                exec($^X, '-e', $struct);
+            }
+            else {
+                execute_struct($struct);
+            }
         }
     }
 }
@@ -209,6 +236,13 @@ sub parse_code {
 
     # Check for optimization
     if (defined($args{O})) {
+
+        # Native conversion to Perl code
+        if ($args{O} == 3) {
+            my $deparser = Sidef::Deparse::Perl->new(namespaces => [@Sidef::Exec::NAMESPACES]);
+            my $code = $deparser->deparse($struct);
+            return $code;
+        }
 
         # Deparse the AST into code, then parse the code again
         if ($args{O} >= 2) {
@@ -290,12 +324,12 @@ sub output_usage {
                     '-N type'        => ['use a specific implementation for numbers', 'valid types: fast, big, int, rat'],
                     '-n type'        => ['try to use a specific backend for Math::BigInt', 'valid types: GMP, Pari, FastCalc'],
                     '-M type,type'   => ['memoize some expensive method calls', 'valid types: num, str, block, all'],
-                    '-O level'       => ['optimize the syntax-tree of a program', 'valid optimization levels: 0, 1, 2'],
+                    '-O level'       => ['optimize the syntax-tree of a program', 'valid optimization levels: 0, 1, 2, 3'],
                     '-s int'         => 'the number of spaces used in code indentation',
                     '-v'             => 'print version number and exit',
                     '-t'             => 'treat all command-line arguments as scripts',
                     '-r'             => 'deparse a Sidef program',
-                    '-R lang'        => ['deparse a Sidef program to a given language', 'valid values: sidef'],
+                    '-R lang'        => ['deparse a Sidef program to a given language', 'valid values: sidef, perl'],
                     '-w'             => 'enable warnings with stack backtrace',
                     '-W'             => 'make warnings fatal (with stack backtrace)',
                    );
@@ -530,14 +564,21 @@ sub deparse_structure {
     my $deparser = $module->new(namespaces => [@Sidef::Exec::NAMESPACES],);
     my $code = $deparser->deparse($struct);
 
+    output($code);
+}
+
+sub output {
+    my ($content) = @_;
+
     my $out_fh = \*STDOUT;
 
     if (defined $args{o}) {
         open $out_fh, '>:utf8', $args{o}
           or die "Can't open file '$args{o}' for write: $!\n";
     }
+    print {$out_fh} $content;
 
-    print {$out_fh} $code;
+    return $out_fh;
 }
 
 sub dump_structure {
@@ -549,12 +590,7 @@ sub dump_structure {
         die qq{** "Data::Dump" is not installed!\n};
     }
     else {
-        my $out_fh = \*STDOUT;
-
-        if (defined $args{o}) {
-            open $out_fh, '>:utf8', $args{o}
-              or die "Can't open file '$args{o}' for write: $!\n";
-        }
+        my $out_fh = output('');
 
         my $requirify = sub {
             join('', map { "require '" . (s{::}{/}gr) . ".pm';\n" } @_);
@@ -655,11 +691,9 @@ sub memoize_types {
 }
 
 sub compile_to_perl {
-    my ($code, $script_name) = @_;
+    my (%opt) = @_;
 
-    my $is_ast = ref($code) ? 1 : 0;
-
-    if ($is_ast) {
+    if ($opt{type} == DUMP) {
         eval { require Data::Dump };
         if ($@) {
             die qq{** "Data::Dump" is not installed!\n};
@@ -680,8 +714,15 @@ binmode STDOUT, ":utf8";
 binmode STDERR, ":utf8" if \$^P == 0;    # to work under Devel::* modules
 
 my %REQ;
-my %MODULE = (
+my %MODULE;
 HEAD
+
+    if ($opt{type} == NATIVE) {
+        $package_content .= "BEGIN { %MODULE = (\n";
+    }
+    else {
+        $package_content .= "%MODULE = (\n";
+    }
 
     require File::Find;
     File::Find::find(
@@ -742,50 +783,56 @@ FOOT
         join('', map { "load_module('$_');\n" } @_);
     };
 
-    if ($is_ast) {
+    if ($opt{type} == DUMP) {
         $package_content .= "use Math::BigFloat;\n";
         $package_content .= $requirify->(_get_loaded_modules());
     }
-    else {
+    elsif ($opt{type} == BUNDLE) {
         $package_content .= $requirify->('Sidef', 'Sidef::Parser', 'Sidef::Exec');
     }
 
-    if ((my @num_modules = _get_number_modules())) {
-        $package_content .= $requirify->('Sidef::Types::Number::Number', @num_modules);
+    if ($opt{type} == DUMP or $opt{type} == BUNDLE) {
+        if ((my @num_modules = _get_number_modules())) {
+            $package_content .= $requirify->('Sidef::Types::Number::Number', @num_modules);
+        }
     }
 
-    my $out_fh = \*STDOUT;
-
-    if (defined $args{o}) {
-        open $out_fh, '>:utf8', $args{o}
-          or die "Can't open file '$args{o}' for write: $!";
+    if ($opt{type} == NATIVE) {
+        $package_content .=
+          $requirify->(_get_loaded_modules(), 'Sidef::Types::Number::Number', 'Sidef::Types::Number::NumberFast');
+        $package_content .= "}\n\n";
     }
 
+    my $out_fh = output('');
     print {$out_fh} $package_content;
 
-    if ($is_ast) {
+    if ($opt{type} == DUMP) {
         print {$out_fh} _get_namespaces;
         print {$out_fh} "\nmy \$struct = ";
-        print {$out_fh} Data::Dump::pp($code);
+        print {$out_fh} Data::Dump::pp($opt{ast});
         print {$out_fh} ";\n";
 
     }
-    else {
+    elsif ($opt{type} == BUNDLE) {
         print {$out_fh} <<"EOT"
 
 chomp(my \$code = <<'~/////////////////END-OF-CODE/////////////////~');
-$code
+$opt{code}
 ~/////////////////END-OF-CODE/////////////////~
 
-my \$parser = Sidef::Parser->new(file_name   => "\Q$script_name\E",
-                                script_name => "\Q$script_name\E",);
+my \$parser = Sidef::Parser->new(file_name   => "\Q$opt{script_name}\E",
+                                script_name => "\Q$opt{script_name}\E",);
 
 my \$struct = \$parser->parse_script(code => \$code);
 EOT
 
     }
+    elsif ($opt{type} == NATIVE) {
+        print {$out_fh} $opt{code};
+    }
 
-    print {$out_fh} <<"EXEC";
+    if ($opt{type} == DUMP or $opt{type} == BUNDLE) {
+        print {$out_fh} <<"EXEC";
 
 #
 ## Execute the data structure
@@ -793,4 +840,5 @@ EOT
 
 Sidef::Exec->new->execute(\$struct);
 EXEC
+    }
 }
