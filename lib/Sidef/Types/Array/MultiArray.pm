@@ -32,7 +32,6 @@ package Sidef::Types::Array::MultiArray {
 
     sub map {
         my ($self, $code) = @_;
-        $self->_is_code($code) || return;
 
         my @arr;
         foreach my $i (0 .. $#{$self->[0]}) {
@@ -44,7 +43,6 @@ package Sidef::Types::Array::MultiArray {
 
     sub each {
         my ($self, $code) = @_;
-        $self->_is_code($code) || return;
 
         foreach my $i (0 .. $#{$self->[0]}) {
             $code->call(map { $_->[$i] } @{$self});
@@ -58,7 +56,6 @@ package Sidef::Types::Array::MultiArray {
 
     sub append {
         my ($self, $array) = @_;
-        $self->_is_array($array) || return;
         push @{$self}, [map { $_->get_value } @{$array}];
     }
 

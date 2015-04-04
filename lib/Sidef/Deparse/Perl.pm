@@ -77,6 +77,26 @@ package Sidef::Variable::PerlVar {
     }
 };
 
+package Sidef::Variable::PerlVarRef {
+
+    use 5.014;
+
+    sub new {
+        my (undef, $var) = @_;
+        bless {var => $var}, __PACKAGE__;
+    }
+
+    sub get_var {
+        my ($self) = @_;
+        Sidef::Variable::PerlVar->new($self->{var});
+    }
+
+    sub set_value {
+        my ($self, $arg) = @_;
+        ${$self->{var}} = $arg;
+    }
+};
+
 package Sidef::Types::Block::PerlCode {
 
     use 5.014;
@@ -240,7 +260,16 @@ HEADER
             }
             else {
                 my $block = $obj->{__BLOCK__};
-                $code = "package " . $self->_dump_class_name($obj->{name});
+                $code = "package ";
+                if (ref $obj->{name}) {
+                    my $class_obj =
+                      Sidef::Types::Block::Code->new(ref($obj->{name}) eq 'HASH' ? $obj->{name} : {self => $obj->{name}})
+                      ->_execute_expr;
+                    $code .= ref($class_obj);
+                }
+                else {
+                    $code .= $self->_dump_class_name($obj->{name});
+                }
                 my $vars = $obj->{__VARS__};
                 local $self->{class}      = refaddr($block);
                 local $self->{inherit}    = $obj->{inherit} if exists $obj->{inherit};
@@ -274,21 +303,22 @@ HEADER
 
                             $code .= "\n";
                             $code .= " " x $Sidef::SPACES;
-                            $code .= $self->_dump_init_vars(@{$self->{class_vars}}) . ";";
-
-                            $code .= "\n";
-                            $code .= " " x $Sidef::SPACES;
                             $code .= 'sub init {';
+                            $code .= "\n";
 
                             $Sidef::SPACES += $Sidef::SPACES_INCR;
-                            $code .= "\n";
-                            $code .= " " x $Sidef::SPACES;
-                            $code .= $self->_dump_init_vars(@{$self->{class_vars}}) . ";\n";
+
+                            if (@{$self->{class_vars}}) {
+                                $code .= " " x $Sidef::SPACES;
+                                $code .= $self->_dump_init_vars(@{$self->{class_vars}}) . ";\n";
+                            }
+
                             foreach my $i (0 .. $#{$self->{class_vars}}) {
                                 my $var = $self->{class_vars}[$i];
                                 my $j   = $i + 1;
                                 $code .= " " x $Sidef::SPACES . $self->_dump_var($var) . "=\$_[$j] if exists \$_[$j];\n";
                             }
+
                             $code .= " " x $Sidef::SPACES;
                             $code .= 'bless {';
                             foreach my $var (@{$self->{class_vars}}) {
@@ -319,7 +349,10 @@ qq{sub $var->{name} { \$_[0]->{"\Q$var->{name}\E"} = \$_[1] if exists \$_[1]; \$
                             --$#{$vars};
                         }
                         my @vars = map { @{$_->{vars}} } @{$vars}[0 .. $#{$vars}];
-                        $code .= ' ' x $Sidef::SPACES . $self->_dump_init_vars(@vars) . ";\n";
+
+                        if (not $is_class) {
+                            $code .= ' ' x $Sidef::SPACES . $self->_dump_init_vars(@vars) . ";\n";
+                        }
 
                         if ($is_function || $is_class) {
 
@@ -332,9 +365,16 @@ qq{sub $var->{name} { \$_[0]->{"\Q$var->{name}\E"} = \$_[1] if exists \$_[1]; \$
                               . "], code => sub {\n";
                         }
 
-                        foreach my $i (0 .. $#{vars}) {
-                            my $var = $vars[$i];
-                            $code .= ' ' x $Sidef::SPACES . $self->_dump_var($var) . "=\$_[$i] if exists \$_[$i];\n";
+                        if (not $is_class) {
+                            if ($#vars == 0 and $vars[0]{name} eq '_') {
+                                $code .= ' ' x $Sidef::SPACES . "\$_ = Sidef::Types::Array::Array->new(\@_) if \@_;\n";
+                            }
+                            else {
+                                foreach my $i (0 .. $#{vars}) {
+                                    my $var = $vars[$i];
+                                    $code .= ' ' x $Sidef::SPACES . $self->_dump_var($var) . "=\$_[$i] if exists \$_[$i];\n";
+                                }
+                            }
                         }
                     }
                     else {
@@ -378,6 +418,9 @@ qq{sub $var->{name} { \$_[0]->{"\Q$var->{name}\E"} = \$_[1] if exists \$_[1]; \$
             $code = $ref . '->new';
         }
         elsif ($ref eq 'Sidef::Types::Block::For') {
+            $code = $ref . '->new';
+        }
+        elsif ($ref eq 'Sidef::Types::Bool::If') {
             $code = $ref . '->new';
         }
         elsif ($ref eq 'Sidef::Types::Block::Break') {
@@ -468,7 +511,7 @@ qq{sub $var->{name} { \$_[0]->{"\Q$var->{name}\E"} = \$_[1] if exists \$_[1]; \$
             $code = $ref . '->new';
         }
         elsif ($ref eq 'Sidef::Types::Regex::Regex') {
-            $code = $ref . '->new(' . $obj->{regex} . ')';
+            $code = $ref . '->new(' . Sidef::Types::String::String->new("$obj->{regex}")->dump->get_value . ')';
         }
         elsif ($ref eq 'Sidef::Types::Number::Number') {
             my $value = $obj->get_value;
@@ -488,6 +531,9 @@ qq{sub $var->{name} { \$_[0]->{"\Q$var->{name}\E"} = \$_[1] if exists \$_[1]; \$
         }
         elsif ($ref eq 'Sidef::Types::Bool::Bool') {
             $code = $self->make_constant($ref, ${$obj} ? ('true', 1) : ('false', 0));
+        }
+        elsif ($ref eq 'Sidef::Types::Array::MultiArray') {
+            $code = $ref . '->new';
         }
         elsif ($obj->can('dump')) {
             $code = $obj->dump->get_value;
@@ -537,7 +583,10 @@ qq{sub $var->{name} { \$_[0]->{"\Q$var->{name}\E"} = \$_[1] if exists \$_[1]; \$
                 $code .= '->' . $self->_dump_indices($ind);
                 if ($i == $limit) {
                     my $nil = $self->make_constant('Sidef::Types::Nil::Nil', 'nil');
-                    $code = "($code // $nil)->get_value";
+                    $code = "($code // $nil)";
+                    if (not $self->{is_var_ref}) {
+                        $code .= '->get_value';
+                    }
                 }
             }
         }
@@ -593,11 +642,12 @@ qq{sub $var->{name} { \$_[0]->{"\Q$var->{name}\E"} = \$_[1] if exists \$_[1]; \$
 
                 if ($ref eq 'Sidef::Variable::Ref') {    # variable refs
                     if ($method eq '\\' or $method eq '&') {
-                        $code = '\\' . $deparse_args->($call->{arg}[0]);
+                        local $self->{is_var_ref} = 1;
+                        $code = 'Sidef::Variable::PerlVarRef->new(' . '\\' . $deparse_args->($call->{arg}[0]) . ')';
                         next;
                     }
                     elsif ($method eq '*') {
-                        $code = '${' . $deparse_args->($call->{arg}[0]) . '}';
+                        $code = '${' . $deparse_args->($call->{arg}[0]) . '->{var}}';
                         next;
                     }
                     elsif (exists $self->{inc_dec_ops}{$method}) {
