@@ -112,10 +112,23 @@ elsif (defined $args{t}) {
         my $exec   = Sidef::Exec->new();
         my $code   = read_script($script_name);
         my $parser = new_parser(name => $script_name);
-        my $struct = parse_code($parser, $code);
-        eval { $exec->execute($struct) };
+        my $struct = eval { parse_code($parser, $code) };
 
         if ($@) {
+            warn "[ERROR] Can't parse the script `$script_name`: $@\n";
+            sleep 2;
+        }
+        else {
+
+            if (ref($struct) eq 'HASH') {
+                eval { $exec->execute($struct) };
+            }
+            else {
+                system($^X, '-e', $struct);
+            }
+        }
+
+        if ($@ or (ref($struct) eq '' and $?)) {
             warn "[ERROR] Error encountered on script `$script_name': $@\n";
             sleep 2;
         }
@@ -751,7 +764,7 @@ HEAD
 
                  close $fh;
              }
-           }
+         }
         } => $path
     );
 
