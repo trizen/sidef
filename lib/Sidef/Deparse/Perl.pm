@@ -157,11 +157,17 @@ HEADER
 
     sub make_constant {
         my ($self, $ref, $name, @args) = @_;
-        $const{$name} //= do {
-            local $" = ", ";
-            $self->{before} .= "use constant $name => " . $ref . "->new(@args);\n";
-        };
-        "main::$name";
+        'main::' . (
+            (
+             $const{$ref, @args} //= [
+                 $name,
+                 do {
+                     local $" = ", ";
+                     $self->{before} .= "use constant $name => " . $ref . "->new(@args);\n";
+                   }
+             ]
+            )->[0]
+        );
     }
 
     sub _dump_var {
@@ -515,10 +521,8 @@ qq{sub $var->{name} { \$_[0]->{"\Q$var->{name}\E"} = \$_[1] if exists \$_[1]; \$
         }
         elsif ($ref eq 'Sidef::Types::Number::Number') {
             my $value = $obj->get_value;
-            $code =
-                $ref
-              . '->new('
-              . (ref($value) ? ref($value) eq 'Math::BigRat' ? $value->numify : (q{'} . $value->bstr . q{'}) : $value) . ')';
+            $code = $self->make_constant($ref, "NUM$refaddr",
+                         ref($value) ? ref($value) eq 'Math::BigRat' ? $value->numify : (q{'} . $value->bstr . q{'}) : $value);
         }
         elsif ($ref eq 'Sidef::Types::Array::Array' or $ref eq 'Sidef::Types::Array::HCArray') {
             $code = $self->_dump_array($obj);
@@ -527,7 +531,7 @@ qq{sub $var->{name} { \$_[0]->{"\Q$var->{name}\E"} = \$_[1] if exists \$_[1]; \$
             $code = $self->make_constant($ref, 'nil');
         }
         elsif ($ref eq 'Sidef::Types::String::String') {
-            $code = $ref . '->new(' . $obj->dump->get_value . ')';
+            $code = $self->make_constant($ref, "STR$refaddr", $obj->dump->get_value);
         }
         elsif ($ref eq 'Sidef::Types::Bool::Bool') {
             $code = $self->make_constant($ref, ${$obj} ? ('true', 1) : ('false', 0));
@@ -591,6 +595,8 @@ qq{sub $var->{name} { \$_[0]->{"\Q$var->{name}\E"} = \$_[1] if exists \$_[1]; \$
             }
         }
 
+        my $old_code = $code;
+
         # Method call on the self obj (+optional arguments)
         if (exists $expr->{call}) {
             foreach my $i (0 .. $#{$expr->{call}}) {
@@ -635,35 +641,68 @@ qq{sub $var->{name} { \$_[0]->{"\Q$var->{name}\E"} = \$_[1] if exists \$_[1]; \$
                       . ')';
                 };
 
+                my $deparse_block_expr = sub {
+                    my (@args) = @_;
+                    'do{' . join(
+                        ';',
+                        map {
+                            ref($_) eq 'HASH' ? $self->deparse_script($_)
+                              : exists($self->{obj_with_block}{$ref})
+                              && exists($self->{obj_with_block}{$ref}{$method}) ? $self->deparse_expr({self => $_})
+                              : $ref eq 'Sidef::Types::Block::For'
+                              && $#{$call->{arg}} == 2
+                              && ref($_) eq 'Sidef::Types::Block::Code' ? $self->deparse_expr({self => $_})
+                              : ref($_)                                 ? $self->deparse_expr({self => $_})
+                              : Sidef::Types::String::String->new($_)->dump
+                          } @args
+                      )
+                      . '}';
+                };
+
                 if ($method eq '?') {    # ternary operator (special case)
-                    $code .= '?' . $deparse_args->($call->{arg}[0]) . ':' . $deparse_args->($expr->{call}[$i + 1]{arg}[0]);
+                    $code .= '?'
+                      . $deparse_block_expr->(@{$call->{arg}}) . ':'
+                      . $deparse_block_expr->(@{$expr->{call}[$i + 1]{arg}});
                     last;
                 }
 
                 if ($ref eq 'Sidef::Variable::Ref') {    # variable refs
+
+                    # Variable refencing
                     if ($method eq '\\' or $method eq '&') {
                         local $self->{is_var_ref} = 1;
-                        $code = 'Sidef::Variable::PerlVarRef->new(' . '\\' . $deparse_args->($call->{arg}[0]) . ')';
+                        $code = 'Sidef::Variable::PerlVarRef->new(' . '\\' . $deparse_args->(@{$call->{arg}}) . ')';
                         next;
                     }
+
+                    # Variable dereferencing
                     elsif ($method eq '*') {
-                        $code = '${' . $deparse_args->($call->{arg}[0]) . '->{var}}';
+                        $code = '${' . $deparse_args->(@{$call->{arg}}) . '->{var}}';
                         next;
                     }
+
+                    # Prefix ++ and -- operators on variables
                     elsif (exists $self->{inc_dec_ops}{$method}) {
-                        my $var = $deparse_args->($call->{arg}[0]);
+                        my $var = $deparse_args->(@{$call->{arg}});
                         $code = "do{$var=$var\->$self->{inc_dec_ops}{$method};$var}";
                         next;
                     }
                 }
 
+                # Postfix ++ and -- operators on variables
                 if (exists($self->{inc_dec_ops}{$method}) and $ref eq 'Sidef::Variable::Variable') {
                     $code = "do{my \$old=$code;$code=$code\->$self->{inc_dec_ops}{$method};\$old}";
                     next;
                 }
 
+                # Reasign operators, such as: +=, -=, *=, /=, etc...
                 if (exists $self->{reassign_ops}{$method}) {
                     $code = "$code=($code->\${\\'$self->{reassign_ops}{$method}'}" . $deparse_args->(@{$call->{arg}}) . ')';
+                    next;
+                }
+
+                if (exists($self->{lazy_ops}{$method})) {
+                    $code .= $method . $deparse_block_expr->(@{$call->{arg}});
                     next;
                 }
 
@@ -675,15 +714,22 @@ qq{sub $var->{name} { \$_[0]->{"\Q$var->{name}\E"} = \$_[1] if exists \$_[1]; \$
                         ## no methods for subs
                     }
                     else {
-                        $code .= '->' if $code ne '';
-                        $code .= $method;
+                        if ($method =~ /^(.+)!\z/) {
+                            $code = '('
+                              . "$old_code=$code->$1"
+                              . (exists($call->{arg}) ? $deparse_args->(@{$call->{arg}}) : '')
+                              . ", $old_code" . ')[1]';
+                            next;
+                        }
+                        else {
+                            $code .= '->' if $code ne '';
+                            $code .= $method;
+                        }
                     }
                 }
                 else {
-                    $code .=
-                      exists($self->{lazy_ops}{$method})
-                      ? $self->{lazy_ops}{$method}
-                      : '->${\\' . q{'} . $method . q{'} . '}';
+                    # Operator-like method call
+                    $code .= '->${\\' . q{'} . $method . q{'} . '}';
                 }
 
                 if (exists $call->{arg}) {
