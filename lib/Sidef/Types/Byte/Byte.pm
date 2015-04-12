@@ -11,6 +11,11 @@ package Sidef::Types::Byte::Byte {
     }
 
     *call = \&new;
+
+    sub dump {
+        my ($self) = @_;
+        Sidef::Types::String::String->new('Byte.new(' . $self->get_value . ')');
+    }
 };
 
 1

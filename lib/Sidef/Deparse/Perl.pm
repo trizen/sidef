@@ -338,8 +338,8 @@ HEADER
                             foreach my $var (@{$self->{class_vars}}) {
                                 $code .= "\n";
                                 $code .= " " x $Sidef::SPACES;
-                                $code .=
-qq{sub $var->{name} { \$_[0]->{"\Q$var->{name}\E"} = \$_[1] if exists \$_[1]; \$_[0]->{"\Q$var->{name}\E"} }};
+                                $code .= qq[sub $var->{name} { \$_[0]->{"\Q$var->{name}\E"} = \$_[1] if exists \$_[1];]
+                                  . qq[\$_[0]->{"\Q$var->{name}\E"} }];
                             }
                         }
                     }

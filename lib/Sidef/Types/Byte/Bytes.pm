@@ -39,6 +39,11 @@ package Sidef::Types::Byte::Bytes {
               } // return
         );
     }
+
+    sub dump {
+        my ($self) = @_;
+        Sidef::Types::String::String->new('Bytes.new(' . join(', ', map { $_->get_value->dump->get_value } @{$self}) . ')');
+    }
 };
 
 1

@@ -15,6 +15,7 @@ package Sidef::Deparse::Sidef {
                     before         => '',
                     between        => ";\n",
                     after          => ";\n",
+                    extra_parens   => 0,
                     namespaces     => [],
                     obj_with_block => {
                                        'Sidef::Types::Bool::While' => {
@@ -64,6 +65,9 @@ package Sidef::Deparse::Sidef {
         my $ref = ref($obj);
         if ($ref eq 'HASH') {
             $code = join(', ', $self->deparse_script($obj));
+            if ($self->{extra_parens}) {
+                $code = "($code)";
+            }
         }
         elsif ($ref eq 'Sidef::Variable::Variable') {
             if ($obj->{type} eq 'var' or $obj->{type} eq 'static' or $obj->{type} eq 'const') {
@@ -198,6 +202,16 @@ package Sidef::Deparse::Sidef {
             }
             else {
                 $code = 'DATA';
+                if (not exists $addr{$obj->{fh}}) {
+                    my $orig_pos = tell($obj->{fh});
+                    seek($obj->{fh}, 0, 0);
+                    $self->{after} .= "\n__DATA__\n" . do {
+                        local $/;
+                        readline($obj->{fh});
+                    };
+                    seek($obj->{fh}, $orig_pos, 0);
+                    $addr{$obj->{fh}} = 1;
+                }
             }
         }
         elsif ($ref eq 'Sidef::Variable::Magic') {
@@ -244,9 +258,6 @@ package Sidef::Deparse::Sidef {
         }
         elsif ($ref eq 'Sidef::Types::Number::Complex') {
             $code = reftype($obj) eq 'HASH' ? 'Complex' : "Complex.new(" . $obj->get_value . ")";
-        }
-        elsif ($ref eq 'Sidef::Types::Array::Pair') {
-            $code = 'Pair';
         }
         elsif ($ref eq 'Sidef::Types::Regex::Regex') {
             $code .= $obj->dump->get_value;

@@ -13,6 +13,11 @@ package Sidef::Types::Char::Chars {
         my ($self, $string) = @_;
         $self->new(map { Sidef::Types::Char::Char->new($_) } split //, $string);
     }
+
+    sub dump {
+        my ($self) = @_;
+        Sidef::Types::String::String->new('Chars.new(' . join(', ', map { $_->get_value->dump->get_value } @{$self}) . ')');
+    }
 };
 
 1

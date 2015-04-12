@@ -386,7 +386,8 @@ package Sidef::Exec {
                   :                                         $expr;
 
                 if (   ref($obj) eq 'Sidef::Types::Block::Return'
-                    or ref($obj) eq 'Sidef::Types::Block::Break') {
+                    or ref($obj) eq 'Sidef::Types::Block::Break'
+                    or ref($obj) eq 'Sidef::Types::Block::Next') {
                     return $obj;
                 }
 

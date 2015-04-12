@@ -83,13 +83,6 @@ if (defined(my $types = $args{M})) {
     memoize_types($types);
 }
 
-# Code from a dumped parse-tree
-if (defined $args{d}) {
-    my $struct = do($args{d})
-      || die "Can't load the data structure from file '$args{d}': $!\n";
-    execute_struct($struct);
-}
-
 # Interactive help
 elsif (defined $args{H}) {
     help_interactive();
@@ -119,7 +112,6 @@ elsif (defined $args{t}) {
             sleep 2;
         }
         else {
-
             if (ref($struct) eq 'HASH') {
                 eval { $exec->execute($struct) };
             }
@@ -128,7 +120,7 @@ elsif (defined $args{t}) {
             }
         }
 
-        if ($@ or (ref($struct) eq '' and $?)) {
+        if ($@ or (ref($struct) ne 'HASH' and $?)) {
             warn "[ERROR] Error encountered on script `$script_name': $@\n";
             sleep 2;
         }
@@ -152,6 +144,7 @@ else {
         require Encode;
         Encode::decode_utf8($args{E});
       }
+      : exists($args{d}) ? ''
       : defined($ARGV[0]) && (-t STDIN or -f $ARGV[0]) ? do {
         $script_name = shift @ARGV;
         read_script($script_name);
@@ -161,14 +154,24 @@ else {
     $code // exit 2;
 
     # Bundle the code as a Perl program (without parsing it)
-    if (defined $args{b}) {
+    if (defined $args{b} and $code ne '') {
         compile_to_perl(code => $code, type => BUNDLE, script_name => $script_name);
     }
     else {
 
-        # Parse the code
-        my $parser = new_parser(name => $script_name);
-        my $struct = parse_code($parser, $code);
+        my $struct;
+
+        # Code from a dumped parse-tree
+        if (defined $args{d}) {
+            $struct = do($args{d})
+              || die "Can't load the data structure from file '$args{d}': $!\n";
+        }
+        else {
+
+            # Parse the code
+            my $parser = new_parser(name => $script_name);
+            $struct = parse_code($parser, $code);
+        }
 
         # Is structure actually Perl code?
         my $is_perl_code = defined($args{O}) && $args{O} == 3;
@@ -252,6 +255,12 @@ sub parse_code {
 
         # Native conversion to Perl code
         if ($args{O} == 3) {
+
+            #my $sidef_deparser = Sidef::Deparse::Sidef->new(namespaces => [@Sidef::Exec::NAMESPACES]);
+            #my $sidef_code = $sidef_deparser->deparse($struct);
+            #my $new_parser = new_parser(name => $parser->{file_name});
+            #my $new_struct = $parser->parse_script(code => $sidef_code);
+
             my $deparser = Sidef::Deparse::Perl->new(namespaces => [@Sidef::Exec::NAMESPACES]);
             my $code = $deparser->deparse($struct);
             return $code;
