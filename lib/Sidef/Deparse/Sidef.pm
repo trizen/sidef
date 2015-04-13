@@ -282,6 +282,27 @@ package Sidef::Deparse::Sidef {
                     $code = 'File';
                 }
             }
+            elsif ($ref eq 'Sidef::Types::Array::Pair') {
+                if (    ref($obj->[0]->get_value) eq 'Sidef::Types::Nil::Nil'
+                    and ref($obj->[1]->get_value) eq 'Sidef::Types::Nil::Nil') {
+                    $code = 'Pair';
+                }
+            }
+            elsif ($ref eq 'Sidef::Types::Byte::Bytes') {
+                if ($#{$obj} == -1) {
+                    $code = 'Bytes';
+                }
+            }
+            elsif ($ref eq 'Sidef::Types::Byte::Byte') {
+                if (${$obj} == 0) {
+                    $code = 'Byte';
+                }
+            }
+            elsif ($ref eq 'Sidef::Types::Char::Chars') {
+                if ($#{$obj} == -1) {
+                    $code = 'Chars';
+                }
+            }
             elsif ($ref eq 'Sidef::Types::Glob::Dir') {
                 if (${$obj} eq '') {
                     $code = 'Dir';

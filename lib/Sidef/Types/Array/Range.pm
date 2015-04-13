@@ -14,14 +14,37 @@ package Sidef::Types::Array::Range {
         $self;
     }
 
+    sub contains {
+        my ($self, $num) = @_;
+
+        my $value = $num->get_value;
+        my ($min, $max) = map { $_->get_value } ($self->min, $self->max);
+
+        if ($self->{type} eq 'number') {
+            if ($value >= $min and $value <= $max) {
+                return Sidef::Types::Bool::Bool->true;
+            }
+        }
+        else {
+            if ($value ge $min and $value le $max) {
+                return Sidef::Types::Bool::Bool->true;
+            }
+        }
+        Sidef::Types::Bool::Bool->false;
+    }
+
+    *includes = \&contains;
+
     sub min {
         my ($self) = @_;
-        Sidef::Types::Number::Number->new($self->{from});
+        ($self->{type} eq 'number' ? 'Sidef::Types::Number::Number' : 'Sidef::Types::String::String')
+          ->new($self->{direction} eq 'up' ? $self->{from} : $self->{to});
     }
 
     sub max {
         my ($self) = @_;
-        Sidef::Types::Number::Number->new($self->{to});
+        ($self->{type} eq 'number' ? 'Sidef::Types::Number::Number' : 'Sidef::Types::String::String')
+          ->new($self->{direction} eq 'up' ? $self->{to} : $self->{from});
     }
 
     sub step {
@@ -31,8 +54,7 @@ package Sidef::Types::Array::Range {
 
     sub bounds {
         my ($self) = @_;
-        Sidef::Types::Array::Array->new(Sidef::Types::Number::Number->new($self->{from}),
-                                        Sidef::Types::Number::Number->new($self->{to}));
+        Sidef::Types::Array::Array->new($self->min, $self->max);
     }
 
     sub each {

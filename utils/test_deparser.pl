@@ -41,8 +41,8 @@ sub parse_deparse {
     my $deparser = Sidef::Deparse::Sidef->new(namespaces => [@Sidef::Exec::NAMESPACES]);
     my $struct = $parser->parse_script(code => $code);
 
-    my @statements = $deparser->deparse($struct);
-    my $deparsed = $deparser->{before} . join($deparser->{between}, @statements) . $deparser->{after};
+    my @statements = $deparser->deparse_script($struct);
+    my $deparsed =   $deparser->{before} . join($deparser->{between}, @statements) . $deparser->{after};
 
     return ($deparsed, \@statements);
 }

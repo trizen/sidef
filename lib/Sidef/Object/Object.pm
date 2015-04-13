@@ -60,6 +60,11 @@ package Sidef::Object::Object {
                 return $second->contains($first);
             }
 
+            # String ~~ Range
+            if ($s_type eq 'Sidef::Types::Array::Range') {
+                return $second->contains($first);
+            }
+
             # String ~~ Hash
             if ($s_type eq 'Sidef::Types::Hash::Hash') {
                 return $second->exists($first);
@@ -73,6 +78,15 @@ package Sidef::Object::Object {
             # String ~~ Regex
             if ($s_type eq 'Sidef::Types::Regex::Regex') {
                 return $second->match($first)->is_successful;
+            }
+        }
+
+        # First is Number
+        if ($f_type eq 'Sidef::Types::Number::Number') {
+
+            # Number ~~ Range
+            if ($s_type eq 'Sidef::Types::Array::Range') {
+                return $second->contains($first);
             }
         }
 
