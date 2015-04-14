@@ -286,7 +286,13 @@ package Sidef::Math::Math {
             *{__PACKAGE__ . '::' . $f} = sub {
                 my ($self, @rest) = @_;
                 require Math::Trig;
-                Sidef::Types::Number::Number->new((\&{'Math::Trig::' . $f})->(map { $_->get_value } @rest));
+                local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
+                my $result = (\&{'Math::Trig::' . $f})->(map { $_->get_value } @rest);
+                (
+                 ref($result) eq 'Math::Complex'
+                 ? 'Sidef::Types::Number::Complex'
+                 : 'Sidef::Types::Number::Number'
+                )->new($result);
             };
         }
     }
