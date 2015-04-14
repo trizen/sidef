@@ -6,6 +6,7 @@ lib/Sidef.pod
 lib/Sidef/Args/Args.pm
 lib/Sidef/Convert/Convert.pm
 lib/Sidef/Convert/Convert.pod
+lib/Sidef/Deparse/Perl.pm
 lib/Sidef/Deparse/Sidef.pm
 lib/Sidef/Eval/Eval.pm
 lib/Sidef/Exec.pm
@@ -168,6 +169,7 @@ scripts/best_shuffle_alg_permute.sf
 scripts/binary_search.sf
 scripts/binary_search_recursive.sf
 scripts/box_the_compass.sf
+scripts/box_the_compass_2.sf
 scripts/break.sf
 scripts/built_in_classes.sf
 scripts/c_plus_plus_input_output.sf
@@ -217,6 +219,7 @@ scripts/Expensive/langton_s_ant_2.sf
 scripts/Expensive/levenshtein_recursive.sf
 scripts/Expensive/longest_common_subsequence.sf
 scripts/Expensive/mandelbrot_set.sf
+scripts/Expensive/mean_time.sf
 scripts/Expensive/mutual_recursion.sf
 scripts/Expensive/root_of_a_function.sf
 scripts/Expensive/sudoku_solver.sf

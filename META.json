@@ -65,6 +65,9 @@
       "Sidef::Convert::Convert" : {
          "file" : "lib/Sidef/Convert/Convert.pm"
       },
+      "Sidef::Deparse::Perl" : {
+         "file" : "lib/Sidef/Deparse/Perl.pm"
+      },
       "Sidef::Deparse::Sidef" : {
          "file" : "lib/Sidef/Deparse/Sidef.pm"
       },
@@ -157,6 +160,9 @@
       },
       "Sidef::Types::Block::Next" : {
          "file" : "lib/Sidef/Types/Block/Next.pm"
+      },
+      "Sidef::Types::Block::PerlCode" : {
+         "file" : "lib/Sidef/Deparse/Perl.pm"
       },
       "Sidef::Types::Block::Return" : {
          "file" : "lib/Sidef/Types/Block/Return.pm"
@@ -268,6 +274,12 @@
       },
       "Sidef::Variable::My" : {
          "file" : "lib/Sidef/Variable/My.pm"
+      },
+      "Sidef::Variable::PerlVar" : {
+         "file" : "lib/Sidef/Deparse/Perl.pm"
+      },
+      "Sidef::Variable::PerlVarRef" : {
+         "file" : "lib/Sidef/Deparse/Perl.pm"
       },
       "Sidef::Variable::Ref" : {
          "file" : "lib/Sidef/Variable/Ref.pm"
