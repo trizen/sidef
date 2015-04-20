@@ -61,6 +61,7 @@ package Sidef::Parser {
                      | Socket\b                       (?{ state $x = Sidef::Types::Glob::Socket->new })
                      | Pipe\b                         (?{ state $x = Sidef::Types::Glob::Pipe->new })
                      | Byte\b                         (?{ state $x = Sidef::Types::Byte::Byte->new })
+                     | Ref\b                          (?{ state $x = Sidef::Variable::Ref->new })
                      | LazyMethod\b                   (?{ state $x = Sidef::Variable::LazyMethod->new })
                      | Bytes\b                        (?{ state $x = Sidef::Types::Byte::Bytes->new })
                      | Time\b                         (?{ state $x = Sidef::Time::Time->new('__INIT__') })
@@ -176,6 +177,7 @@ package Sidef::Parser {
                   Complex
                   Math
                   Pipe
+                  Ref
                   Socket
                   Byte Bytes
                   Chr Char

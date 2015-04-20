@@ -154,7 +154,9 @@ package Sidef::Deparse::Sidef {
             }
         }
         elsif ($ref eq 'Sidef::Variable::Ref') {
-            ## ok
+            if (not exists $expr->{call}) {
+                $code = 'Ref';
+            }
         }
         elsif ($ref eq 'Sidef::Sys::Sys') {
             $code = exists($obj->{file_name}) ? '' : 'Sys';

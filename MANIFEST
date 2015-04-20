@@ -220,6 +220,7 @@ scripts/Expensive/levenshtein_recursive.sf
 scripts/Expensive/longest_common_subsequence.sf
 scripts/Expensive/mandelbrot_set.sf
 scripts/Expensive/mean_time.sf
+scripts/Expensive/monty_hall_problem.sf
 scripts/Expensive/mutual_recursion.sf
 scripts/Expensive/root_of_a_function.sf
 scripts/Expensive/sudoku_solver.sf
