@@ -171,7 +171,7 @@ package Sidef::Types::Array::Range {
         my ($name) = ($AUTOLOAD =~ /^.*[^:]::(.*)$/);
 
         my $array;
-        my $method = $self->{direction} eq 'up' ? 'to' : 'downto';
+        my $method = $self->{direction} eq 'up' ? 'array_to' : 'array_downto';
         if ($self->{type} eq 'number') {
 
             my $step = $self->{step};

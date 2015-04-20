@@ -11,7 +11,7 @@ use warnings;
 
 use File::Find qw(find);
 use File::Basename qw(basename);
-use File::Spec::Functions qw(catfile);
+use File::Spec::Functions qw(catfile splitdir);
 
 my $dir = shift() // die "usage: $0 [lib dir]\n";
 
@@ -65,6 +65,14 @@ sub process_file {
 find {
     no_chdir => 1,
     wanted   => sub {
+        my @parts = splitdir($_);
+
+        # Ignore the `Sidef::Deparse:Perl` module
+             @parts >= 3
+          && $parts[-1] =~ /\.pm\z/
+          && join("/", @parts[$#parts - 2 .. $#parts]) eq 'Sidef/Deparse/Perl.pm'
+          && return;
+
         -f and process_file($_);
     },
 } => $dir;

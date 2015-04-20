@@ -143,7 +143,7 @@ package Sidef::Types::String::String {
 
     *gmatches = \&gmatch;
 
-    sub to {
+    sub array_to {
         my ($self, $string) = @_;
 
         my ($s1, $s2) = ($self->get_value, $string->get_value);
@@ -154,17 +154,16 @@ package Sidef::Types::String::String {
         Sidef::Types::Array::Array->new(map { $self->new($_) } $s1 .. $s2);
     }
 
-    *upto = \&to;
-    *upTo = \&to;
+    *arr_to = \&array_to;
 
-    sub downto {
+    sub array_downto {
         my ($self, $string) = @_;
-        $string->to($self)->reverse;
+        $string->array_to($self)->reverse;
     }
 
-    *downTo = \&downto;
+    *arr_downto = \&array_downto;
 
-    sub range_to {
+    sub to {
         my ($self, $string) = @_;
         Sidef::Types::Array::Range->new(
                                         from      => $self->get_value,
@@ -174,7 +173,10 @@ package Sidef::Types::String::String {
                                        );
     }
 
-    sub range_downto {
+    *upto = \&to;
+    *upTo = \&to;
+
+    sub downto {
         my ($self, $string) = @_;
         Sidef::Types::Array::Range->new(
                                         from      => $self->get_value,
@@ -183,6 +185,8 @@ package Sidef::Types::String::String {
                                         direction => 'down'
                                        );
     }
+
+    *downTo = \&downto;
 
     sub cmp {
         my ($self, $string) = @_;
@@ -1120,10 +1124,10 @@ package Sidef::Types::String::String {
         *{__PACKAGE__ . '::' . '<=>'} = \&cmp;
         *{__PACKAGE__ . '::' . '÷'}  = \&div;
         *{__PACKAGE__ . '::' . '/'}   = \&div;
-        *{__PACKAGE__ . '::' . '..'}  = \&to;
-        *{__PACKAGE__ . '::' . '...'} = \&range_to;
-        *{__PACKAGE__ . '::' . '..^'} = \&range_to;
-        *{__PACKAGE__ . '::' . '^..'} = \&range_downto;
+        *{__PACKAGE__ . '::' . '..'}  = \&array_to;
+        *{__PACKAGE__ . '::' . '...'} = \&to;
+        *{__PACKAGE__ . '::' . '..^'} = \&to;
+        *{__PACKAGE__ . '::' . '^..'} = \&downto;
         *{__PACKAGE__ . '::' . '^'}   = \&xor;
         *{__PACKAGE__ . '::' . '|'}   = \&or;
         *{__PACKAGE__ . '::' . '&'}   = \&and;

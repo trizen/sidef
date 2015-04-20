@@ -198,7 +198,7 @@ package Sidef::Types::Number::Number {
         );
     }
 
-    sub to {
+    sub array_to {
         my ($self, $num, $step) = @_;
 
         $step = defined($step) ? $self->_is_number($step) ? ($step->get_value) : return : 1;
@@ -210,10 +210,9 @@ package Sidef::Types::Number::Number {
         $array;
     }
 
-    *upto = \&to;
-    *upTo = \&to;
+    *arr_to = \&array_to;
 
-    sub downto {
+    sub array_downto {
         my ($self, $num, $step) = @_;
         $step = defined($step) ? $step->get_value : 1;
         my $array = Sidef::Types::Array::Array->new();
@@ -223,9 +222,9 @@ package Sidef::Types::Number::Number {
         $array;
     }
 
-    *downTo = \&downto;
+    *arr_downto = \&array_downto;
 
-    sub range_to {
+    sub to {
         my ($self, $num, $step) = @_;
         $step = defined($step) ? $step->get_value : 1;
         Sidef::Types::Array::Range->new(
@@ -237,7 +236,10 @@ package Sidef::Types::Number::Number {
                                        );
     }
 
-    sub range_downto {
+    *upto = \&to;
+    *upTo = \&to;
+
+    sub downto {
         my ($self, $num, $step) = @_;
         $step = defined($step) ? $step->get_value : 1;
         Sidef::Types::Array::Range->new(
@@ -248,6 +250,8 @@ package Sidef::Types::Number::Number {
                                         direction => 'down'
                                        );
     }
+
+    *downTo = \&downto;
 
     sub sqrt {
         my ($self) = @_;
@@ -659,10 +663,10 @@ package Sidef::Types::Number::Number {
         *{__PACKAGE__ . '::' . '='}   = \&eq;
         *{__PACKAGE__ . '::' . '!='}  = \&ne;
         *{__PACKAGE__ . '::' . '≠'} = \&ne;
-        *{__PACKAGE__ . '::' . '..'}  = \&to;
-        *{__PACKAGE__ . '::' . '...'} = \&range_to;
-        *{__PACKAGE__ . '::' . '..^'} = \&range_to;
-        *{__PACKAGE__ . '::' . '^..'} = \&range_downto;
+        *{__PACKAGE__ . '::' . '..'}  = \&array_to;
+        *{__PACKAGE__ . '::' . '...'} = \&to;
+        *{__PACKAGE__ . '::' . '..^'} = \&to;
+        *{__PACKAGE__ . '::' . '^..'} = \&downto;
         *{__PACKAGE__ . '::' . '!'}   = \&factorial;
         *{__PACKAGE__ . '::' . '%%'}  = \&is_div;
         *{__PACKAGE__ . '::' . '>>'}  = \&shift_right;

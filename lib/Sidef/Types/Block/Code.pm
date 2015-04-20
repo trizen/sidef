@@ -347,7 +347,7 @@ package Sidef::Types::Block::Code {
     sub for {
         my ($self, $arg, @rest) = @_;
 
-        if (    @_ == 4
+        if (    $#_ == 3
             and ref($_[1]) eq __PACKAGE__
             and ref($_[2]) eq __PACKAGE__
             and ref($_[3]) eq __PACKAGE__) {
@@ -359,7 +359,7 @@ package Sidef::Types::Block::Code {
             }
             $self;
         }
-        elsif (@_ == 2 and $arg->can('each')) {
+        elsif ($#_ == 1 and $arg->can('each')) {
             $arg->each($self);
         }
         else {
