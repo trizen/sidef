@@ -38,9 +38,12 @@ package Sidef::Deparse::Sidef {
         join(
             ', ',
             map {
-                    (exists($_->{multi}) ? '*' : '')
-                  . $_->{name}
-                  . (ref($_->{value}) eq 'Sidef::Types::Nil::Nil' ? '' : ('=' . $self->deparse_expr({self => $_->{value}})))
+                (exists($_->{multi}) ? '*' : '') . $_->{name} . (
+                    ref($_->{value}) eq 'Sidef::Types::Nil::Nil' ? '' : do {
+                        my $type = $self->deparse_expr({self => $_->{value}});
+                        $type =~ /^[[:alpha:]_]\w*\z/ ? " is $type" : "=$type";
+                      }
+                  )
               } @vars
             );
     }
@@ -83,7 +86,7 @@ package Sidef::Deparse::Sidef {
                     my $vars = delete $block->{init_vars};
                     $code .= '(' . $self->_dump_init_vars(@{$vars}[($obj->{type} eq 'method' ? 1 : 0) .. $#{$vars} - 1]) . ')';
                     if (exists $obj->{returns}) {
-                        $code .= ' -> ' . $self->deparse_expr({self => $obj->{returns}});
+                        $code .= ' -> ' . $self->deparse_expr({self => $obj->{returns}}) . ' ';
                     }
                     $code .= $self->deparse_expr({self => $block});
                 }

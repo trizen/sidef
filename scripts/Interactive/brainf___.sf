@@ -2,9 +2,9 @@
 
 # http://rosettacode.org/wiki/Execute_Brain****#Sidef
 
-var tape_length = 50_000;
-var eof_val = -1;
-var unbalanced_exit_code = 1;
+const tape_length = 50_000;
+const eof_val = -1;
+const unbalanced_exit_code = 1;
 
 var cmd = 0;
 var cell = 0;
@@ -15,7 +15,7 @@ var tape = tape_length.of(0);
 func get_input {
     static input_buffer = '';
     input_buffer.len || (input_buffer = STDIN.readline);
-    input_buffer == nil ? eof_val : (input_buffer.sub!(/^(.)/s); $1.ord);
+    input_buffer ~~ ['', nil] ? eof_val : (input_buffer -= /^(.)/s; $1.ord);
 }
 
 func jump {
@@ -28,23 +28,21 @@ func jump {
     }
 }
 
-var commands = :(
+var commands = Hash.new(
     '>' => { ++cell },
     '<' => { --cell },
     '+' => { tape[cell]++ },
     '-' => { tape[cell]-- },
-    '.' => { tape[cell] chr print },
+    '.' => { tape[cell].chr.print },
     ',' => { tape[cell] = get_input() },
-    '[' => { ?tape[cell] ? loops.append(cmd) : jump() },
+    '[' => { tape[cell] ? loops.append(cmd) : jump() },
     ']' => { cmd = (loops.pop - 1) },
 );
 
-code = ARGF.slurp.split(1);
+code = ARGF.slurp.split(1).grep {|c| commands.exists(c)};
 var code_len = code.len;
 
-loop {
-    if (commands.exists(code[cmd])) {
-        commands[code[cmd]].run;
-    };
-    ++cmd < code_len || break;
+while (cmd < code_len) {
+    commands[code[cmd]].run;
+    cmd++;
 }
