@@ -203,8 +203,6 @@ package Sidef::Types::Glob::FileHandle {
 
     sub each {
         my ($self, $code) = @_;
-
-        $self->_is_code($code) || return;
         my ($var_ref) = $code->init_block_vars();
 
         while (defined(my $line = CORE::readline($self->{fh}))) {

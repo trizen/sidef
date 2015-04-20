@@ -105,8 +105,6 @@ package Sidef::Types::Glob::DirHandle {
 
     sub each {
         my ($self, $code) = @_;
-
-        $self->_is_code($code) || return;
         my ($var_ref) = $code->init_block_vars();
 
         require Encode;

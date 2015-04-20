@@ -189,7 +189,6 @@ package Sidef::Types::Hash::Hash {
 
     sub delete_if {
         my ($self, $code) = @_;
-        $self->_is_code($code) || return;
         $self->_iterate(
             $code,
             sub {
@@ -246,13 +245,11 @@ package Sidef::Types::Hash::Hash {
 
     sub each_value {
         my ($self, $code) = @_;
-        $self->_is_code($code) || return;
         $self->values->each($code);
     }
 
     sub each_key {
         my ($self, $code) = @_;
-        $self->_is_code($code) || return;
         $self->keys->each($code);
     }
 
@@ -260,7 +257,6 @@ package Sidef::Types::Hash::Hash {
         my ($self, $obj) = @_;
 
         if (defined($obj)) {
-            $self->_is_code($obj) || return;
 
             my $array = Sidef::Types::Array::Array->new();
             while (my ($key, $value) = each %{$self->{data}}) {
@@ -280,8 +276,6 @@ package Sidef::Types::Hash::Hash {
 
     sub sort_by {
         my ($self, $code) = @_;
-
-        $self->_is_code($code) || return;
 
         my @array;
         while (my ($key, $value) = CORE::each %{$self->{data}}) {

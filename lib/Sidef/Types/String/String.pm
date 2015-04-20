@@ -461,7 +461,7 @@ package Sidef::Types::String::String {
     sub gsub {
         my ($self, $regex, $str) = @_;
 
-        $self->_is_code($str, 1, 1)
+        $self->_is_code($str)
           && return $self->gesub($regex, $str);
 
         $str //= __PACKAGE__->new('');

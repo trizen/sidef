@@ -278,6 +278,7 @@ scripts/Interactive/socket.sf
 scripts/Interactive/socket_inet.sf
 scripts/Interactive/stdin.sf
 scripts/inverted_syntax.sf
+scripts/is_prime.sf
 scripts/JASH.sf
 scripts/jensen_s_device.sf
 scripts/josephus_problem.sf

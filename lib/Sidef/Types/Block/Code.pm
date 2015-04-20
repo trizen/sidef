@@ -165,8 +165,6 @@ package Sidef::Types::Block::Code {
     sub loop {
         my ($self, $code) = @_;
 
-        $self->_is_code($code) || return;
-
         while (1) {
             if (defined(my $res = $code->_run_code)) {
                 $code->pop_stack();

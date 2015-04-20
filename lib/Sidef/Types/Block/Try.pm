@@ -9,7 +9,6 @@ package Sidef::Types::Block::Try {
 
     sub try {
         my ($self, $code) = @_;
-        $self->_is_code($code) || return;
 
         my $error = 0;
         local $SIG{__WARN__} = sub { $self->{type} = 'warning'; $self->{msg} = $_[0]; $error = 1 };
@@ -26,7 +25,7 @@ package Sidef::Types::Block::Try {
 
     sub catch {
         my ($self, $code) = @_;
-        $self->_is_code($code) || return;
+
         $self->{catch}
           ? do {
             my ($type, $msg) = $code->init_block_vars();

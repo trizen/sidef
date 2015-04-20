@@ -61,8 +61,6 @@ package Sidef::Types::Array::Range {
         my ($self, $code) = @_;
 
         $code // return ($self->pairs);
-        $self->_is_code($code) || return;
-
         my ($var_ref) = $code->init_block_vars();
 
         if ($self->{type} eq 'number') {

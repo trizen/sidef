@@ -520,7 +520,7 @@ package Sidef::Types::Number::Number {
     sub of {
         my ($self, $obj) = @_;
 
-        if ($self->_is_code($obj)) {
+        if ($obj->can('run')) {
             return Sidef::Types::Array::Array->new(map { $obj->run } 1 .. $self->get_value);
         }
 

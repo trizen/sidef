@@ -372,7 +372,7 @@ package Sidef::Types::Array::Array {
         my ($self, $arg) = @_;
 
         if (defined $arg) {
-            if ($self->_is_code($arg)) {
+            if ($arg->can('run')) {
                 return return $self->find($arg);
             }
 
@@ -553,7 +553,6 @@ package Sidef::Types::Array::Array {
 
     sub find {
         my ($self, $code) = @_;
-
         my ($var_ref) = $code->init_block_vars();
 
         foreach my $var (@{$self}) {
@@ -563,6 +562,21 @@ package Sidef::Types::Array::Array {
         }
 
         return;
+    }
+
+    sub any {
+        my ($self, $code) = @_;
+
+        my ($var_ref) = $code->init_block_vars();
+
+        foreach my $var (@{$self}) {
+            $var_ref->set_value($var->get_value);
+            if ($code->run) {
+                return Sidef::Types::Bool::Bool->true;
+            }
+        }
+
+        Sidef::Types::Bool::Bool->false;
     }
 
     sub all {
@@ -648,7 +662,7 @@ package Sidef::Types::Array::Array {
                 push @array, $x->$method($self->[$i]->get_value);
             }
         }
-        elsif ($self->_is_code($obj)) {
+        elsif ($obj->can('call')) {
             for (my $i = 1 ; $i <= $offset ; $i += 2) {
                 push @array, $obj->call($self->[$i - 1]->get_value, $self->[$i]->get_value);
             }
@@ -810,8 +824,8 @@ package Sidef::Types::Array::Array {
     sub abbrev {
         my ($self, $code) = @_;
 
-        my $__END__ = {};                                                             # some unique value
-        my $__CALL__ = defined($code) && ref($code) eq 'Sidef::Types::Block::Code';
+        my $__END__ = {};                                      # some unique value
+        my $__CALL__ = defined($code) && $code->can('call');
 
         my %table;
         foreach my $sub_array (map { $_->get_value } @{$self}) {
@@ -863,7 +877,7 @@ package Sidef::Types::Array::Array {
     sub contains {
         my ($self, $obj) = @_;
 
-        if (ref($obj) eq 'Sidef::Types::Block::Code') {
+        if ($obj->can('run')) {
             my ($var_ref) = $obj->init_block_vars();
 
             foreach my $var (@{$self}) {

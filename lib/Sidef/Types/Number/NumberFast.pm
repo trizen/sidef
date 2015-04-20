@@ -201,14 +201,14 @@ package Sidef::Types::Number::Number {
 
     sub is_even {
         my ($self) = @_;
-        Sidef::Types::Bool::Bool->new($self->get_value % 2 == 0);
+        Sidef::Types::Bool::Bool->new(not($self->get_value & 1));
     }
 
     *isEven = \&is_even;
 
     sub is_odd {
         my ($self) = @_;
-        Sidef::Types::Bool::Bool->new($self->get_value % 2 == 1);
+        Sidef::Types::Bool::Bool->new($self->get_value & 1);
     }
 
     *isOdd = \&is_odd;
