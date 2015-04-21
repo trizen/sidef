@@ -201,7 +201,7 @@ package Sidef::Types::Number::Number {
 
     sub is_even {
         my ($self) = @_;
-        Sidef::Types::Bool::Bool->new(not($self->get_value & 1));
+        Sidef::Types::Bool::Bool->new(CORE::not($self->get_value & 1));
     }
 
     *isEven = \&is_even;
