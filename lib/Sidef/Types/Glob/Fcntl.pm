@@ -28,7 +28,7 @@ package Sidef::Types::Glob::Fcntl {
                 return $CACHE{$sub} = Sidef::Types::Number::Number->new($call->());
             }
 
-            warn qq{[WARN] ** Inexistent Fcntl method "$sub"!\n};
+            warn qq{[WARN] Inexistent Fcntl method "$sub"!\n};
             return;
         }
     }

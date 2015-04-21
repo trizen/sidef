@@ -116,7 +116,10 @@ package Sidef::Types::Number::Complex {
         state %cache;
         state $table = {i => sub { __PACKAGE__->new(Math::Complex->i) },};
 
-        $cache{lc($name)} //= $table->{lc($name)}->();
+        $cache{lc($name)} //= exists($table->{lc($name)}) ? $table->{lc($name)}->() : do {
+            warn qq{[WARN] Inexistent Complex constant "$name"!\n};
+            undef;
+        };
     }
 
     sub get_value {

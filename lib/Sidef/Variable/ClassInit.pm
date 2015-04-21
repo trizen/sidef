@@ -78,7 +78,7 @@ package Sidef::Variable::ClassInit {
             if (ref($args[$i]) eq 'Sidef::Types::Array::Pair') {
                 foreach my $pair (@args[$i .. $#args]) {
                     ref($pair) eq 'Sidef::Types::Array::Pair' || do {
-                        warn "[WARN]: Class init error -- expected a Pair type argument, but got: ", ref($pair), "\n";
+                        warn "[WARN] Class init error -- expected a Pair type argument, but got: ", ref($pair), "\n";
                         last;
                     };
                     $class->{__VARS__}{$pair->[0]->get_value} = $pair->[1]->get_value;

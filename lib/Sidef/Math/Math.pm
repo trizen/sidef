@@ -8,6 +8,32 @@ package Sidef::Math::Math {
         bless {}, __PACKAGE__;
     }
 
+    sub get_constant {
+        my ($self, $name) = @_;
+
+        state %cache;
+        state $table = {
+            pi  => sub { Math::BigFloat->new('3.14159265358979323846264338327950288419716939937510582097494459') },
+            e   => sub { Math::BigFloat->new('2.71828182845904523536028747135266249775724709369995957496696763') },
+            phi => sub { Math::BigFloat->new('1.61803398874989484820458683436563811772030917980576286213544862') },
+
+            sqrt2   => sub { Math::BigFloat->new('1.41421356237309504880168872420969807856967187537694807317667974') },
+            sqrte   => sub { Math::BigFloat->new('1.64872127070012814684865078781416357165377610071014801157507931') },
+            sqrtpi  => sub { Math::BigFloat->new('1.77245385090551602729816748334114518279754945612238712821380779') },
+            sqrtphi => sub { Math::BigFloat->new('1.27201964951406896425242246173749149171560804184009624861664038') },
+
+            ln2    => sub { Math::BigFloat->new('0.693147180559945309417232121458176568075500134360255254120680009') },
+            log2e  => sub { Math::BigFloat->new('1.4426950408889634073599246810018921374266459541529859') },
+            ln10   => sub { Math::BigFloat->new('2.30258509299404568401799145468436420760110148862877297603332790') },
+            log10e => sub { Math::BigFloat->new('0.4342944819032518276511289189166050822943970058036665') },
+                       };
+
+        $cache{lc($name)} //= exists($table->{lc($name)}) ? Sidef::Types::Number::Number->new($table->{lc($name)}->()) : do {
+            warn qq{[WARN] Inexistent Math constant "$name"!\n};
+            undef;
+        };
+    }
+
     sub e {
         my ($self, $places) = @_;
         Sidef::Types::Number::Number->new(Math::BigFloat->bexp(1, defined($places) ? $places->get_value : ()));
@@ -138,6 +164,21 @@ package Sidef::Math::Math {
     sub pow {
         my ($self, $n, $pow) = @_;
         Sidef::Types::Number::Number->new(Math::BigFloat->new($n->get_value)->bpow($pow->get_value));
+    }
+
+    sub rand {
+        my ($self, $from, $to) = @_;
+
+        if (defined($from) and not defined($to)) {
+            $to   = $from->get_value;
+            $from = 0;
+        }
+        else {
+            $from = defined($from) ? $from->get_value : 0;
+            $to   = defined($to)   ? $to->get_value   : 1;
+        }
+
+        Sidef::Types::Number::Number->new($from + CORE::rand($to - $from));
     }
 
     sub sum {
