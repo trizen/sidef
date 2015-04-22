@@ -6,7 +6,7 @@ package Sidef::Types::Block::Return {
 
     sub return {
         my ($self, @obj) = @_;
-        $self->{obj} = @obj > 1 ? Sidef::Args::Args->new(@obj) : $obj[0];
+        $self->{obj} = @obj > 1 ? Sidef::Types::Array::List->new(@obj) : $obj[0];
         $self;
     }
 

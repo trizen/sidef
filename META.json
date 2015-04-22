@@ -59,9 +59,6 @@
          "file" : "lib/Sidef.pm",
          "version" : "0.04"
       },
-      "Sidef::Args::Args" : {
-         "file" : "lib/Sidef/Args/Args.pm"
-      },
       "Sidef::Convert::Convert" : {
          "file" : "lib/Sidef/Convert/Convert.pm"
       },
@@ -124,6 +121,9 @@
       },
       "Sidef::Types::Array::HCArray" : {
          "file" : "lib/Sidef/Types/Array/HCArray.pm"
+      },
+      "Sidef::Types::Array::List" : {
+         "file" : "lib/Sidef/Types/Array/List.pm"
       },
       "Sidef::Types::Array::MultiArray" : {
          "file" : "lib/Sidef/Types/Array/MultiArray.pm"

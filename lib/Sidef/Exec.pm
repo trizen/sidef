@@ -52,7 +52,7 @@ package Sidef::Exec {
                       : ref($_) eq 'Sidef::Types::Array::HCArray' ? $self->execute_expr({self => $_})
                       :                                             $_;
                     (ref($val) eq 'Sidef::Variable::Variable' || ref($val) eq 'Sidef::Variable::ClassVar') ? $val->get_value
-                      : ref($val) eq 'Sidef::Args::Args' ? @{$val}
+                      : ref($val) eq 'Sidef::Types::Array::List' ? @{$val}
                       : $val
                   } @{$self_obj}
             );
@@ -300,7 +300,7 @@ package Sidef::Exec {
                         elsif ($ref eq 'Sidef::Variable::Init') {
                             push @args, $obj->{vars}[0];
                         }
-                        elsif ($ref eq 'Sidef::Args::Args') {
+                        elsif ($ref eq 'Sidef::Types::Array::List') {
                             push @args, @{$obj};
                         }
                         else {
@@ -312,10 +312,6 @@ package Sidef::Exec {
                 }
                 else {
                     $self_obj = $self_obj->$method;
-
-                    if ($method eq '...') {
-                        return Sidef::Args::Args->new(@{$self_obj});
-                    }
                 }
 
                 my $ref = ref($self_obj);
@@ -395,7 +391,7 @@ package Sidef::Exec {
                     $obj = $obj->{value};
                 }
 
-                if (wantarray and ref($obj) eq 'Sidef::Args::Args') {
+                if (wantarray and ref($obj) eq 'Sidef::Types::Array::List') {
                     push @results, @{$obj};
                 }
                 else {

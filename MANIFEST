@@ -3,7 +3,6 @@ Build.PL
 Changes
 lib/Sidef.pm
 lib/Sidef.pod
-lib/Sidef/Args/Args.pm
 lib/Sidef/Convert/Convert.pm
 lib/Sidef/Convert/Convert.pod
 lib/Sidef/Deparse/Perl.pm
@@ -33,6 +32,7 @@ lib/Sidef/Time/Time.pod
 lib/Sidef/Types/Array/Array.pm
 lib/Sidef/Types/Array/Array.pod
 lib/Sidef/Types/Array/HCArray.pm
+lib/Sidef/Types/Array/List.pm
 lib/Sidef/Types/Array/MultiArray.pm
 lib/Sidef/Types/Array/Pair.pm
 lib/Sidef/Types/Array/Range.pm

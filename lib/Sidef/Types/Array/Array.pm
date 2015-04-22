@@ -1260,6 +1260,10 @@ package Sidef::Types::Array::Array {
     *removeFirstIf   = \&delete_first_if;
     *deleteFirstIf   = \&delete_first_if;
 
+    sub to_list {
+        Sidef::Types::Array::List->new(map { $_->get_value } @{$_[0]});
+    }
+
     sub dump {
         my ($self) = @_;
 
@@ -1273,7 +1277,6 @@ package Sidef::Types::Array::Array {
               )
               . ']'
         );
-
     }
 
     {
@@ -1291,10 +1294,7 @@ package Sidef::Types::Array::Array {
         *{__PACKAGE__ . '::' . ':'}  = \&pair_with;
         *{__PACKAGE__ . '::' . '/'}  = \&divide;
         *{__PACKAGE__ . '::' . '»'} = \&assign_to;
-
-        *{__PACKAGE__ . '::' . '...'} = sub {
-            [map { $_->get_value } @{$_[0]}];
-        };
+        *{__PACKAGE__ . '::' . '...'} = \&to_list;
 
         *{__PACKAGE__ . '::' . '++'} = sub {
             my ($self, $obj) = @_;
