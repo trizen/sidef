@@ -84,17 +84,17 @@ if (defined(my $types = $args{M})) {
 }
 
 # Interactive help
-elsif (defined $args{H}) {
+if (defined $args{H}) {
     help_interactive();
 }
 
 # Interactive coding
-elsif (defined $args{i}) {
+if (defined $args{i}) {
     code_interactive();
 }
 
 # Test mode
-elsif (defined $args{t}) {
+if (defined $args{t}) {
     my @argv = splice(@ARGV);
     while (defined(my $script_name = shift @argv)) {
 
@@ -773,7 +773,7 @@ HEAD
 
                  close $fh;
              }
-         }
+           }
         } => $path
     );
 
