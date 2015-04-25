@@ -3,6 +3,7 @@ Sidef
 
 *Sidef is a modern object-oriented programming language, written in Perl.*
 
+* Gitbook: http://trizen.gitbooks.io/sidef-lang/content/
 * Tutorial: https://github.com/trizen/sidef/wiki
 * RosettaCode: http://rosettacode.org/wiki/Sidef
 
