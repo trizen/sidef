@@ -1135,6 +1135,7 @@ package Sidef::Parser {
                                                                  },
                                                 );
                         pos($_) += $pos1 if defined $pos1;
+                        $obj->__set_params__($var_names);
 
                         # Class inheritance (class Name(...) << Name1, Name2)
                         if (/\G\h*<<?\h*/gc) {
@@ -1183,7 +1184,7 @@ package Sidef::Parser {
                         my ($block, $pos) = $self->parse_block(code => '{' . substr($_, pos));
                         pos($_) += $pos - 1;
 
-                        $obj->__set_value__($block, $var_names);
+                        $obj->__set_block__($block);
                     }
 
                     if ($type eq 'func' or $type eq 'method') {
@@ -1616,8 +1617,12 @@ package Sidef::Parser {
                     require List::Util;
                     if (
                         defined(
-                              my $var = List::Util::first(sub { $_->{name} eq $name }, @{$self->{current_class}{__DEF_VARS__}})
-                        )
+                                my $var = List::Util::first(
+                                                            sub { $_->{name} eq $name },
+                                                            @{$self->{current_class}{__VARS__}},
+                                                            @{$self->{current_class}{__DEF_VARS__}}
+                                                           )
+                               )
                       ) {
                         if (exists $self->{current_method}) {
                             my ($var, $code) = $self->find_var('self', $class);
@@ -1635,7 +1640,7 @@ package Sidef::Parser {
                                   pos;
                             }
                         }
-                        else {
+                        elsif ($var->{type} eq 'def') {
                             return $var, pos;
                         }
                     }

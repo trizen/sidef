@@ -7,10 +7,14 @@ package Sidef::Variable::ClassInit {
         bless \%opt, __PACKAGE__;
     }
 
-    sub __set_value__ {
-        my ($self, $block, $names) = @_;
+    sub __set_params__ {
+        my ($self, $names) = @_;
+        $self->{__VARS__} = $names;
+    }
+
+    sub __set_block__ {
+        my ($self, $block) = @_;
         $self->{__BLOCK__} = $block;
-        $self->{__VARS__}  = $names;
         $self;
     }
 
