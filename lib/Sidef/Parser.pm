@@ -1612,6 +1612,35 @@ package Sidef::Parser {
                         return Sidef::Variable::InitMy->new($name), pos($_) - length($name);
                     }
 
+                    # 'def' instance/class variable
+                    require List::Util;
+                    if (
+                        defined(
+                              my $var = List::Util::first(sub { $_->{name} eq $name }, @{$self->{current_class}{__DEF_VARS__}})
+                        )
+                      ) {
+                        if (exists $self->{current_method}) {
+                            my ($var, $code) = $self->find_var('self', $class);
+                            if (ref $var) {
+                                $var->{count}++;
+                                $var->{obj}{in_use} = 1;
+                                return {
+                                        $self->{class} => [
+                                                           {
+                                                            self => $var->{obj},
+                                                            call => [{method => $name}]
+                                                           }
+                                                          ]
+                                       },
+                                  pos;
+                            }
+                        }
+                        else {
+                            return $var, pos;
+                        }
+                    }
+
+                    # Type constant
                     my $obj;
                     if (    $class ne $self->{class}
                         and index($class, '::') == -1
@@ -1633,6 +1662,7 @@ package Sidef::Parser {
                           pos;
                     }
 
+                    # Fatal error
                     $self->fatal_error(
                                        code  => $_,
                                        pos   => (pos($_) - length($name)),

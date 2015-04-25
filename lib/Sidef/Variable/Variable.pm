@@ -86,11 +86,11 @@ package Sidef::Variable::Variable {
 
         $#_ > 1 && ($obj = $_[-1]);
 
-        if ($self->{type} eq "var" or $self->{type} eq "static") {
+        if ($self->{type} eq 'var' or $self->{type} eq 'static' or $self->{type} eq 'def') {
             return $self->set_value($obj);
         }
 
-        if ($self->{type} eq "const") {
+        if ($self->{type} eq 'const') {
             if (not exists $self->{inited}) {
                 return $self->set_value($obj);
             }

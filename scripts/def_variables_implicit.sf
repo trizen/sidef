@@ -1,0 +1,22 @@
+#!/usr/bin/ruby
+
+class Foo {
+
+    def name = 'Bar';
+    def age = 41;
+
+    say age+1;                # refers to class variable `age`
+
+    method baz {
+        return name;          # refers to instance variable `self.name`
+    }
+}
+
+var obj = Foo();
+say obj.baz();      # prints 'Bar'
+
+obj.baz() == 'Bar' || die "error 1";
+obj.age   += 1;
+obj[:age] == 42    || die "error 2";
+
+say "** Test passed!";
