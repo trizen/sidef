@@ -1257,7 +1257,14 @@ package Sidef::Parser {
                         return scalar {
                             $self->{class} => [
                                 {
-                                 self => $self->{current_class},
+                                 self => exists($self->{current_method})
+                                 ? do {
+                                     my ($var) = $self->find_var('self', $self->{class});
+                                     $var->{count}++;
+                                     $var->{obj}{in_use} = 1;
+                                     $var->{obj};
+                                   }
+                                 : $self->{current_class},
                                  call => [
                                      {
                                       method => 'def_method',
@@ -1598,22 +1605,7 @@ package Sidef::Parser {
                         return $var->{obj}, pos;
                     }
 
-                    if (/\G(?=\h*:?=(?![=~>]))/) {
-
-                        #warn qq{[!] Implicit declaration of variable "$name", at line $self->{line}\n};
-                        unshift @{$self->{vars}{$class}},
-                          {
-                            obj   => Sidef::Variable::My->new($name),
-                            name  => $name,
-                            count => 0,
-                            type  => 'my',
-                            line  => $self->{line},
-                          };
-
-                        return Sidef::Variable::InitMy->new($name), pos($_) - length($name);
-                    }
-
-                    # 'def' instance/class variable
+                    # 'def' instance/class variables
                     require List::Util;
                     if (
                         defined(
@@ -1640,9 +1632,24 @@ package Sidef::Parser {
                                   pos;
                             }
                         }
-                        elsif ($var->{type} eq 'def') {
+                        else {
                             return $var, pos;
                         }
+                    }
+
+                    if (/\G(?=\h*:?=(?![=~>]))/) {
+
+                        #warn qq{[!] Implicit declaration of variable "$name", at line $self->{line}\n};
+                        unshift @{$self->{vars}{$class}},
+                          {
+                            obj   => Sidef::Variable::My->new($name),
+                            name  => $name,
+                            count => 0,
+                            type  => 'my',
+                            line  => $self->{line},
+                          };
+
+                        return Sidef::Variable::InitMy->new($name), pos($_) - length($name);
                     }
 
                     # Type constant

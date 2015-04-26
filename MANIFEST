@@ -180,6 +180,7 @@ scripts/catalan_numbers_recursive.sf
 scripts/class_concept.sf
 scripts/class_config.sf
 scripts/class_inheritance.sf
+scripts/class_parameters_implicit.sf
 scripts/class_redefinition.sf
 scripts/classes.sf
 scripts/classes_and_objects.sf
@@ -199,6 +200,7 @@ scripts/DATA_handle.sf
 scripts/def_class_variables.sf
 scripts/def_variables_implicit.sf
 scripts/define_keyword.sf
+scripts/define_methods_at_runtime.sf
 scripts/echo.sf
 scripts/eq_g2.sf
 scripts/escape_unescape.sf

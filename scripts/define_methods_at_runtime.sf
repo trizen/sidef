@@ -1,0 +1,56 @@
+#!/usr/bin/ruby
+
+class Hello(arr is Array) {
+    arr.each { |name|
+        say "** Creating a class method: #{name}";
+        def_method name { name };
+    };
+    method add_method(name) {
+        say "** Creating an instance method: #{name}";
+        def_method name { name };
+    };
+    method add_block_method(name, block) {
+        say "** Creating an instance method with a block: #{name}";
+        self.def_method(name, block.copy);
+    };
+    method add_class_method(name) {
+        say "** Creating a non-instance class method: #{name}";
+        __CLASS__.def_method(name, { name }.copy);
+    };
+}
+#
+## Object 1
+#
+var obj = Hello(['foo', 'bar']);
+
+obj.foo == "foo"            || die "error";
+obj.add_method('baz');
+obj.add_class_method('zoo');
+obj.baz == "baz"            || die "error";
+obj.baz;
+
+var name = "zoro";
+obj.add_block_method(name, { name });
+obj.zoro == name            || die "error";
+
+#
+## Object 2
+#
+var obj2 = Hello();
+
+obj2.foo == "foo"           || die "error";
+
+if (obj2.has_method('baz')) {
+    die "error";
+};
+
+obj2.zoo == "zoo"           || die "error";
+obj.baz == "baz"            || die "error";
+obj.foo == "foo"            || die "error";
+
+obj.add_method('fox');
+obj.fox == 'fox'            || die "error";
+
+obj.def_method('foo', {'bar'});
+obj.foo == 'bar'            || die "error";
+obj2.foo == 'foo'           || die "error";

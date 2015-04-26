@@ -13,6 +13,16 @@ package Sidef::Variable::Class {
         Sidef::Types::String::String->new($self->{name});
     }
 
+    sub def_method {
+        my ($self, $name, $block) = @_;
+        $self->{method}{$name} = $block;
+    }
+
+    sub has_method {
+        my ($self, $name) = @_;
+        Sidef::Types::Bool::Bool->new(exists $self->{method}{$name});
+    }
+
     sub get_value {
         my $self = shift;
         $AUTOLOAD = __PACKAGE__ . '::' . 'get_value';
