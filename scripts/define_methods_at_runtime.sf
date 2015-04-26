@@ -9,6 +9,10 @@ class Hello(arr is Array) {
         say "** Creating an instance method: #{name}";
         def_method name { name };
     };
+    method add_method_with_arg(name) {
+        say "** Creating an instance method with arguments: #{name}";
+        def_method name (a){ a + name };
+    };
     method add_block_method(name, block) {
         say "** Creating an instance method with a block: #{name}";
         self.def_method(name, block.copy);
@@ -54,3 +58,16 @@ obj.fox == 'fox'            || die "error";
 obj.def_method('foo', {'bar'});
 obj.foo == 'bar'            || die "error";
 obj2.foo == 'foo'           || die "error";
+
+obj.add_method_with_arg('bau');
+obj.bau('~')  == "~bau"     || die "error";
+
+obj2.add_method_with_arg('boo');
+obj2.boo('-') == "-boo"     || die "error";
+obj.bau('/')  == "/bau"     || die "error";
+
+obj2.add_method_with_arg('bau');
+obj.add_method('bau');
+
+obj2.bau('~') == '~bau'     || die "error";
+obj.bau  == 'bau'           || die "error";
