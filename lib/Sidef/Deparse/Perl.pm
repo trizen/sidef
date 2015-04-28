@@ -62,6 +62,8 @@ binmode(STDERR, ":utf8") if $^P == 0;    # to work under Devel::* modules
 use 5.014;
 no if $] >= 5.018, warnings => 'experimental::lexical_topic';
 
+my $ARGV = Sidef::Types::Array::Array->new(map {Sidef::Types::String::String->new($_)} @ARGV);
+
 package Sidef::Variable::PerlVar {
 
     use 5.014;
@@ -549,7 +551,11 @@ HEADER
             }
             elsif ($ref eq 'Sidef::Types::Glob::File') {
                 if (${$obj} eq '') {
-                    $code = 'File';
+                    $code = $ref;
+                }
+                else {
+                    $code =
+                      $self->make_constant($ref, "FILE$refaddr", Sidef::Types::String::String->new(${$obj})->dump->get_value);
                 }
             }
             elsif ($ref eq 'Sidef::Types::Glob::Dir') {
