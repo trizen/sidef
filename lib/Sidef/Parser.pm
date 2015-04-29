@@ -611,6 +611,9 @@ package Sidef::Parser {
             while (/\G(\*?)($self->{var_name_re})/goc) {
                 my ($attr, $name) = ($1, $2);
 
+                my $class_name;
+                ($name, $class_name) = $self->get_name_and_class($name);
+
                 if (exists $self->{keywords}{$name}) {
                     $self->fatal_error(
                                        code  => $_,
@@ -620,7 +623,7 @@ package Sidef::Parser {
                 }
 
                 if (!$opt{private}) {
-                    my ($var, $code) = $self->find_var($name, $self->{class});
+                    my ($var, $code) = $self->find_var($name, $class_name);
 
                     if (defined($var) && $code) {
                         warn "[WARN] Redeclaration of $opt{type} '$name' in same scope, at "
@@ -639,14 +642,15 @@ package Sidef::Parser {
                 }
 
                 my $obj = Sidef::Variable::Variable->new(
-                                                         name => $name,
-                                                         type => $opt{type},
+                                                         name  => $name,
+                                                         type  => $opt{type},
+                                                         class => $class_name,
                                                          defined($value) ? (value => $value, has_value => 1) : (),
                                                          $attr eq '*' ? (multi => 1) : (),
                                                         );
 
                 if (!$opt{private}) {
-                    unshift @{$self->{vars}{$self->{class}}},
+                    unshift @{$self->{vars}{$class_name}},
                       {
                         obj   => $obj,
                         name  => $name,
@@ -1075,6 +1079,8 @@ package Sidef::Parser {
                         ($name, $class_name) = $self->get_name_and_class($name);
                     }
 
+                    local $self->{class} = $class_name;
+
                     if ($type ne 'method'
                         && exists($self->{keywords}{$name})) {
                         $self->fatal_error(
@@ -1086,9 +1092,10 @@ package Sidef::Parser {
 
                     my $obj =
                         $type eq 'my' ? Sidef::Variable::My->new($name)
-                      : $type eq 'func'   ? Sidef::Variable::Variable->new(name => $name, type => $type)
-                      : $type eq 'method' ? Sidef::Variable::Variable->new(name => $name, type => $type)
-                      : $type eq 'class' ? Sidef::Variable::ClassInit->__new__(name => ($built_in_obj // $name))
+                      : $type eq 'func'   ? Sidef::Variable::Variable->new(name => $name, type => $type, class => $class_name)
+                      : $type eq 'method' ? Sidef::Variable::Variable->new(name => $name, type => $type, class => $class_name)
+                      : $type eq 'class'
+                      ? Sidef::Variable::ClassInit->__new__(name => ($built_in_obj // $name), class => $class_name)
                       : $self->fatal_error(
                                            error    => "invalid type",
                                            expected => "expected a magic thing to happen",
@@ -1561,7 +1568,7 @@ package Sidef::Parser {
                     my $name = $1;
                     my $type = 'var';
 
-                    my $variable = Sidef::Variable::Variable->new(name => $name, type => $type);
+                    my $variable = Sidef::Variable::Variable->new(name => $name, type => $type, class => $self->{class});
 
                     unshift @{$self->{vars}{$self->{class}}},
                       {
@@ -1773,7 +1780,7 @@ package Sidef::Parser {
                     state $name = '_';
                     state $type = 'var';
 
-                    my $var_obj = Sidef::Variable::Variable->new(name => $name, type => $type);
+                    my $var_obj = Sidef::Variable::Variable->new(name => $name, type => $type, class => $self->{class});
                     push @{$var_objs}, $var_obj;
                     unshift @{$self->{vars}{$self->{class}}},
                       {

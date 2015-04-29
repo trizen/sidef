@@ -32,28 +32,31 @@ use File::Basename qw(basename);
 sub parse_deparse {
     my ($code, $name) = @_;
 
+    local @Sidef::Exec::NAMESPACES = ();
+
     my $parser = Sidef::Parser->new(
                                     file_name   => $name,
                                     script_name => $name,
                                     strict      => 1,
                                    );
 
-    my $deparser = Sidef::Deparse::Sidef->new(namespaces => [@Sidef::Exec::NAMESPACES]);
     my $struct = $parser->parse_script(code => $code);
 
+    my $deparser   = Sidef::Deparse::Sidef->new(namespaces => [@Sidef::Exec::NAMESPACES]);
     my @statements = $deparser->deparse_script($struct);
-    my $deparsed =   $deparser->{before} . join($deparser->{between}, @statements) . $deparser->{after};
+    my $deparsed   = $deparser->{before} . join($deparser->{between}, @statements) . $deparser->{after};
 
     return ($deparsed, \@statements);
 }
 
 my %ignore = (
-              'include_class.sf'                  => 1,
-              'module_definition.sf'              => 1,
-              'module_loading.sf'                 => 1,
-              'module_order_and_redeclaration.sf' => 1,
-              'Matrix.sm'                         => 1,
-             );
+
+    #'include_class.sf'                  => 1,
+    'module_definition.sf'              => 1,
+    'module_loading.sf'                 => 1,
+    'module_order_and_redeclaration.sf' => 1,
+    'Matrix.sm'                         => 1,
+);
 
 my $dir = shift() // die "usage: $0 [scripts dir]\n";
 

@@ -19,8 +19,9 @@ package Sidef::Variable::Init {
             if ($type eq 'var') {
                 my $new_var =
                   Sidef::Variable::Variable->new(
-                                                 name  => $var->{name},
-                                                 type  => $var->{type},
+                                                 name => $var->{name},
+                                                 type => $var->{type},
+                                                 (exists($var->{class}) ? (class => $var->{class}) : ()),
                                                  value => exists($var->{multi})
                                                  ? Sidef::Types::Array::Array->new(@args[$i .. $#args])
                                                  : (exists($args[$i]) ? $args[$i] : $var->{value})
