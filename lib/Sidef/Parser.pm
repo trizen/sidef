@@ -1986,7 +1986,7 @@ package Sidef::Parser {
                 my @methods;
                 {
 
-                    if (/\G(?=\.(?:$self->{method_name_re}|\())/o) {
+                    if (/\G(?=\.(?:$self->{method_name_re}|[(\$]))/o) {
                         my ($methods, $pos) = $self->parse_methods(code => substr($_, pos));
                         pos($_) += $pos;
                         push @{$struct{$self->{class}}[-1]{call}}, @{$methods};
