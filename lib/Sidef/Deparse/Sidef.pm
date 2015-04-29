@@ -440,7 +440,6 @@ package Sidef::Deparse::Sidef {
         foreach my $class (grep exists $struct->{$_}, @{$self->{namespaces}}, 'main') {
             my $in_module = $class ne $self->{class};
             local $self->{class} = $class;
-            my $spaces = $Sidef::SPACES;
             foreach my $i (0 .. $#{$struct->{$class}}) {
                 my $expr = $struct->{$class}[$i];
                 push @results, ref($expr) eq 'HASH' ? $self->deparse_expr($expr) : $self->deparse_expr({self => $expr});
