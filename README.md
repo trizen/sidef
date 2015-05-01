@@ -1,7 +1,7 @@
 Sidef
 =====
 
-*Sidef is a modern object-oriented programming language, written in Perl.*
+*Sidef is a modern object-oriented programming language, implemented in Perl.*
 
 * Gitbook: http://trizen.gitbooks.io/sidef-lang/content/
 * Tutorial: https://github.com/trizen/sidef/wiki
