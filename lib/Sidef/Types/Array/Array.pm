@@ -1296,6 +1296,7 @@ package Sidef::Types::Array::Array {
         *{__PACKAGE__ . '::' . ':'}   = \&pair_with;
         *{__PACKAGE__ . '::' . '/'}   = \&divide;
         *{__PACKAGE__ . '::' . '»'}  = \&assign_to;
+        *{__PACKAGE__ . '::' . '«'}  = \&append;
         *{__PACKAGE__ . '::' . '...'} = \&to_list;
 
         *{__PACKAGE__ . '::' . '++'} = sub {
