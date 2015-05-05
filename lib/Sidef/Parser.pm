@@ -1615,13 +1615,13 @@ package Sidef::Parser {
                     # 'def' instance/class variables
                     require List::Util;
                     if (
-                        defined(
-                                my $var = List::Util::first(
-                                                            sub { $_->{name} eq $name },
-                                                            @{$self->{current_class}{__VARS__}},
-                                                            @{$self->{current_class}{__DEF_VARS__}}
-                                                           )
-                               )
+                        ref($self->{current_class}) eq 'Sidef::Variable::ClassInit'
+                        and defined(
+                                    my $var = List::Util::first(
+                                        sub { $_->{name} eq $name }, @{$self->{current_class}{__VARS__}},
+                                        @{$self->{current_class}{__DEF_VARS__}}
+                                                               )
+                                   )
                       ) {
                         if (exists $self->{current_method}) {
                             my ($var, $code) = $self->find_var('self', $class);

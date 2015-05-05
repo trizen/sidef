@@ -379,6 +379,7 @@ scripts/Rosettacode/vector_products.sf
 scripts/run_length_encoding.sf
 scripts/run_length_encoding_2.sf
 scripts/script.sf
+scripts/selection_sort.sf
 scripts/short_circuit_evaluation.sf
 scripts/sidef_keywords.sf
 scripts/sidef_to_json.sf

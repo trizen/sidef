@@ -738,6 +738,8 @@ package Sidef::Types::Array::Array {
         Sidef::Types::Number::Number->new($#{$self});
     }
 
+    *end = \&offset;
+
     sub resize {
         my ($self, $num) = @_;
         $#{$self} = $num->get_value;
@@ -1282,18 +1284,18 @@ package Sidef::Types::Array::Array {
     {
         no strict 'refs';
 
-        *{__PACKAGE__ . '::' . '&'}  = \&and;
-        *{__PACKAGE__ . '::' . '*'}  = \&multiply;
-        *{__PACKAGE__ . '::' . '<<'} = \&dropLeft;
-        *{__PACKAGE__ . '::' . '>>'} = \&dropRight;
-        *{__PACKAGE__ . '::' . '|'}  = \&or;
-        *{__PACKAGE__ . '::' . '^'}  = \&xor;
-        *{__PACKAGE__ . '::' . '+'}  = \&concat;
-        *{__PACKAGE__ . '::' . '-'}  = \&subtract;
-        *{__PACKAGE__ . '::' . '=='} = \&equals;
-        *{__PACKAGE__ . '::' . ':'}  = \&pair_with;
-        *{__PACKAGE__ . '::' . '/'}  = \&divide;
-        *{__PACKAGE__ . '::' . '»'} = \&assign_to;
+        *{__PACKAGE__ . '::' . '&'}   = \&and;
+        *{__PACKAGE__ . '::' . '*'}   = \&multiply;
+        *{__PACKAGE__ . '::' . '<<'}  = \&dropLeft;
+        *{__PACKAGE__ . '::' . '>>'}  = \&dropRight;
+        *{__PACKAGE__ . '::' . '|'}   = \&or;
+        *{__PACKAGE__ . '::' . '^'}   = \&xor;
+        *{__PACKAGE__ . '::' . '+'}   = \&concat;
+        *{__PACKAGE__ . '::' . '-'}   = \&subtract;
+        *{__PACKAGE__ . '::' . '=='}  = \&equals;
+        *{__PACKAGE__ . '::' . ':'}   = \&pair_with;
+        *{__PACKAGE__ . '::' . '/'}   = \&divide;
+        *{__PACKAGE__ . '::' . '»'}  = \&assign_to;
         *{__PACKAGE__ . '::' . '...'} = \&to_list;
 
         *{__PACKAGE__ . '::' . '++'} = sub {
