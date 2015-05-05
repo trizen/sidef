@@ -492,6 +492,12 @@ package Sidef::Types::Glob::File {
         Sidef::Types::Bool::Bool->new(CORE::utime($atime->get_value, $mtime->get_value, $self->get_value));
     }
 
+    sub truncate {
+        my ($self, $length) = @_;
+        my $len = defined($length) ? $length->get_value : 0;
+        Sidef::Types::Bool::Bool->new(CORE::truncate($self->get_value, $len));
+    }
+
     sub unlink {
         my ($self) = @_;
         Sidef::Types::Bool::Bool->new(CORE::unlink($self->get_value));
