@@ -2,7 +2,6 @@
 
 # Sidef concept expressed in Julia
 
-import Base.int
 import Base.sqrt
 
 type S_Number
@@ -22,7 +21,7 @@ end
 
 # int(S_Number)
 function int(x::S_Number)
-    S_Number(int(x.value));
+    S_Number(round(Int, x.value));
 end
 
 # sqrt(S_Number)
@@ -30,7 +29,7 @@ function sqrt(x::S_Number)
     S_Number(sqrt(x.value));
 end
 
-{
+Any[
     n1 = S_Number(42);
     n2 = S_Number(2);
 
@@ -41,16 +40,16 @@ end
 
     method = symbol("/");
     println(eval(:($method(n1, n2))));
-}
+]
 
 #########################################
 
-{
+Any[
     d = symbol("/");
     x = S_Number(12);
     y = S_Number(4);
     println("$x / $y == ", eval(:($d(x, y))));
-}
+]
 
 code = "25.3->int->sqrt";
 

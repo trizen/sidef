@@ -96,29 +96,28 @@ function execute(structure)
     results[end];
 end
 
-
 #
 ## The AST
 #
-structure = {
+structure = Dict{Symbol, Any}(
     :main => [
-        {
-            :call => [{:method => "print"}],
-            :self => {
+        Dict{Any, Any}(
+            :call => [Dict{Symbol, Any}(:method => "print")],
+            :self => Dict{Symbol, Any}(
                 :main => [
-                    {
-                        :call => [{:method => "+", :arg => [{:self => SString("llo")}]}],
+                    Dict{Symbol, Any}(
+                        :call => [Dict{Any, Any}(:method => "+", :arg => [Dict{Symbol, Any}(:self => SString("llo"))])],
                         :self => SString("he"),
-                    }
+                    )
                 ],
-            }
-        },
-        {
-            :call => [{:method => "say"}],
+            )
+        ),
+        Dict{Any, Any}(
+            :call => [Dict{Symbol, Any}(:method => "say")],
             :self => SString(" world!");
-        },
+        ),
     ]
-};
+);
 
 #
 ## Begin execution
