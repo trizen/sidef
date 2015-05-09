@@ -324,6 +324,7 @@ scripts/multi_loop_break.sf
 scripts/multi_methods.sf
 scripts/multi_var_assignment.sf
 scripts/named_block_arguments.sf
+scripts/names_to_numbers.sf
 scripts/next.sf
 scripts/number_types.sf
 scripts/objects_init.sf

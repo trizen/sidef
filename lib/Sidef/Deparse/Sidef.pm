@@ -307,9 +307,6 @@ package Sidef::Deparse::Sidef {
         elsif ($ref eq 'Sidef::Types::Number::Complex') {
             $code = reftype($obj) eq 'HASH' ? 'Complex' : "Complex.new(" . $obj->get_value . ")";
         }
-        elsif ($ref eq 'Sidef::Types::Regex::Regex') {
-            $code .= $obj->dump->get_value;
-        }
         elsif ($ref eq 'Sidef::Types::Number::Number') {
             my $value = $obj->get_value;
             $code .= ref($value) ? ref($value) eq 'Math::BigRat' ? $value->numify : $value->bstr : $value;
@@ -323,6 +320,11 @@ package Sidef::Deparse::Sidef {
             if ($ref eq 'Sidef::Types::Glob::Backtick') {
                 if (${$obj} eq '') {
                     $code = 'Backtick';
+                }
+            }
+            elsif ($ref eq 'Sidef::Types::Regex::Regex') {
+                if ($code eq '//') {
+                    $code = 'Regex';
                 }
             }
             elsif ($ref eq 'Sidef::Types::Glob::File') {
