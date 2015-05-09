@@ -324,7 +324,6 @@ scripts/multi_loop_break.sf
 scripts/multi_methods.sf
 scripts/multi_var_assignment.sf
 scripts/named_block_arguments.sf
-scripts/names_to_numbers.sf
 scripts/next.sf
 scripts/number_types.sf
 scripts/objects_init.sf
@@ -370,6 +369,7 @@ scripts/Rosettacode/JSON.sf
 scripts/Rosettacode/literal_strings.sf
 scripts/Rosettacode/loop_over_multiple_arrays_simultaneously.sf
 scripts/Rosettacode/named_parameters.sf
+scripts/Rosettacode/names_to_numbers.sf
 scripts/Rosettacode/program_name.sf
 scripts/Rosettacode/queue_definition.sf
 scripts/Rosettacode/quickselect_algorithm.sf
