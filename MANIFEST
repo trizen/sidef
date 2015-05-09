@@ -372,12 +372,14 @@ scripts/Rosettacode/program_name.sf
 scripts/Rosettacode/queue_definition.sf
 scripts/Rosettacode/quickselect_algorithm.sf
 scripts/Rosettacode/range_expansion.sf
+scripts/Rosettacode/reverse_gender.sf
 scripts/Rosettacode/runtime_evaluation.sf
 scripts/Rosettacode/runtime_evaluation_in_an_environment.sf
 scripts/Rosettacode/van_der_corput_seq.sf
 scripts/Rosettacode/vector_products.sf
 scripts/run_length_encoding.sf
 scripts/run_length_encoding_2.sf
+scripts/run_length_encoding_3.sf
 scripts/script.sf
 scripts/selection_sort.sf
 scripts/short_circuit_evaluation.sf

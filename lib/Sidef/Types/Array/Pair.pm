@@ -72,7 +72,7 @@ package Sidef::Types::Array::Pair {
                 ",\n",
 
                 (' ' x ($Sidef::SPACES += $Sidef::SPACES_INCR)) . join(
-                    " => ",
+                    ", ",
                     map {
                         my $val =
                           ref($_) eq 'Sidef::Variable::Variable'
