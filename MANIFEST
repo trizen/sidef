@@ -299,6 +299,7 @@ scripts/lingua_ro.sf
 scripts/lingua_ro_numbers.sf
 scripts/logic.sf
 scripts/long_division.sf
+scripts/longest_common_prefix.sf
 scripts/look_and_say_seq.sf
 scripts/lwp_module.sf
 scripts/magic_vars.sf
