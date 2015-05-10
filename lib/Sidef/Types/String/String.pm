@@ -453,11 +453,13 @@ package Sidef::Types::String::String {
         $str //= __PACKAGE__->new('');
 
         if ($self->_is_regex($regex)) {
-            $regex->match($self)->to_bool or return $self;
+            $regex->match($self)->{matched} or return $self;
         }
 
         my $search = $self->_string_or_regex($regex);
-        $self->new($self->get_value =~ s{$search}{${\$str->get_value}}r);
+        my $value  = $str->get_value;
+
+        $self->new($self->get_value =~ s{$search}{$value}r);
     }
 
     *replace = \&sub;
@@ -471,11 +473,12 @@ package Sidef::Types::String::String {
         $str //= __PACKAGE__->new('');
 
         if ($self->_is_regex($regex)) {
-            $regex->match($self)->to_bool or return $self;
+            $regex->match($self)->{matched} or return $self;
         }
 
         my $search = $self->_string_or_regex($regex);
-        $self->new($self->get_value =~ s{$search}{${\$str->get_value}}gr);
+        my $value  = $str->get_value;
+        $self->new($self->get_value =~ s{$search}{$value}gr);
     }
 
     *gReplace = \&gsub;
@@ -492,7 +495,7 @@ package Sidef::Types::String::String {
         my $search = $self->_string_or_regex($regex);
 
         if ($self->_is_regex($regex)) {
-            $regex->match($self)->to_bool or return $self;
+            $regex->match($self)->{matched} or return $self;
         }
 
         if ($self->_is_string($code)) {
@@ -509,14 +512,15 @@ package Sidef::Types::String::String {
         my $search = $self->_string_or_regex($regex);
 
         if ($self->_is_regex($regex)) {
-            $regex->match($self)->to_bool or return $self;
+            $regex->match($self)->{matched} or return $self;
         }
 
         if ($self->_is_string($code)) {
             return __PACKAGE__->new($self->get_value =~ s{$search}{$code->get_value}geer);
         }
 
-        __PACKAGE__->new($self->get_value =~ s{$search}{$code->call(_get_captures($self->get_value))}ger);
+        my $value = $self->get_value;
+        __PACKAGE__->new($value =~ s{$search}{$code->call(_get_captures($value))}ger);
     }
 
     sub glob {
