@@ -8,6 +8,8 @@ package Sidef::Types::Regex::Regex {
       Sidef::Object::Object
       );
 
+    use overload q{""} => \&get_value;
+
     sub new {
         my (undef, $regex, $mode, $parser) = @_;
 
@@ -80,6 +82,8 @@ package Sidef::Types::Regex::Regex {
 
         Sidef::Types::String::String->new('/' . $str =~ s{/}{\\/}gr . '/' . $flags . ($self->{global} ? 'g' : ''));
     }
+
+    *to_s = \&dump;
 
     {
         no strict 'refs';

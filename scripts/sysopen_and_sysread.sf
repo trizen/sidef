@@ -13,7 +13,7 @@ desktopFilesPaths.each { |path|
 
         fullpath.is_a(File) || next;
 
-        fullpath.to_s =~ /\.desktop\z/      ??    || next;
+        fullpath.to_s ~~ /\.desktop\z/            || next;
         fullpath.sysopen(\var fh, Fcntl.O_RDONLY) || next;
         fh.sysread(\var content, fullpath.size);
 

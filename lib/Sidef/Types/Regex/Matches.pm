@@ -1,7 +1,7 @@
 package Sidef::Types::Regex::Matches {
 
     use 5.014;
-    use overload 'bool' => \&to_bool;
+    use overload q{bool} => \&to_bool;
 
     sub new {
         my (undef, %hash) = @_;

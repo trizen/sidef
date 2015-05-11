@@ -4,6 +4,8 @@ package Sidef::Types::Byte::Bytes {
       Sidef::Types::Array::Array
       );
 
+    use overload q{""} => \&dump;
+
     sub new {
         my (undef, @bytes) = @_;
         bless [@{Sidef::Types::Array::Array->new(@bytes)}], __PACKAGE__;

@@ -2,7 +2,7 @@ package Sidef::Types::Bool::Bool {
 
     use overload
       q{bool} => \&get_value,
-      q{""}   => sub { ${$_[0]} ? 'true' : 'false' };
+      q{""}   => \&dump;
 
     use parent qw(
       Sidef::Object::Object

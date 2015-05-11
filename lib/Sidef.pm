@@ -156,7 +156,7 @@ package Sidef {
             CORE::join(
                 '',
                 map {
-                    eval { ${ref($_) eq 'Sidef::Variable::Class' ? $_->to_s : $_} }
+                    eval { ${ref($_) ne 'Sidef::Types::String::String' ? $_->to_s : $_} }
                       // $_
                   } @args
             )

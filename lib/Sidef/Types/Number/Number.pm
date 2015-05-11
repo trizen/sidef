@@ -9,6 +9,10 @@ package Sidef::Types::Number::Number {
       Sidef::Object::Object
       );
 
+    use overload
+      q{bool} => sub { ${$_[0]} != 0 },
+      q{""}   => \&get_value;
+
     sub new_float {
         my (undef, $num) = @_;
 

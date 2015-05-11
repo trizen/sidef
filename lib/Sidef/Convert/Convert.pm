@@ -5,31 +5,8 @@ package Sidef::Convert::Convert {
     use 5.014;
     our @ISA = qw(Sidef);
 
-    use overload q{""} => \&stringify;
-
-    sub stringify {
-        if (ref($_[0]) eq 'Sidef::Types::Regex::Regex') {
-            return $_[0]{regex};
-        }
-
-        if ($_[0]->isa('SCALAR') || $_[0]->isa('REF')) {
-            return ${$_[0]};
-        }
-
-        $_[0];
-    }
-
     sub to_s {
         my ($self) = @_;
-
-        if (Sidef->_is_array($self)) {
-            return Sidef::Types::String::String->new(join(' ', map { $_->get_value } @{$self}));
-        }
-
-        if (Sidef->_is_regex($self)) {
-            return $self->dump;
-        }
-
         $self->isa('SCALAR') || $self->isa('REF')
           ? Sidef::Types::String::String->new("$$self")
           : $self;

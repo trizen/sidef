@@ -641,12 +641,6 @@ sub memoize_types {
         # Init
         $known_types{_init_} = sub {
             require Memoize;
-
-            require Sidef::Convert::Convert;
-            my $package = 'Sidef::Convert::Convert';
-            foreach my $method (qw(stringify)) {
-                Memoize::memoize($package . '::' . $method);
-            }
         };
 
         # String methods
@@ -665,15 +659,17 @@ sub memoize_types {
 
             my %ignore;
             @ignore{
-                qw(
+                qw<
                   ISA
                   BEGIN
                   get_value
+                  __ANON__
                   GET_PERL_VALUE
-                  )
+                  >
             } = ();
 
             foreach my $method (keys %{$package . '::'}) {
+                next if $method =~ /^\(/;       # skip overload methods
                 next if exists $ignore{$method};
                 Memoize::memoize($package . '::' . $method);
             }

@@ -6,6 +6,8 @@ package Sidef::Types::Glob::File {
       Sidef::Types::String::String
       );
 
+    use overload q{""} => \&dump;
+
     sub new {
         my (undef, $file) = @_;
         if (@_ > 2) {

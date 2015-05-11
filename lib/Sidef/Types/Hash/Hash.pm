@@ -6,6 +6,10 @@ package Sidef::Types::Hash::Hash {
       Sidef::Object::Object
       );
 
+    use overload
+      q{bool} => sub { scalar(keys %{$_[0]{data}}) },
+      q{""}   => \&dump;
+
     sub new {
         my ($class, @pairs) = @_;
 

@@ -33,10 +33,10 @@ package Sidef::Types::Glob::DirHandle {
 
         Sidef::Types::Array::Array->new(
             map {
-                my $dir = File::Spec->catdir($self->{dir}, $_);
+                my $dir = File::Spec->catdir($self->{dir}->get_value, $_);
                 (-d $dir)
                   ? Sidef::Types::Glob::Dir->new(Encode::decode_utf8($dir))
-                  : Sidef::Types::Glob::File->new(Encode::decode_utf8(File::Spec->catfile($self->{dir}, $_)));
+                  : Sidef::Types::Glob::File->new(Encode::decode_utf8(File::Spec->catfile($self->{dir}->get_value, $_)));
               } readdir($self->{dir_h})
         );
     }
@@ -54,11 +54,11 @@ package Sidef::Types::Glob::DirHandle {
 
             require Encode;
             require File::Spec;
-            my $dir = File::Spec->catdir($self->{dir}, $file);
+            my $dir = File::Spec->catdir($self->{dir}->get_value, $file);
             return (
                     (-d $dir)
                     ? Sidef::Types::Glob::Dir->new(Encode::decode_utf8($dir))
-                    : Sidef::Types::Glob::File->new(Encode::decode_utf8(File::Spec->catfile($self->{dir}, $file)))
+                    : Sidef::Types::Glob::File->new(Encode::decode_utf8(File::Spec->catfile($self->{dir}->get_value, $file)))
                    );
         }
 

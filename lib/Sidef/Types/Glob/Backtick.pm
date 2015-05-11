@@ -4,6 +4,8 @@ package Sidef::Types::Glob::Backtick {
       Sidef::Object::Object
       );
 
+    use overload q{""} => \&dump;
+
     sub new {
         my (undef, $backtick) = @_;
         bless \$backtick, __PACKAGE__;

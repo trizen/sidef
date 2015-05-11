@@ -7,6 +7,10 @@ package Sidef::Types::String::String {
       Sidef::Object::Object
       );
 
+    use overload
+      q{bool} => \&get_value,
+      q{""}   => \&get_value;
+
     sub new {
         my (undef, $str) = @_;
         if (@_ > 2) {

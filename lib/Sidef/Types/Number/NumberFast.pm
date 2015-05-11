@@ -6,6 +6,10 @@ package Sidef::Types::Number::Number {
       Sidef::Object::Object
       );
 
+    use overload
+      q{bool} => sub { ${$_[0]} != 0 },
+      q{""}   => \&get_value;
+
     sub new {
         bless \(ref($_[1]) ? ($_[1]->can('numify') ? $_[1]->numify : $_[1]->get_value + 0) : $_[1] + 0), __PACKAGE__;
     }

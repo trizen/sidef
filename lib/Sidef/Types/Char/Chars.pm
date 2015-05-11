@@ -4,6 +4,8 @@ package Sidef::Types::Char::Chars {
       Sidef::Types::Array::Array
       );
 
+    use overload q{""} => \&dump;
+
     sub new {
         my (undef, @chars) = @_;
         bless [@{Sidef::Types::Array::Array->new(@chars)}], __PACKAGE__;

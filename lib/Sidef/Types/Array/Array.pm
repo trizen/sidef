@@ -7,6 +7,10 @@ package Sidef::Types::Array::Array {
       Sidef::Object::Object
       );
 
+    use overload
+      q{""}   => \&dump,
+      q{bool} => sub { scalar(@{$_[0]}) };
+
     sub new {
         my (undef, @items) = @_;
         bless [map { Sidef::Variable::Variable->new(name => '', type => 'var', value => $_) } @items], __PACKAGE__;
@@ -1279,6 +1283,11 @@ package Sidef::Types::Array::Array {
               )
               . ']'
         );
+    }
+
+    sub to_s {
+        my ($self) = @_;
+        Sidef::Types::String::String->new(join(' ', map { $_->get_value } @{$self}));
     }
 
     {

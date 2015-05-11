@@ -5,6 +5,8 @@ package Sidef::Types::Glob::Pipe {
       Sidef::Object::Object
       );
 
+    use overload q{""} => \&dump;
+
     sub new {
         my (undef, @command) = @_;
         bless \@command, __PACKAGE__;

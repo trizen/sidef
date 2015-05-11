@@ -1,8 +1,8 @@
 package Sidef::Types::Nil::Nil {
 
     use overload
-      'bool' => sub { },
-      q{""}  => sub { '' };
+      q{bool} => sub { },
+      q{""}   => sub { '' };
 
     use parent qw(
       Sidef::Object::Object

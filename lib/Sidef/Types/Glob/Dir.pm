@@ -7,6 +7,8 @@ package Sidef::Types::Glob::Dir {
       Sidef::Types::String::String
       );
 
+    use overload q{""} => \&dump;
+
     sub new {
         my (undef, $dir) = @_;
         if (@_ > 2) {
