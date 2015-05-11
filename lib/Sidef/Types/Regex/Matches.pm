@@ -3,6 +3,10 @@ package Sidef::Types::Regex::Matches {
     use 5.014;
     use overload q{bool} => \&to_bool;
 
+    use parent qw(
+      Sidef::Object::Object
+      );
+
     sub new {
         my (undef, %hash) = @_;
 
