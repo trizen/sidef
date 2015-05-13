@@ -6,6 +6,8 @@ package Sidef::Types::Array::Pair {
       Sidef::Object::Object
       );
 
+    use overload q{""} => \&dump;
+
     sub new {
         my (undef, $item1, $item2) = @_;
         bless [map { Sidef::Variable::Variable->new(name => '', type => 'var', value => $_) } ($item1, $item2)], __PACKAGE__;
