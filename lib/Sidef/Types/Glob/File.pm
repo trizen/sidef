@@ -6,8 +6,6 @@ package Sidef::Types::Glob::File {
       Sidef::Types::String::String
       );
 
-    use overload q{""} => \&dump;
-
     sub new {
         my (undef, $file) = @_;
         if (@_ > 2) {
@@ -486,23 +484,40 @@ package Sidef::Types::Glob::File {
 
     sub chmod {
         my ($self, $permission) = @_;
+
+        if (@_ == 3) {
+            ($self, $permission) = ($permission, $_[2]);
+        }
+
         Sidef::Types::Bool::Bool->new(CORE::chmod($permission->get_value, $self->get_value));
     }
 
     sub utime {
         my ($self, $atime, $mtime) = @_;
+
+        if (@_ == 4) {
+            ($self, $atime, $mtime) = ($atime, $mtime, $_[3]);
+        }
+
         Sidef::Types::Bool::Bool->new(CORE::utime($atime->get_value, $mtime->get_value, $self->get_value));
     }
 
     sub truncate {
         my ($self, $length) = @_;
+
+        if (@_ == 3) {
+            ($self, $length) = ($length, $_[2]);
+        }
+
         my $len = defined($length) ? $length->get_value : 0;
         Sidef::Types::Bool::Bool->new(CORE::truncate($self->get_value, $len));
     }
 
     sub unlink {
-        my ($self) = @_;
-        Sidef::Types::Bool::Bool->new(CORE::unlink($self->get_value));
+        my ($self, @args) = @_;
+        @args
+          ? Sidef::Types::Number::Number->new(CORE::unlink(map { $_->get_value } @args))
+          : Sidef::Types::Bool::Bool->new(CORE::unlink($self->get_value));
     }
 
     *delete = \&unlink;
