@@ -28,17 +28,13 @@ package Sidef::Types::Glob::DirHandle {
     sub get_files {
         my ($self) = @_;
 
-        require Encode;
-        require File::Spec;
+        $self->rewind;
 
-        Sidef::Types::Array::Array->new(
-            map {
-                my $dir = File::Spec->catdir($self->{dir}->get_value, $_);
-                (-d $dir)
-                  ? Sidef::Types::Glob::Dir->new(Encode::decode_utf8($dir))
-                  : Sidef::Types::Glob::File->new(Encode::decode_utf8(File::Spec->catfile($self->{dir}->get_value, $_)));
-              } readdir($self->{dir_h})
-        );
+        my @files;
+        while (defined(my $file = $self->read)) {
+            push @files, $file;
+        }
+        Sidef::Types::Array::Array->new(@files);
     }
 
     *getFiles = \&get_files;
@@ -50,15 +46,27 @@ package Sidef::Types::Glob::DirHandle {
     sub get_file {
         my ($self) = @_;
 
-        if (defined(my $file = CORE::readdir($self->{dir_h}))) {
+        require Encode;
+        require File::Spec;
 
-            require Encode;
-            require File::Spec;
-            my $dir = File::Spec->catdir($self->{dir}->get_value, $file);
+        {
+            my $file = CORE::readdir($self->{dir_h}) // return;
+
+            if ($file eq '.' or $file eq '..') {
+                redo;
+            }
+
+            my $dfile = Encode::decode_utf8($file);
+            my $dir = File::Spec->catdir($self->{dir}->get_value, $dfile);
+
+            lstat($dir);
+            if (-l _) { redo }
+            ;    # ignore links
+
             return (
-                    (-d $dir)
-                    ? Sidef::Types::Glob::Dir->new(Encode::decode_utf8($dir))
-                    : Sidef::Types::Glob::File->new(Encode::decode_utf8(File::Spec->catfile($self->{dir}->get_value, $file)))
+                    (-d _)
+                    ? Sidef::Types::Glob::Dir->new($dir)
+                    : Sidef::Types::Glob::File->new(File::Spec->catfile($self->{dir}->get_value, $dfile))
                    );
         }
 

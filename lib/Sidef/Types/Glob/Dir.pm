@@ -142,21 +142,21 @@ package Sidef::Types::Glob::Dir {
     *mkpath     = \&create_tree;
 
     sub open {
-        my ($self, $var_ref) = @_;
-
-        if (@_ == 3) {
-            ($self, $var_ref) = ($var_ref, $_[2]);
-        }
+        my ($self, $fh_ref, $err_ref) = @_;
 
         my $success = opendir(my $dir_h, $self->get_value);
+        my $error   = $!;
         my $dir_obj = Sidef::Types::Glob::DirHandle->new(dir_h => $dir_h, dir => $self);
 
-        if (defined $var_ref) {
-            $var_ref->get_var->set_value($dir_obj);
+        if (defined $fh_ref) {
+            $fh_ref->get_var->set_value($dir_obj);
 
             return $success
               ? Sidef::Types::Bool::Bool->true
-              : Sidef::Types::Bool::Bool->false;
+              : do {
+                defined($err_ref) && $err_ref->get_var->set_value(Sidef::Types::String::String->new($error));
+                Sidef::Types::Bool::Bool->false;
+              };
         }
 
         $success ? $dir_obj : ();
