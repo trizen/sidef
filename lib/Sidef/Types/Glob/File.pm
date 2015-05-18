@@ -474,11 +474,23 @@ package Sidef::Types::Glob::File {
 
     sub stat {
         my ($self) = @_;
+        @_ == 2 && ($self = $_[1]);
         Sidef::Types::Glob::Stat->stat($self->get_value, $self);
+    }
+
+    sub lstat {
+        my ($self) = @_;
+        @_ == 2 && ($self = $_[1]);
+        Sidef::Types::Glob::Stat->lstat($self->get_value, $self);
     }
 
     sub chown {
         my ($self, $uid, $gid) = @_;
+
+        if (@_ == 4) {
+            ($self, $uid, $gid) = ($uid, $gid, $_[3]);
+        }
+
         Sidef::Types::Bool::Bool->new(CORE::chown($uid->get_value, $gid->get_value, $self->get_value));
     }
 
@@ -522,11 +534,6 @@ package Sidef::Types::Glob::File {
 
     *delete = \&unlink;
     *remove = \&unlink;
-
-    sub lstat {
-        my ($self) = @_;
-        Sidef::Types::Glob::Stat->lstat($self->get_value, $self);
-    }
 
     sub dump {
         my ($self) = @_;
