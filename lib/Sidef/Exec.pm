@@ -27,6 +27,9 @@ package Sidef::Exec {
 
         if (ref $self_obj eq 'HASH') {
             local $self->{var_ref} = 1;
+
+            # Here can be added some run-time optimizations
+            # (at least, theoretically)
             if (exists $self_obj->{self}) {
                 $self_obj = $self->execute_expr($self_obj);
             }
@@ -366,32 +369,34 @@ package Sidef::Exec {
 
             for (local $self->{expr_i} = $i ; $self->{expr_i} <= $self->{expr_i_max} ; $self->{expr_i}++) {
 
-                my $expr = $struct->{$class}[$self->{expr_i}];
+                my $expr     = $struct->{$class}[$self->{expr_i}];
+                my $ref_expr = ref($expr);
 
-                if ((ref($expr) eq 'HASH' and ref($expr->{self}) eq 'Sidef::Variable::InitMy')
-                    or ref($expr) eq 'Sidef::Variable::InitMy') {
+                if (($ref_expr eq 'HASH' and ref($expr->{self}) eq 'Sidef::Variable::InitMy')
+                    or $ref_expr eq 'Sidef::Variable::InitMy') {
                     goto INIT_VAR;
                 }
 
                 ++$i;
                 my $obj =
-                    ref($expr) eq 'HASH' ? $self->execute_expr($expr)
-                  : ref($expr) eq 'Sidef::Types::Array::HCArray' ? $self->execute_expr({self => $expr})
-                  : ref($expr) eq 'Sidef::Variable::Init' ? do { $expr->set_value; $expr }
-                  : ref($expr) eq 'Sidef::Variable::My'   ? $self->{vars}{$expr->_get_name}
-                  :                                         $expr;
+                    $ref_expr eq 'HASH' ? $self->execute_expr($expr)
+                  : $ref_expr eq 'Sidef::Types::Array::HCArray' ? $self->execute_expr({self => $expr})
+                  : $ref_expr eq 'Sidef::Variable::Init' ? do { $expr->set_value; $expr }
+                  : $ref_expr eq 'Sidef::Variable::My'   ? $self->{vars}{$expr->_get_name}
+                  :                                        $expr;
 
-                if (   ref($obj) eq 'Sidef::Types::Block::Return'
-                    or ref($obj) eq 'Sidef::Types::Block::Break'
-                    or ref($obj) eq 'Sidef::Types::Block::Next') {
+                my $ref_obj = ref($obj);
+                if (   $ref_obj eq 'Sidef::Types::Block::Return'
+                    or $ref_obj eq 'Sidef::Types::Block::Break'
+                    or $ref_obj eq 'Sidef::Types::Block::Next') {
                     return $obj;
                 }
 
-                if (ref($obj) eq 'Sidef::Types::Black::Hole') {
+                if ($ref_obj eq 'Sidef::Types::Black::Hole') {
                     $obj = $obj->{value};
                 }
 
-                if (wantarray and ref($obj) eq 'Sidef::Types::Array::List') {
+                if (wantarray and $ref_obj eq 'Sidef::Types::Array::List') {
                     push @results, @{$obj};
                 }
                 else {
