@@ -7,7 +7,7 @@
 func permutations(callback, set, perm=[]) {
     set.len == 0 && callback(perm);
     0 ... set.end -> each { |i|
-        __FUNC__(callback, set[(0 .. i-1) + (i+1 .. set.end)], perm + [set[i]]);
+        __FUNC__(callback, set[(0 .. i-1) + (i+1 .. set.end)], [perm..., set[i]]);
     }
 };
 
