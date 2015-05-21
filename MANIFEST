@@ -333,6 +333,7 @@ scripts/perl_eval.sf
 scripts/permutation.sf
 scripts/pi_and_e.sf
 scripts/pi_machin_like_formula.sf
+scripts/polymorphism.sf
 scripts/power_numbers.sf
 scripts/pythagorean_means.sf
 scripts/quicksort.sf

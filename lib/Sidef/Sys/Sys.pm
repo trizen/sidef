@@ -208,6 +208,12 @@ package Sidef::Sys::Sys {
         CORE::bless $obj, $class;
     }
 
+    sub copy {
+        my ($self, $obj) = @_;
+        require Storable;
+        Storable::dclone($obj);
+    }
+
     sub select {
         my ($self, $fh) = @_;
         CORE::select(CORE::ref($fh) eq 'GLOB' ? $fh : $fh->get_value);
