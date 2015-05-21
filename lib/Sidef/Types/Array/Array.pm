@@ -1093,6 +1093,8 @@ package Sidef::Types::Array::Array {
         }
     }
 
+    *permutations = \&permute;
+
     sub pack {
         my ($self, $format) = @_;
         Sidef::Types::String::String->new(CORE::pack($format->get_value, map { $_->get_value } @{$self}));
