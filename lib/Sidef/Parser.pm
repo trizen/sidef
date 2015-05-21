@@ -2451,16 +2451,16 @@ package Sidef::Parser {
                             pos($_) += $pos;
                             push @{$struct{$self->{class}}[-1]{call}}, {method => 'do', arg => [$arg]};
 
-                            if (/\G\h*(\R\h*)?(?=$self->{method_name_re})/goc) {
+                            if (/\G\h*(\R\h*)?(?=$self->{method_name_re}|$self->{operators_re})/goc) {
 
                                 if (defined $1) {
                                     $self->{line}++;
                                 }
 
-                                my ($methods, $pos) = $self->parse_methods(code => "." . substr($_, pos));
+                                my ($methods, $pos) = $self->parse_methods(code => '. ' . substr($_, pos));
 
                                 if (@{$methods}) {
-                                    pos($_) += $pos - 1;
+                                    pos($_) += $pos - 2;
                                     push @{$struct{$self->{class}}[-1]{call}}, @{$methods};
 
                                     if ((my ($pos, $end) = $self->parse_whitespace(code => substr($_, pos)))[0]) {
