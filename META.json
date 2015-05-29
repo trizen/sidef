@@ -57,7 +57,7 @@
    "provides" : {
       "Sidef" : {
          "file" : "lib/Sidef.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       },
       "Sidef::Convert::Convert" : {
          "file" : "lib/Sidef/Convert/Convert.pm"
@@ -300,5 +300,5 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.04"
+   "version" : "0.05"
 }
