@@ -373,6 +373,8 @@ scripts/Rosettacode/literal_strings.sf
 scripts/Rosettacode/loop_over_multiple_arrays_simultaneously.sf
 scripts/Rosettacode/named_parameters.sf
 scripts/Rosettacode/names_to_numbers.sf
+scripts/Rosettacode/old_lady.sf
+scripts/Rosettacode/old_lady_2.sf
 scripts/Rosettacode/program_name.sf
 scripts/Rosettacode/queue_definition.sf
 scripts/Rosettacode/quickselect_algorithm.sf

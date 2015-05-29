@@ -3,7 +3,7 @@ package Sidef::Types::Array::Pair {
     use 5.014;
 
     use parent qw(
-      Sidef::Object::Object
+      Sidef::Types::Array::Array
       );
 
     use overload q{""} => \&dump;
