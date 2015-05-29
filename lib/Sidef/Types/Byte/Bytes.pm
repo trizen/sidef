@@ -44,7 +44,8 @@ package Sidef::Types::Byte::Bytes {
 
     sub dump {
         my ($self) = @_;
-        Sidef::Types::String::String->new('Bytes.new(' . join(', ', map { $_->get_value->dump->get_value } @{$self}) . ')');
+        Sidef::Types::String::String->new(
+                                       'Bytes.new(' . CORE::join(', ', map { $_->get_value->dump->get_value } @{$self}) . ')');
     }
 };
 

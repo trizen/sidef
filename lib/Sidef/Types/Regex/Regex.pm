@@ -75,7 +75,7 @@ package Sidef::Types::Regex::Regex {
 
         my $flags = '';
         if ($str =~ s/\(\?\^u:\(\?(?:\^|(.*?))://) {
-            $flags = $1;
+            $flags = $1 // '';
             chop $str;
             chop $str;
         }

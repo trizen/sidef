@@ -18,15 +18,15 @@ func get_response(url) {
 
 var resp = get_response("http://www.google.ro");
 
-if (nil == resp) {
+if (resp.is_a(nil)) {
     STDERR.print("** LWP::UserAgent is not installed!\n");
-    Sys.exit;
-}
-
-if (resp.is_success) {
-    var content = resp.decoded_content;
-    printf("Content length is: %d\n", content.len);
 }
 else {
-    Sys.warn("[ERROR] Response: %s".sprintf(resp.status_line));
+    if (resp.is_success) {
+        var content = resp.decoded_content;
+        printf("Content length is: %d\n", content.len);
+    }
+    else {
+        Sys.warn("[ERROR] Response: %s".sprintf(resp.status_line));
+    }
 }

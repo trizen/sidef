@@ -109,11 +109,6 @@ package Sidef::Types::String::String {
         $self;
     }
 
-    sub ne {
-        my ($self, $string) = @_;
-        Sidef::Types::Bool::Bool->new($self->get_value ne $string->get_value);
-    }
-
     {
         my %cache;
 
@@ -242,12 +237,19 @@ package Sidef::Types::String::String {
     *upper       = \&uc;
 
     sub equals {
-        my ($self, $string) = @_;
-        Sidef::Types::Bool::Bool->new($self->get_value eq $string->get_value);
+        my ($self, $arg) = @_;
+        my $value = $arg->get_value;
+        Sidef::Types::Bool::Bool->new(defined($value) ? $self->get_value eq $value : 0);
     }
 
     *eq = \&equals;
     *is = \&equals;
+
+    sub ne {
+        my ($self, $arg) = @_;
+        my $value = $arg->get_value;
+        Sidef::Types::Bool::Bool->new(defined($value) ? $self->get_value ne $value : 1);
+    }
 
     sub append {
         my ($self, $string) = @_;

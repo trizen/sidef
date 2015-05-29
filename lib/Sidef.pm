@@ -110,7 +110,8 @@ package Sidef {
 
                 require Scalar::Util;
                 if (Scalar::Util::reftype($self) eq 'SCALAR') {
-                    return Sidef::Types::Bool::Bool->new(($$self eq $$arg) - $method->[1]);
+                    return Sidef::Types::Bool::Bool->new(
+                         (defined($$self) ? (defined($$arg) ? $$self eq $$arg : 0) : (defined($$arg) ? 0 : 1)) - $method->[1]);
                 }
 
                 return Sidef::Types::Bool::Bool->new($method->[1]);

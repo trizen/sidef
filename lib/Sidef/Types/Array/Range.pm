@@ -155,20 +155,21 @@ package Sidef::Types::Array::Range {
         $self;
     }
 
+    our $AUTOLOAD;
+    sub DESTROY { }
+
     sub to_array {
         my ($self) = @_;
+        local $AUTOLOAD;
         $self->AUTOLOAD();
     }
 
     *to_a = \&to_array;
 
-    our $AUTOLOAD;
-    sub DESTROY { }
-
     sub AUTOLOAD {
         my ($self, @args) = @_;
 
-        my ($name) = ($AUTOLOAD =~ /^.*[^:]::(.*)$/);
+        my ($name) = (defined($AUTOLOAD) ? ($AUTOLOAD =~ /^.*[^:]::(.*)$/) : '');
 
         my $array;
         my $method = $self->{direction} eq 'up' ? 'array_to' : 'array_downto';

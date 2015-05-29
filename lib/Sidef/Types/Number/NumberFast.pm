@@ -11,7 +11,7 @@ package Sidef::Types::Number::Number {
       q{""}   => \&get_value;
 
     sub new {
-        bless \(ref($_[1]) ? ($_[1]->can('numify') ? $_[1]->numify : $_[1]->get_value + 0) : $_[1] + 0), __PACKAGE__;
+        bless \(ref($_[1]) ? ($_[1]->can('numify') ? $_[1]->numify : $_[1]->get_value + 0) : (($_[1] // 0) + 0)), __PACKAGE__;
     }
 
     *new_float = \&new;

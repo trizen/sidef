@@ -203,7 +203,7 @@ package Sidef::Types::Array::Array {
     sub equals {
         my ($self, $array) = @_;
 
-        if ($#{$self} != $#{$array}) {
+        if (not defined $array or not $array->isa('ARRAY') or $#{$self} != $#{$array}) {
             return Sidef::Types::Bool::Bool->false;
         }
 
@@ -211,15 +211,12 @@ package Sidef::Types::Array::Array {
 
             my ($x, $y) = ($self->[$i]->get_value, $array->[$i]->get_value);
 
-            if (ref($x) eq ref($y)) {
-                my $method = '==';
+            my $method = '==';
 
-                if (defined $x->can($method)) {
-                    if (not $x->$method($y)) {
-                        return Sidef::Types::Bool::Bool->false;
-                    }
+            if (defined $x->can($method)) {
+                if (not $x->$method($y)) {
+                    return Sidef::Types::Bool::Bool->false;
                 }
-
             }
             else {
                 return Sidef::Types::Bool::Bool->false;
@@ -231,6 +228,11 @@ package Sidef::Types::Array::Array {
 
     *is = \&equals;
     *eq = \&equals;
+
+    sub ne {
+        my ($self, $array) = @_;
+        $self->equals($array)->not;
+    }
 
     sub mesh {
         my ($self, $array) = @_;
@@ -1289,7 +1291,7 @@ package Sidef::Types::Array::Array {
 
     sub to_s {
         my ($self) = @_;
-        Sidef::Types::String::String->new(join(' ', map { $_->get_value } @{$self}));
+        Sidef::Types::String::String->new(CORE::join(' ', map { $_->get_value } @{$self}));
     }
 
     {
@@ -1304,6 +1306,7 @@ package Sidef::Types::Array::Array {
         *{__PACKAGE__ . '::' . '+'}   = \&concat;
         *{__PACKAGE__ . '::' . '-'}   = \&subtract;
         *{__PACKAGE__ . '::' . '=='}  = \&equals;
+        *{__PACKAGE__ . '::' . '!='}  = \&ne;
         *{__PACKAGE__ . '::' . ':'}   = \&pair_with;
         *{__PACKAGE__ . '::' . '/'}   = \&divide;
         *{__PACKAGE__ . '::' . '»'}  = \&assign_to;

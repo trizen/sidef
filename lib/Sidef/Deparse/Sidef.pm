@@ -183,13 +183,19 @@ package Sidef::Deparse::Sidef {
                         my $vars = $obj->{init_vars};
                         $code .= '|' . $self->_dump_init_vars(@{$vars}[0 .. $#{$vars} - 1]) . "|";
                     }
-                    $code .= "\n";
+
                     $Sidef::SPACES += $Sidef::SPACES_INCR;
                     my @statements = $self->deparse_script($obj->{code});
+
                     $code .=
-                        (" " x $Sidef::SPACES)
-                      . join(";\n" . (" " x $Sidef::SPACES), @statements) . "\n"
-                      . (" " x ($Sidef::SPACES -= $Sidef::SPACES_INCR)) . '}';
+                      @statements
+                      ? ("\n"
+                         . (" " x $Sidef::SPACES)
+                         . join(";\n" . (" " x $Sidef::SPACES), @statements) . "\n"
+                         . (" " x ($Sidef::SPACES - $Sidef::SPACES_INCR)) . '}')
+                      : '}';
+
+                    $Sidef::SPACES -= $Sidef::SPACES_INCR;
                 }
                 else {
                     $code = 'Block';
@@ -359,7 +365,7 @@ package Sidef::Deparse::Sidef {
                 }
             }
             elsif ($ref eq 'Sidef::Types::Char::Char') {
-                if (${$obj} eq '') {
+                if (${$obj} eq "\0") {
                     $code = 'Char';
                 }
             }

@@ -7,6 +7,7 @@ package Sidef::Types::Char::Char {
     sub new {
         my (undef, $char) = @_;
         ref($char) && return $char->to_char;
+        $char //= "\0";
         bless \$char, __PACKAGE__;
     }
 

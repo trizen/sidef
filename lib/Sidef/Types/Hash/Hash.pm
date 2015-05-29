@@ -13,7 +13,7 @@ package Sidef::Types::Hash::Hash {
     sub new {
         my ($class, @pairs) = @_;
 
-        my %hash;
+        my %hash = (data => {});
         my $self = bless \%hash, __PACKAGE__;
 
         if (@pairs == 1) {
@@ -112,7 +112,12 @@ package Sidef::Types::Hash::Hash {
     sub eq {
         my ($self, $obj) = @_;
 
-        %{$self->{data}} eq %{$obj->{data}} || return Sidef::Types::Bool::Bool->false;
+        if (   not defined($obj)
+            or not $obj->isa('HASH')
+            or ref($obj->{data}) ne 'HASH'
+            or %{$self->{data}} ne %{$obj->{data}}) {
+            return Sidef::Types::Bool::Bool->false;
+        }
 
         while (my ($key) = each %{$self->{data}}) {
             !exists($obj->{data}{$key})
@@ -343,7 +348,7 @@ package Sidef::Types::Hash::Hash {
             "Hash.new(" . (
                 @keys
                 ? (
-                   "\n" . join(
+                   (@keys > 1 ? "\n" : '') . join(
                        ",\n",
                        map {
                            my $val =
@@ -351,15 +356,14 @@ package Sidef::Types::Hash::Hash {
                              ? $self->{data}{$_}->get_value
                              : Sidef::Types::Nil::Nil->new;
 
-                           (' ' x $Sidef::SPACES)
+                           (@keys > 1 ? (' ' x $Sidef::SPACES) : '')
                              . "${Sidef::Types::String::String->new($_)->dump} => "
                              . (eval { $val->can('dump') } ? ${$val->dump} : $val)
                          } @keys
                      )
-                     . "\n"
-                     . (' ' x ($Sidef::SPACES -= $Sidef::SPACES_INCR))
+                     . (@keys > 1 ? ("\n" . (' ' x ($Sidef::SPACES -= $Sidef::SPACES_INCR))) : '')
                   )
-                : ""
+                : do { $Sidef::SPACES -= $Sidef::SPACES_INCR; "" }
               )
               . ")"
         );

@@ -573,7 +573,7 @@ package Sidef::Parser {
                 }
             }
 
-            if ((my ($pos) = $self->parse_whitespace(code => substr($_, pos)))[0]) {
+            if ((my ($pos) = $self->parse_whitespace(code => substr($_, pos($_) // 0)))[0]) {
                 pos($_) += $pos;
             }
             defined($end_delim)
@@ -667,7 +667,7 @@ package Sidef::Parser {
                 }
             }
 
-            if ((my ($pos) = $self->parse_whitespace(code => substr($_, pos)))[0]) {
+            if ((my ($pos) = $self->parse_whitespace(code => substr($_, pos($_) // 0)))[0]) {
                 pos($_) += $pos;
             }
 

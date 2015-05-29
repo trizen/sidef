@@ -8,7 +8,7 @@ package Sidef::Convert::Convert {
     sub to_s {
         my ($self) = @_;
         $self->isa('SCALAR') || $self->isa('REF')
-          ? Sidef::Types::String::String->new("$$self")
+          ? Sidef::Types::String::String->new(defined($$self) ? "$$self" : "")
           : $self;
     }
 

@@ -111,16 +111,16 @@ package Sidef::Types::Number::Number {
 
     sub eq {
         my ($self, $num) = @_;
-        ref($self) ne ref($num) and return Sidef::Types::Bool::Bool->false;
-        Sidef::Types::Bool::Bool->new($self->get_value == $num->get_value);
+        my $value = defined($num) ? $num->get_value : undef;
+        Sidef::Types::Bool::Bool->new(length($value) ? $self->get_value == $value : 0);
     }
 
     *equals = \&eq;
 
     sub ne {
         my ($self, $num) = @_;
-        ref($self) ne ref($num) and return Sidef::Types::Bool::Bool->true;
-        Sidef::Types::Bool::Bool->new($self->get_value != $num->get_value);
+        my $value = defined($num) ? $num->get_value : undef;
+        Sidef::Types::Bool::Bool->new(length($value) ? $self->get_value != $value : 1);
     }
 
     sub cmp {
