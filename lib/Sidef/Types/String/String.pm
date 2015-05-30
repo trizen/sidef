@@ -366,8 +366,8 @@ package Sidef::Types::String::String {
     }
 
     sub join {
-        my ($self, $delim, @rest) = @_;
-        __PACKAGE__->new(CORE::join($delim->get_value, $self->get_value, @rest));
+        my ($self, @rest) = @_;
+        __PACKAGE__->new(CORE::join($self->get_value, map { $_->get_value } @rest));
     }
 
     sub clear {

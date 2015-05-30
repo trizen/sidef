@@ -265,6 +265,7 @@ scripts/hash_join.sf
 scripts/hash_sort.sf
 scripts/hashes.sf
 scripts/heap_sort.sf
+scripts/html_generation.sf
 scripts/http_tiny.sf
 scripts/huffman_coding.sf
 scripts/i_love_you.sf
