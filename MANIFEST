@@ -249,6 +249,7 @@ scripts/Games/game_of_life.sf
 scripts/Games/rock_paper_scissors.sf
 scripts/gamma_function.sf
 scripts/gcd.sf
+scripts/generate_an_html_table.sf
 scripts/getopt.sf
 scripts/global_regex_matching.sf
 scripts/Graphical/gtk2_goodbye_world.sf

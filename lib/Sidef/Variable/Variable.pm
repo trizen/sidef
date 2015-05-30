@@ -34,8 +34,12 @@ package Sidef::Variable::Variable {
             $self = $self->{stack}[-1];
         };
 
-        Sidef::Types::Bool::Bool->new(ref($self->{value}) ne 'Sidef::Types::Nil::Nil');
+        ref($self->{value}) eq 'Sidef::Types::Nil::Nil'
+          ? Sidef::Types::Bool::Bool->false
+          : Sidef::Types::Bool::Bool->true;
     }
+
+    *defined = \&is_defined;
 
     sub _get_name {
         $_[0]{name};

@@ -421,7 +421,7 @@ package Sidef::Types::Array::Array {
 
     sub defined {
         my ($self, $index) = @_;
-        Sidef::Types::Bool::Bool->new(defined($self->[$index->get_value]) and $self->[$index->get_value]->is_defined);
+        Sidef::Types::Bool::Bool->new(defined($self->[$index->get_value]) and $self->[$index->get_value]->_is_defined);
     }
 
     sub get {
