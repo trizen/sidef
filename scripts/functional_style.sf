@@ -1,0 +1,23 @@
+#!/usr/bin/ruby
+
+#
+## Method calls in functional style
+#
+
+func is(a, b) {
+    say "#{a.dump} == #{b.dump}";
+    a == b || die "\terror: #{a.dump} != #{b.dump}";
+}
+
+is(lc("Hello").uc, "HELLO");
+is(ucfirst(substr("hello world", 0, 5))+"!", "Hello!");
+is(uc("a"), "A");
+is(int(12.42), 12);
+is(sqrt(25), 5);
+is(push([], 1), [1]);
+is(len([1,2,3]), 3);
+is(len("ab"), 2);
+is(match(/^h/, "he").to_bool, true);
+is(match("he", /^H/i).to_bool, true);
+is(match("he", /^H/).to_bool, false);
+is(tc(uc("hello").lc+"!"), "Hello!");

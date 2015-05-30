@@ -4,6 +4,8 @@ package Sidef::Time::Localtime {
       Sidef::Time::Gmtime
       );
 
+    use overload q{""} => \&ctime;
+
     sub new {
         my (undef, $sec) = @_;
 

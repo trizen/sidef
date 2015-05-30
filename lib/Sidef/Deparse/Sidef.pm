@@ -435,6 +435,10 @@ package Sidef::Deparse::Sidef {
                       )
                       . ')';
                 }
+
+                if ($code eq 'Hash.new()') {
+                    $code = 'Hash.new';
+                }
             }
         }
 

@@ -240,6 +240,7 @@ scripts/func_and_class_test.sf
 scripts/function_composition.sf
 scripts/function_recursion.sf
 scripts/functional_modules.sf
+scripts/functional_style.sf
 scripts/functions.sf
 scripts/Games/asciiplanes.sf
 scripts/Games/bulls_and_cows.sf

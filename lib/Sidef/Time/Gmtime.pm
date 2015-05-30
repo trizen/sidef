@@ -2,6 +2,8 @@ package Sidef::Time::Gmtime {
 
     our @ISA = qw(Sidef);
 
+    use overload q{""} => \&ctime;
+
     sub new {
         my (undef, $sec) = @_;
 
@@ -42,10 +44,8 @@ package Sidef::Time::Gmtime {
     sub strftime {
         my ($self, $format) = @_;
 
-        $self->_is_string($format) || return;
-
         require POSIX;
-        Sidef::Types::String::String->new(POSIX::strftime($format, @{$self->{time}}));
+        Sidef::Types::String::String->new(POSIX::strftime($format->get_value, @{$self->{time}}));
     }
 
     *format = \&strftime;

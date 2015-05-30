@@ -1053,7 +1053,10 @@ package Sidef::Parser {
 
                     my $built_in_obj;
                     if ($type eq 'class' and /\G(?!\{)/) {
-                        my ($obj, $pos) = eval { $self->parse_expr(code => substr($_, pos($_))) };
+                        my ($obj, $pos) = eval {
+                            local $self->{_want_name} = 1;
+                            $self->parse_expr(code => substr($_, pos($_)));
+                        };
                         if (not $@ and defined $obj) {
                             pos($_) += $pos;
                             $built_in_obj =
@@ -1210,7 +1213,10 @@ package Sidef::Parser {
                         # Function return type (func name(...) -> Type {...})
                         # XXX: [KNOWN BUG] It doesn't check the returned type from method calls
                         if (/\G\h*(?:->|returns\b)\h*/gc) {
-                            my ($return_obj, $pos) = eval { $self->parse_expr(code => substr($_, pos($_))) };
+                            my ($return_obj, $pos) = eval {
+                                local $self->{_want_name} = 1;
+                                $self->parse_expr(code => substr($_, pos($_)));
+                            };
                             if (not $@ and defined $return_obj) {
                                 pos($_) += $pos;
                                 $obj->{returns} =
@@ -1661,9 +1667,15 @@ package Sidef::Parser {
 
                     # Type constant
                     my $obj;
-                    if (    $class ne $self->{class}
+                    if (
+                            not $self->{_want_name}
+                        and $class ne $self->{class}
                         and index($class, '::') == -1
-                        and eval { ($obj) = $self->parse_expr(code => $class); }) {
+                        and eval {
+                            local $self->{_want_name} = 1;
+                            ($obj) = $self->parse_expr(code => $class);
+                        }
+                      ) {
                         return
                           scalar {
                                   $self->{class} => [
@@ -1679,6 +1691,33 @@ package Sidef::Parser {
                                                     ]
                                  },
                           pos;
+                    }
+
+                    # Method call in functional style
+                    if (not $self->{_want_name} and ($class eq $self->{class} or $class eq 'CORE') and /\G(?=\()/) {
+                        my ($arg, $pos) = $self->parse_arguments(code => substr($_, pos));
+
+                        if (exists $arg->{$self->{class}}) {
+                            return
+                              scalar {
+                                      $self->{class} => [
+                                                         {
+                                                          self => shift(@{$arg->{$self->{class}}})->{self},
+                                                          call => [
+                                                                   {
+                                                                    method => $name,
+                                                                    (
+                                                                     @{$arg->{$self->{class}}}
+                                                                     ? (arg => [map { $_->{self} } @{$arg->{$self->{class}}}])
+                                                                     : ()
+                                                                    ),
+                                                                   }
+                                                                  ],
+                                                         }
+                                                        ]
+                                     },
+                              (pos($_) + $pos);
+                        }
                     }
 
                     # Fatal error
@@ -1831,7 +1870,7 @@ package Sidef::Parser {
             die "[PARSER ERROR] Invalid operator of type '$opt{op_type}'...";
         }
 
-        if (exists $opt{arg}) {
+        if (exists($opt{arg}) and (%{$opt{arg}} || ($opt{method} =~ /^$self->{operators_re}\z/))) {
             push @{$opt{array}[-1]{arg}}, $opt{arg};
         }
     }
@@ -1930,7 +1969,7 @@ package Sidef::Parser {
                                                       method => ref($obj) eq 'Sidef::Variable::ClassInit'
                                                       ? 'init'
                                                       : 'call',
-                                                      arg => [$arg]
+                                                      (%{$arg} ? (arg => [$arg]) : ())
                                                      }
                                                     ]
                                            }
@@ -2215,7 +2254,10 @@ package Sidef::Parser {
                 }
 
                 if (/\Ginclude\b\h*/gc) {
-                    my ($expr, $pos) = eval { $self->parse_expr(code => substr($_, pos)) };
+                    my ($expr, $pos) = eval {
+                        local $self->{_want_name} = 1;
+                        $self->parse_expr(code => substr($_, pos));
+                    };
 
                     my @abs_filenames;
                     if ($@) {    # an error occured
