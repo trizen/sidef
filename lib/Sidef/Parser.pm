@@ -1724,7 +1724,7 @@ package Sidef::Parser {
                     $self->fatal_error(
                                        code  => $_,
                                        pos   => (pos($_) - length($name)),
-                                       error => "attempt to use an uninitialized variable <$1>",
+                                       error => "attempt to use an undeclared variable <$1>",
                                       );
                 }
 
