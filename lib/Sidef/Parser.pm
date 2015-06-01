@@ -1951,7 +1951,7 @@ package Sidef::Parser {
                 return $obj, pos;
             }
 
-            if (
+            while (
                 #    (ref($obj) eq 'Sidef::Variable::Variable' and ($obj->{type} eq 'func' || $obj->{type} eq 'method'))
                 # || (ref($obj) eq 'Sidef::Variable::ClassInit')
                 # || (ref($obj) eq 'Sidef::Types::Block::Code')

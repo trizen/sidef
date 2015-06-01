@@ -528,8 +528,10 @@ package Sidef::Types::Number::Number {
     sub of {
         my ($self, $obj) = @_;
 
-        if ($obj->can('run')) {
-            return Sidef::Types::Array::Array->new(map { $obj->run } 1 .. $self->get_value);
+        if (ref($obj) eq 'Sidef::Types::Block::Code') {
+            my ($var) = $obj->init_block_vars();
+            return Sidef::Types::Array::Array->new(map { $var->set_value(__PACKAGE__->new($_)); $obj->run }
+                                                   1 .. $self->get_value);
         }
 
         Sidef::Types::Array::Array->new(($obj) x $self->get_value);
