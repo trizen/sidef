@@ -387,6 +387,7 @@ scripts/Rosettacode/runtime_evaluation.sf
 scripts/Rosettacode/runtime_evaluation_in_an_environment.sf
 scripts/Rosettacode/van_der_corput_seq.sf
 scripts/Rosettacode/vector_products.sf
+scripts/Rosettacode/Y_combinator.sf
 scripts/run_length_encoding.sf
 scripts/run_length_encoding_2.sf
 scripts/run_length_encoding_3.sf
