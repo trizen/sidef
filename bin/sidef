@@ -51,7 +51,7 @@ if (defined $args{v}) {
 
 # Warnings
 if (defined $args{w}) {
-    $SIG{__DIE__} = $SIG{__WARN__} = sub {
+    $SIG{__WARN__} = sub {
         require Carp;
         Carp::cluck(@_);
     };

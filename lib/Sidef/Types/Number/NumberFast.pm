@@ -264,10 +264,14 @@ package Sidef::Types::Number::Number {
     *fRound = \&roundf;
 
     sub digit  { ... }
-    sub nok    { ... }
     sub length { ... }
 
     *len = \&length;
+
+    sub nok {
+        my ($n, $k) = @_;
+        $n->factorial->div($n->subtract($k)->factorial->multiply($k->factorial));
+    }
 
     sub to_bin {
         my ($self) = @_;

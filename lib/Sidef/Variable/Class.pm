@@ -3,6 +3,19 @@ package Sidef::Variable::Class {
     use 5.014;
     our $AUTOLOAD;
 
+    use overload q{""} => sub {
+        eval {
+            local $SIG{__WARN__} = sub { };
+            $_[0]->to_s;
+        } // $_[0];
+      },
+      q{bool} => sub {
+        eval {
+            local $SIG{__WARN__} = sub { };
+            $_[0]->to_bool;
+        } // $_[0];
+      };
+
     sub __new__ {
         my (undef, $name) = @_;
         bless {name => $name}, __PACKAGE__;

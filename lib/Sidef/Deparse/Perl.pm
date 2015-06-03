@@ -598,6 +598,9 @@ HEADER
                         $code .= '->get_value';
                     }
                 }
+                else {
+                    $code .= '->get_value';
+                }
             }
         }
 
