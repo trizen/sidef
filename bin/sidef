@@ -86,11 +86,13 @@ if (defined(my $types = $args{M})) {
 # Interactive help
 if (defined $args{H}) {
     help_interactive();
+    exit 0;
 }
 
 # Interactive coding
 if (defined $args{i}) {
     code_interactive();
+    exit 0;
 }
 
 # Test mode
@@ -475,10 +477,7 @@ sub code_interactive {
                 local $/;
                 <$fh>;
               }
-              : (
-                $term->readline('>>> ')
-                  // do { print "\n"; exit }
-                );
+              : ($term->readline('>>> ') // return);
         };
 
         if ($line eq 'help') {
@@ -493,7 +492,7 @@ sub code_interactive {
             $line = $last_line;
         }
         elsif ($line eq 'q' or $line eq 'quit') {
-            exit;
+            return;
         }
         elsif ($line eq 'copyright') {
             print <<'EOT';
@@ -669,7 +668,7 @@ sub memoize_types {
             } = ();
 
             foreach my $method (keys %{$package . '::'}) {
-                next if $method =~ /^\(/;       # skip overload methods
+                next if $method =~ /^\(/;          # skip overload methods
                 next if exists $ignore{$method};
                 Memoize::memoize($package . '::' . $method);
             }

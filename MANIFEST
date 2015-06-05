@@ -197,6 +197,7 @@ scripts/cramers_method.sf
 scripts/cutting_edge_features.sf
 scripts/cyclic_numbers.sf
 scripts/DATA_handle.sf
+scripts/declare_primitive_type.sf
 scripts/def_class_variables.sf
 scripts/def_variables_implicit.sf
 scripts/define_keyword.sf

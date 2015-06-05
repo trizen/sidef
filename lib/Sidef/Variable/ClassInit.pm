@@ -73,6 +73,17 @@ package Sidef::Variable::ClassInit {
         $self;
     }
 
+    sub is_a {
+        my ($self, $arg) = @_;
+        Sidef::Types::Bool::Bool->new(
+                                      ref($arg) eq 'Sidef::Variable::ClassInit' || ref($arg) eq 'Sidef::Variable::Class'
+                                      ? $self->{name} eq $arg->{name}
+                                      : 0
+                                     );
+    }
+
+    *is_an = \&is_a;
+
     sub init {
         my ($self, @args) = @_;
 

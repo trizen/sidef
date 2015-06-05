@@ -42,6 +42,17 @@ package Sidef::Variable::Class {
         $self->AUTOLOAD(@_);
     }
 
+    sub is_a {
+        my ($self, $arg) = @_;
+        Sidef::Types::Bool::Bool->new(
+                                      ref($arg) eq 'Sidef::Variable::ClassInit' || ref($arg) eq 'Sidef::Variable::Class'
+                                      ? $self->{name} eq $arg->{name}
+                                      : 0
+                                     );
+    }
+
+    *is_an = \&is_a;
+
     sub DESTROY { }
 
     sub AUTOLOAD {
