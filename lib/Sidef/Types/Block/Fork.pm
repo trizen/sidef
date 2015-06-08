@@ -16,7 +16,8 @@ package Sidef::Types::Block::Fork {
         # Wait for the process to finish
         waitpid($self->{pid}, 0);
 
-        my $ref = do($self->{result});
+        state $x = require Storable;
+        my $ref = Storable::retrieve($self->{result});
         unlink(delete $self->{result});
         $ref;
     }

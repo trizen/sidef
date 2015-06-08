@@ -1,0 +1,27 @@
+#!/usr/bin/ruby
+
+class T(value) {
+    method display {
+        say value;
+    }
+}
+
+class S(value) < T {
+    method display {
+        say value;
+    }
+}
+
+var obj1 = T("T");
+var obj2 = S("S");
+var obj3 = Sys.copy(obj2);      # make a copy to obj2
+
+obj2.value = "foo";             # change the value of obj2
+
+obj1.value == "T"   || die "error";
+obj2.value == "foo" || die "error";
+obj3.value == "S"   || die "error";
+
+obj1.display;
+obj2.display;
+obj3.display;

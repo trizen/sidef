@@ -25,7 +25,7 @@ package Sidef::Optimizer {
                 ## ok
             }
             elsif ($obj->{type} eq 'func' or $obj->{type} eq 'method') {
-                require Scalar::Util;
+                state $x = require Scalar::Util;
                 if ($addr{Scalar::Util::refaddr($obj)}++) {
                     ## ok
                 }
@@ -35,7 +35,7 @@ package Sidef::Optimizer {
             }
         }
         elsif ($ref eq 'Sidef::Variable::ClassInit') {
-            require Scalar::Util;
+            state $x = require Scalar::Util;
             if ($addr{Scalar::Util::refaddr($obj)}++) {
                 ## ok
             }
@@ -44,7 +44,7 @@ package Sidef::Optimizer {
             }
         }
         elsif ($ref eq 'Sidef::Types::Block::Code') {
-            require Scalar::Util;
+            state $x = require Scalar::Util;
             if ($addr{Scalar::Util::refaddr($obj)}++) {
                 ## ok
             }

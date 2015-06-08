@@ -116,7 +116,7 @@ package Sidef::Types::String::String {
             my ($self, $regex, @rest) = @_;
             (
              $self->_is_regex($regex) ? $regex : do {
-                 require Scalar::Util;
+                 state $x = require Scalar::Util;
                  $cache{Scalar::Util::refaddr($regex)} //= Sidef::Types::Regex::Regex->new($regex);
                }
             )->match($self, @rest);
@@ -132,7 +132,7 @@ package Sidef::Types::String::String {
             my ($self, $regex, @rest) = @_;
             (
              $self->_is_regex($regex) ? $regex : do {
-                 require Scalar::Util;
+                 state $x = require Scalar::Util;
                  $cache{Scalar::Util::refaddr($regex)} //=
                    Sidef::Types::Regex::Regex->new($regex);
                }
@@ -531,7 +531,7 @@ package Sidef::Types::String::String {
 
     sub glob {
         my ($self) = @_;
-        require Encode;
+        state $x = require Encode;
         Sidef::Types::Array::Array->new(map { __PACKAGE__->new(Encode::decode_utf8($_)) } CORE::glob($self->get_value));
     }
 
@@ -647,14 +647,14 @@ package Sidef::Types::String::String {
 
     sub open_r {
         my ($self, @rest) = @_;
-        require Encode;
+        state $x = require Encode;
         my $string = Encode::encode_utf8($self->get_value);
         Sidef::Types::Glob::File->new(\$string)->open_r(@rest);
     }
 
     sub open {
         my ($self, @rest) = @_;
-        require Encode;
+        state $x = require Encode;
         my $string = Encode::encode_utf8($self->get_value);
         Sidef::Types::Glob::File->new(\$string)->open(@rest);
     }
@@ -825,26 +825,26 @@ package Sidef::Types::String::String {
     sub encode {
         my ($self, $enc) = @_;
 
-        require Encode;
+        state $x = require Encode;
         $self->new(Encode::encode($enc->get_value, $self->get_value));
     }
 
     sub decode {
         my ($self, $enc) = @_;
 
-        require Encode;
+        state $x = require Encode;
         $self->new(Encode::decode($enc->get_value, $self->get_value));
     }
 
     sub encode_utf8 {
         my ($self) = @_;
-        require Encode;
+        state $x = require Encode;
         $self->new(Encode::encode_utf8($self->get_value));
     }
 
     sub decode_utf8 {
         my ($self) = @_;
-        require Encode;
+        state $x = require Encode;
         $self->new(Encode::decode_utf8($self->get_value));
     }
 
@@ -912,7 +912,7 @@ package Sidef::Types::String::String {
                     if (exists $chars[$i + 2] and $chars[$i + 2] eq '{') {
                         my $str = CORE::join('', @chars[$i + 2 .. $#chars]);
                         if ($str =~ /^\{(.*?)\}/) {
-                            require charnames;
+                            state $x = require charnames;
                             my $char = charnames::string_vianame($1);
                             if (defined $char) {
                                 splice(@chars, $i--, 2 + $+[0], $char);
@@ -1097,7 +1097,7 @@ package Sidef::Types::String::String {
     sub inspect {
         my ($self) = @_;
 
-        require Data::Dump;
+        state $x = require Data::Dump;
         local $Data::Dump::TRY_BASE64 = 0;
 
         $self->new(Data::Dump::quote($self->get_value) =~ s<(#\{)>{\\$1}gr);

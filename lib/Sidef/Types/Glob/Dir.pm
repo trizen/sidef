@@ -10,7 +10,7 @@ package Sidef::Types::Glob::Dir {
     sub new {
         my (undef, $dir) = @_;
         if (@_ > 2) {
-            require File::Spec;
+            state $x = require File::Spec;
             $dir = File::Spec->catdir(map { ref($_) ? $_->to_dir->get_value : $_ } @_[1 .. $#_]);
         }
         elsif (ref($dir)) {
@@ -28,7 +28,7 @@ package Sidef::Types::Glob::Dir {
     sub root {
         my ($self) = @_;
 
-        require File::Spec;
+        state $x = require File::Spec;
         __PACKAGE__->new(File::Spec->rootdir);
     }
 
@@ -44,7 +44,7 @@ package Sidef::Types::Glob::Dir {
           || `echo -n ~`;
 
         defined($home) ? __PACKAGE__->new($home) : do {
-            require File::HomeDir;
+            state $x = require File::HomeDir;
             __PACKAGE__->new(File::HomeDir->my_home);
         };
     }
@@ -53,7 +53,7 @@ package Sidef::Types::Glob::Dir {
     *home_dir = \&home;
 
     sub tmp {
-        require File::Spec;
+        state $x = require File::Spec;
         __PACKAGE__->new(File::Spec->tmpdir);
     }
 
@@ -64,7 +64,7 @@ package Sidef::Types::Glob::Dir {
     *tmp_dir  = \&tmp;
 
     sub cwd {
-        require Cwd;
+        state $x = require Cwd;
         __PACKAGE__->new(Cwd::getcwd());
     }
 
@@ -74,14 +74,14 @@ package Sidef::Types::Glob::Dir {
     *current_dir       = \&cwd;
 
     sub pwd {
-        require File::Spec;
+        state $x = require File::Spec;
         __PACKAGE__->new(File::Spec->curdir);
     }
 
     sub split {
         my ($self) = @_;
         @_ == 2 && ($self = $_[1]);
-        require File::Spec;
+        state $x = require File::Spec;
         Sidef::Types::Array::Array->new(map { Sidef::Types::String::String->new($_) } File::Spec->splitdir($self->get_value));
     }
 
@@ -89,7 +89,7 @@ package Sidef::Types::Glob::Dir {
     sub parent {
         my ($self) = @_;
         @_ == 2 && ($self = $_[1]);
-        require File::Basename;
+        state $x = require File::Basename;
         __PACKAGE__->new(File::Basename::dirname($self->get_value));
     }
 
@@ -107,7 +107,7 @@ package Sidef::Types::Glob::Dir {
     sub remove_tree {
         my ($self) = @_;
         @_ == 2 && ($self = $_[1]);
-        require File::Path;
+        state $x = require File::Path;
         Sidef::Types::Bool::Bool->new(File::Path::remove_tree($self->get_value));
     }
 
@@ -127,7 +127,7 @@ package Sidef::Types::Glob::Dir {
     sub create_tree {
         my ($self) = @_;
         @_ == 2 && ($self = $_[1]);
-        require File::Path;
+        state $x = require File::Path;
         my $path = $self->get_value;
         -d $path
           ? Sidef::Types::Bool::Bool->true
@@ -181,7 +181,7 @@ package Sidef::Types::Glob::Dir {
             ($self, $file) = ($file, $_[2]);
         }
 
-        require File::Spec;
+        state $x = require File::Spec;
         $file->new(File::Spec->catdir($self->get_value, $file->get_value));
     }
 

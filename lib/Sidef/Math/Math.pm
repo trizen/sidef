@@ -4,7 +4,7 @@ package Sidef::Math::Math {
     our @ISA = qw(Sidef);
 
     sub new {
-        require Math::BigFloat;
+        state $x = require Math::BigFloat;
         bless {}, __PACKAGE__;
     }
 
@@ -184,21 +184,21 @@ package Sidef::Math::Math {
     sub sum {
         my ($self, @nums) = @_;
 
-        require List::Util;
+        state $x = require List::Util;
         Sidef::Types::Number::Number->new(List::Util::sum(map { $_->get_value } @nums));
     }
 
     sub max {
         my ($self, @nums) = @_;
 
-        require List::Util;
+        state $x = require List::Util;
         Sidef::Types::Number::Number->new(List::Util::max(map { $_->get_value } @nums));
     }
 
     sub min {
         my ($self, @nums) = @_;
 
-        require List::Util;
+        state $x = require List::Util;
         Sidef::Types::Number::Number->new(List::Util::min(map { $_->get_value } @nums));
     }
 
@@ -326,7 +326,7 @@ package Sidef::Math::Math {
           ) {
             *{__PACKAGE__ . '::' . $f} = sub {
                 my ($self, @rest) = @_;
-                require Math::Trig;
+                state $x = require Math::Trig;
                 local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
                 my $result = (\&{'Math::Trig::' . $f})->(map { $_->get_value } @rest);
                 (

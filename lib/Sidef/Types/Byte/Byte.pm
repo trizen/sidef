@@ -1,12 +1,13 @@
 package Sidef::Types::Byte::Byte {
 
+    use 5.014;
     use parent qw(
       Sidef::Types::Number::Number
       );
 
     sub new {
         my (undef, $byte) = @_;
-        require Math::BigInt;
+        state $x = require Math::BigInt;
         bless \Math::BigInt->new($byte), __PACKAGE__;
     }
 

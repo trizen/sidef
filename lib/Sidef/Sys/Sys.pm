@@ -16,28 +16,28 @@ package Sidef::Sys::Sys {
     sub alarm {
         my ($self, $sec) = @_;
 
-        require Time::HiRes;
+        state $x = require Time::HiRes;
         Sidef::Types::Bool::Bool->new(Time::HiRes::alarm($sec->get_value));
     }
 
     sub ualarm {
         my ($self, $sec) = @_;
 
-        require Time::HiRes;
+        state $x = require Time::HiRes;
         Sidef::Types::Bool::Bool->new(Time::HiRes::ualarm($sec->get_value));
     }
 
     sub sleep {
         my ($self, $sec) = @_;
 
-        require Time::HiRes;
+        state $x = require Time::HiRes;
         Sidef::Types::Bool::Bool->new(Time::HiRes::sleep($sec->get_value));
     }
 
     sub nanosleep {
         my ($self, $sec) = @_;
 
-        require Time::HiRes;
+        state $x = require Time::HiRes;
         Sidef::Types::Bool::Bool->new(Time::HiRes::nanosleep($sec->get_value));
     }
 
@@ -46,7 +46,7 @@ package Sidef::Sys::Sys {
     sub usleep {
         my ($self, $sec) = @_;
 
-        require Time::HiRes;
+        state $x = require Time::HiRes;
         Sidef::Types::Bool::Bool->new(Time::HiRes::usleep($sec->get_value));
     }
 
@@ -82,7 +82,7 @@ package Sidef::Sys::Sys {
     sub sidef {
         my ($self) = @_;
 
-        require File::Spec;
+        state $x = require File::Spec;
         Sidef::Types::String::String->new(File::Spec->rel2abs($0));
     }
 
@@ -210,7 +210,7 @@ package Sidef::Sys::Sys {
 
     sub copy {
         my ($self, $obj) = @_;
-        require Storable;
+        state $x = require Storable;
         Storable::dclone($obj);
     }
 

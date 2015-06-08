@@ -330,6 +330,7 @@ scripts/multi_var_assignment.sf
 scripts/named_block_arguments.sf
 scripts/next.sf
 scripts/number_types.sf
+scripts/object_copy.sf
 scripts/objects_init.sf
 scripts/open.sf
 scripts/pairs_test.sf

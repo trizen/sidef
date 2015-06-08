@@ -13,7 +13,7 @@ package Sidef::Types::Number::Complex {
         my $self = bless({}, __PACKAGE__);
         defined($x) || return $self;
 
-        require Math::Complex;
+        state $_x = require Math::Complex;
 
         #
         ## Check X
@@ -88,7 +88,7 @@ package Sidef::Types::Number::Complex {
 
     sub real {
         my ($self) = @_;
-        require Math::Complex;
+        state $_x = require Math::Complex;
         Sidef::Types::Number::Number->new(Math::Complex::Re($$self));
     }
 
@@ -97,7 +97,7 @@ package Sidef::Types::Number::Complex {
 
     sub imaginary {
         my ($self) = @_;
-        require Math::Complex;
+        state $_x = require Math::Complex;
         Sidef::Types::Number::Number->new(Math::Complex::Im($$self));
     }
 
@@ -111,7 +111,7 @@ package Sidef::Types::Number::Complex {
     sub get_constant {
         my ($self, $name) = @_;
 
-        require Math::Complex;
+        state $_x = require Math::Complex;
 
         state %cache;
         state $table = {i => sub { __PACKAGE__->new(Math::Complex->i) },};

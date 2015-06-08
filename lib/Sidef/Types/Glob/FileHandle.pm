@@ -57,7 +57,7 @@ package Sidef::Types::Glob::FileHandle {
     sub compare {
         my ($self, $fh) = @_;
         $self->_is_fh($fh) || return;
-        require File::Compare;
+        state $x = require File::Compare;
         Sidef::Types::Number::Number->new(File::Compare::compare($self->{fh}, $fh->{fh}));
     }
 
@@ -249,14 +249,14 @@ package Sidef::Types::Glob::FileHandle {
     sub lock {
         my ($self) = @_;
 
-        require Fcntl;
+        state $x = require Fcntl;
         $self->flock(Sidef::Types::Number::Number->new(&Fcntl::LOCK_EX));
     }
 
     sub unlock {
         my ($self) = @_;
 
-        require Fcntl;
+        state $x = require Fcntl;
         $self->flock(Sidef::Types::Number::Number->new(&Fcntl::LOCK_UN));
     }
 

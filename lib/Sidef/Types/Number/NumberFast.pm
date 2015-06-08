@@ -22,7 +22,7 @@ package Sidef::Types::Number::Number {
     }
 
     sub new_rat {
-        require Math::BigRat;
+        state $x = require Math::BigRat;
         __PACKAGE__->new(Math::BigRat->new(ref($_[1]) ? ${$_[1]} : $_[1]));
     }
 

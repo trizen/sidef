@@ -1,5 +1,6 @@
 package Sidef::Types::Byte::Bytes {
 
+    use 5.014;
     use parent qw(
       Sidef::Types::Array::Array
       );
@@ -23,7 +24,7 @@ package Sidef::Types::Byte::Bytes {
 
     sub join {
         my ($self) = @_;
-        require Encode;
+        state $x = require Encode;
         Sidef::Types::String::String->new(
             eval {
                 Encode::decode_utf8(CORE::join('', map { CORE::chr($_->get_value) } @{$self}));
@@ -33,7 +34,7 @@ package Sidef::Types::Byte::Bytes {
 
     sub encode {
         my ($self, $encoding) = @_;
-        require Encode;
+        state $x = require Encode;
         $encoding = defined($encoding) ? $encoding->get_value : 'UTF-8';
         Sidef::Types::String::String->new(
             eval {

@@ -21,7 +21,7 @@ package Sidef::Types::Glob::Socket {
                 return $CACHE{$name};
             }
 
-            require Socket;
+            state $x = require Socket;
             my $func = \&{'Socket' . '::' . $name};
 
             if (defined(&$func)) {
@@ -145,7 +145,7 @@ package Sidef::Types::Glob::Socket {
 
         my ($name) = ($AUTOLOAD =~ /^.*[^:]::(.*)$/);
 
-        require Socket;
+        state $x = require Socket;
         my $func = \&{'Socket' . '::' . $name};
 
         if (defined(&$func)) {

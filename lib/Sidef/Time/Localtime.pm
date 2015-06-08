@@ -1,10 +1,13 @@
 package Sidef::Time::Localtime {
 
+    use 5.014;
     use parent qw(
       Sidef::Time::Gmtime
       );
 
-    use overload q{""} => \&ctime;
+    use overload
+      q{""}   => \&ctime,
+      q{bool} => sub { $_[0]->{sec} };
 
     sub new {
         my (undef, $sec) = @_;
@@ -17,6 +20,8 @@ package Sidef::Time::Localtime {
     }
 
     {
+        no strict 'refs';
+
         # The order matters!
         my @names = qw(sec min hour mday mon year wday yday isdst);
 

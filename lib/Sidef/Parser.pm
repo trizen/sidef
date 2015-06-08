@@ -351,7 +351,7 @@ package Sidef::Parser {
                      "Invalid code. Feel ashamed for yourself and try again.",
                     );
 
-        require File::Basename;
+        state $x = require File::Basename;
         my $basename = File::Basename::basename($0);
 
         my $error = sprintf("%s: %s\n%s:%s: syntax error, %s\n%s\n",
@@ -1335,7 +1335,7 @@ package Sidef::Parser {
                 # Binary, hexdecimal and octal numbers
                 if (/\G0(b[10_]*|x[0-9A-Fa-f_]*|[0-9_]+\b)/gc) {
                     my $number = "0" . ($1 =~ tr/_//dr);
-                    require Math::BigInt;
+                    state $x = require Math::BigInt;
                     return
                       Sidef::Types::Number::Number->new(
                                                         $number =~ /^0[0-9]/
@@ -1586,14 +1586,14 @@ package Sidef::Parser {
                       };
 
                     if ($name eq 'ARGV') {
-                        require Encode;
+                        state $x = require Encode;
                         my $array =
                           Sidef::Types::Array::Array->new(map { Sidef::Types::String::String->new(Encode::decode_utf8($_)) }
                                                           @ARGV);
                         $variable->set_value($array);
                     }
                     elsif ($name eq 'ENV') {
-                        require Encode;
+                        state $x = require Encode;
                         my $hash =
                           Sidef::Types::Hash::Hash->new(map { Sidef::Types::String::String->new(Encode::decode_utf8($_)) }
                                                         %ENV);
@@ -1619,7 +1619,7 @@ package Sidef::Parser {
                     }
 
                     # 'def' instance/class variables
-                    require List::Util;
+                    state $x = require List::Util;
                     if (
                         ref($self->{current_class}) eq 'Sidef::Variable::ClassInit'
                         and defined(
@@ -2277,11 +2277,11 @@ package Sidef::Parser {
                         foreach my $var_name (@{$var_names}) {
                             my @path = split(/::/, $var_name);
 
-                            require File::Spec;
+                            state $x = require File::Spec;
                             my $mod_path = File::Spec->catfile(@path[0 .. $#path - 1], $path[-1] . '.sm');
 
                             if (@{$self->{inc}} == 0) {
-                                require File::Basename;
+                                state $y = require File::Basename;
                                 push @{$self->{inc}}, split(':', $ENV{SIDEF_INC}) if exists($ENV{SIDEF_INC});
                                 push @{$self->{inc}}, File::Basename::dirname(File::Spec->rel2abs($self->{script_name}));
                                 push @{$self->{inc}}, File::Spec->curdir;

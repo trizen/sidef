@@ -9,7 +9,7 @@ package Sidef::Types::Glob::File {
     sub new {
         my (undef, $file) = @_;
         if (@_ > 2) {
-            require File::Spec;
+            state $x = require File::Spec;
             $file = File::Spec->catfile(map { ref($_) ? $_->to_file->get_value : $_ } @_[1 .. $#_]);
         }
         elsif (ref($file) && ref($file) ne 'SCALAR') {
@@ -51,7 +51,7 @@ package Sidef::Types::Glob::File {
         if (@_ == 3) {
             ($self, $file) = ($file, $_[2]);
         }
-        require File::Compare;
+        state $x = require File::Compare;
         Sidef::Types::Number::Number->new(File::Compare::compare($self->get_value, $file->get_value));
     }
 
@@ -265,7 +265,7 @@ package Sidef::Types::Glob::File {
         my ($self) = @_;
         @_ == 2 && ($self = $_[1]);
 
-        require File::Basename;
+        state $x = require File::Basename;
         Sidef::Types::String::String->new(File::Basename::basename($self->get_value));
     }
 
@@ -277,7 +277,7 @@ package Sidef::Types::Glob::File {
         my ($self) = @_;
         @_ == 2 && ($self = $_[1]);
 
-        require File::Basename;
+        state $x = require File::Basename;
         Sidef::Types::Glob::Dir->new(File::Basename::dirname($self->get_value));
     }
 
@@ -288,7 +288,7 @@ package Sidef::Types::Glob::File {
     sub is_absolute {
         my ($self) = @_;
         @_ == 2 && ($self = $_[1]);
-        require File::Spec;
+        state $x = require File::Spec;
         Sidef::Types::Bool::Bool->new(File::Spec->file_name_is_absolute($self->get_value));
     }
 
@@ -298,7 +298,7 @@ package Sidef::Types::Glob::File {
         my ($self) = @_;
         @_ == 2 && ($self = $_[1]);
 
-        require File::Spec;
+        state $x = require File::Spec;
         $self->new(File::Spec->rel2abs($self->get_value));
     }
 
@@ -309,7 +309,7 @@ package Sidef::Types::Glob::File {
 
     sub rel_name {
         my ($self, $base) = @_;
-        require File::Spec;
+        state $x = require File::Spec;
         $self->new(File::Spec->rel2abs($self->get_value, defined($base) ? $base->get_value : ()));
     }
 
@@ -338,7 +338,7 @@ package Sidef::Types::Glob::File {
             ($self, $file) = ($file, $_[2]);
         }
 
-        require File::Copy;
+        state $x = require File::Copy;
         Sidef::Types::Bool::Bool->new(File::Copy::move($self->get_value, $file->get_value));
     }
 
@@ -353,7 +353,7 @@ package Sidef::Types::Glob::File {
             ($self, $file) = ($file, $_[2]);
         }
 
-        require File::Copy;
+        state $x = require File::Copy;
         Sidef::Types::Bool::Bool->new(File::Copy::copy($self->get_value, $file->get_value));
     }
 

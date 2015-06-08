@@ -16,7 +16,7 @@ package Sidef::Types::Number::Number {
     sub new_float {
         my (undef, $num) = @_;
 
-        require Math::BigFloat;
+        state $x = require Math::BigFloat;
         ref($num) eq 'Math::BigFloat'
           ? (bless \$num, __PACKAGE__)
           : (
@@ -32,7 +32,7 @@ package Sidef::Types::Number::Number {
     sub new_int {
         my (undef, $num) = @_;
 
-        require Math::BigInt;
+        state $x = require Math::BigInt;
         my $ref = ref($num);
         $ref eq 'Math::BigInt' ? (bless \$num, __PACKAGE__)
           : (   $ref eq 'Math::BigFloat'
@@ -43,7 +43,7 @@ package Sidef::Types::Number::Number {
     sub new_rat {
         my (undef, $num) = @_;
 
-        require Math::BigRat;
+        state $x = require Math::BigRat;
         ref($num) eq 'Math::BigRat'
           ? (bless \$num, __PACKAGE__)
           : (
@@ -277,7 +277,7 @@ package Sidef::Types::Number::Number {
 
     sub hex {
         my ($self) = @_;
-        require Math::BigInt;
+        state $x = require Math::BigInt;
         $self->new(Math::BigInt->new("0x$self->get_value"));
     }
 
@@ -285,7 +285,7 @@ package Sidef::Types::Number::Number {
 
     sub oct {
         my ($self) = @_;
-        require Math::BigInt;
+        state $x = require Math::BigInt;
         __PACKAGE__->new(Math::BigInt->from_oct($self->get_value));
     }
 
@@ -293,7 +293,7 @@ package Sidef::Types::Number::Number {
 
     sub bin {
         my ($self) = @_;
-        require Math::BigInt;
+        state $x = require Math::BigInt;
         $self->new(Math::BigInt->new("0b$self->get_value"));
     }
 
@@ -544,7 +544,7 @@ package Sidef::Types::Number::Number {
 
     sub to_bin {
         my ($self) = @_;
-        require Math::BigInt;
+        state $x = require Math::BigInt;
         Sidef::Types::String::String->new(Math::BigInt->new($self->get_value)->as_bin);
     }
 
@@ -552,7 +552,7 @@ package Sidef::Types::Number::Number {
 
     sub to_oct {
         my ($self) = @_;
-        require Math::BigInt;
+        state $x = require Math::BigInt;
         Sidef::Types::String::String->new(Math::BigInt->new($self->get_value)->as_oct);
     }
 
@@ -560,7 +560,7 @@ package Sidef::Types::Number::Number {
 
     sub to_hex {
         my ($self) = @_;
-        require Math::BigInt;
+        state $x = require Math::BigInt;
         Sidef::Types::String::String->new(Math::BigInt->new($self->get_value)->as_hex);
     }
 

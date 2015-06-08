@@ -21,7 +21,7 @@ package Sidef::Types::Glob::Fcntl {
                 return $CACHE{$sub};
             }
 
-            require Fcntl;
+            state $x = require Fcntl;
             my $call = \&{'Fcntl' . '::' . $sub};
 
             if (defined(&$call)) {

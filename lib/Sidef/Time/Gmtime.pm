@@ -1,8 +1,13 @@
 package Sidef::Time::Gmtime {
 
-    our @ISA = qw(Sidef);
+    use 5.014;
+    use parent qw(
+      Sidef::Object::Object
+      );
 
-    use overload q{""} => \&ctime;
+    use overload
+      q{""}   => \&ctime,
+      q{bool} => sub { $_[0]->{sec} };
 
     sub new {
         my (undef, $sec) = @_;
@@ -15,6 +20,8 @@ package Sidef::Time::Gmtime {
     }
 
     {
+        no strict 'refs';
+
         # The order matters!
         my @names = qw(sec min hour mday mon year wday yday);
 
@@ -44,7 +51,7 @@ package Sidef::Time::Gmtime {
     sub strftime {
         my ($self, $format) = @_;
 
-        require POSIX;
+        state $x = require POSIX;
         Sidef::Types::String::String->new(POSIX::strftime($format->get_value, @{$self->{time}}));
     }
 

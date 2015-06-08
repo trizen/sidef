@@ -5,6 +5,10 @@ package Sidef::Time::Time {
       Sidef::Object::Object
       );
 
+    use overload
+      q{""}   => \&get_value,
+      q{bool} => \&get_value;
+
     sub new {
         my (undef, $sec) = @_;
 
@@ -45,7 +49,7 @@ package Sidef::Time::Time {
 
     sub microTime {
         my ($self) = @_;
-        require Time::HiRes;
+        state $x = require Time::HiRes;
         Sidef::Types::Number::Number->new(scalar Time::HiRes::gettimeofday());
     }
 

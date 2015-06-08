@@ -51,7 +51,7 @@ package Sidef::Perl::Perl {
             }
 
             if ($ref eq '') {
-                require Scalar::Util;
+                state $x = require Scalar::Util;
 
                 if (Scalar::Util::looks_like_number($val)) {
                     return Sidef::Types::Number::Number->new($val);

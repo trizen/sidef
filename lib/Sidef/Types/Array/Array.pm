@@ -681,7 +681,7 @@ package Sidef::Types::Array::Array {
 
     sub shuffle {
         my ($self) = @_;
-        require List::Util;
+        state $x = require List::Util;
         $self->new(map { $_->get_value } List::Util::shuffle(@{$self}));
     }
 

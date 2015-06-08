@@ -45,7 +45,7 @@ package Sidef::Types::Block::Code {
     sub copy {
         my ($self) = @_;
 
-        require Storable;
+        state $x = require Storable;
         Storable::dclone($self);
     }
 
@@ -239,7 +239,7 @@ package Sidef::Types::Block::Code {
 
         my @stack_vars = grep { exists $_->{stack} } @{$self->{vars}};
 
-        require List::Util;
+        state $x = require List::Util;
         my $max_depth = @stack_vars ? List::Util::max(map { $#{$_->{stack}} } @stack_vars) : return;
 
         if ($max_depth > -1) {
@@ -310,21 +310,18 @@ package Sidef::Types::Block::Code {
     sub fork {
         my ($self) = @_;
 
-        state $can_dump = eval { require Data::Dump };
-        $can_dump // return $self->thread;
+        state $x = do {
+            require Storable;
+            require File::Temp;
+        };
 
-        require File::Temp;
-        my ($fh, $result) = File::Temp::tempfile(SUFFIX => '.rst');
-        my $fork = Sidef::Types::Block::Fork->new(result => $result);
+        my ($fh, $filename) = File::Temp::tempfile(SUFFIX => '.rst');
+        my $fork = Sidef::Types::Block::Fork->new(result => $filename);
 
-        my $pid;
-        {
-            $pid = fork() // die "[FATAL ERROR]: cannot fork";
-            if ($pid == 0) {
-                print {$fh} scalar Data::Dump::pp(scalar $self->run);
-                close $fh;
-                exit 0;
-            }
+        my $pid = fork() // die "[FATAL ERROR]: cannot fork";
+        if ($pid == 0) {
+            Storable::store($self->run, $filename);
+            exit 0;
         }
 
         $fork->{pid} = $pid;
@@ -333,8 +330,8 @@ package Sidef::Types::Block::Code {
 
     sub thread {
         my ($self) = @_;
-        require threads;
-        state $aliases = do {
+        state $x = do {
+            require threads;
             *threads::get  = \&threads::join;
             *threads::wait = \&threads::join;
             1;
