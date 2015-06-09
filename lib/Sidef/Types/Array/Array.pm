@@ -152,9 +152,11 @@ package Sidef::Types::Array::Array {
     }
 
     sub concat {
-        my ($self, $array) = @_;
+        my ($self, $arg) = @_;
 
-        $self->new(map { $_->get_value } @{$self}, @{$array});
+        defined($arg) && $arg->isa('ARRAY')
+          ? $self->new(map { $_->get_value } @{$self}, @{$arg})
+          : $self->new((map { $_->get_value } @{$self}), $arg);
     }
 
     sub _combinations {
