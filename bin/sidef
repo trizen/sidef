@@ -261,7 +261,7 @@ sub parse_code {
             #my $sidef_deparser = Sidef::Deparse::Sidef->new(namespaces => [@Sidef::Exec::NAMESPACES]);
             #my $sidef_code = $sidef_deparser->deparse($struct);
             #my $new_parser = new_parser(name => $parser->{file_name});
-            #my $new_struct = $new_parser->parse_script(code => $sidef_code);
+            #my $new_struct = $new_parser->parse_script(code => \$sidef_code);
 
             my $deparser = Sidef::Deparse::Perl->new(namespaces => [@Sidef::Exec::NAMESPACES]);
             my $code = $deparser->deparse($struct);

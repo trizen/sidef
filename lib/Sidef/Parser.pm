@@ -1703,16 +1703,8 @@ package Sidef::Parser {
 
         for (${$opt{code}}) {
             if (/\G\(/gc) {
-
                 $self->{parentheses}++;
                 my $obj = $self->parse_script(code => $opt{code});
-
-                $obj // $self->fatal_error(
-                                           code  => $_,
-                                           pos   => (pos($_) - 1),
-                                           error => "unbalanced parentheses",
-                                          );
-
                 return $obj;
             }
         }
@@ -1723,16 +1715,8 @@ package Sidef::Parser {
 
         for (${$opt{code}}) {
             if (/\G\[/gc) {
-
                 $self->{right_brackets}++;
                 my $obj = $self->parse_script(code => $opt{code});
-
-                $obj // $self->fatal_error(
-                                           code  => $_,
-                                           pos   => (pos($_) - 1),
-                                           error => "unbalanced right brackets",
-                                          );
-
                 return $obj;
             }
         }
@@ -1781,12 +1765,6 @@ package Sidef::Parser {
                 }
 
                 my $obj = $self->parse_script(code => $opt{code});
-                $obj // $self->fatal_error(
-                                           code  => $_,
-                                           pos   => (pos($_) - 1),
-                                           error => "unbalanced curly brackets",
-                                          );
-
                 $block->{vars} = [map { $_->{obj} }
                                     grep { ref($_) eq 'HASH' and ref($_->{obj}) eq 'Sidef::Variable::Variable' }
                                     @{$self->{vars}{$self->{class}}}
@@ -2076,8 +2054,6 @@ package Sidef::Parser {
 
     sub parse_script {
         my ($self, %opt) = @_;
-
-        #$self->parse_whitespace(code => $opt{code});
 
         my %struct;
         for (${$opt{code}}) {
