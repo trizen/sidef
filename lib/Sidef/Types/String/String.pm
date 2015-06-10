@@ -985,12 +985,12 @@ package Sidef::Types::String::String {
                    and $chars[$i + 1] eq '{') {
                 if (ref $parser eq 'Sidef::Parser') {
                     my $code = CORE::join('', @chars[$i + 1 .. $#chars]);
-                    my ($block, $pos) = $parser->parse_block(code => $code);
+                    my $block = $parser->parse_block(code => \$code);
                     if (@{$block->{vars}} == 1) {
                         $block = $block->{code};
                     }
                     push @inline_expressions, [$i, $block];
-                    splice(@chars, $i--, 1 + $pos);
+                    splice(@chars, $i--, 1 + pos($code));
                 }
                 else {
                     # Can't eval #{} at runtime!

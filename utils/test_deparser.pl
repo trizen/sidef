@@ -40,7 +40,7 @@ sub parse_deparse {
                                     strict      => 1,
                                    );
 
-    my $struct = $parser->parse_script(code => $code);
+    my $struct = $parser->parse_script(code => \$code);
 
     my $deparser   = Sidef::Deparse::Sidef->new(namespaces => [@Sidef::Exec::NAMESPACES]);
     my @statements = $deparser->deparse_script($struct);

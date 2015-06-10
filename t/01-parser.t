@@ -37,7 +37,7 @@ foreach my $sidef_script (@scripts) {
     };
 
     my $parser = Sidef::Parser->new(script_name => '-T');
-    my $struct = $parser->parse_script(code => $content);
+    my $struct = $parser->parse_script(code => \$content);
 
     is(ref($struct), 'HASH');
 }

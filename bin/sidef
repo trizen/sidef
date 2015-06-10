@@ -250,7 +250,7 @@ sub optimize_struct {
 sub parse_code {
     my ($parser, $code) = @_;
 
-    my $struct = $parser->parse_script(code => $code);
+    my $struct = $parser->parse_script(code => \$code);
 
     # Check for optimization
     if (defined($args{O})) {
@@ -276,7 +276,7 @@ sub parse_code {
             $struct = Sidef::Parser->new(
                                          file_name   => $parser->{file_name},
                                          script_name => $parser->{script_name},
-                                        )->parse_script(code => $code);
+                                        )->parse_script(code => \$code);
         }
 
         # Optimize the AST
@@ -426,7 +426,7 @@ HELP
 
         my $parser = new_parser(name => '-H');
         $parser->{interactive} = 1;
-        my $struct = eval { $parser->parse_script(code => $line) };
+        my $struct = eval { $parser->parse_script(code => \$line) };
 
         if ($@) {
             warn $@;
@@ -524,7 +524,7 @@ EOT
 
         $last_line = $line;
 
-        my $struct = eval { $parser->parse_script(code => $line) };
+        my $struct = eval { $parser->parse_script(code => \$line) };
 
         $@ && do {
             warn $@;
@@ -840,7 +840,7 @@ $opt{code}
 my \$parser = Sidef::Parser->new(file_name   => "\Q$opt{script_name}\E",
                                 script_name => "\Q$opt{script_name}\E",);
 
-my \$struct = \$parser->parse_script(code => \$code);
+my \$struct = \$parser->parse_script(code => \\\$code);
 EOT
 
     }

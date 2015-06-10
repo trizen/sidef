@@ -19,7 +19,7 @@ use Sidef;
 my $parser = Sidef::Parser->new();
 
 # Parse some code and store the returned parse-tree
-my $struct = $parser->parse_script(code => <<'SIDEF_CODE');
+my $struct = $parser->parse_script(code => \<<'SIDEF_CODE');
 
 func fib(n) {
     n > 1 ? (__FUNC__(n-1) + __FUNC__(n-2)) : n;
