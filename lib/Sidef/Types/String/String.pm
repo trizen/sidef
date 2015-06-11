@@ -1094,15 +1094,6 @@ package Sidef::Types::String::String {
 
     *pairWith = \&pair_with;
 
-    sub inspect {
-        my ($self) = @_;
-
-        state $x = require Data::Dump;
-        local $Data::Dump::TRY_BASE64 = 0;
-
-        $self->new(Data::Dump::quote($self->get_value) =~ s<(#\{)>{\\$1}gr);
-    }
-
     sub basic_dump {
         my ($self) = @_;
         __PACKAGE__->new(q{'} . $self->get_value =~ s{([\\'])}{\\$1}gr . q{'});
@@ -1110,8 +1101,15 @@ package Sidef::Types::String::String {
 
     sub dump {
         my ($self) = @_;
-        eval { $self->inspect } // $self->basic_dump;
+
+        state $x = eval { require Data::Dump };
+        $x || return $self->basic_dump;
+
+        local $Data::Dump::TRY_BASE64 = 0;
+        $self->new(Data::Dump::quote($self->get_value) =~ s<(#\{)>{\\$1}gr);
     }
+
+    *inspect = \&dump;
 
     {
         no strict 'refs';
