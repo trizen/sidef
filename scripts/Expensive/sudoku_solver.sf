@@ -27,7 +27,7 @@ func solve(board) {
     };
 }
 
-var board = %w(
+var board = %i(
     5 3 0  0 2 4  7 0 0
     0 0 2  0 0 0  8 0 0
     1 0 0  7 0 3  9 0 2
@@ -39,6 +39,6 @@ var board = %w(
     0 0 0  0 3 0  5 0 6
     9 6 0  0 1 0  3 0 0
     0 5 0  6 9 0  0 1 0
-).map{.to_i};
+);
 
 solve(board);

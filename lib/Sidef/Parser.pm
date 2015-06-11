@@ -432,7 +432,6 @@ package Sidef::Parser {
         my ($self, %opt) = @_;
 
         my $string = $self->get_quoted_string(code => $opt{code}, no_count_line => 1);
-
         $self->parse_whitespace(code => \$string);
 
         my @words;
@@ -1336,14 +1335,22 @@ package Sidef::Parser {
                                   );
             }
 
-            # Quoted words (%w/a b c/)
-            if (/\G%([wW])\b/gc || /\G(?=(«|<(?!<)))/) {
+            # Quoted words or numbers (%w/a b c/)
+            if (/\G%([wWin])\b/gc || /\G(?=(«|<(?!<)))/) {
                 my ($type) = $1;
                 my $strings = $self->get_quoted_words(code => $opt{code});
 
                 if ($type eq 'w' or $type eq '<') {
-                    return Sidef::Types::Array::Array->new(
-                                            map { Sidef::Types::String::String->new($_ =~ s{\\(?=[\\#\s])}{}gr) } @{$strings});
+                    return Sidef::Types::Array::Array->new(map { Sidef::Types::String::String->new(s{\\(?=[\\#\s])}{}gr) }
+                                                           @{$strings});
+                }
+                elsif ($type eq 'i') {
+                    return Sidef::Types::Array::Array->new(map { Sidef::Types::Number::Number->new_int(s{\\(?=[\\#\s])}{}gr) }
+                                                           @{$strings});
+                }
+                elsif ($type eq 'n') {
+                    return Sidef::Types::Array::Array->new(map { Sidef::Types::Number::Number->new(s{\\(?=[\\#\s])}{}gr) }
+                                                           @{$strings});
                 }
 
                 my ($inline_expression, @objs);

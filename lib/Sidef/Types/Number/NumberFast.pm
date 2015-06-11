@@ -263,8 +263,14 @@ package Sidef::Types::Number::Number {
     *fround = \&roundf;
     *fRound = \&roundf;
 
-    sub digit  { ... }
-    sub length { ... }
+    sub digit { ... }
+
+    sub length {
+        my ($self) = @_;
+        my $len1   = CORE::length($$self);
+        my $len2   = CORE::length(CORE::int($$self));
+        $self->new($len1 == $len2 ? $len1 : $len1 - 1);
+    }
 
     *len = \&length;
 
