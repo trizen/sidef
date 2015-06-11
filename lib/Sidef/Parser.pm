@@ -1703,8 +1703,17 @@ package Sidef::Parser {
 
         for (${$opt{code}}) {
             if (/\G\(/gc) {
-                $self->{parentheses}++;
+                my $p = pos($_);
+                local $self->{parentheses} = 1;
                 my $obj = $self->parse_script(code => $opt{code});
+
+                $self->{parentheses}
+                  && $self->fatal_error(
+                                        code  => $_,
+                                        pos   => $p - 1,
+                                        error => "unbalanced parentheses",
+                                       );
+
                 return $obj;
             }
         }
@@ -1715,8 +1724,17 @@ package Sidef::Parser {
 
         for (${$opt{code}}) {
             if (/\G\[/gc) {
-                $self->{right_brackets}++;
+                my $p = pos($_);
+                local $self->{right_brackets} = 1;
                 my $obj = $self->parse_script(code => $opt{code});
+
+                $self->{right_brackets}
+                  && $self->fatal_error(
+                                        code  => $_,
+                                        pos   => $p - 1,
+                                        error => "unbalanced right brackets",
+                                       );
+
                 return $obj;
             }
         }
@@ -1728,7 +1746,8 @@ package Sidef::Parser {
         for (${$opt{code}}) {
             if (/\G\{/gc) {
 
-                $self->{curly_brackets}++;
+                my $p = pos($_);
+                local $self->{curly_brackets} = 1;
 
                 my $ref = $self->{vars}{$self->{class}} //= [];
                 my $count = scalar(@{$self->{vars}{$self->{class}}});
@@ -1765,6 +1784,14 @@ package Sidef::Parser {
                 }
 
                 my $obj = $self->parse_script(code => $opt{code});
+
+                $self->{curly_brackets}
+                  && $self->fatal_error(
+                                        code  => $_,
+                                        pos   => $p - 1,
+                                        error => "unbalanced curly brackets",
+                                       );
+
                 $block->{vars} = [map { $_->{obj} }
                                     grep { ref($_) eq 'HASH' and ref($_->{obj}) eq 'Sidef::Variable::Variable' }
                                     @{$self->{vars}{$self->{class}}}
