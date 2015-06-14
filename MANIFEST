@@ -398,7 +398,7 @@ scripts/selection_sort.sf
 scripts/short_circuit_evaluation.sf
 scripts/sidef_keywords.sf
 scripts/sidef_to_json.sf
-scripts/sierpinksi_alphabet.sf
+scripts/sierpinski_alphabet.sf
 scripts/sierpinski_carpet.sf
 scripts/sierpinski_diamond.sf
 scripts/sierpinski_penta.sf
