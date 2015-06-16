@@ -11,6 +11,7 @@ use CGI::Carp qw(fatalsToBrowser);
 
 my $sidef = 'sidef';    # command or path to sidef
 
+binmode(STDOUT, ':utf8');
 print header(-charset => 'UTF-8'),
   start_html(
              -lang   => 'en',
