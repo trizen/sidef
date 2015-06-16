@@ -122,10 +122,10 @@ class Sierpinski(c='*', s=' ') {
     # *
     method letter_i(n) {
         var c = [self.c];
-        {
-            c = [c.map{|x| x*n },
-                 c.map{|x| x*n },
-                 c.map{|x| x*n },
+        { |i|
+            c = [c.map{|x| x*i },
+                 c.map{|x| x*i },
+                 c.map{|x| x*i },
                 ]«+»;
         } * n;
         return c;
@@ -135,7 +135,7 @@ class Sierpinski(c='*', s=' ') {
     #    *
     # *  *
     # ****
-    method letter_j(n) {
+    method letter_J(n) {
         var c = [self.c];
         {
             c = [c.map{|x| s*(x.len*3) + x     },
@@ -147,15 +147,29 @@ class Sierpinski(c='*', s=' ') {
         return c;
     }
 
+    #  *
+    #  *
+    # **
+    method letter_j(n) {
+        var c = [self.c];
+        {
+            c = [c.map{|x| s*(x.len) + x },
+                 c.map{|x| s*(x.len) + x },
+                 c.map{|x| x * 2         },
+                ]«+»;
+        } * n;
+        return c;
+    }
+
     #   **
     # * * *
     #  **
     method letter_s(n) {
         var c = [self.c];
         {
-            c = [c.map{|x| s*(x.len*2) + x*2 + s*(x.len*1)   },
-                 c.map{|x| x + s*(x.len) + x + s*(x.len) + x },
-                 c.map{|x| s*(x.len*1) + x*2 + s*(x.len*2)   },
+            c = [c.map{|x| s*(x.len*2) + x*2 + s*(x.len*1) },
+                 c.map{|x| x + s*x.len + x + s*(x.len) + x },
+                 c.map{|x| s*(x.len*1) + x*2 + s*(x.len*2) },
                 ]«+»;
         } * n;
         return c;
@@ -167,11 +181,25 @@ class Sierpinski(c='*', s=' ') {
     method letter_t(n) {
         var c = [self.c];
         {
-            c = [c.map{|x| x*5},
+            c = [c.map{|x| x*5                          },
                  c.map{|x| s*(x.len*2) + x + s*(x.len*2)},
                  c.map{|x| s*(x.len*2) + x + s*(x.len*2)},
                 ]«+»;
-        } *n;
+        } * n;
+        return c;
+    }
+
+    # ***
+    #   *
+    #   ***
+    method letter_z(n) {
+        var c = [self.c];
+        {
+            c = [c.map{|x| x*3 + s*(x.len*2)},
+                 c.map{|x| s*(x.len*2) + x + s*(x.len*2) },
+                 c.map{|x| s*(x.len*2) + x*3},
+                ]«+»;
+        } * n;
         return c;
     }
 
@@ -182,7 +210,7 @@ class Sierpinski(c='*', s=' ') {
     # *  *
     # *  *
     # *  ****
-    method letter_z(n) {
+    method letter_Z(n) {
         var c = [self.c];
         {
             c = [c.map{|x| x*4 + s*(x.len*2) + x  },
