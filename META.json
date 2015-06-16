@@ -5,7 +5,7 @@
       "Ioana Fălcușan (<ioanaflavia@gmail.com>)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4212",
+   "generated_by" : "Module::Build version 0.4214",
    "license" : [
       "perl_5"
    ],
@@ -300,5 +300,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.05"
+   "version" : "0.05",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
 }
