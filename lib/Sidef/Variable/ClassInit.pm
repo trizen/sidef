@@ -107,9 +107,15 @@ package Sidef::Variable::ClassInit {
                 last;
             }
 
-            exists($self->{__VARS__}[$i]->{multi}) && do {
+            exists($self->{__VARS__}[$i]->{array}) && do {
                 $self->{__VARS__}[$i]->set_value($class->{__VARS__}{$self->{__VARS__}[$i]{name}} =
                                                  Sidef::Types::Array::Array->new(@args[$i .. $#args]));
+                next;
+            };
+
+            exists($self->{__VARS__}[$i]->{hash}) && do {
+                $self->{__VARS__}[$i]->set_value($class->{__VARS__}{$self->{__VARS__}[$i]{name}} =
+                                                 Sidef::Types::Hash::Hash->new(@args[$i .. $#args]));
                 next;
             };
 

@@ -39,7 +39,7 @@ package Sidef::Deparse::Sidef {
         join(
             ', ',
             map {
-                    (exists($_->{multi}) ? '*' : '')
+                    (exists($_->{array}) ? '*' : exists($_->{hash}) ? ':' : '')
                   . (exists($_->{class}) && $_->{class} ne $self->{class} ? $_->{class} . '::' : '')
                   . $_->{name}
                   . (

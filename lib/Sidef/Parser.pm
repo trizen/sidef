@@ -538,7 +538,7 @@ package Sidef::Parser {
         }
 
         my @vars;
-        while (/\G(\*?$self->{var_name_re})/goc) {
+        while (/\G([*:]?$self->{var_name_re})/goc) {
             push @vars, $1;
             if ($opt{with_vals} && defined($end_delim) && /$self->{var_init_sep_re}/goc) {
                 my $code = substr($_, pos);
@@ -582,7 +582,7 @@ package Sidef::Parser {
         }
 
         my @var_objs;
-        while (/\G(\*?)($self->{var_name_re})/goc) {
+        while (/\G([*:]?)($self->{var_name_re})/goc) {
             my ($attr, $name) = ($1, $2);
 
             my $class_name;
@@ -619,7 +619,7 @@ package Sidef::Parser {
                                                      type  => $opt{type},
                                                      class => $class_name,
                                                      defined($value) ? (value => $value, has_value => 1) : (),
-                                                     $attr eq '*' ? (multi => 1) : (),
+                                                     $attr eq '*' ? (array => 1) : $attr eq ':' ? (hash => 1) : (),
                                                     );
 
             if (!$opt{private}) {

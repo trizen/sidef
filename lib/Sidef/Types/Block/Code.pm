@@ -206,7 +206,7 @@ package Sidef::Types::Block::Code {
             else {
                 my $v = $var->{vars}[0];
                 exists($v->{in_use}) || next;
-                exists($v->{multi}) && do {
+                (exists($v->{array}) || exists($v->{hash})) && do {
                     $var->set_value(@args[$i .. $#args]);
                     next;
                 };

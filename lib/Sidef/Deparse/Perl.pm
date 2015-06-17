@@ -174,7 +174,7 @@ HEADER
 
     sub _dump_var {
         my ($self, $var) = @_;
-        exists($var->{multi}) ? '@' : '$' . $var->{name};
+        exists($var->{array}) ? '@' : exists($var->{hash}) ? '%' : '$' . $var->{name};
     }
 
     sub _dump_vars {

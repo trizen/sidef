@@ -19,13 +19,15 @@ package Sidef::Variable::Init {
             if ($type eq 'var') {
                 my $new_var =
                   Sidef::Variable::Variable->new(
-                                                 name => $var->{name},
-                                                 type => $var->{type},
-                                                 (exists($var->{class}) ? (class => $var->{class}) : ()),
-                                                 value => exists($var->{multi})
-                                                 ? Sidef::Types::Array::Array->new(@args[$i .. $#args])
-                                                 : (exists($args[$i]) ? $args[$i] : $var->{value})
-                                                );
+                                               name => $var->{name},
+                                               type => $var->{type},
+                                               (exists($var->{class}) ? (class => $var->{class}) : ()),
+                                               value => (
+                                                   exists($var->{array}) ? Sidef::Types::Array::Array->new(@args[$i .. $#args])
+                                                   : exists($var->{hash}) ? Sidef::Types::Hash::Hash->new(@args[$i .. $#args])
+                                                   : (exists($args[$i]) ? $args[$i] : $var->{value})
+                                               )
+                  );
                 push @{$var->{stack}}, $new_var;
             }
             elsif ($type eq 'static' or $type eq 'const') {
