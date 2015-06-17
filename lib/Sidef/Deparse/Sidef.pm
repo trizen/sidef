@@ -311,7 +311,7 @@ package Sidef::Deparse::Sidef {
             $code = 'Sig';
         }
         elsif ($ref eq 'Sidef::Types::Number::Complex') {
-            $code = reftype($obj) eq 'HASH' ? 'Complex' : "Complex.new(" . $obj->get_value . ")";
+            $code = reftype($obj) eq 'HASH' ? 'Complex' : $obj->dump->get_value;
         }
         elsif ($ref eq 'Sidef::Types::Number::Number') {
             my $value = $obj->get_value;

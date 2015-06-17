@@ -279,6 +279,11 @@ package Sidef::Types::Number::Complex {
         Sidef::Types::String::String->new($self->get_value);
     }
 
+    sub dump {
+        my ($self) = @_;
+        Sidef::Types::String::String->new('Complex.new(' . $self->real . ' ,', $self->imaginary . ')');
+    }
+
     {
         no strict 'refs';
 

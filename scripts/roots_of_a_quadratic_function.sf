@@ -1,0 +1,30 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Roots_of_a_quadratic_function#Sidef
+#
+
+var sets = [
+            [1,    2,  1],
+            [1,    2,  3],
+            [1,   -2,  1],
+            [1,    0, -4],
+            [1, -1e6,  1],
+           ];
+
+func quadroots(a, b, c) {
+    var root = (
+        (b**2 - 4*a*c) -> complex.sqrt
+    );
+
+    a.complex!;
+    b.complex!;
+
+    [(-b + root) / (2 * a),
+     (-b - root) / (2 * a)];
+}
+
+sets.each { |coefficients|
+    say ("Roots for #{coefficients.dump}",
+        "=> (#{quadroots(coefficients...).join(', ')})");
+}
