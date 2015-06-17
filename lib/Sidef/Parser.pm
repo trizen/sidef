@@ -104,7 +104,7 @@ package Sidef::Parser {
                 | try\b                                           (?{ Sidef::Types::Block::Try->new })
                 | (?:given|switch)\b                              (?{ Sidef::Types::Block::Given->new })
                 | f?require\b                                     (?{ state $x = Sidef::Module::Require->new })
-                | (?:(?:print(?:ln|f)?+|say|exit|read)\b|>>?)     (?{ state $x = Sidef::Sys::Sys->new })
+                | (?:(?:print(?:ln)?+|say|exit|read)\b|>>?)       (?{ state $x = Sidef::Sys::Sys->new })
                 | loop\b                                          (?{ state $x = Sidef::Types::Block::Code->new })
                 | (?:[*\\&]|\+\+|--|lvalue\b)                     (?{ Sidef::Variable::Ref->new })
                 | [?√+~!-]                                        (?{ state $x = Sidef::Object::Unary->new })
@@ -158,8 +158,7 @@ package Sidef::Parser {
                   nil
                   import
                   include
-                  print printf
-                  println say
+                  print println say
                   eval
                   read
                   die
@@ -1654,24 +1653,31 @@ package Sidef::Parser {
                     my $arg = $self->parse_arguments(code => $opt{code});
 
                     if (exists $arg->{$self->{class}}) {
-                        return
-                          scalar {
-                                  $self->{class} => [
-                                                     {
-                                                      self => shift(@{$arg->{$self->{class}}})->{self},
-                                                      call => [
-                                                               {
-                                                                method => $name,
-                                                                (
-                                                                 @{$arg->{$self->{class}}}
-                                                                 ? (arg => [map { $_->{self} } @{$arg->{$self->{class}}}])
-                                                                 : ()
-                                                                ),
-                                                               }
-                                                              ],
-                                                     }
-                                                    ]
-                                 };
+                        return scalar {
+                            $self->{class} => [
+                                {
+                                 self => {
+                                          $self->{class} => [{%{shift(@{$arg->{$self->{class}}})}}]
+                                         },
+                                 call => [
+                                     {
+                                      method => $name,
+                                      (
+                                       @{$arg->{$self->{class}}}
+                                       ? (
+                                          arg => [
+                                              map {
+                                                  { $self->{class} => [{%{$_}}] }
+                                                } @{$arg->{$self->{class}}}
+                                          ]
+                                         )
+                                       : ()
+                                      ),
+                                     }
+                                 ],
+                                }
+                            ]
+                        };
                     }
                 }
 

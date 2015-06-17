@@ -21,3 +21,4 @@ is(match(/^h/, "he").to_bool, true);
 is(match("he", /^H/i).to_bool, true);
 is(match("he", /^H/).to_bool, false);
 is(tc(uc("hello").lc+"!"), "Hello!");
+is(sprintf('%s %s', 'a' + 'b', 'c' + 'd'), 'ab cd');
