@@ -19,7 +19,7 @@ my $builder = Module::Build->new(
                    ],
 
     dist_version_from  => 'lib/Sidef.pm',
-    dist_abstract      => 'Sidef Programming Language',
+    dist_abstract      => 'The Sidef Programming Language',
     release_status     => 'unstable',
     configure_requires => {
                            'Module::Build' => 0,

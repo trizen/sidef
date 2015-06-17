@@ -405,6 +405,7 @@ sub help_interactive {
                     '*'  => 'Sidef::Variable::Ref',
                    );
 
+    require Encode;
     require Term::ReadLine;
     my $term = Term::ReadLine->new("$name $version -- help interactive mode");
 
@@ -418,7 +419,10 @@ type "quit".
 HELP
 
     {
-        my $line = $term->readline('help> ') // do { print "\n"; return };
+        my $line = Encode::decode_utf8(
+            $term->readline('help> ')
+              // do { print "\n"; return }
+        );
 
         if ($line eq 'quit' or $line eq 'q') {
             return;
@@ -454,6 +458,7 @@ HELP
 }
 
 sub code_interactive {
+    require Encode;
     require Term::ReadLine;
     my $term = Term::ReadLine->new("$name $version -- interactive mode");
 
@@ -477,7 +482,7 @@ sub code_interactive {
                 local $/;
                 <$fh>;
               }
-              : ($term->readline('>>> ') // return);
+              : (Encode::decode_utf8($term->readline('>>> ') // return));
         };
 
         if ($line eq 'help') {
