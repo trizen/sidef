@@ -343,6 +343,7 @@ scripts/pi_and_e.sf
 scripts/pi_machin_like_formula.sf
 scripts/polymorphism.sf
 scripts/power_numbers.sf
+scripts/problem_of_apollonius.sf
 scripts/pythagorean_means.sf
 scripts/quicksort.sf
 scripts/quicksort_in_parallel.sf

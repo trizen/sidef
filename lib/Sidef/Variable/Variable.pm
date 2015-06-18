@@ -194,9 +194,22 @@ package Sidef::Variable::Variable {
         }
 
         if ($self->{type} eq 'func' and exists $self->{returns}) {
-            ref($result) eq ref($self->{returns}) || do {
-                die "[ERROR] Return-type error from function '$self->{name}': returned '", ref($result),
-                  "', but expected '", ref($self->{returns}), "'!\n";
+
+            my $this_ref   = ref($result);
+            my $return_ref = ref($self->{returns});
+
+            foreach my $type ('Sidef::Variable::ClassInit', 'Sidef::Variable::Class') {
+                if ($return_ref eq $type) {
+                    $return_ref = $self->{returns}{name};
+                }
+                if ($this_ref eq $type) {
+                    $this_ref = $result->{name};
+                }
+            }
+
+            $this_ref eq $return_ref || do {
+                die "[ERROR] Return-type error from function '$self->{name}': returned '", $this_ref,
+                  "', but expected '", $return_ref, "'!\n";
             };
         }
 
