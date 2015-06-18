@@ -104,7 +104,7 @@ package Sidef::Parser {
                 | try\b                                           (?{ Sidef::Types::Block::Try->new })
                 | (?:given|switch)\b                              (?{ Sidef::Types::Block::Given->new })
                 | f?require\b                                     (?{ state $x = Sidef::Module::Require->new })
-                | (?:(?:print(?:ln)?+|say|exit|read)\b|>>?)       (?{ state $x = Sidef::Sys::Sys->new })
+                | (?:(?:print(?:ln)?+|say|read)\b|>>?)            (?{ state $x = Sidef::Sys::Sys->new })
                 | loop\b                                          (?{ state $x = Sidef::Types::Block::Code->new })
                 | (?:[*\\&]|\+\+|--|lvalue\b)                     (?{ Sidef::Variable::Ref->new })
                 | [?√+~!-]                                        (?{ state $x = Sidef::Object::Unary->new })
@@ -163,7 +163,6 @@ package Sidef::Parser {
                   read
                   die
                   warn
-                  exit
 
                   File
                   Fcntl

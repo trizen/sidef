@@ -39,7 +39,7 @@ fh.close;
 var thr = {Sys.system($^PERL, fname, Perl.eval('\\@ARGV')...)}.fork,
 Sys.sleep(#{wait_time});
 File.new(fname).unlink,
-exit (thr.get >> 8);
+Sys.exit(thr.get >> 8);
 CODE_CONTENT
 
 fh.close;
@@ -47,4 +47,4 @@ fh.close;
 var thr = {Sys.system($0, '-c', '-o', output_file, fname)}.fork;
 Sys.sleep(wait_time);
 File.new(fname).unlink,
-exit (thr.wait >> 8);
+Sys.exit(thr.wait >> 8);

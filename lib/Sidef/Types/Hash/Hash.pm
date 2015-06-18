@@ -24,10 +24,10 @@ package Sidef::Types::Hash::Hash {
             }
 
             # Default value only for: Hash.new(obj);
-            if (ref($pairs[0]) ne 'Sidef::Types::Array::Pair') {
-                $self->default(shift @pairs);
-                return $self;
-            }
+            #if (ref($pairs[0]) ne 'Sidef::Types::Array::Pair') {
+            #    $self->default(shift @pairs);
+            #    return $self;
+            #}
         }
 
         # Add hash key/value pairs

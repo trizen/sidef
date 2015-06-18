@@ -21,7 +21,7 @@ func get_input {
 func jump {
     var depth = 0;
     while (depth >= 0) {
-        ++cmd < code.len || exit(unbalanced_exit_code);
+        ++cmd < code.len || Sys.exit(unbalanced_exit_code);
         given (code[cmd])
             when ('[') { ++depth }
             when (']') { --depth };
