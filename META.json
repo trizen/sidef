@@ -57,7 +57,7 @@
    "provides" : {
       "Sidef" : {
          "file" : "lib/Sidef.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       },
       "Sidef::Convert::Convert" : {
          "file" : "lib/Sidef/Convert/Convert.pm"
@@ -294,12 +294,12 @@
          "file" : "lib/Sidef.pm"
       }
    },
-   "release_status" : "unstable",
+   "release_status" : "stable",
    "resources" : {
       "license" : [
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.05",
+   "version" : "0.06",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }
