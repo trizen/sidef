@@ -1,0 +1,43 @@
+
+=encoding utf8
+
+=head1 NAME
+
+Sidef::Types::Block::Fork
+
+=head1 DESCRIPTION
+
+This object is ...
+
+=head1 SYNOPSIS
+
+var obj = Fork.new(...);
+
+=head1 METHODS
+
+
+=head2 get
+
+Fork.get() -> I<Obj>
+
+Return the
+
+Aliases: I<join>, I<wait>
+
+=cut
+
+=head2 kill
+
+Fork.kill() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 new
+
+Fork.new() -> I<Obj>
+
+Return the
+
+=cut

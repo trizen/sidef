@@ -11,7 +11,7 @@ This object is ...
 
 =head1 SYNOPSIS
 
-var obj = (Char.new(...));
+var obj = Char.new(...);
 
 
 =head1 INHERITS
@@ -19,22 +19,29 @@ var obj = (Char.new(...));
 Inherits methods from:
 
 	* Sidef::Types::String::String
-	* Sidef::Convert::Convert
 
 =head1 METHODS
 
-=head2 dump
 
-Char.dump() -> I<Bool>
+=head2 call
+
+Char.call() -> I<Obj>
 
 Return the
 
 =cut
 
+=head2 dump
+
+Char.dump() -> I<Obj>
+
+Return the
+
+=cut
 
 =head2 new
 
-Char.new() -> I<Bool>
+Char.new() -> I<Obj>
 
 Return the
 

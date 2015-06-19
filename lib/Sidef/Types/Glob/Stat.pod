@@ -11,14 +11,14 @@ This object is ...
 
 =head1 SYNOPSIS
 
-var obj = (Stat.new(...));
+var obj = Stat.new(...);
 
 =head1 METHODS
 
 
 =head2 all
 
-Stat.all() -> I<Bool>
+Stat.all() -> I<Obj>
 
 Return the
 
@@ -26,7 +26,7 @@ Return the
 
 =head2 atime
 
-Stat.atime() -> I<Bool>
+Stat.atime() -> I<Obj>
 
 Return the
 
@@ -34,7 +34,7 @@ Return the
 
 =head2 blksize
 
-Stat.blksize() -> I<Bool>
+Stat.blksize() -> I<Obj>
 
 Return the
 
@@ -42,7 +42,7 @@ Return the
 
 =head2 blocks
 
-Stat.blocks() -> I<Bool>
+Stat.blocks() -> I<Obj>
 
 Return the
 
@@ -50,7 +50,7 @@ Return the
 
 =head2 ctime
 
-Stat.ctime() -> I<Bool>
+Stat.ctime() -> I<Obj>
 
 Return the
 
@@ -58,7 +58,7 @@ Return the
 
 =head2 dev
 
-Stat.dev() -> I<Bool>
+Stat.dev() -> I<Obj>
 
 Return the
 
@@ -66,7 +66,7 @@ Return the
 
 =head2 gid
 
-Stat.gid() -> I<Bool>
+Stat.gid() -> I<Obj>
 
 Return the
 
@@ -74,7 +74,7 @@ Return the
 
 =head2 ino
 
-Stat.ino() -> I<Bool>
+Stat.ino() -> I<Obj>
 
 Return the
 
@@ -82,7 +82,7 @@ Return the
 
 =head2 lstat
 
-Stat.lstat() -> I<Bool>
+Stat.lstat() -> I<Obj>
 
 Return the
 
@@ -90,7 +90,7 @@ Return the
 
 =head2 mode
 
-Stat.mode() -> I<Bool>
+Stat.mode() -> I<Obj>
 
 Return the
 
@@ -98,7 +98,7 @@ Return the
 
 =head2 mtime
 
-Stat.mtime() -> I<Bool>
+Stat.mtime() -> I<Obj>
 
 Return the
 
@@ -106,7 +106,7 @@ Return the
 
 =head2 nlink
 
-Stat.nlink() -> I<Bool>
+Stat.nlink() -> I<Obj>
 
 Return the
 
@@ -114,7 +114,7 @@ Return the
 
 =head2 parent
 
-Stat.parent() -> I<Bool>
+Stat.parent() -> I<Obj>
 
 Return the
 
@@ -122,7 +122,7 @@ Return the
 
 =head2 rdev
 
-Stat.rdev() -> I<Bool>
+Stat.rdev() -> I<Obj>
 
 Return the
 
@@ -130,7 +130,7 @@ Return the
 
 =head2 size
 
-Stat.size() -> I<Bool>
+Stat.size() -> I<Obj>
 
 Return the
 
@@ -138,7 +138,7 @@ Return the
 
 =head2 stat
 
-Stat.stat() -> I<Bool>
+Stat.stat() -> I<Obj>
 
 Return the
 
@@ -146,7 +146,7 @@ Return the
 
 =head2 uid
 
-Stat.uid() -> I<Bool>
+Stat.uid() -> I<Obj>
 
 Return the
 

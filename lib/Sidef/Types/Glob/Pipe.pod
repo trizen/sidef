@@ -11,14 +11,21 @@ This object is ...
 
 =head1 SYNOPSIS
 
-var obj = (Pipe.new(...));
+var obj = Pipe.new(...);
+
+
+=head1 INHERITS
+
+Inherits methods from:
+
+	* Sidef::Object::Object
 
 =head1 METHODS
 
 
 =head2 command
 
-Pipe.command() -> I<Bool>
+Pipe.command() -> I<Obj>
 
 Return the
 
@@ -26,15 +33,7 @@ Return the
 
 =head2 dump
 
-Pipe.dump() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 get_value
-
-Pipe.get_value() -> I<Bool>
+Pipe.dump() -> I<Obj>
 
 Return the
 
@@ -42,23 +41,17 @@ Return the
 
 =head2 new
 
-Pipe.new() -> I<Bool>
+Pipe.new() -> I<Obj>
 
 Return the
+
+Aliases: I<call>
 
 =cut
 
 =head2 open
 
-Pipe.open() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 openR
-
-Pipe.openR() -> I<Bool>
+Pipe.open() -> I<Obj>
 
 Return the
 
@@ -66,56 +59,20 @@ Return the
 
 =head2 open_r
 
-Pipe.open_r() -> I<Bool>
+Pipe.open_r() -> I<Obj>
 
 Return the
 
-=cut
-
-=head2 openRead
-
-Pipe.openRead() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 open_read
-
-Pipe.open_read() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 openW
-
-Pipe.openW() -> I<Bool>
-
-Return the
+Aliases: I<openR>, I<open_read>, I<openRead>
 
 =cut
 
 =head2 open_w
 
-Pipe.open_w() -> I<Bool>
+Pipe.open_w() -> I<Obj>
 
 Return the
 
-=cut
-
-=head2 openWrite
-
-Pipe.openWrite() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 open_write
-
-Pipe.open_write() -> I<Bool>
-
-Return the
+Aliases: I<openW>, I<open_write>, I<openWrite>
 
 =cut

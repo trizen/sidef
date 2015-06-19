@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-Sidef::Types::Byte::Byte
+Sidef::Perl::Perl
 
 =head1 DESCRIPTION
 
@@ -11,21 +11,21 @@ This object is ...
 
 =head1 SYNOPSIS
 
-var obj = Byte.new(...);
+var obj = Perl.new(...);
 
 
 =head1 INHERITS
 
 Inherits methods from:
 
-	* Sidef::Types::Number::Number
+	* Sidef
 
 =head1 METHODS
 
 
-=head2 dump
+=head2 eval
 
-Byte.dump() -> I<Obj>
+Perl.eval() -> I<Obj>
 
 Return the
 
@@ -33,10 +33,16 @@ Return the
 
 =head2 new
 
-Byte.new() -> I<Obj>
+Perl.new() -> I<Obj>
 
 Return the
 
-Aliases: I<call>
+=cut
+
+=head2 to_sidef
+
+Perl.to_sidef() -> I<Obj>
+
+Return the
 
 =cut

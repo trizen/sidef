@@ -11,37 +11,24 @@ This object is ...
 
 =head1 SYNOPSIS
 
-var obj = (Do.new(...));
-
-
-=head1 INHERITS
-
-Inherits methods from:
-
-	* Sidef
+var obj = Do.new(...);
 
 =head1 METHODS
 
 
 =head2 :
 
-I<Num> B<:> I<Num> -> I<Num>
+I<Obj> B<:> I<Obj> -> I<Obj>
 
 Return the
 
-=cut
-
-=head2 do
-
-Do.do() -> I<Bool>
-
-Return the
+Aliases: I<do>, I<then>
 
 =cut
 
 =head2 new
 
-Do.new() -> I<Bool>
+Do.new() -> I<Obj>
 
 Return the
 

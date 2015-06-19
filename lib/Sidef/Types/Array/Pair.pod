@@ -1,0 +1,84 @@
+
+=encoding utf8
+
+=head1 NAME
+
+Sidef::Types::Array::Pair
+
+=head1 DESCRIPTION
+
+This object is ...
+
+=head1 SYNOPSIS
+
+var obj = Pair.new(...);
+
+
+=head1 INHERITS
+
+Inherits methods from:
+
+	* Sidef::Types::Array::Array
+
+=head1 METHODS
+
+
+=head2 dump
+
+Pair.dump() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 first
+
+Pair.first() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 new
+
+Pair.new() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 second
+
+Pair.second() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 swap
+
+Pair.swap() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 to_a
+
+Pair.to_a() -> I<Obj>
+
+Return the
+
+Aliases: I<to_array>, I<toArray>
+
+=cut
+
+=head2 to_h
+
+Pair.to_h() -> I<Obj>
+
+Return the
+
+Aliases: I<to_hash>, I<toHash>
+
+=cut

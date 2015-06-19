@@ -11,23 +11,71 @@ This object is ...
 
 =head1 SYNOPSIS
 
-var obj = (ClassInit.new(...));
+var obj = ClassInit.new(...);
 
 =head1 METHODS
 
 
-=head2 init
+=head2 <
 
-ClassInit.init() -> I<Bool>
+I<Obj> B<E<lt>> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<+=()>, I<E<lt>E<lt>>, I<inherit>
+
+=cut
+
+=head2 =
+
+I<Obj> B<=> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<replace>
+
+=cut
+
+=head2 def_method
+
+ClassInit.def_method() -> I<Obj>
 
 Return the
 
 =cut
 
-=head2 new
+=head2 def_var
 
-ClassInit.new() -> I<Bool>
+ClassInit.def_var() -> I<Obj>
 
 Return the
+
+=cut
+
+=head2 has_method
+
+ClassInit.has_method() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 is_a
+
+ClassInit.is_a() -> I<Obj>
+
+Return the
+
+Aliases: I<is_an>
+
+=cut
+
+=head2 new
+
+ClassInit.new() -> I<Obj>
+
+Return the
+
+Aliases: I<init>
 
 =cut

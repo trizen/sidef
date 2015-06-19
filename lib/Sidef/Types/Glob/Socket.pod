@@ -1,0 +1,176 @@
+
+=encoding utf8
+
+=head1 NAME
+
+Sidef::Types::Glob::Socket
+
+=head1 DESCRIPTION
+
+This object is ...
+
+=head1 SYNOPSIS
+
+var obj = Socket.new(...);
+
+
+=head1 INHERITS
+
+Inherits methods from:
+
+	* Sidef::Object::Object
+
+=head1 METHODS
+
+
+=head2 get_constant
+
+Socket.get_constant() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 gethostbyaddr
+
+Socket.gethostbyaddr() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 gethostbyname
+
+Socket.gethostbyname() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 gethostent
+
+Socket.gethostent() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 getnetbyaddr
+
+Socket.getnetbyaddr() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 getnetbyname
+
+Socket.getnetbyname() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 getnetent
+
+Socket.getnetent() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 getprotobyname
+
+Socket.getprotobyname() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 getprotobynumber
+
+Socket.getprotobynumber() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 getprotoent
+
+Socket.getprotoent() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 getservbyname
+
+Socket.getservbyname() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 getservbyport
+
+Socket.getservbyport() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 getservent
+
+Socket.getservent() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 new
+
+Socket.new() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 open
+
+Socket.open() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 sethostent
+
+Socket.sethostent() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 setnetent
+
+Socket.setnetent() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 setprotoent
+
+Socket.setprotoent() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 setservent
+
+Socket.setservent() -> I<Obj>
+
+Return the
+
+=cut

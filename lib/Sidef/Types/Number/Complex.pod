@@ -1,0 +1,318 @@
+
+=encoding utf8
+
+=head1 NAME
+
+Sidef::Types::Number::Complex
+
+=head1 DESCRIPTION
+
+This object is ...
+
+=head1 SYNOPSIS
+
+var obj = Complex.new(...);
+
+
+=head1 INHERITS
+
+Inherits methods from:
+
+	* Sidef::Types::Number::Number
+
+=head1 METHODS
+
+
+=head2 !
+
+I<Obj> B<!> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<fact>, I<factorial>
+
+=cut
+
+=head2 ++
+
+I<Obj> B<++> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<inc>
+
+=cut
+
+=head2 --
+
+I<Obj> B<--> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<dec>
+
+=cut
+
+=head2 <=>
+
+I<Obj> B<E<lt>=E<gt>> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<cmp>
+
+=cut
+
+=head2 cartesian
+
+Complex.cartesian() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 ceil
+
+Complex.ceil() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 digit
+
+Complex.digit() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 dump
+
+Complex.dump() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 floor
+
+Complex.floor() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 fround
+
+Complex.fround() -> I<Obj>
+
+Return the
+
+Aliases: I<fRound>, I<roundf>
+
+=cut
+
+=head2 get_constant
+
+Complex.get_constant() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 im
+
+Complex.im() -> I<Obj>
+
+Return the
+
+Aliases: I<Im>, I<imaginary>
+
+=cut
+
+=head2 int
+
+Complex.int() -> I<Obj>
+
+Return the
+
+Aliases: I<as_int>
+
+=cut
+
+=head2 is_even
+
+Complex.is_even() -> I<Obj>
+
+Return the
+
+Aliases: I<isEven>
+
+=cut
+
+=head2 is_inf
+
+Complex.is_inf() -> I<Obj>
+
+Return the
+
+Aliases: I<isInf>, I<is_infinite>, I<isInfinite>
+
+=cut
+
+=head2 is_int
+
+Complex.is_int() -> I<Obj>
+
+Return the
+
+Aliases: I<isInt>, I<is_integer>, I<isInteger>
+
+=cut
+
+=head2 is_nan
+
+Complex.is_nan() -> I<Obj>
+
+Return the
+
+Aliases: I<is_NaN>, I<isNaN>
+
+=cut
+
+=head2 is_neg
+
+Complex.is_neg() -> I<Obj>
+
+Return the
+
+Aliases: I<isNeg>, I<is_negative>, I<isNegative>
+
+=cut
+
+=head2 is_pos
+
+Complex.is_pos() -> I<Obj>
+
+Return the
+
+Aliases: I<isPos>, I<is_positive>, I<isPositive>
+
+=cut
+
+=head2 is_zero
+
+Complex.is_zero() -> I<Obj>
+
+Return the
+
+Aliases: I<isZero>
+
+=cut
+
+=head2 len
+
+Complex.len() -> I<Obj>
+
+Return the
+
+Aliases: I<length>
+
+=cut
+
+=head2 neg
+
+Complex.neg() -> I<Obj>
+
+Return the
+
+Aliases: I<negate>
+
+=cut
+
+=head2 new
+
+Complex.new() -> I<Obj>
+
+Return the
+
+Aliases: I<call>
+
+=cut
+
+=head2 nok
+
+Complex.nok() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 not
+
+Complex.not() -> I<Obj>
+
+Return the
+
+Aliases: I<conj>, I<conjugated>
+
+=cut
+
+=head2 polar
+
+Complex.polar() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 rand
+
+Complex.rand() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 re
+
+Complex.re() -> I<Obj>
+
+Return the
+
+Aliases: I<Re>, I<real>
+
+=cut
+
+=head2 reciprocal
+
+Complex.reciprocal() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 round
+
+Complex.round() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 sign
+
+Complex.sign() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 sstr
+
+Complex.sstr() -> I<Obj>
+
+Return the
+
+=cut

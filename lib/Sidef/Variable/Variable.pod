@@ -11,22 +11,14 @@ This object is ...
 
 =head1 SYNOPSIS
 
-var obj = (Variable.new(...));
+var obj = Variable.new(...);
 
 =head1 METHODS
-
-=head2 $$?=
-
-I<Num> B<$$?=> I<Num> -> I<Num>
-
-Return the
-
-=cut
 
 
 =head2 %=
 
-I<Num> B<%=> I<Num> -> I<Num>
+I<Obj> B<%=> I<Obj> -> I<Obj>
 
 Return the
 
@@ -34,7 +26,7 @@ Return the
 
 =head2 &&=
 
-I<Num> B<&&=> I<Num> -> I<Num>
+I<Obj> B<&&=> I<Obj> -> I<Obj>
 
 Return the
 
@@ -42,7 +34,7 @@ Return the
 
 =head2 &=
 
-I<Num> B<&=> I<Num> -> I<Num>
+I<Obj> B<&=> I<Obj> -> I<Obj>
 
 Return the
 
@@ -50,7 +42,7 @@ Return the
 
 =head2 **=
 
-I<Num> B<**=> I<Num> -> I<Num>
+I<Obj> B<**=> I<Obj> -> I<Obj>
 
 Return the
 
@@ -58,7 +50,7 @@ Return the
 
 =head2 *=
 
-I<Num> B<*=> I<Num> -> I<Num>
+I<Obj> B<*=> I<Obj> -> I<Obj>
 
 Return the
 
@@ -66,7 +58,7 @@ Return the
 
 =head2 ++
 
-I<Num> B<++> I<Num> -> I<Num>
+I<Obj> B<++> I<Obj> -> I<Obj>
 
 Return the
 
@@ -74,7 +66,7 @@ Return the
 
 =head2 +=
 
-I<Num> B<+=> I<Num> -> I<Num>
+I<Obj> B<+=> I<Obj> -> I<Obj>
 
 Return the
 
@@ -82,7 +74,7 @@ Return the
 
 =head2 --
 
-I<Num> B<--> I<Num> -> I<Num>
+I<Obj> B<--> I<Obj> -> I<Obj>
 
 Return the
 
@@ -90,7 +82,7 @@ Return the
 
 =head2 -=
 
-I<Num> B<-=> I<Num> -> I<Num>
+I<Obj> B<-=> I<Obj> -> I<Obj>
 
 Return the
 
@@ -98,7 +90,7 @@ Return the
 
 =head2 /=
 
-I<Num> B</=> I<Num> -> I<Num>
+I<Obj> B</=> I<Obj> -> I<Obj>
 
 Return the
 
@@ -106,7 +98,7 @@ Return the
 
 =head2 :=
 
-I<Num> B<:=> I<Num> -> I<Num>
+I<Obj> B<:=> I<Obj> -> I<Obj>
 
 Return the
 
@@ -114,23 +106,7 @@ Return the
 
 =head2 <<=
 
-I<Num> B<E<lt>E<lt>=> I<Num> -> I<Num>
-
-Return the
-
-=cut
-
-=head2 <=?=
-
-I<Num> B<E<lt>=?=> I<Num> -> I<Num>
-
-Return the
-
-=cut
-
-=head2 <?=
-
-I<Num> B<E<lt>?=> I<Num> -> I<Num>
+I<Obj> B<E<lt>E<lt>=> I<Obj> -> I<Obj>
 
 Return the
 
@@ -138,15 +114,7 @@ Return the
 
 =head2 =
 
-I<Num> B<=> I<Num> -> I<Num>
-
-Return the
-
-=cut
-
-=head2 >=?=
-
-I<Num> B<E<gt>=?=> I<Num> -> I<Num>
+I<Obj> B<=> I<Obj> -> I<Obj>
 
 Return the
 
@@ -154,63 +122,7 @@ Return the
 
 =head2 >>=
 
-I<Num> B<E<gt>E<gt>=> I<Num> -> I<Num>
-
-Return the
-
-=cut
-
-=head2 >?=
-
-I<Num> B<E<gt>?=> I<Num> -> I<Num>
-
-Return the
-
-=cut
-
-=head2 ?$$=
-
-I<Num> B<?$$=> I<Num> -> I<Num>
-
-Return the
-
-=cut
-
-=head2 ?<=
-
-I<Num> B<?E<lt>=> I<Num> -> I<Num>
-
-Return the
-
-=cut
-
-=head2 ?<==
-
-I<Num> B<?E<lt>==> I<Num> -> I<Num>
-
-Return the
-
-=cut
-
-=head2 ?>=
-
-I<Num> B<?E<gt>=> I<Num> -> I<Num>
-
-Return the
-
-=cut
-
-=head2 ?>==
-
-I<Num> B<?E<gt>==> I<Num> -> I<Num>
-
-Return the
-
-=cut
-
-=head2 ?^^=
-
-I<Num> B<?^^=> I<Num> -> I<Num>
+I<Obj> B<E<gt>E<gt>=> I<Obj> -> I<Obj>
 
 Return the
 
@@ -218,7 +130,15 @@ Return the
 
 =head2 \\
 
-I<Num> B<\\> I<Num> -> I<Num>
+I<Obj> B<\\> I<Obj> -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 \\=
+
+I<Obj> B<\\=> I<Obj> -> I<Obj>
 
 Return the
 
@@ -226,15 +146,15 @@ Return the
 
 =head2 ^=
 
-I<Num> B<^=> I<Num> -> I<Num>
+I<Obj> B<^=> I<Obj> -> I<Obj>
 
 Return the
 
 =cut
 
-=head2 ^^?=
+=head2 defined
 
-I<Num> B<^^?=> I<Num> -> I<Num>
+Variable.defined() -> I<Obj>
 
 Return the
 
@@ -242,7 +162,7 @@ Return the
 
 =head2 |=
 
-I<Num> B<|=> I<Num> -> I<Num>
+I<Obj> B<|=> I<Obj> -> I<Obj>
 
 Return the
 
@@ -250,7 +170,7 @@ Return the
 
 =head2 ||=
 
-I<Num> B<||=> I<Num> -> I<Num>
+I<Obj> B<||=> I<Obj> -> I<Obj>
 
 Return the
 
@@ -258,7 +178,7 @@ Return the
 
 =head2 ÷=
 
-I<Num> B<÷=> I<Num> -> I<Num>
+I<Obj> B<÷=> I<Obj> -> I<Obj>
 
 Return the
 

@@ -11,37 +11,49 @@ This object is ...
 
 =head1 SYNOPSIS
 
-var obj = (Code.new(...));
+var obj = Code.new(...);
 
 
 =head1 INHERITS
 
 Inherits methods from:
 
-    * Sidef
+	* Sidef::Object::Object
 
 =head1 METHODS
 
 
 =head2 *
 
-I<Num> B<*> I<Num> -> I<Num>
+I<Obj> B<*> I<Obj> -> I<Obj>
 
 Return the
 
-=cut
-
-=head2 :
-
-I<Num> B<:> I<Num> -> I<Num>
-
-Return the
+Aliases: I<repeat>
 
 =cut
 
 =head2 call
 
-Code.call() -> I<Bool>
+Code.call() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 cap
+
+Code.cap() -> I<Obj>
+
+Return the
+
+Aliases: I<capture>
+
+=cut
+
+=head2 copy
+
+Code.copy() -> I<Obj>
 
 Return the
 
@@ -49,15 +61,25 @@ Return the
 
 =head2 do
 
-Code.do() -> I<Bool>
+Code.do() -> I<Obj>
+
+Return the
+
+Aliases: I<exec>
+
+=cut
+
+=head2 dump
+
+Code.dump() -> I<Obj>
 
 Return the
 
 =cut
 
-=head2 exec
+=head2 fast_init_block_vars
 
-Code.exec() -> I<Bool>
+Code.fast_init_block_vars() -> I<Obj>
 
 Return the
 
@@ -65,15 +87,15 @@ Return the
 
 =head2 for
 
-Code.for() -> I<Bool>
+Code.for() -> I<Obj>
 
 Return the
 
 =cut
 
-=head2 get_value
+=head2 fork
 
-Code.get_value() -> I<Bool>
+Code.fork() -> I<Obj>
 
 Return the
 
@@ -81,7 +103,7 @@ Return the
 
 =head2 given
 
-Code.given() -> I<Bool>
+Code.given() -> I<Obj>
 
 Return the
 
@@ -89,7 +111,7 @@ Return the
 
 =head2 if
 
-Code.if() -> I<Bool>
+Code.if() -> I<Obj>
 
 Return the
 
@@ -97,7 +119,15 @@ Return the
 
 =head2 init_block_vars
 
-Code.init_block_vars() -> I<Bool>
+Code.init_block_vars() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 loop
+
+Code.loop() -> I<Obj>
 
 Return the
 
@@ -105,15 +135,7 @@ Return the
 
 =head2 pop_stack
 
-Code.pop_stack() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 repeat
-
-Code.repeat() -> I<Bool>
+Code.pop_stack() -> I<Obj>
 
 Return the
 
@@ -121,47 +143,45 @@ Return the
 
 =head2 run
 
-Code.run() -> I<Bool>
+Code.run() -> I<Obj>
 
 Return the
 
 =cut
 
-=head2 toArray
+=head2 thr
 
-Code.toArray() -> I<Bool>
+Code.thr() -> I<Obj>
 
 Return the
+
+Aliases: I<thread>
 
 =cut
 
 =head2 to_array
 
-Code.to_array() -> I<Bool>
+Code.to_array() -> I<Obj>
 
 Return the
+
+Aliases: I<toArray>
 
 =cut
 
-=head2 toHash
+=head2 to_h
 
-Code.toHash() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 to_hash
-
-Code.to_hash() -> I<Bool>
+Code.to_h() -> I<Obj>
 
 Return the
+
+Aliases: I<to_hash>, I<toHash>
 
 =cut
 
 =head2 while
 
-Code.while() -> I<Bool>
+Code.while() -> I<Obj>
 
 Return the
 

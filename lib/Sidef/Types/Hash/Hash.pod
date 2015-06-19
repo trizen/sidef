@@ -11,77 +11,89 @@ This object is ...
 
 =head1 SYNOPSIS
 
-var obj = (Hash.new(...));
+var obj = Hash.new(...);
 
 
 =head1 INHERITS
 
 Inherits methods from:
 
-	* Sidef::Convert::Convert
+	* Sidef::Object::Object
 
 =head1 METHODS
 
+
 =head2 !=
 
-I<Num> B<!=> I<Num> -> I<Num>
+I<Obj> B<!=> I<Obj> -> I<Obj>
 
 Return the
+
+Aliases: I<ne>
 
 =cut
 
-
 =head2 +
 
-I<Num> B<+> I<Num> -> I<Num>
+I<Obj> B<+> I<Obj> -> I<Obj>
 
 Return the
+
+Aliases: I<merge>, I<concat>
+
+=cut
+
+=head2 :
+
+I<Obj> B<:> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<new>, I<call>
 
 =cut
 
 =head2 ==
 
-I<Num> B<==> I<Num> -> I<Num>
+I<Obj> B<==> I<Obj> -> I<Obj>
 
 Return the
+
+Aliases: I<eq>
 
 =cut
 
 =head2 ===
 
-I<Num> B<===> I<Num> -> I<Num>
+I<Obj> B<===> I<Obj> -> I<Obj>
 
 Return the
+
+Aliases: I<duplicate_of>, I<duplicateOf>
 
 =cut
 
 =head2 add
 
-Hash.add() -> I<Bool>
+Hash.add() -> I<Obj>
 
 Return the
 
-=cut
-
-=head2 append
-
-Hash.append() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 concat
-
-Hash.concat() -> I<Bool>
-
-Return the
+Aliases: I<append>
 
 =cut
 
 =head2 copy
 
-Hash.copy() -> I<Bool>
+Hash.copy() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 default
+
+Hash.default() -> I<Obj>
 
 Return the
 
@@ -89,15 +101,7 @@ Return the
 
 =head2 delete
 
-Hash.delete() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 deleteIf
-
-Hash.deleteIf() -> I<Bool>
+Hash.delete() -> I<Obj>
 
 Return the
 
@@ -105,31 +109,17 @@ Return the
 
 =head2 delete_if
 
-Hash.delete_if() -> I<Bool>
+Hash.delete_if() -> I<Obj>
 
 Return the
+
+Aliases: I<deleteIf>
 
 =cut
 
 =head2 dump
 
-Hash.dump() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 duplicateOf
-
-Hash.duplicateOf() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 duplicate_of
-
-Hash.duplicate_of() -> I<Bool>
+Hash.dump() -> I<Obj>
 
 Return the
 
@@ -137,23 +127,17 @@ Return the
 
 =head2 each
 
-Hash.each() -> I<Bool>
+Hash.each() -> I<Obj>
 
 Return the
+
+Aliases: I<each_pair>
 
 =cut
 
 =head2 each_key
 
-Hash.each_key() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 each_pair
-
-Hash.each_pair() -> I<Bool>
+Hash.each_key() -> I<Obj>
 
 Return the
 
@@ -161,15 +145,7 @@ Return the
 
 =head2 each_value
 
-Hash.each_value() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 eq
-
-Hash.eq() -> I<Bool>
+Hash.each_value() -> I<Obj>
 
 Return the
 
@@ -177,15 +153,17 @@ Return the
 
 =head2 exists
 
-Hash.exists() -> I<Bool>
+Hash.exists() -> I<Obj>
 
 Return the
+
+Aliases: I<has_key>, I<contains>
 
 =cut
 
 =head2 flip
 
-Hash.flip() -> I<Bool>
+Hash.flip() -> I<Obj>
 
 Return the
 
@@ -193,15 +171,7 @@ Return the
 
 =head2 get
 
-Hash.get() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 get_value
-
-Hash.get_value() -> I<Bool>
+Hash.get() -> I<Obj>
 
 Return the
 
@@ -209,87 +179,55 @@ Return the
 
 =head2 grep
 
-Hash.grep() -> I<Bool>
+Hash.grep() -> I<Obj>
 
 Return the
 
-=cut
-
-=head2 has_key
-
-Hash.has_key() -> I<Bool>
-
-Return the
+Aliases: I<select>
 
 =cut
 
 =head2 keys
 
-Hash.keys() -> I<Bool>
+Hash.keys() -> I<Obj>
 
 Return the
 
 =cut
 
-=head2 merge
+=head2 len
 
-Hash.merge() -> I<Bool>
+Hash.len() -> I<Obj>
 
 Return the
+
+Aliases: I<length>
 
 =cut
 
-=head2 mergeValues
+=head2 map_val
 
-Hash.mergeValues() -> I<Bool>
+Hash.map_val() -> I<Obj>
 
 Return the
+
+Aliases: I<mapval>, I<mapVal>
 
 =cut
 
 =head2 merge_values
 
-Hash.merge_values() -> I<Bool>
+Hash.merge_values() -> I<Obj>
 
 Return the
 
-=cut
-
-=head2 ne
-
-Hash.ne() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 new
-
-Hash.new() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 pairs
-
-Hash.pairs() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 select
-
-Hash.select() -> I<Bool>
-
-Return the
+Aliases: I<mergeValues>
 
 =cut
 
 =head2 sort_by
 
-Hash.sort_by() -> I<Bool>
+Hash.sort_by() -> I<Obj>
 
 Return the
 
@@ -297,31 +235,17 @@ Return the
 
 =head2 to_a
 
-Hash.to_a() -> I<Bool>
+Hash.to_a() -> I<Obj>
 
 Return the
 
-=cut
-
-=head2 toArray
-
-Hash.toArray() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 to_array
-
-Hash.to_array() -> I<Bool>
-
-Return the
+Aliases: I<pairs>, I<to_array>, I<to_pairs>, I<toArray>, I<toPairs>
 
 =cut
 
 =head2 values
 
-Hash.values() -> I<Bool>
+Hash.values() -> I<Obj>
 
 Return the
 

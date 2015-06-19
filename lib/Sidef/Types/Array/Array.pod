@@ -48,45 +48,31 @@ Inherits methods from:
 
 =head1 METHODS
 
+=head2 !=
 
-=head2 &
+I<Obj> B<!=> I<Obj> -> I<Obj>
 
-I<Array> B<&> I<Array> -> I<Array>
+Return the
 
-Returns a new array with the elements which exists in both arrays.
-
-    [1, 2, 3] & [1, 3];        # returns [1, 3]
-    [1, 3, 3] & [3, 3, 5];     # returns [3, 3]
-
-Returns a new object of the same type as the self object.
-
-Alias for: L<C<and()>|"and">
+Aliases: I<ne>
 
 =cut
 
-=head2 &&
+=head2 and
 
-I<Array> B<&&> I<Array> -> I<Array>
-
-Intersect two arrays. The self array is the primary array.
-
-    ['a', 'c'] && ['b', 'd'];     # returns ['a', 'b', 'c', 'd']
-
-Returns a new object of the same type as the self object.
+Alias for L<C<&>|"&">.
 
 =cut
 
-=head2 *
+=head2 multiply
 
-I<Array> B<*> I<Num> -> I<Array>
+Array.multiply() -> I<Obj>
 
-Multiplies the array's elements I<n> times.
+Works just like the L<C<combine()>|"combine"> method, except that it multiplies each element of the array, using the C<*> method. Useful for working with matrices.
 
-    ["x", "y"] * 2;     # returns: ["x", "y", "x", "y"]
+    [5,6,7].multiply;       # returns the product number (210)
 
-Returns a new object of the same type as the self object.
-
-Alias for: L<C<multiply()>|"multiply">
+Returns an object of the same type as the elements of the array.
 
 =cut
 
@@ -132,15 +118,21 @@ Returns the self object.
 
 =cut
 
+=head2 +=
+
+I<Obj> B<+=> I<Obj> -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 -
 
-I<Array> B<-> I<Array> -> I<Array>
+I<Obj> B<-> I<Obj> -> I<Obj>
 
-Return the difference between two arrays. This is the opposite of the L<C<&>|"&"> method.
+Return the
 
-    ["x", "y", "z"] - ["y", "x"]    # returns ["z"]
-
-Returns a new object of the same type as the self object.
+Aliases: I<subtract>
 
 =cut
 
@@ -160,39 +152,41 @@ Returns the self object.
 
 =head2 ...
 
-I<Array>B<...> -> I<List>
+I<Obj> B<...> I<Obj> -> I<Obj>
 
-Return the elements of the array as a list. Useful only when an array is passed to a function as a list of arguments.
+Return the
 
-    array = ['x', 'y'];
-    some_func(array...);        # the function receives two arguments: ("x", "y")
+Aliases: I<to_list>
 
-Returns a list with the elements from the self array. In scalar context, only the first element is returned.
+=cut
+
+=head2 /
+
+I<Obj> B</> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<div>, I<divide>
 
 =cut
 
 =head2 :
 
-I<Num> B<:> I<Num> -> I<Num>
+I<Obj> B<:> I<Obj> -> I<Obj>
 
 Return the
+
+Aliases: I<pair_with>, I<pairWith>
 
 =cut
 
 =head2 <<
 
-I<Array> B<E<lt>E<lt>> I<Number> -> I<Array>
+I<Obj> B<E<lt>E<lt>> I<Obj> -> I<Obj>
 
-Shift the array to the left with I<Number> elements, and return the elements removed. The I<Number> must be positive.
+Return the
 
-    array = [1, 2, 3, 4, 5];
-    array << 2;                 # returns the first two elements: [1,2]
-
-    # The array lost its first two elements, so it contains only: [3, 4, 5]
-
-B<WARNING!> This method modifies the array in place.
-
-Returns a new object of the same type as the self object.
+Aliases: I<shift>, I<drop_left>, I<dropLeft>, I<drop_first>, I<dropFirst>
 
 =cut
 
@@ -215,44 +209,63 @@ Returns the self object.
 
 =head2 ==
 
-I<Array> B<==> I<Array> -> I<Bool>
+I<Obj> B<==> I<Obj> -> I<Obj>
 
-Check to see if two arrays contains the same elements. The arrays are checked recursively.
+Return the
 
-    [1,[2,3],4]  == [1,[2,3],4];   # true
-    [1,[8,9],4]  == [1,[2,3],4];   # false
-
-Returns an object of type: C<Sidef::Types::Bool::Bool>
+Aliases: I<eq>, I<is>, I<equals>
 
 =cut
 
-=head2 >>
+=head2 pop
 
-I<Array> B<E<gt>E<gt>> I<Number> -> I<Array>
+=over 2
 
-Shift the array to the right with I<Number> elements, and return the elements removed. The I<Number> must be positive.
+=item * Array.pop(I<Number>) -> I<Obj>
 
-    array = [1, 2, 3, 4, 5];
-    array >> 2;                 # returns the last two elements: [4, 5]
+Remove the element from the specified position.
 
-    # The array lost its last two elements, so it contains only: [1,2,3]
+    array = qw(a b c);
+    array.pop(1);       # returns the removed element from position 1: 'b'
+
+    # array contains: ['a', 'c']
+
+=back
+
+=over 2
+
+=item * Array.pop() -> I<Obj>
+
+Removes the last element of the array.
+
+    array = qw(a b c);
+    array.pop;          # returns the removed last element: 'c'
+
+    # array contains: ['a', 'b']
+
+=back
 
 B<WARNING!> This method modifies the array in place.
-
-Returns a new object of the same type as the self object.
 
 =cut
 
 =head2 ^
 
-I<Array> B<^> I<Array> -> I<Array>
+I<Obj> B<^> I<Obj> -> I<Obj>
 
-Returns a new array with the elements which doesn't exists in both arrays.
+Return the
 
-    [2,3] ^ [3,1];          # returns: [2,1]
-    [1,2] ^ [1,2,3,4];      # returns: [3,4]
+Aliases: I<xor>
 
-Returns a new object of the same type as the self object.
+=cut
+
+=head2 abbrev
+
+Array.abbrev() -> I<Obj>
+
+Return the
+
+Aliases: I<abbreviations>
 
 =cut
 
@@ -270,62 +283,31 @@ Returns an object of type: C<Sidef::Types::Bool::Bool>
 
 =cut
 
-=head2 and
+=head2 any
 
-Alias for L<C<&>|"&">.
-
-=cut
-
-=head2 asList
-
-Array.asList() -> I<Bool>
+Array.any() -> I<Obj>
 
 Return the
 
 =cut
 
-=head2 as_list
+=head2 bshuffle
 
-Array.as_list() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 assignTo
-
-Array.assignTo() -> I<Bool>
+Array.bshuffle() -> I<Obj>
 
 Return the
 
+Aliases: I<best_shuffle>, I<bestShuffle>
+
 =cut
 
-=head2 assign_to
+=head2 combination
 
-Array.assign_to() -> I<Bool>
+Array.combination() -> I<Obj>
 
 Return the
 
-=cut
-
-=head2 collect
-
-Array.collect() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 combine
-
-Array.combine() -> I<Obj>
-
-Combine all the elements from the array togheter. The array's elements must have a C<+> method associated.
-
-    [[1,2],[3,4]].combine;       # returns: [1,2,3,4]
-    [1,2,3,4,5,6].combine;       # returns the sum of the numbers (21)
-
-Returns an object of the same type as the elements of the array.
+Aliases: I<combinations>
 
 =cut
 
@@ -340,6 +322,36 @@ Returns true if the array contains the argument object.
     [1,2,[3],4,5].contains(3);          # false
 
 Returns an object of type: C<Sidef::Types::Bool::Bool>
+
+=cut
+
+=head2 contains_all
+
+Array.contains_all() -> I<Obj>
+
+Return the
+
+Aliases: I<containsAll>
+
+=cut
+
+=head2 contains_any
+
+Array.contains_any() -> I<Obj>
+
+Return the
+
+Aliases: I<containsAny>
+
+=cut
+
+=head2 contains_type
+
+Array.contains_type() -> I<Obj>
+
+Return the
+
+Aliases: I<containsType>
 
 =cut
 
@@ -380,81 +392,41 @@ Returns an object of type: C<Sidef::Types::Bool::Bool>
 
 =head2 delete
 
-Array.delete() -> I<Bool>
+Array.delete() -> I<Obj>
 
 Return the
 
-=cut
-
-=head2 distinct
-
-Array.distinct() -> I<Array>
-
-Returns only the unique objects from the array.
-
-    [1,2,2,[3],4,[3],4].distinct;   # returns: [1,2,[3],4]
-
-Returns an object of the same type as the self object.
+Aliases: I<remove>
 
 =cut
 
-=head2 dropFirst
+=head2 delete_first
 
-Array.dropFirst() -> I<Bool>
+Array.delete_first() -> I<Obj>
 
 Return the
 
+Aliases: I<deleteFirst>, I<remove_first>, I<removeFirst>
+
 =cut
 
-=head2 drop_first
+=head2 delete_first_if
 
-Array.drop_first() -> I<Bool>
+Array.delete_first_if() -> I<Obj>
 
 Return the
 
+Aliases: I<deleteFirstIf>, I<remove_first_if>, I<removeFirstIf>
+
 =cut
 
-=head2 dropLast
+=head2 delete_if
 
-Array.dropLast() -> I<Bool>
+Array.delete_if() -> I<Obj>
 
 Return the
 
-=cut
-
-=head2 drop_last
-
-Array.drop_last() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 dropLeft
-
-Alias for L<C<E<lt>E<lt>>|"E<lt>E<lt>">.
-
-=cut
-
-=head2 drop_left
-
-Array.drop_left() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 dropRight
-
-Alias for L<C<E<gt>E<gt>>|"E<gt>E<gt>">.
-
-=cut
-
-=head2 drop_right
-
-Array.drop_right() -> I<Bool>
-
-Return the
+Aliases: I<deleteIf>, I<remove_if>, I<removeIf>
 
 =cut
 
@@ -470,61 +442,33 @@ Returns an object of type: C<Sidef::Types::String::String>
 
 =cut
 
-=head2 each
+=head2 each_with_index
 
-Array.each() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 eq
-
-Array.eq() -> I<Bool>
+Array.each_with_index() -> I<Obj>
 
 Return the
 
 =cut
 
-=head2 equals
+=head2 offset
 
-Array.equals() -> I<Bool>
+Array.offset() -> I<Number>
 
-Return the
+Returns the last index of the array.
+
+    ['a','b','c'].offset;       # returns: 2
+
+Returns an object of type: C<Sidef::Types::Number::Number>
 
 =cut
 
 =head2 exists
 
-Array.exists(I<Number>) -> I<Bool>
-
-Returns true if the array has an element on the specified index.
-
-    ['a','b','c'].exists(1);    # true
-    ['a','b','c'].exists(5);    # false
-
-Returns an object of type: C<Sidef::Types::Bool::Bool>
-
-=cut
-
-=head2 existsIndex
-
-Array.existsIndex() -> I<Bool>
+Array.exists() -> I<Obj>
 
 Return the
 
-=cut
-
-=head2 filter
-
-Array.filter(I<Block>) -> I<Array>
-
-Filter the array's elements via a block test.
-
-    ['a','b','c'].filter { _ > 'a'};   # returns: ['b', 'c']
-    [1,2,3,4,5,6].filter { _ <= 3};    # returns: [1, 2, 3]
-
-Returns a new object of the same type as the self object.
+Aliases: I<existsIndex>
 
 =cut
 
@@ -562,15 +506,9 @@ Returns an object of type: C<Sidef::Types::Number::Number>
 
 =cut
 
-=head2 first_index
-
-Alias for L<C<firstIndex()>|"firstIndex">.
-
-=cut
-
 =head2 flatten
 
-Array.flatten() -> I<Bool>
+Array.flatten() -> I<Obj>
 
 Return the
 
@@ -578,62 +516,54 @@ Return the
 
 =head2 for
 
-Array.for() -> I<Bool>
+Array.for() -> I<Obj>
 
 Return the
 
-=cut
-
-=head2 fromTo
-
-Array.fromTo() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 from_to
-
-Array.from_to() -> I<Bool>
-
-Return the
+Aliases: I<each>, I<foreach>
 
 =cut
 
 =head2 ft
 
-Array.ft(I<Number>, I<Number>) -> I<Array>
+Array.ft() -> I<Obj>
 
-Returns the element from the array from within a specified range.
+Return the
 
-    array.(from, to);
-
-If the second argument is omitted, will go till the end of the array.
-
-    ['w', 'x', 'y', 'z'].ft(2);         # returns ['y', 'z']
-    ['m', 'n', 'o', 'p'].ft(1, 2);      # returns ['n', 'o']
-
-Returns an object of the same type as the self object.
+Aliases: I<from_to>, I<fromTo>
 
 =cut
 
 =head2 get
 
-Array.get() -> I<Bool>
+Array.get() -> I<Obj>
 
 Return the
 
-=cut
-
-=head2 grep
-
-Alias for L<C<filter()>|"filter">.
+Aliases: I<item>
 
 =cut
 
-=head2 indexWhere
+=head2 filter
 
-Alias for L<C<firstIndex()>|"firstIndex">.
+Array.filter(I<Block>) -> I<Array>
+
+Filter the array's elements via a block test.
+
+    ['a','b','c'].filter { _ > 'a'};   # returns: ['b', 'c']
+    [1,2,3,4,5,6].filter { _ <= 3};    # returns: [1, 2, 3]
+
+Returns a new object of the same type as the self object.
+
+=cut
+
+=head2 group_by
+
+Array.group_by() -> I<Obj>
+
+Return the
+
+Aliases: I<groupBy>
 
 =cut
 
@@ -652,35 +582,13 @@ Returns the self object.
 
 =cut
 
-=head2 is
-
-Array.is() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 isEmpty
-
-Array.isEmpty() -> I<Bool>
-
-Return the
-
-=cut
-
 =head2 is_empty
 
-Array.is_empty() -> I<Bool>
+Array.is_empty() -> I<Obj>
 
 Return the
 
-=cut
-
-=head2 item
-
-Array.item() -> I<Bool>
-
-Return the
+Aliases: I<isEmpty>
 
 =cut
 
@@ -708,12 +616,6 @@ Returns a new object of the same type as the self object.
 
 =cut
 
-=head2 join_insert
-
-Alias for L<C<joinInsert()>|"joinInsert">.
-
-=cut
-
 =head2 last
 
 Array.last() -> I<Obj>
@@ -734,65 +636,23 @@ Returns an object of type: C<Sidef::Types::Number::Number>
 
 =cut
 
-=head2 last_index
-
-Alias for L<C<lastIndex()>|"lastIndex">.
-
-=cut
-
-=head2 lastIndexWhere
-
-Alias for L<C<lastIndex()>|"lastIndex">.
-
-=cut
-
-=head2 lastUniq
-
-Array.lastUniq() -> I<Bool>
-
-Return the
-
-=cut
-
 =head2 last_uniq
 
-Array.last_uniq() -> I<Bool>
+Array.last_uniq() -> I<Obj>
 
 Return the
 
-=cut
-
-=head2 lastUnique
-
-Array.lastUnique() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 last_unique
-
-Array.last_unique() -> I<Bool>
-
-Return the
+Aliases: I<lastUniq>, I<last_unique>, I<lastUnique>
 
 =cut
 
 =head2 len
 
-Array.len() -> I<Number>
+Array.len() -> I<Obj>
 
-Return the length of the array.
+Return the
 
-    ['a','b','c'].len;      # returns: 3
-
-Returns an object of type: C<Sidef::Types::Number::Number>
-
-=cut
-
-=head2 length
-
-Alias for L<C<len()>|"len">.
+Aliases: I<size>, I<length>
 
 =cut
 
@@ -811,15 +671,11 @@ Returns a new object of the same type as the self object.
 
 =head2 map
 
-Array.map(I<Block>) -> I<Bool>
+Array.map() -> I<Obj>
 
-Evaluates the I<Block> for each element of I<Array> and returns a new array composed of the results of each such evaluation.
+Return the
 
-    [1,2,3].map { _ + 10 };     # returns: [11, 12, 13]
-
-B<WARNING!> By modifing the C<_> variable, the modification is visible inside the self array.
-
-Returns a new object of the same type as the self object.
+Aliases: I<collect>
 
 =cut
 
@@ -836,9 +692,13 @@ Returns an object of the same type as the elements of the array.
 
 =cut
 
-=head2 mesh
+=head2 max_by
 
-Alias for L<C<&&>|"&&">.
+Array.max_by() -> I<Obj>
+
+Return the
+
+Aliases: I<maxBy>
 
 =cut
 
@@ -855,15 +715,21 @@ Returns an object of the same type as the elements of the array.
 
 =cut
 
-=head2 multiply
+=head2 min_by
 
-Array.multiply() -> I<Obj>
+Array.min_by() -> I<Obj>
 
-Works just like the L<C<combine()>|"combine"> method, except that it multiplies each element of the array, using the C<*> method. Useful for working with matrices.
+Return the
 
-    [5,6,7].multiply;       # returns the product number (210)
+Aliases: I<minBy>
 
-Returns an object of the same type as the elements of the array.
+=cut
+
+=head2 minmax
+
+Array.minmax() -> I<Obj>
+
+Return the
 
 =cut
 
@@ -879,21 +745,17 @@ Returns a new object of the same type as the self object.
 
 =cut
 
-=head2 offset
+=head2 pack
 
-Array.offset() -> I<Number>
+Array.pack() -> I<Obj>
 
-Returns the last index of the array.
-
-    ['a','b','c'].offset;       # returns: 2
-
-Returns an object of type: C<Sidef::Types::Number::Number>
+Return the
 
 =cut
 
-=head2 or
+=head2 pairs
 
-Array.or() -> I<Bool>
+Array.pairs() -> I<Obj>
 
 Return the
 
@@ -901,98 +763,51 @@ Return the
 
 =head2 permute
 
-Array.permute() -> I<Bool>
+Array.permute() -> I<Obj>
 
 Return the
 
-=cut
-
-=head2 pop
-
-=over 2
-
-=item * Array.pop(I<Number>) -> I<Obj>
-
-Remove the element from the specified position.
-
-    array = qw(a b c);
-    array.pop(1);       # returns the removed element from position 1: 'b'
-
-    # array contains: ['a', 'c']
-
-=back
-
-=over 2
-
-=item * Array.pop() -> I<Obj>
-
-Removes the last element of the array.
-
-    array = qw(a b c);
-    array.pop;          # returns the removed last element: 'c'
-
-    # array contains: ['a', 'b']
-
-=back
-
-B<WARNING!> This method modifies the array in place.
+Aliases: I<permutations>
 
 =cut
 
-=head2 popRand
+=head2 pick
 
-Array.popRand() -> I<Bool>
+Array.pick() -> I<Obj>
 
 Return the
+
+Aliases: I<rand>, I<sample>
+
+=cut
+
+=head2 pop_at
+
+Array.pop_at() -> I<Obj>
+
+Return the
+
+Aliases: I<popAt>, I<delete_index>, I<deleteIndex>
 
 =cut
 
 =head2 pop_rand
 
-Array.pop_rand() -> I<Bool>
+Array.pop_rand() -> I<Obj>
 
 Return the
+
+Aliases: I<popRand>
 
 =cut
 
 =head2 prod
 
-Array.prod() -> I<Bool>
+Array.prod() -> I<Obj>
 
 Return the
 
-=cut
-
-=head2 product
-
-Array.product() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 push
-
-Array.push(I<Obj1>, I<Obj2>, I<...>) -> I<Array>
-
-Append some elements to array.
-
-    array = qw(s i d);
-    array.push("e", "f");      # pushes the element to array and returns: qw(s i d e f)
-
-Aliases: I<append()>.
-
-B<WARNING!> This method modifies the array in place.
-
-Returns the self object.
-
-=cut
-
-=head2 rand
-
-Array.rand() -> I<Bool>
-
-Return the
+Aliases: I<product>
 
 =cut
 
@@ -1034,9 +849,9 @@ Returns an object of the same type as the elements of the array.
 
 =cut
 
-=head2 reducePairs
+=head2 reduce_operator
 
-Array.reducePairs() -> I<Bool>
+Array.reduce_operator() -> I<Obj>
 
 Return the
 
@@ -1044,47 +859,37 @@ Return the
 
 =head2 reduce_pairs
 
-Array.reduce_pairs() -> I<Bool>
+Array.reduce_pairs() -> I<Obj>
 
 Return the
+
+Aliases: I<reducePairs>
+
+=cut
+
+=head2 resize
+
+Array.resize() -> I<Obj>
+
+Return the
+
+Aliases: I<resize_to>, I<resizeTo>
 
 =cut
 
 =head2 reverse
 
-Array.reverse() -> I<Bool>
+Array.reverse() -> I<Obj>
 
 Return the
 
-=cut
-
-=head2 reversed
-
-Array.reversed() -> I<Bool>
-
-Return the
+Aliases: I<reversed>
 
 =cut
 
 =head2 rotate
 
-Array.rotate() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 select
-
-Array.select() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 shift
-
-Array.shift() -> I<Bool>
+Array.rotate() -> I<Obj>
 
 Return the
 
@@ -1092,15 +897,15 @@ Return the
 
 =head2 shuffle
 
-Array.shuffle() -> I<Bool>
+Array.shuffle() -> I<Obj>
 
 Return the
 
 =cut
 
-=head2 size
+=head2 slice
 
-Array.size() -> I<Bool>
+Array.slice() -> I<Obj>
 
 Return the
 
@@ -1108,7 +913,7 @@ Return the
 
 =head2 sort
 
-Array.sort() -> I<Bool>
+Array.sort() -> I<Obj>
 
 Return the
 
@@ -1116,39 +921,28 @@ Return the
 
 =head2 splice
 
-Array.splice() -> I<Bool>
+Array.splice() -> I<Obj>
 
 Return the
 
 =cut
 
-=head2 subtract
+=head2 combine
 
-Array.subtract() -> I<Bool>
+Array.combine() -> I<Obj>
 
-Return the
+Combine all the elements from the array togheter. The array's elements must have a C<+> method associated.
 
-=cut
+    [[1,2],[3,4]].combine;       # returns: [1,2,3,4]
+    [1,2,3,4,5,6].combine;       # returns the sum of the numbers (21)
 
-=head2 sum
-
-Array.sum() -> I<Bool>
-
-Return the
+Returns an object of the same type as the elements of the array.
 
 =cut
 
 =head2 swap
 
-Array.swap() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 takeLeft
-
-Array.takeLeft() -> I<Bool>
+Array.swap() -> I<Obj>
 
 Return the
 
@@ -1156,55 +950,37 @@ Return the
 
 =head2 take_left
 
-Array.take_left() -> I<Bool>
+Array.take_left() -> I<Obj>
 
 Return the
 
-=cut
-
-=head2 takeRight
-
-Array.takeRight() -> I<Bool>
-
-Return the
+Aliases: I<takeLeft>
 
 =cut
 
 =head2 take_right
 
-Array.take_right() -> I<Bool>
+Array.take_right() -> I<Obj>
 
 Return the
 
+Aliases: I<takeRight>
+
 =cut
 
-=head2 toHash
+=head2 to_h
 
-Array.toHash() -> I<Bool>
+Array.to_h() -> I<Obj>
 
 Return the
 
-=cut
-
-=head2 to_hash
-
-Array.to_hash() -> I<Bool>
-
-Return the
+Aliases: I<to_hash>, I<toHash>
 
 =cut
 
-=head2 toList
+=head2 to_s
 
-Array.toList() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 to_list
-
-Array.to_list() -> I<Bool>
+Array.to_s() -> I<Obj>
 
 Return the
 
@@ -1212,15 +988,17 @@ Return the
 
 =head2 uniq
 
-Array.uniq() -> I<Bool>
+Array.uniq() -> I<Obj>
 
 Return the
 
+Aliases: I<unique>, I<distinct>
+
 =cut
 
-=head2 unique
+=head2 unroll_operator
 
-Array.unique() -> I<Bool>
+Array.unroll_operator() -> I<Obj>
 
 Return the
 
@@ -1228,40 +1006,51 @@ Return the
 
 =head2 unshift
 
-Array.unshift() -> I<Bool>
+Array.unshift() -> I<Obj>
 
 Return the
 
 =cut
 
-=head2 xor
+=head2 mesh
 
-Array.xor() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 zip
-
-Array.zip() -> I<Bool>
-
-Return the
+Alias for L<C<&&>|"&&">.
 
 =cut
 
 =head2 |
 
-I<Num> B<|> I<Num> -> I<Num>
+I<Obj> B<|> I<Obj> -> I<Obj>
 
 Return the
+
+Aliases: I<or>
+
+=cut
+
+=head2 push
+
+Array.push(I<Obj1>, I<Obj2>, I<...>) -> I<Array>
+
+Append some elements to array.
+
+    array = qw(s i d);
+    array.push("e", "f");      # pushes the element to array and returns: qw(s i d e f)
+
+Aliases: I<append()>.
+
+B<WARNING!> This method modifies the array in place.
+
+Returns the self object.
 
 =cut
 
 =head2 »
 
-I<Num> B<»> I<Num> -> I<Num>
+I<Obj> B<»> I<Obj> -> I<Obj>
 
 Return the
+
+Aliases: I<assign_to>, I<assignTo>, I<unroll_to>, I<unrollTo>
 
 =cut

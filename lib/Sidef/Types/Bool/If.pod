@@ -11,14 +11,13 @@ This object is ...
 
 =head1 SYNOPSIS
 
-var obj = (If.new(...));
+var obj = If.new(...);
 
 
 =head1 INHERITS
 
 Inherits methods from:
 
-	* Sidef
 	* Sidef::Types::Block::Do
 
 =head1 METHODS
@@ -26,15 +25,7 @@ Inherits methods from:
 
 =head2 else
 
-If.else() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 elseif
-
-If.elseif() -> I<Bool>
+If.else() -> I<Obj>
 
 Return the
 
@@ -42,16 +33,20 @@ Return the
 
 =head2 elsif
 
-If.elsif() -> I<Bool>
+If.elsif() -> I<Obj>
 
 Return the
+
+Aliases: I<elseif>
 
 =cut
 
 =head2 if
 
-If.if() -> I<Bool>
+If.if() -> I<Obj>
 
 Return the
+
+Aliases: I<call>
 
 =cut

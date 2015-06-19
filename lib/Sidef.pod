@@ -44,17 +44,35 @@ Return true if two objects are of the same type.
 
 =cut
 
-=head2 is_a
+=head2 def_method
 
-Sidef.is_a() -> I<Bool>
+Sidef.def_method() -> I<Obj>
 
 Return the
 
 =cut
 
-=head2 respondTo
+=head2 is_a
 
-Sidef.respondTo() -> I<Bool>
+Sidef.is_a() -> I<Obj>
+
+Return the
+
+Aliases: I<is_an>
+
+=cut
+
+=head2 method
+
+Sidef.method() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 METHODS
+
+Sidef.METHODS() -> I<Obj>
 
 Return the
 
@@ -62,7 +80,17 @@ Return the
 
 =head2 respond_to
 
-Sidef.respond_to() -> I<Bool>
+Sidef.respond_to() -> I<Obj>
+
+Return the
+
+Aliases: I<respondTo>
+
+=cut
+
+=head2 super_join
+
+Sidef.super_join() -> I<Obj>
 
 Return the
 

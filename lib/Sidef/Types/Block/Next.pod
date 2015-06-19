@@ -11,14 +11,14 @@ This object is ...
 
 =head1 SYNOPSIS
 
-var obj = (Next.new(...));
+var obj = Next.new(...);
 
 =head1 METHODS
 
 
 =head2 new
 
-Next.new() -> I<Bool>
+Next.new() -> I<Obj>
 
 Return the
 
@@ -26,7 +26,7 @@ Return the
 
 =head2 next
 
-Next.next() -> I<Bool>
+Next.next() -> I<Obj>
 
 Return the
 

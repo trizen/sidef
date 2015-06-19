@@ -20,6 +20,14 @@ This module can load a perl module at run-time, via the keyword I<require>.
 
 =head1 METHODS
 
+=head2 frequire
+
+Require.frequire() -> I<Obj>
+
+Return the
+
+=cut
+
 
 =head2 require
 

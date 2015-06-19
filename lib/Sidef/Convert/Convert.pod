@@ -28,14 +28,6 @@ Inherits methods from:
 
 =head1 METHODS
 
-=head2 stringify
-
-Convert.stringify() -> I<Bool>
-
-Return the
-
-=cut
-
 =head2 toArray
 
 Obj.toArray() -> I<Array>
@@ -93,6 +85,26 @@ Returns an object of type: C<Sidef::Types::Byte::Bytes>
 
 =cut
 
+=head2 to_c
+
+Convert.to_c() -> I<Obj>
+
+Return the
+
+Aliases: I<to_complex>, I<toComplex>
+
+=cut
+
+=head2 to_caller
+
+Convert.to_caller() -> I<Obj>
+
+Return the
+
+Aliases: I<toCaller>
+
+=cut
+
 =head2 toChar
 
 Obj.toChar() -> I<Char>
@@ -133,6 +145,26 @@ Convert the self object into a directory type-object.
 Aliases: I<to_dir()>.
 
 Returns an object of type: C<Sidef::Types::Glob::Dir>
+
+=cut
+
+=head2 to_f
+
+Convert.to_f() -> I<Obj>
+
+Return the
+
+Aliases: I<to_float>, I<toFloat>
+
+=cut
+
+=head2 to_fcaller
+
+Convert.to_fcaller() -> I<Obj>
+
+Return the
+
+Aliases: I<toFcaller>
 
 =cut
 
@@ -177,6 +209,26 @@ Convert the self object into a number type-object.
 Aliases: I<to_num()>.
 
 Returns an object of type: C<Sidef::Types::Number::Number>
+
+=cut
+
+=head2 to_obj
+
+Convert.to_obj() -> I<Obj>
+
+Return the
+
+Aliases: I<to_object>
+
+=cut
+
+=head2 to_r
+
+Convert.to_r() -> I<Obj>
+
+Return the
+
+Aliases: I<to_rat>, I<toRat>, I<to_rational>, I<toRational>
 
 =cut
 

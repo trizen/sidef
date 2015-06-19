@@ -18,15 +18,7 @@ This modules creates a new I<Time> object.
 
 =head2 dump
 
-Time.dump() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 get_value
-
-Time.get_value() -> I<Bool>
+Time.dump() -> I<Obj>
 
 Return the
 
@@ -41,26 +33,6 @@ Return a I<gmtime> object.
 
 =cut
 
-=head2 gmtime
-
-Alias for L<C<gmTime()>|"gmTime">.
-
-=cut
-
-=head2 local
-
-Time.new.local() -> C<Sidef::Time::Localtime>
-
-Return a I<localtime> object.
-
-=cut
-
-=head2 localTime
-
-Alias for L<C<local()>|"local">.
-
-=cut
-
 =head2 localtime
 
 Alias for L<C<local()>|"local">.
@@ -69,11 +41,11 @@ Alias for L<C<local()>|"local">.
 
 =head2 micro
 
-Time.micro() -> I<Bool>
-
-Aliases: I<microSec()>, I<micro_sec()>, I<microSeconds()>, I<micro_seconds()>, I<microTime()>.
+Time.micro() -> I<Obj>
 
 Return the
+
+Aliases: I<micro_sec>, I<microSec>, I<microTime>, I<micro_seconds>, I<microSeconds>
 
 =cut
 
@@ -86,19 +58,9 @@ When no argument is specified, the current time is used.
 
 =cut
 
-=head2 now
+=head2 time_now
 
-Time.now() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 sec
-
-Time.sec() -> I<Bool>
-
-Return the
+Alias for L<C<timeNow()>|"timeNow">.
 
 =cut
 
@@ -107,19 +69,5 @@ Return the
 Time.time() -> I<Number>
 
 Return the time value stored inside the I<Time> object.
-
-=cut
-
-=head2 timeNow
-
-Time.timeNow() -> I<Number>
-
-Return the number of seconds elapsed since the beginning of the current epoch (1900).
-
-=cut
-
-=head2 time_now
-
-Alias for L<C<timeNow()>|"timeNow">.
 
 =cut

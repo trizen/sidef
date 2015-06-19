@@ -11,13 +11,13 @@ Returned values are localized for the standard Greenwich time zone.
 
 =head1 SYNOPSIS
 
-    var time = (Time.gmtime);
+    var time = Time.gmtime;
 
 =head1 INHERITS
 
 Inherits methods from:
 
-    * Sidef
+    * Sidef::Object::Object
 
 =head1 METHODS
 

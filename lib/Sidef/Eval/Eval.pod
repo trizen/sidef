@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-Sidef::Types::Block::For
+Sidef::Eval::Eval
 
 =head1 DESCRIPTION
 
@@ -11,25 +11,23 @@ This object is ...
 
 =head1 SYNOPSIS
 
-var obj = For.new(...);
+var obj = Eval.new(...);
 
 =head1 METHODS
 
 
-=head2 do
+=head2 eval
 
-For.do() -> I<Obj>
+Eval.eval() -> I<Obj>
 
 Return the
 
 =cut
 
-=head2 for
+=head2 new
 
-For.for() -> I<Obj>
+Eval.new() -> I<Obj>
 
 Return the
-
-Aliases: I<foreach>
 
 =cut

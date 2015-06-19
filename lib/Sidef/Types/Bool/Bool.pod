@@ -11,77 +11,21 @@ This object is ...
 
 =head1 SYNOPSIS
 
-var obj = (Bool.new(...));
+var obj = Bool.new(...);
 
 
 =head1 INHERITS
 
 Inherits methods from:
 
-	* Sidef::Convert::Convert
+	* Sidef::Object::Object
 
 =head1 METHODS
 
 
-=head2 !
-
-I<Num> B<!> I<Num> -> I<Num>
-
-Return the
-
-=cut
-
 =head2 &
 
-I<Num> B<&> I<Num> -> I<Num>
-
-Return the
-
-=cut
-
-=head2 &&
-
-I<Num> B<&&> I<Num> -> I<Num>
-
-Return the
-
-=cut
-
-=head2 ?
-
-I<Num> B<?> I<Num> -> I<Num>
-
-Return the
-
-=cut
-
-=head2 ?:
-
-I<Num> B<?:> I<Num> -> I<Num>
-
-Return the
-
-=cut
-
-=head2 ^
-
-I<Num> B<^> I<Num> -> I<Num>
-
-Return the
-
-=cut
-
-=head2 ^^
-
-I<Num> B<^^> I<Num> -> I<Num>
-
-Return the
-
-=cut
-
-=head2 and
-
-Bool.and() -> I<Bool>
+I<Obj> B<&> I<Obj> -> I<Obj>
 
 Return the
 
@@ -89,7 +33,7 @@ Return the
 
 =head2 dump
 
-Bool.dump() -> I<Bool>
+Bool.dump() -> I<Obj>
 
 Return the
 
@@ -97,39 +41,7 @@ Return the
 
 =head2 false
 
-Bool.false() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 get_value
-
-Bool.get_value() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 isFalse
-
-Bool.isFalse() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 is_false
-
-Bool.is_false() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 isTrue
-
-Bool.isTrue() -> I<Bool>
+Bool.false() -> I<Obj>
 
 Return the
 
@@ -137,47 +49,37 @@ Return the
 
 =head2 is_true
 
-Bool.is_true() -> I<Bool>
+Bool.is_true() -> I<Obj>
 
 Return the
+
+Aliases: I<isTrue>
 
 =cut
 
 =head2 new
 
-Bool.new() -> I<Bool>
+Bool.new() -> I<Obj>
 
 Return the
+
+Aliases: I<call>
 
 =cut
 
 =head2 not
 
-Bool.not() -> I<Bool>
+Bool.not() -> I<Obj>
 
 Return the
 
-=cut
-
-=head2 or
-
-Bool.or() -> I<Bool>
-
-Return the
+Aliases: I<flip>, I<toggle>, I<is_false>, I<isFalse>
 
 =cut
 
 =head2 true
 
-Bool.true() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 xor
-
-Bool.xor() -> I<Bool>
+Bool.true() -> I<Obj>
 
 Return the
 
@@ -185,15 +87,7 @@ Return the
 
 =head2 |
 
-I<Num> B<|> I<Num> -> I<Num>
-
-Return the
-
-=cut
-
-=head2 ||
-
-I<Num> B<||> I<Num> -> I<Num>
+I<Obj> B<|> I<Obj> -> I<Obj>
 
 Return the
 

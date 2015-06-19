@@ -11,7 +11,7 @@ This object is ...
 
 =head1 SYNOPSIS
 
-var obj = (Bytes.new(...));
+var obj = Bytes.new(...);
 
 
 =head1 INHERITS
@@ -19,14 +19,37 @@ var obj = (Bytes.new(...));
 Inherits methods from:
 
 	* Sidef::Types::Array::Array
-	* Sidef::Convert::Convert
 
 =head1 METHODS
 
 
+=head2 call
+
+Bytes.call() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 dump
+
+Bytes.dump() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 encode
+
+Bytes.encode() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 join
 
-Bytes.join() -> I<Bool>
+Bytes.join() -> I<Obj>
 
 Return the
 
@@ -34,7 +57,7 @@ Return the
 
 =head2 new
 
-Bytes.new() -> I<Bool>
+Bytes.new() -> I<Obj>
 
 Return the
 

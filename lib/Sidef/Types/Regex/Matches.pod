@@ -11,118 +11,51 @@ This object is ...
 
 =head1 SYNOPSIS
 
-var obj = (Matches.new(...));
+var obj = Matches.new(...);
+
+
+=head1 INHERITS
+
+Inherits methods from:
+
+	* Sidef::Object::Object
 
 =head1 METHODS
 
 
 =head2 ??
 
-I<Num> B<??> I<Num> -> I<Num>
+I<Obj> B<??> I<Obj> -> I<Obj>
 
 Return the
+
+Aliases: I<to_bool>, I<toBool>, I<matched>, I<is_successful>, I<isSuccessful>
 
 =cut
 
 =head2 cap
 
-Matches.cap() -> I<Bool>
+Matches.cap() -> I<Obj>
 
 Return the
+
+Aliases: I<caps>, I<captures>
 
 =cut
 
-=head2 captures
+=head2 ncap
 
-Matches.captures() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 isSuccessful
-
-Matches.isSuccessful() -> I<Bool>
+Matches.ncap() -> I<Obj>
 
 Return the
 
-=cut
-
-=head2 is_successful
-
-Matches.is_successful() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 matched
-
-Matches.matched() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 matches
-
-Matches.matches() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 namedCaptures
-
-Matches.namedCaptures() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 named_captures
-
-Matches.named_captures() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 namedMatches
-
-Matches.namedMatches() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 named_matches
-
-Matches.named_matches() -> I<Bool>
-
-Return the
+Aliases: I<ncaps>, I<named_captures>
 
 =cut
 
 =head2 pos
 
-Matches.pos() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 toBool
-
-Matches.toBool() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 to_bool
-
-Matches.to_bool() -> I<Bool>
+Matches.pos() -> I<Obj>
 
 Return the
 

@@ -11,62 +11,31 @@ This object is ...
 
 =head1 SYNOPSIS
 
-var obj = (Backtick.new(...));
+var obj = Backtick.new(...);
 
 
 =head1 INHERITS
 
 Inherits methods from:
 
-	* Sidef
-	* Sidef::Convert::Convert
+	* Sidef::Object::Object
 
 =head1 METHODS
 
-=head2 getArray
 
-Backtick.getArray() -> I<Bool>
+=head2 `
 
-Return the
-
-=cut
-
-=head2 get_array
-
-Backtick.get_array() -> I<Bool>
+I<Obj> B<`> I<Obj> -> I<Obj>
 
 Return the
 
-=cut
-
-
-=head2 getLines
-
-Backtick.getLines() -> I<Bool>
-
-Return the
+Aliases: I<run>, I<exec>, I<execute>
 
 =cut
 
-=head2 get_lines
+=head2 dump
 
-Backtick.get_lines() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 getString
-
-Backtick.getString() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 get_string
-
-Backtick.get_string() -> I<Bool>
+Backtick.dump() -> I<Obj>
 
 Return the
 

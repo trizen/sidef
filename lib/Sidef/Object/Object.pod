@@ -1,0 +1,81 @@
+
+=encoding utf8
+
+=head1 NAME
+
+Sidef::Object::Object
+
+=head1 DESCRIPTION
+
+This object is ...
+
+=head1 SYNOPSIS
+
+var obj = Object.new(...);
+
+
+=head1 INHERITS
+
+Inherits methods from:
+
+	* Sidef
+	* Sidef::Convert::Convert
+
+=head1 METHODS
+
+
+=head2 !~
+
+I<Obj> B<!~> I<Obj> -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 &&
+
+I<Obj> B<&&> I<Obj> -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 ?
+
+I<Obj> B<?> I<Obj> -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 \\
+
+I<Obj> B<\\> I<Obj> -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 ^
+
+I<Obj> B<^> I<Obj> -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 ||
+
+I<Obj> B<||> I<Obj> -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 ~~
+
+I<Obj> B<~~> I<Obj> -> I<Obj>
+
+Return the
+
+=cut

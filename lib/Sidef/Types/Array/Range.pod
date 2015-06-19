@@ -1,0 +1,100 @@
+
+=encoding utf8
+
+=head1 NAME
+
+Sidef::Types::Array::Range
+
+=head1 DESCRIPTION
+
+This object is ...
+
+=head1 SYNOPSIS
+
+var obj = Range.new(...);
+
+
+=head1 INHERITS
+
+Inherits methods from:
+
+	* Sidef
+
+=head1 METHODS
+
+
+=head2 bounds
+
+Range.bounds() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 by
+
+Range.by() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 contains
+
+Range.contains() -> I<Obj>
+
+Return the
+
+Aliases: I<includes>
+
+=cut
+
+=head2 each
+
+Range.each() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 max
+
+Range.max() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 min
+
+Range.min() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 new
+
+Range.new() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 step
+
+Range.step() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 to_a
+
+Range.to_a() -> I<Obj>
+
+Return the
+
+Aliases: I<to_array>
+
+=cut

@@ -11,46 +11,41 @@ This object is ...
 
 =head1 SYNOPSIS
 
-var obj = (Switch.new(...));
+var obj = Switch.new(...);
 
 
 =head1 INHERITS
 
 Inherits methods from:
 
-	* Sidef
 	* Sidef::Types::Block::Do
 
 =head1 METHODS
 
-=head2 case
 
-Switch.case() -> I<Bool>
+=head2 ..
+
+I<Obj> B<..> I<Obj> -> I<Obj>
 
 Return the
+
+Aliases: I<else>, I<default>
 
 =cut
 
+=head2 ??
 
-=head2 default
-
-Switch.default() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 else
-
-Switch.else() -> I<Bool>
+I<Obj> B<??> I<Obj> -> I<Obj>
 
 Return the
+
+Aliases: I<case>
 
 =cut
 
 =head2 end
 
-Switch.end() -> I<Bool>
+Switch.end() -> I<Obj>
 
 Return the
 
@@ -58,16 +53,18 @@ Return the
 
 =head2 value
 
-Switch.value() -> I<Bool>
+Switch.value() -> I<Obj>
 
 Return the
 
 =cut
 
-=head2 when
+=head2 ~~
 
-Switch.when() -> I<Bool>
+I<Obj> B<~~> I<Obj> -> I<Obj>
 
 Return the
+
+Aliases: I<when>
 
 =cut

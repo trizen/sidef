@@ -11,38 +11,24 @@ This object is ...
 
 =head1 SYNOPSIS
 
-var obj = (Magic.new(...));
+var obj = Magic.new(...);
 
 =head1 METHODS
 
 
 =head2 =
 
-I<Num> B<=> I<Num> -> I<Num>
+I<Obj> B<=> I<Obj> -> I<Obj>
 
 Return the
 
-=cut
-
-=head2 get_value
-
-Magic.get_value() -> I<Bool>
-
-Return the
+Aliases: I<set_value>
 
 =cut
 
 =head2 new
 
-Magic.new() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 set_value
-
-Magic.set_value() -> I<Bool>
+Magic.new() -> I<Obj>
 
 Return the
 

@@ -11,37 +11,95 @@ This object is ...
 
 =head1 SYNOPSIS
 
-var obj = (FileHandle.new(...));
+var obj = FileHandle.new(...);
 
 
 =head1 INHERITS
 
 Inherits methods from:
 
-	* Sidef
+	* Sidef::Object::Object
 
 =head1 METHODS
 
 
-=head2 close
+=head2 <<
 
-FileHandle.close() -> I<Bool>
+I<Obj> B<E<lt>E<lt>> I<Obj> -> I<Obj>
 
 Return the
+
+Aliases: I<output_from>, I<outputFrom>
+
+=cut
+
+=head2 <=>
+
+I<Obj> B<E<lt>=E<gt>> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<cmp>, I<compare>
+
+=cut
+
+=head2 >>
+
+I<Obj> B<E<gt>E<gt>> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<read_to>, I<readTo>
+
+=cut
+
+=head2 autoflush
+
+FileHandle.autoflush() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 binmode
+
+FileHandle.binmode() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 close
+
+FileHandle.close() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 cp
+
+FileHandle.cp() -> I<Obj>
+
+Return the
+
+Aliases: I<copy>
 
 =cut
 
 =head2 each
 
-FileHandle.each() -> I<Bool>
+FileHandle.each() -> I<Obj>
 
 Return the
+
+Aliases: I<each_line>
 
 =cut
 
 =head2 eof
 
-FileHandle.eof() -> I<Bool>
+FileHandle.eof() -> I<Obj>
 
 Return the
 
@@ -49,15 +107,17 @@ Return the
 
 =head2 file
 
-FileHandle.file() -> I<Bool>
+FileHandle.file() -> I<Obj>
 
 Return the
+
+Aliases: I<parent>
 
 =cut
 
 =head2 fileno
 
-FileHandle.fileno() -> I<Bool>
+FileHandle.fileno() -> I<Obj>
 
 Return the
 
@@ -65,103 +125,55 @@ Return the
 
 =head2 flock
 
-FileHandle.flock() -> I<Bool>
+FileHandle.flock() -> I<Obj>
 
 Return the
+
+=cut
+
+=head2 get
+
+FileHandle.get() -> I<Obj>
+
+Return the
+
+Aliases: I<line>, I<readln>, I<get_line>, I<getline>, I<getLine>, I<read_line>, I<readline>, I<readLine>
 
 =cut
 
 =head2 getc
 
-FileHandle.getc() -> I<Bool>
+FileHandle.getc() -> I<Obj>
 
 Return the
 
-=cut
-
-=head2 getChar
-
-FileHandle.getChar() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 get_char
-
-FileHandle.get_char() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 getLines
-
-FileHandle.getLines() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 get_lines
-
-FileHandle.get_lines() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 getlines
-
-FileHandle.getlines() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 inputSeparator
-
-FileHandle.inputSeparator() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 input_separator
-
-FileHandle.input_separator() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 isOnTty
-
-FileHandle.isOnTty() -> I<Bool>
-
-Return the
+Aliases: I<get_char>, I<getChar>, I<read_char>, I<readChar>
 
 =cut
 
 =head2 is_on_tty
 
-FileHandle.is_on_tty() -> I<Bool>
+FileHandle.is_on_tty() -> I<Obj>
 
 Return the
+
+Aliases: I<isOnTty>
 
 =cut
 
 =head2 lines
 
-FileHandle.lines() -> I<Bool>
+FileHandle.lines() -> I<Obj>
 
 Return the
+
+Aliases: I<read_all>, I<readall>, I<readAll>, I<get_lines>, I<getlines>, I<getLines>, I<readlines>, I<readLines>
 
 =cut
 
 =head2 lock
 
-FileHandle.lock() -> I<Bool>
+FileHandle.lock() -> I<Obj>
 
 Return the
 
@@ -169,15 +181,7 @@ Return the
 
 =head2 lstat
 
-FileHandle.lstat() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 parent
-
-FileHandle.parent() -> I<Bool>
+FileHandle.lstat() -> I<Obj>
 
 Return the
 
@@ -185,111 +189,35 @@ Return the
 
 =head2 print
 
-FileHandle.print() -> I<Bool>
+FileHandle.print() -> I<Obj>
 
 Return the
 
-=cut
-
-=head2 println
-
-FileHandle.println() -> I<Bool>
-
-Return the
+Aliases: I<spurt>, I<write>
 
 =cut
 
 =head2 read
 
-FileHandle.read() -> I<Bool>
+FileHandle.read() -> I<Obj>
 
 Return the
 
 =cut
 
-=head2 readAll
+=head2 say
 
-FileHandle.readAll() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 read_all
-
-FileHandle.read_all() -> I<Bool>
+FileHandle.say() -> I<Obj>
 
 Return the
 
-=cut
-
-=head2 readall
-
-FileHandle.readall() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 readChar
-
-FileHandle.readChar() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 read_char
-
-FileHandle.read_char() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 readLine
-
-FileHandle.readLine() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 readline
-
-FileHandle.readline() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 readLines
-
-FileHandle.readLines() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 readlines
-
-FileHandle.readlines() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 readln
-
-FileHandle.readln() -> I<Bool>
-
-Return the
+Aliases: I<println>
 
 =cut
 
 =head2 seek
 
-FileHandle.seek() -> I<Bool>
+FileHandle.seek() -> I<Obj>
 
 Return the
 
@@ -297,15 +225,17 @@ Return the
 
 =head2 sep
 
-FileHandle.sep() -> I<Bool>
+FileHandle.sep() -> I<Obj>
 
 Return the
 
+Aliases: I<separator>, I<input_separator>, I<inputSeparator>
+
 =cut
 
-=head2 separator
+=head2 slurp
 
-FileHandle.separator() -> I<Bool>
+FileHandle.slurp() -> I<Obj>
 
 Return the
 
@@ -313,7 +243,7 @@ Return the
 
 =head2 stat
 
-FileHandle.stat() -> I<Bool>
+FileHandle.stat() -> I<Obj>
 
 Return the
 
@@ -321,7 +251,7 @@ Return the
 
 =head2 stderr
 
-FileHandle.stderr() -> I<Bool>
+FileHandle.stderr() -> I<Obj>
 
 Return the
 
@@ -329,7 +259,7 @@ Return the
 
 =head2 stdin
 
-FileHandle.stdin() -> I<Bool>
+FileHandle.stdin() -> I<Obj>
 
 Return the
 
@@ -337,15 +267,7 @@ Return the
 
 =head2 stdout
 
-FileHandle.stdout() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 sysRead
-
-FileHandle.sysRead() -> I<Bool>
+FileHandle.stdout() -> I<Obj>
 
 Return the
 
@@ -353,31 +275,27 @@ Return the
 
 =head2 sysread
 
-FileHandle.sysread() -> I<Bool>
+FileHandle.sysread() -> I<Obj>
 
 Return the
 
-=cut
-
-=head2 sysSeek
-
-FileHandle.sysSeek() -> I<Bool>
-
-Return the
+Aliases: I<sysRead>
 
 =cut
 
 =head2 sysseek
 
-FileHandle.sysseek() -> I<Bool>
+FileHandle.sysseek() -> I<Obj>
 
 Return the
+
+Aliases: I<sysSeek>
 
 =cut
 
 =head2 tell
 
-FileHandle.tell() -> I<Bool>
+FileHandle.tell() -> I<Obj>
 
 Return the
 
@@ -385,7 +303,7 @@ Return the
 
 =head2 truncate
 
-FileHandle.truncate() -> I<Bool>
+FileHandle.truncate() -> I<Obj>
 
 Return the
 
@@ -393,15 +311,15 @@ Return the
 
 =head2 unlock
 
-FileHandle.unlock() -> I<Bool>
+FileHandle.unlock() -> I<Obj>
 
 Return the
 
 =cut
 
-=head2 writeString
+=head2 words
 
-FileHandle.writeString() -> I<Bool>
+FileHandle.words() -> I<Obj>
 
 Return the
 
@@ -409,8 +327,10 @@ Return the
 
 =head2 write_string
 
-FileHandle.write_string() -> I<Bool>
+FileHandle.write_string() -> I<Obj>
 
 Return the
+
+Aliases: I<writeString>
 
 =cut

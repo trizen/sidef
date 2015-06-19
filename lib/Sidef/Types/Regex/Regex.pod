@@ -11,37 +11,31 @@ This object is ...
 
 =head1 SYNOPSIS
 
-var obj = (Regex.new(...));
+var obj = Regex.new(...);
 
 
 =head1 INHERITS
 
 Inherits methods from:
 
-	* Sidef::Convert::Convert
+	* Sidef::Object::Object
 
 =head1 METHODS
 
 
 =head2 =~
 
-I<Num> B<=~> I<Num> -> I<Num>
+I<Obj> B<=~> I<Obj> -> I<Obj>
 
 Return the
 
-=cut
-
-=head2 dump
-
-Regex.dump() -> I<Bool>
-
-Return the
+Aliases: I<match>, I<matches>
 
 =cut
 
-=head2 get_value
+=head2 call
 
-Regex.get_value() -> I<Bool>
+Regex.call() -> I<Obj>
 
 Return the
 
@@ -49,32 +43,20 @@ Return the
 
 =head2 gmatch
 
-Regex.gmatch() -> I<Bool>
+Regex.gmatch() -> I<Obj>
 
 Return the
+
+Aliases: I<gmatches>
 
 =cut
 
-=head2 gmatches
+=head2 to_s
 
-Regex.gmatches() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 match
-
-Regex.match() -> I<Bool>
+Regex.to_s() -> I<Obj>
 
 Return the
 
-=cut
-
-=head2 matches
-
-Regex.matches() -> I<Bool>
-
-Return the
+Aliases: I<dump>
 
 =cut

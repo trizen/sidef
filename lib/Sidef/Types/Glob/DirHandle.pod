@@ -11,29 +11,29 @@ This object is ...
 
 =head1 SYNOPSIS
 
-var obj = (DirHandle.new(...));
+var obj = DirHandle.new(...);
 
 
 =head1 INHERITS
 
 Inherits methods from:
 
-	* Sidef
+	* Sidef::Object::Object
 
 =head1 METHODS
 
+
 =head2 chdir
 
-DirHandle.chdir() -> I<Bool>
+DirHandle.chdir() -> I<Obj>
 
 Return the
 
 =cut
 
-
 =head2 close
 
-DirHandle.close() -> I<Bool>
+DirHandle.close() -> I<Obj>
 
 Return the
 
@@ -41,63 +41,53 @@ Return the
 
 =head2 dir
 
-DirHandle.dir() -> I<Bool>
+DirHandle.dir() -> I<Obj>
 
 Return the
+
+Aliases: I<parent>
 
 =cut
 
 =head2 each
 
-DirHandle.each() -> I<Bool>
+DirHandle.each() -> I<Obj>
 
 Return the
 
 =cut
 
-=head2 getFile
+=head2 entries
 
-DirHandle.getFile() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 get_file
-
-DirHandle.get_file() -> I<Bool>
+DirHandle.entries() -> I<Obj>
 
 Return the
 
-=cut
-
-=head2 getFiles
-
-DirHandle.getFiles() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 get_files
-
-DirHandle.get_files() -> I<Bool>
-
-Return the
+Aliases: I<read_dir>, I<readdir>, I<readDir>, I<get_files>, I<getFiles>
 
 =cut
 
 =head2 lstat
 
-DirHandle.lstat() -> I<Bool>
+DirHandle.lstat() -> I<Obj>
 
 Return the
 
 =cut
 
-=head2 parent
+=head2 read
 
-DirHandle.parent() -> I<Bool>
+DirHandle.read() -> I<Obj>
+
+Return the
+
+Aliases: I<get_file>, I<getFile>
+
+=cut
+
+=head2 rewind
+
+DirHandle.rewind() -> I<Obj>
 
 Return the
 
@@ -105,7 +95,7 @@ Return the
 
 =head2 seek
 
-DirHandle.seek() -> I<Bool>
+DirHandle.seek() -> I<Obj>
 
 Return the
 
@@ -113,7 +103,7 @@ Return the
 
 =head2 stat
 
-DirHandle.stat() -> I<Bool>
+DirHandle.stat() -> I<Obj>
 
 Return the
 
@@ -121,7 +111,7 @@ Return the
 
 =head2 tell
 
-DirHandle.tell() -> I<Bool>
+DirHandle.tell() -> I<Obj>
 
 Return the
 

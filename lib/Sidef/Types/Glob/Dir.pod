@@ -11,61 +11,32 @@ This object is ...
 
 =head1 SYNOPSIS
 
-var obj = (Dir.new(...));
+var obj = Dir.new(...);
 
 
 =head1 INHERITS
 
 Inherits methods from:
 
-	* Sidef::Convert::Convert
+	* Sidef::Types::Glob::File
+	* Sidef::Types::String::String
 
 =head1 METHODS
 
+
 =head2 +
 
-I<Num> B<+> I<Num> -> I<Num>
+I<Obj> B<+> I<Obj> -> I<Obj>
 
 Return the
 
-=cut
-
-=head2 absName
-
-Dir.absName() -> I<Bool>
-
-Return the
-
-=cut
-
-
-=head2 abs_name
-
-Dir.abs_name() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 absPath
-
-Dir.absPath() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 abs_path
-
-Dir.abs_path() -> I<Bool>
-
-Return the
+Aliases: I<concat>, I<catfile>
 
 =cut
 
 =head2 chdir
 
-Dir.chdir() -> I<Bool>
+Dir.chdir() -> I<Obj>
 
 Return the
 
@@ -73,63 +44,35 @@ Return the
 
 =head2 chroot
 
-Dir.chroot() -> I<Bool>
+Dir.chroot() -> I<Obj>
 
 Return the
 
 =cut
 
-=head2 concat
+=head2 cur
 
-Dir.concat() -> I<Bool>
+Dir.cur() -> I<Obj>
 
 Return the
+
+Aliases: I<cwd>, I<cur_dir>, I<current_dir>, I<current_directory>
 
 =cut
 
-=head2 create
+=head2 delete
 
-Dir.create() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 createTree
-
-Dir.createTree() -> I<Bool>
+Dir.delete() -> I<Obj>
 
 Return the
 
-=cut
-
-=head2 create_tree
-
-Dir.create_tree() -> I<Bool>
-
-Return the
+Aliases: I<remove>, I<unlink>
 
 =cut
 
 =head2 dump
 
-Dir.dump() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 exists
-
-Dir.exists() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 get_value
-
-Dir.get_value() -> I<Bool>
+Dir.dump() -> I<Obj>
 
 Return the
 
@@ -137,103 +80,57 @@ Return the
 
 =head2 home
 
-Dir.home() -> I<Bool>
+Dir.home() -> I<Obj>
 
 Return the
 
-=cut
-
-=head2 isDir
-
-Dir.isDir() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 is_dir
-
-Dir.is_dir() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 isDirectory
-
-Dir.isDirectory() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 is_directory
-
-Dir.is_directory() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 isEmpty
-
-Dir.isEmpty() -> I<Bool>
-
-Return the
+Aliases: I<home_dir>, I<homedir>
 
 =cut
 
 =head2 is_empty
 
-Dir.is_empty() -> I<Bool>
+Dir.is_empty() -> I<Obj>
 
 Return the
 
-=cut
-
-=head2 lstat
-
-Dir.lstat() -> I<Bool>
-
-Return the
+Aliases: I<isEmpty>
 
 =cut
 
 =head2 make
 
-Dir.make() -> I<Bool>
+Dir.make() -> I<Obj>
 
 Return the
+
+Aliases: I<mkdir>, I<create>
 
 =cut
 
-=head2 makeTree
+=head2 mkpath
 
-Dir.makeTree() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 make_tree
-
-Dir.make_tree() -> I<Bool>
+Dir.mkpath() -> I<Obj>
 
 Return the
+
+Aliases: I<mktree>, I<make_path>, I<make_tree>, I<makeTree>, I<create_tree>, I<createTree>
 
 =cut
 
 =head2 new
 
-Dir.new() -> I<Bool>
+Dir.new() -> I<Obj>
 
 Return the
+
+Aliases: I<call>
 
 =cut
 
 =head2 open
 
-Dir.open() -> I<Bool>
+Dir.open() -> I<Obj>
 
 Return the
 
@@ -241,39 +138,15 @@ Return the
 
 =head2 parent
 
-Dir.parent() -> I<Bool>
+Dir.parent() -> I<Obj>
 
 Return the
 
 =cut
 
-=head2 readLink
+=head2 pwd
 
-Dir.readLink() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 readlink
-
-Dir.readlink() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 remove
-
-Dir.remove() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 removeTree
-
-Dir.removeTree() -> I<Bool>
+Dir.pwd() -> I<Obj>
 
 Return the
 
@@ -281,32 +154,38 @@ Return the
 
 =head2 remove_tree
 
-Dir.remove_tree() -> I<Bool>
+Dir.remove_tree() -> I<Obj>
 
 Return the
+
+Aliases: I<removeTree>
+
+=cut
+
+=head2 root
+
+Dir.root() -> I<Obj>
+
+Return the
+
+Aliases: I<rootdir>
 
 =cut
 
 =head2 split
 
-Dir.split() -> I<Bool>
+Dir.split() -> I<Obj>
 
 Return the
 
 =cut
 
-=head2 stat
+=head2 tmp
 
-Dir.stat() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 utime
-
-Dir.utime() -> I<Bool>
+Dir.tmp() -> I<Obj>
 
 Return the
+
+Aliases: I<temp>, I<tmp_dir>, I<tmpdir>, I<temp_dir>, I<tempdir>
 
 =cut

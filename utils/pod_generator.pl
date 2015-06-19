@@ -32,7 +32,7 @@ my %ignored_subs = map { $_ => 1 } qw<
   >;
 
 my %ignored_methods = (
-                       'Sidef'                          => [qw(new VERSION Types:: a b)],
+                       'Sidef'                          => [qw(new)],
                        'Sidef::Types::Block::Return'    => [qw(get_obj new)],
                        'Sidef::Types::Block::Break'     => [qw(new)],
                        'Sidef::Variable::Variable'      => [qw(set_value is_defined get_type get_value new)],
@@ -45,41 +45,42 @@ my %ignored_methods = (
                        'Sidef::Math::Math'              => [qw(new)],
                        'Sidef::Time::Localtime'         => [qw(new)],
                        'Sidef::Time::Gmtime'            => [qw(new)],
-                       'Sidef::Types::Nil::Nil'         => [qw(get_value new)],
+                       'Sidef::Types::Nil::Nil'         => [qw(new)],
                        'Sidef::Types::Bool::If'         => [qw(new)],
                        'Sidef::Types::Bool::While'      => [qw(new)],
                        'Sidef::Types::Bool::Ternary'    => [qw(new)],
                        'Sidef::Types::Glob::DirHandle'  => [qw(new)],
-                       'Sidef::Types::Glob::FileHandle' => [qw(new get_value)],
+                       'Sidef::Types::Glob::FileHandle' => [qw(new)],
                        'Sidef::Types::Glob::Backtick'   => [qw(new)],
-                       'Sidef::Types::Glob::PipeHandle' => [qw(new get_value)],
+                       'Sidef::Types::Glob::PipeHandle' => [qw(new)],
                        'Sidef::Types::Glob::Stat'       => [qw(new)],
                        'Sidef::Types::Block::For'       => [qw(new)],
                        'Sidef::Types::Block::Switch'    => [qw(new)],
                        'Sidef::Types::Block::Try'       => [qw(new)],
-                       'Sidef::Types::Block::Code'      => [qw(new a b)],
+                       'Sidef::Types::Block::Code'      => [qw(new)],
                        'Sidef::Types::Block::Given'     => [qw(new)],
                        'Sidef::Types::Block::Continue'  => [qw(new)],
                        'Sidef::Types::Regex::Matches'   => [qw(new)],
                        'Sidef::Types::Regex::Regex'     => [qw(new)],
                        'Sidef::Types::Black::Hole'      => [qw(new)],
-                       'Sidef::Types::Array::Array'     => [qw(get_value a b)],
-                       'Sidef::Types::Number::Number'   => [qw(get_value)],
-                       'Sidef::Types::String::String'   => [qw(get_value a b)],
-                       'Sidef::Types::Byte::Bytes'      => [qw(decode_utf8)],
                        'Sidef::Types::Glob::Fcntl'      => [qw(new)],
-                       'Sidef::Types::Hash::Hash'       => [qw(a b)],
                       );
 
 my %ignored_modules = map { $_ => 1 } qw (
   Sidef::Exec
   Sidef::Parser
+  Sidef::Optimizer
   Sidef::Sys::SIG
   Sidef::Types::Array::HCArray
+  Sidef::Types::Array::List
   Sidef::Types::Number::NumberFast
   Sidef::Types::Number::NumberInt
   Sidef::Types::Number::NumberRat
   Sidef::Object::Unary
+  Sidef::Variable::LazyMethod
+  Sidef::Variable::ClassVar
+  Sidef::Deparse::Sidef
+  Sidef::Deparse::Perl
   );
 
 my $name = basename($dir);
@@ -151,8 +152,18 @@ sub process_file {
     my %subs;
     foreach my $sub (keys %{$mod_methods}) {
 
-        next if $sub =~ /^_/;
+        next if $sub eq 'get_value';
+        next if $sub =~ /^[(_]/;
         next if exists $ignored_subs{$sub};
+
+        my $code;
+
+        if (defined &{$module . '::' . $sub}) {
+            $code = \&{$module . '::' . $sub};
+        }
+        else {
+            next;
+        }
 
         if (exists $ignored_methods{$module}) {
             if (first { $_ eq $sub } @{$ignored_methods{$module}}) {
@@ -160,6 +171,18 @@ sub process_file {
             }
         }
 
+        push @{$subs{$code}{aliases}}, $sub;
+    }
+
+    while (my ($key, $value) = each %subs) {
+
+        my @sorted =
+          sort { length($a =~ tr/_//dr) <=> length($b =~ tr/_//dr) or lc($a) cmp lc($b) or $b cmp $a } @{$value->{aliases}};
+
+        $value->{name} = shift @sorted;
+        @{$value->{aliases}} = @sorted;
+
+        my $sub       = $value->{name};
         my $orig_name = $sub;
         my $is_method = lc($sub) ne uc($sub);
 
@@ -169,27 +192,36 @@ sub process_file {
 
 =head2 $orig_name
 
-$parts[-1].$sub() -> I<Bool>
+$parts[-1].$sub() -> I<Obj>
 
 Return the
-
-=cut
 __POD__
 
 =head2 $orig_name
 
-I<Num> B<$sub> I<Num> -> I<Num>
+I<Obj> B<$sub> I<Obj> -> I<Obj>
 
 Return the
-
-=cut
 __POD2__
 
-        $subs{$orig_name} = $doc;
+        if (@{$value->{aliases}}) {
+            $doc .= "\nAliases: " . join(
+                ", ",
+                map {
+                    my $sub = $_;
+                    $sub =~ s{([<>])}{E<$esc{$1}>}g;
+                    lc($sub) eq uc($sub) ? "I<$sub()>" : "I<$sub>";
+                  } @{$value->{aliases}}
+              )
+              . "\n";
+        }
+
+        $doc .= "\n=cut\n";
+
+        $subs{$key}{doc} //= $doc;
     }
 
     my @keys = keys %subs;
-
     if ($#keys == -1) {
         warn "[!] No method found for module: $module\n";
         return;
@@ -205,35 +237,30 @@ __POD2__
         $pod_data = parse_pod_file($pod_file);
     };
 
-    my %alias_methods;
-    foreach my $key (@keys) {
-        if (exists $pod_data->{$key}) {
-            $subs{$key} = $pod_data->{$key};
+    while (my ($key, $value) = each %subs) {
 
-            if ($pod_data->{$key} =~ /^Alias(?:es)?:\h*(.*\S)/m) {
-                my @aliases = split(/,\h+/, $1);
-                foreach my $alias (@aliases) {
-                    $alias =~ s{[^>]+\z}{};
-                    if ($alias =~ m{^[A-Z]<(.+)>\z}) {
-                        (my $method = $1) =~ s{\(\)\z}{};
+        my $alias;
+        if (exists $value->{aliases}) {
+            $alias = first {
+                exists($pod_data->{$_})
+            }
+            @{$value->{aliases}};
+        }
 
-                        $method =~ s{E<lt>}{<}g;
-                        $method =~ s{E<gt>}{>}g;
-
-                        undef $alias_methods{$method};
-                    }
-                }
+        if ($alias // exists($pod_data->{$value->{name}})) {
+            my $doc = $pod_data->{$alias // $value->{name}};
+            if (not $doc =~ /^Return the$/m) {
+                $subs{$key}{doc} = $doc;
             }
         }
     }
 
     open my $fh, '>', $pod_file;
 
-    if (exists $pod_data->{__HEADER__}) {
-        print {$fh} $pod_data->{__HEADER__};
-    }
-    else {
-        my $header = <<"HEADER";
+    my $header = $pod_data->{__HEADER__};
+
+    if (not defined($header) or $header =~ /^This object is \.\.\.$/m) {
+        $header = <<"HEADER";
 
 =encoding utf8
 
@@ -247,7 +274,7 @@ This object is ...
 
 =head1 SYNOPSIS
 
-var obj = ($parts[-1].new(...));
+var obj = $parts[-1].new(...);
 
 HEADER
 
@@ -270,15 +297,19 @@ HEADER
 =head1 METHODS
 
 HEADER
-
-        print {$fh} $header;
     }
 
+    # Print the header
+    print {$fh} $header;
+
+    # Print the methods
     foreach my $method (
-                        sort { (lc($a =~ tr/_//dr) cmp lc($b =~ tr/_//dr)) || ($a cmp $b) }
-                        grep { not exists $alias_methods{$_} }
-                        keys %subs
+        sort {
+                 (lc($a->{name} =~ tr/_//dr) cmp lc($b->{name} =~ tr/_//dr))
+              || (lc($a->{name}) cmp lc($b->{name}))
+              || ($a->{name} cmp $b->{name})
+        } values %subs
       ) {
-        print {$fh} $subs{$method};
+        print {$fh} $method->{doc};
     }
 }

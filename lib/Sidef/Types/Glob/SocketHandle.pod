@@ -1,0 +1,120 @@
+
+=encoding utf8
+
+=head1 NAME
+
+Sidef::Types::Glob::SocketHandle
+
+=head1 DESCRIPTION
+
+This object is ...
+
+=head1 SYNOPSIS
+
+var obj = SocketHandle.new(...);
+
+
+=head1 INHERITS
+
+Inherits methods from:
+
+	* Sidef::Types::Glob::FileHandle
+
+=head1 METHODS
+
+
+=head2 accept
+
+SocketHandle.accept() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 bind
+
+SocketHandle.bind() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 connect
+
+SocketHandle.connect() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 getpeername
+
+SocketHandle.getpeername() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 getsockname
+
+SocketHandle.getsockname() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 getsockopt
+
+SocketHandle.getsockopt() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 listen
+
+SocketHandle.listen() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 new
+
+SocketHandle.new() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 recv
+
+SocketHandle.recv() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 send
+
+SocketHandle.send() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 setsockopt
+
+SocketHandle.setsockopt() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 shutdown
+
+SocketHandle.shutdown() -> I<Obj>
+
+Return the
+
+=cut

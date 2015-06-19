@@ -11,21 +11,14 @@ This object is ...
 
 =head1 SYNOPSIS
 
-var obj = (Ternary.new(...));
-
-
-=head1 INHERITS
-
-Inherits methods from:
-
-	* Sidef
+var obj = Ternary.new(...);
 
 =head1 METHODS
 
 
 =head2 :
 
-I<Num> B<:> I<Num> -> I<Num>
+I<Obj> B<:> I<Obj> -> I<Obj>
 
 Return the
 

@@ -11,7 +11,7 @@ This object is ...
 
 =head1 SYNOPSIS
 
-var obj = (Try.new(...));
+var obj = Try.new(...);
 
 
 =head1 INHERITS
@@ -25,7 +25,7 @@ Inherits methods from:
 
 =head2 catch
 
-Try.catch() -> I<Bool>
+Try.catch() -> I<Obj>
 
 Return the
 
@@ -33,7 +33,7 @@ Return the
 
 =head2 try
 
-Try.try() -> I<Bool>
+Try.try() -> I<Obj>
 
 Return the
 

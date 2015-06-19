@@ -11,69 +11,71 @@ This object is ...
 
 =head1 SYNOPSIS
 
-var obj = (File.new(...));
+var obj = File.new(...);
 
 
 =head1 INHERITS
 
 Inherits methods from:
 
-	* Sidef::Convert::Convert
+	* Sidef::Types::String::String
 
 =head1 METHODS
 
 
-=head2 abs_name
+=head2 <=>
 
-File.abs_name() -> I<Bool>
+I<Obj> B<E<lt>=E<gt>> I<Obj> -> I<Obj>
 
 Return the
+
+Aliases: I<cmp>, I<compare>
 
 =cut
 
-=head2 accessTimeDaysDiff
+=head2 abs
 
-File.accessTimeDaysDiff() -> I<Bool>
+File.abs() -> I<Obj>
 
 Return the
+
+Aliases: I<abs_name>, I<absname>, I<absName>, I<rel2abs>
 
 =cut
 
 =head2 access_time_days_diff
 
-File.access_time_days_diff() -> I<Bool>
+File.access_time_days_diff() -> I<Obj>
 
 Return the
+
+Aliases: I<accessTimeDaysDiff>
 
 =cut
 
-=head2 basename
+=head2 base
 
-File.basename() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 changeTimeDaysDiff
-
-File.changeTimeDaysDiff() -> I<Bool>
+File.base() -> I<Obj>
 
 Return the
+
+Aliases: I<base_name>, I<basename>, I<baseName>
 
 =cut
 
 =head2 change_time_days_diff
 
-File.change_time_days_diff() -> I<Bool>
+File.change_time_days_diff() -> I<Obj>
 
 Return the
+
+Aliases: I<changeTimeDaysDiff>
 
 =cut
 
 =head2 chmod
 
-File.chmod() -> I<Bool>
+File.chmod() -> I<Obj>
 
 Return the
 
@@ -81,15 +83,7 @@ Return the
 
 =head2 chown
 
-File.chown() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 copy
-
-File.copy() -> I<Bool>
+File.chown() -> I<Obj>
 
 Return the
 
@@ -97,23 +91,45 @@ Return the
 
 =head2 cp
 
-File.cp() -> I<Bool>
+File.cp() -> I<Obj>
 
 Return the
+
+Aliases: I<copy>
 
 =cut
 
-=head2 dirname
+=head2 delete
 
-File.dirname() -> I<Bool>
+File.delete() -> I<Obj>
 
 Return the
+
+Aliases: I<remove>, I<unlink>
+
+=cut
+
+=head2 dir
+
+File.dir() -> I<Obj>
+
+Return the
+
+Aliases: I<dir_name>, I<dirname>, I<dirName>
 
 =cut
 
 =head2 dump
 
-File.dump() -> I<Bool>
+File.dump() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 edit
+
+File.edit() -> I<Obj>
 
 Return the
 
@@ -121,23 +137,15 @@ Return the
 
 =head2 exists
 
-File.exists() -> I<Bool>
+File.exists() -> I<Obj>
 
 Return the
 
 =cut
 
-=head2 get_value
+=head2 get_constant
 
-File.get_value() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 hasSetgidBit
-
-File.hasSetgidBit() -> I<Bool>
+File.get_constant() -> I<Obj>
 
 Return the
 
@@ -145,39 +153,17 @@ Return the
 
 =head2 has_setgid_bit
 
-File.has_setgid_bit() -> I<Bool>
+File.has_setgid_bit() -> I<Obj>
 
 Return the
 
-=cut
-
-=head2 has_setuid
-
-File.has_setuid() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 hasSetuidBit
-
-File.hasSetuidBit() -> I<Bool>
-
-Return the
+Aliases: I<hasSetgidBit>
 
 =cut
 
 =head2 has_setuid_bit
 
-File.has_setuid_bit() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 hasStickyBit
-
-File.hasStickyBit() -> I<Bool>
+File.has_setuid_bit() -> I<Obj>
 
 Return the
 
@@ -185,343 +171,235 @@ Return the
 
 =head2 has_sticky_bit
 
-File.has_sticky_bit() -> I<Bool>
+File.has_sticky_bit() -> I<Obj>
 
 Return the
+
+Aliases: I<hasStickyBit>
 
 =cut
 
-=head2 isBinary
+=head2 is_abs
 
-File.isBinary() -> I<Bool>
+File.is_abs() -> I<Obj>
 
 Return the
+
+Aliases: I<is_absolute>
 
 =cut
 
 =head2 is_binary
 
-File.is_binary() -> I<Bool>
+File.is_binary() -> I<Obj>
 
 Return the
 
-=cut
-
-=head2 isBlock
-
-File.isBlock() -> I<Bool>
-
-Return the
+Aliases: I<isBinary>
 
 =cut
 
 =head2 is_block
 
-File.is_block() -> I<Bool>
+File.is_block() -> I<Obj>
 
 Return the
 
-=cut
-
-=head2 isCharDevice
-
-File.isCharDevice() -> I<Bool>
-
-Return the
+Aliases: I<isBlock>
 
 =cut
 
 =head2 is_char_device
 
-File.is_char_device() -> I<Bool>
+File.is_char_device() -> I<Obj>
 
 Return the
 
-=cut
-
-=head2 isDir
-
-File.isDir() -> I<Bool>
-
-Return the
+Aliases: I<isCharDevice>
 
 =cut
 
 =head2 is_dir
 
-File.is_dir() -> I<Bool>
+File.is_dir() -> I<Obj>
 
 Return the
 
-=cut
-
-=head2 isDirectory
-
-File.isDirectory() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 is_directory
-
-File.is_directory() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 isEmpty
-
-File.isEmpty() -> I<Bool>
-
-Return the
+Aliases: I<isDir>, I<is_directory>, I<isDirectory>
 
 =cut
 
 =head2 is_empty
 
-File.is_empty() -> I<Bool>
+File.is_empty() -> I<Obj>
 
 Return the
 
-=cut
-
-=head2 isExecutable
-
-File.isExecutable() -> I<Bool>
-
-Return the
+Aliases: I<isEmpty>
 
 =cut
 
 =head2 is_executable
 
-File.is_executable() -> I<Bool>
+File.is_executable() -> I<Obj>
 
 Return the
 
-=cut
-
-=head2 isFile
-
-File.isFile() -> I<Bool>
-
-Return the
+Aliases: I<isExecutable>
 
 =cut
 
 =head2 is_file
 
-File.is_file() -> I<Bool>
+File.is_file() -> I<Obj>
 
 Return the
 
-=cut
-
-=head2 isLink
-
-File.isLink() -> I<Bool>
-
-Return the
+Aliases: I<isFile>
 
 =cut
 
 =head2 is_link
 
-File.is_link() -> I<Bool>
+File.is_link() -> I<Obj>
 
 Return the
 
-=cut
-
-=head2 isOwned
-
-File.isOwned() -> I<Bool>
-
-Return the
+Aliases: I<isLink>
 
 =cut
 
 =head2 is_owned
 
-File.is_owned() -> I<Bool>
+File.is_owned() -> I<Obj>
 
 Return the
 
-=cut
-
-=head2 isReadable
-
-File.isReadable() -> I<Bool>
-
-Return the
+Aliases: I<isOwned>
 
 =cut
 
 =head2 is_readable
 
-File.is_readable() -> I<Bool>
+File.is_readable() -> I<Obj>
 
 Return the
 
-=cut
-
-=head2 isRealExecutable
-
-File.isRealExecutable() -> I<Bool>
-
-Return the
+Aliases: I<isReadable>
 
 =cut
 
 =head2 is_real_executable
 
-File.is_real_executable() -> I<Bool>
+File.is_real_executable() -> I<Obj>
 
 Return the
 
-=cut
-
-=head2 isRealOwned
-
-File.isRealOwned() -> I<Bool>
-
-Return the
+Aliases: I<isRealExecutable>
 
 =cut
 
 =head2 is_real_owned
 
-File.is_real_owned() -> I<Bool>
+File.is_real_owned() -> I<Obj>
 
 Return the
 
-=cut
-
-=head2 isRealReadable
-
-File.isRealReadable() -> I<Bool>
-
-Return the
+Aliases: I<isRealOwned>
 
 =cut
 
 =head2 is_real_readable
 
-File.is_real_readable() -> I<Bool>
+File.is_real_readable() -> I<Obj>
 
 Return the
 
-=cut
-
-=head2 isRealWriteable
-
-File.isRealWriteable() -> I<Bool>
-
-Return the
+Aliases: I<isRealReadable>
 
 =cut
 
 =head2 is_real_writeable
 
-File.is_real_writeable() -> I<Bool>
+File.is_real_writeable() -> I<Obj>
 
 Return the
 
-=cut
-
-=head2 isSocket
-
-File.isSocket() -> I<Bool>
-
-Return the
+Aliases: I<isRealWriteable>
 
 =cut
 
 =head2 is_socket
 
-File.is_socket() -> I<Bool>
+File.is_socket() -> I<Obj>
 
 Return the
 
-=cut
-
-=head2 isText
-
-File.isText() -> I<Bool>
-
-Return the
+Aliases: I<isSocket>
 
 =cut
 
 =head2 is_text
 
-File.is_text() -> I<Bool>
+File.is_text() -> I<Obj>
 
 Return the
 
-=cut
-
-=head2 isWriteable
-
-File.isWriteable() -> I<Bool>
-
-Return the
+Aliases: I<isText>
 
 =cut
 
 =head2 is_writeable
 
-File.is_writeable() -> I<Bool>
+File.is_writeable() -> I<Obj>
 
 Return the
+
+Aliases: I<isWriteable>
 
 =cut
 
 =head2 lstat
 
-File.lstat() -> I<Bool>
+File.lstat() -> I<Obj>
 
 Return the
 
 =cut
 
-=head2 modificationTimeDaysDiff
+=head2 make
 
-File.modificationTimeDaysDiff() -> I<Bool>
+File.make() -> I<Obj>
 
 Return the
+
+Aliases: I<touch>, I<create>, I<mkfile>
 
 =cut
 
 =head2 modification_time_days_diff
 
-File.modification_time_days_diff() -> I<Bool>
+File.modification_time_days_diff() -> I<Obj>
 
 Return the
 
-=cut
-
-=head2 move
-
-File.move() -> I<Bool>
-
-Return the
+Aliases: I<modificationTimeDaysDiff>
 
 =cut
 
 =head2 mv
 
-File.mv() -> I<Bool>
+File.mv() -> I<Obj>
 
 Return the
+
+Aliases: I<move>, I<move_to>, I<moveTo>
 
 =cut
 
 =head2 name
 
-File.name() -> I<Bool>
+File.name() -> I<Obj>
 
 Return the
 
@@ -529,23 +407,17 @@ Return the
 
 =head2 new
 
-File.new() -> I<Bool>
+File.new() -> I<Obj>
 
 Return the
+
+Aliases: I<call>
 
 =cut
 
 =head2 open
 
-File.open() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 openA
-
-File.openA() -> I<Bool>
+File.open() -> I<Obj>
 
 Return the
 
@@ -553,39 +425,17 @@ Return the
 
 =head2 open_a
 
-File.open_a() -> I<Bool>
+File.open_a() -> I<Obj>
 
 Return the
 
-=cut
-
-=head2 openAppend
-
-File.openAppend() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 open_append
-
-File.open_append() -> I<Bool>
-
-Return the
+Aliases: I<openA>, I<open_append>, I<openAppend>
 
 =cut
 
 =head2 opendir
 
-File.opendir() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 openR
-
-File.openR() -> I<Bool>
+File.opendir() -> I<Obj>
 
 Return the
 
@@ -593,119 +443,67 @@ Return the
 
 =head2 open_r
 
-File.open_r() -> I<Bool>
+File.open_r() -> I<Obj>
 
 Return the
 
-=cut
-
-=head2 openRead
-
-File.openRead() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 open_read
-
-File.open_read() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 openReadWrite
-
-File.openReadWrite() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 open_read_write
-
-File.open_read_write() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 openRW
-
-File.openRW() -> I<Bool>
-
-Return the
+Aliases: I<openR>, I<open_read>, I<openRead>
 
 =cut
 
 =head2 open_rw
 
-File.open_rw() -> I<Bool>
+File.open_rw() -> I<Obj>
 
 Return the
 
-=cut
-
-=head2 openW
-
-File.openW() -> I<Bool>
-
-Return the
+Aliases: I<openRW>, I<open_read_write>, I<openReadWrite>
 
 =cut
 
 =head2 open_w
 
-File.open_w() -> I<Bool>
+File.open_w() -> I<Obj>
 
 Return the
 
-=cut
-
-=head2 openWrite
-
-File.openWrite() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 open_write
-
-File.open_write() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 readLink
-
-File.readLink() -> I<Bool>
-
-Return the
+Aliases: I<openW>, I<open_write>, I<openWrite>
 
 =cut
 
 =head2 readlink
 
-File.readlink() -> I<Bool>
+File.readlink() -> I<Obj>
 
 Return the
+
+Aliases: I<readLink>
+
+=cut
+
+=head2 rel
+
+File.rel() -> I<Obj>
+
+Return the
+
+Aliases: I<abs2rel>, I<rel_name>, I<relname>, I<relName>
 
 =cut
 
 =head2 rename
 
-File.rename() -> I<Bool>
+File.rename() -> I<Obj>
 
 Return the
+
+Aliases: I<rename_to>, I<renameTo>
 
 =cut
 
 =head2 size
 
-File.size() -> I<Bool>
+File.size() -> I<Obj>
 
 Return the
 
@@ -713,7 +511,7 @@ Return the
 
 =head2 split
 
-File.split() -> I<Bool>
+File.split() -> I<Obj>
 
 Return the
 
@@ -721,15 +519,7 @@ Return the
 
 =head2 stat
 
-File.stat() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 sysOpen
-
-File.sysOpen() -> I<Bool>
+File.stat() -> I<Obj>
 
 Return the
 
@@ -737,23 +527,17 @@ Return the
 
 =head2 sysopen
 
-File.sysopen() -> I<Bool>
+File.sysopen() -> I<Obj>
 
 Return the
 
-=cut
-
-=head2 touch
-
-File.touch() -> I<Bool>
-
-Return the
+Aliases: I<sysOpen>
 
 =cut
 
-=head2 unlink
+=head2 truncate
 
-File.unlink() -> I<Bool>
+File.truncate() -> I<Obj>
 
 Return the
 
@@ -761,7 +545,7 @@ Return the
 
 =head2 utime
 
-File.utime() -> I<Bool>
+File.utime() -> I<Obj>
 
 Return the
 

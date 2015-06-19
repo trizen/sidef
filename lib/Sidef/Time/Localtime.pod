@@ -11,13 +11,13 @@ Returned values are localized for your current location.
 
 =head1 SYNOPSIS
 
-    var time = (Time.local);
+    var time = Time.local;
 
 =head1 INHERITS
 
 Inherits methods from:
 
-    * Sidef
+    * Sidef::Time::Gmtime
 
 =head1 METHODS
 
@@ -32,11 +32,9 @@ Return the ctime(3) value:
 
 =cut
 
-=head2 day
+=head2 mday
 
-Time.local.day() -> I<Number>
-
-Return the day of the month,
+Alias for L<C<day()>|"day">.
 
 =cut
 
@@ -56,25 +54,11 @@ Return 1 if the specified time occurs during Daylight Saving Time, 0 otherwise.
 
 =cut
 
-=head2 mday
-
-Alias for L<C<day()>|"day">.
-
-=cut
-
 =head2 min
 
 Time.local.min() -> I<Number>
 
 Return the minutes of the specified time.
-
-=cut
-
-=head2 mon
-
-Time.local.mon() -> I<Number>
-
-Return the month in the range 0..11, with 0 indicating January and 11 indicating December.
 
 =cut
 
@@ -89,18 +73,6 @@ Alias for L<C<mon()>|"mon">.
 Time.local.sec() -> I<Number>
 
 Return the seconds of the specified time.
-
-=cut
-
-=head2 strftime
-
-Time.local.strftime(I<String>) -> I<String>
-
-Format the time with I<POSIX::strftime()>.
-
-    Time.local.strftime("%a %b %e %H:%M:%S %Y")    # e.g., "Thu Jul 18 20:45:04 2013"
-
-For more details, see: C<man strftime>
 
 =cut
 

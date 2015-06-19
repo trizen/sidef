@@ -11,246 +11,249 @@ This object is ...
 
 =head1 SYNOPSIS
 
-var obj = (String.new(...));
+var obj = String.new(...);
 
 
 =head1 INHERITS
 
 Inherits methods from:
 
-    * Sidef
-    * Sidef::Convert::Convert
+	* Sidef::Object::Object
 
 =head1 METHODS
 
 
-=head2 !=
+=head2 $$
 
-I<Num> B<!=> I<Num> -> I<Num>
+I<Obj> B<$$> I<Obj> -> I<Obj>
 
 Return the
+
+Aliases: I<ends_with>, I<endsWith>
 
 =cut
 
-=head2 $$
+=head2 %
 
-I<Num> B<$$> I<Num> -> I<Num>
+I<Obj> B<%> I<Obj> -> I<Obj>
 
 Return the
+
+Aliases: I<sprintf>
 
 =cut
 
 =head2 &
 
-I<Num> B<&> I<Num> -> I<Num>
+I<Obj> B<&> I<Obj> -> I<Obj>
 
 Return the
+
+Aliases: I<and>
 
 =cut
 
 =head2 *
 
-I<Num> B<*> I<Num> -> I<Num>
+I<Obj> B<*> I<Obj> -> I<Obj>
 
 Return the
+
+Aliases: I<times>, I<multiply>
 
 =cut
 
 =head2 +
 
-I<Num> B<+> I<Num> -> I<Num>
+I<Obj> B<+> I<Obj> -> I<Obj>
 
 Return the
+
+Aliases: I<append>, I<concat>
 
 =cut
 
 =head2 ++
 
-I<Num> B<++> I<Num> -> I<Num>
+I<Obj> B<++> I<Obj> -> I<Obj>
 
 Return the
+
+Aliases: I<inc>
 
 =cut
 
 =head2 -
 
-I<Num> B<-> I<Num> -> I<Num>
+I<Obj> B<-> I<Obj> -> I<Obj>
 
 Return the
+
+Aliases: I<subtract>
 
 =cut
 
 =head2 ..
 
-I<Num> B<..> I<Num> -> I<Num>
+I<Obj> B<..> I<Obj> -> I<Obj>
 
 Return the
+
+Aliases: I<arr_to>, I<array_to>
 
 =cut
 
 =head2 /
 
-I<Num> B</> I<Num> -> I<Num>
+I<Obj> B</> I<Obj> -> I<Obj>
 
 Return the
+
+Aliases: I<÷()>, I<div>, I<divide>
 
 =cut
 
 =head2 :
 
-I<Num> B<:> I<Num> -> I<Num>
+I<Obj> B<:> I<Obj> -> I<Obj>
 
 Return the
+
+Aliases: I<pair_with>, I<pairWith>
 
 =cut
 
 =head2 <
 
-I<Num> B<E<lt>> I<Num> -> I<Num>
+I<Obj> B<E<lt>> I<Obj> -> I<Obj>
 
 Return the
+
+Aliases: I<lt>
 
 =cut
 
 =head2 <<
 
-I<Num> B<E<lt>E<lt>> I<Num> -> I<Num>
+I<Obj> B<E<lt>E<lt>> I<Obj> -> I<Obj>
 
 Return the
 
-=cut
-
-=head2 <=
-
-I<Num> B<E<lt>=> I<Num> -> I<Num>
-
-Return the
+Aliases: I<drop_left>, I<dropLeft>, I<shift_left>, I<shiftLeft>
 
 =cut
 
 =head2 <=>
 
-I<Num> B<E<lt>=E<gt>> I<Num> -> I<Num>
+I<Obj> B<E<lt>=E<gt>> I<Obj> -> I<Obj>
 
 Return the
+
+Aliases: I<cmp>
 
 =cut
 
-=head2 ==
+=head2 =
 
-I<Num> B<==> I<Num> -> I<Num>
+I<Obj> B<=> I<Obj> -> I<Obj>
 
 Return the
+
+Aliases: I<==()>, I<eq>, I<is>, I<equals>
 
 =cut
 
 =head2 =~
 
-I<Num> B<=~> I<Num> -> I<Num>
+I<Obj> B<=~> I<Obj> -> I<Obj>
 
 Return the
+
+Aliases: I<match>, I<matches>
 
 =cut
 
 =head2 >
 
-I<Num> B<E<gt>> I<Num> -> I<Num>
+I<Obj> B<E<gt>> I<Obj> -> I<Obj>
 
 Return the
 
-=cut
-
-=head2 >=
-
-I<Num> B<E<gt>=> I<Num> -> I<Num>
-
-Return the
+Aliases: I<gt>
 
 =cut
 
 =head2 >>
 
-I<Num> B<E<gt>E<gt>> I<Num> -> I<Num>
+I<Obj> B<E<gt>E<gt>> I<Obj> -> I<Obj>
 
 Return the
+
+Aliases: I<drop_right>, I<dropRight>, I<shift_right>, I<shiftRight>
 
 =cut
 
 =head2 ^
 
-I<Num> B<^> I<Num> -> I<Num>
+I<Obj> B<^> I<Obj> -> I<Obj>
 
 Return the
+
+Aliases: I<xor>
+
+=cut
+
+=head2 ^..
+
+I<Obj> B<^..> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<downto>, I<downTo>
 
 =cut
 
 =head2 ^^
 
-I<Num> B<^^> I<Num> -> I<Num>
+I<Obj> B<^^> I<Obj> -> I<Obj>
 
 Return the
 
-=cut
-
-=head2 and
-
-String.and() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 append
-
-String.append() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 applyEscapes
-
-String.applyEscapes() -> I<Bool>
-
-Return the
+Aliases: I<begins_with>, I<beginsWith>, I<starts_with>, I<startsWith>
 
 =cut
 
 =head2 apply_escapes
 
-String.apply_escapes() -> I<Bool>
+String.apply_escapes() -> I<Obj>
+
+Return the
+
+Aliases: I<applyEscapes>
+
+=cut
+
+=head2 arr_downto
+
+String.arr_downto() -> I<Obj>
+
+Return the
+
+Aliases: I<array_downto>
+
+=cut
+
+=head2 basic_dump
+
+String.basic_dump() -> I<Obj>
 
 Return the
 
 =cut
 
-=head2 beginsWith
+=head2 bytes
 
-String.beginsWith() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 begins_with
-
-String.begins_with() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 capitalize
-
-String.capitalize() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 charAt
-
-String.charAt() -> I<Bool>
+String.bytes() -> I<Obj>
 
 Return the
 
@@ -258,7 +261,17 @@ Return the
 
 =head2 char_at
 
-String.char_at() -> I<Bool>
+String.char_at() -> I<Obj>
+
+Return the
+
+Aliases: I<charAt>
+
+=cut
+
+=head2 chars
+
+String.chars() -> I<Obj>
 
 Return the
 
@@ -266,7 +279,7 @@ Return the
 
 =head2 chomp
 
-String.chomp() -> I<Bool>
+String.chomp() -> I<Obj>
 
 Return the
 
@@ -274,7 +287,7 @@ Return the
 
 =head2 chop
 
-String.chop() -> I<Bool>
+String.chop() -> I<Obj>
 
 Return the
 
@@ -282,31 +295,15 @@ Return the
 
 =head2 clear
 
-String.clear() -> I<Bool>
+String.clear() -> I<Obj>
 
 Return the
 
 =cut
 
-=head2 cmp
+=head2 count
 
-String.cmp() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 concat
-
-String.concat() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 contains
-
-String.contains() -> I<Bool>
+String.count() -> I<Obj>
 
 Return the
 
@@ -314,7 +311,7 @@ Return the
 
 =head2 crypt
 
-String.crypt() -> I<Bool>
+String.crypt() -> I<Obj>
 
 Return the
 
@@ -322,7 +319,7 @@ Return the
 
 =head2 decode
 
-String.decode() -> I<Bool>
+String.decode() -> I<Obj>
 
 Return the
 
@@ -330,7 +327,7 @@ Return the
 
 =head2 decode_utf8
 
-String.decode_utf8() -> I<Bool>
+String.decode_utf8() -> I<Obj>
 
 Return the
 
@@ -338,87 +335,7 @@ Return the
 
 =head2 die
 
-String.die() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 div
-
-String.div() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 divide
-
-String.divide() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 downCase
-
-String.downCase() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 downcase
-
-String.downcase() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 downTo
-
-String.downTo() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 downto
-
-String.downto() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 dropLeft
-
-String.dropLeft() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 drop_left
-
-String.drop_left() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 dropRight
-
-String.dropRight() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 drop_right
-
-String.drop_right() -> I<Bool>
+String.die() -> I<Obj>
 
 Return the
 
@@ -426,23 +343,37 @@ Return the
 
 =head2 dump
 
-String.dump() -> I<Bool>
+String.dump() -> I<Obj>
 
 Return the
+
+Aliases: I<inspect>
 
 =cut
 
 =head2 each
 
-String.each() -> I<Bool>
+String.each() -> I<Obj>
 
 Return the
+
+Aliases: I<each_char>, I<eachChar>
+
+=cut
+
+=head2 each_line
+
+String.each_line() -> I<Obj>
+
+Return the
+
+Aliases: I<eachLine>
 
 =cut
 
 =head2 encode
 
-String.encode() -> I<Bool>
+String.encode() -> I<Obj>
 
 Return the
 
@@ -450,47 +381,33 @@ Return the
 
 =head2 encode_utf8
 
-String.encode_utf8() -> I<Bool>
+String.encode_utf8() -> I<Obj>
 
 Return the
 
 =cut
 
-=head2 endsWith
+=head2 escape
 
-String.endsWith() -> I<Bool>
+String.escape() -> I<Obj>
+
+Return the
+
+Aliases: I<quotemeta>
+
+=cut
+
+=head2 esub
+
+String.esub() -> I<Obj>
 
 Return the
 
 =cut
 
-=head2 ends_with
+=head2 format
 
-String.ends_with() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 eq
-
-String.eq() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 equals
-
-String.equals() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 eval
-
-String.eval() -> I<Bool>
+String.format() -> I<Obj>
 
 Return the
 
@@ -498,15 +415,17 @@ Return the
 
 =head2 ft
 
-String.ft() -> I<Bool>
+String.ft() -> I<Obj>
 
 Return the
 
+Aliases: I<substr>, I<substring>
+
 =cut
 
-=head2 ge
+=head2 gesub
 
-String.ge() -> I<Bool>
+String.gesub() -> I<Obj>
 
 Return the
 
@@ -514,7 +433,7 @@ Return the
 
 =head2 glob
 
-String.glob() -> I<Bool>
+String.glob() -> I<Obj>
 
 Return the
 
@@ -522,55 +441,37 @@ Return the
 
 =head2 gmatch
 
-String.gmatch() -> I<Bool>
+String.gmatch() -> I<Obj>
 
 Return the
+
+Aliases: I<gmatches>
 
 =cut
 
-=head2 gmatches
+=head2 graphs
 
-String.gmatches() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 gReplace
-
-String.gReplace() -> I<Bool>
+String.graphs() -> I<Obj>
 
 Return the
 
-=cut
-
-=head2 gSub
-
-String.gSub() -> I<Bool>
-
-Return the
+Aliases: I<graphemes>, I<to_graphemes>
 
 =cut
 
 =head2 gsub
 
-String.gsub() -> I<Bool>
+String.gsub() -> I<Obj>
 
 Return the
 
-=cut
-
-=head2 gt
-
-String.gt() -> I<Bool>
-
-Return the
+Aliases: I<gReplace>
 
 =cut
 
-=head2 inc
+=head2 hex
 
-String.inc() -> I<Bool>
+String.hex() -> I<Obj>
 
 Return the
 
@@ -578,47 +479,27 @@ Return the
 
 =head2 include
 
-String.include() -> I<Bool>
+String.include() -> I<Obj>
 
 Return the
+
+Aliases: I<contains>
 
 =cut
 
 =head2 index
 
-String.index() -> I<Bool>
+String.index() -> I<Obj>
 
 Return the
 
-=cut
-
-=head2 indexOf
-
-String.indexOf() -> I<Bool>
-
-Return the
+Aliases: I<indexOf>
 
 =cut
 
 =head2 insert
 
-String.insert() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 is
-
-String.is() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 isEmpty
-
-String.isEmpty() -> I<Bool>
+String.insert() -> I<Obj>
 
 Return the
 
@@ -626,15 +507,17 @@ Return the
 
 =head2 is_empty
 
-String.is_empty() -> I<Bool>
+String.is_empty() -> I<Obj>
 
 Return the
+
+Aliases: I<isEmpty>
 
 =cut
 
 =head2 join
 
-String.join() -> I<Bool>
+String.join() -> I<Obj>
 
 Return the
 
@@ -642,23 +525,17 @@ Return the
 
 =head2 lc
 
-String.lc() -> I<Bool>
+String.lc() -> I<Obj>
 
 Return the
+
+Aliases: I<lower>, I<downcase>, I<downCase>, I<toLowerCase>
 
 =cut
 
 =head2 lcfirst
 
-String.lcfirst() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 le
-
-String.le() -> I<Bool>
+String.lcfirst() -> I<Obj>
 
 Return the
 
@@ -666,55 +543,17 @@ Return the
 
 =head2 len
 
-String.len() -> I<Bool>
+String.len() -> I<Obj>
 
 Return the
 
-=cut
-
-=head2 length
-
-String.length() -> I<Bool>
-
-Return the
+Aliases: I<length>
 
 =cut
 
-=head2 lt
+=head2 lines
 
-String.lt() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 match
-
-String.match() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 matches
-
-String.matches() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 multiply
-
-String.multiply() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 ne
-
-String.ne() -> I<Bool>
+String.lines() -> I<Obj>
 
 Return the
 
@@ -722,15 +561,25 @@ Return the
 
 =head2 new
 
-String.new() -> I<Bool>
+String.new() -> I<Obj>
+
+Return the
+
+Aliases: I<call>
+
+=cut
+
+=head2 open
+
+String.open() -> I<Obj>
 
 Return the
 
 =cut
 
-=head2 or
+=head2 open_r
 
-String.or() -> I<Bool>
+String.open_r() -> I<Obj>
 
 Return the
 
@@ -738,15 +587,23 @@ Return the
 
 =head2 ord
 
-String.ord() -> I<Bool>
+String.ord() -> I<Obj>
 
 Return the
 
 =cut
 
-=head2 parse
+=head2 overlaps
 
-String.parse() -> I<Bool>
+String.overlaps() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 pack
+
+String.pack() -> I<Obj>
 
 Return the
 
@@ -754,7 +611,7 @@ Return the
 
 =head2 pop
 
-String.pop() -> I<Bool>
+String.pop() -> I<Obj>
 
 Return the
 
@@ -762,7 +619,7 @@ Return the
 
 =head2 print
 
-String.print() -> I<Bool>
+String.print() -> I<Obj>
 
 Return the
 
@@ -770,15 +627,7 @@ Return the
 
 =head2 printf
 
-String.printf() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 println
-
-String.println() -> I<Bool>
+String.printf() -> I<Obj>
 
 Return the
 
@@ -786,15 +635,15 @@ Return the
 
 =head2 printlnf
 
-String.printlnf() -> I<Bool>
+String.printlnf() -> I<Obj>
 
 Return the
 
 =cut
 
-=head2 quotemeta
+=head2 reduce_operator
 
-String.quotemeta() -> I<Bool>
+String.reduce_operator() -> I<Obj>
 
 Return the
 
@@ -802,15 +651,7 @@ Return the
 
 =head2 repeat
 
-String.repeat() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 replace
-
-String.replace() -> I<Bool>
+String.repeat() -> I<Obj>
 
 Return the
 
@@ -818,7 +659,7 @@ Return the
 
 =head2 reverse
 
-String.reverse() -> I<Bool>
+String.reverse() -> I<Obj>
 
 Return the
 
@@ -826,39 +667,25 @@ Return the
 
 =head2 say
 
-String.say() -> I<Bool>
+String.say() -> I<Obj>
+
+Return the
+
+Aliases: I<println>
+
+=cut
+
+=head2 scan
+
+String.scan() -> I<Obj>
 
 Return the
 
 =cut
 
-=head2 shiftLeft
+=head2 sort
 
-String.shiftLeft() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 shift_left
-
-String.shift_left() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 shiftRight
-
-String.shiftRight() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 shift_right
-
-String.shift_right() -> I<Bool>
+String.sort() -> I<Obj>
 
 Return the
 
@@ -866,15 +693,7 @@ Return the
 
 =head2 split
 
-String.split() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 sprintf
-
-String.sprintf() -> I<Bool>
+String.split() -> I<Obj>
 
 Return the
 
@@ -882,23 +701,7 @@ Return the
 
 =head2 sprintlnf
 
-String.sprintlnf() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 startsWith
-
-String.startsWith() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 starts_with
-
-String.starts_with() -> I<Bool>
+String.sprintlnf() -> I<Obj>
 
 Return the
 
@@ -906,111 +709,57 @@ Return the
 
 =head2 sub
 
-String.sub() -> I<Bool>
+String.sub() -> I<Obj>
 
 Return the
 
-=cut
-
-=head2 substr
-
-String.substr() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 substring
-
-String.substring() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 subtract
-
-String.subtract() -> I<Bool>
-
-Return the
+Aliases: I<replace>
 
 =cut
 
 =head2 tc
 
-String.tc() -> I<Bool>
+String.tc() -> I<Obj>
 
 Return the
+
+Aliases: I<ucfirst>, I<title_case>, I<titleCase>
 
 =cut
 
 =head2 tclc
 
-String.tclc() -> I<Bool>
+String.tclc() -> I<Obj>
 
 Return the
 
-=cut
-
-=head2 times
-
-String.times() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 titleCase
-
-String.titleCase() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 title_case
-
-String.title_case() -> I<Bool>
-
-Return the
+Aliases: I<capitalize>
 
 =cut
 
 =head2 to
 
-String.to() -> I<Bool>
+String.to() -> I<Obj>
 
 Return the
 
-=cut
-
-=head2 toLowerCase
-
-String.toLowerCase() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 toUpperCase
-
-String.toUpperCase() -> I<Bool>
-
-Return the
+Aliases: I<...()>, I<..^()>, I<upto>, I<upTo>
 
 =cut
 
 =head2 tr
 
-String.tr() -> I<Bool>
+String.tr() -> I<Obj>
 
 Return the
 
+Aliases: I<translit>
+
 =cut
 
-=head2 translit
+=head2 trans
 
-String.translit() -> I<Bool>
+String.trans() -> I<Obj>
 
 Return the
 
@@ -1018,63 +767,63 @@ Return the
 
 =head2 trim
 
-String.trim() -> I<Bool>
+String.trim() -> I<Obj>
 
 Return the
+
+Aliases: I<strip>
+
+=cut
+
+=head2 trim_beg
+
+String.trim_beg() -> I<Obj>
+
+Return the
+
+Aliases: I<trimBeg>, I<strip_beg>, I<stripBeg>
+
+=cut
+
+=head2 trim_end
+
+String.trim_end() -> I<Obj>
+
+Return the
+
+Aliases: I<trimEnd>, I<strip_end>, I<stripEnd>
 
 =cut
 
 =head2 uc
 
-String.uc() -> I<Bool>
+String.uc() -> I<Obj>
 
 Return the
 
-=cut
-
-=head2 ucfirst
-
-String.ucfirst() -> I<Bool>
-
-Return the
+Aliases: I<upper>, I<upcase>, I<upCase>, I<toUpperCase>
 
 =cut
 
 =head2 unescape
 
-String.unescape() -> I<Bool>
+String.unescape() -> I<Obj>
 
 Return the
 
 =cut
 
-=head2 upCase
+=head2 unpack
 
-String.upCase() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 upcase
-
-String.upcase() -> I<Bool>
+String.unpack() -> I<Obj>
 
 Return the
 
 =cut
 
-=head2 upTo
+=head2 unroll_operator
 
-String.upTo() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 upto
-
-String.upto() -> I<Bool>
+String.unroll_operator() -> I<Obj>
 
 Return the
 
@@ -1082,7 +831,7 @@ Return the
 
 =head2 warn
 
-String.warn() -> I<Bool>
+String.warn() -> I<Obj>
 
 Return the
 
@@ -1090,72 +839,70 @@ Return the
 
 =head2 wc
 
-String.wc() -> I<Bool>
+String.wc() -> I<Obj>
 
 Return the
+
+Aliases: I<wordcase>, I<wordCase>
 
 =cut
 
-=head2 wordCase
+=head2 words
 
-String.wordCase() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 wordcase
-
-String.wordcase() -> I<Bool>
+String.words() -> I<Obj>
 
 Return the
 
-=cut
-
-=head2 xor
-
-String.xor() -> I<Bool>
-
-Return the
+Aliases: I<each_word>, I<eachWord>
 
 =cut
 
 =head2 |
 
-I<Num> B<|> I<Num> -> I<Num>
+I<Obj> B<|> I<Obj> -> I<Obj>
 
 Return the
+
+Aliases: I<or>
 
 =cut
 
-=head2 ÷
+=head2 ~
 
-I<Num> B<÷> I<Num> -> I<Num>
+I<Obj> B<~> I<Obj> -> I<Obj>
 
 Return the
+
+Aliases: I<not>
 
 =cut
 
 =head2 ≠
 
-I<Num> B<≠> I<Num> -> I<Num>
+I<Obj> B<≠> I<Obj> -> I<Obj>
 
 Return the
+
+Aliases: I<!=()>, I<ne>
 
 =cut
 
 =head2 ≤
 
-I<Num> B<≤> I<Num> -> I<Num>
+I<Obj> B<≤> I<Obj> -> I<Obj>
 
 Return the
+
+Aliases: I<E<lt>=>, I<le>
 
 =cut
 
 =head2 ≥
 
-I<Num> B<≥> I<Num> -> I<Num>
+I<Obj> B<≥> I<Obj> -> I<Obj>
 
 Return the
+
+Aliases: I<E<gt>=>, I<ge>
 
 =cut

@@ -15,9 +15,47 @@ This object provides some methods related to the Sidef working system.
 
 =head1 METHODS
 
+=head2 >
+
+I<Obj> B<E<gt>> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<say>, I<println>
+
+=cut
+
+=head2 print
+
+Sys.print(I<obj1>, I<obj2>, I<...>) -> I<Bool>
+
+Print a list of argument to the standard output (STDOUT). Returns true on success.
+
+    Sys.print("hello", "-", "world");
+
+Returns an object of type: C<Sidef::Types::Bool::Bool>
+
+=cut
+
 =head2 alarm
 
-Sys.alarm() -> I<Bool>
+Sys.alarm() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 bless
+
+Sys.bless() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 copy
+
+Sys.copy() -> I<Obj>
 
 Return the
 
@@ -25,15 +63,17 @@ Return the
 
 =head2 die
 
-Sys.die() -> I<Bool>
+Sys.die() -> I<Obj>
 
 Return the
+
+Aliases: I<raise>
 
 =cut
 
 =head2 eval
 
-Sys.eval() -> I<Bool>
+Sys.eval() -> I<Obj>
 
 Return the
 
@@ -41,7 +81,7 @@ Return the
 
 =head2 exec
 
-Sys.exec() -> I<Bool>
+Sys.exec() -> I<Obj>
 
 Return the
 
@@ -59,9 +99,169 @@ Exit the main program with a given code. If no argument is specified, the code 0
 
 =cut
 
-=head2 nanoSleep
+=head2 getgrent
 
-Sys.nanoSleep() -> I<Bool>
+Sys.getgrent() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 getgrgid
+
+Sys.getgrgid() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 getgrnam
+
+Sys.getgrnam() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 gethostbyaddr
+
+Sys.gethostbyaddr() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 gethostbyname
+
+Sys.gethostbyname() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 gethostent
+
+Sys.gethostent() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 getnetbyaddr
+
+Sys.getnetbyaddr() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 getnetbyname
+
+Sys.getnetbyname() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 getnetent
+
+Sys.getnetent() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 getpgrp
+
+Sys.getpgrp() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 getppid
+
+Sys.getppid() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 getpriority
+
+Sys.getpriority() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 getprotobyname
+
+Sys.getprotobyname() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 getprotobynumber
+
+Sys.getprotobynumber() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 getprotoent
+
+Sys.getprotoent() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 getpwent
+
+Sys.getpwent() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 getpwnam
+
+Sys.getpwnam() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 getpwuid
+
+Sys.getpwuid() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 getservbyname
+
+Sys.getservbyname() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 getservbyport
+
+Sys.getservbyport() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 getservent
+
+Sys.getservent() -> I<Obj>
 
 Return the
 
@@ -69,15 +269,17 @@ Return the
 
 =head2 nanosleep
 
-Sys.nanosleep() -> I<Bool>
+Sys.nanosleep() -> I<Obj>
 
 Return the
+
+Aliases: I<nanoSleep>
 
 =cut
 
 =head2 open
 
-Sys.open() -> I<Bool>
+Sys.open() -> I<Obj>
 
 Return the
 
@@ -85,7 +287,7 @@ Return the
 
 =head2 opendir
 
-Sys.opendir() -> I<Bool>
+Sys.opendir() -> I<Obj>
 
 Return the
 
@@ -106,21 +308,9 @@ Returns an object of type: C<Sidef::Types::String::String>
 
 =cut
 
-=head2 print
-
-Sys.print(I<obj1>, I<obj2>, I<...>) -> I<Bool>
-
-Print a list of argument to the standard output (STDOUT). Returns true on success.
-
-    Sys.print("hello", "-", "world");
-
-Returns an object of type: C<Sidef::Types::Bool::Bool>
-
-=cut
-
 =head2 printf
 
-Sys.printf() -> I<Bool>
+Sys.printf() -> I<Obj>
 
 Return the
 
@@ -138,21 +328,27 @@ Returns an object of type: C<Sidef::Types::Bool::Bool>
 
 =cut
 
-=head2 println
+=head2 read
 
-Sys.println(I<obj1>, I<obj2>, I<...>) -> I<Bool>
+Sys.read() -> I<Obj>
 
-Just like L<C<print()>|"print">, but implicitly appends a newline. Returns true on success.
+Return the
 
-    Sys.println("Goodbye, World!");
+=cut
 
-Returns an object of type: C<Sidef::Types::Bool::Bool>
+=head2 readln
+
+Sys.readln() -> I<Obj>
+
+Return the
+
+Aliases: I<scanln>
 
 =cut
 
 =head2 ref
 
-Sys.ref() -> I<Bool>
+Sys.ref() -> I<Obj>
 
 Return the
 
@@ -160,23 +356,81 @@ Return the
 
 =head2 run
 
-Sys.run() -> I<Bool>
+Sys.run() -> I<Obj>
+
+Return the
+
+Aliases: I<system>
+
+=cut
+
+=head2 select
+
+Sys.select() -> I<Obj>
 
 Return the
 
 =cut
 
-=head2 say
+=head2 setgrent
 
-Sys.say() -> I<Bool>
+Sys.setgrent() -> I<Obj>
 
 Return the
 
 =cut
 
-=head2 scanln
+=head2 sethostent
 
-Sys.scanln() -> I<Bool>
+Sys.sethostent() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 setnetent
+
+Sys.setnetent() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 setpgrp
+
+Sys.setpgrp() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 setpriority
+
+Sys.setpriority() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 setprotoent
+
+Sys.setprotoent() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 setpwent
+
+Sys.setpwent() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 setservent
+
+Sys.setservent() -> I<Obj>
 
 Return the
 
@@ -196,15 +450,31 @@ Returns an object of type: C<Sidef::Types::String::String>
 
 =head2 sleep
 
-Sys.sleep() -> I<Bool>
+Sys.sleep() -> I<Obj>
 
 Return the
 
 =cut
 
-=head2 system
+=head2 stderr
 
-Sys.system() -> I<Bool>
+Sys.stderr() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 stdin
+
+Sys.stdin() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 stdout
+
+Sys.stdout() -> I<Obj>
 
 Return the
 
@@ -212,7 +482,7 @@ Return the
 
 =head2 ualarm
 
-Sys.ualarm() -> I<Bool>
+Sys.ualarm() -> I<Obj>
 
 Return the
 
@@ -220,7 +490,7 @@ Return the
 
 =head2 umask
 
-Sys.umask() -> I<Bool>
+Sys.umask() -> I<Obj>
 
 Return the
 
@@ -228,15 +498,17 @@ Return the
 
 =head2 user
 
-Sys.user() -> I<Bool>
+Sys.user() -> I<Obj>
 
 Return the
+
+Aliases: I<getlogin>
 
 =cut
 
 =head2 usleep
 
-Sys.usleep() -> I<Bool>
+Sys.usleep() -> I<Obj>
 
 Return the
 
@@ -244,7 +516,7 @@ Return the
 
 =head2 warn
 
-Sys.warn() -> I<Bool>
+Sys.warn() -> I<Obj>
 
 Return the
 

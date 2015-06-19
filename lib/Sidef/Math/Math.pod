@@ -40,7 +40,7 @@ Inherits methods from:
 
 =head2 abs
 
-Math.abs() -> I<Bool>
+Math.abs() -> I<Obj>
 
 Return the
 
@@ -55,6 +55,118 @@ Set the calculation accuracy at an arbitrary number of digits.
     Math.accuracy(128);     # sets the accurracy to 128 digits
 
 Returns an object of type: C<Sidef::Types::Number::Number>
+
+=cut
+
+=head2 acos
+
+Math.acos() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 acosec
+
+Math.acosec() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 acosech
+
+Math.acosech() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 acosh
+
+Math.acosh() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 acot
+
+Math.acot() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 acotan
+
+Math.acotan() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 acotanh
+
+Math.acotanh() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 acoth
+
+Math.acoth() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 acsc
+
+Math.acsc() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 acsch
+
+Math.acsch() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 asec
+
+Math.asec() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 asech
+
+Math.asech() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 asin
+
+Math.asin() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 asinh
+
+Math.asinh() -> I<Obj>
+
+Return the
 
 =cut
 
@@ -82,6 +194,30 @@ Returns an object of type: C<Sidef::Types::Number::Number>
 
 =cut
 
+=head2 atanh
+
+Math.atanh() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 avg
+
+Math.avg() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 ceil
+
+Math.ceil() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 cos
 
 Math.cos(I<Num>) -> I<Num>
@@ -94,6 +230,126 @@ Returns an object of type: C<Sidef::Types::Number::Number>
 
 =cut
 
+=head2 cosec
+
+Math.cosec() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 cosech
+
+Math.cosech() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 cosh
+
+Math.cosh() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 cot
+
+Math.cot() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 cotan
+
+Math.cotan() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 cotanh
+
+Math.cotanh() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 coth
+
+Math.coth() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 csc
+
+Math.csc() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 csch
+
+Math.csch() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 deg2deg
+
+Math.deg2deg() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 deg2grad
+
+Math.deg2grad() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 deg2rad
+
+Math.deg2rad() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 e
+
+Math.e() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 exp
+
+Math.exp() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 floor
+
+Math.floor() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 gcd
 
 Math.gcd(I<Num>, I<Num>, I<...>) -> I<Num>
@@ -103,6 +359,38 @@ Returns the greatest common divisor for a list of numbers.
     Math.gcd(64, 40);   # returns 8
 
 Returns an object of type: C<Sidef::Types::Number::Number>
+
+=cut
+
+=head2 get_constant
+
+Math.get_constant() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 grad2deg
+
+Math.grad2deg() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 grad2grad
+
+Math.grad2grad() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 grad2rad
+
+Math.grad2rad() -> I<Obj>
+
+Return the
 
 =cut
 
@@ -131,6 +419,30 @@ Returns an object of type: C<Sidef::Types::Number::Number>
 
 =cut
 
+=head2 log
+
+Math.log() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 log10
+
+Math.log10() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 log2
+
+Math.log2() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 map
 
 Math.map(I<amount>, I<from>, I<to>) -> I<Array>
@@ -141,6 +453,48 @@ each number having the same distance between each other.
     Math.map(8, 1, 3);   # returns: [1, 1.25, 1.5, 1.75, 2, 2.25, 2.5, 2.75]
 
 Returns an object of type: C<Sidef::Types::Array::Array>
+
+=cut
+
+=head2 max
+
+Math.max() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 min
+
+Math.min() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 npow
+
+Math.npow() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 npow2
+
+Math.npow2() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 num2percent
+
+Math.num2percent() -> I<Obj>
+
+Return the
+
+Aliases: I<number_to_percentage>
 
 =cut
 
@@ -161,6 +515,14 @@ Returns an object of type: C<Sidef::Types::Number::Number>
 
 =cut
 
+=head2 pow
+
+Math.pow() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 precision
 
 Math.precision(I<Num>) -> I<Num>
@@ -172,6 +534,38 @@ Basically, this functions just rounds all the numbers to the I<Num>th digit.
     Math.precision(-3);   # mini mode: 10/3 == 3.333
 
 Returns an object of type: C<Sidef::Types::Number::Number>
+
+=cut
+
+=head2 rad2deg
+
+Math.rad2deg() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 rad2grad
+
+Math.rad2grad() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 rad2rad
+
+Math.rad2rad() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 rand
+
+Math.rand() -> I<Obj>
+
+Return the
 
 =cut
 
@@ -190,6 +584,22 @@ Returns an object of type: C<Sidef::Types::Number::Number>
 
 =cut
 
+=head2 sec
+
+Math.sec() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 sech
+
+Math.sech() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 sin
 
 Math.sin(I<Num>) -> I<Num>
@@ -202,6 +612,14 @@ Returns an object of type: C<Sidef::Types::Number::Number>
 
 =cut
 
+=head2 sinh
+
+Math.sinh() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 sqrt
 
 Math.sqrt(I<Num>) -> I<Num>
@@ -211,5 +629,29 @@ Returns the positive square root of I<Num>.
     Math.sqrt(25);   # returns: 5
 
 Returns an object of type: C<Sidef::Types::Number::Number>
+
+=cut
+
+=head2 sum
+
+Math.sum() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 tan
+
+Math.tan() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 tanh
+
+Math.tanh() -> I<Obj>
+
+Return the
 
 =cut

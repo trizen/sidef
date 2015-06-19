@@ -11,254 +11,299 @@ This object is ...
 
 =head1 SYNOPSIS
 
-var obj = (Number.new(...));
+var obj = Number.new(...);
 
 
 =head1 INHERITS
 
 Inherits methods from:
 
-	* Sidef
-	* Sidef::Convert::Convert
+	* Sidef::Object::Object
 
 =head1 METHODS
 
+
 =head2 !
 
-I<Num> B<!> I<Num> -> I<Num>
+I<Obj> B<!> I<Obj> -> I<Obj>
 
 Return the
 
-=cut
-
-
-=head2 !=
-
-I<Num> B<!=> I<Num> -> I<Num>
-
-Return the
+Aliases: I<fact>, I<factorial>
 
 =cut
 
 =head2 %
 
-I<Num> B<%> I<Num> -> I<Num>
+I<Obj> B<%> I<Obj> -> I<Obj>
 
 Return the
+
+Aliases: I<mod>
 
 =cut
 
 =head2 %%
 
-I<Num> B<%%> I<Num> -> I<Num>
+I<Obj> B<%%> I<Obj> -> I<Obj>
 
 Return the
+
+Aliases: I<is_div>, I<isDiv>
 
 =cut
 
 =head2 &
 
-I<Num> B<&> I<Num> -> I<Num>
+I<Obj> B<&> I<Obj> -> I<Obj>
 
 Return the
+
+Aliases: I<and>
 
 =cut
 
 =head2 *
 
-I<Num> B<*> I<Num> -> I<Num>
+I<Obj> B<*> I<Obj> -> I<Obj>
 
 Return the
+
+Aliases: I<x>, I<multiply>
 
 =cut
 
 =head2 **
 
-I<Num> B<**> I<Num> -> I<Num>
+I<Obj> B<**> I<Obj> -> I<Obj>
 
 Return the
+
+Aliases: I<pow>
 
 =cut
 
 =head2 +
 
-I<Num> B<+> I<Num> -> I<Num>
+I<Obj> B<+> I<Obj> -> I<Obj>
 
 Return the
+
+Aliases: I<add>
 
 =cut
 
 =head2 ++
 
-I<Num> B<++> I<Num> -> I<Num>
+I<Obj> B<++> I<Obj> -> I<Obj>
 
 Return the
+
+Aliases: I<inc>
 
 =cut
 
 =head2 -
 
-I<Num> B<-> I<Num> -> I<Num>
+I<Obj> B<-> I<Obj> -> I<Obj>
 
 Return the
+
+Aliases: I<subtract>
 
 =cut
 
 =head2 --
 
-I<Num> B<--> I<Num> -> I<Num>
+I<Obj> B<--> I<Obj> -> I<Obj>
 
 Return the
+
+Aliases: I<dec>
 
 =cut
 
 =head2 ..
 
-I<Num> B<..> I<Num> -> I<Num>
+I<Obj> B<..> I<Obj> -> I<Obj>
 
 Return the
+
+Aliases: I<arr_to>, I<array_to>
 
 =cut
 
 =head2 /
 
-I<Num> B</> I<Num> -> I<Num>
+I<Obj> B</> I<Obj> -> I<Obj>
 
 Return the
+
+Aliases: I<÷()>, I<div>
+
+=cut
+
+=head2 :
+
+I<Obj> B<:> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<c>, I<complex>
 
 =cut
 
 =head2 <
 
-I<Num> B<E<lt>> I<Num> -> I<Num>
+I<Obj> B<E<lt>> I<Obj> -> I<Obj>
 
 Return the
+
+Aliases: I<lt>
 
 =cut
 
 =head2 <<
 
-I<Num> B<E<lt>E<lt>> I<Num> -> I<Num>
+I<Obj> B<E<lt>E<lt>> I<Obj> -> I<Obj>
 
 Return the
 
-=cut
-
-=head2 <=
-
-I<Num> B<E<lt>=> I<Num> -> I<Num>
-
-Return the
+Aliases: I<shift_left>, I<shiftLeft>
 
 =cut
 
 =head2 <=>
 
-I<Num> B<E<lt>=E<gt>> I<Num> -> I<Num>
+I<Obj> B<E<lt>=E<gt>> I<Obj> -> I<Obj>
 
 Return the
+
+Aliases: I<cmp>
 
 =cut
 
 =head2 =
 
-I<Num> B<=> I<Num> -> I<Num>
+I<Obj> B<=> I<Obj> -> I<Obj>
 
 Return the
 
-=cut
-
-=head2 ==
-
-I<Num> B<==> I<Num> -> I<Num>
-
-Return the
+Aliases: I<==()>, I<eq>, I<equals>
 
 =cut
 
 =head2 >
 
-I<Num> B<E<gt>> I<Num> -> I<Num>
+I<Obj> B<E<gt>> I<Obj> -> I<Obj>
 
 Return the
 
-=cut
-
-=head2 >=
-
-I<Num> B<E<gt>=> I<Num> -> I<Num>
-
-Return the
+Aliases: I<gt>
 
 =cut
 
 =head2 >>
 
-I<Num> B<E<gt>E<gt>> I<Num> -> I<Num>
+I<Obj> B<E<gt>E<gt>> I<Obj> -> I<Obj>
 
 Return the
+
+Aliases: I<shift_right>, I<shiftRight>
 
 =cut
 
 =head2 ^
 
-I<Num> B<^> I<Num> -> I<Num>
+I<Obj> B<^> I<Obj> -> I<Obj>
 
 Return the
+
+Aliases: I<xor>
+
+=cut
+
+=head2 ^..
+
+I<Obj> B<^..> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<downto>, I<downTo>
 
 =cut
 
 =head2 abs
 
-Number.abs() -> I<Bool>
+Number.abs() -> I<Obj>
 
 Return the
+
+Aliases: I<pos>, I<positive>
 
 =cut
 
 =head2 acmp
 
-Number.acmp() -> I<Bool>
+Number.acmp() -> I<Obj>
 
 Return the
 
 =cut
 
-=head2 add
+=head2 arr_downto
 
-Number.add() -> I<Bool>
+Number.arr_downto() -> I<Obj>
 
 Return the
+
+Aliases: I<array_downto>
 
 =cut
 
-=head2 and
+=head2 as_bin
 
-Number.and() -> I<Bool>
+Number.as_bin() -> I<Obj>
 
 Return the
+
+Aliases: I<to_bin>
 
 =cut
 
-=head2 as_int
+=head2 as_hex
 
-Number.as_int() -> I<Bool>
+Number.as_hex() -> I<Obj>
 
 Return the
+
+Aliases: I<to_hex>
+
+=cut
+
+=head2 as_oct
+
+Number.as_oct() -> I<Obj>
+
+Return the
+
+Aliases: I<to_oct>
 
 =cut
 
 =head2 bin
 
-Number.bin() -> I<Bool>
+Number.bin() -> I<Obj>
 
 Return the
+
+Aliases: I<from_bin>
 
 =cut
 
 =head2 ceil
 
-Number.ceil() -> I<Bool>
+Number.ceil() -> I<Obj>
 
 Return the
 
@@ -266,15 +311,15 @@ Return the
 
 =head2 chr
 
-Number.chr() -> I<Bool>
+Number.chr() -> I<Obj>
 
 Return the
 
 =cut
 
-=head2 cmp
+=head2 comb
 
-Number.cmp() -> I<Bool>
+Number.comb() -> I<Obj>
 
 Return the
 
@@ -282,7 +327,7 @@ Return the
 
 =head2 commify
 
-Number.commify() -> I<Bool>
+Number.commify() -> I<Obj>
 
 Return the
 
@@ -290,15 +335,7 @@ Return the
 
 =head2 cos
 
-Number.cos() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 dec
-
-Number.dec() -> I<Bool>
+Number.cos() -> I<Obj>
 
 Return the
 
@@ -306,15 +343,7 @@ Return the
 
 =head2 digit
 
-Number.digit() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 div
-
-Number.div() -> I<Bool>
+Number.digit() -> I<Obj>
 
 Return the
 
@@ -322,23 +351,7 @@ Return the
 
 =head2 divmod
 
-Number.divmod() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 downTo
-
-Number.downTo() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 downto
-
-Number.downto() -> I<Bool>
+Number.divmod() -> I<Obj>
 
 Return the
 
@@ -346,23 +359,7 @@ Return the
 
 =head2 dump
 
-Number.dump() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 eq
-
-Number.eq() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 equals
-
-Number.equals() -> I<Bool>
+Number.dump() -> I<Obj>
 
 Return the
 
@@ -370,23 +367,7 @@ Return the
 
 =head2 exp
 
-Number.exp() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 fac
-
-Number.fac() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 factorial
-
-Number.factorial() -> I<Bool>
+Number.exp() -> I<Obj>
 
 Return the
 
@@ -394,15 +375,7 @@ Return the
 
 =head2 floor
 
-Number.floor() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 fRound
-
-Number.fRound() -> I<Bool>
+Number.floor() -> I<Obj>
 
 Return the
 
@@ -410,39 +383,27 @@ Return the
 
 =head2 fround
 
-Number.fround() -> I<Bool>
+Number.fround() -> I<Obj>
 
 Return the
 
-=cut
-
-=head2 ge
-
-Number.ge() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 gt
-
-Number.gt() -> I<Bool>
-
-Return the
+Aliases: I<fRound>, I<roundf>
 
 =cut
 
 =head2 hex
 
-Number.hex() -> I<Bool>
+Number.hex() -> I<Obj>
 
 Return the
 
+Aliases: I<from_hex>
+
 =cut
 
-=head2 inc
+=head2 i
 
-Number.inc() -> I<Bool>
+Number.i() -> I<Obj>
 
 Return the
 
@@ -450,7 +411,7 @@ Return the
 
 =head2 inf
 
-Number.inf() -> I<Bool>
+Number.inf() -> I<Obj>
 
 Return the
 
@@ -458,255 +419,107 @@ Return the
 
 =head2 int
 
-Number.int() -> I<Bool>
+Number.int() -> I<Obj>
 
 Return the
 
-=cut
-
-=head2 isDiv
-
-Number.isDiv() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 is_div
-
-Number.is_div() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 isEven
-
-Number.isEven() -> I<Bool>
-
-Return the
+Aliases: I<as_int>
 
 =cut
 
 =head2 is_even
 
-Number.is_even() -> I<Bool>
+Number.is_even() -> I<Obj>
 
 Return the
 
-=cut
-
-=head2 isInf
-
-Number.isInf() -> I<Bool>
-
-Return the
+Aliases: I<isEven>
 
 =cut
 
 =head2 is_inf
 
-Number.is_inf() -> I<Bool>
+Number.is_inf() -> I<Obj>
 
 Return the
 
-=cut
-
-=head2 isInfinite
-
-Number.isInfinite() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 is_infinite
-
-Number.is_infinite() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 isInt
-
-Number.isInt() -> I<Bool>
-
-Return the
+Aliases: I<isInf>, I<is_infinite>, I<isInfinite>
 
 =cut
 
 =head2 is_int
 
-Number.is_int() -> I<Bool>
+Number.is_int() -> I<Obj>
 
 Return the
 
-=cut
-
-=head2 isInteger
-
-Number.isInteger() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 is_integer
-
-Number.is_integer() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 isNaN
-
-Number.isNaN() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 is_NaN
-
-Number.is_NaN() -> I<Bool>
-
-Return the
+Aliases: I<isInt>, I<is_integer>, I<isInteger>
 
 =cut
 
 =head2 is_nan
 
-Number.is_nan() -> I<Bool>
+Number.is_nan() -> I<Obj>
 
 Return the
 
-=cut
-
-=head2 isNeg
-
-Number.isNeg() -> I<Bool>
-
-Return the
+Aliases: I<is_NaN>, I<isNaN>
 
 =cut
 
 =head2 is_neg
 
-Number.is_neg() -> I<Bool>
+Number.is_neg() -> I<Obj>
 
 Return the
 
-=cut
-
-=head2 isNegative
-
-Number.isNegative() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 is_negative
-
-Number.is_negative() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 isOdd
-
-Number.isOdd() -> I<Bool>
-
-Return the
+Aliases: I<isNeg>, I<is_negative>, I<isNegative>
 
 =cut
 
 =head2 is_odd
 
-Number.is_odd() -> I<Bool>
+Number.is_odd() -> I<Obj>
 
 Return the
 
-=cut
-
-=head2 isPos
-
-Number.isPos() -> I<Bool>
-
-Return the
+Aliases: I<isOdd>
 
 =cut
 
 =head2 is_pos
 
-Number.is_pos() -> I<Bool>
+Number.is_pos() -> I<Obj>
 
 Return the
 
-=cut
-
-=head2 isPositive
-
-Number.isPositive() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 is_positive
-
-Number.is_positive() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 isZero
-
-Number.isZero() -> I<Bool>
-
-Return the
+Aliases: I<isPos>, I<is_positive>, I<isPositive>
 
 =cut
 
 =head2 is_zero
 
-Number.is_zero() -> I<Bool>
+Number.is_zero() -> I<Obj>
 
 Return the
 
-=cut
-
-=head2 le
-
-Number.le() -> I<Bool>
-
-Return the
+Aliases: I<isZero>
 
 =cut
 
 =head2 len
 
-Number.len() -> I<Bool>
+Number.len() -> I<Obj>
 
 Return the
 
-=cut
-
-=head2 length
-
-Number.length() -> I<Bool>
-
-Return the
+Aliases: I<length>
 
 =cut
 
 =head2 log
 
-Number.log() -> I<Bool>
+Number.log() -> I<Obj>
 
 Return the
 
@@ -714,7 +527,7 @@ Return the
 
 =head2 log10
 
-Number.log10() -> I<Bool>
+Number.log10() -> I<Obj>
 
 Return the
 
@@ -722,39 +535,31 @@ Return the
 
 =head2 log2
 
-Number.log2() -> I<Bool>
+Number.log2() -> I<Obj>
 
 Return the
 
 =cut
 
-=head2 lt
+=head2 max
 
-Number.lt() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 mod
-
-Number.mod() -> I<Bool>
+Number.max() -> I<Obj>
 
 Return the
 
 =cut
 
-=head2 multiply
+=head2 min
 
-Number.multiply() -> I<Bool>
+Number.min() -> I<Obj>
 
 Return the
 
 =cut
 
-=head2 NaN
+=head2 modpow
 
-Number.NaN() -> I<Bool>
+Number.modpow() -> I<Obj>
 
 Return the
 
@@ -762,87 +567,45 @@ Return the
 
 =head2 nan
 
-Number.nan() -> I<Bool>
+Number.nan() -> I<Obj>
 
 Return the
 
-=cut
-
-=head2 ne
-
-Number.ne() -> I<Bool>
-
-Return the
+Aliases: I<NaN>
 
 =cut
 
 =head2 neg
 
-Number.neg() -> I<Bool>
+Number.neg() -> I<Obj>
 
 Return the
 
-=cut
-
-=head2 negate
-
-Number.negate() -> I<Bool>
-
-Return the
+Aliases: I<negate>
 
 =cut
 
 =head2 new
 
-Number.new() -> I<Bool>
+Number.new() -> I<Obj>
 
 Return the
 
-=cut
-
-=head2 newInt
-
-Number.newInt() -> I<Bool>
-
-Return the
+Aliases: I<new_float>
 
 =cut
 
 =head2 new_int
 
-Number.new_int() -> I<Bool>
+Number.new_int() -> I<Obj>
 
 Return the
 
 =cut
 
-=head2 nextPowerOf
+=head2 new_rat
 
-Number.nextPowerOf() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 next_power_of
-
-Number.next_power_of() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 nextPowerOfTwo
-
-Number.nextPowerOfTwo() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 next_power_of_two
-
-Number.next_power_of_two() -> I<Bool>
+Number.new_rat() -> I<Obj>
 
 Return the
 
@@ -850,55 +613,45 @@ Return the
 
 =head2 nok
 
-Number.nok() -> I<Bool>
+Number.nok() -> I<Obj>
 
 Return the
 
 =cut
 
-=head2 not
+=head2 npow
 
-Number.not() -> I<Bool>
+Number.npow() -> I<Obj>
 
 Return the
+
+Aliases: I<next_power_of>
+
+=cut
+
+=head2 npow2
+
+Number.npow2() -> I<Obj>
+
+Return the
+
+Aliases: I<next_power_of_two>
+
+=cut
+
+=head2 oct
+
+Number.oct() -> I<Obj>
+
+Return the
+
+Aliases: I<from_oct>
 
 =cut
 
 =head2 of
 
-Number.of() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 or
-
-Number.or() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 pos
-
-Number.pos() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 positive
-
-Number.positive() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 pow
-
-Number.pow() -> I<Bool>
+Number.of() -> I<Obj>
 
 Return the
 
@@ -906,7 +659,7 @@ Return the
 
 =head2 rand
 
-Number.rand() -> I<Bool>
+Number.rand() -> I<Obj>
 
 Return the
 
@@ -914,7 +667,7 @@ Return the
 
 =head2 range
 
-Number.range() -> I<Bool>
+Number.range() -> I<Obj>
 
 Return the
 
@@ -922,7 +675,7 @@ Return the
 
 =head2 root
 
-Number.root() -> I<Bool>
+Number.root() -> I<Obj>
 
 Return the
 
@@ -930,47 +683,7 @@ Return the
 
 =head2 round
 
-Number.round() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 roundf
-
-Number.roundf() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 shiftLeft
-
-Number.shiftLeft() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 shift_left
-
-Number.shift_left() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 shiftRight
-
-Number.shiftRight() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 shift_right
-
-Number.shift_right() -> I<Bool>
+Number.round() -> I<Obj>
 
 Return the
 
@@ -978,7 +691,7 @@ Return the
 
 =head2 sign
 
-Number.sign() -> I<Bool>
+Number.sign() -> I<Obj>
 
 Return the
 
@@ -986,7 +699,7 @@ Return the
 
 =head2 sin
 
-Number.sin() -> I<Bool>
+Number.sin() -> I<Obj>
 
 Return the
 
@@ -994,7 +707,7 @@ Return the
 
 =head2 sqrt
 
-Number.sqrt() -> I<Bool>
+Number.sqrt() -> I<Obj>
 
 Return the
 
@@ -1002,15 +715,7 @@ Return the
 
 =head2 sstr
 
-Number.sstr() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 subtract
-
-Number.subtract() -> I<Bool>
+Number.sstr() -> I<Obj>
 
 Return the
 
@@ -1018,7 +723,7 @@ Return the
 
 =head2 times
 
-Number.times() -> I<Bool>
+Number.times() -> I<Obj>
 
 Return the
 
@@ -1026,80 +731,60 @@ Return the
 
 =head2 to
 
-Number.to() -> I<Bool>
+Number.to() -> I<Obj>
 
 Return the
 
-=cut
-
-=head2 to_bin
-
-Number.to_bin() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 upTo
-
-Number.upTo() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 upto
-
-Number.upto() -> I<Bool>
-
-Return the
-
-=cut
-
-=head2 xor
-
-Number.xor() -> I<Bool>
-
-Return the
+Aliases: I<...()>, I<..^()>, I<upto>, I<upTo>
 
 =cut
 
 =head2 |
 
-I<Num> B<|> I<Num> -> I<Num>
+I<Obj> B<|> I<Obj> -> I<Obj>
 
 Return the
+
+Aliases: I<or>
 
 =cut
 
-=head2 ÷
+=head2 ~
 
-I<Num> B<÷> I<Num> -> I<Num>
+I<Obj> B<~> I<Obj> -> I<Obj>
 
 Return the
+
+Aliases: I<not>
 
 =cut
 
 =head2 ≠
 
-I<Num> B<≠> I<Num> -> I<Num>
+I<Obj> B<≠> I<Obj> -> I<Obj>
 
 Return the
+
+Aliases: I<!=()>, I<ne>
 
 =cut
 
 =head2 ≤
 
-I<Num> B<≤> I<Num> -> I<Num>
+I<Obj> B<≤> I<Obj> -> I<Obj>
 
 Return the
+
+Aliases: I<E<lt>=>, I<le>
 
 =cut
 
 =head2 ≥
 
-I<Num> B<≥> I<Num> -> I<Num>
+I<Obj> B<≥> I<Obj> -> I<Obj>
 
 Return the
+
+Aliases: I<E<gt>=>, I<ge>
 
 =cut
