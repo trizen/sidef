@@ -8,6 +8,7 @@ lib/Sidef/Convert/Convert.pod
 lib/Sidef/Deparse/Perl.pm
 lib/Sidef/Deparse/Sidef.pm
 lib/Sidef/Eval/Eval.pm
+lib/Sidef/Eval/Eval.pod
 lib/Sidef/Exec.pm
 lib/Sidef/Math/Math.pm
 lib/Sidef/Math/Math.pod
@@ -16,10 +17,12 @@ lib/Sidef/Module/Func.pm
 lib/Sidef/Module/Require.pm
 lib/Sidef/Module/Require.pod
 lib/Sidef/Object/Object.pm
+lib/Sidef/Object/Object.pod
 lib/Sidef/Object/Unary.pm
 lib/Sidef/Optimizer.pm
 lib/Sidef/Parser.pm
 lib/Sidef/Perl/Perl.pm
+lib/Sidef/Perl/Perl.pod
 lib/Sidef/Sys/SIG.pm
 lib/Sidef/Sys/Sys.pm
 lib/Sidef/Sys/Sys.pod
@@ -34,8 +37,11 @@ lib/Sidef/Types/Array/Array.pod
 lib/Sidef/Types/Array/HCArray.pm
 lib/Sidef/Types/Array/List.pm
 lib/Sidef/Types/Array/MultiArray.pm
+lib/Sidef/Types/Array/MultiArray.pod
 lib/Sidef/Types/Array/Pair.pm
+lib/Sidef/Types/Array/Pair.pod
 lib/Sidef/Types/Array/Range.pm
+lib/Sidef/Types/Array/Range.pod
 lib/Sidef/Types/Black/Hole.pm
 lib/Sidef/Types/Block/Break.pm
 lib/Sidef/Types/Block/Break.pod
@@ -48,6 +54,7 @@ lib/Sidef/Types/Block/Do.pod
 lib/Sidef/Types/Block/For.pm
 lib/Sidef/Types/Block/For.pod
 lib/Sidef/Types/Block/Fork.pm
+lib/Sidef/Types/Block/Fork.pod
 lib/Sidef/Types/Block/Given.pm
 lib/Sidef/Types/Block/Given.pod
 lib/Sidef/Types/Block/Next.pm
@@ -91,7 +98,9 @@ lib/Sidef/Types/Glob/Pipe.pod
 lib/Sidef/Types/Glob/PipeHandle.pm
 lib/Sidef/Types/Glob/PipeHandle.pod
 lib/Sidef/Types/Glob/Socket.pm
+lib/Sidef/Types/Glob/Socket.pod
 lib/Sidef/Types/Glob/SocketHandle.pm
+lib/Sidef/Types/Glob/SocketHandle.pod
 lib/Sidef/Types/Glob/Stat.pm
 lib/Sidef/Types/Glob/Stat.pod
 lib/Sidef/Types/Hash/Hash.pm
@@ -99,6 +108,7 @@ lib/Sidef/Types/Hash/Hash.pod
 lib/Sidef/Types/Nil/Nil.pm
 lib/Sidef/Types/Nil/Nil.pod
 lib/Sidef/Types/Number/Complex.pm
+lib/Sidef/Types/Number/Complex.pod
 lib/Sidef/Types/Number/Number.pm
 lib/Sidef/Types/Number/Number.pod
 lib/Sidef/Types/Number/NumberFast.pm
@@ -111,6 +121,7 @@ lib/Sidef/Types/Regex/Regex.pod
 lib/Sidef/Types/String/String.pm
 lib/Sidef/Types/String/String.pod
 lib/Sidef/Variable/Class.pm
+lib/Sidef/Variable/Class.pod
 lib/Sidef/Variable/ClassInit.pm
 lib/Sidef/Variable/ClassInit.pod
 lib/Sidef/Variable/ClassVar.pm
