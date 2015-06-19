@@ -852,6 +852,8 @@ package Sidef::Types::String::String {
 
     sub apply_escapes {
         my ($self, $parser) = @_;
+
+        state $x = require Encode;
         my $str = $self->get_value;
 
         state $esc = {
@@ -1043,7 +1045,7 @@ package Sidef::Types::String::String {
                         };
 
                     if ($string ne '') {
-                        $append_arg->($string);
+                        $append_arg->(Encode::decode_utf8(Encode::encode_utf8($string)));
                         $string = '';
                     }
                     $append_arg->($block);
@@ -1054,13 +1056,13 @@ package Sidef::Types::String::String {
             }
 
             if ($string ne '') {
-                $append_arg->($string);
+                $append_arg->(Encode::decode_utf8(Encode::encode_utf8($string)));
             }
 
             return $expr;
         }
 
-        $self->new(CORE::join('', @chars));
+        $self->new(Encode::decode_utf8(Encode::encode_utf8(CORE::join('', @chars))));
     }
 
     *applyEscapes = \&apply_escapes;
