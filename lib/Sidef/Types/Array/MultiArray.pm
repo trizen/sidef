@@ -35,7 +35,7 @@ package Sidef::Types::Array::MultiArray {
 
         my @arr;
         foreach my $i (0 .. $#{$self->[0]}) {
-            push @arr, scalar $code->call(map { $_->[$i] } @{$self});
+            push @arr, scalar $code->run(map { $_->[$i] } @{$self});
         }
 
         Sidef::Types::Array::Array->new(@arr);
@@ -45,7 +45,9 @@ package Sidef::Types::Array::MultiArray {
         my ($self, $code) = @_;
 
         foreach my $i (0 .. $#{$self->[0]}) {
-            $code->call(map { $_->[$i] } @{$self});
+            if (defined(my $res = $code->_run_code(map { $_->[$i] } @{$self}))) {
+                return $res;
+            }
         }
 
         $self;

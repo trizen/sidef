@@ -74,31 +74,23 @@ package Sidef::Types::Block::Code {
 
         $num = defined($num) ? $num->get_value : 1;
 
-        return if $num < 1;
-        my ($var) = $self->init_block_vars();
+        return $self if $num < 1;
 
         if ($num > (-1 >> 1)) {
             for (my $i = 1 ; $i <= $num ; $i++) {
-                $var->set_value(Sidef::Types::Number::Number->new($i));
-
-                if (defined(my $res = $self->_run_code)) {
-                    $self->pop_stack();
+                if (defined(my $res = $self->_run_code(Sidef::Types::Number::Number->new($i)))) {
                     return $res;
                 }
             }
         }
         else {
             foreach my $i (1 .. $num) {
-                $var->set_value(Sidef::Types::Number::Number->new($i));
-
-                if (defined(my $res = $self->_run_code)) {
-                    $self->pop_stack();
+                if (defined(my $res = $self->_run_code(Sidef::Types::Number::Number->new($i)))) {
                     return $res;
                 }
             }
         }
 
-        $self->pop_stack();
         $self;
     }
 
@@ -118,8 +110,9 @@ package Sidef::Types::Block::Code {
     *toArray = \&to_array;
 
     sub _run_code {
-        my ($self) = @_;
-        my $result = $self->run;
+        my ($self, @args) = @_;
+        my $result = $self->run(@args);
+
         ref($result) eq 'Sidef::Types::Block::Return'
           ? $result
           : ref($result) eq 'Sidef::Types::Block::Break' ? --$result->{depth} <= 0
@@ -129,7 +122,12 @@ package Sidef::Types::Block::Code {
     }
 
     sub run {
-        my ($self) = @_;
+        my ($self, @args) = @_;
+
+        if (@args) {
+            $self->fast_init_block_vars(@args);
+        }
+
         my $result = ($self->_execute)[-1];
         my $ref    = ref($result);
         if ($ref eq 'Sidef::Variable::Variable' or $ref eq 'Sidef::Variable::ClassVar') {
@@ -176,9 +174,7 @@ package Sidef::Types::Block::Code {
         $code;
     }
 
-    sub init_block_vars {
-        my ($self, @args) = @_;
-
+    {
         my $check_type = sub {
             my ($var, $value) = @_;
 
@@ -193,40 +189,66 @@ package Sidef::Types::Block::Code {
               "', but expected '", $r1, "'!\n";
         };
 
-        # varName => value
-        my %named_vars;
+        sub init_block_vars {
+            my ($self, @args) = @_;
 
-        # Init the arguments
-        my $last = $#{$self->{init_vars}};
+            # varName => value
+            my %named_vars;
+
+            # Init the arguments
+            my $last = $#{$self->{init_vars}};
+            foreach my $i (0 .. $last) {
+                my $var = $self->{init_vars}[$i];
+                if (ref $args[$i] eq 'Sidef::Types::Array::Pair') {
+                    $named_vars{$args[$i][0]->get_value} = $args[$i][1]->get_value;
+                }
+                else {
+                    my $v = $var->{vars}[0];
+                    exists($v->{in_use}) || next;
+                    (exists($v->{array}) || exists($v->{hash})) && do {
+                        $var->set_value(@args[$i .. $#args]);
+                        next;
+                    };
+                    exists($v->{has_value}) && exists($args[$i]) && $check_type->($v, $args[$i]);
+                    $i == $last
+                      ? $var->set_value(Sidef::Types::Array::Array->new(@args[$i .. $#args]))
+                      : $var->set_value(exists($args[$i]) ? $args[$i] : ());
+                }
+            }
+
+            foreach my $init_var (@{$self->{init_vars}}) {
+                my $var = $init_var->{vars}[0];
+                if (exists $named_vars{$var->{name}}) {
+                    exists($var->{has_value}) && $check_type->($var, $named_vars{$var->{name}});
+                    $init_var->set_value(delete($named_vars{$var->{name}}));
+                }
+            }
+
+            foreach my $key (keys %named_vars) {
+                warn "[WARN] No such named argument: '$key'\n";
+            }
+
+            $last == 0
+              ? @{$self->{init_vars}}
+              : @{$self->{init_vars}}[0 .. $last - 1];
+        }
+    }
+
+    sub fast_init_block_vars {
+        my ($self, @args) = @_;
+
+        my $nargs = $#args;
+        my $last  = $#{$self->{init_vars}};
+
         foreach my $i (0 .. $last) {
             my $var = $self->{init_vars}[$i];
-            if (ref $args[$i] eq 'Sidef::Types::Array::Pair') {
-                $named_vars{$args[$i][0]->get_value} = $args[$i][1]->get_value;
-            }
-            else {
-                my $v = $var->{vars}[0];
-                exists($v->{in_use}) || next;
-                (exists($v->{array}) || exists($v->{hash})) && do {
-                    $var->set_value(@args[$i .. $#args]);
-                    next;
-                };
-                exists($v->{has_value}) && exists($args[$i]) && $check_type->($v, $args[$i]);
-                $i == $last
-                  ? $var->set_value(Sidef::Types::Array::Array->new(@args[$i .. $#args]))
-                  : $var->set_value(exists($args[$i]) ? $args[$i] : ());
-            }
-        }
 
-        foreach my $init_var (@{$self->{init_vars}}) {
-            my $var = $init_var->{vars}[0];
-            if (exists $named_vars{$var->{name}}) {
-                exists($var->{has_value}) && $check_type->($var, $named_vars{$var->{name}});
-                $init_var->set_value(delete($named_vars{$var->{name}}));
-            }
-        }
+            my $v = $var->{vars}[0];
+            exists($v->{in_use}) || next;
 
-        foreach my $key (keys %named_vars) {
-            warn "[WARN] No such named argument: '$key'\n";
+            $nargs > 0 && $i == $last
+              ? $var->set_value(Sidef::Types::Array::Array->new(@args[$i .. $nargs]))
+              : $var->set_value(exists($args[$i]) ? $args[$i] : ());
         }
 
         $last == 0
@@ -360,10 +382,8 @@ package Sidef::Types::Block::Code {
             $arg->each($self);
         }
         else {
-            my ($var_ref) = $self->init_block_vars();
             foreach my $item ($arg, @rest) {
-                $var_ref->set_value($item);
-                if (defined(my $res = $self->_run_code)) {
+                if (defined(my $res = $self->_run_code($item))) {
                     return $res;
                 }
             }

@@ -61,7 +61,6 @@ package Sidef::Types::Array::Range {
         my ($self, $code) = @_;
 
         $code // return ($self->pairs);
-        my ($var_ref) = $code->init_block_vars();
 
         if ($self->{type} eq 'number') {
 
@@ -72,9 +71,7 @@ package Sidef::Types::Array::Range {
             if ($self->{direction} eq 'up') {
                 if ($step == 1 and not $limit > (-1 >> 1) and not $from > (-1 >> 1)) {
                     foreach my $i ($from .. $limit) {
-                        $var_ref->set_value(Sidef::Types::Number::Number->new($i));
-                        if (defined(my $res = $code->_run_code)) {
-                            $code->pop_stack();
+                        if (defined(my $res = $code->_run_code(Sidef::Types::Number::Number->new($i)))) {
                             return $res;
                         }
                     }
@@ -82,9 +79,7 @@ package Sidef::Types::Array::Range {
                 }
                 else {
                     for (my $i = $from ; $i <= $limit ; $i += $step) {
-                        $var_ref->set_value(Sidef::Types::Number::Number->new($i));
-                        if (defined(my $res = $code->_run_code)) {
-                            $code->pop_stack();
+                        if (defined(my $res = $code->_run_code(Sidef::Types::Number::Number->new($i)))) {
                             return $res;
                         }
                     }
@@ -93,15 +88,11 @@ package Sidef::Types::Array::Range {
             else {
 
                 for (my $i = $from ; $i >= $limit ; $i -= $step) {
-                    $var_ref->set_value(Sidef::Types::Number::Number->new($i));
-                    if (defined(my $res = $code->_run_code)) {
-                        $code->pop_stack();
+                    if (defined(my $res = $code->_run_code(Sidef::Types::Number::Number->new($i)))) {
                         return $res;
                     }
                 }
             }
-
-            $code->pop_stack();
         }
         else {
 
@@ -111,18 +102,14 @@ package Sidef::Types::Array::Range {
             if ($self->{direction} eq 'up') {
                 if (length($from) == 1 and length($to) == 1) {
                     foreach my $i (ord($from) .. ord($to)) {
-                        $var_ref->set_value(Sidef::Types::String::String->new(chr($i)));
-                        if (defined(my $res = $code->_run_code)) {
-                            $code->pop_stack();
+                        if (defined(my $res = $code->_run_code(Sidef::Types::String::String->new(chr($i))))) {
                             return $res;
                         }
                     }
                 }
                 else {
                     foreach my $str ($from .. $to) {    # this is lazy
-                        $var_ref->set_value(Sidef::Types::String::String->new($str));
-                        if (defined(my $res = $code->_run_code)) {
-                            $code->pop_stack();
+                        if (defined(my $res = $code->_run_code(Sidef::Types::String::String->new($str)))) {
                             return $res;
                         }
                     }
@@ -133,18 +120,14 @@ package Sidef::Types::Array::Range {
                     my $f = ord($from);
                     my $t = ord($to);
                     for (; $f >= $t ; $f--) {
-                        $var_ref->set_value(Sidef::Types::String::String->new(chr($f)));
-                        if (defined(my $res = $code->_run_code)) {
-                            $code->pop_stack();
+                        if (defined(my $res = $code->_run_code(Sidef::Types::String::String->new(chr($f))))) {
                             return $res;
                         }
                     }
                 }
                 else {
                     foreach my $str (reverse($from .. $to)) {    # this is not lazy
-                        $var_ref->set_value(Sidef::Types::String::String->new($str));
-                        if (defined(my $res = $code->_run_code)) {
-                            $code->pop_stack();
+                        if (defined(my $res = $code->_run_code(Sidef::Types::String::String->new($str)))) {
                             return $res;
                         }
                     }

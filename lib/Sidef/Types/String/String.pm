@@ -618,31 +618,28 @@ package Sidef::Types::String::String {
     sub each {
         my ($self, $code) = @_;
 
-        my ($var_ref) = $code->init_block_vars();
-
         foreach my $char (CORE::split(//, $self->get_value)) {
-            $var_ref->set_value(__PACKAGE__->new($char));
-            if (defined(my $res = $code->_run_code)) {
-                $code->pop_stack();
+            if (defined(my $res = $code->_run_code(__PACKAGE__->new($char)))) {
                 return $res;
             }
         }
 
-        $code->pop_stack();
         $self;
     }
 
     *each_char = \&each;
     *eachChar  = \&each;
 
-    sub each_line {
-        my ($self, $obj) = @_;
-        my $array = Sidef::Types::Array::Array->new(map { __PACKAGE__->new($_) } CORE::split(/\R/, $self->get_value));
-        $obj // return $array;
-        $array->each($obj);
+    sub lines {
+        my ($self) = @_;
+        Sidef::Types::Array::Array->new(map { __PACKAGE__->new($_) } CORE::split(/\R/, $self->get_value));
     }
 
-    *lines    = \&each_line;
+    sub each_line {
+        my ($self, $obj) = @_;
+        $self->lines->each($obj);
+    }
+
     *eachLine = \&each_line;
 
     sub open_r {

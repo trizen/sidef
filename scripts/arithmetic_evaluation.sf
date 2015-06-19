@@ -73,8 +73,9 @@ for [
      ['2*(3+4)+2/4'                              => 2/4 + 14],
      ['2*-3--4+-0.25'                            =>    -2.25],
      ['2 * (3 + (4 * 5 + (6 * 7) * 8) - 9) * 10' =>     7000],
-    ] { |expr, res|
+    ] { |arr|
 
+    var (expr, res) = arr...;
     var num = (evalArithmeticExp(expr)) == res || (
             "Error occurred on expression '#{expr}': got '#{num}' instead of '#{res}'\n".die;
     );

@@ -203,17 +203,13 @@ package Sidef::Types::Glob::FileHandle {
 
     sub each {
         my ($self, $code) = @_;
-        my ($var_ref) = $code->init_block_vars();
 
         while (defined(my $line = CORE::readline($self->{fh}))) {
-            $var_ref->set_value(Sidef::Types::String::String->new($line));
-            if (defined(my $res = $code->_run_code)) {
-                $code->pop_stack();
+            if (defined(my $res = $code->_run_code(Sidef::Types::String::String->new($line)))) {
                 return $res;
             }
         }
 
-        $code->pop_stack();
         $self;
     }
 

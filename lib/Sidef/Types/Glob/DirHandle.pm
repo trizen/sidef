@@ -113,18 +113,14 @@ package Sidef::Types::Glob::DirHandle {
 
     sub each {
         my ($self, $code) = @_;
-        my ($var_ref) = $code->init_block_vars();
 
         require Encode;
         while (defined(my $file = CORE::readdir($self->{dir_h}))) {
-            $var_ref->set_value(Sidef::Types::String::String->new(Encode::decode_utf8($file)));
-            if (defined(my $res = $code->_run_code)) {
-                $code->pop_stack();
+            if (defined(my $res = $code->_run_code(Sidef::Types::String::String->new(Encode::decode_utf8($file))))) {
                 return $res;
             }
         }
 
-        $code->pop_stack();
         $self;
     }
 

@@ -27,12 +27,8 @@ package Sidef::Types::Block::Try {
         my ($self, $code) = @_;
 
         $self->{catch}
-          ? do {
-            my ($type, $msg) = $code->init_block_vars();
-            $type->set_value(Sidef::Types::String::String->new($self->{type}));
-            $msg->set_value(Sidef::Types::String::String->new($self->{msg} =~ s/^\[.*?\]\h*//r)->chomp) if defined($msg);
-            $code->run;
-          }
+          ? $code->run(Sidef::Types::String::String->new($self->{type}),
+                       Sidef::Types::String::String->new($self->{msg} =~ s/^\[.*?\]\h*//r)->chomp)
           : $self->{val};
     }
 

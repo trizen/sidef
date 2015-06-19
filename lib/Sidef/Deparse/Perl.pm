@@ -125,14 +125,9 @@ package Sidef::Types::Block::PerlCode {
         $self;
     }
 
-    sub init_block_vars {
-        my ($self) = @_;
-        map {Sidef::Variable::PerlVar->new($_)} @{$self->{vars}};
-    }
-
     sub run {
-        my ($self) = @_;
-        $self->_execute;
+        my ($self, @args) = @_;
+        $self->_execute(@args);
     }
 
     sub call {

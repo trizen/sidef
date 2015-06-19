@@ -21,7 +21,8 @@ func arabic2roman (num) {
     ];
 
     var roman = '';
-    for (lookup) { |r, a|
+    for (lookup) { |arr|
+        var (r, a) = arr...;
         while (num >= a) {
             roman += r;
             num   -= a;

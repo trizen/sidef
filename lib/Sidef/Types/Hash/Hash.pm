@@ -254,12 +254,26 @@ package Sidef::Types::Hash::Hash {
 
     sub each_value {
         my ($self, $code) = @_;
-        $self->values->each($code);
+
+        foreach my $value (values %{$self->{data}}) {
+            if (defined(my $res = $code->_run_code($value->get_value))) {
+                return $res;
+            }
+        }
+
+        $code;
     }
 
     sub each_key {
         my ($self, $code) = @_;
-        $self->keys->each($code);
+
+        foreach my $key (keys %{$self->{data}}) {
+            if (defined(my $res = $code->_run_code(Sidef::Types::String::String->new($key)))) {
+                return $res;
+            }
+        }
+
+        $code;
     }
 
     sub each {
@@ -267,12 +281,15 @@ package Sidef::Types::Hash::Hash {
 
         if (defined($obj)) {
 
-            my $array = Sidef::Types::Array::Array->new();
-            while (my ($key, $value) = each %{$self->{data}}) {
-                $array->push(Sidef::Types::Array::Array->new(Sidef::Types::String::String->new($key), $value->get_value));
+            foreach my $key (keys %{$self->{data}}) {
+                if (
+                    defined(my $res = $obj->_run_code(Sidef::Types::String::String->new($key), $self->{data}{$key}->get_value))
+                  ) {
+                    return $res;
+                }
             }
 
-            return $array->each($obj);
+            return $obj;
         }
 
         my ($key, $value) = each(%{$self->{data}});
