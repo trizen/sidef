@@ -438,6 +438,7 @@ scripts/unique_prefixes.sf
 scripts/url_encoding_decoding.sf
 scripts/var_ref.sf
 scripts/var_scoping.sf
+scripts/virtual_machine.sf
 scripts/while_loop.sf
 scripts/word_roots.sf
 scripts/zig-zag_matrix.sf

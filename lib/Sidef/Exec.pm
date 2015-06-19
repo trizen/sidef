@@ -130,7 +130,7 @@ package Sidef::Exec {
                                 next;
                             }
 
-                            foreach my $ind (0 .. $num) {
+                            foreach my $ind ($#{$self_obj} + 1 .. $num) {
                                 $self_obj->[$num] //= Sidef::Variable::Variable->new(name => '', type => 'var');
                             }
 
@@ -210,11 +210,8 @@ package Sidef::Exec {
                     }
                 }
 
-                if (
-                    (ref($self_obj) eq 'Sidef::Variable::Variable' or ref($self_obj) eq 'Sidef::Variable::ClassVar')
-                    and ($l < $#{$expr->{ind}}
-                         or ref($expr->{self}) eq 'HASH')
-                  ) {
+                if (    (ref($self_obj) eq 'Sidef::Variable::Variable' or ref($self_obj) eq 'Sidef::Variable::ClassVar')
+                    and ($l < $#{$expr->{ind}})) {
                     $self_obj = $self_obj->get_value;
                 }
             }
