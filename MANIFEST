@@ -282,6 +282,7 @@ scripts/Interactive/brainf___.sf
 scripts/Interactive/cosmic_calendar.sf
 scripts/Interactive/draw_a_clock.sf
 scripts/Interactive/guess_the_number_player.sf
+scripts/Interactive/hello_world.bf
 scripts/Interactive/socket.sf
 scripts/Interactive/socket_inet.sf
 scripts/Interactive/stdin.sf

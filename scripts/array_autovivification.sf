@@ -17,24 +17,28 @@ r.dump.say;
 r == [nil, nil, [nil, nil, ['y'], 'x']]
      || ("Error! (2)\n".die);
 
+r[2][5] = "sidef";
+
+r == [nil, nil, [nil, nil, ['y'], 'x', nil, 'sidef']]
+    || die "error!";
 
 r[2][2][4] = "z";
 r[2][2][2] = "i";
 
 r.dump.say;
 
-r == [nil, nil, [nil, nil, ['y', nil, 'i', nil, 'z'], 'x']]
+r == [nil, nil, [nil, nil, ['y', nil, 'i', nil, 'z'], 'x', nil, 'sidef']]
      || ("Error! (3)\n".die);
 
 
-r[5][5][1][2][3] = "sidef";
+r[5][5][1][2][3] = 'sidef';
 
 r.dump.say;
 
-r == [nil, nil, [nil, nil, ['y', nil, 'i', nil, 'z'], 'x'],
+r == [nil, nil, [nil, nil, ['y', nil, 'i', nil, 'z'], 'x', nil, 'sidef'],
       nil, nil, [nil, nil, nil, nil, nil, [nil, [nil, nil,
      [nil, nil, nil, 'sidef']]]]]
     || ("Error! (4)\n".die);
 
 
-"\nAll tests passed!\n".say;
+say "\n** All tests passed!";
