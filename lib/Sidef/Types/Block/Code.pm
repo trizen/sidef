@@ -151,12 +151,10 @@ package Sidef::Types::Block::Code {
         while ($condition->run) {
             defined($old_self) && ($old_self->{did_while} //= 1);
             if (defined(my $res = $self->_run_code)) {
-                $self->pop_stack();
                 return (ref($res) eq ref($self) && defined($old_self) ? $old_self : $res);
             }
         }
 
-        $self->pop_stack();
         $old_self // $self;
     }
 
@@ -165,12 +163,10 @@ package Sidef::Types::Block::Code {
 
         while (1) {
             if (defined(my $res = $code->_run_code)) {
-                $code->pop_stack();
                 return $res;
             }
         }
 
-        $code->pop_stack();
         $code;
     }
 
@@ -197,10 +193,11 @@ package Sidef::Types::Block::Code {
 
             # Init the arguments
             my $last = $#{$self->{init_vars}};
-            foreach my $i (0 .. $last) {
+            for (my $i = 0 ; $i <= $last ; $i++) {
                 my $var = $self->{init_vars}[$i];
                 if (ref $args[$i] eq 'Sidef::Types::Array::Pair') {
                     $named_vars{$args[$i][0]->get_value} = $args[$i][1]->get_value;
+                    splice(@args, $i--, 1);
                 }
                 else {
                     my $v = $var->{vars}[0];
