@@ -12,4 +12,4 @@ func letter_frequency(file) {
 }
 
 var top = letter_frequency(File.new(__FILE__));
-top.each{|key, val| say "#{key}: #{val}"};
+top.each{ |arr| say "#{arr[0]}: #{arr[1]}"};
