@@ -7,38 +7,33 @@ package Sidef::Object::Object {
 
     # Logical AND
     *{__PACKAGE__ . '::' . '&&'} = sub {
-        my ($self, $code) = @_;
-        $self
-          ? Sidef::Types::Block::Code->new($code)->run
-          : $self;
+        $_[0]
+          ? Sidef::Types::Block::Code->new($_[1])->run
+          : $_[0];
     };
 
     # Logical OR
     *{__PACKAGE__ . '::' . '||'} = sub {
-        my ($self, $code) = @_;
-        $self
-          ? $self
-          : Sidef::Types::Block::Code->new($code)->run;
+        $_[0]
+          ? $_[0]
+          : Sidef::Types::Block::Code->new($_[1])->run;
     };
 
     # Logical XOR
     *{__PACKAGE__ . '::' . '^'} = sub {
-        my ($self, $val) = @_;
-        Sidef::Types::Bool::Bool->new($self xor $val);
+        Sidef::Types::Bool::Bool->new($_[0] xor $_[1]);
     };
 
     # Defined-OR
     *{__PACKAGE__ . '::' . '\\\\'} = sub {
-        my ($self, $code) = @_;
-        ref($self) eq 'Sidef::Types::Nil::Nil'
-          ? Sidef::Types::Block::Code->new($code)->run
-          : $self;
+        ref($_[0]) eq 'Sidef::Types::Nil::Nil'
+          ? Sidef::Types::Block::Code->new($_[1])->run
+          : $_[0];
     };
 
     # Ternary operator (Obj ? TrueExpr : FalseExpr)
     *{__PACKAGE__ . '::' . '?'} = sub {
-        my ($self, $code) = @_;
-        Sidef::Types::Bool::Ternary->new(code => $code, bool => !!$self);
+        Sidef::Types::Bool::Ternary->new(code => $_[1], bool => !!$_[0]);
     };
 
     # Smart match operator
@@ -157,10 +152,9 @@ package Sidef::Object::Object {
 
     # Negation of smart match
     *{__PACKAGE__ . '::' . '!~'} = sub {
-        my ($first, $second) = @_;
         use 5.014;
         state $method = '~~';
-        $first->$method($second)->not;
+        $_[0]->$method($_[1])->not;
     };
 };
 

@@ -7,15 +7,18 @@ package Sidef::Exec {
 
     sub new {
         bless {
-               lazy_ops => {
-                            '||'    => 1,
-                            '&&'    => 1,
-                            ':='    => 1,
-                            '||='   => 1,
-                            '&&='   => 1,
-                            '\\\\'  => 1,
-                            '\\\\=' => 1,
-                           },
+
+            # `1` for primary operators
+            # `0` for composed operators
+            lazy_ops => {
+                         '||'    => 1,
+                         '&&'    => 1,
+                         ':='    => 0,
+                         '||='   => 0,
+                         '&&='   => 0,
+                         '\\\\'  => 1,
+                         '\\\\=' => 0,
+                        },
               },
           __PACKAGE__;
     }
@@ -307,6 +310,14 @@ package Sidef::Exec {
                             push @args, $obj;
                         }
                     }
+
+                    # if (exists $self->{lazy_ops}{$method}) {
+                    #     if ($self_obj->$method(@args) and $self->{lazy_ops}{$method}) {
+                    #         $self_obj = $self->execute(@args);
+                    #     }
+                    # } else {
+                    #    $self_obj = $self_obj->$method(@args);
+                    # }
 
                     $self_obj = $self_obj->$method(@args);
                 }

@@ -50,7 +50,7 @@ class VM {
             given(op)
                 when (PUSH) {
                     var val = code[pc++];
-                    self.stack[++sp] = val;
+                    stack[++sp] = val;
                 }
                 when (ADD) {
                     var a = stack[sp--];

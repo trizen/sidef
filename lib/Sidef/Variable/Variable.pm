@@ -119,16 +119,6 @@ package Sidef::Variable::Variable {
 
         *{__PACKAGE__ . '::' . '='} = \&__set_value__;
 
-        *{__PACKAGE__ . '::' . '\\\\'} = sub {
-            my ($self, $code) = @_;
-
-            if ($self->_is_defined) {
-                return $self->get_value;
-            }
-
-            Sidef::Types::Block::Code->new($code)->run;
-        };
-
         foreach my $operator (qw(:= \\\\=)) {
             *{__PACKAGE__ . '::' . $operator} = sub {
                 my ($self, $code) = @_;
@@ -149,6 +139,15 @@ package Sidef::Variable::Variable {
                 $value;
             };
         }
+
+        # foreach my $operator(qw(&& ||)) {
+        #     *{__PACKAGE__ . '::' . $operator . '='} = sub {
+        #         my $value = $_[0]->get_value;
+        #         $value->$operator
+        #             ? $_[0]->__set_value__(Sidef::Types::Block::Code->new($_[1])->run)
+        #             : $value;
+        #     };
+        # }
 
         foreach my $operator (qw(+ - % * / & | ^ ** && || << >> ÷)) {
             *{__PACKAGE__ . '::' . $operator . '='} = sub {
