@@ -33,4 +33,4 @@ desktopFilesPaths.each { |path|
     }
 }
 
-apps[apps.len.rand.int].dump.join("\n").say;
+say apps[apps.len.rand.int];
