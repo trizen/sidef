@@ -228,7 +228,9 @@ package Sidef::Deparse::Sidef {
             }
         }
         elsif ($ref eq 'Sidef::Types::Block::Next') {
-            $code = 'next';
+            if (not exists $expr->{call}) {
+                $code = 'next';
+            }
         }
         elsif ($ref eq 'Sidef::Types::Block::Continue') {
             $code = 'continue';
