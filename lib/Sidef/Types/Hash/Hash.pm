@@ -154,7 +154,7 @@ package Sidef::Types::Hash::Hash {
             my $key_obj = Sidef::Types::String::String->new($key);
             my $val_obj = $value->get_value;
 
-            if ($code->call($key_obj, $val_obj)) {
+            if ($code->run($key_obj, $val_obj)) {
                 $callback->($key, $val_obj);
             }
         }
@@ -170,7 +170,7 @@ package Sidef::Types::Hash::Hash {
               Sidef::Variable::Variable->new(
                                              name  => '',
                                              type  => 'var',
-                                             value => $code->call(Sidef::Types::String::String->new($key), $value->get_value)
+                                             value => $code->run(Sidef::Types::String::String->new($key), $value->get_value)
                                             );
         }
 
@@ -305,7 +305,7 @@ package Sidef::Types::Hash::Hash {
 
         my @array;
         while (my ($key, $value) = CORE::each %{$self->{data}}) {
-            push @array, [$key, $code->call(Sidef::Types::String::String->new($key), $value->get_value)];
+            push @array, [$key, $code->run(Sidef::Types::String::String->new($key), $value->get_value)];
         }
 
         my $method = '<=>';

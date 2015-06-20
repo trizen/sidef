@@ -508,7 +508,7 @@ package Sidef::Types::String::String {
             return __PACKAGE__->new($self->get_value =~ s{$search}{$code->get_value}eer);
         }
 
-        __PACKAGE__->new($self->get_value =~ s{$search}{$code->call(_get_captures($self->get_value))}er);
+        __PACKAGE__->new($self->get_value =~ s{$search}{$code->run(_get_captures($self->get_value))}er);
     }
 
     sub gesub {
@@ -526,7 +526,7 @@ package Sidef::Types::String::String {
         }
 
         my $value = $self->get_value;
-        __PACKAGE__->new($value =~ s{$search}{$code->call(_get_captures($value))}ger);
+        __PACKAGE__->new($value =~ s{$search}{$code->run(_get_captures($value))}ger);
     }
 
     sub glob {

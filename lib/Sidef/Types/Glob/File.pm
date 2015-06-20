@@ -369,7 +369,7 @@ package Sidef::Types::Glob::File {
         my @lines;
         open(my $fh, '+<:utf8', $self->get_value) || return Sidef::Types::Bool::Bool->false;
         while (defined(my $line = <$fh>)) {
-            push @lines, $code->call(Sidef::Types::String::String->new($line));
+            push @lines, $code->run(Sidef::Types::String::String->new($line));
         }
 
         truncate($fh, 0) || do {

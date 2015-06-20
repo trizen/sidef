@@ -513,16 +513,14 @@ package Sidef::Types::Array::Array {
 
     sub map {
         my ($self, $code) = @_;
-
-        $self->new(map { $code->run($_->get_value); } @{$self});
+        $self->new(map { $code->run($_->get_value) } @{$self});
     }
 
     *collect = \&map;
 
     sub grep {
         my ($self, $code) = @_;
-
-        $self->new(grep { $code->run($_); } map { $_->get_value } @{$self});
+        $self->new(grep { $code->run($_) } map { $_->get_value } @{$self});
     }
 
     *filter = \&grep;
@@ -697,7 +695,7 @@ package Sidef::Types::Array::Array {
 
         my $x = $self->[0]->get_value;
         foreach my $i (1 .. $offset) {
-            $x = $obj->call($x, $self->[$i]->get_value);
+            $x = $obj->run($x, $self->[$i]->get_value);
         }
         $x;
     }
@@ -835,9 +833,14 @@ package Sidef::Types::Array::Array {
                      my $ref   = delete $hash->{$key};
                      while (my ($key) = CORE::each %{$ref}) {
                          if ($key eq $__END__) {
-                             $__CALL__
-                               ? $code->call($self->new(map { $_->get_value } @{$ref->{$key}}[0 .. $#{$ref->{$key}} - $count]))
-                               : $callback->(@{$ref->{$key}}[0 .. $#{$ref->{$key}} - $count]);
+
+                             if ($__CALL__) {
+                                 $code->run($self->new(map { $_->get_value } @{$ref->{$key}}[0 .. $#{$ref->{$key}} - $count]));
+                             }
+                             else {
+                                 $callback->(@{$ref->{$key}}[0 .. $#{$ref->{$key}} - $count]);
+                             }
+
                              last;
                          }
                          $ref = $ref->{$key};
@@ -1003,9 +1006,8 @@ package Sidef::Types::Array::Array {
         my ($self, $code) = @_;
 
         if (defined $code) {
-
             return
-              $self->new(sort { $code->call($a, $b) }
+              $self->new(sort { $code->run($a, $b) }
                          map { $_->get_value } @{$self});
         }
 
