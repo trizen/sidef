@@ -632,7 +632,7 @@ package Sidef::Types::String::String {
 
     sub lines {
         my ($self) = @_;
-        Sidef::Types::Array::Array->new(map { __PACKAGE__->new($_) } CORE::split(/\R/, $self->get_value));
+        Sidef::Types::Array::Array->new(map { __PACKAGE__->new($_) } CORE::split(/\R/, $self->get_value, -1));
     }
 
     sub each_line {
