@@ -442,6 +442,14 @@ Returns an object of type: C<Sidef::Types::String::String>
 
 =cut
 
+=head2 each_index
+
+Array.each_index() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 each_with_index
 
 Array.each_with_index() -> I<Obj>

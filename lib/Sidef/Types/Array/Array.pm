@@ -487,6 +487,18 @@ package Sidef::Types::Array::Array {
     *for     = \&each;
     *foreach = \&each;
 
+    sub each_index {
+        my ($self, $code) = @_;
+
+        foreach my $i (0 .. $#{$self}) {
+            if (defined(my $res = $code->_run_code(Sidef::Types::Number::Number->new($i)))) {
+                return $res;
+            }
+        }
+
+        $self;
+    }
+
     sub each_with_index {
         my ($self, $code) = @_;
 
