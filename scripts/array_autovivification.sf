@@ -40,5 +40,13 @@ r == [nil, nil, [nil, nil, ['y', nil, 'i', nil, 'z'], 'x', nil, 'sidef'],
      [nil, nil, nil, 'sidef']]]]]
     || ("Error! (4)\n".die);
 
+#
+## Array autovivification on slice creation
+#
+var x = [];
+x[4,5] = [1,2];
+
+x.map {"test"} == (['test'] * x.len) || die "map error!";
+x == [nil, nil, nil, nil, 1, 2]      || die "eq error!";
 
 say "\n** All tests passed!";
