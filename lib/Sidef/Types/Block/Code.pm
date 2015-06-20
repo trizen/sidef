@@ -118,6 +118,9 @@ package Sidef::Types::Block::Code {
           : ref($result) eq 'Sidef::Types::Block::Break' ? --$result->{depth} <= 0
               ? $self
               : $result
+          : ref($result) eq 'Sidef::Types::Block::Next' ? --$result->{depth} <= 0
+              ? ()
+              : $result
           : ();
     }
 
