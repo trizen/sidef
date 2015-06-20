@@ -134,7 +134,7 @@ package Sidef::Exec {
                             }
 
                             foreach my $ind ($#{$self_obj} + 1 .. $num) {
-                                $self_obj->[$num] //= Sidef::Variable::Variable->new(name => '', type => 'var');
+                                $self_obj->[$ind] //= Sidef::Variable::Variable->new(name => '', type => 'var');
                             }
 
                             $ind = $num;
