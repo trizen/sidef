@@ -11,7 +11,7 @@ package Sidef::Types::Bool::Bool {
     {
         my %bool = (
                     true  => (bless \(my $t = 1),  __PACKAGE__),
-                    false => (bless \(my $f = ''), __PACKAGE__),
+                    false => (bless \(my $f = 0), __PACKAGE__),
                    );
 
         sub new {
