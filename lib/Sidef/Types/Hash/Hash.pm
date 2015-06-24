@@ -362,7 +362,7 @@ package Sidef::Types::Hash::Hash {
         # Sort the keys case insensitively
         my @keys = sort { lc($a) cmp lc($b) } CORE::keys(%{$self->{data}});
 
-        Sidef::Types::String::String->new(
+        my $str = Sidef::Types::String::String->new(
             "Hash.new(" . (
                 @keys
                 ? (
@@ -379,12 +379,15 @@ package Sidef::Types::Hash::Hash {
                              . (eval { $val->can('dump') } ? ${$val->dump} : $val)
                          } @keys
                      )
-                     . (@keys > 1 ? ("\n" . (' ' x ($Sidef::SPACES -= $Sidef::SPACES_INCR))) : '')
+                     . (@keys > 1 ? ("\n" . (' ' x ($Sidef::SPACES - $Sidef::SPACES_INCR))) : '')
                   )
-                : do { $Sidef::SPACES -= $Sidef::SPACES_INCR; "" }
+                : ""
               )
               . ")"
         );
+
+        $Sidef::SPACES -= $Sidef::SPACES_INCR;
+        $str;
     }
 
     {

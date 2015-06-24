@@ -1920,7 +1920,7 @@ package Sidef::Parser {
                                         call => [
                                                  {
                                                   method => ref($obj) eq 'Sidef::Variable::ClassInit'
-                                                  ? 'init'
+                                                  ? 'new'
                                                   : 'call',
                                                   (%{$arg} ? (arg => [$arg]) : ())
                                                  }

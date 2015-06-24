@@ -1,6 +1,7 @@
 package Sidef::Variable::ClassInit {
 
     use 5.014;
+    use overload q{""} => \&dump;
 
     sub __new__ {
         my (undef, %opt) = @_;
@@ -84,15 +85,25 @@ package Sidef::Variable::ClassInit {
 
     *is_an = \&is_a;
 
+    sub dump {
+        my ($self) = @_;
+        Sidef::Types::String::String->new($self->{name});
+    }
+
     sub init {
         my ($self, @args) = @_;
 
         my $class = Sidef::Variable::Class->__new__($self->{name});
 
+        # The class parameters
+        my @names          = map { $_->{name} } @{$self->{__VARS__}};
         my @default_values = map { $_->{value} } @{$self->{__VARS__}};
 
         # Init the class variables
-        @{$class->{__VARS__}}{map { $_->{name} } @{$self->{__VARS__}}} = @default_values;
+        @{$class->{__VARS__}}{@names} = @default_values;
+
+        # Save the names of class parameters
+        $class->{__PARAMS__} = [@names];
 
         # Set the class arguments
         foreach my $i (0 .. $#{$self->{__VARS__}}) {
@@ -131,7 +142,7 @@ package Sidef::Variable::ClassInit {
             $var->set_value($default_values[$i]);
         }
 
-        # Add 'var' defined variables
+        # Add 'def' defined variables
         foreach my $var (@{$self->{__DEF_VARS__}}) {
             $class->{__VARS__}{$var->{name}} = $var->get_value;
         }
@@ -154,7 +165,8 @@ package Sidef::Variable::ClassInit {
         $class;
     }
 
-    *new = \&init;
+    *call = \&init;
+    *new  = \&init;
 
     {
         no strict 'refs';

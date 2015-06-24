@@ -6,7 +6,7 @@ package Sidef::Variable::Class {
     use overload q{""} => sub {
         eval {
             local $SIG{__WARN__} = sub { };
-            $_[0]->to_s;
+            $_[0]->to_s // $_[0]->dump;
         } // $_[0];
       },
       q{bool} => sub {
@@ -52,6 +52,20 @@ package Sidef::Variable::Class {
     }
 
     *is_an = \&is_a;
+
+    sub dump {
+        my ($self) = @_;
+        Sidef::Types::String::String->new(
+            $self->{name} . '(' . join(
+                ", ",
+                map {
+                    my $val = $self->{__VARS__}{$_};
+                    "$_: " . (eval { $val->can('dump') } ? ${$val->dump} : $val)
+                  } @{$self->{__PARAMS__}}
+              )
+              . ')'
+        );
+    }
 
     sub DESTROY { }
 
