@@ -337,6 +337,7 @@ package Sidef::Types::Hash::Hash {
     }
 
     *has_key  = \&exists;
+    *haskey   = \&exists;
     *contains = \&exists;
 
     sub flip {
