@@ -261,6 +261,7 @@ scripts/Games/bulls_and_cows.sf
 scripts/Games/bulls_and_cows_player.sf
 scripts/Games/game_of_life.sf
 scripts/Games/rock_paper_scissors.sf
+scripts/Games/snake_game.sf
 scripts/gamma_function.sf
 scripts/gcd.sf
 scripts/generate_an_html_table.sf

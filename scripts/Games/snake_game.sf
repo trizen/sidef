@@ -1,0 +1,160 @@
+#!/usr/bin/ruby
+
+# Author: Daniel "Trizen" Șuteu
+# License: GPLv3
+# Date: 25 June 2015
+# Website: https://github.com/trizen
+
+# The snake game. (with colors + Unicode)
+
+const readkey = frequire('Term::ReadKey');
+const ansi    = frequire('Term::ANSIColor');
+
+enum(
+    VOID,
+    HEAD,
+    BODY,
+    TAIL,
+    FOOD,
+);
+
+define LEFT  = [+0, -1];
+define RIGHT = [+0, +1];
+define UP    = [-1, +0];
+define DOWN  = [+1, +0];
+
+const BG_COLOR    = "on_black";
+const FOOD_COLOR  = ("red"        + " " + BG_COLOR);
+const SNAKE_COLOR = ("bold green" + " " + BG_COLOR);
+
+const U_HEAD = ansi.colored('▲', SNAKE_COLOR);
+const D_HEAD = ansi.colored('▼', SNAKE_COLOR);
+const L_HEAD = ansi.colored('◀', SNAKE_COLOR);
+const R_HEAD = ansi.colored('▶', SNAKE_COLOR);
+
+const U_BODY = ansi.colored('╹', SNAKE_COLOR);
+const D_BODY = ansi.colored('╻', SNAKE_COLOR);
+const L_BODY = ansi.colored('╴', SNAKE_COLOR);
+const R_BODY = ansi.colored('╶', SNAKE_COLOR);
+
+const U_TAIL = ansi.colored('╽', SNAKE_COLOR);
+const D_TAIL = ansi.colored('╿', SNAKE_COLOR);
+const L_TAIL = ansi.colored('╼', SNAKE_COLOR);
+const R_TAIL = ansi.colored('╾', SNAKE_COLOR);
+
+const A_VOID = ansi.colored(' ', BG_COLOR);
+const A_FOOD = ansi.colored('❇', FOOD_COLOR);
+
+var sleep    = 0.01;   # sleep duration between updates
+var food_num = 10;     # number of initial food sources
+
+var w = `tput cols`.to_i;
+var h = `tput lines`.to_i;
+var r = "\033[H";
+
+var dir = LEFT;
+var grid = h.of { w.of { Array.new(VOID) } };
+
+var head_pos = [h/2, w/2];
+var tail_pos = [head_pos[0], head_pos[1]+1];
+
+grid[head_pos[0]][head_pos[1]] = [HEAD, dir];    # head
+grid[tail_pos[0]][tail_pos[1]] = [TAIL, dir];    # tail
+
+func make_food {
+    static (food_x, food_y);
+
+    {
+        food_x = w.rand.int;
+        food_y = h.rand.int;
+    } do while {grid[food_y][food_x][0] != VOID};
+
+    grid[food_y][food_x][0] = FOOD;
+}
+
+{ make_food() } * food_num;
+
+func display {
+    static i = 0;
+    static s = [VOID, FOOD];
+
+    print(r, grid.map { |row|
+        row.map { |cell|
+            cell[0] !~ s && (
+                i = (
+                    given(cell[1])
+                        when (UP)    { 0 }
+                        when (DOWN)  { 1 }
+                        when (LEFT)  { 2 }
+                        when (RIGHT) { 3 }
+                    )
+                );
+
+            given(cell[0])
+                when (VOID) { A_VOID }
+                when (FOOD) { A_FOOD }
+                when (BODY) { [U_BODY, D_BODY, L_BODY, R_BODY][i] }
+                when (HEAD) { [U_HEAD, D_HEAD, L_HEAD, R_HEAD][i] }
+                when (TAIL) { [U_TAIL, D_TAIL, L_TAIL, R_TAIL][i] }
+
+          }.join('')
+        }.join("\n")
+    );
+}
+
+func move {
+    var grew = false;
+
+    # Move the head
+    var (y, x) = head_pos...;
+
+    var new_y = (y+dir[0] % h);
+    var new_x = (x+dir[1] % w);
+
+    var cell = grid[new_y][new_x];
+
+    given (cell[0])
+        when (BODY) { die "\nYou just bit your own body!\n" }
+        when (TAIL) { die "\nYou just bit your own tail!\n" }
+        when (FOOD) { grew = true; make_food() };
+
+    # Create a new head
+    grid[new_y][new_x] = [HEAD, dir];
+
+    # Replace the current head with body
+    grid[y][x] = [BODY, dir];
+
+    # Update the head position
+    head_pos = [new_y, new_x];
+
+    # Move the tail
+    if (!grew) {
+        var (y, x) = tail_pos...;
+
+        var pos   = grid[y][x][1];
+        var new_y = (y+pos[0] % h);
+        var new_x = (x+pos[1] % w);
+
+        grid[y][x][0]         = VOID;    # erase the current tail
+        grid[new_y][new_x][0] = TAIL;    # create a new tail
+
+        tail_pos = [new_y, new_x];
+    }
+}
+
+readkey.ReadMode(3);
+
+loop {
+    var key;
+    while ((key = readkey.ReadLine(-1)) == nil) {
+        move();
+        display();
+        Sys.sleep(sleep);
+    }
+
+    given(key)
+        when ("\e[A") { dir = UP    }
+        when ("\e[B") { dir = DOWN  }
+        when ("\e[C") { dir = RIGHT }
+        when ("\e[D") { dir = LEFT  };
+}
