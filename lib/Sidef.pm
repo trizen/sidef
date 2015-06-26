@@ -134,16 +134,14 @@ package Sidef {
 
         sub METHODS {
             my ($self) = @_;
-            Sidef::Types::Array::Array->new(
-                map { Sidef::Types::String::String->new($_) }
-                  sort { lc($a =~ tr/_//dr) cmp lc($b =~ tr/_//dr) or $a cmp $b } grep {
-                          $_ ne '__ANON__'
-                      and $_ ne 'ISA'
-                      and $_ ne 'BEGIN'
-                      and $_ ne 'AUTOLOAD'
-                      and $_ ne 'DESTROY'
-                  } keys %{ref($self) . '::'}
-            );
+
+            my %aliases;
+            my $ref = ref($self);
+            foreach my $method (grep { $_ !~ /^[(_]/ and defined(&{$ref . '::' . $_}) } keys %{$ref . '::'}) {
+                push @{$aliases{\&{$ref . '::' . $method}}}, Sidef::Types::String::String->new($method);
+            }
+
+            Sidef::Types::Array::Array->new(map { Sidef::Types::Array::Array->new(@{$_}) } values %aliases);
         }
     }
 
