@@ -55,8 +55,6 @@ package Sidef::Types::Glob::File {
         Sidef::Types::Number::Number->new(File::Compare::compare($self->get_value, $file->get_value));
     }
 
-    *cmp = \&compare;
-
     sub exists {
         my ($self) = @_;
         @_ == 2 && ($self = $_[1]);
@@ -542,11 +540,6 @@ package Sidef::Types::Glob::File {
 
     # Path split
     *split = \&Sidef::Types::Glob::Dir::split;
-
-    {
-        no strict 'refs';
-        *{__PACKAGE__ . '::' . '<=>'} = \&compare;
-    }
 
 };
 
