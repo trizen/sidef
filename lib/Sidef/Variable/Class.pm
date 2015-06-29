@@ -98,7 +98,7 @@ package Sidef::Variable::Class {
             return $self->{method}{'AUTOLOAD'}->call($self, Sidef::Types::String::String->new($name), @args);
         }
         else {
-            warn "[WARN] Can't find method `$name' for class: $self->{name}\n";
+            die "[ERROR] Can't find method `$name' for class: $self->{name}\n";
         }
 
         return;
