@@ -172,8 +172,6 @@ provides:
     file: lib/Sidef/Variable/Struct.pm
   Sidef::Variable::Variable:
     file: lib/Sidef/Variable/Variable.pm
-  UNIVERSAL:
-    file: lib/Sidef.pm
 requires:
   Cwd: '0'
   Encode: '0'

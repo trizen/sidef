@@ -289,9 +289,6 @@
       },
       "Sidef::Variable::Variable" : {
          "file" : "lib/Sidef/Variable/Variable.pm"
-      },
-      "UNIVERSAL" : {
-         "file" : "lib/Sidef.pm"
       }
    },
    "release_status" : "stable",

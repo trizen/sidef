@@ -6,41 +6,6 @@ package Sidef {
     our $SPACES      = 0;    # the current number of spaces
     our $SPACES_INCR = 4;    # the number of spaces incrementor
 
-    package UNIVERSAL {
-
-        sub get_value {
-            $_[0];
-        }
-
-        our $AUTOLOAD;
-        sub DESTROY { }
-
-        sub AUTOLOAD {
-            my ($self, @args) = @_;
-
-            $self = ref($self) if ref($self);
-            $self =~ /^Sidef::/ or return;
-            eval { require $self =~ s{::}{/}rg . '.pm' };
-
-            if ($@) {
-                if (defined &main::load_module) {
-                    main::load_module($self);
-                }
-                else {
-                    die "[AUTOLOAD] $@";
-                }
-            }
-
-            my $func = \&{$AUTOLOAD};
-            if (defined(&$func)) {
-                return $func->($self, @args);
-            }
-
-            warn "[AUTOLOAD] Undefined function: $AUTOLOAD";
-            return;
-        }
-    }
-
     {
         my %types = (
                      bool   => {class => {'Sidef::Types::Bool::Bool'  => 1}},
@@ -176,6 +141,37 @@ package Sidef {
 
     *is_an = \&is_a;
 
+};
+
+#
+## Some UNIVERSAL magic
+#
+
+*UNIVERSAL::get_value = sub { $_[0] };
+*UNIVERSAL::DESTROY   = sub { };
+*UNIVERSAL::AUTOLOAD  = sub {
+    my ($self, @args) = @_;
+
+    $self = ref($self) if ref($self);
+    $self =~ /^Sidef::/ or return;
+    eval { require $self =~ s{::}{/}rg . '.pm' };
+
+    if ($@) {
+        if (defined &main::load_module) {
+            main::load_module($self);
+        }
+        else {
+            die "[AUTOLOAD] $@";
+        }
+    }
+
+    my $func = \&{$AUTOLOAD};
+    if (defined(&$func)) {
+        return $func->($self, @args);
+    }
+
+    die "[AUTOLOAD] Undefined function: $AUTOLOAD";
+    return;
 };
 
 1;
