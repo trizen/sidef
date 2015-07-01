@@ -1506,18 +1506,18 @@ package Sidef::Parser {
             }
 
             if (exists($self->{current_function})) {
-                return $self->{current_function} if /\G__FUNC__\b/gc;
-                return Sidef::Types::String::String->new($self->{current_function}{name}) if /\G__FUNC_NAME__\b/gc;
+                /\G__FUNC__\b/gc && return $self->{current_function};
+                /\G__FUNC_NAME__\b/gc && return Sidef::Types::String::String->new($self->{current_function}{name});
             }
 
             if (exists($self->{current_class})) {
-                return $self->{current_class} if /\G__CLASS__\b/gc;
-                return Sidef::Types::String::String->new($self->{class_name}) if /\G__CLASS_NAME__\b/gc;
+                /\G__CLASS__\b/gc && return $self->{current_class};
+                /\G__CLASS_NAME__\b/gc && return Sidef::Types::String::String->new($self->{class_name});
             }
 
             if (exists($self->{current_method})) {
-                return $self->{current_method} if /\G__METHOD__\b/gc;
-                return Sidef::Types::String::String->new($self->{current_method}{name}) if /\G__METHOD_NAME__\b/gc;
+                /\G__METHOD__\b/gc && return $self->{current_method};
+                /\G__METHOD_NAME__\b/gc && return Sidef::Types::String::String->new($self->{current_method}{name});
             }
 
             # Variable call
