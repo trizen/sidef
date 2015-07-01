@@ -23,16 +23,6 @@ Inherits methods from:
 =head1 METHODS
 
 
-=head2 <=>
-
-I<Obj> B<E<lt>=E<gt>> I<Obj> -> I<Obj>
-
-Return the
-
-Aliases: I<cmp>, I<compare>
-
-=cut
-
 =head2 abs
 
 File.abs() -> I<Obj>
@@ -84,6 +74,14 @@ Return the
 =head2 chown
 
 File.chown() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 compare
+
+File.compare() -> I<Obj>
 
 Return the
 

@@ -52,6 +52,14 @@ Return the
 
 =cut
 
+=head2 dump
+
+ClassInit.dump() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 has_method
 
 ClassInit.has_method() -> I<Obj>
@@ -76,6 +84,6 @@ ClassInit.new() -> I<Obj>
 
 Return the
 
-Aliases: I<init>
+Aliases: I<call>, I<init>
 
 =cut

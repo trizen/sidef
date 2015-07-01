@@ -157,7 +157,7 @@ Hash.exists() -> I<Obj>
 
 Return the
 
-Aliases: I<has_key>, I<contains>
+Aliases: I<has_key>, I<haskey>, I<contains>
 
 =cut
 
