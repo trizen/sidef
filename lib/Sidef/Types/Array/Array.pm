@@ -700,6 +700,8 @@ package Sidef::Types::Array::Array {
         $x;
     }
 
+    *inject = \&reduce;
+
     sub length {
         my ($self) = @_;
         Sidef::Types::Number::Number->new(scalar @{$self});
