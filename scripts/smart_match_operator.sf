@@ -13,8 +13,9 @@ var array = <red blue green>;
 #
 if (array ~~ hash) {
     say "some array elements in hash keys";
-} else {
-    "a ~~ h error".die;
+}
+else {
+    die "a ~~ h error";
 }
 
 #
@@ -22,8 +23,9 @@ if (array ~~ hash) {
 #
 if ("red" ~~ array) {
     say "red in array";
-} else {
-    "s ~~ a error".die;
+}
+else {
+    die "s ~~ a error";
 }
 
 #
@@ -31,31 +33,45 @@ if ("red" ~~ array) {
 #
 if (/e$/ ~~ hash) {
     say "some keys end in e";
-} else {
-    "r ~~ h error".die;
+}
+else {
+    die "r ~~ h error";
 }
 
 #
 ## Hash ~~ Hash
 #
 var sub_h = :(red => 5, :white => 1);
-if (hash ~~ sub_h) {
+if (sub_h ~~ hash) {
     say "sub-hash contained in larger hash";
-} else {
-    "h ~~ h error".die;
+}
+else {
+    die "h ~~ h error";
+}
+
+#
+## Hash ~~ Array
+#
+
+if (:(a => 1, b => 2) ~~ ["a", "b", "c"]) {
+    say "all hash-keys contained in array";
+}
+else {
+    die "h ~~ a error";
 }
 
 #
 ## Array ~~ Array
 #
-var arr1 = [1,2,3];
-var arr2 = [3,2];
+var arr1 = [3,2];
+var arr2 = [1,2,3];
 
 if (arr1 ~~ arr2) {
     say "sub-array contained in larger array";
-} else {
-    "a ~~ a error".die;
+}
+else {
+    die "a ~~ a error";
 }
 
-arr2.append(0);
-arr1 ~~ arr2 && "a ~~ a error(2)".die;
+arr1.append(0);
+arr1 ~~ arr2 && die "a ~~ a error(2)";

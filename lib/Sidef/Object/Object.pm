@@ -89,7 +89,7 @@ package Sidef::Object::Object {
 
             # Array ~~ Array
             if ($s_type eq 'Sidef::Types::Array::Array') {
-                return $first->contains_all($second);
+                return $second->contains_all($first);
             }
 
             # Array ~~ Regex
@@ -99,7 +99,7 @@ package Sidef::Object::Object {
 
             # Array ~~ Hash
             if ($s_type eq 'Sidef::Types::Hash::Hash') {
-                return $second->keys->contains_any($first);
+                return $second->keys->contains_all($first);
             }
 
             # Array ~~ Any
@@ -111,12 +111,12 @@ package Sidef::Object::Object {
 
             # Hash ~~ Array
             if ($s_type eq 'Sidef::Types::Array::Array') {
-                return $first->keys->contains_all($second);
+                return $second->contains_all($first->keys);
             }
 
             # Hash ~~ Hash
             if ($s_type eq 'Sidef::Types::Hash::Hash') {
-                return $first->keys->contains_all($second->keys);
+                return $second->keys->contains_all($first->keys);
             }
 
             # Hash ~~ Any
