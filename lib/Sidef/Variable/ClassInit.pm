@@ -93,7 +93,7 @@ package Sidef::Variable::ClassInit {
     sub init {
         my ($self, @args) = @_;
 
-        my $class = Sidef::Variable::Class->__new__($self->{name});
+        my $class = Sidef::Variable::Class->__new__(class => $self, name => $self->{name});
 
         # The class parameters
         my @names          = map { $_->{name} } @{$self->{__VARS__}};
