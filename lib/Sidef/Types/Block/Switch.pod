@@ -23,9 +23,9 @@ Inherits methods from:
 =head1 METHODS
 
 
-=head2 ..
+=head2 :
 
-I<Obj> B<..> I<Obj> -> I<Obj>
+I<Obj> B<:> I<Obj> -> I<Obj>
 
 Return the
 
@@ -33,9 +33,19 @@ Aliases: I<else>, I<default>
 
 =cut
 
-=head2 ??
+=head2 >
 
-I<Obj> B<??> I<Obj> -> I<Obj>
+I<Obj> B<E<gt>> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<when>
+
+=cut
+
+=head2 ?
+
+I<Obj> B<?> I<Obj> -> I<Obj>
 
 Return the
 
@@ -56,15 +66,5 @@ Return the
 Switch.value() -> I<Obj>
 
 Return the
-
-=cut
-
-=head2 ~~
-
-I<Obj> B<~~> I<Obj> -> I<Obj>
-
-Return the
-
-Aliases: I<when>
 
 =cut

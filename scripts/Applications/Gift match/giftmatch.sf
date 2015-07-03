@@ -12,7 +12,7 @@ func parse_table(file) {
     var table = [fh.readline.trim_end.split("\t")];
 
     while (fh.readline(\var line)) {
-        line =~ /\S/ ?? || next;
+        line ~~ /\S/ || next;
         table.append(line.trim_end.split("\t"));
     }
 

@@ -471,14 +471,12 @@ utils/Experiments/struct_optimizer.pl
 utils/find_invalid_types.pl
 utils/grep_errors.sh
 utils/pod_generator.pl
-utils/Sidef/Tidy.pm
 utils/sidef_concept.jl
 utils/sidef_concept.pl
 utils/sidef_executor.jl
 utils/sidef_executor.lua
 utils/sidef_in_perl.pl
 utils/test_deparser.pl
-utils/tidy.pl
 'utils/Web interface/css/main.css'
 'utils/Web interface/index.cgi'
 'utils/Web interface/js/jquery-2.1.3.min.js'

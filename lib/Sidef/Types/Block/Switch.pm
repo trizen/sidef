@@ -58,9 +58,9 @@ package Sidef::Types::Block::Switch {
 
     {
         no strict 'refs';
-        *{__PACKAGE__ . '::' . '~~'} = \&when;
-        *{__PACKAGE__ . '::' . '??'} = \&case;
-        *{__PACKAGE__ . '::' . '..'} = \&default;
+        *{__PACKAGE__ . '::' . '>'} = \&when;
+        *{__PACKAGE__ . '::' . '?'} = \&case;
+        *{__PACKAGE__ . '::' . ':'} = \&default;
     }
 
 };

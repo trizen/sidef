@@ -1138,8 +1138,6 @@ package Sidef::Types::String::String {
         *{__PACKAGE__ . '::' . '^'}   = \&xor;
         *{__PACKAGE__ . '::' . '|'}   = \&or;
         *{__PACKAGE__ . '::' . '&'}   = \&and;
-        *{__PACKAGE__ . '::' . '^^'}  = \&begins_with;
-        *{__PACKAGE__ . '::' . '$$'}  = \&ends_with;
         *{__PACKAGE__ . '::' . '<<'}  = \&shift_left;
         *{__PACKAGE__ . '::' . '>>'}  = \&shift_right;
         *{__PACKAGE__ . '::' . '%'}   = \&sprintf;

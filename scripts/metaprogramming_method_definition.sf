@@ -28,6 +28,6 @@ say text.in_green;
 say text.in_blue;
 
 # Tests
-text.in_red  =~ /#f00/ ?? || die "in_red  -- error!";
-text.in_cyan =~ /#0ff/ ?? || die "in_cyan -- error!";
-text.in_blue =~ /#00f/ ?? || die "in_blue -- error!";
+text.in_red  ~~ /#f00/ || die "in_red  -- error!";
+text.in_cyan ~~ /#0ff/ || die "in_cyan -- error!";
+text.in_blue ~~ /#00f/ || die "in_blue -- error!";

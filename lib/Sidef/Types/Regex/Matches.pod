@@ -23,16 +23,6 @@ Inherits methods from:
 =head1 METHODS
 
 
-=head2 ??
-
-I<Obj> B<??> I<Obj> -> I<Obj>
-
-Return the
-
-Aliases: I<to_bool>, I<toBool>, I<matched>, I<is_successful>, I<isSuccessful>
-
-=cut
-
 =head2 cap
 
 Matches.cap() -> I<Obj>
@@ -58,5 +48,15 @@ Aliases: I<ncaps>, I<named_captures>
 Matches.pos() -> I<Obj>
 
 Return the
+
+=cut
+
+=head2 to_bool
+
+Matches.to_bool() -> I<Obj>
+
+Return the
+
+Aliases: I<toBool>, I<matched>, I<is_successful>, I<isSuccessful>
 
 =cut

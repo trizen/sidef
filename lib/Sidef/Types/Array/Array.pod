@@ -575,6 +575,32 @@ Aliases: I<groupBy>
 
 =cut
 
+=head2 reduce
+
+=over 2
+
+=item * Array.reduce(I<Block>) -> I<Bool>
+
+Reduces array by calling I<Block>, multiple times, setting C<_[0]> and C<_[1]> each time. The first call will be with C<_[0]> and C<_[1]> set to the first two elements of the list, subsequent calls will be done by setting C<_[0]> to the result of the previous call and C<_[1]> to the next element in the list.
+
+    [1,2,3,4].reduce { _[0] + _[1] };   # returns the sum of array's elements (1+2+3+4 = 10)
+
+=back
+
+=over 2
+
+=item * Array.reduce(I<String>) -> I<Bool>
+
+Almost the same as when it takes a block argument, but much more limited.
+
+    [1,2,3,4].reduce('*');      # returns the product of array's elements (1*2*3*4 = 24)
+
+=back
+
+Returns an object of the same type as the elements of the array.
+
+=cut
+
 =head2 insert
 
 Array.insert(I<Number>, I<Obj1>, I<Obj2>, I<...>) -> I<Array>
@@ -828,32 +854,6 @@ Returns a new array with numbers ranging from C<0> to C<array.offset>.
     ['x','y','z'].range;       # returns: [0, 1 ,2]
 
 This method always returns an object of type: C<Sidef::Types::Array::Array>
-
-=cut
-
-=head2 reduce
-
-=over 2
-
-=item * Array.reduce(I<Block>) -> I<Bool>
-
-Reduces array by calling I<Block>, multiple times, setting C<_[0]> and C<_[1]> each time. The first call will be with C<_[0]> and C<_[1]> set to the first two elements of the list, subsequent calls will be done by setting C<_[0]> to the result of the previous call and C<_[1]> to the next element in the list.
-
-    [1,2,3,4].reduce { _[0] + _[1] };   # returns the sum of array's elements (1+2+3+4 = 10)
-
-=back
-
-=over 2
-
-=item * Array.reduce(I<String>) -> I<Bool>
-
-Almost the same as when it takes a block argument, but much more limited.
-
-    [1,2,3,4].reduce('*');      # returns the product of array's elements (1*2*3*4 = 24)
-
-=back
-
-Returns an object of the same type as the elements of the array.
 
 =cut
 

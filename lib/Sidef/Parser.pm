@@ -18,7 +18,6 @@ package Sidef::Parser {
             postfix_ops   => {                 # postfix operators
                              '--'  => 1,
                              '++'  => 1,
-                             '??'  => 1,
                              '...' => 1,
                              '!'   => 1,
                            },
@@ -252,7 +251,6 @@ package Sidef::Parser {
                   &= &
                   == =~
                   := =
-                  ^^ $$
                   <= >= < >
                   ++ --
                   += +
@@ -265,8 +263,7 @@ package Sidef::Parser {
                   ...
                   != ..
                   \\\\= \\\\
-                  ?? ?
-                  ! \\
+                  ? ! \\
                   : « » ~
                   );
 

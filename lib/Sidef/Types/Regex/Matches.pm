@@ -93,11 +93,6 @@ package Sidef::Types::Regex::Matches {
 
     *ncap  = \&named_captures;
     *ncaps = \&named_captures;
-
-    {
-        no strict 'refs';
-        *{__PACKAGE__ . '::' . '??'} = \&matched;
-    }
 };
 
 1

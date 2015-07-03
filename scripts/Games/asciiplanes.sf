@@ -225,8 +225,8 @@ while (count > 0) {
     var input = Sys.scanln(text).lc;
     input ~~ ['q', 'quit'] && break;
 
-    input =~ /^\h*([a-z]+)\D*([0-9]+)/ ?? || next;
-    $1 ~~ letters                         || next;
+    input ~~ /^\h*([a-z]+)\D*([0-9]+)/ || next;
+    $1    ~~ letters                   || next;
 
     var x = letters[$1];
     var y = $2.to_num.dec;

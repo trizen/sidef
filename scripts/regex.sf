@@ -34,16 +34,16 @@ var hash = cap.ncap;
 ## Other tests
 #
 
-"TEST" =~ /^test\z/i ?? || ("Regex_2 fail!\n".die);
-'X'    =~ /x/        ?? && ("Regex_3 fail!\n".die);
-'xyz'  =~ /\[a-z\]/  ?? && ("Regex_4 fail!\n".die);
-'XYZ'  =~ /[a-z]/i   ?? || ("Regex_5 fail!\n".die);
-'©'    =~ /^©$/      ?? || ("Regex_6 fail!\n".die);
-'«»'   =~ /[«]/is    ?? || ("Regex_7 fail!\n".die);
-'$hi'  =~ /^\$hi/    ?? || ("Regex_8 fail!\n".die);
-''     =~ /^/        ?? || ("Regex_9 fail!\n".die);
-"\n"   =~ /^$/       ?? || ("Regex_10 fail!\n".die);
-'/'    =~ /^\/\z/    ?? || ("Regex escape fail!\n".die);
+"TEST" =~ /^test\z/i  || ("Regex_2 fail!\n".die);
+'X'    =~ /x/         && ("Regex_3 fail!\n".die);
+'xyz'  =~ /\[a-z\]/   && ("Regex_4 fail!\n".die);
+'XYZ'  =~ /[a-z]/i    || ("Regex_5 fail!\n".die);
+'©'    =~ /^©$/       || ("Regex_6 fail!\n".die);
+'«»'   =~ /[«]/is     || ("Regex_7 fail!\n".die);
+'$hi'  =~ /^\$hi/     || ("Regex_8 fail!\n".die);
+''     =~ /^/         || ("Regex_9 fail!\n".die);
+"\n"   =~ /^$/        || ("Regex_10 fail!\n".die);
+'/'    =~ /^\/\z/     || ("Regex escape fail!\n".die);
 
 
-/^googl\w/->matches(["hei", "google chrome"]) ?? || ("Regex on array fail!\n".die);
+/^googl\w/->matches(["hei", "google chrome"]) || ("Regex on array fail!\n".die);
