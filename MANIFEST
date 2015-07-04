@@ -137,6 +137,7 @@ lib/Sidef/Variable/Ref.pod
 lib/Sidef/Variable/Struct.pm
 lib/Sidef/Variable/Variable.pm
 lib/Sidef/Variable/Variable.pod
+LICENSE
 Makefile.PL
 MANIFEST			This list of files
 META.json

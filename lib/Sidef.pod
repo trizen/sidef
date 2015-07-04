@@ -3,11 +3,11 @@
 
 =head1 NAME
 
-Sidef
+Sidef - The Sidef Programming Language
 
 =head1 DESCRIPTION
 
-This module provides some methods for static objects.
+This in the main object which provides some SUPER methods.
 
 =head1 SYNOPSIS
 
@@ -26,7 +26,7 @@ or
 
 I<Obj> B<!=> I<Obj> -> I<Bool>
 
-Return true if two objects are not of the same type.
+Return true when two objects are not of the same type.
 
     nil != 4     # True
     nil != nil   # False
@@ -37,7 +37,7 @@ Return true if two objects are not of the same type.
 
 I<Obj> B<==> I<Obj> -> I<Bool>
 
-Return true if two objects are of the same type.
+Return true when two objects are of the same type.
 
     nil   == nil   # True
     false == nil   # False
@@ -46,17 +46,17 @@ Return true if two objects are of the same type.
 
 =head2 def_method
 
-Sidef.def_method() -> I<Obj>
+Obj.def_method(name, block) -> I<Obj>
 
-Return the
+Define a method for the self object.
 
 =cut
 
 =head2 is_a
 
-Sidef.is_a() -> I<Obj>
+Obj.is_a(Obj) -> I<Bool>
 
-Return the
+Returns true when both objects have the same type.
 
 Aliases: I<is_an>
 
@@ -64,25 +64,27 @@ Aliases: I<is_an>
 
 =head2 method
 
-Sidef.method() -> I<Obj>
+Obj.method(name; args...) -> I<LazyMethod>
 
-Return the
+Returns a lazy method call for the main object.
 
 =cut
 
 =head2 METHODS
 
-Sidef.METHODS() -> I<Obj>
+Obj.METHODS() -> I<Array>
 
-Return the
+Returns an array of arrays of method names defined for I<Obj>.
+
+The aliases are grouped together in the same array.
 
 =cut
 
 =head2 respond_to
 
-Sidef.respond_to() -> I<Obj>
+Obj.respond_to(method_name) -> I<Bool>
 
-Return the
+Returns true when the I<Obj> responds to a given method name.
 
 Aliases: I<respondTo>
 
@@ -90,8 +92,8 @@ Aliases: I<respondTo>
 
 =head2 super_join
 
-Sidef.super_join() -> I<Obj>
+Obj.super_join(args...) -> I<Obj>
 
-Return the
+Returns a new I<Obj> with all the arguments concatenated together.
 
 =cut

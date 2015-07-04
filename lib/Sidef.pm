@@ -88,6 +88,7 @@ package Sidef {
             *{ref($self) . '::' . $name} = sub {
                 $block->call(@_);
             };
+            $self;
         }
 
         *__add_method__ = \&def_method;
