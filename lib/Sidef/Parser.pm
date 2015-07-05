@@ -1187,8 +1187,9 @@ package Sidef::Parser {
                     # XXX: [KNOWN BUG] It doesn't check the returned type from method calls
                     if (/\G\h*(?:->|returns\b)\h*/gc) {
 
-                        my $name = '';
+                        my $name;
                         my $try_expr;
+                        my $pos = pos($_);
                         if (/\G($self->{var_name_re})\h*/gco) {
                             $name = $1;
                         }
@@ -1197,10 +1198,14 @@ package Sidef::Parser {
                         }
 
                         if (
-                            $try_expr or exists($self->{built_in_classes}{$name}) or do {
-                                my ($obj) = $self->find_var($name, $class_name);
-                                defined($obj) and $obj->{type} eq 'class';
-                            }
+                            $try_expr or (
+                                defined($name) and (
+                                    exists($self->{built_in_classes}{$name}) or do {
+                                        my ($obj) = $self->find_var($name, $class_name);
+                                        defined($obj) and $obj->{type} eq 'class';
+                                    }
+                                )
+                            )
                           ) {
                             local $self->{_want_name} = 1;
                             my ($return_obj) = $self->parse_expr(code => $try_expr ? $opt{code} : \$name);
@@ -1215,7 +1220,7 @@ package Sidef::Parser {
                                                error    => "invalid return-type for function '$name'",
                                                expected => "expected a valid type, such as: Str, Num, Arr, etc...",
                                                code     => $_,
-                                               pos      => pos($_)
+                                               pos      => $pos,
                                               );
                         }
 
