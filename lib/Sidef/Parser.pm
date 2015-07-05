@@ -1656,7 +1656,6 @@ package Sidef::Parser {
                 if (
                         not $self->{_want_name}
                     and $class ne $self->{class}
-                    and index($class, '::') == -1
                     and defined(
                         eval {
                             local $self->{_want_name} = 1;
