@@ -462,8 +462,10 @@ package Sidef::Deparse::Sidef {
                 push @results, ref($expr) eq 'HASH' ? $self->deparse_expr($expr) : $self->deparse_expr({self => $expr});
             }
             if ($in_module) {
+                my $spaces = " " x $Sidef::SPACES_INCR;
+                s/^/$spaces/gm for @results;
                 $results[0] = "module $class {\n" . $results[0];
-                $results[-1] .= "\n}   # end of $class\n";
+                $results[-1] .= "\n}";
             }
         }
 
