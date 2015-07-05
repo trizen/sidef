@@ -32,5 +32,5 @@ var pipe_h = (Pipe.new("ls -x").open_r);
 
 var line;
 while (line = (pipe_h.readline) != nil) {
-    "'%s': %s".printf(pipe_h.pipe.command, line); break;
+    "'%s': %s".printf(pipe_h.parent.command, line); break;
 }

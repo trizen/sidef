@@ -218,9 +218,6 @@
       "Sidef::Types::Glob::Pipe" : {
          "file" : "lib/Sidef/Types/Glob/Pipe.pm"
       },
-      "Sidef::Types::Glob::PipeHandle" : {
-         "file" : "lib/Sidef/Types/Glob/PipeHandle.pm"
-      },
       "Sidef::Types::Glob::Socket" : {
          "file" : "lib/Sidef/Types/Glob/Socket.pm"
       },

@@ -52,7 +52,6 @@ my %ignored_methods = (
                        'Sidef::Types::Glob::DirHandle'  => [qw(new)],
                        'Sidef::Types::Glob::FileHandle' => [qw(new)],
                        'Sidef::Types::Glob::Backtick'   => [qw(new)],
-                       'Sidef::Types::Glob::PipeHandle' => [qw(new)],
                        'Sidef::Types::Glob::Stat'       => [qw(new)],
                        'Sidef::Types::Block::For'       => [qw(new)],
                        'Sidef::Types::Block::Switch'    => [qw(new)],

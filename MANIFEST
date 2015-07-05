@@ -95,8 +95,6 @@ lib/Sidef/Types/Glob/FileHandle.pm
 lib/Sidef/Types/Glob/FileHandle.pod
 lib/Sidef/Types/Glob/Pipe.pm
 lib/Sidef/Types/Glob/Pipe.pod
-lib/Sidef/Types/Glob/PipeHandle.pm
-lib/Sidef/Types/Glob/PipeHandle.pod
 lib/Sidef/Types/Glob/Socket.pm
 lib/Sidef/Types/Glob/Socket.pod
 lib/Sidef/Types/Glob/SocketHandle.pm
@@ -370,6 +368,7 @@ scripts/recursion.sf
 scripts/regex.sf
 scripts/regex_bool.sf
 scripts/return.sf
+scripts/return_types.sf
 scripts/reverse_recursive_general_solution.sf
 scripts/reverse_words_in_a_string.sf
 scripts/roman_numerals_decoding.sf

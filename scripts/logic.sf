@@ -1,32 +1,26 @@
 #!/usr/bin/ruby
 
-(true  ? "x" : "y")->say;               # prints "x"
-(false ? "x" : "y")->say;               # prints "y"
+(true  ? "x" : "y") == "x" || die "error!";
+(false ? "x" : "y") == "y" || die "error!";
 
-''.say;
+(false || (false) || (true))    == true    || die "error!";
+(false || "hello")              == "hello" || die "error!";
+(false || false || "world")     == "world" || die "error!";
+(false || false || false)       == false   || die "error!";
+(true  && true && "linux")      == "linux" || die "error!";
+(true  && false && true)        == false   || die "error!";
+(false && "perl" || "sidef")    == "sidef" || die "error!";
 
-(false || (false) || (true))->to_s->say;    # prints "true"
-(false || "hello") -> say;                  # prints "hello"
-(false || false || "world").say;            # prints "world"
-(false || false || false) -> to_s->say;     # prints "false"
-(true  && true && "linux").say;             # prints "linux"
-(true  && false && true).to_s.say;          # prints "false"
-(false && "perl" || "sidef").say;           # prints "sidef"
+({false; true}.run && ("&&")) == "&&" || die "error!";
+({true; false}.run || ("||")) == "||" || die "error!";
 
-''.say;
-
-({false; true}.run && ("&& block")).say;       # prints "&& block"
-({true; false}.run || ("|| block")).say;       # prints "|| block"
-
-''.say;
-
-{false; true}.run ? "one" : "zero" -> say;  # prints "one"
-{true; false}.run ? "one" : "zero" -> say;  # prints "zero"
+({false; true}.run ? "one" : "zero") == "one"  || die "error!";
+({true; false}.run ? "one" : "zero") == "zero" || die "error!";
 
 
 #
 ## The ternary operator is, actually, an object:
 #
 
-var ternary = (false ? ("False is true?!".say));
-ternary : ("\nTest passed!".say);
+var ternary = (false ? (die "error!"));
+ternary : ("Test passed!".say);

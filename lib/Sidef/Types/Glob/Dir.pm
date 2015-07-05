@@ -4,7 +4,6 @@ package Sidef::Types::Glob::Dir {
 
     use parent qw(
       Sidef::Types::Glob::File
-      Sidef::Types::String::String
       );
 
     sub new {
@@ -161,6 +160,11 @@ package Sidef::Types::Glob::Dir {
 
         $success ? $dir_obj : ();
     }
+
+    *open_r = \&open;
+
+    sub open_w  { ... }
+    sub open_rw { ... }
 
     sub chdir {
         my ($self) = @_;

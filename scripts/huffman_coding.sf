@@ -2,7 +2,7 @@
 
 # http://rosettacode.org/wiki/Huffman_coding#Sidef
 
-func walk(n is Hash, s is String, h is Hash) -> true {
+func walk(n is Hash, s is String, h is Hash) -> Bool {
     n.exists('a') && (
         h[n['a']] = s;
         say "#{n['a']}: #{s}";

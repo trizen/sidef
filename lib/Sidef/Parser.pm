@@ -43,9 +43,10 @@ package Sidef::Parser {
                      | Block\b                        (?{ state $x = Sidef::Types::Block::Code->new })
                      | Backtick\b                     (?{ state $x = Sidef::Types::Glob::Backtick->new })
                      | ARGF\b                         (?{ state $x = Sidef::Types::Glob::FileHandle->new(fh => \*ARGV) })
-                     | STDIN\b                        (?{ state $x = Sidef::Types::Glob::FileHandle->stdin })
+                     | (?:STDIN|FileHandle)\b         (?{ state $x = Sidef::Types::Glob::FileHandle->stdin })
                      | STDOUT\b                       (?{ state $x = Sidef::Types::Glob::FileHandle->stdout })
                      | STDERR\b                       (?{ state $x = Sidef::Types::Glob::FileHandle->stderr })
+                     | DirHandle\b                    (?{ state $x = Sidef::Types::Glob::Dir->cwd->open })
                      | Dir\b                          (?{ state $x = Sidef::Types::Glob::Dir->new })
                      | File\b                         (?{ state $x = Sidef::Types::Glob::File->new })
                      | Fcntl\b                        (?{ state $x = Sidef::Types::Glob::Fcntl->new })
@@ -141,31 +142,12 @@ package Sidef::Parser {
                 | %C\b.                                                    (?{ [qw(1 to_chars Sidef::Types::Char::Chars)] })
              )
             }xs,
-            keywords => {
+            built_in_classes => {
                 map { $_ => 1 }
                   qw(
-                  next
-                  break
-                  return
-                  for foreach
-                  if while
-                  try loop
-                  given switch
-                  continue
-                  require frequire
-                  true false
-                  nil
-                  import
-                  include
-                  print println say
-                  eval
-                  read
-                  die
-                  warn
-
-                  File
+                  File FileHandle
                   Fcntl
-                  Dir
+                  Dir DirHandle
                   Arr Array Pair
                   MultiArray MultiArr
                   Hash
@@ -190,6 +172,30 @@ package Sidef::Parser {
                   BlackHole
                   Backtick
                   LazyMethod
+
+                  true false
+                  nil
+                  )
+            },
+            keywords => {
+                map { $_ => 1 }
+                  qw(
+                  next
+                  break
+                  return
+                  for foreach
+                  if while
+                  try loop
+                  given switch
+                  continue
+                  require frequire
+                  import
+                  include
+                  print println say
+                  eval
+                  read
+                  die
+                  warn
 
                   my
                   var
@@ -583,7 +589,7 @@ package Sidef::Parser {
             my $class_name;
             ($name, $class_name) = $self->get_name_and_class($name);
 
-            if (exists $self->{keywords}{$name}) {
+            if (exists($self->{keywords}{$name}) or exists($self->{built_in_classes}{$name})) {
                 $self->fatal_error(
                                    code  => $_,
                                    pos   => $-[2],
@@ -867,7 +873,7 @@ package Sidef::Parser {
             if (/\Gdefine\h+($self->{var_name_re})\h*/goc) {
                 my $name = $1;
 
-                if (exists $self->{keywords}{$name}) {
+                if (exists($self->{keywords}{$name}) or exists($self->{built_in_classes}{$name})) {
                     $self->fatal_error(
                                        code  => $_,
                                        pos   => (pos($_) - length($name)),
@@ -909,7 +915,7 @@ package Sidef::Parser {
                     $name = $1;
                 }
 
-                if (defined $name and exists $self->{keywords}{$name}) {
+                if (defined($name) and (exists($self->{keywords}{$name}) or exists($self->{built_in_classes}{$name}))) {
                     $self->fatal_error(
                                        code  => $_,
                                        pos   => (pos($_) - length($name)),
@@ -968,7 +974,7 @@ package Sidef::Parser {
                       ? $var->{value}
                       : $value->inc;
 
-                    if (exists $self->{keywords}{$name}) {
+                    if (exists($self->{keywords}{$name}) or exists($self->{built_in_classes}{$name})) {
                         $self->fatal_error(
                                            code  => $_,
                                            pos   => (pos($_) - length($name)),
@@ -1003,26 +1009,40 @@ package Sidef::Parser {
                       : 'func'
                   : $1;
 
+                my $name       = '';
+                my $class_name = $self->{class};
                 my $built_in_obj;
-                if ($type eq 'class' and /\G(?!\{)/) {
-                    my $obj = eval {
+                if ($type eq 'class' and /\G(?![{(])/) {
+
+                    my $try_expr;
+                    if (/\G($self->{var_name_re})\h*/gco) {
+                        ($name, $class_name) = $self->get_name_and_class($1);
+                    }
+                    else {
+                        $try_expr = 1;
+                    }
+
+                    if (
+                        $try_expr or exists($self->{built_in_classes}{$name}) or do {
+                            my ($obj) = $self->find_var($name, $class_name);
+                            defined($obj) and $obj->{type} eq 'class';
+                        }
+                      ) {
                         local $self->{_want_name} = 1;
-                        my $code = substr($_, pos);
-                        my ($obj) = $self->parse_expr(code => \$code);
-                        pos($_) += pos($code);
-                        $obj;
-                    };
-                    if (not $@ and defined $obj) {
+                        my ($obj) = $self->parse_expr(code => $try_expr ? $opt{code} : \$name);
+
                         $built_in_obj =
                           ref($obj) eq 'HASH'
                           ? Sidef::Types::Block::Code->new($obj)->run
                           : Sidef::Types::Block::Code->new({self => $obj})->_execute_expr;
+
+                        if (defined $built_in_obj) {
+                            $name = '';
+                        }
                     }
                 }
 
-                my $name       = '';
-                my $class_name = $self->{class};
-                if (not defined $built_in_obj) {
+                if ($type ne 'class') {
                     $name =
                         /\G($self->{var_name_re})\h*/goc ? $1
                       : $type eq 'method' && /\G($self->{operators_re})\h*/goc ? $+
@@ -1038,8 +1058,9 @@ package Sidef::Parser {
 
                 local $self->{class} = $class_name;
 
-                if ($type ne 'method'
-                    && exists($self->{keywords}{$name})) {
+                if (    $type ne 'method'
+                    and $type ne 'class'
+                    and (exists($self->{keywords}{$name}) or exists($self->{built_in_classes}{$name}))) {
                     $self->fatal_error(
                                        code  => $_,
                                        pos   => $-[0],
@@ -1105,7 +1126,7 @@ package Sidef::Parser {
                     if (/\G\h*<<?\h*/gc) {
                         while (/\G($self->{var_name_re})\h*/gco) {
                             my ($name) = $1;
-                            my ($class, $code) = $self->find_var($name, $class_name);
+                            my ($class) = $self->find_var($name, $class_name);
                             if (ref $class) {
                                 if ($class->{type} eq 'class') {
                                     push @{$obj->{inherit}}, $name;
@@ -1165,14 +1186,25 @@ package Sidef::Parser {
                     # Function return type (func name(...) -> Type {...})
                     # XXX: [KNOWN BUG] It doesn't check the returned type from method calls
                     if (/\G\h*(?:->|returns\b)\h*/gc) {
-                        my $return_obj = eval {
+
+                        my $name = '';
+                        my $try_expr;
+                        if (/\G($self->{var_name_re})\h*/gco) {
+                            $name = $1;
+                        }
+                        else {
+                            $try_expr = 1;
+                        }
+
+                        if (
+                            $try_expr or exists($self->{built_in_classes}{$name}) or do {
+                                my ($obj) = $self->find_var($name, $class_name);
+                                defined($obj) and $obj->{type} eq 'class';
+                            }
+                          ) {
                             local $self->{_want_name} = 1;
-                            my $code = substr($_, pos);
-                            my ($obj) = $self->parse_expr(code => \$code);
-                            pos($_) += pos($code);
-                            $obj;
-                        };
-                        if (not $@ and defined $return_obj) {
+                            my ($return_obj) = $self->parse_expr(code => $try_expr ? $opt{code} : \$name);
+
                             $obj->{returns} =
                               ref($return_obj) eq 'HASH'
                               ? Sidef::Types::Block::Code->new($return_obj)->run
@@ -1186,6 +1218,7 @@ package Sidef::Parser {
                                                pos      => pos($_)
                                               );
                         }
+
                     }
 
                     /\G\h*\{\h*/gc
@@ -1437,7 +1470,7 @@ package Sidef::Parser {
                     $self->{static_objects}{'__DATA__'} //= do {
                         open my $str_fh, '<:utf8', \$self->{'__DATA__'};
                         Sidef::Types::Glob::FileHandle->new(fh   => $str_fh,
-                                                            file => Sidef::Types::Nil::Nil->new);
+                                                            self => Sidef::Types::Glob::File->new($self->{file_name}));
                       }
                 );
             }

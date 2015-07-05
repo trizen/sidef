@@ -1,0 +1,66 @@
+#!/usr/bin/ruby
+
+#
+## Returns String
+#
+func concat(a,b) -> "" {
+    a+b
+}
+
+concat("a", "b") == "ab" || die "error!";
+
+try {
+        concat([1],[2]);
+        die "error!";
+}
+catch {
+    ## ok
+};
+
+
+#
+## Returns number
+#
+func add(a,b) -> Num {
+    a+b;
+}
+
+add(1,2) == 3 || die "error!";
+
+try {
+    add("1", "2");
+    die "error!";
+}
+catch {
+    ## ok
+};
+
+
+#
+## Returns a user-defined type
+#
+class Point(a,b) { };
+
+func point(a, b) -> Point {
+    Point(a, b);
+}
+
+point(1,2).is_a(Point) || die "error!";
+
+func fake_point(a, b) -> Point {
+    [a, b];
+}
+
+try {
+    fake_point(1,2);
+    die "error!";
+}
+catch {
+    ## ok
+};
+
+
+#
+## Test passed!
+#
+say "** Test passed!";

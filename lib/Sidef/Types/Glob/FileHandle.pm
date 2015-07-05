@@ -10,7 +10,7 @@ package Sidef::Types::Glob::FileHandle {
 
         bless {
                fh   => $opt{fh},
-               file => $opt{file},
+               self => $opt{self},
               },
           __PACKAGE__;
     }
@@ -19,11 +19,11 @@ package Sidef::Types::Glob::FileHandle {
         $_[0]->{fh};
     }
 
-    sub file {
-        $_[0]{file};
+    sub parent {
+        $_[0]{self};
     }
 
-    *parent = \&file;
+    *self = \&parent;
 
     sub is_on_tty {
         Sidef::Types::Bool::Bool->new(-t $_[0]{fh});

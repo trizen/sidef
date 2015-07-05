@@ -243,6 +243,9 @@ package Sidef::Deparse::Sidef {
         elsif ($ref eq 'Sidef::Math::Math') {
             $code = 'Math';
         }
+        elsif ($ref eq 'Sidef::Types::Glob::DirHandle') {
+            $code = 'DirHandle';
+        }
         elsif ($ref eq 'Sidef::Types::Glob::FileHandle') {
             if ($obj->{fh} eq \*STDIN) {
                 $code = 'STDIN';

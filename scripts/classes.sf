@@ -47,6 +47,26 @@ g.pop     == 'xxx'       || die '1-g';
 f.pop     == 'bar'       || die '4-f';
 g[:array] == ['yyy']     || die '2-g';
 
+#
+## Class redefinition
+#
+class Example {
+    method hi {
+        say "I'm saying 'hi'";
+    }
+}
+
+class main::Example() {             # main::Example() is just for testing
+    method hello() {
+        say "I'm saying 'hello'";
+    }
+}
+
+var obj = Example();
+
+obj.hi;
+obj.hello;
+
 say "** Test passed!";
 
 __END__
