@@ -1,11 +1,16 @@
-#!/usr/bin/ruby
+#!/usr/bin/sidef
+
+#`(if running under some shell) {
+    eval 'exec /usr/bin/sidef $0 ${1+"$@"}'
+}
 
 # Author: Daniel "Trizen" Șuteu
 # License: GPLv3
 # Created on: 21 August 2012
 # Latest edit on: 10 November 2013
 # Translated to Sidef in 21 September 2014
-# Websites: http://trizen.googlecode.com
+# Latest edit on: 03 July 2015
+# Website: https://github.com/trizen/asciiplanes
 
 # Find the planes' positions on a grid. (text-based game)
 
@@ -16,9 +21,9 @@ var asciitable = (
 
 ## Package variables
 var pkgname = 'asciiplanes';
-var version = 0.01;
+var version = 0.03;
 
-## Game run-time constants
+## Game variables
 var BOARD_SIZE = 8;
 var PLANES_NUM = 3;
 
@@ -31,7 +36,7 @@ var miss_char  = %q{`};
 
 func usage {
     print <<"EOT";
-usage: #{__FILE__} [options]
+usage: #{__MAIN__} [options]
 
 main:
         --size=i    : length side of the board (default: #{BOARD_SIZE})
@@ -39,14 +44,13 @@ main:
         --wrap!     : wrap the plane around the play board (default: #{wrap_plane})
         --hit=s     : character used when a plane is hit (default: "#{hit_char}")
         --miss=s    : character used when a plane is missed (default: "#{miss_char}")
-        --planeN=s  : character used to draw the Nth killed plane (N=[1-99])
 
 help:
         --help      : print this message and exit
         --version   : print the version number and exit
 
 example:
-        #{__FILE__} --size=12 --planes=6 --hit='*'
+        #{__MAIN__} --size=12 --planes=6 --hit='*'
 
 EOT
 
@@ -81,10 +85,9 @@ var play_board = 1.to(BOARD_SIZE).map { [nil] * BOARD_SIZE };
 var info_board = 1.to(BOARD_SIZE).map { [' '] * BOARD_SIZE };
 
 var letters = Hash.new;
-0 ... play_board.offset -> each { |i|
+play_board.range.each { |i|
     static char = 'a';
-    letters[char] = i;
-    char++;
+    letters[char++] = i;
 }
 
 #---------------------------------------------------------------
@@ -92,15 +95,17 @@ var letters = Hash.new;
 func pointers(board, x, y, indices) {
 
     var output = [];
-    [[0,0]] + indices.grep{.is_an(Array)} -> each { |pair|
+    [[0,0]] + indices -> each { |pair|
+
+        pair.is_an(Array) || next;
         var (row, col) = (x + pair[0], y + pair[1]);
 
-        if (row > board.offset) {
+        if (row > board.end) {
             wrap_plane || return [];
             row %= board.len;
         }
 
-        if (col > board[row].offset) {
+        if (col > board[row].end) {
             wrap_plane || return [];
             col %= board[row].len;
         }
@@ -167,7 +172,7 @@ func assign(change=false, plane=[], data=[]) {
         }
     );
 
-    0 ... plane.offset -> each { |i|
+    plane.range.each { |i|
         *plane[i] = data[i];
     }
 
@@ -181,9 +186,8 @@ func print_ascii_table {
 
     var char = 'a';
     info_board.each { |row|
-        table.addRow([char, row...]);
+        table.addRow([char++, row...]);
         table.addRowLine();
-        char++;
     }
 
     say table.drawit;
@@ -238,7 +242,7 @@ while (count > 0) {
     if (point.is_a(nil)) {
         info_board[x][y] = miss_char;
     }
-    elsif (point =~ /^head_(\d)$/i) {
+    elsif (point ~~ /^head_(\d)$/i) {
         var dir  = $1.to_num;
         var item = plane_chars[(PLANES_NUM - count) % plane_chars.len];
         var code = directions[dir];
@@ -249,12 +253,12 @@ while (count > 0) {
                    data:   [item]*8,
                    plane:  code.call($board, $x, $y),
                   )
-              || "#{__FILE__}: unexpected error!".die;
+              || "#{__MAIN__}: unexpected error!".die;
         }
 
         count--;
     }
-    elsif (point =~ /^hit_\d$/i) {
+    elsif (point ~~ /^hit_\d$/i) {
         info_board[x][y] = hit_char;
     }
 
