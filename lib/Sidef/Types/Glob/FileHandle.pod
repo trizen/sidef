@@ -105,16 +105,6 @@ Return the
 
 =cut
 
-=head2 file
-
-FileHandle.file() -> I<Obj>
-
-Return the
-
-Aliases: I<parent>
-
-=cut
-
 =head2 fileno
 
 FileHandle.fileno() -> I<Obj>
@@ -220,6 +210,16 @@ Aliases: I<println>
 FileHandle.seek() -> I<Obj>
 
 Return the
+
+=cut
+
+=head2 self
+
+FileHandle.self() -> I<Obj>
+
+Return the
+
+Aliases: I<parent>
 
 =cut
 

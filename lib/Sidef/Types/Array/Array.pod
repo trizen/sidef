@@ -690,6 +690,16 @@ Aliases: I<size>, I<length>
 
 =cut
 
+=head2 lev
+
+Array.lev() -> I<Obj>
+
+Return the
+
+Aliases: I<leven>, I<levenshtein>
+
+=cut
+
 =head2 make
 
 Array.make(I<Number>, I<Obj>) -> I<Array>

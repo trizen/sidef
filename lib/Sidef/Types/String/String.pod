@@ -551,6 +551,16 @@ Aliases: I<length>
 
 =cut
 
+=head2 lev
+
+String.lev() -> I<Obj>
+
+Return the
+
+Aliases: I<leven>, I<levenshtein>
+
+=cut
+
 =head2 lines
 
 String.lines() -> I<Obj>

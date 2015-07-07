@@ -19,7 +19,6 @@ var obj = Dir.new(...);
 Inherits methods from:
 
 	* Sidef::Types::Glob::File
-	* Sidef::Types::String::String
 
 =head1 METHODS
 
@@ -131,6 +130,24 @@ Aliases: I<call>
 =head2 open
 
 Dir.open() -> I<Obj>
+
+Return the
+
+Aliases: I<open_r>
+
+=cut
+
+=head2 open_rw
+
+Dir.open_rw() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 open_w
+
+Dir.open_w() -> I<Obj>
 
 Return the
 
