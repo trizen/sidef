@@ -101,13 +101,15 @@ package Sidef {
         sub METHODS {
             my ($self) = @_;
 
-            my %aliases;
+            my %alias;
+            my %methods;
             my $ref = ref($self);
             foreach my $method (grep { $_ !~ /^[(_]/ and defined(&{$ref . '::' . $_}) } keys %{$ref . '::'}) {
-                push @{$aliases{\&{$ref . '::' . $method}}}, Sidef::Types::String::String->new($method);
+                $methods{$method} = ($alias{\&{$ref . '::' . $method}} //=
+                                     Sidef::Variable::LazyMethod->new(obj => $self, method => \&{$ref . '::' . $method}));
             }
 
-            Sidef::Types::Array::Array->new(map { Sidef::Types::Array::Array->new(@{$_}) } values %aliases);
+            Sidef::Types::Hash::Hash->new(%methods);
         }
     }
 

@@ -2030,6 +2030,8 @@ package Sidef::Parser {
                         my ($ind) = $self->parse_expr(code => $opt{code});
                         push @{$struct{$self->{class}}[-1]{ind}}, $ind;
                     }
+
+                    redo;
                 }
 
                 if (/\G(?!\h*[=-]>)/ && /\G(?=$self->{operators_re})/o) {

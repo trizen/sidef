@@ -14,12 +14,13 @@ package Sidef::Variable::LazyMethod {
         my ($self, @args) = @_;
 
         my ($method) = ($AUTOLOAD =~ /^.*[^:]::(.*)$/);
+        my $call = ref($self->{method}) eq 'CODE' ? $self->{method} : $self->{method}->get_value;
 
         if ($method eq 'call') {
-            return $self->{obj}->${$self->{method}}(@{$self->{args}}, @args);
+            return $self->{obj}->$call(@{$self->{args}}, @args);
         }
 
-        $self->{obj}->${$self->{method}}(@{$self->{args}})->$method(@args);
+        $self->{obj}->$call(@{$self->{args}})->$method(@args);
     }
 
 };
