@@ -240,6 +240,7 @@ scripts/Expensive/mutual_recursion.sf
 scripts/Expensive/root_of_a_function.sf
 scripts/Expensive/sudoku_solver.sf
 scripts/Expensive/time_a_function.sf
+scripts/Expensive/ulam_spiral.sf
 scripts/Expensive/universal_turing_machine.sf
 scripts/extend_language.sf
 scripts/fibonacci_cached.sf
