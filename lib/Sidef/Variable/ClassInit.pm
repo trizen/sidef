@@ -45,7 +45,7 @@ package Sidef::Variable::ClassInit {
         $self->__add_method__($name, $value);
     }
 
-    sub has_method {
+    sub respond_to {
         my ($self, $name) = @_;
         Sidef::Types::Bool::Bool->new(exists $self->{__METHODS__}{$name});
     }

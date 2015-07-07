@@ -46,12 +46,19 @@ package Sidef::Variable::Class {
         Sidef::Types::Hash::Hash->new(%methods);
     }
 
+    sub method {
+        my ($self, $name) = @_;
+        exists($self->{method}{$name})
+          ? Sidef::Variable::LazyMethod->new(obj => $self, method => $self->{method}{$name})
+          : ();
+    }
+
     sub def_method {
         my ($self, $name, $block) = @_;
         $self->{method}{$name} = $block;
     }
 
-    sub has_method {
+    sub respond_to {
         my ($self, $name) = @_;
         Sidef::Types::Bool::Bool->new(exists $self->{method}{$name});
     }

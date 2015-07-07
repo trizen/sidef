@@ -32,14 +32,6 @@ Return the
 
 =cut
 
-=head2 has_method
-
-Class.has_method() -> I<Obj>
-
-Return the
-
-=cut
-
 =head2 is_a
 
 Class.is_a() -> I<Obj>
@@ -50,9 +42,25 @@ Aliases: I<is_an>
 
 =cut
 
+=head2 method
+
+Class.method() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 METHODS
 
 Class.METHODS() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 respond_to
+
+Class.respond_to() -> I<Obj>
 
 Return the
 

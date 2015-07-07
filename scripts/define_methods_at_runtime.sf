@@ -44,7 +44,7 @@ var obj2 = Hello();
 
 obj2.foo == "foo"           || die "error";
 
-if (obj2.has_method('baz')) {
+if (obj2.respond_to('baz')) {
     die "error";
 };
 
