@@ -14,7 +14,18 @@ package Sidef::Variable::LazyMethod {
         my ($self, @args) = @_;
 
         my ($method) = ($AUTOLOAD =~ /^.*[^:]::(.*)$/);
-        my $call = ref($self->{method}) eq 'CODE' ? $self->{method} : $self->{method}->get_value;
+        my $call = $self->{method};
+
+        if (ref($call) eq 'Sidef::Types::Block::Code') {
+            if ($method eq 'call') {
+                return $call->call($self->{obj}, @{$self->{args}}, @args);
+            }
+            return $call->call($self->{obj}, @{$self->{args}})->$method(@args);
+        }
+
+        if (ref($call) ne 'CODE') {
+            $call = $call->get_value;
+        }
 
         if ($method eq 'call') {
             return $self->{obj}->$call(@{$self->{args}}, @args);

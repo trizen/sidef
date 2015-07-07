@@ -49,3 +49,11 @@ Return the
 Aliases: I<is_an>
 
 =cut
+
+=head2 METHODS
+
+Class.METHODS() -> I<Obj>
+
+Return the
+
+=cut

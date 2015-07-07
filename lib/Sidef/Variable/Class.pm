@@ -31,6 +31,21 @@ package Sidef::Variable::Class {
         $self->{class};
     }
 
+    sub METHODS {
+        my ($self) = @_;
+
+        state $x = require Scalar::Util;
+
+        my %alias;
+        my %methods;
+        while (my ($key, $value) = each %{$self->{method}}) {
+            $methods{$key} =
+              ($alias{Scalar::Util::refaddr($value)} //= Sidef::Variable::LazyMethod->new(obj => $self, method => $value));
+        }
+
+        Sidef::Types::Hash::Hash->new(%methods);
+    }
+
     sub def_method {
         my ($self, $name, $block) = @_;
         $self->{method}{$name} = $block;
