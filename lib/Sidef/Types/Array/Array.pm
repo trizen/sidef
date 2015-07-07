@@ -159,6 +159,34 @@ package Sidef::Types::Array::Array {
           : $self->new((map { $_->get_value } @{$self}), $arg);
     }
 
+    sub levenshtein {
+        my ($self, $arg) = @_;
+
+        my @s = map { $_->get_value } @{$self};
+        my @t = map { $_->get_value } @{$arg};
+
+        my $len1 = scalar(@s);
+        my $len2 = scalar(@t);
+
+        state $eq = '==';
+        state $x  = require List::Util;
+
+        my @d = ([0 .. $len2], map { [$_] } 1 .. $len1);
+        foreach my $i (1 .. $len1) {
+            foreach my $j (1 .. $len2) {
+                $d[$i][$j] =
+                    $s[$i - 1]->$eq($t[$j - 1])
+                  ? $d[$i - 1][$j - 1]
+                  : List::Util::min($d[$i - 1][$j], $d[$i][$j - 1], $d[$i - 1][$j - 1]) + 1;
+            }
+        }
+
+        Sidef::Types::Number::Number->new($d[-1][-1]);
+    }
+
+    *lev   = \&levenshtein;
+    *leven = \&levenshtein;
+
     sub _combinations {
         my ($n, @set) = @_;
 
@@ -188,11 +216,22 @@ package Sidef::Types::Array::Array {
         my ($self, $obj) = @_;
 
         my $counter = 0;
-        my $method  = '==';
+        if ($obj->can('run')) {
+
+            foreach my $item (@{$self}) {
+                if ($obj->run($item->get_value)) {
+                    ++$counter;
+                }
+            }
+
+            return Sidef::Types::Number::Number->new($counter);
+        }
+
+        state $eq = '==';
         foreach my $item (@{$self}) {
             my $value = $item->get_value;
-            if (ref($value) eq ref($obj) && eval { $value->can($method) }) {
-                $value->$method($obj) && $counter++;
+            if (ref($value) eq ref($obj)) {
+                $value->$eq($obj) && $counter++;
             }
         }
 
@@ -209,18 +248,10 @@ package Sidef::Types::Array::Array {
             return Sidef::Types::Bool::Bool->false;
         }
 
+        state $eq = '==';
         foreach my $i (0 .. $#{$self}) {
-
             my ($x, $y) = ($self->[$i]->get_value, $array->[$i]->get_value);
-
-            my $method = '==';
-
-            if (defined $x->can($method)) {
-                if (not $x->$method($y)) {
-                    return Sidef::Types::Bool::Bool->false;
-                }
-            }
-            else {
+            if (not $x->$eq($y)) {
                 return Sidef::Types::Bool::Bool->false;
             }
         }
@@ -276,14 +307,7 @@ package Sidef::Types::Array::Array {
 
         foreach my $i (1 .. $#{$self}) {
             my $val = $self->[$i]->get_value;
-
-            if (defined $val->can($method)) {
-                $max_item = $val if $val->$method($max_item);
-            }
-            else {
-                warn sprintf("[WARN] %s():Can't find the method '$method' for object '%s'!\n",
-                             $method eq '>' ? 'max' : 'min', ref($val));
-            }
+            $max_item = $val if $val->$method($max_item);
         }
 
         return $max_item;
@@ -623,7 +647,7 @@ package Sidef::Types::Array::Array {
     *lastIndexWhere = \&last_index;
     *lastIndex      = \&last_index;
 
-    sub reducePairs {
+    sub reduce_pairs {
         my ($self, $obj) = @_;
 
         (my $offset = $#{$self}) == -1
@@ -646,7 +670,7 @@ package Sidef::Types::Array::Array {
         $self->new(@array);
     }
 
-    *reduce_pairs = \&reducePairs;
+    *reducePairs = \&reduce_pairs;
 
     sub shuffle {
         my ($self) = @_;
@@ -757,17 +781,17 @@ package Sidef::Types::Array::Array {
     sub _unique {
         my ($self, $last) = @_;
 
+        state $method = '==';
+
         my %indices;
-        my $method = '==';
-        my $max    = $#{$self};
+        my $max = $#{$self};
 
         for (my $i = 0 ; $i <= ($max - 1) ; $i++) {
             for (my $j = $i + 1 ; $j <= $max ; $j++) {
                 my $diff = ($#{$self} - $max);
                 my ($x, $y) = ($self->[$i + $diff]->get_value, $self->[$j + $diff]->get_value);
 
-                if (    ref($x) eq ref($y)
-                    and $x->can($method)
+                if (ref($x) eq ref($y)
                     and $x->$method($y)) {
 
                     undef $indices{$last ? ($i + $diff) : ($j + $diff)};
@@ -874,8 +898,7 @@ package Sidef::Types::Array::Array {
         state $method = '==';
         foreach my $var (@{$self}) {
             my $item = $var->get_value;
-            if (    ref($item) eq ref($obj)
-                and defined $item->can($method)
+            if (ref($item) eq ref($obj)
                 and $item->$method($obj)) {
                 return Sidef::Types::Bool::Bool->true;
             }
@@ -1013,16 +1036,8 @@ package Sidef::Types::Array::Array {
                          map { $_->get_value } @{$self});
         }
 
-        my $method = '<=>';
-        $self->new(
-            sort {
-                $a->can($method)
-                  || (ref($a) eq 'Sidef::Variable::Class' && exists $a->{method}{$method})
-                  ? ($a->$method($b))
-                  : -1
-              }
-              map { $_->get_value } @{$self}
-        );
+        state $method = '<=>';
+        $self->new(sort { $a->$method($b) } map { $_->get_value } @{$self});
     }
 
     sub permute {
@@ -1152,8 +1167,7 @@ package Sidef::Types::Array::Array {
         foreach my $i (0 .. $#{$self}) {
             my $var  = $self->[$i];
             my $item = $var->get_value;
-            if (    ref($item) eq ref($obj)
-                and defined $item->can($method)
+            if (ref($item) eq ref($obj)
                 and $item->$method($obj)) {
                 CORE::splice(@{$self}, $i, 1);
                 return Sidef::Types::Bool::Bool->true;
@@ -1173,8 +1187,7 @@ package Sidef::Types::Array::Array {
         my $method = '==';
         for (my $i = 0 ; $i <= $#{$self} ; $i++) {
             my $item = $self->[$i]->get_value;
-            if (    ref($item) eq ref($obj)
-                and defined $item->can($method)
+            if (ref($item) eq ref($obj)
                 and $item->$method($obj)) {
                 CORE::splice(@{$self}, $i--, 1);
             }

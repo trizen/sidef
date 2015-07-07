@@ -746,6 +746,33 @@ package Sidef::Types::String::String {
     *graphemes    = \&graphs;
     *to_graphemes = \&graphs;
 
+    sub levenshtein {
+        my ($self, $arg) = @_;
+
+        my @s = split(//, $self->get_value);
+        my @t = split(//, $arg->get_value);
+
+        my $len1 = scalar(@s);
+        my $len2 = scalar(@t);
+
+        state $x = require List::Util;
+
+        my @d = ([0 .. $len2], map { [$_] } 1 .. $len1);
+        foreach my $i (1 .. $len1) {
+            foreach my $j (1 .. $len2) {
+                $d[$i][$j] =
+                    $s[$i - 1] eq $t[$j - 1]
+                  ? $d[$i - 1][$j - 1]
+                  : List::Util::min($d[$i - 1][$j], $d[$i][$j - 1], $d[$i - 1][$j - 1]) + 1;
+            }
+        }
+
+        Sidef::Types::Number::Number->new($d[-1][-1]);
+    }
+
+    *lev   = \&levenshtein;
+    *leven = \&levenshtein;
+
     sub contains {
         my ($self, $string, $start_pos) = @_;
 
