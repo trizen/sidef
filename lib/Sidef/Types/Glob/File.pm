@@ -47,7 +47,6 @@ package Sidef::Types::Glob::File {
 
     sub compare {
         my ($self, $file) = @_;
-        $self->_is_file($file) || return;
         if (@_ == 3) {
             ($self, $file) = ($file, $_[2]);
         }

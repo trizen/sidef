@@ -7,58 +7,7 @@ package Sidef {
     our $SPACES_INCR = 4;    # the number of spaces incrementor
 
     {
-        my %types = (
-                     bool   => {class => {'Sidef::Types::Bool::Bool'  => 1}},
-                     code   => {class => {'Sidef::Types::Block::Code' => 1}},
-                     hash   => {class => {'Sidef::Types::Hash::Hash'  => 1}},
-                     number => {
-                                class => {
-                                          'Sidef::Types::Number::Number'  => 1,
-                                          'Sidef::Types::Number::Complex' => 1,
-                                          'Sidef::Types::Byte::Byte'      => 1,
-                                         },
-                                type => 'SCALAR',
-                               },
-                     var_ref => {class => {'Sidef::Variable::Ref' => 1}},
-                     file    => {
-                              class => {'Sidef::Types::Glob::File' => 1},
-                              type  => 'SCALAR',
-                             },
-                     fh  => {class => {'Sidef::Types::Glob::FileHandle' => 1}},
-                     dir => {
-                             class => {'Sidef::Types::Glob::Dir' => 1},
-                             type  => 'SCALAR',
-                            },
-                     regex => {class => {'Sidef::Types::Regex::Regex' => 1}},
-                     pair  => {
-                              class => {'Sidef::Types::Array::Pair' => 1},
-                              type  => 'ARRAY',
-                             },
-                     string => {
-                                class => {
-                                          'Sidef::Types::String::String' => 1,
-                                          'Sidef::Types::Char::Char'     => 1,
-                                         },
-                                type => 'SCALAR',
-                               },
-                     array => {
-                               class => {
-                                         'Sidef::Types::Array::Array' => 1,
-                                         'Sidef::Types::Array::Range' => 1,
-                                         'Sidef::Types::Char::Chars'  => 1,
-                                         'Sidef::Types::Byte::Bytes'  => 1,
-                                        },
-                               type => 'ARRAY',
-                              },
-                    );
-
         no strict 'refs';
-
-        foreach my $type (keys %types) {
-            *{__PACKAGE__ . '::' . '_is_' . $type} = sub {
-                exists($types{$type}{class}{ref($_[1])}) ? 1 : 0;
-            };
-        }
 
         foreach my $method (['!=', 1], ['==', 0]) {
 
@@ -93,11 +42,6 @@ package Sidef {
 
         *__add_method__ = \&def_method;
 
-        sub method {
-            my ($self, $method, @args) = @_;
-            Sidef::Variable::LazyMethod->new(obj => $self, method => $method, args => \@args);
-        }
-
         sub METHODS {
             my ($self) = @_;
 
@@ -105,8 +49,13 @@ package Sidef {
             my %methods;
             my $ref = ref($self);
             foreach my $method (grep { $_ !~ /^[(_]/ and defined(&{$ref . '::' . $_}) } keys %{$ref . '::'}) {
-                $methods{$method} = ($alias{\&{$ref . '::' . $method}} //=
-                                     Sidef::Variable::LazyMethod->new(obj => $self, method => \&{$ref . '::' . $method}));
+                $methods{$method} = (
+                                     $alias{\&{$ref . '::' . $method}} //=
+                                       Sidef::Variable::LazyMethod->new(
+                                                                        obj    => $self,
+                                                                        method => \&{$ref . '::' . $method}
+                                                                       )
+                                    );
             }
 
             Sidef::Types::Hash::Hash->new(%methods);
@@ -115,6 +64,11 @@ package Sidef {
 
     sub new {
         bless {}, __PACKAGE__;
+    }
+
+    sub method {
+        my ($self, $method, @args) = @_;
+        Sidef::Variable::LazyMethod->new(obj => $self, method => $method, args => \@args);
     }
 
     sub super_join {

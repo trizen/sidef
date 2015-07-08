@@ -143,7 +143,6 @@ package Sidef::Sys::Sys {
         my ($self, $text) = @_;
 
         if (defined($text)) {
-            $self->_is_string($text) || return;
             $text->print;
         }
 
@@ -157,7 +156,6 @@ package Sidef::Sys::Sys {
 
         if (@vars) {
             foreach my $var_ref (@vars) {
-                $self->_is_var_ref($var_ref) || return;
                 my $var = $var_ref->get_var;
                 print "$var->{name}: ";
                 chomp(my $input = <STDIN>);

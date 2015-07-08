@@ -56,7 +56,6 @@ package Sidef::Types::Glob::FileHandle {
 
     sub compare {
         my ($self, $fh) = @_;
-        $self->_is_fh($fh) || return;
         state $x = require File::Compare;
         Sidef::Types::Number::Number->new(File::Compare::compare($self->{fh}, $fh->{fh}));
     }
@@ -144,7 +143,6 @@ package Sidef::Types::Glob::FileHandle {
         my ($self, $var_ref) = @_;
 
         if (defined $var_ref) {
-            $self->_is_var_ref($var_ref) || return;
             my $line = CORE::readline($self->{fh});
             $var_ref->get_var->set_value(Sidef::Types::String::String->new($line // return Sidef::Types::Bool::Bool->false));
             return Sidef::Types::Bool::Bool->true;
@@ -301,7 +299,6 @@ package Sidef::Types::Glob::FileHandle {
 
     sub read_to {
         my ($self, $var_ref) = @_;
-        $self->_is_var_ref($var_ref) || return;
         $var_ref->get_var->set_value(Sidef::Types::String::String->new(unpack 'A*', scalar CORE::readline($self->{fh})));
         $self;
     }

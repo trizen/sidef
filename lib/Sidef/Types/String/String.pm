@@ -86,7 +86,7 @@ package Sidef::Types::String::String {
     sub subtract {
         my ($self, $obj) = @_;
 
-        if ($self->_is_regex($obj)) {
+        if (ref($obj) eq 'Sidef::Types::Regex::Regex') {
 
             $obj->match($self)->to_bool or return $self;
 
@@ -115,7 +115,7 @@ package Sidef::Types::String::String {
         sub match {
             my ($self, $regex, @rest) = @_;
             (
-             $self->_is_regex($regex) ? $regex : do {
+             ref($regex) eq 'Sidef::Types::Regex::Regex' ? $regex : do {
                  state $x = require Scalar::Util;
                  $cache{Scalar::Util::refaddr($regex)} //= Sidef::Types::Regex::Regex->new($regex);
                }
@@ -131,7 +131,7 @@ package Sidef::Types::String::String {
         sub gmatch {
             my ($self, $regex, @rest) = @_;
             (
-             $self->_is_regex($regex) ? $regex : do {
+             ref($regex) eq 'Sidef::Types::Regex::Regex' ? $regex : do {
                  state $x = require Scalar::Util;
                  $cache{Scalar::Util::refaddr($regex)} //=
                    Sidef::Types::Regex::Regex->new($regex);
@@ -428,7 +428,7 @@ package Sidef::Types::String::String {
     sub sprintf {
         my ($self, @arguments) = @_;
 
-        if (@arguments == 1 and $self->_is_array($arguments[0])) {
+        if (@arguments == 1 and $arguments[0]->isa('ARRAY')) {
             @arguments = map { $_->get_value } @{$arguments[0]};
         }
 
@@ -443,7 +443,7 @@ package Sidef::Types::String::String {
     sub _string_or_regex {
         my ($self, $obj) = @_;
 
-        if ($self->_is_regex($obj)) {
+        if (ref($obj) eq 'Sidef::Types::Regex::Regex') {
             return $obj->{regex};
         }
 
@@ -453,12 +453,12 @@ package Sidef::Types::String::String {
     sub sub {
         my ($self, $regex, $str) = @_;
 
-        $self->_is_code($str)
+        ref($str) eq 'Sidef::Types::Block::Code'
           && return $self->esub($regex, $str);
 
         $str //= __PACKAGE__->new('');
 
-        if ($self->_is_regex($regex)) {
+        if (ref($regex) eq 'Sidef::Types::Regex::Regex') {
             $regex->match($self)->{matched} or return $self;
         }
 
@@ -473,12 +473,12 @@ package Sidef::Types::String::String {
     sub gsub {
         my ($self, $regex, $str) = @_;
 
-        $self->_is_code($str)
+        ref($str) eq 'Sidef::Types::Block::Code'
           && return $self->gesub($regex, $str);
 
         $str //= __PACKAGE__->new('');
 
-        if ($self->_is_regex($regex)) {
+        if (ref($regex) eq 'Sidef::Types::Regex::Regex') {
             $regex->match($self)->{matched} or return $self;
         }
 
@@ -500,15 +500,15 @@ package Sidef::Types::String::String {
         $code //= __PACKAGE__->new('');
         my $search = $self->_string_or_regex($regex);
 
-        if ($self->_is_regex($regex)) {
+        if (ref($regex) eq 'Sidef::Types::Regex::Regex') {
             $regex->match($self)->{matched} or return $self;
         }
 
-        if ($self->_is_string($code)) {
-            return __PACKAGE__->new($self->get_value =~ s{$search}{$code->get_value}eer);
+        if (ref($code) eq 'Sidef::Types::Block::Code') {
+            return __PACKAGE__->new($self->get_value =~ s{$search}{$code->run(_get_captures($self->get_value))}er);
         }
 
-        __PACKAGE__->new($self->get_value =~ s{$search}{$code->run(_get_captures($self->get_value))}er);
+        __PACKAGE__->new($self->get_value =~ s{$search}{$code->get_value}eer);
     }
 
     sub gesub {
@@ -517,16 +517,17 @@ package Sidef::Types::String::String {
         $code //= __PACKAGE__->new('');
         my $search = $self->_string_or_regex($regex);
 
-        if ($self->_is_regex($regex)) {
+        if (ref($regex) eq 'Sidef::Types::Regex::Regex') {
             $regex->match($self)->{matched} or return $self;
         }
 
-        if ($self->_is_string($code)) {
-            return __PACKAGE__->new($self->get_value =~ s{$search}{$code->get_value}geer);
+        if (ref($code) eq 'Sidef::Types::Block::Code') {
+            my $value = $self->get_value;
+            return __PACKAGE__->new($value =~ s{$search}{$code->run(_get_captures($value))}ger);
         }
 
-        my $value = $self->get_value;
-        __PACKAGE__->new($value =~ s{$search}{$code->run(_get_captures($value))}ger);
+        my $value = $code->get_value;
+        __PACKAGE__->new($self->get_value =~ s{$search}{$value}geer);
     }
 
     sub glob {
@@ -559,7 +560,7 @@ package Sidef::Types::String::String {
                                                 split(' ', $self->get_value, $size));
         }
 
-        if ($self->_is_number($sep)) {
+        if (ref($sep) eq 'Sidef::Types::Number::Number') {
             return
               Sidef::Types::Array::Array->new(map { __PACKAGE__->new($_) } unpack '(a' . $sep->get_value . ')*',
                                               $self->get_value);
@@ -702,7 +703,7 @@ package Sidef::Types::String::String {
     sub translit {
         my ($self, $orig, $repl, $modes) = @_;
 
-        $self->_is_array($orig) && return $self->trans($orig, $repl);
+        $orig->isa('ARRAY') && return $self->trans($orig, $repl);
         $self->new(
                        eval qq{"\Q${\$self->get_value}\E"=~tr/}
                      . $orig->get_value =~ s{([/\\])}{\\$1}gr . "/"

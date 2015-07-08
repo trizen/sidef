@@ -205,7 +205,7 @@ package Sidef::Types::Number::Number {
     sub array_to {
         my ($self, $num, $step) = @_;
 
-        $step = defined($step) ? $self->_is_number($step) ? ($step->get_value) : return : 1;
+        $step = defined($step) ? $step->get_value : 1;
 
         my $array = Sidef::Types::Array::Array->new();
         for (my $i = $self->get_value ; $i <= $num->get_value ; $i += $step) {
@@ -612,12 +612,7 @@ package Sidef::Types::Number::Number {
     sub shift_right {
         my ($self, $num, $base) = @_;
 
-        $self->new(
-                   $self->get_value->copy->brsft(
-                                                 $num->get_value,
-                                                 defined($base) ? $self->_is_number($base) ? $base->get_value : return : ()
-                                                )
-                  );
+        $self->new($self->get_value->copy->brsft($num->get_value, (defined($base) ? $base->get_value : ())));
     }
 
     *shiftRight = \&shift_right;

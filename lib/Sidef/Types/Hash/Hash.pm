@@ -210,7 +210,6 @@ package Sidef::Types::Hash::Hash {
 
     sub concat {
         my ($self, $obj) = @_;
-        $self->_is_hash($obj) || return;
 
         my @list;
         while (my ($key, $val) = each %{$self->{data}}) {
@@ -228,8 +227,6 @@ package Sidef::Types::Hash::Hash {
 
     sub merge_values {
         my ($self, $obj) = @_;
-
-        $self->_is_hash($obj) || return;
 
         while (my ($key, undef) = each %{$self->{data}}) {
             if (exists $obj->{data}{$key}) {

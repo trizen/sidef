@@ -654,16 +654,16 @@ package Sidef::Types::Array::Array {
           && return $self->new;
 
         my @array;
-        if ($self->_is_string($obj)) {
+        if ($obj->can('run')) {
+            for (my $i = 1 ; $i <= $offset ; $i += 2) {
+                push @array, $obj->run($self->[$i - 1]->get_value, $self->[$i]->get_value);
+            }
+        }
+        else {
             my $method = $obj->get_value;
             for (my $i = 1 ; $i <= $offset ; $i += 2) {
                 my $x = $self->[$i - 1]->get_value;
                 push @array, $x->$method($self->[$i]->get_value);
-            }
-        }
-        elsif ($obj->can('run')) {
-            for (my $i = 1 ; $i <= $offset ; $i += 2) {
-                push @array, $obj->run($self->[$i - 1]->get_value, $self->[$i]->get_value);
             }
         }
 
@@ -711,17 +711,18 @@ package Sidef::Types::Array::Array {
     sub reduce {
         my ($self, $obj) = @_;
 
-        if ($self->_is_string($obj)) {
-            return $self->reduce_operator($obj->get_value);
+        if ($obj->can('run')) {
+            (my $offset = $#{$self}) >= 0 || return;
+
+            my $x = $self->[0]->get_value;
+            foreach my $i (1 .. $offset) {
+                $x = $obj->run($x, $self->[$i]->get_value);
+            }
+
+            return $x;
         }
 
-        (my $offset = $#{$self}) >= 0 || return;
-
-        my $x = $self->[0]->get_value;
-        foreach my $i (1 .. $offset) {
-            $x = $obj->run($x, $self->[$i]->get_value);
-        }
-        $x;
+        $self->reduce_operator($obj->get_value);
     }
 
     *inject = \&reduce;
@@ -1288,7 +1289,7 @@ package Sidef::Types::Array::Array {
         *{__PACKAGE__ . '::' . '='} = sub {
             my ($self, $arg) = @_;
 
-            if ($self->_is_array($arg)) {
+            if ($arg->isa('ARRAY')) {
                 my @values = map { $_->get_value } @{$arg};
 
                 foreach my $i (0 .. $#{$self}) {
@@ -1309,7 +1310,7 @@ package Sidef::Types::Array::Array {
         *{__PACKAGE__ . '::' . '+='} = sub {
             my ($self, $arg) = @_;
 
-            if ($self->_is_array($arg)) {
+            if ($arg->isa('ARRAY')) {
                 my @values = map { $_->get_value } @{$arg};
 
                 foreach my $i (0 .. $#{$self}) {
