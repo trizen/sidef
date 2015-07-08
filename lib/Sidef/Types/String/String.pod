@@ -569,6 +569,14 @@ Return the
 
 =cut
 
+=head2 looks_like_number
+
+String.looks_like_number() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 new
 
 String.new() -> I<Obj>

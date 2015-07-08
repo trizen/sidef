@@ -206,6 +206,36 @@ package Sidef::Sys::Sys {
         CORE::bless $obj, $class;
     }
 
+    sub refaddr {
+        my ($self, $obj) = @_;
+        state $x = require Scalar::Util;
+        Sidef::Types::Number::Number->new(Scalar::Util::refaddr($obj));
+    }
+
+    sub reftype {
+        my ($self, $obj) = @_;
+        state $x = require Scalar::Util;
+        Sidef::Types::String::String->new(Scalar::Util::reftype($obj));
+    }
+
+    sub weaken {
+        my ($self, $obj) = @_;
+        state $x = require Scalar::Util;
+        Sidef::Types::Bool::Bool->new(Scalar::Util::weaken($obj));
+    }
+
+    sub isweak {
+        my ($self, $obj) = @_;
+        state $x = require Scalar::Util;
+        Sidef::Types::Bool::Bool->new(Scalar::Util::isweak($obj));
+    }
+
+    sub unweaken {
+        my ($self, $obj) = @_;
+        state $x = require Scalar::Util;
+        Sidef::Types::Bool::Bool->new(Scalar::Util::unweaken($obj));
+    }
+
     sub copy {
         my ($self, $obj) = @_;
         state $x = require Storable;

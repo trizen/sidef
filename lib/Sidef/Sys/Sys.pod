@@ -267,6 +267,14 @@ Return the
 
 =cut
 
+=head2 isweak
+
+Sys.isweak() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 nanosleep
 
 Sys.nanosleep() -> I<Obj>
@@ -349,6 +357,22 @@ Aliases: I<scanln>
 =head2 ref
 
 Sys.ref() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 refaddr
+
+Sys.refaddr() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 reftype
+
+Sys.reftype() -> I<Obj>
 
 Return the
 
@@ -496,6 +520,14 @@ Return the
 
 =cut
 
+=head2 unweaken
+
+Sys.unweaken() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 user
 
 Sys.user() -> I<Obj>
@@ -517,6 +549,14 @@ Return the
 =head2 warn
 
 Sys.warn() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 weaken
+
+Sys.weaken() -> I<Obj>
 
 Return the
 

@@ -837,6 +837,12 @@ package Sidef::Types::String::String {
 
     *endsWith = \&ends_with;
 
+    sub looks_like_number {
+        my ($self) = @_;
+        state $x = require Scalar::Util;
+        Sidef::Types::Bool::Bool->new(Scalar::Util::looks_like_number($self->get_value));
+    }
+
     sub warn {
         my ($self) = @_;
         warn $self->get_value;
