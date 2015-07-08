@@ -57,7 +57,7 @@ my $builder = Module::Build->new(
 
     auto_features => {
         dump_support => {
-                         description => "Dump the structure of the parsed source code. (-d, -D)",
+                         description => "Dump the AST of a parsed source code. (-d, -D)",
                          requires    => {
                                       'Data::Dump' => 0,
                                      },

@@ -25,6 +25,8 @@ package Sidef::Variable::ClassInit {
         $self;
     }
 
+    *def_method = \&__add_method__;
+
     sub __add_vars__ {
         my ($self, $vars) = @_;
         push @{$self->{__DEF_VARS__}}, @{$vars};
@@ -35,14 +37,6 @@ package Sidef::Variable::ClassInit {
         my ($self, $name, $value) = @_;
         $self->{__VALS__}{$name} = $value;
         $self;
-    }
-
-    sub def_method {
-        my ($self, $name, $value) = @_;
-        if (ref($value) ne 'Sidef::Types::Block::Code') {
-            return $self->def_var($name, $value);
-        }
-        $self->__add_method__($name, $value);
     }
 
     sub respond_to {
