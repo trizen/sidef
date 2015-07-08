@@ -350,6 +350,7 @@ scripts/object_copy.sf
 scripts/objects_init.sf
 scripts/open.sf
 scripts/pairs_test.sf
+scripts/palindrome_recursive.sf
 scripts/perl_eval.sf
 scripts/permutations.sf
 scripts/permutations_2.sf

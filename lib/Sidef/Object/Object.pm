@@ -66,7 +66,7 @@ package Sidef::Object::Object {
 
             # String ~~ String
             if ($s_type eq 'Sidef::Types::String::String') {
-                return $first->contains($second);
+                return $second->contains($first);
             }
 
             # String ~~ Regex

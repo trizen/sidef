@@ -75,3 +75,16 @@ else {
 
 arr1.append(0);
 arr1 ~~ arr2 && die "a ~~ a error(2)";
+
+#
+## String ~~ String
+#
+
+if ("X" ~~ "Xena") {
+    say "string 'Xena' contains 'X'";
+}
+else {
+    die "s ~~ s error";
+}
+
+"Xena" ~~ "X" && die "s ~~ s error (2)";

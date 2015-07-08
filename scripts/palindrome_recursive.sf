@@ -1,0 +1,23 @@
+#!/usr/bin/ruby
+
+# http://rosettacode.org/wiki/Palindrome_detection#Sidef
+
+func palindrome(s) {
+    if (s.len <= 1) {
+        true
+    }
+    elsif (s.char_at(0) != s.char_at(-1)) {
+        false
+    }
+    else {
+        __FUNC__(s.substr(1, -1))
+    }
+}
+
+var str = 'In girum imus nocte et consumimur igni';
+
+palindrome(str.lc - /\s+/g) || die "error!";
+palindrome('sidef')         && die "error!";
+palindrome('salàlas')       || die "error!";
+
+say "** Test passed!";
