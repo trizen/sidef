@@ -173,6 +173,7 @@ scripts/AUTOLOAD_and_CHECK_methods.sf
 scripts/averages_mode.sf
 scripts/avg_mode.sf
 scripts/balanced_brackets.sf
+scripts/bare_multiplication.sf
 scripts/base64_decoder.sf
 scripts/best_shuffle.sf
 scripts/best_shuffle_2.sf
