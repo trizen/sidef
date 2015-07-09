@@ -256,6 +256,8 @@ scripts/function_recursion.sf
 scripts/functional_modules.sf
 scripts/functional_style.sf
 scripts/functions.sf
+scripts/Games/24_game.sf
+scripts/Games/24_game_sover.sf
 scripts/Games/asciiplanes.sf
 scripts/Games/bulls_and_cows.sf
 scripts/Games/bulls_and_cows_player.sf
