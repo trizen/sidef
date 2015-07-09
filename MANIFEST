@@ -232,6 +232,7 @@ scripts/Expensive/haversine_formula.sf
 scripts/Expensive/langton_s_ant.sf
 scripts/Expensive/langton_s_ant_2.sf
 scripts/Expensive/levenshtein_recursive.sf
+scripts/Expensive/long_multiplication.sf
 scripts/Expensive/longest_common_subsequence.sf
 scripts/Expensive/mandelbrot_set.sf
 scripts/Expensive/mean_time.sf

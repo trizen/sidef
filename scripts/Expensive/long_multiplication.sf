@@ -1,0 +1,69 @@
+#!/usr/bin/ruby
+
+# Author: Daniel "Trizen" Șuteu
+# License: GPLv3
+# Date: 09 July 2015
+# Website: https://github.com/trizen
+
+# A creative algorithm for arbitrary long integer multiplication.
+
+func long_multiplication(a is String, b is String) -> String {
+
+    a.len < b.len && (
+        [b, a] » (\a, \b);
+    );
+
+    '0' ~~ [a, b] && return '0';
+
+    var x = a.split('').map{.to_i}.reverse;
+    var y = b.split('').map{.to_i}.reverse;
+
+    var xlen = x.end;
+    var ylen = y.end;
+
+    var mem = 0;
+    var map = y.len.of { Array.new };
+
+    ylen.range.each { |j|
+        xlen.range.each { |i|
+            var n = (x[i]*y[j] + mem);
+            var(d, m) = n.divmod(10)...;
+            if (i == xlen) {
+                map[j].append(m, d);
+                mem = 0;
+            }
+            else {
+                map[j].append(m);
+                mem = d;
+            }
+        }
+
+        var n = (ylen - j);
+        n > 0 && map[j].append(n.of(0)...);
+        var m = (ylen - n);
+        m > 0 && map[j].prepend(m.of(0)...);
+    }
+
+    var result = [];
+    var mrange = (0 .. map.end);
+    var end    = (xlen + ylen + 1);
+
+    end.range.each { |i|
+        var n = (mrange.map {|j| map[j][i] }.sum + mem);
+        if (i == end) {
+            n != 0 && result.append(n);
+        }
+        else {
+            n.divmod(10) » (\mem, \result[result.end+1]);
+        }
+    }
+
+    result.reverse.join('');
+}
+
+var r = long_multiplication('37975227936943673922808872755445627854565536638199',
+                            '40094690950920881030683735292761468389214899724061');
+
+r == '1522605027922533360535618378132637429718068114961380688657908494580122963258952897654000350692006139' || die "error!";
+
+say r;

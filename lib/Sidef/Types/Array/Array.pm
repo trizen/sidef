@@ -1096,6 +1096,8 @@ package Sidef::Types::Array::Array {
         $self;
     }
 
+    *prepend = \&unshift;
+
     sub rotate {
         my ($self, $num) = @_;
 
