@@ -5,10 +5,13 @@ package Sidef::Convert::Convert {
     use 5.014;
     our @ISA = qw(Sidef);
 
+    use overload;
+
     sub to_s {
         my ($self) = @_;
-        $self->isa('SCALAR') || $self->isa('REF')
-          ? Sidef::Types::String::String->new(defined($$self) ? "$$self" : "")
+        $self->isa('SCALAR')
+          || $self->isa('REF')
+          ? Sidef::Types::String::String->new(overload::StrVal($self) ? "$self" : defined($$self) ? "$$self" : "")
           : $self;
     }
 
