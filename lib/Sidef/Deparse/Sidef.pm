@@ -108,6 +108,7 @@ package Sidef::Deparse::Sidef {
                         $code .= ' -> ' . $self->deparse_expr({self => $obj->{returns}}) . ' ';
                     }
                     $code .= $self->deparse_expr({self => $block});
+                    $block->{init_vars} = $vars;
 
                     if ($in_module) {
                         $code .= "\n}";
