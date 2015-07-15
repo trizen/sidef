@@ -34,7 +34,7 @@ sub NATIVE () { 2 }
 my %args;
 if ($#ARGV != -1 and chr ord $ARGV[0] eq '-') {
     require Getopt::Std;
-    Getopt::Std::getopts('e:E:d:Dho:ivHN:n:WwbcM:rR:tO:s:', \%args);
+    Getopt::Std::getopts('e:E:d:Dho:ivHN:n:WwbcM:rR:tO:s:C', \%args);
 }
 
 # Help
@@ -208,6 +208,11 @@ else {
             }
         }
 
+        # Check the syntax
+        elsif (defined $args{C}) {
+            say "$script_name syntax OK";
+        }
+
         # Execute the struct
         else {
             if ($is_perl_code) {
@@ -340,7 +345,8 @@ sub output_usage {
                     '-i'             => 'interactive mode',
                     '-b'             => 'bundle the code as a stand-alone perl program',
                     '-c'             => 'compile the code as a stand-alone perl program',
-                    '-d dumped_file' => 'execute a syntax tree dumped file',
+                    '-C'             => 'check syntax only',
+                    '-d ast_file'    => 'load a dumped syntax tree',
                     '-D'             => 'dump the syntax tree of a program',
                     '-o output_file' => 'file where to dump the output',
                     '-E program'     => 'one line of program',
@@ -352,8 +358,8 @@ sub output_usage {
                     '-s int'         => 'the number of spaces used in code indentation',
                     '-v'             => 'print version number and exit',
                     '-t'             => 'treat all command-line arguments as scripts',
-                    '-r'             => 'deparse a Sidef program',
-                    '-R lang'        => ['deparse a Sidef program to a given language', 'valid values: sidef, perl'],
+                    '-r'             => 'parse and deparse a Sidef program',
+                    '-R lang'        => ['parse and deparse a Sidef program to a given language', 'valid values: sidef, perl'],
                     '-w'             => 'enable warnings with stack backtrace',
                     '-W'             => 'make warnings fatal (with stack backtrace)',
                    );
@@ -773,7 +779,7 @@ HEAD
 
                  close $fh;
              }
-           }
+         }
         } => $path
     );
 
