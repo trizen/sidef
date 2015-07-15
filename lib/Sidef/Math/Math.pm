@@ -231,10 +231,12 @@ package Sidef::Math::Math {
 
         return $array if $step == 0;
 
+        my @values;
         for (my $i = $from ; $i < $to ; $i += $step) {
-            $array->push(Sidef::Types::Number::Number->new($i));
+            push @values, Sidef::Types::Number::Number->new($i);
         }
 
+        $array->push(@values);
         $array;
     }
 

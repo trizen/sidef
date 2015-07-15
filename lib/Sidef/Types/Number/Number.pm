@@ -167,7 +167,7 @@ package Sidef::Types::Number::Number {
 
     sub divmod {
         my ($self, $num) = @_;
-        Sidef::Types::Array::Array->new($self->div($num)->int, $self->mod($num));
+        Sidef::Types::Array::List->new($self->div($num)->int, $self->mod($num));
     }
 
     sub factorial {

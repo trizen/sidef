@@ -70,6 +70,10 @@ package Sidef::Types::Array::Range {
 
             if ($self->{direction} eq 'up') {
                 if ($step == 1 and not $limit > (-1 >> 1) and not $from > (-1 >> 1)) {
+
+                    # Unpack limit
+                    $limit = $limit->bstr if ref($limit);
+
                     foreach my $i ($from .. $limit) {
                         if (defined(my $res = $code->_run_code(Sidef::Types::Number::Number->new($i)))) {
                             return $res;

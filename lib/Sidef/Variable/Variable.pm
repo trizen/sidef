@@ -47,7 +47,7 @@ package Sidef::Variable::Variable {
 
     sub _stack_depth {
         my ($self) = @_;
-        exists($self->{stack}) ? $#{$self->{stack}} + 1 : -1;
+        Sidef::Types::Number::Number->new(exists($self->{stack}) ? $#{$self->{stack}} + 1 : -1);
     }
 
     sub _stack_vals {

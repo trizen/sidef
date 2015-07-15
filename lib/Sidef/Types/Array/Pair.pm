@@ -35,11 +35,7 @@ package Sidef::Types::Array::Pair {
         no strict 'refs';
         foreach my $pair ([first => 0], [second => 1]) {
             *{__PACKAGE__ . '::' . $pair->[0]} = sub {
-                my ($self, $arg) = @_;
-                if (@_ > 1) {
-                    $self->[$pair->[1]] = $arg;
-                }
-                $self->[$pair->[1]];
+                $_[0]->[$pair->[1]];
             };
         }
     }

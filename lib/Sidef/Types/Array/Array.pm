@@ -447,8 +447,13 @@ package Sidef::Types::Array::Array {
     }
 
     sub get {
-        my ($self, $index) = @_;
-        exists($self->[$index->get_value]) ? $self->[$index->get_value]->get_value : ();
+        my ($self, @indices) = @_;
+
+        if (@indices > 1) {
+            return Sidef::Types::Array::List->new(map { exists($self->[$_]) ? $self->[$_]->get_value : undef } @indices);
+        }
+
+        @indices && exists($self->[$indices[0]]) ? $self->[$indices[0]]->get_value : ();
     }
 
     *item = \&get;

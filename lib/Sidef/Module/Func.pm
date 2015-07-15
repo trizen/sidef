@@ -80,7 +80,7 @@ package Sidef::Module::Func {
         }
 
         if (@results > 1) {
-            return Sidef::Types::Array::Array->new(map { Sidef::Perl::Perl->to_sidef($_) } @results);
+            return Sidef::Types::Array::List->new(map { Sidef::Perl::Perl->to_sidef($_) } @results);
         }
 
         Sidef::Perl::Perl->to_sidef($results[0]);

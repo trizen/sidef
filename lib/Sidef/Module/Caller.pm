@@ -43,7 +43,7 @@ package Sidef::Module::Caller {
         }
 
         if (@results > 1) {
-            return Sidef::Types::Array::Array->new(map { Sidef::Perl::Perl->to_sidef($_) } @results);
+            return Sidef::Types::Array::List->new(map { Sidef::Perl::Perl->to_sidef($_) } @results);
         }
 
         my $result = $results[0];

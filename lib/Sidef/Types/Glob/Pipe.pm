@@ -20,10 +20,7 @@ package Sidef::Types::Glob::Pipe {
 
     sub command {
         my ($self) = @_;
-
-        $#{$self} == 0
-          ? $self->[0]
-          : Sidef::Types::Array::Array->new(@{$self});
+        @{$self} > 1 ? Sidef::Types::Array::List->new(@{$self}) : $self->[0];
     }
 
     sub open {

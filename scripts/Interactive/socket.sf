@@ -2,7 +2,7 @@
 
 # A very basic, low-level, web-server.
 
-var port = 8080;
+var port = 8081;
 var protocol = Socket.getprotobyname( "tcp" );
 
 var sock = (Socket.open(Socket::PF_INET, Socket::SOCK_STREAM, protocol) || die "couldn't open a socket: #{$!}");
@@ -19,7 +19,7 @@ sock.bind(Socket.sockaddr_in(port, Socket::INADDR_ANY)) || die "couldn't bind so
 sock.listen(Socket::SOMAXCONN) || die "couldn't listen to port #{port}: #{$!}";
   # start listening for incoming connections
 
-while(var client = sock.accept){
+while (var client = sock.accept) {
   client.print ("HTTP/1.1 200 OK\r\n" +
                "Content-Type: text/html; charset=UTF-8\r\n\r\n" +
                "<html><head><title>Goodbye, world!</title></head>" +

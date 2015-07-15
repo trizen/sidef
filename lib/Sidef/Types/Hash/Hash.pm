@@ -22,12 +22,6 @@ package Sidef::Types::Hash::Hash {
             if (ref($pairs[0]) eq 'Sidef::Types::Block::Code') {
                 return $pairs[0]->to_hash;
             }
-
-            # Default value only for: Hash.new(obj);
-            #if (ref($pairs[0]) ne 'Sidef::Types::Array::Pair') {
-            #    $self->default(shift @pairs);
-            #    return $self;
-            #}
         }
 
         # Add hash key/value pairs
@@ -76,11 +70,12 @@ package Sidef::Types::Hash::Hash {
     sub get {
         my ($self, @keys) = @_;
 
-        if ($#keys == 0) {
-            return $self->{data}{$keys[0]};
+        if (@keys > 1) {
+            return Sidef::Types::Array::List->new(map { exists($self->{data}{$_}) ? $self->{data}{$_}->get_value : undef }
+                                                  @keys);
         }
 
-        Sidef::Types::Array::Array->new(map { defined($_) ? $_->get_value : $_ } @{$self->{data}}{@keys});
+        @keys && exists($self->{data}{$keys[0]}) ? $self->{data}{$keys[0]}->get_value : ();
     }
 
     sub length {

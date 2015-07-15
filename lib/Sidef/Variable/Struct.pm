@@ -15,13 +15,13 @@ package Sidef::Variable::Struct {
     sub DESTROY { }
 
     sub AUTOLOAD {
-        my ($self, $argv) = @_;
+        my ($self, $arg) = @_;
 
         my ($name) = ($AUTOLOAD =~ /^.*[^:]::(.*)$/);
 
         # Variable autovification
         if (not exists $self->{$name}) {
-            return $self->{$name} = Sidef::Variable::Variable->new(name => '', type => 'var', value => $argv);
+            return $self->{$name} = Sidef::Variable::Variable->new(name => '', type => 'var', value => $arg);
         }
 
         $self->{$name};

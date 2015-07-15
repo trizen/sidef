@@ -27,7 +27,7 @@ func long_multiplication(a is String, b is String) -> String {
     ylen.range.each { |j|
         xlen.range.each { |i|
             var n = (x[i]*y[j] + mem);
-            var(d, m) = n.divmod(10)...;
+            var(d, m) = n.divmod(10);
             if (i == xlen) {
                 map[j].append(m, d);
                 mem = 0;
@@ -54,7 +54,7 @@ func long_multiplication(a is String, b is String) -> String {
             n != 0 && result.append(n);
         }
         else {
-            n.divmod(10) » (\mem, \result[result.end+1]);
+            [n.divmod(10)] » (\mem, \result[result.end+1]);
         }
     }
 

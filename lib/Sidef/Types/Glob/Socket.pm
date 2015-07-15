@@ -156,10 +156,11 @@ package Sidef::Types::Glob::Socket {
                 my $result = $func->(map { $_->get_value } @args);
                 @results = $result;
             }
-            if (@results > 1) {
-                return Sidef::Types::Array::Array->new(map { Sidef::Perl::Perl->to_sidef($_) } @results);
-            }
-            return Sidef::Perl::Perl->to_sidef($results[0]);
+            return (
+                    @results > 1
+                    ? Sidef::Types::Array::List->new(map { Sidef::Perl::Perl->to_sidef($_) } @results)
+                    : Sidef::Perl::Perl->to_sidef($results[0])
+                   );
         }
 
         warn qq{[WARN] Inexistent Socket method "$name"!\n};

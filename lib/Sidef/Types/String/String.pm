@@ -719,11 +719,9 @@ package Sidef::Types::String::String {
     *tr = \&translit;
 
     sub unpack {
-        my ($self, $argv) = @_;
-        my @parts = CORE::unpack($self->get_value, $argv->get_value);
-        $#parts == 0
-          ? __PACKAGE__->new($parts[0])
-          : Sidef::Types::Array::Array->new(map { __PACKAGE__->new($_) } @parts);
+        my ($self, $arg) = @_;
+        my @values = map { __PACKAGE__->new($_) } CORE::unpack($self->get_value, $arg->get_value);
+        @values > 1 ? Sidef::Types::Array::List->new(@values) : $values[0];
     }
 
     sub pack {
