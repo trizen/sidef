@@ -470,6 +470,12 @@ t/manifest.t
 t/pod.t
 utils/auto_perltidy.sh
 utils/bak_cleaner.sh
+utils/Concepts/sidef_concept.jl
+utils/Concepts/sidef_concept.pl
+utils/Concepts/sidef_executor.jl
+utils/Concepts/sidef_executor.lua
+utils/Concepts/sidef_executor.pl6
+utils/Examples/sidef_in_perl.pl
 utils/Experiments/C-inline-function-call.pl
 utils/Experiments/operator_precendece.pl
 utils/Experiments/regexp_grammars_parser.pl
@@ -477,11 +483,6 @@ utils/Experiments/struct_optimizer.pl
 utils/find_invalid_types.pl
 utils/grep_errors.sh
 utils/pod_generator.pl
-utils/sidef_concept.jl
-utils/sidef_concept.pl
-utils/sidef_executor.jl
-utils/sidef_executor.lua
-utils/sidef_in_perl.pl
 utils/test_deparser.pl
 'utils/Web interface/css/main.css'
 'utils/Web interface/index.cgi'

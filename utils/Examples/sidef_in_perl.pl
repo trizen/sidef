@@ -10,7 +10,7 @@ use strict;
 use warnings;
 
 # The directory where Sidef lives
-use lib qw(../lib);
+use lib qw(../../lib);
 
 # Load the Sidef main module
 use Sidef;

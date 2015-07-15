@@ -7,12 +7,12 @@ String = setmetatable({
         return String[i]
     end,
 
-    add = function(self, arg)
+    concat = function(self, arg)
         return String(self.value .. arg.value)
     end,
 
     say = function(self)
-        self:add(String("\n")):print();
+        self:concat(String("\n")):print();
     end,
 
     print = function(self)
@@ -83,7 +83,7 @@ local ast = {
             self = {
                 main = {
                     {
-                        call = {{method = "add", arg = {{self = String("llo")}}}},
+                        call = {{method = "concat", arg = {{self = String("llo")}}}},
                         self = String("he"),
                     }
                 },
