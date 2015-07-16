@@ -72,11 +72,9 @@ Returns a lazy method call for the main object.
 
 =head2 METHODS
 
-Obj.METHODS() -> I<Array>
+Obj.METHODS() -> I<Hash>
 
-Returns an array of arrays of method names defined for I<Obj>.
-
-The aliases are grouped together in the same array.
+Returns a new hash with the method names as keys and I<LazyMethod> objects as values for the self object.
 
 =cut
 
