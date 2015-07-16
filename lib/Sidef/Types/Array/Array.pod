@@ -845,6 +845,16 @@ Aliases: I<popRand>
 
 =cut
 
+=head2 prepend
+
+Array.prepend() -> I<Obj>
+
+Return the
+
+Aliases: I<unshift>
+
+=cut
+
 =head2 prod
 
 Array.prod() -> I<Obj>
@@ -1017,14 +1027,6 @@ Aliases: I<unique>, I<distinct>
 =head2 unroll_operator
 
 Array.unroll_operator() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 unshift
-
-Array.unshift() -> I<Obj>
 
 Return the
 
