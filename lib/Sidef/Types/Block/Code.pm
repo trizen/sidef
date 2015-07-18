@@ -342,6 +342,7 @@ package Sidef::Types::Block::Code {
 
         my $pid = fork() // die "[FATAL ERROR]: cannot fork";
         if ($pid == 0) {
+            srand();
             Storable::store($self->run, $filename);
             exit 0;
         }
