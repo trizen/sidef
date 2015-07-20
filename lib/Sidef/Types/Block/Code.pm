@@ -351,6 +351,22 @@ package Sidef::Types::Block::Code {
         $fork;
     }
 
+    sub pfork {
+        my ($self) = @_;
+
+        my $fork = Sidef::Types::Block::Fork->new();
+
+        my $pid = fork() // die "[FATAL ERROR]: cannot fork";
+        if ($pid == 0) {
+            srand();
+            $self->run;
+            exit 0;
+        }
+
+        $fork->{pid} = $pid;
+        $fork;
+    }
+
     sub thread {
         my ($self) = @_;
         state $x = do {

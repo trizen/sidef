@@ -10,11 +10,12 @@ package Sidef::Types::Block::Fork {
     sub get {
         my ($self) = @_;
 
-        exists($self->{result})
-          or return;
-
         # Wait for the process to finish
         waitpid($self->{pid}, 0);
+
+        # Return when the fork doesn't hold a result
+        exists($self->{result})
+          or return;
 
         state $x = require Storable;
         my $ref = eval { Storable::retrieve($self->{result}) };
