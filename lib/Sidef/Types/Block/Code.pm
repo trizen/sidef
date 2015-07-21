@@ -173,6 +173,24 @@ package Sidef::Types::Block::Code {
         $self;
     }
 
+    sub try {
+        my ($self) = @_;
+
+        my $try = Sidef::Types::Block::Try->new();
+
+        my $error = 0;
+        local $SIG{__WARN__} = sub { $try->{type} = 'warning'; $try->{msg} = $_[0]; $error = 1 };
+        local $SIG{__DIE__}  = sub { $try->{type} = 'error';   $try->{msg} = $_[0]; $error = 1 };
+
+        $try->{val} = eval { $self->run };
+
+        if ($@ || $error) {
+            $try->{catch} = 1;
+        }
+
+        $try;
+    }
+
     {
         my $check_type = sub {
             my ($var, $value) = @_;

@@ -158,9 +158,6 @@
       "Sidef::Types::Block::Given" : {
          "file" : "lib/Sidef/Types/Block/Given.pm"
       },
-      "Sidef::Types::Block::Loop" : {
-         "file" : "lib/Sidef/Types/Block/Loop.pm"
-      },
       "Sidef::Types::Block::Next" : {
          "file" : "lib/Sidef/Types/Block/Next.pm"
       },

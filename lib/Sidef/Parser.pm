@@ -101,11 +101,9 @@ package Sidef::Parser {
                 | return\b                                        (?{ Sidef::Types::Block::Return->new })
                 | next\b                                          (?{ Sidef::Types::Block::Next->new })
                 | break\b                                         (?{ Sidef::Types::Block::Break->new })
-                | try\b                                           (?{ Sidef::Types::Block::Try->new })
                 | (?:given|switch)\b                              (?{ Sidef::Types::Block::Given->new })
                 | f?require\b                                     (?{ state $x = Sidef::Module::Require->new })
                 | (?:(?:print(?:ln)?+|say|read)\b|>>?)            (?{ state $x = Sidef::Sys::Sys->new })
-                | loop\b                                          (?{ state $x = Sidef::Types::Block::Loop->new })
                 | (?:[*\\&]|\+\+|--|lvalue\b)                     (?{ Sidef::Variable::Ref->new })
                 | [?√+~!-]                                        (?{ state $x = Sidef::Object::Unary->new })
                 | :                                               (?{ state $x = Sidef::Types::Hash::Hash->new })
@@ -1682,10 +1680,25 @@ package Sidef::Parser {
                 }
 
                 # Method call in functional style
-                if (not $self->{_want_name} and ($class eq $self->{class} or $class eq 'CORE') and /\G(?=\()/) {
-                    my $arg = $self->parse_arguments(code => $opt{code});
+                if (not $self->{_want_name} and ($class eq $self->{class} or $class eq 'CORE') and /\G\h*(?=[({])/gc) {
+                    my $arg = (
+                               /\G(?=\()/
+                               ? $self->parse_arguments(code => $opt{code})
+                               : $self->parse_block(code => $opt{code})
+                              );
 
-                    if (exists $arg->{$self->{class}}) {
+                    if (ref($arg) eq 'Sidef::Types::Block::Code') {
+                        return
+                          scalar {
+                                  $self->{class} => [
+                                                     {
+                                                      self => $arg,
+                                                      call => [{method => $name}]
+                                                     }
+                                                    ]
+                                 };
+                    }
+                    elsif (exists $arg->{$self->{class}}) {
                         return scalar {
                             $self->{class} => [
                                 {
