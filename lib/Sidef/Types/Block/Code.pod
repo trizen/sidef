@@ -133,6 +133,14 @@ Return the
 
 =cut
 
+=head2 pfork
+
+Code.pfork() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 pop_stack
 
 Code.pop_stack() -> I<Obj>
@@ -176,6 +184,14 @@ Code.to_h() -> I<Obj>
 Return the
 
 Aliases: I<to_hash>, I<toHash>
+
+=cut
+
+=head2 try
+
+Code.try() -> I<Obj>
+
+Return the
 
 =cut
 

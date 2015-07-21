@@ -30,11 +30,3 @@ Try.catch() -> I<Obj>
 Return the
 
 =cut
-
-=head2 try
-
-Try.try() -> I<Obj>
-
-Return the
-
-=cut

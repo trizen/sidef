@@ -30,6 +30,12 @@ For.for() -> I<Obj>
 
 Return the
 
-Aliases: I<foreach>
+=cut
+
+=head2 foreach
+
+For.foreach() -> I<Obj>
+
+Return the
 
 =cut
