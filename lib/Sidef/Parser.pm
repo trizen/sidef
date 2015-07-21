@@ -193,6 +193,7 @@ package Sidef::Parser {
                   read
                   die
                   warn
+                  assert assert_eq assert_ne
 
                   my
                   var
@@ -1417,7 +1418,7 @@ package Sidef::Parser {
                        );
             }
 
-            if (/\G(?:die|warn)\b/gc) {
+            if (/\G(?:die|warn|assert(?:_(?:eq|ne))?)\b/gc) {
                 pos($_) = $-[0];
                 return (Sidef::Sys::Sys->new(line => $self->{line}, file_name => $self->{file_name}), 1);
             }

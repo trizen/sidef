@@ -27,47 +27,46 @@ class Hello(arr is Array) {
 #
 var obj = Hello(['foo', 'bar']);
 
-obj.foo == "foo"            || die "error";
+assert_eq(obj.foo, "foo");
 obj.add_method('baz');
 obj.add_class_method('zoo');
-obj.baz == "baz"            || die "error";
+assert_eq(obj.baz, "baz");
 obj.baz;
 
 var name = "zoro";
 obj.add_block_method(name, { name });
-obj.zoro == name            || die "error";
+assert_eq(obj.zoro, name);
 
 #
 ## Object 2
 #
 var obj2 = Hello();
-
-obj2.foo == "foo"           || die "error";
+assert_eq(obj2.foo, "foo");
 
 if (obj2.respond_to('baz')) {
     die "error";
 };
 
-obj2.zoo == "zoo"           || die "error";
-obj.baz == "baz"            || die "error";
-obj.foo == "foo"            || die "error";
+assert_eq(obj2.zoo, "zoo");
+assert_eq(obj.baz, "baz");
+assert_eq(obj.foo, "foo");
 
 obj.add_method('fox');
-obj.fox == 'fox'            || die "error";
+assert_eq(obj.fox, 'fox');
 
 obj.def_method('foo', {'bar'});
-obj.foo == 'bar'            || die "error";
-obj2.foo == 'foo'           || die "error";
+assert_eq(obj.foo, 'bar');
+assert_eq(obj2.foo, 'foo');
 
 obj.add_method_with_arg('bau');
-obj.bau('~')  == "~bau"     || die "error";
+assert_eq(obj.bau('~'), "~bau");
 
 obj2.add_method_with_arg('boo');
-obj2.boo('-') == "-boo"     || die "error";
-obj.bau('/')  == "/bau"     || die "error";
+assert_eq(obj2.boo('-'), "-boo");
+assert_eq(obj.bau('/'), "/bau");
 
 obj2.add_method_with_arg('bau');
 obj.add_method('bau');
 
-obj2.bau('~') == '~bau'     || die "error";
-obj.bau  == 'bau'           || die "error";
+assert_eq(obj2.bau('~'), '~bau');
+assert_eq(obj.bau, 'bau');

@@ -98,6 +98,23 @@ package Sidef::Sys::Sys {
 
     *raise = \&die;
 
+    sub assert {
+        my ($self, $bool) = @_;
+        $bool || $self->die("assert: not true");
+    }
+
+    sub assert_eq {
+        my ($self, $arg1, $arg2) = @_;
+        state $method = '==';
+        $arg1->$method($arg2) || $self->die("assert_eq: $arg1 $method $arg2 is false");
+    }
+
+    sub assert_ne {
+        my ($self, $arg1, $arg2) = @_;
+        state $method = '!=';
+        $arg1->$method($arg2) || $self->die("assert_ne: $arg1 $method $arg2 is false");
+    }
+
     sub warn {
         my ($self, @args) = @_;
         if (exists $self->{file_name}) {

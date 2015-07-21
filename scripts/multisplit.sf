@@ -15,9 +15,10 @@ var chunks = [];
     chunks.append(multisplit(%w(== != =), 'a!===b=!=c!=', keep_sep => bool));
 }
 
-chunks == [
+assert_eq(chunks,
+[
     ["a", "", "b", "", "c", ""],
     ["a", "!=", "", "==", "b", "=", "", "!=", "c", "!=", ""],
-] || die "error!";
+]);
 
 say "** Test passed!";

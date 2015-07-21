@@ -18,9 +18,9 @@ var obj3 = Sys.copy(obj2);      # make a copy to obj2
 
 obj2.value = "foo";             # change the value of obj2
 
-obj1.value == "T"   || die "error";
-obj2.value == "foo" || die "error";
-obj3.value == "S"   || die "error";
+assert_eq(obj1.value, "T");
+assert_eq(obj2.value, "foo");
+assert_eq(obj3.value, "S");
 
 obj1.display;
 obj2.display;
