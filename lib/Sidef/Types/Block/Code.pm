@@ -162,15 +162,15 @@ package Sidef::Types::Block::Code {
     }
 
     sub loop {
-        my ($self, $code) = @_;
+        my ($self) = @_;
 
         while (1) {
-            if (defined(my $res = $code->_run_code)) {
+            if (defined(my $res = $self->_run_code)) {
                 return $res;
             }
         }
 
-        $code;
+        $self;
     }
 
     {

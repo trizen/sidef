@@ -57,6 +57,7 @@ lib/Sidef/Types/Block/Fork.pm
 lib/Sidef/Types/Block/Fork.pod
 lib/Sidef/Types/Block/Given.pm
 lib/Sidef/Types/Block/Given.pod
+lib/Sidef/Types/Block/Loop.pm
 lib/Sidef/Types/Block/Next.pm
 lib/Sidef/Types/Block/Next.pod
 lib/Sidef/Types/Block/Return.pm

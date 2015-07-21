@@ -105,7 +105,7 @@ package Sidef::Parser {
                 | (?:given|switch)\b                              (?{ Sidef::Types::Block::Given->new })
                 | f?require\b                                     (?{ state $x = Sidef::Module::Require->new })
                 | (?:(?:print(?:ln)?+|say|read)\b|>>?)            (?{ state $x = Sidef::Sys::Sys->new })
-                | loop\b                                          (?{ state $x = Sidef::Types::Block::Code->new })
+                | loop\b                                          (?{ state $x = Sidef::Types::Block::Loop->new })
                 | (?:[*\\&]|\+\+|--|lvalue\b)                     (?{ Sidef::Variable::Ref->new })
                 | [?√+~!-]                                        (?{ state $x = Sidef::Object::Unary->new })
                 | :                                               (?{ state $x = Sidef::Types::Hash::Hash->new })
