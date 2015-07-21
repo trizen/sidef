@@ -1687,7 +1687,7 @@ package Sidef::Parser {
                                :              $self->parse_obj(code => $opt{code})
                               );
 
-                    if (ref($arg) ne 'HASH') {
+                    if (ref($arg) and ref($arg) ne 'HASH') {
                         return
                           scalar {
                                   $self->{class} => [
@@ -1698,7 +1698,7 @@ package Sidef::Parser {
                                                     ]
                                  };
                     }
-                    elsif (exists $arg->{$self->{class}}) {
+                    elsif (ref($arg) eq 'HASH' and exists($arg->{$self->{class}})) {
                         return scalar {
                             $self->{class} => [
                                 {
