@@ -16,7 +16,7 @@ for (a.range) { |i|
 }
 
 # using the array's items
-foreach a { |item|
+a.each { |item|
     "mycallback(%d) = %d\n".printf(item, mycallback(item));
 }
 

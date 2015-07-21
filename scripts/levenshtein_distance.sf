@@ -4,28 +4,11 @@
 
 func levenshtein (s, t) {
 
-    ######################################
-    ## This is a valid way of creating a
-    ## two-dimensional array at run-time
-    ######################################
-
-    # var d = (Array.make(s.len+1, []));
-
-    # for (d.range) {
-    #    d[_] = (Array.make(t.len+1, Num));
-    # }
-
-    ######################################
-    ## But I like more the following code:
-    ######################################
-
-    func new_array (type, rows, cols) {
-        (1..rows).map { (1..cols).map{type} }
-    }
-
-    var d = (new_array(Num, s.len+1, t.len+1));
-
-    #########END-OF-MY-LIKED-CODE#########
+    var d = (
+        (s.len+1).of {
+            (t.len+1).of(0)
+        }
+    );
 
     for (d.range) {
         d[_][0] = _;
@@ -35,10 +18,10 @@ func levenshtein (s, t) {
         d[0][_] = _;
     }
 
-    foreach (1 .. (t.len)) {
+    (1 .. (t.len)).each {
         var j = _;
 
-        foreach (1 .. (s.len)) {
+        (1 .. (s.len)).each {
             var i = _;
 
             if (s[i-1] == t[j-1]) {

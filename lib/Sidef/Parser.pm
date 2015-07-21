@@ -183,7 +183,6 @@ package Sidef::Parser {
                   return
                   for foreach
                   if while
-                  try loop
                   given switch
                   continue
                   require frequire
@@ -1986,6 +1985,8 @@ package Sidef::Parser {
 
                     if (/\G\h*(?!;)/gc) {
 
+                        my $before = $#{$self->{ref_vars}->{$self->{class}}};
+
                         my $arg = (
                                    /\G(?=\()/ ? $self->parse_arguments(code => $opt{code})
                                    : exists($self->{obj_with_block}{ref $struct{$self->{class}}[-1]{self}})
@@ -1993,16 +1994,30 @@ package Sidef::Parser {
                                    : $self->parse_obj(code => $opt{code})
                                   );
 
+                        my $after = $#{$self->{ref_vars}->{$self->{class}}};
+
                         if (defined $arg) {
                             my @arg = ($arg);
                             if (exists $self->{obj_with_block}{ref $struct{$self->{class}}[-1]{self}}
                                 and ref($arg) eq 'HASH') {
-                                @arg = Sidef::Types::Block::Code->new($arg);
+                                my $block = Sidef::Types::Block::Code->new($arg);
+
+                                if ($before != $after) {
+                                    my @vars =
+                                      map  { $_->{obj} }
+                                      grep { ref($_) eq 'HASH' }
+                                      @{$self->{ref_vars}->{$self->{class}}}[0 .. ($after - $before - 1)];
+                                    if (@vars) {
+                                        $block->{_special_stack_vars} = \@vars;
+                                    }
+                                }
+
+                                @arg = ($block);
                             }
                             elsif (    ref($struct{$self->{class}}[-1]{self}) eq 'Sidef::Types::Block::For'
                                    and ref($arg) eq 'HASH'
                                    and $#{$arg->{$self->{class}}} == 2) {
-                                @arg = map { Sidef::Types::Block::Code->new($_) } @{$arg->{$self->{class}}};
+                                @arg = (map { Sidef::Types::Block::Code->new($_) } @{$arg->{$self->{class}}});
                             }
 
                             push @{$struct{$self->{class}}[-1]{call}}, {method => $method, arg => \@arg};

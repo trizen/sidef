@@ -10,11 +10,17 @@ package Sidef::Types::Block::For {
         $self;
     }
 
-    *foreach = \&for;
+    sub foreach {
+        my ($self, $arr) = @_;
+        $self->{arg} = $arr;
+        $self;
+    }
 
     sub do {
         my ($self, $code) = @_;
-        $code->for(@{$self->{arg}});
+        ref($self->{arg}) eq 'ARRAY'
+          ? $code->for(@{$self->{arg}})
+          : $self->{arg}->each($code);
     }
 };
 

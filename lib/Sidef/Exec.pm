@@ -227,11 +227,11 @@ package Sidef::Exec {
                 my @arguments;
                 my $method = $call->{method};
 
-                if (ref $method eq 'HASH') {
+                if (ref($method) eq 'HASH') {
                     $method = $self->execute_expr($method) // '';
                 }
 
-                if (ref $method eq 'Sidef::Variable::Variable') {
+                if (ref($method) eq 'Sidef::Variable::Variable') {
                     $method = $method->get_value;
                 }
 

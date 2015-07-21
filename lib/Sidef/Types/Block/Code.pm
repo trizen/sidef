@@ -151,6 +151,11 @@ package Sidef::Types::Block::Code {
     sub while {
         my ($self, $condition, $old_self) = @_;
 
+        if (exists($condition->{_special_stack_vars}) and not exists($self->{_specialized})) {
+            $self->{_specialized} = 1;
+            push @{$self->{vars}}, @{$condition->{_special_stack_vars}};
+        }
+
         while ($condition->run) {
             defined($old_self) && ($old_self->{did_while} //= 1);
             if (defined(my $res = $self->_run_code)) {

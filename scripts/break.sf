@@ -30,15 +30,14 @@ while (i -= 1 >= 10) {
 } for (["a","b","c"]);
 
 #
-## {...} for {;;}
+## for (;;) {...}
 #
 {
-    var i;
-    {
+    for (var i = 1; i <= 10; i++) {
         i.to_s.say;
         i == 3 && (break);
         i >= 3 && ("Error inside the 'for' loop!\n".die);
-    } for (i = 1; i<=10; i++);
+    }
 }.run;
 
 #
@@ -48,26 +47,13 @@ for ["a", "b", "c"] {
 
     say "<<<: "+_;
 
-    foreach ["d", "e", "f"] {
+    for ["d", "e", "f"] {
         say ">>>: "+_;
         break;
     }
 
     if(_=="b"){break};
 }
-
-#
-## for {;;} {...}
-#
-{
-    var i;
-    for (i = 0; i<= 10; i++) {
-        "Last result!".say;
-        break;
-    };
-
-}.run;
-
 
 #
 ## for (array) {...}
