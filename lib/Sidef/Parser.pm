@@ -1679,14 +1679,15 @@ package Sidef::Parser {
                 }
 
                 # Method call in functional style
-                if (not $self->{_want_name} and ($class eq $self->{class} or $class eq 'CORE') and /\G\h*(?=[({])/gc) {
+                if (not $self->{_want_name} and ($class eq $self->{class} or $class eq 'CORE')) {
+                    /\G\h*/gc;    # remove any horizontal whitespace
                     my $arg = (
-                               /\G(?=\()/
-                               ? $self->parse_arguments(code => $opt{code})
-                               : $self->parse_block(code => $opt{code})
+                                 /\G(?=\()/ ? $self->parse_arguments(code => $opt{code})
+                               : /\G(?=\{)/ ? $self->parse_block(code => $opt{code})
+                               :              $self->parse_obj(code => $opt{code})
                               );
 
-                    if (ref($arg) eq 'Sidef::Types::Block::Code') {
+                    if (ref($arg) ne 'HASH') {
                         return
                           scalar {
                                   $self->{class} => [
