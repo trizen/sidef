@@ -501,12 +501,6 @@ package Sidef::Sys::Sys {
         Sidef::Types::Number::Number->new(CORE::setpgrp($pid, $pgrp));
     }
 
-    {
-        no strict 'refs';
-        *{__PACKAGE__ . '::' . '>'}  = \&println;
-        *{__PACKAGE__ . '::' . '>>'} = \&print;
-    }
-
 };
 
 1

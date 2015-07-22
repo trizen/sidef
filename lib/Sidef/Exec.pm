@@ -249,7 +249,7 @@ package Sidef::Exec {
                 if ($type eq 'Sidef::Variable::Variable') {
                     my $value = $self_obj->get_value;
                     $type = ref($value);
-                    if (   $type eq 'Sidef::Module::Caller'
+                    if (   $type eq 'Sidef::Module::OO'
                         or $type eq 'Sidef::Module::Func') {
                         $self_obj = $value;
                     }

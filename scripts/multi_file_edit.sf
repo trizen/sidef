@@ -1,12 +1,12 @@
 #!/usr/bin/ruby
 
 var files = %w(
-                /tmp/a.txt
+                a.txt
                 b.txt
                 c.txt
-              );
+              ).map{.to_file};
 
-files.map{.toFile}.each { |file|
+files.each { |file|
     say file.edit { |line|
         line.gsub("Goodbye London!", "Hello New York!");
     };

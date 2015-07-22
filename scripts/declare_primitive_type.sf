@@ -13,7 +13,7 @@ class MyInt(value) {
         (value > max) || (value < min) && (
             die "Invalid value '#{value}': must be between #{min} and #{max}";
         );
-        !value.is_int && (
+        value.is_int || (
             die "Invalid value '#{value}': must be an integer";
         );
     }

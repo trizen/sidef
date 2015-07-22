@@ -1,7 +1,9 @@
 package Sidef::Types::Array::Range {
 
     use 5.014;
-    our @ISA = qw(Sidef);
+    use parent qw(
+      Sidef::Object::Object
+      );
 
     sub new {
         my (undef, %opt) = @_;

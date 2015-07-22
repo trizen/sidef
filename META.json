@@ -77,14 +77,11 @@
       "Sidef::Math::Math" : {
          "file" : "lib/Sidef/Math/Math.pm"
       },
-      "Sidef::Module::Caller" : {
-         "file" : "lib/Sidef/Module/Caller.pm"
-      },
       "Sidef::Module::Func" : {
          "file" : "lib/Sidef/Module/Func.pm"
       },
-      "Sidef::Module::Require" : {
-         "file" : "lib/Sidef/Module/Require.pm"
+      "Sidef::Module::OO" : {
+         "file" : "lib/Sidef/Module/OO.pm"
       },
       "Sidef::Object::Object" : {
          "file" : "lib/Sidef/Object/Object.pm"
@@ -205,9 +202,6 @@
       },
       "Sidef::Types::Glob::DirHandle" : {
          "file" : "lib/Sidef/Types/Glob/DirHandle.pm"
-      },
-      "Sidef::Types::Glob::Fcntl" : {
-         "file" : "lib/Sidef/Types/Glob/Fcntl.pm"
       },
       "Sidef::Types::Glob::File" : {
          "file" : "lib/Sidef/Types/Glob/File.pm"

@@ -49,7 +49,6 @@ package Sidef::Parser {
                      | DirHandle\b                    (?{ state $x = Sidef::Types::Glob::Dir->cwd->open })
                      | Dir\b                          (?{ state $x = Sidef::Types::Glob::Dir->new })
                      | File\b                         (?{ state $x = Sidef::Types::Glob::File->new })
-                     | Fcntl\b                        (?{ state $x = Sidef::Types::Glob::Fcntl->new })
                      | Arr(?:ay)?+\b                  (?{ state $x = Sidef::Types::Array::Array->new })
                      | MultiArr(?:ay)?+\b             (?{ state $x = Sidef::Types::Array::MultiArray->new })
                      | Pair\b                         (?{ state $x = Sidef::Types::Array::Pair->new })
@@ -102,10 +101,9 @@ package Sidef::Parser {
                 | next\b                                          (?{ Sidef::Types::Block::Next->new })
                 | break\b                                         (?{ Sidef::Types::Block::Break->new })
                 | (?:given|switch)\b                              (?{ Sidef::Types::Block::Given->new })
-                | f?require\b                                     (?{ state $x = Sidef::Module::Require->new })
-                | (?:(?:print(?:ln)?+|say|read)\b|>>?)            (?{ state $x = Sidef::Sys::Sys->new })
+                | read\b                                          (?{ state $x = Sidef::Sys::Sys->new })
                 | (?:[*\\&]|\+\+|--|lvalue\b)                     (?{ Sidef::Variable::Ref->new })
-                | [?√+~!-]                                        (?{ state $x = Sidef::Object::Unary->new })
+                | (?:[?√+~!>-]|>>)                                (?{ state $x = Sidef::Object::Unary->new })
                 | :                                               (?{ state $x = Sidef::Types::Hash::Hash->new })
               )
             }x,
@@ -144,7 +142,6 @@ package Sidef::Parser {
                 map { $_ => 1 }
                   qw(
                   File FileHandle
-                  Fcntl
                   Dir DirHandle
                   Arr Array Pair
                   MultiArray MultiArr
@@ -185,10 +182,8 @@ package Sidef::Parser {
                   if while
                   given switch
                   continue
-                  require frequire
                   import
                   include
-                  print println say
                   eval
                   read
                   die
@@ -230,7 +225,7 @@ package Sidef::Parser {
 
                   )
             },
-            match_flags_re  => qr{[msixpogcdual]+},
+            match_flags_re  => qr{[msixpogcaludn]+},
             var_name_re     => qr/[[:alpha:]_]\w*(?>::[[:alpha:]_]\w*)*/,
             method_name_re  => qr/[[:alpha:]_]\w*[!:?]?/,
             var_init_sep_re => qr/\G\h*(?:=>|[=:]|\bis\b)\h*/,
@@ -1681,6 +1676,8 @@ package Sidef::Parser {
 
                 # Method call in functional style
                 if (not $self->{_want_name} and ($class eq $self->{class} or $class eq 'CORE')) {
+
+                    my $pos = pos($_);
                     /\G\h*/gc;    # remove any horizontal whitespace
                     my $arg = (
                                  /\G(?=\()/ ? $self->parse_arguments(code => $opt{code})
@@ -1699,7 +1696,15 @@ package Sidef::Parser {
                                                     ]
                                  };
                     }
-                    elsif (ref($arg) eq 'HASH' and exists($arg->{$self->{class}})) {
+                    elsif (ref($arg) eq 'HASH') {
+                        if (not exists($arg->{$self->{class}})) {
+                            $self->fatal_error(
+                                               code  => $_,
+                                               pos   => ($pos - length($name)),
+                                               error => "attempt to call method <$name> on an undefined object",
+                                              );
+                        }
+
                         return scalar {
                             $self->{class} => [
                                 {
@@ -1728,11 +1733,11 @@ package Sidef::Parser {
                     }
                 }
 
-                # Fatal error
+                # Undeclared variable
                 $self->fatal_error(
                                    code  => $_,
                                    pos   => (pos($_) - length($name)),
-                                   error => "attempt to use an undeclared variable <$1>",
+                                   error => "attempt to use an undeclared variable <$name>",
                                   );
             }
 
@@ -2318,7 +2323,7 @@ package Sidef::Parser {
                         my $value = $_;
                         do {
                             $value = $value->get_value;
-                        } while (ref($value) and eval { $value->can('get_value') });
+                        } while (ref($value) =~ /^Sidef::/);
 
                         ref($value) ne ''
                           ? $self->fatal_error(

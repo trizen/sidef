@@ -220,9 +220,6 @@ package Sidef::Deparse::Sidef {
         elsif ($ref eq 'Sidef::Variable::LazyMethod') {
             $code = 'LazyMethod';
         }
-        elsif ($ref eq 'Sidef::Types::Glob::Fcntl') {
-            $code = 'Fcntl';
-        }
         elsif ($ref eq 'Sidef::Types::Block::Break') {
             if (not exists $expr->{call}) {
                 $code = 'break';

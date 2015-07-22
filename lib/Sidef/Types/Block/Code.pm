@@ -33,13 +33,18 @@ package Sidef::Types::Block::Code {
         $exec->execute_expr($self->{code});
     }
 
-    sub get_value {
-        my ($self) = @_;
-        sub {
-            if (defined($a) || defined($b)) { push @_, $a, $b }
-            elsif (defined($_)) { push @_, $_ }
-            $self->call(@_);
-        };
+    {
+        my $ref = \&UNIVERSAL::AUTOLOAD;
+
+        sub get_value {
+            my ($self) = @_;
+            sub {
+                local *UNIVERSAL::AUTOLOAD = $ref;
+                if (defined($a) || defined($b)) { push @_, $a, $b }
+                elsif (defined($_)) { push @_, $_ }
+                $self->call(@_);
+            };
+        }
     }
 
     sub copy {

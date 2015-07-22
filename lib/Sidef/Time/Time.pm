@@ -3,6 +3,7 @@ package Sidef::Time::Time {
     use 5.014;
     use parent qw(
       Sidef::Object::Object
+      Sidef::Convert::Convert
       );
 
     use overload

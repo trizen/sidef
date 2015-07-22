@@ -4,6 +4,7 @@ package Sidef::Types::Number::Complex {
     use 5.014;
 
     use parent qw(
+      Sidef::Convert::Convert
       Sidef::Types::Number::Number
       );
 
@@ -281,7 +282,7 @@ package Sidef::Types::Number::Complex {
 
     sub dump {
         my ($self) = @_;
-        Sidef::Types::String::String->new('Complex.new(' . $self->real . ' ,', $self->imaginary . ')');
+        Sidef::Types::String::String->new('Complex.new(' . $self->real . ', ', $self->imaginary . ')');
     }
 
     {

@@ -6,6 +6,7 @@ package Sidef::Types::Nil::Nil {
 
     use parent qw(
       Sidef::Object::Object
+      Sidef::Convert::Convert
       );
 
     sub new {

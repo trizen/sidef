@@ -24,9 +24,6 @@ my %esc = (
 my %ignored_subs = map { $_ => 1 } qw<
   BEGIN
   ISA
-  (""
-  ((
-  (bool
   AUTOLOAD
   DESTROY
   >;
@@ -40,7 +37,6 @@ my %ignored_methods = (
                        'Sidef::Variable::My'            => [qw(new)],
                        'Sidef::Variable::Init'          => [qw(new)],
                        'Sidef::Variable::InitMy'        => [qw(new)],
-                       'Sidef::Module::Require'         => [qw(new)],
                        'Sidef::Sys::Sys'                => [qw(new)],
                        'Sidef::Math::Math'              => [qw(new)],
                        'Sidef::Time::Localtime'         => [qw(new)],
@@ -62,20 +58,17 @@ my %ignored_methods = (
                        'Sidef::Types::Regex::Matches'   => [qw(new)],
                        'Sidef::Types::Regex::Regex'     => [qw(new)],
                        'Sidef::Types::Black::Hole'      => [qw(new)],
-                       'Sidef::Types::Glob::Fcntl'      => [qw(new)],
                       );
 
 my %ignored_modules = map { $_ => 1 } qw (
   Sidef::Exec
   Sidef::Parser
   Sidef::Optimizer
-  Sidef::Sys::SIG
   Sidef::Types::Array::HCArray
   Sidef::Types::Array::List
   Sidef::Types::Number::NumberFast
   Sidef::Types::Number::NumberInt
   Sidef::Types::Number::NumberRat
-  Sidef::Object::Unary
   Sidef::Variable::LazyMethod
   Sidef::Variable::ClassVar
   Sidef::Deparse::Sidef

@@ -4,6 +4,7 @@ package Sidef::Types::Number::Number {
     use 5.014;
     use parent qw(
       Sidef::Object::Object
+      Sidef::Convert::Convert
       );
 
     use overload

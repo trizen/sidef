@@ -5,7 +5,7 @@ var str = "regex and sidef";
 var res = [];
 var pos = 0;
 
-while (var match = (str.match(/(.{5})/, pos)) -> isSuccessful) {
+while (var match = str.match(/(.{5})/, pos)) {
     pos  = (match.pos.last);
     res += (match.captures);
 }
@@ -16,7 +16,7 @@ res == [
     'sidef',
 ] || ("Error!\n".die);
 
-{
+do {
     var str = "sidef is awesome";
     var wanted = str.split;
 
@@ -41,6 +41,6 @@ res == [
     arr2 == wanted
         || "arr2 error!".die;
 
-}.run;
+};
 
 "Test passed!".say;

@@ -64,10 +64,10 @@ grid[tail_pos[0]][tail_pos[1]] = [TAIL, dir];    # tail
 func make_food {
     static (food_x, food_y);
 
-    {
+    do {
         food_x = w.rand.int;
         food_y = h.rand.int;
-    } do while {grid[food_y][food_x][0] != VOID};
+    } while {grid[food_y][food_x][0] != VOID};
 
     grid[food_y][food_x][0] = FOOD;
 }

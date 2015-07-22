@@ -5,6 +5,7 @@ package Sidef::Types::String::String {
 
     use parent qw(
       Sidef::Object::Object
+      Sidef::Convert::Convert
       );
 
     use overload
@@ -28,6 +29,13 @@ package Sidef::Types::String::String {
     sub get_value {
         ${$_[0]};
     }
+
+    sub to_s {
+        $_[0];
+    }
+
+    *to_str    = \&to_s;
+    *to_string = \&to_s;
 
     sub unroll_operator {
         my ($self, $operator, $arg) = @_;
@@ -401,18 +409,6 @@ package Sidef::Types::String::String {
     sub reverse {
         my ($self) = @_;
         $self->new(scalar CORE::reverse($self->get_value));
-    }
-
-    sub say {
-        my ($self) = @_;
-        Sidef::Types::Bool::Bool->new(CORE::say($self->get_value));
-    }
-
-    *println = \&say;
-
-    sub print {
-        my ($self) = @_;
-        Sidef::Types::Bool::Bool->new(print $self->get_value);
     }
 
     sub printf {
@@ -875,6 +871,29 @@ package Sidef::Types::String::String {
         my ($self) = @_;
         state $x = require Encode;
         $self->new(Encode::decode_utf8($self->get_value));
+    }
+
+    sub _require {
+        my ($self) = @_;
+
+        my $name = $self->get_value;
+        eval { require(($name . '.pm') =~ s{::}{/}gr) };
+
+        if ($@) {
+            die substr($@, 0, rindex($@, ' at ')), "\n";
+        }
+
+        $name;
+    }
+
+    sub require {
+        my ($self) = @_;
+        Sidef::Module::OO->__NEW__(module => $self->_require);
+    }
+
+    sub frequire {
+        my ($self) = @_;
+        Sidef::Module::Func->__NEW__(module => $self->_require);
     }
 
     sub unescape {

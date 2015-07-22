@@ -3,8 +3,6 @@ package Sidef::Convert::Convert {
     # This module is used only as parent!
 
     use 5.014;
-    our @ISA = qw(Sidef);
-
     use overload;
 
     sub to_s {
@@ -15,9 +13,7 @@ package Sidef::Convert::Convert {
           : $self;
     }
 
-    *toStr     = \&to_s;
     *to_str    = \&to_s;
-    *toString  = \&to_s;
     *to_string = \&to_s;
 
     sub to_obj {
@@ -33,9 +29,7 @@ package Sidef::Convert::Convert {
     }
 
     *to_integer = \&to_i;
-    *toInt      = \&to_i;
     *to_int     = \&to_i;
-    *toInteger  = \&to_i;
 
     sub to_rat {
         Sidef::Types::Number::Number->new_rat($_[0]->get_value);
@@ -43,98 +37,70 @@ package Sidef::Convert::Convert {
 
     *to_rational = \&to_rat;
     *to_r        = \&to_rat;
-    *toRat       = \&to_rat;
-    *toRational  = \&to_rat;
 
     sub to_complex {
         Sidef::Types::Number::Complex->new($_[0]->get_value);
     }
 
-    *toComplex = \&to_complex;
-    *to_c      = \&to_complex;
+    *to_c = \&to_complex;
 
     sub to_num {
         Sidef::Types::Number::Number->new($_[0]->get_value);
     }
 
-    *toNum     = \&to_num;
     *to_number = \&to_num;
-    *toNumber  = \&to_num;
 
     sub to_float {
         Sidef::Types::Number::Number->new_float($_[0]->get_value);
     }
 
-    *to_f    = \&to_float;
-    *toFloat = \&to_float;
+    *to_f = \&to_float;
 
     sub to_file {
         Sidef::Types::Glob::File->new($_[0]->get_value);
     }
 
-    *toFile = \&to_file;
-
     sub to_dir {
         Sidef::Types::Glob::Dir->new($_[0]->get_value);
     }
-
-    *toDir = \&to_dir;
 
     sub to_bool {
         Sidef::Types::Bool::Bool->new($_[0]->get_value);
     }
 
-    *toBool = \&to_bool;
-
     sub to_byte {
         Sidef::Types::Byte::Byte->new(CORE::ord($_[0]->get_value));
     }
-
-    *toByte = \&to_byte;
 
     sub to_char {
         Sidef::Types::Char::Char->call($_[0]->get_value);
     }
 
-    *toChar = \&to_char;
-
     sub to_regex {
         Sidef::Types::Regex::Regex->new($_[0]->get_value);
     }
 
-    *toRe    = \&to_regex;
-    *to_re   = \&to_regex;
-    *toRegex = \&to_regex;
+    *to_re = \&to_regex;
 
     sub to_bytes {
         Sidef::Types::Byte::Bytes->call($_[0]->get_value);
     }
 
-    *toBytes = \&to_bytes;
-
     sub to_chars {
         Sidef::Types::Char::Chars->call($_[0]->get_value);
     }
-
-    *toChars = \&to_chars;
 
     sub to_array {
         Sidef::Types::Array::Array->new($_[0]);
     }
 
-    *toArray = \&to_array;
-
     sub to_caller {
-        Sidef::Module::Caller->__NEW__(module => $_[0]->get_value);
+        Sidef::Module::OO->__NEW__(module => $_[0]->get_value);
     }
-
-    *toCaller = \&to_caller;
 
     sub to_fcaller {
         Sidef::Module::Func->__NEW__(module => $_[0]->get_value);
     }
-
-    *toFcaller = \&to_fcaller;
 };
 
 1

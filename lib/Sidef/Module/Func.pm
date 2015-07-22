@@ -53,31 +53,28 @@ package Sidef::Module::Func {
         my ($self, @arg) = @_;
 
         my ($func) = ($AUTOLOAD =~ /^.*[^:]::(.*)$/);
-        my @results;
 
-        eval {
-            @results = (\&{$self->{module} . '::' . $func})->(
-                @arg
-                ? (
-                   map {
-                       local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
-                       ref($_) eq 'Sidef::Variable::Ref'
-                         ? do {
-                           my $obj = $_->get_var->get_value;
-                           ref $obj eq 'Sidef::Types::Hash::Hash' ? $obj->{data} //= {} : $obj;
-                         }
-                         : ref($_) =~ /^Sidef::/ && $_->can('get_value') ? $_->get_value
-                         : $_
-                     } @arg
-                  )
-                : ()
-            );
+        my @args = (
+            @arg
+            ? (
+               map {
+                   local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
+                   ref($_) eq 'Sidef::Variable::Ref'
+                     ? do {
+                       my $obj = $_->get_var->get_value;
+                       ref $obj eq 'Sidef::Types::Hash::Hash' ? $obj->{data} //= {} : $obj;
+                     }
+                     : ref($_) =~ /^Sidef::/ ? $_->get_value
+                     : $_
+                 } @arg
+              )
+            : ()
+        );
+
+        my @results = do {
+            local *UNIVERSAL::AUTOLOAD;
+            (\&{$self->{module} . '::' . $func})->(@args);
         };
-
-        if ($@) {
-            warn $@;
-            return;
-        }
 
         if (@results > 1) {
             return Sidef::Types::Array::List->new(map { Sidef::Perl::Perl->to_sidef($_) } @results);

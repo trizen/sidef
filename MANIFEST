@@ -12,10 +12,8 @@ lib/Sidef/Eval/Eval.pod
 lib/Sidef/Exec.pm
 lib/Sidef/Math/Math.pm
 lib/Sidef/Math/Math.pod
-lib/Sidef/Module/Caller.pm
 lib/Sidef/Module/Func.pm
-lib/Sidef/Module/Require.pm
-lib/Sidef/Module/Require.pod
+lib/Sidef/Module/OO.pm
 lib/Sidef/Object/Object.pm
 lib/Sidef/Object/Object.pod
 lib/Sidef/Object/Unary.pm
@@ -87,8 +85,6 @@ lib/Sidef/Types/Glob/Dir.pm
 lib/Sidef/Types/Glob/Dir.pod
 lib/Sidef/Types/Glob/DirHandle.pm
 lib/Sidef/Types/Glob/DirHandle.pod
-lib/Sidef/Types/Glob/Fcntl.pm
-lib/Sidef/Types/Glob/Fcntl.pod
 lib/Sidef/Types/Glob/File.pm
 lib/Sidef/Types/Glob/File.pod
 lib/Sidef/Types/Glob/FileHandle.pm

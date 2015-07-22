@@ -62,8 +62,6 @@ package Sidef::Types::Regex::Matches {
     }
 
     *to_bool       = \&matched;
-    *toBool        = \&matched;
-    *isSuccessful  = \&matched;
     *is_successful = \&matched;
     *get_value     = \&matched;
 

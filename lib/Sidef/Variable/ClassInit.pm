@@ -3,6 +3,10 @@ package Sidef::Variable::ClassInit {
     use 5.014;
     use overload q{""} => \&dump;
 
+    use parent qw(
+      Sidef::Object::Object
+      );
+
     sub __new__ {
         my (undef, %opt) = @_;
         bless \%opt, __PACKAGE__;

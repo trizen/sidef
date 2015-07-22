@@ -47,8 +47,8 @@ var c = [Circle(0, 0, 1), Circle(4, 0, 1), Circle(2, 4, 2)];
 var a = solve_apollonius(c, %n<1 1 1>);
 var b = solve_apollonius(c, %n<-1 -1 -1>);
 
-say a;
-say b;
+say "#{a}";
+say "#{b}";
 
 a.x == 2     || die "error";
 a.y == 21/10 || die "error";

@@ -1,7 +1,6 @@
 package Sidef::Types::Block::Try {
 
     use 5.014;
-    our @ISA = qw(Sidef);
 
     sub new {
         bless {catch => 0}, __PACKAGE__;

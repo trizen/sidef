@@ -16,12 +16,12 @@ cnp.len == 13
 
 
 # Should not contains non-digits
-cnp =~ /[^0-9]/ -> isSuccessful
+cnp ~~ /[^0-9]/
     && "Invalid CNP: trebuie să conțină doar numere!\n".die;
 
 
 # Transform it into an array of numbers
-cnp.split!('').map!{_->toNum};
+cnp.split!('').map!{.to_num};
 
 
 var years = :(

@@ -19,67 +19,52 @@ or
 
         use parent qw(Sidef::Convert::Convert);
 
-
-=head1 INHERITS
-
-Inherits methods from:
-
-    * Sidef
-
 =head1 METHODS
 
-=head2 toArray
+=head2 to_array
 
-Obj.toArray() -> I<Array>
+Obj.to_array() -> I<Array>
 
 Convert the self object into an array.
 
-    "str".toArray  =>  ["str"]
-
-Aliases: I<to_array()>.
+    "str".to_array  =>  ["str"]
 
 Returns an object of type: C<Sidef::Types::Array::Array>
 
 =cut
 
-=head2 toBool
+=head2 to_bool
 
-Obj.toBool() -> I<Bool>
+Obj.to_bool() -> I<Bool>
 
 Convert the self object into a boolean value.
 
-      1.toBool   =>   true
-    "0".toBool   =>   false
-
-Aliases: I<to_bool()>.
+      1.to_bool   =>   true
+    "0".to_bool   =>   false
 
 Returns an object of type: C<Sidef::Types::Bool::Bool>
 
 =cut
 
-=head2 toByte
+=head2 to_byte
 
-Obj.toByte() -> I<Byte>
+Obj.to_byte() -> I<Byte>
 
 Convert the self object into a numeric byte value.
 
-    "a".toByte   =>   97
-
-Aliases: I<to_byte()>.
+    "a".to_byte   =>   97
 
 Returns an object of type: C<Sidef::Types::Byte::Byte>
 
 =cut
 
-=head2 toBytes
+=head2 to_bytes
 
-Obj.toBytes() -> I<Bytes>
+Obj.to_bytes() -> I<Bytes>
 
 Convert the self object into an array of bytes,
 
-    "abc".toBytes  =>  [97, 98, 99]
-
-Aliases: I<to_bytes()>.
+    "abc".to_bytes  =>  [97, 98, 99]
 
 Returns an object of type: C<Sidef::Types::Byte::Bytes>
 
@@ -87,11 +72,15 @@ Returns an object of type: C<Sidef::Types::Byte::Bytes>
 
 =head2 to_c
 
-Convert.to_c() -> I<Obj>
+Convert.to_c() -> I<Complex>
 
-Return the
+Convert the self object into a Complex object.
 
-Aliases: I<to_complex>, I<toComplex>
+    "12".to_c;    => Complex(12, 0)
+
+Aliases: I<to_complex>
+
+Returns an object of type: C<Sidef::Types::Number::Complex>
 
 =cut
 
@@ -105,44 +94,38 @@ Aliases: I<toCaller>
 
 =cut
 
-=head2 toChar
+=head2 to_char
 
-Obj.toChar() -> I<Char>
+Obj.to_char() -> I<Char>
 
 Convert the self object into a character object.
 
-        4.toChar   =>   "4"
-    "xyz".toChar   =>   "x"
-
-Aliases: I<to_char()>.
+        4.to_char   =>   "4"
+    "xyz".to_char   =>   "x"
 
 Returns an object of type: C<Sidef::Types::Char::Char>
 
 =cut
 
-=head2 toChars
+=head2 to_chars
 
-Obj.toChars() -> I<Chars>
+Obj.to_chars() -> I<Chars>
 
 Convert the self object into an array of characters.
 
-    "abc".toChars   => ['a', 'b', 'c']
-
-Aliases: I<to_chars()>.
+    "abc".to_chars   => ['a', 'b', 'c']
 
 Returns an object of type: C<Sidef::Types::Char::Chars>
 
 =cut
 
-=head2 toDir
+=head2 to_dir
 
-Obj.toDir() -> I<Dir>
+Obj.to_dir() -> I<Dir>
 
 Convert the self object into a directory type-object.
 
-    '/my/dir'.toDir  =>  qd(/my/dir)
-
-Aliases: I<to_dir()>.
+    '/my/dir'.to_dir  =>  Dir.new('/my/dir')
 
 Returns an object of type: C<Sidef::Types::Glob::Dir>
 
@@ -150,17 +133,21 @@ Returns an object of type: C<Sidef::Types::Glob::Dir>
 
 =head2 to_f
 
-Convert.to_f() -> I<Obj>
+Obj.to_f() -> I<Number>
 
-Return the
+Convert the self object into a floating-point number.
 
-Aliases: I<to_float>, I<toFloat>
+    "123.45".to_f      => 123.45
+
+Aliases: I<to_float>
+
+Return an object of type: C<Sidef::Types::Number::Number>
 
 =cut
 
 =head2 to_fcaller
 
-Convert.to_fcaller() -> I<Obj>
+Obj.to_fcaller() -> I<Obj>
 
 Return the
 
@@ -168,15 +155,13 @@ Aliases: I<toFcaller>
 
 =cut
 
-=head2 toFile
+=head2 to_file
 
-Obj.toFile() -> I<File>
+Obj.to_file() -> I<File>
 
 Convert the self object into a file type-object.
 
-    '/my/file'.toFile  =>  qf(/my/file)
-
-Aliases: I<to_file()>.
+    '/my/file'.to_file  =>  File.new('/my/file')
 
 Returns an object of type: C<Sidef::Types::Glob::File>
 
@@ -191,7 +176,7 @@ Convert the self object into an integer.
     "12.34".to_i  =>  12
     332.999.to_i  =>  332
 
-Aliases: I<toInt()>, I<to_int()>, I<toInteger()>, I<to_integer()>.
+Aliases: I<to_int()>, I<to_integer()>.
 
 Returns an object of type: C<Sidef::Types::Number::Number>
 
@@ -199,14 +184,12 @@ Returns an object of type: C<Sidef::Types::Number::Number>
 
 =head2 toNum
 
-Obj.toNum() -> I<Num>
+Obj.to_num() -> I<Num>
 
 Convert the self object into a number type-object.
 
-    "12.34".toNum  =>  12.34
-      12.34.toNum  =>  12.34
-
-Aliases: I<to_num()>.
+    "12.34".to_num  =>  12.34
+      12.34.to_num  =>  12.34
 
 Returns an object of type: C<Sidef::Types::Number::Number>
 
@@ -214,9 +197,12 @@ Returns an object of type: C<Sidef::Types::Number::Number>
 
 =head2 to_obj
 
-Convert.to_obj() -> I<Obj>
+Obj.to_obj(Type) -> I<Type>
 
-Return the
+Convert the self object into a specific type.
+
+    "12.3".to_obj(Num)    => 12.3
+    "12.3".to_obj(Arr)    => ["12.3"]
 
 Aliases: I<to_object>
 
@@ -224,41 +210,45 @@ Aliases: I<to_object>
 
 =head2 to_r
 
-Convert.to_r() -> I<Obj>
+Obj.to_r() -> I<Number>
 
-Return the
+Convert the self object into a rational number.
 
-Aliases: I<to_rat>, I<toRat>, I<to_rational>, I<toRational>
+    0.5.to_r  => 1/2
+
+Aliases: I<to_rat>, I<to_rational>
+
+Returns an object of type: C<Sidef::Types::Number::Number>
 
 =cut
 
-=head2 toRegex
+=head2 to_re
 
-Obj.toRegex() -> I<Regex>
+Obj.to_re() -> I<Regex>
 
 Convert the self object into a regular expression.
 
-    '([a-z])'.toRegex   =>  qr/([a-z])/
+    '([a-z])'.to_re   =>  Regex.new('([a-z])')
 
-Aliases: I<to_re()>, I<to_regex()>, I<toRe()>.
+Aliases: I<to_re()>, I<to_regex()>.
 
 Returns an object of type: C<Sidef::Types::Regex::Regex>
 
 =cut
 
-=head2 toString
+=head2 to_s
 
-Obj.toString() -> I<String>
+Obj.to_s() -> I<String>
 
 Convert the self object into a string type-object.
 
 When the self object is an array-like object,
 its elements will be joined one-level deep with a space character.
 
-         42.toString  => '42'
-    [1,2,3].toString  => '1 2 3'
+         42.to_s  => '42'
+    [1,2,3].to_s  => '1 2 3'
 
-Aliases: I<to_s()>, I<to_str()>, I<to_string()>, I<toStr()>.
+Aliases: I<to_str()>, I<to_string()>.
 
 Returns an object of type: C<Sidef::Types::String::String>
 

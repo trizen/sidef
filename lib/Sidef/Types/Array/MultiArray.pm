@@ -18,14 +18,7 @@ package Sidef::Types::Array::MultiArray {
         my ($self) = @_;
         [
          map {
-             [
-              map {
-                  ref($_)
-                    && defined(eval { $_->can('get_value') })
-                    ? $_->get_value
-                    : $_
-                } @{$_}
-             ]
+             [map { ref($_) =~ /^Sidef::/ ? $_->get_value : $_ } @{$_}]
            } @{$self}
         ];
     }

@@ -1,6 +1,7 @@
 package Sidef::Types::Char::Char {
 
     use parent qw(
+      Sidef::Convert::Convert
       Sidef::Types::String::String
       );
 

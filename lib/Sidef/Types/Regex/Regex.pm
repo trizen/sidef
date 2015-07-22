@@ -6,6 +6,7 @@ package Sidef::Types::Regex::Regex {
 
     use parent qw(
       Sidef::Object::Object
+      Sidef::Convert::Convert
       );
 
     use overload q{""} => \&get_value;
@@ -37,6 +38,9 @@ package Sidef::Types::Regex::Regex {
     *call = \&new;
 
     sub get_value { $_[0]{regex} }
+
+    sub to_regex { $_[0] }
+    *to_re = \&to_regex;
 
     sub match {
         my ($self, $object, $pos) = @_;

@@ -1,6 +1,8 @@
 package Sidef::Object::Unary {
 
     use utf8;
+    use 5.014;
+
     our @ISA = qw(Sidef);
 
     sub new {
@@ -8,6 +10,7 @@ package Sidef::Object::Unary {
     }
 
     {
+        no strict 'refs';
         *{__PACKAGE__ . '::' . '+'} = sub {
             $_[1];
         };
@@ -30,6 +33,14 @@ package Sidef::Object::Unary {
 
         *{__PACKAGE__ . '::' . '!'} = sub {
             Sidef::Types::Bool::Bool->new(not $_[1]->get_value);
+        };
+
+        *{__PACKAGE__ . '::' . '>'} = sub {
+            Sidef::Types::Bool::Bool->new(say join(" ", @_[1 .. $#_]));
+        };
+
+        *{__PACKAGE__ . '::' . '>>'} = sub {
+            Sidef::Types::Bool::Bool->new(print join(" ", @_[1, $#_]));
         };
     }
 };

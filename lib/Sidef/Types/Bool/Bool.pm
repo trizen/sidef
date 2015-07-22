@@ -6,11 +6,12 @@ package Sidef::Types::Bool::Bool {
 
     use parent qw(
       Sidef::Object::Object
+      Sidef::Convert::Convert
       );
 
     {
         my %bool = (
-                    true  => (bless \(my $t = 1),  __PACKAGE__),
+                    true  => (bless \(my $t = 1), __PACKAGE__),
                     false => (bless \(my $f = 0), __PACKAGE__),
                    );
 
@@ -25,9 +26,8 @@ package Sidef::Types::Bool::Bool {
         sub false { $bool{false} }
     }
 
-    sub get_value {
-        ${$_[0]};
-    }
+    sub get_value { ${$_[0]} }
+    sub to_bool   { $_[0] }
 
     *{__PACKAGE__ . '::' . '|'} = sub {
         my ($self, $arg) = @_;

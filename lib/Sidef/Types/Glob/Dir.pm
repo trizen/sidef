@@ -3,6 +3,7 @@ package Sidef::Types::Glob::Dir {
     use 5.014;
 
     use parent qw(
+      Sidef::Convert::Convert
       Sidef::Types::Glob::File
       );
 
@@ -20,9 +21,8 @@ package Sidef::Types::Glob::Dir {
 
     *call = \&new;
 
-    sub get_value {
-        ${$_[0]};
-    }
+    sub get_value { ${$_[0]} }
+    sub to_dir    { $_[0] }
 
     sub root {
         my ($self) = @_;

@@ -20,7 +20,7 @@ package Sidef::Types::Array::Pair {
         foreach my $i (0, 1) {
             my $item = $self->[$i]->get_value;
 
-            if (ref $item and defined eval { $item->can('get_value') }) {
+            if (ref($item) =~ /^Sidef::/) {
                 push @array, $item->get_value;
             }
             else {

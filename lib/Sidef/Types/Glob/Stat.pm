@@ -1,5 +1,9 @@
 package Sidef::Types::Glob::Stat {
 
+    use parent qw(
+      Sidef::Object::Object
+      );
+
     sub new {
         my (undef, %opt) = @_;
 

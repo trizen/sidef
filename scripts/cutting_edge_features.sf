@@ -169,7 +169,7 @@ say obj.(name + 'programming');
 #
 
 say ([1,2,3] ~~ 3);         # true (array contains 3)
-say ("sidef" ~~ "id");      # true (string contains "id")
+say ("id" ~~ "sidef");      # true (string contains "id")
 say (:z ~~ :(z: 26));       # true ('z' exists in hash)
 say (:(a: 1) ~~ :a);        # true (hash has key 'a')
 

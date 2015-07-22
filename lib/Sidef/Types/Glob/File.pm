@@ -3,6 +3,7 @@ package Sidef::Types::Glob::File {
     use 5.014;
 
     use parent qw(
+      Sidef::Convert::Convert
       Sidef::Types::String::String
       );
 
@@ -20,14 +21,28 @@ package Sidef::Types::Glob::File {
 
     *call = \&new;
 
-    sub get_value {
-        ${$_[0]};
-    }
+    sub get_value { ${$_[0]} }
+    sub to_file   { $_[0] }
 
     sub get_constant {
-        my ($self, $name) = @_;
-        state $fcntl = Sidef::Types::Glob::Fcntl->new;
-        $fcntl->$name;
+        my ($self, $str) = @_;
+
+        my $name = $str->get_value;
+        state $CACHE = {};
+
+        if (exists $CACHE->{$name}) {
+            return $CACHE->{$name};
+        }
+
+        state $x = require Fcntl;
+        my $call = \&{'Fcntl' . '::' . $name};
+
+        if (defined(&$call)) {
+            return $CACHE->{$name} = Sidef::Types::Number::Number->new($call->());
+        }
+
+        warn qq{[WARN] Inexistent File constant "$name"!\n};
+        return;
     }
 
     sub touch {

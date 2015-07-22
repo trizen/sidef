@@ -10,5 +10,5 @@ class Accumulator (sum) {
 
 var x = Accumulator(1);
 x + 5;
-say Accumulator(3);
+Accumulator(3);
 say x+2.3;                # prints: 8.3
