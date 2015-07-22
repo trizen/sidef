@@ -44,11 +44,12 @@ package Sidef::Convert::Convert {
 
     *to_c = \&to_complex;
 
-    sub to_num {
+    sub to_n {
         Sidef::Types::Number::Number->new($_[0]->get_value);
     }
 
-    *to_number = \&to_num;
+    *to_num = \&to_n;
+    *to_number = \&to_n;
 
     sub to_float {
         Sidef::Types::Number::Number->new_float($_[0]->get_value);

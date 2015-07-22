@@ -19,6 +19,7 @@ var obj = String.new(...);
 Inherits methods from:
 
 	* Sidef::Object::Object
+	* Sidef::Convert::Convert
 
 =head1 METHODS
 
@@ -413,6 +414,14 @@ Return the
 
 =cut
 
+=head2 frequire
+
+String.frequire() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 ft
 
 String.ft() -> I<Obj>
@@ -635,14 +644,6 @@ Return the
 
 =cut
 
-=head2 print
-
-String.print() -> I<Obj>
-
-Return the
-
-=cut
-
 =head2 printf
 
 String.printf() -> I<Obj>
@@ -675,21 +676,19 @@ Return the
 
 =cut
 
-=head2 reverse
+=head2 require
 
-String.reverse() -> I<Obj>
+String.require() -> I<Obj>
 
 Return the
 
 =cut
 
-=head2 say
+=head2 reverse
 
-String.say() -> I<Obj>
+String.reverse() -> I<Obj>
 
 Return the
-
-Aliases: I<println>
 
 =cut
 
@@ -762,6 +761,16 @@ String.to() -> I<Obj>
 Return the
 
 Aliases: I<...()>, I<..^()>, I<upto>, I<upTo>
+
+=cut
+
+=head2 to_s
+
+String.to_s() -> I<Obj>
+
+Return the
+
+Aliases: I<to_str>, I<to_string>
 
 =cut
 

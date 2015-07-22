@@ -19,6 +19,7 @@ var obj = Regex.new(...);
 Inherits methods from:
 
 	* Sidef::Object::Object
+	* Sidef::Convert::Convert
 
 =head1 METHODS
 
@@ -48,6 +49,16 @@ Regex.gmatch() -> I<Obj>
 Return the
 
 Aliases: I<gmatches>
+
+=cut
+
+=head2 to_re
+
+Regex.to_re() -> I<Obj>
+
+Return the
+
+Aliases: I<to_regex>
 
 =cut
 

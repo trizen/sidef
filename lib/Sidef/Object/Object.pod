@@ -19,7 +19,6 @@ var obj = Object.new(...);
 Inherits methods from:
 
 	* Sidef
-	* Sidef::Convert::Convert
 
 =head1 METHODS
 
@@ -61,6 +60,24 @@ Return the
 I<Obj> B<^> I<Obj> -> I<Obj>
 
 Return the
+
+=cut
+
+=head2 print
+
+Object.print() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 say
+
+Object.say() -> I<Obj>
+
+Return the
+
+Aliases: I<println>
 
 =cut
 

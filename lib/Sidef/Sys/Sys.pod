@@ -15,31 +15,33 @@ This object provides some methods related to the Sidef working system.
 
 =head1 METHODS
 
-=head2 >
-
-I<Obj> B<E<gt>> I<Obj> -> I<Obj>
-
-Return the
-
-Aliases: I<say>, I<println>
-
-=cut
-
-=head2 print
-
-Sys.print(I<obj1>, I<obj2>, I<...>) -> I<Bool>
-
-Print a list of argument to the standard output (STDOUT). Returns true on success.
-
-    Sys.print("hello", "-", "world");
-
-Returns an object of type: C<Sidef::Types::Bool::Bool>
-
-=cut
-
 =head2 alarm
 
 Sys.alarm() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 assert
+
+Sys.assert() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 assert_eq
+
+Sys.assert_eq() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 assert_ne
+
+Sys.assert_ne() -> I<Obj>
 
 Return the
 
@@ -316,6 +318,18 @@ Returns an object of type: C<Sidef::Types::String::String>
 
 =cut
 
+=head2 print
+
+Sys.print(I<obj1>, I<obj2>, I<...>) -> I<Bool>
+
+Print a list of argument to the standard output (STDOUT). Returns true on success.
+
+    Sys.print("hello", "-", "world");
+
+Returns an object of type: C<Sidef::Types::Bool::Bool>
+
+=cut
+
 =head2 printf
 
 Sys.printf() -> I<Obj>
@@ -385,6 +399,16 @@ Sys.run() -> I<Obj>
 Return the
 
 Aliases: I<system>
+
+=cut
+
+=head2 say
+
+Sys.say() -> I<Obj>
+
+Return the
+
+Aliases: I<println>
 
 =cut
 

@@ -239,7 +239,7 @@ Hash.to_a() -> I<Obj>
 
 Return the
 
-Aliases: I<pairs>, I<to_array>, I<to_pairs>, I<toArray>, I<toPairs>
+Aliases: I<pairs>, I<to_array>
 
 =cut
 

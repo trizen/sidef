@@ -18,6 +18,7 @@ var obj = Dir.new(...);
 
 Inherits methods from:
 
+	* Sidef::Convert::Convert
 	* Sidef::Types::Glob::File
 
 =head1 METHODS
@@ -204,5 +205,13 @@ Dir.tmp() -> I<Obj>
 Return the
 
 Aliases: I<temp>, I<tmp_dir>, I<tmpdir>, I<temp_dir>, I<tempdir>
+
+=cut
+
+=head2 to_dir
+
+Dir.to_dir() -> I<Obj>
+
+Return the
 
 =cut

@@ -57,6 +57,6 @@ Matches.to_bool() -> I<Obj>
 
 Return the
 
-Aliases: I<toBool>, I<matched>, I<is_successful>, I<isSuccessful>
+Aliases: I<matched>, I<is_successful>
 
 =cut

@@ -13,13 +13,6 @@ This object is ...
 
 var obj = Try.new(...);
 
-
-=head1 INHERITS
-
-Inherits methods from:
-
-	* Sidef
-
 =head1 METHODS
 
 

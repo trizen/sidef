@@ -1,0 +1,569 @@
+
+=encoding utf8
+
+=head1 NAME
+
+Sidef::Sys::SIG
+
+=head1 DESCRIPTION
+
+This object is ...
+
+=head1 SYNOPSIS
+
+var obj = SIG.new(...);
+
+=head1 METHODS
+
+
+=head2 ABRT
+
+SIG.ABRT() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 ALRM
+
+SIG.ALRM() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 BUS
+
+SIG.BUS() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 CHLD
+
+SIG.CHLD() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 CLD
+
+SIG.CLD() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 CONT
+
+SIG.CONT() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 FPE
+
+SIG.FPE() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 HUP
+
+SIG.HUP() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 ILL
+
+SIG.ILL() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 INT
+
+SIG.INT() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 IO
+
+SIG.IO() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 IOT
+
+SIG.IOT() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 KILL
+
+SIG.KILL() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 new
+
+SIG.new() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 NUM32
+
+SIG.NUM32() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 NUM33
+
+SIG.NUM33() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 NUM35
+
+SIG.NUM35() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 NUM36
+
+SIG.NUM36() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 NUM37
+
+SIG.NUM37() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 NUM38
+
+SIG.NUM38() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 NUM39
+
+SIG.NUM39() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 NUM40
+
+SIG.NUM40() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 NUM41
+
+SIG.NUM41() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 NUM42
+
+SIG.NUM42() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 NUM43
+
+SIG.NUM43() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 NUM44
+
+SIG.NUM44() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 NUM45
+
+SIG.NUM45() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 NUM46
+
+SIG.NUM46() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 NUM47
+
+SIG.NUM47() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 NUM48
+
+SIG.NUM48() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 NUM49
+
+SIG.NUM49() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 NUM50
+
+SIG.NUM50() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 NUM51
+
+SIG.NUM51() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 NUM52
+
+SIG.NUM52() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 NUM53
+
+SIG.NUM53() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 NUM54
+
+SIG.NUM54() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 NUM55
+
+SIG.NUM55() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 NUM56
+
+SIG.NUM56() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 NUM57
+
+SIG.NUM57() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 NUM58
+
+SIG.NUM58() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 NUM59
+
+SIG.NUM59() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 NUM60
+
+SIG.NUM60() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 NUM61
+
+SIG.NUM61() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 NUM62
+
+SIG.NUM62() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 NUM63
+
+SIG.NUM63() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 PIPE
+
+SIG.PIPE() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 POLL
+
+SIG.POLL() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 PROF
+
+SIG.PROF() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 PWR
+
+SIG.PWR() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 QUIT
+
+SIG.QUIT() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 RTMAX
+
+SIG.RTMAX() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 RTMIN
+
+SIG.RTMIN() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 SEGV
+
+SIG.SEGV() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 STKFLT
+
+SIG.STKFLT() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 STOP
+
+SIG.STOP() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 SYS
+
+SIG.SYS() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 TERM
+
+SIG.TERM() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 TRAP
+
+SIG.TRAP() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 TSTP
+
+SIG.TSTP() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 TTIN
+
+SIG.TTIN() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 TTOU
+
+SIG.TTOU() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 UNUSED
+
+SIG.UNUSED() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 URG
+
+SIG.URG() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 USR1
+
+SIG.USR1() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 USR2
+
+SIG.USR2() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 VTALRM
+
+SIG.VTALRM() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 WINCH
+
+SIG.WINCH() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 XCPU
+
+SIG.XCPU() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 XFSZ
+
+SIG.XFSZ() -> I<Obj>
+
+Return the
+
+=cut

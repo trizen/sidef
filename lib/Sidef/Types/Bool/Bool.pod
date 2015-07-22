@@ -19,6 +19,7 @@ var obj = Bool.new(...);
 Inherits methods from:
 
 	* Sidef::Object::Object
+	* Sidef::Convert::Convert
 
 =head1 METHODS
 
@@ -74,6 +75,14 @@ Bool.not() -> I<Obj>
 Return the
 
 Aliases: I<flip>, I<toggle>, I<is_false>, I<isFalse>
+
+=cut
+
+=head2 to_bool
+
+Bool.to_bool() -> I<Obj>
+
+Return the
 
 =cut
 

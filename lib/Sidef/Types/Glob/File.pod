@@ -18,6 +18,7 @@ var obj = File.new(...);
 
 Inherits methods from:
 
+	* Sidef::Convert::Convert
 	* Sidef::Types::String::String
 
 =head1 METHODS
@@ -530,6 +531,14 @@ File.sysopen() -> I<Obj>
 Return the
 
 Aliases: I<sysOpen>
+
+=cut
+
+=head2 to_file
+
+File.to_file() -> I<Obj>
+
+Return the
 
 =cut
 

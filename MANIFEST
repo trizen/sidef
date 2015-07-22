@@ -17,11 +17,13 @@ lib/Sidef/Module/OO.pm
 lib/Sidef/Object/Object.pm
 lib/Sidef/Object/Object.pod
 lib/Sidef/Object/Unary.pm
+lib/Sidef/Object/Unary.pod
 lib/Sidef/Optimizer.pm
 lib/Sidef/Parser.pm
 lib/Sidef/Perl/Perl.pm
 lib/Sidef/Perl/Perl.pod
 lib/Sidef/Sys/SIG.pm
+lib/Sidef/Sys/SIG.pod
 lib/Sidef/Sys/Sys.pm
 lib/Sidef/Sys/Sys.pod
 lib/Sidef/Time/Gmtime.pm

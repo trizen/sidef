@@ -18,6 +18,7 @@ var obj = Complex.new(...);
 
 Inherits methods from:
 
+	* Sidef::Convert::Convert
 	* Sidef::Types::Number::Number
 
 =head1 METHODS

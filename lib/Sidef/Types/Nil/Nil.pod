@@ -19,6 +19,7 @@ var obj = Nil.new(...);
 Inherits methods from:
 
 	* Sidef::Object::Object
+	* Sidef::Convert::Convert
 
 =head1 METHODS
 
