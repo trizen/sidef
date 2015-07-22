@@ -292,7 +292,7 @@ package Sidef::Types::Number::Number {
             $reminder = ($dec >>= 1) % 2;
         }
 
-        $self->new(join('', @bin));
+        Sidef::Types::String::String->new("0b" . join('', @bin));
     }
 
     sub commify {

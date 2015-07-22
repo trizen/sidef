@@ -1356,7 +1356,7 @@ package Sidef::Parser {
 
                 $self->fatal_error(
                                    code  => $_,
-                                   pos   => pos($_) - 1,
+                                   pos   => pos($_),
                                    error => "attempt to use an implicit method call on the uninitialized variable: \"_\"",
                                   );
             }
@@ -1736,7 +1736,7 @@ package Sidef::Parser {
                 # Undeclared variable
                 $self->fatal_error(
                                    code  => $_,
-                                   pos   => (pos($_) - length($name)),
+                                   pos   => (pos($_) - length($name) - 1),
                                    error => "attempt to use an undeclared variable <$name>",
                                   );
             }
