@@ -19,6 +19,15 @@ my %ignored;
       )
 } = ();
 
+if (grep { $_ eq '-O2' } @ARGV) {
+    @ignored{
+        qw(
+          module_definition.sf
+          module_order_and_redeclaration.sf
+          )
+    } = ();
+}
+
 my $regex_filter;
 if (@ARGV and $ARGV[0] =~ m{^/(.+)/$}) {
     $regex_filter = qr/$1/i;
@@ -31,9 +40,9 @@ if (@ARGV and $ARGV[0] eq 'ignored') {
     shift @ARGV;
 }
 
-my @scripts = grep {my $bool = exists $ignored{$_}; $ignored ? $bool : !$bool} glob('*.sf');
+my @scripts = grep { my $bool = exists $ignored{$_}; $ignored ? $bool : !$bool } glob('*.sf');
 if (defined $regex_filter) {
-    @scripts = grep {/$regex_filter/} @scripts;
+    @scripts = grep { /$regex_filter/ } @scripts;
 }
 
 system $^X, $sidef, @ARGV, '-t', @scripts;
