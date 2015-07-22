@@ -103,7 +103,7 @@ package Sidef::Parser {
                 | (?:given|switch)\b                              (?{ Sidef::Types::Block::Given->new })
                 | read\b                                          (?{ state $x = Sidef::Sys::Sys->new })
                 | (?:[*\\&]|\+\+|--|lvalue\b)                     (?{ Sidef::Variable::Ref->new })
-                | (?:[?√+~!>-]|>>)                                (?{ state $x = Sidef::Object::Unary->new })
+                | (?:>>?|[?√+~!-])                                (?{ state $x = Sidef::Object::Unary->new })
                 | :                                               (?{ state $x = Sidef::Types::Hash::Hash->new })
               )
             }x,

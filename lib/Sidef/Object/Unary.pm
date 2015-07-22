@@ -40,7 +40,7 @@ package Sidef::Object::Unary {
         };
 
         *{__PACKAGE__ . '::' . '>>'} = sub {
-            Sidef::Types::Bool::Bool->new(print join(" ", @_[1, $#_]));
+            Sidef::Types::Bool::Bool->new(print join(" ", @_[1 .. $#_]));
         };
     }
 };
