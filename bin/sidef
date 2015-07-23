@@ -546,8 +546,13 @@ EOT
             redo;
         };
 
-        say ref($_) ne 'Sidef::Types::Block::Code' && eval { $_->can('dump') } ? $_->dump : $_
-          for eval { $exec->execute($struct) };
+        if (defined($args{r}) or defined($args{R})) {
+            deparse_structure($struct);
+        }
+        else {
+            say ref($_) ne 'Sidef::Types::Block::Code' && eval { $_->can('dump') } ? $_->dump : $_
+              for eval { $exec->execute($struct) };
+        }
         redo;
     }
 }
@@ -595,7 +600,7 @@ sub deparse_structure {
     my $pm     = ($module =~ s{::}{/}gr . '.pm');
 
     require $pm;
-    my $deparser = $module->new(namespaces => [@Sidef::Exec::NAMESPACES],);
+    my $deparser = $module->new(namespaces => [@Sidef::Exec::NAMESPACES]);
     my $code = $deparser->deparse($struct);
 
     output($code);
@@ -781,7 +786,7 @@ HEAD
 
                  close $fh;
              }
-           }
+         }
         } => $path
     );
 
