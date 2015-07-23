@@ -1,0 +1,17 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Globally_replace_text_in_several_files
+#
+
+var files = %w(
+                a.txt
+                b.txt
+                c.txt
+              );
+ 
+files.map{.to_file}.each { |file|
+    say file.edit { |line|
+        line.gsub("Goodbye London!", "Hello New York!");
+    };
+}

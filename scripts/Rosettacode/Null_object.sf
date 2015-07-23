@@ -1,0 +1,8 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Null_object
+#
+
+var null_obj;              # initialized with an implicit 'nil'
+say null_obj.is_a(nil);    # true

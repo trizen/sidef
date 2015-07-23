@@ -1,0 +1,7 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/A+B
+#
+
+say STDIN.readline.words.map{.to_i}.sum;

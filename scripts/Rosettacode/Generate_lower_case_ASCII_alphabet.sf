@@ -1,0 +1,8 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Generate_lower_case_ASCII_alphabet
+#
+
+var arr = 'a'..'z';
+say arr.join(' ');

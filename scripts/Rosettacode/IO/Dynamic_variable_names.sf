@@ -1,0 +1,10 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Dynamic_variable_names
+#
+
+var name = Sys.scanln("Enter a variable name: ");   # type in 'foo'
+struct _{};
+.(name) = 42;
+say .foo;     # prints: 42

@@ -1,0 +1,15 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Look-and-say_sequence
+#
+
+func lookandsay(str) {
+    str.gsub(/((.)\2*)/, {|a,b| a.len.to_s + b });
+}
+ 
+var num = "1";
+{
+  say num;
+  num = lookandsay(num);
+} * 10;

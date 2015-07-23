@@ -1,0 +1,17 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Integer_comparison
+#
+
+read(Number, \var a, \var b);
+ 
+if (a < b) {
+    say 'Lower';
+}
+elsif (a == b) {
+    say 'Equal';
+}
+elsif (a > b) {
+    say 'Greater';
+}

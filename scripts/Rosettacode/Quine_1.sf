@@ -1,0 +1,9 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Quine
+#
+
+say(<<e*2, 'e')
+say(<<e*2, 'e')
+e

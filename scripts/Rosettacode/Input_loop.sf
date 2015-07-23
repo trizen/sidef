@@ -1,0 +1,15 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Input_loop
+#
+
+var file = File.new(__FILE__);
+file.open_r(\var fh, \var err)
+    || "Can't open file `#{file}': #{err}\n".die;
+ 
+fh.each { |line|              # iterates the lines of the fh
+    line.each_word { |word|   # iterates the words of the line
+        say word;
+    }
+}

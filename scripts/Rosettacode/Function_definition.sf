@@ -1,0 +1,9 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Function_definition
+#
+
+func multiply(a, b) {
+    a * b;
+};

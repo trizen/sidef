@@ -1,0 +1,22 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Binary_search
+#
+
+func binary_search(a, i) {
+ 
+    var l = 0;
+    var h = a.offset;
+ 
+    while (l <= h) {
+        var mid = (h+l / 2 -> int);
+        a[mid] > i && (h = mid-1; next);
+        a[mid] < i && (l = mid+1; next);
+        return mid;
+    }
+ 
+    return -1;
+}
+
+say binary_search(1..100, 23);

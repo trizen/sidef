@@ -1,0 +1,9 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Even_or_odd
+#
+
+var n = 42;
+say n.is_odd;       # false
+say n.is_even;      # true

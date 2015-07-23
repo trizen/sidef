@@ -1,0 +1,9 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Loops/Foreach
+#
+
+foreach [1,2,3] { |i|
+    say i;
+}

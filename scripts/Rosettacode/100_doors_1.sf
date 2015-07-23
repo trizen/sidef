@@ -1,0 +1,9 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/100_doors
+#
+
+{ |i|
+    "Door %3d is %s\n".printf(i, ["closed", "open"][i.sqrt.is_int]);
+} * 100;

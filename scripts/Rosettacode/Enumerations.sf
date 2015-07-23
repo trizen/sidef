@@ -1,0 +1,11 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Enumerations
+#
+
+enum {Apple, Banana, Cherry};   # numbered 0 through 2
+
+say Apple;
+say Banana;
+say Cherry;

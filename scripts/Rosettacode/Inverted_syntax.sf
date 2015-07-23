@@ -1,0 +1,14 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Inverted_syntax
+#
+
+# Inverted syntax with assignment
+var raining = true;
+[false]»(\var needumbrella);
+ 
+# Inverted syntax with conditional expressions
+# (this also works with 'while' and 'for' loops)
+if (raining==true) {needumbrella=true};
+{needumbrella=true} if (raining==true);

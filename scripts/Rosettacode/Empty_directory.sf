@@ -1,0 +1,7 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Empty_directory
+#
+
+Dir.new('/my/dir').is_empty;    # true, false or nil

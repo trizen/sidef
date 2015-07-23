@@ -1,0 +1,7 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Repeat_a_string
+#
+
+say ('ha' * 5);  # ==> 'hahahahaha'

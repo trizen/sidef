@@ -1,0 +1,10 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Literals/String
+#
+
+'single quotes with \'embedded quote\' and \\backslash';
+‚unicode single quoted’;
+%q(not interpolating with (nested) parentheses
+and newline);

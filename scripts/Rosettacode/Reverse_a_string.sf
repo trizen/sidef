@@ -1,0 +1,8 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Reverse_a_string
+#
+
+say "asdf".reverse;             # fdsa
+say "résumé niño".reverse;      # oñin émusér

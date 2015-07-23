@@ -1,0 +1,11 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Phrase_reversals
+#
+
+var str    = "rosetta code phrase reversal";
+ 
+say str.reverse;                            # reversed string
+say str.words.map{.reverse}.join(' ');      # words reversed
+say str.words.reverse.join(' ');            # word order reversed

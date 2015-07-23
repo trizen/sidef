@@ -1,0 +1,7 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Long_multiplication
+#
+
+say (2**64 * 2**64);

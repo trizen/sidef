@@ -1,0 +1,11 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Averages/Root_mean_square
+#
+
+func rms(a) {
+    Math.sqrt(a.map{.**2}.sum / a.len);
+}
+ 
+say rms(1..10);

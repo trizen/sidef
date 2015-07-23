@@ -1,0 +1,10 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Program_name
+#
+
+say __MAIN__;
+if (__MAIN__ != __FILE__) {
+    say "This file has been included!";
+}

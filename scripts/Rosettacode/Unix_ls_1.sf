@@ -1,0 +1,9 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Unix/ls
+#
+
+'*'.glob.each { |file|
+    say file;
+};

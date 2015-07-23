@@ -1,0 +1,7 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Show_the_epoch
+#
+
+say Time.new(0).gmtime.ctime;

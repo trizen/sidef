@@ -1,0 +1,9 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Loops/Downward_for
+#
+
+for (var i = 10; i >= 0; i--) {
+    say i;
+}

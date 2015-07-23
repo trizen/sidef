@@ -1,0 +1,10 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Hostname
+#
+
+var sys = frequire('Sys::Hostname');
+var host = sys.hostname;
+
+say host;

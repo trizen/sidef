@@ -1,0 +1,11 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Terminal_control/Unicode_output
+#
+
+if (ENV["LC_ALL","LC_CTYPE","LANG"].any{_ ~~ /\bUTF-?8/i}) {
+    say "△"
+} else {
+    die "Terminal can't handle UTF-8.";
+}

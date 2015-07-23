@@ -1,0 +1,11 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Inheritance/Single
+#
+
+class Animal {};
+class Dog << Animal {};
+class Cat << Animal {};
+class Lab << Dog {};
+class Collie << Dog {};

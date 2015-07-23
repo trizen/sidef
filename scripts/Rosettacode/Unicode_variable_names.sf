@@ -1,0 +1,9 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Unicode_variable_names
+#
+
+var Δ = 1;
+Δ += 1;
+say Δ;

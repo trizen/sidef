@@ -1,0 +1,9 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Convert_decimal_number_to_rational
+#
+
+'0.9054054 0.518518 0.75'.split.each { |d|
+    say d.to_r;
+}

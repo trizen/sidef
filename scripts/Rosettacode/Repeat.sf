@@ -1,0 +1,15 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Repeat
+#
+
+func repeat(f, n) {
+    { f() } * n;
+}
+ 
+func example {
+    say "Example";
+}
+ 
+repeat(example, 4);

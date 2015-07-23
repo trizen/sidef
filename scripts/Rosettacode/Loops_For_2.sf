@@ -1,0 +1,11 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Loops/For
+#
+
+for (1..5) { |i|
+    for (i..5) { |j|
+        say '*'*j; break;
+    }
+}

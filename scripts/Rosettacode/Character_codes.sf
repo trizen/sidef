@@ -1,0 +1,8 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Character_codes
+#
+
+say 'a'.ord;    # => 97
+say 97.chr;     # => 'a' (of type Char)

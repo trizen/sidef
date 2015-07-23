@@ -1,0 +1,9 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Inheritance/Multiple
+#
+
+class Camera {};
+class MobilePhone {};
+class CameraPhone << Camera, MobilePhone {};

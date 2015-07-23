@@ -1,0 +1,12 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Averages/Mode
+#
+
+func one_mode(arr) {
+    arr.max_by{|i| arr.count(i)};
+}
+
+say one_mode([1, 3, 6, 6, 6, 6, 7, 7, 12, 12, 17]);
+say one_mode([1, 1, 2, 4, 4]);

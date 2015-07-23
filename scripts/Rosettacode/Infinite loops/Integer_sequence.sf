@@ -1,0 +1,7 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Integer_sequence
+#
+
+{|i| say i } * Math.inf;

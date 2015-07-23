@@ -1,0 +1,16 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Strip_a_set_of_characters_from_a_string
+#
+
+func stripchars_tr(str, char_list) {
+    str.tr(char_list, "", "d");
+};
+
+func stripchars_grep(str, char_list) {
+    str.split(1).grep {|c| !char_list.contains(c)}.join;
+};
+
+say stripchars_tr("She was a soul stripper. She took my heart!", "aei");
+say stripchars_grep("She was a soul stripper. She took my heart!", "aei");

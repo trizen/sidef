@@ -1,0 +1,9 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Read_entire_file
+#
+
+var file = File.new(__FILE__);
+var content = file.open_r.slurp;
+print content;

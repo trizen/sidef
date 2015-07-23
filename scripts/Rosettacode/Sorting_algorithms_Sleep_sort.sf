@@ -1,0 +1,9 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Sorting_algorithms/Sleep_sort
+#
+
+ARGV.map{.to_i}.map{ |i|
+    {Sys.sleep(i); say i}.pfork;
+}.each{.wait};

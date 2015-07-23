@@ -1,0 +1,7 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Evaluate_binomial_coefficients
+#
+
+say 400.nok(200);

@@ -1,0 +1,10 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Literals/String
+#
+
+var a = 42;
+say "double \Uquotes\E with \"embedded quote\"\nnewline and variable interpolation: #{a} % 10 = #{a % 10}";
+say „same as above”;
+say %Q(same as above);

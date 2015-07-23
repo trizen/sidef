@@ -1,0 +1,8 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Count_occurrences_of_a_substring
+#
+
+say "the three truths".count("th");
+say "ababababab".count("abab");

@@ -1,0 +1,9 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/JortSort
+#
+
+func jort_sort(array) { array == array.sort };
+
+say jort_sort(1..10);

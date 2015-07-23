@@ -1,0 +1,16 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Josephus_problem
+#
+
+func josephus(n, k) {
+    var prisoners = (0 .. n-1);
+    while (prisoners.len > 1) {
+        prisoners.rotate!(k - 1).shift;
+    };
+    return prisoners[0];
+};
+
+var survivor = josephus(41, 3);
+say "Prisoner #{survivor} survived.";

@@ -1,0 +1,13 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Fibonacci_sequence
+#
+
+func fib_mem (n) {
+    static c = [];
+    n < 2 && return n;
+    c[n] := (__FUNC__(n-1) + __FUNC__(n-2));
+}
+
+say fib_mem(12);

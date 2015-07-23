@@ -1,0 +1,15 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Leap_year
+#
+
+func isleap(year) {
+    if (year %% 100) {
+        return (year %% 400);
+    };
+    return (year %% 4);
+}
+
+say isleap(2000);
+say isleap(2015);

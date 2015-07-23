@@ -1,0 +1,12 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Catalan_numbers
+#
+
+func f(i) { i.isZero ? 1 : (i * f(i-1)) };
+func c(n) { f(2*n) / f(n) / f(n+1) };
+
+15.times { |i|
+    say "#{i-1}\t#{c(i-1)}";
+}

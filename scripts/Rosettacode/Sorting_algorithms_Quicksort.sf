@@ -1,0 +1,17 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Sorting_algorithms/Quicksort
+#
+
+func quicksort (a) {
+    a.len < 2 && return(a);
+    var p = a.popRand;          # to avoid the worst cases
+    __FUNC__(a.grep{ .< p}) + [p] + __FUNC__(a.grep{ .>= p});
+}
+
+var numbers = [7,6,5,9,8,4,3,1,2,0];
+say quicksort(numbers);
+ 
+var strs = ["John", "Kate", "Zerg", "Alice", "Joe", "Jane"];
+say quicksort(strs);

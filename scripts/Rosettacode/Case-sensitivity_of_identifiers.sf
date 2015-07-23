@@ -1,0 +1,10 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Case-sensitivity_of_identifiers
+#
+
+var dog = 'Benjamin';
+var Dog = 'Samba';
+var DOG = 'Bernie';
+say "The three dogs are named #{dog}, #{Dog}, and #{DOG}.";

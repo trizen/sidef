@@ -1,0 +1,23 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Time_a_function
+#
+
+var benchmark = frequire('Benchmark');
+ 
+func fac(n) {
+    n == 0 ? 1 : (n * __FUNC__(n - 1))
+}
+ 
+func fac_mem(n) {
+    static memo = [];
+    memo[n] := (n == 0 ? 1 : (n * __FUNC__(n - 1)));
+}
+ 
+var result = benchmark.timethese(-3, :(
+    'fac'     => func {    fac(10)},
+    'fac mem' => func {fac_mem(10)},
+));
+ 
+benchmark.cmpthese(result);

@@ -1,0 +1,11 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Loops/While
+#
+
+var i = 1024;
+while (i > 0) {
+    say i;
+    i.div!(2).int!;
+}

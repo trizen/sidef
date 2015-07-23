@@ -1,0 +1,8 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Quine
+#
+
+s = %(s = %%(%s); printf(s, s);
+); printf(s, s);

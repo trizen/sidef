@@ -1,0 +1,19 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/100_doors
+#
+
+var doors = [];
+ 
+{ |pass|
+    { |i|
+        i % pass == 0 && (
+            doors[i] := false -> not!
+        );
+    } * 100;
+} * 100;
+ 
+{ |i|
+    "Door %3d is %s\n".printf(i, doors[i] ? 'open' : 'closed');
+} * 100;

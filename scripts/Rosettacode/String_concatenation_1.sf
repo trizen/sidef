@@ -1,0 +1,9 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/String_concatenation
+#
+
+var s = 'hello';
+s += ' literal';
+say s;

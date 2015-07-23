@@ -1,0 +1,9 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Window_creation
+#
+
+var tk = require 'Tk';
+'MainWindow'.to_caller.new;
+tk.MainLoop;

@@ -1,0 +1,16 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Variadic_function
+#
+
+func print_all(*things) {
+    things.each { |x| say x };
+};
+
+print_all(4, 3, 5, 6, 4, 3);
+print_all(4, 3, 5);
+print_all("Rosetta", "Code", "Is", "Awesome!");
+
+var args = ["Rosetta", "Code", "Is", "Awesome!"];
+print_all(args...);

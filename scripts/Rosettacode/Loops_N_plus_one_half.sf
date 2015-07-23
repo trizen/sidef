@@ -1,0 +1,13 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Loops/N_plus_one_half
+#
+
+for 1..10 { |i|
+    print i;
+    i == 10 && break;
+    print ', ';
+}
+ 
+print "\n";

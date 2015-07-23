@@ -1,0 +1,13 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Empty_string
+#
+
+var s = "";
+
+s != "";
+s.length?;
+s.length > 0;
+s ~~ /./s;
+s !~ /^\z/;

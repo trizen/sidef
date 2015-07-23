@@ -1,0 +1,9 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Permutations
+#
+
+[1,2,3].permutations { |set|
+    say set.join;
+};

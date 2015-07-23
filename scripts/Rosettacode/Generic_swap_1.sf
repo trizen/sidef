@@ -1,0 +1,15 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Generic_swap
+#
+
+func swap(a is Ref, b is Ref) {
+    [*a, *b] » (b, a);
+};
+
+var (x, y) = (1, 2);
+swap(\x, \y);
+
+say x;
+say y;

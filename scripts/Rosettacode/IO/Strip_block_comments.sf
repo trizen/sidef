@@ -1,0 +1,12 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Strip_block_comments
+#
+
+func strip_block_comments(code, beg='/*', end='*/') {
+    var re = Regex.new(beg.escape + '.*?' + end.escape, 's');
+    code.gsub(re, '');
+}
+ 
+say strip_block_comments(ARGF.slurp);

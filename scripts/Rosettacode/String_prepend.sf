@@ -1,0 +1,9 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/String_prepend
+#
+
+var str = 'llo!';
+str.sub!(/^/, 'He');
+say str;

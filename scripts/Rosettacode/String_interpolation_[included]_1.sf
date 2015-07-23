@@ -1,0 +1,7 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/String_interpolation_(included)
+#
+
+say ("Mary had a %s lamb" % 'little');

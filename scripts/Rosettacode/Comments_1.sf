@@ -1,0 +1,8 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Comments
+#
+
+var i = 1; # this is the comment part
+assert_eq(i, 1);

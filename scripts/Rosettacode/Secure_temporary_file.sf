@@ -1,0 +1,11 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Secure_temporary_file
+#
+
+var tmpfile = require('File::Temp');
+var fh = tmpfile.new(UNLINK => 1);
+say fh.filename;
+fh.print("Hello, World!\n");
+fh.close;

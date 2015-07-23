@@ -1,0 +1,37 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Real_constants_and_functions
+#
+
+var x = 42;
+var y = 2;
+
+# Constants:
+say Math::e;
+say Math::PI;
+say Math::ln2;
+say Math::phi;
+
+# Arbitrary precision:
+say Math.pi(5);
+say Math.e(5);
+
+# Mathematical functions
+say x.sqrt;    # square root
+say x.log;     # natural logarithm
+say x.log10;   # base 10 logarithm
+say x.exp;     # e raised to the power of x
+say x.abs;     # absolute value
+say x.floor;   # floor
+say x.ceil;    # ceiling
+say x**y;      # exponentiation
+
+## Alternative syntax:
+say sqrt x;    # square root
+say log x;     # natural logarithm
+say log10 x;   # base 10 logarithm
+say exp x;     # e raised to the power of x
+say abs x;     # absolute value
+say floor x;   # floor
+say ceil x;    # ceiling

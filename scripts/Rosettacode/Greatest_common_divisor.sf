@@ -1,0 +1,8 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Greatest_common_divisor
+#
+
+var arr = [100, 1_000, 10_000, 20];
+say Math.gcd(arr...);

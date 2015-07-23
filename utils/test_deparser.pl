@@ -83,6 +83,8 @@ sub test_file {
           )
     };
 
+    require Sidef::Types::Number::Number;
+
     {
         local $| = 1;
         printf("** Processing: %s\r", $file);

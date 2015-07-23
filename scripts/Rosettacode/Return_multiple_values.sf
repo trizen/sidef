@@ -1,0 +1,14 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Return_multiple_values
+#
+
+func foo(a,b) {
+    return (a+b, a*b);
+};
+
+var (x, y) = foo(4, 5);
+
+say x;
+say y;

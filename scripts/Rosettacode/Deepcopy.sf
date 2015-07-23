@@ -1,0 +1,21 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Deepcopy
+#
+
+var src = Hash.new(foo => 0, bar => [0,1]);
+ 
+# Add a cyclic reference
+src[:baz] = src;
+ 
+# Make a copy
+var dst = Sys.copy(src);
+ 
+# The address of src
+say Sys.refaddr(src);
+say Sys.refaddr(src[:baz]);
+ 
+# The address of dst
+say Sys.refaddr(dst);
+say Sys.refaddr(dst[:baz]);

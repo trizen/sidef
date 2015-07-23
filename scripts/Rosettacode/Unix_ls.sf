@@ -1,0 +1,15 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Unix/ls
+#
+
+var content = [];
+Dir.cwd.open.each { |file|
+    file ~~ < . .. > && next;
+    content.append(file);
+};
+ 
+content.sort.each { |file|
+    say file;
+};

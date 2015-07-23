@@ -1,0 +1,14 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Accumulator_factory
+#
+
+func Accumulator(sum) {
+    {|num| sum += num }.copy;
+}
+ 
+var x = Accumulator(1);
+x.call(5);
+Accumulator(3);
+say x.call(2.3);            # prints: 8.3

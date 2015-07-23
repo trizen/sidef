@@ -1,0 +1,7 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Topic_variable
+#
+
+say [9,16,25].map {.sqrt};   # new array: [3, 4, 5]

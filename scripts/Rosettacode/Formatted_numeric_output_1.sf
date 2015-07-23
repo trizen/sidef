@@ -1,0 +1,7 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Formatted_numeric_output
+#
+
+say ("%09.3f" % 7.125);

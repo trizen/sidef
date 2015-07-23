@@ -1,0 +1,12 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Program_termination
+#
+
+var code = 42;
+var problem = true;
+
+if (problem) {
+    Sys.exit(code);
+}

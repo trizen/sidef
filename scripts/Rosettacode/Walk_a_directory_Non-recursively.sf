@@ -1,0 +1,7 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Walk_a_directory/Non-recursively
+#
+
+'*.p[lm]'.glob.each { |file| say file };    # Perl files under this directory

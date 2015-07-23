@@ -1,0 +1,11 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Boolean_values
+#
+
+var t = true;
+var f = false;
+
+say t;
+say f;

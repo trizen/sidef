@@ -1,0 +1,8 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/File_size
+#
+
+say (Dir.cwd  + %f'input.txt' -> size);
+say (Dir.root + %f'input.txt' -> size);

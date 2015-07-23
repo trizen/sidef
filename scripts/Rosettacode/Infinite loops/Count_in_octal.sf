@@ -1,0 +1,8 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Count_in_octal
+#
+
+var i = 0;
+loop { say i++.as_oct }

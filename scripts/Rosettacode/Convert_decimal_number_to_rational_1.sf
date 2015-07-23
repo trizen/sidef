@@ -1,0 +1,9 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Convert_decimal_number_to_rational
+#
+
+say 0.9054054r;
+say 0.518518r;
+say 0.75r;

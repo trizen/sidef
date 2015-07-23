@@ -1,0 +1,9 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Loops/For_with_a_specified_step
+#
+
+for (var i = 2; i <= 8; i += 2) {
+    say i;
+}

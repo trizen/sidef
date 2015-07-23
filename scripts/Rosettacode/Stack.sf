@@ -1,0 +1,10 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Stack
+#
+
+var stack = [];
+stack.push(42);         # pushing
+say stack.pop;          # popping
+say stack.is_empty;     # is_emtpy?

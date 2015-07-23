@@ -1,0 +1,10 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Regular_expressions
+#
+
+var str = "I am a string";
+if (str =~ /string$/) {
+    print "Ends with 'string'\n";
+}

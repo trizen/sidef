@@ -1,5 +1,9 @@
 #!/usr/bin/ruby
 
+#
+## http://rosettacode.org/wiki/JSON
+#
+
 var json = require('JSON').new;
 var data = json.decode('{"blue": [1, 2], "ocean": "water"}');
 say data.dump;

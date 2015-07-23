@@ -1,0 +1,12 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Palindrome_detection
+#
+
+func palindrome(s) {
+    s == s.reverse
+}
+
+say palindrome("sidef");
+say palindrome("salàlas");

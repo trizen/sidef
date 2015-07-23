@@ -1,0 +1,11 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Greatest_common_divisor
+#
+
+func gcd(a, b) {
+    b.is_zero ? a.abs : gcd(b, a % b);
+}
+
+say gcd(90, 24);

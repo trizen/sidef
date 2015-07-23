@@ -1,0 +1,20 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Palindrome_detection
+#
+
+func r_palindrome(s) {
+    if (s.len <= 1) {
+        true
+    }
+    elsif (s.char_at(0) != s.char_at(-1)) {
+        false
+    }
+    else {
+        __FUNC__(s.substr(1, -1))
+    }
+}
+
+say r_palindrome("sidef");
+say r_palindrome("salàlas");
