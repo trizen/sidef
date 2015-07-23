@@ -136,6 +136,10 @@ package Sidef::Parser {
                 # Chars
                 | %c\b.                                                    (?{ [qw(0 to_chars Sidef::Types::Char::Chars)] })
                 | %C\b.                                                    (?{ [qw(1 to_chars Sidef::Types::Char::Chars)] })
+
+                # Symbols
+                | %s\b.                                                    (?{ [qw(0 __NEW__ Sidef::Module::OO)] })
+                | %S\b.                                                    (?{ [qw(0 __NEW__ Sidef::Module::Func)] })
              )
             }xs,
             built_in_classes => {
@@ -775,20 +779,22 @@ package Sidef::Parser {
 
                 # Special case for array-like objects (bytes and chars)
                 my @array_like;
-                if ($method ne 'new') {
+                if ($method ne 'new' and $method ne '__NEW__') {
                     @array_like = ($package, $method);
                     $package    = 'Sidef::Types::String::String';
                     $method     = 'new';
                 }
 
-                my $obj = $double_quoted
-                  ? do {
-                    state $str = Sidef::Types::String::String->new;    # load the string module
-                    Sidef::Types::String::String::apply_escapes($package->$method($string), $self);
-                  }
-                  : $package->$method($string =~ s{\\\\}{\\}gr);
+                my $obj = (
+                    $double_quoted
+                    ? do {
+                        state $str = Sidef::Types::String::String->new;    # load the string module
+                        Sidef::Types::String::String::apply_escapes($package->$method($string), $self);
+                      }
+                    : $package->$method($string =~ s{\\\\}{\\}gr)
+                );
 
-                # Special case for backticks (add method '`')
+                # Special case for backticks (add method 'exec')
                 if ($package eq 'Sidef::Types::Glob::Backtick') {
                     my $struct =
                         $double_quoted && ref($obj) eq 'HASH'

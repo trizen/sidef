@@ -4,8 +4,8 @@ package Sidef::Module::OO {
     our $AUTOLOAD;
 
     sub __NEW__ {
-        my (undef, %opt) = @_;
-        bless \%opt, __PACKAGE__;
+        my (undef, $module) = @_;
+        bless {module => $module}, __PACKAGE__;
     }
 
     sub DESTROY {
@@ -17,7 +17,7 @@ package Sidef::Module::OO {
         my ($method) = ($AUTOLOAD =~ /^.*[^:]::(.*)$/);
 
         if ($method eq '') {
-            return Sidef::Module::Func->__NEW__(module => $self->{module});
+            return Sidef::Module::Func->__NEW__($self->{module});
         }
 
         my @args = (
@@ -45,7 +45,7 @@ package Sidef::Module::OO {
 
         my $result = $results[0];
         if (ref($result) && eval { $result->can('can') }) {
-            return $self->__NEW__(module => ($result));
+            return $self->__NEW__($result);
         }
 
         Sidef::Perl::Perl->to_sidef($result);

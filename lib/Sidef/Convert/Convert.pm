@@ -48,7 +48,7 @@ package Sidef::Convert::Convert {
         Sidef::Types::Number::Number->new($_[0]->get_value);
     }
 
-    *to_num = \&to_n;
+    *to_num    = \&to_n;
     *to_number = \&to_n;
 
     sub to_float {
@@ -96,11 +96,11 @@ package Sidef::Convert::Convert {
     }
 
     sub to_caller {
-        Sidef::Module::OO->__NEW__(module => $_[0]->get_value);
+        Sidef::Module::OO->__NEW__($_[0]->get_value);
     }
 
     sub to_fcaller {
-        Sidef::Module::Func->__NEW__(module => $_[0]->get_value);
+        Sidef::Module::Func->__NEW__($_[0]->get_value);
     }
 };
 

@@ -888,12 +888,12 @@ package Sidef::Types::String::String {
 
     sub require {
         my ($self) = @_;
-        Sidef::Module::OO->__NEW__(module => $self->_require);
+        Sidef::Module::OO->__NEW__($self->_require);
     }
 
     sub frequire {
         my ($self) = @_;
-        Sidef::Module::Func->__NEW__(module => $self->_require);
+        Sidef::Module::Func->__NEW__($self->_require);
     }
 
     sub unescape {

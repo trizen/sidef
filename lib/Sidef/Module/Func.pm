@@ -4,8 +4,8 @@ package Sidef::Module::Func {
     our $AUTOLOAD;
 
     sub __NEW__ {
-        my (undef, %opt) = @_;
-        bless \%opt, __PACKAGE__;
+        my (undef, $module) = @_;
+        bless {module => $module}, __PACKAGE__;
     }
 
     sub DESTROY {
