@@ -2191,7 +2191,7 @@ package Sidef::Parser {
                 local $parser->{ref_vars}{$name} = $self->{ref_vars}{$name} if exists($self->{ref_vars}{$name});
 
                 if ($name ne 'main' and not grep $_ eq $name, @Sidef::Exec::NAMESPACES) {
-                    push @Sidef::Exec::NAMESPACES, $name;
+                    unshift @Sidef::Exec::NAMESPACES, $name;
                 }
 
                 my $code = '{' . substr($_, pos);
@@ -2360,7 +2360,7 @@ package Sidef::Parser {
 
                     local $parser->{class} = $name if defined $name;
                     if (defined $name and $name ne 'main' and not grep $_ eq $name, @Sidef::Exec::NAMESPACES) {
-                        push @Sidef::Exec::NAMESPACES, $name;
+                        unshift @Sidef::Exec::NAMESPACES, $name;
                     }
                     my $struct = $parser->parse_script(code => \$content);
 

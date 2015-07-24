@@ -19,15 +19,6 @@ my %ignored;
       )
 } = ();
 
-if (grep { $_ eq '-O2' } @ARGV) {
-    @ignored{
-        qw(
-          module_definition.sf
-          module_order_and_redeclaration.sf
-          )
-    } = ();
-}
-
 my $regex_filter;
 if (@ARGV and $ARGV[0] =~ m{^/(.+)/$}) {
     $regex_filter = qr/$1/i;
