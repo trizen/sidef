@@ -18,7 +18,7 @@ func get_response(url) {
 
 var resp = get_response("http://www.google.ro");
 
-if (resp.is_a(nil)) {
+if (nil == resp) {
     STDERR.print("** LWP::UserAgent is not installed!\n");
 }
 else {
