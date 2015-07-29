@@ -5,7 +5,7 @@
 #
 
 func map_range(a, b, x) {
-    var (a1, a2, b1, b2) = (a.bounds..., b.bounds...);
+    var (a1, a2, b1, b2) = (a.bounds, b.bounds);
     x-a1 * b2-b1 / a2-a1 + b1;
 }
  

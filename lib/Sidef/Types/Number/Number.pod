@@ -518,6 +518,14 @@ Aliases: I<length>
 
 =cut
 
+=head2 ln
+
+Number.ln() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 log
 
 Number.log() -> I<Obj>

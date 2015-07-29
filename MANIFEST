@@ -40,8 +40,10 @@ lib/Sidef/Types/Array/MultiArray.pm
 lib/Sidef/Types/Array/MultiArray.pod
 lib/Sidef/Types/Array/Pair.pm
 lib/Sidef/Types/Array/Pair.pod
-lib/Sidef/Types/Array/Range.pm
-lib/Sidef/Types/Array/Range.pod
+lib/Sidef/Types/Array/RangeNumber.pm
+lib/Sidef/Types/Array/RangeNumber.pod
+lib/Sidef/Types/Array/RangeString.pm
+lib/Sidef/Types/Array/RangeString.pod
 lib/Sidef/Types/Black/Hole.pm
 lib/Sidef/Types/Block/Break.pm
 lib/Sidef/Types/Block/Break.pod
@@ -233,6 +235,7 @@ scripts/Expensive/langton_s_ant_2.sf
 scripts/Expensive/levenshtein_recursive.sf
 scripts/Expensive/long_multiplication.sf
 scripts/Expensive/longest_common_subsequence.sf
+scripts/Expensive/low_level_math.sf
 scripts/Expensive/mandelbrot_set.sf
 scripts/Expensive/mean_time.sf
 scripts/Expensive/monty_hall_problem.sf
@@ -791,7 +794,6 @@ scripts/Rosettacode/Write_language_name_in_3D_ASCII.sf
 scripts/Rosettacode/WWW/Hello_world_Web_server.sf
 scripts/Rosettacode/WWW/Hello_world_Web_server_1.sf
 scripts/Rosettacode/WWW/Sockets.sf
-scripts/Rosettacode/x.pl
 scripts/Rosettacode/Y_combinator.sf
 scripts/Rosettacode/Zig-zag_matrix.sf
 scripts/run_length_encoding.sf

@@ -226,18 +226,15 @@ package Sidef::Math::Math {
         $from   = $from->get_value;
         $to     = $to->get_value;
 
-        my $step  = ($to - $from) / $amount;
-        my $array = Sidef::Types::Array::Array->new();
-
-        return $array if $step == 0;
+        my $step = ($to - $from) / $amount;
+        $step == 0 && return (Sidef::Types::Array::Array->new());
 
         my @values;
-        for (my $i = $from ; $i < $to ; $i += $step) {
+        for (my $i = $from ; $i <= $to ; $i += $step) {
             push @values, Sidef::Types::Number::Number->new($i);
         }
 
-        $array->push(@values);
-        $array;
+        Sidef::Types::Array::Array->new(@values);
     }
 
     sub number_to_percentage {

@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-Sidef::Types::Array::Range
+Sidef::Types::Array::RangeNumber
 
 =head1 DESCRIPTION
 
@@ -11,7 +11,7 @@ This object is ...
 
 =head1 SYNOPSIS
 
-var obj = Range.new(...);
+var obj = RangeNumber.new(...);
 
 
 =head1 INHERITS
@@ -25,7 +25,7 @@ Inherits methods from:
 
 =head2 bounds
 
-Range.bounds() -> I<Obj>
+RangeNumber.bounds() -> I<Obj>
 
 Return the
 
@@ -33,7 +33,7 @@ Return the
 
 =head2 by
 
-Range.by() -> I<Obj>
+RangeNumber.by() -> I<Obj>
 
 Return the
 
@@ -41,7 +41,7 @@ Return the
 
 =head2 contains
 
-Range.contains() -> I<Obj>
+RangeNumber.contains() -> I<Obj>
 
 Return the
 
@@ -51,7 +51,7 @@ Aliases: I<includes>
 
 =head2 each
 
-Range.each() -> I<Obj>
+RangeNumber.each() -> I<Obj>
 
 Return the
 
@@ -59,7 +59,7 @@ Return the
 
 =head2 max
 
-Range.max() -> I<Obj>
+RangeNumber.max() -> I<Obj>
 
 Return the
 
@@ -67,7 +67,7 @@ Return the
 
 =head2 min
 
-Range.min() -> I<Obj>
+RangeNumber.min() -> I<Obj>
 
 Return the
 
@@ -75,7 +75,7 @@ Return the
 
 =head2 new
 
-Range.new() -> I<Obj>
+RangeNumber.new() -> I<Obj>
 
 Return the
 
@@ -83,7 +83,7 @@ Return the
 
 =head2 step
 
-Range.step() -> I<Obj>
+RangeNumber.step() -> I<Obj>
 
 Return the
 
@@ -91,7 +91,7 @@ Return the
 
 =head2 to_a
 
-Range.to_a() -> I<Obj>
+RangeNumber.to_a() -> I<Obj>
 
 Return the
 

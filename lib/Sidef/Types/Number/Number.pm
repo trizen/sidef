@@ -232,13 +232,12 @@ package Sidef::Types::Number::Number {
     sub to {
         my ($self, $num, $step) = @_;
         $step = defined($step) ? $step->get_value : 1;
-        Sidef::Types::Array::Range->new(
-                                        from      => $self->get_value,
-                                        to        => $num->get_value,
-                                        step      => $step,
-                                        type      => 'number',
-                                        direction => 'up'
-                                       );
+        Sidef::Types::Array::RangeNumber->new(
+                                              from      => $self->get_value,
+                                              to        => $num->get_value,
+                                              step      => $step,
+                                              direction => 'up'
+                                             );
     }
 
     *upto = \&to;
@@ -247,13 +246,12 @@ package Sidef::Types::Number::Number {
     sub downto {
         my ($self, $num, $step) = @_;
         $step = defined($step) ? $step->get_value : 1;
-        Sidef::Types::Array::Range->new(
-                                        from      => $self->get_value,
-                                        to        => $num->get_value,
-                                        step      => $step,
-                                        type      => 'number',
-                                        direction => 'down'
-                                       );
+        Sidef::Types::Array::RangeNumber->new(
+                                              from      => $self->get_value,
+                                              to        => $num->get_value,
+                                              step      => $step,
+                                              direction => 'down'
+                                             );
     }
 
     *downTo = \&downto;
@@ -337,6 +335,11 @@ package Sidef::Types::Number::Number {
     sub log {
         my ($self, $base) = @_;
         $self->new($self->get_value->copy->blog(defined($base) ? $base->get_value : ()));
+    }
+
+    sub ln {
+        my ($self) = @_;
+        $self->new($self->get_value->copy->blog);
     }
 
     sub log10 {

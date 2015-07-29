@@ -128,8 +128,11 @@
       "Sidef::Types::Array::Pair" : {
          "file" : "lib/Sidef/Types/Array/Pair.pm"
       },
-      "Sidef::Types::Array::Range" : {
-         "file" : "lib/Sidef/Types/Array/Range.pm"
+      "Sidef::Types::Array::RangeNumber" : {
+         "file" : "lib/Sidef/Types/Array/RangeNumber.pm"
+      },
+      "Sidef::Types::Array::RangeString" : {
+         "file" : "lib/Sidef/Types/Array/RangeString.pm"
       },
       "Sidef::Types::Black::Hole" : {
          "file" : "lib/Sidef/Types/Black/Hole.pm"

@@ -108,6 +108,11 @@ package Sidef::Types::Number::Number {
         defined($base) ? $self->new($log / CORE::log($base->get_value)) : $self->new($log);
     }
 
+    sub ln {
+        my ($self) = @_;
+        $self->new(CORE::log($self->get_value));
+    }
+
     sub log10 {
         my ($self) = @_;
         $self->new(CORE::log($self->get_value) / CORE::log(10));
