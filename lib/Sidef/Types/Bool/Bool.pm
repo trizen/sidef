@@ -10,20 +10,18 @@ package Sidef::Types::Bool::Bool {
       );
 
     {
-        my %bool = (
-                    true  => (bless \(my $t = 1), __PACKAGE__),
-                    false => (bless \(my $f = 0), __PACKAGE__),
-                   );
+        my $true  = (bless \(my $t = 1), __PACKAGE__);
+        my $false = (bless \(my $f = 0), __PACKAGE__);
 
         sub new {
             my (undef, $bool) = @_;
-            $bool{$bool ? 'true' : 'false'};
+            $bool ? $true : $false;
         }
 
         *call = \&new;
 
-        sub true  { $bool{true} }
-        sub false { $bool{false} }
+        sub true  { $true }
+        sub false { $false }
     }
 
     sub get_value { ${$_[0]} }
