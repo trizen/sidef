@@ -145,9 +145,12 @@ package Sidef::Parser {
             built_in_classes => {
                 map { $_ => 1 }
                   qw(
-                  File FileHandle
-                  Dir DirHandle
-                  Arr Array Pair
+                  File
+                  FileHandle
+                  Dir
+                  DirHandle
+                  Arr Array
+                  Pair
                   MultiArray MultiArr
                   Hash
                   Str String
@@ -165,6 +168,7 @@ package Sidef::Parser {
                   Sig SIG
                   Regex
                   Time
+                  Perl
                   Sidef
                   Parser
                   Block
