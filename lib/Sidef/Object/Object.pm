@@ -67,9 +67,8 @@ package Sidef::Object::Object {
                     return $second->contains($first);
                 }
 
-                # String ~~ Range
-                if (   $s_type eq 'Sidef::Types::Array::RangeNumber'
-                    or $s_type eq 'Sidef::Types::Array::RangeString') {
+                # String ~~ RangeString
+                if ($s_type eq 'Sidef::Types::Array::RangeString') {
                     return $second->contains($first);
                 }
 
@@ -92,9 +91,8 @@ package Sidef::Object::Object {
             # First is Number
             if ($f_type eq 'Sidef::Types::Number::Number') {
 
-                # Number ~~ Range
-                if (   $s_type eq 'Sidef::Types::Array::RangeNumber'
-                    or $s_type eq 'Sidef::Types::Array::RangeString') {
+                # Number ~~ RangeNumber
+                if ($s_type eq 'Sidef::Types::Array::RangeNumber') {
                     return $second->contains($first);
                 }
             }
