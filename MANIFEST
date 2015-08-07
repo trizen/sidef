@@ -225,6 +225,7 @@ scripts/Expensive/anagrams.sf
 scripts/Expensive/anagrams_deranged_anagrams.sf
 scripts/Expensive/baby_size_of_the_universe.sf
 scripts/Expensive/benford_s_law.sf
+scripts/Expensive/binary_multiplier.sf
 scripts/Expensive/dice_game_solver.sf
 scripts/Expensive/factorial_approximations.sf
 scripts/Expensive/fibonacci_validation.sf
