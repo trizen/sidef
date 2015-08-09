@@ -50,9 +50,9 @@ say b;               # => 6
 b.is_a(MyInt)     || die "error!";
 MyInt.is_a(a)     || die "error!";
 
-say a.to_hex;        # => "0x9" -- an hexadecimal string
+say a.to_hex;        # => "9" -- an hexadecimal string
 
-a.to_hex == "0x9" || die "error!";
+a.to_hex == "9"   || die "error!";
 b == 6            || die "error!";
 a == MyInt(9)     || die "error!";
 a == 9            || die "error!";

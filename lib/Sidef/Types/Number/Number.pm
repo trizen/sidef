@@ -547,7 +547,7 @@ package Sidef::Types::Number::Number {
     sub to_bin {
         my ($self) = @_;
         state $x = require Math::BigInt;
-        Sidef::Types::String::String->new(Math::BigInt->new($self->get_value)->as_bin);
+        Sidef::Types::String::String->new(substr(Math::BigInt->new($self->get_value)->as_bin, 2));
     }
 
     *as_bin = \&to_bin;
@@ -555,7 +555,7 @@ package Sidef::Types::Number::Number {
     sub to_oct {
         my ($self) = @_;
         state $x = require Math::BigInt;
-        Sidef::Types::String::String->new(Math::BigInt->new($self->get_value)->as_oct);
+        Sidef::Types::String::String->new(substr(Math::BigInt->new($self->get_value)->as_oct, 1));
     }
 
     *as_oct = \&to_oct;
@@ -563,7 +563,7 @@ package Sidef::Types::Number::Number {
     sub to_hex {
         my ($self) = @_;
         state $x = require Math::BigInt;
-        Sidef::Types::String::String->new(Math::BigInt->new($self->get_value)->as_hex);
+        Sidef::Types::String::String->new(substr(Math::BigInt->new($self->get_value)->as_hex, 2));
     }
 
     *as_hex = \&to_hex;
