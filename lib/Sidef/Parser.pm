@@ -234,8 +234,8 @@ package Sidef::Parser {
                   )
             },
             match_flags_re  => qr{[msixpogcaludn]+},
-            var_name_re     => qr/[[:alpha:]_]\w*(?>::[[:alpha:]_]\w*)*/,
-            method_name_re  => qr/[[:alpha:]_]\w*[!:?]?/,
+            var_name_re     => qr/[_\pL][_\pL\pN]*(?>::[_\pL][_\pL\pN]*)*/,
+            method_name_re  => qr/[_\pL][_\pL\pN]*[!:?]?/,
             var_init_sep_re => qr/\G\h*(?:=>|[=:]|\bis\b)\h*/,
             operators_re    => do {
                 local $" = q{|};
@@ -275,12 +275,12 @@ package Sidef::Parser {
                   );
 
                 qr{
-                      »(?<uop>[[:alpha:]_]\w*|(?&op))«          # unroll method + op (e.g.: »add« or »+«)
-                    | >(?<uop>[[:alpha:]_]\w*|(?&op))<          # unroll method + op (e.g.: >add< or >+<)
-                    | \[(?<rop>(?&op))\]                        # reduce operator    (e.g.: [+])
-                    | <(?<rop>[[:alpha:]_]\w*)>                 # reduce method      (e.g.: <add>)
-                    | «(?<rop>[[:alpha:]_]\w*|(?&op))»          # reduce method + op (e.g.: «add» or «+»)
-                    | \h*\^(?<mop>[[:alpha:]_]\w*[!:?]?)\^\h*   # method-like operator
+                      »(?<uop>[_\pL][_\pL\pN]*|(?&op))«          # unroll method + op (e.g.: »add« or »+«)
+                    | >(?<uop>[_\pL][_\pL\pN]*|(?&op))<          # unroll method + op (e.g.: >add< or >+<)
+                    | \[(?<rop>(?&op))\]                         # reduce operator    (e.g.: [+])
+                    | <(?<rop>[_\pL][_\pL\pN]*)>                 # reduce method      (e.g.: <add>)
+                    | «(?<rop>[_\pL][_\pL\pN]*|(?&op))»          # reduce method + op (e.g.: «add» or «+»)
+                    | \h*\^(?<mop>[_\pL][_\pL\pN]*[!:?]?)\^\h*   # method-like operator
                     | (?<op>@operators
                         | \p{Block: Mathematical_Operators}
                         | \p{Block: Supplemental_Mathematical_Operators}
@@ -853,8 +853,8 @@ package Sidef::Parser {
             }
 
             # Bareword followed by a fat comma or a colon character
-            if (   /\G:([[:alpha:]_]\w*)/gc
-                || /\G([[:alpha:]_]\w*)(?=\h*=>|:(?![=:]))/gc) {
+            if (   /\G:([_\pL][_\pL\pN]*)/gc
+                || /\G([_\pL][_\pL\pN]*)(?=\h*=>|:(?![=:]))/gc) {
                 return Sidef::Types::String::String->new($1);
             }
 
@@ -1492,7 +1492,7 @@ package Sidef::Parser {
                     my $str = $self->get_quoted_string(code => $opt{code});
                     $name = $str;
                 }
-                elsif (/\G(-?\w+)/gc) {
+                elsif (/\G(-?\pL+)/gc) {
                     $name = $1;
                 }
                 else {
