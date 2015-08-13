@@ -384,7 +384,7 @@ package Sidef::Types::Block::Code {
 
         my $fork = Sidef::Types::Block::Fork->new();
 
-        my $pid = fork() // die "[FATAL ERROR]: cannot fork";
+        my $pid = CORE::fork() // die "[FATAL ERROR]: cannot fork";
         if ($pid == 0) {
             srand();
             $self->run;

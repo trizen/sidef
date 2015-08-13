@@ -878,7 +878,7 @@ package Sidef::Types::String::String {
         eval { require(($name . '.pm') =~ s{::}{/}gr) };
 
         if ($@) {
-            die substr($@, 0, rindex($@, ' at ')), "\n";
+            CORE::die CORE::substr($@, 0, CORE::rindex($@, ' at ')), "\n";
         }
 
         $name;

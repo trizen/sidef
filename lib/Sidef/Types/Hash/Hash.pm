@@ -81,7 +81,7 @@ package Sidef::Types::Hash::Hash {
 
     sub length {
         my ($self) = @_;
-        Sidef::Types::Number::Number->new(scalar keys %{$self->{data}});
+        Sidef::Types::Number::Number->new(scalar CORE::keys %{$self->{data}});
     }
 
     *len = \&length;
@@ -248,7 +248,7 @@ package Sidef::Types::Hash::Hash {
     sub each_value {
         my ($self, $code) = @_;
 
-        foreach my $value (values %{$self->{data}}) {
+        foreach my $value (CORE::values %{$self->{data}}) {
             if (defined(my $res = $code->_run_code($value->get_value))) {
                 return $res;
             }
@@ -260,7 +260,7 @@ package Sidef::Types::Hash::Hash {
     sub each_key {
         my ($self, $code) = @_;
 
-        foreach my $key (keys %{$self->{data}}) {
+        foreach my $key (CORE::keys %{$self->{data}}) {
             if (defined(my $res = $code->_run_code(Sidef::Types::String::String->new($key)))) {
                 return $res;
             }
@@ -274,7 +274,7 @@ package Sidef::Types::Hash::Hash {
 
         if (defined($obj)) {
 
-            foreach my $key (keys %{$self->{data}}) {
+            foreach my $key (CORE::keys %{$self->{data}}) {
                 if (
                     defined(my $res = $obj->_run_code(Sidef::Types::String::String->new($key), $self->{data}{$key}->get_value))
                   ) {
