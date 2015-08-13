@@ -215,6 +215,7 @@ scripts/def_variables_implicit.sf
 scripts/define_keyword.sf
 scripts/define_methods_at_runtime.sf
 scripts/echo.sf
+scripts/elementary_cellular_automaton.sf
 scripts/eq_g2.sf
 scripts/escape_unescape.sf
 scripts/eval.sf
