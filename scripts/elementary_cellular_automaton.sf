@@ -3,7 +3,7 @@
 class Automaton(rule, cells) {
 
     method new {
-        rule = sprintf("%08b", rule).split(1).reverse;
+        rule = sprintf("%08b", rule).split(1).map{.to_i}.reverse;
     }
 
     method next {
