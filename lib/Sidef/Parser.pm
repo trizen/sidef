@@ -189,6 +189,7 @@ package Sidef::Parser {
                   for foreach
                   if while
                   given switch
+                  gather
                   continue
                   import
                   include
@@ -196,7 +197,10 @@ package Sidef::Parser {
                   read
                   die
                   warn
-                  assert assert_eq assert_ne
+
+                  assert
+                  assert_eq
+                  assert_ne
 
                   my
                   var
@@ -1251,6 +1255,21 @@ package Sidef::Parser {
                 }
 
                 return $obj;
+            }
+
+            if (/\Ggather\h*(?=\{)/gc) {
+                my $obj = Sidef::Types::Block::Gather->new();
+
+                local $self->{current_gather} = $obj;
+
+                my $block = $self->parse_block(code => $opt{code});
+                $obj->{block} = $block;
+
+                return scalar {$self->{class} => [{self => $obj, call => [{method => 'gather'}]}]};
+            }
+
+            if (exists($self->{current_gather}) and /\G(?=take\b)/) {
+                return $self->{current_gather}, 1;
             }
 
             # Inside a class context

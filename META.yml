@@ -82,6 +82,8 @@ provides:
     file: lib/Sidef/Types/Block/For.pm
   Sidef::Types::Block::Fork:
     file: lib/Sidef/Types/Block/Fork.pm
+  Sidef::Types::Block::Gather:
+    file: lib/Sidef/Types/Block/Gather.pm
   Sidef::Types::Block::Given:
     file: lib/Sidef/Types/Block/Given.pm
   Sidef::Types::Block::Next:
