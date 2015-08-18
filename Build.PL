@@ -35,7 +35,6 @@ my $builder = Module::Build->new(
                  'File::Spec'     => 0,
                  'File::Path'     => 0,
                  'File::Copy'     => 0,
-                 'File::Temp'     => 0,
                  'File::Find'     => 0,
                  'File::Basename' => 0,
                  'List::Util'     => 0,

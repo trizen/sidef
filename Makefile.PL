@@ -14,7 +14,6 @@ WriteMakefile
                    'File::Find' => 0,
                    'File::Path' => 0,
                    'File::Spec' => 0,
-                   'File::Temp' => 0,
                    'Getopt::Std' => 0,
                    'List::Util' => 0,
                    'Math::BigFloat' => 0,
