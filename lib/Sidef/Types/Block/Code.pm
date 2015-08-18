@@ -360,18 +360,14 @@ package Sidef::Types::Block::Code {
     sub fork {
         my ($self) = @_;
 
-        state $x = do {
-            require Storable;
-            require File::Temp;
-        };
-
-        my ($fh, $filename) = File::Temp::tempfile(SUFFIX => '.rst');
-        my $fork = Sidef::Types::Block::Fork->new(result => $filename);
+        state $x = require Storable;
+        open(my $fh, '+>', undef);    # an anonymous temporary file
+        my $fork = Sidef::Types::Block::Fork->new(fh => $fh);
 
         my $pid = fork() // die "[FATAL ERROR]: cannot fork";
         if ($pid == 0) {
             srand();
-            Storable::store($self->run, $filename);
+            Storable::store_fd($self->run, $fh);
             exit 0;
         }
 

@@ -13,14 +13,12 @@ package Sidef::Types::Block::Fork {
         # Wait for the process to finish
         waitpid($self->{pid}, 0);
 
-        # Return when the fork doesn't hold a result
-        exists($self->{result})
-          or return;
+        # Return when the fork doesn't hold a file-handle
+        exists($self->{fh}) or return;
 
         state $x = require Storable;
-        my $ref = eval { Storable::retrieve($self->{result}) };
-        unlink(delete $self->{result});
-        $ref;
+        seek($self->{fh}, 0, 0);    # rewind at the beginning
+        scalar eval { Storable::fd_retrieve($self->{fh}) };
     }
 
     *wait = \&get;
