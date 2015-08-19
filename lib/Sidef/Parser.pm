@@ -189,7 +189,6 @@ package Sidef::Parser {
                   for foreach
                   if while
                   given switch
-                  gather
                   continue
                   import
                   include
