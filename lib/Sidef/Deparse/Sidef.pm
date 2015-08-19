@@ -238,6 +238,14 @@ package Sidef::Deparse::Sidef {
                 $code = 'return';
             }
         }
+        elsif ($ref eq 'Sidef::Types::Block::Gather') {
+            if (exists $addr{refaddr($obj->{block})}) {
+                $code = '';
+            }
+            else {
+                return 'gather ' . $self->deparse_expr({self => $obj->{block}});
+            }
+        }
         elsif ($ref eq 'Sidef::Math::Math') {
             $code = 'Math';
         }
