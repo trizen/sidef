@@ -527,20 +527,36 @@ package Sidef::Parser {
         return ({self => $obj}, 0, '');
     }
 
+    sub _parse_delim {
+        my ($self, %opt) = @_;
+
+        local *_ = $opt{code};
+
+        my @delims = ('|', keys(%{$self->{delim_pairs}}));
+        if (exists $opt{ignore_delim}) {
+            @delims = grep { not exists $opt{ignore_delim}{$_} } @delims;
+        }
+
+        my $regex = do {
+            local $" = "";
+            qr/\G([@delims])\h*/;
+        };
+
+        my $end_delim;
+        if (/$regex/gc) {
+            $end_delim = $self->{delim_pairs}{$1} // $1;
+            $self->parse_whitespace(code => $opt{code});
+        }
+
+        return $end_delim;
+    }
+
     sub get_init_vars {
         my ($self, %opt) = @_;
 
         local *_ = $opt{code};
 
-        my $end_delim;
-        foreach my $key ('|', (keys %{$self->{delim_pairs}})) {
-            next if exists $opt{ignore_delim} and exists $opt{ignore_delim}{$key};
-            if (/\G\Q$key\E\h*/gc) {
-                $end_delim = $self->{delim_pairs}{$key} // '|';
-                $self->parse_whitespace(code => $opt{code});
-                last;
-            }
-        }
+        my $end_delim = $self->_parse_delim(%opt);
 
         my @vars;
         while (/\G([*:]?$self->{var_name_re})/goc) {
@@ -576,15 +592,7 @@ package Sidef::Parser {
 
         local *_ = $opt{code};
 
-        my $end_delim;
-        foreach my $key ('|', (keys %{$self->{delim_pairs}})) {
-            next if exists $opt{ignore_delim} and exists $opt{ignore_delim}{$key};
-            if (/\G\Q$key\E\h*/gc) {
-                $end_delim = $self->{delim_pairs}{$key} // '|';
-                $self->parse_whitespace(code => $opt{code});
-                last;
-            }
-        }
+        my $end_delim = $self->_parse_delim(%opt);
 
         my @var_objs;
         while (/\G([*:]?)($self->{var_name_re})/goc) {
