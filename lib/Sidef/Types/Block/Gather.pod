@@ -1,0 +1,41 @@
+
+=encoding utf8
+
+=head1 NAME
+
+Sidef::Types::Block::Gather
+
+=head1 DESCRIPTION
+
+This object is ...
+
+=head1 SYNOPSIS
+
+var obj = Gather.new(...);
+
+=head1 METHODS
+
+
+=head2 gather
+
+Gather.gather() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 new
+
+Gather.new() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 take
+
+Gather.take() -> I<Obj>
+
+Return the
+
+=cut
