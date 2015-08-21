@@ -723,6 +723,14 @@ Aliases: I<collect>
 
 =cut
 
+=head2 map_operator
+
+Array.map_operator() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 max
 
 Array.max() -> I<Obj>
