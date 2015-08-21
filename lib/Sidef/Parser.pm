@@ -21,13 +21,15 @@ package Sidef::Parser {
                              '...' => 1,
                              '!'   => 1,
                            },
-            special_ops => {
-                            mop => [1, 'map_operator'],
-                            pop => [1, 'pam_operator'],
-                            uop => [1, 'unroll_operator'],
-                            rop => [0, 'reduce_operator'],
-                           },
-            binpost_ops => {                   # infix + postfix operators
+            hyper_ops => {
+
+                # type => [takes args, method name]
+                map    => [1, 'map_operator'],
+                pam    => [1, 'pam_operator'],
+                unroll => [1, 'unroll_operator'],
+                reduce => [0, 'reduce_operator'],
+            },
+            binpost_ops => {    # infix + postfix operators
                              '...' => 1,
                            },
             obj_with_do => {
@@ -292,20 +294,20 @@ package Sidef::Parser {
                         )
                     )
 
-                      »(?<uop>[_\pL][_\pL\pN]*|(?&ops))«          # unroll operator (e.g.: »add« or »+«)
-                    | >>(?<uop>[_\pL][_\pL\pN]*|(?&ops))<<        # unroll operator (e.g.: >>add<< or >>+<<)
+                      »(?<unroll>[_\pL][_\pL\pN]*|(?&ops))«          # unroll operator (e.g.: »add« or »+«)
+                    | >>(?<unroll>[_\pL][_\pL\pN]*|(?&ops))<<        # unroll operator (e.g.: >>add<< or >>+<<)
 
-                    | »(?<mop>[_\pL][_\pL\pN]*|(?&ops))»          # mapping operator (e.g.: »add» or »+»)
-                    | >>(?<mop>[_\pL][_\pL\pN]*|(?&ops))>>        # mapping operator (e.g.: >>add>> or >>+>>)
+                    | »(?<map>[_\pL][_\pL\pN]*|(?&ops))»             # mapping operator (e.g.: »add» or »+»)
+                    | >>(?<map>[_\pL][_\pL\pN]*|(?&ops))>>           # mapping operator (e.g.: >>add>> or >>+>>)
 
-                    | «(?<pop>[_\pL][_\pL\pN]*|(?&ops))«          # reverse mapping operator (e.g.: «add« or «+«)
-                    | <<(?<pop>[_\pL][_\pL\pN]*|(?&ops))<<        # reverse mapping operator (e.g.: <<add<< or <<+<<)
+                    | «(?<pam>[_\pL][_\pL\pN]*|(?&ops))«             # reverse mapping operator (e.g.: «add« or «+«)
+                    | <<(?<pam>[_\pL][_\pL\pN]*|(?&ops))<<           # reverse mapping operator (e.g.: <<add<< or <<+<<)
 
-                    | <<(?<rop>[_\pL][_\pL\pN]*|(?&ops))>>        # reduce operator (e.g.: <<add>> or <<+>>)
-                    | «(?<rop>[_\pL][_\pL\pN]*|(?&ops))»          # reduce operator (e.g.: «add» or «+»)
+                    | <<(?<reduce>[_\pL][_\pL\pN]*|(?&ops))>>        # reduce operator (e.g.: <<add>> or <<+>>)
+                    | «(?<reduce>[_\pL][_\pL\pN]*|(?&ops))»          # reduce operator (e.g.: «add» or «+»)
 
-                    | \h*\^(?<op>[_\pL][_\pL\pN]*[!:?]?)\^\h*     # method-like operator (e.g.: ^add^)
-                    | (?<op>(?&ops))                              # primitive operator   (e.g.: +, -, *, /)
+                    | \h*\^(?<op>[_\pL][_\pL\pN]*[!:?]?)\^\h*        # method-like operator (e.g.: ^add^)
+                    | (?<op>(?&ops))                                 # primitive operator   (e.g.: +, -, *, /)
                 }x;
             },
 
@@ -537,8 +539,8 @@ package Sidef::Parser {
             return (
                     $+,
                     (
-                     exists($self->{special_ops}{$key})
-                     ? $self->{special_ops}{$key}[0]
+                     exists($self->{hyper_ops}{$key})
+                     ? $self->{hyper_ops}{$key}[0]
                      : not(exists $self->{postfix_ops}{$+})
                     ),
                     $key
@@ -1926,23 +1928,21 @@ package Sidef::Parser {
     sub append_method {
         my ($self, %opt) = @_;
 
-        # Standard operator
-        if ($opt{op_type} eq 'op') {
+        # Hyper-operator
+        if (exists $self->{hyper_ops}{$opt{op_type}}) {
+            push @{$opt{array}},
+              {
+                method => $self->{hyper_ops}{$opt{op_type}}[1],
+                arg    => [Sidef::Types::String::String->new($opt{method})],
+              };
+        }
+
+        # Basic operator/method
+        else {
             push @{$opt{array}}, {method => $opt{method}};
         }
 
-        # Special operator
-        elsif (exists $self->{special_ops}{$opt{op_type}}) {
-            push @{$opt{array}},
-              {method => $self->{special_ops}{$opt{op_type}}[1], arg => [Sidef::Types::String::String->new($opt{method})]};
-        }
-
-        # Unknown operator
-        else {
-            die "[PARSER ERROR] Invalid operator of type '$opt{op_type}'";
-        }
-
-        # Append the argument
+        # Append the argument (if any)
         if (exists($opt{arg}) and (%{$opt{arg}} || ($opt{method} =~ /^$self->{operators_re}\z/))) {
             push @{$opt{array}[-1]{arg}}, $opt{arg};
         }
