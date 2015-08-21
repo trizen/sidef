@@ -552,7 +552,7 @@ package Sidef::Parser {
         return ({self => $obj // return}, 0, 'op');
     }
 
-    sub _parse_delim {
+    sub parse_delim {
         my ($self, %opt) = @_;
 
         local *_ = $opt{code};
@@ -581,7 +581,7 @@ package Sidef::Parser {
 
         local *_ = $opt{code};
 
-        my $end_delim = $self->_parse_delim(%opt);
+        my $end_delim = $self->parse_delim(%opt);
 
         my @vars;
         while (/\G([*:]?$self->{var_name_re})/goc) {
@@ -617,7 +617,7 @@ package Sidef::Parser {
 
         local *_ = $opt{code};
 
-        my $end_delim = $self->_parse_delim(%opt);
+        my $end_delim = $self->parse_delim(%opt);
 
         my @var_objs;
         while (/\G([*:]?)($self->{var_name_re})/goc) {
