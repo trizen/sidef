@@ -47,7 +47,39 @@ package Sidef::Math::Math {
 
     sub pi {
         my ($self, $places) = @_;
-        Sidef::Types::Number::Number->new(Math::BigFloat->new(0)->bpi(defined($places) ? $places->get_value : ()));
+
+        $places = defined($places) ? $places->get_value : undef;
+
+        # For large accuracy, the arctan formulas become very inefficient with
+        # Math::BigFloat.  Switch to Brent-Salamin (aka AGM or Gauss-Legendre).
+        if (defined($places) and $places >= 1000) {
+
+            # Code by Dana Jacobsen from RosettaCode
+            # http://rosettacode.org/wiki/Arithmetic-geometric_mean/Calculate_Pi#Perl
+
+            my $acc  = $places + 8;
+            my $HALF = Math::BigFloat->new('0.5');
+
+            my $an = Math::BigFloat->bone;
+            my $bn = $HALF->copy->bsqrt($acc);
+            my $tn = $HALF->copy->bmul($HALF);
+            my $pn = Math::BigFloat->bone;
+
+            while ($pn < $acc) {
+                my $prev_an = $an->copy;
+                $an->badd($bn)->bmul($HALF, $acc);
+                $bn->bmul($prev_an)->bsqrt($acc);
+                $prev_an->bsub($an);
+                $tn->bsub($pn * $prev_an * $prev_an);
+                $pn->badd($pn);
+            }
+            $an->badd($bn);
+            $an->bmul($an, $acc)->bdiv($tn->bmul(4), $places);
+
+            return Sidef::Types::Number::Number->new($an);
+        }
+
+        Sidef::Types::Number::Number->new(Math::BigFloat->bpi(defined($places) ? $places : ()));
     }
 
     *PI = \&pi;
