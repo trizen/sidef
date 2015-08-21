@@ -39,12 +39,11 @@ package Sidef::Types::Array::Array {
     sub unroll_operator {
         my ($self, $operator, $arg) = @_;
 
-        my @array;
-
         if (ref $operator) {
             $operator = $operator->get_value;
         }
 
+        my @array;
         if (defined $arg) {
             foreach my $i (0 .. $#{$self}) {
                 push @array, $self->[$i]->get_value->$operator($arg->[$i]->get_value);

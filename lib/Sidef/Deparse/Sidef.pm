@@ -238,6 +238,12 @@ package Sidef::Deparse::Sidef {
                 $code = 'return';
             }
         }
+        elsif ($ref eq 'Sidef::Module::OO') {
+            $code = "%s($obj->{module})";
+        }
+        elsif ($ref eq 'Sidef::Module::Func') {
+            $code = "%S($obj->{module})";
+        }
         elsif ($ref eq 'Sidef::Types::Block::Gather') {
             if (exists $addr{refaddr($obj->{block})}) {
                 $code = '';

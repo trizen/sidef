@@ -1933,7 +1933,7 @@ package Sidef::Parser {
             push @{$opt{array}},
               {
                 method => $self->{hyper_ops}{$opt{op_type}}[1],
-                arg    => [Sidef::Types::String::String->new($opt{method})],
+                arg    => [$opt{method}],
               };
         }
 
