@@ -23,6 +23,7 @@ package Sidef::Parser {
                            },
             special_ops => {
                             mop => [1, 'map_operator'],
+                            pop => [1, 'pam_operator'],
                             uop => [1, 'unroll_operator'],
                             rop => [0, 'reduce_operator'],
                            },
@@ -291,12 +292,18 @@ package Sidef::Parser {
                         )
                     )
 
-                      »(?<uop>[_\pL][_\pL\pN]*|(?&ops))«          # unroll method + op   (e.g.: »add« or »+«)
-                    | >>(?<uop>[_\pL][_\pL\pN]*|(?&ops))<<        # unroll method + op   (e.g.: >>add<< or >>+<<)
-                    | »(?<mop>[_\pL][_\pL\pN]*|(?&ops))»          # mapping operator     (e.g.: »add» or »+»)
-                    | >>(?<mop>[_\pL][_\pL\pN]*|(?&ops))>>        # mapping operator     (e.g.: >>add>> or >>+>>)
-                    | <<(?<rop>[_\pL][_\pL\pN]*|(?&ops))>>        # reduce method        (e.g.: <<add>> or <<+>>)
-                    | «(?<rop>[_\pL][_\pL\pN]*|(?&ops))»          # reduce method + op   (e.g.: «add» or «+»)
+                      »(?<uop>[_\pL][_\pL\pN]*|(?&ops))«          # unroll operator (e.g.: »add« or »+«)
+                    | >>(?<uop>[_\pL][_\pL\pN]*|(?&ops))<<        # unroll operator (e.g.: >>add<< or >>+<<)
+
+                    | »(?<mop>[_\pL][_\pL\pN]*|(?&ops))»          # mapping operator (e.g.: »add» or »+»)
+                    | >>(?<mop>[_\pL][_\pL\pN]*|(?&ops))>>        # mapping operator (e.g.: >>add>> or >>+>>)
+
+                    | «(?<pop>[_\pL][_\pL\pN]*|(?&ops))«          # reverse mapping operator (e.g.: «add« or «+«)
+                    | <<(?<pop>[_\pL][_\pL\pN]*|(?&ops))<<        # reverse mapping operator (e.g.: <<add<< or <<+<<)
+
+                    | <<(?<rop>[_\pL][_\pL\pN]*|(?&ops))>>        # reduce operator (e.g.: <<add>> or <<+>>)
+                    | «(?<rop>[_\pL][_\pL\pN]*|(?&ops))»          # reduce operator (e.g.: «add» or «+»)
+
                     | \h*\^(?<op>[_\pL][_\pL\pN]*[!:?]?)\^\h*     # method-like operator (e.g.: ^add^)
                     | (?<op>(?&ops))                              # primitive operator   (e.g.: +, -, *, /)
                 }x;

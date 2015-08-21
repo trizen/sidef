@@ -74,6 +74,21 @@ package Sidef::Types::Array::Array {
         $self->new(@array);
     }
 
+    sub pam_operator {
+        my ($self, $operator, $arg) = @_;
+
+        if (ref $operator) {
+            $operator = $operator->get_value;
+        }
+
+        my @array;
+        foreach my $i (0 .. $#{$self}) {
+            push @array, $arg->$operator($self->[$i]->get_value);
+        }
+
+        $self->new(@array);
+    }
+
     sub reduce_operator {
         my ($self, $operator) = @_;
 
