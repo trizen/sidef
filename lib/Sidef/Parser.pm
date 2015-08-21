@@ -21,6 +21,11 @@ package Sidef::Parser {
                              '...' => 1,
                              '!'   => 1,
                            },
+            special_ops => {
+                            mop => [1, 'map_operator'],
+                            uop => [1, 'unroll_operator'],
+                            rop => [0, 'reduce_operator'],
+                           },
             binpost_ops => {                   # infix + postfix operators
                              '...' => 1,
                            },
@@ -278,16 +283,22 @@ package Sidef::Parser {
                   );
 
                 qr{
-                      »(?<uop>[_\pL][_\pL\pN]*|(?&op))«          # unroll method + op (e.g.: »add« or »+«)
-                    | >(?<uop>[_\pL][_\pL\pN]*|(?&op))<          # unroll method + op (e.g.: >add< or >+<)
-                    | \[(?<rop>(?&op))\]                         # reduce operator    (e.g.: [+])
-                    | <(?<rop>[_\pL][_\pL\pN]*)>                 # reduce method      (e.g.: <add>)
-                    | «(?<rop>[_\pL][_\pL\pN]*|(?&op))»          # reduce method + op (e.g.: «add» or «+»)
-                    | \h*\^(?<mop>[_\pL][_\pL\pN]*[!:?]?)\^\h*   # method-like operator
-                    | (?<op>@operators
-                        | \p{Block: Mathematical_Operators}
-                        | \p{Block: Supplemental_Mathematical_Operators}
-                      )
+                    (?(DEFINE)
+                        (?<ops>
+                              @operators
+                            | \p{Block: Mathematical_Operators}
+                            | \p{Block: Supplemental_Mathematical_Operators}
+                        )
+                    )
+
+                      »(?<uop>[_\pL][_\pL\pN]*|(?&ops))«          # unroll method + op   (e.g.: »add« or »+«)
+                    | >>(?<uop>[_\pL][_\pL\pN]*|(?&ops))<<        # unroll method + op   (e.g.: >>add<< or >>+<<)
+                    | »(?<mop>[_\pL][_\pL\pN]*|(?&ops))»          # mapping operator     (e.g.: »add» or »+»)
+                    | >>(?<mop>[_\pL][_\pL\pN]*|(?&ops))>>        # mapping operator     (e.g.: >>add>> or >>+>>)
+                    | <<(?<rop>[_\pL][_\pL\pN]*|(?&ops))>>        # reduce method        (e.g.: <<add>> or <<+>>)
+                    | «(?<rop>[_\pL][_\pL\pN]*|(?&ops))»          # reduce method + op   (e.g.: «add» or «+»)
+                    | \h*\^(?<op>[_\pL][_\pL\pN]*[!:?]?)\^\h*     # method-like operator (e.g.: ^add^)
+                    | (?<op>(?&ops))                              # primitive operator   (e.g.: +, -, *, /)
                 }x;
             },
 
@@ -500,7 +511,6 @@ package Sidef::Parser {
     # 1st: method/operator (or undef)
     # 2nd: does operator require and argument (0 or 1)
     # 3rd: type of operator (e.g.: »+« is "uop", [+] is "rop")
-    # 4th: the position after match
     sub get_method_name {
         my ($self, %opt) = @_;
 
@@ -510,21 +520,27 @@ package Sidef::Parser {
         ($self->parse_whitespace(code => $opt{code}))[1] && return;
 
         # Alpha-numeric method name
-        if (/\G($self->{method_name_re})/gxoc) {
-            return ($1, 0, '');
+        if (/\G($self->{method_name_re})/goc) {
+            return ($1, 0, 'op');
         }
 
         # Operator-like method name
         if (m{\G$self->{operators_re}}goc) {
-            my $uop = exists($+{uop});
-            my $rop = exists($+{rop});
-            return ($+, ($uop ? 1 : $rop ? 0 : not exists $self->{postfix_ops}{$+}), ($uop ? 'uop' : $rop ? 'rop' : ''));
+            my ($key) = keys(%+);
+            return (
+                    $+,
+                    (
+                     exists($self->{special_ops}{$key})
+                     ? $self->{special_ops}{$key}[0]
+                     : not(exists $self->{postfix_ops}{$+})
+                    ),
+                    $key
+                   );
         }
 
         # Method name as expression
         my ($obj) = $self->parse_expr(code => $opt{code});
-        $obj // return;
-        return ({self => $obj}, 0, '');
+        return ({self => $obj // return}, 0, 'op');
     }
 
     sub _parse_delim {
@@ -1903,19 +1919,23 @@ package Sidef::Parser {
     sub append_method {
         my ($self, %opt) = @_;
 
-        if ($opt{op_type} eq '') {
+        # Standard operator
+        if ($opt{op_type} eq 'op') {
             push @{$opt{array}}, {method => $opt{method}};
         }
-        elsif ($opt{op_type} eq 'uop') {
-            push @{$opt{array}}, {method => 'unroll_operator', arg => [Sidef::Types::String::String->new($opt{method})]};
-        }
-        elsif ($opt{op_type} eq 'rop') {
-            push @{$opt{array}}, {method => 'reduce_operator', arg => [Sidef::Types::String::String->new($opt{method})]};
-        }
-        else {
-            die "[PARSER ERROR] Invalid operator of type '$opt{op_type}'...";
+
+        # Special operator
+        elsif (exists $self->{special_ops}{$opt{op_type}}) {
+            push @{$opt{array}},
+              {method => $self->{special_ops}{$opt{op_type}}[1], arg => [Sidef::Types::String::String->new($opt{method})]};
         }
 
+        # Unknown operator
+        else {
+            die "[PARSER ERROR] Invalid operator of type '$opt{op_type}'";
+        }
+
+        # Append the argument
         if (exists($opt{arg}) and (%{$opt{arg}} || ($opt{method} =~ /^$self->{operators_re}\z/))) {
             push @{$opt{array}[-1]{arg}}, $opt{arg};
         }

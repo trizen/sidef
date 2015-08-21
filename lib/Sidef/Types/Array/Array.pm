@@ -40,18 +40,36 @@ package Sidef::Types::Array::Array {
         my ($self, $operator, $arg) = @_;
 
         my @array;
-        my $method = $operator->get_value;
+
+        if (ref $operator) {
+            $operator = $operator->get_value;
+        }
 
         if (defined $arg) {
 
             foreach my $i (0 .. $#{$self}) {
-                push @array, $self->[$i]->get_value->$method($arg->[$i]->get_value);
+                push @array, $self->[$i]->get_value->$operator($arg->[$i]->get_value);
             }
         }
         else {
             foreach my $i (0 .. $#{$self}) {
-                push @array, $self->[$i]->get_value->$method;
+                push @array, $self->[$i]->get_value->$operator;
             }
+        }
+
+        $self->new(@array);
+    }
+
+    sub map_operator {
+        my ($self, $operator, $arg) = @_;
+
+        if (ref $operator) {
+            $operator = $operator->get_value;
+        }
+
+        my @array;
+        foreach my $i (0 .. $#{$self}) {
+            push @array, $self->[$i]->get_value->$operator($arg);
         }
 
         $self->new(@array);
