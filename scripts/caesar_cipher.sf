@@ -1,18 +1,21 @@
-#!/usr/bin/perl
+#!/usr/bin/ruby
 
-func encipher (msg, key, decode) {
+#
+## http://rosettacode.org/wiki/Caesar_cipher
+#
 
-        decode && (key = (26 - key));           # seems that we need the '=-' operator.
-
-        msg.map {
-            _.ord - 65 + key % 26 + 65 . chr;   # no need to worry about the operators precedence.
-        };
+func caesar(msg, key, decode=false) {
+    decode && (key = (26 - key));
+    msg.gsub(/([A-Z])/i, {|c| ((c.uc.ord - 65 + key) % 26) + 65 -> chr});
 };
 
-var msg = 'SIDEF'.to_chars;
+var msg = 'THE FIVE BOXING WIZARDS JUMP QUICKLY';
 
-var enc = ( encipher(msg, 10, false) );
-var dec = ( encipher(enc, 10, true)  );
+var enc = caesar(msg, 10);
+var dec = caesar(enc, 10, true);
 
-enc.join('').say;
-dec.join('').say;
+say "msg: #{msg}";
+say "enc: #{enc}";
+say "dec: #{dec}";
+
+assert_eq(dec, msg);
