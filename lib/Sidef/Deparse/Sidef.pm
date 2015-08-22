@@ -56,17 +56,10 @@ package Sidef::Deparse::Sidef {
         my ($self, $array) = @_;
         '[' . join(
             ', ',
-            map {
-                $self->deparse_expr(
-                                    ref($_) eq 'HASH' ? $_
-                                    : {
-                                       self => (
-                                                ref($_) eq 'Sidef::Variable::Variable' ? $_->get_value
-                                                : $_
-                                               )
-                                      }
-                                   )
-              } @{$array}
+
+            ref($array) eq 'Sidef::Types::Array::Array'
+            ? (map { $self->deparse_expr({self => $_->get_value}) } @{$array})
+            : (map { $self->deparse_expr(ref($_) eq 'HASH' ? $_ : {self => $_}) } @{$array})
           )
           . ']';
     }
