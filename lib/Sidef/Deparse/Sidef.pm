@@ -54,7 +54,21 @@ package Sidef::Deparse::Sidef {
 
     sub _dump_array {
         my ($self, $array) = @_;
-        '[' . join(', ', map { $self->deparse_expr(ref($_) eq 'HASH' ? $_ : {self => $_->get_value}) } @{$array}) . ']';
+        '[' . join(
+            ', ',
+            map {
+                $self->deparse_expr(
+                                    ref($_) eq 'HASH' ? $_
+                                    : {
+                                       self => (
+                                                ref($_) eq 'Sidef::Variable::Variable' ? $_->get_value
+                                                : $_
+                                               )
+                                      }
+                                   )
+              } @{$array}
+          )
+          . ']';
     }
 
     sub _dump_class_name {
@@ -71,7 +85,7 @@ package Sidef::Deparse::Sidef {
         # Self obj
         my $ref = ref($obj);
         if ($ref eq 'HASH') {
-            $code = join(', ', $self->deparse_script($obj));
+            $code = join(', ', exists($obj->{self}) ? $self->deparse_expr($obj) : $self->deparse_script($obj));
             if ($self->{extra_parens}) {
                 $code = "($code)";
             }
@@ -243,6 +257,9 @@ package Sidef::Deparse::Sidef {
         }
         elsif ($ref eq 'Sidef::Module::Func') {
             $code = "%S($obj->{module})";
+        }
+        elsif ($ref eq 'Sidef::Types::Array::List') {
+            $code = join(', ', map { $self->deparse_expr({self => $_}) } @{$obj});
         }
         elsif ($ref eq 'Sidef::Types::Block::Gather') {
             if (exists $addr{refaddr($obj->{block})}) {

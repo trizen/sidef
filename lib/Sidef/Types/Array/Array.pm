@@ -422,7 +422,6 @@ package Sidef::Types::Array::Array {
 
     sub swap {
         my ($self, $i, $j) = @_;
-
         @{$self}[$i, $j] = @{$self}[$j, $i];
         $self;
     }

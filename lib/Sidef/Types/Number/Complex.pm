@@ -202,15 +202,6 @@ package Sidef::Types::Number::Complex {
     *isPos      = \&is_positive;
     *is_pos     = \&is_positive;
 
-    sub is_inf {
-        my ($self) = @_;
-        Sidef::Types::Bool::Bool->new($self->get_value == 'inf');
-    }
-
-    *isInf       = \&is_inf;
-    *is_infinite = \&is_inf;
-    *isInfinite  = \&is_inf;
-
     sub is_negative {
         my ($self) = @_;
         Sidef::Types::Bool::Bool->new($self->get_value < 0);
@@ -226,6 +217,22 @@ package Sidef::Types::Number::Complex {
     }
 
     *isEven = \&is_even;
+
+    sub is_odd {
+        my ($self) = @_;
+        Sidef::Types::Bool::Bool->new($self->get_value % 2 != 0);
+    }
+
+    *isOdd = \&is_odd;
+
+    sub is_inf {
+        my ($self) = @_;
+        Sidef::Types::Bool::Bool->new($self->get_value == 'inf');
+    }
+
+    *isInf       = \&is_inf;
+    *is_infinite = \&is_inf;
+    *isInfinite  = \&is_inf;
 
     sub is_integer {
         my ($self) = @_;
