@@ -154,6 +154,7 @@ package Sidef::Optimizer {
 
                    divmod
 
+                   complex
                    root log
                    max min
                    round roundf
