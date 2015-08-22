@@ -2161,20 +2161,6 @@ package Sidef::Parser {
                             }
 
                             $has_arg = 1;
-                            $struct{$self->{class}}[-1]{self} = {
-                                                                 $self->{class} => [
-                                                                          {
-                                                                           self => $struct{$self->{class}}[-1]{self},
-                                                                           exists($struct{$self->{class}}[-1]{call})
-                                                                           ? (call => delete $struct{$self->{class}}[-1]{call})
-                                                                           : (),
-                                                                           exists($struct{$self->{class}}[-1]{ind})
-                                                                           ? (ind => delete $struct{$self->{class}}[-1]{ind})
-                                                                           : (),
-                                                                          }
-                                                                 ]
-                                                                };
-
                             $self->append_method(
                                                  array   => \@{$struct{$self->{class}}[-1]{call}},
                                                  method  => $method,
