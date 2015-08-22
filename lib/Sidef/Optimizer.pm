@@ -289,6 +289,15 @@ package Sidef::Optimizer {
                    )
                )
             ),
+
+            (
+             map {
+                 { $_, [table('')] }
+               } methods(ARRAY, qw(
+                   reduce_operator
+                   )
+               )
+            ),
         ],
 
         (MATH) => [
@@ -466,7 +475,7 @@ package Sidef::Optimizer {
                 # Method call
                 my $method = $call->{method};
                 if (ref($method) eq 'HASH') {
-                    $method = $self->optimize_expr($method);
+                    $method = $self->optimize_expr($method) // {self => {}};
                 }
 
                 $obj->{call}[$i] = {method => $method};
@@ -485,9 +494,9 @@ package Sidef::Optimizer {
                 #
                 my $optimized = 0;
                 if (    defined($ref_obj)
+                    and exists($rules{$ref_obj})
                     and not exists($expr->{ind})
-                    and ref($method) eq ''
-                    and exists($rules{$ref_obj})) {
+                    and ref($method) eq '') {
 
                     my $code = $ref_obj->SUPER::can($method);
 
@@ -563,6 +572,7 @@ package Sidef::Optimizer {
 
         my %opt_struct;
         my @classes = keys %{$struct};
+
         foreach my $class (@classes) {
             foreach my $i (0 .. $#{$struct->{$class}}) {
                 push @{$opt_struct{$class}}, scalar $self->optimize_expr($struct->{$class}[$i]);
