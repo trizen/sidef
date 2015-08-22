@@ -7,7 +7,7 @@
 class Array {
     method radix_sort(base=10) {
         var arr = self.copy;
-        var rounds = (arr.minmax.map{.abs}.max -> log(base).floor + 1);
+        var rounds = ([arr.minmax].map{.abs}.max -> log(base).floor + 1);
         0 .. rounds-1 each { |i|
             var buckets = (2*base of {[]});
             var base_i = base**i;

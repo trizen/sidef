@@ -354,7 +354,7 @@ package Sidef::Types::Array::Array {
 
     sub minmax {
         my ($self) = @_;
-        $self->new($self->min, $self->max);
+        Sidef::Types::Array::List->new($self->min, $self->max);
     }
 
     sub sum {

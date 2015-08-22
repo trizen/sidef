@@ -195,7 +195,6 @@ package Sidef::Types::String::String {
 
     sub cmp {
         my ($self, $string) = @_;
-
         Sidef::Types::Number::Number->new($self->get_value cmp $string->get_value);
     }
 

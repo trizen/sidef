@@ -85,16 +85,6 @@ package Sidef::Types::Number::Number {
         $self->new($self->get_value->copy->bdec);
     }
 
-    sub lt {
-        my ($self, $num) = @_;
-        Sidef::Types::Bool::Bool->new($self->get_value < $num->get_value);
-    }
-
-    sub gt {
-        my ($self, $num) = @_;
-        Sidef::Types::Bool::Bool->new($self->get_value > $num->get_value);
-    }
-
     sub and {
         my ($self, $num) = @_;
         $self->new($self->get_value->as_int->band($num->get_value->as_int));
@@ -132,6 +122,16 @@ package Sidef::Types::Number::Number {
     sub acmp {
         my ($self, $num) = @_;
         __PACKAGE__->new($self->get_value->bacmp($num->get_value));
+    }
+
+    sub gt {
+        my ($self, $num) = @_;
+        Sidef::Types::Bool::Bool->new($self->get_value > $num->get_value);
+    }
+
+    sub lt {
+        my ($self, $num) = @_;
+        Sidef::Types::Bool::Bool->new($self->get_value < $num->get_value);
     }
 
     sub ge {
@@ -424,15 +424,6 @@ package Sidef::Types::Number::Number {
     *isPos      = \&is_positive;
     *is_pos     = \&is_positive;
 
-    sub is_inf {
-        my ($self) = @_;
-        Sidef::Types::Bool::Bool->new($self->get_value->is_inf);
-    }
-
-    *isInf       = \&is_inf;
-    *is_infinite = \&is_inf;
-    *isInfinite  = \&is_inf;
-
     sub is_negative {
         my ($self) = @_;
         Sidef::Types::Bool::Bool->new($self->get_value->is_neg);
@@ -455,6 +446,15 @@ package Sidef::Types::Number::Number {
     }
 
     *isOdd = \&is_odd;
+
+    sub is_inf {
+        my ($self) = @_;
+        Sidef::Types::Bool::Bool->new($self->get_value->is_inf);
+    }
+
+    *isInf       = \&is_inf;
+    *is_infinite = \&is_inf;
+    *isInfinite  = \&is_inf;
 
     sub is_integer {
         my ($self) = @_;
@@ -570,11 +570,15 @@ package Sidef::Types::Number::Number {
 
     sub is_div {
         my ($self, $num) = @_;
-
         Sidef::Types::Bool::Bool->new($self->get_value % $num->get_value == 0);
     }
 
     *isDiv = \&is_div;
+
+    sub divides {
+        my ($self, $num) = @_;
+        Sidef::Types::Bool::Bool->new($num->get_value % $self->get_value == 0);
+    }
 
     sub commify {
         my ($self) = @_;
@@ -615,7 +619,6 @@ package Sidef::Types::Number::Number {
 
     sub shift_right {
         my ($self, $num, $base) = @_;
-
         $self->new($self->get_value->copy->brsft($num->get_value, (defined($base) ? $base->get_value : ())));
     }
 
