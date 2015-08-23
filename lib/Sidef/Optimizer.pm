@@ -293,14 +293,72 @@ package Sidef::Optimizer {
             (
              map {
                  { $_, [table('')] }
-               } methods(ARRAY, qw(
-                   reduce_operator
-                   )
-               )
+               } methods(ARRAY, qw(reduce_operator))
             ),
         ],
 
         (MATH) => [
+
+            # Math.method(Number)
+            (
+             map {
+                 { $_, [table(NUMBER)] }
+               } methods(MATH, qw(
+                   sqrt
+                   root
+                   pow
+                   exp
+
+                   e
+                   pi
+
+                   atan
+                   atan2
+                   cos
+                   sin
+                   asin
+
+                   log
+                   log2
+                   log10
+                   npow2
+
+                   abs
+                   ceil
+                   floor
+                   )
+               )
+            ),
+
+            # Math.method(Number, Number)
+            (
+             map {
+                 { $_, [table(NUMBER), table(NUMBER)] }
+               } methods(MATH, qw(
+                   exp
+                   atan
+                   atan2
+                   cos
+                   sin
+                   asin
+
+                   log
+                   npow
+                   )
+               )
+            ),
+
+            # Math.method()
+            (
+             map {
+                 { $_, [] }
+               } methods(MATH, qw(
+                   e
+                   pi
+                   inf
+                   )
+               )
+            ),
 
             # Math.method(String)
             (
