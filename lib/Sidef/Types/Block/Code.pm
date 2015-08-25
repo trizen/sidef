@@ -54,6 +54,8 @@ package Sidef::Types::Block::Code {
         Storable::dclone($self);
     }
 
+    *closure = \&copy;
+
     {
         no strict 'refs';
         *{__PACKAGE__ . '::' . '*'} = \&repeat;
