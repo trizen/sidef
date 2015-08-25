@@ -46,7 +46,7 @@ package Sidef::Exec {
             }
         }
 
-        if (ref $self_obj eq 'Sidef::Types::Array::HCArray') {
+        if (ref($self_obj) eq 'Sidef::Types::Array::HCArray') {
             local $self->{var_ref} = 0;
             $self_obj = Sidef::Types::Array::Array->new(
                 map {
@@ -63,7 +63,7 @@ package Sidef::Exec {
                   } @{$self_obj}
             );
         }
-        elsif (ref $self_obj eq 'Sidef::Variable::My') {
+        elsif (ref($self_obj) eq 'Sidef::Variable::Local') {
             $self_obj = $self->{vars}{$self_obj->_get_name};
         }
 
@@ -369,9 +369,11 @@ package Sidef::Exec {
                       : $struct->{$class}[$i - 1]->_get_name
                   }
                   = Sidef::Variable::Variable->new(
-                                  name => ref($struct->{$class}[$i - 1]) eq 'HASH' ? $struct->{$class}[$i - 1]{self}->_get_name
-                                  : $struct->{$class}[$i - 1]->_get_name,
-                                  type => 'var'
+                                      name => (
+                                          ref($struct->{$class}[$i - 1]) eq 'HASH' ? $struct->{$class}[$i - 1]{self}->_get_name
+                                          : $struct->{$class}[$i - 1]->_get_name
+                                      ),
+                                      type => 'var',
                   )
                  );
 
@@ -380,8 +382,8 @@ package Sidef::Exec {
                 my $expr     = $struct->{$class}[$self->{expr_i}];
                 my $ref_expr = ref($expr);
 
-                if (($ref_expr eq 'HASH' and ref($expr->{self}) eq 'Sidef::Variable::InitMy')
-                    or $ref_expr eq 'Sidef::Variable::InitMy') {
+                if (($ref_expr eq 'HASH' and ref($expr->{self}) eq 'Sidef::Variable::InitLocal')
+                    or $ref_expr eq 'Sidef::Variable::InitLocal') {
                     goto INIT_VAR;
                 }
 
@@ -390,8 +392,8 @@ package Sidef::Exec {
                     $ref_expr eq 'HASH' ? $self->execute_expr($expr)
                   : $ref_expr eq 'Sidef::Types::Array::HCArray' ? $self->execute_expr({self => $expr})
                   : $ref_expr eq 'Sidef::Variable::Init' ? do { $expr->set_value; $expr }
-                  : $ref_expr eq 'Sidef::Variable::My'   ? $self->{vars}{$expr->_get_name}
-                  :                                        $expr;
+                  : $ref_expr eq 'Sidef::Variable::Local' ? $self->{vars}{$expr->_get_name}
+                  :                                         $expr;
 
                 my $ref_obj = ref($obj);
                 if (   $ref_obj eq 'Sidef::Types::Block::Return'

@@ -7,7 +7,7 @@ package Sidef::Deparse::Perl {
     use Scalar::Util qw(refaddr reftype);
     use File::Basename qw(dirname);
 
-    # This module is under development...
+    # This module is highly experimental!
 
     my %addr;
     my %type;
@@ -244,10 +244,10 @@ HEADER
                 $code = "struct $obj->{__NAME__} {" . $self->_dump_vars(@vars) . '}';
             }
         }
-        elsif ($ref eq 'Sidef::Variable::InitMy') {
+        elsif ($ref eq 'Sidef::Variable::InitLocal') {
             $code = "my $obj->{name}";
         }
-        elsif ($ref eq 'Sidef::Variable::My') {
+        elsif ($ref eq 'Sidef::Variable::Local') {
             $code = "$obj->{name}";
         }
         elsif ($ref eq 'Sidef::Object::Unary') {

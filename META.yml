@@ -152,14 +152,14 @@ provides:
     file: lib/Sidef/Variable/ClassVar.pm
   Sidef::Variable::Init:
     file: lib/Sidef/Variable/Init.pm
-  Sidef::Variable::InitMy:
-    file: lib/Sidef/Variable/InitMy.pm
+  Sidef::Variable::InitLocal:
+    file: lib/Sidef/Variable/InitLocal.pm
   Sidef::Variable::LazyMethod:
     file: lib/Sidef/Variable/LazyMethod.pm
+  Sidef::Variable::Local:
+    file: lib/Sidef/Variable/Local.pm
   Sidef::Variable::Magic:
     file: lib/Sidef/Variable/Magic.pm
-  Sidef::Variable::My:
-    file: lib/Sidef/Variable/My.pm
   Sidef::Variable::PerlVar:
     file: lib/Sidef/Deparse/Perl.pm
   Sidef::Variable::PerlVarRef:

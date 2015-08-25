@@ -209,7 +209,7 @@ package Sidef::Parser {
                   assert_eq
                   assert_ne
 
-                  my
+                  local
                   var
                   const
                   func
@@ -1034,13 +1034,15 @@ package Sidef::Parser {
                 return Sidef::Types::Number::Number->new($#{$vars});
             }
 
-            # Declaration of the 'my' special variable + class, method and function declarations
+            # Declaration of local variables, classes, methods and functions
             if (
-                   /\G(my|func|class)\b\h*/gc
+                   /\G(local|func|class)\b\h*/gc
                 || /\G(->)\h*/gc
                 || (exists($self->{current_class})
                     && /\G(method)\b\h*/gc)
               ) {
+
+                my $beg_pos = $-[0];
                 my $type =
                     $1 eq '->'
                   ? exists($self->{current_class}) && !(exists($self->{current_method}))
@@ -1085,7 +1087,7 @@ package Sidef::Parser {
                     $name =
                         /\G($self->{var_name_re})\h*/goc ? $1
                       : $type eq 'method' && /\G($self->{operators_re})\h*/goc ? $+
-                      : $type ne 'my' ? ''
+                      : $type ne 'local' ? ''
                       : $self->fatal_error(
                                            error    => "invalid '$type' declaration",
                                            expected => "expected a name",
@@ -1108,7 +1110,7 @@ package Sidef::Parser {
                 }
 
                 my $obj =
-                    $type eq 'my' ? Sidef::Variable::My->new($name)
+                    $type eq 'local' ? Sidef::Variable::Local->new($name)
                   : $type eq 'func'   ? Sidef::Variable::Variable->new(name => $name, type => $type, class => $class_name)
                   : $type eq 'method' ? Sidef::Variable::Variable->new(name => $name, type => $type, class => $class_name)
                   : $type eq 'class'
@@ -1142,8 +1144,11 @@ package Sidef::Parser {
                       };
                 }
 
-                if ($type eq 'my') {
-                    return Sidef::Variable::InitMy->new($name);
+                if ($type eq 'local') {
+                    if (/\G(?![,;)\]\}])/) {
+                        pos($_) = $beg_pos + 5;
+                    }
+                    return Sidef::Variable::InitLocal->new($name);
                 }
 
                 if ($type eq 'class') {
@@ -1694,15 +1699,15 @@ package Sidef::Parser {
                     #warn qq{[!] Implicit declaration of variable "$name", at line $self->{line}\n};
                     unshift @{$self->{vars}{$class}},
                       {
-                        obj   => Sidef::Variable::My->new($name),
+                        obj   => Sidef::Variable::Local->new($name),
                         name  => $name,
                         count => 0,
-                        type  => 'my',
+                        type  => 'local',
                         line  => $self->{line},
                       };
 
                     pos($_) -= length($name);
-                    return Sidef::Variable::InitMy->new($name);
+                    return Sidef::Variable::InitLocal->new($name);
                 }
 
                 # Type constant
@@ -2017,7 +2022,7 @@ package Sidef::Parser {
         my ($obj, $obj_key) = $self->parse_expr(code => $opt{code});
 
         # This object can't take any method!
-        if (ref($obj) eq 'Sidef::Variable::InitMy') {
+        if (ref($obj) eq 'Sidef::Variable::InitLocal') {
             return $obj;
         }
 
@@ -2436,8 +2441,8 @@ package Sidef::Parser {
             if (defined $obj) {
                 push @{$struct{$self->{class}}}, {self => $obj};
 
-                if (ref $obj eq 'Sidef::Variable::InitMy') {
-                    /\G\h*;+/gc;
+                if (ref $obj eq 'Sidef::Variable::InitLocal') {
+                    /\G\h*[,;]+/gc;
                     redo;
                 }
 

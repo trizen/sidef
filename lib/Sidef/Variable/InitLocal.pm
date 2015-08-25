@@ -1,4 +1,4 @@
-package Sidef::Variable::My {
+package Sidef::Variable::InitLocal {
 
     sub new {
         my (undef, $name) = @_;

@@ -4,8 +4,6 @@ package Sidef::Deparse::Sidef {
     our @ISA = qw(Sidef);
     use Scalar::Util qw(refaddr reftype);
 
-    # This module is under development...
-
     my %addr;
 
     sub new {
@@ -137,10 +135,10 @@ package Sidef::Deparse::Sidef {
                 $code = "struct $obj->{__NAME__} {" . $self->_dump_vars(@vars) . '}';
             }
         }
-        elsif ($ref eq 'Sidef::Variable::InitMy') {
-            $code = "my $obj->{name}";
+        elsif ($ref eq 'Sidef::Variable::InitLocal') {
+            $code = "local $obj->{name}";
         }
-        elsif ($ref eq 'Sidef::Variable::My') {
+        elsif ($ref eq 'Sidef::Variable::Local') {
             $code = "$obj->{name}";
         }
         elsif ($ref eq 'Sidef::Variable::Init') {
