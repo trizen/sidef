@@ -60,7 +60,10 @@ class SmartWordWrap(WIDTH=80) {
 
     method find_best(arrays) {
 
-        var best = Hash.new('score' => Math.inf);
+        var best = Hash.new(
+            score => Math.inf,
+            value => [],
+        );
 
         arrays.each { |array_ref|
             var score = 0;
@@ -75,7 +78,7 @@ class SmartWordWrap(WIDTH=80) {
             );
         }
 
-        best.exists(:value) ? best[:value] : '';
+        best[:value];
     }
 
     method wrap(text) {
