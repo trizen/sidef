@@ -160,9 +160,9 @@ class SmartWordWrap(WIDTH=80) {
     }
 }
 
-var sww = SmartWordWrap(WIDTH:6);
+var sww = SmartWordWrap(WIDTH: 6);
 
-var words = %w(aaa bb cc ddddd);;
+var words = %w(aaa bb cc ddddd);
 var wrapped = sww.wrap(words);
 
 say wrapped;

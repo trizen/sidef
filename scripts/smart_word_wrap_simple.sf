@@ -18,7 +18,7 @@ class SmartWordWrap(WIDTH=80) {
         var root = [];
         var len  = 0;
 
-        for (var i = 0 ; i < array.end ; i++) {
+        for (var i = 0 ; i <= array.end ; i++) {
             len += (var word_len = array[i].len);
 
             len > WIDTH && (
@@ -35,7 +35,7 @@ class SmartWordWrap(WIDTH=80) {
             ++len >= WIDTH && break;
         }
 
-        root ? root : (array ? array.join(" ") : ());
+        root ? root : nil;
     }
 
     method combine(root, hash) {
@@ -50,7 +50,7 @@ class SmartWordWrap(WIDTH=80) {
                 }
             }
             else {
-                row = [[root..., value]];
+                row = [[root...]];
             };
             root.pop;
         };
@@ -83,23 +83,19 @@ class SmartWordWrap(WIDTH=80) {
         # Split the text into words
         text.is_a(String) && text.words!;
 
-        var combs = [];
+        var lines = [];
         self.prepare_words(text).each { |path|
-            if (path.is_a(Hash)) {
-                 combs.append(self.combine([], path)...);
-            }
-            else {
-                 combs.append([path]);
-            }
+            lines.append(self.combine([], path)...);
         };
 
-        self.find_best(combs).join("\n");
+        self.find_best(lines).join("\n");
     }
 }
 
-var sww = SmartWordWrap(WIDTH:6);
+var sww = SmartWordWrap(WIDTH: 6);
 
 var words = %w(aaa bb cc ddddd);
+#var words = %w(Lorem ipsum dolor sit amet, consectetur adipiscing elit.);
 var wrapped = sww.wrap(words);
 
 say wrapped;
