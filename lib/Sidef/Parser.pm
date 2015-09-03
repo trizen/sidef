@@ -1539,7 +1539,7 @@ package Sidef::Parser {
                 );
             }
 
-            # Begining of here-document (<<"EOT", <<'EOT', <<EOT)
+            # Beginning of a here-document (<<"EOT", <<'EOT', <<EOT)
             if (/\G<<(?=\S)/gc) {
                 my ($name, $type) = (undef, 1);
 
@@ -1548,7 +1548,7 @@ package Sidef::Parser {
                     my $str = $self->get_quoted_string(code => $opt{code});
                     $name = $str;
                 }
-                elsif (/\G(-?\pL+)/gc) {
+                elsif (/\G(-?[_\pL\pN]+)/gc) {
                     $name = $1;
                 }
                 else {
