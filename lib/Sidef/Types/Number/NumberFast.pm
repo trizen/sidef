@@ -36,6 +36,8 @@ package Sidef::Types::Number::Number {
         $self->new(($self->get_value**$y->get_value) % $mod->get_value);
     }
 
+    *expmod = \&modpow;
+
     sub inc {
         my ($self) = @_;
         $self->new($self->get_value + 1);

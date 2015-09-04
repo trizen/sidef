@@ -70,6 +70,8 @@ package Sidef::Types::Number::Number {
         $self->new($self->get_value->copy->bmodpow($y->get_value, $mod->get_value));
     }
 
+    *expmod = \&modpow;
+
     sub pow {
         my ($self, $num) = @_;
         $self->new($self->get_value**$num->get_value);
@@ -508,8 +510,10 @@ package Sidef::Types::Number::Number {
     *fRound = \&roundf;
 
     sub range {
-        my ($self) = @_;
-        $self->get_value >= 0 ? $self->new(0)->to($self) : $self->to($self->new(0));
+        my ($self, $to) = @_;
+        defined($to)
+          ? ($self->to($to))
+          : ($self->get_value >= 0 ? $self->new(0)->to($self) : $self->to($self->new(0)));
     }
 
     sub length {
