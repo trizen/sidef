@@ -340,10 +340,11 @@ package Sidef::Deparse::Sidef {
         }
         elsif ($ref eq 'Sidef::Types::Number::Number') {
             my $value = $obj->get_value;
-            $code .= ref($value) ? ref($value) eq 'Math::BigRat' ? $value->numify : $value->bstr : $value;
+            my $num = ref($value) ? ref($value) eq 'Math::BigRat' ? $value->numify : $value->bstr : $value;
+            $code = lc($num) eq 'inf' ? '0.inf' : lc($num) eq 'nan' ? '0.nan' : $num;
         }
         elsif ($ref eq 'Sidef::Types::Array::Array' or $ref eq 'Sidef::Types::Array::HCArray') {
-            $code .= $self->_dump_array($obj);
+            $code = $self->_dump_array($obj);
         }
         elsif ($obj->can('dump')) {
             $code = $obj->dump->get_value;
