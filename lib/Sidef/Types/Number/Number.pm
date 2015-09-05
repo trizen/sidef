@@ -210,11 +210,25 @@ package Sidef::Types::Number::Number {
 
         $step = defined($step) ? $step->get_value : 1;
 
-        my $array = Sidef::Types::Array::Array->new();
-        for (my $i = $self->get_value ; $i <= $num->get_value ; $i += $step) {
-            $array->push($self->new($i));
+        my @array;
+        my $to = $num->get_value;
+
+        if ($step == 1) {
+
+            # Unpack limit
+            $to = $to->bstr if ref($to);
+
+            foreach my $i ($self->get_value .. $to) {
+                push @array, $self->new($i);
+            }
         }
-        $array;
+        else {
+            for (my $i = $self->get_value ; $i <= $to ; $i += $step) {
+                push @array, $self->new($i);
+            }
+        }
+
+        Sidef::Types::Array::Array->new(@array);
     }
 
     *arr_to = \&array_to;
@@ -222,11 +236,15 @@ package Sidef::Types::Number::Number {
     sub array_downto {
         my ($self, $num, $step) = @_;
         $step = defined($step) ? $step->get_value : 1;
-        my $array = Sidef::Types::Array::Array->new();
-        for (my $i = $self->get_value ; $i >= $num->get_value ; $i -= $step) {
-            $array->push($self->new($i));
+
+        my @array;
+        my $downto = $num->get_value;
+
+        for (my $i = $self->get_value ; $i >= $downto ; $i -= $step) {
+            push @array, $self->new($i);
         }
-        $array;
+
+        Sidef::Types::Array::Array->new(@array);
     }
 
     *arr_downto = \&array_downto;

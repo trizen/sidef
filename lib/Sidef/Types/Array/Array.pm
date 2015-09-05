@@ -107,7 +107,7 @@ package Sidef::Types::Array::Array {
     sub _grep {
         my ($self, $array, $bool) = @_;
 
-        my $new_array = $self->new();
+        my @new_array;
         foreach my $item (@{$self}) {
 
             my $exists = 0;
@@ -117,10 +117,10 @@ package Sidef::Types::Array::Array {
                 $exists = 1;
             }
 
-            $new_array->push($value) if ($exists - $bool);
+            push(@new_array, $value) if ($exists - $bool);
         }
 
-        $new_array;
+        $self->new(@new_array);
     }
 
     sub multiply {
@@ -133,20 +133,20 @@ package Sidef::Types::Array::Array {
 
         my @obj = map { $_->get_value } @{$self};
 
-        my $array = $self->new;
-        my $len   = @obj / $num->get_value;
+        my @array;
+        my $len = @obj / $num->get_value;
 
         my $i   = 1;
         my $pos = $len;
         while (@obj) {
             my $j = $pos - $i * int($len);
             $pos -= $j if $j >= 1;
-            $array->push($self->new(splice @obj, 0, $len + $j));
+            push @array, $self->new(splice @obj, 0, $len + $j);
             $pos += $len;
             $i++;
         }
 
-        $array;
+        $self->new(@array);
     }
 
     *div = \&divide;
@@ -303,23 +303,23 @@ package Sidef::Types::Array::Array {
 
         my $min = $#{$self} > $#{$array} ? $#{$array} : $#{$self};
 
-        my $new_array = $self->new();
+        my @new_array;
         foreach my $i (0 .. $min) {
-            $new_array->push($self->[$i]->get_value, $array->[$i]->get_value);
+            push @new_array, $self->[$i]->get_value, $array->[$i]->get_value;
         }
 
         if ($#{$self} > $#{$array}) {
             foreach my $i ($min + 1 .. $#{$self}) {
-                $new_array->push($self->[$i]->get_value);
+                push @new_array, $self->[$i]->get_value;
             }
         }
         else {
             foreach my $i ($min + 1 .. $#{$array}) {
-                $new_array->push($array->[$i]->get_value);
+                push @new_array, $array->[$i]->get_value;
             }
         }
 
-        $new_array;
+        $self->new(@new_array);
     }
 
     *zip = \&mesh;
@@ -455,13 +455,13 @@ package Sidef::Types::Array::Array {
     sub flatten {
         my ($self) = @_;
 
-        my $new_array = $self->new;
+        my @new_array;
         foreach my $i (0 .. $#{$self}) {
             my $item = $self->[$i]->get_value;
-            $new_array->push(ref($item) eq ref($self) ? ($item->_flatten) : $item);
+            push @new_array, ref($item) eq ref($self) ? ($item->_flatten) : $item;
         }
 
-        $new_array;
+        $self->new(@new_array);
     }
 
     sub exists {
@@ -1097,13 +1097,12 @@ package Sidef::Types::Array::Array {
             }
         }
 
-        my $array = $self->new;
-
+        my @array;
         while (1) {
-            $array->push($self->new(map { $_->get_value } @{$self}[@idx]));
+            push @array, $self->new(map { $_->get_value } @{$self}[@idx]);
             my $p = $#idx;
             --$p while $idx[$p - 1] > $idx[$p];
-            my $q = $p or (return $array);
+            my $q = $p or (return $self->new(@array));
             push @idx, CORE::reverse CORE::splice @idx, $p;
             ++$q while $idx[$p - 1] > $idx[$q];
             @idx[$p - 1, $q] = @idx[$q, $p - 1];
@@ -1163,13 +1162,13 @@ package Sidef::Types::Array::Array {
     sub join_insert {
         my ($self, $delim_obj) = @_;
 
-        $#{$self} > -1 || return $self->new();
+        $#{$self} > -1 || return $self->new;
 
-        my $array = $self->new($self->[0]->get_value);
+        my @array = $self->[0]->get_value;
         foreach my $i (1 .. $#{$self}) {
-            $array->push($delim_obj, $self->[$i]->get_value);
+            push @array, $delim_obj, $self->[$i]->get_value;
         }
-        $array;
+        $self->new(@array);
     }
 
     *joinInsert = \&join_insert;
