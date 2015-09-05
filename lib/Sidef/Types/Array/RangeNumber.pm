@@ -12,7 +12,7 @@ package Sidef::Types::Array::RangeNumber {
 
     sub by {
         my ($self, $step) = @_;
-        $self->{step} = $step->get_value;
+        $self->{step} = $self->{step} < 0 ? -$step->get_value : $step->get_value;
         $self;
     }
 
