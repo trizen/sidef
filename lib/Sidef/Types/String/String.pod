@@ -760,7 +760,7 @@ String.to() -> I<Obj>
 
 Return the
 
-Aliases: I<...()>, I<..^()>, I<upto>, I<upTo>
+Aliases: I<...()>, I<..^()>, I<upto>, I<upTo>, I<range>
 
 =cut
 

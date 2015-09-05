@@ -252,21 +252,31 @@ package Sidef::Math::Math {
     *rangeSum = \&range_sum;
 
     sub map {
+        my ($self, $value, $in_min, $in_max, $out_min, $out_max) = @_;
+
+        $value = $value->get_value;
+
+        $in_min = $in_min->get_value;
+        $in_max = $in_max->get_value;
+
+        $out_min = $out_min->get_value;
+        $out_max = $out_max->get_value;
+
+        Sidef::Types::Number::Number->new(($value - $in_min) * ($out_max - $out_min) / ($in_max - $in_min) + $out_min);
+    }
+
+    sub map_range {
         my ($self, $amount, $from, $to) = @_;
 
         $amount = $amount->get_value;
         $from   = $from->get_value;
         $to     = $to->get_value;
 
-        my $step = ($to - $from) / $amount;
-        $step == 0 && return (Sidef::Types::Array::Array->new());
-
-        my @values;
-        for (my $i = $from ; $i <= $to ; $i += $step) {
-            push @values, Sidef::Types::Number::Number->new($i);
-        }
-
-        Sidef::Types::Array::Array->new(@values);
+        Sidef::Types::Array::RangeNumber->new(
+                                              from => $from,
+                                              to   => $to,
+                                              step => ($to - $from) / $amount,
+                                             );
     }
 
     sub number_to_percentage {

@@ -81,6 +81,14 @@ Return the
 
 =cut
 
+=head2 reverse
+
+RangeNumber.reverse() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 step
 
 RangeNumber.step() -> I<Obj>

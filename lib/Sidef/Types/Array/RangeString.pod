@@ -73,6 +73,14 @@ Return the
 
 =cut
 
+=head2 reverse
+
+RangeString.reverse() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 to_a
 
 RangeString.to_a() -> I<Obj>

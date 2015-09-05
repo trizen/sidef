@@ -258,6 +258,8 @@ Complex.nok() -> I<Obj>
 
 Return the
 
+Aliases: I<binomial>
+
 =cut
 
 =head2 not
