@@ -192,6 +192,16 @@ Aliases: I<isNeg>, I<is_negative>, I<isNegative>
 
 =cut
 
+=head2 is_odd
+
+Complex.is_odd() -> I<Obj>
+
+Return the
+
+Aliases: I<isOdd>
+
+=cut
+
 =head2 is_pos
 
 Complex.is_pos() -> I<Obj>

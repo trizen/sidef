@@ -350,6 +350,14 @@ Return the
 
 =cut
 
+=head2 divides
+
+Number.divides() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 divmod
 
 Number.divmod() -> I<Obj>
@@ -371,6 +379,16 @@ Return the
 Number.exp() -> I<Obj>
 
 Return the
+
+=cut
+
+=head2 expmod
+
+Number.expmod() -> I<Obj>
+
+Return the
+
+Aliases: I<modpow>
 
 =cut
 
@@ -561,14 +579,6 @@ Return the
 =head2 min
 
 Number.min() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 modpow
-
-Number.modpow() -> I<Obj>
 
 Return the
 

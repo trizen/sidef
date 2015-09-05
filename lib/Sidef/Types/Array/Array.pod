@@ -813,6 +813,14 @@ Return the
 
 =cut
 
+=head2 pam_operator
+
+Array.pam_operator() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 permute
 
 Array.permute() -> I<Obj>

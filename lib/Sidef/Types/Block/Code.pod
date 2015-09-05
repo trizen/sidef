@@ -57,6 +57,8 @@ Code.copy() -> I<Obj>
 
 Return the
 
+Aliases: I<closure>
+
 =cut
 
 =head2 do

@@ -198,6 +198,7 @@ scripts/class_parameters_implicit.sf
 scripts/class_redefinition.sf
 scripts/classes.sf
 scripts/classes_and_objects.sf
+scripts/closure_generator.sf
 scripts/cnp.sf
 scripts/cocktailsort.sf
 scripts/code_interpolation.sf
