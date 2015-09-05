@@ -320,7 +320,12 @@ sub load_math_backend {
     my ($type) = @_;
 
     require Math::BigInt;
+    require Math::BigRat;
+    require Math::BigFloat;
+
     Math::BigInt->import(lib => $type);
+    Math::BigFloat->import(lib => $type);
+    Math::BigRat->import(lib => $type);
 }
 
 sub unload_numbers {
@@ -786,7 +791,7 @@ HEAD
 
                  close $fh;
              }
-         }
+           }
         } => $path
     );
 
