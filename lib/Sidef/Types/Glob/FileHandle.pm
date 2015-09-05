@@ -143,8 +143,8 @@ package Sidef::Types::Glob::FileHandle {
         my ($self, $var_ref) = @_;
 
         if (defined $var_ref) {
-            my $line = CORE::readline($self->{fh});
-            $var_ref->get_var->set_value(Sidef::Types::String::String->new($line // return Sidef::Types::Bool::Bool->false));
+            $var_ref->get_var->set_value(
+                     Sidef::Types::String::String->new(CORE::readline($self->{fh}) // return Sidef::Types::Bool::Bool->false));
             return Sidef::Types::Bool::Bool->true;
         }
 
