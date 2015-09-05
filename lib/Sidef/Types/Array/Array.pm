@@ -1076,6 +1076,21 @@ package Sidef::Types::Array::Array {
         $self->new(sort { $a->$method($b) } map { $_->get_value } @{$self});
     }
 
+    # Insert an object between each element
+    sub join_insert {
+        my ($self, $delim_obj) = @_;
+
+        $#{$self} > -1 || return $self->new;
+
+        my @array = $self->[0]->get_value;
+        foreach my $i (1 .. $#{$self}) {
+            push @array, $delim_obj, $self->[$i]->get_value;
+        }
+        $self->new(@array);
+    }
+
+    *joinInsert = \&join_insert;
+
     sub permute {
         my ($self, $code) = @_;
 
@@ -1157,21 +1172,6 @@ package Sidef::Types::Array::Array {
 
         Sidef::Types::String::String->new(CORE::join($delim, map { $_->get_value } @{$self}));
     }
-
-    # Insert an object between each element
-    sub join_insert {
-        my ($self, $delim_obj) = @_;
-
-        $#{$self} > -1 || return $self->new;
-
-        my @array = $self->[0]->get_value;
-        foreach my $i (1 .. $#{$self}) {
-            push @array, $delim_obj, $self->[$i]->get_value;
-        }
-        $self->new(@array);
-    }
-
-    *joinInsert = \&join_insert;
 
     sub reverse {
         my ($self) = @_;
