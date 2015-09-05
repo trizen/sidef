@@ -830,6 +830,7 @@ scripts/string_encodings.sf
 scripts/string_escapes.sf
 scripts/struct_definition.sf
 scripts/subscript_numbers.sf
+scripts/subtractive_generator.sf
 scripts/sum_of_squares.sf
 scripts/switch.sf
 scripts/sylvesters_sequence.sf
