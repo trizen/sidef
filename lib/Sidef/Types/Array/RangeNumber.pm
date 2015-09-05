@@ -16,14 +16,23 @@ package Sidef::Types::Array::RangeNumber {
         $self;
     }
 
+    sub reverse {
+        my ($self) = @_;
+
+        $self->{step} = -$self->{step};
+        ($self->{from}, $self->{to}) = ($self->{to}, $self->{from});
+
+        $self;
+    }
+
     sub min {
         my ($self) = @_;
-        Sidef::Types::Number::Number->new($self->{direction} eq 'up' ? $self->{from} : $self->{to});
+        Sidef::Types::Number::Number->new($self->{step} > 0 ? $self->{from} : $self->{to});
     }
 
     sub max {
         my ($self) = @_;
-        Sidef::Types::Number::Number->new($self->{direction} eq 'up' ? $self->{to} : $self->{from});
+        Sidef::Types::Number::Number->new($self->{step} > 0 ? $self->{to} : $self->{from});
     }
 
     sub step {
@@ -44,13 +53,13 @@ package Sidef::Types::Array::RangeNumber {
         my $step = $self->{step};
 
         Sidef::Types::Bool::Bool->new(
-                                   $value >= $min and $value <= $max
-                                     and (
-                                         $step == 1 ? 1
-                                       : $self->{direction} eq 'up' ? (int(($value - $min) / $step) * $step == ($value - $min))
-                                       :                              (int(($value - $max) / $step) * $step == ($value - $max))
-                                     )
-        );
+                                      $value >= $min and $value <= $max
+                                        and (
+                                               $step == 1 ? 1
+                                             : $step > 0 ? (int(($value - $min) / $step) * $step == ($value - $min))
+                                             :             (int(($value - $max) / $step) * $step == ($value - $max))
+                                            )
+                                     );
     }
 
     *includes = \&contains;
@@ -62,29 +71,28 @@ package Sidef::Types::Array::RangeNumber {
         my $from  = $self->{from};
         my $limit = $self->{to};
 
-        if ($self->{direction} eq 'up') {
-            if ($step == 1 and not $limit > (-1 >> 1) and not $from > (-1 >> 1)) {
+        if ($step == 1 and not $limit > (-1 >> 1) and not $from > (-1 >> 1)) {
 
-                # Unpack limit
-                $limit = $limit->bstr if ref($limit);
+            # Unpack limit
+            $limit = $limit->bstr if ref($limit);
 
-                foreach my $i ($from .. $limit) {
-                    if (defined(my $res = $code->_run_code(Sidef::Types::Number::Number->new($i)))) {
-                        return $res;
-                    }
+            foreach my $i ($from .. $limit) {
+                if (defined(my $res = $code->_run_code(Sidef::Types::Number::Number->new($i)))) {
+                    return $res;
                 }
-
             }
-            else {
-                for (my $i = $from ; $i <= $limit ; $i += $step) {
-                    if (defined(my $res = $code->_run_code(Sidef::Types::Number::Number->new($i)))) {
-                        return $res;
-                    }
+
+        }
+
+        elsif ($step > 0) {
+            for (my $i = $from ; $i <= $limit ; $i += $step) {
+                if (defined(my $res = $code->_run_code(Sidef::Types::Number::Number->new($i)))) {
+                    return $res;
                 }
             }
         }
         else {
-            for (my $i = $from ; $i >= $limit ; $i -= $step) {
+            for (my $i = $from ; $i >= $limit ; $i += $step) {
                 if (defined(my $res = $code->_run_code(Sidef::Types::Number::Number->new($i)))) {
                     return $res;
                 }
@@ -111,14 +119,14 @@ package Sidef::Types::Array::RangeNumber {
         my ($name) = (defined($AUTOLOAD) ? ($AUTOLOAD =~ /^.*[^:]::(.*)$/) : '');
 
         my $array;
-        my $method = $self->{direction} eq 'up' ? 'array_to' : 'array_downto';
+        my $method = $self->{step} > 0 ? 'array_to' : 'array_downto';
 
         my $step = $self->{step};
         my $from = $self->{from};
         my $to   = $self->{to};
 
-        $array = Sidef::Types::Number::Number->new($from)
-          ->$method(Sidef::Types::Number::Number->new($to), $step != 1 ? Sidef::Types::Number::Number->new($step) : ());
+        $array = Sidef::Types::Number::Number->new($from)->$method(Sidef::Types::Number::Number->new($to),
+                                                         abs($step) != 1 ? Sidef::Types::Number::Number->new(abs($step)) : ());
 
         $name eq '' ? $array : $array->$name(@args);
     }

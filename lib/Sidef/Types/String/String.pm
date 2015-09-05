@@ -173,21 +173,22 @@ package Sidef::Types::String::String {
     sub to {
         my ($self, $string) = @_;
         Sidef::Types::Array::RangeString->new(
-                                              from      => $self->get_value,
-                                              to        => $string->get_value,
-                                              direction => 'up'
+                                              from => $self->get_value,
+                                              to   => $string->get_value,
+                                              asc  => 1,
                                              );
     }
 
-    *upto = \&to;
-    *upTo = \&to;
+    *upto  = \&to;
+    *upTo  = \&to;
+    *range = \&to;
 
     sub downto {
         my ($self, $string) = @_;
         Sidef::Types::Array::RangeString->new(
-                                              from      => $self->get_value,
-                                              to        => $string->get_value,
-                                              direction => 'down'
+                                              from => $self->get_value,
+                                              to   => $string->get_value,
+                                              asc  => 0,
                                              );
     }
 

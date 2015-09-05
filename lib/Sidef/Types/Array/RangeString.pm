@@ -12,17 +12,26 @@ package Sidef::Types::Array::RangeString {
 
     sub min {
         my ($self) = @_;
-        Sidef::Types::String::String->new($self->{direction} eq 'up' ? $self->{from} : $self->{to});
+        Sidef::Types::String::String->new($self->{asc} ? $self->{from} : $self->{to});
     }
 
     sub max {
         my ($self) = @_;
-        Sidef::Types::String::String->new($self->{direction} eq 'up' ? $self->{to} : $self->{from});
+        Sidef::Types::String::String->new($self->{asc} ? $self->{to} : $self->{from});
     }
 
     sub bounds {
         my ($self) = @_;
         Sidef::Types::Array::List->new($self->min, $self->max);
+    }
+
+    sub reverse {
+        my ($self) = @_;
+
+        $self->{asc} ^= 1;
+        ($self->{from}, $self->{to}) = ($self->{to}, $self->{from});
+
+        $self;
     }
 
     sub contains {
@@ -42,7 +51,7 @@ package Sidef::Types::Array::RangeString {
         my $from = $self->{from};
         my $to   = $self->{to};
 
-        if ($self->{direction} eq 'up') {
+        if ($self->{asc}) {
             if (length($from) == 1 and length($to) == 1) {
                 foreach my $i (ord($from) .. ord($to)) {
                     if (defined(my $res = $code->_run_code(Sidef::Types::String::String->new(chr($i))))) {
@@ -77,6 +86,7 @@ package Sidef::Types::Array::RangeString {
             }
         }
 
+        $self;
     }
 
     our $AUTOLOAD;
@@ -96,12 +106,9 @@ package Sidef::Types::Array::RangeString {
         my ($name) = (defined($AUTOLOAD) ? ($AUTOLOAD =~ /^.*[^:]::(.*)$/) : '');
 
         my $array;
-        my $method = $self->{direction} eq 'up' ? 'array_to' : 'array_downto';
+        my $method = $self->{asc} ? 'array_to' : 'array_downto';
 
-        my $from = $self->{from};
-        my $to   = $self->{to};
-        $array = Sidef::Types::String::String->new($from)->$method(Sidef::Types::String::String->new($to));
-
+        $array = Sidef::Types::String::String->new($self->{from})->$method(Sidef::Types::String::String->new($self->{to}));
         $name eq '' ? $array : $array->$name(@args);
     }
 

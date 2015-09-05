@@ -253,10 +253,9 @@ package Sidef::Types::Number::Number {
         my ($self, $num, $step) = @_;
         $step = defined($step) ? $step->get_value : 1;
         Sidef::Types::Array::RangeNumber->new(
-                                              from      => $self->get_value,
-                                              to        => $num->get_value,
-                                              step      => $step,
-                                              direction => 'up'
+                                              from => $self->get_value,
+                                              to   => $num->get_value,
+                                              step => $step,
                                              );
     }
 
@@ -267,14 +266,22 @@ package Sidef::Types::Number::Number {
         my ($self, $num, $step) = @_;
         $step = defined($step) ? $step->get_value : 1;
         Sidef::Types::Array::RangeNumber->new(
-                                              from      => $self->get_value,
-                                              to        => $num->get_value,
-                                              step      => $step,
-                                              direction => 'down'
+                                              from => $self->get_value,
+                                              to   => $num->get_value,
+                                              step => -$step,
                                              );
     }
 
     *downTo = \&downto;
+
+    sub range {
+        my ($self, $to) = @_;
+
+        defined($to)
+          ? $self->to($to)
+          : $self->new(0)->to($self);
+
+    }
 
     sub sqrt {
         my ($self) = @_;
@@ -527,13 +534,6 @@ package Sidef::Types::Number::Number {
     *fround = \&roundf;
     *fRound = \&roundf;
 
-    sub range {
-        my ($self, $to) = @_;
-        defined($to)
-          ? ($self->to($to))
-          : ($self->get_value >= 0 ? $self->new(0)->to($self) : $self->to($self->new(0)));
-    }
-
     sub length {
         my ($self) = @_;
         $self->new($self->get_value->length);
@@ -550,6 +550,8 @@ package Sidef::Types::Number::Number {
         my ($self, $k) = @_;
         $self->new($self->get_value->as_int->bnok($k->get_value));
     }
+
+    *binomial = \&nok;
 
     sub of {
         my ($self, $obj) = @_;

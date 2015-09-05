@@ -276,8 +276,11 @@ package Sidef::Types::Number::Complex {
     *fround = \&roundf;
     *fRound = \&roundf;
 
-    sub digit  { ... }
-    sub nok    { ... }
+    sub digit { ... }
+
+    sub nok { ... }
+    *binomial = \&nok;
+
     sub length { ... }
 
     *len = \&length;

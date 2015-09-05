@@ -799,7 +799,7 @@ package Sidef::Types::Array::Array {
 
     sub range {
         my ($self) = @_;
-        Sidef::Types::Array::RangeNumber->new(from => 0, to => $#{$self}, step => 1, direction => 'up');
+        Sidef::Types::Array::RangeNumber->new(from => 0, to => $#{$self}, step => 1);
     }
 
     sub pairs {

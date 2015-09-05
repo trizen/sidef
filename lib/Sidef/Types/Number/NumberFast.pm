@@ -287,6 +287,8 @@ package Sidef::Types::Number::Number {
         $n->factorial->div($n->subtract($k)->factorial->multiply($k->factorial));
     }
 
+    *binomial = \&nok;
+
     sub to_bin {
         my ($self) = @_;
 
