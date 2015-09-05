@@ -1,0 +1,21 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Currying
+#
+
+func curry(f, *args1) {
+    func (*args2) {
+        f(args1..., args2...);
+    }.copy
+}
+
+func add(a, b) {
+    a + b
+}
+
+var adder = curry(add, 1);
+var n = adder(3);
+
+say n;
+assert_eq(4, n);

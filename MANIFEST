@@ -209,6 +209,7 @@ scripts/common_directory.sf
 scripts/complex_numbes.sf
 scripts/count_in_factors.sf
 scripts/cramers_method.sf
+scripts/currying.sf
 scripts/cutting_edge_features.sf
 scripts/cyclic_numbers.sf
 scripts/DATA_handle.sf
@@ -400,6 +401,7 @@ scripts/Rosettacode/Accumulator_factory.sf
 scripts/Rosettacode/Accumulator_factory_1.sf
 scripts/Rosettacode/Ackermann_function.sf
 scripts/Rosettacode/Add_a_variable_to_a_class_instance_at_runtime.sf
+scripts/Rosettacode/AKS_test_for_primes.sf
 scripts/Rosettacode/Align_columns.sf
 scripts/Rosettacode/Anonymous_recursion.sf
 scripts/Rosettacode/Anonymous_recursion_1.sf
@@ -522,6 +524,7 @@ scripts/Rosettacode/Graphical/Sierpinski_triangle_Graphical.sf
 scripts/Rosettacode/Graphical/Ulam_spiral_[for_primes].sf
 scripts/Rosettacode/Graphical/Window_creation.sf
 scripts/Rosettacode/Graphical/Window_creation_1.sf
+scripts/Rosettacode/Graphical/Yin_and_yang.sf
 scripts/Rosettacode/Gray_code.sf
 scripts/Rosettacode/Greatest_common_divisor.sf
 scripts/Rosettacode/Greatest_common_divisor_1.sf
@@ -648,6 +651,7 @@ scripts/Rosettacode/Optional_parameters.sf
 scripts/Rosettacode/Palindrome_detection.sf
 scripts/Rosettacode/Palindrome_detection_1.sf
 scripts/Rosettacode/Pangram_checker.sf
+scripts/Rosettacode/Pascal_s_triangle.sf
 scripts/Rosettacode/Permutations.sf
 scripts/Rosettacode/Permutations_1.sf
 scripts/Rosettacode/Permutations_2.sf
@@ -690,6 +694,7 @@ scripts/Rosettacode/Roman_numerals_Encode.sf
 scripts/Rosettacode/Roots_of_a_quadratic_function.sf
 scripts/Rosettacode/Run-length_encoding.sf
 scripts/Rosettacode/Run-length_encoding_1.sf
+scripts/Rosettacode/Runge-Kutta_method.sf
 scripts/Rosettacode/Runtime_evaluation.sf
 scripts/Rosettacode/Runtime_evaluation_In_an_environment.sf
 scripts/Rosettacode/Scope_Function_names_and_labels.sf
@@ -725,6 +730,7 @@ scripts/Rosettacode/Slow/Rate_counter.sf
 scripts/Rosettacode/Slow/Roots_of_a_function.sf
 scripts/Rosettacode/Slow/Sequence_of_non-squares.sf
 scripts/Rosettacode/Slow/Statistics_Basic.sf
+scripts/Rosettacode/Slow/Stern-Brocot_sequence.sf
 scripts/Rosettacode/Slow/Sudoku.sf
 scripts/Rosettacode/Slow/Time_a_function.sf
 scripts/Rosettacode/Sort_an_integer_array.sf
