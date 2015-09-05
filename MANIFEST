@@ -191,6 +191,7 @@ scripts/caesar_cipher.sf
 scripts/calendar.sf
 scripts/catalan_numbers.sf
 scripts/catalan_numbers_recursive.sf
+scripts/chinese_remainder_theorem.sf
 scripts/class_concept.sf
 scripts/class_config.sf
 scripts/class_inheritance.sf
