@@ -124,6 +124,26 @@ package Sidef::Optimizer {
             # String.method(String | Number | Regex)
             #(map {{$_, [table(STRING, NUMBER, REGEX)]}} methods(STRING, qw(split))),
 
+            # String.method(String, String)
+            (
+             map {
+                 { $_, [table(STRING), table(STRING)] }
+               } methods(STRING, qw(
+                   tr
+                   )
+               )
+            ),
+
+            # String.method(String, String, String)
+            (
+             map {
+                 { $_, [table(STRING), table(STRING), table(STRING)] }
+               } methods(STRING, qw(
+                   tr
+                   )
+               )
+            ),
+
             # String.method(String, Number)
             (
              map {

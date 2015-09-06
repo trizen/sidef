@@ -362,6 +362,8 @@ scripts/next.sf
 scripts/number_types.sf
 scripts/object_copy.sf
 scripts/objects_init.sf
+scripts/one-dimensional_cellular_automata.sf
+scripts/one-dimensional_cellular_automata_2.sf
 scripts/open.sf
 scripts/pairs_test.sf
 scripts/palindrome_recursive.sf

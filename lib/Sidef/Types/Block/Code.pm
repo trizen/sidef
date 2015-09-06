@@ -254,10 +254,6 @@ package Sidef::Types::Block::Code {
                 }
             }
 
-            foreach my $key (keys %named_vars) {
-                warn "[WARN] No such named argument: '$key'\n";
-            }
-
             $last == 0
               ? @{$self->{init_vars}}
               : @{$self->{init_vars}}[0 .. $last - 1];
