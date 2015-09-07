@@ -55,7 +55,7 @@ my %ignored_methods = (
                        'Sidef::Types::Block::Code'      => [qw(new)],
                        'Sidef::Types::Block::Given'     => [qw(new)],
                        'Sidef::Types::Block::Continue'  => [qw(new)],
-                       'Sidef::Types::Regex::Matches'   => [qw(new)],
+                       'Sidef::Types::Regex::Match'     => [qw(new)],
                        'Sidef::Types::Regex::Regex'     => [qw(new)],
                        'Sidef::Types::Black::Hole'      => [qw(new)],
                       );

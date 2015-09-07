@@ -54,7 +54,7 @@ package Sidef::Types::Regex::Regex {
             return $match // $self->matches(Sidef::Types::String::String->new);
         }
 
-        Sidef::Types::Regex::Matches->new(
+        Sidef::Types::Regex::Match->new(
                                           obj    => $object->get_value,
                                           self   => $self,
                                           parser => $self->{parser},

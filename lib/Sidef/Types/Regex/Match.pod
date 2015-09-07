@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-Sidef::Types::Regex::Matches
+Sidef::Types::Regex::Match
 
 =head1 DESCRIPTION
 
@@ -11,7 +11,7 @@ This object is ...
 
 =head1 SYNOPSIS
 
-var obj = Matches.new(...);
+var obj = Match.new(...);
 
 
 =head1 INHERITS
@@ -25,7 +25,7 @@ Inherits methods from:
 
 =head2 cap
 
-Matches.cap() -> I<Obj>
+Match.cap() -> I<Obj>
 
 Return the
 
@@ -33,9 +33,17 @@ Aliases: I<caps>, I<captures>
 
 =cut
 
+=head2 join
+
+Match.join() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 ncap
 
-Matches.ncap() -> I<Obj>
+Match.ncap() -> I<Obj>
 
 Return the
 
@@ -45,7 +53,7 @@ Aliases: I<ncaps>, I<named_captures>
 
 =head2 pos
 
-Matches.pos() -> I<Obj>
+Match.pos() -> I<Obj>
 
 Return the
 
@@ -53,10 +61,18 @@ Return the
 
 =head2 to_bool
 
-Matches.to_bool() -> I<Obj>
+Match.to_bool() -> I<Obj>
 
 Return the
 
 Aliases: I<matched>, I<is_successful>
+
+=cut
+
+=head2 to_s
+
+Match.to_s() -> I<Obj>
+
+Return the
 
 =cut

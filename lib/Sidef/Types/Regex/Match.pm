@@ -1,4 +1,4 @@
-package Sidef::Types::Regex::Matches {
+package Sidef::Types::Regex::Match {
 
     use 5.014;
     use overload
