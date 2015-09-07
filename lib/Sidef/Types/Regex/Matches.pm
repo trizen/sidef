@@ -94,6 +94,11 @@ package Sidef::Types::Regex::Matches {
     *ncap  = \&named_captures;
     *ncaps = \&named_captures;
 
+    sub join {
+        my ($self, $sep) = @_;
+        Sidef::Types::String::String->new(join($sep->get_value, @{$self->{captures}}));
+    }
+
     sub to_s {
         my ($self) = @_;
         Sidef::Types::String::String->new(join(' ', @{$self->{captures}}));
