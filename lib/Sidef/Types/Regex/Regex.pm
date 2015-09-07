@@ -55,11 +55,11 @@ package Sidef::Types::Regex::Regex {
         }
 
         Sidef::Types::Regex::Match->new(
-                                          obj    => $object->get_value,
-                                          self   => $self,
-                                          parser => $self->{parser},
-                                          pos    => defined($pos) ? $pos->get_value : undef,
-                                         );
+                                        obj    => $object->get_value,
+                                        self   => $self,
+                                        parser => $self->{parser},
+                                        pos    => defined($pos) ? $pos->get_value : undef,
+                                       );
     }
 
     *matches = \&match;
