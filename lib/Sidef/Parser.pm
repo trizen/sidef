@@ -1433,16 +1433,16 @@ package Sidef::Parser {
                 my $strings = $self->get_quoted_words(code => $opt{code});
 
                 if ($type eq 'w' or $type eq '<') {
-                    return Sidef::Types::Array::Array->new(map { Sidef::Types::String::String->new(s{\\(?=[\\#\s])}{}gr) }
-                                                           @{$strings});
+                    return Sidef::Types::Array::HCArray->new(map { Sidef::Types::String::String->new(s{\\(?=[\\#\s])}{}gr) }
+                                                             @{$strings});
                 }
                 elsif ($type eq 'i') {
-                    return Sidef::Types::Array::Array->new(map { Sidef::Types::Number::Number->new_int(s{\\(?=[\\#\s])}{}gr) }
-                                                           @{$strings});
+                    return Sidef::Types::Array::HCArray->new(
+                                              map { Sidef::Types::Number::Number->new_int(s{\\(?=[\\#\s])}{}gr) } @{$strings});
                 }
                 elsif ($type eq 'n') {
-                    return Sidef::Types::Array::Array->new(map { Sidef::Types::Number::Number->new(s{\\(?=[\\#\s])}{}gr) }
-                                                           @{$strings});
+                    return Sidef::Types::Array::HCArray->new(map { Sidef::Types::Number::Number->new(s{\\(?=[\\#\s])}{}gr) }
+                                                             @{$strings});
                 }
 
                 my ($inline_expression, @objs);
@@ -1457,7 +1457,7 @@ package Sidef::Parser {
                 return (
                         $inline_expression
                         ? Sidef::Types::Array::HCArray->new(map { {self => $_} } @objs)
-                        : Sidef::Types::Array::Array->new(@objs)
+                        : Sidef::Types::Array::HCArray->new(@objs)
                        );
             }
 
