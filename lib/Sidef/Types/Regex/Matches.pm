@@ -1,7 +1,9 @@
 package Sidef::Types::Regex::Matches {
 
     use 5.014;
-    use overload q{bool} => \&to_bool;
+    use overload
+      q{bool} => \&to_bool,
+      q{""}   => \&to_s;
 
     use parent qw(
       Sidef::Object::Object
@@ -91,6 +93,11 @@ package Sidef::Types::Regex::Matches {
 
     *ncap  = \&named_captures;
     *ncaps = \&named_captures;
+
+    sub to_s {
+        my ($self) = @_;
+        Sidef::Types::String::String->new(join(' ', @{$self->{captures}}));
+    }
 };
 
 1
