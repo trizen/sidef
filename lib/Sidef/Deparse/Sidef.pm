@@ -424,6 +424,18 @@ package Sidef::Deparse::Sidef {
             foreach my $call (@{$expr->{call}}) {
                 my $method = $call->{method};
 
+                if (ref($method) ne '') {
+                    $method = (
+                               '('
+                                 . $self->deparse_expr(
+                                                       ref($method) eq 'HASH'
+                                                       ? $method
+                                                       : {self => $method}
+                                                      )
+                                 . ')'
+                              );
+                }
+
                 if ($code eq 'Hash' and $method eq ':') {
                     $method = 'new';
                 }
@@ -434,10 +446,7 @@ package Sidef::Deparse::Sidef {
                     $code = '(' . $code . ')';
                 }
 
-                if (ref($method) eq 'HASH') {
-                    $code .= '.(' . $self->deparse_expr($method) . ')';
-                }
-                elsif ($method =~ /^[[:alpha:]_]/) {
+                if ($method =~ /^[[:alpha:]_(]/) {
                     $code .= '.' if $code ne '';
                     $code .= $method;
                 }
