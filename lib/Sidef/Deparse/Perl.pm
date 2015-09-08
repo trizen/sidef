@@ -51,6 +51,7 @@ package Sidef::Deparse::Perl {
         $opts{before} .= <<'HEADER';
 
 use utf8;
+use 5.014;
 use Sidef;
 use Sidef::Types::Number::Number;
 use Sidef::Types::Number::NumberFast;
@@ -58,9 +59,6 @@ use Sidef::Types::Number::NumberFast;
 binmode(STDIN,  ":utf8");
 binmode(STDOUT, ":utf8");
 binmode(STDERR, ":utf8") if $^P == 0;    # to work under Devel::* modules
-
-use 5.014;
-no if $] >= 5.018, warnings => 'experimental::lexical_topic';
 
 my $ARGV = Sidef::Types::Array::Array->new(map {Sidef::Types::String::String->new($_)} @ARGV);
 
@@ -169,7 +167,7 @@ HEADER
 
     sub _dump_var {
         my ($self, $var) = @_;
-        exists($var->{array}) ? '@' : exists($var->{hash}) ? '%' : '$' . $var->{name};
+        exists($var->{array}) ? '@' : exists($var->{hash}) ? '%' : '$' . ($var->{name} eq '_' ? '__' : $var->{name});
     }
 
     sub _dump_vars {
@@ -216,7 +214,7 @@ HEADER
         }
         elsif ($ref eq 'Sidef::Variable::Variable') {
             if ($obj->{type} eq 'var' or $obj->{type} eq 'static' or $obj->{type} eq 'const') {
-                $code = '$' . $obj->{name};
+                $code = $self->_dump_var($obj);
             }
             elsif ($obj->{type} eq 'func' or $obj->{type} eq 'method') {
                 if ($addr{$refaddr}++) {
@@ -225,9 +223,22 @@ HEADER
                 }
                 else {
                     my $block = $obj->{value};
-                    $code = "sub $obj->{name}" if $obj->{name} ne '';
-                    local $self->{function} = refaddr($block) if $obj->{name} ne '';
-                    $code .= $self->deparse_expr({self => $block});
+
+                    # Alphanumeric name
+                    if ($obj->{name} =~ /^[_\pL][_\pL\pN]*\z/) {
+                        $code = "sub $obj->{name}" if $obj->{name} ne '';
+                        local $self->{function} = refaddr($block) if $obj->{name} ne '';
+                        $code .= $self->deparse_expr({self => $block});
+                    }
+
+                    # Non-alphanumeric name
+                    else {
+                        $code =
+                          "{ no strict 'refs'; *{__PACKAGE__ . '::' . " . q{"} . quotemeta($obj->{name}) . q{"} . "} = sub ";
+                        local $self->{function} = refaddr($block) if $obj->{name} ne '';
+                        $code .= $self->deparse_expr({self => $block});
+                        $code .= '}';
+                    }
                 }
             }
         }
@@ -245,10 +256,10 @@ HEADER
             }
         }
         elsif ($ref eq 'Sidef::Variable::InitLocal') {
-            $code = "local $obj->{name}";
+            $code = 'my ' . $self->_dump_var($obj);
         }
         elsif ($ref eq 'Sidef::Variable::Local') {
-            $code = "$obj->{name}";
+            $code = $self->_dump_var($obj);
         }
         elsif ($ref eq 'Sidef::Object::Unary') {
             $code = qq{'$ref'};
@@ -370,7 +381,7 @@ HEADER
 
                         if (not $is_class) {
                             if ($#vars == 0 and $vars[0]{name} eq '_') {
-                                $code .= ' ' x $Sidef::SPACES . "\$_ = \$_[0] if exists \$_[0];\n";
+                                $code .= ' ' x $Sidef::SPACES . "\$__ = \$_[0] if exists \$_[0];\n";
                             }
                             else {
                                 foreach my $i (0 .. $#{vars}) {

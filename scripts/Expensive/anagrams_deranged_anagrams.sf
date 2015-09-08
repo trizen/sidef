@@ -27,7 +27,7 @@ func main () {
     var words = lwp.get('http://www.puzzlers.org/pub/wordlists/unixdict.txt').words;
     "** Processing the words...".say;
 
-    var time = Time.now;
+    var time = Time.micro;
     var letter_list = Hash.new;
 
     # Store anagrams in hash table by letters they contain
@@ -35,7 +35,7 @@ func main () {
         letter_list[word.sort] \\= [] append(word);
     }
 
-    "** The hashing took %d seconds!\n".printf(Time.now - time);
+    "** The hashing took %.5f seconds!\n".printf(Time.micro - time);
 
     letter_list.keys
          .grep {|k| letter_list[k].len > 1}      # take only ones with anagrams
@@ -44,7 +44,7 @@ func main () {
 
         # if we find a pair, they are the longested due to the sort before
         find_deranged(letter_list[key]) && (
-            "** The process took %d seconds!\n".printf(Time.now - time);
+            "** The process took %.5f seconds!\n".printf(Time.micro - time);
             break;
         );
     }
