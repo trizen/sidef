@@ -247,7 +247,7 @@ package Sidef::Types::Array::Array {
         my ($self, $obj) = @_;
 
         my $counter = 0;
-        if ($obj->can('run')) {
+        if ($obj->SUPER::isa('Sidef::Types::Block::Code')) {
 
             foreach my $item (@{$self}) {
                 if ($obj->run($item->get_value)) {
@@ -430,7 +430,7 @@ package Sidef::Types::Array::Array {
         my ($self, $arg) = @_;
 
         if (defined $arg) {
-            if ($arg->can('run')) {
+            if ($arg->SUPER::isa('Sidef::Types::Block::Code')) {
                 return return $self->find($arg);
             }
 
@@ -689,7 +689,7 @@ package Sidef::Types::Array::Array {
           && return $self->new;
 
         my @array;
-        if ($obj->can('run')) {
+        if ($obj->SUPER::isa('Sidef::Types::Block::Code')) {
             for (my $i = 1 ; $i <= $offset ; $i += 2) {
                 push @array, $obj->run($self->[$i - 1]->get_value, $self->[$i]->get_value);
             }
@@ -746,7 +746,7 @@ package Sidef::Types::Array::Array {
     sub reduce {
         my ($self, $obj) = @_;
 
-        if ($obj->can('run')) {
+        if ($obj->SUPER::isa('Sidef::Types::Block::Code')) {
             (my $offset = $#{$self}) >= 0 || return;
 
             my $x = $self->[0]->get_value;
@@ -863,8 +863,8 @@ package Sidef::Types::Array::Array {
     sub abbrev {
         my ($self, $code) = @_;
 
-        my $__END__ = {};                                      # some unique value
-        my $__CALL__ = defined($code) && $code->can('call');
+        my $__END__ = {};                                                                  # some unique value
+        my $__CALL__ = defined($code) && $code->SUPER::isa('Sidef::Types::Block::Code');
 
         my %table;
         foreach my $sub_array (map { $_->get_value } @{$self}) {
@@ -921,7 +921,7 @@ package Sidef::Types::Array::Array {
     sub contains {
         my ($self, $obj) = @_;
 
-        if ($obj->can('run')) {
+        if ($obj->SUPER::isa('Sidef::Types::Block::Code')) {
             foreach my $item (@{$self}) {
                 if ($obj->run($item->get_value)) {
                     return Sidef::Types::Bool::Bool->true;

@@ -447,10 +447,10 @@ package Sidef::Types::String::String {
     sub sub {
         my ($self, $regex, $str) = @_;
 
-        ref($str) eq 'Sidef::Types::Block::Code'
-          && return $self->esub($regex, $str);
-
         $str //= __PACKAGE__->new('');
+
+        $str->SUPER::isa('Sidef::Types::Block::Code')
+          && return $self->esub($regex, $str);
 
         if (ref($regex) eq 'Sidef::Types::Regex::Regex') {
             $regex->match($self)->{matched} or return $self;
@@ -467,10 +467,10 @@ package Sidef::Types::String::String {
     sub gsub {
         my ($self, $regex, $str) = @_;
 
-        ref($str) eq 'Sidef::Types::Block::Code'
-          && return $self->gesub($regex, $str);
-
         $str //= __PACKAGE__->new('');
+
+        $str->SUPER::isa('Sidef::Types::Block::Code')
+          && return $self->gesub($regex, $str);
 
         if (ref($regex) eq 'Sidef::Types::Regex::Regex') {
             $regex->match($self)->{matched} or return $self;
@@ -498,7 +498,7 @@ package Sidef::Types::String::String {
             $regex->match($self)->{matched} or return $self;
         }
 
-        if (ref($code) eq 'Sidef::Types::Block::Code') {
+        if ($code->SUPER::isa('Sidef::Types::Block::Code')) {
             return __PACKAGE__->new($self->get_value =~ s{$search}{$code->run(_get_captures($self->get_value))}er);
         }
 
@@ -515,7 +515,7 @@ package Sidef::Types::String::String {
             $regex->match($self)->{matched} or return $self;
         }
 
-        if (ref($code) eq 'Sidef::Types::Block::Code') {
+        if ($code->SUPER::isa('Sidef::Types::Block::Code')) {
             my $value = $self->get_value;
             return __PACKAGE__->new($value =~ s{$search}{$code->run(_get_captures($value))}ger);
         }

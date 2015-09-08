@@ -556,7 +556,7 @@ package Sidef::Types::Number::Number {
     sub of {
         my ($self, $obj) = @_;
 
-        if (ref($obj) eq 'Sidef::Types::Block::Code') {
+        if ($obj->SUPER::isa('Sidef::Types::Block::Code')) {
             return Sidef::Types::Array::Array->new(map { $obj->run(__PACKAGE__->new($_)) } 1 .. $self->get_value);
         }
 

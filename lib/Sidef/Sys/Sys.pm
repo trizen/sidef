@@ -141,12 +141,8 @@ package Sidef::Sys::Sys {
         if (CORE::ref($fh) eq 'GLOB') {
             return Sidef::Types::Bool::Bool->new(print {$fh} @args);
         }
-        elsif (eval { $fh->can('print') || $fh->can('AUTOLOAD') }) {
-            return $fh->print(@args);
-        }
 
-        CORE::warn "[WARN] Sys.printh(): invalid object handle: `$fh'\n";
-        return;
+        $fh->print(@args);
     }
 
     sub println {

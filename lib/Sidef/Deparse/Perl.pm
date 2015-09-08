@@ -245,7 +245,7 @@ HEADER
             }
         }
         elsif ($ref eq 'Sidef::Variable::InitLocal') {
-            $code = "my $obj->{name}";
+            $code = "local $obj->{name}";
         }
         elsif ($ref eq 'Sidef::Variable::Local') {
             $code = "$obj->{name}";
@@ -306,7 +306,7 @@ HEADER
 
                             $code .= "\n";
                             $code .= " " x $Sidef::SPACES;
-                            $code .= 'sub init {';
+                            $code .= 'sub new {';
                             $code .= "\n";
 
                             $Sidef::SPACES += $Sidef::SPACES_INCR;
@@ -370,7 +370,7 @@ HEADER
 
                         if (not $is_class) {
                             if ($#vars == 0 and $vars[0]{name} eq '_') {
-                                $code .= ' ' x $Sidef::SPACES . "\$_ = Sidef::Types::Array::Array->new(\@_) if \@_;\n";
+                                $code .= ' ' x $Sidef::SPACES . "\$_ = \$_[0] if exists \$_[0];\n";
                             }
                             else {
                                 foreach my $i (0 .. $#{vars}) {
@@ -406,7 +406,7 @@ HEADER
             $code = $ref . '->new';
         }
         elsif ($ref eq 'Sidef::Sys::Sys') {
-            $code = exists($obj->{file_name}) ? '' : $self->make_constant($ref, 'Sys');
+            $code = $self->make_constant($ref, 'Sys');
         }
         elsif ($ref eq 'Sidef::Parser') {
             $code = $ref . '->new';
@@ -450,19 +450,22 @@ HEADER
         }
         elsif ($ref eq 'Sidef::Types::Glob::FileHandle') {
             if ($obj->{fh} eq \*STDIN) {
-                $code = $ref . '->new(fh => \*STDIN)';
+                $code = $self->make_constant($ref, 'STDIN', 'fh => \*STDIN');
             }
             elsif ($obj->{fh} eq \*STDOUT) {
-                $code = $ref . '->new(fh => \*STDOUT)';
+                $code = $self->make_constant($ref, 'STDOUT', 'fh => \*STDOUT');
             }
             elsif ($obj->{fh} eq \*STDERR) {
-                $code = $ref . '->new(fh => \*STDERR)';
+                $code = $self->make_constant($ref, 'STDERR', 'fh => \*STDERR');
             }
             elsif ($obj->{fh} eq \*ARGV) {
-                $code = $ref . '->new(fh => \*ARGV)';
+                $code = $self->make_constant($ref, 'ARGF', 'fh => \*ARGV');
             }
             else {
-                $code = $ref . '->new(fh => \*DATA)';
+                my $data = quotemeta(
+                                     do { seek($obj->{fh}, 0, 0); local $/; readline($obj->{fh}) }
+                                    );
+                $code = $self->make_constant($ref, 'DATA', qq{fh => do {open my \$fh, '<', \\"$data"; \$fh}});
             }
         }
         elsif ($ref eq 'Sidef::Variable::Magic') {

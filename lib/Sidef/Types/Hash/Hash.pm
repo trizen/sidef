@@ -18,8 +18,8 @@ package Sidef::Types::Hash::Hash {
 
         if (@pairs == 1) {
 
-            # Block to hash
-            if (ref($pairs[0]) eq 'Sidef::Types::Block::Code') {
+            # Any object to hash
+            if ($pairs[0]->can('to_hash')) {
                 return $pairs[0]->to_hash;
             }
         }
