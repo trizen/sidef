@@ -255,6 +255,8 @@ package Sidef::Sys::Sys {
         Storable::dclone($obj);
     }
 
+    *clone = \&copy;
+
     sub select {
         my ($self, $fh) = @_;
         CORE::select(CORE::ref($fh) eq 'GLOB' ? $fh : $fh->get_value);

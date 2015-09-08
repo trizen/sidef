@@ -1190,11 +1190,9 @@ package Sidef::Types::Array::Array {
 
     sub copy {
         my ($self) = @_;
-        my $new = $self->new;
-        foreach my $item (map { $_->get_value } @{$self}) {
-            $new->append(eval { $item->can('copy') } ? $item->copy : $item);
-        }
-        $new;
+
+        state $x = require Storable;
+        Storable::dclone($self);
     }
 
     sub delete_first {

@@ -334,14 +334,18 @@ package Sidef::Types::Hash::Hash {
         my ($self) = @_;
 
         my $new_hash = $self->new();
-        @{$new_hash}{CORE::values %{$self->{data}}} =
-          (map { Sidef::Types::String::String->new($_) } CORE::keys %{$self->{data}});
+        @{$new_hash->{data}}{map { $_->get_value } CORE::values %{$self->{data}}} =
+          (map { Sidef::Variable::Variable->new(name => '', type => 'var', value => Sidef::Types::String::String->new($_)) }
+            CORE::keys %{$self->{data}});
+
         $new_hash;
     }
 
     sub copy {
         my ($self) = @_;
-        $self->new(map { ref($_) ? $_->get_value : $_ } %{$self->{data}});
+
+        state $x = require Storable;
+        Storable::dclone($self);
     }
 
     sub dump {
