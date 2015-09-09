@@ -46,8 +46,8 @@ func braille_graphics(a) {
         }
     }
 
-    for (var y = ylo; y <= yhi; y += 4) {
-        for (var x = xlo; x <= xhi; x += 2) {
+    range(ylo, yhi, 4).each { |y|
+        range(xlo, xhi, 2).each { |x|
             var cell = 0x2800;
 
             a[y+0][x+0] && (cell += 1);
