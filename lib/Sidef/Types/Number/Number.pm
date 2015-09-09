@@ -275,12 +275,11 @@ package Sidef::Types::Number::Number {
     *downTo = \&downto;
 
     sub range {
-        my ($self, $to) = @_;
+        my ($self, $to, $step) = @_;
 
         defined($to)
-          ? $self->to($to)
+          ? $self->to($to, $step)
           : $self->new(0)->to($self);
-
     }
 
     sub sqrt {
