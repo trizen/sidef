@@ -373,6 +373,7 @@ scripts/one-dimensional_cellular_automata_2.sf
 scripts/open.sf
 scripts/pairs_test.sf
 scripts/palindrome_recursive.sf
+scripts/pascal_matrix_generation.sf
 scripts/perl_eval.sf
 scripts/permutations.sf
 scripts/permutations_2.sf
