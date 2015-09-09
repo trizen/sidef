@@ -236,6 +236,7 @@ scripts/Expensive/chebyshev_coefficients.sf
 scripts/Expensive/dice_game_solver.sf
 scripts/Expensive/factorial_approximations.sf
 scripts/Expensive/fibonacci_validation.sf
+scripts/Expensive/fibonacci_word_fractal.sf
 scripts/Expensive/gd_sierpinsky_triangle.sf
 scripts/Expensive/haversine_formula.sf
 scripts/Expensive/langton_s_ant.sf
@@ -287,6 +288,7 @@ scripts/group_precedence.sf
 scripts/hailstone.sf
 scripts/happy_2_years_old.sf
 scripts/hash_autovivification.sf
+scripts/hash_default_block_value.sf
 scripts/hash_default_value.sf
 scripts/hash_from_array.sf
 scripts/hash_grep.sf

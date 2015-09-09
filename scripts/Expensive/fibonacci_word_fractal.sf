@@ -1,0 +1,68 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Fibonacci_word/fractal
+#
+
+var(m=17, scale=3) = ARGV»to_i»()...;
+
+(var world = Hash.new)[0][0] = 1;
+var loc = Complex(0, 0);
+var dir = Complex::i;
+
+func fib_word(n) {
+    static fib = ['1', '0'];
+    fib[n] \\= (fib_word(n-1) + fib_word(n-2));
+}
+
+func step {
+    scale.times {
+        loc += dir;
+        world[loc.im][loc.re] = 1;
+    }
+}
+
+func turn_left  { dir *=  Complex::i };
+func turn_right { dir *= -Complex::i };
+
+var n = 1;
+fib_word(m).each_char { |c|
+    if (c == '0') {
+        step();
+        n % 2 == 0 ? turn_left()
+                   : turn_right()
+    } else { n++ }
+}
+
+func braille_graphics(a) {
+    var (xlo, xhi, ylo, yhi) = +([Math.inf, -Math.inf]*2)...;
+
+    a.each_key { |y|
+        ylo.min!(y.to_i);
+        yhi.max!(y.to_i);
+        a[y].each_key { |x|
+            xlo.min!(x.to_i);
+            xhi.max!(x.to_i);
+        }
+    }
+
+    for (var y = ylo; y <= yhi; y += 4) {
+        for (var x = xlo; x <= xhi; x += 2) {
+            var cell = 0x2800;
+
+            a[y+0][x+0] && (cell += 1);
+            a[y+1][x+0] && (cell += 2);
+            a[y+2][x+0] && (cell += 4);
+            a[y+0][x+1] && (cell += 8);
+            a[y+1][x+1] && (cell += 16);
+            a[y+2][x+1] && (cell += 32);
+            a[y+3][x+0] && (cell += 64);
+            a[y+3][x+1] && (cell += 128);
+
+            print cell.chr;
+        };
+        print "\n";
+    }
+}
+
+braille_graphics(world);

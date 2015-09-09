@@ -172,14 +172,18 @@ package Sidef::Exec {
                                 (ref($self_obj) && $self_obj->isa('HASH'))
                                   || ($self_obj = Sidef::Types::Hash::Hash->new);
 
-                                $self_obj->{data}{$ind->get_value} //=
-                                  Sidef::Variable::Variable->new(
-                                                                 name  => '',
-                                                                 type  => 'var',
-                                                                 value => $l < $#{$expr->{ind}}
-                                                                 ? Sidef::Types::Hash::Hash->new
-                                                                 : ($self_obj->default)
-                                                                );
+                                $self_obj->{data}{$ind->get_value} //= Sidef::Variable::Variable->new(
+                                    name  => '',
+                                    type  => 'var',
+                                    value => $l < $#{$expr->{ind}}
+                                    ? Sidef::Types::Hash::Hash->new
+                                    : do {
+                                        my $default = $self_obj->{__DEFAULT_VALUE__};
+                                        defined($default) && $default->SUPER::isa('Sidef::Types::Block::Code')
+                                          ? $default->run
+                                          : $default;
+                                      }
+                                );
                               }
                             : do {
                                 (ref($self_obj) && $self_obj->isa('ARRAY'))

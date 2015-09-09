@@ -889,7 +889,7 @@ package Sidef::Parser {
             }
 
             # Bareword followed by a fat comma or a colon character
-            if (   /\G:([_\pL][_\pL\pN]*)/gc
+            if (   /\G:([_\pL\pN]+)/gc
                 || /\G([_\pL][_\pL\pN]*)(?=\h*=>|:(?![=:]))/gc) {
                 return Sidef::Types::String::String->new($1);
             }
