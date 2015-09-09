@@ -167,7 +167,9 @@ HEADER
 
     sub _dump_var {
         my ($self, $var) = @_;
-        exists($var->{array}) ? '@' : exists($var->{hash}) ? '%' : '$' . ($var->{name} eq '_' ? '__' : $var->{name});
+            exists($var->{array}) ? '@'
+          : exists($var->{hash})  ? '%'
+          : '$' . ($var->{name} =~ /^_+\z/ ? ('_' . $var->{name}) : $var->{name});
     }
 
     sub _dump_vars {
@@ -380,8 +382,8 @@ HEADER
                         }
 
                         if (not $is_class) {
-                            if ($#vars == 0 and $vars[0]{name} eq '_') {
-                                $code .= ' ' x $Sidef::SPACES . "\$__ = \$_[0] if exists \$_[0];\n";
+                            if ($#vars == 0 and $vars[0]{name} =~ /^_+\z/) {
+                                $code .= ' ' x $Sidef::SPACES . "\$_" . $vars[0]{name} . " = \$_[0] if exists \$_[0];\n";
                             }
                             else {
                                 foreach my $i (0 .. $#{vars}) {
