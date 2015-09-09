@@ -6,6 +6,10 @@ package Sidef::Types::Array::MultiArray {
       Sidef::Object::Object
       );
 
+    use overload
+      q{""}   => \&dump,
+      q{bool} => sub { scalar @{$_[0]} };
+
     sub new {
         my (undef, @args) = @_;
         my @array = map {

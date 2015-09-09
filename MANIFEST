@@ -260,6 +260,7 @@ scripts/fibonacci_closed_solution.sf
 scripts/fibonacci_iterative.sf
 scripts/fibonacci_mystery.sf
 scripts/file_find_module.sf
+scripts/first_class_functions_analogously.sf
 scripts/floyds_triangle.sf
 scripts/for_two_vars.sf
 scripts/forward_difference.sf
