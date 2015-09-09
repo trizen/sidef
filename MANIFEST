@@ -275,6 +275,7 @@ scripts/Games/24_game_sover.sf
 scripts/Games/asciiplanes.sf
 scripts/Games/bulls_and_cows.sf
 scripts/Games/bulls_and_cows_player.sf
+scripts/Games/forest_fire.sf
 scripts/Games/game_of_life.sf
 scripts/Games/rock_paper_scissors.sf
 scripts/Games/snake_game.sf
