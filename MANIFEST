@@ -859,6 +859,7 @@ scripts/sysopen_and_sysread.sf
 scripts/tennis_tournament.sf
 scripts/test_all.pl
 scripts/token_recursive.sf
+scripts/topological_sort.sf
 scripts/triangle_path.sf
 scripts/trizen's_pair_numbers.sf
 scripts/two_dimensional_array.sf

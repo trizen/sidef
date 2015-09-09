@@ -136,11 +136,8 @@ package Sidef::Types::Hash::Hash {
     *add = \&append;
 
     sub delete {
-        my ($self, $key) = @_;
-        if (exists $self->{data}{$key}) {
-            return (delete $self->{data}{$key})->get_value;
-        }
-        return;
+        my ($self, @keys) = @_;
+        Sidef::Types::Array::List->new(delete @{$self->{data}}{map { $_->get_value } @keys});
     }
 
     sub _iterate {
