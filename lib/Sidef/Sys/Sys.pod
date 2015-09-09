@@ -61,6 +61,8 @@ Sys.copy() -> I<Obj>
 
 Return the
 
+Aliases: I<clone>
+
 =cut
 
 =head2 die
