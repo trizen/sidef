@@ -60,6 +60,12 @@ package Sidef::Perl::Perl {
                 return Sidef::Types::String::String->new($val);
             }
 
+            # Return an OO object when $val is blessed
+            state $x = require Scalar::Util;
+            if (defined Scalar::Util::blessed($val)) {
+                return Sidef::Module::OO->__NEW__($val);
+            }
+
             $val;
         };
 

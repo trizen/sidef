@@ -43,12 +43,7 @@ package Sidef::Module::OO {
             return Sidef::Types::Array::List->new(map { Sidef::Perl::Perl->to_sidef($_) } @results);
         }
 
-        my $result = $results[0];
-        if (ref($result) && eval { $result->can('can') }) {
-            return $self->__NEW__($result);
-        }
-
-        Sidef::Perl::Perl->to_sidef($result);
+        Sidef::Perl::Perl->to_sidef($results[0]);
     }
 }
 
