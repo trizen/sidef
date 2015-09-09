@@ -1,0 +1,23 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Forward_difference
+#
+
+func dif(arr) {
+    gather {
+        range(0, arr.end-1).each { |i|
+            take(arr[i+1] - arr[i]);
+        }
+    }
+}
+
+func difn(n, arr) {
+    n.times { arr = dif(arr) };
+    arr;
+}
+
+assert_eq(dif([1, 23, 45, 678]), [22, 22, 633]);
+assert_eq(difn(2, [1, 23, 45, 678]), [0, 611]);
+
+say "** Test passed!";

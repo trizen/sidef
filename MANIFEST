@@ -262,6 +262,7 @@ scripts/fibonacci_mystery.sf
 scripts/file_find_module.sf
 scripts/floyds_triangle.sf
 scripts/for_two_vars.sf
+scripts/forward_difference.sf
 scripts/func_and_class_test.sf
 scripts/function_composition.sf
 scripts/function_recursion.sf
