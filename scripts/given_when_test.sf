@@ -1,0 +1,24 @@
+#!/usr/bin/ruby
+
+#
+## Test the 'next' and 'break' keywords inside the 'given/when' construct
+#
+
+range(1, 10).each { |i|
+    given (i)
+        > 3          { say "three"; next }
+        ? (i%2 == 0) { say "even";  next }
+        > 9          { say "nine";  break };
+
+    if (i % 2 == 0) {
+        die "Got an even number!";
+    }
+
+    if (i == 3) {
+        die "Got the number 3";
+    }
+
+    if (i >= 9) {
+        die "Got a number greater or equal with 9";
+    }
+}

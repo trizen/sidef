@@ -282,6 +282,7 @@ scripts/gamma_function.sf
 scripts/gcd.sf
 scripts/generate_an_html_table.sf
 scripts/getopt.sf
+scripts/given_when_test.sf
 scripts/global_regex_matching.sf
 scripts/Graphical/gtk2_goodbye_world.sf
 scripts/Graphical/gtk2_tutorial.sf
