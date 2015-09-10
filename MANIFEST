@@ -333,6 +333,7 @@ scripts/letter_frequency.sf
 scripts/lev_fast.sf
 scripts/levenshtein_distance.sf
 scripts/levenshtein_distance_cached.sf
+scripts/linear_congruential_generator.sf
 scripts/Lingua/RO/Numbers.sm
 scripts/lingua_ro.sf
 scripts/lingua_ro_numbers.sf
