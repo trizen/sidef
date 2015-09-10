@@ -452,6 +452,7 @@ scripts/Rosettacode/Cholesky_decomposition.sf
 scripts/Rosettacode/Classes.sf
 scripts/Rosettacode/Closures_Value_capture.sf
 scripts/Rosettacode/Combinations.sf
+scripts/Rosettacode/Combinations_and_permutations.sf
 scripts/Rosettacode/Combinations_with_repetitions.sf
 scripts/Rosettacode/Comma_quibbling.sf
 scripts/Rosettacode/Command-line_arguments.sf
