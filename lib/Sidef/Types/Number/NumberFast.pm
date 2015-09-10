@@ -110,6 +110,8 @@ package Sidef::Types::Number::Number {
         defined($base) ? $self->new($log / CORE::log($base->get_value)) : $self->new($log);
     }
 
+    sub atan { ... }
+
     sub ln {
         my ($self) = @_;
         $self->new(CORE::log($self->get_value));

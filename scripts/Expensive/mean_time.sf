@@ -5,7 +5,7 @@
 #
 
 func mean_angle(angles) {
-    Math.atan2(
+    atan2(
         angles.map { Math.sin(_ * Math.PI / 180) }.sum / angles.len,
         angles.map { Math.cos(_ * Math.PI / 180) }.sum / angles.len,
     ) * 180 / Math.PI;
@@ -27,7 +27,7 @@ func mean_time(times) {
   deg2time(mean_angle(times.map {|t| time2deg(t)}));
 }
 
-mean_angle([10, 20, 30]) == 20 || die "math is broken!";
+mean_angle([10, 20, 30]).fround(0) == 20 || die "math is broken!";
 mean_time(["23:00:17", "23:40:20", "00:12:45", "00:17:19"]) == "23:47:43" || die "invalid return value";
 
 say "** Test passed!";

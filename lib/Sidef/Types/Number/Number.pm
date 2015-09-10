@@ -358,6 +358,16 @@ package Sidef::Types::Number::Number {
         $self->new(CORE::sin($self->get_value));
     }
 
+    sub atan {
+        my ($x) = @_;
+        Sidef::Types::Number::Number->new($x->get_value->copy->batan);
+    }
+
+    sub atan2 {
+        my ($x, $y) = @_;
+        Sidef::Types::Number::Number->new(CORE::atan2($x->get_value, $y->get_value));
+    }
+
     sub log {
         my ($self, $base) = @_;
         $self->new($self->get_value->copy->blog(defined($base) ? $base->get_value : ()));

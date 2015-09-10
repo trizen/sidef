@@ -84,18 +84,6 @@ package Sidef::Math::Math {
 
     *PI = \&pi;
 
-    sub atan {
-        my ($self, $x, $places) = @_;
-        Sidef::Types::Number::Number->new(
-                                        Math::BigFloat->new($x->get_value)->batan(defined($places) ? $places->get_value : ()));
-    }
-
-    sub atan2 {
-        my ($self, $x, $y, $places) = @_;
-        Sidef::Types::Number::Number->new(
-                        Math::BigFloat->new($x->get_value)->batan2($y->get_value, defined($places) ? $places->get_value : ()));
-    }
-
     sub cos {
         my ($self, $x, $places) = @_;
         Sidef::Types::Number::Number->new(
@@ -106,17 +94,6 @@ package Sidef::Math::Math {
         my ($self, $x, $places) = @_;
         Sidef::Types::Number::Number->new(
                                          Math::BigFloat->new($x->get_value)->bsin(defined($places) ? $places->get_value : ()));
-    }
-
-    sub asin {
-        my ($self, $x, $places) = @_;
-        $self->atan2(
-                     $x,
-                     $self->sqrt(
-                           Sidef::Types::Number::Number->new(1)->subtract($self->pow($x, Sidef::Types::Number::Number->new(2)))
-                     ),
-                     $places
-                    );
     }
 
     sub log {
@@ -322,12 +299,12 @@ package Sidef::Math::Math {
 
             # The arcus (also known as the inverse) functions
             # of the sine, cosine, and tangent
-            ##'asin',
+            'asin',
             'acos',
-            ##'atan',
+            'atan',
 
             # The principal value of the arc tangent of y/x
-            ##'atan2',
+            'atan2',
 
             #  The arcus cofunctions of the sine, cosine, and tangent (acosec/acsc and
             # acotan/acot are aliases).  Note that atan2(0, 0) is not well-defined.
