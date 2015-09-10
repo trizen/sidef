@@ -504,6 +504,7 @@ scripts/Rosettacode/Exceptions/Exceptions_Catch_an_exception_thrown_in_a_nested_
 scripts/Rosettacode/Extend_your_language.sf
 scripts/Rosettacode/Factorial.sf
 scripts/Rosettacode/Fast_Fourier_transform.sf
+scripts/Rosettacode/Fibonacci_n-step_number_sequence.sf
 scripts/Rosettacode/Fibonacci_sequence.sf
 scripts/Rosettacode/Fibonacci_sequence_1.sf
 scripts/Rosettacode/Fibonacci_sequence_2.sf
