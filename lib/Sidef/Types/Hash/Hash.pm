@@ -139,7 +139,7 @@ package Sidef::Types::Hash::Hash {
         my ($self, @keys) = @_;
         @keys == 1
           ? delete($self->{data}{$keys[0]})
-          : Sidef::Types::Array::List->new(delete @{$self->{data}}{map { $_->get_value } @keys});
+          : Sidef::Types::Array::List->new(delete @{$self->{data}}{@keys});
     }
 
     sub _iterate {
