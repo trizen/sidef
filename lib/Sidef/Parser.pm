@@ -1128,6 +1128,16 @@ package Sidef::Parser {
 
                     # Redeclaration of a function or a method in the same scope
                     if (ref $var) {
+
+                        if ($var->{obj}{type} ne $type) {
+                            $self->fatal_error(
+                                  code => $_,
+                                  pos  => $-[0],
+                                  error =>
+                                    "invalid re-declaration of '$var->{obj}{type}' (declared at line $var->{line}) as '$type'",
+                            );
+                        }
+
                         push @{$var->{obj}{value}{kids}}, $obj;
                         $private = 1;
                     }
