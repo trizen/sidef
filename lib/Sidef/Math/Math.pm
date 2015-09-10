@@ -4,7 +4,10 @@ package Sidef::Math::Math {
     our @ISA = qw(Sidef);
 
     sub new {
-        state $x = require Math::BigFloat;
+        state $x = do {
+            require Math::BigFloat;
+            Math::BigFloat->new;
+        };
         bless {}, __PACKAGE__;
     }
 

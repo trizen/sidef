@@ -1,0 +1,26 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Trigonometric_functions
+#
+
+var angle_deg = 45;
+var angle_rad = Math.pi/4;
+
+[
+    [Math.sin(angle_rad), Math.sin(Math.deg2rad(angle_deg))],
+    [Math.cos(angle_rad), Math.cos(Math.deg2rad(angle_deg))],
+    [Math.tan(angle_rad), Math.tan(Math.deg2rad(angle_deg))],
+    [Math.cot(angle_rad), Math.cot(Math.deg2rad(angle_deg))],
+].each { |arr|
+    say arr.join(" ");
+}
+
+[
+    Math.asin(Math.sin(angle_rad)),
+    Math.acos(Math.cos(angle_rad)),
+    Math.atan(Math.tan(angle_rad)),
+    Math.acot(Math.cot(angle_rad)),
+].each { |n|
+    say [n, Math.rad2deg(n)].join(" ");
+}
