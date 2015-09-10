@@ -15,7 +15,7 @@ range(1, 12).each { |i|
     );
 
     while (date.dow != 7) {
-        [date.subtract(days => 1)] » \date;
+        \date = date.subtract(days => 1);
     };
 
     say date.ymd;

@@ -33,6 +33,12 @@ package Sidef::Variable::Ref {
             $self;
         };
 
+        *{__PACKAGE__ . '::' . '='} = sub {
+            my ($self, $value) = @_;
+            state $method = '=';
+            $self->{var}->$method($value);
+        };
+
         foreach my $method (qw(-- ++)) {
             *{__PACKAGE__ . '::' . $method} = sub {
                 my ($self, $var) = @_;
