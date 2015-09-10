@@ -17,7 +17,7 @@ package Sidef::Types::Glob::Backtick {
 
     sub run {
         my ($self) = @_;
-        Sidef::Types::String::String->new(scalar `$$self`)->decode_utf8;
+        Sidef::Types::String::String->new(scalar `$$self`);
     }
 
     *execute = \&run;
