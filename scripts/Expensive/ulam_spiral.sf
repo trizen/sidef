@@ -36,5 +36,4 @@ img.box(filled => 1, color => white);
     }
 }
 
-img.write(file => file)
-    || die "Cannot write `#{file}': #{img.errstr}";
+img.write(file => file);
