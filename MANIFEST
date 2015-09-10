@@ -182,6 +182,7 @@ scripts/best_shuffle_2.sf
 scripts/best_shuffle_alg_permute.sf
 scripts/binary_search.sf
 scripts/binary_search_recursive.sf
+scripts/block_all_and_any.sf
 scripts/box_the_compass.sf
 scripts/box_the_compass_2.sf
 scripts/break.sf

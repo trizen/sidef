@@ -155,6 +155,32 @@ package Sidef::Types::Block::Code {
 
     *do = \&exec;
 
+    sub all {
+        my ($self) = @_;
+
+        foreach my $class (keys %{$self->{code}}) {
+            foreach my $statement (@{$self->{code}{$class}}) {
+                $exec->execute_expr(ref($statement) eq 'HASH' ? $statement : {self => $statement})
+                  || return Sidef::Types::Bool::Bool->false;
+            }
+        }
+
+        Sidef::Types::Bool::Bool->true;
+    }
+
+    sub any {
+        my ($self) = @_;
+
+        foreach my $class (keys %{$self->{code}}) {
+            foreach my $statement (@{$self->{code}{$class}}) {
+                $exec->execute_expr(ref($statement) eq 'HASH' ? $statement : {self => $statement})
+                  && return Sidef::Types::Bool::Bool->true;
+            }
+        }
+
+        Sidef::Types::Bool::Bool->false;
+    }
+
     sub while {
         my ($self, $condition, $old_self) = @_;
 

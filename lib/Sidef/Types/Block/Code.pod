@@ -33,6 +33,22 @@ Aliases: I<repeat>
 
 =cut
 
+=head2 all
+
+Code.all() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 any
+
+Code.any() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 call
 
 Code.call() -> I<Obj>

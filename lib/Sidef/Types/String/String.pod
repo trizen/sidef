@@ -242,6 +242,14 @@ Aliases: I<beginsWith>, I<starts_with>, I<startsWith>
 
 =cut
 
+=head2 bin
+
+String.bin() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 bytes
 
 String.bytes() -> I<Obj>
@@ -593,6 +601,22 @@ String.new() -> I<Obj>
 Return the
 
 Aliases: I<call>
+
+=cut
+
+=head2 num
+
+String.num() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 oct
+
+String.oct() -> I<Obj>
+
+Return the
 
 =cut
 

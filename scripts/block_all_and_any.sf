@@ -1,0 +1,17 @@
+#!/usr/bin/ruby
+
+# Tests for the Block.all and Block.any
+
+any {
+    say "Testing `any`";        # should stop here (unless "say" is broken)
+    warn "is `say` broken?";
+    true;                       # guaranteed stop
+    die "any-error";
+} || die "or-error";
+
+
+all {
+    say "Testing `all`";        # might stop here if "say" is broken
+    false;                      # guaranteed stop
+    die "all-error";
+} && die "and-error";
