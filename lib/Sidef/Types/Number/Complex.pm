@@ -8,6 +8,10 @@ package Sidef::Types::Number::Complex {
       Sidef::Types::Number::Number
       );
 
+    use overload
+      q{""}   => \&get_value,
+      q{bool} => \&get_value;
+
     sub new {
         my (undef, $x, $y) = @_;
 
