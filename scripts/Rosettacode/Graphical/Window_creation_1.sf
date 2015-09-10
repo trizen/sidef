@@ -4,9 +4,8 @@
 ## http://rosettacode.org/wiki/Window_creation
 #
 
-Perl.eval('use Gtk2 qw(-init)');
-var gtk2   = 'Gtk2'.to_caller;
-var window = 'Gtk2::Window'.to_caller.new;
+var gtk2 = require('Gtk2') -> init;
+var window = %s'Gtk2::Window'.new;
 window.signal_connect(destroy => { gtk2.main_quit });
 window.show_all;
 gtk2.main;

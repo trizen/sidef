@@ -4,7 +4,7 @@
 ## http://rosettacode.org/wiki/Hello_world/Graphical
 #
 
-Perl.eval('use Gtk2 qw(-init)');
+require('Gtk2') -> init;
  
 var gtk2   = 'Gtk2'.to_caller;
 var window = 'Gtk2::Window'.to_caller.new;

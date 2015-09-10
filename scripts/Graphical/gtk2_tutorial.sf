@@ -2,9 +2,8 @@
 
 # Translation of: http://gtk2-perl.sourceforge.net/doc/gtk2-perl-tut/ch-GettingStarted.html#sec-HelloWorld
 
-Sys.eval('use Gtk2 qw(-init)');
 var glib = require('Glib');
-var gtk2 = require('Gtk2');
+var gtk2 = require('Gtk2') -> init;
 
 # This is a callback function. We simply say hello to the world, and destroy
 # the window object in order to close the program.

@@ -288,6 +288,7 @@ scripts/given_when_test.sf
 scripts/global_regex_matching.sf
 scripts/Graphical/gtk2_goodbye_world.sf
 scripts/Graphical/gtk2_tutorial.sf
+scripts/Graphical/Gtk2_user_input.sf
 scripts/Graphical/tk_library.sf
 scripts/group_precedence.sf
 scripts/hailstone.sf
