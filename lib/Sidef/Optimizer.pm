@@ -74,7 +74,10 @@ package Sidef::Optimizer {
                    length
 
                    ord
+                   oct
                    hex
+                   bin
+                   num
                    not
 
                    repeat

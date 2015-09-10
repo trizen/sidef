@@ -352,6 +352,22 @@ package Sidef::Types::String::String {
         Sidef::Types::Number::Number->new(CORE::hex($self->get_value));
     }
 
+    sub oct {
+        my ($self) = @_;
+        Sidef::Types::Number::Number->new(CORE::oct($self->get_value));
+    }
+
+    sub bin {
+        my ($self) = @_;
+        my $value = $self->get_value;
+        Sidef::Types::Number::Number->new(CORE::oct($value =~ /^0b/ ? $value : ('0b' . $value)));
+    }
+
+    sub num {
+        my ($self) = @_;
+        Sidef::Types::Number::Number->new($self->get_value);
+    }
+
     sub substr {
         my ($self, $offs, $len) = @_;
         __PACKAGE__->new(

@@ -1,0 +1,19 @@
+#!/usr/bin/ruby
+
+var dec            = '0123459';
+var hex_noprefix   = 'abcf123';
+var hex_withprefix = '0xabcf123';
+var oct_noprefix   = '7651';
+var oct_withprefix = '07651';
+var bin_noprefix   = '101011001';
+var bin_withprefix = '0b101011001';
+
+assert_eq(   123459, dec.num);
+assert_eq(180154659, hex_noprefix.hex);
+assert_eq(180154659, hex_withprefix.hex);
+assert_eq(     4009, oct_noprefix.oct);
+assert_eq(     4009, oct_withprefix.oct);
+assert_eq(      345, bin_noprefix.bin);
+assert_eq(      345, bin_withprefix.bin);
+
+say "** Test passed!";

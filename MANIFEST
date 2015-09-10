@@ -502,6 +502,7 @@ scripts/Rosettacode/Exceptions/Exceptions.sf
 scripts/Rosettacode/Exceptions/Exceptions_Catch_an_exception_thrown_in_a_nested_call.sf
 scripts/Rosettacode/Extend_your_language.sf
 scripts/Rosettacode/Factorial.sf
+scripts/Rosettacode/Fast_Fourier_transform.sf
 scripts/Rosettacode/Fibonacci_sequence.sf
 scripts/Rosettacode/Fibonacci_sequence_1.sf
 scripts/Rosettacode/Fibonacci_sequence_2.sf
@@ -849,6 +850,7 @@ scripts/split_combine.sf
 scripts/static_const_lazy_init.sf
 scripts/string_encodings.sf
 scripts/string_escapes.sf
+scripts/string_to_number.sf
 scripts/struct_definition.sf
 scripts/subscript_numbers.sf
 scripts/subtractive_generator.sf
