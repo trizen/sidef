@@ -45,8 +45,11 @@ package Sidef::Types::Array::Array {
 
         my @array;
         if (defined $arg) {
-            foreach my $i (0 .. $#{$self}) {
-                push @array, $self->[$i]->get_value->$operator($arg->[$i]->get_value);
+            my $argc  = @{$arg};
+            my $selfc = @{$self};
+            my $max   = $argc > $selfc ? $argc - 1 : $selfc - 1;
+            foreach my $i (0 .. $max) {
+                push @array, $self->[$i % $selfc]->get_value->$operator($arg->[$i % $argc]->get_value);
             }
         }
         else {

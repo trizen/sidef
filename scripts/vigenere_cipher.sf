@@ -1,0 +1,22 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Vigen%C3%A8re_cipher
+#
+
+func s2v(s) { s.uc.scan(/[A-Z]/)»ord»() »-» 65 };
+func v2s(v) { (v »%» 26 »+» 65)»chr»().join };
+
+func blacken (red, key) { v2s(s2v(red) »+« s2v(key)) };
+func redden  (blk, key) { v2s(s2v(blk) »-« s2v(key)) };
+
+var red = "Beware the Jabberwock, my son! The jaws that bite, the claws that catch!";
+var key = "Vigenere Cipher!!!";
+
+var black = blacken(red, key);
+var ured = redden(black, key);
+
+assert_eq('WMCEEIKLGRPIFVMEUGXQPWQVIOIAVEYXUEKFKBTALVXTGAFXYEVKPAGY', black);
+assert_eq('BEWARETHEJABBERWOCKMYSONTHEJAWSTHATBITETHECLAWSTHATCATCH', ured);
+
+say "** Test passed!";

@@ -674,6 +674,7 @@ scripts/Rosettacode/Order_disjoint_list_items.sf
 scripts/Rosettacode/Palindrome_detection.sf
 scripts/Rosettacode/Palindrome_detection_1.sf
 scripts/Rosettacode/Pangram_checker.sf
+scripts/Rosettacode/Partial_function_application.sf
 scripts/Rosettacode/Pascal_s_triangle.sf
 scripts/Rosettacode/Permutations.sf
 scripts/Rosettacode/Permutations_1.sf
@@ -882,6 +883,7 @@ scripts/unique_prefixes.sf
 scripts/url_encoding_decoding.sf
 scripts/var_ref.sf
 scripts/var_scoping.sf
+scripts/vigenere_cipher.sf
 scripts/virtual_machine.sf
 scripts/while_loop.sf
 scripts/word_roots.sf
