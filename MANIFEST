@@ -830,6 +830,7 @@ scripts/Rosettacode/WWW/Hello_world_Web_server.sf
 scripts/Rosettacode/WWW/Hello_world_Web_server_1.sf
 scripts/Rosettacode/WWW/Sockets.sf
 scripts/Rosettacode/Y_combinator.sf
+scripts/Rosettacode/Zeckendorf_number_representation.sf
 scripts/Rosettacode/Zig-zag_matrix.sf
 scripts/run_length_encoding.sf
 scripts/run_length_encoding_2.sf
