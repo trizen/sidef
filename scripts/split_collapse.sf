@@ -11,7 +11,7 @@
 var parts = (
               "key1: value1; key2: value2;".split(/\s*;\s*/)
                                            .map { _.split(/\s*:\s*/) }
-                                           .combine
+                                           .collapse
                                            .to_hash
             );
 
@@ -22,14 +22,14 @@ parts['key1'] == 'value1' || ("Fail key1!\n".die);
 parts['key2'] == 'value2' || ("Fail key2!\n".die);
 
 
-["x","y","z"].combine == 'xyz' || ("Fail str join!\n".die);
+["x","y","z"].collapse == 'xyz' || ("Fail str join!\n".die);
 
 [["Hello","there!"],
  ["This is",
     ["something"]
  ],
  ["cool."]
-].combine == [
+].collapse == [
                 'Hello', 'there!',
                 'This is', ['something'], 'cool.'
              ]

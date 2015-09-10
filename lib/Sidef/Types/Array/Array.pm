@@ -361,7 +361,7 @@ package Sidef::Types::Array::Array {
         $_[0]->reduce_operator('+');
     }
 
-    *combine = \&sum;
+    *collapse = \&sum;
 
     sub prod {
         $_[0]->reduce_operator('*');

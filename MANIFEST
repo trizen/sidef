@@ -849,7 +849,7 @@ scripts/smart_word_wrap.sf
 scripts/smart_word_wrap_simple.sf
 scripts/soundex.sf
 scripts/special_methods.sf
-scripts/split_combine.sf
+scripts/split_collapse.sf
 scripts/static_const_lazy_init.sf
 scripts/string_encodings.sf
 scripts/string_escapes.sf

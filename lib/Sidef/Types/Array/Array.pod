@@ -64,15 +64,13 @@ Alias for L<C<&>|"&">.
 
 =cut
 
-=head2 multiply
+=head2 *
 
-Array.multiply() -> I<Obj>
+I<Obj> B<*> I<Obj> -> I<Obj>
 
-Works just like the L<C<combine()>|"combine"> method, except that it multiplies each element of the array, using the C<*> method. Useful for working with matrices.
+Return the
 
-    [5,6,7].multiply;       # returns the product number (210)
-
-Returns an object of the same type as the elements of the array.
+Aliases: I<multiply>
 
 =cut
 
@@ -871,13 +869,15 @@ Aliases: I<unshift>
 
 =cut
 
-=head2 prod
+=head2 product
 
-Array.prod() -> I<Obj>
+Array.product() -> I<Obj>
 
-Return the
+Works just like the L<C<sum()>|"sum"> method, except that it multiplies each element of the array, using the C<*> method.
 
-Aliases: I<product>
+    [5,6,7].product;       # returns the product number (210)
+
+Returns an object of the same type as the elements of the array.
 
 =cut
 
@@ -971,16 +971,18 @@ Return the
 
 =cut
 
-=head2 combine
+=head2 sum
 
-Array.combine() -> I<Obj>
+Array.sum() -> I<Obj>
 
-Combine all the elements from the array togheter. The array's elements must have a C<+> method associated.
+Reduces all the elements from the array to a single element, using the C<+> method.
 
-    [[1,2],[3,4]].combine;       # returns: [1,2,3,4]
-    [1,2,3,4,5,6].combine;       # returns the sum of the numbers (21)
+    [[1,2],[3,4]].sum;       # returns: [1,2,3,4]
+    [1,2,3,4,5,6].sum;       # returns the sum of the numbers (1+2+3+...+6)
 
 Returns an object of the same type as the elements of the array.
+
+Aliases: I<collapse>
 
 =cut
 
