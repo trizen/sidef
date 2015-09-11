@@ -6,15 +6,13 @@
 
 __USE_FASTNUM__
 
-define pi = 3.14159265358979323E0;
-
 func fft(*arr) {
     arr.len == 1 && return arr;
 
     var (evn, odd, twd);
     evn = fft(arr[arr.range.grep { _ % 2 == 0 }]...);
     odd = fft(arr[arr.range.grep { _ % 2 == 1 }]...);
-    twd = (Complex(0, 2) * (pi / arr.len));
+    twd = (Complex(0, 2) * Math.pi / arr.len);
 
     odd.range.map {|n| odd[n] *= exp(twd * n)};
     (evn »+« odd) + (evn »-« odd);
@@ -22,6 +20,6 @@ func fft(*arr) {
 
 var cycles = 3;
 var sequence = (0 .. 15);
-var wave = sequence.map {|n| Complex(sin(n * 2*pi / sequence.len * cycles)) };
+var wave = sequence.map {|n| Complex(sin(n * 2*Math.pi / sequence.len * cycles)) };
 say "wave:#{wave.map{ '%6.3f' % _ }}";
 say "fft: #{fft(wave...).map { '%6.3f' % .abs }}";
