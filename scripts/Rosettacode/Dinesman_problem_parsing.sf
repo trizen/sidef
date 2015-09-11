@@ -15,7 +15,7 @@ func dinesman(problem) {
   var re_keywords = Regex.new(words.join('|'));
 
   # Build an array of lambda's
-  var predicates = lines[1 .. lines.end-1].reverse.map{ |line|
+  var predicates = lines[1 .. lines.end-1].map{ |line|
     var keywords = line.scan(re_keywords);
     var (name1, name2) = line.scan(re_names)...;
 

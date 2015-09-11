@@ -1,0 +1,43 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Rosetta_Code/Rank_languages_by_popularity
+#
+
+require 'MediaWiki::API';
+
+var api = %s'MediaWiki::API'.new(
+    Hash.new(api_url => 'http://rosettacode.org/mw/api.php')
+);
+
+var languages = [];
+var gcmcontinue;
+loop {
+    var apih = api.api(
+        Hash.new(
+            action      => 'query',
+            generator   => 'categorymembers',
+            gcmtitle    => 'Category:Programming Languages',
+            gcmlimit    => 250,
+            prop        => 'categoryinfo',
+            gcmcontinue => gcmcontinue,
+        )
+    );
+
+    languages.append(apih[:query][:pages].values...);
+    gcmcontinue = apih['query-continue'][:categorymembers][:gcmcontinue];
+    gcmcontinue || break;
+}
+
+languages.each { |lang|
+    lang[:title] -= /^Category:/;
+    lang[:categoryinfo][:size] \\= 0;
+}
+
+var sorted_languages = languages.sort { |a, b|
+    a[:categoryinfo][:size] <=> b[:categoryinfo][:size]
+}.reverse;
+
+sorted_languages.each_with_index { |i, lang|
+    printf("%3d. %20s - %3d\n", i+1, lang[:title], lang[:categoryinfo][:size]);
+}
