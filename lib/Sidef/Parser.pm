@@ -76,7 +76,7 @@ package Sidef::Parser {
                      | Cha?r\b                        (?{ state $x = Sidef::Types::Char::Char->new })
                      | Cha?rs\b                       (?{ state $x = Sidef::Types::Char::Chars->new })
                      | Sys\b                          (?{ state $x = Sidef::Sys::Sys->new })
-                     | Regex\b                        (?{ state $x = Sidef::Types::Regex::Regex->new('') })
+                     | Regexp?\b                      (?{ state $x = Sidef::Types::Regex::Regex->new('') })
                      | Sidef\b                        (?{ state $x = Sidef->new })
                      | Perl\b                         (?{ state $x = Sidef::Perl::Perl->new })
                      | \$\.                           (?{ state $x = Sidef::Variable::Magic->new(\$., 1) })
@@ -174,7 +174,7 @@ package Sidef::Parser {
                   Bool
                   Sys
                   Sig SIG
-                  Regex
+                  Regex Regexp
                   Time
                   Perl
                   Sidef

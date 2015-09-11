@@ -1,0 +1,21 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Dinesman%27s_multiple-dwelling_problem
+#
+
+var names = %w(Baker Cooper Fletcher Miller Smith);
+
+var predicates = [
+    ->(c){ :Baker != c.last },
+    ->(c){ :Cooper != c.first },
+    ->(c){ (:Fletcher != c.first) && (:Fletcher != c.last) },
+    ->(c){ c.index(:Miller) > c.index(:Cooper) },
+    ->(c){ (c.index(:Smith) - c.index(:Fletcher)).abs != 1 },
+    ->(c){ (c.index(:Cooper) - c.index(:Fletcher)).abs != 1 },
+];
+
+names.permutations { |candidate|
+    predicates.all {|predicate| predicate(candidate) }
+        && (say candidate.join("\n"); break);
+};

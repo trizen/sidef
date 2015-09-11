@@ -657,6 +657,30 @@ package Sidef::Types::Array::Array {
     *unrollTo  = \&assign_to;
     *assignTo  = \&assign_to;
 
+    sub index {
+        my ($self, $obj) = @_;
+
+        state $method = '=';
+        foreach my $i (0 .. $#{$self}) {
+            $self->[$i]->get_value->$method($obj)
+              && return Sidef::Types::Number::Number->new($i);
+        }
+
+        Sidef::Types::Number::Number->new(-1);
+    }
+
+    sub rindex {
+        my ($self, $obj) = @_;
+
+        state $method = '=';
+        for (my $i = $#{$self} ; $i >= 0 ; $i--) {
+            $self->[$i]->get_value->$method($obj)
+              && return Sidef::Types::Number::Number->new($i);
+        }
+
+        Sidef::Types::Number::Number->new(-1);
+    }
+
     sub first_index {
         my ($self, $code) = @_;
 
