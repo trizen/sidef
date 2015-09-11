@@ -482,6 +482,8 @@ scripts/Rosettacode/Deepcopy.sf
 scripts/Rosettacode/Define_a_primitive_data_type.sf
 scripts/Rosettacode/Delete_a_file.sf
 scripts/Rosettacode/Determine_if_a_string_is_numeric.sf
+scripts/Rosettacode/Dinesman_problem_parsing.sf
+scripts/Rosettacode/Dinesman_problem_simple.sf
 scripts/Rosettacode/Dot_product.sf
 scripts/Rosettacode/Doubly-linked_list_Element_definition.sf
 scripts/Rosettacode/Draw_a_cuboid.sf
@@ -830,6 +832,7 @@ scripts/Rosettacode/Walk_a_directory_Recursively.sf
 scripts/Rosettacode/Word_wrap.sf
 scripts/Rosettacode/Word_wrap_1.sf
 scripts/Rosettacode/Write_language_name_in_3D_ASCII.sf
+scripts/Rosettacode/WWW/FTP.sf
 scripts/Rosettacode/WWW/Hello_world_Web_server.sf
 scripts/Rosettacode/WWW/Hello_world_Web_server_1.sf
 scripts/Rosettacode/WWW/Sockets.sf

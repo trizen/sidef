@@ -1010,7 +1010,7 @@ package Sidef::Types::String::String {
                     if (exists $chars[$i + 2] and $chars[$i + 2] eq '{') {
                         my $str = CORE::join('', @chars[$i + 2 .. $#chars]);
                         if ($str =~ /^\{(.*?)\}/) {
-                            splice(@chars, $i--, 2 + $+[0], chr(oct($1)));
+                            splice(@chars, $i--, 2 + $+[0], CORE::chr(CORE::oct($1)));
                             next;
                         }
                         else {
@@ -1025,7 +1025,7 @@ package Sidef::Types::String::String {
                 elsif ($char =~ /^[0-7]/) {
                     my $str = CORE::join('', @chars[$i + 1 .. $#chars]);
                     if ($str =~ /^(0[0-7]{1,2}|[0-7]{1,2})/) {
-                        splice @chars, $i, 1 + $+[0], chr(oct($1));
+                        splice @chars, $i, 1 + $+[0], CORE::chr(CORE::oct($1));
                     }
                 }
                 elsif ($char eq 'd') {
