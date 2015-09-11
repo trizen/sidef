@@ -27,7 +27,7 @@ package Sidef::Module::OO {
                    local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
                        ref($_) eq __PACKAGE__            ? $_->{module}
                      : ref($_) eq 'Sidef::Variable::Ref' ? $_->get_var->get_value
-                     : ref($_) =~ /^Sidef::/             ? $_->get_value
+                     : index(ref($_), 'Sidef::') == 0 ? $_->get_value
                      : $_
                  } @arg
               )

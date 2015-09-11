@@ -51,7 +51,7 @@ package Sidef::Types::Hash::Hash {
         while (my ($k, $v) = each %{$self->{data}}) {
             my $rv = $v->get_value;
             $hash{$k} = (
-                         ref($rv) =~ /^Sidef::/
+                         index(ref($rv), 'Sidef::') == 0
                          ? $rv->get_value
                          : $rv
                         );

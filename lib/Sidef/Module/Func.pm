@@ -64,7 +64,7 @@ package Sidef::Module::Func {
                        my $obj = $_->get_var->get_value;
                        ref $obj eq 'Sidef::Types::Hash::Hash' ? $obj->{data} //= {} : $obj;
                      }
-                     : ref($_) =~ /^Sidef::/ ? $_->get_value
+                     : index(ref($_), 'Sidef::') == 0 ? $_->get_value
                      : $_
                  } @arg
               )

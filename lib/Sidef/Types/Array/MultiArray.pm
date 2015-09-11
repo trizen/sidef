@@ -22,7 +22,7 @@ package Sidef::Types::Array::MultiArray {
         my ($self) = @_;
         [
          map {
-             [map { ref($_) =~ /^Sidef::/ ? $_->get_value : $_ } @{$_}]
+             [map { index(ref($_), 'Sidef::') == 0 ? $_->get_value : $_ } @{$_}]
            } @{$self}
         ];
     }

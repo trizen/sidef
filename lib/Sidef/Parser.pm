@@ -2387,7 +2387,7 @@ package Sidef::Parser {
                         my $value = $_;
                         do {
                             $value = $value->get_value;
-                        } while (ref($value) =~ /^Sidef::/);
+                        } while (index(ref($value), 'Sidef::') == 0);
 
                         ref($value) ne ''
                           ? $self->fatal_error(

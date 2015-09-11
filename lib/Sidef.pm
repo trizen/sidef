@@ -108,7 +108,7 @@ package Sidef {
     my ($self, @args) = @_;
 
     $self = ref($self) if ref($self);
-    $self =~ /^Sidef::/ or return;
+    index($self, 'Sidef::') == 0 or return;
     eval { require $self =~ s{::}{/}rg . '.pm' };
 
     if ($@) {

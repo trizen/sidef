@@ -360,7 +360,7 @@ package Sidef::Types::String::String {
     sub bin {
         my ($self) = @_;
         my $value = $self->get_value;
-        Sidef::Types::Number::Number->new(CORE::oct($value =~ /^0b/ ? $value : ('0b' . $value)));
+        Sidef::Types::Number::Number->new(CORE::oct(index($value, '0b') == 0 ? $value : ('0b' . $value)));
     }
 
     sub num {
