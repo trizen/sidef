@@ -75,6 +75,11 @@ package Sidef::Types::Glob::FileHandle {
 
     *say = \&println;
 
+    sub printf {
+        my ($self, @args) = @_;
+        Sidef::Types::Bool::Bool->new(CORE::printf {$self->{fh}} @args);
+    }
+
     sub read {
         my ($self, $var_ref, $length, $offset) = @_;
 
