@@ -12,7 +12,7 @@ class Counter {
             };
             p = self.next_prime(p);
         };
-        (n > 1 || out.len.isZero) && out.append(n);
+        (n > 1 || out.len.is_zero) && out.append(n);
         return out;
     }
 

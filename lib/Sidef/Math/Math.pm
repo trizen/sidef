@@ -229,8 +229,6 @@ package Sidef::Math::Math {
         Sidef::Types::Number::Number->new(($from + $to) * (($to - $from) / $step + 1) / 2);
     }
 
-    *rangeSum = \&range_sum;
-
     sub map {
         my ($self, $value, $in_min, $in_max, $out_min, $out_max) = @_;
 

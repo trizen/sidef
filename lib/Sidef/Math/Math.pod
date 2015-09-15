@@ -572,18 +572,11 @@ Return the
 
 =cut
 
-=head2 rangeSum
+=head2 range_sum
 
-Math.rangeSum(I<from>, I<to>, I<step>) -> I<Num>
+Math.range_sum() -> I<Obj>
 
-Returns the sum for a given range of numbers and an optional step.
-
-    Math.rangeSum(1, 9);     # returns: 45 (1+2+3+...+9)
-    Math.rangeSum(1, 9, 2);  # returns: 25 (1+3+5+...+9)
-
-Aliases: I<range_sum()>.
-
-Returns an object of type: C<Sidef::Types::Number::Number>
+Return the
 
 =cut
 

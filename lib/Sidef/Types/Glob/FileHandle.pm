@@ -1,5 +1,6 @@
 package Sidef::Types::Glob::FileHandle {
 
+    use utf8;
     use 5.014;
     use parent qw(
       Sidef::Object::Object
@@ -29,8 +30,6 @@ package Sidef::Types::Glob::FileHandle {
         Sidef::Types::Bool::Bool->new(-t $_[0]{fh});
     }
 
-    *isOnTty = \&is_on_tty;
-
     sub stdout {
         __PACKAGE__->new(fh => \*STDOUT);
     }
@@ -54,26 +53,12 @@ package Sidef::Types::Glob::FileHandle {
         CORE::binmode($self->{fh}, $encoding->get_value);
     }
 
-    sub compare {
-        my ($self, $fh) = @_;
-        state $x = require File::Compare;
-        Sidef::Types::Number::Number->new(File::Compare::compare($self->{fh}, $fh->{fh}));
-    }
-
-    *cmp = \&compare;
-
-    sub writeString {
+    sub write_string {
         my ($self, @args) = @_;
-
-        @args <= 3 || do {
-            warn "[WARN] FileHandle.writeString(): Too many arguments! Expected: (str, len, offset).";
-            return;
-        };
-
         Sidef::Types::Bool::Bool->new(syswrite $self->{fh}, @args);
     }
 
-    *write_string = \&writeString;
+    *syswrite = \&write_string;
 
     sub print {
         my ($self, @args) = @_;
@@ -124,8 +109,6 @@ package Sidef::Types::Glob::FileHandle {
         return $size;
     }
 
-    *sysRead = \&sysread;
-
     sub slurp {
         my ($self) = @_;
 
@@ -152,13 +135,9 @@ package Sidef::Types::Glob::FileHandle {
     }
 
     *readln    = \&readline;
-    *readLine  = \&readline;
     *read_line = \&readline;
     *get       = \&readline;
     *line      = \&readline;
-    *get_line  = \&readline;
-    *getLine   = \&readline;
-    *getline   = \&readline;
 
     sub read_char {
         my ($self) = @_;
@@ -169,24 +148,15 @@ package Sidef::Types::Glob::FileHandle {
           : ();
     }
 
-    *readChar = \&read_char;
-    *getc     = \&read_char;
-    *getChar  = \&read_char;
-    *get_char = \&read_char;
+    *getc = \&read_char;
 
-    sub read_all {
+    sub read_lines {
         my ($self) = @_;
         Sidef::Types::Array::Array->new(map { Sidef::Types::String::String->new($_) } CORE::readline($self->{fh}));
     }
 
-    *readAll   = \*read_all;
-    *readall   = \&read_all;
-    *getlines  = \&read_all;
-    *get_lines = \&read_all;
-    *getLines  = \&read_all;
-    *readlines = \&read_all;
-    *readLines = \&read_all;
-    *lines     = \&read_all;
+    *readlines = \&read_lines;
+    *lines     = \&read_lines;
 
     sub words {
         my ($self) = @_;
@@ -291,11 +261,13 @@ package Sidef::Types::Glob::FileHandle {
 
     *sep             = \&separator;
     *input_separator = \&separator;
-    *inputSeparator  = \&separator;
 
     # File copy
     *copy = \&Sidef::Types::Glob::File::copy;
     *cp   = \&copy;
+
+    # File compare
+    *compare = \&File::Types::Glob::File::compare;
 
     sub read_to {
         my ($self, $var_ref) = @_;
@@ -303,20 +275,18 @@ package Sidef::Types::Glob::FileHandle {
         $self;
     }
 
-    *readTo = \&read_to;
-
     sub output_from {
         my ($self, $string) = @_;
         CORE::print {$self->{fh}} $string;
         $self;
     }
 
-    *outputFrom = \&output_from;
-
     {
         no strict 'refs';
         *{__PACKAGE__ . '::' . '>>'}  = \&read_to;
+        *{__PACKAGE__ . '::' . '»'}  = \&read_to;
         *{__PACKAGE__ . '::' . '<<'}  = \&output_from;
+        *{__PACKAGE__ . '::' . '«'}  = \&output_from;
         *{__PACKAGE__ . '::' . '<=>'} = \&compare;
     }
 

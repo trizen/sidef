@@ -29,7 +29,7 @@ loop {
     var pi = Sys.scanln("Play: ");
     pi == 'q' && break;
  
-    var pChoice = rps.indexWhere{_ == pi};
+    var pChoice = rps.index(pi);
  
     if (pChoice == -1) {
         STDERR.print("Invalid input!\n");

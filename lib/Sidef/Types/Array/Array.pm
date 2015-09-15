@@ -178,8 +178,6 @@ package Sidef::Types::Array::Array {
         Sidef::Types::Bool::Bool->new($#{$self} == -1);
     }
 
-    *isEmpty = \&is_empty;
-
     sub subtract {
         my ($self, $array) = @_;
         $self->_grep($array, 1);
@@ -271,9 +269,6 @@ package Sidef::Types::Array::Array {
 
         Sidef::Types::Number::Number->new($counter);
     }
-
-    *countObj  = \&count;
-    *count_obj = \&count;
 
     sub equals {
         my ($self, $array) = @_;
@@ -390,8 +385,6 @@ package Sidef::Types::Array::Array {
         $max;
     }
 
-    *maxBy = \&max_by;
-
     sub min_by {
         my ($self, $code) = @_;
 
@@ -409,8 +402,6 @@ package Sidef::Types::Array::Array {
 
         $min;
     }
-
-    *minBy = \&min_by;
 
     sub last {
         my ($self, $arg) = @_;
@@ -472,7 +463,7 @@ package Sidef::Types::Array::Array {
         Sidef::Types::Bool::Bool->new(exists $self->[$index->get_value]);
     }
 
-    *existsIndex = \&exists;
+    *has_index = \&exists;
 
     sub defined {
         my ($self, $index) = @_;
@@ -531,7 +522,6 @@ package Sidef::Types::Array::Array {
         $self->new(map { $_->get_value } _slice(@_));
     }
 
-    *fromTo  = \&ft;
     *from_to = \&ft;
 
     sub each {
@@ -601,8 +591,6 @@ package Sidef::Types::Array::Array {
         $hash;
     }
 
-    *groupBy = \&group_by;
-
     sub find {
         my ($self, $code) = @_;
         foreach my $var (@{$self}) {
@@ -643,19 +631,16 @@ package Sidef::Types::Array::Array {
     sub assign_to {
         my ($self, @vars) = @_;
 
-        for my $i (0 .. $#vars) {
+        my @values = splice(@{$self}, 0, $#vars + 1);
 
-            if (exists $self->[$i]) {
-                $vars[$i]->get_var->set_value($self->[$i]->get_value);
+        for my $i (0 .. $#vars) {
+            if (exists $values[$i]) {
+                $vars[$i]->get_var->set_value($values[$i]->get_value);
             }
         }
 
-        $self;
+        $self->new(@values);
     }
-
-    *unroll_to = \&assign_to;
-    *unrollTo  = \&assign_to;
-    *assignTo  = \&assign_to;
 
     sub index {
         my ($self, $obj) = @_;
@@ -692,9 +677,6 @@ package Sidef::Types::Array::Array {
         Sidef::Types::Number::Number->new(-1);
     }
 
-    *indexWhere = \&first_index;
-    *firstIndex = \&first_index;
-
     sub last_index {
         my ($self, $code) = @_;
 
@@ -705,9 +687,6 @@ package Sidef::Types::Array::Array {
 
         Sidef::Types::Number::Number->new(-1);
     }
-
-    *lastIndexWhere = \&last_index;
-    *lastIndex      = \&last_index;
 
     sub reduce_pairs {
         my ($self, $obj) = @_;
@@ -731,8 +710,6 @@ package Sidef::Types::Array::Array {
 
         $self->new(@array);
     }
-
-    *reducePairs = \&reduce_pairs;
 
     sub shuffle {
         my ($self) = @_;
@@ -760,8 +737,7 @@ package Sidef::Types::Array::Array {
         $t;
     }
 
-    *bshuffle    = \&best_shuffle;
-    *bestShuffle = \&best_shuffle;
+    *bshuffle = \&best_shuffle;
 
     sub pair_with {
         my ($self, @args) = @_;
@@ -810,7 +786,6 @@ package Sidef::Types::Array::Array {
         $num;
     }
 
-    *resizeTo  = \&resize;
     *resize_to = \&resize;
 
     sub rand {
@@ -883,9 +858,7 @@ package Sidef::Types::Array::Array {
         $self->_unique(1);
     }
 
-    *last_uniq  = \&last_unique;
-    *lastUniq   = \&last_unique;
-    *lastUnique = \&last_unique;
+    *last_uniq = \&last_unique;
 
     sub abbrev {
         my ($self, $code) = @_;
@@ -982,8 +955,6 @@ package Sidef::Types::Array::Array {
         return Sidef::Types::Bool::Bool->false;
     }
 
-    *containsType = \&contains_type;
-
     sub contains_any {
         my ($self, $array) = @_;
 
@@ -994,8 +965,6 @@ package Sidef::Types::Array::Array {
         Sidef::Types::Bool::Bool->false;
     }
 
-    *containsAny = \&contains_any;
-
     sub contains_all {
         my ($self, $array) = @_;
 
@@ -1005,8 +974,6 @@ package Sidef::Types::Array::Array {
 
         Sidef::Types::Bool::Bool->true;
     }
-
-    *containsAll = \&contains_all;
 
     sub shift {
         my ($self, $num) = @_;
@@ -1019,9 +986,7 @@ package Sidef::Types::Array::Array {
         shift(@{$self})->get_value;
     }
 
-    *dropFirst  = \&shift;
     *drop_first = \&shift;
-    *dropLeft   = \&shift;
     *drop_left  = \&shift;
 
     sub pop {
@@ -1037,9 +1002,7 @@ package Sidef::Types::Array::Array {
     }
 
     *drop_last  = \&pop;
-    *dropLast   = \&pop;
     *drop_right = \&pop;
-    *dropRight  = \&pop;
 
     sub pop_rand {
         my ($self) = @_;
@@ -1047,16 +1010,12 @@ package Sidef::Types::Array::Array {
         CORE::splice(@{$self}, CORE::rand($#{$self} + 1), 1)->get_value;
     }
 
-    *popRand = \&pop_rand;
-
     sub delete_index {
         my ($self, $offset) = @_;
         CORE::splice(@{$self}, $offset->get_value, 1)->get_value;
     }
 
-    *pop_at      = \&delete_index;
-    *deleteIndex = \&delete_index;
-    *popAt       = \&delete_index;
+    *pop_at = \&delete_index;
 
     sub splice {
         my ($self, $offset, $length, @objects) = @_;
@@ -1071,7 +1030,7 @@ package Sidef::Types::Array::Array {
         $self->new(map { $_->get_value } CORE::splice(@{$self}, $offset, $length));
     }
 
-    sub takeRight {
+    sub take_right {
         my ($self, $amount) = @_;
 
         my $offset = $#{$self};
@@ -1079,16 +1038,12 @@ package Sidef::Types::Array::Array {
         $self->new(map { $_->get_value } @{$self}[$offset - $amount .. $offset]);
     }
 
-    *take_right = \&takeRight;
-
-    sub takeLeft {
+    sub take_left {
         my ($self, $amount) = @_;
 
         $amount = $#{$self} > ($amount->get_value - 1) ? $amount->get_value - 1 : $#{$self};
         $self->new(map { $_->get_value } @{$self}[0 .. $amount]);
     }
-
-    *take_left = \&takeLeft;
 
     sub sort {
         my ($self, $code) = @_;
@@ -1225,7 +1180,7 @@ package Sidef::Types::Array::Array {
     sub delete_first {
         my ($self, $obj) = @_;
 
-        my $method = '==';
+        state $method = '==';
         foreach my $i (0 .. $#{$self}) {
             my $var  = $self->[$i];
             my $item = $var->get_value;
@@ -1240,8 +1195,25 @@ package Sidef::Types::Array::Array {
     }
 
     *remove_first = \&delete_first;
-    *removeFirst  = \&delete_first;
-    *deleteFirst  = \&delete_first;
+
+    sub delete_last {
+        my ($self, $obj) = @_;
+
+        state $method = '==';
+        for (my $i = $#{$self} ; $i >= 0 ; $i--) {
+            my $var  = $self->[$i];
+            my $item = $var->get_value;
+            if (ref($item) eq ref($obj)
+                and $item->$method($obj)) {
+                CORE::splice(@{$self}, $i, 1);
+                return Sidef::Types::Bool::Bool->true;
+            }
+        }
+
+        Sidef::Types::Bool::Bool->false;
+    }
+
+    *remove_last = \&delete_first;
 
     sub delete {
         my ($self, $obj) = @_;
@@ -1271,8 +1243,6 @@ package Sidef::Types::Array::Array {
     }
 
     *remove_if = \&delete_if;
-    *removeIf  = \&delete_if;
-    *deleteIf  = \&delete_if;
 
     sub delete_first_if {
         my ($self, $code) = @_;
@@ -1289,8 +1259,6 @@ package Sidef::Types::Array::Array {
     }
 
     *remove_first_if = \&delete_first_if;
-    *removeFirstIf   = \&delete_first_if;
-    *deleteFirstIf   = \&delete_first_if;
 
     sub to_list {
         Sidef::Types::Array::List->new(map { $_->get_value } @{$_[0]});
@@ -1321,8 +1289,10 @@ package Sidef::Types::Array::Array {
 
         *{__PACKAGE__ . '::' . '&'}   = \&and;
         *{__PACKAGE__ . '::' . '*'}   = \&multiply;
-        *{__PACKAGE__ . '::' . '<<'}  = \&dropLeft;
-        *{__PACKAGE__ . '::' . '>>'}  = \&dropRight;
+        *{__PACKAGE__ . '::' . '<<'}  = \&append;
+        *{__PACKAGE__ . '::' . '«'}  = \&append;
+        *{__PACKAGE__ . '::' . '>>'}  = \&assign_to;
+        *{__PACKAGE__ . '::' . '»'}  = \&assign_to;
         *{__PACKAGE__ . '::' . '|'}   = \&or;
         *{__PACKAGE__ . '::' . '^'}   = \&xor;
         *{__PACKAGE__ . '::' . '+'}   = \&concat;
@@ -1331,8 +1301,6 @@ package Sidef::Types::Array::Array {
         *{__PACKAGE__ . '::' . '!='}  = \&ne;
         *{__PACKAGE__ . '::' . ':'}   = \&pair_with;
         *{__PACKAGE__ . '::' . '/'}   = \&divide;
-        *{__PACKAGE__ . '::' . '»'}  = \&assign_to;
-        *{__PACKAGE__ . '::' . '«'}  = \&append;
         *{__PACKAGE__ . '::' . '...'} = \&to_list;
 
         *{__PACKAGE__ . '::' . '++'} = sub {

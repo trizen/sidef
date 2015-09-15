@@ -106,15 +106,12 @@ package Sidef::Types::Block::Code {
         Sidef::Types::Hash::Hash->new($self->_execute);
     }
 
-    *toHash = \&to_hash;
-    *to_h   = \&to_hash;
+    *to_h = \&to_hash;
 
     sub to_array {
         my ($self) = @_;
         Sidef::Types::Array::Array->new($self->_execute);
     }
-
-    *toArray = \&to_array;
 
     sub _run_code {
         my ($self, @args) = @_;

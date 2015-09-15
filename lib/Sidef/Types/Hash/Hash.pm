@@ -103,8 +103,6 @@ package Sidef::Types::Hash::Hash {
         Sidef::Types::Bool::Bool->true;
     }
 
-    *duplicateOf = \&duplicate_of;
-
     sub eq {
         my ($self, $obj) = @_;
 
@@ -157,7 +155,7 @@ package Sidef::Types::Hash::Hash {
         $self;
     }
 
-    sub mapval {
+    sub map_val {
         my ($self, $code) = @_;
 
         while (my ($key, $value) = each %{$self->{data}}) {
@@ -172,21 +170,18 @@ package Sidef::Types::Hash::Hash {
         $self;
     }
 
-    *mapVal  = \&mapval;
-    *map_val = \&mapval;
-
     sub select {
         my ($self, $code) = @_;
 
-        my $new_hash = $self->new;
+        my @pairs;
         $self->_iterate(
             $code,
             sub {
-                $new_hash->append(@_);
+                push @pairs, @_;
             }
         );
 
-        $new_hash;
+        $self->new(@pairs);
     }
 
     *grep = \&select;
@@ -231,8 +226,6 @@ package Sidef::Types::Hash::Hash {
 
         $self;
     }
-
-    *mergeValues = \&merge_values;
 
     sub keys {
         my ($self) = @_;
@@ -326,7 +319,6 @@ package Sidef::Types::Hash::Hash {
     }
 
     *has_key  = \&exists;
-    *haskey   = \&exists;
     *contains = \&exists;
 
     sub flip {
@@ -387,7 +379,7 @@ package Sidef::Types::Hash::Hash {
         no strict 'refs';
 
         *{__PACKAGE__ . '::' . '+'}   = \&concat;
-        *{__PACKAGE__ . '::' . '==='} = \&duplicateOf;
+        *{__PACKAGE__ . '::' . '==='} = \&duplicate_of;
         *{__PACKAGE__ . '::' . '=='}  = \&eq;
         *{__PACKAGE__ . '::' . '!='}  = \&ne;
         *{__PACKAGE__ . '::' . ':'}   = \&new;

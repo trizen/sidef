@@ -8,8 +8,8 @@ func hailstone (n) {
 
     while (n > 1) {
         sequence.append(
-            n.isEven ? n.div!(2)
-                     : n.multiply!(3).add!(1);
+            n.is_even ? n.div!(2)
+                      : n.multiply!(3).add!(1);
         );
     }
 

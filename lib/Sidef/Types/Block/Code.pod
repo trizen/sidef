@@ -191,8 +191,6 @@ Code.to_array() -> I<Obj>
 
 Return the
 
-Aliases: I<toArray>
-
 =cut
 
 =head2 to_h
@@ -201,7 +199,7 @@ Code.to_h() -> I<Obj>
 
 Return the
 
-Aliases: I<to_hash>, I<toHash>
+Aliases: I<to_hash>
 
 =cut
 

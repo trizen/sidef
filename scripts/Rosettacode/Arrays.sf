@@ -18,7 +18,7 @@ arr[2] = "b";           # => ['a', 1, 'b', 3]
 arr[5] = "end";         # => ['a', 1, 'b', 3, nil, 'end']
  
 # resize the array
-arr.resizeTo(-1);       # => []
+arr.resize_to(-1);      # => []
  
 # slice assignment
 arr[0..2] = 'a'..'c';   # => ['a', 'b', 'c']

@@ -31,8 +31,6 @@ package Sidef::Types::Glob::Dir {
         __PACKAGE__->new(File::Spec->rootdir);
     }
 
-    *rootdir = \&root;
-
     sub home {
         my ($self) = @_;
 
@@ -48,29 +46,17 @@ package Sidef::Types::Glob::Dir {
         };
     }
 
-    *homedir  = \&home;
-    *home_dir = \&home;
-
     sub tmp {
         state $x = require File::Spec;
         __PACKAGE__->new(File::Spec->tmpdir);
     }
 
-    *tmpdir   = \&tmp;
-    *tempdir  = \&tmp;
-    *temp     = \&tmp;
-    *temp_dir = \&tmp;
-    *tmp_dir  = \&tmp;
+    *temp = \&tmp;
 
     sub cwd {
         state $x = require Cwd;
         __PACKAGE__->new(Cwd::getcwd());
     }
-
-    *cur_dir           = \&cwd;
-    *cur               = \&cwd;
-    *current_directory = \&cwd;
-    *current_dir       = \&cwd;
 
     sub pwd {
         state $x = require File::Spec;
@@ -110,8 +96,6 @@ package Sidef::Types::Glob::Dir {
         Sidef::Types::Bool::Bool->new(File::Path::remove_tree($self->get_value));
     }
 
-    *removeTree = \&remove_tree;
-
     # Create directory without parents
     sub create {
         my ($self) = @_;
@@ -133,12 +117,10 @@ package Sidef::Types::Glob::Dir {
           : Sidef::Types::Bool::Bool->new(File::Path::make_path($path));
     }
 
-    *createTree = \&create_tree;
-    *makeTree   = \&create_tree;
-    *make_tree  = \&create_tree;
-    *mktree     = \&create_tree;
-    *make_path  = \&create_tree;
-    *mkpath     = \&create_tree;
+    *make_tree = \&create_tree;
+    *mktree    = \&create_tree;
+    *make_path = \&create_tree;
+    *mkpath    = \&create_tree;
 
     sub open {
         my ($self, $fh_ref, $err_ref) = @_;
@@ -201,8 +183,6 @@ package Sidef::Types::Glob::Dir {
         }
         Sidef::Types::Bool::Bool->true;
     }
-
-    *isEmpty = \&is_empty;
 
     sub dump {
         my ($self) = @_;

@@ -13,8 +13,7 @@ package Sidef::Convert::Convert {
           : $self;
     }
 
-    *to_str    = \&to_s;
-    *to_string = \&to_s;
+    *to_str = \&to_s;
 
     sub to_obj {
         my ($self, $obj) = @_;
@@ -22,14 +21,11 @@ package Sidef::Convert::Convert {
         $obj->new($self);
     }
 
-    *to_object = \&to_obj;
-
     sub to_i {
         Sidef::Types::Number::Number->new_int($_[0]->get_value);
     }
 
-    *to_integer = \&to_i;
-    *to_int     = \&to_i;
+    *to_int = \&to_i;
 
     sub to_rat {
         Sidef::Types::Number::Number->new_rat($_[0]->get_value);

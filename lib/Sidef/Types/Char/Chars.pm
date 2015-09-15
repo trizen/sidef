@@ -12,8 +12,8 @@ package Sidef::Types::Char::Chars {
     }
 
     sub call {
-        my ($self, $string) = @_;
-        $self->new(map { Sidef::Types::Char::Char->new($_) } split //, $string);
+        my ($self, @strings) = @_;
+        $self->new(map { Sidef::Types::Char::Char->new($_) } split(//, join('', @strings)));
     }
 
     sub dump {

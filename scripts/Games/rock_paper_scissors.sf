@@ -30,7 +30,7 @@ var aChoice = (3.rand.int); # ai choice for first play is completely random
     pi = Sys.scanln;        # get player choice
     pi == 'q' && (break);
 
-    var pChoice = rps.indexWhere{_ == pi};
+    var pChoice = rps.index(pi);
 
     if (var block = __BLOCK__; pChoice == -1) {
         "Invalid input!\n".warn;

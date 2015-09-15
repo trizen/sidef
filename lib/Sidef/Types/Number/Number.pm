@@ -259,8 +259,8 @@ package Sidef::Types::Number::Number {
                                              );
     }
 
-    *upto = \&to;
-    *upTo = \&to;
+    *upto  = \&to;
+    *up_to = \&to;
 
     sub downto {
         my ($self, $num, $step) = @_;
@@ -272,7 +272,7 @@ package Sidef::Types::Number::Number {
                                              );
     }
 
-    *downTo = \&downto;
+    *down_to = \&downto;
 
     sub range {
         my ($self, $to, $step) = @_;
@@ -441,14 +441,11 @@ package Sidef::Types::Number::Number {
         Sidef::Types::Bool::Bool->new($self->get_value->is_zero);
     }
 
-    *isZero = \&is_zero;
-
     sub is_nan {
         my ($self) = @_;
         Sidef::Types::Bool::Bool->new($self->get_value->is_nan);
     }
 
-    *isNaN  = \&is_nan;
     *is_NaN = \&is_nan;
 
     sub is_positive {
@@ -456,50 +453,38 @@ package Sidef::Types::Number::Number {
         Sidef::Types::Bool::Bool->new($self->get_value->is_pos);
     }
 
-    *isPositive = \&is_positive;
-    *isPos      = \&is_positive;
-    *is_pos     = \&is_positive;
+    *is_pos = \&is_positive;
 
     sub is_negative {
         my ($self) = @_;
         Sidef::Types::Bool::Bool->new($self->get_value->is_neg);
     }
 
-    *isNegative = \&is_negative;
-    *isNeg      = \&is_negative;
-    *is_neg     = \&is_negative;
+    *is_neg = \&is_negative;
 
     sub is_even {
         my ($self) = @_;
         Sidef::Types::Bool::Bool->new($self->get_value->as_int->is_even);
     }
 
-    *isEven = \&is_even;
-
     sub is_odd {
         my ($self) = @_;
         Sidef::Types::Bool::Bool->new($self->get_value->as_int->is_odd);
     }
-
-    *isOdd = \&is_odd;
 
     sub is_inf {
         my ($self) = @_;
         Sidef::Types::Bool::Bool->new($self->get_value->is_inf);
     }
 
-    *isInf       = \&is_inf;
     *is_infinite = \&is_inf;
-    *isInfinite  = \&is_inf;
 
     sub is_integer {
         my ($self) = @_;
         Sidef::Types::Bool::Bool->new($self->get_value->is_int);
     }
 
-    *isInt     = \&is_integer;
-    *is_int    = \&is_integer;
-    *isInteger = \&is_integer;
+    *is_int = \&is_integer;
 
     sub rand {
         my ($self, $max) = @_;
@@ -541,7 +526,6 @@ package Sidef::Types::Number::Number {
     }
 
     *fround = \&roundf;
-    *fRound = \&roundf;
 
     sub length {
         my ($self) = @_;
@@ -606,8 +590,6 @@ package Sidef::Types::Number::Number {
         Sidef::Types::Bool::Bool->new($self->get_value % $num->get_value == 0);
     }
 
-    *isDiv = \&is_div;
-
     sub divides {
         my ($self, $num) = @_;
         Sidef::Types::Bool::Bool->new($num->get_value % $self->get_value == 0);
@@ -616,9 +598,10 @@ package Sidef::Types::Number::Number {
     sub commify {
         my ($self) = @_;
 
-        my $n = $self->get_value->bstr;
-        my $x = $n;
+        my $n = $self->get_value;
+        $n = $n->bstr if ref($n);
 
+        my $x   = $n;
         my $neg = $n =~ s{^-}{};
         $n =~ /\.|$/;
 
@@ -655,14 +638,10 @@ package Sidef::Types::Number::Number {
         $self->new($self->get_value->copy->brsft($num->get_value, (defined($base) ? $base->get_value : ())));
     }
 
-    *shiftRight = \&shift_right;
-
     sub shift_left {
         my ($self, $num, $base) = @_;
         $self->new($self->get_value->copy->blsft($num->get_value, defined($base) ? $base->get_value : ()));
     }
-
-    *shiftLeft = \&shift_left;
 
     sub complex {
         my ($self, $num) = @_;

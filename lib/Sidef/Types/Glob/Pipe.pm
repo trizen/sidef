@@ -49,8 +49,6 @@ package Sidef::Types::Glob::Pipe {
         $self->open('-|:utf8', $var_ref);
     }
 
-    *openR     = \&open_r;
-    *openRead  = \&open_r;
     *open_read = \&open_r;
 
     sub open_w {
@@ -58,8 +56,6 @@ package Sidef::Types::Glob::Pipe {
         $self->open('|-:utf8', $var_ref);
     }
 
-    *openW      = \&open_w;
-    *openWrite  = \&open_w;
     *open_write = \&open_w;
 
     sub dump {

@@ -41,8 +41,6 @@ package Sidef::Sys::Sys {
         Sidef::Types::Bool::Bool->new(Time::HiRes::nanosleep($sec->get_value));
     }
 
-    *nanoSleep = \&nanosleep;
-
     sub usleep {
         my ($self, $sec) = @_;
 
@@ -54,8 +52,6 @@ package Sidef::Sys::Sys {
         my ($self) = @_;
         Sidef::Types::String::String->new($^O);
     }
-
-    *osName = \&osname;
 
     sub user {
         my ($self) = @_;

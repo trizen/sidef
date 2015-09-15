@@ -50,13 +50,11 @@ Return the
 
 =cut
 
-=head2 cur
+=head2 cwd
 
-Dir.cur() -> I<Obj>
+Dir.cwd() -> I<Obj>
 
 Return the
-
-Aliases: I<cwd>, I<cur_dir>, I<current_dir>, I<current_directory>
 
 =cut
 
@@ -84,8 +82,6 @@ Dir.home() -> I<Obj>
 
 Return the
 
-Aliases: I<home_dir>, I<homedir>
-
 =cut
 
 =head2 is_empty
@@ -93,8 +89,6 @@ Aliases: I<home_dir>, I<homedir>
 Dir.is_empty() -> I<Obj>
 
 Return the
-
-Aliases: I<isEmpty>
 
 =cut
 
@@ -114,7 +108,7 @@ Dir.mkpath() -> I<Obj>
 
 Return the
 
-Aliases: I<mktree>, I<make_path>, I<make_tree>, I<makeTree>, I<create_tree>, I<createTree>
+Aliases: I<mktree>, I<make_path>, I<make_tree>, I<create_tree>
 
 =cut
 
@@ -176,8 +170,6 @@ Dir.remove_tree() -> I<Obj>
 
 Return the
 
-Aliases: I<removeTree>
-
 =cut
 
 =head2 root
@@ -185,8 +177,6 @@ Aliases: I<removeTree>
 Dir.root() -> I<Obj>
 
 Return the
-
-Aliases: I<rootdir>
 
 =cut
 
@@ -204,7 +194,7 @@ Dir.tmp() -> I<Obj>
 
 Return the
 
-Aliases: I<temp>, I<tmp_dir>, I<tmpdir>, I<temp_dir>, I<tempdir>
+Aliases: I<temp>
 
 =cut
 

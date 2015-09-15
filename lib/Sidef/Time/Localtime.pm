@@ -36,11 +36,8 @@ package Sidef::Time::Localtime {
         *minute    = \&min;
         *second    = \&sec;
         *month_day = \&mday;
-        *monthDay  = \&mday;
         *week_day  = \&wday;
-        *weekDay   = \&wday;
         *year_day  = \&yday;
-        *yearDay   = \&yday;
     }
 
     sub ctime {

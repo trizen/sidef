@@ -285,8 +285,6 @@ Sys.nanosleep() -> I<Obj>
 
 Return the
 
-Aliases: I<nanoSleep>
-
 =cut
 
 =head2 open
@@ -305,18 +303,11 @@ Return the
 
 =cut
 
-=head2 osName
+=head2 osname
 
-Sys.osName() -> I<String>
+Sys.osname() -> I<Obj>
 
-Return the name of the current operating system under which Sidef is running.
-
-    Sys.osName    # 'linux'   under Linux
-                  # 'MSWin32' under Windows
-
-Aliases: I<osname()>.
-
-Returns an object of type: C<Sidef::Types::String::String>
+Return the
 
 =cut
 

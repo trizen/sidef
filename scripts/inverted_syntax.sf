@@ -3,11 +3,11 @@
 # Inverted syntax:  http://rosettacode.org/wiki/Inverted_syntax
 
 #
-## Variable assignments ('assign_to' == 'assignTo' == '»')
+## Variable assignments ('assign_to' == '»' == '>>')
 #
 
 var a = 5;
-[5].assignTo(\var b);
+[5] >> \var b;
 
 say "A: #{a}";
 say "B: #{b}";
@@ -17,7 +17,7 @@ say "B: #{b}";
 #
 
 var (m, n) = (0, 1);
-[0, 1]»(\var x, \var y);
+[0, 1] >> (\var x, \var y);
 
 say "M,N: #{m},#{n}";
 say "X,Y: #{x},#{y}";

@@ -30,7 +30,7 @@ I<Obj> B<=~> I<Obj> -> I<Obj>
 
 Return the
 
-Aliases: I<match>, I<matches>
+Aliases: I<match>
 
 =cut
 
@@ -47,8 +47,6 @@ Return the
 Regex.gmatch() -> I<Obj>
 
 Return the
-
-Aliases: I<gmatches>
 
 =cut
 

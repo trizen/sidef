@@ -11,7 +11,7 @@ func cuboid(nx, ny, nz) {
   var(x, y, z) = (8*nx, 2*ny, 4*nz);
   var area = [];
   var line = func(n, sx, sy, c) {
-    DIR[c]»(\var dx, \var dy);
+    var(dx, dy) = DIR[c]...;
     0..n -> each {|i|
       var (xi, yi) = (sx + i*dx, sy + i*dy);
       area[yi] \\= [" "]*(x+y+1);

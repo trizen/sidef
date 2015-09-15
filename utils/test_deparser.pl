@@ -50,11 +50,6 @@ sub parse_deparse {
 }
 
 my %ignore = (
-
-    #'include_class.sf'                  => 1,
-    'module_definition.sf'              => 1,
-    'module_loading.sf'                 => 1,
-    'module_order_and_redeclaration.sf' => 1,
     'Matrix.sm'                         => 1,
 );
 

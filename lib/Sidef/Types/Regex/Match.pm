@@ -59,13 +59,16 @@ package Sidef::Types::Regex::Match {
         bless \%hash, __PACKAGE__;
     }
 
+    sub get_value {
+        $_[0]->{matched};
+    }
+
     sub matched {
         Sidef::Types::Bool::Bool->new($_[0]->{matched});
     }
 
     *to_bool       = \&matched;
     *is_successful = \&matched;
-    *get_value     = \&matched;
 
     sub pos {
         my ($self) = @_;

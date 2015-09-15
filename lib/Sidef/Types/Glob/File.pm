@@ -81,24 +81,18 @@ package Sidef::Types::Glob::File {
         Sidef::Types::Bool::Bool->new(-z $self->get_value);
     }
 
-    *isEmpty = \&is_empty;
-
     sub is_directory {
         my ($self) = @_;
         @_ == 2 && ($self = $_[1]);
         Sidef::Types::Bool::Bool->new(-d $self->get_value);
     }
 
-    *is_dir      = \&is_directory;
-    *isDir       = \&is_directory;
-    *isDirectory = \&is_directory;
+    *is_dir = \&is_directory;
 
     sub is_link {
         my ($self) = @_;
         Sidef::Types::Bool::Bool->new(-l $self->get_value);
     }
-
-    *isLink = \&is_link;
 
     sub readlink {
         my ($self) = @_;
@@ -106,7 +100,7 @@ package Sidef::Types::Glob::File {
         Sidef::Types::String::String->new(CORE::readlink($self->get_value));
     }
 
-    *readLink = \&readlink;
+    *read_link = \&readlink;
 
     sub is_socket {
         my ($self) = @_;
@@ -114,15 +108,11 @@ package Sidef::Types::Glob::File {
         Sidef::Types::Bool::Bool->new(-S $self->get_value);
     }
 
-    *isSocket = \&is_socket;
-
     sub is_block {
         my ($self) = @_;
         @_ == 2 && ($self = $_[1]);
         Sidef::Types::Bool::Bool->new(-b $self->get_value);
     }
-
-    *isBlock = \&is_block;
 
     sub is_char_device {
         my ($self) = @_;
@@ -130,15 +120,11 @@ package Sidef::Types::Glob::File {
         Sidef::Types::Bool::Bool->new(-c $self->get_value);
     }
 
-    *isCharDevice = \&is_char_device;
-
     sub is_readable {
         my ($self) = @_;
         @_ == 2 && ($self = $_[1]);
         Sidef::Types::Bool::Bool->new(-r $self->get_value);
     }
-
-    *isReadable = \&is_readable;
 
     sub is_writeable {
         my ($self) = @_;
@@ -146,22 +132,16 @@ package Sidef::Types::Glob::File {
         Sidef::Types::Bool::Bool->new(-w $self->get_value);
     }
 
-    *isWriteable = \&is_writeable;
-
     sub has_setuid_bit {
         my ($self) = @_;
         @_ == 2 && ($self = $_[1]);
         Sidef::Types::Bool::Bool->new(-u $self->get_value);
     }
 
-    *hasSetuidBit = \&has_setuid;
-
     sub has_setgid_bit {
         my ($self) = @_;
         Sidef::Types::Bool::Bool->new(-g $self->get_value);
     }
-
-    *hasSetgidBit = \&has_setgid_bit;
 
     sub has_sticky_bit {
         my ($self) = @_;
@@ -169,15 +149,11 @@ package Sidef::Types::Glob::File {
         Sidef::Types::Bool::Bool->new(-k $self->get_value);
     }
 
-    *hasStickyBit = \&has_sticky_bit;
-
     sub modification_time_days_diff {
         my ($self) = @_;
         @_ == 2 && ($self = $_[1]);
         Sidef::Types::Bool::Bool->new(-M $self->get_value);
     }
-
-    *modificationTimeDaysDiff = \&modification_time_days_diff;
 
     sub access_time_days_diff {
         my ($self) = @_;
@@ -185,15 +161,11 @@ package Sidef::Types::Glob::File {
         Sidef::Types::Bool::Bool->new(-A $self->get_value);
     }
 
-    *accessTimeDaysDiff = \&access_time_days_diff;
-
     sub change_time_days_diff {
         my ($self) = @_;
         @_ == 2 && ($self = $_[1]);
         Sidef::Types::Bool::Bool->new(-C $self->get_value);
     }
-
-    *changeTimeDaysDiff = \&change_time_days_diff;
 
     sub is_executable {
         my ($self) = @_;
@@ -201,15 +173,11 @@ package Sidef::Types::Glob::File {
         Sidef::Types::Bool::Bool->new(-x $self->get_value);
     }
 
-    *isExecutable = \&is_executable;
-
     sub is_owned {
         my ($self) = @_;
         @_ == 2 && ($self = $_[1]);
         Sidef::Types::Bool::Bool->new(-o $self->get_value);
     }
-
-    *isOwned = \&is_owned;
 
     sub is_real_readable {
         my ($self) = @_;
@@ -217,15 +185,11 @@ package Sidef::Types::Glob::File {
         Sidef::Types::Bool::Bool->new(-R $self->get_value);
     }
 
-    *isRealReadable = \&is_real_readable;
-
     sub is_real_writeable {
         my ($self) = @_;
         @_ == 2 && ($self = $_[1]);
         Sidef::Types::Bool::Bool->new(-W $self->get_value);
     }
-
-    *isRealWriteable = \&is_real_writeable;
 
     sub is_real_executable {
         my ($self) = @_;
@@ -233,15 +197,11 @@ package Sidef::Types::Glob::File {
         Sidef::Types::Bool::Bool->new(-X $self->get_value);
     }
 
-    *isRealExecutable = \&is_real_executable;
-
     sub is_real_owned {
         my ($self) = @_;
         @_ == 2 && ($self = $_[1]);
         Sidef::Types::Bool::Bool->new(-O $self->get_value);
     }
-
-    *isRealOwned = \&is_real_owned;
 
     sub is_binary {
         my ($self) = @_;
@@ -249,23 +209,17 @@ package Sidef::Types::Glob::File {
         Sidef::Types::Bool::Bool->new(-B $self->get_value);
     }
 
-    *isBinary = \&is_binary;
-
     sub is_text {
         my ($self) = @_;
         @_ == 2 && ($self = $_[1]);
         Sidef::Types::Bool::Bool->new(-T $self->get_value);
     }
 
-    *isText = \&is_text;
-
     sub is_file {
         my ($self) = @_;
         @_ == 2 && ($self = $_[1]);
         Sidef::Types::Bool::Bool->new(-f $self->get_value);
     }
-
-    *isFile = \&is_file;
 
     sub name {
         my ($self) = @_;
@@ -283,7 +237,6 @@ package Sidef::Types::Glob::File {
 
     *base      = \&basename;
     *base_name = \&basename;
-    *baseName  = \&basename;
 
     sub dirname {
         my ($self) = @_;
@@ -295,7 +248,6 @@ package Sidef::Types::Glob::File {
 
     *dir      = \&dirname;
     *dir_name = \&dirname;
-    *dirName  = \&dirname;
 
     sub is_absolute {
         my ($self) = @_;
@@ -316,7 +268,6 @@ package Sidef::Types::Glob::File {
 
     *abs     = \&abs_name;
     *absname = \&abs_name;
-    *absName = \&abs_name;
     *rel2abs = \&abs_name;
 
     sub rel_name {
@@ -327,7 +278,6 @@ package Sidef::Types::Glob::File {
 
     *rel     = \&rel_name;
     *relname = \&rel_name;
-    *relName = \&rel_name;
     *abs2rel = \&rel_name;
 
     sub rename {
@@ -340,9 +290,6 @@ package Sidef::Types::Glob::File {
         Sidef::Types::Bool::Bool->new(CORE::rename($self->get_value, $file->get_value));
     }
 
-    *rename_to = \&rename;
-    *renameTo  = \&rename;
-
     sub move {
         my ($self, $file) = @_;
 
@@ -354,9 +301,7 @@ package Sidef::Types::Glob::File {
         Sidef::Types::Bool::Bool->new(File::Copy::move($self->get_value, $file->get_value));
     }
 
-    *mv      = \&move;
-    *move_to = \&move;
-    *moveTo  = \&move;
+    *mv = \&move;
 
     sub copy {
         my ($self, $file) = @_;
@@ -434,8 +379,6 @@ package Sidef::Types::Glob::File {
         $self->open('<:utf8', @rest);
     }
 
-    *openR     = \&open_r;
-    *openRead  = \&open_r;
     *open_read = \&open_r;
 
     sub open_w {
@@ -443,8 +386,6 @@ package Sidef::Types::Glob::File {
         $self->open('>:utf8', @rest);
     }
 
-    *openW      = \&open_w;
-    *openWrite  = \&open_w;
     *open_write = \&open_w;
 
     sub open_a {
@@ -452,8 +393,6 @@ package Sidef::Types::Glob::File {
         $self->open('>>:utf8', @rest);
     }
 
-    *openA       = \&open_a;
-    *openAppend  = \&open_a;
     *open_append = \&open_a;
 
     sub open_rw {
@@ -461,8 +400,6 @@ package Sidef::Types::Glob::File {
         $self->open('+<:utf8', @rest);
     }
 
-    *openRW          = \&open_rw;
-    *openReadWrite   = \&open_rw;
     *open_read_write = \&open_rw;
 
     sub opendir {
@@ -481,8 +418,6 @@ package Sidef::Types::Glob::File {
 
         Sidef::Types::Bool::Bool->new($success);
     }
-
-    *sysOpen = \&sysopen;
 
     sub stat {
         my ($self) = @_;

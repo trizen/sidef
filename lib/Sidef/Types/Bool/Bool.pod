@@ -54,8 +54,6 @@ Bool.is_true() -> I<Obj>
 
 Return the
 
-Aliases: I<isTrue>
-
 =cut
 
 =head2 new
@@ -74,7 +72,7 @@ Bool.not() -> I<Obj>
 
 Return the
 
-Aliases: I<flip>, I<toggle>, I<is_false>, I<isFalse>
+Aliases: I<flip>, I<toggle>, I<is_false>
 
 =cut
 

@@ -63,7 +63,7 @@ Pipe.open_r() -> I<Obj>
 
 Return the
 
-Aliases: I<openR>, I<open_read>, I<openRead>
+Aliases: I<open_read>
 
 =cut
 
@@ -73,6 +73,6 @@ Pipe.open_w() -> I<Obj>
 
 Return the
 
-Aliases: I<openW>, I<open_write>, I<openWrite>
+Aliases: I<open_write>
 
 =cut

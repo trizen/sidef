@@ -14,7 +14,9 @@ package Sidef::Variable::Ref {
             my ($self, $var) = ($_[0], $_[-1]);
 
             my $ref = ref($var);
-            if ($ref eq 'Sidef::Variable::Variable' or $ref eq 'Sidef::Variable::ClassVar') {
+            if (   $ref eq 'Sidef::Variable::Variable'
+                or $ref eq 'Sidef::Variable::ClassVar'
+                or $ref eq 'Sidef::Variable::Magic') {
                 return $self->new($var);
             }
 

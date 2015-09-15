@@ -34,8 +34,7 @@ package Sidef::Types::String::String {
         $_[0];
     }
 
-    *to_str    = \&to_s;
-    *to_string = \&to_s;
+    *to_str = \&to_s;
 
     sub unroll_operator {
         my ($self, $operator, $arg) = @_;
@@ -131,8 +130,6 @@ package Sidef::Types::String::String {
         }
     }
 
-    *matches = \&match;
-
     {
         my %cache;
 
@@ -147,8 +144,6 @@ package Sidef::Types::String::String {
             )->gmatch($self, @rest);
         }
     }
-
-    *gmatches = \&gmatch;
 
     sub array_to {
         my ($self, $string) = @_;
@@ -179,8 +174,8 @@ package Sidef::Types::String::String {
                                              );
     }
 
+    *up_to = \&to;
     *upto  = \&to;
-    *upTo  = \&to;
     *range = \&to;
 
     sub downto {
@@ -192,7 +187,7 @@ package Sidef::Types::String::String {
                                              );
     }
 
-    *downTo = \&downto;
+    *down_to = \&downto;
 
     sub cmp {
         my ($self, $string) = @_;
@@ -237,10 +232,8 @@ package Sidef::Types::String::String {
         $self->new(CORE::uc $self->get_value);
     }
 
-    *toUpperCase = \&uc;
-    *upcase      = \&uc;
-    *upCase      = \&uc;
-    *upper       = \&uc;
+    *upcase = \&uc;
+    *upper  = \&uc;
 
     sub equals {
         my ($self, $arg) = @_;
@@ -269,19 +262,16 @@ package Sidef::Types::String::String {
         $self->new(CORE::ucfirst $self->get_value);
     }
 
-    *tc         = \&ucfirst;
-    *titleCase  = \&ucfirst;
-    *title_case = \&ucfirst;
+    *tc        = \&ucfirst;
+    *titlecase = \&ucfirst;
 
     sub lc {
         my ($self) = @_;
         $self->new(CORE::lc $self->get_value);
     }
 
-    *toLowerCase = \&lc;
-    *downcase    = \&lc;
-    *downCase    = \&lc;
-    *lower       = \&lc;
+    *downcase = \&lc;
+    *lower    = \&lc;
 
     sub lcfirst {
         my ($self) = @_;
@@ -312,8 +302,7 @@ package Sidef::Types::String::String {
         $self->new($string);
     }
 
-    *wc       = \&wordcase;
-    *wordCase = \&wordcase;
+    *wc = \&wordcase;
 
     sub capitalize {
         my ($self) = @_;
@@ -368,6 +357,8 @@ package Sidef::Types::String::String {
         Sidef::Types::Number::Number->new($self->get_value);
     }
 
+    *dec = \&num;
+
     sub substr {
         my ($self, $offs, $len) = @_;
         __PACKAGE__->new(
@@ -402,8 +393,6 @@ package Sidef::Types::String::String {
         Sidef::Types::Bool::Bool->new($self->get_value eq '');
     }
 
-    *isEmpty = \&is_empty;
-
     sub index {
         my ($self, $substr, $pos) = @_;
         Sidef::Types::Number::Number->new(
@@ -412,8 +401,6 @@ package Sidef::Types::String::String {
                                           : CORE::index($self->get_value, $substr->get_value)
                                          );
     }
-
-    *indexOf = \&index;
 
     sub ord {
         my ($self) = @_;
@@ -496,8 +483,6 @@ package Sidef::Types::String::String {
         my $value  = $str->get_value;
         $self->new($self->get_value =~ s{$search}{$value}gr);
     }
-
-    *gReplace = \&gsub;
 
     sub _get_captures {
         my ($string) = @_;
@@ -613,8 +598,7 @@ package Sidef::Types::String::String {
         $array->each($obj);
     }
 
-    *words    = \&each_word;
-    *eachWord = \&each_word;
+    *words = \&each_word;
 
     sub bytes {
         my ($self) = @_;
@@ -639,7 +623,6 @@ package Sidef::Types::String::String {
     }
 
     *each_char = \&each;
-    *eachChar  = \&each;
 
     sub lines {
         my ($self) = @_;
@@ -650,8 +633,6 @@ package Sidef::Types::String::String {
         my ($self, $obj) = @_;
         $self->lines->each($obj);
     }
-
-    *eachLine = \&each_line;
 
     sub open_r {
         my ($self, @rest) = @_;
@@ -680,8 +661,6 @@ package Sidef::Types::String::String {
     }
 
     *trim_beg = \&strip_beg;
-    *trimBeg  = \&strip_beg;
-    *stripBeg = \&strip_beg;
 
     sub strip_end {
         my ($self) = @_;
@@ -689,8 +668,6 @@ package Sidef::Types::String::String {
     }
 
     *trim_end = \&strip_end;
-    *trimEnd  = \&strip_end;
-    *stripEnd = \&strip_end;
 
     sub trans {
         my ($self, $orig, $repl) = @_;
@@ -752,8 +729,7 @@ package Sidef::Types::String::String {
         Sidef::Types::Array::Array->new(map { __PACKAGE__->new($_) } $str =~ /\X/g);
     }
 
-    *graphemes    = \&graphs;
-    *to_graphemes = \&graphs;
+    *graphemes = \&graphs;
 
     sub levenshtein {
         my ($self, $arg) = @_;
@@ -828,8 +804,6 @@ package Sidef::Types::String::String {
     }
 
     *starts_with = \&begins_with;
-    *startsWith  = \&begins_with;
-    *beginsWith  = \&begins_with;
 
     sub ends_with {
         my ($self, $string) = @_;
@@ -842,8 +816,6 @@ package Sidef::Types::String::String {
 
         Sidef::Types::Bool::Bool->false;
     }
-
-    *endsWith = \&ends_with;
 
     sub looks_like_number {
         my ($self) = @_;
@@ -1130,8 +1102,6 @@ package Sidef::Types::String::String {
         $self->new(Encode::decode_utf8(Encode::encode_utf8(CORE::join('', @chars))));
     }
 
-    *applyEscapes = \&apply_escapes;
-
     sub shift_left {
         my ($self, $i) = @_;
         my $len = CORE::length($self->get_value);
@@ -1139,24 +1109,18 @@ package Sidef::Types::String::String {
         $self->new(CORE::substr($self->get_value, $i));
     }
 
-    *dropLeft  = \&shift_left;
     *drop_left = \&shift_left;
-    *shiftLeft = \&shift_left;
 
     sub shift_right {
         my ($self, $i) = @_;
         $self->new(CORE::substr($self->get_value, 0, -$i->get_value));
     }
 
-    *dropRight  = \&shift_right;
     *drop_right = \&shift_right;
-    *shiftRight = \&shift_right;
 
     sub pair_with {
         Sidef::Types::Array::Pair->new($_[0], $_[1]);
     }
-
-    *pairWith = \&pair_with;
 
     sub basic_dump {
         my ($self) = @_;

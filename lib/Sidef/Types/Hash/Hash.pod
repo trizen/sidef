@@ -69,7 +69,7 @@ I<Obj> B<===> I<Obj> -> I<Obj>
 
 Return the
 
-Aliases: I<duplicate_of>, I<duplicateOf>
+Aliases: I<duplicate_of>
 
 =cut
 
@@ -157,7 +157,7 @@ Hash.exists() -> I<Obj>
 
 Return the
 
-Aliases: I<has_key>, I<haskey>, I<contains>
+Aliases: I<has_key>, I<contains>
 
 =cut
 
@@ -211,8 +211,6 @@ Hash.map_val() -> I<Obj>
 
 Return the
 
-Aliases: I<mapval>, I<mapVal>
-
 =cut
 
 =head2 merge_values
@@ -220,8 +218,6 @@ Aliases: I<mapval>, I<mapVal>
 Hash.merge_values() -> I<Obj>
 
 Return the
-
-Aliases: I<mergeValues>
 
 =cut
 

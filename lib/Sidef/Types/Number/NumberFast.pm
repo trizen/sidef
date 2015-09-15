@@ -110,7 +110,11 @@ package Sidef::Types::Number::Number {
         defined($base) ? $self->new($log / CORE::log($base->get_value)) : $self->new($log);
     }
 
-    sub atan { ... }
+    sub atan {
+        my ($self) = @_;
+        state $x = require Math::Trig;
+        $self->new(Math::Trig::atan($self->get_value));
+    }
 
     sub ln {
         my ($self) = @_;
@@ -176,14 +180,11 @@ package Sidef::Types::Number::Number {
         Sidef::Types::Bool::Bool->new($self->get_value eq '0');    # 'eq' is well intented here
     }
 
-    *isZero = \&is_zero;
-
     sub is_nan {
         my ($self) = @_;
         Sidef::Types::Bool::Bool->new(lc($self->get_value) eq 'nan');
     }
 
-    *isNaN  = \&is_nan;
     *is_NaN = \&is_nan;
 
     sub is_positive {
@@ -191,52 +192,38 @@ package Sidef::Types::Number::Number {
         Sidef::Types::Bool::Bool->new($self->get_value >= 0);
     }
 
-    *isPositive = \&is_positive;
-    *isPos      = \&is_positive;
-    *is_pos     = \&is_positive;
+    *is_pos = \&is_positive;
 
     sub is_inf {
         my ($self) = @_;
         Sidef::Types::Bool::Bool->new($self->get_value == 'inf');
     }
 
-    *isInf       = \&is_inf;
     *is_infinite = \&is_inf;
-    *isInfinite  = \&is_inf;
 
     sub is_negative {
         my ($self) = @_;
         Sidef::Types::Bool::Bool->new($self->get_value < 0);
     }
 
-    *isNegative = \&is_negative;
-    *isNeg      = \&is_negative;
-    *is_neg     = \&is_negative;
+    *is_neg = \&is_negative;
 
     sub is_even {
         my ($self) = @_;
         Sidef::Types::Bool::Bool->new(CORE::not($self->get_value & 1));
     }
 
-    *isEven = \&is_even;
-
     sub is_odd {
         my ($self) = @_;
         Sidef::Types::Bool::Bool->new($self->get_value & 1);
     }
 
-    *isOdd = \&is_odd;
-
     sub is_integer {
         my ($self) = @_;
-
-        # 'eq' is well intented here
-        Sidef::Types::Bool::Bool->new($self->get_value eq CORE::int($self->get_value));
+        Sidef::Types::Bool::Bool->new($self->get_value eq CORE::int($self->get_value));    # 'eq' is well intended
     }
 
-    *isInt     = \&is_integer;
-    *is_int    = \&is_integer;
-    *isInteger = \&is_integer;
+    *is_int = \&is_integer;
 
     sub rand {
         my ($self, $max) = @_;
@@ -250,8 +237,7 @@ package Sidef::Types::Number::Number {
     sub ceil {
         my ($self) = @_;
 
-        # 'eq' is well intended here
-        CORE::int($self->get_value) eq $self->get_value
+        CORE::int($self->get_value) eq $self->get_value    # 'eq' is well intended
           && return $self;
 
         $self->new(CORE::int($self->get_value + 1));
@@ -266,12 +252,10 @@ package Sidef::Types::Number::Number {
 
     sub roundf {
         my ($self, $num) = @_;
-
         $self->new(sprintf "%.*f", $num->get_value * -1, $self->get_value);
     }
 
     *fround = \&roundf;
-    *fRound = \&roundf;
 
     sub digit { ... }
 
@@ -308,33 +292,6 @@ package Sidef::Types::Number::Number {
 
     *as_bin = \&to_bin;
 
-    sub commify {
-        my ($self) = @_;
-
-        my $n = $self->get_value;
-        my $x = $n;
-
-        my $neg = $n =~ s{^-}{};
-        $n =~ /\.|$/;
-
-        if ($-[0] > 3) {
-
-            my $l = $-[0] - 3;
-            my $i = ($l - 1) % 3 + 1;
-
-            $x = substr($n, 0, $i) . ',';
-
-            while ($i < $l) {
-                $x .= substr($n, $i, 3) . ',';
-                $i += 3;
-            }
-
-            $x .= substr($n, $i);
-        }
-
-        Sidef::Types::String::String->new(($neg ? '-' : '') . $x);
-    }
-
     sub dump {
         my ($self) = @_;
         Sidef::Types::String::String->new($self->get_value);
@@ -350,14 +307,10 @@ package Sidef::Types::Number::Number {
         $self->new($self->get_value >> $num->get_value);
     }
 
-    *shiftRight = \&shift_right;
-
     sub shift_left {
         my ($self, $num) = @_;
         $self->new($self->get_value << $num->get_value);
     }
-
-    *shiftLeft = \&shift_left;
 
     {
         no strict 'refs';

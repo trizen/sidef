@@ -1,6 +1,6 @@
 #!/usr/bin/ruby
 
-if (STDIN.isOnTty) {
+if (STDIN.is_on_tty) {
     "Your name: ".print;
     "Hello %s!\n".printf(STDIN.readline.chomp);
 }

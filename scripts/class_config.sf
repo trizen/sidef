@@ -10,7 +10,7 @@ class Test (opts) {
                 name => "Unknown",
         ));
 
-        self.opts.mergeValues(args);
+        self.opts.merge_values(args);
     }
 
     method get_name {

@@ -16,11 +16,11 @@ func divide (x,y,f) {
 
         var s = -1;
         while (y > x) {
-            x *= 10; s++; x.isZero && break
+            x *= 10; s++; x.is_zero && break
         }
 
-        c.isZero && (z += '.');
-        s.isPos  && (z += ('0' * s));
+        c.is_zero && (z += '.');
+        s.is_pos  && (z += ('0' * s));
         c += (s + 1);
 
         c <= f && __FUNC__();

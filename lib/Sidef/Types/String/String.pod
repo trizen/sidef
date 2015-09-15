@@ -110,7 +110,7 @@ I<Obj> B<:> I<Obj> -> I<Obj>
 
 Return the
 
-Aliases: I<pair_with>, I<pairWith>
+Aliases: I<pair_with>
 
 =cut
 
@@ -130,7 +130,7 @@ I<Obj> B<E<lt>E<lt>> I<Obj> -> I<Obj>
 
 Return the
 
-Aliases: I<drop_left>, I<dropLeft>, I<shift_left>, I<shiftLeft>
+Aliases: I<drop_left>, I<shift_left>
 
 =cut
 
@@ -160,7 +160,7 @@ I<Obj> B<=~> I<Obj> -> I<Obj>
 
 Return the
 
-Aliases: I<match>, I<matches>
+Aliases: I<match>
 
 =cut
 
@@ -180,7 +180,7 @@ I<Obj> B<E<gt>E<gt>> I<Obj> -> I<Obj>
 
 Return the
 
-Aliases: I<drop_right>, I<dropRight>, I<shift_right>, I<shiftRight>
+Aliases: I<drop_right>, I<shift_right>
 
 =cut
 
@@ -200,7 +200,7 @@ I<Obj> B<^..> I<Obj> -> I<Obj>
 
 Return the
 
-Aliases: I<downto>, I<downTo>
+Aliases: I<down_to>, I<downto>
 
 =cut
 
@@ -209,8 +209,6 @@ Aliases: I<downto>, I<downTo>
 String.apply_escapes() -> I<Obj>
 
 Return the
-
-Aliases: I<applyEscapes>
 
 =cut
 
@@ -238,7 +236,7 @@ String.begins_with() -> I<Obj>
 
 Return the
 
-Aliases: I<beginsWith>, I<starts_with>, I<startsWith>
+Aliases: I<starts_with>
 
 =cut
 
@@ -316,6 +314,16 @@ Return the
 
 =cut
 
+=head2 dec
+
+String.dec() -> I<Obj>
+
+Return the
+
+Aliases: I<num>
+
+=cut
+
 =head2 decode
 
 String.decode() -> I<Obj>
@@ -356,7 +364,7 @@ String.each() -> I<Obj>
 
 Return the
 
-Aliases: I<each_char>, I<eachChar>
+Aliases: I<each_char>
 
 =cut
 
@@ -365,8 +373,6 @@ Aliases: I<each_char>, I<eachChar>
 String.each_line() -> I<Obj>
 
 Return the
-
-Aliases: I<eachLine>
 
 =cut
 
@@ -391,8 +397,6 @@ Return the
 String.ends_with() -> I<Obj>
 
 Return the
-
-Aliases: I<endsWith>
 
 =cut
 
@@ -462,8 +466,6 @@ String.gmatch() -> I<Obj>
 
 Return the
 
-Aliases: I<gmatches>
-
 =cut
 
 =head2 graphs
@@ -472,7 +474,7 @@ String.graphs() -> I<Obj>
 
 Return the
 
-Aliases: I<graphemes>, I<to_graphemes>
+Aliases: I<graphemes>
 
 =cut
 
@@ -481,8 +483,6 @@ Aliases: I<graphemes>, I<to_graphemes>
 String.gsub() -> I<Obj>
 
 Return the
-
-Aliases: I<gReplace>
 
 =cut
 
@@ -510,8 +510,6 @@ String.index() -> I<Obj>
 
 Return the
 
-Aliases: I<indexOf>
-
 =cut
 
 =head2 insert
@@ -527,8 +525,6 @@ Return the
 String.is_empty() -> I<Obj>
 
 Return the
-
-Aliases: I<isEmpty>
 
 =cut
 
@@ -546,7 +542,7 @@ String.lc() -> I<Obj>
 
 Return the
 
-Aliases: I<lower>, I<downcase>, I<downCase>, I<toLowerCase>
+Aliases: I<lower>, I<downcase>
 
 =cut
 
@@ -601,14 +597,6 @@ String.new() -> I<Obj>
 Return the
 
 Aliases: I<call>
-
-=cut
-
-=head2 num
-
-String.num() -> I<Obj>
-
-Return the
 
 =cut
 
@@ -764,7 +752,7 @@ String.tc() -> I<Obj>
 
 Return the
 
-Aliases: I<ucfirst>, I<title_case>, I<titleCase>
+Aliases: I<ucfirst>, I<titlecase>
 
 =cut
 
@@ -784,7 +772,7 @@ String.to() -> I<Obj>
 
 Return the
 
-Aliases: I<...()>, I<..^()>, I<upto>, I<upTo>, I<range>
+Aliases: I<...()>, I<..^()>, I<up_to>, I<upto>, I<range>
 
 =cut
 
@@ -794,7 +782,7 @@ String.to_s() -> I<Obj>
 
 Return the
 
-Aliases: I<to_str>, I<to_string>
+Aliases: I<to_str>
 
 =cut
 
@@ -832,7 +820,7 @@ String.trim_beg() -> I<Obj>
 
 Return the
 
-Aliases: I<trimBeg>, I<strip_beg>, I<stripBeg>
+Aliases: I<strip_beg>
 
 =cut
 
@@ -842,7 +830,7 @@ String.trim_end() -> I<Obj>
 
 Return the
 
-Aliases: I<trimEnd>, I<strip_end>, I<stripEnd>
+Aliases: I<strip_end>
 
 =cut
 
@@ -852,7 +840,7 @@ String.uc() -> I<Obj>
 
 Return the
 
-Aliases: I<upper>, I<upcase>, I<upCase>, I<toUpperCase>
+Aliases: I<upper>, I<upcase>
 
 =cut
 
@@ -894,7 +882,7 @@ String.wc() -> I<Obj>
 
 Return the
 
-Aliases: I<wordcase>, I<wordCase>
+Aliases: I<wordcase>
 
 =cut
 
@@ -904,7 +892,7 @@ String.words() -> I<Obj>
 
 Return the
 
-Aliases: I<each_word>, I<eachWord>
+Aliases: I<each_word>
 
 =cut
 

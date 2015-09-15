@@ -30,7 +30,7 @@ File.abs() -> I<Obj>
 
 Return the
 
-Aliases: I<abs_name>, I<absname>, I<absName>, I<rel2abs>
+Aliases: I<abs_name>, I<absname>, I<rel2abs>
 
 =cut
 
@@ -40,8 +40,6 @@ File.access_time_days_diff() -> I<Obj>
 
 Return the
 
-Aliases: I<accessTimeDaysDiff>
-
 =cut
 
 =head2 base
@@ -50,7 +48,7 @@ File.base() -> I<Obj>
 
 Return the
 
-Aliases: I<base_name>, I<basename>, I<baseName>
+Aliases: I<base_name>, I<basename>
 
 =cut
 
@@ -59,8 +57,6 @@ Aliases: I<base_name>, I<basename>, I<baseName>
 File.change_time_days_diff() -> I<Obj>
 
 Return the
-
-Aliases: I<changeTimeDaysDiff>
 
 =cut
 
@@ -114,7 +110,7 @@ File.dir() -> I<Obj>
 
 Return the
 
-Aliases: I<dir_name>, I<dirname>, I<dirName>
+Aliases: I<dir_name>, I<dirname>
 
 =cut
 
@@ -156,8 +152,6 @@ File.has_setgid_bit() -> I<Obj>
 
 Return the
 
-Aliases: I<hasSetgidBit>
-
 =cut
 
 =head2 has_setuid_bit
@@ -173,8 +167,6 @@ Return the
 File.has_sticky_bit() -> I<Obj>
 
 Return the
-
-Aliases: I<hasStickyBit>
 
 =cut
 
@@ -194,8 +186,6 @@ File.is_binary() -> I<Obj>
 
 Return the
 
-Aliases: I<isBinary>
-
 =cut
 
 =head2 is_block
@@ -203,8 +193,6 @@ Aliases: I<isBinary>
 File.is_block() -> I<Obj>
 
 Return the
-
-Aliases: I<isBlock>
 
 =cut
 
@@ -214,8 +202,6 @@ File.is_char_device() -> I<Obj>
 
 Return the
 
-Aliases: I<isCharDevice>
-
 =cut
 
 =head2 is_dir
@@ -224,7 +210,7 @@ File.is_dir() -> I<Obj>
 
 Return the
 
-Aliases: I<isDir>, I<is_directory>, I<isDirectory>
+Aliases: I<is_directory>
 
 =cut
 
@@ -234,8 +220,6 @@ File.is_empty() -> I<Obj>
 
 Return the
 
-Aliases: I<isEmpty>
-
 =cut
 
 =head2 is_executable
@@ -243,8 +227,6 @@ Aliases: I<isEmpty>
 File.is_executable() -> I<Obj>
 
 Return the
-
-Aliases: I<isExecutable>
 
 =cut
 
@@ -254,8 +236,6 @@ File.is_file() -> I<Obj>
 
 Return the
 
-Aliases: I<isFile>
-
 =cut
 
 =head2 is_link
@@ -263,8 +243,6 @@ Aliases: I<isFile>
 File.is_link() -> I<Obj>
 
 Return the
-
-Aliases: I<isLink>
 
 =cut
 
@@ -274,8 +252,6 @@ File.is_owned() -> I<Obj>
 
 Return the
 
-Aliases: I<isOwned>
-
 =cut
 
 =head2 is_readable
@@ -283,8 +259,6 @@ Aliases: I<isOwned>
 File.is_readable() -> I<Obj>
 
 Return the
-
-Aliases: I<isReadable>
 
 =cut
 
@@ -294,8 +268,6 @@ File.is_real_executable() -> I<Obj>
 
 Return the
 
-Aliases: I<isRealExecutable>
-
 =cut
 
 =head2 is_real_owned
@@ -303,8 +275,6 @@ Aliases: I<isRealExecutable>
 File.is_real_owned() -> I<Obj>
 
 Return the
-
-Aliases: I<isRealOwned>
 
 =cut
 
@@ -314,8 +284,6 @@ File.is_real_readable() -> I<Obj>
 
 Return the
 
-Aliases: I<isRealReadable>
-
 =cut
 
 =head2 is_real_writeable
@@ -323,8 +291,6 @@ Aliases: I<isRealReadable>
 File.is_real_writeable() -> I<Obj>
 
 Return the
-
-Aliases: I<isRealWriteable>
 
 =cut
 
@@ -334,8 +300,6 @@ File.is_socket() -> I<Obj>
 
 Return the
 
-Aliases: I<isSocket>
-
 =cut
 
 =head2 is_text
@@ -344,8 +308,6 @@ File.is_text() -> I<Obj>
 
 Return the
 
-Aliases: I<isText>
-
 =cut
 
 =head2 is_writeable
@@ -353,8 +315,6 @@ Aliases: I<isText>
 File.is_writeable() -> I<Obj>
 
 Return the
-
-Aliases: I<isWriteable>
 
 =cut
 
@@ -382,8 +342,6 @@ File.modification_time_days_diff() -> I<Obj>
 
 Return the
 
-Aliases: I<modificationTimeDaysDiff>
-
 =cut
 
 =head2 mv
@@ -392,7 +350,7 @@ File.mv() -> I<Obj>
 
 Return the
 
-Aliases: I<move>, I<move_to>, I<moveTo>
+Aliases: I<move>
 
 =cut
 
@@ -428,7 +386,7 @@ File.open_a() -> I<Obj>
 
 Return the
 
-Aliases: I<openA>, I<open_append>, I<openAppend>
+Aliases: I<open_append>
 
 =cut
 
@@ -446,7 +404,7 @@ File.open_r() -> I<Obj>
 
 Return the
 
-Aliases: I<openR>, I<open_read>, I<openRead>
+Aliases: I<open_read>
 
 =cut
 
@@ -456,7 +414,7 @@ File.open_rw() -> I<Obj>
 
 Return the
 
-Aliases: I<openRW>, I<open_read_write>, I<openReadWrite>
+Aliases: I<open_read_write>
 
 =cut
 
@@ -466,17 +424,17 @@ File.open_w() -> I<Obj>
 
 Return the
 
-Aliases: I<openW>, I<open_write>, I<openWrite>
+Aliases: I<open_write>
 
 =cut
 
-=head2 readlink
+=head2 read_link
 
-File.readlink() -> I<Obj>
+File.read_link() -> I<Obj>
 
 Return the
 
-Aliases: I<readLink>
+Aliases: I<readlink>
 
 =cut
 
@@ -486,7 +444,7 @@ File.rel() -> I<Obj>
 
 Return the
 
-Aliases: I<abs2rel>, I<rel_name>, I<relname>, I<relName>
+Aliases: I<abs2rel>, I<rel_name>, I<relname>
 
 =cut
 
@@ -495,8 +453,6 @@ Aliases: I<abs2rel>, I<rel_name>, I<relname>, I<relName>
 File.rename() -> I<Obj>
 
 Return the
-
-Aliases: I<rename_to>, I<renameTo>
 
 =cut
 
@@ -529,8 +485,6 @@ Return the
 File.sysopen() -> I<Obj>
 
 Return the
-
-Aliases: I<sysOpen>
 
 =cut
 

@@ -110,7 +110,7 @@ Complex.fround() -> I<Obj>
 
 Return the
 
-Aliases: I<fRound>, I<roundf>
+Aliases: I<roundf>
 
 =cut
 
@@ -128,7 +128,7 @@ Complex.im() -> I<Obj>
 
 Return the
 
-Aliases: I<Im>, I<imaginary>
+Aliases: I<imaginary>
 
 =cut
 
@@ -148,8 +148,6 @@ Complex.is_even() -> I<Obj>
 
 Return the
 
-Aliases: I<isEven>
-
 =cut
 
 =head2 is_inf
@@ -158,7 +156,7 @@ Complex.is_inf() -> I<Obj>
 
 Return the
 
-Aliases: I<isInf>, I<is_infinite>, I<isInfinite>
+Aliases: I<is_infinite>
 
 =cut
 
@@ -168,7 +166,7 @@ Complex.is_int() -> I<Obj>
 
 Return the
 
-Aliases: I<isInt>, I<is_integer>, I<isInteger>
+Aliases: I<is_integer>
 
 =cut
 
@@ -178,7 +176,7 @@ Complex.is_nan() -> I<Obj>
 
 Return the
 
-Aliases: I<is_NaN>, I<isNaN>
+Aliases: I<is_NaN>
 
 =cut
 
@@ -188,7 +186,7 @@ Complex.is_neg() -> I<Obj>
 
 Return the
 
-Aliases: I<isNeg>, I<is_negative>, I<isNegative>
+Aliases: I<is_negative>
 
 =cut
 
@@ -198,8 +196,6 @@ Complex.is_odd() -> I<Obj>
 
 Return the
 
-Aliases: I<isOdd>
-
 =cut
 
 =head2 is_pos
@@ -208,7 +204,7 @@ Complex.is_pos() -> I<Obj>
 
 Return the
 
-Aliases: I<isPos>, I<is_positive>, I<isPositive>
+Aliases: I<is_positive>
 
 =cut
 
@@ -217,8 +213,6 @@ Aliases: I<isPos>, I<is_positive>, I<isPositive>
 Complex.is_zero() -> I<Obj>
 
 Return the
-
-Aliases: I<isZero>
 
 =cut
 
@@ -294,7 +288,7 @@ Complex.re() -> I<Obj>
 
 Return the
 
-Aliases: I<Re>, I<real>
+Aliases: I<real>
 
 =cut
 

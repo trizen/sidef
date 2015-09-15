@@ -17,14 +17,14 @@ func agm1(a, g) {
     while (true) {
         var ag = given [a+g / 2, Math.sqrt(a*g)];
         ag.when([a,g]) do { return a }
-           else        do { ag.value»(\a, \g) }
+           else        do { ag.value >> (\a, \g) }
     }
 }
 
 func agm2(a, g) {
     while (true) {
         .=  [a+g / 2, Math.sqrt(a*g)];
-        .== [a,g]  ? return(a) : (_»(\a, \g));
+        .== [a,g]  ? return(a) : (_ >> (\a, \g));
     }
 }
 

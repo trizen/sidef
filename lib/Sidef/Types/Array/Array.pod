@@ -178,16 +178,6 @@ Aliases: I<pair_with>, I<pairWith>
 
 =cut
 
-=head2 <<
-
-I<Obj> B<E<lt>E<lt>> I<Obj> -> I<Obj>
-
-Return the
-
-Aliases: I<shift>, I<drop_left>, I<dropLeft>, I<drop_first>, I<dropFirst>
-
-=cut
-
 =head2 =
 
 I<Slice> B<=> I<Array> -> I<Slice>
@@ -212,38 +202,6 @@ I<Obj> B<==> I<Obj> -> I<Obj>
 Return the
 
 Aliases: I<eq>, I<is>, I<equals>
-
-=cut
-
-=head2 pop
-
-=over 2
-
-=item * Array.pop(I<Number>) -> I<Obj>
-
-Remove the element from the specified position.
-
-    array = qw(a b c);
-    array.pop(1);       # returns the removed element from position 1: 'b'
-
-    # array contains: ['a', 'c']
-
-=back
-
-=over 2
-
-=item * Array.pop() -> I<Obj>
-
-Removes the last element of the array.
-
-    array = qw(a b c);
-    array.pop;          # returns the removed last element: 'c'
-
-    # array contains: ['a', 'b']
-
-=back
-
-B<WARNING!> This method modifies the array in place.
 
 =cut
 
@@ -295,7 +253,7 @@ Array.bshuffle() -> I<Obj>
 
 Return the
 
-Aliases: I<best_shuffle>, I<bestShuffle>
+Aliases: I<best_shuffle>
 
 =cut
 
@@ -329,8 +287,6 @@ Array.contains_all() -> I<Obj>
 
 Return the
 
-Aliases: I<containsAll>
-
 =cut
 
 =head2 contains_any
@@ -339,8 +295,6 @@ Array.contains_any() -> I<Obj>
 
 Return the
 
-Aliases: I<containsAny>
-
 =cut
 
 =head2 contains_type
@@ -348,8 +302,6 @@ Aliases: I<containsAny>
 Array.contains_type() -> I<Obj>
 
 Return the
-
-Aliases: I<containsType>
 
 =cut
 
@@ -398,23 +350,13 @@ Aliases: I<remove>
 
 =cut
 
-=head2 delete_first
-
-Array.delete_first() -> I<Obj>
-
-Return the
-
-Aliases: I<deleteFirst>, I<remove_first>, I<removeFirst>
-
-=cut
-
 =head2 delete_first_if
 
 Array.delete_first_if() -> I<Obj>
 
 Return the
 
-Aliases: I<deleteFirstIf>, I<remove_first_if>, I<removeFirstIf>
+Aliases: I<remove_first_if>
 
 =cut
 
@@ -424,7 +366,15 @@ Array.delete_if() -> I<Obj>
 
 Return the
 
-Aliases: I<deleteIf>, I<remove_if>, I<removeIf>
+Aliases: I<remove_if>
+
+=cut
+
+=head2 delete_last
+
+Array.delete_last() -> I<Obj>
+
+Return the
 
 =cut
 
@@ -474,7 +424,7 @@ Array.exists() -> I<Obj>
 
 Return the
 
-Aliases: I<existsIndex>
+Aliases: I<has_index>
 
 =cut
 
@@ -499,16 +449,11 @@ Returns the first element of the array.
 
 =cut
 
-=head2 firstIndex
+=head2 first_index
 
-Array.firstIndex(I<Block>) -> I<Number>
+Array.first_index() -> I<Obj>
 
-Returns the index of the first element which passes the block test. Works just like the L<C<find()>|"find"> method, except that it returns the possition of the element, not the element itself.
-
-    ['a','b','c'].firstIndex { _ == 'c' };      # returns: 3
-    [1,2,3,4,5,6].firstIndex { _ >= 100 };      # returns: -1
-
-Returns an object of type: C<Sidef::Types::Number::Number>
+Return the
 
 =cut
 
@@ -536,7 +481,7 @@ Array.ft() -> I<Obj>
 
 Return the
 
-Aliases: I<from_to>, I<fromTo>
+Aliases: I<from_to>
 
 =cut
 
@@ -569,7 +514,13 @@ Array.group_by() -> I<Obj>
 
 Return the
 
-Aliases: I<groupBy>
+=cut
+
+=head2 index
+
+Array.index() -> I<Obj>
+
+Return the
 
 =cut
 
@@ -620,8 +571,6 @@ Array.is_empty() -> I<Obj>
 
 Return the
 
-Aliases: I<isEmpty>
-
 =cut
 
 =head2 join
@@ -656,15 +605,11 @@ Returns the last element of the array.
 
 =cut
 
-=head2 lastIndex
+=head2 last_index
 
-Array.lastIndex(I<Block>) -> I<Number>
+Array.last_index() -> I<Obj>
 
-Works just like L<C<firstIndex()>|"firstIndex">, except that it searches backwards and returns the index of the last element of the array which passed the block test.
-
-    [1,2,3,4,5,6].firstIndex { _**2 < 20 };     # returns: 3
-
-Returns an object of type: C<Sidef::Types::Number::Number>
+Return the
 
 =cut
 
@@ -674,7 +619,7 @@ Array.last_uniq() -> I<Obj>
 
 Return the
 
-Aliases: I<lastUniq>, I<last_unique>, I<lastUnique>
+Aliases: I<last_unique>
 
 =cut
 
@@ -748,8 +693,6 @@ Array.max_by() -> I<Obj>
 
 Return the
 
-Aliases: I<maxBy>
-
 =cut
 
 =head2 min
@@ -770,8 +713,6 @@ Returns an object of the same type as the elements of the array.
 Array.min_by() -> I<Obj>
 
 Return the
-
-Aliases: I<minBy>
 
 =cut
 
@@ -839,13 +780,45 @@ Aliases: I<rand>, I<sample>
 
 =cut
 
+=head2 pop
+
+=over 2
+
+=item * Array.pop(I<Number>) -> I<Obj>
+
+Remove the element from the specified position.
+
+    array = qw(a b c);
+    array.pop(1);       # returns the removed element from position 1: 'b'
+
+    # array contains: ['a', 'c']
+
+=back
+
+=over 2
+
+=item * Array.pop() -> I<Obj>
+
+Removes the last element of the array.
+
+    array = qw(a b c);
+    array.pop;          # returns the removed last element: 'c'
+
+    # array contains: ['a', 'b']
+
+=back
+
+B<WARNING!> This method modifies the array in place.
+
+=cut
+
 =head2 pop_at
 
 Array.pop_at() -> I<Obj>
 
 Return the
 
-Aliases: I<popAt>, I<delete_index>, I<deleteIndex>
+Aliases: I<delete_index>
 
 =cut
 
@@ -854,8 +827,6 @@ Aliases: I<popAt>, I<delete_index>, I<deleteIndex>
 Array.pop_rand() -> I<Obj>
 
 Return the
-
-Aliases: I<popRand>
 
 =cut
 
@@ -907,7 +878,15 @@ Array.reduce_pairs() -> I<Obj>
 
 Return the
 
-Aliases: I<reducePairs>
+=cut
+
+=head2 remove_last
+
+Array.remove_last() -> I<Obj>
+
+Return the
+
+Aliases: I<delete_first>, I<remove_first>
 
 =cut
 
@@ -917,7 +896,7 @@ Array.resize() -> I<Obj>
 
 Return the
 
-Aliases: I<resize_to>, I<resizeTo>
+Aliases: I<resize_to>
 
 =cut
 
@@ -931,11 +910,29 @@ Aliases: I<reversed>
 
 =cut
 
+=head2 rindex
+
+Array.rindex() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 rotate
 
 Array.rotate() -> I<Obj>
 
 Return the
+
+=cut
+
+=head2 shift
+
+Array.shift() -> I<Obj>
+
+Return the
+
+Aliases: I<drop_left>, I<drop_first>
 
 =cut
 
@@ -1000,8 +997,6 @@ Array.take_left() -> I<Obj>
 
 Return the
 
-Aliases: I<takeLeft>
-
 =cut
 
 =head2 take_right
@@ -1009,8 +1004,6 @@ Aliases: I<takeLeft>
 Array.take_right() -> I<Obj>
 
 Return the
-
-Aliases: I<takeRight>
 
 =cut
 
@@ -1066,20 +1059,13 @@ Aliases: I<or>
 
 =cut
 
-=head2 push
+=head2 «
 
-Array.push(I<Obj1>, I<Obj2>, I<...>) -> I<Array>
+I<Obj> B<«> I<Obj> -> I<Obj>
 
-Append some elements to array.
+Return the
 
-    array = qw(s i d);
-    array.push("e", "f");      # pushes the element to array and returns: qw(s i d e f)
-
-Aliases: I<append()>.
-
-B<WARNING!> This method modifies the array in place.
-
-Returns the self object.
+Aliases: I<E<lt>E<lt>>, I<push>, I<append>
 
 =cut
 
@@ -1089,6 +1075,6 @@ I<Obj> B<»> I<Obj> -> I<Obj>
 
 Return the
 
-Aliases: I<assign_to>, I<assignTo>, I<unroll_to>, I<unrollTo>
+Aliases: I<E<gt>E<gt>>, I<assign_to>
 
 =cut

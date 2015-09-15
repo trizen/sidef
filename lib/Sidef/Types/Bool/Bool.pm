@@ -41,15 +41,12 @@ package Sidef::Types::Bool::Bool {
         $_[0];
     }
 
-    *isTrue = \&is_true;
-
     sub not {
         my ($self) = @_;
         $self->get_value ? $self->false : $self->true;
     }
 
     *is_false = \&not;
-    *isFalse  = \&not;
     *flip     = \&not;
     *toggle   = \&not;
 

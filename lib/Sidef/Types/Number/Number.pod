@@ -50,7 +50,7 @@ I<Obj> B<%%> I<Obj> -> I<Obj>
 
 Return the
 
-Aliases: I<is_div>, I<isDiv>
+Aliases: I<is_div>
 
 =cut
 
@@ -170,7 +170,7 @@ I<Obj> B<E<lt>E<lt>> I<Obj> -> I<Obj>
 
 Return the
 
-Aliases: I<shift_left>, I<shiftLeft>
+Aliases: I<shift_left>
 
 =cut
 
@@ -210,7 +210,7 @@ I<Obj> B<E<gt>E<gt>> I<Obj> -> I<Obj>
 
 Return the
 
-Aliases: I<shift_right>, I<shiftRight>
+Aliases: I<shift_right>
 
 =cut
 
@@ -230,7 +230,7 @@ I<Obj> B<^..> I<Obj> -> I<Obj>
 
 Return the
 
-Aliases: I<downto>, I<downTo>
+Aliases: I<down_to>, I<downto>
 
 =cut
 
@@ -289,6 +289,22 @@ Number.as_oct() -> I<Obj>
 Return the
 
 Aliases: I<to_oct>
+
+=cut
+
+=head2 atan
+
+Number.atan() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 atan2
+
+Number.atan2() -> I<Obj>
+
+Return the
 
 =cut
 
@@ -406,7 +422,7 @@ Number.fround() -> I<Obj>
 
 Return the
 
-Aliases: I<fRound>, I<roundf>
+Aliases: I<roundf>
 
 =cut
 
@@ -452,8 +468,6 @@ Number.is_even() -> I<Obj>
 
 Return the
 
-Aliases: I<isEven>
-
 =cut
 
 =head2 is_inf
@@ -462,7 +476,7 @@ Number.is_inf() -> I<Obj>
 
 Return the
 
-Aliases: I<isInf>, I<is_infinite>, I<isInfinite>
+Aliases: I<is_infinite>
 
 =cut
 
@@ -472,7 +486,7 @@ Number.is_int() -> I<Obj>
 
 Return the
 
-Aliases: I<isInt>, I<is_integer>, I<isInteger>
+Aliases: I<is_integer>
 
 =cut
 
@@ -482,7 +496,7 @@ Number.is_nan() -> I<Obj>
 
 Return the
 
-Aliases: I<is_NaN>, I<isNaN>
+Aliases: I<is_NaN>
 
 =cut
 
@@ -492,7 +506,7 @@ Number.is_neg() -> I<Obj>
 
 Return the
 
-Aliases: I<isNeg>, I<is_negative>, I<isNegative>
+Aliases: I<is_negative>
 
 =cut
 
@@ -502,8 +516,6 @@ Number.is_odd() -> I<Obj>
 
 Return the
 
-Aliases: I<isOdd>
-
 =cut
 
 =head2 is_pos
@@ -512,7 +524,7 @@ Number.is_pos() -> I<Obj>
 
 Return the
 
-Aliases: I<isPos>, I<is_positive>, I<isPositive>
+Aliases: I<is_positive>
 
 =cut
 
@@ -521,8 +533,6 @@ Aliases: I<isPos>, I<is_positive>, I<isPositive>
 Number.is_zero() -> I<Obj>
 
 Return the
-
-Aliases: I<isZero>
 
 =cut
 
@@ -756,7 +766,7 @@ Number.to() -> I<Obj>
 
 Return the
 
-Aliases: I<...()>, I<..^()>, I<upto>, I<upTo>
+Aliases: I<...()>, I<..^()>, I<up_to>, I<upto>
 
 =cut
 

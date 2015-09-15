@@ -1,8 +1,9 @@
 #!/usr/bin/perl
 
-%w(a b).map{Sys.scanln("** Integer " + _ + ": ").to_i}
-       .assignTo(\var a, \var b);
+var (a, b) = %w(a b).map{
+    Sys.scanln("** Integer " + _ + ": ").to_i
+}...;
 
-for (%w(+ - * / % ** ^ | & << >>)) { |op|
-    Sys.printf("%s %s %s = %s\n", a, op, b, a->$op(b));
+%w(+ - * / % ** ^ | & << >>).each { |op|
+    printf("%s %s %s = %s\n", a, op, b, a.$op(b));
 }

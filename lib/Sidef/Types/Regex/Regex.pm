@@ -45,13 +45,13 @@ package Sidef::Types::Regex::Regex {
     sub match {
         my ($self, $object, $pos) = @_;
 
-        if (ref $object eq 'Sidef::Types::Array::Array') {
+        if (ref($object) eq 'Sidef::Types::Array::Array') {
             my $match;
             foreach my $item (@{$object}) {
-                $match = $self->matches($item->get_value);
+                $match = $self->match($item->get_value);
                 $match->matched && return $match;
             }
-            return $match // $self->matches(Sidef::Types::String::String->new);
+            return $match // $self->match(Sidef::Types::String::String->new);
         }
 
         Sidef::Types::Regex::Match->new(
@@ -62,15 +62,11 @@ package Sidef::Types::Regex::Regex {
                                        );
     }
 
-    *matches = \&match;
-
     sub gmatch {
         my ($self, $obj, $pos) = @_;
         local $self->{global} = 1;
-        $self->matches($obj, $pos);
+        $self->match($obj, $pos);
     }
-
-    *gmatches = \&gmatch;
 
     sub dump {
         my ($self) = @_;

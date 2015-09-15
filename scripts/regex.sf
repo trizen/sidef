@@ -5,14 +5,14 @@
 #
 
 var regex = /^(\d+) (\w+) (\d+)$/;
-var reg = ('26 Iunie 2013' =~ regex);
+var match = ('26 Iunie 2013' =~ regex);
 
-if (reg.matched) {
-    "Got '%d' captures\n".printf(reg.cap.len);
-    reg.cap.join("--").say;
+if (match) {
+    "Got '%d' captures\n".printf(match.cap.len);
+    match.cap.join("--").say;
 }
 else {
-    "Regex_1 fail!\n".die
+    die "Regex_1 fail!";
 }
 
 
@@ -22,13 +22,10 @@ else {
 
 var cap = ("12 John Wall Street no. 4" =~ /(?<id>\d+)\s+(?<name>\S+)\s+(?<address>(.+))$/);
 
-cap.matched
-    || "Named captures failed!\n".die;
+cap || die "Named captures failed!\n";
 
 var hash = cap.ncap;
-[hash["name"], hash["address"]]
-    == ['John', 'Wall Street no. 4']
-        || "ncap error".die;
+assert([hash[:name], hash[:address]], ['John', 'Wall Street no. 4']);
 
 #
 ## Other tests
@@ -46,4 +43,4 @@ var hash = cap.ncap;
 '/'    =~ /^\/\z/     || ("Regex escape fail!\n".die);
 
 
-/^googl\w/->matches(["hei", "google chrome"]) || ("Regex on array fail!\n".die);
+/^googl\w/.match(["hei", "google chrome"]) || (die "Regex on array fail!");

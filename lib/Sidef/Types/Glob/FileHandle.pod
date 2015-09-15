@@ -23,36 +23,6 @@ Inherits methods from:
 =head1 METHODS
 
 
-=head2 <<
-
-I<Obj> B<E<lt>E<lt>> I<Obj> -> I<Obj>
-
-Return the
-
-Aliases: I<output_from>, I<outputFrom>
-
-=cut
-
-=head2 <=>
-
-I<Obj> B<E<lt>=E<gt>> I<Obj> -> I<Obj>
-
-Return the
-
-Aliases: I<cmp>, I<compare>
-
-=cut
-
-=head2 >>
-
-I<Obj> B<E<gt>E<gt>> I<Obj> -> I<Obj>
-
-Return the
-
-Aliases: I<read_to>, I<readTo>
-
-=cut
-
 =head2 autoflush
 
 FileHandle.autoflush() -> I<Obj>
@@ -127,7 +97,7 @@ FileHandle.get() -> I<Obj>
 
 Return the
 
-Aliases: I<line>, I<readln>, I<get_line>, I<getline>, I<getLine>, I<read_line>, I<readline>, I<readLine>
+Aliases: I<line>, I<readln>, I<read_line>, I<readline>
 
 =cut
 
@@ -137,7 +107,7 @@ FileHandle.getc() -> I<Obj>
 
 Return the
 
-Aliases: I<get_char>, I<getChar>, I<read_char>, I<readChar>
+Aliases: I<read_char>
 
 =cut
 
@@ -147,8 +117,6 @@ FileHandle.is_on_tty() -> I<Obj>
 
 Return the
 
-Aliases: I<isOnTty>
-
 =cut
 
 =head2 lines
@@ -157,7 +125,7 @@ FileHandle.lines() -> I<Obj>
 
 Return the
 
-Aliases: I<read_all>, I<readall>, I<readAll>, I<get_lines>, I<getlines>, I<getLines>, I<readlines>, I<readLines>
+Aliases: I<read_lines>, I<readlines>
 
 =cut
 
@@ -229,7 +197,7 @@ FileHandle.sep() -> I<Obj>
 
 Return the
 
-Aliases: I<separator>, I<input_separator>, I<inputSeparator>
+Aliases: I<separator>, I<input_separator>
 
 =cut
 
@@ -279,8 +247,6 @@ FileHandle.sysread() -> I<Obj>
 
 Return the
 
-Aliases: I<sysRead>
-
 =cut
 
 =head2 sysseek
@@ -290,6 +256,16 @@ FileHandle.sysseek() -> I<Obj>
 Return the
 
 Aliases: I<sysSeek>
+
+=cut
+
+=head2 syswrite
+
+FileHandle.syswrite() -> I<Obj>
+
+Return the
+
+Aliases: I<write_string>
 
 =cut
 
@@ -325,12 +301,22 @@ Return the
 
 =cut
 
-=head2 write_string
+=head2 «
 
-FileHandle.write_string() -> I<Obj>
+I<Obj> B<«> I<Obj> -> I<Obj>
 
 Return the
 
-Aliases: I<writeString>
+Aliases: I<E<lt>E<lt>>, I<output_from>
+
+=cut
+
+=head2 »
+
+I<Obj> B<»> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<E<gt>E<gt>>, I<read_to>
 
 =cut

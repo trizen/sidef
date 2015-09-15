@@ -257,7 +257,7 @@ class new(diacritics            = true,
             words.append(self[:negative_sign]);
             words.append(__METHOD__(self, number.abs)...);
         }
-        elsif (!(number.isInt)) {
+        elsif (!(number.is_int)) {
 
             words.append(__METHOD__(self, number.int)...);
             words.append(self[:decimal_point]);
@@ -291,7 +291,7 @@ class new(diacritics            = true,
                     if (cat >= 100 && (cat < 1000)) {
                         var rest = (cat - (100 * (cat / 100 -> int)));
                         if (of.len != 0 && (rest != 0 && (DIGITS.exists(rest)))) {
-                            of.dropRight(1);
+                            of.pop;
                         }
                     }
 
@@ -329,7 +329,7 @@ class new(diacritics            = true,
                 words.append('și', DIGITS[number % 10 -> int]);
             }
         }
-        elsif (number.isInf) {
+        elsif (number.is_inf) {
             return [self[:infinity]];
         }
         else {
