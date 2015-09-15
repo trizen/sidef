@@ -180,10 +180,10 @@ package Sidef::Deparse::Sidef {
         }
         elsif ($ref eq 'Sidef::Types::Block::Code') {
             if ($addr{refaddr($obj)}++) {
-                $code = %{$obj} ? '__BLOCK__' : 'Block';
+                $code = keys(%{$obj}) ? '__BLOCK__' : 'Block';
             }
             else {
-                if (%{$obj}) {
+                if (keys(%{$obj})) {
                     $code = '{';
                     if (exists($obj->{init_vars}) and @{$obj->{init_vars}} > 1) {
                         my $vars = $obj->{init_vars};
@@ -321,7 +321,7 @@ package Sidef::Deparse::Sidef {
             }
         }
         elsif ($ref eq 'Sidef::Types::Hash::Hash') {
-            $code = 'Hash';
+            $code = keys(%{$obj->{data}}) ? $obj->dump->get_value : 'Hash';
         }
         elsif ($ref eq 'Sidef::Types::Glob::Socket') {
             $code = 'Socket';
