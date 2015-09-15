@@ -190,6 +190,7 @@ scripts/built_in_classes.sf
 scripts/c_plus_plus_input_output.sf
 scripts/caesar_cipher.sf
 scripts/calendar.sf
+scripts/call_an_object_method.sf
 scripts/catalan_numbers.sf
 scripts/catalan_numbers_recursive.sf
 scripts/chinese_remainder_theorem.sf
@@ -501,6 +502,7 @@ scripts/Rosettacode/Enumerations.sf
 scripts/Rosettacode/Enumerations_1.sf
 scripts/Rosettacode/Environment_variables.sf
 scripts/Rosettacode/Equilibrium_index.sf
+scripts/Rosettacode/Ethiopian_multiplication.sf
 scripts/Rosettacode/Evaluate_binomial_coefficients.sf
 scripts/Rosettacode/Evaluate_binomial_coefficients_1.sf
 scripts/Rosettacode/Even_or_odd.sf

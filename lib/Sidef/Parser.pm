@@ -2126,6 +2126,18 @@ package Sidef::Parser {
                     push @{$struct{$self->{class}}[-1]{call}}, @{$methods};
                 }
 
+                if (/\G(?=\()/) {
+                    my $arg = $self->parse_arguments(code => $opt{code});
+
+                    push @{$struct{$self->{class}}[-1]{call}},
+                      {
+                        method => 'call',
+                        (%{$arg} ? (arg => [$arg]) : ())
+                      };
+
+                    redo;
+                }
+
                 if (/\G(?=\[)/) {
                     $struct{$self->{class}}[-1]{self} = {
                             $self->{class} => [

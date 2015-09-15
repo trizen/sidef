@@ -88,6 +88,18 @@ package Sidef::Variable::ClassInit {
         Sidef::Types::String::String->new($self->{name});
     }
 
+    sub invoke {
+        my ($self, $name, @args) = @_;
+        $self->{__METHODS__}{$name}->call(@args);
+    }
+
+    sub method {
+        my ($self, $name) = @_;
+        exists($self->{__METHODS__}{$name})
+          ? Sidef::Variable::LazyMethod->new(obj => $self, method => $self->{__METHODS__}{$name})
+          : ();
+    }
+
     sub init {
         my ($self, @args) = @_;
 
