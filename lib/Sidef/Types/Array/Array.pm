@@ -570,6 +570,15 @@ package Sidef::Types::Array::Array {
 
     *collect = \&map;
 
+    sub flat_map {
+        my ($self, $code) = @_;
+        $self->new(
+            map {
+                map { $_->get_value } @{$code->run($_->get_value)}
+              } @{$self}
+        );
+    }
+
     sub grep {
         my ($self, $code) = @_;
         $self->new(grep { $code->run($_) } map { $_->get_value } @{$self});

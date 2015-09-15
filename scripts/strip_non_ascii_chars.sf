@@ -1,0 +1,19 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Strip_control_codes_and_extended_characters_from_a_string
+#
+
+var str = "\ba\x00b\n\rc\fd\xc3\x7ffoo";
+
+var letters = str.chars»ord»();
+assert_eq(letters»chr»().join, "\ba\0b\n\rc\fd\xC3\x7Ffoo");
+
+var nocontrols = letters.grep{ (_ > 32) && (_ != 127) };
+assert_eq(nocontrols»chr»().join, "abcd\xC3foo");
+
+var noextended = nocontrols.grep{ _ < 127 };
+assert_eq(noextended»chr»().join, "abcdfoo");
+
+
+say '** Test passed';

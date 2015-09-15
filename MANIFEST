@@ -871,6 +871,7 @@ scripts/static_const_lazy_init.sf
 scripts/string_encodings.sf
 scripts/string_escapes.sf
 scripts/string_to_number.sf
+scripts/strip_non_ascii_chars.sf
 scripts/struct_definition.sf
 scripts/subscript_numbers.sf
 scripts/subtractive_generator.sf
