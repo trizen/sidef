@@ -13,9 +13,20 @@ package Sidef::Types::Block::Switch {
     sub when {
         my ($self, $arg) = @_;
 
-        if (ref($self->{obj}) eq ref($arg)) {
+        state $method = '~~';
+        if ($arg->$method($self->{obj})->get_value) {
+            $self->{do_block} = 1;
+        }
+
+        $self;
+    }
+
+    sub exact {
+        my ($self, $arg) = @_;
+
+        if (ref($arg) eq ref($self->{obj})) {
             state $method = '==';
-            if ($self->{obj}->$method($arg)->get_value) {
+            if ($self->{obj}->$method($arg)) {
                 $self->{do_block} = 1;
             }
         }
@@ -32,7 +43,7 @@ package Sidef::Types::Block::Switch {
             }
         }
         else {
-            return $self->when($arg);
+            return $self->exact($arg);
         }
 
         $self;
@@ -58,8 +69,9 @@ package Sidef::Types::Block::Switch {
 
     {
         no strict 'refs';
-        *{__PACKAGE__ . '::' . '>'} = \&when;
+        *{__PACKAGE__ . '::' . '~'} = \&when;
         *{__PACKAGE__ . '::' . '?'} = \&case;
+        *{__PACKAGE__ . '::' . '>'} = \&exact;
         *{__PACKAGE__ . '::' . ':'} = \&default;
     }
 

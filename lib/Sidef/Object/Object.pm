@@ -160,7 +160,8 @@ package Sidef::Object::Object {
                 return $second->contains($first);
             }
 
-            Sidef::Types::Bool::Bool->false;
+            state $method = '==';
+            $first->$method($second);
         };
 
         # Negation of smart match

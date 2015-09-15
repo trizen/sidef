@@ -5,10 +5,11 @@
 #
 
 range(1, 10).each { |i|
+
     given (i)
-        > 3          { say "three"; next }
-        ? (i%2 == 0) { say "even";  next }
-        > 9          { say "nine";  break };
+        > 3           { say "three"; next }          # exact
+        ? (i.is_even) { say "even";  next }          # boolean
+        ~ 9           { say "nine";  break };        # smartmatch
 
     if (i % 2 == 0) {
         die "Got an even number!";

@@ -394,6 +394,7 @@ scripts/quicksort.sf
 scripts/quicksort_in_parallel.sf
 scripts/quoted_strings.sf
 scripts/rand.sf
+scripts/read_a_configuration_file.sf
 scripts/rec_reverse.sf
 scripts/recursion.sf
 scripts/regex.sf

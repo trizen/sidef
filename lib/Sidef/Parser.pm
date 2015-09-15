@@ -2205,7 +2205,6 @@ package Sidef::Parser {
                                                error => "operator '$method' requires a right-side argument",
                                               );
                         }
-
                     }
 
                     $has_arg || do {
@@ -2570,11 +2569,8 @@ package Sidef::Parser {
                     if (defined $arg) {
                         push @{$struct{$self->{class}}[-1]{call}}, {method => 'do', arg => [$arg]};
 
-                        if (/\G\h*(\R\h*)?(?=$self->{method_name_re}|$self->{operators_re})/goc) {
-
-                            if (defined $1) {
-                                $self->{line}++;
-                            }
+                        if (not(($self->parse_whitespace(code => $opt{code}))[1])
+                            and /(?=$self->{method_name_re}|$self->{operators_re})/o) {
 
                             my $code = '. ' . substr($_, pos);
                             my $methods = $self->parse_methods(code => \$code);

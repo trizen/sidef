@@ -91,10 +91,10 @@ given([8,9,10])
     when ("x") do {
         "Not the right place! (1)".die;
     }
-    when([8,10,9]) do {
+    exact([8,10,9]) do {
         "Not the right place! (2)".die;
     }
-    when ([8,9,10]) do {
+    exact([8,9,10]) do {
         "Right place! (5)".say;
     }
     when ([42]) do {
@@ -107,7 +107,7 @@ given(0)
     when (1) do {
         "Not the right place! (1)".die;
     }
-    when ('0') do {
+    exact ('0') do {
         "Not the right place! (2)".die;
     }
     when (0) do {
