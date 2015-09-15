@@ -557,6 +557,7 @@ EOT
         else {
             say ref($_) ne 'Sidef::Types::Block::Code' && eval { $_->can('dump') } ? $_->dump : $_
               for eval { $exec->execute($struct) };
+            print $@ if ($@);
         }
         redo;
     }
