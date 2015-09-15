@@ -67,6 +67,14 @@ Return the
 
 =cut
 
+=head2 invoke
+
+ClassInit.invoke() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 is_a
 
 ClassInit.is_a() -> I<Obj>
@@ -74,6 +82,14 @@ ClassInit.is_a() -> I<Obj>
 Return the
 
 Aliases: I<is_an>
+
+=cut
+
+=head2 method
+
+ClassInit.method() -> I<Obj>
+
+Return the
 
 =cut
 

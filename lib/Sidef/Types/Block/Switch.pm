@@ -26,7 +26,7 @@ package Sidef::Types::Block::Switch {
 
         if (ref($arg) eq ref($self->{obj})) {
             state $method = '==';
-            if ($self->{obj}->$method($arg)) {
+            if ($self->{obj}->$method($arg)->get_value) {
                 $self->{do_block} = 1;
             }
         }

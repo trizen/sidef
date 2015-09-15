@@ -39,7 +39,7 @@ I<Obj> B<E<gt>> I<Obj> -> I<Obj>
 
 Return the
 
-Aliases: I<when>
+Aliases: I<exact>
 
 =cut
 
@@ -66,5 +66,15 @@ Return the
 Switch.value() -> I<Obj>
 
 Return the
+
+=cut
+
+=head2 ~
+
+I<Obj> B<~> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<when>
 
 =cut
