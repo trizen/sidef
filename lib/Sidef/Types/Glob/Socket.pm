@@ -39,6 +39,15 @@ package Sidef::Types::Glob::Socket {
         Sidef::Types::Glob::SocketHandle->new(fh => $fh);
     }
 
+    sub socketpair {
+        my ($self, $socket1, $socket2, $domain, $type, $protocol) = @_;
+        CORE::socketpair(my $sh1, my $sh2, $domain->get_value, $type->get_value, $protocol->get_value)
+          || return Sidef::Types::Bool::Bool->false;
+        $socket1->get_var->set_value(Sidef::Types::Glob::SocketHandle->new(fh => $sh1));
+        $socket2->get_var->set_value(Sidef::Types::Glob::SocketHandle->new(fh => $sh2));
+        Sidef::Types::Bool::Bool->true;
+    }
+
     #
     ## gethost*
     #

@@ -13,6 +13,16 @@ package Sidef::Sys::Sys {
         exit($code // 0);
     }
 
+    sub wait {
+        my ($self) = @_;
+        Sidef::Types::Number::Number->new(CORE::wait);
+    }
+
+    sub fork {
+        my ($self) = @_;
+        Sidef::Types::Number::Number->new(fork() // return);
+    }
+
     sub alarm {
         my ($self, $sec) = @_;
 

@@ -53,12 +53,12 @@ package Sidef::Types::Glob::FileHandle {
         CORE::binmode($self->{fh}, $encoding->get_value);
     }
 
-    sub write_string {
+    sub syswrite {
         my ($self, @args) = @_;
-        Sidef::Types::Bool::Bool->new(syswrite $self->{fh}, @args);
+        Sidef::Types::Bool::Bool->new(CORE::syswrite $self->{fh}, @args);
     }
 
-    *syswrite = \&write_string;
+    *write_string = \&syswrite;
 
     sub print {
         my ($self, @args) = @_;
