@@ -174,3 +174,11 @@ Socket.setservent() -> I<Obj>
 Return the
 
 =cut
+
+=head2 socketpair
+
+Socket.socketpair() -> I<Obj>
+
+Return the
+
+=cut

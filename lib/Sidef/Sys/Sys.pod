@@ -103,6 +103,14 @@ Exit the main program with a given code. If no argument is specified, the code 0
 
 =cut
 
+=head2 fork
+
+Sys.fork() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 getgrent
 
 Sys.getgrent() -> I<Obj>
@@ -558,6 +566,14 @@ Aliases: I<getlogin>
 =head2 usleep
 
 Sys.usleep() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 wait
+
+Sys.wait() -> I<Obj>
 
 Return the
 

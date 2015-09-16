@@ -57,6 +57,14 @@ Return the
 
 =cut
 
+=head2 map
+
+RangeNumber.map() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 max
 
 RangeNumber.max() -> I<Obj>

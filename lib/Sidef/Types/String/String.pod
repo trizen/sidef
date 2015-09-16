@@ -256,13 +256,13 @@ Return the
 
 =cut
 
-=head2 char_at
+=head2 char
 
-String.char_at() -> I<Obj>
+String.char() -> I<Obj>
 
 Return the
 
-Aliases: I<charAt>
+Aliases: I<char_at>
 
 =cut
 
