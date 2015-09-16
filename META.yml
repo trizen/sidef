@@ -17,7 +17,7 @@ name: Sidef
 provides:
   Sidef:
     file: lib/Sidef.pm
-    version: '0.09'
+    version: '0.10'
   Sidef::Convert::Convert:
     file: lib/Sidef/Convert/Convert.pm
   Sidef::Deparse::Perl:
@@ -196,5 +196,5 @@ requires:
   utf8: '0'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.09'
+version: '0.10'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.016'
