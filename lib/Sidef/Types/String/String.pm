@@ -278,12 +278,12 @@ package Sidef::Types::String::String {
         $self->new(CORE::lcfirst $self->get_value);
     }
 
-    sub charAt {
+    sub char {
         my ($self, $pos) = @_;
         Sidef::Types::Char::Char->new(CORE::substr($self->get_value, $pos->get_value, 1));
     }
 
-    *char_at = \&charAt;
+    *char_at = \&char;
 
     sub wordcase {
         my ($self) = @_;
