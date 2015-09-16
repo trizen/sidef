@@ -544,11 +544,13 @@ scripts/Rosettacode/Generic_swap_1.sf
 scripts/Rosettacode/Get_system_command_output.sf
 scripts/Rosettacode/Get_system_command_output_1.sf
 scripts/Rosettacode/Globally_replace_text_in_several_files.sf
+scripts/Rosettacode/Graphical/Death_Star.sf
 scripts/Rosettacode/Graphical/Fractal_tree.sf
 scripts/Rosettacode/Graphical/Hello_world_Graphical.sf
 scripts/Rosettacode/Graphical/Hello_world_Graphical_1.sf
 scripts/Rosettacode/Graphical/Munching_squares.sf
 scripts/Rosettacode/Graphical/Sierpinski_triangle_Graphical.sf
+scripts/Rosettacode/Graphical/Simple_windowed_application.sf
 scripts/Rosettacode/Graphical/Ulam_spiral_[for_primes].sf
 scripts/Rosettacode/Graphical/Window_creation.sf
 scripts/Rosettacode/Graphical/Window_creation_1.sf
@@ -789,6 +791,7 @@ scripts/Rosettacode/Soundex.sf
 scripts/Rosettacode/Spiral_matrix.sf
 scripts/Rosettacode/Stack.sf
 scripts/Rosettacode/Stack_1.sf
+scripts/Rosettacode/Strand_sort.sf
 scripts/Rosettacode/String_append.sf
 scripts/Rosettacode/String_case.sf
 scripts/Rosettacode/String_comparison.sf
@@ -819,6 +822,7 @@ scripts/Rosettacode/System/Truncate_a_file.sf
 scripts/Rosettacode/System_time.sf
 scripts/Rosettacode/Terminal_control_Unicode_output.sf
 scripts/Rosettacode/Tokenize_a_string.sf
+scripts/Rosettacode/Top_rank_per_group.sf
 scripts/Rosettacode/Topic_variable.sf
 scripts/Rosettacode/Tree_traversal.sf
 scripts/Rosettacode/Trigonometric_functions.sf
@@ -835,6 +839,7 @@ scripts/Rosettacode/Vector_products.sf
 scripts/Rosettacode/Walk_a_directory_Non-recursively.sf
 scripts/Rosettacode/Walk_a_directory_Non-recursively_1.sf
 scripts/Rosettacode/Walk_a_directory_Recursively.sf
+scripts/Rosettacode/Wireworld.sf
 scripts/Rosettacode/Word_wrap.sf
 scripts/Rosettacode/Word_wrap_1.sf
 scripts/Rosettacode/Write_language_name_in_3D_ASCII.sf
@@ -849,6 +854,7 @@ scripts/Rosettacode/Zig-zag_matrix.sf
 scripts/run_length_encoding.sf
 scripts/run_length_encoding_2.sf
 scripts/run_length_encoding_3.sf
+scripts/same_fringe.sf
 scripts/script.sf
 scripts/selection_sort.sf
 scripts/short_circuit_evaluation.sf

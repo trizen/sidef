@@ -28,11 +28,11 @@ package Sidef::Object::Unary {
         };
 
         *{__PACKAGE__ . '::' . '?'} = sub {
-            Sidef::Types::Bool::Bool->new($_[1]->get_value);
+            Sidef::Types::Bool::Bool->new($_[1]);
         };
 
         *{__PACKAGE__ . '::' . '!'} = sub {
-            Sidef::Types::Bool::Bool->new(not $_[1]->get_value);
+            Sidef::Types::Bool::Bool->new(not $_[1]);
         };
 
         *{__PACKAGE__ . '::' . '>'} = sub {
