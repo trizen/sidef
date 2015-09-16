@@ -544,6 +544,7 @@ scripts/Rosettacode/Generic_swap_1.sf
 scripts/Rosettacode/Get_system_command_output.sf
 scripts/Rosettacode/Get_system_command_output_1.sf
 scripts/Rosettacode/Globally_replace_text_in_several_files.sf
+scripts/Rosettacode/Graphical/Color_Bars.sf
 scripts/Rosettacode/Graphical/Death_Star.sf
 scripts/Rosettacode/Graphical/Fractal_tree.sf
 scripts/Rosettacode/Graphical/Hello_world_Graphical.sf
