@@ -291,6 +291,7 @@ scripts/Graphical/gtk2_goodbye_world.sf
 scripts/Graphical/gtk2_tutorial.sf
 scripts/Graphical/Gtk2_user_input.sf
 scripts/Graphical/tk_library.sf
+scripts/greatest_subsequential_sum.sf
 scripts/group_precedence.sf
 scripts/hailstone.sf
 scripts/happy_2_years_old.sf
@@ -598,6 +599,7 @@ scripts/Rosettacode/Interactive/Bulls_and_cows.sf
 scripts/Rosettacode/Interactive/Bulls_and_cows_Player.sf
 scripts/Rosettacode/Interactive/Conway's_Game_of_Life.sf
 scripts/Rosettacode/Interactive/Guess_the_number.sf
+scripts/Rosettacode/Interactive/Guess_the_number_with_feedback.sf
 scripts/Rosettacode/Interactive/Guess_the_number_With_feedback_[player].sf
 scripts/Rosettacode/Interactive/Integer_comparison.sf
 scripts/Rosettacode/Interactive/Menu.sf
@@ -694,6 +696,7 @@ scripts/Rosettacode/Permutations_by_swapping.sf
 scripts/Rosettacode/Phrase_reversals.sf
 scripts/Rosettacode/Pick_random_element.sf
 scripts/Rosettacode/Pig_the_dice_game_player.sf
+scripts/Rosettacode/Playing_cards.sf
 scripts/Rosettacode/Pointers_and_references.sf
 scripts/Rosettacode/Polymorphic_copy.sf
 scripts/Rosettacode/Polymorphism.sf

@@ -27,12 +27,20 @@ package Sidef::Types::Array::MultiArray {
         ];
     }
 
+    sub _max {
+        my ($self) = @_;
+        state $x = require List::Util;
+        List::Util::max(map { $#{$_} } @{$self});
+    }
+
     sub map {
         my ($self, $code) = @_;
 
+        my $max = $self->_max;
+
         my @arr;
-        foreach my $i (0 .. $#{$self->[0]}) {
-            push @arr, scalar $code->run(map { $_->[$i] } @{$self});
+        foreach my $i (0 .. $max) {
+            push @arr, scalar $code->run(map { $_->[$i % @{$_}] } @{$self});
         }
 
         Sidef::Types::Array::Array->new(@arr);
@@ -41,8 +49,10 @@ package Sidef::Types::Array::MultiArray {
     sub each {
         my ($self, $code) = @_;
 
-        foreach my $i (0 .. $#{$self->[0]}) {
-            if (defined(my $res = $code->_run_code(map { $_->[$i] } @{$self}))) {
+        my $max = $self->_max;
+
+        foreach my $i (0 .. $max) {
+            if (defined(my $res = $code->_run_code(map { $_->[$i % @{$_}] } @{$self}))) {
                 return $res;
             }
         }
