@@ -102,6 +102,38 @@ package Sidef::Types::Array::RangeNumber {
         $self;
     }
 
+    sub map {
+        my ($self, $code) = @_;
+
+        my $step  = $self->{step};
+        my $from  = $self->{from};
+        my $limit = $self->{to};
+
+        my @values;
+        if ($step == 1 and not $limit > (-1 >> 1) and not $from > (-1 >> 1)) {
+
+            # Unpack limit
+            $limit = $limit->bstr if ref($limit);
+
+            foreach my $i ($from .. $limit) {
+                push @values, $code->run(Sidef::Types::Number::Number->new($i));
+            }
+        }
+
+        elsif ($step > 0) {
+            for (my $i = $from ; $i <= $limit ; $i += $step) {
+                push @values, $code->run(Sidef::Types::Number::Number->new($i));
+            }
+        }
+        else {
+            for (my $i = $from ; $i >= $limit ; $i += $step) {
+                push @values, $code->run(Sidef::Types::Number::Number->new($i));
+            }
+        }
+
+        Sidef::Types::Array::Array->new(@values);
+    }
+
     our $AUTOLOAD;
     sub DESTROY { }
 
