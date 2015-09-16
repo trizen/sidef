@@ -687,8 +687,10 @@ scripts/Rosettacode/Pascal_s_triangle.sf
 scripts/Rosettacode/Permutations.sf
 scripts/Rosettacode/Permutations_1.sf
 scripts/Rosettacode/Permutations_2.sf
+scripts/Rosettacode/Permutations_by_swapping.sf
 scripts/Rosettacode/Phrase_reversals.sf
 scripts/Rosettacode/Pick_random_element.sf
+scripts/Rosettacode/Pig_the_dice_game_player.sf
 scripts/Rosettacode/Pointers_and_references.sf
 scripts/Rosettacode/Polymorphic_copy.sf
 scripts/Rosettacode/Polymorphism.sf

@@ -457,6 +457,14 @@ Return the
 
 =cut
 
+=head2 flat_map
+
+Array.flat_map() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 flatten
 
 Array.flatten() -> I<Obj>
