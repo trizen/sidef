@@ -97,6 +97,24 @@ package Sidef::Object::Object {
                 }
             }
 
+            # First is RangeNumber
+            if ($f_type eq 'Sidef::Types::Array::RangeNumber') {
+
+                # RangeNumber ~~ Number
+                if ($s_type eq 'Sidef::Types::Number::Number') {
+                    return $first->contains($second);
+                }
+            }
+
+            # First is RangeString
+            if ($f_type eq 'Sidef::Types::Array::RangeString') {
+
+                # RangeString ~~ String
+                if ($s_type eq 'Sidef::Types::String::String') {
+                    return $first->contains($second);
+                }
+            }
+
             # First is Array
             if ($f_type eq 'Sidef::Types::Array::Array') {
 
