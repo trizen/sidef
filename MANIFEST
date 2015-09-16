@@ -732,6 +732,8 @@ scripts/Rosettacode/Roman_numerals_Decode.sf
 scripts/Rosettacode/Roman_numerals_Decode_1.sf
 scripts/Rosettacode/Roman_numerals_Encode.sf
 scripts/Rosettacode/Roots_of_a_quadratic_function.sf
+scripts/Rosettacode/RPN_calculator_algorithm.sf
+scripts/Rosettacode/RPN_to_infix_conversion.sf
 scripts/Rosettacode/Run-length_encoding.sf
 scripts/Rosettacode/Run-length_encoding_1.sf
 scripts/Rosettacode/Runge-Kutta_method.sf
@@ -747,6 +749,7 @@ scripts/Rosettacode/SHA-1.sf
 scripts/Rosettacode/SHA-256.sf
 scripts/Rosettacode/Short-circuit_evaluation.sf
 scripts/Rosettacode/Show_the_epoch.sf
+scripts/Rosettacode/Shunting-yard_algorithm.sf
 scripts/Rosettacode/Sierpinski_carpet.sf
 scripts/Rosettacode/Sierpinski_triangle.sf
 scripts/Rosettacode/Singly-linked_list_Element_definition.sf
@@ -852,6 +855,7 @@ scripts/Rosettacode/WWW/Hello_world_Web_server.sf
 scripts/Rosettacode/WWW/Hello_world_Web_server_1.sf
 scripts/Rosettacode/WWW/Rosettacode_top_languages.sf
 scripts/Rosettacode/WWW/Sockets.sf
+scripts/Rosettacode/Xiaolin_Wu_line_algorithm.sf
 scripts/Rosettacode/Y_combinator.sf
 scripts/Rosettacode/Zeckendorf_number_representation.sf
 scripts/Rosettacode/Zig-zag_matrix.sf
