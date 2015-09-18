@@ -28,5 +28,4 @@ combinations.each {|row|
     say row.join(' ');
 }
 
-combinations == 3.comb(5) || die "error!";
 combinations == (0..4 -> combinations(3)) || die "error2";

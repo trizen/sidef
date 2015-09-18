@@ -3,26 +3,26 @@
 #
 ## Boolean type
 #
-class SBool {
+class Sidef::Types::Bool::Bool {
     has Bool $.value;
 }
 
 #
 ## String type + methods
 #
-class SString {
+class Sidef::Types::String::String {
     has Str $.value;
 
-    method concat(SString $arg) {
-        SString.new(value => $.value ~ $arg.value);
+    method concat(Sidef::Types::String::String $arg) {
+        Sidef::Types::String::String.new(value => $.value ~ $arg.value);
     }
 
     method say() {
-        $.concat(SString.new(value => "\n")).print;
+        $.concat(Sidef::Types::String::String.new(value => "\n")).print;
     }
 
     method print() {
-        SBool.new(value => print $.value);
+        Sidef::Types::Bool::Bool.new(value => print $.value);
     }
 }
 
@@ -45,7 +45,7 @@ class Interpreter {
                 my $meth = $call<method>;
                 if "arg" ~~ $call {
                     my $args = $call<arg>.map({
-                        $_.isa(Hash) ?? $.execute_expr($_) !! $_
+                        $_.isa(Hash) ?? $.execute($_) !! $_
                     });
                     $self_obj = $self_obj."$meth"(|$args);
                 }
@@ -71,25 +71,71 @@ class Interpreter {
     }
 }
 
-my $ast = {
-    main => [
-        {
-            call => [{method => "print"}],
+ my $ast =  {
+  main => [
+    {
+      self => {
+        main => [
+          {
             self => {
-                main => [
-                    {
-                        call => [{method => "concat", arg => [{self => SString.new(value => "llo")}]}],
-                        self => SString.new(value => "he"),
-                    }
-                ],
-            }
-        },
-        {
-            call => [{method => "say"}],
-            self => SString.new(value => " world!");
-        },
-    ]
+              main => [
+                {
+                  call => [{ method => "print" }],
+                  self => {
+                            main => [
+                              {
+                                call => [
+                                          {
+                                            arg => [
+                                              {
+                                                main => [
+                                                  {
+                                                    self => {
+                                                      main => [
+                                                        { self => Sidef::Types::String::String.bless(value => "llo") },
+                                                      ],
+                                                    },
+                                                  },
+                                                ],
+                                              },
+                                            ],
+                                            method => "concat",
+                                          },
+                                        ],
+                                self => Sidef::Types::String::String.bless(value => "He"),
+                              },
+                            ],
+                          },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+    {
+      self => {
+        main => [
+          {
+            self => {
+              main => [
+                {
+                  call => [{ method => "say" }],
+                  self => {
+                            main => [
+                              { self => Sidef::Types::String::String.bless(value => " world!") },
+                            ],
+                          },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
 };
+
 
 #
 ## Begin execution

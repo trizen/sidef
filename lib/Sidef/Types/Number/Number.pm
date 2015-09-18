@@ -180,31 +180,6 @@ package Sidef::Types::Number::Number {
 
     *fact = \&factorial;
 
-    sub comb {
-        my ($self, $num) = @_;
-
-        my $k = $self->get_value;
-        my $n = $num->get_value;
-        my @c = 0 .. $k - 1;
-
-        my @bag;
-        while (1) {
-            push @bag, [@c];
-            next if $c[$k - 1]++ < $n - 1;
-            my $i = $k - 2;
-            $i-- while $i >= 0 && $c[$i] >= $n - ($k - $i);
-            last if $i < 0;
-            $c[$i]++;
-            while (++$i < $k) { $c[$i] = $c[$i - 1] + 1; }
-        }
-
-        Sidef::Types::Array::Array->new(
-            map {
-                Sidef::Types::Array::Array->new(map { Sidef::Types::Number::Number->new($_) } @{$_})
-              } @bag
-        );
-    }
-
     sub array_to {
         my ($self, $num, $step) = @_;
 

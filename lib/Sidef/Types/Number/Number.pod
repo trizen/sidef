@@ -334,14 +334,6 @@ Return the
 
 =cut
 
-=head2 comb
-
-Number.comb() -> I<Obj>
-
-Return the
-
-=cut
-
 =head2 commify
 
 Number.commify() -> I<Obj>
