@@ -116,15 +116,12 @@ package Sidef::Types::Glob::FileHandle {
 
     sub slurp {
         my ($self) = @_;
-
-        my $size = (-s $self->{fh});
-        if (not defined($size) or ($size == 0)) {
-            local $/;
-            return Sidef::Types::String::String->new(CORE::readline($self->{fh}));
-        }
-
-        CORE::sysread($self->{fh}, (my $content), $size);
-        Sidef::Types::String::String->new($content);
+        Sidef::Types::String::String->new(
+            do {
+                local $/;
+                CORE::readline($self->{fh});
+              }
+        );
     }
 
     sub readline {
