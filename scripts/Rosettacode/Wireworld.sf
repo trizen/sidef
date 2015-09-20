@@ -18,10 +18,10 @@ range(1, 10).each {
             var c = r[x];
             rr.append(
               given(c)
-                > 'H' { 't' }
-                > 't' { '.' }
-                > '.' { <. H>[f[y-1 .. y+1].flat_map{_[x-1 .. x+1]}.count('H') ~~ [1,2]] }
-                :     { c }
+                > ('H') { 't' }
+                > ('t') { '.' }
+                > ('.') { <. H>[f[y-1 .. y+1].flat_map{_[x-1 .. x+1]}.count('H') ~~ [1,2]] }
+                :       { c }
             );
         };
         rr.append('');

@@ -7,7 +7,7 @@
 ## means: "Hello" + ({name}.run.to_s)
 #
 
-for 0..5 { |i|
+5.times { |i|
     print "#{i} + #{i} == #{i + i}\t";
     print "2*i == 2*#{i} => #{ 2*i }"+"\n";
 }

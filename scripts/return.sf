@@ -50,7 +50,7 @@ hi(4) == "FUNC RETURN"     || "Error hi(4)!".die;
 
 func for_loop {
 
-    for ["a", "z", "f"] { |c|
+    for (["a", "z", "f"]) { |c|
         if (c == "z") {
             return "LOOP RETURN";
         }

@@ -33,16 +33,16 @@ class Interpreter {
         statement.has_key(:self) || die "Invalid AST!";
         var self_obj = statement[:self];
 
-        if self_obj.is_a(Hash) {
+        if (self_obj.is_a(Hash)) {
             self_obj = self.execute(self_obj);
         }
 
-        if statement.has_key(:call) {
+        if (statement.has_key(:call)) {
             statement[:call].each { |call|
 
                 var meth = call[:method];
 
-                if call.has_key(:arg) {
+                if (call.has_key(:arg)) {
                     var args = call[:arg].map {|arg|
                         arg.is_a(Hash) ? self.execute_expr(arg) : arg
                     };

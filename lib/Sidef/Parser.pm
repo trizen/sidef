@@ -33,10 +33,7 @@ package Sidef::Parser {
                              '...' => 1,
                            },
             obj_with_do => {
-                            'Sidef::Types::Block::For'   => 1,
-                            'Sidef::Types::Bool::While'  => 1,
-                            'Sidef::Types::Bool::If'     => 1,
-                            'Sidef::Types::Block::Given' => 1,
+                            'Sidef::Types::Block::Given' => 1,    # TODO: find a better way and remove this line
                            },
             obj_with_block => {
                                'Sidef::Types::Bool::While' => 1,
@@ -2036,31 +2033,6 @@ package Sidef::Parser {
             return $obj;
         }
 
-        while (
-            #    (ref($obj) eq 'Sidef::Variable::Variable' and ($obj->{type} eq 'func' || $obj->{type} eq 'method'))
-            # || (ref($obj) eq 'Sidef::Variable::ClassInit')
-            # || (ref($obj) eq 'Sidef::Types::Block::Code')
-            #  and
-            /\G\h*(?=\()/gc
-          ) {
-            my $arg = $self->parse_arguments(code => $opt{code});
-            $obj = {
-                    $self->{class} => [
-                                       {
-                                        self => $obj,
-                                        call => [
-                                                 {
-                                                  method => ref($obj) eq 'Sidef::Variable::ClassInit'
-                                                  ? 'new'
-                                                  : 'call',
-                                                  (%{$arg} ? (arg => [$arg]) : ())
-                                                 }
-                                                ]
-                                       }
-                                      ]
-                   };
-        }
-
         if (defined $obj) {
             push @{$struct{$self->{class}}}, {self => $obj};
 
@@ -2085,6 +2057,15 @@ package Sidef::Parser {
                             my @arg = ($arg);
                             if (exists $self->{obj_with_block}{ref $struct{$self->{class}}[-1]{self}}
                                 and ref($arg) eq 'HASH') {
+
+                                my $while_block;
+                                if ($#{$arg->{$self->{class}}} > 0
+                                    and ref($arg->{$self->{class}}[-1]{self}{$self->{class}}[-1]{self}) eq
+                                    'Sidef::Types::Block::Code') {
+                                    $while_block = pop(@{$arg->{$self->{class}}});
+                                    $while_block = $while_block->{self}{$self->{class}}[-1]{self};
+                                }
+
                                 my $block = Sidef::Types::Block::Code->new($arg);
 
                                 if ($before != $after) {
@@ -2097,12 +2078,19 @@ package Sidef::Parser {
                                     }
                                 }
 
-                                @arg = ($block);
+                                @arg = ($block, defined($while_block) ? $while_block : ());
                             }
                             elsif (    ref($struct{$self->{class}}[-1]{self}) eq 'Sidef::Types::Block::For'
-                                   and ref($arg) eq 'HASH'
-                                   and $#{$arg->{$self->{class}}} == 2) {
-                                @arg = (map { Sidef::Types::Block::Code->new($_) } @{$arg->{$self->{class}}});
+                                   and ref($arg) eq 'HASH') {
+                                if ($#{$arg->{$self->{class}}} == 2) {
+                                    @arg = (map { Sidef::Types::Block::Code->new($_) } @{$arg->{$self->{class}}});
+                                }
+                                elsif ($#{$arg->{$self->{class}}} == 3
+                                       and ref($arg->{$self->{class}}[-1]{self}{$self->{class}}[-1]{self}) eq
+                                       'Sidef::Types::Block::Code') {
+                                    my $block = pop(@{$arg->{$self->{class}}})->{self};
+                                    @arg = ((map { Sidef::Types::Block::Code->new($_) } @{$arg->{$self->{class}}}), $block);
+                                }
                             }
 
                             push @{$struct{$self->{class}}[-1]{call}}, {method => $method, arg => \@arg};
@@ -2119,6 +2107,7 @@ package Sidef::Parser {
                 push @{$struct{$self->{class}}[-1]{ind}}, $ind;
             }
 
+            my $chain = 0;
             my @methods;
             {
                 if (/\G(?=\.(?:$self->{method_name_re}|[(\$]))/o) {
@@ -2126,7 +2115,7 @@ package Sidef::Parser {
                     push @{$struct{$self->{class}}[-1]{call}}, @{$methods};
                 }
 
-                if (/\G(?=\()/) {
+                if (/\G\h*(?=\()/gc) {
                     my $arg = $self->parse_arguments(code => $opt{code});
 
                     push @{$struct{$self->{class}}[-1]{call}},
@@ -2135,6 +2124,41 @@ package Sidef::Parser {
                         (%{$arg} ? (arg => [$arg]) : ())
                       };
 
+                    redo;
+                }
+
+                if (exists($struct{$self->{class}}[-1]{call}) and /\G\h*(?=\{)/gc) {
+                    my $arg = $self->parse_block(code => $opt{code});
+                    push @{$struct{$self->{class}}[-1]{call}[-1]{arg}}, $arg;
+                    $chain = 1;
+                    redo;
+                }
+
+                if ($chain) {
+                    my $pos = pos($_);
+                    if (not(($self->parse_whitespace(code => $opt{code}))[1]) and /\G(?=$self->{method_name_re})/o) {
+                        my $code = q{. } . substr($_, pos($_));
+                        my $methods = $self->parse_methods(code => \$code);
+                        pos($_) += pos($code) - 2;
+                        push @{$struct{$self->{class}}[-1]{call}}, @{$methods};
+                        redo;
+                    }
+                    else {
+                        $chain = 0;
+                        pos($_) = $pos;
+                    }
+                }
+
+                if (/\G\h*(?=\{)/gc) {
+                    my $arg = $self->parse_block(code => $opt{code});
+
+                    push @{$struct{$self->{class}}[-1]{call}},
+                      {
+                        method => 'call',
+                        (%{$arg} ? (arg => [$arg]) : ())
+                      };
+
+                    $chain = 1;
                     redo;
                 }
 
@@ -2164,7 +2188,6 @@ package Sidef::Parser {
 
                     my $has_arg;
                     if ($req_arg or exists $self->{binpost_ops}{$method}) {
-
                         my $lonely_obj = /\G\h*(?=\()/gc;
 
                         my $code = substr($_, pos);
@@ -2568,7 +2591,6 @@ package Sidef::Parser {
 
                     if (defined $arg) {
                         push @{$struct{$self->{class}}[-1]{call}}, {method => 'do', arg => [$arg]};
-
                         if (not(($self->parse_whitespace(code => $opt{code}))[1])
                             and /(?=$self->{method_name_re}|$self->{operators_re})/o) {
 

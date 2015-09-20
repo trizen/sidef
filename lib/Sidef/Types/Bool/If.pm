@@ -11,19 +11,11 @@ package Sidef::Types::Bool::If {
 
     sub if {
         my ($self, @args) = @_;
-        $self->{do_block} = $args[-1] ? 1 : 0;
-        $self;
+        ($self->{do_block} = $args[-2] ? 1 : 0) ? $self->do($args[-1]) : $self;
     }
 
-    *call = \&if;
-
-    sub elsif {
-        my ($self, @args) = @_;
-        $self->{do_block} = $args[-1] ? 1 : 0;
-        $self;
-    }
-
-    *elseif = \&elsif;
+    *call  = \&if;
+    *elsif = \&if;
 
     sub else {
         my ($self, $code) = @_;

@@ -22,12 +22,12 @@ func dinesman(problem) {
     keywords.map{ |keyword|
       var l = (
         given(keyword)
-            > "bottom"   { closure{|c| c.first == name1 } }
-            > "top"      { closure{|c| c.last == name1 } }
-            > "higher"   { closure{|c| c.index(name1) > c.index(name2) } }
-            > "lower"    { closure{|c| c.index(name1) < c.index(name2) } }
-            > "adjacent" { closure{|c| c.index(name1) - c.index(name2) -> abs == 1 } }
-            :            { closure{|c| c[words.index(keyword)] == name1 } }
+            > ("bottom")   { closure{|c| c.first == name1 } }
+            > ("top")      { closure{|c| c.last == name1 } }
+            > ("higher")   { closure{|c| c.index(name1) > c.index(name2) } }
+            > ("lower")    { closure{|c| c.index(name1) < c.index(name2) } }
+            > ("adjacent") { closure{|c| c.index(name1) - c.index(name2) -> abs == 1 } }
+            :              { closure{|c| c[words.index(keyword)] == name1 } }
       );
       line ~~ /\bnot\b/ ? closure{|c| l(c) -> not } : l;  # handle "not"
     }

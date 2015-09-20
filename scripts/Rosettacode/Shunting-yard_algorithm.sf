@@ -32,9 +32,9 @@ func shunting_yard(prog) {
 
     while (inp) {
         given(var t = inp.shift)
-           ~ /\d/ { reduce(t) }
-           > '('  { shift(t) }
-           > ')'  { while (ops && (var x = ops.pop) && (x != '(')) { reduce(x) } }
+           ~ (/\d/) { reduce(t) }
+           > ('(')  { shift(t) }
+           > (')')  { while (ops && (var x = ops.pop) && (x != '(')) { reduce(x) } }
            : {
                 var newprec = prec[t];
                 while (ops) {

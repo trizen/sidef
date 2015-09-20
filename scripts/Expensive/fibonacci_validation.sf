@@ -30,15 +30,15 @@ func is_prob_fib(n) {
     fib(fib_pos(n)) == n;
 }
 
-for [
-      [12,  144,                   true],
-      [12,  143,                   false],
-      [12,  145,                   false],
-      [13,  233,                   true],
-      [49,  1337,                  false],
-      [32,  2178309,               true],
-      [100, 354224848179261915075, true],
-    ] { |group|
+[
+    [12,  144,                   true],
+    [12,  143,                   false],
+    [12,  145,                   false],
+    [13,  233,                   true],
+    [49,  1337,                  false],
+    [32,  2178309,               true],
+    [100, 354224848179261915075, true],
+].each { |group|
 
     var(pos, num, bool) = group...;
     is_fib(pos, num) == bool || die "Validation error (1)!";

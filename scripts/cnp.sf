@@ -164,12 +164,12 @@ if (day > days[month_name] || (day < 1)) {
     "Ziua de naștere e invalidă!\n".die;
 }
 
-if !juds.exists(jud) {
+if (!juds.exists(jud)) {
     "Codul județului e invalid!\n".die
 }
 
 if (month == 2 && (day == 29)) {
-    if !(birth_year % 400 == 0 || (birth_year % 4 == 0 && (birth_year % 100 != 0))) {
+    if (!(birth_year % 400 == 0 || (birth_year % 4 == 0 && (birth_year % 100 != 0)))) {
         "Anul #{birth_year} nu a fost un an bisect!\n".die;
     }
 }

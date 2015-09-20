@@ -45,7 +45,7 @@ func levenshtein (s, t) {
     return(d[s.len][t.len]);
 }
 
-for [["kitten", "sitting"], ["rosettacode", "raisethysword"]] {
+[["kitten", "sitting"], ["rosettacode", "raisethysword"]].each {
     "Distance between '%s' and '%s' is: %d\n"
         -> printf(_[0], _[1] => levenshtein(_[0].to_chars, _[1].to_chars));
 }

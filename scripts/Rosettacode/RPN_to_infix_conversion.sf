@@ -19,9 +19,9 @@ func rpm_to_infix(string) {
             var y = stack.pop;
             var x = stack.pop;
             given(w)
-              > '^'   { stack << [4, [p(x,5), w, p(y,4)].to_s] }
-              ~ <* /> { stack << [3, [p(x,3), w, p(y,3)].to_s] }
-              ~ <+ -> { stack << [2, [p(x,2), w, p(y,2)].to_s] }
+              > ('^')   { stack << [4, [p(x,5), w, p(y,4)].to_s] }
+              ~ (<* />) { stack << [3, [p(x,3), w, p(y,3)].to_s] }
+              ~ (<+ ->) { stack << [2, [p(x,2), w, p(y,2)].to_s] }
             ;
             say stack;
         }

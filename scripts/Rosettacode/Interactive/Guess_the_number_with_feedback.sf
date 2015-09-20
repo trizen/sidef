@@ -9,8 +9,8 @@ say "Guess the number between 1 and 10";
 
 loop {
     given(read(Number).int)
-        > number           { say "You guessed it."; break }
-        ~ range(1, number) { say "Too low" }
-        :                  { say "Too high" }
+        > (number)           { say "You guessed it."; break }
+        ~ (range(1, number)) { say "Too low" }
+        :                    { say "Too high" }
     ;
 }

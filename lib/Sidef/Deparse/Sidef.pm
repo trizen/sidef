@@ -346,7 +346,7 @@ package Sidef::Deparse::Sidef {
         elsif ($ref eq 'Sidef::Types::Array::Array' or $ref eq 'Sidef::Types::Array::HCArray') {
             $code = $self->_dump_array($obj);
         }
-        elsif ($obj->can('dump')) {
+        elsif ($ref =~ /^Sidef::/ and $obj->can('dump')) {
             $code = $obj->dump->get_value;
 
             if ($ref eq 'Sidef::Types::Glob::Backtick') {
@@ -455,17 +455,21 @@ package Sidef::Deparse::Sidef {
                 }
 
                 if (exists $call->{arg}) {
+                    my $i = 0;
                     $code .= '(' . join(
                         ', ',
-                        map {
+                        map { $_ eq '' ? '()' : $_ }
+                          map {
+                            ++$i;
                             ref($_) eq 'HASH' ? $self->deparse_script($_)
-                              : exists($self->{obj_with_block}{$ref})
+                              : $i == 1
+                              && exists($self->{obj_with_block}{$ref})
                               && exists($self->{obj_with_block}{$ref}{$method}) ? $self->deparse_expr({self => $_->{code}})
                               : $ref eq 'Sidef::Types::Block::For'
-                              && $#{$call->{arg}} == 2
-                              && ref($_) eq 'Sidef::Types::Block::Code' ? $self->deparse_expr($_->{code})
+                              && (($#{$call->{arg}} == 2) || $#{$call->{arg}} == 3)
+                              && $i <= 3 && ref($_) eq 'Sidef::Types::Block::Code' ? $self->deparse_expr($_->{code})
                               : ref($_) ? $self->deparse_expr({self => $_})
-                              : Sidef::Types::String::String->new($_)->dump
+                              : Sidef::Types::String::String->new($_)->dump->get_value
                           } @{$call->{arg}}
                       )
                       . ')';

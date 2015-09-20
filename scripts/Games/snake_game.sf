@@ -83,19 +83,19 @@ func display {
             cell[0] !~ s && (
                 i = (
                     given(cell[1])
-                        > UP    { 0 }
-                        > DOWN  { 1 }
-                        > LEFT  { 2 }
-                        > RIGHT { 3 }
+                        > (UP)    { 0 }
+                        > (DOWN)  { 1 }
+                        > (LEFT)  { 2 }
+                        > (RIGHT) { 3 }
                     )
                 );
 
             given(cell[0])
-                > VOID { A_VOID }
-                > FOOD { A_FOOD }
-                > BODY { [U_BODY, D_BODY, L_BODY, R_BODY][i] }
-                > HEAD { [U_HEAD, D_HEAD, L_HEAD, R_HEAD][i] }
-                > TAIL { [U_TAIL, D_TAIL, L_TAIL, R_TAIL][i] }
+                > (VOID) { A_VOID }
+                > (FOOD) { A_FOOD }
+                > (BODY) { [U_BODY, D_BODY, L_BODY, R_BODY][i] }
+                > (HEAD) { [U_HEAD, D_HEAD, L_HEAD, R_HEAD][i] }
+                > (TAIL) { [U_TAIL, D_TAIL, L_TAIL, R_TAIL][i] }
 
           }.join('')
         }.join("\n")
@@ -114,9 +114,9 @@ func move {
     var cell = grid[new_y][new_x];
 
     given (cell[0])
-        > BODY { die "\nYou just bit your own body!\n" }
-        > TAIL { die "\nYou just bit your own tail!\n" }
-        > FOOD { grew = true; make_food()              };
+        > (BODY) { die "\nYou just bit your own body!\n" }
+        > (TAIL) { die "\nYou just bit your own tail!\n" }
+        > (FOOD) { grew = true; make_food()              };
 
     # Create a new head
     grid[new_y][new_x] = [HEAD, dir];
@@ -153,8 +153,8 @@ loop {
     }
 
     given(key)
-        > "\e[A" { dir = UP    }
-        > "\e[B" { dir = DOWN  }
-        > "\e[C" { dir = RIGHT }
-        > "\e[D" { dir = LEFT  };
+        > ("\e[A") { dir = UP    }
+        > ("\e[B") { dir = DOWN  }
+        > ("\e[C") { dir = RIGHT }
+        > ("\e[D") { dir = LEFT  };
 }

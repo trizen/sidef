@@ -43,11 +43,11 @@ while (i -= 1 >= 10) {
 #
 ## Loop inside loop
 #
-for ["a", "b", "c"] {
+["a", "b", "c"].each {
 
     say "<<<: "+_;
 
-    for ["d", "e", "f"] {
+    ["d", "e", "f"].each {
         say ">>>: "+_;
         break;
     }
@@ -58,6 +58,6 @@ for ["a", "b", "c"] {
 #
 ## for (array) {...}
 #
-for ["a","b","c"] {
-    break; _.say;  # doesn't say it
+for (["a","b","c"]) {
+    break; die "error";  # doesn't say it
 }

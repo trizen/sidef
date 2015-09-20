@@ -56,10 +56,10 @@ end;
 
 
 {value}.given
-    when {"x"} do {
+    when ("x") do {
         "Not the right place! (1)".die;
     }
-    when {"y"} do {
+    when ("y") do {
         "Not the right place! (2)".die;
     }
     when ("z") do {

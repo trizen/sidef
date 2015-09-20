@@ -14,7 +14,7 @@ func balanced (str) {
     return (!depth);
 }
 
-for [
+[
     ']',
     '[',
     '[[]',
@@ -22,7 +22,6 @@ for [
     '[[]]',
     '[[]]]][][]]',
     'x[ y [ [] z ]][ 1 ][]abcd'
-   ]
-{ |str|
+].each { |str|
     printf("%sbalanced\t: %s\n", balanced(str) ? "" : "NOT ", str);
 }

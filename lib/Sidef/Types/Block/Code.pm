@@ -179,21 +179,8 @@ package Sidef::Types::Block::Code {
     }
 
     sub while {
-        my ($self, $condition, $old_self) = @_;
-
-        if (exists($condition->{_special_stack_vars}) and not exists($self->{_specialized})) {
-            $self->{_specialized} = 1;
-            push @{$self->{vars}}, @{$condition->{_special_stack_vars}};
-        }
-
-        while ($condition->run) {
-            defined($old_self) && ($old_self->{did_while} //= 1);
-            if (defined(my $res = $self->_run_code)) {
-                return (ref($res) eq ref($self) && defined($old_self) ? $old_self : $res);
-            }
-        }
-
-        $old_self // $self;
+        my ($self, $condition) = @_;
+        Sidef::Types::Bool::While->new->while($condition, $self);
     }
 
     sub loop {
@@ -426,31 +413,8 @@ package Sidef::Types::Block::Code {
     *thr = \&thread;
 
     sub for {
-        my ($self, $arg, @rest) = @_;
-
-        if (    $#_ == 3
-            and ref($_[1]) eq __PACKAGE__
-            and ref($_[2]) eq __PACKAGE__
-            and ref($_[3]) eq __PACKAGE__) {
-            my ($one, $two, $three) = ($_[1], $_[2], $_[3]);
-            for ($one->_execute_expr ; $two->_execute_expr ; $three->_execute_expr) {
-                if (defined(my $res = $self->_run_code)) {
-                    return $res;
-                }
-            }
-            $self;
-        }
-        elsif ($#_ == 1 and $arg->can('each')) {
-            $arg->each($self);
-        }
-        else {
-            foreach my $item ($arg, @rest) {
-                if (defined(my $res = $self->_run_code($item))) {
-                    return $res;
-                }
-            }
-            $self;
-        }
+        my ($self, @args) = @_;
+        Sidef::Types::Block::For->new->for(@args, $self);
     }
 };
 

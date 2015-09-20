@@ -5,14 +5,21 @@ package Sidef::Types::Bool::While {
     }
 
     sub while {
-        my ($self, $code) = @_;
-        $self->{arg} = $code;
-        $self;
-    }
+        my ($self, $condition, $block) = @_;
 
-    sub do {
-        my ($self, $code) = @_;
-        $code->while($self->{arg}, $self);
+        if (exists($condition->{_special_stack_vars}) and not exists($block->{_specialized})) {
+            $block->{_specialized} = 1;
+            push @{$block->{vars}}, @{$condition->{_special_stack_vars}};
+        }
+
+        while ($condition->run) {
+            $self->{did_while} //= 1;
+            if (defined(my $res = $block->_run_code)) {
+                return $res;
+            }
+        }
+
+        $self;
     }
 
     sub else {
