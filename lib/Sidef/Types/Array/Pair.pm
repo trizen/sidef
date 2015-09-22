@@ -13,6 +13,8 @@ package Sidef::Types::Array::Pair {
         bless [map { Sidef::Variable::Variable->new(name => '', type => 'var', value => $_) } ($item1, $item2)], __PACKAGE__;
     }
 
+    *call = \&new;
+
     sub get_value {
         my ($self) = @_;
 

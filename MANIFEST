@@ -358,6 +358,7 @@ scripts/merge_sort.sf
 scripts/merge_sort_2.sf
 scripts/metaprogramming_2.sf
 scripts/metaprogramming_method_definition.sf
+scripts/method_aliases.sf
 scripts/method_expressions.sf
 scripts/Module/Fact.sm
 scripts/Module/Fib.sm

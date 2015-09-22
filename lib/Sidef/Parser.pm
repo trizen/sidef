@@ -2154,7 +2154,7 @@ package Sidef::Parser {
 
                     push @{$struct{$self->{class}}[-1]{call}},
                       {
-                        method => 'call',
+                        method => 'bcall',
                         (%{$arg} ? (arg => [$arg]) : ())
                       };
 

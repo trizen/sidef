@@ -350,6 +350,8 @@ package Sidef::Types::Block::Code {
         $result;
     }
 
+    *bcall = \&call;
+
     sub if {
         my ($self, $bool) = @_;
 

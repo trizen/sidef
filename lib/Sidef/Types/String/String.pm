@@ -622,6 +622,7 @@ package Sidef::Types::String::String {
         $self;
     }
 
+    *bcall     = \&each;
     *each_char = \&each;
 
     sub lines {

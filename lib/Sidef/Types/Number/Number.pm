@@ -536,6 +536,8 @@ package Sidef::Types::Number::Number {
         $obj->repeat($self);
     }
 
+    *bcall = \&times;
+
     sub to_bin {
         my ($self) = @_;
         state $x = require Math::BigInt;

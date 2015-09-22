@@ -18,6 +18,8 @@ package Sidef::Types::Array::MultiArray {
         bless \@array, __PACKAGE__;
     }
 
+    *call = \&new;
+
     sub get_value {
         my ($self) = @_;
         [
@@ -60,6 +62,7 @@ package Sidef::Types::Array::MultiArray {
         $self;
     }
 
+    *bcall   = \&each;
     *iter    = \&each;
     *iterate = \&each;
 

@@ -102,7 +102,7 @@ package Sidef::Types::Array::RangeNumber {
         $self;
     }
 
-    *call = \&each;
+    *bcall = \&each;
 
     sub map {
         my ($self, $code) = @_;

@@ -1,0 +1,20 @@
+#!/usr/bin/ruby
+
+#
+## Example of method aliases
+#
+
+class Hi {
+    method hi {
+        say "Hello!";
+    };
+
+    Hi.alias("hello", hi);         # `hi` refers directly to the method
+    Hi.alias("hey", "hello");      # `hello` refers to the method by name
+}
+
+var obj = Hi();
+
+obj.hi;
+obj.hello;
+obj.hey;

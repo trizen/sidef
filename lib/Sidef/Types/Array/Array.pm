@@ -538,6 +538,7 @@ package Sidef::Types::Array::Array {
 
     *for     = \&each;
     *foreach = \&each;
+    *bcall   = \&each;
 
     sub each_index {
         my ($self, $code) = @_;
@@ -574,7 +575,8 @@ package Sidef::Types::Array::Array {
         my ($self, $code) = @_;
         $self->new(
             map {
-                map { $_->get_value } @{$code->run($_->get_value)}
+                map { $_->get_value }
+                  @{$code->run($_->get_value)}
               } @{$self}
         );
     }

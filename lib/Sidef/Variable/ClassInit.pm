@@ -43,6 +43,13 @@ package Sidef::Variable::ClassInit {
         $self;
     }
 
+    sub alias {
+        my ($self, $name, $method) = @_;
+        ref($method) eq 'Sidef::Types::Block::Code'
+          ? ($self->{__METHODS__}{$name} = $method)
+          : ($self->{__METHODS__}{$name} = $self->{__METHODS__}{$method});
+    }
+
     sub respond_to {
         my ($self, $name) = @_;
         Sidef::Types::Bool::Bool->new(exists $self->{__METHODS__}{$name});
@@ -175,8 +182,9 @@ package Sidef::Variable::ClassInit {
         $class;
     }
 
-    *call = \&init;
-    *new  = \&init;
+    *call  = \&init;
+    *bcall = \&init;
+    *new   = \&init;
 
     {
         no strict 'refs';

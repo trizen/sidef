@@ -46,8 +46,8 @@ class my_if {
         self;
     };
 
-    # Alias "my_elsif" to "if"
-    __CLASS__.def_method(:my_elsif, new);
+    # Alias "my_elsif" to "my_if"
+    my_if.alias(:my_elsif, new);
 
     method my_else(callback) {
         !did && callback();
@@ -56,7 +56,7 @@ class my_if {
 }
 
 #
-## Test elsif (alias for 'if')
+## Test elsif (alias for 'my_if')
 #
 my_if (false) {
     die "my_if error";
@@ -96,7 +96,47 @@ var obj = Test();
 
 var y = 0;
 obj.hello {
-    say "Test passed!";
     y = 42;
 };
 assert_eq(y, 42);
+
+#
+## Class init with block call
+#
+
+class BlockTest(block) {
+    method brun {
+        block();
+    }
+}
+
+var j = 0;
+var bt = BlockTest {
+    j++;
+};
+bt.brun;
+assert_eq(j, 1);
+
+#
+## Block-call as implicit ".each" method
+#
+
+var z = 0;
+
+4 { |i|
+    print i;      # prints: 1,2,3,4
+    z++;
+};
+
+"abc" { |c|
+    print c;      # prints each character of the string
+    z++;
+};
+
+['x', 'y'] { |item|
+    print item;    # prints each item of the array
+    z++;
+};
+
+say "";
+assert_eq(z, 4+3+2);

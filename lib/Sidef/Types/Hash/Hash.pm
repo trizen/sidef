@@ -283,6 +283,7 @@ package Sidef::Types::Hash::Hash {
         Sidef::Types::Array::Array->new(Sidef::Types::String::String->new($key), $value->get_value);
     }
 
+    *bcall     = \&each;
     *each_pair = \&each;
 
     sub sort_by {
