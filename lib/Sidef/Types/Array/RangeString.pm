@@ -89,6 +89,8 @@ package Sidef::Types::Array::RangeString {
         $self;
     }
 
+    *call = \&each;
+
     our $AUTOLOAD;
     sub DESTROY { }
 

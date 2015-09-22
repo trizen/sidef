@@ -102,6 +102,8 @@ package Sidef::Types::Array::RangeNumber {
         $self;
     }
 
+    *call = \&each;
+
     sub map {
         my ($self, $code) = @_;
 
