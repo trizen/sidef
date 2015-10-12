@@ -55,6 +55,8 @@ Code.call() -> I<Obj>
 
 Return the
 
+Aliases: I<bcall>
+
 =cut
 
 =head2 cap

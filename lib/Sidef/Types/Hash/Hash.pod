@@ -131,7 +131,7 @@ Hash.each() -> I<Obj>
 
 Return the
 
-Aliases: I<each_pair>
+Aliases: I<bcall>, I<each_pair>
 
 =cut
 

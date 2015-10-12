@@ -933,6 +933,7 @@ utils/Concepts/sidef_executor.pl6
 utils/Examples/sidef_in_perl.pl
 utils/Experiments/C-inline-function-call.pl
 utils/Experiments/operator_precendece.pl
+utils/Experiments/regexp_grammars_op_precedence.pl
 utils/Experiments/regexp_grammars_parser.pl
 utils/Experiments/struct_optimizer.pl
 utils/find_invalid_types.pl

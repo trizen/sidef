@@ -31,22 +31,12 @@ Return the
 
 =cut
 
-=head2 elsif
-
-If.elsif() -> I<Obj>
-
-Return the
-
-Aliases: I<elseif>
-
-=cut
-
 =head2 if
 
 If.if() -> I<Obj>
 
 Return the
 
-Aliases: I<call>
+Aliases: I<call>, I<elsif>
 
 =cut

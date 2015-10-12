@@ -308,6 +308,16 @@ Return the
 
 =cut
 
+=head2 bcall
+
+Number.bcall() -> I<Obj>
+
+Return the
+
+Aliases: I<times>
+
+=cut
+
 =head2 bin
 
 Number.bin() -> I<Obj>
@@ -739,14 +749,6 @@ Return the
 =head2 sstr
 
 Number.sstr() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 times
-
-Number.times() -> I<Obj>
 
 Return the
 

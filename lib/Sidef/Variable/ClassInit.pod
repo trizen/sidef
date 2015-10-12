@@ -43,6 +43,14 @@ Aliases: I<replace>
 
 =cut
 
+=head2 alias
+
+ClassInit.alias() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 def_method
 
 ClassInit.def_method() -> I<Obj>
@@ -99,7 +107,7 @@ ClassInit.new() -> I<Obj>
 
 Return the
 
-Aliases: I<call>, I<init>
+Aliases: I<call>, I<init>, I<bcall>
 
 =cut
 

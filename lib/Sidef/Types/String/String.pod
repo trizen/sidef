@@ -364,7 +364,7 @@ String.each() -> I<Obj>
 
 Return the
 
-Aliases: I<each_char>
+Aliases: I<bcall>, I<each_char>
 
 =cut
 

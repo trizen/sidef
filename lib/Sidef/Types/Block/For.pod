@@ -16,26 +16,12 @@ var obj = For.new(...);
 =head1 METHODS
 
 
-=head2 do
-
-For.do() -> I<Obj>
-
-Return the
-
-=cut
-
 =head2 for
 
 For.for() -> I<Obj>
 
 Return the
 
-=cut
-
-=head2 foreach
-
-For.foreach() -> I<Obj>
-
-Return the
+Aliases: I<foreach>
 
 =cut

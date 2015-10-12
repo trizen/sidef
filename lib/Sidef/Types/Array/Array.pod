@@ -479,7 +479,7 @@ Array.for() -> I<Obj>
 
 Return the
 
-Aliases: I<each>, I<foreach>
+Aliases: I<each>, I<bcall>, I<foreach>
 
 =cut
 

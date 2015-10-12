@@ -16,14 +16,6 @@ var obj = While.new(...);
 =head1 METHODS
 
 
-=head2 do
-
-While.do() -> I<Obj>
-
-Return the
-
-=cut
-
 =head2 else
 
 While.else() -> I<Obj>

@@ -47,6 +47,8 @@ RangeString.each() -> I<Obj>
 
 Return the
 
+Aliases: I<bcall>
+
 =cut
 
 =head2 max
