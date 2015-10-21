@@ -1,7 +1,7 @@
-Sidef2
+Sidef
 ======
 
-*Sidef2 is a faster implementation of the Sidef Programming Language.*
+*Sidef is a modern object-oriented programming language, implemented in Perl.*
 
 To learn about Sidef, check out the following links:
 
@@ -23,7 +23,7 @@ To learn about Sidef, check out the following links:
 
 **LICENSE AND COPYRIGHT**
 
-* Copyright (C) 2015 Daniel Șuteu
+* Copyright (C) 2013-2015 Daniel Șuteu, Ioana Fălcușan
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the *Artistic License (2.0)*. You may obtain a

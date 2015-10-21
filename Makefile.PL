@@ -21,6 +21,7 @@ WriteMakefile
                    'Math::BigRat' => 0,
                    'Math::Complex' => 0,
                    'Math::Trig' => 0,
+                   'Memoize' => 0,
                    'POSIX' => 0,
                    'Scalar::Util' => 0,
                    'Socket' => 0,

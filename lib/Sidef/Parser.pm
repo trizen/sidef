@@ -2031,7 +2031,7 @@ package Sidef::Parser {
         local *_ = $opt{code};
 
         {
-            if ((/\G(?![-=]>)/ && /\G(?=$self->{operators_re})/o) || /\G\./goc) {
+            if ((/\G(?![-=]>)/ && /\G(?=$self->{operators_re})/o) || /\G(\.|\s*(?!\.\.)\.)/gc) {
                 my ($method, $req_arg, $op_type) = $self->get_method_name(code => $opt{code});
 
                 if (defined($method)) {
@@ -2147,7 +2147,7 @@ package Sidef::Parser {
             }
 
             {
-                if (/\G(?=\.(?:$self->{method_name_re}|[(\$]))/o) {
+                if (/\G\h*(?=\.\h*(?:$self->{method_name_re}|[(\$]))/ogc) {
                     my $methods = $self->parse_methods(code => $opt{code});
                     push @{$struct{$self->{class}}[-1]{call}}, @{$methods};
                 }
