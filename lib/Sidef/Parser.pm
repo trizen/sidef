@@ -110,7 +110,7 @@ package Sidef::Parser {
                      | \$,                            (?{ state $x = Sidef::Variable::Magic->new('$,') })
                      | \$\^O\b                        (?{ state $x = Sidef::Variable::Magic->new('$^O') })
                      | \$\^PERL\b                     (?{ state $x = Sidef::Variable::Magic->new('$^X') })
-                     | \$0\b                          (?{ state $x = Sidef::Variable::Magic->new('$0') })
+                     | (?:\$0|\$\^SIDEF)\b            (?{ state $x = Sidef::Variable::Magic->new('$0') })
                      | \$\)                           (?{ state $x = Sidef::Variable::Magic->new('$)') })
                      | \$\(                           (?{ state $x = Sidef::Variable::Magic->new('$(') })
                      | \$<                            (?{ state $x = Sidef::Variable::Magic->new('$<') })
@@ -447,6 +447,7 @@ package Sidef::Parser {
                        && $variable->{type} ne 'class'
                        && $variable->{type} ne 'func'
                        && $variable->{type} ne 'method'
+                       && $variable->{type} ne 'global'
                        && $variable->{name} ne 'self'
                        && $variable->{name} ne ''
                        && chr(ord $variable->{name}) ne '_') {
