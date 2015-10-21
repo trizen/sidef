@@ -1,0 +1,40 @@
+#!/usr/bin/ruby
+
+var file  = DATA;
+var names = file.get.words;
+
+var matches = Hash.new;
+var sets    = Hash.new;
+
+file.lines.each { |line|
+
+    line.chomp!;
+
+    var (pairing, result) = line.split(/\h+\|\h+/)...;
+    var (p1, p2) = pairing.words...;
+    var (r1, r2) = result.split(':')...;
+
+    sets{p1} := 0 += r1.to_num;
+    sets{p2} := 0 += r2.to_num;
+
+    matches{r1 > r2 ? p1 : p2} := 0 ++;
+}
+
+var sorted = (
+               names.sort{|a,b| sets{a}    <=> sets{b}}
+                    .sort{|a,b| matches{a} <=> matches{b}}
+                    .reverse
+             );
+
+sorted.each { |n|
+    say "#{n} has won #{matches{n}} matches and #{sets{n}} sets";
+}
+
+__END__
+Beth Ana Charlie Dave
+Ana Dave | 3:0
+Charlie Beth | 3:1
+Ana Beth | 2:3
+Dave Charlie | 3:0
+Ana Charlie | 3:1
+Beth Dave | 0:3

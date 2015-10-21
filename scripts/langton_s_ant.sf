@@ -1,0 +1,36 @@
+#!/usr/bin/ruby
+
+var dirs = [[1,0], [0,-1], [-1,0], [0,1]];
+var size = 13;
+
+enum |White, Black|;
+
+var plane = [];
+{|i| plane[i-1] = [White]*size} * size;
+
+var (x, y) = ([size/2 -> int] * 2 ...);
+
+var dir = dirs.len.rand.int;
+
+var moves = 0;
+loop {
+    (x >= 0) && (y >= 0) && (x < size) && (y < size) || break;
+
+    if (plane[x][y] == White) {
+        --dir;
+        plane[x][y] = Black;
+    }
+    else {
+        ++dir;
+        plane[x][y] = White;
+    }
+
+    moves++;
+
+    var a = dirs[dir %= dirs.len];
+    x += a[0];
+    y += a[1];
+}
+
+say "Out of bounds after #{moves} moves at (#{x}, #{y})";
+plane.map{.map {|square| square == Black ? '#' : '.' }}.each{.join.say};

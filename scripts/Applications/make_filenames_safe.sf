@@ -4,8 +4,8 @@
 
 SIG.__WARN__ { |msg| die msg };     # make warnings fatal
 
-var f = require('File::Find').();
-var u = require('Text::Unidecode').();
+var f = frequire('File::Find');
+var u = frequire('Text::Unidecode');
 
 var rename = false;
 
@@ -29,15 +29,15 @@ f.find(
 
                 # Unidecode and remove unsafe characters
                 basename = u.unidecode(basename).to_s;
-                basename.gsub!(/[^A-Za-z0-9_.-]+/, ' ');
+                basename.gsub!(/[^A-Za-z0-9_.-]+/, '_');
                 basename.tr('_.-', '_.-', 's');
 
                 # Get away the extension (if any)
                 var ext = '';
-                if (basename =~ /(\.\w{1,5})\z/) {
-                    ext = $1;
+                if (var match = (basename =~ /(\.\w{1,5})\z/)) {
+                    ext = match.cap[0];
                     basename.substr!(0, -ext.len);
-                };
+                }
 
                 # Replace any dot sequence with a space
                 basename.gsub!(/\./, ' ');
@@ -54,7 +54,7 @@ f.find(
                 basename += ext;
 
                 # Create the new filename
-                var new_file = dirname+basename;
+                var new_file = (dirname + basename.lc);
 
                 # Rename the old filename to the new filename
                 if (new_file != file) {

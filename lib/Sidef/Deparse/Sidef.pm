@@ -17,9 +17,9 @@ package Sidef::Deparse::Sidef {
                     extra_parens   => 0,
                     namespaces     => [],
                     obj_with_block => {
-                                       'Sidef::Types::Bool::While' => {
-                                                                       while => 1,
-                                                                      },
+                                       'Sidef::Types::Block::While' => {
+                                                                        while => 1,
+                                                                       },
                                       },
                     %args,
                    );
@@ -135,7 +135,7 @@ package Sidef::Deparse::Sidef {
                 $code = "struct $obj->{__NAME__} {" . $self->_dump_vars(@vars) . '}';
             }
         }
-        elsif ($ref eq 'Sidef::Variable::InitLocal') {
+        elsif ($ref eq 'Sidef::Variable::LocalInit') {
             $code = "local $obj->{name}";
         }
         elsif ($ref eq 'Sidef::Variable::Local') {
@@ -321,7 +321,7 @@ package Sidef::Deparse::Sidef {
             }
         }
         elsif ($ref eq 'Sidef::Types::Hash::Hash') {
-            $code = keys(%{$obj->{data}}) ? $obj->dump->get_value : 'Hash';
+            $code = keys(%{$obj}) ? $obj->dump->get_value : 'Hash';
         }
         elsif ($ref eq 'Sidef::Types::Glob::Socket') {
             $code = 'Socket';

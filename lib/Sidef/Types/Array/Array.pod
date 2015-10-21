@@ -7,46 +7,21 @@ Sidef::Types::Array::Array
 
 =head1 DESCRIPTION
 
-This module provides the support for arrays.
+This object is ...
 
 =head1 SYNOPSIS
 
-=over 2
+var obj = Array.new(...);
 
-=item * Creating an array
-
-    var array = (Array.new(obj1, obj2, ...));
-
-or
-
-    var array = [obj1, obj2, ...];
-
-or
-
-    var array = qw(word1 word2 ...);
-
-=item * Retrieving an element
-
-    var elem = array[index];
-
-=item * Modifying an element
-
-    array[index] = someObj;
-
-=item * Applying methods on arrays
-
-    array->method(argument1, argument2, ...);
-
-=back
 
 =head1 INHERITS
 
 Inherits methods from:
 
-    * Sidef
-    * Sidef::Convert::Convert
+	* Sidef::Object::Object
 
 =head1 METHODS
+
 
 =head2 !=
 
@@ -58,9 +33,13 @@ Aliases: I<ne>
 
 =cut
 
-=head2 and
+=head2 &
 
-Alias for L<C<&>|"&">.
+I<Obj> B<&> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<and>
 
 =cut
 
@@ -70,55 +49,23 @@ I<Obj> B<*> I<Obj> -> I<Obj>
 
 Return the
 
-Aliases: I<multiply>
+Aliases: I<mul>, I<multiply>
 
 =cut
 
 =head2 +
 
-I<Array> B<+> I<Array> -> I<Array>
+I<Obj> B<+> I<Obj> -> I<Obj>
 
-Concatenate two arrays.
+Return the
 
-    [1, 2] + [3, 4];   # returns [1, 2, 3, 4]
-
-Aliases: I<concat()>.
-
-Returns a new object of the same type as the self object.
+Aliases: I<concat>
 
 =cut
 
 =head2 ++
 
-=over 2
-
-=item * I<Array> B<++> I<Obj> -> I<Array>
-
-Append one element to array.
-
-    array ++ "str";      # "str" has been pushed into array
-
-=back
-
-=over 2
-
-=item * I<Array>B<++> -> I<Array>
-
-Increases the array's size by one element.
-
-    array++;             # array size is increased by one
-
-=back
-
-B<WARNING!> This method modifies the array in place.
-
-Returns the self object.
-
-=cut
-
-=head2 +=
-
-I<Obj> B<+=> I<Obj> -> I<Obj>
+I<Obj> B<++> I<Obj> -> I<Obj>
 
 Return the
 
@@ -136,15 +83,9 @@ Aliases: I<subtract>
 
 =head2 --
 
-I<Array>B<--> -> I<Array>
+I<Obj> B<--> I<Obj> -> I<Obj>
 
-Remove the last element from the array.
-
-    [1, 2, 3]--;        # returns [1, 2]
-
-B<WARNING!> This method modifies the array in place.
-
-Returns the self object.
+Return the
 
 =cut
 
@@ -178,20 +119,13 @@ Aliases: I<pair_with>, I<pairWith>
 
 =cut
 
-=head2 =
+=head2 <=>
 
-I<Slice> B<=> I<Array> -> I<Slice>
+I<Obj> B<E<lt>=E<gt>> I<Obj> -> I<Obj>
 
-This method is used to change the elements in a slice of array.
+Return the
 
-    array = ["a", "b", "c"];
-    array[1, 3, 5]  = ["x", "y", "z"];       # changes the slice elements with the elements from the argument array
-
-    # array is now: ['a', 'x', 'c', 'y', nil, 'z']
-
-B<WARNING!> This method modifies the array in place.
-
-Returns the self object.
+Aliases: I<cmp>
 
 =cut
 
@@ -201,7 +135,7 @@ I<Obj> B<==> I<Obj> -> I<Obj>
 
 Return the
 
-Aliases: I<eq>, I<is>, I<equals>
+Aliases: I<eq>
 
 =cut
 
@@ -227,15 +161,9 @@ Aliases: I<abbreviations>
 
 =head2 all
 
-Array.all(I<Block>) -> I<Bool>
+Array.all() -> I<Obj>
 
-Returns true if all the array's elements passes the block test.
-
-    ["a", "b", "c"].all { _ < "d"  };       # true
-    [0, 2, 4, 6, 8].all { _ % 2 == 0 };     # true
-    [101, 102, 103].all { _ > 102 };        # false
-
-Returns an object of type: C<Sidef::Types::Bool::Bool>
+Return the
 
 =cut
 
@@ -257,6 +185,14 @@ Aliases: I<best_shuffle>
 
 =cut
 
+=head2 change_to
+
+Array.change_to() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 combination
 
 Array.combination() -> I<Obj>
@@ -269,15 +205,9 @@ Aliases: I<combinations>
 
 =head2 contains
 
-Array.contains(I<Obj>) -> I<Bool>
+Array.contains() -> I<Obj>
 
-Returns true if the array contains the argument object.
-
-    ['x','y','z'].contains('y');        # true
-    [1,[2,3],4,5].contains([2,3]);      # true
-    [1,2,[3],4,5].contains(3);          # false
-
-Returns an object of type: C<Sidef::Types::Bool::Bool>
+Return the
 
 =cut
 
@@ -307,36 +237,27 @@ Return the
 
 =head2 copy
 
-Array.copy() -> I<Array>
+Array.copy() -> I<Obj>
 
-Returns a copy of the self array.
+Return the
 
 =cut
 
 =head2 count
 
-Array.count(I<Obj>) -> I<Number>
+Array.count() -> I<Obj>
 
-Count the number of objects indentical with the argument.
+Return the
 
-    ["x", "y", "y", "z"].count("y");    # returns: 2
-
-Aliases: I<count_obj()>, I<countObj()>.
-
-Returns an object of type: C<Sidef::Types::Number::Number>
+Aliases: I<count_by>
 
 =cut
 
 =head2 defined
 
-Array.defined(I<Number>) -> I<Bool>
+Array.defined() -> I<Obj>
 
-Returns true if the element from the I<Number> position is defined.
-
-    [1,2,3,4,5,6].defined(0);     # true
-    ['a','b',nil].defined(2);     # false
-
-Returns an object of type: C<Sidef::Types::Bool::Bool>
+Return the
 
 =cut
 
@@ -380,13 +301,9 @@ Return the
 
 =head2 dump
 
-Array.dump() -> I<String>
+Array.dump() -> I<Obj>
 
-Returns a string representation of the array.
-
-    qw(a b c).dump;     # returns: "['a', 'b', 'c']"
-
-Returns an object of type: C<Sidef::Types::String::String>
+Return the
 
 =cut
 
@@ -406,15 +323,13 @@ Return the
 
 =cut
 
-=head2 offset
+=head2 end
 
-Array.offset() -> I<Number>
+Array.end() -> I<Obj>
 
-Returns the last index of the array.
+Return the
 
-    ['a','b','c'].offset;       # returns: 2
-
-Returns an object of type: C<Sidef::Types::Number::Number>
+Aliases: I<offset>
 
 =cut
 
@@ -430,28 +345,17 @@ Aliases: I<has_index>
 
 =head2 find
 
-Array.find(I<Block>) -> I<Obj>
+Array.find() -> I<Obj>
 
-Find an element inside the array.
+Return the
 
-    [1, 2, 1, 7, 5, 8].find { _ >= 4 };           # returns: 7
-    ['Hello', 'World'].find { _ =~ /^w/i ?? };    # returns: 'World'
-
-Returns the first element found.
+Aliases: I<first_by>
 
 =cut
 
 =head2 first
 
 Array.first() -> I<Obj>
-
-Returns the first element of the array.
-
-=cut
-
-=head2 first_index
-
-Array.first_index() -> I<Obj>
 
 Return the
 
@@ -479,7 +383,7 @@ Array.for() -> I<Obj>
 
 Return the
 
-Aliases: I<each>, I<bcall>, I<foreach>
+Aliases: I<each>, I<foreach>
 
 =cut
 
@@ -493,26 +397,13 @@ Aliases: I<from_to>
 
 =cut
 
-=head2 get
+=head2 grep
 
-Array.get() -> I<Obj>
+Array.grep() -> I<Obj>
 
 Return the
 
-Aliases: I<item>
-
-=cut
-
-=head2 filter
-
-Array.filter(I<Block>) -> I<Array>
-
-Filter the array's elements via a block test.
-
-    ['a','b','c'].filter { _ > 'a'};   # returns: ['b', 'c']
-    [1,2,3,4,5,6].filter { _ <= 3};    # returns: [1, 2, 3]
-
-Returns a new object of the same type as the self object.
+Aliases: I<filter>, I<select>
 
 =cut
 
@@ -530,46 +421,25 @@ Array.index() -> I<Obj>
 
 Return the
 
+Aliases: I<first_index>
+
 =cut
 
-=head2 reduce
+=head2 inject
 
-=over 2
+Array.inject() -> I<Obj>
 
-=item * Array.reduce(I<Block>) -> I<Bool>
+Return the
 
-Reduces array by calling I<Block>, multiple times, setting C<_[0]> and C<_[1]> each time. The first call will be with C<_[0]> and C<_[1]> set to the first two elements of the list, subsequent calls will be done by setting C<_[0]> to the result of the previous call and C<_[1]> to the next element in the list.
-
-    [1,2,3,4].reduce { _[0] + _[1] };   # returns the sum of array's elements (1+2+3+4 = 10)
-
-=back
-
-=over 2
-
-=item * Array.reduce(I<String>) -> I<Bool>
-
-Almost the same as when it takes a block argument, but much more limited.
-
-    [1,2,3,4].reduce('*');      # returns the product of array's elements (1*2*3*4 = 24)
-
-=back
-
-Returns an object of the same type as the elements of the array.
+Aliases: I<reduce>
 
 =cut
 
 =head2 insert
 
-Array.insert(I<Number>, I<Obj1>, I<Obj2>, I<...>) -> I<Array>
+Array.insert() -> I<Obj>
 
-Insert elements inside the array at a given position.
-
-    array = qw(a b f);
-    array.insert(2, 'c', 'd', 'e');     # returns: ['a', 'b', 'c', 'd', 'e', 'f']
-
-B<WARNING!> This method modifies the array in place.
-
-Returns the self object.
+Return the
 
 =cut
 
@@ -581,41 +451,43 @@ Return the
 
 =cut
 
-=head2 join
+=head2 item
 
-Array.join(I<String>) -> I<String>
+Array.item() -> I<Obj>
 
-Join the array as a string.
-
-    qw(apples pears apricots).join(", ");      # returns: "apples, pears, apricots"
-
-Returns an object of type: C<Sidef::Types::String::String>
+Return the
 
 =cut
 
-=head2 joinInsert
+=head2 items
 
-Array.joinInsert(I<Object>) -> I<Array>
+Array.items() -> I<Obj>
 
-Insert after each element the argument object. The array is B<NOT> modified in place.
+Return the
 
-    ['a','b','c'].joinInsert('--');     # returns: ['a','--','b','--','c']
+=cut
 
-Returns a new object of the same type as the self object.
+=head2 join
+
+Array.join() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 join_insert
+
+Array.join_insert() -> I<Obj>
+
+Return the
+
+Aliases: I<joinInsert>
 
 =cut
 
 =head2 last
 
 Array.last() -> I<Obj>
-
-Returns the last element of the array.
-
-=cut
-
-=head2 last_index
-
-Array.last_index() -> I<Obj>
 
 Return the
 
@@ -628,6 +500,14 @@ Array.last_uniq() -> I<Obj>
 Return the
 
 Aliases: I<last_unique>
+
+=cut
+
+=head2 last_uniq_by
+
+Array.last_uniq_by() -> I<Obj>
+
+Return the
 
 =cut
 
@@ -653,14 +533,9 @@ Aliases: I<leven>, I<levenshtein>
 
 =head2 make
 
-Array.make(I<Number>, I<Obj>) -> I<Array>
+Array.make() -> I<Obj>
 
-Make a new array of I<Number> size, contaiting the I<Obj> on every position.
-
-    Array.make(3, Num);     # returns: [0,0,0]
-    Array.make(3, "x");     # returns: ['x','x','x']
-
-Returns a new object of the same type as the self object.
+Return the
 
 =cut
 
@@ -686,12 +561,7 @@ Return the
 
 Array.max() -> I<Obj>
 
-Returns the greatest element of the list. Each element must have the C<E<gt>> method associated.
-
-    [5,7,8,2,3,1].max;        # returns: 8
-    ['l','w','p'].max;        # returns: 'w'
-
-Returns an object of the same type as the elements of the array.
+Return the
 
 =cut
 
@@ -707,12 +577,7 @@ Return the
 
 Array.min() -> I<Obj>
 
-Works just like the L<C<max()>|"max"> method, except that it returns the lower element, instead of the greatest one.
-
-    [4,2,3,5,7,8].min;       # returns: 2
-    ['s','p','d'].min;       # returns: 'd'
-
-Returns an object of the same type as the elements of the array.
+Return the
 
 =cut
 
@@ -732,15 +597,21 @@ Return the
 
 =cut
 
+=head2 mzip
+
+Array.mzip() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 new
 
-Array.new(I<Obj1>, I<Obj2>, I<...>) -> I<Array>
+Array.new() -> I<Obj>
 
-Creates a new array.
+Return the
 
-    Array.new(1,2,3);       # returns: [1, 2, 3]
-
-Returns a new object of the same type as the self object.
+Aliases: I<call>
 
 =cut
 
@@ -790,33 +661,11 @@ Aliases: I<rand>, I<sample>
 
 =head2 pop
 
-=over 2
+Array.pop() -> I<Obj>
 
-=item * Array.pop(I<Number>) -> I<Obj>
+Return the
 
-Remove the element from the specified position.
-
-    array = qw(a b c);
-    array.pop(1);       # returns the removed element from position 1: 'b'
-
-    # array contains: ['a', 'c']
-
-=back
-
-=over 2
-
-=item * Array.pop() -> I<Obj>
-
-Removes the last element of the array.
-
-    array = qw(a b c);
-    array.pop;          # returns the removed last element: 'c'
-
-    # array contains: ['a', 'b']
-
-=back
-
-B<WARNING!> This method modifies the array in place.
+Aliases: I<drop_last>, I<drop_right>
 
 =cut
 
@@ -848,27 +697,21 @@ Aliases: I<unshift>
 
 =cut
 
-=head2 product
+=head2 prod
 
-Array.product() -> I<Obj>
+Array.prod() -> I<Obj>
 
-Works just like the L<C<sum()>|"sum"> method, except that it multiplies each element of the array, using the C<*> method.
+Return the
 
-    [5,6,7].product;       # returns the product number (210)
-
-Returns an object of the same type as the elements of the array.
+Aliases: I<product>
 
 =cut
 
 =head2 range
 
-Array.range() -> I<Array>
+Array.range() -> I<Obj>
 
-Returns a new array with numbers ranging from C<0> to C<array.offset>.
-
-    ['x','y','z'].range;       # returns: [0, 1 ,2]
-
-This method always returns an object of type: C<Sidef::Types::Array::Array>
+Return the
 
 =cut
 
@@ -923,6 +766,8 @@ Aliases: I<reversed>
 Array.rindex() -> I<Obj>
 
 Return the
+
+Aliases: I<last_index>
 
 =cut
 
@@ -980,12 +825,7 @@ Return the
 
 Array.sum() -> I<Obj>
 
-Reduces all the elements from the array to a single element, using the C<+> method.
-
-    [[1,2],[3,4]].sum;       # returns: [1,2,3,4]
-    [1,2,3,4,5,6].sum;       # returns the sum of the numbers (1+2+3+...+6)
-
-Returns an object of the same type as the elements of the array.
+Return the
 
 Aliases: I<collapse>
 
@@ -1021,7 +861,7 @@ Array.to_h() -> I<Obj>
 
 Return the
 
-Aliases: I<to_hash>, I<toHash>
+Aliases: I<to_hash>
 
 =cut
 
@@ -1043,6 +883,16 @@ Aliases: I<unique>, I<distinct>
 
 =cut
 
+=head2 uniq_by
+
+Array.uniq_by() -> I<Obj>
+
+Return the
+
+Aliases: I<unique_by>, I<last_unique_by>
+
+=cut
+
 =head2 unroll_operator
 
 Array.unroll_operator() -> I<Obj>
@@ -1051,9 +901,11 @@ Return the
 
 =cut
 
-=head2 mesh
+=head2 zip
 
-Alias for L<C<&&>|"&&">.
+Array.zip() -> I<Obj>
+
+Return the
 
 =cut
 

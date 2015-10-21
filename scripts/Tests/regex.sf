@@ -1,0 +1,46 @@
+#!/usr/bin/ruby
+
+#
+## Numbered captures (array)
+#
+
+var regex = /^(\d+) (\w+) (\d+)$/;
+var match = ('26 Iunie 2013' =~ regex);
+
+if (match) {
+    "Got '%d' captures\n".printf(match.cap.len);
+    match.cap.join("--").say;
+}
+else {
+    die "Regex_1 fail!";
+}
+
+
+#
+## Named captures (hash)
+#
+
+var cap = ("12 John Wall Street no. 4" =~ /(?<id>\d+)\s+(?<name>\S+)\s+(?<address>(.+))$/);
+
+cap || die "Named captures failed!\n";
+
+var hash = cap.ncap;
+assert([hash{:name}, hash{:address}], ['John', 'Wall Street no. 4']);
+
+#
+## Other tests
+#
+
+"TEST" =~ /^test\z/i  || ("Regex_2 fail!\n".die);
+'X'    =~ /x/         && ("Regex_3 fail!\n".die);
+'xyz'  =~ /\[a-z\]/   && ("Regex_4 fail!\n".die);
+'XYZ'  =~ /[a-z]/i    || ("Regex_5 fail!\n".die);
+'©'    =~ /^©$/       || ("Regex_6 fail!\n".die);
+'«»'   =~ /[«]/is     || ("Regex_7 fail!\n".die);
+'$hi'  =~ /^\$hi/     || ("Regex_8 fail!\n".die);
+''     =~ /^/         || ("Regex_9 fail!\n".die);
+"\n"   =~ /^$/        || ("Regex_10 fail!\n".die);
+'/'    =~ /^\/\z/     || ("Regex escape fail!\n".die);
+
+
+/^googl\w/.match(["hei", "google chrome"]) || die "Regex on array fail!";

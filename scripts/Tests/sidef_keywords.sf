@@ -1,0 +1,11 @@
+#!/usr/bin/ruby
+
+var hash = Perl.to_sidef(Parser{:keywords});
+
+var keys = hash.keys.sort;
+var max = keys.map{.len}.max;
+
+var cols = 3;
+0 ..^ (keys.offset, cols) -> each { |i|
+    %(#{"%-#{max+2}s" * cols-1}%s\n) -> printf(keys.@[i .. (i + cols-1)]);
+}

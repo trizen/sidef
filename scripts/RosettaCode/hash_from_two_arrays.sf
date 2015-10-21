@@ -1,0 +1,13 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Hash_from_two_arrays
+#
+
+var keys = %w(a b c);
+var vals = [1, 2, 3];
+ 
+var hash = Hash.new;
+hash@{keys} = vals...;
+
+say hash;

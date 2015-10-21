@@ -1,9 +1,41 @@
 package Sidef::Object::Object {
 
     use 5.014;
-    use parent qw(
-      Sidef
-      );
+    require Scalar::Util;
+
+    use overload
+      q{~~}   => \&{__PACKAGE__ . '::' . '~~'},
+      q{bool} => sub { $_[0] },
+      q{0+}   => sub { $_[0] },
+      q{""}   => sub { $_[0] },
+      q{cmp}  => sub {
+        my ($obj1, $obj2, $first) = @_;
+
+        if (ref($obj1) && $obj1->SUPER::isa(ref($obj2)) or ref($obj2) && $obj2->SUPER::isa(ref($obj1))) {
+            if (defined(my $sub = $obj1->can('<=>'))) {
+                local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
+                return $sub->($obj1, $obj2)->get_value;
+            }
+        }
+
+        Scalar::Util::refaddr($obj1) <=> (ref($obj2) ? Scalar::Util::refaddr($obj2) : $first ? -1 : 'inf');
+      },
+      q{eq} => sub {
+        my ($obj1, $obj2) = @_;
+
+        ($obj1->SUPER::isa(ref($obj2) || return) || $obj2->SUPER::isa(ref($obj1) || return))
+          || return;
+
+        if (defined(my $sub = $obj1->can('=='))) {
+            return ${$sub->($obj1, $obj2)};
+        }
+
+        Scalar::Util::refaddr($obj1) == Scalar::Util::refaddr($obj2);
+      };
+
+    sub new {
+        bless {}, __PACKAGE__;
+    }
 
     sub say {
         Sidef::Types::Bool::Bool->new(say @_);
@@ -15,21 +47,136 @@ package Sidef::Object::Object {
         Sidef::Types::Bool::Bool->new(print @_);
     }
 
+    sub method {
+        my ($self, $method, @args) = @_;
+        Sidef::Variable::LazyMethod->new(obj => $self, method => $method, args => \@args);
+    }
+
+    sub object_id {
+        my ($self) = @_;
+        Sidef::Types::Number::Number->new(Scalar::Util::refaddr($self));
+    }
+
+    sub class {
+        my ($obj) = @_;
+        my $ref = CORE::ref($obj) || $obj;
+
+        my $rindex = rindex($ref, '::');
+        Sidef::Types::String::String->new($rindex == -1 ? $ref : substr($ref, $rindex + 2));
+    }
+
+    sub ref {
+        my ($obj) = @_;
+        Sidef::Types::String::String->new(CORE::ref($obj) || $obj);
+    }
+
+    sub respond_to {
+        my ($self, $method) = @_;
+        Sidef::Types::Bool::Bool->new($self->can($method));
+    }
+
+    sub is_a {
+        my ($self, $obj) = @_;
+        Sidef::Types::Bool::Bool->new($self->SUPER::isa(ref($obj) || $obj));
+    }
+
+    *is_an = \&is_a;
+
+    sub parent_classes {
+        my ($obj) = @_;
+
+        no strict 'refs';
+
+        my %seen;
+        my $extract_parents;
+        $extract_parents = sub {
+            my ($ref) = @_;
+
+            my @parents = @{${$ref . '::'}{ISA}};
+
+            if (@parents) {
+                foreach my $parent (@parents) {
+                    next if $seen{$parent}++;
+                    push @parents, $extract_parents->($parent);
+                }
+            }
+
+            @parents;
+        };
+
+        Sidef::Types::Array::Array->new(map { Sidef::Types::String::String->new($_) } $extract_parents->(ref($obj)));
+    }
+
+    sub super_join {
+        my ($self, @args) = @_;
+        $self->new(
+            CORE::join(
+                '',
+                map {
+                    eval { ${CORE::ref($_) ne 'Sidef::Types::String::String' ? $_->to_s : $_} }
+                      // $_
+                  } @args
+            )
+        );
+    }
+
     {
         no strict 'refs';
 
+        sub def_method {
+            my ($self, $name, $block) = @_;
+            *{(CORE::ref($self) ? CORE::ref($self) : $self) . '::' . $name} = sub {
+                $block->call(@_);
+            };
+            $self;
+        }
+
+        sub undef_method {
+            my ($self, $name) = @_;
+            delete ${(CORE::ref($self) ? CORE::ref($self) : $self) . '::'}{$name};
+            $self;
+        }
+
+        sub alias_method {
+            my ($self, $old, $new) = @_;
+
+            my $ref = (CORE::ref($self) ? CORE::ref($self) : $self);
+            my $to = \&{$ref . '::' . $old};
+
+            if (not defined &$to) {
+                die "[ERROR] Can't alias the nonexistent method '$old' as '$new'!";
+            }
+
+            *{$ref . '::' . $new} = $to;
+        }
+
+        sub methods {
+            my ($self) = @_;
+
+            my %alias;
+            my %methods;
+            my $ref = CORE::ref($self);
+            foreach my $method (grep { $_ !~ /^[(_]/ and defined(&{$ref . '::' . $_}) } keys %{$ref . '::'}) {
+                $methods{$method} = (
+                                     $alias{\&{$ref . '::' . $method}} //=
+                                       Sidef::Variable::LazyMethod->new(
+                                                                        obj    => $self,
+                                                                        method => \&{$ref . '::' . $method}
+                                                                       )
+                                    );
+            }
+
+            Sidef::Types::Hash::Hash->new(%methods);
+        }
+
         # Logical AND
         *{__PACKAGE__ . '::' . '&&'} = sub {
-            $_[0]
-              ? Sidef::Types::Block::Code->new($_[1])->run
-              : $_[0];
+            $_[0] ? $_[1] : $_[0];
         };
 
         # Logical OR
         *{__PACKAGE__ . '::' . '||'} = sub {
-            $_[0]
-              ? $_[0]
-              : Sidef::Types::Block::Code->new($_[1])->run;
+            $_[0] ? $_[0] : $_[1];
         };
 
         # Logical XOR
@@ -39,22 +186,15 @@ package Sidef::Object::Object {
 
         # Defined-OR
         *{__PACKAGE__ . '::' . '\\\\'} = sub {
-            ref($_[0]) eq 'Sidef::Types::Nil::Nil'
-              ? Sidef::Types::Block::Code->new($_[1])->run
-              : $_[0];
-        };
-
-        # Ternary operator (Obj ? TrueExpr : FalseExpr)
-        *{__PACKAGE__ . '::' . '?'} = sub {
-            Sidef::Types::Bool::Ternary->new(code => $_[1], bool => !!$_[0]);
+            defined($_[0]) ? $_[1] : $_[0];
         };
 
         # Smart match operator
         *{__PACKAGE__ . '::' . '~~'} = sub {
             my ($first, $second) = @_;
 
-            my $f_type = ref($first);
-            my $s_type = ref($second);
+            my $f_type = CORE::ref($first);
+            my $s_type = CORE::ref($second);
 
             # First is String
             if (   $f_type eq 'Sidef::Types::String::String'
@@ -79,7 +219,7 @@ package Sidef::Object::Object {
 
                 # String ~~ String
                 if ($s_type eq 'Sidef::Types::String::String') {
-                    return $second->contains($first);
+                    return $second->eq($first);
                 }
 
                 # String ~~ Regex
@@ -93,6 +233,11 @@ package Sidef::Object::Object {
 
                 # Number ~~ RangeNumber
                 if ($s_type eq 'Sidef::Types::Array::RangeNumber') {
+                    return $second->contains($first);
+                }
+
+                # Number ~~ Array
+                if ($s_type eq 'Sidef::Types::Array::Array') {
                     return $second->contains($first);
                 }
             }
@@ -120,7 +265,7 @@ package Sidef::Object::Object {
 
                 # Array ~~ Array
                 if ($s_type eq 'Sidef::Types::Array::Array') {
-                    return $second->contains_all($first);
+                    return $second->eq($first);
                 }
 
                 # Array ~~ Regex
@@ -130,7 +275,7 @@ package Sidef::Object::Object {
 
                 # Array ~~ Hash
                 if ($s_type eq 'Sidef::Types::Hash::Hash') {
-                    return $second->keys->contains_all($first);
+                    return $first->contains_all($second->keys);
                 }
 
                 # Array ~~ Any
@@ -142,12 +287,17 @@ package Sidef::Object::Object {
 
                 # Hash ~~ Array
                 if ($s_type eq 'Sidef::Types::Array::Array') {
-                    return $second->contains_all($first->keys);
+                    return $first->keys->contains_all($second);
                 }
 
                 # Hash ~~ Hash
                 if ($s_type eq 'Sidef::Types::Hash::Hash') {
-                    return $second->keys->contains_all($first->keys);
+                    return $second->eq($first->keys);
+                }
+
+                # Hash ~~ Regex
+                if ($s_type eq 'Sidef::Types::Regex::Regex') {
+                    return $second->match($first->keys)->is_successful;
                 }
 
                 # Hash ~~ Any
@@ -174,12 +324,15 @@ package Sidef::Object::Object {
             # Second is Array
             if ($s_type eq 'Sidef::Types::Array::Array') {
 
+                if ($f_type eq 'Sidef::Types::Array::Array') {
+                    return $first->eq($second);
+                }
+
                 # Any ~~ Array
                 return $second->contains($first);
             }
 
-            state $method = '==';
-            $first->$method($second);
+            Sidef::Types::Bool::Bool->new($first eq $second);
         };
 
         # Negation of smart match
@@ -188,6 +341,6 @@ package Sidef::Object::Object {
             $_[0]->$method($_[1])->not;
         };
     }
-};
+}
 
-1
+1;

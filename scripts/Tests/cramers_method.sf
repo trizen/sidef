@@ -1,0 +1,100 @@
+#!/usr/bin/ruby
+
+# Liniar ecuations solver - Cramer's method.
+
+# Example:
+# | 2x - 3y +  z =  4
+# |  x - 2y - 2z = -6
+# | 3x - 4y +  z =  5
+
+var matrix = [
+    [2, -3,  1],
+    [1, -2, -2],
+    [3, -4,  1],
+];
+
+var free_terms = [4, -6, 5];
+
+func diag_multiply_sum (matrix, left) {
+
+    var range    = matrix[0].range;   # range from 0 to len(matrix[0])-1
+    var products = [];
+
+    (left ? range.reverse : range).each { |i|
+
+        var x = 0;
+        var nums = [];
+        var rangex = CORE::range(i, matrix[0].end+i);   # range from i to len(matrix[0])-1+i
+
+        (left ? rangex.reverse : rangex).each { |j|
+            nums.push(matrix[j][x++]);
+        };
+
+        products.push(nums.prod);       # appending the product of 'nums' inside the 'products' array
+    }
+
+    "sum %s\n".printf(products.dump);
+
+    return(products.sum);
+}
+
+func make_det_matrix (matrix) {
+    matrix + [matrix.@[range(matrix.end-1)]];
+}
+
+func calculate_delta (:opts) {
+
+    var matrix     = opts{:matrix}.copy;        # making a copy of the matrix
+    var free_terms = opts{:free_terms};
+    var position   = opts{:position};
+
+    free_terms.range.each { |i|
+        matrix[i][position] = free_terms[i];    # substituting the 'pos' column with the free terms
+    };
+
+    var det_matrix = make_det_matrix(matrix);
+    var right      = diag_multiply_sum(det_matrix, false);
+    var left       = diag_multiply_sum(det_matrix, true);
+
+    var diff = (right - left);
+    "%d - %d == %d\n\n".printf(right, left, diff);
+
+    return(diff);
+}
+
+var det_matrix = make_det_matrix(matrix);
+
+var right = diag_multiply_sum(det_matrix, false);
+var left  = diag_multiply_sum(det_matrix, true);
+
+var delta = (right - left);
+"%d - %d == %d\n\n".printf(right, left, delta);
+
+"Delta == %s\n\n".printf(delta);
+
+var xyz = [];
+free_terms.range.each { |i|
+    xyz[i] = calculate_delta(
+                matrix     => matrix,
+                free_terms => free_terms,
+                position   => i,
+            )
+}
+
+var indices = [
+    ['X', 0],
+    ['Y', 1],
+    ['Z', 2],
+]
+
+indices.each {
+    var i = _[1];
+    "Delta %s: %d\n".printf(_[0], xyz[i]);
+}
+
+"\n".print;
+
+indices.each {
+    var i = _[1];
+    "%s == %3d/%-3d == %3s\n".printf(_[0], xyz[i], delta, xyz[i] / delta);
+}

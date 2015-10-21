@@ -1,0 +1,24 @@
+#!/usr/bin/ruby
+
+func simple_moving_average(period) {
+
+    var list = [];
+    var sum = 0;
+
+    func (number) {
+        list.append(number);
+        sum += number;
+        list.len > period && (
+            sum -= list.shift;
+        );
+        return (sum / list.length);
+    }
+}
+
+var ma3 = simple_moving_average(3);
+var ma5 = simple_moving_average(5);
+
+[(1 ..^ 5).to_a..., ( 5 ^.. 1 ).to_a...].reverse -> each {|num|
+  printf("Next number = %d, SMA_3 = %.3f, SMA_5 = %.1f\n",
+    num, ma3.call(num), ma5.call(num));
+}

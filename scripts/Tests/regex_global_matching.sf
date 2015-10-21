@@ -1,0 +1,20 @@
+#!/usr/bin/ruby
+
+#
+## Regular expressions -- global matching
+#
+
+3.times { |i|
+    say i;
+    while (var m = ("abcd" =~ /(..)/g)) {
+        say m.cap[0];
+    }
+};
+
+
+3.times { |i|
+    say i;
+    while (var m = "abcd".gmatch(/(..)/)) {
+        say m.cap[0];
+    }
+};

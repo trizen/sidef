@@ -17,7 +17,7 @@ name: Sidef
 provides:
   Sidef:
     file: lib/Sidef.pm
-    version: '0.11'
+    version: '2.10'
   Sidef::Convert::Convert:
     file: lib/Sidef/Convert/Convert.pm
   Sidef::Deparse::Perl:
@@ -26,8 +26,6 @@ provides:
     file: lib/Sidef/Deparse/Sidef.pm
   Sidef::Eval::Eval:
     file: lib/Sidef/Eval/Eval.pm
-  Sidef::Exec:
-    file: lib/Sidef/Exec.pm
   Sidef::Math::Math:
     file: lib/Sidef/Math/Math.pm
   Sidef::Module::Func:
@@ -42,6 +40,8 @@ provides:
     file: lib/Sidef/Optimizer.pm
   Sidef::Parser:
     file: lib/Sidef/Parser.pm
+  Sidef::Perl::Builtin:
+    file: lib/Sidef/Perl/Builtin.pm
   Sidef::Perl::Perl:
     file: lib/Sidef/Perl/Perl.pm
   Sidef::Sys::SIG:
@@ -74,8 +74,12 @@ provides:
     file: lib/Sidef/Types/Block/Break.pm
   Sidef::Types::Block::Code:
     file: lib/Sidef/Types/Block/Code.pm
+  Sidef::Types::Block::CodeInit:
+    file: lib/Sidef/Types/Block/CodeInit.pm
   Sidef::Types::Block::Continue:
     file: lib/Sidef/Types/Block/Continue.pm
+  Sidef::Types::Block::Default:
+    file: lib/Sidef/Types/Block/Default.pm
   Sidef::Types::Block::Do:
     file: lib/Sidef/Types/Block/Do.pm
   Sidef::Types::Block::For:
@@ -86,24 +90,24 @@ provides:
     file: lib/Sidef/Types/Block/Gather.pm
   Sidef::Types::Block::Given:
     file: lib/Sidef/Types/Block/Given.pm
+  Sidef::Types::Block::If:
+    file: lib/Sidef/Types/Block/If.pm
   Sidef::Types::Block::Next:
     file: lib/Sidef/Types/Block/Next.pm
-  Sidef::Types::Block::PerlCode:
-    file: lib/Sidef/Deparse/Perl.pm
   Sidef::Types::Block::Return:
     file: lib/Sidef/Types/Block/Return.pm
-  Sidef::Types::Block::Switch:
-    file: lib/Sidef/Types/Block/Switch.pm
+  Sidef::Types::Block::Take:
+    file: lib/Sidef/Types/Block/Take.pm
   Sidef::Types::Block::Try:
     file: lib/Sidef/Types/Block/Try.pm
+  Sidef::Types::Block::When:
+    file: lib/Sidef/Types/Block/When.pm
+  Sidef::Types::Block::While:
+    file: lib/Sidef/Types/Block/While.pm
   Sidef::Types::Bool::Bool:
     file: lib/Sidef/Types/Bool/Bool.pm
-  Sidef::Types::Bool::If:
-    file: lib/Sidef/Types/Bool/If.pm
   Sidef::Types::Bool::Ternary:
     file: lib/Sidef/Types/Bool/Ternary.pm
-  Sidef::Types::Bool::While:
-    file: lib/Sidef/Types/Bool/While.pm
   Sidef::Types::Byte::Byte:
     file: lib/Sidef/Types/Byte/Byte.pm
   Sidef::Types::Byte::Bytes:
@@ -130,10 +134,16 @@ provides:
     file: lib/Sidef/Types/Glob/SocketHandle.pm
   Sidef::Types::Glob::Stat:
     file: lib/Sidef/Types/Glob/Stat.pm
+  Sidef::Types::Grapheme::Grapheme:
+    file: lib/Sidef/Types/Grapheme/Grapheme.pm
+  Sidef::Types::Grapheme::Graphemes:
+    file: lib/Sidef/Types/Grapheme/Graphemes.pm
   Sidef::Types::Hash::Hash:
     file: lib/Sidef/Types/Hash/Hash.pm
   Sidef::Types::Nil::Nil:
     file: lib/Sidef/Types/Nil/Nil.pm
+  Sidef::Types::Null::Null:
+    file: lib/Sidef/Types/Null/Null.pm
   Sidef::Types::Number::Complex:
     file: lib/Sidef/Types/Number/Complex.pm
   Sidef::Types::Number::Number:
@@ -144,28 +154,34 @@ provides:
     file: lib/Sidef/Types/Regex/Regex.pm
   Sidef::Types::String::String:
     file: lib/Sidef/Types/String/String.pm
-  Sidef::Variable::Class:
-    file: lib/Sidef/Variable/Class.pm
   Sidef::Variable::ClassInit:
     file: lib/Sidef/Variable/ClassInit.pm
-  Sidef::Variable::ClassVar:
-    file: lib/Sidef/Variable/ClassVar.pm
+  Sidef::Variable::Const:
+    file: lib/Sidef/Variable/Const.pm
+  Sidef::Variable::ConstInit:
+    file: lib/Sidef/Variable/ConstInit.pm
+  Sidef::Variable::Define:
+    file: lib/Sidef/Variable/Define.pm
+  Sidef::Variable::Global:
+    file: lib/Sidef/Variable/Global.pm
   Sidef::Variable::Init:
     file: lib/Sidef/Variable/Init.pm
-  Sidef::Variable::InitLocal:
-    file: lib/Sidef/Variable/InitLocal.pm
+  Sidef::Variable::Label:
+    file: lib/Sidef/Variable/Label.pm
   Sidef::Variable::LazyMethod:
     file: lib/Sidef/Variable/LazyMethod.pm
   Sidef::Variable::Local:
     file: lib/Sidef/Variable/Local.pm
+  Sidef::Variable::LocalInit:
+    file: lib/Sidef/Variable/LocalInit.pm
+  Sidef::Variable::LocalMagic:
+    file: lib/Sidef/Variable/LocalMagic.pm
   Sidef::Variable::Magic:
     file: lib/Sidef/Variable/Magic.pm
-  Sidef::Variable::PerlVar:
-    file: lib/Sidef/Deparse/Perl.pm
-  Sidef::Variable::PerlVarRef:
-    file: lib/Sidef/Deparse/Perl.pm
   Sidef::Variable::Ref:
     file: lib/Sidef/Variable/Ref.pm
+  Sidef::Variable::Static:
+    file: lib/Sidef/Variable/Static.pm
   Sidef::Variable::Struct:
     file: lib/Sidef/Variable/Struct.pm
   Sidef::Variable::Variable:
@@ -180,7 +196,7 @@ requires:
   File::Path: '0'
   File::Spec: '0'
   Getopt::Std: '0'
-  List::Util: '0'
+  List::Util: '1.33'
   Math::BigFloat: '0'
   Math::BigInt: '0'
   Math::BigRat: '0'
@@ -192,9 +208,9 @@ requires:
   Storable: '0'
   Term::ReadLine: '0'
   Time::HiRes: '0'
-  perl: v5.14.0
+  perl: v5.16.1
   utf8: '0'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.11'
+version: '2.10'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

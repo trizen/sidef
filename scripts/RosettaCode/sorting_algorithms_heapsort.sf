@@ -1,0 +1,46 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Sorting_algorithms/Heapsort
+#
+
+func siftDown(a, start, end) {
+    var root = start;
+    while ((2*root + 1) <= end) {
+        var child = (2*root + 1);
+        if ((child+1 <= end) && (a[child] < a[child + 1])) {
+            child += 1;
+        }
+        if (a[root] < a[child]) {
+            a[child, root] = a[root, child];
+            root = child;
+        } else {
+            return;
+        }
+    }
+}
+ 
+func heapify(a, count) {
+    var start = ((count - 2) / 2);
+    while (start >= 0) {
+        siftDown(a, start, count-1);
+        start -= 1;
+    }
+}
+ 
+func heapSort(a, count) {
+    heapify(a, count);
+    var end = (count - 1);
+    while (end > 0) {
+        a[0, end] = a[end, 0];
+        end -= 1;
+        siftDown(a, 0, end)
+    }
+    return a
+}
+ 
+var numbers = [7,6,5,9,8,4,3,1,2,0];
+say heapSort(numbers, numbers.len);
+ 
+var strs = ["John", "Kate", "Zerg", "Alice", "Joe", "Jane"];
+say heapSort(strs, strs.len);

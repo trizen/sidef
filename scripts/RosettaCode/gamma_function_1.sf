@@ -1,0 +1,17 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Gamma_function
+#
+
+define e  = Math::e;
+define pi = Math::pi;
+ 
+func Γ(t) {
+    t < 20 ? (__FUNC__(t + 1) / t)
+           : (Math.sqrt(2*pi*t) * Math.pow(t/e + 1/(12*e*t), t) / t);
+}
+ 
+(1..10).each { |i|
+    say ("%.14e" % Γ(i/3));
+};

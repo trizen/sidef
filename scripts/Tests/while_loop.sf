@@ -1,0 +1,10 @@
+#!/usr/bin/ruby
+
+#
+## The 'while' loop:
+#
+
+var num = 0;
+while (++num <= 3) {
+    "Hello sidef (%d)!\n".printf(num);
+}

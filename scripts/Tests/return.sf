@@ -1,0 +1,69 @@
+#!/usr/bin/ruby
+
+func hi (i) {
+
+    func user (user) {
+        return ("Username is '%s'".sprintf(user));      # child function return
+        "Child function error! in #{__FILE__} at line #{__LINE__}\n" -> die;
+    }
+
+    user('sidef');
+
+    if (i == 3) {
+
+        if (i == 1+2) {
+            return "IF(3) RETURN";
+        }
+
+        "Error! (1)".die;
+    }
+    elsif (i == 3) {
+        "ERROR: re-true elsif!".die;
+    }
+    elsif (i == 1) {
+        return "ELSIF(1) RETURN";
+        "Error! (2)".die;
+    }
+
+    i == 3 && (
+        return "&& RETURN";
+        "Error! (3)".die;
+    );
+
+    if (i == 2) {
+        return "IF(2) RETURN";
+        "Error! (4)".die;
+    }
+
+    return "FUNC RETURN";
+    "ERROR RETURN";
+}
+
+hi(1) == "ELSIF(1) RETURN" || "Error hi(1)!".die;
+hi(2) == "IF(2) RETURN"    || "Error hi(2)!".die;
+hi(3) == "IF(3) RETURN"    || "Error hi(3)!".die;
+hi(4) == "FUNC RETURN"     || "Error hi(4)!".die;
+
+#
+## Return from 'for' loop
+#
+
+func for_loop {
+
+    for (["a", "z", "f"]) { |c|
+        if (c == "z") {
+            return "LOOP RETURN";
+        }
+
+        if (c == "f") {
+            "LOOP ERROR!".die;
+        }
+    }
+
+    "Error hello(name)!".die;
+}
+
+for_loop() == "LOOP RETURN" || "Error hello(Sidef)!".die;
+
+
+say "Test passed!";

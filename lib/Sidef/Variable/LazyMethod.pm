@@ -1,11 +1,26 @@
 package Sidef::Variable::LazyMethod {
 
-    our @ISA = qw(Sidef);
+    use 5.014;
+    use parent qw(
+      Sidef::Object::Object
+      );
+
     our $AUTOLOAD;
 
     sub new {
         my (undef, %hash) = @_;
         bless \%hash, __PACKAGE__;
+    }
+
+    {
+        no strict 'refs';
+        foreach my $meth (qw(say print println)) {
+            *{__PACKAGE__ . '::' . $meth} = sub {
+                my $self = shift;
+                local $AUTOLOAD = __PACKAGE__ . '::' . $meth;
+                $self->AUTOLOAD(@_);
+              }
+        }
     }
 
     sub DESTROY { }
@@ -16,7 +31,7 @@ package Sidef::Variable::LazyMethod {
         my ($method) = ($AUTOLOAD =~ /^.*[^:]::(.*)$/);
         my $call = $self->{method};
 
-        if ($call->SUPER::isa('Sidef::Types::Block::Code')) {
+        if (ref($call) eq 'Sidef::Types::Block::Code') {
             if ($method eq 'call') {
                 return $call->call($self->{obj}, @{$self->{args}}, @args);
             }

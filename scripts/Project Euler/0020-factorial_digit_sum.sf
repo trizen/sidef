@@ -1,0 +1,11 @@
+#!/usr/bin/ruby
+
+# Find the sum of the digits in the number 100!
+
+# https://projecteuler.net/problem=20
+
+# Answer: 648
+
+var n = 100!;
+
+say range(0, n.length-1).map { |i| n.digit(i) }.sum;

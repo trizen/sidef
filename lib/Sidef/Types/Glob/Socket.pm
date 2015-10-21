@@ -43,8 +43,8 @@ package Sidef::Types::Glob::Socket {
         my ($self, $socket1, $socket2, $domain, $type, $protocol) = @_;
         CORE::socketpair(my $sh1, my $sh2, $domain->get_value, $type->get_value, $protocol->get_value)
           || return Sidef::Types::Bool::Bool->false;
-        $socket1->get_var->set_value(Sidef::Types::Glob::SocketHandle->new(fh => $sh1));
-        $socket2->get_var->set_value(Sidef::Types::Glob::SocketHandle->new(fh => $sh2));
+        ${$socket1} = Sidef::Types::Glob::SocketHandle->new(fh => $sh1);
+        ${$socket2} = Sidef::Types::Glob::SocketHandle->new(fh => $sh2);
         Sidef::Types::Bool::Bool->true;
     }
 
@@ -167,7 +167,7 @@ package Sidef::Types::Glob::Socket {
             }
             return (
                     @results > 1
-                    ? Sidef::Types::Array::List->new(map { Sidef::Perl::Perl->to_sidef($_) } @results)
+                    ? (map { Sidef::Perl::Perl->to_sidef($_) } @results)
                     : Sidef::Perl::Perl->to_sidef($results[0])
                    );
         }

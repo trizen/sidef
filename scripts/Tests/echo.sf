@@ -1,0 +1,13 @@
+#!/usr/bin/ruby
+
+# Examples:
+#    perl sidef echo.sf -e 'hello there.\nHow are you?'
+#    perl sidef echo.sf Sidef is awesome.
+
+if ((ARGV.len >= 1) && (ARGV[0] == '-e')) {
+    ARGV.shift;
+    say ARGV.join(" ").apply_escapes;
+}
+else {
+    say ARGV.join(" ");
+}

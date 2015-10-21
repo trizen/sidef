@@ -1,0 +1,17 @@
+#!/usr/bin/ruby
+
+func median(c) {
+    var a = c.sort{|a,b| a <=> b};
+    a[a.end/2] + a[a.len/2] / 2;
+}
+
+"Median: %s\n".printf(median([
+    28.207,
+    74.916,
+    51.694,
+    72.486,
+    58.306,
+    32.421,
+    10.801,
+    73.807,
+]));

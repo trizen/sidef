@@ -1,0 +1,25 @@
+#!/usr/bin/ruby
+
+func levenshtein(s, t) is cached {
+
+    s.is_empty && return t.len;
+    t.is_empty && return s.len;
+
+    var s1 = s.ft(1);
+    var t1 = t.ft(1);
+
+    s[0] == t[0]
+            ? __FUNC__(s1, t1)
+            : (1 + [
+                    __FUNC__(s1, t1),
+                    __FUNC__(s,  t1),
+                    __FUNC__(s1, t ),
+                   ].min
+              );
+}
+
+assert_eq(levenshtein(%c"kitten", %c"sitting"), 3);
+assert_eq(levenshtein(%c"rosettacode", %c"raisethysword"), 8);
+assert_eq(levenshtein(%G"J\x{332}o\x{332}s\x{332}e\x{301}\x{332}", %G"J\x{332}o\x{332}s\x{332}"), 1);
+
+say "** Test passed!";

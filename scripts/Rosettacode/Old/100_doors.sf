@@ -1,8 +1,0 @@
-#!/usr/bin/ruby
-
-var format = "Door %d is %s\n";
-
-for (var i = 1; i <= 100; i++) {
-    var root = (i->sqrt);
-    format.printf(i, root->int == root ? 'open' : 'closed');
-}

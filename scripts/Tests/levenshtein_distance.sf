@@ -1,0 +1,44 @@
+#!/usr/bin/ruby
+
+# Translation of: http://rosettacode.org/wiki/Levenshtein_distance#Go
+
+func levenshtein(s, t) {
+
+    var d = (
+        s.len+1 -> of {
+            t.len+1 -> of(0)
+        }
+    )
+
+    d.range.each { |i| d[i][0] = i }
+    d[0].range.each { |i| d[0][i] = i }
+
+    range(1, t.len).each { |j|
+        range(1, s.len).each { |i|
+
+            if (s[i-1] == t[j-1]) {
+                d[i][j] = d[i-1][j-1];
+            }
+            else {
+                var min = d[i-1][j];
+
+                d[i][j-1] < min && (
+                    min = d[i][j-1];
+                )
+                d[i-1][j-1] < min && (
+                    min = d[i-1][j-1];
+                )
+
+                d[i][j] = (min + 1);
+            }
+        }
+    }
+
+    return d[s.len][t.len];
+}
+
+assert_eq(levenshtein(%c"kitten", %c"sitting"), 3);
+assert_eq(levenshtein(%c"rosettacode", %c"raisethysword"), 8);
+assert_eq(levenshtein(%G"J\x{332}o\x{332}s\x{332}e\x{301}\x{332}", %G"J\x{332}o\x{332}s\x{332}"), 1);
+
+say "** Test passed!";

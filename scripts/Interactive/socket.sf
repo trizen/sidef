@@ -2,7 +2,7 @@
 
 # A very basic, low-level, web-server.
 
-var port = 8081;
+var port = 8080;
 var protocol = Socket.getprotobyname( "tcp" );
 
 var sock = (Socket.open(Socket::PF_INET, Socket::SOCK_STREAM, protocol) || die "couldn't open a socket: #{$!}");

@@ -1,0 +1,23 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Levenshtein_distance
+#
+
+func lev(s,t) {
+ 
+    s == '' && return t.len;
+    t == '' && return s.len;
+ 
+    var s1 = s.ft(1);
+    var t1 = t.ft(1);
+ 
+    s.first == t.first ? __FUNC__(s1, t1)
+                 : 1+[
+                        __FUNC__(s1, t1),
+                        __FUNC__(s,  t1),
+                        __FUNC__(s1, t )
+                     ].min;
+};
+
+say lev("abcz", "aecd");

@@ -27,14 +27,12 @@ require Sidef;
 my $name    = 'Sidef';
 my $version = $Sidef::VERSION;
 
-sub DUMP ()   { 0 }
-sub BUNDLE () { 1 }
-sub NATIVE () { 2 }
+sub NATIVE () { 0 }
 
 my %args;
 if ($#ARGV != -1 and chr ord $ARGV[0] eq '-') {
     require Getopt::Std;
-    Getopt::Std::getopts('e:E:d:Dho:ivHN:n:WwbcM:rR:tO:s:C', \%args);
+    Getopt::Std::getopts('e:E:d:Dho:ivHn:WwbcrR:ts:C', \%args);
 }
 
 # Help
@@ -63,11 +61,6 @@ elsif (defined $args{W}) {
     };
 }
 
-# Number types
-if (defined(my $type = $args{N})) {
-    load_numbers($type);
-}
-
 # Backend for Math::BigInt
 if (defined(my $type = $args{n})) {
     load_math_backend($type);
@@ -78,9 +71,9 @@ if (defined(my $num = $args{s})) {
     $Sidef::SPACES_INCR = int($num);
 }
 
-# Memoization
-if (defined(my $types = $args{M})) {
-    memoize_types($types);
+# Change the Math backend to 'FastCalc' when '-D' or '-d' is specified
+if (defined($args{D}) or defined($args{d})) {
+    load_math_backend('FastCalc');
 }
 
 # Interactive help
@@ -98,13 +91,18 @@ if (defined $args{i}) {
 # Test mode
 if (defined $args{t}) {
     my @argv = splice(@ARGV);
+
+    require Encode;
     while (defined(my $script_name = shift @argv)) {
+
+        my $script_name = Encode::decode_utf8($script_name);
 
         say "\n** Executing: $script_name";
         say "-" x 80;
 
-        splice(@Sidef::Exec::NAMESPACES);
-        my $exec   = Sidef::Exec->new();
+        splice(@Sidef::NAMESPACES);
+        %Sidef::INCLUDED = ();
+
         my $code   = read_script($script_name);
         my $parser = new_parser(name => $script_name);
         my $struct = eval { parse_code($parser, $code) };
@@ -116,23 +114,18 @@ if (defined $args{t}) {
             $slept = 1;
         }
         else {
-            if (ref($struct) eq 'HASH') {
-                eval { $exec->execute($struct) };
-            }
-            else {
-                system($^X, '-e', $struct);
-            }
+            local $Sidef::PARSER = $parser;
+
+            local $SIG{INT} = sub {
+                die "Stopped by user...";
+            };
+
+            execute_struct($struct, 1);
         }
 
-        if (not($slept) and ($@ or (ref($struct) ne 'HASH' and $?))) {
+        if (not($slept) and $@) {
             warn "[ERROR] Error encountered on script `$script_name': $@";
-            sleep(2);
-        }
-
-        if (@argv) {
-            unload_numbers();
-            load_numbers($args{N} // 'float');
-            load_math_backend($args{n}) if defined($args{n});
+            sleep(2) if @argv;
         }
     }
 }
@@ -140,7 +133,9 @@ if (defined $args{t}) {
 # Default
 else {
     my $script_name = '-';
+
     $args{E} = $args{e} if exists($args{e});
+
     my $code = exists($args{E})
       ? do {
         defined($args{E}) || die "No code specified for -E.\n";
@@ -153,77 +148,59 @@ else {
         $script_name = shift @ARGV;
         read_script($script_name);
       }
-      : do { local $/; <STDIN> };
+      : (-t STDIN) ? do { code_interactive(); exit }
+      :              do { local $/;           <STDIN> };
 
     $code // exit 2;
 
-    # Bundle the code as a Perl program (without parsing it)
-    if (defined $args{b} and $code ne '') {
-        compile_to_perl(code => $code, type => BUNDLE, script_name => $script_name);
+    my ($struct, $parser);
+
+    # Code from a dumped parse-tree
+    if (defined $args{d}) {
+        $struct = do($args{d})
+          || die "Can't load the data structure from file '$args{d}': $!\n";
     }
     else {
 
-        my $struct;
+        # Parse the code
+        $parser = new_parser(name => $script_name);
+        $struct = parse_code($parser, $code);
+    }
 
-        # Code from a dumped parse-tree
-        if (defined $args{d}) {
-            $struct = do($args{d})
-              || die "Can't load the data structure from file '$args{d}': $!\n";
+    # Dump the data structure
+    if (defined $args{D}) {
+        dump_structure($struct);
+    }
+
+    # Deparse code
+    elsif (defined($args{r}) or defined($args{R})) {
+        my $deparsed = deparse_structure($struct, $args{R});
+
+        if (defined($args{R}) and lc($args{R}) eq 'perl') {
+            my $header = "\nuse lib qw{" . join(" ", @INC) . "};\n" . "use Sidef;\n";
+            $deparsed = $header . $deparsed;
         }
         else {
-
-            # Parse the code
-            my $parser = new_parser(name => $script_name);
-            $struct = parse_code($parser, $code);
+            warn "\n# NOTE: deparsing to Sidef is not fully implemented!\n\n";
         }
 
-        # Is structure actually Perl code?
-        my $is_perl_code = defined($args{O}) && $args{O} == 3;
+        output($deparsed);
+    }
 
-        # Dump the data structure
-        if (defined $args{D}) {
-            if ($is_perl_code) {
-                output($struct);
-            }
-            else {
-                dump_structure($struct);
-            }
-        }
+    # Compile the struct to a Perl program
+    elsif (defined $args{c}) {
+        compile_to_perl(code => deparse_structure($struct, 'Perl'), type => NATIVE);
+    }
 
-        # Deparse code
-        elsif (defined($args{r}) or defined($args{R})) {
-            if ($is_perl_code) {
-                output($struct);
-            }
-            else {
-                deparse_structure($struct);
-            }
-        }
+    # Check the syntax
+    elsif (defined $args{C}) {
+        say "$script_name syntax OK";
+    }
 
-        # Compile the struct to a Perl program
-        elsif (defined $args{c}) {
-            if ($is_perl_code) {
-                compile_to_perl(code => $struct, type => NATIVE);
-            }
-            else {
-                compile_to_perl(ast => $struct, type => DUMP);
-            }
-        }
-
-        # Check the syntax
-        elsif (defined $args{C}) {
-            say "$script_name syntax OK";
-        }
-
-        # Execute the struct
-        else {
-            if ($is_perl_code) {
-                exec($^X, '-e', $struct);
-            }
-            else {
-                execute_struct($struct);
-            }
-        }
+    # Execute the struct
+    else {
+        local $Sidef::PARSER = $parser;
+        execute_struct($struct);
     }
 }
 
@@ -256,64 +233,7 @@ sub optimize_struct {
 
 sub parse_code {
     my ($parser, $code) = @_;
-
-    my $struct = $parser->parse_script(code => \$code);
-
-    # Check for optimization
-    if (defined($args{O})) {
-
-        # Native conversion to Perl code
-        if ($args{O} == 3) {
-
-            #my $sidef_deparser = Sidef::Deparse::Sidef->new(namespaces => [@Sidef::Exec::NAMESPACES]);
-            #my $sidef_code = $sidef_deparser->deparse($struct);
-            #my $new_parser = new_parser(name => $parser->{file_name});
-            #my $new_struct = $new_parser->parse_script(code => \$sidef_code);
-
-            my $deparser = Sidef::Deparse::Perl->new(namespaces => [@Sidef::Exec::NAMESPACES]);
-            my $code = $deparser->deparse($struct);
-            return $code;
-        }
-
-        # Deparse the AST into code, then parse the code again
-        if ($args{O} >= 2) {
-            my $deparser = Sidef::Deparse::Sidef->new(namespaces => [@Sidef::Exec::NAMESPACES]);
-            my $code = $deparser->deparse($struct);
-
-            $struct = Sidef::Parser->new(
-                                         file_name   => $parser->{file_name},
-                                         script_name => $parser->{script_name},
-                                        )->parse_script(code => \$code);
-        }
-
-        # Optimize the AST
-        if ($args{O} >= 1) {
-            $struct = optimize_struct($struct);
-        }
-    }
-
-    return $struct;
-}
-
-sub load_numbers {
-    my ($type) = @_;
-
-    require Sidef::Types::Number::Number;
-    if ($type eq 'fast' or $type eq 'perl') {
-        require Sidef::Types::Number::NumberFast;
-    }
-    elsif ($type eq 'rat') {
-        require Sidef::Types::Number::NumberRat;
-    }
-    elsif ($type eq 'int') {
-        require Sidef::Types::Number::NumberInt;
-    }
-    elsif ($type eq 'big' or $type eq 'float') {
-        ## default
-    }
-    else {
-        die "Invalid value '${type}' for option '-N'!";
-    }
+    scalar $parser->parse_script(code => \$code);
 }
 
 sub load_math_backend {
@@ -328,47 +248,32 @@ sub load_math_backend {
     Math::BigRat->import(lib => $type);
 }
 
-sub unload_numbers {
-    delete @INC{
-        qw(
-          Math/BigInt.pm
-          Math/BigFloat.pm
-          Math/BigRat.pm
-          Sidef/Types/Number/Number.pm
-          Sidef/Types/Number/NumberInt.pm
-          Sidef/Types/Number/NumberFast.pm
-          Sidef/Types/Number/NumberRat.pm
-          )
-    };
-}
-
 sub execute_struct {
-    my ($struct) = @_;
-    Sidef::Types::Block::Code->new($struct)->run;
+    my ($struct, $return) = @_;
+    my $deparser = Sidef::Deparse::Perl->new(namespaces => [@Sidef::NAMESPACES]);
+    local $Sidef::DEPARSER = $deparser;
+    my $code = $deparser->deparse($struct);
+    $return ? eval($code) : do { eval($code); $@ && die $@; exit };
 }
 
 sub output_usage {
     my %switches = (
-                    '-i'             => 'interactive mode',
-                    '-b'             => 'bundle the code as a stand-alone perl program',
-                    '-c'             => 'compile the code as a stand-alone perl program',
-                    '-C'             => 'check syntax only',
-                    '-d ast_file'    => 'load a dumped syntax tree',
-                    '-D'             => 'dump the syntax tree of a program',
-                    '-o output_file' => 'file where to dump the output',
-                    '-E program'     => 'one line of program',
-                    '-H'             => 'interactive help',
-                    '-N type'        => ['use a specific implementation for numbers', 'valid types: fast, big, int, rat'],
-                    '-n type'        => ['try to use a specific backend for Math::BigInt', 'valid types: GMP, Pari, FastCalc'],
-                    '-M type,type'   => ['memoize some expensive method calls', 'valid types: num, str, block, all'],
-                    '-O level'       => ['optimize the syntax-tree of a program', 'valid optimization levels: 0, 1, 2, 3'],
-                    '-s int'         => 'the number of spaces used in code indentation',
-                    '-v'             => 'print version number and exit',
-                    '-t'             => 'treat all command-line arguments as scripts',
-                    '-r'             => 'parse and deparse a Sidef program',
-                    '-R lang'        => ['parse and deparse a Sidef program to a given language', 'valid values: sidef, perl'],
-                    '-w'             => 'enable warnings with stack backtrace',
-                    '-W'             => 'make warnings fatal (with stack backtrace)',
+                    '-i'         => 'interactive mode',
+                    '-c'         => 'compile the code as a stand-alone Perl program',
+                    '-C'         => 'check syntax only',
+                    '-d file'    => 'load a dumped syntax tree',
+                    '-D'         => 'dump the syntax tree of a program',
+                    '-o file'    => 'file where to dump the output',
+                    '-E program' => 'one line of program',
+                    '-H'         => 'interactive help',
+                    '-n type'    => ['try to use a specific backend for Math::BigInt', 'valid types: GMP, Pari, FastCalc'],
+                    '-s int'     => 'the number of spaces used in code indentation',
+                    '-v'         => 'print version number and exit',
+                    '-t'         => 'treat all command-line arguments as scripts',
+                    '-r'         => 'parse and deparse a Sidef program',
+                    '-R lang'    => ['parse and deparse a Sidef program to a given language', 'valid values: sidef, perl'],
+                    '-w'         => 'enable warnings with stack backtrace',
+                    '-W'         => 'make warnings fatal (with stack backtrace)',
                    );
 
     require File::Basename;
@@ -412,12 +317,6 @@ sub help_interactive {
     require File::Basename;
     require File::Spec;
 
-    my %keywords = (
-                    if   => 'Sidef::Types::Bool::If',
-                    '\\' => 'Sidef::Variable::Ref',
-                    '*'  => 'Sidef::Variable::Ref',
-                   );
-
     require Encode;
     require Term::ReadLine;
     my $term = Term::ReadLine->new("$name $version -- help interactive mode");
@@ -450,7 +349,12 @@ HELP
             redo;
         }
 
-        my @refs = exists($keywords{$line}) ? $keywords{$line} : (map { ref($_) } eval { execute_struct($struct) });
+        my @refs = (
+            map { ref($_) } do {
+                local $Sidef::PARSER = $parser;
+                execute_struct($struct, 1);
+              }
+        );
 
         foreach my $ref (@refs) {
             $ref eq '' && do { warn "Not an object!\n"; next };
@@ -473,9 +377,9 @@ HELP
 sub code_interactive {
     require Encode;
     require Term::ReadLine;
+
     my $term = Term::ReadLine->new("$name $version -- interactive mode");
 
-    my $exec = Sidef::Exec->new;
     my $parser = new_parser(name => '-i');
     $parser->{interactive} = 1;
 
@@ -495,7 +399,7 @@ sub code_interactive {
                 local $/;
                 <$fh>;
               }
-              : (Encode::decode_utf8($term->readline('>>> ') // return));
+              : (Encode::decode_utf8($term->readline('>> ') // return));
         };
 
         if ($line eq 'help') {
@@ -540,51 +444,50 @@ EOT
             redo;
         }
 
+        # Remove 'var' declarations (if any)
+        $line =~ s/^\h*var\b\h*//;
+
         $last_line = $line;
 
         my $struct = eval { $parser->parse_script(code => \$line) };
 
         $@ && do {
             warn $@;
-            $parser = new_parser(name => '-i');
-            $parser->{interactive} = 1;
+
+            #  $parser = new_parser(name => '-i');
+            #  $parser->{interactive} = 1;
+
             redo;
         };
 
         if (defined($args{r}) or defined($args{R})) {
-            deparse_structure($struct);
+            output(deparse_structure($struct, $args{R}));
         }
         else {
-            say ref($_) ne 'Sidef::Types::Block::Code' && eval { $_->can('dump') } ? $_->dump : $_
-              for eval { $exec->execute($struct) };
-            print $@ if ($@);
+            my $result = do {
+                local $Sidef::PARSER = $parser;
+                execute_struct($struct, 1);
+            };
+            print $@ if $@;
+            use overload;
+            say "=> ",
+              (
+                  ref($result)
+                ? overload::StrVal($result)
+                      ? "$result"
+                      : eval { $result->can('dump') } ? $result->dump
+                    : $result
+                : $result
+              );
         }
         redo;
     }
 }
 
 sub _get_namespaces {
-    @Sidef::Exec::NAMESPACES
-      ? ('push(@Sidef::Exec::NAMESPACES, ' . join(', ', map { qq{"\Q$_\E"} } @Sidef::Exec::NAMESPACES) . ");\n")
+    @Sidef::NAMESPACES
+      ? ('push(@Sidef::NAMESPACES, ' . join(', ', map { qq{"\Q$_\E"} } @Sidef::NAMESPACES) . ");\n")
       : '';
-}
-
-sub _get_number_modules {
-    my @modules;
-
-    if (defined(my $type = $args{N})) {
-        if ($type eq 'fast' or $type eq 'perl') {
-            push @modules, 'Sidef::Types::Number::NumberFast';
-        }
-        elsif ($type eq 'rat') {
-            push @modules, 'Sidef::Types::Number::NumberRat';
-        }
-        elsif ($type eq 'int') {
-            push @modules, 'Sidef::Types::Number::NumberInt';
-        }
-    }
-
-    return @modules;
 }
 
 sub _get_loaded_modules {
@@ -598,18 +501,17 @@ sub _get_loaded_modules {
 }
 
 sub deparse_structure {
-    my ($struct) = @_;
+    my ($struct, $lang) = @_;
 
-    my $lang = defined($args{R}) ? $args{R} : 'Sidef';
-
+    my $lang   = $lang // 'Sidef';
     my $module = "Sidef::Deparse::\u\L$lang";
     my $pm     = ($module =~ s{::}{/}gr . '.pm');
 
     require $pm;
-    my $deparser = $module->new(namespaces => [@Sidef::Exec::NAMESPACES]);
+    my $deparser = $module->new(namespaces => [@Sidef::NAMESPACES]);
     my $code = $deparser->deparse($struct);
 
-    output($code);
+    return $code;
 }
 
 sub output {
@@ -644,102 +546,12 @@ sub dump_structure {
         print {$out_fh} _get_namespaces();
         print {$out_fh} "use Math::BigFloat;\n";
         print {$out_fh} $requirify->(_get_loaded_modules());
-        print {$out_fh} $requirify->(_get_number_modules());
         print {$out_fh} Data::Dump::pp($struct);
-    }
-}
-
-sub memoize_types {
-    my ($types) = @_;
-
-    my @types =
-      $types eq 'all'
-      ? ()
-      : split(/\s*,\s*/, $types);
-
-    my %known_types;
-    {
-        no strict 'refs';
-
-        # Init
-        $known_types{_init_} = sub {
-            require Memoize;
-        };
-
-        # String methods
-        $known_types{str} = sub {
-            require Sidef::Types::String::String;
-            my $package = 'Sidef::Types::String::String';
-            foreach my $method (qw(new)) {
-                Memoize::memoize($package . '::' . $method);
-            }
-        };
-
-        # Number methods
-        $known_types{num} = sub {
-            require Sidef::Types::Number::Number;
-            my $package = 'Sidef::Types::Number::Number';
-
-            my %ignore;
-            @ignore{
-                qw<
-                  ISA
-                  BEGIN
-                  get_value
-                  __ANON__
-                  GET_PERL_VALUE
-                  >
-            } = ();
-
-            foreach my $method (keys %{$package . '::'}) {
-                next if $method =~ /^\(/;          # skip overload methods
-                next if exists $ignore{$method};
-                Memoize::memoize($package . '::' . $method);
-            }
-        };
-
-        # Block methods
-        $known_types{block} = sub {
-            require Sidef::Types::Block::Code;
-            my $package = 'Sidef::Types::Block::Code';
-            foreach my $method ('call') {
-                Memoize::memoize($package . '::' . $method);
-            }
-        };
-    }
-
-    # Get the valid types
-    my @valid_types = @types
-      ? (
-        grep {
-            exists $known_types{$_} || do {
-                die "Invalid value '$_' for option '-M'!";
-                0;
-              }
-          } @types
-        )
-      : (grep { $_ ne '_init_' } keys %known_types);
-
-    # Init only if we have some valid types
-    if (@valid_types) {
-        $known_types{_init_}->();
-    }
-
-    # Memoize each category
-    foreach my $type (@valid_types) {
-        $known_types{$type}->();
     }
 }
 
 sub compile_to_perl {
     my (%opt) = @_;
-
-    if ($opt{type} == DUMP) {
-        eval { require Data::Dump };
-        if ($@) {
-            die qq{** "Data::Dump" is not installed!\n};
-        }
-    }
 
     require File::Basename;
     my $path = File::Basename::dirname($INC{'Sidef.pm'});
@@ -749,6 +561,8 @@ sub compile_to_perl {
 
 eval 'exec $^X  -S \$0 \${1+"\$@"}'
     if 0; # not running under some shell
+
+use utf8;
 
 binmode STDIN,  ":utf8";
 binmode STDOUT, ":utf8";
@@ -760,9 +574,6 @@ HEAD
 
     if ($opt{type} == NATIVE) {
         $package_content .= "BEGIN { %MODULE = (\n";
-    }
-    else {
-        $package_content .= "%MODULE = (\n";
     }
 
     require File::Find;
@@ -792,20 +603,20 @@ HEAD
 
                  close $fh;
              }
-           }
+         }
         } => $path
     );
 
     $package_content .= <<'FOOT';
 );
 
-sub load_module {
+sub __load_sidef_module__ {
     my ($name) = @_;
     if (not exists $REQ{$name}) {
         my $module = $name =~ s{::}{/}gr . '.pm';
         if (exists $MODULE{$name} and not exists $INC{$module}) {
              if ($MODULE{$name} =~ /^\h*use parent\s+qw\((.*?)\)/sm) {
-                load_module($_) for split(' ', $1);
+                __load_sidef_module__($_) for split(' ', $1);
             }
             $INC{$module} = 1;
             eval($MODULE{$name});
@@ -821,65 +632,18 @@ sub load_module {
 FOOT
 
     my $requirify = sub {
-        join('', map { "load_module('$_');\n" } @_);
+        join('', map { "__load_sidef_module__('$_');\n" } @_);
     };
 
-    if ($opt{type} == DUMP) {
-        $package_content .= "use Math::BigFloat;\n";
-        $package_content .= $requirify->(_get_loaded_modules());
-    }
-    elsif ($opt{type} == BUNDLE) {
-        $package_content .= $requirify->('Sidef', 'Sidef::Parser', 'Sidef::Exec');
-    }
-
-    if ($opt{type} == DUMP or $opt{type} == BUNDLE) {
-        if ((my @num_modules = _get_number_modules())) {
-            $package_content .= $requirify->('Sidef::Types::Number::Number', @num_modules);
-        }
-    }
-
     if ($opt{type} == NATIVE) {
-        $package_content .=
-          $requirify->(_get_loaded_modules(), 'Sidef::Types::Number::Number', 'Sidef::Types::Number::NumberFast');
+        $package_content .= $requirify->(_get_loaded_modules());
         $package_content .= "}\n\n";
     }
 
     my $out_fh = output('');
     print {$out_fh} $package_content;
 
-    if ($opt{type} == DUMP) {
-        print {$out_fh} _get_namespaces;
-        print {$out_fh} "\nmy \$struct = ";
-        print {$out_fh} Data::Dump::pp($opt{ast});
-        print {$out_fh} ";\n";
-
-    }
-    elsif ($opt{type} == BUNDLE) {
-        print {$out_fh} <<"EOT"
-
-chomp(my \$code = <<'~/////////////////END-OF-CODE/////////////////~');
-$opt{code}
-~/////////////////END-OF-CODE/////////////////~
-
-my \$parser = Sidef::Parser->new(file_name   => "\Q$opt{script_name}\E",
-                                script_name => "\Q$opt{script_name}\E",);
-
-my \$struct = \$parser->parse_script(code => \\\$code);
-EOT
-
-    }
-    elsif ($opt{type} == NATIVE) {
+    if ($opt{type} == NATIVE) {
         print {$out_fh} $opt{code};
-    }
-
-    if ($opt{type} == DUMP or $opt{type} == BUNDLE) {
-        print {$out_fh} <<"EXEC";
-
-#
-## Execute the data structure
-#
-
-Sidef::Exec->new->execute(\$struct);
-EXEC
     }
 }

@@ -1,0 +1,39 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/One-dimensional_cellular_automata
+#
+
+class Automaton(rule, cells) {
+
+    method init {
+        rule = sprintf("%08b", rule).split(1).map{.to_i}.reverse;
+    }
+
+    method next {
+        var previous = cells.map{_};
+        var len = previous.len;
+        cells = [rule.@[
+                previous.range.map { |i|
+                    4*previous[i-1 % len] +
+                    2*previous[i]         +
+                      previous[i+1 % len]
+                }]
+            ];
+    }
+
+    method to_str {
+        cells.map { _ ? '#' : ' ' }.join('');
+    }
+}
+
+var size = 10;
+var auto = Automaton(
+    104,
+    [(size/2).of(0), '111011010101'.chars, (size/2).of(0)].reduce('+'),
+);
+
+size.times {
+    say "|#{auto}|";
+    auto.next;
+};

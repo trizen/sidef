@@ -1,0 +1,21 @@
+#!/usr/bin/ruby
+
+false
+    && ("This should not be printed".say);              # not printed
+
+
+true
+    && false
+        && ("Error!".say);                              # not printed
+
+(false || false || true) == true || die "Bool error!\n";
+
+while (false) {
+    die "While error!\n";
+}
+
+true
+    && true
+        && ("** Test passed!".say)                      # printed
+            && false
+                && ("But failed at the end!".say);      # not printed

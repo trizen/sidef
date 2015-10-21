@@ -1,15 +1,9 @@
 #!/usr/bin/ruby
 
-# http://rosettacode.org/wiki/Ackermann_function
-
 func A(m, n) {
     m == 0 ? (n + 1)
-           : (n == 0 ? A(m - 1, 1)
-                     : A(m - 1, A(m, n - 1)));
-}
+           : (n == 0 ? (A(m - 1, 1))
+                     : (A(m - 1, A(m, n - 1))));
+};
 
-A(1,4) == 6  || "Error 1!".die;
-A(2,3) == 9  || "Error 2!".die;
-A(3,2) == 29 || "Error 3!".die;
-
-"Test passed!".say;
+say A(3, 2);     # prints: 29

@@ -1,8 +1,0 @@
-#!/usr/bin/ruby
-
-include (Module::Fib, Module::Fact);
-
-Module::Fib::fibonacci(10) == 55 || "error fib".die;
-Module::Fact::factorial(4) == 24 || "error fact".die;
-
-say "Test passed!";

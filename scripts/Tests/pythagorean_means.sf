@@ -1,0 +1,12 @@
+#!/usr/bin/ruby
+
+# Translation of: http://rosettacode.org/wiki/Averages/Pythagorean_means#Perl_6
+
+func A(a) { a«+» / a.len };
+func G(a) { a«*» ** 1/a.len };
+func H(a) { a «/« 1 «+» / a.len ** -1 };
+
+static ints = 1..10;
+say("A(1,...,10) = ", A(ints));
+say("G(1,...,10) = ", G(ints));
+say("H(1,...,10) = ", H(ints));

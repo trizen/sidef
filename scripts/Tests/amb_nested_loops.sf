@@ -1,0 +1,33 @@
+#!/usr/bin/ruby
+
+var code = { |*arr|
+    var words = arr.map {|item| Perl.to_sidef(item) };
+
+    var chr = words[0].last;
+    words.ft(1).each { |word|
+        word.first == chr || goto :END;
+        chr = word.last;
+    }
+
+    words.join(" ").say;
+    @:END;
+};
+
+func main () {
+
+    var alg = (
+        try   { frequire 'Algorithm::Loops' }
+        catch { STDERR.print("** Algorithm::Loops is not installed!\n"); return }
+    );
+
+    var array = [
+        %w'the that a',
+        %w'frog elephant thing',
+        %w'walked treaded grows',
+        %w'slowly quickly',
+    ];
+
+    alg.NestedLoops(array, code);
+}
+
+main();

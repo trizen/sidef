@@ -1,0 +1,33 @@
+
+=encoding utf8
+
+=head1 NAME
+
+Sidef::Types::Block::While
+
+=head1 DESCRIPTION
+
+This object is ...
+
+=head1 SYNOPSIS
+
+var obj = While.new(...);
+
+=head1 METHODS
+
+
+=head2 new
+
+While.new() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 while
+
+While.while() -> I<Obj>
+
+Return the
+
+=cut

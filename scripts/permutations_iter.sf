@@ -1,0 +1,23 @@
+#!/usr/bin/ruby
+
+func permutations(callback, arr) {
+    var end = arr.end;
+    var idx = 0..end;
+
+    loop {
+        callback([arr.@[idx]]);
+
+        var p = end;
+        while (idx[p-1] > idx[p]) {p--};
+        p == 0 && return;
+
+        var d = p;
+        idx += idx.splice(p).reverse;
+
+        while (idx[p-1] > idx[d]) {d++};
+        idx[p-1, d] = idx[d, p-1];
+    }
+}
+
+var list = [1,2,3];
+permutations({|set| say set.join }, list);

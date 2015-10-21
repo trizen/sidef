@@ -1,0 +1,33 @@
+#!/usr/bin/ruby
+
+# Translation of: http://rosettacode.org/wiki/9_billion_names_of_God_the_integer#Python
+
+var cache = [[1]];
+
+func cumu (n) {
+    cache.len ... n -> each { |l|
+        var r = [0];
+        { |i|
+            r.append(r[-1] + cache[l-i][[i, l-i].min])
+        } * l;
+        cache.append(r);
+    }
+
+    return(cache[n]);
+}
+
+func row (n) {
+    var r = cumu(n);
+    return (n-1 -> range.map{|i| r[i+1] - r[i] });
+}
+
+"rows:".say;
+{ |i|
+    "%2d: %s\n".printf(i, row(i).dump);
+} * 10;
+
+"\nsums:".say;
+
+[2, 5, 23, 32].each { |i|
+    "%2d : %4d\n".printf(i, (cumu(i))[-1]);
+}

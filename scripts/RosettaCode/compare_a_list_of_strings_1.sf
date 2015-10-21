@@ -1,0 +1,10 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Compare_a_list_of_strings
+#
+
+var arr = [1,2,3,4,5];
+
+say (arr.unique.len == 1);    # all equal?
+say (arr == arr.sort);        # sorted?

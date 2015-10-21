@@ -1,0 +1,22 @@
+#!/usr/bin/ruby
+
+# What is the index of the first term in the Fibonacci sequence to contain 1000 digits?
+
+# https://projecteuler.net/problem=25
+
+# Answer: 4782
+
+func fib_n_digits(n) {
+    var (f1, f2) = (1, 1);
+
+    var i = 2;
+    loop {
+        (f1, f2) = (f2, f1+f2)
+        if (f2.length == n) {
+            return i+1;
+        }
+        ++i
+    }
+}
+
+say fib_n_digits(1000);

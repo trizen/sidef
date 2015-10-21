@@ -1,0 +1,9 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Concurrent_computing
+#
+
+<Enjoy Rosetta Code>
+    -> map{|str| {say str}.fork }
+    -> map{|thr| thr.wait };

@@ -5,7 +5,7 @@ func matrix_multi(a, b) {
     a.range.each { |r|
         b.first.range.each { |c|
             b.range.each { |i|
-                m[r][c] := 0 += (a[r][i] * b[i][c]);
+                m[r][c] \\= 0 += (a[r][i] * b[i][c]);
             }
         }
     };

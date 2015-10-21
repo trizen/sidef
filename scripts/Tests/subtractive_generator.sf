@@ -1,0 +1,38 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Subtractive_generator
+#
+
+class SubRandom(seed, state=[]) {
+
+    const mod = 1_000_000_000;
+
+    method init {
+        var s = [seed % mod, 1];
+        53.times {
+            s.append((s[-2] - s[-1]) % mod);
+        };
+        state = range(s).map {|i| s[(34 + 34*i) % 55] };
+        range(55, 219).each { self.subrand };
+    }
+
+    method subrand {
+        var x = ((state.shift - state[-24]) % mod);
+        state.append(x);
+        return x;
+    }
+}
+
+## Tests
+var r1 = SubRandom(292929);
+assert_eq(r1.subrand, 467478574);
+
+var r2 = SubRandom(123456);
+assert_eq(r2.subrand, 53516807);
+assert_eq(r2.subrand, 810719496);
+assert_eq(r1.subrand, 512932792);
+assert_eq(r1.subrand, 539453717);
+assert_eq(r2.subrand, 781070541);
+
+say "** Test passed!";

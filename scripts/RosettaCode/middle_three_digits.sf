@@ -1,0 +1,19 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Middle_three_digits
+#
+
+func middle_three(n) {
+  var s = n.to_i.abs.to_s;
+  var l = s.len;
+  if (l < 3)        { "#{n} is too short" }
+  elsif (l.is_even) { "#{n} has an even number of digits" }
+  else              { "The three middle digits of #{n} are: " + s.substr(l-3 / 2, 3) }
+}
+
+var nums = %n(
+    123 12345 1234567 987654321 10001 -10001 -123 -100 100 -12345
+    1 2 -1 -10 2002 -2002 0
+);
+nums.each { say middle_three(_) };

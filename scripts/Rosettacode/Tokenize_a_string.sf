@@ -1,7 +1,0 @@
-#!/usr/bin/ruby
-
-#
-## http://rosettacode.org/wiki/Tokenize_a_string
-#
-
-'Hello,How,Are,You,Today'.split(',').join('.').say;

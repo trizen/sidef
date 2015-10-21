@@ -14,10 +14,9 @@ my $builder = Module::Build->new(
     module_name => 'Sidef',
     license     => 'perl',
     dist_author => [
-                        q{Daniel Șuteu   (<trizenx@gmail.com>)},
-                        q{Ioana Fălcușan (<ioanaflavia@gmail.com>)},
+                     q{Daniel Șuteu   (<trizenx@gmail.com>)},
+                     q{Ioana Fălcușan (<ioanaflavia@gmail.com>)},
                    ],
-
     dist_version_from  => 'lib/Sidef.pm',
     dist_abstract      => 'The Sidef Programming Language',
     release_status     => 'stable',
@@ -29,15 +28,16 @@ my $builder = Module::Build->new(
                       },
 
     requires => {
-                 'perl'           => '5.14.0',
+                 'perl'           => '5.16.1',
                  'utf8'           => 0,
+                 'Memoize'        => 0,
                  'Cwd'            => 0,
                  'File::Spec'     => 0,
                  'File::Path'     => 0,
                  'File::Copy'     => 0,
                  'File::Find'     => 0,
                  'File::Basename' => 0,
-                 'List::Util'     => 0,
+                 'List::Util'     => 1.33,
                  'Math::BigInt'   => 0,
                  'Math::BigRat'   => 0,
                  'Math::BigFloat' => 0,
@@ -62,19 +62,12 @@ my $builder = Module::Build->new(
                                      },
                         },
 
-        memoization_support => {
-                                description => "Cache some expensive method calls to improve performance. (-M)",
-                                requires    => {
-                                             'Memoize' => 0,
-                                            },
-                               },
-
-        stack_backtrace_support => {
-                                    description => "Dump the full stack backtrace on errors. (-w, -W)",
-                                    requires    => {
-                                                 'Carp' => 0,
-                                                },
-                                   },
+        GMP_support => {
+                        description => "Faster numerical computation, using the GMP library",
+                        requires    => {
+                                     'Math::BigInt::GMP' => 0,
+                                    }
+                       },
                      },
 
     add_to_cleanup     => ['Sidef-*'],

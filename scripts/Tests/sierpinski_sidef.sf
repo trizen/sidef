@@ -1,0 +1,87 @@
+#!/usr/bin/ruby
+
+class Sierpinski {
+
+    #   **
+    # * * *
+    #  **
+    method letter_s(n) {
+        var c = ['*'];
+        {
+            c = (c.map{|x| ' '.times(x.len*2) + x*2 + ' '.times(x.len*1)   } +
+                 c.map{|x| x + ' '.times(x.len) + x + ' '.times(x.len) + x } +
+                 c.map{|x| ' '.times(x.len*1) + x*2 + ' '.times(x.len*2)   }
+                );
+        } * n;
+        return c;
+    }
+
+    # *
+    # *
+    # *
+    method letter_i(n) {
+        var c = ['*'];
+        { |i|
+            c = (c.map{|x| x*i } +
+                 c.map{|x| x*i } +
+                 c.map{|x| x*i }
+                );
+        } * n;
+        return c;
+    }
+
+    # *
+    # **
+    # ***
+    method letter_d(n) {
+        var c = ['*'];
+        {
+            c = (c.map{|x| x*1 + ' '.times(x.len*2) } +
+                 c.map{|x| x*2 + ' '.times(x.len*1) } +
+                 c.map{|x| x*3                      }
+                );
+        } * n;
+        return c;
+    }
+
+    # ***
+    # **
+    # ***
+    method letter_e(n) {
+        var c = ['*'];
+        {
+            c = (c.map{|x| x*3                    } +
+                 c.map{|x| x*2 + ' '.times(x.len) } +
+                 c.map{|x| x*3                    }
+                );
+        } * n;
+        return c;
+    }
+
+    # ***
+    # **
+    # *
+    method letter_f(n) {
+        var c = ['*'];
+        {
+            c = (c.map{|x| x*3                      } +
+                 c.map{|x| x*2 + ' '.times(x.len*1) } +
+                 c.map{|x| x*1 + ' '.times(x.len*2) }
+                );
+        } * n;
+        return c;
+    }
+}
+
+var size = 2;
+var ski = Sierpinski();
+var str = "sidef";
+
+var chars = [];
+str.each { |char|
+    chars.append(ski.('letter_' + char)(size));
+}
+
+var marry = MultiArr.new;
+chars.each {|line| marry.append(line) };
+marry.each { |*a| say a.join('   ') };

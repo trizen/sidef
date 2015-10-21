@@ -1,0 +1,15 @@
+#!/usr/bin/ruby
+
+# gather/take construct
+
+func fib(n) {
+    var arr = gather {
+        take(n <= 1 ? n : fib(n-1)+fib(n-2));
+    };
+
+    return arr[0];
+}
+
+assert_eq(144, fib(12));
+
+say "** Test passed!";

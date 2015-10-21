@@ -361,12 +361,12 @@ package Sidef::Types::Glob::File {
         my $fh_obj  = Sidef::Types::Glob::FileHandle->new(fh => $fh, self => $self);
 
         if (defined $fh_ref) {
-            $fh_ref->get_var->set_value($fh_obj);
+            ${$fh_ref} = $fh_obj;
 
             return $success
               ? Sidef::Types::Bool::Bool->true
               : do {
-                defined($err_ref) && $err_ref->get_var->set_value(Sidef::Types::String::String->new($error));
+                defined($err_ref) && do { ${$err_ref} = Sidef::Types::String::String->new($error) };
                 Sidef::Types::Bool::Bool->false;
               };
         }
@@ -413,7 +413,7 @@ package Sidef::Types::Glob::File {
         my $success = sysopen(my $fh, $self->get_value, $mode->get_value, defined($perm) ? $perm->get_value : 0666);
 
         if ($success) {
-            $var_ref->get_var->set_value(Sidef::Types::Glob::FileHandle->new(fh => $fh, self => $self));
+            ${$var_ref} = Sidef::Types::Glob::FileHandle->new(fh => $fh, self => $self);
         }
 
         Sidef::Types::Bool::Bool->new($success);

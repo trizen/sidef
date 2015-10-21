@@ -16,25 +16,9 @@ var obj = Gather.new(...);
 =head1 METHODS
 
 
-=head2 gather
-
-Gather.gather() -> I<Obj>
-
-Return the
-
-=cut
-
 =head2 new
 
 Gather.new() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 take
-
-Gather.take() -> I<Obj>
 
 Return the
 

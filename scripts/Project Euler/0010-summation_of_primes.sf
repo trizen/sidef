@@ -1,0 +1,20 @@
+#!/usr/bin/ruby
+
+# The sum of the primes below 10 is 2 + 3 + 5 + 7 = 17.
+# Find the sum of all the primes below two million.
+
+# https://projecteuler.net/problem=10
+
+var nt = frequire('ntheory');
+
+func sum_primes(limit) {
+    var sum = 0;
+    limit.times { |i|
+        if (nt.is_prime(i)) {
+            sum += i;
+        }
+    };
+    return sum;
+}
+
+say sum_primes(2e6);

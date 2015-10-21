@@ -1,0 +1,10 @@
+
+#
+## Memoize functions and methods
+#
+
+require 'Memoize';
+
+func memoize(f) {
+    *f = Block.new(%S'Memoize'.memoize((*f){:code}));
+}

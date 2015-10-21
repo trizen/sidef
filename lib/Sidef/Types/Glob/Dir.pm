@@ -130,12 +130,12 @@ package Sidef::Types::Glob::Dir {
         my $dir_obj = Sidef::Types::Glob::DirHandle->new(dir_h => $dir_h, dir => $self);
 
         if (defined $fh_ref) {
-            $fh_ref->get_var->set_value($dir_obj);
+            ${$fh_ref} = $dir_obj;
 
             return $success
               ? Sidef::Types::Bool::Bool->true
               : do {
-                defined($err_ref) && $err_ref->get_var->set_value(Sidef::Types::String::String->new($error));
+                defined($err_ref) && do { ${$err_ref} = Sidef::Types::String::String->new($error) };
                 Sidef::Types::Bool::Bool->false;
               };
         }

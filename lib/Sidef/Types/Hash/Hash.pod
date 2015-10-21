@@ -19,6 +19,7 @@ var obj = Hash.new(...);
 Inherits methods from:
 
 	* Sidef::Object::Object
+	* Sidef::Convert::Convert
 
 =head1 METHODS
 
@@ -60,16 +61,6 @@ I<Obj> B<==> I<Obj> -> I<Obj>
 Return the
 
 Aliases: I<eq>
-
-=cut
-
-=head2 ===
-
-I<Obj> B<===> I<Obj> -> I<Obj>
-
-Return the
-
-Aliases: I<duplicate_of>
 
 =cut
 
@@ -131,7 +122,7 @@ Hash.each() -> I<Obj>
 
 Return the
 
-Aliases: I<bcall>, I<each_pair>
+Aliases: I<each_pair>
 
 =cut
 
@@ -169,14 +160,6 @@ Return the
 
 =cut
 
-=head2 get
-
-Hash.get() -> I<Obj>
-
-Return the
-
-=cut
-
 =head2 grep
 
 Hash.grep() -> I<Obj>
@@ -184,6 +167,22 @@ Hash.grep() -> I<Obj>
 Return the
 
 Aliases: I<select>
+
+=cut
+
+=head2 item
+
+Hash.item() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 items
+
+Hash.items() -> I<Obj>
+
+Return the
 
 =cut
 
@@ -216,6 +215,22 @@ Return the
 =head2 merge_values
 
 Hash.merge_values() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 same_keys
+
+Hash.same_keys() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 slice
+
+Hash.slice() -> I<Obj>
 
 Return the
 

@@ -1,0 +1,26 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Sorting_algorithms/Shell_sort
+#
+
+func shell_sort(a) {
+    var h = a.len;
+    while (h = (h / 2 -> int)) {
+        range(h, a.end).each { |i|
+            var k = a[i];
+            var j;
+            for (j = i; (j >= h) && (k < a[j - h]); j -= h) {
+                a[j] = a[j - h];
+            }
+            a[j] = k;
+        }
+    }
+    return a;
+}
+ 
+var numbers = [7,6,5,9,8,4,3,1,2,0];
+say shell_sort(numbers);
+ 
+var strs = ["John", "Kate", "Zerg", "Alice", "Joe", "Jane"];
+say shell_sort(strs);

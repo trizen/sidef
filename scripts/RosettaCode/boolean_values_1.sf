@@ -1,0 +1,11 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Boolean_values
+#
+
+if (0 || "0" || false || nil || "" || [] || :()) {
+    say "true"
+} else {
+    say "false";
+}

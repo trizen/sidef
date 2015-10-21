@@ -1,0 +1,19 @@
+#!/usr/bin/ruby
+
+#
+## Creating an hash from two arrays
+#
+
+var keys = ["a", "b", "c"];
+var vals = [1, 2, 3];
+
+var hash = Hash.new;
+hash.@{keys} = @vals;          # mapping keys and vals into hash
+
+assert_eq(hash{:a}, 1);
+assert_eq(hash{:c}, 3);
+
+assert_eq([hash{:a, :b}], [1,2]);
+assert_eq([hash.@{keys}], vals);
+
+say "** Test passed!";

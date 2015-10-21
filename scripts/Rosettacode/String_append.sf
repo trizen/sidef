@@ -1,9 +1,0 @@
-#!/usr/bin/ruby
-
-#
-## http://rosettacode.org/wiki/String_append
-#
-
-var str = 'Foo';
-str += 'bar';
-say str;

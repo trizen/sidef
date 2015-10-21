@@ -9,17 +9,15 @@ package Sidef::Types::Byte::Bytes {
 
     sub new {
         my (undef, @bytes) = @_;
-        bless [@{Sidef::Types::Array::Array->new(@bytes)}], __PACKAGE__;
+        bless \@bytes, __PACKAGE__;
     }
 
     sub call {
         my ($self, @strings) = @_;
         my $string = CORE::join('', @strings);
-        my @bytes = do {
-            use bytes;
-            map { Sidef::Types::Byte::Byte->new(CORE::ord bytes::substr($string, $_, 1)) } 0 .. bytes::length($string) - 1;
-        };
-        $self->new(@bytes);
+        state $x = require bytes;
+        $self->new(map { Sidef::Types::Byte::Byte->new(CORE::ord bytes::substr($string, $_, 1)) }
+                   0 .. bytes::length($string) - 1);
     }
 
     sub join {
@@ -27,7 +25,7 @@ package Sidef::Types::Byte::Bytes {
         state $x = require Encode;
         Sidef::Types::String::String->new(
             eval {
-                Encode::decode_utf8(CORE::join('', map { CORE::chr($_->get_value) } @{$self}));
+                Encode::decode_utf8(CORE::join('', map { CORE::chr($_) } @{$self}));
               } // return
         );
     }
@@ -38,15 +36,14 @@ package Sidef::Types::Byte::Bytes {
         $encoding = defined($encoding) ? $encoding->get_value : 'UTF-8';
         Sidef::Types::String::String->new(
             eval {
-                Encode::decode($encoding, CORE::join('', map { CORE::chr($_->get_value) } @{$self}));
+                Encode::decode($encoding, CORE::join('', map { CORE::chr($_) } @{$self}));
               } // return
         );
     }
 
     sub dump {
         my ($self) = @_;
-        Sidef::Types::String::String->new(
-                                       'Bytes.new(' . CORE::join(', ', map { $_->get_value->dump->get_value } @{$self}) . ')');
+        Sidef::Types::String::String->new('Bytes.new(' . CORE::join(', ', map { $_->dump->get_value } @{$self}) . ')');
     }
 };
 

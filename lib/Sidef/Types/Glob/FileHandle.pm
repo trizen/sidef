@@ -83,16 +83,14 @@ package Sidef::Types::Glob::FileHandle {
     sub read {
         my ($self, $var_ref, $length, $offset) = @_;
 
-        my $var = $var_ref->get_var;
-        my $chunk = $var->get_value->get_value // '';
-
+        my $chunk = ref(${$var_ref}) ? ${$var_ref}->get_value : '';
         my $size = Sidef::Types::Number::Number->new(
                                                      defined($offset)
                                                      ? CORE::read($self->{fh}, $chunk, $length->get_value, $offset->get_value)
                                                      : CORE::read($self->{fh}, $chunk, $length->get_value)
                                                     );
 
-        $var->set_value(Sidef::Types::String::String->new($chunk));
+        ${$var_ref} = Sidef::Types::String::String->new($chunk);
 
         return $size;
     }
@@ -100,16 +98,14 @@ package Sidef::Types::Glob::FileHandle {
     sub sysread {
         my ($self, $var_ref, $length, $offset) = @_;
 
-        my $var = $var_ref->get_var;
-        my $chunk = $var->get_value->get_value // '';
-
+        my $chunk = ref(${$var_ref}) ? ${$var_ref}->get_value : '';
         my $size = Sidef::Types::Number::Number->new(
                                                    defined($offset)
                                                    ? CORE::sysread($self->{fh}, $chunk, $length->get_value, $offset->get_value)
                                                    : CORE::sysread($self->{fh}, $chunk, $length->get_value)
         );
 
-        $var->set_value(Sidef::Types::String::String->new($chunk));
+        ${$var_ref} = Sidef::Types::String::String->new($chunk);
 
         return $size;
     }
@@ -128,8 +124,8 @@ package Sidef::Types::Glob::FileHandle {
         my ($self, $var_ref) = @_;
 
         if (defined $var_ref) {
-            $var_ref->get_var->set_value(
-                     Sidef::Types::String::String->new(CORE::readline($self->{fh}) // return Sidef::Types::Bool::Bool->false));
+            ${$var_ref} =
+              (Sidef::Types::String::String->new(CORE::readline($self->{fh}) // return Sidef::Types::Bool::Bool->false));
             return Sidef::Types::Bool::Bool->true;
         }
 
@@ -146,7 +142,7 @@ package Sidef::Types::Glob::FileHandle {
 
         my $char = getc($self->{fh});
         defined($char)
-          ? Sidef::Types::Char::Char->new($char)
+          ? Sidef::Types::String::String->new($char)
           : ();
     }
 
@@ -273,7 +269,12 @@ package Sidef::Types::Glob::FileHandle {
 
     sub read_to {
         my ($self, $var_ref) = @_;
-        $var_ref->get_var->set_value(Sidef::Types::String::String->new(unpack 'A*', scalar CORE::readline($self->{fh})));
+        ${$var_ref} = Sidef::Types::String::String->new(
+            do {
+                chomp(my $line = CORE::readline($self->{fh}));
+                $line;
+              }
+        );
         $self;
     }
 

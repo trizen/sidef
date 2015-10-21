@@ -1,0 +1,17 @@
+#!/usr/bin/ruby
+
+# What is the millionth lexicographic permutation of the digits 0, 1, 2, 3, 4, 5, 6, 7, 8 and 9?
+
+# https://projecteuler.net/problem=24
+
+# Answer: 2783915460
+
+var i = 0;
+var arr = 0..9;
+
+arr.permutations { |p|
+    if (++i == 1e6) {
+        say p.join;
+        break;
+    }
+}

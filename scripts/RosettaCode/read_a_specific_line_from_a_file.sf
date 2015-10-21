@@ -1,0 +1,17 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Read_a_specific_line_from_a_file
+#
+
+func getNthLine(filename, n) {
+  var file = File.new(filename);
+  file.open_r.each { |line|
+     Num($.) == n && return line;
+  };
+  Sys.warn("file #{file} does not have #{n} lines, only #{Num($.)}\n");
+  return nil;
+}
+ 
+var wantedLine = getNthLine("/etc/passwd", 7);
+defined(wantedLine) && print wantedLine;

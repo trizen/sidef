@@ -1,0 +1,108 @@
+#!/usr/bin/ruby
+
+#
+## %w() with comments and space-escapes
+#
+
+var array = %w(
+    a b c
+    hello\ world       # space escaped
+    value(i)           # this is a comment
+    \#not_a_comment
+);
+
+
+array == [
+    'a', 'b', 'c',
+    'hello world',
+    'value(i)',
+    '#not_a_comment'
+] || (
+    "%w() error!\n".die
+);
+
+#
+## Double quoted words
+#
+
+%W <
+    tab:\t
+    newline:\n
+    not\ a\ new_line!:\\n
+> == [
+    "tab:\t",
+    "newline:\n",
+    'not a new_line!:\n'
+] || (
+    "%W<> error!\n".die
+);
+
+#
+## Balanced and escaped delimiter
+#
+
+var single_q = %q «Single quo\ted s«tr»ing: Escaping: \\\««\»» \»\» »;
+
+single_q == 'Single quo\ted s«tr»ing: Escaping: \««»» »» '
+    || ("%q«» error!\n".die);
+
+#
+## Escaped unary delimited
+#
+
+single_q = %q~hello\~world~;
+
+single_q == 'hello~world'
+    || ("%q~~ error!\n".die);
+
+
+#
+## Backslash delimiter (q\\)
+#
+
+var double_q = %Q\#not a comment\;
+
+double_q == '#not a comment'
+    || ("%Q\\\\ error!\n".die);
+
+
+#
+## Balanced brackets
+#
+
+%q{g\~o{{\}\{\}{\{}}\\}o\}\{{da\}g}le} ==
+ 'g\~o{{}{}{{}}\}o}{{da}g}le'        || ("%q{} error!".die);
+
+
+#
+## Real-quote delimiter
+#
+
+„test\n” == "test\n"
+    || ("„” error!\n".die);
+
+#
+## Unescaping
+#
+
+double_q = %Q „tab:\t -- not a tab: \\t”;
+double_q == ('tab:' + "\t" + ' -- not a tab: \\t')
+    || ("%Q„” error!\n".die);
+
+var str = 'h€ll©';
+%B"#{str}".join == 'h€ll©'      || die "%B() error";
+%B"#{str}" == str.to_bytes      || die "%B() conversion error";
+%B'ab#{str}'.join == "ab#{str}" || die "%B() ab-pre error";
+%B'#{str}cd'.join == "#{str}cd" || die "%B() cd-post error";
+%B«literal».join == "literal"   || die "%B() literal error";
+%B(h€ll©).join == str           || die "%B() unicode literal error";
+%C"x=#{1+2};".join == %(x=3;)   || die "%C() error";
+%C"blah" == "blah".to_chars     || die "%C() conversion error";
+
+%C"blah=#{'a'+'b' -> uc}".join == 'blah=AB'      || die "%C() complex error";
+%D"#{Dir.root}home" == Dir.root.concat(%d(home)) || die "%D() error";
+%b(Copyright © 2014) == %B(Copyright © 2014)     || die "%b() <=> %B() error";
+%b(copy-©-).join == 'copy-©-'                    || die "%b() join error";
+%C"#{str}".join == str                           || die "%C() str error";
+
+say "** All tests passed!";

@@ -1,0 +1,120 @@
+#!/usr/bin/ruby
+
+var s = "something";
+var ref_s = (\s);     # 'ref_s' points to var 's'
+*ref_s->say;          # prints "something"
+*ref_s = "else";      # changes the 's' variable
+s.say;                # prints "else"
+
+'-' * 80 -> say;
+
+####################################
+
+var ref_x = (\var x);
+
+x = "Changed x";
+*ref_x->say;
+
+var y = (\ref_x);
+*(*y) = "Changed y (ref of ref)";
+x.say;
+
+*ref_x = "Changed ref_x";
+x.say;
+
+####################################
+
+var text = "Changed x again";
+
+x = text;
+*ref_x->say;
+
+'-' * 80 -> say;
+
+"** Checking y...".say;
+*(*y) == text
+    ? ("** Passed.".say)
+    : ("** Failed!".say);
+
+'-' * 80 -> say;
+
+
+###################################
+
+{
+    var values = ["Hello", "Perl5", "World"];
+
+    [\var x, \var y, \var z].map {
+        *_ = (values.shift);
+    };
+
+    x.say;
+    y.say;
+    z.say;
+
+}.run;
+
+'-' * 80 -> say;
+
+###################################
+
+{
+    func assign2ref (ref, value) {
+        *ref = value;
+        return(ref);
+    }
+
+    var name;
+
+    var name_ref = (assign2ref(\name, "Carl"));
+    *name_ref->say;
+
+    assign2ref(\name, "John");
+    "Assigned name: " + name -> say;
+
+}.run;
+
+
+#
+## More testing
+#
+
+{
+    func is(a, b) {
+        a == b || die "#{a} != #{b}";
+    }
+
+    class Test(hello) {
+        method changeTo(arg) {
+            var ref = \self.hello;
+            say *ref;
+            *ref = "x";
+            is(self.hello, "x");
+            *ref = arg;
+            self.hello;
+        }
+    }
+
+    var obj = Test(42);
+    is(obj.hello, 42);
+
+    is(obj.changeTo(15), 15);
+    is(obj.hello, 15);
+
+    var r = \obj.hello;
+    *r += 23;
+
+    is(*r, 38);
+    is(obj.hello, 38);
+
+    obj.hello = 44;
+    is(*r, 44);
+    is(obj.hello, 44);
+
+    var value = 12;
+    var rv = \value;
+    *rv = 20;
+    is(*rv, value);
+    is(*rv, 20);
+    is(20, value);
+}.run;

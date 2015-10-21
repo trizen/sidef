@@ -2,10 +2,11 @@
 
 var inet = require 'IO::Socket::INET';
 
-var sock = inet.new( LocalAddr => "127.0.0.1:8080",
-                     Listen    => 1,
-                     Reuse     => 1,
-            );
+var sock = inet.new(
+                LocalAddr => "127.0.0.1:8080",
+                Listen    => 1,
+                Reuse     => 1,
+        );
 
 while (var client = sock.accept) {
     client.print ("HTTP/1.1 200 OK\r\n" +

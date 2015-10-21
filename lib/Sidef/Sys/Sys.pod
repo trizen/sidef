@@ -7,13 +7,21 @@ Sidef::Sys::Sys
 
 =head1 DESCRIPTION
 
-This object provides some methods related to the Sidef working system.
+This object is ...
 
 =head1 SYNOPSIS
 
-    Sys.method(arg)
+var obj = Sys.new(...);
+
+
+=head1 INHERITS
+
+Inherits methods from:
+
+	* Sidef::Object::Object
 
 =head1 METHODS
+
 
 =head2 alarm
 
@@ -55,6 +63,14 @@ Return the
 
 =cut
 
+=head2 class_name
+
+Sys.class_name() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 copy
 
 Sys.copy() -> I<Obj>
@@ -62,6 +78,14 @@ Sys.copy() -> I<Obj>
 Return the
 
 Aliases: I<clone>
+
+=cut
+
+=head2 defined
+
+Sys.defined() -> I<Obj>
+
+Return the
 
 =cut
 
@@ -91,15 +115,11 @@ Return the
 
 =cut
 
-
 =head2 exit
 
-Sys.exit(I<Number>)
+Sys.exit() -> I<Obj>
 
-Exit the main program with a given code. If no argument is specified, the code 0 (SUCCESS) is assumed.
-
-    Sys.exit(0)     # exit with success
-    Sys.exit(-1)    # exit with some error
+Return the
 
 =cut
 
@@ -321,13 +341,9 @@ Return the
 
 =head2 print
 
-Sys.print(I<obj1>, I<obj2>, I<...>) -> I<Bool>
+Sys.print() -> I<Obj>
 
-Print a list of argument to the standard output (STDOUT). Returns true on success.
-
-    Sys.print("hello", "-", "world");
-
-Returns an object of type: C<Sidef::Types::Bool::Bool>
+Return the
 
 =cut
 
@@ -341,13 +357,9 @@ Return the
 
 =head2 printh
 
-Sys.printh(I<handle>, I<obj1>, I<obj2>, I<...>) -> I<Bool>
+Sys.printh() -> I<Obj>
 
-Print a list of argument into a handle object. The handle object can be of type GLOB or anyother handle which has the I<print> method. Returns true on success.
-
-    Sys.printh(STDERR, "This is a warning!\n");
-
-Returns an object of type: C<Sidef::Types::Bool::Bool>
+Return the
 
 =cut
 
@@ -487,13 +499,9 @@ Return the
 
 =head2 sidef
 
-Sys.sidef() -> I<String>
+Sys.sidef() -> I<Obj>
 
-Return the full path of the 'sidef' main program.
-
-    Sys.sidef   # under Linux, normally is '/usr/bin/sidef'
-
-Returns an object of type: C<Sidef::Types::String::String>
+Return the
 
 =cut
 

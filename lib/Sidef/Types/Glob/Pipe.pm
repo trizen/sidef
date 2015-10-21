@@ -20,7 +20,7 @@ package Sidef::Types::Glob::Pipe {
 
     sub command {
         my ($self) = @_;
-        @{$self} > 1 ? Sidef::Types::Array::List->new(@{$self}) : $self->[0];
+        @{$self} > 1 ? (@{$self}) : $self->[0];
     }
 
     sub open {
@@ -34,7 +34,7 @@ package Sidef::Types::Glob::Pipe {
         my $pipe_obj = Sidef::Types::Glob::FileHandle->new(fh => $pipe_h, self => $self);
 
         if (defined($var_ref)) {
-            $var_ref->get_var->set_value($pipe_obj);
+            ${$var_ref} = $pipe_obj;
 
             return defined($pid)
               ? Sidef::Types::Number::Number->new($pid)

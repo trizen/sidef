@@ -27,6 +27,7 @@ package Sidef::Types::Regex::Match {
                 $hash{matched} = 1;
             }
             else {
+                $hash{self}{pos} = 0;
                 $hash{matched} = 0;
             }
 
@@ -85,12 +86,11 @@ package Sidef::Types::Regex::Match {
 
     sub named_captures {
         my ($self) = @_;
+
         my $hash = Sidef::Types::Hash::Hash->new();
-
-        foreach my $key (keys %{$self->{named_captures}}) {
-            $hash->{data}{$key} = Sidef::Types::String::String->new($self->{named_captures}{$key});
+        while (my ($key, $value) = each %{$self->{named_captures}}) {
+            $hash->{$key} = Sidef::Types::String::String->new($value);
         }
-
         $hash;
     }
 

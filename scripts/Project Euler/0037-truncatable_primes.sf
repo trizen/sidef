@@ -1,0 +1,48 @@
+#!/usr/bin/ruby
+
+# Find the sum of the only eleven primes that are both truncatable from left to right and right to left.
+
+# NOTE: 2, 3, 5, and 7 are not considered to be truncatable primes.
+
+# https://projecteuler.net/problem=37
+
+# Answer: 748317
+
+var nt = frequire('ntheory');
+
+func is_truncatable_prime(n) {
+
+    nt.is_prime(n) || return false;
+
+    var orig = n;
+
+    loop {
+        var d = int(n / 10);
+        d > 0 || break;
+        nt.is_prime(d) || return false;
+        n = d;
+    }
+
+    n = orig;
+
+    var l = n.log10.int;
+    range(1, n.len-1).each { |i|
+        n -= (orig.digit(-i) * 10**(l-i + 1));
+        nt.is_prime(n) || return false;
+    }
+
+    return true;
+}
+
+var sum = 0;
+var count = 0;
+
+Math.inf.times { |i|
+    if (i > 7 && is_truncatable_prime(i)) {
+        say i;
+        sum += i;
+        ++count == 11 && break;
+    }
+}
+
+say "Sum: #{sum}";

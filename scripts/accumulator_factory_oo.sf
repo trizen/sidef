@@ -1,0 +1,29 @@
+#!/usr/bin/ruby
+
+class Accumulator (sum) {
+    method add1(num) {
+        sum += num;
+    }
+
+    method add2(num) {
+        self{:sum} += num;
+    }
+
+    method add3(num) {
+        self.sum += num;
+    }
+
+    method +(num) {
+        self.sum = (sum + num);
+    }
+}
+
+var x = Accumulator(1);
+
+x.add1(1.25);
+x.add2(1.875);
+x.add3(1.875);
+
+Accumulator(3);             # create another accumulator
+
+say (x + 2.3);              # prints: 8.3

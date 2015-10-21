@@ -1,8 +1,0 @@
-#!/usr/bin/ruby
-
-#
-## http://rosettacode.org/wiki/Increment_a_numerical_string
-#
-
-say '1234'++;    #=> '1235'
-say '99'++;      #=> '100'

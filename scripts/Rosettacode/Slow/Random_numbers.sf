@@ -1,7 +1,0 @@
-#!/usr/bin/ruby
-
-#
-## http://rosettacode.org/wiki/Random_numbers
-#
-
-1000.of { 1 + (0.5 * Math.sqrt(-2 * Math.log(Math.rand)) * Math.cos(2 * Math::PI * Math.rand)) };

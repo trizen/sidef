@@ -1,7 +1,9 @@
-Sidef
-=====
+Sidef2
+======
 
-*Sidef is a modern object-oriented programming language, implemented in Perl.*
+*Sidef2 is a faster implementation of the Sidef Programming Language.*
+
+To learn about Sidef, check out the following links:
 
 * Gitbook: http://trizen.gitbooks.io/sidef-lang/content/
 * Tutorial: https://github.com/trizen/sidef/wiki
@@ -21,8 +23,7 @@ Sidef
 
 **LICENSE AND COPYRIGHT**
 
-* Copyright (C) 2013 Daniel Șuteu, Ioana Fălcușan
-* Copyright (C) 2014-2015 Daniel Șuteu
+* Copyright (C) 2015 Daniel Șuteu
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the *Artistic License (2.0)*. You may obtain a

@@ -1,0 +1,6 @@
+#!/usr/bin/ruby
+
+var method = 'sqrt';
+81->$method.to_s.say;
+
+42->(['+','-'][2.rand])(10).to_s.say;

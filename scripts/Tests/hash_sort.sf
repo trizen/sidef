@@ -1,0 +1,21 @@
+#!/usr/bin/ruby
+
+# Sort a hash by its values (highest to lowest)
+
+var frequencies = Hash.new(
+    "simple" => 2,
+    "keep"   => 4,
+    "it"     => 3,
+    "stupid" => 1,
+);
+
+# Traditional way
+var sorted_1 = frequencies.keys.sort({|a,b| frequencies{b} <=> frequencies{a}}).map({|key| [key, frequencies{key}]});
+sorted_1.dump.say;
+
+# Built-in way
+var sorted_2 = frequencies.sort_by({|_,value| value}).reverse;
+sorted_2.dump.say;
+
+# The results should be identical
+sorted_2 == sorted_1 || "Error!\n".die;

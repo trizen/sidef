@@ -254,6 +254,18 @@ String.bytes() -> I<Obj>
 
 Return the
 
+Aliases: I<to_bytes>
+
+=cut
+
+=head2 bytes_len
+
+String.bytes_len() -> I<Obj>
+
+Return the
+
+Aliases: I<bytes_length>
+
 =cut
 
 =head2 char
@@ -271,6 +283,8 @@ Aliases: I<char_at>
 String.chars() -> I<Obj>
 
 Return the
+
+Aliases: I<to_chars>
 
 =cut
 
@@ -364,7 +378,25 @@ String.each() -> I<Obj>
 
 Return the
 
-Aliases: I<bcall>, I<each_char>
+Aliases: I<each_char>
+
+=cut
+
+=head2 each_byte
+
+String.each_byte() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 each_graph
+
+String.each_graph() -> I<Obj>
+
+Return the
+
+Aliases: I<each_grapheme>
 
 =cut
 
@@ -418,6 +450,14 @@ Return the
 
 =cut
 
+=head2 first
+
+String.first() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 format
 
 String.format() -> I<Obj>
@@ -439,8 +479,6 @@ Return the
 String.ft() -> I<Obj>
 
 Return the
-
-Aliases: I<substr>, I<substring>
 
 =cut
 
@@ -474,7 +512,17 @@ String.graphs() -> I<Obj>
 
 Return the
 
-Aliases: I<graphemes>
+Aliases: I<to_graphs>, I<graphemes>, I<to_graphemes>
+
+=cut
+
+=head2 graphs_len
+
+String.graphs_len() -> I<Obj>
+
+Return the
+
+Aliases: I<graphs_length>
 
 =cut
 
@@ -528,9 +576,33 @@ Return the
 
 =cut
 
+=head2 is_palindrome
+
+String.is_palindrome() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 jaro_distance
+
+String.jaro_distance() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 join
 
 String.join() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 last
+
+String.last() -> I<Obj>
 
 Return the
 
@@ -560,7 +632,7 @@ String.len() -> I<Obj>
 
 Return the
 
-Aliases: I<length>
+Aliases: I<length>, I<chars_len>, I<chars_length>
 
 =cut
 
@@ -704,6 +776,14 @@ Return the
 
 =cut
 
+=head2 rindex
+
+String.rindex() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 scan
 
 String.scan() -> I<Obj>
@@ -743,6 +823,16 @@ String.sub() -> I<Obj>
 Return the
 
 Aliases: I<replace>
+
+=cut
+
+=head2 substr
+
+String.substr() -> I<Obj>
+
+Return the
+
+Aliases: I<substring>
 
 =cut
 

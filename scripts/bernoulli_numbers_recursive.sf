@@ -1,0 +1,32 @@
+#!/usr/bin/ruby
+
+# Recursive computation of Bernoulli numbers.
+
+# See: https://en.wikipedia.org/wiki/Bernoulli_number#Recursive_definition
+#      https://en.wikipedia.org/wiki/Binomial_coefficient#Recursive_formula
+
+func bernoulli_number{};    # must be declared before used
+
+func binomial(n, k) is cached {
+    (k == 0) || (n == k) ? 1 : (binomial(n - 1, k - 1) + binomial(n - 1, k));
+}
+
+func bern_helper(n, k) {
+    binomial(n, k).to_r * (bernoulli_number(k).to_r / (n - k + 1));
+}
+
+func bern_diff(n, k, d) {
+    n < k ? d : bern_diff(n, k + 1, d.to_r - bern_helper(n + 1, k));
+}
+
+bernoulli_number = func(n) is cached {
+
+    n.is_one && return 1/2;
+    n.is_odd && return   0;
+
+    n > 0 ? bern_diff(n - 1, 0, 1) : 1;
+}
+
+range(0, 20).each { |i|
+    printf("B%-2d = %s\n", i, bernoulli_number(i).to_r);
+}

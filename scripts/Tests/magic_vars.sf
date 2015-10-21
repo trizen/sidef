@@ -1,0 +1,19 @@
+#!/usr/bin/ruby
+
+local $, = "\n";         # sets the list separator to "\n"
+say ("hello", "world");  # prints one item per line
+
+if (Sys.open(\var fh, '<:encoding(UTF-8)', Sys.sidef)) {
+
+    var lines = 1+(10.rand.int);
+    say "\n** Reading ##{lines} lines from `#{fh.parent}':";
+
+    fh.each { |line|
+        say line.chomp;
+        Number.new($.) == lines && break;
+    };
+
+    Number.new($.) == lines || (
+        "#{$.} != #{lines}!".die;
+    );
+}

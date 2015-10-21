@@ -10,14 +10,16 @@ var step = 0.001;
 var start = -1;
 var stop = 3;
 
-start+step ..^ (stop, step).each { |x|
+range(start+step, stop, step).each { |x|
     static sign = false;
-    given (var value = f(x))
+    var value = f(x);
+    given (value) {
         when (0) {
             say "Root found at #{x}";
         }
-        case (sign && ((value > 0) != sign)) {
+        when (sign && ((value > 0) != sign)) {
             say "Root found near #{x}";
-        };
+        }
+    }
     sign = value>0;
 }

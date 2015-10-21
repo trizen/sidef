@@ -1,0 +1,76 @@
+#!/usr/bin/ruby
+
+# Class (re)definitions and inheritance
+
+class Shape { };
+
+class Circle {
+    method name {
+        "Replace me!";
+    };
+};
+
+class Square(side) {
+    method diagonal {
+        Math.sqrt(self.side**2 * 2);
+    };
+};
+
+class Triangle(base, height) << Shape {
+    method area {
+        self.base * self.height / 2;
+    };
+};
+
+class Shape {
+    method triangle(base, height) -> Triangle {
+        Triangle(base, height);
+    };
+    method square(side) -> Square {
+        Square(side);
+    };
+    method circle(radius) -> Circle {
+        Circle(radius);
+    };
+    method type {
+        Sys.class_name(self);
+    }
+}
+
+class Circle(radius) < Shape {
+    method area {
+        self.radius**2 * Math::PI;
+    };
+    method diameter {
+        self.radius * 2;
+    };
+    method circumference {
+        self.diameter * Math::PI;
+    };
+    method name {
+        "Ringie";
+    };
+}
+
+class Square(side) < Shape {
+    method area {
+        self.side ** 2;
+    };
+}
+
+var shape = Shape();
+
+var triangle = shape.triangle(8, 5);
+var circle = shape.circle(6);
+var square = shape.square(4);
+
+say "Area of triangle with base #{triangle.base} and height #{triangle.height} is: #{triangle.area}";
+say "Area of a circle with radius #{circle.radius} is: #{circle.area}";
+say "Circumfere of a circle with radius #{circle.radius} is #{circle.circumference}";
+say "Area of a square with side #{square.side} is #{square.area}";
+say "Diagonal of a square with side #{square.side} is #{square.diagonal}";
+
+circle.type   == "Circle"   || die "circle type error";
+square.type   == "Square"   || die "square type error";
+triangle.type == "Triangle" || die "triangle type error";
+circle.name   == "Ringie"   || die "circle name error";

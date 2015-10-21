@@ -7,14 +7,22 @@ Sidef::Time::Time
 
 =head1 DESCRIPTION
 
-This modules creates a new I<Time> object.
+This object is ...
 
 =head1 SYNOPSIS
 
-    var time = (Time.new(sec));
-    var lday = (time.local.day);
+var obj = Time.new(...);
+
+
+=head1 INHERITS
+
+Inherits methods from:
+
+	* Sidef::Object::Object
+	* Sidef::Convert::Convert
 
 =head1 METHODS
+
 
 =head2 dump
 
@@ -24,18 +32,21 @@ Return the
 
 =cut
 
+=head2 gmtime
 
-=head2 gmTime
+Time.gmtime() -> I<Obj>
 
-Time.new.gmTime() -> C<Sidef::Time::Gmtime>
-
-Return a I<gmtime> object.
+Return the
 
 =cut
 
-=head2 localtime
+=head2 local
 
-Alias for L<C<local()>|"local">.
+Time.local() -> I<Obj>
+
+Return the
+
+Aliases: I<localtime>
 
 =cut
 
@@ -45,29 +56,34 @@ Time.micro() -> I<Obj>
 
 Return the
 
-Aliases: I<micro_sec>, I<microSec>, I<microTime>, I<micro_seconds>, I<microSeconds>
+Aliases: I<micro_sec>, I<micro_seconds>
 
 =cut
 
 =head2 new
 
-Time.new(I<number>) -> I<Time>
+Time.new() -> I<Obj>
 
-Create a new I<Time> object. The argument is the number of seconds elapsed since the beginning of the current epoch (1900).
-When no argument is specified, the current time is used.
+Return the
 
-=cut
-
-=head2 time_now
-
-Alias for L<C<timeNow()>|"timeNow">.
+Aliases: I<call>
 
 =cut
 
-=head2 time
+=head2 now
 
-Time.time() -> I<Number>
+Time.now() -> I<Obj>
 
-Return the time value stored inside the I<Time> object.
+Return the
+
+=cut
+
+=head2 sec
+
+Time.sec() -> I<Obj>
+
+Return the
+
+Aliases: I<time>
 
 =cut

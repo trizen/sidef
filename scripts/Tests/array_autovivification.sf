@@ -1,0 +1,52 @@
+#!/usr/bin/ruby
+
+var r = [];
+
+r[2][3] = "x";
+
+r.dump.say;
+
+r == [nil, nil, [nil, nil, nil, 'x']]
+     || ("Error! (1)\n".die);
+
+
+r[2][2] = ["y"];
+
+r.dump.say;
+
+r == [nil, nil, [nil, nil, ['y'], 'x']]
+     || ("Error! (2)\n".die);
+
+r[2][5] = "sidef";
+
+r == [nil, nil, [nil, nil, ['y'], 'x', nil, 'sidef']]
+    || die "error!";
+
+r[2][2][4] = "z";
+r[2][2][2] = "i";
+
+r.dump.say;
+
+r == [nil, nil, [nil, nil, ['y', nil, 'i', nil, 'z'], 'x', nil, 'sidef']]
+     || ("Error! (3)\n".die);
+
+
+r[5][5][1][2][3] = 'sidef';
+
+r.dump.say;
+
+r == [nil, nil, [nil, nil, ['y', nil, 'i', nil, 'z'], 'x', nil, 'sidef'],
+      nil, nil, [nil, nil, nil, nil, nil, [nil, [nil, nil,
+     [nil, nil, nil, 'sidef']]]]]
+    || ("Error! (4)\n".die);
+
+#
+## Array autovivification on slice creation
+#
+var x = [];
+x[4,5] = (1,2);
+
+x.map {"test"} == (['test'] * x.len) || die "map error!";
+x == [nil, nil, nil, nil, 1, 2]      || die "eq error!";
+
+say "\n** All tests passed!";

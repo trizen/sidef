@@ -24,6 +24,7 @@
 \bpm_to_blib\.ts$
 \bpm_to_blib$
 \bblibdirs\.ts$         # 6.18 through 6.25 generated this
+\b_eumm/                # 7.05_05 and above
 
 # Avoid Module::Build generated and utility files.
 \bBuild$
@@ -32,6 +33,9 @@
 \bBuild.COM$
 \bBUILD.COM$
 \bbuild.com$
+
+# and Module::Build::Tiny generated files
+\b_build_params$
 
 # Avoid temp and backup files.
 ~$
@@ -42,6 +46,7 @@
 \.tmp$
 \.#
 \.rej$
+\..*\.sw.?$
 
 # Avoid OS-specific files/dirs
 # Mac OSX metadata
@@ -52,6 +57,9 @@
 # Avoid Devel::Cover and Devel::CoverX::Covered files.
 \bcover_db\b
 \bcovered\b
+
+# Avoid prove files
+\B\.prove$
 
 # Avoid MYMETA files
 ^MYMETA\.

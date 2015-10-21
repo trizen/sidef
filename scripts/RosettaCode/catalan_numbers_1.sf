@@ -1,0 +1,16 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Catalan_numbers
+#
+
+do (
+    var mem = [1]
+    func c(n) {
+        mem[n-1] := (c(n-1) * (4 * n - 2) / (n + 1))
+    }
+)
+
+15.times { |i|
+    say "#{i-1}\t#{c(i-1)}"
+}

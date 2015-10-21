@@ -1,0 +1,55 @@
+#!/usr/bin/ruby
+
+# The old problem of string expanding
+# http://trizenx.blogspot.ro/2012/03/expand-string.html
+
+func abs_str (str) {
+
+    var strs = [];
+    var root = [];
+    var word = '';
+
+    func store {
+        word != '' && (
+            strs.append(root.join + word);
+        );
+    }
+
+    str.split('').each { |c|
+
+        given (c) {
+            when ('{') {
+                root.append(word);
+                word.clear!;
+            }
+            when ('}') {
+                store.run;
+                root.pop;
+                word.clear!;
+            }
+            when (',') {
+                store.run;
+                word.clear!;
+            }
+            default {
+                word += c;
+            }
+        }
+    }
+
+    store.run;
+    return(strs);
+}
+
+var strings = [
+        "perl-{gnome2-wnck,gtk2-{imageview,unique},x11-protocol,image-exiftool}",
+        "perl-{proc-{simple,processtable},net-{dbus,dropbox-api},goo-canvas}",
+        "perl-{sort-naturally,json,json-xs,xml-simple,www-mechanize,locale-gettext}",
+        "perl-{file-{which,basedir,copy-recursive},pathtools,path-class},mplayer",
+        "perl-{script-{test,meta}},flash-player",
+];
+
+strings.each { |str|
+    var array = abs_str(str);
+    "%-25s" * 3 + "\n" -> printf(array.@[0..2]);
+}

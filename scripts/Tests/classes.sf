@@ -1,0 +1,80 @@
+#!/usr/bin/ruby
+
+class FIFO(*array) {
+    method pop {
+        self.empty && die "underflow";
+        array.shift;
+    };
+    method push(*items) {
+        array += items;
+        self;
+    };
+    method empty {
+        array.len == 0;
+    };
+};
+
+var f1 = FIFO();
+var f2 = FIFO();
+
+f1.push('a');
+f2.push('b');
+
+assert_eq(f1.array, %w(a));
+assert_eq(f2.array, %w(b));
+
+f1.push('a');
+f2.push('b');
+
+assert_eq(f1.array, %w(a a));
+assert_eq(f2.array, %w(b b));
+
+f1.pop;
+f2.pop;
+
+assert_eq(f1.array, %w(a));
+assert_eq(f2.array, %w(b));
+
+var f = FIFO();
+
+assert_eq(f.empty, true);
+
+f.push('foo');
+f.push('bar', 'baz');
+
+assert_eq(f.pop, 'foo');
+assert_eq(f.array, %w(bar baz));
+
+var g = FIFO('xxx', 'yyy');
+assert_eq(g.pop, 'xxx');
+assert_eq(f.pop, 'bar');
+assert_eq(g.array, ['yyy']);
+
+#
+## Class redefinition
+#
+class Example {
+    method hi {
+        say "I'm saying 'hi'";
+    }
+}
+
+class main::Example() {             # main::Example() is just for testing
+    method hello() {
+        say "I'm saying 'hello'";
+    }
+}
+
+class Example {
+    method howdy {
+        say "I'm saying 'howdy'";
+    }
+}
+
+var obj = Example();
+
+obj.hi;
+obj.hello;
+obj.howdy;
+
+say "** Test passed!";

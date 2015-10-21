@@ -1,0 +1,39 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Playing_cards
+#
+
+define Pip = <A 2 3 4 5 6 7 8 9 10 J Q K>;
+define Suit = <♦ ♣ ♥ ♠>;
+
+class Card(pip, suit) {
+    method to_s { pip + suit }
+}
+
+class Deck {
+    method init {
+        self{:cards} = [];
+        Pip.each { |p|
+            Suit.each { |s|
+                self{:cards} << Card(p, s);
+            }
+        }
+    }
+
+    method shuffle {
+        self{:cards}.shuffle!;
+    }
+
+    method deal { self{:cards}.shift };
+    method to_s { self{:cards}.join(" ") };
+}
+
+var d = Deck();
+say "Deck: #{d}";
+
+var top = d.deal;
+say "Top card: #{top}";
+
+d.shuffle;
+say "Deck, shuffled: #{d}";

@@ -1,0 +1,25 @@
+#!/usr/bin/ruby
+
+# Translation of: http://rosettacode.org/wiki/Hailstone_sequence#Perl
+
+func hailstone (n) {
+
+    var sequence = [n];
+
+    while (n > 1) {
+        sequence.append(
+            n.is_even ? n.div!(2)
+                      : n.mul!(3).add!(1)
+        );
+    }
+
+    return(sequence);
+}
+
+var h = hailstone(27);
+
+h[1]  ==  82 || "Item error!".die;
+h.len == 112 || "Length error!".die;
+
+"Length of hailstone(27) = %s".printlnf(h.len);
+"[%s]".printlnf(h.ft(0,3) + ['...'] + h.ft(-4, -1) -> join(', '));

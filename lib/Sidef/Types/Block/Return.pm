@@ -1,13 +1,8 @@
 package Sidef::Types::Block::Return {
 
     sub new {
-        bless {}, __PACKAGE__;
-    }
-
-    sub return {
-        my ($self, @obj) = @_;
-        $self->{obj} = @obj > 1 ? Sidef::Types::Array::List->new(@obj) : $obj[0];
-        $self;
+        my (undef, @obj) = @_;
+        bless {obj => \@obj}, __PACKAGE__;
     }
 
 }

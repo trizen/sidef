@@ -16,14 +16,6 @@ var obj = Eval.new(...);
 =head1 METHODS
 
 
-=head2 eval
-
-Eval.eval() -> I<Obj>
-
-Return the
-
-=cut
-
 =head2 new
 
 Eval.new() -> I<Obj>

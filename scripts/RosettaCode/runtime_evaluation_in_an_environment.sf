@@ -1,0 +1,13 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Runtime_evaluation/In_an_environment
+#
+
+func eval_with_x(code, x, y) {
+    var f = eval(code);
+    x = y;
+    eval(code) - f;
+}
+ 
+say eval_with_x('2 ** x', 3, 5);   # => 24

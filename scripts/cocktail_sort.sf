@@ -1,0 +1,24 @@
+#!/usr/bin/ruby
+
+func cocktailsort(a) {
+    var swapped = false;
+    func cmpsw(i) {
+        if (a[i] > a[i+1]) {
+            a[i, i+1] = a[i+1, i];
+            swapped = true;
+        }
+    }
+    var max = a.end;
+    do {
+        { |i| cmpsw(i-1) } * max;
+        swapped.not! && break;
+        { |i| cmpsw(max-i) } * max;
+    } while(swapped);
+    return a;
+}
+
+var numbers = (0..10 -> shuffle);
+say cocktailsort(numbers);
+
+var strs = %w(John Kate Zerg Alice Joe Jane).shuffle;
+say cocktailsort(strs);

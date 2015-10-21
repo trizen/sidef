@@ -1,0 +1,357 @@
+#!/usr/bin/ruby
+
+# AUTHOR: Daniel "Trizen" Șuteu
+# LICENSE: GPLv3
+
+class new(diacritics            = true,
+          invalid_number        = nil,
+          negative_sign         = 'minus',
+          decimal_point         = 'virgulă',
+          thousands_separator   = '',
+          infinity              = 'infinit',
+          not_a_number          = 'NaN') {
+
+    # This function removes the Romanian diacritics from a given text.
+    func _remove_diacritics(s) {
+        s.tr('ăâșțî','aasti');
+    }
+
+    # Numbers => text
+    static DIGITS = Hash.new;
+    DIGITS.@{'0'..'19'} = %w(
+      zero unu doi trei patru cinci șase șapte opt nouă zece
+      unsprezece
+      doisprezece
+      treisprezece
+      paisprezece
+      cincisprezece
+      șaisprezece
+      șaptesprezece
+      optsprezece
+      nouăsprezece
+    )...;
+
+    # Text => numbers
+    static WORDS = Hash.new;
+    WORDS.@{DIGITS.values.map {|v|_remove_diacritics(v)}} = DIGITS.keys.map{.to_num}...;
+    WORDS.@{%w(o un doua sai)} = (1, 1, 2, 6);
+
+    # Colocvial
+    WORDS.@{%w(unspe doispe treispe paispe cinspe cinsprezece saispe saptespe saptuspe optspe nouaspe)} =
+    (11, 12, 13, 14, 15, 15, 16, 17, 17, 18, 19);
+
+    # This array contains number greater than 1000 and it's used to convert numbers into text
+    # See: http://ro.wikipedia.org/wiki/Sistem_zecimal#Denumiri_ale_numerelor
+    static BIGNUMS = (
+                [
+                    [ 10**2,        'suta',         'sute',  true],
+                    [ 10**3,         'mie',          'mii',  true],
+                    [ 10**6,      'milion',     'milioane', false],
+                    [ 10**9,     'miliard',     'miliarde', false],
+                    [10**12,      'bilion',     'bilioane', false],
+                    [10**15,     'biliard',     'biliarde', false],
+                    [10**18,     'trilion',    'trilioane', false],
+                    [10**21,    'triliard',    'triliarde', false],
+                    [10**24,  'cvadrilion', 'cvadrilioane', false],
+                    [10**27, 'cvadriliard', 'cvadriliarde', false],
+                    [Math.inf,  'inifinit',      'infinit', false],
+                ]
+                 -> map { |v|
+                     var h = Hash.new;
+                     h.@{%w(num sg pl fem)} = v...;
+                     h;
+                }
+    );
+
+    # This hash is a reversed version of the above array and it's used to convert text into numbers
+    static BIGWORDS = Hash.new;
+    BIGNUMS.each { |x|
+        BIGWORDS{x{:sg},x{:pl}} = (x{:num}, x{:num});
+    };
+
+    # Change 'suta' to 'sută'
+    BIGNUMS[0]{:sg} = 'sută';
+
+    # This functions removes irrelevant characters from a text
+    func _normalize_text(s) {
+
+        # Lowercase and remove the diacritics
+        var text = _remove_diacritics(s.lc);
+
+        # Replace irrelevant characters with a space
+        return text.tr('a-z', ' ', 'c');
+    }
+
+    # This function adds together a list of numbers
+    func _add_numbers(nums) {
+
+        var num = 0;
+        while (nums.len) {
+            var i = nums.shift;
+
+            # When the current number is lower than the next number
+            if (nums.len && (i < nums[0])) {
+                var n = nums.shift;
+
+                # This is a special case, where: int(log(1000)/log(10)) == 2
+                var l = n.log10;
+                if (l.to_s.len == l.int.to_s.len) {
+                    l = sprintf('%.0f', l);
+                }
+
+                # Factor (e.g.: 400 -> 4)
+                var f = (i / (10**(i.log10.int)) -> int);
+
+                # When the next number is not really next to the current number
+                # e.g.: $i == 400 and $n == 5000 # should produce 405_000 not 45_000
+                if ((var mod = (n.len % 3)) != 0) {
+                    f *= 10**(3 - mod);
+                }
+
+                # Join the numbers and continue
+                num += (10**(l.to_i) * f + n);
+                next;
+            }
+
+            num += i;
+        }
+
+        return num;
+    }
+
+    # This function converts a Romanian
+    # text-number into a mathematical number.
+    method ro_to_number(text) {
+
+        # When text is not a string
+        text.is_a(String) || return;
+
+        # If a thousand separator is defined, remove it from text
+        if (self.thousands_separator != '' && (self.thousands_separator.len > 1)) {
+            text.gsub!(self.thousands_separator, ' ');
+        }
+
+        # Split the text into words
+        var words = _normalize_text(text).words;
+
+        var dec_point = _normalize_text(self.decimal_point);
+        var neg_sign  = _normalize_text(self.negative_sign);
+
+        var nums = [];    # numbers
+        var decs = [];    # decimal numbers
+
+        var neg  = false;    # bool -- true when the number is negative
+        var adec = false;    # bool -- true after the decimal point
+
+        var amount = 0;  # int -- current number
+        var factor = 1;  # int -- multiplication factor
+
+        if (words.len) {
+
+            # Check for negative numbers
+            if (words[0] == neg_sign) {
+                neg = true;
+                words.shift;
+            }
+
+            # Check for infinity and NaN
+            if (words.len == 1) {
+
+                # Infinity
+                var inf = _normalize_text(self.infinity);
+                if (words[0] == inf) {
+                    return(neg ? Math.inf.neg : Math.inf);
+                }
+
+                # Not a number
+                var nan = _normalize_text(self.not_a_number);
+                if (words[0] == nan) {
+                    return Num.nan;
+                }
+            }
+        }
+
+        # Iterate over the @words
+        while ( {words.len && (
+                # It's a small number (lower than 100)
+                (factor = (WORDS.exists(words[0]) ? 1 : (words[0].ends_with('zeci') ? (words[0].sub!(/zeci\z/); 10) : 0));
+                factor > 0 && (amount = words.shift);
+                factor > 0)
+                || (( # It's a big number (e.g.: milion)
+                words.len && (BIGWORDS.has_key(words[0]) && (
+                    factor = BIGWORDS{words.shift};
+                    factor > 0;
+                )))
+                || (    # Ignore invalid words
+                    words.shift;
+                    __BLOCK__.run;
+                )
+            ))}.run
+          ) {
+
+            # Take and multiply the current number
+            var num = (WORDS.has_key(amount) ? (WORDS{amount} * factor) : next);    # skip invalid words
+
+            # Check for some word-joining tokens
+            if (words.len) {
+                if (words[0] == 'si') {    # e.g.: patruzeci si doi
+                    words.shift;
+                    num += WORDS{words.shift};
+                }
+
+                if (words.len) {
+                    {
+                        if (words[0] == 'de') {    # e.g.: o suta de mii
+                            words.shift;
+                        }
+
+                        if (BIGWORDS.has_key(words[0])) {
+                            num *= BIGWORDS{words.shift};
+                        }
+
+                        (words.len && (words[0] == 'de')) && (
+                            __BLOCK__.run;
+                        );
+                    }.run;
+                }
+            }
+
+            # If we are after the decimal point, store the
+            # numbers in @decs, otherwise store them in @nums.
+            [nums,decs][adec].push(num);
+
+            # Check for the decimal point
+            if (words.len && (words[0] == dec_point)) {
+                adec = true;
+                words.shift;
+            }
+        }
+
+        # Return undef when no number has been converted
+        nums.len || return;
+
+        # Add all the numbers together (if any)
+        var num = _add_numbers(nums).to_s;
+
+        # If the number contains decimals,
+        # add them at the end of the number
+        if (decs.len) {
+
+            # Special case -- check for leading zeros
+            var zeros = '';
+            while (decs.len && (decs[0] == 0)) {
+                zeros += decs.shift.to_s;
+            }
+
+            num += ('.' + zeros + _add_numbers(decs).to_s);
+        }
+
+        # Return the number
+        return(neg ? num.to_num.neg : num.to_num);
+    }
+
+    method _number_to_ro(number) {
+
+        var words = [];
+        if (DIGITS.has_key(number)) {
+            words.append(DIGITS{number});
+        }
+        elsif (number.to_num! -> is_nan) {
+            return [self.not_a_number];
+        }
+        elsif (number.is_negative) {
+            words.append(self.negative_sign);
+            words.append(__METHOD__(self, number.abs)...);
+        }
+        elsif (!(number.is_int)) {
+
+            words.append(__METHOD__(self, number.int)...);
+            words.append(self.decimal_point);
+
+            number -= number.int;
+
+            while (number != number.int) {
+                number *= 10 < 1 && (words.append(DIGITS{0}));
+            }
+
+            words.append(__METHOD__(self, number.int)...);
+        }
+        elsif (number >= BIGNUMS[0]{:num}) {
+            0 ... BIGNUMS.end-1 -> each { |i|
+                var j = BIGNUMS.end-i;
+
+                if (number >= BIGNUMS[j-1]{:num} && (number < BIGNUMS[j]{:num})) {
+                    var cat = (number / BIGNUMS[j-1]{:num} -> int);
+                    number -= (BIGNUMS[j-1]{:num} * (number / BIGNUMS[j-1]{:num} -> int));
+
+                    var of = (cat <= 2 ? [] : (
+                        var w = (
+                            DIGITS.has_key(cat)
+                                ? [DIGITS{cat}]
+                                : (__METHOD__(self, cat) + ['de'])
+                            );
+                        w.len > 2 && (w[-2] == DIGITS{2} && (w[-2] = 'două'));
+                        w;
+                    ));
+
+                    if (cat >= 100 && (cat < 1000)) {
+                        var rest = (cat - (100 * (cat / 100 -> int)));
+                        if (of.len != 0 && (rest != 0 && (DIGITS.has_key(rest)))) {
+                            of.pop;
+                        }
+                    }
+
+                    words += (
+                        cat == 1 ? ([BIGNUMS[j-1]{:fem} ? 'o' : 'un', BIGNUMS[j-1]{:sg}])
+                                 : (cat == 2 ? (['două', BIGNUMS[j-1]{:pl}])
+                                             : (of + [BIGNUMS[j-1]{:pl}]));
+                    );
+
+                    number > 0 && (
+                        BIGNUMS[j]{:num} > 1000 && (
+                            words[-1] += self.thousands_separator
+                        );
+                        words.append(__METHOD__(self, number)...)
+                    );
+
+                    break;
+                }
+            }
+        }
+        elsif (number > 19 && (number < 100)) {
+            var cat = (number / 10 -> int);
+
+            words.append(
+                (
+                 cat == 2 ? 'două'
+                          : (
+                             cat == 6 ? ('șai')
+                                      : (DIGITS{cat})
+                            )
+                ) + 'zeci'
+            );
+
+            if (number % 10 != 0) {
+                words.append('și', DIGITS{number % 10 -> int});
+            }
+        }
+        elsif (number.is_inf) {
+            return [self.infinity];
+        }
+        else {
+            return([self.invalid_number]);
+        }
+
+        return(words);
+    }
+
+    method number_to_ro(num) {
+        var word = self._number_to_ro(num).join(" ");
+
+        if (!self.diacritics) {
+            word = _remove_diacritics(word);
+        }
+
+        return word;
+    }
+}

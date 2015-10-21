@@ -1,0 +1,32 @@
+#!/usr/bin/ruby
+
+func get_response(url) {
+
+    var req = (
+        try   { require 'LWP::UserAgent' }
+        catch { return nil }
+    );
+
+    var lwp = req.new(
+        'show_progress' => 1,
+        'timeout'       => 10,
+        'agent'         => 'Mozilla/5.0',
+    );
+
+    lwp.get(url);
+}
+
+var resp = get_response("http://www.google.ro");
+
+if (!defined resp) {
+    STDERR.print("** LWP::UserAgent is not installed!\n");
+}
+else {
+    if (resp.is_success) {
+        var content = resp.decoded_content;
+        printf("Content length is: %d\n", content.len);
+    }
+    else {
+        Sys.warn("[ERROR] Response: %s".sprintf(resp.status_line));
+    }
+}

@@ -1,9 +1,0 @@
-#!/usr/bin/perl
-
-# Version 0.01
-(:%W)2 A 4 H 1 J 3 S)...)[1..4]map{static(ß)=+%w;tsu rehton fedi
-rekca;,_+(ß>>\$?pop reverse+(!ß.len->?%q\,\ :32.chr))}.'join'say
-
-# Version 0.02
-(:«2 A 4 H 1 J 3 S»...)[1..4]map{static(ß)=+<tsu rehton fedi
-rekca>,.+(ß>>\$?pop.reverse+(?ß.len ?32.chr :%\,\))}join.say

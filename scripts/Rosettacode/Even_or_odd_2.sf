@@ -1,8 +1,0 @@
-#!/usr/bin/ruby
-
-#
-## http://rosettacode.org/wiki/Even_or_odd
-#
-
-func is_odd(n)  { n%2 == 1 };
-func is_even(n) { n%2 == 0 };

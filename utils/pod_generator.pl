@@ -30,10 +30,10 @@ my %ignored_subs = map { $_ => 1 } qw<
 
 my %ignored_methods = (
                        'Sidef'                          => [qw(new)],
-                       'Sidef::Types::Block::Return'    => [qw(get_obj new)],
+                       'Sidef::Types::Block::Return'    => [qw(new)],
                        'Sidef::Types::Block::Break'     => [qw(new)],
-                       'Sidef::Variable::Variable'      => [qw(set_value is_defined get_type get_value new)],
-                       'Sidef::Variable::Ref'           => [qw(get_var new)],
+                       'Sidef::Variable::Variable'      => [qw(new)],
+                       'Sidef::Variable::Ref'           => [qw(new)],
                        'Sidef::Variable::Local'         => [qw(new)],
                        'Sidef::Variable::Init'          => [qw(new)],
                        'Sidef::Variable::InitLocal'     => [qw(new)],

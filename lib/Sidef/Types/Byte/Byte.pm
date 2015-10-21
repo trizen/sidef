@@ -7,7 +7,6 @@ package Sidef::Types::Byte::Byte {
 
     sub new {
         my (undef, $byte) = @_;
-        state $x = require Math::BigInt;
         bless \Math::BigInt->new($byte), __PACKAGE__;
     }
 

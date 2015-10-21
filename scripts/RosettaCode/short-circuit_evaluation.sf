@@ -1,0 +1,22 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Short-circuit_evaluation
+#
+
+func a(bool) { print 'A'; return bool };
+func b(bool) { print 'B'; return bool };
+ 
+# Test-driver
+func test() {
+    ['&&', '||'].each { |op|
+        [[1,1],[1,0],[0,1],[0,0]].each { |pair|
+            "a(%s) %s b(%s): ".printf(pair[0], op, pair[1]);
+            eval "a(pair[0].to_bool) #{op} b(pair[1].to_bool)";
+            print "\n";
+        }
+    }
+}
+ 
+# Test and display
+test();

@@ -13,12 +13,9 @@ package Sidef::Time::Time {
     sub new {
         my (undef, $sec) = @_;
 
-        if (defined($sec)) {
+        if (defined $sec) {
             if (ref($sec)) {
                 $sec = $sec->get_value;
-            }
-            elsif ($sec eq '__INIT__') {
-                undef $sec;
             }
         }
         else {
@@ -41,39 +38,30 @@ package Sidef::Time::Time {
 
     *sec = \&time;
 
-    sub timeNow {
+    sub now {
         Sidef::Types::Number::Number->new(CORE::time);
     }
 
-    *now      = \&timeNow;
-    *time_now = \&timeNow;
-
-    sub microTime {
+    sub micro {
         my ($self) = @_;
         state $x = require Time::HiRes;
         Sidef::Types::Number::Number->new(scalar Time::HiRes::gettimeofday());
     }
 
-    *micro         = \&microTime;
-    *micro_sec     = \&microTime;
-    *microSec      = \&microTime;
-    *microSeconds  = \&microTime;
-    *micro_seconds = \&microTime;
+    *micro_sec     = \&micro;
+    *micro_seconds = \&micro;
 
     sub localtime {
         my ($self) = @_;
         Sidef::Time::Localtime->new($self->get_value);
     }
 
-    *local     = \&localtime;
-    *localTime = \&localtime;
+    *local = \&localtime;
 
     sub gmtime {
         my ($self) = @_;
         Sidef::Time::Gmtime->new($self->get_value);
     }
-
-    *gmTime = \&gmtime;
 
     sub dump {
         my ($self) = @_;

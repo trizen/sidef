@@ -13,13 +13,6 @@ This object is ...
 
 var obj = Object.new(...);
 
-
-=head1 INHERITS
-
-Inherits methods from:
-
-	* Sidef
-
 =head1 METHODS
 
 
@@ -34,14 +27,6 @@ Return the
 =head2 &&
 
 I<Obj> B<&&> I<Obj> -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 ?
-
-I<Obj> B<?> I<Obj> -> I<Obj>
 
 Return the
 
@@ -63,9 +48,99 @@ Return the
 
 =cut
 
+=head2 alias_method
+
+Object.alias_method() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 class
+
+Object.class() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 def_method
+
+Object.def_method() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 is_a
+
+Object.is_a() -> I<Obj>
+
+Return the
+
+Aliases: I<is_an>
+
+=cut
+
+=head2 method
+
+Object.method() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 methods
+
+Object.methods() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 new
+
+Object.new() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 object_id
+
+Object.object_id() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 parent_classes
+
+Object.parent_classes() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 print
 
 Object.print() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 ref
+
+Object.ref() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 respond_to
+
+Object.respond_to() -> I<Obj>
 
 Return the
 
@@ -78,6 +153,22 @@ Object.say() -> I<Obj>
 Return the
 
 Aliases: I<println>
+
+=cut
+
+=head2 super_join
+
+Object.super_join() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 undef_method
+
+Object.undef_method() -> I<Obj>
+
+Return the
 
 =cut
 

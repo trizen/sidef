@@ -1,0 +1,22 @@
+#!/usr/bin/ruby
+
+func fib_iter(n) {
+    var fib = [1, 1];
+    { fib = [fib[-1], fib[-2] + fib[-1]] }
+       -> * (n - fib.len);
+    return fib[-1];
+}
+
+func fib_rec(n) {
+    n < 2 ? n : (__FUNC__(n-1) + __FUNC__(n-2));
+}
+
+func fib_mem (n) {
+    static c = [];
+    n < 2 && return n;
+    c[n] := (__FUNC__(n-1) + __FUNC__(n-2));
+}
+
+say fib_iter(12);
+say fib_rec(12);
+say fib_mem(35);

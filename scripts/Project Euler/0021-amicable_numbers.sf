@@ -1,0 +1,34 @@
+#!/usr/bin/ruby
+
+# For example, the proper divisors of 220 are 1, 2, 4, 5, 10, 11, 20, 22, 44, 55 and 110; therefore d(220) = 284. The proper divisors of 284 are 1, 2, 4, 71 and 142; so d(284) = 220.
+# Evaluate the sum of all the amicable numbers under 10000.
+
+# https://projecteuler.net/problem=21
+
+# Answer: 31626
+
+var ntheory = frequire('ntheory');
+
+var sum = 0;
+var mem = Hash.new;
+
+range(2, 10000-1).each { |i|
+
+    var d = ntheory.divisor_sum(i)-i;
+
+    if (mem.exists(d)) {
+
+        var n = mem{d};
+        if (ntheory.divisor_sum(n)-n == d) {
+            sum += d+n;
+            say "#{d} #{n}";
+        }
+
+        mem.delete(d);
+    }
+    elsif (i != d) {
+        mem{i} = d;
+    }
+}
+
+say "Sum: #{sum}";

@@ -1,0 +1,18 @@
+#!/usr/bin/ruby
+
+# For example, if a = 7 and n = 3, then r = 42: 63 + 83 = 728 ≡ 42 mod 49. And as n varies, so too will r, but for a = 7 it turns out that max(r) = 42.
+# For 3 ≤ a ≤ 1000, find ∑ max(r).
+
+# https://projecteuler.net/problem=120
+
+# Answer: 333082500
+
+func max_square_remainder(a) {
+    a * (a - (2 - (a % 2)));
+}
+
+var sum = 0;
+range(3, 1e3).each { |a|
+    sum += max_square_remainder(a);
+}
+say sum;

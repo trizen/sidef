@@ -18,8 +18,8 @@ var obj = Complex.new(...);
 
 Inherits methods from:
 
+	* Sidef::Object::Object
 	* Sidef::Convert::Convert
-	* Sidef::Types::Number::Number
 
 =head1 METHODS
 
@@ -30,7 +30,37 @@ I<Obj> B<!> I<Obj> -> I<Obj>
 
 Return the
 
-Aliases: I<fact>, I<factorial>
+Aliases: I<fac>, I<fact>, I<factorial>
+
+=cut
+
+=head2 !=
+
+I<Obj> B<!=> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<ne>
+
+=cut
+
+=head2 *
+
+I<Obj> B<*> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<mul>
+
+=cut
+
+=head2 +
+
+I<Obj> B<+> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<add>
 
 =cut
 
@@ -44,6 +74,16 @@ Aliases: I<inc>
 
 =cut
 
+=head2 -
+
+I<Obj> B<-> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<sub>
+
+=cut
+
 =head2 --
 
 I<Obj> B<--> I<Obj> -> I<Obj>
@@ -54,6 +94,36 @@ Aliases: I<dec>
 
 =cut
 
+=head2 /
+
+I<Obj> B</> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<÷()>, I<div>
+
+=cut
+
+=head2 <
+
+I<Obj> B<E<lt>> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<lt>
+
+=cut
+
+=head2 <=
+
+I<Obj> B<E<lt>=> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<le>
+
+=cut
+
 =head2 <=>
 
 I<Obj> B<E<lt>=E<gt>> I<Obj> -> I<Obj>
@@ -61,6 +131,156 @@ I<Obj> B<E<lt>=E<gt>> I<Obj> -> I<Obj>
 Return the
 
 Aliases: I<cmp>
+
+=cut
+
+=head2 ==
+
+I<Obj> B<==> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<eq>
+
+=cut
+
+=head2 >
+
+I<Obj> B<E<gt>> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<gt>
+
+=cut
+
+=head2 >=
+
+I<Obj> B<E<gt>=> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<ge>
+
+=cut
+
+=head2 abs
+
+Complex.abs() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 acos
+
+Complex.acos() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 acosh
+
+Complex.acosh() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 acot
+
+Complex.acot() -> I<Obj>
+
+Return the
+
+Aliases: I<acotan>
+
+=cut
+
+=head2 acoth
+
+Complex.acoth() -> I<Obj>
+
+Return the
+
+Aliases: I<acotanh>
+
+=cut
+
+=head2 acsc
+
+Complex.acsc() -> I<Obj>
+
+Return the
+
+Aliases: I<acosec>
+
+=cut
+
+=head2 acsch
+
+Complex.acsch() -> I<Obj>
+
+Return the
+
+Aliases: I<acosech>
+
+=cut
+
+=head2 asec
+
+Complex.asec() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 asech
+
+Complex.asech() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 asin
+
+Complex.asin() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 asinh
+
+Complex.asinh() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 atan
+
+Complex.atan() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 atan2
+
+Complex.atan2() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 atanh
+
+Complex.atanh() -> I<Obj>
+
+Return the
 
 =cut
 
@@ -80,6 +300,62 @@ Return the
 
 =cut
 
+=head2 cos
+
+Complex.cos() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 cosh
+
+Complex.cosh() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 cot
+
+Complex.cot() -> I<Obj>
+
+Return the
+
+Aliases: I<cotan>
+
+=cut
+
+=head2 coth
+
+Complex.coth() -> I<Obj>
+
+Return the
+
+Aliases: I<cotanh>
+
+=cut
+
+=head2 csc
+
+Complex.csc() -> I<Obj>
+
+Return the
+
+Aliases: I<cosec>
+
+=cut
+
+=head2 csch
+
+Complex.csch() -> I<Obj>
+
+Return the
+
+Aliases: I<cosech>
+
+=cut
+
 =head2 digit
 
 Complex.digit() -> I<Obj>
@@ -91,6 +367,14 @@ Return the
 =head2 dump
 
 Complex.dump() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 exp
+
+Complex.exp() -> I<Obj>
 
 Return the
 
@@ -117,6 +401,14 @@ Aliases: I<roundf>
 =head2 get_constant
 
 Complex.get_constant() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 i
+
+Complex.i() -> I<Obj>
 
 Return the
 
@@ -226,6 +518,22 @@ Aliases: I<length>
 
 =cut
 
+=head2 log
+
+Complex.log() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 log10
+
+Complex.log10() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 neg
 
 Complex.neg() -> I<Obj>
@@ -263,6 +571,14 @@ Complex.not() -> I<Obj>
 Return the
 
 Aliases: I<conj>, I<conjugated>
+
+=cut
+
+=head2 pi
+
+Complex.pi() -> I<Obj>
+
+Return the
 
 =cut
 
@@ -308,6 +624,22 @@ Return the
 
 =cut
 
+=head2 sec
+
+Complex.sec() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 sech
+
+Complex.sech() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 sign
 
 Complex.sign() -> I<Obj>
@@ -316,9 +648,49 @@ Return the
 
 =cut
 
+=head2 sin
+
+Complex.sin() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 sinh
+
+Complex.sinh() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 sqrt
+
+Complex.sqrt() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 sstr
 
 Complex.sstr() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 tan
+
+Complex.tan() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 tanh
+
+Complex.tanh() -> I<Obj>
 
 Return the
 

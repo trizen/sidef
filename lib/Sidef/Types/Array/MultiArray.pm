@@ -12,9 +12,7 @@ package Sidef::Types::Array::MultiArray {
 
     sub new {
         my (undef, @args) = @_;
-        my @array = map {
-            [map { $_->get_value } @{$_}]
-        } @args;
+        my @array = map { [@{$_}] } @args;
         bless \@array, __PACKAGE__;
     }
 
@@ -62,13 +60,12 @@ package Sidef::Types::Array::MultiArray {
         $self;
     }
 
-    *bcall   = \&each;
     *iter    = \&each;
     *iterate = \&each;
 
     sub append {
         my ($self, $array) = @_;
-        push @{$self}, [map { $_->get_value } @{$array}];
+        push @{$self}, [@{$array}];
     }
 
     *push = \&append;
@@ -78,8 +75,7 @@ package Sidef::Types::Array::MultiArray {
         Sidef::Types::Array::Array->new(map { Sidef::Types::Array::Array->new(@{$_}) } @{$self});
     }
 
-    *to_a    = \&to_array;
-    *toArray = \&to_array;
+    *to_a = \&to_array;
 
     sub dump {
         my ($self) = @_;

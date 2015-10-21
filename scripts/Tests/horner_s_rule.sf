@@ -1,0 +1,25 @@
+#!/usr/bin/ruby
+
+# http://rosettacode.org/wiki/Horner%27s_rule_for_polynomial_evaluation
+
+#
+## Recursive
+#
+func horner_rec(coeff, x) {
+    coeff.len > 0 && (
+        coeff[0] + x*horner_rec(coeff.ft(1), x)
+    );
+}
+
+assert_eq(128, horner_rec([-19, 7, -4, 6], 3));
+
+#
+## Functional
+#
+func horner_func(coeff, x) {
+    coeff.reverse.reduce { |a,b| a*x + b };
+}
+
+assert_eq(128, horner_func([-19.0, 7, -4, 6], 3));
+
+say "** Test passed!";

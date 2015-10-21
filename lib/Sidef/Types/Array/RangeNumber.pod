@@ -55,7 +55,13 @@ RangeNumber.each() -> I<Obj>
 
 Return the
 
-Aliases: I<bcall>
+=cut
+
+=head2 grep
+
+RangeNumber.grep() -> I<Obj>
+
+Return the
 
 =cut
 

@@ -1,0 +1,28 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Call_an_object_method
+#
+
+class MyClass {
+    method foo(arg) { arg }
+}
+
+var arg = 42;
+
+# Class method
+assert_eq(MyClass.(:foo)(arg), arg);
+
+# Create an instance
+var instance = MyClass();
+
+# Instance method
+assert_eq(instance.foo(arg), arg);
+
+# Alternatively, by using an expression as a method
+assert_eq(instance.(:foo)(arg), arg);
+
+# Alternatively, by asking for a method
+assert_eq(instance.method(:foo)(arg), arg);
+
+say "** Test passed!";

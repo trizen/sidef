@@ -5,6 +5,8 @@ package Sidef::Types::Array::RangeNumber {
       Sidef::Object::Object
       );
 
+    use overload '@{}' => \&to_a;
+
     sub new {
         my (undef, %opt) = @_;
         bless \%opt, __PACKAGE__;
@@ -42,7 +44,7 @@ package Sidef::Types::Array::RangeNumber {
 
     sub bounds {
         my ($self) = @_;
-        Sidef::Types::Array::List->new($self->min, $self->max);
+        ($self->min, $self->max);
     }
 
     sub contains {
@@ -71,38 +73,63 @@ package Sidef::Types::Array::RangeNumber {
         my $from  = $self->{from};
         my $limit = $self->{to};
 
-        if ($step == 1 and not $limit > (-1 >> 1) and not $from > (-1 >> 1)) {
+        if ($step == 1 and $limit < (-1 >> 1) and $from < (-1 >> 1)) {
 
             # Unpack limit
-            $limit = $limit->bstr if ref($limit);
+            $from  = $from->numify  if ref($from);
+            $limit = $limit->numify if ref($limit);
 
             foreach my $i ($from .. $limit) {
                 if (defined(my $res = $code->_run_code(Sidef::Types::Number::Number->new($i)))) {
                     return $res;
                 }
             }
-
         }
-
         elsif ($step > 0) {
-            for (my $i = $from ; $i <= $limit ; $i += $step) {
-                if (defined(my $res = $code->_run_code(Sidef::Types::Number::Number->new($i)))) {
-                    return $res;
+            if (ref($from) || ref($limit) || ref($step)) {
+
+                $from  = Math::BigFloat->new($from)  if not ref($from);
+                $limit = Math::BigFloat->new($limit) if not ref($limit);
+                $step  = Math::BigFloat->new($step)  if not ref($step);
+
+                for (my $i = $from->copy ; $i->bcmp($limit) <= 0 ; $i->badd($step)) {
+                    if (defined(my $res = $code->_run_code(Sidef::Types::Number::Number->new($i->copy)))) {
+                        return $res;
+                    }
+                }
+            }
+            else {
+                for (my $i = $from ; $i <= $limit ; $i += $step) {
+                    if (defined(my $res = $code->_run_code(Sidef::Types::Number::Number->new($i)))) {
+                        return $res;
+                    }
                 }
             }
         }
         else {
-            for (my $i = $from ; $i >= $limit ; $i += $step) {
-                if (defined(my $res = $code->_run_code(Sidef::Types::Number::Number->new($i)))) {
-                    return $res;
+            if (ref($from) || ref($limit) || ref($step)) {
+
+                $from  = Math::BigFloat->new($from)  if not ref($from);
+                $limit = Math::BigFloat->new($limit) if not ref($limit);
+                $step  = Math::BigFloat->new($step)  if not ref($step);
+
+                for (my $i = $from->copy ; $i->bcmp($limit) >= 0 ; $i->badd($step)) {
+                    if (defined(my $res = $code->_run_code(Sidef::Types::Number::Number->new($i->copy)))) {
+                        return $res;
+                    }
+                }
+            }
+            else {
+                for (my $i = $from ; $i >= $limit ; $i += $step) {
+                    if (defined(my $res = $code->_run_code(Sidef::Types::Number::Number->new($i)))) {
+                        return $res;
+                    }
                 }
             }
         }
 
         $self;
     }
-
-    *bcall = \&each;
 
     sub map {
         my ($self, $code) = @_;
@@ -112,10 +139,10 @@ package Sidef::Types::Array::RangeNumber {
         my $limit = $self->{to};
 
         my @values;
-        if ($step == 1 and not $limit > (-1 >> 1) and not $from > (-1 >> 1)) {
+        if ($step == 1 and $limit < (-1 >> 1) and $from < (-1 >> 1)) {
 
             # Unpack limit
-            $limit = $limit->bstr if ref($limit);
+            $limit = $limit->numify if ref($limit);
 
             foreach my $i ($from .. $limit) {
                 push @values, $code->run(Sidef::Types::Number::Number->new($i));
@@ -130,6 +157,41 @@ package Sidef::Types::Array::RangeNumber {
         else {
             for (my $i = $from ; $i >= $limit ; $i += $step) {
                 push @values, $code->run(Sidef::Types::Number::Number->new($i));
+            }
+        }
+
+        Sidef::Types::Array::Array->new(@values);
+    }
+
+    sub grep {
+        my ($self, $code) = @_;
+
+        my $step  = $self->{step};
+        my $from  = $self->{from};
+        my $limit = $self->{to};
+
+        my @values;
+        if ($step == 1 and $limit < (-1 >> 1) and $from < (-1 >> 1)) {
+
+            # Unpack limit
+            $limit = $limit->numify if ref($limit);
+
+            foreach my $i ($from .. $limit) {
+                my $num = Sidef::Types::Number::Number->new($i);
+                push(@values, $num) if $code->run($num);
+            }
+        }
+
+        elsif ($step > 0) {
+            for (my $i = $from ; $i <= $limit ; $i += $step) {
+                my $num = Sidef::Types::Number::Number->new($i);
+                push(@values, $num) if $code->run($num);
+            }
+        }
+        else {
+            for (my $i = $from ; $i >= $limit ; $i += $step) {
+                my $num = Sidef::Types::Number::Number->new($i);
+                push(@values, $num) if $code->run($num);
             }
         }
 

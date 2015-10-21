@@ -13,83 +13,12 @@ This object is ...
 
 var obj = Unary.new(...);
 
-
-=head1 INHERITS
-
-Inherits methods from:
-
-	* Sidef
-
 =head1 METHODS
 
-
-=head2 !
-
-I<Obj> B<!> I<Obj> -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 +
-
-I<Obj> B<+> I<Obj> -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 -
-
-I<Obj> B<-> I<Obj> -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 >
-
-I<Obj> B<E<gt>> I<Obj> -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 >>
-
-I<Obj> B<E<gt>E<gt>> I<Obj> -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 ?
-
-I<Obj> B<?> I<Obj> -> I<Obj>
-
-Return the
-
-=cut
 
 =head2 new
 
 Unary.new() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 ~
-
-I<Obj> B<~> I<Obj> -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 √
-
-I<Obj> B<√> I<Obj> -> I<Obj>
 
 Return the
 

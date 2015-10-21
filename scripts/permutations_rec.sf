@@ -1,0 +1,11 @@
+#!/usr/bin/ruby
+
+func permutations(callback, set, perm=[]) {
+    set.is_empty && callback(perm);
+    set.range.each { |i|
+        __FUNC__(callback, [set[(0 .. i-1)..., (i+1 .. set.end)...]], [perm..., set[i]]);
+    }
+};
+
+var list = [1,2,3];
+permutations({|set| say set.join}, list);

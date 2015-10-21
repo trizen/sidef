@@ -1,0 +1,61 @@
+#!/usr/bin/ruby
+
+# http://rosettacode.org/wiki/Run-length_encoding
+
+func encode (str) {
+    var chars = str.to_chars;
+
+    var i = 0;
+    var lc = '';
+
+    var output = Chars.new;
+
+    for (chars.range) {
+        var index = _;
+
+        if (i > 0 && (chars[index] != lc)) {
+            output.append(i.to_s + (lc.to_s)); i = 0;
+        }
+        elsif (chars.end == index) {
+            output.append(i + 1 -> to_s + chars[index].to_s);
+            break;
+        }
+
+        i++; lc = chars[index];
+    }
+
+    output.to_s;
+}
+
+func decode (str) {
+    var chars = str.to_chars;
+
+    var acc = '';
+    var output = '';
+
+    for (chars.range) {
+
+        var index = _;
+        var sc = chars[index].to_s;
+
+        if (sc != ' '){
+            acc += sc;
+        }
+
+        if (sc == ' ' || (chars.end == index)) {
+            var num = acc.substr(0, -1).to_i;
+            var chr = acc.substr(-1);
+            output += (chr * num);
+            acc = '';
+        }
+    }
+
+    output;
+}
+
+var str = 'WWWWWWWWWWWWBWWWWWWWWWWWWBBBWWWWWWWWWWWWWWWWWWWWWWWWBWWWWWWWWWWWWWW' -> say;
+
+var encoded = (encode(str))     -> say;
+var decoded = (decode(encoded)) -> say;
+
+str == decoded || ("Failed!\n".die);

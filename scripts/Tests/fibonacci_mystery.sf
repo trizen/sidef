@@ -1,0 +1,28 @@
+#!/usr/bin/ruby
+
+# Inspired by: http://www.youtube.com/watch?v=Nu-lW-Ifyec
+
+var c = [];
+
+func fib (n) {
+    n < 2 && return n;
+    c[n] := (fib(n-1) + (fib(n-2)));
+}
+
+var srt = 2;
+var arr = [];
+var fmt = "%6s %6s %6s\n";
+var max = (ARGV[0] \\ 9 -> to_num);
+
+" " + fmt -> printf(%w(pos fib len)...);
+
+for (var i = 0; true; i++) {
+
+    arr.push(fib(i) % srt);
+
+    arr.ft(-2) == [0,1] && (
+        fmt.printf(srt, fib(srt), arr.len-1);
+        srt >= max && break; arr=[]; i = 0; srt++;
+    );
+
+}

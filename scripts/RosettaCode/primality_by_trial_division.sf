@@ -1,0 +1,17 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Primality_by_trial_division
+#
+
+func is_prime(a) {
+  given (a) {
+    when (a == 2)              { true  }
+    when (a <= 1 || a.is_even) { false }
+    default                    { 3 .. a.sqrt -> any { a %% _ } -> not }
+  }
+}
+
+25.times { |i|
+    is_prime(i) && say i;
+}

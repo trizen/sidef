@@ -1,0 +1,20 @@
+#!/usr/bin/ruby
+
+# http://rosettacode.org/wiki/Functional_Composition
+
+func compose (f, g) {
+    func(n){ f(g(n)) }
+}
+
+func f(n) {
+    n / 64;
+}
+
+func g(n) {
+    n * 32;
+}
+
+var fg = compose(f, g);    # fg(x) is equivalent with: f(g(x))
+
+assert_eq(fg(4), 2);
+say "** Test passed!";

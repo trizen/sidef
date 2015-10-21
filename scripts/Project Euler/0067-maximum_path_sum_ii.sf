@@ -1,0 +1,22 @@
+#!/usr/bin/ruby
+
+# Find the maximum total from top to bottom in triangle.txt, a 15K text file containing a triangle with one-hundred rows.
+
+# https://projecteuler.net/problem=67
+
+# Answer: 7273
+
+var data = %f'0067-triangle.txt'.open_r.slurp;
+var triangle = data.lines.map{.words.map{.to_i}};
+
+var sum = [0];
+
+triangle.each { |x|
+    sum = [
+            x.first + sum.first,
+            1 ... x.end-1 -> map{|i| x[i] + Math.max(sum[i-1, i])}...,
+            x.last + sum.last,
+          ];
+}
+
+say sum.max;

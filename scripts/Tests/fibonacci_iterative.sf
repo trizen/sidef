@@ -1,0 +1,16 @@
+#!/usr/bin/ruby
+
+# http://rosettacode.org/wiki/Fibonacci_sequence
+
+func fib_iter(n) {
+    var fib = [1, 1];
+    {
+        fib = [fib[-1], fib[-2] + fib[-1]]
+    } * (n - fib.len);
+    return fib[-1];
+}
+
+assert_eq(fib_iter(5), 5);
+assert_eq(fib_iter(12), 144);
+
+say "** Test passed!";

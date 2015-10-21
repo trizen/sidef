@@ -1,0 +1,28 @@
+#!/usr/bin/ruby
+
+# Classes and objects
+
+class Task(callback, dependencies=[]) {
+    method perform {
+        dependencies.each { .perform };
+        callback();
+    }
+}
+
+var eat = (
+    Task.new({ say 'eating dinner. NOM!' },
+        [
+         Task.new({ say 'making dinner' },
+           [
+            Task.new({ say 'buying food' },
+              [
+               Task.new({ say 'making some money' }),
+               Task.new({ say 'going to the store' }),
+              ]
+            ),
+            Task.new({ say 'cleaning kitchen' })
+           ])
+        ])
+    );
+
+eat.perform;

@@ -11,7 +11,7 @@ var board = [
              [6, 2, 1, 6, 6, 3],
             ]
 
-var moves = :(
+var moves = Hash.new(
                 'up'         => [-1, +0],
                 'up-right'   => [-1, +1],
                 'up-left'    => [-1, -1],
@@ -26,41 +26,41 @@ var directions = moves.keys;
 
 func valid_move (row, col) {
 
-    if (
-        (row < 0) || (!(board.exists(row)))
-     || (col < 0) || (!(board[row].exists(col)))
-     ) {
-        return false;
-    }
+    row < 0 && return false;
+    col < 0 && return false;
+
+    board.has_index(row)      || return false;
+    board[row].has_index(col) || return false;
 
     return true;
 }
 
-while (true) {
+loop {
 
     var map  = Hash.new;
     var seen = Hash.new;
     var dirs = Array.new;
     var spos = Hash.new;
 
-    var current_pos = [board.offset, 0];
+    var current_pos = [board.end, 0];
     var current_num = board[current_pos[0]][current_pos[1]];
 
-    spos[current_pos.join(';')] = 1;
+    spos{current_pos.join(';')} = 1;
 
     {
         var dir = (
-         map.exists(current_num)
-          ? (map[current_num])
+         map.has_key(current_num)
+          ? map{current_num}
           : (
             var d = '';
-            { d = directions[directions.len.rand.int] }
-                do while {map.values.contains(d)};
+            do {
+                d = directions[directions.len.rand]
+            } while (map.values.contains(d));
             d;
           )
         );
 
-        var pos = moves[dir];
+        var pos = moves{dir};
         var row = current_pos[0]+pos[0];
         var col = current_pos[1]+pos[1];
 
@@ -74,27 +74,28 @@ while (true) {
                    )
                 );
 
-        map[current_num] := dir;
+        map{current_num} := dir;
         current_pos = [row, col];
         current_num = board[current_pos[0]][current_pos[1]];
 
-        if (spos[current_pos.join(';')] := 0 ++ > 1) {
+        if (spos{current_pos.join(';')} := 0 ++ > 1) {
             break;
         }
 
-        seen[current_num] := 0 ++;
+        seen{current_num} := 0 ++;
 
         if (current_num == 0) {
 
-            if (seen[board[current_pos[0] - pos[0]][current_pos[1] - pos[1]]] > 1) {
+            if (seen{board[current_pos[0] - pos[0]][current_pos[1] - pos[1]]} > 1) {
                 dirs.each { |hash|
-                    "Go %-40s (from num '%s')\n".printf(hash[:dir], hash[:num]);
+                    "Go %-40s (from num '%s')\n".printf(hash{:dir}, hash{:num});
                 };
-                break(2);
+                goto :END;
             }
 
             break;
         }
 
-    } * (board.offset ** 2);
+    } * (board.end ** 2);
 }
+@:END;

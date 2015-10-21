@@ -1,0 +1,15 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Regular_expressions
+#
+
+var str = <<'EOF';
+    x:Foo
+    y:Bar
+EOF
+ 
+while (var m = (str =~ /(\w+):(\S+)/g)) {
+    var(s1,s2) = m.cap...;
+    say "#{s1} -> #{s2}";
+}

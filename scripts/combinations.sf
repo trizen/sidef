@@ -1,31 +1,21 @@
 #!/usr/bin/ruby
 
-# Translation of: http://rosettacode.org/wiki/Combinations#Perl5i
-
 func combine(n, set) {
 
-    set.len? || return [];
-    n == 1   && return set.map{[_]};
+    set.len || return [];
+    n == 1  && return set.map{[_]};
 
-    var(head, result);
+    var (head, result);
     head   = set.shift;
     result = __FUNC__(n-1, set.copy);
 
     result.each { |subarray|
         subarray.unshift(head);
-    }
+    };
 
     result + __FUNC__(n, set);
 }
 
-
-##
-# Testing
-##
-
-var combinations = combine(3, 0..4);
-combinations.each {|row|
+combine(3, 0..4).each {|row|
     say row.join(' ');
 }
-
-combinations == (0..4 -> combinations(3)) || die "error2";

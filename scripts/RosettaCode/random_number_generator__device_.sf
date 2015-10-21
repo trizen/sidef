@@ -1,0 +1,18 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Random_number_generator_(device)
+#
+
+func urandom() {
+    const device = %f'/dev/urandom';
+ 
+    var(fh, err);
+    device.open('<:raw', \fh, \err)
+        || die "Can't open `#{device}': #{err}";
+ 
+    fh.sysread(\var noise, 4);
+    'L'.unpack(noise);
+}
+ 
+say urandom();    # sample: 3517432564

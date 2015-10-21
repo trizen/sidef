@@ -1,0 +1,12 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Multiple_distinct_objects
+#
+
+class Foo { };
+
+[Foo.new] * 5;      # incorrect (only one distinct object is created)
+
+5.of {Foo.new};     # correct
+1..5 -> map {Foo.new}; # also correct

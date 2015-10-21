@@ -1,7 +1,9 @@
 package Sidef::Sys::Sys {
 
     use 5.014;
-    our @ISA = qw(Sidef);
+    use parent qw(
+      Sidef::Object::Object
+      );
 
     sub new {
         my (undef, %opt) = @_;
@@ -85,6 +87,19 @@ package Sidef::Sys::Sys {
         Sidef::Types::String::String->new(CORE::ref $obj);
     }
 
+    sub defined {
+        my ($self, $obj) = @_;
+        Sidef::Types::Bool::Bool->new(defined $obj);
+    }
+
+    sub class_name {
+        my ($self, $obj) = @_;
+        my $ref = CORE::ref($obj);
+
+        my $rindex = rindex($ref, '::');
+        Sidef::Types::String::String->new($rindex == -1 ? $ref : substr($ref, $rindex + 2));
+    }
+
     sub sidef {
         my ($self) = @_;
 
@@ -111,14 +126,12 @@ package Sidef::Sys::Sys {
 
     sub assert_eq {
         my ($self, $arg1, $arg2) = @_;
-        state $method = '==';
-        $arg1->$method($arg2) || $self->die("assert_eq: $arg1 $method $arg2 is false");
+        Sidef::Types::Bool::Bool->new(($arg1 eq $arg2) || $self->die("assert_eq: $arg1 == $arg2 is false"));
     }
 
     sub assert_ne {
         my ($self, $arg1, $arg2) = @_;
-        state $method = '!=';
-        $arg1->$method($arg2) || $self->die("assert_ne: $arg1 $method $arg2 is false");
+        Sidef::Types::Bool::Bool->new(not($arg1 eq $arg2) || $self->die("assert_eq: $arg1 != $arg2 is false"));
     }
 
     sub warn {
@@ -175,10 +188,8 @@ package Sidef::Sys::Sys {
 
         if (@vars) {
             foreach my $var_ref (@vars) {
-                my $var = $var_ref->get_var;
-                print "$var->{name}: ";
                 chomp(my $input = <STDIN>);
-                $var->set_value($type->new($input));
+                ${$var_ref} = $type->new($input);
             }
 
             return $self;

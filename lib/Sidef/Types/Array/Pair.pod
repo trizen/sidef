@@ -71,7 +71,7 @@ Pair.to_a() -> I<Obj>
 
 Return the
 
-Aliases: I<to_array>, I<toArray>
+Aliases: I<to_array>
 
 =cut
 
@@ -81,6 +81,6 @@ Pair.to_h() -> I<Obj>
 
 Return the
 
-Aliases: I<to_hash>, I<toHash>
+Aliases: I<to_hash>
 
 =cut

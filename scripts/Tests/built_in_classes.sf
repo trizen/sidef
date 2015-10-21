@@ -1,0 +1,48 @@
+#!/usr/bin/ruby
+
+# Extension of buil-in classes
+
+class Custom {
+    method in_blue {
+        "in_blue('#{self}')";
+    }
+}
+
+# Inherit a used-defined class into the String class
+class String << Custom {
+    method in_red {
+        "#f00 --#{self}--"
+    }
+};
+
+"hello".in_red.contains("#f00")     || "error -1".die;
+"hello".in_blue.contains("in_blue") || "error 0".die;
+
+# Define a hash of colors
+var COLORS = Hash.new(
+           black   => "000",
+           red     => "f00",
+           green   => "0f0",
+           yellow  => "ff0",
+           blue    => "00f",
+           magenta => "f0f",
+           cyan    => "0ff",
+           white   => "fff",
+        );
+
+# Redefine the String class and define new methods in it with 'def_method' keyword
+# Inspired from: http://en.wikipedia.org/wiki/Ruby_(programming_language)#Metaprogramming
+class "" {
+    COLORS.each { |color,code|
+       __CLASS__.def_method("in_#{color}", func(self) {
+            "<span style=\"color: ##{code}\">#{self}</span>"
+        });
+    }
+};
+
+"hello".in_red.contains("#f00")    || "error 1".die;
+"hello".in_yellow.contains("#ff0") || "error 2".die;
+"hello".in_green.contains("#0f0")  || "error 3".die;
+
+# All OK!
+say "** Test passed!";

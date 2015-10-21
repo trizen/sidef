@@ -1,0 +1,38 @@
+#!/usr/bin/ruby
+
+# General solution for reversing strings and arrays
+
+func reverse (data) {
+
+    # Create a new object of the same
+    # type as the data provided as argument
+    var rev = data.new;
+
+    # Cut the last item from data
+    var last = data.last;
+    data = data.ft!(0, -2);
+
+    # Append it to our reversed object
+    rev.append!(last);
+
+    # Recurse with data-1 if data.len >= 1
+    if (data.length >= 1) {
+        rev += reverse(data);
+    }
+
+    return rev;
+}
+
+
+# String
+say reverse('abc').dump;
+
+# String (built-in)
+say 'abc'.reverse.dump;
+
+
+# Array
+say reverse(%w(a b c)).dump;
+
+# Array (built-in)
+say %w(a b c).reverse.dump;

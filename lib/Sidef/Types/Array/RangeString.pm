@@ -5,6 +5,8 @@ package Sidef::Types::Array::RangeString {
       Sidef::Object::Object
       );
 
+    use overload '@{}' => \&to_a;
+
     sub new {
         my (undef, %opt) = @_;
         bless \%opt, __PACKAGE__;
@@ -22,7 +24,7 @@ package Sidef::Types::Array::RangeString {
 
     sub bounds {
         my ($self) = @_;
-        Sidef::Types::Array::List->new($self->min, $self->max);
+        ($self->min, $self->max);
     }
 
     sub reverse {
@@ -88,8 +90,6 @@ package Sidef::Types::Array::RangeString {
 
         $self;
     }
-
-    *bcall = \&each;
 
     our $AUTOLOAD;
     sub DESTROY { }

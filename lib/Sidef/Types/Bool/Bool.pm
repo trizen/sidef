@@ -2,6 +2,7 @@ package Sidef::Types::Bool::Bool {
 
     use overload
       q{bool} => \&get_value,
+      q{0+}   => \&get_value,
       q{""}   => \&dump;
 
     use parent qw(
@@ -14,8 +15,7 @@ package Sidef::Types::Bool::Bool {
         my $false = (bless \(my $f = 0), __PACKAGE__);
 
         sub new {
-            my (undef, $bool) = @_;
-            $bool ? $true : $false;
+            $_[1] ? $true : $false;
         }
 
         *call = \&new;

@@ -1,9 +1,0 @@
-#!/usr/bin/ruby
-
-#
-## http://rosettacode.org/wiki/Hello_world/Line_printer
-#
-
-Sys.open(\var fh, '>', '/dev/lp0')
-    && fh.println("Hello World!")
-    && fh.close;

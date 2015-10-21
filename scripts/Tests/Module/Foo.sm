@@ -1,0 +1,7 @@
+#!/usr/bin/ruby
+
+class Bar {
+    method baz {
+        "foo";
+    }
+}

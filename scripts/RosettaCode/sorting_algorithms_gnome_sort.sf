@@ -1,0 +1,30 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Sorting_algorithms/Gnome_sort
+#
+
+class Array {
+    method gnomesort {
+        var (i=1, j=2);
+        var len = self.len;
+        while (i < len) {
+            if (self[i-1] <= self[i]) {
+                (i, j) = (j, j+1);
+            }
+            else {
+                self[i-1, i] = self[i, i-1];
+                if (--i == 0) {
+                    (i, j) = (j, j+1);
+                }
+            }
+        }
+        return self;
+    }
+}
+ 
+var numbers = [7,6,5,9,8,4,3,1,2,0];
+say numbers.gnomesort;
+ 
+var strs = ["John", "Kate", "Zerg", "Alice", "Joe", "Jane"];
+say strs.gnomesort;

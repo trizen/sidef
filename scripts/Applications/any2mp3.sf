@@ -42,7 +42,7 @@ func main() {
     var outputDir = Dir.cwd;
 
     # Command-line flags
-    var glong = (require('Getopt::Long')->());
+    var glong = frequire('Getopt::Long');
     glong.GetOptionsFromArray(ARGV,
         'output-dir|o=s' => func(_, val) { outputDir  = Dir.new(val) },
         'threads|t=i'    => func(_, val) { maxThreads = Num.new(val) },

@@ -1,0 +1,49 @@
+
+=encoding utf8
+
+=head1 NAME
+
+Sidef::Types::Grapheme::Grapheme
+
+=head1 DESCRIPTION
+
+This object is ...
+
+=head1 SYNOPSIS
+
+var obj = Grapheme.new(...);
+
+
+=head1 INHERITS
+
+Inherits methods from:
+
+	* Sidef::Convert::Convert
+	* Sidef::Types::String::String
+
+=head1 METHODS
+
+
+=head2 call
+
+Grapheme.call() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 dump
+
+Grapheme.dump() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 new
+
+Grapheme.new() -> I<Obj>
+
+Return the
+
+=cut

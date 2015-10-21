@@ -1,7 +1,0 @@
-#!/usr/bin/ruby
-
-#
-## http://rosettacode.org/wiki/Narcissist
-#
-
-say (File.new(__FILE__).open_r.slurp == ARGF.slurp);

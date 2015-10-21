@@ -3,22 +3,22 @@ package Sidef::Types::Number::Complex {
     use utf8;
     use 5.014;
 
+    require Math::Complex;
+
     use parent qw(
+      Sidef::Object::Object
       Sidef::Convert::Convert
-      Sidef::Types::Number::Number
       );
 
     use overload
       q{""}   => \&get_value,
+      q{0+}   => \&get_value,
       q{bool} => \&get_value;
 
     sub new {
         my (undef, $x, $y) = @_;
 
-        my $self = bless({}, __PACKAGE__);
-        defined($x) || return $self;
-
-        state $_x = require Math::Complex;
+        $x // return (state $_zero = bless(\Math::Complex->make(0, 0), __PACKAGE__));
 
         #
         ## Check X
@@ -32,11 +32,8 @@ package Sidef::Types::Number::Complex {
         }
 
         if (my $rx = ref($x)) {
-            if ($rx eq 'Math::BigFloat' or $rx eq 'Math::BigInt') {
-                ## ok
-            }
-            elsif ($rx eq 'Math::BigRat') {
-                $x = $x->as_float;
+            if ($rx eq 'Math::BigRat' or $rx eq 'Math::BigFloat' or $rx eq 'Math::BigInt') {
+                $x = $x->numify;
             }
             elsif ($rx eq 'Math::Complex') {
                 $x = Math::Complex::Re($x);
@@ -44,12 +41,6 @@ package Sidef::Types::Number::Complex {
             else {
                 $x = $x->get_value;
             }
-        }
-
-        if (not defined(&Math::BigFloat::_cartesian)) {
-            *Math::BigFloat::_cartesian = sub {
-                Math::Complex->make($_[0], 0)->_cartesian;
-            };
         }
 
         #
@@ -60,11 +51,8 @@ package Sidef::Types::Number::Complex {
         }
 
         if (my $ry = ref($y)) {
-            if ($ry eq 'Math::BigFloat' or $ry eq 'Math::BigInt') {
-                ## ok
-            }
-            elsif ($ry eq 'Math::BigRat') {
-                $y = $y->as_float;
+            if ($ry eq 'Math::BigRat' or $ry eq 'Math::BigFloat' or $ry eq 'Math::BigInt') {
+                $y = $y->numify;
             }
             elsif ($ry eq 'Math::Complex') {
                 $y = Math::Complex::Im($y);
@@ -78,6 +66,30 @@ package Sidef::Types::Number::Complex {
     }
 
     *call = \&new;
+
+    sub get_value {
+        ${$_[0]};
+    }
+
+    sub get_constant {
+        my ($self, $name) = @_;
+
+        state %cache;
+        state $table = {
+                        pi => sub { $self->new(Math::Complex::pi()) },
+                        i  => sub { $self->new(Math::Complex::i()) },
+                       };
+
+        $cache{lc($name)} //= exists($table->{lc($name)}) ? $table->{lc($name)}->() : do {
+            warn qq{[WARN] Inexistent Complex constant "$name"!\n};
+            undef;
+        };
+    }
+
+    sub i {
+        my ($self) = @_;
+        $self->new(Math::Complex::i());
+    }
 
     sub cartesian {
         my ($self) = @_;
@@ -93,96 +105,322 @@ package Sidef::Types::Number::Complex {
 
     sub real {
         my ($self) = @_;
-        state $_x = require Math::Complex;
-        Sidef::Types::Number::Number->new(Math::Complex::Re($$self));
+        $self->new(Math::Complex::Re($$self));
     }
 
     *re = \&real;
 
     sub imaginary {
         my ($self) = @_;
-        state $_x = require Math::Complex;
-        Sidef::Types::Number::Number->new(Math::Complex::Im($$self));
+        $self->new(Math::Complex::Im($$self));
     }
 
     *im = \&imaginary;
 
     sub reciprocal {
-        __PACKAGE__->new(1)->div($_[0]);
-    }
-
-    sub get_constant {
-        my ($self, $name) = @_;
-
-        state $_x = require Math::Complex;
-
-        state %cache;
-        state $table = {i => sub { __PACKAGE__->new(Math::Complex->i) },};
-
-        $cache{lc($name)} //= exists($table->{lc($name)}) ? $table->{lc($name)}->() : do {
-            warn qq{[WARN] Inexistent Complex constant "$name"!\n};
-            undef;
-        };
-    }
-
-    sub get_value {
-        ${$_[0]};
+        my ($self) = @_;
+        $self->new(1 / $$self);
     }
 
     sub inc {
         my ($self) = @_;
-        $self->new($self->get_value + 1);
+        $self->new($$self + 1);
     }
 
     sub dec {
         my ($self) = @_;
-        $self->new($self->get_value - 1);
+        $self->new($$self - 1);
     }
 
     sub cmp {
-        my ($self, $num) = @_;
-        Sidef::Types::Number::Number->new($self->get_value <=> $num->get_value);
+        my ($self, $arg) = @_;
+        local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
+
+        state $mone = Sidef::Types::Number::Number->new(-1);
+        state $zero = Sidef::Types::Number::Number->new(0);
+        state $one  = Sidef::Types::Number::Number->new(1);
+
+        my $cmp = $$self <=> $arg->get_value;
+        $cmp == 0 ? $zero : $cmp > 0 ? $one : $mone;
+    }
+
+    sub gt {
+        my ($self, $arg) = @_;
+        local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
+        Sidef::Types::Bool::Bool->new($$self > $arg->get_value);
+    }
+
+    sub lt {
+        my ($self, $arg) = @_;
+        local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
+        Sidef::Types::Bool::Bool->new($$self < $arg->get_value);
+    }
+
+    sub ge {
+        my ($self, $arg) = @_;
+        local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
+        Sidef::Types::Bool::Bool->new($$self >= $arg->get_value);
+    }
+
+    sub le {
+        my ($self, $arg) = @_;
+        local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
+        Sidef::Types::Bool::Bool->new($$self <= $arg->get_value);
+    }
+
+    sub eq {
+        my ($self, $arg) = @_;
+        Sidef::Types::Bool::Bool->new($$self == $$arg);
+    }
+
+    sub ne {
+        my ($self, $arg) = @_;
+        Sidef::Types::Bool::Bool->new($$self != $$arg);
+    }
+
+    sub abs {
+        my ($self) = @_;
+        $self->new($$self->abs);
     }
 
     sub factorial {
         my ($self) = @_;
         my $fac = 1;
-        $fac *= $_ for (2 .. $self->get_value);
+        $fac *= $_ for (2 .. $$self);
         $self->new($fac);
     }
 
+    *fac  = \&factorial;
     *fact = \&factorial;
+
+    sub mul {
+        my ($self, $arg) = @_;
+        local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
+        $self->new($$self * $arg->get_value);
+    }
+
+    sub div {
+        my ($self, $arg) = @_;
+        local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
+        $self->new($$self / $arg->get_value);
+    }
+
+    sub add {
+        my ($self, $arg) = @_;
+        local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
+        $self->new($$self + $arg->get_value);
+    }
+
+    sub sub {
+        my ($self, $arg) = @_;
+        local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
+        $self->new($$self - $arg->get_value);
+    }
+
+    sub exp {
+        my ($self) = @_;
+        $self->new($$self->exp);
+    }
+
+    sub log {
+        my ($self, $base) = @_;
+        $self->new(
+            defined($base)
+            ? do {
+                local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
+                $$self->logn($base->get_value);
+              }
+            : $$self->log
+        );
+    }
+
+    sub log10 {
+        my ($self) = @_;
+        $self->new($$self->log10);
+    }
+
+    sub sqrt {
+        my ($self) = @_;
+        $self->new($$self->sqrt);
+    }
 
     sub int {
         my ($self) = @_;
-        $self->new(CORE::int($self->get_value));
+        $self->new(CORE::int($$self));
     }
 
     *as_int = \&int;
 
+    sub atan2 {
+        my ($self, $arg) = @_;
+        local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
+        $self->new($$self->atan2($arg->get_value));
+    }
+
+    sub cos {
+        my ($self) = @_;
+        $self->new($$self->cos);
+    }
+
+    sub sin {
+        my ($self) = @_;
+        $self->new($$self->sin);
+    }
+
     sub neg {
         my ($self) = @_;
-        $self->new(-$self->get_value);
+        $self->new($$self->_negate);
     }
 
     *negate = \&neg;
 
     sub not {
         my ($self) = @_;
-        $self->new(-$self->get_value - 1);
+        $self->new(-$$self - 1);
     }
 
     *conjugated = \&not;
     *conj       = \&not;
 
+    sub pi {
+        my ($self) = @_;
+        $self->new(Math::Complex::pi());
+    }
+
+    sub tan {
+        my ($self) = @_;
+        $self->new($$self->tan);
+    }
+
+    sub csc {
+        my ($self) = @_;
+        $self->new($$self->csc);
+    }
+
+    *cosec = \&csc;
+
+    sub sec {
+        my ($self) = @_;
+        $self->new($$self->sec);
+    }
+
+    sub cot {
+        my ($self) = @_;
+        $self->new($$self->cot);
+    }
+
+    *cotan = \&cot;
+
+    sub asin {
+        my ($self) = @_;
+        $self->new($$self->asin);
+    }
+
+    sub acos {
+        my ($self) = @_;
+        $self->new($$self->acos);
+    }
+
+    sub atan {
+        my ($self) = @_;
+        $self->new($$self->acos);
+    }
+
+    sub acsc {
+        my ($self) = @_;
+        $self->new($$self->acsc);
+    }
+
+    *acosec = \&acsc;
+
+    sub asec {
+        my ($self) = @_;
+        $self->new($$self->asec);
+    }
+
+    sub acot {
+        my ($self) = @_;
+        $self->new($$self->acot);
+    }
+
+    *acotan = \&acot;
+
+    sub sinh {
+        my ($self) = @_;
+        $self->new($$self->sinh);
+    }
+
+    sub cosh {
+        my ($self) = @_;
+        $self->new($$self->cosh);
+    }
+
+    sub tanh {
+        my ($self) = @_;
+        $self->new($$self->tanh);
+    }
+
+    sub csch {
+        my ($self) = @_;
+        $self->new($$self->csch);
+    }
+
+    *cosech = \&csch;
+
+    sub sech {
+        my ($self) = @_;
+        $self->new($$self->sech);
+    }
+
+    sub coth {
+        my ($self) = @_;
+        $self->new($$self->coth);
+    }
+
+    *cotanh = \&coth;
+
+    sub asinh {
+        my ($self) = @_;
+        $self->new($$self->asinh);
+    }
+
+    sub acosh {
+        my ($self) = @_;
+        $self->new($$self->acosh);
+    }
+
+    sub atanh {
+        my ($self) = @_;
+        $self->new($$self->atanh);
+    }
+
+    sub acsch {
+        my ($self) = @_;
+        $self->new($$self->acsch);
+    }
+
+    *acosech = \&acsch;
+
+    sub asech {
+        my ($self) = @_;
+        $self->new($$self->asech);
+    }
+
+    sub acoth {
+        my ($self) = @_;
+        $self->new($$self->acoth);
+    }
+
+    *acotanh = \&acoth;
+
     sub sign {
         my ($self) = @_;
-        Sidef::Types::String::String->new($self->get_value >= 0 ? '+' : '-');
+        Sidef::Types::String::String->new($$self >= 0 ? '+' : '-');
     }
 
     sub is_zero {
         my ($self) = @_;
-        Sidef::Types::Bool::Bool->new($self->get_value == 0);
+        Sidef::Types::Bool::Bool->new($$self == 0);
     }
 
     sub is_nan {
@@ -194,38 +432,38 @@ package Sidef::Types::Number::Complex {
 
     sub is_positive {
         my ($self) = @_;
-        Sidef::Types::Bool::Bool->new($self->get_value >= 0);
+        Sidef::Types::Bool::Bool->new($$self >= 0);
     }
 
     *is_pos = \&is_positive;
 
     sub is_negative {
         my ($self) = @_;
-        Sidef::Types::Bool::Bool->new($self->get_value < 0);
+        Sidef::Types::Bool::Bool->new($$self < 0);
     }
 
     *is_neg = \&is_negative;
 
     sub is_even {
         my ($self) = @_;
-        Sidef::Types::Bool::Bool->new($self->get_value % 2 == 0);
+        Sidef::Types::Bool::Bool->new($$self % 2 == 0);
     }
 
     sub is_odd {
         my ($self) = @_;
-        Sidef::Types::Bool::Bool->new($self->get_value % 2 != 0);
+        Sidef::Types::Bool::Bool->new($$self % 2 != 0);
     }
 
     sub is_inf {
         my ($self) = @_;
-        Sidef::Types::Bool::Bool->new($self->get_value == 'inf');
+        Sidef::Types::Bool::Bool->new($$self == 'inf');
     }
 
     *is_infinite = \&is_inf;
 
     sub is_integer {
         my ($self) = @_;
-        Sidef::Types::Bool::Bool->new($self->get_value == CORE::int($self->get_value));
+        Sidef::Types::Bool::Bool->new($$self == CORE::int($$self));
     }
 
     *is_int = \&is_integer;
@@ -233,8 +471,8 @@ package Sidef::Types::Number::Complex {
     sub rand {
         my ($self, $max) = @_;
 
-        my $min = $self->get_value;
-        $max = ref($max) ? $max->get_value : do { $min = 0; $self->get_value };
+        my $min = $$self;
+        $max = ref($max) ? $max->get_value : do { $min = 0; $$self };
 
         $self->new($min + CORE::rand($max - $min));
     }
@@ -242,22 +480,22 @@ package Sidef::Types::Number::Complex {
     sub ceil {
         my ($self) = @_;
 
-        CORE::int($self->get_value) == $self->get_value
+        CORE::int($$self) == $$self
           && return $self;
 
-        $self->new(CORE::int($self->get_value + 1));
+        $self->new(CORE::int($$self + 1));
     }
 
     sub floor {
         my ($self) = @_;
-        $self->new(CORE::int($self->get_value));
+        $self->new(CORE::int($$self));
     }
 
     sub round { ... }
 
     sub roundf {
         my ($self, $num) = @_;
-        $self->new(sprintf "%.*f", $num->get_value * -1, $self->get_value);
+        $self->new(sprintf "%.*f", $num->get_value * -1, $$self);
     }
 
     *fround = \&roundf;
@@ -273,7 +511,7 @@ package Sidef::Types::Number::Complex {
 
     sub sstr {
         my ($self) = @_;
-        Sidef::Types::String::String->new($self->get_value);
+        Sidef::Types::String::String->new($$self);
     }
 
     sub dump {
@@ -287,6 +525,17 @@ package Sidef::Types::Number::Complex {
         *{__PACKAGE__ . '::' . '++'}  = \&inc;
         *{__PACKAGE__ . '::' . '--'}  = \&dec;
         *{__PACKAGE__ . '::' . '<=>'} = \&cmp;
+        *{__PACKAGE__ . '::' . '<'}   = \&lt;
+        *{__PACKAGE__ . '::' . '>'}   = \&gt;
+        *{__PACKAGE__ . '::' . '<='}  = \&le;
+        *{__PACKAGE__ . '::' . '>='}  = \&ge;
+        *{__PACKAGE__ . '::' . '=='}  = \&eq;
+        *{__PACKAGE__ . '::' . '!='}  = \&ne;
+        *{__PACKAGE__ . '::' . '*'}   = \&mul;
+        *{__PACKAGE__ . '::' . '/'}   = \&div;
+        *{__PACKAGE__ . '::' . '÷'}  = \&div;
+        *{__PACKAGE__ . '::' . '-'}   = \&sub;
+        *{__PACKAGE__ . '::' . '+'}   = \&add;
         *{__PACKAGE__ . '::' . '!'}   = \&factorial;
     }
 };

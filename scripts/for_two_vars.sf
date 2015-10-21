@@ -1,9 +1,0 @@
-#!/usr/bin/perl
-
-#
-## Incrementing two vars in a 'for' loop
-#
-
-for ((var i = 0; var j = 3); i <= 5; (i++; j += i)) {
-    "%d -- %d\n".printf(i, j);
-}

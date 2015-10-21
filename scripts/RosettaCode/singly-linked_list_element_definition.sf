@@ -1,0 +1,17 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Singly-linked_list/Element_definition
+#
+
+var foo_node = Hash.new(foo => 1);
+var bar_node = Hash.new(bar => 2);
+
+var node = :(
+    data => 'say what',
+    next => foo_node,
+);
+ 
+node{:next} = bar_node;  # mutable
+
+say node;

@@ -1,13 +1,11 @@
 package Sidef::Math::Math {
 
     use 5.014;
-    our @ISA = qw(Sidef);
+    use parent qw(
+      Sidef::Object::Object
+      );
 
     sub new {
-        state $x = do {
-            require Math::BigFloat;
-            Math::BigFloat->new;
-        };
         bless {}, __PACKAGE__;
     }
 
@@ -16,8 +14,8 @@ package Sidef::Math::Math {
 
         state %cache;
         state $table = {
-            pi  => sub { Math::BigFloat->new('3.14159265358979323846264338327950288419716939937510582097494459') },
             e   => sub { Math::BigFloat->new('2.71828182845904523536028747135266249775724709369995957496696763') },
+            pi  => sub { Math::BigFloat->new('3.14159265358979323846264338327950288419716939937510582097494459') },
             phi => sub { Math::BigFloat->new('1.61803398874989484820458683436563811772030917980576286213544862') },
 
             sqrt2   => sub { Math::BigFloat->new('1.41421356237309504880168872420969807856967187537694807317667974') },
@@ -25,13 +23,14 @@ package Sidef::Math::Math {
             sqrtpi  => sub { Math::BigFloat->new('1.77245385090551602729816748334114518279754945612238712821380779') },
             sqrtphi => sub { Math::BigFloat->new('1.27201964951406896425242246173749149171560804184009624861664038') },
 
-            ln2    => sub { Math::BigFloat->new('0.693147180559945309417232121458176568075500134360255254120680009') },
-            log2e  => sub { Math::BigFloat->new('1.4426950408889634073599246810018921374266459541529859') },
-            ln10   => sub { Math::BigFloat->new('2.30258509299404568401799145468436420760110148862877297603332790') },
-            log10e => sub { Math::BigFloat->new('0.4342944819032518276511289189166050822943970058036665') },
+            ln2    => sub { Math::BigFloat->new(2)->blog },
+            log2e  => sub { Math::BigFloat->new(2)->blog->bpow(-1) },
+            ln10   => sub { Math::BigFloat->new(10)->blog },
+            log10e => sub { Math::BigFloat->new(10)->blog->bpow(-1) },
                        };
 
-        $cache{lc($name)} //= exists($table->{lc($name)}) ? Sidef::Types::Number::Number->new($table->{lc($name)}->()) : do {
+        my $key = lc($name);
+        $cache{$key} //= exists($table->{$key}) ? Sidef::Types::Number::Number->new($table->{$key}->()) : do {
             warn qq{[WARN] Inexistent Math constant "$name"!\n};
             undef;
         };
@@ -39,7 +38,8 @@ package Sidef::Math::Math {
 
     sub e {
         my ($self, $places) = @_;
-        Sidef::Types::Number::Number->new(Math::BigFloat->bexp(1, defined($places) ? $places->get_value : ()));
+        state $one = Math::BigFloat->new(1);
+        Sidef::Types::Number::Number->new(Math::BigFloat->bexp($one, defined($places) ? $places->get_value : ()));
     }
 
     sub exp {
@@ -60,8 +60,8 @@ package Sidef::Math::Math {
             # Code by Dana Jacobsen from RosettaCode
             # http://rosettacode.org/wiki/Arithmetic-geometric_mean/Calculate_Pi#Perl
 
-            my $acc  = $places + 8;
-            my $HALF = Math::BigFloat->new('0.5');
+            my $acc = $places + 8;
+            state $HALF = Math::BigFloat->new('0.5');
 
             my $an = Math::BigFloat->bone;
             my $bn = $HALF->copy->bsqrt($acc);
@@ -106,18 +106,20 @@ package Sidef::Math::Math {
 
     sub log2 {
         my ($self, $n) = @_;
-        Sidef::Types::Number::Number->new(Math::BigFloat->new($n->get_value)->blog(2));
+        state $two = Math::BigFloat->new(2);
+        Sidef::Types::Number::Number->new(Math::BigFloat->new($n->get_value)->blog($two));
     }
 
     sub log10 {
         my ($self, $n) = @_;
-        Sidef::Types::Number::Number->new(Math::BigFloat->new($n->get_value)->blog(10));
+        state $ten = Math::BigFloat->new(10);
+        Sidef::Types::Number::Number->new(Math::BigFloat->new($n->get_value)->blog($ten));
     }
 
     sub npow2 {
         my ($self, $x) = @_;
         my $y = Math::BigFloat->new(2);
-        Sidef::Types::Number::Number->new($y->blsft(Math::BigFloat->new($x->get_value)->blog($y)->as_int));
+        Sidef::Types::Number::Number->new($y->blsft(Math::BigFloat->new($x->get_value)->as_int->blog($y)));
     }
 
     sub npow {
@@ -126,7 +128,7 @@ package Sidef::Math::Math {
         $x = Math::BigFloat->new($x->get_value);
         $y = Math::BigFloat->new($y->get_value);
 
-        Sidef::Types::Number::Number->new($y->bpow($x->blog($y)->as_int->binc));
+        Sidef::Types::Number::Number->new($y->bpow($x->as_int->blog($y)->binc));
     }
 
     sub gcd {
@@ -150,12 +152,12 @@ package Sidef::Math::Math {
 
     sub precision {
         my ($self, $n) = @_;
-        Sidef::Types::Number::Number->new(Math::BigFloat->precision($n->get_value));
+        Sidef::Types::Number::Number->new(Math::BigFloat->precision(defined($n) ? $n->get_value || undef : ()));
     }
 
     sub accuracy {
         my ($self, $n) = @_;
-        Sidef::Types::Number::Number->new(Math::BigFloat->accuracy($n->get_value));
+        Sidef::Types::Number::Number->new(Math::BigFloat->accuracy(defined($n) ? $n->get_value || undef : ()));
     }
 
     sub ceil {
@@ -171,6 +173,21 @@ package Sidef::Math::Math {
     sub sqrt {
         my ($self, $n) = @_;
         Sidef::Types::Number::Number->new(Math::BigFloat->new($n->get_value)->bsqrt);
+    }
+
+    sub root {
+        my ($self, $n, $m) = @_;
+        Sidef::Types::Number::Number->new(Math::BigFloat->new($n->get_value)->broot($m->get_value));
+    }
+
+    sub troot {
+        my ($self, $n) = @_;
+
+        state $two   = Math::BigFloat->new(2);
+        state $eight = Math::BigFloat->new(8);
+
+        Sidef::Types::Number::Number->new(
+                                       scalar Math::BigFloat->new($n->get_value)->bmul($eight)->binc->bsqrt->bdec->bdiv($two));
     }
 
     sub pow {

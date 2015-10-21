@@ -1,0 +1,13 @@
+#!/usr/bin/ruby
+
+var file = (File.new(__FILE__));
+
+if (file.open_r(\var fh)) {
+    say "** File successfully accessed!";
+
+    fh.readline == "#!/usr/bin/ruby\n"
+        || die "fh.readline error!\n";
+}
+else {
+    die "Can't open the file for reading!\n";
+}

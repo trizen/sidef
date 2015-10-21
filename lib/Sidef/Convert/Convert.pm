@@ -22,13 +22,13 @@ package Sidef::Convert::Convert {
     }
 
     sub to_i {
-        Sidef::Types::Number::Number->new_int($_[0]->get_value);
+        Sidef::Types::Number::Number->new(Math::BigFloat->new($_[0]->get_value)->as_int);
     }
 
     *to_int = \&to_i;
 
     sub to_rat {
-        Sidef::Types::Number::Number->new_rat($_[0]->get_value);
+        Sidef::Types::Number::Number->new(Math::BigRat->new($_[0]->get_value));
     }
 
     *to_rational = \&to_rat;
@@ -48,7 +48,7 @@ package Sidef::Convert::Convert {
     *to_number = \&to_n;
 
     sub to_float {
-        Sidef::Types::Number::Number->new_float($_[0]->get_value);
+        Sidef::Types::Number::Number->new(Math::BigFloat->new($_[0]->get_value));
     }
 
     *to_f = \&to_float;
@@ -65,27 +65,39 @@ package Sidef::Convert::Convert {
         Sidef::Types::Bool::Bool->new($_[0]->get_value);
     }
 
-    sub to_byte {
-        Sidef::Types::Byte::Byte->new(CORE::ord($_[0]->get_value));
-    }
-
-    sub to_char {
-        Sidef::Types::Char::Char->call($_[0]->get_value);
-    }
-
     sub to_regex {
         Sidef::Types::Regex::Regex->new($_[0]->get_value);
     }
 
     *to_re = \&to_regex;
 
+    sub to_byte {
+        Sidef::Types::Byte::Byte->new(CORE::ord($_[0]->get_value));
+    }
+
     sub to_bytes {
         Sidef::Types::Byte::Bytes->call($_[0]->get_value);
+    }
+
+    sub to_char {
+        Sidef::Types::Char::Char->call($_[0]->get_value);
     }
 
     sub to_chars {
         Sidef::Types::Char::Chars->call($_[0]->get_value);
     }
+
+    sub to_grapheme {
+        Sidef::Types::Grapheme::Grapheme->call($_[0]);
+    }
+
+    *to_graph = \&to_grapheme;
+
+    sub to_graphemes {
+        Sidef::Types::Grapheme::Graphemes->call($_[0]);
+    }
+
+    *to_graphs = \&to_graphemes;
 
     sub to_array {
         Sidef::Types::Array::Array->new($_[0]);

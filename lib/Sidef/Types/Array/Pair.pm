@@ -10,7 +10,7 @@ package Sidef::Types::Array::Pair {
 
     sub new {
         my (undef, $item1, $item2) = @_;
-        bless [map { Sidef::Variable::Variable->new(name => '', type => 'var', value => $_) } ($item1, $item2)], __PACKAGE__;
+        bless [$item1, $item2], __PACKAGE__;
     }
 
     *call = \&new;
@@ -20,7 +20,7 @@ package Sidef::Types::Array::Pair {
 
         my @array;
         foreach my $i (0, 1) {
-            my $item = $self->[$i]->get_value;
+            my $item = $self->[$i];
 
             if (index(ref($item), 'Sidef::') == 0) {
                 push @array, $item->get_value;
@@ -50,19 +50,17 @@ package Sidef::Types::Array::Pair {
 
     sub to_hash {
         my ($self) = @_;
-        Sidef::Types::Hash::Hash->new(map { $_->get_value } @{$self});
+        Sidef::Types::Hash::Hash->new(@{$self});
     }
 
-    *to_h   = \&to_hash;
-    *toHash = \&to_hash;
+    *to_h = \&to_hash;
 
     sub to_array {
         my ($self) = @_;
-        Sidef::Types::Array::Array->new(map { $_->get_value } @{$self});
+        Sidef::Types::Array::Array->new(@{$self});
     }
 
-    *to_a    = \&to_array;
-    *toArray = \&to_array;
+    *to_a = \&to_array;
 
     sub dump {
         my ($self) = @_;
@@ -74,11 +72,7 @@ package Sidef::Types::Array::Pair {
                 (' ' x ($Sidef::SPACES += $Sidef::SPACES_INCR)) . join(
                     ", ",
                     map {
-                        my $val =
-                          ref($_) eq 'Sidef::Variable::Variable'
-                          ? $_->get_value
-                          : Sidef::Types::Nil::Nil->new;
-
+                        my $val = $_;
                         eval { $val->can('dump') } ? ${$val->dump} : $val
                       } @{$self}
                 )

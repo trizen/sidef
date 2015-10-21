@@ -1,0 +1,26 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Sorting_algorithms/Insertion_sort
+#
+
+class Array {
+    method insertion_sort {
+        { |i|
+            var j = i;
+            var k = self[i];
+            while ((j > 0) && (k < self[j - 1])) {
+                self[j] = self[j - 1];
+                j--;
+            };
+            self[j] = k;
+        } * self.end;
+        return self;
+    }
+}
+ 
+var numbers = [7,6,5,9,8,4,3,1,2,0];
+say numbers.insertion_sort;
+ 
+var strs = ["John", "Kate", "Zerg", "Alice", "Joe", "Jane"];
+say insertion_sort(strs);

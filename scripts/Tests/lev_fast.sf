@@ -1,0 +1,24 @@
+#!/usr/bin/ruby
+
+# http://rosettacode.org/wiki/Levenshtein_distance#Sidef
+
+func lev(s, t) {
+    var d = [0 .. t.len, 1 .. s.len -> map {[_]}...];
+    { |i|
+        { |j|
+            d[i][j] = (
+                s[i-1] == t[j-1]
+                ? d[i-1][j-1]
+                : [d[i-1][j], d[i][j-1], d[i-1][j-1]].min+1;
+              );
+        } * t.len;
+    } * s.len;
+    d[-1][-1] \\ [s.len, t.len].min;
+};
+
+var a = 'kitten';
+var b = 'sitting';
+
+lev(a.split(1), b.split(1)) == 3 || 'error 2'.die;
+
+say "** Test passed!";

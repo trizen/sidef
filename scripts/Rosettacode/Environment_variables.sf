@@ -1,7 +1,0 @@
-#!/usr/bin/ruby
-
-#
-## http://rosettacode.org/wiki/Environment_variables
-#
-
-say ENV['HOME'];

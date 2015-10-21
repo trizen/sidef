@@ -1,0 +1,19 @@
+#!/usr/bin/ruby
+
+# Find the sum of all numbers which are equal to the sum of the factorial of their digits.
+
+# https://projecteuler.net/problem=34
+
+# Answer: 40730
+
+func factorial(n) is cached {
+    n < 2 ? 1 : n*factorial(n-1);
+}
+
+var sum = 0;
+range(3, 1e5, 2).each { |i|
+    if (i.digits.map{|d| factorial(d)}.sum == i) {
+        sum += i;
+    }
+}
+say sum;

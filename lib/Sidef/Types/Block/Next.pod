@@ -23,11 +23,3 @@ Next.new() -> I<Obj>
 Return the
 
 =cut
-
-=head2 next
-
-Next.next() -> I<Obj>
-
-Return the
-
-=cut

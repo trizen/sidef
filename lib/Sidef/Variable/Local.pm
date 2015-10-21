@@ -1,12 +1,8 @@
 package Sidef::Variable::Local {
 
     sub new {
-        my (undef, $name) = @_;
-        bless {name => $name}, __PACKAGE__;
-    }
-
-    sub _get_name {
-        $_[0]->{name};
+        my (undef, %opt) = @_;
+        bless \%opt, __PACKAGE__;
     }
 
 };

@@ -1,0 +1,21 @@
+#!/usr/bin/ruby
+
+include (Module::Fib, Module::Fact);
+
+Module::Fib::fibonacci(10) == 55 || die "error fib";
+Module::Fact::factorial(4) == 24 || die "error fact";
+
+include Module::YouTube;
+
+var youtube_url = "abcdef".as_youtube_url;
+assert(youtube_url.begins_with("http"));
+
+include (Module::Foo, Module::Bar);
+
+var foo = Module::Foo::Bar();
+var bar = Module::Bar::Bar();
+
+assert_eq(foo.baz, 'foo');
+assert_eq(bar.baz, 'bar');
+
+say "** Test passed!";

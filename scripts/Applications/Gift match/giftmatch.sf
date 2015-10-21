@@ -56,7 +56,7 @@ var ngifts = (cols.offset - 1);    # the number of gifts
 # Map the limit of gifts
 var limit = Hash.new;
 { |i|
-    limit[cols[i]] = lim[i].to_i;
+    limit{cols[i]} = lim[i].to_i;
 } * ngifts;
 
 
@@ -66,7 +66,7 @@ var people = table.range.map { |i|
      table[i][0],
 
     # [1] == gift preferences
-     1..ngifts map { |j|
+    range(1, ngifts).map { |j|
         [
             cols[j],              # [1][0] == gift name
             table[i][j].to_i,     # [1][1] == gift rank
@@ -97,9 +97,9 @@ var matches = Array.new;
 # Start from #1 up to the end and assign gifts
 rank.each { |cat|
     cat.each { |pers|
-        if (!(served.exists(pers[0])) && (limit[pers[1][0]] > 0)) {
-            limit[pers[1][0]]--;
-            served[pers[0]] = 1;
+        if (!(served.exists(pers[0])) && (limit{pers[1][0]} > 0)) {
+            limit{pers[1][0]}--;
+            served{pers[0]} = 1;
             matches.append(pers);
         }
     }
@@ -117,20 +117,20 @@ matches.sort {|a,b| a[0] <=> b[0]}.each { |match|
     var column_pos = Hash.new;
 
     { |i|
-        column_pos[cols[i]] = i;
+        column_pos{cols[i]} = i;
     } * ngifts;
 
     # Fill in the matches
     { |i|
         var match = matches.find {|item| item[0] == new_table[i][0]};
-        var pos = column_pos[match[1][0]];
+        var pos = column_pos{match[1][0]};
         new_table[i][pos] = 'match';
     } * (new_table.offset - 1);
 
     # Update the limit number of gifts
     limit.keys.each { |key|
-        var pos = column_pos[key];
-        new_table[-1][pos] = limit[key];
+        var pos = column_pos{key};
+        new_table[-1][pos] = limit{key};
     };
 
     output_table(new_table, output_file);

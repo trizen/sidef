@@ -1,0 +1,7 @@
+#!/usr/bin/ruby
+
+func print_all(*things) {
+    things.each { |x| say x };
+};
+
+print_all("Rosetta", "Code", "Is", "Awesome!");

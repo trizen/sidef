@@ -1,0 +1,43 @@
+
+=encoding utf8
+
+=head1 NAME
+
+Sidef::Types::Null::Null
+
+=head1 DESCRIPTION
+
+This object is ...
+
+=head1 SYNOPSIS
+
+var obj = Null.new(...);
+
+
+=head1 INHERITS
+
+Inherits methods from:
+
+	* Sidef::Object::Object
+	* Sidef::Convert::Convert
+
+=head1 METHODS
+
+
+=head2 dump
+
+Null.dump() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 new
+
+Null.new() -> I<Obj>
+
+Return the
+
+Aliases: I<call>
+
+=cut

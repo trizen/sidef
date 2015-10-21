@@ -1,8 +1,0 @@
-#!/usr/bin/ruby
-
-#
-## http://rosettacode.org/wiki/String_interpolation_(included)
-#
-
-var extra = 'little';
-say "Mary had a #{extra} lamb";

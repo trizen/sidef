@@ -1,0 +1,23 @@
+#!/usr/bin/ruby
+
+# http://rosettacode.org/wiki/Run-length_encoding
+
+func encode(str) {
+    str.gsub(/(.)(\1{0,254})/, {|a,b| b.len+1 -> chr + a});
+}
+
+func decode(str) {
+     var chars = str.chars;
+     var r = '';
+     0 .. (chars.len/2 - 1 -> int) -> each { |i|
+         r += (chars[2*i + 1] * str.char(2*i).ord);
+     };
+     return r;
+}
+
+var str = "WWWWWWWWWWWWBWWWWWWWWWWWWBBBWWWWWWWWWWWWWWWWWWWWWWWWBWWWWWWWWWWWWWW";
+var e = encode(str);
+e == "\fW\1B\fW\3B\30W\1B\16W" || die "error 1";
+decode(e) == str || die "error 2";
+
+say "** Test passed!";

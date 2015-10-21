@@ -1,7 +1,6 @@
 package Sidef::Perl::Perl {
 
     use 5.014;
-    our @ISA = qw(Sidef);
 
     sub new {
         bless {}, __PACKAGE__;
@@ -18,7 +17,7 @@ package Sidef::Perl::Perl {
 
             my $ref = CORE::ref($val);
             if (not defined $val) {
-                return Sidef::Types::Nil::Nil->new;
+                return undef;
             }
 
             if ($ref eq 'ARRAY') {
@@ -26,7 +25,7 @@ package Sidef::Perl::Perl {
                 foreach my $item (@{$val}) {
                     $array->push(
                                  ref($item) eq 'ARRAY' && $item eq $val
-                                 ? Sidef::Variable::Variable->new(type => 'var', name => '', value => $array)
+                                 ? $array
                                  : $guess_type->($item)
                                 );
                 }
@@ -35,11 +34,11 @@ package Sidef::Perl::Perl {
 
             if ($ref eq 'HASH') {
                 my $hash = $refs{$val} //= Sidef::Types::Hash::Hash->new;
-                while (my ($key, $value) = each %{$val}) {
+                foreach my $key (keys %{$val}) {
+                    my $value = $val->{$key};
                     $hash->append(
-                                  $key,
-                                  ref($value) eq 'HASH' && $value eq $val
-                                  ? Sidef::Variable::Variable->new(type => 'var', name => '', value => $hash)
+                                    $key, ref($value) eq 'HASH' && $value eq $val
+                                  ? $hash
                                   : $guess_type->($value)
                                  );
                 }

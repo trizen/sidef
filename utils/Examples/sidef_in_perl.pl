@@ -15,8 +15,9 @@ use lib qw(../../lib);
 # Load the Sidef main module
 use Sidef;
 
-# Initialize a new parser
+# Initialize a new parser and a new deparser
 my $parser = Sidef::Parser->new();
+my $deparser = Sidef::Deparse::Perl->new();
 
 # Parse some code and store the returned parse-tree
 my $struct = $parser->parse_script(code => \<<'SIDEF_CODE');
@@ -29,8 +30,8 @@ fib(12);
 
 SIDEF_CODE
 
-# Execute the parse-tree and store the result
-my $num = Sidef::Exec->new->execute($struct);
+# Generate Perl code and evaluate it
+my $num = eval $deparser->deparse($struct);
 
 # Output the result
 say $num;

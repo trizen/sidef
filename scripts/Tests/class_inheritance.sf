@@ -1,0 +1,60 @@
+#!/usr/bin/ruby
+
+#
+## Class inheritance
+#
+
+class Animal {
+    method is_animal {
+        return true;
+    }
+}
+
+class Mammals < Animal {
+    method legs_num {
+        return 4;
+    }
+
+    method type {
+        return 'mammal';
+    }
+}
+
+class Primates < Mammals, Animal {
+    method has_tail {
+        return true;
+    }
+}
+
+class Dog() < Mammals {
+    method speak {
+        return "Ham-Ham!";
+    }
+}
+
+class Human < Primates {
+    method speak {
+        return "Hello!";
+    }
+
+    method legs_num {
+        return 2;
+    }
+
+    method has_tail {
+        return false;
+    }
+}
+
+var dog = Dog();
+say "Dog is a #{dog.type}, has #{dog.legs_num} legs and says '#{dog.speak}'";
+
+var human = Human();
+say "Human is a #{human.type}, has #{human.legs_num} legs and says '#{human.speak}'";
+
+assert_eq(human.is_animal, true);
+assert_eq(dog.is_animal, true);
+assert_eq(human.has_tail, false);
+assert_eq(human.legs_num, 2);
+assert_eq(dog.legs_num, 4);
+assert_eq(human.speak, 'Hello!');

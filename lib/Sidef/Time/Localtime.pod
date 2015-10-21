@@ -7,99 +7,110 @@ Sidef::Time::Localtime
 
 =head1 DESCRIPTION
 
-Returned values are localized for your current location.
+This object is ...
 
 =head1 SYNOPSIS
 
-    var time = Time.local;
+var obj = Localtime.new(...);
+
 
 =head1 INHERITS
 
 Inherits methods from:
 
-    * Sidef::Time::Gmtime
+	* Sidef::Time::Gmtime
 
 =head1 METHODS
 
 
 =head2 ctime
 
-Time.local.ctime() -> I<String>
+Localtime.ctime() -> I<Obj>
 
-Return the ctime(3) value:
-
-    Time.local.ctime    # e.g., "Thu Jul 18 20:39:47 2013"
+Return the
 
 =cut
 
-=head2 mday
+=head2 day
 
-Alias for L<C<day()>|"day">.
+Localtime.day() -> I<Obj>
+
+Return the
+
+Aliases: I<mday>, I<month_day>
 
 =cut
 
 =head2 hour
 
-Time.local.hour() -> I<Number>
+Localtime.hour() -> I<Obj>
 
-Return the hours of the specified time.
+Return the
 
 =cut
 
 =head2 isdst
 
-Time.local.isdst() -> I<Number>
+Localtime.isdst() -> I<Obj>
 
-Return 1 if the specified time occurs during Daylight Saving Time, 0 otherwise.
+Return the
 
 =cut
 
 =head2 min
 
-Time.local.min() -> I<Number>
+Localtime.min() -> I<Obj>
 
-Return the minutes of the specified time.
+Return the
+
+Aliases: I<minute>
 
 =cut
 
-=head2 month
+=head2 mon
 
-Alias for L<C<mon()>|"mon">.
+Localtime.mon() -> I<Obj>
+
+Return the
+
+Aliases: I<month>
 
 =cut
 
 =head2 sec
 
-Time.local.sec() -> I<Number>
+Localtime.sec() -> I<Obj>
 
-Return the seconds of the specified time.
+Return the
+
+Aliases: I<second>
 
 =cut
 
 =head2 wday
 
-Time.local.wday() -> I<Number>
+Localtime.wday() -> I<Obj>
 
-Return the day of the week, with 0 indicating Sunday and 3 indicating Wednesday.
+Return the
+
+Aliases: I<week_day>
 
 =cut
 
 =head2 yday
 
-Time.local.yday() -> I<Number>
+Localtime.yday() -> I<Obj>
 
-Return the day of the year, in the range 0..364 (or 0..365 in leap years.)
+Return the
+
+Aliases: I<year_day>
 
 =cut
 
 =head2 year
 
-Time.local.year() -> I<Number>
+Localtime.year() -> I<Obj>
 
-Return the number of years since 1900.
-
-To get a 4-digit year, write:
-
-   var year = (Time.gmtime.year + 1900);
+Return the
 
 =cut

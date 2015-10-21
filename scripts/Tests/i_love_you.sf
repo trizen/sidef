@@ -1,0 +1,8 @@
+#!/usr/bin/ruby
+
+var Yes = Null;
+
+{
+    Yes.def_method(:I, {class{method love{class{method you{say "Well, I hate you!"}}()}}()});
+    Yes -> I.love.you;
+}.run;

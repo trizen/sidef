@@ -1,0 +1,39 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Maze_generation#Sidef
+#
+
+var(w, h) = (5, 5);
+var avail = (w * h);
+
+# cell is padded by sentinel col and row, so I don't check array bounds
+var cell = (1..h -> map {([true] * w) + [false]} + [[false] * w+1]);
+var ver  = (1..h -> map {["|  "] * w });
+var hor  = (0..h -> map {["+--"] * w });
+
+func walk(x, y) {
+    cell[y][x] = false;
+    avail-- > 0 || return;  # no more bottles, er, cells
+
+    var d = [[-1, 0], [0, 1], [1, 0], [0, -1]];
+    while (d.len) {
+        var i = d.pop_rand;
+        var (x1, y1) = (x + i[0], y + i[1]);
+
+        cell[y1][x1] || next;
+
+        if (x == x1) { hor[[y1, y].max][x] = '+  ' };
+        if (y == y1) { ver[y][[x1, x].max] = '   ' };
+        walk(x1, y1);
+    }
+}
+
+walk(w.rand.int, h.rand.int);   # generate
+
+0...h -> each { |i|
+    say (hor[i].join('') + '+');
+    if (i < h) {
+        say (ver[i].join('') + '|');
+    }
+}

@@ -1,0 +1,42 @@
+#!/usr/bin/ruby
+
+#
+## Removes duplicated items from array
+#
+
+
+var array = [
+             1, 2, 3, 'a', 'b', 'c', 2, 3, 4, 'b',
+             'c', 'd', 'd', 'd', 'b', '3', '2', 2,
+             ["hello"],["hello"],["perl","hacker"]
+            ];
+
+assert_eq(array.uniq, [1, 2, 3, "a", "b", "c", 4, "d", "3", "2", ["hello"], ["perl", "hacker"]]);
+assert_eq(array.last_uniq, [1, "a", 3, 4, "c", "d", "b", "3", "2", 2, ["hello"], ["perl", "hacker"]]);
+
+var array = [['a','b'], ['a'], ['a', 'b'], ['z']];
+
+assert_eq(array.uniq, [["a", "b"], ["a"], ["z"]]);
+assert_eq(array.last_uniq, [["a"], ["a", "b"], ["z"]]);
+
+var a1 = ('a'..'z' -> shuffle);
+var a2 = ('a'..'z' -> shuffle);
+
+var nums = (a1 + a2);
+assert_eq(nums.uniq, a1);
+assert_eq(nums.last_uniq, a2);
+
+assert_eq(nums.uniq_by { _ }, a1);
+assert_eq(nums.last_uniq_by { _ }, a2);
+
+var ary = [1,1,2,1,'redundant',[1,2,3],[1,2,3],'redundant'];
+assert_eq(ary.uniq, [1, 2, "redundant", [1, 2, 3]]);
+assert_eq(ary.last_uniq, [2, 1, [1, 2, 3], "redundant"]);
+
+#
+## Same thing, made simple
+#
+
+assert_eq([1,2,1,3,2].unique, [1,2,3]);
+
+say "** Test passed!";

@@ -1,0 +1,24 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Multisplit#Sidef
+#
+
+func multisplit(sep, str, :opt) {
+    sep = sep.map{.escape}.join('|');
+    var re = Regex.new(opt{:keep_sep} ? "(#{sep})" : sep);
+    str.split(re, -1);
+}
+
+var chunks = [];
+[false, true].each { |bool|
+    chunks.append(multisplit(%w(== != =), 'a!===b=!=c!=', keep_sep => bool));
+}
+
+assert_eq(chunks,
+[
+    ["a", "", "b", "", "c", ""],
+    ["a", "!=", "", "==", "b", "=", "", "!=", "c", "!=", ""],
+]);
+
+say "** Test passed!";

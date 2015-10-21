@@ -45,10 +45,10 @@ package Sidef::Types::Regex::Regex {
     sub match {
         my ($self, $object, $pos) = @_;
 
-        if (ref($object) eq 'Sidef::Types::Array::Array') {
+        if ($object->SUPER::isa('ARRAY')) {
             my $match;
             foreach my $item (@{$object}) {
-                $match = $self->match($item->get_value);
+                $match = $self->match($item);
                 $match->matched && return $match;
             }
             return $match // $self->match(Sidef::Types::String::String->new);

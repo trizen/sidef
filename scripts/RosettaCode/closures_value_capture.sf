@@ -1,0 +1,13 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Closures/Value_capture
+#
+
+var f = (
+    0..9 -> map {|i| func(j){i * j} }
+);
+ 
+0 ..^ 8 -> each { |j|
+    say f[j].call(j);
+};

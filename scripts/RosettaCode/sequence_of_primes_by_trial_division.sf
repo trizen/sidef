@@ -1,0 +1,26 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Sequence_of_primes_by_Trial_Division
+#
+
+func is_prime(a) {
+  given (a) {
+        when (a == 2)              { true  }
+        when (a <= 1 || a.is_even) { false }
+        default                    { 3 .. a.sqrt -> any { a %% _ } -> not };
+    }
+}
+
+func prime_seq(amount, callback) {
+    var (counter, number) = (0, 0);
+    while (counter < amount) {
+        if (is_prime(number)) {
+            callback(number);
+            counter += 1;
+        };
+        number += 1;
+    };
+};
+ 
+prime_seq(10, {|p| say p});     # prints the first 10 primes

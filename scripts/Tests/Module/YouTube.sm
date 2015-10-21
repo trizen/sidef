@@ -1,0 +1,7 @@
+#!/usr/bin/ruby
+
+class String {
+    method as_youtube_url {
+        "https://www.youtube.com/watch?v=#{self}"
+    }
+}

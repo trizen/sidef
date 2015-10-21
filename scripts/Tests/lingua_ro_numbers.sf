@@ -1,0 +1,23 @@
+#!/usr/bin/ruby
+
+include Lingua::RO::Numbers;
+var lingua = Lingua::RO::Numbers::new();
+
+lingua.thousands_separator = (',');
+
+for(var i = -1000000; i <= 1000000; i += 500000.rand.int) {
+
+    # From number to RO
+    var ro = lingua.number_to_ro(i);
+
+    # From RO to number
+    var num = lingua.ro_to_number(ro);
+
+    # Print the results
+    "%-10s%-10s%s\n".printf(i, num, ro);
+
+    # Check the results
+    if (i != num) {
+        "Error: #{num} != #{i}\n".die;
+    }
+}

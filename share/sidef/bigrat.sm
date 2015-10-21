@@ -1,0 +1,18 @@
+
+#
+## Represent each number by a Math::BigRat object
+#
+
+class Number {
+    method new(n) {
+        Sys.ref(n) == 'Math::BigRat'
+            ? Sys.bless(\n, __CLASS_NAME__)
+            : Sys.bless(\(%s'Math::BigRat'.new(n){:module}), __CLASS_NAME__);
+    }
+
+    method DESTROY {
+        Number.def_method('new', func(self, n) {
+            Sys.bless(\(%s'Math::BigFloat'.new(n){:module}), __CLASS_NAME__)
+        });
+    }
+}

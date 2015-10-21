@@ -1,0 +1,16 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Empty_directory
+#
+
+func is_empty(dir) {
+    dir.open(\var dir_h) || return nil;
+    dir_h.each { |file|
+        file ~~ ['.', '..'] && next;
+        return false;
+    };
+    return true;
+};
+
+say is_empty(Dir.cwd);

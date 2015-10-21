@@ -1,0 +1,192 @@
+#!/usr/bin/ruby
+
+# Author: Trizen
+# License: GPLv3
+# Date: 14th November 2013
+# http://trizenx.blogspot.com
+
+
+# First argument (if defined) or default CNP
+var cnp = (ARGV[0] \\ '2940823432049');
+
+
+# Should have length() == 13
+cnp.len == 13 ||
+    die "Invalid CNP: trebuie să conțină exact 13 caractere!\n";
+
+
+# Should not contains non-digits
+cnp ~~ /[^0-9]/ &&
+    die "Invalid CNP: trebuie să conțină doar numere!\n";
+
+
+# Transform it into an array of numbers
+cnp.split!('').map!{.to_num};
+
+
+var years = :(
+                1 => :(era => 1900),
+                2 => :(era => 1900),
+                3 => :(era => 1800),
+                4 => :(era => 1800),
+                5 => :(era => 2000),
+                6 => :(era => 2000),
+                7 => :(
+                       era => 0,
+                       cet => "Străin rezident în România",
+                     ),
+                8 => :(
+                       era => 0,
+                       cet => "Străin rezident în România",
+                     ),
+                9 => :(
+                       era => 0,
+                       cet => "Persoană străină",
+                     ),
+               );
+
+
+var juds = :(
+           '01' => 'Alba',
+           '02' => 'Arad',
+           '03' => 'Argeș',
+           '04' => 'Bacău',
+           '05' => 'Bihor',
+           '06' => 'Bistrița-Năsăud',
+           '07' => 'Botoșani',
+           '08' => 'Brașov',
+           '09' => 'Brăila',
+           '10' => 'Buzău',
+           '11' => 'Caraș-Severin',
+           '12' => 'Cluj',
+           '13' => 'Constanța',
+           '14' => 'Covasna',
+           '15' => 'Dâmbovița',
+           '16' => 'Dolj',
+           '17' => 'Galați',
+           '18' => 'Gorj',
+           '19' => 'Harghita',
+           '20' => 'Hunedoara',
+           '21' => 'Ialomița',
+           '22' => 'Iași',
+           '23' => 'Ilfov',
+           '24' => 'Maramureș',
+           '25' => 'Mehedinți',
+           '26' => 'Mureș',
+           '27' => 'Neamț',
+           '28' => 'Olt',
+           '29' => 'Prahova',
+           '30' => 'Satu Mare',
+           '31' => 'Sălaj',
+           '32' => 'Sibiu',
+           '33' => 'Suceava',
+           '34' => 'Teleorman',
+           '35' => 'Timiș',
+           '36' => 'Tulcea',
+           '37' => 'Vaslui',
+           '38' => 'Vâlcea',
+           '39' => 'Vrancea',
+           '40' => 'București',
+           '41' => 'București S.1',
+           '42' => 'București S.2',
+           '43' => 'București S.3',
+           '44' => 'București S.4',
+           '45' => 'București S.5',
+           '46' => 'București S.6',
+           '51' => 'Călărași',
+           '52' => 'Giurgiu',
+          );
+
+
+var months = %w(
+  Ianuarie
+  Februarie
+  Martie
+  Aprilie
+  Mai
+  Iunie
+  Iulie
+  August
+  Septembrie
+  Octombrie
+  Noiembrie
+  Decembrie
+);
+
+(var days = Hash.new)@{months} = (
+  31,
+  29,
+  31,
+  30,
+  31,
+  30,
+  31,
+  31,
+  30,
+  31,
+  30,
+  31,
+);
+
+var magic = [2, 7, 9, 1, 4, 6, 3, 5, 8, 2, 7, 9];
+
+var sum = 0;
+magic.range.each { |i|
+    sum += magic[i]*cnp[i];
+}
+
+var cc = (sum % 11);
+cc == 10 && (cc = 1);
+
+if (cc != cnp[-1]) {
+    "Cifra de control e incorectă!\n".die;
+}
+
+var year  = (cnp[1]*10 + cnp[2]);
+var month = (cnp[3]*10 + cnp[4]);
+var day   = (cnp[5]*10 + cnp[6]);
+var jud   = "%02d".sprintf(cnp[7]*10 + cnp[8]);
+
+var nationality = "Română";
+var era = years{cnp[0]}{:era};
+
+var current = Time.local;
+
+if (era == 0) {
+    era = [1900, 2000][year < (current.year() - 100)];
+    nationality = years{cnp[0]}{:cet};
+}
+
+var birth_year = (year + era);
+var month_name = months[month-1];
+
+if (day > days{month_name} || (day < 1)) {
+    "Ziua de naștere e invalidă!\n".die;
+}
+
+if (!juds.exists(jud)) {
+    "Codul județului e invalid!\n".die
+}
+
+if (month == 2 && (day == 29)) {
+    if (!(birth_year % 400 == 0 || (birth_year % 4 == 0 && (birth_year % 100 != 0)))) {
+        "Anul #{birth_year} nu a fost un an bisect!\n".die;
+    }
+}
+
+var age = (current.year + 1900 - birth_year);
+if (current.month < month || (month == current.month && (day < current.day))) {
+    age--;
+}
+
+print (<<'EOT' + <<EOT + <<"EOF");
+==============================
+EOT
+Data Nașterii:  #{day} #{month_name} #{birth_year}
+Cetațenie:      #{nationality}
+Sexul:          #{cnp[0] == 9 ? "Necunoscut" : ["Feminin", "Masculin"][cnp[0] % 2]}
+Vârsta:         #{age}
+Județul:        #{juds{jud}}
+EOT
+==============================
+EOF

@@ -1,7 +1,5 @@
 #!/usr/bin/ruby
 
-# http://rosettacode.org/wiki/Sierpinski_triangle#Sidef
-
 func sierpinski_triangle(n) {
     var triangle = ['*'];
     { |i|

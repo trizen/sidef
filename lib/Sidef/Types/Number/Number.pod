@@ -30,7 +30,7 @@ I<Obj> B<!> I<Obj> -> I<Obj>
 
 Return the
 
-Aliases: I<fact>, I<factorial>
+Aliases: I<fac>, I<fact>, I<factorial>
 
 =cut
 
@@ -70,7 +70,7 @@ I<Obj> B<*> I<Obj> -> I<Obj>
 
 Return the
 
-Aliases: I<x>, I<multiply>
+Aliases: I<x>, I<mul>
 
 =cut
 
@@ -110,7 +110,7 @@ I<Obj> B<-> I<Obj> -> I<Obj>
 
 Return the
 
-Aliases: I<subtract>
+Aliases: I<sub>
 
 =cut
 
@@ -140,7 +140,7 @@ I<Obj> B</> I<Obj> -> I<Obj>
 
 Return the
 
-Aliases: I<÷()>, I<div>
+Aliases: I<÷()>, I<div>, I<divide>
 
 =cut
 
@@ -272,6 +272,14 @@ Aliases: I<to_bin>
 
 =cut
 
+=head2 as_float
+
+Number.as_float() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 as_hex
 
 Number.as_hex() -> I<Obj>
@@ -305,16 +313,6 @@ Return the
 Number.atan2() -> I<Obj>
 
 Return the
-
-=cut
-
-=head2 bcall
-
-Number.bcall() -> I<Obj>
-
-Return the
-
-Aliases: I<times>
 
 =cut
 
@@ -360,9 +358,27 @@ Return the
 
 =cut
 
+=head2 de
+
+Number.de() -> I<Obj>
+
+Return the
+
+Aliases: I<denominator>
+
+=cut
+
 =head2 digit
 
 Number.digit() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 digits
+
+Number.digits() -> I<Obj>
 
 Return the
 
@@ -379,14 +395,6 @@ Return the
 =head2 divmod
 
 Number.divmod() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 dump
-
-Number.dump() -> I<Obj>
 
 Return the
 
@@ -460,7 +468,7 @@ Number.int() -> I<Obj>
 
 Return the
 
-Aliases: I<as_int>
+Aliases: I<to_i>, I<as_int>
 
 =cut
 
@@ -515,6 +523,14 @@ Aliases: I<is_negative>
 =head2 is_odd
 
 Number.is_odd() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 is_one
+
+Number.is_one() -> I<Obj>
 
 Return the
 
@@ -622,23 +638,7 @@ Number.new() -> I<Obj>
 
 Return the
 
-Aliases: I<new_float>
-
-=cut
-
-=head2 new_int
-
-Number.new_int() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 new_rat
-
-Number.new_rat() -> I<Obj>
-
-Return the
+Aliases: I<call>
 
 =cut
 
@@ -658,8 +658,6 @@ Number.npow() -> I<Obj>
 
 Return the
 
-Aliases: I<next_power_of>
-
 =cut
 
 =head2 npow2
@@ -668,7 +666,25 @@ Number.npow2() -> I<Obj>
 
 Return the
 
-Aliases: I<next_power_of_two>
+=cut
+
+=head2 nu
+
+Number.nu() -> I<Obj>
+
+Return the
+
+Aliases: I<numerator>
+
+=cut
+
+=head2 nude
+
+Number.nude() -> I<Obj>
+
+Return the
+
+Aliases: I<parts>
 
 =cut
 
@@ -701,6 +717,14 @@ Return the
 =head2 range
 
 Number.range() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 rat
+
+Number.rat() -> I<Obj>
 
 Return the
 
@@ -754,6 +778,14 @@ Return the
 
 =cut
 
+=head2 times
+
+Number.times() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 to
 
 Number.to() -> I<Obj>
@@ -761,6 +793,24 @@ Number.to() -> I<Obj>
 Return the
 
 Aliases: I<...()>, I<..^()>, I<up_to>, I<upto>
+
+=cut
+
+=head2 to_s
+
+Number.to_s() -> I<Obj>
+
+Return the
+
+Aliases: I<dump>
+
+=cut
+
+=head2 troot
+
+Number.troot() -> I<Obj>
+
+Return the
 
 =cut
 

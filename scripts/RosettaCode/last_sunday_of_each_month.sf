@@ -1,0 +1,22 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Find_the_last_Sunday_of_each_month
+#
+
+require 'DateTime';
+
+var year = (ARGV[0] \\ 2015);
+
+range(1, 12).each { |i|
+    var date = %s'DateTime'.last_day_of_month(
+        year  => year,
+        month => i,
+    );
+
+    while (date.dow != 7) {
+        date = date.subtract(days => 1);
+    };
+
+    say date.ymd;
+}

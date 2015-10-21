@@ -19,6 +19,7 @@ var obj = Code.new(...);
 Inherits methods from:
 
 	* Sidef::Object::Object
+	* Sidef::Convert::Convert
 
 =head1 METHODS
 
@@ -33,29 +34,11 @@ Aliases: I<repeat>
 
 =cut
 
-=head2 all
-
-Code.all() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 any
-
-Code.any() -> I<Obj>
-
-Return the
-
-=cut
-
 =head2 call
 
 Code.call() -> I<Obj>
 
 Return the
-
-Aliases: I<bcall>
 
 =cut
 
@@ -66,16 +49,6 @@ Code.cap() -> I<Obj>
 Return the
 
 Aliases: I<capture>
-
-=cut
-
-=head2 copy
-
-Code.copy() -> I<Obj>
-
-Return the
-
-Aliases: I<closure>
 
 =cut
 
@@ -97,14 +70,6 @@ Return the
 
 =cut
 
-=head2 fast_init_block_vars
-
-Code.fast_init_block_vars() -> I<Obj>
-
-Return the
-
-=cut
-
 =head2 for
 
 Code.for() -> I<Obj>
@@ -121,25 +86,9 @@ Return the
 
 =cut
 
-=head2 given
-
-Code.given() -> I<Obj>
-
-Return the
-
-=cut
-
 =head2 if
 
 Code.if() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 init_block_vars
-
-Code.init_block_vars() -> I<Obj>
 
 Return the
 
@@ -161,14 +110,6 @@ Return the
 
 =cut
 
-=head2 pop_stack
-
-Code.pop_stack() -> I<Obj>
-
-Return the
-
-=cut
-
 =head2 run
 
 Code.run() -> I<Obj>
@@ -184,32 +125,6 @@ Code.thr() -> I<Obj>
 Return the
 
 Aliases: I<thread>
-
-=cut
-
-=head2 to_array
-
-Code.to_array() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 to_h
-
-Code.to_h() -> I<Obj>
-
-Return the
-
-Aliases: I<to_hash>
-
-=cut
-
-=head2 try
-
-Code.try() -> I<Obj>
-
-Return the
 
 =cut
 

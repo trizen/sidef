@@ -1,0 +1,47 @@
+#!/usr/bin/ruby
+
+# Equality checks for user-defined objects
+
+class Example {
+    method ==(arg) {
+        say "#{arg.class} == #{self.class}";
+        true;
+    }
+}
+
+class Example2 < Example {
+
+}
+
+class Example3 {
+
+}
+
+var obj1  = Example();
+var obj1a = Example();
+var obj2  = Example2();
+var obj3  = Example3();
+var obj3a = Example3();
+
+assert_eq(obj1, obj2);
+assert_eq(obj1, obj1a);
+assert_eq(obj2, obj1);
+
+assert_ne(obj3, obj1);
+assert_ne(obj3, obj2);
+assert_ne(obj3, obj3a);
+assert_eq(obj3, obj3);
+
+Example == Example2 && die "error ==: Example == Example2";
+Example == Example  || die "error ==: Example != Example";
+
+Example != Example2 || die "error !=: Example == Example2";
+Example != Example  && die "error !=: Example != Example";
+
+Example   == 'Example' && die "error ==: Example == 'Example'";
+'Example' == Example   && die "error ==: 'Example' == Example";
+
+Example == nil     && die "error ==: Example == nil";
+nil     == Example && die "error ==: nil == Example";
+
+say "** Test passed!";

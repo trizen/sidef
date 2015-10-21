@@ -1,0 +1,249 @@
+#!/usr/bin/ruby
+
+class Sierpinski(c='*', s=' ') {
+
+    #   *
+    #  * *
+    # *   *
+    method letter_a(n) {
+        # needs more work
+        var c = [self.c];
+        { |i|
+            var xp = s*(Math.pow(2, i-1) * i + 1);
+            var sp = s*(Math.pow(2, i-1));
+            c = [c.map{|x| xp + x + xp          },
+                 c.map{|x| sp + x + s*i + x + sp},
+                 c.map{|x| x + sp + xp + x      },
+                ]«+»;
+        } * n;
+        return c;
+    }
+
+    # **
+    # ***
+    # **
+    method letter_b(n) {
+        var c = [self.c];
+        {
+            c = [c.map{|x| x*2 + s*(x.len) },
+                 c.map{|x| x*3 },
+                 c.map{|x| x*2 + s*(x.len) },
+                ]«+»;
+        } * n;
+        return c;
+    }
+
+    # ***
+    # *
+    # ***
+    method letter_c(n) {
+        var c = [self.c];
+        {
+            c = [c.map{|x| x*3 },
+                 c.map{|x| x + s*(x.len*2) },
+                 c.map{|x| x*3 },
+                ]«+»;
+        } * n;
+        return c;
+    }
+
+    # *
+    # **
+    # ***
+    method letter_d(n) {
+        var c = [self.c];
+        {
+            c = [c.map{|x| x*1 + s*(x.len*2) },
+                 c.map{|x| x*2 + s*(x.len*1) },
+                 c.map{|x| x*3               },
+                ]«+»;
+        } * n;
+        return c;
+    }
+
+    # ***
+    # **
+    # ***
+    method letter_e(n) {
+        var c = ['*'];
+        {
+            c = [c.map{|x| x*3             },
+                 c.map{|x| x*2 + s*(x.len) },
+                 c.map{|x| x*3             },
+                ]«+»;
+        } * n;
+        return c;
+    }
+
+    # ***
+    # **
+    # *
+    method letter_f(n) {
+        var c = [self.c];
+        {
+            c = [c.map{|x| x*3               },
+                 c.map{|x| x*2 + s*(x.len*1) },
+                 c.map{|x| x*1 + s*(x.len*2) },
+                ]«+»;
+        } * n;
+        return c;
+    }
+
+    # **
+    # *  *
+    # ****
+    method letter_g(n) {
+        var c = [self.c];
+        {
+            c = [c.map{|x| x*2 + s*(x.len*2)   },
+                 c.map{|x| x + s*(x.len*2) + x },
+                 c.map{|x| x*4 },
+                ]«+»;
+        } * n;
+        return c;
+    }
+
+    # *  *
+    # ****
+    # *  *
+    method letter_h(n) {
+        var c = [self.c];
+        {
+            c = [c.map{|x| x + s*(x.len*2) + x },
+                 c.map{|x| x * 4 },
+                 c.map{|x| x + s*(x.len*2) + x },
+                ]«+»;
+        } * n;
+        return c;
+    }
+
+    # *
+    # *
+    # *
+    method letter_i(n) {
+        var c = [self.c];
+        { |i|
+            c = [c.map{|x| x*i },
+                 c.map{|x| x*i },
+                 c.map{|x| x*i },
+                ]«+»;
+        } * n;
+        return c;
+    }
+
+    #    *
+    #    *
+    # *  *
+    # ****
+    method letter_J(n) {
+        var c = [self.c];
+        {
+            c = [c.map{|x| s*(x.len*3) + x     },
+                 c.map{|x| s*(x.len*3) + x     },
+                 c.map{|x| x + s*(x.len*2) + x },
+                 c.map{|x| x * 4 },
+                ]«+»;
+        } * n;
+        return c;
+    }
+
+    #  *
+    #  *
+    # **
+    method letter_j(n) {
+        var c = [self.c];
+        {
+            c = [c.map{|x| s*(x.len) + x },
+                 c.map{|x| s*(x.len) + x },
+                 c.map{|x| x * 2         },
+                ]«+»;
+        } * n;
+        return c;
+    }
+
+    #   **
+    # * * *
+    #  **
+    method letter_s(n) {
+        var c = [self.c];
+        {
+            c = [c.map{|x| s*(x.len*2) + x*2 + s*(x.len*1) },
+                 c.map{|x| x + s*x.len + x + s*(x.len) + x },
+                 c.map{|x| s*(x.len*1) + x*2 + s*(x.len*2) },
+                ]«+»;
+        } * n;
+        return c;
+    }
+
+    # *****
+    #   *
+    #   *
+    method letter_t(n) {
+        var c = [self.c];
+        {
+            c = [c.map{|x| x*5                          },
+                 c.map{|x| s*(x.len*2) + x + s*(x.len*2)},
+                 c.map{|x| s*(x.len*2) + x + s*(x.len*2)},
+                ]«+»;
+        } * n;
+        return c;
+    }
+
+    # ***
+    #   *
+    #   ***
+    method letter_z(n) {
+        var c = [self.c];
+        {
+            c = [c.map{|x| x*3 + s*(x.len*2)},
+                 c.map{|x| s*(x.len*2) + x + s*(x.len*2) },
+                 c.map{|x| s*(x.len*2) + x*3},
+                ]«+»;
+        } * n;
+        return c;
+    }
+
+    # ****  *
+    #    *  *
+    #    *  *
+    # *******
+    # *  *
+    # *  *
+    # *  ****
+    method letter_Z(n) {
+        var c = [self.c];
+        {
+            c = [c.map{|x| x*4 + s*(x.len*2) + x  },
+                 c.map{|x| s*(x.len*3) + x + s*(x.len*2) + x },
+                 c.map{|x| s*(x.len*3) + x + s*(x.len*2) + x },
+                 c.map{|x| x*7  },
+                 c.map{|x| x + s*(x.len*2) + x + s*(x.len*3)  },
+                 c.map{|x| x + s*(x.len*2) + x + s*(x.len*3)  },
+                 c.map{|x| x + s*(x.len*2) + x*4 },
+                ]«+»;
+        } * n;
+        return c;
+    }
+}
+
+var size = 2;
+var ski = Sierpinski('*');
+
+var word = "best";
+var chars = word.chars.map {|char| ski.("letter_#{char}")(size)};
+
+var marry = MultiArr.new;
+chars.each {|line| marry.append(line) };
+marry.each {|*a| a.join("   ").say };
+
+__END__
+
+        *
+       * *
+      *   *
+     *     *
+    * *   * *
+   *   * *   *
+  *           *
+ * *         * *
+*   *       *   *

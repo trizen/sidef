@@ -1,0 +1,402 @@
+#!/usr/bin/ruby
+
+# This is the very first script written in Sidef.
+#     (-- with very minor modifications --)
+
+###################################
+# Error testing
+###################################
+# +->say;      # Invalid object type!
+# 3->5;        # Invalid method name!
+# var->say;    # Attempt to use an uninitialized variable: <var>
+###################################
+
+
+###################################
+# Code testing
+###################################
+
+
+#
+## Support for multiple arguments
+#
+
+"a"->join("::", "b"->uc, "c")->say;   # will print a::B::c
+
+
+###################
+# SUPPORT FOR FILES
+###################
+
+var file = (File.new(Sys.sidef));
+
+var size_kb = (file->size / 1024);
+
+"Size of sidef in bytes: "->print;
+size_kb * 1024 -> to_s -> say;
+
+"size of file 'sidef': #{size_kb} KB\n"->print;
+
+var fh = (file->open_r);
+"\n** Reading one line from 'sidef':" -> say;
+fh->readline->print;
+
+# OR:
+
+file = ("sidef"->to_file);
+
+"\nFile name is: "->print;
+file->name->say;
+
+"Full path is: "->print;
+var abs_path = (file->abs_name)->to_s->say;
+
+"Dir name is:  "->print;
+abs_path->dirname->to_s->say;
+
+###############################################
+##### NEW WAY TO INITIALIZE THE VARIABLES #####
+###############################################
+#
+# optional parentheses for arguments
+#
+###############################################
+
+var x = "RaNdOm StRiNg"->lc;   # WRONG!!!
+var y = ("RaNdOm StRiNg"->lc); # RIGHT!!!
+#var z = "\LRaNdOm StRiNg";     # Also, right.
+
+#var lang = "Sidef";
+#"\nJust another $lang hacker,"->say;
+
+"\nescaped variable: \$var\n"->say;
+
+#
+## Single-quoted string to double-quoted string
+#
+
+var single = 'this \Uis\E a \Utest\n';
+single->say;
+single.apply_escapes.say;
+
+# -----------------------------------------------
+
+x->say;     # prints 'RaNdOm StRiNg'
+y->say;     # prints 'random string'
+
+var name = "Ioana";       # initialize variable "name"
+
+"Hello, $name! How are you? :)\n"->print;
+name->uc->say;
+
+###############################################
+################# OTHER STUFF #################
+###############################################
+
+var creepy = "\\tthis is a creepy string\\n\n";
+creepy->print;
+creepy->apply_escapes->print;
+
+"Hello, World"->substr(0, 5)->say;
+"Hello, World"->substr( -5 )->say;
+
+var num = 1234;
+"Next power of two after number #{num} is: "->print;
+num->npow2->to_s->say;
+
+assert_eq(num.npow(2), num.npow2);
+assert_eq(Math.npow(num, 3), num.npow(3));
+assert_eq(Math.npow2(num), Math.npow(num, 2));
+assert_eq(Math.npow(num, 2), 2048);
+
+var init = "^_^ Sidef ^_^"->say;  # assings to variable 'init', and prints it
+init->uc->say;                    # upper cases the variable 'init', and prints it again
+
+"\n\uvariable interpolation ==> \L$init\\\\\E <== is Working\n"->say;
+
+var hello = "Hello, World!";      # assign a string value to variable 'hello'
+hello->say;                       # prints "Hello, World!" from var 'hello'
+
+hello = ("Goodbye, World!\n");    # assign another string to variable 'hello'
+hello->print;                     # prints the last assigned string.
+
+var diff = (43-23);               # assign value to 'diff'
+diff->to_s->say;                  # print the value stored into 'diff' (20)
+
+(42 / ( 3/(1.0) ) )->to_s->say;   # prints 14
+
+#24 -> / (6)->to_s->say;           # prints 4 ( "/" is a method! )
+
+((((((60+(40)))))))->to_s->say;   # prints 100
+
+((42-(4.3*(3)))/(6))->to_s->say;  # prints 4.85
+
+-81->abs->sqrt->to_s->say;        # prints 9
+
+10/(3)->to_s->say;                # prints 3.3333333333333
+
+24/(18*(3/(1)))->to_s->say;       # prints 0.444444444444444
+
+"StRinG"->lc->uc->say;            # prints STRING
+
+44.2->int->log10->to_s->say;      # prints 1.64345267648619
+
+###################################
+
+const pi = 3.14;                  # print constant value
+#pi = 11;                         # Testing warning
+pi->to_s->say;
+
+["test", 44, 123, ["aa", "bb"], ["x"->uc, 4*3, [32,4+3], "y"->uc]]->pop->to_s->say;
+
+var array = [1,2,3];
+var array2 = [1,2];
+var left = [array ,array2];
+left->pop->to_s->say;
+
+array->pop->to_s->say;          # prints '3'
+
+(["x","y","z"])->pop->say;
+
+#####################################################
+
+#
+## Remove from array 1 anything listed in array 2.
+#
+
+["w","x"->uc,"y", 3, [5], "IT"] - ["w", [5], "Y"->lc] -> to_s->say;
+
+#
+## same thing as above:
+#
+
+var arr_1 = ["w","x"->uc,"y", 3, [5], "IT"];
+var arr_2 = ["w", [5], "Y"->lc];
+
+arr_1 - arr_2 -> to_s -> say;
+
+assert_eq(["Paris", "Berlin", "Atena", "London"] - ["London", "Berlin"], ['Paris', 'Atena']);
+
+#
+## joining two arrays
+#
+
+["a", "b", "c"] + ["d", "e", "f"] -> to_s -> say;
+
+#####################################################
+
+
+#
+## Regular expressions
+#
+
+/TEST/i -> match("For testing.") -> to_bool->to_s->say;    # true
+"one two three" ~~ /[123]/ -> to_s->say;            # false
+
+"--string--" ~~ /(\w+)/ -> to_s -> say;             # true
+
+var regex = /^\d+ \w+ \d+$/;
+"03 May 2013" ~~ regex -> to_s->say;                # true
+regex -> to_s -> say;                               # prints the regex
+
+assert_eq(/item/.match(["str", ['123', ["w", "item", "x"], '6'], "boo"]) -> to_bool, true);
+
+
+#"\n=>> Variable interpolation for regular expressions:"->say;
+
+#'-' * 80 -> say;
+
+#var re = '\w';
+#"test" =~ /\d$re/ -> to_s->say;                  # false
+#"3d" =~ /\d$re/   -> to_s->say;                  # true
+
+#/\d$re/->to_s->say;                              # prints the regex
+
+#'-' * 80 -> say;
+
+#######################################################
+
+#
+## Support for method calls written as expressions
+#
+
+"\n=>> Methods as expressions:\n" + ('-' * 80) -> say;
+
+("sqrt of 81 is: " + (81->(["sqrt"]->shift)->to_s))->say;
+
+var sqrt_method = "sqrt";
+("sqrt of 25 is: " + (25->$sqrt_method->to_s))->say;
+
+var method_name = "substr";
+"Ioana" + ("Sidef is awesome!"->$method_name(5, 12))->insert("super ", 9)->say;
+
+'-' * 80 -> say;
+
+#######################################################
+
+#"Your OS name is: $OSNAME"->say;
+#"The name of this script is: $SCRIPT\n"->say;
+
+#######################################################
+
+'-' * 80 -> say;
+
+var range_array = (1..5);
+range_array->reverse->join(', ') + ". BOOM!"->say;
+
+#######################################################
+
+'-' * 80 -> say;
+
+static my_def = "original";
+my_def := "modified";
+
+my_def->say;
+
+my_def = nil;
+my_def := "modified";
+
+my_def->say;
+
+#######################################################
+
+'-' * 80 -> say;
+
+var chars = "sidef".to_chars;
+"Number of chars: " + (chars->len->to_s)->say;
+chars->to_s->say;
+
+var i = 2;
+"chars[%d] is '%s'\n"->printf(i, (chars[i]->to_s));
+
+chars[0] = "g";
+chars[2] = "r";
+chars[3] = "a";
+chars[5] = "f";
+chars[6] = "e";
+chars->join('')->say;
+
+'-' * 80 -> say;
+
+var nums = ["zero", "one", "two", "three", "four"];
+
+# Returns an object
+nums[1]->say;
+nums[2]->say;
+
+# Returns an array of objects
+nums[2,3,4]->to_s->say;
+nums[-1,-2,-3,-4,-5]->to_s->say;
+
+'-' * 80 -> say;
+
+#######################################################
+
+#defined[3]->say;
+#defined[0,1,1,2,3,-2]->join('')->say;
+#'-'*80->say;
+
+nums[1]->say;
+nums[1] = "unu" -> say;
+nums[2]->say;
+
+nums[5-3] = "doi";
+nums[2+1] = "trei";
+nums[8/2] = "patru";
+
+nums[3]->say;
+
+nums[2,3,4,5,6] = ["doi", "trei", "patru", "cinci", "șase"];
+
+nums.to_s.say;
+
+var word_nums = ["two", "trei", "four", "cinci", "six"];
+
+(2..6).map {
+    nums[_] = word_nums[_-2];
+};
+
+
+nums->join(' ')->say;
+
+#######################################################
+
+'-' * 80 -> say;
+
+var nes = ["beg", ["x", "y", "z"], "end"];
+
+nes[1]->to_s->say;
+nes[1] = ["m", "n", "o"];
+nes[1]->to_s->say;
+nes[1][1]->to_s->say;
+
+'-' * 80 -> say;
+
+nes[0]->say;
+nes[0] = ["one", "two", "three"];
+
+nes[0]->to_s->say;
+nes[0][1] = "doi";
+nes[0]->to_s->say;
+
+#######################################################
+
+'-' * 80 -> say;
+
+var array_test = [];
+array_test[0] = "elem1";
+array_test[1] = "elem2";
+
+array_test->to_s->say;
+
+#######################################################
+
+'-' * 80 -> say;
+
+"ord('a') ==  " + ("a"->ord->to_s)->say;
+
+#######################################################
+
+var block = {
+    "first"->say;
+    "block"->say;
+
+    var private = [1,2,4];
+    private[1]->to_s->say;
+
+    "end of block";
+};
+
+block->if(true);            # execute the block
+block->if(false);           # don't execute the block
+
+block.run.say;
+
+#######################################################
+
+'-' * 80->say;
+
+{
+    "Sidef rocks!!!"->say;
+} -> for (1..5);
+
+'-' * 80 -> say;
+
+#######################################################
+
+for (var index = 1; index < 10; index++) {
+    "** Sum of 0 to %d is: %d\n"->printf(index, (index * (index + 1) / 2));
+}
+
+'-' * 80 -> say;
+
+var arr_test = [["x", "y", "z"]];
+arr_test[0][1,0] -> to_s -> say;
+
+'-' * 80 -> say;
+
+#######################################################
+
+(1..3)[1].to_s.say;
+
+#######################################################

@@ -1,0 +1,26 @@
+#!/usr/bin/ruby
+
+# Comparing two arrays
+
+var arr1 = [1,2,3,4,5];
+var arr2 = [1,2,3,4];
+
+assert_eq(arr1 <=> arr2, 1);
+assert_eq(arr2 <=> arr1, -1);
+
+var arr3 = [["a"], ["z"]];
+var arr4 = [["a"], ["b"]];
+
+assert_eq(arr3 <=> arr4, 1);
+assert_eq(arr4 <=> arr3, -1);
+
+assert_eq(arr1 <=> arr3, -1);
+assert_eq(arr3 <=> arr1, 1);
+
+assert_eq(arr1, arr1, 0);
+assert_eq(arr3, arr3, 0);
+
+arr3[-1] = ["b"];
+assert_eq(arr3, arr4, 0);
+
+say "** Test passed!";

@@ -1,0 +1,18 @@
+#!/usr/bin/ruby
+
+# What is the value of the first triangle number to have over five hundred divisors?
+
+# # https://projecteuler.net/problem=12
+
+# Answer: 76576500
+
+var nt = frequire('ntheory');
+
+var n = 0;
+Math.inf.times { |i|
+    n += i;
+    if ([nt.divisors(n)].len > 500) {
+        say n;
+        break;
+    }
+}

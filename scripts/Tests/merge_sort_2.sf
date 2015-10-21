@@ -1,0 +1,30 @@
+#!/usr/bin/ruby
+
+# http://rosettacode.org/wiki/Sorting_algorithms/Merge_sort
+
+func merge(left, right) {
+    var result = [];
+    while (!left.is_empty && !right.is_empty) {
+        result.append([right,left][left.first <= right.first].shift);
+    };
+    result + left + right;
+}
+
+func mergesort(arr) {
+    var len = arr.len;
+    len < 2 && return arr;
+    merge(__FUNC__(arr.ft(0, len/2 -> int - 1)), __FUNC__(arr.ft(len/2 -> int)));
+}
+
+# Numeric sort
+var nums = 0..7;
+mergesort(nums.shuffle) == nums
+    || "error(123)".die;
+
+# String sort
+var strings = 'a'..'e';
+mergesort(strings.shuffle) == strings
+    || "error(abc)".die;
+
+# All OK!
+say "** Test passed!";

@@ -1,7 +1,0 @@
-#!/usr/bin/ruby
-
-#
-## http://rosettacode.org/wiki/Make_directory_path
-#
-
-Dir.new(Dir.cwd, "path", "to", "dir").make_path;   # works cross-platform

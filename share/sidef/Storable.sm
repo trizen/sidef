@@ -1,0 +1,18 @@
+
+require 'Storable';
+
+func store(obj, file) {
+    %S'Storable'.store(obj, file);
+}
+
+func store_fh(obj, fh) {
+    %S'Storable'.store_fd(obj, fh);
+}
+
+func load(file) {
+    %S'Storable'.retrieve(file);
+}
+
+func clone(obj) {
+    %S'Storable'.dclone(obj);
+}

@@ -1,0 +1,17 @@
+#!/usr/bin/ruby
+
+var req = require 'HTTP::Tiny';
+var http = req.new;
+
+var response = http.get('http://www.rcs-rds.ro/');
+if (!response{:success}) {
+    "GET failed!\n".die;
+}
+
+say "#{response{:status}} #{response{:reason}}";
+
+response{:headers}.each { |k,v|
+    say "#{k}: #{v}";
+}
+
+response{:content}.len && say response{:content}.len;

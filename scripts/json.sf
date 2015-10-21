@@ -1,0 +1,13 @@
+#!/usr/bin/ruby
+
+var json = require('JSON').new;
+
+# Parse JSON
+var data = json.decode('{"blue": [1, 2], "ocean": "water"}');
+say data;
+
+# Change JSON
+data{:ocean} = Hash.new(water => %w[fishy salty]);
+
+# Encode JSON
+say json.encode(data);

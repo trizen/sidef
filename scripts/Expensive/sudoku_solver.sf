@@ -1,30 +1,40 @@
 #!/usr/bin/ruby
 
-__USE_INTNUM__
+func _check(i, j) is cached {
+    var (id, im) = i.divmod(9);
+    var (jd, jm) = j.divmod(9);
+
+    jd == id && return true;
+    jm == im && return true;
+
+    var id2 = int(id/3);
+    var jd2 = int(jd/3);
+
+    jd2 == id2 || return false;
+
+    int(jm/3) == int(im/3)
+}
 
 func solve(board) {
     board.range.each { |i|
-        !board[i] || next;
-        var t = board[
-                board.range.grep {|j|
-                    (j.div(9)  == i.div(9)) ||
-                    (j.mod(9)  == i.mod(9)) ||
-                    (j.div(27) == i.div(27) &&
-                    (j.mod(9).div(3) == i.mod(9).div(3)))
-                }
-            ];
-        1..9 grep {!(.~~t)}
-             each {|k| board[i] = k; solve(board)};
+        board[i] && next;
+        var t = board.items(
+            board.range.grep {|j|
+                _check(i, j)
+            }...
+        );
+        1..9 -> grep {!(.~~t)}
+             -> each {|k| board[i] = k; solve(board) };
         board[i] = 0;
         return;
-    };
+    }
 
     board.range.each { |i|
         print "#{board[i]} ";
-        {print " "}  if (i+1 %% 3);
-        {print "\n"} if (i+1 %% 9);
-        {print "\n"} if (i+1 %% 27);
-    };
+        print " "  if (3  -> divides(i+1));
+        print "\n" if (9  -> divides(i+1));
+        print "\n" if (27 -> divides(i+1));
+    }
 }
 
 var board = %i(

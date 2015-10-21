@@ -1,0 +1,19 @@
+#!/usr/bin/ruby
+
+# Tests for prefix methods
+
+assert_eq(run { "hi" }, "hi");
+assert_eq(run { var run = 42; run }, 42);
+assert_eq(run { "hi" }, "hi");
+
+var i = int 12.5;
+
+assert_eq(i, 12);
+assert_eq(lc "TeSt", "test");
+assert_eq(ceil 12.1.add(2), 15);
+
+var int = 42;
+assert_eq(int, 42);
+assert_eq(CORE::int 12.5, 12);
+
+say "** Test passed!";

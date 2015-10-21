@@ -1,0 +1,22 @@
+#!/usr/bin/ruby
+
+
+func fib(n) is cached -> Num {
+    n < 2 ? n : (fib(n-1) + fib(n-2));
+};
+
+say fib(120);
+
+
+class Fib {
+    method nth(n) is cached -> Num {
+        n < 2 ? n : (self.nth(n-1) + self.nth(n-2));
+    }
+    method +(n) is cached -> Num {
+        n < 2 ? n : (self+(n-1) + self+(n-2));
+    }
+}
+
+var fib = Fib();
+say fib.nth(120);
+say fib+120;

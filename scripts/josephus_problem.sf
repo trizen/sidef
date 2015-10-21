@@ -1,8 +1,6 @@
 #!/usr/bin/ruby
 
-# http://rosettacode.org/wiki/Josephus_problem
-
-func josephus_i(n, k) {
+func josephus(n, k) {
     var prisoners = (0 .. n-1);
     while (prisoners.len > 1) {
         prisoners.rotate!(k - 1).shift;
@@ -10,15 +8,12 @@ func josephus_i(n, k) {
     return prisoners[0];
 };
 
-func josephus_r(n, k) {
+func josephus_rec(n, k) {
     n == 1 ? 0 : ((__FUNC__(n-1, k) + k) % n)
 };
 
+var survivor = josephus(41, 3);
+say "Prisoner #{survivor} survived.";
 
-var i = josephus_i(41, 3);
-var j = josephus_r(41, 3);
-
-i == j  || die "error: #{i} != #{j}";
-i == 30 || die "#{i} != 30";
-
-say "** Test passed!";
+var survivor2 = josephus_rec(41, 3);
+say "Prisoner #{survivor2} survived.";

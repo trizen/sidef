@@ -10,7 +10,7 @@
 func long_multiplication(a is String, b is String) -> String {
 
     a.len < b.len && (
-        [b, a] » (\a, \b);
+        (a, b) = (b, a);
     );
 
     '0' ~~ [a, b] && return '0';
@@ -54,7 +54,7 @@ func long_multiplication(a is String, b is String) -> String {
             n != 0 && result.append(n);
         }
         else {
-            [n.divmod(10)] » (\mem, \result[result.end+1]);
+            (mem, result[result.end+1]) = n.divmod(10);
         }
     }
 

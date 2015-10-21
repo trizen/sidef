@@ -1,0 +1,9 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Compound_data_type
+#
+
+class Point(x, y) {};
+var point = Point(1, 2);
+say point.y;                #=> 2

@@ -1,0 +1,91 @@
+#!/usr/bin/ruby
+
+#
+## Inspired by Tom Hudson: http://www.youtube.com/watch?v=GjGRhIl0xWs
+#
+
+enum (
+    PUSH,
+    ADD,
+    PRINT,
+    HALT,
+    JMPLT,
+);
+
+class Op(name, nargs) {};
+
+var ops = Hash.new(
+    PUSH,    Op("push", 1),
+    ADD,     Op("add", 0),
+    PRINT,   Op("print", 0),
+    HALT,    Op("halt", 0),
+    JMPLT,   Op("jmplt", 2),
+);
+
+class VM (
+    code = [],
+    pc = 0,
+    stack = [],
+    sp = -1
+){
+
+    method trace {
+        var op = ops{code[pc]};
+        var args = code.ft(pc+1, pc + op.nargs);
+        printf("%04d:%-10s%20s%40s\n", pc, op.name, args, stack);
+    }
+
+    method run(c=[]) {
+        code = c;
+
+        loop {
+
+            # Trace
+            self.trace();
+
+            # Fetch
+            var op = code[pc++];
+
+            # Decode
+            given(op) {
+                when (PUSH) {
+                    var val = code[pc++];
+                    stack[++sp] = val;
+                }
+                when (ADD) {
+                    var a = stack[sp--];
+                    var b = stack[sp--];
+
+                    stack[++sp] = a+b;
+                }
+                when (PRINT) {
+                    var val = stack[sp--];
+                    say val;
+                }
+                when (JMPLT) {
+                    var lt = code[pc++];
+                    var addr = code[pc++];
+
+                    if (stack[sp] < lt) {
+                        pc = addr;
+                    }
+                }
+                when (HALT) {
+                    return;
+                }
+            }
+        }
+    }
+}
+
+var code = [
+    PUSH, 2,
+    PUSH, 3,
+    ADD,
+    JMPLT, 10, 2,
+    PRINT,
+    HALT,
+];
+
+var v = VM();
+v.run(code);

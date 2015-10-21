@@ -1,0 +1,75 @@
+#!/usr/bin/ruby
+
+#
+## Unicode characters in variable name
+#
+
+var îșțh = "- Șe t©t fași băi?
+- ßiene băi „țărane”, î§ în «U€».";
+îșțh.say;
+
+'-' * 80 -> say;
+
+var chars = îșțh.to_chars;
+chars->join("_")->say;
+
+#######################################################
+
+#
+## Bytes
+#
+
+'-' * 80 -> say;
+
+var b = ('c'->ord);
+"byte '%d' made uppercase, is: %s\n".printf(b, (b - 32 -> chr));
+
+'-' * 80 -> say;
+
+var bytes = "Șarpe".to_bytes;   # splits on bytes!
+
+bytes.join.say;
+"The character 'Ș' is composed of two bytes: " + (bytes[0,1]->to_s)->say;
+"Then comes the character 'a', which is: " + (bytes[2].to_s) + " (" + (bytes[2].chr.to_s) + ")"->say;
+
+bytes[0] = 200;   # Keep the first byte as it is
+bytes[1] = 154;   # and change the 'S' to 'T', resulting in 'Ț'
+bytes.join.say;   # prints: 'Țarpe'
+
+#######################################################
+
+#
+## Characters
+#
+
+'-' * 80 -> say;
+
+var sidef = "șopârlă".to_chars;     # splits on characters!
+sidef.join('-').say;
+sidef[1]->say;
+sidef[2]->say;
+sidef[3]->say;
+sidef[4]->say;
+sidef[5]->say;
+sidef[6]->say;
+
+'-' * 80 -> say;
+
+#######################################################
+
+"Chinese characters: 文化交流学院"->say;
+
+'-' * 80 -> say;
+
+var chinese_chars = "文化交流学院".to_chars;
+chinese_chars.join(" . ").say;
+
+'-' * 80 -> say;
+
+var chinese_bytes = chinese_chars.join('').to_bytes;
+chinese_bytes.join.say;
+"Is composed from %d bytes.\n"->printf(chinese_bytes.len);
+
+'-' * 80 -> say;
+
+#######################################################

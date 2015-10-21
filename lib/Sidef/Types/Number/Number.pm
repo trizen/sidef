@@ -12,49 +12,35 @@ package Sidef::Types::Number::Number {
 
     use overload
       q{bool} => sub { ${$_[0]} != 0 },
-      q{""}   => \&get_value;
+      q{0+}   => sub { ${$_[0]}->numify },
+      q{""}   => sub { ${$_[0]}->bstr };
 
-    sub new_float {
+    my %cache;
+
+    sub new {
         my (undef, $num) = @_;
 
-        state $x = require Math::BigFloat;
         ref($num) eq 'Math::BigFloat'
-          ? (bless \$num, __PACKAGE__)
+          ? (bless \$num => __PACKAGE__)
           : (
-            bless \do {
-                eval { Math::BigFloat->new($num) } // Math::BigFloat->new(Math::BigInt->new($num));
-            },
-            __PACKAGE__
+            ref($num) || (length($num) > 5) ? (
+               bless \do {
+                   eval { Math::BigFloat->new($num) } // Math::BigFloat->new(Math::BigInt->new($num));
+                 }
+                 => __PACKAGE__
+              )
+            : (
+               $cache{$num} //= (
+                   bless \do {
+                       eval { Math::BigFloat->new($num) } // Math::BigFloat->new(Math::BigInt->new($num));
+                     }
+                     => __PACKAGE__
+               )
+              )
             );
     }
 
-    *new = \&new_float;
-
-    sub new_int {
-        my (undef, $num) = @_;
-
-        state $x = require Math::BigInt;
-        my $ref = ref($num);
-        $ref eq 'Math::BigInt' ? (bless \$num, __PACKAGE__)
-          : (   $ref eq 'Math::BigFloat'
-             || $ref eq 'Math::BigRat') ? (bless \($num->as_int), __PACKAGE__)
-          : (bless \Math::BigInt->new(index($num, '.') > 0 ? CORE::int($num) : $num), __PACKAGE__);
-    }
-
-    sub new_rat {
-        my (undef, $num) = @_;
-
-        state $x = require Math::BigRat;
-        ref($num) eq 'Math::BigRat'
-          ? (bless \$num, __PACKAGE__)
-          : (
-            bless \do {
-                eval { Math::BigRat->new($num) }
-                  // eval { Math::BigRat->new(Math::BigFloat->new($num)) } // Math::BigRat->new(Math::BigInt->new($num));
-            },
-            __PACKAGE__
-            );
-    }
+    *call = \&new;
 
     sub get_value {
         $GET_PERL_VALUE ? ${$_[0]}->numify : ${$_[0]};
@@ -62,122 +48,135 @@ package Sidef::Types::Number::Number {
 
     sub mod {
         my ($self, $num) = @_;
-        $self->new($self->get_value % $num->get_value);
+        $self->new($$self % $num->get_value);
     }
 
     sub modpow {
         my ($self, $y, $mod) = @_;
-        $self->new($self->get_value->copy->bmodpow($y->get_value, $mod->get_value));
+        $self->new($$self->copy->bmodpow($y->get_value, $mod->get_value));
     }
 
     *expmod = \&modpow;
 
     sub pow {
         my ($self, $num) = @_;
-        $self->new($self->get_value**$num->get_value);
+        $self->new($$self->copy->bpow($num->get_value));
     }
 
     sub inc {
         my ($self) = @_;
-        $self->new($self->get_value->copy->binc);
+        $self->new($$self->copy->binc);
     }
 
     sub dec {
         my ($self) = @_;
-        $self->new($self->get_value->copy->bdec);
+        $self->new($$self->copy->bdec);
     }
 
     sub and {
         my ($self, $num) = @_;
-        $self->new($self->get_value->as_int->band($num->get_value->as_int));
+        $self->new($$self->as_int->band($num->get_value->as_int));
     }
 
     sub or {
         my ($self, $num) = @_;
-        $self->new($self->get_value->as_int->bior($num->get_value->as_int));
+        $self->new($$self->as_int->bior($num->get_value->as_int));
     }
 
     sub xor {
         my ($self, $num) = @_;
-        $self->new($self->get_value->as_int->bxor($num->get_value->as_int));
+        $self->new($$self->as_int->bxor($num->get_value->as_int));
     }
 
     sub eq {
-        my ($self, $num) = @_;
-        my $value = defined($num) ? $num->get_value : undef;
-        Sidef::Types::Bool::Bool->new(length($value) ? $self->get_value == $value : 0);
+        my ($self, $arg) = @_;
+        Sidef::Types::Bool::Bool->new($$self == $$arg);
     }
 
     *equals = \&eq;
 
     sub ne {
-        my ($self, $num) = @_;
-        my $value = defined($num) ? $num->get_value : undef;
-        Sidef::Types::Bool::Bool->new(length($value) ? $self->get_value != $value : 1);
+        my ($self, $arg) = @_;
+        Sidef::Types::Bool::Bool->new($$self != $$arg);
     }
 
     sub cmp {
         my ($self, $num) = @_;
-        __PACKAGE__->new($self->get_value->bcmp($num->get_value));
+
+        state $mone = Sidef::Types::Number::Number->new(-1);
+        state $zero = Sidef::Types::Number::Number->new(0);
+        state $one  = Sidef::Types::Number::Number->new(1);
+
+        my $cmp = $$self->bcmp($num->get_value);
+        $cmp == 0 ? $zero : $cmp > 0 ? $one : $mone;
     }
 
     sub acmp {
         my ($self, $num) = @_;
-        __PACKAGE__->new($self->get_value->bacmp($num->get_value));
+
+        state $mone = Sidef::Types::Number::Number->new(-1);
+        state $zero = Sidef::Types::Number::Number->new(0);
+        state $one  = Sidef::Types::Number::Number->new(1);
+
+        my $cmp = $$self->bacmp($num->get_value);
+        $cmp == 0 ? $zero : $cmp > 0 ? $one : $mone;
     }
 
     sub gt {
         my ($self, $num) = @_;
-        Sidef::Types::Bool::Bool->new($self->get_value > $num->get_value);
+        Sidef::Types::Bool::Bool->new($$self->bcmp($num->get_value) > 0);
     }
 
     sub lt {
         my ($self, $num) = @_;
-        Sidef::Types::Bool::Bool->new($self->get_value < $num->get_value);
+        Sidef::Types::Bool::Bool->new($$self->bcmp($num->get_value) < 0);
     }
 
     sub ge {
         my ($self, $num) = @_;
-        Sidef::Types::Bool::Bool->new($self->get_value >= $num->get_value);
+        Sidef::Types::Bool::Bool->new($$self->bcmp($num->get_value) >= 0);
     }
 
     sub le {
         my ($self, $num) = @_;
-        Sidef::Types::Bool::Bool->new($self->get_value <= $num->get_value);
+        Sidef::Types::Bool::Bool->new($$self->bcmp($num->get_value) <= 0);
     }
 
-    sub subtract {
+    sub sub {
         my ($self, $num) = @_;
-        $self->new($self->get_value - $num->get_value);
+        $self->new(scalar $$self->copy->bsub($num->get_value));
     }
 
     sub add {
         my ($self, $num) = @_;
-        $self->new($self->get_value + $num->get_value);
+        $self->new(scalar $$self->copy->badd($num->get_value));
     }
 
-    sub multiply {
+    sub mul {
         my ($self, $num) = @_;
-        $self->new($self->get_value * $num->get_value);
+        $self->new(scalar $$self->copy->bmul($num->get_value));
     }
 
-    *x = \&multiply;
+    *x = \&mul;
 
     sub div {
         my ($self, $num) = @_;
-        $self->new($self->get_value / $num->get_value);
+        $self->new(scalar $$self->copy->bdiv($num->get_value));
     }
+
+    *divide = \&div;
 
     sub divmod {
         my ($self, $num) = @_;
-        Sidef::Types::Array::List->new($self->div($num)->int, $self->mod($num));
+        ($self->div($num)->int, $self->mod($num));
     }
 
     sub factorial {
         my ($self) = @_;
-        $self->new($self->get_value->copy->bfac);
+        $self->new($$self->copy->bfac);
     }
 
+    *fac  = \&factorial;
     *fact = \&factorial;
 
     sub array_to {
@@ -193,12 +192,12 @@ package Sidef::Types::Number::Number {
             # Unpack limit
             $to = $to->bstr if ref($to);
 
-            foreach my $i ($self->get_value .. $to) {
+            foreach my $i ($$self .. $to) {
                 push @array, $self->new($i);
             }
         }
         else {
-            for (my $i = $self->get_value ; $i <= $to ; $i += $step) {
+            for (my $i = $$self ; $i <= $to ; $i += $step) {
                 push @array, $self->new($i);
             }
         }
@@ -215,7 +214,7 @@ package Sidef::Types::Number::Number {
         my @array;
         my $downto = $num->get_value;
 
-        for (my $i = $self->get_value ; $i >= $downto ; $i -= $step) {
+        for (my $i = $$self ; $i >= $downto ; $i -= $step) {
             push @array, $self->new($i);
         }
 
@@ -228,7 +227,7 @@ package Sidef::Types::Number::Number {
         my ($self, $num, $step) = @_;
         $step = defined($step) ? $step->get_value : 1;
         Sidef::Types::Array::RangeNumber->new(
-                                              from => $self->get_value,
+                                              from => $$self,
                                               to   => $num->get_value,
                                               step => $step,
                                              );
@@ -241,7 +240,7 @@ package Sidef::Types::Number::Number {
         my ($self, $num, $step) = @_;
         $step = defined($step) ? $step->get_value : 1;
         Sidef::Types::Array::RangeNumber->new(
-                                              from => $self->get_value,
+                                              from => $$self,
                                               to   => $num->get_value,
                                               step => -$step,
                                              );
@@ -259,17 +258,26 @@ package Sidef::Types::Number::Number {
 
     sub sqrt {
         my ($self) = @_;
-        $self->new(CORE::sqrt($self->get_value));
+        $self->new($$self->copy->bsqrt);
     }
 
     sub root {
         my ($self, $n) = @_;
-        $self->new($self->get_value->copy->broot($n->get_value));
+        $self->new($$self->copy->broot($n->get_value));
+    }
+
+    sub troot {
+        my ($self) = @_;
+
+        state $two   = Math::BigFloat->new(2);
+        state $eight = Math::BigFloat->new(8);
+
+        $self->new(scalar $$self->copy->bmul($eight)->binc->bsqrt->bdec->bdiv($two));
     }
 
     sub abs {
         my ($self) = @_;
-        $self->new(CORE::abs($self->get_value));
+        $self->new($$self->copy->babs);
     }
 
     *pos      = \&abs;
@@ -277,60 +285,58 @@ package Sidef::Types::Number::Number {
 
     sub hex {
         my ($self) = @_;
-        state $x = require Math::BigInt;
-        $self->new(Math::BigInt->new("0x$self->get_value"));
+        $self->new(Math::BigInt->new("0x$$self"));
     }
 
     *from_hex = \&hex;
 
     sub oct {
         my ($self) = @_;
-        state $x = require Math::BigInt;
-        __PACKAGE__->new(Math::BigInt->from_oct($self->get_value));
+        $self->new(Math::BigInt->from_oct($$self));
     }
 
     *from_oct = \&oct;
 
     sub bin {
         my ($self) = @_;
-        state $x = require Math::BigInt;
-        $self->new(Math::BigInt->new("0b$self->get_value"));
+        $self->new(Math::BigInt->new("0b$$self"));
     }
 
     *from_bin = \&bin;
 
     sub exp {
         my ($self) = @_;
-        $self->new(CORE::exp($self->get_value));
+        $self->new($$self->copy->bexp);
     }
 
     sub int {
         my ($self) = @_;
-        $self->new($self->get_value->as_int);
+        $self->new($$self->as_int);
     }
 
     *as_int = \&int;
+    *to_i   = \&int;
 
     sub max {
         my ($self, $num) = @_;
-        my ($x, $y) = ($self->get_value, $num->get_value);
+        my ($x, $y) = ($$self, $num->get_value);
         $self->new($x > $y ? $x : $y);
     }
 
     sub min {
         my ($self, $num) = @_;
-        my ($x, $y) = ($self->get_value, $num->get_value);
+        my ($x, $y) = ($$self, $num->get_value);
         $self->new($x < $y ? $x : $y);
     }
 
     sub cos {
         my ($self) = @_;
-        $self->new(CORE::cos($self->get_value));
+        $self->new($$self->copy->bcos);
     }
 
     sub sin {
         my ($self) = @_;
-        $self->new(CORE::sin($self->get_value));
+        $self->new($$self->copy->bsin);
     }
 
     sub atan {
@@ -340,49 +346,51 @@ package Sidef::Types::Number::Number {
 
     sub atan2 {
         my ($x, $y) = @_;
-        Sidef::Types::Number::Number->new(CORE::atan2($x->get_value, $y->get_value));
+        Sidef::Types::Number::Number->new($x->get_value->copy->batan2($y->get_value));
     }
 
     sub log {
         my ($self, $base) = @_;
-        $self->new($self->get_value->copy->blog(defined($base) ? $base->get_value : ()));
+        $self->new($$self->copy->blog(defined($base) ? $base->get_value : ()));
     }
 
     sub ln {
         my ($self) = @_;
-        $self->new($self->get_value->copy->blog);
+        $self->new($$self->copy->blog);
     }
 
     sub log10 {
         my ($self) = @_;
-        $self->new($self->get_value->copy->blog(10));
+        state $ten = Math::BigFloat->new(10);
+        $self->new($$self->copy->blog($ten));
     }
 
     sub log2 {
         my ($self) = @_;
-        $self->new($self->get_value->copy->blog(2));
+        state $two = Math::BigFloat->new(2);
+        $self->new($$self->copy->blog($two));
     }
 
     sub inf {
         my ($self) = @_;
-        $self->new(Math::BigFloat->binf);
+        $self->new(Math::BigInt->binf);
     }
 
     sub neg {
         my ($self) = @_;
-        $self->new($self->get_value->copy->bneg);
+        $self->new($$self->copy->bneg);
     }
 
     *negate = \&neg;
 
     sub not {
         my ($self) = @_;
-        $self->new($self->get_value->copy->bnot);
+        $self->new($$self->copy->bnot);
     }
 
     sub sign {
         my ($self) = @_;
-        Sidef::Types::String::String->new($self->get_value->sign);
+        Sidef::Types::String::String->new($$self->sign);
     }
 
     sub nan {
@@ -394,69 +402,72 @@ package Sidef::Types::Number::Number {
 
     sub chr {
         my ($self) = @_;
-        Sidef::Types::Char::Char->new(CORE::chr $self->get_value);
+        Sidef::Types::String::String->new(CORE::chr($$self->numify));
     }
 
-    sub next_power_of_two {
+    sub npow2 {
         my ($self) = @_;
-        $self->new(2 << ($self->get_value->copy->blog(2)->as_int));
+        my $two = Math::BigInt->new(2);
+        $self->new(scalar $two->blsft($$self->as_int->blog($two)));
     }
 
-    *npow2 = \&next_power_of_two;
-
-    sub next_power_of {
+    sub npow {
         my ($self, $num) = @_;
-        $self->new($num->get_value**($self->get_value->copy->blog($num->get_value)->as_int->binc));
+        $num = $num->get_value;
+        $self->new(scalar $num->copy->bpow($$self->as_int->blog($num)->binc));
     }
-
-    *npow = \&next_power_of;
 
     sub is_zero {
         my ($self) = @_;
-        Sidef::Types::Bool::Bool->new($self->get_value->is_zero);
+        Sidef::Types::Bool::Bool->new($$self->is_zero);
+    }
+
+    sub is_one {
+        my ($self, $sign) = @_;
+        Sidef::Types::Bool::Bool->new($$self->is_one(defined($sign) ? $sign->get_value : ()));
     }
 
     sub is_nan {
         my ($self) = @_;
-        Sidef::Types::Bool::Bool->new($self->get_value->is_nan);
+        Sidef::Types::Bool::Bool->new($$self->is_nan);
     }
 
     *is_NaN = \&is_nan;
 
     sub is_positive {
         my ($self) = @_;
-        Sidef::Types::Bool::Bool->new($self->get_value->is_pos);
+        Sidef::Types::Bool::Bool->new($$self->is_pos);
     }
 
     *is_pos = \&is_positive;
 
     sub is_negative {
         my ($self) = @_;
-        Sidef::Types::Bool::Bool->new($self->get_value->is_neg);
+        Sidef::Types::Bool::Bool->new($$self->is_neg);
     }
 
     *is_neg = \&is_negative;
 
     sub is_even {
         my ($self) = @_;
-        Sidef::Types::Bool::Bool->new($self->get_value->as_int->is_even);
+        Sidef::Types::Bool::Bool->new($$self->as_int->is_even);
     }
 
     sub is_odd {
         my ($self) = @_;
-        Sidef::Types::Bool::Bool->new($self->get_value->as_int->is_odd);
+        Sidef::Types::Bool::Bool->new($$self->as_int->is_odd);
     }
 
     sub is_inf {
         my ($self) = @_;
-        Sidef::Types::Bool::Bool->new($self->get_value->is_inf);
+        Sidef::Types::Bool::Bool->new($$self->is_inf);
     }
 
     *is_infinite = \&is_inf;
 
     sub is_integer {
         my ($self) = @_;
-        Sidef::Types::Bool::Bool->new($self->get_value->is_int);
+        Sidef::Types::Bool::Bool->new($$self->is_int);
     }
 
     *is_int = \&is_integer;
@@ -464,39 +475,39 @@ package Sidef::Types::Number::Number {
     sub rand {
         my ($self, $max) = @_;
         defined($max)
-          ? $self->new($self->get_value + CORE::rand($max->get_value - $self->get_value))
-          : $self->new(CORE::rand($self->get_value));
+          ? $self->new($$self + CORE::rand($max->get_value - $$self))
+          : $self->new(CORE::rand($$self));
     }
 
     sub ceil {
         my ($self) = @_;
-        $self->new($self->get_value->copy->bceil);
+        $self->new($$self->copy->bceil);
     }
 
     sub floor {
         my ($self) = @_;
-        $self->new($self->get_value->copy->bfloor);
+        $self->new($$self->copy->bfloor);
     }
 
     sub round {
         my ($self, $places) = @_;
         $self->new(
-                   $self->get_value->copy->bround(
-                                                  defined($places)
-                                                  ? $places->get_value
-                                                  : ()
-                                                 )
+                   $$self->copy->bround(
+                                        defined($places)
+                                        ? $places->get_value
+                                        : ()
+                                       )
                   );
     }
 
     sub roundf {
         my ($self, $places) = @_;
         $self->new(
-                   $self->get_value->copy->bfround(
-                                                   defined($places)
-                                                   ? $places->get_value
-                                                   : ()
-                                                  )
+                   $$self->copy->bfround(
+                                         defined($places)
+                                         ? $places->get_value
+                                         : ()
+                                        )
                   );
     }
 
@@ -504,19 +515,32 @@ package Sidef::Types::Number::Number {
 
     sub length {
         my ($self) = @_;
-        $self->new($self->get_value->length);
+        $self->new($$self->length);
     }
 
     *len = \&length;
 
     sub digit {
         my ($self, $n) = @_;
-        $self->new($self->get_value->as_int->digit($n->get_value));
+        $self->new($$self->as_int->digit($n->get_value));
+    }
+
+    sub digits {
+        my ($self) = @_;
+
+        my $len = $$self->length;
+        my $int = $$self->as_int;
+
+        my @digits;
+        foreach my $i (0 .. $len - 1) {
+            unshift @digits, $self->new($int->digit($i));
+        }
+        Sidef::Types::Array::Array->new(@digits);
     }
 
     sub nok {
         my ($self, $k) = @_;
-        $self->new($self->get_value->as_int->bnok($k->get_value));
+        $self->new($$self->as_int->bnok($k->get_value));
     }
 
     *binomial = \&nok;
@@ -524,11 +548,11 @@ package Sidef::Types::Number::Number {
     sub of {
         my ($self, $obj) = @_;
 
-        if ($obj->SUPER::isa('Sidef::Types::Block::Code')) {
-            return Sidef::Types::Array::Array->new(map { $obj->run(__PACKAGE__->new($_)) } 1 .. $self->get_value);
+        if (ref($obj) eq 'Sidef::Types::Block::Code') {
+            return Sidef::Types::Array::Array->new(map { $obj->run($self->new($_)) } 1 .. $$self);
         }
 
-        Sidef::Types::Array::Array->new(($obj) x $self->get_value);
+        Sidef::Types::Array::Array->new(($obj) x $$self);
     }
 
     sub times {
@@ -536,46 +560,41 @@ package Sidef::Types::Number::Number {
         $obj->repeat($self);
     }
 
-    *bcall = \&times;
-
     sub to_bin {
         my ($self) = @_;
-        state $x = require Math::BigInt;
-        Sidef::Types::String::String->new(substr(Math::BigInt->new($self->get_value)->as_bin, 2));
+        Sidef::Types::String::String->new(substr(Math::BigInt->new($$self)->as_bin, 2));
     }
 
     *as_bin = \&to_bin;
 
     sub to_oct {
         my ($self) = @_;
-        state $x = require Math::BigInt;
-        Sidef::Types::String::String->new(substr(Math::BigInt->new($self->get_value)->as_oct, 1));
+        Sidef::Types::String::String->new(substr(Math::BigInt->new($$self)->as_oct, 1));
     }
 
     *as_oct = \&to_oct;
 
     sub to_hex {
         my ($self) = @_;
-        state $x = require Math::BigInt;
-        Sidef::Types::String::String->new(substr(Math::BigInt->new($self->get_value)->as_hex, 2));
+        Sidef::Types::String::String->new(substr(Math::BigInt->new($$self)->as_hex, 2));
     }
 
     *as_hex = \&to_hex;
 
     sub is_div {
         my ($self, $num) = @_;
-        Sidef::Types::Bool::Bool->new($self->get_value % $num->get_value == 0);
+        Sidef::Types::Bool::Bool->new($$self->copy->bmod($num->get_value)->is_zero);
     }
 
     sub divides {
         my ($self, $num) = @_;
-        Sidef::Types::Bool::Bool->new($num->get_value % $self->get_value == 0);
+        Sidef::Types::Bool::Bool->new(Math::BigFloat->new($num->get_value)->bmod($$self)->is_zero);
     }
 
     sub commify {
         my ($self) = @_;
 
-        my $n = $self->get_value;
+        my $n = $$self;
         $n = $n->bstr if ref($n);
 
         my $x   = $n;
@@ -600,24 +619,57 @@ package Sidef::Types::Number::Number {
         Sidef::Types::String::String->new(($neg ? '-' : '') . $x);
     }
 
+    sub rat {
+        my ($self) = @_;
+        $self->new(Math::BigRat->new($$self));
+    }
+
+    sub numerator {
+        my ($self) = @_;
+        $self->new($$self->numerator);
+    }
+
+    *nu = \&numerator;
+
+    sub denominator {
+        my ($self) = @_;
+        $self->new($$self->denominator);
+    }
+
+    *de = \&denominator;
+
+    sub parts {
+        my ($self) = @_;
+        map { $self->new($_) } $$self->parts;
+    }
+
+    *nude = \&parts;
+
+    sub as_float {
+        my ($self) = @_;
+        $self->new($$self->as_float);
+    }
+
     sub dump {
         my ($self) = @_;
-        Sidef::Types::String::String->new($self->get_value->bstr);
+        Sidef::Types::String::String->new($$self->bstr);
     }
+
+    *to_s = \&dump;
 
     sub sstr {
         my ($self) = @_;
-        Sidef::Types::String::String->new($self->get_value->bsstr);
+        Sidef::Types::String::String->new($$self->bsstr);
     }
 
     sub shift_right {
         my ($self, $num, $base) = @_;
-        $self->new($self->get_value->copy->brsft($num->get_value, (defined($base) ? $base->get_value : ())));
+        $self->new($$self->copy->brsft($num->get_value, (defined($base) ? $base->get_value : ())));
     }
 
     sub shift_left {
         my ($self, $num, $base) = @_;
-        $self->new($self->get_value->copy->blsft($num->get_value, defined($base) ? $base->get_value : ()));
+        $self->new($$self->copy->blsft($num->get_value, defined($base) ? $base->get_value : ()));
     }
 
     sub complex {
@@ -628,8 +680,8 @@ package Sidef::Types::Number::Number {
     *c = \&complex;
 
     sub i {
-        my ($self, $num) = @_;
-        Sidef::Types::Number::Complex->new($self)->multiply(Sidef::Types::Number::Complex->get_constant('i'));
+        my ($self) = @_;
+        Sidef::Types::Number::Complex->new(0, $$self);
     }
 
     {
@@ -637,9 +689,9 @@ package Sidef::Types::Number::Number {
 
         *{__PACKAGE__ . '::' . '/'}   = \&div;
         *{__PACKAGE__ . '::' . '÷'}  = \&div;
-        *{__PACKAGE__ . '::' . '*'}   = \&multiply;
+        *{__PACKAGE__ . '::' . '*'}   = \&mul;
         *{__PACKAGE__ . '::' . '+'}   = \&add;
-        *{__PACKAGE__ . '::' . '-'}   = \&subtract;
+        *{__PACKAGE__ . '::' . '-'}   = \&sub;
         *{__PACKAGE__ . '::' . '%'}   = \&mod;
         *{__PACKAGE__ . '::' . '**'}  = \&pow;
         *{__PACKAGE__ . '::' . '++'}  = \&inc;

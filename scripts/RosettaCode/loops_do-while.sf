@@ -1,0 +1,10 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Loops/Do-while
+#
+
+var value = 0;
+do {
+    say ++value;
+} while (value % 6);

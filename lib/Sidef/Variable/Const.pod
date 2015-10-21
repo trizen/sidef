@@ -1,0 +1,25 @@
+
+=encoding utf8
+
+=head1 NAME
+
+Sidef::Variable::Const
+
+=head1 DESCRIPTION
+
+This object is ...
+
+=head1 SYNOPSIS
+
+var obj = Const.new(...);
+
+=head1 METHODS
+
+
+=head2 new
+
+Const.new() -> I<Obj>
+
+Return the
+
+=cut

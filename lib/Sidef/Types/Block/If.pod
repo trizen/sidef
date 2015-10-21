@@ -1,0 +1,25 @@
+
+=encoding utf8
+
+=head1 NAME
+
+Sidef::Types::Block::If
+
+=head1 DESCRIPTION
+
+This object is ...
+
+=head1 SYNOPSIS
+
+var obj = If.new(...);
+
+=head1 METHODS
+
+
+=head2 new
+
+If.new() -> I<Obj>
+
+Return the
+
+=cut

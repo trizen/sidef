@@ -1,0 +1,14 @@
+#!/usr/bin/ruby
+
+#
+## Array intersection
+#
+
+var arr1 = [1,3,5,7,9];
+var arr2 = [2,4,6];
+
+var arr3 = (arr1 ^zip^ arr2);
+arr2 ^zip!^ arr1;
+
+arr3.join(", ").say;
+arr2.join(", ").say;

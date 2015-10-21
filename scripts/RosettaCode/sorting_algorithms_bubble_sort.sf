@@ -1,0 +1,25 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Sorting_algorithms/Bubble_sort
+#
+
+func bubble_sort(arr is Array) -> Array {
+    loop {
+        var swapped = false;
+        { |i|
+            arr[i-1] > arr[i] && (
+                arr[i-1, i] = arr[i, i-1];
+                swapped = true;
+            );
+        } * arr.end;
+        swapped || break;
+    };
+    return arr;
+};
+
+var numbers = [7,6,5,9,8,4,3,1,2,0];
+say bubble_sort(numbers);
+ 
+var strs = ["John", "Kate", "Zerg", "Alice", "Joe", "Jane"];
+say bubble_sort(strs);

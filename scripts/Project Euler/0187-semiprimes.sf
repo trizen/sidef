@@ -1,0 +1,23 @@
+#!/usr/bin/ruby
+
+# How many composite integers, n < 10^8, have precisely two, not necessarily distinct, prime factors?
+
+# https://projecteuler.net/problem=187
+
+# Answer: 17427258
+
+var limit = 10**8;
+
+var nt = frequire('ntheory');
+var primes = nt.primes(0, limit/2);
+
+var count = 0;
+var len = primes.end;
+
+primes.range.each { |i|
+    range(i, len).each { |j|
+        primes[i]*primes[j] >= limit ? break : ++count;
+    }
+}
+
+say count;

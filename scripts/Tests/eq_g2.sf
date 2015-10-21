@@ -1,0 +1,16 @@
+#!/usr/bin/ruby
+
+func g2(a,b,c) {
+    var dt = (b**2 - 4*a*c);
+    var x1 = ((-b + dt.sqrt) / 2*a);
+    var x2 = ((-b - dt.sqrt) / 2*a);
+    (x1, x2);
+}
+
+# x^2 + 2x - 8 = 0
+var (a, b) = g2(1, 2, -8);
+
+assert_eq(a, 2);
+assert_eq(b, -4);
+
+say '** Test passed!';

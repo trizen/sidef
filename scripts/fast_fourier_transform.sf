@@ -1,0 +1,20 @@
+#!/usr/bin/ruby
+
+func fft(arr) {
+    arr.len == 1 && return arr;
+
+    var evn = fft([arr.@[arr.range.grep { .is_even }]]);
+    var odd = fft([arr.@[arr.range.grep { .is_odd  }]]);
+    var twd = (Complex(0, 2) * Math::PI / arr.len);
+
+    odd.range.map {|n| odd[n] *= exp(twd * n)};
+    (evn »+« odd) + (evn »-« odd);
+}
+
+var cycles = 3;
+var sequence = (0 .. 15);
+
+var wave = sequence.map {|n| Complex(sin(n * 2*Math::PI / sequence.len * cycles)) };
+
+say "wave:#{wave.map{ '%6.3f' % _ }}";
+say "fft: #{fft(wave).map { '%6.3f' % .abs }}";

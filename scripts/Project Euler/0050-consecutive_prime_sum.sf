@@ -1,0 +1,35 @@
+#!/usr/bin/ruby
+
+# Which prime, below one-million, can be written as the sum of the most consecutive primes?
+
+# https://projecteuler.net/problem=50
+
+# Answer: 997651 is the sum of 543 consecutive primes (from 7 to 3931).
+
+define limit = 1e6;
+
+var sum = 0;
+var primes = [];
+var nt = frequire('ntheory');
+
+Math.inf.times { |i|
+    var p = nt.nth_prime(i);
+    (sum += p)/1.2 > limit && break;        # /1.2 is a naive optimization
+    primes << p;
+}
+
+var l = primes.len;
+var arr = [];
+
+for (var i = 0; i <= l; ++i) {
+    for (var j = i+1; j <= l-i; j++) {
+        var slice = primes.ft(i, j);
+        var sum = slice.sum;
+        if (sum < limit && nt.is_prime(sum)) {
+            arr << [j-i + 1, sum, slice];
+        }
+    }
+}
+
+var num = arr.max_by { |a| a[0] };
+say "#{num[1]} is the sum of the following #{num[0]} consecutive primes: #{num[2].dump}";

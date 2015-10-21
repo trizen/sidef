@@ -7,36 +7,21 @@ Sidef::Math::Math
 
 =head1 DESCRIPTION
 
-This object is the Math department. It handles various math functions, like I<cos>, I<sin>, I<gcd> and others.
+This object is ...
 
 =head1 SYNOPSIS
 
-=over 2
+var obj = Math.new(...);
 
-=item * Special Numbers
-
-    var pi  = Math.pi;
-    var inf = Math.inf;
-
-=item * Calculation precision
-
-    Math.precision(-32);     # precision to 32 decimal digits
-    Math.accuracy(64);       # accuracy to 64 digits
-
-=item * Math functions
-
-    var sqrt = Math.sqrt(5);
-    var gcd  = Math.gcd(81, 21, 63);
-
-=back
 
 =head1 INHERITS
 
 Inherits methods from:
 
-    * Sidef
+	* Sidef::Object::Object
 
 =head1 METHODS
+
 
 =head2 abs
 
@@ -48,13 +33,9 @@ Return the
 
 =head2 accuracy
 
-Math.accuracy() -> I<Num>
+Math.accuracy() -> I<Obj>
 
-Set the calculation accuracy at an arbitrary number of digits.
-
-    Math.accuracy(128);     # sets the accurracy to 128 digits
-
-Returns an object of type: C<Sidef::Types::Number::Number>
+Return the
 
 =cut
 
@@ -172,25 +153,17 @@ Return the
 
 =head2 atan
 
-Math.atan(I<Num>) -> I<Num>
+Math.atan() -> I<Obj>
 
-This functions takes one arguments and calculcates the arctangent of it in the range -PI to PI.
-
-    Math.atan(1/180);
-
-Returns an object of type: C<Sidef::Types::Number::Number>
+Return the
 
 =cut
 
 =head2 atan2
 
-Math.atan2(I<Num>, I<Num>) -> I<Num>
+Math.atan2() -> I<Obj>
 
-This function works in the same way as the L<C<atan>|"atan"> function, except that it takes two arguments.
-
-    Math.atan2(0, -Math.inf);     # returns PI
-
-Returns an object of type: C<Sidef::Types::Number::Number>
+Return the
 
 =cut
 
@@ -220,13 +193,9 @@ Return the
 
 =head2 cos
 
-Math.cos(I<Num>) -> I<Num>
+Math.cos() -> I<Obj>
 
-Returns the cosine of I<Num> (expressed in radians).
-
-    Math.cos(45);
-
-Returns an object of type: C<Sidef::Types::Number::Number>
+Return the
 
 =cut
 
@@ -352,13 +321,9 @@ Return the
 
 =head2 gcd
 
-Math.gcd(I<Num>, I<Num>, I<...>) -> I<Num>
+Math.gcd() -> I<Obj>
 
-Returns the greatest common divisor for a list of numbers.
-
-    Math.gcd(64, 40);   # returns 8
-
-Returns an object of type: C<Sidef::Types::Number::Number>
+Return the
 
 =cut
 
@@ -396,26 +361,17 @@ Return the
 
 =head2 inf
 
-Math.inf() -> I<Num>
+Math.inf() -> I<Obj>
 
-Returns the logical infinite number.
-
-     Math.inf;   # positive infinity (+1/0)
-    -Math.inf;   # negative infinity (-1/0)
-
-Returns an object of type: C<Sidef::Types::Number::Number>
+Return the
 
 =cut
 
 =head2 lcm
 
-Math.lcm(I<Num>, I<Num>, I<...>) -> I<Num>
+Math.lcm() -> I<Obj>
 
-Returns the least common multiple for a list of numbers.
-
-    Math.lcm(3, 6, 8);  # returns 24
-
-Returns an object of type: C<Sidef::Types::Number::Number>
+Return the
 
 =cut
 
@@ -501,20 +457,13 @@ Aliases: I<number_to_percentage>
 
 =cut
 
-=head2 PI
+=head2 pi
 
-Math.PI(I<Num>) -> I<Num>
+Math.pi() -> I<Obj>
 
-Returns the PI number. The function can take an optional argument,
-which must be a positive integer, and returns the PI with the I<Num>
-number of digits.
+Return the
 
-    Math.pi;      # returns PI (default: 40 places)
-    Math.pi(320)  # returns PI at 320 places accuracy
-
-Aliases: I<pi()>.
-
-Returns an object of type: C<Sidef::Types::Number::Number>
+Aliases: I<PI>
 
 =cut
 
@@ -528,15 +477,9 @@ Return the
 
 =head2 precision
 
-Math.precision(I<Num>) -> I<Num>
+Math.precision() -> I<Obj>
 
-Set the calculation precision. A negative number indicates decimal precision.
-Basically, this functions just rounds all the numbers to the I<Num>th digit.
-
-    Math.precision(1);    # int mode:  10/3 == 3
-    Math.precision(-3);   # mini mode: 10/3 == 3.333
-
-Returns an object of type: C<Sidef::Types::Number::Number>
+Return the
 
 =cut
 
@@ -580,6 +523,14 @@ Return the
 
 =cut
 
+=head2 root
+
+Math.root() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 sec
 
 Math.sec() -> I<Obj>
@@ -598,13 +549,9 @@ Return the
 
 =head2 sin
 
-Math.sin(I<Num>) -> I<Num>
+Math.sin() -> I<Obj>
 
-Returns the sine of I<Num> (expressed in radians).
-
-    Math.sin(90);
-
-Returns an object of type: C<Sidef::Types::Number::Number>
+Return the
 
 =cut
 
@@ -618,13 +565,9 @@ Return the
 
 =head2 sqrt
 
-Math.sqrt(I<Num>) -> I<Num>
+Math.sqrt() -> I<Obj>
 
-Returns the positive square root of I<Num>.
-
-    Math.sqrt(25);   # returns: 5
-
-Returns an object of type: C<Sidef::Types::Number::Number>
+Return the
 
 =cut
 
@@ -647,6 +590,14 @@ Return the
 =head2 tanh
 
 Math.tanh() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 troot
+
+Math.troot() -> I<Obj>
 
 Return the
 

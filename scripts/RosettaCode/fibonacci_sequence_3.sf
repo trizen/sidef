@@ -1,0 +1,13 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Fibonacci_sequence
+#
+
+func fib_closed(n) {
+    define S = (1.25.sqrt + 0.5);
+    define T = (-S + 1);
+    (S**n - T**n) / (-T + S) -> roundf(0);
+}
+
+say fib_closed(12);

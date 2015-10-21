@@ -1,0 +1,31 @@
+#!/usr/bin/ruby
+
+# The following iterative sequence is defined for the set of positive integers:
+
+# n → n/2 (n is even)
+# n → 3n + 1 (n is odd)
+
+# Which starting number, under one million, produces the longest chain?
+
+# https://projecteuler.net/problem=14
+
+# Answer: 837799
+
+func collatz(n) is cached {
+    n.is_one ? 1
+             : (n.is_even ? 1+collatz(n/2)
+                          : 1+collatz(3*n + 1));
+}
+
+var num = 0;
+var max = 0;
+
+range(1, 1e6-1).each { |i|
+    var value = collatz(i);
+    if (value > max) {
+        max = value;
+        num = i;
+    }
+}
+
+say num;

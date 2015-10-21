@@ -1,15 +1,11 @@
 #!/usr/bin/ruby
 
-#
-## http://rosettacode.org/wiki/Linear_congruential_generator
-#
-
 module LCG {
 
   # Creates a linear congruential generator with the given _seed_.
   class Common {
-    -> new(seed) {
-      self[:seed] = (self[:r] = seed);
+    -> init(seed) {
+      self{:seed} = (self{:r} = seed);
     }
   }
 
@@ -17,7 +13,7 @@ module LCG {
   # as BSD rand().
   class Berkeley < Common {
     -> rand {
-      self.r = ((1103515245 * self.r + 12345) & 0x7fff_ffff);
+      self{:r} = ((1103515245 * self{:r} + 12345) & 0x7fff_ffff);
     }
   }
 
@@ -25,18 +21,14 @@ module LCG {
   # as rand() from the Microsoft C Runtime.
   class Microsoft < Common {
     -> rand {
-      self.r = ((214013 * self.r + 2531011) & 0x7fff_ffff);
-      self.r >> 16;
+      self{:r} = ((214013 * self{:r} + 2531011) & 0x7fff_ffff);
+      self{:r} >> 16;
     }
   }
 }
 
 var lcg1 = LCG::Berkeley.new(1);
+say 5.of { lcg1.rand };
+
 var lcg2 = LCG::Microsoft.new(1);
-
-assert_eq([1103527590, 377401575, 662824084, 1147902781, 2035015474], 5.of { lcg1.rand });
-assert_eq([41, 18467, 6334, 26500, 19169], 5.of { lcg2.rand });
-assert_eq([368800899, 1508029952, 486256185, 1062517886, 267834847], 5.of { lcg1.rand});
-assert_eq([15724, 11478, 29358, 26962, 24464], 5.of { lcg2.rand });
-
-say "** Test passed!";
+say 5.of { lcg2.rand };

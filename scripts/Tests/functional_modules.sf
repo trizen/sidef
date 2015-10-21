@@ -1,0 +1,24 @@
+#!/usr/bin/ruby
+
+var spec = frequire('File::Spec::Functions');
+"** This file: %s\n".printf(spec.catfile(spec.curdir, __FILE__));
+"** Full path: %s\n".printf(spec.rel2abs(__FILE__));
+
+#
+## Same thing, but with a req check
+#
+
+var sf = (
+            try   { frequire 'File::Spec::Functions' }
+            catch { nil }
+         );
+
+if (nil != sf) {
+    "** Root dir: '%s'\n".printf(sf.rootdir);
+}
+
+__END__
+var ron = frequire 'Lingua::RO::Numbers';
+var num = ron.number_to_ro(123553);
+
+num.say;

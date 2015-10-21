@@ -8,7 +8,7 @@ package Sidef::Types::Char::Chars {
 
     sub new {
         my (undef, @chars) = @_;
-        bless [@{Sidef::Types::Array::Array->new(@chars)}], __PACKAGE__;
+        bless \@chars, __PACKAGE__;
     }
 
     sub call {
@@ -18,7 +18,7 @@ package Sidef::Types::Char::Chars {
 
     sub dump {
         my ($self) = @_;
-        Sidef::Types::String::String->new('Chars.new(' . join(', ', map { $_->get_value->dump->get_value } @{$self}) . ')');
+        Sidef::Types::String::String->new('Chars.new(' . join(', ', map { $_->dump->get_value } @{$self}) . ')');
     }
 };
 

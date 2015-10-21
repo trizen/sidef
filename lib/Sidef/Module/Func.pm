@@ -59,12 +59,8 @@ package Sidef::Module::Func {
             ? (
                map {
                    local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
-                   ref($_) eq 'Sidef::Variable::Ref'
-                     ? do {
-                       my $obj = $_->get_var->get_value;
-                       ref $obj eq 'Sidef::Types::Hash::Hash' ? $obj->{data} //= {} : $obj;
-                     }
-                     : index(ref($_), 'Sidef::') == 0 ? $_->get_value
+                   index(ref($_), 'Sidef::') == 0 ? $_->get_value
+                     : ref($_) eq 'REF' ? ${$_}
                      : $_
                  } @arg
               )
@@ -77,7 +73,7 @@ package Sidef::Module::Func {
         };
 
         if (@results > 1) {
-            return Sidef::Types::Array::List->new(map { Sidef::Perl::Perl->to_sidef($_) } @results);
+            return (map { Sidef::Perl::Perl->to_sidef($_) } @results);
         }
 
         Sidef::Perl::Perl->to_sidef($results[0]);

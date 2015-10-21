@@ -4,42 +4,16 @@ package Sidef::Types::Hash::Hash {
 
     use parent qw(
       Sidef::Object::Object
+      Sidef::Convert::Convert
       );
 
     use overload
-      q{bool} => sub { scalar(keys %{$_[0]{data}}) },
+      q{bool} => sub { scalar(keys %{$_[0]}) },
       q{""}   => \&dump;
 
     sub new {
-        my ($class, @pairs) = @_;
-
-        my %hash = (data => {});
-        my $self = bless \%hash, __PACKAGE__;
-
-        if (@pairs == 1) {
-
-            # Any object to hash
-            if ($pairs[0]->can('to_hash')) {
-                return $pairs[0]->to_hash;
-            }
-        }
-
-        # Add hash key/value pairs
-        while (@pairs) {
-            my $key = shift @pairs;
-
-            my $value;
-            if (ref($key) eq 'Sidef::Types::Array::Pair') {
-                ($key, $value) = ($key->[0], $key->[1]);
-            }
-            else {
-                $value = Sidef::Variable::Variable->new(name => '', type => 'var', value => shift @pairs);
-            }
-
-            $hash{data}{$key} = $value;
-        }
-
-        $self;
+        my ($class, %pairs) = @_;
+        bless \%pairs, __PACKAGE__;
     }
 
     *call = \&new;
@@ -48,12 +22,12 @@ package Sidef::Types::Hash::Hash {
         my ($self) = @_;
 
         my %hash;
-        while (my ($k, $v) = each %{$self->{data}}) {
-            my $rv = $v->get_value;
+        foreach my $k (keys %{$self}) {
+            my $v = $self->{$k};
             $hash{$k} = (
-                         index(ref($rv), 'Sidef::') == 0
-                         ? $rv->get_value
-                         : $rv
+                         index(ref($v), 'Sidef::') == 0
+                         ? $v->get_value
+                         : $v
                         );
         }
 
@@ -68,54 +42,40 @@ package Sidef::Types::Hash::Hash {
         $self->{__DEFAULT_VALUE__};
     }
 
-    sub get {
+    sub items {
         my ($self, @keys) = @_;
+        Sidef::Types::Array::Array->new(map { exists($self->{$_}) ? $self->{$_} : undef } @keys);
+    }
 
-        if (@keys > 1) {
-            return Sidef::Types::Array::List->new(map { exists($self->{data}{$_}) ? $self->{data}{$_}->get_value : undef }
-                                                  @keys);
-        }
+    sub item {
+        my ($self, $key) = @_;
+        exists($self->{$key}) ? $self->{$key} : ();
+    }
 
-        @keys && exists($self->{data}{$keys[0]}) ? $self->{data}{$keys[0]}->get_value : ();
+    sub slice {
+        my ($self, @keys) = @_;
+        $self->new(map { ($_ => exists($self->{$_}) ? $self->{$_} : undef) } @keys);
     }
 
     sub length {
         my ($self) = @_;
-        Sidef::Types::Number::Number->new(scalar CORE::keys %{$self->{data}});
+        Sidef::Types::Number::Number->new(scalar CORE::keys %{$self});
     }
 
     *len = \&length;
 
-    sub duplicate_of {
-        my ($self, $obj) = @_;
-
-        %{$self->{data}} eq %{$obj->{data}} || return Sidef::Types::Bool::Bool->false;
-
-        my $ne_method = '!=';
-        while (my ($key, $value) = each %{$self->{data}}) {
-            !exists($obj->{data}{$key})
-              && (return Sidef::Types::Bool::Bool->false);
-
-            $value->get_value->$ne_method($obj->{data}{$key}->get_value)
-              && return (Sidef::Types::Bool::Bool->false);
-        }
-
-        Sidef::Types::Bool::Bool->true;
-    }
-
     sub eq {
         my ($self, $obj) = @_;
 
-        if (   not defined($obj)
-            or not $obj->isa('HASH')
-            or ref($obj->{data}) ne 'HASH'
-            or %{$self->{data}} ne %{$obj->{data}}) {
-            return Sidef::Types::Bool::Bool->false;
-        }
+        (%{$self} eq %{$obj})
+          or return Sidef::Types::Bool::Bool->false;
 
-        while (my ($key) = each %{$self->{data}}) {
-            !exists($obj->{data}{$key})
-              && return Sidef::Types::Bool::Bool->false;
+        while (my ($key, $value) = each %{$self}) {
+            exists($obj->{$key})
+              or return Sidef::Types::Bool::Bool->false;
+
+            $value eq $obj->{$key}
+              or return Sidef::Types::Bool::Bool->false;
         }
 
         Sidef::Types::Bool::Bool->true;
@@ -126,9 +86,30 @@ package Sidef::Types::Hash::Hash {
         $self->eq($obj)->not;
     }
 
+    sub same_keys {
+        my ($self, $obj) = @_;
+
+        if (ref($self) ne ref($obj)
+            or %{$self} ne %{$obj}) {
+            return Sidef::Types::Bool::Bool->false;
+        }
+
+        while (my ($key) = each %{$self}) {
+            exists($obj->{$key})
+              or return Sidef::Types::Bool::Bool->false;
+        }
+
+        Sidef::Types::Bool::Bool->true;
+    }
+
     sub append {
-        my ($self, $key, $value) = @_;
-        $self->{data}{$key} = Sidef::Variable::Variable->new(name => '', type => 'var', value => $value);
+        my ($self, %pairs) = @_;
+
+        foreach my $key (keys %pairs) {
+            $self->{$key} = $pairs{$key};
+        }
+
+        $self;
     }
 
     *add = \&append;
@@ -136,19 +117,18 @@ package Sidef::Types::Hash::Hash {
     sub delete {
         my ($self, @keys) = @_;
         @keys == 1
-          ? delete($self->{data}{$keys[0]})
-          : Sidef::Types::Array::List->new(delete @{$self->{data}}{@keys});
+          ? delete($self->{$keys[0]})
+          : (delete @{$self}{@keys});
     }
 
     sub _iterate {
         my ($self, $code, $callback) = @_;
 
-        while (my ($key, $value) = each %{$self->{data}}) {
+        while (my ($key, $value) = each %{$self}) {
             my $key_obj = Sidef::Types::String::String->new($key);
-            my $val_obj = $value->get_value;
 
-            if ($code->run($key_obj, $val_obj)) {
-                $callback->($key, $val_obj);
+            if ($code->run($key_obj, $value)) {
+                $callback->($key, $value);
             }
         }
 
@@ -158,13 +138,8 @@ package Sidef::Types::Hash::Hash {
     sub map_val {
         my ($self, $code) = @_;
 
-        while (my ($key, $value) = each %{$self->{data}}) {
-            $self->{data}{$key} =
-              Sidef::Variable::Variable->new(
-                                             name  => '',
-                                             type  => 'var',
-                                             value => $code->run(Sidef::Types::String::String->new($key), $value->get_value)
-                                            );
+        while (my ($key, $value) = each %{$self}) {
+            $self->{$key} = $code->run(Sidef::Types::String::String->new($key), $value);
         }
 
         $self;
@@ -191,7 +166,7 @@ package Sidef::Types::Hash::Hash {
         $self->_iterate(
             $code,
             sub {
-                delete $self->{data}{$_[0]};
+                delete $self->{$_[0]};
             }
         );
     }
@@ -202,12 +177,12 @@ package Sidef::Types::Hash::Hash {
         my ($self, $obj) = @_;
 
         my @list;
-        while (my ($key, $val) = each %{$self->{data}}) {
-            push @list, $key, $val->get_value;
+        while (my ($key, $val) = each %{$self}) {
+            push @list, $key, $val;
         }
 
-        while (my ($key, $val) = each %{$obj->{data}}) {
-            push @list, $key, $val->get_value;
+        while (my ($key, $val) = each %{$obj}) {
+            push @list, $key, $val;
         }
 
         $self->new(@list);
@@ -218,9 +193,9 @@ package Sidef::Types::Hash::Hash {
     sub merge_values {
         my ($self, $obj) = @_;
 
-        while (my ($key, undef) = each %{$self->{data}}) {
-            if (exists $obj->{data}{$key}) {
-                $self->{data}{$key} = $obj->{data}{$key};
+        while (my ($key, undef) = each %{$self}) {
+            if (exists $obj->{$key}) {
+                $self->{$key} = $obj->{$key};
             }
         }
 
@@ -229,19 +204,19 @@ package Sidef::Types::Hash::Hash {
 
     sub keys {
         my ($self) = @_;
-        Sidef::Types::Array::Array->new(map { Sidef::Types::String::String->new($_) } keys %{$self->{data}});
+        Sidef::Types::Array::Array->new(map { Sidef::Types::String::String->new($_) } keys %{$self});
     }
 
     sub values {
         my ($self) = @_;
-        Sidef::Types::Array::Array->new(map { $_->get_value } values %{$self->{data}});
+        Sidef::Types::Array::Array->new(values %{$self});
     }
 
     sub each_value {
         my ($self, $code) = @_;
 
-        foreach my $value (CORE::values %{$self->{data}}) {
-            if (defined(my $res = $code->_run_code($value->get_value))) {
+        foreach my $value (CORE::values %{$self}) {
+            if (defined(my $res = $code->_run_code($value))) {
                 return $res;
             }
         }
@@ -252,7 +227,7 @@ package Sidef::Types::Hash::Hash {
     sub each_key {
         my ($self, $code) = @_;
 
-        foreach my $key (CORE::keys %{$self->{data}}) {
+        foreach my $key (CORE::keys %{$self}) {
             if (defined(my $res = $code->_run_code(Sidef::Types::String::String->new($key)))) {
                 return $res;
             }
@@ -266,10 +241,8 @@ package Sidef::Types::Hash::Hash {
 
         if (defined($obj)) {
 
-            foreach my $key (CORE::keys %{$self->{data}}) {
-                if (
-                    defined(my $res = $obj->_run_code(Sidef::Types::String::String->new($key), $self->{data}{$key}->get_value))
-                  ) {
+            foreach my $key (CORE::keys %{$self}) {
+                if (defined(my $res = $obj->_run_code(Sidef::Types::String::String->new($key), $self->{$key}))) {
                     return $res;
                 }
             }
@@ -277,28 +250,26 @@ package Sidef::Types::Hash::Hash {
             return $obj;
         }
 
-        my ($key, $value) = each(%{$self->{data}});
+        my ($key, $value) = each(%{$self});
 
         $key // return;
-        Sidef::Types::Array::Array->new(Sidef::Types::String::String->new($key), $value->get_value);
+        Sidef::Types::Array::Array->new(Sidef::Types::String::String->new($key), $value);
     }
 
-    *bcall     = \&each;
     *each_pair = \&each;
 
     sub sort_by {
         my ($self, $code) = @_;
 
         my @array;
-        while (my ($key, $value) = CORE::each %{$self->{data}}) {
-            push @array, [$key, $code->run(Sidef::Types::String::String->new($key), $value->get_value)];
+        while (my ($key, $value) = CORE::each %{$self}) {
+            push @array, [$key, $code->run(Sidef::Types::String::String->new($key), $value)];
         }
 
-        my $method = '<=>';
         Sidef::Types::Array::Array->new(
             map {
-                Sidef::Types::Array::Array->new(Sidef::Types::String::String->new($_->[0]), $self->{data}{$_->[0]}->get_value)
-              } (sort { $a->[1]->can($method) ? ($a->[1]->$method($b->[1])) : -1 } @array)
+                Sidef::Types::Array::Array->new(Sidef::Types::String::String->new($_->[0]), $self->{$_->[0]})
+              } (sort { $a->[1] cmp $b->[1] } @array)
         );
     }
 
@@ -306,8 +277,8 @@ package Sidef::Types::Hash::Hash {
         my ($self) = @_;
         Sidef::Types::Array::Array->new(
             map {
-                Sidef::Types::Array::Pair->new(Sidef::Types::String::String->new($_), $self->{data}{$_}->get_value)
-              } CORE::keys %{$self->{data}}
+                Sidef::Types::Array::Pair->new(Sidef::Types::String::String->new($_), $self->{$_})
+              } CORE::keys %{$self}
         );
     }
 
@@ -316,7 +287,7 @@ package Sidef::Types::Hash::Hash {
 
     sub exists {
         my ($self, $key) = @_;
-        Sidef::Types::Bool::Bool->new(exists $self->{data}{$key});
+        Sidef::Types::Bool::Bool->new(exists $self->{$key});
     }
 
     *has_key  = \&exists;
@@ -326,9 +297,8 @@ package Sidef::Types::Hash::Hash {
         my ($self) = @_;
 
         my $new_hash = $self->new();
-        @{$new_hash->{data}}{map { $_->get_value } CORE::values %{$self->{data}}} =
-          (map { Sidef::Variable::Variable->new(name => '', type => 'var', value => Sidef::Types::String::String->new($_)) }
-            CORE::keys %{$self->{data}});
+        @{$new_hash}{map { $_->get_value } CORE::values %{$self}} =
+          (map           { Sidef::Types::String::String->new($_) } CORE::keys %{$self});
 
         $new_hash;
     }
@@ -346,7 +316,7 @@ package Sidef::Types::Hash::Hash {
         $Sidef::SPACES += $Sidef::SPACES_INCR;
 
         # Sort the keys case insensitively
-        my @keys = sort { lc($a) cmp lc($b) } CORE::keys(%{$self->{data}});
+        my @keys = sort { (lc($a) cmp lc($b)) || ($a cmp $b) } CORE::keys(%{$self});
 
         my $str = Sidef::Types::String::String->new(
             "Hash.new(" . (
@@ -355,14 +325,10 @@ package Sidef::Types::Hash::Hash {
                    (@keys > 1 ? "\n" : '') . join(
                        ",\n",
                        map {
-                           my $val =
-                             ref($self->{data}{$_}) eq 'Sidef::Variable::Variable'
-                             ? $self->{data}{$_}->get_value
-                             : Sidef::Types::Nil::Nil->new;
-
+                           my $val = $self->{$_};
                            (@keys > 1 ? (' ' x $Sidef::SPACES) : '')
                              . "${Sidef::Types::String::String->new($_)->dump} => "
-                             . (eval { $val->can('dump') } ? ${$val->dump} : $val)
+                             . (eval { $val->can('dump') } ? ${$val->dump} : defined($val) ? $val : 'nil')
                          } @keys
                      )
                      . (@keys > 1 ? ("\n" . (' ' x ($Sidef::SPACES - $Sidef::SPACES_INCR))) : '')
@@ -379,11 +345,10 @@ package Sidef::Types::Hash::Hash {
     {
         no strict 'refs';
 
-        *{__PACKAGE__ . '::' . '+'}   = \&concat;
-        *{__PACKAGE__ . '::' . '==='} = \&duplicate_of;
-        *{__PACKAGE__ . '::' . '=='}  = \&eq;
-        *{__PACKAGE__ . '::' . '!='}  = \&ne;
-        *{__PACKAGE__ . '::' . ':'}   = \&new;
+        *{__PACKAGE__ . '::' . '+'}  = \&concat;
+        *{__PACKAGE__ . '::' . '=='} = \&eq;
+        *{__PACKAGE__ . '::' . '!='} = \&ne;
+        *{__PACKAGE__ . '::' . ':'}  = \&new;
     }
 };
 

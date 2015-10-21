@@ -1,7 +1,0 @@
-#!/usr/bin/ruby
-
-#
-## http://rosettacode.org/wiki/Command-line_arguments
-#
-
-say ARGV.dump;

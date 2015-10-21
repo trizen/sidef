@@ -1,0 +1,20 @@
+#!/usr/bin/ruby
+
+(true  ? "x" : "y") == "x" || die "error!";
+(false ? "x" : "y") == "y" || die "error!";
+
+(false || (false) || (true))    == true    || die "error!";
+(false || "hello")              == "hello" || die "error!";
+(false || false || "world")     == "world" || die "error!";
+(false || false || false)       == false   || die "error!";
+(true  && true && "linux")      == "linux" || die "error!";
+(true  && false && true)        == false   || die "error!";
+(false && "perl" || "sidef")    == "sidef" || die "error!";
+
+({false; true}.run && ("&&")) == "&&" || die "error!";
+({true; false}.run || ("||")) == "||" || die "error!";
+
+({false; true}.run ? "one" : "zero") == "one"  || die "error!";
+({true; false}.run ? "one" : "zero") == "zero" || die "error!";
+
+say "** Test passed!";

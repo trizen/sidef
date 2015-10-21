@@ -1,0 +1,128 @@
+#!/usr/bin/ruby
+
+#
+## Break
+#
+
+var lim = 20;
+while (true) {
+    say (var n = lim.rand.int);
+    n == 10 && break;
+    say lim.rand.int;
+}
+
+
+#
+## Continue
+#
+
+for (1..10) { |i|
+    print i;
+    if (i % 5 == 0) {
+        print "\n";
+        next;
+    };
+    print ', ';
+}
+
+
+#
+## Do-while
+#
+
+var value = 0;
+do {
+    say ++value;
+} while (value % 6);
+
+
+#
+## Downward for
+#
+
+for (var k = 10; k >= 0; k--) {
+    say k;
+}
+
+
+#
+## For
+#
+
+for (var i = 1; i <= 5; i++) {
+    for (var j = 1; j <= i; j++) {
+        print '*';
+    };
+    print "\n";
+}
+
+for (1..5) { |i|
+    for (1..i) { print '*' };
+    print "\n";
+}
+
+for (1..5) { |i|
+    for (i..5) { |j|
+        say '*'*j; break;
+    }
+}
+
+#
+## For with a specified step
+#
+
+for (var p = 2; p <= 8; p += 2) {
+    say p;
+}
+
+#
+## Foreach
+#
+
+for ([1,2,3]) { |i|
+    say i;
+}
+
+[1,2,3].each { |i|
+    say i;
+}
+
+#
+## N plus one half
+#
+
+for (1..10) { |i|
+    print i;
+    i == 10 && break;
+    print ', ';
+}
+
+print "\n";
+
+
+#
+## Nested
+#
+
+var arr = 10.of{ 10.of{ 20.rand.int + 1 } };
+
+for (arr) { |row|
+    for (row) { |num|
+        "%3d".printf(num);
+        num == 20 && goto :LOOPEND;
+    };
+    print "\n";
+}
+
+@:LOOPEND;
+print "\n";
+
+#
+## While
+#
+
+var b = 1024;
+while (b > 0) {
+    say b;
+    b.div!(2).int!;
+}

@@ -1,0 +1,44 @@
+#!/usr/bin/ruby
+
+# By listing the set of reduced proper fractions for d ≤ 1,000,000 in ascending order of size, find the numerator of the fraction immediately to the left of 3/7.
+
+# https://projecteuler.net/problem=71
+
+# Answer: 428570
+
+#
+## Closed-form solution
+#
+
+func before_numerator(b, n, d, m) {
+    m -= (m+b % d);
+    int(m/n + m/d - m/(n*d));
+}
+
+say before_numerator(2, 3, 7, 1e6);
+
+
+__END__
+#
+## Brute-force solution:
+#
+
+var max = 35;
+
+var fractions = [];
+range(1, max-1).each { |n|
+    range(n+1, max).each { |d|
+        fractions << (n.rat / d.rat);
+    }
+}
+
+var last 0.rat;
+var wfr = 3.rat/7.rat;
+
+fractions.sort.each { |f|
+    if (f == wfr) {
+        say (last, " => ", last.numerator);
+        break;
+    }
+    last = f;
+}

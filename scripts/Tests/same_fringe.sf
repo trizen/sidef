@@ -1,0 +1,47 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Same_Fringe
+#
+
+var trees = [
+    # 0..2 are same
+    [ 'd', [ 'c', [ 'a', 'b', ], ], ],
+    [ [ 'd', 'c' ], [ 'a', 'b' ] ],
+    [ [ [ 'd', 'c', ], 'a', ], 'b', ],
+    # and this one's different!
+    [ [ [ [ [ [ 'a' ], 'b' ], 'c', ], 'd', ], 'e', ], 'f' ],
+];
+
+func get_tree_iterator(*rtrees) {
+    var tree;
+    func {
+        tree = rtrees.pop;
+        while (defined(tree) && tree.is_an(Array)) {
+            rtrees.append(tree[1]);
+            tree = tree[0];
+        }
+        return tree;
+    }
+}
+
+func cmp_fringe(a, b) {
+    var ti1 = get_tree_iterator(a);
+    var ti2 = get_tree_iterator(b);
+    loop {
+        var (L, R) = (ti1(), ti2());
+         defined(L) &&  defined(R) && (L == R) && next;
+        !defined(L) && !defined(R) && return "Same";
+        return "Different";
+    }
+}
+
+var a = cmp_fringe(trees[0], trees[1]);
+var b = cmp_fringe(trees[1], trees[2]);
+var c = cmp_fringe(trees[2], trees[3]);
+
+assert_eq(a, "Same");
+assert_eq(b, "Same");
+assert_eq(c, "Different");
+
+say "** Test passed!";

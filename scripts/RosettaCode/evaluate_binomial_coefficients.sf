@@ -1,0 +1,13 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Evaluate_binomial_coefficients
+#
+
+include bigint;
+
+func binomial(n,k) {
+    n! / ((n-k)! * k!);
+}
+ 
+say binomial(400, 200);

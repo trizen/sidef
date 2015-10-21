@@ -1,13 +1,13 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Currying
+## Using a generic curry function:
 #
 
 func curry(f, *args1) {
     func (*args2) {
         f(args1..., args2...);
-    }.copy
+    }
 }
 
 func add(a, b) {
@@ -15,7 +15,12 @@ func add(a, b) {
 }
 
 var adder = curry(add, 1);
-var n = adder(3);
+say adder(3);                 #=>4
 
-say n;
-assert_eq(4, n);
+
+#
+## Another way, using lazy methods:
+#
+
+var adder2 = 1.method(:add);
+say adder2(3);                #=> 4

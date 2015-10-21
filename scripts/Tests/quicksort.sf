@@ -1,0 +1,18 @@
+#!/usr/bin/ruby
+
+# Translation of: http://rosettacode.org/wiki/Sorting_algorithms/Quicksort#Perl
+
+func quicksort (a) {
+    a.len < 2 && return(a);
+    var p = a.pop_rand;          # to avoid the worst cases
+    __FUNC__(a.grep{ .< p}) + [p] + __FUNC__(a.grep{ .>= p});
+}
+
+var a = [4, 65, 2, -31, 0, 99, 83, 782, 2, 0, 1].shuffle;
+var s = quicksort(a.copy);
+
+say "Unsorted #{a.dump}";
+say "Sorted   #{s.dump}";
+
+a.sort == s
+    || die "The array is not sorted!";

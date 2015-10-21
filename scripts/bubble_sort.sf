@@ -1,0 +1,20 @@
+#!/usr/bin/ruby
+
+func bubble_sort(arr is Array) -> Array {
+    loop {
+        var swapped = false;
+        { |i|
+            arr[i-1] > arr[i] && (
+                arr[i-1, i] = arr[i, i-1];
+                swapped = true;
+            );
+        } * arr.offset;
+        swapped || break;
+    };
+    return arr;
+};
+
+var arr = (1..10 -> shuffle);
+say arr;
+bubble_sort(arr);
+say arr;

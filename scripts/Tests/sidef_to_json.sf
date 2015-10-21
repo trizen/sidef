@@ -1,0 +1,40 @@
+#!/usr/bin/ruby
+
+# Sidef to JSON conversion
+
+String.def_method('to_json', func (self) {
+    '"' + self.trans(['"',  '\\',   "\b", "\f", "\n", "\r", "\t"]
+                  => ['\"', '\\\\', '\b', '\f', '\n', '\r', '\t']) + '"'
+});
+
+Array.def_method('to_json', func (self) {
+    '[ ' + self.map{.to_json}.join(', ') +' ]'
+});
+
+Hash.def_method('to_json', func (self) {
+    '{ ' + self.pairs.map { .first.to_json + ' : ' + .second.to_json }.join(', ') + ' }'
+});
+
+Null.def_method("to_json", func (self) {
+    "null"
+});
+
+Object.def_method('to_json', func (self) {
+    defined(self) ? (self.respond_to('dump') ? self.dump : '') : 'null';
+});
+
+# Sidef structure
+var hash = Hash.new(
+    'test'  => ["one", 2, 'three'],
+    'hello' => Hash.new(
+                 'bool'  => true,
+                 'null'  => Null,
+                 'array' => [["\t"]],
+               ),
+);
+
+say '==> Sidef';
+say hash.dump;
+
+say "\n==> JSON";
+say hash.to_json;

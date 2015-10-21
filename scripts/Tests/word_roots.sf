@@ -1,0 +1,70 @@
+#!/usr/bin/ruby
+
+# Author: Daniel "Trizen" Șuteu
+# License: GPLv3
+# Date: 11th September 2014
+# http://github.com/trizen
+
+# Find the minimum word derivations for a list of words
+
+func make_tree(fh) {
+
+    var table = Hash.new;
+    while (defined(var word = fh.readline)) {
+        var ref = table;
+        word.trim_end!.each { |char|
+            ref = (ref{char} \\= Hash.new);
+        };
+        ref{word} = nil;
+    }
+
+    return table;
+}
+
+func traverse(code, hash) {
+    var keys = hash.keys.sort;
+    keys.each { |key|
+
+        var child = hash{key};
+        defined(child) && __FUNC__(code, child);
+
+        if (keys.len > 1) {
+
+            var count = 0;
+            var ref = (var val = hash.delete(key));
+            ref == nil && next;
+
+            loop {
+                var key = ref.keys[0] \\ break;
+                ref = (val = ref{key});
+                ref == nil && (
+                    code.call(key.substr(0, key.len - count));
+                    break;
+                );
+                count++;
+            }
+        }
+    }
+}
+
+#
+## Tests
+#
+var tree = make_tree(ARGV.len > 0 ? ARGV[0].to_file.open_r : DATA);
+
+var abrv_words = [];
+traverse(func(word) { say word; abrv_words.append(word) }, tree);
+
+if (ARGV.len == 0) {
+    assert_eq(abrv_words, ['deca', 'decora', 'deo', 'j', 'pla', 'plecar', 'plecat'])
+}
+
+__DATA__
+deodorant
+decor
+decorat
+decadere
+plecare
+placere
+plecat
+jaguar

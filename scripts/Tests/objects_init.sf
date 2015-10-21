@@ -1,0 +1,36 @@
+#!/usr/bin/ruby
+
+#
+## Dir object
+#
+
+var current_dir = Dir.new('.');
+"Your CWD is: `%s'\n".printf(current_dir.abs_name);
+
+
+#
+## File object
+#
+
+var file = File.new(__FILE__);
+"The size of file '%s' is %.3f KB\n".printf(file.name, file.size / 1024);
+
+
+#
+## Array object
+#
+
+var array = (Array.new("x", "y", "z"));
+array.join(", ").say;
+
+
+#
+## Pipe object
+#
+
+var pipe_h = Pipe.new('ls', '-x').open_r;
+
+pipe_h.each { |line|
+    "'%s': %s".printf(join(' ', pipe_h.parent.command), line);
+    break;
+}
