@@ -170,6 +170,7 @@ scripts/Applications/fdf.sf
 'scripts/Applications/Gift match/output.txt'
 scripts/Applications/make_filenames_safe.sf
 scripts/Applications/smart-units.sf
+scripts/bernoulli_numbers.sf
 scripts/bernoulli_numbers_recursive.sf
 scripts/bubble_sort.sf
 scripts/caesar_cipher.sf
@@ -200,6 +201,8 @@ scripts/fast_fourier_transform.sf
 scripts/fibonacci_sequence.sf
 scripts/fibonacci_word_fractal.sf
 scripts/first-class_functions.sf
+scripts/Games/bulls_and_cows.sf
+scripts/Games/bulls_and_cows_player.sf
 scripts/Games/conway_s_game_of_life.sf
 scripts/Games/forest_fire.sf
 scripts/Games/snake_game.sf

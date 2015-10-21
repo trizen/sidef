@@ -15,7 +15,7 @@ class sma_generator(period, list=[], sum=0) {
 var ma3 = sma_generator(3);
 var ma5 = sma_generator(5);
 
-[(1 ..^ 5).to_a..., ( 5 ^.. 1 ).to_a...].reverse -> each {|num|
+[(1 ..^ 5)..., ( 5 ^.. 1 )...].reverse -> each {|num|
   printf("Next number = %d, SMA_3 = %.3f, SMA_5 = %.1f\n",
     num, ma3.SMA(num), ma5.SMA(num));
 }

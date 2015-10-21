@@ -177,7 +177,7 @@ else {
         my $deparsed = deparse_structure($struct, $args{R});
 
         if (defined($args{R}) and lc($args{R}) eq 'perl') {
-            my $header = "\nuse lib qw{" . join(" ", @INC) . "};\n" . "use Sidef;\n";
+            my $header = "\nuse lib (" . join(', ', map { qq{"\Q$_\E"} } @INC) . ");\n" . "use Sidef;\n";
             $deparsed = $header . $deparsed;
         }
         else {
@@ -603,7 +603,7 @@ HEAD
 
                  close $fh;
              }
-         }
+           }
         } => $path
     );
 

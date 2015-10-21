@@ -1,0 +1,15 @@
+#!/usr/bin/ruby
+
+func bernoulli_print {
+    var a = [];
+    range(0, 20).each { |m|
+        a.append(1.rat / rat(m+1));
+        range(m, 1, -1).each { |j|
+            a[j-1] = (j.rat * (a[j-1] - a[j]));
+        }
+        a[0] || next;
+        printf("B(%2d) = %20s / %s\n", m, a[0].parts);
+    }
+}
+
+bernoulli_print();

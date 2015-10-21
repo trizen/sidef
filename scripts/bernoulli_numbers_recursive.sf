@@ -28,5 +28,6 @@ bernoulli_number = func(n) is cached {
 }
 
 range(0, 20).each { |i|
-    printf("B%-2d = %s\n", i, bernoulli_number(i).to_r);
+    var num = bernoulli_number(i) || next;
+    printf("B(%2d) = %20s / %s\n", i, num.to_r.parts);
 }
