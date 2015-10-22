@@ -548,6 +548,7 @@ scripts/Tests/count_in_factors.sf
 scripts/Tests/cpp_input_output.sf
 scripts/Tests/cramers_method.sf
 scripts/Tests/data_handle.sf
+scripts/Tests/default_var_values.sf
 scripts/Tests/echo.sf
 scripts/Tests/eq_g2.sf
 scripts/Tests/equal_classes.sf
@@ -718,6 +719,7 @@ scripts/variadic_function.sf
 scripts/vector_products.sf
 'scripts/Vigenère cipher.sf'
 scripts/WWW/deranged_anagrams.sf
+scripts/WWW/DNS_query.sf
 scripts/WWW/rc_rank_languages_by_popularity.sf
 scripts/xiaolin_wu_s_line_algorithm.sf
 scripts/y_combinator.sf
