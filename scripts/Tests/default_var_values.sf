@@ -1,0 +1,32 @@
+#!/usr/bin/ruby
+
+# Test for declaration of variables with default values
+
+var (x, y=755, z=777) = (666, 655);
+
+assert_eq(x, 666);
+assert_eq(y, 655);
+assert_eq(z, 777);
+
+var (a, *b) = (1,2,3,4);
+assert_eq(a, 1);
+assert_eq(b, [2,3,4]);
+
+var *arr = (21,42,84);
+assert_eq(arr, [21, 42, 84]);
+
+var :hash = (a => 21, b => 42);
+assert_eq(hash, Hash.new(a => 21, b => 42));
+
+assert_eq([var(p, q) = (9,10)], [9, 10]);
+assert_eq(p, 9);
+assert_eq(q, 10);
+
+assert_eq([var(s=7, t=3)], [7, 3]);
+assert_eq(s, 7);
+assert_eq(t, 3);
+
+assert_eq([var x = 42], [42]);
+assert_eq(x, 42);
+
+say "** Test passed!";

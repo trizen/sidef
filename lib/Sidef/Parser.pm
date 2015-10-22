@@ -920,7 +920,23 @@ package Sidef::Parser {
                                             error => "expected a variable name after the keyword '$type'!",
                                            );
 
-                return Sidef::Variable::Init->new(@{$vars});
+                my $init_obj = Sidef::Variable::Init->new(vars => $vars);
+
+                if (/\G\h*=\h*/gc) {
+                    my $args = (
+                                /\G\s*(?=\()/gc
+                                ? $self->parse_arguments(code => $opt{code})
+                                : $self->parse_obj(code => $opt{code})
+                      ) // $self->fatal_error(
+                                              code  => $_,
+                                              pos   => pos,
+                                              error => "expected an expression after variable declaration",
+                                             );
+
+                    $init_obj->{args} = $args;
+                }
+
+                return $init_obj;
             }
 
             # Declaration of constants and static variables
@@ -1992,7 +2008,7 @@ package Sidef::Parser {
                 grep { ref($_) eq 'HASH' and ref($_->{obj}) eq 'Sidef::Variable::Variable' } @{$self->{vars}{$self->{class}}}
             ];
 
-            $block->{init_vars} = [map { Sidef::Variable::Init->new($_) } @{$var_objs}];
+            $block->{init_vars} = Sidef::Variable::Init->new(vars => $var_objs);
 
             $block->{code} = $obj;
             splice @{$self->{ref_vars_refs}{$self->{class}}}, 0, $count;

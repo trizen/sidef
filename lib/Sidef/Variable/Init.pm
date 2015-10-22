@@ -1,10 +1,9 @@
 package Sidef::Variable::Init {
 
     sub new {
-        my (undef, @vars) = @_;
-        bless {vars => \@vars}, __PACKAGE__;
+        my (undef, %opt) = @_;
+        bless \%opt, __PACKAGE__;
     }
-
-};
+}
 
 1;

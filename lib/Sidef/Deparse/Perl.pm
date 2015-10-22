@@ -142,20 +142,63 @@ HEADER
     }
 
     sub _dump_init_vars {
-        my ($self, @vars) = @_;
+        my ($self, $init_obj) = @_;
 
+        my @vars = @{$init_obj->{vars}};
         @vars || return '';
 
-        my @dumped_vars = map { exists($_->{value}) ? $self->deparse_expr({self => $_->{value}}) : ('undef') } @vars;
+        my @dumped_values = map { exists($_->{value}) ? $self->deparse_expr({self => $_->{value}}) : ('undef') } @vars;
 
         # Ignore "undef" values
-        if (all { $_ eq 'undef' } @dumped_vars) {
-            @dumped_vars = ();
+        if (all { $_ eq 'undef' } @dumped_values) {
+            @dumped_values = ();
         }
 
-        'my('
+        my @code;
+        push @code,
+            '('
           . join(', ', map { $self->_dump_var($_) } @vars) . ')'
-          . (@dumped_vars ? ('=(' . join(', ', @dumped_vars) . ')') : '');
+          . (exists($init_obj->{args}) ? '=' . $self->deparse_args($init_obj->{args}) : '');
+
+        foreach my $var (@vars) {
+
+            ref($var) || next;
+            if (exists $var->{array}) {
+                my $name = $var->{name} . refaddr($var);
+                push @{$self->{function_declarations}}, [-1, 'my @' . $name . ';'];
+                push @code, (' ' x $Sidef::SPACES) . "\$$name = Sidef::Types::Array::Array->new(\@$name);\n";
+                delete $var->{array};
+            }
+            elsif (exists $var->{hash}) {
+                my $name = $var->{name} . refaddr($var);
+                push @{$self->{function_declarations}}, [-1, 'my %' . $name . ';'];
+                push @code, (' ' x $Sidef::SPACES) . "\$$name = Sidef::Types::Hash::Hash->new(\%$name);\n";
+                delete $var->{hash};
+            }
+            elsif (exists $var->{value}) {
+                my $value = $self->deparse_expr({self => $var->{value}});
+                if ($value ne '') {
+                    push @code, (' ' x $Sidef::SPACES) . "\$$var->{name}" . refaddr($var) . " //= " . $value . ";\n";
+                }
+            }
+        }
+
+        # XXX: should we store the declaration in something like 'block_declarations'?
+        push @{$self->{function_declarations}},
+          [ -1,
+            'my('
+              . join(', ', map { $self->_dump_var($_) } @vars) . ')'
+              . (@dumped_values ? ('=(' . join(', ', @dumped_values) . ')') : '') . ';'
+          ];
+
+        # Return the variables on assignments
+        if (@code > 1 or exists($init_obj->{args})) {
+            push @code, '(' . join(', ', map { $self->_dump_var($_) } @vars) . ')';
+            return ('do { ' . join(';', @code) . '}');
+        }
+
+        # Return one var as a list
+        '(' . join(',', @code) . ')';
     }
 
     sub _dump_sub_init_vars {
@@ -489,8 +532,7 @@ HEADER
             }
         }
         elsif ($ref eq 'Sidef::Variable::Init') {
-            my @vars = @{$obj->{vars}};
-            $code = $self->_dump_init_vars(@vars);
+            $code = $self->_dump_init_vars($obj);
         }
         elsif ($ref eq 'Sidef::Variable::ClassInit') {
             if ($addr{$refaddr}++) {
@@ -595,14 +637,15 @@ HEADER
                     else {
                         $code .= "\n" . (" " x ($Sidef::SPACES - $Sidef::SPACES_INCR)) . "sub {\n";
 
-                        if (exists($obj->{init_vars}) and @{$obj->{init_vars}}) {
-                            my $vars = $obj->{init_vars};
-                            if (@{$obj->{init_vars}} > 1) {
+                        if (exists($obj->{init_vars}) and @{$obj->{init_vars}{vars}}) {
+                            my $vars = $obj->{init_vars}{vars};
+
+                            # Remove the underscore (_) variable
+                            if (@{$vars} > 1) {
                                 --$#{$vars};
                             }
-                            my @vars = map { @{$_->{vars}} } @{$vars}[0 .. $#{$vars}];
 
-                            $code .= $self->_dump_sub_init_vars(@vars);
+                            $code .= $self->_dump_sub_init_vars(@{$vars});
 
                             if ($is_function) {
                                 $code .= (' ' x $Sidef::SPACES) . 'my @return;' . "\n";
