@@ -184,12 +184,7 @@ HEADER
         }
 
         # XXX: should we store the declaration in something like 'block_declarations'?
-        push @{$self->{function_declarations}},
-          [ -1,
-            'my('
-              . join(', ', map { $self->_dump_var($_) } @vars) . ')'
-              . (@dumped_values ? ('=(' . join(', ', @dumped_values) . ')') : '') . ';'
-          ];
+        push @{$self->{function_declarations}}, [-1, 'my(' . join(', ', map { $self->_dump_var($_) } @vars) . ')' . ';'];
 
         # Return the variables on assignments
         if (@code > 1 or exists($init_obj->{args})) {
