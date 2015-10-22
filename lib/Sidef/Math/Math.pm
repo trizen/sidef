@@ -39,7 +39,7 @@ package Sidef::Math::Math {
     sub e {
         my ($self, $places) = @_;
         state $one = Math::BigFloat->new(1);
-        Sidef::Types::Number::Number->new(Math::BigFloat->bexp($one, defined($places) ? $places->get_value : ()));
+        Sidef::Types::Number::Number->new(Math::BigFloat->bexp($one->copy, defined($places) ? $places->get_value : ()));
     }
 
     sub exp {
@@ -60,8 +60,8 @@ package Sidef::Math::Math {
             # Code by Dana Jacobsen from RosettaCode
             # http://rosettacode.org/wiki/Arithmetic-geometric_mean/Calculate_Pi#Perl
 
-            my $acc = $places + 8;
-            state $HALF = Math::BigFloat->new('0.5');
+            my $acc  = $places + 8;
+            my $HALF = Math::BigFloat->new('0.5');
 
             my $an = Math::BigFloat->bone;
             my $bn = $HALF->copy->bsqrt($acc);
