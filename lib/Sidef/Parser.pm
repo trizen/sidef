@@ -415,15 +415,19 @@ package Sidef::Parser {
 
         foreach my $var (@{$self->{vars}{$class}}) {
             next if ref $var eq 'ARRAY';
-            return ($var, 1) if $var->{name} eq $var_name;
+            if ($var->{name} eq $var_name) {
+                return (wantarray ? ($var, 1) : $var);
+            }
         }
 
         foreach my $var (@{$self->{ref_vars_refs}{$class}}) {
             next if ref $var eq 'ARRAY';
-            return ($var, 0) if $var->{name} eq $var_name;
+            if ($var->{name} eq $var_name) {
+                return (wantarray ? ($var, 0) : $var);
+            }
         }
 
-        ();
+        return;
     }
 
     sub check_declarations {
@@ -652,15 +656,6 @@ package Sidef::Parser {
                                    error => "'$name' is either a keyword or a predefined variable!",
                                   );
             }
-
-            #~ if (!$opt{private}) {
-            #~ my ($var, $code) = $self->find_var($name, $class_name);
-
-            #~ if (defined($var) && $code) {
-            #~ warn "[WARN] Redeclaration of $opt{type} '$name' in same scope, at "
-            #~ . "$self->{file_name}, line $self->{line}\n";
-            #~ }
-            #~ }
 
             my $value;
             if (defined($end_delim) && /$self->{var_init_sep_re}/goc) {
@@ -1165,7 +1160,7 @@ package Sidef::Parser {
 
                     if (
                         $try_expr or exists($self->{built_in_classes}{$name}) or do {
-                            my ($obj) = $self->find_var($name, $class_name);
+                            my $obj = $self->find_var($name, $class_name);
                             defined($obj) and $obj->{type} eq 'class';
                         }
                       ) {
@@ -1231,10 +1226,10 @@ package Sidef::Parser {
 
                 my $private = 0;
                 if (($type eq 'method' or $type eq 'func') and $name ne '') {
-                    my ($var) = $self->find_var($name, $class_name);
+                    my $var = $self->find_var($name, $class_name);
 
                     # Redeclaration of a function or a method in the same scope
-                    if (ref $var) {
+                    if (defined $var) {
 
                         if ($var->{obj}{type} ne $type) {
                             $self->fatal_error(
@@ -1288,8 +1283,7 @@ package Sidef::Parser {
                     if (/\G\h*<<?\h*/gc) {
                         while (/\G($self->{var_name_re})\h*/gco) {
                             my ($name) = $1;
-                            my ($class) = $self->find_var($name, $class_name);
-                            if (ref $class) {
+                            if (defined(my $class = $self->find_var($name, $class_name))) {
                                 if ($class->{type} eq 'class') {
                                     push @{$obj->{inherit}}, $class->{obj};    #$class_name . '::' . $name;
 
@@ -1396,7 +1390,7 @@ package Sidef::Parser {
                             $try_expr or (
                                 defined($ret_name) and (
                                     exists($self->{built_in_classes}{$ret_name}) or do {
-                                        my ($obj) = $self->find_var($ret_name, $class_name);
+                                        my $obj = $self->find_var($ret_name, $class_name);
                                         defined($obj) and $obj->{type} eq 'class';
                                     }
                                 )
@@ -1502,9 +1496,8 @@ package Sidef::Parser {
 
             # Implicit method call on special variable: _
             if (/\G\./) {
-                my ($var) = $self->find_var('_', $self->{class});
 
-                if (defined $var) {
+                if (defined(my $var = $self->find_var('_', $self->{class}))) {
                     $var->{count}++;
                     ref($var->{obj}) eq 'Sidef::Variable::Variable' && do {
                         $var->{obj}{in_use} = 1;
@@ -1691,13 +1684,10 @@ package Sidef::Parser {
             # Variable call
             if (/\G($self->{var_name_re})/goc) {
                 my ($name, $class) = $self->get_name_and_class($1);
-                my ($var, $code) = $self->find_var($name, $class);
 
-                if (ref $var) {
+                if (defined(my $var = $self->find_var($name, $class))) {
                     $var->{count}++;
                     ref($var->{obj}) eq 'Sidef::Variable::Variable' && do {
-
-                        #$var->{closure} = 1 if $code == 0;  # it might be a closure
                         $var->{obj}{in_use} = 1;
                     };
                     return $var->{obj};
@@ -1734,8 +1724,7 @@ package Sidef::Parser {
                                )
                   ) {
                     if (exists $self->{current_method}) {
-                        my ($var, $code) = $self->find_var('self', $class);
-                        if (ref $var) {
+                        if (defined(my $var = $self->find_var('self', $class))) {
                             $var->{count}++;
                             $var->{obj}{in_use} = 1;
                             return
@@ -1984,14 +1973,18 @@ package Sidef::Parser {
             {    # special '_' variable
                 my $var_obj = Sidef::Variable::Variable->new(name => '_', type => 'var', class => $self->{class});
                 push @{$var_objs}, $var_obj;
-                unshift @{$self->{vars}{$self->{class}}},
-                  {
-                    obj   => $var_obj,
-                    name  => '_',
-                    count => 0,
-                    type  => 'var',
-                    line  => $self->{line},
-                  };
+
+                my (undef, $code) = $self->find_var('_', $self->{class});
+                if (not defined($code) or $code == 0) {
+                    unshift @{$self->{vars}{$self->{class}}},
+                      {
+                        obj   => $var_obj,
+                        name  => '_',
+                        count => 0,
+                        type  => 'var',
+                        line  => $self->{line},
+                      };
+                }
             }
 
             my $obj = $self->parse_script(code => $opt{code});
@@ -2444,7 +2437,7 @@ package Sidef::Parser {
                                           );
                     }
 
-                    my ($var, $code) = $self->find_var($name, $class);
+                    my $var = $self->find_var($name, $class);
 
                     if (not defined $var) {
                         $self->fatal_error(
