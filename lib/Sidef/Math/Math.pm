@@ -118,8 +118,8 @@ package Sidef::Math::Math {
 
     sub npow2 {
         my ($self, $x) = @_;
-        my $y = Math::BigFloat->new(2);
-        Sidef::Types::Number::Number->new($y->blsft(Math::BigFloat->new($x->get_value)->as_int->blog($y)));
+        state $two = Math::BigInt->new(2);
+        Sidef::Types::Number::Number->new(scalar $two->copy->blsft(Math::BigFloat->new($x->get_value)->as_int->blog($two)));
     }
 
     sub npow {
@@ -128,7 +128,7 @@ package Sidef::Math::Math {
         $x = Math::BigFloat->new($x->get_value);
         $y = Math::BigFloat->new($y->get_value);
 
-        Sidef::Types::Number::Number->new($y->bpow($x->as_int->blog($y)->binc));
+        Sidef::Types::Number::Number->new(scalar $y->bpow($x->blog($y)->binc->as_int));
     }
 
     sub gcd {

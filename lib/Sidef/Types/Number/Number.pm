@@ -407,14 +407,14 @@ package Sidef::Types::Number::Number {
 
     sub npow2 {
         my ($self) = @_;
-        my $two = Math::BigInt->new(2);
-        $self->new(scalar $two->blsft($$self->as_int->blog($two)));
+        state $two = Math::BigInt->new(2);
+        $self->new(scalar $two->copy->blsft($$self->as_int->blog($two)));
     }
 
     sub npow {
         my ($self, $num) = @_;
         $num = $num->get_value;
-        $self->new(scalar $num->copy->bpow($$self->as_int->blog($num)->binc));
+        return $self->new(scalar $num->copy->bpow($$self->copy->blog($num)->binc->as_int));
     }
 
     sub is_zero {
