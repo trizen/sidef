@@ -126,7 +126,9 @@ HEADER
 
     sub _dump_var {
         my ($self, $var, $refaddr) = @_;
-        $var->{in_use} || return 'undef';
+
+        $var->{in_use} || exists($var->{value}) || return 'undef';
+
         (
            exists($var->{array}) ? '@'
          : exists($var->{hash})  ? '%'
