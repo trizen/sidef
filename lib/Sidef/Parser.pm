@@ -607,17 +607,45 @@ package Sidef::Parser {
         my $end_delim = $self->parse_delim(%opt);
 
         my @vars;
+        my %classes;
+
         while (/\G([*:]?$self->{var_name_re})/goc) {
             push @vars, $1;
-            if ($opt{with_vals} && defined($end_delim) && /$self->{var_init_sep_re}/goc) {
-                my $code = substr($_, pos);
-                $self->parse_obj(code => \$code);
-                $vars[-1] .= '=' . substr($_, pos($_), pos($code));
-                pos($_) += pos($code);
+
+            if ($opt{with_vals} && defined($end_delim)) {
+
+                # Add the variables into the symbol table
+                my ($name, $class_name) = $self->get_name_and_class($vars[-1]);
+
+                undef $classes{$class_name};
+                unshift @{$self->{vars}{$class_name}},
+                  {
+                    obj   => '',
+                    name  => $name,
+                    count => 0,
+                    type  => $opt{type},
+                    line  => $self->{line},
+                  };
+
+                if (/$self->{var_init_sep_re}/goc) {
+                    my $code = substr($_, pos);
+                    $self->parse_obj(code => \$code);
+                    $vars[-1] .= '=' . substr($_, pos($_), pos($code));
+                    pos($_) += pos($code);
+                }
             }
 
             defined($end_delim) && (/\G\h*,\h*/gc || last);
             $self->parse_whitespace(code => $opt{code});
+        }
+
+        # Remove the newly added variables
+        foreach my $class_name (keys %classes) {
+            for (my $i = 0 ; $i <= $#{$self->{vars}{$class_name}} ; $i++) {
+                if (ref($self->{vars}{$class_name}[$i]) eq 'HASH' and not ref($self->{vars}{$class_name}[$i]{obj})) {
+                    splice(@{$self->{vars}{$class_name}}, $i--, 1);
+                }
+            }
         }
 
         $self->parse_whitespace(code => $opt{code});
@@ -898,10 +926,22 @@ package Sidef::Parser {
                 return $array;
             }
 
-            # Bareword followed by a fat comma or a colon character
+            # Bareword followed by a fat comma or preceded by a colon
             if (   /\G:([_\pL\pN]+)/gc
                 || /\G([_\pL][_\pL\pN]*)(?=\h*=>)/gc) {
+
+                # || /\G([_\pL][_\pL\pN]*)(?=\h*=>|:(?![=:]))/gc) {
                 return Sidef::Types::String::String->new($1);
+            }
+
+            if (/\G([_\pL][_\pL\pN]*):(?![=:])/gc) {
+                my $name = $1;
+                my $obj = (
+                           /\G\s*(?=\()/gc
+                           ? $self->parse_arguments(code => $opt{code})
+                           : $self->parse_obj(code => $opt{code})
+                          );
+                return Sidef::Variable::NamedParam->new($name, $obj);
             }
 
             # Declaration of variable types

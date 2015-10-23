@@ -4,14 +4,7 @@
 ## http://rosettacode.org/wiki/Universal_Turing_machine#Sidef
 #
 
-func run_utm(:args) {
-
-    var state = (args{:state} \\ "");
-    var blank = (args{:blank} \\ "");
-    var rules = (args{:rules} \\ []);
-    var tape  = (args{:tape}  \\ [blank]);
-    var halt  = (args{:halt}  \\ "");
-    var pos   = (args{:pos}   \\ 0);
+func run_utm(state="", blank="", rules=[], tape=[blank], halt="", pos=0) {
 
     if (pos < 0) {
         pos += tape.len;
@@ -64,21 +57,21 @@ func run_utm(:args) {
 
 print "incr machine\n";
 run_utm(
-    halt  => 'qf',
-    state => 'q0',
-    tape  => %w(1 1 1),
-    blank => 'B',
-    rules => [
+    halt:  'qf',
+    state: 'q0',
+    tape:  %w(1 1 1),
+    blank: 'B',
+    rules: [
         %w(q0 1 1 right q0),
         %w(q0 B 1 stay  qf),
     ]);
 
 say "\nbusy beaver";
 run_utm(
-    halt  => 'halt',
-    state => 'a',
-    blank => '0',
-    rules => [
+    halt:  'halt',
+    state: 'a',
+    blank: '0',
+    rules: [
         %w(a 0 1 right b),
         %w(a 1 1 left  c),
         %w(b 0 1 left  a),
@@ -89,11 +82,11 @@ run_utm(
 
 say "\nsorting test";
 run_utm(
-    halt  => 'STOP',
-    state => 'A',
-    blank => '0',
-    tape  => %w(2 2 2 1 2 2 1 2 1 2 1 2 1 2),
-    rules => [
+    halt:  'STOP',
+    state: 'A',
+    blank: '0',
+    tape:  %w(2 2 2 1 2 2 1 2 1 2 1 2 1 2),
+    rules: [
         %w(A 1 1 right A),
         %w(A 2 3 right B),
         %w(A 0 0 left  E),

@@ -143,6 +143,7 @@ lib/Sidef/Variable/LocalMagic.pm
 lib/Sidef/Variable/LocalMagic.pod
 lib/Sidef/Variable/Magic.pm
 lib/Sidef/Variable/Magic.pod
+lib/Sidef/Variable/NamedParam.pm
 lib/Sidef/Variable/Ref.pm
 lib/Sidef/Variable/Static.pm
 lib/Sidef/Variable/Static.pod
@@ -548,6 +549,7 @@ scripts/Tests/count_in_factors.sf
 scripts/Tests/cpp_input_output.sf
 scripts/Tests/cramers_method.sf
 scripts/Tests/data_handle.sf
+scripts/Tests/default_param_values.sf
 scripts/Tests/default_var_values.sf
 scripts/Tests/echo.sf
 scripts/Tests/eq_g2.sf
@@ -625,6 +627,7 @@ scripts/Tests/multi_file_edit.sf
 scripts/Tests/multi_var_assignment.sf
 scripts/Tests/multisplit.sf
 scripts/Tests/named_block_arguments.sf
+scripts/Tests/named_parameters.sf
 scripts/Tests/object_copy.sf
 scripts/Tests/objects_init.sf
 scripts/Tests/one-dimensional_cellular_automata.sf

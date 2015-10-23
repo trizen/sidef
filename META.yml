@@ -178,6 +178,8 @@ provides:
     file: lib/Sidef/Variable/LocalMagic.pm
   Sidef::Variable::Magic:
     file: lib/Sidef/Variable/Magic.pm
+  Sidef::Variable::NamedParam:
+    file: lib/Sidef/Variable/NamedParam.pm
   Sidef::Variable::Ref:
     file: lib/Sidef/Variable/Ref.pm
   Sidef::Variable::Static:

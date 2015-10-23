@@ -1,0 +1,48 @@
+#!/usr/bin/ruby
+
+#
+## Default values for function and method parameters
+#
+
+#
+## Test 1
+#
+
+func test1(a, b, c=a+b, d=c+b) {
+    assert_eq(c, a+b);
+    assert_eq(d, c+b);
+}
+
+test1(1, 2);
+test1(1, 2, 3, 5);
+test1(42, 99);
+
+#
+## Test 2
+#
+
+func test2(a, b=(a+42), c=21+a+b) {
+    assert_eq(b, a+42);
+    assert_eq(c, 21+a+b);
+}
+
+test2(100);
+test2(100, 100+42, 100+100+42+21);
+
+#
+## Test 3
+#
+
+func test3(a, b: 21, c=42) {
+    assert_eq(b, 21);
+    assert_eq(c, 42);
+    assert_eq(a, 13) if defined(a);
+}
+
+test3();
+test3(b: 21);
+test3(a: 13);
+test3(13);
+
+
+say "** Test passed!";

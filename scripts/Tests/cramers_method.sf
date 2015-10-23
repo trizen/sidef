@@ -42,11 +42,10 @@ func make_det_matrix (matrix) {
     matrix + [matrix.@[range(matrix.end-1)]];
 }
 
-func calculate_delta (:opts) {
+func calculate_delta (matrix, free_terms, position) {
 
-    var matrix     = opts{:matrix}.copy;        # making a copy of the matrix
-    var free_terms = opts{:free_terms};
-    var position   = opts{:position};
+    # Make a copy of the matrix
+    matrix = matrix.copy;
 
     free_terms.range.each { |i|
         matrix[i][position] = free_terms[i];    # substituting the 'pos' column with the free terms
@@ -75,9 +74,9 @@ var delta = (right - left);
 var xyz = [];
 free_terms.range.each { |i|
     xyz[i] = calculate_delta(
-                matrix     => matrix,
-                free_terms => free_terms,
-                position   => i,
+                matrix:     matrix,
+                free_terms: free_terms,
+                position:   i,
             )
 }
 
