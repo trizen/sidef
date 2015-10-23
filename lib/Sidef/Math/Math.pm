@@ -14,14 +14,14 @@ package Sidef::Math::Math {
 
         state %cache;
         state $table = {
-            e   => sub { Math::BigFloat->new('2.71828182845904523536028747135266249775724709369995957496696763') },
-            pi  => sub { Math::BigFloat->new('3.14159265358979323846264338327950288419716939937510582097494459') },
-            phi => sub { Math::BigFloat->new('1.61803398874989484820458683436563811772030917980576286213544862') },
+            e   => sub { Math::BigFloat->new(1)->bexp },
+            pi  => sub { Math::BigFloat->bpi },
+            phi => sub { Math::BigFloat->new(1)->badd(Math::BigFloat->new(5)->bsqrt)->bdiv(2) },
 
-            sqrt2   => sub { Math::BigFloat->new('1.41421356237309504880168872420969807856967187537694807317667974') },
-            sqrte   => sub { Math::BigFloat->new('1.64872127070012814684865078781416357165377610071014801157507931') },
-            sqrtpi  => sub { Math::BigFloat->new('1.77245385090551602729816748334114518279754945612238712821380779') },
-            sqrtphi => sub { Math::BigFloat->new('1.27201964951406896425242246173749149171560804184009624861664038') },
+            sqrt2   => sub { Math::BigFloat->new(2)->bsqrt },
+            sqrte   => sub { Math::BigFloat->new(1)->bexp->bsqrt },
+            sqrtpi  => sub { Math::BigFloat->bpi->bsqrt },
+            sqrtphi => sub { Math::BigFloat->new(1)->badd(Math::BigFloat->new(5)->bsqrt)->bdiv(2)->bsqrt },
 
             ln2    => sub { Math::BigFloat->new(2)->blog },
             log2e  => sub { Math::BigFloat->new(2)->blog->bpow(-1) },
@@ -30,7 +30,7 @@ package Sidef::Math::Math {
                        };
 
         my $key = lc($name);
-        $cache{$key} //= exists($table->{$key}) ? Sidef::Types::Number::Number->new($table->{$key}->()) : do {
+        $cache{$key} //= exists($table->{$key}) ? Sidef::Types::Number::Number->new(scalar $table->{$key}->()) : do {
             warn qq{[WARN] Inexistent Math constant "$name"!\n};
             undef;
         };
@@ -39,7 +39,7 @@ package Sidef::Math::Math {
     sub e {
         my ($self, $places) = @_;
         state $one = Math::BigFloat->new(1);
-        Sidef::Types::Number::Number->new(Math::BigFloat->bexp($one->copy, defined($places) ? $places->get_value : ()));
+        Sidef::Types::Number::Number->new($one->copy->bexp(defined($places) ? $places->get_value : ()));
     }
 
     sub exp {
