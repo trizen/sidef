@@ -216,15 +216,15 @@ HEADER
             join(
                 '',
                 map { s/^\s+//r }
-                  "my \@vars = (" . join(', ', map { $_ eq 'undef' ? $_ : "\\my $_" } @dumped_vars) . ');',
-                "state \$table = {"
+                  "my \@__vars__ = (" . join(', ', map { $_ eq 'undef' ? $_ : "\\my $_" } @dumped_vars) . ');',
+                "{state \$table = {"
                   . join(', ', map { ref($vars[$_]) ? "$vars[$_]{name} => $_" : () } 0 .. $#vars) . "};",
                 'my @left;',
                 'my %seen;',
                 q(foreach my $arg(@_) {),
                 q(    if (ref($arg) eq 'Sidef::Variable::NamedParam') {),
                 q(        if (exists $table->{$arg->[0]}) {),
-                q(            my $var = $vars[$table->{$arg->[0]}] // next;),
+                q(            my $var = $__vars__[$table->{$arg->[0]}] // next;),
                 q(            if (ref($var) eq 'SCALAR') { ),
                 q(               $$var = ${$arg->[1]}[-1];),
                 q(            } elsif (ref($var) eq 'ARRAY') {),
@@ -241,7 +241,7 @@ HEADER
                 q(     }),
                 q(}),
 
-                q(foreach my $var(@vars) {),
+                q(foreach my $var(@__vars__) {),
                 q(    next if exists $seen{$var // do{shift @left; next}};),
                 q(    @left || last;),
                 q(    if (ref($var) eq 'SCALAR') {),
@@ -251,7 +251,7 @@ HEADER
                 q(    } else {),
                 q(      %$var = @left; last;),
                 q(    }),
-                q(}),
+                q(}}),
                 )
           )
           . "\n";

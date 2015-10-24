@@ -59,9 +59,8 @@ var dirs = %w(
 );
 
 var uniq = abbrev(dirs.map{.split('/')}).min_by{.len};
-uniq.pop;
-uniq.join('/').say;
-
+var dir = [uniq.pop, uniq.join('/')][1];
+assert_eq('/home/user1/tmp', dir);
 
 var words = %w(
     deodorant
