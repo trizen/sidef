@@ -274,6 +274,7 @@ scripts/permutations_rec.sf
 'scripts/Project Euler/0016-power_digit_sum.sf'
 'scripts/Project Euler/0017-number_letter_counts.sf'
 'scripts/Project Euler/0018-maximum_path_sum_i.sf'
+'scripts/Project Euler/0019-counting_sundays.sf'
 'scripts/Project Euler/0020-factorial_digit_sum.sf'
 'scripts/Project Euler/0021-amicable_numbers.sf'
 'scripts/Project Euler/0022-names.txt'
@@ -370,6 +371,7 @@ scripts/RosettaCode/gamma_function.sf
 scripts/RosettaCode/gamma_function_1.sf
 scripts/RosettaCode/general_fizzbuzz.sf
 scripts/RosettaCode/generate_lower_case_ascii_alphabet.sf
+scripts/RosettaCode/generator_exponential.sf
 scripts/RosettaCode/generic_swap.sf
 scripts/RosettaCode/generic_swap_1.sf
 scripts/RosettaCode/get_system_command_output.sf
@@ -562,6 +564,7 @@ scripts/Tests/execute_system_command.sf
 scripts/Tests/fibonacci_closed_solution.sf
 scripts/Tests/fibonacci_iterative.sf
 scripts/Tests/fibonacci_mystery.sf
+scripts/Tests/find_the_missing_permutation.sf
 scripts/Tests/first_class_functions_analogously.sf
 scripts/Tests/floyds_triangle.sf
 scripts/Tests/for_two_vars.sf
@@ -696,6 +699,7 @@ scripts/Tests/string_escapes.sf
 scripts/Tests/string_to_number.sf
 scripts/Tests/strip_non_ascii_chars.sf
 scripts/Tests/subtractive_generator.sf
+scripts/Tests/swap.sf
 scripts/Tests/sylvesters_sequence.sf
 scripts/Tests/sysopen_and_sysread.sf
 scripts/Tests/tennis_tournament.sf

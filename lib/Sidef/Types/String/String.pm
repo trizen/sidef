@@ -258,6 +258,13 @@ package Sidef::Types::String::String {
     *downcase = \&lc;
     *lower    = \&lc;
 
+    sub fc {
+        my ($self) = @_;
+        $self->new(CORE::fc $$self);
+    }
+
+    *foldcase = \&fc;
+
     sub lcfirst {
         my ($self) = @_;
         $self->new(CORE::lcfirst $$self);

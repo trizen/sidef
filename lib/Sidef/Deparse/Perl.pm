@@ -65,7 +65,7 @@ package Sidef::Deparse::Perl {
         $opts{header} .= <<"HEADER";
 
 use utf8;
-use 5.16.1;
+use $];
 
 HEADER
 
@@ -219,8 +219,7 @@ HEADER
                   "my \@__vars__ = (" . join(', ', map { $_ eq 'undef' ? $_ : "\\my $_" } @dumped_vars) . ');',
                 "{state \$table = {"
                   . join(', ', map { ref($vars[$_]) ? "$vars[$_]{name} => $_" : () } 0 .. $#vars) . "};",
-                'my @left;',
-                'my %seen;',
+                'my (@left, %seen);',
                 q(foreach my $arg(@_) {),
                 q(    if (ref($arg) eq 'Sidef::Variable::NamedParam') {),
                 q(        if (exists $table->{$arg->[0]}) {),
@@ -234,7 +233,7 @@ HEADER
                 q(            }),
                 q(            undef $seen{$var};),
                 q(         } else {),
-                q(             die "No such named argument: <<$arg->[0]>>";),
+                q(             die "No such named parameter: <<$arg->[0]>>";),
                 q(         }),
                 q(     } else {),
                 q(        push @left, $arg;),
@@ -679,14 +678,14 @@ HEADER
                         $code .= "\n" . (" " x ($Sidef::SPACES - $Sidef::SPACES_INCR)) . "sub {\n";
 
                         if (exists($obj->{init_vars}) and @{$obj->{init_vars}{vars}}) {
-                            my $vars = $obj->{init_vars}{vars};
+                            my @vars = @{$obj->{init_vars}{vars}};
 
                             # Remove the underscore (_) variable
-                            if (@{$vars} > 1) {
-                                --$#{$vars};
+                            if (@vars > 1) {
+                                pop @vars;
                             }
 
-                            $code .= $self->_dump_sub_init_vars(@{$vars});
+                            $code .= $self->_dump_sub_init_vars(@vars);
 
                             if ($is_function) {
                                 $code .= (' ' x $Sidef::SPACES) . 'my @return;' . "\n";
@@ -759,10 +758,10 @@ HEADER
             ## ok
         }
         elsif ($ref eq 'Sidef::Types::Block::Given') {
-            $self->top_add(qq{use experimental "smartmatch";\n});
+            $self->top_add(qq{use experimental 'smartmatch';\n});
         }
         elsif ($ref eq 'Sidef::Types::Block::When') {
-            $self->top_add(qq{use experimental "smartmatch";\n});
+            $self->top_add(qq{use experimental 'smartmatch';\n});
         }
         elsif ($ref eq 'Sidef::Types::Block::Default') {
             $code = 'default' . $self->deparse_bare_block($obj->{block}->{code});
@@ -1114,7 +1113,7 @@ HEADER
 
                     # !~ and ~~ methods
                     if ($method eq '~~' or $method eq '!~') {
-                        $self->top_add(qq{use experimental "smartmatch";\n});
+                        $self->top_add(qq{use experimental 'smartmatch';\n});
                         $code = 'Sidef::Types::Bool::Bool->new(' . $code . '~~' . $self->deparse_args(@{$call->{arg}}) . ')';
                         $code .= '->not' if ($method eq '!~');
                         next;

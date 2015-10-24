@@ -1,0 +1,30 @@
+#!/usr/bin/ruby
+
+# How many Sundays fell on the first of the month during the twentieth century (1 Jan 1901 to 31 Dec 2000)?
+
+# https://projecteuler.net/problem=19
+
+# Answer: 171
+
+var dt = require 'DateTime';
+
+func first_sundays(year) {
+    var count = 0;
+    range(1, 12).each { |i|
+
+        var date = dt.new(
+            year  => year,
+            month => i,
+            day   => 1,
+        );
+
+        ++count if (date.dow == 7);
+    }
+    return count;
+}
+
+var total = 0;
+range(1901, 2000).each { |year|
+    total += first_sundays(year);
+}
+say total;

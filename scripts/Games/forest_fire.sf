@@ -1,32 +1,33 @@
 #!/usr/bin/ruby
 
-var w = `tput cols`.to_i-1;
-var h = `tput lines`.to_i-1;
-var r = "\033[H";
+define w = `tput cols`.to_i-1;
+define h = `tput lines`.to_i-1;
+define r = "\033[H";
 
-const red = "\033[31m";
-const green = "\033[32m";
-const yellow = "\033[33m";
+define red = "\033[31m";
+define green = "\033[32m";
+define yellow = "\033[33m";
 
-var tree_prob = 0.05;
-var burn_prob = 0.0002;
+define chars = [' ', green+'*', yellow+'&', red+'&'];
+
+define tree_prob = 0.05;
+define burn_prob = 0.0002;
 
 enum |Empty, Tree, Heating, Burning|;
 
-const dirs = [
+define dirs = [
     %n(-1 -1), %n(-1 0), %n(-1 1), %n(0 -1),
     %n(0   1), %n(1 -1), %n(1  0), %n(1  1),
 ];
 
-var chars = [' ', green+'*', yellow+'&', red+'&'];
 var forest = h.of { w.of { 1.rand < tree_prob ? Tree : Empty } };
 
 func iterate {
     var new = h.of{ w.of(0) };
     range(0, h-1).each { |i|
         range(0, w-1).each { |j|
-            var v = (new[i][j] = forest[i][j]);
-            if (v == Tree) {
+            given (new[i][j] = forest[i][j]) {
+              when (Tree) {
                 1.rand < burn_prob && (new[i][j] = Heating; next);
                 dirs.each { |pair|
                     var y = pair[0]+i;
@@ -35,12 +36,13 @@ func iterate {
                     x ~~ range(0, w-1) || next;
                     forest[y][x] == Heating && (new[i][j] = Heating; break);
                 }
+              }
+              when (Heating)            { new[i][j] = Burning }
+              when (Burning)            { new[i][j] = Empty   }
+              when (1.rand < tree_prob) { new[i][j] = Tree    }
             }
-            elsif (v == Heating)       { new[i][j] = Burning }
-            elsif (v == Burning)       { new[i][j] = Empty   }
-            elsif (1.rand < tree_prob) { new[i][j] = Tree    }
         }
-    };
+    }
     forest = new;
 }
 
@@ -49,7 +51,7 @@ func init_forest {
     forest.each { |row|
         print chars@[row];
         print "\033[E\033[1G";
-    };
+    }
     iterate();
 }
 

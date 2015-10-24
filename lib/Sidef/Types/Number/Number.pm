@@ -424,7 +424,7 @@ package Sidef::Types::Number::Number {
 
     sub is_one {
         my ($self, $sign) = @_;
-        Sidef::Types::Bool::Bool->new($$self->is_one(defined($sign) ? $sign->get_value : ()));
+        Sidef::Types::Bool::Bool->new($$self->is_one(defined($sign) ? $sign->get_value : ('+')));
     }
 
     sub is_nan {
@@ -459,8 +459,8 @@ package Sidef::Types::Number::Number {
     }
 
     sub is_inf {
-        my ($self) = @_;
-        Sidef::Types::Bool::Bool->new($$self->is_inf);
+        my ($self, $sign) = @_;
+        Sidef::Types::Bool::Bool->new($$self->is_inf(defined($sign) ? $sign->get_value : ()));
     }
 
     *is_infinite = \&is_inf;
