@@ -148,27 +148,36 @@ package Sidef::Types::String::String {
 
     sub to {
         my ($self, $string) = @_;
-        Sidef::Types::Array::RangeString->new(
-                                              from => $$self,
-                                              to   => $string->get_value,
-                                              asc  => 1,
-                                             );
+        Sidef::Types::Range::RangeString->__new__(
+                                                  from => $$self,
+                                                  to   => $string->get_value,
+                                                  asc  => 1,
+                                                 );
     }
 
     *up_to = \&to;
     *upto  = \&to;
-    *range = \&to;
 
     sub downto {
         my ($self, $string) = @_;
-        Sidef::Types::Array::RangeString->new(
-                                              from => $$self,
-                                              to   => $string->get_value,
-                                              asc  => 0,
-                                             );
+        Sidef::Types::Range::RangeString->__new__(
+                                                  from => $$self,
+                                                  to   => $string->get_value,
+                                                  asc  => 0,
+                                                 );
     }
 
     *down_to = \&downto;
+
+    sub range {
+        my ($self, $to, $step) = @_;
+
+        state $from = $self->new('a');
+
+        defined($to)
+          ? $self->to($to, $step)
+          : $from->to($self);
+    }
 
     sub cmp {
         my ($self, $string) = @_;

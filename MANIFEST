@@ -40,10 +40,6 @@ lib/Sidef/Types/Array/MultiArray.pm
 lib/Sidef/Types/Array/MultiArray.pod
 lib/Sidef/Types/Array/Pair.pm
 lib/Sidef/Types/Array/Pair.pod
-lib/Sidef/Types/Array/RangeNumber.pm
-lib/Sidef/Types/Array/RangeNumber.pod
-lib/Sidef/Types/Array/RangeString.pm
-lib/Sidef/Types/Array/RangeString.pod
 lib/Sidef/Types/Black/Hole.pm
 lib/Sidef/Types/Block/Break.pm
 lib/Sidef/Types/Block/Code.pm
@@ -117,6 +113,10 @@ lib/Sidef/Types/Number/Complex.pm
 lib/Sidef/Types/Number/Complex.pod
 lib/Sidef/Types/Number/Number.pm
 lib/Sidef/Types/Number/Number.pod
+lib/Sidef/Types/Range/RangeNumber.pm
+lib/Sidef/Types/Range/RangeNumber.pod
+lib/Sidef/Types/Range/RangeString.pm
+lib/Sidef/Types/Range/RangeString.pod
 lib/Sidef/Types/Regex/Match.pm
 lib/Sidef/Types/Regex/Match.pod
 lib/Sidef/Types/Regex/Regex.pm
@@ -144,6 +144,7 @@ lib/Sidef/Variable/LocalMagic.pod
 lib/Sidef/Variable/Magic.pm
 lib/Sidef/Variable/Magic.pod
 lib/Sidef/Variable/NamedParam.pm
+lib/Sidef/Variable/NamedParam.pod
 lib/Sidef/Variable/Ref.pm
 lib/Sidef/Variable/Static.pm
 lib/Sidef/Variable/Static.pod
@@ -653,6 +654,7 @@ scripts/Tests/pythagorean_means.sf
 scripts/Tests/quicksort.sf
 scripts/Tests/quicksort_in_parallel.sf
 scripts/Tests/quoted_strings.sf
+scripts/Tests/range_objects.sf
 scripts/Tests/read_a_configuration_file.sf
 scripts/Tests/rec_reverse.sf
 scripts/Tests/recursion.sf

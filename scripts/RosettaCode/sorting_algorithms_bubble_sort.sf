@@ -4,7 +4,7 @@
 ## http://rosettacode.org/wiki/Sorting_algorithms/Bubble_sort
 #
 
-func bubble_sort(arr is Array) -> Array {
+func bubble_sort(Array arr) -> Array {
     loop {
         var swapped = false;
         { |i|

@@ -1,4 +1,4 @@
-package Sidef::Types::Array::RangeString {
+package Sidef::Types::Range::RangeString {
 
     use 5.014;
     use parent qw(
@@ -8,6 +8,33 @@ package Sidef::Types::Array::RangeString {
     use overload '@{}' => \&to_a;
 
     sub new {
+        my (undef, $from, $to, $direction) = @_;
+
+        if (defined $to) {
+            $from      = ref($from)      ? $from->get_value      : $from;
+            $to        = ref($to)        ? $to->get_value        : $to;
+            $direction = ref($direction) ? $direction->get_value : defined($direction) ? $direction : 1;
+        }
+        elsif (defined $from) {
+            $to        = ref($from) ? $from->get_value : $from;
+            $from      = 'a';
+            $direction = 1;
+        }
+        else {
+            ($from, $to, $direction) = ('b', 'a', 1);
+        }
+
+        bless {
+               from => $from,
+               to   => $to,
+               asc  => $direction,
+              },
+          __PACKAGE__;
+    }
+
+    *call = \&new;
+
+    sub __new__ {
         my (undef, %opt) = @_;
         bless \%opt, __PACKAGE__;
     }
@@ -114,6 +141,16 @@ package Sidef::Types::Array::RangeString {
         $name eq '' ? $array : $array->$name(@args);
     }
 
+    {
+        no strict 'refs';
+        *{__PACKAGE__ . '::' . '=='} = sub {
+            my ($r1, $r2) = @_;
+            Sidef::Types::Bool::Bool->new(    ref($r1) eq ref($r2)
+                                          and $r1->{from} eq $r2->{from}
+                                          and $r1->{to} eq $r2->{to}
+                                          and $r1->{asc} eq $r2->{asc});
+        };
+    }
 }
 
 1;

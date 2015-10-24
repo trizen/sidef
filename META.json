@@ -128,12 +128,6 @@
       "Sidef::Types::Array::Pair" : {
          "file" : "lib/Sidef/Types/Array/Pair.pm"
       },
-      "Sidef::Types::Array::RangeNumber" : {
-         "file" : "lib/Sidef/Types/Array/RangeNumber.pm"
-      },
-      "Sidef::Types::Array::RangeString" : {
-         "file" : "lib/Sidef/Types/Array/RangeString.pm"
-      },
       "Sidef::Types::Black::Hole" : {
          "file" : "lib/Sidef/Types/Black/Hole.pm"
       },
@@ -253,6 +247,12 @@
       },
       "Sidef::Types::Number::Number" : {
          "file" : "lib/Sidef/Types/Number/Number.pm"
+      },
+      "Sidef::Types::Range::RangeNumber" : {
+         "file" : "lib/Sidef/Types/Range/RangeNumber.pm"
+      },
+      "Sidef::Types::Range::RangeString" : {
+         "file" : "lib/Sidef/Types/Range/RangeString.pm"
       },
       "Sidef::Types::Regex::Match" : {
          "file" : "lib/Sidef/Types/Regex/Match.pm"

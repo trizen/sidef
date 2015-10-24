@@ -7,7 +7,7 @@
 
 # A creative algorithm for arbitrary long integer multiplication.
 
-func long_multiplication(a is String, b is String) -> String {
+func long_multiplication(String a, String b) -> String {
 
     a.len < b.len && (
         (a, b) = (b, a);

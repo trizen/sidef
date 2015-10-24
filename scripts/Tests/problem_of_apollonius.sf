@@ -4,7 +4,7 @@ class Circle(x,y,r) {
    method to_s { "Circle(#{x}, #{y}, #{r})" };
 }
 
-func solve_apollonius(c is Array, s is Array) -> Circle {
+func solve_apollonius(Array c, Array s) -> Circle {
 
     var 𝑣11 = (2*c[1].x - 2*c[0].x);
     var 𝑣12 = (2*c[1].y - 2*c[0].y);

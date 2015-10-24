@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 # Compress a string to a list of output symbols.
-func compress(uncompressed is String) -> Array {
+func compress(String uncompressed) -> Array {
 
     # Build the dictionary.
     var dict_size = 256;
@@ -35,7 +35,7 @@ func compress(uncompressed is String) -> Array {
 };
 
 # Decompress a list of output ks to a string.
-func decompress(compressed is Array) -> String {
+func decompress(Array compressed) -> String {
 
     # Build the dictionary.
     var dict_size = 256;

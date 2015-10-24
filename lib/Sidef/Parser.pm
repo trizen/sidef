@@ -69,6 +69,8 @@ package Sidef::Parser {
                      | Hash\b                         (?{ state $x = Sidef::Types::Hash::Hash->new })
                      | Str(?:ing)?+\b                 (?{ state $x = Sidef::Types::String::String->new })
                      | Num(?:ber)?+\b                 (?{ state $x = Sidef::Types::Number::Number->new })
+                     | RangeNum(?:ber)?+\b            (?{ state $x = Sidef::Types::Range::RangeNumber->new })
+                     | RangeStr(?:ing)?+\b            (?{ state $x = Sidef::Types::Range::RangeString->new })
                      | Math\b                         (?{ state $x = Sidef::Math::Math->new })
                      | Socket\b                       (?{ state $x = Sidef::Types::Glob::Socket->new })
                      | Pipe\b                         (?{ state $x = Sidef::Types::Glob::Pipe->new })
@@ -189,6 +191,8 @@ package Sidef::Parser {
                   Hash
                   Str String
                   Num Number
+                  RangeStr RangeString
+                  RangeNum RangeNumber
                   Complex
                   Math
                   Pipe
@@ -271,7 +275,7 @@ package Sidef::Parser {
             match_flags_re  => qr{[msixpogcaludn]+},
             var_name_re     => qr/[_\pL][_\pL\pN]*(?>::[_\pL][_\pL\pN]*)*/,
             method_name_re  => qr/[_\pL][_\pL\pN]*!?/,
-            var_init_sep_re => qr/\G\h*(?:=>|[=:]|\bis\b)\h*/,
+            var_init_sep_re => qr/\G\h*(?:=>|[=:])\h*/,
             operators_re    => do {
                 local $" = q{|};
 
@@ -609,7 +613,7 @@ package Sidef::Parser {
         my @vars;
         my %classes;
 
-        while (/\G([*:]?$self->{var_name_re})/goc) {
+        while (/\G(?<type>$self->{var_name_re}\h+$self->{var_name_re})/goc || /\G([*:]?$self->{var_name_re})/goc) {
             push @vars, $1;
 
             if ($opt{with_vals} && defined($end_delim)) {
@@ -671,8 +675,29 @@ package Sidef::Parser {
         my $end_delim = $self->parse_delim(%opt);
 
         my @var_objs;
-        while (/\G([*:]?)($self->{var_name_re})/goc) {
+        while (/\G(?<type>$self->{var_name_re})\h+($self->{var_name_re})/goc || /\G([*:]?)($self->{var_name_re})/goc) {
             my ($attr, $name) = ($1, $2);
+
+            my $ref_type;
+            if (defined($+{type})) {
+                my $type = $+{type};
+
+                my $obj = do {
+                    local $self->{_want_name} = 1;
+                    $self->parse_expr(code => \$type);
+                };
+
+                if (not defined($obj) or ref($obj) eq 'HASH') {
+                    $self->fatal_error(
+                                       code     => $_,
+                                       pos      => pos,
+                                       error    => "invalid type <<$type>> for variable '$name'",
+                                       expected => "expected a type, such as: Str, Num, File, etc...",
+                                      );
+                }
+
+                $ref_type = $obj;
+            }
 
             my $class_name;
             ($name, $class_name) = $self->get_name_and_class($name);
@@ -696,8 +721,9 @@ package Sidef::Parser {
             }
 
             my $obj = Sidef::Variable::Variable->new(
-                                                     name  => $name,
-                                                     type  => $opt{type},
+                                                     name => $name,
+                                                     type => $opt{type},
+                                                     (defined($ref_type) ? (ref_type => $ref_type) : ()),
                                                      class => $class_name,
                                                      defined($value) ? (value => $value, has_value => 1) : (),
                                                      $attr eq '*' ? (array => 1) : $attr eq ':' ? (hash => 1) : (),
@@ -1448,11 +1474,7 @@ package Sidef::Parser {
                                                   );
                             }
 
-                            $obj->{returns} = (
-                                               ref($return_obj) eq 'Sidef::Variable::ClassInit'
-                                               ? $return_obj
-                                               : ref($return_obj)
-                                              );
+                            $obj->{returns} = $return_obj;
                         }
                         else {
                             $self->fatal_error(

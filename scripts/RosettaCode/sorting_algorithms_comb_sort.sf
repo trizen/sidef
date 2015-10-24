@@ -4,7 +4,7 @@
 ## http://rosettacode.org/wiki/Sorting_algorithms/Comb_sort
 #
 
-func comb_sort(arr is Array) {
+func comb_sort(Array arr) {
     var gap = arr.len;
     var swaps = true;
     while (gap > 1 || swaps) {

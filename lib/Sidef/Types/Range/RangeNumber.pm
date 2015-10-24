@@ -1,4 +1,4 @@
-package Sidef::Types::Array::RangeNumber {
+package Sidef::Types::Range::RangeNumber {
 
     use 5.014;
     use parent qw(
@@ -8,6 +8,33 @@ package Sidef::Types::Array::RangeNumber {
     use overload '@{}' => \&to_a;
 
     sub new {
+        my (undef, $from, $to, $step) = @_;
+
+        if (defined $to) {
+            $from = ref($from) ? $from->get_value : $from;
+            $to   = ref($to)   ? $to->get_value   : $to;
+            $step = ref($step) ? $step->get_value : defined($step) ? $step : 1;
+        }
+        elsif (defined $from) {
+            $to   = ref($from) ? $from->get_value : $from;
+            $from = 0;
+            $step = 1;
+        }
+        else {
+            ($from, $to, $step) = (0, -1, 1);
+        }
+
+        bless {
+               from => $from,
+               to   => $to,
+               step => $step,
+              },
+          __PACKAGE__;
+    }
+
+    *call = \&new;
+
+    sub __new__ {
         my (undef, %opt) = @_;
         bless \%opt, __PACKAGE__;
     }
@@ -225,6 +252,17 @@ package Sidef::Types::Array::RangeNumber {
                                                          abs($step) != 1 ? Sidef::Types::Number::Number->new(abs($step)) : ());
 
         $name eq '' ? $array : $array->$name(@args);
+    }
+
+    {
+        no strict 'refs';
+        *{__PACKAGE__ . '::' . '=='} = sub {
+            my ($r1, $r2) = @_;
+            Sidef::Types::Bool::Bool->new(    ref($r1) eq ref($r2)
+                                          and $r1->{from} == $r2->{from}
+                                          and $r1->{to} == $r2->{to}
+                                          and $r1->{step} == $r2->{step});
+        };
     }
 
 }

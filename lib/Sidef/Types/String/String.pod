@@ -450,6 +450,16 @@ Return the
 
 =cut
 
+=head2 fc
+
+String.fc() -> I<Obj>
+
+Return the
+
+Aliases: I<foldcase>
+
+=cut
+
 =head2 first
 
 String.first() -> I<Obj>
@@ -744,6 +754,14 @@ Return the
 
 =cut
 
+=head2 range
+
+String.range() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 reduce_operator
 
 String.reduce_operator() -> I<Obj>
@@ -862,7 +880,7 @@ String.to() -> I<Obj>
 
 Return the
 
-Aliases: I<...()>, I<..^()>, I<up_to>, I<upto>, I<range>
+Aliases: I<...()>, I<..^()>, I<up_to>, I<upto>
 
 =cut
 

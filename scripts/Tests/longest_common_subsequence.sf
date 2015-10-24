@@ -1,6 +1,6 @@
 #!/usr/bin/ruby
 
-func lcs(xstr is String, ystr is String) is cached -> String {
+func lcs(String xstr, String ystr) is cached -> String {
     (xstr.is_empty || ystr.is_empty) && return '';
 
     var(x, xs, y, ys) = (xstr.first, xstr.ft(1),

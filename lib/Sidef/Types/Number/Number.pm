@@ -226,11 +226,11 @@ package Sidef::Types::Number::Number {
     sub to {
         my ($self, $num, $step) = @_;
         $step = defined($step) ? $step->get_value : 1;
-        Sidef::Types::Array::RangeNumber->new(
-                                              from => $$self,
-                                              to   => $num->get_value,
-                                              step => $step,
-                                             );
+        Sidef::Types::Range::RangeNumber->__new__(
+                                                  from => $$self,
+                                                  to   => $num->get_value,
+                                                  step => $step,
+                                                 );
     }
 
     *upto  = \&to;
@@ -239,11 +239,11 @@ package Sidef::Types::Number::Number {
     sub downto {
         my ($self, $num, $step) = @_;
         $step = defined($step) ? $step->get_value : 1;
-        Sidef::Types::Array::RangeNumber->new(
-                                              from => $$self,
-                                              to   => $num->get_value,
-                                              step => -$step,
-                                             );
+        Sidef::Types::Range::RangeNumber->__new__(
+                                                  from => $$self,
+                                                  to   => $num->get_value,
+                                                  step => -$step,
+                                                 );
     }
 
     *down_to = \&downto;
@@ -251,9 +251,11 @@ package Sidef::Types::Number::Number {
     sub range {
         my ($self, $to, $step) = @_;
 
+        state $from = $self->new(0);
+
         defined($to)
           ? $self->to($to, $step)
-          : $self->new(0)->to($self);
+          : $from->to($self);
     }
 
     sub sqrt {

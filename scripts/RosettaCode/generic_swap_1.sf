@@ -4,7 +4,7 @@
 ## http://rosettacode.org/wiki/Generic_swap
 #
 
-func swap(a is Ref, b is Ref) {
+func swap(Ref a, Ref b) {
     (*b, *a) = (*a, *b);
 }
 

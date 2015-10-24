@@ -267,11 +267,11 @@ package Sidef::Math::Math {
         $from   = $from->get_value;
         $to     = $to->get_value;
 
-        Sidef::Types::Array::RangeNumber->new(
-                                              from => $from,
-                                              to   => $to,
-                                              step => ($to - $from) / $amount,
-                                             );
+        Sidef::Types::Range::RangeNumber->__new__(
+                                                  from => $from,
+                                                  to   => $to,
+                                                  step => ($to - $from) / $amount,
+                                                 );
     }
 
     sub number_to_percentage {

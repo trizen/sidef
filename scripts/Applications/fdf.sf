@@ -2,7 +2,7 @@
 
 # usage: sidef fdf.sf [size] [dir1] [...]
 
-func find_duplicate_files(code is Block, size_min=0, *dirs) {
+func find_duplicate_files(Block code, size_min=0, *dirs) {
     var files = Hash.new;
     var f = frequire('File::Find');
     f.find(

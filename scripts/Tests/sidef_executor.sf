@@ -3,15 +3,15 @@
 #
 ## Boolean type
 #
-class SBool(val is Bool) {
+class SBool(Bool val) {
 
 }
 
 #
 ## String type + methods
 #
-class SString(val is String) {
-    method +(arg is SString) {
+class SString(String val) {
+    method +(SString arg) {
         SString(val + arg.val);
     }
 

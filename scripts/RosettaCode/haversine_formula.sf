@@ -9,7 +9,7 @@ class EarthPoint(lat, lon) {
     method latR { self.lat * radian_ratio };
     method lonR { self.lon * radian_ratio };
 
-    method haversine_dist(p is EarthPoint) {
+    method haversine_dist(EarthPoint p) {
         var arc = __CLASS__.new(
             self.lat - p.lat,
             self.lon - p.lon,

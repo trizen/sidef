@@ -1,6 +1,6 @@
 #!/usr/bin/ruby
 
-func bubble_sort(arr is Array) -> Array {
+func bubble_sort(Array arr) -> Array {
     loop {
         var swapped = false;
         { |i|

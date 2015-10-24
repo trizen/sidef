@@ -1,0 +1,34 @@
+#!/usr/bin/ruby
+
+#
+## Ranges as objects
+#
+
+class RangeExample {
+
+    method count(RangeNum r=(1...10)) {
+        r.each { |i|
+            say i;
+        }
+    }
+}
+
+var obj = RangeExample();
+
+obj.count();                # uses the default range
+obj.count(1...3);           # passes a range from 1 to 3
+
+# Make the sure the equality works
+assert(1...3 == 1...3);
+assert("a"..."d" == "a"..."d");
+
+# Number range
+assert_eq(RangeNum(1,10), 1...10);
+assert_eq(RangeNum(10), 0...10);
+assert_eq(RangeNum(1, 10, 2), range(1, 10, 2));
+
+# String range
+assert_eq(RangeStr("a", "z"), "a"..."z");
+assert_eq(RangeStr("z"), range("z"));
+assert_eq(RangeStr("z"), range("a", "z"));
+assert_eq(RangeStr("z", "a", false), "z" ^.. "a");

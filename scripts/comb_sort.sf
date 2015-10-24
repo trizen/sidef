@@ -1,6 +1,6 @@
 #!/usr/bin/ruby
 
-func combSort(arr is Array) {
+func combSort(Array arr) {
     var gap = arr.len;
     var swaps = true;
     while (gap > 1 || swaps) {

@@ -4,17 +4,17 @@
 ## http://rosettacode.org/wiki/Generic_swap#Sidef
 #
 
-func swap_1(a is Ref, b is Ref) {
+func swap_1(Ref a, Ref b) {
     var tmp = *a;
     *a = *b;
     *b = tmp;
 }
 
-func swap_2(a is Ref, b is Ref) {
+func swap_2(Ref a, Ref b) {
     (*a, *b) = (*b, *a);
 }
 
-func swap_3(a is Ref, b is Ref) {
+func swap_3(Ref a, Ref b) {
     [*a, *b] » (b, a);
 }
 

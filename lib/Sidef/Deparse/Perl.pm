@@ -107,6 +107,19 @@ HEADER
         }
     }
 
+    sub _get_reftype {
+        my ($self, $obj) = @_;
+
+        my $ref = ref($obj);
+
+        $self->_dump_string(
+                              $ref eq 'Sidef::Variable::ClassInit'    ? $self->_dump_class_name($obj)
+                            : $ref eq 'Sidef::Variable::Ref'          ? 'REF'
+                            : $ref eq 'Sidef::Types::Block::CodeInit' ? 'Sidef::Types::Block::Code'
+                            :                                           $ref
+                           );
+    }
+
     sub _dump_string {
         my ($self, $str) = @_;
 
@@ -127,7 +140,7 @@ HEADER
     sub _dump_var {
         my ($self, $var, $refaddr) = @_;
 
-        $var->{in_use} || exists($var->{value}) || return 'undef';
+        $var->{in_use} || exists($var->{value}) || exists($var->{ref_type}) || return 'undef';
 
         (
            exists($var->{array}) ? '@'
@@ -268,10 +281,23 @@ HEADER
                 $code .= (' ' x $Sidef::SPACES) . "my \$$name = Sidef::Types::Hash::Hash->new(\%$name);\n";
                 delete $var->{hash};
             }
-            elsif (exists $var->{value}) {
-                my $value = $self->deparse_expr({self => $var->{value}});
-                if ($value ne '') {
-                    $code .= (' ' x $Sidef::SPACES) . "\$$var->{name}" . refaddr($var) . " //= " . $value . ";\n";
+            else {
+
+                if (exists $var->{value}) {
+                    my $value = $self->deparse_expr({self => $var->{value}});
+                    if ($value ne '') {
+                        $code .= (' ' x $Sidef::SPACES) . "\$$var->{name}" . refaddr($var) . " //= " . $value . ";\n";
+                    }
+                }
+
+                if (exists($var->{ref_type})) {
+                    my $var_name = "\$$var->{name}" . refaddr($var);
+                    my $type     = $self->_get_reftype($var->{ref_type});
+                    $code .=
+                        (' ' x $Sidef::SPACES)
+                      . "(ref($var_name) eq $type || ($type ne 'REF' && eval{$var_name->SUPER::isa($type)})) or "
+                      . "die q{[ERROR] Invalid type-parameter for variable <<$var->{name}>> in $self->{parent_name}[0] <<$self->{parent_name}[1]>>: got <<} . "
+                      . "ref($var_name) . q{>>, but expected $type};\n";
                 }
             }
         }
@@ -419,6 +445,7 @@ HEADER
                     # Deparse the block of the method/function
                     {
                         local $self->{function} = refaddr($block);
+                        local $self->{parent_name} = [$obj->{type}, $name];
                         push @{$self->{function_declarations}}, [$self->{function}, "my \$$obj->{name}$refaddr;"];
                         $code .= $self->deparse_expr({self => $block});
                     }
@@ -437,11 +464,7 @@ HEADER
                     # Check the return value (when "-> Type" is specified)
                     if (exists $obj->{returns}) {
 
-                        my $obj_ref = (
-                                       ref($obj->{returns})
-                                       ? $self->_dump_class_name($obj->{returns})
-                                       : $obj->{returns}
-                                      );
+                        my $type = $self->_get_reftype($obj->{returns});
 
                         $code =
                             "do { $code;\n"
@@ -449,10 +472,10 @@ HEADER
                           . "my \$_$refaddr = \$$obj->{name}$refaddr;\n"
                           . (' ' x $Sidef::SPACES)
                           . "\$$obj->{name}$refaddr = Sidef::Types::Block::Code->new("
-                          . "sub {my \$arg = \$_$refaddr->call(\@_); ref(\$arg) eq "
-                          . $self->_dump_string($obj_ref)
-                          . " or die q{[ERROR] Invalid return-type from $obj->{type} $self->{class_name}<<$name>>: got '}"
-                          . " . ref(\$arg) . q{', but expected '${obj_ref}'}; \$arg })}";
+                          . "sub {my \$arg = \$_$refaddr->call(\@_); "
+                          . "(ref(\$arg) eq $type || ($type ne 'REF' && eval{\$arg->SUPER::isa($type)})) or "
+                          . " die q{[ERROR] Invalid return-type from $obj->{type} $self->{class_name}<<$name>>: got <<}"
+                          . " . ref(\$arg) . q{>>, but expected $type}; \$arg })}";
                     }
 
                     # Memoize the method/function (when "is cached" trait is specified)
@@ -604,6 +627,7 @@ HEADER
                 my $vars = $obj->{__VARS__};
                 local $self->{class}        = refaddr($block);
                 local $self->{class_name}   = $obj->{name};
+                local $self->{parent_name}  = ['class initialization', $obj->{name}];
                 local $self->{package_name} = $package_name;
                 local $self->{inherit}      = $obj->{inherit} if exists $obj->{inherit};
                 local $self->{class_vars}   = $vars;
@@ -917,6 +941,9 @@ HEADER
             $code = $self->make_constant($ref, 'new', ${$obj} ? ("true$refaddr", 1) : ("false$refaddr", 0));
         }
         elsif ($ref eq 'Sidef::Types::Array::MultiArray') {
+            $code = $ref . '->new';
+        }
+        elsif ($ref eq 'Sidef::Types::Range::RangeNumber' or $ref eq 'Sidef::Types::Range::RangeString') {
             $code = $ref . '->new';
         }
         elsif ($ref eq 'Sidef::Types::Glob::Backtick') {
