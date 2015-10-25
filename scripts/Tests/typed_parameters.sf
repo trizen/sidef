@@ -1,0 +1,40 @@
+#!/usr/bin/ruby
+
+#
+## Typed parameters
+#
+
+func add_nums(Number a, Number b) -> Object {   # requires two numbers
+    a + b
+}
+
+assert_eq(add(1, 2), 3);
+
+var count = 0;
+try   { say add("a", "b");      #`(run-time error: invalid type for parameters) }
+catch { ++count }
+assert_eq(count, 1);
+
+
+#
+## Typed parameters with optional values
+#
+
+func add_def(Number a=2, Number b=3) {
+    a + b
+}
+
+assert_eq(add_def(), 5);
+assert_eq(add_def(b: 8), 10);
+
+#
+## Typed parameters with mandatory and optional values
+#
+func concat_dm(String a, String b="") -> String {
+    a + b
+}
+
+assert_eq(concat_dm("foo"), "foo");
+assert_eq(concat_dm("foo", "bar"), "foobar");
+
+say "** Test passed!";

@@ -711,6 +711,7 @@ scripts/Tests/triangle_path.sf
 scripts/Tests/trizen_s_pair_numbers.sf
 scripts/Tests/two_dimensional_array.sf
 scripts/Tests/type_comparisons.sf
+scripts/Tests/typed_parameters.sf
 scripts/Tests/unary_inc_dec.sf
 scripts/Tests/unexecuted_arguments.sf
 scripts/Tests/unicode.sf

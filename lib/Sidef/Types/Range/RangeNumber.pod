@@ -1,0 +1,134 @@
+
+=encoding utf8
+
+=head1 NAME
+
+Sidef::Types::Range::RangeNumber
+
+=head1 DESCRIPTION
+
+This object is ...
+
+=head1 SYNOPSIS
+
+var obj = RangeNumber.new(...);
+
+
+=head1 INHERITS
+
+Inherits methods from:
+
+	* Sidef::Object::Object
+
+=head1 METHODS
+
+
+=head2 ==
+
+I<Obj> B<==> I<Obj> -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 bounds
+
+RangeNumber.bounds() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 by
+
+RangeNumber.by() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 contains
+
+RangeNumber.contains() -> I<Obj>
+
+Return the
+
+Aliases: I<includes>
+
+=cut
+
+=head2 each
+
+RangeNumber.each() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 grep
+
+RangeNumber.grep() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 map
+
+RangeNumber.map() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 max
+
+RangeNumber.max() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 min
+
+RangeNumber.min() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 new
+
+RangeNumber.new() -> I<Obj>
+
+Return the
+
+Aliases: I<call>
+
+=cut
+
+=head2 reverse
+
+RangeNumber.reverse() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 step
+
+RangeNumber.step() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 to_a
+
+RangeNumber.to_a() -> I<Obj>
+
+Return the
+
+Aliases: I<to_array>
+
+=cut
