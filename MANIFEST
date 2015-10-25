@@ -393,6 +393,8 @@ scripts/RosettaCode/inheritance_single.sf
 scripts/RosettaCode/knapsack_problem_continuous.sf
 scripts/RosettaCode/largest_int_from_concatenated_ints.sf
 scripts/RosettaCode/last_sunday_of_each_month.sf
+scripts/RosettaCode/left_factorials.sf
+scripts/RosettaCode/left_factorials_1.sf
 scripts/RosettaCode/levenshtein_distance.sf
 scripts/RosettaCode/levenshtein_distance_1.sf
 scripts/RosettaCode/levenshtein_distance_2.sf

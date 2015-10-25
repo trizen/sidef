@@ -1,0 +1,15 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Left_factorials#Sidef
+#
+
+func left_fact(k) {
+    range(0, k-1).map { _! }.sum \\ 0;
+}
+
+[range(0, 10), range(20, 50).by(10)].each { |r|
+    r.each { |i|
+        printf("!%d  = %s\n", i, left_fact(i));
+    }
+}

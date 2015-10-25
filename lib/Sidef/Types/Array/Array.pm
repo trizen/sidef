@@ -1106,6 +1106,11 @@ package Sidef::Types::Array::Array {
         $self->new(sort { $a cmp $b } @{$self});
     }
 
+    sub sort_by {
+        my ($self, $code) = @_;
+        $self->new(map { $_->[0] } sort { $a->[1] cmp $b->[1] } map { [$_, $code->run($_)] } @{$self});
+    }
+
     sub cmp {
         my ($self, $arg) = @_;
 

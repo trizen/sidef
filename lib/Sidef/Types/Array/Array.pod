@@ -813,6 +813,14 @@ Return the
 
 =cut
 
+=head2 sort_by
+
+Array.sort_by() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 splice
 
 Array.splice() -> I<Obj>
