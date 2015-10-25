@@ -607,8 +607,10 @@ scripts/Tests/logic.sf
 scripts/Tests/long_division.sf
 scripts/Tests/longest_common_prefix.sf
 scripts/Tests/longest_common_subsequence.sf
+scripts/Tests/longest_common_subsequence_2.sf
 scripts/Tests/look_and_say_seq.sf
 scripts/Tests/loops.sf
+scripts/Tests/luhn_test_of_credit_card_numbers.sf
 scripts/Tests/lwp_module.sf
 scripts/Tests/magic_vars.sf
 scripts/Tests/man_or_boy.sf

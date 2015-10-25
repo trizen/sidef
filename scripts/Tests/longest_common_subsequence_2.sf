@@ -1,0 +1,26 @@
+#!/usr/bin/ruby
+
+#
+## This is generalized version which works with strings
+## but also with arrays of any kind, such as arrays of characters.
+#
+
+func lcs(xstr, ystr) is cached {
+
+    xstr.is_empty && return xstr;
+    ystr.is_empty && return ystr;
+
+    var(x, xs, y, ys) = (xstr.ft(0,0), xstr.ft(1),
+                         ystr.ft(0,0), ystr.ft(1));
+
+    if (x == y) {
+        x + lcs($xs, $ys)
+    } else {
+        [lcs(xstr, ys), lcs(xs, ystr)].max_by { .len };
+    }
+}
+
+assert_eq(lcs("thisisatest", "testing123testing"), "tsitest");
+assert_eq(lcs(%g"thisisatest", %g"testing123testing"), %g"tsitest");
+
+say "** Test passed!";

@@ -16,7 +16,7 @@ func find_common_prefix(hash, acc) {
 func lcp(*strings) {
     var hash = Hash.new;
 
-    strings.sort {|a,b| a.len <=> b.len}.each { |str|
+    strings.sort_by{ .len }.each { |str|
         var ref = hash;
         str == '' && return '';
         str.each { |char|

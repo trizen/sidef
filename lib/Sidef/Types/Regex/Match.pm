@@ -3,6 +3,7 @@ package Sidef::Types::Regex::Match {
     use 5.014;
     use overload
       q{bool} => \&to_bool,
+      q{@{}}  => \&cap,
       q{""}   => \&to_s;
 
     use parent qw(

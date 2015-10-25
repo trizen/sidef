@@ -1,5 +1,9 @@
 #!/usr/bin/ruby
 
+#
+## http://rosettacode.org/wiki/Longest_common_subsequence#Sidef
+#
+
 func lcs(String xstr, String ystr) is cached -> String {
     (xstr.is_empty || ystr.is_empty) && return '';
 
