@@ -17,4 +17,7 @@ func quickselect(a, k) {
 }
  
 var v = [9, 8, 7, 6, 5, 0, 1, 2, 3, 4];
-say v.range.map{|i| quickselect(v, i)}.dump;
+var arr = v.range.map{|i| quickselect(v, i)};
+
+say arr;
+assert_eq(arr, v.sort);

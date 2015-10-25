@@ -9,7 +9,6 @@ var str = <<'EOF';
     y:Bar
 EOF
  
-while (var m = (str =~ /(\w+):(\S+)/g)) {
-    var(s1,s2) = m.cap...;
-    say "#{s1} -> #{s2}";
+while (var m = str=~/(\w+):(\S+)/g) {
+    say "#{m[0]} -> #{m[1]}";
 }

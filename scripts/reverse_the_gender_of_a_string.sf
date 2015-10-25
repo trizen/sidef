@@ -70,6 +70,9 @@ func copy_case(orig, repl) {
 
 func reverse_gender(text) {
     text.gsub(gen_re, { |a| copy_case(a, dict{a.lc}) });
-};
+}
 
-say reverse_gender("She was a soul stripper. She took my heart!");
+var rev = reverse_gender("She was a soul stripper. She took my heart!");
+
+say rev;
+assert_eq(rev, "He was a soul stripper. He took my heart!");

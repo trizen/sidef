@@ -36,24 +36,16 @@ loop {
         next;
     }
  
-    pcf[pChoice]++;
-    plays++;
+    ++pcf[pChoice];
+    ++plays;
  
     # show result of play
     ">> My play: %-8s".printf(rps[aChoice]);
  
     given ((aChoice - pChoice + 3) % 3) {
-        when (0) {
-            say "Tie.";
-        }
-        when (1) {
-            "%-*s %s".printlnf(30, msg[aChoice], 'My point');
-            aScore++;
-        }
-        when (2) {
-            "%-*s %s".printlnf(30, msg[pChoice], 'Your point');
-            pScore++;
-        }
+        when (0) { say "Tie." }
+        when (1) { "%-*s %s".printlnf(30, msg[aChoice], 'My point'); aScore++ }
+        when (2) { "%-*s %s".printlnf(30, msg[pChoice], 'Your point'); pScore++ }
     }
  
     # show score
@@ -61,14 +53,8 @@ loop {
  
     # compute ai choice for next play
     given (var rn = (plays.rand.int)) {
-        when (rn < pcf[0]) {
-            aChoice = 1;
-        }
-        when (pcf[0]+pcf[1] > rn) {
-            aChoice = 2;
-        }
-        default {
-            aChoice = 0;
-        }
+        when (rn < pcf[0])        { aChoice = 1 }
+        when (pcf[0]+pcf[1] > rn) { aChoice = 2 }
+        default                   { aChoice = 0 }
     }
 }

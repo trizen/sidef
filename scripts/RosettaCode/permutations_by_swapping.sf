@@ -1,0 +1,27 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Permutations_by_swapping
+#
+
+func perms(xx) {
+   var perms = [[+1]];
+   range(1, xx).each { |x|
+      var sign = -1;
+      perms.flat_map! { |arr|
+          var (s, *p) = arr...;
+          var r = range(0, p.len);
+          (s < 0 ? r : r.reverse).map {|i|
+            [sign *= -1, p.@[0..i-1], x, p.@[i..p.end]]
+          }
+      }
+   }
+   perms;
+}
+
+var n = 4;
+perms(n).each { |p|
+    var s = p.shift;
+    s > 0 && (s = '+1');
+    say "#{p.dump} => #{s}";
+}

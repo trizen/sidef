@@ -9,7 +9,7 @@ func pi(callback) {
     loop {
         if ((4*q + r - t) < n*t) {
             callback(n);
-            static _ = callback('.');
+            static _dot = callback('.');
             var nr = 10*(r-n*t);
             n = (int((10*(3*q + r)) / t) - 10*n);
             q *= 10;
@@ -27,6 +27,6 @@ func pi(callback) {
         }
     }
 }
- 
+
 STDOUT.autoflush(1);
 pi(func(digit){ print digit });

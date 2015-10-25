@@ -11,7 +11,7 @@ var array = <1001110011 1110111011
  
  array.each { |n|
     if (var m = (n =~ /^(.+)\1+(.*$)(?(?{ substr($1, 0, length $2) eq $2 })|(?!))/)) {
-       var i = m.cap[0].len;
+       var i = m[0].len;
        say (n.substr(0, i),
             n.substr(i, i).tr('01', '𝟘𝟙'),
             n.substr(i*2));

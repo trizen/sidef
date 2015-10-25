@@ -11,26 +11,15 @@ var otherfamily = [];
 DATA.each { |line|
     var(key, value) = line.strip.split(/\h+/, 2)...;
 
-    defined(key) || next;
-    key ~~ /^([#;]|\h*$)/ && next;
-
-    if (key == "FULLNAME") {
-        fullname = value;
-    }
-    elsif (key == "FAVOURITEFRUIT") {
-        favouritefruit = value;
-    }
-    elsif (key == "NEEDSPEELING") {
-        needspeeling = true;
-    }
-    elsif (key == "SEEDSREMOVED") {
-        seedsremoved = true;
-    }
-    elsif (key == "OTHERFAMILY") {
-        otherfamily = value.split(',')»strip»()
-    }
-    elsif (key ~~ /./) {
-        say "#{key}: unknown key"
+    given(key) {
+        when (nil)              { }
+        when (/^([#;]|\h*$)/)   { }
+        when ("FULLNAME")       { fullname = value }
+        when ("FAVOURITEFRUIT") { favouritefruit = value }
+        when ("NEEDSPEELING")   { needspeeling = true }
+        when ("SEEDSREMOVED")   { seedsremoved = true }
+        when ("OTHERFAMILY")    { otherfamily = value.split(',')»strip»() }
+        default                 { say "#{key}: unknown key" }
     }
 }
 

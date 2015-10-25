@@ -11,22 +11,20 @@ class Card(pip, suit) {
     method to_s { pip + suit }
 }
 
-class Deck {
+class Deck(cards=[]) {
+
     method init {
-        self{:cards} = [];
-        Pip.each { |p|
-            Suit.each { |s|
-                self{:cards} << Card(p, s);
-            }
+        cards = gather {
+            Pip.each { |p| Suit.each { |s| take(Card(p, s)) } }
         }
     }
 
     method shuffle {
-        self{:cards}.shuffle!;
+        cards.shuffle!;
     }
 
-    method deal { self{:cards}.shift };
-    method to_s { self{:cards}.join(" ") };
+    method deal { cards.shift };
+    method to_s { cards.join(" ") };
 }
 
 var d = Deck();
