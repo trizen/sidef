@@ -665,6 +665,7 @@ scripts/Tests/recursion.sf
 scripts/Tests/regex.sf
 scripts/Tests/regex_bool.sf
 scripts/Tests/regex_global_matching.sf
+scripts/Tests/regex_match_as_array.sf
 scripts/Tests/return.sf
 scripts/Tests/return_types.sf
 scripts/Tests/reverse_recursive_general_solution.sf

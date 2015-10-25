@@ -22,9 +22,8 @@ func evalArithmeticExp(s) {
             }
 
             var b = s.split('-');
-            b.len == 3
-                    ? (-1 * b[1].to_num - b[2].to_num)
-                    : operate(s, '-');
+            b.len == 3 ? (-1*b[1].to_num - b[2].to_num)
+                       : operate(s, '-');
         }
 
         s.gsub!(/[()]/,'').gsub!(/-\+/, '-');
@@ -35,19 +34,16 @@ func evalArithmeticExp(s) {
         var reA  = /\d\+/;
         var reAS = /(-?\d+\.?\d*\s*[+-]\s*[+-]?\d+\.?\d*)/;
 
-        var match;
-        while (match = s.match(reMD)) {
-            var cap = match.cap[0];
-            cap ~~ reM
-                ? s.sub!(reMD, operate(cap, '*').to_s)
-                : s.sub!(reMD, operate(cap, '/').to_s);
+        while (var match = reMD.match(s)) {
+            match[0] ~~ reM
+                ? s.sub!(reMD, operate(match[0], '*').to_s)
+                : s.sub!(reMD, operate(match[0], '/').to_s);
         }
 
-        while (match = s.match(reAS)) {
-            var cap = match.cap[0];
-            cap ~~ reA
-                ? s.sub!(reAS,      add(cap).to_s)
-                : s.sub!(reAS, subtract(cap).to_s);
+        while (var match = reAS.match(s)) {
+            match[0] ~~ reA
+                ? s.sub!(reAS,      add(match[0]).to_s)
+                : s.sub!(reAS, subtract(match[0]).to_s);
         }
 
         return s;
@@ -56,9 +52,8 @@ func evalArithmeticExp(s) {
     var rePara = /(\([^\(\)]*\))/;
     s.split!.join!('').sub!(/^\+/,'');
 
-    var match;
-    while (match = s.match(rePara)) {
-        s.sub!(rePara, evalExp(match.captures[0]));
+    while (var match = s.match(rePara)) {
+        s.sub!(rePara, evalExp(match[0]));
     }
 
     return evalExp(s).to_num;

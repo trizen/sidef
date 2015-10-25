@@ -12,7 +12,7 @@ package Sidef::Types::Regex::Regex {
     use overload q{""} => \&get_value;
 
     sub new {
-        my (undef, $regex, $mode, $parser) = @_;
+        my (undef, $regex, $mode) = @_;
 
         if (ref($mode) eq 'Sidef::Types::String::String') {
             $mode = $mode->get_value;
@@ -30,7 +30,6 @@ package Sidef::Types::Regex::Regex {
                regex  => $compiled_re,
                global => $global_mode,
                pos    => 0,
-               parser => $parser,
               },
           __PACKAGE__;
     }
@@ -55,10 +54,9 @@ package Sidef::Types::Regex::Regex {
         }
 
         Sidef::Types::Regex::Match->new(
-                                        obj    => $object->get_value,
-                                        self   => $self,
-                                        parser => $self->{parser},
-                                        pos    => defined($pos) ? $pos->get_value : undef,
+                                        obj  => $object->get_value,
+                                        self => $self,
+                                        pos  => defined($pos) ? $pos->get_value : undef,
                                        );
     }
 

@@ -1645,7 +1645,7 @@ package Sidef::Parser {
             # Regular expression
             if (m{\G(?=/)} || /\G%r\b/gc) {
                 my $string = $self->get_quoted_string(code => $opt{code});
-                return Sidef::Types::Regex::Regex->new($string, /\G($self->{match_flags_re})/goc ? $1 : undef, $self);
+                return Sidef::Types::Regex::Regex->new($string, /\G($self->{match_flags_re})/goc ? $1 : undef);
             }
 
             # Static object (like String or nil)
@@ -1927,7 +1927,13 @@ package Sidef::Parser {
 
             # Regex variables ($1, $2, ...)
             if (/\G\$([0-9]+)\b/gc) {
-                return $self->{regexp_vars}{$1} //= Sidef::Variable::Variable->new(name => $1, type => 'var');
+                $self->fatal_error(
+                                   code  => $_,
+                                   pos   => (pos($_) - length($1)),
+                                   error => "attempt to use the deprecated regex variables",
+                                  );
+
+                #return $self->{regexp_vars}{$1} //= Sidef::Variable::Variable->new(name => $1, type => 'var');
             }
 
             /\G\$/gc && redo;

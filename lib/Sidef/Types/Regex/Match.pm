@@ -3,8 +3,10 @@ package Sidef::Types::Regex::Match {
     use 5.014;
     use overload
       q{bool} => \&to_bool,
-      q{@{}}  => \&cap,
-      q{""}   => \&to_s;
+      q{""}   => \&to_s,
+      q{@{}}  => sub {
+        $_[0]->{_cached_arr} //= [map { Sidef::Types::String::String->new($_) } @{$_[0]->{captures}}];
+      };
 
     use parent qw(
       Sidef::Object::Object
@@ -52,11 +54,11 @@ package Sidef::Types::Regex::Match {
 
         $hash{captures} = \@captures;
 
-        if (defined $hash{parser}) {
-            while (my ($key, $value) = each %{$hash{parser}{regexp_vars}}) {
-                $value->set_value(Sidef::Types::String::String->new($captures[$key - 1]));
-            }
-        }
+        #if (defined $hash{parser}) {
+        #    while (my ($key, $value) = each %{$hash{parser}{regexp_vars}}) {
+        #        $value->set_value(Sidef::Types::String::String->new($captures[$key - 1]));
+        #    }
+        #}
 
         bless \%hash, __PACKAGE__;
     }

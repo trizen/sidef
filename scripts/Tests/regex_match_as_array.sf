@@ -1,0 +1,8 @@
+#!/usr/bin/ruby
+
+var m = /(\w+)\s+(\w+)/.match("foo bar");
+
+assert_eq(m[0], 'foo');
+assert_eq(m[1], 'bar');
+
+say "** Test passed!";
