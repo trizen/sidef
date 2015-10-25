@@ -96,8 +96,6 @@ package Sidef::Types::String::String {
 
         if (ref($obj) eq 'Sidef::Types::Regex::Regex') {
 
-            $obj->match($self)->to_bool or return $self;
-
             my $str = $$self;
             if (exists $obj->{global}) {
                 return $self->new($str =~ s/$obj->{regex}//gr);
@@ -491,10 +489,6 @@ package Sidef::Types::String::String {
 
         $str //= __PACKAGE__->new('');
 
-        if (ref($regex) eq 'Sidef::Types::Regex::Regex') {
-            $regex->match($self)->{matched} or return $self;
-        }
-
         my $search = $self->_string_or_regex($regex);
         my $value  = $str->get_value;
 
@@ -510,10 +504,6 @@ package Sidef::Types::String::String {
           && return $self->gesub($regex, $str);
 
         $str //= __PACKAGE__->new('');
-
-        if (ref($regex) eq 'Sidef::Types::Regex::Regex') {
-            $regex->match($self)->{matched} or return $self;
-        }
 
         my $search = $self->_string_or_regex($regex);
         my $value  = $str->get_value;
@@ -531,10 +521,6 @@ package Sidef::Types::String::String {
         $code //= __PACKAGE__->new('');
         my $search = $self->_string_or_regex($regex);
 
-        if (ref($regex) eq 'Sidef::Types::Regex::Regex') {
-            $regex->match($self)->{matched} or return $self;
-        }
-
         if (ref($code) eq 'Sidef::Types::Block::Code') {
             return __PACKAGE__->new($$self =~ s{$search}{$code->run(_get_captures($$self))}er);
         }
@@ -547,10 +533,6 @@ package Sidef::Types::String::String {
 
         $code //= __PACKAGE__->new('');
         my $search = $self->_string_or_regex($regex);
-
-        if (ref($regex) eq 'Sidef::Types::Regex::Regex') {
-            $regex->match($self)->{matched} or return $self;
-        }
 
         if (ref($code) eq 'Sidef::Types::Block::Code') {
             my $value = $$self;
