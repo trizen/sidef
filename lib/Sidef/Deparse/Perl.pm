@@ -712,7 +712,7 @@ HEADER
                             }
 
                             $code .= '}, __PACKAGE__;' . "\n";
-                            $code .= (" " x $Sidef::SPACES) . '$self->init(@_[1..$#_]) if $self->can("init");' . "\n";
+                            $code .= (" " x $Sidef::SPACES) . '$self->init() if $self->can("init");' . "\n";
                             $code .= (" " x $Sidef::SPACES) . '$self;' . "\n";
 
                             $Sidef::SPACES -= $Sidef::SPACES_INCR;
