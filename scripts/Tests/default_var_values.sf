@@ -29,4 +29,18 @@ assert_eq(t, 3);
 assert_eq([var x = 42], [42]);
 assert_eq(x, 42);
 
+# Default values or provided values
+var (*v1 = (1,2,3))          = (21, 42);
+var (:h1 = (a => 1, b => 2)) = (a => 42);
+
+assert_eq(v1, [21, 42]);
+assert_eq(h1, :(a => 42));
+
+# Default values only
+var (*v2 = (1,2,3));
+var (:h2 = (a => 1, b => 2));
+
+assert_eq(v2, [1,2,3]);
+assert_eq(h2, :(a => 1, b => 2));
+
 say "** Test passed!";

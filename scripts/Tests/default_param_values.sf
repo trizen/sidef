@@ -45,4 +45,15 @@ test3(a: 13);
 test3(13);
 
 
+#
+## Test 4 (slurpy parameters with default values)
+#
+
+func test4(*a=(1,2,3)) {
+    a;
+}
+
+assert_eq(test4(), [1,2,3]);
+assert_eq(test4(21, 42), [21, 42]);
+
 say "** Test passed!";

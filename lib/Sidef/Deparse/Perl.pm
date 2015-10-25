@@ -181,13 +181,35 @@ HEADER
             if (exists $var->{array}) {
                 my $name = $var->{name} . refaddr($var);
                 push @{$self->{function_declarations}}, [-1, 'my @' . $name . ';'];
+
+                # Overwrite with the default values, when the array is empty
+                if (exists $var->{value}) {
+                    push @code,
+                      (   (' ' x $Sidef::SPACES) . '@'
+                        . $name . '=('
+                        . $self->deparse_expr({self => $var->{value}})
+                        . ") if not \@$name;\n");
+                }
+
                 push @code, (' ' x $Sidef::SPACES) . "\$$name = Sidef::Types::Array::Array->new(\@$name);\n";
+                $var->{in_use} ||= 1;
                 delete $var->{array};
             }
             elsif (exists $var->{hash}) {
                 my $name = $var->{name} . refaddr($var);
                 push @{$self->{function_declarations}}, [-1, 'my %' . $name . ';'];
+
+                # Overwrite with the default values, when the hash has no keys
+                if (exists $var->{value}) {
+                    push @code,
+                      (   (' ' x $Sidef::SPACES) . '%'
+                        . $name . '=('
+                        . $self->deparse_expr({self => $var->{value}})
+                        . ") if not keys \%$name;\n");
+                }
+
                 push @code, (' ' x $Sidef::SPACES) . "\$$name = Sidef::Types::Hash::Hash->new(\%$name);\n";
+                $var->{in_use} ||= 1;
                 delete $var->{hash};
             }
             elsif (exists $var->{value}) {
@@ -273,11 +295,23 @@ HEADER
             ref($var) || next;
             if (exists $var->{array}) {
                 my $name = $var->{name} . refaddr($var);
+
+                # Overwrite with the default values, when the array is empty
+                if (exists $var->{value}) {
+                    $code .= ('@' . $name . '=(' . $self->deparse_expr({self => $var->{value}}) . ") if not \@$name;\n");
+                }
+
                 $code .= (' ' x $Sidef::SPACES) . "my \$$name = Sidef::Types::Array::Array->new(\@$name);\n";
                 delete $var->{array};
             }
             elsif (exists $var->{hash}) {
                 my $name = $var->{name} . refaddr($var);
+
+                # Overwrite with the default values, when the hash has no keys
+                if (exists $var->{value}) {
+                    $code .= ('%' . $name . '=(' . $self->deparse_expr({self => $var->{value}}) . ") if not keys \%$name;\n");
+                }
+
                 $code .= (' ' x $Sidef::SPACES) . "my \$$name = Sidef::Types::Hash::Hash->new(\%$name);\n";
                 delete $var->{hash};
             }
