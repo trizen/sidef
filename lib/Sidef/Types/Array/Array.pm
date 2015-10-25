@@ -985,8 +985,7 @@ package Sidef::Types::Array::Array {
         }
 
         foreach my $item (@{$self}) {
-            if (ref($item) eq ref($obj)
-                and $item eq $obj) {
+            if ($item eq $obj) {
                 return Sidef::Types::Bool::Bool->true;
             }
         }
@@ -997,8 +996,10 @@ package Sidef::Types::Array::Array {
     sub contains_type {
         my ($self, $obj) = @_;
 
+        my $ref = ref($obj);
+
         foreach my $item (@{$self}) {
-            if (ref($item) eq ref($obj)) {
+            if (ref($item) eq $ref || eval { $item->SUPER::isa($ref) }) {
                 return Sidef::Types::Bool::Bool->true;
             }
         }
@@ -1262,8 +1263,7 @@ package Sidef::Types::Array::Array {
 
         foreach my $i (0 .. $#{$self}) {
             my $item = $self->[$i];
-            if (ref($item) eq ref($obj)
-                and $item eq $obj) {
+            if ($item eq $obj) {
                 CORE::splice(@{$self}, $i, 1);
                 return Sidef::Types::Bool::Bool->true;
             }
@@ -1279,8 +1279,7 @@ package Sidef::Types::Array::Array {
 
         for (my $i = $#{$self} ; $i >= 0 ; $i--) {
             my $item = $self->[$i];
-            if (ref($item) eq ref($obj)
-                and $item eq $obj) {
+            if ($item eq $obj) {
                 CORE::splice(@{$self}, $i, 1);
                 return Sidef::Types::Bool::Bool->true;
             }
@@ -1296,8 +1295,7 @@ package Sidef::Types::Array::Array {
 
         for (my $i = 0 ; $i <= $#{$self} ; $i++) {
             my $item = $self->[$i];
-            if (ref($item) eq ref($obj)
-                and $item eq $obj) {
+            if ($item eq $obj) {
                 CORE::splice(@{$self}, $i--, 1);
             }
         }
