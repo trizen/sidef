@@ -6,7 +6,7 @@ func stern_brocot {
     {
         list.append(list[0]+list[1], list[1]);
         list.shift;
-    };
+    }
 }
 
 # Show the first fifteen members of the sequence.
@@ -18,8 +18,8 @@ func stern_brocot {
     var index = 1;
     var generator = stern_brocot();
     while (generator() != i) {
-        index++;
-    };
+        ++index;
+    }
     say "First occurrence of #{i} is at index #{index}";
 }
 

@@ -103,8 +103,14 @@ package Sidef::Types::Range::RangeNumber {
         if ($step == 1 and $limit < (-1 >> 1) and $from < (-1 >> 1)) {
 
             # Unpack limit
-            $from  = $from->numify  if ref($from);
-            $limit = $limit->numify if ref($limit);
+            if (ref($from)) {
+                $self->{from} = $from = $from->numify;
+                $self->{step} = 1;
+            }
+            if (ref($limit)) {
+                $self->{step} = 1;
+                $self->{to} = $limit = $limit->numify;
+            }
 
             foreach my $i ($from .. $limit) {
                 if (defined(my $res = $code->_run_code(Sidef::Types::Number::Number->new($i)))) {
@@ -169,7 +175,14 @@ package Sidef::Types::Range::RangeNumber {
         if ($step == 1 and $limit < (-1 >> 1) and $from < (-1 >> 1)) {
 
             # Unpack limit
-            $limit = $limit->numify if ref($limit);
+            if (ref($from)) {
+                $self->{from} = $from = $from->numify;
+                $self->{step} = 1;
+            }
+            if (ref($limit)) {
+                $self->{step} = 1;
+                $self->{to} = $limit = $limit->numify;
+            }
 
             foreach my $i ($from .. $limit) {
                 push @values, $code->run(Sidef::Types::Number::Number->new($i));
@@ -201,7 +214,14 @@ package Sidef::Types::Range::RangeNumber {
         if ($step == 1 and $limit < (-1 >> 1) and $from < (-1 >> 1)) {
 
             # Unpack limit
-            $limit = $limit->numify if ref($limit);
+            if (ref($from)) {
+                $self->{from} = $from = $from->numify;
+                $self->{step} = 1;
+            }
+            if (ref($limit)) {
+                $self->{step} = 1;
+                $self->{to} = $limit = $limit->numify;
+            }
 
             foreach my $i ($from .. $limit) {
                 my $num = Sidef::Types::Number::Number->new($i);

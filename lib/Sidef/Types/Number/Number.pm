@@ -90,14 +90,14 @@ package Sidef::Types::Number::Number {
 
     sub eq {
         my ($self, $arg) = @_;
-        Sidef::Types::Bool::Bool->new($$self == $$arg);
+        Sidef::Types::Bool::Bool->new($$self->bcmp($$arg) == 0);
     }
 
     *equals = \&eq;
 
     sub ne {
         my ($self, $arg) = @_;
-        Sidef::Types::Bool::Bool->new($$self != $$arg);
+        Sidef::Types::Bool::Bool->new($$self->bcmp($$arg) != 0);
     }
 
     sub cmp {

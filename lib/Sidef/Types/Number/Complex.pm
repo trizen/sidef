@@ -244,6 +244,12 @@ package Sidef::Types::Number::Complex {
         $self->new($$self->sqrt);
     }
 
+    sub pow {
+        my ($self, $arg) = @_;
+        local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
+        $self->new($$self**$arg->get_value);
+    }
+
     sub int {
         my ($self) = @_;
         $self->new(CORE::int($$self));
@@ -532,6 +538,7 @@ package Sidef::Types::Number::Complex {
         *{__PACKAGE__ . '::' . '=='}  = \&eq;
         *{__PACKAGE__ . '::' . '!='}  = \&ne;
         *{__PACKAGE__ . '::' . '*'}   = \&mul;
+        *{__PACKAGE__ . '::' . '**'}  = \&pow;
         *{__PACKAGE__ . '::' . '/'}   = \&div;
         *{__PACKAGE__ . '::' . '÷'}  = \&div;
         *{__PACKAGE__ . '::' . '-'}   = \&sub;

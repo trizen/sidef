@@ -1686,7 +1686,7 @@ package Sidef::Parser {
             if (/\GDATA\b/gc) {
                 return (
                     $self->{static_objects}{'__DATA__'} //= do {
-                        open my $str_fh, '<:utf8', \$self->{'__DATA__'};
+                        open my $str_fh, '<:raw', \$self->{'__DATA__'};
                         Sidef::Types::Glob::FileHandle->new(fh   => $str_fh,
                                                             self => Sidef::Types::Glob::File->new($self->{file_name}));
                       }

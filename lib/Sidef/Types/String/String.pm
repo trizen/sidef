@@ -867,7 +867,7 @@ package Sidef::Types::String::String {
             my $window_end = List::Util::min($i + $match_window + 1, $len2);
 
             foreach my $j ($window_start .. $window_end - 1) {
-                if (not exists($string2_matches[$j]) and $chars1[$i] eq $chars2[$j]) {
+                if (CORE::not exists($string2_matches[$j]) and $chars1[$i] eq $chars2[$j]) {
                     $string1_matches[$i] = $chars1[$i];
                     $string2_matches[$j] = $chars2[$j];
                     last;

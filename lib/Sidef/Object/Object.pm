@@ -11,19 +11,20 @@ package Sidef::Object::Object {
       q{cmp}  => sub {
         my ($obj1, $obj2, $first) = @_;
 
-        if (ref($obj1) && $obj1->SUPER::isa(ref($obj2)) or ref($obj2) && $obj2->SUPER::isa(ref($obj1))) {
+        if (CORE::ref($obj1) && $obj1->SUPER::isa(CORE::ref($obj2)) or CORE::ref($obj2) && $obj2->SUPER::isa(CORE::ref($obj1)))
+        {
             if (defined(my $sub = $obj1->can('<=>'))) {
                 local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
                 return $sub->($obj1, $obj2)->get_value;
             }
         }
 
-        Scalar::Util::refaddr($obj1) <=> (ref($obj2) ? Scalar::Util::refaddr($obj2) : $first ? -1 : 'inf');
+        Scalar::Util::refaddr($obj1) <=> (CORE::ref($obj2) ? Scalar::Util::refaddr($obj2) : $first ? -1 : 'inf');
       },
       q{eq} => sub {
         my ($obj1, $obj2) = @_;
 
-        ($obj1->SUPER::isa(ref($obj2) || return) || $obj2->SUPER::isa(ref($obj1) || return))
+        ($obj1->SUPER::isa(CORE::ref($obj2) || return) || $obj2->SUPER::isa(CORE::ref($obj1) || return))
           || return;
 
         if (defined(my $sub = $obj1->can('=='))) {
@@ -77,7 +78,7 @@ package Sidef::Object::Object {
 
     sub is_a {
         my ($self, $obj) = @_;
-        Sidef::Types::Bool::Bool->new($self->SUPER::isa(ref($obj) || $obj));
+        Sidef::Types::Bool::Bool->new($self->SUPER::isa(CORE::ref($obj) || $obj));
     }
 
     *is_an = \&is_a;
@@ -104,7 +105,7 @@ package Sidef::Object::Object {
             @parents;
         };
 
-        Sidef::Types::Array::Array->new(map { Sidef::Types::String::String->new($_) } $extract_parents->(ref($obj)));
+        Sidef::Types::Array::Array->new(map { Sidef::Types::String::String->new($_) } $extract_parents->(CORE::ref($obj)));
     }
 
     sub super_join {

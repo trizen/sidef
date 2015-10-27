@@ -1,0 +1,44 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Sorting_algorithms/Strand_sort
+#
+
+func merge(x, y) {
+    var out = [];
+    while (x && y) {
+        given (x[-1] <=> y[-1]) {
+            when ( 1) { out.prepend(x.pop) }
+            when (-1) { out.prepend(y.pop) }
+            default   { out.prepend(x.pop, y.pop) }
+        }
+    }
+    x + y + out;
+}
+
+func strand(x) {
+    x || return [];
+    var out = [x.shift];
+    if (x.len) {
+        range(-x.len, -1).each { |i|
+            if (x[i] >= out[-1]) {
+                out.append(x.pop_at(i));
+            }
+        }
+    }
+    return out;
+}
+
+func strand_sort(x) {
+    var out = [];
+    while (var strd = strand(x)) {
+        out = merge(out, strd);
+    }
+    return out;
+}
+
+var numbers = [7,6,5,9,8,4,3,1,2,0];
+say strand_sort(numbers);
+ 
+var strs = ["John", "Kate", "Zerg", "Alice", "Joe", "Jane"];
+say strand_sort(strs);

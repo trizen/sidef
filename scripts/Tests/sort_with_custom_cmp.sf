@@ -1,0 +1,13 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Sort_using_a_custom_comparator
+#
+
+func mycmp(a, b) { (b.len <=> a.len) || (a.lc <=> b.lc) };
+var strings = %w(Here are some sample strings to be sorted);
+var sorted = strings.sort(mycmp);
+
+assert_eq(sorted, ["strings", "sample", "sorted", "Here", "some", "are", "be", "to"]);
+
+say "** Test passed!";

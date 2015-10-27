@@ -550,14 +550,14 @@ package Sidef::Types::Array::Array {
 
     sub map {
         my ($self, $code) = @_;
-        $self->new(map { scalar $code->run($_) } @{$self});
+        $self->new(map { $code->run($_) } @{$self});
     }
 
     *collect = \&map;
 
     sub flat_map {
         my ($self, $code) = @_;
-        $self->new(map { @{$code->run($_)} } @{$self});
+        $self->new(map { @{scalar $code->run($_)} } @{$self});
     }
 
     sub grep {
@@ -822,7 +822,7 @@ package Sidef::Types::Array::Array {
             foreach my $i (0 .. $#{$self}) {
                 push @arr, [$i, $self->[$i]];
             }
-            sort { $a->[1] cmp $b->[1] } @arr;
+            CORE::sort { $a->[1] cmp $b->[1] } @arr;
         };
 
         my @unique;
@@ -847,7 +847,7 @@ package Sidef::Types::Array::Array {
             foreach my $i (0 .. $#{$self}) {
                 push @arr, [$i, $self->[$i]];
             }
-            sort { $a->[1] cmp $b->[1] } @arr;
+            CORE::sort { $a->[1] cmp $b->[1] } @arr;
         };
 
         my @unique;
@@ -872,7 +872,7 @@ package Sidef::Types::Array::Array {
             foreach my $item (@{$self}) {
                 push @arr, [++$i, $item, scalar $block->run($item)];
             }
-            sort { $a->[2] cmp $b->[2] } @arr;
+            CORE::sort { $a->[2] cmp $b->[2] } @arr;
         };
 
         my @unique;
@@ -897,7 +897,7 @@ package Sidef::Types::Array::Array {
             foreach my $item (@{$self}) {
                 push @arr, [++$i, $item, scalar $block->run($item)];
             }
-            sort { $a->[2] cmp $b->[2] } @arr;
+            CORE::sort { $a->[2] cmp $b->[2] } @arr;
         };
 
         my @unique;
@@ -939,7 +939,7 @@ package Sidef::Types::Array::Array {
          $traverse = sub {
              my ($hash) = @_;
 
-             foreach my $key (my @keys = sort keys %{$hash}) {
+             foreach my $key (my @keys = CORE::sort keys %{$hash}) {
                  next if $key eq $__END__;
                  $traverse->($hash->{$key});
 
@@ -1101,15 +1101,15 @@ package Sidef::Types::Array::Array {
         my ($self, $code) = @_;
 
         if (defined $code) {
-            return $self->new(sort { scalar $code->run($a, $b) } @{$self});
+            return $self->new(CORE::sort { scalar $code->run($a, $b) } @{$self});
         }
 
-        $self->new(sort { $a cmp $b } @{$self});
+        $self->new(CORE::sort { $a cmp $b } @{$self});
     }
 
     sub sort_by {
         my ($self, $code) = @_;
-        $self->new(map { $_->[0] } sort { $a->[1] cmp $b->[1] } map { [$_, $code->run($_)] } @{$self});
+        $self->new(map { $_->[0] } sort { $a->[1] cmp $b->[1] } map { [$_, scalar $code->run($_)] } @{$self});
     }
 
     sub cmp {

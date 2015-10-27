@@ -1,0 +1,28 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Walk_a_directory/Recursively
+#
+
+func traverse(Block callback, Dir dir) {
+    dir.open(\var dir_h) || return;
+
+    dir_h.entries.each { |entry|
+        if (entry.is_a(Dir)) {
+            traverse(callback, entry);
+        } else {
+            callback(entry);
+        }
+    }
+}
+
+var dir = Dir.cwd;
+var pattern = /sierpinski/;   # display files that contain 'sierpinski'
+
+traverse(
+    { |file|
+        if (file.basename ~~ pattern) {
+            say file;
+        }
+    } => dir
+);

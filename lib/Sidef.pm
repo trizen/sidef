@@ -24,9 +24,13 @@ package Sidef {
 ## Some UNIVERSAL magic
 #
 
-*UNIVERSAL::get_value = sub { $_[0] };
-*UNIVERSAL::DESTROY   = sub { };
-*UNIVERSAL::AUTOLOAD  = sub {
+*UNIVERSAL::get_value = sub {
+    ref($_[0]) eq 'Sidef::Module::OO' || ref($_[0]) eq 'Sidef::Module::Func'
+      ? $_[0]->{module}
+      : $_[0];
+};
+*UNIVERSAL::DESTROY = sub { };
+*UNIVERSAL::AUTOLOAD = sub {
     my ($self, @args) = @_;
 
     $self = ref($self) if ref($self);

@@ -899,7 +899,8 @@ HEADER
                 my $data = $self->_dump_string(
                                                do { seek($obj->{fh}, 0, 0); local $/; readline($obj->{fh}) }
                                               );
-                $code = $self->make_constant($ref, 'new', "DATA$refaddr", qq{fh => do {open my \$fh, '<', \\$data; \$fh}});
+                $code =
+                  $self->make_constant($ref, 'new', "DATA$refaddr", qq{fh => do {open my \$fh, '<:utf8', \\$data; \$fh}});
             }
         }
         elsif ($ref eq 'Sidef::Variable::Magic') {

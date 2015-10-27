@@ -1,0 +1,22 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Strip_a_set_of_characters_from_a_string
+#
+
+func stripchars_1(str, char_list) {
+    str.tr(char_list, "", "d");
+}
+
+func stripchars_2(str, char_list) {
+    str.chars.grep {|c| !char_list.contains(c)}.join;
+}
+
+var orig = 'She was a soul stripper. She took my heart!';
+var mod = 'Sh ws  soul strppr. Sh took my hrt!';
+var rem = 'aei';
+
+assert_eq(stripchars_1(orig, rem), mod);
+assert_eq(stripchars_2(orig, rem), mod);
+
+say "** Test passed!";

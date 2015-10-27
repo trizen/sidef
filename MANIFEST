@@ -226,6 +226,7 @@ scripts/Graphical/munching_squares.sf
 scripts/Graphical/sierpinski_triangle_graphical.sf
 scripts/Graphical/simple_windowed_application.sf
 scripts/Graphical/ulam_spiral.sf
+scripts/Graphical/user_input.sf
 scripts/Graphical/window_creation.sf
 scripts/Graphical/window_creation_1.sf
 scripts/Graphical/yin_and_yang.sf
@@ -493,6 +494,7 @@ scripts/RosettaCode/sha-256.sf
 scripts/RosettaCode/short-circuit_evaluation.sf
 scripts/RosettaCode/show_the_epoch.sf
 scripts/RosettaCode/shunting-yard_algorithm.sf
+scripts/RosettaCode/sidef_3d_ascii.sf
 scripts/RosettaCode/sierpinski_carpet.sf
 scripts/RosettaCode/sierpinski_triangle.sf
 scripts/RosettaCode/singly-linked_list_element_definition.sf
@@ -515,10 +517,19 @@ scripts/RosettaCode/sorting_algorithms_selection_sort.sf
 scripts/RosettaCode/sorting_algorithms_shell_sort.sf
 scripts/RosettaCode/sorting_algorithms_sleep_sort.sf
 scripts/RosettaCode/sorting_algorithms_stooge_sort.sf
+scripts/RosettaCode/sorting_algorithms_strand_sort.sf
 scripts/RosettaCode/spiral_matrix.sf
 scripts/RosettaCode/stack.sf
 scripts/RosettaCode/stack_1.sf
+scripts/RosettaCode/standard_deviation.sf
+scripts/RosettaCode/standard_deviation_2.sf
+scripts/RosettaCode/the_isaac_cipher.sf
 scripts/RosettaCode/universal_turing_machine.sf
+scripts/RosettaCode/van_der_corput_sequence.sf
+scripts/RosettaCode/walk_a_dir_non_recursively.sf
+scripts/RosettaCode/word_wrap.sf
+scripts/RosettaCode/zeckendorf_number_representation.sf
+scripts/RosettaCode/zig-zag_matrix.sf
 scripts/sierpinski_triangle.sf
 scripts/simple_moving_average.sf
 scripts/simple_moving_average_oo.sf
@@ -705,6 +716,8 @@ scripts/Tests/sierpinski_x.sf
 scripts/Tests/smart_match_operator.sf
 scripts/Tests/smart_word_wrap.sf
 scripts/Tests/smart_word_wrap_simple.sf
+scripts/Tests/sort_disjoint_sublist.sf
+scripts/Tests/sort_with_custom_cmp.sf
 scripts/Tests/soundex.sf
 scripts/Tests/special_methods.sf
 scripts/Tests/split_collapse.sf
@@ -712,13 +725,16 @@ scripts/Tests/static_const_lazy_init.sf
 scripts/Tests/string_encodings.sf
 scripts/Tests/string_escapes.sf
 scripts/Tests/string_to_number.sf
+scripts/Tests/strip_chars_from_str.sf
 scripts/Tests/strip_non_ascii_chars.sf
 scripts/Tests/subtractive_generator.sf
 scripts/Tests/swap.sf
 scripts/Tests/sylvesters_sequence.sf
+scripts/Tests/symmetric_difference.sf
 scripts/Tests/sysopen_and_sysread.sf
 scripts/Tests/tennis_tournament.sf
 scripts/Tests/token_recursive.sf
+scripts/Tests/top_rank_per_group.sf
 scripts/Tests/topological_sort.sf
 scripts/Tests/triangle_path.sf
 scripts/Tests/trizen_s_pair_numbers.sf
@@ -737,12 +753,13 @@ scripts/Tests/variable_references.sf
 scripts/Tests/vigenere_cipher.sf
 scripts/Tests/virtual_machine.sf
 scripts/Tests/while_loop.sf
+scripts/Tests/wireworld.sf
 scripts/Tests/word_roots.sf
-scripts/Tests/zig-zag_matrix.sf
 scripts/tree_traversal.sf
 scripts/variadic_function.sf
 scripts/vector_products.sf
-'scripts/Vigenère cipher.sf'
+scripts/vigenere_cipher.sf
+scripts/walk_a_dir_recursively.sf
 scripts/WWW/deranged_anagrams.sf
 scripts/WWW/DNS_query.sf
 scripts/WWW/rc_rank_languages_by_popularity.sf
