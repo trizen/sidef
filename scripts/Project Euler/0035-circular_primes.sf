@@ -1,0 +1,26 @@
+#!/usr/bin/ruby
+
+# How many circular primes are there below one million?
+
+# https://projecteuler.net/problem=35
+
+# Answer: 55
+
+var ntheory = frequire('ntheory');
+
+var count = 4;      # circular primes less than 10
+var limit = 1e6;
+
+range(11, limit-1, 2).each { |i|
+    var s = i.to_s;
+    s ~~ /[^1379]/ && next;
+    ntheory.is_prime(i) || next;
+    var d = s.chars;
+    range(0, d.end).each { |i|
+        ntheory.is_prime(d.rotate(i).join) || goto :NEXT;
+    }
+    ++count;
+    @:NEXT;
+}
+
+say count;
