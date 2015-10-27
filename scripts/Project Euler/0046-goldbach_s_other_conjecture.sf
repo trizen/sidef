@@ -1,0 +1,22 @@
+#!/usr/bin/ruby
+
+# What is the smallest odd composite that cannot be written as the sum of a prime and twice a square?
+
+# https://projecteuler.net/problem=46
+
+# Answer: 5777
+
+var ntheory = frequire('ntheory');
+
+range(3, Math.inf, 2).each { |n|
+    ntheory.is_prime(n) && next;
+
+    range(1, (n/2).sqrt.int).each { |i|
+        if (ntheory.is_prime(n - 2*(i**2))) {
+            goto :NEXT;
+        }
+    }
+
+    say n; break;
+    @:NEXT;
+}

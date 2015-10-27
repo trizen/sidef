@@ -1,0 +1,19 @@
+#!/usr/bin/ruby
+
+# How many, not necessarily distinct, values of  nCr, for 1 ≤ n ≤ 100, are greater than one-million?
+
+# https://projecteuler.net/problem=53
+
+# Answer: 4075
+
+var count = 0;
+
+range(1, 100).each { |k|
+    range(k+1, 100).each { |n|
+        if (n.nok(k) > 1e6) {
+            ++count;
+        }
+    }
+}
+
+say count;

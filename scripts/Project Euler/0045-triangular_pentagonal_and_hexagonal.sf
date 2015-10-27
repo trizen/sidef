@@ -1,0 +1,16 @@
+#!/usr/bin/ruby
+
+# It can be verified that T285 = P165 = H143 = 40755.
+# Find the next triangle number that is also pentagonal and hexagonal.
+
+# https://projecteuler.net/problem=45
+
+# Answer: 1533776805
+
+range(144, Math.inf).each { |n|
+    var h = n*(2*n - 1);
+    if ((sqrt(1 + 24*h).inc %% 6) && (sqrt(1 + 8*h).dec %% 2)) {
+        say h;
+        break;
+    }
+}
