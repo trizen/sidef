@@ -1,0 +1,20 @@
+#!/usr/bin/ruby
+
+func fib_cf(n) {
+
+    define S = sqrt(5);
+    define T = ((1+S) / 2);
+    define U = (2 / (1+S));
+
+    (T**n - (U**n * cos(Math.pi(2*n) * n))) / S -> fround(0);
+}
+
+func fib_rec(n) is cached {
+    n > 1 ? (__FUNC__(n-1) + __FUNC__(n-2)) : n;
+}
+
+range(10, 20).each { |i|
+    var f = fib_cf(i);
+    say "F(#{i}) = #{f}";
+    assert_eq(f, fib_rec(i));
+}

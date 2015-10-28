@@ -191,6 +191,7 @@ scripts/elementary_cellular_automaton.sf
 scripts/ethiopian_multiplication.sf
 scripts/Expensive/benford_s_law.sf
 scripts/Expensive/binary_multiplier.sf
+scripts/Expensive/closed_form_fibonacci.sf
 scripts/Expensive/dice_game_solver.sf
 scripts/Expensive/factorial_approximations.sf
 scripts/Expensive/fibonacci_validation.sf
@@ -305,6 +306,7 @@ scripts/permutations_rec.sf
 'scripts/Project Euler/0067-triangle.txt'
 'scripts/Project Euler/0071-ordered_fractions.sf'
 'scripts/Project Euler/0120-square_remainders.sf'
+'scripts/Project Euler/0137-fibonacci_golden_nuggets.sf'
 'scripts/Project Euler/0187-semiprimes.sf'
 scripts/pythagorean_means.sf
 scripts/quicksort.sf

@@ -1,0 +1,15 @@
+#!/usr/bin/ruby
+
+# Find the 15th golden nugget.
+
+# https://projecteuler.net/problem=137
+
+# Answer: 1120149658760
+
+var nth = 15;
+
+func fib(n) is cached {
+    n > 1 ? (fib(n-1) + fib(n-2)) : n;
+}
+
+say (fib(2*nth) * fib(2*nth + 1));
