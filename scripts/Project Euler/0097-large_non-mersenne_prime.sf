@@ -1,0 +1,10 @@
+#!/usr/bin/ruby
+
+# However, in 2004 there was found a massive non-Mersenne prime which contains 2,357,207 digits: 28433 × 2^7830457 + 1.
+# Find the last ten digits of this prime number.
+
+# https://projecteuler.net/problem=97
+
+# Answer: 8739992577
+
+say ((28433 * 2**7830457)+ 1 % 10**10);
