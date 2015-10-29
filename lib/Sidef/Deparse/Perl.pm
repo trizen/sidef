@@ -606,7 +606,7 @@ HEADER
                 $obj->{inited} = 1;
 
                 # Use dynamical constants inside functions
-                if (exists $self->{function}) {
+                if (exists $self->{function} or exists $self->{class}) {
                     $self->top_add("use experimental 'lexical_subs';\n");
                     $code = "state sub $name() { state \$_$refaddr"
                       . (defined($obj->{expr}) ? (" = " . $self->deparse_script($obj->{expr})) : '') . " }";
