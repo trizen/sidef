@@ -604,9 +604,19 @@ HEADER
             my $value = '(' . $name . ')';
             if (not exists $obj->{inited}) {
                 $obj->{inited} = 1;
-                $self->top_add("use experimental 'lexical_subs';\n");
-                $code = "state sub $name() { state \$_$refaddr"
-                  . (defined($obj->{expr}) ? (" = " . $self->deparse_script($obj->{expr})) : '') . " }";
+
+                # Use dynamical constants inside functions
+                if (exists $self->{function}) {
+                    $self->top_add("use experimental 'lexical_subs';\n");
+                    $code = "state sub $name() { state \$_$refaddr"
+                      . (defined($obj->{expr}) ? (" = " . $self->deparse_script($obj->{expr})) : '') . " }";
+                }
+
+                # Otherwise, use static constants
+                else {
+                    $code = "sub $name() { state \$_$refaddr"
+                      . (defined($obj->{expr}) ? " = " . ($self->deparse_script($obj->{expr})) : '') . "}";
+                }
             }
             else {
                 $code = $value;

@@ -174,7 +174,6 @@ scripts/Applications/make_filenames_safe.sf
 scripts/Applications/smart-units.sf
 scripts/bernoulli_numbers.sf
 scripts/bernoulli_numbers_recursive.sf
-scripts/bubble_sort.sf
 scripts/caesar_cipher.sf
 scripts/chebyshev_coefficients.sf
 scripts/chinese_remainder_theorem.sf
@@ -231,9 +230,7 @@ scripts/Graphical/user_input.sf
 scripts/Graphical/window_creation.sf
 scripts/Graphical/window_creation_1.sf
 scripts/Graphical/yin_and_yang.sf
-scripts/heapsort.sf
 scripts/huffman_coding.sf
-scripts/insertion_sort.sf
 scripts/Interactive/cosmic_calendar.sf
 scripts/Interactive/draw_a_clock.sf
 scripts/Interactive/execute_brainfuck.sf
@@ -255,7 +252,6 @@ scripts/langton_s_ant_2.sf
 scripts/linear_congruential_generator.sf
 scripts/mandelbrot_set.sf
 scripts/matrix_multiplication.sf
-scripts/merge_sort.sf
 scripts/mutual_recursion.sf
 scripts/nth_root.sf
 scripts/permutations_iter.sf
@@ -310,7 +306,6 @@ scripts/permutations_rec.sf
 'scripts/Project Euler/0137-fibonacci_golden_nuggets.sf'
 'scripts/Project Euler/0187-semiprimes.sf'
 scripts/pythagorean_means.sf
-scripts/quicksort.sf
 scripts/reverse_the_gender_of_a_string.sf
 scripts/RosettaCode/9_billion_names.sf
 scripts/RosettaCode/arithmetic-geometric_mean.sf

@@ -14,9 +14,9 @@ func bubble_sort(Array arr) -> Array {
             );
         } * arr.end;
         swapped || break;
-    };
+    }
     return arr;
-};
+}
 
 var numbers = [7,6,5,9,8,4,3,1,2,0];
 say bubble_sort(numbers);

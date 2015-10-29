@@ -32,7 +32,7 @@ use File::Basename qw(basename);
 sub parse_deparse {
     my ($code, $name) = @_;
 
-    local @Sidef::Exec::NAMESPACES = ();
+    local @Sidef::NAMESPACES = ();
 
     my $parser = Sidef::Parser->new(
                                     file_name   => $name,
@@ -42,7 +42,7 @@ sub parse_deparse {
 
     my $struct = $parser->parse_script(code => \$code);
 
-    my $deparser   = Sidef::Deparse::Sidef->new(namespaces => [@Sidef::Exec::NAMESPACES]);
+    my $deparser   = Sidef::Deparse::Sidef->new(namespaces => [@Sidef::NAMESPACES]);
     my @statements = $deparser->deparse_script($struct);
     my $deparsed   = $deparser->{before} . join($deparser->{between}, @statements) . $deparser->{after};
 
@@ -65,20 +65,6 @@ sub test_file {
 
     my $basename = basename($file);
     return if exists $ignore{$basename};
-
-    delete @INC{
-        qw(
-          Math/BigInt.pm
-          Math/BigFloat.pm
-          Math/BigRat.pm
-          Sidef/Types/Number/Number.pm
-          Sidef/Types/Number/NumberInt.pm
-          Sidef/Types/Number/NumberFast.pm
-          Sidef/Types/Number/NumberRat.pm
-          )
-    };
-
-    require Sidef::Types::Number::Number;
 
     {
         local $| = 1;
