@@ -1,0 +1,30 @@
+#!/usr/bin/ruby
+
+# Find the value of d < 1000 for which 1/d contains the longest recurring cycle in its decimal fraction part.
+
+# https://projecteuler.net/problem=26
+
+# Answer: 983
+
+func rec_cycle(d) {
+    range(1, d).each { |x|
+        if (modpow(10, x, d) == 1) {
+            return x;
+        }
+    }
+    return 0;
+}
+
+var d = 1;
+var max = 0;
+
+range(2, 1000).each { |i|
+    var r = rec_cycle(i);
+
+    if (r > max) {
+        max = r;
+        d = i;
+    }
+}
+
+say d;
