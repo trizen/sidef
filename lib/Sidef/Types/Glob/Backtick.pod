@@ -33,6 +33,14 @@ Aliases: I<run>, I<exec>, I<execute>
 
 =cut
 
+=head2 call
+
+Backtick.call() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 dump
 
 Backtick.dump() -> I<Obj>

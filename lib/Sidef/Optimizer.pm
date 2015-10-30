@@ -505,7 +505,7 @@ package Sidef::Optimizer {
                 ## ok
             }
             else {
-                $obj->{__BLOCK__} = $self->optimize_expr({self => $obj->{__BLOCK__}});
+                $obj->{block} = $self->optimize_expr({self => $obj->{block}});
             }
         }
         elsif ($ref eq 'Sidef::Variable::Init') {

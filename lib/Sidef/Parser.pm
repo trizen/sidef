@@ -1084,9 +1084,9 @@ package Sidef::Parser {
             # Struct declaration
             if (/\Gstruct\b\h*/gc) {
 
-                my $name;
+                my ($name, $class_name);
                 if (/\G($self->{var_name_re})\h*/goc) {
-                    $name = $1;
+                    ($name, $class_name) = $self->get_name_and_class($1);
                 }
 
                 if (defined($name) and (exists($self->{keywords}{$name}) or exists($self->{built_in_classes}{$name}))) {
@@ -1105,10 +1105,14 @@ package Sidef::Parser {
                                          type      => 'var',
                                         );
 
-                my $struct = Sidef::Variable::Struct->__new__($name, $vars);
+                my $struct = Sidef::Variable::Struct->new(
+                                                          name  => $name,
+                                                          class => $class_name,
+                                                          vars  => $vars,
+                                                         );
 
                 if (defined $name) {
-                    unshift @{$self->{vars}{$self->{class}}},
+                    unshift @{$self->{vars}{$class_name}},
                       {
                         obj   => $struct,
                         name  => $name,
@@ -1283,8 +1287,7 @@ package Sidef::Parser {
                   : $type eq 'global' ? Sidef::Variable::Global->new(name => $name, class => $class_name)
                   : $type eq 'func'   ? Sidef::Variable::Variable->new(name => $name, type => $type, class => $class_name)
                   : $type eq 'method' ? Sidef::Variable::Variable->new(name => $name, type => $type, class => $class_name)
-                  : $type eq 'class'
-                  ? Sidef::Variable::ClassInit->__new__(name => ($built_in_obj // $name), class => $class_name)
+                  : $type eq 'class' ? Sidef::Variable::ClassInit->new(name => ($built_in_obj // $name), class => $class_name)
                   : $self->fatal_error(
                                        error    => "invalid type",
                                        expected => "expected a magic thing to happen",
@@ -1345,7 +1348,7 @@ package Sidef::Parser {
                                                              },
                                             );
 
-                    $obj->__set_params__($var_names);
+                    $obj->set_params($var_names);
 
                     # Class inheritance (class Name(...) << Name1, Name2)
                     if (/\G\h*<<?\h*/gc) {
@@ -1353,11 +1356,7 @@ package Sidef::Parser {
                             my ($name) = $1;
                             if (defined(my $class = $self->find_var($name, $class_name))) {
                                 if ($class->{type} eq 'class') {
-                                    push @{$obj->{inherit}}, $class->{obj};    #$class_name . '::' . $name;
-
-                                    #while (my ($name, $method) = each %{$class->{obj}{__METHODS__}}) {
-                                    #    ($built_in_obj // $obj)->__add_method__($name, $method);
-                                    #}
+                                    push @{$obj->{inherit}}, $class->{obj};
                                 }
                                 else {
                                     $self->fatal_error(
@@ -1403,7 +1402,7 @@ package Sidef::Parser {
                     local $self->{current_class} = $built_in_obj // $obj;
                     my $block = $self->parse_block(code => $opt{code});
 
-                    $obj->__set_block__($block);
+                    $obj->set_block($block);
                 }
 
                 if ($type eq 'func' or $type eq 'method') {
@@ -1506,7 +1505,7 @@ package Sidef::Parser {
                     $obj->{value} = $block;
 
                     #if (not $private) {
-                    #    $self->{current_class}->__add_method__($name, $block) if $type eq 'method';
+                    #    $self->{current_class}->add_method($name, $block) if $type eq 'method';
                     #}
                 }
 
@@ -1781,7 +1780,7 @@ package Sidef::Parser {
                     and defined(
                         my $var = List::Util::first(
                             sub { $_->{name} eq $name },
-                            @{$self->{current_class}{__VARS__}},
+                            @{$self->{current_class}{vars}},
 
                             #@{$self->{current_class}{__DEF_VARS__}}
                                                    )

@@ -1,0 +1,49 @@
+#!/usr/bin/ruby
+
+#
+## Struct 1
+#
+
+struct Person {
+    name,
+    age,
+}
+
+var man = Person(name: "John Smith", age: 30);
+
+assert_eq(man.name, "John Smith");
+assert_eq(man.age, 30);
+
+man.age += 1;
+assert_eq(man.age, 31);
+
+var woman = Person("Chris Miller", 24);
+
+assert_eq(woman.name, "Chris Miller");
+assert_eq(woman.age, 24);
+
+#
+## Struct 2
+#
+
+struct Job {
+    String title,
+    Number salary = 1000,       # default salary
+}
+
+var job1 = Job(title: "Programmer", salary: 3000);
+var job2 = Job("Writer", 2400);
+var job3 = Job("Worker");
+
+assert_eq(job1.salary, 3000);
+assert_eq(job2.salary, 2400);
+assert_eq(job3.salary, 1000);
+
+job3.salary = 800;
+assert_eq(job3.salary, 800);
+assert_eq(job2.salary, 2400);
+
+assert_eq(woman.age, 24);
+assert_eq(man.age, 31);
+
+say "** Test passed!";

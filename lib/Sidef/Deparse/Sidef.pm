@@ -200,15 +200,10 @@ package Sidef::Deparse::Sidef {
         }
         elsif ($ref eq 'Sidef::Variable::Struct') {
             if ($addr{refaddr($obj)}++) {
-                $code = $obj->{__NAME__};
+                $code = $obj->{name};
             }
             else {
-                my @vars;
-                foreach my $key (sort keys %{$obj}) {
-                    next if $key eq '__NAME__';
-                    push @vars, $obj->{$key};
-                }
-                $code = "struct $obj->{__NAME__} {" . $self->_dump_vars(@vars) . '}';
+                $code = "struct $obj->{name} {" . $self->_dump_vars(@{$obj->{vars}}) . '}';
             }
         }
         elsif ($ref eq 'Sidef::Variable::LocalInit') {
@@ -275,7 +270,7 @@ package Sidef::Deparse::Sidef {
                   );
             }
             else {
-                my $block     = $obj->{__BLOCK__};
+                my $block     = $obj->{block};
                 my $in_module = $obj->{class} ne $self->{class};
 
                 if ($in_module) {
@@ -286,7 +281,7 @@ package Sidef::Deparse::Sidef {
 
                 local $self->{class} = $obj->{class};
                 $code .= "class " . $self->_dump_class_name($obj->{name});
-                my $vars = $obj->{__VARS__};
+                my $vars = $obj->{vars};
                 $code .= '(' . $self->_dump_vars(@{$vars}) . ')';
                 if (exists $obj->{inherit}) {
                     $code .= ' << ' . join(', ', map { $_->{name} } @{$obj->{inherit}}) . ' ';

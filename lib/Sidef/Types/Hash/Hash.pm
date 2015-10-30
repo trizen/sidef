@@ -34,14 +34,6 @@ package Sidef::Types::Hash::Hash {
         \%hash;
     }
 
-    sub default {
-        my ($self, $value) = @_;
-        if (@_ > 1) {
-            $self->{__DEFAULT_VALUE__} = $value;
-        }
-        $self->{__DEFAULT_VALUE__};
-    }
-
     sub items {
         my ($self, @keys) = @_;
         Sidef::Types::Array::Array->new(map { exists($self->{$_}) ? $self->{$_} : undef } @keys);

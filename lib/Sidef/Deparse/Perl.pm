@@ -567,16 +567,42 @@ HEADER
             }
         }
         elsif ($ref eq 'Sidef::Variable::Struct') {
+            my $name = $self->_dump_class_name($obj);
             if ($addr{$refaddr}++) {
-                $code = $obj->{__NAME__};
+                $code = $name;
             }
             else {
-                my @vars;
-                foreach my $key (sort keys %{$obj}) {
-                    next if $key eq '__NAME__';
-                    push @vars, $obj->{$key};
+                local $self->{parent_name} = ['struct initialization', $obj->{name}];
+
+                # Mark the variables all in use
+                foreach my $var (@{$obj->{vars}}) {
+                    $var->{in_use} = 1;
                 }
-                $code = "struct $obj->{__NAME__} {" . $self->_dump_vars(@vars) . '}';
+
+                $Sidef::SPACES += $Sidef::SPACES_INCR;
+                $code =
+                    "package $name {\n"
+                  . (' ' x $Sidef::SPACES)
+                  . "sub new {\n"
+                  . (' ' x $Sidef::SPACES)
+                  . $self->_dump_sub_init_vars('undef', @{$obj->{vars}})
+
+                  . (' ' x ($Sidef::SPACES * 2))
+                  . "bless {"
+                  . join(", ", map { $self->_dump_string($_->{name}) . " => " . $self->_dump_var($_) } @{$obj->{vars}})
+                  . "}, __PACKAGE__" . "\n"
+                  . (' ' x $Sidef::SPACES) . "}\n"
+                  .
+
+                  (' ' x $Sidef::SPACES) . "*call = \\&new;\n" .
+
+                  (' ' x $Sidef::SPACES)
+                  . join("\n" . (' ' x $Sidef::SPACES),
+                         map { "sub $_->{name} : lvalue { \$_[0]->{$_->{name}} }" } @{$obj->{vars}})
+
+                  . "\n" . (' ' x ($Sidef::SPACES - $Sidef::SPACES_INCR)) . "}";
+
+                $Sidef::SPACES -= $Sidef::SPACES_INCR;
             }
         }
         elsif ($ref eq 'Sidef::Variable::LocalInit') {
@@ -649,7 +675,7 @@ HEADER
                 $code = q{'} . $self->_dump_class_name($obj) . q{'};
             }
             else {
-                my $block = $obj->{__BLOCK__};
+                my $block = $obj->{block};
 
                 $code = "do {package ";
 
@@ -671,7 +697,7 @@ HEADER
                     $code .= ($package_name = $self->_dump_class_name($obj));
                 }
 
-                my $vars = $obj->{__VARS__};
+                my $vars = $obj->{vars};
                 local $self->{class}        = refaddr($block);
                 local $self->{class_name}   = $obj->{name};
                 local $self->{parent_name}  = ['class initialization', $obj->{name}];

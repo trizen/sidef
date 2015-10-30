@@ -1,0 +1,64 @@
+
+=encoding utf8
+
+=head1 NAME
+
+Sidef::Variable::ClassInit
+
+=head1 DESCRIPTION
+
+This object is ...
+
+=head1 SYNOPSIS
+
+var obj = ClassInit.new(...);
+
+
+=head1 INHERITS
+
+Inherits methods from:
+
+	* Sidef::Object::Object
+
+=head1 METHODS
+
+
+=head2 add_method
+
+ClassInit.add_method() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 add_vars
+
+ClassInit.add_vars() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 new
+
+ClassInit.new() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 set_block
+
+ClassInit.set_block() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 set_params
+
+ClassInit.set_params() -> I<Obj>
+
+Return the
+
+=cut

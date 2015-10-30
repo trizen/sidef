@@ -124,6 +124,7 @@ lib/Sidef/Types/Regex/Regex.pod
 lib/Sidef/Types/String/String.pm
 lib/Sidef/Types/String/String.pod
 lib/Sidef/Variable/ClassInit.pm
+lib/Sidef/Variable/ClassInit.pod
 lib/Sidef/Variable/Const.pm
 lib/Sidef/Variable/Const.pod
 lib/Sidef/Variable/ConstInit.pm
@@ -149,6 +150,7 @@ lib/Sidef/Variable/Ref.pm
 lib/Sidef/Variable/Static.pm
 lib/Sidef/Variable/Static.pod
 lib/Sidef/Variable/Struct.pm
+lib/Sidef/Variable/Struct.pod
 lib/Sidef/Variable/Variable.pm
 LICENSE
 Makefile.PL
@@ -731,6 +733,7 @@ scripts/Tests/string_escapes.sf
 scripts/Tests/string_to_number.sf
 scripts/Tests/strip_chars_from_str.sf
 scripts/Tests/strip_non_ascii_chars.sf
+scripts/Tests/structures.sf
 scripts/Tests/subtractive_generator.sf
 scripts/Tests/swap.sf
 scripts/Tests/sylvesters_sequence.sf

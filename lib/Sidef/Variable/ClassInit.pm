@@ -6,31 +6,31 @@ package Sidef::Variable::ClassInit {
       Sidef::Object::Object
       );
 
-    sub __new__ {
+    sub new {
         my (undef, %opt) = @_;
         bless \%opt, __PACKAGE__;
     }
 
-    sub __set_params__ {
+    sub set_params {
         my ($self, $names) = @_;
-        $self->{__VARS__} = $names;
+        $self->{vars} = $names;
     }
 
-    sub __set_block__ {
+    sub set_block {
         my ($self, $block) = @_;
-        $self->{__BLOCK__} = $block;
+        $self->{block} = $block;
         $self;
     }
 
-    sub __add_method__ {
+    sub add_method {
         my ($self, $name, $method) = @_;
-        $self->{__METHODS__}{$name} = $method;
+        $self->{methods}{$name} = $method;
         $self;
     }
 
-    sub __add_vars__ {
+    sub add_vars {
         my ($self, $vars) = @_;
-        push @{$self->{__DEF_VARS__}}, @{$vars};
+        push @{$self->{def_vars}}, @{$vars};
         $self;
     }
 };
