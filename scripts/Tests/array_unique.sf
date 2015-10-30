@@ -5,15 +5,6 @@
 #
 
 
-var array = [
-             1, 2, 3, 'a', 'b', 'c', 2, 3, 4, 'b',
-             'c', 'd', 'd', 'd', 'b', '3', '2', 2,
-             ["hello"],["hello"],["perl","hacker"]
-            ];
-
-assert_eq(array.uniq, [1, 2, 3, "a", "b", "c", 4, "d", "3", "2", ["hello"], ["perl", "hacker"]]);
-assert_eq(array.last_uniq, [1, "a", 3, 4, "c", "d", "b", "3", "2", 2, ["hello"], ["perl", "hacker"]]);
-
 var array = [['a','b'], ['a'], ['a', 'b'], ['z']];
 
 assert_eq(array.uniq, [["a", "b"], ["a"], ["z"]]);

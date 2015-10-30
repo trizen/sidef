@@ -28,10 +28,14 @@ use Sidef;
 
 use File::Find qw(find);
 use File::Basename qw(basename);
+use File::Spec::Functions qw(catdir updir rel2abs);
+
+local $ENV{SIDEF_INC} = rel2abs(catdir(updir(), 'scripts', 'Tests'));
 
 sub parse_deparse {
     my ($code, $name) = @_;
 
+    local %Sidef::INCLUDED   = ();
     local @Sidef::NAMESPACES = ();
 
     my $parser = Sidef::Parser->new(
@@ -49,9 +53,7 @@ sub parse_deparse {
     return ($deparsed, \@statements);
 }
 
-my %ignore = (
-    'Matrix.sm'                         => 1,
-);
+my %ignore = ('module_definition.sf' => 1,);
 
 my $dir = shift() // die "usage: $0 [scripts dir]\n";
 

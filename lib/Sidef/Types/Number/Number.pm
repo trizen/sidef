@@ -374,8 +374,8 @@ package Sidef::Types::Number::Number {
     }
 
     sub inf {
-        my ($self) = @_;
-        $self->new(Math::BigInt->binf);
+        my ($self, $sign) = @_;
+        $self->new(Math::BigInt->binf(defined($sign) ? $sign->get_value : ()));
     }
 
     sub neg {

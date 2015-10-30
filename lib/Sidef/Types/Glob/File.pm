@@ -484,7 +484,7 @@ package Sidef::Types::Glob::File {
 
     sub dump {
         my ($self) = @_;
-        Sidef::Types::String::String->new('File.new(' . ${Sidef::Types::String::String->new($self->get_value)->dump} . ')');
+        Sidef::Types::String::String->new('File(' . ${Sidef::Types::String::String->new($self->get_value)->dump} . ')');
     }
 
     # Path split

@@ -14,6 +14,18 @@ package Sidef::Types::Byte::Bytes {
 
     sub call {
         my ($self, @strings) = @_;
+
+        # The arguments are already bytes
+        my $bytes = 1;
+        foreach my $obj (@strings) {
+            if (ref($obj) ne 'Sidef::Types::Byte::Byte') {
+                $bytes = 0;
+                last;
+            }
+        }
+        $bytes && return $self->new(@strings);
+
+        # The arguments are strings -- convert to bytes
         my $string = CORE::join('', @strings);
         state $x = require bytes;
         $self->new(map { Sidef::Types::Byte::Byte->new(CORE::ord bytes::substr($string, $_, 1)) }
@@ -43,7 +55,7 @@ package Sidef::Types::Byte::Bytes {
 
     sub dump {
         my ($self) = @_;
-        Sidef::Types::String::String->new('Bytes.new(' . CORE::join(', ', map { $_->dump->get_value } @{$self}) . ')');
+        Sidef::Types::String::String->new('Bytes(' . CORE::join(', ', map { $_->dump->get_value } @{$self}) . ')');
     }
 };
 

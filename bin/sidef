@@ -32,7 +32,7 @@ sub NATIVE () { 0 }
 my %args;
 if ($#ARGV != -1 and chr ord $ARGV[0] eq '-') {
     require Getopt::Std;
-    Getopt::Std::getopts('e:E:d:Dho:ivHn:WwbcrR:ts:C', \%args);
+    Getopt::Std::getopts('e:E:d:Dho:ivHn:WwbcrR:ts:CO:', \%args);
 }
 
 # Help
@@ -180,9 +180,6 @@ else {
             my $header = "\nuse lib (" . join(', ', map { qq{"\Q$_\E"} } @INC) . ");\n" . "use Sidef;\n";
             $deparsed = $header . $deparsed;
         }
-        else {
-            warn "\n# NOTE: deparsing to Sidef is not fully implemented!\n\n";
-        }
 
         output($deparsed);
     }
@@ -233,7 +230,35 @@ sub optimize_struct {
 
 sub parse_code {
     my ($parser, $code) = @_;
-    scalar $parser->parse_script(code => \$code);
+
+    my $struct = $parser->parse_script(code => \$code);
+
+    # Check for optimization
+    if (defined($args{O})) {
+
+        # Optimize the AST
+        if ($args{O} >= 1) {
+            $struct = optimize_struct($struct);
+        }
+
+        # Deparse the AST into code, then parse the code again.
+        if ($args{O} >= 2) {
+            my $deparser = Sidef::Deparse::Sidef->new(namespaces => [@Sidef::NAMESPACES]);
+            my $code = $deparser->deparse($struct);
+
+            local %Sidef::INCLUDED;
+            local @Sidef::NAMESPACES;
+
+            $struct = Sidef::Parser->new(
+                                         file_name   => $parser->{file_name},
+                                         script_name => $parser->{script_name},
+                                        )->parse_script(code => \$code);
+
+            $struct = optimize_struct($struct);
+        }
+    }
+
+    $struct;
 }
 
 sub load_math_backend {
@@ -264,6 +289,7 @@ sub output_usage {
                     '-d file'    => 'load a dumped syntax tree',
                     '-D'         => 'dump the syntax tree of a program',
                     '-o file'    => 'file where to dump the output',
+                    '-O level'   => ['perform code optimizations before execution', 'valid levels: 0, 1, 2'],
                     '-E program' => 'one line of program',
                     '-H'         => 'interactive help',
                     '-n type'    => ['try to use a specific backend for Math::BigInt', 'valid types: GMP, Pari, FastCalc'],
@@ -342,7 +368,8 @@ HELP
 
         my $parser = new_parser(name => '-H');
         $parser->{interactive} = 1;
-        my $struct = eval { $parser->parse_script(code => \$line) };
+
+        my $struct = eval { parse_code($parser, $line) };
 
         if ($@) {
             warn $@;
@@ -445,18 +472,15 @@ EOT
         }
 
         # Remove 'var' declarations (if any)
-        $line =~ s/^\h*var\b\h*//;
+        if (not defined($args{r}) and not defined($args{R})) {
+            $line =~ s/^\h*var\b\h*//;
+        }
 
         $last_line = $line;
-
-        my $struct = eval { $parser->parse_script(code => \$line) };
+        my $struct = eval { parse_code($parser, $line) };
 
         $@ && do {
             warn $@;
-
-            #  $parser = new_parser(name => '-i');
-            #  $parser->{interactive} = 1;
-
             redo;
         };
 
@@ -546,7 +570,7 @@ sub dump_structure {
         print {$out_fh} _get_namespaces();
         print {$out_fh} "use Math::BigFloat;\n";
         print {$out_fh} $requirify->(_get_loaded_modules());
-        print {$out_fh} Data::Dump::pp($struct);
+        print {$out_fh} Data::Dump::pp($struct) . "\n";
     }
 }
 
@@ -603,7 +627,7 @@ HEAD
 
                  close $fh;
              }
-           }
+         }
         } => $path
     );
 

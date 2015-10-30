@@ -18,7 +18,7 @@ package Sidef::Types::Grapheme::Graphemes {
 
     sub dump {
         my ($self) = @_;
-        Sidef::Types::String::String->new('Graphemes.new(' . join(', ', map { $_->dump->get_value } @{$self}) . ')');
+        Sidef::Types::String::String->new('Graphemes(' . join(', ', map { $_->dump->get_value } @{$self}) . ')');
     }
 };
 

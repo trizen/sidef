@@ -522,7 +522,7 @@ package Sidef::Types::Number::Complex {
 
     sub dump {
         my ($self) = @_;
-        Sidef::Types::String::String->new('Complex.new(' . $self->real . ', ', $self->imaginary . ')');
+        Sidef::Types::String::String->new('Complex(' . $self->real . ', ', $self->imaginary . ')');
     }
 
     {

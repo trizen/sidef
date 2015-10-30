@@ -19,7 +19,7 @@ package Sidef::Types::Grapheme::Grapheme {
 
     sub dump {
         my ($self) = @_;
-        Sidef::Types::String::String->new(q{Grapheme.new(} . $self->to_s->dump->get_value . q{)});
+        Sidef::Types::String::String->new(q{Grapheme(} . $self->to_s->dump->get_value . q{)});
     }
 };
 

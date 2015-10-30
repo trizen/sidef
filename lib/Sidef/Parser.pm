@@ -448,7 +448,9 @@ package Sidef::Parser {
                 elsif ($self->{interactive}) {
 
                     # Minor exception for interactive mode
-                    ++$variable->{obj}{in_use};
+                    if (ref $variable->{obj} eq 'HASH') {
+                        ++$variable->{obj}{in_use};
+                    }
 
                 }
                 elsif (   $variable->{count} == 0
@@ -1841,7 +1843,7 @@ package Sidef::Parser {
                   ) {
                     return
                       Sidef::Variable::Static->new(
-                                                   name => 'ANON',
+                                                   name => '__CONST__',
                                                    expr => {
                                                             $self->{class} => [
                                                                         {
@@ -2162,6 +2164,81 @@ package Sidef::Parser {
         return \@methods;
     }
 
+    sub parse_suffixes {
+        my ($self, %opt) = @_;
+
+        my $struct = $opt{struct};
+        local *_ = $opt{code};
+
+        my $parsed = 0;
+
+        {
+            if (/\G(?=\{)/) {
+                $struct->{$self->{class}}[-1]{self} = {
+                        $self->{class} => [
+                            {
+                             self => $struct->{$self->{class}}[-1]{self},
+                             exists($struct->{$self->{class}}[-1]{call}) ? (call => delete $struct->{$self->{class}}[-1]{call})
+                             : (),
+                             exists($struct->{$self->{class}}[-1]{ind}) ? (ind => delete $struct->{$self->{class}}[-1]{ind})
+                             : (),
+                             exists($struct->{$self->{class}}[-1]{lookup})
+                             ? (lookup => delete $struct->{$self->{class}}[-1]{lookup})
+                             : (),
+                            }
+                        ]
+                };
+
+                while (/\G(?=\{)/) {
+                    my $lookup = $self->parse_lookup(code => $opt{code});
+                    push @{$struct->{$self->{class}}[-1]{lookup}}, $lookup->{$self->{class}};
+                }
+
+                $parsed ||= 1;
+                redo;
+            }
+
+            if (/\G(?=\[)/) {
+                $struct->{$self->{class}}[-1]{self} = {
+                        $self->{class} => [
+                            {
+                             self => $struct->{$self->{class}}[-1]{self},
+                             exists($struct->{$self->{class}}[-1]{call}) ? (call => delete $struct->{$self->{class}}[-1]{call})
+                             : (),
+                             exists($struct->{$self->{class}}[-1]{ind}) ? (ind => delete $struct->{$self->{class}}[-1]{ind})
+                             : (),
+                             exists($struct->{$self->{class}}[-1]{lookup})
+                             ? (lookup => delete $struct->{$self->{class}}[-1]{lookup})
+                             : (),
+                            }
+                        ]
+                };
+
+                while (/\G(?=\[)/) {
+                    my ($ind) = $self->parse_expr(code => $opt{code});
+                    push @{$struct->{$self->{class}}[-1]{ind}}, $ind;
+                }
+
+                $parsed ||= 1;
+                redo;
+            }
+
+            if (/\G\h*(?=\()/gc) {
+                my $arg = $self->parse_arguments(code => $opt{code});
+
+                push @{$struct->{$self->{class}}[-1]{call}},
+                  {
+                    method => 'call',
+                    (%{$arg} ? (arg => [$arg]) : ())
+                  };
+
+                redo;
+            }
+        }
+
+        $parsed;
+    }
+
     sub parse_obj {
         my ($self, %opt) = @_;
 
@@ -2217,11 +2294,6 @@ package Sidef::Parser {
                 else {
                     die "[PARSER ERROR] The same object needs to be parsed again as a method for itself!";
                 }
-            }
-
-            while (/\G(?=\[)/) {
-                my ($ind) = $self->parse_expr(code => $opt{code});
-                push @{$struct{$self->{class}}[-1]{ind}}, $ind;
             }
 
             {
@@ -2307,53 +2379,8 @@ package Sidef::Parser {
                     }
                 }
 
-                if (/\G(?=\{)/) {
-                    $struct{$self->{class}}[-1]{self} = {
-                            $self->{class} => [
-                                {
-                                 self => $struct{$self->{class}}[-1]{self},
-                                 exists($struct{$self->{class}}[-1]{call}) ? (call => delete $struct{$self->{class}}[-1]{call})
-                                 : (),
-                                 exists($struct{$self->{class}}[-1]{ind}) ? (ind => delete $struct{$self->{class}}[-1]{ind})
-                                 : (),
-                                 exists($struct{$self->{class}}[-1]{lookup})
-                                 ? (lookup => delete $struct{$self->{class}}[-1]{lookup})
-                                 : (),
-                                }
-                            ]
-                    };
-
-                    while (/\G(?=\{)/) {
-                        my $lookup = $self->parse_lookup(code => $opt{code});
-                        push @{$struct{$self->{class}}[-1]{lookup}}, $lookup->{$self->{class}};
-                    }
-
-                    redo;
-                }
-
-                if (/\G(?=\[)/) {
-                    $struct{$self->{class}}[-1]{self} = {
-                            $self->{class} => [
-                                {
-                                 self => $struct{$self->{class}}[-1]{self},
-                                 exists($struct{$self->{class}}[-1]{call}) ? (call => delete $struct{$self->{class}}[-1]{call})
-                                 : (),
-                                 exists($struct{$self->{class}}[-1]{ind}) ? (ind => delete $struct{$self->{class}}[-1]{ind})
-                                 : (),
-                                 exists($struct{$self->{class}}[-1]{lookup})
-                                 ? (lookup => delete $struct{$self->{class}}[-1]{lookup})
-                                 : (),
-                                }
-                            ]
-                    };
-
-                    while (/\G(?=\[)/) {
-                        my ($ind) = $self->parse_expr(code => $opt{code});
-                        push @{$struct{$self->{class}}[-1]{ind}}, $ind;
-                    }
-
-                    redo;
-                }
+                # Parse array and hash fetchers ([...] and {...})
+                $self->parse_suffixes(code => $opt{code}, struct => \%struct) && redo;
 
                 if (/\G(?!\h*[=-]>)/ && /\G(?=$self->{operators_re})/o) {
                     my ($method, $req_arg, $op_type) = $self->get_method_name(code => $opt{code});
@@ -2781,6 +2808,7 @@ package Sidef::Parser {
                                               );
                         }
 
+                        $self->parse_suffixes(code => $opt{code}, struct => \%struct);
                         redo;
                     }
                     elsif (!$has_newline and /\G(if|while|and|or)\b\h*/gc) {

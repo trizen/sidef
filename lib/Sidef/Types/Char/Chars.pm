@@ -18,7 +18,7 @@ package Sidef::Types::Char::Chars {
 
     sub dump {
         my ($self) = @_;
-        Sidef::Types::String::String->new('Chars.new(' . join(', ', map { $_->dump->get_value } @{$self}) . ')');
+        Sidef::Types::String::String->new('Chars(' . join(', ', map { $_->dump->get_value } @{$self}) . ')');
     }
 };
 

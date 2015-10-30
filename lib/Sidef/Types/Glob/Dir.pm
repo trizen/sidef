@@ -186,7 +186,7 @@ package Sidef::Types::Glob::Dir {
 
     sub dump {
         my ($self) = @_;
-        Sidef::Types::String::String->new('Dir.new(' . ${Sidef::Types::String::String->new($self->get_value)->dump} . ')');
+        Sidef::Types::String::String->new('Dir(' . ${Sidef::Types::String::String->new($self->get_value)->dump} . ')');
     }
 
     {

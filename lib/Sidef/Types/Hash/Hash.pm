@@ -319,7 +319,7 @@ package Sidef::Types::Hash::Hash {
         my @keys = sort { (lc($a) cmp lc($b)) || ($a cmp $b) } CORE::keys(%{$self});
 
         my $str = Sidef::Types::String::String->new(
-            "Hash.new(" . (
+            "Hash(" . (
                 @keys
                 ? (
                    (@keys > 1 ? "\n" : '') . join(

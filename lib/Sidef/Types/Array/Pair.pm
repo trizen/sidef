@@ -66,7 +66,7 @@ package Sidef::Types::Array::Pair {
         my ($self) = @_;
 
         Sidef::Types::String::String->new(
-            "Pair.new(" . "\n" . join(
+            "Pair(" . "\n" . join(
                 ",\n",
 
                 (' ' x ($Sidef::SPACES += $Sidef::SPACES_INCR)) . join(

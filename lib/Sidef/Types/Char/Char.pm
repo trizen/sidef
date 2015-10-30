@@ -19,7 +19,7 @@ package Sidef::Types::Char::Char {
 
     sub dump {
         my ($self) = @_;
-        Sidef::Types::String::String->new(q{Char.new(} . $self->to_s->dump->get_value . q{)});
+        Sidef::Types::String::String->new(q{Char(} . $self->to_s->dump->get_value . q{)});
     }
 };
 

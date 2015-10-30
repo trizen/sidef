@@ -107,7 +107,7 @@ HEADER
         }
     }
 
-    sub _get_reftype {
+    sub _dump_reftype {
         my ($self, $obj) = @_;
 
         my $ref = ref($obj);
@@ -326,7 +326,7 @@ HEADER
 
                 if (exists($var->{ref_type})) {
                     my $var_name = "\$$var->{name}" . refaddr($var);
-                    my $type     = $self->_get_reftype($var->{ref_type});
+                    my $type     = $self->_dump_reftype($var->{ref_type});
                     $code .=
                         (' ' x $Sidef::SPACES)
                       . "(ref($var_name) eq $type || ($type ne 'REF' && eval{$var_name->SUPER::isa($type)})) or "
@@ -418,9 +418,14 @@ HEADER
 
     sub deparse_bare_block {
         my ($self, @args) = @_;
-        $self->deparse_generic("{\n" . " " x ($Sidef::SPACES + $Sidef::SPACES_INCR),
-                               ";\n" . (" " x ($Sidef::SPACES + $Sidef::SPACES_INCR)),
-                               "\n" . (" " x $Sidef::SPACES) . "}", @args);
+
+        $Sidef::SPACES += $Sidef::SPACES_INCR;
+        my $code = $self->deparse_generic("{\n" . " " x ($Sidef::SPACES),
+                                          ";\n" . (" " x ($Sidef::SPACES)),
+                                          "\n" .  (" " x ($Sidef::SPACES - $Sidef::SPACES_INCR)) . "}", @args);
+        $Sidef::SPACES -= $Sidef::SPACES_INCR;
+
+        $code;
     }
 
     sub deparse_expr {
@@ -433,7 +438,7 @@ HEADER
         # Self obj
         my $ref = ref($obj);
         if ($ref eq 'HASH') {
-            $code = join(', ', $self->deparse_script($obj));
+            $code = join(', ', exists($obj->{self}) ? $self->deparse_expr($obj) : $self->deparse_script($obj));
         }
         elsif ($ref eq 'Sidef::Variable::Variable') {
             if ($obj->{type} eq 'var') {
@@ -498,7 +503,7 @@ HEADER
                     # Check the return value (when "-> Type" is specified)
                     if (exists $obj->{returns}) {
 
-                        my $type = $self->_get_reftype($obj->{returns});
+                        my $type = $self->_dump_reftype($obj->{returns});
 
                         $code =
                             "do { $code;\n"
@@ -634,9 +639,7 @@ HEADER
             }
         }
         elsif ($ref eq 'Sidef::Variable::ConstInit') {
-            foreach my $var (@{$obj->{vars}}) {
-                $code .= $self->deparse_expr({self => $var}) . ";\n";
-            }
+            $code = join(";\n" . (" " x $Sidef::SPACES), map { $self->deparse_expr({self => $_}) } @{$obj->{vars}});
         }
         elsif ($ref eq 'Sidef::Variable::Init') {
             $code = $self->_dump_init_vars($obj);
@@ -860,20 +863,10 @@ HEADER
             $code = $self->make_constant($ref, '__NEW__', "MOD_F$refaddr", $self->_dump_string($obj->{module}));
         }
         elsif ($ref eq 'Sidef::Types::Block::Break') {
-            if (not exists $expr->{call}) {
-                $code = 'last';
-            }
-            else {
-                die "[ERROR] Arguments and method calls for 'break' are not supported!";
-            }
+            $code = 'last';
         }
         elsif ($ref eq 'Sidef::Types::Block::Next') {
-            if (not exists $expr->{call}) {
-                $code = 'next';
-            }
-            else {
-                die "[ERROR] Arguments and method calls for 'next' are not supported!";
-            }
+            $code = 'next';
         }
         elsif ($ref eq 'Sidef::Types::Block::Continue') {
             $code = 'continue';
@@ -947,7 +940,7 @@ HEADER
             $code = $self->make_constant($ref, 'new', "Sig$refaddr");
         }
         elsif ($ref eq 'Sidef::Types::Number::Complex') {
-            $code = $self->make_constant($ref, 'new', "Complex$refaddr");
+            $code = $self->make_constant($ref, 'new', "Complex$refaddr", "'" . ${$obj}->Re . "'", "'" . ${$obj}->Im . "'");
         }
         elsif ($ref eq 'Sidef::Types::Array::Pair') {
             $code = $ref . '->new';
@@ -969,12 +962,7 @@ HEADER
             $code = $self->_dump_array('Sidef::Types::Array::Array', $obj);
         }
         elsif ($ref eq 'Sidef::Types::Nil::Nil') {
-            if (not exists $expr->{call}) {
-                $code = 'undef';
-            }
-            else {
-                die "[ERROR] Arguments and method calls for 'nil' are not supported!";
-            }
+            $code = 'undef';
         }
         elsif ($ref eq 'Sidef::Types::Null::Null') {
             $code = $self->make_constant($ref, 'new', "Null$refaddr");
@@ -1230,8 +1218,9 @@ HEADER
                         }
                     }
 
-                    if (ref($method) eq 'HASH') {
-                        $code .= '->${\\do{' . $self->deparse_expr($method) . '}}';
+                    if (ref($method)) {
+                        $code .=
+                          '->${\\do{' . $self->deparse_expr(ref($method) eq 'HASH' ? $method : {self => $method}) . '}}';
                     }
                     elsif ($method =~ /^[\pL_]/) {
 
@@ -1304,7 +1293,7 @@ HEADER
                 if (exists $call->{block}) {
                     if ($ref eq 'Sidef::Types::Block::Given'
                         or ($ref eq 'Sidef::Types::Block::If' and $i == $#{$expr->{call}})) {
-                        $code = "do { " . $code . $self->deparse_bare_block(@{$call->{block}}) . '}';
+                        $code = "do {\n" . (' ' x $Sidef::SPACES) . $code . $self->deparse_bare_block(@{$call->{block}}) . '}';
                     }
                     else {
                         $code .= $self->deparse_bare_block(@{$call->{block}});
@@ -1330,11 +1319,24 @@ HEADER
 
                 push @results, ref($expr) eq 'HASH' ? $self->deparse_expr($expr) : $self->deparse_expr({self => $expr});
 
-                if ($i > 0 and ref($struct->{$class}[$i - 1]{self}) eq 'Sidef::Variable::Label') {
-                    $results[-1] = $struct->{$class}[$i - 1]{self}->{name} . ':' . $results[-1];
+                if (
+                    $i > 0
+                    and (
+                         ref($expr) eq 'Sidef::Variable::Label'
+                         or (    ref($struct->{$class}[$i - 1]) eq 'HASH'
+                             and ref($struct->{$class}[$i - 1]{self}) eq 'Sidef::Variable::Label')
+                        )
+                  ) {
+                    $results[-1] =
+                      (ref($expr) eq 'Sidef::Variable::Label' ? $expr->{name} : $struct->{$class}[$i - 1]{self}->{name}) . ':'
+                      . $results[-1];
                 }
-                elsif ($i == $max and ref($expr->{self}) eq 'Sidef::Variable::Label') {
-                    $results[-1] = $expr->{self}{name} . ':';
+                elsif (
+                       $i == $max
+                       and (ref($expr) eq 'Sidef::Variable::Label'
+                            or (ref($expr) eq 'HASH' and ref($expr->{self}) eq 'Sidef::Variable::Label'))
+                  ) {
+                    $results[-1] = (ref($expr) eq 'Sidef::Variable::Label' ? $expr->{name} : $expr->{self}{name}) . ':';
                 }
             }
         }

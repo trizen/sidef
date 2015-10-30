@@ -1,6 +1,7 @@
 package Sidef::Optimizer {
 
     use 5.014;
+    require Scalar::Util;
 
     use constant {
                   STRING  => 'Sidef::Types::String::String',
@@ -491,7 +492,6 @@ package Sidef::Optimizer {
                 ## ok
             }
             elsif ($obj->{type} eq 'func' or $obj->{type} eq 'method') {
-                state $x = require Scalar::Util;
                 if ($addr{Scalar::Util::refaddr($obj)}++) {
                     ## ok
                 }
@@ -501,7 +501,6 @@ package Sidef::Optimizer {
             }
         }
         elsif ($ref eq 'Sidef::Variable::ClassInit') {
-            state $x = require Scalar::Util;
             if ($addr{Scalar::Util::refaddr($obj)}++) {
                 ## ok
             }
@@ -509,8 +508,18 @@ package Sidef::Optimizer {
                 $obj->{__BLOCK__} = $self->optimize_expr({self => $obj->{__BLOCK__}});
             }
         }
-        elsif ($ref eq 'Sidef::Types::Block::Code') {
-            state $x = require Scalar::Util;
+        elsif ($ref eq 'Sidef::Variable::Init') {
+            if ($addr{Scalar::Util::refaddr($obj)}++) {
+                ## ok
+            }
+            else {
+                if (exists $obj->{args}) {
+                    my %code = $self->optimize($obj->{args});
+                    $obj->{args} = \%code;
+                }
+            }
+        }
+        elsif ($ref eq 'Sidef::Types::Block::CodeInit') {
             if ($addr{Scalar::Util::refaddr($obj)}++) {
                 ## ok
             }
@@ -527,20 +536,28 @@ package Sidef::Optimizer {
             }
         }
 
-        if (not exists $expr->{ind} and not exists $expr->{call}) {
-            return $obj;
+        if (not exists($expr->{ind}) and not exists($expr->{lookup}) and not exists($expr->{call})) {
+            return (ref($obj) eq 'HASH' ? {self => $obj} : $obj);
         }
 
         $obj = {
                 self => $obj,
-                (exists($expr->{ind})  ? (ind  => []) : ()),
-                (exists($expr->{call}) ? (call => []) : ()),
+                (exists($expr->{ind})    ? (ind    => []) : ()),
+                (exists($expr->{lookup}) ? (lookup => []) : ()),
+                (exists($expr->{call})   ? (call   => []) : ()),
                };
 
-        # Indices
+        # Array indices
         if (exists $expr->{ind}) {
             foreach my $i (0 .. $#{$expr->{ind}}) {
                 $obj->{ind}[$i] = [map { $self->optimize_expr($_) } @{$expr->{ind}[$i]}];
+            }
+        }
+
+        # Hash lookup
+        if (exists $expr->{lookup}) {
+            foreach my $i (0 .. $#{$expr->{lookup}}) {
+                $obj->{lookup}[$i] = [map { ref($_) eq 'HASH' ? $self->optimize_expr($_) : $_ } @{$expr->{lookup}[$i]}];
             }
         }
 
@@ -555,17 +572,32 @@ package Sidef::Optimizer {
 
                 # Method call
                 my $method = $call->{method};
-                if (ref($method) eq 'HASH') {
-                    $method = $self->optimize_expr($method) // {self => {}};
-                }
 
-                $obj->{call}[$i] = {method => $method};
+                if (defined $method) {
+                    if (ref($method) eq 'HASH') {
+                        $method = $self->optimize_expr($method) // {self => {}};
+                    }
+
+                    $obj->{call}[$i] = {method => $method};
+                }
+                elsif (exists $call->{keyword}) {
+                    $obj->{call}[$i] = {keyword => $call->{keyword}};
+                }
 
                 # Method arguments
                 if (exists $call->{arg}) {
                     foreach my $j (0 .. $#{$call->{arg}}) {
                         my $arg = $call->{arg}[$j];
-                        push @{$obj->{call}[$i]{arg}},
+                        push @{$obj->{call}[$i]{arg}}, ref $arg eq 'HASH'
+                          && $ref_obj ne 'Sidef::Types::Block::For' ? do { my %arg = $self->optimize($arg); \%arg } : $arg;
+                    }
+                }
+
+                # Block
+                if (exists $call->{block}) {
+                    foreach my $j (0 .. $#{$call->{block}}) {
+                        my $arg = $call->{block}[$j];
+                        push @{$obj->{call}[$i]{block}},
                           ref $arg eq 'HASH' ? do { my %arg = $self->optimize($arg); \%arg } : $arg;
                     }
                 }
@@ -577,6 +609,7 @@ package Sidef::Optimizer {
                 if (    defined($ref_obj)
                     and exists($rules{$ref_obj})
                     and not exists($expr->{ind})
+                    and not exists($expr->{lookup})
                     and ref($method) eq '') {
 
                     my $code = $ref_obj->SUPER::can($method);
@@ -632,7 +665,7 @@ package Sidef::Optimizer {
 
             if ($count > 0) {
                 if ($count == @{$obj->{call}}) {
-                    if (not exists $expr->{ind}) {
+                    if (not exists $expr->{ind} and not exists $expr->{lookup}) {
                         return $obj->{self};
                     }
                     else {
