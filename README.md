@@ -5,6 +5,7 @@ Sidef
 
 To learn about Sidef, check out the following links:
 
+* Github: https://github.com/trizen/sidef
 * Gitbook: http://trizen.gitbooks.io/sidef-lang/content/
 * Tutorial: https://github.com/trizen/sidef/wiki
 * RosettaCode: http://rosettacode.org/wiki/Sidef

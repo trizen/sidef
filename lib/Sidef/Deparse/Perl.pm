@@ -733,7 +733,7 @@ HEADER
                                  ? (join(' ', map { ref($_) ? $self->_dump_class_name($_) : $_ } @{$self->{inherit}}) . ' ')
                                  : ''
                                 )
-                              . "Sidef::Object::Object);\n";
+                              . ($self->{package_name} eq 'Sidef::Object::Object' ? '' : "Sidef::Object::Object") . ");\n";
                         }
 
                         if ($is_class and exists $self->{class_vars} and not $self->{ref_class}) {

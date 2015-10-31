@@ -232,6 +232,7 @@ scripts/Graphical/user_input.sf
 scripts/Graphical/window_creation.sf
 scripts/Graphical/window_creation_1.sf
 scripts/Graphical/yin_and_yang.sf
+scripts/happy_numbers.sf
 scripts/huffman_coding.sf
 scripts/Interactive/cosmic_calendar.sf
 scripts/Interactive/draw_a_clock.sf
@@ -356,6 +357,7 @@ scripts/RosettaCode/entropy.sf
 scripts/RosettaCode/enumerations.sf
 scripts/RosettaCode/enumerations_1.sf
 scripts/RosettaCode/equilibrium_index.sf
+scripts/RosettaCode/euler_method.sf
 scripts/RosettaCode/evaluate_binomial_coefficients.sf
 scripts/RosettaCode/factorial.sf
 scripts/RosettaCode/fibonacci_n-step_number_sequence.sf
@@ -536,6 +538,7 @@ scripts/RosettaCode/walk_a_dir_non_recursively.sf
 scripts/RosettaCode/word_wrap.sf
 scripts/RosettaCode/zeckendorf_number_representation.sf
 scripts/RosettaCode/zig-zag_matrix.sf
+scripts/sets.sf
 scripts/sierpinski_triangle.sf
 scripts/simple_moving_average.sf
 scripts/simple_moving_average_oo.sf
