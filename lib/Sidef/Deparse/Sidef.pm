@@ -10,17 +10,12 @@ package Sidef::Deparse::Sidef {
         my (undef, %args) = @_;
 
         my %opts = (
-                    before         => '',
-                    between        => ";\n",
-                    after          => ";\n",
-                    class          => 'main',
-                    extra_parens   => 0,
-                    namespaces     => [],
-                    obj_with_block => {
-                                       'Sidef::Types::Block::While' => {
-                                                                        while => 1,
-                                                                       },
-                                      },
+                    before       => '',
+                    between      => ";\n",
+                    after        => ";\n",
+                    class        => 'main',
+                    extra_parens => 0,
+                    namespaces   => [],
                     %args,
                    );
         %addr = ();    # reset the addr map
