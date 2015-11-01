@@ -1,0 +1,43 @@
+#!/usr/bin/ruby
+
+#
+## Test 1
+#
+
+class Example {
+    method foo(arg) {
+        assert_eq(self{:bar}, arg);
+    }
+}
+
+var obj = Example();
+
+obj{:bar} = 21;     # add some value inside the object
+obj.foo(21);        # call the method foo
+
+do {
+    local obj{:bar} = 42;       # localize the value of 'bar' to 42
+    obj.foo(42);                # call the method foo
+    assert_eq(obj{:bar}, 42);
+}
+
+obj.foo(21);               # the value of bar is unlocalized here
+assert_eq(obj{:bar}, 21);  # test again to be sure
+
+
+#
+## Test 2
+#
+
+global x = 42;
+
+do {
+    assert_eq(x, 42);
+    local x = 100;
+    assert_eq(x, 100);
+}
+
+assert_eq(x, 42);
+
+
+say "** Test passed!";

@@ -605,14 +605,8 @@ HEADER
                 $Sidef::SPACES -= $Sidef::SPACES_INCR;
             }
         }
-        elsif ($ref eq 'Sidef::Variable::LocalInit') {
-            $code = 'local $' . $obj->{class} . '::' . $obj->{name};
-        }
-        elsif ($ref eq 'Sidef::Variable::LocalMagic') {
-            $code = 'local ' . $obj->{name};
-        }
         elsif ($ref eq 'Sidef::Variable::Local') {
-            $code = '$' . $obj->{class} . '::' . $obj->{name};
+            $code = 'local ' . $self->deparse_script($obj->{expr});
         }
         elsif ($ref eq 'Sidef::Variable::Global') {
             $code = '$' . $obj->{class} . '::' . $obj->{name},;

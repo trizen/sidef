@@ -1196,14 +1196,15 @@ package Sidef::Parser {
                 return {$self->{class} => [{self => $obj, call => [{method => '@*'}]}]};
             }
 
-            # Localization of magic variables
-            if (/\Glocal\h*(\$[.,\/\@\\+\-:;"'`><?~!\$%&|()\[\]])/gc) {
-                return Sidef::Variable::LocalMagic->new(name => $1);
+            # Local variables
+            if (/\Glocal\b\h*/gc) {
+                my $expr = $self->parse_obj(code => $opt{code});
+                return Sidef::Variable::Local->new(expr => $expr);
             }
 
             # Declaration of local variables, classes, methods and functions
             if (
-                   /\G(local|global|func|class)\b\h*/gc
+                   /\G(func|class|global)\b\h*/gc
                 || /\G(->)\h*/gc
                 || (exists($self->{current_class})
                     && /\G(method)\b\h*/gc)
@@ -1257,16 +1258,11 @@ package Sidef::Parser {
                 }
 
                 if ($type ne 'class') {
-                    $name =
-                        /\G($self->{var_name_re})\h*/goc ? $1
-                      : $type eq 'method' && /\G($self->{operators_re})\h*/goc ? $+
-                      : $type ne 'local' ? ''
-                      : $self->fatal_error(
-                                           error    => "invalid '$type' declaration",
-                                           expected => "expected a name",
-                                           code     => $_,
-                                           pos      => pos($_)
-                                          );
+                    $name = (
+                               /\G($self->{var_name_re})\h*/goc ? $1
+                             : $type eq 'method' && /\G($self->{operators_re})\h*/goc ? $+
+                             :                                                          ''
+                            );
                     ($name, $class_name) = $self->get_name_and_class($name);
                 }
 
@@ -1283,11 +1279,10 @@ package Sidef::Parser {
                 }
 
                 my $obj =
-                    $type eq 'local' ? Sidef::Variable::Local->new(name => $name, class => $class_name)
-                  : $type eq 'global' ? Sidef::Variable::Global->new(name => $name, class => $class_name)
-                  : $type eq 'func'   ? Sidef::Variable::Variable->new(name => $name, type => $type, class => $class_name)
+                    $type eq 'func'   ? Sidef::Variable::Variable->new(name => $name, type => $type, class => $class_name)
                   : $type eq 'method' ? Sidef::Variable::Variable->new(name => $name, type => $type, class => $class_name)
                   : $type eq 'class' ? Sidef::Variable::ClassInit->new(name => ($built_in_obj // $name), class => $class_name)
+                  : $type eq 'global' ? Sidef::Variable::Global->new(name => $name, class => $class_name)
                   : $self->fatal_error(
                                        error    => "invalid type",
                                        expected => "expected a magic thing to happen",
@@ -1327,10 +1322,7 @@ package Sidef::Parser {
                       };
                 }
 
-                if ($type eq 'local') {
-                    return Sidef::Variable::LocalInit->new(name => $name, class => $class_name);
-                }
-                elsif ($type eq 'global') {
+                if ($type eq 'global') {
                     return $obj;
                 }
 

@@ -201,11 +201,8 @@ package Sidef::Deparse::Sidef {
                 $code = "struct $obj->{name} {" . $self->_dump_vars(@{$obj->{vars}}) . '}';
             }
         }
-        elsif ($ref eq 'Sidef::Variable::LocalInit') {
-            $code = "local $obj->{name}";
-        }
         elsif ($ref eq 'Sidef::Variable::Local') {
-            $code = "$obj->{name}";
+            $code = 'local ' . '(' . $self->deparse_script($obj->{expr}) . ')';
         }
         elsif ($ref eq 'Sidef::Variable::Global') {
             $code = 'global ' . $obj->{class} . '::' . $obj->{name},;
@@ -215,12 +212,6 @@ package Sidef::Deparse::Sidef {
         }
         elsif ($ref eq 'Sidef::Variable::ConstInit') {
             $code = join(";\n" . (" " x $Sidef::SPACES), map { $self->deparse_expr({self => $_}) } @{$obj->{vars}});
-        }
-        elsif ($ref eq 'Sidef::Variable::LocalInit') {
-            $code = 'local ' . $obj->{class} . '::' . $obj->{name};
-        }
-        elsif ($ref eq 'Sidef::Variable::LocalMagic') {
-            $code = 'local ' . $obj->{name};
         }
         elsif ($ref eq 'Sidef::Types::Range::RangeNumber' or $ref eq 'Sidef::Types::Range::RangeString') {
             $code = $self->_dump_reftype($obj);

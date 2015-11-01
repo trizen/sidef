@@ -138,10 +138,6 @@ lib/Sidef/Variable/Label.pm
 lib/Sidef/Variable/Label.pod
 lib/Sidef/Variable/LazyMethod.pm
 lib/Sidef/Variable/Local.pm
-lib/Sidef/Variable/LocalInit.pm
-lib/Sidef/Variable/LocalInit.pod
-lib/Sidef/Variable/LocalMagic.pm
-lib/Sidef/Variable/LocalMagic.pod
 lib/Sidef/Variable/Magic.pm
 lib/Sidef/Variable/Magic.pod
 lib/Sidef/Variable/NamedParam.pm
@@ -629,6 +625,7 @@ scripts/Tests/levenshtein_distance_cached.sf
 scripts/Tests/Lingua/RO/Numbers.sm
 scripts/Tests/lingua_ro.sf
 scripts/Tests/lingua_ro_numbers.sf
+scripts/Tests/local_vars.sf
 scripts/Tests/logic.sf
 scripts/Tests/long_division.sf
 scripts/Tests/longest_common_prefix.sf

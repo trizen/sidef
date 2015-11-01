@@ -172,10 +172,6 @@ provides:
     file: lib/Sidef/Variable/LazyMethod.pm
   Sidef::Variable::Local:
     file: lib/Sidef/Variable/Local.pm
-  Sidef::Variable::LocalInit:
-    file: lib/Sidef/Variable/LocalInit.pm
-  Sidef::Variable::LocalMagic:
-    file: lib/Sidef/Variable/LocalMagic.pm
   Sidef::Variable::Magic:
     file: lib/Sidef/Variable/Magic.pm
   Sidef::Variable::NamedParam:
