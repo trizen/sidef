@@ -1,0 +1,38 @@
+#!/usr/bin/ruby
+
+# Find the sum of the first thirty golden nuggets.
+
+# https://projecteuler.net/problem=140
+
+# Answer: 5673835352990
+
+func lucas(n) is cached {
+    n.is_one ? 1
+             : (n.is_zero ? 2
+                          : (lucas(n-1) + lucas(n-2)));
+}
+
+func fib(n) is cached {
+    n.is_one ? 1
+             : (n.is_zero ? 0
+                          : (fib(n-1) + fib(n-2)));
+}
+
+func f(x) {
+    - x*(3*x + 1) / (x**2 + x - 1) -> roundf(0);
+}
+
+var sum = 0;
+
+30.times { |i|          # starts at 1
+    if (i.is_even) {
+        sum += f(fib(i)/fib(i+1));
+    }
+    else {
+        var a = fib(i+1)+lucas(i);
+        var b = fib(i+2)+lucas(i+1);
+        sum += f(a/b);
+    }
+}
+
+say sum;

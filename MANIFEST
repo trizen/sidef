@@ -303,6 +303,7 @@ scripts/permutations_rec.sf
 'scripts/Project Euler/0097-large_non-mersenne_prime.sf'
 'scripts/Project Euler/0120-square_remainders.sf'
 'scripts/Project Euler/0137-fibonacci_golden_nuggets.sf'
+'scripts/Project Euler/0140-modified_fibonacci_golden_nuggets.sf'
 'scripts/Project Euler/0187-semiprimes.sf'
 scripts/pythagorean_means.sf
 scripts/reverse_the_gender_of_a_string.sf
