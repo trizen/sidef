@@ -1,0 +1,27 @@
+#!/usr/bin/ruby
+
+# What is the side length of the square spiral for which the ratio of primes along both diagonals first falls below 10%?
+
+# https://projecteuler.net/problem=58
+
+# Answer: 26241
+
+var nt = frequire('ntheory');
+
+var f1 = func(n) { 3 + n*(4*n - 6) };
+var f2 = func(n) { 5 + n*(4*n - 8) };
+var f3 = func(n) { 7 + n*(4*n - 10) };
+
+var primes = 0;
+range(1, Math.inf).each { |i|
+
+    var total = (4*(i-1) + 1);
+    var side  = (2*(i-1) + 1);
+
+    primes += [f1(i), f2(i), f3(i)].count { nt.is_prime(_) };
+
+    if (side > 7 && (primes/total < 0.1)) {
+        say side;
+        break;
+    }
+}
