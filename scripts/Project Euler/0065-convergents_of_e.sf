@@ -1,0 +1,28 @@
+#!/usr/bin/ruby
+
+# Find the sum of digits in the numerator of the 100th convergent of the continued fraction for e.
+
+# https://projecteuler.net/problem=65
+
+# Answer: 272
+
+var one = 1.rat;
+var two = 2.rat;
+
+func e(n, i=1) {
+
+    return 0 if (i >= n);
+
+    one/(
+        one + one/(
+            two*i + one/(
+                one + e(n, i+1)
+            )
+        )
+    )
+}
+
+var n = 100;
+var frac = two+e(int(n/3 + 1));
+
+say frac.numerator.digits.sum;
