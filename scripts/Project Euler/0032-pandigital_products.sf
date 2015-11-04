@@ -1,0 +1,41 @@
+#!/usr/bin/ruby
+
+# Find the sum of all products whose multiplicand/multiplier/product identity can be written as a 1 through 9 pandigital.
+
+# https://projecteuler.net/problem=32
+
+# Answer: 45228
+
+func valid_num(n) {
+    var digits = n.digits;
+
+    return false if (digits.contains(0));
+    return false if (digits.unique.len != n.len);
+
+    return true;
+}
+
+var a = (1...99   -> grep(valid_num));
+var b = (1...9999 -> grep(valid_num));
+
+var sum = 0;
+var seen = Hash.new;
+
+a.each { |x|
+    b.each { |y|
+        var prod = x*y;
+        var pd = ("%s%s%s" % (x, y, prod));
+
+        pd.len == 9        || next;
+        valid_num(prod)    || next;
+        valid_num(pd.to_i) || next;
+
+        next if seen.has_key(prod);
+        seen{prod} = 1;
+
+        say "#{x} * #{y} = #{prod}";
+        sum += prod;
+    }
+}
+
+say sum;

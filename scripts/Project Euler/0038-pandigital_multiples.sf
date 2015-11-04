@@ -1,0 +1,36 @@
+#!/usr/bin/ruby
+
+# What is the largest 1 to 9 pandigital 9-digit number that can be formed as the concatenated product of an integer with (1,2, ... , n) where n > 1?
+
+# https://projecteuler.net/problem=38
+
+# Answer: 932718654
+
+func valid_num(n) {
+    var digits = n.digits;
+
+    return false if (digits.contains(0));
+    return false if (digits.unique.len != n.len);
+
+    return true;
+}
+
+var max = 0;
+range(1, 10000).each { |i|
+    valid_num(i) || next;
+
+    var prod = i.to_s;
+    range(2, 9).each { |n|
+
+        var last = prod;
+        prod += (n*i -> to_s);
+
+        if (!valid_num(prod.to_i)) {
+            last = last.to_i;
+            max = last if (max < last);
+            break;
+        }
+    }
+}
+
+say max;

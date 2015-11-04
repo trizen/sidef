@@ -993,6 +993,8 @@ package Sidef::Types::Array::Array {
         Sidef::Types::Bool::Bool->false;
     }
 
+    *contain = \&contains;
+
     sub contains_type {
         my ($self, $obj) = @_;
 

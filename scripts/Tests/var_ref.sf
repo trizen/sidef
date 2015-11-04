@@ -118,3 +118,22 @@ x = text;
     is(*rv, 20);
     is(20, value);
 }.run;
+
+
+#
+## Even more tests
+#
+
+func max(a, b, c) {
+    if (*a > *b) {
+        *c = a;
+    } else {
+        *c = b;
+    }
+}
+
+var i = 3;
+var j = 5;
+
+max(\i, \j, \var k);
+assert_eq(*k, j);
