@@ -283,6 +283,7 @@ scripts/permutations_rec.sf
 'scripts/Project Euler/0026-reciprocal_cycles.sf'
 'scripts/Project Euler/0028-number_spiral_diagonals.sf'
 'scripts/Project Euler/0029-distinct_powers.sf'
+'scripts/Project Euler/0031-coin_sums.sf'
 'scripts/Project Euler/0032-pandigital_products.sf'
 'scripts/Project Euler/0034-digit_factorials.sf'
 'scripts/Project Euler/0035-circular_primes.sf'

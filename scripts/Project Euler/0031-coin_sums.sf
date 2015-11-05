@@ -1,0 +1,29 @@
+#!/usr/bin/ruby
+
+# It is possible to make £2 in the following way:
+# 1×£1 + 1×50p + 2×20p + 1×5p + 1×2p + 3×1p
+
+# How many different ways can £2 be made using any number of coins?
+
+# https://projecteuler.net/problem=31
+
+# Answer: 73682
+
+var target = 200;
+var coins = [1, 2, 5, 10, 20, 50, 100, 200];
+
+func num_paths(startsum, lastcoin) is cached {
+
+    return 1 if (startsum == target);
+
+    var paths = 0;
+    coins.each { |coin|
+        if ((lastcoin >= coin) && (startsum <= (target - coin))) {
+            paths += num_paths(startsum + coin, coin);
+        }
+    }
+
+    paths;
+}
+
+say num_paths(0, target);
