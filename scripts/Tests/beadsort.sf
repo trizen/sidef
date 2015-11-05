@@ -1,0 +1,25 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Sorting_algorithms/Bead_sort#Sidef
+#
+
+func beadsort(arr) {
+
+    var columns = [];
+    var rows = [];
+
+    arr.each { |datum|
+        range(0, datum-1).each { |column|
+            ++(columns[column] := 0);
+            ++(rows[columns[column] - 1] := 0);
+        }
+    }
+
+    rows.reverse;
+}
+
+var arr = [5,3,1,7,4,1,1];
+assert_eq(beadsort(arr), [1, 1, 1, 3, 4, 5, 7]);
+
+say "** Test passed!";
