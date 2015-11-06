@@ -741,8 +741,6 @@ package Sidef::Types::Array::Array {
         Sidef::Types::Array::MultiArray->new($self, @args);
     }
 
-    *pairWith = \&pair_with;
-
     sub reduce {
         my ($self, $obj) = @_;
 
@@ -911,7 +909,7 @@ package Sidef::Types::Array::Array {
         $self->new(grep { defined } @unique);
     }
 
-    *last_unique_by = \&uniq_by;
+    *last_unique_by = \&last_uniq_by;
 
     sub abbrev {
         my ($self, $code) = @_;
@@ -1151,8 +1149,6 @@ package Sidef::Types::Array::Array {
         $self->new(@array);
     }
 
-    *joinInsert = \&join_insert;
-
     sub permute {
         my ($self, $code) = @_;
 
@@ -1290,7 +1286,7 @@ package Sidef::Types::Array::Array {
         Sidef::Types::Bool::Bool->false;
     }
 
-    *remove_last = \&delete_first;
+    *remove_last = \&delete_last;
 
     sub delete {
         my ($self, $obj) = @_;
@@ -1335,6 +1331,22 @@ package Sidef::Types::Array::Array {
     }
 
     *remove_first_if = \&delete_first_if;
+
+    sub delete_last_if {
+        my ($self, $code) = @_;
+
+        for (my $i = $#{$self} ; $i >= 0 ; --$i) {
+            my $item = $self->[$i];
+            $code->run($item) && do {
+                CORE::splice(@{$self}, $i, 1);
+                return Sidef::Types::Bool::Bool->true;
+              }
+        }
+
+        Sidef::Types::Bool::Bool->false;
+    }
+
+    *remove_last_if = \&delete_last_if;
 
     sub to_list {
         @{$_[0]};

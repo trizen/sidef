@@ -115,7 +115,7 @@ I<Obj> B<:> I<Obj> -> I<Obj>
 
 Return the
 
-Aliases: I<pair_with>, I<pairWith>
+Aliases: I<pair_with>
 
 =cut
 
@@ -203,11 +203,13 @@ Aliases: I<combinations>
 
 =cut
 
-=head2 contains
+=head2 contain
 
-Array.contains() -> I<Obj>
+Array.contain() -> I<Obj>
 
 Return the
+
+Aliases: I<contains>
 
 =cut
 
@@ -271,6 +273,16 @@ Aliases: I<remove>
 
 =cut
 
+=head2 delete_first
+
+Array.delete_first() -> I<Obj>
+
+Return the
+
+Aliases: I<remove_first>
+
+=cut
+
 =head2 delete_first_if
 
 Array.delete_first_if() -> I<Obj>
@@ -296,6 +308,18 @@ Aliases: I<remove_if>
 Array.delete_last() -> I<Obj>
 
 Return the
+
+Aliases: I<remove_last>
+
+=cut
+
+=head2 delete_last_if
+
+Array.delete_last_if() -> I<Obj>
+
+Return the
+
+Aliases: I<remove_last_if>
 
 =cut
 
@@ -481,8 +505,6 @@ Array.join_insert() -> I<Obj>
 
 Return the
 
-Aliases: I<joinInsert>
-
 =cut
 
 =head2 last
@@ -508,6 +530,8 @@ Aliases: I<last_unique>
 Array.last_uniq_by() -> I<Obj>
 
 Return the
+
+Aliases: I<last_unique_by>
 
 =cut
 
@@ -731,16 +755,6 @@ Return the
 
 =cut
 
-=head2 remove_last
-
-Array.remove_last() -> I<Obj>
-
-Return the
-
-Aliases: I<delete_first>, I<remove_first>
-
-=cut
-
 =head2 resize
 
 Array.resize() -> I<Obj>
@@ -897,7 +911,7 @@ Array.uniq_by() -> I<Obj>
 
 Return the
 
-Aliases: I<unique_by>, I<last_unique_by>
+Aliases: I<unique_by>
 
 =cut
 
