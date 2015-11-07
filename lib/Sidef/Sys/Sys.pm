@@ -184,23 +184,19 @@ package Sidef::Sys::Sys {
     *readln = \&scanln;
 
     sub read {
-        my ($self, $type, @vars) = @_;
+        my ($self, $type, $opt_arg) = @_;
 
-        if (@vars) {
-            foreach my $var_ref (@vars) {
-                chomp(my $input = <STDIN>);
-                ${$var_ref} = $type->new($input);
-            }
-
-            return $self;
+        if (defined $opt_arg) {
+            print $type;
+            $type = $opt_arg;
         }
 
         if (defined $type) {
-            chomp(my $input = <STDIN>);
+            chomp(my $input = <STDIN> // return);
             return $type->new($input);
         }
 
-        chomp(my $input = <STDIN>);
+        chomp(my $input = <STDIN> // return);
         Sidef::Types::String::String->new($input);
     }
 
