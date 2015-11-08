@@ -10,7 +10,7 @@ func permute (code, arr) {
     while (true) {
         code(arr.items(idx...));
 
-        var p = idx.offset;
+        var p = idx.end;
         while (idx[p - 1] > idx[p]) { --p };
         p == 0 && return;
 

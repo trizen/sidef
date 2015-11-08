@@ -36,7 +36,7 @@ var arr = [
 ];
 
 [15, 120, 122, 532, 1235, 8, 0, 12425, 997, 325].each { |value|
-    var idx = binary_search(arr, value, 0, arr.offset);
+    var idx = binary_search(arr, value, 0, arr.end);
 
     arr.contains(value) == (idx != -1) ||
         "Error on value: %d\n".sprintf(value).die;

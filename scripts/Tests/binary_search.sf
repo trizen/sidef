@@ -3,7 +3,7 @@
 func binary_search(a,i) {
 
     var l = 0;
-    var h = a.offset;
+    var h = a.end;
 
     while (h >= l) {
         var mid = (h+l / 2 -> int);

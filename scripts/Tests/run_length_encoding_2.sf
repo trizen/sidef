@@ -10,7 +10,7 @@ func encode (str) {
     var count = 1;
     var prev = input[0];
 
-    for (var i = 1; i <= (input.offset); i++) {
+    for (var i = 1; i <= (input.end); i++) {
 
         if (input[i] != prev) {
             encoding.push([count, prev]);

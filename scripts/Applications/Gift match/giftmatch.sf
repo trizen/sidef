@@ -51,7 +51,7 @@ var table = parse_table(input_file);
 var cols = table.shift;    # column names
 var lim  = table.pop;      # limit values
 
-var ngifts = (cols.offset - 1);    # the number of gifts
+var ngifts = (cols.end - 1);    # the number of gifts
 
 # Map the limit of gifts
 var limit = Hash.new;
@@ -125,7 +125,7 @@ matches.sort {|a,b| a[0] <=> b[0]}.each { |match|
         var match = matches.find {|item| item[0] == new_table[i][0]};
         var pos = column_pos{match[1][0]};
         new_table[i][pos] = 'match';
-    } * (new_table.offset - 1);
+    } * (new_table.end - 1);
 
     # Update the limit number of gifts
     limit.keys.each { |key|

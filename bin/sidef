@@ -525,9 +525,9 @@ sub _get_loaded_modules {
 }
 
 sub deparse_structure {
-    my ($struct, $lang) = @_;
+    my ($struct, $arg) = @_;
 
-    my $lang   = $lang // 'Sidef';
+    my $lang   = $arg // 'Sidef';
     my $module = "Sidef::Deparse::\u\L$lang";
     my $pm     = ($module =~ s{::}{/}gr . '.pm');
 
@@ -627,7 +627,7 @@ HEAD
 
                  close $fh;
              }
-         }
+           }
         } => $path
     );
 

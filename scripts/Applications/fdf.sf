@@ -22,8 +22,8 @@ func find_duplicate_files(Block code, size_min=0, *dirs) {
     files.values.each { |set|
         set.len > 1 || next;
         var dups = Hash.new;
-        0 ..^ set.offset-1 -> each { |i|
-            for (var j = i+1; j <= set.offset; j++) {
+        0 ..^ set.end-1 -> each { |i|
+            for (var j = i+1; j <= set.end; j++) {
                 if (set[i].compare(set[j]) == 0) {
                     dups{set[i]} := [] -> append(set.pop_at(j--));
                 }
