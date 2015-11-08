@@ -8,15 +8,12 @@ func quicksort(arr) {
 
     say arr;
 
-    var le = arr.grep{ _ <= p};
-    var gt = arr.grep{ _ >  p};
-
     var forks = [
-        {quicksort(le)}.fork,
-        {quicksort(gt)}.fork,
+        { quicksort(arr.grep{ _ <= p}) }.fork,
+        { quicksort(arr.grep{ _ > p }) }.fork,
     ];
 
     forks[0].get + [p] + forks[1].get;
 }
 
-quicksort(1..50 -> shuffle).dump.say;
+say quicksort(1..50 -> shuffle);

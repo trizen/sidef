@@ -898,18 +898,29 @@ package Sidef::Types::String::String {
     }
 
     sub contains {
-        my ($self, $string, $start_pos) = @_;
+        my ($self, $arg, $start_pos) = @_;
 
         $start_pos =
           defined($start_pos)
           ? $start_pos->get_value
           : 0;
 
+        if (ref($arg) eq 'Sidef::Types::Regex::Regex') {
+            my $regex = $arg->{regex};
+            my $s     = $$self;
+
+            if ($start_pos != 0) {
+                pos($s) = $start_pos;
+            }
+
+            return Sidef::Types::Bool::Bool->new(scalar $s =~ /$regex/g);
+        }
+
         if ($start_pos < 0) {
             $start_pos = CORE::length($$self) + $start_pos;
         }
 
-        Sidef::Types::Bool::Bool->new(CORE::index($$self, $string->get_value, $start_pos) != -1);
+        Sidef::Types::Bool::Bool->new(CORE::index($$self, $arg->get_value, $start_pos) != -1);
     }
 
     *include = \&contains;
