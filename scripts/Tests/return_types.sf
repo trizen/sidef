@@ -15,7 +15,7 @@ try {
 }
 catch {
     ## ok
-};
+}
 
 
 #
@@ -33,7 +33,7 @@ try {
 }
 catch {
     ## ok
-};
+}
 
 
 #
@@ -57,7 +57,19 @@ try {
 }
 catch {
     ## ok
-};
+}
+
+#
+## Return more types
+#
+
+func foo() -> (String, Number) {
+    ("abc", 42)
+}
+
+var(str, num) = foo();
+assert_eq(str, "abc");
+assert_eq(num, 42);
 
 
 #

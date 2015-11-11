@@ -2058,10 +2058,10 @@ package Sidef::Parser {
                                     error => "unbalanced curly brackets",
                                    );
 
-            $block->{vars} = [
-                map { $_->{obj} }
-                grep { ref($_) eq 'HASH' and ref($_->{obj}) eq 'Sidef::Variable::Variable' } @{$self->{vars}{$self->{class}}}
-            ];
+            #$block->{vars} = [
+            #    map { $_->{obj} }
+            #    grep { ref($_) eq 'HASH' and ref($_->{obj}) eq 'Sidef::Variable::Variable' } @{$self->{vars}{$self->{class}}}
+            #];
 
             $block->{init_vars} = Sidef::Variable::Init->new(vars => $var_objs);
 
