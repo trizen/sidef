@@ -523,7 +523,7 @@ HEADER
                         $code =
                             "do {$code;\n"
                           . (' ' x $Sidef::SPACES)
-                          . "\$$obj->{name}$refaddr = Sidef::Types::Block::Code->new(Memoize::memoize(\$$obj->{name}${refaddr}->{code}))}";
+                          . "\$$obj->{name}$refaddr\->{code} = Memoize::memoize(\$$obj->{name}${refaddr}->{code}); \$$obj->{name}$refaddr}";
                     }
 
                     if ($obj->{type} eq 'method') {
