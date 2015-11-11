@@ -1,4 +1,4 @@
-package Sidef::Types::Block::Do {
+package Sidef::Types::Block::Loop {
 
     sub new {
         my (undef, %opt) = @_;

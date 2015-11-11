@@ -111,7 +111,6 @@ HEADER
         my ($self, $obj) = @_;
 
         my $ref = ref($obj);
-
         $self->_dump_string(
                               $ref eq 'Sidef::Variable::ClassInit'    ? $self->_dump_class_name($obj)
                             : $ref eq 'Sidef::Variable::Ref'          ? 'REF'
@@ -502,19 +501,8 @@ HEADER
 
                     # Check the return value (when "-> Type" is specified)
                     if (exists $obj->{returns}) {
-
-                        my $type = $self->_dump_reftype($obj->{returns});
-
-                        $code =
-                            "do { $code;\n"
-                          . (' ' x $Sidef::SPACES)
-                          . "my \$_$refaddr = \$$obj->{name}$refaddr;\n"
-                          . (' ' x $Sidef::SPACES)
-                          . "\$$obj->{name}$refaddr = Sidef::Types::Block::Code->new("
-                          . "sub {my \$arg = \$_$refaddr->call(\@_); "
-                          . "(ref(\$arg) eq $type || ($type ne 'REF' && eval{\$arg->SUPER::isa($type)})) or "
-                          . " die q{[ERROR] Invalid return-type from $obj->{type} $self->{class_name}<<$name>>: got <<}"
-                          . " . ref(\$arg) . q{>>, but expected $type}; \$arg })}";
+                        my $types = '[' . join(',', map { $self->_dump_reftype($_) } @{$obj->{returns}}) . ']';
+                        $code = "do {$code; \$$obj->{name}$refaddr\->{returns} = $types; \$$obj->{name}$refaddr}";
                     }
 
                     # Memoize the method/function (when "is cached" trait is specified)
@@ -705,7 +693,7 @@ HEADER
         }
         elsif ($ref eq 'Sidef::Types::Block::CodeInit') {
             if ($addr{$refaddr}++) {
-                $code = 'Sidef::Types::Block::Code->new(__SUB__)';
+                $code = 'Sidef::Types::Block::Code->new(code => __SUB__)';
             }
             else {
                 if (%{$obj}) {
@@ -762,11 +750,9 @@ HEADER
                         $code = 'Sidef::Types::Block::Code->new(';
                     }
 
-                    if ($is_class) {
+                    if (not $is_class) {
 
-                    }
-                    else {
-                        $code .= "\n" . (" " x ($Sidef::SPACES - $Sidef::SPACES_INCR)) . "sub {\n";
+                        $code .= "\n" . (" " x ($Sidef::SPACES - $Sidef::SPACES_INCR)) . "code => sub {\n";
 
                         if (exists($obj->{init_vars}) and @{$obj->{init_vars}{vars}}) {
                             my @vars = @{$obj->{init_vars}{vars}};
@@ -814,7 +800,21 @@ HEADER
                       . join(";\n" . (" " x $Sidef::SPACES), @statements)
                       . ($is_function ? (";\n" . (" " x $Sidef::SPACES) . "END$refaddr: \@return;\n") : '') . "\n"
                       . (" " x ($Sidef::SPACES -= $Sidef::SPACES_INCR))
-                      . ($is_class ? '}' : '})');
+                      . '}';
+
+                    if (not $is_class) {
+                        if (exists $self->{parent_name}) {
+                            $code .= ','
+                              . join(',',
+                                     'type => ' . $self->_dump_string($self->{parent_name}[0]),
+                                     'name => ' . $self->_dump_string($self->{parent_name}[1]));
+                        }
+
+                        if (exists $self->{class_name}) {
+                            $code .= ',' . 'class => ' . $self->_dump_string($self->{class_name});
+                        }
+                        $code .= ')';
+                    }
                 }
                 else {
                     $code = 'Block';
@@ -847,6 +847,12 @@ HEADER
         }
         elsif ($ref eq 'Sidef::Types::Block::While') {
             ## ok
+        }
+        elsif ($ref eq 'Sidef::Types::Block::Do') {
+            $code = 'do {' . join(';', $self->deparse_script($obj->{block}{code})) . '}';
+        }
+        elsif ($ref eq 'Sidef::Types::Block::Loop') {
+            $code = 'while(1) {' . join(';', $self->deparse_script($obj->{block}{code})) . '}';
         }
         elsif ($ref eq 'Sidef::Types::Block::Given') {
             $self->top_add(qq{use experimental 'smartmatch';\n});
@@ -1140,18 +1146,6 @@ HEADER
                         }
                     }
 
-                    # Do-block
-                    if ($code eq '' and $ref eq 'Sidef::Types::Block::Do') {
-                        my $arg = $self->deparse_generic('', ';', '', @{$call->{arg}});
-
-                        if ($arg =~ s/^Sidef::Types::Block::Code->new\(\s*sub\h*\{//) {
-                            $arg =~ s/\}\)\z//;
-                        }
-
-                        $code = 'do { ' . $arg . '}';
-                        next;
-                    }
-
                     # Postfix ++ and -- operators on variables
                     if (exists($self->{inc_dec_ops}{$method})) {
                         $code = "do{my \$old=$code; $code=$code\->$self->{inc_dec_ops}{$method}; \$old}";
@@ -1244,30 +1238,8 @@ HEADER
                     }
                     elsif ($method =~ /^[\pL_]/) {
 
-                        # Optimize the "loop {}" construct
-                        if ($ref eq 'Sidef::Types::Block::CodeInit' and $method eq 'loop') {
-                            my $block = $code =~ s/^\(Sidef::Types::Block::Code->new\(\s*sub\h*(?=\{)//r =~ s/\)\)\z//r;
-
-                            if (not defined $block) {
-                                die "[ERROR] Failed to optimize the 'loop {}' construct...";
-                            }
-
-                            $code = 'while (1) ' . $block;
-                            next;
-                        }
-
-                        # Optimize the "n.times {}" construct
-                        elsif ($ref eq 'Sidef::Types::Number::Number' and $method eq 'times' and $$obj < (-1 >> 1)) {
-
-                            my $arg   = $self->deparse_args(@{$call->{arg}});
-                            my $block = $arg =~ s/^\(Sidef::Types::Block::Code->new\(\s*sub\h*\{//r =~ s/\)\)\z//r;
-
-                            $code = "for (1..$$obj) { local \@_ = (Sidef::Types::Number::Number->new(\$_));  " . $block;
-                            next;
-                        }
-
                         # Exclamation mark (!) at the end of a method
-                        elsif (substr($method, -1) eq '!') {
+                        if (substr($method, -1) eq '!') {
                             $code = '('
                               . "$old_code=$code->"
                               . substr($method, 0, -1)

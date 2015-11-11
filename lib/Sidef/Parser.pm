@@ -123,7 +123,6 @@ package Sidef::Parser {
             prefix_obj_re => qr{\G
               (?:
                   if\b                                            (?{ Sidef::Types::Block::If->new })
-                | do\b                                            (?{ Sidef::Types::Block::Do->new })
                 | while\b                                         (?{ Sidef::Types::Block::While->new })
                 | try\b                                           (?{ Sidef::Types::Block::Try->new })
                 | for(?:each)?+\b                                 (?{ Sidef::Types::Block::For->new })
@@ -1435,48 +1434,39 @@ package Sidef::Parser {
                     # Function return type (func name(...) -> Type {...})
                     if (/\G\h*->\h*/gc) {
 
-                        my $ret_name;
-                        my $try_expr;
-                        my $pos = pos($_);
-                        if (/\G($self->{var_name_re})\h*/gco) {
-                            $ret_name = $1;
+                        my @ref;
+                        if (/\G\(/gc) {    # multiple types
+                            while (1) {
+                                my ($ref) = $self->parse_expr(code => $opt{code});
+                                push @ref, $ref;
+
+                                /\G\s*\)/gc && last;
+                                /\G\s*,\s*/gc
+                                  || $self->fatal_error(
+                                                        error => "invalid return-type for $type $self->{class_name}<<$name>>",
+                                                        expected => "expected a comma",
+                                                        code     => $_,
+                                                        pos      => pos($_),
+                                                       );
+                            }
                         }
-                        else {
-                            $try_expr = 1;
+                        else {    # only one type
+                            my ($ref) = $self->parse_expr(code => $opt{code});
+                            push @ref, $ref;
                         }
 
-                        if (
-                            $try_expr or (
-                                defined($ret_name) and (
-                                    exists($self->{built_in_classes}{$ret_name}) or do {
-                                        my $obj = $self->find_var($ret_name, $class_name);
-                                        defined($obj) and $obj->{type} eq 'class';
-                                    }
-                                )
-                            )
-                          ) {
-                            local $self->{_want_name} = 1;
-                            my ($return_obj) = $self->parse_expr(code => $try_expr ? $opt{code} : \$ret_name);
-
-                            if (ref($return_obj) eq 'HASH') {
+                        foreach my $ref (@ref) {
+                            if (ref($ref) eq 'HASH') {
                                 $self->fatal_error(
                                                    error    => "invalid return-type for $type $self->{class_name}<<$name>>",
                                                    expected => "expected a valid type, such as: Str, Num, Arr, etc...",
                                                    code     => $_,
-                                                   pos      => $pos,
+                                                   pos      => pos($_),
                                                   );
                             }
+                        }
 
-                            $obj->{returns} = $return_obj;
-                        }
-                        else {
-                            $self->fatal_error(
-                                               error    => "invalid return-type for $type $self->{class_name}<<$name>>",
-                                               expected => "expected a valid type, such as: Str, Num, Arr, etc...",
-                                               code     => $_,
-                                               pos      => $pos,
-                                              );
-                        }
+                        $obj->{returns} = \@ref;
                     }
 
                     /\G\h*\{\h*/gc
@@ -1510,7 +1500,19 @@ package Sidef::Parser {
                 return Sidef::Types::Block::Default->new(block => $block);
             }
 
-            ## Experimental gather/take
+            # "do {...}" construct
+            if (/\Gdo\h*(?=\{)/gc) {
+                my $block = $self->parse_block(code => $opt{code});
+                return Sidef::Types::Block::Do->new(block => $block);
+            }
+
+            # "loop {...}" construct
+            if (/\Gloop\h*(?=\{)/gc) {
+                my $block = $self->parse_block(code => $opt{code});
+                return Sidef::Types::Block::Loop->new(block => $block);
+            }
+
+            # "gather/take" construct
             if (/\Ggather\h*(?=\{)/gc) {
                 my $obj = Sidef::Types::Block::Gather->new();
 
@@ -1625,7 +1627,6 @@ package Sidef::Parser {
                                         );
             }
 
-            #if (/\G(?:die|warn|assert(?:_(?:eq|ne))?)\b/gc) {
             if (/\Gassert(?:_(?:eq|ne))?\b/gc) {
                 pos($_) = $-[0];
                 return (Sidef::Sys::Sys->new(line => $self->{line}, file_name => $self->{file_name}), 1);

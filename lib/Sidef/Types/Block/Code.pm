@@ -7,31 +7,45 @@ package Sidef::Types::Block::Code {
       );
 
     sub new {
-        my (undef, $sub) = @_;
-        bless {code => $sub}, __PACKAGE__;
+        my (undef, %opt) = @_;
+        bless \%opt, __PACKAGE__;
     }
 
     sub run {
         my ($self, @args) = @_;
-        my @objs = $self->{code}->(@args);
-        wantarray ? @objs : $objs[-1];
+        $self->{code}->(@args);
     }
 
     sub call {
         my ($self, @args) = @_;
+
         my @objs = $self->{code}->(@args);
 
-        @objs == 1 && ref($objs[0]) eq 'Sidef::Types::Block::Return'
-          ? (
-             wantarray
-             ? @{$objs[0]{obj}}
-             : $objs[0]{obj}[-1]
-            )
-          : (
-             wantarray
-             ? @objs
-             : $objs[-1]
-            );
+        # Unpack 'return'ed arguments from bare-blocks
+        if (@objs == 1 and ref($objs[0]) eq 'Sidef::Types::Block::Return') {
+            @objs = @{$objs[0]{obj}};
+        }
+
+        # Check the return types
+        if (exists $self->{returns}) {
+
+            if ($#{$self->{returns}} != $#objs) {
+                die qq{[ERROR] Wrong number of return arguments from $self->{type} $self->{class}<<$self->{name}>>: got }
+                  . @objs
+                  . ", but expected "
+                  . @{$self->{returns}};
+            }
+
+            foreach my $i (0 .. $#{$self->{returns}}) {
+                if (ref($objs[$i]) ne ($self->{returns}[$i])) {
+                    die qq{[ERROR] Invalid return-type from $self->{type} $self->{class}<<$self->{name}>>: got <<}
+                      . ref($objs[$i])
+                      . qq{>>, but expected <<$self->{returns}[$i]>>};
+                }
+            }
+        }
+
+        wantarray ? @objs : $objs[-1];
     }
 
     {

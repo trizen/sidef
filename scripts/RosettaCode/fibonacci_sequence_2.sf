@@ -4,12 +4,10 @@
 ## http://rosettacode.org/wiki/Fibonacci_sequence
 #
 
-do (
-    var c = [];
-    func fib_mem (n) {
-        n < 2 && return n;
-        c[n] := (__FUNC__(n-1) + __FUNC__(n-2));
-    }
-);
+var c = [];
+func fib_mem (n) {
+    n < 2 && return n;
+    c[n] := (__FUNC__(n-1) + __FUNC__(n-2));
+}
 
 say fib_mem(35);

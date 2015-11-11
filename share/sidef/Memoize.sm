@@ -6,5 +6,5 @@
 require 'Memoize';
 
 func memoize(f) {
-    *f = Block.new(%S'Memoize'.memoize((*f){:code}));
+    f{:code} = %S'Memoize'.memoize(f{:code});
 }

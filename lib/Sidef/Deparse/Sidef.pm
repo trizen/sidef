@@ -171,16 +171,12 @@ package Sidef::Deparse::Sidef {
                       . $self->_dump_vars(@{$var_obj->{vars}}[($obj->{type} eq 'method' ? 1 : 0) .. $#{$var_obj->{vars}} - 1])
                       . ') ';
 
-                   #$code .= $self->_dump_sub_init_vars($vars);
-                   #$code .= $self->_dump_init_vars($vars);
-                   #$code .= '(' . $self->_dump_init_vars(@{$vars}[($obj->{type} eq 'method' ? 1 : 0) .. $#{$vars} - 1]) . ')';
-
                     if (exists $obj->{cached}) {
                         $code .= 'is cached ';
                     }
 
                     if (exists $obj->{returns}) {
-                        $code .= '-> ' . $self->deparse_expr({self => $obj->{returns}}) . ' ';
+                        $code .= '-> (' . join(',', map { $self->deparse_expr({self => $_}) } @{$obj->{returns}}) . ') ';
                     }
 
                     $code .= $self->deparse_expr({self => $block});
@@ -384,6 +380,12 @@ package Sidef::Deparse::Sidef {
         }
         elsif ($ref eq 'Sidef::Types::Block::Take') {
             $code = 'take' . $self->deparse_args($obj->{expr});
+        }
+        elsif ($ref eq 'Sidef::Types::Block::Do') {
+            $code = 'do ' . $self->deparse_expr({self => $obj->{block}});
+        }
+        elsif ($ref eq 'Sidef::Types::Block::Loop') {
+            $code = 'loop ' . $self->deparse_expr({self => $obj->{block}});
         }
         elsif ($ref eq 'Sidef::Math::Math') {
             $code = 'Math';

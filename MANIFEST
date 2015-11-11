@@ -60,6 +60,7 @@ lib/Sidef/Types/Block/Gather.pod
 lib/Sidef/Types/Block/Given.pm
 lib/Sidef/Types/Block/If.pm
 lib/Sidef/Types/Block/If.pod
+lib/Sidef/Types/Block/Loop.pm
 lib/Sidef/Types/Block/Next.pm
 lib/Sidef/Types/Block/Next.pod
 lib/Sidef/Types/Block/Return.pm
@@ -648,6 +649,7 @@ scripts/Tests/magic_vars.sf
 scripts/Tests/man_or_boy.sf
 scripts/Tests/man_or_boy_2.sf
 scripts/Tests/man_or_boy_3.sf
+scripts/Tests/man_or_boy_cached.sf
 scripts/Tests/matrix_multiplication.sf
 scripts/Tests/median.sf
 scripts/Tests/memoize.sf
