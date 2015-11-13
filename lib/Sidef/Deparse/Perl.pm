@@ -4,8 +4,7 @@ package Sidef::Deparse::Perl {
     use 5.014;
 
     use List::Util qw(all);
-    use File::Basename qw(dirname);
-    use Scalar::Util qw(refaddr reftype);
+    use Scalar::Util qw(refaddr);
 
     my %addr;
     my %type;
@@ -799,8 +798,7 @@ HEADER
                         (" " x $Sidef::SPACES)
                       . join(";\n" . (" " x $Sidef::SPACES), @statements)
                       . ($is_function ? (";\n" . (" " x $Sidef::SPACES) . "END$refaddr: \@return;\n") : '') . "\n"
-                      . (" " x ($Sidef::SPACES -= $Sidef::SPACES_INCR))
-                      . '}';
+                      . (" " x ($Sidef::SPACES -= $Sidef::SPACES_INCR)) . '}';
 
                     if (not $is_class) {
                         if (exists $self->{parent_name}) {
