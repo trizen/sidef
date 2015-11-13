@@ -2350,7 +2350,6 @@ package Sidef::Parser {
                                 /\Gelse\h*/gc;
                                 my $block = $self->parse_block(code => $opt{code});
                                 push @{$struct{$self->{class}}[-1]{call}}, {keyword => 'else', block => [$block->{code}]};
-
                             }
                         }
                     }

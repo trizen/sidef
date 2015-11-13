@@ -21,7 +21,7 @@ package Sidef::Types::Block::Code {
 
         my @objs = $self->{code}->(@args);
 
-        # Unpack 'return'ed arguments from bare-blocks
+        # Unpack 'return'ed values from bare-blocks
         if (@objs == 1 and ref($objs[0]) eq 'Sidef::Types::Block::Return') {
             @objs = @{$objs[0]{obj}};
         }
@@ -30,7 +30,7 @@ package Sidef::Types::Block::Code {
         if (exists $self->{returns}) {
 
             if ($#{$self->{returns}} != $#objs) {
-                die qq{[ERROR] Wrong number of return arguments from $self->{type} $self->{class}<<$self->{name}>>: got }
+                die qq{[ERROR] Wrong number of return values from $self->{type} $self->{class}<<$self->{name}>>: got }
                   . @objs
                   . ", but expected "
                   . @{$self->{returns}};
