@@ -1,0 +1,34 @@
+#!/usr/bin/ruby
+
+#
+## The classic coin-change problem
+#
+
+var denominations = [.01, .05, .1, .25, .5, 1, 2, 5, 10, 20, 50, 100];
+
+func change(n, pos=0, solution=[]) {
+
+    var sum = solution.sum\\0;
+
+    if (solution.sum == n) {
+        return [solution];    # found a solution
+    }
+    elsif ((sum > n) || (pos > denominations.end)) {
+        return [];
+    }
+
+    change(n, pos + 1, solution)+
+    change(n, pos, [@solution, denominations[pos]]);
+}
+
+var amount = 0.26;
+var solutions = change(amount);
+
+say "There are #{solutions.len} solutions for #{amount} dollars.";
+
+# Find the best solution
+var best = solutions.min_by{.len};
+say "The best solution is: #{best.dump}";
+
+# Test the best solution
+assert_eq(best, [0.01, 0.25]);
