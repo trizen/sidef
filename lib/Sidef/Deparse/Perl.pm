@@ -52,7 +52,7 @@ package Sidef::Deparse::Perl {
                                    'Sidef::Types::Block::For'   => 1,
                                   },
 
-            reassign_ops => {map (("$_=" => $_), qw(+ - % * / & | ^ ** && || << >> ÷))},
+            reassign_ops => {map (("$_=" => $_), qw(+ - % * // / & | ^ ** && || << >> ÷))},
 
             inc_dec_ops => {
                             '++' => 'inc',

@@ -173,7 +173,7 @@ package Sidef::Types::Number::Number {
 
     sub factorial {
         my ($self) = @_;
-        $self->new($$self->copy->bfac);
+        $self->new(scalar $$self->copy->bfac);
     }
 
     *fac  = \&factorial;
@@ -260,12 +260,12 @@ package Sidef::Types::Number::Number {
 
     sub sqrt {
         my ($self) = @_;
-        $self->new($$self->copy->bsqrt);
+        $self->new(scalar $$self->copy->bsqrt);
     }
 
     sub root {
         my ($self, $n) = @_;
-        $self->new($$self->copy->broot($n->get_value));
+        $self->new(scalar $$self->copy->broot($n->get_value));
     }
 
     sub troot {
@@ -279,7 +279,7 @@ package Sidef::Types::Number::Number {
 
     sub abs {
         my ($self) = @_;
-        $self->new($$self->copy->babs);
+        $self->new(scalar $$self->copy->babs);
     }
 
     *pos      = \&abs;
@@ -308,7 +308,7 @@ package Sidef::Types::Number::Number {
 
     sub exp {
         my ($self) = @_;
-        $self->new($$self->copy->bexp);
+        $self->new(scalar $$self->copy->bexp);
     }
 
     sub int {
@@ -320,57 +320,55 @@ package Sidef::Types::Number::Number {
     *to_i   = \&int;
 
     sub max {
-        my ($self, $num) = @_;
-        my ($x, $y) = ($$self, $num->get_value);
-        $self->new($x > $y ? $x : $y);
+        my ($self, $arg) = @_;
+        $$self->bcmp($arg->get_value) >= 0 ? $self : $arg;
     }
 
     sub min {
-        my ($self, $num) = @_;
-        my ($x, $y) = ($$self, $num->get_value);
-        $self->new($x < $y ? $x : $y);
+        my ($self, $arg) = @_;
+        $$self->bcmp($arg->get_value) <= 0 ? $self : $arg;
     }
 
     sub cos {
         my ($self) = @_;
-        $self->new($$self->copy->bcos);
+        $self->new(scalar $$self->copy->bcos);
     }
 
     sub sin {
         my ($self) = @_;
-        $self->new($$self->copy->bsin);
+        $self->new(scalar $$self->copy->bsin);
     }
 
     sub atan {
-        my ($x) = @_;
-        Sidef::Types::Number::Number->new($x->get_value->copy->batan);
+        my ($self) = @_;
+        $self->new(scalar $$self->copy->batan);
     }
 
     sub atan2 {
-        my ($x, $y) = @_;
-        Sidef::Types::Number::Number->new($x->get_value->copy->batan2($y->get_value));
+        my ($self, $y) = @_;
+        $self->new(scalar $$self->copy->batan2($y->get_value));
     }
 
     sub log {
         my ($self, $base) = @_;
-        $self->new($$self->copy->blog(defined($base) ? $base->get_value : ()));
+        $self->new(scalar $$self->copy->blog(defined($base) ? $base->get_value : ()));
     }
 
     sub ln {
         my ($self) = @_;
-        $self->new($$self->copy->blog);
+        $self->new(scalar $$self->copy->blog);
     }
 
     sub log10 {
         my ($self) = @_;
         state $ten = Math::BigFloat->new(10);
-        $self->new($$self->copy->blog($ten));
+        $self->new(scalar $$self->copy->blog($ten));
     }
 
     sub log2 {
         my ($self) = @_;
         state $two = Math::BigFloat->new(2);
-        $self->new($$self->copy->blog($two));
+        $self->new(scalar $$self->copy->blog($two));
     }
 
     sub inf {
@@ -380,14 +378,14 @@ package Sidef::Types::Number::Number {
 
     sub neg {
         my ($self) = @_;
-        $self->new($$self->copy->bneg);
+        $self->new(scalar $$self->copy->bneg);
     }
 
     *negate = \&neg;
 
     sub not {
         my ($self) = @_;
-        $self->new($$self->copy->bnot);
+        $self->new(scalar $$self->copy->bnot);
     }
 
     sub sign {
@@ -483,12 +481,12 @@ package Sidef::Types::Number::Number {
 
     sub ceil {
         my ($self) = @_;
-        $self->new($$self->copy->bceil);
+        $self->new(scalar $$self->copy->bceil);
     }
 
     sub floor {
         my ($self) = @_;
-        $self->new($$self->copy->bfloor);
+        $self->new(scalar $$self->copy->bfloor);
     }
 
     sub round {
@@ -524,7 +522,7 @@ package Sidef::Types::Number::Number {
 
     sub digit {
         my ($self, $n) = @_;
-        $self->new($$self->as_int->digit($n->get_value));
+        $self->new(scalar $$self->as_int->digit($n->get_value));
     }
 
     sub digits {
@@ -542,7 +540,7 @@ package Sidef::Types::Number::Number {
 
     sub nok {
         my ($self, $k) = @_;
-        $self->new($$self->as_int->bnok($k->get_value));
+        $self->new(scalar $$self->as_int->bnok($k->get_value));
     }
 
     *binomial = \&nok;
@@ -647,6 +645,13 @@ package Sidef::Types::Number::Number {
 
     *nude = \&parts;
 
+    sub rdiv {
+        my ($self, $arg) = @_;
+        $self->new(scalar Math::BigRat->new($$self)->bdiv($$arg));
+    }
+
+    *rat_div = \&rdiv;
+
     sub as_float {
         my ($self) = @_;
         $self->new($$self->as_float);
@@ -722,6 +727,7 @@ package Sidef::Types::Number::Number {
         *{__PACKAGE__ . '::' . '<<'}  = \&shift_left;
         *{__PACKAGE__ . '::' . '~'}   = \&not;
         *{__PACKAGE__ . '::' . ':'}   = \&complex;
+        *{__PACKAGE__ . '::' . '//'}  = \&rdiv;
     }
 };
 
