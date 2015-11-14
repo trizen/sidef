@@ -1,0 +1,23 @@
+#!/usr/bin/ruby
+
+# There are exactly four non-trivial examples of this type of fraction, less than one in value, and containing two digits in the numerator and denominator.
+# If the product of these four fractions is given in its lowest common terms, find the value of the denominator.
+
+# https://projecteuler.net/problem=33
+
+# Answer: 100
+
+var prod = 1.rat;
+
+9.times { |i|
+    9.times { |j|
+        9.times { |k|
+            next if (i == j);
+            if ((10*i + j) // (10*j + k) == i//k) {
+                prod *= i//k;
+            }
+        }
+    }
+}
+
+say prod.de;
