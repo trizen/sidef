@@ -12,7 +12,10 @@ enum (
     JMPLT,
 );
 
-class Op(name, nargs) {};
+struct Op {
+    String name,
+    Number nargs,
+}
 
 var ops = Hash.new(
     PUSH,    Op("push", 1),
