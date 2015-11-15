@@ -555,6 +555,17 @@ package Sidef::Types::Array::Array {
 
     *collect = \&map;
 
+    sub map_with_index {
+        my ($self, $code) = @_;
+
+        my @arr;
+        foreach my $i (0 .. $#{$self}) {
+            push @arr, $code->run(Sidef::Types::Number::Number->new($i), $self->[$i]);
+        }
+
+        $self->new(@arr);
+    }
+
     sub flat_map {
         my ($self, $code) = @_;
         $self->new(map { @{scalar $code->run($_)} } @{$self});
@@ -816,7 +827,6 @@ package Sidef::Types::Array::Array {
 
         my @sorted = do {
             my @arr;
-
             foreach my $i (0 .. $#{$self}) {
                 push @arr, [$i, $self->[$i]];
             }

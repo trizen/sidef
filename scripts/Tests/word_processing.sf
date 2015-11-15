@@ -1,0 +1,17 @@
+#!/usr/bin/ruby
+
+var base = ('A'.ord - 1);
+
+var n = DATA.slurp.chomp.split(/\s*,\s*/)
+            .map { |s| s - /"/g }.sort.uniq
+            .map { |s| s.chars.map { |sym| sym.ord - base  }.sum }
+            .map_with_index { |idx, val| val * (idx+1) }
+            .sum;
+
+assert_eq(n, 5738);
+say "** Test passed!";
+
+__DATA__
+"LISA","MARY","PATRICIA","LINDA","BARBARA",
+"MARIA","ELIZABETH","JENNIFER","MARIA","SUSAN",
+"MARGARET","DOROTHY","LISA","NANCY","KAREN","MARY"

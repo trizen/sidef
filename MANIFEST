@@ -775,6 +775,7 @@ scripts/Tests/vigenere_cipher.sf
 scripts/Tests/virtual_machine.sf
 scripts/Tests/while_loop.sf
 scripts/Tests/wireworld.sf
+scripts/Tests/word_processing.sf
 scripts/Tests/word_roots.sf
 scripts/tree_traversal.sf
 scripts/unique_prefixes.sf
