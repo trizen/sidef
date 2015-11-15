@@ -1,0 +1,23 @@
+#!/usr/bin/ruby
+
+# How many different ways can one hundred be written as a sum of at least two positive integers?
+
+# https://projecteuler.net/problem=76
+
+# Answer: 190569291
+
+var nums = [];
+
+func count(n, i=0, sum=0) is cached {
+    return 1 if (sum == n);
+    return 0 if (sum > n);
+    return 0 if (i > nums.end);
+
+    count(n, i+1, sum) +
+    count(n, i, sum + nums[i]);
+}
+
+var n = 100;
+nums = (1 .. n-1);
+
+say count(100);

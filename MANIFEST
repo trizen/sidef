@@ -310,6 +310,7 @@ scripts/permutations_rec.sf
 'scripts/Project Euler/0067-maximum_path_sum_ii.sf'
 'scripts/Project Euler/0067-triangle.txt'
 'scripts/Project Euler/0071-ordered_fractions.sf'
+'scripts/Project Euler/0076-counting_summations.sf'
 'scripts/Project Euler/0077-prime_summations.sf'
 'scripts/Project Euler/0097-large_non-mersenne_prime.sf'
 'scripts/Project Euler/0120-square_remainders.sf'
