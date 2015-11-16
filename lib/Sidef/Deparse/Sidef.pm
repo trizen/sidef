@@ -287,7 +287,7 @@ package Sidef::Deparse::Sidef {
                         my @vars = @{$obj->{init_vars}{vars}};
                         pop @vars;
                         if (@vars) {
-                            $code .= '|' . $self->_dump_vars(@vars) . "|";
+                            $code .= '| ' . $self->_dump_vars(@vars) . ' |';
                         }
                     }
 
