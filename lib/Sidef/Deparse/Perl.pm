@@ -232,8 +232,9 @@ HEADER
     }
 
     sub _dump_sub_init_vars {
-        my ($self, @vars) = @_;
+        my ($self, %opt) = @_;
 
+        my @vars = @{$opt{vars}};
         @vars || return '';
 
         my @dumped_vars = map { ref($_) ? $self->_dump_var($_) : $_ } @vars;
@@ -243,50 +244,56 @@ HEADER
             return '';
         }
 
-        #my $code = (' ' x $Sidef::SPACES) . "my (" . join(', ', @dumped_vars) . ') = @_;' . "\n";
-        my $code = (' ' x $Sidef::SPACES) . join(
-            "\n" . (' ' x $Sidef::SPACES),
-            join(
-                '',
-                map { s/^\s+//r }
-                  "my \@__vars__ = (" . join(', ', map { $_ eq 'undef' ? $_ : "\\my $_" } @dumped_vars) . ');',
-                "{state \$table = {"
-                  . join(', ', map { ref($vars[$_]) ? "$vars[$_]{name} => $_" : () } 0 .. $#vars) . "};",
-                'my (@left, %seen);',
-                q(foreach my $arg(@_) {),
-                q(    if (ref($arg) eq 'Sidef::Variable::NamedParam') {),
-                q(        if (exists $table->{$arg->[0]}) {),
-                q(            my $var = $__vars__[$table->{$arg->[0]}] // next;),
-                q(            if (ref($var) eq 'SCALAR') { ),
-                q(               $$var = ${$arg->[1]}[-1];),
-                q(            } elsif (ref($var) eq 'ARRAY') {),
-                q(              @$var = @{$arg->[1]};),
-                q(            } else {),
-                q(              %$var = @{$arg->[1]};),
-                q(            }),
-                q(            undef $seen{$var};),
-                q(         } else {),
-                q(             die "No such named parameter: <<$arg->[0]>>";),
-                q(         }),
-                q(     } else {),
-                q(        push @left, $arg;),
-                q(     }),
-                q(}),
+        my $code;
 
-                q(foreach my $var(@__vars__) {),
-                q(    next if exists $seen{$var // do{shift @left; next}};),
-                q(    @left || last;),
-                q(    if (ref($var) eq 'SCALAR') {),
-                q(      $$var = shift @left;),
-                q(    } elsif (ref($var) eq 'ARRAY') {),
-                q(      @$var = @left; last;),
-                q(    } else {),
-                q(      %$var = @left; last;),
-                q(    }),
-                q(}}),
-                )
-          )
-          . "\n";
+        if ($opt{extended}) {
+            $code = (' ' x $Sidef::SPACES) . join(
+                "\n" . (' ' x $Sidef::SPACES),
+                join(
+                    '',
+                    map { s/^\s+//r }
+                      "my \@__vars__ = (" . join(', ', map { $_ eq 'undef' ? $_ : "\\my $_" } @dumped_vars) . ');',
+                    "{state \$table = {"
+                      . join(', ', map { ref($vars[$_]) ? "$vars[$_]{name} => $_" : () } 0 .. $#vars) . "};",
+                    'my (@left, %seen);',
+                    q(foreach my $arg(@_) {),
+                    q(    if (ref($arg) eq 'Sidef::Variable::NamedParam') {),
+                    q(        if (exists $table->{$arg->[0]}) {),
+                    q(            my $var = $__vars__[$table->{$arg->[0]}] // next;),
+                    q(            if (ref($var) eq 'SCALAR') { ),
+                    q(               $$var = ${$arg->[1]}[-1];),
+                    q(            } elsif (ref($var) eq 'ARRAY') {),
+                    q(              @$var = @{$arg->[1]};),
+                    q(            } else {),
+                    q(              %$var = @{$arg->[1]};),
+                    q(            }),
+                    q(            undef $seen{$var};),
+                    q(         } else {),
+                    q(             die "No such named parameter: <<$arg->[0]>>";),
+                    q(         }),
+                    q(     } else {),
+                    q(        push @left, $arg;),
+                    q(     }),
+                    q(}),
+
+                    q(foreach my $var(@__vars__) {),
+                    q(    next if exists $seen{$var // do{shift @left; next}};),
+                    q(    @left || last;),
+                    q(    if (ref($var) eq 'SCALAR') {),
+                    q(      $$var = shift @left;),
+                    q(    } elsif (ref($var) eq 'ARRAY') {),
+                    q(      @$var = @left; last;),
+                    q(    } else {),
+                    q(      %$var = @left; last;),
+                    q(    }),
+                    q(}}),
+                    )
+              )
+              . "\n";
+        }
+        else {
+            $code = (' ' x $Sidef::SPACES) . "my (" . join(', ', @dumped_vars) . ') = @_;' . "\n";
+        }
 
         foreach my $var (@vars) {
 
@@ -572,7 +579,7 @@ HEADER
                   . (' ' x $Sidef::SPACES)
                   . "sub new {\n"
                   . (' ' x $Sidef::SPACES)
-                  . $self->_dump_sub_init_vars('undef', @{$obj->{vars}})
+                  . $self->_dump_sub_init_vars(extended => 1, vars => ['undef', @{$obj->{vars}}])
 
                   . (' ' x ($Sidef::SPACES * 2))
                   . "bless {"
@@ -722,8 +729,7 @@ HEADER
                             $code .= (" " x $Sidef::SPACES) . 'sub new {' . "\n";
 
                             $Sidef::SPACES += $Sidef::SPACES_INCR;
-
-                            $code .= $self->_dump_sub_init_vars('undef', @{$self->{class_vars}});
+                            $code .= $self->_dump_sub_init_vars(extended => 1, vars => ['undef', @{$self->{class_vars}}]);
 
                             $code .= " " x $Sidef::SPACES;
                             $code .= 'my $self = bless {';
@@ -761,7 +767,7 @@ HEADER
                                 pop @vars;
                             }
 
-                            $code .= $self->_dump_sub_init_vars(@vars);
+                            $code .= $self->_dump_sub_init_vars(extended => $is_function, vars => \@vars);
 
                             if ($is_function) {
                                 $code .= (' ' x $Sidef::SPACES) . 'my @return;' . "\n";

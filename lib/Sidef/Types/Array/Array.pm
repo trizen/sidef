@@ -566,6 +566,8 @@ package Sidef::Types::Array::Array {
         $self->new(@arr);
     }
 
+    *collect_with_index = \&map_with_index;
+
     sub flat_map {
         my ($self, $code) = @_;
         $self->new(map { @{scalar $code->run($_)} } @{$self});
