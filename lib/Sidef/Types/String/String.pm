@@ -244,10 +244,15 @@ package Sidef::Types::String::String {
 
     sub append {
         my ($self, $string) = @_;
-        __PACKAGE__->new($$self . $string->get_value);
+        $self->new($$self . $string->get_value);
     }
 
     *concat = \&append;
+
+    sub prepend {
+        my ($self, $string) = @_;
+        $self->new($string->get_value . $$self);
+    }
 
     sub ucfirst {
         my ($self) = @_;
