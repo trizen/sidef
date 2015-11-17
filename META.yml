@@ -80,6 +80,8 @@ provides:
     file: lib/Sidef/Types/Block/Do.pm
   Sidef::Types::Block::For:
     file: lib/Sidef/Types/Block/For.pm
+  Sidef::Types::Block::ForArray:
+    file: lib/Sidef/Types/Block/ForArray.pm
   Sidef::Types::Block::Fork:
     file: lib/Sidef/Types/Block/Fork.pm
   Sidef::Types::Block::Gather:

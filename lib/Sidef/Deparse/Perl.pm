@@ -846,6 +846,13 @@ HEADER
         elsif ($ref eq 'Sidef::Types::Block::For') {
             ## ok
         }
+        elsif ($ref eq 'Sidef::Types::Block::ForArray') {
+            $code =
+                'for my '
+              . $self->deparse_expr({self => $obj->{var}}) . '(@{'
+              . $self->deparse_expr({self => $obj->{array}}) . '})'
+              . $self->deparse_bare_block($obj->{block}->{code});
+        }
         elsif ($ref eq 'Sidef::Types::Block::If') {
             ## ok
         }

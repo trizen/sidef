@@ -2243,7 +2243,56 @@ package Sidef::Parser {
         if (defined $obj) {
             push @{$struct{$self->{class}}}, {self => $obj};
 
-            if ($obj_key) {
+            # for var in array { ... }
+            if (ref($obj) eq 'Sidef::Types::Block::For' and /\Gfor\h+($self->{var_name_re})\h+in\h+/gc) {
+                my ($var_name, $class_name) = $self->get_name_and_class($1);
+
+                my $array = (
+                             /\G(?=\()/
+                             ? $self->parse_arguments(code => $opt{code})
+                             : $self->parse_obj(code => $opt{code})
+                            );
+
+                my $variable = Sidef::Variable::Variable->new(
+                                                              class => $class_name,
+                                                              name  => $var_name,
+                                                              type  => 'var',
+                                                             );
+
+                my $vars_len = $#{$self->{vars}{$class_name}} + 1;
+
+                unshift @{$self->{vars}{$class_name}},
+                  {
+                    obj   => $variable,
+                    name  => $var_name,
+                    count => 1,
+                    type  => 'var',
+                    line  => $self->{line},
+                  };
+
+                my $block = (
+                             /\G\h*(?=\{)/gc
+                             ? $self->parse_block(code => $opt{code})
+                             : $self->fatal_error(
+                                                  error => "expected a block after the token 'in': for $var_name in { ... }",
+                                                  code  => $_,
+                                                  pos   => pos($_),
+                                                 )
+                            );
+
+                # Remove the loop variable from the current scope
+                splice(@{$self->{vars}{$class_name}}, $#{$self->{vars}{$class_name}} - $vars_len, 1);
+
+                # Replace the old Block::For object with Block::ForArray
+                $struct{$self->{class}}[-1]{self} =
+                  Sidef::Types::Block::ForArray->new(
+                                                     var   => $variable,
+                                                     block => $block,
+                                                     array => $array,
+                                                    );
+            }
+
+            elsif ($obj_key) {
                 my ($method) = $self->get_method_name(code => $opt{code});
                 if (defined $method) {
 

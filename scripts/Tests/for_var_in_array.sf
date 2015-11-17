@@ -1,0 +1,29 @@
+#!/usr/bin/ruby
+
+var arr = [1,2,3,4];
+
+for i in arr {
+    next if i==2;
+    if (i == 2) {
+        die "next error!";
+    }
+}
+
+var i = 42;
+assert_eq(i, 42);
+
+for i in arr {
+    break if i==2;
+    if (i >= 2) {
+        die "break error!";
+    }
+}
+
+assert_eq(i, 42);
+i = 99;
+
+for i in arr {
+    say i;
+}
+
+assert_eq(i, 99);

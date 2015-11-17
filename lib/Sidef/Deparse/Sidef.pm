@@ -387,6 +387,12 @@ package Sidef::Deparse::Sidef {
         elsif ($ref eq 'Sidef::Types::Block::Loop') {
             $code = 'loop ' . $self->deparse_expr({self => $obj->{block}});
         }
+        elsif ($ref eq 'Sidef::Types::Block::ForArray') {
+            $code = 'for '
+              . $self->deparse_expr({self => $obj->{var}}) . ' in ('
+              . $self->deparse_expr({self => $obj->{array}}) . ') '
+              . $self->deparse_bare_block($obj->{block}->{code});
+        }
         elsif ($ref eq 'Sidef::Math::Math') {
             $code = 'Math';
         }

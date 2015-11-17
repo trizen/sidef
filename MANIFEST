@@ -53,6 +53,7 @@ lib/Sidef/Types/Block/Do.pm
 lib/Sidef/Types/Block/Do.pod
 lib/Sidef/Types/Block/For.pm
 lib/Sidef/Types/Block/For.pod
+lib/Sidef/Types/Block/ForArray.pm
 lib/Sidef/Types/Block/Fork.pm
 lib/Sidef/Types/Block/Fork.pod
 lib/Sidef/Types/Block/Gather.pm
@@ -607,6 +608,7 @@ scripts/Tests/find_the_missing_permutation.sf
 scripts/Tests/first_class_functions_analogously.sf
 scripts/Tests/floyds_triangle.sf
 scripts/Tests/for_two_vars.sf
+scripts/Tests/for_var_in_array.sf
 scripts/Tests/forward_difference.sf
 scripts/Tests/function_composition.sf
 scripts/Tests/functional_modules.sf
