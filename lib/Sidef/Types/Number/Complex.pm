@@ -429,6 +429,11 @@ package Sidef::Types::Number::Complex {
         Sidef::Types::Bool::Bool->new($$self == 0);
     }
 
+    sub is_one {
+        my ($self) = @_;
+        Sidef::Types::Bool::Bool->new($$self == 1);
+    }
+
     sub is_nan {
         my ($self) = @_;
         Sidef::Types::Bool::Bool->false;

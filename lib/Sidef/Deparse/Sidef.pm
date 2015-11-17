@@ -110,14 +110,7 @@ package Sidef::Deparse::Sidef {
 
     sub _dump_array {
         my ($self, $array) = @_;
-        '[' . join(
-            ', ',
-
-            ref($array) eq 'Sidef::Types::Array::Array'
-            ? (map { $self->deparse_expr({self => $_->get_value}) } @{$array})
-            : (map { $self->deparse_expr(ref($_) eq 'HASH' ? $_ : {self => $_}) } @{$array})
-          )
-          . ']';
+        '[' . join(', ', map { $self->deparse_expr(ref($_) eq 'HASH' ? $_ : {self => $_}) } @{$array}) . ']';
     }
 
     sub _dump_class_name {
@@ -340,17 +333,13 @@ package Sidef::Deparse::Sidef {
             $code = 'LazyMethod';
         }
         elsif ($ref eq 'Sidef::Types::Block::Break') {
-            if (not exists $expr->{call}) {
-                $code = 'break';
-            }
+            $code = 'break';
         }
         elsif ($ref eq 'Sidef::Types::Block::Default') {
             $code = 'default' . $self->deparse_bare_block($obj->{block}->{code});
         }
         elsif ($ref eq 'Sidef::Types::Block::Next') {
-            if (not exists $expr->{call}) {
-                $code = 'next';
-            }
+            $code = 'next';
         }
         elsif ($ref eq 'Sidef::Types::Block::Continue') {
             $code = 'continue';

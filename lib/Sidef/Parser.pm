@@ -2854,8 +2854,11 @@ package Sidef::Parser {
                     }
                     elsif (!$has_newline and /\G(if|while|and|or)\b\h*/gc) {
                         my $keyword = $1;
-                        my $obj =
-                          (/\G(?=\()/ ? $self->parse_arguments(code => $opt{code}) : $self->parse_obj(code => $opt{code}));
+                        my $obj = (
+                                   /\G(?=\()/
+                                   ? $self->parse_arguments(code => $opt{code})
+                                   : $self->parse_obj(code => $opt{code})
+                                  );
                         push @{$struct{$self->{class}}[-1]{call}}, {keyword => $keyword, arg => [$obj]};
                         redo;
                     }

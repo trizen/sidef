@@ -38,7 +38,11 @@ package Sidef::Optimizer {
              map {
                  { $_, [table(STRING)] }
                } methods(STRING, qw(
+                   new call
+
                    concat
+                   prepend
+
                    gt lt le ge cmp
 
                    xor and or
@@ -46,6 +50,7 @@ package Sidef::Optimizer {
 
                    index
                    unpack
+                   crypt
 
                    levenshtein
                    contains
@@ -68,11 +73,21 @@ package Sidef::Optimizer {
              map {
                  { $_, [] }
                } methods(STRING, qw(
-                   lc uc tc wc tclc lcfirst
+                   lc uc fc tc wc tclc lcfirst
 
                    pop
+                   chop
                    chomp
-                   length
+
+                   chars_len
+                   bytes_len
+                   graphs_len
+
+                   chars
+                   bytes
+                   lines
+                   words
+                   graphemes
 
                    ord
                    oct
@@ -81,10 +96,16 @@ package Sidef::Optimizer {
                    num
                    not
 
+                   first
+                   last
+
                    repeat
                    reverse
                    clear
+                   sort
+
                    is_empty
+                   is_palindrome
 
                    trim
                    trim_beg
@@ -114,7 +135,7 @@ package Sidef::Optimizer {
 
                    times
                    repeat
-                   char_at
+                   char
 
                    sprintf
                    sprintlnf
@@ -126,7 +147,11 @@ package Sidef::Optimizer {
             ),
 
             # String.method(String | Number | Regex)
-            #(map {{$_, [table(STRING, NUMBER, REGEX)]}} methods(STRING, qw(split))),
+            (
+             map {
+                 { $_, [table(STRING, NUMBER, REGEX)] }
+               } methods(STRING, qw(split))
+            ),
 
             # String.method(String, String)
             (
@@ -170,6 +195,8 @@ package Sidef::Optimizer {
              map {
                  { $_, [table(NUMBER)] }
                } methods(NUMBER, qw(
+                   new call
+
                    + - / * % **
 
                    lt gt le ge cmp acmp
@@ -177,6 +204,7 @@ package Sidef::Optimizer {
                    and or xor
 
                    divmod
+                   digit
 
                    complex
                    root log
@@ -184,6 +212,7 @@ package Sidef::Optimizer {
                    round roundf
                    digit
                    nok
+                   rdiv
                    is_div
 
                    shift_right
@@ -198,10 +227,12 @@ package Sidef::Optimizer {
              map {
                  { $_, [] }
                } methods(NUMBER, qw(
+                   new call
                    inc dec not
 
                    factorial
                    sqrt
+                   troot
                    abs
 
                    hex oct bin
@@ -216,6 +247,7 @@ package Sidef::Optimizer {
                    chr
 
                    is_zero
+                   is_one
                    is_nan
                    is_positive
                    is_negative
@@ -228,10 +260,17 @@ package Sidef::Optimizer {
                    floor
                    length
 
+                   parts
+                   numerator
+                   denominator
+
+                   digits
+
                    as_bin
                    as_oct
                    as_hex
 
+                   rat
                    complex i
 
                    sstr
@@ -247,6 +286,7 @@ package Sidef::Optimizer {
              map {
                  { $_, [table(NUMBER), table(NUMBER)] }
                } methods(NUMBER, qw(
+                   modpow
                    shift_right
                    shift_left
                    )
@@ -287,8 +327,13 @@ package Sidef::Optimizer {
                    sum
                    prod
 
+                   sort
+                   reverse
+
+                   unique
+                   last_unique
+
                    to_s
-                   to_list
                    dump
                    )
                )
@@ -300,6 +345,27 @@ package Sidef::Optimizer {
                } methods(ARRAY, qw(
                    exists
                    defined
+                   contains
+
+                   multiply
+
+                   take_right
+                   take_left
+                   )
+               )
+            ),
+
+            (
+             map {
+                 { $_, [table(ARRAY)] }
+               } methods(ARRAY, qw(
+                   and
+                   or
+                   xor
+                   concat
+
+                   contains_any
+                   contains_all
                    )
                )
             ),
@@ -310,6 +376,8 @@ package Sidef::Optimizer {
                } methods(ARRAY, qw(
                    pack
                    join
+                   contains
+                   reduce_operator
                    )
                )
             ),
@@ -414,13 +482,45 @@ package Sidef::Optimizer {
 
         (COMPLEX) => [
 
-            # Complex.method(Complex)
+            # Complex.method(Complex|Number)
             (
              map {
-                 { $_, [table(COMPLEX)] }
+                 { $_, [table(COMPLEX, NUMBER)] }
                } methods(COMPLEX, qw(
-                   cmp
+                   cmp gt lt ge le eq ne
                    roundf
+
+                   mul
+                   div
+                   add
+                   sub
+                   exp
+                   log
+                   pow
+
+                   atan2
+                   )
+               )
+            ),
+
+            # Complex.method(Number|Complex, Number|Complex)
+            (
+             map {
+                 { $_, [table(NUMBER, COMPLEX)] }
+               } methods(COMPLEX, qw(
+                   call
+                   new
+                   )
+               )
+            ),
+
+            # Complex.method(Number|Complex, Number|Complex)
+            (
+             map {
+                 { $_, [table(NUMBER, COMPLEX), table(NUMBER, COMPLEX)] }
+               } methods(COMPLEX, qw(
+                   call
+                   new
                    )
                )
             ),
@@ -430,11 +530,45 @@ package Sidef::Optimizer {
              map {
                  { $_, [] }
                } methods(COMPLEX, qw(
+                   new call
+
                    inc
                    dec
+                   abs
+
+                   log
+                   log10
+                   sqrt
+
+                   cos
+                   sin
+                   tan
+                   csc
+                   sec
+                   cot
+                   asin
+                   acos
+                   atan
+                   acsc
+                   asec
+                   acot
+                   sinh
+                   cosh
+                   tanh
+                   csch
+                   sech
+                   coth
+                   asinh
+                   acosh
+                   atanh
+                   acsch
+                   asech
+                   acoth
+
+                   pi
 
                    int
-                   negate
+                   neg
                    not
                    sign
 
@@ -442,9 +576,10 @@ package Sidef::Optimizer {
                    imaginary
 
                    is_zero
+                   is_one
                    is_nan
-                   is_positive
-                   is_negative
+                   is_pos
+                   is_neg
                    is_even
                    is_odd
                    is_inf
@@ -508,6 +643,15 @@ package Sidef::Optimizer {
                 $obj->{block} = $self->optimize_expr({self => $obj->{block}});
             }
         }
+        elsif ($ref eq 'Sidef::Variable::Static') {
+            if ($addr{refaddr($obj)}++) {
+                ## ok
+            }
+            else {
+                my %code = $self->optimize($obj->{expr});
+                $obj->{expr} = \%code;
+            }
+        }
         elsif ($ref eq 'Sidef::Variable::Init') {
             if ($addr{refaddr($obj)}++) {
                 ## ok
@@ -520,6 +664,15 @@ package Sidef::Optimizer {
             }
         }
         elsif ($ref eq 'Sidef::Types::Block::Do') {
+            if ($addr{refaddr($obj)}++) {
+                ## ok
+            }
+            else {
+                my %code = $self->optimize($obj->{block}{code});
+                $obj->{block}{code} = \%code;
+            }
+        }
+        elsif ($ref eq 'Sidef::Types::Block::ForArray') {
             if ($addr{refaddr($obj)}++) {
                 ## ok
             }

@@ -1249,7 +1249,7 @@ package Sidef::Types::Array::Array {
 
     sub reverse {
         my ($self) = @_;
-        $self->new(reverse @{$self});
+        $self->new(CORE::reverse @{$self});
     }
 
     *reversed = \&reverse;    # alias
