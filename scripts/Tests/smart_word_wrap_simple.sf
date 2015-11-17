@@ -52,9 +52,9 @@ class SmartWordWrap(WIDTH=80) {
             }
             else {
                 row = [[root...]];
-            };
+            }
             root.pop;
-        };
+        }
 
         row;
     }
@@ -82,7 +82,10 @@ class SmartWordWrap(WIDTH=80) {
         best{:value};
     }
 
-    method wrap(text) {
+    method wrap(text, width) {
+
+        # Temporarily modify the width
+        local WIDTH = width if defined(width);
 
         # Split the text into words
         text.is_a(String) && text.words!;
@@ -90,17 +93,17 @@ class SmartWordWrap(WIDTH=80) {
         var lines = [];
         self.prepare_words(text).each { |path|
             lines.append(self.combine([], path)...);
-        };
+        }
 
         self.find_best(lines).join("\n");
     }
 }
 
-var sww = SmartWordWrap(6);
+var sww = SmartWordWrap();
 
 var words = %w(aaa bb cc ddddd);
 #var words = %w(Lorem ipsum dolor sit amet, consectetur adipiscing elit.);
-var wrapped = sww.wrap(words);
+var wrapped = sww.wrap(words, 6);
 
 say wrapped;
 

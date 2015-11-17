@@ -124,8 +124,8 @@ class SmartWordWrap(WIDTH=80) {
     ## returns the best possible wrapped string.
     method wrap(text, width) {
 
-        # Change the width
-        defined(width) && (self{:WIDTH} = width);
+        # Temporarily modify the width
+        local WIDTH = width if defined(width);
 
         # Split the text into words
         text.is_a(String) && (
