@@ -20,7 +20,7 @@ package Sidef::Types::Number::Number {
     sub new {
         my (undef, $num) = @_;
 
-        ref($num) eq 'Math::BigFloat'
+        ref($num) eq 'Math::BigFloat' || ref($num) eq 'Math::BigRat'
           ? (bless \$num => __PACKAGE__)
           : (
             ref($num) || (length($num) > 5) ? (

@@ -22,7 +22,13 @@ package Sidef::Optimizer {
             my ($package, @names) = @_;
             my $module = $cache{$package} //= (($package =~ s{::}{/}gr) . '.pm');
             exists($INC{$module}) || require($module);
-            map { \&{$package . '::' . $_} } @names;
+            map {
+
+                # defined(&{$package . '::' . $_})
+                #   or warn "Invalid method $package: $_";
+
+                \&{$package . '::' . $_}
+            } @names;
         }
     }
 
@@ -49,7 +55,6 @@ package Sidef::Optimizer {
                    eq ne
 
                    index
-                   unpack
                    crypt
 
                    levenshtein
@@ -203,11 +208,10 @@ package Sidef::Optimizer {
                    eq ne
                    and or xor
 
-                   divmod
                    digit
-
                    complex
                    root log
+                   npow
                    max min
                    round roundf
                    digit
@@ -217,7 +221,6 @@ package Sidef::Optimizer {
 
                    shift_right
                    shift_left
-                   next_power_of
                    )
                )
             ),
@@ -232,6 +235,7 @@ package Sidef::Optimizer {
 
                    factorial
                    sqrt
+                   npow2
                    troot
                    abs
 
@@ -240,8 +244,8 @@ package Sidef::Optimizer {
                    cos sin
                    log ln log10 log2
 
-                   infinity
-                   negate
+                   inf
+                   neg
                    sign
                    nan
                    chr
@@ -260,7 +264,6 @@ package Sidef::Optimizer {
                    floor
                    length
 
-                   parts
                    numerator
                    denominator
 
@@ -276,7 +279,6 @@ package Sidef::Optimizer {
                    sstr
                    dump
                    commify
-                   next_power_of_two
                    )
                )
             ),
@@ -322,7 +324,6 @@ package Sidef::Optimizer {
                    is_empty
 
                    min max
-                   minmax
 
                    sum
                    prod

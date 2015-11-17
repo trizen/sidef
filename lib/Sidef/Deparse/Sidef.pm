@@ -108,6 +108,19 @@ package Sidef::Deparse::Sidef {
         Data::Dump::quote($str);
     }
 
+    sub _dump_number {
+        my ($self, $num) = @_;
+
+        state $table = {
+                        'inf'  => q{Number.inf},
+                        '-inf' => q{Number.inf('-')},
+                        'nan'  => q{Number.nan},
+                        '0'    => q{Number},
+                       };
+
+        exists($table->{lc($num)}) ? $table->{lc($num)} : $num;
+    }
+
     sub _dump_array {
         my ($self, $array) = @_;
         '[' . join(', ', map { $self->deparse_expr(ref($_) eq 'HASH' ? $_ : {self => $_}) } @{$array}) . ']';
@@ -436,13 +449,18 @@ package Sidef::Deparse::Sidef {
         }
         elsif ($ref eq 'Sidef::Types::Number::Number') {
             my $value = $obj->get_value;
-            my $num = ref($value) ? ref($value) eq 'Math::BigRat' ? $value->numify : $value->bstr : $value;
-            $code =
-                $num eq '0'        ? 'Number'
-              : lc($num) eq 'inf'  ? '0.inf'
-              : lc($num) eq '-inf' ? "0.inf('-')"
-              : lc($num) eq 'nan'  ? '0.nan'
-              :                      $num;
+
+            if (ref($value)) {
+                if (ref($value) eq 'Math::BigRat') {
+                    $code = '(' . join('//', map { $self->_dump_number($_) } $value->parts()) . ')';
+                }
+                else {
+                    $code = $self->_dump_number($value->bstr);
+                }
+            }
+            else {
+                $code = $self->_dump_number($value);
+            }
         }
         elsif ($ref eq 'Sidef::Types::Array::Array' or $ref eq 'Sidef::Types::Array::HCArray') {
             if (not @{$obj}) {

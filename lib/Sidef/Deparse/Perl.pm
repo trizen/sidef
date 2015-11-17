@@ -993,7 +993,17 @@ HEADER
         }
         elsif ($ref eq 'Sidef::Types::Number::Number') {
             my $value = $obj->get_value;
-            $code = $self->make_constant($ref, 'new', "Number$refaddr", ref($value) ? (q{'} . $value->bstr . q{'}) : $value);
+
+            if (ref($value)) {
+                if (ref($value) eq 'Math::BigRat') {
+                    $value = (q{Math::BigRat->new('} . join('/', $value->parts) . q{')});
+                }
+                else {
+                    $value = (q{'} . $value->bstr . q{'});
+                }
+            }
+
+            $code = $self->make_constant($ref, 'new', "Number$refaddr", $value);
         }
         elsif ($ref eq 'Sidef::Types::Array::Array' or $ref eq 'Sidef::Types::Array::HCArray') {
             $code = $self->_dump_array('Sidef::Types::Array::Array', $obj);
