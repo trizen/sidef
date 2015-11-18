@@ -1222,17 +1222,16 @@ package Sidef::Types::Array::Array {
     sub rotate {
         my ($self, $num) = @_;
 
-        $num = $num->get_value;
-        my $array = $self->new(@{$self});
+        $num = $num->get_value % ($#{$self} + 1);
+        return $self if $num == 0;
 
-        if ($num < 0) {
-            CORE::unshift(@{$array}, CORE::pop(@{$array})) for 1 .. abs($num);
-        }
-        else {
-            CORE::push(@{$array}, CORE::shift(@{$array})) for 1 .. $num;
-        }
+        # Surprisingly, this is slower:
+        # $self->new(@{$self}[$num .. $#{$self}], @{$self}[0 .. $num - 1]);
 
-        $array;
+        # Surprisingly, this is 73% faster:
+        my @array = @{$self};
+        unshift(@array, splice(@array, $num));
+        $self->new(@array);
     }
 
     # Join the array as string
