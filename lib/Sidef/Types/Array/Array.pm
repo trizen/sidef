@@ -38,9 +38,7 @@ package Sidef::Types::Array::Array {
     sub unroll_operator {
         my ($self, $operator, $arg) = @_;
 
-        if (ref $operator) {
-            $operator = $operator->get_value;
-        }
+        $operator = $operator->get_value if ref($operator);
 
         my @array;
         if (defined $arg) {
@@ -63,9 +61,7 @@ package Sidef::Types::Array::Array {
     sub map_operator {
         my ($self, $operator, @args) = @_;
 
-        if (ref $operator) {
-            $operator = $operator->get_value;
-        }
+        $operator = $operator->get_value if ref($operator);
 
         my @array;
         foreach my $i (0 .. $#{$self}) {
@@ -78,9 +74,7 @@ package Sidef::Types::Array::Array {
     sub pam_operator {
         my ($self, $operator, $arg) = @_;
 
-        if (ref $operator) {
-            $operator = $operator->get_value;
-        }
+        $operator = $operator->get_value if ref($operator);
 
         my @array;
         foreach my $i (0 .. $#{$self}) {
@@ -93,15 +87,12 @@ package Sidef::Types::Array::Array {
     sub reduce_operator {
         my ($self, $operator) = @_;
 
-        if (ref $operator) {
-            $operator = $operator->get_value;
-        }
-
+        $operator = $operator->get_value if ref($operator);
         (my $offset = $#{$self}) >= 0 || return;
 
         my $x = $self->[0];
         foreach my $i (1 .. $offset) {
-            $x = ($x->$operator($self->[$i]));
+            $x = $x->$operator($self->[$i]);
         }
         $x;
     }
@@ -228,7 +219,7 @@ package Sidef::Types::Array::Array {
         my $head = shift @set;
         my @result = _combinations($n - 1, @set);
         foreach my $subarray (@result) {
-            unshift @{$subarray}, $head;
+            CORE::unshift @{$subarray}, $head;
         }
         @result, _combinations($n, @set);
     }
@@ -348,13 +339,31 @@ package Sidef::Types::Array::Array {
     }
 
     sub sum {
-        $_[0]->reduce_operator('+');
+        defined($_[1])
+          ? do {
+            my $sum = $_[1];
+            state $method = '+';
+            foreach my $obj (@{$_[0]}) {
+                $sum = $sum->$method($obj);
+            }
+            $sum;
+          }
+          : $_[0]->reduce_operator('+');
     }
 
     *collapse = \&sum;
 
     sub prod {
-        $_[0]->reduce_operator('*');
+        defined($_[1])
+          ? do {
+            my $prod = $_[1];
+            state $method = '*';
+            foreach my $obj (@{$_[0]}) {
+                $prod = $prod->$method($obj);
+            }
+            $prod;
+          }
+          : $_[0]->reduce_operator('*');
     }
 
     *product = \&prod;
@@ -1213,7 +1222,7 @@ package Sidef::Types::Array::Array {
 
     sub unshift {
         my ($self, @args) = @_;
-        unshift @{$self}, @{$self->new(@args)};
+        CORE::unshift(@{$self}, @{$self->new(@args)});
         $self;
     }
 
@@ -1230,7 +1239,7 @@ package Sidef::Types::Array::Array {
 
         # Surprisingly, this is 73% faster:
         my @array = @{$self};
-        unshift(@array, splice(@array, $num));
+        CORE::unshift(@array, CORE::splice(@array, $num));
         $self->new(@array);
     }
 
@@ -1405,13 +1414,13 @@ package Sidef::Types::Array::Array {
 
         *{__PACKAGE__ . '::' . '++'} = sub {
             my ($self, $obj) = @_;
-            $self->push($obj);
+            CORE::push(@{$self}, $obj);
             $self;
         };
 
         *{__PACKAGE__ . '::' . '--'} = sub {
             my ($self) = @_;
-            $self->pop;
+            CORE::pop(@{$self});
             $self;
         };
     }

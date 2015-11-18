@@ -322,6 +322,7 @@ package Sidef::Optimizer {
 
                    len end
                    is_empty
+                   pairs
 
                    min max
 
@@ -333,8 +334,10 @@ package Sidef::Optimizer {
 
                    unique
                    last_unique
+                   flatten
 
                    to_s
+                   to_hash
                    dump
                    )
                )
@@ -344,11 +347,26 @@ package Sidef::Optimizer {
              map {
                  { $_, [table(NUMBER)] }
                } methods(ARRAY, qw(
+                   count
+                   index
+                   rindex
                    exists
                    defined
                    contains
+                   contains_type
 
+                   divide
                    multiply
+
+                   rotate
+
+                   first
+                   last
+                   item
+                   ft
+
+                   sum
+                   prod
 
                    take_right
                    take_left
@@ -365,6 +383,9 @@ package Sidef::Optimizer {
                    xor
                    concat
 
+                   eq ne
+                   mzip
+                   contains_type
                    contains_any
                    contains_all
                    )
@@ -377,7 +398,12 @@ package Sidef::Optimizer {
                } methods(ARRAY, qw(
                    pack
                    join
+                   index
+                   rindex
+                   count
                    contains
+                   contains_type
+                   reduce
                    reduce_operator
                    )
                )
@@ -701,10 +727,18 @@ package Sidef::Optimizer {
             }
         }
         elsif ($ref eq 'Sidef::Types::Array::HCArray') {
+            my $has_expr = 0;
+
             foreach my $i (0 .. $#{$obj}) {
                 if (ref($obj->[$i]) eq 'HASH') {
                     $obj->[$i] = $self->optimize_expr($obj->[$i]);
+                    $has_expr ||= ref($obj->[$i]) eq 'HASH';
                 }
+            }
+
+            # Has no expressions, so let's convert it into an Array
+            if (not $has_expr) {
+                $obj = Sidef::Types::Array::Array->new(@{$obj});
             }
         }
 

@@ -1594,16 +1594,14 @@ package Sidef::Parser {
                 my ($inline_expression, @objs);
                 foreach my $item (@{$strings}) {
                     my $str = Sidef::Types::String::String->new($item)->apply_escapes($self);
-                    if (!$inline_expression and ref $str eq 'HASH') {
-                        $inline_expression = 1;
-                    }
+                    $inline_expression ||= ref($str) eq 'HASH';
                     push @objs, $str;
                 }
 
                 return (
                         $inline_expression
                         ? Sidef::Types::Array::HCArray->new(map { {self => $_} } @objs)
-                        : Sidef::Types::Array::HCArray->new(@objs)
+                        : Sidef::Types::Array::Array->new(@objs)
                        );
             }
 
