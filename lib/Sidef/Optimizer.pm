@@ -322,8 +322,6 @@ package Sidef::Optimizer {
 
                    len end
                    is_empty
-                   pairs
-
                    min max
 
                    sum
@@ -337,7 +335,6 @@ package Sidef::Optimizer {
                    flatten
 
                    to_s
-                   to_hash
                    dump
                    )
                )
