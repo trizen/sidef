@@ -666,10 +666,9 @@ package Sidef::Types::Array::Array {
                 return Sidef::Types::Number::Number->new(-1);
             }
 
-            state $method = '=';
             foreach my $i (0 .. $#{$self}) {
-                $self->[$i]->$method($obj)
-                  && return Sidef::Types::Number::Number->new($i);
+                $self->[$i] eq $obj
+                  and return Sidef::Types::Number::Number->new($i);
             }
 
             return Sidef::Types::Number::Number->new(-1);
@@ -693,10 +692,9 @@ package Sidef::Types::Array::Array {
                 return Sidef::Types::Number::Number->new(-1);
             }
 
-            state $method = '=';
             for (my $i = $#{$self} ; $i >= 0 ; $i--) {
-                $self->[$i]->$method($obj)
-                  && return Sidef::Types::Number::Number->new($i);
+                $self->[$i] eq $obj
+                  and return Sidef::Types::Number::Number->new($i);
             }
 
             return Sidef::Types::Number::Number->new(-1);

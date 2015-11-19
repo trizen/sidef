@@ -714,7 +714,6 @@ package Sidef::Types::Number::Number {
         *{__PACKAGE__ . '::' . '>='}  = \&ge;
         *{__PACKAGE__ . '::' . '≥'} = \&ge;
         *{__PACKAGE__ . '::' . '=='}  = \&eq;
-        *{__PACKAGE__ . '::' . '='}   = \&eq;
         *{__PACKAGE__ . '::' . '!='}  = \&ne;
         *{__PACKAGE__ . '::' . '≠'} = \&ne;
         *{__PACKAGE__ . '::' . '..'}  = \&array_to;
