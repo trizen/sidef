@@ -537,6 +537,7 @@ scripts/RosettaCode/sorting_algorithms_sleep_sort.sf
 scripts/RosettaCode/sorting_algorithms_stooge_sort.sf
 scripts/RosettaCode/sorting_algorithms_strand_sort.sf
 scripts/RosettaCode/spiral_matrix.sf
+scripts/RosettaCode/stable_marriage_problem.sf
 scripts/RosettaCode/stack.sf
 scripts/RosettaCode/stack_1.sf
 scripts/RosettaCode/standard_deviation.sf
