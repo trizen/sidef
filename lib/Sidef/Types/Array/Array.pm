@@ -97,6 +97,54 @@ package Sidef::Types::Array::Array {
         $x;
     }
 
+    sub cross_operator {
+        my ($self, $operator, $arg) = @_;
+
+        $operator = $operator->get_value if ref($operator);
+
+        my @array;
+        if ($operator eq '') {
+            foreach my $i (@{$self}) {
+                foreach my $j (@{$arg}) {
+                    push @array, $self->new($i, $j);
+                }
+            }
+        }
+        else {
+            foreach my $i (@{$self}) {
+                foreach my $j (@{$arg}) {
+                    push @array, $i->$operator($j);
+                }
+            }
+        }
+
+        $self->new(@array);
+    }
+
+    sub zip_operator {
+        my ($self, $operator, $arg) = @_;
+
+        $operator = $operator->get_value if ref($operator);
+
+        my $self_len = $#{$self};
+        my $arg_len  = $#{$arg};
+        my $min      = $self_len < $arg_len ? $self_len : $arg_len;
+
+        my @array;
+        if ($operator eq '') {
+            foreach my $i (0 .. $min) {
+                push @array, $self->new($self->[$i], $arg->[$i]);
+            }
+        }
+        else {
+            foreach my $i (0 .. $min) {
+                push @array, $self->[$i]->$operator($arg->[$i]);
+            }
+        }
+
+        $self->new(@array);
+    }
+
     sub _grep {
         my ($self, $array, $bool) = @_;
 
@@ -174,6 +222,8 @@ package Sidef::Types::Array::Array {
         my ($self, $array) = @_;
         $self->_grep($array, 1);
     }
+
+    *sub = \&subtract;
 
     sub concat {
         my ($self, $arg) = @_;
