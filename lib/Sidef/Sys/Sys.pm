@@ -6,8 +6,7 @@ package Sidef::Sys::Sys {
       );
 
     sub new {
-        my (undef, %opt) = @_;
-        CORE::bless \%opt, __PACKAGE__;
+        CORE::bless {}, __PACKAGE__;
     }
 
     sub exit {
@@ -109,12 +108,7 @@ package Sidef::Sys::Sys {
 
     sub die {
         my ($self, @args) = @_;
-        if (exists $self->{file_name}) {
-            CORE::die(@args, " at $self->{file_name} line $self->{line}.\n");
-        }
-        else {
-            CORE::die(@args, "\n");
-        }
+        CORE::die(@args, "\n");
     }
 
     *raise = \&die;
@@ -136,12 +130,7 @@ package Sidef::Sys::Sys {
 
     sub warn {
         my ($self, @args) = @_;
-        if (exists $self->{file_name}) {
-            CORE::warn(@args, " at $self->{file_name} line $self->{line}.\n");
-        }
-        else {
-            CORE::warn(@args, "\n");
-        }
+        CORE::warn(@args, "\n");
     }
 
     sub print {

@@ -133,7 +133,7 @@ package Sidef::Parser {
                 #| break\b                                         (?{ Sidef::Types::Block::Break->new })
                 | given\b                                         (?{ Sidef::Types::Block::Given->new })
                 | when\b                                          (?{ Sidef::Types::Block::When->new })
-                | (?:defined|read)\b                              (?{ state $x = Sidef::Sys::Sys->new })
+                | (?:defined|read|assert(?:_(?:eq|ne))?)\b        (?{ state $x = Sidef::Sys::Sys->new })
                 | (?:goto|die|warn)\b                             (?{ state $x = Sidef::Perl::Builtin->new })
                 | (?:[*\\&]|\+\+|--)                              (?{ state $x = Sidef::Variable::Ref->new })
                 | (?:>>?|[√+~!-]|say\b|print\b)                   (?{ state $x = Sidef::Object::Unary->new })
@@ -1610,9 +1610,8 @@ package Sidef::Parser {
                        );
             }
 
-            if (/$self->{prefix_obj_re}/goc) {
-                pos($_) = $-[0];
-                return ($^R, 1);
+            if (/($self->{prefix_obj_re})/goc) {
+                return ($^R, 1, $1);
             }
 
             # Eval keyword
@@ -1629,11 +1628,6 @@ package Sidef::Parser {
                                          vars          => {$self->{class} => [@{$self->{vars}{$self->{class}}}]},
                                          ref_vars_refs => {$self->{class} => [@{$self->{ref_vars_refs}{$self->{class}}}]},
                                         );
-            }
-
-            if (/\Gassert(?:_(?:eq|ne))?\b/gc) {
-                pos($_) = $-[0];
-                return (Sidef::Sys::Sys->new(line => $self->{line}, file_name => $self->{file_name}), 1);
             }
 
             if (/\GParser\b/gc) {
@@ -2241,13 +2235,13 @@ package Sidef::Parser {
         my %struct;
         local *_ = $opt{code};
 
-        my ($obj, $obj_key) = $self->parse_expr(code => $opt{code});
+        my ($obj, $obj_key, $method) = $self->parse_expr(code => $opt{code});
 
         if (defined $obj) {
             push @{$struct{$self->{class}}}, {self => $obj};
 
             # for var in array { ... }
-            if (ref($obj) eq 'Sidef::Types::Block::For' and /\Gfor\h+($self->{var_name_re})\h+in\h+/gc) {
+            if (ref($obj) eq 'Sidef::Types::Block::For' and /\G\h+($self->{var_name_re})\h+in\h+/gc) {
                 my ($var_name, $class_name) = $self->get_name_and_class($1);
 
                 my $array = (
@@ -2294,50 +2288,42 @@ package Sidef::Parser {
                                                      array => $array,
                                                     );
             }
-
             elsif ($obj_key) {
-                my ($method) = $self->get_method_name(code => $opt{code});
-                if (defined $method) {
+                my $arg = (
+                           /\G\h*(?=\()/gc
+                           ? $self->parse_arguments(code => $opt{code})
+                           : $self->parse_obj(code => $opt{code})
+                          );
 
-                    my $arg = (
-                               /\G\h*(?=\()/gc
-                               ? $self->parse_arguments(code => $opt{code})
-                               : $self->parse_obj(code => $opt{code})
-                              );
+                if (defined $arg) {
+                    my @arg = ($arg);
 
-                    if (defined $arg) {
-                        my @arg = ($arg);
-
-                        if (    ref($struct{$self->{class}}[-1]{self}) eq 'Sidef::Types::Block::For'
-                            and ref($arg) eq 'HASH') {
-                            if ($#{$arg->{$self->{class}}} == 2) {
-                                @arg = (
-                                    map {
-                                        { $self->{class} => [$_] }
-                                      } @{$arg->{$self->{class}}}
-                                );
-                            }
-                            elsif ($#{$arg->{$self->{class}}} != 0) {
-                                $self->fatal_error(
-                                                   code  => $_,
-                                                   pos   => pos($_) - 1,
-                                                   error => "invalid for-loop: too many arguments",
-                                                  );
-                            }
+                    if (    ref($struct{$self->{class}}[-1]{self}) eq 'Sidef::Types::Block::For'
+                        and ref($arg) eq 'HASH') {
+                        if ($#{$arg->{$self->{class}}} == 2) {
+                            @arg = (
+                                map {
+                                    { $self->{class} => [$_] }
+                                  } @{$arg->{$self->{class}}}
+                            );
                         }
+                        elsif ($#{$arg->{$self->{class}}} != 0) {
+                            $self->fatal_error(
+                                               code  => $_,
+                                               pos   => pos($_) - 1,
+                                               error => "invalid for-loop: too many arguments",
+                                              );
+                        }
+                    }
 
-                        push @{$struct{$self->{class}}[-1]{call}}, {method => $method, arg => \@arg};
-                    }
-                    elsif (ref($obj) ne 'Sidef::Types::Block::Return') {
-                        $self->fatal_error(
-                                           code  => $_,
-                                           error => "expected an argument. Did you mean '$method()' instead?",
-                                           pos   => pos($_) - 1,
-                                          );
-                    }
+                    push @{$struct{$self->{class}}[-1]{call}}, {method => $method, arg => \@arg};
                 }
-                else {
-                    die "[PARSER ERROR] The same object needs to be parsed again as a method for itself!";
+                elsif (ref($obj) ne 'Sidef::Types::Block::Return') {
+                    $self->fatal_error(
+                                       code  => $_,
+                                       error => "expected an argument. Did you mean '$method()' instead?",
+                                       pos   => pos($_) - 1,
+                                      );
                 }
             }
 
