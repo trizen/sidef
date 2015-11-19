@@ -133,7 +133,7 @@ package Sidef::Parser {
                 #| break\b                                         (?{ Sidef::Types::Block::Break->new })
                 | given\b                                         (?{ Sidef::Types::Block::Given->new })
                 | when\b                                          (?{ Sidef::Types::Block::When->new })
-                | (?:defined|read|assert(?:_(?:eq|ne))?)\b        (?{ state $x = Sidef::Sys::Sys->new })
+                | (?:defined|read|assert(?:_(?:eq|ne))?+)\b       (?{ state $x = Sidef::Sys::Sys->new })
                 | (?:goto|die|warn)\b                             (?{ state $x = Sidef::Perl::Builtin->new })
                 | (?:[*\\&]|\+\+|--)                              (?{ state $x = Sidef::Variable::Ref->new })
                 | (?:>>?|[√+~!-]|say\b|print\b)                   (?{ state $x = Sidef::Object::Unary->new })
@@ -1610,7 +1610,7 @@ package Sidef::Parser {
                        );
             }
 
-            if (/($self->{prefix_obj_re})/goc) {
+            if (/($self->{prefix_obj_re})\h*/goc) {
                 return ($^R, 1, $1);
             }
 
@@ -2241,7 +2241,7 @@ package Sidef::Parser {
             push @{$struct{$self->{class}}}, {self => $obj};
 
             # for var in array { ... }
-            if (ref($obj) eq 'Sidef::Types::Block::For' and /\G\h+($self->{var_name_re})\h+in\h+/gc) {
+            if (ref($obj) eq 'Sidef::Types::Block::For' and /\G($self->{var_name_re})\h+in\h+/gc) {
                 my ($var_name, $class_name) = $self->get_name_and_class($1);
 
                 my $array = (
@@ -2290,7 +2290,7 @@ package Sidef::Parser {
             }
             elsif ($obj_key) {
                 my $arg = (
-                           /\G\h*(?=\()/gc
+                           /\G(?=\()/
                            ? $self->parse_arguments(code => $opt{code})
                            : $self->parse_obj(code => $opt{code})
                           );
