@@ -1,4 +1,4 @@
-#!/usr/bin/sidef
+#!/usr/bin/ruby
 
 #`(if running under some shell) {
     eval 'exec /usr/bin/sidef $0 ${1+"$@"}'

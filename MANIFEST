@@ -208,6 +208,7 @@ scripts/first-class_functions.sf
 scripts/Games/24_game.sf
 scripts/Games/24_game_solve.sf
 scripts/Games/24_game_solve_no_eval.sf
+scripts/Games/asciiplanes.sf
 scripts/Games/bulls_and_cows.sf
 scripts/Games/bulls_and_cows_player.sf
 scripts/Games/conway_s_game_of_life.sf
