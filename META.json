@@ -59,9 +59,6 @@
          "file" : "lib/Sidef.pm",
          "version" : "2.10"
       },
-      "Sidef::Assert::Assert" : {
-         "file" : "lib/Sidef/Assert/Assert.pm"
-      },
       "Sidef::Convert::Convert" : {
          "file" : "lib/Sidef/Convert/Convert.pm"
       },
@@ -76,6 +73,15 @@
       },
       "Sidef::Math::Math" : {
          "file" : "lib/Sidef/Math/Math.pm"
+      },
+      "Sidef::Meta::Assert" : {
+         "file" : "lib/Sidef/Meta/Assert.pm"
+      },
+      "Sidef::Meta::Error" : {
+         "file" : "lib/Sidef/Meta/Error.pm"
+      },
+      "Sidef::Meta::Warning" : {
+         "file" : "lib/Sidef/Meta/Warning.pm"
       },
       "Sidef::Module::Func" : {
          "file" : "lib/Sidef/Module/Func.pm"

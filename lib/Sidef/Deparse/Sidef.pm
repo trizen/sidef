@@ -328,8 +328,11 @@ package Sidef::Deparse::Sidef {
         elsif ($ref eq 'Sidef::Sys::Sys') {
             $code = exists($obj->{file_name}) ? '' : 'Sys';
         }
-        elsif ($ref eq 'Sidef::Assert::Assert') {
-            $code = $obj->{action} . $self->deparse_args($obj->{arg});
+        elsif ($ref eq 'Sidef::Meta::Assert') {
+            $code = $obj->{act} . $self->deparse_args($obj->{arg});
+        }
+        elsif ($ref eq 'Sidef::Meta::Error' or $ref eq 'Sidef::Meta::Warning') {
+            $code = $obj->{act} . $self->deparse_args($obj->{arg});
         }
         elsif ($ref eq 'Sidef::Eval::Eval') {
             $code = 'eval(' . $self->deparse_script($obj->{expr}) . ')';

@@ -1,4 +1,4 @@
-package Sidef::Assert::Assert {
+package Sidef::Meta::Warning {
 
     sub new {
         my (undef, %opt) = @_;

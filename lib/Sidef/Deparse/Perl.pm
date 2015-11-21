@@ -560,53 +560,14 @@ HEADER
                 }
             }
         }
-        elsif ($ref eq 'Sidef::Variable::Struct') {
-            my $name = $self->_dump_class_name($obj);
-            if ($addr{$refaddr}++) {
-                $code = $name;
-            }
-            else {
-                local $self->{parent_name} = ['struct initialization', $obj->{name}];
-
-                # Mark the variables all in use
-                foreach my $var (@{$obj->{vars}}) {
-                    $var->{in_use} = 1;
-                }
-
-                $Sidef::SPACES += $Sidef::SPACES_INCR;
-                $code =
-                    "package $name {\n"
-                  . (' ' x $Sidef::SPACES)
-                  . "sub new {\n"
-                  . (' ' x $Sidef::SPACES)
-                  . $self->_dump_sub_init_vars(extended => 1, vars => ['undef', @{$obj->{vars}}])
-
-                  . (' ' x ($Sidef::SPACES * 2))
-                  . "bless {"
-                  . join(", ", map { $self->_dump_string($_->{name}) . " => " . $self->_dump_var($_) } @{$obj->{vars}})
-                  . "}, __PACKAGE__" . "\n"
-                  . (' ' x $Sidef::SPACES) . "}\n"
-                  .
-
-                  (' ' x $Sidef::SPACES) . "*call = \\&new;\n" .
-
-                  (' ' x $Sidef::SPACES)
-                  . join("\n" . (' ' x $Sidef::SPACES),
-                         map { "sub $_->{name} : lvalue { \$_[0]->{$_->{name}} }" } @{$obj->{vars}})
-
-                  . "\n" . (' ' x ($Sidef::SPACES - $Sidef::SPACES_INCR)) . "}";
-
-                $Sidef::SPACES -= $Sidef::SPACES_INCR;
-            }
+        elsif ($ref eq 'Sidef::Object::Unary') {
+            ## OK
         }
         elsif ($ref eq 'Sidef::Variable::Local') {
             $code = 'local ' . $self->deparse_script($obj->{expr});
         }
         elsif ($ref eq 'Sidef::Variable::Global') {
             $code = '$' . $obj->{class} . '::' . $obj->{name},;
-        }
-        elsif ($ref eq 'Sidef::Object::Unary') {
-            ## OK
         }
         elsif ($ref eq 'Sidef::Variable::Define') {
             my $name  = $obj->{name} . $refaddr;
@@ -615,7 +576,6 @@ HEADER
                 $obj->{inited} = 1;
                 $self->top_add('use constant ' . $name . ' => ' . 'do {' . $self->deparse_script($obj->{expr}) . " };\n");
             }
-
             $code = $value;
         }
         elsif ($ref eq 'Sidef::Variable::Const') {
@@ -825,68 +785,103 @@ HEADER
                 }
             }
         }
-        elsif ($ref eq 'Sidef::Variable::Ref') {
-            ## ok
-        }
-        elsif ($ref eq 'Sidef::Sys::Sys') {
-            $code = $self->make_constant($ref, 'new', "Sys$refaddr");
-        }
-        elsif ($ref eq 'Sidef::Assert::Assert') {
+        elsif ($ref eq 'Sidef::Variable::Struct') {
+            my $name = $self->_dump_class_name($obj);
+            if ($addr{$refaddr}++) {
+                $code = $name;
+            }
+            else {
+                local $self->{parent_name} = ['struct initialization', $obj->{name}];
 
-            # Deparse the arguments of assert*()
-            my @args = $self->deparse_script($obj->{arg});
+                # Mark the variables all in use
+                foreach my $var (@{$obj->{vars}}) {
+                    $var->{in_use} = 1;
+                }
 
-            if ($obj->{action} eq 'assert') {
-
-                # Check arity
-                @args == 1
-                  or die "[ERROR] Incorrect number of arguments for assert() in"
-                  . " `$obj->{file}' at line $obj->{line} (expected 1 argument)\n";
-
-                # Generate code
+                $Sidef::SPACES += $Sidef::SPACES_INCR;
                 $code =
-qq{do{do{$args[0]} or CORE::die "assert\Q$obj->{code}\E failed in \Q$obj->{file}\E at line $obj->{line}\\n"}};
-            }
-            elsif ($obj->{action} eq 'assert_eq' or $obj->{action} eq 'assert_ne') {
+                    "package $name {\n"
+                  . (' ' x $Sidef::SPACES)
+                  . "sub new {\n"
+                  . (' ' x $Sidef::SPACES)
+                  . $self->_dump_sub_init_vars(extended => 1, vars => ['undef', @{$obj->{vars}}])
 
-                # Check arity
-                @args == 2
-                  or die "[ERROR] Incorrect number of arguments for $obj->{action}\() in"
-                  . " `$obj->{file}' at line $obj->{line} (expected 2 arguments)\n";
+                  . (' ' x ($Sidef::SPACES * 2))
+                  . "bless {"
+                  . join(", ", map { $self->_dump_string($_->{name}) . " => " . $self->_dump_var($_) } @{$obj->{vars}})
+                  . "}, __PACKAGE__" . "\n"
+                  . (' ' x $Sidef::SPACES) . "}\n"
+                  .
 
-                # Generate code
-                $code = "do{"
-                  . ($obj->{action} eq 'assert_ne' ? qq{not(do{$args[0]} eq do{$args[1]})} : qq{do{$args[0]} eq do{$args[1]}})
-                  . qq{ or CORE::die "$obj->{action}\Q$obj->{code}\E failed in \Q$obj->{file}\E at line $obj->{line}\\n\"\}};
+                  (' ' x $Sidef::SPACES) . "*call = \\&new;\n" .
+
+                  (' ' x $Sidef::SPACES)
+                  . join("\n" . (' ' x $Sidef::SPACES),
+                         map { "sub $_->{name} : lvalue { \$_[0]->{$_->{name}} }" } @{$obj->{vars}})
+
+                  . "\n" . (' ' x ($Sidef::SPACES - $Sidef::SPACES_INCR)) . "}";
+
+                $Sidef::SPACES -= $Sidef::SPACES_INCR;
             }
         }
-        elsif ($ref eq 'Sidef::Parser') {
-            $code = $ref . '->new';
+        elsif ($ref eq 'Sidef::Types::Number::Number') {
+            my $value = $obj->get_value;
+
+            if (ref($value)) {
+                if (ref($value) eq 'Math::BigRat') {
+                    $value = (q{Math::BigRat->new('} . join('/', $value->parts) . q{')});
+                }
+                else {
+                    $value = (q{'} . $value->bstr . q{'});
+                }
+            }
+
+            $code = $self->make_constant($ref, 'new', "Number$refaddr", $value);
         }
-        elsif ($ref eq 'Sidef') {
-            $code = $self->make_constant($ref, 'new', "Sidef$refaddr");
+        elsif ($ref eq 'Sidef::Types::String::String') {
+            $code = $self->make_constant($ref, 'new', "String$refaddr", $self->_dump_string(${$obj}));
         }
-        elsif ($ref eq 'Sidef::Object::Object') {
-            $code = $self->make_constant($ref, 'new', "Object$refaddr");
+        elsif ($ref eq 'Sidef::Types::Array::Array' or $ref eq 'Sidef::Types::Array::HCArray') {
+            $code = $self->_dump_array('Sidef::Types::Array::Array', $obj);
         }
-        elsif ($ref eq 'Sidef::Variable::LazyMethod') {
-            $code = $ref . '->new';
+        elsif ($ref eq 'Sidef::Types::Bool::Bool') {
+            $code = $self->make_constant($ref, 'new', ${$obj} ? ("true$refaddr", 1) : ("false$refaddr", 0));
         }
-        elsif ($ref eq 'Sidef::Types::Block::For') {
-            ## ok
-        }
-        elsif ($ref eq 'Sidef::Types::Block::ForArray') {
+        elsif ($ref eq 'Sidef::Types::Regex::Regex') {
             $code =
-                'for my '
-              . $self->deparse_expr({self => $obj->{var}}) . '(@{'
-              . $self->deparse_expr({self => $obj->{array}}) . '})'
-              . $self->deparse_bare_block($obj->{block}->{code});
+              $self->make_constant($ref, 'new', "Regex$refaddr",
+                                   $self->_dump_string("$obj->{regex}"),
+                                   $obj->{global} ? '"g"' : ());
         }
-        elsif ($ref eq 'Sidef::Types::Block::If') {
+        elsif ($ref eq 'Sidef::Types::Block::If' or $ref eq 'Sidef::Types::Block::While') {
             ## ok
         }
-        elsif ($ref eq 'Sidef::Types::Block::While') {
-            ## ok
+        elsif ($ref eq 'Sidef::Types::Bool::Ternary') {
+            $code = '('
+              . $self->deparse_script($obj->{cond}) . '?'
+              . $self->deparse_block_expr($obj->{true}) . ':'
+              . $self->deparse_block_expr($obj->{false}) . ')';
+        }
+        elsif ($ref eq 'Sidef::Variable::NamedParam') {
+            $code = $ref . '->new(' . $self->_dump_string($obj->[0]) . ',' . $self->deparse_args(@{$obj->[1]}) . ')';
+        }
+        elsif ($ref eq 'Sidef::Types::Nil::Nil') {
+            $code = 'undef';
+        }
+        elsif ($ref eq 'Sidef::Types::Hash::Hash') {
+            if (keys(%{$obj})) {
+                $code = $ref . '->new(' . join(
+                    ',',
+                    map {
+                        $self->_dump_string($_) . ' => '
+                          . (defined($obj->{$_}) ? $self->deparse_expr({self => $obj->{$_}}) : 'undef')
+                      } keys(%{$obj})
+                  )
+                  . ')';
+            }
+            else {
+                $code = $self->make_constant($ref, 'new', "Hash$refaddr");
+            }
         }
         elsif ($ref eq 'Sidef::Types::Block::Do') {
             $code = 'do {' . join(';', $self->deparse_script($obj->{block}{code})) . '}';
@@ -913,20 +908,11 @@ qq{do{do{$args[0]} or CORE::die "assert\Q$obj->{code}\E failed in \Q$obj->{file}
             my $raddr = refaddr($obj->{gather});
             $code = "do { push \@_$raddr," . $self->deparse_args($obj->{expr}) . "; \$_$raddr\[-1] }";
         }
+        elsif ($ref eq 'Sidef::Types::Block::For') {
+            ## ok
+        }
         elsif ($ref eq 'Sidef::Types::Block::Try') {
             $code = $ref . '->new';
-        }
-        elsif ($ref eq 'Sidef::Types::Bool::Ternary') {
-            $code = '('
-              . $self->deparse_script($obj->{cond}) . '?'
-              . $self->deparse_block_expr($obj->{true}) . ':'
-              . $self->deparse_block_expr($obj->{false}) . ')';
-        }
-        elsif ($ref eq 'Sidef::Module::OO') {
-            $code = $self->make_constant($ref, '__NEW__', "MOD_OO$refaddr", $self->_dump_string($obj->{module}));
-        }
-        elsif ($ref eq 'Sidef::Module::Func') {
-            $code = $self->make_constant($ref, '__NEW__', "MOD_F$refaddr", $self->_dump_string($obj->{module}));
         }
         elsif ($ref eq 'Sidef::Types::Block::Break') {
             $code = 'last';
@@ -975,21 +961,6 @@ qq{do{do{$args[0]} or CORE::die "assert\Q$obj->{code}\E failed in \Q$obj->{file}
         elsif ($ref eq 'Sidef::Variable::Magic') {
             $code = $obj->{name};
         }
-        elsif ($ref eq 'Sidef::Types::Hash::Hash') {
-            if (keys(%{$obj})) {
-                $code = $ref . '->new(' . join(
-                    ',',
-                    map {
-                        $self->_dump_string($_) . ' => '
-                          . (defined($obj->{$_}) ? $self->deparse_expr({self => $obj->{$_}}) : 'undef')
-                      } keys(%{$obj})
-                  )
-                  . ')';
-            }
-            else {
-                $code = $self->make_constant($ref, 'new', "Hash$refaddr");
-            }
-        }
         elsif ($ref eq 'Sidef::Types::Glob::Socket') {
             $code = $self->make_constant($ref, 'new', "Socket$refaddr");
         }
@@ -1031,43 +1002,14 @@ qq{do{do{$args[0]} or CORE::die "assert\Q$obj->{code}\E failed in \Q$obj->{file}
                   . join(', ', map { defined($_) ? $self->deparse_expr({self => $_}) : 'undef' } @{$obj}) . ')';
             }
         }
-        elsif ($ref eq 'Sidef::Variable::NamedParam') {
-            $code = $ref . '->new(' . $self->_dump_string($obj->[0]) . ',' . $self->deparse_args(@{$obj->[1]}) . ')';
-        }
-        elsif ($ref eq 'Sidef::Types::Regex::Regex') {
-            $code =
-              $self->make_constant($ref, 'new', "Regex$refaddr",
-                                   $self->_dump_string("$obj->{regex}"),
-                                   $obj->{global} ? '"g"' : ());
-        }
-        elsif ($ref eq 'Sidef::Types::Number::Number') {
-            my $value = $obj->get_value;
-
-            if (ref($value)) {
-                if (ref($value) eq 'Math::BigRat') {
-                    $value = (q{Math::BigRat->new('} . join('/', $value->parts) . q{')});
-                }
-                else {
-                    $value = (q{'} . $value->bstr . q{'});
-                }
-            }
-
-            $code = $self->make_constant($ref, 'new', "Number$refaddr", $value);
-        }
-        elsif ($ref eq 'Sidef::Types::Array::Array' or $ref eq 'Sidef::Types::Array::HCArray') {
-            $code = $self->_dump_array('Sidef::Types::Array::Array', $obj);
-        }
-        elsif ($ref eq 'Sidef::Types::Nil::Nil') {
-            $code = 'undef';
-        }
         elsif ($ref eq 'Sidef::Types::Null::Null') {
             $code = $self->make_constant($ref, 'new', "Null$refaddr");
         }
-        elsif ($ref eq 'Sidef::Types::String::String') {
-            $code = $self->make_constant($ref, 'new', "String$refaddr", $self->_dump_string(${$obj}));
+        elsif ($ref eq 'Sidef::Module::OO') {
+            $code = $self->make_constant($ref, '__NEW__', "MOD_OO$refaddr", $self->_dump_string($obj->{module}));
         }
-        elsif ($ref eq 'Sidef::Types::Bool::Bool') {
-            $code = $self->make_constant($ref, 'new', ${$obj} ? ("true$refaddr", 1) : ("false$refaddr", 0));
+        elsif ($ref eq 'Sidef::Module::Func') {
+            $code = $self->make_constant($ref, '__NEW__', "MOD_F$refaddr", $self->_dump_string($obj->{module}));
         }
         elsif ($ref eq 'Sidef::Types::Array::MultiArray') {
             $code = $ref . '->new';
@@ -1083,6 +1025,63 @@ qq{do{do{$args[0]} or CORE::die "assert\Q$obj->{code}\E failed in \Q$obj->{file}
         }
         elsif ($ref eq 'Sidef::Types::Glob::Dir') {
             $code = $self->make_constant($ref, 'new', "Dir$refaddr", $self->_dump_string(${$obj}));
+        }
+        elsif ($ref eq 'Sidef::Sys::Sys') {
+            $code = $self->make_constant($ref, 'new', "Sys$refaddr");
+        }
+        elsif ($ref eq 'Sidef::Meta::Assert') {
+            my @args = $self->deparse_script($obj->{arg});
+
+            if ($obj->{act} eq 'assert') {
+
+                # Check arity
+                @args == 1
+                  or die "[ERROR] Incorrect number of arguments for assert() in"
+                  . " `$obj->{file}' at line $obj->{line} (expected 1 argument)\n";
+
+                # Generate code
+                $code = qq~do{do{$args[0]} or CORE::die "$obj->{act}\Q$obj->{code}\E failed ~
+                  . qq~in \Q$obj->{file}\E at line $obj->{line}\\n"}~;
+            }
+            elsif ($obj->{act} eq 'assert_eq' or $obj->{act} eq 'assert_ne') {
+
+                # Check arity
+                @args == 2
+                  or die "[ERROR] Incorrect number of arguments for $obj->{act}\() at"
+                  . " `$obj->{file}' line $obj->{line} (expected 2 arguments)\n";
+
+                # Generate code
+                $code = "do{"
+                  . ($obj->{act} eq 'assert_ne' ? qq{not(do{$args[0]} eq do{$args[1]})} : qq{do{$args[0]} eq do{$args[1]}})
+                  . qq{ or CORE::die "$obj->{act}\Q$obj->{code}\E failed at \Q$obj->{file}\E line $obj->{line}\\n\"\}};
+            }
+        }
+        elsif ($ref eq 'Sidef::Meta::Error') {
+            my @args = $self->deparse_args($obj->{arg});
+            $code = qq~do{CORE::die(@args, " at \Q$obj->{file}\E line $obj->{line}\\n")}~;
+        }
+        elsif ($ref eq 'Sidef::Meta::Warning') {
+            my @args = $self->deparse_args($obj->{arg});
+            $code = qq~Sidef::Types::Bool::Bool->new(CORE::warn(@args, " at \Q$obj->{file}\E line $obj->{line}\\n"))~;
+        }
+        elsif ($ref eq 'Sidef::Parser') {
+            $code = $ref . '->new';
+        }
+        elsif ($ref eq 'Sidef') {
+            $code = $self->make_constant($ref, 'new', "Sidef$refaddr");
+        }
+        elsif ($ref eq 'Sidef::Object::Object') {
+            $code = $self->make_constant($ref, 'new', "Object$refaddr");
+        }
+        elsif ($ref eq 'Sidef::Variable::LazyMethod') {
+            $code = $ref . '->new';
+        }
+        elsif ($ref eq 'Sidef::Types::Block::ForArray') {
+            $code =
+                'for my '
+              . $self->deparse_expr({self => $obj->{var}}) . '(@{'
+              . $self->deparse_expr({self => $obj->{array}}) . '})'
+              . $self->deparse_bare_block($obj->{block}->{code});
         }
         elsif ($ref eq 'Sidef::Types::Byte::Bytes') {
             $code = $self->_dump_array($ref, $obj);

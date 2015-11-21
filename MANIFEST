@@ -2,7 +2,6 @@ bin/sidef
 Build.PL
 Changes
 lib/Sidef.pm
-lib/Sidef/Assert/Assert.pm
 lib/Sidef/Convert/Convert.pm
 lib/Sidef/Convert/Convert.pod
 lib/Sidef/Deparse/Perl.pm
@@ -11,6 +10,9 @@ lib/Sidef/Eval/Eval.pm
 lib/Sidef/Eval/Eval.pod
 lib/Sidef/Math/Math.pm
 lib/Sidef/Math/Math.pod
+lib/Sidef/Meta/Assert.pm
+lib/Sidef/Meta/Error.pm
+lib/Sidef/Meta/Warning.pm
 lib/Sidef/Module/Func.pm
 lib/Sidef/Module/OO.pm
 lib/Sidef/Object/Object.pm

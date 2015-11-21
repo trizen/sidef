@@ -134,7 +134,7 @@ package Sidef::Parser {
                 | given\b                                   (?{ Sidef::Types::Block::Given->new })
                 | when\b                                    (?{ Sidef::Types::Block::When->new })
                 | (?:defined|read)\b                        (?{ state $x = Sidef::Sys::Sys->new })
-                | (?:goto|die|warn)\b                       (?{ state $x = Sidef::Perl::Builtin->new })
+                | goto\b                                    (?{ state $x = Sidef::Perl::Builtin->new })
                 | (?:[*\\&]|\+\+|--)                        (?{ state $x = Sidef::Variable::Ref->new })
                 | (?:>>?|[√+~!-]|say\b|print\b)             (?{ state $x = Sidef::Object::Unary->new })
                 | :                                         (?{ state $x = Sidef::Types::Hash::Hash->new })
@@ -1615,7 +1615,7 @@ package Sidef::Parser {
             }
 
             # Assertions
-            if (/\G(assert(?:_(?:eq|ne))?+)\h*+\b/gc) {
+            if (/\G(assert(?:_(?:eq|ne))?+)\b\h*/gc) {
                 my $action = $1;
 
                 my $pos = pos($_);
@@ -1626,13 +1626,37 @@ package Sidef::Parser {
                           );
 
                 return
-                  Sidef::Assert::Assert->new(
-                                             line   => $self->{line},
-                                             action => $action,
-                                             arg    => $arg,
-                                             file   => $self->{file_name},
-                                             code   => substr($_, $pos, pos($_) - $pos)
-                                            );
+                  Sidef::Meta::Assert->new(
+                                           arg  => $arg,
+                                           act  => $action,
+                                           line => $self->{line},
+                                           file => $self->{file_name},
+                                           code => substr($_, $pos, pos($_) - $pos)
+                                          );
+            }
+
+            # die/warn
+            if (/\G(die|warn)\b\h*/gc) {
+                my $action = $1;
+
+                my $arg = (
+                           /\G(?=\()/
+                           ? $self->parse_arguments(code => $opt{code})
+                           : $self->parse_obj(code => $opt{code})
+                          );
+
+                return (
+                        (
+                         $action eq 'die'
+                         ? "Sidef::Meta::Error"
+                         : "Sidef::Meta::Warning"
+                        )->new(
+                               arg  => $arg,
+                               act  => $action,
+                               line => $self->{line},
+                               file => $self->{file_name},
+                              )
+                       );
             }
 
             # Eval keyword
