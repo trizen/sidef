@@ -831,6 +831,35 @@ HEADER
         elsif ($ref eq 'Sidef::Sys::Sys') {
             $code = $self->make_constant($ref, 'new', "Sys$refaddr");
         }
+        elsif ($ref eq 'Sidef::Assert::Assert') {
+
+            # Deparse the arguments of assert*()
+            my @args = $self->deparse_script($obj->{arg});
+
+            if ($obj->{action} eq 'assert') {
+
+                # Check arity
+                @args == 1
+                  or die "[ERROR] Incorrect number of arguments for assert() in"
+                  . " `$obj->{file}' at line $obj->{line} (expected 1 argument)\n";
+
+                # Generate code
+                $code =
+qq{do{do{$args[0]} or CORE::die "assert\Q$obj->{code}\E failed in \Q$obj->{file}\E at line $obj->{line}\\n"}};
+            }
+            elsif ($obj->{action} eq 'assert_eq' or $obj->{action} eq 'assert_ne') {
+
+                # Check arity
+                @args == 2
+                  or die "[ERROR] Incorrect number of arguments for $obj->{action}\() in"
+                  . " `$obj->{file}' at line $obj->{line} (expected 2 arguments)\n";
+
+                # Generate code
+                $code = "do{"
+                  . ($obj->{action} eq 'assert_ne' ? qq{not(do{$args[0]} eq do{$args[1]})} : qq{do{$args[0]} eq do{$args[1]}})
+                  . qq{ or CORE::die "$obj->{action}\Q$obj->{code}\E failed in \Q$obj->{file}\E at line $obj->{line}\\n\"\}};
+            }
+        }
         elsif ($ref eq 'Sidef::Parser') {
             $code = $ref . '->new';
         }

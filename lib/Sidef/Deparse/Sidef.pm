@@ -328,6 +328,9 @@ package Sidef::Deparse::Sidef {
         elsif ($ref eq 'Sidef::Sys::Sys') {
             $code = exists($obj->{file_name}) ? '' : 'Sys';
         }
+        elsif ($ref eq 'Sidef::Assert::Assert') {
+            $code = $obj->{action} . $self->deparse_args($obj->{arg});
+        }
         elsif ($ref eq 'Sidef::Eval::Eval') {
             $code = 'eval(' . $self->deparse_script($obj->{expr}) . ')';
         }

@@ -124,20 +124,20 @@ package Sidef::Parser {
             }x,
             prefix_obj_re => qr{\G
               (?:
-                  if\b                                            (?{ Sidef::Types::Block::If->new })
-                | while\b                                         (?{ Sidef::Types::Block::While->new })
-                | try\b                                           (?{ Sidef::Types::Block::Try->new })
-                | for(?:each)?+\b                                 (?{ Sidef::Types::Block::For->new })
-                | return\b                                        (?{ Sidef::Types::Block::Return->new })
-                #| next\b                                          (?{ Sidef::Types::Block::Next->new })
-                #| break\b                                         (?{ Sidef::Types::Block::Break->new })
-                | given\b                                         (?{ Sidef::Types::Block::Given->new })
-                | when\b                                          (?{ Sidef::Types::Block::When->new })
-                | (?:defined|read|assert(?:_(?:eq|ne))?+)\b       (?{ state $x = Sidef::Sys::Sys->new })
-                | (?:goto|die|warn)\b                             (?{ state $x = Sidef::Perl::Builtin->new })
-                | (?:[*\\&]|\+\+|--)                              (?{ state $x = Sidef::Variable::Ref->new })
-                | (?:>>?|[√+~!-]|say\b|print\b)                   (?{ state $x = Sidef::Object::Unary->new })
-                | :                                               (?{ state $x = Sidef::Types::Hash::Hash->new })
+                  if\b                                      (?{ Sidef::Types::Block::If->new })
+                | while\b                                   (?{ Sidef::Types::Block::While->new })
+                | try\b                                     (?{ Sidef::Types::Block::Try->new })
+                | for(?:each)?+\b                           (?{ Sidef::Types::Block::For->new })
+                | return\b                                  (?{ Sidef::Types::Block::Return->new })
+                #| next\b                                    (?{ Sidef::Types::Block::Next->new })
+                #| break\b                                   (?{ Sidef::Types::Block::Break->new })
+                | given\b                                   (?{ Sidef::Types::Block::Given->new })
+                | when\b                                    (?{ Sidef::Types::Block::When->new })
+                | (?:defined|read)\b                        (?{ state $x = Sidef::Sys::Sys->new })
+                | (?:goto|die|warn)\b                       (?{ state $x = Sidef::Perl::Builtin->new })
+                | (?:[*\\&]|\+\+|--)                        (?{ state $x = Sidef::Variable::Ref->new })
+                | (?:>>?|[√+~!-]|say\b|print\b)             (?{ state $x = Sidef::Object::Unary->new })
+                | :                                         (?{ state $x = Sidef::Types::Hash::Hash->new })
               )
             }x,
             quote_operators_re => qr{\G
@@ -1612,6 +1612,27 @@ package Sidef::Parser {
 
             if (/($self->{prefix_obj_re})\h*/goc) {
                 return ($^R, 1, $1);
+            }
+
+            # Assertions
+            if (/\G(assert(?:_(?:eq|ne))?+)\h*+\b/gc) {
+                my $action = $1;
+
+                my $pos = pos($_);
+                my $arg = (
+                           /\G(?=\()/
+                           ? $self->parse_arguments(code => $opt{code})
+                           : $self->parse_obj(code => $opt{code})
+                          );
+
+                return
+                  Sidef::Assert::Assert->new(
+                                             line   => $self->{line},
+                                             action => $action,
+                                             arg    => $arg,
+                                             file   => $self->{file_name},
+                                             code   => substr($_, $pos, pos($_) - $pos)
+                                            );
             }
 
             # Eval keyword

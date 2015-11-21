@@ -18,6 +18,8 @@ provides:
   Sidef:
     file: lib/Sidef.pm
     version: '2.10'
+  Sidef::Assert::Assert:
+    file: lib/Sidef/Assert/Assert.pm
   Sidef::Convert::Convert:
     file: lib/Sidef/Convert/Convert.pm
   Sidef::Deparse::Perl:
