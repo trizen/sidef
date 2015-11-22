@@ -16,27 +16,24 @@ func gamma(z) {
         12.507343278686905,    -0.13857109526572012,
         9.9843695780195716e-6,  1.5056327351493116e-7,
     ]
-    z = Complex(z)
 
-    var result;
-    const pi = Complex.pi;
-    const one = Complex(1);
+    var result
+    z = Complex(z)
+    const pi = Complex.pi
 
     if (z.real < 0.5) {
-        result = (pi / (sin(pi * z) * gamma(one - z)))
+        result = (pi / (sin(pi * z) * gamma(Complex(1) - z)))
     }
     else {
-        z -= one
+        z--
         var x = 0.99999999999980993
 
-        var i = Complex(0);
-        p.each { |pval|
-            x += pval/(z + i + one)
-            i.inc!
+        p.each_with_index { |i, v|
+            x += v/(z + i + 1)
         }
 
-        var t = (z + len(p) - 0.5);
-        result = (sqrt(pi*2) * t**(z+0.5) * exp(-t) * x);
+        var t = (z + p.len - 0.5)
+        result = (sqrt(pi*2) * t**(z+0.5) * exp(-t) * x)
     }
 
     withinepsilon(result.im) ? result.real : result

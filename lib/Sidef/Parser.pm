@@ -646,7 +646,7 @@ package Sidef::Parser {
                 }
             }
 
-            defined($end_delim) && (/\G\h*,\h*/gc || last);
+            (defined($end_delim) && /\G\h*,\h*/gc) || last;
             $self->parse_whitespace(code => $opt{code});
         }
 
@@ -749,7 +749,7 @@ package Sidef::Parser {
             }
 
             push @var_objs, $obj;
-            defined($end_delim) && (/\G\h*,\h*/gc || last);
+            (defined($end_delim) && /\G\h*,\h*/gc) || last;
             $self->parse_whitespace(code => $opt{code});
         }
 
