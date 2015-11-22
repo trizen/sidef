@@ -1033,8 +1033,8 @@ HEADER
 
                 # Check arity
                 @args == 1
-                  or die "[ERROR] Incorrect number of arguments for $obj->{act}\() in"
-                  . " `$obj->{file}' at line $obj->{line} (expected 1 argument)\n";
+                  or die "[ERROR] Incorrect number of arguments for $obj->{act}\() at"
+                  . " $obj->{file} line $obj->{line} (expected 1 argument)\n";
 
                 # Generate code
                 $code = qq~do{do{$args[0]} or CORE::die "$obj->{act}\Q$obj->{code}\E failed ~
@@ -1045,7 +1045,7 @@ HEADER
                 # Check arity
                 @args == 2
                   or die "[ERROR] Incorrect number of arguments for $obj->{act}\() at"
-                  . " `$obj->{file}' line $obj->{line} (expected 2 arguments)\n";
+                  . " $obj->{file} line $obj->{line} (expected 2 arguments)\n";
 
                 # Generate code
                 $code = "do{"
@@ -1060,12 +1060,6 @@ HEADER
         elsif ($ref eq 'Sidef::Meta::Warning') {
             my @args = $self->deparse_args($obj->{arg});
             $code = qq~Sidef::Types::Bool::Bool->new(CORE::warn(@args, " at \Q$obj->{file}\E line $obj->{line}\\n"))~;
-        }
-        elsif ($ref eq 'Sidef::Parser') {
-            $code = $ref . '->new';
-        }
-        elsif ($ref eq 'Sidef') {
-            $code = $self->make_constant($ref, 'new', "Sidef$refaddr");
         }
         elsif ($ref eq 'Sidef::Object::Object') {
             $code = $self->make_constant($ref, 'new', "Object$refaddr");
@@ -1103,6 +1097,12 @@ HEADER
         }
         elsif ($ref eq 'Sidef::Types::Glob::Pipe') {
             $code = $self->make_constant($ref, 'new', "Pipe$refaddr", map { $self->_dump_string($_) } @{$obj});
+        }
+        elsif ($ref eq 'Sidef::Parser') {
+            $code = $ref . '->new';
+        }
+        elsif ($ref eq 'Sidef') {
+            $code = $self->make_constant($ref, 'new', "Sidef$refaddr");
         }
 
         # Array indices

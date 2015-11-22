@@ -501,7 +501,8 @@ EOT
                       ? "$result"
                       : eval { $result->can('dump') } ? $result->dump
                     : $result
-                : $result
+                : defined($result) ? $result
+                :                    'nil'
               );
         }
         redo;

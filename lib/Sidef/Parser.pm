@@ -1652,7 +1652,6 @@ package Sidef::Parser {
                          : "Sidef::Meta::Warning"
                         )->new(
                                arg  => $arg,
-                               act  => $action,
                                line => $self->{line},
                                file => $self->{file_name},
                               )

@@ -331,11 +331,14 @@ package Sidef::Deparse::Sidef {
         elsif ($ref eq 'Sidef::Meta::Assert') {
             $code = $obj->{act} . $self->deparse_args($obj->{arg});
         }
-        elsif ($ref eq 'Sidef::Meta::Error' or $ref eq 'Sidef::Meta::Warning') {
-            $code = $obj->{act} . $self->deparse_args($obj->{arg});
+        elsif ($ref eq 'Sidef::Meta::Error') {
+            $code = 'die' . $self->deparse_args($obj->{arg});
+        }
+        elsif ($ref eq 'Sidef::Meta::Warning') {
+            $code = 'warn' . $self->deparse_args($obj->{arg});
         }
         elsif ($ref eq 'Sidef::Eval::Eval') {
-            $code = 'eval(' . $self->deparse_script($obj->{expr}) . ')';
+            $code = 'eval' . $self->deparse_args($obj->{expr});
         }
         elsif ($ref eq 'Sidef::Parser') {
             $code = 'Parser';
