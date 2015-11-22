@@ -1011,9 +1011,6 @@ HEADER
         elsif ($ref eq 'Sidef::Module::Func') {
             $code = $self->make_constant($ref, '__NEW__', "MOD_F$refaddr", $self->_dump_string($obj->{module}));
         }
-        elsif ($ref eq 'Sidef::Types::Array::MultiArray') {
-            $code = $ref . '->new';
-        }
         elsif ($ref eq 'Sidef::Types::Range::RangeNumber' or $ref eq 'Sidef::Types::Range::RangeString') {
             $code = $ref . '->new';
         }
@@ -1036,7 +1033,7 @@ HEADER
 
                 # Check arity
                 @args == 1
-                  or die "[ERROR] Incorrect number of arguments for assert() in"
+                  or die "[ERROR] Incorrect number of arguments for $obj->{act}\() in"
                   . " `$obj->{file}' at line $obj->{line} (expected 1 argument)\n";
 
                 # Generate code
@@ -1100,6 +1097,9 @@ HEADER
         }
         elsif ($ref eq 'Sidef::Types::Grapheme::Grapheme') {
             $code = $self->make_constant($ref, 'new', "Grapheme$refaddr", $self->_dump_string(${$obj}));
+        }
+        elsif ($ref eq 'Sidef::Types::Array::MultiArray') {
+            $code = $ref . '->new';
         }
         elsif ($ref eq 'Sidef::Types::Glob::Pipe') {
             $code = $self->make_constant($ref, 'new', "Pipe$refaddr", map { $self->_dump_string($_) } @{$obj});
