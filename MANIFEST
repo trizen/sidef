@@ -253,6 +253,7 @@ scripts/jensen_s_device_sf
 scripts/josephus_problem.sf
 scripts/json.sf
 scripts/knuth_shuffle.sf
+scripts/lanczos_approximation.sf
 scripts/langton_s_ant.sf
 scripts/langton_s_ant_2.sf
 scripts/linear_congruential_generator.sf
