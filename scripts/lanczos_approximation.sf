@@ -18,7 +18,7 @@ func gamma(z) {
     ]
     z = Complex(z)
 
-    var result = 1;
+    var result;
     const pi = Complex.pi;
     const one = Complex(1);
 
@@ -43,5 +43,5 @@ func gamma(z) {
 }
 
 for i in [1//2,4,5,6,30,40,50] {
-    say ("gamma(%3s) =~ %s" % i, gamma(i));
+    say "gamma(%3s) =~ %s"%(i, gamma(i));
 }
