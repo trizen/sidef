@@ -44,6 +44,11 @@ package Sidef::Types::Hash::Hash {
         exists($self->{$key}) ? $self->{$key} : ();
     }
 
+    sub fetch {
+        my ($self, $key, $default) = @_;
+        exists($self->{$key}) ? $self->{$key} : $default;
+    }
+
     sub slice {
         my ($self, @keys) = @_;
         $self->new(map { ($_ => exists($self->{$_}) ? $self->{$_} : undef) } @keys);

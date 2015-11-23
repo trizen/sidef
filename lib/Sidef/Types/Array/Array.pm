@@ -526,6 +526,11 @@ package Sidef::Types::Array::Array {
         exists($self->[$index]) ? $self->[$index] : ();
     }
 
+    sub fetch {
+        my ($self, $index, $default) = @_;
+        exists($self->[$index]) ? $self->[$index] : $default;
+    }
+
     sub _slice {
         my ($self, $from, $to) = @_;
 
