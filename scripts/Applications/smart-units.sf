@@ -7,30 +7,14 @@
 # Author: Daniel "Trizen" Șuteu
 # License: GPLv3
 # Date: 17 May 2014
-# Latest edit on: 05 October 2015
+# Latest edit on: 23 November 2015
 # Website: https://github.com/trizen/smart-units
 
 #
 ## Requires Sidef: https://github.com/trizen/sidef
 #
 
-# VERSION 0.02
-
-func help {
-    print <<"USAGE";
-usage: #{File.new(__FILE__).basename} [text]
-
-options:
-    -p  --precision=i : set floating point precision (default: 2)
-
-examples:
-    144 F to C
-    convert 10kg into pounds
-    whats the equivalent of 21 inches in meters
-    what is the speed of light in miles per hour
-USAGE
-    Sys.exit(0);
-}
+define VERSION = 0.03;
 
 func more_help {
     print <<"HELP";
@@ -78,7 +62,7 @@ class Units(precision = 2) {
             kilograms => :(re => /^(?:kg|kilograms?)$/i,     factor => 1),
             pounds    => :(re => /^(?:pounds?|lbs)$/i,       factor => 0.45359237),
         ),
-        temperature => :(   # using celsius as the standard
+        temperature => :(   # using Celsius as the standard
             celsius    => :(re => /^(?:celsius|(?-i:C))$/i,    code => {|n, _| n} ),
             kelvin     => :(re => /^(?:kelvin|(?-i:K))$/i,     code => {|n, to| to ? (n + 273.15) : (-273.15 + n)} ),
             fahrenheit => :(re => /^(?:fahrenheit|(?-i:F))$/i, code => {|n, to| to ? (32 + n*9/5) : ((n - 32) * 5/9)} ),
@@ -154,11 +138,11 @@ class Units(precision = 2) {
                                 new_amount   = to_data{:code}(std_from, true);
                             } else {
                                 new_amount = (amount / to_data{:factor} * from_data{:factor});
-                            };
-                            say (new_amount.is_int ? new_amount : "%.#{precision}f"%new_amount);
+                            }
+                            say (new_amount.is_int ? new_amount : new_amount.roundf(-precision));
                             return true;
                         }
-                    };
+                    }
                     STDERR.say("#{category}: I don't know how to convert #{from_unit.gsub('_', ' ')} to #{to}...");
                     return false;
                 }
@@ -170,11 +154,48 @@ class Units(precision = 2) {
     }
 }
 
+var precision = 2;
+var interactive = false;
+
+func help {
+    print <<"USAGE";
+usage: #{File.new(__FILE__).basename} [text]
+
+options:
+    -p int : set floating point precision (default: #{precision})
+    -i     : start in interactive mode (default: #{interactive})
+
+examples:
+    144 F to C
+    convert 10kg into pounds
+    whats the equivalent of 21 inches in meters
+    what is the speed of light in miles per hour
+USAGE
+    Sys.exit(0);
+}
+
+var cmd = [];
+while (!ARGV.is_empty) {
+    given (var arg = ARGV.shift) {
+        when ('-p') {
+            precision = Num(ARGV.shift);
+        }
+        when ('-i') {
+            interactive = true;
+        }
+        when ('-h') {
+            help();
+        }
+        default {
+            cmd << arg;
+        }
+    }
+}
+
+var units = Units(precision);
+
 func main(command) {
     var match = command.match(/^
-
-        # precision option (-p [i])
-        (?:--?p(?:recision)?(?:=|\h*)([0-9]+)\h+)?
 
         # command or question
         (?:(?:convert|how\s+much\s+is|what(?:\s+is|\W*s)(?:\s+the)?(?:\s+equivalent\s+of)?)\s+)?
@@ -193,13 +214,7 @@ func main(command) {
     $/ix);
 
     if (match) {
-        var (precision, amount, from, to) = match.cap...;
-
-        if (precision == '') {
-            precision = 2;
-        } else {
-            precision.to_i!;
-        }
+        var (amount, from, to) = match.captures...;
 
         if (amount ~~ ['a','an','one','']) {
             amount = 1;
@@ -207,7 +222,6 @@ func main(command) {
             amount.to_f!;
         }
 
-        var units = Units(precision);
         return units.convert(amount, from, to);
     }
     else {
@@ -217,4 +231,15 @@ func main(command) {
     return false;
 }
 
-Sys.exit((ARGV.is_empty ? help() : main(ARGV.join(' '))) ? 0 : 1);
+if (interactive) {
+    print <<"EOT";
+Welcome to smart-units #{VERSION} in interactive mode.
+EOT
+    loop {
+        var line = read(">> ", String) \\ break;
+        main(line)
+    }
+}
+else {
+    Sys.exit((cmd.is_empty ? help() : main(cmd.join(' '))) ? 0 : 1);
+}
