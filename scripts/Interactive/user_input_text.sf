@@ -4,8 +4,8 @@
 ## http://rosettacode.org/wiki/User_input/Text
 #
 
-var s = read(String);
-var i = read(Number);    # auto-conversion to a number
+var s = read("string: ", String);
+var i = read("number: ", Number);    # auto-conversion to a number
 
 say s;
 say i;
