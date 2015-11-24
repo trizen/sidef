@@ -1,6 +1,7 @@
 #!/usr/bin/julia
 
 import Base.print;
+import Base.+;
 
 #
 ## Boolean type
@@ -19,9 +20,9 @@ end
 ## String type
 #
 type SString
-    value::String;
+    value::AbstractString;
 
-    function SString(s::String)
+    function SString(s::AbstractString)
         this = new();
         this.value = s;
         return this;

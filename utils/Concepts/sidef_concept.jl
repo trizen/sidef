@@ -3,6 +3,7 @@
 # Sidef concept expressed in Julia
 
 import Base.sqrt
+import Base./;
 
 type S_Number
     value::Number;

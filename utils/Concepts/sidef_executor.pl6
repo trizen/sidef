@@ -32,18 +32,18 @@ class Interpreter {
     ## Expression executor
     #
     method execute_expr($statement) {
-        "self" ~~ $statement or die "Invalid AST!";
+        defined($statement<self>) or die "Invalid AST!";
         my $self_obj = $statement<self>;
 
         if $self_obj.isa(Hash) {
             $self_obj = $.execute($self_obj);
         }
 
-        if "call" ~~ $statement {
+        if defined($statement<call>) {
             for @($statement<call>) -> $call {
 
                 my $meth = $call<method>;
-                if "arg" ~~ $call {
+                if defined($call<arg>) {
                     my $args = $call<arg>.map({
                         $_.isa(Hash) ?? $.execute($_) !! $_
                     });
@@ -63,7 +63,7 @@ class Interpreter {
     #
     method execute($structure) {
         my $result;
-        "main" ~~ $structure or die "Invalid AST!";
+        defined($structure<main>) or die "Invalid AST!";
         for @($structure<main>) -> $statement {
             $result = $.execute_expr($statement);
         }
