@@ -118,6 +118,8 @@ package Sidef::Types::Range::RangeString {
         $self;
     }
 
+    *for = \&each;
+
     our $AUTOLOAD;
     sub DESTROY { }
 

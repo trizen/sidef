@@ -164,6 +164,8 @@ package Sidef::Types::Range::RangeNumber {
         $self;
     }
 
+    *for = \&each;
+
     sub map {
         my ($self, $code) = @_;
 
