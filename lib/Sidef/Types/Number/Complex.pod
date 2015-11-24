@@ -500,6 +500,14 @@ Return the
 
 =cut
 
+=head2 is_one
+
+Complex.is_one() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 is_pos
 
 Complex.is_pos() -> I<Obj>

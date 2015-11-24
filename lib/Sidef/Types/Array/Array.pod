@@ -77,7 +77,7 @@ I<Obj> B<-> I<Obj> -> I<Obj>
 
 Return the
 
-Aliases: I<subtract>
+Aliases: I<sub>, I<subtract>
 
 =cut
 
@@ -255,6 +255,14 @@ Aliases: I<count_by>
 
 =cut
 
+=head2 cross_operator
+
+Array.cross_operator() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 defined
 
 Array.defined() -> I<Obj>
@@ -364,6 +372,14 @@ Array.exists() -> I<Obj>
 Return the
 
 Aliases: I<has_index>
+
+=cut
+
+=head2 fetch
+
+Array.fetch() -> I<Obj>
+
+Return the
 
 =cut
 
@@ -578,6 +594,16 @@ Aliases: I<collect>
 Array.map_operator() -> I<Obj>
 
 Return the
+
+=cut
+
+=head2 map_with_index
+
+Array.map_with_index() -> I<Obj>
+
+Return the
+
+Aliases: I<collect_with_index>
 
 =cut
 
@@ -926,6 +952,14 @@ Return the
 =head2 zip
 
 Array.zip() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 zip_operator
+
+Array.zip_operator() -> I<Obj>
 
 Return the
 

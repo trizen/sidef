@@ -2,6 +2,7 @@ bin/sidef
 Build.PL
 Changes
 lib/Sidef.pm
+lib/Sidef.pod
 lib/Sidef/Convert/Convert.pm
 lib/Sidef/Convert/Convert.pod
 lib/Sidef/Deparse/Perl.pm
@@ -11,8 +12,11 @@ lib/Sidef/Eval/Eval.pod
 lib/Sidef/Math/Math.pm
 lib/Sidef/Math/Math.pod
 lib/Sidef/Meta/Assert.pm
+lib/Sidef/Meta/Assert.pod
 lib/Sidef/Meta/Error.pm
+lib/Sidef/Meta/Error.pod
 lib/Sidef/Meta/Warning.pm
+lib/Sidef/Meta/Warning.pod
 lib/Sidef/Module/Func.pm
 lib/Sidef/Module/OO.pm
 lib/Sidef/Object/Object.pm
@@ -57,6 +61,7 @@ lib/Sidef/Types/Block/Do.pod
 lib/Sidef/Types/Block/For.pm
 lib/Sidef/Types/Block/For.pod
 lib/Sidef/Types/Block/ForArray.pm
+lib/Sidef/Types/Block/ForArray.pod
 lib/Sidef/Types/Block/Fork.pm
 lib/Sidef/Types/Block/Fork.pod
 lib/Sidef/Types/Block/Gather.pm
@@ -65,6 +70,7 @@ lib/Sidef/Types/Block/Given.pm
 lib/Sidef/Types/Block/If.pm
 lib/Sidef/Types/Block/If.pod
 lib/Sidef/Types/Block/Loop.pm
+lib/Sidef/Types/Block/Loop.pod
 lib/Sidef/Types/Block/Next.pm
 lib/Sidef/Types/Block/Next.pod
 lib/Sidef/Types/Block/Return.pm

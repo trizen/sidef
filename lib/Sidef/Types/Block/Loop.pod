@@ -1,0 +1,25 @@
+
+=encoding utf8
+
+=head1 NAME
+
+Sidef::Types::Block::Loop
+
+=head1 DESCRIPTION
+
+This object is ...
+
+=head1 SYNOPSIS
+
+var obj = Loop.new(...);
+
+=head1 METHODS
+
+
+=head2 new
+
+Loop.new() -> I<Obj>
+
+Return the
+
+=cut

@@ -144,6 +144,16 @@ Aliases: I<÷()>, I<div>, I<divide>
 
 =cut
 
+=head2 //
+
+I<Obj> B<//> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<rdiv>, I<rat_div>
+
+=cut
+
 =head2 :
 
 I<Obj> B<:> I<Obj> -> I<Obj>
@@ -184,13 +194,13 @@ Aliases: I<cmp>
 
 =cut
 
-=head2 =
+=head2 ==
 
-I<Obj> B<=> I<Obj> -> I<Obj>
+I<Obj> B<==> I<Obj> -> I<Obj>
 
 Return the
 
-Aliases: I<==()>, I<eq>, I<equals>
+Aliases: I<eq>, I<equals>
 
 =cut
 

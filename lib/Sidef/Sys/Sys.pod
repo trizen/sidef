@@ -31,30 +31,6 @@ Return the
 
 =cut
 
-=head2 assert
-
-Sys.assert() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 assert_eq
-
-Sys.assert_eq() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 assert_ne
-
-Sys.assert_ne() -> I<Obj>
-
-Return the
-
-=cut
-
 =head2 bless
 
 Sys.bless() -> I<Obj>

@@ -748,6 +748,7 @@ HEADER
                         }
                     }
 
+                    # Localize variable declarations
                     while (    exists($self->{block_declarations})
                            and @{$self->{block_declarations}}
                            and $self->{block_declarations}[-1][0] == $refaddr) {

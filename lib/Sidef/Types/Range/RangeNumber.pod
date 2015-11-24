@@ -57,11 +57,13 @@ Aliases: I<includes>
 
 =cut
 
-=head2 each
+=head2 for
 
-RangeNumber.each() -> I<Obj>
+RangeNumber.for() -> I<Obj>
 
 Return the
+
+Aliases: I<each>
 
 =cut
 

@@ -144,6 +144,14 @@ Aliases: I<has_key>, I<contains>
 
 =cut
 
+=head2 fetch
+
+Hash.fetch() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 flip
 
 Hash.flip() -> I<Obj>

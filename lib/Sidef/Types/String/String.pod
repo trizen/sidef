@@ -144,13 +144,13 @@ Aliases: I<cmp>
 
 =cut
 
-=head2 =
+=head2 ==
 
-I<Obj> B<=> I<Obj> -> I<Obj>
+I<Obj> B<==> I<Obj> -> I<Obj>
 
 Return the
 
-Aliases: I<==()>, I<eq>, I<is>, I<equals>
+Aliases: I<eq>, I<is>, I<equals>
 
 =cut
 
@@ -738,6 +738,14 @@ Return the
 
 =cut
 
+=head2 prepend
+
+String.prepend() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 printf
 
 String.printf() -> I<Obj>
@@ -757,14 +765,6 @@ Return the
 =head2 range
 
 String.range() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 reduce_operator
-
-String.reduce_operator() -> I<Obj>
 
 Return the
 
@@ -963,14 +963,6 @@ Return the
 =head2 unpack
 
 String.unpack() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 unroll_operator
-
-String.unroll_operator() -> I<Obj>
 
 Return the
 
