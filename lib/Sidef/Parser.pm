@@ -1016,6 +1016,17 @@ package Sidef::Parser {
                                                   in_use  => 1,
                                                  );
 
+                foreach my $var (@{$vars}) {
+                    my $name = $var->{name};
+                    if (exists($self->{keywords}{$name}) or exists($self->{built_in_classes}{$name})) {
+                        $self->fatal_error(
+                                           code  => $_,
+                                           pos   => (pos($_) - length($name)),
+                                           error => "'$name' is either a keyword or a predefined variable!",
+                                          );
+                    }
+                }
+
                 my $args;
                 if (/\G\h*=\h*/gc) {
                     $args = $self->parse_obj(code => $opt{code});
