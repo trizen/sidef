@@ -134,6 +134,7 @@ lib/Sidef/Types/Regex/Regex.pm
 lib/Sidef/Types/Regex/Regex.pod
 lib/Sidef/Types/String/String.pm
 lib/Sidef/Types/String/String.pod
+lib/Sidef/Variable/ClassAttr.pm
 lib/Sidef/Variable/ClassInit.pm
 lib/Sidef/Variable/ClassInit.pod
 lib/Sidef/Variable/Const.pm
@@ -461,6 +462,8 @@ scripts/RosettaCode/maze_generation.sf
 scripts/RosettaCode/md5.sf
 scripts/RosettaCode/md5_1.sf
 scripts/RosettaCode/middle_three_digits.sf
+scripts/RosettaCode/move_to_front_algorithm_1.sf
+scripts/RosettaCode/move_to_front_algorithm_2.sf
 scripts/RosettaCode/multifactorial.sf
 scripts/RosettaCode/multiple_distinct_objects.sf
 scripts/RosettaCode/multiplication_tables.sf
@@ -553,6 +556,7 @@ scripts/RosettaCode/stack.sf
 scripts/RosettaCode/stack_1.sf
 scripts/RosettaCode/standard_deviation.sf
 scripts/RosettaCode/standard_deviation_2.sf
+scripts/RosettaCode/string_comparison.sf
 scripts/RosettaCode/the_isaac_cipher.sf
 scripts/RosettaCode/universal_turing_machine.sf
 scripts/RosettaCode/van_der_corput_sequence.sf
@@ -593,6 +597,7 @@ scripts/Tests/calendar.sf
 scripts/Tests/call_an_object_method.sf
 scripts/Tests/catalan_numbers.sf
 scripts/Tests/catalan_numbers_2.sf
+scripts/Tests/class_attributes.sf
 scripts/Tests/class_inheritance.sf
 scripts/Tests/class_redefinition.sf
 scripts/Tests/classes.sf

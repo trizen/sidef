@@ -1,0 +1,67 @@
+#!/usr/bin/ruby
+
+class Foo {
+    has (foo, bar) = (1, 2)
+}
+
+var f1 = Foo();
+
+assert_eq(f1.foo, 1);
+assert_eq(f1.bar, 2);
+
+f1.foo = 42;
+f1.bar = 99;
+
+var f2 = Foo();
+assert_eq(f1.foo, 42);
+assert_eq(f1.bar, 99);
+assert_eq(f2.foo, 1);
+assert_eq(f2.bar, 2);
+
+class Bar(a, b) {
+    has (foo=1, bar=2);
+
+    method init {
+        foo += a;
+        bar += b
+    }
+}
+
+var obj1 = Bar(21, 42);
+var obj2 = Bar(100, 200);
+
+assert_eq(obj1.foo, 22);
+assert_eq(obj1.bar, 44);
+
+assert_eq(obj2.foo, 101);
+assert_eq(obj2.bar, 202);
+
+
+class Baz(a, b) {
+    has foo = 42;
+    has bar = "hello";
+
+    method display {
+        say foo;
+        say bar;
+    }
+
+    method change {
+        foo = a;
+        bar = b;
+    }
+}
+
+var baz = Baz(21, "Sidef");
+baz.display;
+
+assert_eq(baz.foo, 42);
+assert_eq(baz.bar, "hello");
+
+baz.change;
+baz.display;
+
+assert_eq(baz.foo, 21);
+assert_eq(baz.bar, "Sidef");
+
+say "** Test passed!";

@@ -231,6 +231,35 @@ HEADER
         '(' . join(',', @code) . ')';
     }
 
+    sub _dump_class_attributes {
+        my ($self, @attrs) = @_;
+
+        my @code;
+        foreach my $attr (@attrs) {
+
+            my @vars = @{$attr->{vars}};
+            @vars || next;
+
+            my @dumped_vars = map { ref($_) ? $self->_dump_var($_) : $_ } @vars;
+
+            push @code,
+              (   'my('
+                . join(', ', @dumped_vars) . ')'
+                . (exists($attr->{args}) ? '=' . $self->deparse_args($attr->{args}) : ''));
+            foreach my $var (@vars) {
+                if (exists $var->{value}) {
+                    my $value = $self->deparse_expr({self => $var->{value}});
+                    if ($value ne '') {
+                        push @code, "\$$var->{name}" . refaddr($var) . " //= " . $value . ";";
+                    }
+                }
+            }
+
+        }
+
+        (' ' x $Sidef::SPACES) . join(";\n" . (' ' x $Sidef::SPACES), @code) . ";\n";
+    }
+
     sub _dump_sub_init_vars {
         my ($self, %opt) = @_;
 
@@ -645,14 +674,14 @@ HEADER
                     $code .= ($package_name = $self->_dump_class_name($obj));
                 }
 
-                my $vars = $obj->{vars};
-                local $self->{class}        = refaddr($block);
-                local $self->{class_name}   = $obj->{name};
-                local $self->{parent_name}  = ['class initialization', $obj->{name}];
-                local $self->{package_name} = $package_name;
-                local $self->{inherit}      = $obj->{inherit} if exists $obj->{inherit};
-                local $self->{class_vars}   = $vars;
-                local $self->{ref_class}    = 1 if ref($obj->{name});
+                local $self->{class}            = refaddr($block);
+                local $self->{class_name}       = $obj->{name};
+                local $self->{parent_name}      = ['class initialization', $obj->{name}];
+                local $self->{package_name}     = $package_name;
+                local $self->{inherit}          = $obj->{inherit} if exists $obj->{inherit};
+                local $self->{class_vars}       = $obj->{vars} if exists $obj->{vars};
+                local $self->{class_attributes} = $obj->{attributes} if exists $obj->{attributes};
+                local $self->{ref_class}        = 1 if ref($obj->{name});
                 $code .= $self->deparse_expr({self => $block});
                 $code .= '; ' . $self->_dump_string($package_name) . '}';
             }
@@ -686,16 +715,17 @@ HEADER
                               . ($self->{package_name} eq 'Sidef::Object::Object' ? '' : "Sidef::Object::Object") . ");\n";
                         }
 
-                        if ($is_class and exists $self->{class_vars} and not $self->{ref_class}) {
+                        if ($is_class and not $self->{ref_class}) {
 
                             $code .= (" " x $Sidef::SPACES) . 'sub new {' . "\n";
 
                             $Sidef::SPACES += $Sidef::SPACES_INCR;
                             $code .= $self->_dump_sub_init_vars(extended => 1, vars => ['undef', @{$self->{class_vars}}]);
+                            $code .= $self->_dump_class_attributes(@{$self->{class_attributes}});
 
                             $code .= " " x $Sidef::SPACES;
                             $code .= 'my $self = bless {';
-                            foreach my $var (@{$self->{class_vars}}) {
+                            foreach my $var (@{$self->{class_vars}}, map { @{$_->{vars}} } @{$self->{class_attributes}}) {
                                 $code .= qq{"\Q$var->{name}\E"=>} . $self->_dump_var($var) . ',';
                             }
 
@@ -707,7 +737,7 @@ HEADER
                             $code .= " " x $Sidef::SPACES . "}";
                             $code .= "\n" . (' ' x $Sidef::SPACES) . "*call = \\&new;\n";
 
-                            foreach my $var (@{$self->{class_vars}}) {
+                            foreach my $var (@{$self->{class_vars}}, map { @{$_->{vars}} } @{$self->{class_attributes}}) {
                                 $code .= " " x $Sidef::SPACES;
                                 $code .= qq{sub $var->{name} : lvalue { \$_[0]->{"\Q$var->{name}\E"} }\n};
                             }
@@ -793,6 +823,9 @@ HEADER
                     $code = 'Block';
                 }
             }
+        }
+        elsif ($ref eq 'Sidef::Variable::ClassAttr') {
+            ## ok
         }
         elsif ($ref eq 'Sidef::Variable::Struct') {
             my $name = $self->_dump_class_name($obj);

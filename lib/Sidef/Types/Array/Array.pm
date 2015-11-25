@@ -443,17 +443,6 @@ package Sidef::Types::Array::Array {
         $_[0]->_min_max_by($_[1], -1);
     }
 
-    sub last {
-        my ($self, $arg) = @_;
-
-        if (defined $arg) {
-            my $from = @{$self} - $arg->get_value;
-            return $self->new(@{$self}[($from < 0 ? 0 : $from) .. $#{$self}]);
-        }
-
-        @{$self} ? $self->[-1] : ();
-    }
-
     sub swap {
         my ($self, $i, $j) = @_;
         @{$self}[$i, $j] = @{$self}[$j, $i];
@@ -474,10 +463,23 @@ package Sidef::Types::Array::Array {
                 return return $self->find($arg);
             }
 
-            return $self->new(@{$self}[0 .. $arg->get_value - 1]);
+            my $max = $#{$self};
+            $arg = $arg->get_value - 1;
+            return $self->new(@{$self}[0 .. ($arg > $max ? $max : $arg)]);
         }
 
         @{$self} ? $self->[0] : ();
+    }
+
+    sub last {
+        my ($self, $arg) = @_;
+
+        if (defined $arg) {
+            my $from = @{$self} - $arg->get_value;
+            return $self->new(@{$self}[($from < 0 ? 0 : $from) .. $#{$self}]);
+        }
+
+        @{$self} ? $self->[-1] : ();
     }
 
     sub _flatten {    # this exists for performance reasons
@@ -1141,7 +1143,8 @@ package Sidef::Types::Array::Array {
         CORE::splice(@{$self}, $offset->get_value, 1);
     }
 
-    *pop_at = \&delete_index;
+    *pop_at    = \&delete_index;
+    *delete_at = \&delete_index;
 
     sub splice {
         my ($self, $offset, $length, @objects) = @_;

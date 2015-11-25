@@ -1007,6 +1007,30 @@ package Sidef::Parser {
                 return $init_obj;
             }
 
+            # "has" class attributes
+            if (exists($self->{current_class}) and /\Ghas\b\h*/gc) {
+                my $vars = $self->parse_init_vars(
+                                                  code    => $opt{code},
+                                                  type    => 'var',
+                                                  private => 1,
+                                                  in_use  => 1,
+                                                 );
+
+                my $args;
+                if (/\G\h*=\h*/gc) {
+                    $args = $self->parse_obj(code => $opt{code});
+                    $args // $self->fatal_error(
+                                                code  => $_,
+                                                pos   => pos,
+                                                error => qq{expected an expression after "=" in `has` declaration},
+                                               );
+                }
+
+                my $obj = Sidef::Variable::ClassAttr->new(vars => $vars, defined($args) ? (args => $args) : ());
+                push @{$self->{current_class}{attributes}}, $obj;
+                return $obj;
+            }
+
             # Declaration of constants and static variables
             if (/\G(define|const|static)\b\h*/gc) {
                 my $type = $1;
@@ -1813,12 +1837,11 @@ package Sidef::Parser {
                 if (
                     ref($self->{current_class}) eq 'Sidef::Variable::ClassInit'
                     and defined(
-                        my $var = List::Util::first(
-                            sub { $_->{name} eq $name },
-                            @{$self->{current_class}{vars}},
-
-                            #@{$self->{current_class}{__DEF_VARS__}}
-                                                   )
+                                my $var = List::Util::first(
+                                                            sub { $_->{name} eq $name },
+                                                            @{$self->{current_class}{vars}},
+                                                            map { @{$_->{vars}} } @{$self->{current_class}{attributes}}
+                                                           )
                                )
                   ) {
                     if (exists $self->{current_method}) {

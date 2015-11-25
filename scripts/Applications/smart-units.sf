@@ -195,7 +195,7 @@ while (!ARGV.is_empty) {
 var units = Units(precision);
 
 func main(command) {
-    var match = command.match(/^
+    var match = command.match(/^\s*
 
         # command or question
         (?:(?:convert|how\s+much\s+is|what(?:\s+is|\W*s)(?:\s+the)?(?:\s+equivalent\s+of)?)\s+)?
@@ -211,7 +211,7 @@ func main(command) {
 
         # unit to (up to 3 words)
         (\S+(?:\s+\S+){0,2})
-    $/ix);
+    \s*$/ix);
 
     if (match) {
         var (amount, from, to) = match.captures...;

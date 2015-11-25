@@ -164,6 +164,8 @@ provides:
     file: lib/Sidef/Types/Regex/Regex.pm
   Sidef::Types::String::String:
     file: lib/Sidef/Types/String/String.pm
+  Sidef::Variable::ClassAttr:
+    file: lib/Sidef/Variable/ClassAttr.pm
   Sidef::Variable::ClassInit:
     file: lib/Sidef/Variable/ClassInit.pm
   Sidef::Variable::Const:
