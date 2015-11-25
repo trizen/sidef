@@ -1288,7 +1288,7 @@ package Sidef::Types::Array::Array {
         my ($self, $num) = @_;
 
         $num = $num->get_value % ($#{$self} + 1);
-        return $self if $num == 0;
+        return $self->new(@{$self}) if $num == 0;
 
         # Surprisingly, this is slower:
         # $self->new(@{$self}[$num .. $#{$self}], @{$self}[0 .. $num - 1]);

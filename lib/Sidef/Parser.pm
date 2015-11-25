@@ -977,7 +977,7 @@ package Sidef::Parser {
                 return Sidef::Variable::NamedParam->new($name, $obj);
             }
 
-            # Declaration of variable types
+            # Declaration of variables
             if (/\Gvar\b\h*/gc) {
                 my $type = 'var';
                 my $vars = $self->parse_init_vars(code => $opt{code}, type => $type);
@@ -1021,7 +1021,7 @@ package Sidef::Parser {
                     $args = $self->parse_obj(code => $opt{code});
                     $args // $self->fatal_error(
                                                 code  => $_,
-                                                pos   => pos,
+                                                pos   => pos($_) - 2,
                                                 error => qq{expected an expression after "=" in `has` declaration},
                                                );
                 }
@@ -1056,7 +1056,7 @@ package Sidef::Parser {
                     my $obj = $self->parse_obj(code => $opt{code});
                     $obj // $self->fatal_error(
                                                code  => $_,
-                                               pos   => pos,
+                                               pos   => pos($_) - 2,
                                                error => qq{expected an expression after $type "$name"},
                                               );
 
