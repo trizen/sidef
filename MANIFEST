@@ -611,6 +611,7 @@ scripts/Tests/count_in_factors.sf
 scripts/Tests/cpp_input_output.sf
 scripts/Tests/cramers_method.sf
 scripts/Tests/cross_and_zip_metaoperators.sf
+scripts/Tests/data_digging.sf
 scripts/Tests/data_handle.sf
 scripts/Tests/default_param_values.sf
 scripts/Tests/default_var_values.sf

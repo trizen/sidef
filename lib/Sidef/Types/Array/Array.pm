@@ -533,6 +533,18 @@ package Sidef::Types::Array::Array {
         exists($self->[$index]) ? $self->[$index] : $default;
     }
 
+    sub dig {
+        my ($self, $key, @keys) = @_;
+
+        my $value = $self->fetch($key) // return;
+
+        foreach my $key (@keys) {
+            $value = $value->fetch($key) // return $value;
+        }
+
+        $value;
+    }
+
     sub _slice {
         my ($self, $from, $to) = @_;
 

@@ -1,0 +1,29 @@
+#!/usr/bin/ruby
+
+var data = Hash(
+        lang => [
+            Hash(
+                name => "Sidef"
+            ),
+            Hash(
+                name => "Ruby",
+            ),
+            Hash(
+                name => "Perl",
+            )
+        ]
+)
+
+say data.dig(:lang, 0, :name);
+say data.dig(:lang, 1, :name);
+say data.dig(:lang, 2, :name);
+
+# Successful digging
+assert_eq(data.dig(:lang, 0, :name), "Sidef");
+assert_eq(data{:lang}.dig(-1, :name), "Perl");
+assert_eq(data{:lang}[1].dig(:name), "Ruby");
+
+# Fail digging
+assert_eq(data.dig(:lang, 42, :name), nil);
+assert_eq(data.dig(:hello, 0, :name), nil);
+assert_eq(data{:lang}.dig(42, :name), nil);
