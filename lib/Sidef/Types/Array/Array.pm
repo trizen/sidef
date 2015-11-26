@@ -539,7 +539,7 @@ package Sidef::Types::Array::Array {
         my $value = $self->fetch($key) // return;
 
         foreach my $key (@keys) {
-            $value = $value->fetch($key) // return $value;
+            $value = $value->fetch($key) // return;
         }
 
         $value;
