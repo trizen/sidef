@@ -795,7 +795,6 @@ scripts/Tests/var_ref.sf
 scripts/Tests/var_scoping.sf
 scripts/Tests/variable_references.sf
 scripts/Tests/vigenere_cipher.sf
-scripts/Tests/virtual_machine.sf
 scripts/Tests/while_loop.sf
 scripts/Tests/wireworld.sf
 scripts/Tests/word_processing.sf
@@ -805,6 +804,7 @@ scripts/unique_prefixes.sf
 scripts/variadic_function.sf
 scripts/vector_products.sf
 scripts/vigenere_cipher.sf
+scripts/virtual_machine.sf
 scripts/walk_a_dir_recursively.sf
 scripts/WWW/deranged_anagrams.sf
 scripts/WWW/DNS_query.sf
