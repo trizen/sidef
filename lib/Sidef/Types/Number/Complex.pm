@@ -265,9 +265,13 @@ package Sidef::Types::Number::Complex {
     sub root {
         my ($self, $n, $k) = @_;
         local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
-        @_ == 2
-          ? Sidef::Types::Array::Array->new(map { $self->new($_) } $$self->root($n->get_value))
-          : $self->new($$self->root($n->get_value, $k->get_value));
+        $self->new($$self->root($n->get_value, $k->get_value));
+    }
+
+    sub roots {
+        my ($self, $n) = @_;
+        local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
+        Sidef::Types::Array::Array->new(map { $self->new($_) } $$self->root($n->get_value));
     }
 
     sub int {
