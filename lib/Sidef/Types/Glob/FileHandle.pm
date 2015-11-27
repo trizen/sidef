@@ -58,8 +58,6 @@ package Sidef::Types::Glob::FileHandle {
         Sidef::Types::Bool::Bool->new(CORE::syswrite $self->{fh}, @args);
     }
 
-    *write_string = \&syswrite;
-
     sub print {
         my ($self, @args) = @_;
         Sidef::Types::Bool::Bool->new(CORE::print {$self->{fh}} @args);

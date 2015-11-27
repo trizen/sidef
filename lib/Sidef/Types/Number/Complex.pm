@@ -93,13 +93,13 @@ package Sidef::Types::Number::Complex {
 
     sub cartesian {
         my ($self) = @_;
-        ${$self}->display_format('cartesian');
+        $$self->display_format('cartesian');
         $self;
     }
 
     sub polar {
         my ($self) = @_;
-        ${$self}->display_format('polar');
+        $$self->display_format('polar');
         $self;
     }
 
@@ -109,6 +109,18 @@ package Sidef::Types::Number::Complex {
     }
 
     *re = \&real;
+
+    sub parts {
+        my ($self) = @_;
+        map { Sidef::Types::Number::Number->new($_) } @{$$self->_cartesian};
+    }
+
+    *reals = \&parts;
+
+    sub polars {
+        my ($self) = @_;
+        map { Sidef::Types::Number::Number->new($_) } @{$$self->_polar};
+    }
 
     sub imaginary {
         my ($self) = @_;
@@ -248,6 +260,14 @@ package Sidef::Types::Number::Complex {
         my ($self, $arg) = @_;
         local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
         $self->new($$self**$arg->get_value);
+    }
+
+    sub root {
+        my ($self, $n, $k) = @_;
+        local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
+        @_ == 2
+          ? Sidef::Types::Array::Array->new(map { $self->new($_) } $$self->root($n->get_value))
+          : $self->new($$self->root($n->get_value, $k->get_value));
     }
 
     sub int {
