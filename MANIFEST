@@ -333,6 +333,7 @@ scripts/permutations_rec.sf
 scripts/pythagorean_means.sf
 scripts/reverse_the_gender_of_a_string.sf
 scripts/RosettaCode/9_billion_names.sf
+scripts/RosettaCode/abc_problem.sf
 scripts/RosettaCode/arithmetic-geometric_mean.sf
 scripts/RosettaCode/arithmetic_complex.sf
 scripts/RosettaCode/averages_arithmetic_mean.sf
