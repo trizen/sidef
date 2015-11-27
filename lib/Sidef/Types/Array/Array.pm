@@ -672,6 +672,23 @@ package Sidef::Types::Array::Array {
         $hash;
     }
 
+    sub freq {
+        my ($self) = @_;
+
+        my %hash;
+        foreach my $item (@{$self}) {
+            $hash{$item}++;
+        }
+
+        foreach my $key (keys %hash) {
+            $hash{$key} = Sidef::Types::Number::Number->new($hash{$key});
+        }
+
+        Sidef::Types::Hash::Hash->new(%hash);
+    }
+
+    *frequency = \&freq;
+
     sub find {
         my ($self, $code) = @_;
         foreach my $val (@{$self}) {

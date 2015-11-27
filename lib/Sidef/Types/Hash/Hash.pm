@@ -8,7 +8,7 @@ package Sidef::Types::Hash::Hash {
       );
 
     use overload
-      q{bool} => sub { scalar(keys %{$_[0]}) },
+      q{bool} => sub { scalar(CORE::keys %{$_[0]}) },
       q{""}   => \&dump;
 
     sub new {
@@ -22,7 +22,7 @@ package Sidef::Types::Hash::Hash {
         my ($self) = @_;
 
         my %hash;
-        foreach my $k (keys %{$self}) {
+        foreach my $k (CORE::keys %{$self}) {
             my $v = $self->{$k};
             $hash{$k} = (
                          index(ref($v), 'Sidef::') == 0
@@ -114,7 +114,7 @@ package Sidef::Types::Hash::Hash {
     sub append {
         my ($self, %pairs) = @_;
 
-        foreach my $key (keys %pairs) {
+        foreach my $key (CORE::keys %pairs) {
             $self->{$key} = $pairs{$key};
         }
 
@@ -133,8 +133,9 @@ package Sidef::Types::Hash::Hash {
     sub _iterate {
         my ($self, $code, $callback) = @_;
 
-        while (my ($key, $value) = each %{$self}) {
+        foreach my $key (CORE::keys %{$self}) {
             my $key_obj = Sidef::Types::String::String->new($key);
+            my $value   = $self->{$key};
 
             if ($code->run($key_obj, $value)) {
                 $callback->($key, $value);
@@ -147,11 +148,26 @@ package Sidef::Types::Hash::Hash {
     sub map_val {
         my ($self, $code) = @_;
 
-        while (my ($key, $value) = each %{$self}) {
-            $self->{$key} = $code->run(Sidef::Types::String::String->new($key), $value);
+        my %hash;
+        foreach my $key (CORE::keys %{$self}) {
+            $hash{$key} = $code->run(Sidef::Types::String::String->new($key), $self->{$key});
         }
 
-        $self;
+        $self->new(%hash);
+    }
+
+    *map_values = \&map_val;
+
+    sub map {
+        my ($self, $code) = @_;
+
+        my %hash;
+        foreach my $key (CORE::keys %{$self}) {
+            my ($k, $v) = $code->run(Sidef::Types::String::String->new($key), $self->{$key});
+            $hash{$k} = $v;
+        }
+
+        $self->new(%hash);
     }
 
     sub select {
@@ -213,12 +229,12 @@ package Sidef::Types::Hash::Hash {
 
     sub keys {
         my ($self) = @_;
-        Sidef::Types::Array::Array->new(map { Sidef::Types::String::String->new($_) } keys %{$self});
+        Sidef::Types::Array::Array->new(map { Sidef::Types::String::String->new($_) } CORE::keys %{$self});
     }
 
     sub values {
         my ($self) = @_;
-        Sidef::Types::Array::Array->new(values %{$self});
+        Sidef::Types::Array::Array->new(CORE::values %{$self});
     }
 
     sub each_value {
@@ -271,8 +287,8 @@ package Sidef::Types::Hash::Hash {
         my ($self, $code) = @_;
 
         my @array;
-        while (my ($key, $value) = CORE::each %{$self}) {
-            push @array, [$key, $code->run(Sidef::Types::String::String->new($key), $value)];
+        foreach my $key (CORE::keys %{$self}) {
+            push @array, [$key, $code->run(Sidef::Types::String::String->new($key), $self->{$key})];
         }
 
         Sidef::Types::Array::Array->new(
