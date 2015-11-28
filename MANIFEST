@@ -513,6 +513,8 @@ scripts/RosettaCode/return_multiple_values.sf
 scripts/RosettaCode/reverse_a_string.sf
 scripts/RosettaCode/reverse_words_in_a_string.sf
 scripts/RosettaCode/roots_of_a_quadratic_function.sf
+scripts/RosettaCode/roots_of_unity_1.sf
+scripts/RosettaCode/roots_of_unity_2.sf
 scripts/RosettaCode/rpn_calculator_algorithm.sf
 scripts/RosettaCode/rpn_to_infix_conversion.sf
 scripts/RosettaCode/runge-kutta_method.sf
