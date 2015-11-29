@@ -331,6 +331,14 @@ Aliases: I<remove_last_if>
 
 =cut
 
+=head2 dig
+
+Array.dig() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 dump
 
 Array.dump() -> I<Obj>
@@ -424,6 +432,16 @@ Array.for() -> I<Obj>
 Return the
 
 Aliases: I<each>, I<foreach>
+
+=cut
+
+=head2 freq
+
+Array.freq() -> I<Obj>
+
+Return the
+
+Aliases: I<frequency>
 
 =cut
 
@@ -725,7 +743,7 @@ Array.pop_at() -> I<Obj>
 
 Return the
 
-Aliases: I<delete_index>
+Aliases: I<delete_at>, I<delete_index>
 
 =cut
 

@@ -592,6 +592,16 @@ Aliases: I<conj>, I<conjugated>
 
 =cut
 
+=head2 parts
+
+Complex.parts() -> I<Obj>
+
+Return the
+
+Aliases: I<reals>
+
+=cut
+
 =head2 pi
 
 Complex.pi() -> I<Obj>
@@ -603,6 +613,14 @@ Return the
 =head2 polar
 
 Complex.polar() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 polars
+
+Complex.polars() -> I<Obj>
 
 Return the
 
@@ -629,6 +647,22 @@ Aliases: I<real>
 =head2 reciprocal
 
 Complex.reciprocal() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 root
+
+Complex.root() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 roots
+
+Complex.roots() -> I<Obj>
 
 Return the
 

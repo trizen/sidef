@@ -1,10 +1,12 @@
 =encoding utf8
 
-=head1 Sidef
+=head1 NAME
 
-Sidef is a modern object-oriented programming language, implemented in Perl.
+Sidef - a modern OO programming language.
 
-To learn about Sidef, check out the following links:
+=head1 DESCRIPTION
+
+To learn more about Sidef, check out the following links:
 
 =over 2
 
@@ -15,7 +17,6 @@ To learn about Sidef, check out the following links:
 =item * RosettaCode: L<http://rosettacode.org/wiki/Sidef>
 
 =back
-
 
                 **   **         ****   *           *********   *********
               * * ** * *        ****   **          ** ** **    ** ** **

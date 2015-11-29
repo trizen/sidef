@@ -25,12 +25,12 @@ var ops = Hash.new(
     JMPLT,   Op("jmplt", 2),
 );
 
-class VM (
-    code = [],
-    pc = 0,
-    stack = [],
-    sp = -1
-){
+class VM {
+
+    has code = []
+    has pc = 0
+    has stack = []
+    has sp = -1
 
     method trace {
         var op = ops{code[pc]};

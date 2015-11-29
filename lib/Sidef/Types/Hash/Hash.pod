@@ -82,6 +82,16 @@ Return the
 
 =cut
 
+=head2 count
+
+Hash.count() -> I<Obj>
+
+Return the
+
+Aliases: I<count_by>
+
+=cut
+
 =head2 delete
 
 Hash.delete() -> I<Obj>
@@ -96,7 +106,13 @@ Hash.delete_if() -> I<Obj>
 
 Return the
 
-Aliases: I<deleteIf>
+=cut
+
+=head2 dig
+
+Hash.dig() -> I<Obj>
+
+Return the
 
 =cut
 
@@ -204,11 +220,21 @@ Aliases: I<length>
 
 =cut
 
+=head2 map
+
+Hash.map() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 map_val
 
 Hash.map_val() -> I<Obj>
 
 Return the
+
+Aliases: I<map_values>
 
 =cut
 

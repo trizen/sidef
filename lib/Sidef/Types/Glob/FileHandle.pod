@@ -273,8 +273,6 @@ FileHandle.syswrite() -> I<Obj>
 
 Return the
 
-Aliases: I<write_string>
-
 =cut
 
 =head2 tell
