@@ -103,7 +103,11 @@ package Sidef::Types::Block::Code {
 
         my $name = ($self->{name} // '__ANON__') =~ s/^_:://r;
 
-        die "Can't dispatch $self->{type}: " . $name . '(' . join(
+        die "ERROR: $self->{type} `$name` does not match $name("
+          . join(', ', map { ref($_) ? ref($_) =~ s/^_:://r : 'nil' } @args)
+          . "), invoked as "
+          . $name . '('
+          . join(
             ', ',
             map {
                 ref($_) && eval { $_->can('dump') }
@@ -112,19 +116,29 @@ package Sidef::Types::Block::Code {
               } @args
           )
           . ')'
-          . " [expected: $name("
+          . "\nPossible candidates are: "
+
+          . "\n    $name("
           . join(
-                 ', ',
-                 map { (exists($_->{slurpy}) ? '*' : '') . $_->{name} . (exists($_->{type}) ? " = $_->{type}" : '') }
-                   @{$self->{vars}}
-                )
-          . ')]';
+            ")\n    $name(",
+            map {
+                join(
+                    ', ',
+                    map {
+                            (exists($_->{slurpy}) ? '*' : '')
+                          . $_->{name}
+                          . (exists($_->{type}) ? (" = " . ($_->{type} =~ s/^_:://r)) : '')
+                      } @{$_->{vars}}
+                    )
+              } ($self, (exists($self->{kids}) ? @{$self->{kids}} : ()))
+          )
+          . ")\n";
     }
 
     sub call {
-        my ($self, @args) = @_;
+        my ($block, @args) = @_;
 
-        my ($self, @objs) = $self->_method_dispatch(@args);
+        my ($self, @objs) = $block->_method_dispatch(@args);
 
         # Unpack 'return'ed values from bare-blocks
         if (@objs == 1 and ref($objs[0]) eq 'Sidef::Types::Block::Return') {

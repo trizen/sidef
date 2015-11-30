@@ -700,6 +700,7 @@ scripts/Tests/module_loading.sf
 scripts/Tests/module_order_and_redeclaration.sf
 scripts/Tests/multi_file_edit.sf
 scripts/Tests/multi_var_assignment.sf
+scripts/Tests/multiple_dispatch.sf
 scripts/Tests/multisplit.sf
 scripts/Tests/named_block_arguments.sf
 scripts/Tests/named_parameters.sf

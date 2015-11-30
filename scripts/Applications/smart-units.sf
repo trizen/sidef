@@ -7,14 +7,14 @@
 # Author: Daniel "Trizen" Șuteu
 # License: GPLv3
 # Date: 17 May 2014
-# Latest edit on: 23 November 2015
+# Latest edit on: 28 November 2015
 # Website: https://github.com/trizen/smart-units
 
 #
 ## Requires Sidef: https://github.com/trizen/sidef
 #
 
-define VERSION = 0.03;
+define VERSION = 0.04;
 
 func more_help {
     print <<"HELP";
@@ -50,7 +50,6 @@ Information:
 
 ...and more that are left for you to discover!
 HELP
-
 }
 
 class Units(precision = 2) {
@@ -68,29 +67,29 @@ class Units(precision = 2) {
             fahrenheit => :(re => /^(?:fahrenheit|(?-i:F))$/i, code => {|n, to| to ? (32 + n*9/5) : ((n - 32) * 5/9)} ),
         ),
         time => :(  # all relative to 1 second
-            nanoseconds  => :(re => /^(?:nanosec(?:ond)?s?|(?-i:ns))/i,       factor => 1e-9),
-            microseconds => :(re => /^(?:microsec(?:ond)?s?|(?-i:us))/i,      factor => 1e-6),
-            milliseconds => :(re => /^(?:mill?isec(?:ond)?s?|(?-i:ms))$/i,    factor => 1e-3),
-            seconds      => :(re => /^(?:sec(?:ond)?s?|(?-i:s))$/i,           factor => 1),
-            minutes      => :(re => /^(?:min(?:ute)?s?)$/i,                   factor => 60),
-            moments      => :(re => /^(?:mom(?:ent)?s?)$/i,                   factor => 90),
-            hours        => :(re => /^(?:hours?)$/i,                          factor => 3600),
-            days         => :(re => /^(?:days?)$/i,                           factor => 86400),
-            millidays    => :(re => /^(?:millidays?|(?-i:md))$/i,             factor => 86.4),
-            weeks        => :(re => /^(?:weeks?)$/i,                          factor => 604800),
-            months       => :(re => /^(?:mon(?:th)?s?)$/i,                    factor => 2629743.83),
-            years        => :(re => /^(?:years?)$/i,                          factor => 31556952),
+            nanoseconds  => :(re => /^(?:nanosec(?:ond)?s?|(?-i:ns))/i,     factor => 1e-9),
+            microseconds => :(re => /^(?:microsec(?:ond)?s?|(?-i:us))/i,    factor => 1e-6),
+            milliseconds => :(re => /^(?:mill?isec(?:ond)?s?|(?-i:ms))$/i,  factor => 1e-3),
+            seconds      => :(re => /^(?:sec(?:ond)?s?|(?-i:s))$/i,         factor => 1),
+            minutes      => :(re => /^(?:min(?:ute)?s?)$/i,                 factor => 60),
+            moments      => :(re => /^(?:mom(?:ent)?s?)$/i,                 factor => 90),
+            hours        => :(re => /^(?:hours?)$/i,                        factor => 3600),
+            days         => :(re => /^(?:days?)$/i,                         factor => 86400),
+            millidays    => :(re => /^(?:millidays?|(?-i:md))$/i,           factor => 86.4),
+            weeks        => :(re => /^(?:weeks?)$/i,                        factor => 604800),
+            months       => :(re => /^(?:mon(?:th)?s?)$/i,                  factor => 2629743.83),
+            years        => :(re => /^(?:years?)$/i,                        factor => 31556952),
         ),
         velocity    => :( # all relative to 1 meter / second
-            meters_per_second     => :(re => /^(?:m(?:et(?:er|re)s?)?\/s(?:ec)?|m(?:et(?:er|re)s?)?\s+per\s+sec(?:ond)?)$/i,      factor => 1),
-            miles_per_hour        => :(re => /^(?:mph|mi(?:les?)?\/h|mi(?:les?)?\s+per\s+hour)$/i,                                factor => 0.44704),
-            miles_per_minute      => :(re => /^(?:mpm|mi(?:les?)?\/min|mi(?:les?)?\s+per\s+min(?:ute)?)$/i,                       factor => 26.8224),
-            miles_per_second      => :(re => /^(?:mps|mi(?:les?)?\/s(?:ec)?|mi(?:les?)?\s+per\s+sec(?:ond)?)$/i,                  factor => 1609.344),
-            kilometers_per_hour   => :(re => /^(?:kph|km[\/p]h|(?:kilomet(?:er|re)s|km)\s+per\s+hour)$/i,                         factor => 1 / 3.6),
-            metres_per_hour       => :(re => /^(?:m(?:eters?)?\/h|(?:metres?|m)\s+per\s+hour)$/i,                                 factor => 1 / 3600),
-            kilometers_per_second => :(re => /^(?:kph|km\/s(?:ec)?|(?:kilomet(?:er|re)s|km)\s+per\s+sec(?:ond)?)$/i,              factor => 1e3),
-            speed_of_light        => :(re => /^(?:speed\s+of\s+light|(?-i:c))$/i,                                                 factor => 299792458),
-            speed_of_sound        => :(re => /^(?:speed\s+of\s+sound)$/i,                                                         factor => 340.29),
+            meters_per_second     => :(re => /^(?:m(?:et(?:er|re)s?)?\/s(?:ec)?|m(?:et(?:er|re)s?)?\s+per\s+sec(?:ond)?)$/i,  factor => 1),
+            miles_per_hour        => :(re => /^(?:mph|mi(?:les?)?\/h|mi(?:les?)?\s+per\s+hour)$/i,                            factor => 0.44704),
+            miles_per_minute      => :(re => /^(?:mpm|mi(?:les?)?\/min|mi(?:les?)?\s+per\s+min(?:ute)?)$/i,                   factor => 26.8224),
+            miles_per_second      => :(re => /^(?:mps|mi(?:les?)?\/s(?:ec)?|mi(?:les?)?\s+per\s+sec(?:ond)?)$/i,              factor => 1609.344),
+            kilometers_per_hour   => :(re => /^(?:kph|km[\/p]h|(?:kilomet(?:er|re)s|km)\s+per\s+hour)$/i,                     factor => 1 / 3.6),
+            metres_per_hour       => :(re => /^(?:m(?:eters?)?\/h|(?:metres?|m)\s+per\s+hour)$/i,                             factor => 1 / 3600),
+            kilometers_per_second => :(re => /^(?:kph|km\/s(?:ec)?|(?:kilomet(?:er|re)s|km)\s+per\s+sec(?:ond)?)$/i,          factor => 1e3),
+            speed_of_light        => :(re => /^(?:speed\s+of\s+light|(?-i:c))$/i,                                             factor => 299792458),
+            speed_of_sound        => :(re => /^(?:speed\s+of\s+sound)$/i,                                                     factor => 340.29),
         ),
         length      => :(   # all relative to 1 meter
             kilometers       => :(re => /^(?:kilomet(?:er|re)s?|km)$/i,       factor => 1e3),
@@ -162,8 +161,8 @@ func help {
 usage: #{File.new(__FILE__).basename} [text]
 
 options:
-    -p int : set floating point precision (default: #{precision})
     -i     : start in interactive mode (default: #{interactive})
+    -p int : set floating point precision (default: #{precision})
 
 examples:
     144 F to C
@@ -207,7 +206,7 @@ func main(command) {
         \s*(\S+(?:\s+\S+){0,2})
 
         # 'to' token
-        \s+(?:in|to|into)\s+
+        \s+(?:in|to|into|as)\s+
 
         # unit to (up to 3 words)
         (\S+(?:\s+\S+){0,2})
