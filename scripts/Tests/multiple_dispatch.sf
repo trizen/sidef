@@ -1,6 +1,6 @@
 #!/usr/bin/ruby
 
-func fib(String n) is cached -> String {
+func fib(String n) -> String {
     return n
 }
 

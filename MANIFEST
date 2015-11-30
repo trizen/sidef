@@ -486,6 +486,7 @@ scripts/RosettaCode/pick_random_element.sf
 scripts/RosettaCode/playing_cards.sf
 scripts/RosettaCode/pointers_and_references.sf
 scripts/RosettaCode/polymorphic_copy.sf
+scripts/RosettaCode/polymorphism.sf
 scripts/RosettaCode/price_fraction.sf
 scripts/RosettaCode/primality_by_trial_division.sf
 scripts/RosettaCode/probabilistic_choice.sf
@@ -816,8 +817,6 @@ scripts/WWW/DNS_query.sf
 scripts/WWW/rc_rank_languages_by_popularity.sf
 scripts/xiaolin_wu_s_line_algorithm.sf
 scripts/y_combinator.sf
-share/sidef/bigint.sm
-share/sidef/bigrat.sm
 share/sidef/Memoize.sm
 share/sidef/ntheory.sm
 share/sidef/Storable.sm
@@ -834,6 +833,8 @@ utils/Concepts/sidef_executor.jl
 utils/Concepts/sidef_executor.lua
 utils/Concepts/sidef_executor.pl6
 utils/Examples/sidef_in_perl.pl
+utils/Experiments/bigint.sm
+utils/Experiments/bigrat.sm
 utils/Experiments/C-inline-function-call.pl
 utils/Experiments/operator_precendece.pl
 utils/Experiments/regexp_grammars_op_precedence.pl

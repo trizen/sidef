@@ -16,7 +16,7 @@ package Sidef::Types::Block::Code {
         $self->{code}->(@args);
     }
 
-    sub _method_dispatch {
+    sub _multiple_dispatch {
         my ($self, @args) = @_;
 
       OUTER: foreach my $method ($self, (exists($self->{kids}) ? @{$self->{kids}} : ())) {
@@ -117,7 +117,6 @@ package Sidef::Types::Block::Code {
           )
           . ')'
           . "\nPossible candidates are: "
-
           . "\n    $name("
           . join(
             ")\n    $name(",
@@ -138,7 +137,7 @@ package Sidef::Types::Block::Code {
     sub call {
         my ($block, @args) = @_;
 
-        my ($self, @objs) = $block->_method_dispatch(@args);
+        my ($self, @objs) = $block->_multiple_dispatch(@args);
 
         # Unpack 'return'ed values from bare-blocks
         if (@objs == 1 and ref($objs[0]) eq 'Sidef::Types::Block::Return') {
