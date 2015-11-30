@@ -26,6 +26,19 @@ package Sidef {
               : $_
         } @_;
     }
+
+    sub normalize_type {
+        my ($type) = @_;
+
+        $type =~ s/^_:://;
+
+        if (index($type, 'Sidef::') == 0) {
+            $type = substr($type, rindex($type, '::') + 2);
+        }
+
+        $type;
+    }
+
 };
 
 #

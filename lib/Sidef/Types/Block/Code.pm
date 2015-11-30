@@ -66,11 +66,8 @@ package Sidef::Types::Block::Code {
 
                     if (exists $seen{$var->{name}}) {
                         my $value = $seen{$var->{name}};
-                        if (
-                            ref($value) eq $var->{type}
-                            or ($var->{type} ne 'REF'
-                                and eval { $value->SUPER::isa($var->{type}) })
-                          ) {
+                        if (ref($value) eq $var->{type}
+                            or eval { $value->SUPER::isa($var->{type}) }) {
                             push @pos_args, $value;
                         }
                         else {
@@ -101,10 +98,10 @@ package Sidef::Types::Block::Code {
             return ($method, $method->{code}(@pos_args));
         }
 
-        my $name = ($self->{name} // '__ANON__') =~ s/^_:://r;
+        my $name = Sidef::normalize_type($self->{name} // '__ANON__');
 
-        die "ERROR: $self->{type} `$name` does not match $name("
-          . join(', ', map { ref($_) ? ref($_) =~ s/^_:://r : 'nil' } @args)
+        die "[ERROR] $self->{type} `$name` does not match $name("
+          . join(', ', map { ref($_) ? Sidef::normalize_type(ref($_)) : 'nil' } @args)
           . "), invoked as "
           . $name . '('
           . join(
@@ -112,11 +109,11 @@ package Sidef::Types::Block::Code {
             map {
                 ref($_) && eval { $_->can('dump') }
                   ? $_->dump
-                  : (ref($_) =~ s/^_:://r)
+                  : Sidef::normalize_type(ref($_))
               } @args
           )
           . ')'
-          . "\nPossible candidates are: "
+          . "\n\nPossible candidates are: "
           . "\n    $name("
           . join(
             ")\n    $name(",
@@ -126,12 +123,12 @@ package Sidef::Types::Block::Code {
                     map {
                             (exists($_->{slurpy}) ? '*' : '')
                           . $_->{name}
-                          . (exists($_->{type}) ? (" = " . ($_->{type} =~ s/^_:://r)) : '')
+                          . (exists($_->{type}) ? (": " . Sidef::normalize_type($_->{type})) : '')
                       } @{$_->{vars}}
                     )
               } ($self, (exists($self->{kids}) ? @{$self->{kids}} : ()))
           )
-          . ")\n";
+          . ")\n\n ";
     }
 
     sub call {
@@ -148,17 +145,22 @@ package Sidef::Types::Block::Code {
         if (exists $self->{returns}) {
 
             if ($#{$self->{returns}} != $#objs) {
-                die qq{[ERROR] Wrong number of return values from $self->{type} $self->{class}<<$self->{name}>>: got }
+                die qq{[ERROR] Wrong number of return values from $self->{type} }
+                  . (defined($self->{class}) ? Sidef::normalize_type($self->{class}) . '.' : '')
+                  . qq{$self->{name}\(): got }
                   . @objs
                   . ", but expected "
                   . @{$self->{returns}};
             }
 
             foreach my $i (0 .. $#{$self->{returns}}) {
-                if (ref($objs[$i]) ne ($self->{returns}[$i])) {
-                    die qq{[ERROR] Invalid return-type from $self->{type} $self->{class}<<$self->{name}>>: got <<}
-                      . ref($objs[$i])
-                      . qq{>>, but expected <<$self->{returns}[$i]>>};
+                if (not(ref($objs[$i]) eq ($self->{returns}[$i]) or eval { $objs[$i]->SUPER::isa($self->{returns}[$i]) })) {
+                    die qq{[ERROR] Invalid return-type from $self->{type} }
+                      . (defined($self->{class}) ? Sidef::normalize_type($self->{class}) . '.' : '')
+                      . qq{$self->{name}\(): got `}
+                      . Sidef::normalize_type(ref($objs[$i]))
+                      . qq{`, but expected `}
+                      . Sidef::normalize_type($self->{returns}[$i]) . "`";
                 }
             }
         }

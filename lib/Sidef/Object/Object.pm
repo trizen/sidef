@@ -148,7 +148,6 @@ package Sidef::Object::Object {
 
         sub def_method {
             my ($self, $name, $block) = @_;
-            ($name) = Sidef::unpack_args($name);
             *{(CORE::ref($self) ? CORE::ref($self) : $self) . '::' . $name} = sub {
                 $block->call(@_);
             };

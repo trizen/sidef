@@ -71,6 +71,16 @@ var(str, num) = foo();
 assert_eq(str, "abc");
 assert_eq(num, 42);
 
+#
+## Generic types
+#
+
+func bar(a, b) -> Object {
+    a + b
+}
+
+assert_eq(bar(1, 2), 3);
+assert_eq(bar("a", "b"), "ab");
 
 #
 ## Test passed!
