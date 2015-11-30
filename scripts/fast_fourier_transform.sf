@@ -16,5 +16,5 @@ var sequence = (0 .. 15);
 
 var wave = sequence.map {|n| Complex(sin(n * 2*Math::PI / sequence.len * cycles)) };
 
-say "wave:#{wave.map{ '%6.3f' % _ }}";
-say "fft: #{fft(wave).map { '%6.3f' % .abs }}";
+say "wave:#{wave.map{ '%6.3f' % _ }.join(' ')}";
+say "fft: #{fft(wave).map { '%6.3f' % .abs }.join(' ')}";

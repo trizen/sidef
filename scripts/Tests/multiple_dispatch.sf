@@ -1,0 +1,15 @@
+#!/usr/bin/ruby
+
+func fib(String n) is cached -> String {
+    return n
+}
+
+func fib(Number n) is cached -> Number {
+    n <= 1 ? n : (fib(n-1) + fib(n-2))
+}
+
+say fib("-------");
+say fib(30);
+say fib("-------");
+
+assert_eq(fib(30), 832040);

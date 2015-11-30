@@ -98,7 +98,7 @@ package Sidef::Types::Block::Code {
                 }
             }
 
-            return $method->{code}(@pos_args);
+            return ($method, $method->{code}(@pos_args));
         }
 
         my $name = ($self->{name} // '__ANON__') =~ s/^_:://r;
@@ -124,7 +124,7 @@ package Sidef::Types::Block::Code {
     sub call {
         my ($self, @args) = @_;
 
-        my @objs = $self->_method_dispatch(@args);
+        my ($self, @objs) = $self->_method_dispatch(@args);
 
         # Unpack 'return'ed values from bare-blocks
         if (@objs == 1 and ref($objs[0]) eq 'Sidef::Types::Block::Return') {

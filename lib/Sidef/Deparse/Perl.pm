@@ -309,16 +309,6 @@ HEADER
                         $code .= (' ' x $Sidef::SPACES) . "\$$var->{name}" . refaddr($var) . " //= " . $value . ";\n";
                     }
                 }
-
-#~ if (exists($var->{ref_type})) {
-#~ my $var_name = "\$$var->{name}" . refaddr($var);
-#~ my $type     = $self->_dump_reftype($var->{ref_type});
-#~ $code .=
-#~ (' ' x $Sidef::SPACES)
-#~ . "(ref($var_name) eq $type || ($type ne 'REF' && eval{$var_name->SUPER::isa($type)})) or "
-#~ . "die q{[ERROR] Invalid type-parameter for variable <<$var->{name}>> in $self->{parent_name}[0] <<$self->{parent_name}[1]>>: got <<} . "
-#~ . "ref($var_name) . q{>>, but expected $type};\n";
-#~ }
             }
         }
 
@@ -495,26 +485,13 @@ HEADER
 
                     # Check to see if the method/function has kids (can do multiple dispatch)
                     if (exists $obj->{value}{kids}) {
-
-                        #die "[ERROR] Multiple dispatch is currently unsupported!";
-                        #die $#{$obj->{value}{kids}};
-                        #say $code;
                         chop $code;
                         my @kids = map {
-                            my $value = $self->deparse_expr({self => $_->{value}});
-                            $_->{value} = $obj;
-                            $value;
+                            local $_->{type} = 'func';
+                            "do{" . $self->deparse_expr({self => $_}) . "}";
                         } @{$obj->{value}{kids}};
 
                         $code .= ', kids => [' . join(', ', @kids) . '])';
-
-                        #die "@kids";
-
-                        # my $deparsed_block = $self->deparse_expr({self => $block});
-                        #my @kids = map{$self->deparse_expr({self=>$_})}@{$obj->{value}{kids}};
-                        #die join('', @kids);
-                        #$code .= 'Sidef::Types::Block::MultiDispatch->new(' . join(', ',  $deparsed_block, @kids). ')';
-
                     }
 
                     # Check the return value (when "-> Type" is specified)
@@ -1112,7 +1089,7 @@ HEADER
             $code = $self->make_constant($ref, 'new', "Dir$refaddr", $self->_dump_string(${$obj}));
         }
         elsif ($ref eq 'Sidef::Sys::Sys') {
-            $code = $self->make_constant($ref, 'new', "Sys");
+            $code = $self->make_constant($ref, 'new', "Sys$refaddr");
         }
         elsif ($ref eq 'Sidef::Meta::Assert') {
             my @args = $self->deparse_script($obj->{arg});
@@ -1383,7 +1360,7 @@ HEADER
                             next;
                         }
 
-                        if ($method eq '>' or $method eq 'say') {
+                        if ($method eq '>') {
                             $code =
                                 $self->make_constant('Sidef::Sys::Sys', 'new', "Sys$refaddr")
                               . '->say('
@@ -1391,7 +1368,7 @@ HEADER
                             next;
                         }
 
-                        if ($method eq '>>' or $method eq 'print') {
+                        if ($method eq '>>') {
                             $code =
                                 $self->make_constant('Sidef::Sys::Sys', 'new', "Sys$refaddr")
                               . '->print('
