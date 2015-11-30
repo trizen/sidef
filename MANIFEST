@@ -135,6 +135,7 @@ lib/Sidef/Types/Regex/Regex.pod
 lib/Sidef/Types/String/String.pm
 lib/Sidef/Types/String/String.pod
 lib/Sidef/Variable/ClassAttr.pm
+lib/Sidef/Variable/ClassAttr.pod
 lib/Sidef/Variable/ClassInit.pm
 lib/Sidef/Variable/ClassInit.pod
 lib/Sidef/Variable/Const.pm
@@ -266,6 +267,7 @@ scripts/langton_s_ant_2.sf
 scripts/linear_congruential_generator.sf
 scripts/mandelbrot_set.sf
 scripts/matrix_multiplication.sf
+scripts/multiple_dispatch.sf
 scripts/mutual_recursion.sf
 scripts/nth_root.sf
 scripts/permutations_iter.sf
@@ -368,6 +370,7 @@ scripts/RosettaCode/convert_decimal_number_to_rational.sf
 scripts/RosettaCode/copy_a_string.sf
 scripts/RosettaCode/count_in_factors.sf
 scripts/RosettaCode/count_occurrences_of_a_substring.sf
+scripts/RosettaCode/create_an_html_table.sf
 scripts/RosettaCode/date_format.sf
 scripts/RosettaCode/delete_a_file.sf
 scripts/RosettaCode/determine_if_a_string_is_numeric.sf
@@ -381,7 +384,6 @@ scripts/RosettaCode/enumerations.sf
 scripts/RosettaCode/enumerations_1.sf
 scripts/RosettaCode/equilibrium_index.sf
 scripts/RosettaCode/euler_method.sf
-scripts/RosettaCode/evaluate_binomial_coefficients.sf
 scripts/RosettaCode/factorial.sf
 scripts/RosettaCode/fibonacci_n-step_number_sequence.sf
 scripts/RosettaCode/fibonacci_sequence.sf
@@ -822,6 +824,7 @@ t/00-load.t
 t/01-parser.t
 t/manifest.t
 t/pod.t
+TODO
 utils/auto_perltidy.sh
 utils/bak_cleaner.sh
 utils/Concepts/sidef_concept.jl

@@ -5,17 +5,39 @@ package Sidef::Object::Object {
 
     use overload
       q{~~}   => \&{__PACKAGE__ . '::' . '~~'},
-      q{bool} => sub { $_[0] },
-      q{0+}   => sub { $_[0] },
-      q{""}   => sub { $_[0] },
-      q{cmp}  => sub {
+      q{bool} => sub {
+        if (defined(my $sub = $_[0]->can('to_b'))) {
+            $_[0]->to_b;
+        }
+        else {
+            $_[0];
+        }
+      },
+      q{0+} => sub {
+        if (defined(my $sub = $_[0]->can('to_n'))) {
+            $_[0]->to_n;
+        }
+        else {
+            $_[0];
+        }
+      },
+      q{""} => sub {
+        if (defined(my $sub = $_[0]->can('to_s'))) {
+            $_[0]->to_s;
+        }
+        else {
+            $_[0];
+        }
+      },
+      q{cmp} => sub {
         my ($obj1, $obj2, $first) = @_;
 
         if (CORE::ref($obj1) && $obj1->SUPER::isa(CORE::ref($obj2)) or CORE::ref($obj2) && $obj2->SUPER::isa(CORE::ref($obj1)))
         {
             if (defined(my $sub = $obj1->can('<=>'))) {
+                my $result = $sub->($obj1, $obj2);
                 local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
-                return $sub->($obj1, $obj2)->get_value;
+                return $result->get_value;
             }
         }
 
@@ -39,13 +61,13 @@ package Sidef::Object::Object {
     }
 
     sub say {
-        Sidef::Types::Bool::Bool->new(say @_);
+        Sidef::Types::Bool::Bool->new(CORE::say Sidef::unpack_args(@_));
     }
 
     *println = \&say;
 
     sub print {
-        Sidef::Types::Bool::Bool->new(print @_);
+        Sidef::Types::Bool::Bool->new(CORE::print Sidef::unpack_args(@_));
     }
 
     sub method {
@@ -126,6 +148,7 @@ package Sidef::Object::Object {
 
         sub def_method {
             my ($self, $name, $block) = @_;
+            ($name) = Sidef::unpack_args($name);
             *{(CORE::ref($self) ? CORE::ref($self) : $self) . '::' . $name} = sub {
                 $block->call(@_);
             };

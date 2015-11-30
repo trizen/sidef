@@ -7,10 +7,10 @@
 
 # Find the unique prefixes for an array of arrays of strings
 
-func abbrev(array, code) {
+func abbrev(array, code=nil) {
 
     var END  = "#{{}}";              # some unique value
-    var CALL = (defined(code) && code.is_a(Block));
+    var CALL = (code != nil && code.is_a(Block));
 
     var table = Hash.new;
     array.each { |sub_array|

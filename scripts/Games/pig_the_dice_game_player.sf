@@ -5,7 +5,7 @@ var (games=10) = @ARGV.map{.to_i};
 define DIE = 1..6;
 define GOAL = 100;
 
-class Player(score=0, ante, rolls, strategy={false}) {
+class Player(score=0, ante=nil, rolls, strategy={false}) {
     method turn {
         rolls = 0;
         ante  = 0;

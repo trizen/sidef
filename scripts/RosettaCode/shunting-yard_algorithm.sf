@@ -4,7 +4,7 @@
 ## http://rosettacode.org/wiki/Parsing/Shunting-yard_algorithm
 #
 
-var prec = Hash.new(
+var prec = Hash(
     '^' => 4,
     '*' => 3,
     '/' => 3,
@@ -13,7 +13,7 @@ var prec = Hash.new(
     '(' => 1,
 );
 
-var assoc = Hash.new(
+var assoc = Hash(
     '^' => 'right',
     '*' => 'left',
     '/' => 'left',
@@ -26,9 +26,9 @@ func shunting_yard(prog) {
     var ops = [];
     var res = [];
 
-    func report (op) { printf("%25s    %-7s %10s %s\n", res.to_s, ops.to_s, op, inp.to_s) };
-    func shift  (t)  { report( "shift #{t}"); ops << t };
-    func reduce (t)  { report("reduce #{t}"); res << t };
+    func report (op) { printf("%25s    %-7s %10s %s\n", res.join(' '), ops.join(' '), op, inp.join(' ')) }
+    func shift  (t)  { report( "shift #{t}"); ops << t }
+    func reduce (t)  { report("reduce #{t}"); res << t }
 
     while (inp) {
         given(var t = inp.shift) {
@@ -44,7 +44,7 @@ func shunting_yard(prog) {
                     break if ((newprec == oldprec) && (assoc{t} == 'right'))
 
                     reduce(ops.pop);
-                };
+                }
                 shift(t);
             }
         }
@@ -53,4 +53,4 @@ func shunting_yard(prog) {
     return res
 }
 
-say shunting_yard('3 + 4 * 2 / ( 1 - 5 ) ^ 2 ^ 3').to_s;
+say shunting_yard('3 + 4 * 2 / ( 1 - 5 ) ^ 2 ^ 3').join(' ');

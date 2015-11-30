@@ -46,5 +46,5 @@ func solve_apollonius(c, s) {
 }
 
 var c = [Circle(0, 0, 1), Circle(4, 0, 1), Circle(2, 4, 2)];
-say solve_apollonius(c, %n<1 1 1>).to_s;
-say solve_apollonius(c, %n<-1 -1 -1>).to_s;
+say solve_apollonius(c, %n<1 1 1>);
+say solve_apollonius(c, %n<-1 -1 -1>);

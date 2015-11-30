@@ -728,14 +728,14 @@ package Sidef::Parser {
             }
 
             my $obj = Sidef::Variable::Variable->new(
-                                                     name => $name,
-                                                     type => $opt{type},
-                                                     (defined($ref_type) ? (ref_type => $ref_type) : ()),
-                                                     class => $class_name,
-                                                     defined($value) ? (value => $value, has_value => 1) : (),
-                                                     $attr eq '*' ? (array => 1) : $attr eq ':' ? (hash => 1) : (),
-                                                     $opt{in_use} ? (in_use => 1) : (),
-                                                    );
+                                       name => $name,
+                                       type => $opt{type},
+                                       (defined($ref_type) ? (ref_type => $ref_type) : ()),
+                                       class => $class_name,
+                                       defined($value) ? (value => $value, has_value => 1) : (),
+                                       $attr eq '*' ? (array => 1, slurpy => 1) : $attr eq ':' ? (hash => 1, slurpy => 1) : (),
+                                       $opt{in_use} ? (in_use => 1) : (),
+            );
 
             if (!$opt{private}) {
                 unshift @{$self->{vars}{$class_name}},
@@ -750,6 +750,15 @@ package Sidef::Parser {
 
             push @var_objs, $obj;
             (defined($end_delim) && /\G\h*,\h*/gc) || last;
+
+            #~ if ($obj->{slurpy}) {
+            #~ $self->fatal_error(
+            #~ error => "can't declare more parameters after a slurpy parameter",
+            #~ code => $_,
+            #~ pos => pos($_),
+            #~ )
+            #~ }
+
             $self->parse_whitespace(code => $opt{code});
         }
 

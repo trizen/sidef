@@ -18,6 +18,14 @@ package Sidef {
     sub new {
         bless {}, __PACKAGE__;
     }
+
+    sub unpack_args {
+        map {
+            ref($_) && eval { $_->can('to_s') }
+              ? $_->to_s
+              : $_
+        } @_;
+    }
 };
 
 #

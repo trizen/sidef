@@ -24,7 +24,7 @@ func encode (str) {
         i++; lc = chars[index];
     }
 
-    output.to_s;
+    output.join(' ');
 }
 
 func decode (str) {

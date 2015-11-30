@@ -122,10 +122,10 @@ class SmartWordWrap(WIDTH=80) {
     ## This is the main function of the algorithm
     ## which calls all the other functions and
     ## returns the best possible wrapped string.
-    method wrap(text, width) {
+    method wrap(text, width=WIDTH) {
 
         # Temporarily modify the width
-        local WIDTH = width if defined(width);
+        local WIDTH = width;
 
         # Split the text into words
         text.is_a(String) && (

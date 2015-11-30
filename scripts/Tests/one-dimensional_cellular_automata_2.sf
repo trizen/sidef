@@ -22,7 +22,7 @@ class Automaton(rule, cells) {
             ];
     }
 
-    method to_str {
+    method to_s {
         cells.map { _ ? '#' : ' ' }.join('');
     }
 }

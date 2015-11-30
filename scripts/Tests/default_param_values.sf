@@ -33,7 +33,7 @@ test2(100, 100+42, 100+100+42+21);
 ## Test 3
 #
 
-func test3(a, b: 21, c=42) {
+func test3(a=nil, b: 21, c=42) {
     assert_eq(b, 21);
     assert_eq(c, 42);
     assert_eq(a, 13) if defined(a);

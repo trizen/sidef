@@ -1472,10 +1472,12 @@ package Sidef::Types::Array::Array {
         );
     }
 
-    sub to_s {
-        my ($self) = @_;
-        Sidef::Types::String::String->new(CORE::join(' ', @{$self}));
-    }
+    *to_s = \&dump;
+
+    #sub to_s {
+    #    my ($self) = @_;
+    #    Sidef::Types::String::String->new(CORE::join(' ', @{$self}));
+    #}
 
     {
         no strict 'refs';

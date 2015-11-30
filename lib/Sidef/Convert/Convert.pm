@@ -65,6 +65,8 @@ package Sidef::Convert::Convert {
         Sidef::Types::Bool::Bool->new($_[0]->get_value);
     }
 
+    *to_b = \&to_bool;
+
     sub to_regex {
         Sidef::Types::Regex::Regex->new($_[0]->get_value);
     }

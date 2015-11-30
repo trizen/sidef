@@ -16,10 +16,115 @@ package Sidef::Types::Block::Code {
         $self->{code}->(@args);
     }
 
+    sub _method_dispatch {
+        my ($self, @args) = @_;
+
+      OUTER: foreach my $method ($self, (exists($self->{kids}) ? @{$self->{kids}} : ())) {
+            my $table = $self->{table};
+
+            my %seen;
+            my @left_args;
+            my @vars = @{$method->{vars}};
+
+            foreach my $arg (@args) {
+                if (ref($arg) eq 'Sidef::Variable::NamedParam') {
+                    if (exists $table->{$arg->[0]}) {
+                        my $info = $vars[$table->{$arg->[0]}];
+                        if (exists $info->{slurpy}) {
+                            $seen{$arg->[0]} = $arg->[1];
+                        }
+                        else {
+                            $seen{$arg->[0]} = $arg->[1][-1];
+                        }
+                    }
+                    else {
+                        next OUTER;
+                    }
+                }
+                else {
+                    push @left_args, $arg;
+                }
+            }
+
+            foreach my $var (@vars) {
+                exists($seen{$var->{name}}) && next;
+                @left_args || last;
+                if (exists($var->{slurpy})) {
+                    $seen{$var->{name}} = [splice(@left_args)];
+                    last;
+                }
+                else {
+                    $seen{$var->{name}} = shift(@left_args);
+                }
+            }
+
+            @left_args && next;
+
+            my @pos_args;
+            foreach my $var (@vars) {
+                if (exists $var->{type}) {
+
+                    if (exists $seen{$var->{name}}) {
+                        my $value = $seen{$var->{name}};
+                        if (
+                            ref($value) eq $var->{type}
+                            or ($var->{type} ne 'REF'
+                                and eval { $value->SUPER::isa($var->{type}) })
+                          ) {
+                            push @pos_args, $value;
+                        }
+                        else {
+                            next OUTER;
+                        }
+                    }
+                    elsif (exists $var->{has_value}) {
+                        push @pos_args, undef;
+                    }
+                    else {
+                        next OUTER;
+                    }
+                }
+                elsif (exists $seen{$var->{name}}) {
+                    push @pos_args, exists($var->{slurpy}) ? @{$seen{$var->{name}}} : $seen{$var->{name}};
+                }
+                elsif (exists $var->{slurpy}) {
+                    ## ok
+                }
+                elsif (exists $var->{has_value}) {
+                    push @pos_args, undef;
+                }
+                else {
+                    next OUTER;
+                }
+            }
+
+            return $method->{code}(@pos_args);
+        }
+
+        my $name = ($self->{name} // '__ANON__') =~ s/^_:://r;
+
+        die "Can't dispatch $self->{type}: " . $name . '(' . join(
+            ', ',
+            map {
+                ref($_) && eval { $_->can('dump') }
+                  ? $_->dump
+                  : (ref($_) =~ s/^_:://r)
+              } @args
+          )
+          . ')'
+          . " [expected: $name("
+          . join(
+                 ', ',
+                 map { (exists($_->{slurpy}) ? '*' : '') . $_->{name} . (exists($_->{type}) ? " = $_->{type}" : '') }
+                   @{$self->{vars}}
+                )
+          . ')]';
+    }
+
     sub call {
         my ($self, @args) = @_;
 
-        my @objs = $self->{code}->(@args);
+        my @objs = $self->_method_dispatch(@args);
 
         # Unpack 'return'ed values from bare-blocks
         if (@objs == 1 and ref($objs[0]) eq 'Sidef::Types::Block::Return') {
