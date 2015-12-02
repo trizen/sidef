@@ -1364,19 +1364,13 @@ HEADER
                             next;
                         }
 
-                        if ($method eq '>') {
-                            $code =
-                                $self->make_constant('Sidef::Sys::Sys', 'new', "Sys$refaddr")
-                              . '->say('
-                              . $self->deparse_args(@{$call->{arg}}) . ')';
+                        if ($method eq 'say' or $method eq '>') {
+                            $code = 'Sidef::Types::Bool::Bool->new(CORE::say' . $self->deparse_args(@{$call->{arg}}) . ')';
                             next;
                         }
 
-                        if ($method eq '>>') {
-                            $code =
-                                $self->make_constant('Sidef::Sys::Sys', 'new', "Sys$refaddr")
-                              . '->print('
-                              . $self->deparse_args(@{$call->{arg}}) . ')';
+                        if ($method eq 'print' or $method eq '>>') {
+                            $code = 'Sidef::Types::Bool::Bool->new(CORE::print' . $self->deparse_args(@{$call->{arg}}) . ')';
                             next;
                         }
                     }

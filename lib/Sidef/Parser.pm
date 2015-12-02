@@ -129,10 +129,10 @@ package Sidef::Parser {
                 | return\b                                  (?{ Sidef::Types::Block::Return->new })
                 #| next\b                                    (?{ Sidef::Types::Block::Next->new })
                 #| break\b                                   (?{ Sidef::Types::Block::Break->new })
-                | (?:defined|read|say|print)\b              (?{ state $x = Sidef::Sys::Sys->new })
+                | (?:defined|read)                          (?{ state $x = Sidef::Sys::Sys->new })
                 | goto\b                                    (?{ state $x = Sidef::Perl::Builtin->new })
                 | (?:[*\\&]|\+\+|--)                        (?{ state $x = Sidef::Variable::Ref->new })
-                | (?:>>?|[√+~!-])                           (?{ state $x = Sidef::Object::Unary->new })
+                | (?:>>?|[√+~!-]|(?:say|print)\b)           (?{ state $x = Sidef::Object::Unary->new })
                 | :                                         (?{ state $x = Sidef::Types::Hash::Hash->new })
               )
             }x,

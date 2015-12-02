@@ -19,21 +19,14 @@ package Sidef {
         bless {}, __PACKAGE__;
     }
 
-    sub unpack_args {
-        map {
-            ref($_) && eval { $_->can('to_s') }
-              ? $_->to_s
-              : $_
-        } @_;
-    }
-
     sub normalize_type {
         my ($type) = @_;
 
-        $type =~ s/^_:://;
-
         if (index($type, 'Sidef::') == 0) {
             $type = substr($type, rindex($type, '::') + 2);
+        }
+        else {
+            $type =~ s/^_:://;
         }
 
         $type;

@@ -120,19 +120,19 @@ package Sidef::Sys::Sys {
 
     sub print {
         my ($self, @args) = @_;
-        Sidef::Types::Bool::Bool->new(CORE::print(Sidef::unpack_args(@args)));
+        Sidef::Types::Bool::Bool->new(CORE::print(@args));
     }
 
     sub printf {
-        my ($self, $format, @args) = @_;
-        Sidef::Types::Bool::Bool->new(CORE::printf($format->get_value, Sidef::unpack_args(@args)));
+        my ($self, @args) = @_;
+        Sidef::Types::Bool::Bool->new(CORE::printf(@args));
     }
 
     sub printh {
         my ($self, $fh, @args) = @_;
 
         if (CORE::ref($fh) eq 'GLOB') {
-            return Sidef::Types::Bool::Bool->new(CORE::print {$fh} Sidef::unpack_args(@args));
+            return Sidef::Types::Bool::Bool->new(CORE::print {$fh} @args);
         }
 
         $fh->print(@args);
@@ -140,7 +140,7 @@ package Sidef::Sys::Sys {
 
     sub println {
         my ($self, @args) = @_;
-        Sidef::Types::Bool::Bool->new(CORE::say(Sidef::unpack_args(@args)));
+        Sidef::Types::Bool::Bool->new(CORE::say @args);
     }
 
     *say = \&println;

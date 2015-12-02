@@ -61,13 +61,13 @@ package Sidef::Object::Object {
     }
 
     sub say {
-        Sidef::Types::Bool::Bool->new(CORE::say Sidef::unpack_args(@_));
+        Sidef::Types::Bool::Bool->new(CORE::say @_);
     }
 
     *println = \&say;
 
     sub print {
-        Sidef::Types::Bool::Bool->new(CORE::print Sidef::unpack_args(@_));
+        Sidef::Types::Bool::Bool->new(CORE::print @_);
     }
 
     sub method {
