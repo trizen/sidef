@@ -22,10 +22,17 @@ package Sidef::Types::Bool::Bool {
 
         sub true  { $true }
         sub false { $false }
+
+        sub pick {
+            rand(1) < 0.5 ? $true : $false;
+        }
+
+        *rand = \&pick;
     }
 
     sub get_value { ${$_[0]} }
     sub to_bool   { $_[0] }
+    *to_b = \&to_bool;
 
     *{__PACKAGE__ . '::' . '|'} = sub {
         my ($self, $arg) = @_;

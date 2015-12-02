@@ -46,6 +46,12 @@ package Sidef::Types::Number::Number {
         $GET_PERL_VALUE ? ${$_[0]}->numify : ${$_[0]};
     }
 
+    sub to_n {
+        $_[0]
+    }
+
+    *to_num = \&to_n;
+
     sub mod {
         my ($self, $num) = @_;
         $self->new($$self % $num->get_value);
@@ -318,6 +324,7 @@ package Sidef::Types::Number::Number {
 
     *as_int = \&int;
     *to_i   = \&int;
+    *to_int = \&int;
 
     sub max {
         my ($self, $arg) = @_;

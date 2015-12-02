@@ -24,17 +24,17 @@ loop {
  
     ++tries;
     given(var score = STDIN.readline) {
-        when(max <= min) {
+        case(max <= min) {
             say "\nI give up...";
             break;
         }
-        when(score ~~ /^h/i) {
+        when(/^h/i) {
             min = guess+1;
         }
-        when(score ~~ /^l/i) {
+        when(/^l/i) {
             max = guess;
         }
-        when(score ~~ /^e/i) {
+        when(/^e/i) {
             say "\nI knew it! It took me only #{tries} tries.";
             break;
         }

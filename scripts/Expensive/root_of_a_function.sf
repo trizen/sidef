@@ -17,7 +17,7 @@ range(start+step, stop, step).each { |x|
         when (0) {
             say "Root found at #{x}";
         }
-        when (sign && ((value > 0) != sign)) {
+        case (sign && ((value > 0) != sign)) {
             say "Root found near #{x}";
         }
     }
