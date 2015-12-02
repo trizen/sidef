@@ -948,16 +948,20 @@ HEADER
             }
         }
         elsif ($ref eq 'Sidef::Types::Block::Do') {
-            $code = 'do {' . join(';', $self->deparse_script($obj->{block}{code})) . '}';
+            $code = 'do ' . $self->deparse_bare_block($obj->{block}{code});
         }
         elsif ($ref eq 'Sidef::Types::Block::Loop') {
-            $code = 'while(1) {' . join(';', $self->deparse_script($obj->{block}{code})) . '}';
+            $code = 'while(1) ' . $self->deparse_bare_block($obj->{block}{code});
         }
         elsif ($ref eq 'Sidef::Types::Block::Given') {
             $self->top_add(qq{use experimental 'smartmatch';\n});
+            $code = 'do{given ' . $self->deparse_args($obj->{expr}) . $self->deparse_bare_block($obj->{block}{code}) . '}';
         }
         elsif ($ref eq 'Sidef::Types::Block::When') {
-            $self->top_add(qq{use experimental 'smartmatch';\n});
+            $code = 'when($_ ~~ ' . $self->deparse_args($obj->{expr}) . ')' . $self->deparse_bare_block($obj->{block}{code});
+        }
+        elsif ($ref eq 'Sidef::Types::Block::Case') {
+            $code = 'when(!!' . $self->deparse_args($obj->{expr}) . ')' . $self->deparse_bare_block($obj->{block}{code});
         }
         elsif ($ref eq 'Sidef::Types::Block::Default') {
             $code = 'default' . $self->deparse_bare_block($obj->{block}->{code});
@@ -1277,7 +1281,7 @@ HEADER
                             my $var = $self->deparse_args(@{$call->{arg}});
 
                             #$code = "($var=$var\->$self->{inc_dec_ops}{$method})[0]";
-                            $code = "do{my\$ref=\\$var;\$\$ref=\$\$ref\->$self->{inc_dec_ops}{$method}}";
+                            $code = "do{my \$ref=\\$var; \$\$ref=\$\$ref\->$self->{inc_dec_ops}{$method}}";
                             next;
                         }
                     }
@@ -1287,7 +1291,7 @@ HEADER
 
                         #$code = "do{my \$old=$code; $code=$code\->$self->{inc_dec_ops}{$method}; \$old}";
                         $code =
-                          "do{my\$ref=\\$code;my\$value=\$\$ref;\$\$ref=\$value\->$self->{inc_dec_ops}{$method}; \$value}";
+                          "do{my \$ref=\\$code; my \$value=\$\$ref; \$\$ref=\$value\->$self->{inc_dec_ops}{$method}; \$value}";
                         next;
                     }
 
@@ -1428,8 +1432,9 @@ HEADER
                 }
 
                 if (exists $call->{block}) {
-                    if ($ref eq 'Sidef::Types::Block::Given'
-                        or ($ref eq 'Sidef::Types::Block::If' and $i == $#{$expr->{call}})) {
+
+                    # TODO: move above the deparsing of `Block::If`
+                    if ($ref eq 'Sidef::Types::Block::If' and $i == $#{$expr->{call}}) {
                         $code = "do {\n" . (' ' x $Sidef::SPACES) . $code . $self->deparse_bare_block(@{$call->{block}}) . '}';
                     }
                     else {

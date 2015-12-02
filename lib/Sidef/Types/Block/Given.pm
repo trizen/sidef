@@ -1,7 +1,8 @@
 package Sidef::Types::Block::Given {
 
     sub new {
-        bless {}, __PACKAGE__;
+        my (undef, %opt) = @_;
+        bless \%opt, __PACKAGE__;
     }
 }
 

@@ -17,7 +17,7 @@ func agm1(a, g) {
     loop {
         given (var ag = [a+g / 2, Math.sqrt(a*g)]) {
             when (a, g) { return a }
-            default       { (a, g) = ag... }
+            default     { (a, g) = ag... }
         }
     }
 }

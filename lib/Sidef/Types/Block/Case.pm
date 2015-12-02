@@ -1,5 +1,4 @@
-package Sidef::Types::Block::When {
-
+package Sidef::Types::Block::Case {
     sub new {
         my (undef, %opt) = @_;
         bless \%opt, __PACKAGE__;

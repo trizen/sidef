@@ -7,7 +7,7 @@
 func is_prime(a) {
   given (a) {
     when (2)                   { true  }
-    when (a <= 1 || a.is_even) { false }
+    case (a <= 1 || a.is_even) { false }
     default                    { 3 ... a.sqrt -> any { .divides(a) } -> not }
   }
 }

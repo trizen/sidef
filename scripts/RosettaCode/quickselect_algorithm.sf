@@ -11,7 +11,7 @@ func quickselect(a, k) {
  
     given(var l = left.len) {
         when(k)     { pivot }
-        when(k < l) { __FUNC__(left, k) }
+        case(k < l) { __FUNC__(left, k) }
         default     { __FUNC__(right, k - l - 1) }
     }
 }

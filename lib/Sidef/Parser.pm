@@ -42,8 +42,6 @@ package Sidef::Parser {
                                    'Sidef::Types::Block::While' => 1,
                                    'Sidef::Types::Block::If'    => 1,
                                    'Sidef::Types::Block::For'   => 1,
-                                   'Sidef::Types::Block::Given' => 1,
-                                   'Sidef::Types::Block::When'  => 1,
                                   },
 
             static_obj_re => qr{\G
@@ -131,8 +129,6 @@ package Sidef::Parser {
                 | return\b                                  (?{ Sidef::Types::Block::Return->new })
                 #| next\b                                    (?{ Sidef::Types::Block::Next->new })
                 #| break\b                                   (?{ Sidef::Types::Block::Break->new })
-                | given\b                                   (?{ Sidef::Types::Block::Given->new })
-                | when\b                                    (?{ Sidef::Types::Block::When->new })
                 | (?:defined|read|say|print)\b              (?{ state $x = Sidef::Sys::Sys->new })
                 | goto\b                                    (?{ state $x = Sidef::Perl::Builtin->new })
                 | (?:[*\\&]|\+\+|--)                        (?{ state $x = Sidef::Variable::Ref->new })
@@ -228,7 +224,7 @@ package Sidef::Parser {
                   return
                   for foreach
                   if while
-                  given when
+                  given
                   try
                   continue
                   import
@@ -1544,8 +1540,96 @@ package Sidef::Parser {
                 return $obj;
             }
 
+            # "given(expr) {...}" construct
+            if (/\Ggiven\b\h*/gc) {
+                my $expr = (
+                            /\G(?=\()/
+                            ? $self->parse_arguments(code => $opt{code})
+                            : $self->parse_obj(code => $opt{code})
+                           );
+
+                $expr // $self->fatal_error(
+                                            error    => "invalid declaration of the `given/when` construct",
+                                            expected => "expected `given(expr) {...}`",
+                                            code     => $_,
+                                            pos      => pos($_),
+                                           );
+
+                my $given_obj = Sidef::Types::Block::Given->new(expr => $expr);
+                local $self->{current_given} = $given_obj;
+                my $block = (
+                             /\G\h*(?=\{)/gc
+                             ? $self->parse_block(code => $opt{code})
+                             : $self->fatal_error(
+                                                  error => "expected a block after `given(expr)`",
+                                                  code  => $_,
+                                                  pos   => pos($_),
+                                                 )
+                            );
+
+                $given_obj->{block} = $block;
+
+                return $given_obj;
+            }
+
+            # "when(expr) {...}" construct
+            if (exists($self->{current_given}) && /\Gwhen\b\h*/gc) {
+                my $expr = (
+                            /\G(?=\()/
+                            ? $self->parse_arguments(code => $opt{code})
+                            : $self->parse_obj(code => $opt{code})
+                           );
+
+                $expr // $self->fatal_error(
+                                            error    => "invalid declaration of the `when` construct",
+                                            expected => "expected `when(expr) {...}`",
+                                            code     => $_,
+                                            pos      => pos($_),
+                                           );
+
+                my $block = (
+                             /\G\h*(?=\{)/gc
+                             ? $self->parse_block(code => $opt{code})
+                             : $self->fatal_error(
+                                                  error => "expected a block after `when(expr)`",
+                                                  code  => $_,
+                                                  pos   => pos($_),
+                                                 )
+                            );
+
+                return Sidef::Types::Block::When->new(expr => $expr, block => $block);
+            }
+
+            # "case(expr) {...}" construct
+            if (exists($self->{current_given}) && /\Gcase\b\h*/gc) {
+                my $expr = (
+                            /\G(?=\()/
+                            ? $self->parse_arguments(code => $opt{code})
+                            : $self->parse_obj(code => $opt{code})
+                           );
+
+                $expr // $self->fatal_error(
+                                            error    => "invalid declaration of the `case` construct",
+                                            expected => "expected `case(expr) {...}`",
+                                            code     => $_,
+                                            pos      => pos($_),
+                                           );
+
+                my $block = (
+                             /\G\h*(?=\{)/gc
+                             ? $self->parse_block(code => $opt{code})
+                             : $self->fatal_error(
+                                                  error => "expected a block after `case(expr)`",
+                                                  code  => $_,
+                                                  pos   => pos($_),
+                                                 )
+                            );
+
+                return Sidef::Types::Block::Case->new(expr => $expr, block => $block);
+            }
+
             # "default {...}" construct
-            if (/\Gdefault\h*(?=\{)/gc) {
+            if (exists($self->{current_given}) && /\Gdefault\h*(?=\{)/gc) {
                 my $block = $self->parse_block(code => $opt{code});
                 return Sidef::Types::Block::Default->new(block => $block);
             }

@@ -143,6 +143,9 @@
       "Sidef::Types::Block::Break" : {
          "file" : "lib/Sidef/Types/Block/Break.pm"
       },
+      "Sidef::Types::Block::Case" : {
+         "file" : "lib/Sidef/Types/Block/Case.pm"
+      },
       "Sidef::Types::Block::Code" : {
          "file" : "lib/Sidef/Types/Block/Code.pm"
       },

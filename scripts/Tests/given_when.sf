@@ -1,0 +1,86 @@
+#!/usr/bin/ruby
+
+#
+## Tests for the `given/when` construct
+#
+
+var c1 = 0;
+
+given (1) {
+    when (true) {              # true does not equal 1
+        die "error"
+    }
+    when (2) {                 # 2 does not equal 1
+        die "error"
+    }
+    when([9,3,1,4]) {          # [9,3,1,4] contains 1
+        ++c1;
+        continue;
+    }
+    when([1,3,4]) {             # [1,3,4] contains 1
+        ++c1;
+        continue;
+    }
+    when([2,3,4]) {             # [2,3,4] does not contain 1
+        die "error"
+    }
+    when (1) {                  # 1 equals 1
+        ++c1;
+        continue;
+    }
+    when(2 == 3) {              # 1 does not equal false
+        die "error";
+    }
+    case(1 == 2) {              # false expression
+        die "error";
+    }
+    case(1 == 1) {              # true expression
+        ++c1;
+    }
+    default {                   # must not execute reach the default case
+        die "error"
+    }
+}
+
+assert_eq(c1, 4);
+
+
+var c2 = 0;
+given([1,2,3]) {
+    when(1) {               # 1 exists inside [1,2,3]
+        ++c2;
+        continue;
+    }
+    when(4) {               # 4 does not exists inside [1,2,3]
+        die "error"
+    }
+    when([2,5]) {           # [2,5] does not equal [1,2,3]
+        die "error"
+    }
+    when(3, 4) {            # (3, 4) does not exists in [1,2,3]
+        die "error"
+    }
+    when([1,2,3]) {         # [1,2,3] equals [1,2,3]
+        ++c2;
+        continue;
+    }
+    when([2,3,1]) {         # [2,3,1] does not equal [1,2,3]
+        die "error"
+    }
+    when(2, 3) {            # (2,3) exists in [1,2,3]
+        ++c2;
+        continue;
+    }
+    when (3, 1) {           # (3, 1) exists in [1,2,3]
+        ++c2;
+        continue;
+    }
+    default {               # must reach the default case
+        ++c2;
+    }
+}
+
+assert_eq(c2, 5);
+
+
+say "** Test passed!";

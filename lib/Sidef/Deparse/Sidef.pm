@@ -361,6 +361,15 @@ package Sidef::Deparse::Sidef {
         elsif ($ref eq 'Sidef::Types::Block::Break') {
             $code = 'break';
         }
+        elsif ($ref eq 'Sidef::Types::Block::Given') {
+            $code = 'given ' . $self->deparse_args($obj->{expr}) . $self->deparse_bare_block($obj->{block}{code});
+        }
+        elsif ($ref eq 'Sidef::Types::Block::When') {
+            $code = 'when(' . $self->deparse_args($obj->{expr}) . ')' . $self->deparse_bare_block($obj->{block}{code});
+        }
+        elsif ($ref eq 'Sidef::Types::Block::Case') {
+            $code = 'case(' . $self->deparse_args($obj->{expr}) . ')' . $self->deparse_bare_block($obj->{block}{code});
+        }
         elsif ($ref eq 'Sidef::Types::Block::Default') {
             $code = 'default' . $self->deparse_bare_block($obj->{block}->{code});
         }
@@ -664,13 +673,7 @@ package Sidef::Deparse::Sidef {
                 }
 
                 if (exists $call->{block}) {
-                    if ($ref eq 'Sidef::Types::Block::Given'
-                        or ($ref eq 'Sidef::Types::Block::If' and $i == $#{$expr->{call}})) {
-                        $code .= $self->deparse_bare_block(@{$call->{block}});
-                    }
-                    else {
-                        $code .= $self->deparse_bare_block(@{$call->{block}});
-                    }
+                    $code .= $self->deparse_bare_block(@{$call->{block}});
                     next;
                 }
             }

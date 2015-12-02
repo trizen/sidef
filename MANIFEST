@@ -49,6 +49,7 @@ lib/Sidef/Types/Array/Pair.pm
 lib/Sidef/Types/Array/Pair.pod
 lib/Sidef/Types/Black/Hole.pm
 lib/Sidef/Types/Block/Break.pm
+lib/Sidef/Types/Block/Case.pm
 lib/Sidef/Types/Block/Code.pm
 lib/Sidef/Types/Block/Code.pod
 lib/Sidef/Types/Block/CodeInit.pm
@@ -642,6 +643,7 @@ scripts/Tests/functional_style.sf
 scripts/Tests/gather_take.sf
 scripts/Tests/gcd.sf
 scripts/Tests/getopt.sf
+scripts/Tests/given_when.sf
 scripts/Tests/greatest_subsequential_sum.sf
 scripts/Tests/group_precedence.sf
 scripts/Tests/hailstone.sf
