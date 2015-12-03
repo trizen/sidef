@@ -1,0 +1,47 @@
+#!/usr/bin/ruby
+
+#
+## Ackermann function
+#
+
+func A({ .is_zero }, n) {
+    n + 1
+}
+
+func A(m, (0)) {
+    A(m-1, 1);
+}
+
+func A(m, n) {
+    A(m-1, A(m, n-1));
+}
+
+assert_eq(A(3, 2), 29);
+
+
+#
+## Fibonacci function
+#
+
+func fib(Number n { _ <= 1 } = 0) {
+    return n
+}
+
+func fib(n) {
+    fib(n-1) + fib(n-2)
+}
+
+assert_eq(fib(12), 144);
+
+
+#
+## Fibonacci function (#2)
+#
+
+func fib2((0)) { 0 }
+func fib2((1)) { 1 }
+func fib2(n)   { __FUNC__(n-1) + __FUNC__(n-2) }
+
+assert_eq(fib2(12), 144);
+
+say "** Test passed!";

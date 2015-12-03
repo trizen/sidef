@@ -618,9 +618,9 @@ package Sidef::Parser {
         my @vars;
         my %classes;
 
-        while (   /\G($self->{var_name_re})\h+(?=where\b)/goc
-               || /\G(?<type>$self->{var_name_re}\h+$self->{var_name_re})/goc
-               || /\G([*:]?$self->{var_name_re})/goc) {
+        while (   /\G(?<type>$self->{var_name_re}\h+$self->{var_name_re})\h*/goc
+               || /\G([*:]?$self->{var_name_re})\h*/goc
+               || (defined($end_delim) && /\G(?=[({])/)) {
             push @vars, $1;
 
             if ($opt{with_vals} && defined($end_delim)) {
@@ -638,17 +638,23 @@ package Sidef::Parser {
                     line  => $self->{line},
                   };
 
+                if (/\G(?=\{)/) {
+                    my $code = substr($_, pos);
+                    $self->parse_block(code => \$code);
+                    $vars[-1] .= substr($_, pos($_), pos($code));
+                    pos($_) += pos($code);
+                }
+                elsif (/\G(?=\()/) {
+                    my $code = substr($_, pos);
+                    $self->parse_arguments(code => \$code);
+                    $vars[-1] .= substr($_, pos($_), pos($code));
+                    pos($_) += pos($code);
+                }
+
                 if (/$self->{var_init_sep_re}/goc) {
                     my $code = substr($_, pos);
                     $self->parse_obj(code => \$code);
                     $vars[-1] .= '=' . substr($_, pos($_), pos($code));
-                    pos($_) += pos($code);
-                }
-
-                if (/\G\h*where\b\h*/gc) {
-                    my $code = substr($_, pos);
-                    $self->parse_obj(code => \$code);
-                    $vars[-1] .= ' where ' . substr($_, pos($_), pos($code));
                     pos($_) += pos($code);
                 }
             }
@@ -689,9 +695,9 @@ package Sidef::Parser {
         my $end_delim = $self->parse_delim(%opt);
 
         my @var_objs;
-        while (   /\G()($self->{var_name_re})\h+(?=where\b)/goc
-               || /\G(?<type>$self->{var_name_re})\h+($self->{var_name_re})/goc
-               || /\G([*:]?)($self->{var_name_re})/goc) {
+        while (   /\G(?<type>$self->{var_name_re})\h+($self->{var_name_re})\h*/goc
+               || /\G([*:]?)($self->{var_name_re})\h*/goc
+               || (defined($end_delim) && /\G(?=[({])/)) {
             my ($attr, $name) = ($1, $2);
 
             my $ref_type;
@@ -726,19 +732,25 @@ package Sidef::Parser {
                                   );
             }
 
-            my $value;
-            if (defined($end_delim) && /$self->{var_init_sep_re}/goc) {
-                my $obj = $self->parse_obj(code => $opt{code});
-                $value = (
-                          ref($obj) eq 'HASH'
-                          ? $obj
-                          : {$self->{class} => [{self => $obj}]}
-                         );
-            }
+            my ($value, $where_block, $where_expr);
 
-            my $where_block;
-            if (/\G\h*where\b\h*/gc) {
-                $where_block = $self->parse_obj(code => $opt{code});
+            if (defined($end_delim)) {
+
+                if (/\G\h*(?=\{)/gc) {
+                    $where_block = $self->parse_block(code => $opt{code});
+                }
+                elsif (/\G\h*(?=\()/gc) {
+                    $where_expr = $self->parse_arguments(code => $opt{code});
+                }
+
+                if (/$self->{var_init_sep_re}/goc) {
+                    my $obj = $self->parse_obj(code => $opt{code});
+                    $value = (
+                              ref($obj) eq 'HASH'
+                              ? $obj
+                              : {$self->{class} => [{self => $obj}]}
+                             );
+                }
             }
 
             my $obj = Sidef::Variable::Variable->new(
@@ -749,6 +761,7 @@ package Sidef::Parser {
                                        defined($value) ? (value => $value, has_value => 1) : (),
                                        $attr eq '*' ? (array => 1, slurpy => 1) : $attr eq ':' ? (hash => 1, slurpy => 1) : (),
                                        defined($where_block) ? (where_block => $where_block) : (),
+                                       defined($where_expr)  ? (where_expr  => $where_expr)  : (),
                                        $opt{in_use}          ? (in_use      => 1)            : (),
             );
 

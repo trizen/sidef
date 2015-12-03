@@ -702,6 +702,7 @@ scripts/Tests/module_definition.sf
 scripts/Tests/module_loading.sf
 scripts/Tests/module_order_and_redeclaration.sf
 scripts/Tests/multi_file_edit.sf
+scripts/Tests/multi_functions.sf
 scripts/Tests/multi_var_assignment.sf
 scripts/Tests/multiple_dispatch.sf
 scripts/Tests/multisplit.sf
@@ -803,7 +804,6 @@ scripts/Tests/var_ref.sf
 scripts/Tests/var_scoping.sf
 scripts/Tests/variable_references.sf
 scripts/Tests/vigenere_cipher.sf
-scripts/Tests/where_trait.sf
 scripts/Tests/while_loop.sf
 scripts/Tests/wireworld.sf
 scripts/Tests/word_processing.sf

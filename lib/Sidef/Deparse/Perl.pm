@@ -138,6 +138,8 @@ HEADER
     sub _dump_var {
         my ($self, $var, $refaddr) = @_;
 
+        $var->{name} // return 'undef';
+
         # $var->{in_use} || exists($var->{value}) || exists($var->{ref_type}) || return 'undef';
 
         (
@@ -376,6 +378,7 @@ HEADER
                   . (exists($_->{ref_type})  ? (", type => " . $self->_dump_reftype($_->{ref_type})) : '')
                   . (exists($_->{has_value}) ? (', has_value => 1')                                  : '')
                   . (exists($_->{where_block}) ? (', where_block => ' . $self->deparse_expr({self => $_->{where_block}})) : '')
+                  . (exists($_->{where_expr}) ? (', where_expr => ' . $self->deparse_expr({self => $_->{where_expr}})) : '')
                   . '}'
               } @vars
           )

@@ -70,7 +70,10 @@ package Sidef::Types::Block::Code {
                             or eval { $value->SUPER::isa($var->{type}) }) {
 
                             if (exists $var->{where_block}) {
-                                $var->{where_block}->run($value) || next OUTER;
+                                $var->{where_block}->run($value) or next OUTER;
+                            }
+                            elsif (exists $var->{where_expr}) {
+                                $value eq $var->{where_expr} or next OUTER;
                             }
 
                             push @pos_args, $value;
@@ -88,8 +91,12 @@ package Sidef::Types::Block::Code {
                 }
                 elsif (exists $seen{$var->{name}}) {
                     if (exists $var->{where_block}) {
-                        $var->{where_block}->run($seen{$var->{name}}) || next OUTER;
+                        $var->{where_block}->run($seen{$var->{name}}) or next OUTER;
                     }
+                    elsif (exists $var->{where_expr}) {
+                        $var->{where_expr} eq $seen{$var->{name}} or next OUTER;
+                    }
+
                     push @pos_args, exists($var->{slurpy}) ? @{$seen{$var->{name}}} : $seen{$var->{name}};
                 }
                 elsif (exists $var->{slurpy}) {

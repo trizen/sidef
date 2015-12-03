@@ -83,8 +83,9 @@ package Sidef::Deparse::Sidef {
                   . (exists($_->{class}) && $_->{class} ne $self->{class} ? $_->{class} . '::' : '')
                   . (exists($_->{ref_type}) ? ($self->_dump_reftype($_->{ref_type}) . ' ') : '')
                   . $_->{name}
+                  . (exists($_->{where_block}) ? $self->deparse_expr({self => $_->{where_block}}) : '')
+                  . (exists($_->{where_expr}) ? ('(' . $self->deparse_expr({self => $_->{where_expr}}) . ')') : '')
                   . (exists($_->{value}) ? ('=(' . $self->deparse_expr({self => $_->{value}}) . ')') : '')
-                  . (exists($_->{where_block}) ? (' where ' . $self->deparse_expr({self => $_->{where_block}})) : '')
               } @vars
             );
     }
@@ -298,13 +299,18 @@ package Sidef::Deparse::Sidef {
                         $statements[-1] = '(' . $statements[-1] . ')';
                     }
 
-                    $code .=
-                      @statements
-                      ? ("\n"
-                         . (" " x $Sidef::SPACES)
-                         . join(";\n" . (" " x $Sidef::SPACES), @statements) . "\n"
-                         . (" " x ($Sidef::SPACES - $Sidef::SPACES_INCR)) . '}')
-                      : '}';
+                    if (@statements == 1 and length($statements[0]) <= 80) {
+                        $code .= "$statements[0]}";
+                    }
+                    else {
+                        $code .=
+                          @statements
+                          ? ("\n"
+                             . (" " x $Sidef::SPACES)
+                             . join(";\n" . (" " x $Sidef::SPACES), @statements) . "\n"
+                             . (" " x ($Sidef::SPACES - $Sidef::SPACES_INCR)) . '}')
+                          : '}';
+                    }
 
                     $Sidef::SPACES -= $Sidef::SPACES_INCR;
                 }
