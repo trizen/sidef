@@ -7,7 +7,7 @@ package Sidef::Object::Object {
       q{~~}   => \&{__PACKAGE__ . '::' . '~~'},
       q{bool} => sub {
         if (defined(my $sub = $_[0]->can('to_b'))) {
-            $_[0]->to_b;
+            $sub->($_[0]);
         }
         else {
             $_[0];
@@ -15,7 +15,7 @@ package Sidef::Object::Object {
       },
       q{0+} => sub {
         if (defined(my $sub = $_[0]->can('to_n'))) {
-            $_[0]->to_n;
+            $sub->($_[0]);
         }
         else {
             $_[0];
@@ -23,7 +23,7 @@ package Sidef::Object::Object {
       },
       q{""} => sub {
         if (defined(my $sub = $_[0]->can('to_s'))) {
-            $_[0]->to_s;
+            $sub->($_[0]);
         }
         else {
             $_[0];
