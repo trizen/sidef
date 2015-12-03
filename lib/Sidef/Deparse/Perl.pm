@@ -377,10 +377,15 @@ HEADER
                   . (exists($_->{slurpy})    ? (", slurpy => " . $_->{slurpy})                       : '')
                   . (exists($_->{ref_type})  ? (", type => " . $self->_dump_reftype($_->{ref_type})) : '')
                   . (exists($_->{has_value}) ? (', has_value => 1')                                  : '')
-                  . (exists($_->{where_block}) ? (', where_block => ' . $self->deparse_expr({self => $_->{where_block}})) : '')
                   . (
-                     exists($_->{where_expr})
-                     ? (', where_expr => do{' . $self->deparse_expr({self => $_->{where_expr}}) . '}')
+                     exists($_->{where_block})
+                     ? (', where_block => sub{'
+                        . $self->_dump_sub_init_vars($_->{where_block}{init_vars}{vars}[0])
+                        . $self->deparse_generic('', ';', '', $_->{where_block}{code}) . '}')
+                     : ''
+                    )
+                  . (
+                     exists($_->{where_expr}) ? (', where_expr => do{' . $self->deparse_expr({self => $_->{where_expr}}) . '}')
                      : ''
                     )
                   . '}'
