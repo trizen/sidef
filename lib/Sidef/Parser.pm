@@ -234,8 +234,6 @@ package Sidef::Parser {
                   die
                   warn
 
-                  where
-
                   assert
                   assert_eq
                   assert_ne

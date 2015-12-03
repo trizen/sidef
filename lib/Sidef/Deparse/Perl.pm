@@ -271,10 +271,10 @@ HEADER
 
         my @dumped_vars = map { ref($_) ? $self->_dump_var($_) : $_ } @vars;
 
-        # Return when all variables are "undef" (i.e.: not in use)
-        #~ if (all { $_ eq 'undef' } @dumped_vars) {
-        #~ return '';
-        #~ }
+        # Return when all variables are "undef"
+        if (all { $_ eq 'undef' } @dumped_vars) {
+            return '';
+        }
 
         my $code = (' ' x $Sidef::SPACES) . "my (" . join(', ', @dumped_vars) . ') = @_;' . "\n";
 
@@ -378,7 +378,11 @@ HEADER
                   . (exists($_->{ref_type})  ? (", type => " . $self->_dump_reftype($_->{ref_type})) : '')
                   . (exists($_->{has_value}) ? (', has_value => 1')                                  : '')
                   . (exists($_->{where_block}) ? (', where_block => ' . $self->deparse_expr({self => $_->{where_block}})) : '')
-                  . (exists($_->{where_expr}) ? (', where_expr => ' . $self->deparse_expr({self => $_->{where_expr}})) : '')
+                  . (
+                     exists($_->{where_expr})
+                     ? (', where_expr => do{' . $self->deparse_expr({self => $_->{where_expr}}) . '}')
+                     : ''
+                    )
                   . '}'
               } @vars
           )
