@@ -88,20 +88,8 @@ package Sidef::Deparse::Sidef {
                   . (exists($_->{class}) && $_->{class} ne $self->{class} ? $_->{class} . '::' : '')
                   . (exists($_->{ref_type}) ? ($self->_dump_reftype($_->{ref_type}) . ' ') : '')
                   . $_->{name}
-                  . (
-                    exists($_->{value}) ? do {
-                        my $value = $self->deparse_expr({self => $_->{value}});
-                        "=($value)";
-                      }
-                    : ''
-                    )
-                  . (
-                    exists($_->{where_block})
-                    ? do {
-                        ' where ' . $self->deparse_expr({self => $_->{where_block}});
-                      }
-                    : ''
-                  )
+                  . (exists($_->{value}) ? ('=(' . $self->deparse_expr({self => $_->{value}}) . ')') : '')
+                  . (exists($_->{where_block}) ? (' where ' . $self->deparse_expr({self => $_->{where_block}})) : '')
               } @vars
             );
     }

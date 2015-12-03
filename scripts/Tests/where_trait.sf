@@ -23,11 +23,11 @@ assert_eq(A(3, 2), 29);
 ## Fibonacci function
 #
 
-func fib(n where { _ <= 1 }) {
+func fib(Number n where { _ <= 1 }) {
     n
 }
 
-func fib(n) {
+func fib(Number n) {
     fib(n-1) + fib(n-2)
 }
 
