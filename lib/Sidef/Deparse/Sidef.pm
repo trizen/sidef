@@ -40,11 +40,6 @@ package Sidef::Deparse::Sidef {
         $self->deparse_generic('(', ', ', ')', @args);
     }
 
-    sub deparse_block_expr {
-        my ($self, @args) = @_;
-        $self->deparse_generic('do{', ';', '}', @args);
-    }
-
     sub deparse_bare_block {
         my ($self, @args) = @_;
 

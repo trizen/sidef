@@ -1354,7 +1354,8 @@ package Sidef::Parser {
                                        pos      => pos($_),
                                       );
 
-                my $private = 0;
+                my $has_kids = 0;
+                my $parent;
                 if (($type eq 'method' or $type eq 'func') and $name ne '') {
                     my $var = $self->find_var($name, $class_name);
 
@@ -1370,12 +1371,14 @@ package Sidef::Parser {
                             );
                         }
 
+                        $parent   = $var->{obj};
+                        $has_kids = 1;
+
                         push @{$var->{obj}{value}{kids}}, $obj;
-                        $private = 1;
                     }
                 }
 
-                if (not $private) {
+                if (not $has_kids) {
                     unshift @{$self->{vars}{$class_name}},
                       {
                         obj   => $obj,
@@ -1542,7 +1545,7 @@ package Sidef::Parser {
                                             pos      => pos($_)
                                            );
 
-                    local $self->{$type eq 'func' ? 'current_function' : 'current_method'} = $obj;
+                    local $self->{$type eq 'func' ? 'current_function' : 'current_method'} = $has_kids ? $parent : $obj;
                     my $args = '|' . join(',', $type eq 'method' ? 'self' : (), @{$var_names}) . ' |';
 
                     my $code = '{' . $args . substr($_, pos);
@@ -1551,7 +1554,7 @@ package Sidef::Parser {
 
                     $obj->{value} = $block;
 
-                    #if (not $private) {
+                    #if (not $has_kids) {
                     #    $self->{current_class}->add_method($name, $block) if $type eq 'method';
                     #}
                 }
