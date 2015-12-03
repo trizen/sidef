@@ -234,6 +234,8 @@ package Sidef::Parser {
                   die
                   warn
 
+                  where
+
                   assert
                   assert_eq
                   assert_ne
@@ -616,7 +618,9 @@ package Sidef::Parser {
         my @vars;
         my %classes;
 
-        while (/\G(?<type>$self->{var_name_re}\h+$self->{var_name_re})/goc || /\G([*:]?$self->{var_name_re})/goc) {
+        while (   /\G($self->{var_name_re})\h+(?=where\b)/goc
+               || /\G(?<type>$self->{var_name_re}\h+$self->{var_name_re})/goc
+               || /\G([*:]?$self->{var_name_re})/goc) {
             push @vars, $1;
 
             if ($opt{with_vals} && defined($end_delim)) {
@@ -638,6 +642,13 @@ package Sidef::Parser {
                     my $code = substr($_, pos);
                     $self->parse_obj(code => \$code);
                     $vars[-1] .= '=' . substr($_, pos($_), pos($code));
+                    pos($_) += pos($code);
+                }
+
+                if (/\G\h*where\b\h*/gc) {
+                    my $code = substr($_, pos);
+                    $self->parse_obj(code => \$code);
+                    $vars[-1] .= ' where ' . substr($_, pos($_), pos($code));
                     pos($_) += pos($code);
                 }
             }
@@ -678,7 +689,9 @@ package Sidef::Parser {
         my $end_delim = $self->parse_delim(%opt);
 
         my @var_objs;
-        while (/\G(?<type>$self->{var_name_re})\h+($self->{var_name_re})/goc || /\G([*:]?)($self->{var_name_re})/goc) {
+        while (   /\G()($self->{var_name_re})\h+(?=where\b)/goc
+               || /\G(?<type>$self->{var_name_re})\h+($self->{var_name_re})/goc
+               || /\G([*:]?)($self->{var_name_re})/goc) {
             my ($attr, $name) = ($1, $2);
 
             my $ref_type;
@@ -723,6 +736,11 @@ package Sidef::Parser {
                          );
             }
 
+            my $where_block;
+            if (/\G\h*where\b\h*/gc) {
+                $where_block = $self->parse_obj(code => $opt{code});
+            }
+
             my $obj = Sidef::Variable::Variable->new(
                                        name => $name,
                                        type => $opt{type},
@@ -730,7 +748,8 @@ package Sidef::Parser {
                                        class => $class_name,
                                        defined($value) ? (value => $value, has_value => 1) : (),
                                        $attr eq '*' ? (array => 1, slurpy => 1) : $attr eq ':' ? (hash => 1, slurpy => 1) : (),
-                                       $opt{in_use} ? (in_use => 1) : (),
+                                       defined($where_block) ? (where_block => $where_block) : (),
+                                       $opt{in_use}          ? (in_use      => 1)            : (),
             );
 
             if (!$opt{private}) {

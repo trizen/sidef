@@ -68,6 +68,11 @@ package Sidef::Types::Block::Code {
                         my $value = $seen{$var->{name}};
                         if (ref($value) eq $var->{type}
                             or eval { $value->SUPER::isa($var->{type}) }) {
+
+                            if (exists $var->{where_block}) {
+                                $var->{where_block}->run($value) || next OUTER;
+                            }
+
                             push @pos_args, $value;
                         }
                         else {
@@ -82,6 +87,9 @@ package Sidef::Types::Block::Code {
                     }
                 }
                 elsif (exists $seen{$var->{name}}) {
+                    if (exists $var->{where_block}) {
+                        $var->{where_block}->run($seen{$var->{name}}) || next OUTER;
+                    }
                     push @pos_args, exists($var->{slurpy}) ? @{$seen{$var->{name}}} : $seen{$var->{name}};
                 }
                 elsif (exists $var->{slurpy}) {

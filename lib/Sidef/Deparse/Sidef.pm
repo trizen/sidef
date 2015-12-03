@@ -95,6 +95,13 @@ package Sidef::Deparse::Sidef {
                       }
                     : ''
                     )
+                  . (
+                    exists($_->{where_block})
+                    ? do {
+                        ' where ' . $self->deparse_expr({self => $_->{where_block}});
+                      }
+                    : ''
+                  )
               } @vars
             );
     }

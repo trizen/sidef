@@ -1,0 +1,37 @@
+#!/usr/bin/ruby
+
+#
+## Ackermann function
+#
+
+func A(_ where { _ == 0 }, n) {
+    n + 1
+}
+
+func A(m, _ where { _ == 0 }) {
+    A(m-1, 1);
+}
+
+func A(m, n) {
+    A(m-1, A(m, n-1));
+}
+
+assert_eq(A(3, 2), 29);
+
+
+#
+## Fibonacci function
+#
+
+func fib(n where { _ <= 1 }) {
+    n
+}
+
+func fib(n) {
+    fib(n-1) + fib(n-2)
+}
+
+assert_eq(fib(12), 144);
+
+
+say "** Test passed!";

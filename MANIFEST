@@ -803,6 +803,7 @@ scripts/Tests/var_ref.sf
 scripts/Tests/var_scoping.sf
 scripts/Tests/variable_references.sf
 scripts/Tests/vigenere_cipher.sf
+scripts/Tests/where_trait.sf
 scripts/Tests/while_loop.sf
 scripts/Tests/wireworld.sf
 scripts/Tests/word_processing.sf

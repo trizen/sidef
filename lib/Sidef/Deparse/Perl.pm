@@ -374,7 +374,9 @@ HEADER
                   . $self->_dump_string($_->{name})
                   . (exists($_->{slurpy})    ? (", slurpy => " . $_->{slurpy})                       : '')
                   . (exists($_->{ref_type})  ? (", type => " . $self->_dump_reftype($_->{ref_type})) : '')
-                  . (exists($_->{has_value}) ? (', has_value => 1')                                  : '') . " }",
+                  . (exists($_->{has_value}) ? (', has_value => 1')                                  : '')
+                  . (exists($_->{where_block}) ? (', where_block => ' . $self->deparse_expr({self => $_->{where_block}})) : '')
+                  . '}'
               } @vars
           )
           . ']' . ', '

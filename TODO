@@ -2,18 +2,6 @@ TODO list for Sidef
 
 General:
     * improve the OO system
-    * reduce the usage of the `overload` pragma
-
-Method/function parameters:
-    * add the `where` trait:
-
-        func foo(a where { _ > 0 }) {       # works only with positive numbers
-            say a
-        }
-        foo(42)     # ok
-        foo(-1)     # must be an error
 
 Method/functions:
     * implement the `is export` trait for methods (maybe)
-    * improve the user-defined auto-conversion methods (such as: to_s)
-      `- maybe, rename `to_s` to `to_str`?
