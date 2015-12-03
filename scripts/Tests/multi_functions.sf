@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## Ackermann function
+## The Ackermann function
 #
 
 func A({ .is_zero }, n) {
@@ -20,7 +20,7 @@ assert_eq(A(3, 2), 29);
 
 
 #
-## Fibonacci function
+## The Fibonacci Nth term
 #
 
 func fib(Number n { _ <= 1 } = 0) {
@@ -31,11 +31,12 @@ func fib(n) {
     fib(n-1) + fib(n-2)
 }
 
+assert_eq(fib(), 0);
 assert_eq(fib(12), 144);
 
 
 #
-## Fibonacci function (#2)
+## The Fibonacci Nth term (#2)
 #
 
 func fib2((0)) { 0 }
