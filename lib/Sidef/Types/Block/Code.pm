@@ -122,9 +122,9 @@ package Sidef::Types::Block::Code {
           . join(
             ', ',
             map {
-                ref($_) && eval { $_->can('dump') }
-                  ? $_->dump
-                  : Sidef::normalize_type(ref($_))
+                    ref($_) && eval { $_->can('dump') } ? $_->dump
+                  : ref($_) ? Sidef::normalize_type(ref($_))
+                  : 'nil'
               } @args
           )
           . ')'

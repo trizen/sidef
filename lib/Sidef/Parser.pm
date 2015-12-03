@@ -1779,7 +1779,6 @@ package Sidef::Parser {
             if (/\G(assert(?:_(?:eq|ne))?+)\b\h*/gc) {
                 my $action = $1;
 
-                my $pos = pos($_);
                 my $arg = (
                            /\G(?=\()/
                            ? $self->parse_arguments(code => $opt{code})
@@ -1792,7 +1791,6 @@ package Sidef::Parser {
                                            act  => $action,
                                            line => $self->{line},
                                            file => $self->{file_name},
-                                           code => substr($_, $pos, pos($_) - $pos)
                                           );
             }
 

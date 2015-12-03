@@ -1,10 +1,8 @@
 #!/usr/bin/ruby
 
-func is_prime(a) {
-    if (a == 2)                { true  }
-    elsif (a <= 1 || !(a & 1)) { false }
-    else                       { 3 .. a.sqrt -> any { a %% _ } -> not }
-}
+func is_prime(Number _ (2))                   { true }
+func is_prime(Number _ { _ <= 1 || !(_ & 1)}) { false }
+func is_prime(Number a) { 3 ... a.sqrt.int -> any { a %% _ } -> not }
 
 assert_eq(
     (0..50).grep { is_prime(_) },

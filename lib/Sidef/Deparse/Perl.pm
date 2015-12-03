@@ -709,18 +709,20 @@ HEADER
                             push @{$self->{function_declarations}}, [$refaddr, "my \$new$refaddr;"];
 
                             $Sidef::SPACES += $Sidef::SPACES_INCR;
-                            $code .= $self->_dump_sub_init_vars(@{$self->{class_vars}});
-                            $code .= $self->_dump_class_attributes(@{$self->{class_attributes}});
+                            $code .= $self->_dump_sub_init_vars(@{$self->{class_vars}})
+                              . $self->_dump_class_attributes(@{$self->{class_attributes}});
 
-                            $code .= " " x $Sidef::SPACES;
-                            $code .= 'my $self = bless {';
+                            $code .= (' ' x $Sidef::SPACES) . 'my $self = bless {';
                             foreach my $var (@{$self->{class_vars}}, map { @{$_->{vars}} } @{$self->{class_attributes}}) {
                                 $code .= qq{"\Q$var->{name}\E"=>} . $self->_dump_var($var) . ', ';
                             }
 
-                            $code .= '}, __PACKAGE__;' . "\n";
-                            $code .= (" " x $Sidef::SPACES) . '$self->init() if $self->can("init");' . "\n";
-                            $code .= (" " x $Sidef::SPACES) . '$self;' . "\n";
+                            $code .=
+                                '}, __PACKAGE__;' . "\n"
+                              . (' ' x $Sidef::SPACES)
+                              . '$self->init() if $self->can("init");' . "\n"
+                              . (' ' x $Sidef::SPACES)
+                              . '$self;' . "\n";
 
                             $Sidef::SPACES -= $Sidef::SPACES_INCR;
                             $code .=
@@ -744,8 +746,8 @@ HEADER
                             #$code .= "\n" . (' ' x $Sidef::SPACES) . "*call = \\&new;\n";
 
                             foreach my $var (@{$self->{class_vars}}, map { @{$_->{vars}} } @{$self->{class_attributes}}) {
-                                $code .= " " x $Sidef::SPACES;
-                                $code .= qq{sub $var->{name} : lvalue { \$_[0]->{"\Q$var->{name}\E"} }\n};
+                                $code .=
+                                  (' ' x $Sidef::SPACES) . qq{sub $var->{name} : lvalue { \$_[0]->{"\Q$var->{name}\E"} }\n};
                             }
                         }
                     }
@@ -1060,6 +1062,8 @@ HEADER
             local \$Sidef::DEPARSER->{block_declarations} = [];
             \$Sidef::DEPARSER->deparse(
             do {
+                local \$Sidef::PARSER->{line} = 0;
+                local \$Sidef::PARSER->{file_name} = 'eval($refaddr)';
                 local \$Sidef::PARSER->{vars} = \$Sidef::EVALS{$refaddr}{vars};
                 local \$Sidef::PARSER->{ref_vars_refs} = \$Sidef::EVALS{$refaddr}{ref_vars_refs};
                 \$Sidef::PARSER->parse_script(code => \\(~ . $self->deparse_script($obj->{expr}) . qq~->get_value));
@@ -1120,8 +1124,8 @@ HEADER
                   . " $obj->{file} line $obj->{line} (expected 1 argument)\n";
 
                 # Generate code
-                $code = qq~do{do{$args[0]} or CORE::die "$obj->{act}\Q$obj->{code}\E failed ~
-                  . qq~in \Q$obj->{file}\E at line $obj->{line}\\n"}~;
+                $code = qq~do{my \$a$refaddr = do{$args[0]}; \$a$refaddr or CORE::die "$obj->{act}(\$a$refaddr) failed ~
+                  . qq~at \Q$obj->{file}\E line $obj->{line}\\n"}~;
             }
             elsif ($obj->{act} eq 'assert_eq' or $obj->{act} eq 'assert_ne') {
 
@@ -1132,8 +1136,10 @@ HEADER
 
                 # Generate code
                 $code = "do{"
-                  . ($obj->{act} eq 'assert_ne' ? qq{not(do{$args[0]} eq do{$args[1]})} : qq{do{$args[0]} eq do{$args[1]}})
-                  . qq{ or CORE::die "$obj->{act}\Q$obj->{code}\E failed at \Q$obj->{file}\E line $obj->{line}\\n\"\}};
+                  . "my \$a$refaddr = do{$args[0]};"
+                  . "my \$b$refaddr = do{$args[1]};"
+                  . ($obj->{act} eq 'assert_ne' ? qq{CORE::not(\$a$refaddr eq \$b$refaddr)} : qq{\$a$refaddr eq \$b$refaddr})
+                  . qq{ or CORE::die "$obj->{act}(\$a$refaddr, \$b$refaddr) failed at \Q$obj->{file}\E line $obj->{line}\\n\"\}};
             }
         }
         elsif ($ref eq 'Sidef::Meta::Error') {
