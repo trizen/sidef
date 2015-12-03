@@ -122,6 +122,8 @@ package Sidef::Types::Number::Complex {
         map { Sidef::Types::Number::Number->new($_) } @{$$self->_polar};
     }
 
+    *polar_parts = \&polars;
+
     sub imaginary {
         my ($self) = @_;
         $self->new(Math::Complex::Im($$self));

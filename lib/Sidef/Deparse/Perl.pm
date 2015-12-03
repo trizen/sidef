@@ -500,6 +500,7 @@ HEADER
                     # Check to see if the method/function has kids (can do multiple dispatch)
                     if (exists $obj->{value}{kids}) {
                         chop $code;
+
                         my @kids = map {
                             local $_->{type} = 'func';
                             "do{" . $self->deparse_expr({self => $_}) . "}";
@@ -540,11 +541,6 @@ HEADER
 
                         # Other methods
                         else {
-
-                            ## Old way
-                          # $code .= ";\n" . (' ' x $Sidef::SPACES) . "sub $obj->{name} { \$$obj->{name}$refaddr->call(\@_) }";
-
-                            # New way
                             $code .= ";\n"
                               . (' ' x $Sidef::SPACES)
                               . "state \$_$refaddr = do { no strict 'refs'; *{"
@@ -731,19 +727,13 @@ HEADER
                               . ", type => "
                               . $self->_dump_string('class')
                               . ", name => "
-                              . $self->_dump_string($self->{parent_name}[1]) . ");";
-
-                     #$code .= "\n" . (' ' x $Sidef::SPACES) . "sub new { CORE::shift(\@_); scalar \$new$refaddr->call(\@_) }";
-
-                            $code .= ";\n"
+                              . $self->_dump_string($self->{parent_name}[1]) . ");\n"
                               . (' ' x $Sidef::SPACES)
                               . "state \$_$refaddr = do { no strict 'refs'; *{"
                               . $self->_dump_string("$self->{package_name}\::new")
                               . "} = *{"
                               . $self->_dump_string("$self->{package_name}\::call")
                               . "} = sub { CORE::shift(\@_); \$new$refaddr->call(\@_) } };\n";
-
-                            #$code .= "\n" . (' ' x $Sidef::SPACES) . "*call = \\&new;\n";
 
                             foreach my $var (@{$self->{class_vars}}, map { @{$_->{vars}} } @{$self->{class_attributes}}) {
                                 $code .=
@@ -858,12 +848,6 @@ HEADER
                 $code = $name;
             }
             else {
-                # local $self->{parent_name} = ['struct', $name];
-                # Mark the variables all in use
-                #foreach my $var (@{$obj->{vars}}) {
-                #    $var->{in_use} = 1;
-                #}
-
                 $Sidef::SPACES += $Sidef::SPACES_INCR;
                 $code =
                     "package $name {\n"
@@ -880,24 +864,18 @@ HEADER
                   . $self->_dump_string($name) . ', '
                   . 'type => '
                   . $self->_dump_string('struct') . ', '
-                  . $self->_dump_var_attr(@{$obj->{vars}}) . ");\n"
-
-                  #. (' ' x $Sidef::SPACES) . "sub new { CORE::shift(\@_); scalar \$new$refaddr\->call(\@_) }\n"
-                  #. (' ' x $Sidef::SPACES) . "*call = \\&new;\n"
-
-                  . ";\n"
+                  . $self->_dump_var_attr(@{$obj->{vars}}) . ");\n" . ";\n"
                   . (' ' x $Sidef::SPACES)
                   . "state \$_$refaddr = do { no strict 'refs'; *{"
                   . $self->_dump_string("$name\::new")
                   . "} = *{"
                   . $self->_dump_string("$name\::call")
                   . "} = sub { CORE::shift(\@_); \$new$refaddr->call(\@_) } };\n"
-
                   . (' ' x $Sidef::SPACES)
                   . join("\n" . (' ' x $Sidef::SPACES),
                          map { "sub $_->{name} : lvalue { \$_[0]->{$_->{name}} }" } @{$obj->{vars}})
-
-                  . "\n" . (' ' x ($Sidef::SPACES - $Sidef::SPACES_INCR)) . "}";
+                  . "\n"
+                  . (' ' x ($Sidef::SPACES - $Sidef::SPACES_INCR)) . "}";
 
                 push @{$self->{function_declarations}}, [$refaddr, "my \$new$refaddr;"];
 
@@ -1048,9 +1026,6 @@ HEADER
         elsif ($ref eq 'Sidef::Types::Glob::Socket') {
             $code = $self->make_constant($ref, 'new', "Socket$refaddr");
         }
-        elsif ($ref eq 'Sidef::Perl::Perl') {
-            $code = $self->make_constant($ref, 'new', "Perl$refaddr");
-        }
         elsif ($ref eq 'Sidef::Eval::Eval') {
             $Sidef::EVALS{$refaddr} = $obj;
             $code = qq~
@@ -1139,7 +1114,7 @@ HEADER
                   . "my \$a$refaddr = do{$args[0]};"
                   . "my \$b$refaddr = do{$args[1]};"
                   . ($obj->{act} eq 'assert_ne' ? qq{CORE::not(\$a$refaddr eq \$b$refaddr)} : qq{\$a$refaddr eq \$b$refaddr})
-                  . qq{ or CORE::die "$obj->{act}(\$a$refaddr, \$b$refaddr) failed at \Q$obj->{file}\E line $obj->{line}\\n\"\}};
+                  . qq~ or CORE::die "$obj->{act}(\$a$refaddr, \$b$refaddr) failed at \Q$obj->{file}\E line $obj->{line}\\n"}~;
             }
         }
         elsif ($ref eq 'Sidef::Meta::Error') {
@@ -1192,6 +1167,9 @@ HEADER
         }
         elsif ($ref eq 'Sidef') {
             $code = $self->make_constant($ref, 'new', "Sidef$refaddr");
+        }
+        elsif ($ref eq 'Sidef::Perl::Perl') {
+            $code = $self->make_constant($ref, 'new', "Perl$refaddr");
         }
 
         # Array indices

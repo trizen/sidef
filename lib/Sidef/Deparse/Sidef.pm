@@ -138,7 +138,7 @@ package Sidef::Deparse::Sidef {
             }
         }
         elsif ($ref eq 'Sidef::Variable::Variable') {
-            if ($obj->{type} eq 'var' or $obj->{type} eq 'static' or $obj->{type} eq 'const' or $obj->{type} eq 'def') {
+            if ($obj->{type} eq 'var' or $obj->{type} eq 'static' or $obj->{type} eq 'const') {
                 $code =
                   $obj->{name} =~ /^[0-9]+\z/
                   ? ('$' . $obj->{name})
@@ -300,7 +300,7 @@ package Sidef::Deparse::Sidef {
                     }
 
                     if (@statements == 1 and length($statements[0]) <= 80) {
-                        $code .= "$statements[0]}";
+                        $code .= " $statements[0] }";
                     }
                     else {
                         $code .=

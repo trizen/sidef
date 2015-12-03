@@ -24,7 +24,7 @@ package Sidef::Types::Bool::Bool {
         sub false { $false }
 
         sub pick {
-            rand(1) < 0.5 ? $true : $false;
+            CORE::rand(1) < 0.5 ? $true : $false;
         }
 
         *rand = \&pick;

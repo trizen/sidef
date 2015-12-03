@@ -659,14 +659,6 @@ package Sidef::Optimizer {
                 }
             }
         }
-        elsif ($ref eq 'Sidef::Variable::ClassInit') {
-            if ($addr{refaddr($obj)}++) {
-                ## ok
-            }
-            else {
-                $obj->{block} = $self->optimize_expr({self => $obj->{block}});
-            }
-        }
         elsif ($ref eq 'Sidef::Variable::Static') {
             if ($addr{refaddr($obj)}++) {
                 ## ok
@@ -687,25 +679,14 @@ package Sidef::Optimizer {
                 }
             }
         }
-        elsif ($ref eq 'Sidef::Types::Block::Do') {
-            if ($addr{refaddr($obj)}++) {
-                ## ok
-            }
-            else {
-                my %code = $self->optimize($obj->{block}{code});
-                $obj->{block}{code} = \%code;
-            }
-        }
-        elsif ($ref eq 'Sidef::Types::Block::ForArray') {
-            if ($addr{refaddr($obj)}++) {
-                ## ok
-            }
-            else {
-                my %code = $self->optimize($obj->{block}{code});
-                $obj->{block}{code} = \%code;
-            }
-        }
-        elsif ($ref eq 'Sidef::Types::Block::Loop') {
+        elsif (   $ref eq 'Sidef::Variable::ClassInit'
+               or $ref eq 'Sidef::Types::Block::Do'
+               or $ref eq 'Sidef::Types::Block::ForArray'
+               or $ref eq 'Sidef::Types::Block::Loop'
+               or $ref eq 'Sidef::Types::Block::Given'
+               or $ref eq 'Sidef::Types::Block::When'
+               or $ref eq 'Sidef::Types::Block::Case'
+               or $ref eq 'Sidef::Types::Block::Default') {
             if ($addr{refaddr($obj)}++) {
                 ## ok
             }

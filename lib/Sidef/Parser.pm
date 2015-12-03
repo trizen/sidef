@@ -1014,15 +1014,8 @@ package Sidef::Parser {
 
             # Declaration of variables
             if (/\Gvar\b\h*/gc) {
-                my $type = 'var';
-                my $vars = $self->parse_init_vars(code => $opt{code}, type => $type);
-
-                $vars // $self->fatal_error(
-                                            code  => $_,
-                                            pos   => pos,
-                                            error => "expected a variable name after the keyword '$type'!",
-                                           );
-
+                my $type     = 'var';
+                my $vars     = $self->parse_init_vars(code => $opt{code}, type => $type);
                 my $init_obj = Sidef::Variable::Init->new(vars => $vars);
 
                 if (/\G\h*=\h*/gc) {

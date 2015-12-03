@@ -201,14 +201,6 @@ package Sidef::Types::String::String {
         $self->times($num);
     }
 
-    sub uc {
-        my ($self) = @_;
-        $self->new(CORE::uc $$self);
-    }
-
-    *upcase = \&uc;
-    *upper  = \&uc;
-
     sub equals {
         my ($self, $arg) = @_;
         Sidef::Types::Bool::Bool->new($$self eq $$arg);
@@ -249,6 +241,14 @@ package Sidef::Types::String::String {
 
     *downcase = \&lc;
     *lower    = \&lc;
+
+    sub uc {
+        my ($self) = @_;
+        $self->new(CORE::uc $$self);
+    }
+
+    *upcase = \&uc;
+    *upper  = \&uc;
 
     sub fc {
         my ($self) = @_;
