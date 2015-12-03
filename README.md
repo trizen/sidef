@@ -1,13 +1,7 @@
-Sidef
-======
+The Sidef Programming Language
+=======
 
-*Sidef is a modern object-oriented programming language, implemented in Perl.*
-
-To learn about Sidef, check out the following links:
-
-* Gitbook: http://trizen.gitbooks.io/sidef-lang/content/
-* Tutorial: https://github.com/trizen/sidef/wiki
-* RosettaCode: http://rosettacode.org/wiki/Sidef
+Sidef is a high-level, general-purpose programming language, inspired by Ruby, Perl 6 and Go.
 
 ```
             **   **         ****   *           *********   *********
@@ -21,13 +15,30 @@ To learn about Sidef, check out the following links:
       **   **               ****   *********   *********   *
 ```
 
-**LICENSE AND COPYRIGHT**
+* Sidef offers many features, including:
+    * object-oriented programming,
+    * functional programming,
+    * functional pattern matching,
+    * multiple dispatch,
+    * metaprogramming,
+    * regular expressions,
+    * support for using Perl modules,
+    * optional dynamic type checking,
+    * and a large number of built-in types.
+
+### WWW
+
+* Github: https://github.com/trizen/sidef
+* Gitbook: http://trizen.gitbooks.io/sidef-lang/
+* RosettaCode: http://rosettacode.org/wiki/Sidef
+
+### LICENSE AND COPYRIGHT
 
 * Copyright (C) 2013-2015 Daniel Șuteu, Ioana Fălcușan
 
 This program is free software; you can redistribute it and/or modify it
-under the terms of the the *Artistic License (2.0)*. You may obtain a
-copy of the full license at:
+under the terms of the *Artistic License (2.0)*. You may obtain a copy
+of the full license at:
 
 http://www.perlfoundation.org/artistic_license_2_0
 
