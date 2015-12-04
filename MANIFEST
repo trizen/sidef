@@ -576,6 +576,7 @@ scripts/sets.sf
 scripts/sierpinski_triangle.sf
 scripts/simple_moving_average.sf
 scripts/simple_moving_average_oo.sf
+scripts/space_collisions.sf
 scripts/stack.sf
 scripts/stern-brocot_sequence.sf
 scripts/Tests/amb.sf

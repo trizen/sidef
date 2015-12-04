@@ -1,0 +1,56 @@
+#!/usr/bin/ruby
+
+#
+## Translation of: https://en.wikipedia.org/wiki/Multiple_dispatch#Perl_6
+#
+
+class StellarObject(Number mass)  {
+    method <=>(StellarObject arg) {
+        self.mass <=> arg.mass;
+    }
+
+    method >(StellarObject arg) {
+        self.mass > arg.mass
+    }
+
+    method <(StellarObject arg) {
+        self.mass < arg.mass
+    }
+}
+
+class Asteroid(Number mass, String name='an asteroid') << StellarObject { }
+class Spaceship(Number mass, String name='some unnamed spaceship') << StellarObject { }
+
+var destroyed = < obliterated destroyed mangled >;
+var damaged = ['damaged', 'collided with', 'was damaged by'];
+
+func collide(Asteroid a, Asteroid b) {
+    say "two asteroids collided and combined into one larger asteroid of mass #{ a.mass + b.mass }";
+}
+
+func collide(a, b) {
+    if (a > b) {
+        collide(b, a)
+    }
+    elsif (a < b) {
+        say "#{a.name} was #{destroyed.pick} by #{b.name}";
+    }
+    else {
+        if (a.is_a(Spaceship) && b.is_a(Spaceship) && (a.mass == b.mass)) {
+            var (n1, n2) = [a.name, b.name].shuffle...;
+            say "#{n1} collided with #{n2}, and both ships were #{[destroyed.pick, 'left damaged'].pick}";
+        }
+        else {
+            var (n1, n2) = [a.name, b.name].shuffle...;
+            say "#{n1} #{damaged.pick} #{n2}";
+        }
+    }
+}
+
+var Enterprise = Spaceship(mass: 1, name: 'The Enterprise');
+
+collide(Asteroid(mass: 1), Enterprise);
+collide(Enterprise, Spaceship(mass: .1));
+collide(Enterprise, Asteroid(mass: 1));
+collide(Enterprise, Spaceship(mass: 1));
+collide(Asteroid(mass: 10), Asteroid(mass: 5));
