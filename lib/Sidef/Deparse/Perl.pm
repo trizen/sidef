@@ -1315,8 +1315,11 @@ HEADER
 
                     # != and == methods
                     if ($method eq '==' or $method eq '!=') {
-                        $code = 'Sidef::Types::Bool::Bool->new(' . $code . 'eq' . $self->deparse_args(@{$call->{arg}}) . ')';
-                        $code .= '->not' if ($method eq '!=');
+                        $code =
+                            'Sidef::Types::Bool::Bool->new('
+                          . ($method eq '!=' ? 'CORE::not' : '') . '('
+                          . $code . 'eq'
+                          . $self->deparse_args(@{$call->{arg}}) . '))';
                         next;
                     }
 
