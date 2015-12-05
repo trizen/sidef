@@ -177,7 +177,15 @@ else {
         my $deparsed = deparse_structure($struct, $args{R});
 
         if (defined($args{R}) and lc($args{R}) eq 'perl') {
-            my $header = "\nuse lib (" . join(', ', map { qq{"\Q$_\E"} } @INC) . ");\n" . "use Sidef;\n";
+
+            my $header =
+                "\nuse lib ("
+              . join(', ', map { qq{"\Q$_\E"} } @INC) . ");\n"
+              . "use Sidef;\n\n"
+              . "binmode(STDIN, ':utf8');\n"
+              . "binmode(STDOUT, ':utf8');\n"
+              . "binmode(STDERR, ':utf8') if \$^P == 0;\n";
+
             $deparsed = $header . $deparsed;
         }
 
@@ -628,7 +636,7 @@ HEAD
 
                  close $fh;
              }
-           }
+         }
         } => $path
     );
 
