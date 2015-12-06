@@ -23,8 +23,13 @@ func solve(board) {
                 _check(i, j)
             }...
         );
-        1..9 -> grep {!(.~~t)}
-             -> each {|k| board[i] = k; solve(board) };
+
+        { |k|
+            t.contains(k) && next;
+            board[i] = k;
+            solve(board);
+        } * 9;
+
         board[i] = 0;
         return;
     }
