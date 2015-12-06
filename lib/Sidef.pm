@@ -34,17 +34,8 @@ package Sidef {
     }
 
     sub normalize_method {
-        my ($type) = @_;
-
-        if (index($type, 'Sidef::') == 0) {
-            $type = substr($type, rindex($type, '::', rindex($type, '::') - 2) + 2);
-        }
-        else {
-            $type =~ s/^_::main:://
-              or $type =~ s/^_:://;
-        }
-
-        $type =~ s/^.*\K::/./r;
+        my ($type, $method) = ($_[0] =~ /^(.*[^:])::(.*)$/);
+        normalize_type($type) . ".$method";
     }
 
 };
