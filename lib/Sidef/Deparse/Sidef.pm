@@ -336,6 +336,9 @@ package Sidef::Deparse::Sidef {
         elsif ($ref eq 'Sidef::Meta::Warning') {
             $code = 'warn' . $self->deparse_args($obj->{arg});
         }
+        elsif ($ref eq 'Sidef::Meta::Unimplemented') {
+            $code = '...';
+        }
         elsif ($ref eq 'Sidef::Eval::Eval') {
             $code = 'eval' . $self->deparse_args($obj->{expr});
         }

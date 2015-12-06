@@ -624,6 +624,8 @@ Complex.polars() -> I<Obj>
 
 Return the
 
+Aliases: I<polar_parts>
+
 =cut
 
 =head2 rand

@@ -100,3 +100,11 @@ CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
 EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =cut
+
+=head2 normalize_type
+
+Sidef.normalize_type() -> I<Obj>
+
+Return the
+
+=cut

@@ -1171,6 +1171,9 @@ HEADER
         elsif ($ref eq 'Sidef::Perl::Perl') {
             $code = $self->make_constant($ref, 'new', "Perl$refaddr");
         }
+        elsif ($ref eq 'Sidef::Meta::Unimplemented') {
+            $code = qq{CORE::die "Unimplemented at " . } . $self->_dump_string($obj->{file}) . qq{. " line $obj->{line}\E\\n"};
+        }
 
         # Array indices
         if (exists $expr->{ind}) {

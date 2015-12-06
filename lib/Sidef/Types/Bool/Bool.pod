@@ -76,11 +76,23 @@ Aliases: I<flip>, I<toggle>, I<is_false>
 
 =cut
 
-=head2 to_bool
+=head2 pick
 
-Bool.to_bool() -> I<Obj>
+Bool.pick() -> I<Obj>
 
 Return the
+
+Aliases: I<rand>
+
+=cut
+
+=head2 to_b
+
+Bool.to_b() -> I<Obj>
+
+Return the
+
+Aliases: I<to_bool>
 
 =cut
 

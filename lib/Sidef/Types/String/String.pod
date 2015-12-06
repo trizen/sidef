@@ -408,6 +408,24 @@ Return the
 
 =cut
 
+=head2 each_num
+
+String.each_num() -> I<Obj>
+
+Return the
+
+Aliases: I<each_number>
+
+=cut
+
+=head2 each_word
+
+String.each_word() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 encode
 
 String.encode() -> I<Obj>
@@ -679,6 +697,16 @@ String.new() -> I<Obj>
 Return the
 
 Aliases: I<call>
+
+=cut
+
+=head2 nums
+
+String.nums() -> I<Obj>
+
+Return the
+
+Aliases: I<numbers>
 
 =cut
 
@@ -991,8 +1019,6 @@ Aliases: I<wordcase>
 String.words() -> I<Obj>
 
 Return the
-
-Aliases: I<each_word>
 
 =cut
 

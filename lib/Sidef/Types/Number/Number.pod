@@ -478,7 +478,7 @@ Number.int() -> I<Obj>
 
 Return the
 
-Aliases: I<to_i>, I<as_int>
+Aliases: I<to_i>, I<as_int>, I<to_int>
 
 =cut
 
@@ -803,6 +803,16 @@ Number.to() -> I<Obj>
 Return the
 
 Aliases: I<...()>, I<..^()>, I<up_to>, I<upto>
+
+=cut
+
+=head2 to_n
+
+Number.to_n() -> I<Obj>
+
+Return the
+
+Aliases: I<to_num>
 
 =cut
 

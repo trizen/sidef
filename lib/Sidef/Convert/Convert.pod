@@ -24,11 +24,13 @@ Return the
 
 =cut
 
-=head2 to_bool
+=head2 to_b
 
-Convert.to_bool() -> I<Obj>
+Convert.to_b() -> I<Obj>
 
 Return the
+
+Aliases: I<to_bool>
 
 =cut
 

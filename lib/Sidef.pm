@@ -33,6 +33,20 @@ package Sidef {
         $type;
     }
 
+    sub normalize_method {
+        my ($type) = @_;
+
+        if (index($type, 'Sidef::') == 0) {
+            $type = substr($type, rindex($type, '::', rindex($type, '::') - 2) + 2);
+        }
+        else {
+            $type =~ s/^_::main:://
+              or $type =~ s/^_:://;
+        }
+
+        $type =~ s/^.*\K::/./r;
+    }
+
 };
 
 #
@@ -51,7 +65,7 @@ package Sidef {
     $self = ref($self) if ref($self);
 
     index($self, 'Sidef::') == 0
-      or die("[AUTOLOAD] Undefined method: $AUTOLOAD");
+      or die("[AUTOLOAD] Undefined method `" . Sidef::normalize_method($AUTOLOAD) . q{'});
 
     eval { require $self =~ s{::}{/}rg . '.pm' };
 
@@ -64,12 +78,11 @@ package Sidef {
         }
     }
 
-    my $func = \&{$AUTOLOAD};
-    if (defined(&$func)) {
-        return $func->($self, @args);
+    if (defined(&$AUTOLOAD)) {
+        return $AUTOLOAD->($self, @args);
     }
 
-    die "[AUTOLOAD] Undefined method: $AUTOLOAD";
+    die("[AUTOLOAD] Undefined method `" . Sidef::normalize_method($AUTOLOAD) . q{'});
     return;
 };
 

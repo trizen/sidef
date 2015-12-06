@@ -80,6 +80,9 @@
       "Sidef::Meta::Error" : {
          "file" : "lib/Sidef/Meta/Error.pm"
       },
+      "Sidef::Meta::Unimplemented" : {
+         "file" : "lib/Sidef/Meta/Unimplemented.pm"
+      },
       "Sidef::Meta::Warning" : {
          "file" : "lib/Sidef/Meta/Warning.pm"
       },

@@ -1711,6 +1711,13 @@ package Sidef::Parser {
                 return Sidef::Types::Number::Number->new($1 =~ tr/_//dr);
             }
 
+            # Prefix `...`
+            if (/\G\.\.\./gc) {
+                return
+                  Sidef::Meta::Unimplemented->new(line => $self->{line},
+                                                  file => $self->{file_name},);
+            }
+
             # Implicit method call on special variable: _
             if (/\G\./) {
 
@@ -1725,7 +1732,7 @@ package Sidef::Parser {
                 $self->fatal_error(
                                    code  => $_,
                                    pos   => pos($_),
-                                   error => "attempt to use an implicit method call on the uninitialized variable: \"_\"",
+                                   error => q{attempt to use an implicit method call on the uninitialized variable: "_"},
                                   );
             }
 

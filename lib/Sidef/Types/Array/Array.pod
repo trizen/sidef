@@ -549,6 +549,14 @@ Return the
 
 =cut
 
+=head2 last_by
+
+Array.last_by() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 last_uniq
 
 Array.last_uniq() -> I<Obj>
