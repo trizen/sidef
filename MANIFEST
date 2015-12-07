@@ -40,8 +40,6 @@ lib/Sidef/Types/Block/Fork.pod
 lib/Sidef/Types/Block/Return.pm
 lib/Sidef/Types/Block/Try.pm
 lib/Sidef/Types/Block/Try.pod
-lib/Sidef/Types/Block/While.pm
-lib/Sidef/Types/Block/While.pod
 lib/Sidef/Types/Bool/Bool.pm
 lib/Sidef/Types/Bool/Bool.pod
 lib/Sidef/Types/Byte/Byte.pm

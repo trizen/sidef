@@ -835,7 +835,7 @@ HEADER
                     }
                 }
                 else {
-                    $code = 'Block';
+                    $code = q{'Sidef::Types::Block::Block'};
                 }
             }
         }

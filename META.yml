@@ -62,8 +62,6 @@ provides:
     file: lib/Sidef/Types/Block/Return.pm
   Sidef::Types::Block::Try:
     file: lib/Sidef/Types/Block/Try.pm
-  Sidef::Types::Block::While:
-    file: lib/Sidef/Types/Block/While.pm
   Sidef::Types::Bool::Bool:
     file: lib/Sidef/Types/Bool/Bool.pm
   Sidef::Types::Byte::Byte:
