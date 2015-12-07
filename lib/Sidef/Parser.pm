@@ -124,7 +124,7 @@ package Sidef::Parser {
                   if\b                                      (?{ state $x = bless({}, 'Sidef::Types::Block::If') })
                 | while\b                                   (?{ state $x = bless({}, 'Sidef::Types::Block::While') })
                 | try\b                                     (?{ Sidef::Types::Block::Try->new })
-                | for(?:each)?+\b                           (?{ Sidef::Types::Block::For->new })
+                | for(?:each)?+\b                           (?{ state $x = bless({}, 'Sidef::Types::Block::For') })
                 | return\b                                  (?{ Sidef::Types::Block::Return->new })
                 #| next\b                                    (?{ bless({}, 'Sidef::Types::Block::Next') })
                 #| break\b                                   (?{ bless({}, 'Sidef::Types::Block::Break') })
@@ -1128,12 +1128,15 @@ package Sidef::Parser {
                     my $name       = $v->{name};
                     my $class_name = $v->{class};
 
-                    my $var =
-                      $type eq 'define' ? bless({name => $name, class => $class_name, expr => $obj}, 'Sidef::Variable::Define')
-                      : $type eq 'static'
-                      ? bless({name => $name, class => $class_name, expr => $obj}, 'Sidef::Variable::Static')
-                      : $type eq 'const' ? bless({name => $name, class => $class_name, expr => $obj}, 'Sidef::Variable::Const')
-                      :                    die "[PARSER ERROR] Invalid variable type: $type";
+                    my $var = (
+                               $type eq 'define'
+                               ? bless({name => $name, class => $class_name, expr => $obj}, 'Sidef::Variable::Define')
+                               : $type eq 'static'
+                               ? bless({name => $name, class => $class_name, expr => $obj}, 'Sidef::Variable::Static')
+                               : $type eq 'const'
+                               ? bless({name => $name, class => $class_name, expr => $obj}, 'Sidef::Variable::Const')
+                               : die "[PARSER ERROR] Invalid variable type: $type"
+                              );
 
                     push @var_objs, $var;
 

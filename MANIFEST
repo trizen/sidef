@@ -35,8 +35,6 @@ lib/Sidef/Types/Array/Pair.pm
 lib/Sidef/Types/Array/Pair.pod
 lib/Sidef/Types/Block/Block.pm
 lib/Sidef/Types/Block/Block.pod
-lib/Sidef/Types/Block/For.pm
-lib/Sidef/Types/Block/For.pod
 lib/Sidef/Types/Block/Fork.pm
 lib/Sidef/Types/Block/Fork.pod
 lib/Sidef/Types/Block/Return.pm

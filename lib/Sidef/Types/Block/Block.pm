@@ -347,8 +347,21 @@ package Sidef::Types::Block::Block {
 
     sub for {
         my ($self, @args) = @_;
-        Sidef::Types::Block::For->new->for(@args, $self);
+
+        if (@args == 1 and eval { $args[0]->can('each') }) {
+            $args[0]->each($self);
+        }
+        else {
+            foreach my $item (@args) {
+                if (defined(my $res = $self->_run_code($item))) {
+                    return $res;
+                }
+            }
+            $self;
+        }
     }
+
+    *foreach = \&for;
 
     sub dump {
         $_[0];

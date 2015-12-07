@@ -56,8 +56,6 @@ provides:
     file: lib/Sidef/Types/Array/Pair.pm
   Sidef::Types::Block::Block:
     file: lib/Sidef/Types/Block/Block.pm
-  Sidef::Types::Block::For:
-    file: lib/Sidef/Types/Block/For.pm
   Sidef::Types::Block::Fork:
     file: lib/Sidef/Types/Block/Fork.pm
   Sidef::Types::Block::Return:
