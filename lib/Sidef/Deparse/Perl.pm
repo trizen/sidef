@@ -111,10 +111,10 @@ HEADER
 
         my $ref = ref($obj);
         $self->_dump_string(
-                              $ref eq 'Sidef::Variable::ClassInit'    ? $self->_dump_class_name($obj)
-                            : $ref eq 'Sidef::Variable::Ref'          ? 'REF'
-                            : $ref eq 'Sidef::Types::Block::CodeInit' ? 'Sidef::Types::Block::Code'
-                            :                                           $ref
+                              $ref eq 'Sidef::Variable::ClassInit'     ? $self->_dump_class_name($obj)
+                            : $ref eq 'Sidef::Variable::Ref'           ? 'REF'
+                            : $ref eq 'Sidef::Types::Block::BlockInit' ? 'Sidef::Types::Block::Block'
+                            :                                            $ref
                            );
     }
 
@@ -656,9 +656,9 @@ HEADER
                 $code .= '; ' . $self->_dump_string($package_name) . '}';
             }
         }
-        elsif ($ref eq 'Sidef::Types::Block::CodeInit') {
+        elsif ($ref eq 'Sidef::Types::Block::BlockInit') {
             if ($addr{$refaddr}++) {
-                $code = 'Sidef::Types::Block::Code->new(code => __SUB__';
+                $code = 'Sidef::Types::Block::Block->new(code => __SUB__';
 
                 if (exists($obj->{init_vars}) and @{$obj->{init_vars}{vars}}) {
                     my @vars = @{$obj->{init_vars}{vars}};
@@ -701,7 +701,7 @@ HEADER
                         if ($is_class and not $self->{ref_class}) {
 
                             $code .=
-                              (" " x $Sidef::SPACES) . "\$new$refaddr = Sidef::Types::Block::Code->new(code => sub {" . "\n";
+                              (" " x $Sidef::SPACES) . "\$new$refaddr = Sidef::Types::Block::Block->new(code => sub {" . "\n";
                             push @{$self->{function_declarations}}, [$refaddr, "my \$new$refaddr;"];
 
                             $Sidef::SPACES += $Sidef::SPACES_INCR;
@@ -742,7 +742,7 @@ HEADER
                         }
                     }
                     else {
-                        $code = 'Sidef::Types::Block::Code->new(';
+                        $code = 'Sidef::Types::Block::Block->new(';
                     }
 
                     if (not $is_class) {
@@ -852,7 +852,7 @@ HEADER
                 $code =
                     "package $name {\n"
                   . (' ' x $Sidef::SPACES)
-                  . "\$new$refaddr = Sidef::Types::Block::Code->new(code => sub {" . "\n"
+                  . "\$new$refaddr = Sidef::Types::Block::Block->new(code => sub {" . "\n"
                   . (' ' x $Sidef::SPACES)
                   . $self->_dump_sub_init_vars(@{$obj->{vars}})
                   . (' ' x ($Sidef::SPACES * 2))
@@ -1172,7 +1172,7 @@ HEADER
             $code = $self->make_constant($ref, 'new', "Perl$refaddr");
         }
         elsif ($ref eq 'Sidef::Meta::Unimplemented') {
-            $code = qq{CORE::die "Unimplemented at " . } . $self->_dump_string($obj->{file}) . qq{. " line $obj->{line}\E\\n"};
+            $code = qq{CORE::die "Unimplemented at " . } . $self->_dump_string($obj->{file}) . qq{. " line $obj->{line}\\n"};
         }
 
         # Array indices

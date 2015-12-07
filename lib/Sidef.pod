@@ -108,3 +108,19 @@ Sidef.normalize_type() -> I<Obj>
 Return the
 
 =cut
+
+=head2 normalize_method
+
+Sidef.normalize_method() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 normalize_type
+
+Sidef.normalize_type() -> I<Obj>
+
+Return the
+
+=cut

@@ -46,15 +46,14 @@ package Sidef::Parser {
 
             static_obj_re => qr{\G
                 (?>
-                       nil\b                          (?{ state $x = Sidef::Types::Nil::Nil->new })
-                     | Null\b                         (?{ state $x = Sidef::Types::Null::Null->new })
+                       nil\b                          (?{ state $x = bless({}, 'Sidef::Types::Nil::Nil') })
+                     | null\b                         (?{ state $x = Sidef::Types::Null::Null->new })
                      | true\b                         (?{ state $x = Sidef::Types::Bool::Bool->true })
                      | (?:false|Bool)\b               (?{ state $x = Sidef::Types::Bool::Bool->false })
-                     | next\b                         (?{ state $x = Sidef::Types::Block::Next->new })
-                     | break\b                        (?{ state $x = Sidef::Types::Block::Break->new })
-                     | continue\b                     (?{ state $x = Sidef::Types::Block::Continue->new })
-                     | BlackHole\b                    (?{ state $x = Sidef::Types::Black::Hole->new })
-                     | Block\b                        (?{ state $x = Sidef::Types::Block::CodeInit->new })
+                     | next\b                         (?{ state $x = bless({}, 'Sidef::Types::Block::Next') })
+                     | break\b                        (?{ state $x = bless({}, 'Sidef::Types::Block::Break') })
+                     | continue\b                     (?{ state $x = bless({}, 'Sidef::Types::Block::Continue') })
+                     | Block\b                        (?{ state $x = bless({}, 'Sidef::Types::Block::BlockInit') })
                      | Backtick\b                     (?{ state $x = Sidef::Types::Glob::Backtick->new })
                      | ARGF\b                         (?{ state $x = Sidef::Types::Glob::FileHandle->new(fh => \*ARGV) })
                      | (?:STDIN|FileHandle)\b         (?{ state $x = Sidef::Types::Glob::FileHandle->stdin })
@@ -75,7 +74,7 @@ package Sidef::Parser {
                      | Socket\b                       (?{ state $x = Sidef::Types::Glob::Socket->new })
                      | Pipe\b                         (?{ state $x = Sidef::Types::Glob::Pipe->new })
                      | Byte\b                         (?{ state $x = Sidef::Types::Byte::Byte->new })
-                     | Ref\b                          (?{ state $x = Sidef::Variable::Ref->new })
+                     | Ref\b                          (?{ state $x = bless({}, 'Sidef::Variable::Ref') })
                      | LazyMethod\b                   (?{ state $x = Sidef::Variable::LazyMethod->new })
                      | Bytes\b                        (?{ state $x = Sidef::Types::Byte::Bytes->new })
                      | Time\b                         (?{ state $x = Sidef::Time::Time->new })
@@ -90,49 +89,49 @@ package Sidef::Parser {
                      | Sidef\b                        (?{ state $x = Sidef->new })
                      | Object\b                       (?{ state $x = Sidef::Object::Object->new })
                      | Perl\b                         (?{ state $x = Sidef::Perl::Perl->new })
-                     | \$\.                           (?{ state $x = Sidef::Variable::Magic->new('$.') })
-                     | \$\?                           (?{ state $x = Sidef::Variable::Magic->new('$?') })
-                     | \$\$                           (?{ state $x = Sidef::Variable::Magic->new('$$') })
-                     | \$\^T\b                        (?{ state $x = Sidef::Variable::Magic->new('$^T') })
-                     | \$\|                           (?{ state $x = Sidef::Variable::Magic->new('$|') })
-                     | \$!                            (?{ state $x = Sidef::Variable::Magic->new('$!') })
-                     | \$"                            (?{ state $x = Sidef::Variable::Magic->new('$"') })
-                     | \$\\                           (?{ state $x = Sidef::Variable::Magic->new('$\\') })
-                     | \$@                            (?{ state $x = Sidef::Variable::Magic->new('$@') })
-                     | \$%                            (?{ state $x = Sidef::Variable::Magic->new('$%') })
-                     | \$~                            (?{ state $x = Sidef::Variable::Magic->new('$~') })
-                     | \$/                            (?{ state $x = Sidef::Variable::Magic->new('$/') })
-                     | \$&                            (?{ state $x = Sidef::Variable::Magic->new('$&') })
-                     | \$'                            (?{ state $x = Sidef::Variable::Magic->new('$\'') })
-                     | \$`                            (?{ state $x = Sidef::Variable::Magic->new('$`') })
-                     | \$:                            (?{ state $x = Sidef::Variable::Magic->new('$:') })
-                     | \$\]                           (?{ state $x = Sidef::Variable::Magic->new('$]') })
-                     | \$\[                           (?{ state $x = Sidef::Variable::Magic->new('$[') })
-                     | \$;                            (?{ state $x = Sidef::Variable::Magic->new('$;') })
-                     | \$,                            (?{ state $x = Sidef::Variable::Magic->new('$,') })
-                     | \$\^O\b                        (?{ state $x = Sidef::Variable::Magic->new('$^O') })
-                     | \$\^PERL\b                     (?{ state $x = Sidef::Variable::Magic->new('$^X') })
-                     | (?:\$0|\$\^SIDEF)\b            (?{ state $x = Sidef::Variable::Magic->new('$0') })
-                     | \$\)                           (?{ state $x = Sidef::Variable::Magic->new('$)') })
-                     | \$\(                           (?{ state $x = Sidef::Variable::Magic->new('$(') })
-                     | \$<                            (?{ state $x = Sidef::Variable::Magic->new('$<') })
-                     | \$>                            (?{ state $x = Sidef::Variable::Magic->new('$>') })
+                     | \$\.                           (?{ state $x = bless({name => '$.'}, 'Sidef::Variable::Magic') })
+                     | \$\?                           (?{ state $x = bless({name => '$?'}, 'Sidef::Variable::Magic') })
+                     | \$\$                           (?{ state $x = bless({name => '$$'}, 'Sidef::Variable::Magic') })
+                     | \$\^T\b                        (?{ state $x = bless({name => '$^T'}, 'Sidef::Variable::Magic') })
+                     | \$\|                           (?{ state $x = bless({name => '$|'}, 'Sidef::Variable::Magic') })
+                     | \$!                            (?{ state $x = bless({name => '$!'}, 'Sidef::Variable::Magic') })
+                     | \$"                            (?{ state $x = bless({name => '$"'}, 'Sidef::Variable::Magic') })
+                     | \$\\                           (?{ state $x = bless({name => '$\\'}, 'Sidef::Variable::Magic') })
+                     | \$@                            (?{ state $x = bless({name => '$@'}, 'Sidef::Variable::Magic') })
+                     | \$%                            (?{ state $x = bless({name => '$%'}, 'Sidef::Variable::Magic') })
+                     | \$~                            (?{ state $x = bless({name => '$~'}, 'Sidef::Variable::Magic') })
+                     | \$/                            (?{ state $x = bless({name => '$/'}, 'Sidef::Variable::Magic') })
+                     | \$&                            (?{ state $x = bless({name => '$&'}, 'Sidef::Variable::Magic') })
+                     | \$'                            (?{ state $x = bless({name => '$\''}, 'Sidef::Variable::Magic') })
+                     | \$`                            (?{ state $x = bless({name => '$`'}, 'Sidef::Variable::Magic') })
+                     | \$:                            (?{ state $x = bless({name => '$:'}, 'Sidef::Variable::Magic') })
+                     | \$\]                           (?{ state $x = bless({name => '$]'}, 'Sidef::Variable::Magic') })
+                     | \$\[                           (?{ state $x = bless({name => '$['}, 'Sidef::Variable::Magic') })
+                     | \$;                            (?{ state $x = bless({name => '$;'}, 'Sidef::Variable::Magic') })
+                     | \$,                            (?{ state $x = bless({name => '$,'}, 'Sidef::Variable::Magic') })
+                     | \$\^O\b                        (?{ state $x = bless({name => '$^O'}, 'Sidef::Variable::Magic') })
+                     | \$\^PERL\b                     (?{ state $x = bless({name => '$^X'}, 'Sidef::Variable::Magic') })
+                     | (?:\$0|\$\^SIDEF)\b            (?{ state $x = bless({name => '$0'}, 'Sidef::Variable::Magic') })
+                     | \$\)                           (?{ state $x = bless({name => '$)'}, 'Sidef::Variable::Magic') })
+                     | \$\(                           (?{ state $x = bless({name => '$('}, 'Sidef::Variable::Magic') })
+                     | \$<                            (?{ state $x = bless({name => '$<'}, 'Sidef::Variable::Magic') })
+                     | \$>                            (?{ state $x = bless({name => '$>'}, 'Sidef::Variable::Magic') })
                      | ∞                              (?{ state $x = Sidef::Types::Number::Number->new->inf })
                 ) (?!::)
             }x,
             prefix_obj_re => qr{\G
               (?:
-                  if\b                                      (?{ Sidef::Types::Block::If->new })
-                | while\b                                   (?{ Sidef::Types::Block::While->new })
+                  if\b                                      (?{ state $x = bless({}, 'Sidef::Types::Block::If') })
+                | while\b                                   (?{ state $x = bless({}, 'Sidef::Types::Block::While') })
                 | try\b                                     (?{ Sidef::Types::Block::Try->new })
                 | for(?:each)?+\b                           (?{ Sidef::Types::Block::For->new })
                 | return\b                                  (?{ Sidef::Types::Block::Return->new })
-                #| next\b                                    (?{ Sidef::Types::Block::Next->new })
-                #| break\b                                   (?{ Sidef::Types::Block::Break->new })
+                #| next\b                                    (?{ bless({}, 'Sidef::Types::Block::Next') })
+                #| break\b                                   (?{ bless({}, 'Sidef::Types::Block::Break') })
                 | (?:defined|read)\b                        (?{ state $x = Sidef::Sys::Sys->new })
-                | goto\b                                    (?{ state $x = Sidef::Perl::Builtin->new })
-                | (?:[*\\&]|\+\+|--)                        (?{ state $x = Sidef::Variable::Ref->new })
-                | (?:>>?|[√+~!-]|(?:say|print)\b)           (?{ state $x = Sidef::Object::Unary->new })
+                | goto\b                                    (?{ state $x = bless({}, 'Sidef::Perl::Builtin') })
+                | (?:[*\\&]|\+\+|--)                        (?{ state $x = bless({}, 'Sidef::Variable::Ref') })
+                | (?:>>?|[√+~!-]|(?:say|print)\b)           (?{ state $x = bless({}, 'Sidef::Object::Unary') })
                 | :                                         (?{ state $x = Sidef::Types::Hash::Hash->new })
               )
             }x,
@@ -208,12 +207,11 @@ package Sidef::Parser {
                   Object
                   Parser
                   Block
-                  BlackHole
                   Backtick
                   LazyMethod
 
                   true false
-                  nil Null
+                  nil null
                   )
             },
             keywords => {
@@ -751,17 +749,20 @@ package Sidef::Parser {
                 }
             }
 
-            my $obj = Sidef::Variable::Variable->new(
-                                       name => $name,
-                                       type => $opt{type},
-                                       (defined($ref_type) ? (ref_type => $ref_type) : ()),
-                                       class => $class_name,
-                                       defined($value) ? (value => $value, has_value => 1) : (),
-                                       $attr eq '*' ? (array => 1, slurpy => 1) : $attr eq ':' ? (hash => 1, slurpy => 1) : (),
-                                       defined($where_block) ? (where_block => $where_block) : (),
-                                       defined($where_expr)  ? (where_expr  => $where_expr)  : (),
-                                       $opt{in_use}          ? (in_use      => 1)            : (),
-            );
+            my $obj = bless(
+                            {
+                             name => $name,
+                             type => $opt{type},
+                             (defined($ref_type) ? (ref_type => $ref_type) : ()),
+                             class => $class_name,
+                             defined($value) ? (value => $value, has_value => 1) : (),
+                             $attr eq '*' ? (array => 1, slurpy => 1) : $attr eq ':' ? (hash => 1, slurpy => 1) : (),
+                             defined($where_block) ? (where_block => $where_block) : (),
+                             defined($where_expr)  ? (where_expr  => $where_expr)  : (),
+                             $opt{in_use}          ? (in_use      => 1)            : (),
+                            },
+                            'Sidef::Variable::Variable'
+                           );
 
             if (!$opt{private}) {
                 unshift @{$self->{vars}{$class_name}},
@@ -984,14 +985,14 @@ package Sidef::Parser {
             # Array as object
             if (/\G(?=\[)/) {
 
-                my $array = Sidef::Types::Array::HCArray->new();
+                my @array;
                 my $obj = $self->parse_array(code => $opt{code});
 
                 if (ref $obj->{$self->{class}} eq 'ARRAY') {
-                    push @{$array}, (@{$obj->{$self->{class}}});
+                    push @array, @{$obj->{$self->{class}}};
                 }
 
-                return $array;
+                return bless(\@array, 'Sidef::Types::Array::HCArray');
             }
 
             # Bareword followed by a fat comma or preceded by a colon
@@ -1016,7 +1017,7 @@ package Sidef::Parser {
             if (/\Gvar\b\h*/gc) {
                 my $type     = 'var';
                 my $vars     = $self->parse_init_vars(code => $opt{code}, type => $type);
-                my $init_obj = Sidef::Variable::Init->new(vars => $vars);
+                my $init_obj = bless({vars => $vars}, 'Sidef::Variable::Init');
 
                 if (/\G\h*=\h*/gc) {
                     my $args = (
@@ -1065,7 +1066,7 @@ package Sidef::Parser {
                                                );
                 }
 
-                my $obj = Sidef::Variable::ClassAttr->new(vars => $vars, defined($args) ? (args => $args) : ());
+                my $obj = bless {vars => $vars, defined($args) ? (args => $args) : ()}, 'Sidef::Variable::ClassAttr';
                 push @{$self->{current_class}{attributes}}, $obj;
                 return $obj;
             }
@@ -1101,11 +1102,11 @@ package Sidef::Parser {
 
                     my $var =
                       $type eq 'define'
-                      ? Sidef::Variable::Define->new(init => 1, name => $name, class => $class_name, expr => $obj)
+                      ? bless({init => 1, name => $name, class => $class_name, expr => $obj}, 'Sidef::Variable::Define')
                       : $type eq 'static'
-                      ? Sidef::Variable::Static->new(init => 1, name => $name, class => $class_name, expr => $obj)
+                      ? bless({init => 1, name => $name, class => $class_name, expr => $obj}, 'Sidef::Variable::Static')
                       : $type eq 'const'
-                      ? Sidef::Variable::Const->new(init => 1, name => $name, class => $class_name, expr => $obj)
+                      ? bless({init => 1, name => $name, class => $class_name, expr => $obj}, 'Sidef::Variable::Const')
                       : die "[PARSER ERROR] Invalid variable type: $type";
 
                     unshift @{$self->{vars}{$class_name}},
@@ -1128,9 +1129,10 @@ package Sidef::Parser {
                     my $class_name = $v->{class};
 
                     my $var =
-                        $type eq 'define' ? Sidef::Variable::Define->new(name => $name, class => $class_name, expr => $obj)
-                      : $type eq 'static' ? Sidef::Variable::Static->new(name => $name, class => $class_name, expr => $obj)
-                      : $type eq 'const' ? Sidef::Variable::Const->new(name => $name, class => $class_name, expr => $obj)
+                      $type eq 'define' ? bless({name => $name, class => $class_name, expr => $obj}, 'Sidef::Variable::Define')
+                      : $type eq 'static'
+                      ? bless({name => $name, class => $class_name, expr => $obj}, 'Sidef::Variable::Static')
+                      : $type eq 'const' ? bless({name => $name, class => $class_name, expr => $obj}, 'Sidef::Variable::Const')
                       :                    die "[PARSER ERROR] Invalid variable type: $type";
 
                     push @var_objs, $var;
@@ -1146,7 +1148,7 @@ package Sidef::Parser {
 
                 }
 
-                return Sidef::Variable::ConstInit->new(vars => \@var_objs);
+                return bless({vars => \@var_objs}, 'Sidef::Variable::ConstInit');
             }
 
             # Struct declaration
@@ -1173,11 +1175,14 @@ package Sidef::Parser {
                                          type      => 'var',
                                         );
 
-                my $struct = Sidef::Variable::Struct->new(
-                                                          name  => $name,
-                                                          class => $class_name,
-                                                          vars  => $vars,
-                                                         );
+                my $struct = bless(
+                                   {
+                                    name  => $name,
+                                    class => $class_name,
+                                    vars  => $vars,
+                                   },
+                                   'Sidef::Variable::Struct'
+                                  );
 
                 if (defined $name) {
                     unshift @{$self->{vars}{$class_name}},
@@ -1267,7 +1272,7 @@ package Sidef::Parser {
             # Local variables
             if (/\Glocal\b\h*/gc) {
                 my $expr = $self->parse_obj(code => $opt{code});
-                return Sidef::Variable::Local->new(expr => $expr);
+                return bless({expr => $expr}, 'Sidef::Variable::Local');
             }
 
             # Declaration of local variables, classes, methods and functions
@@ -1347,10 +1352,11 @@ package Sidef::Parser {
                 }
 
                 my $obj =
-                    $type eq 'func'   ? Sidef::Variable::Variable->new(name => $name, type => $type, class => $class_name)
-                  : $type eq 'method' ? Sidef::Variable::Variable->new(name => $name, type => $type, class => $class_name)
-                  : $type eq 'class' ? Sidef::Variable::ClassInit->new(name => ($built_in_obj // $name), class => $class_name)
-                  : $type eq 'global' ? Sidef::Variable::Global->new(name => $name, class => $class_name)
+                  ($type eq 'func' or $type eq 'method')
+                  ? bless({name => $name, type => $type, class => $class_name}, 'Sidef::Variable::Variable')
+                  : $type eq 'class'
+                  ? bless({name => ($built_in_obj // $name), class => $class_name}, 'Sidef::Variable::ClassInit')
+                  : $type eq 'global' ? bless({name => $name, class => $class_name}, 'Sidef::Variable::Global')
                   : $self->fatal_error(
                                        error    => "invalid type",
                                        expected => "expected a magic thing to happen",
@@ -1411,7 +1417,8 @@ package Sidef::Parser {
                                                              },
                                             );
 
-                    $obj->set_params($var_names);
+                    # Set the class parameters
+                    $obj->{vars} = $var_names;
 
                     # Class inheritance (class Name(...) << Name1, Name2)
                     if (/\G\h*<<?\h*/gc) {
@@ -1465,7 +1472,8 @@ package Sidef::Parser {
                     local $self->{current_class} = $built_in_obj // $obj;
                     my $block = $self->parse_block(code => $opt{code});
 
-                    $obj->set_block($block);
+                    # Set the block of the class
+                    $obj->{block} = $block;
                 }
 
                 if ($type eq 'func' or $type eq 'method') {
@@ -1556,11 +1564,8 @@ package Sidef::Parser {
                     my $block = $self->parse_block(code => \$code);
                     pos($_) += pos($code) - length($args) - 1;
 
+                    # Set the block of the function/method
                     $obj->{value} = $block;
-
-                    #if (not $has_kids) {
-                    #    $self->{current_class}->add_method($name, $block) if $type eq 'method';
-                    #}
                 }
 
                 return $obj;
@@ -1581,7 +1586,7 @@ package Sidef::Parser {
                                             pos      => pos($_),
                                            );
 
-                my $given_obj = Sidef::Types::Block::Given->new(expr => $expr);
+                my $given_obj = bless({expr => $expr}, 'Sidef::Types::Block::Given');
                 local $self->{current_given} = $given_obj;
                 my $block = (
                              /\G\h*(?=\{)/gc
@@ -1623,7 +1628,7 @@ package Sidef::Parser {
                                                  )
                             );
 
-                return Sidef::Types::Block::When->new(expr => $expr, block => $block);
+                return bless({expr => $expr, block => $block}, 'Sidef::Types::Block::When');
             }
 
             # "case(expr) {...}" construct
@@ -1651,30 +1656,30 @@ package Sidef::Parser {
                                                  )
                             );
 
-                return Sidef::Types::Block::Case->new(expr => $expr, block => $block);
+                return bless({expr => $expr, block => $block}, 'Sidef::Types::Block::Case');
             }
 
             # "default {...}" construct
             if (exists($self->{current_given}) && /\Gdefault\h*(?=\{)/gc) {
                 my $block = $self->parse_block(code => $opt{code});
-                return Sidef::Types::Block::Default->new(block => $block);
+                return bless({block => $block}, 'Sidef::Types::Block::Default');
             }
 
             # "do {...}" construct
             if (/\Gdo\h*(?=\{)/gc) {
                 my $block = $self->parse_block(code => $opt{code});
-                return Sidef::Types::Block::Do->new(block => $block);
+                return bless({block => $block}, 'Sidef::Types::Block::Do');
             }
 
             # "loop {...}" construct
             if (/\Gloop\h*(?=\{)/gc) {
                 my $block = $self->parse_block(code => $opt{code});
-                return Sidef::Types::Block::Loop->new(block => $block);
+                return bless({block => $block}, 'Sidef::Types::Block::Loop');
             }
 
             # "gather/take" construct
             if (/\Ggather\h*(?=\{)/gc) {
-                my $obj = Sidef::Types::Block::Gather->new();
+                my $obj = bless({}, 'Sidef::Types::Block::Gather');
 
                 local $self->{current_gather} = $obj;
 
@@ -1692,7 +1697,7 @@ package Sidef::Parser {
                            : $self->parse_obj(code => $opt{code})
                           );
 
-                return Sidef::Types::Block::Take->new(expr => $obj, gather => $self->{current_gather});
+                return bless({expr => $obj, gather => $self->{current_gather}}, 'Sidef::Types::Block::Take');
             }
 
             # Binary, hexdecimal and octal numbers
@@ -1714,8 +1719,13 @@ package Sidef::Parser {
             # Prefix `...`
             if (/\G\.\.\./gc) {
                 return
-                  Sidef::Meta::Unimplemented->new(line => $self->{line},
-                                                  file => $self->{file_name},);
+                  bless(
+                        {
+                         line => $self->{line},
+                         file => $self->{file_name},
+                        },
+                        'Sidef::Meta::Unimplemented'
+                       );
             }
 
             # Implicit method call on special variable: _
@@ -1766,7 +1776,7 @@ package Sidef::Parser {
 
                 return (
                         $inline_expression
-                        ? Sidef::Types::Array::HCArray->new(map { {self => $_} } @objs)
+                        ? bless([map { {self => $_} } @objs], 'Sidef::Types::Array::HCArray')
                         : Sidef::Types::Array::Array->new(@objs)
                        );
             }
@@ -1786,12 +1796,15 @@ package Sidef::Parser {
                           );
 
                 return
-                  Sidef::Meta::Assert->new(
-                                           arg  => $arg,
-                                           act  => $action,
-                                           line => $self->{line},
-                                           file => $self->{file_name},
-                                          );
+                  bless(
+                        {
+                         arg  => $arg,
+                         act  => $action,
+                         line => $self->{line},
+                         file => $self->{file_name},
+                        },
+                        'Sidef::Meta::Assert'
+                       );
             }
 
             # die/warn
@@ -1804,16 +1817,16 @@ package Sidef::Parser {
                            : $self->parse_obj(code => $opt{code})
                           );
 
-                return (
-                        (
-                         $action eq 'die'
-                         ? "Sidef::Meta::Error"
-                         : "Sidef::Meta::Warning"
-                        )->new(
-                               arg  => $arg,
-                               line => $self->{line},
-                               file => $self->{file_name},
-                              )
+                return
+                  bless(
+                        {
+                         arg  => $arg,
+                         line => $self->{line},
+                         file => $self->{file_name},
+                        },
+                        $action eq 'die'
+                        ? "Sidef::Meta::Error"
+                        : "Sidef::Meta::Warning"
                        );
             }
 
@@ -1826,11 +1839,14 @@ package Sidef::Parser {
                           );
 
                 return
-                  Sidef::Eval::Eval->new(
-                                         expr          => $obj,
-                                         vars          => {$self->{class} => [@{$self->{vars}{$self->{class}}}]},
-                                         ref_vars_refs => {$self->{class} => [@{$self->{ref_vars_refs}{$self->{class}}}]},
-                                        );
+                  bless(
+                        {
+                         expr          => $obj,
+                         vars          => {$self->{class} => [@{$self->{vars}{$self->{class}}}]},
+                         ref_vars_refs => {$self->{class} => [@{$self->{ref_vars_refs}{$self->{class}}}]},
+                        },
+                        'Sidef::Eval::Eval'
+                       );
             }
 
             if (/\GParser\b/gc) {
@@ -1953,7 +1969,8 @@ package Sidef::Parser {
                 if ($name eq 'ARGV' or $name eq 'ENV') {
 
                     my $type = 'var';
-                    my $variable = Sidef::Variable::Variable->new(name => $name, type => $type, class => $class, in_use => 1);
+                    my $variable =
+                      bless({name => $name, type => $type, class => $class, in_use => 1}, 'Sidef::Variable::Variable');
 
                     unshift @{$self->{vars}{$class}},
                       {
@@ -2001,7 +2018,7 @@ package Sidef::Parser {
 
                 if (/\G(?=\h*:?=(?![=~>]))/) {
 
-                    my $var = Sidef::Variable::Global->new(name => $name, class => $class);
+                    my $var = bless({name => $name, class => $class}, 'Sidef::Variable::Global');
 
                     if (not $self->{interactive}) {
                         warn "[WARN] Implicit declaration of global variable '$name', at line $self->{line}\n";
@@ -2034,22 +2051,25 @@ package Sidef::Parser {
                     )
                   ) {
                     return
-                      Sidef::Variable::Static->new(
-                                                   name => '__CONST__',
-                                                   expr => {
-                                                            $self->{class} => [
-                                                                        {
-                                                                         self => $obj,
-                                                                         call => [
-                                                                             {
-                                                                              method => 'get_constant',
-                                                                              arg => [Sidef::Types::String::String->new($name)]
-                                                                             }
-                                                                         ]
-                                                                        }
-                                                            ]
-                                                           }
-                                                  );
+                      bless(
+                            {
+                             name => '__CONST__',
+                             expr => {
+                                      $self->{class} => [
+                                                         {
+                                                          self => $obj,
+                                                          call => [
+                                                                   {
+                                                                    method => 'get_constant',
+                                                                    arg    => [Sidef::Types::String::String->new($name)]
+                                                                   }
+                                                                  ]
+                                                         }
+                                                        ]
+                                     }
+                            },
+                            'Sidef::Variable::Static'
+                           );
                 }
 
                 # Method call in functional style
@@ -2126,8 +2146,6 @@ package Sidef::Parser {
                                    pos   => (pos($_) - length($1)),
                                    error => "attempt to use the deprecated regex variables",
                                   );
-
-                #return $self->{regexp_vars}{$1} //= Sidef::Variable::Variable->new(name => $1, type => 'var');
             }
 
             /\G\$/gc && redo;
@@ -2219,7 +2237,7 @@ package Sidef::Parser {
 
             $self->{vars}{$self->{class}} = $self->{vars}{$self->{class}}[0];
 
-            my $block = Sidef::Types::Block::CodeInit->new({});
+            my $block = bless({}, 'Sidef::Types::Block::BlockInit');
             local $self->{current_block} = $block;
 
             # Parse whitespace (if any)
@@ -2233,7 +2251,7 @@ package Sidef::Parser {
             }
 
             {    # special '_' variable
-                my $var_obj = Sidef::Variable::Variable->new(name => '_', type => 'var', class => $self->{class});
+                my $var_obj = bless({name => '_', type => 'var', class => $self->{class}}, 'Sidef::Variable::Variable');
                 push @{$var_objs}, $var_obj;
 
                 my (undef, $code) = $self->find_var('_', $self->{class});
@@ -2263,7 +2281,7 @@ package Sidef::Parser {
             #    grep { ref($_) eq 'HASH' and ref($_->{obj}) eq 'Sidef::Variable::Variable' } @{$self->{vars}{$self->{class}}}
             #];
 
-            $block->{init_vars} = Sidef::Variable::Init->new(vars => $var_objs);
+            $block->{init_vars} = bless({vars => $var_objs}, 'Sidef::Variable::Init');
 
             $block->{code} = $obj;
             splice @{$self->{ref_vars_refs}{$self->{class}}}, 0, $count;
@@ -2452,11 +2470,14 @@ package Sidef::Parser {
                              : $self->parse_obj(code => $opt{code})
                             );
 
-                my $variable = Sidef::Variable::Variable->new(
-                                                              class => $class_name,
-                                                              name  => $var_name,
-                                                              type  => 'var',
-                                                             );
+                my $variable = bless(
+                                     {
+                                      class => $class_name,
+                                      name  => $var_name,
+                                      type  => 'var',
+                                     },
+                                     'Sidef::Variable::Variable'
+                                    );
 
                 my $vars_len = $#{$self->{vars}{$class_name}} + 1;
 
@@ -2484,11 +2505,14 @@ package Sidef::Parser {
 
                 # Replace the old Block::For object with Block::ForArray
                 $struct{$self->{class}}[-1]{self} =
-                  Sidef::Types::Block::ForArray->new(
-                                                     var   => $variable,
-                                                     block => $block,
-                                                     array => $array,
-                                                    );
+                  bless(
+                        {
+                         var   => $variable,
+                         block => $block,
+                         array => $array,
+                        },
+                        'Sidef::Types::Block::ForArray'
+                       );
             }
             elsif ($obj_key) {
                 my $arg = (
@@ -2790,7 +2814,7 @@ package Sidef::Parser {
             }
 
             if (/\G\@:([\pL_][\pL\pN_]*)/gc) {
-                push @{$struct{$self->{class}}}, {self => Sidef::Variable::Label->new(name => $1)};
+                push @{$struct{$self->{class}}}, {self => bless({name => $1}, 'Sidef::Variable::Label')};
                 redo;
             }
 
@@ -2956,11 +2980,14 @@ package Sidef::Parser {
                              : $self->parse_obj(code => $opt{code})
                             );
 
-                my $tern = Sidef::Types::Bool::Ternary->new(
-                                                           cond => scalar {$self->{class} => [pop @{$struct{$self->{class}}}]},
-                                                           true => $true,
-                                                           false => $false
-                );
+                my $tern = bless(
+                                 {
+                                  cond  => scalar {$self->{class} => [pop @{$struct{$self->{class}}}]},
+                                  true  => $true,
+                                  false => $false
+                                 },
+                                 'Sidef::Types::Bool::Ternary'
+                                );
 
                 push @{$struct{$self->{class}}}, {self => $tern};
                 redo MAIN;

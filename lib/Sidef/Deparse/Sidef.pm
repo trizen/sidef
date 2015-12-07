@@ -69,9 +69,9 @@ package Sidef::Deparse::Sidef {
 
         my $ref = ref($obj);
 
-            $ref eq 'Sidef::Variable::ClassInit'    ? $obj->{name}
-          : $ref eq 'Sidef::Types::Block::CodeInit' ? 'Block'
-          :                                           substr($ref, rindex($ref, '::') + 2);
+            $ref eq 'Sidef::Variable::ClassInit'     ? $obj->{name}
+          : $ref eq 'Sidef::Types::Block::BlockInit' ? 'Block'
+          :                                            substr($ref, rindex($ref, '::') + 2);
     }
 
     sub _dump_vars {
@@ -277,7 +277,7 @@ package Sidef::Deparse::Sidef {
                 }
             }
         }
-        elsif ($ref eq 'Sidef::Types::Block::CodeInit') {
+        elsif ($ref eq 'Sidef::Types::Block::BlockInit') {
             if ($addr{refaddr($obj)}++) {
                 $code = keys(%{$obj}) ? '__BLOCK__' : 'Block';
             }
@@ -624,7 +624,7 @@ package Sidef::Deparse::Sidef {
                     }
                     elsif ($method =~ /^[\pL_]/) {
 
-                        if ($ref eq 'Sidef::Types::Block::CodeInit' and $method eq 'loop') {
+                        if ($ref eq 'Sidef::Types::Block::BlockInit' and $method eq 'loop') {
                             $code = "loop $code";
                         }
                         else {

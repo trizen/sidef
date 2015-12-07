@@ -21,7 +21,7 @@ package Sidef::Types::Null::Null {
     }
 
     sub dump {
-        Sidef::Types::String::String->new('Null');
+        Sidef::Types::String::String->new('null');
     }
 };
 

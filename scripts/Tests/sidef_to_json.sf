@@ -15,7 +15,7 @@ Hash.def_method('to_json', func (self) {
     '{ ' + self.pairs.map { .first.to_json + ' : ' + .second.to_json }.join(', ') + ' }'
 });
 
-Null.def_method("to_json", func (self) {
+null.def_method("to_json", func (self) {
     "null"
 });
 
@@ -28,7 +28,7 @@ var hash = Hash.new(
     'test'  => ["one", 2, 'three'],
     'hello' => Hash.new(
                  'bool'  => true,
-                 'null'  => Null,
+                 'null'  => null,
                  'array' => [["\t"]],
                ),
 );

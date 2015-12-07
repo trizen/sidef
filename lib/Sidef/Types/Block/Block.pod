@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-Sidef::Types::Block::Code
+Sidef::Types::Block::Block
 
 =head1 DESCRIPTION
 
@@ -11,7 +11,7 @@ This object is ...
 
 =head1 SYNOPSIS
 
-var obj = Code.new(...);
+var obj = Block.new(...);
 
 
 =head1 INHERITS
@@ -36,7 +36,7 @@ Aliases: I<repeat>
 
 =head2 call
 
-Code.call() -> I<Obj>
+Block.call() -> I<Obj>
 
 Return the
 
@@ -44,7 +44,7 @@ Return the
 
 =head2 cap
 
-Code.cap() -> I<Obj>
+Block.cap() -> I<Obj>
 
 Return the
 
@@ -54,17 +54,25 @@ Aliases: I<capture>
 
 =head2 do
 
-Code.do() -> I<Obj>
+Block.do() -> I<Obj>
 
 Return the
 
-Aliases: I<exec>
+Aliases: I<run>
 
 =cut
 
 =head2 dump
 
-Code.dump() -> I<Obj>
+Block.dump() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 exec
+
+Block.exec() -> I<Obj>
 
 Return the
 
@@ -72,7 +80,7 @@ Return the
 
 =head2 for
 
-Code.for() -> I<Obj>
+Block.for() -> I<Obj>
 
 Return the
 
@@ -80,7 +88,7 @@ Return the
 
 =head2 fork
 
-Code.fork() -> I<Obj>
+Block.fork() -> I<Obj>
 
 Return the
 
@@ -88,7 +96,7 @@ Return the
 
 =head2 if
 
-Code.if() -> I<Obj>
+Block.if() -> I<Obj>
 
 Return the
 
@@ -96,7 +104,15 @@ Return the
 
 =head2 loop
 
-Code.loop() -> I<Obj>
+Block.loop() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 new
+
+Block.new() -> I<Obj>
 
 Return the
 
@@ -104,15 +120,7 @@ Return the
 
 =head2 pfork
 
-Code.pfork() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 run
-
-Code.run() -> I<Obj>
+Block.pfork() -> I<Obj>
 
 Return the
 
@@ -120,7 +128,7 @@ Return the
 
 =head2 thr
 
-Code.thr() -> I<Obj>
+Block.thr() -> I<Obj>
 
 Return the
 
@@ -130,7 +138,7 @@ Aliases: I<thread>
 
 =head2 while
 
-Code.while() -> I<Obj>
+Block.while() -> I<Obj>
 
 Return the
 

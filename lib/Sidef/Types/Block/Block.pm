@@ -1,4 +1,4 @@
-package Sidef::Types::Block::Code {
+package Sidef::Types::Block::Block {
 
     use 5.014;
     use parent qw(
@@ -15,6 +15,8 @@ package Sidef::Types::Block::Code {
         my ($self, @args) = @_;
         $self->{code}->(@args);
     }
+
+    *do = \&run;
 
     sub _multiple_dispatch {
         my ($self, @args) = @_;
@@ -257,20 +259,20 @@ package Sidef::Types::Block::Code {
 
     sub exec {
         my ($self) = @_;
-
-        for (1) {
-            $self->run;
-            return $self;
-        }
-
-        Sidef::Types::Black::Hole->new;
+        $self->run;
+        $self;
     }
-
-    *do = \&exec;
 
     sub while {
         my ($self, $condition) = @_;
-        Sidef::Types::Block::While->new->while($condition, $self);
+
+        while ($condition->run) {
+            if (defined(my $res = $self->_run_code)) {
+                return $res;
+            }
+        }
+
+        $self;
     }
 
     sub loop {

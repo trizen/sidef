@@ -9,7 +9,7 @@ package Sidef::Types::Block::For {
     sub for {
         my ($self, @args) = @_;
 
-        if ($#args == 1 and $args[0]->can('each')) {
+        if ($#args == 1 and eval { $args[0]->can('each') }) {
             $args[0]->each($args[1]);
         }
         else {

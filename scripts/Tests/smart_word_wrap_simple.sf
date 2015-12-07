@@ -36,7 +36,7 @@ class SmartWordWrap(WIDTH=80) {
             ++len >= WIDTH && break;
         }
 
-        root ? root : Null;
+        root ? root : null;
     }
 
     method combine(root, hash) {

@@ -1,6 +1,6 @@
 #!/usr/bin/ruby
 
-var Yes = Null;
+var Yes = null;
 
 {
     Yes.def_method(:I, func(self){class{method love{class{method you{say "Well, I hate you!"}}()}}()});

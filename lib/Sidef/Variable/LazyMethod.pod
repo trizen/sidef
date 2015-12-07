@@ -1,0 +1,56 @@
+
+=encoding utf8
+
+=head1 NAME
+
+Sidef::Variable::LazyMethod
+
+=head1 DESCRIPTION
+
+This object is ...
+
+=head1 SYNOPSIS
+
+var obj = LazyMethod.new(...);
+
+
+=head1 INHERITS
+
+Inherits methods from:
+
+	* Sidef::Object::Object
+
+=head1 METHODS
+
+
+=head2 new
+
+LazyMethod.new() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 print
+
+LazyMethod.print() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 println
+
+LazyMethod.println() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 say
+
+LazyMethod.say() -> I<Obj>
+
+Return the
+
+=cut

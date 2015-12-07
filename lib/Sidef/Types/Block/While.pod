@@ -23,11 +23,3 @@ While.new() -> I<Obj>
 Return the
 
 =cut
-
-=head2 while
-
-While.while() -> I<Obj>
-
-Return the
-
-=cut

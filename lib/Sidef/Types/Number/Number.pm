@@ -47,7 +47,7 @@ package Sidef::Types::Number::Number {
     }
 
     sub to_n {
-        $_[0]
+        $_[0];
     }
 
     *to_num = \&to_n;
@@ -555,7 +555,7 @@ package Sidef::Types::Number::Number {
     sub of {
         my ($self, $obj) = @_;
 
-        if (ref($obj) eq 'Sidef::Types::Block::Code') {
+        if (ref($obj) eq 'Sidef::Types::Block::Block') {
             return Sidef::Types::Array::Array->new(map { $obj->run($self->new($_)) } 1 .. $$self);
         }
 

@@ -31,46 +31,24 @@ my %ignored_subs = map { $_ => 1 } qw<
 my %ignored_methods = (
                        'Sidef'                          => [qw(new)],
                        'Sidef::Types::Block::Return'    => [qw(new)],
-                       'Sidef::Types::Block::Break'     => [qw(new)],
-                       'Sidef::Variable::Variable'      => [qw(new)],
-                       'Sidef::Variable::Ref'           => [qw(new)],
-                       'Sidef::Variable::Local'         => [qw(new)],
-                       'Sidef::Variable::Init'          => [qw(new)],
-                       'Sidef::Variable::InitLocal'     => [qw(new)],
                        'Sidef::Sys::Sys'                => [qw(new)],
                        'Sidef::Math::Math'              => [qw(new)],
                        'Sidef::Time::Localtime'         => [qw(new)],
                        'Sidef::Time::Gmtime'            => [qw(new)],
-                       'Sidef::Types::Nil::Nil'         => [qw(new)],
-                       'Sidef::Types::Bool::If'         => [qw(new)],
-                       'Sidef::Types::Bool::While'      => [qw(new)],
-                       'Sidef::Types::Bool::Ternary'    => [qw(new)],
                        'Sidef::Types::Glob::DirHandle'  => [qw(new)],
                        'Sidef::Types::Glob::FileHandle' => [qw(new)],
                        'Sidef::Types::Glob::Backtick'   => [qw(new)],
                        'Sidef::Types::Glob::Stat'       => [qw(new)],
                        'Sidef::Types::Block::For'       => [qw(new)],
-                       'Sidef::Types::Block::Switch'    => [qw(new)],
                        'Sidef::Types::Block::Try'       => [qw(new)],
-                       'Sidef::Types::Block::Code'      => [qw(new)],
-                       'Sidef::Types::Block::Given'     => [qw(new)],
-                       'Sidef::Types::Block::Continue'  => [qw(new)],
                        'Sidef::Types::Regex::Match'     => [qw(new)],
                        'Sidef::Types::Regex::Regex'     => [qw(new)],
-                       'Sidef::Types::Black::Hole'      => [qw(new)],
                       );
 
 my %ignored_modules = map { $_ => 1 } qw (
   Sidef::Exec
   Sidef::Parser
   Sidef::Optimizer
-  Sidef::Types::Array::HCArray
-  Sidef::Types::Array::List
-  Sidef::Types::Number::NumberFast
-  Sidef::Types::Number::NumberInt
-  Sidef::Types::Number::NumberRat
-  Sidef::Variable::LazyMethod
-  Sidef::Variable::ClassVar
   Sidef::Deparse::Sidef
   Sidef::Deparse::Perl
   );

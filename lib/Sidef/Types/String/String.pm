@@ -469,7 +469,7 @@ package Sidef::Types::String::String {
     sub sub {
         my ($self, $regex, $str) = @_;
 
-        ref($str) eq 'Sidef::Types::Block::Code'
+        ref($str) eq 'Sidef::Types::Block::Block'
           && return $self->esub($regex, $str);
 
         $str //= __PACKAGE__->new('');
@@ -485,7 +485,7 @@ package Sidef::Types::String::String {
     sub gsub {
         my ($self, $regex, $str) = @_;
 
-        ref($str) eq 'Sidef::Types::Block::Code'
+        ref($str) eq 'Sidef::Types::Block::Block'
           && return $self->gesub($regex, $str);
 
         $str //= __PACKAGE__->new('');
@@ -506,7 +506,7 @@ package Sidef::Types::String::String {
         $code //= __PACKAGE__->new('');
         my $search = $self->_string_or_regex($regex);
 
-        if (ref($code) eq 'Sidef::Types::Block::Code') {
+        if (ref($code) eq 'Sidef::Types::Block::Block') {
             return __PACKAGE__->new($$self =~ s{$search}{$code->run(_get_captures($$self))}er);
         }
 
@@ -519,7 +519,7 @@ package Sidef::Types::String::String {
         $code //= __PACKAGE__->new('');
         my $search = $self->_string_or_regex($regex);
 
-        if (ref($code) eq 'Sidef::Types::Block::Code') {
+        if (ref($code) eq 'Sidef::Types::Block::Block') {
             my $value = $$self;
             return __PACKAGE__->new($value =~ s{$search}{$code->run(_get_captures($value))}ger);
         }
@@ -950,7 +950,7 @@ package Sidef::Types::String::String {
             $counter += CORE::length($1) while $s =~ /($regex)/g;
             return Sidef::Types::Number::Number->new($counter);
         }
-        elsif (ref($arg) eq 'Sidef::Types::Block::Code') {
+        elsif (ref($arg) eq 'Sidef::Types::Block::Block') {
             foreach my $char (split //, $s) {
                 ++$counter if $arg->run(__PACKAGE__->new($char));
             }

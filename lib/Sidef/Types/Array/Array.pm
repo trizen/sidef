@@ -285,7 +285,7 @@ package Sidef::Types::Array::Array {
         my ($self, $obj) = @_;
 
         my $counter = 0;
-        if (ref($obj) eq 'Sidef::Types::Block::Code') {
+        if (ref($obj) eq 'Sidef::Types::Block::Block') {
 
             foreach my $item (@{$self}) {
                 if ($obj->run($item)) {
@@ -460,7 +460,7 @@ package Sidef::Types::Array::Array {
 
         if (defined $arg) {
 
-            if (ref($arg) eq 'Sidef::Types::Block::Code') {
+            if (ref($arg) eq 'Sidef::Types::Block::Block') {
                 return $self->first_by($arg);
             }
 
@@ -477,7 +477,7 @@ package Sidef::Types::Array::Array {
 
         if (defined $arg) {
 
-            if (ref($arg) eq 'Sidef::Types::Block::Code') {
+            if (ref($arg) eq 'Sidef::Types::Block::Block') {
                 return $self->last_by($arg);
             }
 
@@ -758,7 +758,7 @@ package Sidef::Types::Array::Array {
 
         if (@_ > 1) {
 
-            if (ref($obj) eq 'Sidef::Types::Block::Code') {
+            if (ref($obj) eq 'Sidef::Types::Block::Block') {
                 foreach my $i (0 .. $#{$self}) {
                     $obj->run($self->[$i])
                       && return Sidef::Types::Number::Number->new($i);
@@ -783,7 +783,7 @@ package Sidef::Types::Array::Array {
         my ($self, $obj) = @_;
 
         if (@_ > 1) {
-            if (ref($obj) eq 'Sidef::Types::Block::Code') {
+            if (ref($obj) eq 'Sidef::Types::Block::Block') {
                 for (my $i = $#{$self} ; $i >= 0 ; $i--) {
                     $obj->run($self->[$i])
                       && return Sidef::Types::Number::Number->new($i);
@@ -813,7 +813,7 @@ package Sidef::Types::Array::Array {
           && return $self->new;
 
         my @array;
-        if (ref($obj) eq 'Sidef::Types::Block::Code') {
+        if (ref($obj) eq 'Sidef::Types::Block::Block') {
             for (my $i = 1 ; $i <= $end ; $i += 2) {
                 push @array, scalar $obj->run($self->[$i - 1], $self->[$i]);
             }
@@ -864,7 +864,7 @@ package Sidef::Types::Array::Array {
     sub reduce {
         my ($self, $obj) = @_;
 
-        if (ref($obj) eq 'Sidef::Types::Block::Code') {
+        if (ref($obj) eq 'Sidef::Types::Block::Block') {
             (my $end = $#{$self}) >= 0 || return;
 
             my $x = $self->[0];
@@ -1033,8 +1033,8 @@ package Sidef::Types::Array::Array {
     sub abbrev {
         my ($self, $code) = @_;
 
-        my $__END__ = {};                                                               # some unique value
-        my $__CALL__ = defined($code) && (ref($code) eq 'Sidef::Types::Block::Code');
+        my $__END__ = {};                                                                # some unique value
+        my $__CALL__ = defined($code) && (ref($code) eq 'Sidef::Types::Block::Block');
 
         my %table;
         foreach my $sub_array (@{$self}) {
@@ -1091,7 +1091,7 @@ package Sidef::Types::Array::Array {
     sub contains {
         my ($self, $obj) = @_;
 
-        if (ref($obj) eq 'Sidef::Types::Block::Code') {
+        if (ref($obj) eq 'Sidef::Types::Block::Block') {
             foreach my $item (@{$self}) {
                 if ($obj->run($item)) {
                     return Sidef::Types::Bool::Bool->true;

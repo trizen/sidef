@@ -695,7 +695,7 @@ package Sidef::Optimizer {
                 $obj->{block}{code} = \%code;
             }
         }
-        elsif ($ref eq 'Sidef::Types::Block::CodeInit') {
+        elsif ($ref eq 'Sidef::Types::Block::BlockInit') {
             if ($addr{refaddr($obj)}++) {
                 ## ok
             }

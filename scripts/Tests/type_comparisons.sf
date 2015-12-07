@@ -4,29 +4,38 @@
 ## Type comparisons
 #
 
+func dump(arg) {
+    try{
+        arg.dump
+    }
+    catch{
+        'nil'
+    }
+}
+
 func ne(a, b, c) {
     if ((a != b) == c) {
-        say "NE: (#{a.dump} != #{b.dump}) == #{c.dump}";
+        say "NE: (#{dump(a)} != #{dump(b)}) == #{dump(c)}";
     } else {
-        die "error: (#{a.dump} != #{b.dump}) != #{c.dump}";
+        die "error: (#{dump(a)} != #{dump(b)}) != #{dump(c)}";
     }
 }
 
 func is(a, b, c) {
     if ((a == b) == c) {
-        say "EQ: (#{a.dump} == #{b.dump}) == #{c.dump}";
+        say "EQ: (#{dump(a)} == #{dump(b)}) == #{dump(c)}";
     } else {
-        die "error: (#{a.dump} == #{b.dump}) != #{c.dump}";
+        die "error: (#{dump(a)} == #{dump(b)}) != #{dump(c)}";
     }
 }
 
-# string-Null
-is("", Null, false);
-ne("", Null, true);
+# string-nil
+is("", nil, false);
+ne("", nil, true);
 
-# Null-string
-is(Null, "", false);
-ne(Null, "", true);
+# nil-string
+is(nil, "", false);
+ne(nil, "", true);
 
 # string-number
 is("", 0, false);
@@ -171,38 +180,38 @@ is([[]], [[]], true);
 is([[]], [], false);
 is([], [[]], false);
 
-is([], [Null], false);
-is([Null], [], false);
-is([[]], [Null], false);
-is([Null], [[]], false);
+is([], [nil], false);
+is([nil], [], false);
+is([[]], [nil], false);
+is([nil], [[]], false);
 
 is([:()], [:()], true);
 is([[]], [:()], false);
 is([:()], [[]], false);
 
-# Null-string
-is("", Null, false);
-is(Null, "", false);
+# nil-string
+is("", nil, false);
+is(nil, "", false);
 
-ne("", Null, true);
-ne(Null, "", true);
+ne("", nil, true);
+ne(nil, "", true);
 
-# Null-numbers
-is(0, Null, false);
-is(Null, 0, false);
+# nil-numbers
+is(0, nil, false);
+is(nil, 0, false);
 
-# Null-array
-is(Null, [], false);
-is([], Null, false);
+# nil-array
+is(nil, [], false);
+is([], nil, false);
 
-# Null-hash
-is(Null, :(), false);
-is(:(), Null, false);
+# nil-hash
+is(nil, :(), false);
+is(:(), nil, false);
 
-# Null-Null
-is(Null, Null, true);
-ne(Null, Null, false);
+# nil-nil
+is(nil, nil, true);
+ne(nil, nil, false);
 
-# Null-block
-is(Null, {}, false);
-is({}, Null, false);
+# nil-block
+is(nil, {}, false);
+is({}, nil, false);
