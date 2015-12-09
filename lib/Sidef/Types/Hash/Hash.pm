@@ -316,7 +316,10 @@ package Sidef::Types::Hash::Hash {
     }
 
     *has_key  = \&exists;
+    *contain  = \&exists;
     *contains = \&exists;
+    *include  = \&exists;
+    *includes = \&exists;
 
     sub flip {
         my ($self) = @_;

@@ -1110,7 +1110,9 @@ package Sidef::Types::Array::Array {
         Sidef::Types::Bool::Bool->false;
     }
 
-    *contain = \&contains;
+    *contain  = \&contains;
+    *include  = \&contains;
+    *includes = \&contains;
 
     sub contains_type {
         my ($self, $obj) = @_;

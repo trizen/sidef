@@ -937,7 +937,9 @@ package Sidef::Types::String::String {
         Sidef::Types::Bool::Bool->new(CORE::index($$self, $arg->get_value, $start_pos) != -1);
     }
 
-    *include = \&contains;
+    *contain  = \&contains;
+    *include  = \&contains;
+    *includes = \&contains;
 
     sub count {
         my ($self, $arg) = @_;

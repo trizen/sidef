@@ -30,6 +30,8 @@ package Sidef::Types::Glob::FileHandle {
         Sidef::Types::Bool::Bool->new(-t $_[0]{fh});
     }
 
+    *isatty = \&is_on_tty;
+
     sub stdout {
         __PACKAGE__->new(fh => \*STDOUT);
     }

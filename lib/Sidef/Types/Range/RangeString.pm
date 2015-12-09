@@ -72,6 +72,8 @@ package Sidef::Types::Range::RangeString {
         Sidef::Types::Bool::Bool->new($value ge $min and $value le $max);
     }
 
+    *contain  = \&contains;
+    *include  = \&contains;
     *includes = \&contains;
 
     sub each {
@@ -118,7 +120,8 @@ package Sidef::Types::Range::RangeString {
         $self;
     }
 
-    *for = \&each;
+    *for     = \&each;
+    *foreach = \&each;
 
     our $AUTOLOAD;
     sub DESTROY { }

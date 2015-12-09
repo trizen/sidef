@@ -91,6 +91,8 @@ package Sidef::Types::Range::RangeNumber {
                                      );
     }
 
+    *contain  = \&contains;
+    *include  = \&contains;
     *includes = \&contains;
 
     sub each {
@@ -164,7 +166,8 @@ package Sidef::Types::Range::RangeNumber {
         $self;
     }
 
-    *for = \&each;
+    *for     = \&each;
+    *foreach = \&each;
 
     sub map {
         my ($self, $code) = @_;
@@ -204,6 +207,8 @@ package Sidef::Types::Range::RangeNumber {
 
         Sidef::Types::Array::Array->new(@values);
     }
+
+    *collect = \&map;
 
     sub grep {
         my ($self, $code) = @_;
@@ -246,6 +251,9 @@ package Sidef::Types::Range::RangeNumber {
 
         Sidef::Types::Array::Array->new(@values);
     }
+
+    *filter = \&grep;
+    *select = \&grep;
 
     our $AUTOLOAD;
     sub DESTROY { }
