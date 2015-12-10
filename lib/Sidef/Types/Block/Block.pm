@@ -195,7 +195,7 @@ package Sidef::Types::Block::Block {
                 local *UNIVERSAL::AUTOLOAD = $ref;
                 if (defined($a) || defined($b)) { push @args, $a, $b }
                 elsif (defined($_)) { unshift @args, $_ }
-                $self->call(@args);
+                $self->run(map { Sidef::Perl::Perl->to_sidef($_) } @args);
             };
         }
     }

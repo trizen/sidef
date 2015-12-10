@@ -1,7 +1,6 @@
 #!/usr/bin/ruby
 
-var code = { |*arr|
-    var words = arr.map {|item| Perl.to_sidef(item) };
+var code = { |*words|
 
     var chr = words[0].last;
     words.ft(1).each { |word|
