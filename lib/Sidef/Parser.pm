@@ -2257,15 +2257,16 @@ package Sidef::Parser {
             # Parse whitespace (if any)
             $self->parse_whitespace(code => $opt{code});
 
+            my $has_vars;
             my $var_objs = [];
             if (/\G(?=\|)/) {
-                $var_objs =
-                  $self->parse_init_vars(code => $opt{code},
-                                         type => 'var');
+                $has_vars = 1;
+                $var_objs = $self->parse_init_vars(code => $opt{code},
+                                                   type => 'var',);
             }
 
             # Special '_' variable
-            if ($opt{topic_var} and not @{$var_objs}) {
+            if ($opt{topic_var} and not $has_vars) {
                 my $var_obj = bless({name => '_', type => 'var', class => $self->{class}}, 'Sidef::Variable::Variable');
 
                 push @{$var_objs}, $var_obj;
