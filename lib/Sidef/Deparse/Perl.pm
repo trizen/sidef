@@ -954,11 +954,14 @@ HEADER
             my $raddr = refaddr($obj->{gather});
             $code = "do { push \@_$raddr," . $self->deparse_args($obj->{expr}) . "; \$_$raddr\[-1] }";
         }
-        elsif ($ref eq 'Sidef::Types::Block::For') {
-            ## ok
-        }
         elsif ($ref eq 'Sidef::Types::Block::Try') {
             $code = $ref . '->new';
+        }
+        elsif ($ref eq 'Sidef::Variable::Ref') {
+            ## ok
+        }
+        elsif ($ref eq 'Sidef::Types::Block::For') {
+            ## ok
         }
         elsif ($ref eq 'Sidef::Types::Block::Break') {
             $code = 'last';

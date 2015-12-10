@@ -3,5 +3,12 @@ TODO list for Sidef
 General:
     * improve the OO system
 
+Classes:
+    * implement roles (from Perl 6) and add the `does` trait for classes
+      (http://doc.perl6.org/language/objects#Roles)
+
+Blocks:
+    * find a better way to implement the `next` and `last` statements
+
 Method/functions:
-    * implement the `is export` trait for methods (maybe)
+    * implement the `is export` trait for functions and classes (maybe)
