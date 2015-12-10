@@ -2001,6 +2001,12 @@ package Sidef::Parser {
                   ) {
                     if (exists $self->{current_method}) {
                         if (defined(my $var = $self->find_var('self', $class))) {
+
+                            if ($self->{opt}{k}) {
+                                print STDERR
+                                  "[INFO] `$name` is interpreted as `self.$name` at $self->{file_name} line $self->{line}\n";
+                            }
+
                             $var->{count}++;
                             $var->{obj}{in_use} = 1;
                             return
@@ -2077,6 +2083,11 @@ package Sidef::Parser {
 
                 # Method call in functional style
                 if (not $self->{_want_name} and ($class eq $self->{class} or $class eq 'CORE')) {
+
+                    if ($self->{opt}{k}) {
+                        print STDERR
+                          "[INFO] `$name` is interpreted as a prefix method-call at $self->{file_name} line $self->{line}\n";
+                    }
 
                     my $pos = pos($_);
                     /\G\h*/gc;    # remove any horizontal whitespace

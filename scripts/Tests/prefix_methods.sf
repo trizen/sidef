@@ -10,6 +10,7 @@ var i = int 12.5;
 
 assert_eq(i, 12);
 assert_eq(lc "TeSt", "test");
+assert_eq(lc("TeSt"), "test");
 assert_eq(ceil 12.1.add(2), 15);
 
 var int = 42;

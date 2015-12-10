@@ -312,6 +312,16 @@ Return the
 
 =cut
 
+=head2 contain
+
+String.contain() -> I<Obj>
+
+Return the
+
+Aliases: I<include>, I<contains>, I<includes>
+
+=cut
+
 =head2 count
 
 String.count() -> I<Obj>
@@ -567,16 +577,6 @@ Return the
 String.hex() -> I<Obj>
 
 Return the
-
-=cut
-
-=head2 include
-
-String.include() -> I<Obj>
-
-Return the
-
-Aliases: I<contains>
 
 =cut
 

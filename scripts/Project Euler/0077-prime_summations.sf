@@ -6,7 +6,7 @@
 
 # Answer: 71
 
-require 'ntheory';
+require('ntheory');
 
 var primes = [];
 

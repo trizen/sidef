@@ -84,6 +84,8 @@ Block.for() -> I<Obj>
 
 Return the
 
+Aliases: I<foreach>
+
 =cut
 
 =head2 fork

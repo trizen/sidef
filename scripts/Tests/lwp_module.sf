@@ -3,7 +3,7 @@
 func get_response(url) {
 
     var req = (
-        try   { require 'LWP::UserAgent' }
+        try   { require('LWP::UserAgent') }
         catch { return nil }
     );
 

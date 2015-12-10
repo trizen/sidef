@@ -16,7 +16,7 @@ var code = { |*arr|
 func main () {
 
     var alg = (
-        try   { frequire 'Algorithm::Loops' }
+        try   { frequire('Algorithm::Loops') }
         catch { STDERR.print("** Algorithm::Loops is not installed!\n"); return }
     );
 

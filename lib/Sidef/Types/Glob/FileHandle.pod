@@ -111,11 +111,13 @@ Aliases: I<read_char>
 
 =cut
 
-=head2 is_on_tty
+=head2 isatty
 
-FileHandle.is_on_tty() -> I<Obj>
+FileHandle.isatty() -> I<Obj>
 
 Return the
+
+Aliases: I<is_on_tty>
 
 =cut
 

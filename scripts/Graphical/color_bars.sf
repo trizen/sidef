@@ -4,7 +4,7 @@
 ## http://rosettacode.org/wiki/Colour_bars/Display
 #
 
-require 'GD';
+require('GD');
 
 var colors = Hash.new(
               white   => [255, 255, 255],

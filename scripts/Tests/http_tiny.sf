@@ -1,6 +1,6 @@
 #!/usr/bin/ruby
 
-var req = require 'HTTP::Tiny';
+var req = require('HTTP::Tiny');
 var http = req.new;
 
 var response = http.get('http://www.rcs-rds.ro/');

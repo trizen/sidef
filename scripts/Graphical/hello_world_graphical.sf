@@ -4,7 +4,7 @@
 ## http://rosettacode.org/wiki/Hello_world/Graphical
 #
 
-var tk = require 'Tk';
+var tk = require('Tk');
 var main = 'MainWindow'.to_caller.new;
 main.Button(
     '-text'    => 'Goodbye, World!',

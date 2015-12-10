@@ -4,6 +4,6 @@
 ## http://rosettacode.org/wiki/Window_creation
 #
 
-var tk = require 'Tk';
+var tk = require('Tk');
 'MainWindow'.to_caller.new;
 tk.MainLoop;

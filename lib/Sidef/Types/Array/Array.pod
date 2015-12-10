@@ -209,7 +209,7 @@ Array.contain() -> I<Obj>
 
 Return the
 
-Aliases: I<contains>
+Aliases: I<include>, I<contains>, I<includes>
 
 =cut
 

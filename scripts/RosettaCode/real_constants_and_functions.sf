@@ -28,10 +28,10 @@ say x.ceil;    # ceiling
 say x**y;      # exponentiation
 
 ## Alternative syntax:
-say sqrt x;    # square root
-say log x;     # natural logarithm
-say log10 x;   # base 10 logarithm
-say exp x;     # e raised to the power of x
-say abs x;     # absolute value
-say floor x;   # floor
-say ceil x;    # ceiling
+say sqrt(x);    # square root
+say log(x);     # natural logarithm
+say log10(x);   # base 10 logarithm
+say exp(x);     # e raised to the power of x
+say abs(x);     # absolute value
+say floor(x);   # floor
+say ceil(x);    # ceiling

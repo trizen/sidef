@@ -39,13 +39,13 @@ Return the
 
 =cut
 
-=head2 contains
+=head2 contain
 
-RangeString.contains() -> I<Obj>
+RangeString.contain() -> I<Obj>
 
 Return the
 
-Aliases: I<includes>
+Aliases: I<include>, I<contains>, I<includes>
 
 =cut
 
@@ -55,7 +55,7 @@ RangeString.for() -> I<Obj>
 
 Return the
 
-Aliases: I<each>
+Aliases: I<each>, I<foreach>
 
 =cut
 

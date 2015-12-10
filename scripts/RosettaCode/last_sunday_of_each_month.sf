@@ -4,7 +4,7 @@
 ## http://rosettacode.org/wiki/Find_the_last_Sunday_of_each_month
 #
 
-require 'DateTime';
+require('DateTime');
 
 var year = (ARGV[0] \\ 2015);
 

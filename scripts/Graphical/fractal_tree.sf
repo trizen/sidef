@@ -13,7 +13,7 @@ func tree(img, x, y, scale=6/10, len=400, angle=270) {
     tree(img, x1, y1, scale, len*scale, angle-35);
 }
 
-require 'GD::Simple';
+require('GD::Simple');
 
 var (width=1000, height=1000);
 var img = %s'GD::Simple'.new(width, height);

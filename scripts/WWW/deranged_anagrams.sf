@@ -19,7 +19,7 @@ func find_deranged (a) {
 func main () {
 
     var lwp = (
-        try   { require 'LWP::Simple'->() }
+        try   { frequire('LWP::Simple') }
         catch { warn("** LWP::Simple is not installed!"); return }
     );
 

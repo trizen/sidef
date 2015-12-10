@@ -6,7 +6,7 @@
 
 # Answer: 171
 
-var dt = require 'DateTime';
+var dt = require('DateTime');
 
 func first_sundays(year) {
     var count = 0;

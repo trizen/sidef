@@ -1,6 +1,6 @@
 #!/usr/bin/ruby
 
-var inet = require 'IO::Socket::INET';
+var inet = require('IO::Socket::INET');
 
 var sock = inet.new(
                 LocalAddr => "127.0.0.1:8080",

@@ -47,13 +47,13 @@ Return the
 
 =cut
 
-=head2 contains
+=head2 contain
 
-RangeNumber.contains() -> I<Obj>
+RangeNumber.contain() -> I<Obj>
 
 Return the
 
-Aliases: I<includes>
+Aliases: I<include>, I<contains>, I<includes>
 
 =cut
 
@@ -63,7 +63,7 @@ RangeNumber.for() -> I<Obj>
 
 Return the
 
-Aliases: I<each>
+Aliases: I<each>, I<foreach>
 
 =cut
 
@@ -73,6 +73,8 @@ RangeNumber.grep() -> I<Obj>
 
 Return the
 
+Aliases: I<filter>, I<select>
+
 =cut
 
 =head2 map
@@ -80,6 +82,8 @@ Return the
 RangeNumber.map() -> I<Obj>
 
 Return the
+
+Aliases: I<collect>
 
 =cut
 

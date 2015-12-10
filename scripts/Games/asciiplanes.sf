@@ -15,7 +15,7 @@
 # Find the planes' positions on a grid. (text-based game)
 
 var asciitable = (
-                   try   { require 'Text::ASCIITable' }
+                   try   { require('Text::ASCIITable') }
                    catch { STDERR.print("Can't load the 'Text::ASCIITable' Perl module...\n"); Sys.exit(2) }
                  );
 
@@ -64,7 +64,7 @@ func ver {
 
 if (!ARGV.is_empty) {
     var getopt = (
-                    try   { frequire 'Getopt::Long' }
+                    try   { frequire('Getopt::Long') }
                     catch { STDERR.print("Can't load the 'Getopt::Long' Perl module...\n"); Sys.exit(2) }
                  );
 

@@ -4,7 +4,7 @@
 ## Can be executed as: sidef getopt.sf -d -e "hello"
 #
 
-var g = frequire 'Getopt::Std';
+var g = frequire('Getopt::Std');
 
 var hash = Hash.new;
 g.getopts('de:', \hash);

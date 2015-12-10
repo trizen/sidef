@@ -4,7 +4,7 @@
 ## http://rosettacode.org/wiki/Five_weekends
 #
 
-require 'DateTime';
+require('DateTime');
 
 var happymonths = [];
 var workhardyears = [];

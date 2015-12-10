@@ -9,7 +9,7 @@ var spec = frequire('File::Spec::Functions');
 #
 
 var sf = (
-            try   { frequire 'File::Spec::Functions' }
+            try   { frequire('File::Spec::Functions') }
             catch { nil }
          );
 

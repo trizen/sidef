@@ -16,7 +16,7 @@ class Array {
   method to_png(scale=1, bgcolor='white', fgcolor='black') {
 
     var gd = (
-      try   { require 'GD::Simple' }
+      try   { require('GD::Simple') }
       catch { warn "GD::Simple is not installed!"; return };
     );
 
