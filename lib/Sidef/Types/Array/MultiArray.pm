@@ -80,8 +80,8 @@ package Sidef::Types::Array::MultiArray {
     sub dump {
         my ($self) = @_;
         Sidef::Types::String::String->new(
-            'MultiArr(' . join(
-                ",\n\t     ",
+            'MultiArr(' . "\n\t" . join(
+                ",\n\t",
                 map {
                     '[' . join(
                         ", ",
@@ -95,7 +95,7 @@ package Sidef::Types::Array::MultiArray {
                       . ']'
                   } @{$self}
               )
-              . ")"
+              . "\n)"
         );
     }
 };

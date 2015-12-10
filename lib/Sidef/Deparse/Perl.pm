@@ -1157,13 +1157,13 @@ HEADER
             $code = $self->make_constant($ref, 'new', "Grapheme$refaddr", $self->_dump_string(${$obj}));
         }
         elsif ($ref eq 'Sidef::Types::Array::MultiArray') {
-            $code = $ref . '->new';
+            $code = $self->make_constant($ref, 'new', "MultiArr$refaddr");
         }
         elsif ($ref eq 'Sidef::Types::Glob::Pipe') {
             $code = $self->make_constant($ref, 'new', "Pipe$refaddr", map { $self->_dump_string($_) } @{$obj});
         }
         elsif ($ref eq 'Sidef::Parser') {
-            $code = $ref . '->new';
+            $code = $self->make_constant($ref, 'new', "Parser$refaddr");
         }
         elsif ($ref eq 'Sidef') {
             $code = $self->make_constant($ref, 'new', "Sidef$refaddr");
