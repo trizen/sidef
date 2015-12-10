@@ -492,7 +492,7 @@ HEADER
                     # Deparse the block of the method/function
                     {
                         local $self->{function} = refaddr($block);
-                        local $self->{parent_name} = [$obj->{type}, $name];
+                        local $self->{parent_name} = [$obj->{type}, "$obj->{class}::$name"];
                         push @{$self->{function_declarations}}, [$self->{function}, "my \$$obj->{name}$refaddr;"];
                         $code .= $self->deparse_expr({self => $block});
                     }
@@ -645,7 +645,7 @@ HEADER
                 }
 
                 local $self->{class}            = refaddr($block);
-                local $self->{class_name}       = $obj->{name};
+                local $self->{class_name}       = "$obj->{class}::$obj->{name}";
                 local $self->{parent_name}      = ['class', $package_name];
                 local $self->{package_name}     = $package_name;
                 local $self->{inherit}          = $obj->{inherit} if exists $obj->{inherit};
