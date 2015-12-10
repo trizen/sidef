@@ -2745,8 +2745,11 @@ package Sidef::Parser {
                                         pos      => pos($_)
                                        );
 
-                my $parser = __PACKAGE__->new(file_name   => $self->{file_name},
-                                              script_name => $self->{script_name},);
+                my $parser = __PACKAGE__->new(
+                                              opt         => $self->{opt},
+                                              file_name   => $self->{file_name},
+                                              script_name => $self->{script_name},
+                                             );
                 local $parser->{line}  = $self->{line};
                 local $parser->{class} = $name;
                 local $parser->{ref_vars}{$name} = $self->{ref_vars}{$name} if exists($self->{ref_vars}{$name});
@@ -2938,8 +2941,11 @@ package Sidef::Parser {
                     my $content = do { local $/; <$fh> };
                     close $fh;
 
-                    my $parser = __PACKAGE__->new(file_name   => $full_path,
-                                                  script_name => $self->{script_name},);
+                    my $parser = __PACKAGE__->new(
+                                                  opt         => $self->{opt},
+                                                  file_name   => $full_path,
+                                                  script_name => $self->{script_name},
+                                                 );
 
                     local $parser->{class} = $name if defined $name;
                     if (defined $name and $name ne 'main' and not grep $_ eq $name, @Sidef::NAMESPACES) {
