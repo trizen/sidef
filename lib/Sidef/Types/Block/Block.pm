@@ -26,7 +26,7 @@ package Sidef::Types::Block::Block {
 
             my %seen;
             my @left_args;
-            my @vars = @{$method->{vars}};
+            my @vars = exists($method->{vars}) ? @{$method->{vars}} : ();
 
             foreach my $arg (@args) {
                 if (ref($arg) eq 'Sidef::Variable::NamedParam') {

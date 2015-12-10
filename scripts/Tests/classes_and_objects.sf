@@ -5,7 +5,7 @@
 class Task(callback, dependencies=[]) {
     method perform {
         dependencies.each { .perform };
-        callback();
+        callback.run;
     }
 }
 

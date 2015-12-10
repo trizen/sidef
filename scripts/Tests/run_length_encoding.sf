@@ -10,8 +10,7 @@ func encode (str) {
 
     var output = Chars.new;
 
-    for (chars.range) {
-        var index = _;
+    chars.range.each { |index|
 
         if (i > 0 && (chars[index] != lc)) {
             output.append(i.to_s + (lc.to_s)); i = 0;
@@ -33,9 +32,8 @@ func decode (str) {
     var acc = '';
     var output = '';
 
-    for (chars.range) {
+    chars.range.each { |index|
 
-        var index = _;
         var sc = chars[index].to_s;
 
         if (sc != ' '){

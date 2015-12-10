@@ -260,6 +260,7 @@ scripts/permutations_rec.sf
 'scripts/Project Euler/0071-ordered_fractions.sf'
 'scripts/Project Euler/0076-counting_summations.sf'
 'scripts/Project Euler/0077-prime_summations.sf'
+'scripts/Project Euler/0080-square_root_digital_expansion.sf'
 'scripts/Project Euler/0097-large_non-mersenne_prime.sf'
 'scripts/Project Euler/0120-square_remainders.sf'
 'scripts/Project Euler/0137-fibonacci_golden_nuggets.sf'
@@ -506,9 +507,12 @@ scripts/RosettaCode/word_wrap.sf
 scripts/RosettaCode/zeckendorf_number_representation.sf
 scripts/RosettaCode/zig-zag_matrix.sf
 scripts/sets.sf
+scripts/sierpinski_carpet.sf
 scripts/sierpinski_triangle.sf
 scripts/simple_moving_average.sf
 scripts/simple_moving_average_oo.sf
+scripts/smart_word_wrap.sf
+scripts/smart_word_wrap_simple.sf
 scripts/space_collisions.sf
 scripts/stack.sf
 scripts/stern-brocot_sequence.sf
@@ -695,16 +699,12 @@ scripts/Tests/sidef_executor.sf
 scripts/Tests/sidef_keywords.sf
 scripts/Tests/sidef_to_json.sf
 scripts/Tests/sierpinski_alphabet.sf
-scripts/Tests/sierpinski_carpet.sf
 scripts/Tests/sierpinski_diamond.sf
 scripts/Tests/sierpinski_penta.sf
 scripts/Tests/sierpinski_sidef.sf
-scripts/Tests/sierpinski_triangle.sf
 scripts/Tests/sierpinski_triangle_90.sf
 scripts/Tests/sierpinski_x.sf
 scripts/Tests/smart_match_operator.sf
-scripts/Tests/smart_word_wrap.sf
-scripts/Tests/smart_word_wrap_simple.sf
 scripts/Tests/sort_disjoint_sublist.sf
 scripts/Tests/sort_with_custom_cmp.sf
 scripts/Tests/soundex.sf

@@ -1,0 +1,25 @@
+#!/usr/bin/ruby
+
+# For the first one hundred natural numbers, find the total of the digital sums of the first one hundred decimal digits for all the irrational square roots.
+
+# https://projecteuler.net/problem=80
+
+# Answer: 40886
+
+var sum = 0;
+Math.accuracy(102);
+
+for (1 ..^ 100) { |i|
+
+    var sr = i.sqrt;
+    next if sr.is_int;
+
+    var x = sr.to_s;
+    x -= /\./;
+    x.substr!(0, 100);
+
+    sum += x.to_i.digits.sum;
+}
+
+say sum.int;
+Math.accuracy(0);

@@ -11,7 +11,7 @@ var size = 15;
 
 # we treat any false as white and true as black, so undef is fine for initial all-white grid
 var plane = [];
-for (0 .. size-1) { plane[_] = [] };
+for (0 .. size-1) {|i| plane[i] = [] };
 
 # start out in approximate middle
 var (x, y) = (size/2, size/2);

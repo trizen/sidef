@@ -30,8 +30,8 @@ func decode (encoded) {
 
     var output = '';
 
-    for (encoded) {
-        output += (_[1].to_s * _[0]);
+    for i in (encoded) {
+        output += (i[1].to_s * i[0]);
     }
 
     return(output);
