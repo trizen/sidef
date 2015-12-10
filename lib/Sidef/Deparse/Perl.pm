@@ -645,7 +645,7 @@ HEADER
                 }
 
                 local $self->{class}            = refaddr($block);
-                local $self->{class_name}       = "$obj->{class}::$obj->{name}";
+                local $self->{class_name}       = $package_name;
                 local $self->{parent_name}      = ['class', $package_name];
                 local $self->{package_name}     = $package_name;
                 local $self->{inherit}          = $obj->{inherit} if exists $obj->{inherit};

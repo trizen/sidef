@@ -26,7 +26,7 @@ package Sidef {
             $type = substr($type, rindex($type, '::') + 2);
         }
         else {
-            $type =~ s/^_::main:://
+            $type =~ s/^(?:_::)?main:://
               or $type =~ s/^_:://;
         }
 
