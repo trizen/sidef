@@ -1,6 +1,5 @@
 package Sidef::Module::Func {
 
-    use 5.014;
     our $AUTOLOAD;
 
     sub __NEW__ {
@@ -9,43 +8,6 @@ package Sidef::Module::Func {
     }
 
     sub DESTROY {
-        return;
-    }
-
-    sub __LOCATE__ {
-        my ($self, $name) = @_;
-
-        no strict 'refs';
-        my $mod_space = \%{$self->{module} . '::'};
-
-        if (exists $mod_space->{$name}) {
-            return $self->{module} . '::' . $name;
-        }
-
-        return;
-    }
-
-    sub _var {
-        my ($self, $name) = @_;
-
-        if (defined(my $type = $self->__LOCATE__($name))) {
-            no strict 'refs';
-            return ${$type};
-        }
-
-        warn qq{[WARN] Variable '$name' is not exported by module: "$self->{module}"!\n};
-        return;
-    }
-
-    sub _arr {
-        my ($self, $name) = @_;
-
-        if (defined(my $type = $self->__LOCATE__($name))) {
-            no strict 'refs';
-            return Sidef::Types::Array::Array->new(@{$type});
-        }
-
-        warn qq{[WARN] Array '$name' is not exported by module: "$self->{module}"!\n};
         return;
     }
 
@@ -59,8 +21,8 @@ package Sidef::Module::Func {
             ? (
                map {
                    local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
-                   index(ref($_), 'Sidef::') == 0 ? $_->get_value
-                     : ref($_) eq 'REF' ? ${$_}
+                   index(ref($_), 'Sidef::') == 0
+                     ? $_->get_value
                      : $_
                  } @arg
               )
@@ -69,7 +31,7 @@ package Sidef::Module::Func {
 
         my @results = do {
             local *UNIVERSAL::AUTOLOAD;
-            (\&{$self->{module} . '::' . $func})->(@args);
+            ($self->{module} . '::' . $func)->(@args);
         };
 
         if (@results > 1) {

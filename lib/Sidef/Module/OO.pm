@@ -14,11 +14,8 @@ package Sidef::Module::OO {
 
     sub AUTOLOAD {
         my ($self, @arg) = @_;
-        my ($method) = ($AUTOLOAD =~ /^.*[^:]::(.*)$/);
 
-        if ($method eq '') {
-            return Sidef::Module::Func->__NEW__($self->{module});
-        }
+        my ($method) = ($AUTOLOAD =~ /^.*[^:]::(.*)$/);
 
         my @args = (
             @arg
@@ -27,7 +24,6 @@ package Sidef::Module::OO {
                    local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
                    ref($_) eq __PACKAGE__ ? $_->{module}
                      : index(ref($_), 'Sidef::') == 0 ? $_->get_value
-                     : ref($_) eq 'REF' ? ${$_}
                      : $_
                  } @arg
               )
