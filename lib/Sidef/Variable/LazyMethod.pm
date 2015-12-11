@@ -12,15 +12,22 @@ package Sidef::Variable::LazyMethod {
         bless \%hash, __PACKAGE__;
     }
 
-    {
-        no strict 'refs';
-        foreach my $meth (qw(say print println)) {
-            *{__PACKAGE__ . '::' . $meth} = sub {
-                my $self = shift;
-                local $AUTOLOAD = __PACKAGE__ . '::' . $meth;
-                $self->AUTOLOAD(@_);
-              }
-        }
+    sub to_s {
+        my $self = shift;
+        local $AUTOLOAD = __PACKAGE__ . '::' . 'to_s';
+        $self->AUTOLOAD(@_);
+    }
+
+    sub to_b {
+        my $self = shift;
+        local $AUTOLOAD = __PACKAGE__ . '::' . 'to_b';
+        $self->AUTOLOAD(@_);
+    }
+
+    sub to_n {
+        my $self = shift;
+        local $AUTOLOAD = __PACKAGE__ . '::' . 'to_n';
+        $self->AUTOLOAD(@_);
     }
 
     sub DESTROY { }
