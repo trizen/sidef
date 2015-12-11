@@ -1206,12 +1206,11 @@ HEADER
             }
         }
 
-        my $old_code = $code;
-
         # Method call on the self obj (+optional arguments)
         if (exists $expr->{call}) {
 
-            foreach my $i (0 .. $#{$expr->{call}}) {
+            my $end = $#{$expr->{call}};
+            foreach my $i (0 .. $end) {
 
                 my $call   = $expr->{call}[$i];
                 my $method = $call->{method};
@@ -1299,7 +1298,15 @@ HEADER
 
                         $code =
                           "CORE::sub : lvalue {my \$ref=\\$code; \$\$ref=\$\$ref\->\${\\'$self->{reassign_ops}{$method}'}"
-                          .  $self->deparse_args(@{$call->{arg}}) . "}->()";
+                          . $self->deparse_args(@{$call->{arg}}) . "}->()";
+
+                        #$code =
+                        #    "do {my \$ref="
+                        #  . ($i == 0 ? '\\' : '')
+                        #  . "$code; \$\$ref=\$\$ref\->\${\\'$self->{reassign_ops}{$method}'}"
+                        #  . (exists($call->{arg}) ? $self->deparse_args(@{$call->{arg}}) : '') . "; "
+                        #  . ($i == $end ? '$' : '')
+                        #  . "\$ref}";
 
                         next;
                     }
@@ -1381,6 +1388,15 @@ HEADER
                               . substr($method, 0, -1)
                               . (exists($call->{arg}) ? $self->deparse_args(@{$call->{arg}}) : '') . "}->()";
 
+                            #$code =
+                            #    "do {my \$ref="
+                            #  . ($i == 0 ? '\\' : '')
+                            #  . "$code; \$\$ref=\$\$ref\->"
+                            #  . substr($method, 0, -1)
+                            #  . (exists($call->{arg}) ? $self->deparse_args(@{$call->{arg}}) : '') . "; "
+                            #  . ($i == $end ? '$' : '')
+                            #  . "\$ref}";
+
                             next;
                         }
 
@@ -1421,7 +1437,7 @@ HEADER
                 if (exists $call->{block}) {
 
                     # TODO: move above the deparsing of `Block::If`
-                    if ($ref eq 'Sidef::Types::Block::If' and $i == $#{$expr->{call}}) {
+                    if ($ref eq 'Sidef::Types::Block::If' and $i == $end) {
                         $code = "do {\n" . (' ' x $Sidef::SPACES) . $code . $self->deparse_bare_block(@{$call->{block}}) . '}';
                     }
                     else {
