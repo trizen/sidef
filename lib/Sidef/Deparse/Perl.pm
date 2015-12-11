@@ -1296,10 +1296,11 @@ HEADER
 
                     # Reasign operators, such as: +=, -=, *=, /=, etc...
                     if (exists $self->{reassign_ops}{$method}) {
+
                         $code =
-                            "do { $code=($code->\${\\'$self->{reassign_ops}{$method}'}"
-                          . $self->deparse_args(@{$call->{arg}})
-                          . "); $code }";
+                          "CORE::sub : lvalue {my \$ref=\\$code; \$\$ref=\$\$ref\->\${\\'$self->{reassign_ops}{$method}'}"
+                          .  $self->deparse_args(@{$call->{arg}}) . "}->()";
+
                         next;
                     }
 
@@ -1374,11 +1375,12 @@ HEADER
 
                         # Exclamation mark (!) at the end of a method
                         if (substr($method, -1) eq '!') {
-                            $code = '('
-                              . "$old_code=$code->"
+
+                            $code =
+                                "CORE::sub : lvalue {my \$ref=\\$code; \$\$ref=\$\$ref\->"
                               . substr($method, 0, -1)
-                              . (exists($call->{arg}) ? $self->deparse_args(@{$call->{arg}}) : '')
-                              . ", $old_code" . ')[1]';
+                              . (exists($call->{arg}) ? $self->deparse_args(@{$call->{arg}}) : '') . "}->()";
+
                             next;
                         }
 
