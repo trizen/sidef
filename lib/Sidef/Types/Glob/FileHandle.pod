@@ -265,8 +265,6 @@ FileHandle.sysseek() -> I<Obj>
 
 Return the
 
-Aliases: I<sysSeek>
-
 =cut
 
 =head2 syswrite
@@ -315,7 +313,7 @@ I<Obj> B<«> I<Obj> -> I<Obj>
 
 Return the
 
-Aliases: I<E<lt>E<lt>>, I<output_from>
+Aliases: I<E<lt>E<lt>>, I<write_from>
 
 =cut
 

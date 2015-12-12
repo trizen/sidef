@@ -31,25 +31,25 @@ Return the
 
 =cut
 
-=head2 print
+=head2 to_b
 
-LazyMethod.print() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 println
-
-LazyMethod.println() -> I<Obj>
+LazyMethod.to_b() -> I<Obj>
 
 Return the
 
 =cut
 
-=head2 say
+=head2 to_n
 
-LazyMethod.say() -> I<Obj>
+LazyMethod.to_n() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 to_s
+
+LazyMethod.to_s() -> I<Obj>
 
 Return the
 
