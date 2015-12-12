@@ -525,6 +525,7 @@ scripts/Tests/array_compare.sf
 scripts/Tests/array_unique.sf
 scripts/Tests/arrays.sf
 scripts/Tests/arrays_intersection.sf
+scripts/Tests/autovivification.sf
 scripts/Tests/averages_mode.sf
 scripts/Tests/avg_mode.sf
 scripts/Tests/balanced_brakets.sf

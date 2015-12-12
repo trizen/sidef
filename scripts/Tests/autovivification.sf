@@ -1,0 +1,34 @@
+#!/usr/bin/ruby
+
+#
+## Array
+#
+
+var a = [];
+a[0]{:foo}[1][2]{:bar}{:baz} = 42;
+say a;
+
+var a1 = [Hash("foo" => [nil, [nil, nil, Hash("bar" => Hash("baz" => 42))]])];
+
+assert_eq(a, a1);
+assert(a[0].is_a(Hash));
+assert_eq(a[0]{:foo}[1][2]{:bar}{:baz}, 42);
+assert_eq(a[0]{:foo}[1][2]{:bar}, Hash(baz => 42));
+assert_eq(a[0]{:foo}[1][2], Hash(bar => Hash(baz => 42)));
+
+#
+## Hash
+#
+
+var b = Hash();
+b{:foo}[2]{:bar}{:baz}[1][2] = 42;
+say b;
+
+var b1 = Hash("foo" => [nil, nil, Hash("bar" => Hash("baz" => [nil, [nil, nil, 42]]))]);
+
+assert_eq(b, b1);
+assert(b{:foo}.is_a(Array));
+assert_eq(b{:foo}[2]{:bar}{:baz}[1][2], 42);
+assert_eq(b{:foo}[2]{:bar}{:baz}[1], [nil, nil, 42]);
+
+say "** Test passed!"

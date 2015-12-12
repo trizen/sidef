@@ -731,17 +731,16 @@ package Sidef::Optimizer {
                 (exists($expr->{call})   ? (call   => []) : ()),
                };
 
-        # Array indices
+        # Array and hash indices
         if (exists $expr->{ind}) {
             foreach my $i (0 .. $#{$expr->{ind}}) {
-                $obj->{ind}[$i] = [map { $self->optimize_expr($_) } @{$expr->{ind}[$i]}];
-            }
-        }
-
-        # Hash lookup
-        if (exists $expr->{lookup}) {
-            foreach my $i (0 .. $#{$expr->{lookup}}) {
-                $obj->{lookup}[$i] = [map { ref($_) eq 'HASH' ? $self->optimize_expr($_) : $_ } @{$expr->{lookup}[$i]}];
+                my $ind = $expr->{ind}[$i];
+                if (exists $ind->{array}) {
+                    $obj->{ind}[$i]{array} = [map { ref($_) eq 'HASH' ? $self->optimize_expr($_) : $_ } @{$ind->{array}}];
+                }
+                else {
+                    $obj->{ind}[$i]{hash} = [map { ref($_) eq 'HASH' ? $self->optimize_expr($_) : $_ } @{$ind->{hash}}];
+                }
             }
         }
 

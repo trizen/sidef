@@ -577,20 +577,19 @@ package Sidef::Deparse::Sidef {
             }
         }
 
-        # Indices
+        # Array and hash indices
         if (exists $expr->{ind}) {
             foreach my $ind (@{$expr->{ind}}) {
-                $code .= $self->_dump_array($ind);
-            }
-        }
-
-        if (exists $expr->{lookup}) {
-            foreach my $lookup (@{$expr->{lookup}}) {
-                $code .= '{'
-                  . join(',',
-                         map { ref($_) eq 'HASH' ? ($self->deparse_expr($_)) : $self->deparse_generic('', '', '', $_) }
-                           @{$lookup})
-                  . '}';
+                if (exists $ind->{array}) {
+                    $code .= $self->_dump_array($ind->{array});
+                }
+                else {
+                    $code .= '{'
+                      . join(',',
+                             map { ref($_) eq 'HASH' ? ($self->deparse_expr($_)) : $self->deparse_generic('', '', '', $_) }
+                               @{$ind->{hash}})
+                      . '}';
+                }
             }
         }
 

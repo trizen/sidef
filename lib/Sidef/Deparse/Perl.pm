@@ -1162,46 +1162,48 @@ HEADER
             $code = qq{CORE::die "Unimplemented at " . } . $self->_dump_string($obj->{file}) . qq{. " line $obj->{line}\\n"};
         }
 
-        # Array indices
+        # Array and hash indices
         if (exists $expr->{ind}) {
             my $limit = $#{$expr->{ind}};
             foreach my $i (0 .. $limit) {
+
                 my $ind = $expr->{ind}[$i];
+                if (exists $ind->{array}) {
 
-                if (substr($code, -1) eq '@') {
-                    $code .= $self->_dump_unpacked_indices($ind);
-                }
-                elsif ($#{$ind} > 0) {
-                    $code = '@{' . $code . '}' . $self->_dump_indices($ind);
+                    my $pos = $ind->{array};
+
+                    if (substr($code, -1) eq '@') {
+                        $code .= $self->_dump_unpacked_indices($pos);
+                    }
+                    elsif ($#{$pos} > 0) {
+                        $code = '@{' . $code . '}' . $self->_dump_indices($pos);
+                    }
+                    else {
+                        $code .= '->' . $self->_dump_indices($pos);
+                    }
                 }
                 else {
-                    $code .= '->' . $self->_dump_indices($ind);
+
+                    my $key = $ind->{hash};
+
+                    if (substr($code, -1) eq '@') {
+                        $code .= $self->_dump_unpacked_lookups($key);
+                    }
+                    elsif ($#{$key} > 0) {
+                        $code = '@{' . $code . '}' . $self->_dump_lookups($key);
+                    }
+                    else {
+                        $code .= '->' . $self->_dump_lookups($key);
+                    }
                 }
 
-                if ($i < $limit and $#{$ind} == 0) {
-                    $code = '(' . $code . ' //= Sidef::Types::Array::Array->new' . ')';
-                }
-            }
-        }
-
-        # Hash lookup
-        if (exists $expr->{lookup}) {
-            my $limit = $#{$expr->{lookup}};
-            foreach my $i (0 .. $limit) {
-                my $key = $expr->{lookup}[$i];
-
-                if (substr($code, -1) eq '@') {
-                    $code .= $self->_dump_unpacked_lookups($key);
-                }
-                elsif ($#{$key} > 0) {
-                    $code = '@{' . $code . '}' . $self->_dump_lookups($key);
-                }
-                else {
-                    $code .= '->' . $self->_dump_lookups($key);
-                }
-
-                if ($i < $limit and $#{$key} == 0) {
-                    $code = '(' . $code . ' //= Sidef::Types::Hash::Hash->new' . ')';
+                if ($i < $limit) {
+                    if ($expr->{ind}[$i + 1]{array}) {
+                        $code = '(' . $code . ' //= Sidef::Types::Array::Array->new' . ')';
+                    }
+                    else {
+                        $code = '(' . $code . ' //= Sidef::Types::Hash::Hash->new' . ')';
+                    }
                 }
             }
         }
