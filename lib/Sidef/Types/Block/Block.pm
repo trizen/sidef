@@ -22,6 +22,7 @@ package Sidef::Types::Block::Block {
         my ($self, @args) = @_;
 
       OUTER: foreach my $method ($self, (exists($self->{kids}) ? @{$self->{kids}} : ())) {
+
             my $table = $self->{table};
 
             my %seen;
@@ -112,7 +113,7 @@ package Sidef::Types::Block::Block {
                 }
             }
 
-            return ($method, $method->{code}(@pos_args));
+            return ($method, $method->{code}->(@pos_args));
         }
 
         my $name = Sidef::normalize_type($self->{name} // '__ANON__');
@@ -150,6 +151,11 @@ package Sidef::Types::Block::Block {
 
     sub call {
         my ($block, @args) = @_;
+
+        # Handle block calls
+        if ($block->{type} eq 'block') {
+            return $block->{code}->(@args);
+        }
 
         my ($self, @objs) = $block->_multiple_dispatch(@args);
 
@@ -195,7 +201,7 @@ package Sidef::Types::Block::Block {
                 local *UNIVERSAL::AUTOLOAD = $ref;
                 if (defined($a) || defined($b)) { push @args, $a, $b }
                 elsif (defined($_)) { unshift @args, $_ }
-                $self->run(map { Sidef::Perl::Perl->to_sidef($_) } @args);
+                $self->call(map { Sidef::Perl::Perl->to_sidef($_) } @args);
             };
         }
     }
@@ -210,7 +216,7 @@ package Sidef::Types::Block::Block {
 
         open my $str_h, '>:utf8', \my $str;
         if (defined(my $old_h = select($str_h))) {
-            $self->run;
+            $self->{code}->();
             close $str_h;
             select $old_h;
         }
@@ -253,20 +259,20 @@ package Sidef::Types::Block::Block {
 
     sub _run_code {
         my ($self, @args) = @_;
-        my $result = $self->run(@args);
+        my $result = $self->{code}->(@args);
         ref($result) eq 'Sidef::Types::Block::Return' ? $result : ();
     }
 
     sub exec {
         my ($self) = @_;
-        $self->run;
+        $self->{code}->();
         $self;
     }
 
     sub while {
         my ($self, $condition) = @_;
 
-        while ($condition->run) {
+        while ($condition->{code}->()) {
             if (defined(my $res = $self->_run_code)) {
                 return $res;
             }
@@ -291,7 +297,7 @@ package Sidef::Types::Block::Block {
         my ($self, $bool) = @_;
 
         if ($bool) {
-            return $self->run;
+            return $self->{code}->();
         }
 
         $bool;
@@ -307,7 +313,7 @@ package Sidef::Types::Block::Block {
         my $pid = fork() // die "[FATAL ERROR]: cannot fork";
         if ($pid == 0) {
             srand();
-            my $obj = $self->run;
+            my $obj = $self->{code}->();
             ref($obj) && Storable::store_fd($obj, $fh);
             exit 0;
         }
@@ -324,7 +330,7 @@ package Sidef::Types::Block::Block {
         my $pid = CORE::fork() // die "[FATAL ERROR]: cannot fork";
         if ($pid == 0) {
             srand();
-            $self->run;
+            $self->{code}->();
             exit 0;
         }
 
@@ -340,7 +346,7 @@ package Sidef::Types::Block::Block {
             *threads::wait = \&threads::join;
             1;
         };
-        threads->create(sub { $self->run });
+        threads->create(sub { $self->{code}->() });
     }
 
     *thr = \&thread;

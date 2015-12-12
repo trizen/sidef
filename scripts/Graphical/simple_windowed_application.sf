@@ -8,7 +8,7 @@ require('Gtk2') -> init;
 
 # Window.
 var window = %s'Gtk2::Window'.new;
-window.signal_connect('destroy' => func(_) { %s'Gtk2'.main_quit });
+window.signal_connect('destroy' => { %s'Gtk2'.main_quit });
 
 # VBox.
 var vbox = %s'Gtk2::VBox'.new(0, 0);
@@ -22,7 +22,7 @@ vbox.add(label);
 var count = 0;
 var button = %s'Gtk2::Button'.new(' Click Me ');
 vbox.add(button);
-button.signal_connect('clicked' => func(_) {
+button.signal_connect('clicked' => {
     label.set_text(++count);
 });
 
