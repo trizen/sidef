@@ -37,10 +37,8 @@ package Sidef::Types::Glob::DirHandle {
         Sidef::Types::Array::Array->new(@files);
     }
 
-    *getFiles = \&get_files;
     *read_dir = \&get_files;
     *readdir  = \&get_files;
-    *readDir  = \&get_files;
     *entries  = \&get_files;
 
     sub get_file {
@@ -73,7 +71,6 @@ package Sidef::Types::Glob::DirHandle {
         return;
     }
 
-    *getFile = \&get_file;
     *read    = \&get_file;
 
     sub tell {

@@ -63,7 +63,7 @@ DirHandle.entries() -> I<Obj>
 
 Return the
 
-Aliases: I<read_dir>, I<readdir>, I<readDir>, I<get_files>, I<getFiles>
+Aliases: I<read_dir>, I<readdir>, I<get_files>
 
 =cut
 
@@ -81,7 +81,7 @@ DirHandle.read() -> I<Obj>
 
 Return the
 
-Aliases: I<get_file>, I<getFile>
+Aliases: I<get_file>
 
 =cut
 
