@@ -7,14 +7,14 @@
 # Author: Daniel "Trizen" Șuteu
 # License: GPLv3
 # Date: 17 May 2014
-# Latest edit on: 28 November 2015
+# Latest edit on: 12 December 2015
 # Website: https://github.com/trizen/smart-units
 
 #
 ## Requires Sidef: https://github.com/trizen/sidef
 #
 
-define VERSION = 0.04;
+define VERSION = 0.05;
 
 func more_help {
     print <<"HELP";
@@ -55,73 +55,74 @@ HELP
 class Units(precision = 2) {
     static conversions = :(
         mass => :(  # all relative to 1 kilogram
-            grams     => :(re => /^(?:grams?|gr)$/i,         factor => 1e-3),
-            quintals  => :(re => /^(?:quintals?)$/i,         factor => 1e2),
-            tonnes    => :(re => /^(?:tonn?es?|(?-i:t))$/i,  factor => 1e3),
-            kilograms => :(re => /^(?:kg|kilograms?)$/i,     factor => 1),
-            pounds    => :(re => /^(?:pounds?|lbs)$/i,       factor => 0.45359237),
+            grams     => :(re => /^(grams?|gr)$/in,         factor => 1e-3),
+            quintals  => :(re => /^(quintals?)$/in,         factor => 1e2),
+            tonnes    => :(re => /^(tonn?es?|(?-i:t))$/in,  factor => 1e3),
+            kilograms => :(re => /^(kg|kilograms?)$/in,     factor => 1),
+            pounds    => :(re => /^(pounds?|lbs)$/in,       factor => 0.45359237),
         ),
         temperature => :(   # using Celsius as the standard
-            celsius    => :(re => /^(?:celsius|(?-i:C))$/i,    code => {|n, _| n} ),
-            kelvin     => :(re => /^(?:kelvin|(?-i:K))$/i,     code => {|n, to| to ? (n + 273.15) : (-273.15 + n)} ),
-            fahrenheit => :(re => /^(?:fahrenheit|(?-i:F))$/i, code => {|n, to| to ? (32 + n*9/5) : ((n - 32) * 5/9)} ),
+            celsius    => :(re => /^(celsius|(?-i:C))$/in,    code => {|n, _| n} ),
+            kelvin     => :(re => /^(kelvin|(?-i:K))$/in,     code => {|n, to| to ? (n + 273.15) : (-273.15 + n)} ),
+            fahrenheit => :(re => /^(fahrenheit|(?-i:F))$/in, code => {|n, to| to ? (32 + n*9/5) : ((n - 32) * 5/9)} ),
+            rankine    => :(re => /^(rankine|(?-i:R))$/in,    code => {|n, to| to ? ((n + 273.15) * 9/5) : (n*5/9 - 273.15)} ),
         ),
         time => :(  # all relative to 1 second
-            nanoseconds  => :(re => /^(?:nanosec(?:ond)?s?|(?-i:ns))/i,     factor => 1e-9),
-            microseconds => :(re => /^(?:microsec(?:ond)?s?|(?-i:us))/i,    factor => 1e-6),
-            milliseconds => :(re => /^(?:mill?isec(?:ond)?s?|(?-i:ms))$/i,  factor => 1e-3),
-            seconds      => :(re => /^(?:sec(?:ond)?s?|(?-i:s))$/i,         factor => 1),
-            minutes      => :(re => /^(?:min(?:ute)?s?)$/i,                 factor => 60),
-            moments      => :(re => /^(?:mom(?:ent)?s?)$/i,                 factor => 90),
-            hours        => :(re => /^(?:hours?)$/i,                        factor => 3600),
-            days         => :(re => /^(?:days?)$/i,                         factor => 86400),
-            millidays    => :(re => /^(?:millidays?|(?-i:md))$/i,           factor => 86.4),
-            weeks        => :(re => /^(?:weeks?)$/i,                        factor => 604800),
-            months       => :(re => /^(?:mon(?:th)?s?)$/i,                  factor => 2629743.83),
-            years        => :(re => /^(?:years?)$/i,                        factor => 31556952),
+            nanoseconds  => :(re => /^(nanosec(ond)?s?|(?-i:ns))/in,     factor => 1e-9),
+            microseconds => :(re => /^(microsec(ond)?s?|(?-i:us))/in,    factor => 1e-6),
+            milliseconds => :(re => /^(mill?isec(ond)?s?|(?-i:ms))$/in,  factor => 1e-3),
+            seconds      => :(re => /^(sec(ond)?s?|(?-i:s))$/in,         factor => 1),
+            minutes      => :(re => /^(min(ute)?s?)$/in,                 factor => 60),
+            moments      => :(re => /^(mom(ent)?s?)$/in,                 factor => 90),
+            hours        => :(re => /^(hours?)$/in,                      factor => 3600),
+            days         => :(re => /^(days?)$/in,                       factor => 86400),
+            millidays    => :(re => /^(millidays?|(?-i:md))$/in,         factor => 86.4),
+            weeks        => :(re => /^(weeks?)$/in,                      factor => 604800),
+            months       => :(re => /^(mon(th)?s?)$/in,                  factor => 2629743.83),
+            years        => :(re => /^(years?)$/in,                      factor => 31556952),
         ),
         velocity    => :( # all relative to 1 meter / second
-            meters_per_second     => :(re => /^(?:m(?:et(?:er|re)s?)?\/s(?:ec)?|m(?:et(?:er|re)s?)?\s+per\s+sec(?:ond)?)$/i,  factor => 1),
-            miles_per_hour        => :(re => /^(?:mph|mi(?:les?)?\/h|mi(?:les?)?\s+per\s+hour)$/i,                            factor => 0.44704),
-            miles_per_minute      => :(re => /^(?:mpm|mi(?:les?)?\/min|mi(?:les?)?\s+per\s+min(?:ute)?)$/i,                   factor => 26.8224),
-            miles_per_second      => :(re => /^(?:mps|mi(?:les?)?\/s(?:ec)?|mi(?:les?)?\s+per\s+sec(?:ond)?)$/i,              factor => 1609.344),
-            kilometers_per_hour   => :(re => /^(?:kph|km[\/p]h|(?:kilomet(?:er|re)s|km)\s+per\s+hour)$/i,                     factor => 1 / 3.6),
-            metres_per_hour       => :(re => /^(?:m(?:eters?)?\/h|(?:metres?|m)\s+per\s+hour)$/i,                             factor => 1 / 3600),
-            kilometers_per_second => :(re => /^(?:kph|km\/s(?:ec)?|(?:kilomet(?:er|re)s|km)\s+per\s+sec(?:ond)?)$/i,          factor => 1e3),
-            speed_of_light        => :(re => /^(?:speed\s+of\s+light|(?-i:c))$/i,                                             factor => 299792458),
-            speed_of_sound        => :(re => /^(?:speed\s+of\s+sound)$/i,                                                     factor => 340.29),
+            meters_per_second     => :(re => /^ m(et(er|re)s?)? (\/|\s+per\s+) s(ec(ond)?)? $/inx,                  factor => 1),
+            miles_per_hour        => :(re => /^ ( mph | mi(les?)? (\/|\s+per\s+) h(our)? ) $/inx,                   factor => 0.44704),
+            miles_per_minute      => :(re => /^ ( mpm | mi(les?)? (\/|\s+per\s+) m(in(ute)?)? )$/inx,               factor => 26.8224),
+            miles_per_second      => :(re => /^ ( mps | mi(les?)? (\/|\s+per\s+) s(ec(ond)?)? )$/inx,               factor => 1609.344),
+            kilometers_per_hour   => :(re => /^ ( kph | k(ilo)?m(et(er|re)s?)? (\/|\s+per\s+) h(our)? )$/inx,       factor => 1 / 3.6),
+            metres_per_hour       => :(re => /^ ( m(et(er|re)s?)? (\/|\s+per\s+) h(our)? ) $/inx,                   factor => 1 / 3600),
+            kilometers_per_second => :(re => /^ ( kph | k(ilo)?m(et(er|re)s?)? (\/|\s+per\s+) s(ec(ond)?)? ) $/inx, factor => 1e3),
+            speed_of_light        => :(re => /^ ( speed\s+of\s+light|(?-i:c) ) $/inx,                               factor => 299792458),
+            speed_of_sound        => :(re => /^ ( speed\s+of\s+sound ) $/inx,                                       factor => 340.29),
         ),
         length      => :(   # all relative to 1 meter
-            kilometers       => :(re => /^(?:kilomet(?:er|re)s?|km)$/i,       factor => 1e3),
-            meters           => :(re => /^(?:met(?:er|re)s?|(?-i:m))$/i,      factor => 1),
-            centimetres      => :(re => /^(?:centimet(?:er|re)s?|cm)$/i,      factor => 1e-2),
-            millimetres      => :(re => /^(?:millimet(?:er|re)s?|mm)$/i,      factor => 1e-3),
-            micrometres      => :(re => /^(?:micromet(?:er|re)s?|um)$/i,      factor => 1e-6),
-            nanometres       => :(re => /^(?:nanomet(?:er|re)s?|nm)$/i,       factor => 1e-9),
-            picometres       => :(re => /^(?:picomet(?:er|re)s?|pm)$/i,       factor => 1e-12),
-            femtometres      => :(re => /^(?:femtomet(?:er|re)s?|fm)$/i,      factor => 1e-15),
-            feet             => :(re => /^(?:feet|ft|foot)$/i,                factor => 0.304799735),
-            inches           => :(re => /^(?:inch(?:es)?|in|")$/i,            factor => 0.0254),
-            miles            => :(re => /^(?:miles?|mi)$/i,                   factor => 1609.344),
-            yards            => :(re => /^(?:yards?|yd)$/i,                   factor => 0.9144),
-            astronomic_units => :(re => /^(?:astronomic[-\s]*units?|AU)$/i,   factor => 149597870700),
-            light_seconds    => :(re => /^(?:light[-\s]*sec(?:ond)?s?|ls)$/i, factor => 299792458),
-            light_minutes    => :(re => /^(?:light[-\s]*min(?:ute)?s?|lm)$/i, factor => 1.798754748e10),
-            light_hours      => :(re => /^(?:light[-\s]*hours?|lh)$/i,        factor => 1.0792528488e12),
-            light_days       => :(re => /^(?:light[-\s]*days?|ld)$/i,         factor => 2.59020683712e13),
-            light_years      => :(re => /^(?:light[-\s]*years?|LY)$/i,        factor => 9.4607304725808e15),
+            kilometers       => :(re => /^k(ilo)?m(et(er|re)s?)?$/in,      factor => 1e3),
+            meters           => :(re => /^m(et(er|re)s?)?$/in,             factor => 1),
+            centimetres      => :(re => /^(centimet(er|re)s?|cm)$/in,      factor => 1e-2),
+            millimetres      => :(re => /^(millimet(er|re)s?|mm)$/in,      factor => 1e-3),
+            micrometres      => :(re => /^(micromet(er|re)s?|um)$/in,      factor => 1e-6),
+            nanometres       => :(re => /^(nanomet(er|re)s?|nm)$/in,       factor => 1e-9),
+            picometres       => :(re => /^(picomet(er|re)s?|pm)$/in,       factor => 1e-12),
+            femtometres      => :(re => /^(femtomet(er|re)s?|fm)$/in,      factor => 1e-15),
+            feet             => :(re => /^(feet|ft|foot)$/in,              factor => 0.304799735),
+            inches           => :(re => /^(inch(es)?|in|")$/in,            factor => 0.0254),
+            miles            => :(re => /^(miles?|mi)$/in,                 factor => 1609.344),
+            yards            => :(re => /^(yards?|yd)$/in,                 factor => 0.9144),
+            astronomic_units => :(re => /^(astronomic[-\s]*units?|AU)$/in, factor => 149597870700),
+            light_seconds    => :(re => /^(light[-\s]*sec(ond)?s?|ls)$/in, factor => 299792458),
+            light_minutes    => :(re => /^(light[-\s]*min(ute)?s?|lm)$/in, factor => 1.798754748e10),
+            light_hours      => :(re => /^(light[-\s]*hours?|lh)$/in,      factor => 1.0792528488e12),
+            light_days       => :(re => /^(light[-\s]*days?|ld)$/in,       factor => 2.59020683712e13),
+            light_years      => :(re => /^(light[-\s]*years?|ly)$/in,      factor => 9.4607304725808e15),
         ),
         information   => :( # all relative to 1 byte
-            bits           => :(re => /^(?:bits?)$/i,            factor => 1 / 8),
-            bytes          => :(re => /^(?:bytes?)$/i,           factor => 1),
-            kilobytes      => :(re => /^(?:kilobytes?|ki?b)$/i,  factor => 1024 ** 1),
-            megabytes      => :(re => /^(?:megabytes?|mi?b)$/i,  factor => 1024 ** 2),
-            gigabytes      => :(re => /^(?:gigabytes?|gi?b)$/i,  factor => 1024 ** 3),
-            terabytes      => :(re => /^(?:terabytes?|ti?b)$/i,  factor => 1024 ** 4),
-            petabytes      => :(re => /^(?:petabytes?|pi?b)$/i,  factor => 1024 ** 5),
-            exabytes       => :(re => /^(?:exabytes?|ei?b)$/i,   factor => 1024 ** 6),
-            zettabytes     => :(re => /^(?:zettabytes?|zi?b)$/i, factor => 1024 ** 7),
-            yottabytes     => :(re => /^(?:yottabytes?|yi?b)$/i, factor => 1024 ** 8),
+            bits           => :(re => /^(bits?)$/in,            factor => 1 / 8),
+            bytes          => :(re => /^(bytes?)$/in,           factor => 1),
+            kilobytes      => :(re => /^(kilobytes?|ki?b)$/in,  factor => 1024 ** 1),
+            megabytes      => :(re => /^(megabytes?|mi?b)$/in,  factor => 1024 ** 2),
+            gigabytes      => :(re => /^(gigabytes?|gi?b)$/in,  factor => 1024 ** 3),
+            terabytes      => :(re => /^(terabytes?|ti?b)$/in,  factor => 1024 ** 4),
+            petabytes      => :(re => /^(petabytes?|pi?b)$/in,  factor => 1024 ** 5),
+            exabytes       => :(re => /^(exabytes?|ei?b)$/in,   factor => 1024 ** 6),
+            zettabytes     => :(re => /^(zettabytes?|zi?b)$/in, factor => 1024 ** 7),
+            yottabytes     => :(re => /^(yottabytes?|yi?b)$/in, factor => 1024 ** 8),
         ),
     );
 
@@ -191,6 +192,10 @@ while (!ARGV.is_empty) {
     }
 }
 
+if (cmd.is_empty && STDIN.is_on_tty) {
+    interactive = true;
+}
+
 var units = Units(precision);
 
 func main(command) {
@@ -236,6 +241,11 @@ Welcome to smart-units #{VERSION} in interactive mode.
 EOT
     loop {
         var line = read(">> ", String) \\ break;
+
+        if (line ~~ ['q', 'exit']) {
+            break
+        }
+
         main(line)
     }
 }

@@ -201,8 +201,6 @@ package Sidef::Types::Glob::FileHandle {
         Sidef::Types::Bool::Bool->new(sysseek($self->{fh}, $pos->get_value, $whence->get_value));
     }
 
-    *sysSeek = \&sysseek;
-
     sub fileno {
         my ($self) = @_;
         Sidef::Types::Number::Number->new(fileno($self->{fh}));
@@ -278,7 +276,7 @@ package Sidef::Types::Glob::FileHandle {
         $self;
     }
 
-    sub output_from {
+    sub write_from {
         my ($self, $string) = @_;
         CORE::print {$self->{fh}} $string;
         $self;
@@ -288,8 +286,8 @@ package Sidef::Types::Glob::FileHandle {
         no strict 'refs';
         *{__PACKAGE__ . '::' . '>>'}  = \&read_to;
         *{__PACKAGE__ . '::' . '»'}  = \&read_to;
-        *{__PACKAGE__ . '::' . '<<'}  = \&output_from;
-        *{__PACKAGE__ . '::' . '«'}  = \&output_from;
+        *{__PACKAGE__ . '::' . '<<'}  = \&write_from;
+        *{__PACKAGE__ . '::' . '«'}  = \&write_from;
         *{__PACKAGE__ . '::' . '<=>'} = \&compare;
     }
 
