@@ -79,7 +79,7 @@ package Sidef::Parser {
                      | Bytes\b                        (?{ state $x = Sidef::Types::Byte::Bytes->new })
                      | Time\b                         (?{ state $x = Sidef::Time::Time->new })
                      | Complex\b                      (?{ state $x = Sidef::Types::Number::Complex->new })
-                     | (?:Sig|SIG)\b                  (?{ state $x = Sidef::Sys::SIG->new })
+                     | Sig\b                          (?{ state $x = Sidef::Sys::Sig->new })
                      | Chars\b                        (?{ state $x = Sidef::Types::Char::Chars->new })
                      | Char\b                         (?{ state $x = Sidef::Types::Char::Char->new })
                      | Graphemes\b                    (?{ state $x = Sidef::Types::Grapheme::Graphemes->new })
@@ -199,7 +199,7 @@ package Sidef::Parser {
                   Grapheme Graphemes
                   Bool
                   Sys
-                  Sig SIG
+                  Sig
                   Regex Regexp
                   Time
                   Perl

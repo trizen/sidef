@@ -1034,7 +1034,7 @@ HEADER
         elsif ($ref eq 'Sidef::Time::Time') {
             $code = $ref . '->new';
         }
-        elsif ($ref eq 'Sidef::Sys::SIG') {
+        elsif ($ref eq 'Sidef::Sys::Sig') {
             $code = $self->make_constant($ref, 'new', "Sig$refaddr");
         }
         elsif ($ref eq 'Sidef::Types::Number::Complex') {

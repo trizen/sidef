@@ -1,4 +1,4 @@
-package Sidef::Sys::SIG {
+package Sidef::Sys::Sig {
 
     sub new {
         bless {}, __PACKAGE__;

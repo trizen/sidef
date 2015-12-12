@@ -463,7 +463,7 @@ package Sidef::Deparse::Sidef {
         elsif ($ref eq 'Sidef::Time::Time') {
             $code = 'Time';
         }
-        elsif ($ref eq 'Sidef::Sys::SIG') {
+        elsif ($ref eq 'Sidef::Sys::Sig') {
             $code = 'Sig';
         }
         elsif ($ref eq 'Sidef::Types::Number::Number') {

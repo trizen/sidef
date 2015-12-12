@@ -17,8 +17,8 @@ lib/Sidef/Optimizer.pm
 lib/Sidef/Parser.pm
 lib/Sidef/Perl/Perl.pm
 lib/Sidef/Perl/Perl.pod
-lib/Sidef/Sys/SIG.pm
-lib/Sidef/Sys/SIG.pod
+lib/Sidef/Sys/Sig.pm
+lib/Sidef/Sys/Sig.pod
 lib/Sidef/Sys/Sys.pm
 lib/Sidef/Sys/Sys.pod
 lib/Sidef/Time/Gmtime.pm

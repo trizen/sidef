@@ -2,7 +2,7 @@
 
 # Make the filenames portable to almost any filesystem
 
-SIG.__WARN__ { |msg| die msg };     # make warnings fatal
+Sig.__WARN__ { |msg| die msg };     # make warnings fatal
 
 var f = frequire('File::Find');
 var u = frequire('Text::Unidecode');

@@ -89,8 +89,8 @@
       "Sidef::Perl::Perl" : {
          "file" : "lib/Sidef/Perl/Perl.pm"
       },
-      "Sidef::Sys::SIG" : {
-         "file" : "lib/Sidef/Sys/SIG.pm"
+      "Sidef::Sys::Sig" : {
+         "file" : "lib/Sidef/Sys/Sig.pm"
       },
       "Sidef::Sys::Sys" : {
          "file" : "lib/Sidef/Sys/Sys.pm"

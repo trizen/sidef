@@ -38,8 +38,8 @@ provides:
     file: lib/Sidef/Parser.pm
   Sidef::Perl::Perl:
     file: lib/Sidef/Perl/Perl.pm
-  Sidef::Sys::SIG:
-    file: lib/Sidef/Sys/SIG.pm
+  Sidef::Sys::Sig:
+    file: lib/Sidef/Sys/Sig.pm
   Sidef::Sys::Sys:
     file: lib/Sidef/Sys/Sys.pm
   Sidef::Time::Gmtime:
@@ -144,4 +144,4 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
 version: '2.12'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.016'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
