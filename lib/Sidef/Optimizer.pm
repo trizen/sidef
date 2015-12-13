@@ -721,15 +721,14 @@ package Sidef::Optimizer {
             }
         }
 
-        if (not exists($expr->{ind}) and not exists($expr->{lookup}) and not exists($expr->{call})) {
+        if (not exists($expr->{ind}) and not exists($expr->{call})) {
             return (ref($obj) eq 'HASH' ? {self => $obj} : $obj);
         }
 
         $obj = {
                 self => $obj,
-                (exists($expr->{ind})    ? (ind    => []) : ()),
-                (exists($expr->{lookup}) ? (lookup => []) : ()),
-                (exists($expr->{call})   ? (call   => []) : ()),
+                (exists($expr->{ind})  ? (ind  => []) : ()),
+                (exists($expr->{call}) ? (call => []) : ()),
                };
 
         # Array and hash indices
@@ -793,7 +792,6 @@ package Sidef::Optimizer {
                 if (    defined($ref_obj)
                     and exists($rules{$ref_obj})
                     and not exists($expr->{ind})
-                    and not exists($expr->{lookup})
                     and ref($method) eq '') {
 
                     my $code = $ref_obj->SUPER::can($method);
@@ -849,7 +847,7 @@ package Sidef::Optimizer {
 
             if ($count > 0) {
                 if ($count == @{$obj->{call}}) {
-                    if (not exists $expr->{ind} and not exists $expr->{lookup}) {
+                    if (not exists $expr->{ind}) {
                         return $obj->{self};
                     }
                     else {
