@@ -216,6 +216,7 @@ package Sidef::Optimizer {
                    round roundf
                    digit
                    nok
+                   modinv
                    rdiv
                    is_div
 

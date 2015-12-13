@@ -64,6 +64,13 @@ package Sidef::Types::Number::Number {
 
     *expmod = \&modpow;
 
+    sub modinv {
+        my ($self, $mod) = @_;
+        $self->new($$self->as_int->bmodinv($mod->get_value->as_int));
+    }
+
+    *invmod = \&modinv;
+
     sub pow {
         my ($self, $num) = @_;
         $self->new($$self->copy->bpow($num->get_value));

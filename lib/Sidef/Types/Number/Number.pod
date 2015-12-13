@@ -482,6 +482,16 @@ Aliases: I<to_i>, I<as_int>, I<to_int>
 
 =cut
 
+=head2 invmod
+
+Number.invmod() -> I<Obj>
+
+Return the
+
+Aliases: I<modinv>
+
+=cut
+
 =head2 is_even
 
 Number.is_even() -> I<Obj>

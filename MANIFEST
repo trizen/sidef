@@ -337,6 +337,7 @@ scripts/RosettaCode/formatted_numeric_output.sf
 scripts/RosettaCode/formatted_numeric_output_1.sf
 scripts/RosettaCode/function_composition.sf
 scripts/RosettaCode/function_definition.sf
+scripts/RosettaCode/function_frequency.sf
 scripts/RosettaCode/gamma_function.sf
 scripts/RosettaCode/gamma_function_1.sf
 scripts/RosettaCode/general_fizzbuzz.sf
@@ -400,6 +401,7 @@ scripts/RosettaCode/maze_generation.sf
 scripts/RosettaCode/md5.sf
 scripts/RosettaCode/md5_1.sf
 scripts/RosettaCode/middle_three_digits.sf
+scripts/RosettaCode/modular_inverse.sf
 scripts/RosettaCode/move_to_front_algorithm_1.sf
 scripts/RosettaCode/move_to_front_algorithm_2.sf
 scripts/RosettaCode/multifactorial.sf
