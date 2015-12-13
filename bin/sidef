@@ -592,7 +592,7 @@ sub compile_to_perl {
     my (%opt) = @_;
 
     require File::Basename;
-    my $path = File::Basename::dirname($INC{'Sidef.pm'});
+    my $path = File::Spec->catdir(File::Basename::dirname($INC{'Sidef.pm'}), 'Sidef');
 
     my $package_content = <<"HEAD";
 #!$^X
@@ -641,8 +641,8 @@ HEAD
 
                  close $fh;
              }
-         }
-        } => $path
+           }
+        } => ($path, $INC{'Sidef.pm'})
     );
 
     $package_content .= <<'FOOT';
