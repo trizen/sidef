@@ -1291,11 +1291,11 @@ HEADER
 
                     # Variable assignment (=)
                     if (exists($self->{assignment_ops}{$method})) {
-                        $code = "($code$self->{assignment_ops}{$method}" . $self->deparse_args(@{$call->{arg}}) . ")[0]";
+                        $code = "($code$self->{assignment_ops}{$method}" . $self->deparse_args(@{$call->{arg}}) . ")[-1]";
                         next;
                     }
 
-                    # Reasign operators, such as: +=, -=, *=, /=, etc...
+                    # Reassignment operators, such as: +=, -=, *=, /=, etc...
                     if (exists $self->{reassign_ops}{$method}) {
 
                         $code =
