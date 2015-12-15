@@ -134,6 +134,7 @@ scripts/elementary_cellular_automaton.sf
 scripts/ethiopian_multiplication.sf
 scripts/Expensive/benford_s_law.sf
 scripts/Expensive/binary_multiplier.sf
+scripts/Expensive/calendar.sf
 scripts/Expensive/closed_form_fibonacci.sf
 scripts/Expensive/coin_change.sf
 scripts/Expensive/dice_game_solver.sf
@@ -270,6 +271,7 @@ scripts/pythagorean_means.sf
 scripts/reverse_the_gender_of_a_string.sf
 scripts/RosettaCode/9_billion_names.sf
 scripts/RosettaCode/abc_problem.sf
+scripts/RosettaCode/almost_prime.sf
 scripts/RosettaCode/arithmetic-geometric_mean.sf
 scripts/RosettaCode/arithmetic_complex.sf
 scripts/RosettaCode/averages_arithmetic_mean.sf
@@ -426,6 +428,7 @@ scripts/RosettaCode/polymorphic_copy.sf
 scripts/RosettaCode/polymorphism.sf
 scripts/RosettaCode/price_fraction.sf
 scripts/RosettaCode/primality_by_trial_division.sf
+scripts/RosettaCode/priority_queue.sf
 scripts/RosettaCode/probabilistic_choice.sf
 scripts/RosettaCode/problem_of_apollonius.sf
 scripts/RosettaCode/program_name.sf

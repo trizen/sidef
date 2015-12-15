@@ -263,13 +263,13 @@ package Sidef::Types::String::String {
     }
 
     sub first {
-        my ($self) = @_;
-        __PACKAGE__->new(CORE::substr($$self, 0, 1));
+        my ($self, $obj) = @_;
+        __PACKAGE__->new(CORE::substr($$self, 0, defined($obj) ? $obj->get_value : 1));
     }
 
     sub last {
-        my ($self) = @_;
-        __PACKAGE__->new(CORE::substr($$self, -1));
+        my ($self, $obj) = @_;
+        __PACKAGE__->new(CORE::substr($$self, defined($obj) ? -$obj->get_value : -1));
     }
 
     sub char {
