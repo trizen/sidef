@@ -75,6 +75,11 @@ package Sidef::Object::Object {
         Sidef::Variable::LazyMethod->new(obj => $self, method => $method, args => \@args);
     }
 
+    #~ sub lazy {
+    #~ my ($self) = @_;
+    #~ Sidef::Lazy::Lazy->new($self);
+    #~ }
+
     sub object_id {
         my ($self) = @_;
         Sidef::Types::Number::Number->new(Scalar::Util::refaddr($self));
