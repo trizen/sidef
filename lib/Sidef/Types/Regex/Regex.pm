@@ -14,16 +14,9 @@ package Sidef::Types::Regex::Regex {
     sub new {
         my (undef, $regex, $mode) = @_;
 
-        if (ref($mode) eq 'Sidef::Types::String::String') {
-            $mode = $mode->get_value;
-        }
+        $mode = defined($mode) ? ref($mode) ? $mode->get_value : $mode : '^';
 
-        my $global_mode = defined($mode) && $mode =~ tr/g//d;
-
-        if (not defined $mode or $mode eq '') {
-            $mode = q{^};
-        }
-
+        my $global_mode = $mode =~ tr/g//d;
         my $compiled_re = qr{(?$mode:$regex)};
 
         bless {
@@ -44,7 +37,7 @@ package Sidef::Types::Regex::Regex {
     sub match {
         my ($self, $object, $pos) = @_;
 
-        $object //= Sidef::Types::String::String->new('');
+        $object //= do { state $x = Sidef::Types::String::String->new('') };
 
         if ($object->SUPER::isa('ARRAY')) {
             my $match;

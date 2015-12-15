@@ -95,13 +95,30 @@ package Sidef::Types::String::String {
     }
 
     sub match {
-        my ($self, $regex, @rest) = @_;
-        $regex->match($self, @rest);
+        my ($self, $regex, $pos) = @_;
+
+        $regex = $regex->to_re
+          if ref($regex) ne 'Sidef::Types::Regex::Regex';
+
+        Sidef::Types::Regex::Match->new(
+                                        obj  => $$self,
+                                        self => $regex,
+                                        pos  => defined($pos) ? $pos->get_value : undef,
+                                       );
     }
 
     sub gmatch {
-        my ($self, $regex, @rest) = @_;
-        $regex->gmatch($self, @rest);
+        my ($self, $regex, $pos) = @_;
+
+        $regex = $regex->to_re
+          if ref($regex) ne 'Sidef::Types::Regex::Regex';
+
+        local $regex->{global} = 1;
+        Sidef::Types::Regex::Match->new(
+                                        obj  => $$self,
+                                        self => $regex,
+                                        pos  => defined($pos) ? $pos->get_value : undef,
+                                       );
     }
 
     sub array_to {

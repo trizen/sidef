@@ -927,7 +927,7 @@ package Sidef::Types::Array::Array {
 
     sub insert {
         my ($self, $index, @objects) = @_;
-        splice(@{$self}, $index->get_value, 0, @{__PACKAGE__->new(@objects)});
+        splice(@{$self}, $index->get_value, 0, @objects);
         $self;
     }
 
@@ -1197,11 +1197,7 @@ package Sidef::Types::Array::Array {
         $offset = defined($offset) ? $offset->get_value : 0;
         $length = defined($length) ? $length->get_value : scalar(@{$self});
 
-        if (@objects) {
-            return $self->new(CORE::splice(@{$self}, $offset, $length, @{__PACKAGE__->new(@objects)}));
-        }
-
-        $self->new(CORE::splice(@{$self}, $offset, $length));
+        $self->new(CORE::splice(@{$self}, $offset, $length, @objects));
     }
 
     sub take_right {
