@@ -48,7 +48,8 @@ package Sidef::Convert::Convert {
     *to_number = \&to_n;
 
     sub to_float {
-        Sidef::Types::Number::Number->new(Math::BigFloat->new($_[0]->get_value));
+        my ($value) = $_[0]->get_value;
+        Sidef::Types::Number::Number->new(ref($value) eq 'Math::BigRat' ? $value->as_float : Math::BigFloat->new($value));
     }
 
     *to_f = \&to_float;
