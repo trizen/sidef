@@ -887,8 +887,8 @@ HEADER
         elsif ($ref eq 'Sidef::Types::Regex::Regex') {
             $code =
               $self->make_constant($ref, 'new', "Regex$refaddr",
-                                   $self->_dump_string("$obj->{regex}"),
-                                   $obj->{global} ? '"g"' : ());
+                                   $self->_dump_string("$obj->{raw}"),
+                                   $self->_dump_string($obj->{flags} . ($obj->{global} ? 'g' : '')));
         }
         elsif ($ref eq 'Sidef::Types::Block::If' or $ref eq 'Sidef::Types::Block::While') {
             ## ok

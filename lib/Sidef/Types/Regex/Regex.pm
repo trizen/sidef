@@ -14,13 +14,16 @@ package Sidef::Types::Regex::Regex {
     sub new {
         my (undef, $regex, $mode) = @_;
 
-        $mode = defined($mode) ? ref($mode) ? $mode->get_value : $mode : '';
+        $regex = defined($regex) ? ref($regex) ? $regex->get_value : $regex : '';
+        $mode  = defined($mode)  ? ref($mode)  ? $mode->get_value  : $mode  : '';
 
         my $global_mode = $mode =~ tr/g//d;
-        my $compiled_re = $mode eq '' ? qr{$regex} : qr{(?$mode:$regex)};
+        my $compiled_re = qr{(?$mode:$regex)};
 
         bless {
                regex  => $compiled_re,
+               raw    => $regex,
+               flags  => $mode,
                global => $global_mode,
                pos    => 0,
               },
@@ -64,14 +67,8 @@ package Sidef::Types::Regex::Regex {
     sub dump {
         my ($self) = @_;
 
-        my $str = "$self->{regex}";
-
-        my $flags = '';
-        if ($str =~ s/\(\?\^u:\(\?(?:\^|(.*?))://) {
-            $flags = $1 // '';
-            chop $str;
-            chop $str;
-        }
+        my $str   = $self->{raw};
+        my $flags = $self->{flags};
 
         Sidef::Types::String::String->new('/' . $str =~ s{/}{\\/}gr . '/' . $flags . ($self->{global} ? 'g' : ''));
     }
