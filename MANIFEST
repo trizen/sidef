@@ -756,6 +756,7 @@ scripts/variadic_function.sf
 scripts/vector_products.sf
 scripts/vigenere_cipher.sf
 scripts/virtual_machine.sf
+scripts/visualize_tree.sf
 scripts/walk_a_dir_recursively.sf
 scripts/WWW/deranged_anagrams.sf
 scripts/WWW/DNS_query.sf
