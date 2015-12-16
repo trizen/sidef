@@ -9,11 +9,9 @@ func partitions({.is_empty}) { [[]] }
 
 func part(s, args) {
   var res = [];
-  var combs = s.combinations(args[0]);
-  combs << [] if combs.is_empty;
-  combs.each { |c|
+  s.combinations(args[0], { |c|
     part(s - c, args.ft(1)).each{|r| res << ([c] + r)}
-  }
+  })
   res
 }
 
