@@ -1,0 +1,55 @@
+#!/usr/bin/ruby
+
+#
+## Test assignment lvalues
+#
+
+((var x) = 41).add!(1);
+assert_eq(x, 42);
+
+(var y = 41).add!(1);
+assert_eq(y, 42);
+
+var a = [1,2] += [3,4];
+assert_eq(a, [1,2,3,4]);
+
+((var b) = [1,2]) += [3,4];
+assert_eq(b, [1,2,3,4])
+
+(var c = [1,2,3]).map!{_**2};
+assert_eq(c, [1,4,9]);
+
+((var d) = [1,2,3]).map!{_**2}
+assert_eq(d, [1,4,9]);
+
+var e = 1 -> add!(2) -> add!(3);
+assert_eq(e, 6);
+
+((var f) = 1).add!(2).add!(3);
+assert_eq(f, 6);
+assert_eq(e, 6);
+
+var g = 1 += 2 += 3;
+assert_eq(g, 6);
+
+((var h) = 1) += 2 += 3;
+assert_eq(h, 6);
+
+#
+## Test other lvalues
+#
+
+var arr = [1,2,3];
+arr[0] += 1 += 2;
+assert_eq(arr, [4,2,3]);
+
+(((arr[0]) -= 1) -= 2);
+assert_eq(arr, [1,2,3]);
+
+arr[1].add!(1).add!(2);
+assert_eq(arr, [1,5,3]);
+
+((arr[1]).sub!(1)).sub!(2);
+assert_eq(arr, [1,2,3]);
+
+say "** Test passed!";

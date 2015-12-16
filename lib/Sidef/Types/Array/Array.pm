@@ -632,6 +632,8 @@ package Sidef::Types::Array::Array {
         $self;
     }
 
+    *each_kv = \&each_with_index;
+
     sub map {
         my ($self, $code) = @_;
         $self->new(map { $code->run($_) } @{$self});
@@ -650,6 +652,8 @@ package Sidef::Types::Array::Array {
         $self->new(@arr);
     }
 
+    *map_kv             = \&map_with_index;
+    *collect_kv         = \&map_with_index;
     *collect_with_index = \&map_with_index;
 
     sub flat_map {

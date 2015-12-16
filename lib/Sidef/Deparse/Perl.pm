@@ -225,10 +225,10 @@ HEADER
         push @{$self->{block_declarations}},
           [$self->{current_block} // -1, 'my(' . join(', ', map { $self->_dump_var($_) } @vars) . ')' . ';'];
 
-        # Return the variables on assignments
+        # Return the lvalue variables on assignments
         if (@code > 1 or exists($init_obj->{args})) {
             push @code, '(' . join(', ', map { $self->_dump_var($_) } @vars) . ')';
-            return ('do { ' . join(';', @code) . '}');
+            return 'CORE::sub : lvalue {' . join(';', @code) . '}->()';
         }
 
         # Return one var as a list
