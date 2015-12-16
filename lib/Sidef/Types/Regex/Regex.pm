@@ -18,7 +18,7 @@ package Sidef::Types::Regex::Regex {
         $mode  = defined($mode)  ? ref($mode)  ? $mode->get_value  : $mode  : '';
 
         my $global_mode = $mode =~ tr/g//d;
-        my $compiled_re = qr{(?$mode:$regex)};
+        my $compiled_re = $mode eq '' ? qr{$regex} : qr{(?$mode:$regex)};
 
         bless {
                regex  => $compiled_re,
