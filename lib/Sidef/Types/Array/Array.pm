@@ -1,7 +1,7 @@
 package Sidef::Types::Array::Array {
 
     use utf8;
-    use 5.014;
+    use 5.016;
 
     use parent qw(
       Sidef::Object::Object
@@ -1079,59 +1079,52 @@ package Sidef::Types::Array::Array {
     *last_unique_by = \&last_uniq_by;
 
     sub abbrev {
-        my ($self, $code) = @_;
+        my ($self, $block) = @_;
 
-        my $__END__ = {};                                                                # some unique value
-        my $__CALL__ = defined($code) && (ref($code) eq 'Sidef::Types::Block::Block');
+        my $tail     = {};                # some unique value
+        my $callback = defined($block);
 
         my %table;
         foreach my $sub_array (@{$self}) {
             my $ref = \%table;
-
             foreach my $item (@{$sub_array}) {
                 $ref = $ref->{$item} //= {};
             }
-            $ref->{$__END__} = $sub_array;
+            $ref->{$tail} = $sub_array;
         }
 
-        my $abbrevs = $__CALL__ ? undef : $self->new();
-        my $callback = sub {
-            $abbrevs->append($self->new(@_));
-        };
+        my @abbrev;
+        sub {
+            my ($hash) = @_;
 
-        my $traverse;
-        (
-         $traverse = sub {
-             my ($hash) = @_;
+            foreach my $key (my @keys = CORE::sort keys %{$hash}) {
+                next if $key eq $tail;
+                __SUB__->($hash->{$key});
 
-             foreach my $key (my @keys = CORE::sort keys %{$hash}) {
-                 next if $key eq $__END__;
-                 $traverse->($hash->{$key});
+                if ($#keys > 0) {
+                    my $count = 0;
+                    my $ref   = delete $hash->{$key};
+                    while (my ($key) = CORE::each %{$ref}) {
+                        if ($key eq $tail) {
 
-                 if ($#keys > 0) {
-                     my $count = 0;
-                     my $ref   = delete $hash->{$key};
-                     while (my ($key) = CORE::each %{$ref}) {
-                         if ($key eq $__END__) {
+                            if ($callback) {
+                                $block->run($self->new(@{$ref->{$key}}[0 .. $#{$ref->{$key}} - $count]));
+                            }
+                            else {
+                                push @abbrev, $self->new(@{$ref->{$key}}[0 .. $#{$ref->{$key}} - $count]);
+                            }
 
-                             if ($__CALL__) {
-                                 $code->run($self->new(@{$ref->{$key}}[0 .. $#{$ref->{$key}} - $count]));
-                             }
-                             else {
-                                 $callback->(@{$ref->{$key}}[0 .. $#{$ref->{$key}} - $count]);
-                             }
+                            last;
+                        }
+                        $ref = $ref->{$key};
+                        $count++;
+                    }
+                }
+            }
+          }
+          ->(\%table);
 
-                             last;
-                         }
-                         $ref = $ref->{$key};
-                         $count++;
-                     }
-                 }
-             }
-         }
-        )->(\%table);
-
-        $abbrevs;
+        $self->new(@abbrev);
     }
 
     *abbreviations = \&abbrev;
