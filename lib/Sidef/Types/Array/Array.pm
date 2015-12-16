@@ -271,7 +271,7 @@ package Sidef::Types::Array::Array {
         foreach my $subarray (@result) {
             CORE::unshift @{$subarray}, $head;
         }
-        @result, _combinations($n, @set);
+        (@result, _combinations($n, @set));
     }
 
     sub combinations {
@@ -832,6 +832,8 @@ package Sidef::Types::Array::Array {
 
         $self->new(@array);
     }
+
+    *pairmap = \&reduce_pairs;
 
     sub shuffle {
         my ($self) = @_;

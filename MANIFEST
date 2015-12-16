@@ -142,6 +142,7 @@ scripts/Expensive/factorial_approximations.sf
 scripts/Expensive/fibonacci_validation.sf
 scripts/Expensive/fibonacci_word.sf
 scripts/Expensive/long_multiplication.sf
+scripts/Expensive/numerical_integration.sf
 scripts/Expensive/pi.sf
 scripts/Expensive/root_of_a_function.sf
 scripts/Expensive/sudoku_solver.sf
@@ -414,6 +415,7 @@ scripts/RosettaCode/natural_sorting.sf
 scripts/RosettaCode/nth.sf
 scripts/RosettaCode/nth_root.sf
 scripts/RosettaCode/order_disjoint_list_items.sf
+scripts/RosettaCode/ordered_partitions.sf
 scripts/RosettaCode/pangram_checker.sf
 scripts/RosettaCode/partial_function_application.sf
 scripts/RosettaCode/pascal_s_triangle.sf
