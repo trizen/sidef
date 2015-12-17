@@ -59,7 +59,7 @@ class Forest(p=0.01, f=0.001, height, width) {
 
     method show {
         range(0, height-1).each { |i|
-            say pix.@[spot[i]];
+            say pix[@spot[i]];
         }
     }
 }

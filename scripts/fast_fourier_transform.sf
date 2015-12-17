@@ -3,8 +3,8 @@
 func fft(arr) {
     arr.len == 1 && return arr;
 
-    var evn = fft([arr.@[arr.range.grep { .is_even }]]);
-    var odd = fft([arr.@[arr.range.grep { .is_odd  }]]);
+    var evn = fft([arr[arr.range.grep { .is_even }...]]);
+    var odd = fft([arr[arr.range.grep { .is_odd  }...]]);
     var twd = (Complex(0, 2) * Math::PI / arr.len);
 
     odd.range.map {|n| odd[n] *= exp(twd * n)};

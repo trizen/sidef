@@ -1311,9 +1311,10 @@ HEADER
                     if ($method eq '==' or $method eq '!=') {
                         $code =
                             'Sidef::Types::Bool::Bool->new('
-                          . ($method eq '!=' ? 'CORE::not' : '') . '('
-                          . $code . 'eq'
-                          . $self->deparse_args(@{$call->{arg}}) . '))';
+                          . ($method eq '!=' ? 'CORE::not ' : '') . 'do{'
+                          . $code
+                          . '} eq do{'
+                          . $self->deparse_args(@{$call->{arg}}) . '})';
                         next;
                     }
 
@@ -1321,8 +1322,9 @@ HEADER
                     if ($method eq '<=>') {
                         $code =
                             'Sidef::Types::Number::Number->new(do{'
-                          . $code . '}cmp'
-                          . $self->deparse_args(@{$call->{arg}}) . ')';
+                          . $code
+                          . '} cmp do {'
+                          . $self->deparse_args(@{$call->{arg}}) . '})';
                         next;
                     }
 
@@ -1330,15 +1332,18 @@ HEADER
                     if ($method eq '~~' or $method eq '!~') {
                         $self->top_add(qq{use experimental 'smartmatch';\n});
                         $code =
-                          'Sidef::Types::Bool::Bool->new(do{' . $code . '}~~' . $self->deparse_args(@{$call->{arg}}) . ')';
-                        $code .= '->not' if ($method eq '!~');
+                            'Sidef::Types::Bool::Bool->new('
+                          . ($method eq '!~' ? 'CORE::not ' : '') . 'do{'
+                          . $code
+                          . '} ~~ do{'
+                          . $self->deparse_args(@{$call->{arg}}) . '})';
                         next;
                     }
 
                     # ! prefix-unary
                     if ($ref eq 'Sidef::Object::Unary') {
                         if ($method eq '!') {
-                            $code = 'Sidef::Types::Bool::Bool->new(!' . $self->deparse_args(@{$call->{arg}}) . ')';
+                            $code = 'Sidef::Types::Bool::Bool->new(!do{' . $self->deparse_args(@{$call->{arg}}) . '})';
                             next;
                         }
 
