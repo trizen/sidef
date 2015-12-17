@@ -5,4 +5,4 @@
 
 # https://projecteuler.net/problem=1
 
-say +(1000-1).range.grep{ (_ %% 3) || (_ %% 5) }.sum;
+say 1000.range.grep{ (_ %% 3) || (_ %% 5) }.sum;

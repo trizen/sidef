@@ -24,8 +24,8 @@ func long_multiplication(String a, String b) -> String {
     var mem = 0;
     var map = y.len.of { Array.new };
 
-    ylen.range.each { |j|
-        xlen.range.each { |i|
+    y.range.each { |j|
+        x.range.each { |i|
             var n = (x[i]*y[j] + mem);
             var(d, m) = n.divmod(10);
             if (i == xlen) {
@@ -48,7 +48,7 @@ func long_multiplication(String a, String b) -> String {
     var mrange = (0 .. map.end);
     var end    = (xlen + ylen + 1);
 
-    end.range.each { |i|
+    (end+1).range.each { |i|
         var n = (mrange.map {|j| map[j][i] }.sum + mem);
         if (i == end) {
             n != 0 && result.append(n);

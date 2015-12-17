@@ -554,6 +554,8 @@ package Sidef::Types::Array::Array {
         $self->new(@new_array);
     }
 
+    *flat = \&flatten;
+
     sub exists {
         my ($self, $index) = @_;
         Sidef::Types::Bool::Bool->new(exists $self->[$index->get_value]);

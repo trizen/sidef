@@ -17,16 +17,16 @@ var free_terms = [4, -6, 5];
 
 func diag_multiply_sum (matrix, left) {
 
-    var range    = matrix[0].range;   # range from 0 to len(matrix[0])-1
+    var r1    = matrix[0].range;   # range from 0 to len(matrix[0])-1
     var products = [];
 
-    (left ? range.reverse : range).each { |i|
+    (left ? r1.reverse : r1).each { |i|
 
         var x = 0;
         var nums = [];
-        var rangex = CORE::range(i, matrix[0].end+i);   # range from i to len(matrix[0])-1+i
+        var r2 = i.to(matrix[0].end+i);   # range from i to len(matrix[0])-1+i
 
-        (left ? rangex.reverse : rangex).each { |j|
+        (left ? r2.reverse : r2).each { |j|
             nums.push(matrix[j][x++]);
         };
 
@@ -39,7 +39,7 @@ func diag_multiply_sum (matrix, left) {
 }
 
 func make_det_matrix (matrix) {
-    matrix + [matrix.@[range(matrix.end-1)]];
+    matrix + [matrix[matrix.end.range...]];
 }
 
 func calculate_delta (matrix, free_terms, position) {
@@ -97,3 +97,5 @@ indices.each {
     var i = _[1];
     "%s == %3d/%-3d == %3s\n".printf(_[0], xyz[i], delta, xyz[i] / delta);
 }
+
+assert_eq(xyz, [6,3,9]);

@@ -15,11 +15,11 @@ func coef(n, e) {
 }
 
 func binpoly(p) {
-    join(" ", coef(1, p), range(p-1).reverse.map {|i|
+    join(" ", coef(1, p), p.range.reverse.map {|i|
         join(" ", %w(+ -)[(p-i)&1], coef(binomial(p, i), i));
     }...);
 }
 
 say "expansions of (x-1)^p:";
-range(9).each { |i| say binpoly(i) };
+10.range.each { |i| say binpoly(i) };
 say "Primes to 80: [#{(2..80).grep { binprime(_) }}]";

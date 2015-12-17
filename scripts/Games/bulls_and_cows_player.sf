@@ -27,7 +27,7 @@ func read_score(guess) {
 func score_correct(a, b, bulls, cows) {
     var (exact, loose) = (0, 0);
 
-    3.range.each { |i|
+    4.range.each { |i|
         a[i] == b[i] ? ++exact
                      : (b.contains(a[i]) && ++loose)
     }
