@@ -147,12 +147,8 @@ package Sidef::Sys::Sys {
 
     sub scanln {
         my ($self, $text) = @_;
-
-        if (defined($text)) {
-            $text->print;
-        }
-
-        Sidef::Types::String::String->new(scalar unpack("A*", scalar <STDIN>));
+        CORE::print $text;
+        Sidef::Types::String::String->new(scalar unpack("A*", scalar(<STDIN>) // return));
     }
 
     *readln = \&scanln;
