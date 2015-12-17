@@ -129,7 +129,7 @@ HEADER
         # Make sure that code-points between 128 and 256
         # will be stored internally as UTF-8 strings.
         if ($str =~ /[\200-\400]/) {
-            return "do {state \$x = do {require Encode; Encode::decode_utf8(Encode::encode_utf8($d))}}";
+            return "do {require Encode; Encode::decode_utf8(Encode::encode_utf8($d))}";
         }
 
         $d;
