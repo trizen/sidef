@@ -297,7 +297,7 @@ package Sidef::Deparse::Sidef {
                         $statements[-1] = '(' . $statements[-1] . ')';
                     }
 
-                    if (@statements == 1 and length($statements[0]) <= 80) {
+                    if (@statements == 1 and length($statements[0]) + $Sidef::SPACES <= 80) {
                         $code .= " $statements[0] }";
                     }
                     else {
