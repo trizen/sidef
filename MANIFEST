@@ -446,6 +446,7 @@ scripts/RosettaCode/read_a_file_line_by_line_1.sf
 scripts/RosettaCode/read_a_specific_line_from_a_file.sf
 scripts/RosettaCode/read_entire_file.sf
 scripts/RosettaCode/real_constants_and_functions.sf
+scripts/RosettaCode/reduced_row_echelon_form.sf
 scripts/RosettaCode/regular_expressions.sf
 scripts/RosettaCode/regular_expressions_1.sf
 scripts/RosettaCode/regular_expressions_2.sf

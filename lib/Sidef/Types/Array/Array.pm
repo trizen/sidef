@@ -88,10 +88,10 @@ package Sidef::Types::Array::Array {
         my ($self, $operator) = @_;
 
         $operator = $operator->get_value if ref($operator);
-        (my $offset = $#{$self}) >= 0 || return;
+        (my $end = $#{$self}) >= 0 || return;
 
         my $x = $self->[0];
-        foreach my $i (1 .. $offset) {
+        foreach my $i (1 .. $end) {
             $x = $x->$operator($self->[$i]);
         }
         $x;
@@ -166,7 +166,13 @@ package Sidef::Types::Array::Array {
 
     sub multiply {
         my ($self, $num) = @_;
-        $self->new((@{$self}) x $num->get_value);
+
+        {
+            local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
+            $num = $num->get_value;
+        }
+
+        $self->new((@{$self}) x $num);
     }
 
     *mul = \&multiply;
@@ -177,7 +183,10 @@ package Sidef::Types::Array::Array {
         my @obj = @{$self};
 
         my @array;
-        my $len = @obj / $num->get_value;
+        my $len = @obj / do {
+            local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
+            $num->get_value;
+        };
 
         my $i   = 1;
         my $pos = $len;
@@ -197,14 +206,12 @@ package Sidef::Types::Array::Array {
     sub or {
         my ($self, $array) = @_;
         my $new_array = $self->new;
-
         $self->xor($array)->concat($self->and($array));
     }
 
     sub xor {
         my ($self, $array) = @_;
         my $new_array = $self->new;
-
         ($self->concat($array))->subtract($self->and($array));
     }
 
@@ -263,15 +270,17 @@ package Sidef::Types::Array::Array {
     sub combinations {
         my ($self, $k, $block) = @_;
 
-        do {
+        {
             local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
             $k = $k->get_value;
-        };
+        }
 
         if (defined($block)) {
 
             if ($k == 0) {
-                $block->run($self->new);
+                if (defined(my $res = $block->_run_code($self->new))) {
+                    return $res;
+                }
                 return $self;
             }
 
@@ -400,7 +409,12 @@ package Sidef::Types::Array::Array {
 
     sub make {
         my ($self, $size, $type) = @_;
-        $self->new(($type) x $size->get_value);
+        $self->new(
+            ($type) x do {
+                local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
+                $size->get_value;
+              }
+        );
     }
 
     sub _min_max {
@@ -652,6 +666,31 @@ package Sidef::Types::Array::Array {
     *for     = \&each;
     *foreach = \&each;
 
+    sub each_slice {
+        my ($self, $n, $code) = @_;
+
+        {
+            local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
+            $n = $n->get_value;
+        }
+
+        my $end = @{$self};
+        for (my $i = $n - 1 ; $i < $end ; $i += $n) {
+            if (defined(my $res = $code->_run_code($self->new(@{$self}[$i - ($n - 1) .. $i])))) {
+                return $res;
+            }
+        }
+
+        my $mod = $end % $n;
+        if ($mod != 0) {
+            if (defined(my $res = $code->_run_code($self->new(@{$self}[$end - $mod .. $end - 1])))) {
+                return $res;
+            }
+        }
+
+        $self;
+    }
+
     sub each_index {
         my ($self, $code) = @_;
 
@@ -854,30 +893,18 @@ package Sidef::Types::Array::Array {
 
     *last_index = \&rindex;
 
-    sub reduce_pairs {
+    sub pairmap {
         my ($self, $obj) = @_;
 
-        (my $end = $#{$self}) == -1
-          && return $self->new;
+        my $end = @{$self} || return $self->new;
 
         my @array;
-        if (ref($obj) eq 'Sidef::Types::Block::Block') {
-            for (my $i = 1 ; $i <= $end ; $i += 2) {
-                push @array, scalar $obj->run($self->[$i - 1], $self->[$i]);
-            }
-        }
-        else {
-            my $method = $obj->get_value;
-            for (my $i = 1 ; $i <= $end ; $i += 2) {
-                my $x = $self->[$i - 1];
-                push @array, $x->$method($self->[$i]);
-            }
+        for (my $i = 1 ; $i < $end ; $i += 2) {
+            push @array, scalar $obj->run(@{$self}[$i - 1, $i]);
         }
 
         $self->new(@array);
     }
-
-    *pairmap = \&reduce_pairs;
 
     sub shuffle {
         my ($self) = @_;
@@ -947,7 +974,8 @@ package Sidef::Types::Array::Array {
 
     sub resize {
         my ($self, $num) = @_;
-        $#{$self} = $num;
+        local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
+        $#{$self} = $num->get_value;
         $num;
     }
 
@@ -955,7 +983,12 @@ package Sidef::Types::Array::Array {
 
     sub rand {
         my ($self, $amount) = @_;
+
         if (defined $amount) {
+            {
+                local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
+                $amount = $amount->get_value;
+            }
             return $self->new(map { $self->[CORE::rand(scalar @{$self})] } 1 .. $amount);
         }
         $self->[CORE::rand(scalar @{$self})];
@@ -1195,7 +1228,16 @@ package Sidef::Types::Array::Array {
         my ($self, $num) = @_;
 
         if (defined $num) {
-            return $self->new(CORE::splice(@{$self}, 0, $num->get_value));
+            return $self->new(
+                CORE::splice(
+                    @{$self},
+                    0,
+                    do {
+                        local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
+                        $num->get_value;
+                      }
+                )
+            );
         }
 
         @{$self} || return;
@@ -1209,7 +1251,12 @@ package Sidef::Types::Array::Array {
         my ($self, $num) = @_;
 
         if (defined $num) {
-            $num = $num->get_value > $#{$self} ? 0 : @{$self} - $num->get_value;
+            {
+                local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
+                $num = $num->get_value;
+            }
+
+            $num = $num > $#{$self} ? 0 : @{$self} - $num;
             return $self->new(CORE::splice(@{$self}, $num));
         }
 
@@ -1228,7 +1275,14 @@ package Sidef::Types::Array::Array {
 
     sub delete_index {
         my ($self, $offset) = @_;
-        CORE::splice(@{$self}, $offset->get_value, 1);
+        CORE::splice(
+            @{$self},
+            do {
+                local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
+                $offset->get_value;
+            },
+            1
+                    );
     }
 
     *pop_at    = \&delete_index;
@@ -1237,8 +1291,11 @@ package Sidef::Types::Array::Array {
     sub splice {
         my ($self, $offset, $length, @objects) = @_;
 
-        $offset = defined($offset) ? $offset->get_value : 0;
-        $length = defined($length) ? $length->get_value : scalar(@{$self});
+        {
+            local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
+            $offset = defined($offset) ? $offset->get_value : 0;
+            $length = defined($length) ? $length->get_value : scalar(@{$self});
+        }
 
         $self->new(CORE::splice(@{$self}, $offset, $length, @objects));
     }
@@ -1246,15 +1303,24 @@ package Sidef::Types::Array::Array {
     sub take_right {
         my ($self, $amount) = @_;
 
-        my $offset = $#{$self};
-        $amount = $offset > ($amount->get_value - 1) ? $amount->get_value - 1 : $offset;
-        $self->new(@{$self}[$offset - $amount .. $offset]);
+        my $end = $#{$self};
+        {
+            local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
+            $amount = $amount->get_value;
+            $amount = $end > ($amount - 1) ? $amount - 1 : $end;
+        }
+        $self->new(@{$self}[$end - $amount .. $end]);
     }
 
     sub take_left {
         my ($self, $amount) = @_;
 
-        $amount = $#{$self} > ($amount->get_value - 1) ? $amount->get_value - 1 : $#{$self};
+        my $end = $#{$self};
+        {
+            local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
+            $amount = $amount->get_value;
+            $amount = $end > ($amount - 1) ? $amount - 1 : $end;
+        }
         $self->new(@{$self}[0 .. $amount]);
     }
 
@@ -1371,7 +1437,12 @@ package Sidef::Types::Array::Array {
     sub rotate {
         my ($self, $num) = @_;
 
-        $num = $num->get_value % ($#{$self} + 1);
+        {
+            local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
+            $num = $num->get_value;
+        }
+
+        $num %= ($#{$self} + 1);
         return $self->new(@{$self}) if $num == 0;
 
         # Surprisingly, this is slower:
