@@ -465,6 +465,7 @@ scripts/RosettaCode/rpn_to_infix_conversion.sf
 scripts/RosettaCode/runge-kutta_method.sf
 scripts/RosettaCode/runtime_evaluation.sf
 scripts/RosettaCode/runtime_evaluation_in_an_environment.sf
+scripts/RosettaCode/s_expressions.sf
 scripts/RosettaCode/search_a_list.sf
 scripts/RosettaCode/search_a_list_1.sf
 scripts/RosettaCode/secure_temporary_file.sf
@@ -478,6 +479,8 @@ scripts/RosettaCode/shunting-yard_algorithm.sf
 scripts/RosettaCode/sidef_3d_ascii.sf
 scripts/RosettaCode/sierpinski_carpet.sf
 scripts/RosettaCode/sierpinski_triangle.sf
+scripts/RosettaCode/sieve_of_eratosthenes.sf
+scripts/RosettaCode/singleton.sf
 scripts/RosettaCode/singly-linked_list_element_definition.sf
 scripts/RosettaCode/singly-linked_list_element_insertion.sf
 scripts/RosettaCode/sort_an_integer_array.sf
@@ -505,6 +508,7 @@ scripts/RosettaCode/stack.sf
 scripts/RosettaCode/stack_1.sf
 scripts/RosettaCode/standard_deviation.sf
 scripts/RosettaCode/standard_deviation_2.sf
+scripts/RosettaCode/stem_and_leaf_plot.sf
 scripts/RosettaCode/string_comparison.sf
 scripts/RosettaCode/the_isaac_cipher.sf
 scripts/RosettaCode/universal_turing_machine.sf

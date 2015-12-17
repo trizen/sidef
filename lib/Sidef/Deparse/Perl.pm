@@ -1175,11 +1175,8 @@ HEADER
                     if (substr($code, -1) eq '@') {
                         $code .= $self->_dump_unpacked_indices($pos);
                     }
-                    elsif ($#{$pos} > 0) {
-                        $code = '@{' . $code . '}' . $self->_dump_indices($pos);
-                    }
                     else {
-                        $code .= '->' . $self->_dump_indices($pos);
+                        $code = '@{' . $code . '}' . $self->_dump_indices($pos);
                     }
                 }
                 else {
@@ -1189,11 +1186,8 @@ HEADER
                     if (substr($code, -1) eq '@') {
                         $code .= $self->_dump_unpacked_lookups($key);
                     }
-                    elsif ($#{$key} > 0) {
-                        $code = '@{' . $code . '}' . $self->_dump_lookups($key);
-                    }
                     else {
-                        $code .= '->' . $self->_dump_lookups($key);
+                        $code = '@{' . $code . '}' . $self->_dump_lookups($key);
                     }
                 }
 
@@ -1326,14 +1320,17 @@ HEADER
                     # <=> method
                     if ($method eq '<=>') {
                         $code =
-                          'Sidef::Types::Number::Number->new(' . $code . 'cmp' . $self->deparse_args(@{$call->{arg}}) . ')';
+                            'Sidef::Types::Number::Number->new(do{'
+                          . $code . '}cmp'
+                          . $self->deparse_args(@{$call->{arg}}) . ')';
                         next;
                     }
 
                     # !~ and ~~ methods
                     if ($method eq '~~' or $method eq '!~') {
                         $self->top_add(qq{use experimental 'smartmatch';\n});
-                        $code = 'Sidef::Types::Bool::Bool->new(' . $code . '~~' . $self->deparse_args(@{$call->{arg}}) . ')';
+                        $code =
+                          'Sidef::Types::Bool::Bool->new(do{' . $code . '}~~' . $self->deparse_args(@{$call->{arg}}) . ')';
                         $code .= '->not' if ($method eq '!~');
                         next;
                     }
