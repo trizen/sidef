@@ -1348,7 +1348,7 @@ HEADER
                         }
 
                         if ($method eq '-') {
-                            $code = $self->deparse_args(@{$call->{arg}}) . '->negate';
+                            $code = $self->deparse_args(@{$call->{arg}}) . '->neg';
                             next;
                         }
 
