@@ -481,16 +481,6 @@ package Sidef::Types::Number::Complex {
 
     *is_neg = \&is_negative;
 
-    sub is_even {
-        my ($self) = @_;
-        Sidef::Types::Bool::Bool->new($$self % 2 == 0);
-    }
-
-    sub is_odd {
-        my ($self) = @_;
-        Sidef::Types::Bool::Bool->new($$self % 2 != 0);
-    }
-
     sub is_inf {
         my ($self) = @_;
         Sidef::Types::Bool::Bool->new($$self == 'inf');
