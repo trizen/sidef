@@ -34,6 +34,6 @@ var sorted_languages = languages.sort_by { |lang|
     -lang{:categoryinfo}{:size}
 }
 
-sorted_languages.each_with_index { |i, lang|
+sorted_languages.each_kv { |i, lang|
     printf("%3d. %20s - %3d\n", i+1, lang{:title}, lang{:categoryinfo}{:size});
 }

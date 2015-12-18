@@ -28,7 +28,7 @@ func gamma(z) {
         z--
         var x = 0.99999999999980993
 
-        p.each_with_index { |i, v|
+        p.each_kv { |i, v|
             x += v/(z + i + 1)
         }
 

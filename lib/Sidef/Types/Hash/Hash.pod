@@ -44,6 +44,16 @@ Aliases: I<merge>, I<concat>
 
 =cut
 
+=head2 ...
+
+I<Obj> B<...> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<as_list>, I<to_list>
+
+=cut
+
 =head2 :
 
 I<Obj> B<:> I<Obj> -> I<Obj>
@@ -130,7 +140,7 @@ Hash.each() -> I<Obj>
 
 Return the
 
-Aliases: I<each_pair>
+Aliases: I<each_kv>, I<each_pair>
 
 =cut
 

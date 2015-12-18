@@ -444,14 +444,6 @@ Aliases: I<as_int>
 
 =cut
 
-=head2 is_even
-
-Complex.is_even() -> I<Obj>
-
-Return the
-
-=cut
-
 =head2 is_inf
 
 Complex.is_inf() -> I<Obj>
@@ -489,14 +481,6 @@ Complex.is_neg() -> I<Obj>
 Return the
 
 Aliases: I<is_negative>
-
-=cut
-
-=head2 is_odd
-
-Complex.is_odd() -> I<Obj>
-
-Return the
 
 =cut
 

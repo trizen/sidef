@@ -206,7 +206,7 @@ package Sidef::Types::Hash::Hash {
             push @list, $key, $val;
         }
 
-        while (my ($key, $val) = each %{$obj}) {
+        while (my ($key, $val) = each %$obj) {
             push @list, $key, $val;
         }
 
@@ -281,6 +281,7 @@ package Sidef::Types::Hash::Hash {
         Sidef::Types::Array::Array->new(Sidef::Types::String::String->new($key), $value);
     }
 
+    *each_kv   = \&each;
     *each_pair = \&each;
 
     sub sort_by {
@@ -288,14 +289,12 @@ package Sidef::Types::Hash::Hash {
 
         my @array;
         foreach my $key (CORE::keys %$self) {
-            push @array, [$key, $code->run(Sidef::Types::String::String->new($key), $self->{$key})];
+            my $str = Sidef::Types::String::String->new($key);
+            push @array, [$key, $str, $code->run($str, $self->{$key})];
         }
 
-        Sidef::Types::Array::Array->new(
-            map {
-                Sidef::Types::Array::Array->new(Sidef::Types::String::String->new($_->[0]), $self->{$_->[0]})
-              } (sort { $a->[1] cmp $b->[1] } @array)
-        );
+        Sidef::Types::Array::Array->new(map { Sidef::Types::Array::Array->new($_->[1], $self->{$_->[0]}) }
+                                        (sort { $a->[2] cmp $b->[2] } @array));
     }
 
     sub to_a {
@@ -312,7 +311,7 @@ package Sidef::Types::Hash::Hash {
 
     sub exists {
         my ($self, $key) = @_;
-        Sidef::Types::Bool::Bool->new(exists $self->{$key});
+        Sidef::Types::Bool::Bool->new(CORE::exists $self->{$key});
     }
 
     *has_key  = \&exists;
@@ -325,8 +324,8 @@ package Sidef::Types::Hash::Hash {
         my ($self) = @_;
 
         my $new_hash = $self->new();
-        @{$new_hash}{map { $_->get_value } CORE::values %$self} =
-          (map           { Sidef::Types::String::String->new($_) } CORE::keys %$self);
+        @{$new_hash}{CORE::values %$self} =
+          (map { Sidef::Types::String::String->new($_) } CORE::keys %$self);
 
         $new_hash;
     }
@@ -337,6 +336,13 @@ package Sidef::Types::Hash::Hash {
         state $x = require Storable;
         Storable::dclone($self);
     }
+
+    sub to_list {
+        my ($self) = @_;
+        map { (Sidef::Types::String::String->new($_) => $self->{$_}) } keys %$self;
+    }
+
+    *as_list = \&to_list;
 
     sub dump {
         my ($self) = @_;
@@ -373,10 +379,11 @@ package Sidef::Types::Hash::Hash {
     {
         no strict 'refs';
 
-        *{__PACKAGE__ . '::' . '+'}  = \&concat;
-        *{__PACKAGE__ . '::' . '=='} = \&eq;
-        *{__PACKAGE__ . '::' . '!='} = \&ne;
-        *{__PACKAGE__ . '::' . ':'}  = \&new;
+        *{__PACKAGE__ . '::' . '+'}   = \&concat;
+        *{__PACKAGE__ . '::' . '=='}  = \&eq;
+        *{__PACKAGE__ . '::' . '!='}  = \&ne;
+        *{__PACKAGE__ . '::' . ':'}   = \&new;
+        *{__PACKAGE__ . '::' . '...'} = \&to_list;
     }
 };
 

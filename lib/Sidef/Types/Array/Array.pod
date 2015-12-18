@@ -95,7 +95,7 @@ I<Obj> B<...> I<Obj> -> I<Obj>
 
 Return the
 
-Aliases: I<to_list>
+Aliases: I<as_list>, I<to_list>
 
 =cut
 
@@ -347,17 +347,27 @@ Return the
 
 =cut
 
-=head2 each_index
+=head2 each_key
 
-Array.each_index() -> I<Obj>
+Array.each_key() -> I<Obj>
+
+Return the
+
+Aliases: I<each_index>
+
+=cut
+
+=head2 each_kv
+
+Array.each_kv() -> I<Obj>
 
 Return the
 
 =cut
 
-=head2 each_with_index
+=head2 each_slice
 
-Array.each_with_index() -> I<Obj>
+Array.each_slice() -> I<Obj>
 
 Return the
 
@@ -409,17 +419,19 @@ Return the
 
 =cut
 
-=head2 flat_map
+=head2 flat
 
-Array.flat_map() -> I<Obj>
+Array.flat() -> I<Obj>
 
 Return the
 
+Aliases: I<flatten>
+
 =cut
 
-=head2 flatten
+=head2 flat_map
 
-Array.flatten() -> I<Obj>
+Array.flat_map() -> I<Obj>
 
 Return the
 
@@ -462,6 +474,16 @@ Array.grep() -> I<Obj>
 Return the
 
 Aliases: I<filter>, I<select>
+
+=cut
+
+=head2 grep_kv
+
+Array.grep_kv() -> I<Obj>
+
+Return the
+
+Aliases: I<filter_kv>, I<select_kv>
 
 =cut
 
@@ -615,21 +637,21 @@ Aliases: I<collect>
 
 =cut
 
+=head2 map_kv
+
+Array.map_kv() -> I<Obj>
+
+Return the
+
+Aliases: I<collect_kv>
+
+=cut
+
 =head2 map_operator
 
 Array.map_operator() -> I<Obj>
 
 Return the
-
-=cut
-
-=head2 map_with_index
-
-Array.map_with_index() -> I<Obj>
-
-Return the
-
-Aliases: I<collect_with_index>
 
 =cut
 
@@ -694,6 +716,14 @@ Aliases: I<call>
 =head2 pack
 
 Array.pack() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 pairmap
+
+Array.pairmap() -> I<Obj>
 
 Return the
 
@@ -794,14 +824,6 @@ Return the
 =head2 reduce_operator
 
 Array.reduce_operator() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 reduce_pairs
-
-Array.reduce_pairs() -> I<Obj>
 
 Return the
 

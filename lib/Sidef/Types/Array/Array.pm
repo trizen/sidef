@@ -703,7 +703,9 @@ package Sidef::Types::Array::Array {
         $self;
     }
 
-    sub each_with_index {
+    *each_key = \&each_index;
+
+    sub each_kv {
         my ($self, $code) = @_;
 
         foreach my $i (0 .. $#{$self}) {
@@ -715,8 +717,6 @@ package Sidef::Types::Array::Array {
         $self;
     }
 
-    *each_kv = \&each_with_index;
-
     sub map {
         my ($self, $code) = @_;
         $self->new(map { $code->run($_) } @{$self});
@@ -724,7 +724,7 @@ package Sidef::Types::Array::Array {
 
     *collect = \&map;
 
-    sub map_with_index {
+    sub map_kv {
         my ($self, $code) = @_;
 
         my @arr;
@@ -735,9 +735,7 @@ package Sidef::Types::Array::Array {
         $self->new(@arr);
     }
 
-    *map_kv             = \&map_with_index;
-    *collect_kv         = \&map_with_index;
-    *collect_with_index = \&map_with_index;
+    *collect_kv = \&map_kv;
 
     sub flat_map {
         my ($self, $code) = @_;
@@ -751,6 +749,20 @@ package Sidef::Types::Array::Array {
 
     *filter = \&grep;
     *select = \&grep;
+
+    sub grep_kv {
+        my ($self, $code) = @_;
+
+        my @arr;
+        foreach my $i (0 .. $#{$self}) {
+            push(@arr, $self->[$i]) if $code->run(Sidef::Types::Number::Number->new($i), $self->[$i]);
+        }
+
+        $self->new(@arr);
+    }
+
+    *filter_kv = \&grep_kv;
+    *select_kv = \&grep_kv;
 
     sub group_by {
         my ($self, $code) = @_;
@@ -1579,9 +1591,8 @@ package Sidef::Types::Array::Array {
 
     *remove_last_if = \&delete_last_if;
 
-    sub to_list {
-        @{$_[0]};
-    }
+    sub to_list { @{$_[0]} }
+    *as_list = \&to_list;
 
     sub dump {
         my ($self) = @_;

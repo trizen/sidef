@@ -56,6 +56,14 @@ Return the
 
 =cut
 
+=head2 bless
+
+Object.bless() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 class
 
 Object.class() -> I<Obj>

@@ -180,7 +180,7 @@ else {
 
             my $header =
                 "\nuse lib ("
-              . join(', ', map { qq{"\Q$_\E"} } @INC) . ");\n"
+              . join(', ', map { qq{"\Q$_\E"} } @INC) . ");\n\n"
               . "use Sidef;\n\n"
               . "binmode(STDIN, ':utf8');\n"
               . "binmode(STDOUT, ':utf8');\n"
