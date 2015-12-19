@@ -17,12 +17,15 @@ package Sidef::Math::Math {
             e  => sub { Math::BigFloat->new(1)->bexp },
             pi => sub {
 
+                my $precision = $Math::BigFloat::precision;
+
                 # Old bug in Math::BigFloat
                 # https://rt.cpan.org/Ticket/Display.html?id=84950
                 my $pi = do {
-                    local $Math::BigFloat::precision = undef if defined($Math::BigFloat::precision);
-                    Math::BigFloat->bpi;
+                    local $Math::BigFloat::precision = undef if defined($precision);
+                    defined($precision) ? Math::BigFloat->bpi(-$precision + 1) : Math::BigFloat->bpi;
                 };
+
                 defined($Math::BigFloat::precision) ? $pi->bfround($Math::BigFloat::precision) : $pi;
             },
             phi => sub { Math::BigFloat->new(1)->badd(Math::BigFloat->new(5)->bsqrt)->bdiv(2) },
@@ -58,8 +61,9 @@ package Sidef::Math::Math {
                     local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1 if defined($precision);
                     $places->get_value;
                   }
-                : ()
-            );
+                : defined($precision) ? (-$precision + 1)
+                :                       ()
+                                        );
         };
 
         Sidef::Types::Number::Number->new(
@@ -90,8 +94,9 @@ package Sidef::Math::Math {
                     local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1 if defined($precision);
                     $places->get_value;
                   }
-                : ()
-            );
+                : defined($precision) ? (-$precision + 1)
+                :                       ()
+                               );
         };
 
         Sidef::Types::Number::Number->new(
