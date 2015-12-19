@@ -32,7 +32,7 @@ sub NATIVE () { 0 }
 my %args;
 if ($#ARGV != -1 and chr ord $ARGV[0] eq '-') {
     require Getopt::Std;
-    Getopt::Std::getopts('e:E:d:Dho:ivHn:WwbcrR:ts:CO:k', \%args);
+    Getopt::Std::getopts('e:E:d:Dho:ivHn:WwbcrR:ts:CO:kP:A:M:', \%args);
 }
 
 # Help
@@ -180,7 +180,8 @@ else {
 
             my $header =
                 "\nuse lib ("
-              . join(', ', map { qq{"\Q$_\E"} } @INC) . ");\n\n"
+              . join(', ', map { qq{"\Q$_\E"} } @INC)
+              . ");\n\n"
               . "use Sidef;\n\n"
               . "binmode(STDIN, ':utf8');\n"
               . "binmode(STDOUT, ':utf8');\n"
@@ -287,13 +288,14 @@ sub load_math_backend {
 
 sub execute_struct {
     my ($struct, $return) = @_;
-    my $deparser = Sidef::Deparse::Perl->new(namespaces => [@Sidef::NAMESPACES]);
+    my $deparser = Sidef::Deparse::Perl->new(namespaces => [@Sidef::NAMESPACES], opt => \%args);
     local $Sidef::DEPARSER = $deparser;
     my $code = $deparser->deparse($struct);
     $return ? eval($code) : do { eval($code); $@ && die $@; exit };
 }
 
 sub output_usage {
+#<<<
     my %switches = (
                     '-i'         => 'interactive mode',
                     '-c'         => 'compile the code as a stand-alone Perl program',
@@ -301,20 +303,27 @@ sub output_usage {
                     '-d file'    => 'load a dumped syntax tree',
                     '-D'         => 'dump the syntax tree of a program',
                     '-o file'    => 'file where to dump the output',
-                    '-O level'   => ['perform code optimizations before execution', 'valid levels: 0, 1, 2'],
+                    '-O level'   => ['perform code optimizations before execution',
+                                     'valid levels: [0], 1, 2'],
+                    '-P int'     => 'set the precision of floating-point numbers',
+                    '-A int'     => 'set the numeric accuracy to a certain number of digits',
+                    '-M mode'    => ['set the rounding mode of floating-point numbers',
+                                     'valid modes: [even], odd, +inf, -inf, zero, trunc, common'],
                     '-k'         => 'keep track of potential unsafe parser interpretations',
                     '-E program' => 'one line of program',
                     '-H'         => 'interactive help',
-                    '-n type'    => ['try to use a specific backend for Math::BigInt', 'valid types: GMP, Pari, FastCalc'],
+                    '-n type'    => ['try to use a specific backend for Math::BigInt',
+                                     'valid types: GMP, Pari, FastCalc'],
                     '-s int'     => 'the number of spaces used in code indentation',
                     '-v'         => 'print version number and exit',
                     '-t'         => 'treat all command-line arguments as scripts',
                     '-r'         => 'parse and deparse a Sidef program',
-                    '-R lang'    => ['parse and deparse a Sidef program to a given language', 'valid values: sidef, perl'],
+                    '-R lang'    => ['parse and deparse a Sidef program to a given language',
+                                     'valid values: sidef, perl'],
                     '-w'         => 'enable warnings with stack backtrace',
                     '-W'         => 'make warnings fatal (with stack backtrace)',
-                   );
-
+    );
+#>>>
     require File::Basename;
     my $basename = File::Basename::basename($0);
 
@@ -546,7 +555,7 @@ sub deparse_structure {
     my $pm     = ($module =~ s{::}{/}gr . '.pm');
 
     require $pm;
-    my $deparser = $module->new(namespaces => [@Sidef::NAMESPACES]);
+    my $deparser = $module->new(namespaces => [@Sidef::NAMESPACES], opt => \%args);
     my $code = $deparser->deparse($struct);
 
     return $code;
@@ -641,7 +650,7 @@ HEAD
 
                  close $fh;
              }
-           }
+         }
         } => ($path, $INC{'Sidef.pm'})
     );
 

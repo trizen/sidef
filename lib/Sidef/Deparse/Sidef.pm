@@ -16,6 +16,7 @@ package Sidef::Deparse::Sidef {
                     class        => 'main',
                     extra_parens => 0,
                     namespaces   => [],
+                    opt          => {},
                     %args,
                    );
         %addr = ();    # reset the addr map

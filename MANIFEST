@@ -791,6 +791,7 @@ utils/Experiments/bigint.sm
 utils/Experiments/bigrat.sm
 utils/Experiments/C-inline-function-call.pl
 utils/Experiments/Lazy/Lazy.pm
+utils/Experiments/NumberMPFR.pm
 utils/Experiments/operator_precendece.pl
 utils/Experiments/regexp_grammars_op_precedence.pl
 utils/Experiments/regexp_grammars_parser.pl

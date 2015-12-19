@@ -278,7 +278,21 @@ package Sidef::Types::Number::Number {
 
     sub root {
         my ($self, $n) = @_;
-        $self->new(scalar $$self->copy->broot($n->get_value));
+
+        my $precision = $Math::BigFloat::precision;
+
+        # Bug in Math::BigFloat
+        my $root = do {
+            local $Math::BigFloat::precision = undef if defined($precision);
+            $$self->copy->broot(
+                do {
+                    local $GET_PERL_VALUE = 1 if defined($precision);
+                    $n->get_value;
+                  }
+            );
+        };
+
+        Sidef::Types::Number::Number->new(defined($precision) ? scalar($root->bfround($precision)) : $root);
     }
 
     sub troot {
@@ -365,7 +379,32 @@ package Sidef::Types::Number::Number {
 
     sub log {
         my ($self, $base) = @_;
-        $self->new(scalar $$self->copy->blog(defined($base) ? $base->get_value : ()));
+
+        my $precision = $Math::BigFloat::precision;
+
+        # Bug in Math::BigFloat
+        # https://rt.cpan.org/Ticket/Display.html?id=110444
+        if (defined $base) {
+
+            my $log = do {
+                local $Math::BigFloat::precision = undef if defined($precision);
+                $$self->copy->blog(
+                    do {
+                        local $GET_PERL_VALUE = 1 if defined($precision);
+                        $base->get_value;
+                      }
+                );
+            };
+
+            return
+              $self->new(
+                         defined($precision)
+                         ? scalar($log->bfround($precision))
+                         : $log
+                        );
+        }
+
+        $self->new(scalar $$self->copy->blog);
     }
 
     sub ln {
@@ -375,14 +414,36 @@ package Sidef::Types::Number::Number {
 
     sub log10 {
         my ($self) = @_;
-        state $ten = Math::BigFloat->new(10);
-        $self->new(scalar $$self->copy->blog($ten));
+
+        # Bug in Math::BigFloat
+        # https://rt.cpan.org/Ticket/Display.html?id=110444
+        my $log = do {
+            local $Math::BigFloat::precision = undef if defined($Math::BigFloat::precision);
+            $$self->copy->blog(10);
+        };
+
+        Sidef::Types::Number::Number->new(
+                                          defined($Math::BigFloat::precision)
+                                          ? scalar($log->bfround($Math::BigFloat::precision))
+                                          : $log
+                                         );
     }
 
     sub log2 {
         my ($self) = @_;
-        state $two = Math::BigFloat->new(2);
-        $self->new(scalar $$self->copy->blog($two));
+
+        # Bug in Math::BigFloat
+        # https://rt.cpan.org/Ticket/Display.html?id=110444
+        my $log = do {
+            local $Math::BigFloat::precision = undef if defined($Math::BigFloat::precision);
+            $$self->copy->blog(2);
+        };
+
+        Sidef::Types::Number::Number->new(
+                                          defined($Math::BigFloat::precision)
+                                          ? scalar($log->bfround($Math::BigFloat::precision))
+                                          : $log
+                                         );
     }
 
     sub inf {

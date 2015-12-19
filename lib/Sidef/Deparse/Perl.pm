@@ -21,6 +21,7 @@ package Sidef::Deparse::Perl {
             between     => ";\n",
             after       => ";\n",
             namespaces  => [],
+            opt         => {},
 
             assignment_ops => {
                                '=' => '=',
@@ -67,6 +68,27 @@ use utf8;
 use $];
 
 HEADER
+
+        if (exists $opts{opt}{A}) {
+            my $accuracy = abs(int($opts{opt}{A}));
+
+            #$opts{header} .= "Math::BigFloat->precision(-$p);";
+            #$opts{header} .= "local \$Math::BigFloat::precision = -$p;\n";
+            #$opts{header} .= "local \$Math::BigFloat::round_mode = 'trunc';" if $p == 0;
+            $opts{header} .= "local \$Math::BigFloat::accuracy = $accuracy;\n";
+
+            #$opts{header} .= "local \$Math::BigFloat::round_mode = 'common';";
+        }
+
+        if (exists $opts{opt}{P}) {
+            my $precision = abs(int($opts{opt}{P}));
+            $opts{header} .= "local \$Math::BigFloat::precision = -$precision;\n";
+        }
+
+        if (exists $opts{opt}{M}) {
+            my $mode = lc($opts{opt}{M}) =~ s/\s+//rg;
+            $opts{header} .= "local \$Math::BigFloat::round_mode = '${mode}';\n";
+        }
 
         %addr    = ();
         %type    = ();

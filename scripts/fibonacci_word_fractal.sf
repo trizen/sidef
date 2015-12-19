@@ -1,6 +1,6 @@
 #!/usr/bin/ruby
 
-var(m=17, scale=3);
+var(m=14, scale=3);
 
 var world = Hash.new;
 world{0}{0} = 1;

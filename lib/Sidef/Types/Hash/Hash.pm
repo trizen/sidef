@@ -339,7 +339,7 @@ package Sidef::Types::Hash::Hash {
 
     sub to_list {
         my ($self) = @_;
-        map { (Sidef::Types::String::String->new($_) => $self->{$_}) } keys %$self;
+        map { (Sidef::Types::String::String->new($_), $self->{$_}) } keys %$self;
     }
 
     *as_list = \&to_list;
