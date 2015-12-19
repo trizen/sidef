@@ -56,13 +56,13 @@ package Sidef::Math::Math {
         my $e = do {
             local $Math::BigFloat::precision = undef if defined($precision);
             Math::BigFloat->new(1)->bexp(
-                defined($places)
-                ? do {
+                defined($precision)
+                ? (-$precision + 1)
+                : defined($places) ? do {
                     local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1 if defined($precision);
                     $places->get_value;
                   }
-                : defined($precision) ? (-$precision + 1)
-                :                       ()
+                : ()
                                         );
         };
 
@@ -89,13 +89,13 @@ package Sidef::Math::Math {
         my $pi = do {
             local $Math::BigFloat::precision = undef if defined($precision);
             Math::BigFloat->bpi(
-                defined($places)
-                ? do {
+                defined($precision)
+                ? (-$precision + 1)
+                : defined($places) ? do {
                     local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1 if defined($precision);
                     $places->get_value;
                   }
-                : defined($precision) ? (-$precision + 1)
-                :                       ()
+                : ()
                                );
         };
 
