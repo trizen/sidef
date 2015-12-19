@@ -71,13 +71,7 @@ HEADER
 
         if (exists $opts{opt}{A}) {
             my $accuracy = abs(int($opts{opt}{A}));
-
-            #$opts{header} .= "Math::BigFloat->precision(-$p);";
-            #$opts{header} .= "local \$Math::BigFloat::precision = -$p;\n";
-            #$opts{header} .= "local \$Math::BigFloat::round_mode = 'trunc';" if $p == 0;
             $opts{header} .= "local \$Math::BigFloat::accuracy = $accuracy;\n";
-
-            #$opts{header} .= "local \$Math::BigFloat::round_mode = 'common';";
         }
 
         if (exists $opts{opt}{P}) {
