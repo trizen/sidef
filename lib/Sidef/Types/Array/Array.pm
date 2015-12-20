@@ -691,6 +691,24 @@ package Sidef::Types::Array::Array {
         $self;
     }
 
+    sub each_cons {
+        my ($self, $n, $code) = @_;
+
+        {
+            local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
+            $n = $n->get_value;
+        }
+
+        my $end = @{$self};
+        foreach my $i ($n - 1 .. $end - 1) {
+            if (defined(my $res = $code->_run_code($self->new(@{$self}[$i - $n + 1 .. $i])))) {
+                return $res;
+            }
+        }
+
+        $self;
+    }
+
     sub each_index {
         my ($self, $code) = @_;
 
