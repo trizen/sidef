@@ -537,7 +537,10 @@ package Sidef::Types::Array::Array {
                 return $self->last_by($arg);
             }
 
-            my $from = @{$self} - $arg->get_value;
+            my $from = @{$self} - do {
+                local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
+                $arg->get_value;
+            };
             return $self->new(@{$self}[($from < 0 ? 0 : $from) .. $#{$self}]);
         }
 
@@ -614,8 +617,11 @@ package Sidef::Types::Array::Array {
 
         my $max = @{$self};
 
-        $from = defined($from) ? ($from->get_value) : 0;
-        $to   = defined($to)   ? ($to->get_value)   : $max - 1;
+        {
+            local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
+            $from = defined($from) ? ($from->get_value) : 0;
+            $to   = defined($to)   ? ($to->get_value)   : $max - 1;
+        }
 
         if (abs($from) > $max) {
             return;
@@ -699,8 +705,7 @@ package Sidef::Types::Array::Array {
             $n = $n->get_value;
         }
 
-        my $end = @{$self};
-        foreach my $i ($n - 1 .. $end - 1) {
+        foreach my $i ($n - 1 .. $#{$self}) {
             if (defined(my $res = $code->_run_code($self->new(@{$self}[$i - $n + 1 .. $i])))) {
                 return $res;
             }
