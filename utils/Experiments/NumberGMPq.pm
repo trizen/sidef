@@ -3,12 +3,13 @@ package Sidef::Types::Number::NumberGMPq {
     use 5.014;
 
     use Math::GMPq qw(:mpq);
+    use Math::GMPz qw(:mpz);
     use Math::MPFR qw(:mpfr);
 
     #use Math::BigRat (try => 'GMP');
 
     our $ROUND = MPFR_RNDN;
-    our $PREC  = 328;
+    our $PREC  = 128;
 
     use overload q{""} => \&get_value;
 
@@ -33,7 +34,7 @@ package Sidef::Types::Number::NumberGMPq {
 
     sub _as_float {
         my $r = Rmpfr_init2($PREC);
-        Rmpfr_set_str($r, $_[0]->get_value(), 10, $ROUND);
+        Rmpfr_set_q($r, ${$_[0]}, $ROUND);
         $r;
     }
 
@@ -72,11 +73,56 @@ package Sidef::Types::Number::NumberGMPq {
         }
     }
 
-    sub _as_rat {
-        my $str = Rmpfr_get_str($_[0], 10, 0, $ROUND);
-        Math::GMPq->new(_str2rat($str));
+    sub Rmpfr_get_str {
 
-        #Math::GMPq->new(Math::BigRat->new($str)->bstr);
+        my ($mantissa, $exponent) = Rmpfr_deref2($_[0], $_[1], $_[2], $_[3]);
+
+        #say "M: $mantissa; E: $exponent";
+
+        if ($mantissa =~ /^\@/) { return substr($mantissa, 1, -1) }
+        if ($mantissa =~ /\-/ && $mantissa !~ /[^0,\-]/) { return '-0' }
+        if ($mantissa !~ /[^0]/) { return '0' }
+
+        my $len = substr($mantissa, 0, 1) eq '-' ? 2 : 1;
+
+        if (!$_[2]) {
+
+            #$mantissa =~ s/^.{$len}.*?\K0+$//;
+            $mantissa =~ s/0+$//;
+
+            #$mantissa = reverse(reverse($mantissa) =~ s/^0+(?=.{$len,})//r);
+
+            #while(length($mantissa) > $len && substr($mantissa, -1, 1) eq '0') {
+            #     substr($mantissa, -1, 1, '');
+            #}
+        }
+
+        $exponent--;
+
+        my $sep = $_[1] <= 10 ? 'e' : '@';
+
+        if (length($mantissa) == $len) {
+            if ($exponent) { return $mantissa . $sep . $exponent }
+            return $mantissa;
+        }
+
+        substr($mantissa, $len, 0, '.');
+        if ($exponent) { return $mantissa . $sep . $exponent }
+        return $mantissa;
+    }
+
+    sub _as_rat {
+        my ($mantissa, $exponent) = Rmpfr_deref2($_[0], 10, 0, $ROUND);
+
+        my $r = Rmpq_init();
+        Rmpq_set_str($r, "$mantissa/1" . ('0' x (length($mantissa) - $exponent)), 10);
+        Rmpq_canonicalize($r);
+        $r
+
+          #Math::GMPq->new("$mantissa/1" . ('0' x (length($mantissa) - $exponent)));
+
+          #my $str = Rmpfr_get_str($_[0], 10, 0, $ROUND);
+          #Math::GMPq->new(_str2rat($str));
     }
 
     sub get_value {
@@ -101,7 +147,7 @@ package Sidef::Types::Number::NumberGMPq {
                 my ($before, $after) = split(/\./, substr($str, 0, $j));
 
                 if ($exp < 1) {
-                    ('0' x abs($exp)) . '.' . $before . $after;
+                    '0' . '.' . ('0' x abs($exp + 1)) . $before . $after;
                 }
                 else {
                     my $s = $before . $after;
@@ -128,6 +174,13 @@ package Sidef::Types::Number::NumberGMPq {
         $x->_new($r);
     }
 
+    sub sub {
+        my ($x, $y) = @_;
+        my $r = Rmpq_init();
+        Rmpq_sub($r, $$x, $$y);
+        $x->_new($r);
+    }
+
     sub div {
         my ($x, $y) = @_;
         my $r = Rmpq_init();
@@ -142,6 +195,27 @@ package Sidef::Types::Number::NumberGMPq {
         $x->_new($r);
     }
 
+    sub neg {
+        my ($x) = @_;
+        my $r = Rmpq_init();
+        Rmpq_neg($r, $$x);
+        $x->_new($r);
+    }
+
+    sub abs {
+        my ($x) = @_;
+        my $r = Rmpq_init();
+        Rmpq_abs($r, $$x);
+        $x->_new($r);
+    }
+
+    sub inv {
+        my ($x) = @_;
+        my $r = Rmpq_init();
+        Rmpq_inv($r, $$x);
+        $x->_new($r);
+    }
+
     sub sqrt {
         my ($x) = @_;
         my $r = Rmpfr_init2($PREC);
@@ -149,14 +223,10 @@ package Sidef::Types::Number::NumberGMPq {
         $x->_new(_as_rat($r));
     }
 
-    #sub pow2 {    # using no-blessed values
-    #    my ($x, $y) = @_;
-    #    my $r = Rmpfr_init2_nobless($PREC);
-    #    Rmpfr_pow($r, _as_float($x), _as_float($y), $ROUND);
-    #    my $res = $x->_new(_as_rat($r));
-    #    Rmpfr_clear($r);
-    #    $res;
-    #}
+    sub sqr {
+        my ($x) = @_;
+        $x->mul($x);
+    }
 
     sub pow {
         my ($x, $y) = @_;
@@ -170,6 +240,195 @@ package Sidef::Types::Number::NumberGMPq {
         my $r = Rmpfr_init2($PREC);
         Rmpfr_fmod($r, _as_float($x), _as_float($y), $ROUND);
         $x->_new(_as_rat($r));
+    }
+
+    sub log {
+        my ($x) = @_;
+        my $r = Rmpfr_init2($PREC);
+        Rmpfr_log($r, _as_float($x), $ROUND);
+        $x->_new(_as_rat($r));
+    }
+
+    sub log2 {
+        my ($x) = @_;
+        my $r = Rmpfr_init2($PREC);
+        Rmpfr_log2($r, _as_float($x), $ROUND);
+        $x->_new(_as_rat($r));
+    }
+
+    sub log10 {
+        my ($x) = @_;
+        my $r = Rmpfr_init2($PREC);
+        Rmpfr_log10($r, _as_float($x), $ROUND);
+        $x->_new(_as_rat($r));
+    }
+
+    sub exp {
+        my ($x) = @_;
+        my $r = Rmpfr_init2($PREC);
+        Rmpfr_exp($r, _as_float($x), $ROUND);
+        $x->_new(_as_rat($r));
+    }
+
+    sub exp2 {
+        my ($x) = @_;
+        my $r = Rmpfr_init2($PREC);
+        Rmpfr_exp2($r, _as_float($x), $ROUND);
+        $x->_new(_as_rat($r));
+    }
+
+    sub exp10 {
+        my ($x) = @_;
+        my $r = Rmpfr_init2($PREC);
+        Rmpfr_exp10($r, _as_float($x), $ROUND);
+        $x->_new(_as_rat($r));
+    }
+
+    sub sin {
+        my ($x) = @_;
+        my $r = Rmpfr_init2($PREC);
+        Rmpfr_sin($r, _as_float($x), $ROUND);
+        $x->_new(_as_rat($r));
+    }
+
+    sub asin {
+        my ($x) = @_;
+        my $r = Rmpfr_init2($PREC);
+        Rmpfr_asin($r, _as_float($x), $ROUND);
+        $x->_new(_as_rat($r));
+    }
+
+    sub sinh {
+        my ($x) = @_;
+        my $r = Rmpfr_init2($PREC);
+        Rmpfr_sinh($r, _as_float($x), $ROUND);
+        $x->_new(_as_rat($r));
+    }
+
+    sub asinh {
+        my ($x) = @_;
+        my $r = Rmpfr_init2($PREC);
+        Rmpfr_asinh($r, _as_float($x), $ROUND);
+        $x->_new(_as_rat($r));
+    }
+
+    sub cos {
+        my ($x) = @_;
+        my $r = Rmpfr_init2($PREC);
+        Rmpfr_cos($r, _as_float($x), $ROUND);
+        $x->_new(_as_rat($r));
+    }
+
+    sub acos {
+        my ($x) = @_;
+        my $r = Rmpfr_init2($PREC);
+        Rmpfr_acos($r, _as_float($x), $ROUND);
+        $x->_new(_as_rat($r));
+    }
+
+    sub cosh {
+        my ($x) = @_;
+        my $r = Rmpfr_init2($PREC);
+        Rmpfr_cosh($r, _as_float($x), $ROUND);
+        $x->_new(_as_rat($r));
+    }
+
+    sub acosh {
+        my ($x) = @_;
+        my $r = Rmpfr_init2($PREC);
+        Rmpfr_acosh($r, _as_float($x), $ROUND);
+        $x->_new(_as_rat($r));
+    }
+
+    sub tan {
+        my ($x) = @_;
+        my $r = Rmpfr_init2($PREC);
+        Rmpfr_tan($r, _as_float($x), $ROUND);
+        $x->_new(_as_rat($r));
+    }
+
+    sub atan {
+        my ($x) = @_;
+        my $r = Rmpfr_init2($PREC);
+        Rmpfr_atan($r, _as_float($x), $ROUND);
+        $x->_new(_as_rat($r));
+    }
+
+    sub tanh {
+        my ($x) = @_;
+        my $r = Rmpfr_init2($PREC);
+        Rmpfr_tanh($r, _as_float($x), $ROUND);
+        $x->_new(_as_rat($r));
+    }
+
+    sub atanh {
+        my ($x) = @_;
+        my $r = Rmpfr_init2($PREC);
+        Rmpfr_atanh($r, _as_float($x), $ROUND);
+        $x->_new(_as_rat($r));
+    }
+
+    sub sec {
+        my ($x) = @_;
+        my $r = Rmpfr_init2($PREC);
+        Rmpfr_sec($r, _as_float($x), $ROUND);
+        $x->_new(_as_rat($r));
+    }
+
+    sub sech {
+        my ($x) = @_;
+        my $r = Rmpfr_init2($PREC);
+        Rmpfr_sech($r, _as_float($x), $ROUND);
+        $x->_new(_as_rat($r));
+    }
+
+    sub csc {
+        my ($x) = @_;
+        my $r = Rmpfr_init2($PREC);
+        Rmpfr_csc($r, _as_float($x), $ROUND);
+        $x->_new(_as_rat($r));
+    }
+
+    sub csch {
+        my ($x) = @_;
+        my $r = Rmpfr_init2($PREC);
+        Rmpfr_csch($r, _as_float($x), $ROUND);
+        $x->_new(_as_rat($r));
+    }
+
+    sub cot {
+        my ($x) = @_;
+        my $r = Rmpfr_init2($PREC);
+        Rmpfr_cot($r, _as_float($x), $ROUND);
+        $x->_new(_as_rat($r));
+    }
+
+    sub coth {
+        my ($x) = @_;
+        my $r = Rmpfr_init2($PREC);
+        Rmpfr_coth($r, _as_float($x), $ROUND);
+        $x->_new(_as_rat($r));
+    }
+
+    sub gamma {
+        my ($x) = @_;
+        my $r = Rmpfr_init2($PREC);
+        Rmpfr_gamma($r, _as_float($x), $ROUND);
+        $x->_new(_as_rat($r));
+    }
+
+    sub numerator {
+        my ($x) = @_;
+        my $r = Rmpz_init();
+        Rmpq_get_num($r, $$x);
+        $x->_new(Math::GMPq->new("$r"));
+    }
+
+    sub denominator {
+        my ($x) = @_;
+        my $r = Rmpz_init();
+        Rmpq_get_den($r, $$x);
+        $x->_new(Math::GMPq->new("$r"));
     }
 }
 
@@ -252,3 +511,18 @@ say $pkg->new(1)->div($pkg->new(7));
 say $prod->sqrt;
 say $pkg->new(1000)->div($pkg->new(10));
 say $pkg->new(1000)->div($pkg->new(5));
+
+say $pkg->new(42)->sub($pkg->new(21.1));
+say $pkg->new(2)->neg;
+
+say $pkg->new(13)->div($pkg->new(4))->numerator;
+say $pkg->new(13)->div($pkg->new(4))->denominator;
+
+say $pkg->new(21)->log;
+say $pkg->new(1)->exp;
+
+say $pkg->new(5.6)->gamma;
+say $pkg->new(1)->div($pkg->new(12345));
+
+say $pkg->new(10)->div($pkg->new(4));
+say $pkg->new(10)->div($pkg->new(771));
