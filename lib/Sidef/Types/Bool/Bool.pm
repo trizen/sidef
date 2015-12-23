@@ -3,7 +3,7 @@ package Sidef::Types::Bool::Bool {
     use overload
       q{bool} => \&get_value,
       q{0+}   => \&get_value,
-      q{""}   => \&dump;
+      q{""}   => sub { ${$_[0]} ? 'true' : 'false' };
 
     use parent qw(
       Sidef::Object::Object
@@ -59,7 +59,7 @@ package Sidef::Types::Bool::Bool {
 
     sub dump {
         my ($self) = @_;
-        Sidef::Types::String::String->new($self->get_value ? 'true' : 'false');
+        Sidef::Types::String::String->new($$self ? 'true' : 'false');
     }
 
 };
