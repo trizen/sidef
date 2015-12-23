@@ -10,14 +10,16 @@ package Sidef::Types::Number::NumberGMPq {
     our $ROUND = MPFR_RNDN;
     our $PREC  = 128;
 
+    our $GET_PERL_VALUE = 0;
+
     sub _new {
         bless(\$_[1], __PACKAGE__);
     }
 
     use constant {
-                  ONE  => __PACKAGE__->_new(Math::GMPq->new(-1)),
+                  ONE  => __PACKAGE__->_new(Math::GMPq->new(1)),
                   ZERO => __PACKAGE__->_new(Math::GMPq->new(0)),
-                  MONE => __PACKAGE__->_new(Math::GMPq->new(1)),
+                  MONE => __PACKAGE__->_new(Math::GMPq->new(-1)),
                  };
 
     use overload q{""} => \&get_value;
@@ -42,6 +44,12 @@ package Sidef::Types::Number::NumberGMPq {
         $r;
     }
 
+    sub _as_int {
+        my $i = Rmpz_init();
+        Rmpz_set_q($i, ${$_[0]});
+        $i;
+    }
+
     sub _mpfr2rat {
 
         #~ my ($mantissa, $exponent) = Rmpfr_deref2($_[0], 10, 0, $ROUND);
@@ -63,12 +71,6 @@ package Sidef::Types::Number::NumberGMPq {
           #Math::GMPq->new("$mantissa/1" . ('0' x (length($mantissa) - $exponent)));
           #my $str = Rmpfr_get_str($_[0], 10, 0, $ROUND);
           #Math::GMPq->new(_str2rat($str));
-    }
-
-    sub _as_int {
-        my $i = Rmpz_init();
-        Rmpz_set_q($i, ${$_[0]});
-        $i;
     }
 
     sub _mpz2rat {
@@ -151,45 +153,24 @@ package Sidef::Types::Number::NumberGMPq {
     }
 
     sub get_value {
-        my $value = ${$_[0]};
+        $GET_PERL_VALUE && return Rmpq_get_d(${$_[0]});
 
-        my $v = Rmpq_get_str($value, 10);
-        if ((my $i = index($v, '/')) != -1) {
-            my ($numerator, $denominator) = (substr($v, 0, $i), substr($v, $i + 1));
+        my $v = Rmpq_get_str(${$_[0]}, 10);
 
-            my $r  = Rmpfr_init2($PREC);
-            my $nu = Rmpfr_init2($PREC);
-            my $de = Rmpfr_init2($PREC);
+        if (index($v, '/') != -1) {
+            my $br = Math::BigRat->new($v);
 
-            Rmpfr_set_str($nu, $numerator,   10, $ROUND);
-            Rmpfr_set_str($de, $denominator, 10, $ROUND);
-            Rmpfr_div($r, $nu, $de, $ROUND);
-
-            my $str = Rmpfr_get_str($r, 10, 0, $ROUND);
-
-            if ((my $j = index($str, 'e')) != -1) {
-                my $exp = substr($str, $j + 1);
-                my ($before, $after) = split(/\./, substr($str, 0, $j));
-
-                if ($exp < 1) {
-                    '0' . '.' . ('0' x abs($exp + 1)) . $before . $after;
-                }
-                else {
-                    my $s = $before . $after;
-                    substr($s, $exp + length($before), 0, '.');
-                    $s;
-                }
+            # This should not happen
+            if ($br->is_int) {
+                die "$v is integer from Math::BigRat!";
             }
-            else {
-                $str;
-            }
+
+            #return ($br->is_int ? $br->as_int->bstr :
+            return ($br->as_float(int($PREC / 3.2))->bstr =~ s/0+$//r);
         }
         else {
-            $v;
+            return $v;
         }
-
-        #my $n = Math::BigRat->new(Rmpq_get_str($value, 10));
-        #$n->is_int ? $n->as_int->bstr : $n->as_float(int($PREC / 3.321923))->bstr;
     }
 
     sub add {
@@ -460,6 +441,32 @@ package Sidef::Types::Number::NumberGMPq {
         $cmp == 0 ? ZERO : $cmp < 0 ? MONE : ONE;
     }
 
+    sub acmp {
+        my ($x, $y) = @_;
+
+        my $xn = $$x;
+        my $yn = $$y;
+
+        my $a1 = Rmpq_sgn($xn) < 0
+          ? do {
+            my $r = Rmpq_init();
+            Rmpq_abs($r, $xn);
+            $r;
+          }
+          : $xn;
+
+        my $a2 = Rmpq_sgn($yn) < 0
+          ? do {
+            my $r = Rmpq_init();
+            Rmpq_abs($r, $yn);
+            $r;
+          }
+          : $yn;
+
+        my $cmp = Rmpq_cmp($a1, $a2);
+        $cmp == 0 ? ZERO : $cmp < 0 ? MONE : ONE;
+    }
+
     sub is_zero {
         my ($x) = @_;
         Sidef::Types::Bool::Bool->new(Rmpq_sgn($$x) == 0);
@@ -473,36 +480,6 @@ package Sidef::Types::Number::NumberGMPq {
     sub is_negative {
         my ($x) = @_;
         Sidef::Types::Bool::Bool->new(Rmpq_sgn($$x) < 0);
-    }
-
-    sub is_psquare {
-        my ($x) = @_;
-
-        my $dz = Rmpz_init();
-        Rmpq_get_den($dz, $$x);
-
-        state $zone = Rmpz_init_set_str(1, 10);
-        Rmpz_cmp($dz, $zone) == 0 or return Sidef::Types::Bool::Bool->false;
-
-        my $nz = Rmpz_init();
-        Rmpq_get_num($nz, $$x);
-
-        Sidef::Types::Bool::Bool->new(Rmpz_perfect_square_p($nz));
-    }
-
-    sub is_ppower {
-        my ($x) = @_;
-
-        my $dz = Rmpz_init();
-        Rmpq_get_den($dz, $$x);
-
-        state $zone = Rmpz_init_set_str(1, 10);
-        Rmpz_cmp($dz, $zone) == 0 or return Sidef::Types::Bool::Bool->false;
-
-        my $nz = Rmpz_init();
-        Rmpq_get_num($nz, $$x);
-
-        Sidef::Types::Bool::Bool->new(Rmpz_perfect_power_p($nz));
     }
 
     sub inc {
@@ -586,7 +563,14 @@ package Sidef::Types::Number::NumberGMPq {
     sub binomial {
         my ($x, $y) = @_;
         my $r = Rmpz_init();
-        Rmpz_bin_ui($r, $$x, CORE::int(Rmpq_get_d($$y)));
+        Rmpz_bin_ui($r, _as_int($x), CORE::int(Rmpq_get_d($$y)));
+        $x->_new(_mpz2rat($r));
+    }
+
+    sub legendre {
+        my ($x, $y) = @_;
+        my $r = Rmpz_init();
+        Rmpz_legendre($r, _as_int($x), _as_int($y));
         $x->_new(_mpz2rat($r));
     }
 
@@ -600,8 +584,66 @@ package Sidef::Types::Number::NumberGMPq {
     sub gcd {
         my ($x, $y) = @_;
         my $r = Rmpz_init();
-        Rmpz_gcd($r, $$x, $$y);
+        Rmpz_gcd($r, _as_int($x), _as_int($y));
         $x->_new(_mpz2rat($r));
+    }
+
+    sub lcm {
+        my ($x, $y) = @_;
+        my $r = Rmpz_init();
+        Rmpz_lcm($r, _as_int($x), _as_int($y));
+        $x->_new(_mpz2rat($r));
+    }
+
+    sub modinv {
+        my ($x, $y) = @_;
+        my $r = Rmpz_init();
+        Rmpz_invert($r, _as_int($x), _as_int($y));
+        $x->_new(_mpz2rat($r));
+    }
+
+    # Correct up to a maximum value of 341,550,071,728,320
+    # See: https://en.wikipedia.org/wiki/Miller%E2%80%93Rabin_primality_test#Deterministic_variants_of_the_test
+    sub is_prime {
+        my ($x) = @_;
+        Sidef::Types::Bool::Bool->new(Rmpz_probab_prime_p(_as_int($x), 7) > 0);
+    }
+
+    sub nextprime {
+        my ($x) = @_;
+        my $r = Rmpz_init();
+        Rmpz_nextprime($r, _as_int($x));
+        $x->_new(_mpz2rat($r));
+    }
+
+    sub is_psquare {
+        my ($x) = @_;
+
+        my $dz = Rmpz_init();
+        Rmpq_get_den($dz, $$x);
+
+        state $zone = Rmpz_init_set_str(1, 10);
+        Rmpz_cmp($dz, $zone) == 0 or return Sidef::Types::Bool::Bool->false;
+
+        my $nz = Rmpz_init();
+        Rmpq_get_num($nz, $$x);
+
+        Sidef::Types::Bool::Bool->new(Rmpz_perfect_square_p($nz));
+    }
+
+    sub is_ppower {
+        my ($x) = @_;
+
+        my $dz = Rmpz_init();
+        Rmpq_get_den($dz, $$x);
+
+        state $zone = Rmpz_init_set_str(1, 10);
+        Rmpz_cmp($dz, $zone) == 0 or return Sidef::Types::Bool::Bool->false;
+
+        my $nz = Rmpz_init();
+        Rmpq_get_num($nz, $$x);
+
+        Sidef::Types::Bool::Bool->new(Rmpz_perfect_power_p($nz));
     }
 
     #
@@ -635,7 +677,7 @@ package Sidef::Types::Number::NumberGMPq {
 
 use 5.014;
 
-use lib ('/home/swampyx/Other/Programare/Sidef/lib');
+use lib ('../../lib');
 require Sidef;
 
 #my $pkg = 'Sidef::Types::Number::Number';
@@ -737,6 +779,11 @@ say $pkg->new(26)->is_psquare;
 say $pkg->new(1 / 3)->is_psquare;
 say $pkg->new(3**7)->is_ppower;
 say $pkg->new(12345)->is_ppower;
-say $pkg->new(81)->gcd($pkg->new(21));
+say $pkg->new(81.0)->gcd($pkg->new(21.6));
 say $pkg->new(5.5)->fac;
-say $pkg->new(23.3)->and($pkg->new(99));
+
+say(join(' ', grep { $pkg->new($_)->is_prime } 0 .. 100));
+say $pkg->new(98)->nextprime;
+say $pkg->new(-3)->acmp($pkg->new(-3));
+say $pkg->new(-42)->acmp($pkg->new(3));
+say $pkg->new(1.34)->sub($pkg->new(9.49));
