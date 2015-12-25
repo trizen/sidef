@@ -42,14 +42,6 @@ lib/Sidef/Types/Block/Try.pm
 lib/Sidef/Types/Block/Try.pod
 lib/Sidef/Types/Bool/Bool.pm
 lib/Sidef/Types/Bool/Bool.pod
-lib/Sidef/Types/Byte/Byte.pm
-lib/Sidef/Types/Byte/Byte.pod
-lib/Sidef/Types/Byte/Bytes.pm
-lib/Sidef/Types/Byte/Bytes.pod
-lib/Sidef/Types/Char/Char.pm
-lib/Sidef/Types/Char/Char.pod
-lib/Sidef/Types/Char/Chars.pm
-lib/Sidef/Types/Char/Chars.pod
 lib/Sidef/Types/Glob/Backtick.pm
 lib/Sidef/Types/Glob/Backtick.pod
 lib/Sidef/Types/Glob/Dir.pm
@@ -68,10 +60,6 @@ lib/Sidef/Types/Glob/SocketHandle.pm
 lib/Sidef/Types/Glob/SocketHandle.pod
 lib/Sidef/Types/Glob/Stat.pm
 lib/Sidef/Types/Glob/Stat.pod
-lib/Sidef/Types/Grapheme/Grapheme.pm
-lib/Sidef/Types/Grapheme/Grapheme.pod
-lib/Sidef/Types/Grapheme/Graphemes.pm
-lib/Sidef/Types/Grapheme/Graphemes.pod
 lib/Sidef/Types/Hash/Hash.pm
 lib/Sidef/Types/Hash/Hash.pod
 lib/Sidef/Types/Null/Null.pm
@@ -96,7 +84,7 @@ lib/Sidef/Variable/NamedParam.pm
 lib/Sidef/Variable/NamedParam.pod
 LICENSE
 Makefile.PL
-MANIFEST            This list of files
+MANIFEST			This list of files
 META.json
 META.yml
 README.md
@@ -682,7 +670,6 @@ scripts/Tests/prefix_methods.sf
 scripts/Tests/problem_of_apollonius.sf
 scripts/Tests/pythagorean_means.sf
 scripts/Tests/quicksort.sf
-scripts/Tests/quicksort_in_parallel.sf
 scripts/Tests/quoted_strings.sf
 scripts/Tests/range_objects.sf
 scripts/Tests/read_a_configuration_file.sf
@@ -787,8 +774,6 @@ utils/Concepts/sidef_executor.jl
 utils/Concepts/sidef_executor.lua
 utils/Concepts/sidef_executor.pl6
 utils/Examples/sidef_in_perl.pl
-utils/Experiments/bigint.sm
-utils/Experiments/bigrat.sm
 utils/Experiments/C-inline-function-call.pl
 utils/Experiments/Lazy/Lazy.pm
 utils/Experiments/operator_precendece.pl

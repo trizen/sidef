@@ -37,10 +37,13 @@
             "File::Spec" : "0",
             "Getopt::Std" : "0",
             "List::Util" : "1.33",
-            "Math::BigFloat" : "0",
             "Math::BigInt" : "0",
             "Math::BigRat" : "0",
-            "Math::Complex" : "0",
+            "Math::GMPf" : "0",
+            "Math::GMPq" : "0",
+            "Math::GMPz" : "0",
+            "Math::MPC" : "0",
+            "Math::MPFR" : "0",
             "Math::Trig" : "0",
             "Memoize" : "0",
             "POSIX" : "0",
@@ -57,7 +60,7 @@
    "provides" : {
       "Sidef" : {
          "file" : "lib/Sidef.pm",
-         "version" : "2.13"
+         "version" : "2.20"
       },
       "Sidef::Convert::Convert" : {
          "file" : "lib/Sidef/Convert/Convert.pm"
@@ -128,18 +131,6 @@
       "Sidef::Types::Bool::Bool" : {
          "file" : "lib/Sidef/Types/Bool/Bool.pm"
       },
-      "Sidef::Types::Byte::Byte" : {
-         "file" : "lib/Sidef/Types/Byte/Byte.pm"
-      },
-      "Sidef::Types::Byte::Bytes" : {
-         "file" : "lib/Sidef/Types/Byte/Bytes.pm"
-      },
-      "Sidef::Types::Char::Char" : {
-         "file" : "lib/Sidef/Types/Char/Char.pm"
-      },
-      "Sidef::Types::Char::Chars" : {
-         "file" : "lib/Sidef/Types/Char/Chars.pm"
-      },
       "Sidef::Types::Glob::Backtick" : {
          "file" : "lib/Sidef/Types/Glob/Backtick.pm"
       },
@@ -166,12 +157,6 @@
       },
       "Sidef::Types::Glob::Stat" : {
          "file" : "lib/Sidef/Types/Glob/Stat.pm"
-      },
-      "Sidef::Types::Grapheme::Grapheme" : {
-         "file" : "lib/Sidef/Types/Grapheme/Grapheme.pm"
-      },
-      "Sidef::Types::Grapheme::Graphemes" : {
-         "file" : "lib/Sidef/Types/Grapheme/Graphemes.pm"
       },
       "Sidef::Types::Hash::Hash" : {
          "file" : "lib/Sidef/Types/Hash/Hash.pm"
@@ -213,6 +198,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "2.13",
+   "version" : "2.20",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

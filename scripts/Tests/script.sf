@@ -102,12 +102,12 @@ creepy->apply_escapes->print;
 
 var num = 1234;
 "Next power of two after number #{num} is: "->print;
-num->npow2->to_s->say;
+num->next_pow2->to_s->say;
 
-assert_eq(num.npow(2), num.npow2);
-assert_eq(Math.npow(num, 3), num.npow(3));
-assert_eq(Math.npow2(num), Math.npow(num, 2));
-assert_eq(Math.npow(num, 2), 2048);
+assert_eq(num.next_pow(2), num.next_pow2);
+assert_eq(Math.next_pow(num, 3), num.next_pow(3));
+assert_eq(Math.next_pow2(num), Math.next_pow(num, 2));
+assert_eq(Math.next_pow(num, 2), 2048);
 
 var init = "^_^ Sidef ^_^"->say;  # assings to variable 'init', and prints it
 init->uc->say;                    # upper cases the variable 'init', and prints it again
@@ -262,7 +262,7 @@ my_def->say;
 
 '-' * 80 -> say;
 
-var chars = "sidef".to_chars;
+var chars = "sidef".chars;
 "Number of chars: " + (chars->len->to_s)->say;
 chars->to_s->say;
 

@@ -231,7 +231,6 @@ package Sidef::Object::Object {
 
             # First is String
             if (   $f_type eq 'Sidef::Types::String::String'
-                or $f_type eq 'Sidef::Types::Char::Char'
                 or $f_type eq 'Sidef::Types::Glob::File'
                 or $f_type eq 'Sidef::Types::Glob::Dir') {
 

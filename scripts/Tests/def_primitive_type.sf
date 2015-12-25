@@ -36,7 +36,7 @@ say b;               # => 6
 
 assert_eq(b, MyInt(6));
 
-say a.to_hex.dump;   # => "9" -- an hexadecimal string
+say a.as_hex.dump;   # => "9" -- an hexadecimal string
 
 a -= 7;              # a=2
 say (a + b);         # => 8 -- the result of (2 + 6)

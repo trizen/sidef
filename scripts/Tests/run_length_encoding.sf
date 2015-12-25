@@ -3,12 +3,12 @@
 # http://rosettacode.org/wiki/Run-length_encoding
 
 func encode (str) {
-    var chars = str.to_chars;
+    var chars = str.chars;
 
     var i = 0;
     var lc = '';
 
-    var output = Chars.new;
+    var output = []
 
     chars.range.each { |index|
 
@@ -27,7 +27,7 @@ func encode (str) {
 }
 
 func decode (str) {
-    var chars = str.to_chars;
+    var chars = str.chars;
 
     var acc = '';
     var output = '';

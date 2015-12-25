@@ -1501,6 +1501,17 @@ package Sidef::Types::Array::Array {
         Sidef::Types::String::String->new(CORE::join($delim, @{$self}));
     }
 
+    sub join_bytes {
+        my ($self, $encoding) = @_;
+        state $x = require Encode;
+        $encoding = defined($encoding) ? $encoding->get_value : 'UTF-8';
+        Sidef::Types::String::String->new(
+            eval {
+                Encode::decode($encoding, CORE::join('', map { CORE::chr($_) } @{$self}));
+              } // return
+        );
+    }
+
     sub reverse {
         my ($self) = @_;
         $self->new(CORE::reverse @{$self});
@@ -1517,9 +1528,10 @@ package Sidef::Types::Array::Array {
 
     sub copy {
         my ($self) = @_;
+        $self->new(@{$self});
 
-        state $x = require Storable;
-        Storable::dclone($self);
+        #state $x = require Storable;
+        #Storable::dclone($self);
     }
 
     sub delete_first {

@@ -6,9 +6,9 @@
 ## Recursive
 #
 func horner_rec(coeff, x) {
-    coeff.len > 0 && (
+    coeff.len > 0 ? (
         coeff[0] + x*horner_rec(coeff.ft(1), x)
-    );
+    ) : 0
 }
 
 assert_eq(128, horner_rec([-19, 7, -4, 6], 3));

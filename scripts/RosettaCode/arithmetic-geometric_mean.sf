@@ -7,7 +7,7 @@
 func agm(a, g) {
     loop {
         var x = [a+g / 2, Math.sqrt(a*g)];
-        x == [a, g] && return a;
+        x.map{.float} == [a, g].map{.float} && return a;
         (a, g) = x...;
     }
 }

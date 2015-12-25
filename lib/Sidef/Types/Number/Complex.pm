@@ -3,11 +3,10 @@ package Sidef::Types::Number::Complex {
     use utf8;
     use 5.014;
 
-    require Math::Complex;
-
     use parent qw(
       Sidef::Object::Object
       Sidef::Convert::Convert
+      Sidef::Types::Number::Number
       );
 
     use overload
@@ -15,535 +14,342 @@ package Sidef::Types::Number::Complex {
       q{0+}   => \&get_value,
       q{bool} => \&get_value;
 
+    use Math::MPC qw(:mpc);
+    use Math::MPFR qw(:mpfr);
+
+    our $ROUND = MPC_RNDNN;
+    our $PREC  = $Sidef::Types::Number::Number::PREC;
+
     sub new {
         my (undef, $x, $y) = @_;
 
-        $x // return (state $_zero = bless(\Math::Complex->make(0, 0), __PACKAGE__));
-
-        #
-        ## Check X
-        #
-        if (ref($x) eq __PACKAGE__ or ref($x) eq 'Sidef::Types::Number::Number') {
+        if (ref($x) eq 'Sidef::Types::Number::Number') {
             $x = $$x;
         }
-
-        if (not defined $y and ref($x) eq 'Math::Complex') {
-            return bless \$x, __PACKAGE__;
+        elsif (ref($x) eq __PACKAGE__) {
+            return $x if not defined $y;
+            my $mpfr = Rmpfr_init2($PREC);
+            Rmpc_real($mpfr, ${$_[0]}, $ROUND);
+            $x = $mpfr;
+        }
+        elsif (index(ref($x), 'Sidef::') == 0) {
+            $x = $x->get_value;
         }
 
-        if (my $rx = ref($x)) {
-            if ($rx eq 'Math::BigRat' or $rx eq 'Math::BigFloat' or $rx eq 'Math::BigInt') {
-                $x = $x->numify;
-            }
-            elsif ($rx eq 'Math::Complex') {
-                $x = Math::Complex::Re($x);
-            }
-            else {
-                $x = $x->get_value;
-            }
-        }
+        return bless(\Math::MPC->new($x // 0), __PACKAGE__) if not defined $y;
 
-        #
-        ## Check Y
-        #
-        if (ref($y) eq __PACKAGE__ or ref($y) eq 'Sidef::Types::Number::Number') {
+        if (ref($y) eq 'Sidef::Types::Number::Number') {
             $y = $$y;
         }
-
-        if (my $ry = ref($y)) {
-            if ($ry eq 'Math::BigRat' or $ry eq 'Math::BigFloat' or $ry eq 'Math::BigInt') {
-                $y = $y->numify;
-            }
-            elsif ($ry eq 'Math::Complex') {
-                $y = Math::Complex::Im($y);
-            }
-            else {
-                $y = $y->get_value;
-            }
+        elsif (ref($y) eq __PACKAGE__) {
+            my $mpfr = Rmpfr_init2($PREC);
+            Rmpc_real($mpfr, ${$_[0]}, $ROUND);
+            $x = $mpfr;
+        }
+        elsif (index(ref($y), 'Sidef::') == 0) {
+            $y = $y->get_value;
         }
 
-        bless \Math::Complex->make($x, $y), __PACKAGE__;
+        bless \Math::MPC->new($x, $y), __PACKAGE__;
     }
 
     *call = \&new;
 
+    sub _new {
+        bless \$_[0], __PACKAGE__;
+    }
+
+    sub _valid {
+        (
+         ref($_) eq __PACKAGE__
+           or die "[ERROR] Invalid argument `$_` of type "
+           . Sidef::normalize_type(ref($_)) . " in "
+           . Sidef::normalize_method((caller(1))[3])
+           . "(). Expected an argument of type Complex!\n"
+        )
+          for @_;
+    }
+
     sub get_value {
-        ${$_[0]};
+        my $re = $_[0]->re->get_value;
+        my $im = $_[0]->im->get_value;
+        $im eq '0' ? $re : ($re . (substr($im, 0, 1) eq '-' ? '' : '+') . $im . 'i');
+    }
+
+    sub dump {
+        Sidef::Types::String::String->new("Complex(" . $_[0]->re->get_value . ", ". $_[0]->im->get_value. ")");
     }
 
     sub get_constant {
-        my ($self, $name) = @_;
+        my (undef, $name) = @_;
 
         state %cache;
         state $table = {
-                        pi => sub { $self->new(Math::Complex::pi()) },
-                        i  => sub { $self->new(Math::Complex::i()) },
+                        e   => sub { __PACKAGE__->new(Sidef::Types::Number::Number->e) },
+                        pi  => sub { __PACKAGE__->new(Sidef::Types::Number::Number->pi) },
+                        phi => sub { __PACKAGE__->new(Sidef::Types::Number::Number->phi) },
+                        i   => sub { __PACKAGE__->new(0, 1) },
                        };
 
-        $cache{lc($name)} //= exists($table->{lc($name)}) ? $table->{lc($name)}->() : do {
-            warn qq{[WARN] Inexistent Complex constant "$name"!\n};
+        my $key = lc($name);
+        $cache{$key} //= exists($table->{$key}) ? $table->{$key}->() : do {
+            warn qq{[WARN] Inexistent Math constant "$name"!\n};
             undef;
         };
     }
 
-    sub i {
-        my ($self) = @_;
-        $self->new(Math::Complex::i());
+    sub abs {
+        my $mpfr = Rmpfr_init2($PREC);
+        Rmpc_abs($mpfr, ${$_[0]}, $ROUND);
+        Sidef::Types::Number::Number::_new(Sidef::Types::Number::Number::_mpfr2rat($mpfr));
     }
 
-    sub cartesian {
-        my ($self) = @_;
-        $$self->display_format('cartesian');
-        $self;
+    sub norm {
+        my $mpfr = Rmpfr_init2($PREC);
+        Rmpc_norm($mpfr, ${$_[0]}, $ROUND);
+        Sidef::Types::Number::Number::_new(Sidef::Types::Number::Number::_mpfr2rat($mpfr));
     }
 
-    sub polar {
-        my ($self) = @_;
-        $$self->display_format('polar');
-        $self;
-    }
+    *reciprocal = \&norm;
 
     sub real {
-        my ($self) = @_;
-        $self->new(Math::Complex::Re($$self));
+        my $mpfr = Rmpfr_init2($PREC);
+        Rmpc_real($mpfr, ${$_[0]}, $ROUND);
+        Sidef::Types::Number::Number::_new(Sidef::Types::Number::Number::_mpfr2rat($mpfr));
     }
 
     *re = \&real;
 
-    sub parts {
-        my ($self) = @_;
-        map { Sidef::Types::Number::Number->new($_) } @{$$self->_cartesian};
+    sub imag {
+        my $mpfr = Rmpfr_init2($PREC);
+        Rmpc_imag($mpfr, ${$_[0]}, $ROUND);
+        Sidef::Types::Number::Number::_new(Sidef::Types::Number::Number::_mpfr2rat($mpfr));
     }
 
-    *reals = \&parts;
+    *im = \&imag;
 
-    sub polars {
-        my ($self) = @_;
-        map { Sidef::Types::Number::Number->new($_) } @{$$self->_polar};
+    sub neg {
+        my ($x) = @_;
+        my $r = Rmpc_init2($PREC);
+        Rmpc_neg($r, $$x, $ROUND);
+        _new($r);
     }
 
-    *polar_parts = \&polars;
-
-    sub imaginary {
-        my ($self) = @_;
-        $self->new(Math::Complex::Im($$self));
+    sub conj {
+        my ($x) = @_;
+        my $r = Rmpc_init2($PREC);
+        Rmpc_conj($r, $$x, $ROUND);
+        _new($r);
     }
 
-    *im = \&imaginary;
+    *not       = \&conj;
+    *conjugate = \&conj;
 
-    sub reciprocal {
-        my ($self) = @_;
-        $self->new(1 / $$self);
-    }
-
-    sub inc {
-        my ($self) = @_;
-        $self->new($$self + 1);
-    }
-
-    sub dec {
-        my ($self) = @_;
-        $self->new($$self - 1);
-    }
-
-    sub cmp {
-        my ($self, $arg) = @_;
-        local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
-
-        state $mone = Sidef::Types::Number::Number->new(-1);
-        state $zero = Sidef::Types::Number::Number->new(0);
-        state $one  = Sidef::Types::Number::Number->new(1);
-
-        my $cmp = $$self <=> $arg->get_value;
-        $cmp == 0 ? $zero : $cmp > 0 ? $one : $mone;
-    }
-
-    sub gt {
-        my ($self, $arg) = @_;
-        local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
-        Sidef::Types::Bool::Bool->new($$self > $arg->get_value);
-    }
-
-    sub lt {
-        my ($self, $arg) = @_;
-        local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
-        Sidef::Types::Bool::Bool->new($$self < $arg->get_value);
-    }
-
-    sub ge {
-        my ($self, $arg) = @_;
-        local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
-        Sidef::Types::Bool::Bool->new($$self >= $arg->get_value);
-    }
-
-    sub le {
-        my ($self, $arg) = @_;
-        local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
-        Sidef::Types::Bool::Bool->new($$self <= $arg->get_value);
-    }
-
-    sub eq {
-        my ($self, $arg) = @_;
-        Sidef::Types::Bool::Bool->new($$self == $$arg);
-    }
-
-    sub ne {
-        my ($self, $arg) = @_;
-        Sidef::Types::Bool::Bool->new($$self != $$arg);
-    }
-
-    sub abs {
-        my ($self) = @_;
-        $self->new($$self->abs);
-    }
-
-    sub factorial {
-        my ($self) = @_;
-        my $fac = 1;
-        $fac *= $_ for (2 .. $$self);
-        $self->new($fac);
-    }
-
-    *fac  = \&factorial;
-    *fact = \&factorial;
-
-    sub mul {
-        my ($self, $arg) = @_;
-        local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
-        $self->new($$self * $arg->get_value);
-    }
-
-    sub div {
-        my ($self, $arg) = @_;
-        local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
-        $self->new($$self / $arg->get_value);
-    }
+    #
+    ## Arithmetic operations
+    #
 
     sub add {
-        my ($self, $arg) = @_;
-        local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
-        $self->new($$self + $arg->get_value);
+        my ($x, $y) = @_;
+        my $r = Rmpc_init2($PREC);
+
+        if (ref($y) eq __PACKAGE__) {
+            Rmpc_add($r, $$x, $$y, $ROUND);
+        }
+        else {
+            Rmpc_add_fr($r, $$x, $y->_as_float(), $ROUND);
+        }
+
+        _new($r);
     }
 
     sub sub {
-        my ($self, $arg) = @_;
-        local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
-        $self->new($$self - $arg->get_value);
+        my ($x, $y) = @_;
+        my $r = Rmpc_init2($PREC);
+
+        if (ref($y) eq __PACKAGE__) {
+            Rmpc_sub($r, $$x, $$y, $ROUND);
+        }
+        else {
+            Rmpc_add_fr($r, $$x, -$y->_as_float(), $ROUND);
+        }
+
+        _new($r);
     }
 
-    sub exp {
-        my ($self) = @_;
-        $self->new($$self->exp);
+    sub mul {
+        my ($x, $y) = @_;
+        my $r = Rmpc_init2($PREC);
+
+        if (ref($y) eq __PACKAGE__) {
+            Rmpc_mul($r, $$x, $$y, $ROUND);
+        }
+        else {
+            Rmpc_mul_fr($r, $$x, $y->_as_float(), $ROUND);
+        }
+
+        _new($r);
     }
 
-    sub log {
-        my ($self, $base) = @_;
-        $self->new(
-            defined($base)
-            ? do {
-                local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
-                $$self->logn($base->get_value);
-              }
-            : $$self->log
-        );
-    }
+    sub div {
+        my ($x, $y) = @_;
+        my $r = Rmpc_init2($PREC);
 
-    sub log10 {
-        my ($self) = @_;
-        $self->new($$self->log10);
-    }
+        if (ref($y) eq __PACKAGE__) {
+            Rmpc_div($r, $$x, $$y, $ROUND);
+        }
+        else {
+            Rmpc_div_fr($r, $$x, $y->_as_float(), $ROUND);
+        }
 
-    sub sqrt {
-        my ($self) = @_;
-        $self->new($$self->sqrt);
+        _new($r);
     }
 
     sub pow {
-        my ($self, $arg) = @_;
-        local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
-        $self->new($$self**$arg->get_value);
+        my ($x, $y) = @_;
+        my $r = Rmpc_init2($PREC);
+
+        if (ref($y) eq __PACKAGE__) {
+            Rmpc_pow($r, $$x, $$y, $ROUND);
+        }
+        else {
+            Rmpc_pow_fr($r, $$x, $y->_as_float(), $ROUND);
+        }
+
+        _new($r);
     }
 
-    sub root {
-        my ($self, $n, $k) = @_;
-        local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
-        $self->new($$self->root($n->get_value, $k->get_value));
+    sub sqrt {
+        my ($x) = @_;
+        my $r = Rmpc_init2($PREC);
+        Rmpc_sqrt($r, $$x, $ROUND);
+        _new($r);
     }
 
-    sub roots {
-        my ($self, $n) = @_;
-        local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
-        Sidef::Types::Array::Array->new(map { $self->new($_) } $$self->root($n->get_value));
+    sub exp {
+        my ($x) = @_;
+        my $r = Rmpc_init2($PREC);
+        Rmpc_exp($r, $$x, $ROUND);
+        _new($r);
     }
 
-    sub int {
-        my ($self) = @_;
-        $self->new(CORE::int($$self));
+    sub log {
+        my ($x) = @_;
+        my $r = Rmpc_init2($PREC);
+        Rmpc_log($r, $$x, $ROUND);
+        _new($r);
     }
 
-    *as_int = \&int;
-
-    sub atan2 {
-        my ($self, $arg) = @_;
-        local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
-        $self->new($$self->atan2($arg->get_value));
+    sub dec {
+        my ($x) = @_;
+        state $one_c = $x->new(1);
+        $x->sub($one_c);
     }
 
-    sub cos {
-        my ($self) = @_;
-        $self->new($$self->cos);
+    sub inc {
+        my ($x) = @_;
+        state $one_c = $x->new(1);
+        $x->add($one_c);
     }
 
-    sub sin {
-        my ($self) = @_;
-        $self->new($$self->sin);
+    #
+    ## Testing
+    #
+
+    sub eq {
+        my ($x, $y) = @_;
+
+        if (ref($y) eq 'Sidef::Types::Number::Number') {
+            return $x->eq(__PACKAGE__->new($y));
+        }
+        else {
+            _valid($y);
+        }
+
+        Sidef::Types::Bool::Bool->new(Rmpc_cmp($$x, $$y) == 0);
     }
 
-    sub neg {
-        my ($self) = @_;
-        $self->new($$self->_negate);
+    sub gt {
+        my ($x, $y) = @_;
+
+        if (ref($y) eq 'Sidef::Types::Number::Number') {
+            return $x->gt(__PACKAGE__->new($y));
+        }
+        else {
+            _valid($y);
+        }
+
+        my $cmp = Rmpc_cmp($$x, $$y);
+        my $re  = RMPC_INEX_RE($cmp);
+        my $im  = RMPC_INEX_IM($cmp);
+
+        Sidef::Types::Bool::Bool->new($re > 0 ? $im >= 0 : $re >= 0 ? $im > 0 : 0);
     }
 
-    *negate = \&neg;
+    sub ge {
+        my ($x, $y) = @_;
 
-    sub not {
-        my ($self) = @_;
-        $self->new(-$$self - 1);
+        if (ref($y) eq 'Sidef::Types::Number::Number') {
+            return $x->ge(__PACKAGE__->new($y));
+        }
+        else {
+            _valid($y);
+        }
+
+        my $cmp = Rmpc_cmp($$x, $$y);
+        my $re  = RMPC_INEX_RE($cmp);
+        my $im  = RMPC_INEX_IM($cmp);
+
+        Sidef::Types::Bool::Bool->new($re >= 0 and $im >= 0);
     }
 
-    *conjugated = \&not;
-    *conj       = \&not;
+    sub lt {
+        my ($x, $y) = @_;
 
-    sub pi {
-        my ($self) = @_;
-        $self->new(Math::Complex::pi());
+        if (ref($y) eq 'Sidef::Types::Number::Number') {
+            return $x->lt(__PACKAGE__->new($y));
+        }
+        else {
+            _valid($y);
+        }
+
+        my $cmp = Rmpc_cmp($$x, $$y);
+        my $re  = RMPC_INEX_RE($cmp);
+        my $im  = RMPC_INEX_IM($cmp);
+
+        Sidef::Types::Bool::Bool->new($re < 0 ? $im <= 0 : $re <= 0 ? $im < 0 : 0);
     }
 
-    sub tan {
-        my ($self) = @_;
-        $self->new($$self->tan);
+    sub le {
+        my ($x, $y) = @_;
+
+        if (ref($y) eq 'Sidef::Types::Number::Number') {
+            return $x->le(__PACKAGE__->new($y));
+        }
+        else {
+            _valid($y);
+        }
+
+        my $cmp = Rmpc_cmp($$x, $$y);
+        my $re  = RMPC_INEX_RE($cmp);
+        my $im  = RMPC_INEX_IM($cmp);
+
+        Sidef::Types::Bool::Bool->new($re <= 0 and $im <= 0);
     }
 
-    sub csc {
-        my ($self) = @_;
-        $self->new($$self->csc);
-    }
+    sub cmp {
+        my ($x, $y) = @_;
 
-    *cosec = \&csc;
+        if (ref($y) eq 'Sidef::Types::Number::Number') {
+            return $x->le(__PACKAGE__->new($y));
+        }
+        else {
+            _valid($y);
+        }
 
-    sub sec {
-        my ($self) = @_;
-        $self->new($$self->sec);
-    }
-
-    sub cot {
-        my ($self) = @_;
-        $self->new($$self->cot);
-    }
-
-    *cotan = \&cot;
-
-    sub asin {
-        my ($self) = @_;
-        $self->new($$self->asin);
-    }
-
-    sub acos {
-        my ($self) = @_;
-        $self->new($$self->acos);
-    }
-
-    sub atan {
-        my ($self) = @_;
-        $self->new($$self->acos);
-    }
-
-    sub acsc {
-        my ($self) = @_;
-        $self->new($$self->acsc);
-    }
-
-    *acosec = \&acsc;
-
-    sub asec {
-        my ($self) = @_;
-        $self->new($$self->asec);
-    }
-
-    sub acot {
-        my ($self) = @_;
-        $self->new($$self->acot);
-    }
-
-    *acotan = \&acot;
-
-    sub sinh {
-        my ($self) = @_;
-        $self->new($$self->sinh);
-    }
-
-    sub cosh {
-        my ($self) = @_;
-        $self->new($$self->cosh);
-    }
-
-    sub tanh {
-        my ($self) = @_;
-        $self->new($$self->tanh);
-    }
-
-    sub csch {
-        my ($self) = @_;
-        $self->new($$self->csch);
-    }
-
-    *cosech = \&csch;
-
-    sub sech {
-        my ($self) = @_;
-        $self->new($$self->sech);
-    }
-
-    sub coth {
-        my ($self) = @_;
-        $self->new($$self->coth);
-    }
-
-    *cotanh = \&coth;
-
-    sub asinh {
-        my ($self) = @_;
-        $self->new($$self->asinh);
-    }
-
-    sub acosh {
-        my ($self) = @_;
-        $self->new($$self->acosh);
-    }
-
-    sub atanh {
-        my ($self) = @_;
-        $self->new($$self->atanh);
-    }
-
-    sub acsch {
-        my ($self) = @_;
-        $self->new($$self->acsch);
-    }
-
-    *acosech = \&acsch;
-
-    sub asech {
-        my ($self) = @_;
-        $self->new($$self->asech);
-    }
-
-    sub acoth {
-        my ($self) = @_;
-        $self->new($$self->acoth);
-    }
-
-    *acotanh = \&acoth;
-
-    sub sign {
-        my ($self) = @_;
-        Sidef::Types::String::String->new($$self >= 0 ? '+' : '-');
-    }
-
-    sub is_zero {
-        my ($self) = @_;
-        Sidef::Types::Bool::Bool->new($$self == 0);
-    }
-
-    sub is_one {
-        my ($self) = @_;
-        Sidef::Types::Bool::Bool->new($$self == 1);
-    }
-
-    sub is_nan {
-        my ($self) = @_;
-        Sidef::Types::Bool::Bool->false;
-    }
-
-    *is_NaN = \&is_nan;
-
-    sub is_positive {
-        my ($self) = @_;
-        Sidef::Types::Bool::Bool->new($$self >= 0);
-    }
-
-    *is_pos = \&is_positive;
-
-    sub is_negative {
-        my ($self) = @_;
-        Sidef::Types::Bool::Bool->new($$self < 0);
-    }
-
-    *is_neg = \&is_negative;
-
-    sub is_inf {
-        my ($self) = @_;
-        Sidef::Types::Bool::Bool->new($$self == 'inf');
-    }
-
-    *is_infinite = \&is_inf;
-
-    sub is_integer {
-        my ($self) = @_;
-        Sidef::Types::Bool::Bool->new($$self == CORE::int($$self));
-    }
-
-    *is_int = \&is_integer;
-
-    sub rand {
-        my ($self, $max) = @_;
-
-        my $min = $$self;
-        $max = ref($max) ? $max->get_value : do { $min = 0; $$self };
-
-        $self->new($min + CORE::rand($max - $min));
-    }
-
-    sub ceil {
-        my ($self) = @_;
-
-        CORE::int($$self) == $$self
-          && return $self;
-
-        $self->new(CORE::int($$self + 1));
-    }
-
-    sub floor {
-        my ($self) = @_;
-        $self->new(CORE::int($$self));
-    }
-
-    sub round { ... }
-
-    sub roundf {
-        my ($self, $num) = @_;
-        $self->new(sprintf "%.*f", $num->get_value * -1, $$self);
-    }
-
-    *fround = \&roundf;
-
-    sub digit { ... }
-
-    sub nok { ... }
-    *binomial = \&nok;
-
-    sub length { ... }
-
-    *len = \&length;
-
-    sub sstr {
-        my ($self) = @_;
-        Sidef::Types::String::String->new($$self);
-    }
-
-    sub dump {
-        my ($self) = @_;
-        Sidef::Types::String::String->new('Complex(' . $self->real . ', ', $self->imaginary . ')');
+            $x->eq($y) ? Sidef::Types::Number::Number::ZERO
+          : $x->gt($y) ? Sidef::Types::Number::Number::ONE
+          :              Sidef::Types::Number::Number::MONE;
     }
 
     {
@@ -564,8 +370,8 @@ package Sidef::Types::Number::Complex {
         *{__PACKAGE__ . '::' . '÷'}  = \&div;
         *{__PACKAGE__ . '::' . '-'}   = \&sub;
         *{__PACKAGE__ . '::' . '+'}   = \&add;
-        *{__PACKAGE__ . '::' . '!'}   = \&factorial;
+        *{__PACKAGE__ . '::' . '~'}   = \&not;
     }
-};
+}
 
 1

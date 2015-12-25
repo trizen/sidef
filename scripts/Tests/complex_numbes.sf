@@ -11,7 +11,7 @@ var b = Complex(3.14159, 1.25);
     a.reciprocal,           # multiplicative inverse
     ~a,                     # complex conjugate
     a.abs,                  # abs
-    a.sqrt.cartesian,       # sqrt
+    a.sqrt,                 # sqrt
     b.re,                   # real part
     b.im,                   # imaginary part
 ].each { |c| say c };

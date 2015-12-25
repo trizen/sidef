@@ -4,6 +4,8 @@
 ## http://rosettacode.org/wiki/Polymorphism
 #
 
+__END__
+
 class Point(x=0, y=0) {
 
 }

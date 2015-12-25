@@ -24,7 +24,7 @@ var data = <<'EOT';
 04 62 98 27 23 09 70 98 73 93 38 53 60 04 23
 EOT
 
-var triangle = data.lines.map{.words.map{.to_i}};
+var triangle = data.lines.map{.words.map{_-/^0+/ -> to_i}};
 
 func max_value(i=0, j=0) is cached {
     i == triangle.len && return 0;

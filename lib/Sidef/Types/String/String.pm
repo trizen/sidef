@@ -649,10 +649,11 @@ package Sidef::Types::String::String {
 
     sub bytes {
         my ($self) = @_;
-        Sidef::Types::Byte::Bytes->call($$self);
+        my $string = $$self;
+        state $x = require bytes;
+        Sidef::Types::Array::Array->new(map { Sidef::Types::Number::Number->new(CORE::ord(bytes::substr($string, $_, 1))) }
+                                        0 .. bytes::length($string) - 1);
     }
-
-    *to_bytes = \&bytes;
 
     sub each_byte {
         my ($self, $code) = @_;
@@ -661,7 +662,9 @@ package Sidef::Types::String::String {
 
         state $x = require bytes;
         foreach my $i (0 .. bytes::length($string) - 1) {
-            if (defined(my $res = $code->_run_code(Sidef::Types::Byte::Byte->new(CORE::ord bytes::substr($string, $i, 1))))) {
+            if (
+                defined(my $res = $code->_run_code(Sidef::Types::Number::Number->new(CORE::ord bytes::substr($string, $i, 1))))
+              ) {
                 return $res;
             }
         }
@@ -671,16 +674,14 @@ package Sidef::Types::String::String {
 
     sub chars {
         my ($self) = @_;
-        Sidef::Types::Char::Chars->call($$self);
+        Sidef::Types::Array::Array->new(map { __PACKAGE__->new($_) } CORE::split(//, CORE::join('', $$self)));
     }
-
-    *to_chars = \&chars;
 
     sub each_char {
         my ($self, $code) = @_;
 
         foreach my $char (CORE::split(//, $$self)) {
-            if (defined(my $res = $code->_run_code(Sidef::Types::Char::Char->new($char)))) {
+            if (defined(my $res = $code->_run_code(__PACKAGE__->new($char)))) {
                 return $res;
             }
         }
@@ -692,19 +693,17 @@ package Sidef::Types::String::String {
 
     sub graphemes {
         my ($self) = @_;
-        Sidef::Types::Grapheme::Graphemes->call($$self);
+        Sidef::Types::Array::Array->new(map { __PACKAGE__->new($_) } map { /\X/g } $$self);
     }
 
-    *graphs       = \&graphemes;
-    *to_graphemes = \&graphemes;
-    *to_graphs    = \&graphemes;
+    *graphs = \&graphemes;
 
     sub each_grapheme {
         my ($self, $code) = @_;
 
         my $str = $$self;
         while ($str =~ /(\X)/g) {
-            if (defined(my $res = $code->_run_code(Sidef::Types::Grapheme::Grapheme->new($1)))) {
+            if (defined(my $res = $code->_run_code(__PACKAGE__->new($1)))) {
                 return $res;
             }
         }

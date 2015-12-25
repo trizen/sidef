@@ -73,17 +73,11 @@ package Sidef::Parser {
                      | Math\b                         (?{ state $x = Sidef::Math::Math->new })
                      | Socket\b                       (?{ state $x = Sidef::Types::Glob::Socket->new })
                      | Pipe\b                         (?{ state $x = Sidef::Types::Glob::Pipe->new })
-                     | Byte\b                         (?{ state $x = Sidef::Types::Byte::Byte->new })
                      | Ref\b                          (?{ state $x = bless({}, 'Sidef::Variable::Ref') })
                      | LazyMethod\b                   (?{ state $x = Sidef::Variable::LazyMethod->new })
-                     | Bytes\b                        (?{ state $x = Sidef::Types::Byte::Bytes->new })
                      | Time\b                         (?{ state $x = Sidef::Time::Time->new })
                      | Complex\b                      (?{ state $x = Sidef::Types::Number::Complex->new })
                      | Sig\b                          (?{ state $x = Sidef::Sys::Sig->new })
-                     | Chars\b                        (?{ state $x = Sidef::Types::Char::Chars->new })
-                     | Char\b                         (?{ state $x = Sidef::Types::Char::Char->new })
-                     | Graphemes\b                    (?{ state $x = Sidef::Types::Grapheme::Graphemes->new })
-                     | Grapheme\b                     (?{ state $x = Sidef::Types::Grapheme::Grapheme->new })
                      | Sys\b                          (?{ state $x = Sidef::Sys::Sys->new })
                      | Regexp?\b                      (?{ state $x = Sidef::Types::Regex::Regex->new('') })
                      | Sidef\b                        (?{ state $x = Sidef->new })
@@ -158,16 +152,16 @@ package Sidef::Parser {
                 | (?: %X\b. | ` )                                          (?{ [qw(1 new Sidef::Types::Glob::Backtick)] })
 
                 # Bytes
-                | %b\b.                                                    (?{ [qw(0 to_bytes Sidef::Types::Byte::Bytes)] })
-                | %B\b.                                                    (?{ [qw(1 to_bytes Sidef::Types::Byte::Bytes)] })
+                | %b\b.                                                    (?{ [qw(0 bytes Sidef::Types::Array::Array)] })
+                | %B\b.                                                    (?{ [qw(1 bytes Sidef::Types::Array::Array)] })
 
                 # Chars
-                | %c\b.                                                    (?{ [qw(0 to_chars Sidef::Types::Char::Chars)] })
-                | %C\b.                                                    (?{ [qw(1 to_chars Sidef::Types::Char::Chars)] })
+                | %c\b.                                                    (?{ [qw(0 chars Sidef::Types::Array::Array)] })
+                | %C\b.                                                    (?{ [qw(1 chars Sidef::Types::Array::Array)] })
 
                 # Graphemes
-                | %g\b.                                                    (?{ [qw(0 to_graphemes Sidef::Types::Grapheme::Graphemes)] })
-                | %G\b.                                                    (?{ [qw(1 to_graphemes Sidef::Types::Grapheme::Graphemes)] })
+                | %g\b.                                                    (?{ [qw(0 graphemes Sidef::Types::Array::Array)] })
+                | %G\b.                                                    (?{ [qw(1 graphemes Sidef::Types::Array::Array)] })
 
                 # Symbols
                 | %s\b.                                                    (?{ [qw(0 __NEW__ Sidef::Module::OO)] })
@@ -194,9 +188,6 @@ package Sidef::Parser {
                   Pipe
                   Ref
                   Socket
-                  Byte Bytes
-                  Char Chars
-                  Grapheme Graphemes
                   Bool
                   Sys
                   Sig
@@ -963,7 +954,8 @@ package Sidef::Parser {
                         push @{$obj->{$self->{class}}[-1]{call}}, {method => $array_like[1]};
                     }
                     else {
-                        $obj = $array_like[0]->call($obj);
+                        my $method = $array_like[1];
+                        $obj = $obj->$method;
                     }
                 }
 
@@ -1705,13 +1697,7 @@ package Sidef::Parser {
 
             # Binary, hexdecimal and octal numbers
             if (/\G0(b[10_]*|x[0-9A-Fa-f_]*|[0-9_]+\b)/gc) {
-                my $number = "0" . ($1 =~ tr/_//dr);
-                return
-                  Sidef::Types::Number::Number->new(
-                                                    $number =~ /^0[0-9]/
-                                                    ? Math::BigInt->from_oct($number)
-                                                    : Math::BigInt->new($number)
-                                                   );
+                return Sidef::Types::Number::Number->new("0" . ($1 =~ tr/_//dr));
             }
 
             # Integer or float number
@@ -1759,11 +1745,8 @@ package Sidef::Parser {
                                                            @{$strings});
                 }
                 elsif ($type eq 'i') {
-                    return Sidef::Types::Array::Array->new(
-                        map {
-                            Sidef::Types::Number::Number->new(Math::BigInt->new(s{\\(?=[\\#\s])}{}gr))
-                          } @{$strings}
-                    );
+                    return Sidef::Types::Array::Array->new(map { Sidef::Types::Number::Number->new(s{\\(?=[\\#\s])}{}gr)->int }
+                                                           @{$strings});
                 }
                 elsif ($type eq 'n') {
                     return Sidef::Types::Array::Array->new(map { Sidef::Types::Number::Number->new(s{\\(?=[\\#\s])}{}gr) }

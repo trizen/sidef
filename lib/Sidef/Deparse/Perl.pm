@@ -69,19 +69,31 @@ use $];
 
 HEADER
 
-        if (exists $opts{opt}{A}) {
-            my $accuracy = abs(int($opts{opt}{A}));
-            $opts{header} .= "local \$Math::BigFloat::accuracy = $accuracy;\n";
-        }
-
         if (exists $opts{opt}{P}) {
             my $precision = abs(int($opts{opt}{P}));
-            $opts{header} .= "local \$Math::BigFloat::precision = -$precision;\n";
+            $opts{header} .= "local \$Sidef::Types::Number::Number::PREC = $precision;\n";
         }
 
         if (exists $opts{opt}{M}) {
-            my $mode = lc($opts{opt}{M}) =~ s/\s+//rg;
-            $opts{header} .= "local \$Math::BigFloat::round_mode = '${mode}';\n";
+            my $round = unpack('A*', lc($opts{opt}{M}) =~ s/^\s+//r);
+
+            if ($round eq 'zero') {
+                $round = 1;
+            }
+            elsif ($round eq '+inf') {
+                $round = 2;
+            }
+            elsif ($round eq '-inf') {
+                $round = 3;
+            }
+            elsif ($round eq '+zero') {
+                $round = 4;
+            }
+            else {
+                $round = 0;
+            }
+
+            $opts{header} .= "local \$Sidef::Types::Number::Number::ROUND = $round;\n";
         }
 
         %addr    = ();
@@ -878,18 +890,7 @@ HEADER
             }
         }
         elsif ($ref eq 'Sidef::Types::Number::Number') {
-            my $value = $obj->get_value;
-
-            if (ref($value)) {
-                if (ref($value) eq 'Math::BigRat') {
-                    $value = (q{Math::BigRat->new('} . join('/', $value->parts) . q{')});
-                }
-                else {
-                    $value = (q{'} . $value->bstr . q{'});
-                }
-            }
-
-            $code = $self->make_constant($ref, 'new', "Number$refaddr", $value);
+            $code = $self->make_constant($ref, 'new', "Number$refaddr", "'" . $obj->_get_frac . "'");
         }
         elsif ($ref eq 'Sidef::Types::String::String') {
             $code = $self->make_constant($ref, 'new', "String$refaddr", $self->_dump_string(${$obj}));
@@ -1054,7 +1055,11 @@ HEADER
             $code = $self->make_constant($ref, 'new', "Sig$refaddr");
         }
         elsif ($ref eq 'Sidef::Types::Number::Complex') {
-            $code = $self->make_constant($ref, 'new', "Complex$refaddr", "'" . ${$obj}->Re . "'", "'" . ${$obj}->Im . "'");
+
+            #$code = $self->make_constant($ref, 'new', "Complex$refaddr", "'" . ${$obj}->Re . "'", "'" . ${$obj}->Im . "'");
+            $code = $self->make_constant($ref, 'new', "Complex$refaddr",
+                                         "'" . $obj->re->get_value . "'",
+                                         "'" . $obj->im->get_value . "'");
         }
         elsif ($ref eq 'Sidef::Types::Array::Pair') {
             if (all { not defined($_) } @{$obj}) {
@@ -1140,24 +1145,6 @@ HEADER
               . $self->deparse_expr({self => $obj->{var}}) . '(@{'
               . $self->deparse_expr({self => $obj->{array}}) . '})'
               . $self->deparse_bare_block($obj->{block}->{code});
-        }
-        elsif ($ref eq 'Sidef::Types::Byte::Bytes') {
-            $code = $self->_dump_array($ref, $obj);
-        }
-        elsif ($ref eq 'Sidef::Types::Byte::Byte') {
-            $code = $self->make_constant($ref, 'new', "Byte$refaddr", $obj->get_value);
-        }
-        elsif ($ref eq 'Sidef::Types::Char::Chars') {
-            $code = $self->_dump_array($ref, $obj);
-        }
-        elsif ($ref eq 'Sidef::Types::Char::Char') {
-            $code = $self->make_constant($ref, 'new', "Char$refaddr", $self->_dump_string(${$obj}));
-        }
-        elsif ($ref eq 'Sidef::Types::Grapheme::Graphemes') {
-            $code = $self->_dump_array($ref, $obj);
-        }
-        elsif ($ref eq 'Sidef::Types::Grapheme::Grapheme') {
-            $code = $self->make_constant($ref, 'new', "Grapheme$refaddr", $self->_dump_string(${$obj}));
         }
         elsif ($ref eq 'Sidef::Types::Array::MultiArray') {
             $code = $self->make_constant($ref, 'new', "MultiArr$refaddr");

@@ -1,7 +1,7 @@
 package Sidef {
 
     use 5.014;
-    our $VERSION = '2.13';
+    our $VERSION = '2.20';
 
     our $SPACES      = 0;    # the current number of spaces
     our $SPACES_INCR = 4;    # the number of spaces incrementor
@@ -11,9 +11,9 @@ package Sidef {
 
     our %EVALS;              # will contain info required for eval()
 
-    use Math::BigInt qw(try GMP);
-    use Math::BigRat qw(try GMP);
-    use Math::BigFloat qw(try GMP);
+    #use Math::BigInt qw(try GMP);
+    #use Math::BigRat qw(try GMP);
+    #use Math::BigFloat qw(try GMP);
 
     sub new {
         bless {}, __PACKAGE__;

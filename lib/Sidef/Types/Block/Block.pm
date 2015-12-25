@@ -227,34 +227,8 @@ package Sidef::Types::Block::Block {
     *cap = \&capture;
 
     sub repeat {
-        my ($self, $num) = @_;
-
-        $num = defined($num) ? $num->get_value : 1;
-
-        return $self if $num < 1;
-
-        if ($num < (-1 >> 1)) {
-
-            $num = $num->numify if ref($num);
-
-            foreach my $i (1 .. $num) {
-                if (defined(my $res = $self->_run_code(Sidef::Types::Number::Number->new($i)))) {
-                    return $res;
-                }
-            }
-        }
-        else {
-
-            $num = Math::BigFloat->new($num) if not ref($num);
-
-            for (my $i = Math::BigFloat->new(1) ; $i->bcmp($num) <= 0 ; $i->binc) {
-                if (defined(my $res = $self->_run_code(Sidef::Types::Number::Number->new($i->copy)))) {
-                    return $res;
-                }
-            }
-        }
-
-        $self;
+        my ($block, $num) = @_;
+        $num->times($block);
     }
 
     sub _run_code {
@@ -303,31 +277,31 @@ package Sidef::Types::Block::Block {
         $bool;
     }
 
+    #~ sub fork {
+    #~ my ($self) = @_;
+
+    #~ state $x = require Storable;
+    #~ open(my $fh, '+>', undef);    # an anonymous temporary file
+    #~ my $fork = Sidef::Types::Block::Fork->new(fh => $fh);
+
+    #~ my $pid = fork() // die "[FATAL ERROR]: cannot fork";
+    #~ if ($pid == 0) {
+    #~ srand();
+    #~ my $obj = $self->{code}->();
+    #~ ref($obj) && Storable::store_fd($obj, $fh);
+    #~ exit 0;
+    #~ }
+
+    #~ $fork->{pid} = $pid;
+    #~ $fork;
+    #~ }
+
     sub fork {
-        my ($self) = @_;
-
-        state $x = require Storable;
-        open(my $fh, '+>', undef);    # an anonymous temporary file
-        my $fork = Sidef::Types::Block::Fork->new(fh => $fh);
-
-        my $pid = fork() // die "[FATAL ERROR]: cannot fork";
-        if ($pid == 0) {
-            srand();
-            my $obj = $self->{code}->();
-            ref($obj) && Storable::store_fd($obj, $fh);
-            exit 0;
-        }
-
-        $fork->{pid} = $pid;
-        $fork;
-    }
-
-    sub pfork {
         my ($self) = @_;
 
         my $fork = Sidef::Types::Block::Fork->new();
 
-        my $pid = CORE::fork() // die "[FATAL ERROR]: cannot fork";
+        my $pid = CORE::fork() // die "[ERROR] Cannot fork: $!";
         if ($pid == 0) {
             srand();
             $self->{code}->();

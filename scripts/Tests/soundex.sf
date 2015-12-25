@@ -29,7 +29,7 @@ func soundex(word, length=4) {
     # Convert the string to a 4-digit number
     var numValue = (
         word ~~ /^\d+\z/ ? (
-            var num = word.to_f;
+            var num = word.to_n;
             num * (10**(length-1 - num.log10.int)) -> to_i.to_s
     ) : ('0' * length));
 

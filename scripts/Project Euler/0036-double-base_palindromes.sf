@@ -8,7 +8,7 @@
 
 var sum = 0;
 range(0, 1e6-1).each { |i|
-    if (i.to_s.is_palindrome && i.to_bin.is_palindrome) {
+    if (i.to_s.is_palindrome && i.as_bin.is_palindrome) {
         sum += i;
     }
 }

@@ -22,5 +22,5 @@ func permute (code, arr) {
     }
 }
 
-var name = "abc".to_chars;
+var name = %c"abc";
 permute(func (list) { list.join(' ').say }, name);

@@ -106,7 +106,7 @@ package Sidef::Deparse::Sidef {
 
         state $table = {
                         'inf'  => q{Number.inf},
-                        '-inf' => q{Number.inf('-')},
+                        '-inf' => q{Number.ninf},
                         'nan'  => q{Number.nan},
                         '0'    => q{Number},
                        };
@@ -468,19 +468,7 @@ package Sidef::Deparse::Sidef {
             $code = 'Sig';
         }
         elsif ($ref eq 'Sidef::Types::Number::Number') {
-            my $value = $obj->get_value;
-
-            if (ref($value)) {
-                if (ref($value) eq 'Math::BigRat') {
-                    $code = '(' . join('//', map { $self->_dump_number($_) } $value->parts()) . ')';
-                }
-                else {
-                    $code = $self->_dump_number($value->bstr);
-                }
-            }
-            else {
-                $code = $self->_dump_number($value);
-            }
+            $code = $self->_dump_number($obj->get_value);
         }
         elsif ($ref eq 'Sidef::Types::Array::Array' or $ref eq 'Sidef::Types::Array::HCArray') {
             if (not @{$obj}) {
@@ -526,39 +514,9 @@ package Sidef::Deparse::Sidef {
                     $code = 'Pair';
                 }
             }
-            elsif ($ref eq 'Sidef::Types::Byte::Bytes') {
-                if (not @{$obj}) {
-                    $code = 'Bytes';
-                }
-            }
-            elsif ($ref eq 'Sidef::Types::Byte::Byte') {
-                if (${$obj} == 0) {
-                    $code = 'Byte';
-                }
-            }
-            elsif ($ref eq 'Sidef::Types::Char::Chars') {
-                if (not @{$obj}) {
-                    $code = 'Chars';
-                }
-            }
-            elsif ($ref eq 'Sidef::Types::Grapheme::Grapheme') {
-                if (${$obj} eq "\0") {
-                    $code = 'Grapheme';
-                }
-            }
-            elsif ($ref eq 'Sidef::Types::Grapheme::Graphemes') {
-                if (not @{$obj}) {
-                    $code = 'Graphemes';
-                }
-            }
             elsif ($ref eq 'Sidef::Types::Glob::Dir') {
                 if (${$obj} eq '') {
                     $code = 'Dir';
-                }
-            }
-            elsif ($ref eq 'Sidef::Types::Char::Char') {
-                if (${$obj} eq "\0") {
-                    $code = 'Char';
                 }
             }
             elsif ($ref eq 'Sidef::Types::String::String') {

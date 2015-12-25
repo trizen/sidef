@@ -106,29 +106,6 @@ ne(:(), {}, true);
 is({}, :(), false);
 ne({}, :(), true);
 
-# char-string
-is(Char.new("a"), "a", true);
-is("a", Char.new("a"), true);
-
-ne(Char.new("a"), "a", false);
-ne("a", Char.new("a"), false);
-
-is("", Char.new(""), false);
-is(Char.new(""), "", false);
-
-ne(Char.new(""), "", true);
-ne("", Char.new(""), true);
-
-ne(Char.new("b"), "a", true);
-ne("a", Char.new("b"), true);
-
-# byte-number
-is(Byte.new(97), 97, true);
-is(97, Byte.new(97), true);
-
-ne(Byte.new(97), 97, false);
-ne(97, Byte.new(97), false);
-
 # file-string
 is(%f"f.txt", "f.txt", true);
 is("f.txt", %f"f.txt", true);

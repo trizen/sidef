@@ -28,7 +28,7 @@ func diag_multiply_sum (matrix, left) {
 
         (left ? r2.reverse : r2).each { |j|
             nums.push(matrix[j][x++]);
-        };
+        }
 
         products.push(nums.prod);       # appending the product of 'nums' inside the 'products' array
     }
@@ -45,7 +45,7 @@ func make_det_matrix (matrix) {
 func calculate_delta (matrix, free_terms, position) {
 
     # Make a copy of the matrix
-    matrix = matrix.copy;
+    matrix = matrix.map{.map{_}};
 
     free_terms.range.each { |i|
         matrix[i][position] = free_terms[i];    # substituting the 'pos' column with the free terms

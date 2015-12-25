@@ -32,7 +32,7 @@ sub NATIVE () { 0 }
 my %args;
 if ($#ARGV != -1 and chr ord $ARGV[0] eq '-') {
     require Getopt::Std;
-    Getopt::Std::getopts('e:E:d:Dho:ivHn:WwbcrR:ts:CO:kP:A:M:', \%args);
+    Getopt::Std::getopts('e:E:d:Dho:ivHWwbcrR:ts:CO:kP:M:', \%args);
 }
 
 # Help
@@ -61,19 +61,9 @@ elsif (defined $args{W}) {
     };
 }
 
-# Backend for Math::BigInt
-if (defined(my $type = $args{n})) {
-    load_math_backend($type);
-}
-
 # Number of spaces for indentation
 if (defined(my $num = $args{s})) {
     $Sidef::SPACES_INCR = int($num);
-}
-
-# Change the Math backend to 'FastCalc' when '-D' or '-d' is specified
-if (defined($args{D}) or defined($args{d})) {
-    load_math_backend('FastCalc');
 }
 
 # Interactive help
@@ -274,18 +264,6 @@ sub parse_code {
     $struct;
 }
 
-sub load_math_backend {
-    my ($type) = @_;
-
-    require Math::BigInt;
-    require Math::BigRat;
-    require Math::BigFloat;
-
-    Math::BigInt->import(lib => $type);
-    Math::BigFloat->import(lib => $type);
-    Math::BigRat->import(lib => $type);
-}
-
 sub execute_struct {
     my ($struct, $return) = @_;
     my $deparser = Sidef::Deparse::Perl->new(namespaces => [@Sidef::NAMESPACES], opt => \%args);
@@ -306,14 +284,11 @@ sub output_usage {
                     '-O level'   => ['perform code optimizations before execution',
                                      'valid levels: [0], 1, 2'],
                     '-P int'     => 'set the precision of floating-point numbers',
-                    '-A int'     => 'set the numeric accuracy to a certain number of digits',
                     '-M mode'    => ['set the rounding mode of floating-point numbers',
-                                     'valid modes: [even], odd, +inf, -inf, zero, trunc, common'],
+                                     'valid modes: [near], zero, +zero, +inf, -inf'],
                     '-k'         => 'keep track of potential unsafe parser interpretations',
                     '-E program' => 'one line of program',
                     '-H'         => 'interactive help',
-                    '-n type'    => ['try to use a specific backend for Math::BigInt',
-                                     'valid types: GMP, Pari, FastCalc'],
                     '-s int'     => 'the number of spaces used in code indentation',
                     '-v'         => 'print version number and exit',
                     '-t'         => 'treat all command-line arguments as scripts',
@@ -591,7 +566,6 @@ sub dump_structure {
         };
 
         print {$out_fh} _get_namespaces();
-        print {$out_fh} "use Math::BigFloat;\n";
         print {$out_fh} $requirify->(_get_loaded_modules());
         print {$out_fh} Data::Dump::pp($struct) . "\n";
     }

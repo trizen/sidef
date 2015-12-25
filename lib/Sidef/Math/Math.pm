@@ -14,268 +14,42 @@ package Sidef::Math::Math {
 
         state %cache;
         state $table = {
-            e  => sub { Math::BigFloat->new(1)->bexp },
-            pi => sub {
-
-                my $precision = $Math::BigFloat::precision;
-
-                # Old bug in Math::BigFloat
-                # https://rt.cpan.org/Ticket/Display.html?id=84950
-                my $pi = do {
-                    local $Math::BigFloat::precision = undef if defined($precision);
-                    defined($precision) ? Math::BigFloat->bpi(-$precision + 1) : Math::BigFloat->bpi;
-                };
-
-                defined($Math::BigFloat::precision) ? $pi->bfround($Math::BigFloat::precision) : $pi;
-            },
-            phi => sub { Math::BigFloat->new(1)->badd(Math::BigFloat->new(5)->bsqrt)->bdiv(2) },
-
-            sqrt2   => sub { Math::BigFloat->new(2)->bsqrt },
-            sqrte   => sub { Math::BigFloat->new(1)->bexp->bsqrt },
-            sqrtpi  => sub { Math::BigFloat->bpi->bsqrt },
-            sqrtphi => sub { Math::BigFloat->new(1)->badd(Math::BigFloat->new(5)->bsqrt)->bdiv(2)->bsqrt },
-
-            ln2    => sub { Math::BigFloat->new(2)->blog },
-            log2e  => sub { Math::BigFloat->new(2)->blog->bpow(-1) },
-            ln10   => sub { Math::BigFloat->new(10)->blog },
-            log10e => sub { Math::BigFloat->new(10)->blog->bpow(-1) },
+                        e   => sub { Sidef::Types::Number::Number->e },
+                        pi  => sub { Sidef::Types::Number::Number->pi },
+                        phi => sub { Sidef::Types::Number::Number->phi },
                        };
 
         my $key = lc($name);
-        $cache{$key} //= exists($table->{$key}) ? Sidef::Types::Number::Number->new(scalar $table->{$key}->()) : do {
+        $cache{$key} //= exists($table->{$key}) ? $table->{$key}->() : do {
             warn qq{[WARN] Inexistent Math constant "$name"!\n};
             undef;
         };
     }
 
-    sub e {
-        my ($self, $places) = @_;
-
-        my $precision = $Math::BigFloat::precision;
-
-        my $e = do {
-            local $Math::BigFloat::precision = undef if defined($precision);
-            Math::BigFloat->new(1)->bexp(
-                defined($precision)
-                ? (-$precision + 1)
-                : defined($places) ? do {
-                    local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1 if defined($precision);
-                    $places->get_value;
-                  }
-                : ()
-                                        );
-        };
-
-        Sidef::Types::Number::Number->new(
-            defined($precision)                 #&& !defined($places)
-            ? scalar($e->bfround($precision))
-            : $e
-        );
-    }
-
-    sub exp {
-        my ($self, $x, $places) = @_;
-        Sidef::Types::Number::Number->new(
-                                         Math::BigFloat->new($x->get_value)->bexp(defined($places) ? $places->get_value : ()));
-    }
-
-    sub pi {
-        my ($self, $places) = @_;
-
-        my $precision = $Math::BigFloat::precision;
-
-        # Old bug in Math::BigFloat
-        # https://rt.cpan.org/Ticket/Display.html?id=84950
-        my $pi = do {
-            local $Math::BigFloat::precision = undef if defined($precision);
-            Math::BigFloat->bpi(
-                defined($precision)
-                ? (-$precision + 1)
-                : defined($places) ? do {
-                    local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1 if defined($precision);
-                    $places->get_value;
-                  }
-                : ()
-                               );
-        };
-
-        Sidef::Types::Number::Number->new(
-            defined($precision)                  #&& !defined($places)
-            ? scalar($pi->bfround($precision))
-            : $pi
-        );
-    }
-
-    *PI = \&pi;
-
-    sub cos {
-        my ($self, $x, $places) = @_;
-        Sidef::Types::Number::Number->new(
-                                         Math::BigFloat->new($x->get_value)->bcos(defined($places) ? $places->get_value : ()));
-    }
-
-    sub sin {
-        my ($self, $x, $places) = @_;
-        Sidef::Types::Number::Number->new(
-                                         Math::BigFloat->new($x->get_value)->bsin(defined($places) ? $places->get_value : ()));
-    }
-
-    sub log {
-        my ($self, $n, $base) = @_;
-
-        # Bug in Math::BigFloat
-        # https://rt.cpan.org/Ticket/Display.html?id=110444
-        if (defined $base) {
-
-            my $precision = $Math::BigFloat::precision;
-
-            my $log = do {
-                local $Math::BigFloat::precision = undef if defined($precision);
-                Math::BigFloat->new($n->get_value)->blog(
-                    do {
-                        local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1 if defined($precision);
-                        $base->get_value;
-                      }
-                );
-            };
-
-            return Sidef::Types::Number::Number->new(defined($precision) ? scalar($log->bfround($precision)) : $log);
-        }
-
-        Sidef::Types::Number::Number->new(Math::BigFloat->new($n->get_value)->blog);
-    }
-
-    sub log2 {
-        my ($self, $n) = @_;
-
-        # Bug in Math::BigFloat
-        # https://rt.cpan.org/Ticket/Display.html?id=110444
-        my $log = do {
-            local $Math::BigFloat::precision = undef if defined($Math::BigFloat::precision);
-            Math::BigFloat->new($n->get_value)->blog(2);
-        };
-
-        Sidef::Types::Number::Number->new(
-                                          defined($Math::BigFloat::precision)
-                                          ? scalar($log->bfround($Math::BigFloat::precision))
-                                          : $log
-                                         );
-    }
-
-    sub log10 {
-        my ($self, $n) = @_;
-
-        # Bug in Math::BigFloat
-        # https://rt.cpan.org/Ticket/Display.html?id=110444
-        my $log = do {
-            local $Math::BigFloat::precision = undef if defined($Math::BigFloat::precision);
-            Math::BigFloat->new($n->get_value)->blog(10);
-        };
-
-        Sidef::Types::Number::Number->new(
-                                          defined($Math::BigFloat::precision)
-                                          ? scalar($log->bfround($Math::BigFloat::precision))
-                                          : $log
-                                         );
-    }
-
-    sub npow2 {
-        my ($self, $x) = @_;
-        state $two = Math::BigInt->new(2);
-        Sidef::Types::Number::Number->new(scalar $two->copy->blsft(Math::BigFloat->new($x->get_value)->as_int->blog($two)));
-    }
-
-    sub npow {
-        my ($self, $x, $y) = @_;
-
-        $x = Math::BigFloat->new($x->get_value);
-        $y = Math::BigFloat->new($y->get_value);
-
-        Sidef::Types::Number::Number->new(scalar $y->bpow($x->blog($y)->binc->as_int));
-    }
-
     sub gcd {
         my ($self, @list) = @_;
-        Sidef::Types::Number::Number->new(Math::BigFloat::bgcd(map { $_->get_value } @list));
-    }
 
-    sub abs {
-        my ($self, $n) = @_;
-        Sidef::Types::Number::Number->new(Math::BigFloat->new($n->get_value)->babs);
+        my $gcd = $list[0];
+        foreach my $i (1 .. $#list) {
+            last if ($gcd->is_one);
+            $gcd = $gcd->gcd($list[$i]);
+        }
+
+        $gcd;
     }
 
     sub lcm {
         my ($self, @list) = @_;
-        Sidef::Types::Number::Number->new(Math::BigFloat::blcm(map { $_->get_value } @list));
+
+        my $lcm = $list[0];
+        foreach my $i (1 .. $#list) {
+            $lcm = $lcm->lcm($list[$i]);
+        }
+
+        $lcm;
     }
 
-    sub inf {
-        Sidef::Types::Number::Number->new(Math::BigFloat->binf);
-    }
-
-    sub precision {
-        my ($self, $n) = @_;
-        Sidef::Types::Number::Number->new(Math::BigFloat->precision(defined($n) ? $n->get_value || undef : ()));
-    }
-
-    sub accuracy {
-        my ($self, $n) = @_;
-        Sidef::Types::Number::Number->new(Math::BigFloat->accuracy(defined($n) ? $n->get_value || undef : ()));
-    }
-
-    sub ceil {
-        my ($self, $n) = @_;
-        Sidef::Types::Number::Number->new(Math::BigFloat->new($n->get_value)->bceil);
-    }
-
-    sub floor {
-        my ($self, $n) = @_;
-        Sidef::Types::Number::Number->new(Math::BigFloat->new($n->get_value)->bfloor);
-    }
-
-    sub sqrt {
-        my ($self, $n) = @_;
-        Sidef::Types::Number::Number->new(Math::BigFloat->new($n->get_value)->bsqrt);
-    }
-
-    sub root {
-        my ($self, $n, $m) = @_;
-
-        my $precision = $Math::BigFloat::precision;
-
-        # Bug in Math::BigFloat
-        my $root = do {
-            local $Math::BigFloat::precision = undef if defined($precision);
-            Math::BigFloat->new($n->get_value)->broot(
-                do {
-                    local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1 if defined($precision);
-                    $m->get_value;
-                  }
-            );
-        };
-
-        Sidef::Types::Number::Number->new(
-                                          defined($precision)
-                                          ? scalar($root->bfround($precision))
-                                          : $root
-                                         );
-    }
-
-    sub troot {
-        my ($self, $n) = @_;
-
-        state $two   = Math::BigFloat->new(2);
-        state $eight = Math::BigFloat->new(8);
-
-        Sidef::Types::Number::Number->new(
-                                       scalar Math::BigFloat->new($n->get_value)->bmul($eight)->binc->bsqrt->bdec->bdiv($two));
-    }
-
-    sub pow {
-        my ($self, $n, $pow) = @_;
-        Sidef::Types::Number::Number->new(Math::BigFloat->new($n->get_value)->bpow($pow->get_value));
-    }
-
+    # TODO: make it work!
     sub rand {
         my ($self, $from, $to) = @_;
 
@@ -292,29 +66,48 @@ package Sidef::Math::Math {
     }
 
     sub sum {
-        my ($self, @nums) = @_;
+        my ($self, @list) = @_;
 
-        state $x = require List::Util;
-        Sidef::Types::Number::Number->new(List::Util::sum(map { $_->get_value } @nums));
+        my $sum = Sidef::Types::Number::Number::_new_int(0);
+        foreach my $n (@list) {
+            $sum = $sum->add($n);
+        }
+
+        $sum;
     }
 
     sub max {
-        my ($self, @nums) = @_;
+        my ($self, @list) = @_;
 
-        state $x = require List::Util;
-        Sidef::Types::Number::Number->new(List::Util::max(map { $_->get_value } @nums));
+        my $max = $list[0];
+        foreach my $i (1 .. $#list) {
+            $max = $max->max($list[$i]);
+        }
+
+        $max;
     }
 
     sub min {
-        my ($self, @nums) = @_;
+        my ($self, @list) = @_;
 
-        state $x = require List::Util;
-        Sidef::Types::Number::Number->new(List::Util::min(map { $_->get_value } @nums));
+        my $min = $list[0];
+        foreach my $i (1 .. $#list) {
+            $min = $min->min($list[$i]);
+        }
+
+        $min;
     }
 
     sub avg {
-        my ($self, @nums) = @_;
-        Sidef::Types::Number::Number->new($self->sum(@nums)->get_value / @nums);
+        my ($self, @list) = @_;
+
+        my $sum = Sidef::Types::Number::Number::_new_int(0);
+        foreach my $n (@list) {
+            $sum = $sum->add($n);
+        }
+
+        my $n = Sidef::Types::Number::Number->new(scalar(@list));
+        $sum->div($n);
     }
 
     sub range_sum {
@@ -453,6 +246,17 @@ package Sidef::Math::Math {
                 )->new($result);
             };
         }
+    }
+
+    our $AUTOLOAD;
+
+    sub AUTOLOAD {
+        my ($self, $x, @args) = @_;
+        my ($method) = ($AUTOLOAD =~ /^.*[^:]::(.*)$/);
+        defined($x) ? $x->$method(@args) : do {
+            state $one = Sidef::Types::Number::Number->new(1);
+            $one->$method;
+        };
     }
 
 };
