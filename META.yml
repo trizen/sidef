@@ -88,6 +88,12 @@ provides:
     file: lib/Sidef/Types/Null/Null.pm
   Sidef::Types::Number::Complex:
     file: lib/Sidef/Types/Number/Complex.pm
+  Sidef::Types::Number::Inf:
+    file: lib/Sidef/Types/Number/Inf.pm
+  Sidef::Types::Number::Nan:
+    file: lib/Sidef/Types/Number/Nan.pm
+  Sidef::Types::Number::Ninf:
+    file: lib/Sidef/Types/Number/Ninf.pm
   Sidef::Types::Number::Number:
     file: lib/Sidef/Types/Number/Number.pm
   Sidef::Types::Range::RangeNumber:

@@ -163,14 +163,6 @@ Return the
 
 =cut
 
-=head2 c_string
-
-Complex.c_string() -> I<Obj>
-
-Return the
-
-=cut
-
 =head2 dump
 
 Complex.dump() -> I<Obj>
@@ -202,14 +194,6 @@ Complex.im() -> I<Obj>
 Return the
 
 Aliases: I<imag>
-
-=cut
-
-=head2 i_string
-
-Complex.i_string() -> I<Obj>
-
-Return the
 
 =cut
 
@@ -249,14 +233,6 @@ Aliases: I<reciprocal>
 
 =cut
 
-=head2 prec_cast
-
-Complex.prec_cast() -> I<Obj>
-
-Return the
-
-=cut
-
 =head2 re
 
 Complex.re() -> I<Obj>
@@ -264,14 +240,6 @@ Complex.re() -> I<Obj>
 Return the
 
 Aliases: I<real>
-
-=cut
-
-=head2 r_string
-
-Complex.r_string() -> I<Obj>
-
-Return the
 
 =cut
 

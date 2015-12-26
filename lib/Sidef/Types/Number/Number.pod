@@ -998,14 +998,6 @@ Return the
 
 =cut
 
-=head2 prec_cast
-
-Number.prec_cast() -> I<Obj>
-
-Return the
-
-=cut
-
 =head2 primorial
 
 Number.primorial() -> I<Obj>
@@ -1022,17 +1014,9 @@ Return the
 
 =cut
 
-=head2 rand_clear
+=head2 rand_int
 
-Number.rand_clear() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 rand_init
-
-Number.rand_init() -> I<Obj>
+Number.rand_int() -> I<Obj>
 
 Return the
 

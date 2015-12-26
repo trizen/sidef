@@ -124,7 +124,7 @@ sub process_file {
 
         next if $sub eq 'get_value';
         next if $sub =~ /^[(_]/;
-        next if $sub =~ /^([[:upper:]]|mpfr_|qgmp_|zgmp_|fgmp_)/;
+        next if $sub =~ /^([[:upper:]])/;
         next if exists $ignored_subs{$sub};
 
         my $code;

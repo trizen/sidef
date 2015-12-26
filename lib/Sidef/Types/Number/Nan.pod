@@ -1,0 +1,25 @@
+
+=encoding utf8
+
+=head1 NAME
+
+Sidef::Types::Number::Nan
+
+=head1 DESCRIPTION
+
+This object is ...
+
+=head1 SYNOPSIS
+
+var obj = Nan.new(...);
+
+=head1 METHODS
+
+
+=head2 new
+
+Nan.new() -> I<Obj>
+
+Return the
+
+=cut

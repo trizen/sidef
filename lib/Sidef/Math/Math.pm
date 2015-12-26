@@ -5,6 +5,8 @@ package Sidef::Math::Math {
       Sidef::Object::Object
       );
 
+    require Sidef::Types::Number::Number;
+
     sub new {
         bless {}, __PACKAGE__;
     }
@@ -253,12 +255,9 @@ package Sidef::Math::Math {
     sub AUTOLOAD {
         my ($self, $x, @args) = @_;
         my ($method) = ($AUTOLOAD =~ /^.*[^:]::(.*)$/);
-        defined($x) ? $x->$method(@args) : do {
-            state $one = Sidef::Types::Number::Number->new(1);
-            $one->$method;
-        };
+        defined($x) ? $x->$method(@args) : 'Sidef::Types::Number::Number'->$method;
     }
 
-};
+}
 
 1

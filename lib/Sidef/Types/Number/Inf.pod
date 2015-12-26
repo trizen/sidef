@@ -1,0 +1,97 @@
+
+=encoding utf8
+
+=head1 NAME
+
+Sidef::Types::Number::Inf
+
+=head1 DESCRIPTION
+
+This object is ...
+
+=head1 SYNOPSIS
+
+var obj = Inf.new(...);
+
+
+=head1 INHERITS
+
+Inherits methods from:
+
+	* Sidef::Object::Object
+	* Sidef::Convert::Convert
+
+=head1 METHODS
+
+
+=head2 atan
+
+Inf.atan() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 is_neg
+
+Inf.is_neg() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 is_pos
+
+Inf.is_pos() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 max
+
+Inf.max() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 min
+
+Inf.min() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 neg
+
+Inf.neg() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 new
+
+Inf.new() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 sqrt
+
+Inf.sqrt() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 times
+
+Inf.times() -> I<Obj>
+
+Return the
+
+=cut

@@ -1,0 +1,97 @@
+
+=encoding utf8
+
+=head1 NAME
+
+Sidef::Types::Number::Ninf
+
+=head1 DESCRIPTION
+
+This object is ...
+
+=head1 SYNOPSIS
+
+var obj = Ninf.new(...);
+
+
+=head1 INHERITS
+
+Inherits methods from:
+
+	* Sidef::Object::Object
+	* Sidef::Convert::Convert
+
+=head1 METHODS
+
+
+=head2 atan
+
+Ninf.atan() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 is_neg
+
+Ninf.is_neg() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 is_pos
+
+Ninf.is_pos() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 max
+
+Ninf.max() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 min
+
+Ninf.min() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 neg
+
+Ninf.neg() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 new
+
+Ninf.new() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 sqrt
+
+Ninf.sqrt() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 times
+
+Ninf.times() -> I<Obj>
+
+Return the
+
+=cut
