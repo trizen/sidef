@@ -63,6 +63,8 @@ package Sidef::Types::Number::Number {
     sub new {
         my (undef, $num, $base) = @_;
 
+        $base = defined($base) ? ref($base) ? $base->get_value : $base : 10;
+
         ref($num) eq __PACKAGE__ ? $num : do {
 
             $num = $num->get_value
@@ -70,7 +72,7 @@ package Sidef::Types::Number::Number {
 
             ref($num) eq 'Math::GMPq'
               ? bless(\$num, __PACKAGE__)
-              : bless(\Math::GMPq->new(_str2rat($num // 0), ref($base) ? $base->get_value : ($base // 10)), __PACKAGE__);
+              : bless(\Math::GMPq->new($base == 10 ? _str2rat($num // 0) : ($num // 0), $base), __PACKAGE__);
           }
     }
 
@@ -1558,6 +1560,19 @@ package Sidef::Types::Number::Number {
         }
         else {
             $x->new(CORE::rand(Rmpq_get_d($$x)));
+        }
+    }
+
+    sub rand_int {
+        my ($x, $y) = @_;
+
+        if (defined $y) {
+            _valid($y);
+            my $min = Rmpq_get_d($$x);
+            $x->new(CORE::int($min + CORE::rand(Rmpq_get_d($$y) - $min)));
+        }
+        else {
+            $x->new(CORE::int(CORE::rand(Rmpq_get_d($$x))));
         }
     }
 
