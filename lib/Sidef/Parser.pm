@@ -1697,7 +1697,7 @@ package Sidef::Parser {
 
             # Binary, hexdecimal and octal numbers
             if (/\G0(b[10_]*|x[0-9A-Fa-f_]*|[0-9_]+\b)/gc) {
-                return Sidef::Types::Number::Number->new("0" . ($1 =~ tr/_//dr));
+                return Sidef::Types::Number::Number->new("0" . ($1 =~ tr/_//dr), 0);
             }
 
             # Integer or float number

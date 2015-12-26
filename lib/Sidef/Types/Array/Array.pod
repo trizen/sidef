@@ -347,6 +347,14 @@ Return the
 
 =cut
 
+=head2 each_cons
+
+Array.each_cons() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 each_key
 
 Array.each_key() -> I<Obj>
@@ -370,6 +378,16 @@ Return the
 Array.each_slice() -> I<Obj>
 
 Return the
+
+=cut
+
+=head2 encode
+
+Array.encode() -> I<Obj>
+
+Return the
+
+Aliases: I<join_bytes>
 
 =cut
 

@@ -26,7 +26,7 @@ EOT
 var sum = [0];
 
 triangle.open_r.each { |line|
-    var x = line.words.map{_-/^0+/ -> to_i};
+    var x = line.words.map{.to_i};
     sum = [
             x.first + sum.first,
             1 ... x.len-2 -> map{|i| x[i] + Math.max(sum[i-1, i])}...,

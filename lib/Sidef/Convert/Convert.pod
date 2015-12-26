@@ -34,22 +34,6 @@ Aliases: I<to_bool>
 
 =cut
 
-=head2 to_byte
-
-Convert.to_byte() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 to_bytes
-
-Convert.to_bytes() -> I<Obj>
-
-Return the
-
-=cut
-
 =head2 to_c
 
 Convert.to_c() -> I<Obj>
@@ -63,22 +47,6 @@ Aliases: I<to_complex>
 =head2 to_caller
 
 Convert.to_caller() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 to_char
-
-Convert.to_char() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 to_chars
-
-Convert.to_chars() -> I<Obj>
 
 Return the
 
@@ -115,26 +83,6 @@ Return the
 Convert.to_file() -> I<Obj>
 
 Return the
-
-=cut
-
-=head2 to_graph
-
-Convert.to_graph() -> I<Obj>
-
-Return the
-
-Aliases: I<to_grapheme>
-
-=cut
-
-=head2 to_graphs
-
-Convert.to_graphs() -> I<Obj>
-
-Return the
-
-Aliases: I<to_graphemes>
 
 =cut
 

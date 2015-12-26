@@ -20,29 +20,10 @@ Inherits methods from:
 
 	* Sidef::Object::Object
 	* Sidef::Convert::Convert
+	* Sidef::Types::Number::Number
 
 =head1 METHODS
 
-
-=head2 !
-
-I<Obj> B<!> I<Obj> -> I<Obj>
-
-Return the
-
-Aliases: I<fac>, I<fact>, I<factorial>
-
-=cut
-
-=head2 !=
-
-I<Obj> B<!=> I<Obj> -> I<Obj>
-
-Return the
-
-Aliases: I<ne>
-
-=cut
 
 =head2 *
 
@@ -182,193 +163,9 @@ Return the
 
 =cut
 
-=head2 acos
+=head2 c_string
 
-Complex.acos() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 acosh
-
-Complex.acosh() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 acot
-
-Complex.acot() -> I<Obj>
-
-Return the
-
-Aliases: I<acotan>
-
-=cut
-
-=head2 acoth
-
-Complex.acoth() -> I<Obj>
-
-Return the
-
-Aliases: I<acotanh>
-
-=cut
-
-=head2 acsc
-
-Complex.acsc() -> I<Obj>
-
-Return the
-
-Aliases: I<acosec>
-
-=cut
-
-=head2 acsch
-
-Complex.acsch() -> I<Obj>
-
-Return the
-
-Aliases: I<acosech>
-
-=cut
-
-=head2 asec
-
-Complex.asec() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 asech
-
-Complex.asech() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 asin
-
-Complex.asin() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 asinh
-
-Complex.asinh() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 atan
-
-Complex.atan() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 atan2
-
-Complex.atan2() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 atanh
-
-Complex.atanh() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 cartesian
-
-Complex.cartesian() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 ceil
-
-Complex.ceil() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 cos
-
-Complex.cos() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 cosh
-
-Complex.cosh() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 cot
-
-Complex.cot() -> I<Obj>
-
-Return the
-
-Aliases: I<cotan>
-
-=cut
-
-=head2 coth
-
-Complex.coth() -> I<Obj>
-
-Return the
-
-Aliases: I<cotanh>
-
-=cut
-
-=head2 csc
-
-Complex.csc() -> I<Obj>
-
-Return the
-
-Aliases: I<cosec>
-
-=cut
-
-=head2 csch
-
-Complex.csch() -> I<Obj>
-
-Return the
-
-Aliases: I<cosech>
-
-=cut
-
-=head2 digit
-
-Complex.digit() -> I<Obj>
+Complex.c_string() -> I<Obj>
 
 Return the
 
@@ -390,35 +187,9 @@ Return the
 
 =cut
 
-=head2 floor
-
-Complex.floor() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 fround
-
-Complex.fround() -> I<Obj>
-
-Return the
-
-Aliases: I<roundf>
-
-=cut
-
 =head2 get_constant
 
 Complex.get_constant() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 i
-
-Complex.i() -> I<Obj>
 
 Return the
 
@@ -430,93 +201,15 @@ Complex.im() -> I<Obj>
 
 Return the
 
-Aliases: I<imaginary>
+Aliases: I<imag>
 
 =cut
 
-=head2 int
+=head2 i_string
 
-Complex.int() -> I<Obj>
-
-Return the
-
-Aliases: I<as_int>
-
-=cut
-
-=head2 is_inf
-
-Complex.is_inf() -> I<Obj>
+Complex.i_string() -> I<Obj>
 
 Return the
-
-Aliases: I<is_infinite>
-
-=cut
-
-=head2 is_int
-
-Complex.is_int() -> I<Obj>
-
-Return the
-
-Aliases: I<is_integer>
-
-=cut
-
-=head2 is_nan
-
-Complex.is_nan() -> I<Obj>
-
-Return the
-
-Aliases: I<is_NaN>
-
-=cut
-
-=head2 is_neg
-
-Complex.is_neg() -> I<Obj>
-
-Return the
-
-Aliases: I<is_negative>
-
-=cut
-
-=head2 is_one
-
-Complex.is_one() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 is_pos
-
-Complex.is_pos() -> I<Obj>
-
-Return the
-
-Aliases: I<is_positive>
-
-=cut
-
-=head2 is_zero
-
-Complex.is_zero() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 len
-
-Complex.len() -> I<Obj>
-
-Return the
-
-Aliases: I<length>
 
 =cut
 
@@ -528,21 +221,11 @@ Return the
 
 =cut
 
-=head2 log10
-
-Complex.log10() -> I<Obj>
-
-Return the
-
-=cut
-
 =head2 neg
 
 Complex.neg() -> I<Obj>
 
 Return the
-
-Aliases: I<negate>
 
 =cut
 
@@ -556,65 +239,19 @@ Aliases: I<call>
 
 =cut
 
-=head2 nok
+=head2 norm
 
-Complex.nok() -> I<Obj>
-
-Return the
-
-Aliases: I<binomial>
-
-=cut
-
-=head2 not
-
-Complex.not() -> I<Obj>
+Complex.norm() -> I<Obj>
 
 Return the
 
-Aliases: I<conj>, I<conjugated>
+Aliases: I<reciprocal>
 
 =cut
 
-=head2 parts
+=head2 prec_cast
 
-Complex.parts() -> I<Obj>
-
-Return the
-
-Aliases: I<reals>
-
-=cut
-
-=head2 pi
-
-Complex.pi() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 polar
-
-Complex.polar() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 polars
-
-Complex.polars() -> I<Obj>
-
-Return the
-
-Aliases: I<polar_parts>
-
-=cut
-
-=head2 rand
-
-Complex.rand() -> I<Obj>
+Complex.prec_cast() -> I<Obj>
 
 Return the
 
@@ -630,73 +267,9 @@ Aliases: I<real>
 
 =cut
 
-=head2 reciprocal
+=head2 r_string
 
-Complex.reciprocal() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 root
-
-Complex.root() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 roots
-
-Complex.roots() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 round
-
-Complex.round() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 sec
-
-Complex.sec() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 sech
-
-Complex.sech() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 sign
-
-Complex.sign() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 sin
-
-Complex.sin() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 sinh
-
-Complex.sinh() -> I<Obj>
+Complex.r_string() -> I<Obj>
 
 Return the
 
@@ -710,26 +283,12 @@ Return the
 
 =cut
 
-=head2 sstr
+=head2 ~
 
-Complex.sstr() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 tan
-
-Complex.tan() -> I<Obj>
+I<Obj> B<~> I<Obj> -> I<Obj>
 
 Return the
 
-=cut
-
-=head2 tanh
-
-Complex.tanh() -> I<Obj>
-
-Return the
+Aliases: I<not>, I<conj>, I<conjugate>
 
 =cut

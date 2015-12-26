@@ -1512,6 +1512,8 @@ package Sidef::Types::Array::Array {
         );
     }
 
+    *encode = \&join_bytes;
+
     sub reverse {
         my ($self) = @_;
         $self->new(CORE::reverse @{$self});

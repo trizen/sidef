@@ -23,22 +23,6 @@ Inherits methods from:
 =head1 METHODS
 
 
-=head2 abs
-
-Math.abs() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 accuracy
-
-Math.accuracy() -> I<Obj>
-
-Return the
-
-=cut
-
 =head2 acos
 
 Math.acos() -> I<Obj>
@@ -183,22 +167,6 @@ Return the
 
 =cut
 
-=head2 ceil
-
-Math.ceil() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 cos
-
-Math.cos() -> I<Obj>
-
-Return the
-
-=cut
-
 =head2 cosec
 
 Math.cosec() -> I<Obj>
@@ -295,30 +263,6 @@ Return the
 
 =cut
 
-=head2 e
-
-Math.e() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 exp
-
-Math.exp() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 floor
-
-Math.floor() -> I<Obj>
-
-Return the
-
-=cut
-
 =head2 gcd
 
 Math.gcd() -> I<Obj>
@@ -359,41 +303,9 @@ Return the
 
 =cut
 
-=head2 inf
-
-Math.inf() -> I<Obj>
-
-Return the
-
-=cut
-
 =head2 lcm
 
 Math.lcm() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 log
-
-Math.log() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 log10
-
-Math.log10() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 log2
-
-Math.log2() -> I<Obj>
 
 Return the
 
@@ -431,22 +343,6 @@ Return the
 
 =cut
 
-=head2 npow
-
-Math.npow() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 npow2
-
-Math.npow2() -> I<Obj>
-
-Return the
-
-=cut
-
 =head2 num2percent
 
 Math.num2percent() -> I<Obj>
@@ -454,32 +350,6 @@ Math.num2percent() -> I<Obj>
 Return the
 
 Aliases: I<number_to_percentage>
-
-=cut
-
-=head2 pi
-
-Math.pi() -> I<Obj>
-
-Return the
-
-Aliases: I<PI>
-
-=cut
-
-=head2 pow
-
-Math.pow() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 precision
-
-Math.precision() -> I<Obj>
-
-Return the
 
 =cut
 
@@ -523,14 +393,6 @@ Return the
 
 =cut
 
-=head2 root
-
-Math.root() -> I<Obj>
-
-Return the
-
-=cut
-
 =head2 sec
 
 Math.sec() -> I<Obj>
@@ -547,25 +409,9 @@ Return the
 
 =cut
 
-=head2 sin
-
-Math.sin() -> I<Obj>
-
-Return the
-
-=cut
-
 =head2 sinh
 
 Math.sinh() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 sqrt
-
-Math.sqrt() -> I<Obj>
 
 Return the
 
@@ -590,14 +436,6 @@ Return the
 =head2 tanh
 
 Math.tanh() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 troot
-
-Math.troot() -> I<Obj>
 
 Return the
 

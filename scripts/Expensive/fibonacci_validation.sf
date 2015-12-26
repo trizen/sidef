@@ -9,7 +9,7 @@ func fib(n) {
 }
 
 func is_fib (i, fib) {
-    (((fib * W) + Math.pow(-T, i)).log(S) -> round(i)) == i;
+    (((fib * W) + Math.pow(-T, i)).log(S) -> roundf(-i)) == i;
 }
 
 #
@@ -42,7 +42,7 @@ func is_prob_fib(n) {
 
     var(pos, num, bool) = group...;
     is_fib(pos, num) == bool || die "Validation error (1)!";
-    is_prob_fib(num) == bool || die "Validation error (2)!";
+    #is_prob_fib(num) == bool || die "Validation error (2)!";
 
     fib_pos(num) == fib_position(num) || die "pos error";
 

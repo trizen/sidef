@@ -30,7 +30,7 @@ I<Obj> B<!> I<Obj> -> I<Obj>
 
 Return the
 
-Aliases: I<fac>, I<fact>, I<factorial>
+Aliases: I<fac>, I<factorial>
 
 =cut
 
@@ -70,7 +70,7 @@ I<Obj> B<*> I<Obj> -> I<Obj>
 
 Return the
 
-Aliases: I<x>, I<mul>
+Aliases: I<mul>
 
 =cut
 
@@ -140,17 +140,7 @@ I<Obj> B</> I<Obj> -> I<Obj>
 
 Return the
 
-Aliases: I<÷()>, I<div>, I<divide>
-
-=cut
-
-=head2 //
-
-I<Obj> B<//> I<Obj> -> I<Obj>
-
-Return the
-
-Aliases: I<rdiv>, I<rat_div>
+Aliases: I<÷()>, I<//()>, I<div>, I<rdiv>
 
 =cut
 
@@ -200,7 +190,7 @@ I<Obj> B<==> I<Obj> -> I<Obj>
 
 Return the
 
-Aliases: I<eq>, I<equals>
+Aliases: I<eq>
 
 =cut
 
@@ -240,7 +230,7 @@ I<Obj> B<^..> I<Obj> -> I<Obj>
 
 Return the
 
-Aliases: I<down_to>, I<downto>
+Aliases: I<downto>
 
 =cut
 
@@ -262,29 +252,41 @@ Return the
 
 =cut
 
-=head2 arr_downto
+=head2 acos
 
-Number.arr_downto() -> I<Obj>
+Number.acos() -> I<Obj>
 
 Return the
 
-Aliases: I<array_downto>
+=cut
+
+=head2 acosh
+
+Number.acosh() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 agm
+
+Number.agm() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 array_downto
+
+Number.array_downto() -> I<Obj>
+
+Return the
 
 =cut
 
 =head2 as_bin
 
 Number.as_bin() -> I<Obj>
-
-Return the
-
-Aliases: I<to_bin>
-
-=cut
-
-=head2 as_float
-
-Number.as_float() -> I<Obj>
 
 Return the
 
@@ -296,7 +298,21 @@ Number.as_hex() -> I<Obj>
 
 Return the
 
-Aliases: I<to_hex>
+=cut
+
+=head2 asin
+
+Number.asin() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 asinh
+
+Number.asinh() -> I<Obj>
+
+Return the
 
 =cut
 
@@ -305,8 +321,6 @@ Aliases: I<to_hex>
 Number.as_oct() -> I<Obj>
 
 Return the
-
-Aliases: I<to_oct>
 
 =cut
 
@@ -318,9 +332,9 @@ Return the
 
 =cut
 
-=head2 atan2
+=head2 atanh
 
-Number.atan2() -> I<Obj>
+Number.atanh() -> I<Obj>
 
 Return the
 
@@ -332,7 +346,21 @@ Number.bin() -> I<Obj>
 
 Return the
 
-Aliases: I<from_bin>
+=cut
+
+=head2 binomial
+
+Number.binomial() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 cbrt
+
+Number.cbrt() -> I<Obj>
+
+Return the
 
 =cut
 
@@ -352,17 +380,49 @@ Return the
 
 =cut
 
-=head2 commify
+=head2 cos
 
-Number.commify() -> I<Obj>
+Number.cos() -> I<Obj>
 
 Return the
 
 =cut
 
-=head2 cos
+=head2 cosh
 
-Number.cos() -> I<Obj>
+Number.cosh() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 cot
+
+Number.cot() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 coth
+
+Number.coth() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 csc
+
+Number.csc() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 csch
+
+Number.csch() -> I<Obj>
 
 Return the
 
@@ -378,9 +438,19 @@ Aliases: I<denominator>
 
 =cut
 
-=head2 digit
+=head2 dfac
 
-Number.digit() -> I<Obj>
+Number.dfac() -> I<Obj>
+
+Return the
+
+Aliases: I<factorial2>
+
+=cut
+
+=head2 digamma
+
+Number.digamma() -> I<Obj>
 
 Return the
 
@@ -410,6 +480,48 @@ Return the
 
 =cut
 
+=head2 dump
+
+Number.dump() -> I<Obj>
+
+Return the
+
+Aliases: I<as_rat>
+
+=cut
+
+=head2 e
+
+Number.e() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 eint
+
+Number.eint() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 erf
+
+Number.erf() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 erfc
+
+Number.erfc() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 exp
 
 Number.exp() -> I<Obj>
@@ -418,13 +530,39 @@ Return the
 
 =cut
 
-=head2 expmod
+=head2 exp10
 
-Number.expmod() -> I<Obj>
+Number.exp10() -> I<Obj>
 
 Return the
 
-Aliases: I<modpow>
+=cut
+
+=head2 exp2
+
+Number.exp2() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 fib
+
+Number.fib() -> I<Obj>
+
+Return the
+
+Aliases: I<fibonacci>
+
+=cut
+
+=head2 float
+
+Number.float() -> I<Obj>
+
+Return the
+
+Aliases: I<as_float>
 
 =cut
 
@@ -436,29 +574,65 @@ Return the
 
 =cut
 
-=head2 fround
+=head2 fmod
 
-Number.fround() -> I<Obj>
+Number.fmod() -> I<Obj>
 
 Return the
-
-Aliases: I<roundf>
 
 =cut
 
-=head2 hex
+=head2 gamma
 
-Number.hex() -> I<Obj>
+Number.gamma() -> I<Obj>
 
 Return the
 
-Aliases: I<from_hex>
+=cut
+
+=head2 gcd
+
+Number.gcd() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 hypot
+
+Number.hypot() -> I<Obj>
+
+Return the
 
 =cut
 
 =head2 i
 
 Number.i() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 iadd
+
+Number.iadd() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 idiv
+
+Number.idiv() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 imul
+
+Number.imul() -> I<Obj>
 
 Return the
 
@@ -478,17 +652,15 @@ Number.int() -> I<Obj>
 
 Return the
 
-Aliases: I<to_i>, I<as_int>, I<to_int>
+Aliases: I<as_int>
 
 =cut
 
-=head2 invmod
+=head2 inv
 
-Number.invmod() -> I<Obj>
+Number.inv() -> I<Obj>
 
 Return the
-
-Aliases: I<modinv>
 
 =cut
 
@@ -506,8 +678,6 @@ Number.is_inf() -> I<Obj>
 
 Return the
 
-Aliases: I<is_infinite>
-
 =cut
 
 =head2 is_int
@@ -516,8 +686,6 @@ Number.is_int() -> I<Obj>
 
 Return the
 
-Aliases: I<is_integer>
-
 =cut
 
 =head2 is_nan
@@ -525,8 +693,6 @@ Aliases: I<is_integer>
 Number.is_nan() -> I<Obj>
 
 Return the
-
-Aliases: I<is_NaN>
 
 =cut
 
@@ -566,9 +732,61 @@ Aliases: I<is_positive>
 
 =cut
 
+=head2 is_pow
+
+Number.is_pow() -> I<Obj>
+
+Return the
+
+Aliases: I<is_power>
+
+=cut
+
+=head2 is_prime
+
+Number.is_prime() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 is_sqr
+
+Number.is_sqr() -> I<Obj>
+
+Return the
+
+Aliases: I<is_square>
+
+=cut
+
+=head2 isub
+
+Number.isub() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 is_zero
 
 Number.is_zero() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 lcm
+
+Number.lcm() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 legendre
+
+Number.legendre() -> I<Obj>
 
 Return the
 
@@ -580,7 +798,23 @@ Number.len() -> I<Obj>
 
 Return the
 
-Aliases: I<length>
+Aliases: I<size>, I<length>
+
+=cut
+
+=head2 lgamma
+
+Number.lgamma() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 li2
+
+Number.li2() -> I<Obj>
+
+Return the
 
 =cut
 
@@ -616,6 +850,14 @@ Return the
 
 =cut
 
+=head2 lucas
+
+Number.lucas() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 max
 
 Number.max() -> I<Obj>
@@ -632,13 +874,27 @@ Return the
 
 =cut
 
+=head2 modinv
+
+Number.modinv() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 modpow
+
+Number.modpow() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 nan
 
 Number.nan() -> I<Obj>
 
 Return the
-
-Aliases: I<NaN>
 
 =cut
 
@@ -648,7 +904,7 @@ Number.neg() -> I<Obj>
 
 Return the
 
-Aliases: I<negate>
+Aliases: I<negative>
 
 =cut
 
@@ -662,27 +918,37 @@ Aliases: I<call>
 
 =cut
 
-=head2 nok
+=head2 next_pow
 
-Number.nok() -> I<Obj>
-
-Return the
-
-Aliases: I<binomial>
-
-=cut
-
-=head2 npow
-
-Number.npow() -> I<Obj>
+Number.next_pow() -> I<Obj>
 
 Return the
 
+Aliases: I<next_power>
+
 =cut
 
-=head2 npow2
+=head2 next_pow2
 
-Number.npow2() -> I<Obj>
+Number.next_pow2() -> I<Obj>
+
+Return the
+
+Aliases: I<next_power2>
+
+=cut
+
+=head2 next_prime
+
+Number.next_prime() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 ninf
+
+Number.ninf() -> I<Obj>
 
 Return the
 
@@ -708,16 +974,6 @@ Aliases: I<parts>
 
 =cut
 
-=head2 oct
-
-Number.oct() -> I<Obj>
-
-Return the
-
-Aliases: I<from_oct>
-
-=cut
-
 =head2 of
 
 Number.of() -> I<Obj>
@@ -726,9 +982,57 @@ Return the
 
 =cut
 
+=head2 phi
+
+Number.phi() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 pi
+
+Number.pi() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 prec_cast
+
+Number.prec_cast() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 primorial
+
+Number.primorial() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 rand
 
 Number.rand() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 rand_clear
+
+Number.rand_clear() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 rand_init
+
+Number.rand_init() -> I<Obj>
 
 Return the
 
@@ -758,17 +1062,25 @@ Return the
 
 =cut
 
-=head2 round
+=head2 roundf
 
-Number.round() -> I<Obj>
+Number.roundf() -> I<Obj>
 
 Return the
 
 =cut
 
-=head2 sign
+=head2 sec
 
-Number.sign() -> I<Obj>
+Number.sec() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 sech
+
+Number.sech() -> I<Obj>
 
 Return the
 
@@ -782,6 +1094,22 @@ Return the
 
 =cut
 
+=head2 sinh
+
+Number.sinh() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 sqr
+
+Number.sqr() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 sqrt
 
 Number.sqrt() -> I<Obj>
@@ -790,9 +1118,17 @@ Return the
 
 =cut
 
-=head2 sstr
+=head2 tan
 
-Number.sstr() -> I<Obj>
+Number.tan() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 tanh
+
+Number.tanh() -> I<Obj>
 
 Return the
 
@@ -812,33 +1148,13 @@ Number.to() -> I<Obj>
 
 Return the
 
-Aliases: I<...()>, I<..^()>, I<up_to>, I<upto>
+Aliases: I<...()>, I<..^()>, I<upto>
 
 =cut
 
-=head2 to_n
+=head2 zeta
 
-Number.to_n() -> I<Obj>
-
-Return the
-
-Aliases: I<to_num>
-
-=cut
-
-=head2 to_s
-
-Number.to_s() -> I<Obj>
-
-Return the
-
-Aliases: I<dump>
-
-=cut
-
-=head2 troot
-
-Number.troot() -> I<Obj>
+Number.zeta() -> I<Obj>
 
 Return the
 

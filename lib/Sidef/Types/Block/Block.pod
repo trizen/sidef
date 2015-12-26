@@ -120,14 +120,6 @@ Return the
 
 =cut
 
-=head2 pfork
-
-Block.pfork() -> I<Obj>
-
-Return the
-
-=cut
-
 =head2 thr
 
 Block.thr() -> I<Obj>

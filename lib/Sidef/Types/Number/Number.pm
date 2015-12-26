@@ -61,7 +61,7 @@ package Sidef::Types::Number::Number {
     }
 
     sub new {
-        my (undef, $num) = @_;
+        my (undef, $num, $base) = @_;
 
         ref($num) eq __PACKAGE__ ? $num : do {
 
@@ -70,7 +70,7 @@ package Sidef::Types::Number::Number {
 
             ref($num) eq 'Math::GMPq'
               ? bless(\$num, __PACKAGE__)
-              : bless(\Math::GMPq->new(_str2rat($num // 0)), __PACKAGE__);
+              : bless(\Math::GMPq->new(_str2rat($num // 0), ref($base) ? $base->get_value : ($base // 10)), __PACKAGE__);
           }
     }
 

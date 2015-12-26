@@ -254,8 +254,6 @@ String.bytes() -> I<Obj>
 
 Return the
 
-Aliases: I<to_bytes>
-
 =cut
 
 =head2 bytes_len
@@ -283,8 +281,6 @@ Aliases: I<char_at>
 String.chars() -> I<Obj>
 
 Return the
-
-Aliases: I<to_chars>
 
 =cut
 
@@ -550,7 +546,7 @@ String.graphs() -> I<Obj>
 
 Return the
 
-Aliases: I<to_graphs>, I<graphemes>, I<to_graphemes>
+Aliases: I<graphemes>
 
 =cut
 
