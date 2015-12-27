@@ -287,6 +287,7 @@ scripts/RosettaCode/catalan_numbers_pascal_triangle.sf
 scripts/RosettaCode/catamorphism.sf
 scripts/RosettaCode/character_codes.sf
 scripts/RosettaCode/check_that_file_exists.sf
+scripts/RosettaCode/cholesky_decomposition.sf
 scripts/RosettaCode/classes.sf
 scripts/RosettaCode/closures_value_capture.sf
 scripts/RosettaCode/compare_a_list_of_strings.sf

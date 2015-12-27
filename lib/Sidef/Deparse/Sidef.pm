@@ -470,6 +470,12 @@ package Sidef::Deparse::Sidef {
         elsif ($ref eq 'Sidef::Types::Number::Number') {
             $code = $self->_dump_number($obj->get_value);
         }
+        elsif ($ref eq 'Sidef::Types::Number::Inf') {
+            $code = 'Inf';
+        }
+        elsif ($ref eq 'Sidef::Types::Number::Ninf') {
+            $code = '-Inf';
+        }
         elsif ($ref eq 'Sidef::Types::Array::Array' or $ref eq 'Sidef::Types::Array::HCArray') {
             if (not @{$obj}) {
                 $code = 'Array';
