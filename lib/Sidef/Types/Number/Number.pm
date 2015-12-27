@@ -392,19 +392,7 @@ package Sidef::Types::Number::Number {
         }
 
         _valid($y);
-
-        my $sign = Math::GMPq::Rmpq_sgn($$y);
-
-        if ($sign == 0) {
-            return state $z = inf();
-        }
-        elsif ($sign < 0) {
-            return $x->pow($ONE->div($y));
-        }
-
-        my $r = Math::MPFR::Rmpfr_init2($PREC);
-        Math::MPFR::Rmpfr_root($r, _as_float($x), CORE::int(Math::GMPq::Rmpq_get_d($$y)), $ROUND);
-        _new(_mpfr2rat($r));
+        return $x->pow($ONE->div($y));
     }
 
     sub sqr {
