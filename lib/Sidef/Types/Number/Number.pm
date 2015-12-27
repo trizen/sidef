@@ -1168,6 +1168,7 @@ package Sidef::Types::Number::Number {
 
     sub factorial {
         my ($x) = @_;
+        return nan() if Math::GMPq::Rmpq_sgn($$x) < 0;
         my $r = Math::GMPz::Rmpz_init();
         Math::GMPz::Rmpz_fac_ui($r, CORE::int(Math::GMPq::Rmpq_get_d($$x)));
         _new(_mpz2rat($r));
@@ -1175,17 +1176,19 @@ package Sidef::Types::Number::Number {
 
     *fac = \&factorial;
 
-    sub factorial2 {
+    sub double_factorial {
         my ($x) = @_;
+        return nan() if Math::GMPq::Rmpq_sgn($$x) < 0;
         my $r = Math::GMPz::Rmpz_init();
         Math::GMPz::Rmpz_2fac_ui($r, CORE::int(Math::GMPq::Rmpq_get_d($$x)));
         _new(_mpz2rat($r));
     }
 
-    *dfac = \&factorial2;
+    *dfac = \&double_factorial;
 
     sub primorial {
         my ($x) = @_;
+        return nan() if Math::GMPq::Rmpq_sgn($$x) < 0;
         my $r = Math::GMPz::Rmpz_init();
         Math::GMPz::Rmpz_primorial_ui($r, CORE::int(Math::GMPq::Rmpq_get_d($$x)));
         _new(_mpz2rat($r));
@@ -1193,6 +1196,7 @@ package Sidef::Types::Number::Number {
 
     sub fibonacci {
         my ($x) = @_;
+        return nan() if Math::GMPq::Rmpq_sgn($$x) < 0;
         my $r = Math::GMPz::Rmpz_init();
         Math::GMPz::Rmpz_fib_ui($r, CORE::int(Math::GMPq::Rmpq_get_d($$x)));
         _new(_mpz2rat($r));
@@ -1204,20 +1208,31 @@ package Sidef::Types::Number::Number {
         my ($x, $y) = @_;
         _valid($y);
         my $r = Math::GMPz::Rmpz_init();
-        Math::GMPz::Rmpz_bin_ui($r, _as_int($x), CORE::int(Math::GMPq::Rmpq_get_d($$y)));
+        Math::GMPz::Rmpz_bin_si($r, _as_int($x), CORE::int(Math::GMPq::Rmpq_get_d($$y)));
         _new(_mpz2rat($r));
     }
 
     sub legendre {
         my ($x, $y) = @_;
         _valid($y);
-        my $r = Math::GMPz::Rmpz_init();
-        Math::GMPz::Rmpz_legendre($r, _as_int($x), _as_int($y));
-        _new(_mpz2rat($r));
+        _new_int(Math::GMPz::Rmpz_legendre(_as_int($x), _as_int($y)));
+    }
+
+    sub jacobi {
+        my ($x, $y) = @_;
+        _valid($y);
+        _new_int(Math::GMPz::Rmpz_jacobi(_as_int($x), _as_int($y)));
+    }
+
+    sub kronecker {
+        my ($x, $y) = @_;
+        _valid($y);
+        _new_int(Math::GMPz::Rmpz_kronecker(_as_int($x), _as_int($y)));
     }
 
     sub lucas {
         my ($x) = @_;
+        return nan() if Math::GMPq::Rmpq_sgn($$x) < 0;
         my $r = Math::GMPz::Rmpz_init();
         Math::GMPz::Rmpz_lucnum_ui($r, CORE::int(Math::GMPq::Rmpq_get_d($$x)));
         _new(_mpz2rat($r));
@@ -1392,10 +1407,10 @@ package Sidef::Types::Number::Number {
 
         if (defined $y) {
             _valid($y);
-            Sidef::Types::Number::Complex->new(Math::GMPq::Rmpq_get_d($$x), Math::GMPq::Rmpq_get_d($$y));
+            Sidef::Types::Number::Complex->new($x, $y);
         }
         else {
-            Sidef::Types::Number::Complex->new(Math::GMPq::Rmpq_get_d($$x));
+            Sidef::Types::Number::Complex->new($x);
         }
     }
 
@@ -1403,7 +1418,7 @@ package Sidef::Types::Number::Number {
 
     sub i {
         my ($x) = @_;
-        Sidef::Types::Number::Complex->new(0, Math::GMPq::Rmpq_get_d($$x));
+        Sidef::Types::Number::Complex->new(0, $x);
     }
 
     sub array_to {
@@ -1524,6 +1539,14 @@ package Sidef::Types::Number::Number {
                                                  );
     }
 
+    sub range {
+        my ($from, $to, $step) = @_;
+
+        defined($to)
+          ? $from->to($to, $step)
+          : $ZERO->to($from->dec);
+    }
+
     sub rand {
         my ($x, $y) = @_;
 
@@ -1548,14 +1571,6 @@ package Sidef::Types::Number::Number {
         else {
             $x->new(CORE::int(CORE::rand(Math::GMPq::Rmpq_get_d($$x))));
         }
-    }
-
-    sub range {
-        my ($from, $to, $step) = @_;
-
-        defined($to)
-          ? $from->to($to, $step)
-          : $ZERO->to($from->dec);
     }
 
     sub of {
@@ -1631,7 +1646,7 @@ package Sidef::Types::Number::Number {
         *{__PACKAGE__ . '::' . '<<'}  = \&shift_left;
         *{__PACKAGE__ . '::' . '~'}   = \&not;
         *{__PACKAGE__ . '::' . ':'}   = \&complex;
-        *{__PACKAGE__ . '::' . '//'}  = \&rdiv;
+        *{__PACKAGE__ . '::' . '//'}  = \&idiv;
     }
 }
 

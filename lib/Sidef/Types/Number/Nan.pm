@@ -21,6 +21,17 @@ package Sidef::Types::Number::Nan {
 
     sub new { $NAN }
 
+    sub is_nan {
+        state $x = Sidef::Types::Bool::Bool->true;
+    }
+
+    sub is_inf {
+        state $x = Sidef::Types::Bool::Bool->false;
+    }
+
+    sub is_ninf {
+        state $x = Sidef::Types::Bool::Bool->false;
+    }
 }
 
 1

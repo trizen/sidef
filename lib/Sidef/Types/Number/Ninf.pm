@@ -37,16 +37,22 @@ package Sidef::Types::Number::Ninf {
         ref($y) eq 'Sidef::Types::Number::Inf' ? nan() : $x;
     }
 
+    *iadd = \&add;
+
     sub sub {
         my ($x, $y) = @_;
         ref($y) eq __PACKAGE__ ? nan() : $x;
     }
+
+    *isub = \&sub;
 
     sub mul {
         my ($x, $y) = @_;
         ref($y) eq __PACKAGE__ and return $x->neg;
         $y->is_neg ? $x->neg : $x;
     }
+
+    *imul = \&mul;
 
     sub div {
         my ($x, $y) = @_;
@@ -56,44 +62,117 @@ package Sidef::Types::Number::Ninf {
         $y->is_neg ? $x->neg : $x;
     }
 
+    *idiv = \&div;
+
     sub is_pos {
         state $x = Sidef::Types::Bool::Bool->false;
     }
+
+    *is_nan    = \&is_pos;
+    *is_prime  = \&is_pos;
+    *is_square = \&is_pos;
+    *is_sqr    = \&is_pos;
+    *is_power  = \&is_pos;
+    *is_pow    = \&is_pos;
+    *is_div    = \&is_pos;
+    *is_even   = \&is_pos;
+    *is_odd    = \&is_pos;
 
     sub is_neg {
         state $x = Sidef::Types::Bool::Bool->true;
     }
 
+    sub is_inf {
+        state $x = Sidef::Types::Bool::Bool->true;
+    }
+
+    sub is_ninf {
+        state $x = Sidef::Types::Bool::Bool->true;
+    }
+
     sub nan { state $x = Sidef::Types::Number::Nan->new }
 
-    *gamma   = \&nan;
-    *lgamma  = \&nan;
-    *digamma = \&nan;
-    *zeta    = \&nan;
-    *fmod    = \&nan;
-    *mod     = \&nan;
+    *gamma            = \&nan;
+    *lgamma           = \&nan;
+    *digamma          = \&nan;
+    *zeta             = \&nan;
+    *fmod             = \&nan;
+    *mod              = \&nan;
+    *bin              = \&nan;
+    *modpow           = \&nan;
+    *modinv           = \&nan;
+    *and              = \&nan;
+    *or               = \&nan;
+    *xor              = \&nan;
+    *factorial        = \&nan;
+    *fac              = \&nan;
+    *double_factorial = \&nan;
+    *dfac             = \&nan;
+    *primorial        = \&nan;
+    *fibonacci        = \&nan;
+    *legendre         = \&nan;
+    *jacobi           = \&nan;
+    *kronecker        = \&nan;
+    *lucas            = \&nan;
+    *gcd              = \&nan;
+    *lcm              = \&nan;
+    *next_power2      = \&nan;
+    *next_pow2        = \&nan;
+    *next_pow         = \&nan;
+    *next_power       = \&nan;
+
+    sub as_bin {
+        state $x = Sidef::Types::String::String->new;
+    }
+
+    *as_oct = \&as_bin;
+    *as_hex = \&as_bin;
+
+    sub digits {
+        Sidef::Types::Array::Array->new;
+    }
+
+    sub divmod {
+        my ($x, $y) = @_;
+        ($x->div($y), nan());
+    }
 
     sub inf { state $x = Sidef::Types::Number::Inf->new }
 
-    *neg   = \&inf;
-    *abs   = \&inf;
-    *log   = \&inf;
-    *cosh  = \&inf;
-    *acosh = \&inf;
-    *tan   = \&inf;
-    *sec   = \&inf;
-    *csc   = \&inf;
-    *cot   = \&inf;
-    *hypot = \&inf;
+    *neg    = \&inf;
+    *abs    = \&inf;
+    *log    = \&inf;
+    *cosh   = \&inf;
+    *acosh  = \&inf;
+    *tan    = \&inf;
+    *sec    = \&inf;
+    *csc    = \&inf;
+    *cot    = \&inf;
+    *hypot  = \&inf;
+    *length = \&inf;
+    *len    = \&inf;
+    *size   = \&inf;
+    *not    = \&inf;
 
     sub ninf { $_[0] }
 
-    *min   = \&ninf;
-    *sinh  = \&ninf;
-    *asinh = \&ninf;
-    *li2   = \&ninf;
-    *inc   = \&ninf;
-    *dec   = \&ninf;
+    *min         = \&ninf;
+    *sinh        = \&ninf;
+    *asinh       = \&ninf;
+    *li2         = \&ninf;
+    *inc         = \&ninf;
+    *dec         = \&ninf;
+    *int         = \&ninf;
+    *as_int      = \&ninf;
+    *float       = \&ninf;
+    *as_float    = \&ninf;
+    *rat         = \&ninf;
+    *floor       = \&ninf;
+    *ceil        = \&ninf;
+    *shift_left  = \&ninf;
+    *shift_right = \&ninf;
+    *rand_int    = \&ninf;
+    *rand        = \&ninf;
 
     sub max { $_[1] }
 
@@ -108,7 +187,9 @@ package Sidef::Types::Number::Ninf {
     *eint  = \&zero;
     *exp   = \&zero;
     *exp2  = \&zero;
-    *exp10 = \&inf;
+    *exp10 = \&zero;
+
+    sub chr { state $x = Sidef::Types::String::String->new('') }
 
     #
     ## erfc(-inf) = 2
@@ -234,15 +315,26 @@ package Sidef::Types::Number::Ninf {
         *{__PACKAGE__ . '::' . '÷'}  = \&div;
         *{__PACKAGE__ . '::' . '%'}   = \&mod;
         *{__PACKAGE__ . '::' . '**'}  = \&pow;
+        *{__PACKAGE__ . '::' . '&'}   = \&and;
+        *{__PACKAGE__ . '::' . '|'}   = \&or;
+        *{__PACKAGE__ . '::' . '^'}   = \&xor;
         *{__PACKAGE__ . '::' . '++'}  = \&inc;
         *{__PACKAGE__ . '::' . '--'}  = \&dec;
         *{__PACKAGE__ . '::' . '=='}  = \&eq;
         *{__PACKAGE__ . '::' . '!='}  = \&ne;
+        *{__PACKAGE__ . '::' . '≠'} = \&ne;
         *{__PACKAGE__ . '::' . '>'}   = \&gt;
         *{__PACKAGE__ . '::' . '>='}  = \&ge;
+        *{__PACKAGE__ . '::' . '≥'} = \&ge;
         *{__PACKAGE__ . '::' . '<'}   = \&lt;
         *{__PACKAGE__ . '::' . '<='}  = \&le;
+        *{__PACKAGE__ . '::' . '≤'} = \&le;
         *{__PACKAGE__ . '::' . '<=>'} = \&cmp;
+        *{__PACKAGE__ . '::' . '!'}   = \&factorial;
+        *{__PACKAGE__ . '::' . '%%'}  = \&is_div;
+        *{__PACKAGE__ . '::' . '>>'}  = \&shift_right;
+        *{__PACKAGE__ . '::' . '<<'}  = \&shift_left;
+        *{__PACKAGE__ . '::' . '//'}  = \&div;
     }
 }
 

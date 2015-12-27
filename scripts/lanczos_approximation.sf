@@ -39,6 +39,6 @@ func gamma(z) {
     withinepsilon(result.im) ? result.real : result
 }
 
-for i in [1//2,4,5,6,30,40,50] {
+for i in [1/2,4,5,6,30,40,50] {
     say "gamma(%3s) =~ %s"%(i, gamma(i));
 }

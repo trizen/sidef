@@ -138,7 +138,7 @@ package Sidef::Types::Range::RangeNumber {
         my @values;
         if ($step == 1 and $to < (-1 >> 1) and $from < (-1 >> 1)) {
             foreach my $i ($from .. $to) {
-                push @values, $code->run(Sidef::Types::Number::Number->new($i));
+                push @values, $code->run(Sidef::Types::Number::Number::_new_int($i));
             }
         }
         elsif ($step > 0) {
@@ -167,7 +167,7 @@ package Sidef::Types::Range::RangeNumber {
         my @values;
         if ($step == 1 and $to < (-1 >> 1) and $from < (-1 >> 1)) {
             foreach my $i ($from .. $to) {
-                my $num = Sidef::Types::Number::Number->new($i);
+                my $num = Sidef::Types::Number::Number::_new_uint($i);
                 push(@values, $num) if $code->run($num);
             }
         }

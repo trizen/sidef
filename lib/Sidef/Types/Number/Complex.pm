@@ -256,6 +256,7 @@ package Sidef::Types::Number::Complex {
 
     sub div {
         my ($x, $y) = @_;
+
         my $r = Math::MPC::Rmpc_init2($PREC);
 
         if (ref($y) eq __PACKAGE__) {

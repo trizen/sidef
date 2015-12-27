@@ -13,8 +13,8 @@ var prod = 1.rat;
     9.times { |j|
         9.times { |k|
             next if (i == j);
-            if ((10*i + j) // (10*j + k) == i//k) {
-                prod *= i//k;
+            if ((10*i + j) / (10*j + k) == i/k) {
+                prod *= i/k;
             }
         }
     }
