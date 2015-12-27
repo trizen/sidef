@@ -892,6 +892,12 @@ HEADER
         elsif ($ref eq 'Sidef::Types::Number::Number') {
             $code = $self->make_constant($ref, 'new', "Number$refaddr", "'" . $obj->_get_frac . "'");
         }
+        elsif ($ref eq 'Sidef::Types::Number::Inf') {
+            $code = $self->make_constant($ref, 'new', "Inf$refaddr");
+        }
+        elsif ($ref eq 'Sidef::Types::Number::Ninf') {
+            $code = $self->make_constant($ref, 'new', "Ninf$refaddr");
+        }
         elsif ($ref eq 'Sidef::Types::String::String') {
             $code = $self->make_constant($ref, 'new', "String$refaddr", $self->_dump_string(${$obj}));
         }

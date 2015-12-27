@@ -8,10 +8,6 @@ package Sidef::Types::Number::Number {
     require Math::GMPf;
     require Math::MPFR;
 
-    require Sidef::Types::Number::Inf;
-    require Sidef::Types::Number::Ninf;
-    require Sidef::Types::Number::Nan;
-
     use parent qw(
       Sidef::Object::Object
       Sidef::Convert::Convert
@@ -22,13 +18,21 @@ package Sidef::Types::Number::Number {
 
     our $GET_PERL_VALUE = 0;
 
-    my $ONE  = bless(\Math::GMPq->new(1),  __PACKAGE__);
-    my $ZERO = bless(\Math::GMPq->new(0),  __PACKAGE__);
-    my $MONE = bless(\Math::GMPq->new(-1), __PACKAGE__);
+    our $ONE  = bless(\Math::GMPq->new(1),  __PACKAGE__);
+    our $ZERO = bless(\Math::GMPq->new(0),  __PACKAGE__);
+    our $MONE = bless(\Math::GMPq->new(-1), __PACKAGE__);
 
-    my $INF  = Sidef::Types::Number::Inf->new;
-    my $NINF = Sidef::Types::Number::Ninf->new;
-    my $NAN  = Sidef::Types::Number::Nan->new;
+    require Sidef::Types::Number::Nan;
+    our $NAN = Sidef::Types::Number::Nan->new;
+
+    require Sidef::Types::Number::Inf;
+    require Sidef::Types::Number::Ninf;
+    our $INF  = Sidef::Types::Number::Inf->new;
+    our $NINF = Sidef::Types::Number::Ninf->new;
+
+    if (not defined $INF or not defined $NINF or not defined $NAN) {
+        die "Fatal error: can't load the Number class!";
+    }
 
     use overload
       q{bool} => sub { Math::GMPq::Rmpq_sgn(${$_[0]}) != 0 },
@@ -118,6 +122,10 @@ package Sidef::Types::Number::Number {
 
         if (Math::MPFR::Rmpfr_inf_p($_[0])) {
             return (Math::MPFR::Rmpfr_sgn($_[0]) > 0 ? $INF : $NINF);
+        }
+
+        if (Math::MPFR::Rmpfr_nan_p($_[0])) {
+            return $NAN;
         }
 
         if (Math::MPFR::Rmpfr_integer_p($_[0])) {
@@ -230,32 +238,16 @@ package Sidef::Types::Number::Number {
     }
 
     sub e {
-
-        state $one_f = do {
-            my ($f) = Math::MPFR::Rmpfr_init_set_ui(1, $ROUND);
-            $f;
-        };
-
+        state $one_f = (Math::MPFR::Rmpfr_init_set_ui(1, $ROUND))[0];
         my $e = Math::MPFR::Rmpfr_init2($PREC);
         Math::MPFR::Rmpfr_exp($e, $one_f, $ROUND);
         _new(_mpfr2rat($e));
     }
 
     sub phi {
-        state $one_f = do {
-            my ($f) = Math::MPFR::Rmpfr_init_set_ui(1, $ROUND);
-            $f;
-        };
-
-        state $two_f = do {
-            my ($f) = Math::MPFR::Rmpfr_init_set_ui(2, $ROUND);
-            $f;
-        };
-
-        state $five_f = do {
-            my ($f) = Math::MPFR::Rmpfr_init_set_ui(5, $ROUND);
-            $f;
-        };
+        state $one_f  = (Math::MPFR::Rmpfr_init_set_ui(1, $ROUND))[0];
+        state $two_f  = (Math::MPFR::Rmpfr_init_set_ui(2, $ROUND))[0];
+        state $five_f = (Math::MPFR::Rmpfr_init_set_ui(5, $ROUND))[0];
 
         my $phi = Math::MPFR::Rmpfr_init2($PREC);
         Math::MPFR::Rmpfr_sqrt($phi, $five_f, $ROUND);
@@ -265,31 +257,9 @@ package Sidef::Types::Number::Number {
         _new(_mpfr2rat($phi));
     }
 
-    sub inf {
-
-        #state $x = do {
-        #    my $inf = Math::GMPq::Rmpq_init();
-        #    Math::GMPq::Rmpq_set_ui($inf, 1, 0);
-        #    _new($inf);
-        #};
-        $INF;
-    }
-
-    sub ninf {
-        state $x = do {
-            my $ninf = Math::GMPq::Rmpq_init();
-            Math::GMPq::Rmpq_set_si($ninf, -1, 0);
-            _new($ninf);
-        };
-    }
-
-    sub nan {
-        state $x = do {
-            my $nan = Math::GMPq::Rmpq_init();
-            Math::GMPq::Rmpq_set_si($nan, "-0", "-0");
-            _new($nan);
-        };
-    }
+    sub inf  { $INF }
+    sub ninf { $NINF }
+    sub nan  { $NAN }
 
     #
     ## Rational operations
@@ -402,6 +372,12 @@ package Sidef::Types::Number::Number {
 
     sub sqrt {
         my ($x) = @_;
+
+        # Return a complex number for x < 0
+        if (Math::GMPq::Rmpq_sgn($$x) < 0) {
+            return Sidef::Types::Number::Complex->new($x)->sqrt;
+        }
+
         my $r = Math::MPFR::Rmpfr_init2($PREC);
         Math::MPFR::Rmpfr_sqrt($r, _as_float($x), $ROUND);
         _new(_mpfr2rat($r));
@@ -409,6 +385,12 @@ package Sidef::Types::Number::Number {
 
     sub cbrt {
         my ($x) = @_;
+
+        # Return a complex number for x < 0
+        if (Math::GMPq::Rmpq_sgn($$x) < 0) {
+            return Sidef::Types::Number::Complex->new($x)->cbrt;
+        }
+
         my $r = Math::MPFR::Rmpfr_init2($PREC);
         Math::MPFR::Rmpfr_cbrt($r, _as_float($x), $ROUND);
         _new(_mpfr2rat($r));
@@ -470,10 +452,20 @@ package Sidef::Types::Number::Number {
 
     sub log {
         my ($x, $y) = @_;
+
+        if (Math::GMPq::Rmpq_sgn($$x) < 0) {
+            return Sidef::Types::Number::Complex->new($x)->log($y);
+        }
+
         my $r = Math::MPFR::Rmpfr_init2($PREC);
         Math::MPFR::Rmpfr_log($r, _as_float($x), $ROUND);
 
         if (defined $y) {
+
+            if (ref($y) eq 'Sidef::Types::Number::Inf' or ref($y) eq 'Sidef::Types::Number::Ninf') {
+                return $ZERO;
+            }
+
             _valid($y);
             my $baseln = Math::MPFR::Rmpfr_init2($PREC);
             Math::MPFR::Rmpfr_log($baseln, _as_float($y), $ROUND);
@@ -485,6 +477,11 @@ package Sidef::Types::Number::Number {
 
     sub ln {
         my ($x) = @_;
+
+        if (Math::GMPq::Rmpq_sgn($$x) < 0) {
+            return Sidef::Types::Number::Complex->new($x)->ln;
+        }
+
         my $r = Math::MPFR::Rmpfr_init2($PREC);
         Math::MPFR::Rmpfr_log($r, _as_float($x), $ROUND);
         _new(_mpfr2rat($r));
@@ -524,6 +521,10 @@ package Sidef::Types::Number::Number {
         Math::MPFR::Rmpfr_exp10($r, _as_float($x), $ROUND);
         _new(_mpfr2rat($r));
     }
+
+    #
+    ## Trigonometric functions
+    #
 
     sub sin {
         my ($x) = @_;
@@ -650,6 +651,10 @@ package Sidef::Types::Number::Number {
         Math::MPFR::Rmpfr_coth($r, _as_float($x), $ROUND);
         _new(_mpfr2rat($r));
     }
+
+    #
+    ## Special functions
+    #
 
     sub agm {
         my ($x, $y) = @_;
@@ -909,39 +914,12 @@ package Sidef::Types::Number::Number {
         Sidef::Types::Bool::Bool->new(Math::GMPz::Rmpz_sgn($z) == 0);
     }
 
-    sub _is_inf {
-        my ($x) = @_;
-
-        state $inf = do {
-            my $q = Math::GMPq::Rmpq_init();
-            Math::GMPq::Rmpq_set_ui($q, 1, 0);
-            $q;
-        };
-
-        state $ninf = do {
-            my $q = Math::GMPq::Rmpq_init();
-            Math::GMPq::Rmpq_set_si($q, -1, 0);
-            $q;
-        };
-
-        Math::GMPq::Rmpq_equal($inf, $x) or Math::GMPq::Rmpq_equal($ninf, $x);
-    }
-
     sub is_inf {
-        my ($x) = @_;
-        Sidef::Types::Bool::Bool->new(_is_inf($$x));
+        state $x = Sidef::Types::Bool::Bool->false;
     }
 
     sub is_nan {
-        my ($x) = @_;
-
-        my $nz = Math::GMPz::Rmpz_init();
-        my $dz = Math::GMPz::Rmpz_init();
-
-        Math::GMPq::Rmpq_get_num($nz, $$x);
-        Math::GMPq::Rmpq_get_den($dz, $$x);
-
-        Sidef::Types::Bool::Bool->new(Math::GMPz::Rmpz_sgn($nz) == 0 and Math::GMPz::Rmpz_sgn($dz) == 0);
+        state $x = Sidef::Types::Bool::Bool->false;
     }
 
     sub max {

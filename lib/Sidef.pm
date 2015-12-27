@@ -73,7 +73,10 @@ package Sidef {
         return $AUTOLOAD->($self, @args);
     }
 
-    die("[AUTOLOAD] Undefined method `" . Sidef::normalize_method($AUTOLOAD) . q{'});
+    my @caller = caller(1);
+    my $from   = Sidef::normalize_method($caller[3]);
+    $from = $from eq '.' ? 'main()' : "$from()";
+    die("[AUTOLOAD] Undefined method `" . Sidef::normalize_method($AUTOLOAD) . q{'} . " called from $from\n");
     return;
 };
 

@@ -6,7 +6,6 @@ package Sidef::Types::Number::Complex {
     use parent qw(
       Sidef::Object::Object
       Sidef::Convert::Convert
-      Sidef::Types::Number::Number
       );
 
     use overload
@@ -16,6 +15,7 @@ package Sidef::Types::Number::Complex {
 
     require Math::MPC;
     require Math::MPFR;
+    require Sidef::Types::Number::Number;
 
     our $ROUND = Math::MPC::MPC_RNDNN();
     our $PREC  = $Sidef::Types::Number::Number::PREC;
@@ -73,7 +73,17 @@ package Sidef::Types::Number::Complex {
     sub get_value {
         my $re = $_[0]->re->get_value;
         my $im = $_[0]->im->get_value;
-        $im eq '0' ? $re : ($re . (substr($im, 0, 1) eq '-' ? '' : '+') . $im . 'i');
+
+        return $re if $im eq '0';
+        my $sign = '+';
+
+        if (substr($im, 0, 1) eq '-') {
+            $sign = '-';
+            substr($im, 0, 1, '');
+        }
+
+        $im = '' if $im eq '1';
+        $re eq '0' ? $sign eq '+' ? "${im}i" : "$sign${im}i" : "$re$sign${im}i";
     }
 
     sub dump {
@@ -93,9 +103,25 @@ package Sidef::Types::Number::Complex {
 
         my $key = lc($name);
         $cache{$key} //= exists($table->{$key}) ? $table->{$key}->() : do {
-            warn qq{[WARN] Inexistent Math constant "$name"!\n};
+            warn qq{[WARN] Inexistent Complex constant "$name"!\n};
             undef;
         };
+    }
+
+    sub pi {
+        my $pi = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_const_pi($pi, $ROUND);
+        my $cpi = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_set_fr($cpi, $pi, $ROUND);
+        _new($cpi);
+    }
+
+    sub e {
+        my $pi = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_const_pi($pi, $ROUND);
+        my $cpi = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_set_fr($cpi, $pi, $ROUND);
+        _new($cpi);
     }
 
     sub abs {
@@ -226,6 +252,62 @@ package Sidef::Types::Number::Complex {
         _new($r);
     }
 
+    sub cbrt {
+        my ($x) = @_;
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_pow_d($r, $$x, 1 / 3, $ROUND);
+        _new($r);
+    }
+
+    sub log {
+        my ($x, $y) = @_;
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_log($r, $$x, $ROUND);
+
+        if (defined $y) {
+            if (ref($y) eq __PACKAGE__) {
+                my $baseln = Math::MPC::Rmpc_init2($PREC);
+                Math::MPC::Rmpc_log($baseln, $$y, $ROUND);
+                Math::MPC::Rmpc_div($r, $r, $baseln, $ROUND);
+            }
+            else {
+                my $baseln = Math::MPFR::Rmpfr_init2($PREC);
+                Math::MPFR::Rmpfr_log($baseln, $y->_as_float(), $ROUND);
+                Math::MPC::Rmpc_div_fr($r, $r, $baseln, $ROUND);
+            }
+        }
+
+        _new($r);
+    }
+
+    sub ln {
+        my ($x) = @_;
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_log($r, $$x, $ROUND);
+        _new($r);
+    }
+
+    sub log2 {
+        my ($x) = @_;
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_log($r, $$x, $ROUND);
+
+        state $two = (Math::MPFR::Rmpfr_init_set_ui(2, $ROUND))[0];
+
+        my $baseln = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_log($baseln, $two, $ROUND);
+        Math::MPC::Rmpc_div_fr($r, $r, $baseln, $ROUND);
+
+        _new($r);
+    }
+
+    sub log10 {
+        my ($x) = @_;
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_log10($r, $$x, $ROUND);
+        _new($r);
+    }
+
     sub exp {
         my ($x) = @_;
         my $r = Math::MPC::Rmpc_init2($PREC);
@@ -233,23 +315,196 @@ package Sidef::Types::Number::Complex {
         _new($r);
     }
 
-    sub log {
+    sub exp2 {
         my ($x) = @_;
+        state $two = Math::MPC->new(2);
         my $r = Math::MPC::Rmpc_init2($PREC);
-        Math::MPC::Rmpc_log($r, $$x, $ROUND);
+        Math::MPC::Rmpc_pow($r, $two, $$x, $ROUND);
+        _new($r);
+    }
+
+    sub exp10 {
+        my ($x) = @_;
+        state $ten = Math::MPC->new(10);
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_pow($r, $ten, $$x, $ROUND);
         _new($r);
     }
 
     sub dec {
         my ($x) = @_;
-        state $one_c = $x->new(1);
-        $x->sub($one_c);
+        state $one = Math::MPC->new(1);
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_sub($r, $$x, $one, $ROUND);
+        _new($r);
     }
 
     sub inc {
         my ($x) = @_;
-        state $one_c = $x->new(1);
-        $x->add($one_c);
+        state $one = Math::MPC->new(1);
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_add($r, $$x, $one, $ROUND);
+        _new($r);
+    }
+
+    #
+    ## Trigonometric
+    #
+
+    sub sin {
+        my ($x) = @_;
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_sin($r, $$x, $ROUND);
+        _new($r);
+    }
+
+    sub asin {
+        my ($x) = @_;
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_asin($r, $$x, $ROUND);
+        _new($r);
+    }
+
+    sub sinh {
+        my ($x) = @_;
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_sinh($r, $$x, $ROUND);
+        _new($r);
+    }
+
+    sub asinh {
+        my ($x) = @_;
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_asinh($r, $$x, $ROUND);
+        _new($r);
+    }
+
+    sub cos {
+        my ($x) = @_;
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_cos($r, $$x, $ROUND);
+        _new($r);
+    }
+
+    sub acos {
+        my ($x) = @_;
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_acos($r, $$x, $ROUND);
+        _new($r);
+    }
+
+    sub cosh {
+        my ($x) = @_;
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_cosh($r, $$x, $ROUND);
+        _new($r);
+    }
+
+    sub acosh {
+        my ($x) = @_;
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_acosh($r, $$x, $ROUND);
+        _new($r);
+    }
+
+    sub tan {
+        my ($x) = @_;
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_tan($r, $$x, $ROUND);
+        _new($r);
+    }
+
+    sub atan {
+        my ($x) = @_;
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_atan($r, $$x, $ROUND);
+        _new($r);
+    }
+
+    sub tanh {
+        my ($x) = @_;
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_tanh($r, $$x, $ROUND);
+        _new($r);
+    }
+
+    sub atanh {
+        my ($x) = @_;
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_atanh($r, $$x, $ROUND);
+        _new($r);
+    }
+
+    #
+    ## csc(x) = 1/sin(x)
+    #
+    sub csc {
+        my ($x) = @_;
+        state $one = Math::MPC->new(1);
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_sin($r, $$x, $ROUND);
+        Math::MPC::Rmpc_div($r, $one, $r, $ROUND);
+        _new($r);
+    }
+
+    #
+    ## csch(x) = 1/sinh(x)
+    #
+    sub csch {
+        my ($x) = @_;
+        state $one = Math::MPC->new(1);
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_sinh($r, $$x, $ROUND);
+        Math::MPC::Rmpc_div($r, $one, $r, $ROUND);
+        _new($r);
+    }
+
+    #
+    ## sec(x) = 1/cos(x)
+    #
+    sub sec {
+        my ($x) = @_;
+        state $one = Math::MPC->new(1);
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_cos($r, $$x, $ROUND);
+        Math::MPC::Rmpc_div($r, $one, $r, $ROUND);
+        _new($r);
+    }
+
+    #
+    ## sech(x) = 1/cosh(x)
+    #
+    sub sech {
+        my ($x) = @_;
+        state $one = Math::MPC->new(1);
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_cosh($r, $$x, $ROUND);
+        Math::MPC::Rmpc_div($r, $one, $r, $ROUND);
+        _new($r);
+    }
+
+    #
+    ## cot(x) = 1/tan(x)
+    #
+    sub cot {
+        my ($x) = @_;
+        state $one = Math::MPC->new(1);
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_tan($r, $$x, $ROUND);
+        Math::MPC::Rmpc_div($r, $one, $r, $ROUND);
+        _new($r);
+    }
+
+    #
+    ## coth(x) = 1/tanh(x)
+    #
+    sub coth {
+        my ($x) = @_;
+        state $one = Math::MPC->new(1);
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_tanh($r, $$x, $ROUND);
+        Math::MPC::Rmpc_div($r, $one, $r, $ROUND);
+        _new($r);
     }
 
     #
@@ -347,13 +602,9 @@ package Sidef::Types::Number::Complex {
             _valid($y);
         }
 
-        state $ZERO = Sidef::Types::Number::Number->new(0);
-        state $ONE  = Sidef::Types::Number::Number->new(1);
-        state $MONE = Sidef::Types::Number::Number->new(-1);
-
-            $x->eq($y) ? $ZERO
-          : $x->gt($y) ? $ONE
-          :              $MONE;
+            $x->eq($y) ? $Sidef::Types::Number::Number::ZERO
+          : $x->gt($y) ? $Sidef::Types::Number::Number::ONE
+          :              $Sidef::Types::Number::Number::MONE;
     }
 
     {

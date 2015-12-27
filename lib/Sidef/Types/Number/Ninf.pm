@@ -10,16 +10,25 @@ package Sidef::Types::Number::Ninf {
 
     use overload
       q{bool} => sub { 1 },
-      q{0+}   => sub { '-inf' },
+      q{0+}   => sub { -'inf' },
       q{""}   => sub { '-Inf' };
-
-    require Sidef::Types::Number::Number;
 
     state $NINF = do {
         my $r = Math::GMPq::Rmpq_init();
         Math::GMPq::Rmpq_set_si($r, -1, 0);
         bless \$r, __PACKAGE__;
     };
+
+    require Sidef::Types::Number::Number;
+
+    state $ZERO = $Sidef::Types::Number::Number::ZERO;
+    state $ONE  = $Sidef::Types::Number::Number::ONE;
+    state $MONE = $Sidef::Types::Number::Number::MONE;
+    state $NAN  = $Sidef::Types::Number::Number::NAN;
+
+    if (not defined $ZERO or not defined $ONE or not defined $MONE or not defined $NAN) {
+        die "Fatal error: can't load the Ninf class!";
+    }
 
     sub new { $NINF }
 
@@ -33,22 +42,47 @@ package Sidef::Types::Number::Ninf {
 
     sub neg { state $x = Sidef::Types::Number::Inf->new }
 
+    *abs = \&neg;
+    *log = \&neg;
+
     sub min { $_[0] }
     sub max { $_[1] }
+
+    sub inv { $ZERO }
+
+    #
+    ## sin(-inf) = [-1, 1]
+    #
+    sub sin { $NAN }
+
+    #
+    ## sinh(-inf) = -inf
+    #
+    sub sinh { $_[0] }
+
+    #
+    ## asin(-inf) = inf*i
+    #
+    sub asin { state $x = Sidef::Types::Number::Complex->new(0, '@inf@') }
+
+    *sqrt = \&asin;
 
     #
     ## atan(-inf) = -pi/2
     #
     sub atan {
-        state $neg_pi_2 = Sidef::Types::Number::Number->pi->div(Sidef::Types::Number::Number->new(-2));
+        state $x = Sidef::Types::Number::Number->pi->div(Sidef::Types::Number::Number->new(-2));
     }
 
     #
-    ## sqrt(-inf) = -inf
+    ## tanh(-inf) = -1
     #
-    sub sqrt {
-        $_[0];
-    }
+    sub tanh { $MONE }
+
+    #
+    ## exp(-inf) = 0
+    #
+    sub exp { $ZERO }
 
     #
     ## -inf.times {} does no-op
@@ -56,7 +90,12 @@ package Sidef::Types::Number::Ninf {
     sub times { $_[1] }
 
     our $AUTOLOAD;
-    sub AUTOLOAD { $NINF }
+    sub AUTOLOAD { $_[0] }
+
+    {
+        no strict 'refs';
+        *{__PACKAGE__ . '::' . '**'} = \&pow;
+    }
 }
 
 1
