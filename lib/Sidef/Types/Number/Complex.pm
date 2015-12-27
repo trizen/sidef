@@ -89,6 +89,12 @@ package Sidef::Types::Number::Complex {
         $re eq '0' ? $sign eq '+' ? "${im}i" : "$sign${im}i" : "$re$sign${im}i";
     }
 
+    sub reals {
+        ($_[0]->re, $_[0]->im);
+    }
+
+    *parts = \&reals;
+
     sub dump {
         my $re = $_[0]->re;
         my $im = $_[0]->im;

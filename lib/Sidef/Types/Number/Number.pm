@@ -392,6 +392,9 @@ package Sidef::Types::Number::Number {
         }
 
         _valid($y);
+
+        return $ZERO if Math::GMPq::Rmpq_sgn($$y) == 0;
+
         my $r = Math::MPFR::Rmpfr_init2($PREC);
         Math::MPFR::Rmpfr_root($r, _as_float($x), CORE::int(Math::GMPq::Rmpq_get_d($$y)), $ROUND);
         _new(_mpfr2rat($r));
@@ -1122,6 +1125,8 @@ package Sidef::Types::Number::Number {
         Math::GMPz::Rmpz_invert($r, _as_int($x), _as_int($y));
         _new(_mpz2rat($r));
     }
+
+    *invmod = \&modinv;
 
     sub divmod {
         my ($x, $y) = @_;

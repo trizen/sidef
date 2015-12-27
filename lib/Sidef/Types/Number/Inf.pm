@@ -96,6 +96,7 @@ package Sidef::Types::Number::Inf {
     *bin         = \&nan;
     *modpow      = \&nan;
     *modinv      = \&nan;
+    *invmod      = \&nan;
     *and         = \&nan;
     *or          = \&nan;
     *xor         = \&nan;
@@ -246,7 +247,7 @@ package Sidef::Types::Number::Inf {
 
     sub pow {
         my ($x, $y) = @_;
-        $y->is_neg ? $ZERO : $y->is_zero ? nan() : $x;
+        $y->is_neg ? $ZERO : $y->is_zero ? $ONE : $x;
     }
 
     #
