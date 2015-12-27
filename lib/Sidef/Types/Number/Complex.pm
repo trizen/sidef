@@ -71,8 +71,11 @@ package Sidef::Types::Number::Complex {
     }
 
     sub get_value {
-        my $re = $_[0]->re->get_value;
-        my $im = $_[0]->im->get_value;
+        my $re = $_[0]->re;
+        my $im = $_[0]->im;
+
+        $re = "$re";
+        $im = "$im";
 
         return $re if $im eq '0';
         my $sign = '+';
@@ -87,7 +90,9 @@ package Sidef::Types::Number::Complex {
     }
 
     sub dump {
-        Sidef::Types::String::String->new("Complex(" . $_[0]->re->get_value . ", " . $_[0]->im->get_value . ")");
+        my $re = $_[0]->re;
+        my $im = $_[0]->im;
+        Sidef::Types::String::String->new("Complex($re, $im)");
     }
 
     sub get_constant {
@@ -108,21 +113,53 @@ package Sidef::Types::Number::Complex {
         };
     }
 
+    #
+    ## Complex constants
+    #
+
     sub pi {
         my $pi = Math::MPFR::Rmpfr_init2($PREC);
         Math::MPFR::Rmpfr_const_pi($pi, $ROUND);
-        my $cpi = Math::MPC::Rmpc_init2($PREC);
-        Math::MPC::Rmpc_set_fr($cpi, $pi, $ROUND);
-        _new($cpi);
+        my $cplx_pi = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_set_fr($cplx_pi, $pi, $ROUND);
+        _new($cplx_pi);
     }
 
     sub e {
-        my $pi = Math::MPFR::Rmpfr_init2($PREC);
-        Math::MPFR::Rmpfr_const_pi($pi, $ROUND);
-        my $cpi = Math::MPC::Rmpc_init2($PREC);
-        Math::MPC::Rmpc_set_fr($cpi, $pi, $ROUND);
-        _new($cpi);
+        state $one_f = (Math::MPFR::Rmpfr_init_set_ui(1, $ROUND))[0];
+        my $e = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_exp($e, $one_f, $ROUND);
+        my $cplx_e = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_set_fr($cplx_e, $e, $ROUND);
+        _new($cplx_e);
     }
+
+    sub i {
+        state $i = do {
+            my $r = Math::MPC::Rmpc_init2($PREC);
+            Math::MPC::Rmpc_set_ui_ui($r, 0, 1, $ROUND);
+            _new($r);
+        };
+    }
+
+    sub phi {
+        state $one_f  = (Math::MPFR::Rmpfr_init_set_ui(1, $ROUND))[0];
+        state $two_f  = (Math::MPFR::Rmpfr_init_set_ui(2, $ROUND))[0];
+        state $five_f = (Math::MPFR::Rmpfr_init_set_ui(5, $ROUND))[0];
+
+        my $phi = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_sqrt($phi, $five_f, $ROUND);
+        Math::MPFR::Rmpfr_add($phi, $phi, $one_f, $ROUND);
+        Math::MPFR::Rmpfr_div($phi, $phi, $two_f, $ROUND);
+
+        my $cplx_phi = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_set_fr($cplx_phi, $phi, $ROUND);
+        _new($cplx_phi);
+    }
+
+    #
+    ## Complex specific functions
+    #
 
     sub abs {
         my $mpfr = Math::MPFR::Rmpfr_init2($PREC);
@@ -605,6 +642,19 @@ package Sidef::Types::Number::Complex {
             $x->eq($y) ? $Sidef::Types::Number::Number::ZERO
           : $x->gt($y) ? $Sidef::Types::Number::Number::ONE
           :              $Sidef::Types::Number::Number::MONE;
+    }
+
+    sub floor {
+        $_[0]->abs->floor;
+    }
+
+    sub ceil {
+        $_[0]->abs->ceil;
+    }
+
+    sub roundf {
+        my ($x, $prec) = @_;
+        $x->abs->roundf($prec);
     }
 
     {

@@ -22,18 +22,6 @@ package Sidef::Types::Number::Number {
     our $ZERO = bless(\Math::GMPq->new(0),  __PACKAGE__);
     our $MONE = bless(\Math::GMPq->new(-1), __PACKAGE__);
 
-    require Sidef::Types::Number::Nan;
-    our $NAN = Sidef::Types::Number::Nan->new;
-
-    require Sidef::Types::Number::Inf;
-    require Sidef::Types::Number::Ninf;
-    our $INF  = Sidef::Types::Number::Inf->new;
-    our $NINF = Sidef::Types::Number::Ninf->new;
-
-    if (not defined $INF or not defined $NINF or not defined $NAN) {
-        die "Fatal error: can't load the Number class!";
-    }
-
     use overload
       q{bool} => sub { Math::GMPq::Rmpq_sgn(${$_[0]}) != 0 },
       q{0+}   => sub { Math::GMPq::Rmpq_get_d(${$_[0]}) },
@@ -121,11 +109,11 @@ package Sidef::Types::Number::Number {
         #~ $r
 
         if (Math::MPFR::Rmpfr_inf_p($_[0])) {
-            return (Math::MPFR::Rmpfr_sgn($_[0]) > 0 ? $INF : $NINF);
+            return (Math::MPFR::Rmpfr_sgn($_[0]) > 0 ? inf() : ninf());
         }
 
         if (Math::MPFR::Rmpfr_nan_p($_[0])) {
-            return $NAN;
+            return nan();
         }
 
         if (Math::MPFR::Rmpfr_integer_p($_[0])) {
@@ -257,9 +245,9 @@ package Sidef::Types::Number::Number {
         _new(_mpfr2rat($phi));
     }
 
-    sub inf  { $INF }
-    sub ninf { $NINF }
-    sub nan  { $NAN }
+    sub nan  { state $x = Sidef::Types::Number::Nan->new }
+    sub inf  { state $x = Sidef::Types::Number::Inf->new }
+    sub ninf { state $x = Sidef::Types::Number::Ninf->new }
 
     #
     ## Rational operations
@@ -316,7 +304,7 @@ package Sidef::Types::Number::Number {
 
         if (Math::GMPq::Rmpq_sgn($$y) == 0) {
             my $sign = Math::GMPq::Rmpq_sgn($$x);
-            return ($sign == 0 ? $NAN : $sign > 0 ? $INF : $NINF);
+            return ($sign == 0 ? nan() : $sign > 0 ? inf() : ninf());
         }
 
         my $r = Math::GMPq::Rmpq_init();
@@ -430,11 +418,15 @@ package Sidef::Types::Number::Number {
 
         _valid($y);
 
-        if (_is_int($$x) and _is_int($$y) and Math::GMPq::Rmpq_sgn($$y) >= 0) {
+        if (Math::GMPq::Rmpq_sgn($$y) >= 0 and _is_int($$x) and _is_int($$y)) {
             my $z = Math::GMPz::Rmpz_init();
             Math::GMPz::Rmpz_set_q($z, $$x);
             Math::GMPz::Rmpz_pow_ui($z, $z, Math::GMPq::Rmpq_get_d($$y));
             return _new(_mpz2rat($z));
+        }
+
+        if (Math::GMPq::Rmpq_sgn($$x) < 0 and not _is_int($$y)) {
+            return Sidef::Types::Number::Complex->new($x)->pow($y);
         }
 
         my $r = Math::MPFR::Rmpfr_init2($PREC);
@@ -746,6 +738,14 @@ package Sidef::Types::Number::Number {
 
     sub cmp {
         my ($x, $y) = @_;
+
+        if (ref($y) eq 'Sidef::Types::Number::Inf') {
+            return $MONE;
+        }
+        elsif (ref($y) eq 'Sidef::Types::Number::Ninf') {
+            return $ONE;
+        }
+
         _valid($y);
         my $cmp = Math::GMPq::Rmpq_cmp($$x, $$y);
         $cmp == 0 ? $ZERO : $cmp < 0 ? $MONE : $ONE;

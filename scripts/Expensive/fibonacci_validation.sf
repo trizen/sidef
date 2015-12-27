@@ -16,14 +16,14 @@ func is_fib (i, fib) {
 ## log(n*sqrt(5) + (((1-sqrt(5))/2) ^ ((log(n)+(log(5))/2) / (log(1+sqrt(5))-log(2))))) / (log(1+sqrt(5))-log(2))
 #
 func fib_pos(n) {
-    (W*n + ((-T)**((5 * n**2).log / (W+1)))).log(S).floor;
+    (W*n + ((-T)**((5 * n**2).log / (W+1)))).log(S).roundf(0);
 }
 
 #
 ## (log(n*sqrt(5) + (((1-sqrt(5))/2) ^ (log(n * sqrt(5)) / log((1+sqrt(5))/2))))) / log((1+sqrt(5))/2)
 #
 func fib_position(n) {
-    ((n * W) + Math.pow(-T, (((n * W)).log(S)))).log(S).floor;
+    ((n * W) + Math.pow(-T, (((n * W)).log(S)))).log(S).roundf(0);
 }
 
 func is_prob_fib(n) {
@@ -41,8 +41,9 @@ func is_prob_fib(n) {
 ].each { |group|
 
     var(pos, num, bool) = group...;
+
     is_fib(pos, num) == bool || die "Validation error (1)!";
-    #is_prob_fib(num) == bool || die "Validation error (2)!";
+    is_prob_fib(num) == bool || die "Validation error (2)!";
 
     fib_pos(num) == fib_position(num) || die "pos error";
 
