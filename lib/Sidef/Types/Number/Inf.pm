@@ -188,6 +188,12 @@ package Sidef::Types::Number::Inf {
     *shift_right      = \&inf;
     *rand_int         = \&inf;
     *rand             = \&inf;
+    *rad2deg          = \&inf;
+    *rad2grad         = \&inf;
+    *deg2grad         = \&inf;
+    *deg2rad          = \&inf;
+    *grad2rad         = \&inf;
+    *grad2deg         = \&inf;
 
     sub zero { $ZERO }
 
@@ -222,6 +228,8 @@ package Sidef::Types::Number::Inf {
     sub atan {
         state $x = Sidef::Types::Number::Number->pi->div(Sidef::Types::Number::Number->new(2));
     }
+
+    *atan2 = \&atan;
 
     #
     ## atanh(-inf) = -pi/2*i

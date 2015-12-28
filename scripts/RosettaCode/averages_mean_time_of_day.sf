@@ -5,10 +5,10 @@
 #
 
 func mean_angle(angles) {
-    Math.atan2(
-        angles.map { Math.sin(_ * Math::PI / 180) }.sum / angles.len,
-        angles.map { Math.cos(_ * Math::PI / 180) }.sum / angles.len,
-    ) * 180 / Math::PI;
+    atan2(
+        Math.avg(angles.map { .deg2rad.sin }...),
+        Math.avg(angles.map { .deg2rad.cos }...),
+    ).rad2deg;
 }
 
 func time2deg(t) {

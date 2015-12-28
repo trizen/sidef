@@ -19,7 +19,12 @@ package Sidef::Math::Math {
         state $table = {
                         "e"       => sub { Sidef::Types::Number::Number->e },
                         "pi"      => sub { Sidef::Types::Number::Number->pi },
+                        "PI"      => sub { Sidef::Types::Number::Number->pi },
+                        "π"      => sub { Sidef::Types::Number::Number->pi },
+                        "tau"     => sub { Sidef::Types::Number::Number->tau },
+                        "τ"      => sub { Sidef::Types::Number::Number->tau },
                         "phi"     => sub { Sidef::Types::Number::Number->phi },
+                        "Φ"      => sub { Sidef::Types::Number::Number->phi },
                         "ln2"     => sub { Sidef::Types::Number::Number->ln2 },
                         "G"       => sub { Sidef::Types::Number::Number->G },
                         "Y"       => sub { Sidef::Types::Number::Number->Y },
@@ -28,7 +33,7 @@ package Sidef::Math::Math {
                         "euler"   => sub { Sidef::Types::Number::Number->Y },
                        };
 
-        my $key = lc($name);
+        my $key = "$name";
         $cache{$key} //= exists($table->{$key}) ? $table->{$key}->() : do {
             warn qq{[WARN] Inexistent Math constant "$name"!\n};
             undef;
@@ -171,91 +176,6 @@ package Sidef::Math::Math {
     }
 
     *num2percent = \&number_to_percentage;
-
-    {
-        no strict 'refs';
-        foreach my $f (
-
-            # (Plane, 2-dimensional) angles may be converted with the following functions.
-            'rad2rad',
-            'deg2deg',
-            'grad2grad',
-            'rad2deg',
-            'deg2rad',
-            'grad2deg',
-            'deg2grad',
-            'rad2grad',
-            'grad2rad',
-
-            # The tangent
-            'tan',
-
-            # The cofunctions of the sine, cosine,
-            # and tangent (cosec/csc and cotan/cot are aliases)
-            'csc',
-            'cosec',
-            'sec',
-            'cot',
-            'cotan',
-
-            # The arcus (also known as the inverse) functions
-            # of the sine, cosine, and tangent
-            'asin',
-            'acos',
-            'atan',
-
-            # The principal value of the arc tangent of y/x
-            'atan2',
-
-            #  The arcus cofunctions of the sine, cosine, and tangent (acosec/acsc and
-            # acotan/acot are aliases).  Note that atan2(0, 0) is not well-defined.
-            'acsc',
-            'acosec',
-            'asec',
-            'acot',
-            'acotan',
-
-            # The hyperbolic sine, cosine, and tangent
-            'sinh',
-            'cosh',
-            'tanh',
-
-            # The cofunctions of the hyperbolic sine, cosine, and tangent
-            # (cosech/csch and cotanh/coth are aliases)
-            'csch',
-            'cosech',
-            'sech',
-            'coth',
-            'cotanh',
-
-            # The area (also known as the inverse) functions of the hyperbolic sine,
-            # cosine, and tangent
-            'asinh',
-            'acosh',
-            'atanh',
-
-            # The area cofunctions of the hyperbolic sine, cosine, and tangent
-            # (acsch/acosech and acoth/acotanh are aliases)
-            'acsch',
-            'acosech',
-            'asech',
-            'acoth',
-            'acotanh',
-
-          ) {
-            *{__PACKAGE__ . '::' . $f} = sub {
-                my ($self, @rest) = @_;
-                state $x = require Math::Trig;
-                local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
-                my $result = (\&{'Math::Trig::' . $f})->(map { $_->get_value } @rest);
-                (
-                 ref($result) eq 'Math::Complex'
-                 ? 'Sidef::Types::Number::Complex'
-                 : 'Sidef::Types::Number::Number'
-                )->new($result);
-            };
-        }
-    }
 
     our $AUTOLOAD;
 

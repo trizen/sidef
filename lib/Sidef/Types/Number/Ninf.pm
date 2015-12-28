@@ -178,6 +178,12 @@ package Sidef::Types::Number::Ninf {
     *shift_right = \&ninf;
     *rand_int    = \&ninf;
     *rand        = \&ninf;
+    *rad2deg     = \&ninf;
+    *rad2grad    = \&ninf;
+    *deg2grad    = \&ninf;
+    *deg2rad     = \&ninf;
+    *grad2rad    = \&ninf;
+    *grad2deg    = \&ninf;
 
     sub max { $_[1] }
 
@@ -220,6 +226,8 @@ package Sidef::Types::Number::Ninf {
     sub atan {
         state $x = Sidef::Types::Number::Number->pi->div(Sidef::Types::Number::Number->new(-2));
     }
+
+    *atan2 = \&atan;
 
     #
     ## atanh(-inf) = pi/2*i

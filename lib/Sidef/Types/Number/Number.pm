@@ -223,47 +223,68 @@ package Sidef::Types::Number::Number {
     #
 
     sub pi {
-        my $pi = Math::MPFR::Rmpfr_init2($PREC);
-        Math::MPFR::Rmpfr_const_pi($pi, $ROUND);
-        _mpfr2rat($pi);
+        state $x = do {
+            my $pi = Math::MPFR::Rmpfr_init2($PREC);
+            Math::MPFR::Rmpfr_const_pi($pi, $ROUND);
+            _mpfr2rat($pi);
+          }
+    }
+
+    sub tau {
+        state $x = do {
+            my $tau = Math::MPFR::Rmpfr_init2($PREC);
+            Math::MPFR::Rmpfr_const_pi($tau, $ROUND);
+            Math::MPFR::Rmpfr_mul_ui($tau, $tau, 2, $ROUND);
+            _mpfr2rat($tau);
+          }
     }
 
     sub ln2 {
-        my $ln2 = Math::MPFR::Rmpfr_init2($PREC);
-        Math::MPFR::Rmpfr_const_log2($ln2, $ROUND);
-        _mpfr2rat($ln2);
+        state $x = do {
+            my $ln2 = Math::MPFR::Rmpfr_init2($PREC);
+            Math::MPFR::Rmpfr_const_log2($ln2, $ROUND);
+            _mpfr2rat($ln2);
+          }
     }
 
     sub Y {
-        my $euler = Math::MPFR::Rmpfr_init2($PREC);
-        Math::MPFR::Rmpfr_const_euler($euler, $ROUND);
-        _mpfr2rat($euler);
+        state $x = do {
+            my $euler = Math::MPFR::Rmpfr_init2($PREC);
+            Math::MPFR::Rmpfr_const_euler($euler, $ROUND);
+            _mpfr2rat($euler);
+          }
     }
 
     sub G {
-        my $catalan = Math::MPFR::Rmpfr_init2($PREC);
-        Math::MPFR::Rmpfr_const_catalan($catalan, $ROUND);
-        _mpfr2rat($catalan);
+        state $x = do {
+            my $catalan = Math::MPFR::Rmpfr_init2($PREC);
+            Math::MPFR::Rmpfr_const_catalan($catalan, $ROUND);
+            _mpfr2rat($catalan);
+          }
     }
 
     sub e {
-        state $one_f = (Math::MPFR::Rmpfr_init_set_ui(1, $ROUND))[0];
-        my $e = Math::MPFR::Rmpfr_init2($PREC);
-        Math::MPFR::Rmpfr_exp($e, $one_f, $ROUND);
-        _mpfr2rat($e);
+        state $x = do {
+            state $one_f = (Math::MPFR::Rmpfr_init_set_ui(1, $ROUND))[0];
+            my $e = Math::MPFR::Rmpfr_init2($PREC);
+            Math::MPFR::Rmpfr_exp($e, $one_f, $ROUND);
+            _mpfr2rat($e);
+          }
     }
 
     sub phi {
-        state $one_f  = (Math::MPFR::Rmpfr_init_set_ui(1, $ROUND))[0];
-        state $two_f  = (Math::MPFR::Rmpfr_init_set_ui(2, $ROUND))[0];
-        state $five_f = (Math::MPFR::Rmpfr_init_set_ui(5, $ROUND))[0];
+        state $x = do {
+            state $one_f  = (Math::MPFR::Rmpfr_init_set_ui(1, $ROUND))[0];
+            state $two_f  = (Math::MPFR::Rmpfr_init_set_ui(2, $ROUND))[0];
+            state $five_f = (Math::MPFR::Rmpfr_init_set_ui(5, $ROUND))[0];
 
-        my $phi = Math::MPFR::Rmpfr_init2($PREC);
-        Math::MPFR::Rmpfr_sqrt($phi, $five_f, $ROUND);
-        Math::MPFR::Rmpfr_add($phi, $phi, $one_f, $ROUND);
-        Math::MPFR::Rmpfr_div($phi, $phi, $two_f, $ROUND);
+            my $phi = Math::MPFR::Rmpfr_init2($PREC);
+            Math::MPFR::Rmpfr_sqrt($phi, $five_f, $ROUND);
+            Math::MPFR::Rmpfr_add($phi, $phi, $one_f, $ROUND);
+            Math::MPFR::Rmpfr_div($phi, $phi, $two_f, $ROUND);
 
-        _mpfr2rat($phi);
+            _mpfr2rat($phi);
+          }
     }
 
     sub nan  { state $x = Sidef::Types::Number::Nan->new }
@@ -660,6 +681,27 @@ package Sidef::Types::Number::Number {
         my ($x) = @_;
         my $r = Math::MPFR::Rmpfr_init2($PREC);
         Math::MPFR::Rmpfr_coth($r, _as_float($x), $ROUND);
+        _mpfr2rat($r);
+    }
+
+    sub atan2 {
+        my ($x, $y) = @_;
+
+        if (ref($y) eq 'Sidef::Types::Number::Inf') {
+            return $ZERO;
+        }
+        elsif (ref($y) eq 'Sidef::Types::Number::Ninf') {
+            if (Math::GMPq::Rmpq_sgn($$x) >= 0) {
+                return state $z = pi();
+            }
+            else {
+                return state $z = pi()->neg;
+            }
+        }
+
+        _valid($y);
+        my $r = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_atan2($r, _as_float($x), _as_float($y), $ROUND);
         _mpfr2rat($r);
     }
 
@@ -1641,6 +1683,82 @@ package Sidef::Types::Number::Number {
         }
 
         $block;
+    }
+
+    #
+    ## Conversions
+    #
+
+    sub rad2deg {
+        my ($x) = @_;
+        state $f = do {
+            my $fr = Math::MPFR::Rmpfr_init2($PREC);
+            my $pi = Math::MPFR::Rmpfr_init2($PREC);
+            Math::MPFR::Rmpfr_const_pi($pi, $ROUND);
+            Math::MPFR::Rmpfr_ui_div($fr, 180, $pi, $ROUND);
+            _mpfr2rat($fr);
+        };
+        $f->mul($x);
+    }
+
+    sub deg2rad {
+        my ($x) = @_;
+        state $f = do {
+            my $fr = Math::MPFR::Rmpfr_init2($PREC);
+            my $pi = Math::MPFR::Rmpfr_init2($PREC);
+            Math::MPFR::Rmpfr_const_pi($pi, $ROUND);
+            Math::MPFR::Rmpfr_div_ui($fr, $pi, 180, $ROUND);
+            _mpfr2rat($fr);
+        };
+        $f->mul($x);
+    }
+
+    sub rad2grad {
+        my ($x) = @_;
+        state $factor = do {
+            my $fr = Math::MPFR::Rmpfr_init2($PREC);
+            my $pi = Math::MPFR::Rmpfr_init2($PREC);
+            Math::MPFR::Rmpfr_const_pi($pi, $ROUND);
+            Math::MPFR::Rmpfr_ui_div($fr, 200, $pi, $ROUND);
+            _mpfr2rat($fr);
+        };
+        $factor->mul($x);
+    }
+
+    sub grad2rad {
+        my ($x) = @_;
+        state $factor = do {
+            my $fr = Math::MPFR::Rmpfr_init2($PREC);
+            my $pi = Math::MPFR::Rmpfr_init2($PREC);
+            Math::MPFR::Rmpfr_const_pi($pi, $ROUND);
+            Math::MPFR::Rmpfr_div_ui($fr, $pi, 200, $ROUND);
+            _mpfr2rat($fr);
+        };
+        $factor->mul($x);
+    }
+
+    sub grad2deg {
+        my ($x) = @_;
+        state $factor = do {
+            my $q = Math::GMPq::Rmpq_init();
+            Math::GMPq::Rmpq_set_ui($q, 9, 10);
+            $q;
+        };
+        my $r = Math::GMPq::Rmpq_init();
+        Math::GMPq::Rmpq_mul($r, $factor, $$x);
+        bless \$r, __PACKAGE__;
+    }
+
+    sub deg2grad {
+        my ($x) = @_;
+        state $factor = do {
+            my $q = Math::GMPq::Rmpq_init();
+            Math::GMPq::Rmpq_set_ui($q, 10, 9);
+            $q;
+        };
+        my $r = Math::GMPq::Rmpq_init();
+        Math::GMPq::Rmpq_mul($r, $factor, $$x);
+        bless \$r, __PACKAGE__;
     }
 
     {
