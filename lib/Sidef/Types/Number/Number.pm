@@ -1040,10 +1040,11 @@ package Sidef::Types::Number::Number {
     sub is_div {
         my ($x, $y) = @_;
         _valid($y);
-        my $z = Math::GMPz::Rmpz_init();
-        Math::GMPz::Rmpz_mod($z, _as_int($x), _as_int($y));
 
-        if (Math::GMPz::Rmpz_sgn($z) == 0) {
+        my $q = Math::GMPq::Rmpq_init();
+        Math::GMPq::Rmpq_div($q, $$x, $$y);
+
+        if (_is_int($q)) {
             state $z = Sidef::Types::Bool::Bool->true;
         }
         else {
@@ -1054,10 +1055,11 @@ package Sidef::Types::Number::Number {
     sub divides {
         my ($x, $y) = @_;
         _valid($y);
-        my $z = Math::GMPz::Rmpz_init();
-        Math::GMPz::Rmpz_mod($z, _as_int($y), _as_int($x));
 
-        if (Math::GMPz::Rmpz_sgn($z) == 0) {
+        my $q = Math::GMPq::Rmpq_init();
+        Math::GMPq::Rmpq_div($q, $$y, $$x);
+
+        if (_is_int($q)) {
             state $z = Sidef::Types::Bool::Bool->true;
         }
         else {

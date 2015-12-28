@@ -79,18 +79,14 @@ package Sidef::Types::Number::Ninf {
     *is_div    = \&is_pos;
     *is_even   = \&is_pos;
     *is_odd    = \&is_pos;
+    *divides   = \&is_pos;
 
     sub is_neg {
         state $x = Sidef::Types::Bool::Bool->true;
     }
 
-    sub is_inf {
-        state $x = Sidef::Types::Bool::Bool->true;
-    }
-
-    sub is_ninf {
-        state $x = Sidef::Types::Bool::Bool->true;
-    }
+    *is_inf  = \&is_neg;
+    *is_ninf = \&is_neg;
 
     sub nan { state $x = Sidef::Types::Number::Nan->new }
 
