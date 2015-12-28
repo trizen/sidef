@@ -67,11 +67,9 @@ lib/Sidef/Types/Null/Null.pod
 lib/Sidef/Types/Number/Complex.pm
 lib/Sidef/Types/Number/Complex.pod
 lib/Sidef/Types/Number/Inf.pm
-lib/Sidef/Types/Number/Inf.pod
 lib/Sidef/Types/Number/Nan.pm
 lib/Sidef/Types/Number/Nan.pod
 lib/Sidef/Types/Number/Ninf.pm
-lib/Sidef/Types/Number/Ninf.pod
 lib/Sidef/Types/Number/Number.pm
 lib/Sidef/Types/Number/Number.pod
 lib/Sidef/Types/Range/RangeNumber.pm
