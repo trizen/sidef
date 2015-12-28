@@ -162,6 +162,7 @@ package Sidef::Types::Number::Inf {
     *gamma            = \&inf;
     *lgamma           = \&inf;
     *digamma          = \&inf;
+    *lngamma          = \&inf;
     *eint             = \&inf;
     *li2              = \&inf;
     *inc              = \&inf;
@@ -338,6 +339,8 @@ package Sidef::Types::Number::Inf {
         *{__PACKAGE__ . '::' . '>>'}  = \&shift_right;
         *{__PACKAGE__ . '::' . '<<'}  = \&shift_left;
         *{__PACKAGE__ . '::' . '//'}  = \&div;
+        *{__PACKAGE__ . '::' . 'Γ'}  = \&inf;
+        *{__PACKAGE__ . '::' . 'Ψ'}  = \&inf;
     }
 }
 

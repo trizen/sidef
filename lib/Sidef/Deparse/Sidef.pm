@@ -360,7 +360,7 @@ package Sidef::Deparse::Sidef {
             $code = 'break';
         }
         elsif ($ref eq 'Sidef::Types::Block::Given') {
-            $code = 'given ' . $self->deparse_args($obj->{expr}) . $self->deparse_bare_block($obj->{block}{code});
+            $code = 'given ' . $self->deparse_args($obj->{expr}) . $self->deparse_expr({self => $obj->{block}});
         }
         elsif ($ref eq 'Sidef::Types::Block::When') {
             $code = 'when(' . $self->deparse_args($obj->{expr}) . ')' . $self->deparse_bare_block($obj->{block}{code});
@@ -370,6 +370,9 @@ package Sidef::Deparse::Sidef {
         }
         elsif ($ref eq 'Sidef::Types::Block::Default') {
             $code = 'default' . $self->deparse_bare_block($obj->{block}->{code});
+        }
+        elsif ($ref eq 'Sidef::Types::Block::With') {
+            $code = 'with ' . $self->deparse_args($obj->{expr}) . $self->deparse_expr({self => $obj->{block}});
         }
         elsif ($ref eq 'Sidef::Types::Block::Next') {
             $code = 'next';

@@ -970,6 +970,14 @@ HEADER
         elsif ($ref eq 'Sidef::Types::Block::Default') {
             $code = 'default' . $self->deparse_bare_block($obj->{block}->{code});
         }
+        elsif ($ref eq 'Sidef::Types::Block::With') {
+            my $dvar = $self->_dump_var($obj->{block}{init_vars}->{vars}[0]);
+            $code =
+                'do{ if (defined(my '
+              . $dvar . '='
+              . $self->deparse_args($obj->{expr}) . ')) '
+              . $self->deparse_bare_block($obj->{block}{code}) . '}';
+        }
         elsif ($ref eq 'Sidef::Types::Block::Gather') {
             $code =
                 "do {my \@_$refaddr;"

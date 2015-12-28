@@ -217,6 +217,7 @@ package Sidef::Parser {
                   for foreach
                   if while
                   given
+                  with
                   try
                   continue
                   import
@@ -1661,6 +1662,34 @@ package Sidef::Parser {
             if (exists($self->{current_given}) && /\Gdefault\h*(?=\{)/gc) {
                 my $block = $self->parse_block(code => $opt{code});
                 return bless({block => $block}, 'Sidef::Types::Block::Default');
+            }
+
+            # "with(expr) {...}" construct
+            if (/\Gwith\b\h*/gc) {
+                my $expr = (
+                            /\G(?=\()/
+                            ? $self->parse_arguments(code => $opt{code})
+                            : $self->parse_obj(code => $opt{code})
+                           );
+
+                $expr // $self->fatal_error(
+                                            error    => "invalid declaration of the `with` construct",
+                                            expected => "expected `with(expr) {...}`",
+                                            code     => $_,
+                                            pos      => pos($_),
+                                           );
+
+                my $block = (
+                             /\G\h*(?=\{)/gc
+                             ? $self->parse_block(code => $opt{code}, topic_var => 1)
+                             : $self->fatal_error(
+                                                  error => "expected a block after `with(expr)`",
+                                                  code  => $_,
+                                                  pos   => pos($_),
+                                                 )
+                            );
+
+                return bless({expr => $expr, block => $block}, 'Sidef::Types::Block::With');
             }
 
             # "do {...}" construct

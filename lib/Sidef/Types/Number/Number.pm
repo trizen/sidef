@@ -228,6 +228,24 @@ package Sidef::Types::Number::Number {
         _mpfr2rat($pi);
     }
 
+    sub ln2 {
+        my $ln2 = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_const_log2($ln2, $ROUND);
+        _mpfr2rat($ln2);
+    }
+
+    sub Y {
+        my $euler = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_const_euler($euler, $ROUND);
+        _mpfr2rat($euler);
+    }
+
+    sub G {
+        my $catalan = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_const_catalan($catalan, $ROUND);
+        _mpfr2rat($catalan);
+    }
+
     sub e {
         state $one_f = (Math::MPFR::Rmpfr_init_set_ui(1, $ROUND))[0];
         my $e = Math::MPFR::Rmpfr_init2($PREC);
@@ -669,6 +687,13 @@ package Sidef::Types::Number::Number {
         my ($x) = @_;
         my $r = Math::MPFR::Rmpfr_init2($PREC);
         Math::MPFR::Rmpfr_gamma($r, _as_float($x), $ROUND);
+        _mpfr2rat($r);
+    }
+
+    sub lngamma {
+        my ($x) = @_;
+        my $r = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_lngamma($r, _as_float($x), $ROUND);
         _mpfr2rat($r);
     }
 
@@ -1654,6 +1679,9 @@ package Sidef::Types::Number::Number {
         *{__PACKAGE__ . '::' . '~'}   = \&not;
         *{__PACKAGE__ . '::' . ':'}   = \&complex;
         *{__PACKAGE__ . '::' . '//'}  = \&idiv;
+        *{__PACKAGE__ . '::' . 'γ'}  = \&Y;
+        *{__PACKAGE__ . '::' . 'Γ'}  = \&gamma;
+        *{__PACKAGE__ . '::' . 'Ψ'}  = \&digamma;
     }
 }
 

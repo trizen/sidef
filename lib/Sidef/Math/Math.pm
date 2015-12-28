@@ -1,5 +1,6 @@
 package Sidef::Math::Math {
 
+    use utf8;
     use 5.014;
     use parent qw(
       Sidef::Object::Object
@@ -16,9 +17,15 @@ package Sidef::Math::Math {
 
         state %cache;
         state $table = {
-                        e   => sub { Sidef::Types::Number::Number->e },
-                        pi  => sub { Sidef::Types::Number::Number->pi },
-                        phi => sub { Sidef::Types::Number::Number->phi },
+                        "e"       => sub { Sidef::Types::Number::Number->e },
+                        "pi"      => sub { Sidef::Types::Number::Number->pi },
+                        "phi"     => sub { Sidef::Types::Number::Number->phi },
+                        "ln2"     => sub { Sidef::Types::Number::Number->ln2 },
+                        "G"       => sub { Sidef::Types::Number::Number->G },
+                        "Y"       => sub { Sidef::Types::Number::Number->Y },
+                        "γ"      => sub { Sidef::Types::Number::Number->Y },
+                        "catalan" => sub { Sidef::Types::Number::Number->G },
+                        "euler"   => sub { Sidef::Types::Number::Number->Y },
                        };
 
         my $key = lc($name);

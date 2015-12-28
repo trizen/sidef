@@ -97,6 +97,7 @@ package Sidef::Types::Number::Ninf {
     *gamma            = \&nan;
     *lgamma           = \&nan;
     *digamma          = \&nan;
+    *lngamma          = \&nan;
     *zeta             = \&nan;
     *fmod             = \&nan;
     *mod              = \&nan;
@@ -339,6 +340,8 @@ package Sidef::Types::Number::Ninf {
         *{__PACKAGE__ . '::' . '>>'}  = \&shift_right;
         *{__PACKAGE__ . '::' . '<<'}  = \&shift_left;
         *{__PACKAGE__ . '::' . '//'}  = \&div;
+        *{__PACKAGE__ . '::' . 'Γ'}  = \&nan;
+        *{__PACKAGE__ . '::' . 'Ψ'}  = \&nan;
     }
 }
 
