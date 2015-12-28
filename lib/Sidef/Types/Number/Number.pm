@@ -795,13 +795,23 @@ package Sidef::Types::Number::Number {
     sub eq {
         my ($x, $y) = @_;
         _valid($y);
-        Sidef::Types::Bool::Bool->new(Math::GMPq::Rmpq_equal($$x, $$y));
+        if (Math::GMPq::Rmpq_equal($$x, $$y)) {
+            state $z = Sidef::Types::Bool::Bool->true;
+        }
+        else {
+            state $z = Sidef::Types::Bool::Bool->false;
+        }
     }
 
     sub ne {
         my ($x, $y) = @_;
         _valid($y);
-        Sidef::Types::Bool::Bool->new(!Math::GMPq::Rmpq_equal($$x, $$y));
+        if (Math::GMPq::Rmpq_equal($$x, $$y)) {
+            state $z = Sidef::Types::Bool::Bool->false;
+        }
+        else {
+            state $z = Sidef::Types::Bool::Bool->true;
+        }
     }
 
     sub cmp {
@@ -859,7 +869,12 @@ package Sidef::Types::Number::Number {
 
         _valid($y);
 
-        Sidef::Types::Bool::Bool->new(Math::GMPq::Rmpq_cmp($$x, $$y) > 0);
+        if (Math::GMPq::Rmpq_cmp($$x, $$y) > 0) {
+            state $z = Sidef::Types::Bool::Bool->true;
+        }
+        else {
+            state $z = Sidef::Types::Bool::Bool->false;
+        }
     }
 
     sub ge {
@@ -874,7 +889,12 @@ package Sidef::Types::Number::Number {
 
         _valid($y);
 
-        Sidef::Types::Bool::Bool->new(Math::GMPq::Rmpq_cmp($$x, $$y) >= 0);
+        if (Math::GMPq::Rmpq_cmp($$x, $$y) >= 0) {
+            state $z = Sidef::Types::Bool::Bool->true;
+        }
+        else {
+            state $z = Sidef::Types::Bool::Bool->false;
+        }
     }
 
     sub lt {
@@ -889,7 +909,12 @@ package Sidef::Types::Number::Number {
 
         _valid($y);
 
-        Sidef::Types::Bool::Bool->new(Math::GMPq::Rmpq_cmp($$x, $$y) < 0);
+        if (Math::GMPq::Rmpq_cmp($$x, $$y) < 0) {
+            state $z = Sidef::Types::Bool::Bool->true;
+        }
+        else {
+            state $z = Sidef::Types::Bool::Bool->false;
+        }
     }
 
     sub le {
@@ -904,29 +929,54 @@ package Sidef::Types::Number::Number {
 
         _valid($y);
 
-        Sidef::Types::Bool::Bool->new(Math::GMPq::Rmpq_cmp($$x, $$y) <= 0);
+        if (Math::GMPq::Rmpq_cmp($$x, $$y) <= 0) {
+            state $z = Sidef::Types::Bool::Bool->true;
+        }
+        else {
+            state $z = Sidef::Types::Bool::Bool->false;
+        }
     }
 
     sub is_zero {
         my ($x) = @_;
-        Sidef::Types::Bool::Bool->new(Math::GMPq::Rmpq_sgn($$x) == 0);
+        if (Math::GMPq::Rmpq_sgn($$x) == 0) {
+            state $z = Sidef::Types::Bool::Bool->true;
+        }
+        else {
+            state $z = Sidef::Types::Bool::Bool->false;
+        }
     }
 
     sub is_one {
         my ($x) = @_;
-        Sidef::Types::Bool::Bool->new(Math::GMPq::Rmpq_equal($$x, $$ONE));
+        if (Math::GMPq::Rmpq_equal($$x, $$ONE)) {
+            state $z = Sidef::Types::Bool::Bool->true;
+        }
+        else {
+            state $z = Sidef::Types::Bool::Bool->false;
+        }
     }
 
     sub is_positive {
         my ($x) = @_;
-        Sidef::Types::Bool::Bool->new(Math::GMPq::Rmpq_sgn($$x) > 0);
+        if (Math::GMPq::Rmpq_sgn($$x) > 0) {
+            state $z = Sidef::Types::Bool::Bool->true;
+        }
+        else {
+            state $z = Sidef::Types::Bool::Bool->false;
+        }
     }
 
     *is_pos = \&is_positive;
 
     sub is_negative {
         my ($x) = @_;
-        Sidef::Types::Bool::Bool->new(Math::GMPq::Rmpq_sgn($$x) < 0);
+        if (Math::GMPq::Rmpq_sgn($$x) < 0) {
+            state $z = Sidef::Types::Bool::Bool->true;
+        }
+        else {
+            state $z = Sidef::Types::Bool::Bool->false;
+        }
     }
 
     *is_neg = \&is_negative;
@@ -943,27 +993,48 @@ package Sidef::Types::Number::Number {
 
     sub is_int {
         my ($x) = @_;
-        Sidef::Types::Bool::Bool->new(_is_int($$x));
+        if (_is_int($$x)) {
+            state $z = Sidef::Types::Bool::Bool->true;
+        }
+        else {
+            state $z = Sidef::Types::Bool::Bool->false;
+        }
     }
 
     sub is_even {
         my ($x) = @_;
-        _is_int($$x) or return Sidef::Types::Bool::Bool->false;
+
+        if (not _is_int($$x)) {
+            return state $z = Sidef::Types::Bool::Bool->false;
+        }
 
         my $nz = Math::GMPz::Rmpz_init();
         Math::GMPq::Rmpq_get_num($nz, $$x);
 
-        Sidef::Types::Bool::Bool->new(Math::GMPz::Rmpz_even_p($nz));
+        if (Math::GMPz::Rmpz_even_p($nz)) {
+            state $z = Sidef::Types::Bool::Bool->true;
+        }
+        else {
+            state $z = Sidef::Types::Bool::Bool->false;
+        }
     }
 
     sub is_odd {
         my ($x) = @_;
-        _is_int($$x) or return Sidef::Types::Bool::Bool->false;
+
+        if (not _is_int($$x)) {
+            return state $z = Sidef::Types::Bool::Bool->false;
+        }
 
         my $nz = Math::GMPz::Rmpz_init();
         Math::GMPq::Rmpq_get_num($nz, $$x);
 
-        Sidef::Types::Bool::Bool->new(Math::GMPz::Rmpz_odd_p($nz));
+        if (Math::GMPz::Rmpz_odd_p($nz)) {
+            state $z = Sidef::Types::Bool::Bool->true;
+        }
+        else {
+            state $z = Sidef::Types::Bool::Bool->false;
+        }
     }
 
     sub is_div {
@@ -971,7 +1042,13 @@ package Sidef::Types::Number::Number {
         _valid($y);
         my $z = Math::GMPz::Rmpz_init();
         Math::GMPz::Rmpz_mod($z, _as_int($x), _as_int($y));
-        Sidef::Types::Bool::Bool->new(Math::GMPz::Rmpz_sgn($z) == 0);
+
+        if (Math::GMPz::Rmpz_sgn($z) == 0) {
+            state $z = Sidef::Types::Bool::Bool->true;
+        }
+        else {
+            state $z = Sidef::Types::Bool::Bool->false;
+        }
     }
 
     sub divides {
@@ -979,7 +1056,13 @@ package Sidef::Types::Number::Number {
         _valid($y);
         my $z = Math::GMPz::Rmpz_init();
         Math::GMPz::Rmpz_mod($z, _as_int($y), _as_int($x));
-        Sidef::Types::Bool::Bool->new(Math::GMPz::Rmpz_sgn($z) == 0);
+
+        if (Math::GMPz::Rmpz_sgn($z) == 0) {
+            state $z = Sidef::Types::Bool::Bool->true;
+        }
+        else {
+            state $z = Sidef::Types::Bool::Bool->false;
+        }
     }
 
     sub is_inf {
@@ -987,6 +1070,10 @@ package Sidef::Types::Number::Number {
     }
 
     sub is_nan {
+        state $x = Sidef::Types::Bool::Bool->false;
+    }
+
+    sub is_ninf {
         state $x = Sidef::Types::Bool::Bool->false;
     }
 
@@ -1332,7 +1419,12 @@ package Sidef::Types::Number::Number {
     # See: https://en.wikipedia.org/wiki/Miller%E2%80%93Rabin_primality_test#Deterministic_variants_of_the_test
     sub is_prime {
         my ($x) = @_;
-        Sidef::Types::Bool::Bool->new(Math::GMPz::Rmpz_probab_prime_p(_as_int($x), 7) > 0);
+        if (Math::GMPz::Rmpz_probab_prime_p(_as_int($x), 7) > 0) {
+            state $z = Sidef::Types::Bool::Bool->true;
+        }
+        else {
+            state $z = Sidef::Types::Bool::Bool->false;
+        }
     }
 
     sub next_prime {
@@ -1345,12 +1437,19 @@ package Sidef::Types::Number::Number {
     sub is_square {
         my ($x) = @_;
 
-        _is_int($$x) or return Sidef::Types::Bool::Bool->false;
+        if (not _is_int($$x)) {
+            return state $z = Sidef::Types::Bool::Bool->false;
+        }
 
         my $nz = Math::GMPz::Rmpz_init();
         Math::GMPq::Rmpq_get_num($nz, $$x);
 
-        Sidef::Types::Bool::Bool->new(Math::GMPz::Rmpz_perfect_square_p($nz));
+        if (Math::GMPz::Rmpz_perfect_square_p($nz)) {
+            state $z = Sidef::Types::Bool::Bool->true;
+        }
+        else {
+            state $z = Sidef::Types::Bool::Bool->false;
+        }
     }
 
     *is_sqr = \&is_square;
@@ -1358,12 +1457,19 @@ package Sidef::Types::Number::Number {
     sub is_power {
         my ($x) = @_;
 
-        _is_int($$x) or return Sidef::Types::Bool::Bool->false;
+        if (not _is_int($$x)) {
+            return state $z = Sidef::Types::Bool::Bool->false;
+        }
 
         my $nz = Math::GMPz::Rmpz_init();
         Math::GMPq::Rmpq_get_num($nz, $$x);
 
-        Sidef::Types::Bool::Bool->new(Math::GMPz::Rmpz_perfect_power_p($nz));
+        if (Math::GMPz::Rmpz_perfect_power_p($nz)) {
+            state $z = Sidef::Types::Bool::Bool->true;
+        }
+        else {
+            state $z = Sidef::Types::Bool::Bool->false;
+        }
     }
 
     *is_pow = \&is_power;
@@ -1640,10 +1746,10 @@ package Sidef::Types::Number::Number {
         if (defined $y) {
             _valid($y);
             my $min = Math::GMPq::Rmpq_get_d($$x);
-            $x->new(CORE::int($min + CORE::rand(Math::GMPq::Rmpq_get_d($$y) - $min)));
+            _new_int(CORE::int($min + CORE::rand(Math::GMPq::Rmpq_get_d($$y) - $min)));
         }
         else {
-            $x->new(CORE::int(CORE::rand(Math::GMPq::Rmpq_get_d($$x))));
+            _new_int(CORE::int(CORE::rand(Math::GMPq::Rmpq_get_d($$x))));
         }
     }
 
