@@ -13,8 +13,40 @@ This object is ...
 
 var obj = Nan.new(...);
 
+
+=head1 INHERITS
+
+Inherits methods from:
+
+	* Sidef::Object::Object
+	* Sidef::Convert::Convert
+
 =head1 METHODS
 
+
+=head2 is_inf
+
+Nan.is_inf() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 is_nan
+
+Nan.is_nan() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 is_ninf
+
+Nan.is_ninf() -> I<Obj>
+
+Return the
+
+=cut
 
 =head2 new
 

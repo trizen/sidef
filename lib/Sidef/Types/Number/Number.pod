@@ -140,7 +140,17 @@ I<Obj> B</> I<Obj> -> I<Obj>
 
 Return the
 
-Aliases: I<÷()>, I<//()>, I<div>, I<rdiv>
+Aliases: I<÷()>, I<div>, I<rdiv>
+
+=cut
+
+=head2 //
+
+I<Obj> B<//> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<idiv>
 
 =cut
 
@@ -444,7 +454,7 @@ Number.dfac() -> I<Obj>
 
 Return the
 
-Aliases: I<factorial2>
+Aliases: I<double_factorial>
 
 =cut
 
@@ -546,6 +556,16 @@ Return the
 
 =cut
 
+=head2 expmod
+
+Number.expmod() -> I<Obj>
+
+Return the
+
+Aliases: I<modpow>
+
+=cut
+
 =head2 fib
 
 Number.fib() -> I<Obj>
@@ -622,14 +642,6 @@ Return the
 
 =cut
 
-=head2 idiv
-
-Number.idiv() -> I<Obj>
-
-Return the
-
-=cut
-
 =head2 imul
 
 Number.imul() -> I<Obj>
@@ -661,6 +673,16 @@ Aliases: I<as_int>
 Number.inv() -> I<Obj>
 
 Return the
+
+=cut
+
+=head2 invmod
+
+Number.invmod() -> I<Obj>
+
+Return the
+
+Aliases: I<modinv>
 
 =cut
 
@@ -776,6 +798,22 @@ Return the
 
 =cut
 
+=head2 jacobi
+
+Number.jacobi() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 kronecker
+
+Number.kronecker() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 lcm
 
 Number.lcm() -> I<Obj>
@@ -869,22 +907,6 @@ Return the
 =head2 min
 
 Number.min() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 modinv
-
-Number.modinv() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 modpow
-
-Number.modpow() -> I<Obj>
 
 Return the
 

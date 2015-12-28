@@ -20,7 +20,6 @@ Inherits methods from:
 
 	* Sidef::Object::Object
 	* Sidef::Convert::Convert
-	* Sidef::Types::Number::Number
 
 =head1 METHODS
 
@@ -163,9 +162,129 @@ Return the
 
 =cut
 
+=head2 acos
+
+Complex.acos() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 acosh
+
+Complex.acosh() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 asin
+
+Complex.asin() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 asinh
+
+Complex.asinh() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 atan
+
+Complex.atan() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 atanh
+
+Complex.atanh() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 cbrt
+
+Complex.cbrt() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 ceil
+
+Complex.ceil() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 cos
+
+Complex.cos() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 cosh
+
+Complex.cosh() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 cot
+
+Complex.cot() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 coth
+
+Complex.coth() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 csc
+
+Complex.csc() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 csch
+
+Complex.csch() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 dump
 
 Complex.dump() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 e
+
+Complex.e() -> I<Obj>
 
 Return the
 
@@ -179,9 +298,41 @@ Return the
 
 =cut
 
+=head2 exp10
+
+Complex.exp10() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 exp2
+
+Complex.exp2() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 floor
+
+Complex.floor() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 get_constant
 
 Complex.get_constant() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 i
+
+Complex.i() -> I<Obj>
 
 Return the
 
@@ -197,9 +348,33 @@ Aliases: I<imag>
 
 =cut
 
+=head2 ln
+
+Complex.ln() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 log
 
 Complex.log() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 log10
+
+Complex.log10() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 log2
+
+Complex.log2() -> I<Obj>
 
 Return the
 
@@ -233,6 +408,32 @@ Aliases: I<reciprocal>
 
 =cut
 
+=head2 parts
+
+Complex.parts() -> I<Obj>
+
+Return the
+
+Aliases: I<reals>
+
+=cut
+
+=head2 phi
+
+Complex.phi() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 pi
+
+Complex.pi() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 re
 
 Complex.re() -> I<Obj>
@@ -243,9 +444,65 @@ Aliases: I<real>
 
 =cut
 
+=head2 roundf
+
+Complex.roundf() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 sec
+
+Complex.sec() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 sech
+
+Complex.sech() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 sin
+
+Complex.sin() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 sinh
+
+Complex.sinh() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 sqrt
 
 Complex.sqrt() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 tan
+
+Complex.tan() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 tanh
+
+Complex.tanh() -> I<Obj>
 
 Return the
 

@@ -1,5 +1,6 @@
 package Sidef::Types::Number::Inf {
 
+    use utf8;
     use 5.014;
     require Math::GMPq;
 
@@ -95,6 +96,7 @@ package Sidef::Types::Number::Inf {
     *fmod        = \&nan;
     *bin         = \&nan;
     *modpow      = \&nan;
+    *expmod      = \&nan;
     *modinv      = \&nan;
     *invmod      = \&nan;
     *and         = \&nan;

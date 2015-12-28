@@ -1118,6 +1118,8 @@ package Sidef::Types::Number::Number {
         _mpz2rat($r);
     }
 
+    *expmod = \&modpow;
+
     sub modinv {
         my ($x, $y) = @_;
         _valid($y);
