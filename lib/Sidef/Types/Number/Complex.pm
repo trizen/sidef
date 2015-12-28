@@ -170,13 +170,13 @@ package Sidef::Types::Number::Complex {
     sub abs {
         my $mpfr = Math::MPFR::Rmpfr_init2($PREC);
         Math::MPC::Rmpc_abs($mpfr, ${$_[0]}, $ROUND);
-        Sidef::Types::Number::Number::_new(Sidef::Types::Number::Number::_mpfr2rat($mpfr));
+        Sidef::Types::Number::Number::_mpfr2rat($mpfr);
     }
 
     sub norm {
         my $mpfr = Math::MPFR::Rmpfr_init2($PREC);
         Math::MPC::Rmpc_norm($mpfr, ${$_[0]}, $ROUND);
-        Sidef::Types::Number::Number::_new(Sidef::Types::Number::Number::_mpfr2rat($mpfr));
+        Sidef::Types::Number::Number::_mpfr2rat($mpfr);
     }
 
     *reciprocal = \&norm;
@@ -184,7 +184,7 @@ package Sidef::Types::Number::Complex {
     sub real {
         my $mpfr = Math::MPFR::Rmpfr_init2($PREC);
         Math::MPC::Rmpc_real($mpfr, ${$_[0]}, $ROUND);
-        Sidef::Types::Number::Number::_new(Sidef::Types::Number::Number::_mpfr2rat($mpfr));
+        Sidef::Types::Number::Number::_mpfr2rat($mpfr);
     }
 
     *re = \&real;
@@ -192,7 +192,7 @@ package Sidef::Types::Number::Complex {
     sub imag {
         my $mpfr = Math::MPFR::Rmpfr_init2($PREC);
         Math::MPC::Rmpc_imag($mpfr, ${$_[0]}, $ROUND);
-        Sidef::Types::Number::Number::_new(Sidef::Types::Number::Number::_mpfr2rat($mpfr));
+        Sidef::Types::Number::Number::_mpfr2rat($mpfr);
     }
 
     *im = \&imag;

@@ -65,7 +65,7 @@ class Forest(p=0.01, f=0.001, height, width) {
 }
 
 local $| = 1;
-var(height, width) = `stty size`.nums...;
+var(height, width) = `stty size`.nums.map{.dec}...;
 
 var forest = Forest(height: height, width: width);
 print "\e[2J";
