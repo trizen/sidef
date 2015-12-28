@@ -84,8 +84,8 @@ package Sidef::Types::Number::Inf {
     *is_power  = \&is_ninf;
     *is_pow    = \&is_ninf;
     *is_div    = \&is_ninf;
-    *is_even   = \&is_pos;
-    *is_odd    = \&is_pos;
+    *is_even   = \&is_ninf;
+    *is_odd    = \&is_ninf;
 
     sub nan {
         state $x = Sidef::Types::Number::Nan->new;

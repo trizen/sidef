@@ -476,6 +476,9 @@ package Sidef::Deparse::Sidef {
         elsif ($ref eq 'Sidef::Types::Number::Ninf') {
             $code = '-Inf';
         }
+        elsif ($ref eq 'Sidef::Types::Number::Nan') {
+            $code = 'NaN';
+        }
         elsif ($ref eq 'Sidef::Types::Array::Array' or $ref eq 'Sidef::Types::Array::HCArray') {
             if (not @{$obj}) {
                 $code = 'Array';

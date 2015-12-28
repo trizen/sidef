@@ -7,6 +7,7 @@ package Sidef::Types::Number::Ninf {
       Sidef::Object::Object
       Sidef::Convert::Convert
       Sidef::Types::Number::Number
+      Sidef::Types::Number::Inf
       );
 
     use overload

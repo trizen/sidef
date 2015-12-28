@@ -21,6 +21,8 @@ package Sidef::Types::Number::Nan {
 
     sub new { $NAN }
 
+    sub get_value { 'NaN' }
+
     sub is_nan {
         state $x = Sidef::Types::Bool::Bool->true;
     }

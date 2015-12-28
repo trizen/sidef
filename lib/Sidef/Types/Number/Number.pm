@@ -1007,7 +1007,9 @@ package Sidef::Types::Number::Number {
     sub length {
         my $z = Math::GMPz::Rmpz_init();
         Math::GMPz::Rmpz_set_q($z, ${$_[0]});
-        _new_uint(Math::GMPz::Rmpz_sizeinbase($z, 10));
+
+        #_new_uint(Math::GMPz::Rmpz_sizeinbase($z, 10));        # turns out to be inexact
+        _new_uint(Math::GMPz::Rmpz_snprintf(my $buf, 0, "%Zd", $z, 0));
     }
 
     *len  = \&length;
