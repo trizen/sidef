@@ -41,8 +41,7 @@ package Sidef::Types::Glob::File {
             return $CACHE->{$name} = Sidef::Types::Number::Number->new($call->());
         }
 
-        warn qq{[WARN] Inexistent File constant "$name"!\n};
-        return;
+        die qq{[ERROR] Inexistent File constant "$name"!\n};
     }
 
     sub touch {

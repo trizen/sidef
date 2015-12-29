@@ -28,8 +28,7 @@ package Sidef::Types::Glob::Socket {
                 return $CACHE{$name} = Sidef::Perl::Perl->to_sidef(scalar $func->());
             }
 
-            warn qq{[WARN] Inexistent Socket constant "$name"!\n};
-            return;
+            die qq{[ERROR] Inexistent Socket constant "$name"!\n};
         }
     }
 

@@ -199,7 +199,7 @@ package Sidef::Types::Number::Number {
             if (index($v, '/') != -1) {
                 state $bigrat = _load_bigrat();
                 my $br = Math::BigRat->new($v);
-                local $Math::BigFloat::precision = -CORE::int($PREC / 3.321923);
+                local $Math::BigFloat::precision = -CORE::int(CORE::int($PREC) / 3.321923);
                 $br->as_float->bstr =~ s/0+$//r;
             }
             else {
@@ -1662,7 +1662,8 @@ package Sidef::Types::Number::Number {
         _valid($prec);
         my $str = Math::GMPq::Rmpq_get_str($$x, 10);
         state $bigrat = _load_bigrat();
-        $x->new(Math::BigRat->new($str)->as_float(CORE::length($str))->bfround(Math::GMPq::Rmpq_get_d($$prec))->bstr);
+        local $Math::BigFloat::precision = -CORE::int(CORE::int($PREC) / 3.321923);
+        $x->new(Math::BigRat->new($str)->as_float->bfround(Math::GMPq::Rmpq_get_d($$prec))->bstr);
     }
 
     sub to {

@@ -35,8 +35,7 @@ package Sidef::Math::Math {
 
         my $key = "$name";
         $cache{$key} //= exists($table->{$key}) ? $table->{$key}->() : do {
-            warn qq{[WARN] Inexistent Math constant "$name"!\n};
-            undef;
+            die qq{[ERROR] Inexistent Math constant "$name"!\n};
         };
     }
 
