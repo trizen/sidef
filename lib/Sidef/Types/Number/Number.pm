@@ -27,13 +27,6 @@ package Sidef::Types::Number::Number {
       q{0+}   => sub { Math::GMPq::Rmpq_get_d(${$_[0]}) },
       q{""}   => \&get_value;
 
-    sub _load_bigint {
-        state $bigint = do {
-            require Math::BigInt;
-            Math::BigInt->import(try => 'GMP');
-        };
-    }
-
     sub _load_bigrat {
         state $bigrat = do {
             require Math::BigRat;
@@ -213,6 +206,22 @@ package Sidef::Types::Number::Number {
             }
           }
     }
+
+    sub base {
+        my ($x, $y) = @_;
+        _valid($y);
+
+        state $min = Math::GMPq->new(2);
+        state $max = Math::GMPq->new(36);
+
+        if (Math::GMPq::Rmpq_cmp($$y, $min) < 0 or Math::GMPq::Rmpq_cmp($$y, $max) > 0) {
+            die "[ERROR] base must be between 2 and 36, got $$y\n";
+        }
+
+        Sidef::Types::String::String->new(Math::GMPq::Rmpq_get_str(${$_[0]}, $$y));
+    }
+
+    *in_base = \&base;
 
     sub _get_frac {
         Math::GMPq::Rmpq_get_str(${$_[0]}, 10);
@@ -1119,41 +1128,19 @@ package Sidef::Types::Number::Number {
     sub as_bin {
         my $z = Math::GMPz::Rmpz_init();
         Math::GMPz::Rmpz_set_q($z, ${$_[0]});
-        state $bigint = _load_bigint();
-        Sidef::Types::String::String->new(substr(Math::BigInt->new(Math::GMPz::Rmpz_get_str($z, 10))->as_bin, 2));
+        Sidef::Types::String::String->new(Math::GMPz::Rmpz_get_str($z, 2));
     }
 
     sub as_oct {
         my $z = Math::GMPz::Rmpz_init();
         Math::GMPz::Rmpz_set_q($z, ${$_[0]});
-        state $bigint = _load_bigint();
-        Sidef::Types::String::String->new(substr(Math::BigInt->new(Math::GMPz::Rmpz_get_str($z, 10))->as_oct, 1));
+        Sidef::Types::String::String->new(Math::GMPz::Rmpz_get_str($z, 8));
     }
 
     sub as_hex {
         my $z = Math::GMPz::Rmpz_init();
         Math::GMPz::Rmpz_set_q($z, ${$_[0]});
-        state $bigint = _load_bigint();
-        Sidef::Types::String::String->new(substr(Math::BigInt->new(Math::GMPz::Rmpz_get_str($z, 10))->as_hex, 2));
-    }
-
-    sub bin {
-        my $z = Math::GMPz::Rmpz_init();
-        Math::GMPz::Rmpz_set_q($z, ${$_[0]});
-
-        my $r = Math::GMPz::Rmpz_init();
-        my @digits =
-          grep { $_ eq '0' or $_ eq '1' or die "[ERROR] Non-binary digit detected inside number `$z` in Number.bin()\n" }
-          split(//, scalar reverse Math::GMPz::Rmpz_get_str($z, 10));
-
-        foreach my $i (0 .. $#digits) {
-            if ($digits[$i] eq '1') {
-                my $tmp = Math::GMPz::Rmpz_init();
-                Math::GMPz::Rmpz_ui_pow_ui($tmp, 2, $i);
-                Math::GMPz::Rmpz_add($r, $r, $tmp);
-            }
-        }
-        _mpz2rat($r);
+        Sidef::Types::String::String->new(Math::GMPz::Rmpz_get_str($z, 16));
     }
 
     sub digits {

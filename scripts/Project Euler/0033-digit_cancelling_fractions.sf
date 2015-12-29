@@ -7,7 +7,7 @@
 
 # Answer: 100
 
-var prod = 1.rat;
+var prod = 1;
 
 9.times { |i|
     9.times { |j|

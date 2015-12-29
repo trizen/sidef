@@ -347,28 +347,25 @@ package Sidef::Types::String::String {
         $self->new(crypt($$self, $salt->get_value));
     }
 
-    sub hex {
+    sub bin {
         my ($self) = @_;
-        Sidef::Types::Number::Number->new(CORE::hex($$self));
+        Sidef::Types::Number::Number->new($$self, 2);
     }
 
     sub oct {
         my ($self) = @_;
-        Sidef::Types::Number::Number->new(CORE::oct($$self));
-    }
-
-    sub bin {
-        my ($self) = @_;
-        my $value = $$self;
-        Sidef::Types::Number::Number->new(CORE::oct(index($value, '0b') == 0 ? $value : ('0b' . $value)));
+        Sidef::Types::Number::Number->new($$self, 8);
     }
 
     sub num {
         my ($self) = @_;
-        Sidef::Types::Number::Number->new($$self);
+        Sidef::Types::Number::Number->new($$self, 10);
     }
 
-    *dec = \&num;
+    sub hex {
+        my ($self) = @_;
+        Sidef::Types::Number::Number->new($$self, 16);
+    }
 
     sub substr {
         my ($self, $offs, $len) = @_;
