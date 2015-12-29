@@ -34,7 +34,7 @@ func rref (Array m) {
 func say_it (message, array) {
     say "\n#{message}";
     array.each { |row|
-        say row.map { |n| " %5s" % n }.join
+        say row.map { |n| " %5s" % n.as_rat }.join
     }
 }
 
@@ -59,8 +59,7 @@ var M = [
 ];
 
 M.each { |matrix|
-    var rat_matrix = matrix.map{.map{.to_r}};
-    say_it('Original Matrix', rat_matrix);
-    say_it('Reduced Row Echelon Form Matrix', rref(rat_matrix));
+    say_it('Original Matrix', matrix);
+    say_it('Reduced Row Echelon Form Matrix', rref(matrix));
     say '';
 }

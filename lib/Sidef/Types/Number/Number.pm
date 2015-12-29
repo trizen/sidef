@@ -199,7 +199,8 @@ package Sidef::Types::Number::Number {
             if (index($v, '/') != -1) {
                 state $bigrat = _load_bigrat();
                 my $br = Math::BigRat->new($v);
-                $br->as_float(CORE::int($PREC / 3.321923))->bstr =~ s/0+$//r;
+                local $Math::BigFloat::precision = -CORE::int($PREC / 3.321923);
+                $br->as_float->bstr =~ s/0+$//r;
             }
             else {
                 $v;
