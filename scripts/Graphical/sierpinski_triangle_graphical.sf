@@ -30,15 +30,15 @@ class Array {
         var row = self[i];
         img.moveTo(0, j);
         loop {
-          if ((var sp = row.count(/^\s+/)) > 0) {
-             row.substr!(sp);
+          if (var sp = row.match(/^\s+/)) {
+             row.substr!(sp.pos.last);
              img.fgcolor(bgcolor);
-             img.line(scale * sp);
+             img.line(scale * sp.pos.last);
           }
-          elsif ((var nsp = row.count(/^\S+/)) > 0) {
-             row.substr!(nsp);
+          elsif (var nsp = row.match(/^\S+/)) {
+             row.substr!(nsp.pos.last);
              img.fgcolor(fgcolor);
-             img.line(scale * nsp);
+             img.line(scale * nsp.pos.last);
           }
           else {
              break;

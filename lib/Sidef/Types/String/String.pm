@@ -962,7 +962,7 @@ package Sidef::Types::String::String {
 
         if (ref($arg) eq 'Sidef::Types::Regex::Regex') {
             my $regex = $arg->{regex};
-            $counter += CORE::length($1) while $s =~ /($regex)/g;
+            ++$counter while $s =~ /$regex/g;
             return Sidef::Types::Number::Number->new($counter);
         }
         elsif (ref($arg) eq 'Sidef::Types::Block::Block') {
