@@ -24,8 +24,8 @@ package Sidef::Optimizer {
             exists($INC{$module}) || require($module);
             map {
 
-                # defined(&{$package . '::' . $_})
-                #   or warn "Invalid method $package: $_";
+                defined(&{$package . '::' . $_})
+                  or die "Invalid method $package: $_";
 
                 \&{$package . '::' . $_}
             } @names;
@@ -195,26 +195,32 @@ package Sidef::Optimizer {
 
         (NUMBER) => [
 
+            # Number.method(String | Number)
+            (
+             map {
+                 { $_, [table(STRING, NUMBER)] }
+               } methods(NUMBER, qw(
+                   new call
+                   )
+               )
+            ),
+
             # Number.method(Number)
             (
              map {
                  { $_, [table(NUMBER)] }
                } methods(NUMBER, qw(
-                   new call
-
-                   + - / * % **
+                   + - / * % %% **
 
                    lt gt le ge cmp acmp
                    eq ne
                    and or xor
 
-                   digit
                    complex
                    root log
-                   npow
+                   next_pow
                    max min
-                   round roundf
-                   digit
+                   roundf
                    nok
                    modinv
                    rdiv
@@ -222,6 +228,16 @@ package Sidef::Optimizer {
 
                    shift_right
                    shift_left
+                   )
+               )
+            ),
+
+            # Number.method(String, Number)
+            (
+             map {
+                 { $_, [table(STRING), table(NUMBER)] }
+               } methods(NUMBER, qw(
+                   new call
                    )
                )
             ),
@@ -236,20 +252,60 @@ package Sidef::Optimizer {
 
                    factorial
                    sqrt
-                   npow2
-                   troot
+                   next_pow2
                    abs
 
-                   hex oct bin
                    exp int
                    cos sin
                    log ln log10 log2
+
+                   sin
+                   asin
+                   sinh
+                   asinh
+
+                   cos
+                   acos
+                   cosh
+                   acosh
+
+                   tan
+                   atan
+                   tanh
+                   atanh
+
+                   cot
+                   acot
+                   coth
+                   acoth
+
+                   sec
+                   sech
+                   asec
+                   asech
+
+                   csc
+                   csch
+                   acsc
+                   acsch
+
+                   cot
+                   acot
+                   coth
+                   acoth
 
                    inf
                    neg
                    sign
                    nan
                    chr
+                   pi
+                   ln2
+                   phi
+                   tau
+                   e
+                   Y
+                   G
 
                    is_zero
                    is_one
@@ -259,6 +315,7 @@ package Sidef::Optimizer {
                    is_even
                    is_odd
                    is_inf
+                   is_ninf
                    is_int
 
                    ceil
@@ -273,11 +330,11 @@ package Sidef::Optimizer {
                    as_bin
                    as_oct
                    as_hex
+                   as_rat
 
                    rat
                    complex i
 
-                   sstr
                    dump
                    commify
                    )
@@ -416,67 +473,6 @@ package Sidef::Optimizer {
 
         (MATH) => [
 
-            # Math.method(Number)
-            (
-             map {
-                 { $_, [table(NUMBER)] }
-               } methods(MATH, qw(
-                   sqrt
-                   root
-                   pow
-                   exp
-
-                   e
-                   pi
-
-                   atan
-                   atan2
-                   cos
-                   sin
-                   asin
-
-                   log
-                   log2
-                   log10
-                   npow2
-
-                   abs
-                   ceil
-                   floor
-                   )
-               )
-            ),
-
-            # Math.method(Number, Number)
-            (
-             map {
-                 { $_, [table(NUMBER), table(NUMBER)] }
-               } methods(MATH, qw(
-                   exp
-                   atan
-                   atan2
-                   cos
-                   sin
-                   asin
-
-                   log
-                   npow
-                   )
-               )
-            ),
-
-            # Math.method()
-            (
-             map {
-                 { $_, [] }
-               } methods(MATH, qw(
-                   e
-                   pi
-                   inf
-                   )
-               )
-            ),
-
             # Math.method(String)
             (
              map {
@@ -591,11 +587,8 @@ package Sidef::Optimizer {
                    acoth
 
                    pi
-
-                   int
                    neg
                    not
-                   sign
 
                    real
                    imaginary
@@ -603,19 +596,14 @@ package Sidef::Optimizer {
                    is_zero
                    is_one
                    is_nan
-                   is_pos
-                   is_neg
-                   is_even
-                   is_odd
+                   is_real
                    is_inf
                    is_int
 
                    ceil
                    floor
 
-                   sstr
                    dump
-                   factorial
                    )
                )
             ),

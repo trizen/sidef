@@ -80,6 +80,7 @@ package Sidef::Types::Number::Ninf {
     *is_even   = \&is_pos;
     *is_odd    = \&is_pos;
     *divides   = \&is_pos;
+    *is_real   = \&is_pos;
 
     sub is_neg {
         state $x = Sidef::Types::Bool::Bool->true;
@@ -180,6 +181,7 @@ package Sidef::Types::Number::Ninf {
     *deg2rad     = \&ninf;
     *grad2rad    = \&ninf;
     *grad2deg    = \&ninf;
+    *commify     = \&ninf;
 
     sub max { $_[1] }
 
@@ -191,12 +193,17 @@ package Sidef::Types::Number::Ninf {
     *cos   = \&zero;
     *sech  = \&zero;
     *csch  = \&zero;
+    *acsc  = \&zero;
+    *acsch = \&zero;
     *eint  = \&zero;
     *exp   = \&zero;
     *exp2  = \&zero;
     *exp10 = \&zero;
+    *acot  = \&zero;
+    *acoth = \&zero;
 
-    sub chr { state $x = Sidef::Types::String::String->new('') }
+    sub chr  { state $x = Sidef::Types::String::String->new('') }
+    sub sign { state $x = Sidef::Types::String::String->new('-') }
 
     #
     ## erfc(-inf) = 2
@@ -220,22 +227,29 @@ package Sidef::Types::Number::Ninf {
     ## atan(-inf) = -pi/2
     #
     sub atan {
-        state $x = Sidef::Types::Number::Number->pi->div(Sidef::Types::Number::Number->new(-2));
+        state $neg_two = Sidef::Types::Number::Number->new(-2);
+        Sidef::Types::Number::Number->pi->div($neg_two);
     }
 
     *atan2 = \&atan;
 
     #
+    ## asec(-inf) = pi/2
+    #
+    sub asec {
+        state $two = Sidef::Types::Number::Number->new(2);
+        Sidef::Types::Number::Number->pi->div($two);
+    }
+
+    #
     ## atanh(-inf) = pi/2*i
     #
     sub atanh {
-        state $x = Sidef::Types::Number::Complex->new(
-                                                      0,
-                                                      Sidef::Types::Number::Number->pi->div(
-                                                                                           Sidef::Types::Number::Number->new(2)
-                                                      )
-                                                     );
+        state $two = Sidef::Types::Number::Number->new(2);
+        Sidef::Types::Number::Number->pi->div($two)->i;
     }
+
+    *asech = \&atanh;
 
     #
     ## tanh(-inf) = -1
@@ -257,6 +271,19 @@ package Sidef::Types::Number::Ninf {
         my ($x, $y) = @_;
         $y->is_neg ? $ZERO : $y->is_zero ? $ONE : $y->is_even ? $x->neg : $x;
     }
+
+    #
+    ## binomial(-inf, x) = 0        | with x < 0
+    ## binomial(-inf, inf) = 1
+    ## binomial(-inf, x) = -inf     | with x > 0
+    ##
+    #
+    sub binomial {
+        my ($x, $y) = @_;
+        ref($y) eq 'Sidef::Types::Number::Inf' ? $ONE : $y->is_neg ? $ZERO : $x;
+    }
+
+    *nok = \&binomial;
 
     #
     ## Comparisons

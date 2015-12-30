@@ -134,16 +134,19 @@ HEADER
         }
     }
 
-    sub _dump_reftype {
+    sub _get_reftype {
         my ($self, $obj) = @_;
 
         my $ref = ref($obj);
-        $self->_dump_string(
-                              $ref eq 'Sidef::Variable::ClassInit'     ? $self->_dump_class_name($obj)
-                            : $ref eq 'Sidef::Variable::Ref'           ? 'REF'
-                            : $ref eq 'Sidef::Types::Block::BlockInit' ? 'Sidef::Types::Block::Block'
-                            :                                            $ref
-                           );
+            $ref eq 'Sidef::Variable::ClassInit'     ? $self->_dump_class_name($obj)
+          : $ref eq 'Sidef::Variable::Ref'           ? 'REF'
+          : $ref eq 'Sidef::Types::Block::BlockInit' ? 'Sidef::Types::Block::Block'
+          :                                            $ref;
+    }
+
+    sub _dump_reftype {
+        my ($self, $obj) = @_;
+        $self->_dump_string($self->_get_reftype($obj));
     }
 
     sub _dump_string {
@@ -594,7 +597,10 @@ HEADER
             $code = 'local ' . $self->deparse_script($obj->{expr});
         }
         elsif ($ref eq 'Sidef::Variable::Global') {
-            $code = '$' . $obj->{class} . '::' . $obj->{name},;
+            $code = '$' . $obj->{class} . '::' . $obj->{name};
+        }
+        elsif ($ref eq 'Sidef::Variable::ClassVar') {
+            $code = '$' . $self->_get_reftype($obj->{class}) . '::' . $obj->{name};
         }
         elsif ($ref eq 'Sidef::Variable::Define') {
             my $name  = $obj->{name} . $refaddr;
@@ -615,13 +621,13 @@ HEADER
                 if (exists $self->{function} or exists $self->{class}) {
                     $self->top_add("use experimental 'lexical_subs';\n");
                     $code = "state sub $name() { state \$_$refaddr"
-                      . (defined($obj->{expr}) ? (" = " . $self->deparse_script($obj->{expr})) : '') . " }";
+                      . (defined($obj->{expr}) ? (" = do{" . $self->deparse_script($obj->{expr}) . '}') : '') . " }";
                 }
 
                 # Otherwise, use static constants
                 else {
                     $code = "sub $name() { state \$_$refaddr"
-                      . (defined($obj->{expr}) ? " = " . ($self->deparse_script($obj->{expr})) : '') . "}";
+                      . (defined($obj->{expr}) ? " = do{" . ($self->deparse_script($obj->{expr}) . '}') : '') . "}";
                 }
             }
             else {
@@ -633,7 +639,8 @@ HEADER
             my $value = "\$$name";
             if (not exists $obj->{inited}) {
                 $obj->{inited} = 1;
-                $code = "(state \$$name" . (defined($obj->{expr}) ? (" = " . $self->deparse_script($obj->{expr})) : '') . ")";
+                $code = "(state \$$name"
+                  . (defined($obj->{expr}) ? (' = do{' . $self->deparse_script($obj->{expr}) . '}') : '') . ")";
             }
             else {
                 $code = $value;

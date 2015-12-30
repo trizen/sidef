@@ -327,7 +327,7 @@ package Sidef::Parser {
                     | <<(?<reduce>[_\pL][_\pL\pN]*|(?&ops))>>        # reduce operator (e.g.: <<add>> or <<+>>)
                     | «(?<reduce>[_\pL][_\pL\pN]*|(?&ops))»          # reduce operator (e.g.: «add» or «+»)
 
-                    | \h*\^(?<op>[_\pL][_\pL\pN]*[!:?]?)\^\h*        # method-like operator (e.g.: ^add^)
+                    | \^(?<op>[_\pL][_\pL\pN]*[!:?]?)\^              # method-like operator (e.g.: ^add^)
                     | (?<op>(?&ops))                                 # primitive operator   (e.g.: +, -, *, /)
                 }x;
             },
@@ -1875,6 +1875,13 @@ package Sidef::Parser {
             if (m{\G(?=/)} || /\G%r\b/gc) {
                 my $string = $self->get_quoted_string(code => $opt{code});
                 return Sidef::Types::Regex::Regex->new($string, /\G($self->{match_flags_re})/goc ? $1 : undef);
+            }
+
+            # Class variable in form of `Class!var_name`
+            if (/\G($self->{var_name_re})!($self->{var_name_re})/goc) {
+                my ($class_name, $var_name) = ($1, $2);
+                my $class_obj = $self->parse_expr(code => \$class_name);
+                return (bless {class => $class_obj, name => $var_name}, 'Sidef::Variable::ClassVar');
             }
 
             # Static object (like String or nil)

@@ -18,7 +18,9 @@ package Sidef::Types::Number::Complex {
     require Sidef::Types::Number::Number;
 
     our $ROUND = Math::MPC::MPC_RNDNN();
-    our $PREC  = $Sidef::Types::Number::Number::PREC;
+
+    our ($PREC);
+    *PREC = \$Sidef::Types::Number::Number::PREC;
 
     sub new {
         my (undef, $x, $y) = @_;
@@ -28,23 +30,25 @@ package Sidef::Types::Number::Complex {
         }
         elsif (ref($x) eq __PACKAGE__) {
             return $x if not defined $y;
-            my $mpfr = Math::MPFR::Rmpfr_init2($PREC);
-            Math::MPC::Rmpc_real($mpfr, ${$_[0]}, $ROUND);
-            $x = $mpfr;
+            if (ref($y) eq __PACKAGE__) {
+                return $x->add($y);
+            }
+            else {
+                return $x->add(__PACKAGE__->new($y));
+            }
         }
         elsif (index(ref($x), 'Sidef::') == 0) {
             $x = $x->get_value;
         }
 
-        return bless(\Math::MPC->new($x // 0), __PACKAGE__) if not defined $y;
-
-        if (ref($y) eq 'Sidef::Types::Number::Number') {
+        if (not defined($y)) {
+            return bless(\Math::MPC->new($x // 0), __PACKAGE__);
+        }
+        elsif (ref($y) eq 'Sidef::Types::Number::Number') {
             $y = $$y;
         }
         elsif (ref($y) eq __PACKAGE__) {
-            my $mpfr = Math::MPFR::Rmpfr_init2($PREC);
-            Math::MPC::Rmpc_real($mpfr, ${$_[0]}, $ROUND);
-            $x = $mpfr;
+            return $y->add(__PACKAGE__->new($x));
         }
         elsif (index(ref($y), 'Sidef::') == 0) {
             $y = $y->get_value;
@@ -195,7 +199,8 @@ package Sidef::Types::Number::Complex {
         Sidef::Types::Number::Number::_mpfr2rat($mpfr);
     }
 
-    *im = \&imag;
+    *im        = \&imag;
+    *imaginary = \&imag;
 
     sub neg {
         my ($x) = @_;
@@ -492,6 +497,18 @@ package Sidef::Types::Number::Complex {
     }
 
     #
+    ## acsc(x) = asin(1/x)
+    #
+    sub acsc {
+        my ($x) = @_;
+        state $one = Math::MPC->new(1);
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_div($r, $one, $$x, $ROUND);
+        Math::MPC::Rmpc_asin($r, $r, $ROUND);
+        _new($r);
+    }
+
+    #
     ## csch(x) = 1/sinh(x)
     #
     sub csch {
@@ -500,6 +517,18 @@ package Sidef::Types::Number::Complex {
         my $r = Math::MPC::Rmpc_init2($PREC);
         Math::MPC::Rmpc_sinh($r, $$x, $ROUND);
         Math::MPC::Rmpc_div($r, $one, $r, $ROUND);
+        _new($r);
+    }
+
+    #
+    ## acsch(x) = asinh(1/x)
+    #
+    sub acsch {
+        my ($x) = @_;
+        state $one = Math::MPC->new(1);
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_div($r, $one, $$x, $ROUND);
+        Math::MPC::Rmpc_asinh($r, $r, $ROUND);
         _new($r);
     }
 
@@ -516,6 +545,18 @@ package Sidef::Types::Number::Complex {
     }
 
     #
+    ## asec(x) = acos(1/x)
+    #
+    sub asec {
+        my ($x) = @_;
+        state $one = Math::MPC->new(1);
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_div($r, $one, $$x, $ROUND);
+        Math::MPC::Rmpc_acos($r, $r, $ROUND);
+        _new($r);
+    }
+
+    #
     ## sech(x) = 1/cosh(x)
     #
     sub sech {
@@ -524,6 +565,18 @@ package Sidef::Types::Number::Complex {
         my $r = Math::MPC::Rmpc_init2($PREC);
         Math::MPC::Rmpc_cosh($r, $$x, $ROUND);
         Math::MPC::Rmpc_div($r, $one, $r, $ROUND);
+        _new($r);
+    }
+
+    #
+    ## asech(x) = acosh(1/x)
+    #
+    sub asech {
+        my ($x) = @_;
+        state $one = Math::MPC->new(1);
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_div($r, $one, $$x, $ROUND);
+        Math::MPC::Rmpc_acosh($r, $r, $ROUND);
         _new($r);
     }
 
@@ -540,6 +593,18 @@ package Sidef::Types::Number::Complex {
     }
 
     #
+    ## acot(x) = atan(1/x)
+    #
+    sub acot {
+        my ($x) = @_;
+        state $one = Math::MPC->new(1);
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_div($r, $one, $$x, $ROUND);
+        Math::MPC::Rmpc_atan($r, $r, $ROUND);
+        _new($r);
+    }
+
+    #
     ## coth(x) = 1/tanh(x)
     #
     sub coth {
@@ -552,6 +617,37 @@ package Sidef::Types::Number::Complex {
     }
 
     #
+    ## acoth(x) = atanh(1/x)
+    #
+    sub acoth {
+        my ($x) = @_;
+        state $one = Math::MPC->new(1);
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_div($r, $one, $$x, $ROUND);
+        Math::MPC::Rmpc_atanh($r, $r, $ROUND);
+        _new($r);
+    }
+
+    #
+    ## atan2(x, y) = atan(x/y)
+    #
+    sub atan2 {
+        my ($x, $y) = @_;
+
+        if (ref($y) eq 'Sidef::Types::Number::Number') {
+            $y = __PACKAGE__->new($y);
+        }
+        else {
+            _valid($y);
+        }
+
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_div($r, $$x, $$y, $ROUND);
+        Math::MPC::Rmpc_atan($r, $r, $ROUND);
+        _new($r);
+    }
+
+    #
     ## Testing
     #
 
@@ -559,96 +655,101 @@ package Sidef::Types::Number::Complex {
         my ($x, $y) = @_;
 
         if (ref($y) eq 'Sidef::Types::Number::Number') {
-            return $x->eq(__PACKAGE__->new($y));
+            $y = __PACKAGE__->new($y);
         }
         else {
             _valid($y);
         }
 
-        Sidef::Types::Bool::Bool->new(Math::MPC::Rmpc_cmp($$x, $$y) == 0);
+        if (Math::MPC::Rmpc_cmp($$x, $$y) == 0) {
+            state $z = Sidef::Types::Bool::Bool->true;
+        }
+        else {
+            state $z = Sidef::Types::Bool::Bool->false;
+        }
+    }
+
+    sub ne {
+        my ($x, $y) = @_;
+
+        if (ref($y) eq 'Sidef::Types::Number::Number') {
+            $y = __PACKAGE__->new($y);
+        }
+        else {
+            _valid($y);
+        }
+
+        if (Math::MPC::Rmpc_cmp($$x, $$y) == 0) {
+            state $z = Sidef::Types::Bool::Bool->false;
+        }
+        else {
+            state $z = Sidef::Types::Bool::Bool->true;
+        }
     }
 
     sub gt {
         my ($x, $y) = @_;
 
         if (ref($y) eq 'Sidef::Types::Number::Number') {
-            return $x->gt(__PACKAGE__->new($y));
+            $y = __PACKAGE__->new($y);
         }
         else {
             _valid($y);
         }
 
-        my $cmp = Math::MPC::Rmpc_cmp($$x, $$y);
-        my $re  = Math::MPC::RMPC_INEX_RE($cmp);
-        my $im  = Math::MPC::RMPC_INEX_IM($cmp);
-
-        Sidef::Types::Bool::Bool->new($re > 0 ? $im >= 0 : $re >= 0 ? $im > 0 : 0);
+        $x->abs->gt($y->abs);
     }
 
     sub ge {
         my ($x, $y) = @_;
 
         if (ref($y) eq 'Sidef::Types::Number::Number') {
-            return $x->ge(__PACKAGE__->new($y));
+            $y = __PACKAGE__->new($y);
         }
         else {
             _valid($y);
         }
 
-        my $cmp = Math::MPC::Rmpc_cmp($$x, $$y);
-        my $re  = Math::MPC::RMPC_INEX_RE($cmp);
-        my $im  = Math::MPC::RMPC_INEX_IM($cmp);
-
-        Sidef::Types::Bool::Bool->new($re >= 0 and $im >= 0);
+        $x->abs->ge($y->abs);
     }
 
     sub lt {
         my ($x, $y) = @_;
 
         if (ref($y) eq 'Sidef::Types::Number::Number') {
-            return $x->lt(__PACKAGE__->new($y));
+            $y = __PACKAGE__->new($y);
         }
         else {
             _valid($y);
         }
 
-        my $cmp = Math::MPC::Rmpc_cmp($$x, $$y);
-        my $re  = Math::MPC::RMPC_INEX_RE($cmp);
-        my $im  = Math::MPC::RMPC_INEX_IM($cmp);
-
-        Sidef::Types::Bool::Bool->new($re < 0 ? $im <= 0 : $re <= 0 ? $im < 0 : 0);
+        $x->abs->lt($y->abs);
     }
 
     sub le {
         my ($x, $y) = @_;
 
         if (ref($y) eq 'Sidef::Types::Number::Number') {
-            return $x->le(__PACKAGE__->new($y));
+            $y = __PACKAGE__->new($y);
         }
         else {
             _valid($y);
         }
 
-        my $cmp = Math::MPC::Rmpc_cmp($$x, $$y);
-        my $re  = Math::MPC::RMPC_INEX_RE($cmp);
-        my $im  = Math::MPC::RMPC_INEX_IM($cmp);
-
-        Sidef::Types::Bool::Bool->new($re <= 0 and $im <= 0);
+        $x->abs->le($y->abs);
     }
 
     sub cmp {
         my ($x, $y) = @_;
 
         if (ref($y) eq 'Sidef::Types::Number::Number') {
-            return $x->le(__PACKAGE__->new($y));
+            $y = __PACKAGE__->new($y);
         }
         else {
             _valid($y);
         }
 
-            $x->eq($y) ? $Sidef::Types::Number::Number::ZERO
-          : $x->gt($y) ? $Sidef::Types::Number::Number::ONE
-          :              $Sidef::Types::Number::Number::MONE;
+        $x->abs->cmp($y->abs);
     }
 
     sub floor {
@@ -662,6 +763,70 @@ package Sidef::Types::Number::Complex {
     sub roundf {
         my ($x, $prec) = @_;
         $x->abs->roundf($prec);
+    }
+
+    sub is_zero {
+        $_[0]->abs->is_zero;
+    }
+
+    sub is_one {
+        $_[0]->abs->is_one;
+    }
+
+    sub is_even {
+        $_[0]->abs->is_even;
+    }
+
+    sub is_odd {
+        $_[0]->abs->is_odd;
+    }
+
+    # Is int when the imaginary part is
+    # zero and the real part is an integer
+    sub is_int {
+        my ($x) = @_;
+        my $im = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPC::Rmpc_imag($im, ${$_[0]}, $ROUND);
+
+        if (Math::MPFR::Rmpfr_sgn($im) != 0) {
+            return state $z = Sidef::Types::Bool::Bool->false;
+        }
+
+        my $re = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPC::Rmpc_real($re, ${$_[0]}, $ROUND);
+
+        if (Math::MPFR::Rmpfr_integer_p($re)) {
+            state $z = Sidef::Types::Bool::Bool->true;
+        }
+        else {
+            state $z = Sidef::Types::Bool::Bool->false;
+        }
+    }
+
+    # Returns true when the imaginary part is zero
+    sub is_real {
+        my ($x) = @_;
+        my $im = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPC::Rmpc_imag($im, ${$_[0]}, $ROUND);
+
+        if (Math::MPFR::Rmpfr_sgn($im) == 0) {
+            state $z = Sidef::Types::Bool::Bool->true;
+        }
+        else {
+            state $z = Sidef::Types::Bool::Bool->false;
+        }
+    }
+
+    sub is_nan {
+        state $x = Sidef::Types::Bool::Bool->false;
+    }
+
+    sub is_inf {
+        state $x = Sidef::Types::Bool::Bool->false;
+    }
+
+    sub is_ninf {
+        state $x = Sidef::Types::Bool::Bool->false;
     }
 
     {

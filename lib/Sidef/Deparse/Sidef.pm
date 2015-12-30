@@ -205,6 +205,9 @@ package Sidef::Deparse::Sidef {
         elsif ($ref eq 'Sidef::Variable::Global') {
             $code = 'global ' . $obj->{class} . '::' . $obj->{name},;
         }
+        elsif ($ref eq 'Sidef::Variable::ClassVar') {
+            $code = $self->_dump_reftype($obj->{class}) . '!' . $obj->{name};
+        }
         elsif ($ref eq 'Sidef::Variable::Init') {
             $code = $self->_dump_init_vars($obj, 'var');
         }
@@ -218,7 +221,10 @@ package Sidef::Deparse::Sidef {
             my $name = $obj->{name};
             if (not exists $obj->{inited}) {
                 $obj->{inited} = 1;
-                $code = "define $name = (" . $self->deparse_script($obj->{expr}) . ')';
+                $code = "define $name";
+                if (defined $obj->{expr}) {
+                    $code .= ' = (' . $self->deparse_script($obj->{expr}) . ')';
+                }
             }
             else {
                 $code = $name;
@@ -228,7 +234,10 @@ package Sidef::Deparse::Sidef {
             my $name = $obj->{name};
             if (not exists $obj->{inited}) {
                 $obj->{inited} = 1;
-                $code = "const $name = (" . $self->deparse_script($obj->{expr}) . ')';
+                $code = "const $name";
+                if (defined $obj->{expr}) {
+                    $code .= ' = (' . $self->deparse_script($obj->{expr}) . ')';
+                }
             }
             else {
                 $code = $name;
@@ -238,7 +247,10 @@ package Sidef::Deparse::Sidef {
             my $name = $obj->{name};
             if (not exists $obj->{inited}) {
                 $obj->{inited} = 1;
-                $code = "static $name = (" . $self->deparse_script($obj->{expr}) . ')';
+                $code = "static $name";
+                if (defined $obj->{expr}) {
+                    $code .= ' = (' . $self->deparse_script($obj->{expr}) . ')';
+                }
             }
             else {
                 $code = $name;
@@ -471,7 +483,10 @@ package Sidef::Deparse::Sidef {
             $code = 'Sig';
         }
         elsif ($ref eq 'Sidef::Types::Number::Number') {
-            $code = $self->_dump_number($obj->get_value);
+            $code = $self->_dump_number($obj->_get_frac);
+            if (index($code, '/') != -1) {
+                $code = qq{Number("$code")};
+            }
         }
         elsif ($ref eq 'Sidef::Types::Number::Inf') {
             $code = 'Inf';
