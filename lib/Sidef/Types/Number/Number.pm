@@ -332,9 +332,9 @@ package Sidef::Types::Number::Number {
 
         _valid($y);
 
-        if (Math::GMPq::Rmpq_sgn($$y) == 0) {
+        if (not Math::GMPq::Rmpq_sgn($$y)) {
             my $sign = Math::GMPq::Rmpq_sgn($$x);
-            return ($sign == 0 ? nan() : $sign > 0 ? inf() : ninf());
+            return (!$sign ? nan() : $sign > 0 ? inf() : ninf());
         }
 
         my $r = Math::GMPq::Rmpq_init();
@@ -938,7 +938,7 @@ package Sidef::Types::Number::Number {
 
         _valid($y);
         my $cmp = Math::GMPq::Rmpq_cmp($$x, $$y);
-        $cmp == 0 ? $ZERO : $cmp < 0 ? $MONE : $ONE;
+        !$cmp ? $ZERO : $cmp < 0 ? $MONE : $ONE;
     }
 
     sub acmp {
@@ -966,7 +966,7 @@ package Sidef::Types::Number::Number {
           : $yn;
 
         my $cmp = Math::GMPq::Rmpq_cmp($a1, $a2);
-        $cmp == 0 ? $ZERO : $cmp < 0 ? $MONE : $ONE;
+        !$cmp ? $ZERO : $cmp < 0 ? $MONE : $ONE;
     }
 
     sub gt {
@@ -1051,7 +1051,7 @@ package Sidef::Types::Number::Number {
 
     sub is_zero {
         my ($x) = @_;
-        if (Math::GMPq::Rmpq_sgn($$x) == 0) {
+        if (not Math::GMPq::Rmpq_sgn($$x)) {
             state $z = Sidef::Types::Bool::Bool->true;
         }
         else {
@@ -1099,7 +1099,7 @@ package Sidef::Types::Number::Number {
         if ($sign > 0) {
             state $z = Sidef::Types::String::String->new('+');
         }
-        elsif ($sign == 0) {
+        elsif (not $sign) {
             state $z = Sidef::Types::String::String->new('');
         }
         else {
@@ -1114,7 +1114,7 @@ package Sidef::Types::Number::Number {
         Math::GMPq::Rmpq_get_den($dz, $x);
 
         state $one_z = Math::GMPz::Rmpz_init_set_str(1, 10);
-        Math::GMPz::Rmpz_cmp($dz, $one_z) == 0;
+        not Math::GMPz::Rmpz_cmp($dz, $one_z);
     }
 
     sub is_int {
@@ -1370,9 +1370,26 @@ package Sidef::Types::Number::Number {
     sub mod {
         my ($x, $y) = @_;
         _valid($y);
-        my $r = Math::GMPz::Rmpz_init();
-        Math::GMPz::Rmpz_mod($r, _as_int($x), _as_int($y));
-        _mpz2rat($r);
+
+        if (_is_int($$x) and _is_int($$y)) {
+            my $r  = Math::GMPz::Rmpz_init();
+            my $yz = _as_int($y);
+            return nan() if !Math::GMPz::Rmpz_sgn($yz);
+            Math::GMPz::Rmpz_mod($r, _as_int($x), $yz);
+            _mpz2rat($r);
+        }
+        else {
+            my $r  = Math::MPFR::Rmpfr_init2($PREC);
+            my $yf = _as_float($y);
+            Math::MPFR::Rmpfr_fmod($r, _as_float($x), $yf, $ROUND);
+            if (not Math::MPFR::Rmpfr_sgn($r)) {
+                return $ZERO;
+            }
+            elsif ((Math::MPFR::Rmpfr_sgn($r) > 0) != (Math::MPFR::Rmpfr_sgn($yf) > 0)) {
+                Math::MPFR::Rmpfr_add($r, $r, $yf, $ROUND);
+            }
+            _mpfr2rat($r);
+        }
     }
 
     sub modpow {
