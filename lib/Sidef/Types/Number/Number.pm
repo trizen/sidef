@@ -1272,6 +1272,16 @@ package Sidef::Types::Number::Number {
         Sidef::Types::Array::Array->new(map { _new_uint($_) } split(//, Math::GMPz::Rmpz_get_str($z, 10)));
     }
 
+    sub digit {
+        my ($x, $y) = @_;
+        _valid($y);
+        my $z = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_set_q($z, $$x);
+        Math::GMPz::Rmpz_abs($z, $z);
+        my $digit = (split(//, Math::GMPz::Rmpz_get_str($z, 10)))[Math::GMPq::Rmpq_get_d($$y)];
+        defined($digit) ? _new_uint($digit) : $MONE;
+    }
+
     sub length {
         my $z = Math::GMPz::Rmpz_init();
         Math::GMPz::Rmpz_set_q($z, ${$_[0]});

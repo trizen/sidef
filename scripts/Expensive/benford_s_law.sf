@@ -3,7 +3,7 @@
 # Translation of: http://rosettacode.org/wiki/Benford's_law#Perl
 
 var (actuals, expected) = ([], []);
-var fibonacci = 1000.of {|i| fib(i-1).digits[0] }
+var fibonacci = 1000.of {|i| fib(i-1).digit(0) }
 
 { |i|
     var num = fibonacci.count { |j| j == i };

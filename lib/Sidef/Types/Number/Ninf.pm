@@ -122,6 +122,7 @@ package Sidef::Types::Number::Ninf {
     *next_pow2        = \&nan;
     *next_pow         = \&nan;
     *next_power       = \&nan;
+    *digit            = \&nan;
 
     sub as_bin {
         state $x = Sidef::Types::String::String->new;
