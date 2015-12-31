@@ -1,3 +1,4 @@
+.project
 bin/sidef
 Build.PL
 Changes
@@ -150,6 +151,7 @@ scripts/Games/bulls_and_cows.sf
 scripts/Games/bulls_and_cows_player.sf
 scripts/Games/conway_s_game_of_life.sf
 scripts/Games/forest_fire.sf
+scripts/Games/forest_fire_old.sf
 scripts/Games/guess_the_number.sf
 scripts/Games/guess_the_number_with_feedback.sf
 scripts/Games/guess_the_number_with_feedback__player_.sf
