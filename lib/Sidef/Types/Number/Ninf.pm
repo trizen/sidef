@@ -203,6 +203,16 @@ package Sidef::Types::Number::Ninf {
     *acot  = \&zero;
     *acoth = \&zero;
 
+    sub array_to { Sidef::Types::Array::Array->new }
+
+    *arr_to       = \&array_to;
+    *arr_downto   = \&array_to;
+    *array_downto = \&array_to;
+
+    # Probably, this ones should return each a RangeNumber object instead
+    *to     = \&array_to;
+    *downto = \&array_to;
+
     sub chr  { state $x = Sidef::Types::String::String->new('') }
     sub sign { state $x = Sidef::Types::String::String->new('-') }
 
@@ -360,6 +370,10 @@ package Sidef::Types::Number::Ninf {
         *{__PACKAGE__ . '::' . '=='}  = \&eq;
         *{__PACKAGE__ . '::' . '!='}  = \&ne;
         *{__PACKAGE__ . '::' . '≠'} = \&ne;
+        *{__PACKAGE__ . '::' . '..'}  = \&array_to;
+        *{__PACKAGE__ . '::' . '...'} = \&to;
+        *{__PACKAGE__ . '::' . '..^'} = \&to;
+        *{__PACKAGE__ . '::' . '^..'} = \&downto;
         *{__PACKAGE__ . '::' . '>'}   = \&gt;
         *{__PACKAGE__ . '::' . '>='}  = \&ge;
         *{__PACKAGE__ . '::' . '≥'} = \&ge;

@@ -1113,7 +1113,7 @@ package Sidef::Types::Number::Number {
         my $dz = Math::GMPz::Rmpz_init();
         Math::GMPq::Rmpq_get_den($dz, $x);
 
-        state $one_z = Math::GMPz::Rmpz_init_set_str(1, 10);
+        state $one_z = Math::GMPz::Rmpz_init_set_ui(1);
         not Math::GMPz::Rmpz_cmp($dz, $one_z);
     }
 
@@ -1745,20 +1745,24 @@ package Sidef::Types::Number::Number {
     sub array_to {
         my ($x, $y, $step) = @_;
 
+        _valid($y);
+
         my @array;
-        if (not defined($step)) {
-
-            _valid($y);
-
+        if (not defined($step) and _is_int($$x) and _is_int($$y)) {
             foreach my $i (Math::GMPq::Rmpq_get_d($$x) .. Math::GMPq::Rmpq_get_d($$y)) {
                 my $n = Math::GMPq::Rmpq_init();
-                Math::GMPq::Rmpq_set_str($n, $i, 10);
+                Math::GMPq::Rmpq_set_si($n, $i, 1);
                 push @array, bless(\$n, __PACKAGE__);
             }
         }
         else {
 
-            _valid($y, $step);
+            if (not defined $step) {
+                $step = $ONE;
+            }
+            else {
+                _valid($step);
+            }
 
             my $xq    = $$x;
             my $yq    = $$y;
@@ -1806,6 +1810,8 @@ package Sidef::Types::Number::Number {
 
         Sidef::Types::Array::Array->new(@array);
     }
+
+    *arr_downto = \&array_downto;
 
     # TODO: find a better solution which doesn't use Math::BigRat
     sub roundf {
