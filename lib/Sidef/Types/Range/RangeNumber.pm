@@ -13,12 +13,14 @@ package Sidef::Types::Range::RangeNumber {
         my (undef, $from, $to, $step) = @_;
 
         if (defined $to) {
-            $from = ref($from) ? $from->get_value : $from;
-            $to   = ref($to)   ? $to->get_value   : $to;
-            $step = ref($step) ? $step->get_value : defined($step) ? $step : 1;
+            Sidef::Types::Number::Number::_valid($from, $to, defined($step) ? $step : ());
+            $from = ref($from) ? $$from : $from;
+            $to   = ref($to)   ? $$to   : $to;
+            $step = ref($step) ? $$step : defined($step) ? $step : 1;
         }
         elsif (defined $from) {
-            $to   = ref($from) ? $from->get_value : $from;
+            Sidef::Types::Number::Number::_valid($from);
+            $to   = ref($from) ? $$from : $from;
             $from = 0;
             $step = 1;
         }
@@ -43,7 +45,8 @@ package Sidef::Types::Range::RangeNumber {
 
     sub by {
         my ($self, $step) = @_;
-        $self->{step} = $self->{step} < 0 ? -$step->get_value : $step->get_value;
+        Sidef::Types::Number::Number::_valid($step);
+        $self->{step} = $self->{step} < 0 ? -$$step : $$step;
         $self;
     }
 
@@ -79,8 +82,10 @@ package Sidef::Types::Range::RangeNumber {
     sub contains {
         my ($self, $num) = @_;
 
-        my $value = $num->get_value;
-        my ($min, $max) = map { $_->get_value } ($self->min, $self->max);
+        Sidef::Types::Number::Number::_valid($num);
+
+        my $value = $$num;
+        my ($min, $max) = ($self->{step} > 0 ? ($self->{from}, $self->{to}) : ($self->{to}, $self->{from}));
         my $step = $self->{step};
 
         Sidef::Types::Bool::Bool->new(

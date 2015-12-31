@@ -1014,6 +1014,8 @@ package Sidef::Types::String::String {
         Sidef::Types::Bool::Bool->new(Scalar::Util::looks_like_number($$self));
     }
 
+    *is_numeric = \&looks_like_number;
+
     sub is_palindrome {
         my ($self) = @_;
         Sidef::Types::Bool::Bool->new(${$self} eq CORE::reverse(${$self}));
