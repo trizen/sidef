@@ -509,6 +509,11 @@ package Sidef::Types::Number::Number {
 
     sub log2 {
         my ($x) = @_;
+
+        if (Math::GMPq::Rmpq_sgn($$x) < 0) {
+            return Sidef::Types::Number::Complex->new($x)->log2;
+        }
+
         my $r = Math::MPFR::Rmpfr_init2($PREC);
         Math::MPFR::Rmpfr_log2($r, _as_float($x), $ROUND);
         _mpfr2rat($r);
@@ -516,6 +521,11 @@ package Sidef::Types::Number::Number {
 
     sub log10 {
         my ($x) = @_;
+
+        if (Math::GMPq::Rmpq_sgn($$x) < 0) {
+            return Sidef::Types::Number::Complex->new($x)->log10;
+        }
+
         my $r = Math::MPFR::Rmpfr_init2($PREC);
         Math::MPFR::Rmpfr_log10($r, _as_float($x), $ROUND);
         _mpfr2rat($r);
