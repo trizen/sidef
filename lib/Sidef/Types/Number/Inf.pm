@@ -142,8 +142,10 @@ package Sidef::Types::Number::Inf {
     *max              = \&inf;
     *abs              = \&inf;
     *sqrt             = \&inf;
+    *isqrt            = \&inf;
     *cbrt             = \&inf;
     *root             = \&inf;
+    *iroot            = \&inf;
     *sqr              = \&inf;
     *log              = \&inf;
     *log2             = \&inf;

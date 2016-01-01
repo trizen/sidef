@@ -454,7 +454,6 @@ scripts/RosettaCode/reverse_a_string.sf
 scripts/RosettaCode/reverse_words_in_a_string.sf
 scripts/RosettaCode/roots_of_a_quadratic_function.sf
 scripts/RosettaCode/roots_of_unity_1.sf
-scripts/RosettaCode/roots_of_unity_2.sf
 scripts/RosettaCode/rpn_calculator_algorithm.sf
 scripts/RosettaCode/rpn_to_infix_conversion.sf
 scripts/RosettaCode/runge-kutta_method.sf
@@ -647,6 +646,7 @@ scripts/Tests/Module/YouTube.sm
 scripts/Tests/module_definition.sf
 scripts/Tests/module_loading.sf
 scripts/Tests/module_order_and_redeclaration.sf
+scripts/Tests/modulo.sf
 scripts/Tests/multi_file_edit.sf
 scripts/Tests/multi_functions.sf
 scripts/Tests/multi_methods.sf

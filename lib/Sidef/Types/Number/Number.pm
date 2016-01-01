@@ -107,9 +107,9 @@ package Sidef::Types::Number::Number {
             return state $x = nan();
         }
 
-            my $r = Math::GMPq::Rmpq_init();
-            Math::MPFR::Rmpfr_get_q($r, $_[0]);
-            bless \$r, __PACKAGE__;
+        my $r = Math::GMPq::Rmpq_init();
+        Math::MPFR::Rmpfr_get_q($r, $_[0]);
+        bless \$r, __PACKAGE__;
     }
 
     sub _mpz2rat {
@@ -131,7 +131,8 @@ package Sidef::Types::Number::Number {
             $sign = '';
         }
 
-        if ((my $i = index($str, 'e')) != -1) {
+        my $i;
+        if (($i = index($str, 'e')) != -1) {
 
             my $exp = substr($str, $i + 1);
             my ($before, $after) = split(/\./, substr($str, 0, $i));
@@ -155,7 +156,7 @@ package Sidef::Types::Number::Number {
 
             "$sign$numerator/$denominator";
         }
-        elsif ((my $i = index($str, '.')) != -1) {
+        elsif (($i = index($str, '.')) != -1) {
             my ($before, $after) = (substr($str, 0, $i), substr($str, $i + 1));
             if ($after =~ tr/0// == length($after)) {
                 return "$sign$before";
@@ -316,7 +317,7 @@ package Sidef::Types::Number::Number {
 
         _valid($y);
 
-        if (not Math::GMPq::Rmpq_sgn($$y)) {
+        if (CORE::not Math::GMPq::Rmpq_sgn($$y)) {
             my $sign = Math::GMPq::Rmpq_sgn($$x);
             return (!$sign ? nan() : $sign > 0 ? inf() : ninf());
         }
@@ -437,7 +438,7 @@ package Sidef::Types::Number::Number {
             return _mpz2rat($z);
         }
 
-        if (Math::GMPq::Rmpq_sgn($$x) < 0 and not _is_int($$y)) {
+        if (Math::GMPq::Rmpq_sgn($$x) < 0 and CORE::not _is_int($$y)) {
             return Sidef::Types::Number::Complex->new($x)->pow($y);
         }
 
@@ -1035,7 +1036,7 @@ package Sidef::Types::Number::Number {
 
     sub is_zero {
         my ($x) = @_;
-        if (not Math::GMPq::Rmpq_sgn($$x)) {
+        if (CORE::not Math::GMPq::Rmpq_sgn($$x)) {
             state $z = Sidef::Types::Bool::Bool->true;
         }
         else {
@@ -1083,7 +1084,7 @@ package Sidef::Types::Number::Number {
         if ($sign > 0) {
             state $z = Sidef::Types::String::String->new('+');
         }
-        elsif (not $sign) {
+        elsif (CORE::not $sign) {
             state $z = Sidef::Types::String::String->new('');
         }
         else {
@@ -1098,7 +1099,7 @@ package Sidef::Types::Number::Number {
         Math::GMPq::Rmpq_get_den($dz, $x);
 
         state $one_z = Math::GMPz::Rmpz_init_set_ui(1);
-        not Math::GMPz::Rmpz_cmp($dz, $one_z);
+        CORE::not Math::GMPz::Rmpz_cmp($dz, $one_z);
     }
 
     sub is_int {
@@ -1119,7 +1120,7 @@ package Sidef::Types::Number::Number {
     sub is_even {
         my ($x) = @_;
 
-        if (not _is_int($$x)) {
+        if (CORE::not _is_int($$x)) {
             return state $z = Sidef::Types::Bool::Bool->false;
         }
 
@@ -1137,7 +1138,7 @@ package Sidef::Types::Number::Number {
     sub is_odd {
         my ($x) = @_;
 
-        if (not _is_int($$x)) {
+        if (CORE::not _is_int($$x)) {
             return state $z = Sidef::Types::Bool::Bool->false;
         }
 
@@ -1362,25 +1363,48 @@ package Sidef::Types::Number::Number {
         _mpz2rat($r);
     }
 
+    sub isqrt {
+        my ($x) = @_;
+        my $r = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_sqrt($r, _as_int($x));
+        _mpz2rat($r);
+    }
+
+    sub iroot {
+        my ($x, $y) = @_;
+
+        if (ref($y) eq 'Sidef::Types::Number::Inf' or ref($y) eq 'Sidef::Types::Number::Ninf') {
+            return $ONE;
+        }
+
+        _valid($y);
+        my $r = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_root($r, _as_int($x), CORE::int(Math::GMPq::Rmpq_get_d($$y)));
+        _mpz2rat($r);
+    }
+
     sub mod {
         my ($x, $y) = @_;
         _valid($y);
 
         if (_is_int($$x) and _is_int($$y)) {
-            my $r  = Math::GMPz::Rmpz_init();
-            my $yz = _as_int($y);
-            return nan() if !Math::GMPz::Rmpz_sgn($yz);
+            my $r      = Math::GMPz::Rmpz_init();
+            my $yz     = _as_int($y);
+            my $sign_y = Math::GMPz::Rmpz_sgn($yz);
+            return nan() if !$sign_y;
             Math::GMPz::Rmpz_mod($r, _as_int($x), $yz);
+            Math::GMPz::Rmpz_add($r, $r, $yz) if ($sign_y < 0);
             _mpz2rat($r);
         }
         else {
             my $r  = Math::MPFR::Rmpfr_init2($PREC);
             my $yf = _as_float($y);
             Math::MPFR::Rmpfr_fmod($r, _as_float($x), $yf, $ROUND);
-            if (not Math::MPFR::Rmpfr_sgn($r)) {
+            my $sign = Math::MPFR::Rmpfr_sgn($r);
+            if (CORE::not $sign) {
                 return $ZERO;
             }
-            elsif ((Math::MPFR::Rmpfr_sgn($r) > 0) != (Math::MPFR::Rmpfr_sgn($yf) > 0)) {
+            elsif (($sign > 0) ne (Math::MPFR::Rmpfr_sgn($yf) > 0)) {
                 Math::MPFR::Rmpfr_add($r, $r, $yf, $ROUND);
             }
             _mpfr2rat($r);
@@ -1562,7 +1586,7 @@ package Sidef::Types::Number::Number {
     sub is_square {
         my ($x) = @_;
 
-        if (not _is_int($$x)) {
+        if (CORE::not _is_int($$x)) {
             return state $z = Sidef::Types::Bool::Bool->false;
         }
 
@@ -1582,7 +1606,7 @@ package Sidef::Types::Number::Number {
     sub is_power {
         my ($x) = @_;
 
-        if (not _is_int($$x)) {
+        if (CORE::not _is_int($$x)) {
             return state $z = Sidef::Types::Bool::Bool->false;
         }
 
@@ -1733,7 +1757,7 @@ package Sidef::Types::Number::Number {
         _valid($y);
 
         my @array;
-        if (not defined($step) and _is_int($$x) and _is_int($$y)) {
+        if (CORE::not defined($step) and _is_int($$x) and _is_int($$y)) {
             foreach my $i (Math::GMPq::Rmpq_get_d($$x) .. Math::GMPq::Rmpq_get_d($$y)) {
                 my $n = Math::GMPq::Rmpq_init();
                 Math::GMPq::Rmpq_set_si($n, $i, 1);
@@ -1742,7 +1766,7 @@ package Sidef::Types::Number::Number {
         }
         else {
 
-            if (not defined $step) {
+            if (CORE::not defined $step) {
                 $step = $ONE;
             }
             else {
@@ -1771,7 +1795,7 @@ package Sidef::Types::Number::Number {
     sub array_downto {
         my ($x, $y, $step) = @_;
 
-        if (not defined $step) {
+        if (CORE::not defined $step) {
             _valid($y);
             $step = $ONE;
         }

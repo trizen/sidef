@@ -79,7 +79,7 @@ package Sidef::Parser {
                      | Ref\b                          (?{ state $x = bless({}, 'Sidef::Variable::Ref') })
                      | LazyMethod\b                   (?{ state $x = Sidef::Variable::LazyMethod->new })
                      | Time\b                         (?{ state $x = Sidef::Time::Time->new })
-                     | Complex\b                      (?{ state $x = Sidef::Types::Number::Complex->new })
+                     | Complex\b                      (?{ state $x = Sidef::Types::Number::Complex->new(0, 0) })
                      | Sig\b                          (?{ state $x = Sidef::Sys::Sig->new })
                      | Sys\b                          (?{ state $x = Sidef::Sys::Sys->new })
                      | Regexp?\b                      (?{ state $x = Sidef::Types::Regex::Regex->new('') })

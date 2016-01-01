@@ -227,7 +227,15 @@ package Sidef::Types::Number::Ninf {
     #
     sub asin { state $x = Sidef::Types::Number::Complex->new(0, '@inf@') }
 
-    *sqrt = \&asin;
+    *sqrt  = \&asin;
+    *isqrt = \&asin;
+
+    #
+    ## (-inf)^(1/x) = i^(1/x) * inf
+    ## However, returning inf*i is good enough!
+    #
+    *root  = \&asin;
+    *iroot = \&asin;
 
     #
     ## acos(-inf) = -inf*i

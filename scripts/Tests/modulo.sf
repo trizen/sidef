@@ -1,0 +1,24 @@
+#!/usr/bin/ruby
+
+#
+## Tests for the modulo operator
+#
+
+var m = 5;
+var x = (100! + m);
+var y = 23;
+
+assert_eq( x %  y,     m);
+assert_eq(-x % -y,    -m);
+assert_eq( x % -y, m - y);
+assert_eq(-x %  y, y - m);
+
+var f1 = 399.8;
+var f2 = 41.2;
+
+assert_eq( f1 %  f2 -> roundf( 0),    29);
+assert_eq(-f1 % -f2 -> roundf( 0),   -29);
+assert_eq( f1 % -f2 -> roundf(-1), -12.2);
+assert_eq(-f1 %  f2 -> roundf(-1),  12.2);
+
+say "** Test passed!";

@@ -42,7 +42,15 @@ package Sidef::Types::Number::Complex {
         }
 
         if (not defined($y)) {
-            return bless(\Math::MPC->new($x // 0), __PACKAGE__);
+            my $r = Math::MPC::Rmpc_init2($PREC);
+            if (ref($x) eq 'Math::GMPq') {
+                Math::MPC::Rmpc_set_q($r, $x, $ROUND);
+            }
+            else {
+                Math::MPC::Rmpc_set_str($r, $x, 10, $ROUND);
+            }
+
+            return (bless \$r, __PACKAGE__);
         }
         elsif (ref($y) eq 'Sidef::Types::Number::Number') {
             $y = $$y;
@@ -54,7 +62,38 @@ package Sidef::Types::Number::Complex {
             $y = $y->get_value;
         }
 
-        bless \Math::MPC->new($x, $y), __PACKAGE__;
+        my $r = Math::MPC::Rmpc_init2($PREC);
+
+        if (ref($x) eq 'Math::GMPq') {
+            if (ref($y) eq 'Math::GMPq') {
+                Math::MPC::Rmpc_set_q_q($r, $x, $y, $ROUND);
+            }
+            else {
+                my $y_fr = Math::MPFR::Rmpfr_init2($PREC);
+                Math::MPFR::Rmpfr_set_str($y_fr, $y, 10, $Sidef::Types::Number::Number::ROUND);
+                Math::MPC::Rmpc_set_q_fr($r, $x, $y_fr, $ROUND);
+            }
+        }
+        elsif (ref($y) eq 'Math::GMPq') {
+            my $x_fr = Math::MPFR::Rmpfr_init2($PREC);
+            Math::MPFR::Rmpfr_set_str($x_fr, $x, 10, $Sidef::Types::Number::Number::ROUND);
+            Math::MPC::Rmpc_set_fr_q($r, $x_fr, $y, $ROUND);
+        }
+        else {
+            my $x_fr = Math::MPFR::Rmpfr_init2($PREC);
+            Math::MPFR::Rmpfr_set_str($x_fr, $x, 10, $Sidef::Types::Number::Number::ROUND);
+
+            my $y_fr = Math::MPFR::Rmpfr_init2($PREC);
+            Math::MPFR::Rmpfr_set_str($y_fr, $y, 10, $Sidef::Types::Number::Number::ROUND);
+
+            Math::MPC::Rmpc_set_fr_fr($r, $x_fr, $y_fr, $ROUND);
+
+            #my $x_q = Math::GMPq->new(Sidef::Types::Number::Number::_str2rat($x), 10);
+            #my $y_q = Math::GMPq->new(Sidef::Types::Number::Number::_str2rat($y), 10);
+            #Math::MPC::Rmpc_set_q_q($r, $x_q, $y_q, $ROUND);
+        }
+
+        bless \$r, __PACKAGE__;
     }
 
     *call = \&new;
@@ -129,16 +168,16 @@ package Sidef::Types::Number::Complex {
 
     sub pi {
         my $pi = Math::MPFR::Rmpfr_init2($PREC);
-        Math::MPFR::Rmpfr_const_pi($pi, $ROUND);
+        Math::MPFR::Rmpfr_const_pi($pi, $Sidef::Types::Number::Number::ROUND);
         my $cplx_pi = Math::MPC::Rmpc_init2($PREC);
         Math::MPC::Rmpc_set_fr($cplx_pi, $pi, $ROUND);
         _new($cplx_pi);
     }
 
     sub e {
-        state $one_f = (Math::MPFR::Rmpfr_init_set_ui(1, $ROUND))[0];
+        state $one_f = (Math::MPFR::Rmpfr_init_set_ui(1, $Sidef::Types::Number::Number::ROUND))[0];
         my $e = Math::MPFR::Rmpfr_init2($PREC);
-        Math::MPFR::Rmpfr_exp($e, $one_f, $ROUND);
+        Math::MPFR::Rmpfr_exp($e, $one_f, $Sidef::Types::Number::Number::ROUND);
         my $cplx_e = Math::MPC::Rmpc_init2($PREC);
         Math::MPC::Rmpc_set_fr($cplx_e, $e, $ROUND);
         _new($cplx_e);
@@ -153,14 +192,14 @@ package Sidef::Types::Number::Complex {
     }
 
     sub phi {
-        state $one_f  = (Math::MPFR::Rmpfr_init_set_ui(1, $ROUND))[0];
-        state $two_f  = (Math::MPFR::Rmpfr_init_set_ui(2, $ROUND))[0];
-        state $five_f = (Math::MPFR::Rmpfr_init_set_ui(5, $ROUND))[0];
+        state $one_f  = (Math::MPFR::Rmpfr_init_set_ui(1, $Sidef::Types::Number::Number::ROUND))[0];
+        state $two_f  = (Math::MPFR::Rmpfr_init_set_ui(2, $Sidef::Types::Number::Number::ROUND))[0];
+        state $five_f = (Math::MPFR::Rmpfr_init_set_ui(5, $Sidef::Types::Number::Number::ROUND))[0];
 
         my $phi = Math::MPFR::Rmpfr_init2($PREC);
-        Math::MPFR::Rmpfr_sqrt($phi, $five_f, $ROUND);
-        Math::MPFR::Rmpfr_add($phi, $phi, $one_f, $ROUND);
-        Math::MPFR::Rmpfr_div($phi, $phi, $two_f, $ROUND);
+        Math::MPFR::Rmpfr_sqrt($phi, $five_f, $Sidef::Types::Number::Number::ROUND);
+        Math::MPFR::Rmpfr_add($phi, $phi, $one_f, $Sidef::Types::Number::Number::ROUND);
+        Math::MPFR::Rmpfr_div($phi, $phi, $two_f, $Sidef::Types::Number::Number::ROUND);
 
         my $cplx_phi = Math::MPC::Rmpc_init2($PREC);
         Math::MPC::Rmpc_set_fr($cplx_phi, $phi, $ROUND);
@@ -187,7 +226,9 @@ package Sidef::Types::Number::Complex {
 
     sub real {
         my $mpfr = Math::MPFR::Rmpfr_init2($PREC);
-        Math::MPC::Rmpc_real($mpfr, ${$_[0]}, $ROUND);
+        Math::MPC::RMPC_RE($mpfr, ${$_[0]});
+
+        #Math::MPC::Rmpc_real($mpfr, ${$_[0]}, $ROUND);
         Sidef::Types::Number::Number::_mpfr2rat($mpfr);
     }
 
@@ -195,7 +236,9 @@ package Sidef::Types::Number::Complex {
 
     sub imag {
         my $mpfr = Math::MPFR::Rmpfr_init2($PREC);
-        Math::MPC::Rmpc_imag($mpfr, ${$_[0]}, $ROUND);
+        Math::MPC::RMPC_IM($mpfr, ${$_[0]});
+
+        #Math::MPC::Rmpc_imag($mpfr, ${$_[0]}, $ROUND);
         Sidef::Types::Number::Number::_mpfr2rat($mpfr);
     }
 
@@ -294,6 +337,12 @@ package Sidef::Types::Number::Complex {
         _new($r);
     }
 
+    sub root {
+        my ($x, $y) = @_;
+        state $one = __PACKAGE__->new(1);
+        return $x->pow($one->div($y));
+    }
+
     sub sqrt {
         my ($x) = @_;
         my $r = Math::MPC::Rmpc_init2($PREC);
@@ -321,7 +370,7 @@ package Sidef::Types::Number::Complex {
             }
             else {
                 my $baseln = Math::MPFR::Rmpfr_init2($PREC);
-                Math::MPFR::Rmpfr_log($baseln, $y->_as_float(), $ROUND);
+                Math::MPFR::Rmpfr_log($baseln, $y->_as_float(), $Sidef::Types::Number::Number::ROUND);
                 Math::MPC::Rmpc_div_fr($r, $r, $baseln, $ROUND);
             }
         }
@@ -341,10 +390,10 @@ package Sidef::Types::Number::Complex {
         my $r = Math::MPC::Rmpc_init2($PREC);
         Math::MPC::Rmpc_log($r, $$x, $ROUND);
 
-        state $two = (Math::MPFR::Rmpfr_init_set_ui(2, $ROUND))[0];
+        state $two = (Math::MPFR::Rmpfr_init_set_ui(2, $Sidef::Types::Number::Number::ROUND))[0];
 
         my $baseln = Math::MPFR::Rmpfr_init2($PREC);
-        Math::MPFR::Rmpfr_log($baseln, $two, $ROUND);
+        Math::MPFR::Rmpfr_log($baseln, $two, $Sidef::Types::Number::Number::ROUND);
         Math::MPC::Rmpc_div_fr($r, $r, $baseln, $ROUND);
 
         _new($r);

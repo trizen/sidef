@@ -854,7 +854,7 @@ package Sidef::Types::Array::Array {
     sub all {
         my ($self, $code) = @_;
 
-        @{$self} || return state $x = Sidef::Types::Bool::Bool->false;
+        @{$self} || return state $z = Sidef::Types::Bool::Bool->false;
 
         foreach my $val (@{$self}) {
             if (not $code->run($val)) {

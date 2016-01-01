@@ -6,21 +6,21 @@
 
 class MyInt(Number value {|n| (n <= 10) && (n >= 1) && n.is_int } ) {
 
-    method ==(arg) {
-        self.get_value == arg.get_value;
-    }
-
+    method ==(arg)   { self.value == arg.value }
     method to_s      { value.to_s }
-    method get_value { value.get_value }
 
-    method AUTOLOAD(_, name, *args) {
-        var result = value.(name)(args...);
+    method +(Number arg) { MyInt(value + arg.int) }
+    method +(arg)        { self + arg.value }
 
-        result.is_a(Number) &&
-            return MyInt(result.int);
+    method /(Number arg) { MyInt(value / arg.int -> int) }
+    method /(arg)        { self / arg.value }
 
-        result;
-    }
+    method -(Number arg) { MyInt(value - arg.int) }
+    method -(arg)        { self - arg.value }
+
+    method *(Number arg) { MyInt(value - arg.int -> int) }
+    method *(arg)        { self * arg.value }
+
 }
 
 #
@@ -35,8 +35,6 @@ var b = (a - 3);     # b is of type `MyInt`
 say b;               # => 6
 
 assert_eq(b, MyInt(6));
-
-say a.as_hex.dump;   # => "9" -- an hexadecimal string
 
 a -= 7;              # a=2
 say (a + b);         # => 8 -- the result of (2 + 6)
