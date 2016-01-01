@@ -113,6 +113,14 @@ Aliases: I<call>
 
 =cut
 
+=head2 reduce
+
+RangeNumber.reduce() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 reverse
 
 RangeNumber.reverse() -> I<Obj>

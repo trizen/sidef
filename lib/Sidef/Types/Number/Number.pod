@@ -278,6 +278,38 @@ Return the
 
 =cut
 
+=head2 acot
+
+Number.acot() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 acoth
+
+Number.acoth() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 acsc
+
+Number.acsc() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 acsch
+
+Number.acsch() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 agm
 
 Number.agm() -> I<Obj>
@@ -286,17 +318,35 @@ Return the
 
 =cut
 
-=head2 array_downto
+=head2 arr_downto
 
-Number.array_downto() -> I<Obj>
+Number.arr_downto() -> I<Obj>
 
 Return the
+
+Aliases: I<array_downto>
 
 =cut
 
 =head2 as_bin
 
 Number.as_bin() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 asec
+
+Number.asec() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 asech
+
+Number.asech() -> I<Obj>
 
 Return the
 
@@ -342,6 +392,14 @@ Return the
 
 =cut
 
+=head2 atan2
+
+Number.atan2() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 atanh
 
 Number.atanh() -> I<Obj>
@@ -350,19 +408,13 @@ Return the
 
 =cut
 
-=head2 bin
+=head2 base
 
-Number.bin() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 binomial
-
-Number.binomial() -> I<Obj>
+Number.base() -> I<Obj>
 
 Return the
+
+Aliases: I<in_base>
 
 =cut
 
@@ -385,6 +437,14 @@ Return the
 =head2 chr
 
 Number.chr() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 commify
+
+Number.commify() -> I<Obj>
 
 Return the
 
@@ -448,6 +508,22 @@ Aliases: I<denominator>
 
 =cut
 
+=head2 deg2grad
+
+Number.deg2grad() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 deg2rad
+
+Number.deg2rad() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 dfac
 
 Number.dfac() -> I<Obj>
@@ -461,6 +537,14 @@ Aliases: I<double_factorial>
 =head2 digamma
 
 Number.digamma() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 digit
+
+Number.digit() -> I<Obj>
 
 Return the
 
@@ -618,6 +702,22 @@ Return the
 
 =cut
 
+=head2 grad2deg
+
+Number.grad2deg() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 grad2rad
+
+Number.grad2rad() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 hypot
 
 Number.hypot() -> I<Obj>
@@ -686,6 +786,14 @@ Aliases: I<modinv>
 
 =cut
 
+=head2 iroot
+
+Number.iroot() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 is_even
 
 Number.is_even() -> I<Obj>
@@ -728,6 +836,14 @@ Aliases: I<is_negative>
 
 =cut
 
+=head2 is_ninf
+
+Number.is_ninf() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 is_odd
 
 Number.is_odd() -> I<Obj>
@@ -767,6 +883,22 @@ Aliases: I<is_power>
 =head2 is_prime
 
 Number.is_prime() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 isqrt
+
+Number.isqrt() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 is_real
+
+Number.is_real() -> I<Obj>
 
 Return the
 
@@ -859,6 +991,22 @@ Return the
 =head2 ln
 
 Number.ln() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 ln2
+
+Number.ln2() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 lngamma
+
+Number.lngamma() -> I<Obj>
 
 Return the
 
@@ -976,6 +1124,16 @@ Return the
 
 =cut
 
+=head2 nok
+
+Number.nok() -> I<Obj>
+
+Return the
+
+Aliases: I<binomial>
+
+=cut
+
 =head2 nu
 
 Number.nu() -> I<Obj>
@@ -1023,6 +1181,22 @@ Return the
 =head2 primorial
 
 Number.primorial() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 rad2deg
+
+Number.rad2deg() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 rad2grad
+
+Number.rad2grad() -> I<Obj>
 
 Return the
 
@@ -1092,6 +1266,14 @@ Return the
 
 =cut
 
+=head2 sign
+
+Number.sign() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 sin
 
 Number.sin() -> I<Obj>
@@ -1140,6 +1322,14 @@ Return the
 
 =cut
 
+=head2 tau
+
+Number.tau() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 times
 
 Number.times() -> I<Obj>
@@ -1183,6 +1373,14 @@ I<Obj> B<~> I<Obj> -> I<Obj>
 Return the
 
 Aliases: I<not>
+
+=cut
+
+=head2 γ
+
+Number.γ() -> I<Obj>
+
+Return the
 
 =cut
 

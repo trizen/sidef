@@ -334,16 +334,6 @@ Return the
 
 =cut
 
-=head2 dec
-
-String.dec() -> I<Obj>
-
-Return the
-
-Aliases: I<num>
-
-=cut
-
 =head2 decode
 
 String.decode() -> I<Obj>
@@ -600,6 +590,16 @@ Return the
 
 =cut
 
+=head2 is_numeric
+
+String.is_numeric() -> I<Obj>
+
+Return the
+
+Aliases: I<looks_like_number>
+
+=cut
+
 =head2 is_palindrome
 
 String.is_palindrome() -> I<Obj>
@@ -678,14 +678,6 @@ Return the
 
 =cut
 
-=head2 looks_like_number
-
-String.looks_like_number() -> I<Obj>
-
-Return the
-
-=cut
-
 =head2 new
 
 String.new() -> I<Obj>
@@ -693,6 +685,14 @@ String.new() -> I<Obj>
 Return the
 
 Aliases: I<call>
+
+=cut
+
+=head2 num
+
+String.num() -> I<Obj>
+
+Return the
 
 =cut
 
