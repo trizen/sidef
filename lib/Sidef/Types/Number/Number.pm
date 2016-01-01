@@ -5,7 +5,6 @@ package Sidef::Types::Number::Number {
 
     require Math::GMPq;
     require Math::GMPz;
-    require Math::GMPf;
     require Math::MPFR;
 
     use parent qw(
@@ -108,24 +107,9 @@ package Sidef::Types::Number::Number {
             return state $x = nan();
         }
 
-        if (Math::MPFR::Rmpfr_integer_p($_[0])) {
-            my $z = Math::GMPz::Rmpz_init_nobless();
-            Math::MPFR::Rmpfr_get_z($z, $_[0], $ROUND);
-
             my $r = Math::GMPq::Rmpq_init();
-            Math::GMPq::Rmpq_set_z($r, $z);
-            Math::GMPz::Rmpz_clear($z);
+            Math::MPFR::Rmpfr_get_q($r, $_[0]);
             bless \$r, __PACKAGE__;
-        }
-        else {
-            my $f = Math::GMPf::Rmpf_init2_nobless($PREC);
-            Math::MPFR::Rmpfr_get_f($f, $_[0], $ROUND);
-
-            my $r = Math::GMPq::Rmpq_init();
-            Math::GMPq::Rmpq_set_f($r, $f);
-            Math::GMPf::Rmpf_clear($f);
-            bless \$r, __PACKAGE__;
-        }
     }
 
     sub _mpz2rat {
