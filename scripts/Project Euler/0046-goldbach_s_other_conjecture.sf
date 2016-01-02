@@ -8,7 +8,7 @@
 
 var ntheory = frequire('ntheory');
 
-range(3, Math.inf, 2).each { |n|
+range(3, 1e100, 2).each { |n|
     ntheory.is_prime(n) && next;
 
     range(1, (n/2).sqrt.int).each { |i|

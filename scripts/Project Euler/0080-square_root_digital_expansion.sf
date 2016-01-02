@@ -7,19 +7,18 @@
 # Answer: 40886
 
 var sum = 0;
-Math.accuracy(102);
+
+local Num!PREC = 105*3.3;
 
 for (1 ..^ 100) { |i|
 
-    var sr = i.sqrt;
-    next if sr.is_int;
+    i.is_square && next;
 
-    var x = sr.to_s;
+    var x = i.sqrt.to_s;
     x -= /\./;
     x.substr!(0, 100);
 
     sum += x.to_i.digits.sum;
 }
 
-say sum.int;
-Math.accuracy(0);
+say sum;

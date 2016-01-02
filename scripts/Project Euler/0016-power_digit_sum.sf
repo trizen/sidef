@@ -7,4 +7,4 @@
 
 # Answer: 1366
 
-say (2**1000 -> to_chars.map{.to_i}.sum);
+say (2**1000 -> digits.sum);
