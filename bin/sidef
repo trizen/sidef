@@ -637,7 +637,9 @@ sub __load_sidef_module__ {
         my $module = $name =~ s{::}{/}gr . '.pm';
         if (exists $MODULE{$name} and not exists $INC{$module}) {
              while ($MODULE{$name} =~ /^\h*(?:use parent\s+qw\((.*?)\)|require (Sidef::[\w:]+))/smg) {
-                __load_sidef_module__($_) for split(' ', $+);
+                foreach my $mod (split(' ', $+)) {
+                    __load_sidef_module__($mod) if not exists $REQ{$mod};
+                }
             }
             $INC{$module} = 1;
             eval($MODULE{$name});
