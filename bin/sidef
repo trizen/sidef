@@ -611,7 +611,7 @@ HEAD
                  my $token   = tr/A-Za-z0-9/_/cr;
                  my $content = <$fh>;
 
-                 if ($content =~ /^(?>##\h*)?package\h+([\w:]+)/) {
+                 if ($content =~ /^package\h+([\w:]+)/) {
                      $package_content .= qq{'$1' => };
                  }
                  else {
@@ -636,8 +636,8 @@ sub __load_sidef_module__ {
     if (not exists $REQ{$name}) {
         my $module = $name =~ s{::}{/}gr . '.pm';
         if (exists $MODULE{$name} and not exists $INC{$module}) {
-             if ($MODULE{$name} =~ /^\h*use parent\s+qw\((.*?)\)/sm) {
-                __load_sidef_module__($_) for split(' ', $1);
+             while ($MODULE{$name} =~ /^\h*(?:use parent\s+qw\((.*?)\)|require (Sidef::[\w:]+))/smg) {
+                __load_sidef_module__($_) for split(' ', $+);
             }
             $INC{$module} = 1;
             eval($MODULE{$name});
