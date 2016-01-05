@@ -821,6 +821,7 @@ package Sidef::Types::String::String {
     *len       = \&chars_length;
     *length    = \&chars_length;
     *chars_len = \&chars_length;
+    *size      = \&chars_length;
 
     sub graphs_length {
         Sidef::Types::Number::Number->new(scalar(() = ${$_[0]} =~ /\X/g));

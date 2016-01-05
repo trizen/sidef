@@ -71,7 +71,8 @@ package Sidef::Types::Hash::Hash {
         Sidef::Types::Number::Number->new(scalar CORE::keys %$self);
     }
 
-    *len = \&length;
+    *len  = \&length;
+    *size = \&length;
 
     sub eq {
         my ($self, $obj) = @_;
