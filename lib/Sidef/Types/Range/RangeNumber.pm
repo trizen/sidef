@@ -112,8 +112,8 @@ package Sidef::Types::Range::RangeNumber {
         if (    $step == 1
             and $to <   (-1 >> 1)
             and $from < (-1 >> 1)
-            and (ref($from) ? Sidef::Types::Number::Number::_is_int($from) : 1)
-            and (ref($to)   ? Sidef::Types::Number::Number::_is_int($to)   : 1)) {
+            and (ref($from) ? Math::GMPq::Rmpq_integer_p($from) : 1)
+            and (ref($to)   ? Math::GMPq::Rmpq_integer_p($to)   : 1)) {
             foreach my $i ($from .. $to) {
                 if (defined(my $res = $code->_run_code(Sidef::Types::Number::Number::_new_int($i)))) {
                     return $res;
@@ -150,8 +150,8 @@ package Sidef::Types::Range::RangeNumber {
         if (    $step == 1
             and $to <   (-1 >> 1)
             and $from < (-1 >> 1)
-            and (ref($from) ? Sidef::Types::Number::Number::_is_int($from) : 1)
-            and (ref($to)   ? Sidef::Types::Number::Number::_is_int($to)   : 1)) {
+            and (ref($from) ? Math::GMPq::Rmpq_integer_p($from) : 1)
+            and (ref($to)   ? Math::GMPq::Rmpq_integer_p($to)   : 1)) {
             foreach my $i ($from .. $to) {
                 push @values, $code->run(Sidef::Types::Number::Number::_new_int($i));
             }
@@ -183,8 +183,8 @@ package Sidef::Types::Range::RangeNumber {
         if (    $step == 1
             and $to <   (-1 >> 1)
             and $from < (-1 >> 1)
-            and (ref($from) ? Sidef::Types::Number::Number::_is_int($from) : 1)
-            and (ref($to)   ? Sidef::Types::Number::Number::_is_int($to)   : 1)) {
+            and (ref($from) ? Math::GMPq::Rmpq_integer_p($from) : 1)
+            and (ref($to)   ? Math::GMPq::Rmpq_integer_p($to)   : 1)) {
             foreach my $i ($from .. $to) {
                 my $num = Sidef::Types::Number::Number::_new_int($i);
                 push(@values, $num) if $code->run($num);
@@ -220,8 +220,8 @@ package Sidef::Types::Range::RangeNumber {
         if (    $step == 1
             and $to <   (-1 >> 1)
             and $from < (-1 >> 1)
-            and (ref($from) ? Sidef::Types::Number::Number::_is_int($from) : 1)
-            and (ref($to)   ? Sidef::Types::Number::Number::_is_int($to)   : 1)) {
+            and (ref($from) ? Math::GMPq::Rmpq_integer_p($from) : 1)
+            and (ref($to)   ? Math::GMPq::Rmpq_integer_p($to)   : 1)) {
             foreach my $i ($from + 1 .. $to) {
                 my $num = Sidef::Types::Number::Number::_new_int($i);
                 $value = $code->run($value, $num);

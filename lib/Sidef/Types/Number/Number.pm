@@ -431,14 +431,14 @@ package Sidef::Types::Number::Number {
 
         _valid($y);
 
-        if (Math::GMPq::Rmpq_sgn($$y) >= 0 and _is_int($$x) and _is_int($$y)) {
+        if (Math::GMPq::Rmpq_sgn($$y) >= 0 and Math::GMPq::Rmpq_integer_p($$x) and Math::GMPq::Rmpq_integer_p($$y)) {
             my $z = Math::GMPz::Rmpz_init();
             Math::GMPz::Rmpz_set_q($z, $$x);
             Math::GMPz::Rmpz_pow_ui($z, $z, Math::GMPq::Rmpq_get_d($$y));
             return _mpz2rat($z);
         }
 
-        if (Math::GMPq::Rmpq_sgn($$x) < 0 and CORE::not _is_int($$y)) {
+        if (Math::GMPq::Rmpq_sgn($$x) < 0 and CORE::not Math::GMPq::Rmpq_integer_p($$y)) {
             return Sidef::Types::Number::Complex->new($x)->pow($y);
         }
 
@@ -1092,19 +1092,9 @@ package Sidef::Types::Number::Number {
         }
     }
 
-    sub _is_int {
-        my ($x) = @_;
-
-        my $dz = Math::GMPz::Rmpz_init();
-        Math::GMPq::Rmpq_get_den($dz, $x);
-
-        state $one_z = Math::GMPz::Rmpz_init_set_ui(1);
-        CORE::not Math::GMPz::Rmpz_cmp($dz, $one_z);
-    }
-
     sub is_int {
         my ($x) = @_;
-        if (_is_int($$x)) {
+        if (Math::GMPq::Rmpq_integer_p($$x)) {
             state $z = Sidef::Types::Bool::Bool->true;
         }
         else {
@@ -1120,7 +1110,7 @@ package Sidef::Types::Number::Number {
     sub is_even {
         my ($x) = @_;
 
-        if (CORE::not _is_int($$x)) {
+        if (CORE::not Math::GMPq::Rmpq_integer_p($$x)) {
             return state $z = Sidef::Types::Bool::Bool->false;
         }
 
@@ -1138,7 +1128,7 @@ package Sidef::Types::Number::Number {
     sub is_odd {
         my ($x) = @_;
 
-        if (CORE::not _is_int($$x)) {
+        if (CORE::not Math::GMPq::Rmpq_integer_p($$x)) {
             return state $z = Sidef::Types::Bool::Bool->false;
         }
 
@@ -1160,7 +1150,7 @@ package Sidef::Types::Number::Number {
         my $q = Math::GMPq::Rmpq_init();
         Math::GMPq::Rmpq_div($q, $$x, $$y);
 
-        if (_is_int($q)) {
+        if (Math::GMPq::Rmpq_integer_p($q)) {
             state $z = Sidef::Types::Bool::Bool->true;
         }
         else {
@@ -1175,7 +1165,7 @@ package Sidef::Types::Number::Number {
         my $q = Math::GMPq::Rmpq_init();
         Math::GMPq::Rmpq_div($q, $$y, $$x);
 
-        if (_is_int($q)) {
+        if (Math::GMPq::Rmpq_integer_p($q)) {
             state $z = Sidef::Types::Bool::Bool->true;
         }
         else {
@@ -1281,7 +1271,7 @@ package Sidef::Types::Number::Number {
 
     sub floor {
         my ($x) = @_;
-        _is_int($$x) && return $x;
+        Math::GMPq::Rmpq_integer_p($$x) && return $x;
 
         if (Math::GMPq::Rmpq_sgn($$x) > 0) {
             my $z = Math::GMPz::Rmpz_init();
@@ -1298,7 +1288,7 @@ package Sidef::Types::Number::Number {
 
     sub ceil {
         my ($x) = @_;
-        _is_int($$x) && return $x;
+        Math::GMPq::Rmpq_integer_p($$x) && return $x;
 
         if (Math::GMPq::Rmpq_sgn($$x) > 0) {
             my $z = Math::GMPz::Rmpz_init();
@@ -1387,7 +1377,7 @@ package Sidef::Types::Number::Number {
         my ($x, $y) = @_;
         _valid($y);
 
-        if (_is_int($$x) and _is_int($$y)) {
+        if (Math::GMPq::Rmpq_integer_p($$x) and Math::GMPq::Rmpq_integer_p($$y)) {
             my $r      = Math::GMPz::Rmpz_init();
             my $yz     = _as_int($y);
             my $sign_y = Math::GMPz::Rmpz_sgn($yz);
@@ -1586,7 +1576,7 @@ package Sidef::Types::Number::Number {
     sub is_square {
         my ($x) = @_;
 
-        if (CORE::not _is_int($$x)) {
+        if (CORE::not Math::GMPq::Rmpq_integer_p($$x)) {
             return state $z = Sidef::Types::Bool::Bool->false;
         }
 
@@ -1606,7 +1596,7 @@ package Sidef::Types::Number::Number {
     sub is_power {
         my ($x) = @_;
 
-        if (CORE::not _is_int($$x)) {
+        if (CORE::not Math::GMPq::Rmpq_integer_p($$x)) {
             return state $z = Sidef::Types::Bool::Bool->false;
         }
 
@@ -1757,7 +1747,7 @@ package Sidef::Types::Number::Number {
         _valid($y);
 
         my @array;
-        if (CORE::not defined($step) and _is_int($$x) and _is_int($$y)) {
+        if (CORE::not defined($step) and Math::GMPq::Rmpq_integer_p($$x) and Math::GMPq::Rmpq_integer_p($$y)) {
             foreach my $i (Math::GMPq::Rmpq_get_d($$x) .. Math::GMPq::Rmpq_get_d($$y)) {
                 my $n = Math::GMPq::Rmpq_init();
                 Math::GMPq::Rmpq_set_si($n, $i, 1);
