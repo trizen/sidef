@@ -711,10 +711,10 @@ package Sidef::Types::Number::Complex {
         }
 
         if (Math::MPC::Rmpc_cmp($$x, $$y) == 0) {
-            state $z = Sidef::Types::Bool::Bool->true;
+            (Sidef::Types::Bool::Bool::TRUE);
         }
         else {
-            state $z = Sidef::Types::Bool::Bool->false;
+            (Sidef::Types::Bool::Bool::FALSE);
         }
     }
 
@@ -729,10 +729,10 @@ package Sidef::Types::Number::Complex {
         }
 
         if (Math::MPC::Rmpc_cmp($$x, $$y) == 0) {
-            state $z = Sidef::Types::Bool::Bool->false;
+            (Sidef::Types::Bool::Bool::FALSE);
         }
         else {
-            state $z = Sidef::Types::Bool::Bool->true;
+            (Sidef::Types::Bool::Bool::TRUE);
         }
     }
 
@@ -838,17 +838,17 @@ package Sidef::Types::Number::Complex {
         Math::MPC::Rmpc_imag($im, ${$_[0]}, $ROUND);
 
         if (Math::MPFR::Rmpfr_sgn($im) != 0) {
-            return state $z = Sidef::Types::Bool::Bool->false;
+            return (Sidef::Types::Bool::Bool::FALSE);
         }
 
         my $re = Math::MPFR::Rmpfr_init2($PREC);
         Math::MPC::Rmpc_real($re, ${$_[0]}, $ROUND);
 
         if (Math::MPFR::Rmpfr_integer_p($re)) {
-            state $z = Sidef::Types::Bool::Bool->true;
+            (Sidef::Types::Bool::Bool::TRUE);
         }
         else {
-            state $z = Sidef::Types::Bool::Bool->false;
+            (Sidef::Types::Bool::Bool::FALSE);
         }
     }
 
@@ -859,23 +859,23 @@ package Sidef::Types::Number::Complex {
         Math::MPC::Rmpc_imag($im, ${$_[0]}, $ROUND);
 
         if (Math::MPFR::Rmpfr_sgn($im) == 0) {
-            state $z = Sidef::Types::Bool::Bool->true;
+            (Sidef::Types::Bool::Bool::TRUE);
         }
         else {
-            state $z = Sidef::Types::Bool::Bool->false;
+            (Sidef::Types::Bool::Bool::FALSE);
         }
     }
 
     sub is_nan {
-        state $x = Sidef::Types::Bool::Bool->false;
+        (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub is_inf {
-        state $x = Sidef::Types::Bool::Bool->false;
+        (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub is_ninf {
-        state $x = Sidef::Types::Bool::Bool->false;
+        (Sidef::Types::Bool::Bool::FALSE);
     }
 
     {

@@ -5,30 +5,30 @@ package Sidef::Types::Bool::Bool {
       q{0+}   => \&get_value,
       q{""}   => sub { ${$_[0]} ? 'true' : 'false' };
 
+    use constant {
+                  TRUE  => (bless \(my $t = 1), __PACKAGE__),
+                  FALSE => (bless \(my $f = 0), __PACKAGE__),
+                 };
+
     use parent qw(
       Sidef::Object::Object
       Sidef::Convert::Convert
       );
 
-    {
-        my $true  = (bless \(my $t = 1), __PACKAGE__);
-        my $false = (bless \(my $f = 0), __PACKAGE__);
-
-        sub new {
-            $_[1] ? $true : $false;
-        }
-
-        *call = \&new;
-
-        sub true  { $true }
-        sub false { $false }
-
-        sub pick {
-            CORE::rand(1) < 0.5 ? $true : $false;
-        }
-
-        *rand = \&pick;
+    sub new {
+        $_[1] ? (TRUE) : (FALSE);
     }
+
+    *call = \&new;
+
+    sub true  { (TRUE) }
+    sub false { (FALSE) }
+
+    sub pick {
+        CORE::rand(1) < 0.5 ? (TRUE) : (FALSE);
+    }
+
+    *rand = \&pick;
 
     sub get_value { ${$_[0]} }
     sub to_bool   { $_[0] }
@@ -36,21 +36,18 @@ package Sidef::Types::Bool::Bool {
 
     *{__PACKAGE__ . '::' . '|'} = sub {
         my ($self, $arg) = @_;
-        $self->get_value ? $self : $arg;
+        $$self ? $self : $arg;
     };
 
     *{__PACKAGE__ . '::' . '&'} = sub {
         my ($self, $arg) = @_;
-        $self->get_value ? $arg : $self;
+        $$self ? $arg : $self;
     };
 
-    sub is_true {
-        $_[0];
-    }
+    sub is_true { $_[0] }
 
     sub not {
-        my ($self) = @_;
-        $self->get_value ? $self->false : $self->true;
+        ${$_[0]} ? (FALSE) : (TRUE);
     }
 
     *is_false = \&not;

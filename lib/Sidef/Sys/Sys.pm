@@ -28,35 +28,35 @@ package Sidef::Sys::Sys {
         my ($self, $sec) = @_;
 
         state $x = require Time::HiRes;
-        Sidef::Types::Bool::Bool->new(Time::HiRes::alarm($sec->get_value));
+        (Time::HiRes::alarm($sec->get_value)) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub ualarm {
         my ($self, $sec) = @_;
 
         state $x = require Time::HiRes;
-        Sidef::Types::Bool::Bool->new(Time::HiRes::ualarm($sec->get_value));
+        (Time::HiRes::ualarm($sec->get_value)) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub sleep {
         my ($self, $sec) = @_;
 
         state $x = require Time::HiRes;
-        Sidef::Types::Bool::Bool->new(Time::HiRes::sleep($sec->get_value));
+        (Time::HiRes::sleep($sec->get_value)) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub nanosleep {
         my ($self, $sec) = @_;
 
         state $x = require Time::HiRes;
-        Sidef::Types::Bool::Bool->new(Time::HiRes::nanosleep($sec->get_value));
+        (Time::HiRes::nanosleep($sec->get_value)) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub usleep {
         my ($self, $sec) = @_;
 
         state $x = require Time::HiRes;
-        Sidef::Types::Bool::Bool->new(Time::HiRes::usleep($sec->get_value));
+        (Time::HiRes::usleep($sec->get_value)) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub osname {
@@ -88,7 +88,7 @@ package Sidef::Sys::Sys {
 
     sub defined {
         my ($self, $obj) = @_;
-        Sidef::Types::Bool::Bool->new(defined $obj);
+        (defined $obj) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub class_name {
@@ -120,19 +120,19 @@ package Sidef::Sys::Sys {
 
     sub print {
         my ($self, @args) = @_;
-        Sidef::Types::Bool::Bool->new(CORE::print(@args));
+        (CORE::print(@args)) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub printf {
         my ($self, @args) = @_;
-        Sidef::Types::Bool::Bool->new(CORE::printf(@args));
+        (CORE::printf(@args)) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub printh {
         my ($self, $fh, @args) = @_;
 
         if (CORE::ref($fh) eq 'GLOB') {
-            return Sidef::Types::Bool::Bool->new(CORE::print {$fh} @args);
+            return (CORE::print {$fh} @args) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
         }
 
         $fh->print(@args);
@@ -140,7 +140,7 @@ package Sidef::Sys::Sys {
 
     sub println {
         my ($self, @args) = @_;
-        Sidef::Types::Bool::Bool->new(CORE::say @args);
+        (CORE::say @args) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     *say = \&println;
@@ -217,19 +217,19 @@ package Sidef::Sys::Sys {
     sub weaken {
         my ($self, $obj) = @_;
         state $x = require Scalar::Util;
-        Sidef::Types::Bool::Bool->new(Scalar::Util::weaken($obj));
+        (Scalar::Util::weaken($obj)) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub isweak {
         my ($self, $obj) = @_;
         state $x = require Scalar::Util;
-        Sidef::Types::Bool::Bool->new(Scalar::Util::isweak($obj));
+        (Scalar::Util::isweak($obj)) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub unweaken {
         my ($self, $obj) = @_;
         state $x = require Scalar::Util;
-        Sidef::Types::Bool::Bool->new(Scalar::Util::unweaken($obj));
+        (Scalar::Util::unweaken($obj)) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub copy {
@@ -274,7 +274,7 @@ package Sidef::Sys::Sys {
 
     sub setpwent {
         my ($self) = @_;
-        Sidef::Types::Bool::Bool->new(CORE::setpwent);
+        (CORE::setpwent) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub getpwuid {
@@ -307,7 +307,7 @@ package Sidef::Sys::Sys {
 
     sub setgrent {
         my ($self) = @_;
-        Sidef::Types::Bool::Bool->new(CORE::setgrent);
+        (CORE::setgrent) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub getgrent {
@@ -339,7 +339,7 @@ package Sidef::Sys::Sys {
 
     sub sethostent {
         my ($self, $stayopen) = @_;
-        Sidef::Types::Bool::Bool->new(CORE::sethostent($stayopen->get_value));
+        (CORE::sethostent($stayopen->get_value)) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub gethostbyaddr {
@@ -370,7 +370,7 @@ package Sidef::Sys::Sys {
 
     sub setnetent {
         my ($self, $stayopen) = @_;
-        Sidef::Types::Bool::Bool->new(CORE::setnetent($stayopen->get_value));
+        (CORE::setnetent($stayopen->get_value)) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub getnetbyaddr {
@@ -400,7 +400,7 @@ package Sidef::Sys::Sys {
 
     sub setprotoent {
         my ($self, $stayopen) = @_;
-        Sidef::Types::Bool::Bool->new(CORE::setprotoent($stayopen->get_value));
+        (CORE::setprotoent($stayopen->get_value)) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub getprotobyname {
@@ -431,7 +431,7 @@ package Sidef::Sys::Sys {
 
     sub setservent {
         my ($self, $stayopen) = @_;
-        Sidef::Types::Bool::Bool->new(CORE::setservent($stayopen->get_value));
+        (CORE::setservent($stayopen->get_value)) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub getservbyname {

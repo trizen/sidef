@@ -12,8 +12,9 @@ package Sidef::Types::Glob::SocketHandle {
 
     sub setsockopt {
         my ($self, $level, $optname, $optval) = @_;
-        Sidef::Types::Bool::Bool->new(
-                                    CORE::setsockopt($self->{fh}, $level->get_value, $optname->get_value, $optval->get_value));
+        (CORE::setsockopt($self->{fh}, $level->get_value, $optname->get_value, $optval->get_value))
+          ? (Sidef::Types::Bool::Bool::TRUE)
+          : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub getsockopt {
@@ -33,12 +34,14 @@ package Sidef::Types::Glob::SocketHandle {
 
     sub bind {
         my ($self, $name) = @_;
-        Sidef::Types::Bool::Bool->new(CORE::bind($self->{fh}, $name->get_value));
+        (CORE::bind($self->{fh}, $name->get_value)) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub listen {
         my ($self, $queuesize) = @_;
-        Sidef::Types::Bool::Bool->new(CORE::listen($self->{fh}, $queuesize->get_value));
+        (CORE::listen($self->{fh}, $queuesize->get_value))
+          ? (Sidef::Types::Bool::Bool::TRUE)
+          : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub accept {
@@ -49,7 +52,7 @@ package Sidef::Types::Glob::SocketHandle {
 
     sub connect {
         my ($self, $name) = @_;
-        Sidef::Types::Bool::Bool->new(CORE::connect($self->{fh}, $name->get_value));
+        (CORE::connect($self->{fh}, $name->get_value)) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub recv {
@@ -65,7 +68,7 @@ package Sidef::Types::Glob::SocketHandle {
 
     sub shutdown {
         my ($self, $how) = @_;
-        Sidef::Types::Bool::Bool->new(CORE::shutdown($self->{fh}, $how->get_value));
+        (CORE::shutdown($self->{fh}, $how->get_value)) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
 };

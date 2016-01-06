@@ -3,9 +3,9 @@ package Sidef::Types::Number::Number {
     use utf8;
     use 5.014;
 
-    require Math::GMPq;
-    require Math::GMPz;
-    require Math::MPFR;
+    use Math::GMPq qw();
+    use Math::GMPz qw();
+    use Math::MPFR qw();
 
     use parent qw(
       Sidef::Object::Object
@@ -17,9 +17,11 @@ package Sidef::Types::Number::Number {
 
     our $GET_PERL_VALUE = 0;
 
-    our $ONE  = bless(\Math::GMPq->new(1),  __PACKAGE__);
-    our $ZERO = bless(\Math::GMPq->new(0),  __PACKAGE__);
-    our $MONE = bless(\Math::GMPq->new(-1), __PACKAGE__);
+    use constant {
+                  ONE  => bless(\Math::GMPq->new(1),  __PACKAGE__),
+                  ZERO => bless(\Math::GMPq->new(0),  __PACKAGE__),
+                  MONE => bless(\Math::GMPq->new(-1), __PACKAGE__),
+                 };
 
     use overload
       q{bool} => sub { Math::GMPq::Rmpq_sgn(${$_[0]}) != 0 },
@@ -312,7 +314,7 @@ package Sidef::Types::Number::Number {
         }
 
         if (ref($y) eq 'Sidef::Types::Number::Inf' or ref($y) eq 'Sidef::Types::Number::Ninf') {
-            return $ZERO;
+            return (ZERO);
         }
 
         _valid($y);
@@ -403,11 +405,11 @@ package Sidef::Types::Number::Number {
         my ($x, $y) = @_;
 
         if (ref($y) eq 'Sidef::Types::Number::Inf' or ref($y) eq 'Sidef::Types::Number::Ninf') {
-            return $ONE;
+            return (ONE);
         }
 
         _valid($y);
-        return $x->pow($ONE->div($y));
+        return $x->pow((ONE)->div($y));
     }
 
     sub sqr {
@@ -426,7 +428,7 @@ package Sidef::Types::Number::Number {
             return $y;
         }
         elsif (ref($y) eq 'Sidef::Types::Number::Ninf') {
-            return $ZERO;
+            return (ZERO);
         }
 
         _valid($y);
@@ -468,7 +470,7 @@ package Sidef::Types::Number::Number {
         if (defined $y) {
 
             if (ref($y) eq 'Sidef::Types::Number::Inf' or ref($y) eq 'Sidef::Types::Number::Ninf') {
-                return $ZERO;
+                return (ZERO);
             }
 
             _valid($y);
@@ -785,7 +787,7 @@ package Sidef::Types::Number::Number {
         my ($x, $y) = @_;
 
         if (ref($y) eq 'Sidef::Types::Number::Inf') {
-            return $ZERO;
+            return (ZERO);
         }
         elsif (ref($y) eq 'Sidef::Types::Number::Ninf') {
             if (Math::GMPq::Rmpq_sgn($$x) >= 0) {
@@ -893,10 +895,10 @@ package Sidef::Types::Number::Number {
         my ($x, $y) = @_;
         _valid($y);
         if (Math::GMPq::Rmpq_equal($$x, $$y)) {
-            state $z = Sidef::Types::Bool::Bool->true;
+            (Sidef::Types::Bool::Bool::TRUE);
         }
         else {
-            state $z = Sidef::Types::Bool::Bool->false;
+            (Sidef::Types::Bool::Bool::FALSE);
         }
     }
 
@@ -904,10 +906,10 @@ package Sidef::Types::Number::Number {
         my ($x, $y) = @_;
         _valid($y);
         if (Math::GMPq::Rmpq_equal($$x, $$y)) {
-            state $z = Sidef::Types::Bool::Bool->false;
+            (Sidef::Types::Bool::Bool::FALSE);
         }
         else {
-            state $z = Sidef::Types::Bool::Bool->true;
+            (Sidef::Types::Bool::Bool::TRUE);
         }
     }
 
@@ -915,15 +917,15 @@ package Sidef::Types::Number::Number {
         my ($x, $y) = @_;
 
         if (ref($y) eq 'Sidef::Types::Number::Inf') {
-            return $MONE;
+            return (MONE);
         }
         elsif (ref($y) eq 'Sidef::Types::Number::Ninf') {
-            return $ONE;
+            return (ONE);
         }
 
         _valid($y);
         my $cmp = Math::GMPq::Rmpq_cmp($$x, $$y);
-        !$cmp ? $ZERO : $cmp < 0 ? $MONE : $ONE;
+        !$cmp ? (ZERO) : $cmp < 0 ? (MONE) : (ONE);
     }
 
     sub acmp {
@@ -951,26 +953,26 @@ package Sidef::Types::Number::Number {
           : $yn;
 
         my $cmp = Math::GMPq::Rmpq_cmp($a1, $a2);
-        !$cmp ? $ZERO : $cmp < 0 ? $MONE : $ONE;
+        !$cmp ? (ZERO) : $cmp < 0 ? (MONE) : (ONE);
     }
 
     sub gt {
         my ($x, $y) = @_;
 
         if (ref($y) eq 'Sidef::Types::Number::Inf') {
-            return state $x = Sidef::Types::Bool::Bool->false;
+            return (Sidef::Types::Bool::Bool::FALSE);
         }
         elsif (ref($y) eq 'Sidef::Types::Number::Ninf') {
-            return state $x = Sidef::Types::Bool::Bool->true;
+            return (Sidef::Types::Bool::Bool::TRUE);
         }
 
         _valid($y);
 
         if (Math::GMPq::Rmpq_cmp($$x, $$y) > 0) {
-            state $z = Sidef::Types::Bool::Bool->true;
+            (Sidef::Types::Bool::Bool::TRUE);
         }
         else {
-            state $z = Sidef::Types::Bool::Bool->false;
+            (Sidef::Types::Bool::Bool::FALSE);
         }
     }
 
@@ -978,19 +980,19 @@ package Sidef::Types::Number::Number {
         my ($x, $y) = @_;
 
         if (ref($y) eq 'Sidef::Types::Number::Inf') {
-            return state $x = Sidef::Types::Bool::Bool->false;
+            return (Sidef::Types::Bool::Bool::FALSE);
         }
         elsif (ref($y) eq 'Sidef::Types::Number::Ninf') {
-            return state $x = Sidef::Types::Bool::Bool->true;
+            return (Sidef::Types::Bool::Bool::TRUE);
         }
 
         _valid($y);
 
         if (Math::GMPq::Rmpq_cmp($$x, $$y) >= 0) {
-            state $z = Sidef::Types::Bool::Bool->true;
+            (Sidef::Types::Bool::Bool::TRUE);
         }
         else {
-            state $z = Sidef::Types::Bool::Bool->false;
+            (Sidef::Types::Bool::Bool::FALSE);
         }
     }
 
@@ -998,19 +1000,19 @@ package Sidef::Types::Number::Number {
         my ($x, $y) = @_;
 
         if (ref($y) eq 'Sidef::Types::Number::Inf') {
-            return state $x = Sidef::Types::Bool::Bool->true;
+            return (Sidef::Types::Bool::Bool::TRUE);
         }
         elsif (ref($y) eq 'Sidef::Types::Number::Ninf') {
-            return state $x = Sidef::Types::Bool::Bool->false;
+            return (Sidef::Types::Bool::Bool::FALSE);
         }
 
         _valid($y);
 
         if (Math::GMPq::Rmpq_cmp($$x, $$y) < 0) {
-            state $z = Sidef::Types::Bool::Bool->true;
+            (Sidef::Types::Bool::Bool::TRUE);
         }
         else {
-            state $z = Sidef::Types::Bool::Bool->false;
+            (Sidef::Types::Bool::Bool::FALSE);
         }
     }
 
@@ -1018,49 +1020,49 @@ package Sidef::Types::Number::Number {
         my ($x, $y) = @_;
 
         if (ref($y) eq 'Sidef::Types::Number::Inf') {
-            return state $x = Sidef::Types::Bool::Bool->true;
+            return (Sidef::Types::Bool::Bool::TRUE);
         }
         elsif (ref($y) eq 'Sidef::Types::Number::Ninf') {
-            return state $x = Sidef::Types::Bool::Bool->false;
+            return (Sidef::Types::Bool::Bool::FALSE);
         }
 
         _valid($y);
 
         if (Math::GMPq::Rmpq_cmp($$x, $$y) <= 0) {
-            state $z = Sidef::Types::Bool::Bool->true;
+            (Sidef::Types::Bool::Bool::TRUE);
         }
         else {
-            state $z = Sidef::Types::Bool::Bool->false;
+            (Sidef::Types::Bool::Bool::FALSE);
         }
     }
 
     sub is_zero {
         my ($x) = @_;
         if (CORE::not Math::GMPq::Rmpq_sgn($$x)) {
-            state $z = Sidef::Types::Bool::Bool->true;
+            (Sidef::Types::Bool::Bool::TRUE);
         }
         else {
-            state $z = Sidef::Types::Bool::Bool->false;
+            (Sidef::Types::Bool::Bool::FALSE);
         }
     }
 
     sub is_one {
         my ($x) = @_;
-        if (Math::GMPq::Rmpq_equal($$x, $$ONE)) {
-            state $z = Sidef::Types::Bool::Bool->true;
+        if (Math::GMPq::Rmpq_equal($$x, ${(ONE)})) {
+            (Sidef::Types::Bool::Bool::TRUE);
         }
         else {
-            state $z = Sidef::Types::Bool::Bool->false;
+            (Sidef::Types::Bool::Bool::FALSE);
         }
     }
 
     sub is_positive {
         my ($x) = @_;
         if (Math::GMPq::Rmpq_sgn($$x) > 0) {
-            state $z = Sidef::Types::Bool::Bool->true;
+            (Sidef::Types::Bool::Bool::TRUE);
         }
         else {
-            state $z = Sidef::Types::Bool::Bool->false;
+            (Sidef::Types::Bool::Bool::FALSE);
         }
     }
 
@@ -1069,10 +1071,10 @@ package Sidef::Types::Number::Number {
     sub is_negative {
         my ($x) = @_;
         if (Math::GMPq::Rmpq_sgn($$x) < 0) {
-            state $z = Sidef::Types::Bool::Bool->true;
+            (Sidef::Types::Bool::Bool::TRUE);
         }
         else {
-            state $z = Sidef::Types::Bool::Bool->false;
+            (Sidef::Types::Bool::Bool::FALSE);
         }
     }
 
@@ -1095,33 +1097,33 @@ package Sidef::Types::Number::Number {
     sub is_int {
         my ($x) = @_;
         if (Math::GMPq::Rmpq_integer_p($$x)) {
-            state $z = Sidef::Types::Bool::Bool->true;
+            (Sidef::Types::Bool::Bool::TRUE);
         }
         else {
-            state $z = Sidef::Types::Bool::Bool->false;
+            (Sidef::Types::Bool::Bool::FALSE);
         }
     }
 
     sub is_real {
         my ($x) = @_;
-        state $z = Sidef::Types::Bool::Bool->true;
+        (Sidef::Types::Bool::Bool::TRUE);
     }
 
     sub is_even {
         my ($x) = @_;
 
         if (CORE::not Math::GMPq::Rmpq_integer_p($$x)) {
-            return state $z = Sidef::Types::Bool::Bool->false;
+            return (Sidef::Types::Bool::Bool::FALSE);
         }
 
         my $nz = Math::GMPz::Rmpz_init();
         Math::GMPq::Rmpq_get_num($nz, $$x);
 
         if (Math::GMPz::Rmpz_even_p($nz)) {
-            state $z = Sidef::Types::Bool::Bool->true;
+            (Sidef::Types::Bool::Bool::TRUE);
         }
         else {
-            state $z = Sidef::Types::Bool::Bool->false;
+            (Sidef::Types::Bool::Bool::FALSE);
         }
     }
 
@@ -1129,17 +1131,17 @@ package Sidef::Types::Number::Number {
         my ($x) = @_;
 
         if (CORE::not Math::GMPq::Rmpq_integer_p($$x)) {
-            return state $z = Sidef::Types::Bool::Bool->false;
+            return (Sidef::Types::Bool::Bool::FALSE);
         }
 
         my $nz = Math::GMPz::Rmpz_init();
         Math::GMPq::Rmpq_get_num($nz, $$x);
 
         if (Math::GMPz::Rmpz_odd_p($nz)) {
-            state $z = Sidef::Types::Bool::Bool->true;
+            (Sidef::Types::Bool::Bool::TRUE);
         }
         else {
-            state $z = Sidef::Types::Bool::Bool->false;
+            (Sidef::Types::Bool::Bool::FALSE);
         }
     }
 
@@ -1151,10 +1153,10 @@ package Sidef::Types::Number::Number {
         Math::GMPq::Rmpq_div($q, $$x, $$y);
 
         if (Math::GMPq::Rmpq_integer_p($q)) {
-            state $z = Sidef::Types::Bool::Bool->true;
+            (Sidef::Types::Bool::Bool::TRUE);
         }
         else {
-            state $z = Sidef::Types::Bool::Bool->false;
+            (Sidef::Types::Bool::Bool::FALSE);
         }
     }
 
@@ -1166,23 +1168,23 @@ package Sidef::Types::Number::Number {
         Math::GMPq::Rmpq_div($q, $$y, $$x);
 
         if (Math::GMPq::Rmpq_integer_p($q)) {
-            state $z = Sidef::Types::Bool::Bool->true;
+            (Sidef::Types::Bool::Bool::TRUE);
         }
         else {
-            state $z = Sidef::Types::Bool::Bool->false;
+            (Sidef::Types::Bool::Bool::FALSE);
         }
     }
 
     sub is_inf {
-        state $x = Sidef::Types::Bool::Bool->false;
+        (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub is_nan {
-        state $x = Sidef::Types::Bool::Bool->false;
+        (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub is_ninf {
-        state $x = Sidef::Types::Bool::Bool->false;
+        (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub max {
@@ -1254,7 +1256,7 @@ package Sidef::Types::Number::Number {
         Math::GMPz::Rmpz_set_q($z, $$x);
         Math::GMPz::Rmpz_abs($z, $z);
         my $digit = (split(//, Math::GMPz::Rmpz_get_str($z, 10)))[Math::GMPq::Rmpq_get_d($$y)];
-        defined($digit) ? _new_uint($digit) : $MONE;
+        defined($digit) ? _new_uint($digit) : (MONE);
     }
 
     sub length {
@@ -1306,14 +1308,14 @@ package Sidef::Types::Number::Number {
     sub inc {
         my ($x) = @_;
         my $r = Math::GMPq::Rmpq_init();
-        Math::GMPq::Rmpq_add($r, $$x, $$ONE);
+        Math::GMPq::Rmpq_add($r, $$x, ${(ONE)});
         bless \$r, __PACKAGE__;
     }
 
     sub dec {
         my ($x) = @_;
         my $r = Math::GMPq::Rmpq_init();
-        Math::GMPq::Rmpq_sub($r, $$x, $$ONE);
+        Math::GMPq::Rmpq_sub($r, $$x, ${(ONE)});
         bless \$r, __PACKAGE__;
     }
 
@@ -1364,7 +1366,7 @@ package Sidef::Types::Number::Number {
         my ($x, $y) = @_;
 
         if (ref($y) eq 'Sidef::Types::Number::Inf' or ref($y) eq 'Sidef::Types::Number::Ninf') {
-            return $ONE;
+            return (ONE);
         }
 
         _valid($y);
@@ -1392,7 +1394,7 @@ package Sidef::Types::Number::Number {
             Math::MPFR::Rmpfr_fmod($r, _as_float($x), $yf, $ROUND);
             my $sign = Math::MPFR::Rmpfr_sgn($r);
             if (CORE::not $sign) {
-                return $ZERO;
+                return (ZERO);
             }
             elsif (($sign > 0) ne (Math::MPFR::Rmpfr_sgn($yf) > 0)) {
                 Math::MPFR::Rmpfr_add($r, $r, $yf, $ROUND);
@@ -1559,10 +1561,10 @@ package Sidef::Types::Number::Number {
     sub is_prime {
         my ($x) = @_;
         if (Math::GMPz::Rmpz_probab_prime_p(_as_int($x), 7) > 0) {
-            state $z = Sidef::Types::Bool::Bool->true;
+            (Sidef::Types::Bool::Bool::TRUE);
         }
         else {
-            state $z = Sidef::Types::Bool::Bool->false;
+            (Sidef::Types::Bool::Bool::FALSE);
         }
     }
 
@@ -1577,17 +1579,17 @@ package Sidef::Types::Number::Number {
         my ($x) = @_;
 
         if (CORE::not Math::GMPq::Rmpq_integer_p($$x)) {
-            return state $z = Sidef::Types::Bool::Bool->false;
+            return (Sidef::Types::Bool::Bool::FALSE);
         }
 
         my $nz = Math::GMPz::Rmpz_init();
         Math::GMPq::Rmpq_get_num($nz, $$x);
 
         if (Math::GMPz::Rmpz_perfect_square_p($nz)) {
-            state $z = Sidef::Types::Bool::Bool->true;
+            (Sidef::Types::Bool::Bool::TRUE);
         }
         else {
-            state $z = Sidef::Types::Bool::Bool->false;
+            (Sidef::Types::Bool::Bool::FALSE);
         }
     }
 
@@ -1597,17 +1599,17 @@ package Sidef::Types::Number::Number {
         my ($x) = @_;
 
         if (CORE::not Math::GMPq::Rmpq_integer_p($$x)) {
-            return state $z = Sidef::Types::Bool::Bool->false;
+            return (Sidef::Types::Bool::Bool::FALSE);
         }
 
         my $nz = Math::GMPz::Rmpz_init();
         Math::GMPq::Rmpq_get_num($nz, $$x);
 
         if (Math::GMPz::Rmpz_perfect_power_p($nz)) {
-            state $z = Sidef::Types::Bool::Bool->true;
+            (Sidef::Types::Bool::Bool::TRUE);
         }
         else {
-            state $z = Sidef::Types::Bool::Bool->false;
+            (Sidef::Types::Bool::Bool::FALSE);
         }
     }
 
@@ -1757,7 +1759,7 @@ package Sidef::Types::Number::Number {
         else {
 
             if (CORE::not defined $step) {
-                $step = $ONE;
+                $step = (ONE);
             }
             else {
                 _valid($step);
@@ -1787,7 +1789,7 @@ package Sidef::Types::Number::Number {
 
         if (CORE::not defined $step) {
             _valid($y);
-            $step = $ONE;
+            $step = (ONE);
         }
         else {
             _valid($y, $step);
@@ -1835,7 +1837,7 @@ package Sidef::Types::Number::Number {
         Sidef::Types::Range::RangeNumber->__new__(
                                                   from => $$from,
                                                   to   => $$to,
-                                                  step => (defined($step) ? $$step : $$ONE),
+                                                  step => (defined($step) ? $$step : ${(ONE)}),
                                                  );
     }
 
@@ -1857,7 +1859,7 @@ package Sidef::Types::Number::Number {
             Math::GMPq::Rmpq_neg($r, $$step);
             $r;
           }
-          : $$MONE;
+          : ${(MONE)};
 
         Sidef::Types::Range::RangeNumber->__new__(
                                                   from => $$from,
@@ -1871,7 +1873,7 @@ package Sidef::Types::Number::Number {
 
         defined($to)
           ? $from->to($to, $step)
-          : $ZERO->to($from->dec);
+          : (ZERO)->to($from->dec);
     }
 
     sub rand {

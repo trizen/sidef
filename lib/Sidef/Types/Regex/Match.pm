@@ -68,7 +68,7 @@ package Sidef::Types::Regex::Match {
     }
 
     sub matched {
-        Sidef::Types::Bool::Bool->new($_[0]->{matched});
+        ($_[0]->{matched}) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     *to_bool       = \&matched;

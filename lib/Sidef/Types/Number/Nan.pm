@@ -1,7 +1,7 @@
 package Sidef::Types::Number::Nan {
 
     use 5.014;
-    require Math::GMPq;
+    use Math::GMPq qw();
 
     use parent qw(
       Sidef::Object::Object
@@ -24,15 +24,15 @@ package Sidef::Types::Number::Nan {
     sub get_value { 'NaN' }
 
     sub is_nan {
-        state $x = Sidef::Types::Bool::Bool->true;
+        (Sidef::Types::Bool::Bool::TRUE);
     }
 
     sub is_inf {
-        state $x = Sidef::Types::Bool::Bool->false;
+        (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub is_ninf {
-        state $x = Sidef::Types::Bool::Bool->false;
+        (Sidef::Types::Bool::Bool::FALSE);
     }
 }
 

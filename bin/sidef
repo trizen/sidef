@@ -22,7 +22,7 @@ binmode STDIN,  ":utf8";
 binmode STDOUT, ":utf8";
 binmode STDERR, ":utf8" if $^P == 0;    # to work under Devel::* modules
 
-require Sidef;
+use Sidef;
 
 my $name    = 'Sidef';
 my $version = $Sidef::VERSION;
@@ -614,7 +614,7 @@ HEAD
                      $package_content .= qq{'$1' => };
                  }
                  else {
-                     die qq{ERROR: can't get the package name!};
+                     die qq{ERROR: can't get the package name from file `$_`};
                  }
 
                  $package_content .= qq{<<'${token}',\n};
@@ -635,13 +635,17 @@ sub __load_sidef_module__ {
     if (not exists $REQ{$name}) {
         my $module = $name =~ s{::}{/}gr . '.pm';
         if (exists $MODULE{$name} and not exists $INC{$module}) {
-             while ($MODULE{$name} =~ /^\h*(?:use parent\s+qw\((.*?)\)|require (Sidef::[\w:]+))/smg) {
+             while ($MODULE{$name} =~ /^\h*
+                  (?:use \h+ parent \s+ qw\((.*?)\)
+                | (?:require|use) \h+ (Sidef::[\w:]+))
+            /smxg) {
                 foreach my $mod (split(' ', $+)) {
                     __load_sidef_module__($mod) if not exists $REQ{$mod};
                 }
             }
             $INC{$module} = 1;
             eval($MODULE{$name});
+            die "[FATAL ERROR] Can't load `$module`: $@" if $@;
         }
         else {
             require $module;
@@ -650,6 +654,8 @@ sub __load_sidef_module__ {
     }
     return 1;
 }
+
+eval($MODULE{"Sidef::Types::Bool::Bool"});      # it's used inside `Object`
 
 FOOT
 

@@ -88,14 +88,14 @@ package Sidef::Types::Range::RangeNumber {
         my ($min, $max) = ($self->{step} > 0 ? ($self->{from}, $self->{to}) : ($self->{to}, $self->{from}));
         my $step = $self->{step};
 
-        Sidef::Types::Bool::Bool->new(
-                                      $value >= $min and $value <= $max
-                                        and (
-                                               $step == 1 ? 1
-                                             : $step > 0 ? (int(($value - $min) / $step) * $step == ($value - $min))
-                                             :             (int(($value - $max) / $step) * $step == ($value - $max))
-                                            )
-                                     );
+        (
+         $value >= $min and $value <= $max
+           and (
+                  $step == 1 ? 1
+                : $step > 0 ? (int(($value - $min) / $step) * $step == ($value - $min))
+                :             (int(($value - $max) / $step) * $step == ($value - $max))
+               )
+        ) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     *contain  = \&contains;
@@ -276,10 +276,9 @@ package Sidef::Types::Range::RangeNumber {
         no strict 'refs';
         *{__PACKAGE__ . '::' . '=='} = sub {
             my ($r1, $r2) = @_;
-            Sidef::Types::Bool::Bool->new(    ref($r1) eq ref($r2)
-                                          and $r1->{from} == $r2->{from}
-                                          and $r1->{to} == $r2->{to}
-                                          and $r1->{step} == $r2->{step});
+            (ref($r1) eq ref($r2) and $r1->{from} == $r2->{from} and $r1->{to} == $r2->{to} and $r1->{step} == $r2->{step})
+              ? (Sidef::Types::Bool::Bool::TRUE)
+              : (Sidef::Types::Bool::Bool::FALSE);
         };
     }
 

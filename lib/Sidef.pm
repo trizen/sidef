@@ -11,9 +11,8 @@ package Sidef {
 
     our %EVALS;              # will contain info required for eval()
 
-    #use Math::BigInt qw(try GMP);
-    #use Math::BigRat qw(try GMP);
-    #use Math::BigFloat qw(try GMP);
+    use Sidef::Types::Bool::Bool;
+    use Sidef::Types::Number::Number;
 
     sub new {
         bless {}, __PACKAGE__;

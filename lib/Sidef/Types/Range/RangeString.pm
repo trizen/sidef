@@ -69,7 +69,7 @@ package Sidef::Types::Range::RangeString {
         my $value = $num->get_value;
         my ($min, $max) = map { $_->get_value } ($self->min, $self->max);
 
-        Sidef::Types::Bool::Bool->new($value ge $min and $value le $max);
+        ($value ge $min and $value le $max) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     *contain  = \&contains;
@@ -150,10 +150,9 @@ package Sidef::Types::Range::RangeString {
         no strict 'refs';
         *{__PACKAGE__ . '::' . '=='} = sub {
             my ($r1, $r2) = @_;
-            Sidef::Types::Bool::Bool->new(    ref($r1) eq ref($r2)
-                                          and $r1->{from} eq $r2->{from}
-                                          and $r1->{to} eq $r2->{to}
-                                          and $r1->{asc} eq $r2->{asc});
+            (ref($r1) eq ref($r2) and $r1->{from} eq $r2->{from} and $r1->{to} eq $r2->{to} and $r1->{asc} eq $r2->{asc})
+              ? (Sidef::Types::Bool::Bool::TRUE)
+              : (Sidef::Types::Bool::Bool::FALSE);
         };
     }
 }

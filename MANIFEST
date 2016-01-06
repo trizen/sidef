@@ -136,6 +136,7 @@ scripts/Expensive/long_multiplication.sf
 scripts/Expensive/numerical_integration.sf
 scripts/Expensive/pi.sf
 scripts/Expensive/root_of_a_function.sf
+scripts/Expensive/smart_word_wrap.sf
 scripts/Expensive/sudoku_solver.sf
 scripts/extend_your_language.sf
 scripts/fast_fourier_transform.sf

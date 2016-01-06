@@ -1155,7 +1155,8 @@ HEADER
         }
         elsif ($ref eq 'Sidef::Meta::Warning') {
             my @args = $self->deparse_args($obj->{arg});
-            $code = qq~Sidef::Types::Bool::Bool->new(CORE::warn(@args, " at \Q$obj->{file}\E line $obj->{line}\\n"))~;
+            $code = qq~((CORE::warn(@args, " at \Q$obj->{file}\E line $obj->{line}\\n")) ? ~
+              . qq~(Sidef::Types::Bool::Bool::FALSE) : (Sidef::Types::Bool::Bool::TRUE))~;
         }
         elsif ($ref eq 'Sidef::Object::Object') {
             $code = $self->make_constant($ref, 'new', "Object$refaddr");
@@ -1337,21 +1338,22 @@ HEADER
                     # != and == methods
                     if ($method eq '==' or $method eq '!=') {
                         $code =
-                            'Sidef::Types::Bool::Bool->new('
+                            '(('
                           . ($method eq '!=' ? 'CORE::not ' : '') . 'do{'
                           . $code
                           . '} eq do{'
-                          . $self->deparse_args(@{$call->{arg}}) . '})';
+                          . $self->deparse_args(@{$call->{arg}})
+                          . '}) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE))';
                         next;
                     }
 
                     # <=> method
                     if ($method eq '<=>') {
                         $code =
-                            'Sidef::Types::Number::Number->new(do{'
+'((Sidef::Types::Number::Number::ZERO, Sidef::Types::Number::Number::ONE, Sidef::Types::Number::Number::MONE)[do{'
                           . $code
                           . '} cmp do {'
-                          . $self->deparse_args(@{$call->{arg}}) . '})';
+                          . $self->deparse_args(@{$call->{arg}}) . '}])';
                         next;
                     }
 
@@ -1359,18 +1361,21 @@ HEADER
                     if ($method eq '~~' or $method eq '!~') {
                         $self->top_add(qq{use experimental 'smartmatch';\n});
                         $code =
-                            'Sidef::Types::Bool::Bool->new('
+                            '(('
                           . ($method eq '!~' ? 'CORE::not ' : '') . 'do{'
                           . $code
                           . '} ~~ do{'
-                          . $self->deparse_args(@{$call->{arg}}) . '})';
+                          . $self->deparse_args(@{$call->{arg}})
+                          . '}) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE))';
                         next;
                     }
 
                     # ! prefix-unary
                     if ($ref eq 'Sidef::Object::Unary') {
                         if ($method eq '!') {
-                            $code = 'Sidef::Types::Bool::Bool->new(!do{' . $self->deparse_args(@{$call->{arg}}) . '})';
+                            $code = '(do{'
+                              . $self->deparse_args(@{$call->{arg}})
+                              . '} ? (Sidef::Types::Bool::Bool::FALSE) : (Sidef::Types::Bool::Bool::TRUE))';
                             next;
                         }
 
@@ -1395,12 +1400,18 @@ HEADER
                         }
 
                         if ($method eq 'say' or $method eq '>') {
-                            $code = 'Sidef::Types::Bool::Bool->new(CORE::say' . $self->deparse_args(@{$call->{arg}}) . ')';
+                            $code =
+                                '((CORE::say'
+                              . $self->deparse_args(@{$call->{arg}})
+                              . ') ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE))';
                             next;
                         }
 
                         if ($method eq 'print' or $method eq '>>') {
-                            $code = 'Sidef::Types::Bool::Bool->new(CORE::print' . $self->deparse_args(@{$call->{arg}}) . ')';
+                            $code =
+                                '((CORE::print'
+                              . $self->deparse_args(@{$call->{arg}})
+                              . ') ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE))';
                             next;
                         }
                     }

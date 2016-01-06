@@ -11,6 +11,8 @@ package Sidef::Types::Hash::Hash {
       q{bool} => sub { scalar(CORE::keys %{$_[0]}) },
       q{""}   => \&dump;
 
+    use Sidef::Types::Bool::Bool;
+
     sub new {
         my ($class, %pairs) = @_;
         bless \%pairs, __PACKAGE__;
@@ -78,17 +80,17 @@ package Sidef::Types::Hash::Hash {
         my ($self, $obj) = @_;
 
         (%$self eq %{$obj})
-          or return Sidef::Types::Bool::Bool->false;
+          or return (Sidef::Types::Bool::Bool::FALSE);
 
         while (my ($key, $value) = each %$self) {
             exists($obj->{$key})
-              or return Sidef::Types::Bool::Bool->false;
+              or return (Sidef::Types::Bool::Bool::FALSE);
 
             $value eq $obj->{$key}
-              or return Sidef::Types::Bool::Bool->false;
+              or return (Sidef::Types::Bool::Bool::FALSE);
         }
 
-        Sidef::Types::Bool::Bool->true;
+        (Sidef::Types::Bool::Bool::TRUE);
     }
 
     sub ne {
@@ -101,15 +103,15 @@ package Sidef::Types::Hash::Hash {
 
         if (ref($self) ne ref($obj)
             or %$self ne %{$obj}) {
-            return Sidef::Types::Bool::Bool->false;
+            return (Sidef::Types::Bool::Bool::FALSE);
         }
 
         while (my ($key) = each %$self) {
             exists($obj->{$key})
-              or return Sidef::Types::Bool::Bool->false;
+              or return (Sidef::Types::Bool::Bool::FALSE);
         }
 
-        Sidef::Types::Bool::Bool->true;
+        (Sidef::Types::Bool::Bool::TRUE);
     }
 
     sub append {
@@ -312,7 +314,7 @@ package Sidef::Types::Hash::Hash {
 
     sub exists {
         my ($self, $key) = @_;
-        Sidef::Types::Bool::Bool->new(CORE::exists $self->{$key});
+        (CORE::exists $self->{$key}) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     *has_key  = \&exists;

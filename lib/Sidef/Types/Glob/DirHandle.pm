@@ -44,8 +44,14 @@ package Sidef::Types::Glob::DirHandle {
     sub get_file {
         my ($self) = @_;
 
-        require Encode;
-        require File::Spec;
+        state $_z1 = require Encode;
+        state $_z2 = require File::Spec;
+
+        my $basedir = (
+            $self->{basedir} // do {
+                $self->{basedir} = $self->{dir}->get_value;
+              }
+        );
 
         {
             my $file = CORE::readdir($self->{dir_h}) // return;
@@ -55,7 +61,7 @@ package Sidef::Types::Glob::DirHandle {
             }
 
             my $dfile = Encode::decode_utf8($file);
-            my $dir = File::Spec->catdir($self->{dir}->get_value, $dfile);
+            my $dir = File::Spec->catdir($basedir, $dfile);
 
             lstat($dir);
             if (-l _) { redo }
@@ -64,14 +70,14 @@ package Sidef::Types::Glob::DirHandle {
             return (
                     (-d _)
                     ? Sidef::Types::Glob::Dir->new($dir)
-                    : Sidef::Types::Glob::File->new(File::Spec->catfile($self->{dir}->get_value, $dfile))
+                    : Sidef::Types::Glob::File->new(File::Spec->catfile($basedir, $dfile))
                    );
         }
 
         return;
     }
 
-    *read    = \&get_file;
+    *read = \&get_file;
 
     sub tell {
         my ($self) = @_;
@@ -80,22 +86,30 @@ package Sidef::Types::Glob::DirHandle {
 
     sub seek {
         my ($self, $pos) = @_;
-        Sidef::Types::Bool::Bool->new(seekdir($self->{dir_h}, $pos->get_value));
+        (
+         seekdir(
+             $self->{dir_h},
+             do {
+                 local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
+                 $pos->get_value;
+               }
+         )
+        ) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub rewind {
         my ($self) = @_;
-        Sidef::Types::Bool::Bool->new(rewinddir($self->{dir_h}));
+        (rewinddir($self->{dir_h})) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub close {
         my ($self) = @_;
-        Sidef::Types::Bool::Bool->new(closedir($self->{dir_h}));
+        (closedir($self->{dir_h})) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub chdir {
         my ($self) = @_;
-        Sidef::Types::Bool::Bool->new(chdir($self->{dir_h}));
+        (chdir($self->{dir_h})) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub stat {

@@ -61,13 +61,13 @@ package Sidef::Object::Object {
     }
 
     sub say {
-        Sidef::Types::Bool::Bool->new(CORE::say @_);
+        (CORE::say @_) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     *println = \&say;
 
     sub print {
-        Sidef::Types::Bool::Bool->new(CORE::print @_);
+        (CORE::print @_) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub method {
@@ -105,15 +105,16 @@ package Sidef::Object::Object {
 
     sub respond_to {
         my ($self, $method) = @_;
-        Sidef::Types::Bool::Bool->new($self->can($method));
+        ($self->can($method)) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub is_a {
         my ($self, $obj) = @_;
-        Sidef::Types::Bool::Bool->new($self->SUPER::isa(CORE::ref($obj) || $obj));
+        ($self->SUPER::isa(CORE::ref($obj) || $obj)) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
-    *is_an = \&is_a;
+    *is_an   = \&is_a;
+    *kind_of = \&is_a;
 
     sub parent_classes {
         my ($obj) = @_;
@@ -214,7 +215,7 @@ package Sidef::Object::Object {
 
         # Logical XOR
         *{__PACKAGE__ . '::' . '^'} = sub {
-            Sidef::Types::Bool::Bool->new($_[0] xor $_[1]);
+            ($_[0] xor $_[1]) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
         };
 
         # Defined-OR
@@ -364,7 +365,7 @@ package Sidef::Object::Object {
                 return $second->contains($first);
             }
 
-            Sidef::Types::Bool::Bool->new($first eq $second);
+            ($first eq $second) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
         };
 
         # Negation of smart match

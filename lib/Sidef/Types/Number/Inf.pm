@@ -2,7 +2,6 @@ package Sidef::Types::Number::Inf {
 
     use utf8;
     use 5.014;
-    require Math::GMPq;
 
     use parent qw(
       Sidef::Object::Object
@@ -20,14 +19,6 @@ package Sidef::Types::Number::Inf {
         Math::GMPq::Rmpq_set_ui($r, 1, 0);
         bless \$r, __PACKAGE__;
     };
-
-    state $ZERO = $Sidef::Types::Number::Number::ZERO;
-    state $ONE  = $Sidef::Types::Number::Number::ONE;
-    state $MONE = $Sidef::Types::Number::Number::MONE;
-
-    if (not defined $ZERO or not defined $ONE or not defined $MONE) {
-        die "Fatal error: can't load the Inf class!";
-    }
 
     sub new { $INF }
 
@@ -66,13 +57,13 @@ package Sidef::Types::Number::Inf {
     *idiv = \&div;
 
     sub is_pos {
-        state $x = Sidef::Types::Bool::Bool->true;
+        (Sidef::Types::Bool::Bool::TRUE);
     }
 
     *is_inf = \&is_pos;
 
     sub is_ninf {
-        state $x = Sidef::Types::Bool::Bool->false;
+        (Sidef::Types::Bool::Bool::FALSE);
     }
 
     *is_nan    = \&is_ninf;
@@ -199,7 +190,7 @@ package Sidef::Types::Number::Inf {
     *grad2deg         = \&inf;
     *commify          = \&inf;
 
-    sub zero { $ZERO }
+    sub zero { (Sidef::Types::Number::Number::ZERO) }
 
     *inv   = \&zero;
     *sin   = \&zero;
@@ -212,7 +203,7 @@ package Sidef::Types::Number::Inf {
     *acoth = \&zero;
     *erfc  = \&zero;
 
-    sub tanh { $ONE }
+    sub tanh { (Sidef::Types::Number::Number::ONE) }
 
     *coth = \&tanh;
     *zeta = \&tanh;
@@ -276,7 +267,9 @@ package Sidef::Types::Number::Inf {
     #
     sub binomial {
         my ($x, $y) = @_;
-        ref($y) eq 'Sidef::Types::Number::Inf' ? $ONE : $y->is_neg ? $ZERO : $x;
+        ref($y) eq 'Sidef::Types::Number::Inf' ? (Sidef::Types::Number::Number::ONE)
+          : $y->is_neg                         ? (Sidef::Types::Number::Number::ZERO)
+          :                                      $x;
     }
 
     *nok = \&binomial;
@@ -296,7 +289,7 @@ package Sidef::Types::Number::Inf {
 
     sub pow {
         my ($x, $y) = @_;
-        $y->is_neg ? $ZERO : $y->is_zero ? $ONE : $x;
+        $y->is_neg ? (Sidef::Types::Number::Number::ZERO) : $y->is_zero ? (Sidef::Types::Number::Number::ONE) : $x;
     }
 
     #
@@ -306,54 +299,54 @@ package Sidef::Types::Number::Inf {
     sub eq {
         my ($x, $y) = @_;
         if (ref($y) eq __PACKAGE__) {
-            state $z = Sidef::Types::Bool::Bool->true;
+            (Sidef::Types::Bool::Bool::TRUE);
         }
         else {
-            state $z = Sidef::Types::Bool::Bool->false;
+            (Sidef::Types::Bool::Bool::FALSE);
         }
     }
 
     sub ne {
         my ($x, $y) = @_;
         if (ref($y) eq __PACKAGE__) {
-            state $z = Sidef::Types::Bool::Bool->false;
+            (Sidef::Types::Bool::Bool::FALSE);
         }
         else {
-            state $z = Sidef::Types::Bool::Bool->true;
+            (Sidef::Types::Bool::Bool::TRUE);
         }
     }
 
     sub gt {
         my ($x, $y) = @_;
         if (ref($y) eq __PACKAGE__) {
-            state $z = Sidef::Types::Bool::Bool->false;
+            (Sidef::Types::Bool::Bool::FALSE);
         }
         else {
-            state $z = Sidef::Types::Bool::Bool->true;
+            (Sidef::Types::Bool::Bool::TRUE);
         }
     }
 
     sub ge {
-        state $z = Sidef::Types::Bool::Bool->true;
+        (Sidef::Types::Bool::Bool::TRUE);
     }
 
     sub lt {
-        state $z = Sidef::Types::Bool::Bool->false;
+        (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub le {
         my ($x, $y) = @_;
         if (ref($y) eq __PACKAGE__) {
-            state $z = Sidef::Types::Bool::Bool->true;
+            (Sidef::Types::Bool::Bool::TRUE);
         }
         else {
-            state $z = Sidef::Types::Bool::Bool->false;
+            (Sidef::Types::Bool::Bool::FALSE);
         }
     }
 
     sub cmp {
         my ($x, $y) = @_;
-        ref($y) eq __PACKAGE__ ? $ZERO : $ONE;
+        ref($y) eq __PACKAGE__ ? (Sidef::Types::Number::Number::ZERO) : (Sidef::Types::Number::Number::ONE);
     }
 
     {

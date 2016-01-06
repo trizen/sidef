@@ -41,10 +41,10 @@ package Sidef::Types::Glob::Socket {
     sub socketpair {
         my ($self, $socket1, $socket2, $domain, $type, $protocol) = @_;
         CORE::socketpair(my $sh1, my $sh2, $domain->get_value, $type->get_value, $protocol->get_value)
-          || return Sidef::Types::Bool::Bool->false;
+          || return (Sidef::Types::Bool::Bool::FALSE);
         ${$socket1} = Sidef::Types::Glob::SocketHandle->new(fh => $sh1);
         ${$socket2} = Sidef::Types::Glob::SocketHandle->new(fh => $sh2);
-        Sidef::Types::Bool::Bool->true;
+        (Sidef::Types::Bool::Bool::TRUE);
     }
 
     #
@@ -124,22 +124,22 @@ package Sidef::Types::Glob::Socket {
     #
     sub sethostent {
         my ($self, $stayopen) = @_;
-        Sidef::Types::Bool::Bool->new(CORE::sethostent($stayopen->get_value));
+        (CORE::sethostent($stayopen->get_value)) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub setnetent {
         my ($self, $stayopen) = @_;
-        Sidef::Types::Bool::Bool->new(CORE::setnetent($stayopen->get_value));
+        (CORE::setnetent($stayopen->get_value)) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub setprotoent {
         my ($self, $stayopen) = @_;
-        Sidef::Types::Bool::Bool->new(CORE::setprotoent($stayopen->get_value));
+        (CORE::setprotoent($stayopen->get_value)) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub setservent {
         my ($self, $stayopen) = @_;
-        Sidef::Types::Bool::Bool->new(CORE::setservent($stayopen->get_value));
+        (CORE::setservent($stayopen->get_value)) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     #

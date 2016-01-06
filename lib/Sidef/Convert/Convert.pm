@@ -54,21 +54,21 @@ package Sidef::Convert::Convert {
     *to_f = \&to_float;
 
     sub to_file {
-        Sidef::Types::Glob::File->new($_[0]->get_value);
+        Sidef::Types::Glob::File->new("$_[0]");
     }
 
     sub to_dir {
-        Sidef::Types::Glob::Dir->new($_[0]->get_value);
+        Sidef::Types::Glob::Dir->new("$_[0]");
     }
 
     sub to_bool {
-        Sidef::Types::Bool::Bool->new($_[0]->get_value);
+        $_[0] ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     *to_b = \&to_bool;
 
     sub to_regex {
-        Sidef::Types::Regex::Regex->new($_[0]->get_value);
+        Sidef::Types::Regex::Regex->new("$_[0]");
     }
 
     *to_re = \&to_regex;
@@ -78,11 +78,11 @@ package Sidef::Convert::Convert {
     }
 
     sub to_caller {
-        Sidef::Module::OO->__NEW__($_[0]->get_value);
+        Sidef::Module::OO->__NEW__("$_[0]");
     }
 
     sub to_fcaller {
-        Sidef::Module::Func->__NEW__($_[0]->get_value);
+        Sidef::Module::Func->__NEW__("$_[0]");
     }
 };
 

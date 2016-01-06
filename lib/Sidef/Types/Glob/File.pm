@@ -11,7 +11,7 @@ package Sidef::Types::Glob::File {
         my (undef, $file) = @_;
         if (@_ > 2) {
             state $x = require File::Spec;
-            $file = File::Spec->catfile(map { ref($_) ? $_->to_file->get_value : $_ } @_[1 .. $#_]);
+            $file = File::Spec->catfile(map { ref($_) ? "${$_->to_file}" : $_ } @_[1 .. $#_]);
         }
         elsif (ref($file) && ref($file) ne 'SCALAR') {
             return $file->to_file;
@@ -27,7 +27,7 @@ package Sidef::Types::Glob::File {
     sub get_constant {
         my ($self, $str) = @_;
 
-        my $name = $str->get_value;
+        my $name = "$str";
         state $CACHE = {};
 
         if (exists $CACHE->{$name}) {
@@ -56,7 +56,7 @@ package Sidef::Types::Glob::File {
     sub size {
         my ($self) = @_;
         @_ == 2 && ($self = $_[1]);
-        Sidef::Types::Number::Number->new(-s $self->get_value);
+        Sidef::Types::Number::Number->new(-s $$self);
     }
 
     sub compare {
@@ -65,38 +65,38 @@ package Sidef::Types::Glob::File {
             ($self, $file) = ($file, $_[2]);
         }
         state $x = require File::Compare;
-        Sidef::Types::Number::Number->new(File::Compare::compare($self->get_value, $file->get_value));
+        Sidef::Types::Number::Number->new(File::Compare::compare($$self, "$file"));
     }
 
     sub exists {
         my ($self) = @_;
         @_ == 2 && ($self = $_[1]);
-        Sidef::Types::Bool::Bool->new(-e $self->get_value);
+        (-e $$self) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub is_empty {
         my ($self) = @_;
         @_ == 2 && ($self = $_[1]);
-        Sidef::Types::Bool::Bool->new(-z $self->get_value);
+        (-z $$self) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub is_directory {
         my ($self) = @_;
         @_ == 2 && ($self = $_[1]);
-        Sidef::Types::Bool::Bool->new(-d $self->get_value);
+        (-d $$self) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     *is_dir = \&is_directory;
 
     sub is_link {
         my ($self) = @_;
-        Sidef::Types::Bool::Bool->new(-l $self->get_value);
+        (-l $$self) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub readlink {
         my ($self) = @_;
         @_ == 2 && ($self = $_[1]);
-        Sidef::Types::String::String->new(CORE::readlink($self->get_value));
+        Sidef::Types::String::String->new(CORE::readlink($$self));
     }
 
     *read_link = \&readlink;
@@ -104,126 +104,126 @@ package Sidef::Types::Glob::File {
     sub is_socket {
         my ($self) = @_;
         @_ == 2 && ($self = $_[1]);
-        Sidef::Types::Bool::Bool->new(-S $self->get_value);
+        (-S $$self) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub is_block {
         my ($self) = @_;
         @_ == 2 && ($self = $_[1]);
-        Sidef::Types::Bool::Bool->new(-b $self->get_value);
+        (-b $$self) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub is_char_device {
         my ($self) = @_;
         @_ == 2 && ($self = $_[1]);
-        Sidef::Types::Bool::Bool->new(-c $self->get_value);
+        (-c $$self) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub is_readable {
         my ($self) = @_;
         @_ == 2 && ($self = $_[1]);
-        Sidef::Types::Bool::Bool->new(-r $self->get_value);
+        (-r $$self) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub is_writeable {
         my ($self) = @_;
         @_ == 2 && ($self = $_[1]);
-        Sidef::Types::Bool::Bool->new(-w $self->get_value);
+        (-w $$self) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub has_setuid_bit {
         my ($self) = @_;
         @_ == 2 && ($self = $_[1]);
-        Sidef::Types::Bool::Bool->new(-u $self->get_value);
+        (-u $$self) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub has_setgid_bit {
         my ($self) = @_;
-        Sidef::Types::Bool::Bool->new(-g $self->get_value);
+        (-g $$self) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub has_sticky_bit {
         my ($self) = @_;
         @_ == 2 && ($self = $_[1]);
-        Sidef::Types::Bool::Bool->new(-k $self->get_value);
+        (-k $$self) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub modification_time_days_diff {
         my ($self) = @_;
         @_ == 2 && ($self = $_[1]);
-        Sidef::Types::Bool::Bool->new(-M $self->get_value);
+        (-M $$self) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub access_time_days_diff {
         my ($self) = @_;
         @_ == 2 && ($self = $_[1]);
-        Sidef::Types::Bool::Bool->new(-A $self->get_value);
+        (-A $$self) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub change_time_days_diff {
         my ($self) = @_;
         @_ == 2 && ($self = $_[1]);
-        Sidef::Types::Bool::Bool->new(-C $self->get_value);
+        (-C $$self) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub is_executable {
         my ($self) = @_;
         @_ == 2 && ($self = $_[1]);
-        Sidef::Types::Bool::Bool->new(-x $self->get_value);
+        (-x $$self) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub is_owned {
         my ($self) = @_;
         @_ == 2 && ($self = $_[1]);
-        Sidef::Types::Bool::Bool->new(-o $self->get_value);
+        (-o $$self) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub is_real_readable {
         my ($self) = @_;
         @_ == 2 && ($self = $_[1]);
-        Sidef::Types::Bool::Bool->new(-R $self->get_value);
+        (-R $$self) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub is_real_writeable {
         my ($self) = @_;
         @_ == 2 && ($self = $_[1]);
-        Sidef::Types::Bool::Bool->new(-W $self->get_value);
+        (-W $$self) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub is_real_executable {
         my ($self) = @_;
         @_ == 2 && ($self = $_[1]);
-        Sidef::Types::Bool::Bool->new(-X $self->get_value);
+        (-X $$self) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub is_real_owned {
         my ($self) = @_;
         @_ == 2 && ($self = $_[1]);
-        Sidef::Types::Bool::Bool->new(-O $self->get_value);
+        (-O $$self) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub is_binary {
         my ($self) = @_;
         @_ == 2 && ($self = $_[1]);
-        Sidef::Types::Bool::Bool->new(-B $self->get_value);
+        (-B $$self) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub is_text {
         my ($self) = @_;
         @_ == 2 && ($self = $_[1]);
-        Sidef::Types::Bool::Bool->new(-T $self->get_value);
+        (-T $$self) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub is_file {
         my ($self) = @_;
         @_ == 2 && ($self = $_[1]);
-        Sidef::Types::Bool::Bool->new(-f $self->get_value);
+        (-f $$self) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub name {
         my ($self) = @_;
         @_ == 2 && ($self = $_[1]);
-        Sidef::Types::String::String->new($self->get_value);
+        Sidef::Types::String::String->new($$self);
     }
 
     sub basename {
@@ -231,7 +231,7 @@ package Sidef::Types::Glob::File {
         @_ == 2 && ($self = $_[1]);
 
         state $x = require File::Basename;
-        Sidef::Types::String::String->new(File::Basename::basename($self->get_value));
+        Sidef::Types::String::String->new(File::Basename::basename($$self));
     }
 
     *base      = \&basename;
@@ -242,7 +242,7 @@ package Sidef::Types::Glob::File {
         @_ == 2 && ($self = $_[1]);
 
         state $x = require File::Basename;
-        Sidef::Types::Glob::Dir->new(File::Basename::dirname($self->get_value));
+        Sidef::Types::Glob::Dir->new(File::Basename::dirname($$self));
     }
 
     *dir      = \&dirname;
@@ -252,7 +252,7 @@ package Sidef::Types::Glob::File {
         my ($self) = @_;
         @_ == 2 && ($self = $_[1]);
         state $x = require File::Spec;
-        Sidef::Types::Bool::Bool->new(File::Spec->file_name_is_absolute($self->get_value));
+        (File::Spec->file_name_is_absolute($$self)) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     *is_abs = \&is_absolute;
@@ -262,7 +262,7 @@ package Sidef::Types::Glob::File {
         @_ == 2 && ($self = $_[1]);
 
         state $x = require File::Spec;
-        $self->new(File::Spec->rel2abs($self->get_value));
+        $self->new(File::Spec->rel2abs($$self));
     }
 
     *abs     = \&abs_name;
@@ -272,7 +272,7 @@ package Sidef::Types::Glob::File {
     sub rel_name {
         my ($self, $base) = @_;
         state $x = require File::Spec;
-        $self->new(File::Spec->rel2abs($self->get_value, defined($base) ? $base->get_value : ()));
+        $self->new(File::Spec->rel2abs($$self, defined($base) ? "$base" : ()));
     }
 
     *rel     = \&rel_name;
@@ -286,7 +286,7 @@ package Sidef::Types::Glob::File {
             ($self, $file) = ($file, $_[2]);
         }
 
-        Sidef::Types::Bool::Bool->new(CORE::rename($self->get_value, $file->get_value));
+        (CORE::rename($$self, "$file")) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub move {
@@ -297,7 +297,7 @@ package Sidef::Types::Glob::File {
         }
 
         state $x = require File::Copy;
-        Sidef::Types::Bool::Bool->new(File::Copy::move($self->get_value, $file->get_value));
+        (File::Copy::move($$self, "$file")) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     *mv = \&move;
@@ -310,7 +310,7 @@ package Sidef::Types::Glob::File {
         }
 
         state $x = require File::Copy;
-        Sidef::Types::Bool::Bool->new(File::Copy::copy($self->get_value, $file->get_value));
+        (File::Copy::copy($$self, "$file")) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     *cp = \&copy;
@@ -323,39 +323,36 @@ package Sidef::Types::Glob::File {
         }
 
         my @lines;
-        open(my $fh, '+<:utf8', $self->get_value) || return Sidef::Types::Bool::Bool->false;
+        open(my $fh, '+<:utf8', $$self) || return (Sidef::Types::Bool::Bool::FALSE);
         while (defined(my $line = <$fh>)) {
             push @lines, $code->run(Sidef::Types::String::String->new($line));
         }
 
         truncate($fh, 0) || do {
-            warn "[WARN] Can't truncate file `$self->get_value': $!";
+            warn "[WARN] Can't truncate file `$$self': $!";
             return;
         };
 
         seek($fh, 0, 0) || do {
-            warn "[WARN] Can't seek the begining of file `$self->get_value': $!";
+            warn "[WARN] Can't seek the begining of file `$$self': $!";
             return;
         };
 
-        Sidef::Types::Bool::Bool->new(
-            do {
-                local $, = q{};
-                local $\ = q{};
-                print $fh @lines;
-                close $fh;
-              }
-        );
+        do {
+            local $, = q{};
+            local $\ = q{};
+            print $fh @lines;
+            close $fh;
+          }
+          ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub open {
         my ($self, $mode, $fh_ref, $err_ref) = @_;
 
-        if (ref $mode) {
-            $mode = $mode->get_value;
-        }
+        $mode = "$mode" if (ref $mode);
 
-        my $success = CORE::open(my $fh, $mode, $self->get_value);
+        my $success = CORE::open(my $fh, $mode, $$self);
         my $error   = $!;
         my $fh_obj  = Sidef::Types::Glob::FileHandle->new(fh => $fh, self => $self);
 
@@ -363,10 +360,10 @@ package Sidef::Types::Glob::File {
             ${$fh_ref} = $fh_obj;
 
             return $success
-              ? Sidef::Types::Bool::Bool->true
+              ? (Sidef::Types::Bool::Bool::TRUE)
               : do {
                 defined($err_ref) && do { ${$err_ref} = Sidef::Types::String::String->new($error) };
-                Sidef::Types::Bool::Bool->false;
+                (Sidef::Types::Bool::Bool::FALSE);
               };
         }
 
@@ -403,31 +400,40 @@ package Sidef::Types::Glob::File {
 
     sub opendir {
         my ($self, @rest) = @_;
-        Sidef::Types::Glob::Dir->new($self->get_value)->open(@rest);
+        Sidef::Types::Glob::Dir->new($$self)->open(@rest);
     }
 
     sub sysopen {
         my ($self, $var_ref, $mode, $perm) = @_;
 
-        my $success = sysopen(my $fh, $self->get_value, $mode->get_value, defined($perm) ? $perm->get_value : 0666);
+        my $success = sysopen(
+            my $fh,
+            $$self, "$mode",
+            defined($perm)
+            ? do {
+                local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
+                $perm->get_value;
+              }
+            : 0666
+        );
 
         if ($success) {
             ${$var_ref} = Sidef::Types::Glob::FileHandle->new(fh => $fh, self => $self);
         }
 
-        Sidef::Types::Bool::Bool->new($success);
+        ($success) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub stat {
         my ($self) = @_;
         @_ == 2 && ($self = $_[1]);
-        Sidef::Types::Glob::Stat->stat($self->get_value, $self);
+        Sidef::Types::Glob::Stat->stat($$self, $self);
     }
 
     sub lstat {
         my ($self) = @_;
         @_ == 2 && ($self = $_[1]);
-        Sidef::Types::Glob::Stat->lstat($self->get_value, $self);
+        Sidef::Types::Glob::Stat->lstat($$self, $self);
     }
 
     sub chown {
@@ -437,7 +443,21 @@ package Sidef::Types::Glob::File {
             ($self, $uid, $gid) = ($uid, $gid, $_[3]);
         }
 
-        Sidef::Types::Bool::Bool->new(CORE::chown($uid->get_value, $gid->get_value, $self->get_value));
+        (
+         CORE::chown(
+             do {
+                 local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
+                 $uid->get_value;
+             },
+             do {
+                 local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
+                 $gid->get_value;
+             },
+             $$self
+                    )
+        )
+          ? (Sidef::Types::Bool::Bool::TRUE)
+          : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub chmod {
@@ -447,7 +467,15 @@ package Sidef::Types::Glob::File {
             ($self, $permission) = ($permission, $_[2]);
         }
 
-        Sidef::Types::Bool::Bool->new(CORE::chmod($permission->get_value, $self->get_value));
+        (
+         CORE::chmod(
+             do {
+                 local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
+                 $permission->get_value;
+             },
+             $$self
+                    )
+        ) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub utime {
@@ -457,7 +485,21 @@ package Sidef::Types::Glob::File {
             ($self, $atime, $mtime) = ($atime, $mtime, $_[3]);
         }
 
-        Sidef::Types::Bool::Bool->new(CORE::utime($atime->get_value, $mtime->get_value, $self->get_value));
+        (
+         CORE::utime(
+             do {
+                 local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
+                 $atime->get_value;
+             },
+             do {
+                 local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
+                 $mtime->get_value;
+             },
+             $$self
+                    )
+        )
+          ? (Sidef::Types::Bool::Bool::TRUE)
+          : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub truncate {
@@ -467,15 +509,20 @@ package Sidef::Types::Glob::File {
             ($self, $length) = ($length, $_[2]);
         }
 
-        my $len = defined($length) ? $length->get_value : 0;
-        Sidef::Types::Bool::Bool->new(CORE::truncate($self->get_value, $len));
+        my $len = defined($length)
+          ? do {
+            local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
+            $length->get_value;
+          }
+          : 0;
+        (CORE::truncate($$self, $len)) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub unlink {
         my ($self, @args) = @_;
-        @args
-          ? Sidef::Types::Number::Number->new(CORE::unlink(map { $_->get_value } @args))
-          : Sidef::Types::Bool::Bool->new(CORE::unlink($self->get_value));
+        @args                      ? Sidef::Types::Number::Number->new(CORE::unlink(@args))
+          : (CORE::unlink($$self)) ? (Sidef::Types::Bool::Bool::TRUE)
+          :                          (Sidef::Types::Bool::Bool::FALSE);
     }
 
     *delete = \&unlink;
@@ -483,7 +530,7 @@ package Sidef::Types::Glob::File {
 
     sub dump {
         my ($self) = @_;
-        Sidef::Types::String::String->new('File(' . ${Sidef::Types::String::String->new($self->get_value)->dump} . ')');
+        Sidef::Types::String::String->new('File(' . ${Sidef::Types::String::String->new($$self)->dump} . ')');
     }
 
     # Path split

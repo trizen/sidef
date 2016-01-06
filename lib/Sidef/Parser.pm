@@ -48,8 +48,8 @@ package Sidef::Parser {
                 (?>
                        nil\b                          (?{ state $x = bless({}, 'Sidef::Types::Nil::Nil') })
                      | null\b                         (?{ state $x = Sidef::Types::Null::Null->new })
-                     | true\b                         (?{ state $x = Sidef::Types::Bool::Bool->true })
-                     | (?:false|Bool)\b               (?{ state $x = Sidef::Types::Bool::Bool->false })
+                     | true\b                         (?{ Sidef::Types::Bool::Bool::TRUE })
+                     | (?:false|Bool)\b               (?{ Sidef::Types::Bool::Bool::FALSE })
                      | next\b                         (?{ state $x = bless({}, 'Sidef::Types::Block::Next') })
                      | break\b                        (?{ state $x = bless({}, 'Sidef::Types::Block::Break') })
                      | continue\b                     (?{ state $x = bless({}, 'Sidef::Types::Block::Continue') })
@@ -1437,10 +1437,17 @@ package Sidef::Parser {
                                 }
                             }
                             elsif (exists $self->{built_in_classes}{$name}) {
-                                if ($name ne 'Sidef') {
-                                    my $ref = $self->parse_expr(code => \$name);
-                                    push @{$obj->{inherit}}, ref($ref);
-                                }
+                                $self->fatal_error(
+                                                   error    => "Inheritance from built-in classes is not allowed",
+                                                   expected => "class `$name` is a built-in class",
+                                                   code     => $_,
+                                                   pos      => pos($_) - length($name) - 1,
+                                                  );
+
+                                #if ($name ne 'Sidef') {
+                                #    my $ref = $self->parse_expr(code => \$name);
+                                #    push @{$obj->{inherit}}, ref($ref);
+                                #}
                             }
                             else {
                                 $self->fatal_error(

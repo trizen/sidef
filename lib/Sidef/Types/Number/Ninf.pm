@@ -2,7 +2,6 @@ package Sidef::Types::Number::Ninf {
 
     use utf8;
     use 5.014;
-    require Math::GMPq;
 
     use parent qw(
       Sidef::Object::Object
@@ -21,14 +20,6 @@ package Sidef::Types::Number::Ninf {
         Math::GMPq::Rmpq_set_si($r, -1, 0);
         bless \$r, __PACKAGE__;
     };
-
-    state $ZERO = $Sidef::Types::Number::Number::ZERO;
-    state $ONE  = $Sidef::Types::Number::Number::ONE;
-    state $MONE = $Sidef::Types::Number::Number::MONE;
-
-    if (not defined $ZERO or not defined $ONE or not defined $MONE) {
-        die "Fatal error: can't load the Ninf class!";
-    }
 
     sub new { $NINF }
 
@@ -67,7 +58,7 @@ package Sidef::Types::Number::Ninf {
     *idiv = \&div;
 
     sub is_pos {
-        state $x = Sidef::Types::Bool::Bool->false;
+        (Sidef::Types::Bool::Bool::FALSE);
     }
 
     *is_nan    = \&is_pos;
@@ -83,7 +74,7 @@ package Sidef::Types::Number::Ninf {
     *is_real   = \&is_pos;
 
     sub is_neg {
-        state $x = Sidef::Types::Bool::Bool->true;
+        (Sidef::Types::Bool::Bool::TRUE);
     }
 
     *is_inf  = \&is_neg;
@@ -186,7 +177,7 @@ package Sidef::Types::Number::Ninf {
 
     sub max { $_[1] }
 
-    sub zero { $ZERO }
+    sub zero { (Sidef::Types::Number::Number::ZERO) }
 
     *inv   = \&zero;
     *sin   = \&zero;
@@ -273,7 +264,7 @@ package Sidef::Types::Number::Ninf {
     #
     ## tanh(-inf) = -1
     #
-    sub tanh { $MONE }
+    sub tanh { (Sidef::Types::Number::Number::MONE) }
 
     *coth = \&tanh;
     *erf  = \&tanh;
@@ -288,7 +279,10 @@ package Sidef::Types::Number::Ninf {
     #
     sub pow {
         my ($x, $y) = @_;
-        $y->is_neg ? $ZERO : $y->is_zero ? $ONE : $y->is_even ? $x->neg : $x;
+            $y->is_neg  ? (Sidef::Types::Number::Number::ZERO)
+          : $y->is_zero ? (Sidef::Types::Number::Number::ONE)
+          : $y->is_even ? $x->neg
+          :               $x;
     }
 
     #
@@ -299,7 +293,9 @@ package Sidef::Types::Number::Ninf {
     #
     sub binomial {
         my ($x, $y) = @_;
-        ref($y) eq 'Sidef::Types::Number::Inf' ? $ONE : $y->is_neg ? $ZERO : $x;
+        ref($y) eq 'Sidef::Types::Number::Inf' ? (Sidef::Types::Number::Number::ONE)
+          : $y->is_neg                         ? (Sidef::Types::Number::Number::ZERO)
+          :                                      $x;
     }
 
     *nok = \&binomial;
@@ -311,54 +307,54 @@ package Sidef::Types::Number::Ninf {
     sub eq {
         my ($x, $y) = @_;
         if (ref($y) eq __PACKAGE__) {
-            state $z = Sidef::Types::Bool::Bool->true;
+            (Sidef::Types::Bool::Bool::TRUE);
         }
         else {
-            state $z = Sidef::Types::Bool::Bool->false;
+            (Sidef::Types::Bool::Bool::FALSE);
         }
     }
 
     sub ne {
         my ($x, $y) = @_;
         if (ref($y) eq __PACKAGE__) {
-            state $z = Sidef::Types::Bool::Bool->false;
+            (Sidef::Types::Bool::Bool::FALSE);
         }
         else {
-            state $z = Sidef::Types::Bool::Bool->true;
+            (Sidef::Types::Bool::Bool::TRUE);
         }
     }
 
     sub gt {
-        state $z = Sidef::Types::Bool::Bool->false;
+        (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub ge {
         my ($x, $y) = @_;
         if (ref($y) eq __PACKAGE__) {
-            state $z = Sidef::Types::Bool::Bool->true;
+            (Sidef::Types::Bool::Bool::TRUE);
         }
         else {
-            state $z = Sidef::Types::Bool::Bool->false;
+            (Sidef::Types::Bool::Bool::FALSE);
         }
     }
 
     sub lt {
         my ($x, $y) = @_;
         if (ref($y) eq __PACKAGE__) {
-            state $z = Sidef::Types::Bool::Bool->false;
+            (Sidef::Types::Bool::Bool::FALSE);
         }
         else {
-            state $z = Sidef::Types::Bool::Bool->true;
+            (Sidef::Types::Bool::Bool::TRUE);
         }
     }
 
     sub le {
-        state $z = Sidef::Types::Bool::Bool->true;
+        (Sidef::Types::Bool::Bool::TRUE);
     }
 
     sub cmp {
         my ($x, $y) = @_;
-        ref($y) eq __PACKAGE__ ? $ZERO : $MONE;
+        ref($y) eq __PACKAGE__ ? (Sidef::Types::Number::Number::ZERO) : (Sidef::Types::Number::Number::MONE);
     }
 
     {

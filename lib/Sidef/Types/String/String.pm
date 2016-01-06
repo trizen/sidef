@@ -16,7 +16,7 @@ package Sidef::Types::String::String {
     sub new {
         my (undef, $str) = @_;
         if (@_ > 2) {
-            $str = CORE::join('', map { ref($_) ? $_->to_s->get_value : $_ } @_[1 .. $#_]);
+            $str = CORE::join('', map { ref($_) ? "${$_->to_s}" : $_ } @_[1 .. $#_]);
         }
         elsif (ref $str) {
             return $str->to_s;
@@ -45,7 +45,15 @@ package Sidef::Types::String::String {
 
     sub div {
         my ($self, $num) = @_;
-        (my $strlen = int(length($$self) / $num->get_value)) < 1 && return;
+        (
+         my $strlen = int(
+             length($$self) / do {
+                 local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
+                 $num->get_value;
+               }
+         )
+          ) < 1
+          && return;
         Sidef::Types::Array::Array->new(map { $self->new($_) } unpack "(a$strlen)*", $$self);
     }
 
@@ -53,22 +61,22 @@ package Sidef::Types::String::String {
 
     sub lt {
         my ($self, $string) = @_;
-        Sidef::Types::Bool::Bool->new($$self lt $string->get_value);
+        ($$self lt "$string") ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub gt {
         my ($self, $string) = @_;
-        Sidef::Types::Bool::Bool->new($$self gt $string->get_value);
+        ($$self gt "$string") ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub le {
         my ($self, $string) = @_;
-        Sidef::Types::Bool::Bool->new($$self le $string->get_value);
+        ($$self le "$string") ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub ge {
         my ($self, $string) = @_;
-        Sidef::Types::Bool::Bool->new($$self ge $string->get_value);
+        ($$self ge "$string") ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub subtract {
@@ -88,8 +96,8 @@ package Sidef::Types::String::String {
             return $self;
         }
 
-        if ((my $ind = CORE::index($$self, $obj->get_value)) != -1) {
-            return $self->new(CORE::substr($$self, 0, $ind) . CORE::substr($$self, $ind + CORE::length($obj->get_value)));
+        if ((my $ind = CORE::index($$self, "$obj")) != -1) {
+            return $self->new(CORE::substr($$self, 0, $ind) . CORE::substr($$self, $ind + CORE::length("$obj")));
         }
         $self;
     }
@@ -101,10 +109,15 @@ package Sidef::Types::String::String {
           if ref($regex) ne 'Sidef::Types::Regex::Regex';
 
         Sidef::Types::Regex::Match->new(
-                                        obj  => $$self,
-                                        self => $regex,
-                                        pos  => defined($pos) ? $pos->get_value : undef,
-                                       );
+            obj  => $$self,
+            self => $regex,
+            pos  => defined($pos)
+            ? do {
+                local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
+                $pos->get_value;
+              }
+            : undef,
+        );
     }
 
     sub gmatch {
@@ -115,16 +128,21 @@ package Sidef::Types::String::String {
 
         local $regex->{global} = 1;
         Sidef::Types::Regex::Match->new(
-                                        obj  => $$self,
-                                        self => $regex,
-                                        pos  => defined($pos) ? $pos->get_value : undef,
-                                       );
+            obj  => $$self,
+            self => $regex,
+            pos  => defined($pos)
+            ? do {
+                local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
+                $pos->get_value;
+              }
+            : undef,
+        );
     }
 
     sub array_to {
         my ($self, $string) = @_;
 
-        my ($s1, $s2) = ($$self, $string->get_value);
+        my ($s1, $s2) = ($$self, "$string");
 
         if (length($s1) == 1 and length($s2) == 1) {
             return Sidef::Types::Array::Array->new(map { $self->new(chr($_)) } ord($s1) .. ord($s2));
@@ -145,7 +163,7 @@ package Sidef::Types::String::String {
         my ($self, $string) = @_;
         Sidef::Types::Range::RangeString->__new__(
                                                   from => $$self,
-                                                  to   => $string->get_value,
+                                                  to   => "$string",
                                                   asc  => 1,
                                                  );
     }
@@ -157,7 +175,7 @@ package Sidef::Types::String::String {
         my ($self, $string) = @_;
         Sidef::Types::Range::RangeString->__new__(
                                                   from => $$self,
-                                                  to   => $string->get_value,
+                                                  to   => "$string",
                                                   asc  => 0,
                                                  );
     }
@@ -176,28 +194,25 @@ package Sidef::Types::String::String {
 
     sub cmp {
         my ($self, $string) = @_;
-
-        state $mone = Sidef::Types::Number::Number->new(-1);
-        state $zero = Sidef::Types::Number::Number->new(0);
-        state $one  = Sidef::Types::Number::Number->new(1);
-
-        my $cmp = $$self cmp $string->get_value;
-        $cmp == 0 ? $zero : $cmp > 0 ? $one : $mone;
+        my $cmp = $$self cmp "$string";
+            $cmp == 0 ? (Sidef::Types::Number::Number::ZERO)
+          : $cmp > 0  ? (Sidef::Types::Number::Number::ONE)
+          :             (Sidef::Types::Number::Number::MONE);
     }
 
     sub xor {
         my ($self, $str) = @_;
-        $self->new($$self ^ $str->get_value);
+        $self->new($$self ^ "$str");
     }
 
     sub or {
         my ($self, $str) = @_;
-        $self->new($$self | $str->get_value);
+        $self->new($$self | "$str");
     }
 
     sub and {
         my ($self, $str) = @_;
-        $self->new($$self & $str->get_value);
+        $self->new($$self & "$str");
     }
 
     sub not {
@@ -207,20 +222,26 @@ package Sidef::Types::String::String {
 
     sub times {
         my ($self, $num) = @_;
-        $self->new($$self x $num->get_value);
+        $self->new(
+            $$self x do {
+                local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
+                $num->get_value;
+              }
+        );
     }
 
     *multiply = \&times;
 
     sub repeat {
         my ($self, $num) = @_;
-        $num //= Sidef::Types::Number::Number->new(1);
-        $self->times($num);
+        $self->times($num // (Sidef::Types::Number::Number::ONE));
     }
 
     sub equals {
         my ($self, $arg) = @_;
-        Sidef::Types::Bool::Bool->new($$self eq $$arg);
+        $$self eq $$arg
+          ? (Sidef::Types::Bool::Bool::TRUE)
+          : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     *eq = \&equals;
@@ -228,19 +249,21 @@ package Sidef::Types::String::String {
 
     sub ne {
         my ($self, $arg) = @_;
-        Sidef::Types::Bool::Bool->new($$self ne $$arg);
+        $$self ne $$arg
+          ? (Sidef::Types::Bool::Bool::TRUE)
+          : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub append {
         my ($self, $string) = @_;
-        $self->new($$self . $string->get_value);
+        $self->new($$self . "$string");
     }
 
     *concat = \&append;
 
     sub prepend {
         my ($self, $string) = @_;
-        $self->new($string->get_value . $$self);
+        $self->new("$string" . $$self);
     }
 
     sub ucfirst {
@@ -280,18 +303,47 @@ package Sidef::Types::String::String {
     }
 
     sub first {
-        my ($self, $obj) = @_;
-        __PACKAGE__->new(CORE::substr($$self, 0, defined($obj) ? $obj->get_value : 1));
+        my ($self, $num) = @_;
+        __PACKAGE__->new(
+            CORE::substr(
+                $$self, 0,
+                defined($num)
+                ? do {
+                    local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
+                    $num->get_value;
+                  }
+                : 1
+            )
+        );
     }
 
     sub last {
-        my ($self, $obj) = @_;
-        __PACKAGE__->new(CORE::substr($$self, defined($obj) ? -$obj->get_value : -1));
+        my ($self, $num) = @_;
+        __PACKAGE__->new(
+            CORE::substr(
+                $$self,
+                defined($num)
+                ? do {
+                    local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
+                    -$num->get_value;
+                  }
+                : -1
+            )
+        );
     }
 
     sub char {
         my ($self, $pos) = @_;
-        __PACKAGE__->new(CORE::substr($$self, $pos->get_value, 1));
+        __PACKAGE__->new(
+            CORE::substr(
+                $$self,
+                do {
+                    local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
+                    $pos->get_value;
+                },
+                1
+                        )
+        );
     }
 
     *char_at = \&char;
@@ -344,7 +396,7 @@ package Sidef::Types::String::String {
 
     sub crypt {
         my ($self, $salt) = @_;
-        $self->new(crypt($$self, $salt->get_value));
+        $self->new(crypt($$self, "$salt"));
     }
 
     sub bin {
@@ -370,10 +422,26 @@ package Sidef::Types::String::String {
     sub substr {
         my ($self, $offs, $len) = @_;
         __PACKAGE__->new(
-                         defined($len)
-                         ? CORE::substr($$self, $offs->get_value, $len->get_value)
-                         : CORE::substr($$self, $offs->get_value)
-                        );
+            defined($len)
+            ? CORE::substr(
+                $$self,
+                do {
+                    local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
+                    $offs->get_value;
+                },
+                do {
+                    local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
+                    $len->get_value;
+                  }
+              )
+            : CORE::substr(
+                $$self,
+                do {
+                    local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
+                    $offs->get_value;
+                  }
+            )
+        );
     }
 
     *substring = \&substr;
@@ -383,8 +451,18 @@ package Sidef::Types::String::String {
 
         my $max = CORE::length($$self);
 
-        $from = defined($from) ? $from->get_value : 0;
-        $to   = defined($to)   ? $to->get_value   : $max;
+        $from = defined($from)
+          ? do {
+            local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
+            $from->get_value;
+          }
+          : 0;
+        $to = defined($to)
+          ? do {
+            local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
+            $to->get_value;
+          }
+          : $max;
 
         if (abs($from) > $max) {
             return __PACKAGE__->new('');
@@ -403,13 +481,28 @@ package Sidef::Types::String::String {
 
     sub insert {
         my ($self, $string, $pos, $len) = @_;
-        CORE::substr(my $copy_str = $$self, $pos->get_value, (defined($len) ? $len->get_value : 0), $string->get_value);
+        CORE::substr(
+            my $copy_str = $$self,
+            do {
+                local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
+                $pos->get_value;
+            },
+            (
+             defined($len)
+             ? do {
+                 local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
+                 $len->get_value;
+               }
+             : 0
+            ),
+            "$string"
+                    );
         __PACKAGE__->new($copy_str);
     }
 
     sub join {
         my ($self, @rest) = @_;
-        __PACKAGE__->new(CORE::join($$self, map { $_->get_value } @rest));
+        __PACKAGE__->new(CORE::join($$self, @rest));
     }
 
     sub clear {
@@ -419,30 +512,44 @@ package Sidef::Types::String::String {
 
     sub is_empty {
         my ($self) = @_;
-        Sidef::Types::Bool::Bool->new($$self eq '');
+        ($$self eq '') ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub index {
         my ($self, $substr, $pos) = @_;
-        Sidef::Types::Number::Number->new(
-                                          defined($pos)
-                                          ? CORE::index($$self, $substr->get_value, $pos->get_value)
-                                          : CORE::index($$self, $substr->get_value)
-                                         );
+        Sidef::Types::Number::Number::_new_int(
+            defined($pos)
+            ? CORE::index(
+                $$self,
+                "$substr",
+                do {
+                    local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
+                    $pos->get_value;
+                  }
+              )
+            : CORE::index($$self, "$substr")
+        );
     }
 
     sub rindex {
         my ($self, $substr, $pos) = @_;
-        Sidef::Types::Number::Number->new(
-                                          defined($pos)
-                                          ? CORE::rindex($$self, $substr->get_value, $pos->get_value)
-                                          : CORE::rindex($$self, $substr->get_value)
-                                         );
+        Sidef::Types::Number::Number::_new_int(
+            defined($pos)
+            ? CORE::rindex(
+                $$self,
+                "$substr",
+                do {
+                    local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
+                    $pos->get_value;
+                  }
+              )
+            : CORE::rindex($$self, "$substr")
+        );
     }
 
     sub ord {
         my ($self) = @_;
-        Sidef::Types::Number::Number->new(CORE::ord($$self));
+        Sidef::Types::Number::Number::_new_uint(CORE::ord($$self));
     }
 
     sub reverse {
@@ -452,12 +559,12 @@ package Sidef::Types::String::String {
 
     sub printf {
         my ($self, @arguments) = @_;
-        Sidef::Types::Bool::Bool->new(printf $$self, @arguments);
+        (printf $$self, @arguments) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub printlnf {
         my ($self, @arguments) = @_;
-        Sidef::Types::Bool::Bool->new(printf($$self . "\n", @arguments));
+        (printf($$self . "\n", @arguments)) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub sprintf {
@@ -477,7 +584,7 @@ package Sidef::Types::String::String {
             return $obj->{regex};
         }
 
-        CORE::quotemeta($obj->get_value);
+        CORE::quotemeta("$obj");
     }
 
     sub sub {
@@ -489,7 +596,7 @@ package Sidef::Types::String::String {
         $str //= __PACKAGE__->new('');
 
         my $search = $self->_string_or_regex($regex);
-        my $value  = $str->get_value;
+        my $value  = "$str";
 
         $self->new($$self =~ s{$search}{$value}r);
     }
@@ -505,7 +612,7 @@ package Sidef::Types::String::String {
         $str //= __PACKAGE__->new('');
 
         my $search = $self->_string_or_regex($regex);
-        my $value  = $str->get_value;
+        my $value  = "$str";
         $self->new($$self =~ s{$search}{$value}gr);
     }
 
@@ -524,7 +631,7 @@ package Sidef::Types::String::String {
             return __PACKAGE__->new($$self =~ s{$search}{$code->run(_get_captures($$self))}er);
         }
 
-        __PACKAGE__->new($$self =~ s{$search}{$code->get_value}eer);
+        __PACKAGE__->new($$self =~ s{$search}{"$code"}eer);
     }
 
     sub gesub {
@@ -538,7 +645,7 @@ package Sidef::Types::String::String {
             return __PACKAGE__->new($value =~ s{$search}{$code->run(_get_captures($value))}ger);
         }
 
-        my $value = $code->get_value;
+        my $value = "$code";
         __PACKAGE__->new($$self =~ s{$search}{$value}geer);
     }
 
@@ -564,7 +671,12 @@ package Sidef::Types::String::String {
     sub split {
         my ($self, $sep, $size) = @_;
 
-        $size = defined($size) ? $size->get_value : 0;
+        $size = defined($size)
+          ? do {
+            local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
+            $size->get_value;
+          }
+          : 0;
 
         if (CORE::not defined $sep) {
             return
@@ -573,7 +685,14 @@ package Sidef::Types::String::String {
         }
 
         if (ref($sep) eq 'Sidef::Types::Number::Number') {
-            return Sidef::Types::Array::Array->new(map { __PACKAGE__->new($_) } unpack '(a' . $sep->get_value . ')*', $$self);
+            return Sidef::Types::Array::Array->new(
+                map { __PACKAGE__->new($_) } unpack '(a' . do {
+                    local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
+                    $sep->get_value;
+                  }
+                  . ')*',
+                $$self
+                                                  );
         }
 
         $sep = $self->_string_or_regex($sep);
@@ -648,8 +767,11 @@ package Sidef::Types::String::String {
         my ($self) = @_;
         my $string = $$self;
         state $x = require bytes;
-        Sidef::Types::Array::Array->new(map { Sidef::Types::Number::Number->new(CORE::ord(bytes::substr($string, $_, 1))) }
-                                        0 .. bytes::length($string) - 1);
+        Sidef::Types::Array::Array->new(
+            map {
+                Sidef::Types::Number::Number::_new_uint(CORE::ord(bytes::substr($string, $_, 1)))
+              } 0 .. bytes::length($string) - 1
+        );
     }
 
     sub each_byte {
@@ -660,7 +782,10 @@ package Sidef::Types::String::String {
         state $x = require bytes;
         foreach my $i (0 .. bytes::length($string) - 1) {
             if (
-                defined(my $res = $code->_run_code(Sidef::Types::Number::Number->new(CORE::ord bytes::substr($string, $i, 1))))
+                defined(
+                        my $res =
+                          $code->_run_code(Sidef::Types::Number::Number::_new_uint(CORE::ord bytes::substr($string, $i, 1)))
+                       )
               ) {
                 return $res;
             }
@@ -768,7 +893,7 @@ package Sidef::Types::String::String {
         my %map;
         if (CORE::not defined($repl) and defined($orig)) {    # assume an array of pairs
             foreach my $pair (@{$orig}) {
-                $map{$pair->first} = $pair->second->get_value;
+                $map{"$pair->[0]"} = "$pair->[1]";
             }
         }
         else {
@@ -791,11 +916,11 @@ package Sidef::Types::String::String {
         $orig->isa('ARRAY') && return $self->trans($orig, $repl);
         $self->new(
                        eval qq{"\Q${\$$self}\E"=~tr/}
-                     . $orig->get_value =~ s{([/\\])}{\\$1}gr . "/"
-                     . $repl->get_value =~ s{([/\\])}{\\$1}gr . "/r"
+                     . "$orig" =~ s{([/\\])}{\\$1}gr . "/"
+                     . "$repl" =~ s{([/\\])}{\\$1}gr . "/r"
                      . (
                         defined($modes)
-                        ? $modes->get_value
+                        ? "$modes"
                         : ''
                        )
                   );
@@ -805,7 +930,7 @@ package Sidef::Types::String::String {
 
     sub unpack {
         my ($self, $arg) = @_;
-        my @values = map { __PACKAGE__->new($_) } CORE::unpack($$self, $arg->get_value);
+        my @values = map { __PACKAGE__->new($_) } CORE::unpack($$self, "$arg");
         @values > 1 ? @values : $values[0];
     }
 
@@ -815,7 +940,7 @@ package Sidef::Types::String::String {
     }
 
     sub chars_length {
-        Sidef::Types::Number::Number->new(CORE::length(${$_[0]}));
+        Sidef::Types::Number::Number::_new_uint(CORE::length(${$_[0]}));
     }
 
     *len       = \&chars_length;
@@ -824,7 +949,7 @@ package Sidef::Types::String::String {
     *size      = \&chars_length;
 
     sub graphs_length {
-        Sidef::Types::Number::Number->new(scalar(() = ${$_[0]} =~ /\X/g));
+        Sidef::Types::Number::Number::_new_uint(scalar(() = ${$_[0]} =~ /\X/g));
     }
 
     *graphs_len = \&graphs_length;
@@ -833,7 +958,7 @@ package Sidef::Types::String::String {
         my ($self) = @_;
 
         state $x = require bytes;
-        Sidef::Types::Number::Number->new(bytes::length($$self));
+        Sidef::Types::Number::Number::_new_uint(bytes::length($$self));
     }
 
     *bytes_len = \&bytes_length;
@@ -842,7 +967,7 @@ package Sidef::Types::String::String {
         my ($self, $arg) = @_;
 
         my @s = split(//, $$self);
-        my @t = split(//, $arg->get_value);
+        my @t = split(//, "$arg");
 
         my $len1 = scalar(@s);
         my $len2 = scalar(@t);
@@ -859,7 +984,7 @@ package Sidef::Types::String::String {
             }
         }
 
-        Sidef::Types::Number::Number->new($d[-1][-1]);
+        Sidef::Types::Number::Number::_new_int($d[-1][-1]);
     }
 
     *lev   = \&levenshtein;
@@ -869,7 +994,7 @@ package Sidef::Types::String::String {
         my ($string1, $string2, $winkle) = @_;
 
         $string1 = $$string1;
-        $string2 = $string2->get_value;
+        $string2 = "$string2";
 
         my $len1 = length($string1);
         my $len2 = length($string2);
@@ -877,7 +1002,7 @@ package Sidef::Types::String::String {
         ($string1, $len1, $string2, $len2) = ($string2, $len2, $string1, $len1)
           if $len1 > $len2;
 
-        $len1 || return Sidef::Types::Number::Number->new(0);
+        $len1 || return (Sidef::Types::Number::Number::ZERO);
 
         my $match_window = $len2 > 3 ? int($len2 / 2) - 1 : 0;
 
@@ -903,7 +1028,7 @@ package Sidef::Types::String::String {
             }
         }
 
-        (@string1_matches = grep { defined } @string1_matches) || return Sidef::Types::Number::Number->new(0);
+        (@string1_matches = grep { defined } @string1_matches) || return (Sidef::Types::Number::Number::ZERO);
         @string2_matches = grep { defined } @string2_matches;
 
         my $transpositions = 0;
@@ -928,9 +1053,11 @@ package Sidef::Types::String::String {
     sub contains {
         my ($self, $arg, $start_pos) = @_;
 
-        $start_pos =
-          defined($start_pos)
-          ? $start_pos->get_value
+        $start_pos = defined($start_pos)
+          ? do {
+            local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
+            $start_pos->get_value;
+          }
           : 0;
 
         if (ref($arg) eq 'Sidef::Types::Regex::Regex') {
@@ -941,14 +1068,14 @@ package Sidef::Types::String::String {
                 pos($s) = $start_pos;
             }
 
-            return Sidef::Types::Bool::Bool->new(scalar $s =~ /$regex/g);
+            return (scalar $s =~ /$regex/g) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
         }
 
         if ($start_pos < 0) {
             $start_pos = CORE::length($$self) + $start_pos;
         }
 
-        Sidef::Types::Bool::Bool->new(CORE::index($$self, $arg->get_value, $start_pos) != -1);
+        (CORE::index($$self, "$arg", $start_pos) != -1) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     *contain  = \&contains;
@@ -964,35 +1091,37 @@ package Sidef::Types::String::String {
         if (ref($arg) eq 'Sidef::Types::Regex::Regex') {
             my $regex = $arg->{regex};
             ++$counter while $s =~ /$regex/g;
-            return Sidef::Types::Number::Number->new($counter);
+            return Sidef::Types::Number::Number::_new_uint($counter);
         }
         elsif (ref($arg) eq 'Sidef::Types::Block::Block') {
             foreach my $char (split //, $s) {
                 ++$counter if $arg->run(__PACKAGE__->new($char));
             }
-            return $counter;
+            return Sidef::Types::Number::Number::_new_uint($counter);
         }
 
-        my $ss = $arg->get_value;
+        my $ss = "$arg";
         ++$counter while $s =~ /\Q$ss\E/g;
-        Sidef::Types::Number::Number->new($counter);
+        Sidef::Types::Number::Number::_new_uint($counter);
     }
 
     sub overlaps {
         my ($self, $arg) = @_;
-        Sidef::Types::Bool::Bool->new(CORE::index($$self ^ $arg->get_value, "\0") != -1);
+        (CORE::index($$self ^ "$arg", "\0") != -1) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub begins_with {
         my ($self, $string) = @_;
 
-        CORE::length($$self) < (my $len = CORE::length($string->get_value))
-          && return Sidef::Types::Bool::Bool->false;
+        $string = "$string";
 
-        CORE::substr($$self, 0, $len) eq $string->get_value
-          && return Sidef::Types::Bool::Bool->true;
+        CORE::length($$self) < (my $len = CORE::length($string))
+          && return (Sidef::Types::Bool::Bool::FALSE);
 
-        Sidef::Types::Bool::Bool->false;
+        CORE::substr($$self, 0, $len) eq $string
+          && return (Sidef::Types::Bool::Bool::TRUE);
+
+        (Sidef::Types::Bool::Bool::FALSE);
     }
 
     *starts_with = \&begins_with;
@@ -1000,26 +1129,28 @@ package Sidef::Types::String::String {
     sub ends_with {
         my ($self, $string) = @_;
 
-        CORE::length($$self) < (my $len = CORE::length($string->get_value))
-          && return Sidef::Types::Bool::Bool->false;
+        $string = "$string";
 
-        CORE::substr($$self, -$len) eq $string->get_value
-          && return Sidef::Types::Bool::Bool->true;
+        CORE::length($$self) < (my $len = CORE::length($string))
+          && return (Sidef::Types::Bool::Bool::FALSE);
 
-        Sidef::Types::Bool::Bool->false;
+        CORE::substr($$self, -$len) eq $string
+          && return (Sidef::Types::Bool::Bool::TRUE);
+
+        (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub looks_like_number {
         my ($self) = @_;
         state $x = require Scalar::Util;
-        Sidef::Types::Bool::Bool->new(Scalar::Util::looks_like_number($$self));
+        (Scalar::Util::looks_like_number($$self)) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     *is_numeric = \&looks_like_number;
 
     sub is_palindrome {
         my ($self) = @_;
-        Sidef::Types::Bool::Bool->new(${$self} eq CORE::reverse(${$self}));
+        ($$self eq CORE::reverse(${$self})) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub warn {
@@ -1036,14 +1167,14 @@ package Sidef::Types::String::String {
         my ($self, $enc) = @_;
 
         state $x = require Encode;
-        $self->new(Encode::encode($enc->get_value, $$self));
+        $self->new(Encode::encode("$enc", $$self));
     }
 
     sub decode {
         my ($self, $enc) = @_;
 
         state $x = require Encode;
-        $self->new(Encode::decode($enc->get_value, $$self));
+        $self->new(Encode::decode("$enc", $$self));
     }
 
     sub encode_utf8 {
@@ -1293,7 +1424,11 @@ package Sidef::Types::String::String {
     sub shift_left {
         my ($self, $i) = @_;
         my $len = CORE::length($$self);
-        $i = $i->get_value > $len ? $len : $i->get_value;
+        $i = do {
+            local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
+            $i->get_value;
+        };
+        $i = $len if $i > $len;
         $self->new(CORE::substr($$self, $i));
     }
 
@@ -1301,7 +1436,11 @@ package Sidef::Types::String::String {
 
     sub shift_right {
         my ($self, $i) = @_;
-        $self->new(CORE::substr($$self, 0, -$i->get_value));
+        $i = do {
+            local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
+            $i->get_value;
+        };
+        $self->new(CORE::substr($$self, 0, -$i));
     }
 
     *drop_right = \&shift_right;

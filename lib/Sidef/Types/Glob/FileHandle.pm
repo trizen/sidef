@@ -27,7 +27,7 @@ package Sidef::Types::Glob::FileHandle {
     *self = \&parent;
 
     sub is_on_tty {
-        Sidef::Types::Bool::Bool->new(-t $_[0]{fh});
+        (-t $_[0]{fh}) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     *isatty = \&is_on_tty;
@@ -52,17 +52,17 @@ package Sidef::Types::Glob::FileHandle {
 
     sub binmode {
         my ($self, $encoding) = @_;
-        CORE::binmode($self->{fh}, $encoding->get_value);
+        CORE::binmode($self->{fh}, "$encoding");
     }
 
     sub syswrite {
         my ($self, @args) = @_;
-        Sidef::Types::Bool::Bool->new(CORE::syswrite $self->{fh}, @args);
+        (CORE::syswrite $self->{fh}, @args) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub print {
         my ($self, @args) = @_;
-        Sidef::Types::Bool::Bool->new(CORE::print {$self->{fh}} @args);
+        (CORE::print {$self->{fh}} @args) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     *write = \&print;
@@ -70,27 +70,45 @@ package Sidef::Types::Glob::FileHandle {
 
     sub println {
         my ($self, @args) = @_;
-        Sidef::Types::Bool::Bool->new(CORE::say {$self->{fh}} @args);
+        (CORE::say {$self->{fh}} @args) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     *say = \&println;
 
     sub printf {
         my ($self, @args) = @_;
-        Sidef::Types::Bool::Bool->new(CORE::printf {$self->{fh}} @args);
+        (CORE::printf {$self->{fh}} @args) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub read {
         my ($self, $var_ref, $length, $offset) = @_;
 
-        my $chunk = ref(${$var_ref}) ? ${$var_ref}->get_value : '';
+        my $chunk = "$$var_ref";
         my $size = Sidef::Types::Number::Number->new(
-                                                     defined($offset)
-                                                     ? CORE::read($self->{fh}, $chunk, $length->get_value, $offset->get_value)
-                                                     : CORE::read($self->{fh}, $chunk, $length->get_value)
-                                                    );
+            defined($offset)
+            ? CORE::read(
+                $self->{fh},
+                $chunk,
+                do {
+                    local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
+                    $length->get_value;
+                },
+                do {
+                    local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
+                    $offset->get_value;
+                  }
+              )
+            : CORE::read(
+                $self->{fh},
+                $chunk,
+                do {
+                    local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
+                    $length->get_value;
+                  }
+            )
+        );
 
-        ${$var_ref} = Sidef::Types::String::String->new($chunk);
+        $$var_ref = Sidef::Types::String::String->new($chunk);
 
         return $size;
     }
@@ -98,14 +116,32 @@ package Sidef::Types::Glob::FileHandle {
     sub sysread {
         my ($self, $var_ref, $length, $offset) = @_;
 
-        my $chunk = ref(${$var_ref}) ? ${$var_ref}->get_value : '';
+        my $chunk = "$$var_ref";
         my $size = Sidef::Types::Number::Number->new(
-                                                   defined($offset)
-                                                   ? CORE::sysread($self->{fh}, $chunk, $length->get_value, $offset->get_value)
-                                                   : CORE::sysread($self->{fh}, $chunk, $length->get_value)
+            defined($offset)
+            ? CORE::sysread(
+                $self->{fh},
+                $chunk,
+                do {
+                    local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
+                    $length->get_value;
+                },
+                do {
+                    local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
+                    $offset->get_value;
+                  }
+              )
+            : CORE::sysread(
+                $self->{fh},
+                $chunk,
+                do {
+                    local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
+                    $length->get_value;
+                  }
+            )
         );
 
-        ${$var_ref} = Sidef::Types::String::String->new($chunk);
+        $$var_ref = Sidef::Types::String::String->new($chunk);
 
         return $size;
     }
@@ -125,8 +161,8 @@ package Sidef::Types::Glob::FileHandle {
 
         if (defined $var_ref) {
             ${$var_ref} =
-              (Sidef::Types::String::String->new(CORE::readline($self->{fh}) // return Sidef::Types::Bool::Bool->false));
-            return Sidef::Types::Bool::Bool->true;
+              (Sidef::Types::String::String->new(CORE::readline($self->{fh}) // return (Sidef::Types::Bool::Bool::FALSE)));
+            return (Sidef::Types::Bool::Bool::TRUE);
         }
 
         Sidef::Types::String::String->new(CORE::readline($self->{fh}) // return);
@@ -183,7 +219,7 @@ package Sidef::Types::Glob::FileHandle {
 
     sub eof {
         my ($self) = @_;
-        Sidef::Types::Bool::Bool->new(eof $self->{fh});
+        (eof $self->{fh}) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub tell {
@@ -193,12 +229,40 @@ package Sidef::Types::Glob::FileHandle {
 
     sub seek {
         my ($self, $pos, $whence) = @_;
-        Sidef::Types::Bool::Bool->new(seek($self->{fh}, $pos->get_value, $whence->get_value));
+        (
+         seek(
+             $self->{fh},
+             do {
+                 local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
+                 $pos->get_value;
+             },
+             do {
+                 local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
+                 $whence->get_value;
+               }
+             )
+        )
+          ? (Sidef::Types::Bool::Bool::TRUE)
+          : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub sysseek {
         my ($self, $pos, $whence) = @_;
-        Sidef::Types::Bool::Bool->new(sysseek($self->{fh}, $pos->get_value, $whence->get_value));
+        (
+         sysseek(
+             $self->{fh},
+             do {
+                 local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
+                 $pos->get_value;
+             },
+             do {
+                 local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
+                 $whence->get_value;
+               }
+         )
+        )
+          ? (Sidef::Types::Bool::Bool::TRUE)
+          : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub fileno {
@@ -222,12 +286,12 @@ package Sidef::Types::Glob::FileHandle {
 
     sub flock {
         my ($self, $mode) = @_;
-        Sidef::Types::Bool::Bool->new(CORE::flock($self->{fh}, $mode->get_value));
+        (CORE::flock($self->{fh}, $mode->get_value)) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub close {
         my ($self) = @_;
-        Sidef::Types::Bool::Bool->new(close $self->{fh});
+        (close $self->{fh}) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub stat {
@@ -242,21 +306,14 @@ package Sidef::Types::Glob::FileHandle {
 
     sub truncate {
         my ($self, $length) = @_;
-        my $len = defined($length) ? $length->get_value : 0;
-        Sidef::Types::Bool::Bool->new(CORE::truncate($self->{fh}, $len));
+        my $len = defined($length)
+          ? do {
+            local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
+            $length->get_value;
+          }
+          : 0;
+        (CORE::truncate($self->{fh}, $len)) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
-
-    sub separator {
-        my ($self, $sep) = @_;
-
-        my $old_sep = $/;
-        $/ = $sep->get_value if defined($sep);
-
-        Sidef::Types::String::String->new($old_sep);
-    }
-
-    *sep             = \&separator;
-    *input_separator = \&separator;
 
     # File copy
     *copy = \&Sidef::Types::Glob::File::copy;
