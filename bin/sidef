@@ -32,7 +32,7 @@ sub NATIVE () { 0 }
 my %args;
 if ($#ARGV != -1 and chr ord $ARGV[0] eq '-') {
     require Getopt::Std;
-    Getopt::Std::getopts('e:E:d:Dho:ivHWwbcrR:ts:CO:kP:M:', \%args);
+    Getopt::Std::getopts('e:E:Dho:ivHWwbcrR:ts:CO:kP:M:', \%args);
 }
 
 # Help
@@ -133,7 +133,6 @@ else {
         require Encode;
         Encode::decode_utf8($args{E});
       }
-      : exists($args{d}) ? ''
       : defined($ARGV[0]) && (-t STDIN or -f $ARGV[0]) ? do {
         $script_name = shift @ARGV;
         read_script($script_name);
@@ -143,19 +142,9 @@ else {
 
     $code // exit 2;
 
-    my ($struct, $parser);
-
-    # Code from a dumped parse-tree
-    if (defined $args{d}) {
-        $struct = do($args{d})
-          || die "Can't load the data structure from file '$args{d}': $!\n";
-    }
-    else {
-
-        # Parse the code
-        $parser = new_parser(name => $script_name);
-        $struct = parse_code($parser, $code);
-    }
+    # Parse the code
+    my $parser = new_parser(name => $script_name);
+    my $struct = parse_code($parser, $code);
 
     # Dump the data structure
     if (defined $args{D}) {
@@ -278,7 +267,6 @@ sub output_usage {
                     '-i'         => 'interactive mode',
                     '-c'         => 'compile the code as a stand-alone Perl program',
                     '-C'         => 'check syntax only',
-                    '-d file'    => 'load a dumped syntax tree',
                     '-D'         => 'dump the syntax tree of a program',
                     '-o file'    => 'file where to dump the output',
                     '-O level'   => ['perform code optimizations before execution',
