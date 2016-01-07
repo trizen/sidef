@@ -355,7 +355,15 @@ HEADER
 
     sub _dump_indices {
         my ($self, $array) = @_;
-        '[' . join(', ', map { ref($_) ? ($self->deparse_expr(ref($_) eq 'HASH' ? $_ : {self => $_})) : $_ } @{$array}) . ']';
+        '[' . join(
+            ', ',
+            map {
+                    ref($_) eq 'Sidef::Types::Number::Number' ? $_->_get_double
+                  : ref($_) ? ($self->deparse_expr(ref($_) eq 'HASH' ? $_ : {self => $_}))
+                  : $_
+              } @{$array}
+          )
+          . ']';
     }
 
     sub _dump_unpacked_indices {
@@ -377,7 +385,16 @@ HEADER
 
     sub _dump_lookups {
         my ($self, $array) = @_;
-        '{' . join(', ', map { ref($_) ? ($self->deparse_expr(ref($_) eq 'HASH' ? $_ : {self => $_})) : $_ } @{$array}) . '}';
+        '{' . join(
+            ', ',
+            map {
+                (ref($_) eq 'Sidef::Types::String::String' or ref($_) eq 'Sidef::Types::Number::Number')
+                  ? $self->_dump_string($_->get_value)
+                  : ref($_) ? ($self->deparse_expr(ref($_) eq 'HASH' ? $_ : {self => $_}))
+                  : $_
+              } @{$array}
+          )
+          . '}';
     }
 
     sub _dump_unpacked_lookups {
@@ -1350,7 +1367,9 @@ HEADER
                     # <=> method
                     if ($method eq '<=>') {
                         $code =
-'((Sidef::Types::Number::Number::ZERO, Sidef::Types::Number::Number::ONE, Sidef::Types::Number::Number::MONE)[do{'
+                            '((Sidef::Types::Number::Number::ZERO,'
+                          . 'Sidef::Types::Number::Number::ONE,'
+                          . 'Sidef::Types::Number::Number::MONE)[do{'
                           . $code
                           . '} cmp do {'
                           . $self->deparse_args(@{$call->{arg}}) . '}])';

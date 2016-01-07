@@ -207,6 +207,10 @@ package Sidef::Types::Number::Number {
         Math::GMPq::Rmpq_get_str(${$_[0]}, 10);
     }
 
+    sub _get_double {
+        Math::GMPq::Rmpq_get_d(${$_[0]});
+    }
+
     #
     ## Constants
     #
