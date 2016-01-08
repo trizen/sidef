@@ -144,7 +144,7 @@ package Sidef::Types::Hash::Hash {
         $self->new(%hash);
     }
 
-    *map_values = \&map_val;
+    *map_v = \&map_val;
 
     sub map {
         my ($self, $code) = @_;
@@ -158,21 +158,53 @@ package Sidef::Types::Hash::Hash {
         $self->new(%hash);
     }
 
-    sub select {
-        my ($self, $code) = @_;
+    *map_kv = \&map;
+
+    sub grep {
+        my ($self, $obj) = @_;
 
         my %hash;
-        foreach my $key (CORE::keys %$self) {
-            my $value = $self->{$key};
-            if ($code->run(Sidef::Types::String::String->new($key), $value)) {
-                $hash{$key} = $value;
+        if (ref($obj) eq 'Sidef::Types::Regex::Regex') {
+            my $re = $obj->{regex};
+            my @keys = grep { $_ =~ $re } CORE::keys(%$self);
+            @hash{@keys} = @$self{@keys};
+        }
+        else {
+            foreach my $key (CORE::keys %$self) {
+                my $value = $self->{$key};
+                if ($obj->run(Sidef::Types::String::String->new($key), $value)) {
+                    $hash{$key} = $value;
+                }
             }
         }
 
         $self->new(%hash);
     }
 
-    *grep = \&select;
+    *grep_kv = \&grep;
+    *select  = \&grep;
+
+    sub grep_val {
+        my ($self, $obj) = @_;
+
+        my %hash;
+        if (ref($obj) eq 'Sidef::Types::Regex::Regex') {
+            my @keys = grep { $obj->match($self->{$_}) } CORE::keys(%$self);
+            @hash{@keys} = @$self{@keys};
+        }
+        else {
+            foreach my $key (CORE::keys %$self) {
+                my $value = $self->{$key};
+                if ($obj->run($value)) {
+                    $hash{$key} = $value;
+                }
+            }
+        }
+
+        $self->new(%hash);
+    }
+
+    *grep_v = \&grep_val;
 
     sub count {
         my ($self, $code) = @_;

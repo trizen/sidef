@@ -471,6 +471,7 @@ scripts/RosettaCode/search_a_list_1.sf
 scripts/RosettaCode/secure_temporary_file.sf
 scripts/RosettaCode/send_an_unknown_method_call.sf
 scripts/RosettaCode/sequence_of_primes_by_trial_division.sf
+scripts/RosettaCode/set_consolidation.sf
 scripts/RosettaCode/sha-1.sf
 scripts/RosettaCode/sha-256.sf
 scripts/RosettaCode/short-circuit_evaluation.sf
@@ -510,6 +511,7 @@ scripts/RosettaCode/standard_deviation.sf
 scripts/RosettaCode/standard_deviation_2.sf
 scripts/RosettaCode/stem_and_leaf_plot.sf
 scripts/RosettaCode/string_comparison.sf
+scripts/RosettaCode/sum_digits_of_an_integer.sf
 scripts/RosettaCode/the_isaac_cipher.sf
 scripts/RosettaCode/universal_turing_machine.sf
 scripts/RosettaCode/van_der_corput_sequence.sf

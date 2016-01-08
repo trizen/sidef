@@ -789,8 +789,14 @@ package Sidef::Types::Array::Array {
     }
 
     sub grep {
-        my ($self, $code) = @_;
-        $self->new(grep { scalar $code->run($_) } @{$self});
+        my ($self, $obj) = @_;
+
+        if (ref($obj) eq 'Sidef::Types::Regex::Regex') {
+            $self->new(grep { $obj->match($_) } @{$self});
+        }
+        else {
+            $self->new(grep { scalar $obj->run($_) } @{$self});
+        }
     }
 
     *filter = \&grep;

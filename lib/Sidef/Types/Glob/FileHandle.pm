@@ -182,15 +182,52 @@ package Sidef::Types::Glob::FileHandle {
           : ();
     }
 
+    *char = \&read_char;
     *getc = \&read_char;
 
     sub read_lines {
         my ($self) = @_;
-        Sidef::Types::Array::Array->new(map { Sidef::Types::String::String->new($_) } CORE::readline($self->{fh}));
+        Sidef::Types::Array::Array->new(map { chomp($_); Sidef::Types::String::String->new($_) } CORE::readline($self->{fh}));
     }
 
     *readlines = \&read_lines;
     *lines     = \&read_lines;
+
+    sub grep {
+        my ($self, $obj) = @_;
+
+        my $array = Sidef::Types::Array::Array->new;
+
+        if (ref($obj) eq 'Sidef::Types::Regex::Regex') {
+            my $re = $obj->{regex};
+            while (defined(my $line = CORE::readline($self->{fh}))) {
+                chomp($line);
+                if ($line =~ $re) {
+                    push @{$array}, Sidef::Types::String::String->new($line);
+                }
+            }
+        }
+        else {
+            while (defined(my $line = CORE::readline($self->{fh}))) {
+                chomp($line);
+                my $string = Sidef::Types::String::String->new($line);
+                push @{$array}, $string if $obj->run($line);
+            }
+        }
+
+        $array;
+    }
+
+    sub map {
+        my ($self, $block) = @_;
+
+        my $array = Sidef::Types::Array::Array->new;
+        while (defined(my $line = CORE::readline($self->{fh}))) {
+            chomp($line);
+            push @{$array}, $block->run(Sidef::Types::String::String->new($line));
+        }
+        $array;
+    }
 
     sub words {
         my ($self) = @_;
@@ -200,6 +237,16 @@ package Sidef::Types::Glob::FileHandle {
                   grep { $_ ne '' }
                   split(' ', $_)
               } CORE::readline($self->{fh})
+        );
+    }
+
+    sub chars {
+        my ($self) = @_;
+        Sidef::Types::Array::Array->new(
+            map { Sidef::Types::String::String->new($_) } do {
+                local $/;
+                split(//, scalar CORE::readline($self->{fh}));
+              }
         );
     }
 

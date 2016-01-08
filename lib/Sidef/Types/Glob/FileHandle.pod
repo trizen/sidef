@@ -39,6 +39,24 @@ Return the
 
 =cut
 
+=head2 char
+
+FileHandle.char() -> I<Obj>
+
+Return the
+
+Aliases: I<getc>, I<read_char>
+
+=cut
+
+=head2 chars
+
+FileHandle.chars() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 close
 
 FileHandle.close() -> I<Obj>
@@ -101,13 +119,11 @@ Aliases: I<line>, I<readln>, I<read_line>, I<readline>
 
 =cut
 
-=head2 getc
+=head2 grep
 
-FileHandle.getc() -> I<Obj>
+FileHandle.grep() -> I<Obj>
 
 Return the
-
-Aliases: I<read_char>
 
 =cut
 
@@ -142,6 +158,14 @@ Return the
 =head2 lstat
 
 FileHandle.lstat() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 map
+
+FileHandle.map() -> I<Obj>
 
 Return the
 

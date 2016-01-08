@@ -192,7 +192,17 @@ Hash.grep() -> I<Obj>
 
 Return the
 
-Aliases: I<select>
+Aliases: I<grep_kv>, I<select>
+
+=cut
+
+=head2 grep_v
+
+Hash.grep_v() -> I<Obj>
+
+Return the
+
+Aliases: I<grep_val>
 
 =cut
 
@@ -236,15 +246,17 @@ Hash.map() -> I<Obj>
 
 Return the
 
+Aliases: I<map_kv>
+
 =cut
 
-=head2 map_val
+=head2 map_v
 
-Hash.map_val() -> I<Obj>
+Hash.map_v() -> I<Obj>
 
 Return the
 
-Aliases: I<map_values>
+Aliases: I<map_val>
 
 =cut
 
