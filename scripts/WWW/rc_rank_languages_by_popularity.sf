@@ -21,13 +21,13 @@ loop {
     );
 
     languages.append(apih{:query}{:pages}.values...);
-    gcmcontinue = apih{'query-continue'}{:categorymembers}{:gcmcontinue};
+    gcmcontinue = apih{'continue'}{:gcmcontinue};
     gcmcontinue || break;
 }
 
 languages.each { |lang|
     lang{:title} -= /^Category:/;
-    lang{:categoryinfo}{:size} \\= 0;
+    lang{:categoryinfo}{:size} := 0;
 }
 
 var sorted_languages = languages.sort_by { |lang|
