@@ -53,7 +53,7 @@ package Sidef::Perl::Perl {
                 state $x = require Scalar::Util;
 
                 if (Scalar::Util::looks_like_number($val)) {
-                    return Sidef::Types::Number::Number->new($val);
+                    return Sidef::Types::Number::Number->new($val, 10);
                 }
 
                 return Sidef::Types::String::String->new($val);

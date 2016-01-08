@@ -12,6 +12,7 @@ package Sidef::Types::Glob::SocketHandle {
 
     sub setsockopt {
         my ($self, $level, $optname, $optval) = @_;
+        local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
         (CORE::setsockopt($self->{fh}, $level->get_value, $optname->get_value, $optval->get_value))
           ? (Sidef::Types::Bool::Bool::TRUE)
           : (Sidef::Types::Bool::Bool::FALSE);
@@ -19,7 +20,16 @@ package Sidef::Types::Glob::SocketHandle {
 
     sub getsockopt {
         my ($self, $level, $optname) = @_;
-        Sidef::Types::String::String->new(CORE::getsockopt($self->{fh}, $level->get_value, $optname->get_value) // return);
+        Sidef::Types::String::String->new(
+            CORE::getsockopt(
+                $self->{fh},
+                do {
+                    local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
+                    $level->get_value;
+                },
+                $optname->get_value
+              ) // return
+        );
     }
 
     sub getpeername {
@@ -39,7 +49,15 @@ package Sidef::Types::Glob::SocketHandle {
 
     sub listen {
         my ($self, $queuesize) = @_;
-        (CORE::listen($self->{fh}, $queuesize->get_value))
+        (
+         CORE::listen(
+             $self->{fh},
+             do {
+                 local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
+                 $queuesize->get_value;
+               }
+         )
+        )
           ? (Sidef::Types::Bool::Bool::TRUE)
           : (Sidef::Types::Bool::Bool::FALSE);
     }
@@ -57,7 +75,15 @@ package Sidef::Types::Glob::SocketHandle {
 
     sub recv {
         my ($self, $length, $flags) = @_;
-        CORE::recv($self->{fh}, (my $content), $length->get_value, $flags->get_value) // return;
+        CORE::recv(
+            $self->{fh},
+            (my $content),
+            do {
+                local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
+                $length->get_value;
+            },
+            $flags->get_value
+                  ) // return;
         Sidef::Types::String::String->new($content);
     }
 

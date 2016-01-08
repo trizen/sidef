@@ -137,10 +137,10 @@ scripts/Expensive/knapsack_problem_bounded.sf
 scripts/Expensive/knapsack_problem_unbounded.sf
 scripts/Expensive/long_multiplication.sf
 scripts/Expensive/numerical_integration.sf
-scripts/Expensive/pi.sf
 scripts/Expensive/root_of_a_function.sf
 scripts/Expensive/smart_word_wrap.sf
 scripts/Expensive/sudoku_solver.sf
+scripts/Expensive/zhang_suen_thinning_algorithm.sf
 scripts/extend_your_language.sf
 scripts/fast_fourier_transform.sf
 scripts/fibonacci_sequence.sf
@@ -182,6 +182,7 @@ scripts/Interactive/execute_brainfuck.sf
 scripts/Interactive/hello_world.bf
 scripts/Interactive/integer_comparison.sf
 scripts/Interactive/menu.sf
+scripts/Interactive/pi.sf
 scripts/Interactive/socket.sf
 scripts/Interactive/socket_inet.sf
 scripts/Interactive/sparkline_in_unicode.sf
@@ -378,6 +379,7 @@ scripts/RosettaCode/logical_operations.sf
 scripts/RosettaCode/long_multiplication.sf
 scripts/RosettaCode/long_multiplication_1.sf
 scripts/RosettaCode/longest_common_prefix.sf
+scripts/RosettaCode/longest_common_substring.sf
 scripts/RosettaCode/look-and-say_sequence.sf
 scripts/RosettaCode/loop_over_multiple_arrays_simultaneously.sf
 scripts/RosettaCode/loops_break.sf

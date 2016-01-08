@@ -22,9 +22,9 @@ package Sidef::Types::Glob::Socket {
             }
 
             state $x = require Socket;
-            my $func = \&{'Socket' . '::' . $name};
 
-            if (defined(&$func)) {
+            if (defined(&{'Socket' . '::' . $name})) {
+                my $func = \&{'Socket' . '::' . $name};
                 return $CACHE{$name} = Sidef::Perl::Perl->to_sidef(scalar $func->());
             }
 
@@ -34,13 +34,25 @@ package Sidef::Types::Glob::Socket {
 
     sub open {
         my ($self, $domain, $type, $protocol) = @_;
-        CORE::socket(my $fh, $domain->get_value, $type->get_value, $protocol->get_value) || return;
+        {
+            local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
+            $domain   = $domain->get_value;
+            $type     = $type->get_value;
+            $protocol = $protocol->get_value;
+        }
+        CORE::socket(my $fh, $domain, $type, $protocol) || return;
         Sidef::Types::Glob::SocketHandle->new(fh => $fh);
     }
 
     sub socketpair {
         my ($self, $socket1, $socket2, $domain, $type, $protocol) = @_;
-        CORE::socketpair(my $sh1, my $sh2, $domain->get_value, $type->get_value, $protocol->get_value)
+        {
+            local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
+            $domain   = $domain->get_value;
+            $type     = $type->get_value;
+            $protocol = $protocol->get_value;
+        }
+        CORE::socketpair(my $sh1, my $sh2, $domain, $type, $protocol)
           || return (Sidef::Types::Bool::Bool::FALSE);
         ${$socket1} = Sidef::Types::Glob::SocketHandle->new(fh => $sh1);
         ${$socket2} = Sidef::Types::Glob::SocketHandle->new(fh => $sh2);
@@ -88,12 +100,25 @@ package Sidef::Types::Glob::Socket {
     #
     sub getservbyname {
         my ($self, $name, $proto) = @_;
-        Sidef::Types::String::String->new(CORE::getservbyname($name->get_value, $proto->get_value) // return);
+        Sidef::Types::String::String->new(
+            CORE::getservbyname(
+                $name->get_value,
+                do {
+                    local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
+                    $proto->get_value;
+                  }
+              ) // return
+        );
     }
 
     sub getservbyport {
         my ($self, $port, $proto) = @_;
-        Sidef::Types::String::String->new(CORE::getservbyport($port->get_value, $proto->get_value) // return);
+        {
+            local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
+            $port  = $port->get_value;
+            $proto = $proto->get_value;
+        }
+        Sidef::Types::String::String->new(CORE::getservbyport($port, $proto) // return);
     }
 
     sub getservent {
@@ -106,17 +131,24 @@ package Sidef::Types::Glob::Socket {
     #
     sub getprotobynumber {
         my ($self, $num) = @_;
-        Sidef::Types::String::String->new(CORE::getprotobynumber($num->get_value) // return);
+        Sidef::Types::String::String->new(
+            CORE::getprotobynumber(
+                do {
+                    local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
+                    $num->get_value;
+                  }
+              ) // return
+        );
     }
 
     sub getprotobyname {
         my ($self, $name) = @_;
-        Sidef::Types::Number::Number->new(CORE::getprotobyname($name->get_value) // return);
+        Sidef::Types::Number::Number->new(CORE::getprotobyname("$name") // return (), 10);
     }
 
     sub getprotoent {
         my ($self) = @_;
-        Sidef::Types::Number::Number->new(CORE::getprotoent() // return);
+        Sidef::Types::Number::Number->new(CORE::getprotoent() // return (), 10);
     }
 
     #
@@ -154,9 +186,9 @@ package Sidef::Types::Glob::Socket {
         my ($name) = ($AUTOLOAD =~ /^.*[^:]::(.*)$/);
 
         state $x = require Socket;
-        my $func = \&{'Socket' . '::' . $name};
 
-        if (defined(&$func)) {
+        if (defined(&{'Socket' . '::' . $name})) {
+            my $func    = \&{'Socket' . '::' . $name};
             my @results = eval {
                 $func->(map { $_->get_value } @args);
             };
@@ -171,7 +203,7 @@ package Sidef::Types::Glob::Socket {
                    );
         }
 
-        warn qq{[WARN] Inexistent Socket method "$name"!\n};
+        die qq{[ERROR] Inexistent Socket method "$name"!\n};
         return;
     }
 };
