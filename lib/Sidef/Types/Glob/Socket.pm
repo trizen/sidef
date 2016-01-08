@@ -143,12 +143,12 @@ package Sidef::Types::Glob::Socket {
 
     sub getprotobyname {
         my ($self, $name) = @_;
-        Sidef::Types::Number::Number->new(CORE::getprotobyname("$name") // return (), 10);
+        Sidef::Types::Number::Number->new(CORE::getprotobyname("$name") // (return), 10);
     }
 
     sub getprotoent {
         my ($self) = @_;
-        Sidef::Types::Number::Number->new(CORE::getprotoent() // return (), 10);
+        Sidef::Types::Number::Number->new(CORE::getprotoent() // (return), 10);
     }
 
     #
