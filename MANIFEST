@@ -68,7 +68,6 @@ lib/Sidef/Types/Number/Complex.pm
 lib/Sidef/Types/Number/Complex.pod
 lib/Sidef/Types/Number/Inf.pm
 lib/Sidef/Types/Number/Nan.pm
-lib/Sidef/Types/Number/Nan.pod
 lib/Sidef/Types/Number/Ninf.pm
 lib/Sidef/Types/Number/Number.pm
 lib/Sidef/Types/Number/Number.pod
@@ -579,6 +578,7 @@ scripts/Tests/equal_classes.sf
 scripts/Tests/escape_unescape.sf
 scripts/Tests/eval.sf
 scripts/Tests/execute_system_command.sf
+scripts/Tests/extreme_floating_point_values.sf
 scripts/Tests/fibonacci_closed_solution.sf
 scripts/Tests/fibonacci_iterative.sf
 scripts/Tests/fibonacci_mystery.sf

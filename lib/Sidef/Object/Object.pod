@@ -86,7 +86,7 @@ Object.is_a() -> I<Obj>
 
 Return the
 
-Aliases: I<is_an>
+Aliases: I<is_an>, I<kind_of>
 
 =cut
 

@@ -201,16 +201,6 @@ Aliases: I<parent>
 
 =cut
 
-=head2 sep
-
-FileHandle.sep() -> I<Obj>
-
-Return the
-
-Aliases: I<separator>, I<input_separator>
-
-=cut
-
 =head2 slurp
 
 FileHandle.slurp() -> I<Obj>

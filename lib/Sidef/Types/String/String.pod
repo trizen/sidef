@@ -656,7 +656,7 @@ String.len() -> I<Obj>
 
 Return the
 
-Aliases: I<length>, I<chars_len>, I<chars_length>
+Aliases: I<size>, I<length>, I<chars_len>, I<chars_length>
 
 =cut
 

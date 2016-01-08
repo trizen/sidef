@@ -343,7 +343,8 @@ package Sidef::Types::Number::Number {
         }
 
         if (ref($y) eq 'Sidef::Types::Number::Inf' or ref($y) eq 'Sidef::Types::Number::Ninf') {
-            return (Math::GMPq::Rmpq_sgn($$x) < 0 ? $y->neg : $y);
+            my $sign = Math::GMPq::Rmpq_sgn($$x);
+            return ($sign < 0 ? $y->neg : $sign > 0 ? $y : nan());
         }
 
         _valid($y);
@@ -1729,9 +1730,7 @@ package Sidef::Types::Number::Number {
 
     sub complex {
         my ($x, $y) = @_;
-
         if (defined $y) {
-            _valid($y);
             Sidef::Types::Number::Complex->new($x, $y);
         }
         else {

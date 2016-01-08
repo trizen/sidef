@@ -226,7 +226,7 @@ Hash.len() -> I<Obj>
 
 Return the
 
-Aliases: I<length>
+Aliases: I<size>, I<length>
 
 =cut
 

@@ -69,7 +69,6 @@ package Sidef::Parser {
                      | Str(?:ing)?+\b                 (?{ state $x = Sidef::Types::String::String->new })
                      | Num(?:ber)?+\b                 (?{ state $x = Sidef::Types::Number::Number->new })
                      | Inf\b                          (?{ state $x = Sidef::Types::Number::Inf->new })
-                     | -Inf\b                         (?{ state $x = Sidef::Types::Number::Ninf->new })
                      | NaN\b                          (?{ state $x = Sidef::Types::Number::Nan->new })
                      | RangeNum(?:ber)?+\b            (?{ state $x = Sidef::Types::Range::RangeNumber->new })
                      | RangeStr(?:ing)?+\b            (?{ state $x = Sidef::Types::Range::RangeString->new })

@@ -41,7 +41,7 @@ package Sidef::Types::Number::Inf {
     sub mul {
         my ($x, $y) = @_;
         ref($y) eq __PACKAGE__ and return $x;
-        $y->is_neg ? $x->neg : $x;
+        $y->is_neg ? $x->neg : $y->is_pos ? $x : nan();
     }
 
     *imul = \&mul;
@@ -188,7 +188,6 @@ package Sidef::Types::Number::Inf {
     *deg2rad          = \&inf;
     *grad2rad         = \&inf;
     *grad2deg         = \&inf;
-    *commify          = \&inf;
 
     sub zero { (Sidef::Types::Number::Number::ZERO) }
 
@@ -349,6 +348,35 @@ package Sidef::Types::Number::Inf {
         ref($y) eq __PACKAGE__ ? (Sidef::Types::Number::Number::ZERO) : (Sidef::Types::Number::Number::ONE);
     }
 
+    sub i {
+        my ($x) = @_;
+        Sidef::Types::Number::Complex->new(0, $x);
+    }
+
+    sub dump {
+        Sidef::Types::String::String->new('Inf');
+    }
+
+    *commify = \&dump;
+
+    sub numerator {
+        Sidef::Types::Number::Number::ONE;
+    }
+
+    *nu = \&numerator;
+
+    sub denominator {
+        Sidef::Types::Number::Number::ZERO;
+    }
+
+    *de = \&denominator;
+
+    sub parts {
+        (Sidef::Types::Number::Number::ONE, Sidef::Types::Number::Number::ZERO);
+    }
+
+    *nude = \&parts;
+
     {
         no strict 'refs';
         *{__PACKAGE__ . '::' . '+'}   = \&add;
@@ -379,6 +407,7 @@ package Sidef::Types::Number::Inf {
         *{__PACKAGE__ . '::' . '<=>'} = \&cmp;
         *{__PACKAGE__ . '::' . '!'}   = \&factorial;
         *{__PACKAGE__ . '::' . '%%'}  = \&is_div;
+        *{__PACKAGE__ . '::' . '~'}   = \&not;
         *{__PACKAGE__ . '::' . '>>'}  = \&shift_right;
         *{__PACKAGE__ . '::' . '<<'}  = \&shift_left;
         *{__PACKAGE__ . '::' . '//'}  = \&div;
