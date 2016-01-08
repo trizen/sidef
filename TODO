@@ -2,6 +2,7 @@ TODO list for Sidef
 
 General:
     * improve the OO system
+    * implement sidef in Sidef (too optimistic?)
 
 Classes:
     * implement roles (from Perl 6) and add the `does` trait for classes

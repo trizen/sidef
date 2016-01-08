@@ -150,7 +150,7 @@ package Sidef::Types::Number::Nan {
     *is_odd      = \&is_inf;
     *divides     = \&is_inf;
     *is_square   = \&is_inf;
-    *is_square   = \&is_inf;
+    *is_sqr      = \&is_inf;
 
     sub complex {
         my ($x, $y) = @_;

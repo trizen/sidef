@@ -319,6 +319,7 @@ scripts/RosettaCode/enumerations.sf
 scripts/RosettaCode/enumerations_1.sf
 scripts/RosettaCode/equilibrium_index.sf
 scripts/RosettaCode/euler_method.sf
+scripts/RosettaCode/extreme_floating_point_values.sf
 scripts/RosettaCode/factorial.sf
 scripts/RosettaCode/fibonacci_n-step_number_sequence.sf
 scripts/RosettaCode/fibonacci_sequence.sf
