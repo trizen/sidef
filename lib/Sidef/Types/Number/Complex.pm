@@ -37,8 +37,22 @@ package Sidef::Types::Number::Complex {
                 return $x->add(__PACKAGE__->new($y));
             }
         }
-        elsif (index(ref($x), 'Sidef::') == 0) {
-            $x = $x->get_value;
+        elsif (index(ref($x), 'Sidef::') == 0 or ref($x) eq '') {
+            $x = "$x";
+            if ($x eq 'i' or $x eq '+i') {
+                return __PACKAGE__->new(__PACKAGE__->new(0, 1), $y);
+            }
+            elsif ($x eq '-i') {
+                return __PACKAGE__->new(__PACKAGE__->new(0, -1), $y);
+            }
+            elsif (substr($x, -1) eq 'i') {
+                if ($x =~ /^(.+?)([+-].*?i)\z/) {
+                    return __PACKAGE__->new(__PACKAGE__->new($1, $2), $y);
+                }
+                else {
+                    return __PACKAGE__->new(__PACKAGE__->new(0, $x), $y);
+                }
+            }
         }
 
         if (not defined($y)) {
@@ -59,7 +73,21 @@ package Sidef::Types::Number::Complex {
             return $y->add(__PACKAGE__->new($x));
         }
         elsif (index(ref($y), 'Sidef::') == 0) {
-            $y = $y->get_value;
+            $y = "$y";
+            if ($y eq 'i' or $y eq '+i') {
+                return __PACKAGE__->new($x, __PACKAGE__->new(0, 1));
+            }
+            elsif ($y eq '-i') {
+                return __PACKAGE__->new($x, __PACKAGE__->new(0, -1));
+            }
+            elsif (substr($y, -1) eq 'i') {
+                if ($y =~ /^(.+?)([+-].*?i)\z/) {
+                    return __PACKAGE__->new($x, __PACKAGE__->new($1, $2));
+                }
+                else {
+                    return __PACKAGE__->new($x, __PACKAGE__->new(0, $y));
+                }
+            }
         }
 
         my $r = Math::MPC::Rmpc_init2($PREC);

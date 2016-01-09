@@ -567,7 +567,7 @@ scripts/Tests/classes_and_objects.sf
 scripts/Tests/closure_generator.sf
 scripts/Tests/cnp.sf
 scripts/Tests/code_interpolation.sf
-scripts/Tests/complex_numbes.sf
+scripts/Tests/complex_numbers.sf
 scripts/Tests/count_in_factors.sf
 scripts/Tests/cpp_input_output.sf
 scripts/Tests/cramers_method.sf
