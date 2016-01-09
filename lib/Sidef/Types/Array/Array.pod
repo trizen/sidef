@@ -581,6 +581,16 @@ Return the
 
 =cut
 
+=head2 keys
+
+Array.keys() -> I<Obj>
+
+Return the
+
+Aliases: I<indices>
+
+=cut
+
 =head2 last
 
 Array.last() -> I<Obj>
@@ -769,7 +779,7 @@ Array.permute() -> I<Obj>
 
 Return the
 
-Aliases: I<permutations>
+Aliases: I<permutation>, I<permutations>
 
 =cut
 

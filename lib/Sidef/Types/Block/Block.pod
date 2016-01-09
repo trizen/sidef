@@ -78,6 +78,14 @@ Return the
 
 =cut
 
+=head2 ffork
+
+Block.ffork() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 for
 
 Block.for() -> I<Obj>
