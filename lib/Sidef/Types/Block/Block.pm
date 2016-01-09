@@ -284,7 +284,7 @@ package Sidef::Types::Block::Block {
         open(my $fh, '+>', undef);    # an anonymous temporary file
         my $fork = Sidef::Types::Block::Fork->new(fh => $fh);
 
-        my $pid = fork() // die "[FATAL ERROR]: cannot fork";
+        my $pid = fork() // die "[ERROR]: Cannot fork";
         if ($pid == 0) {
             srand();
             my $obj = $self->call(@args);
