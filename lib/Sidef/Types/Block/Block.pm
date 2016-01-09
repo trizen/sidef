@@ -277,24 +277,24 @@ package Sidef::Types::Block::Block {
         $bool;
     }
 
-    #~ sub fork {
-    #~ my ($self) = @_;
+    sub ffork {
+        my ($self, @args) = @_;
 
-    #~ state $x = require Storable;
-    #~ open(my $fh, '+>', undef);    # an anonymous temporary file
-    #~ my $fork = Sidef::Types::Block::Fork->new(fh => $fh);
+        state $x = require Storable;
+        open(my $fh, '+>', undef);    # an anonymous temporary file
+        my $fork = Sidef::Types::Block::Fork->new(fh => $fh);
 
-    #~ my $pid = fork() // die "[FATAL ERROR]: cannot fork";
-    #~ if ($pid == 0) {
-    #~ srand();
-    #~ my $obj = $self->{code}->();
-    #~ ref($obj) && Storable::store_fd($obj, $fh);
-    #~ exit 0;
-    #~ }
+        my $pid = fork() // die "[FATAL ERROR]: cannot fork";
+        if ($pid == 0) {
+            srand();
+            my $obj = $self->call(@args);
+            ref($obj) && Storable::store_fd($obj, $fh);
+            exit 0;
+        }
 
-    #~ $fork->{pid} = $pid;
-    #~ $fork;
-    #~ }
+        $fork->{pid} = $pid;
+        $fork;
+    }
 
     sub fork {
         my ($self) = @_;
@@ -313,14 +313,23 @@ package Sidef::Types::Block::Block {
     }
 
     sub thread {
-        my ($self) = @_;
+        my ($self, @args) = @_;
         state $x = do {
-            require threads;
+            eval { require forks; } // do {
+                warn "[WARN] Can't load the `forks` module. Using `threads` instead...\n";
+                require threads;
+            };
             *threads::get  = \&threads::join;
             *threads::wait = \&threads::join;
             1;
         };
-        threads->create(sub { $self->{code}->() });
+        threads->create(
+                        {
+                         'context' => 'list',
+                         'exit'    => 'thread_only'
+                        },
+                        sub { $self->call(@args) }
+                       );
     }
 
     *thr = \&thread;
