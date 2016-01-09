@@ -37,7 +37,7 @@ package Sidef::Types::Number::Complex {
                 return $x->add(__PACKAGE__->new($y));
             }
         }
-        elsif (index(ref($x), 'Sidef::') == 0 or ref($x) eq '') {
+        elsif (index(ref($x), 'Sidef::') == 0) {
             $x = "$x";
             if ($x eq 'i' or $x eq '+i') {
                 return __PACKAGE__->new(__PACKAGE__->new(0, 1), $y);
@@ -46,8 +46,15 @@ package Sidef::Types::Number::Complex {
                 return __PACKAGE__->new(__PACKAGE__->new(0, -1), $y);
             }
             elsif (substr($x, -1) eq 'i') {
-                if ($x =~ /^(.+?)([+-].*?i)\z/) {
-                    return __PACKAGE__->new(__PACKAGE__->new($1, $2), $y);
+                if ($x =~ /^(.+?)([+-].*?)i\z/) {
+                    my ($re, $im) = ($1, $2);
+                    if ($im eq '+') {
+                        $im = 1;
+                    }
+                    elsif ($im eq '-') {
+                        $im = -1;
+                    }
+                    return __PACKAGE__->new(__PACKAGE__->new($re, $im), $y);
                 }
                 else {
                     return __PACKAGE__->new(__PACKAGE__->new(0, $x), $y);
@@ -81,8 +88,15 @@ package Sidef::Types::Number::Complex {
                 return __PACKAGE__->new($x, __PACKAGE__->new(0, -1));
             }
             elsif (substr($y, -1) eq 'i') {
-                if ($y =~ /^(.+?)([+-].*?i)\z/) {
-                    return __PACKAGE__->new($x, __PACKAGE__->new($1, $2));
+                if ($y =~ /^(.+?)([+-].*?)i\z/) {
+                    my ($re, $im) = ($1, $2);
+                    if ($im eq '+') {
+                        $im = 1;
+                    }
+                    elsif ($im eq '-') {
+                        $im = -1;
+                    }
+                    return __PACKAGE__->new($x, __PACKAGE__->new($re, $im));
                 }
                 else {
                     return __PACKAGE__->new($x, __PACKAGE__->new(0, $y));
