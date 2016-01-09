@@ -1068,6 +1068,13 @@ package Sidef::Types::Array::Array {
         Sidef::Types::Range::RangeNumber->__new__(from => 0, to => $#{$self}, step => 1);
     }
 
+    sub indices {
+        my ($self) = @_;
+        Sidef::Types::Array::Array->new(map { Sidef::Types::Number::Number::_new_uint($_) } 0 .. $#{$self});
+    }
+
+    *keys = \&indices;
+
     sub pairs {
         my ($self) = @_;
         __PACKAGE__->new(map { Sidef::Types::Array::Pair->new(Sidef::Types::Number::Number::_new_uint($_), $self->[$_]) }
@@ -1461,17 +1468,27 @@ package Sidef::Types::Array::Array {
         my @idx = 0 .. $#{$self};
 
         if (defined($code)) {
+            my $perm;
             while (1) {
-                if (defined(my $res = $code->_run_code($self->new(@{$self}[@idx])))) {
-                    return $res;
-                }
+                $perm = $self->new(@{$self}[@idx]);
 
                 my $p = $#idx;
                 --$p while $idx[$p - 1] > $idx[$p];
-                my $q = $p or (return $self);
+
+                my $q = $p or do {
+                    if (defined(my $res = $code->_run_code($perm))) {
+                        return $res;
+                    }
+                    return $self;
+                };
+
                 push @idx, CORE::reverse CORE::splice @idx, $p;
                 ++$q while $idx[$p - 1] > $idx[$q];
                 @idx[$p - 1, $q] = @idx[$q, $p - 1];
+
+                if (defined(my $res = $code->_run_code($perm))) {
+                    return $res;
+                }
             }
 
             return;
@@ -1490,6 +1507,7 @@ package Sidef::Types::Array::Array {
     }
 
     *permutations = \&permute;
+    *permutation  = \&permute;
 
     sub pack {
         my ($self, $format) = @_;
