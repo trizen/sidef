@@ -618,6 +618,10 @@ package Sidef::Deparse::Sidef {
 
                             $code .= $method;
                         }
+
+                        if (not exists $call->{arg}) {
+                            $code .= '()';
+                        }
                     }
                     else {
 
