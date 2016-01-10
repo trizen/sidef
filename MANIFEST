@@ -99,7 +99,6 @@ scripts/ackermann_function.sf
 scripts/add_a_variable_to_a_class_instance_at_runtime.sf
 scripts/aks_test_for_primes.sf
 scripts/align_columns.sf
-scripts/anonymous_recursion.sf
 scripts/Applications/any2mp3.sf
 scripts/Applications/fdf.sf
 'scripts/Applications/Gift match/giftmatch.sf'
@@ -534,6 +533,7 @@ scripts/stack.sf
 scripts/stern-brocot_sequence.sf
 scripts/Tests/amb.sf
 scripts/Tests/amb_nested_loops.sf
+scripts/Tests/anonymous_recursion.sf
 scripts/Tests/arithmetic_evaluation.sf
 scripts/Tests/arithmetic_geometric_mean.sf
 scripts/Tests/array_autovivification.sf
