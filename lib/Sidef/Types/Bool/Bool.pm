@@ -44,6 +44,11 @@ package Sidef::Types::Bool::Bool {
         $$self ? $arg : $self;
     };
 
+    *{__PACKAGE__ . '::' . '^'} = sub {
+        my ($self, $arg) = @_;
+        ($$self xor $arg) ? (TRUE) : (FALSE);
+    };
+
     sub is_true { $_[0] }
 
     sub not {
