@@ -15,19 +15,43 @@ func is_fib (i, fib) {
 #
 ## log(n*sqrt(5) + (((1-sqrt(5))/2) ^ ((log(n)+(log(5))/2) / (log(1+sqrt(5))-log(2))))) / (log(1+sqrt(5))-log(2))
 #
-func fib_pos(n) {
-    (W*n + ((-T)**((5 * n**2).log / (W+1)))).log(S).roundf(0);
+func fib_pos1(n) {
+    W*n + pow(-T, log(5 * n**2) / (W+1)) -> log(S).roundf(0)
+}
+
+#
+## (log((2/(sqrt(5)-1))^(log((1+sqrt(5))/(5 * n^2)))+sqrt(5)*n))/(log(1/2 (1+sqrt(5))))
+#
+func fib_pos2(n) {
+    W*n + pow(2 / (W-1), log((1+W) / (5 * n**2))) -> log((1+W) / 2) -> roundf(0)
 }
 
 #
 ## (log(n*sqrt(5) + (((1-sqrt(5))/2) ^ (log(n * sqrt(5)) / log((1+sqrt(5))/2))))) / log((1+sqrt(5))/2)
 #
-func fib_position(n) {
+func fib_pos3(n) {
     ((n * W) + Math.pow(-T, (((n * W)).log(S)))).log(S).roundf(0);
 }
 
+#
+## log((W*n + ((-T)**((log(n) + log(5)/2) / S)))) / log(S)
+#
+func fib_pos4(n) {
+    (Math.log((S+T)*n + ((0.5 * (1-(S+T)))**((Math.log(n) + (Math.log(5)/2)) / (Math.log(1+(S+T))-Math.log(2)))))) /
+                                (Math.log(1+(S+T))-Math.log(2)) -> roundf(0);
+}
+
+#
+## log(n*sqrt(5)) / log(PHI)
+#
+func fib_pos5(n) {
+    n * sqrt(5) -> log(S).roundf(0)
+}
+
+var fib_pos_funcs = [fib_pos1, fib_pos2, fib_pos3, fib_pos4, fib_pos5];
+
 func is_prob_fib(n) {
-    fib(fib_pos(n)) == n;
+    fib(fib_pos_funcs.rand()(n)) == n;
 }
 
 [
@@ -37,6 +61,8 @@ func is_prob_fib(n) {
     [13,  233,                   true],
     [49,  1337,                  false],
     [32,  2178309,               true],
+    [100, 354224848179261915074, false],
+    [100, 354224848179261915076, false],
     [100, 354224848179261915075, true],
 ].each { |group|
 
@@ -45,18 +71,9 @@ func is_prob_fib(n) {
     is_fib(pos, num) == bool || die "Validation error (1)!";
     is_prob_fib(num) == bool || die "Validation error (2)!";
 
-    fib_pos(num) == fib_position(num) || die "pos error";
+    assert_eq(fib_pos_funcs.rand()(num), fib_pos_funcs.rand()(num))
+    assert_eq(fib_pos_funcs.rand()(num), pos) if bool
 
     "%21s is on position %3s in the fibonacci sequence: %s\n"
         -> printf(num, pos, bool);
-}
-
-__END__
-
-#
-## (W*n + ((-T)**((n.log + 5.log/2) / S))).log(S).floor
-#
-func fib_pos(n) {
-    (Math.log((S+T)*n + ((0.5 * (1-(S+T)))**((Math.log(n) + (Math.log(5)/2)) / (Math.log(1+(S+T))-Math.log(2)))))) /
-                                (Math.log(1+(S+T))-Math.log(2)) -> floor;
 }
