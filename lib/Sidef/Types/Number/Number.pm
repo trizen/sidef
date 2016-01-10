@@ -1154,6 +1154,9 @@ package Sidef::Types::Number::Number {
         my ($x, $y) = @_;
         _valid($y);
 
+        return Sidef::Types::Bool::Bool::FALSE
+          if Math::GMPq::Rmpq_sgn($$y) == 0;
+
         my $q = Math::GMPq::Rmpq_init();
         Math::GMPq::Rmpq_div($q, $$x, $$y);
 
@@ -1168,6 +1171,9 @@ package Sidef::Types::Number::Number {
     sub divides {
         my ($x, $y) = @_;
         _valid($y);
+
+        return Sidef::Types::Bool::Bool::FALSE
+          if Math::GMPq::Rmpq_sgn($$x) == 0;
 
         my $q = Math::GMPq::Rmpq_init();
         Math::GMPq::Rmpq_div($q, $$y, $$x);
