@@ -636,14 +636,16 @@ package Sidef::Parser {
                 }
                 elsif (/\G(?=\()/) {
                     my $code = substr($_, pos);
-                    $self->parse_arguments(code => \$code);
+                    $self->parse_arg(code => \$code);
                     $vars[-1] .= substr($_, pos($_), pos($code));
                     pos($_) += pos($code);
                 }
 
                 if (/$self->{var_init_sep_re}/goc) {
                     my $code = substr($_, pos);
-                    $self->parse_obj(code => \$code);
+                    $code =~ /^(?=\()/
+                      ? $self->parse_arg(code => \$code)
+                      : $self->parse_obj(code => \$code);
                     $vars[-1] .= '=' . substr($_, pos($_), pos($code));
                     pos($_) += pos($code);
                 }
@@ -730,11 +732,15 @@ package Sidef::Parser {
                     $where_block = $self->parse_block(code => $opt{code}, topic_var => 1);
                 }
                 elsif (/\G\h*(?=\()/gc) {
-                    $where_expr = $self->parse_arguments(code => $opt{code});
+                    $where_expr = $self->parse_arg(code => $opt{code});
                 }
 
                 if (/$self->{var_init_sep_re}/goc) {
-                    my $obj = $self->parse_obj(code => $opt{code});
+                    my $obj = (
+                               /\G(?=\()/
+                               ? $self->parse_arg(code => $opt{code})
+                               : $self->parse_obj(code => $opt{code})
+                              );
                     $value = (
                               ref($obj) eq 'HASH'
                               ? $obj
@@ -967,7 +973,7 @@ package Sidef::Parser {
 
             # Object as expression
             if (/\G(?=\()/) {
-                my $obj = $self->parse_arguments(code => $opt{code});
+                my $obj = $self->parse_arg(code => $opt{code});
                 return $obj;
             }
 
@@ -1002,7 +1008,7 @@ package Sidef::Parser {
                 my $name = $1;
                 my $obj = (
                            /\G\s*(?=\()/gc
-                           ? $self->parse_arguments(code => $opt{code})
+                           ? $self->parse_arg(code => $opt{code})
                            : $self->parse_obj(code => $opt{code})
                           );
                 return Sidef::Variable::NamedParam->new($name, $obj);
@@ -1017,7 +1023,7 @@ package Sidef::Parser {
                 if (/\G\h*=\h*/gc) {
                     my $args = (
                                 /\G\s*(?=\()/gc
-                                ? $self->parse_arguments(code => $opt{code})
+                                ? $self->parse_arg(code => $opt{code})
                                 : $self->parse_obj(code => $opt{code})
                       ) // $self->fatal_error(
                                               code  => $_,
@@ -1252,7 +1258,7 @@ package Sidef::Parser {
                 my $pos = pos($_);
                 my $obj = (
                            /\G(?=\()/
-                           ? $self->parse_arguments(code => $opt{code})
+                           ? $self->parse_arg(code => $opt{code})
                            : $self->parse_obj(code => $opt{code})
                           );
 
@@ -1580,7 +1586,7 @@ package Sidef::Parser {
             if (/\Ggiven\b\h*/gc) {
                 my $expr = (
                             /\G(?=\()/
-                            ? $self->parse_arguments(code => $opt{code})
+                            ? $self->parse_arg(code => $opt{code})
                             : $self->parse_obj(code => $opt{code})
                            );
 
@@ -1612,7 +1618,7 @@ package Sidef::Parser {
             if (exists($self->{current_given}) && /\Gwhen\b\h*/gc) {
                 my $expr = (
                             /\G(?=\()/
-                            ? $self->parse_arguments(code => $opt{code})
+                            ? $self->parse_arg(code => $opt{code})
                             : $self->parse_obj(code => $opt{code})
                            );
 
@@ -1640,7 +1646,7 @@ package Sidef::Parser {
             if (exists($self->{current_given}) && /\Gcase\b\h*/gc) {
                 my $expr = (
                             /\G(?=\()/
-                            ? $self->parse_arguments(code => $opt{code})
+                            ? $self->parse_arg(code => $opt{code})
                             : $self->parse_obj(code => $opt{code})
                            );
 
@@ -1674,7 +1680,7 @@ package Sidef::Parser {
             if (/\Gwith\b\h*/gc) {
                 my $expr = (
                             /\G(?=\()/
-                            ? $self->parse_arguments(code => $opt{code})
+                            ? $self->parse_arg(code => $opt{code})
                             : $self->parse_obj(code => $opt{code})
                            );
 
@@ -1726,7 +1732,7 @@ package Sidef::Parser {
 
                 my $obj = (
                            /\G(?=\()/
-                           ? $self->parse_arguments(code => $opt{code})
+                           ? $self->parse_arg(code => $opt{code})
                            : $self->parse_obj(code => $opt{code})
                           );
 
@@ -1815,7 +1821,7 @@ package Sidef::Parser {
 
                 my $arg = (
                            /\G(?=\()/
-                           ? $self->parse_arguments(code => $opt{code})
+                           ? $self->parse_arg(code => $opt{code})
                            : $self->parse_obj(code => $opt{code})
                           );
 
@@ -1837,7 +1843,7 @@ package Sidef::Parser {
 
                 my $arg = (
                            /\G(?=\()/
-                           ? $self->parse_arguments(code => $opt{code})
+                           ? $self->parse_arg(code => $opt{code})
                            : $self->parse_obj(code => $opt{code})
                           );
 
@@ -1858,7 +1864,7 @@ package Sidef::Parser {
             if (/\Geval\b\h*/gc) {
                 my $obj = (
                            /\G(?=\()/
-                           ? $self->parse_arguments(code => $opt{code})
+                           ? $self->parse_arg(code => $opt{code})
                            : $self->parse_obj(code => $opt{code})
                           );
 
@@ -2120,7 +2126,7 @@ package Sidef::Parser {
                     my $pos = pos($_);
                     /\G\h*/gc;    # remove any horizontal whitespace
                     my $arg = (
-                                 /\G(?=\()/ ? $self->parse_arguments(code => $opt{code})
+                                 /\G(?=\()/ ? $self->parse_arg(code => $opt{code})
                                : /\G(?=\{)/ ? $self->parse_block(code => $opt{code}, topic_var => 1)
                                :              $self->parse_obj(code => $opt{code})
                               );
@@ -2199,7 +2205,7 @@ package Sidef::Parser {
         }
     }
 
-    sub parse_arguments {
+    sub parse_arg {
         my ($self, %opt) = @_;
 
         local *_ = $opt{code};
@@ -2372,7 +2378,7 @@ package Sidef::Parser {
 
                         my $code = substr($_, pos);
                         my $arg = (
-                                     /\G(?=\()/ ? $self->parse_arguments(code => \$code)
+                                     /\G(?=\()/ ? $self->parse_arg(code => \$code)
                                    : ($req_arg || exists($self->{binpost_ops}{$method})) ? $self->parse_obj(code => \$code)
                                    : /\G(?=\{)/ ? $self->parse_block(code => \$code, topic_var => 1)
                                    :              die "[PARSING ERROR] Something is wrong in the if condition"
@@ -2473,7 +2479,7 @@ package Sidef::Parser {
                         ]
                 };
 
-                my $arg = $self->parse_arguments(code => $opt{code});
+                my $arg = $self->parse_arg(code => $opt{code});
 
                 push @{$struct->{$self->{class}}[-1]{call}},
                   {
@@ -2505,7 +2511,7 @@ package Sidef::Parser {
 
                 my $array = (
                              /\G(?=\()/
-                             ? $self->parse_arguments(code => $opt{code})
+                             ? $self->parse_arg(code => $opt{code})
                              : $self->parse_obj(code => $opt{code})
                             );
 
@@ -2556,7 +2562,7 @@ package Sidef::Parser {
             elsif ($obj_key) {
                 my $arg = (
                            /\G(?=\()/
-                           ? $self->parse_arguments(code => $opt{code})
+                           ? $self->parse_arg(code => $opt{code})
                            : $self->parse_obj(code => $opt{code})
                           );
 
@@ -2604,7 +2610,7 @@ package Sidef::Parser {
                 }
 
                 if (/\G\h*(?=\()/gc) {
-                    my $arg = $self->parse_arguments(code => $opt{code});
+                    my $arg = $self->parse_arg(code => $opt{code});
 
                     push @{$struct{$self->{class}}[-1]{call}},
                       {
@@ -2641,7 +2647,7 @@ package Sidef::Parser {
                                 if (/\G(?=\s*elsif\h*\()/) {
                                     $self->parse_whitespace(code => $opt{code});
                                     while (/\G\h*elsif\h*(?=\()/gc) {
-                                        my $arg = $self->parse_arguments(code => $opt{code});
+                                        my $arg = $self->parse_arg(code => $opt{code});
                                         $self->parse_whitespace(code => $opt{code});
                                         my $block = $self->parse_block(code => $opt{code});
                                         push @{$struct{$self->{class}}[-1]{call}},
@@ -2689,7 +2695,7 @@ package Sidef::Parser {
                         my $code = substr($_, pos);
                         my $arg = (
                                      $lonely_obj
-                                   ? $self->parse_arguments(code => \$code)
+                                   ? $self->parse_arg(code => \$code)
                                    : $self->parse_obj(code => \$code)
                                   );
 
@@ -3005,7 +3011,7 @@ package Sidef::Parser {
 
                 my $true = (
                             /\G(?=\()/
-                            ? $self->parse_arguments(code => $opt{code})
+                            ? $self->parse_arg(code => $opt{code})
                             : $self->parse_obj(code => $opt{code})
                            );
 
@@ -3023,7 +3029,7 @@ package Sidef::Parser {
 
                 my $false = (
                              /\G(?=\()/
-                             ? $self->parse_arguments(code => $opt{code})
+                             ? $self->parse_arg(code => $opt{code})
                              : $self->parse_obj(code => $opt{code})
                             );
 
@@ -3123,7 +3129,7 @@ package Sidef::Parser {
                         my $keyword = $1;
                         my $obj = (
                                    /\G(?=\()/
-                                   ? $self->parse_arguments(code => $opt{code})
+                                   ? $self->parse_arg(code => $opt{code})
                                    : $self->parse_obj(code => $opt{code})
                                   );
                         push @{$struct{$self->{class}}[-1]{call}}, {keyword => $keyword, arg => [$obj]};

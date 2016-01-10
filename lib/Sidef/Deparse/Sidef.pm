@@ -299,7 +299,7 @@ package Sidef::Deparse::Sidef {
                     if (exists($obj->{init_vars}) and @{$obj->{init_vars}{vars}}) {
                         my @vars = @{$obj->{init_vars}{vars}};
                         if (@vars) {
-                            $code .= '| ' . $self->_dump_vars(@vars) . ' |';
+                            $code .= '|' . $self->_dump_vars(@vars) . '|';
                         }
                     }
 
