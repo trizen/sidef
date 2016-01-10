@@ -1905,6 +1905,8 @@ package Sidef::Types::Number::Number {
         }
     }
 
+    *irand = \&rand_int;
+
     sub of {
         my ($x, $obj) = @_;
         ref($obj) eq 'Sidef::Types::Block::Block'

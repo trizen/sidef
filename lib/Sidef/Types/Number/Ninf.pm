@@ -166,6 +166,7 @@ package Sidef::Types::Number::Ninf {
     *shift_left  = \&ninf;
     *shift_right = \&ninf;
     *rand_int    = \&ninf;
+    *irand       = \&ninf;
     *rand        = \&ninf;
     *rad2deg     = \&ninf;
     *rad2grad    = \&ninf;

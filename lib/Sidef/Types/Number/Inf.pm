@@ -181,6 +181,7 @@ package Sidef::Types::Number::Inf {
     *shift_left       = \&inf;
     *shift_right      = \&inf;
     *rand_int         = \&inf;
+    *irand            = \&inf;
     *rand             = \&inf;
     *rad2deg          = \&inf;
     *rad2grad         = \&inf;

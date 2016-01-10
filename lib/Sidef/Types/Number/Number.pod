@@ -786,6 +786,16 @@ Aliases: I<modinv>
 
 =cut
 
+=head2 irand
+
+Number.irand() -> I<Obj>
+
+Return the
+
+Aliases: I<rand_int>
+
+=cut
+
 =head2 iroot
 
 Number.iroot() -> I<Obj>
@@ -1205,14 +1215,6 @@ Return the
 =head2 rand
 
 Number.rand() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 rand_int
-
-Number.rand_int() -> I<Obj>
 
 Return the
 
