@@ -204,7 +204,10 @@
    "resources" : {
       "license" : [
          "http://dev.perl.org/licenses/"
-      ]
+      ],
+      "repository" : {
+         "url" : "https://github.com/trizen/sidef"
+      }
    },
    "version" : "2.20",
    "x_serialization_backend" : "JSON::PP version 2.27300"

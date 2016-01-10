@@ -7,7 +7,7 @@
 func is_prime(n { .is_odd && (_ > 2) }, k) {
     var s = 0
     var d = n.dec
-    (d //= 2; ++s) while d.is_even
+    (d >>= 1; ++s) while d.is_even
 
     k.times {
         var a = 2.irand(n)

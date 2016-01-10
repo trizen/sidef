@@ -21,7 +21,7 @@ Sidef is a high-level, general-purpose programming language, inspired by Ruby, P
           **   **               ****   *********   *********   *
 
 
-Sidef offers many features, including:
+Sidef offers:
 
 =over 2
 
@@ -41,7 +41,7 @@ Sidef offers many features, including:
 
 =item * optional dynamic type checking,
 
-=item * and a large number of built-in types.
+=item * and a reasonable number of built-in types.
 
 =back
 
@@ -59,6 +59,9 @@ You can find more info about Sidef, by clicking on the following links:
 
 =back
 
+=head1 REPOSITORY
+
+L<https://github.com/trizen/Lingua-RO-Numbers>
 
 =head2 LICENSE AND COPYRIGHT
 

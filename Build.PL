@@ -11,12 +11,12 @@ use Module::Build;
 
 my $builder = Module::Build->new(
 
-    module_name => 'Sidef',
-    license     => 'perl',
-    dist_author => [
-                     q{Daniel Șuteu   (<trizenx@gmail.com>)},
-                     q{Ioana Fălcușan (<ioanaflavia@gmail.com>)},
-                   ],
+    module_name        => 'Sidef',
+    license            => 'perl',
+    dist_author        => [
+                            q{Daniel Șuteu   (<trizenx@gmail.com>)},
+                            q{Ioana Fălcușan (<ioanaflavia@gmail.com>)},
+                          ],
     dist_version_from  => 'lib/Sidef.pm',
     dist_abstract      => 'The Sidef Programming Language',
     release_status     => 'stable',
@@ -26,6 +26,12 @@ my $builder = Module::Build->new(
     build_requires => {
                        'Test::More' => 0,
                       },
+
+    meta_merge => {
+                   resources => {
+                                 repository => 'https://github.com/trizen/sidef'
+                                }
+                  },
 
     requires => {
                  'perl'           => '5.16.1',
