@@ -32,6 +32,14 @@ Return the
 
 =cut
 
+=head2 ^
+
+I<Obj> B<^> I<Obj> -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 dump
 
 Bool.dump() -> I<Obj>

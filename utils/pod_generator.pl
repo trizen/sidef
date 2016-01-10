@@ -164,14 +164,14 @@ sub process_file {
 
         my $doc = $is_method ? <<"__POD__" : <<"__POD2__";
 
-=head2 $orig_name
+\=head2 $orig_name
 
 $parts[-1].$sub() -> I<Obj>
 
 Return the
 __POD__
 
-=head2 $orig_name
+\=head2 $orig_name
 
 I<Obj> B<$sub> I<Obj> -> I<Obj>
 
@@ -236,17 +236,17 @@ __POD2__
     if (not defined($header) or $header =~ /^This object is \.\.\.$/m) {
         $header = <<"HEADER";
 
-=encoding utf8
+\=encoding utf8
 
-=head1 NAME
+\=head1 NAME
 
 $module
 
-=head1 DESCRIPTION
+\=head1 DESCRIPTION
 
 This object is ...
 
-=head1 SYNOPSIS
+\=head1 SYNOPSIS
 
 var obj = $parts[-1].new(...);
 
@@ -255,9 +255,9 @@ HEADER
         my @isa = @{exists($mod_methods->{ISA}) ? $mod_methods->{ISA} : []};
 
         if (@isa) {
-            $header .= <<'HEADER';
+            $header .= <<"HEADER";
 
-=head1 INHERITS
+\=head1 INHERITS
 
 Inherits methods from:
 
@@ -268,7 +268,7 @@ HEADER
         }
 
         $header .= <<"HEADER";
-=head1 METHODS
+\=head1 METHODS
 
 HEADER
     }
