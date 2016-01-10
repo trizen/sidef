@@ -2286,7 +2286,6 @@ package Sidef::Parser {
             $self->{vars}{$self->{class}} = $self->{vars}{$self->{class}}[0];
 
             my $block = bless({}, 'Sidef::Types::Block::BlockInit');
-            local $self->{current_block} = $block;
 
             # Parse whitespace (if any)
             $self->parse_whitespace(code => $opt{code});
@@ -2313,6 +2312,8 @@ package Sidef::Parser {
                     line  => $self->{line},
                   };
             }
+
+            local $self->{current_block} = $block if ($opt{topic_var} || $has_vars);
 
             my $obj = $self->parse_script(code => $opt{code});
 
