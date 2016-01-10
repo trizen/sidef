@@ -650,6 +650,7 @@ scripts/Tests/metaprogramming_2.sf
 scripts/Tests/metaprogramming_method_definition.sf
 scripts/Tests/method_aliases.sf
 scripts/Tests/method_expressions.sf
+scripts/Tests/miller_rabin_primality_test.sf
 scripts/Tests/Module/Bar.sm
 scripts/Tests/Module/Fact.sm
 scripts/Tests/Module/Fib.sm
