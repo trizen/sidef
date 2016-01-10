@@ -143,6 +143,7 @@ scripts/Expensive/zebra_puzzle.sf
 scripts/Expensive/zhang_suen_thinning_algorithm.sf
 scripts/extend_your_language.sf
 scripts/fast_fourier_transform.sf
+scripts/faulhaber_s_formula.sf
 scripts/fibonacci_sequence.sf
 scripts/fibonacci_word_fractal.sf
 scripts/first-class_functions.sf
