@@ -5,9 +5,10 @@ package Sidef::Types::Range::RangeNumber {
       Sidef::Object::Object
       );
 
-    require Sidef::Types::Number::Number;
-
     use overload '@{}' => \&to_a;
+
+    use Sidef::Types::Number::Number;
+    use Sidef::Types::Bool::Bool;
 
     sub new {
         my (undef, $from, $to, $step) = @_;

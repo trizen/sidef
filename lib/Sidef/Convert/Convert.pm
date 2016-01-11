@@ -62,7 +62,9 @@ package Sidef::Convert::Convert {
     }
 
     sub to_bool {
-        $_[0] ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
+        $_[0]
+          ? (state $x = Sidef::Types::Bool::Bool->true)
+          : (state $y = Sidef::Types::Bool::Bool->false);
     }
 
     *to_b = \&to_bool;

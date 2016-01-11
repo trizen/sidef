@@ -12,6 +12,8 @@ package Sidef::Types::Regex::Match {
       Sidef::Object::Object
       );
 
+    use Sidef::Types::Bool::Bool;
+
     sub new {
         my (undef, %hash) = @_;
 

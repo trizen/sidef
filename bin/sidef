@@ -643,8 +643,6 @@ sub __load_sidef_module__ {
     return 1;
 }
 
-eval($MODULE{"Sidef::Types::Bool::Bool"});      # it's used inside `Object`
-
 FOOT
 
     my $requirify = sub {

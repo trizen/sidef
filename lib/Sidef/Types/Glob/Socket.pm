@@ -7,6 +7,8 @@ package Sidef::Types::Glob::Socket {
       Sidef::Object::Object
       );
 
+    use Sidef::Types::Bool::Bool;
+
     sub new {
         bless {}, __PACKAGE__;
     }

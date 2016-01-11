@@ -6,6 +6,7 @@ package Sidef::Types::Range::RangeString {
       );
 
     use overload '@{}' => \&to_a;
+    use Sidef::Types::Bool::Bool;
 
     sub new {
         my (undef, $from, $to, $direction) = @_;

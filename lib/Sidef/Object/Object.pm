@@ -61,13 +61,17 @@ package Sidef::Object::Object {
     }
 
     sub say {
-        (CORE::say @_) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
+        (CORE::say @_)
+          ? (state $x = Sidef::Types::Bool::Bool->true)
+          : (state $y = Sidef::Types::Bool::Bool->false);
     }
 
     *println = \&say;
 
     sub print {
-        (CORE::print @_) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
+        (CORE::print @_)
+          ? (state $x = Sidef::Types::Bool::Bool->true)
+          : (state $y = Sidef::Types::Bool::Bool->false);
     }
 
     sub method {
@@ -105,12 +109,16 @@ package Sidef::Object::Object {
 
     sub respond_to {
         my ($self, $method) = @_;
-        ($self->can($method)) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
+        ($self->can($method))
+          ? (state $x = Sidef::Types::Bool::Bool->true)
+          : (state $y = Sidef::Types::Bool::Bool->false);
     }
 
     sub is_a {
         my ($self, $obj) = @_;
-        ($self->SUPER::isa(CORE::ref($obj) || $obj)) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
+        ($self->SUPER::isa(CORE::ref($obj) || $obj))
+          ? (state $x = Sidef::Types::Bool::Bool->true)
+          : (state $y = Sidef::Types::Bool::Bool->false);
     }
 
     *is_an   = \&is_a;
@@ -215,7 +223,9 @@ package Sidef::Object::Object {
 
         # Logical XOR
         *{__PACKAGE__ . '::' . '^'} = sub {
-            ($_[0] xor $_[1]) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
+            ($_[0] xor $_[1])
+              ? (state $x = Sidef::Types::Bool::Bool->true)
+              : (state $y = Sidef::Types::Bool::Bool->false);
         };
 
         # Defined-OR
@@ -365,7 +375,9 @@ package Sidef::Object::Object {
                 return $second->contains($first);
             }
 
-            ($first eq $second) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
+            ($first eq $second)
+              ? (state $x = Sidef::Types::Bool::Bool->true)
+              : (state $y = Sidef::Types::Bool::Bool->false);
         };
 
         # Negation of smart match

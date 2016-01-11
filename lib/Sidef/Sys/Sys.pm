@@ -5,6 +5,8 @@ package Sidef::Sys::Sys {
       Sidef::Object::Object
       );
 
+    use Sidef::Types::Bool::Bool;
+
     sub new {
         CORE::bless {}, __PACKAGE__;
     }

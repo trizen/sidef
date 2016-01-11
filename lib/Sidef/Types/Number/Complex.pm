@@ -15,7 +15,9 @@ package Sidef::Types::Number::Complex {
 
     require Math::MPC;
     require Math::MPFR;
-    require Sidef::Types::Number::Number;
+
+    use Sidef::Types::Bool::Bool;
+    use Sidef::Types::Number::Number;
 
     our $ROUND = Math::MPC::MPC_RNDNN();
 

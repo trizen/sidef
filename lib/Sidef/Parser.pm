@@ -4,6 +4,7 @@ package Sidef::Parser {
     use 5.014;
 
     our $DEBUG = 0;
+    use Sidef::Types::Bool::Bool;
 
     sub new {
         my (undef, %opts) = @_;

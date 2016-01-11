@@ -5,6 +5,8 @@ package Sidef::Types::Glob::DirHandle {
       Sidef::Object::Object
       );
 
+    use Sidef::Types::Bool::Bool;
+
     sub new {
         my (undef, %opt) = @_;
 

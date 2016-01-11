@@ -13,6 +13,9 @@ package Sidef::Types::String::String {
       q{0+}   => sub { 0 + ${$_[0]} },
       q{""}   => \&get_value;
 
+    use Sidef::Types::Bool::Bool;
+    use Sidef::Types::Number::Number;
+
     sub new {
         my (undef, $str) = @_;
         if (@_ > 2) {

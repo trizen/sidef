@@ -28,6 +28,8 @@ package Sidef::Types::Number::Number {
       q{0+}   => sub { Math::GMPq::Rmpq_get_d(${$_[0]}) },
       q{""}   => \&get_value;
 
+    use Sidef::Types::Bool::Bool;
+
     sub _load_bigrat {
         state $bigrat = do {
             require Math::BigRat;
