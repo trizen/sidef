@@ -1,0 +1,23 @@
+#!/usr/bin/ruby
+
+struct Foo {
+    String name,
+    Number age {.is_even},
+}
+
+class Example << Foo {
+    method uc {
+        self.name.uc
+    }
+}
+
+var obj1 = Example("foo", 42);
+var obj2 = Example("bar", 22);
+
+assert_ne(obj1.name, obj2.name);
+assert_ne(obj1.age,  obj2.age);
+
+assert_eq(obj1.uc, "FOO");
+assert_eq(obj2.uc, "BAR");
+
+say "** Test passed";

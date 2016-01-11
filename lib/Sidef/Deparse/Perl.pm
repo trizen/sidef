@@ -702,6 +702,7 @@ HEADER
                 local $self->{package_name}     = $package_name;
                 local $self->{inherit}          = $obj->{inherit} if exists $obj->{inherit};
                 local $self->{class_vars}       = $obj->{vars} if exists $obj->{vars};
+                local $self->{class_struct}     = $obj->{struct} if exists $obj->{struct};
                 local $self->{class_attributes} = $obj->{attributes} if exists $obj->{attributes};
                 local $self->{ref_class}        = 1 if ref($obj->{name});
                 $code .= $self->deparse_expr({self => $block});
@@ -750,11 +751,14 @@ HEADER
                             push @{$self->{function_declarations}}, [$refaddr, "my \$new$refaddr;"];
 
                             $Sidef::SPACES += $Sidef::SPACES_INCR;
-                            $code .= $self->_dump_sub_init_vars(@{$self->{class_vars}})
+                            $code .= $self->_dump_sub_init_vars(@{$self->{class_vars}},
+                                                                (map { @{$_->{vars}} } @{$self->{class_struct}}))
                               . $self->_dump_class_attributes(@{$self->{class_attributes}});
 
                             $code .= (' ' x $Sidef::SPACES) . 'my $self = bless {';
-                            foreach my $var (@{$self->{class_vars}}, map { @{$_->{vars}} } @{$self->{class_attributes}}) {
+                            foreach my $var (@{$self->{class_vars}},
+                                             (map { @{$_->{vars}} } @{$self->{class_attributes}}),
+                                             (map { @{$_->{vars}} } @{$self->{class_struct}})) {
                                 $code .= qq{"\Q$var->{name}\E"=>} . $self->_dump_var($var) . ', ';
                             }
 
@@ -768,7 +772,7 @@ HEADER
                             $Sidef::SPACES -= $Sidef::SPACES_INCR;
                             $code .=
                                 (" " x $Sidef::SPACES . "}") . ', '
-                              . $self->_dump_var_attr(@{$self->{class_vars}})
+                              . $self->_dump_var_attr(@{$self->{class_vars}}, map { @{$_->{vars}} } @{$self->{class_struct}})
                               . ", type => "
                               . $self->_dump_string('class')
                               . ", name => "
@@ -780,7 +784,9 @@ HEADER
                               . $self->_dump_string("$self->{package_name}\::call")
                               . "} = sub { CORE::shift(\@_); \$new$refaddr->call(\@_) } };\n";
 
-                            foreach my $var (@{$self->{class_vars}}, map { @{$_->{vars}} } @{$self->{class_attributes}}) {
+                            foreach my $var (@{$self->{class_vars}},
+                                             (map { @{$_->{vars}} } @{$self->{class_attributes}}),
+                                             (map { @{$_->{vars}} } @{$self->{class_struct}})) {
                                 $code .=
                                   (' ' x $Sidef::SPACES) . qq{sub $var->{name} : lvalue { \$_[0]->{"\Q$var->{name}\E"} }\n};
                             }

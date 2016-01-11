@@ -564,6 +564,7 @@ scripts/Tests/catalan_numbers_2.sf
 scripts/Tests/class_attributes.sf
 scripts/Tests/class_inheritance.sf
 scripts/Tests/class_redefinition.sf
+scripts/Tests/class_struct_inheritance.sf
 scripts/Tests/classes.sf
 scripts/Tests/classes_and_objects.sf
 scripts/Tests/closure_generator.sf

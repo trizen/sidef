@@ -1430,7 +1430,12 @@ package Sidef::Parser {
                             my ($name) = $1;
                             if (defined(my $class = $self->find_var($name, $class_name))) {
                                 if ($class->{type} eq 'class') {
+                                    ++$class->{count};
                                     push @{$obj->{inherit}}, $class->{obj};
+                                }
+                                elsif ($class->{type} eq 'struct') {
+                                    ++$class->{count};
+                                    push @{$obj->{struct}}, $class->{obj};
                                 }
                                 else {
                                     $self->fatal_error(

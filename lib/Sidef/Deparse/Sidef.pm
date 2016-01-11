@@ -279,7 +279,10 @@ package Sidef::Deparse::Sidef {
                 $code .= "class " . $self->_dump_class_name($obj->{name});
                 $code .= '(' . $self->_dump_vars(@{$obj->{vars}}) . ')';
                 if (exists $obj->{inherit}) {
-                    $code .= ' << ' . join(', ', map { $_->{name} } @{$obj->{inherit}}) . ' ';
+                    $code .= ' << ' . join(', ', map { $self->deparse_expr({self => $_}) } @{$obj->{inherit}}) . ' ';
+                }
+                elsif (exists $obj->{struct}) {
+                    $code .= ' << ' . join(', ', map { $self->deparse_expr({self => $_}) } @{$obj->{struct}}) . ' ';
                 }
                 $code .= $self->deparse_expr({self => $block});
 
