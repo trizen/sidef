@@ -49,6 +49,17 @@ package Sidef::Perl::Perl {
                 return Sidef::Types::Regex::Regex->new($val);
             }
 
+            if ($ref eq 'Math::BigFloat' or $ref eq 'Math::BigInt' or $ref eq 'Math::BigRat') {
+                return (
+                        $val->is_nan
+                        ? Sidef::Types::Number::Nan->new
+                        : $val->is_inf ? $val->is_inf('-')
+                              ? Sidef::Types::Number::Ninf->new
+                              : Sidef::Types::Number::Inf->new
+                          : Sidef::Types::Number::Number->new($val->bstr, 10)
+                       );
+            }
+
             if ($ref eq '') {
                 state $x = require Scalar::Util;
 

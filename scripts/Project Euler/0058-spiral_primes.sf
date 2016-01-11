@@ -13,7 +13,7 @@ var f2 = func(n) { 5 + n*(4*n - 8) };
 var f3 = func(n) { 7 + n*(4*n - 10) };
 
 var primes = 0;
-range(1, Math.inf).each { |i|
+Inf.times { |i|
 
     var total = (4*(i-1) + 1);
     var side  = (2*(i-1) + 1);
