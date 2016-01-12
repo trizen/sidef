@@ -1,0 +1,26 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Truncatable_primes
+#
+
+func t_prime(n, left=true) {
+    var p = %w(2 3 5 7);
+    var f = (
+        left ? { '1'..'9' ~X+ p }
+             : { p ~X+ '1'..'9' }
+    )
+    n.times {
+        p = f().grep{ .to_i.is_prime }
+    }
+    p.map{.to_i}.max
+}
+
+var ltp = t_prime(5, left: true)
+var rtp = t_prime(5, left: false)
+
+say ltp;
+say rtp;
+
+assert_eq(ltp, 998443);
+assert_eq(rtp, 739399);

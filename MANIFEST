@@ -516,6 +516,7 @@ scripts/RosettaCode/stem_and_leaf_plot.sf
 scripts/RosettaCode/string_comparison.sf
 scripts/RosettaCode/sum_digits_of_an_integer.sf
 scripts/RosettaCode/the_isaac_cipher.sf
+scripts/RosettaCode/truncatable_primes.sf
 scripts/RosettaCode/universal_turing_machine.sf
 scripts/RosettaCode/van_der_corput_sequence.sf
 scripts/RosettaCode/walk_a_dir_non_recursively.sf
