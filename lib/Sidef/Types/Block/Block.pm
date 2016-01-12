@@ -94,7 +94,12 @@ package Sidef::Types::Block::Block {
                 }
                 elsif (exists $seen{$var->{name}}) {
                     if (exists $var->{where_block}) {
-                        $var->{where_block}($seen{$var->{name}}) or next OUTER;
+                        (
+                         exists($var->{slurpy})
+                         ? $var->{where_block}(Sidef::Types::Array::Array->new(@{$seen{$var->{name}}}))
+                         : $var->{where_block}($seen{$var->{name}})
+                        )
+                          or next OUTER;
                     }
                     elsif (exists $var->{where_expr}) {
                         $var->{where_expr} eq $seen{$var->{name}} or next OUTER;

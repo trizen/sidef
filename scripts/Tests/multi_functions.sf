@@ -45,4 +45,14 @@ func fib2(n)   { __FUNC__(n-1) + __FUNC__(n-2) }
 
 assert_eq(fib2(12), 144);
 
+#
+## Slurpy variable with block
+#
+
+func f(a, *b { .all{ _ >= 0} }) {
+    a * b.sum
+}
+
+assert_eq(f(2, 3, 4, 5, 6), 36);
+
 say "** Test passed!";
