@@ -7,8 +7,8 @@ package Sidef::Types::Range::RangeNumber {
 
     use overload '@{}' => \&to_a;
 
-    use Sidef::Types::Number::Number;
     use Sidef::Types::Bool::Bool;
+    use Sidef::Types::Number::Number;
 
     sub new {
         my (undef, $from, $to, $step) = @_;

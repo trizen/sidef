@@ -4,6 +4,7 @@ package Sidef::Convert::Convert {
 
     use 5.014;
     use overload;
+    use Sidef::Types::Bool::Bool;
 
     sub to_s {
         my ($self) = @_;
@@ -63,8 +64,8 @@ package Sidef::Convert::Convert {
 
     sub to_bool {
         $_[0]
-          ? (state $x = Sidef::Types::Bool::Bool->true)
-          : (state $y = Sidef::Types::Bool::Bool->false);
+          ? (Sidef::Types::Bool::Bool::TRUE)
+          : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     *to_b = \&to_bool;

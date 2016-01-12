@@ -623,14 +623,22 @@ sub __load_sidef_module__ {
     if (not exists $REQ{$name}) {
         my $module = $name =~ s{::}{/}gr . '.pm';
         if (exists $MODULE{$name} and not exists $INC{$module}) {
-             while ($MODULE{$name} =~ /^\h*
-                  (?:use \h+ parent \s+ qw\((.*?)\)
-                | (?:require|use) \h+ (Sidef::[\w:]+))
-            /smxg) {
-                foreach my $mod (split(' ', $+)) {
-                    __load_sidef_module__($mod) if not exists $REQ{$mod};
-                }
-            }
+
+            # Load the Sidef used modules
+            $MODULE{$name} =~ s{^\h*
+                  use \h+ (?:
+                      parent \s+ qw\((.*?)\)
+                    | (Sidef::[\w:]+)
+                  )
+            }{
+                  join(
+                  ";\n" => map{
+                    exists($REQ{$_})
+                        ? ()
+                        : "BEGIN{ main::__load_sidef_module__('$_') }" } split(' ', $+)
+                  ) . (defined($1) ? "\nuse parent qw($+);\n" : '')
+            }gxmse;
+
             $INC{$module} = 1;
             eval($MODULE{$name});
             die "[FATAL ERROR] Can't load `$module`: $@" if $@;

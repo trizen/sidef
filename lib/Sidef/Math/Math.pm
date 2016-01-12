@@ -6,7 +6,7 @@ package Sidef::Math::Math {
       Sidef::Object::Object
       );
 
-    require Sidef::Types::Number::Number;
+    use Sidef::Types::Number::Number;
 
     sub new {
         bless {}, __PACKAGE__;
