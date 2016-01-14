@@ -168,6 +168,7 @@ scripts/Graphical/fractal_tree.sf
 scripts/Graphical/hello_world_graphical.sf
 scripts/Graphical/hello_world_graphical_1.sf
 scripts/Graphical/munching_squares.sf
+scripts/Graphical/sierpinski_pentagon.sf
 scripts/Graphical/sierpinski_triangle_graphical.sf
 scripts/Graphical/simple_windowed_application.sf
 scripts/Graphical/ulam_spiral.sf
@@ -372,6 +373,7 @@ scripts/RosettaCode/left_factorials_1.sf
 scripts/RosettaCode/levenshtein_distance.sf
 scripts/RosettaCode/levenshtein_distance_1.sf
 scripts/RosettaCode/levenshtein_distance_2.sf
+scripts/RosettaCode/list_rooted_trees.sf
 scripts/RosettaCode/literals_floating_point.sf
 scripts/RosettaCode/literals_integer.sf
 scripts/RosettaCode/literals_string.sf
@@ -406,6 +408,7 @@ scripts/RosettaCode/maze_generation.sf
 scripts/RosettaCode/md5.sf
 scripts/RosettaCode/md5_1.sf
 scripts/RosettaCode/middle_three_digits.sf
+scripts/RosettaCode/modular_arithmetic.sf
 scripts/RosettaCode/modular_inverse.sf
 scripts/RosettaCode/move_to_front_algorithm_1.sf
 scripts/RosettaCode/move_to_front_algorithm_2.sf
@@ -492,6 +495,7 @@ scripts/RosettaCode/sort_disjoint_sublist.sf
 scripts/RosettaCode/sort_stability.sf
 scripts/RosettaCode/sort_using_a_custom_comparator.sf
 scripts/RosettaCode/sorting_algorithms_bubble_sort.sf
+scripts/RosettaCode/sorting_algorithms_circlesort.sf
 scripts/RosettaCode/sorting_algorithms_cocktail_sort.sf
 scripts/RosettaCode/sorting_algorithms_comb_sort.sf
 scripts/RosettaCode/sorting_algorithms_counting_sort.sf
@@ -499,6 +503,7 @@ scripts/RosettaCode/sorting_algorithms_gnome_sort.sf
 scripts/RosettaCode/sorting_algorithms_heapsort.sf
 scripts/RosettaCode/sorting_algorithms_insertion_sort.sf
 scripts/RosettaCode/sorting_algorithms_merge_sort.sf
+scripts/RosettaCode/sorting_algorithms_patience_sort.sf
 scripts/RosettaCode/sorting_algorithms_quicksort.sf
 scripts/RosettaCode/sorting_algorithms_radix_sort.sf
 scripts/RosettaCode/sorting_algorithms_selection_sort.sf

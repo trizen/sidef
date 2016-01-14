@@ -587,6 +587,12 @@ HEADER
                               . "\$$obj->{name}$refaddr->call(\$self, Sidef::Types::String::String->new(\$class), Sidef::Types::String::String->new(\$method), \@_) }";
                         }
 
+                        # Anonymous method
+                        elsif ($obj->{name} eq '__ANON__') {
+                            ## don't add anonymous methods to the class,
+                            ## but allow them to be defined and used freely
+                        }
+
                         # Other methods
                         else {
                             $code .= ";\n"
@@ -1006,7 +1012,8 @@ HEADER
                 'do{ if (defined(my '
               . $dvar . '='
               . $self->deparse_args($obj->{expr}) . ')) '
-              . $self->deparse_bare_block($obj->{block}{code}) . '}';
+              . $self->deparse_bare_block($obj->{block}{code})
+              . ' else { } }';
         }
         elsif ($ref eq 'Sidef::Types::Block::Gather') {
             $code =
