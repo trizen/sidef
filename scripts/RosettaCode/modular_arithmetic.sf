@@ -16,7 +16,7 @@ class Modulo(n=0, m=13) {
       Modulo.def_method(meth, method(n2) { Modulo(n.(meth)(n2.to_n), m) })
   }
 
-  method to_s { "(#{n}, #{m})" }
+  method to_s { "#{n} 「mod #{m}」" }
 }
 
 func f(x) { x**100 + x + 1 }
