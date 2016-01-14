@@ -5,7 +5,9 @@ package Sidef::Types::Range::RangeNumber {
       Sidef::Object::Object
       );
 
-    use overload '@{}' => \&to_a;
+    use overload
+      '@{}' => \&to_a,
+      q{""} => \&dump;
 
     use Sidef::Types::Bool::Bool;
     use Sidef::Types::Number::Number;
@@ -281,6 +283,11 @@ package Sidef::Types::Range::RangeNumber {
               ? (Sidef::Types::Bool::Bool::TRUE)
               : (Sidef::Types::Bool::Bool::FALSE);
         };
+    }
+
+    sub dump {
+        my ($self) = @_;
+        Sidef::Types::String::String->new("RangeNum($self->{from}, $self->{to}, $self->{step})");
     }
 
 }

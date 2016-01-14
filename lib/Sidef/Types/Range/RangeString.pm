@@ -5,7 +5,9 @@ package Sidef::Types::Range::RangeString {
       Sidef::Object::Object
       );
 
-    use overload '@{}' => \&to_a;
+    use overload
+      '@{}' => \&to_a,
+      q{""} => \&dump;
     use Sidef::Types::Bool::Bool;
 
     sub new {
@@ -155,6 +157,19 @@ package Sidef::Types::Range::RangeString {
               ? (Sidef::Types::Bool::Bool::TRUE)
               : (Sidef::Types::Bool::Bool::FALSE);
         };
+    }
+
+    sub dump {
+        my ($self) = @_;
+        Sidef::Types::String::String->new(
+                                          "RangeStr("
+                                            . join(', ',
+                                                   ${Sidef::Types::String::String->new($self->{from})->dump},
+                                                   ${Sidef::Types::String::String->new($self->{to})->dump},
+                                                   Sidef::Types::Bool::Bool->new($self->{asc}),
+                                                  )
+                                            . ")"
+                                         );
     }
 }
 
