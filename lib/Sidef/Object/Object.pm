@@ -31,7 +31,11 @@ package Sidef::Object::Object {
         }
       },
       q{cmp} => sub {
-        my ($obj1, $obj2, $first) = @_;
+        my ($obj1, $obj2, $swaped) = @_;
+
+        if ($swaped) {
+            ($obj1, $obj2) = ($obj2, $obj1);
+        }
 
         if (CORE::ref($obj1) && $obj1->SUPER::isa(CORE::ref($obj2)) or CORE::ref($obj2) && $obj2->SUPER::isa(CORE::ref($obj1)))
         {
@@ -42,7 +46,7 @@ package Sidef::Object::Object {
             }
         }
 
-        Scalar::Util::refaddr($obj1) <=> (CORE::ref($obj2) ? Scalar::Util::refaddr($obj2) : $first ? -1 : 'inf');
+        Scalar::Util::refaddr($obj1) <=> (CORE::ref($obj2) ? Scalar::Util::refaddr($obj2) : 'inf');
       },
       q{eq} => sub {
         my ($obj1, $obj2) = @_;
@@ -236,7 +240,11 @@ package Sidef::Object::Object {
 
         # Smart match operator
         *{__PACKAGE__ . '::' . '~~'} = sub {
-            my ($first, $second) = @_;
+            my ($first, $second, $swaped) = @_;
+
+            if ($swaped) {
+                ($first, $second) = ($second, $first);
+            }
 
             my $f_type = CORE::ref($first);
             my $s_type = CORE::ref($second);
@@ -319,7 +327,7 @@ package Sidef::Object::Object {
 
                 # Array ~~ Hash
                 if ($s_type eq 'Sidef::Types::Hash::Hash') {
-                    return $first->contains_all($second->keys);
+                    return $second->keys->contains_all($first);
                 }
 
                 # Array ~~ Any
@@ -331,7 +339,7 @@ package Sidef::Object::Object {
 
                 # Hash ~~ Array
                 if ($s_type eq 'Sidef::Types::Array::Array') {
-                    return $first->keys->contains_all($second);
+                    return $second->contains_all($first->keys);
                 }
 
                 # Hash ~~ Hash
