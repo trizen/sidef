@@ -59,10 +59,6 @@ You can find more info about Sidef, by clicking on the following links:
 
 =back
 
-=head1 REPOSITORY
-
-L<https://github.com/trizen/Lingua-RO-Numbers>
-
 =head2 LICENSE AND COPYRIGHT
 
 Copyright (C) 2013-2016 Daniel Șuteu, Ioana Fălcușan
