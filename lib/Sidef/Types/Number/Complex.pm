@@ -388,8 +388,7 @@ package Sidef::Types::Number::Complex {
 
     sub root {
         my ($x, $y) = @_;
-        state $one = __PACKAGE__->new(1);
-        return $x->pow($one->div($y));
+        return $x->pow($y->inv);
     }
 
     sub sqrt {
@@ -402,7 +401,13 @@ package Sidef::Types::Number::Complex {
     sub cbrt {
         my ($x) = @_;
         my $r = Math::MPC::Rmpc_init2($PREC);
-        Math::MPC::Rmpc_pow_d($r, $$x, 1 / 3, $ROUND);
+        state $three_inv = do {
+            my $r = Math::MPC::Rmpc_init2($PREC);
+            Math::MPC::Rmpc_set_ui($r, 3, $ROUND);
+            Math::MPC::Rmpc_ui_div($r, 1, $r, $ROUND);
+            $r;
+        };
+        Math::MPC::Rmpc_pow($r, $$x, $three_inv, $ROUND);
         bless(\$r, __PACKAGE__);
     }
 
