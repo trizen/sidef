@@ -411,6 +411,10 @@ package Sidef::Types::Number::Number {
     sub root {
         my ($x, $y) = @_;
 
+        if (ref($y) eq 'Sidef::Types::Number::Complex') {
+            return $y->new($x)->pow((ONE)->div($y));
+        }
+
         if (ref($y) eq 'Sidef::Types::Number::Inf' or ref($y) eq 'Sidef::Types::Number::Ninf') {
             return (ONE);
         }
