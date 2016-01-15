@@ -328,7 +328,7 @@ package Sidef::Types::Number::Complex {
             Math::MPC::Rmpc_sub($r, $$x, $$y, $ROUND);
         }
         else {
-            Math::MPC::Rmpc_sub_fr($r, $$x, -$y->_as_float(), $ROUND);
+            Math::MPC::Rmpc_add_fr($r, $$x, -$y->_as_float(), $ROUND);
         }
 
         bless(\$r, __PACKAGE__);
