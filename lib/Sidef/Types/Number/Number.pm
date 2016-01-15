@@ -425,7 +425,9 @@ package Sidef::Types::Number::Number {
 
     sub sqr {
         my ($x) = @_;
-        $x->mul($x);
+        my $r = Math::GMPq::Rmpq_init();
+        Math::GMPq::Rmpq_mul($r, $$x, $$x);
+        bless \$r, __PACKAGE__;
     }
 
     sub pow {
