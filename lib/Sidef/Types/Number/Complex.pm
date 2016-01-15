@@ -142,10 +142,6 @@ package Sidef::Types::Number::Complex {
 
     *call = \&new;
 
-    sub _new {
-        bless \$_[0], __PACKAGE__;
-    }
-
     sub _valid {
         (
          ref($_) eq __PACKAGE__
@@ -215,7 +211,7 @@ package Sidef::Types::Number::Complex {
         Math::MPFR::Rmpfr_const_pi($pi, $Sidef::Types::Number::Number::ROUND);
         my $cplx_pi = Math::MPC::Rmpc_init2($PREC);
         Math::MPC::Rmpc_set_fr($cplx_pi, $pi, $ROUND);
-        _new($cplx_pi);
+        bless(\$cplx_pi, __PACKAGE__);
     }
 
     sub e {
@@ -224,14 +220,14 @@ package Sidef::Types::Number::Complex {
         Math::MPFR::Rmpfr_exp($e, $one_f, $Sidef::Types::Number::Number::ROUND);
         my $cplx_e = Math::MPC::Rmpc_init2($PREC);
         Math::MPC::Rmpc_set_fr($cplx_e, $e, $ROUND);
-        _new($cplx_e);
+        bless(\$cplx_e, __PACKAGE__);
     }
 
     sub i {
         state $i = do {
             my $r = Math::MPC::Rmpc_init2($PREC);
             Math::MPC::Rmpc_set_ui_ui($r, 0, 1, $ROUND);
-            _new($r);
+            bless(\$r, __PACKAGE__);
         };
     }
 
@@ -247,7 +243,7 @@ package Sidef::Types::Number::Complex {
 
         my $cplx_phi = Math::MPC::Rmpc_init2($PREC);
         Math::MPC::Rmpc_set_fr($cplx_phi, $phi, $ROUND);
-        _new($cplx_phi);
+        bless(\$cplx_phi, __PACKAGE__);
     }
 
     #
@@ -293,14 +289,14 @@ package Sidef::Types::Number::Complex {
         my ($x) = @_;
         my $r = Math::MPC::Rmpc_init2($PREC);
         Math::MPC::Rmpc_neg($r, $$x, $ROUND);
-        _new($r);
+        bless(\$r, __PACKAGE__);
     }
 
     sub conj {
         my ($x) = @_;
         my $r = Math::MPC::Rmpc_init2($PREC);
         Math::MPC::Rmpc_conj($r, $$x, $ROUND);
-        _new($r);
+        bless(\$r, __PACKAGE__);
     }
 
     *not       = \&conj;
@@ -321,7 +317,7 @@ package Sidef::Types::Number::Complex {
             Math::MPC::Rmpc_add_fr($r, $$x, $y->_as_float(), $ROUND);
         }
 
-        _new($r);
+        bless(\$r, __PACKAGE__);
     }
 
     sub sub {
@@ -335,7 +331,7 @@ package Sidef::Types::Number::Complex {
             Math::MPC::Rmpc_add_fr($r, $$x, -$y->_as_float(), $ROUND);
         }
 
-        _new($r);
+        bless(\$r, __PACKAGE__);
     }
 
     sub mul {
@@ -349,7 +345,7 @@ package Sidef::Types::Number::Complex {
             Math::MPC::Rmpc_mul_fr($r, $$x, $y->_as_float(), $ROUND);
         }
 
-        _new($r);
+        bless(\$r, __PACKAGE__);
     }
 
     sub div {
@@ -364,7 +360,16 @@ package Sidef::Types::Number::Complex {
             Math::MPC::Rmpc_div_fr($r, $$x, $y->_as_float(), $ROUND);
         }
 
-        _new($r);
+        bless(\$r, __PACKAGE__);
+    }
+
+    sub inv {
+        my ($x) = @_;
+
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_ui_div($r, 1, $$x, $ROUND);
+
+        bless(\$r, __PACKAGE__);
     }
 
     sub pow {
@@ -378,7 +383,7 @@ package Sidef::Types::Number::Complex {
             Math::MPC::Rmpc_pow_fr($r, $$x, $y->_as_float(), $ROUND);
         }
 
-        _new($r);
+        bless(\$r, __PACKAGE__);
     }
 
     sub root {
@@ -391,14 +396,14 @@ package Sidef::Types::Number::Complex {
         my ($x) = @_;
         my $r = Math::MPC::Rmpc_init2($PREC);
         Math::MPC::Rmpc_sqrt($r, $$x, $ROUND);
-        _new($r);
+        bless(\$r, __PACKAGE__);
     }
 
     sub cbrt {
         my ($x) = @_;
         my $r = Math::MPC::Rmpc_init2($PREC);
         Math::MPC::Rmpc_pow_d($r, $$x, 1 / 3, $ROUND);
-        _new($r);
+        bless(\$r, __PACKAGE__);
     }
 
     sub log {
@@ -419,14 +424,14 @@ package Sidef::Types::Number::Complex {
             }
         }
 
-        _new($r);
+        bless(\$r, __PACKAGE__);
     }
 
     sub ln {
         my ($x) = @_;
         my $r = Math::MPC::Rmpc_init2($PREC);
         Math::MPC::Rmpc_log($r, $$x, $ROUND);
-        _new($r);
+        bless(\$r, __PACKAGE__);
     }
 
     sub log2 {
@@ -440,21 +445,21 @@ package Sidef::Types::Number::Complex {
         Math::MPFR::Rmpfr_log($baseln, $two, $Sidef::Types::Number::Number::ROUND);
         Math::MPC::Rmpc_div_fr($r, $r, $baseln, $ROUND);
 
-        _new($r);
+        bless(\$r, __PACKAGE__);
     }
 
     sub log10 {
         my ($x) = @_;
         my $r = Math::MPC::Rmpc_init2($PREC);
         Math::MPC::Rmpc_log10($r, $$x, $ROUND);
-        _new($r);
+        bless(\$r, __PACKAGE__);
     }
 
     sub exp {
         my ($x) = @_;
         my $r = Math::MPC::Rmpc_init2($PREC);
         Math::MPC::Rmpc_exp($r, $$x, $ROUND);
-        _new($r);
+        bless(\$r, __PACKAGE__);
     }
 
     sub exp2 {
@@ -462,7 +467,7 @@ package Sidef::Types::Number::Complex {
         state $two = Math::MPC->new(2);
         my $r = Math::MPC::Rmpc_init2($PREC);
         Math::MPC::Rmpc_pow($r, $two, $$x, $ROUND);
-        _new($r);
+        bless(\$r, __PACKAGE__);
     }
 
     sub exp10 {
@@ -470,7 +475,7 @@ package Sidef::Types::Number::Complex {
         state $ten = Math::MPC->new(10);
         my $r = Math::MPC::Rmpc_init2($PREC);
         Math::MPC::Rmpc_pow($r, $ten, $$x, $ROUND);
-        _new($r);
+        bless(\$r, __PACKAGE__);
     }
 
     sub dec {
@@ -478,7 +483,7 @@ package Sidef::Types::Number::Complex {
         state $one = Math::MPC->new(1);
         my $r = Math::MPC::Rmpc_init2($PREC);
         Math::MPC::Rmpc_sub($r, $$x, $one, $ROUND);
-        _new($r);
+        bless(\$r, __PACKAGE__);
     }
 
     sub inc {
@@ -486,7 +491,7 @@ package Sidef::Types::Number::Complex {
         state $one = Math::MPC->new(1);
         my $r = Math::MPC::Rmpc_init2($PREC);
         Math::MPC::Rmpc_add($r, $$x, $one, $ROUND);
-        _new($r);
+        bless(\$r, __PACKAGE__);
     }
 
     #
@@ -497,84 +502,84 @@ package Sidef::Types::Number::Complex {
         my ($x) = @_;
         my $r = Math::MPC::Rmpc_init2($PREC);
         Math::MPC::Rmpc_sin($r, $$x, $ROUND);
-        _new($r);
+        bless(\$r, __PACKAGE__);
     }
 
     sub asin {
         my ($x) = @_;
         my $r = Math::MPC::Rmpc_init2($PREC);
         Math::MPC::Rmpc_asin($r, $$x, $ROUND);
-        _new($r);
+        bless(\$r, __PACKAGE__);
     }
 
     sub sinh {
         my ($x) = @_;
         my $r = Math::MPC::Rmpc_init2($PREC);
         Math::MPC::Rmpc_sinh($r, $$x, $ROUND);
-        _new($r);
+        bless(\$r, __PACKAGE__);
     }
 
     sub asinh {
         my ($x) = @_;
         my $r = Math::MPC::Rmpc_init2($PREC);
         Math::MPC::Rmpc_asinh($r, $$x, $ROUND);
-        _new($r);
+        bless(\$r, __PACKAGE__);
     }
 
     sub cos {
         my ($x) = @_;
         my $r = Math::MPC::Rmpc_init2($PREC);
         Math::MPC::Rmpc_cos($r, $$x, $ROUND);
-        _new($r);
+        bless(\$r, __PACKAGE__);
     }
 
     sub acos {
         my ($x) = @_;
         my $r = Math::MPC::Rmpc_init2($PREC);
         Math::MPC::Rmpc_acos($r, $$x, $ROUND);
-        _new($r);
+        bless(\$r, __PACKAGE__);
     }
 
     sub cosh {
         my ($x) = @_;
         my $r = Math::MPC::Rmpc_init2($PREC);
         Math::MPC::Rmpc_cosh($r, $$x, $ROUND);
-        _new($r);
+        bless(\$r, __PACKAGE__);
     }
 
     sub acosh {
         my ($x) = @_;
         my $r = Math::MPC::Rmpc_init2($PREC);
         Math::MPC::Rmpc_acosh($r, $$x, $ROUND);
-        _new($r);
+        bless(\$r, __PACKAGE__);
     }
 
     sub tan {
         my ($x) = @_;
         my $r = Math::MPC::Rmpc_init2($PREC);
         Math::MPC::Rmpc_tan($r, $$x, $ROUND);
-        _new($r);
+        bless(\$r, __PACKAGE__);
     }
 
     sub atan {
         my ($x) = @_;
         my $r = Math::MPC::Rmpc_init2($PREC);
         Math::MPC::Rmpc_atan($r, $$x, $ROUND);
-        _new($r);
+        bless(\$r, __PACKAGE__);
     }
 
     sub tanh {
         my ($x) = @_;
         my $r = Math::MPC::Rmpc_init2($PREC);
         Math::MPC::Rmpc_tanh($r, $$x, $ROUND);
-        _new($r);
+        bless(\$r, __PACKAGE__);
     }
 
     sub atanh {
         my ($x) = @_;
         my $r = Math::MPC::Rmpc_init2($PREC);
         Math::MPC::Rmpc_atanh($r, $$x, $ROUND);
-        _new($r);
+        bless(\$r, __PACKAGE__);
     }
 
     #
@@ -586,7 +591,7 @@ package Sidef::Types::Number::Complex {
         my $r = Math::MPC::Rmpc_init2($PREC);
         Math::MPC::Rmpc_sin($r, $$x, $ROUND);
         Math::MPC::Rmpc_div($r, $one, $r, $ROUND);
-        _new($r);
+        bless(\$r, __PACKAGE__);
     }
 
     #
@@ -598,7 +603,7 @@ package Sidef::Types::Number::Complex {
         my $r = Math::MPC::Rmpc_init2($PREC);
         Math::MPC::Rmpc_div($r, $one, $$x, $ROUND);
         Math::MPC::Rmpc_asin($r, $r, $ROUND);
-        _new($r);
+        bless(\$r, __PACKAGE__);
     }
 
     #
@@ -610,7 +615,7 @@ package Sidef::Types::Number::Complex {
         my $r = Math::MPC::Rmpc_init2($PREC);
         Math::MPC::Rmpc_sinh($r, $$x, $ROUND);
         Math::MPC::Rmpc_div($r, $one, $r, $ROUND);
-        _new($r);
+        bless(\$r, __PACKAGE__);
     }
 
     #
@@ -622,7 +627,7 @@ package Sidef::Types::Number::Complex {
         my $r = Math::MPC::Rmpc_init2($PREC);
         Math::MPC::Rmpc_div($r, $one, $$x, $ROUND);
         Math::MPC::Rmpc_asinh($r, $r, $ROUND);
-        _new($r);
+        bless(\$r, __PACKAGE__);
     }
 
     #
@@ -634,7 +639,7 @@ package Sidef::Types::Number::Complex {
         my $r = Math::MPC::Rmpc_init2($PREC);
         Math::MPC::Rmpc_cos($r, $$x, $ROUND);
         Math::MPC::Rmpc_div($r, $one, $r, $ROUND);
-        _new($r);
+        bless(\$r, __PACKAGE__);
     }
 
     #
@@ -646,7 +651,7 @@ package Sidef::Types::Number::Complex {
         my $r = Math::MPC::Rmpc_init2($PREC);
         Math::MPC::Rmpc_div($r, $one, $$x, $ROUND);
         Math::MPC::Rmpc_acos($r, $r, $ROUND);
-        _new($r);
+        bless(\$r, __PACKAGE__);
     }
 
     #
@@ -658,7 +663,7 @@ package Sidef::Types::Number::Complex {
         my $r = Math::MPC::Rmpc_init2($PREC);
         Math::MPC::Rmpc_cosh($r, $$x, $ROUND);
         Math::MPC::Rmpc_div($r, $one, $r, $ROUND);
-        _new($r);
+        bless(\$r, __PACKAGE__);
     }
 
     #
@@ -670,7 +675,7 @@ package Sidef::Types::Number::Complex {
         my $r = Math::MPC::Rmpc_init2($PREC);
         Math::MPC::Rmpc_div($r, $one, $$x, $ROUND);
         Math::MPC::Rmpc_acosh($r, $r, $ROUND);
-        _new($r);
+        bless(\$r, __PACKAGE__);
     }
 
     #
@@ -682,7 +687,7 @@ package Sidef::Types::Number::Complex {
         my $r = Math::MPC::Rmpc_init2($PREC);
         Math::MPC::Rmpc_tan($r, $$x, $ROUND);
         Math::MPC::Rmpc_div($r, $one, $r, $ROUND);
-        _new($r);
+        bless(\$r, __PACKAGE__);
     }
 
     #
@@ -694,7 +699,7 @@ package Sidef::Types::Number::Complex {
         my $r = Math::MPC::Rmpc_init2($PREC);
         Math::MPC::Rmpc_div($r, $one, $$x, $ROUND);
         Math::MPC::Rmpc_atan($r, $r, $ROUND);
-        _new($r);
+        bless(\$r, __PACKAGE__);
     }
 
     #
@@ -706,7 +711,7 @@ package Sidef::Types::Number::Complex {
         my $r = Math::MPC::Rmpc_init2($PREC);
         Math::MPC::Rmpc_tanh($r, $$x, $ROUND);
         Math::MPC::Rmpc_div($r, $one, $r, $ROUND);
-        _new($r);
+        bless(\$r, __PACKAGE__);
     }
 
     #
@@ -718,7 +723,7 @@ package Sidef::Types::Number::Complex {
         my $r = Math::MPC::Rmpc_init2($PREC);
         Math::MPC::Rmpc_div($r, $one, $$x, $ROUND);
         Math::MPC::Rmpc_atanh($r, $r, $ROUND);
-        _new($r);
+        bless(\$r, __PACKAGE__);
     }
 
     #
@@ -737,7 +742,7 @@ package Sidef::Types::Number::Complex {
         my $r = Math::MPC::Rmpc_init2($PREC);
         Math::MPC::Rmpc_div($r, $$x, $$y, $ROUND);
         Math::MPC::Rmpc_atan($r, $r, $ROUND);
-        _new($r);
+        bless(\$r, __PACKAGE__);
     }
 
     #

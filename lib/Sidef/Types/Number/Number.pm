@@ -412,7 +412,7 @@ package Sidef::Types::Number::Number {
         my ($x, $y) = @_;
 
         if (ref($y) eq 'Sidef::Types::Number::Complex') {
-            return $y->new($x)->pow((ONE)->div($y));
+            return $y->new($x)->pow($y->inv);
         }
 
         if (ref($y) eq 'Sidef::Types::Number::Inf' or ref($y) eq 'Sidef::Types::Number::Ninf') {
@@ -420,7 +420,7 @@ package Sidef::Types::Number::Number {
         }
 
         _valid($y);
-        return $x->pow((ONE)->div($y));
+        return $x->pow($y->inv);
     }
 
     sub sqr {
