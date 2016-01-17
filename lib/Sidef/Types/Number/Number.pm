@@ -949,23 +949,19 @@ package Sidef::Types::Number::Number {
         my $xn = $$x;
         my $yn = $$y;
 
-        my $a1 = Math::GMPq::Rmpq_sgn($xn) < 0
-          ? do {
+        if (Math::GMPq::Rmpq_sgn($xn) < 0) {
             my $r = Math::GMPq::Rmpq_init();
             Math::GMPq::Rmpq_abs($r, $xn);
-            $r;
-          }
-          : $xn;
+            $xn = $r;
+        }
 
-        my $a2 = Math::GMPq::Rmpq_sgn($yn) < 0
-          ? do {
+        if (Math::GMPq::Rmpq_sgn($yn) < 0) {
             my $r = Math::GMPq::Rmpq_init();
             Math::GMPq::Rmpq_abs($r, $yn);
-            $r;
-          }
-          : $yn;
+            $yn = $r;
+        }
 
-        my $cmp = Math::GMPq::Rmpq_cmp($a1, $a2);
+        my $cmp = Math::GMPq::Rmpq_cmp($xn, $yn);
         !$cmp ? (ZERO) : $cmp < 0 ? (MONE) : (ONE);
     }
 
@@ -1219,9 +1215,8 @@ package Sidef::Types::Number::Number {
     }
 
     sub int {
-        my ($x) = @_;
         my $z = Math::GMPz::Rmpz_init();
-        Math::GMPz::Rmpz_set_q($z, $$x);
+        Math::GMPz::Rmpz_set_q($z, ${$_[0]});
         _mpz2rat($z);
     }
 
