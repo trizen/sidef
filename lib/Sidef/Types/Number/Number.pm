@@ -325,7 +325,7 @@ package Sidef::Types::Number::Number {
 
         _valid($y);
 
-        if (CORE::not Math::GMPq::Rmpq_sgn($$y)) {
+        if (!Math::GMPq::Rmpq_sgn($$y)) {
             my $sign = Math::GMPq::Rmpq_sgn($$x);
             return (!$sign ? nan() : $sign > 0 ? inf() : ninf());
         }
@@ -453,7 +453,7 @@ package Sidef::Types::Number::Number {
             return _mpz2rat($z);
         }
 
-        if (Math::GMPq::Rmpq_sgn($$x) < 0 and CORE::not Math::GMPq::Rmpq_integer_p($$y)) {
+        if (Math::GMPq::Rmpq_sgn($$x) < 0 and !Math::GMPq::Rmpq_integer_p($$y)) {
             return Sidef::Types::Number::Complex->new($x)->pow($y);
         }
 
@@ -1047,7 +1047,7 @@ package Sidef::Types::Number::Number {
 
     sub is_zero {
         my ($x) = @_;
-        if (CORE::not Math::GMPq::Rmpq_sgn($$x)) {
+        if (!Math::GMPq::Rmpq_sgn($$x)) {
             (Sidef::Types::Bool::Bool::TRUE);
         }
         else {
@@ -1095,7 +1095,7 @@ package Sidef::Types::Number::Number {
         if ($sign > 0) {
             state $z = Sidef::Types::String::String->new('+');
         }
-        elsif (CORE::not $sign) {
+        elsif (!$sign) {
             state $z = Sidef::Types::String::String->new('');
         }
         else {
@@ -1121,7 +1121,7 @@ package Sidef::Types::Number::Number {
     sub is_even {
         my ($x) = @_;
 
-        if (CORE::not Math::GMPq::Rmpq_integer_p($$x)) {
+        if (!Math::GMPq::Rmpq_integer_p($$x)) {
             return (Sidef::Types::Bool::Bool::FALSE);
         }
 
@@ -1139,7 +1139,7 @@ package Sidef::Types::Number::Number {
     sub is_odd {
         my ($x) = @_;
 
-        if (CORE::not Math::GMPq::Rmpq_integer_p($$x)) {
+        if (!Math::GMPq::Rmpq_integer_p($$x)) {
             return (Sidef::Types::Bool::Bool::FALSE);
         }
 
@@ -1364,6 +1364,12 @@ package Sidef::Types::Number::Number {
     sub idiv {
         my ($x, $y) = @_;
         _valid($y);
+
+        if (!Math::GMPq::Rmpq_sgn($$y)) {
+            my $sign = Math::GMPq::Rmpq_sgn($$x);
+            return (!$sign ? nan() : $sign > 0 ? inf() : ninf());
+        }
+
         my $r = Math::GMPz::Rmpz_init();
         Math::GMPz::Rmpz_div($r, _as_int($x), _as_int($y));
         _mpz2rat($r);
@@ -1407,7 +1413,7 @@ package Sidef::Types::Number::Number {
             my $yf = _as_float($y);
             Math::MPFR::Rmpfr_fmod($r, _as_float($x), $yf, $ROUND);
             my $sign = Math::MPFR::Rmpfr_sgn($r);
-            if (CORE::not $sign) {
+            if (!$sign) {
                 return (ZERO);
             }
             elsif (($sign > 0) ne (Math::MPFR::Rmpfr_sgn($yf) > 0)) {
@@ -1596,7 +1602,7 @@ package Sidef::Types::Number::Number {
     sub is_square {
         my ($x) = @_;
 
-        if (CORE::not Math::GMPq::Rmpq_integer_p($$x)) {
+        if (!Math::GMPq::Rmpq_integer_p($$x)) {
             return (Sidef::Types::Bool::Bool::FALSE);
         }
 
@@ -1616,7 +1622,7 @@ package Sidef::Types::Number::Number {
     sub is_power {
         my ($x) = @_;
 
-        if (CORE::not Math::GMPq::Rmpq_integer_p($$x)) {
+        if (!Math::GMPq::Rmpq_integer_p($$x)) {
             return (Sidef::Types::Bool::Bool::FALSE);
         }
 
@@ -1765,7 +1771,7 @@ package Sidef::Types::Number::Number {
         _valid($y);
 
         my @array;
-        if (CORE::not defined($step) and Math::GMPq::Rmpq_integer_p($$x) and Math::GMPq::Rmpq_integer_p($$y)) {
+        if (!defined($step) and Math::GMPq::Rmpq_integer_p($$x) and Math::GMPq::Rmpq_integer_p($$y)) {
             foreach my $i (Math::GMPq::Rmpq_get_d($$x) .. Math::GMPq::Rmpq_get_d($$y)) {
                 my $n = Math::GMPq::Rmpq_init();
                 Math::GMPq::Rmpq_set_si($n, $i, 1);
@@ -1774,7 +1780,7 @@ package Sidef::Types::Number::Number {
         }
         else {
 
-            if (CORE::not defined $step) {
+            if (!defined($step)) {
                 $step = (ONE);
             }
             else {
@@ -1803,7 +1809,7 @@ package Sidef::Types::Number::Number {
     sub array_downto {
         my ($x, $y, $step) = @_;
 
-        if (CORE::not defined $step) {
+        if (!defined($step)) {
             _valid($y);
             $step = (ONE);
         }
