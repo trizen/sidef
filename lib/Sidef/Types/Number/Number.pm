@@ -396,8 +396,8 @@ package Sidef::Types::Number::Number {
             return Sidef::Types::Number::Complex->new($x)->sqrt;
         }
 
-        my $r = Math::MPFR::Rmpfr_init2($PREC);
-        Math::MPFR::Rmpfr_sqrt($r, _as_float($x), $ROUND);
+        my $r = _as_float($x);
+        Math::MPFR::Rmpfr_sqrt($r, $r, $ROUND);
         _mpfr2rat($r);
     }
 
@@ -409,8 +409,8 @@ package Sidef::Types::Number::Number {
             return Sidef::Types::Number::Complex->new($x)->cbrt;
         }
 
-        my $r = Math::MPFR::Rmpfr_init2($PREC);
-        Math::MPFR::Rmpfr_cbrt($r, _as_float($x), $ROUND);
+        my $r = _as_float($x);
+        Math::MPFR::Rmpfr_cbrt($r, $r, $ROUND);
         _mpfr2rat($r);
     }
 
@@ -463,16 +463,16 @@ package Sidef::Types::Number::Number {
             return Sidef::Types::Number::Complex->new($x)->pow($y);
         }
 
-        my $r = Math::MPFR::Rmpfr_init2($PREC);
-        Math::MPFR::Rmpfr_pow($r, _as_float($x), _as_float($y), $ROUND);
+        my $r = _as_float($x);
+        Math::MPFR::Rmpfr_pow($r, $r, _as_float($y), $ROUND);
         _mpfr2rat($r);
     }
 
     sub fmod {
         my ($x, $y) = @_;
         _valid($y);
-        my $r = Math::MPFR::Rmpfr_init2($PREC);
-        Math::MPFR::Rmpfr_fmod($r, _as_float($x), _as_float($y), $ROUND);
+        my $r = _as_float($x);
+        Math::MPFR::Rmpfr_fmod($r, $r, _as_float($y), $ROUND);
         _mpfr2rat($r);
     }
 
@@ -483,8 +483,8 @@ package Sidef::Types::Number::Number {
             return Sidef::Types::Number::Complex->new($x)->log($y);
         }
 
-        my $r = Math::MPFR::Rmpfr_init2($PREC);
-        Math::MPFR::Rmpfr_log($r, _as_float($x), $ROUND);
+        my $r = _as_float($x);
+        Math::MPFR::Rmpfr_log($r, $r, $ROUND);
 
         if (defined $y) {
 
@@ -493,8 +493,8 @@ package Sidef::Types::Number::Number {
             }
 
             _valid($y);
-            my $baseln = Math::MPFR::Rmpfr_init2($PREC);
-            Math::MPFR::Rmpfr_log($baseln, _as_float($y), $ROUND);
+            my $baseln = _as_float($y);
+            Math::MPFR::Rmpfr_log($baseln, $baseln, $ROUND);
             Math::MPFR::Rmpfr_div($r, $r, $baseln, $ROUND);
         }
 
@@ -508,8 +508,8 @@ package Sidef::Types::Number::Number {
             return Sidef::Types::Number::Complex->new($x)->ln;
         }
 
-        my $r = Math::MPFR::Rmpfr_init2($PREC);
-        Math::MPFR::Rmpfr_log($r, _as_float($x), $ROUND);
+        my $r = _as_float($x);
+        Math::MPFR::Rmpfr_log($r, $r, $ROUND);
         _mpfr2rat($r);
     }
 
@@ -520,8 +520,8 @@ package Sidef::Types::Number::Number {
             return Sidef::Types::Number::Complex->new($x)->log2;
         }
 
-        my $r = Math::MPFR::Rmpfr_init2($PREC);
-        Math::MPFR::Rmpfr_log2($r, _as_float($x), $ROUND);
+        my $r = _as_float($x);
+        Math::MPFR::Rmpfr_log2($r, $r, $ROUND);
         _mpfr2rat($r);
     }
 
@@ -532,29 +532,26 @@ package Sidef::Types::Number::Number {
             return Sidef::Types::Number::Complex->new($x)->log10;
         }
 
-        my $r = Math::MPFR::Rmpfr_init2($PREC);
-        Math::MPFR::Rmpfr_log10($r, _as_float($x), $ROUND);
+        my $r = _as_float($x);
+        Math::MPFR::Rmpfr_log10($r, $r, $ROUND);
         _mpfr2rat($r);
     }
 
     sub exp {
-        my ($x) = @_;
-        my $r = Math::MPFR::Rmpfr_init2($PREC);
-        Math::MPFR::Rmpfr_exp($r, _as_float($x), $ROUND);
+        my $r = _as_float($_[0]);
+        Math::MPFR::Rmpfr_exp($r, $r, $ROUND);
         _mpfr2rat($r);
     }
 
     sub exp2 {
-        my ($x) = @_;
-        my $r = Math::MPFR::Rmpfr_init2($PREC);
-        Math::MPFR::Rmpfr_exp2($r, _as_float($x), $ROUND);
+        my $r = _as_float($_[0]);
+        Math::MPFR::Rmpfr_exp2($r, $r, $ROUND);
         _mpfr2rat($r);
     }
 
     sub exp10 {
-        my ($x) = @_;
-        my $r = Math::MPFR::Rmpfr_init2($PREC);
-        Math::MPFR::Rmpfr_exp10($r, _as_float($x), $ROUND);
+        my $r = _as_float($_[0]);
+        Math::MPFR::Rmpfr_exp10($r, $r, $ROUND);
         _mpfr2rat($r);
     }
 
@@ -563,9 +560,8 @@ package Sidef::Types::Number::Number {
     #
 
     sub sin {
-        my ($x) = @_;
-        my $r = Math::MPFR::Rmpfr_init2($PREC);
-        Math::MPFR::Rmpfr_sin($r, _as_float($x), $ROUND);
+        my $r = _as_float($_[0]);
+        Math::MPFR::Rmpfr_sin($r, $r, $ROUND);
         _mpfr2rat($r);
     }
 
@@ -577,29 +573,26 @@ package Sidef::Types::Number::Number {
             return Sidef::Types::Number::Complex->new($x)->asin;
         }
 
-        my $r = Math::MPFR::Rmpfr_init2($PREC);
-        Math::MPFR::Rmpfr_asin($r, _as_float($x), $ROUND);
+        my $r = _as_float($x);
+        Math::MPFR::Rmpfr_asin($r, $r, $ROUND);
         _mpfr2rat($r);
     }
 
     sub sinh {
-        my ($x) = @_;
-        my $r = Math::MPFR::Rmpfr_init2($PREC);
-        Math::MPFR::Rmpfr_sinh($r, _as_float($x), $ROUND);
+        my $r = _as_float($_[0]);
+        Math::MPFR::Rmpfr_sinh($r, $r, $ROUND);
         _mpfr2rat($r);
     }
 
     sub asinh {
-        my ($x) = @_;
-        my $r = Math::MPFR::Rmpfr_init2($PREC);
-        Math::MPFR::Rmpfr_asinh($r, _as_float($x), $ROUND);
+        my $r = _as_float($_[0]);
+        Math::MPFR::Rmpfr_asinh($r, $r, $ROUND);
         _mpfr2rat($r);
     }
 
     sub cos {
-        my ($x) = @_;
-        my $r = Math::MPFR::Rmpfr_init2($PREC);
-        Math::MPFR::Rmpfr_cos($r, _as_float($x), $ROUND);
+        my $r = _as_float($_[0]);
+        Math::MPFR::Rmpfr_cos($r, $r, $ROUND);
         _mpfr2rat($r);
     }
 
@@ -611,15 +604,15 @@ package Sidef::Types::Number::Number {
             return Sidef::Types::Number::Complex->new($x)->acos;
         }
 
-        my $r = Math::MPFR::Rmpfr_init2($PREC);
-        Math::MPFR::Rmpfr_acos($r, _as_float($x), $ROUND);
+        my $r = _as_float($x);
+        Math::MPFR::Rmpfr_acos($r, $r, $ROUND);
         _mpfr2rat($r);
     }
 
     sub cosh {
         my ($x) = @_;
-        my $r = Math::MPFR::Rmpfr_init2($PREC);
-        Math::MPFR::Rmpfr_cosh($r, _as_float($x), $ROUND);
+        my $r = _as_float($x);
+        Math::MPFR::Rmpfr_cosh($r, $r, $ROUND);
         _mpfr2rat($r);
     }
 
@@ -631,29 +624,29 @@ package Sidef::Types::Number::Number {
             return Sidef::Types::Number::Complex->new($x)->acosh;
         }
 
-        my $r = Math::MPFR::Rmpfr_init2($PREC);
-        Math::MPFR::Rmpfr_acosh($r, _as_float($x), $ROUND);
+        my $r = _as_float($x);
+        Math::MPFR::Rmpfr_acosh($r, $r, $ROUND);
         _mpfr2rat($r);
     }
 
     sub tan {
         my ($x) = @_;
-        my $r = Math::MPFR::Rmpfr_init2($PREC);
-        Math::MPFR::Rmpfr_tan($r, _as_float($x), $ROUND);
+        my $r = _as_float($x);
+        Math::MPFR::Rmpfr_tan($r, $r, $ROUND);
         _mpfr2rat($r);
     }
 
     sub atan {
         my ($x) = @_;
-        my $r = Math::MPFR::Rmpfr_init2($PREC);
-        Math::MPFR::Rmpfr_atan($r, _as_float($x), $ROUND);
+        my $r = _as_float($x);
+        Math::MPFR::Rmpfr_atan($r, $r, $ROUND);
         _mpfr2rat($r);
     }
 
     sub tanh {
         my ($x) = @_;
-        my $r = Math::MPFR::Rmpfr_init2($PREC);
-        Math::MPFR::Rmpfr_tanh($r, _as_float($x), $ROUND);
+        my $r = _as_float($x);
+        Math::MPFR::Rmpfr_tanh($r, $r, $ROUND);
         _mpfr2rat($r);
     }
 
@@ -665,15 +658,15 @@ package Sidef::Types::Number::Number {
             return Sidef::Types::Number::Complex->new($x)->atanh;
         }
 
-        my $r = Math::MPFR::Rmpfr_init2($PREC);
-        Math::MPFR::Rmpfr_atanh($r, _as_float($x), $ROUND);
+        my $r = _as_float($x);
+        Math::MPFR::Rmpfr_atanh($r, $r, $ROUND);
         _mpfr2rat($r);
     }
 
     sub sec {
         my ($x) = @_;
-        my $r = Math::MPFR::Rmpfr_init2($PREC);
-        Math::MPFR::Rmpfr_sec($r, _as_float($x), $ROUND);
+        my $r = _as_float($x);
+        Math::MPFR::Rmpfr_sec($r, $r, $ROUND);
         _mpfr2rat($r);
     }
 
@@ -689,16 +682,16 @@ package Sidef::Types::Number::Number {
         }
 
         state $one = Math::MPFR->new(1);
-        my $r = Math::MPFR::Rmpfr_init2($PREC);
-        Math::MPFR::Rmpfr_div($r, $one, _as_float($x), $ROUND);
+        my $r = _as_float($x);
+        Math::MPFR::Rmpfr_div($r, $one, $r, $ROUND);
         Math::MPFR::Rmpfr_acos($r, $r, $ROUND);
         _mpfr2rat($r);
     }
 
     sub sech {
         my ($x) = @_;
-        my $r = Math::MPFR::Rmpfr_init2($PREC);
-        Math::MPFR::Rmpfr_sech($r, _as_float($x), $ROUND);
+        my $r = _as_float($x);
+        Math::MPFR::Rmpfr_sech($r, $r, $ROUND);
         _mpfr2rat($r);
     }
 
@@ -714,16 +707,16 @@ package Sidef::Types::Number::Number {
         }
 
         state $one = Math::MPFR->new(1);
-        my $r = Math::MPFR::Rmpfr_init2($PREC);
-        Math::MPFR::Rmpfr_div($r, $one, _as_float($x), $ROUND);
+        my $r = _as_float($x);
+        Math::MPFR::Rmpfr_div($r, $one, $r, $ROUND);
         Math::MPFR::Rmpfr_acosh($r, $r, $ROUND);
         _mpfr2rat($r);
     }
 
     sub csc {
         my ($x) = @_;
-        my $r = Math::MPFR::Rmpfr_init2($PREC);
-        Math::MPFR::Rmpfr_csc($r, _as_float($x), $ROUND);
+        my $r = _as_float($x);
+        Math::MPFR::Rmpfr_csc($r, $r, $ROUND);
         _mpfr2rat($r);
     }
 
@@ -739,16 +732,16 @@ package Sidef::Types::Number::Number {
         }
 
         state $one = Math::MPFR->new(1);
-        my $r = Math::MPFR::Rmpfr_init2($PREC);
-        Math::MPFR::Rmpfr_div($r, $one, _as_float($x), $ROUND);
+        my $r = _as_float($x);
+        Math::MPFR::Rmpfr_div($r, $one, $r, $ROUND);
         Math::MPFR::Rmpfr_asin($r, $r, $ROUND);
         _mpfr2rat($r);
     }
 
     sub csch {
         my ($x) = @_;
-        my $r = Math::MPFR::Rmpfr_init2($PREC);
-        Math::MPFR::Rmpfr_csch($r, _as_float($x), $ROUND);
+        my $r = _as_float($x);
+        Math::MPFR::Rmpfr_csch($r, $r, $ROUND);
         _mpfr2rat($r);
     }
 
@@ -758,16 +751,16 @@ package Sidef::Types::Number::Number {
     sub acsch {
         my ($x) = @_;
         state $one = Math::MPFR->new(1);
-        my $r = Math::MPFR::Rmpfr_init2($PREC);
-        Math::MPFR::Rmpfr_div($r, $one, _as_float($x), $ROUND);
+        my $r = _as_float($x);
+        Math::MPFR::Rmpfr_div($r, $one, $r, $ROUND);
         Math::MPFR::Rmpfr_asinh($r, $r, $ROUND);
         _mpfr2rat($r);
     }
 
     sub cot {
         my ($x) = @_;
-        my $r = Math::MPFR::Rmpfr_init2($PREC);
-        Math::MPFR::Rmpfr_cot($r, _as_float($x), $ROUND);
+        my $r = _as_float($x);
+        Math::MPFR::Rmpfr_cot($r, $r, $ROUND);
         _mpfr2rat($r);
     }
 
@@ -777,16 +770,16 @@ package Sidef::Types::Number::Number {
     sub acot {
         my ($x) = @_;
         state $one = Math::MPFR->new(1);
-        my $r = Math::MPFR::Rmpfr_init2($PREC);
-        Math::MPFR::Rmpfr_div($r, $one, _as_float($x), $ROUND);
+        my $r = _as_float($x);
+        Math::MPFR::Rmpfr_div($r, $one, $r, $ROUND);
         Math::MPFR::Rmpfr_atan($r, $r, $ROUND);
         _mpfr2rat($r);
     }
 
     sub coth {
         my ($x) = @_;
-        my $r = Math::MPFR::Rmpfr_init2($PREC);
-        Math::MPFR::Rmpfr_coth($r, _as_float($x), $ROUND);
+        my $r = _as_float($x);
+        Math::MPFR::Rmpfr_coth($r, $r, $ROUND);
         _mpfr2rat($r);
     }
 
@@ -796,8 +789,8 @@ package Sidef::Types::Number::Number {
     sub acoth {
         my ($x) = @_;
         state $one = Math::MPFR->new(1);
-        my $r = Math::MPFR::Rmpfr_init2($PREC);
-        Math::MPFR::Rmpfr_div($r, $one, _as_float($x), $ROUND);
+        my $r = _as_float($x);
+        Math::MPFR::Rmpfr_div($r, $one, $r, $ROUND);
         Math::MPFR::Rmpfr_atanh($r, $r, $ROUND);
         _mpfr2rat($r);
     }
@@ -818,8 +811,8 @@ package Sidef::Types::Number::Number {
         }
 
         _valid($y);
-        my $r = Math::MPFR::Rmpfr_init2($PREC);
-        Math::MPFR::Rmpfr_atan2($r, _as_float($x), _as_float($y), $ROUND);
+        my $r = _as_float($x);
+        Math::MPFR::Rmpfr_atan2($r, $r, _as_float($y), $ROUND);
         _mpfr2rat($r);
     }
 
@@ -830,79 +823,79 @@ package Sidef::Types::Number::Number {
     sub agm {
         my ($x, $y) = @_;
         _valid($y);
-        my $r = Math::MPFR::Rmpfr_init2($PREC);
-        Math::MPFR::Rmpfr_agm($r, _as_float($x), _as_float($y), $ROUND);
+        my $r = _as_float($x);
+        Math::MPFR::Rmpfr_agm($r, $r, _as_float($y), $ROUND);
         _mpfr2rat($r);
     }
 
     sub hypot {
         my ($x, $y) = @_;
         _valid($y);
-        my $r = Math::MPFR::Rmpfr_init2($PREC);
-        Math::MPFR::Rmpfr_hypot($r, _as_float($x), _as_float($y), $ROUND);
+        my $r = _as_float($x);
+        Math::MPFR::Rmpfr_hypot($r, $r, _as_float($y), $ROUND);
         _mpfr2rat($r);
     }
 
     sub gamma {
         my ($x) = @_;
-        my $r = Math::MPFR::Rmpfr_init2($PREC);
-        Math::MPFR::Rmpfr_gamma($r, _as_float($x), $ROUND);
+        my $r = _as_float($x);
+        Math::MPFR::Rmpfr_gamma($r, $r, $ROUND);
         _mpfr2rat($r);
     }
 
     sub lngamma {
         my ($x) = @_;
-        my $r = Math::MPFR::Rmpfr_init2($PREC);
-        Math::MPFR::Rmpfr_lngamma($r, _as_float($x), $ROUND);
+        my $r = _as_float($x);
+        Math::MPFR::Rmpfr_lngamma($r, $r, $ROUND);
         _mpfr2rat($r);
     }
 
     sub lgamma {
         my ($x) = @_;
-        my $r = Math::MPFR::Rmpfr_init2($PREC);
-        Math::MPFR::Rmpfr_lgamma($r, _as_float($x), $ROUND);
+        my $r = _as_float($x);
+        Math::MPFR::Rmpfr_lgamma($r, $r, $ROUND);
         _mpfr2rat($r);
     }
 
     sub digamma {
         my ($x) = @_;
-        my $r = Math::MPFR::Rmpfr_init2($PREC);
-        Math::MPFR::Rmpfr_digamma($r, _as_float($x), $ROUND);
+        my $r = _as_float($x);
+        Math::MPFR::Rmpfr_digamma($r, $r, $ROUND);
         _mpfr2rat($r);
     }
 
     sub zeta {
         my ($x) = @_;
-        my $r = Math::MPFR::Rmpfr_init2($PREC);
-        Math::MPFR::Rmpfr_zeta($r, _as_float($x), $ROUND);
+        my $r = _as_float($x);
+        Math::MPFR::Rmpfr_zeta($r, $r, $ROUND);
         _mpfr2rat($r);
     }
 
     sub erf {
         my ($x) = @_;
-        my $r = Math::MPFR::Rmpfr_init2($PREC);
-        Math::MPFR::Rmpfr_erf($r, _as_float($x), $ROUND);
+        my $r = _as_float($x);
+        Math::MPFR::Rmpfr_erf($r, $r, $ROUND);
         _mpfr2rat($r);
     }
 
     sub erfc {
         my ($x) = @_;
-        my $r = Math::MPFR::Rmpfr_init2($PREC);
-        Math::MPFR::Rmpfr_erfc($r, _as_float($x), $ROUND);
+        my $r = _as_float($x);
+        Math::MPFR::Rmpfr_erfc($r, $r, $ROUND);
         _mpfr2rat($r);
     }
 
     sub eint {
         my ($x) = @_;
-        my $r = Math::MPFR::Rmpfr_init2($PREC);
-        Math::MPFR::Rmpfr_eint($r, _as_float($x), $ROUND);
+        my $r = _as_float($x);
+        Math::MPFR::Rmpfr_eint($r, $r, $ROUND);
         _mpfr2rat($r);
     }
 
     sub li2 {
         my ($x) = @_;
-        my $r = Math::MPFR::Rmpfr_init2($PREC);
-        Math::MPFR::Rmpfr_li2($r, _as_float($x), $ROUND);
+        my $r = _as_float($x);
+        Math::MPFR::Rmpfr_li2($r, $r, $ROUND);
         _mpfr2rat($r);
     }
 
@@ -1346,24 +1339,24 @@ package Sidef::Types::Number::Number {
     sub iadd {
         my ($x, $y) = @_;
         _valid($y);
-        my $r = Math::GMPz::Rmpz_init();
-        Math::GMPz::Rmpz_add($r, _as_int($x), _as_int($y));
+        my $r = _as_int($x);
+        Math::GMPz::Rmpz_add($r, $r, _as_int($y));
         _mpz2rat($r);
     }
 
     sub isub {
         my ($x, $y) = @_;
         _valid($y);
-        my $r = Math::GMPz::Rmpz_init();
-        Math::GMPz::Rmpz_sub($r, _as_int($x), _as_int($y));
+        my $r = _as_int($x);
+        Math::GMPz::Rmpz_sub($r, $r, _as_int($y));
         _mpz2rat($r);
     }
 
     sub imul {
         my ($x, $y) = @_;
         _valid($y);
-        my $r = Math::GMPz::Rmpz_init();
-        Math::GMPz::Rmpz_mul($r, _as_int($x), _as_int($y));
+        my $r = _as_int($x);
+        Math::GMPz::Rmpz_mul($r, $r, _as_int($y));
         _mpz2rat($r);
     }
 
@@ -1376,16 +1369,21 @@ package Sidef::Types::Number::Number {
             return (!$sign ? nan() : $sign > 0 ? inf() : ninf());
         }
 
-        my $r = Math::GMPz::Rmpz_init();
-        Math::GMPz::Rmpz_div($r, _as_int($x), _as_int($y));
+        my $r = _as_int($x);
+        Math::GMPz::Rmpz_div($r, $r, _as_int($y));
         _mpz2rat($r);
     }
 
     sub isqrt {
-        my ($x) = @_;
-        my $r = Math::GMPz::Rmpz_init();
-        Math::GMPz::Rmpz_sqrt($r, _as_int($x));
-        _mpz2rat($r);
+        my ($x)    = @_;
+        my $r      = _as_int($x);
+        my $is_neg = Math::GMPz::Rmpz_sgn($r) < 0;
+        Math::GMPz::Rmpz_abs($r, $r) if $is_neg;
+        Math::GMPz::Rmpz_sqrt($r, $r);
+
+        $is_neg
+          ? Sidef::Types::Number::Complex->new(0, _mpz2rat($r))
+          : _mpz2rat($r);
     }
 
     sub iroot {
@@ -1396,9 +1394,18 @@ package Sidef::Types::Number::Number {
         }
 
         _valid($y);
-        my $r = Math::GMPz::Rmpz_init();
-        Math::GMPz::Rmpz_root($r, _as_int($x), CORE::int(Math::GMPq::Rmpq_get_d($$y)));
-        _mpz2rat($r);
+
+        my $r    = _as_int($x);
+        my $root = CORE::int(Math::GMPq::Rmpq_get_d($$y));
+
+        my ($is_even, $is_neg) = $root % 2 == 0;
+        ($is_neg = Math::GMPz::Rmpz_sgn($r) < 0) if $is_even;
+        Math::GMPz::Rmpz_abs($r, $r) if ($is_even && $is_neg);
+        Math::GMPz::Rmpz_root($r, $r, $root);
+
+        $is_even && $is_neg
+          ? Sidef::Types::Number::Complex->new(0, _mpz2rat($r))
+          : _mpz2rat($r);
     }
 
     sub mod {
@@ -1406,18 +1413,20 @@ package Sidef::Types::Number::Number {
         _valid($y);
 
         if (Math::GMPq::Rmpq_integer_p($$x) and Math::GMPq::Rmpq_integer_p($$y)) {
-            my $r      = Math::GMPz::Rmpz_init();
+
             my $yz     = _as_int($y);
             my $sign_y = Math::GMPz::Rmpz_sgn($yz);
             return nan() if !$sign_y;
-            Math::GMPz::Rmpz_mod($r, _as_int($x), $yz);
+
+            my $r = _as_int($x);
+            Math::GMPz::Rmpz_mod($r, $r, $yz);
             Math::GMPz::Rmpz_add($r, $r, $yz) if ($sign_y < 0);
             _mpz2rat($r);
         }
         else {
-            my $r  = Math::MPFR::Rmpfr_init2($PREC);
+            my $r  = _as_float($x);
             my $yf = _as_float($y);
-            Math::MPFR::Rmpfr_fmod($r, _as_float($x), $yf, $ROUND);
+            Math::MPFR::Rmpfr_fmod($r, $r, $yf, $ROUND);
             my $sign = Math::MPFR::Rmpfr_sgn($r);
             if (!$sign) {
                 return (ZERO);
@@ -1432,8 +1441,8 @@ package Sidef::Types::Number::Number {
     sub modpow {
         my ($x, $y, $z) = @_;
         _valid($y, $z);
-        my $r = Math::GMPz::Rmpz_init();
-        Math::GMPz::Rmpz_powm($r, _as_int($x), _as_int($y), _as_int($z));
+        my $r = _as_int($x);
+        Math::GMPz::Rmpz_powm($r, $r, _as_int($y), _as_int($z));
         _mpz2rat($r);
     }
 
@@ -1442,8 +1451,8 @@ package Sidef::Types::Number::Number {
     sub modinv {
         my ($x, $y) = @_;
         _valid($y);
-        my $r = Math::GMPz::Rmpz_init();
-        Math::GMPz::Rmpz_invert($r, _as_int($x), _as_int($y));
+        my $r = _as_int($x);
+        Math::GMPz::Rmpz_invert($r, $r, _as_int($y));
         _mpz2rat($r);
     }
 
@@ -1454,41 +1463,41 @@ package Sidef::Types::Number::Number {
 
         _valid($y);
 
-        my $r1 = Math::GMPz::Rmpz_init();
-        my $r2 = Math::GMPz::Rmpz_init();
+        my $r1 = _as_int($x);
+        my $r2 = _as_int($y);
 
-        Math::GMPz::Rmpz_divmod($r1, $r2, _as_int($x), _as_int($y));
+        Math::GMPz::Rmpz_divmod($r1, $r2, $r1, $r2);
         (_mpz2rat($r1), _mpz2rat($r2));
     }
 
     sub and {
         my ($x, $y) = @_;
         _valid($y);
-        my $r = Math::GMPz::Rmpz_init();
-        Math::GMPz::Rmpz_and($r, _as_int($x), _as_int($y));
+        my $r = _as_int($x);
+        Math::GMPz::Rmpz_and($r, $r, _as_int($y));
         _mpz2rat($r);
     }
 
     sub or {
         my ($x, $y) = @_;
         _valid($y);
-        my $r = Math::GMPz::Rmpz_init();
-        Math::GMPz::Rmpz_ior($r, _as_int($x), _as_int($y));
+        my $r = _as_int($x);
+        Math::GMPz::Rmpz_ior($r, $r, _as_int($y));
         _mpz2rat($r);
     }
 
     sub xor {
         my ($x, $y) = @_;
         _valid($y);
-        my $r = Math::GMPz::Rmpz_init();
-        Math::GMPz::Rmpz_xor($r, _as_int($x), _as_int($y));
+        my $r = _as_int($x);
+        Math::GMPz::Rmpz_xor($r, $r, _as_int($y));
         _mpz2rat($r);
     }
 
     sub not {
         my ($x) = @_;
-        my $r = Math::GMPz::Rmpz_init();
-        Math::GMPz::Rmpz_com($r, _as_int($x));
+        my $r = _as_int($x);
+        Math::GMPz::Rmpz_com($r, $r);
         _mpz2rat($r);
     }
 
@@ -1533,8 +1542,8 @@ package Sidef::Types::Number::Number {
     sub binomial {
         my ($x, $y) = @_;
         _valid($y);
-        my $r = Math::GMPz::Rmpz_init();
-        Math::GMPz::Rmpz_bin_si($r, _as_int($x), CORE::int(Math::GMPq::Rmpq_get_d($$y)));
+        my $r = _as_int($x);
+        Math::GMPz::Rmpz_bin_si($r, $r, CORE::int(Math::GMPq::Rmpq_get_d($$y)));
         _mpz2rat($r);
     }
 
@@ -1569,16 +1578,16 @@ package Sidef::Types::Number::Number {
     sub gcd {
         my ($x, $y) = @_;
         _valid($y);
-        my $r = Math::GMPz::Rmpz_init();
-        Math::GMPz::Rmpz_gcd($r, _as_int($x), _as_int($y));
+        my $r = _as_int($x);
+        Math::GMPz::Rmpz_gcd($r, $r, _as_int($y));
         _mpz2rat($r);
     }
 
     sub lcm {
         my ($x, $y) = @_;
         _valid($y);
-        my $r = Math::GMPz::Rmpz_init();
-        Math::GMPz::Rmpz_lcm($r, _as_int($x), _as_int($y));
+        my $r = _as_int($x);
+        Math::GMPz::Rmpz_lcm($r, $r, _as_int($y));
         _mpz2rat($r);
     }
 
@@ -1600,8 +1609,8 @@ package Sidef::Types::Number::Number {
 
     sub next_prime {
         my ($x) = @_;
-        my $r = Math::GMPz::Rmpz_init();
-        Math::GMPz::Rmpz_nextprime($r, _as_int($x));
+        my $r = _as_int($x);
+        Math::GMPz::Rmpz_nextprime($r, $r);
         _mpz2rat($r);
     }
 
@@ -1682,8 +1691,8 @@ package Sidef::Types::Number::Number {
 
         my $ui = Math::MPFR::Rmpfr_get_ui($f, $ROUND);
 
-        my $z = Math::GMPz::Rmpz_init();
-        Math::GMPz::Rmpz_pow_ui($z, _as_int($y), $ui);
+        my $z = _as_int($y);
+        Math::GMPz::Rmpz_pow_ui($z, $z, $ui);
         _mpz2rat($z);
     }
 
@@ -1692,16 +1701,16 @@ package Sidef::Types::Number::Number {
     sub shift_left {
         my ($x, $y) = @_;
         _valid($y);
-        my $r = Math::GMPz::Rmpz_init();
-        Math::GMPz::Rmpz_mul_2exp($r, _as_int($x), CORE::int(Math::GMPq::Rmpq_get_d($$y)));
+        my $r = _as_int($x);
+        Math::GMPz::Rmpz_mul_2exp($r, $r, CORE::int(Math::GMPq::Rmpq_get_d($$y)));
         _mpz2rat($r);
     }
 
     sub shift_right {
         my ($x, $y) = @_;
         _valid($y);
-        my $r = Math::GMPz::Rmpz_init();
-        Math::GMPz::Rmpz_div_2exp($r, _as_int($x), CORE::int(Math::GMPq::Rmpq_get_d($$y)));
+        my $r = _as_int($x);
+        Math::GMPz::Rmpz_div_2exp($r, $r, CORE::int(Math::GMPq::Rmpq_get_d($$y)));
         _mpz2rat($r);
     }
 
