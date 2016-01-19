@@ -377,6 +377,12 @@ package Sidef::Types::Number::Number {
 
     sub inv {
         my ($x) = @_;
+
+        # Return Inf when x is zero
+        if (!Math::GMPq::Rmpq_sgn($$x)) {
+            return inf();
+        }
+
         my $r = Math::GMPq::Rmpq_init();
         Math::GMPq::Rmpq_inv($r, $$x);
         bless \$r, __PACKAGE__;
@@ -804,10 +810,10 @@ package Sidef::Types::Number::Number {
         }
         elsif (ref($y) eq 'Sidef::Types::Number::Ninf') {
             if (Math::GMPq::Rmpq_sgn($$x) >= 0) {
-                return state $z = pi();
+                return pi();
             }
             else {
-                return state $z = pi()->neg;
+                return pi()->neg;
             }
         }
 
@@ -1642,11 +1648,7 @@ package Sidef::Types::Number::Number {
     sub next_pow2 {
         my ($x) = @_;
 
-        state $one_z = do {
-            my $r = Math::GMPz::Rmpz_init();
-            Math::GMPz::Rmpz_set_ui($r, 1);
-            $r;
-        };
+        state $one_z = Math::GMPz::Rmpz_init_set_ui(1);
 
         my $f = Math::MPFR::Rmpfr_init2($PREC);
         Math::MPFR::Rmpfr_set_z($f, _as_int($x), $PREC);
