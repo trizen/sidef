@@ -1420,7 +1420,12 @@ package Sidef::Types::Number::Number {
 
             my $r = _as_int($x);
             Math::GMPz::Rmpz_mod($r, $r, $yz);
-            Math::GMPz::Rmpz_add($r, $r, $yz) if ($sign_y < 0);
+            if (!Math::GMPz::Rmpz_sgn($r)) {
+                return (ZERO);
+            }
+            elsif ($sign_y < 0) {
+                Math::GMPz::Rmpz_add($r, $r, $yz);
+            }
             _mpz2rat($r);
         }
         else {
@@ -1431,7 +1436,7 @@ package Sidef::Types::Number::Number {
             if (!$sign) {
                 return (ZERO);
             }
-            elsif (($sign > 0) xor(Math::MPFR::Rmpfr_sgn($yf) > 0)) {
+            elsif ($sign > 0 xor Math::MPFR::Rmpfr_sgn($yf) > 0) {
                 Math::MPFR::Rmpfr_add($r, $r, $yf, $ROUND);
             }
             _mpfr2rat($r);
