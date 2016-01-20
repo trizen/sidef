@@ -1431,7 +1431,7 @@ package Sidef::Types::Number::Number {
             if (!$sign) {
                 return (ZERO);
             }
-            elsif (($sign > 0) ne (Math::MPFR::Rmpfr_sgn($yf) > 0)) {
+            elsif (($sign > 0) xor(Math::MPFR::Rmpfr_sgn($yf) > 0)) {
                 Math::MPFR::Rmpfr_add($r, $r, $yf, $ROUND);
             }
             _mpfr2rat($r);
