@@ -1457,7 +1457,7 @@ package Sidef::Types::Number::Number {
         my ($x, $y) = @_;
         _valid($y);
         my $r = _as_int($x);
-        Math::GMPz::Rmpz_invert($r, $r, _as_int($y));
+        Math::GMPz::Rmpz_invert($r, $r, _as_int($y)) || return nan();
         _mpz2rat($r);
     }
 
@@ -1470,6 +1470,8 @@ package Sidef::Types::Number::Number {
 
         my $r1 = _as_int($x);
         my $r2 = _as_int($y);
+
+        return (nan(), nan()) if !Math::GMPz::Rmpz_sgn($r2);
 
         Math::GMPz::Rmpz_divmod($r1, $r2, $r1, $r2);
         (_mpz2rat($r1), _mpz2rat($r2));
