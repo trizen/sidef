@@ -284,6 +284,8 @@ package Sidef::Types::Hash::Hash {
         $code;
     }
 
+    *each_v = \&each_value;
+
     sub each_key {
         my ($self, $code) = @_;
 
@@ -295,6 +297,8 @@ package Sidef::Types::Hash::Hash {
 
         $code;
     }
+
+    *each_k = \&each_key;
 
     sub each {
         my ($self, $obj) = @_;

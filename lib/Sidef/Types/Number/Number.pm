@@ -341,7 +341,7 @@ package Sidef::Types::Number::Number {
         my ($x, $y) = @_;
 
         if (ref($y) eq 'Sidef::Types::Number::Complex') {
-            return $y->new($x)->mul($y);
+            return $y->mul($x);
         }
 
         if (ref($y) eq 'Sidef::Types::Number::Inf' or ref($y) eq 'Sidef::Types::Number::Ninf') {
@@ -1159,6 +1159,18 @@ package Sidef::Types::Number::Number {
 
         return Sidef::Types::Bool::Bool::FALSE
           if Math::GMPq::Rmpq_sgn($$y) == 0;
+
+        #---------------------------------------------------------------------------------
+        ## Optimization for integers, but it turns out to be slower for small integers...
+        #---------------------------------------------------------------------------------
+        #~ if (Math::GMPq::Rmpq_integer_p($$x) and Math::GMPq::Rmpq_integer_p($$y)) {
+        #~     if (Math::GMPz::Rmpz_divisible_p(_as_int($x), _as_int($y))) {
+        #~         return (Sidef::Types::Bool::Bool::TRUE);
+        #~     }
+        #~     else {
+        #~         return (Sidef::Types::Bool::Bool::FALSE);
+        #~     }
+        #~ }
 
         my $q = Math::GMPq::Rmpq_init();
         Math::GMPq::Rmpq_div($q, $$x, $$y);
