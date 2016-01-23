@@ -25,7 +25,7 @@ func cumulative_freq(freq) {
     return cf
 }
 
-func arithmethic_coding(bytes) {
+func arithmethic_coding(bytes, radix) {
 
     # The frequency characters
     var freq = Hash()
@@ -55,16 +55,16 @@ func arithmethic_coding(bytes) {
     # Upper bound
     var U = L+pf
 
-    var pow = pf.log10.int
-    var enc = ((U-1) // 10**pow)    #/
+    var pow = pf.log(radix).int
+    var enc = ((U-1) // radix**pow)    #/
 
     return (enc, pow, freq)
 }
 
-func arithmethic_decoding(enc, pow, freq) {
+func arithmethic_decoding(enc, radix, pow, freq) {
 
     # Multiply enc by 10^pow
-    enc *= 10**pow;
+    enc *= radix**pow;
 
     var base = 0
     freq.each_value { |v| base += v }
@@ -114,12 +114,14 @@ func arithmethic_decoding(enc, pow, freq) {
 ## Run some tests
 #
 
+const radix = 10    # can be any base greater or equal with 2
+
 %w(DABDDB DABDDBBDDBA ABBDDD ABRACADABRA CoMpReSSeD Sidef Trizen google TOBEORNOTTOBEORTOBEORNOT 象形字).each { |str|
 
     var bytes = str.bytes
 
-    var (enc, pow, freq) = arithmethic_coding(bytes)
-    var dec = arithmethic_decoding(enc, pow, freq)
+    var (enc, pow, freq) = arithmethic_coding(bytes, radix)
+    var dec = arithmethic_decoding(enc, radix, pow, freq)
 
     dec = dec.join_bytes('UTF-8')
 
