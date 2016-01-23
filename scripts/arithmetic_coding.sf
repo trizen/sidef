@@ -11,12 +11,10 @@
 
 # See: http://en.wikipedia.org/wiki/Arithmetic_coding#Arithmetic_coding_as_a_generalized_change_of_radix
 
-const asciibet = 0..255
-
 func cumulative_freq(freq) {
     var cf = Hash()
     var total = 0
-    asciibet.each { |b|
+    256.range.each { |b|
         if (freq.contains(b)) {
             cf{b} = total
             total += freq{b}
@@ -114,22 +112,18 @@ func arithmethic_decoding(enc, radix, pow, freq) {
 ## Run some tests
 #
 
-const radix = 10    # can be any base greater or equal with 2
+const radix = 10    # can be any integer greater or equal with 2
 
 %w(DABDDB DABDDBBDDBA ABBDDD ABRACADABRA CoMpReSSeD Sidef Trizen google TOBEORNOTTOBEORTOBEORNOT 象形字).each { |str|
 
-    var bytes = str.bytes
+    var (enc, pow, freq) = arithmethic_coding(str.bytes, radix)
+    var dec = arithmethic_decoding(enc, radix, pow, freq).join_bytes('UTF-8')
 
-    var (enc, pow, freq) = arithmethic_coding(bytes, radix)
-    var dec = arithmethic_decoding(enc, radix, pow, freq)
-
-    dec = dec.join_bytes('UTF-8')
-
-    say "Encoded: #{enc}"
-    say "Decoded: #{dec}"
+    say "Encoded: #{enc} * #{radix}^#{pow}";
+    say "Decoded: #{dec}";
 
     if (str != dec) {
         die "\tHowever that is incorrect!"
     }
-    say "-"*80
+    say '-'*80;
 }
