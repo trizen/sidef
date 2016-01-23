@@ -148,10 +148,6 @@ package Sidef::Types::Range::RangeNumber {
     sub map {
         my ($self, $code) = @_;
 
-        my $step = $self->{step};
-        my $from = $self->{from};
-        my $to   = $self->{to};
-
         my $values = Sidef::Types::Array::Array->new;
         my $iter   = $self->_new_iter();
         while (defined(my $num = $iter->())) {
@@ -165,10 +161,6 @@ package Sidef::Types::Range::RangeNumber {
 
     sub grep {
         my ($self, $code) = @_;
-
-        my $step = $self->{step};
-        my $from = $self->{from};
-        my $to   = $self->{to};
 
         my $values = Sidef::Types::Array::Array->new;
         my $iter   = $self->_new_iter();
@@ -185,10 +177,6 @@ package Sidef::Types::Range::RangeNumber {
     sub reduce {
         my ($self, $code) = @_;
 
-        my $step = $self->{step};
-        my $from = $self->{from};
-        my $to   = $self->{to};
-
         my $iter  = $self->_new_iter();
         my $value = $iter->();
 
@@ -197,6 +185,30 @@ package Sidef::Types::Range::RangeNumber {
         }
 
         $value;
+    }
+
+    sub all {
+        my ($self, $code) = @_;
+
+        my $iter = $self->_new_iter();
+        while (defined(my $num = $iter->())) {
+            $code->run($num)
+              || return Sidef::Types::Bool::Bool::FALSE;
+        }
+
+        Sidef::Types::Bool::Bool::TRUE;
+    }
+
+    sub any {
+        my ($self, $code) = @_;
+
+        my $iter = $self->_new_iter();
+        while (defined(my $num = $iter->())) {
+            $code->run($num)
+              && return Sidef::Types::Bool::Bool::TRUE;
+        }
+
+        Sidef::Types::Bool::Bool::FALSE;
     }
 
     our $AUTOLOAD;

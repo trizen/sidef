@@ -869,9 +869,8 @@ package Sidef::Types::Array::Array {
         my ($self, $code) = @_;
 
         foreach my $val (@{$self}) {
-            if ($code->run($val)) {
-                return (Sidef::Types::Bool::Bool::TRUE);
-            }
+            $code->run($val)
+              && return (Sidef::Types::Bool::Bool::TRUE);
         }
 
         (Sidef::Types::Bool::Bool::FALSE);
@@ -883,9 +882,8 @@ package Sidef::Types::Array::Array {
         @{$self} || return (Sidef::Types::Bool::Bool::FALSE);
 
         foreach my $val (@{$self}) {
-            if (not $code->run($val)) {
-                return (Sidef::Types::Bool::Bool::FALSE);
-            }
+            $code->run($val)
+              || return (Sidef::Types::Bool::Bool::FALSE);
         }
 
         (Sidef::Types::Bool::Bool::TRUE);
