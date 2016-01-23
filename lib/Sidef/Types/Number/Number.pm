@@ -56,17 +56,16 @@ package Sidef::Types::Number::Number {
     sub new {
         my (undef, $num, $base) = @_;
 
+        return $num if ref($num) eq __PACKAGE__;
+
         $base = defined($base) ? ref($base) ? $base->get_value : $base : 10;
 
-        ref($num) eq __PACKAGE__ ? $num : do {
+        $num = $num->get_value
+          if (index(ref($num), 'Sidef::') == 0);
 
-            $num = $num->get_value
-              if (index(ref($num), 'Sidef::') == 0);
-
-            ref($num) eq 'Math::GMPq'
-              ? bless(\$num, __PACKAGE__)
-              : bless(\Math::GMPq->new($base == 10 ? _str2rat($num // 0) : ($num // 0), $base), __PACKAGE__);
-          }
+        ref($num) eq 'Math::GMPq'
+          ? bless(\$num, __PACKAGE__)
+          : bless(\Math::GMPq->new($base == 10 ? _str2rat($num // 0) : ($num // 0), $base), __PACKAGE__);
     }
 
     *call = \&new;
@@ -1969,25 +1968,12 @@ package Sidef::Types::Number::Number {
         $num = $$num;
         return $block if $num < 1;
 
-        if ($num < (-1 >> 1)) {
-            foreach my $i (1 .. $num) {
-                if (defined(my $res = $block->_run_code(_new_uint($i)))) {
-                    return $res;
-                }
-            }
-        }
-        else {
-            my $limit = Math::GMPz::Rmpz_init();
-            Math::GMPz::Rmpz_set_q($limit, $num);
-
-            for (my $i = Math::GMPz::Rmpz_init_set_ui(1) ;
-                 Math::GMPz::Rmpz_cmp($i, $num) <= 0 ;
-                 Math::GMPz::Rmpz_add_ui($i, $i, 1)) {
-                my $n = Math::GMPq::Rmpq_init();
-                Math::GMPq::Rmpq_set_z($n, $i);
-                if (defined(my $res = $block->_run_code(bless(\$n, __PACKAGE__)))) {
-                    return $res;
-                }
+        for (my $i = Math::GMPz::Rmpz_init_set_ui(1) ;
+             Math::GMPz::Rmpz_cmp($i, $num) <= 0 ; Math::GMPz::Rmpz_add_ui($i, $i, 1)) {
+            my $n = Math::GMPq::Rmpq_init();
+            Math::GMPq::Rmpq_set_z($n, $i);
+            if (defined(my $res = $block->_run_code(bless(\$n, __PACKAGE__)))) {
+                return $res;
             }
         }
 
