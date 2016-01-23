@@ -56,16 +56,17 @@ package Sidef::Types::Number::Number {
     sub new {
         my (undef, $num, $base) = @_;
 
-        return $num if ref($num) eq __PACKAGE__;
+            ref($num) eq 'Math::GMPq' ? bless(\$num, __PACKAGE__)
+          : ref($num) eq __PACKAGE__ ? $num
+          : do {
 
-        $base = defined($base) ? ref($base) ? $base->get_value : $base : 10;
+            $base = defined($base) ? ref($base) ? $base->get_value : $base : 10;
 
-        $num = $num->get_value
-          if (index(ref($num), 'Sidef::') == 0);
+            $num = $num->get_value
+              if (index(ref($num), 'Sidef::') == 0);
 
-        ref($num) eq 'Math::GMPq'
-          ? bless(\$num, __PACKAGE__)
-          : bless(\Math::GMPq->new($base == 10 ? _str2rat($num // 0) : ($num // 0), $base), __PACKAGE__);
+            bless(\Math::GMPq->new($base == 10 ? _str2rat($num // 0) : ($num // 0), $base), __PACKAGE__);
+          };
     }
 
     *call = \&new;
@@ -1795,72 +1796,59 @@ package Sidef::Types::Number::Number {
     }
 
     sub array_to {
-        my ($x, $y, $step) = @_;
+        my ($from, $to, $step) = @_;
 
-        _valid($y);
-
-        my @array;
-        if (!defined($step) and Math::GMPq::Rmpq_integer_p($$x) and Math::GMPq::Rmpq_integer_p($$y)) {
-            foreach my $i (Math::GMPq::Rmpq_get_d($$x) .. Math::GMPq::Rmpq_get_d($$y)) {
-                my $n = Math::GMPq::Rmpq_init();
-                Math::GMPq::Rmpq_set_si($n, $i, 1);
-                push @array, bless(\$n, __PACKAGE__);
-            }
+        if (!defined($step)) {
+            _valid($to);
+            $step = (ONE);
         }
         else {
-
-            if (!defined($step)) {
-                $step = (ONE);
-            }
-            else {
-                _valid($step);
-            }
-
-            my $xq    = $$x;
-            my $yq    = $$y;
-            my $stepq = $$step;
-
-            my $acc = Math::GMPq::Rmpq_init();
-            Math::GMPq::Rmpq_set($acc, $xq);
-
-            for (; Math::GMPq::Rmpq_cmp($acc, $yq) <= 0 ; Math::GMPq::Rmpq_add($acc, $acc, $stepq)) {
-                my $copy = Math::GMPq::Rmpq_init();
-                Math::GMPq::Rmpq_set($copy, $acc);
-                push @array, bless(\$copy, __PACKAGE__);
-            }
+            _valid($to, $step);
         }
 
-        Sidef::Types::Array::Array->new(@array);
+        $from = $$from;
+        $to   = $$to;
+        $step = $$step;
+
+        my $acc   = Math::GMPq::Rmpq_init();
+        my $array = Sidef::Types::Array::Array->new;
+        for (Math::GMPq::Rmpq_set($acc, $from) ;
+             Math::GMPq::Rmpq_cmp($acc, $to) <= 0 ; Math::GMPq::Rmpq_add($acc, $acc, $step)) {
+            my $copy = Math::GMPq::Rmpq_init();
+            Math::GMPq::Rmpq_set($copy, $acc);
+            push @$array, bless(\$copy, __PACKAGE__);
+        }
+
+        $array;
     }
 
     *arr_to = \&array_to;
 
     sub array_downto {
-        my ($x, $y, $step) = @_;
+        my ($from, $to, $step) = @_;
 
         if (!defined($step)) {
-            _valid($y);
+            _valid($to);
             $step = (ONE);
         }
         else {
-            _valid($y, $step);
+            _valid($to, $step);
         }
 
-        my $xq    = $$x;
-        my $yq    = $$y;
-        my $stepq = $$step;
+        $from = $$from;
+        $to   = $$to;
+        $step = $$step;
 
-        my $acc = Math::GMPq::Rmpq_init();
-        Math::GMPq::Rmpq_set($acc, $xq);
-
-        my @array;
-        for (; Math::GMPq::Rmpq_cmp($acc, $yq) >= 0 ; Math::GMPq::Rmpq_sub($acc, $acc, $stepq)) {
+        my $acc   = Math::GMPq::Rmpq_init();
+        my $array = Sidef::Types::Array::Array->new;
+        for (Math::GMPq::Rmpq_set($acc, $from) ;
+             Math::GMPq::Rmpq_cmp($acc, $to) >= 0 ; Math::GMPq::Rmpq_sub($acc, $acc, $step)) {
             my $copy = Math::GMPq::Rmpq_init();
             Math::GMPq::Rmpq_set($copy, $acc);
-            push @array, bless(\$copy, __PACKAGE__);
+            push @$array, bless(\$copy, __PACKAGE__);
         }
 
-        Sidef::Types::Array::Array->new(@array);
+        $array;
     }
 
     *arr_downto = \&array_downto;
@@ -1904,18 +1892,10 @@ package Sidef::Types::Number::Number {
             _valid($to);
         }
 
-        $step = defined($step)
-          ? do {
-            my $r = Math::GMPq::Rmpq_init();
-            Math::GMPq::Rmpq_neg($r, $$step);
-            $r;
-          }
-          : ${(MONE)};
-
         Sidef::Types::Range::RangeNumber->__new__(
                                                   from => $$from,
                                                   to   => $$to,
-                                                  step => $step,
+                                                  step => (defined($step) ? -$$step : ${(MONE)}),
                                                  );
     }
 
@@ -1930,14 +1910,31 @@ package Sidef::Types::Number::Number {
     sub rand {
         my ($x, $y) = @_;
 
+        state $state = Math::MPFR::Rmpfr_randinit_mt();
+        state $seed  = do {
+            my $seed = srand();
+            Math::MPFR::Rmpfr_randseed_ui($state, $seed);
+        };
+
+        my $rand = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_urandom($rand, $state, $ROUND);
+
+        my $q = Math::GMPq::Rmpq_init();
+        Math::MPFR::Rmpfr_get_q($q, $rand);
+
         if (defined $y) {
             _valid($y);
-            my $min = Math::GMPq::Rmpq_get_d($$x);
-            $x->new($min + CORE::rand(Math::GMPq::Rmpq_get_d($$y) - $min));
+
+            my $diff = Math::GMPq::Rmpq_init();
+            Math::GMPq::Rmpq_sub($diff, $$y, $$x);
+            Math::GMPq::Rmpq_mul($q, $q, $diff);
+            Math::GMPq::Rmpq_add($q, $q, $$x);
         }
         else {
-            $x->new(CORE::rand(Math::GMPq::Rmpq_get_d($$x)));
+            Math::GMPq::Rmpq_mul($q, $q, $$x);
         }
+
+        bless \$q, __PACKAGE__;
     }
 
     sub rand_int {
@@ -1966,7 +1963,7 @@ package Sidef::Types::Number::Number {
         my ($num, $block) = @_;
 
         $num = $$num;
-        return $block if $num < 1;
+        return $block if Math::GMPq::Rmpq_cmp($num, ${(ONE)}) < 0;
 
         for (my $i = Math::GMPz::Rmpz_init_set_ui(1) ;
              Math::GMPz::Rmpz_cmp($i, $num) <= 0 ; Math::GMPz::Rmpz_add_ui($i, $i, 1)) {

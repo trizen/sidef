@@ -1065,7 +1065,18 @@ package Sidef::Types::Array::Array {
 
     sub range {
         my ($self) = @_;
-        Sidef::Types::Range::RangeNumber->__new__(from => 0, to => $#{$self}, step => 1);
+        Sidef::Types::Range::RangeNumber->__new__(
+            from => ${(Sidef::Types::Number::Number::ZERO)},
+            to   => do {
+                my $r = Math::GMPq::Rmpq_init();
+                my $i = $#{$self};
+                $i < 0
+                  ? Math::GMPq::Rmpq_set_si($r, $i, 1)
+                  : Math::GMPq::Rmpq_set_ui($r, $i, 1);
+                $r;
+            },
+            step => ${(Sidef::Types::Number::Number::ONE)},
+                                                 );
     }
 
     sub indices {

@@ -20,7 +20,7 @@ class Player(score=0, ante=0, rolls=0, strategy={false}) {
                     ante += roll;
                 }
             }
-            ((score + ante >= GOAL) || strategy) && break;
+            ((score + ante >= GOAL) || strategy()) && break;
         }
         score += ante;
     }

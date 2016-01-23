@@ -6,6 +6,11 @@ package Sidef::Types::Block::Block {
       Sidef::Convert::Convert
       );
 
+    use overload
+      q{bool} => sub { 1 },
+      q{""}   => sub { Sidef::normalize_type($_[0]->{name} // '__ANON__') . '()' },
+      q{0+}   => sub { state $x = require Scalar::Util; Scalar::Util::refaddr($_[0]) };
+
     sub new {
         my (undef, %opt) = @_;
         bless \%opt, __PACKAGE__;

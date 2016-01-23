@@ -62,22 +62,6 @@ package Sidef::Math::Math {
         $lcm;
     }
 
-    # TODO: make it work!
-    sub rand {
-        my ($self, $from, $to) = @_;
-
-        if (defined($from) and not defined($to)) {
-            $to   = $from->get_value;
-            $from = 0;
-        }
-        else {
-            $from = defined($from) ? $from->get_value : 0;
-            $to   = defined($to)   ? $to->get_value   : 1;
-        }
-
-        Sidef::Types::Number::Number->new($from + CORE::rand($to - $from));
-    }
-
     sub sum {
         my ($self, @list) = @_;
 
@@ -125,53 +109,29 @@ package Sidef::Math::Math {
 
     sub range_sum {
         my ($self, $from, $to, $step) = @_;
-
-        $from = $from->get_value;
-        $to   = $to->get_value;
-        $step = defined($step) ? $step->get_value : 1;
-
-        Sidef::Types::Number::Number->new(($from + $to) * (($to - $from) / $step + 1) / 2);
+        $step //= Sidef::Types::Number::Number::ONE;
+        state $two = Sidef::Types::Number::Number::_new_uint(2);
+        ($from->add($to))->mul($to->sub($from)->div($step)->add(Sidef::Types::Number::Number::ONE))->div($two);
     }
 
     sub map {
         my ($self, $value, $in_min, $in_max, $out_min, $out_max) = @_;
-
-        $value = $value->get_value;
-
-        $in_min = $in_min->get_value;
-        $in_max = $in_max->get_value;
-
-        $out_min = $out_min->get_value;
-        $out_max = $out_max->get_value;
-
-        Sidef::Types::Number::Number->new(($value - $in_min) * ($out_max - $out_min) / ($in_max - $in_min) + $out_min);
+        ($value->sub($in_min))->mul($out_max->sub($out_min))->div($in_max->sub($in_min))->add($out_min);
     }
 
     sub map_range {
         my ($self, $amount, $from, $to) = @_;
-
-        $amount = $amount->get_value;
-        $from   = $from->get_value;
-        $to     = $to->get_value;
-
-        Sidef::Types::Range::RangeNumber->__new__(
-                                                  from => $from,
-                                                  to   => $to,
-                                                  step => ($to - $from) / $amount,
-                                                 );
+        Sidef::Types::Range::RangeNumber->new($from, $to, $to->sub($from)->div($amount),);
     }
 
     sub number_to_percentage {
         my ($self, $num, $from, $to) = @_;
 
-        $num  = $num->get_value;
-        $to   = $to->get_value;
-        $from = $from->get_value;
+        my $sum  = $to->sub($from)->abs;
+        my $dist = $num->sub($to)->abs;
 
-        my $sum  = CORE::abs($to - $from);
-        my $dist = CORE::abs($num - $to);
-
-        Sidef::Types::Number::Number->new(($sum - $dist) / $sum * 100);
+        state $hundred = Sidef::Types::Number::Number::_new_uint(100);
+        ($sum->sub($dist))->div($sum)->mul($hundred);
     }
 
     *num2percent = \&number_to_percentage;
