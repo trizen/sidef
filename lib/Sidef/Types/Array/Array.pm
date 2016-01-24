@@ -1525,7 +1525,7 @@ package Sidef::Types::Array::Array {
 
     sub push {
         my ($self, @args) = @_;
-        push @{$self}, @{$self->new(@args)};
+        CORE::push(@{$self}, @args);
         $self;
     }
 
@@ -1533,7 +1533,7 @@ package Sidef::Types::Array::Array {
 
     sub unshift {
         my ($self, @args) = @_;
-        CORE::unshift(@{$self}, @{$self->new(@args)});
+        CORE::unshift(@{$self}, @args);
         $self;
     }
 
