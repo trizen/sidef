@@ -7,12 +7,12 @@ func _check(i, j) is cached {
     jd == id && return true;
     jm == im && return true;
 
-    var id2 = int(id/3);
-    var jd2 = int(jd/3);
+    var id2 = id//3;
+    var jd2 = jd//3;
 
     jd2 == id2 || return false;
 
-    int(jm/3) == int(im/3)
+    jm//3 == im//3
 }
 
 func solve(board) {

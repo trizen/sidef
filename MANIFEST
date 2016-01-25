@@ -166,6 +166,7 @@ scripts/Games/rock-paper-scissors.sf
 scripts/Games/snake_game.sf
 scripts/Graphical/color_bars.sf
 scripts/Graphical/death_star.sf
+scripts/Graphical/draw_a_sphere.sf
 scripts/Graphical/fractal_tree.sf
 scripts/Graphical/hello_world_graphical.sf
 scripts/Graphical/hello_world_graphical_1.sf
