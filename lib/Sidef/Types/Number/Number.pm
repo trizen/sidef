@@ -1882,9 +1882,14 @@ package Sidef::Types::Number::Number {
             Math::GMPq::Rmpq_set_ui($q, 1, 2);
             $q;
         };
-        Math::GMPq::Rmpq_add($n, $n, $half);
 
+        Math::GMPq::Rmpq_add($n, $n, $half);
         Math::GMPz::Rmpz_set_q($z, $n);
+
+        if (Math::GMPz::Rmpz_odd_p($z) and Math::GMPq::Rmpq_integer_p($n)) {
+            Math::GMPz::Rmpz_sub_ui($z, $z, 1);
+        }
+
         Math::GMPq::Rmpq_set_z($n, $z);
 
         if ($nth < 0) {

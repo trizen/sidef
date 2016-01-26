@@ -86,7 +86,7 @@ HEADER
             elsif ($round eq '-inf') {
                 $round = 3;
             }
-            elsif ($round eq '+zero') {
+            elsif ($round eq 'inf') {    # away from zero
                 $round = 4;
             }
             else {

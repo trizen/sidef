@@ -273,7 +273,7 @@ sub output_usage {
                                      'valid levels: [0], 1, 2'],
                     '-P int'     => 'set the precision of floating-point numbers',
                     '-M mode'    => ['set the rounding mode of floating-point numbers',
-                                     'valid modes: [near], zero, +zero, +inf, -inf'],
+                                     'valid modes: [near], zero, inf, +inf, -inf'],
                     '-k'         => 'keep track of potential unsafe parser interpretations',
                     '-E program' => 'one line of program',
                     '-H'         => 'interactive help',

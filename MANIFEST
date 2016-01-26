@@ -720,6 +720,7 @@ scripts/Tests/roman_numerals_encoding.sf
 scripts/Tests/roman_numerals_encoding_2.sf
 scripts/Tests/root_mean_square.sf
 scripts/Tests/roots_of_a_quadratic_function.sf
+scripts/Tests/roundf.sf
 scripts/Tests/run_length_encoding.sf
 scripts/Tests/run_length_encoding_2.sf
 scripts/Tests/run_length_encoding_3.sf
