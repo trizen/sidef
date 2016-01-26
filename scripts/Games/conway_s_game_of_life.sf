@@ -1,35 +1,37 @@
 #!/usr/bin/ruby
 
-var w = `tput cols`.to_i-1;
-var h = `tput lines`.to_i-1;
-var r = "\033[H";
+var w = `tput cols`.to_i
+var h = `tput lines`.to_i
+var r = "\033[H"
 
 var dirs = [[-1,-1], [-1, 0], [-1, 1], [ 0,-1],
-            [ 0, 1], [ 1,-1], [ 1, 0], [ 1, 1]];
+            [ 0, 1], [ 1,-1], [ 1, 0], [ 1, 1]]
 
-var universe = h.of { w.of {1.rand < 0.1} };
+var universe = h.of { w.of {1.rand < 0.1} }
+
+var rh = h.range
+var rw = w.range
 
 func iterate {
-    var new = h.of { w.of(false) };
-    range(h-1).each { |i|
-        range(w-1).each { |j|
-        var neighbor = 0;
+    var new = h.of { w.of(false) }
+    rh.each { |i|
+        rw.each { |j|
+        var neighbor = 0
         dirs.each { |dir|
-            var (y, x) = (dir[0] + i, dir[1] + j);
-            neighbor += (universe[y % h][x % w] ? 1 : 0);
-            neighbor > 3 && break;
-        };
-
+            var (y, x) = (dir[0]+i, dir[1]+j)
+            universe[y % h][x % w] && ++neighbor
+            neighbor > 3 && break
+        }
         new[i][j] = (universe[i][j]
-                        ? (neighbor ~~ [2,3])
-                        : (neighbor ==    3));
-       };
-    };
-    universe = new;
-};
+                        ? (neighbor==2 || neighbor==3)
+                        : (neighbor==3))
+       }
+    }
+    universe = new
+}
 
 loop {
-    print r;
-    say universe.map{|row| row.map{|cell| cell ? '#' : ' '}.join('')}.join("\n");
-    iterate();
+    print r
+    say universe.map{|row| row.map{|cell| cell ? '#' : ' '}.join }.join("\n")
+    iterate()
 }

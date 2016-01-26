@@ -1853,14 +1853,52 @@ package Sidef::Types::Number::Number {
 
     *arr_downto = \&array_downto;
 
-    # TODO: find a better solution which doesn't use Math::BigRat
     sub roundf {
         my ($x, $prec) = @_;
         _valid($prec);
-        my $str = Math::GMPq::Rmpq_get_str($$x, 10);
-        state $bigrat = _load_bigrat();
-        local $Math::BigFloat::precision = -CORE::int(CORE::int($PREC) / 3.321923);
-        $x->new(Math::BigRat->new($str)->as_float->bfround(Math::GMPq::Rmpq_get_d($$prec))->bstr);
+
+        my $nth = -CORE::int(Math::GMPq::Rmpq_get_d($$prec));
+        my $sgn = Math::GMPq::Rmpq_sgn($$x);
+
+        my $n = Math::GMPq::Rmpq_init();
+        Math::GMPq::Rmpq_set($n, $$x);
+        Math::GMPq::Rmpq_abs($n, $n) if $sgn < 0;
+
+        my $z = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_ui_pow_ui($z, 10, abs($nth));
+
+        my $p = Math::GMPq::Rmpq_init();
+        Math::GMPq::Rmpq_set_z($p, $z);
+
+        if ($nth < 0) {
+            Math::GMPq::Rmpq_div($n, $n, $p);
+        }
+        else {
+            Math::GMPq::Rmpq_mul($n, $n, $p);
+        }
+
+        state $half = do {
+            my $q = Math::GMPq::Rmpq_init();
+            Math::GMPq::Rmpq_set_ui($q, 1, 2);
+            $q;
+        };
+        Math::GMPq::Rmpq_add($n, $n, $half);
+
+        Math::GMPz::Rmpz_set_q($z, $n);
+        Math::GMPq::Rmpq_set_z($n, $z);
+
+        if ($nth < 0) {
+            Math::GMPq::Rmpq_mul($n, $n, $p);
+        }
+        else {
+            Math::GMPq::Rmpq_div($n, $n, $p);
+        }
+
+        if ($sgn < 0) {
+            Math::GMPq::Rmpq_neg($n, $n);
+        }
+
+        bless \$n, __PACKAGE__;
     }
 
     sub to {
