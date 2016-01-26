@@ -1865,7 +1865,7 @@ package Sidef::Types::Number::Number {
         Math::GMPq::Rmpq_abs($n, $n) if $sgn < 0;
 
         my $z = Math::GMPz::Rmpz_init();
-        Math::GMPz::Rmpz_ui_pow_ui($z, 10, abs($nth));
+        Math::GMPz::Rmpz_ui_pow_ui($z, 10, CORE::abs($nth));
 
         my $p = Math::GMPq::Rmpq_init();
         Math::GMPq::Rmpq_set_z($p, $z);
