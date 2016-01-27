@@ -71,7 +71,7 @@ HEADER
 
         if (exists $opts{opt}{P}) {
             my $precision = abs(int($opts{opt}{P}));
-            $opts{header} .= "local \$Sidef::Types::Number::Number::PREC = $precision;\n";
+            $opts{header} .= "local \$Sidef::Types::Number::Number::PREC = 4*$precision;\n";
         }
 
         if (exists $opts{opt}{M}) {

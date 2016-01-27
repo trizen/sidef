@@ -173,7 +173,7 @@ package Sidef::Types::Number::Number {
                 my ($x) = @_;
                 $PREC = "$$PREC" if ref($PREC);
 
-                my $prec = CORE::int($PREC / 3.5);
+                my $prec = CORE::int($PREC / 4);
                 my $sgn  = Math::GMPq::Rmpq_sgn($$x);
 
                 my $n = Math::GMPq::Rmpq_init();
@@ -1296,17 +1296,34 @@ package Sidef::Types::Number::Number {
         _mpz2rat($z);
     }
 
-    *as_int = \&int;
-
     sub float {
         my $f = Math::MPFR::Rmpfr_init2($PREC);
         Math::MPFR::Rmpfr_set_q($f, ${$_[0]}, $ROUND);
         _mpfr2rat($f);
     }
 
-    *as_float = \&float;
-
     sub rat { $_[0] }
+
+    sub as_int {
+        my $z = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_set_q($z, ${$_[0]});
+        Sidef::Types::String::String->new(Math::GMPz::Rmpz_get_str($z, 10));
+    }
+
+    sub as_float {
+        my ($x, $prec) = @_;
+
+        if (defined $prec) {
+            _valid($prec);
+            $prec = Math::GMPq::Rmpq_get_d($$prec);
+        }
+        else {
+            $prec = $Sidef::Types::Number::Number::PREC / 4;
+        }
+
+        local $Sidef::Types::Number::Number::PREC = 4 * $prec;
+        Sidef::Types::String::String->new($x->get_value);
+    }
 
     sub as_rat {
         Sidef::Types::String::String->new(Math::GMPq::Rmpq_get_str(${$_[0]}, 10));
