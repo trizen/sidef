@@ -1319,9 +1319,19 @@ package Sidef::Types::Number::Number {
     sub rat { $_[0] }
 
     sub as_int {
+        my ($x, $base) = @_;
+
+        if (defined $base) {
+            _valid($base);
+            $base = CORE::int(Math::GMPq::Rmpq_get_d($$base));
+        }
+        else {
+            $base = 10;
+        }
+
         my $z = Math::GMPz::Rmpz_init();
-        Math::GMPz::Rmpz_set_q($z, ${$_[0]});
-        Sidef::Types::String::String->new(Math::GMPz::Rmpz_get_str($z, 10));
+        Math::GMPz::Rmpz_set_q($z, $$x);
+        Sidef::Types::String::String->new(Math::GMPz::Rmpz_get_str($z, $base));
     }
 
     sub as_float {
