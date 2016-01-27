@@ -472,6 +472,7 @@ EOT
             output(deparse_structure($struct, $args{R}));
         }
         else {
+            local $Sidef::Types::Number::Number::PREC = $args{P} if exists($args{P});
             my $result = do {
                 local $Sidef::PARSER = $parser;
                 execute_struct($struct, 1);

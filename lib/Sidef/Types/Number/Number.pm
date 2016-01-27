@@ -174,14 +174,72 @@ package Sidef::Types::Number::Number {
 
     sub get_value {
         $GET_PERL_VALUE ? Math::GMPq::Rmpq_get_d(${$_[0]}) : do {
-
             my $v = Math::GMPq::Rmpq_get_str(${$_[0]}, 10);
 
             if (index($v, '/') != -1) {
+
                 state $bigrat = _load_bigrat();
                 my $br = Math::BigRat->new($v);
                 local $Math::BigFloat::precision = -CORE::int(CORE::int($PREC) / 3.321923);
                 $br->as_float->bstr =~ s/0+$//r;
+
+                #
+                ## TODO: add rounding support to the code bellow and make it the default solution
+                #
+
+                #~ my ($x) = @_;
+                #~ $PREC = "$$PREC" if ref($PREC);
+
+                #~ my $prec = CORE::int($PREC / 3.321923);
+                #~ my $n    = Math::GMPq::Rmpq_init();
+                #~ Math::GMPq::Rmpq_set($n, $$x);
+
+                #~ my $num = Math::GMPz::Rmpz_init();
+                #~ my $den = Math::GMPz::Rmpz_init();
+
+                #~ Math::GMPq::Rmpq_get_num($num, $n);
+                #~ Math::GMPq::Rmpq_get_den($den, $n);
+
+                #~ my $sgn = Math::GMPz::Rmpz_sgn($num);
+                #~ Math::GMPz::Rmpz_abs($num, $num) if $sgn < 0;
+
+                #~ my $z = Math::GMPz::Rmpz_init();
+
+                #~ my $r = '';
+                #~ my $c = 0;
+                #~ my $divisible;
+
+                #~ while (1) {
+                    #~ $divisible = Math::GMPz::Rmpz_divisible_p($num, $den);
+
+                    #~ Math::GMPz::Rmpz_div($z, $num, $den);
+                    #~ $r .= Math::GMPz::Rmpz_get_str($z, 10);
+                    #~ $r .= '.' unless $c;
+
+                    #~ Math::GMPz::Rmpz_mul($z, $z, $den);
+                    #~ Math::GMPz::Rmpz_sub($num, $num, $z);
+
+                    #~ my $s = -1;
+                    #~ while (Math::GMPz::Rmpz_cmp($den, $num) > 0) {
+                        #~ last if !Math::GMPz::Rmpz_sgn($num);
+                        #~ Math::GMPz::Rmpz_mul_ui($num, $num, 10);
+                        #~ ++$s;
+                    #~ }
+
+                    #~ ($r .= '0' x $s) if $s > 0;
+
+                    #~ ++$c;   # or: $c += 1+$s;   # for equal precision
+
+                    #~ if ($divisible) {
+                        #~ last;
+                    #~ }
+                    #~ elsif ($c >= $prec) {
+                        #~ # TODO: round the number half to even
+                        #~ last;
+                    #~ }
+                #~ }
+
+                #~ ($sgn < 0 ? "-" : '') . ($r =~ s/0+$//r);
             }
             else {
                 $v;
