@@ -30,13 +30,6 @@ package Sidef::Types::Number::Number {
 
     use Sidef::Types::Bool::Bool;
 
-    sub _load_bigrat {
-        state $bigrat = do {
-            require Math::BigRat;
-            Math::BigRat->import('try' => 'GMP');
-        };
-    }
-
     sub _new {
         bless(\$_[0], __PACKAGE__);
     }
@@ -177,69 +170,83 @@ package Sidef::Types::Number::Number {
             my $v = Math::GMPq::Rmpq_get_str(${$_[0]}, 10);
 
             if (index($v, '/') != -1) {
+                my ($x) = @_;
+                $PREC = "$$PREC" if ref($PREC);
 
-                state $bigrat = _load_bigrat();
-                my $br = Math::BigRat->new($v);
-                local $Math::BigFloat::precision = -CORE::int(CORE::int($PREC) / 3.321923);
-                $br->as_float->bstr =~ s/0+$//r;
+                my $prec = CORE::int($PREC / 3.5);
+                my $sgn  = Math::GMPq::Rmpq_sgn($$x);
 
-                #
-                ## TODO: add rounding support to the code bellow and make it the default solution
-                #
+                my $n = Math::GMPq::Rmpq_init();
+                Math::GMPq::Rmpq_set($n, $$x);
+                Math::GMPq::Rmpq_abs($n, $n) if $sgn < 0;
 
-                #~ my ($x) = @_;
-                #~ $PREC = "$$PREC" if ref($PREC);
+                my $z = Math::GMPz::Rmpz_init();
+                Math::GMPz::Rmpz_ui_pow_ui($z, 10, CORE::abs($prec));
 
-                #~ my $prec = CORE::int($PREC / 3.321923);
-                #~ my $n    = Math::GMPq::Rmpq_init();
-                #~ Math::GMPq::Rmpq_set($n, $$x);
+                my $p = Math::GMPq::Rmpq_init();
+                Math::GMPq::Rmpq_set_z($p, $z);
 
-                #~ my $num = Math::GMPz::Rmpz_init();
-                #~ my $den = Math::GMPz::Rmpz_init();
+                if ($prec < 0) {
+                    Math::GMPq::Rmpq_div($n, $n, $p);
+                }
+                else {
+                    Math::GMPq::Rmpq_mul($n, $n, $p);
+                }
 
-                #~ Math::GMPq::Rmpq_get_num($num, $n);
-                #~ Math::GMPq::Rmpq_get_den($den, $n);
+                state $half = do {
+                    my $q = Math::GMPq::Rmpq_init();
+                    Math::GMPq::Rmpq_set_ui($q, 1, 2);
+                    $q;
+                };
 
-                #~ my $sgn = Math::GMPz::Rmpz_sgn($num);
-                #~ Math::GMPz::Rmpz_abs($num, $num) if $sgn < 0;
+                Math::GMPq::Rmpq_add($n, $n, $half);
+                Math::GMPz::Rmpz_set_q($z, $n);
 
-                #~ my $z = Math::GMPz::Rmpz_init();
+                if (Math::GMPz::Rmpz_odd_p($z) and Math::GMPq::Rmpq_integer_p($n)) {
+                    Math::GMPz::Rmpz_sub_ui($z, $z, 1);
+                }
 
-                #~ my $r = '';
-                #~ my $c = 0;
-                #~ my $divisible;
+                Math::GMPq::Rmpq_set_z($n, $z);
 
-                #~ while (1) {
-                    #~ $divisible = Math::GMPz::Rmpz_divisible_p($num, $den);
+                if ($prec < 0) {
+                    Math::GMPq::Rmpq_mul($n, $n, $p);
+                }
+                else {
+                    Math::GMPq::Rmpq_div($n, $n, $p);
+                }
 
-                    #~ Math::GMPz::Rmpz_div($z, $num, $den);
-                    #~ $r .= Math::GMPz::Rmpz_get_str($z, 10);
-                    #~ $r .= '.' unless $c;
+                my $num = Math::GMPz::Rmpz_init();
+                my $den = Math::GMPz::Rmpz_init();
 
-                    #~ Math::GMPz::Rmpz_mul($z, $z, $den);
-                    #~ Math::GMPz::Rmpz_sub($num, $num, $z);
+                Math::GMPq::Rmpq_get_num($num, $n);
+                Math::GMPq::Rmpq_get_den($den, $n);
 
-                    #~ my $s = -1;
-                    #~ while (Math::GMPz::Rmpz_cmp($den, $num) > 0) {
-                        #~ last if !Math::GMPz::Rmpz_sgn($num);
-                        #~ Math::GMPz::Rmpz_mul_ui($num, $num, 10);
-                        #~ ++$s;
-                    #~ }
+                my @r;
+                my $c = 0;
+                my $divisible;
 
-                    #~ ($r .= '0' x $s) if $s > 0;
+                while (1) {
+                    $divisible = Math::GMPz::Rmpz_divisible_p($num, $den);
 
-                    #~ ++$c;   # or: $c += 1+$s;   # for equal precision
+                    Math::GMPz::Rmpz_div($z, $num, $den);
+                    push @r, Math::GMPz::Rmpz_get_str($z, 10);
 
-                    #~ if ($divisible) {
-                        #~ last;
-                    #~ }
-                    #~ elsif ($c >= $prec) {
-                        #~ # TODO: round the number half to even
-                        #~ last;
-                    #~ }
-                #~ }
+                    Math::GMPz::Rmpz_mul($z, $z, $den);
+                    Math::GMPz::Rmpz_sub($num, $num, $z);
 
-                #~ ($sgn < 0 ? "-" : '') . ($r =~ s/0+$//r);
+                    last if $divisible;
+
+                    my $s = -1;
+                    while (Math::GMPz::Rmpz_cmp($den, $num) > 0) {
+                        last if !Math::GMPz::Rmpz_sgn($num);
+                        Math::GMPz::Rmpz_mul_ui($num, $num, 10);
+                        ++$s;
+                    }
+
+                    push(@r, '0' x $s) if ($s > 0);
+                }
+
+                ($sgn < 0 ? "-" : '') . ((shift(@r) . '.' . join('', @r)) =~ s/0+$//r);
             }
             else {
                 $v;
