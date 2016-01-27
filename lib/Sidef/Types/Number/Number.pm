@@ -116,7 +116,7 @@ package Sidef::Types::Number::Number {
     }
 
     sub _str2rat {
-        my ($str) = @_;
+        my $str = lc($_[0]);
 
         my $sign = substr($str, 0, 1);
         if ($sign eq '-') {
@@ -133,9 +133,19 @@ package Sidef::Types::Number::Number {
 
             my $exp = substr($str, $i + 1);
             my ($before, $after) = split(/\./, substr($str, 0, $i));
-            my $numerator = $before . $after;
 
+            if (not defined($after)) {    # return faster for numbers like "13e2"
+                if ($exp >= 0) {
+                    return ("$sign$before" . ('0' x $exp));
+                }
+                else {
+                    $after = '';
+                }
+            }
+
+            my $numerator   = "$before$after";
             my $denominator = 1;
+
             if ($exp < 1) {
                 $denominator .= '0' x (abs($exp) + length($after));
             }
@@ -145,7 +155,7 @@ package Sidef::Types::Number::Number {
                     $numerator .= '0' x $diff;
                 }
                 else {
-                    my $s = $before . $after;
+                    my $s = "$before$after";
                     substr($s, $exp + length($before), 0, '.');
                     return _str2rat("$sign$s");
                 }
@@ -223,18 +233,15 @@ package Sidef::Types::Number::Number {
 
                 my @r;
                 my $c = 0;
-                my $divisible;
 
                 while (1) {
-                    $divisible = Math::GMPz::Rmpz_divisible_p($num, $den);
 
                     Math::GMPz::Rmpz_div($z, $num, $den);
                     push @r, Math::GMPz::Rmpz_get_str($z, 10);
 
                     Math::GMPz::Rmpz_mul($z, $z, $den);
+                    last if Math::GMPz::Rmpz_divisible_p($num, $den);
                     Math::GMPz::Rmpz_sub($num, $num, $z);
-
-                    last if $divisible;
 
                     my $s = -1;
                     while (Math::GMPz::Rmpz_cmp($den, $num) > 0) {
