@@ -144,7 +144,7 @@ package Sidef::Types::Number::Number {
             }
 
             my $numerator   = "$before$after";
-            my $denominator = 1;
+            my $denominator = "1";
 
             if ($exp < 1) {
                 $denominator .= '0' x (abs($exp) + length($after));
@@ -171,7 +171,7 @@ package Sidef::Types::Number::Number {
             $sign . ("$before$after/1" =~ s/^0+//r) . ('0' x length($after));
         }
         else {
-            $sign . $str;
+            "$sign$str";
         }
     }
 
@@ -260,7 +260,7 @@ package Sidef::Types::Number::Number {
                     push(@r, '0' x $s) if ($s > 0);
                 }
 
-                ($sgn < 0 ? "-" : '') . ((shift(@r) . '.' . join('', @r)) =~ s/0+$//r);
+                ($sgn < 0 ? "-" : '') . ((shift(@r) . '.' . join('', @r)) =~ s/0+\z//r =~ s/\.\z//r);
             }
             else {
                 $v;
