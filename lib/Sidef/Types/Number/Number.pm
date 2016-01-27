@@ -212,6 +212,13 @@ package Sidef::Types::Number::Number {
                 Math::GMPq::Rmpq_add($n, $n, $half);
                 Math::GMPz::Rmpz_set_q($z, $n);
 
+                # Too much rounding... Give up and return an MPFR stringified number.
+                Math::GMPz::Rmpz_sgn($z) || do {
+                    my $mpfr = Math::MPFR::Rmpfr_init2($PREC);
+                    Math::MPFR::Rmpfr_set_q($mpfr, $$x, $ROUND);
+                    return Math::MPFR::Rmpfr_get_str($mpfr, 10, $prec, 0);
+                };
+
                 if (Math::GMPz::Rmpz_odd_p($z) and Math::GMPq::Rmpq_integer_p($n)) {
                     Math::GMPz::Rmpz_sub_ui($z, $z, 1);
                 }
