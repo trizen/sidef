@@ -277,9 +277,12 @@ package Sidef::Types::Number::Inf {
     sub times {
         my ($x, $block) = @_;
 
-        my $i = 0;
+        my $i = Math::GMPz::Rmpz_init_set_ui(1);
         while (1) {
-            if (defined(my $res = $block->_run_code(Sidef::Types::Number::Number::_new_uint(++$i)))) {
+            my $num = Math::GMPq::Rmpq_init();
+            Math::GMPq::Rmpq_set_z($num, $i);
+            Math::GMPz::Rmpz_add_ui($i, $i, 1);
+            if (defined(my $res = $block->_run_code(bless \$num, 'Sidef::Types::Number::Number'))) {
                 return $res;
             }
         }
