@@ -216,7 +216,7 @@ package Sidef::Types::Number::Number {
                 Math::GMPz::Rmpz_sgn($z) || do {
                     my $mpfr = Math::MPFR::Rmpfr_init2($PREC);
                     Math::MPFR::Rmpfr_set_q($mpfr, $$x, $ROUND);
-                    return Math::MPFR::Rmpfr_get_str($mpfr, 10, $prec, 0);
+                    return Math::MPFR::Rmpfr_get_str($mpfr, 10, $prec, $ROUND);
                 };
 
                 if (Math::GMPz::Rmpz_odd_p($z) and Math::GMPq::Rmpq_integer_p($n)) {
