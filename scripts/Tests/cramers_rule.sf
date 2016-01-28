@@ -1,0 +1,64 @@
+#!/usr/bin/ruby
+
+# Liniar ecuations solver - Cramer's rule.
+
+# Example:
+# | 2x - 3y +  z =  4
+# |  x - 2y - 2z = -6
+# | 3x - 4y +  z =  5
+
+func det(A) {
+    gather {
+        A.each_index { |i|
+            var (p1=1, p2=1)
+            A[i].each_index { |j|
+                p1 *= A[(j+i)%A.len][j]
+                p2 *= A[(j+i)%A.len][-j]
+            }
+            take(p1-p2)
+        }
+    } -> sum
+}
+
+func cramers_rule(A, terms) {
+    gather {
+        A.each_index { |i|
+            var Ai = A.map{.map{_}}
+            terms.each_index { |j|
+                Ai[j][i] = terms[j]
+            }
+            take det(Ai)
+        }
+    } »/» det(A)
+}
+
+var matrix = [
+    [2, -3,  1],
+    [1, -2, -2],
+    [3, -4,  1],
+]
+
+var free_terms = [4, -6, 5]
+var (x, y, z) = cramers_rule(matrix, free_terms)...
+
+say "x = #{x}"
+say "y = #{y}"
+say "z = #{z}"
+
+assert_eq(x, 2)
+assert_eq(y, 1)
+assert_eq(z, 3)
+
+# Another example:
+# | 3x +   2y -  z =  1
+# | 2x -   2y + 4z = -2
+# | -x + 1/2y -  z =  0
+
+var m2 = [
+    [3, 2, -1],
+    [2, -2, 4],
+    [-1, 1/2, -1],
+]
+
+var ft = [1, -2, 0]
+assert_eq(cramers_rule(m2, ft), [1, -2, -2])

@@ -583,6 +583,7 @@ scripts/Tests/complex_numbers.sf
 scripts/Tests/count_in_factors.sf
 scripts/Tests/cpp_input_output.sf
 scripts/Tests/cramers_method.sf
+scripts/Tests/cramers_rule.sf
 scripts/Tests/cross_and_zip_metaoperators.sf
 scripts/Tests/data_digging.sf
 scripts/Tests/data_handle.sf
