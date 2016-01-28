@@ -1324,6 +1324,9 @@ package Sidef::Types::Number::Number {
         if (defined $base) {
             _valid($base);
             $base = CORE::int(Math::GMPq::Rmpq_get_d($$base));
+            if ($base < 2 or $base > 36) {
+                die "[ERROR] base must be between 2 and 36, got $base\n";
+            }
         }
         else {
             $base = 10;
