@@ -352,6 +352,14 @@ Return the
 
 =cut
 
+=head2 as_float
+
+Number.as_float() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 as_hex
 
 Number.as_hex() -> I<Obj>
@@ -371,6 +379,14 @@ Return the
 =head2 asinh
 
 Number.asinh() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 as_int
+
+Number.as_int() -> I<Obj>
 
 Return the
 
@@ -666,8 +682,6 @@ Number.float() -> I<Obj>
 
 Return the
 
-Aliases: I<as_float>
-
 =cut
 
 =head2 floor
@@ -763,8 +777,6 @@ Return the
 Number.int() -> I<Obj>
 
 Return the
-
-Aliases: I<as_int>
 
 =cut
 
@@ -1244,11 +1256,13 @@ Return the
 
 =cut
 
-=head2 roundf
+=head2 round
 
-Number.roundf() -> I<Obj>
+Number.round() -> I<Obj>
 
 Return the
+
+Aliases: I<roundf>
 
 =cut
 

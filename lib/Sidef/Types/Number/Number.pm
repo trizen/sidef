@@ -1962,7 +1962,7 @@ package Sidef::Types::Number::Number {
 
     *arr_downto = \&array_downto;
 
-    sub roundf {
+    sub round {
         my ($x, $prec) = @_;
         _valid($prec);
 
@@ -2014,6 +2014,8 @@ package Sidef::Types::Number::Number {
 
         bless \$n, __PACKAGE__;
     }
+
+    *roundf = \&round;
 
     sub to {
         my ($from, $to, $step) = @_;

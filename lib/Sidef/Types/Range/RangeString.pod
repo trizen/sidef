@@ -49,6 +49,14 @@ Aliases: I<include>, I<contains>, I<includes>
 
 =cut
 
+=head2 dump
+
+RangeString.dump() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 for
 
 RangeString.for() -> I<Obj>

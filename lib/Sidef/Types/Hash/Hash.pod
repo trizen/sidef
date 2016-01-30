@@ -144,19 +144,23 @@ Aliases: I<each_kv>, I<each_pair>
 
 =cut
 
-=head2 each_key
+=head2 each_k
 
-Hash.each_key() -> I<Obj>
+Hash.each_k() -> I<Obj>
 
 Return the
+
+Aliases: I<each_key>
 
 =cut
 
-=head2 each_value
+=head2 each_v
 
-Hash.each_value() -> I<Obj>
+Hash.each_v() -> I<Obj>
 
 Return the
+
+Aliases: I<each_value>
 
 =cut
 

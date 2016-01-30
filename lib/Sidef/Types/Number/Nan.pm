@@ -119,6 +119,8 @@ package Sidef::Types::Number::Nan {
     *deg2rad     = \&nan;
     *grad2rad    = \&nan;
     *grad2deg    = \&nan;
+    *round       = \&nan;
+    *roundf      = \&nan;
 
     sub cmp { }
 

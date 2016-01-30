@@ -97,14 +97,6 @@ Aliases: I<number_to_percentage>
 
 =cut
 
-=head2 rand
-
-Math.rand() -> I<Obj>
-
-Return the
-
-=cut
-
 =head2 range_sum
 
 Math.range_sum() -> I<Obj>

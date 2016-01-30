@@ -863,10 +863,12 @@ package Sidef::Types::Number::Complex {
         $_[0]->abs->ceil;
     }
 
-    sub roundf {
+    sub round {
         my ($x, $prec) = @_;
-        $x->abs->roundf($prec);
+        $x->abs->round($prec);
     }
+
+    *roundf = \&round;
 
     sub is_zero {
         $_[0]->abs->is_zero;

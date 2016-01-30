@@ -414,6 +414,14 @@ Aliases: I<imag>, I<imaginary>
 
 =cut
 
+=head2 inv
+
+Complex.inv() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 is_even
 
 Complex.is_even() -> I<Obj>
@@ -590,11 +598,13 @@ Return the
 
 =cut
 
-=head2 roundf
+=head2 round
 
-Complex.roundf() -> I<Obj>
+Complex.round() -> I<Obj>
 
 Return the
+
+Aliases: I<roundf>
 
 =cut
 

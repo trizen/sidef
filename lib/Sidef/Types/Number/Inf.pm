@@ -189,6 +189,8 @@ package Sidef::Types::Number::Inf {
     *deg2rad          = \&inf;
     *grad2rad         = \&inf;
     *grad2deg         = \&inf;
+    *round            = \&inf;
+    *roundf           = \&inf;
 
     sub zero { (Sidef::Types::Number::Number::ZERO) }
 

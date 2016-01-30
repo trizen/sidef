@@ -174,6 +174,8 @@ package Sidef::Types::Number::Ninf {
     *deg2rad     = \&ninf;
     *grad2rad    = \&ninf;
     *grad2deg    = \&ninf;
+    *round       = \&ninf;
+    *roundf      = \&ninf;
 
     sub max { $_[1] }
 

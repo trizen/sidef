@@ -31,6 +31,22 @@ Return the
 
 =cut
 
+=head2 all
+
+RangeNumber.all() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 any
+
+RangeNumber.any() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 bounds
 
 RangeNumber.bounds() -> I<Obj>
@@ -54,6 +70,14 @@ RangeNumber.contain() -> I<Obj>
 Return the
 
 Aliases: I<include>, I<contains>, I<includes>
+
+=cut
+
+=head2 dump
+
+RangeNumber.dump() -> I<Obj>
+
+Return the
 
 =cut
 
