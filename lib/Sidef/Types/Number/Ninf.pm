@@ -289,6 +289,7 @@ package Sidef::Types::Number::Ninf {
 
     #
     ## binomial(-inf, x) = 0        | with x < 0
+    ## binomial(-inf, 0) = 1
     ## binomial(-inf, inf) = 1
     ## binomial(-inf, x) = -inf     | with x > 0
     ##
@@ -297,6 +298,7 @@ package Sidef::Types::Number::Ninf {
         my ($x, $y) = @_;
         ref($y) eq 'Sidef::Types::Number::Inf' ? (Sidef::Types::Number::Number::ONE)
           : $y->is_neg                         ? (Sidef::Types::Number::Number::ZERO)
+          : $y->is_zero                        ? (Sidef::Types::Number::Number::ONE)
           :                                      $x;
     }
 

@@ -227,12 +227,12 @@ package Sidef::Types::Number::Inf {
     #
     ## asin(inf) = -inf*i
     #
-    sub asin { state $x = Sidef::Types::Number::Complex->new(0, '-@inf@') }
+    sub asin { state $x = Sidef::Types::Number::Complex->new(0, '-@Inf@') }
 
     #
     ## acos(inf) = inf*i
     #
-    sub acos { state $x = Sidef::Types::Number::Complex->new(0, '@inf@') }
+    sub acos { state $x = Sidef::Types::Number::Complex->new(0, '@Inf@') }
 
     #
     ## atan(inf) = pi/2
@@ -271,6 +271,7 @@ package Sidef::Types::Number::Inf {
         my ($x, $y) = @_;
         ref($y) eq 'Sidef::Types::Number::Inf' ? (Sidef::Types::Number::Number::ONE)
           : $y->is_neg                         ? (Sidef::Types::Number::Number::ZERO)
+          : $y->is_zero                        ? (Sidef::Types::Number::Number::ONE)
           :                                      $x;
     }
 
