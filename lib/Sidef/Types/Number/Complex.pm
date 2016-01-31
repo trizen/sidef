@@ -101,7 +101,7 @@ package Sidef::Types::Number::Complex {
                     return __PACKAGE__->new($x, __PACKAGE__->new($re, $im));
                 }
                 else {
-                    return __PACKAGE__->new($x, __PACKAGE__->new(0, $y));
+                    return __PACKAGE__->new($x, __PACKAGE__->new(0, substr($y, 0, -1)));
                 }
             }
         }
@@ -423,8 +423,8 @@ package Sidef::Types::Number::Complex {
                 Math::MPC::Rmpc_div($r, $r, $baseln, $ROUND);
             }
             else {
-                my $baseln = Math::MPFR::Rmpfr_init2($PREC);
-                Math::MPFR::Rmpfr_log($baseln, $y->_as_float(), $Sidef::Types::Number::Number::ROUND);
+                my $baseln = $y->_as_float();
+                Math::MPFR::Rmpfr_log($baseln, $baseln, $Sidef::Types::Number::Number::ROUND);
                 Math::MPC::Rmpc_div_fr($r, $r, $baseln, $ROUND);
             }
         }
