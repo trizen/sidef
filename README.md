@@ -1,7 +1,7 @@
 The Sidef Programming Language
 =======
 
-Sidef is a high-level, general-purpose programming language, inspired by Ruby, Perl 6 and Go.
+Sidef is a modern, high-level, general-purpose programming language, inspired by Ruby, Perl 6 and Go.
 
 ```
             **   **         ****   *           *********   *********
@@ -15,7 +15,7 @@ Sidef is a high-level, general-purpose programming language, inspired by Ruby, P
       **   **               ****   *********   *********   *
 ```
 
-* Sidef offers many features, including:
+* The main features of Sidef include:
     * object-oriented programming,
     * functional programming,
     * functional pattern matching,
