@@ -269,6 +269,65 @@ package Sidef::Types::Array::Array {
     *lev   = \&levenshtein;
     *leven = \&levenshtein;
 
+    sub jaro_distance {
+        my ($self, $arg, $winkler) = @_;
+
+        my @s = @{$self};
+        my @t = @{$arg};
+
+        my $s_len = @s;
+        my $t_len = @t;
+
+        if ($s_len == 0 and $t_len == 0) {
+            return 1;
+        }
+
+        state $x = require List::Util;
+        my $match_distance = int(List::Util::max($s_len, $t_len) / 2) - 1;
+
+        my @s_matches;
+        my @t_matches;
+
+        my $matches = 0;
+        foreach my $i (0 .. $#s) {
+
+            my $start = List::Util::max(0, $i - $match_distance);
+            my $end = List::Util::min($i + $match_distance + 1, $t_len);
+
+            foreach my $j ($start .. $end - 1) {
+                $t_matches[$j] and next;
+                $s[$i] eq $t[$j] or next;
+                $s_matches[$i] = 1;
+                $t_matches[$j] = 1;
+                $matches++;
+                last;
+            }
+        }
+
+        return Sidef::Types::Number::Number::ZERO if $matches == 0;
+
+        my $k              = 0;
+        my $transpositions = 0;
+
+        foreach my $i (0 .. $#s) {
+            $s_matches[$i] or next;
+            while (not $t_matches[$k]) { ++$k }
+            $s[$i] eq $t[$k] or ++$transpositions;
+            ++$k;
+        }
+
+        my $jaro = (($matches / $s_len) + ($matches / $t_len) + (($matches - $transpositions / 2) / $matches)) / 3;
+
+        $winkler || return Sidef::Types::Number::Number->new($jaro);    # return the Jaro distance instead of Jaro-Winkler
+
+        my $prefix = 0;
+        foreach my $i (0 .. List::Util::min(3, $#t, $#s)) {
+            $s[$i] eq $t[$i] ? ++$prefix : last;
+        }
+
+        Sidef::Types::Number::Number->new($jaro + $prefix * 0.1 * (1 - $jaro));
+    }
+
     sub combinations {
         my ($self, $k, $block) = @_;
 

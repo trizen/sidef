@@ -994,63 +994,66 @@ package Sidef::Types::String::String {
     *leven = \&levenshtein;
 
     sub jaro_distance {
-        my ($string1, $string2, $winkle) = @_;
+        my ($s, $t, $winkler) = @_;
 
-        $string1 = $$string1;
-        $string2 = "$string2";
+        $s = $$s;
+        $t = "$t";
 
-        my $len1 = length($string1);
-        my $len2 = length($string2);
+        my $s_len = length($s);
+        my $t_len = length($t);
 
-        ($string1, $len1, $string2, $len2) = ($string2, $len2, $string1, $len1)
-          if $len1 > $len2;
-
-        $len1 || return (Sidef::Types::Number::Number::ZERO);
-
-        my $match_window = $len2 > 3 ? int($len2 / 2) - 1 : 0;
-
-        my @string1_matches;
-        my @string2_matches;
-
-        my @chars1 = split(//, $string1);
-        my @chars2 = split(//, $string2);
+        if ($s_len == 0 and $t_len == 0) {
+            return 1;
+        }
 
         state $x = require List::Util;
 
-        foreach my $i (0 .. $#chars1) {
+        my $match_distance = int(List::Util::max($s_len, $t_len) / 2) - 1;
 
-            my $window_start = List::Util::max(0, $i - $match_window);
-            my $window_end = List::Util::min($i + $match_window + 1, $len2);
+        my @s_matches;
+        my @t_matches;
 
-            foreach my $j ($window_start .. $window_end - 1) {
-                if (CORE::not exists($string2_matches[$j]) and $chars1[$i] eq $chars2[$j]) {
-                    $string1_matches[$i] = $chars1[$i];
-                    $string2_matches[$j] = $chars2[$j];
-                    last;
-                }
+        my @s = split(//, $s);
+        my @t = split(//, $t);
+
+        my $matches = 0;
+        foreach my $i (0 .. $#s) {
+
+            my $start = List::Util::max(0, $i - $match_distance);
+            my $end = List::Util::min($i + $match_distance + 1, $t_len);
+
+            foreach my $j ($start .. $end - 1) {
+                $t_matches[$j] and next;
+                $s[$i] eq $t[$j] or next;
+                $s_matches[$i] = 1;
+                $t_matches[$j] = 1;
+                $matches++;
+                last;
             }
         }
 
-        (@string1_matches = grep { defined } @string1_matches) || return (Sidef::Types::Number::Number::ZERO);
-        @string2_matches = grep { defined } @string2_matches;
+        return Sidef::Types::Number::Number::ZERO if $matches == 0;
 
+        my $k              = 0;
         my $transpositions = 0;
-        foreach my $i (0 .. $#string1_matches) {
-            $string1_matches[$i] eq $string2_matches[$i] or ++$transpositions;
+
+        foreach my $i (0 .. $#s) {
+            $s_matches[$i] or next;
+            while (not $t_matches[$k]) { ++$k }
+            $s[$i] eq $t[$k] or ++$transpositions;
+            ++$k;
         }
 
-        my $num_matches = @string1_matches;
-        my $jaro =
-          (($num_matches / $len1) + ($num_matches / $len2) + ($num_matches - int($transpositions / 2)) / $num_matches) / 3;
+        my $jaro = (($matches / $s_len) + ($matches / $t_len) + (($matches - $transpositions / 2) / $matches)) / 3;
 
-        $winkle || return Sidef::Types::Number::Number->new($jaro);    # return the Jaro distance instead of Jaro-Winkle
+        $winkler || return Sidef::Types::Number::Number->new($jaro);    # return the Jaro distance instead of Jaro-Winkler
 
         my $prefix = 0;
-        foreach my $i (0 .. $#chars1) {
-            $chars1[$i] eq $chars2[$i] ? ++$prefix : last;
+        foreach my $i (0 .. List::Util::min(3, $#t, $#s)) {
+            $s[$i] eq $t[$i] ? ++$prefix : last;
         }
 
-        Sidef::Types::Number::Number->new($jaro + List::Util::min($prefix, 4) * 0.1 * (1 - $jaro));
+        Sidef::Types::Number::Number->new($jaro + $prefix * 0.1 * (1 - $jaro));
     }
 
     sub contains {

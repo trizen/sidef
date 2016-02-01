@@ -565,6 +565,14 @@ Return the
 
 =cut
 
+=head2 jaro_distance
+
+Array.jaro_distance() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 join
 
 Array.join() -> I<Obj>
