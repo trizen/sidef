@@ -194,6 +194,7 @@ scripts/Interactive/sparkline_in_unicode.sf
 scripts/Interactive/temperature_conversion.sf
 scripts/Interactive/user_input_text.sf
 scripts/Interactive/user_input_text_1.sf
+scripts/jaro_distance.sf
 scripts/jensen_s_device_sf
 scripts/josephus_problem.sf
 scripts/json.sf
