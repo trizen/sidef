@@ -1,0 +1,60 @@
+#!/usr/bin/ruby
+
+func round_nth(orig, nth) {
+
+    var n = orig.abs
+    var p = 10**nth;
+
+    n *= p;
+    n += 0.5;
+    n -= 0.5 if n.is_odd;
+
+    n = n.int;
+    n /= p;
+    n = -n if (orig < 0);
+
+    return n;
+}
+
+var tests = [
+
+    # original | rounded | places
+    [+1.6,      +2,        0],
+    [+1.5,      +2,        0],
+    [+1.4,      +1,        0],
+    [+0.6,      +1,        0],
+    [+0.5,      0,         0],
+    [+0.4,      0,         0],
+    [-0.4,      0,         0],
+    [-0.5,      0,         0],
+    [-0.6,      -1,        0],
+    [-1.4,      -1,        0],
+    [-1.5,      -2,        0],
+    [-1.6,      -2,        0],
+    [3.016,     3.02,      2],
+    [3.013,     3.01,      2],
+    [3.015,     3.02,      2],
+    [3.045,     3.04,      2],
+    [3.04501,   3.05,      2],
+    [-1234.555, -1000,     -3],
+    [-1234.555, -1200,     -2],
+    [-1234.555, -1230,     -1],
+    [-1234.555, -1235,     0],
+    [-1234.555, -1234.6,   1],
+    [-1234.555, -1234.56,  2],
+    [-1234.555, -1234.555, 3],
+];
+
+tests.each { |t|
+    var (n, expected, places) = t...
+    var rounded = round_nth(n, places);
+
+    print "#{n} rounded to #{places} digits is ";
+
+    if (rounded == expected) {
+        say rounded;
+    }
+    else {
+        die "#{expected}, but got #{rounded}! This is wrong!";
+    }
+}
