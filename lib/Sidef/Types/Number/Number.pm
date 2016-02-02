@@ -531,11 +531,25 @@ package Sidef::Types::Number::Number {
 
         _valid($y);
 
-        if (Math::GMPq::Rmpq_sgn($$y) >= 0 and Math::GMPq::Rmpq_integer_p($$x) and Math::GMPq::Rmpq_integer_p($$y)) {
+        if (Math::GMPq::Rmpq_integer_p($$x) and Math::GMPq::Rmpq_integer_p($$y)) {
+
+            my $pow = Math::GMPq::Rmpq_get_d($$y);
+
             my $z = Math::GMPz::Rmpz_init();
             Math::GMPz::Rmpz_set_q($z, $$x);
-            Math::GMPz::Rmpz_pow_ui($z, $z, Math::GMPq::Rmpq_get_d($$y));
-            return _mpz2rat($z);
+            Math::GMPz::Rmpz_pow_ui($z, $z, CORE::abs($pow));
+
+            my $q = Math::GMPq::Rmpq_init();
+            Math::GMPq::Rmpq_set_z($q, $z);
+
+            if ($pow < 0) {
+                if (!Math::GMPq::Rmpq_sgn($q)) {
+                    return inf();
+                }
+                Math::GMPq::Rmpq_inv($q, $q);
+            }
+
+            return bless \$q, __PACKAGE__;
         }
 
         if (Math::GMPq::Rmpq_sgn($$x) < 0 and !Math::GMPq::Rmpq_integer_p($$y)) {
