@@ -1844,7 +1844,13 @@ package Sidef::Types::Number::Number {
         my ($x, $y) = @_;
         _valid($y);
         my $r = _as_int($x);
-        Math::GMPz::Rmpz_mul_2exp($r, $r, CORE::int(Math::GMPq::Rmpq_get_d($$y)));
+        my $i = CORE::int(Math::GMPq::Rmpq_get_d($$y));
+        if ($i < 0) {
+            Math::GMPz::Rmpz_div_2exp($r, $r, CORE::abs($i));
+        }
+        else {
+            Math::GMPz::Rmpz_mul_2exp($r, $r, $i);
+        }
         _mpz2rat($r);
     }
 
@@ -1852,7 +1858,13 @@ package Sidef::Types::Number::Number {
         my ($x, $y) = @_;
         _valid($y);
         my $r = _as_int($x);
-        Math::GMPz::Rmpz_div_2exp($r, $r, CORE::int(Math::GMPq::Rmpq_get_d($$y)));
+        my $i = CORE::int(Math::GMPq::Rmpq_get_d($$y));
+        if ($i < 0) {
+            Math::GMPz::Rmpz_mul_2exp($r, $r, CORE::abs($i));
+        }
+        else {
+            Math::GMPz::Rmpz_div_2exp($r, $r, $i);
+        }
         _mpz2rat($r);
     }
 
