@@ -255,9 +255,16 @@ sub parse_code {
 
 sub execute_struct {
     my ($struct, $return) = @_;
-    my $deparser = Sidef::Deparse::Perl->new(namespaces => [@Sidef::NAMESPACES], opt => \%args);
+    state $count = 0;
+
+    my $environment_name = 'Sidef::Runtime' . CORE::abs(++$count);
+    my $deparser = Sidef::Deparse::Perl->new(
+                                             opt              => \%args,
+                                             namespaces       => [@Sidef::NAMESPACES],
+                                             environment_name => $environment_name,
+                                            );
     local $Sidef::DEPARSER = $deparser;
-    my $code = $deparser->deparse($struct);
+    my $code = "package $environment_name {" . $deparser->deparse($struct) . "}";
     $return ? eval($code) : do { eval($code); $@ && die $@; exit };
 }
 

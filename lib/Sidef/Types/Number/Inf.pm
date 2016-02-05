@@ -127,6 +127,15 @@ package Sidef::Types::Number::Inf {
     *neg = \&ninf;
     *not = \&ninf;
 
+    sub root {
+        my ($x, $y) = @_;
+        ref($y) eq 'Sidef::Types::Number::Inf' || ref($y) eq 'Sidef::Types::Number::Ninf' ? Sidef::Types::Number::Number::ONE
+          : $y->is_neg ? Sidef::Types::Number::Number::ZERO
+          :              $x->inf();
+    }
+
+    *iroot = \&root;
+
     sub min { $_[1] }
     sub inf { $_[0] }
 
@@ -135,8 +144,6 @@ package Sidef::Types::Number::Inf {
     *sqrt             = \&inf;
     *isqrt            = \&inf;
     *cbrt             = \&inf;
-    *root             = \&inf;
-    *iroot            = \&inf;
     *sqr              = \&inf;
     *log              = \&inf;
     *log2             = \&inf;

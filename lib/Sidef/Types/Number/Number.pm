@@ -132,6 +132,17 @@ package Sidef::Types::Number::Number {
         if (($i = index($str, 'e')) != -1) {
 
             my $exp = substr($str, $i + 1);
+
+            # Handle specially numbers with very big exponents
+            # (it's not a very good solution, but I hope it's only temporary)
+            if (abs($exp) >= 1000000) {
+                my $mpfr = Math::MPFR::Rmpfr_init2($PREC);
+                Math::MPFR::Rmpfr_set_str($mpfr, "$sign$str", 10, $ROUND);
+                my $mpq = Math::GMPq::Rmpq_init();
+                Math::MPFR::Rmpfr_get_q($mpq, $mpfr);
+                return Math::GMPq::Rmpq_get_str($mpq, 10);
+            }
+
             my ($before, $after) = split(/\./, substr($str, 0, $i));
 
             if (not defined($after)) {    # return faster for numbers like "13e2"

@@ -225,10 +225,15 @@ package Sidef::Types::Number::Ninf {
 
     #
     ## (-inf)^(1/x) = i^(1/x) * inf
-    ## However, returning inf*i is good enough!
     #
-    *root  = \&asin;
-    *iroot = \&asin;
+    sub root {
+        my ($x, $y) = @_;
+        ref($y) eq 'Sidef::Types::Number::Inf' || ref($y) eq 'Sidef::Types::Number::Ninf' ? Sidef::Types::Number::Number::ONE
+          : $y->is_neg ? Sidef::Types::Number::Number::ZERO
+          :              $x->inf();
+    }
+
+    *iroot = \&root;
 
     #
     ## acos(-inf) = -inf*i
