@@ -405,45 +405,32 @@ sub code_interactive {
     print qq{$name $version on $^O\n};
     print qq{Type "help", "copyright" or "license" for more information.\n};
 
-    my $last_line = '';
-    {
-        my $line = do {
-            @ARGV
-              ? do {
-                my $file = shift(@ARGV);
-                open my $fh, '<:utf8', $file or do {
-                    warn "Can't open file `$file': $!\n";
-                    next;
-                };
-                local $/;
-                <$fh>;
-              }
-              : (Encode::decode_utf8($term->readline('>> ') // return));
-        };
+  MAINLOOP: {
+        my $line = '';
 
-        if ($line eq 'help') {
-            help_interactive();
-            redo;
-        }
-        elsif ($line eq '^') {
-            say $last_line;
-            redo;
-        }
-        elsif ($line eq '&') {
-            $line = $last_line;
-        }
-        elsif ($line eq 'q' or $line eq 'quit') {
-            return;
-        }
-        elsif ($line eq 'copyright') {
-            print <<'EOT';
+        {
+            $line .= Encode::decode_utf8($term->readline($line eq '' ? '>> ' : '   ') // return);
+
+            if ($line eq 'help') {
+                help_interactive();
+                redo MAINLOOP;
+            }
+            elsif ($line eq 'q' or $line eq 'quit') {
+                return;
+            }
+            elsif ($line =~ /\h\z/) {
+                $line .= "\n";
+                redo;
+            }
+            elsif ($line eq 'copyright') {
+                print <<'EOT';
 Copyright © 2013-2016 Daniel Șuteu, Ioana Fălcușan
 All Rights Reserved.
 EOT
-            redo;
-        }
-        elsif ($line eq 'license') {
-            print <<'EOT';
+                redo MAINLOOP;
+            }
+            elsif ($line eq 'license') {
+                print <<'EOT';
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -459,7 +446,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 EOT
-            redo;
+                redo MAINLOOP;
+            }
         }
 
         # Remove 'var' declarations (if any)
@@ -467,7 +455,6 @@ EOT
             $line =~ s/^\h*var\b\h*//;
         }
 
-        $last_line = $line;
         my $struct = eval { parse_code($parser, $line) };
 
         $@ && do {
@@ -619,7 +606,7 @@ HEAD
 
                  close $fh;
              }
-         }
+           }
         } => ($path, $INC{'Sidef.pm'})
     );
 
