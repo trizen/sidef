@@ -1370,12 +1370,16 @@ HEADER
                     # != and == methods
                     if ($method eq '==' or $method eq '!=') {
                         $code =
-                            '(('
-                          . ($method eq '!=' ? 'CORE::not ' : '') . 'do{'
+                            '(' . 'do{'
                           . $code
                           . '} eq do{'
-                          . $self->deparse_args(@{$call->{arg}})
-                          . '}) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE))';
+                          . $self->deparse_args(@{$call->{arg}}) . '} ? '
+                          . (
+                             $method eq '!='
+                             ? '(Sidef::Types::Bool::Bool::FALSE) : (Sidef::Types::Bool::Bool::TRUE)'
+                             : '(Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE)'
+                            )
+                          . ')';
                         next;
                     }
 
@@ -1395,12 +1399,16 @@ HEADER
                     if ($method eq '~~' or $method eq '!~') {
                         $self->top_add(qq{use experimental 'smartmatch';\n});
                         $code =
-                            '(('
-                          . ($method eq '!~' ? 'CORE::not ' : '') . 'do{'
+                            '(' . 'do{'
                           . $code
                           . '} ~~ do{'
-                          . $self->deparse_args(@{$call->{arg}})
-                          . '}) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE))';
+                          . $self->deparse_args(@{$call->{arg}}) . '} ? '
+                          . (
+                             $method eq '!~'
+                             ? '(Sidef::Types::Bool::Bool::FALSE) : (Sidef::Types::Bool::Bool::TRUE)'
+                             : '(Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE)'
+                            )
+                          . ')';
                         next;
                     }
 
