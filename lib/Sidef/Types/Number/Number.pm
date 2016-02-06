@@ -58,7 +58,11 @@ package Sidef::Types::Number::Number {
             $num = $num->get_value
               if (index(ref($num), 'Sidef::') == 0);
 
-            bless(\Math::GMPq->new($base == 10 ? _str2rat($num // 0) : ($num // 0), $base), __PACKAGE__);
+            my $r = Math::GMPq::Rmpq_init();
+            my $rat = $num ? ($base == 10 && $num =~ tr/Ee.//) ? _str2rat($num) : ($num =~ tr/+//dr) : 0;
+            Math::GMPq::Rmpq_set_str($r, $rat, $base);
+            Math::GMPq::Rmpq_canonicalize($r) if index($rat, '/') != -1;
+            bless \$r, __PACKAGE__;
           };
     }
 
