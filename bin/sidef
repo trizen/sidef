@@ -415,8 +415,13 @@ sub code_interactive {
                 help_interactive();
                 redo MAINLOOP;
             }
-            elsif ($line eq 'q' or $line eq 'quit') {
-                return;
+            elsif ($line =~ /^#\h*load\h+(.+)/) {
+                my $file = unpack('A*', $1);
+                open my $fh, '<:utf8', $file or do {
+                    warn "Can't open file <<$file>> for read: $!\n";
+                    redo MAINLOOP;
+                };
+                $line = do { local $/; <$fh> };
             }
             elsif ($line =~ /\h\z/) {
                 $line .= "\n";
@@ -456,6 +461,10 @@ EOT
         }
 
         my $struct = eval { parse_code($parser, $line) };
+
+        if ($@ and ($line eq 'q' or $line eq 'exit' or $line eq 'quit')) {
+            return;
+        }
 
         $@ && do {
             warn $@;
@@ -606,7 +615,7 @@ HEAD
 
                  close $fh;
              }
-           }
+         }
         } => ($path, $INC{'Sidef.pm'})
     );
 
