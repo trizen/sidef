@@ -307,14 +307,14 @@ package Sidef::Types::Block::Block {
     }
 
     sub fork {
-        my ($self) = @_;
+        my ($self, @args) = @_;
 
         my $fork = Sidef::Types::Block::Fork->new();
 
         my $pid = CORE::fork() // die "[ERROR] Cannot fork: $!";
         if ($pid == 0) {
             srand();
-            $self->{code}->();
+            $self->call(@args);
             exit 0;
         }
 

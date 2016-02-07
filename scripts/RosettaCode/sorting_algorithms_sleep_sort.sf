@@ -5,5 +5,5 @@
 #
 
 ARGV.map{.to_i}.map{ |i|
-    {Sys.sleep(i); say i}.pfork;
+    {Sys.sleep(i); say i}.fork;
 }.each{.wait};
