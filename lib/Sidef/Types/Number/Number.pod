@@ -140,7 +140,7 @@ I<Obj> B</> I<Obj> -> I<Obj>
 
 Return the
 
-Aliases: I<÷()>, I<div>, I<rdiv>
+Aliases: I<÷()>, I<div>
 
 =cut
 
@@ -756,6 +756,14 @@ Return the
 
 =cut
 
+=head2 imod
+
+Number.imod() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 imul
 
 Number.imul() -> I<Obj>
@@ -798,6 +806,14 @@ Aliases: I<modinv>
 
 =cut
 
+=head2 ipow
+
+Number.ipow() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 irand
 
 Number.irand() -> I<Obj>
@@ -835,6 +851,14 @@ Return the
 =head2 is_int
 
 Number.is_int() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 is_mone
+
+Number.is_mone() -> I<Obj>
 
 Return the
 
@@ -947,6 +971,14 @@ Return the
 =head2 is_zero
 
 Number.is_zero() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 itimes
+
+Number.itimes() -> I<Obj>
 
 Return the
 

@@ -2170,7 +2170,10 @@ package Sidef::Types::Number::Number {
     sub to {
         my ($from, $to, $step) = @_;
 
-        if (defined $step) {
+        if (ref($to) eq 'Sidef::Types::Number::Inf' or ref($to) eq 'Sidef::Types::Number::Ninf') {
+            _valid($step) if defined($step);
+        }
+        elsif (defined $step) {
             _valid($to, $step);
         }
         else {
@@ -2189,7 +2192,10 @@ package Sidef::Types::Number::Number {
     sub downto {
         my ($from, $to, $step) = @_;
 
-        if (defined $step) {
+        if (ref($to) eq 'Sidef::Types::Number::Inf' or ref($to) eq 'Sidef::Types::Number::Ninf') {
+            _valid($step) if defined($step);
+        }
+        elsif (defined $step) {
             _valid($to, $step);
         }
         else {
@@ -2267,10 +2273,26 @@ package Sidef::Types::Number::Number {
         my ($num, $block) = @_;
 
         $num = $$num;
-        return $block if Math::GMPq::Rmpq_cmp($num, ${(ONE)}) < 0;
 
         for (my $i = Math::GMPz::Rmpz_init_set_ui(1) ;
              Math::GMPz::Rmpz_cmp($i, $num) <= 0 ; Math::GMPz::Rmpz_add_ui($i, $i, 1)) {
+            my $n = Math::GMPq::Rmpq_init();
+            Math::GMPq::Rmpq_set_z($n, $i);
+            if (defined(my $res = $block->_run_code(bless(\$n, __PACKAGE__)))) {
+                return $res;
+            }
+        }
+
+        $block;
+    }
+
+    sub itimes {
+        my ($num, $block) = @_;
+
+        $num = $$num;
+
+        for (my $i = Math::GMPz::Rmpz_init_set_ui(0) ; Math::GMPz::Rmpz_cmp($i, $num) < 0 ; Math::GMPz::Rmpz_add_ui($i, $i, 1))
+        {
             my $n = Math::GMPq::Rmpq_init();
             Math::GMPq::Rmpq_set_z($n, $i);
             if (defined(my $res = $block->_run_code(bless(\$n, __PACKAGE__)))) {

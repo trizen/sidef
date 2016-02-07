@@ -16,6 +16,12 @@ package Sidef::Types::Range::RangeNumber {
     my $ZERO = ${(Sidef::Types::Number::Number::ZERO)};
     my $MONE = ${(Sidef::Types::Number::Number::MONE)};
 
+    use Sidef::Types::Number::Inf;
+    use Sidef::Types::Number::Ninf;
+
+    my $INF  = ${Sidef::Types::Number::Inf->new};
+    my $NINF = ${Sidef::Types::Number::Ninf->new};
+
     sub new {
         my (undef, $from, $to, $step) = @_;
 
@@ -86,22 +92,28 @@ package Sidef::Types::Range::RangeNumber {
         ($self->min, $self->max);
     }
 
+    # Known issue for +/-Infinity: always returns false for those values.
     sub contains {
         my ($self, $num) = @_;
 
         Sidef::Types::Number::Number::_valid($num);
 
         my $value = $$num;
-        my ($min, $max) =
-          (Math::GMPq::Rmpq_sgn($self->{step}) > 0 ? ($self->{from}, $self->{to}) : ($self->{to}, $self->{from}));
-        my $step = $self->{step};
+        my $step  = $self->{step};
+        my $sgn   = Math::GMPq::Rmpq_sgn($step);
+
+        my ($from, $to) = (
+                           $sgn > 0
+                           ? ($self->{from}, $self->{to})
+                           : ($self->{to}, $self->{from})
+                          );
 
         (
-         $value >= $min and $value <= $max
+         $value >= $from and $value <= $to
            and (
                   Math::GMPq::Rmpq_equal($step, $ONE) ? 1
-                : Math::GMPq::Rmpq_sgn($step) > 0 ? (int(($value - $min) / $step) * $step == ($value - $min))
-                :                                   (int(($value - $max) / $step) * $step == ($value - $max))
+                : $sgn > 0 ? (int(($value - $from) / $step) * $step == ($value - $from))
+                :            (int(($value - $to) / $step) * $step ==   ($value - $to))
                )
         ) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
@@ -122,8 +134,14 @@ package Sidef::Types::Range::RangeNumber {
         my $i = Math::GMPq::Rmpq_init();
         Math::GMPq::Rmpq_set($i, $from);
 
+        my $is_inf  = Math::GMPq::Rmpq_equal($to, $INF);
+        my $is_ninf = Math::GMPq::Rmpq_equal($to, $NINF);
+
         sub {
-            ($sgn > 0 ? Math::GMPq::Rmpq_cmp($i, $to) <= 0 : Math::GMPq::Rmpq_cmp($i, $to) >= 0) || return;
+            ($sgn > 0
+             ? ($is_inf ? 1 : $is_ninf ? 0 : Math::GMPq::Rmpq_cmp($i, $to) <= 0)
+             : ($is_inf ? 0 : $is_ninf ? 1 : Math::GMPq::Rmpq_cmp($i, $to) >= 0))
+              || return;
             my $tmp = Math::GMPq::Rmpq_init();
             Math::GMPq::Rmpq_set($tmp, $i);
             Math::GMPq::Rmpq_add($i, $i, $step);

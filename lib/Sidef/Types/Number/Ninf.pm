@@ -291,9 +291,10 @@ package Sidef::Types::Number::Ninf {
     *erf  = \&tanh;
 
     #
-    ## -inf.times {} does no-op
+    ## -inf.times {} is a no-op
     #
     sub times { $_[1] }
+    *itimes = \&times;
 
     #
     ## (-inf)^even = inf

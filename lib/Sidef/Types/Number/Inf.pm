@@ -306,6 +306,22 @@ package Sidef::Types::Number::Inf {
         $block;
     }
 
+    sub itimes {
+        my ($x, $block) = @_;
+
+        my $i = Math::GMPz::Rmpz_init_set_ui(0);
+        while (1) {
+            my $num = Math::GMPq::Rmpq_init();
+            Math::GMPq::Rmpq_set_z($num, $i);
+            Math::GMPz::Rmpz_add_ui($i, $i, 1);
+            if (defined(my $res = $block->_run_code(bless \$num, 'Sidef::Types::Number::Number'))) {
+                return $res;
+            }
+        }
+
+        $block;
+    }
+
     sub pow {
         my ($x, $y) = @_;
 
