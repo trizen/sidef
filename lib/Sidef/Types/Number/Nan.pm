@@ -29,13 +29,23 @@ package Sidef::Types::Number::Nan {
 
     sub nan { $_[0] }
 
+    *abs         = \&nan;
     *add         = \&nan;
+    *iadd        = \&nan;
     *sub         = \&nan;
+    *isub        = \&nan;
     *sqrt        = \&nan;
+    *isqrt       = \&nan;
     *mul         = \&nan;
+    *imul        = \&nan;
     *div         = \&nan;
+    *idiv        = \&nan;
     *mod         = \&nan;
+    *imod        = \&nan;
     *pow         = \&nan;
+    *ipow        = \&nan;
+    *iroot       = \&nan;
+    *root        = \&nan;
     *and         = \&nan;
     *or          = \&nan;
     *xor         = \&nan;
@@ -143,6 +153,8 @@ package Sidef::Types::Number::Nan {
     *is_div      = \&is_inf;
     *ne          = \&is_inf;
     *is_zero     = \&is_inf;
+    *is_one      = \&is_inf;
+    *is_mone     = \&is_inf;
     *is_ninf     = \&is_inf;
     *is_positive = \&is_inf;
     *is_negative = \&is_inf;

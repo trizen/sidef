@@ -78,12 +78,16 @@ package Sidef::Types::Number::Inf {
     *is_odd    = \&is_ninf;
     *divides   = \&is_ninf;
     *is_real   = \&is_ninf;
+    *is_zero   = \&is_ninf;
+    *is_one    = \&is_ninf;
+    *is_mone   = \&is_ninf;
 
     sub nan {
         state $x = Sidef::Types::Number::Nan->new;
     }
 
     *mod         = \&nan;
+    *imod        = \&nan;
     *fmod        = \&nan;
     *bin         = \&nan;
     *modpow      = \&nan;
@@ -201,9 +205,11 @@ package Sidef::Types::Number::Inf {
 
     sub zero { (Sidef::Types::Number::Number::ZERO) }
 
-    *inv   = \&zero;
-    *sin   = \&zero;
-    *cos   = \&zero;
+    *inv = \&zero;
+
+    *sin = \&nan;    # -1 to 1
+    *cos = \&nan;    # -1 to 1
+
     *sech  = \&zero;
     *csch  = \&zero;
     *acsc  = \&zero;
@@ -302,7 +308,18 @@ package Sidef::Types::Number::Inf {
 
     sub pow {
         my ($x, $y) = @_;
-        $y->is_neg ? (Sidef::Types::Number::Number::ZERO) : $y->is_zero ? (Sidef::Types::Number::Number::ONE) : $x;
+
+        if (ref($y) eq 'Sidef::Types::Number::Nan') {
+            return $y;
+        }
+
+            $y->is_neg  ? (Sidef::Types::Number::Number::ZERO)
+          : $y->is_zero ? (Sidef::Types::Number::Number::ONE)
+          :               $x;
+    }
+
+    sub ipow {
+        $_[0]->pow($_[1]->int);
     }
 
     #

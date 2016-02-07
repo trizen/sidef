@@ -253,13 +253,13 @@ package Sidef::Types::Number::Complex {
     sub abs {
         my $mpfr = Math::MPFR::Rmpfr_init2($PREC);
         Math::MPC::Rmpc_abs($mpfr, ${$_[0]}, $ROUND);
-        Sidef::Types::Number::Number::_mpfr2rat($mpfr);
+        Sidef::Types::Number::Number::_mpfr2big($mpfr);
     }
 
     sub norm {
         my $mpfr = Math::MPFR::Rmpfr_init2($PREC);
         Math::MPC::Rmpc_norm($mpfr, ${$_[0]}, $ROUND);
-        Sidef::Types::Number::Number::_mpfr2rat($mpfr);
+        Sidef::Types::Number::Number::_mpfr2big($mpfr);
     }
 
     *reciprocal = \&norm;
@@ -269,7 +269,7 @@ package Sidef::Types::Number::Complex {
         Math::MPC::RMPC_RE($mpfr, ${$_[0]});
 
         #Math::MPC::Rmpc_real($mpfr, ${$_[0]}, $ROUND);
-        Sidef::Types::Number::Number::_mpfr2rat($mpfr);
+        Sidef::Types::Number::Number::_mpfr2big($mpfr);
     }
 
     *re = \&real;
@@ -279,7 +279,7 @@ package Sidef::Types::Number::Complex {
         Math::MPC::RMPC_IM($mpfr, ${$_[0]});
 
         #Math::MPC::Rmpc_imag($mpfr, ${$_[0]}, $ROUND);
-        Sidef::Types::Number::Number::_mpfr2rat($mpfr);
+        Sidef::Types::Number::Number::_mpfr2big($mpfr);
     }
 
     *im        = \&imag;
@@ -314,7 +314,7 @@ package Sidef::Types::Number::Complex {
             Math::MPC::Rmpc_add($r, $$x, $$y, $ROUND);
         }
         else {
-            Math::MPC::Rmpc_add_fr($r, $$x, $y->_as_float(), $ROUND);
+            Math::MPC::Rmpc_add_fr($r, $$x, $y->_big2mpfr(), $ROUND);
         }
 
         bless(\$r, __PACKAGE__);
@@ -328,7 +328,7 @@ package Sidef::Types::Number::Complex {
             Math::MPC::Rmpc_sub($r, $$x, $$y, $ROUND);
         }
         else {
-            Math::MPC::Rmpc_add_fr($r, $$x, -$y->_as_float(), $ROUND);
+            Math::MPC::Rmpc_add_fr($r, $$x, -$y->_big2mpfr(), $ROUND);
         }
 
         bless(\$r, __PACKAGE__);
@@ -342,7 +342,7 @@ package Sidef::Types::Number::Complex {
             Math::MPC::Rmpc_mul($r, $$x, $$y, $ROUND);
         }
         else {
-            Math::MPC::Rmpc_mul_fr($r, $$x, $y->_as_float(), $ROUND);
+            Math::MPC::Rmpc_mul_fr($r, $$x, $y->_big2mpfr(), $ROUND);
         }
 
         bless(\$r, __PACKAGE__);
@@ -357,7 +357,7 @@ package Sidef::Types::Number::Complex {
             Math::MPC::Rmpc_div($r, $$x, $$y, $ROUND);
         }
         else {
-            Math::MPC::Rmpc_div_fr($r, $$x, $y->_as_float(), $ROUND);
+            Math::MPC::Rmpc_div_fr($r, $$x, $y->_big2mpfr(), $ROUND);
         }
 
         bless(\$r, __PACKAGE__);
@@ -380,7 +380,7 @@ package Sidef::Types::Number::Complex {
             Math::MPC::Rmpc_pow($r, $$x, $$y, $ROUND);
         }
         else {
-            Math::MPC::Rmpc_pow_fr($r, $$x, $y->_as_float(), $ROUND);
+            Math::MPC::Rmpc_pow_fr($r, $$x, $y->_big2mpfr(), $ROUND);
         }
 
         bless(\$r, __PACKAGE__);
@@ -423,7 +423,7 @@ package Sidef::Types::Number::Complex {
                 Math::MPC::Rmpc_div($r, $r, $baseln, $ROUND);
             }
             else {
-                my $baseln = $y->_as_float();
+                my $baseln = $y->_big2mpfr();
                 Math::MPFR::Rmpfr_log($baseln, $baseln, $Sidef::Types::Number::Number::ROUND);
                 Math::MPC::Rmpc_div_fr($r, $r, $baseln, $ROUND);
             }

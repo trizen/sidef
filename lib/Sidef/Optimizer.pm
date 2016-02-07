@@ -217,14 +217,19 @@ package Sidef::Optimizer {
                    and or xor
 
                    complex
-                   root log
+                   root iroot
+                   log
                    next_pow
                    max min
                    roundf
                    nok
                    modinv
-                   rdiv
-                   is_div
+                   isub
+                   iadd
+                   imul
+                   idiv
+                   ipow
+                   imod
 
                    shift_right
                    shift_left
@@ -251,7 +256,7 @@ package Sidef::Optimizer {
                    inc dec not
 
                    factorial
-                   sqrt
+                   sqrt isqrt
                    next_pow2
                    abs
 

@@ -42,7 +42,7 @@ package Sidef::Types::Number::Ninf {
     sub mul {
         my ($x, $y) = @_;
         ref($y) eq __PACKAGE__ and return $x->neg;
-        $y->is_neg ? $x->neg : $x->is_pos ? $x : nan();
+        $y->is_neg ? $x->neg : $y->is_pos ? $x : nan();
     }
 
     *imul = \&mul;
@@ -72,6 +72,9 @@ package Sidef::Types::Number::Ninf {
     *is_odd    = \&is_pos;
     *divides   = \&is_pos;
     *is_real   = \&is_pos;
+    *is_zero   = \&is_pos;
+    *is_one    = \&is_pos;
+    *is_mone   = \&is_pos;
 
     sub is_neg {
         (Sidef::Types::Bool::Bool::TRUE);
@@ -89,6 +92,7 @@ package Sidef::Types::Number::Ninf {
     *zeta             = \&nan;
     *fmod             = \&nan;
     *mod              = \&nan;
+    *imod             = \&nan;
     *bin              = \&nan;
     *modpow           = \&nan;
     *expmod           = \&nan;
@@ -181,10 +185,12 @@ package Sidef::Types::Number::Ninf {
 
     sub zero { (Sidef::Types::Number::Number::ZERO) }
 
-    *inv   = \&zero;
-    *sin   = \&zero;
+    *inv = \&zero;
+
+    *sin = \&nan;    # -1 to 1
+    *cos = \&nan;    # -1 to 1
+
     *exp   = \&zero;
-    *cos   = \&zero;
     *sech  = \&zero;
     *csch  = \&zero;
     *acsc  = \&zero;
@@ -220,14 +226,22 @@ package Sidef::Types::Number::Ninf {
     #
     sub asin { state $x = Sidef::Types::Number::Complex->new(0, '@inf@') }
 
-    *sqrt  = \&asin;
-    *isqrt = \&asin;
+    #
+    ## sqrt(-Inf) = (-Inf)**(1/2) == Inf
+    #
+    *isqrt = \&inf;
+    *sqrt  = \&inf;
 
     #
     ## (-inf)^(1/x) = i^(1/x) * inf
     #
     sub root {
         my ($x, $y) = @_;
+
+        if (ref($y) eq 'Sidef::Types::Number::Nan') {
+            return $y;
+        }
+
         ref($y) eq 'Sidef::Types::Number::Inf' || ref($y) eq 'Sidef::Types::Number::Ninf' ? Sidef::Types::Number::Number::ONE
           : $y->is_neg ? Sidef::Types::Number::Number::ZERO
           :              $x->inf();
@@ -286,11 +300,18 @@ package Sidef::Types::Number::Ninf {
     #
     sub pow {
         my ($x, $y) = @_;
+
+        if (ref($y) eq 'Sidef::Types::Number::Inf' or ref($y) eq 'Sidef::Types::Number::Nan') {
+            return $y;
+        }
+
             $y->is_neg  ? (Sidef::Types::Number::Number::ZERO)
           : $y->is_zero ? (Sidef::Types::Number::Number::ONE)
-          : $y->is_even ? $x->neg
-          :               $x;
+          : $y->is_odd  ? $x
+          :               $x->neg;
     }
+
+    *ipow = \&pow;
 
     #
     ## binomial(-inf, x) = 0        | with x < 0

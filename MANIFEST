@@ -797,7 +797,12 @@ share/sidef/Memoize.sm
 share/sidef/ntheory.sm
 share/sidef/Storable.sm
 t/00-load.t
-t/01-parser.t
+t/01-number.t
+t/02-pow.t
+t/03-mod.t
+t/04-inf_nan.t
+t/05-trignometric.t
+t/09-parser.t
 t/manifest.t
 t/pod.t
 TODO
