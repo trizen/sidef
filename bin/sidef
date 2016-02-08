@@ -90,8 +90,8 @@ if (defined $args{t}) {
         say "\n** Executing: $script_name";
         say "-" x 80;
 
-        splice(@Sidef::NAMESPACES);
-        %Sidef::INCLUDED = ();
+        @Sidef::NAMESPACES = ();
+        %Sidef::INCLUDED   = ();
 
         my $code   = read_script($script_name);
         my $parser = new_parser(name => $script_name);
@@ -405,6 +405,8 @@ sub code_interactive {
     print qq{$name $version on $^O\n};
     print qq{Type "help", "copyright" or "license" for more information.\n};
 
+    my $valid_lines = '';
+
   MAINLOOP: {
         my $line = '';
 
@@ -416,12 +418,25 @@ sub code_interactive {
                 redo MAINLOOP;
             }
             elsif ($line =~ /^#\h*load\h+(.+)/) {
+                @Sidef::NAMESPACES = ();
+                %Sidef::INCLUDED   = ();
                 my $file = unpack('A*', $1);
                 open my $fh, '<:utf8', $file or do {
                     warn "Can't open file <<$file>> for read: $!\n";
                     redo MAINLOOP;
                 };
                 $line = do { local $/; <$fh> };
+                close $fh;
+            }
+            elsif ($line =~ /^#\h*save\h+(.+)/) {
+                my $file = unpack('A*', $1);
+                open my $fh, '>:utf8', $file or do {
+                    warn "Can't open file <<$file>> for write: $!\n";
+                    redo MAINLOOP;
+                };
+                print $fh $valid_lines;
+                close $fh;
+                say "** Updated file <<$file>> successfully!";
             }
             elsif ($line =~ /\h\z/) {
                 $line .= "\n";
@@ -462,14 +477,20 @@ EOT
 
         my $struct = eval { parse_code($parser, $line) };
 
-        if ($@ and ($line eq 'q' or $line eq 'exit' or $line eq 'quit')) {
-            return;
-        }
+        if ($@) {
 
-        $@ && do {
+            # Valid keywords for 'exit'
+            if ($line eq 'q' or $line eq 'exit' or $line eq 'quit') {
+                return;
+            }
+
+            # Otherwise a syntax-error
             warn $@;
             redo;
-        };
+        }
+        else {
+            $valid_lines .= "$line\n";    # store valid lines
+        }
 
         if (defined($args{r}) or defined($args{R})) {
             output(deparse_structure($struct, $args{R}));
@@ -615,7 +636,7 @@ HEAD
 
                  close $fh;
              }
-         }
+           }
         } => ($path, $INC{'Sidef.pm'})
     );
 
