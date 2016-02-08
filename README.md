@@ -24,7 +24,7 @@ Sidef is a modern, high-level, general-purpose programming language, inspired by
     * regular expressions,
     * support for using Perl modules,
     * optional dynamic type checking,
-    * and a large number of built-in types.
+    * and a reasonable number of built-in types.
 
 ### WWW
 
