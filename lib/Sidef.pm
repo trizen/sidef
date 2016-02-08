@@ -1,7 +1,7 @@
 package Sidef {
 
     use 5.014;
-    our $VERSION = '2.21';
+    our $VERSION = '2.22';
 
     our $SPACES      = 0;    # the current number of spaces
     our $SPACES_INCR = 4;    # the number of spaces incrementor
