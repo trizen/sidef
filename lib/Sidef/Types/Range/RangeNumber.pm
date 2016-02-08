@@ -63,8 +63,26 @@ package Sidef::Types::Range::RangeNumber {
         $self;
     }
 
+    sub from {
+        my ($self, $from) = @_;
+        Sidef::Types::Number::Number::_valid($from);
+        $self->{from} = $$from;
+        $self;
+    }
+
+    sub to {
+        my ($self, $to) = @_;
+        Sidef::Types::Number::Number::_valid($to);
+        $self->{to} = $$to;
+        $self;
+    }
+
     sub reverse {
         my ($self) = @_;
+
+        if (Math::GMPq::Rmpq_equal($self->{to}, $INF) or Math::GMPq::Rmpq_equal($self->{to}, $NINF)) {
+            die "[ERROR] Can't reverse an infinite range: $self";
+        }
 
         $self->{step} = -$self->{step};
         ($self->{from}, $self->{to}) = ($self->{to}, $self->{from});
@@ -74,12 +92,26 @@ package Sidef::Types::Range::RangeNumber {
 
     sub min {
         my ($self) = @_;
-        Sidef::Types::Number::Number->new(Math::GMPq::Rmpq_sgn($self->{step}) > 0 ? $self->{from} : $self->{to});
+        Sidef::Types::Number::Number->new(
+            Math::GMPq::Rmpq_sgn($self->{step}) > 0 ? $self->{from} : do {
+                    Math::GMPq::Rmpq_equal($self->{to}, $INF) ? (return Sidef::Types::Number::Inf->new)
+                  : Math::GMPq::Rmpq_equal($self->{to}, $NINF) ? (return Sidef::Types::Number::Ninf->new)
+                  :                                              $self->{to};
+              }
+        );
     }
 
     sub max {
         my ($self) = @_;
-        Sidef::Types::Number::Number->new(Math::GMPq::Rmpq_sgn($self->{step}) > 0 ? $self->{to} : $self->{from});
+        Sidef::Types::Number::Number->new(
+            Math::GMPq::Rmpq_sgn($self->{step}) > 0
+            ? do {
+                    Math::GMPq::Rmpq_equal($self->{to}, $INF) ? (return Sidef::Types::Number::Inf->new)
+                  : Math::GMPq::Rmpq_equal($self->{to}, $NINF) ? (return Sidef::Types::Number::Ninf->new)
+                  :                                              $self->{to};
+              }
+            : $self->{from}
+        );
     }
 
     sub step {
@@ -92,7 +124,6 @@ package Sidef::Types::Range::RangeNumber {
         ($self->min, $self->max);
     }
 
-    # Known issue for +/-Infinity: always returns false for those values.
     sub contains {
         my ($self, $num) = @_;
 
@@ -101,6 +132,19 @@ package Sidef::Types::Range::RangeNumber {
         my $value = $$num;
         my $step  = $self->{step};
         my $sgn   = Math::GMPq::Rmpq_sgn($step);
+
+        if (Math::GMPq::Rmpq_equal($self->{to}, $INF)) {
+            ($sgn < 0 ? $value <= $self->{from} : $value >= $self->{from}) or return (Sidef::Types::Bool::Bool::FALSE);
+            Math::GMPq::Rmpq_equal($step, $ONE) and return (Sidef::Types::Bool::Bool::TRUE);
+            return $num->add(bless \$self->{from}, 'Sidef::Types::Number::Number')
+              ->mod(bless(\$step, 'Sidef::Types::Number::Number'))->is_zero;
+        }
+        elsif (Math::GMPq::Rmpq_equal($self->{to}, $NINF)) {
+            ($sgn < 0 ? $value <= $self->{from} : $value >= $self->{from}) or return (Sidef::Types::Bool::Bool::FALSE);
+            Math::GMPq::Rmpq_equal($step, $ONE) and return (Sidef::Types::Bool::Bool::TRUE);
+            return $num->sub(bless \$self->{from}, 'Sidef::Types::Number::Number')
+              ->mod(bless(\$step, 'Sidef::Types::Number::Number'))->is_zero;
+        }
 
         my ($from, $to) = (
                            $sgn > 0
@@ -138,9 +182,11 @@ package Sidef::Types::Range::RangeNumber {
         my $is_ninf = Math::GMPq::Rmpq_equal($to, $NINF);
 
         sub {
-            ($sgn > 0
+            (
+             $sgn > 0
              ? ($is_inf ? 1 : $is_ninf ? 0 : Math::GMPq::Rmpq_cmp($i, $to) <= 0)
-             : ($is_inf ? 0 : $is_ninf ? 1 : Math::GMPq::Rmpq_cmp($i, $to) >= 0))
+             : ($is_inf ? 0 : $is_ninf ? 1 : Math::GMPq::Rmpq_cmp($i, $to) >= 0)
+            )
               || return;
             my $tmp = Math::GMPq::Rmpq_init();
             Math::GMPq::Rmpq_set($tmp, $i);

@@ -628,6 +628,7 @@ scripts/Tests/http_tiny.sf
 scripts/Tests/i_love_you.sf
 scripts/Tests/iban.sf
 scripts/Tests/implicit_method_call_on_var_.sf
+scripts/Tests/infinite_ranges.sf
 scripts/Tests/inverted_syntax.sf
 scripts/Tests/is_prime.sf
 scripts/Tests/lazy_methods.sf

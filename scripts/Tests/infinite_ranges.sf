@@ -1,0 +1,51 @@
+#!/usr/bin/ruby
+
+var r = range(101, -Inf, -2)
+
+assert(!r.contains(30))
+assert(!r.contains(2))
+
+r = range(100, -Inf, -2)
+
+assert(r.contains(30))
+assert(r.contains(2))
+
+r = range(20, -Inf, -2)
+
+assert(!r.contains(30))
+assert(!r.contains(5))
+assert(r.contains(2))
+
+r = range(100, -Inf, 2)
+
+assert(!r.contains(30))
+assert(!r.contains(2))
+
+r = range(-3, Inf, 2)
+
+assert(!r.contains(30))
+assert(!r.contains(2))
+
+r = range(-100, Inf, 2)
+
+assert(r.contains(30))
+assert(r.contains(2))
+assert(r.contains(132438))
+
+r = range(-3, Inf, 2)
+
+assert(!r.contains(30))
+assert(!r.contains(2))
+assert(r.contains(5))
+assert(r.contains(-3))
+assert(!r.contains(-9))
+
+r = range(100, -Inf, -3)
+
+assert(!r.contains(103))
+assert(r.contains(73))
+assert(r.contains(-531341))
+assert(!r.contains(-100))
+assert(r.contains(100))
+
+say "** Test passed!";

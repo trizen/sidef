@@ -1,6 +1,7 @@
 package Sidef::Perl::Perl {
 
     use 5.014;
+    use Sidef::Types::Number::Number;
 
     sub new {
         bless {}, __PACKAGE__;
@@ -58,6 +59,22 @@ package Sidef::Perl::Perl {
                               : Sidef::Types::Number::Inf->new
                           : Sidef::Types::Number::Number->new($val->bstr, 10)
                        );
+            }
+
+            if ($ref eq 'Math::Complex') {
+                return Sidef::Types::Number::Complex->new($val->Re, $val->Im);
+            }
+
+            if ($ref eq 'Math::MPFR') {
+                return Sidef::Types::Number::Number::_mpfr2big($val);
+            }
+
+            if ($ref eq 'Math::GMPz') {
+                return Sidef::Types::Number::Number::_mpz2big($val);
+            }
+
+            if ($ref eq 'Math::GMPq') {
+                return bless(\$val, 'Sidef::Types::Number::Number');
             }
 
             if ($ref eq '') {
