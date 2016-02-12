@@ -894,7 +894,7 @@ package Sidef::Types::String::String {
         my ($self, $orig, $repl) = @_;
 
         my %map;
-        if (CORE::not defined($repl) and defined($orig)) {    # assume an array of pairs
+        if (!defined($repl) and defined($orig)) {    # assume an array of pairs
             foreach my $pair (@{$orig}) {
                 $map{"$pair->[0]"} = "$pair->[1]";
             }

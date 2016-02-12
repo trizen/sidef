@@ -125,10 +125,10 @@ package Sidef::Parser {
                 | return\b                                  (?{ Sidef::Types::Block::Return->new })
                 #| next\b                                    (?{ bless({}, 'Sidef::Types::Block::Next') })
                 #| break\b                                   (?{ bless({}, 'Sidef::Types::Block::Break') })
-                | (?:defined|read)\b                        (?{ state $x = Sidef::Sys::Sys->new })
+                | read\b                                    (?{ state $x = Sidef::Sys::Sys->new })
                 | goto\b                                    (?{ state $x = bless({}, 'Sidef::Perl::Builtin') })
                 | (?:[*\\&]|\+\+|--)                        (?{ state $x = bless({}, 'Sidef::Variable::Ref') })
-                | (?:>>?|[√+~!-]|(?:say|print)\b)           (?{ state $x = bless({}, 'Sidef::Object::Unary') })
+                | (?:>>?|[√+~!-]|(?:say|print|defined)\b)   (?{ state $x = bless({}, 'Sidef::Object::Unary') })
                 | :                                         (?{ state $x = Sidef::Types::Hash::Hash->new })
               )
             }x,

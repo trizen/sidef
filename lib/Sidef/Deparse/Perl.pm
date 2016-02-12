@@ -1456,6 +1456,14 @@ HEADER
                               . ') ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE))';
                             next;
                         }
+
+                        if ($method eq 'defined') {
+                            $code =
+                                '((CORE::defined'
+                              . $self->deparse_args(@{$call->{arg}})
+                              . ') ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE))';
+                            next;
+                        }
                     }
 
                     if (ref($method)) {
