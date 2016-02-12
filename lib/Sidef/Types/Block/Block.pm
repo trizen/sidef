@@ -294,6 +294,10 @@ package Sidef::Types::Block::Block {
         open(my $fh, '+>', undef);    # an anonymous temporary file
         my $fork = Sidef::Types::Block::Fork->new(fh => $fh);
 
+        # Prevent the destruction of Math::GMPq objects
+        local *Math::GMPq::DESTROY;
+
+        # Try to fork
         my $pid = fork() // die "[ERROR]: Cannot fork";
         if ($pid == 0) {
             srand();

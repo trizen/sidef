@@ -18,7 +18,7 @@ package Sidef::Types::Block::Fork {
 
         state $x = require Storable;
         seek($self->{fh}, 0, 0);    # rewind at the beginning
-        scalar eval { Storable::fd_retrieve($self->{fh}) };
+        Storable::fd_retrieve($self->{fh});
     }
 
     *wait = \&get;
