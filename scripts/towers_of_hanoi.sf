@@ -1,0 +1,37 @@
+#!/usr/bin/ruby
+
+var n = 3
+var tije = 3.of { [] }
+n.times { |i| tije[0] << (n - i + 1) }
+
+func display() {
+    n.range.reverse.each { |i|
+        tije.range.each { |j|
+            var k = tije[j][i]\\0
+            var disc = '='*k
+            var space = ' '*(n-k)
+            print (space + disc + '|' + disc + space)
+        }
+        print "\n"
+    }
+    print "\n"
+}
+
+func move(a, b) {
+    tije[b].push(tije[a].pop)
+}
+
+func hanoi(n, a=0, b=1, c=2) {
+    if (n == 1) {
+        move(a, b)
+        display()
+    }
+    else {
+        hanoi(n-1, a, c, b)
+        hanoi(  1, a, b, c)
+        hanoi(n-1, c, b, a)
+    }
+}
+
+display()
+hanoi(n)

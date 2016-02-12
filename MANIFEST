@@ -781,6 +781,7 @@ scripts/Tests/while_loop.sf
 scripts/Tests/wireworld.sf
 scripts/Tests/word_processing.sf
 scripts/Tests/word_roots.sf
+scripts/towers_of_hanoi.sf
 scripts/tree_traversal.sf
 scripts/unique_prefixes.sf
 scripts/variadic_function.sf
