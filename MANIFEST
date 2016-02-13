@@ -380,6 +380,8 @@ scripts/RosettaCode/levenshtein_distance.sf
 scripts/RosettaCode/levenshtein_distance_1.sf
 scripts/RosettaCode/levenshtein_distance_2.sf
 scripts/RosettaCode/levenshtein_distance_alignment.sf
+scripts/RosettaCode/lis_dynamic_programming.sf
+scripts/RosettaCode/lis_patience_sorting.sf
 scripts/RosettaCode/list_rooted_trees.sf
 scripts/RosettaCode/literals_floating_point.sf
 scripts/RosettaCode/literals_integer.sf

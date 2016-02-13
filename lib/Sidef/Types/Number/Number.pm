@@ -484,13 +484,15 @@ package Sidef::Types::Number::Number {
         my ($x, $y) = @_;
         _valid($y);
 
-        if (!Math::GMPq::Rmpq_sgn($$y)) {
-            my $sign = Math::GMPq::Rmpq_sgn($$x);
+        my $r = _big2mpz($x);
+        $y = _big2mpz($y);
+
+        if (!Math::GMPz::Rmpz_sgn($y)) {
+            my $sign = Math::GMPz::Rmpz_sgn($r);
             return (!$sign ? nan() : $sign > 0 ? inf() : ninf());
         }
 
-        my $r = _big2mpz($x);
-        Math::GMPz::Rmpz_div($r, $r, _big2mpz($y));
+        Math::GMPz::Rmpz_div($r, $r, $y);
         _mpz2big($r);
     }
 
