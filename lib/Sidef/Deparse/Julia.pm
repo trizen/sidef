@@ -64,57 +64,43 @@ package Sidef::Deparse::Julia {
             %args,
                    );
 
-        $opts{header} .= <<"HEADER";
+        $opts{header} .= <<'HEADER';
 
-import Base.-;
-import Base.+;
-import Base.*;
-import Base./;
-import Base.<=;
-import Base.==;
-import Base.print;
-import Base.println;
+import Base.-,
+       Base.+,
+       Base.*,
+       Base./,
+       Base.//,
+       Base.^,
+       Base.$,
+       Base.&,
+       Base.|,
+       Base.<=,
+       Base.>=,
+       Base.<,
+       Base.>,
+       Base.==,
+       Base.!=,
+       Base.sqrt,
+       Base.print,
+       Base.println;
 
 abstract Sidef_Object
 
-type Sidef_Types_Bool_Bool <: Sidef_Object
-    value::Bool;
-
-    function Sidef_Types_Bool_Bool(b::Bool)
-        this = new();
-        this.value = b;
-        return this;
-    end
+immutable Sidef_Types_Bool_Bool <: Sidef_Object
+    value::Bool
 end
 
-type Sidef_Types_String_String <: Sidef_Object
-    value::AbstractString;
-
-    function Sidef_Types_String_String(s::AbstractString)
-        this = new();
-        this.value = s;
-        return this;
-    end
+immutable Sidef_Types_String_String <: Sidef_Object
+    value::AbstractString
 end
 
-type Sidef_Types_Number_Number <: Sidef_Object
-    value::Number;
-
-    function Sidef_Types_Number_Number(s::Number)
-        this = new();
-        this.value = s;
-        return this;
-    end
+immutable Sidef_Types_Number_Number <: Sidef_Object
+    value::Number
 end
 
-type Sidef_Types_Block_Block <: Sidef_Object
-    value::Function;
-
-    function Sidef_Types_Block_Block(s::Function)
-        this = new();
-        this.value = s;
-        return this;
-    end
+immutable Sidef_Types_Block_Block <: Sidef_Object
+    value::Function
 end
 
 const TRUE = Sidef_Types_Bool_Bool(true)
@@ -137,34 +123,34 @@ end
 ## String methods
 #
 function +(a::Sidef_Types_String_String, b::Sidef_Types_String_String)
-    Sidef_Types_String_String(a.value * b.value);
+    Sidef_Types_String_String(a.value * b.value)
 end
 
 #
 ## Number methods
 #
-function +(a::Sidef_Types_Number_Number, b::Sidef_Types_Number_Number)
-    Sidef_Types_Number_Number(a.value + b.value);
+for sym in Symbol[:+, :-, :*, :/, ://, :|, :&, :^, :$]
+    @eval function $sym(a::Sidef_Types_Number_Number, b::Sidef_Types_Number_Number)
+        Sidef_Types_Number_Number($sym(a.value, b.value))
+    end
 end
 
-function -(a::Sidef_Types_Number_Number, b::Sidef_Types_Number_Number)
-    Sidef_Types_Number_Number(a.value - b.value);
-end
-
-function *(a::Sidef_Types_Number_Number, b::Sidef_Types_Number_Number)
-    Sidef_Types_Number_Number(a.value * b.value);
-end
-
-function /(a::Sidef_Types_Number_Number, b::Sidef_Types_Number_Number)
-    Sidef_Types_Number_Number(a.value / b.value);
-end
-
-function <=(a::Sidef_Types_Number_Number, b::Sidef_Types_Number_Number)
-    a.value <= b.value ? TRUE : FALSE
+for sym in Symbol[:<=, :>=, :<, :>]
+    @eval function $sym(a::Sidef_Types_Number_Number, b::Sidef_Types_Number_Number)
+        $sym(a.value, b.value) ? TRUE : FALSE
+    end
 end
 
 function ==(a::Sidef_Types_Number_Number, b::Sidef_Types_Number_Number)
-    a.value == b.value ? TRUE : FALSE
+    (a.value == b.value) ? TRUE : FALSE
+end
+
+function !=(a::Sidef_Types_Number_Number, b::Sidef_Types_Number_Number)
+    (a.value == b.value) ? FALSE : TRUE
+end
+
+function sqrt(a::Sidef_Types_Number_Number)
+    Sidef_Types_Number_Number(sqrt(a.value))
 end
 
 #
@@ -360,12 +346,17 @@ HEADER
         }
 
         push @{$self->{block_declarations}},
-          [$self->{current_block} // -1, 'my(' . join(', ', map { $self->_dump_var($_) } @vars) . ')' . ';'];
+          [ $self->{current_block} // -1,
+            '(' . join(', ', map { $self->_dump_var($_) } @vars) . ') = (' . join(',', ('Any') x @vars) . ')'
+          ];
 
         # Return the lvalue variables on assignments
         if (@code > 1 or exists($init_obj->{args})) {
-            push @code, '(' . join(', ', map { $self->_dump_var($_) } @vars) . ')';
-            return 'CORE::sub : lvalue {' . join(';', @code) . '}->()';
+
+            #push @code, '(' . join(', ', map { $self->_dump_var($_) } @vars) . ')';
+            return join(';', @code);
+
+            #return 'CORE::sub : lvalue {' . join(';', @code) . '}->()';
         }
 
         # Return one var as a list
@@ -928,9 +919,11 @@ HEADER
                         $code .=
                             (" " x ($Sidef::SPACES - $Sidef::SPACES_INCR))
                           . "function("
-                          . ((exists($obj->{init_vars}) and @{$obj->{init_vars}{vars}})
+                          . (
+                             (exists($obj->{init_vars}) and @{$obj->{init_vars}{vars}})
                              ? $self->_dump_func_params(@{$obj->{init_vars}{vars}})
-                             : '')
+                             : ''
+                            )
                           . ") \n";
 
                         if (exists($obj->{init_vars}) and @{$obj->{init_vars}{vars}}) {
@@ -1053,7 +1046,8 @@ HEADER
             }
         }
         elsif ($ref eq 'Sidef::Types::Number::Number') {
-            $code = $self->make_constant($ref, 'new', "Number$refaddr", $obj->_get_frac);
+            $code =
+              $self->make_constant($ref, 'new', "Number$refaddr", join '//', map { qq{big"$_"} } split /\//, $obj->_get_frac);
         }
         elsif ($ref eq 'Sidef::Types::Number::Inf') {
             $code = $self->make_constant($ref, 'new', "Inf$refaddr");
@@ -1633,7 +1627,17 @@ HEADER
                         # Operator-like method call
                         else {
                             #$code .= $method; #'->${\\' . q{'} . $method . q{'} . '}';
-                            $code .= ',';
+
+                            if ($method eq '^') {
+                                $method = '$';
+                                $code .= $method;
+                            }
+                            else {
+                                $code .= ',';
+                                if ($method eq '**') {
+                                    $method = '^';
+                                }
+                            }
                         }
                     }
                 }
@@ -1651,7 +1655,9 @@ HEADER
                     }
                 }
 
-                $code = "$method($code)" if $method ne '';
+                if ($method ne '$' and $method ne '') {
+                    $code = "$method($code)";
+                }
 
                 if (exists $call->{block}) {
 
