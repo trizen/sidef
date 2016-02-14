@@ -102,7 +102,7 @@ end
 #
 structure = Dict{Symbol, Any}(
     :main => [
-        Dict{Any, Any}(
+        Dict{Symbol, Any}(
             :call => [Dict{Symbol, Any}(:method => "print")],
             :self => Dict{Symbol, Any}(
                 :main => [
@@ -113,7 +113,7 @@ structure = Dict{Symbol, Any}(
                 ],
             )
         ),
-        Dict{Any, Any}(
+        Dict{Symbol, Any}(
             :call => [Dict{Symbol, Any}(:method => "say")],
             :self => SString(" world!");
         ),

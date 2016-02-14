@@ -81,9 +81,12 @@ import Base.-,
        Base.>,
        Base.==,
        Base.!=,
+       Base.!,
        Base.sqrt,
        Base.print,
-       Base.println;
+       Base.println,
+       Base.setindex!,
+       Base.getindex;
 
 abstract Sidef_Object
 
@@ -101,6 +104,10 @@ end
 
 immutable Sidef_Types_Block_Block <: Sidef_Object
     value::Function
+end
+
+immutable Sidef_Types_Array_Array <: Sidef_Object
+    value::Array{Any}
 end
 
 const TRUE = Sidef_Types_Bool_Bool(true)
@@ -151,6 +158,35 @@ end
 
 function sqrt(a::Sidef_Types_Number_Number)
     Sidef_Types_Number_Number(sqrt(a.value))
+end
+
+for p in Dict{Symbol, Symbol}(
+    :+ => :add,
+    :- => :sub,
+    :* => :mul,
+    :/ => :div,
+    :^ => :pow,
+)
+    @eval function $(p.second)(a::Sidef_Types_Number_Number...)
+        Sidef_Types_Number_Number(mapreduce((x) -> x.value, $(p.first), a))
+    end
+end
+
+function !(a::Sidef_Types_Number_Number)
+    Sidef_Types_Number_Number(factorial(a.value))
+end
+
+#
+## Array methods
+#
+
+function getindex(a::Sidef_Types_Array_Array, i::Sidef_Types_Number_Number)
+    (a.value)[i.value]
+end
+
+function setindex!(a::Sidef_Types_Array_Array, v::Any, i::Sidef_Types_Number_Number)
+    #setindex!(a.value, v, i.value)
+    (a.value)[i.value] = v
 end
 
 #
@@ -461,7 +497,8 @@ HEADER
 
     sub _dump_array {
         my ($self, $ref, $array) = @_;
-        $ref . '->new(' . join(', ', map { $self->deparse_expr(ref($_) eq 'HASH' ? $_ : {self => $_}) } @{$array}) . ')';
+        _normalize_type($ref) . '(Any['
+          . join(', ', map { $self->deparse_expr(ref($_) eq 'HASH' ? $_ : {self => $_}) } @{$array}) . '])';
     }
 
     sub _dump_indices {
@@ -1087,7 +1124,7 @@ HEADER
             $code = $ref . '->new(' . $self->_dump_string($obj->[0]) . ', ' . $self->deparse_args(@{$obj->[1]}) . ')';
         }
         elsif ($ref eq 'Sidef::Types::Nil::Nil') {
-            $code = 'undef';
+            $code = 'Any';
         }
         elsif ($ref eq 'Sidef::Types::Hash::Hash') {
             if (keys(%{$obj})) {
@@ -1356,7 +1393,7 @@ HEADER
                         $code .= $self->_dump_unpacked_indices($pos);
                     }
                     else {
-                        $code = '@{' . $code . '}' . $self->_dump_indices($pos);
+                        $code = $code . $self->_dump_indices($pos);
                     }
                 }
                 else {
@@ -1465,16 +1502,22 @@ HEADER
 
                     # Variable assignment (=)
                     if (exists($self->{assignment_ops}{$method})) {
-                        $code = "($code$self->{assignment_ops}{$method}" . $self->deparse_args(@{$call->{arg}}) . ")[-1]";
+                        $code = "($code$self->{assignment_ops}{$method}" . $self->deparse_args(@{$call->{arg}}) . ")";
                         next;
                     }
 
                     # Reassignment operators, such as: +=, -=, *=, /=, etc...
                     if (exists $self->{reassign_ops}{$method}) {
 
-                        $code =
-                          "CORE::sub : lvalue {my \$ref=\\$code; \$\$ref=\$\$ref\->\${\\'$self->{reassign_ops}{$method}'}"
-                          . $self->deparse_args(@{$call->{arg}}) . "}->()";
+                        ## OLD CODE
+                        #$code =
+                        #"CORE::sub : lvalue {my \$ref=\\$code; \$\$ref=\$\$ref\->\${\\'$self->{reassign_ops}{$method}'}"
+                        #. $self->deparse_args(@{$call->{arg}}) . "}->()";
+
+                        $method =~ s/^\^/\$/;
+                        $method =~ s/^\*\*/^/;
+
+                        $code = "$code $method " . $self->deparse_args(@{$call->{arg}});
 
                         #$code =
                         #    "do {my \$ref="
@@ -1568,17 +1611,12 @@ HEADER
 
                         if ($method eq 'print' or $method eq '>>') {
                             $code =
-                                '((CORE::print'
-                              . $self->deparse_args(@{$call->{arg}})
-                              . ') ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE))';
+                              'print' . $self->deparse_args(@{$call->{arg}});
                             next;
                         }
 
                         if ($method eq 'defined') {
-                            $code =
-                                '((CORE::defined'
-                              . $self->deparse_args(@{$call->{arg}})
-                              . ') ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE))';
+                            $code = '(' . $self->deparse_args(@{$call->{arg}}) . ' == Any ? FALSE : TRUE)';
                             next;
                         }
                     }
@@ -1651,7 +1689,7 @@ HEADER
                         $code .= $self->deparse_generic('(', ';', ')', @{$call->{arg}});
                     }
                     else {
-                        $code .= $self->deparse_args(@{$call->{arg}});
+                        $code .= $self->deparse_generic('', ',', '', @{$call->{arg}});   #$self->deparse_args(@{$call->{arg}});
                     }
                 }
 
