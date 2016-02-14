@@ -20,6 +20,8 @@ provides:
     version: '2.22'
   Sidef::Convert::Convert:
     file: lib/Sidef/Convert/Convert.pm
+  Sidef::Deparse::Julia:
+    file: lib/Sidef/Deparse/Julia.pm
   Sidef::Deparse::Perl:
     file: lib/Sidef/Deparse/Perl.pm
   Sidef::Deparse::Sidef:

@@ -61,6 +61,9 @@
       "Sidef::Convert::Convert" : {
          "file" : "lib/Sidef/Convert/Convert.pm"
       },
+      "Sidef::Deparse::Julia" : {
+         "file" : "lib/Sidef/Deparse/Julia.pm"
+      },
       "Sidef::Deparse::Perl" : {
          "file" : "lib/Sidef/Deparse/Perl.pm"
       },
