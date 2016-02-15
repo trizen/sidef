@@ -110,6 +110,10 @@ immutable Sidef_Types_Array_Array <: Sidef_Object
     value::Array{Any}
 end
 
+immutable Sidef_Types_Hash_Hash <: Sidef_Object
+    value::Dict{Any,Any}
+end
+
 const TRUE = Sidef_Types_Bool_Bool(true)
 const FALSE = Sidef_Types_Bool_Bool(false)
 
@@ -180,13 +184,38 @@ end
 ## Array methods
 #
 
+# TODO: Change "Sidef_Types_Array_Array" to "Type{Sidef_Types_Array_Array}"
+function call(h::Sidef_Types_Array_Array, v::Any...)
+    Sidef_Types_Array_Array(Any[v...])
+end
+
 function getindex(a::Sidef_Types_Array_Array, i::Sidef_Types_Number_Number)
-    (a.value)[i.value]
+    (a.value)[i.value+1]
 end
 
 function setindex!(a::Sidef_Types_Array_Array, v::Any, i::Sidef_Types_Number_Number)
     #setindex!(a.value, v, i.value)
-    (a.value)[i.value] = v
+    (a.value)[i.value+1] = v
+end
+
+#
+## Hash methods
+#
+
+function call(h::Type{Sidef_Types_Hash_Hash}, s::Any...)
+    d = Dict{Any,Any}()
+    for i in 1:2:length(s)
+        d[s[i]] = s[i+1]
+    end
+    Sidef_Types_Hash_Hash(d)
+end
+
+function getindex(h::Sidef_Types_Hash_Hash, k::Any)
+    (h.value)[k]
+end
+
+function setindex!(h::Sidef_Types_Hash_Hash, v::Any, k::Any)
+    (h.value)[k] = v
 end
 
 #
@@ -246,7 +275,8 @@ HEADER
                  $name . @args,
                  do {
                      local $" = ", ";
-                     $self->{before} .= "const $name" . @args . " = " . _normalize_type($ref) . "(@args);\n";
+                     $self->{before} .=
+                       "const $name" . @args . " = " . _normalize_type($ref) . (@args ? "(@args);" : '') . "\n";
                    }
              ]
             )->[0]
@@ -533,7 +563,7 @@ HEADER
 
     sub _dump_lookups {
         my ($self, $array) = @_;
-        '{' . join(
+        '[' . join(
             ', ',
             map {
                 (ref($_) eq 'Sidef::Types::String::String' or ref($_) eq 'Sidef::Types::Number::Number')
@@ -542,7 +572,7 @@ HEADER
                   : $_
               } @{$array}
           )
-          . '}';
+          . ']';
     }
 
     sub _dump_unpacked_lookups {
@@ -1404,7 +1434,7 @@ HEADER
                         $code .= $self->_dump_unpacked_lookups($key);
                     }
                     else {
-                        $code = '@{' . $code . '}' . $self->_dump_lookups($key);
+                        $code = $code . $self->_dump_lookups($key);
                     }
                 }
 
