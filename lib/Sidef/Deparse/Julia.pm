@@ -89,6 +89,9 @@ import Base.-,
        Base.getindex;
 
 abstract Sidef_Object
+abstract Sidef_Types_Nil_Nil
+abstract Sidef_Types_Bool_True
+abstract Sidef_Types_Bool_False
 
 immutable Sidef_Types_Bool_Bool <: Sidef_Object
     value::Bool
@@ -114,8 +117,9 @@ immutable Sidef_Types_Hash_Hash <: Sidef_Object
     value::Dict{Any,Any}
 end
 
-const TRUE = Sidef_Types_Bool_Bool(true)
-const FALSE = Sidef_Types_Bool_Bool(false)
+const NIL = Sidef_Types_Nil_Nil
+const TRUE = Sidef_Types_Bool_True
+const FALSE = Sidef_Types_Bool_False
 
 #
 ## Object methods
@@ -135,6 +139,10 @@ end
 #
 function +(a::Sidef_Types_String_String, b::Sidef_Types_String_String)
     Sidef_Types_String_String(a.value * b.value)
+end
+
+function *(a::Sidef_Types_String_String, b::Sidef_Types_Number_Number)
+    Sidef_Types_String_String(repeat(a.value, Int(b.value)))
 end
 
 #
@@ -221,8 +229,14 @@ end
 #
 ## Block methods
 #
-function call(a::Sidef_Types_Block_Block, args...)
-    (a.value)(args...)
+function call(b::Sidef_Types_Block_Block, args...)
+    (b.value)(args...)
+end
+
+function *(b::Sidef_Types_Block_Block, n::Sidef_Types_Number_Number)
+    for i = 1:Int(n.value)
+        (b.value)(Sidef_Types_Number_Number(i))
+    end
 end
 
 HEADER
@@ -468,7 +482,7 @@ HEADER
     }
 
     sub _dump_sub_init_vars {
-        my ($self, @vars) = @_;
+        my ($self, $refaddr, @vars) = @_;
 
         @vars || return '';
 
@@ -479,14 +493,19 @@ HEADER
             return '';
         }
 
-        #my $code = (' ' x $Sidef::SPACES) . "my (" . join(', ', @dumped_vars) . ') = @_;' . "\n";
-        #my $code = join(', ', @dumped_vars);
-
         my $code = '';
+
+        $code .= "_anys$refaddr = Any[]\n";
+        $code .= "for i in 1:(" . @dumped_vars . " - length(_$refaddr)) push!(_anys$refaddr, NIL); end\n";
+        $code .= "_$refaddr = (_$refaddr..., _anys$refaddr...)\n";
+        $code .= (' ' x $Sidef::SPACES) . join(', ', @dumped_vars) . ", = _$refaddr\n";
+
+        #my $code = join(', ', @dumped_vars);
+        #my $code = '';
 
         foreach my $var (@vars) {
 
-            $code .= (' ' x $Sidef::SPACES) . $self->_dump_var($var) . ' = ' . $self->_dump_var($var, '') . "\n";
+            #$code .= (' ' x $Sidef::SPACES) . $self->_dump_var($var) . ' = ' . $self->_dump_var($var, '') . "\n";
 
             ref($var) || next;
             if (exists $var->{array}) {
@@ -516,7 +535,10 @@ HEADER
                 if (exists $var->{value}) {
                     my $value = $self->deparse_expr({self => $var->{value}});
                     if ($value ne '') {
-                        $code .= (' ' x $Sidef::SPACES) . "\$$var->{name}" . refaddr($var) . " //= " . $value . ";\n";
+                        my $name = $var->{name} . refaddr($var);
+                        $code .= (' ' x $Sidef::SPACES) . "($name == NIL) && ($name = $value);\n";
+
+                        #$code .= (' ' x $Sidef::SPACES) . "\$$var->{name}" . refaddr($var) . " //= " . $value . ";\n";
                     }
                 }
             }
@@ -983,18 +1005,17 @@ HEADER
 
                     if (not $is_class) {
 
-                        $code .=
-                            (" " x ($Sidef::SPACES - $Sidef::SPACES_INCR))
-                          . "function("
-                          . (
-                             (exists($obj->{init_vars}) and @{$obj->{init_vars}{vars}})
-                             ? $self->_dump_func_params(@{$obj->{init_vars}{vars}})
-                             : ''
-                            )
-                          . ") \n";
+                        $code .= (" " x ($Sidef::SPACES - $Sidef::SPACES_INCR)) . "function(" .    #(
+                                # (exists($obj->{init_vars}) and @{$obj->{init_vars}{vars}})
+                                # ? $self->_dump_func_params(@{$obj->{init_vars}{vars}})
+                                # : ''
+                                #)
+                          '_' . $refaddr . '::Any...' . ") \n";
+
+                        #$code .= $self->_dump_func_params($obj->{init_vars}{vars}, $refaddr);
 
                         if (exists($obj->{init_vars}) and @{$obj->{init_vars}{vars}}) {
-                            $code .= $self->_dump_sub_init_vars(@{$obj->{init_vars}{vars}});
+                            $code .= $self->_dump_sub_init_vars($refaddr, @{$obj->{init_vars}{vars}});
                         }
 
                         if ($is_function) {
