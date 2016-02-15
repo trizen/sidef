@@ -82,6 +82,7 @@ import Base.-,
        Base.==,
        Base.!=,
        Base.!,
+       Base.abs,
        Base.sqrt,
        Base.print,
        Base.println,
@@ -90,8 +91,7 @@ import Base.-,
 
 abstract Sidef_Object
 abstract Sidef_Types_Nil_Nil
-abstract Sidef_Types_Bool_True
-abstract Sidef_Types_Bool_False
+abstract Sidef_Types_Number_Complex
 
 immutable Sidef_Types_Bool_Bool <: Sidef_Object
     value::Bool
@@ -117,9 +117,13 @@ immutable Sidef_Types_Hash_Hash <: Sidef_Object
     value::Dict{Any,Any}
 end
 
+immutable Sidef_Types_Range_RangeNumber <: Sidef_Object
+    value::Range
+end
+
 const NIL = Sidef_Types_Nil_Nil
-const TRUE = Sidef_Types_Bool_True
-const FALSE = Sidef_Types_Bool_False
+const TRUE = Sidef_Types_Bool_Bool(true)
+const FALSE = Sidef_Types_Bool_Bool(false)
 
 #
 ## Object methods
@@ -172,6 +176,10 @@ function sqrt(a::Sidef_Types_Number_Number)
     Sidef_Types_Number_Number(sqrt(a.value))
 end
 
+function abs(a::Sidef_Types_Number_Number)
+    Sidef_Types_Number_Number(abs(a.value))
+end
+
 for p in Dict{Symbol, Symbol}(
     :+ => :add,
     :- => :sub,
@@ -186,6 +194,13 @@ end
 
 function !(a::Sidef_Types_Number_Number)
     Sidef_Types_Number_Number(factorial(a.value))
+end
+
+#
+## Complex methods
+#
+function call(self::Type{Sidef_Types_Number_Complex}, a::Sidef_Types_Number_Number, b::Sidef_Types_Number_Number)
+    Sidef_Types_Number_Number(Complex(a.value, b.value))
 end
 
 #
@@ -236,6 +251,20 @@ end
 function *(b::Sidef_Types_Block_Block, n::Sidef_Types_Number_Number)
     for i = 1:Int(n.value)
         (b.value)(Sidef_Types_Number_Number(i))
+    end
+end
+
+#
+## Range methods
+#
+function call(r::Type{Sidef_Types_Range_RangeNumber}, from::Sidef_Types_Number_Number, to::Sidef_Types_Number_Number, step::Sidef_Types_Number_Number=Sidef_Types_Number_Number(1))
+    Sidef_Types_Range_RangeNumber(from.value:step.value:to.value)
+end
+
+function each(r::Sidef_Types_Range_RangeNumber, b::Sidef_Types_Block_Block)
+    code = b.value
+    for i in r.value
+        (code)(Sidef_Types_Number_Number(i))
     end
 end
 
@@ -1135,7 +1164,7 @@ HEADER
         }
         elsif ($ref eq 'Sidef::Types::Number::Number') {
             $code =
-              $self->make_constant($ref, 'new', "Number$refaddr", join '//', map { qq{big"$_"} } split /\//, $obj->_get_frac);
+              $self->make_constant($ref, 'new', "Number$refaddr", join '/', map { qq{big"$_"} } split /\//, $obj->_get_frac);
         }
         elsif ($ref eq 'Sidef::Types::Number::Inf') {
             $code = $self->make_constant($ref, 'new', "Inf$refaddr");
@@ -1153,7 +1182,9 @@ HEADER
             $code = $self->_dump_array('Sidef::Types::Array::Array', $obj);
         }
         elsif ($ref eq 'Sidef::Types::Bool::Bool') {
-            $code = $self->make_constant($ref, 'new', ${$obj} ? ("true$refaddr", 1) : ("false$refaddr", 0));
+
+            #$code = $self->make_constant($ref, 'new', ${$obj} ? ("true$refaddr", 1) : ("false$refaddr", 0));
+            $code = ${$obj} ? 'TRUE' : 'FALSE';
         }
         elsif ($ref eq 'Sidef::Types::Regex::Regex') {
             $code =
@@ -1167,7 +1198,7 @@ HEADER
         elsif ($ref eq 'Sidef::Types::Bool::Ternary') {
             $code = '('
               . $self->deparse_script($obj->{cond})
-              . ' == TRUE ?'
+              . '.value ?'
               . $self->deparse_block_expr($obj->{true}) . ':'
               . $self->deparse_block_expr($obj->{false}) . ')';
         }
@@ -1321,9 +1352,12 @@ HEADER
         elsif ($ref eq 'Sidef::Types::Number::Complex') {
 
             #$code = $self->make_constant($ref, 'new', "Complex$refaddr", "'" . ${$obj}->Re . "'", "'" . ${$obj}->Im . "'");
-            $code = $self->make_constant($ref, 'new', "Complex$refaddr",
-                                         "'" . $obj->re->get_value . "'",
-                                         "'" . $obj->im->get_value . "'");
+            $code = $self->make_constant(
+                $ref, 'new', "Complex$refaddr",
+
+                #"'" . $obj->re->get_value . "'",
+                #"'" . $obj->im->get_value . "'"
+                                        );
         }
         elsif ($ref eq 'Sidef::Types::Array::Pair') {
             if (all { not defined($_) } @{$obj}) {
@@ -1346,7 +1380,7 @@ HEADER
             $code = $self->make_constant($ref, '__NEW__', "MOD_F$refaddr", $self->_dump_string($obj->{module}));
         }
         elsif ($ref eq 'Sidef::Types::Range::RangeNumber' or $ref eq 'Sidef::Types::Range::RangeString') {
-            $code = $ref . '->new';
+            $code = _normalize_type($ref);
         }
         elsif ($ref eq 'Sidef::Types::Glob::Backtick') {
             $code = $self->make_constant($ref, 'new', "Backtick$refaddr", $self->_dump_string(${$obj}));
@@ -1488,11 +1522,15 @@ HEADER
                 if ($ref eq 'Sidef::Types::Block::Return') {
 
                     if (exists $self->{function}) {
-                        $code .= 'do {';
-                        if (@{$call->{arg}}) {
-                            $code .= '@return = ' . $self->deparse_args(@{$call->{arg}}) . ';';
-                        }
-                        $code .= 'goto ' . "END$self->{function}}";
+
+                        #$code .= 'do {';
+                        #if (@{$call->{arg}}) {
+                        #    $code .= '@return = ' . $self->deparse_args(@{$call->{arg}}) . ';';
+                        #}
+                        #$code .= 'goto ' . "END$self->{function}}";
+
+                        ## TODO: add support to return from inner blocks
+                        $code .= 'return ' . $self->deparse_args(@{$call->{arg}});
                     }
                     else {
                         $code .= 'return Sidef::Types::Block::Return->new' . $self->deparse_args(@{$call->{arg}});
@@ -1547,7 +1585,7 @@ HEADER
                     }
 
                     if (exists($self->{lazy_ops}{$method})) {
-                        $code .= $self->{lazy_ops}{$method} . $self->deparse_block_expr(@{$call->{arg}});
+                        $code .= '.value ' . $self->{lazy_ops}{$method} . $self->deparse_block_expr(@{$call->{arg}});
                         next;
                     }
 
