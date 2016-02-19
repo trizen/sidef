@@ -83,6 +83,7 @@ import Base.-,
        Base.!=,
        Base.!,
        Base.abs,
+       Base.min,
        Base.sqrt,
        Base.print,
        Base.println,
@@ -149,6 +150,10 @@ function *(a::Sidef_Types_String_String, b::Sidef_Types_Number_Number)
     Sidef_Types_String_String(repeat(a.value, Int(b.value)))
 end
 
+function ==(a::Sidef_Types_String_String, b::Sidef_Types_String_String)
+    (a.value == b.value) ? TRUE : FALSE
+end
+
 #
 ## Number methods
 #
@@ -178,6 +183,10 @@ end
 
 function abs(a::Sidef_Types_Number_Number)
     Sidef_Types_Number_Number(abs(a.value))
+end
+
+function min(a::Sidef_Types_Number_Number...)
+    Sidef_Types_Number_Number(min(map((x) -> x.value, a)...))
 end
 
 for p in Dict{Symbol, Symbol}(
@@ -219,6 +228,22 @@ end
 function setindex!(a::Sidef_Types_Array_Array, v::Any, i::Sidef_Types_Number_Number)
     #setindex!(a.value, v, i.value)
     (a.value)[i.value+1] = v
+end
+
+function is_empty(a::Sidef_Types_Array_Array)
+    length(a.value) == 0 ? TRUE : FALSE
+end
+
+function len(a::Sidef_Types_Array_Array)
+    Sidef_Types_Number_Number(length(a.value))
+end
+
+function ft(a::Sidef_Types_Array_Array, from::Sidef_Types_Number_Number, to::Sidef_Types_Number_Number)
+    Sidef_Types_Array_Array((a.value)[from.value+1:to.value+1])
+end
+
+function ft(a::Sidef_Types_Array_Array, from::Sidef_Types_Number_Number)
+    Sidef_Types_Array_Array((a.value)[from.value+1:length(a.value)])
 end
 
 #
