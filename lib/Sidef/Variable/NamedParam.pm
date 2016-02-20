@@ -1,6 +1,6 @@
 package Sidef::Variable::NamedParam {
 
-    #use overload q{""} => \&dump;
+    use overload q{""} => \&dump;
 
     sub new {
         my (undef, $name, @args) = @_;

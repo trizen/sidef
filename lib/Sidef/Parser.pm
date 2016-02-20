@@ -114,7 +114,7 @@ package Sidef::Parser {
                      | \$\(                           (?{ state $x = bless({name => '$('}, 'Sidef::Variable::Magic') })
                      | \$<                            (?{ state $x = bless({name => '$<'}, 'Sidef::Variable::Magic') })
                      | \$>                            (?{ state $x = bless({name => '$>'}, 'Sidef::Variable::Magic') })
-                     | ∞                              (?{ state $x = Sidef::Types::Number::Number->new->inf })
+                     | ∞                              (?{ state $x = Sidef::Types::Number::Inf->new })
                 ) (?!::)
             }x,
             prefix_obj_re => qr{\G
@@ -130,7 +130,7 @@ package Sidef::Parser {
                 | goto\b                                    (?{ state $x = bless({}, 'Sidef::Perl::Builtin') })
                 | (?:[*\\&]|\+\+|--)                        (?{ state $x = bless({}, 'Sidef::Variable::Ref') })
                 | (?:>>?|[√+~!-]|(?:say|print|defined)\b)   (?{ state $x = bless({}, 'Sidef::Object::Unary') })
-                | :                                         (?{ state $x = Sidef::Types::Hash::Hash->new })
+                | :                                         (?{ state $x = bless({}, 'Sidef::DataTypes::Hash::Hash') })
               )
             }x,
             quote_operators_re => qr{\G
