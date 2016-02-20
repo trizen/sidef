@@ -5,7 +5,7 @@
 #
 
 func happy(n) is cached {
-    static seen = Hash;
+    static seen = Hash();
 
     return true  if n.is_one;
     return false if seen.has_key(n);

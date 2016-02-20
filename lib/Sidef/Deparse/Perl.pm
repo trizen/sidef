@@ -49,6 +49,32 @@ package Sidef::Deparse::Perl {
             #~ to_num  => q{0+},
             #~ },
 
+            data_types => {
+                qw(
+                  Sidef::DataTypes::Array::Array          Sidef::Types::Array::Array
+                  Sidef::DataTypes::Array::Pair           Sidef::Types::Array::Pair
+                  Sidef::DataTypes::Array::MultiArray     Sidef::Types::Array::MultiArray
+                  Sidef::DataTypes::Hash::Hash            Sidef::Types::Hash::Hash
+                  Sidef::DataTypes::Regex::Regex          Sidef::Types::Regex::Regex
+                  Sidef::DataTypes::String::String        Sidef::Types::String::String
+                  Sidef::DataTypes::Number::Number        Sidef::Types::Number::Number
+                  Sidef::DataTypes::Number::Complex       Sidef::Types::Number::Complex
+                  Sidef::DataTypes::Range::RangeNumber    Sidef::Types::Range::RangeNumber
+                  Sidef::DataTypes::Range::RangeString    Sidef::Types::Range::RangeString
+                  Sidef::DataTypes::Block::Block          Sidef::Types::Block::Block
+                  Sidef::DataTypes::Glob::Socket          Sidef::Types::Glob::Socket
+                  Sidef::DataTypes::Glob::Pipe            Sidef::Types::Glob::Pipe
+                  Sidef::DataTypes::Glob::Backtick        Sidef::Types::Glob::Backtick
+                  Sidef::DataTypes::Glob::DirHandle       Sidef::Types::Glob::DirHandle
+                  Sidef::DataTypes::Glob::FileHandle      Sidef::Types::Glob::FileHandle
+                  Sidef::DataTypes::Glob::Dir             Sidef::Types::Glob::Dir
+                  Sidef::DataTypes::Glob::File            Sidef::Types::Glob::File
+                  Sidef::DataTypes::Object::Object        Sidef::Object::Object
+                  Sidef::DataTypes::Sidef::Sidef          Sidef
+                  Sidef::DataTypes::Variable::LazyMethod  Sidef::Variable::LazyMethod
+                  )
+            },
+
             special_constructs => {
                                    'Sidef::Types::Block::If'    => 1,
                                    'Sidef::Types::Block::While' => 1,
@@ -140,6 +166,19 @@ HEADER
         my ($self, $obj) = @_;
 
         my $ref = ref($obj);
+
+        if (exists $self->{data_types}{$ref}) {
+            my $target = $self->{data_types}{$ref};
+
+            state $cache = {};
+            $cache->{$ref} //= do {
+                $self->{header} .= "defined(&$target\::new) || require $target;\n";
+                1;
+            };
+
+            return $target;
+        }
+
             $ref eq 'Sidef::Variable::ClassInit'     ? $self->_dump_class_name($obj)
           : $ref eq 'Sidef::Variable::Ref'           ? 'REF'
           : $ref eq 'Sidef::Types::Block::BlockInit' ? 'Sidef::Types::Block::Block'
@@ -693,7 +732,7 @@ HEADER
                         die "[ERROR] Invalid class name: '$obj->{name}' inside namespace '$obj->{class}'";
                     }
 
-                    $code .= ($package_name = ref($obj->{name}));
+                    $code .= ($package_name = $self->_get_reftype($obj->{name}));
                 }
                 else {
 
@@ -1220,6 +1259,9 @@ HEADER
         }
         elsif ($ref eq 'Sidef::Meta::Unimplemented') {
             $code = qq{CORE::die "Unimplemented at " . } . $self->_dump_string($obj->{file}) . qq{. " line $obj->{line}\\n"};
+        }
+        elsif (exists $self->{data_types}{$ref}) {
+            $code = "'" . $self->{data_types}{$ref} . "'";
         }
 
         # Array and hash indices

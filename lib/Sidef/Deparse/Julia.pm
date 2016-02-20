@@ -52,6 +52,32 @@ package Sidef::Deparse::Julia {
             #~ to_num  => q{0+},
             #~ },
 
+            data_types => {
+                qw(
+                  Sidef::DataTypes::Array::Array          Sidef_Types_Array_Array
+                  Sidef::DataTypes::Array::Pair           Sidef_Types_Array_Pair
+                  Sidef::DataTypes::Array::MultiArray     Sidef_Types_Array_MultiArray
+                  Sidef::DataTypes::Hash::Hash            Sidef_Types_Hash_Hash
+                  Sidef::DataTypes::Regex::Regex          Sidef_Types_Regex_Regex
+                  Sidef::DataTypes::String::String        Sidef_Types_String_String
+                  Sidef::DataTypes::Number::Number        Sidef_Types_Number_Number
+                  Sidef::DataTypes::Number::Complex       Sidef_Types_Number_Complex
+                  Sidef::DataTypes::Range::RangeNumber    Sidef_Types_Range_RangeNumber
+                  Sidef::DataTypes::Range::RangeString    Sidef_Types_Range_RangeString
+                  Sidef::DataTypes::Block::Block          Sidef_Types_Block_Block
+                  Sidef::DataTypes::Glob::Socket          Sidef_Types_Glob_Socket
+                  Sidef::DataTypes::Glob::Pipe            Sidef_Types_Glob_Pipe
+                  Sidef::DataTypes::Glob::Backtick        Sidef_Types_Glob_Backtick
+                  Sidef::DataTypes::Glob::DirHandle       Sidef_Types_Glob_DirHandle
+                  Sidef::DataTypes::Glob::FileHandle      Sidef_Types_Glob_FileHandle
+                  Sidef::DataTypes::Glob::Dir             Sidef_Types_Glob_Dir
+                  Sidef::DataTypes::Glob::File            Sidef_Types_Glob_File
+                  Sidef::DataTypes::Object::Object        Sidef_Object_Object
+                  Sidef::DataTypes::Sidef::Sidef          Sidef
+                  Sidef::DataTypes::Variable::LazyMethod  Sidef_Variable_LazyMethod
+                  )
+            },
+
             special_constructs => {
                                    'Sidef::Types::Block::If'    => 1,
                                    'Sidef::Types::Block::While' => 1,
@@ -215,8 +241,7 @@ end
 ## Array methods
 #
 
-# TODO: Change "Sidef_Types_Array_Array" to "Type{Sidef_Types_Array_Array}"
-function call(h::Sidef_Types_Array_Array, v::Any...)
+function call(h::Type{Sidef_Types_Array_Array}, v::Any...)
     Sidef_Types_Array_Array(Any[v...])
 end
 
@@ -363,6 +388,10 @@ HEADER
         my ($self, $obj) = @_;
 
         my $ref = ref($obj);
+        if (exists $self->{data_types}{$ref}) {
+            return $self->{data_types}{$ref};
+        }
+
             $ref eq 'Sidef::Variable::ClassInit'     ? $self->_dump_class_name($obj)
           : $ref eq 'Sidef::Variable::Ref'           ? 'REF'
           : $ref eq 'Sidef::Types::Block::BlockInit' ? 'Sidef::Types::Block::Block'
@@ -1485,6 +1514,9 @@ HEADER
         }
         elsif ($ref eq 'Sidef::Meta::Unimplemented') {
             $code = qq{CORE::die "Unimplemented at " . } . $self->_dump_string($obj->{file}) . qq{. " line $obj->{line}\\n"};
+        }
+        elsif (exists $self->{data_types}{$ref}) {
+            $code = $self->{data_types}{$ref};
         }
 
         # Array and hash indices

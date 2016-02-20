@@ -10,14 +10,39 @@ package Sidef::Deparse::Sidef {
         my (undef, %args) = @_;
 
         my %opts = (
-                    before       => '',
-                    between      => ";\n",
-                    after        => ";\n",
-                    class        => 'main',
-                    extra_parens => 0,
-                    namespaces   => [],
-                    opt          => {},
-                    %args,
+            before       => '',
+            between      => ";\n",
+            after        => ";\n",
+            class        => 'main',
+            extra_parens => 0,
+            namespaces   => [],
+            opt          => {},
+            data_types   => {
+                qw(
+                  Sidef::DataTypes::Array::Array          Array
+                  Sidef::DataTypes::Array::Pair           Pair
+                  Sidef::DataTypes::Array::MultiArray     MultiArray
+                  Sidef::DataTypes::Hash::Hash            Hash
+                  Sidef::DataTypes::Regex::Regex          Regex
+                  Sidef::DataTypes::String::String        String
+                  Sidef::DataTypes::Number::Number        Number
+                  Sidef::DataTypes::Number::Complex       Complex
+                  Sidef::DataTypes::Range::RangeNumber    RangeNumber
+                  Sidef::DataTypes::Range::RangeString    RangeString
+                  Sidef::DataTypes::Block::Block          Block
+                  Sidef::DataTypes::Glob::Socket          Socket
+                  Sidef::DataTypes::Glob::Pipe            Pipe
+                  Sidef::DataTypes::Glob::Backtick        Backtick
+                  Sidef::DataTypes::Glob::DirHandle       DirHandle
+                  Sidef::DataTypes::Glob::FileHandle      FileHandle
+                  Sidef::DataTypes::Glob::Dir             Dir
+                  Sidef::DataTypes::Glob::File            File
+                  Sidef::DataTypes::Object::Object        Object
+                  Sidef::DataTypes::Sidef::Sidef          Sidef
+                  Sidef::DataTypes::Variable::LazyMethod  LazyMethod
+                  )
+            },
+            %args,
                    );
         %addr = ();    # reset the addr map
         bless \%opts, __PACKAGE__;
@@ -94,7 +119,6 @@ package Sidef::Deparse::Sidef {
     sub _dump_string {
         my ($self, $str) = @_;
 
-        return 'String' if $str eq '';
         state $x = eval { require Data::Dump };
         $x || return ('"' . quotemeta($str) . '"');
 
@@ -105,10 +129,11 @@ package Sidef::Deparse::Sidef {
         my ($self, $num) = @_;
 
         state $table = {
-                        'inf'  => q{Number.inf},
-                        '-inf' => q{Number.ninf},
-                        'nan'  => q{Number.nan},
-                        '0'    => q{Number},
+                        'inf'  => q{Inf},
+                        '-inf' => q{Inf.neg},
+                        'nan'  => q{NaN},
+                        '1/0'  => q{Inf},
+                        '-1/0' => q{Inf.neg},
                        };
 
         exists($table->{lc($num)}) ? $table->{lc($num)} : $num;
@@ -359,9 +384,6 @@ package Sidef::Deparse::Sidef {
         elsif ($ref eq 'Sidef::Parser') {
             $code = 'Parser';
         }
-        elsif ($ref eq 'Sidef') {
-            $code = 'Sidef';
-        }
         elsif ($ref eq 'Sidef::Variable::NamedParam') {
             $code = $obj->[0] . ':' . $self->deparse_args(@{$obj->[1]});
         }
@@ -436,9 +458,6 @@ package Sidef::Deparse::Sidef {
         elsif ($ref eq 'Sidef::Math::Math') {
             $code = 'Math';
         }
-        elsif ($ref eq 'Sidef::Types::Glob::DirHandle') {
-            $code = 'DirHandle';
-        }
         elsif ($ref eq 'Sidef::Types::Glob::FileHandle') {
             if ($obj->{fh} eq \*STDIN) {
                 $code = 'STDIN';
@@ -473,9 +492,6 @@ package Sidef::Deparse::Sidef {
         elsif ($ref eq 'Sidef::Types::Hash::Hash') {
             $code = keys(%{$obj}) ? $obj->dump->get_value : 'Hash';
         }
-        elsif ($ref eq 'Sidef::Types::Glob::Socket') {
-            $code = 'Socket';
-        }
         elsif ($ref eq 'Sidef::Perl::Perl') {
             $code = 'Perl';
         }
@@ -495,75 +511,22 @@ package Sidef::Deparse::Sidef {
             $code = 'Inf';
         }
         elsif ($ref eq 'Sidef::Types::Number::Ninf') {
-            $code = '-Inf';
+            $code = 'Inf.neg';
         }
         elsif ($ref eq 'Sidef::Types::Number::Nan') {
             $code = 'NaN';
         }
         elsif ($ref eq 'Sidef::Types::Array::Array' or $ref eq 'Sidef::Types::Array::HCArray') {
-            if (not @{$obj}) {
-                $code = 'Array';
-            }
-            else {
-                $code = $self->_dump_array($obj);
-            }
+            $code = $self->_dump_array($obj);
         }
         elsif ($ref eq 'Sidef::Types::Nil::Nil') {
             $code = 'nil';
         }
-        elsif ($ref eq 'Sidef::Object::Object') {
-            $code = 'Object';
+        elsif (exists $self->{data_types}{$ref}) {
+            $code = $self->{data_types}{$ref};
         }
         elsif ($ref =~ /^Sidef::/ and $obj->can('dump')) {
             $code = $obj->dump->get_value;
-
-            if ($ref eq 'Sidef::Types::Glob::Backtick') {
-                if (${$obj} eq '') {
-                    $code = 'Backtick';
-                }
-            }
-
-            elsif ($ref eq 'Sidef::Types::Number::Complex') {
-                if (${$obj} == 0) {
-                    $code = 'Complex';
-                }
-            }
-            elsif ($ref eq 'Sidef::Types::Regex::Regex') {
-                if ($code eq '//') {
-                    $code = 'Regex';
-                }
-            }
-            elsif ($ref eq 'Sidef::Types::Glob::File') {
-                if (${$obj} eq '') {
-                    $code = 'File';
-                }
-            }
-            elsif ($ref eq 'Sidef::Types::Array::Pair') {
-                if (    not defined($obj->[0])
-                    and not defined($obj->[1])) {
-                    $code = 'Pair';
-                }
-            }
-            elsif ($ref eq 'Sidef::Types::Glob::Dir') {
-                if (${$obj} eq '') {
-                    $code = 'Dir';
-                }
-            }
-            elsif ($ref eq 'Sidef::Types::String::String') {
-                if (${$obj} eq '') {
-                    $code = 'String';
-                }
-            }
-            elsif ($ref eq 'Sidef::Types::Array::MultiArray') {
-                if (not @{$obj}) {
-                    $code = 'MultiArr';
-                }
-            }
-            elsif ($ref eq 'Sidef::Types::Glob::Pipe') {
-                if (not @{$obj}) {
-                    $code = 'Pipe';
-                }
-            }
         }
 
         # Array and hash indices
