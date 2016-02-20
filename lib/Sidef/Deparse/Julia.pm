@@ -6,6 +6,9 @@ package Sidef::Deparse::Julia {
     use List::Util qw(all);
     use Scalar::Util qw(refaddr);
 
+    # This module is highly experimental!
+    # ~~~ User discretion is advised ~~~
+
     my %addr;
     my %type;
     my %const;
@@ -94,10 +97,6 @@ abstract Sidef_Object
 abstract Sidef_Types_Nil_Nil
 abstract Sidef_Types_Number_Complex
 
-immutable Sidef_Types_Bool_Bool <: Sidef_Object
-    value::Bool
-end
-
 immutable Sidef_Types_String_String <: Sidef_Object
     value::AbstractString
 end
@@ -123,20 +122,20 @@ immutable Sidef_Types_Range_RangeNumber <: Sidef_Object
 end
 
 const NIL = Sidef_Types_Nil_Nil
-const TRUE = Sidef_Types_Bool_Bool(true)
-const FALSE = Sidef_Types_Bool_Bool(false)
 
 #
 ## Object methods
 #
 function say(s::Sidef_Object)
     println(s.value)
-    TRUE
+end
+
+function say(b::Bool)
+    println(b ? "true" : "false")
 end
 
 function print(s::Sidef_Object)
     print(s.value)
-    TRUE
 end
 
 #
@@ -151,7 +150,7 @@ function *(a::Sidef_Types_String_String, b::Sidef_Types_Number_Number)
 end
 
 function ==(a::Sidef_Types_String_String, b::Sidef_Types_String_String)
-    (a.value == b.value) ? TRUE : FALSE
+    a.value == b.value
 end
 
 #
@@ -165,16 +164,16 @@ end
 
 for sym in Symbol[:<=, :>=, :<, :>]
     @eval function $sym(a::Sidef_Types_Number_Number, b::Sidef_Types_Number_Number)
-        $sym(a.value, b.value) ? TRUE : FALSE
+        $sym(a.value, b.value)
     end
 end
 
 function ==(a::Sidef_Types_Number_Number, b::Sidef_Types_Number_Number)
-    (a.value == b.value) ? TRUE : FALSE
+    a.value == b.value
 end
 
 function !=(a::Sidef_Types_Number_Number, b::Sidef_Types_Number_Number)
-    (a.value == b.value) ? FALSE : TRUE
+    a.value != b.value
 end
 
 function sqrt(a::Sidef_Types_Number_Number)
@@ -231,7 +230,7 @@ function setindex!(a::Sidef_Types_Array_Array, v::Any, i::Sidef_Types_Number_Num
 end
 
 function is_empty(a::Sidef_Types_Array_Array)
-    length(a.value) == 0 ? TRUE : FALSE
+    length(a.value) == 0
 end
 
 function len(a::Sidef_Types_Array_Array)
@@ -1209,7 +1208,7 @@ HEADER
         elsif ($ref eq 'Sidef::Types::Bool::Bool') {
 
             #$code = $self->make_constant($ref, 'new', ${$obj} ? ("true$refaddr", 1) : ("false$refaddr", 0));
-            $code = ${$obj} ? 'TRUE' : 'FALSE';
+            $code = ${$obj} ? 'true' : 'false';
         }
         elsif ($ref eq 'Sidef::Types::Regex::Regex') {
             $code =
@@ -1222,8 +1221,7 @@ HEADER
         }
         elsif ($ref eq 'Sidef::Types::Bool::Ternary') {
             $code = '('
-              . $self->deparse_script($obj->{cond})
-              . '.value ?'
+              . $self->deparse_script($obj->{cond}) . ' ?'
               . $self->deparse_block_expr($obj->{true}) . ':'
               . $self->deparse_block_expr($obj->{false}) . ')';
         }
@@ -1610,7 +1608,7 @@ HEADER
                     }
 
                     if (exists($self->{lazy_ops}{$method})) {
-                        $code .= '.value ' . $self->{lazy_ops}{$method} . $self->deparse_block_expr(@{$call->{arg}});
+                        $code .= $self->{lazy_ops}{$method} . $self->deparse_block_expr(@{$call->{arg}});
                         next;
                     }
 
@@ -1730,7 +1728,7 @@ HEADER
                         }
 
                         if ($method eq 'defined') {
-                            $code = '(' . $self->deparse_args(@{$call->{arg}}) . ' == Any ? FALSE : TRUE)';
+                            $code = '(' . $self->deparse_args(@{$call->{arg}}) . ' != Any)';
                             next;
                         }
                     }
@@ -1782,14 +1780,14 @@ HEADER
 
                             if ($method eq '^') {
                                 $method = '$';
-                                $code .= $method;
                             }
                             else {
-                                $code .= ',';
                                 if ($method eq '**') {
                                     $method = '^';
                                 }
                             }
+
+                            $code .= ',';
                         }
                     }
                 }
@@ -1807,8 +1805,8 @@ HEADER
                     }
                 }
 
-                if ($method ne '$' and $method ne '') {
-                    $code = "$method($code)";
+                if ($method ne '') {
+                    $code = "($method)($code)";
                 }
 
                 if (exists $call->{block}) {
