@@ -45,6 +45,7 @@ package Sidef::Optimizer {
                  { $_, [table(STRING)] }
                } methods(STRING, qw(
                    new call
+                   to downto
 
                    concat
                    prepend
@@ -58,11 +59,13 @@ package Sidef::Optimizer {
                    crypt
 
                    levenshtein
+                   jaro_distance
                    contains
                    overlaps
                    begins_with
                    ends_with
                    count
+                   range
 
                    sprintf
                    sprintlnf
@@ -191,6 +194,16 @@ package Sidef::Optimizer {
                )
             ),
 
+            # String.method(String, Bool)
+            (
+             map {
+                 { $_, [table(STRING), table(BOOL)] }
+               } methods(STRING, qw(
+                   range
+                   )
+               )
+            ),
+
         ],
 
         (NUMBER) => [
@@ -230,6 +243,9 @@ package Sidef::Optimizer {
                    idiv
                    ipow
                    imod
+                   range
+                   to
+                   downto
 
                    shift_right
                    shift_left
@@ -352,8 +368,7 @@ package Sidef::Optimizer {
                  { $_, [table(NUMBER), table(NUMBER)] }
                } methods(NUMBER, qw(
                    modpow
-                   shift_right
-                   shift_left
+                   range
                    )
                )
             ),

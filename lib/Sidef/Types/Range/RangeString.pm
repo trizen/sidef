@@ -52,6 +52,11 @@ package Sidef::Types::Range::RangeString {
         Sidef::Types::String::String->new($self->{asc} ? $self->{to} : $self->{from});
     }
 
+    sub asc {
+        my ($self) = @_;
+        $self->{asc} ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
+    }
+
     sub bounds {
         my ($self) = @_;
         ($self->min, $self->max);
@@ -59,11 +64,11 @@ package Sidef::Types::Range::RangeString {
 
     sub reverse {
         my ($self) = @_;
-
-        $self->{asc} ^= 1;
-        ($self->{from}, $self->{to}) = ($self->{to}, $self->{from});
-
-        $self;
+        __PACKAGE__->__new__(
+                             from => $self->{to},
+                             to   => $self->{from},
+                             asc  => $self->{asc} ^ 1,
+                            );
     }
 
     sub contains {

@@ -27,8 +27,8 @@ package Sidef::Deparse::Sidef {
                   Sidef::DataTypes::String::String        String
                   Sidef::DataTypes::Number::Number        Number
                   Sidef::DataTypes::Number::Complex       Complex
-                  Sidef::DataTypes::Range::RangeNumber    RangeNumber
-                  Sidef::DataTypes::Range::RangeString    RangeString
+                  Sidef::DataTypes::Range::RangeNumber    RangeNum
+                  Sidef::DataTypes::Range::RangeString    RangeStr
                   Sidef::DataTypes::Block::Block          Block
                   Sidef::DataTypes::Glob::Socket          Socket
                   Sidef::DataTypes::Glob::Pipe            Pipe
@@ -238,9 +238,6 @@ package Sidef::Deparse::Sidef {
         }
         elsif ($ref eq 'Sidef::Variable::ConstInit') {
             $code = join(";\n" . (" " x $Sidef::SPACES), map { $self->deparse_expr({self => $_}) } @{$obj->{vars}});
-        }
-        elsif ($ref eq 'Sidef::Types::Range::RangeNumber' or $ref eq 'Sidef::Types::Range::RangeString') {
-            $code = $self->_dump_reftype($obj);
         }
         elsif ($ref eq 'Sidef::Variable::Define') {
             my $name = $obj->{name};

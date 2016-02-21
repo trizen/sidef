@@ -59,22 +59,31 @@ package Sidef::Types::Range::RangeNumber {
     sub by {
         my ($self, $step) = @_;
         Sidef::Types::Number::Number::_valid($step);
-        $self->{step} = Math::GMPq::Rmpq_sgn($self->{step}) < 0 ? -$$step : $$step;
-        $self;
+        __PACKAGE__->__new__(
+                             from => $self->{from},
+                             to   => $self->{to},
+                             step => (Math::GMPq::Rmpq_sgn($self->{step}) < 0 ? -$$step : $$step),
+                            );
     }
 
     sub from {
         my ($self, $from) = @_;
         Sidef::Types::Number::Number::_valid($from);
-        $self->{from} = $$from;
-        $self;
+        __PACKAGE__->__new__(
+                             from => $$from,
+                             to   => $self->{to},
+                             step => $self->{step},
+                            );
     }
 
     sub to {
         my ($self, $to) = @_;
         Sidef::Types::Number::Number::_valid($to);
-        $self->{to} = $$to;
-        $self;
+        __PACKAGE__->__new__(
+                             from => $self->{from},
+                             to   => $$to,
+                             step => $self->{step},
+                            );
     }
 
     sub reverse {
@@ -84,10 +93,11 @@ package Sidef::Types::Range::RangeNumber {
             die "[ERROR] Can't reverse an infinite range: $self";
         }
 
-        $self->{step} = -$self->{step};
-        ($self->{from}, $self->{to}) = ($self->{to}, $self->{from});
-
-        $self;
+        __PACKAGE__->__new__(
+                             from => $self->{to},
+                             to   => $self->{from},
+                             step => -$self->{step},
+                            );
     }
 
     sub min {

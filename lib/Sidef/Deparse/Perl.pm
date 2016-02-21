@@ -1176,8 +1176,21 @@ HEADER
         elsif ($ref eq 'Sidef::Module::Func') {
             $code = $self->make_constant($ref, '__NEW__', "MOD_F$refaddr", $self->_dump_string($obj->{module}));
         }
-        elsif ($ref eq 'Sidef::Types::Range::RangeNumber' or $ref eq 'Sidef::Types::Range::RangeString') {
-            $code = $ref . '->new';
+        elsif ($ref eq 'Sidef::Types::Range::RangeNumber') {
+            $code = $self->make_constant(
+                $ref,
+                '__new__',
+                "RangeNumber$refaddr",
+                map {
+                        "$_ => do { my \$r = Math::GMPq::Rmpq_init(); Math::GMPq::Rmpq_set_str(\$r,'"
+                      . Math::GMPq::Rmpq_get_str($obj->{$_}, 10)
+                      . "', 10); \$r }"
+                  } keys(%{$obj})
+            );
+        }
+        elsif ($ref eq 'Sidef::Types::Range::RangeString') {
+            $code = $self->make_constant($ref, '__new__', "RangeString$refaddr",
+                                         map { "$_ => " . $self->_dump_string($obj->{$_}) } keys(%{$obj}));
         }
         elsif ($ref eq 'Sidef::Types::Glob::Backtick') {
             $code = $self->make_constant($ref, 'new', "Backtick$refaddr", $self->_dump_string(${$obj}));
@@ -1228,12 +1241,6 @@ HEADER
             my @args = $self->deparse_args($obj->{arg});
             $code = qq~((CORE::warn(@args, " at \Q$obj->{file}\E line $obj->{line}\\n")) ? ~
               . qq~(Sidef::Types::Bool::Bool::FALSE) : (Sidef::Types::Bool::Bool::TRUE))~;
-        }
-        elsif ($ref eq 'Sidef::Object::Object') {
-            $code = $self->make_constant($ref, 'new', "Object$refaddr");
-        }
-        elsif ($ref eq 'Sidef::Variable::LazyMethod') {
-            $code = $ref . '->new';
         }
         elsif ($ref eq 'Sidef::Types::Block::ForArray') {
             $code =
