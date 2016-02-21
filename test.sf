@@ -1,0 +1,116 @@
+#!/usr/bin/ruby
+
+func fib(n) {
+    n <= 1 ? n : fib(n-1)+fib(n-2)
+}
+
+say fib(12)
+
+func fac(n) {
+    n == 0 ? 1 : n*fac(n-1)
+}
+
+say fac(5)
+
+say 3**4;
+say 3^5;
+
+var (x, z) = (42, 32)
+say x-2;
+say z;
+
+say sqrt(2)
+say 0.5
+say 10/3;
+
+say add(1,2,3);
+say mul(2,3,4);
+say pow(2, 3);
+
+say 5!;
+
+var x = 42;
+say x;
+x += 2;
+say x;
+x //= 5;        #/
+say x;
+print("a")
+print("b")
+say ''
+
+x **= 2
+say x;
+
+var arr = [123,99,42];
+
+say arr[2]
+arr[2] = 7;
+say arr[1];
+say arr[2];
+
+var h = Hash(a => 1, b => 2);
+say h{:a}
+say h{:b}
+h{:c} = 42
+say h{:c}
+
+var a = Array(1,2,3)
+say a
+say a[1]
+a[2] = 42;
+
+#!/usr/bin/ruby
+
+func cuboid (x=1,y=1,z=1,s=' ',c='+',h='-',v='|',d='/') {
+
+    #say("cuboid %d %d %d:" % [x, y, z]);
+    ' ' * z+1 + c + h*x + c -> say;
+
+    { |i|
+        ' ' * (z - i + 1) + d + s*x + d +
+              (s * (i - (i > y ? i-y : 1))) +
+              (i - 1 == y ? c : (i > y ? d : v)) -> say
+    } * z;
+
+    c + h*x + c + (s * (z < y ? z : y) +
+        (z < y ? v : (z == y ? c : d))) -> say;
+
+    { |i|
+        v + s*x + v + (z > y
+            ? (i >= z ? (s*x + c) : (s * y-i + d))
+            : (y - i > z
+                ? (s * z + v)
+                : (s * y-i + (y-i == z ? c : d))
+               )
+        ) -> say;
+    } * y;
+
+    c + h*x + c -> say;
+};
+
+cuboid(2, 3, 4);
+cuboid(1, 1, 1);
+cuboid(6, 2, 1);
+cuboid(2, 4, 1);
+
+say true;
+say false;
+
+func lev(s, t) {
+
+    s.is_empty && return t.len;
+    t.is_empty && return s.len;
+
+    var s1 = s.ft(1);
+    var t1 = t.ft(1);
+
+    s[0] == t[0] ? lev(s1, t1)
+                 : 1+min(
+                        lev(s1, t1),
+                        lev(s,  t1),
+                        lev(s1, t )
+                     );
+}
+
+say lev(%c"abcz", %c"aecd");        # prints: 2

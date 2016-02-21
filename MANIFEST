@@ -6,6 +6,15 @@ lib/Sidef.pod
 lib/Sidef/Convert/Convert.pm
 lib/Sidef/Convert/Convert.pod
 lib/Sidef/Deparse/Julia.pm
+lib/Sidef/Deparse/Julia/array.jl
+lib/Sidef/Deparse/Julia/block.jl
+lib/Sidef/Deparse/Julia/complex.jl
+lib/Sidef/Deparse/Julia/hash.jl
+lib/Sidef/Deparse/Julia/number.jl
+lib/Sidef/Deparse/Julia/object.jl
+lib/Sidef/Deparse/Julia/range.jl
+lib/Sidef/Deparse/Julia/Sidef.jl
+lib/Sidef/Deparse/Julia/string.jl
 lib/Sidef/Deparse/Perl.pm
 lib/Sidef/Deparse/Sidef.pm
 lib/Sidef/Math/Math.pm
@@ -812,6 +821,7 @@ t/05-trignometric.t
 t/09-parser.t
 t/manifest.t
 t/pod.t
+test.sf
 TODO
 utils/auto_perltidy.sh
 utils/bak_cleaner.sh
@@ -822,7 +832,7 @@ utils/Concepts/sidef_executor.lua
 utils/Concepts/sidef_executor.pl6
 utils/Examples/sidef_in_perl.pl
 utils/Experiments/C-inline-function-call.pl
-utils/Experiments/fib_fac.jl
+utils/Experiments/julia_codegen.jl
 utils/Experiments/Lazy/Lazy.pm
 utils/Experiments/operator_precendece.pl
 utils/Experiments/regexp_grammars_op_precedence.pl
