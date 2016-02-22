@@ -66,9 +66,12 @@ function join(a::Sidef_Types_Array_Array, sep::Sidef_Types_String_String)
     str = ""
     a = a.value
     sep = sep.value
-    for i in 1:length(a)-1
+    len = length(a)
+    for i in 1:len-1
         str *= string(a[i]) * sep
     end
-    str *= string(a[end])
+    if (len > 0)
+        str *= string(a[end])
+    end
     Sidef_Types_String_String(str)
 end
