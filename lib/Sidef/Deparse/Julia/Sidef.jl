@@ -55,6 +55,12 @@ immutable Sidef_Types_Array_Array <: Sidef_Object
     value::Array{Any}
 end
 
+const NIL = Sidef_Types_Nil_Nil
+
+const MONE = Sidef_Types_Number_Number(-1)
+const ZERO = Sidef_Types_Number_Number(0)
+const ONE = Sidef_Types_Number_Number(1)
+
 include("object.jl")
 include("number.jl")
 include("hash.jl")
@@ -63,5 +69,3 @@ include("block.jl")
 include("range.jl")
 include("string.jl")
 include("array.jl")
-
-const NIL = Sidef_Types_Nil_Nil

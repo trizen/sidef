@@ -114,3 +114,7 @@ func lev(s, t) {
 }
 
 say lev(%c"abcz", %c"aecd");        # prints: 2
+
+for i in range(1, 10, 2) {
+    say i
+}

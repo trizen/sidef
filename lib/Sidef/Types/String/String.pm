@@ -1388,10 +1388,12 @@ package Sidef::Types::String::String {
                 splice @chars, $pair->[0] + $i, 0, $pair->[1];
             }
 
+            state $str_dt = bless({}, 'Sidef::DataTypes::String::String');
+
             my $expr = {
                         $parser->{class} => [
                                              {
-                                              self => $self->new,
+                                              self => $str_dt,
                                               call => [{method => 'super_join'}]
                                              }
                                             ]

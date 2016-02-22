@@ -446,6 +446,28 @@ package Sidef::Deparse::Sidef {
         elsif ($ref eq 'Sidef::Types::Block::Loop') {
             $code = 'loop ' . $self->deparse_expr({self => $obj->{block}});
         }
+        elsif ($ref eq 'Sidef::Types::Block::If') {
+            foreach my $i (0 .. $#{$obj->{if}}) {
+                $code .= ($i == 0 ? 'if' : 'elsif');
+                my $info = $obj->{if}[$i];
+                $code .= $self->deparse_args($info->{expr}) . $self->deparse_bare_block($info->{block}{code});
+            }
+            if (exists $obj->{else}) {
+                $code .= 'else' . $self->deparse_bare_block($obj->{else}{block}{code});
+            }
+        }
+        elsif ($ref eq 'Sidef::Types::Block::While') {
+            $code = "while" . $self->deparse_args($obj->{expr}) . $self->deparse_bare_block($obj->{block}{code});
+        }
+        elsif ($ref eq 'Sidef::Types::Block::For') {
+            $code = $self->deparse_args($obj->{expr}) . '->for' . '(' . $self->deparse_expr({self => $obj->{block}}) . ')';
+        }
+        elsif ($ref eq 'Sidef::Types::Block::CFor') {
+            $code =
+                'for' . '('
+              . join(';', map { $self->deparse_args($_) } @{$obj->{expr}}) . ')'
+              . $self->deparse_bare_block($obj->{block}{code});
+        }
         elsif ($ref eq 'Sidef::Types::Block::ForArray') {
             $code = 'for '
               . $self->deparse_expr({self => $obj->{var}}) . ' in ('
@@ -618,12 +640,7 @@ package Sidef::Deparse::Sidef {
                 }
 
                 if (exists $call->{arg}) {
-                    if ($ref eq 'Sidef::Types::Block::For') {
-                        $code .= '(' . join(';', map { $self->deparse_args($_) } @{$call->{arg}}) . ')';
-                    }
-                    else {
-                        $code .= $self->deparse_args(@{$call->{arg}});
-                    }
+                    $code .= $self->deparse_args(@{$call->{arg}});
                 }
 
                 if (exists $call->{block}) {

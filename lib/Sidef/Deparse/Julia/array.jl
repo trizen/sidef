@@ -31,3 +31,9 @@ end
 function ft(a::Sidef_Types_Array_Array, from::Sidef_Types_Number_Number)
     Sidef_Types_Array_Array((a.value)[from.value+1:length(a.value)])
 end
+
+function each(a::Sidef_Types_Array_Array, block::Sidef_Types_Block_Block)
+    for item in a.value
+        block(item)
+    end
+end

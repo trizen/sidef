@@ -9,7 +9,10 @@ package Sidef::Types::Regex::Regex {
       Sidef::Convert::Convert
       );
 
-    use overload q{""} => \&get_value;
+    use overload
+      q{""}   => \&get_value,
+      q{bool} => \&get_value,
+      q{0+}   => \&get_value;
 
     sub new {
         my (undef, $regex, $mode) = @_;

@@ -39,12 +39,6 @@ package Sidef::Parser {
                              '...' => 1,
                            },
 
-            special_constructs => {
-                                   'Sidef::Types::Block::While' => 1,
-                                   'Sidef::Types::Block::If'    => 1,
-                                   'Sidef::Types::Block::For'   => 1,
-                                  },
-
             static_obj_re => qr{\G
                 (?>
                        nil\b                          (?{ state $x = bless({}, 'Sidef::Types::Nil::Nil') })
@@ -119,10 +113,10 @@ package Sidef::Parser {
             }x,
             prefix_obj_re => qr{\G
               (?:
-                  if\b                                      (?{ state $x = bless({}, 'Sidef::Types::Block::If') })
-                | while\b                                   (?{ state $x = bless({}, 'Sidef::Types::Block::While') })
+                  if\b                                      (?{ bless({}, 'Sidef::Types::Block::If') })
+                | while\b                                   (?{ bless({}, 'Sidef::Types::Block::While') })
                 | try\b                                     (?{ Sidef::Types::Block::Try->new })
-                | for(?:each)?+\b                           (?{ state $x = bless({}, 'Sidef::Types::Block::For') })
+                | for(?:each)?+\b                           (?{ bless({}, 'Sidef::Types::Block::For') })
                 | return\b                                  (?{ Sidef::Types::Block::Return->new })
                 #| next\b                                    (?{ bless({}, 'Sidef::Types::Block::Next') })
                 #| break\b                                   (?{ bless({}, 'Sidef::Types::Block::Break') })
@@ -2577,25 +2571,109 @@ package Sidef::Parser {
                 if (defined $arg) {
                     my @arg = ($arg);
 
-                    if (    ref($struct{$self->{class}}[-1]{self}) eq 'Sidef::Types::Block::For'
-                        and ref($arg) eq 'HASH') {
+                    if (ref($obj) eq 'Sidef::Types::Block::For') {
+
                         if ($#{$arg->{$self->{class}}} == 2) {
                             @arg = (
                                 map {
                                     { $self->{class} => [$_] }
                                   } @{$arg->{$self->{class}}}
                             );
+
+                            if (/\G\h*(?=\{)/gc) {
+                                my $block = $self->parse_block(code => $opt{code});
+                                $obj->{expr}  = \@arg;
+                                $obj->{block} = $block;
+
+                                bless $obj, 'Sidef::Types::Block::CFor';
+
+                            }
+                            else {
+                                $self->fatal_error(
+                                                   code     => $_,
+                                                   pos      => pos($_) - 1,
+                                                   error    => "invalid declaration of the `for` loop",
+                                                   expected => "expected a block after `for(;;)`",
+                                                  );
+                            }
                         }
-                        elsif ($#{$arg->{$self->{class}}} != 0) {
+                        elsif ($#{$arg->{$self->{class}}} == 0) {
+
+                            if (/\G\h*(?=\{)/gc) {
+                                my $block = $self->parse_block(code => $opt{code}, topic_var => 1);
+                                $obj->{expr}  = $arg;
+                                $obj->{block} = $block;
+                            }
+                            else {
+                                $self->fatal_error(
+                                                   code     => $_,
+                                                   pos      => pos($_) - 1,
+                                                   error    => "invalid declaration of the `for` loop",
+                                                   expected => "expected a block after `for(...)`",
+                                                  );
+                            }
+                        }
+                        else {
                             $self->fatal_error(
                                                code  => $_,
                                                pos   => pos($_) - 1,
-                                               error => "invalid for-loop: too many arguments",
+                                               error => "invalid declaration of the `for` loop: too many arguments",
                                               );
                         }
                     }
+                    elsif (ref($obj) eq 'Sidef::Types::Block::If') {
 
-                    push @{$struct{$self->{class}}[-1]{call}}, {method => $method, arg => \@arg};
+                        if (/\G\h*(?=\{)/gc) {
+                            my $block = $self->parse_block(code => $opt{code});
+                            push @{$obj->{if}}, {expr => $arg, block => $block};
+
+                          ELSIF: {
+                                if (/\G(?=\s*elsif\h*\()/) {
+                                    $self->parse_whitespace(code => $opt{code});
+                                    while (/\G\h*elsif\h*(?=\()/gc) {
+                                        my $arg = $self->parse_arg(code => $opt{code});
+                                        $self->parse_whitespace(code => $opt{code});
+                                        my $block = $self->parse_block(code => $opt{code});
+                                        push @{$obj->{if}}, {expr => $arg, block => $block};
+                                        redo ELSIF;
+                                    }
+                                }
+                            }
+
+                            if (/\G(?=\s*else\h*\{)/) {
+                                $self->parse_whitespace(code => $opt{code});
+                                /\Gelse\h*/gc;
+                                my $block = $self->parse_block(code => $opt{code});
+                                $obj->{else}{block} = $block;
+                            }
+                        }
+                        else {
+                            $self->fatal_error(
+                                               code     => $_,
+                                               pos      => pos($_) - 1,
+                                               error    => "invalid declaration of the `if` statement",
+                                               expected => "expected a block after `if(...)`",
+                                              );
+                        }
+                    }
+                    elsif (ref($obj) eq 'Sidef::Types::Block::While') {
+                        if (/\G\h*(?=\{)/gc) {
+                            my $block = $self->parse_block(code => $opt{code});
+                            $obj->{expr}  = $arg;
+                            $obj->{block} = $block;
+                        }
+                        else {
+                            $self->fatal_error(
+                                               code     => $_,
+                                               pos      => pos($_) - 1,
+                                               error    => "invalid declaration of the `while` statement",
+                                               expected => "expected a block after `while(...)`",
+                                              );
+                        }
+                    }
+                    else {
+                        push @{$struct{$self->{class}}[-1]{call}}, {method => $method, arg => \@arg};
+                    }
                 }
                 elsif (ref($obj) ne 'Sidef::Types::Block::Return') {
                     $self->fatal_error(
@@ -2627,52 +2705,6 @@ package Sidef::Parser {
                       };
 
                     redo;
-                }
-
-                if (    exists($struct{$self->{class}}[-1]{call})
-                    and exists $self->{special_constructs}{ref($obj)}
-                    and /\G\h*(?=\{)/gc) {
-
-                    if (ref($obj) eq 'Sidef::Types::Block::For') {
-                        if ($#{$struct{$self->{class}}[-1]{call}[-1]{arg}} == 0) {
-                            my $arg = $self->parse_block(code => $opt{code}, topic_var => 1);
-                            $struct{$self->{class}}[-1]{self} = shift @{delete $struct{$self->{class}}[-1]{call}[-1]{arg}};
-                            push @{$struct{$self->{class}}[-1]{call}[-1]{arg}}, $arg;
-                        }
-                        else {
-                            my $arg = $self->parse_block(code => $opt{code});
-                            push @{$struct{$self->{class}}[-1]{call}[-1]{block}}, $arg->{code};
-                        }
-                    }
-                    else {
-
-                        my $arg = $self->parse_block(code => $opt{code});
-
-                        push @{$struct{$self->{class}}[-1]{call}[-1]{block}}, $arg->{code};
-
-                        if (ref($obj) eq 'Sidef::Types::Block::If') {
-                          ELSIF: {
-                                if (/\G(?=\s*elsif\h*\()/) {
-                                    $self->parse_whitespace(code => $opt{code});
-                                    while (/\G\h*elsif\h*(?=\()/gc) {
-                                        my $arg = $self->parse_arg(code => $opt{code});
-                                        $self->parse_whitespace(code => $opt{code});
-                                        my $block = $self->parse_block(code => $opt{code});
-                                        push @{$struct{$self->{class}}[-1]{call}},
-                                          {keyword => 'elsif', arg => [$arg], block => [$block->{code}]};
-                                        redo ELSIF;
-                                    }
-                                }
-                            }
-
-                            if (/\G(?=\s*else\h*\{)/) {
-                                $self->parse_whitespace(code => $opt{code});
-                                /\Gelse\h*/gc;
-                                my $block = $self->parse_block(code => $opt{code});
-                                push @{$struct{$self->{class}}[-1]{call}}, {keyword => 'else', block => [$block->{code}]};
-                            }
-                        }
-                    }
                 }
 
                 # Do-while construct

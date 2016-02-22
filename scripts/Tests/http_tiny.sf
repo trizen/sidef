@@ -3,7 +3,7 @@
 var req = require('HTTP::Tiny');
 var http = req.new;
 
-var response = http.get('http://www.rcs-rds.ro/');
+var response = http.get('http://google.com/');
 if (!response{:success}) {
     "GET failed!\n".die;
 }

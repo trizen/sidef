@@ -96,11 +96,11 @@ package Sidef::Deparse::Julia {
         require File::Spec;
         require File::Basename;
 
-        my $name = File::Spec->catdir(File::Basename::dirname($INC{"Sidef/Deparse/Julia.pm"}), "Julia");
+        my $path = File::Spec->catdir(File::Basename::dirname($INC{"Sidef/Deparse/Julia.pm"}), "Julia");
         $opts{header} .= <<"HEADER";
-module Sidef
+module SidefRuntime
 
-include("$name/Sidef.jl")
+include("$path/Sidef.jl")
 
 HEADER
 
@@ -543,9 +543,9 @@ HEADER
         my ($self, @args) = @_;
 
         $Sidef::SPACES += $Sidef::SPACES_INCR;
-        my $code = $self->deparse_generic("{\n" . " " x ($Sidef::SPACES),
+        my $code = $self->deparse_generic("\n" . " " x ($Sidef::SPACES),
                                           ";\n" . (" " x ($Sidef::SPACES)),
-                                          "\n" .  (" " x ($Sidef::SPACES - $Sidef::SPACES_INCR)) . "}", @args);
+                                          "\n" .  (" " x ($Sidef::SPACES - $Sidef::SPACES_INCR)) . "end", @args);
         $Sidef::SPACES -= $Sidef::SPACES_INCR;
 
         $code;
@@ -1113,10 +1113,10 @@ HEADER
             ## ok
         }
         elsif ($ref eq 'Sidef::Types::Block::Break') {
-            $code = 'last';
+            $code = 'break';
         }
         elsif ($ref eq 'Sidef::Types::Block::Next') {
-            $code = 'next';
+            $code = 'continue';
         }
         elsif ($ref eq 'Sidef::Types::Block::Continue') {
             $code = 'continue';
@@ -1276,10 +1276,13 @@ HEADER
             $code = $ref . '->new';
         }
         elsif ($ref eq 'Sidef::Types::Block::ForArray') {
+            my $var = $self->deparse_expr({self => $obj->{var}});
             $code =
-                'for my '
-              . $self->deparse_expr({self => $obj->{var}}) . '(@{'
-              . $self->deparse_expr({self => $obj->{array}}) . '})'
+                'for '
+              . $var . ' in '
+              . $self->deparse_expr({self => $obj->{array}})
+              . '.value '
+              . "\nisa($var, Number) && ($var = Sidef_Types_Number_Number($var))\n"
               . $self->deparse_bare_block($obj->{block}->{code});
         }
         elsif ($ref eq 'Sidef::Types::Array::MultiArray') {
@@ -1425,7 +1428,7 @@ HEADER
                     }
 
                     if (exists($self->{lazy_ops}{$method})) {
-                        $code .= $self->{lazy_ops}{$method} . $self->deparse_block_expr(@{$call->{arg}});
+                        $code .= $self->{lazy_ops}{$method} . $self->deparse_block_expr(@{$call->{arg}}) . ' ';
                         next;
                     }
 
@@ -1622,19 +1625,36 @@ HEADER
                     }
                 }
 
-                if ($method ne '') {
+                if ($ref eq 'Sidef::Types::Block::While') {
+                    $code = "while " . substr($code, 1);
+                }
+                elsif ($ref eq 'Sidef::Types::Block::If') {
+                    if ($i == 0) {
+                        $code = "if " . substr($code, 1);
+                    }
+
+                    $code .= ' ' . $self->deparse_generic("\n", ';', "\n", @{$call->{block}});
+
+                    if ($i == $end) {
+                        $code .= "end";
+                    }
+
+                    next;
+                }
+                elsif ($method ne '') {
                     $code = "($method)($code)";
                 }
 
                 if (exists $call->{block}) {
 
-                    # TODO: move above the deparsing of `Block::If`
-                    if ($ref eq 'Sidef::Types::Block::If' and $i == $end) {
-                        $code = "do {\n" . (' ' x $Sidef::SPACES) . $code . $self->deparse_bare_block(@{$call->{block}}) . '}';
-                    }
-                    else {
-                        $code .= $self->deparse_bare_block(@{$call->{block}});
-                    }
+                   # TODO: move above the deparsing of `Block::If`
+                   #if ($ref eq 'Sidef::Types::Block::If' and $i == $end) {
+                   #    $code = "do {\n" . (' ' x $Sidef::SPACES) . $code . $self->deparse_bare_block(@{$call->{block}}) . '}';
+                   #}
+                   #else {
+                    $code .= $self->deparse_bare_block(@{$call->{block}});
+
+                    #}
                     next;
                 }
             }
