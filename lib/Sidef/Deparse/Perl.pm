@@ -502,18 +502,13 @@ HEADER
         $self->deparse_generic('(', ', ', ')', @args);
     }
 
-    sub deparse_block_expr {
-        my ($self, @args) = @_;
-        $self->deparse_generic('do{', ';', '}', @args);
-    }
-
     sub deparse_bare_block {
         my ($self, @args) = @_;
 
         $Sidef::SPACES += $Sidef::SPACES_INCR;
-        my $code = $self->deparse_generic("{\n" . " " x ($Sidef::SPACES),
-                                          ";\n" . (" " x ($Sidef::SPACES)),
-                                          "\n" .  (" " x ($Sidef::SPACES - $Sidef::SPACES_INCR)) . "}", @args);
+        my $code = $self->deparse_generic("{\n" . (" " x $Sidef::SPACES),
+                                          ";\n" . (" " x $Sidef::SPACES),
+                                          "\n" . (" " x ($Sidef::SPACES - $Sidef::SPACES_INCR)) . "}", @args);
         $Sidef::SPACES -= $Sidef::SPACES_INCR;
 
         $code;
@@ -1003,7 +998,7 @@ HEADER
             $code = "while(do{" . $self->deparse_args($obj->{expr}) . "})" . $self->deparse_bare_block($obj->{block}{code});
         }
         elsif ($ref eq 'Sidef::Types::Block::ForEach') {
-            $code = $self->deparse_args($obj->{expr}) . '->for' . '(' . $self->deparse_expr({self => $obj->{block}}) . ')';
+            $code = $self->deparse_args($obj->{expr}) . '->each' . '(' . $self->deparse_expr({self => $obj->{block}}) . ')';
         }
         elsif ($ref eq 'Sidef::Types::Block::CFor') {
             $code = 'for('
@@ -1019,9 +1014,9 @@ HEADER
         }
         elsif ($ref eq 'Sidef::Types::Bool::Ternary') {
             $code = '('
-              . $self->deparse_script($obj->{cond}) . '?'
-              . $self->deparse_block_expr($obj->{true}) . ':'
-              . $self->deparse_block_expr($obj->{false}) . ')';
+              . $self->deparse_script($obj->{cond}) . '?' . 'do'
+              . $self->deparse_bare_block($obj->{true}) . ':' . 'do'
+              . $self->deparse_bare_block($obj->{false}) . ')';
         }
         elsif ($ref eq 'Sidef::Variable::NamedParam') {
             $code = $ref . '->new(' . $self->_dump_string($obj->[0]) . ', ' . $self->deparse_args(@{$obj->[1]}) . ')';
@@ -1397,7 +1392,7 @@ HEADER
                     }
 
                     if (exists($self->{lazy_ops}{$method})) {
-                        $code .= $self->{lazy_ops}{$method} . $self->deparse_block_expr(@{$call->{arg}});
+                        $code .= $self->{lazy_ops}{$method} . 'do' . $self->deparse_bare_block(@{$call->{arg}});
                         next;
                     }
 

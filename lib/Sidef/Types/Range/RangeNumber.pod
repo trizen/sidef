@@ -91,6 +91,14 @@ Aliases: I<each>, I<foreach>
 
 =cut
 
+=head2 from
+
+RangeNumber.from() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 grep
 
 RangeNumber.grep() -> I<Obj>
@@ -156,6 +164,14 @@ Return the
 =head2 step
 
 RangeNumber.step() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 to
+
+RangeNumber.to() -> I<Obj>
 
 Return the
 

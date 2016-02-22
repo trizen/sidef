@@ -23,6 +23,7 @@ import Base.-,
        Base.min,
        Base.sqrt,
        Base.print,
+       Base.string,
        Base.println,
        Base.setindex!,
        Base.getindex;
@@ -60,6 +61,14 @@ const NIL = Sidef_Types_Nil_Nil
 const MONE = Sidef_Types_Number_Number(-1)
 const ZERO = Sidef_Types_Number_Number(0)
 const ONE = Sidef_Types_Number_Number(1)
+
+function super_join(s::Type{Sidef_Types_String_String}, a::Any...)
+    str = ""
+    for item in a
+        str *= string(item)
+    end
+    Sidef_Types_String_String(str)
+end
 
 include("object.jl")
 include("number.jl")

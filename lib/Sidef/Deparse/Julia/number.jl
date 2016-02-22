@@ -58,3 +58,7 @@ end
 function !(a::Sidef_Types_Number_Number)
     Sidef_Types_Number_Number(factorial(a.value))
 end
+
+function string(a::Sidef_Types_Number_Number)
+    string(a.value)
+end
