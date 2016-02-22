@@ -116,7 +116,8 @@ package Sidef::Parser {
                   if\b                                      (?{ bless({}, 'Sidef::Types::Block::If') })
                 | while\b                                   (?{ bless({}, 'Sidef::Types::Block::While') })
                 | try\b                                     (?{ Sidef::Types::Block::Try->new })
-                | for(?:each)?+\b                           (?{ bless({}, 'Sidef::Types::Block::For') })
+                | foreach\b                                 (?{ bless({}, 'Sidef::Types::Block::ForEach') })
+                | for\b                                     (?{ bless({}, 'Sidef::Types::Block::For') })
                 | return\b                                  (?{ Sidef::Types::Block::Return->new })
                 #| next\b                                    (?{ bless({}, 'Sidef::Types::Block::Next') })
                 #| break\b                                   (?{ bless({}, 'Sidef::Types::Block::Break') })
@@ -2550,16 +2551,13 @@ package Sidef::Parser {
                 # Remove the loop variable from the current scope
                 splice(@{$self->{vars}{$class_name}}, $#{$self->{vars}{$class_name}} - $vars_len, 1);
 
-                # Replace the old Block::For object with Block::ForArray
-                $struct{$self->{class}}[-1]{self} =
-                  bless(
-                        {
-                         var   => $variable,
-                         block => $block,
-                         array => $array,
-                        },
-                        'Sidef::Types::Block::ForArray'
-                       );
+                # Store the info
+                $obj->{var}   = $variable;
+                $obj->{block} = $block;
+                $obj->{array} = $array;
+
+                # Re-bless the $obj in a different class
+                bless $obj, 'Sidef::Types::Block::ForIn';
             }
             elsif ($obj_key) {
                 my $arg = (
@@ -2582,6 +2580,7 @@ package Sidef::Parser {
 
                             if (/\G\h*(?=\{)/gc) {
                                 my $block = $self->parse_block(code => $opt{code});
+
                                 $obj->{expr}  = \@arg;
                                 $obj->{block} = $block;
 
@@ -2601,8 +2600,11 @@ package Sidef::Parser {
 
                             if (/\G\h*(?=\{)/gc) {
                                 my $block = $self->parse_block(code => $opt{code}, topic_var => 1);
+
                                 $obj->{expr}  = $arg;
                                 $obj->{block} = $block;
+
+                                bless $obj, 'Sidef::Types::Block::ForEach';
                             }
                             else {
                                 $self->fatal_error(
@@ -2617,7 +2619,24 @@ package Sidef::Parser {
                             $self->fatal_error(
                                                code  => $_,
                                                pos   => pos($_) - 1,
-                                               error => "invalid declaration of the `for` loop: too many arguments",
+                                               error => "invalid declaration of the `for` loop: incorrect number of arguments",
+                                              );
+                        }
+                    }
+                    elsif (ref($obj) eq 'Sidef::Types::Block::ForEach') {
+                        if (/\G\h*(?=\{)/gc) {
+                            my $block = $self->parse_block(code => $opt{code}, topic_var => 1);
+
+                            $obj->{expr}  = $arg;
+                            $obj->{block} = $block;
+
+                        }
+                        else {
+                            $self->fatal_error(
+                                               code     => $_,
+                                               pos      => pos($_) - 1,
+                                               error    => "invalid declaration of the `foreach` loop",
+                                               expected => "expected a block after `foreach(...)`",
                                               );
                         }
                     }

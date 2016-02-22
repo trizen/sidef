@@ -1002,7 +1002,7 @@ HEADER
         elsif ($ref eq 'Sidef::Types::Block::While') {
             $code = "while(do{" . $self->deparse_args($obj->{expr}) . "})" . $self->deparse_bare_block($obj->{block}{code});
         }
-        elsif ($ref eq 'Sidef::Types::Block::For') {
+        elsif ($ref eq 'Sidef::Types::Block::ForEach') {
             $code = $self->deparse_args($obj->{expr}) . '->for' . '(' . $self->deparse_expr({self => $obj->{block}}) . ')';
         }
         elsif ($ref eq 'Sidef::Types::Block::CFor') {
@@ -1010,7 +1010,7 @@ HEADER
               . join(';', map { $self->deparse_args($_) } @{$obj->{expr}}) . ')'
               . $self->deparse_bare_block($obj->{block}{code});
         }
-        elsif ($ref eq 'Sidef::Types::Block::ForArray') {
+        elsif ($ref eq 'Sidef::Types::Block::ForIn') {
             $code =
                 'for my '
               . $self->deparse_expr({self => $obj->{var}}) . '(@{'

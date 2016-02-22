@@ -690,7 +690,7 @@ package Sidef::Optimizer {
         }
         elsif (   $ref eq 'Sidef::Variable::ClassInit'
                or $ref eq 'Sidef::Types::Block::Do'
-               or $ref eq 'Sidef::Types::Block::ForArray'
+               or $ref eq 'Sidef::Types::Block::ForIn'
                or $ref eq 'Sidef::Types::Block::Loop'
                or $ref eq 'Sidef::Types::Block::Given'
                or $ref eq 'Sidef::Types::Block::When'
@@ -727,6 +727,34 @@ package Sidef::Optimizer {
             if (not $has_expr) {
                 $obj = Sidef::Types::Array::Array->new(@{$obj});
             }
+        }
+        elsif ($ref eq 'Sidef::Types::Block::If') {
+            foreach my $i (0 .. $#{$obj->{if}}) {
+                my %code = $self->optimize($obj->{if}[$i]{block}{code});
+                $obj->{if}[$i]{block}{code} = \%code;
+
+                my %expr = $self->optimize($obj->{if}[$i]{expr});
+                $obj->{if}[$i]{expr} = \%expr;
+            }
+            if (exists $obj->{else}) {
+                my %code = $self->optimize($obj->{else}{block}{code});
+                $obj->{else}{block}{code} = \%code;
+            }
+        }
+        elsif ($ref eq 'Sidef::Types::Block::While' or $ref eq 'Sidef::Types::Block::ForEach') {
+            my %expr = $self->optimize($obj->{expr});
+            $obj->{expr} = \%expr;
+
+            my %code = $self->optimize($obj->{block}{code});
+            $obj->{block}{code} = \%code;
+        }
+        elsif ($ref eq 'Sidef::Types::Block::CFor') {
+            foreach my $i (0 .. $#{$obj->{expr}}) {
+                my %expr = $self->optimize($obj->{expr}[$i]);
+                $obj->{expr}[$i] = \%expr;
+            }
+            my %code = $self->optimize($obj->{block}{code});
+            $obj->{block}{code} = \%code;
         }
 
         if (not exists($expr->{ind}) and not exists($expr->{call})) {

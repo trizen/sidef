@@ -459,8 +459,8 @@ package Sidef::Deparse::Sidef {
         elsif ($ref eq 'Sidef::Types::Block::While') {
             $code = "while" . $self->deparse_args($obj->{expr}) . $self->deparse_bare_block($obj->{block}{code});
         }
-        elsif ($ref eq 'Sidef::Types::Block::For') {
-            $code = $self->deparse_args($obj->{expr}) . '->for' . '(' . $self->deparse_expr({self => $obj->{block}}) . ')';
+        elsif ($ref eq 'Sidef::Types::Block::ForEach') {
+            $code = 'foreach' . $self->deparse_args($obj->{expr}) . $self->deparse_expr({self => $obj->{block}});
         }
         elsif ($ref eq 'Sidef::Types::Block::CFor') {
             $code =
@@ -468,7 +468,7 @@ package Sidef::Deparse::Sidef {
               . join(';', map { $self->deparse_args($_) } @{$obj->{expr}}) . ')'
               . $self->deparse_bare_block($obj->{block}{code});
         }
-        elsif ($ref eq 'Sidef::Types::Block::ForArray') {
+        elsif ($ref eq 'Sidef::Types::Block::ForIn') {
             $code = 'for '
               . $self->deparse_expr({self => $obj->{var}}) . ' in ('
               . $self->deparse_expr({self => $obj->{array}}) . ') '

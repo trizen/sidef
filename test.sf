@@ -118,3 +118,32 @@ say lev(%c"abcz", %c"aecd");        # prints: 2
 for i in range(1, 10, 2) {
     say i
 }
+
+if ("a" > "b") {
+    say "if"
+}
+elsif ("b" > "a") {
+    say "elsif"
+}
+else {
+    say "else"
+}
+
+var i = 197;
+while (i < 200) {
+    say "while(): #{i}";
+    i += 1
+}
+
+for i in [100, 101, 102] {
+    say "for i in(): #{i}"
+}
+
+for ([42,43,44]) { |i|
+    say "for(): #{i}";
+}
+
+for ((var i = 0, var j = 42); i <= 6; (i+=2, j+=1)) {
+    say "for(;;): #{i}";
+    say "for(;;): #{j}";
+}
