@@ -33,28 +33,27 @@ package Sidef::Deparse::Julia {
                               },
 
             lazy_ops => {
-                '?'  => '?',
-                '||' => '||',
-                '&&' => '&&',
-
+                         '?'  => '?',
+                         '||' => '||',
+                         '&&' => '&&',
                         },
 
             assign_lazy => {
-                ':=' => '//=',
-
-                # '='     => '=',
-                '||='   => '||=',
-                '&&='   => '&&=',
-                '\\\\'  => '//',
-                '\\\\=' => '//=',
+                            ':='    => '//=',
+                            '||='   => '||=',
+                            '&&='   => '&&=',
+                            '\\\\'  => '//',
+                            '\\\\=' => '//=',
                            },
 
-            #~ overload_methods => {
-            #~ to_str  => q{""},
-            #~ to_s    => q{""},
-            #~ to_bool => q{bool},
-            #~ to_num  => q{0+},
-            #~ },
+            op_names => {
+                '==' => 'eq',
+                '!=' => 'ne',
+
+                #'+'  => 'add',
+                #'-'  => 'sub',
+                #'*'  => 'mul',
+                        },
 
             data_types => {
                 qw(
@@ -1470,10 +1469,23 @@ HEADER
                         next;
                     }
 
+                    if (exists($call->{keyword})) {
+                        my $keyword = $call->{keyword};
+                        if ($keyword eq 'and') {
+                            $method = '&&';
+                        }
+                        elsif ($keyword eq 'or') {
+                            $method = '||';
+                        }
+                    }
+
                     # Lazy operators, such as: ||, &&, etc...
                     if (exists($self->{lazy_ops}{$method})) {
-                        $code = 'convert(Bool, ' . $code . ')' .=
-                          $self->{lazy_ops}{$method} . $self->deparse_block_expr(@{$call->{arg}}) . ' ';
+                        $code =
+                            'convert(Bool, '
+                          . $code . ')'
+                          . $self->{lazy_ops}{$method}
+                          . $self->deparse_block_expr(@{$call->{arg}}) . ' ';
                         next;
                     }
 
@@ -1510,6 +1522,10 @@ HEADER
                         #  . "\$ref}";
 
                         next;
+                    }
+
+                    if (exists $self->{op_names}{$method}) {
+                        $method = $self->{op_names}{$method};
                     }
 
                     #~ # != and == methods
@@ -1560,7 +1576,7 @@ HEADER
                     # ! prefix-unary
                     if ($ref eq 'Sidef::Object::Unary') {
                         if ($method eq '!') {
-                            $code = '!' . $self->deparse_args(@{$call->{arg}});
+                            $code = 'excl' . $self->deparse_args(@{$call->{arg}});
                             next;
                         }
 
@@ -1575,7 +1591,7 @@ HEADER
                         }
 
                         if ($method eq '~') {
-                            $code = 'not' . $self->deparse_args(@{$call->{arg}});
+                            $code = 'tilde' . $self->deparse_args(@{$call->{arg}});
                             next;
                         }
 
@@ -1596,7 +1612,7 @@ HEADER
                         }
 
                         if ($method eq 'defined') {
-                            $code = '(' . $self->deparse_args(@{$call->{arg}}) . ' != Any)';
+                            $code = '(' . $self->deparse_args(@{$call->{arg}}) . ' != Any ? TRUE : FALSE)';
                             next;
                         }
                     }
@@ -1668,20 +1684,23 @@ HEADER
 
                     my $keyword = $call->{keyword};
                     if ($keyword eq 'if') {
-                        $code = $self->deparse_generic('(', ';', ')', @{$call->{arg}}) . '&&' . $code;
+                        $code = 'convert(Bool,' . $self->deparse_generic('(', ';', ')', @{$call->{arg}}) . ')&&' . $code;
                         next;
                     }
                     elsif ($keyword eq 'while') {
-                        $code = 'while' . $self->deparse_generic('(', ';', ')', @{$call->{arg}}) . "\n" . $code . "end";
+                        $code =
+                            'while(convert(Bool,'
+                          . $self->deparse_generic('(', ';', ')', @{$call->{arg}}) . "))\n"
+                          . $code . "end";
                         next;
                     }
-                    elsif ($keyword eq 'and') {
-                        $method = '&&';
-                    }
-                    elsif ($keyword eq 'or') {
-                        $method = '||';
-                    }
 
+                    #elsif ($keyword eq 'and') {
+                    #    $method = '&&';
+                    #}
+                    #elsif ($keyword eq 'or') {
+                    #    $method = '||';
+                    #}
                     #$code .= $call->{keyword};
                 }
 

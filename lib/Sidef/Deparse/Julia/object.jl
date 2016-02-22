@@ -10,10 +10,10 @@ function say(s::Sidef_Object...)
     println()
 end
 
-function say(b::Bool)
-    println(b ? "true" : "false")
-end
-
 function print(s::Sidef_Object)
     print(s.value)
+end
+
+function ifelse(b::Sidef_Types_Bool_Bool, x::Any, y::Any)
+    b.value ? x : y
 end

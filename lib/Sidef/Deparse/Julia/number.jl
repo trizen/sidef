@@ -11,16 +11,16 @@ end
 
 for sym in Symbol[:<=, :>=, :<, :>]
     @eval function $sym(a::Sidef_Types_Number_Number, b::Sidef_Types_Number_Number)
-        $sym(a.value, b.value)
+        ($sym(a.value, b.value)) ? TRUE : FALSE
     end
 end
 
-function ==(a::Sidef_Types_Number_Number, b::Sidef_Types_Number_Number)
-    a.value == b.value
+function eq(a::Sidef_Types_Number_Number, b::Sidef_Types_Number_Number)
+    (a.value == b.value) ? TRUE : FALSE
 end
 
-function !=(a::Sidef_Types_Number_Number, b::Sidef_Types_Number_Number)
-    a.value != b.value
+function ne(a::Sidef_Types_Number_Number, b::Sidef_Types_Number_Number)
+    (a.value != b.value) ? TRUE : FALSE
 end
 
 function sqrt(a::Sidef_Types_Number_Number)
@@ -81,6 +81,10 @@ end
 
 function !(a::Sidef_Types_Number_Number)
     Sidef_Types_Number_Number(factorial(a.value))
+end
+
+function excl(a::Sidef_Types_Number_Number)
+    (a.value == 0) ? TRUE : FALSE
 end
 
 function string(a::Sidef_Types_Number_Number)

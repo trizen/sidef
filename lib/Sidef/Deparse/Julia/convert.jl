@@ -20,6 +20,7 @@ function convert(::Type{Bool}, v::Bool)
     v
 end
 
-function convert(::Type{Bool}, ::Any)
+function convert(::Type{Bool}, v::Any)
+    println("Unimplemented conversion of Any $v to Bool")
     false
 end

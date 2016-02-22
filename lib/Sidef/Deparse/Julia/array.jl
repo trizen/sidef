@@ -34,7 +34,7 @@ function setindex!(a::Sidef_Types_Array_Array, v::Any, i::Sidef_Types_Number_Num
 end
 
 function is_empty(a::Sidef_Types_Array_Array)
-    length(a.value) == 0
+    (length(a.value) == 0) ? TRUE : FALSE
 end
 
 function len(a::Sidef_Types_Array_Array)
@@ -66,7 +66,7 @@ end
 function grep(a::Sidef_Types_Array_Array, block::Sidef_Types_Block_Block)
     arr = Any[]
     for item in a.value
-        block(item) && push!(arr, item)
+        convert(Bool, block(item)) && push!(arr, item)
     end
     Sidef_Types_Array_Array(arr)
 end
