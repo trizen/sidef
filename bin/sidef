@@ -32,7 +32,7 @@ sub NATIVE () { 0 }
 my %args;
 if ($#ARGV != -1 and chr ord $ARGV[0] eq '-') {
     require Getopt::Std;
-    Getopt::Std::getopts('e:E:Dho:ivHWwbcrR:ts:CO:kP:M:', \%args);
+    Getopt::Std::getopts('e:E:Dho:ivHWwbcrR:ts:CO:kP:M:B', \%args);
 }
 
 # Help
@@ -274,6 +274,7 @@ sub output_usage {
                     '-i'         => 'interactive mode',
                     '-c'         => 'compile the code as a stand-alone Perl program',
                     '-C'         => 'check syntax only',
+                    '-B'         => 'instructs the compiler to use big numbers',
                     '-D'         => 'dump the syntax tree of a program',
                     '-o file'    => 'file where to dump the output',
                     '-O level'   => ['perform code optimizations before execution',
@@ -636,7 +637,7 @@ HEAD
 
                  close $fh;
              }
-           }
+         }
         } => ($path, $INC{'Sidef.pm'})
     );
 

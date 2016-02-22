@@ -8,8 +8,11 @@ lib/Sidef/Convert/Convert.pod
 lib/Sidef/Deparse/Julia.pm
 lib/Sidef/Deparse/Julia/array.jl
 lib/Sidef/Deparse/Julia/block.jl
+lib/Sidef/Deparse/Julia/bool.jl
 lib/Sidef/Deparse/Julia/complex.jl
+lib/Sidef/Deparse/Julia/convert.jl
 lib/Sidef/Deparse/Julia/hash.jl
+lib/Sidef/Deparse/Julia/nil.jl
 lib/Sidef/Deparse/Julia/number.jl
 lib/Sidef/Deparse/Julia/object.jl
 lib/Sidef/Deparse/Julia/range.jl
@@ -822,6 +825,7 @@ t/09-parser.t
 t/manifest.t
 t/pod.t
 test.sf
+test2.sf
 TODO
 utils/auto_perltidy.sh
 utils/bak_cleaner.sh

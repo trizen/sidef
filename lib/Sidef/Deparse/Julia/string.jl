@@ -14,3 +14,7 @@ end
 function ==(a::Sidef_Types_String_String, b::Sidef_Types_String_String)
     a.value == b.value
 end
+
+function string(s::Sidef_Types_String_String)
+    s.value
+end

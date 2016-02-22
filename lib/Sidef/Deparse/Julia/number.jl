@@ -35,6 +35,14 @@ function min(a::Sidef_Types_Number_Number...)
     Sidef_Types_Number_Number(min(map((x) -> x.value, a)...))
 end
 
+function floor(n::Sidef_Types_Number_Number)
+    Sidef_Types_Number_Number(floor(n.value))
+end
+
+function range(to::Sidef_Types_Number_Number)
+    Sidef_Types_Range_RangeNumber(ZERO, dec(to))
+end
+
 function range(from::Sidef_Types_Number_Number, to::Sidef_Types_Number_Number)
     Sidef_Types_Range_RangeNumber(from, to)
 end

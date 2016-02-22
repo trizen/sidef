@@ -8,12 +8,29 @@ function call(h::Type{Sidef_Types_Array_Array}, v::Any...)
 end
 
 function getindex(a::Sidef_Types_Array_Array, i::Sidef_Types_Number_Number)
-    (a.value)[i.value+1]
+
+    a = a.value
+    if (length(a) <= i.value)
+        return NIL
+    end
+
+    a[round(Int, i.value+1)]
 end
 
 function setindex!(a::Sidef_Types_Array_Array, v::Any, i::Sidef_Types_Number_Number)
     #setindex!(a.value, v, i.value)
-    (a.value)[i.value+1] = v
+
+    i = i.value
+    a = a.value
+    len = length(a)
+
+    if (len <= i)
+        for _ in len:i+1
+            push!(a, NIL)
+        end
+    end
+
+    a[round(Int, i+1)] = v
 end
 
 function is_empty(a::Sidef_Types_Array_Array)

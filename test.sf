@@ -144,6 +144,10 @@ for ([42,43,44]) { |i|
     say "for(): #{i}";
 }
 
+foreach ([42,43,44]) { |i|
+    say "foreach(): #{i}";
+}
+
 #for ((var i = 0, var j = 42); i <= 6; (i+=2, j+=1)) {
 #    say "for(;;): #{i}";
 #    say "for(;;): #{j}";

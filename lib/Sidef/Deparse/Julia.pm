@@ -36,6 +36,10 @@ package Sidef::Deparse::Julia {
                 '?'  => '?',
                 '||' => '||',
                 '&&' => '&&',
+
+                        },
+
+            assign_lazy => {
                 ':=' => '//=',
 
                 # '='     => '=',
@@ -43,7 +47,7 @@ package Sidef::Deparse::Julia {
                 '&&='   => '&&=',
                 '\\\\'  => '//',
                 '\\\\=' => '//=',
-                        },
+                           },
 
             #~ overload_methods => {
             #~ to_str  => q{""},
@@ -1018,7 +1022,9 @@ HEADER
         }
         elsif ($ref eq 'Sidef::Types::Number::Number') {
             $code =
-              $self->make_constant($ref, 'new', "Number$refaddr", join '/', map { qq{big"$_"} } split /\//, $obj->_get_frac);
+              $self->make_constant($ref, 'new', "Number$refaddr", join '/',
+                                   map { $self->{opt}{B} ? qq{big"$_"} : $_ } split /\//,
+                                   $obj->_get_frac);
         }
         elsif ($ref eq 'Sidef::Types::Number::Inf') {
             $code = $self->make_constant($ref, 'new', "Inf$refaddr");
@@ -1038,7 +1044,7 @@ HEADER
         elsif ($ref eq 'Sidef::Types::Bool::Bool') {
 
             #$code = $self->make_constant($ref, 'new', ${$obj} ? ("true$refaddr", 1) : ("false$refaddr", 0));
-            $code = ${$obj} ? 'true' : 'false';
+            $code = ${$obj} ? 'TRUE' : 'FALSE';    #'true' : 'false';
         }
         elsif ($ref eq 'Sidef::Types::Regex::Regex') {
             $code =
@@ -1050,7 +1056,10 @@ HEADER
             foreach my $i (0 .. $#{$obj->{if}}) {
                 $code .= ($i == 0 ? 'if' : 'elseif');
                 my $info = $obj->{if}[$i];
-                $code .= "(" . $self->deparse_args($info->{expr}) . ")" . $self->deparse_statements($info->{block}{code});
+                $code .=
+                    "(convert(Bool,"
+                  . $self->deparse_args($info->{expr}) . "))"
+                  . $self->deparse_statements($info->{block}{code});
             }
             if (exists $obj->{else}) {
                 $code .= 'else' . $self->deparse_statements($obj->{else}{block}{code});
@@ -1058,7 +1067,10 @@ HEADER
             $code .= 'end';
         }
         elsif ($ref eq 'Sidef::Types::Block::While') {
-            $code = "while" . $self->deparse_args($obj->{expr}) . $self->deparse_bare_block($obj->{block}{code});
+            $code =
+                "while(convert(Bool,"
+              . $self->deparse_args($obj->{expr}) . '))'
+              . $self->deparse_bare_block($obj->{block}{code});
         }
         elsif ($ref eq 'Sidef::Types::Block::ForEach') {
             $code = 'each('
@@ -1074,13 +1086,15 @@ HEADER
                 'for '
               . $var . ' in '
               . $self->deparse_expr({self => $obj->{array}})
-              . '.value '
-              . "\nisa($var, Number) && ($var = Sidef_Types_Number_Number($var))\n"
+              . '.value ' . "\n"
+              . (' ' x ($Sidef::SPACES + $Sidef::SPACES_INCR))
+              . "isa($var, Number) && ($var = Sidef_Types_Number_Number($var))\n"
               . $self->deparse_bare_block($obj->{block}{code});
         }
         elsif ($ref eq 'Sidef::Types::Bool::Ternary') {
             $code = '('
-              . $self->deparse_script($obj->{cond}) . ' ?'
+              . 'convert(Bool,'
+              . $self->deparse_script($obj->{cond}) . ')' . ' ?'
               . $self->deparse_block_expr($obj->{true}) . ':'
               . $self->deparse_block_expr($obj->{false}) . ')';
         }
@@ -1456,9 +1470,16 @@ HEADER
                         next;
                     }
 
+                    # Lazy operators, such as: ||, &&, etc...
                     if (exists($self->{lazy_ops}{$method})) {
-                        $code .= $self->{lazy_ops}{$method} . $self->deparse_block_expr(@{$call->{arg}}) . ' ';
+                        $code = 'convert(Bool, ' . $code . ')' .=
+                          $self->{lazy_ops}{$method} . $self->deparse_block_expr(@{$call->{arg}}) . ' ';
                         next;
+                    }
+
+                    # Lazy assignment, such as: ||=, &&=, etc...
+                    if (exists($self->{assign_lazy}{$method})) {
+                        die "ERROR: Lazy assignment (`$method`) is not implemented yet.";
                     }
 
                     # Variable assignment (=)
@@ -1539,14 +1560,12 @@ HEADER
                     # ! prefix-unary
                     if ($ref eq 'Sidef::Object::Unary') {
                         if ($method eq '!') {
-                            $code = '(do{'
-                              . $self->deparse_args(@{$call->{arg}})
-                              . '} ? (Sidef::Types::Bool::Bool::FALSE) : (Sidef::Types::Bool::Bool::TRUE))';
+                            $code = '!' . $self->deparse_args(@{$call->{arg}});
                             next;
                         }
 
                         if ($method eq '-') {
-                            $code = $self->deparse_args(@{$call->{arg}}) . '->neg';
+                            $code = 'neg' . $self->deparse_args(@{$call->{arg}});
                             next;
                         }
 
@@ -1556,12 +1575,12 @@ HEADER
                         }
 
                         if ($method eq '~') {
-                            $code = $self->deparse_args(@{$call->{arg}}) . '->not';
+                            $code = 'not' . $self->deparse_args(@{$call->{arg}});
                             next;
                         }
 
                         if ($method eq '√') {
-                            $code = $self->deparse_args(@{$call->{arg}}) . '->sqrt';
+                            $code = 'sqrt' . $self->deparse_args(@{$call->{arg}});
                             next;
                         }
 
@@ -1630,9 +1649,13 @@ HEADER
                             if ($method eq '^') {
                                 $method = '$';
                             }
-                            else {
-                                if ($method eq '**') {
-                                    $method = '^';
+                            elsif ($method eq '**') {
+                                $method = '^';
+                            }
+                            elsif ($method eq '...') {
+                                if (not exists $call->{arg}) {
+                                    $code .= '.value...';
+                                    next;
                                 }
                             }
 
@@ -1642,7 +1665,24 @@ HEADER
                 }
 
                 if (exists $call->{keyword}) {
-                    $code .= $call->{keyword};
+
+                    my $keyword = $call->{keyword};
+                    if ($keyword eq 'if') {
+                        $code = $self->deparse_generic('(', ';', ')', @{$call->{arg}}) . '&&' . $code;
+                        next;
+                    }
+                    elsif ($keyword eq 'while') {
+                        $code = 'while' . $self->deparse_generic('(', ';', ')', @{$call->{arg}}) . "\n" . $code . "end";
+                        next;
+                    }
+                    elsif ($keyword eq 'and') {
+                        $method = '&&';
+                    }
+                    elsif ($keyword eq 'or') {
+                        $method = '||';
+                    }
+
+                    #$code .= $call->{keyword};
                 }
 
                 if (exists $call->{arg}) {
