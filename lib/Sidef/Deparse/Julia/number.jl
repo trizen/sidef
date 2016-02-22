@@ -43,6 +43,14 @@ function range(from::Sidef_Types_Number_Number, to::Sidef_Types_Number_Number, s
     Sidef_Types_Range_RangeNumber(from, to, step)
 end
 
+function inc(n::Sidef_Types_Number_Number)
+    Sidef_Types_Number_Number(n.value+1)
+end
+
+function dec(n::Sidef_Types_Number_Number)
+    Sidef_Types_Number_Number(n.value-1)
+end
+
 function ..(from::Sidef_Types_Number_Number, to::Sidef_Types_Number_Number)
     arr = Sidef_Types_Number_Number[]
     for i in from.value:to.value

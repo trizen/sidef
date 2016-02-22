@@ -356,9 +356,10 @@ HEADER
 
         my $code = '';
 
-        $code .= "_anys$refaddr = Any[]\n";
-        $code .= "for i in 1:(" . @dumped_vars . " - length(_$refaddr)) push!(_anys$refaddr, NIL); end\n";
-        $code .= "_$refaddr = (_$refaddr..., _anys$refaddr...)\n";
+        $code .= (' ' x $Sidef::SPACES) . "_anys$refaddr = Any[]\n";
+        $code .=
+          (' ' x $Sidef::SPACES) . "for i in 1:(" . @dumped_vars . " - length(_$refaddr)) push!(_anys$refaddr, NIL); end\n";
+        $code .= (' ' x $Sidef::SPACES) . "_$refaddr = (_$refaddr..., _anys$refaddr...)\n";
         $code .= (' ' x $Sidef::SPACES) . join(', ', @dumped_vars) . ", = _$refaddr\n";
 
         #my $code = join(', ', @dumped_vars);
@@ -615,7 +616,7 @@ HEADER
                     }
 
                     # The name of the function
-                    $code .= "$obj->{name}$refaddr = ";
+                    $code .= "begin $obj->{name}$refaddr = ";
 
                     # Deparse the block of the method/function
                     {
@@ -690,6 +691,8 @@ HEADER
                         #~ . $self->_dump_string("$self->{package_name}::$obj->{name}");
                         #~ }
                     }
+
+                    $code .= "\n" . (' ' x $Sidef::SPACES) . 'end';
                 }
             }
         }
@@ -939,7 +942,7 @@ HEADER
                     $code .= (" " x $Sidef::SPACES) . join(";\n" . (" " x $Sidef::SPACES), @statements)
 
                       #. ($is_function ? (";\n" . (" " x $Sidef::SPACES) . "END$refaddr: \@return;\n") : '') . "\n"
-                      . (" " x ($Sidef::SPACES -= $Sidef::SPACES_INCR)) . 'end)';
+                      . "\n" . (" " x ($Sidef::SPACES -= $Sidef::SPACES_INCR)) . 'end)';
 
                     #~ if (not $is_class) {
                     #~ if ($is_function) {
@@ -1052,7 +1055,7 @@ HEADER
             if (exists $obj->{else}) {
                 $code .= 'else' . $self->deparse_statements($obj->{else}{block}{code});
             }
-            $code .= "end";
+            $code .= 'end';
         }
         elsif ($ref eq 'Sidef::Types::Block::While') {
             $code = "while" . $self->deparse_args($obj->{expr}) . $self->deparse_bare_block($obj->{block}{code});
@@ -1439,8 +1442,8 @@ HEADER
                         elsif (exists $self->{inc_dec_ops}{$method}) {
                             my $var = $self->deparse_args(@{$call->{arg}});
 
-                            #$code = "($var=$var\->$self->{inc_dec_ops}{$method})[0]";
-                            $code = "do{my \$ref=\\$var; \$\$ref=\$\$ref\->$self->{inc_dec_ops}{$method}}";
+                            # TODO: optimize it
+                            $code = " begin $var=$self->{inc_dec_ops}{$method}\($var); end ";
                             next;
                         }
                     }
@@ -1448,9 +1451,8 @@ HEADER
                     # Postfix ++ and -- operators on variables
                     if (exists($self->{inc_dec_ops}{$method})) {
 
-                        #$code = "do{my \$old=$code; $code=$code\->$self->{inc_dec_ops}{$method}; \$old}";
-                        $code =
-                          "do{my \$ref=\\$code; my \$value=\$\$ref; \$\$ref=\$value\->$self->{inc_dec_ops}{$method}; \$value}";
+                        # TODO: optimize it
+                        $code = " begin _res = $code; $code=$self->{inc_dec_ops}{$method}\($code); _res; end ";
                         next;
                     }
 

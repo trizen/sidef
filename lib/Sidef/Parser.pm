@@ -1370,17 +1370,8 @@ package Sidef::Parser {
                 if (($type eq 'method' or $type eq 'func') and $name ne '') {
                     my $var = $self->find_var($name, $class_name);
 
-                    # Redeclaration of a function or a method in the same scope
-                    if (defined $var) {
-
-                        if ($var->{obj}{type} ne $type) {
-                            $self->fatal_error(
-                                  code => $_,
-                                  pos  => $-[0],
-                                  error =>
-                                    "invalid re-declaration of '$var->{obj}{type}' (declared at line $var->{line}) as '$type'",
-                            );
-                        }
+                    # A function or a method must be declared in the same scope
+                    if (defined($var) and $var->{obj}{type} eq $type) {
 
                         $parent   = $var->{obj};
                         $has_kids = 1;
