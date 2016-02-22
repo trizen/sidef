@@ -1719,7 +1719,7 @@ HEADER
              )
            . $self->{top_program} . "\n"
            . join($self->{between}, @statements)
-           . $self->{after} . "end"
+           . $self->{after} . "end\n"
         ) =~ s/^\s*/$self->{header}/r;
     }
 }

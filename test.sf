@@ -148,3 +148,27 @@ for ([42,43,44]) { |i|
 #    say "for(;;): #{i}";
 #    say "for(;;): #{j}";
 #}
+
+
+#
+## Array `grep` and `map`
+#
+
+var arr = [1,2,3,4,5,5,6,6,7,7]
+
+say arr.grep{ _ % 2 == 0 }.join
+say arr.map{|i| i**2 }.join(' ')
+
+#
+## Mutual recursion
+#
+
+func F {};
+func M {};
+
+F = func(n) { n > 0 ? (n - M(F(n-1))) : 1 };
+M = func(n) { n > 0 ? (n - F(M(n-1))) : 0 };
+
+[F, M].each { |seq|
+    (0..19).map {|i| seq.call(i)}.join(' ').say;
+}

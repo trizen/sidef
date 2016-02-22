@@ -3,7 +3,7 @@
 ## Number methods
 #
 
-for sym in Symbol[:+, :-, :*, :/, ://, :|, :&, :^, :$]
+for sym in Symbol[:+, :-, :*, :/, ://, :%, :|, :&, :^, :$]
     @eval function $sym(a::Sidef_Types_Number_Number, b::Sidef_Types_Number_Number)
         Sidef_Types_Number_Number($sym(a.value, b.value))
     end
@@ -41,6 +41,14 @@ end
 
 function range(from::Sidef_Types_Number_Number, to::Sidef_Types_Number_Number, step::Sidef_Types_Number_Number)
     Sidef_Types_Range_RangeNumber(from, to, step)
+end
+
+function ..(from::Sidef_Types_Number_Number, to::Sidef_Types_Number_Number)
+    arr = Sidef_Types_Number_Number[]
+    for i in from.value:to.value
+        push!(arr, Sidef_Types_Number_Number(i))
+    end
+    Sidef_Types_Array_Array(arr)
 end
 
 for p in Dict{Symbol, Symbol}(

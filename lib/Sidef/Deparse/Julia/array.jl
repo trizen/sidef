@@ -37,3 +37,38 @@ function each(a::Sidef_Types_Array_Array, block::Sidef_Types_Block_Block)
         block(item)
     end
 end
+
+function map(a::Sidef_Types_Array_Array, block::Sidef_Types_Block_Block)
+    arr = Any[]
+    for item in a.value
+        push!(arr, block(item))
+    end
+    Sidef_Types_Array_Array(arr)
+end
+
+function grep(a::Sidef_Types_Array_Array, block::Sidef_Types_Block_Block)
+    arr = Any[]
+    for item in a.value
+        block(item) && push!(arr, item)
+    end
+    Sidef_Types_Array_Array(arr)
+end
+
+function join(a::Sidef_Types_Array_Array)
+    str = ""
+    for item in a.value
+        str *= string(item)
+    end
+    Sidef_Types_String_String(str)
+end
+
+function join(a::Sidef_Types_Array_Array, sep::Sidef_Types_String_String)
+    str = ""
+    a = a.value
+    sep = sep.value
+    for i in 1:length(a)-1
+        str *= string(a[i]) * sep
+    end
+    str *= string(a[end])
+    Sidef_Types_String_String(str)
+end
