@@ -19,8 +19,16 @@ function eq(a::Sidef_Types_Number_Number, b::Sidef_Types_Number_Number)
     (a.value == b.value) ? TRUE : FALSE
 end
 
+function eq(::Sidef_Types_Number_Number, ::Sidef_Object)
+    FALSE
+end
+
 function ne(a::Sidef_Types_Number_Number, b::Sidef_Types_Number_Number)
     (a.value != b.value) ? TRUE : FALSE
+end
+
+function ne(::Sidef_Types_Number_Number, ::Sidef_Object)
+    TRUE
 end
 
 function sqrt(a::Sidef_Types_Number_Number)
@@ -60,9 +68,18 @@ function dec(n::Sidef_Types_Number_Number)
 end
 
 function ..(from::Sidef_Types_Number_Number, to::Sidef_Types_Number_Number)
-    arr = Sidef_Types_Number_Number[]
+    arr = Any[]
     for i in from.value:to.value
         push!(arr, Sidef_Types_Number_Number(i))
+    end
+    Sidef_Types_Array_Array(arr)
+end
+
+function of(n::Sidef_Types_Number_Number, block::Sidef_Types_Block_Block)
+    arr = Any[]
+    block = block.value
+    for i in 1:n.value
+        push!(arr, block(Sidef_Types_Number_Number(i)))
     end
     Sidef_Types_Array_Array(arr)
 end

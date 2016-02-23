@@ -3,7 +3,7 @@
 ## Range methods
 #
 
-function call(r::Type{Sidef_Types_Range_RangeNumber}, from::Sidef_Types_Number_Number, to::Sidef_Types_Number_Number, step::Sidef_Types_Number_Number=ONE)
+function call(::Type{Sidef_Types_Range_RangeNumber}, from::Sidef_Types_Number_Number, to::Sidef_Types_Number_Number, step::Sidef_Types_Number_Number=ONE)
     Sidef_Types_Range_RangeNumber(from.value:step.value:to.value)
 end
 

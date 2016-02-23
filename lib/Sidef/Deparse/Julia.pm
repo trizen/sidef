@@ -359,11 +359,13 @@ HEADER
 
         my $code = '';
 
+        my $slurpy = @vars && exists($vars[-1]{array});
+
         $code .= (' ' x $Sidef::SPACES) . "_anys$refaddr = Any[]\n";
         $code .=
           (' ' x $Sidef::SPACES) . "for i in 1:(" . @dumped_vars . " - length(_$refaddr)) push!(_anys$refaddr, NIL); end\n";
         $code .= (' ' x $Sidef::SPACES) . "_$refaddr = (_$refaddr..., _anys$refaddr...)\n";
-        $code .= (' ' x $Sidef::SPACES) . join(', ', @dumped_vars) . ", = _$refaddr\n";
+        $code .= (' ' x $Sidef::SPACES) . join(', ', @dumped_vars) . ($slurpy ? '' : ',') . " = _$refaddr\n";
 
         #my $code = join(', ', @dumped_vars);
         #my $code = '';
@@ -381,7 +383,7 @@ HEADER
                     $code .= ('@' . $name . '=(' . $self->deparse_expr({self => $var->{value}}) . ") if not \@$name;\n");
                 }
 
-                $code .= (' ' x $Sidef::SPACES) . "my \$$name = Sidef::Types::Array::Array->new(\@$name);\n";
+                $code .= (' ' x $Sidef::SPACES) . "$name = Sidef_Types_Array_Array(Any[$name...]);\n";
                 delete $var->{array};
             }
             elsif (exists $var->{hash}) {

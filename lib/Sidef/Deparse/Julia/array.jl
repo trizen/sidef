@@ -3,7 +3,7 @@
 ## Array methods
 #
 
-function call(h::Type{Sidef_Types_Array_Array}, v::Any...)
+function call(::Type{Sidef_Types_Array_Array}, v::Any...)
     Sidef_Types_Array_Array(Any[v...])
 end
 
@@ -91,4 +91,17 @@ function join(a::Sidef_Types_Array_Array, sep::Sidef_Types_String_String)
         str *= string(a[end])
     end
     Sidef_Types_String_String(str)
+end
+
+function string(a::Sidef_Types_Array_Array)
+    str = "["
+    a = a.value
+    len = length(a)
+    for i in 1:len-1
+        str *= string(a[i]) * ", "
+    end
+    if (len > 0)
+        str *= string(a[end])
+    end
+    str * "]"
 end

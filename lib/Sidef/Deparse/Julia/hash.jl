@@ -3,7 +3,7 @@
 ## Hash methods
 #
 
-function call(h::Type{Sidef_Types_Hash_Hash}, s::Any...)
+function call(::Type{Sidef_Types_Hash_Hash}, s::Any...)
     d = Dict{Any,Any}()
     for i in 1:2:length(s)
         d[s[i]] = s[i+1]
