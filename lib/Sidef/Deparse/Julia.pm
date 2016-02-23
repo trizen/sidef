@@ -93,13 +93,20 @@ package Sidef::Deparse::Julia {
         require File::Spec;
         require File::Basename;
 
-        my $path = File::Spec->catdir(File::Basename::dirname($INC{"Sidef/Deparse/Julia.pm"}), "Julia");
+        my $local = File::Spec->catfile(File::Basename::dirname($INC{"Sidef/Deparse/Julia.pm"}), "Julia", "Sidef.jl");
+
         $opts{header} .= <<"HEADER";
 module SidefRuntime
 
-include("$path/Sidef.jl")
-
 HEADER
+
+        if (-e $local) {
+            $opts{header} .= qq{include("\Q$local\E")\n\n};
+        }
+        else {
+            my $libpath = join(",", map { qq{"\Q$_\E"} } "Sidef", "Sidef.jl");
+            $opts{header} .= "include(Pkg.dir($libpath))\n\n";
+        }
 
         if (exists $opts{opt}{P}) {
             my $precision = abs(int($opts{opt}{P}));
