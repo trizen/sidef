@@ -782,7 +782,7 @@ package Sidef::Parser {
             $self->parse_whitespace(code => $opt{code});
         }
 
-        $self->parse_whitespace(code => $opt{code});
+        $self->parse_whitespace(code => $opt{code}) if defined($end_delim);
 
         defined($end_delim)
           && (
