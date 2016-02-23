@@ -14,7 +14,7 @@ func mean_angle(angles) {
 func time2deg(t) {
   (var m = t.match(/^(\d\d):(\d\d):(\d\d)$/)) || die "invalid time";
   var (hh,mm,ss) = m.cap.map{.to_i}...;
-  ((hh ~~ 0...23) && (mm ~~ 0...59) && (ss ~~ 0...59)) || die "invalid time";
+  ((hh ~~ range(24)) && (mm ~~ range(60)) && (ss ~~ range(60))) || die "invalid time";
   (hh*3600 + mm*60 + ss) * 360 / 86400;
 }
  

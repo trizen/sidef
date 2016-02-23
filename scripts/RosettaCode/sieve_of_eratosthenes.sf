@@ -10,7 +10,7 @@ func sieve_iter(limit) {
         is_prime.each_kv { |number, prime|
             if (prime) {
                 take(number);
-                number**2 ... limit -> each { |n| is_prime[n] = false if n%%number }
+                for n in range(number**2, limit) { is_prime[n] = false if n%%number }
             }
         }
     }

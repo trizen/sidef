@@ -715,7 +715,6 @@ scripts/Tests/permutations.sf
 scripts/Tests/permutations_2.sf
 scripts/Tests/pi_and_e.sf
 scripts/Tests/pi_machin_like_formula.sf
-scripts/Tests/postfix_and_infix_ellipsis.sf
 scripts/Tests/power_numbers.sf
 scripts/Tests/prefix_methods.sf
 scripts/Tests/problem_of_apollonius.sf

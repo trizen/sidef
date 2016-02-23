@@ -2434,7 +2434,6 @@ package Sidef::Types::Number::Number {
         *{__PACKAGE__ . '::' . '!='}  = \&ne;
         *{__PACKAGE__ . '::' . '≠'} = \&ne;
         *{__PACKAGE__ . '::' . '..'}  = \&array_to;
-        *{__PACKAGE__ . '::' . '...'} = \&to;
         *{__PACKAGE__ . '::' . '..^'} = \&to;
         *{__PACKAGE__ . '::' . '^..'} = \&downto;
         *{__PACKAGE__ . '::' . '!'}   = \&factorial;

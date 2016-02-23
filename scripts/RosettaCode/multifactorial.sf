@@ -8,6 +8,6 @@ func mfact(s, n) {
     n > 0 ? (n * mfact(s, n-s)) : 1;
 }
  
-1...10 -> each { |s|
+for s in range(1, 10) {
     say "step=#{s}: #{1..10 -> map {|n| mfact(s, n)}.join(' ')}";
 }

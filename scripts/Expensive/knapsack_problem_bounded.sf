@@ -56,7 +56,7 @@ func pick(weight, pos) is cached {
     var (bv=0, bi=0, bw=0, bp=[])
     var item = items[pos];
 
-    0 ... item.quant -> each { |i|
+    for i in range(0, item.quant) {
         break if (i*item.weight > weight)
         var (v, w, p) = pick(weight - i*item.weight, pos.dec)
         next if ((v += i*item.value) <= bv)

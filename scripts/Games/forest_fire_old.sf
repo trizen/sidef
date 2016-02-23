@@ -22,8 +22,8 @@ define dirs = [
 
 var forest = h.of { w.of { 1.rand < tree_prob ? Tree : Empty } };
 
-var range_h = (0 ... h-1);
-var range_w = (0 ... w-1);
+var range_h = range(h);
+var range_w = range(w);
 
 func iterate {
     var new = h.of{ w.of(0) };
@@ -48,6 +48,8 @@ func iterate {
     }
     forest = new;
 }
+
+STDOUT.autoflush(true)
 
 func init_forest {
     print r;

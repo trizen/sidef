@@ -435,7 +435,6 @@ package Sidef::Types::Number::Ninf {
         *{__PACKAGE__ . '::' . '!='}  = \&ne;
         *{__PACKAGE__ . '::' . '≠'} = \&ne;
         *{__PACKAGE__ . '::' . '..'}  = \&array_to;
-        *{__PACKAGE__ . '::' . '...'} = \&to;
         *{__PACKAGE__ . '::' . '..^'} = \&to;
         *{__PACKAGE__ . '::' . '^..'} = \&downto;
         *{__PACKAGE__ . '::' . '>'}   = \&gt;

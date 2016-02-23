@@ -28,7 +28,7 @@ func binary_multiplier(a,b) {
                 carry = d;
             };
             carry && (
-                ylen + 1 ... plen -> each { |j|
+                for j in range(ylen+1, plen) {
                     var add = (carry + p[plen - j - k]);
                     var (d, m) = add.divmod(2);
                     p[plen - j - k] = m;

@@ -35,10 +35,6 @@ package Sidef::Parser {
                 reduce => [0, 'reduce_operator'],
             },
 
-            binpost_ops => {    # infix + postfix operators
-                             '...' => 1,
-                           },
-
             static_obj_re => qr{\G
                 (?>
                        nil\b                          (?{ state $x = bless({}, 'Sidef::Types::Nil::Nil') })
@@ -2368,12 +2364,12 @@ package Sidef::Parser {
                 if (defined($method)) {
 
                     my $has_arg;
-                    if (/\G\h*(?=[({])/gc || $req_arg || exists($self->{binpost_ops}{$method})) {
+                    if (/\G\h*(?=[({])/gc || $req_arg) {
 
                         my $code = substr($_, pos);
                         my $arg = (
                                      /\G(?=\()/ ? $self->parse_arg(code => \$code)
-                                   : ($req_arg || exists($self->{binpost_ops}{$method})) ? $self->parse_obj(code => \$code)
+                                   : $req_arg ? $self->parse_obj(code => \$code)
                                    : /\G(?=\{)/ ? $self->parse_block(code => \$code, topic_var => 1)
                                    :              die "[PARSING ERROR] Something is wrong in the if condition"
                                   );
@@ -2387,9 +2383,6 @@ package Sidef::Parser {
                                                  arg     => $arg,
                                                  op_type => $op_type,
                                                 );
-                        }
-                        elsif (exists($self->{binpost_ops}{$method})) {
-                            ## it's a postfix operator
                         }
                         else {
                             $self->fatal_error(
@@ -2739,15 +2732,14 @@ package Sidef::Parser {
                     my ($method, $req_arg, $op_type) = $self->get_method_name(code => $opt{code});
 
                     my $has_arg;
-                    if ($req_arg or exists $self->{binpost_ops}{$method}) {
+                    if ($req_arg) {
                         my $lonely_obj = /\G\h*(?=\()/gc;
-                        my $is_binpost = exists($self->{binpost_ops}{$method});
 
                         my $code = substr($_, pos);
                         my $arg = (
-                                     $is_binpost && /\G(?=\h*(?:\R|#))/ ? ()
-                                   : $lonely_obj ? $self->parse_arg(code => \$code)
-                                   :               $self->parse_obj(code => \$code)
+                                     $lonely_obj
+                                   ? $self->parse_arg(code => \$code)
+                                   : $self->parse_obj(code => \$code)
                                   );
 
                         if (defined $arg) {
@@ -2770,9 +2762,6 @@ package Sidef::Parser {
                                                  arg     => $arg,
                                                  op_type => $op_type,
                                                 );
-                        }
-                        elsif ($is_binpost) {
-                            ## it's a postfix operator
                         }
                         else {
                             $self->fatal_error(

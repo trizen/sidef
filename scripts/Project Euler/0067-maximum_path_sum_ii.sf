@@ -14,7 +14,7 @@ var sum = [0];
 triangle.each { |x|
     sum = [
             x.first + sum.first,
-            1 ... x.end-1 -> map{|i| x[i] + Math.max(sum[i-1, i])}...,
+            range(1, x.end-1) -> map{|i| x[i] + Math.max(sum[i-1, i])}...,
             x.last + sum.last,
           ];
 }

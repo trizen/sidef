@@ -2,7 +2,7 @@
 
 func is_prime(Number _ (2))                   { true }
 func is_prime(Number _ { _ <= 1 || !(_ & 1)}) { false }
-func is_prime(Number a) { 3 ... a.sqrt.int -> any { a %% _ } -> not }
+func is_prime(Number a) { range(3, a.isqrt) -> any { a %% _ } -> not }
 
 assert_eq(
     (0..50).grep { is_prime(_) },

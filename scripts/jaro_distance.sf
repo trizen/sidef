@@ -21,7 +21,7 @@ func jaro(s, t) {
         var start = max(0, i-match_distance)
         var end = min(i+match_distance, t_len-1)
 
-        start ... end -> each { |k|
+        for k in range(start, end) {
             t_matches[k] && next
             s[i] == t[k] || next
             s_matches[i] = true

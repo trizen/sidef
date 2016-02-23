@@ -64,10 +64,10 @@ class Forest(p=0.01, f=0.001, height, width) {
     }
 }
 
-local $| = 1;
-var(height, width) = `stty size`.nums.map{.dec}...;
+STDOUT.autoflush(true)
+var(height, width) = `stty size`.nums.map{.dec}...
 
-var forest = Forest(height: height, width: width);
+var forest = Forest(height: height, width: width)
 print "\e[2J";
 loop {
     print "\e[H";

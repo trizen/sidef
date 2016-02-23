@@ -1495,7 +1495,6 @@ package Sidef::Types::String::String {
         *{__PACKAGE__ . '::' . '÷'}  = \&div;
         *{__PACKAGE__ . '::' . '/'}   = \&div;
         *{__PACKAGE__ . '::' . '..'}  = \&array_to;
-        *{__PACKAGE__ . '::' . '...'} = \&to;
         *{__PACKAGE__ . '::' . '..^'} = \&to;
         *{__PACKAGE__ . '::' . '^..'} = \&downto;
         *{__PACKAGE__ . '::' . '^'}   = \&xor;

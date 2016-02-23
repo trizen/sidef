@@ -277,7 +277,7 @@ class new(diacritics            = true,
             words.append(__METHOD__(self, number.int)...);
         }
         elsif (number >= BIGNUMS[0]{:num}) {
-            0 ... BIGNUMS.end-1 -> each { |i|
+            for i in range(BIGNUMS.end) {
                 var j = BIGNUMS.end-i;
 
                 if (number >= BIGNUMS[j-1]{:num} && (number < BIGNUMS[j]{:num})) {

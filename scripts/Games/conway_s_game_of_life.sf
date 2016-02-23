@@ -30,6 +30,8 @@ func iterate {
     universe = new
 }
 
+STDOUT.autoflush(true)
+
 loop {
     print r
     say universe.map{|row| row.map{|cell| cell ? '#' : ' '}.join }.join("\n")

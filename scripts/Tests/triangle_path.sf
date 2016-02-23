@@ -29,7 +29,7 @@ triangle.open_r.each { |line|
     var x = line.words.map{.to_i};
     sum = [
             x.first + sum.first,
-            1 ... x.len-2 -> map{|i| x[i] + Math.max(sum[i-1, i])}...,
+            range(1, x.len-2) -> map{|i| x[i] + Math.max(sum[i-1, i])}...,
             x.last + sum.last,
           ];
 }

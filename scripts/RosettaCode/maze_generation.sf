@@ -31,7 +31,7 @@ func walk(x, y) {
 
 walk(w.rand.int, h.rand.int);   # generate
 
-0...h -> each { |i|
+for i in range(0, h) {
     say (hor[i].join('') + '+');
     if (i < h) {
         say (ver[i].join('') + '|');

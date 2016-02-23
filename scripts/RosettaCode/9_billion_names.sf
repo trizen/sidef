@@ -5,7 +5,7 @@
 var cache = [[1]];
 
 func cumu (n) {
-    cache.len ... n -> each { |l|
+    for l in range(cache.len, n) {
         var r = [0];
         { |i|
             r.append(r[-1] + cache[l-i][[i, l-i].min])

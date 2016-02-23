@@ -20,10 +20,10 @@ func fmt_month (year, month) {
     str += (["  "] * week_day-1 -> join(" "))
 
     var last_day = dt.last_day_of_month(year => year, month => month).day
-    date.day ... last_day -> each { |day|
+    for day in range(date.day, last_day) {
         date = dt.new(year => year, month => month, day => day)
 
-        str += " " if (week_day ~~ 2...7)
+        str += " " if (week_day ~~ range(2, 7))
         if (week_day == 8) {
             str += "\n"
             week_day = 1
