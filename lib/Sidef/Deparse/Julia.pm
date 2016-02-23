@@ -1403,9 +1403,9 @@ HEADER
                 my $call   = $expr->{call}[$i];
                 my $method = $call->{method};
 
-                if ($code ne '') {
-                    $code = '(' . $code . ')';
-                }
+                #if ($code ne '' and substr($code, -3) ne '...') {
+                #    $code = '(' . $code . ')';
+                #}
 
                 if ($ref eq 'Sidef::Types::Block::Return') {
 
