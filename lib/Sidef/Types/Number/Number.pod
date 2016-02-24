@@ -1392,7 +1392,7 @@ Number.to() -> I<Obj>
 
 Return the
 
-Aliases: I<...()>, I<..^()>, I<upto>
+Aliases: I<..^()>, I<upto>
 
 =cut
 

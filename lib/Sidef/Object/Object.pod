@@ -80,6 +80,14 @@ Return the
 
 =cut
 
+=head2 interpolate
+
+Object.interpolate() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 is_a
 
 Object.is_a() -> I<Obj>
@@ -161,14 +169,6 @@ Object.say() -> I<Obj>
 Return the
 
 Aliases: I<println>
-
-=cut
-
-=head2 super_join
-
-Object.super_join() -> I<Obj>
-
-Return the
 
 =cut
 

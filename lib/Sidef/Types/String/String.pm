@@ -1394,7 +1394,7 @@ package Sidef::Types::String::String {
                         $parser->{class} => [
                                              {
                                               self => $str_dt,
-                                              call => [{method => 'super_join'}]
+                                              call => [{method => 'interpolate'}]
                                              }
                                             ]
                        };

@@ -904,7 +904,7 @@ String.to() -> I<Obj>
 
 Return the
 
-Aliases: I<...()>, I<..^()>, I<up_to>, I<upto>
+Aliases: I<..^()>, I<up_to>, I<upto>
 
 =cut
 

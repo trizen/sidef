@@ -777,6 +777,30 @@ HEADER
             else {
                 my $block = $obj->{block};
 
+                #
+                ## Implementation idea:
+                #
+
+                #~ immutable Example <: Sidef_Object
+                #~      value::Dict{Symbol, Any}
+                #~ end
+
+                #~ function call(::Type{Example})
+                #~      Example(Dict{}(:name => 42))
+                #~ end
+
+                #~ function hello(::Example)
+                #~      println("hello world!")
+                #~ end
+
+                #~ function getindex(self::Example, name::Sidef_Types_String_String)
+                #~ (self.value)[symbol(name.value)]
+                #~ end
+
+                #~ obj = Example()
+                #~ println(obj[Sidef_Types_String_String("name")])
+                #~ (hello)(obj)
+
                 $code = "do {package ";
 
                 my $package_name;

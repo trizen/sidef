@@ -154,7 +154,7 @@ package Sidef::Object::Object {
         Sidef::Types::Array::Array->new(map { Sidef::Types::String::String->new($_) } $extract_parents->(CORE::ref($obj)));
     }
 
-    sub super_join {
+    sub interpolate {
         my ($self, @args) = @_;
         $self->new(
             CORE::join(

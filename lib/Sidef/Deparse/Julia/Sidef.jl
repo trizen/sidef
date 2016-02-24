@@ -76,7 +76,7 @@ const MONE = Sidef_Types_Number_Number(-1)
 const ZERO = Sidef_Types_Number_Number(0)
 const ONE = Sidef_Types_Number_Number(1)
 
-function super_join(::Type{Sidef_Types_String_String}, a::Any...)
+function interpolate(::Type{Sidef_Types_String_String}, a::Any...)
     str = ""
     for item in a
         str *= string(item)
