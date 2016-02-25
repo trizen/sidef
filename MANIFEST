@@ -18,6 +18,7 @@ lib/Sidef/Deparse/Julia/object.jl
 lib/Sidef/Deparse/Julia/range.jl
 lib/Sidef/Deparse/Julia/Sidef.jl
 lib/Sidef/Deparse/Julia/string.jl
+lib/Sidef/Deparse/Julia2.pm
 lib/Sidef/Deparse/Perl.pm
 lib/Sidef/Deparse/Sidef.pm
 lib/Sidef/Math/Math.pm

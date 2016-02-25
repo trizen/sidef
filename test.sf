@@ -23,9 +23,9 @@ say sqrt(2)
 say 0.5
 say 10/3;
 
-say add(1,2,3);
-say mul(2,3,4);
-say pow(2, 3);
+#say add(1,2,3);
+#say mul(2,3,4);
+#say pow(2, 3);
 
 say 5!;
 
