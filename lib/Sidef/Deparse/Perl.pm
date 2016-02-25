@@ -51,6 +51,7 @@ package Sidef::Deparse::Perl {
 
             data_types => {
                 qw(
+                  Sidef::DataTypes::Bool::Bool            Sidef::Types::Bool::Bool
                   Sidef::DataTypes::Array::Array          Sidef::Types::Array::Array
                   Sidef::DataTypes::Array::Pair           Sidef::Types::Array::Pair
                   Sidef::DataTypes::Array::MultiArray     Sidef::Types::Array::MultiArray

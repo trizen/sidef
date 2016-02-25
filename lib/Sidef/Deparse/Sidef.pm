@@ -19,6 +19,7 @@ package Sidef::Deparse::Sidef {
             opt          => {},
             data_types   => {
                 qw(
+                  Sidef::DataTypes::Bool::Bool            Bool
                   Sidef::DataTypes::Array::Array          Array
                   Sidef::DataTypes::Array::Pair           Pair
                   Sidef::DataTypes::Array::MultiArray     MultiArray

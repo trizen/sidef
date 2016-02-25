@@ -57,6 +57,7 @@ package Sidef::Deparse::Julia {
 
             data_types => {
                 qw(
+                  Sidef::DataTypes::Bool::Bool            Sidef_Types_Bool_Bool
                   Sidef::DataTypes::Array::Array          Sidef_Types_Array_Array
                   Sidef::DataTypes::Array::Pair           Sidef_Types_Array_Pair
                   Sidef::DataTypes::Array::MultiArray     Sidef_Types_Array_MultiArray
