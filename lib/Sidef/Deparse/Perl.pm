@@ -1171,15 +1171,8 @@ HEADER
                                          "'" . $obj->im->get_value . "'");
         }
         elsif ($ref eq 'Sidef::Types::Array::Pair') {
-            if (all { not defined($_) } @{$obj}) {
-                $code = $self->make_constant($ref, 'new', "Pair$refaddr");
-            }
-            else {
-                $code =
-                    $ref
-                  . '->new('
-                  . join(', ', map { defined($_) ? $self->deparse_expr({self => $_}) : 'undef' } @{$obj}) . ')';
-            }
+            $code =
+              $ref . '->new(' . join(', ', map { defined($_) ? $self->deparse_expr({self => $_}) : 'undef' } @{$obj}) . ')';
         }
         elsif ($ref eq 'Sidef::Types::Null::Null') {
             $code = $self->make_constant($ref, 'new', "Null$refaddr");
