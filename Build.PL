@@ -34,7 +34,7 @@ my $builder = Module::Build->new(
                   },
 
     requires => {
-                 'perl'           => '5.16.1',
+                 'perl'           => '5.18.0',
                  'utf8'           => 0,
                  'Memoize'        => 0,
                  'Cwd'            => 0,
@@ -60,19 +60,12 @@ my $builder = Module::Build->new(
                 },
 
     auto_features => {
-        dump_support => {
-                         description => "Dump the AST of a parsed source code. (-d, -D)",
-                         requires    => {
-                                      'Data::Dump' => 0,
-                                     },
-                        },
-
-        GMP_support => {
-                        description => "Faster numerical computation, using the GMP library",
-                        requires    => {
-                                     'Math::BigInt::GMP' => 0,
-                                    }
-                       },
+                      dump_support => {
+                                       description => "Dump the AST of a parsed source code. (-d, -D)",
+                                       requires    => {
+                                                    'Data::Dump' => 0,
+                                                   },
+                                      },
                      },
 
     add_to_cleanup     => ['Sidef-*'],

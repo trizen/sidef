@@ -5,20 +5,6 @@ lib/Sidef.pm
 lib/Sidef.pod
 lib/Sidef/Convert/Convert.pm
 lib/Sidef/Convert/Convert.pod
-lib/Sidef/Deparse/Julia.pm
-lib/Sidef/Deparse/Julia/array.jl
-lib/Sidef/Deparse/Julia/block.jl
-lib/Sidef/Deparse/Julia/bool.jl
-lib/Sidef/Deparse/Julia/complex.jl
-lib/Sidef/Deparse/Julia/convert.jl
-lib/Sidef/Deparse/Julia/hash.jl
-lib/Sidef/Deparse/Julia/nil.jl
-lib/Sidef/Deparse/Julia/number.jl
-lib/Sidef/Deparse/Julia/object.jl
-lib/Sidef/Deparse/Julia/range.jl
-lib/Sidef/Deparse/Julia/Sidef.jl
-lib/Sidef/Deparse/Julia/string.jl
-lib/Sidef/Deparse/Julia2.pm
 lib/Sidef/Deparse/Perl.pm
 lib/Sidef/Deparse/Sidef.pm
 lib/Sidef/Math/Math.pm
@@ -814,7 +800,6 @@ scripts/xiaolin_wu_s_line_algorithm.sf
 scripts/y_combinator.sf
 share/sidef/Memoize.sm
 share/sidef/ntheory.sm
-share/sidef/Storable.sm
 t/00-load.t
 t/01-number.t
 t/02-pow.t
@@ -824,8 +809,6 @@ t/05-trignometric.t
 t/09-parser.t
 t/manifest.t
 t/pod.t
-test.sf
-test2.sf
 TODO
 utils/auto_perltidy.sh
 utils/bak_cleaner.sh
@@ -836,6 +819,21 @@ utils/Concepts/sidef_executor.lua
 utils/Concepts/sidef_executor.pl6
 utils/Examples/sidef_in_perl.pl
 utils/Experiments/C-inline-function-call.pl
+'utils/Experiments/Julia Backend/Julia.pm'
+'utils/Experiments/Julia Backend/Julia/array.jl'
+'utils/Experiments/Julia Backend/Julia/block.jl'
+'utils/Experiments/Julia Backend/Julia/bool.jl'
+'utils/Experiments/Julia Backend/Julia/complex.jl'
+'utils/Experiments/Julia Backend/Julia/convert.jl'
+'utils/Experiments/Julia Backend/Julia/hash.jl'
+'utils/Experiments/Julia Backend/Julia/nil.jl'
+'utils/Experiments/Julia Backend/Julia/number.jl'
+'utils/Experiments/Julia Backend/Julia/object.jl'
+'utils/Experiments/Julia Backend/Julia/range.jl'
+'utils/Experiments/Julia Backend/Julia/Sidef.jl'
+'utils/Experiments/Julia Backend/Julia/string.jl'
+'utils/Experiments/Julia Backend/test.sf'
+'utils/Experiments/Julia Backend/test2.sf'
 utils/Experiments/julia_codegen.jl
 utils/Experiments/Lazy/Lazy.pm
 utils/Experiments/operator_precendece.pl

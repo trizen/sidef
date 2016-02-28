@@ -20,8 +20,6 @@ provides:
     version: '2.22'
   Sidef::Convert::Convert:
     file: lib/Sidef/Convert/Convert.pm
-  Sidef::Deparse::Julia:
-    file: lib/Sidef/Deparse/Julia.pm
   Sidef::Deparse::Perl:
     file: lib/Sidef/Deparse/Perl.pm
   Sidef::Deparse::Sidef:
@@ -134,7 +132,7 @@ requires:
   Storable: '0'
   Term::ReadLine: '0'
   Time::HiRes: '0'
-  perl: v5.16.1
+  perl: v5.18.0
   utf8: '0'
 resources:
   license: http://dev.perl.org/licenses/
