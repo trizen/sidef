@@ -311,7 +311,7 @@ package Sidef::Types::Array::Array {
 
         foreach my $i (0 .. $#s) {
             $s_matches[$i] or next;
-            while (not $t_matches[$k]) { ++$k }
+            until ($t_matches[$k]) { ++$k }
             $s[$i] eq $t[$k] or ++$transpositions;
             ++$k;
         }

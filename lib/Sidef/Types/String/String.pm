@@ -681,7 +681,7 @@ package Sidef::Types::String::String {
           }
           : 0;
 
-        if (CORE::not defined $sep) {
+        if (!defined($sep)) {
             return
               Sidef::Types::Array::Array->new(map { __PACKAGE__->new($_) }
                                                 split(' ', $$self, $size));
@@ -1039,7 +1039,7 @@ package Sidef::Types::String::String {
 
         foreach my $i (0 .. $#s) {
             $s_matches[$i] or next;
-            while (not $t_matches[$k]) { ++$k }
+            until ($t_matches[$k]) { ++$k }
             $s[$i] eq $t[$k] or ++$transpositions;
             ++$k;
         }
