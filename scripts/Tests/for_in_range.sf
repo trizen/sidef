@@ -71,3 +71,11 @@ for i in MyRange(1, 1e9) {
     say i;
     break if (i == 5);
 }
+
+say '=> Prefix caret range:'
+
+for i in ^100 {
+    next if (i%2 == 0)
+    say i
+    break if (i == 7)
+}

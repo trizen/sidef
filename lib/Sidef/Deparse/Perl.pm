@@ -1507,6 +1507,11 @@ HEADER
                             next;
                         }
 
+                        if ($method eq '^') {
+                            $code = $self->deparse_args(@{$call->{arg}}) . '->range';
+                            next;
+                        }
+
                         if ($method eq 'say' or $method eq '>') {
                             $code =
                                 '((CORE::say'

@@ -110,19 +110,19 @@ package Sidef::Parser {
             }x,
             prefix_obj_re => qr{\G
               (?:
-                  if\b                                      (?{ bless({}, 'Sidef::Types::Block::If') })
-                | while\b                                   (?{ bless({}, 'Sidef::Types::Block::While') })
-                | try\b                                     (?{ Sidef::Types::Block::Try->new })
-                | foreach\b                                 (?{ bless({}, 'Sidef::Types::Block::ForEach') })
-                | for\b                                     (?{ bless({}, 'Sidef::Types::Block::For') })
-                | return\b                                  (?{ Sidef::Types::Block::Return->new })
-                #| next\b                                    (?{ bless({}, 'Sidef::Types::Block::Next') })
-                #| break\b                                   (?{ bless({}, 'Sidef::Types::Block::Break') })
-                | read\b                                    (?{ state $x = Sidef::Sys::Sys->new })
-                | goto\b                                    (?{ state $x = bless({}, 'Sidef::Perl::Builtin') })
-                | (?:[*\\&]|\+\+|--)                        (?{ state $x = bless({}, 'Sidef::Variable::Ref') })
-                | (?:>>?|[√+~!-]|(?:say|print|defined)\b)   (?{ state $x = bless({}, 'Sidef::Object::Unary') })
-                | :                                         (?{ state $x = bless({}, 'Sidef::DataTypes::Hash::Hash') })
+                  if\b                                       (?{ bless({}, 'Sidef::Types::Block::If') })
+                | while\b                                    (?{ bless({}, 'Sidef::Types::Block::While') })
+                | try\b                                      (?{ Sidef::Types::Block::Try->new })
+                | foreach\b                                  (?{ bless({}, 'Sidef::Types::Block::ForEach') })
+                | for\b                                      (?{ bless({}, 'Sidef::Types::Block::For') })
+                | return\b                                   (?{ Sidef::Types::Block::Return->new })
+                #| next\b                                     (?{ bless({}, 'Sidef::Types::Block::Next') })
+                #| break\b                                    (?{ bless({}, 'Sidef::Types::Block::Break') })
+                | read\b                                     (?{ state $x = Sidef::Sys::Sys->new })
+                | goto\b                                     (?{ state $x = bless({}, 'Sidef::Perl::Builtin') })
+                | (?:[*\\&]|\+\+|--)                         (?{ state $x = bless({}, 'Sidef::Variable::Ref') })
+                | (?:>>?|[√+~!\-\^]|(?:say|print|defined)\b) (?{ state $x = bless({}, 'Sidef::Object::Unary') })
+                | :                                          (?{ state $x = bless({}, 'Sidef::DataTypes::Hash::Hash') })
               )
             }x,
             quote_operators_re => qr{\G
