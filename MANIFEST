@@ -609,6 +609,7 @@ scripts/Tests/fibonacci_mystery.sf
 scripts/Tests/find_the_missing_permutation.sf
 scripts/Tests/first_class_functions_analogously.sf
 scripts/Tests/floyds_triangle.sf
+scripts/Tests/for_in_range.sf
 scripts/Tests/for_two_vars.sf
 scripts/Tests/for_var_in_array.sf
 scripts/Tests/forward_difference.sf

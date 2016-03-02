@@ -117,7 +117,7 @@ package Sidef::Types::Range::RangeString {
                 }
             }
             else {
-                foreach my $str (reverse($from .. $to)) {    # this is not lazy
+                foreach my $str (CORE::reverse($from .. $to)) {    # this is not lazy
                     if (defined(my $res = $code->_run_code(Sidef::Types::String::String->new($str)))) {
                         return $res;
                     }

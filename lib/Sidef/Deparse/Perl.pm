@@ -1007,11 +1007,30 @@ HEADER
               . $self->deparse_bare_block($obj->{block}{code});
         }
         elsif ($ref eq 'Sidef::Types::Block::ForIn') {
+
+            #~ $code =
+            #~ 'for my '
+            #~ . $self->deparse_expr({self => $obj->{var}}) . '(@{'
+            #~ . $self->deparse_expr({self => $obj->{array}}) . '})'
+            #~ . $self->deparse_bare_block($obj->{block}->{code});
+
+            my $var = $self->deparse_expr({self => $obj->{var}});
+            my $arr = $self->deparse_expr({self => $obj->{array}});
+            my $block = $self->deparse_bare_block($obj->{block}->{code});
+
             $code =
-                'for my '
-              . $self->deparse_expr({self => $obj->{var}}) . '(@{'
-              . $self->deparse_expr({self => $obj->{array}}) . '})'
-              . $self->deparse_bare_block($obj->{block}->{code});
+                'do { my $obj = '
+              . $arr . '; my '
+              . $var
+              . '; my $block = CORE::sub '
+              . $block . ';'
+              . 'if (ref($obj) && $obj->SUPER::can("range_iter")) { my $iter = $obj->range_iter();'
+              . 'while (defined('
+              . $var
+              . '  = $iter->())) { $block->()} }'
+              . 'else { for my $item (@$obj) { '
+              . $var
+              . ' = $item; $block->() }}}';
         }
         elsif ($ref eq 'Sidef::Types::Bool::Ternary') {
             $code = '('

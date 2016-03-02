@@ -176,7 +176,7 @@ package Sidef::Types::Range::RangeNumber {
     *include  = \&contains;
     *includes = \&contains;
 
-    sub _new_iter {
+    sub range_iter {
         my ($self) = @_;
 
         my $step = $self->{step};
@@ -208,7 +208,7 @@ package Sidef::Types::Range::RangeNumber {
     sub each {
         my ($self, $code) = @_;
 
-        my $iter = $self->_new_iter();
+        my $iter = $self->range_iter();
         while (defined(my $num = $iter->())) {
             if (defined(my $res = $code->_run_code($num))) {
                 return $res;
@@ -223,7 +223,7 @@ package Sidef::Types::Range::RangeNumber {
         my ($self, $code) = @_;
 
         my $values = Sidef::Types::Array::Array->new;
-        my $iter   = $self->_new_iter();
+        my $iter   = $self->range_iter();
         while (defined(my $num = $iter->())) {
             push @$values, $code->run($num);
         }
@@ -237,7 +237,7 @@ package Sidef::Types::Range::RangeNumber {
         my ($self, $code) = @_;
 
         my $values = Sidef::Types::Array::Array->new;
-        my $iter   = $self->_new_iter();
+        my $iter   = $self->range_iter();
         while (defined(my $num = $iter->())) {
             push(@$values, $num) if $code->run($num);
         }
@@ -251,7 +251,7 @@ package Sidef::Types::Range::RangeNumber {
     sub reduce {
         my ($self, $code) = @_;
 
-        my $iter  = $self->_new_iter();
+        my $iter  = $self->range_iter();
         my $value = $iter->();
 
         while (defined(my $num = $iter->())) {
@@ -264,7 +264,7 @@ package Sidef::Types::Range::RangeNumber {
     sub all {
         my ($self, $code) = @_;
 
-        my $iter = $self->_new_iter();
+        my $iter = $self->range_iter();
         while (defined(my $num = $iter->())) {
             $code->run($num)
               || return Sidef::Types::Bool::Bool::FALSE;
@@ -276,7 +276,7 @@ package Sidef::Types::Range::RangeNumber {
     sub any {
         my ($self, $code) = @_;
 
-        my $iter = $self->_new_iter();
+        my $iter = $self->range_iter();
         while (defined(my $num = $iter->())) {
             $code->run($num)
               && return Sidef::Types::Bool::Bool::TRUE;
@@ -302,7 +302,7 @@ package Sidef::Types::Range::RangeNumber {
         my ($name) = (defined($AUTOLOAD) ? ($AUTOLOAD =~ /^.*[^:]::(.*)$/) : '');
 
         my $array = Sidef::Types::Array::Array->new;
-        my $iter  = $self->_new_iter();
+        my $iter  = $self->range_iter();
         while (defined(my $num = $iter->())) {
             push @$array, $num;
         }

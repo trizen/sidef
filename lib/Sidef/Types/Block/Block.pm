@@ -8,6 +8,7 @@ package Sidef::Types::Block::Block {
 
     use overload
       q{bool} => sub { 1 },
+      q{&{}}  => sub { $_[0]->{code} },
       q{""}   => sub { "$_[0]->{code}" =~ s{^CODE}{Sidef::normalize_type($_[0]->{name} // '__BLOCK__')}er },
       q{0+}   => sub { state $x = require Scalar::Util; Scalar::Util::refaddr($_[0]) };
 

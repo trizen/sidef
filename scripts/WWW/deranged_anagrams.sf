@@ -4,8 +4,8 @@
 
 func find_deranged (a) {
 
-    a.range.each { |i|
-        range(i+1, a.end) -> each { |j|
+    for i in (a.range) {
+        for j in RangeNum(i+1, a.end) {
             a[i].overlaps(a[j]) || (
                 "length %d: %s => %s\n".printf(a[i].len, a[i], a[j]);
                 return true;
