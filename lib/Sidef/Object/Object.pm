@@ -2,7 +2,9 @@ package Sidef::Object::Object {
 
     use 5.014;
     require Scalar::Util;
+
     use Sidef::Types::Bool::Bool;
+    use Sidef::Types::Number::Number;
 
     use overload
       q{~~}   => \&{__PACKAGE__ . '::' . '~~'},
@@ -40,25 +42,30 @@ package Sidef::Object::Object {
         if (CORE::ref($obj1) && $obj1->SUPER::isa(CORE::ref($obj2)) or CORE::ref($obj2) && $obj2->SUPER::isa(CORE::ref($obj1)))
         {
             if (defined(my $sub = $obj1->can('<=>'))) {
-                my $result = $sub->($obj1, $obj2);
-                local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
-                return $result->get_value;
+                return $sub->($obj1, $obj2);
             }
         }
 
-        Scalar::Util::refaddr($obj1) <=> (CORE::ref($obj2) ? Scalar::Util::refaddr($obj2) : 'inf');
+        my $cmp = Scalar::Util::refaddr($obj1) <=> (CORE::ref($obj2) ? Scalar::Util::refaddr($obj2) : 'inf');
+
+            $cmp < 0 ? Sidef::Types::Number::Number::MONE
+          : $cmp > 0 ? Sidef::Types::Number::Number::ONE
+          :            Sidef::Types::Number::Number::ZERO;
       },
       q{eq} => sub {
         my ($obj1, $obj2) = @_;
 
-        ($obj1->SUPER::isa(CORE::ref($obj2) || return) || $obj2->SUPER::isa(CORE::ref($obj1) || return))
-          || return;
+        (   $obj1->SUPER::isa(CORE::ref($obj2) || return (Sidef::Types::Bool::Bool::FALSE))
+         || $obj2->SUPER::isa(CORE::ref($obj1) || return (Sidef::Types::Bool::Bool::FALSE)))
+          || return (Sidef::Types::Bool::Bool::FALSE);
 
         if (defined(my $sub = $obj1->can('=='))) {
-            return ${$sub->($obj1, $obj2)};
+            return $sub->($obj1, $obj2);
         }
 
-        Scalar::Util::refaddr($obj1) == Scalar::Util::refaddr($obj2);
+        Scalar::Util::refaddr($obj1) == Scalar::Util::refaddr($obj2)
+          ? (Sidef::Types::Bool::Bool::TRUE)
+          : (Sidef::Types::Bool::Bool::FALSE);
       };
 
     sub new {

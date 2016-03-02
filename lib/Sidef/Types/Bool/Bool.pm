@@ -58,6 +58,7 @@ package Sidef::Types::Bool::Bool {
     *is_false = \&not;
     *flip     = \&not;
     *toggle   = \&not;
+    *neg      = \&not;
 
     sub dump {
         my ($self) = @_;

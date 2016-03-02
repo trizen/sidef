@@ -49,6 +49,12 @@ package Sidef::Deparse::Perl {
             #~ to_num  => q{0+},
             #~ },
 
+            overload_methods => {
+                                 '=='  => 'eq',
+                                 '<=>' => 'cmp',
+                                 '~~'  => '~~',
+                                },
+
             data_types => {
                 qw(
                   Sidef::DataTypes::Bool::Bool            Sidef::Types::Bool::Bool
@@ -634,12 +640,16 @@ HEADER
                         }
 
                         # Add the "overload" pragma for some special methods
-                        #~ if (exists $self->{overload_methods}{$obj->{name}}) {
-                        #~ $code .= ";\n"
-                        #~ . (' ' x $Sidef::SPACES)
-                        #~ . qq{use overload q{$self->{overload_methods}{$obj->{name}}} => }
-                        #~ . $self->_dump_string("$self->{package_name}::$obj->{name}");
-                        #~ }
+                        if (exists $self->{overload_methods}{$name}) {
+                            my $overload_name = $self->{overload_methods}{$name};
+                            $code .= ";\n"
+                              . (' ' x $Sidef::SPACES)
+                              . qq(use overload q{$overload_name} =>)
+                              . q( sub { my ($first, $second, $swap) = @_; )
+                              . q( if ($swap) { ($first, $second) = ($second, $first) } )
+                              . qq( \$first->\${\\q{$name}}(\$second) }; );
+                        }
+
                     }
                 }
             }
@@ -1436,28 +1446,12 @@ HEADER
                     # != and == methods
                     if ($method eq '==' or $method eq '!=') {
                         $code =
-                            '(' . 'do{'
+                            'do{ my $bool = do{'
                           . $code
                           . '} eq do{'
-                          . $self->deparse_args(@{$call->{arg}}) . '} ? '
-                          . (
-                             $method eq '!='
-                             ? '(Sidef::Types::Bool::Bool::FALSE) : (Sidef::Types::Bool::Bool::TRUE)'
-                             : '(Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE)'
-                            )
-                          . ')';
-                        next;
-                    }
-
-                    # <=> method
-                    if ($method eq '<=>') {
-                        $code =
-                            '((Sidef::Types::Number::Number::ZERO,'
-                          . 'Sidef::Types::Number::Number::ONE,'
-                          . 'Sidef::Types::Number::Number::MONE)[do{'
-                          . $code
-                          . '} cmp do {'
-                          . $self->deparse_args(@{$call->{arg}}) . '}])';
+                          . $self->deparse_args(@{$call->{arg}})
+                          . '}; ref($bool) ? $bool : ($bool ? Sidef::Types::Bool::Bool::TRUE : Sidef::Types::Bool::Bool::FALSE) }'
+                          . ($method eq '!=' ? '->neg' : '');
                         next;
                     }
 
@@ -1465,16 +1459,24 @@ HEADER
                     if ($method eq '~~' or $method eq '!~') {
                         $self->top_add(qq{use experimental 'smartmatch';\n});
                         $code =
-                            '(' . 'do{'
+                            'do{ my $bool = do{'
                           . $code
                           . '} ~~ do{'
-                          . $self->deparse_args(@{$call->{arg}}) . '} ? '
-                          . (
-                             $method eq '!~'
-                             ? '(Sidef::Types::Bool::Bool::FALSE) : (Sidef::Types::Bool::Bool::TRUE)'
-                             : '(Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE)'
-                            )
-                          . ')';
+                          . $self->deparse_args(@{$call->{arg}})
+                          . '}; ref($bool) ? $bool : ($bool ? Sidef::Types::Bool::Bool::TRUE : Sidef::Types::Bool::Bool::FALSE) }'
+                          . ($method eq '!~' ? '->neg' : '');
+                        next;
+                    }
+
+                    # <=> method
+                    if ($method eq '<=>') {
+                        $code =
+                            'do { my $cmp = do { '
+                          . $code
+                          . '} cmp do {'
+                          . $self->deparse_args(@{$call->{arg}})
+                          . '}; ref($cmp) ? $cmp : ($cmp < 0 ? Sidef::Types::Number::Number::MONE : '
+                          . '$cmp > 0 ? Sidef::Types::Number::Number::ONE : Sidef::Types::Number::Number::ZERO )}';
                         next;
                     }
 

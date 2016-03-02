@@ -1,0 +1,39 @@
+#!/usr/bin/ruby
+
+class TrueResult(value) {
+    method else(_) {
+        value
+    }
+}
+
+class FalseResult {
+    method else(value) {
+        value
+    }
+}
+
+class True {
+    method then(value) {
+        TrueResult(value)
+    }
+
+    method to_s {
+        "<true>"
+    }
+}
+
+class False {
+    method then(_) {
+        FalseResult()
+    }
+
+    method to_s {
+        "<false>"
+    }
+}
+
+class If(cond) {
+    method then(value) {
+        cond.then(value)
+    }
+}

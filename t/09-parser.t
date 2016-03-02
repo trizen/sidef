@@ -21,6 +21,7 @@ my @scripts;
 find {
     no_chdir => 1,
     wanted   => sub {
+        return if /\bPure OO\b/;
         if (/\.sf\z/) {
             push @scripts, $_;
         }

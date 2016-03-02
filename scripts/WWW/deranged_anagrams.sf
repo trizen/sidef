@@ -38,8 +38,8 @@ func main () {
     "** The hashing took %.5f seconds!\n".printf(Time.micro - time);
 
     letter_list.keys
-         .grep {|k| letter_list{k}.len > 1}      # take only ones with anagrams
-         .sort {|a,b| b.len <=> a.len}           # sort by length, descending
+         .grep {|k| letter_list{k}.len > 1}       # take only ones with anagrams
+         .sort {|a,b| b.len <=> a.len }           # sort by length, descending
          .each {|key|
 
         # if we find a pair, they are the longest due to the sort before

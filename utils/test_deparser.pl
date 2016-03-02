@@ -58,7 +58,7 @@ my %ignore = ('module_definition.sf' => 1,);
 my $dir = shift() // die "usage: $0 [scripts dir]\n";
 
 find {
-      wanted => sub { /\.s[fm]\z/ && (-f $_) && test_file($_) },
+      wanted => sub { return if /\bPure OO\b/; /\.s[fm]\z/ && (-f $_) && test_file($_) },
       no_chdir => 1,
      } => $dir;
 

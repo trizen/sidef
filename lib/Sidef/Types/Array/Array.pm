@@ -426,9 +426,8 @@ package Sidef::Types::Array::Array {
 
         foreach my $i (0 .. $#{$self}) {
             my ($x, $y) = ($self->[$i], $array->[$i]);
-            $x eq $y or do {
-                return (Sidef::Types::Bool::Bool::FALSE);
-            };
+            $x eq $y
+              or return (Sidef::Types::Bool::Bool::FALSE);
         }
 
         (Sidef::Types::Bool::Bool::TRUE);
@@ -487,18 +486,18 @@ package Sidef::Types::Array::Array {
         my $item = $self->[0];
         foreach my $i (1 .. $#{$self}) {
             my $val = $self->[$i];
-            $item = $val if (($val cmp $item) == $value);
+            $item = $val if (($val cmp $item) eq $value);
         }
 
         $item;
     }
 
     sub max {
-        $_[0]->_min_max(1);
+        $_[0]->_min_max(Sidef::Types::Number::Number::ONE);
     }
 
     sub min {
-        $_[0]->_min_max(-1);
+        $_[0]->_min_max(Sidef::Types::Number::Number::MONE);
     }
 
     sub minmax {
@@ -542,23 +541,22 @@ package Sidef::Types::Array::Array {
         @{$self} || return;
 
         my @pairs = map { [$_, scalar $code->run($_)] } @{$self};
-
         my $item = $pairs[0];
 
         foreach my $i (1 .. $#pairs) {
             my $val = $pairs[$i][1];
-            $item = $pairs[$i] if (($val cmp $item->[1]) == $value);
+            $item = $pairs[$i] if (($val cmp $item->[1]) eq $value);
         }
 
         $item->[0];
     }
 
     sub max_by {
-        $_[0]->_min_max_by($_[1], 1);
+        $_[0]->_min_max_by($_[1], Sidef::Types::Number::Number::ONE);
     }
 
     sub min_by {
-        $_[0]->_min_max_by($_[1], -1);
+        $_[0]->_min_max_by($_[1], Sidef::Types::Number::Number::MONE);
     }
 
     sub swap {
@@ -1495,10 +1493,6 @@ package Sidef::Types::Array::Array {
     sub cmp {
         my ($self, $arg) = @_;
 
-        state $mone = Sidef::Types::Number::Number::_new_int(-1);
-        state $zero = Sidef::Types::Number::Number::_new_uint(0);
-        state $one  = Sidef::Types::Number::Number::_new_uint(1);
-
         my $l1 = $#{$self};
         my $l2 = $#{$arg};
 
@@ -1510,10 +1504,19 @@ package Sidef::Types::Array::Array {
             my $obj2 = $arg->[$i];
 
             my $value = $obj1 cmp $obj2;
-            $value == 0 or return ($value == -1 ? $mone : $one);
+
+            if (ref($value)) {
+                $value eq Sidef::Types::Number::Number::ZERO
+                  or return $value;
+            }
+            elsif ($value != 0) {
+                return ($value < 0 ? Sidef::Types::Number::Number::MONE : Sidef::Types::Number::Number::ONE);
+            }
         }
 
-        $l1 == $l2 ? $zero : $l1 < $l2 ? $mone : $one;
+            $l1 == $l2 ? Sidef::Types::Number::Number::ZERO
+          : $l1 < $l2  ? Sidef::Types::Number::Number::MONE
+          :              Sidef::Types::Number::Number::ONE;
     }
 
     # Insert an object between each element

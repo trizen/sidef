@@ -1,0 +1,88 @@
+#!/usr/bin/ruby
+
+include "./booleans.sf"
+
+class NumberClass(pred) {
+    method succ {
+        NumberClass(self)
+    }
+
+    method +(other) {
+        (pred + other).succ
+    }
+
+    method ==(other) {
+        pred == other.pred
+    }
+
+    method is_zero {
+        False()
+    }
+
+    method to_s {
+        pred.to_s + "+";
+    }
+}
+
+class LessThanZero {
+    method is_zero {
+        False()
+    }
+
+    method pred {
+        self
+    }
+}
+
+class NumberZero {
+    method succ {
+        NumberClass(self)
+    }
+
+    method pred {
+        LessThanZero()
+    }
+
+    method +(other){
+        other
+    }
+
+    method ==(other) {
+        other.is_zero
+    }
+
+    method is_zero {
+        True()
+    }
+
+    method to_s {
+        "<zero>";
+    }
+}
+
+var zero = NumberZero()
+var one = zero.succ;
+var two = one.succ;
+var three = two.succ;
+var four = three.succ;
+
+say ("4 = ", four);
+
+say ("0 + 0 = ", zero + zero)
+say ("0 + 1 = ", zero + one)
+say ("0 + 2 = ", zero + two)
+
+say ("1 + 2 = ", one + two)
+say ("2 + 2 = ", two + two)
+say ("0 + 2 = ", zero + two)
+
+say ("0 == 0 -> ", zero == zero)
+say ("0 == 1 -> ", zero == one)
+say ("1 == 1 -> ", one == one)
+say ("1 == 2 -> ", one == two)
+say ("2 == 2 -> ", two == two)
+say ("2 == 1 -> ", two == one)
+say ("4 == 1 -> ", four == one)
+say ("4 == 4 -> ", four == four)
+
+say ("1 + 1 == 2 -> ", one+one == two)

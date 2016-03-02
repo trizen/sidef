@@ -1,0 +1,52 @@
+#!/usr/bin/ruby
+
+include "./numbers.sf"
+
+var t = True()
+var f = False()
+
+var r1 = If(t).then(one).else(two)
+say r1
+
+var r2 = If(f).then(one).else(two)
+say r2
+
+class NuclearMissile {
+    method launch { "<<BOOM>>" }
+}
+
+class NoAction {
+    method to_s {
+        "<no action>"
+    }
+}
+
+class Option1 {
+    method result {
+        NuclearMissile().launch
+    }
+}
+
+class Option2 {
+    method result {
+        NoAction()
+    }
+}
+
+var threat_level = one
+var action = If(threat_level == four).then(
+                Option1()
+            ).else(
+                Option2()
+            )
+
+say action.result
+
+threat_level = four
+var action2 = If(threat_level == four).then(
+                Option1()
+            ).else(
+                Option2()
+            )
+
+say action2.result
