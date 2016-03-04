@@ -561,7 +561,7 @@ HEADER
 
                     # Anonymous function
                     if ($obj->{name} eq '') {
-                        $obj->{name} = "__ANON__";
+                        $obj->{name} = "__FUNC__";
                     }
 
                     my $name = $obj->{name};
@@ -625,7 +625,7 @@ HEADER
                         }
 
                         # Anonymous method
-                        elsif ($obj->{name} eq '__ANON__') {
+                        elsif ($obj->{name} eq '__FUNC__') {
                             ## don't add anonymous methods to the class,
                             ## but allow them to be defined and used freely
                         }
@@ -737,7 +737,7 @@ HEADER
                 else {
 
                     if ($obj->{name} eq '') {
-                        $obj->{name} = '__ANON__' . $refaddr;
+                        $obj->{name} = '__FUNC__' . $refaddr;
                     }
 
                     $code .= ($package_name = $self->_dump_class_name($obj));

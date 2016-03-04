@@ -9,8 +9,24 @@ package Sidef::Types::Block::Block {
     use overload
       q{bool} => sub { 1 },
       q{&{}}  => sub { $_[0]->{code} },
-      q{""}   => sub { "$_[0]->{code}" =~ s{^CODE}{Sidef::normalize_type($_[0]->{name} // '__BLOCK__')}er },
-      q{0+}   => sub { state $x = require Scalar::Util; Scalar::Util::refaddr($_[0]) };
+      q{0+}   => sub { state $x = require Scalar::Util; Scalar::Util::refaddr($_[0]) },
+      q{""} => sub {
+        my ($self) = @_;
+
+        state $x = require Scalar::Util;
+
+        my $name = Sidef::normalize_type($self->{name});
+        my $addr = Scalar::Util::refaddr($self->{code});
+        my @vars = map { ($_->{slurpy} ? '*' : '') . Sidef::normalize_type($_->{name}) . ($_->{has_value} ? '=(nil)' : '') }
+          @{$_[0]->{vars}};
+
+        (
+         $self->{type} eq 'block'
+         ? ('{' . (@vars ? ('|' . join(',', @vars) . '|') : ''))
+         : ('func (' . join(',', @vars) . ') {')
+        )
+          . " #`($name|$addr) ... }";
+      };
 
     sub new {
         my (undef, %opt) = @_;
@@ -127,7 +143,7 @@ package Sidef::Types::Block::Block {
             return ($method, $method->{code}->(@pos_args));
         }
 
-        my $name = Sidef::normalize_type($self->{name} // '__ANON__');
+        my $name = Sidef::normalize_type($self->{name} // '__FUNC__');
 
         die "[ERROR] $self->{type} `$name` does not match $name("
           . join(', ', map { ref($_) ? Sidef::normalize_type(ref($_)) : 'nil' } @args)
