@@ -231,6 +231,7 @@ package Sidef::Types::Number::Ninf {
     #
     *isqrt = \&inf;
     *sqrt  = \&inf;
+    *sqr   = \&inf;
 
     #
     ## (-inf)^(1/x) = i^(1/x) * inf

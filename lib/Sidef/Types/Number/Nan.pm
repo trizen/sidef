@@ -41,6 +41,7 @@ package Sidef::Types::Number::Nan {
     *div         = \&nan;
     *idiv        = \&nan;
     *mod         = \&nan;
+    *inv         = \&nan;
     *imod        = \&nan;
     *pow         = \&nan;
     *ipow        = \&nan;
