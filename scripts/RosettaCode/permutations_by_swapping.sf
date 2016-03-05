@@ -6,14 +6,15 @@
 
 func perms(xx) {
    var perms = [[+1]];
-   range(1, xx).each { |x|
+   for x in (1 ..^ xx) {
       var sign = -1;
-      perms.flat_map! { |arr|
-          var (s, *p) = arr...;
-          var r = range(0, p.len);
-          (s < 0 ? r : r.reverse).map {|i|
-            [sign *= -1, p.@[0..i-1], x, p.@[i..p.end]]
-          }
+      perms = gather {
+        for s,*p in perms {
+            var r = range(0, p.len);
+            take((s < 0 ? r : r.reverse).map {|i|
+                [sign *= -1, p.@[0..i-1], x, p.@[i..p.end]]
+            }...)
+        }
       }
    }
    perms;

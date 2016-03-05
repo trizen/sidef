@@ -777,6 +777,28 @@ package Sidef::Types::Array::Array {
         $self;
     }
 
+    sub slices {
+        my ($self, $n) = @_;
+
+        {
+            local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
+            $n = $n->get_value;
+        }
+
+        my @slices;
+        my $end = @{$self};
+        for (my $i = $n - 1 ; $i < $end ; $i += $n) {
+            push @slices, $self->new(@{$self}[$i - ($n - 1) .. $i]);
+        }
+
+        my $mod = $end % $n;
+        if ($mod != 0) {
+            push @slices, $self->new(@{$self}[$end - $mod .. $end - 1]);
+        }
+
+        $self->new(@slices);
+    }
+
     sub each_cons {
         my ($self, $n, $code) = @_;
 
