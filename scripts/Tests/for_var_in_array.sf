@@ -44,3 +44,32 @@ for i,j,k in [
 }
 
 assert_eq(i, 99)
+
+var a1 = []
+var a2 = []
+for i,j,*k in [[1,2,3,4], [5,6,7,8]] {
+    say "<#{i}> <#{j}> <#{k}>";
+    a1 << j
+    a2 << k
+}
+
+assert_eq(a1, [2, 6])
+assert_eq(a2, [[3,4],[7,8]])
+
+for i,:j in [
+    %w(a b c d e),
+    %w(f g h i j),
+] {
+    say "#{i} => #{j}"
+}
+
+var h = []
+for :j in [
+    %w(a b c d),
+    %w(e f g h),
+] {
+    h << j
+}
+
+assert_eq(i, 99)
+assert_eq(h, [Hash(<a b c d>...), Hash(<e f g h>...)])

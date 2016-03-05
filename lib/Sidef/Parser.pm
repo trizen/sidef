@@ -2494,22 +2494,31 @@ package Sidef::Parser {
             push @{$struct{$self->{class}}}, {self => $obj};
 
             # for var in array { ... }
-            if (ref($obj) eq 'Sidef::Types::Block::For' and /\G\h*(?=$self->{var_name_re})/goc) {
+            if (ref($obj) eq 'Sidef::Types::Block::For' and /\G\h*(?=[*:]?$self->{var_name_re})/goc) {
 
                 my $class_name = $self->{class};
                 my $vars_end   = $#{$self->{vars}{$class_name}};
 
                 my @vars;
 
-                while (/\G($self->{var_name_re})/gc) {
+                while (/\G([*:])?($self->{var_name_re})/gc) {
 
-                    my $name = $1;
+                    my $type = $1;
+                    my $name = $2;
                     push @vars,
                       bless(
                             {
                              name  => $name,
                              type  => 'var',
                              class => $class_name,
+                             (
+                              $type
+                              ? (
+                                 slurpy => 1,
+                                 ($type eq '*' ? (array => 1) : (hash => 1)),
+                                )
+                              : ()
+                             ),
                             },
                             'Sidef::Variable::Variable'
                            );
@@ -2523,6 +2532,7 @@ package Sidef::Parser {
                         line  => $self->{line},
                       };
 
+                    $type && last;
                     /\G\h*,\h*/gc || last;
                 }
 

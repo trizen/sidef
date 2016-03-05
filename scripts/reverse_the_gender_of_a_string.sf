@@ -1,6 +1,6 @@
 #!/usr/bin/ruby
 
-var male2female = <<'EOD';
+var male2female = <<'EOD'
   maleS femaleS, maleness femaleness, him her, himself herself, his her, his
   hers, he she, Mr Mrs, Mister Missus, Ms Mr, Master Miss, MasterS MistressES,
   uncleS auntS, nephewS nieceS, sonS daughterS, grandsonS granddaughterS,
@@ -22,12 +22,12 @@ var male2female = <<'EOD';
   drakeS henS, dogS vixenS, tomS tibS, boarS sowS, buckS roeS, peacockS
   peahenS, gander goose, ganders geese, friarS nunS, monkS nunS
 EOD
-
-var m2f = male2female.split(/,\s*/).map { |tok| tok.words};
-
-var re_plural = /E?S\z/;
-var re_ES = /ES\z/;
-
+ 
+var m2f = male2female.split(/,\s*/).map { |tok| tok.words}
+ 
+var re_plural = /E?S\z/
+var re_ES = /ES\z/
+ 
 func gen_pluralize(m, f) {
     [
         [m - re_plural, f - re_plural],
@@ -35,41 +35,39 @@ func gen_pluralize(m, f) {
         [m.sub(re_plural, 's'), f.sub(re_plural, 's')],
     ]
 }
-
-var dict = Hash.new;
-
-m2f.each { |pair|
-    var (m, f) = pair...;
-    gen_pluralize(m, f).each { |arr|
-        var (x, y) = arr.map{.lc}...;
-        if (!dict.contains(x)) {
-            dict{x, y} = (y, x);
+ 
+var dict = Hash()
+ 
+for m,f in m2f {
+    for x,y in gen_pluralize(m, f).map{.map{.lc}} {
+        if (x ~~ dict) {
+            dict{y} = x
         } else {
-            dict{y} = x;
+            dict{x, y} = (y, x)
         }
     }
 }
-
-var gen_re = Regex.new('\b(' + dict.keys.join('|') + ')\b', 'i');
-
+ 
+var gen_re = Regex.new('\b(' + dict.keys.join('|') + ')\b', 'i')
+ 
 func copy_case(orig, repl) {
-    var a = orig.split('');
-    var b = repl.split('');
-
-    var uc = 0;
-    var min = [a, b].map{.len}.min;
-    0 .. min-1 -> each { |i|
+    var a = orig.chars
+    var b = repl.chars
+ 
+    var uc = 0
+    var min = [a, b].map{.len}.min
+    for i in ^min {
         if (a[i] ~~ /^[[:upper:]]/) {
-            b[i].uc!;
-            uc += 1;
+            b[i].uc!
+            ++uc
         }
-    };
-
-    uc == min ? repl.uc : b.join('');
+    }
+ 
+    uc == min ? repl.uc : b.join('')
 }
-
+ 
 func reverse_gender(text) {
-    text.gsub(gen_re, { |a| copy_case(a, dict{a.lc}) });
+    text.gsub(gen_re, { |a| copy_case(a, dict{a.lc}) })
 }
 
 var rev = reverse_gender("She was a soul stripper. She took my heart!");

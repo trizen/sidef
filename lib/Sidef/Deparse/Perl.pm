@@ -1029,35 +1029,65 @@ HEADER
         }
         elsif ($ref eq 'Sidef::Types::Block::ForIn') {
 
-            #~ $code =
-            #~ 'for my '
-            #~ . $self->deparse_expr({self => $obj->{var}}) . '(@{'
-            #~ . $self->deparse_expr({self => $obj->{array}}) . '})'
-            #~ . $self->deparse_bare_block($obj->{block}->{code});
+            my $expr = $self->deparse_expr({self => $obj->{array}});
 
-            my @vars = map { $self->deparse_expr({self => $_}) } @{$obj->{vars}};
-            my $arr = $self->deparse_expr({self => $obj->{array}});
-            my $block = $self->deparse_bare_block($obj->{block}->{code});
+            if (
+                @{$obj->{vars}} > 1
+                or (@{$obj->{vars}} == 1
+                    and exists($obj->{vars}[0]{slurpy}))
+              ) {
 
-            if (@vars > 1) {
-                my $vars = '(' . join(',', @vars) . ')';
+                my $last_var = $obj->{vars}[-1];
+
+                my $hash  = 0;
+                my $array = 0;
+                if (exists($last_var->{slurpy})) {
+                    delete($last_var->{slurpy});
+                    if (exists($last_var->{array})) {
+                        $array = delete($last_var->{array});
+                    }
+                    else {
+                        $hash = delete($last_var->{hash});
+                    }
+                }
+
+                my @vars = map { $self->deparse_expr({self => $_}) } @{$obj->{vars}};
+
+                my @last_var = ($array ? ($vars[-1] =~ tr/$/@/r) : $hash ? ($vars[-1] =~ tr/$/%/r) : ());
+                my $init_vars = '(' . join(',', @vars, @last_var) . ')';
+                my $vars = '(' . join(',', @vars[0 .. $#vars - @last_var], @last_var) . ')';
+                my $block = $self->deparse_bare_block($obj->{block}->{code});
+
                 $code =
                     'do { my $obj = '
-                  . $arr . '; my '
-                  . $vars . '; '
+                  . $expr . '; my '
+                  . $init_vars . '; '
                   . 'my $block = CORE::sub '
                   . $block . ';'
                   . 'for my $group($obj->SUPER::isa("ARRAY") ? @$obj : @{$obj->to_a}) {'
                   . $vars
-                  . ' = ($group->SUPER::isa("ARRAY") ? @{$group}[0..'
-                  . $#vars
-                  . '] : $group); $block->() }}';
+                  . ' = ($group->SUPER::isa("ARRAY") ? @$group'
+                  . ' : $group);'
+                  . (
+                     @last_var
+                     ? ($vars[-1] . ' = '
+                        . ($array ? 'Sidef::Types::Array::Array' : 'Sidef::Types::Hash::Hash')
+                        . '->new('
+                        . join('', @last_var) . ')')
+                     : ''
+                    )
+                  . '; $block->() }}';
             }
             else {
+
+                my @vars = map { $self->deparse_expr({self => $_}) } @{$obj->{vars}};
+                my $block = $self->deparse_bare_block($obj->{block}->{code});
+
                 my $var = $vars[0];
+
                 $code =
                     'do { my $obj = '
-                  . $arr . '; my '
+                  . $expr . '; my '
                   . $var
                   . '; my $block = CORE::sub '
                   . $block . ';'

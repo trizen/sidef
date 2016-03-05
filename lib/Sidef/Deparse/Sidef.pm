@@ -471,7 +471,10 @@ package Sidef::Deparse::Sidef {
         }
         elsif ($ref eq 'Sidef::Types::Block::ForIn') {
             $code = 'for '
-              . $self->deparse_expr({self => $obj->{var}}) . ' in ('
+              . join(',',
+                     map { ($_->{slurpy} ? ($_->{array} ? '*' : ':') : '') . $self->deparse_expr({self => $_}) }
+                       @{$obj->{vars}})
+              . ' in ('
               . $self->deparse_expr({self => $obj->{array}}) . ') '
               . $self->deparse_bare_block($obj->{block}->{code});
         }
