@@ -707,7 +707,7 @@ package Sidef::Types::String::String {
         my ($self, $block) = @_;
 
         if (defined $block) {
-            return $self->to_chars->sort($block)->join;
+            return $self->chars->sort($block)->join;
         }
 
         $self->new(CORE::join('', sort(CORE::split(//, $$self))));
@@ -801,6 +801,9 @@ package Sidef::Types::String::String {
         my ($self) = @_;
         Sidef::Types::Array::Array->new(map { __PACKAGE__->new($_) } CORE::split(//, CORE::join('', $$self)));
     }
+
+    *to_a     = \&chars;
+    *to_array = \&chars;
 
     sub each_char {
         my ($self, $code) = @_;

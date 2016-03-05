@@ -1035,23 +1035,40 @@ HEADER
             #~ . $self->deparse_expr({self => $obj->{array}}) . '})'
             #~ . $self->deparse_bare_block($obj->{block}->{code});
 
-            my $var = $self->deparse_expr({self => $obj->{var}});
+            my @vars = map { $self->deparse_expr({self => $_}) } @{$obj->{vars}};
             my $arr = $self->deparse_expr({self => $obj->{array}});
             my $block = $self->deparse_bare_block($obj->{block}->{code});
 
-            $code =
-                'do { my $obj = '
-              . $arr . '; my '
-              . $var
-              . '; my $block = CORE::sub '
-              . $block . ';'
-              . 'if (ref($obj) && $obj->SUPER::can("range_iter")) { my $iter = $obj->range_iter();'
-              . 'while (defined('
-              . $var
-              . '  = $iter->())) { $block->()} }'
-              . 'else { for my $item (@$obj) { '
-              . $var
-              . ' = $item; $block->() }}}';
+            if (@vars > 1) {
+                my $vars = '(' . join(',', @vars) . ')';
+                $code =
+                    'do { my $obj = '
+                  . $arr . '; my '
+                  . $vars . '; '
+                  . 'my $block = CORE::sub '
+                  . $block . ';'
+                  . 'for my $group($obj->SUPER::isa("ARRAY") ? @$obj : @{$obj->to_a}) {'
+                  . $vars
+                  . ' = ($group->SUPER::isa("ARRAY") ? @{$group}[0..'
+                  . $#vars
+                  . '] : $group); $block->() }}';
+            }
+            else {
+                my $var = $vars[0];
+                $code =
+                    'do { my $obj = '
+                  . $arr . '; my '
+                  . $var
+                  . '; my $block = CORE::sub '
+                  . $block . ';'
+                  . 'if (ref($obj) && $obj->SUPER::can("range_iter")) { my $iter = $obj->range_iter();'
+                  . 'while (defined('
+                  . $var
+                  . '  = $iter->())) { $block->()} }'
+                  . 'else { for my $item ($obj->SUPER::isa("ARRAY") ? @$obj : @{$obj->to_a}) { '
+                  . $var
+                  . ' = $item; $block->() }}}';
+            }
         }
         elsif ($ref eq 'Sidef::Types::Bool::Ternary') {
             $code = '('

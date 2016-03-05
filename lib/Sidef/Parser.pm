@@ -2494,8 +2494,44 @@ package Sidef::Parser {
             push @{$struct{$self->{class}}}, {self => $obj};
 
             # for var in array { ... }
-            if (ref($obj) eq 'Sidef::Types::Block::For' and /\G($self->{var_name_re})\h+in\h+/gc) {
-                my ($var_name, $class_name) = $self->get_name_and_class($1);
+            if (ref($obj) eq 'Sidef::Types::Block::For' and /\G\h*(?=$self->{var_name_re})/goc) {
+
+                my $class_name = $self->{class};
+                my $vars_end   = $#{$self->{vars}{$class_name}};
+
+                my @vars;
+
+                while (/\G($self->{var_name_re})/gc) {
+
+                    my $name = $1;
+                    push @vars,
+                      bless(
+                            {
+                             name  => $name,
+                             type  => 'var',
+                             class => $class_name,
+                            },
+                            'Sidef::Variable::Variable'
+                           );
+
+                    unshift @{$self->{vars}{$class_name}},
+                      {
+                        obj   => $vars[-1],
+                        name  => $name,
+                        count => 1,
+                        type  => 'var',
+                        line  => $self->{line},
+                      };
+
+                    /\G\h*,\h*/gc || last;
+                }
+
+                /\G\h*in\h*/gc
+                  || $self->fatal_error(
+                                        error => "expected the token 'in' after variable declaration in for-loop",
+                                        code  => $_,
+                                        pos   => pos($_),
+                                       );
 
                 my $array = (
                              /\G(?=\()/
@@ -2503,45 +2539,27 @@ package Sidef::Parser {
                              : $self->parse_obj(code => $opt{code})
                             );
 
-                my $variable = bless(
-                                     {
-                                      class => $class_name,
-                                      name  => $var_name,
-                                      type  => 'var',
-                                     },
-                                     'Sidef::Variable::Variable'
-                                    );
-
-                my $vars_len = $#{$self->{vars}{$class_name}} + 1;
-
-                unshift @{$self->{vars}{$class_name}},
-                  {
-                    obj   => $variable,
-                    name  => $var_name,
-                    count => 1,
-                    type  => 'var',
-                    line  => $self->{line},
-                  };
-
                 my $block = (
                              /\G\h*(?=\{)/gc
                              ? $self->parse_block(code => $opt{code})
                              : $self->fatal_error(
-                                                  error => "expected a block after the token 'in': for $var_name in { ... }",
+                                                  error => "expected a block after the token 'in': for (...) in { ... }",
                                                   code  => $_,
                                                   pos   => pos($_),
                                                  )
                             );
 
-                # Remove the loop variable from the current scope
-                splice(@{$self->{vars}{$class_name}}, $#{$self->{vars}{$class_name}} - $vars_len, 1);
+                # Remove the for-loop variables from the current scope
+                splice(@{$self->{vars}{$class_name}},
+                       $#{$self->{vars}{$class_name}} - $vars_end - scalar(@vars),
+                       scalar(@vars));
 
                 # Store the info
-                $obj->{var}   = $variable;
+                $obj->{vars}  = \@vars;
                 $obj->{block} = $block;
                 $obj->{array} = $array;
 
-                # Re-bless the $obj in a different class
+                # Re-bless the $obj into a different class
                 bless $obj, 'Sidef::Types::Block::ForIn';
             }
             elsif ($obj_key) {

@@ -27,3 +27,20 @@ for i in arr {
 }
 
 assert_eq(i, 99);
+
+for c in "string" {
+    say "<#{c}>"
+}
+
+for i,k in Hash(a => 1, b => 2) {
+    say "<#{i}> <#{k}>";
+}
+
+for i,j,k in [
+    %w(a b d),
+    %w(e f g),
+] {
+    say "<#{i}> <#{j}> <#{k}>"
+}
+
+assert_eq(i, 99)

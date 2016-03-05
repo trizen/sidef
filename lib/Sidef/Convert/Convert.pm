@@ -76,10 +76,6 @@ package Sidef::Convert::Convert {
 
     *to_re = \&to_regex;
 
-    sub to_array {
-        Sidef::Types::Array::Array->new($_[0]);
-    }
-
     sub to_caller {
         Sidef::Module::OO->__NEW__("$_[0]");
     }
