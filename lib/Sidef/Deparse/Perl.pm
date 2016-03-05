@@ -208,6 +208,15 @@ HEADER
         $d;
     }
 
+    sub _dump_op_call {
+        my ($self, $method) = @_;
+
+        my $name = 'OP' . join('', unpack('C*', $method)) . refaddr($self);
+        my $line = "use constant $name => \\" . $self->_dump_string($method) . ";\n";
+        $self->top_add($line);
+        '->${(' . $self->{environment_name} . '::' . $name . ')}';
+    }
+
     sub _dump_var {
         my ($self, $var, $refaddr) = @_;
 
@@ -647,7 +656,9 @@ HEADER
                               . qq(use overload q{$overload_name} =>)
                               . q( sub { my ($first, $second, $swap) = @_; )
                               . q( if ($swap) { ($first, $second) = ($second, $first) } )
-                              . qq( \$first->\${\\q{$name}}(\$second) }; );
+                              . q( $first)
+                              . $self->_dump_op_call($name)
+                              . q(($second) }; );
                         }
 
                     }
@@ -985,7 +996,7 @@ HEADER
             $code = $self->_dump_array('Sidef::Types::Array::Array', $obj);
         }
         elsif ($ref eq 'Sidef::Types::Bool::Bool') {
-            $code = $self->make_constant($ref, 'new', ${$obj} ? ("true$refaddr", 1) : ("false$refaddr", 0));
+            $code = 'Sidef::Types::Bool::Bool::' . (${$obj} ? 'TRUE' : 'FALSE');
         }
         elsif ($ref eq 'Sidef::Types::Regex::Regex') {
             $code =
@@ -1429,7 +1440,8 @@ HEADER
                     if (exists $self->{reassign_ops}{$method}) {
 
                         $code =
-                          "CORE::sub : lvalue {my \$ref=\\$code; \$\$ref=\$\$ref\->\${\\'$self->{reassign_ops}{$method}'}"
+                            "CORE::sub : lvalue {my \$ref=\\$code; \$\$ref=\$\$ref"
+                          . $self->_dump_op_call($self->{reassign_ops}{$method})
                           . $self->deparse_args(@{$call->{arg}}) . "}->()";
 
                         #$code =
@@ -1581,7 +1593,12 @@ HEADER
 
                         # Operator-like method call
                         else {
-                            $code .= '->${\\' . q{'} . $method . q{'} . '}';
+
+                            ## Old way:
+                            #$code .= '->${\\' . q{'} . $method . q{'} . '}';
+
+                            ## New way:
+                            $code .= $self->_dump_op_call($method);
                         }
                     }
                 }

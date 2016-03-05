@@ -725,7 +725,8 @@ package Sidef::Optimizer {
 
             # Has no expressions, so let's convert it into an Array
             if (not $has_expr) {
-                $obj = Sidef::Types::Array::Array->new(@{$obj});
+                #$obj = Sidef::Types::Array::Array->new(@{$obj});
+                bless $obj, 'Sidef::Types::Array::Array';
             }
         }
         elsif ($ref eq 'Sidef::Types::Block::If') {

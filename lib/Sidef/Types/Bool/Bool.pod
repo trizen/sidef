@@ -64,6 +64,16 @@ Return the
 
 =cut
 
+=head2 neg
+
+Bool.neg() -> I<Obj>
+
+Return the
+
+Aliases: I<not>, I<flip>, I<toggle>, I<is_false>
+
+=cut
+
 =head2 new
 
 Bool.new() -> I<Obj>
@@ -71,16 +81,6 @@ Bool.new() -> I<Obj>
 Return the
 
 Aliases: I<call>
-
-=cut
-
-=head2 not
-
-Bool.not() -> I<Obj>
-
-Return the
-
-Aliases: I<flip>, I<toggle>, I<is_false>
 
 =cut
 

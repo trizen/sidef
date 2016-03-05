@@ -145,6 +145,14 @@ Aliases: I<call>
 
 =cut
 
+=head2 range_iter
+
+RangeNumber.range_iter() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 reduce
 
 RangeNumber.reduce() -> I<Obj>
