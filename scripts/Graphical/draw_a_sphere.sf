@@ -19,8 +19,7 @@ func draw_sphere(rad, k, ambient) {
     var pixels = [];
     var r2 = (rad * rad);
     var range = (-rad .. rad);
-    range ~X range -> each { |pair|
-        var (x, y) = pair...;
+    for x,y in (range ~X range) {
         if ((var x2 = x*x) + (var y2 = y*y) < r2) {
             var vector = normalize([x, y, (r2 - x2 - y2).sqrt]);
             var intensity = (dot(light, vector)**k + ambient);
@@ -28,7 +27,7 @@ func draw_sphere(rad, k, ambient) {
             pixels << pixel;
         }
         else {
-            pixels << 0
+            pixels << 0;
         }
     }
     return pixels;

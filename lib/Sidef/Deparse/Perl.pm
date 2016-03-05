@@ -1064,9 +1064,9 @@ HEADER
                   . $init_vars . '; '
                   . 'my $block = CORE::sub '
                   . $block . ';'
-                  . 'for my $group($obj->SUPER::isa("ARRAY") ? @$obj : @{$obj->to_a}) {'
+                  . 'for my $group(ref($obj) ? $obj->SUPER::isa("ARRAY") ? @$obj : @{$obj->to_a} : ()) {'
                   . $vars
-                  . ' = ($group->SUPER::isa("ARRAY") ? @$group'
+                  . ' = (ref($group) && $group->SUPER::isa("ARRAY") ? @$group'
                   . ' : $group);'
                   . (
                      @last_var
