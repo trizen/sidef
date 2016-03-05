@@ -1091,13 +1091,13 @@ HEADER
                   . $var
                   . '; my $block = CORE::sub '
                   . $block . ';'
-                  . 'if (ref($obj) && $obj->SUPER::can("range_iter")) { my $iter = $obj->range_iter();'
+                  . 'if (ref($obj)) { if (defined(my $sub = $obj->SUPER::can("range_iter"))) { my $iter = $sub->($obj);'
                   . 'while (defined('
                   . $var
                   . '  = $iter->())) { $block->()} }'
                   . 'else { for my $item ($obj->SUPER::isa("ARRAY") ? @$obj : @{$obj->to_a}) { '
                   . $var
-                  . ' = $item; $block->() }}}';
+                  . ' = $item; $block->() }}}}';
             }
         }
         elsif ($ref eq 'Sidef::Types::Bool::Ternary') {
