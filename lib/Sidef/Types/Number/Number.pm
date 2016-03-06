@@ -7,11 +7,6 @@ package Sidef::Types::Number::Number {
     use Math::GMPz qw();
     use Math::MPFR qw();
 
-    use parent qw(
-      Sidef::Object::Object
-      Sidef::Convert::Convert
-      );
-
     our $ROUND = Math::MPFR::MPFR_RNDN();
     our $PREC  = 128;
 
@@ -22,6 +17,11 @@ package Sidef::Types::Number::Number {
                   ZERO => bless(\Math::GMPq->new(0),  __PACKAGE__),
                   MONE => bless(\Math::GMPq->new(-1), __PACKAGE__),
                  };
+
+    use parent qw(
+      Sidef::Object::Object
+      Sidef::Convert::Convert
+      );
 
     use overload
       q{bool} => sub { Math::GMPq::Rmpq_sgn(${$_[0]}) != 0 },
