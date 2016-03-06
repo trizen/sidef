@@ -121,7 +121,12 @@ package Sidef::Parser {
                 | read\b                                     (?{ state $x = Sidef::Sys::Sys->new })
                 | goto\b                                     (?{ state $x = bless({}, 'Sidef::Perl::Builtin') })
                 | (?:[*\\&]|\+\+|--)                         (?{ state $x = bless({}, 'Sidef::Variable::Ref') })
-                | (?:>>?|[√+~!\-\^]|(?:say|print|defined)\b) (?{ state $x = bless({}, 'Sidef::Object::Unary') })
+                | (?:>>?|[√+~!\-\^]|
+                    (?:
+                        say
+                      | print
+                      | defined
+                    )\b)                                     (?{ state $x = bless({}, 'Sidef::Object::Unary') })
                 | :                                          (?{ state $x = bless({}, 'Sidef::DataTypes::Hash::Hash') })
               )
             }x,
@@ -2118,7 +2123,11 @@ package Sidef::Parser {
                     my $arg = (
                                  /\G(?=\()/ ? $self->parse_arg(code => $opt{code})
                                : /\G(?=\{)/ ? $self->parse_block(code => $opt{code}, topic_var => 1)
-                               :              $self->parse_obj(code => $opt{code})
+                               : $self->fatal_error(
+                                                    code  => $_,
+                                                    pos   => ($pos - length($name)),
+                                                    error => "variable <$name> is not declared in the current scope",
+                                                   )
                               );
 
                     if (ref($arg) and ref($arg) ne 'HASH') {

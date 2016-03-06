@@ -18,7 +18,7 @@ if (nil != sf) {
 }
 
 __END__
-var ron = frequire 'Lingua::RO::Numbers';
+var ron = frequire('Lingua::RO::Numbers');
 var num = ron.number_to_ro(123553);
 
 num.say;
