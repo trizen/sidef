@@ -1006,6 +1006,7 @@ package Sidef::Types::Array::Array {
         Sidef::Types::Number::Number::_new_int(@{$self} ? 0 : -1);
     }
 
+    *index_by    = \&index;
     *first_index = \&index;
 
     sub rindex {
@@ -1032,6 +1033,7 @@ package Sidef::Types::Array::Array {
         Sidef::Types::Number::Number::_new_int($#{$self});
     }
 
+    *rindex_by  = \&rindex;
     *last_index = \&rindex;
 
     sub pairmap {

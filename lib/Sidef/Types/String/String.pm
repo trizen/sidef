@@ -248,7 +248,6 @@ package Sidef::Types::String::String {
     }
 
     *eq = \&equals;
-    *is = \&equals;
 
     sub ne {
         my ($self, $arg) = @_;

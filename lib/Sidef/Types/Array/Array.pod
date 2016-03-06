@@ -519,7 +519,7 @@ Array.index() -> I<Obj>
 
 Return the
 
-Aliases: I<first_index>
+Aliases: I<index_by>, I<first_index>
 
 =cut
 
@@ -891,7 +891,7 @@ Array.rindex() -> I<Obj>
 
 Return the
 
-Aliases: I<last_index>
+Aliases: I<rindex_by>, I<last_index>
 
 =cut
 
@@ -924,6 +924,14 @@ Return the
 =head2 slice
 
 Array.slice() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 slices
+
+Array.slices() -> I<Obj>
 
 Return the
 

@@ -150,7 +150,7 @@ I<Obj> B<==> I<Obj> -> I<Obj>
 
 Return the
 
-Aliases: I<eq>, I<is>, I<equals>
+Aliases: I<eq>, I<equals>
 
 =cut
 
@@ -273,14 +273,6 @@ String.char() -> I<Obj>
 Return the
 
 Aliases: I<char_at>
-
-=cut
-
-=head2 chars
-
-String.chars() -> I<Obj>
-
-Return the
 
 =cut
 
@@ -905,6 +897,16 @@ String.to() -> I<Obj>
 Return the
 
 Aliases: I<..^()>, I<up_to>, I<upto>
+
+=cut
+
+=head2 to_a
+
+String.to_a() -> I<Obj>
+
+Return the
+
+Aliases: I<chars>, I<to_array>
 
 =cut
 

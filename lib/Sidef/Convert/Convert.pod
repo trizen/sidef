@@ -16,14 +16,6 @@ var obj = Convert.new(...);
 =head1 METHODS
 
 
-=head2 to_array
-
-Convert.to_array() -> I<Obj>
-
-Return the
-
-=cut
-
 =head2 to_b
 
 Convert.to_b() -> I<Obj>
