@@ -91,11 +91,6 @@ package Sidef::Object::Object {
         Sidef::Variable::LazyMethod->new(obj => $self, method => $method, args => \@args);
     }
 
-    #~ sub lazy {
-    #~ my ($self) = @_;
-    #~ Sidef::Lazy::Lazy->new($self);
-    #~ }
-
     sub object_id {
         my ($self) = @_;
         Sidef::Types::Number::Number->new(Scalar::Util::refaddr($self));
@@ -399,7 +394,7 @@ package Sidef::Object::Object {
         # Negation of smart match
         *{__PACKAGE__ . '::' . '!~'} = sub {
             state $method = '~~';
-            $_[0]->$method($_[1])->not;
+            $_[0]->$method($_[1])->neg;
         };
     }
 }

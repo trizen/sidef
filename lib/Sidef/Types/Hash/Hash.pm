@@ -95,7 +95,7 @@ package Sidef::Types::Hash::Hash {
 
     sub ne {
         my ($self, $obj) = @_;
-        $self->eq($obj)->not;
+        $self->eq($obj)->neg;
     }
 
     sub same_keys {

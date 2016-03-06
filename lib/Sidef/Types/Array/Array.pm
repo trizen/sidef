@@ -435,7 +435,7 @@ package Sidef::Types::Array::Array {
 
     sub ne {
         my ($self, $array) = @_;
-        $self->eq($array)->not;
+        $self->eq($array)->neg;
     }
 
     sub zip {
