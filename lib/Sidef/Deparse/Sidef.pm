@@ -475,7 +475,7 @@ package Sidef::Deparse::Sidef {
                      map { ($_->{slurpy} ? ($_->{array} ? '*' : ':') : '') . $self->deparse_expr({self => $_}) }
                        @{$obj->{vars}})
               . ' in ('
-              . $self->deparse_expr({self => $obj->{array}}) . ') '
+              . $self->deparse_expr({self => $obj->{expr}}) . ') '
               . $self->deparse_bare_block($obj->{block}->{code});
         }
         elsif ($ref eq 'Sidef::Math::Math') {

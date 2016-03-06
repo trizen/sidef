@@ -2543,11 +2543,11 @@ package Sidef::Parser {
                                         pos   => pos($_),
                                        );
 
-                my $array = (
-                             /\G(?=\()/
-                             ? $self->parse_arg(code => $opt{code})
-                             : $self->parse_obj(code => $opt{code})
-                            );
+                my $expr = (
+                            /\G(?=\()/
+                            ? $self->parse_arg(code => $opt{code})
+                            : $self->parse_obj(code => $opt{code})
+                           );
 
                 my $block = (
                              /\G\h*(?=\{)/gc
@@ -2567,7 +2567,7 @@ package Sidef::Parser {
                 # Store the info
                 $obj->{vars}  = \@vars;
                 $obj->{block} = $block;
-                $obj->{array} = $array;
+                $obj->{expr}  = $expr;
 
                 # Re-bless the $obj into a different class
                 bless $obj, 'Sidef::Types::Block::ForIn';

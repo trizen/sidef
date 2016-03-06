@@ -690,7 +690,6 @@ package Sidef::Optimizer {
         }
         elsif (   $ref eq 'Sidef::Variable::ClassInit'
                or $ref eq 'Sidef::Types::Block::Do'
-               or $ref eq 'Sidef::Types::Block::ForIn'
                or $ref eq 'Sidef::Types::Block::Loop'
                or $ref eq 'Sidef::Types::Block::Given'
                or $ref eq 'Sidef::Types::Block::When'
@@ -725,6 +724,7 @@ package Sidef::Optimizer {
 
             # Has no expressions, so let's convert it into an Array
             if (not $has_expr) {
+
                 #$obj = Sidef::Types::Array::Array->new(@{$obj});
                 bless $obj, 'Sidef::Types::Array::Array';
             }
@@ -742,7 +742,9 @@ package Sidef::Optimizer {
                 $obj->{else}{block}{code} = \%code;
             }
         }
-        elsif ($ref eq 'Sidef::Types::Block::While' or $ref eq 'Sidef::Types::Block::ForEach') {
+        elsif (   $ref eq 'Sidef::Types::Block::While'
+               or $ref eq 'Sidef::Types::Block::ForIn'
+               or $ref eq 'Sidef::Types::Block::ForEach') {
             my %expr = $self->optimize($obj->{expr});
             $obj->{expr} = \%expr;
 

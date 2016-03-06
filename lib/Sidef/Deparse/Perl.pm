@@ -1029,7 +1029,7 @@ HEADER
         }
         elsif ($ref eq 'Sidef::Types::Block::ForIn') {
 
-            my $expr = $self->deparse_expr({self => $obj->{array}});
+            my $expr = $self->deparse_expr({self => $obj->{expr}});
 
             if (
                 @{$obj->{vars}} > 1
