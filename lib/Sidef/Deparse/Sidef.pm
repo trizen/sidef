@@ -97,6 +97,7 @@ package Sidef::Deparse::Sidef {
         my $ref = ref($obj);
 
             $ref eq 'Sidef::Variable::ClassInit'     ? $obj->{name}
+          : $ref eq 'Sidef::Variable::Struct'        ? $obj->{name}
           : $ref eq 'Sidef::Types::Block::BlockInit' ? 'Block'
           :                                            substr($ref, rindex($ref, '::') + 2);
     }

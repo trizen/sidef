@@ -181,6 +181,7 @@ HEADER
         }
 
             $ref eq 'Sidef::Variable::ClassInit'     ? $self->_dump_class_name($obj)
+          : $ref eq 'Sidef::Variable::Struct'        ? $self->_dump_class_name($obj)
           : $ref eq 'Sidef::Variable::Ref'           ? 'REF'
           : $ref eq 'Sidef::Types::Block::BlockInit' ? 'Sidef::Types::Block::Block'
           :                                            $ref;
@@ -497,7 +498,7 @@ HEADER
 
     sub _dump_class_name {
         my ($self, $class) = @_;
-        join('::', '_', $class->{class}, $class->{name});
+        join('::', $self->{environment_name}, $class->{class}, $class->{name});
     }
 
     sub deparse_generic {

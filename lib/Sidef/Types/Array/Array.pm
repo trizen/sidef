@@ -1173,15 +1173,17 @@ package Sidef::Types::Array::Array {
 
     sub insert {
         my ($self, $index, @objects) = @_;
-        splice(
-            @{$self},
-            do {
-                local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
-                $index->get_value;
-            },
-            0,
-            @objects
-              );
+
+        my $i = do {
+            local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
+            $index->get_value;
+        };
+
+        if ($#{$self} < $i) {
+            $#{$self} = $i - 1;
+        }
+
+        splice(@{$self}, $i, 0, @objects);
         $self;
     }
 

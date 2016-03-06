@@ -114,7 +114,7 @@ package Sidef {
 
     $self = ref($self) if ref($self);
 
-    if (index($self, 'Sidef::') == 0) {
+    if (index($self, 'Sidef::') == 0 and index($self, 'Sidef::Runtime') != 0) {
 
         eval { require $self =~ s{::}{/}rg . '.pm' };
 
