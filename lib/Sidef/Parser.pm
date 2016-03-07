@@ -186,7 +186,6 @@ package Sidef::Parser {
                   RangeNum RangeNumber
                   Complex
                   Math
-                  Fcntl
                   Pipe
                   Ref
                   Socket

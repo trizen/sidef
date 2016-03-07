@@ -38,7 +38,6 @@ package Sidef::Deparse::Sidef {
                   Sidef::DataTypes::Glob::FileHandle      FileHandle
                   Sidef::DataTypes::Glob::Dir             Dir
                   Sidef::DataTypes::Glob::File            File
-                  Sidef::DataTypes::Glob::Fcntl           Fcntl
                   Sidef::DataTypes::Object::Object        Object
                   Sidef::DataTypes::Sidef::Sidef          Sidef
                   Sidef::DataTypes::Variable::LazyMethod  LazyMethod

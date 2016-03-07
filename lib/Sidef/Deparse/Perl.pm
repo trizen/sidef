@@ -76,7 +76,6 @@ package Sidef::Deparse::Perl {
                   Sidef::DataTypes::Glob::FileHandle      Sidef::Types::Glob::FileHandle
                   Sidef::DataTypes::Glob::Dir             Sidef::Types::Glob::Dir
                   Sidef::DataTypes::Glob::File            Sidef::Types::Glob::File
-                  Sidef::DataTypes::Glob::Fcntl           Sidef::Types::Glob::Fcntl
                   Sidef::DataTypes::Object::Object        Sidef::Object::Object
                   Sidef::DataTypes::Sidef::Sidef          Sidef
                   Sidef::DataTypes::Variable::LazyMethod  Sidef::Variable::LazyMethod
