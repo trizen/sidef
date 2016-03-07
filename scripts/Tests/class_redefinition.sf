@@ -39,13 +39,13 @@ class Shape {
 
 class Circle(radius) < Shape {
     method area {
-        self.radius**2 * Math::PI;
+        self.radius**2 * Number.pi;
     };
     method diameter {
         self.radius * 2;
     };
     method circumference {
-        self.diameter * Math::PI;
+        self.diameter * Number.pi;
     };
     method name {
         "Ringie";

@@ -24,26 +24,6 @@ package Sidef::Types::Glob::File {
     sub get_value { ${$_[0]} }
     sub to_file   { $_[0] }
 
-    sub get_constant {
-        my ($self, $str) = @_;
-
-        my $name = "$str";
-        state $CACHE = {};
-
-        if (exists $CACHE->{$name}) {
-            return $CACHE->{$name};
-        }
-
-        state $x = require Fcntl;
-        my $call = \&{'Fcntl' . '::' . $name};
-
-        if (defined(&$call)) {
-            return $CACHE->{$name} = Sidef::Types::Number::Number->new($call->());
-        }
-
-        die qq{[ERROR] Inexistent File constant "$name"!\n};
-    }
-
     sub touch {
         my ($self, @args) = @_;
         $self->open('>>', @args);

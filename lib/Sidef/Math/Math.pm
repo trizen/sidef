@@ -12,33 +12,6 @@ package Sidef::Math::Math {
         bless {}, __PACKAGE__;
     }
 
-    sub get_constant {
-        my ($self, $name) = @_;
-
-        state %cache;
-        state $table = {
-                        "e"       => sub { Sidef::Types::Number::Number->e },
-                        "pi"      => sub { Sidef::Types::Number::Number->pi },
-                        "PI"      => sub { Sidef::Types::Number::Number->pi },
-                        "π"      => sub { Sidef::Types::Number::Number->pi },
-                        "tau"     => sub { Sidef::Types::Number::Number->tau },
-                        "τ"      => sub { Sidef::Types::Number::Number->tau },
-                        "phi"     => sub { Sidef::Types::Number::Number->phi },
-                        "Φ"      => sub { Sidef::Types::Number::Number->phi },
-                        "ln2"     => sub { Sidef::Types::Number::Number->ln2 },
-                        "G"       => sub { Sidef::Types::Number::Number->G },
-                        "Y"       => sub { Sidef::Types::Number::Number->Y },
-                        "γ"      => sub { Sidef::Types::Number::Number->Y },
-                        "catalan" => sub { Sidef::Types::Number::Number->G },
-                        "euler"   => sub { Sidef::Types::Number::Number->Y },
-                       };
-
-        my $key = "$name";
-        $cache{$key} //= exists($table->{$key}) ? $table->{$key}->() : do {
-            die qq{[ERROR] Inexistent Math constant "$name"!\n};
-        };
-    }
-
     sub gcd {
         my ($self, @list) = @_;
 

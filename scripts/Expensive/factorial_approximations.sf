@@ -1,57 +1,59 @@
 #!/usr/bin/ruby
 
-define DPI   = 2*Math::PI;
+define e     = Number.e;
+define PI    = Number.pi
+define TAU   = Number.tau;
 define NAMES = %w(Unknown Ramanujan Trizen Stirling Stirling+Laplace Ramanujan2 Batir Batir2 Batir2WA);
 
 # Unknown
 func f1(n) {
     define w = ((3 - 3.sqrt) / 6);
-    define d = (DPI * Math::e -> sqrt * Math.exp(-w));
-    d * (Math.pow((n+w) / Math::e, n + 1/2));
+    define d = (TAU * e -> sqrt * Math.exp(-w));
+    d * (Math.pow((n+w) / e, n + 1/2));
 }
 
 # S. Ramanujan's formula
 func f2(n) {
-    define d = (Math::PI.log / 2);
+    define d = (PI.log / 2);
     Math.exp(n * n.log - n + (n * (1 + (4*n * (1 + 2*n))) -> log / 6) + d);
 }
 
 # Trizen's formula
 func f3(n) {
-    n**n / n.exp * (Math::e / n.sqrt) / Math::e.root((12 + 1/n.root(Math::e + (1 / (n - ((n*2).log(n+1)))))) * Math::e.root(n));
+    n**n / n.exp * (e / n.sqrt) / e.root((12 + 1/n.root(e + (1 / (n - ((n*2).log(n+1)))))) * e.root(n));
 }
 
 # Stirling's formula
 func f4(n) {
-    DPI * n -> sqrt * Math.pow(n / Math::e, n);
+    TAU * n -> sqrt * Math.pow(n / e, n);
 }
 
 # Stirling's formula + Laplace's method (1)
 func f5(n) {
-    DPI * n -> sqrt * Math.pow(n / Math::e, n) * (1 + 1/(12*n));
+    TAU * n -> sqrt * Math.pow(n / e, n) * (1 + 1/(12*n));
 }
 
 # S. Ramanujan (2)
 func f6(n) {
-    define w = (Math::PI.sqrt);
+    define w = (PI.sqrt);
     w * Math.pow(n, n) * Math.exp(-n) * Math.pow(((8 * n**3) + (4 * n**2) + n + 1/30), 1/6);
 }
 
 # N. Batir
 func f7(n) {
-    define w = (DPI.sqrt);
+    define w = (TAU.sqrt);
     w * Math.pow(n, n) * Math.exp(-n) * (n + 1/2 -> sqrt) * Math.exp(-(1 / (6 * (n + 3/8))));
 }
 
 # N. Batir(2)
 func f8(n) {
-    define w = (DPI.sqrt);
-    w * Math.pow(n, n) * Math::e**(-n) * (n + 1/6 + 1/(72*n) - 31/(6480 * n**2) - 139/(155520 * n**3) + 9871/(6531840 * n**4) -> sqrt);
+    define w = (TAU.sqrt);
+    w * Math.pow(n, n) * e**(-n) * (n + 1/6 + 1/(72*n) - 31/(6480 * n**2) - 139/(155520 * n**3) + 9871/(6531840 * n**4) -> sqrt);
 }
 
 # N. Batir(2) derivation by WolframAlpha
 func f9(n) {
-    1/216 * Math.sqrt(Math::PI/70) * Math::e**(-n) * n**(n-2) * Math.sqrt(42*n*(24*n*(90*n*(12*n*(6*n + 1) + 1) - 31) - 139) + 9871);
+    1/216 * Math.sqrt(PI/70) * e**(-n) * n**(n-2) * Math.sqrt(42*n*(24*n*(90*n*(12*n*(6*n + 1) + 1) - 31) - 139) + 9871);
 }
 
 #

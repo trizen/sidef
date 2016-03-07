@@ -4,8 +4,8 @@
 ## http://rosettacode.org/wiki/Gamma_function
 #
 
-define e  = Math::e;
-define pi = Math::pi;
+define e  = Number.e;
+define pi = Number.pi;
  
 func Γ(t) {
     t < 20 ? (__FUNC__(t + 1) / t)

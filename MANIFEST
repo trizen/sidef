@@ -48,6 +48,7 @@ lib/Sidef/Types/Glob/Dir.pm
 lib/Sidef/Types/Glob/Dir.pod
 lib/Sidef/Types/Glob/DirHandle.pm
 lib/Sidef/Types/Glob/DirHandle.pod
+lib/Sidef/Types/Glob/Fcntl.pm
 lib/Sidef/Types/Glob/File.pm
 lib/Sidef/Types/Glob/File.pod
 lib/Sidef/Types/Glob/FileHandle.pm
@@ -191,8 +192,6 @@ scripts/Interactive/hello_world.bf
 scripts/Interactive/integer_comparison.sf
 scripts/Interactive/menu.sf
 scripts/Interactive/pi.sf
-scripts/Interactive/socket.sf
-scripts/Interactive/socket_inet.sf
 scripts/Interactive/sparkline_in_unicode.sf
 scripts/Interactive/temperature_conversion.sf
 scripts/Interactive/user_input_text.sf
@@ -802,6 +801,8 @@ scripts/walk_a_dir_recursively.sf
 scripts/WWW/deranged_anagrams.sf
 scripts/WWW/DNS_query.sf
 scripts/WWW/rc_rank_languages_by_popularity.sf
+scripts/WWW/socket.sf
+scripts/WWW/socket_inet.sf
 scripts/xiaolin_wu_s_line_algorithm.sf
 scripts/y_combinator.sf
 share/sidef/Memoize.sm

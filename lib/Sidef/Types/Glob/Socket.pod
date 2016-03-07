@@ -23,9 +23,9 @@ Inherits methods from:
 =head1 METHODS
 
 
-=head2 get_constant
+=head2 getaddrinfo
 
-Socket.get_constant() -> I<Obj>
+Socket.getaddrinfo() -> I<Obj>
 
 Return the
 
@@ -50,6 +50,14 @@ Return the
 =head2 gethostent
 
 Socket.gethostent() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 getnameinfo
+
+Socket.getnameinfo() -> I<Obj>
 
 Return the
 
@@ -127,6 +135,38 @@ Return the
 
 =cut
 
+=head2 inet_aton
+
+Socket.inet_aton() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 inet_ntoa
+
+Socket.inet_ntoa() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 inet_ntop
+
+Socket.inet_ntop() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 inet_pton
+
+Socket.inet_pton() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 new
 
 Socket.new() -> I<Obj>
@@ -138,6 +178,54 @@ Return the
 =head2 open
 
 Socket.open() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 pack_ip_mreq
+
+Socket.pack_ip_mreq() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 pack_ip_mreq_source
+
+Socket.pack_ip_mreq_source() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 pack_ipv6_mreq
+
+Socket.pack_ipv6_mreq() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 pack_sockaddr_in
+
+Socket.pack_sockaddr_in() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 pack_sockaddr_in6
+
+Socket.pack_sockaddr_in6() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 pack_sockaddr_un
+
+Socket.pack_sockaddr_un() -> I<Obj>
 
 Return the
 
@@ -175,9 +263,89 @@ Return the
 
 =cut
 
+=head2 sockaddr_family
+
+Socket.sockaddr_family() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 sockaddr_in
+
+Socket.sockaddr_in() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 sockaddr_in6
+
+Socket.sockaddr_in6() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 sockaddr_un
+
+Socket.sockaddr_un() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 socketpair
 
 Socket.socketpair() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 unpack_ip_mreq
+
+Socket.unpack_ip_mreq() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 unpack_ip_mreq_source
+
+Socket.unpack_ip_mreq_source() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 unpack_ipv6_mreq
+
+Socket.unpack_ipv6_mreq() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 unpack_sockaddr_in
+
+Socket.unpack_sockaddr_in() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 unpack_sockaddr_in6
+
+Socket.unpack_sockaddr_in6() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 unpack_sockaddr_un
+
+Socket.unpack_sockaddr_un() -> I<Obj>
 
 Return the
 

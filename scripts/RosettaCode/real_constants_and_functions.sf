@@ -8,14 +8,10 @@ var x = 42;
 var y = 2;
 
 # Constants:
-say Math::e;
-say Math::PI;
-say Math::ln2;
-say Math::phi;
-
-# Arbitrary precision:
-say Math.pi(5);
-say Math.e(5);
+say Number.e;
+say Number.pi;
+say Number.ln2;
+say Number.phi;
 
 # Mathematical functions
 say x.sqrt;    # square root

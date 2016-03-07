@@ -388,14 +388,6 @@ Return the
 
 =cut
 
-=head2 get_constant
-
-Complex.get_constant() -> I<Obj>
-
-Return the
-
-=cut
-
 =head2 i
 
 Complex.i() -> I<Obj>

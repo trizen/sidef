@@ -14,23 +14,28 @@ package Sidef::Types::Glob::Socket {
     }
 
     {
-        my %CACHE;
+        no strict 'refs';
+        require Socket;
 
-        sub get_constant {
-            my ($self, $name) = @_;
+        foreach my $name (@Socket::EXPORT, @Socket::EXPORT_OK) {
+            $name =~ /^[a-z]/i or next;
+            *{__PACKAGE__ . '::' . $name} = sub {
+                my ($self, @args) = @_;
 
-            if (exists $CACHE{$name}) {
-                return $CACHE{$name};
-            }
-
-            state $x = require Socket;
-
-            if (defined(&{'Socket' . '::' . $name})) {
-                my $func = \&{'Socket' . '::' . $name};
-                return $CACHE{$name} = Sidef::Perl::Perl->to_sidef(scalar $func->());
-            }
-
-            die qq{[ERROR] Inexistent Socket constant "$name"!\n};
+                my $func    = \&{'Socket' . '::' . $name};
+                my @results = eval {
+                    $func->(map { $_->get_value } @args);
+                };
+                if ($@) {
+                    my $result = $func->(map { $_->get_value } @args);
+                    @results = $result;
+                }
+                return (
+                        @results > 1
+                        ? (map { Sidef::Perl::Perl->to_sidef($_) } @results)
+                        : Sidef::Perl::Perl->to_sidef($results[0])
+                       );
+            };
         }
     }
 
@@ -174,39 +179,6 @@ package Sidef::Types::Glob::Socket {
     sub setservent {
         my ($self, $stayopen) = @_;
         (CORE::setservent($stayopen->get_value)) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
-    }
-
-    #
-    ## Socket::* functions
-    #
-
-    sub DESTROY { }
-
-    sub AUTOLOAD {
-        my ($self, @args) = @_;
-
-        my ($name) = ($AUTOLOAD =~ /^.*[^:]::(.*)$/);
-
-        state $x = require Socket;
-
-        if (defined(&{'Socket' . '::' . $name})) {
-            my $func    = \&{'Socket' . '::' . $name};
-            my @results = eval {
-                $func->(map { $_->get_value } @args);
-            };
-            if ($@) {
-                my $result = $func->(map { $_->get_value } @args);
-                @results = $result;
-            }
-            return (
-                    @results > 1
-                    ? (map { Sidef::Perl::Perl->to_sidef($_) } @results)
-                    : Sidef::Perl::Perl->to_sidef($results[0])
-                   );
-        }
-
-        die qq{[ERROR] Inexistent Socket method "$name"!\n};
-        return;
     }
 };
 

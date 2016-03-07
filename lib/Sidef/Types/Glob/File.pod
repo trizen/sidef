@@ -138,14 +138,6 @@ Return the
 
 =cut
 
-=head2 get_constant
-
-File.get_constant() -> I<Obj>
-
-Return the
-
-=cut
-
 =head2 has_setgid_bit
 
 File.has_setgid_bit() -> I<Obj>

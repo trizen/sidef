@@ -9,9 +9,6 @@ package Sidef::Optimizer {
                   REGEX   => 'Sidef::Types::Regex::Regex',
                   BOOL    => 'Sidef::Types::Bool::Bool',
                   ARRAY   => 'Sidef::Types::Array::Array',
-                  MATH    => 'Sidef::Math::Math',
-                  FILE    => 'Sidef::Types::Glob::File',
-                  SOCKET  => 'Sidef::Types::Glob::Socket',
                   COMPLEX => 'Sidef::Types::Number::Complex',
                  };
 
@@ -491,36 +488,6 @@ package Sidef::Optimizer {
             ),
         ],
 
-        (MATH) => [
-
-            # Math.method(String)
-            (
-             map {
-                 { $_, [table(STRING)] }
-               } methods(MATH, qw(get_constant))
-            ),
-        ],
-
-        (FILE) => [
-
-            # File.method(String)
-            (
-             map {
-                 { $_, [table(STRING)] }
-               } methods(FILE, qw(get_constant))
-            ),
-        ],
-
-        (SOCKET) => [
-
-            # Socket.method(String)
-            (
-             map {
-                 { $_, [table(STRING)] }
-               } methods(SOCKET, qw(get_constant))
-            ),
-        ],
-
         (COMPLEX) => [
 
             # Complex.method(Complex|Number)
@@ -626,13 +593,6 @@ package Sidef::Optimizer {
                    dump
                    )
                )
-            ),
-
-            # Complex.method(String)
-            (
-             map {
-                 { $_, [table(STRING)] }
-               } methods(COMPLEX, qw(get_constant))
             ),
         ],
     );

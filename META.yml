@@ -70,6 +70,8 @@ provides:
     file: lib/Sidef/Types/Glob/Dir.pm
   Sidef::Types::Glob::DirHandle:
     file: lib/Sidef/Types/Glob/DirHandle.pm
+  Sidef::Types::Glob::Fcntl:
+    file: lib/Sidef/Types/Glob/Fcntl.pm
   Sidef::Types::Glob::File:
     file: lib/Sidef/Types/Glob/File.pm
   Sidef::Types::Glob::FileHandle:

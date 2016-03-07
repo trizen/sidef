@@ -1,6 +1,7 @@
 #!/usr/bin/ruby
 
-include (Module::Fib, Module::Fact);
+include Module::Fib;
+include Module::Fact;
 
 Module::Fib::fibonacci(10) == 55 || die "error fib";
 Module::Fact::factorial(4) == 24 || die "error fact";
@@ -10,7 +11,8 @@ include Module::YouTube;
 var youtube_url = "abcdef".as_youtube_url;
 assert(youtube_url.begins_with("http"));
 
-include (Module::Foo, Module::Bar);
+include Module::Foo;
+include Module::Bar;
 
 var foo = Module::Foo::Bar();
 var bar = Module::Bar::Bar();

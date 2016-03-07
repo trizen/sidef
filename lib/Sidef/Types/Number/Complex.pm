@@ -184,24 +184,6 @@ package Sidef::Types::Number::Complex {
         Sidef::Types::String::String->new("Complex($re, $im)");
     }
 
-    sub get_constant {
-        my (undef, $name) = @_;
-
-        state %cache;
-        state $table = {
-                        e   => sub { __PACKAGE__->new(Sidef::Types::Number::Number->e) },
-                        pi  => sub { __PACKAGE__->new(Sidef::Types::Number::Number->pi) },
-                        phi => sub { __PACKAGE__->new(Sidef::Types::Number::Number->phi) },
-                        i   => sub { __PACKAGE__->new(0, 1) },
-                       };
-
-        my $key = lc($name);
-        $cache{$key} //= exists($table->{$key}) ? $table->{$key}->() : do {
-            warn qq{[WARN] Inexistent Complex constant "$name"!\n};
-            undef;
-        };
-    }
-
     #
     ## Complex constants
     #

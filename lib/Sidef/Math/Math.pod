@@ -39,14 +39,6 @@ Return the
 
 =cut
 
-=head2 get_constant
-
-Math.get_constant() -> I<Obj>
-
-Return the
-
-=cut
-
 =head2 lcm
 
 Math.lcm() -> I<Obj>

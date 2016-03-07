@@ -73,6 +73,7 @@ package Sidef::Parser {
                      | Regexp?\b                      (?{ state $x = bless({}, 'Sidef::DataTypes::Regex::Regex') })
                      | Object\b                       (?{ state $x = bless({}, 'Sidef::DataTypes::Object::Object') })
                      | Sidef\b                        (?{ state $x = bless({}, 'Sidef::DataTypes::Sidef::Sidef') })
+                     | Fcntl\b                        (?{ state $x = bless({}, 'Sidef::DataTypes::Glob::Fcntl') })
                      | Sig\b                          (?{ state $x = Sidef::Sys::Sig->new })
                      | Sys\b                          (?{ state $x = Sidef::Sys::Sys->new })
                      | Perl\b                         (?{ state $x = Sidef::Perl::Perl->new })
@@ -186,6 +187,7 @@ package Sidef::Parser {
                   RangeNum RangeNumber
                   Complex
                   Math
+                  Fcntl
                   Pipe
                   Ref
                   Socket
@@ -694,11 +696,7 @@ package Sidef::Parser {
             my $ref_type;
             if (defined($+{type})) {
                 my $type = $+{type};
-
-                my $obj = do {
-                    local $self->{_want_name} = 1;
-                    $self->parse_expr(code => \$type);
-                };
+                my $obj = $self->parse_expr(code => \$type);
 
                 if (not defined($obj) or ref($obj) eq 'HASH') {
                     $self->fatal_error(
@@ -1314,7 +1312,6 @@ package Sidef::Parser {
                         }
                       ) {
 
-                        local $self->{_want_name} = 1;
                         my ($obj) = $self->parse_expr(code => $try_expr ? $opt{code} : \$name);
 
                         if (ref($obj) eq 'HASH') {
@@ -2074,44 +2071,8 @@ package Sidef::Parser {
                     return $var;
                 }
 
-                # Type constant
-                my $obj;
-                if (
-                        not $self->{_want_name}
-                    and $class ne $self->{class}
-                    and defined(
-                        eval {
-                            local $self->{_want_name} = 1;
-                            my $code = $class;
-                            ($obj) = $self->parse_expr(code => \$code);
-                            $obj;
-                        }
-                    )
-                  ) {
-                    return
-                      bless(
-                            {
-                             name => '__CONST__',
-                             expr => {
-                                      $self->{class} => [
-                                                         {
-                                                          self => $obj,
-                                                          call => [
-                                                                   {
-                                                                    method => 'get_constant',
-                                                                    arg    => [Sidef::Types::String::String->new($name)]
-                                                                   }
-                                                                  ]
-                                                         }
-                                                        ]
-                                     }
-                            },
-                            'Sidef::Variable::Static'
-                           );
-                }
-
                 # Method call in functional style
-                if (not $self->{_want_name} and ($class eq $self->{class} or $class eq 'CORE')) {
+                if ($class eq $self->{class} or $class eq 'CORE') {
 
                     if ($self->{opt}{k}) {
                         print STDERR
@@ -2181,8 +2142,8 @@ package Sidef::Parser {
                 # Undeclared variable
                 $self->fatal_error(
                                    code  => $_,
-                                   pos   => (pos($_) - length($name) - 1),
-                                   error => "attempt to use an undeclared variable <$name>",
+                                   pos   => (pos($_) - length($name)),
+                                   error => "variable <$name> is not declared in the current scope",
                                   );
             }
 
@@ -2947,69 +2908,55 @@ package Sidef::Parser {
             }
 
             if (/\Ginclude\b\h*/gc) {
-                my $expr = eval {
-                    local $self->{_want_name} = 1;
-                    my $code = substr($_, pos);
-                    my ($obj) = $self->parse_expr(code => \$code);
-                    pos($_) += pos($code);
-                    $obj;
-                };
 
                 my @abs_filenames;
-                if ($@) {    # an error occured
+                if (/\G($self->{var_name_re})/gc) {
 
-                    # Try to get variable-like values (e.g.: include Some::Module::Name)
-                    my $var_names = $self->get_init_vars(code      => $opt{code},
-                                                         with_vals => 0,);
+                    my $var_name = $1;
+                    next if exists $Sidef::INCLUDED{$var_name};
 
-                    @{$var_names}
-                      || $self->fatal_error(
-                                            code  => $_,
-                                            pos   => pos($_),
-                                            error => "expected a variable-like `Module::Name'!",
-                                           );
+                    state $x = require File::Spec;
+                    my @path = split(/::/, $var_name);
+                    my $mod_path = File::Spec->catfile(@path[0 .. $#path - 1], $path[-1] . '.sm');
 
-                    foreach my $var_name (@{$var_names}) {
+                    $Sidef::INCLUDED{$var_name} = $mod_path;
 
-                        next if exists $Sidef::INCLUDED{$var_name};
-
-                        state $x = require File::Spec;
-                        my @path = split(/::/, $var_name);
-                        my $mod_path = File::Spec->catfile(@path[0 .. $#path - 1], $path[-1] . '.sm');
-
-                        $Sidef::INCLUDED{$var_name} = $mod_path;
-
-                        if (@{$self->{inc}} == 0) {
-                            state $y = require File::Basename;
-                            push @{$self->{inc}}, split(':', $ENV{SIDEF_INC}) if exists($ENV{SIDEF_INC});
-                            push @{$self->{inc}},
-                              File::Spec->catdir(File::Basename::dirname(File::Spec->rel2abs($0)),
-                                                 File::Spec->updir, 'share', 'sidef');
-                            push @{$self->{inc}}, File::Basename::dirname(File::Spec->rel2abs($self->{script_name}));
-                            push @{$self->{inc}}, File::Spec->curdir;
-                        }
-
-                        my ($full_path, $found_module);
-                        foreach my $inc_dir (@{$self->{inc}}) {
-                            if (    -e ($full_path = File::Spec->catfile($inc_dir, $mod_path))
-                                and -f _
-                                and -r _ ) {
-                                $found_module = 1;
-                                last;
-                            }
-                        }
-
-                        $found_module // $self->fatal_error(
-                                                            code  => $_,
-                                                            pos   => pos($_),
-                                                            error => "can't find the module '${mod_path}' anywhere in ['"
-                                                              . join("', '", @{$self->{inc}}) . "']",
-                                                           );
-
-                        push @abs_filenames, [$full_path, $var_name];
+                    if (@{$self->{inc}} == 0) {
+                        state $y = require File::Basename;
+                        push @{$self->{inc}}, split(':', $ENV{SIDEF_INC}) if exists($ENV{SIDEF_INC});
+                        push @{$self->{inc}},
+                          File::Spec->catdir(File::Basename::dirname(File::Spec->rel2abs($0)),
+                                             File::Spec->updir, 'share', 'sidef');
+                        push @{$self->{inc}}, File::Basename::dirname(File::Spec->rel2abs($self->{script_name}));
+                        push @{$self->{inc}}, File::Spec->curdir;
                     }
+
+                    my ($full_path, $found_module);
+                    foreach my $inc_dir (@{$self->{inc}}) {
+                        if (    -e ($full_path = File::Spec->catfile($inc_dir, $mod_path))
+                            and -f _
+                            and -r _ ) {
+                            $found_module = 1;
+                            last;
+                        }
+                    }
+
+                    $found_module // $self->fatal_error(
+                          code  => $_,
+                          pos   => pos($_),
+                          error => "can't find the module '${mod_path}' anywhere in ['" . join("', '", @{$self->{inc}}) . "']",
+                    );
+
+                    push @abs_filenames, [$full_path, $var_name];
                 }
                 else {
+
+                    my $expr = do {
+                        my $code = substr($_, pos);
+                        my ($obj) = $self->parse_expr(code => \$code);
+                        pos($_) += pos($code);
+                        $obj;
+                    };
 
                     my @files = (
                         ref($expr) eq 'HASH'
