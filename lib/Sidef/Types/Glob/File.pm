@@ -24,6 +24,19 @@ package Sidef::Types::Glob::File {
     sub get_value { ${$_[0]} }
     sub to_file   { $_[0] }
 
+    {
+        no strict 'refs';
+        require Fcntl;
+
+        my %cache;
+        foreach my $name (@Fcntl::EXPORT, @Fcntl::EXPORT_OK) {
+            $name =~ /^[a-z]/i or next;
+            *{__PACKAGE__ . '::' . $name} = sub {
+                $cache{$name} //= Sidef::Types::Number::Number->new(&{'Fcntl::' . $name});
+            };
+        }
+    }
+
     sub touch {
         my ($self, @args) = @_;
         $self->open('>>', @args);

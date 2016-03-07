@@ -48,7 +48,6 @@ lib/Sidef/Types/Glob/Dir.pm
 lib/Sidef/Types/Glob/Dir.pod
 lib/Sidef/Types/Glob/DirHandle.pm
 lib/Sidef/Types/Glob/DirHandle.pod
-lib/Sidef/Types/Glob/Fcntl.pm
 lib/Sidef/Types/Glob/File.pm
 lib/Sidef/Types/Glob/File.pod
 lib/Sidef/Types/Glob/FileHandle.pm

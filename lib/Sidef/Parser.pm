@@ -73,7 +73,6 @@ package Sidef::Parser {
                      | Regexp?\b                      (?{ state $x = bless({}, 'Sidef::DataTypes::Regex::Regex') })
                      | Object\b                       (?{ state $x = bless({}, 'Sidef::DataTypes::Object::Object') })
                      | Sidef\b                        (?{ state $x = bless({}, 'Sidef::DataTypes::Sidef::Sidef') })
-                     | Fcntl\b                        (?{ state $x = bless({}, 'Sidef::DataTypes::Glob::Fcntl') })
                      | Sig\b                          (?{ state $x = Sidef::Sys::Sig->new })
                      | Sys\b                          (?{ state $x = Sidef::Sys::Sys->new })
                      | Perl\b                         (?{ state $x = Sidef::Perl::Perl->new })

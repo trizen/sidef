@@ -14,7 +14,7 @@ desktopFilesPaths.each { |path|
         fullpath.is_a(File) || next;
 
         fullpath.to_s ~~ /\.desktop\z/            || next;
-        fullpath.sysopen(\var fh, Fcntl.O_RDONLY) || next;
+        fullpath.sysopen(\var fh, File.O_RDONLY) || next;
         fh.sysread(\var content, fullpath.size);
 
         content.decode_utf8!;
