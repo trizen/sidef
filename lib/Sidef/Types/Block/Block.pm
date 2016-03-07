@@ -34,8 +34,7 @@ package Sidef::Types::Block::Block {
     }
 
     sub run {
-        my ($self, @args) = @_;
-        $self->{code}->(@args);
+        $_[0]{code}->(@_[1 .. $#_]);
     }
 
     *do = \&run;
@@ -186,11 +185,6 @@ package Sidef::Types::Block::Block {
 
         my ($self, @objs) = $block->_multiple_dispatch(@args);
 
-        # Unpack 'return'ed values from bare-blocks
-        if (@objs == 1 and ref($objs[0]) eq 'Sidef::Types::Block::Return') {
-            @objs = @{$objs[0]{obj}};
-        }
-
         # Check the return types
         if (exists $self->{returns}) {
 
@@ -258,12 +252,6 @@ package Sidef::Types::Block::Block {
         $num->times($block);
     }
 
-    sub _run_code {
-        my ($self, @args) = @_;
-        my $result = $self->{code}->(@args);
-        ref($result) eq 'Sidef::Types::Block::Return' ? $result : ();
-    }
-
     sub exec {
         my ($self) = @_;
         $self->{code}->();
@@ -274,9 +262,7 @@ package Sidef::Types::Block::Block {
         my ($self, $condition) = @_;
 
         while ($condition->{code}->()) {
-            if (defined(my $res = $self->_run_code)) {
-                return $res;
-            }
+            $self->{code}->();
         }
 
         $self;
@@ -286,9 +272,7 @@ package Sidef::Types::Block::Block {
         my ($self) = @_;
 
         while (1) {
-            if (defined(my $res = $self->_run_code)) {
-                return $res;
-            }
+            $self->{code}->();
         }
 
         $self;
@@ -373,9 +357,7 @@ package Sidef::Types::Block::Block {
         }
         else {
             foreach my $item (@args) {
-                if (defined(my $res = $self->_run_code($item))) {
-                    return $res;
-                }
+                $self->{code}->($item);
             }
             $self;
         }

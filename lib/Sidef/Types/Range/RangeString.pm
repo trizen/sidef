@@ -93,16 +93,12 @@ package Sidef::Types::Range::RangeString {
         if ($self->{asc}) {
             if (length($from) == 1 and length($to) == 1) {
                 foreach my $i (ord($from) .. ord($to)) {
-                    if (defined(my $res = $code->_run_code(Sidef::Types::String::String->new(chr($i))))) {
-                        return $res;
-                    }
+                    $code->run(Sidef::Types::String::String->new(chr($i)));
                 }
             }
             else {
                 foreach my $str ($from .. $to) {    # this is lazy
-                    if (defined(my $res = $code->_run_code(Sidef::Types::String::String->new($str)))) {
-                        return $res;
-                    }
+                    $code->run(Sidef::Types::String::String->new($str));
                 }
             }
         }
@@ -111,16 +107,12 @@ package Sidef::Types::Range::RangeString {
                 my $f = ord($from);
                 my $t = ord($to);
                 for (; $f >= $t ; $f--) {
-                    if (defined(my $res = $code->_run_code(Sidef::Types::String::String->new(chr($f))))) {
-                        return $res;
-                    }
+                    $code->run(Sidef::Types::String::String->new(chr($f)));
                 }
             }
             else {
                 foreach my $str (CORE::reverse($from .. $to)) {    # this is not lazy
-                    if (defined(my $res = $code->_run_code(Sidef::Types::String::String->new($str)))) {
-                        return $res;
-                    }
+                    $code->run(Sidef::Types::String::String->new($str));
                 }
             }
         }

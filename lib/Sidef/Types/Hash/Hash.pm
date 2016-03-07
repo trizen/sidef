@@ -276,9 +276,7 @@ package Sidef::Types::Hash::Hash {
         my ($self, $code) = @_;
 
         foreach my $value (CORE::values %$self) {
-            if (defined(my $res = $code->_run_code($value))) {
-                return $res;
-            }
+            $code->run($value);
         }
 
         $code;
@@ -290,9 +288,7 @@ package Sidef::Types::Hash::Hash {
         my ($self, $code) = @_;
 
         foreach my $key (CORE::keys %$self) {
-            if (defined(my $res = $code->_run_code(Sidef::Types::String::String->new($key)))) {
-                return $res;
-            }
+            $code->run(Sidef::Types::String::String->new($key));
         }
 
         $code;
@@ -306,9 +302,7 @@ package Sidef::Types::Hash::Hash {
         if (defined($obj)) {
 
             foreach my $key (CORE::keys %$self) {
-                if (defined(my $res = $obj->_run_code(Sidef::Types::String::String->new($key), $self->{$key}))) {
-                    return $res;
-                }
+                $obj->run(Sidef::Types::String::String->new($key), $self->{$key});
             }
 
             return $obj;

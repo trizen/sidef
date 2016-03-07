@@ -298,9 +298,7 @@ package Sidef::Types::Number::Inf {
             my $num = Math::GMPq::Rmpq_init();
             Math::GMPq::Rmpq_set_z($num, $i);
             Math::GMPz::Rmpz_add_ui($i, $i, 1);
-            if (defined(my $res = $block->_run_code(bless \$num, 'Sidef::Types::Number::Number'))) {
-                return $res;
-            }
+            $block->run(bless \$num, 'Sidef::Types::Number::Number');
         }
 
         $block;
@@ -314,9 +312,7 @@ package Sidef::Types::Number::Inf {
             my $num = Math::GMPq::Rmpq_init();
             Math::GMPq::Rmpq_set_z($num, $i);
             Math::GMPz::Rmpz_add_ui($i, $i, 1);
-            if (defined(my $res = $block->_run_code(bless \$num, 'Sidef::Types::Number::Number'))) {
-                return $res;
-            }
+            $block->run(bless \$num, 'Sidef::Types::Number::Number');
         }
 
         $block;

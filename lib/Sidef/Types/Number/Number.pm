@@ -2280,9 +2280,7 @@ package Sidef::Types::Number::Number {
              Math::GMPz::Rmpz_cmp($i, $num) <= 0 ; Math::GMPz::Rmpz_add_ui($i, $i, 1)) {
             my $n = Math::GMPq::Rmpq_init();
             Math::GMPq::Rmpq_set_z($n, $i);
-            if (defined(my $res = $block->_run_code(bless(\$n, __PACKAGE__)))) {
-                return $res;
-            }
+            $block->run(bless(\$n, __PACKAGE__));
         }
 
         $block;
@@ -2297,9 +2295,7 @@ package Sidef::Types::Number::Number {
         {
             my $n = Math::GMPq::Rmpq_init();
             Math::GMPq::Rmpq_set_z($n, $i);
-            if (defined(my $res = $block->_run_code(bless(\$n, __PACKAGE__)))) {
-                return $res;
-            }
+            $block->run(bless(\$n, __PACKAGE__));
         }
 
         $block;

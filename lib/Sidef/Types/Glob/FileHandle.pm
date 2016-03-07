@@ -256,9 +256,7 @@ package Sidef::Types::Glob::FileHandle {
         my ($self, $code) = @_;
 
         while (defined(my $line = CORE::readline($self->{fh}))) {
-            if (defined(my $res = $code->_run_code(Sidef::Types::String::String->new($line)))) {
-                return $res;
-            }
+            $code->run(Sidef::Types::String::String->new($line));
         }
 
         $self;

@@ -37,7 +37,6 @@ lib/Sidef/Types/Block/Block.pm
 lib/Sidef/Types/Block/Block.pod
 lib/Sidef/Types/Block/Fork.pm
 lib/Sidef/Types/Block/Fork.pod
-lib/Sidef/Types/Block/Return.pm
 lib/Sidef/Types/Block/Try.pm
 lib/Sidef/Types/Block/Try.pod
 lib/Sidef/Types/Bool/Bool.pm
@@ -570,6 +569,7 @@ scripts/Tests/beadsort.sf
 scripts/Tests/best_shuffle.sf
 scripts/Tests/binary_search.sf
 scripts/Tests/binary_search_recursive.sf
+scripts/Tests/block_return.sf
 scripts/Tests/box_the_compass.sf
 scripts/Tests/break.sf
 scripts/Tests/built_in_classes.sf

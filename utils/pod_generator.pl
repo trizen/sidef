@@ -30,7 +30,6 @@ my %ignored_subs = map { $_ => 1 } qw<
 
 my %ignored_methods = (
                        'Sidef'                          => [qw(new)],
-                       'Sidef::Types::Block::Return'    => [qw(new)],
                        'Sidef::Sys::Sys'                => [qw(new)],
                        'Sidef::Math::Math'              => [qw(new)],
                        'Sidef::Time::Localtime'         => [qw(new)],

@@ -1193,7 +1193,7 @@ HEADER
                     $code = "goto END$self->{function}";
                 }
                 else {
-                    $code = 'return Sidef::Types::Block::Return->new';
+                    $code = "return;";
                 }
             }
         }
@@ -1422,7 +1422,7 @@ HEADER
                         $code .= 'goto ' . "END$self->{function}}";
                     }
                     else {
-                        $code .= 'return Sidef::Types::Block::Return->new' . $self->deparse_args(@{$call->{arg}});
+                        $code .= 'return' . $self->deparse_args(@{$call->{arg}});
                     }
 
                     next;

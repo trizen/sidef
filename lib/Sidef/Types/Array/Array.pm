@@ -339,9 +339,7 @@ package Sidef::Types::Array::Array {
         if (defined($block)) {
 
             if ($k == 0) {
-                if (defined(my $res = $block->_run_code($self->new))) {
-                    return $res;
-                }
+                $block->run($self->new);
                 return $self;
             }
 
@@ -353,11 +351,7 @@ package Sidef::Types::Array::Array {
             my @c = (0 .. $k - 1);
 
             while (1) {
-
-                if (defined(my $res = $block->_run_code($self->new(@{$self}[@c])))) {
-                    return $res;
-                }
-
+                $block->run($self->new(@{$self}[@c]));
                 next if ($c[$k - 1]++ < $n - 1);
                 my $i = $k - 2;
                 $i-- while ($i >= 0 && $c[$i] >= $n - ($k - $i));
@@ -741,9 +735,7 @@ package Sidef::Types::Array::Array {
         my ($self, $code) = @_;
 
         foreach my $item (@{$self}) {
-            if (defined(my $res = $code->_run_code($item))) {
-                return $res;
-            }
+            $code->run($item);
         }
 
         $self;
@@ -762,16 +754,12 @@ package Sidef::Types::Array::Array {
 
         my $end = @{$self};
         for (my $i = $n - 1 ; $i < $end ; $i += $n) {
-            if (defined(my $res = $code->_run_code($self->new(@{$self}[$i - ($n - 1) .. $i])))) {
-                return $res;
-            }
+            $code->run($self->new(@{$self}[$i - ($n - 1) .. $i]));
         }
 
         my $mod = $end % $n;
         if ($mod != 0) {
-            if (defined(my $res = $code->_run_code($self->new(@{$self}[$end - $mod .. $end - 1])))) {
-                return $res;
-            }
+            $code->run($self->new(@{$self}[$end - $mod .. $end - 1]));
         }
 
         $self;
@@ -808,9 +796,7 @@ package Sidef::Types::Array::Array {
         }
 
         foreach my $i ($n - 1 .. $#{$self}) {
-            if (defined(my $res = $code->_run_code($self->new(@{$self}[$i - $n + 1 .. $i])))) {
-                return $res;
-            }
+            $code->run($self->new(@{$self}[$i - $n + 1 .. $i]));
         }
 
         $self;
@@ -820,9 +806,7 @@ package Sidef::Types::Array::Array {
         my ($self, $code) = @_;
 
         foreach my $i (0 .. $#{$self}) {
-            if (defined(my $res = $code->_run_code(Sidef::Types::Number::Number::_new_uint($i)))) {
-                return $res;
-            }
+            $code->run(Sidef::Types::Number::Number::_new_uint($i));
         }
 
         $self;
@@ -834,9 +818,7 @@ package Sidef::Types::Array::Array {
         my ($self, $code) = @_;
 
         foreach my $i (0 .. $#{$self}) {
-            if (defined(my $res = $code->_run_code(Sidef::Types::Number::Number::_new_uint($i), $self->[$i]))) {
-                return $res;
-            }
+            $code->run(Sidef::Types::Number::Number::_new_uint($i), $self->[$i]);
         }
 
         $self;
@@ -1573,9 +1555,7 @@ package Sidef::Types::Array::Array {
                 --$p while $idx[$p - 1] > $idx[$p];
 
                 my $q = $p or do {
-                    if (defined(my $res = $code->_run_code($perm))) {
-                        return $res;
-                    }
+                    $code->run($perm);
                     return $self;
                 };
 
@@ -1583,9 +1563,7 @@ package Sidef::Types::Array::Array {
                 ++$q while $idx[$p - 1] > $idx[$q];
                 @idx[$p - 1, $q] = @idx[$q, $p - 1];
 
-                if (defined(my $res = $code->_run_code($perm))) {
-                    return $res;
-                }
+                $code->run($perm);
             }
 
             return;

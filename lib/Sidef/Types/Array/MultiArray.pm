@@ -52,9 +52,7 @@ package Sidef::Types::Array::MultiArray {
         my $max = $self->_max;
 
         foreach my $i (0 .. $max) {
-            if (defined(my $res = $code->_run_code(map { $_->[$i % @{$_}] } @{$self}))) {
-                return $res;
-            }
+            $code->run(map { $_->[$i % @{$_}] } @{$self});
         }
 
         $self;

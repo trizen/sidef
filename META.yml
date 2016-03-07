@@ -58,8 +58,6 @@ provides:
     file: lib/Sidef/Types/Block/Block.pm
   Sidef::Types::Block::Fork:
     file: lib/Sidef/Types/Block/Fork.pm
-  Sidef::Types::Block::Return:
-    file: lib/Sidef/Types/Block/Return.pm
   Sidef::Types::Block::Try:
     file: lib/Sidef/Types/Block/Try.pm
   Sidef::Types::Bool::Bool:

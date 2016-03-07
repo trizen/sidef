@@ -210,9 +210,7 @@ package Sidef::Types::Range::RangeNumber {
 
         my $iter = $self->range_iter();
         while (defined(my $num = $iter->())) {
-            if (defined(my $res = $code->_run_code($num))) {
-                return $res;
-            }
+            $code->run($num);
         }
     }
 

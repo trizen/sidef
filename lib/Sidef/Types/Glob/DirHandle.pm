@@ -129,9 +129,7 @@ package Sidef::Types::Glob::DirHandle {
 
         require Encode;
         while (defined(my $file = CORE::readdir($self->{dir_h}))) {
-            if (defined(my $res = $code->_run_code(Sidef::Types::String::String->new(Encode::decode_utf8($file))))) {
-                return $res;
-            }
+            $code->run(Sidef::Types::String::String->new(Encode::decode_utf8($file)));
         }
 
         $self;

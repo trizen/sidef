@@ -736,9 +736,7 @@ package Sidef::Types::String::String {
         my ($self, $code) = @_;
 
         foreach my $word (CORE::split(' ', $$self)) {
-            if (defined(my $res = $code->_run_code(__PACKAGE__->new($word)))) {
-                return $res;
-            }
+            $code->run(__PACKAGE__->new($word));
         }
 
         $self;
@@ -755,9 +753,7 @@ package Sidef::Types::String::String {
         my ($self, $code) = @_;
 
         foreach my $num (CORE::split(' ', $$self)) {
-            if (defined(my $res = $code->_run_code(Sidef::Types::Number::Number->new($num)))) {
-                return $res;
-            }
+            $code->run(Sidef::Types::Number::Number->new($num));
         }
 
         $self;
@@ -783,14 +779,7 @@ package Sidef::Types::String::String {
 
         state $x = require bytes;
         foreach my $i (0 .. bytes::length($string) - 1) {
-            if (
-                defined(
-                        my $res =
-                          $code->_run_code(Sidef::Types::Number::Number::_new_uint(CORE::ord bytes::substr($string, $i, 1)))
-                       )
-              ) {
-                return $res;
-            }
+            $code->run(Sidef::Types::Number::Number::_new_uint(CORE::ord bytes::substr($string, $i, 1)));
         }
 
         $self;
@@ -808,9 +797,7 @@ package Sidef::Types::String::String {
         my ($self, $code) = @_;
 
         foreach my $char (CORE::split(//, $$self)) {
-            if (defined(my $res = $code->_run_code(__PACKAGE__->new($char)))) {
-                return $res;
-            }
+            $code->run(__PACKAGE__->new($char));
         }
 
         $self;
@@ -830,9 +817,7 @@ package Sidef::Types::String::String {
 
         my $str = $$self;
         while ($str =~ /(\X)/g) {
-            if (defined(my $res = $code->_run_code(__PACKAGE__->new($1)))) {
-                return $res;
-            }
+            $code->run(__PACKAGE__->new($1));
         }
 
         $self;
@@ -849,9 +834,7 @@ package Sidef::Types::String::String {
         my ($self, $code) = @_;
 
         foreach my $line (CORE::split(/\R/, $$self)) {
-            if (defined(my $res = $code->_run_code(__PACKAGE__->new($line)))) {
-                return $res;
-            }
+            $code->run(__PACKAGE__->new($line));
         }
 
         $self;

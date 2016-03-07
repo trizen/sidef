@@ -115,7 +115,7 @@ package Sidef::Parser {
                 | try\b                                      (?{ Sidef::Types::Block::Try->new })
                 | foreach\b                                  (?{ bless({}, 'Sidef::Types::Block::ForEach') })
                 | for\b                                      (?{ bless({}, 'Sidef::Types::Block::For') })
-                | return\b                                   (?{ Sidef::Types::Block::Return->new })
+                | return\b                                   (?{ state $x = bless({}, 'Sidef::Types::Block::Return') })
                 #| next\b                                     (?{ bless({}, 'Sidef::Types::Block::Next') })
                 #| break\b                                    (?{ bless({}, 'Sidef::Types::Block::Break') })
                 | read\b                                     (?{ state $x = Sidef::Sys::Sys->new })
