@@ -400,10 +400,36 @@ package Sidef::Parser {
                             $basename,
                             $lines[rand @lines],
                             $self->{file_name} // '-',
-                            $self->{line}, join(', ', grep { defined } $opt{error}, $opt{expected}), $error_line,);
+                            $self->{line}, join(', ', grep { defined } $opt{error}, $opt{reason}), $error_line,);
 
-        my $pointer = ' ' x ($point) . '^' . "\n";
-        die $error, $pointer;
+        $error .= ' ' x ($point) . '^' . "\n";
+
+        if (exists($opt{var})) {
+
+            my ($name, $class) = $self->get_name_and_class($opt{var});
+
+            my %seen;
+            my @names;
+            foreach my $var (@{$self->{vars}{$class}}) {
+                next if ref $var eq 'ARRAY';
+                if (!$seen{$var->{name}}++) {
+                    push @names, $var->{name};
+                }
+            }
+
+            foreach my $var (@{$self->{ref_vars_refs}{$class}}) {
+                next if ref $var eq 'ARRAY';
+                if (!$seen{$var->{name}}++) {
+                    push @names, $var->{name};
+                }
+            }
+
+            if (my @candidates = Sidef::best_matches($name, \@names)) {
+                $error .= ("[?] Did you mean: " . join("\n" . (' ' x 18), sort @candidates) . "\n");
+            }
+        }
+
+        die $error;
     }
 
     sub find_var {
@@ -698,10 +724,10 @@ package Sidef::Parser {
 
                 if (not defined($obj) or ref($obj) eq 'HASH') {
                     $self->fatal_error(
-                                       code     => $_,
-                                       pos      => pos,
-                                       error    => "invalid type <<$type>> for variable '$name'",
-                                       expected => "expected a type, such as: Str, Num, File, etc...",
+                                       code   => $_,
+                                       pos    => pos,
+                                       error  => "invalid type <<$type>> for variable '$name'",
+                                       reason => "expected a type, such as: Str, Num, File, etc...",
                                       );
                 }
 
@@ -1314,7 +1340,7 @@ package Sidef::Parser {
 
                         if (ref($obj) eq 'HASH') {
                             $self->fatal_error(
-                                               error => "can't use an expression inside class declaration",
+                                               error => "can't use an expression in class declaration",
                                                code  => $_,
                                                pos   => pos($_),
                                               );
@@ -1356,10 +1382,10 @@ package Sidef::Parser {
                   ? bless({name => ($built_in_obj // $name), class => $class_name}, 'Sidef::Variable::ClassInit')
                   : $type eq 'global' ? bless({name => $name, class => $class_name}, 'Sidef::Variable::Global')
                   : $self->fatal_error(
-                                       error    => "invalid type",
-                                       expected => "expected a magic thing to happen",
-                                       code     => $_,
-                                       pos      => pos($_),
+                                       error  => "invalid type",
+                                       reason => "expected a magic thing to happen",
+                                       code   => $_,
+                                       pos    => pos($_),
                                       );
 
                 my $has_kids = 0;
@@ -1424,19 +1450,19 @@ package Sidef::Parser {
                                 }
                                 else {
                                     $self->fatal_error(
-                                                       error    => "this is not a class",
-                                                       expected => "expected a class name",
-                                                       code     => $_,
-                                                       pos      => pos($_) - length($name) - 1,
+                                                       error  => "this is not a class",
+                                                       reason => "expected a class name",
+                                                       code   => $_,
+                                                       pos    => pos($_) - length($name) - 1,
                                                       );
                                 }
                             }
                             elsif (exists $self->{built_in_classes}{$name}) {
                                 $self->fatal_error(
-                                                   error    => "Inheritance from built-in classes is not allowed",
-                                                   expected => "class `$name` is a built-in class",
-                                                   code     => $_,
-                                                   pos      => pos($_) - length($name) - 1,
+                                                   error  => "Inheritance from built-in classes is not allowed",
+                                                   reason => "class `$name` is a built-in class",
+                                                   code   => $_,
+                                                   pos    => pos($_) - length($name) - 1,
                                                   );
 
                                 #if ($name ne 'Sidef') {
@@ -1446,10 +1472,11 @@ package Sidef::Parser {
                             }
                             else {
                                 $self->fatal_error(
-                                                   error    => "can't find '$name' class",
-                                                   expected => "expected an existent class name",
-                                                   code     => $_,
-                                                   pos      => pos($_) - length($name) - 1,
+                                                   error  => "can't find '$name' class",
+                                                   reason => "expected an existent class name",
+                                                   var    => $name,
+                                                   code   => $_,
+                                                   pos    => pos($_) - length($name) - 1,
                                                   );
                             }
 
@@ -1459,10 +1486,10 @@ package Sidef::Parser {
 
                     /\G\h*(?=\{)/gc
                       || $self->fatal_error(
-                                            error    => "invalid class declaration",
-                                            expected => "expected: class $name(...){...}",
-                                            code     => $_,
-                                            pos      => pos($_)
+                                            error  => "invalid class declaration",
+                                            reason => "expected: class $name(...){...}",
+                                            code   => $_,
+                                            pos    => pos($_)
                                            );
 
                     if (ref($built_in_obj) eq 'Sidef::Variable::ClassInit') {
@@ -1524,10 +1551,10 @@ package Sidef::Parser {
                                 /\G\s*\)/gc && last;
                                 /\G\s*,\s*/gc
                                   || $self->fatal_error(
-                                                        error => "invalid return-type for $type $self->{class_name}<<$name>>",
-                                                        expected => "expected a comma",
-                                                        code     => $_,
-                                                        pos      => pos($_),
+                                                        error  => "invalid return-type for $type $self->{class_name}<<$name>>",
+                                                        reason => "expected a comma",
+                                                        code   => $_,
+                                                        pos    => pos($_),
                                                        );
                             }
                         }
@@ -1539,10 +1566,10 @@ package Sidef::Parser {
                         foreach my $ref (@ref) {
                             if (ref($ref) eq 'HASH') {
                                 $self->fatal_error(
-                                                   error    => "invalid return-type for $type $self->{class_name}<<$name>>",
-                                                   expected => "expected a valid type, such as: Str, Num, Arr, etc...",
-                                                   code     => $_,
-                                                   pos      => pos($_),
+                                                   error  => "invalid return-type for $type $self->{class_name}<<$name>>",
+                                                   reason => "expected a valid type, such as: Str, Num, Arr, etc...",
+                                                   code   => $_,
+                                                   pos    => pos($_),
                                                   );
                             }
                         }
@@ -1552,10 +1579,10 @@ package Sidef::Parser {
 
                     /\G\h*\{\h*/gc
                       || $self->fatal_error(
-                                            error    => "invalid '$type' declaration",
-                                            expected => "expected: $type $name(...){...}",
-                                            code     => $_,
-                                            pos      => pos($_)
+                                            error  => "invalid '$type' declaration",
+                                            reason => "expected: $type $name(...){...}",
+                                            code   => $_,
+                                            pos    => pos($_)
                                            );
 
                     local $self->{$type eq 'func' ? 'current_function' : 'current_method'} = $has_kids ? $parent : $obj;
@@ -1581,10 +1608,10 @@ package Sidef::Parser {
                            );
 
                 $expr // $self->fatal_error(
-                                            error    => "invalid declaration of the `given/when` construct",
-                                            expected => "expected `given(expr) {...}`",
-                                            code     => $_,
-                                            pos      => pos($_),
+                                            error  => "invalid declaration of the `given/when` construct",
+                                            reason => "expected `given(expr) {...}`",
+                                            code   => $_,
+                                            pos    => pos($_),
                                            );
 
                 my $given_obj = bless({expr => $expr}, 'Sidef::Types::Block::Given');
@@ -1613,10 +1640,10 @@ package Sidef::Parser {
                            );
 
                 $expr // $self->fatal_error(
-                                            error    => "invalid declaration of the `when` construct",
-                                            expected => "expected `when(expr) {...}`",
-                                            code     => $_,
-                                            pos      => pos($_),
+                                            error  => "invalid declaration of the `when` construct",
+                                            reason => "expected `when(expr) {...}`",
+                                            code   => $_,
+                                            pos    => pos($_),
                                            );
 
                 my $block = (
@@ -1641,10 +1668,10 @@ package Sidef::Parser {
                            );
 
                 $expr // $self->fatal_error(
-                                            error    => "invalid declaration of the `case` construct",
-                                            expected => "expected `case(expr) {...}`",
-                                            code     => $_,
-                                            pos      => pos($_),
+                                            error  => "invalid declaration of the `case` construct",
+                                            reason => "expected `case(expr) {...}`",
+                                            code   => $_,
+                                            pos    => pos($_),
                                            );
 
                 my $block = (
@@ -1675,10 +1702,10 @@ package Sidef::Parser {
                            );
 
                 $expr // $self->fatal_error(
-                                            error    => "invalid declaration of the `with` construct",
-                                            expected => "expected `with(expr) {...}`",
-                                            code     => $_,
-                                            pos      => pos($_),
+                                            error  => "invalid declaration of the `with` construct",
+                                            reason => "expected `with(expr) {...}`",
+                                            code   => $_,
+                                            pos    => pos($_),
                                            );
 
                 my $block = (
@@ -1945,10 +1972,10 @@ package Sidef::Parser {
                 }
                 else {
                     $self->fatal_error(
-                                       error    => "invalid 'here-doc' declaration",
-                                       expected => "expected an alpha-numeric token after '<<'",
-                                       code     => $_,
-                                       pos      => pos($_)
+                                       error  => "invalid 'here-doc' declaration",
+                                       reason => "expected an alpha-numeric token after '<<'",
+                                       code   => $_,
+                                       pos    => pos($_)
                                       );
                 }
 
@@ -2085,6 +2112,7 @@ package Sidef::Parser {
                                : $self->fatal_error(
                                                     code  => $_,
                                                     pos   => ($pos - length($name)),
+                                                    var   => $name,
                                                     error => "variable <$name> is not declared in the current scope",
                                                    )
                               );
@@ -2105,6 +2133,7 @@ package Sidef::Parser {
                             $self->fatal_error(
                                                code  => $_,
                                                pos   => ($pos - length($name)),
+                                               var   => $name,
                                                error => "attempt to call method <$name> on an undefined object",
                                               );
                         }
@@ -2140,6 +2169,7 @@ package Sidef::Parser {
                 # Undeclared variable
                 $self->fatal_error(
                                    code  => $_,
+                                   var   => $name,
                                    pos   => (pos($_) - length($name)),
                                    error => "variable <$name> is not declared in the current scope",
                                   );
@@ -2570,10 +2600,10 @@ package Sidef::Parser {
                             }
                             else {
                                 $self->fatal_error(
-                                                   code     => $_,
-                                                   pos      => pos($_) - 1,
-                                                   error    => "invalid declaration of the `for` loop",
-                                                   expected => "expected a block after `for(;;)`",
+                                                   code   => $_,
+                                                   pos    => pos($_) - 1,
+                                                   error  => "invalid declaration of the `for` loop",
+                                                   reason => "expected a block after `for(;;)`",
                                                   );
                             }
                         }
@@ -2589,10 +2619,10 @@ package Sidef::Parser {
                             }
                             else {
                                 $self->fatal_error(
-                                                   code     => $_,
-                                                   pos      => pos($_) - 1,
-                                                   error    => "invalid declaration of the `for` loop",
-                                                   expected => "expected a block after `for(...)`",
+                                                   code   => $_,
+                                                   pos    => pos($_) - 1,
+                                                   error  => "invalid declaration of the `for` loop",
+                                                   reason => "expected a block after `for(...)`",
                                                   );
                             }
                         }
@@ -2614,10 +2644,10 @@ package Sidef::Parser {
                         }
                         else {
                             $self->fatal_error(
-                                               code     => $_,
-                                               pos      => pos($_) - 1,
-                                               error    => "invalid declaration of the `foreach` loop",
-                                               expected => "expected a block after `foreach(...)`",
+                                               code   => $_,
+                                               pos    => pos($_) - 1,
+                                               error  => "invalid declaration of the `foreach` loop",
+                                               reason => "expected a block after `foreach(...)`",
                                               );
                         }
                     }
@@ -2649,10 +2679,10 @@ package Sidef::Parser {
                         }
                         else {
                             $self->fatal_error(
-                                               code     => $_,
-                                               pos      => pos($_) - 1,
-                                               error    => "invalid declaration of the `if` statement",
-                                               expected => "expected a block after `if(...)`",
+                                               code   => $_,
+                                               pos    => pos($_) - 1,
+                                               error  => "invalid declaration of the `if` statement",
+                                               reason => "expected a block after `if(...)`",
                                               );
                         }
                     }
@@ -2664,10 +2694,10 @@ package Sidef::Parser {
                         }
                         else {
                             $self->fatal_error(
-                                               code     => $_,
-                                               pos      => pos($_) - 1,
-                                               error    => "invalid declaration of the `while` statement",
-                                               expected => "expected a block after `while(...)`",
+                                               code   => $_,
+                                               pos    => pos($_) - 1,
+                                               error  => "invalid declaration of the `while` statement",
+                                               reason => "expected a block after `while(...)`",
                                               );
                         }
                     }
@@ -2801,18 +2831,18 @@ package Sidef::Parser {
                   /\G($self->{var_name_re})\h*/goc
                   ? $1
                   : $self->fatal_error(
-                                       error    => "invalid 'module' declaration",
-                                       expected => "expected a name",
-                                       code     => $_,
-                                       pos      => pos($_)
+                                       error  => "invalid 'module' declaration",
+                                       reason => "expected a name",
+                                       code   => $_,
+                                       pos    => pos($_)
                                       );
 
                 /\G\h*\{\h*/gc
                   || $self->fatal_error(
-                                        error    => "invalid module declaration",
-                                        expected => "expected: module $name {...}",
-                                        code     => $_,
-                                        pos      => pos($_)
+                                        error  => "invalid module declaration",
+                                        reason => "expected: module $name {...}",
+                                        code   => $_,
+                                        pos    => pos($_)
                                        );
 
                 my $parser = __PACKAGE__->new(
@@ -3042,10 +3072,10 @@ package Sidef::Parser {
 
                 /\G:/gc
                   || $self->fatal_error(
-                                        code     => $_,
-                                        pos      => pos($_) - 1,
-                                        error    => "invalid usage of the ternary operator",
-                                        expected => "expected ':'",
+                                        code   => $_,
+                                        pos    => pos($_) - 1,
+                                        error  => "invalid usage of the ternary operator",
+                                        reason => "expected ':'",
                                        );
 
                 $self->parse_whitespace(code => $opt{code});

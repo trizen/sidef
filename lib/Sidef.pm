@@ -100,6 +100,24 @@ package Sidef {
         $distance + $prefix * 0.1 * (1 - $distance);
     }
 
+    sub best_matches {
+        my ($name, $set) = @_;
+
+        my $max = 0;
+        my @best;
+        foreach my $elem (@$set) {
+            my $dist = sprintf("%.4f", Sidef::jaro_winkler($elem, $name));
+            $dist >= 0.8 or next;
+            if ($dist > $max) {
+                $max  = $dist;
+                @best = ();
+            }
+            push(@best, $elem) if $dist == $max;
+        }
+
+        @best;
+    }
+
 };
 
 #
@@ -145,17 +163,7 @@ package Sidef {
     my $method = Sidef::normalize_method($AUTOLOAD);
     my $name = substr($method, rindex($method, '.') + 1);
 
-    my $max = 0;
-    my @candidates;
-    foreach my $meth (@methods) {
-        my $dist = sprintf("%.4f", Sidef::jaro_winkler($meth, $name));
-        $dist >= 0.8 or next;
-        if ($dist > $max) {
-            $max        = $dist;
-            @candidates = ();
-        }
-        push(@candidates, $meth) if $dist == $max;
-    }
+    my @candidates = Sidef::best_matches($name, \@methods);
 
     die(  "[AUTOLOAD] Undefined method `"
         . $method . q{'}
