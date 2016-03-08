@@ -221,7 +221,7 @@ HEADER
     sub _dump_var {
         my ($self, $var, $refaddr) = @_;
 
-        $var->{name} // return 'undef';
+        $var->{name} eq '' and return 'undef';
 
         # $var->{in_use} || exists($var->{value}) || exists($var->{ref_type}) || return 'undef';
 
@@ -1200,26 +1200,23 @@ HEADER
         elsif ($ref eq 'Sidef::Math::Math') {
             $code = $self->make_constant($ref, 'new', "Math$refaddr");
         }
-        elsif ($ref eq 'Sidef::Types::Glob::FileHandle') {
-            if ($obj->{fh} eq \*STDIN) {
-                $code = $self->make_constant($ref, 'new', "STDIN$refaddr", 'fh => \*STDIN');
-            }
-            elsif ($obj->{fh} eq \*STDOUT) {
-                $code = $self->make_constant($ref, 'new', "STDOUT$refaddr", 'fh => \*STDOUT');
-            }
-            elsif ($obj->{fh} eq \*STDERR) {
-                $code = $self->make_constant($ref, 'new', "STDERR$refaddr", 'fh => \*STDERR');
-            }
-            elsif ($obj->{fh} eq \*ARGV) {
-                $code = $self->make_constant($ref, 'new', "ARGF$refaddr", 'fh => \*ARGV');
-            }
-            else {
-                my $data = $self->_dump_string(
-                                               do { seek($obj->{fh}, 0, 0); local $/; readline($obj->{fh}) }
-                                              );
-                $code =
-                  $self->make_constant($ref, 'new', "DATA$refaddr", qq{fh => do {open my \$fh, '<:utf8', \\$data; \$fh}});
-            }
+        elsif ($ref eq 'Sidef::Meta::Glob::STDIN') {
+            $code = $self->make_constant('Sidef::Types::Glob::FileHandle', 'new', "STDIN$refaddr", 'fh => \*STDIN');
+        }
+        elsif ($ref eq 'Sidef::Meta::Glob::STDOUT') {
+            $code = $self->make_constant('Sidef::Types::Glob::FileHandle', 'new', "STDOUT$refaddr", 'fh => \*STDOUT');
+        }
+        elsif ($ref eq 'Sidef::Meta::Glob::STDERR') {
+            $code = $self->make_constant('Sidef::Types::Glob::FileHandle', 'new', "STDERR$refaddr", 'fh => \*STDERR');
+        }
+        elsif ($ref eq 'Sidef::Meta::Glob::ARGF') {
+            $code = $self->make_constant('Sidef::Types::Glob::FileHandle', 'new', "ARGF$refaddr", 'fh => \*ARGV');
+        }
+        elsif ($ref eq 'Sidef::Meta::Glob::DATA') {
+            require Encode;
+            my $data = $self->_dump_string(Encode::encode_utf8(${$obj->{data}}));
+            $code = $self->make_constant('Sidef::Types::Glob::FileHandle',
+                                         'new', "DATA$refaddr", qq{fh => do {open my \$fh, '<:utf8', \\$data; \$fh}});
         }
         elsif ($ref eq 'Sidef::Variable::Magic') {
             $code = $obj->{name};

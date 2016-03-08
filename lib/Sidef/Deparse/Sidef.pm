@@ -41,6 +41,28 @@ package Sidef::Deparse::Sidef {
                   Sidef::DataTypes::Object::Object        Object
                   Sidef::DataTypes::Sidef::Sidef          Sidef
                   Sidef::DataTypes::Variable::LazyMethod  LazyMethod
+
+                  Sidef::Math::Math                       Math
+                  Sidef::Meta::Glob::ARGF                 ARGF
+                  Sidef::Meta::Glob::STDIN                STDIN
+                  Sidef::Meta::Glob::STDOUT               STDOUT
+                  Sidef::Meta::Glob::STDERR               STDERR
+                  Sidef::Types::Number::Inf               Inf
+                  Sidef::Types::Number::Ninf              Inf.neg
+                  Sidef::Types::Number::Nan               NaN
+                  Sidef::Parser                           Parser
+
+                  Sidef::Types::Nil::Nil                  nil
+                  Sidef::Types::Null::Null                null
+                  Sidef::Types::Block::Next               next
+                  Sidef::Types::Block::Break              break
+                  Sidef::Types::Block::Continue           continue
+
+                  Sidef::Perl::Perl                       Perl
+                  Sidef::Time::Time                       Time
+                  Sidef::Sys::Sig                         Sig
+                  Sidef::Meta::Unimplemented              ...
+
                   )
             },
             %args,
@@ -374,26 +396,14 @@ package Sidef::Deparse::Sidef {
         elsif ($ref eq 'Sidef::Meta::Warning') {
             $code = 'warn' . $self->deparse_args($obj->{arg});
         }
-        elsif ($ref eq 'Sidef::Meta::Unimplemented') {
-            $code = '...';
-        }
         elsif ($ref eq 'Sidef::Eval::Eval') {
             $code = 'eval' . $self->deparse_args($obj->{expr});
-        }
-        elsif ($ref eq 'Sidef::Parser') {
-            $code = 'Parser';
         }
         elsif ($ref eq 'Sidef::Variable::NamedParam') {
             $code = $obj->[0] . ':' . $self->deparse_args(@{$obj->[1]});
         }
         elsif ($ref eq 'Sidef::Variable::Label') {
             $code = '@:' . $obj->{name};
-        }
-        elsif ($ref eq 'Sidef::Variable::LazyMethod') {
-            $code = 'LazyMethod';
-        }
-        elsif ($ref eq 'Sidef::Types::Block::Break') {
-            $code = 'break';
         }
         elsif ($ref eq 'Sidef::Types::Block::Given') {
             $code = 'given ' . $self->deparse_args($obj->{expr}) . $self->deparse_expr({self => $obj->{block}});
@@ -409,12 +419,6 @@ package Sidef::Deparse::Sidef {
         }
         elsif ($ref eq 'Sidef::Types::Block::With') {
             $code = 'with ' . $self->deparse_args($obj->{expr}) . $self->deparse_expr({self => $obj->{block}});
-        }
-        elsif ($ref eq 'Sidef::Types::Block::Next') {
-            $code = 'next';
-        }
-        elsif ($ref eq 'Sidef::Types::Block::Continue') {
-            $code = 'continue';
         }
         elsif ($ref eq 'Sidef::Types::Block::Return') {
             if (not exists $expr->{call}) {
@@ -479,35 +483,11 @@ package Sidef::Deparse::Sidef {
               . $self->deparse_expr({self => $obj->{expr}}) . ') '
               . $self->deparse_bare_block($obj->{block}->{code});
         }
-        elsif ($ref eq 'Sidef::Math::Math') {
-            $code = 'Math';
-        }
-        elsif ($ref eq 'Sidef::Types::Glob::FileHandle') {
-            if ($obj->{fh} eq \*STDIN) {
-                $code = 'STDIN';
-            }
-            elsif ($obj->{fh} eq \*STDOUT) {
-                $code = 'STDOUT';
-            }
-            elsif ($obj->{fh} eq \*STDERR) {
-                $code = 'STDERR';
-            }
-            elsif ($obj->{fh} eq \*ARGV) {
-                $code = 'ARGF';
-            }
-            else {
-                $code = 'DATA';
-                if (not exists $addr{$obj->{fh}}) {
-                    my $orig_pos = tell($obj->{fh});
-                    seek($obj->{fh}, 0, 0);
-                    $self->{after} .= "\n__DATA__\n" . do {
-                        local $/;
-                        require Encode;
-                        Encode::decode_utf8(readline($obj->{fh}));
-                    };
-                    seek($obj->{fh}, $orig_pos, 0);
-                    $addr{$obj->{fh}} = 1;
-                }
+        elsif ($ref eq 'Sidef::Meta::Glob::DATA') {
+            $code = 'DATA';
+            if (not exists $addr{$obj->{data}}) {
+                $self->{after} .= "\n__DATA__\n" . ${$obj->{data}};
+                $addr{$obj->{data}} = 1;
             }
         }
         elsif ($ref eq 'Sidef::Variable::Magic') {
@@ -516,35 +496,14 @@ package Sidef::Deparse::Sidef {
         elsif ($ref eq 'Sidef::Types::Hash::Hash') {
             $code = keys(%{$obj}) ? $obj->dump->get_value : 'Hash';
         }
-        elsif ($ref eq 'Sidef::Perl::Perl') {
-            $code = 'Perl';
-        }
-        elsif ($ref eq 'Sidef::Time::Time') {
-            $code = 'Time';
-        }
-        elsif ($ref eq 'Sidef::Sys::Sig') {
-            $code = 'Sig';
-        }
         elsif ($ref eq 'Sidef::Types::Number::Number') {
             $code = $self->_dump_number($obj->_get_frac);
             if (index($code, '/') != -1) {
                 $code = qq{Number("$code")};
             }
         }
-        elsif ($ref eq 'Sidef::Types::Number::Inf') {
-            $code = 'Inf';
-        }
-        elsif ($ref eq 'Sidef::Types::Number::Ninf') {
-            $code = 'Inf.neg';
-        }
-        elsif ($ref eq 'Sidef::Types::Number::Nan') {
-            $code = 'NaN';
-        }
         elsif ($ref eq 'Sidef::Types::Array::Array' or $ref eq 'Sidef::Types::Array::HCArray') {
             $code = $self->_dump_array($obj);
-        }
-        elsif ($ref eq 'Sidef::Types::Nil::Nil') {
-            $code = 'nil';
         }
         elsif (exists $self->{data_types}{$ref}) {
             $code = $self->{data_types}{$ref};

@@ -157,16 +157,7 @@ package Sidef::Object::Object {
     }
 
     sub interpolate {
-        my ($self, @args) = @_;
-        $self->new(
-            CORE::join(
-                '',
-                map {
-                    eval { ${CORE::ref($_) ne 'Sidef::Types::String::String' ? $_->to_s : $_} }
-                      // $_
-                  } @args
-            )
-        );
+        $_[0]->new(CORE::join('', @_[1 .. $#_]));
     }
 
     {

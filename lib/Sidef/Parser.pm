@@ -46,10 +46,10 @@ package Sidef::Parser {
                      | continue\b                     (?{ state $x = bless({}, 'Sidef::Types::Block::Continue') })
                      | Block\b                        (?{ state $x = bless({}, 'Sidef::DataTypes::Block::Block') })
                      | Backtick\b                     (?{ state $x = bless({}, 'Sidef::DataTypes::Glob::Backtick') })
-                     | ARGF\b                         (?{ state $x = Sidef::Types::Glob::FileHandle->new(fh => \*ARGV) })
-                     | STDIN\b                        (?{ state $x = Sidef::Types::Glob::FileHandle->stdin })
-                     | STDOUT\b                       (?{ state $x = Sidef::Types::Glob::FileHandle->stdout })
-                     | STDERR\b                       (?{ state $x = Sidef::Types::Glob::FileHandle->stderr })
+                     | ARGF\b                         (?{ state $x = bless({}, 'Sidef::Meta::Glob::ARGF') })
+                     | STDIN\b                        (?{ state $x = bless({}, 'Sidef::Meta::Glob::STDIN') })
+                     | STDOUT\b                       (?{ state $x = bless({}, 'Sidef::Meta::Glob::STDOUT') })
+                     | STDERR\b                       (?{ state $x = bless({}, 'Sidef::Meta::Glob::STDERR') })
                      | Bool\b                         (?{ state $x = bless({}, 'Sidef::DataTypes::Bool::Bool') })
                      | FileHandle\b                   (?{ state $x = bless({}, 'Sidef::DataTypes::Glob::FileHandle') })
                      | DirHandle\b                    (?{ state $x = bless({}, 'Sidef::DataTypes::Glob::DirHandle') })
@@ -494,6 +494,8 @@ package Sidef::Parser {
     sub get_name_and_class {
         my ($self, $var_name) = @_;
 
+        $var_name // return ('', $self->{class});
+
         my $rindex = rindex($var_name, '::');
         $rindex != -1
           ? (substr($var_name, $rindex + 2), substr($var_name, 0, $rindex))
@@ -777,7 +779,9 @@ package Sidef::Parser {
                              (defined($ref_type) ? (ref_type => $ref_type) : ()),
                              class => $class_name,
                              defined($value) ? (value => $value, has_value => 1) : (),
-                             $attr eq '*' ? (array => 1, slurpy => 1) : $attr eq ':' ? (hash => 1, slurpy => 1) : (),
+                             defined($attr)
+                             ? ($attr eq '*' ? (array => 1, slurpy => 1) : $attr eq ':' ? (hash => 1, slurpy => 1) : ())
+                             : (),
                              defined($where_block) ? (where_block => $where_block) : (),
                              defined($where_expr)  ? (where_expr  => $where_expr)  : (),
                              $opt{in_use}          ? (in_use      => 1)            : (),
@@ -1951,9 +1955,7 @@ package Sidef::Parser {
             if (/\GDATA\b/gc) {
                 return (
                     $self->{static_objects}{'__DATA__'} //= do {
-                        open my $str_fh, '<:raw', \$self->{'__DATA__'};
-                        Sidef::Types::Glob::FileHandle->new(fh   => $str_fh,
-                                                            self => Sidef::Types::Glob::File->new($self->{file_name}));
+                        bless({data => \$self->{'__DATA__'}}, 'Sidef::Meta::Glob::DATA');
                       }
                 );
             }
@@ -2745,7 +2747,7 @@ package Sidef::Parser {
 
                 # Try-catch construct
                 if (ref($obj) eq 'Sidef::Types::Block::Try') {
-                    $self->parse_whitespace();
+                    $self->parse_whitespace(code => $opt{code});
                     if (/\G\h*catch\b/gc) {
                         my $arg = $self->parse_obj(code => $opt{code});
                         push @{$struct{$self->{class}}[-1]{call}}, {method => 'catch', arg => [$arg]};
