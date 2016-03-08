@@ -1356,6 +1356,7 @@ HEADER
             $code = qq{CORE::die "Unimplemented at " . } . $self->_dump_string($obj->{file}) . qq{. " line $obj->{line}\\n"};
         }
         elsif (exists $self->{data_types}{$ref}) {
+            $self->top_add("use $self->{data_types}{$ref};\n");
             $code = "'" . $self->{data_types}{$ref} . "'";
         }
 
