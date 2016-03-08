@@ -912,8 +912,8 @@ package Sidef::Optimizer {
                 if (exists $call->{arg}) {
                     foreach my $j (0 .. $#{$call->{arg}}) {
                         my $arg = $call->{arg}[$j];
-                        push @{$obj->{call}[$i]{arg}}, ref $arg eq 'HASH'
-                          && $ref_obj ne 'Sidef::Types::Block::For' ? do { my %arg = $self->optimize($arg); \%arg } : $arg;
+                        push @{$obj->{call}[$i]{arg}},
+                          ref($arg) eq 'HASH' ? do { my %arg = $self->optimize($arg); \%arg } : $arg;
                     }
                 }
 
