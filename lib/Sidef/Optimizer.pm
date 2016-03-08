@@ -4,12 +4,15 @@ package Sidef::Optimizer {
     use Scalar::Util qw(refaddr);
 
     use constant {
-                  STRING  => 'Sidef::Types::String::String',
-                  NUMBER  => 'Sidef::Types::Number::Number',
-                  REGEX   => 'Sidef::Types::Regex::Regex',
-                  BOOL    => 'Sidef::Types::Bool::Bool',
-                  ARRAY   => 'Sidef::Types::Array::Array',
-                  COMPLEX => 'Sidef::Types::Number::Complex',
+                  STRING     => 'Sidef::Types::String::String',
+                  NUMBER     => 'Sidef::Types::Number::Number',
+                  REGEX      => 'Sidef::Types::Regex::Regex',
+                  BOOL       => 'Sidef::Types::Bool::Bool',
+                  ARRAY      => 'Sidef::Types::Array::Array',
+                  COMPLEX    => 'Sidef::Types::Number::Complex',
+                  NUMBER_DT  => 'Sidef::DataTypes::Number::Number',
+                  STRING_DT  => 'Sidef::DataTypes::String::String',
+                  COMPLEX_DT => 'Sidef::DataTypes::Number::Complex',
                  };
 
     {
@@ -22,9 +25,56 @@ package Sidef::Optimizer {
             map {
 
                 defined(&{$package . '::' . $_})
-                  or die "Invalid method $package: $_";
+                  or die "[ERROR] Invalid method $package: $_";
 
                 \&{$package . '::' . $_}
+            } @names;
+        }
+
+        my %table = (
+            qw(
+              Sidef::DataTypes::Bool::Bool            Sidef::Types::Bool::Bool
+              Sidef::DataTypes::Array::Array          Sidef::Types::Array::Array
+              Sidef::DataTypes::Array::Pair           Sidef::Types::Array::Pair
+              Sidef::DataTypes::Array::MultiArray     Sidef::Types::Array::MultiArray
+              Sidef::DataTypes::Hash::Hash            Sidef::Types::Hash::Hash
+              Sidef::DataTypes::Regex::Regex          Sidef::Types::Regex::Regex
+              Sidef::DataTypes::String::String        Sidef::Types::String::String
+              Sidef::DataTypes::Number::Number        Sidef::Types::Number::Number
+              Sidef::DataTypes::Number::Complex       Sidef::Types::Number::Complex
+              Sidef::DataTypes::Range::RangeNumber    Sidef::Types::Range::RangeNumber
+              Sidef::DataTypes::Range::RangeString    Sidef::Types::Range::RangeString
+              Sidef::DataTypes::Block::Block          Sidef::Types::Block::Block
+              Sidef::DataTypes::Glob::Socket          Sidef::Types::Glob::Socket
+              Sidef::DataTypes::Glob::Pipe            Sidef::Types::Glob::Pipe
+              Sidef::DataTypes::Glob::Backtick        Sidef::Types::Glob::Backtick
+              Sidef::DataTypes::Glob::DirHandle       Sidef::Types::Glob::DirHandle
+              Sidef::DataTypes::Glob::FileHandle      Sidef::Types::Glob::FileHandle
+              Sidef::DataTypes::Glob::Dir             Sidef::Types::Glob::Dir
+              Sidef::DataTypes::Glob::File            Sidef::Types::Glob::File
+              Sidef::DataTypes::Object::Object        Sidef::Object::Object
+              Sidef::DataTypes::Sidef::Sidef          Sidef
+              Sidef::DataTypes::Variable::LazyMethod  Sidef::Variable::LazyMethod
+              )
+        );
+
+        my %seen;
+
+        sub dtypes {
+            my ($type, @names) = @_;
+            exists($table{$type}) || die "[ERROR] Non-existent data type: $type";
+
+            if (not $seen{$type}++) {
+                no strict 'refs';
+                push @{$type . '::' . 'ISA'}, $table{$type};
+            }
+
+            map {
+
+                defined(my $method = $type->SUPER::can($_))
+                  or die "[ERROR] Invalid method $type: $_";
+
+                $method;
             } @names;
         }
     }
@@ -275,7 +325,11 @@ package Sidef::Optimizer {
 
                    exp int
                    cos sin
-                   log ln log10 log2
+
+                   ln
+                   log
+                   log2
+                   log10
 
                    sin
                    asin
@@ -545,6 +599,7 @@ package Sidef::Optimizer {
                    abs
 
                    log
+                   log2
                    log10
                    sqrt
 
@@ -591,6 +646,93 @@ package Sidef::Optimizer {
                    floor
 
                    dump
+                   )
+               )
+            ),
+        ],
+
+        (NUMBER_DT) => [
+
+            # Number.method()
+            (
+             map {
+                 { $_, [] }
+               } dtypes(NUMBER_DT, qw(
+                   pi
+                   tau
+                   ln2
+                   Y
+                   G
+                   e
+                   phi
+                   nan
+                   inf
+                   ninf
+                   )
+               )
+            ),
+
+            # Number.method(STRING|NUMBER)
+            (
+             map {
+                 { $_, [table(STRING, NUMBER)] }
+               } dtypes(NUMBER_DT, qw(
+                   call
+                   new
+                   )
+               )
+            ),
+        ],
+
+        (STRING_DT) => [
+
+            # String.method(STRING|NUMBER)
+            (
+             map {
+                 { $_, [table(STRING, NUMBER)] }
+               } dtypes(STRING_DT, qw(
+                   call
+                   new
+                   )
+               )
+            ),
+        ],
+
+        (COMPLEX_DT) => [
+
+            # Complex.method()
+            (
+             map {
+                 { $_, [] }
+               } dtypes(COMPLEX_DT, qw(
+                   i
+                   e
+                   pi
+                   phi
+                   new
+                   call
+                   )
+               )
+            ),
+
+            # Complex.method(STRING|NUMBER)
+            (
+             map {
+                 { $_, [table(STRING, NUMBER)] }
+               } dtypes(COMPLEX_DT, qw(
+                   call
+                   new
+                   )
+               )
+            ),
+
+            # Complex.method(NUMBER|STRING, NUMBER|STRING)
+            (
+             map {
+                 { $_, [table(NUMBER, STRING), table(NUMBER, STRING)] }
+               } dtypes(COMPLEX_DT, qw(
+                   call
+                   new
                    )
                )
             ),
