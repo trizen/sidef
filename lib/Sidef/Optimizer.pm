@@ -4,30 +4,33 @@ package Sidef::Optimizer {
     use Scalar::Util qw(refaddr);
 
     use constant {
-                  STRING     => 'Sidef::Types::String::String',
-                  NUMBER     => 'Sidef::Types::Number::Number',
-                  REGEX      => 'Sidef::Types::Regex::Regex',
-                  BOOL       => 'Sidef::Types::Bool::Bool',
-                  ARRAY      => 'Sidef::Types::Array::Array',
-                  COMPLEX    => 'Sidef::Types::Number::Complex',
-                  NUMBER_DT  => 'Sidef::DataTypes::Number::Number',
-                  STRING_DT  => 'Sidef::DataTypes::String::String',
-                  COMPLEX_DT => 'Sidef::DataTypes::Number::Complex',
+                  STRING      => 'Sidef::Types::String::String',
+                  NUMBER      => 'Sidef::Types::Number::Number',
+                  REGEX       => 'Sidef::Types::Regex::Regex',
+                  BOOL        => 'Sidef::Types::Bool::Bool',
+                  ARRAY       => 'Sidef::Types::Array::Array',
+                  COMPLEX     => 'Sidef::Types::Number::Complex',
+                  NUMBER_DT   => 'Sidef::DataTypes::Number::Number',
+                  STRING_DT   => 'Sidef::DataTypes::String::String',
+                  COMPLEX_DT  => 'Sidef::DataTypes::Number::Complex',
+                  REGEX_DT    => 'Sidef::DataTypes::Regex::Regex',
+                  RANGENUM_DT => 'Sidef::DataTypes::Range::RangeNumber',
+                  BACKTICK_DT => 'Sidef::DataTypes::Glob::Backtick',
                  };
 
+    my %cache;
     {
-        my %cache;
 
         sub methods {
             my ($package, @names) = @_;
-            my $module = $cache{$package} //= (($package =~ s{::}{/}gr) . '.pm');
+            my $module = ($cache{$package} //= (($package =~ s{::}{/}gr) . '.pm'));
             exists($INC{$module}) || require($module);
             map {
-
-                defined(my $method = $package->SUPER::can($_))
-                  or die "[ERROR] Invalid method $package: $_";
-
-                $method
+                $cache{$package, $_} //= do {
+                    defined(my $method = $package->SUPER::can($_))
+                      or die "[ERROR] Invalid method $package: $_";
+                    $method;
+                  }
             } @names;
         }
 
@@ -44,6 +47,7 @@ package Sidef::Optimizer {
               Sidef::DataTypes::Number::Complex       Sidef::Types::Number::Complex
               Sidef::DataTypes::Range::RangeNumber    Sidef::Types::Range::RangeNumber
               Sidef::DataTypes::Range::RangeString    Sidef::Types::Range::RangeString
+              Sidef::DataTypes::Glob::Backtick        Sidef::Types::Glob::Backtick
               Sidef::DataTypes::Glob::Socket          Sidef::Types::Glob::Socket
               Sidef::DataTypes::Glob::Pipe            Sidef::Types::Glob::Pipe
               Sidef::DataTypes::Glob::Dir             Sidef::Types::Glob::Dir
@@ -56,36 +60,60 @@ package Sidef::Optimizer {
 
         sub dtypes {
             my ($type, @names) = @_;
+
             exists($table{$type}) || die "[ERROR] Non-existent data type: $type";
+
+            my $package = $table{$type};
+            my $module = ($cache{$package} //= (($package =~ s{::}{/}gr) . '.pm'));
+            exists($INC{$module}) || require($module);
 
             if (not $seen{$type}++) {
                 no strict 'refs';
-                push @{$type . '::' . 'ISA'}, $table{$type};
+                push @{$type . '::' . 'ISA'}, $package;
             }
 
             map {
-
-                defined(my $method = $type->SUPER::can($_))
-                  or die "[ERROR] Invalid method $type: $_";
-
-                $method;
+                $cache{$type, $_} //= do {
+                    defined(my $method = $type->SUPER::can($_))
+                      or die "[ERROR] Invalid method $type: $_";
+                    $method;
+                  }
             } @names;
         }
     }
 
     sub table {
-        scalar {map { $_ => 1 } @_};
+        [@_];
+    }
+
+    # It's probably easier to use a Cartesian product here,
+    # but for our purposes, it's good enough. At least for now.
+    sub build_tree {
+        my (@data) = @_;
+
+        my %tree;
+        foreach my $node (@data) {
+            my $ref = ($tree{$node->[0]} //= {});
+            $ref = $ref->{$#{$node->[1]}} //= {};
+            my $orig = $ref;
+            foreach my $arg (@{$node->[1]}) {
+                my $ref2 = $ref;
+                foreach my $key (@{$arg}) {
+                    $ref = $ref2->{$key} //= {};
+                }
+            }
+        }
+
+        \%tree;
     }
 
     my %rules = (
-        (STRING) => [
+        (STRING) => build_tree(
 
             # String.method(String)
             (
-             map {
-                 { $_, [table(STRING)] }
-               } methods(STRING, qw(
-                   new call
+             map { [$_, [table(STRING)]] }
+               methods(STRING, qw(
                    to downto
 
                    concat
@@ -119,9 +147,8 @@ package Sidef::Optimizer {
 
             # String.method()
             (
-             map {
-                 { $_, [] }
-               } methods(STRING, qw(
+             map { [$_, []] }
+               methods(STRING, qw(
                    lc uc fc tc wc tclc lcfirst
 
                    pop
@@ -152,6 +179,7 @@ package Sidef::Optimizer {
                    reverse
                    clear
                    sort
+                   split
 
                    is_empty
                    is_palindrome
@@ -177,9 +205,8 @@ package Sidef::Optimizer {
 
             # String.method(Number)
             (
-             map {
-                 { $_, [table(NUMBER)] }
-               } methods(STRING, qw(
+             map { [$_, [table(NUMBER)]] }
+               methods(STRING, qw(
                    eq ne
 
                    times
@@ -196,17 +223,12 @@ package Sidef::Optimizer {
             ),
 
             # String.method(String | Number | Regex)
-            (
-             map {
-                 { $_, [table(STRING, NUMBER, REGEX)] }
-               } methods(STRING, qw(split))
-            ),
+            (map { [$_, [table(STRING, NUMBER, REGEX)]] } methods(STRING, qw(split))),
 
             # String.method(String, String)
             (
-             map {
-                 { $_, [table(STRING), table(STRING)] }
-               } methods(STRING, qw(
+             map { [$_, [table(STRING), table(STRING)]] }
+               methods(STRING, qw(
                    tr
                    )
                )
@@ -214,9 +236,8 @@ package Sidef::Optimizer {
 
             # String.method(String, String, String)
             (
-             map {
-                 { $_, [table(STRING), table(STRING), table(STRING)] }
-               } methods(STRING, qw(
+             map { [$_, [table(STRING), table(STRING), table(STRING)]] }
+               methods(STRING, qw(
                    tr
                    )
                )
@@ -224,9 +245,8 @@ package Sidef::Optimizer {
 
             # String.method(String, Number)
             (
-             map {
-                 { $_, [table(STRING), table(NUMBER)] }
-               } methods(STRING, qw(
+             map { [$_, [table(STRING), table(NUMBER)]] }
+               methods(STRING, qw(
                    index
                    contains
                    sprintf
@@ -237,33 +257,21 @@ package Sidef::Optimizer {
 
             # String.method(String, Bool)
             (
-             map {
-                 { $_, [table(STRING), table(BOOL)] }
-               } methods(STRING, qw(
+             map { [$_, [table(STRING), table(BOOL)]] }
+               methods(STRING, qw(
                    range
                    )
                )
             ),
 
-        ],
+        ),
 
-        (NUMBER) => [
-
-            # Number.method(String | Number)
-            (
-             map {
-                 { $_, [table(STRING, NUMBER)] }
-               } methods(NUMBER, qw(
-                   new call
-                   )
-               )
-            ),
+        (NUMBER) => build_tree(
 
             # Number.method(Number)
             (
-             map {
-                 { $_, [table(NUMBER)] }
-               } methods(NUMBER, qw(
+             map { [$_, [table(NUMBER)]] }
+               methods(NUMBER, qw(
                    + - / * % %% **
 
                    lt gt le ge cmp acmp
@@ -294,22 +302,10 @@ package Sidef::Optimizer {
                )
             ),
 
-            # Number.method(String, Number)
-            (
-             map {
-                 { $_, [table(STRING), table(NUMBER)] }
-               } methods(NUMBER, qw(
-                   new call
-                   )
-               )
-            ),
-
             # Number.method()
             (
-             map {
-                 { $_, [] }
-               } methods(NUMBER, qw(
-                   new call
+             map { [$_, []] }
+               methods(NUMBER, qw(
                    inc dec not
 
                    factorial
@@ -409,21 +405,19 @@ package Sidef::Optimizer {
 
             # Number.method(Number, Number)
             (
-             map {
-                 { $_, [table(NUMBER), table(NUMBER)] }
-               } methods(NUMBER, qw(
+             map { [$_, [table(NUMBER), table(NUMBER)]] }
+               methods(NUMBER, qw(
                    modpow
                    range
                    )
                )
             ),
-        ],
+        ),
 
-        (BOOL) => [
+        (BOOL) => build_tree(
             (
-             map {
-                 { $_, [] }
-               } methods(BOOL, qw(
+             map { [$_, []] }
+               methods(BOOL, qw(
                    not
                    is_true
                    true
@@ -433,13 +427,12 @@ package Sidef::Optimizer {
                    )
                )
             ),
-        ],
+        ),
 
-        (ARRAY) => [
+        (ARRAY) => build_tree(
             (
-             map {
-                 { $_, [] }
-               } methods(ARRAY, qw(
+             map { [$_, []] }
+               methods(ARRAY, qw(
                    first
                    last
 
@@ -464,9 +457,8 @@ package Sidef::Optimizer {
             ),
 
             (
-             map {
-                 { $_, [table(NUMBER)] }
-               } methods(ARRAY, qw(
+             map { [$_, [table(NUMBER)]] }
+               methods(ARRAY, qw(
                    count
                    index
                    rindex
@@ -495,9 +487,8 @@ package Sidef::Optimizer {
             ),
 
             (
-             map {
-                 { $_, [table(ARRAY)] }
-               } methods(ARRAY, qw(
+             map { [$_, [table(ARRAY)]] }
+               methods(ARRAY, qw(
                    and
                    or
                    xor
@@ -513,9 +504,8 @@ package Sidef::Optimizer {
             ),
 
             (
-             map {
-                 { $_, [table(STRING)] }
-               } methods(ARRAY, qw(
+             map { [$_, [table(STRING)]] }
+               methods(ARRAY, qw(
                    pack
                    join
                    index
@@ -529,20 +519,15 @@ package Sidef::Optimizer {
                )
             ),
 
-            (
-             map {
-                 { $_, [table('')] }
-               } methods(ARRAY, qw(reduce_operator))
-            ),
-        ],
+            (map { [$_, [table('')]] } methods(ARRAY, qw(reduce_operator))),
+                             ),
 
-        (COMPLEX) => [
+        (COMPLEX) => build_tree(
 
             # Complex.method(Complex|Number)
             (
-             map {
-                 { $_, [table(COMPLEX, NUMBER)] }
-               } methods(COMPLEX, qw(
+             map { [$_, [table(COMPLEX, NUMBER)]] }
+               methods(COMPLEX, qw(
                    cmp gt lt ge le eq ne
                    roundf
 
@@ -559,34 +544,10 @@ package Sidef::Optimizer {
                )
             ),
 
-            # Complex.method(Number|Complex, Number|Complex)
-            (
-             map {
-                 { $_, [table(NUMBER, COMPLEX)] }
-               } methods(COMPLEX, qw(
-                   call
-                   new
-                   )
-               )
-            ),
-
-            # Complex.method(Number|Complex, Number|Complex)
-            (
-             map {
-                 { $_, [table(NUMBER, COMPLEX), table(NUMBER, COMPLEX)] }
-               } methods(COMPLEX, qw(
-                   call
-                   new
-                   )
-               )
-            ),
-
             # Complex.method()
             (
-             map {
-                 { $_, [] }
-               } methods(COMPLEX, qw(
-                   new call
+             map { [$_, []] }
+               methods(COMPLEX, qw(
 
                    inc
                    dec
@@ -622,7 +583,6 @@ package Sidef::Optimizer {
                    asech
                    acoth
 
-                   pi
                    neg
                    not
 
@@ -643,15 +603,14 @@ package Sidef::Optimizer {
                    )
                )
             ),
-        ],
+        ),
 
-        (NUMBER_DT) => [
+        (NUMBER_DT) => build_tree(
 
             # Number.method()
             (
-             map {
-                 { $_, [] }
-               } dtypes(NUMBER_DT, qw(
+             map { [$_, []] }
+               dtypes(NUMBER_DT, qw(
                    pi
                    tau
                    ln2
@@ -668,53 +627,96 @@ package Sidef::Optimizer {
 
             # Number.method(STRING|NUMBER)
             (
-             map {
-                 { $_, [table(STRING, NUMBER)] }
-               } dtypes(NUMBER_DT, qw(
-                   call
+             map { [$_, [table(STRING, NUMBER)]] }
+               dtypes(NUMBER_DT, qw(
                    new
                    )
                )
             ),
-        ],
 
-        (STRING_DT) => [
+            # Number.method(NUMBER, NUMBER)
+            (
+             map { [$_, [table(NUMBER), table(NUMBER)]] }
+               dtypes(NUMBER_DT, qw(
+                   new
+                   )
+               )
+            ),
+
+            # Number.method(STRING, NUMBER)
+            (
+             map { [$_, [table(STRING), table(NUMBER)]] }
+               dtypes(NUMBER_DT, qw(
+                   new
+                   )
+               )
+            ),
+        ),
+
+        (STRING_DT) => build_tree(
 
             # String.method(STRING|NUMBER)
             (
-             map {
-                 { $_, [table(STRING, NUMBER)] }
-               } dtypes(STRING_DT, qw(
-                   call
+             map { [$_, [table(STRING, NUMBER)]] }
+               dtypes(STRING_DT, qw(
                    new
                    )
                )
             ),
-        ],
+        ),
 
-        (COMPLEX_DT) => [
+        (REGEX_DT) => build_tree(
+
+            # Regex.method(STRING)
+            (
+             map { [$_, [table(STRING)]] }
+               dtypes(REGEX_DT, qw(
+                   new
+                   )
+               )
+            ),
+        ),
+
+        (RANGENUM_DT) => build_tree(
+
+            # RangeNum.method(NUMBER, NUMBER)
+            (
+             map { [$_, [table(NUMBER), table(NUMBER)]] }
+               dtypes(RANGENUM_DT, qw(
+                   new
+                   )
+               )
+            ),
+
+            # RangeNum.method(NUMBER, NUMBER)
+            (
+             map { [$_, [table(NUMBER), table(NUMBER), table(NUMBER)]] }
+               dtypes(RANGENUM_DT, qw(
+                   new
+                   )
+               )
+            ),
+        ),
+
+        (COMPLEX_DT) => build_tree(
 
             # Complex.method()
             (
-             map {
-                 { $_, [] }
-               } dtypes(COMPLEX_DT, qw(
+             map { [$_, []] }
+               dtypes(COMPLEX_DT, qw(
                    i
                    e
                    pi
                    phi
                    new
-                   call
                    )
                )
             ),
 
             # Complex.method(STRING|NUMBER)
             (
-             map {
-                 { $_, [table(STRING, NUMBER)] }
-               } dtypes(COMPLEX_DT, qw(
-                   call
+             map { [$_, [table(STRING, NUMBER)]] }
+               dtypes(COMPLEX_DT, qw(
                    new
                    )
                )
@@ -722,15 +724,49 @@ package Sidef::Optimizer {
 
             # Complex.method(NUMBER|STRING, NUMBER|STRING)
             (
-             map {
-                 { $_, [table(NUMBER, STRING), table(NUMBER, STRING)] }
-               } dtypes(COMPLEX_DT, qw(
-                   call
+             map { [$_, [table(STRING), table(STRING)]] }
+               dtypes(COMPLEX_DT, qw(
                    new
                    )
                )
             ),
-        ],
+
+            (
+             map { [$_, [table(STRING), table(NUMBER)]] }
+               dtypes(COMPLEX_DT, qw(
+                   new
+                   )
+               )
+            ),
+
+            (
+             map { [$_, [table(NUMBER), table(STRING)]] }
+               dtypes(COMPLEX_DT, qw(
+                   new
+                   )
+               )
+            ),
+
+            (
+             map { [$_, [table(NUMBER), table(NUMBER)]] }
+               dtypes(COMPLEX_DT, qw(
+                   new
+                   )
+               )
+            ),
+        ),
+
+        (BACKTICK_DT) => build_tree(
+
+            # Backtick.method(STRING)
+            (
+             map { [$_, [table(STRING)]] }
+               dtypes(BACKTICK_DT, qw(
+                   new
+                   )
+               )
+            ),
+        ),
     );
 
     my %addr;
@@ -926,46 +962,44 @@ package Sidef::Optimizer {
                 my $optimized = 0;
                 if (    defined($ref_obj)
                     and exists($rules{$ref_obj})
-                    and not exists($expr->{ind})
                     and ref($method) eq '') {
 
-                    my $code = $ref_obj->SUPER::can($method);
+                    my $code = ($cache{$ref_obj, $method} //= $ref_obj->SUPER::can($method));
 
                     if (defined $code) {
                         my $obj_call = $obj->{call}[$i];
 
-                        foreach my $rule (@{$rules{$ref_obj}}) {
+                        my $ref = $rules{$ref_obj};
+                        if (exists($ref->{$code}) and (exists($obj_call->{arg}) ? ($#{$obj_call->{arg}} == 0) : 1)) {
+                            $ref = $ref->{$code};
 
-                            if (exists($rule->{$code})
-                                and (exists($obj_call->{arg}) ? ($#{$obj_call->{arg}} == 0) : 1)) {
+                            my @args = (
+                                  exists($obj_call->{arg})
+                                ? ref($obj_call->{arg}[0]) eq 'HASH'
+                                      ? do {
+                                          @{(values(%{$obj_call->{arg}[0]}))[0]};
+                                      }
+                                      : $obj_call->{arg}[0]
+                                : ()
+                            );
 
-                                my @args = (
-                                      exists($obj_call->{arg})
-                                    ? ref($obj_call->{arg}[0]) eq 'HASH'
-                                          ? do {
-                                              @{(values(%{$obj_call->{arg}[0]}))[0]};
-                                          }
-                                          : $obj_call->{arg}[0]
-                                    : ()
-                                );
-
-                                if ($#args == $#{$rule->{$code}}) {
-
-                                    my $ok = 1;
-                                    foreach my $j (0 .. $#args) {
-                                        if (not exists($rule->{$code}[$j]{ref($args[$j])})) {
-                                            $ok = 0;
-                                            last;
-                                        }
+                            if (exists $ref->{$#args}) {
+                                $ref = $ref->{$#args};
+                                my $ok = 1;
+                                foreach my $arg (@args) {
+                                    if (exists $ref->{ref($arg)}) {
+                                        $ref = $ref->{ref($arg)};
                                     }
-
-                                    if ($ok) {
-                                        $obj->{self} = $obj->{self}->$code(@args);
-                                        $ref_obj     = ref($obj->{self});
-                                        $optimized   = 1;
+                                    else {
+                                        $ok = 0;
+                                        last;
                                     }
+                                }
 
-                                    last;
+                                if ($ok) {
+                                    $obj->{self} = $obj->{self}->$code(@args);
+                                    $ref_obj     = ref($obj->{self});
+                                    $optimized   = 1;
                                 }
                             }
                         }
