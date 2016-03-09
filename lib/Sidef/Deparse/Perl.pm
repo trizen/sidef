@@ -1162,10 +1162,11 @@ HEADER
               . ' else { } }';
         }
         elsif ($ref eq 'Sidef::Types::Block::Gather') {
+            $self->top_add("use Sidef::Types::Array::Array;\n");
             $code =
                 "do {my \@_$refaddr;"
               . $self->deparse_bare_block($obj->{block}->{code})
-              . "; Sidef::Types::Array::Array->new(\@_$refaddr)}";
+              . "; bless(\\\@_$refaddr, 'Sidef::Types::Array::Array')}";
         }
         elsif ($ref eq 'Sidef::Types::Block::Take') {
             my $raddr = refaddr($obj->{gather});
