@@ -539,6 +539,7 @@ scripts/RosettaCode/walk_a_dir_non_recursively.sf
 scripts/RosettaCode/word_wrap.sf
 scripts/RosettaCode/zeckendorf_number_representation.sf
 scripts/RosettaCode/zig-zag_matrix.sf
+scripts/rsa_code.sf
 scripts/sets.sf
 scripts/sierpinski_carpet.sf
 scripts/sierpinski_triangle.sf

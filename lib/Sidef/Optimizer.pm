@@ -24,10 +24,10 @@ package Sidef::Optimizer {
             exists($INC{$module}) || require($module);
             map {
 
-                defined(&{$package . '::' . $_})
+                defined(my $method = $package->SUPER::can($_))
                   or die "[ERROR] Invalid method $package: $_";
 
-                \&{$package . '::' . $_}
+                $method
             } @names;
         }
 
@@ -44,16 +44,10 @@ package Sidef::Optimizer {
               Sidef::DataTypes::Number::Complex       Sidef::Types::Number::Complex
               Sidef::DataTypes::Range::RangeNumber    Sidef::Types::Range::RangeNumber
               Sidef::DataTypes::Range::RangeString    Sidef::Types::Range::RangeString
-              Sidef::DataTypes::Block::Block          Sidef::Types::Block::Block
               Sidef::DataTypes::Glob::Socket          Sidef::Types::Glob::Socket
               Sidef::DataTypes::Glob::Pipe            Sidef::Types::Glob::Pipe
-              Sidef::DataTypes::Glob::Backtick        Sidef::Types::Glob::Backtick
-              Sidef::DataTypes::Glob::DirHandle       Sidef::Types::Glob::DirHandle
-              Sidef::DataTypes::Glob::FileHandle      Sidef::Types::Glob::FileHandle
               Sidef::DataTypes::Glob::Dir             Sidef::Types::Glob::Dir
               Sidef::DataTypes::Glob::File            Sidef::Types::Glob::File
-              Sidef::DataTypes::Object::Object        Sidef::Object::Object
-              Sidef::DataTypes::Sidef::Sidef          Sidef
               Sidef::DataTypes::Variable::LazyMethod  Sidef::Variable::LazyMethod
               )
         );

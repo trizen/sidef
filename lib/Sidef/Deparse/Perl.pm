@@ -1334,17 +1334,11 @@ HEADER
             $code = qq~((CORE::warn(@args, " at \Q$obj->{file}\E line $obj->{line}\\n")) ? ~
               . qq~(Sidef::Types::Bool::Bool::FALSE) : (Sidef::Types::Bool::Bool::TRUE))~;
         }
-        elsif ($ref eq 'Sidef::Types::Array::MultiArray') {
-            $code = $self->make_constant($ref, 'new', "MultiArr$refaddr");
-        }
         elsif ($ref eq 'Sidef::Types::Glob::Pipe') {
             $code = $self->make_constant($ref, 'new', "Pipe$refaddr", map { $self->_dump_string($_) } @{$obj});
         }
         elsif ($ref eq 'Sidef::Parser') {
             $code = $self->make_constant($ref, 'new', "Parser$refaddr");
-        }
-        elsif ($ref eq 'Sidef') {
-            $code = $self->make_constant($ref, 'new', "Sidef$refaddr");
         }
         elsif ($ref eq 'Sidef::Perl::Perl') {
             $code = $self->make_constant($ref, 'new', "Perl$refaddr");
