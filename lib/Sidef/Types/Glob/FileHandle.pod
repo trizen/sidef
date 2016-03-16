@@ -137,6 +137,14 @@ Aliases: I<is_on_tty>
 
 =cut
 
+=head2 iter
+
+FileHandle.iter() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 lines
 
 FileHandle.lines() -> I<Obj>

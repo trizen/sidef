@@ -67,6 +67,14 @@ Aliases: I<read_dir>, I<readdir>, I<get_files>
 
 =cut
 
+=head2 iter
+
+DirHandle.iter() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 lstat
 
 DirHandle.lstat() -> I<Obj>

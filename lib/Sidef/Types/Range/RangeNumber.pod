@@ -109,6 +109,14 @@ Aliases: I<filter>, I<select>
 
 =cut
 
+=head2 iter
+
+RangeNumber.iter() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 map
 
 RangeNumber.map() -> I<Obj>
@@ -142,14 +150,6 @@ RangeNumber.new() -> I<Obj>
 Return the
 
 Aliases: I<call>
-
-=cut
-
-=head2 range_iter
-
-RangeNumber.range_iter() -> I<Obj>
-
-Return the
 
 =cut
 

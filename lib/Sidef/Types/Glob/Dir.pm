@@ -63,6 +63,12 @@ package Sidef::Types::Glob::Dir {
         __PACKAGE__->new(File::Spec->curdir);
     }
 
+    sub up {
+        my ($self) = @_;
+        state $x = require File::Spec;
+        __PACKAGE__->new(File::Spec->catdir(ref($self) ? $$self : (), File::Spec->updir));
+    }
+
     sub split {
         my ($self) = @_;
         @_ == 2 && ($self = $_[1]);

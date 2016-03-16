@@ -30,7 +30,13 @@ package Sidef::Types::Block::Block {
 
     sub new {
         my (undef, %opt) = @_;
-        bless \%opt, __PACKAGE__;
+
+        bless {
+               name => '__BLOCK__',
+               type => 'block',
+               %opt
+              },
+          __PACKAGE__;
     }
 
     sub run {

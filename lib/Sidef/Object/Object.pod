@@ -98,6 +98,14 @@ Aliases: I<is_an>, I<kind_of>
 
 =cut
 
+=head2 lazy
+
+Object.lazy() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 method
 
 Object.method() -> I<Obj>

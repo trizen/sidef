@@ -1092,7 +1092,7 @@ HEADER
                   . $var
                   . '; my $block = CORE::sub '
                   . $block . ';'
-                  . 'if (ref($obj)) { if (defined(my $sub = $obj->SUPER::can("range_iter"))) { my $iter = $sub->($obj);'
+                  . 'if (ref($obj)) { if (defined(my $sub = $obj->SUPER::can("iter"))) { my $iter = $sub->($obj);'
                   . 'while (defined('
                   . $var
                   . '  = $iter->())) { $block->()} }'

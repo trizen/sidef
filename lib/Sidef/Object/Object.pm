@@ -80,6 +80,11 @@ package Sidef::Object::Object {
 
     *println = \&say;
 
+    sub lazy {
+        my ($self) = @_;
+        Sidef::Object::Lazy->new(obj => $self);
+    }
+
     sub print {
         (CORE::print @_)
           ? (Sidef::Types::Bool::Bool::TRUE)

@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 class MyRange(from, to) {
-    method range_iter {
+    method iter {
         var b = to;
         var i = from;
         func {

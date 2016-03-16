@@ -1,0 +1,65 @@
+
+=encoding utf8
+
+=head1 NAME
+
+Sidef::Object::Lazy
+
+=head1 DESCRIPTION
+
+This object is ...
+
+=head1 SYNOPSIS
+
+var obj = Lazy.new(...);
+
+=head1 METHODS
+
+
+=head2 each
+
+Lazy.each() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 first
+
+Lazy.first() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 grep
+
+Lazy.grep() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 map
+
+Lazy.map() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 new
+
+Lazy.new() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 to_a
+
+Lazy.to_a() -> I<Obj>
+
+Return the
+
+=cut

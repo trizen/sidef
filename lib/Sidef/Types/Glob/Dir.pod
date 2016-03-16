@@ -205,3 +205,11 @@ Dir.to_dir() -> I<Obj>
 Return the
 
 =cut
+
+=head2 up
+
+Dir.up() -> I<Obj>
+
+Return the
+
+=cut

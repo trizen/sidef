@@ -176,7 +176,7 @@ package Sidef::Types::Range::RangeNumber {
     *include  = \&contains;
     *includes = \&contains;
 
-    sub range_iter {
+    sub iter {
         my ($self) = @_;
 
         my $step = $self->{step};
@@ -191,24 +191,26 @@ package Sidef::Types::Range::RangeNumber {
         my $is_inf  = Math::GMPq::Rmpq_equal($to, $INF);
         my $is_ninf = Math::GMPq::Rmpq_equal($to, $NINF);
 
-        sub {
-            (
-             $sgn > 0
-             ? ($is_inf ? 1 : $is_ninf ? 0 : Math::GMPq::Rmpq_cmp($i, $to) <= 0)
-             : ($is_inf ? 0 : $is_ninf ? 1 : Math::GMPq::Rmpq_cmp($i, $to) >= 0)
-            )
-              || return;
-            my $tmp = Math::GMPq::Rmpq_init();
-            Math::GMPq::Rmpq_set($tmp, $i);
-            Math::GMPq::Rmpq_add($i, $i, $step);
-            bless \$tmp, 'Sidef::Types::Number::Number';
-        };
+        Sidef::Types::Block::Block->new(
+            code => sub {
+                (
+                 $sgn > 0
+                 ? ($is_inf ? 1 : $is_ninf ? 0 : Math::GMPq::Rmpq_cmp($i, $to) <= 0)
+                 : ($is_inf ? 0 : $is_ninf ? 1 : Math::GMPq::Rmpq_cmp($i, $to) >= 0)
+                )
+                  || return;
+                my $tmp = Math::GMPq::Rmpq_init();
+                Math::GMPq::Rmpq_set($tmp, $i);
+                Math::GMPq::Rmpq_add($i, $i, $step);
+                bless \$tmp, 'Sidef::Types::Number::Number';
+            }
+        );
     }
 
     sub each {
         my ($self, $code) = @_;
 
-        my $iter = $self->range_iter();
+        my $iter = $self->iter();
         while (defined(my $num = $iter->())) {
             $code->run($num);
         }
@@ -221,7 +223,7 @@ package Sidef::Types::Range::RangeNumber {
         my ($self, $code) = @_;
 
         my $values = Sidef::Types::Array::Array->new;
-        my $iter   = $self->range_iter();
+        my $iter   = $self->iter();
         while (defined(my $num = $iter->())) {
             push @$values, $code->run($num);
         }
@@ -235,7 +237,7 @@ package Sidef::Types::Range::RangeNumber {
         my ($self, $code) = @_;
 
         my $values = Sidef::Types::Array::Array->new;
-        my $iter   = $self->range_iter();
+        my $iter   = $self->iter();
         while (defined(my $num = $iter->())) {
             push(@$values, $num) if $code->run($num);
         }
@@ -249,7 +251,7 @@ package Sidef::Types::Range::RangeNumber {
     sub reduce {
         my ($self, $code) = @_;
 
-        my $iter  = $self->range_iter();
+        my $iter  = $self->iter();
         my $value = $iter->();
 
         while (defined(my $num = $iter->())) {
@@ -262,7 +264,7 @@ package Sidef::Types::Range::RangeNumber {
     sub all {
         my ($self, $code) = @_;
 
-        my $iter = $self->range_iter();
+        my $iter = $self->iter();
         while (defined(my $num = $iter->())) {
             $code->run($num)
               || return Sidef::Types::Bool::Bool::FALSE;
@@ -274,7 +276,7 @@ package Sidef::Types::Range::RangeNumber {
     sub any {
         my ($self, $code) = @_;
 
-        my $iter = $self->range_iter();
+        my $iter = $self->iter();
         while (defined(my $num = $iter->())) {
             $code->run($num)
               && return Sidef::Types::Bool::Bool::TRUE;
@@ -300,7 +302,7 @@ package Sidef::Types::Range::RangeNumber {
         my ($name) = (defined($AUTOLOAD) ? ($AUTOLOAD =~ /^.*[^:]::(.*)$/) : '');
 
         my $array = Sidef::Types::Array::Array->new;
-        my $iter  = $self->range_iter();
+        my $iter  = $self->iter();
         while (defined(my $num = $iter->())) {
             push @$array, $num;
         }

@@ -124,10 +124,21 @@ package Sidef::Types::Glob::DirHandle {
         Sidef::Types::Glob::Stat->lstat($self->{dir_h}, $self);
     }
 
+    sub iter {
+        my ($self) = @_;
+
+        state $x = require Encode;
+        Sidef::Types::Block::Block->new(
+            code => sub {
+                Sidef::Types::String::String->new(Encode::decode_utf8(CORE::readdir($self->{dir_h}) // return));
+            }
+        );
+    }
+
     sub each {
         my ($self, $code) = @_;
 
-        require Encode;
+        state $x = require Encode;
         while (defined(my $file = CORE::readdir($self->{dir_h}))) {
             $code->run(Sidef::Types::String::String->new(Encode::decode_utf8($file)));
         }

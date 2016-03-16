@@ -82,6 +82,15 @@ package Sidef::Types::Glob::FileHandle {
         (CORE::printf {$self->{fh}} @args) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
+    sub iter {
+        my ($self) = @_;
+        Sidef::Types::Block::Block->new(
+            code => sub {
+                Sidef::Types::String::String->new(CORE::readline($self->{fh}) // return);
+            }
+        );
+    }
+
     sub read {
         my ($self, $var_ref, $length, $offset) = @_;
 
