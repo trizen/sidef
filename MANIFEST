@@ -11,6 +11,8 @@ lib/Sidef/Math/Math.pm
 lib/Sidef/Math/Math.pod
 lib/Sidef/Module/Func.pm
 lib/Sidef/Module/OO.pm
+lib/Sidef/Object/Lazy.pm
+lib/Sidef/Object/Lazy.pod
 lib/Sidef/Object/Object.pm
 lib/Sidef/Object/Object.pod
 lib/Sidef/Optimizer.pm
@@ -641,6 +643,7 @@ scripts/Tests/implicit_method_call_on_var_.sf
 scripts/Tests/infinite_ranges.sf
 scripts/Tests/inverted_syntax.sf
 scripts/Tests/is_prime.sf
+scripts/Tests/lazy_iterators.sf
 scripts/Tests/lazy_methods.sf
 scripts/Tests/leap_year.sf
 scripts/Tests/letter_frequency.sf
