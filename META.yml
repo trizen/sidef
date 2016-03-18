@@ -30,6 +30,8 @@ provides:
     file: lib/Sidef/Module/Func.pm
   Sidef::Module::OO:
     file: lib/Sidef/Module/OO.pm
+  Sidef::Object::Lazy:
+    file: lib/Sidef/Object/Lazy.pm
   Sidef::Object::Object:
     file: lib/Sidef/Object/Object.pm
   Sidef::Optimizer:

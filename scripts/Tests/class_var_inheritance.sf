@@ -1,0 +1,68 @@
+#!/usr/bin/ruby
+
+#
+## Inheritance of class variables (test)
+#
+
+class Foo(x="bau") {
+
+}
+
+class Bar(y=42, x="hi") < Foo {
+
+}
+
+class Baz(z) < Bar {
+
+}
+
+var obj = Baz(y:32, z:10);
+
+assert_eq(obj.x, 'hi');
+assert_eq(obj.y, 32);
+assert_eq(obj.z, 10);
+
+obj = Baz(z: 23)
+
+assert_eq(obj.x, 'hi')
+assert_eq(obj.y, 42)
+
+obj = Baz(x: 'baz', y: 21, z: 42)
+
+assert_eq(obj.x, 'baz')
+assert_eq(obj.y, 21)
+assert_eq(obj.z, 42)
+
+class Baxx(x='baxx', z='new') < Baz {
+
+}
+
+obj = Baxx()
+
+assert_eq(obj.x, 'baxx')
+assert_eq(obj.y, 42)
+assert_eq(obj.z, 'new')
+
+obj = Baxx(x: 'a', y: 'b', z:'c')
+
+assert_eq(obj.x, 'a')
+assert_eq(obj.y, 'b')
+assert_eq(obj.z, 'c')
+
+class Baz(z='bye', y=10) < Bar {
+
+}
+
+obj = Baz()
+
+assert_eq(obj.x, 'hi')
+assert_eq(obj.y, 10)
+assert_eq(obj.z, 'bye')
+
+obj = Baz(x:'a', y:'b', z:'c')
+
+assert_eq(obj.x, 'a')
+assert_eq(obj.y, 'b')
+assert_eq(obj.z, 'c')
+
+say "** Test passed!"

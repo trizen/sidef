@@ -4,7 +4,7 @@
 ## Translation of: https://en.wikipedia.org/wiki/Multiple_dispatch#Perl_6
 #
 
-class StellarObject(Number mass)  {
+class StellarObject(Number mass) {
     method <=>(StellarObject arg) {
         self.mass <=> arg.mass;
     }
@@ -18,8 +18,12 @@ class StellarObject(Number mass)  {
     }
 }
 
-class Asteroid(Number mass, String name='an asteroid') << StellarObject { }
-class Spaceship(Number mass, String name='some unnamed spaceship') << StellarObject { }
+class Asteroid < StellarObject {
+    has name = 'an asteroid'
+}
+
+class Spaceship(name='some unnamed spaceship') < StellarObject {
+}
 
 var destroyed = < obliterated destroyed mangled >;
 var damaged = ['damaged', 'collided with', 'was damaged by'];
@@ -36,7 +40,7 @@ func collide(a, b) {
         say "#{a.name} was #{destroyed.pick} by #{b.name}";
     }
     else {
-        if (a.is_a(Spaceship) && b.is_a(Spaceship) && (a.mass == b.mass)) {
+        if (a.kind_of(Spaceship) && b.kind_of(Spaceship) && (a.mass == b.mass)) {
             var (n1, n2) = [a.name, b.name].shuffle...;
             say "#{n1} collided with #{n2}, and both ships were #{[destroyed.pick, 'left damaged'].pick}";
         }

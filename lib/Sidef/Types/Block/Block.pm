@@ -151,14 +151,16 @@ package Sidef::Types::Block::Block {
         my $name = Sidef::normalize_type($self->{name} // '__FUNC__');
 
         die "[ERROR] $self->{type} `$name` does not match $name("
-          . join(', ', map { ref($_) ? Sidef::normalize_type(ref($_)) : 'nil' } @args)
+          . join(', ',
+                 map { ref($_) ? Sidef::normalize_type(ref($_)) : defined($_) ? Sidef::normalize_type($_) : 'nil' } @args)
           . "), invoked as "
           . $name . '('
           . join(
             ', ',
             map {
                     ref($_) && eval { $_->can('dump') } ? $_->dump
-                  : ref($_) ? Sidef::normalize_type(ref($_))
+                  : ref($_)     ? Sidef::normalize_type(ref($_))
+                  : defined($_) ? Sidef::normalize_type($_)
                   : 'nil'
               } @args
           )
