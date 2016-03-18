@@ -1,0 +1,46 @@
+#!/usr/bin/ruby
+
+#
+## Inheritance of class attributes (test)
+#
+
+class Foo(x) {
+    has y = x
+    has z = 42
+}
+
+class Bar(x) < Foo {
+    has y = 21
+    has b = x
+}
+
+var obj = Bar(10)
+
+assert_eq(obj.x, 10)
+assert_eq(obj.y, 21)
+assert_eq(obj.z, 42)
+assert_eq(obj.b, 10)
+
+class Baz < Foo {
+    has x = 3
+}
+
+obj = Baz(21)
+
+assert_eq(obj.x, 3)
+assert_eq(obj.y, 21)
+assert_eq(obj.z, 42)
+
+class Baxx << Bar {
+    has b = 99
+    has z = 37
+}
+
+obj = Baxx(31)
+
+assert_eq(obj.y, 21)
+assert_eq(obj.x, 31)
+assert_eq(obj.b, 99)
+assert_eq(obj.z, 37)
+
+say "** Test passed!"

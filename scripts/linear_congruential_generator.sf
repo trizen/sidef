@@ -3,8 +3,8 @@
 module LCG {
 
   # Creates a linear congruential generator and remembers the initial seed.
-  class Common(r) {
-     has seed = r
+  class Common(seed) {
+     has r = seed
   }
 
   # LCG::Berkeley generates 31-bit integers using the same formula

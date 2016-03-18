@@ -321,15 +321,18 @@ HEADER
     sub _dump_class_attributes {
         my ($self, @attrs) = @_;
 
+        my %seen;
         my @code;
-        foreach my $attr (@attrs) {
+        foreach my $attr (reverse @attrs) {
 
             my @vars = @{$attr->{vars}};
             @vars || next;
 
-            my @dumped_vars = map { ref($_) ? $self->_dump_var($_) : $_ } @vars;
+            my @dumped_vars = map { ref($_) ? $self->_dump_var($_) : $_ } grep { !$seen{$_->{name}}++ } @vars;
 
-            push @code,
+            @dumped_vars || next;
+
+            unshift @code,
               (   'my('
                 . join(', ', @dumped_vars) . ')'
                 . (exists($attr->{args}) ? '=' . $self->deparse_args($attr->{args}) : ''));
@@ -496,14 +499,14 @@ HEADER
           . join(', ', map { $self->_dump_string($vars[$_]{name}) . ' => ' . $_ } 0 .. $#vars) . '}';
     }
 
-    sub _get_inherited_vars {
-        my ($self, $classes) = @_;
+    sub _get_inherited_stuff {
+        my ($self, $classes, $callback) = @_;
 
         my @vars;
         foreach my $class (@{$classes}) {
-            push @vars, @{$class->{vars}};
+            push @vars, $callback->($class);
             if (exists $class->{inherit}) {
-                unshift @vars, $self->_get_inherited_vars($class->{inherit});
+                unshift @vars, $self->_get_inherited_stuff($class->{inherit}, $callback);
             }
         }
 
@@ -817,15 +820,32 @@ HEADER
                               . ($self->{package_name} eq 'Sidef::Object::Object' ? '' : "Sidef::Object::Object") . ");\n";
                         }
 
+                        ## TODO: find a simpler and more elegant solution
                         if ($is_class and not $self->{ref_class}) {
 
                             my @class_vars = do {
                                 my %seen;
                                 reverse grep { !$seen{$_->{name}}++ }
-                                  reverse(exists($self->{inherit})
-                                          ? $self->_get_inherited_vars($self->{inherit})
+                                  reverse(
+                                          exists($self->{inherit})
+                                          ? $self->_get_inherited_stuff($self->{inherit},
+                                                                        sub { exists($_[0]->{vars}) ? @{$_[0]->{vars}} : () })
                                           : (),
-                                          @{$self->{class_vars}});
+                                          @{$self->{class_vars}}
+                                         );
+                            };
+
+                            my @class_attributes = do {
+                                my %seen;
+                                (
+                                 exists($self->{inherit})
+                                 ? $self->_get_inherited_stuff(
+                                                              $self->{inherit},
+                                                              sub { exists($_[0]->{attributes}) ? @{$_[0]->{attributes}} : () }
+                                   )
+                                 : (),
+                                 (exists($self->{class_attributes}) ? @{$self->{class_attributes}} : ())
+                                );
                             };
 
                             $code .=
@@ -834,12 +854,16 @@ HEADER
 
                             $Sidef::SPACES += $Sidef::SPACES_INCR;
                             $code .= $self->_dump_sub_init_vars(@class_vars, (map { @{$_->{vars}} } @{$self->{class_struct}}))
-                              . $self->_dump_class_attributes(@{$self->{class_attributes}});
+                              . $self->_dump_class_attributes(@class_attributes);
+
+                            my @class_var_attributes = do {
+                                my %seen;
+                                reverse(grep { !$seen{$_->{name}}++ } map { @{$_->{vars}} } reverse(@class_attributes));
+                            };
 
                             $code .= (' ' x $Sidef::SPACES) . 'my $self = bless {';
-                            foreach my $var (@class_vars,
-                                             (map { @{$_->{vars}} } @{$self->{class_attributes}}),
-                                             (map { @{$_->{vars}} } @{$self->{class_struct}})) {
+                            foreach
+                              my $var (@class_vars, @class_var_attributes, (map { @{$_->{vars}} } @{$self->{class_struct}})) {
                                 $code .= qq{"\Q$var->{name}\E"=>} . $self->_dump_var($var) . ', ';
                             }
 
@@ -865,9 +889,8 @@ HEADER
                               . $self->_dump_string("$self->{package_name}\::call")
                               . "} = sub { CORE::shift(\@_); \$new$refaddr->call(\@_) } };\n";
 
-                            foreach my $var (@class_vars,
-                                             (map { @{$_->{vars}} } @{$self->{class_attributes}}),
-                                             (map { @{$_->{vars}} } @{$self->{class_struct}})) {
+                            foreach
+                              my $var (@class_vars, @class_var_attributes, (map { @{$_->{vars}} } @{$self->{class_struct}})) {
                                 $code .=
                                   (' ' x $Sidef::SPACES) . qq{sub $var->{name} : lvalue { \$_[0]->{"\Q$var->{name}\E"} }\n};
                             }

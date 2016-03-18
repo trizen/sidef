@@ -583,6 +583,7 @@ scripts/Tests/calendar.sf
 scripts/Tests/call_an_object_method.sf
 scripts/Tests/catalan_numbers.sf
 scripts/Tests/catalan_numbers_2.sf
+scripts/Tests/class_attr_inheritance.sf
 scripts/Tests/class_attributes.sf
 scripts/Tests/class_inheritance.sf
 scripts/Tests/class_redefinition.sf
