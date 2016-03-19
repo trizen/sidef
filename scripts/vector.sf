@@ -41,14 +41,14 @@ class Vector(:args) {
 
 var u = Vector(x => 3, y => 4)
 var v = Vector(from => [1, 0], to => [2, 3])
-var w = Vector(length => 1, angle => Number.pi/4)
+var w = Vector(length => 1, angle => 45.deg2rad)
 
 say u    #: vec[3, 4]
 say v    #: vec[1, 3]
 say w    #: vec[0.70710678118654752440084436210485, 0.70710678118654752440084436210485]
 
 say u.length                             #: 5
-say u.angle*180/Number.pi                #: 53.13010235415597870314438744090659
+say u.angle.rad2deg                      #: 53.13010235415597870314438744090659
 
 say u+v                                  #: vec[4, 7]
 say u-v                                  #: vec[2, 1]

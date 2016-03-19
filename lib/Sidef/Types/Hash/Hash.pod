@@ -188,6 +188,8 @@ Hash.flip() -> I<Obj>
 
 Return the
 
+Aliases: I<reverse>
+
 =cut
 
 =head2 grep

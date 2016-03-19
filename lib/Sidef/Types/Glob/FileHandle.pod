@@ -85,6 +85,14 @@ Aliases: I<each_line>
 
 =cut
 
+=head2 each_char
+
+FileHandle.each_char() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 eof
 
 FileHandle.eof() -> I<Obj>

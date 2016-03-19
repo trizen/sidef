@@ -167,7 +167,7 @@ package Sidef::Types::Glob::FileHandle {
         );
     }
 
-    sub readline {
+    sub read_line {
         my ($self, $var_ref) = @_;
 
         if (defined $var_ref) {
@@ -179,18 +179,21 @@ package Sidef::Types::Glob::FileHandle {
         Sidef::Types::String::String->new(CORE::readline($self->{fh}) // return);
     }
 
-    *readln    = \&readline;
-    *read_line = \&readline;
-    *get       = \&readline;
-    *line      = \&readline;
+    *readln   = \&read_line;
+    *readline = \&read_line;
+    *get      = \&read_line;
+    *line     = \&read_line;
 
     sub read_char {
-        my ($self) = @_;
+        my ($self, $var_ref) = @_;
 
-        my $char = getc($self->{fh});
-        defined($char)
-          ? Sidef::Types::String::String->new($char)
-          : ();
+        if (defined $var_ref) {
+            ${$var_ref} =
+              (Sidef::Types::String::String->new(CORE::getc($self->{fh}) // return (Sidef::Types::Bool::Bool::FALSE)));
+            return (Sidef::Types::Bool::Bool::TRUE);
+        }
+
+        Sidef::Types::String::String->new(getc($self->{fh}) // return);
     }
 
     *char = \&read_char;
@@ -272,6 +275,16 @@ package Sidef::Types::Glob::FileHandle {
     }
 
     *each_line = \&each;
+
+    sub each_char {
+        my ($self, $code) = @_;
+
+        while (defined(my $char = CORE::getc($self->{fh}))) {
+            $code->run(Sidef::Types::String::String->new($char));
+        }
+
+        $self;
+    }
 
     sub eof {
         my ($self) = @_;
