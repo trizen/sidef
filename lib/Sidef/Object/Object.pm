@@ -252,19 +252,9 @@ package Sidef::Object::Object {
                 or $f_type eq 'Sidef::Types::Glob::File'
                 or $f_type eq 'Sidef::Types::Glob::Dir') {
 
-                # String ~~ Array
-                if ($s_type eq 'Sidef::Types::Array::Array') {
-                    return $second->contains($first);
-                }
-
                 # String ~~ RangeString
                 if ($s_type eq 'Sidef::Types::Range::RangeString') {
                     return $second->contains($first);
-                }
-
-                # String ~~ Hash
-                if ($s_type eq 'Sidef::Types::Hash::Hash') {
-                    return $second->exists($first);
                 }
 
                 # String ~~ String
@@ -374,12 +364,15 @@ package Sidef::Object::Object {
             # Second is Array
             if ($s_type eq 'Sidef::Types::Array::Array') {
 
-                if ($f_type eq 'Sidef::Types::Array::Array') {
-                    return $first->eq($second);
-                }
-
                 # Any ~~ Array
                 return $second->contains($first);
+            }
+
+            # Second is Hash
+            if ($s_type eq 'Sidef::Types::Hash::Hash') {
+
+                # Any ~~ Hash
+                return $second->exists($first);
             }
 
             ($first eq $second)

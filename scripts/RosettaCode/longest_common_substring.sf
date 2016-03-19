@@ -5,21 +5,18 @@
 #
 
 func createSubstrings(String word) -> Array {
-   gather {
-     var length = word.len;
-     length.range.each { |start|
-      1.to(length - start).each { |howmany|
-        take word.substr(start, howmany)
-      }
+  gather {
+    for i,j in (0 .. word.len -> combinations(2)) {
+        take(word.substr(i, j-i))
     }
   }
 }
 
 func findLongestCommon(String first, String second) -> Str {
-    (createSubstrings(first) & createSubstrings(second)) -> max_by { .len }
+    createSubstrings(first) & createSubstrings(second) -> max_by { .len }
 }
 
 var substr = findLongestCommon("thisisatest", "testing123testing")
 
-say substr;
-assert_eq(substr, "test");
+say substr
+assert_eq(substr, "test")
