@@ -868,7 +868,7 @@ HEADER
                             $code .=
                                 '}, __PACKAGE__;' . "\n"
                               . (' ' x $Sidef::SPACES)
-                              . '$self->init() if $self->can("init");' . "\n"
+                              . 'if(defined(my $sub = $self->can("init"))) { $sub->($self) }' . "\n"
                               . (' ' x $Sidef::SPACES)
                               . '$self;' . "\n";
 
