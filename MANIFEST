@@ -141,9 +141,11 @@ scripts/Expensive/knapsack_problem_0_1.sf
 scripts/Expensive/knapsack_problem_bounded.sf
 scripts/Expensive/knapsack_problem_unbounded.sf
 scripts/Expensive/long_multiplication.sf
+scripts/Expensive/normal_distribution.sf
 scripts/Expensive/numerical_integration.sf
 scripts/Expensive/root_of_a_function.sf
 scripts/Expensive/smart_word_wrap.sf
+scripts/Expensive/subset_sum_problem.sf
 scripts/Expensive/sudoku_solver.sf
 scripts/Expensive/zebra_puzzle.sf
 scripts/Expensive/zhang_suen_thinning_algorithm.sf
@@ -600,6 +602,7 @@ scripts/Tests/cpp_input_output.sf
 scripts/Tests/cramers_method.sf
 scripts/Tests/cramers_rule.sf
 scripts/Tests/cross_and_zip_metaoperators.sf
+scripts/Tests/cycle_sort.sf
 scripts/Tests/data_digging.sf
 scripts/Tests/data_handle.sf
 scripts/Tests/def_primitive_type.sf

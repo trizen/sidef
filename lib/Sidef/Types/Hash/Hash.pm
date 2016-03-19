@@ -363,6 +363,8 @@ package Sidef::Types::Hash::Hash {
         $new_hash;
     }
 
+    *reverse = \&flip;
+
     sub copy {
         my ($self) = @_;
 

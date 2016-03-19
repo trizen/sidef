@@ -1,0 +1,46 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Sorting_algorithms/Cycle_sort
+#
+
+func cycle_sort (array) {
+    var (writes=0, pos=0)
+
+    func f(cycle_start, Ref item, bool=false) {
+        pos = (cycle_start + array.ft(cycle_start+1).count{ _ < *item })
+        return(false) if (bool && pos==cycle_start)
+        while (*item == array[pos]) { ++pos }
+        (array[pos], *item) = (*item, array[pos])
+        ++writes
+        return true
+    }
+
+    array.each_kv { |cycle_start, item|
+        f(cycle_start, \item, true) || next
+        while (pos != cycle_start) {
+            f(cycle_start, \item)
+        }
+    }
+
+    return writes
+}
+
+var a = %n(0 1 2 2 2 2 1 9 3.5 5 8 4 7 0 6)
+
+say a.join(' ')
+say ('writes ', var writes = cycle_sort(a))
+say a.join(' ')
+
+assert_eq(writes, 10)
+assert_eq(a, %n(0 0 1 1 2 2 2 2 3.5 4 5 6 7 8 9))
+
+a = 20.irand.of { 100.irand }
+cycle_sort(a)
+assert_eq(a, a.sort)
+
+a = %w(a t d b f g y l t p w c r r x i y j k i z q e v a f o q j u x k m h s u v z g m b o l e n h p n c s w d)
+writes = cycle_sort(a)
+
+assert_eq(writes, 50)
+assert_eq(a, a.sort)
