@@ -1196,19 +1196,10 @@ package Sidef::Parser {
                                       );
                 }
 
-                my $vars =
-                  $self->parse_init_vars(
-                                         code      => $opt{code},
-                                         with_vals => 1,
-                                         private   => 1,
-                                         type      => 'var',
-                                        );
-
                 my $struct = bless(
                                    {
                                     name  => $name,
                                     class => $class_name,
-                                    vars  => $vars,
                                    },
                                    'Sidef::Variable::Struct'
                                   );
@@ -1223,6 +1214,16 @@ package Sidef::Parser {
                         line  => $self->{line},
                       };
                 }
+
+                my $vars =
+                  $self->parse_init_vars(
+                                         code      => $opt{code},
+                                         with_vals => 1,
+                                         private   => 1,
+                                         type      => 'var',
+                                        );
+
+                $struct->{vars} = $vars;
 
                 return $struct;
             }
