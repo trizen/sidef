@@ -573,6 +573,7 @@ scripts/Tests/beadsort.sf
 scripts/Tests/best_shuffle.sf
 scripts/Tests/binary_search.sf
 scripts/Tests/binary_search_recursive.sf
+scripts/Tests/bitonic_sorter.sf
 scripts/Tests/block_return.sf
 scripts/Tests/box_the_compass.sf
 scripts/Tests/break.sf

@@ -1,0 +1,41 @@
+#!/usr/bin/ruby
+
+# Bitonic sorter
+# https://en.wikipedia.org/wiki/Bitonic_sorter
+
+func bitonic_compare(x, bool) {
+    var dist = (x.len/2 -> int)
+    for i in ^dist {
+        if ((x[i] > x[i + dist]) == bool) {
+            x.swap(i, i+dist)
+        }
+    }
+}
+
+func bitonic_merge(x, bool) {
+
+    return(x) if (x.len == 1)
+
+    bitonic_compare(x, bool)
+    var parts = x/2
+    var first = bitonic_merge(parts[0], bool)
+    var second = bitonic_merge(parts[1], bool)
+    first + second
+}
+
+func bitonic_sort(x, bool=true) {
+
+    return(x) if (x.len <= 1)
+
+    var parts = x/2
+    var first = bitonic_sort(parts[0], true)
+    var second = bitonic_sort(parts[1], false)
+    bitonic_merge(first + second, bool)
+}
+
+var a = 16.of { 100.rand_int }
+var s = bitonic_sort(a)
+
+assert_eq(a.sort, s)
+
+say "** Test passed!"
