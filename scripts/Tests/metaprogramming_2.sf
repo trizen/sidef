@@ -13,7 +13,7 @@ var colors = Hash.new(
                'white'   => "fff",
              );
 
-colors.each { |color, code|
+for color,code in colors {
     String.def_method("in_#{color}", func (self) {
         %Q<<span style="color: ##{code}">#{self}</span>>
     })
@@ -22,3 +22,7 @@ colors.each { |color, code|
 say "blue".in_blue;
 say "red".in_red;
 say "white".in_white;
+
+assert_eq("blue".in_blue, %q(<span style="color: #00f">blue</span>))
+assert_eq("red".in_red, %q(<span style="color: #f00">red</span>))
+assert_eq("white".in_white, %q(<span style="color: #fff">white</span>))
