@@ -140,6 +140,7 @@ scripts/Expensive/kd_tree.sf
 scripts/Expensive/knapsack_problem_0_1.sf
 scripts/Expensive/knapsack_problem_bounded.sf
 scripts/Expensive/knapsack_problem_unbounded.sf
+scripts/Expensive/knuth_power_tree.sf
 scripts/Expensive/long_multiplication.sf
 scripts/Expensive/normal_distribution.sf
 scripts/Expensive/numerical_integration.sf
@@ -802,6 +803,7 @@ scripts/towers_of_hanoi.sf
 scripts/tree_traversal.sf
 scripts/unique_prefixes.sf
 scripts/variadic_function.sf
+scripts/vector.sf
 scripts/vector_products.sf
 scripts/vigenere_cipher.sf
 scripts/virtual_machine.sf
