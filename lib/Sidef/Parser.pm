@@ -1334,10 +1334,13 @@ package Sidef::Parser {
                     }
 
                     if (
-                        $try_expr or exists($self->{built_in_classes}{$name}) or do {
-                            my $obj = $self->find_var($name, $class_name);
-                            defined($obj) and $obj->{type} eq 'class';
-                        }
+                        $try_expr
+                        or exists($self->{built_in_classes}{$name})
+
+                        #or do {
+                        #    my $obj = $self->find_var($name, $class_name);
+                        #    defined($obj) and $obj->{type} eq 'class';
+                        #}
                       ) {
 
                         my ($obj) = $self->parse_expr(code => $try_expr ? $opt{code} : \$name);
@@ -1448,10 +1451,6 @@ package Sidef::Parser {
                                     ++$class->{count};
                                     push @{$obj->{inherit}}, $class->{obj};
                                 }
-                                elsif ($class->{type} eq 'struct') {
-                                    ++$class->{count};
-                                    push @{$obj->{struct}}, $class->{obj};
-                                }
                                 else {
                                     $self->fatal_error(
                                                        error  => "this is not a class",
@@ -1496,9 +1495,9 @@ package Sidef::Parser {
                                             pos    => pos($_)
                                            );
 
-                    if (ref($built_in_obj) eq 'Sidef::Variable::ClassInit') {
-                        $obj->{name} = $built_in_obj->{name};
-                    }
+                    #~ if (ref($built_in_obj) eq 'Sidef::Variable::ClassInit') {
+                    #~ $obj->{name} = $built_in_obj->{name};
+                    #~ }
 
                     local $self->{class_name} = (defined($built_in_obj) ? ref($built_in_obj) : $obj->{name});
                     local $self->{current_class} = $built_in_obj // $obj;

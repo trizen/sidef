@@ -587,7 +587,6 @@ scripts/Tests/class_attr_inheritance.sf
 scripts/Tests/class_attributes.sf
 scripts/Tests/class_inheritance.sf
 scripts/Tests/class_redefinition.sf
-scripts/Tests/class_struct_inheritance.sf
 scripts/Tests/class_var_inheritance.sf
 scripts/Tests/classes.sf
 scripts/Tests/classes_and_objects.sf
