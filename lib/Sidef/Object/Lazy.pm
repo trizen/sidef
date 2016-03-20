@@ -41,6 +41,26 @@ package Sidef::Object::Lazy {
         $self;
     }
 
+    sub iter {
+        my ($self) = @_;
+
+        my $iter = $self->{obj}->iter;
+
+        Sidef::Types::Block::Block->new(
+            code => sub {
+                {
+                    my $item = $iter->() // return;
+                    my @arg = ($item);
+                    foreach my $call (@{$self->{calls}}) {
+                        @arg = $call->(@arg);
+                    }
+                    @arg || redo;
+                    $arg[0];
+                }
+            }
+        );
+    }
+
     sub first {
         my ($self, $num) = @_;
 
