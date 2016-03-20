@@ -57,7 +57,7 @@ package Sidef::Types::String::String {
          )
           ) < 1
           && return;
-        Sidef::Types::Array::Array->new(map { $self->new($_) } unpack "(a$strlen)*", $$self);
+        Sidef::Types::Array::Array->new([map { $self->new($_) } unpack "(a$strlen)*", $$self]);
     }
 
     *divide = \&div;
@@ -148,9 +148,9 @@ package Sidef::Types::String::String {
         my ($s1, $s2) = ($$self, "$string");
 
         if (length($s1) == 1 and length($s2) == 1) {
-            return Sidef::Types::Array::Array->new(map { $self->new(chr($_)) } ord($s1) .. ord($s2));
+            return Sidef::Types::Array::Array->new([map { $self->new(chr($_)) } ord($s1) .. ord($s2)]);
         }
-        Sidef::Types::Array::Array->new(map { $self->new($_) } $s1 .. $s2);
+        Sidef::Types::Array::Array->new([map { $self->new($_) } $s1 .. $s2]);
     }
 
     *arr_to = \&array_to;
@@ -654,7 +654,7 @@ package Sidef::Types::String::String {
     sub glob {
         my ($self) = @_;
         state $x = require Encode;
-        Sidef::Types::Array::Array->new(map { __PACKAGE__->new(Encode::decode_utf8($_)) } CORE::glob($$self));
+        Sidef::Types::Array::Array->new([map { __PACKAGE__->new(Encode::decode_utf8($_)) } CORE::glob($$self)]);
     }
 
     sub quotemeta {
@@ -667,7 +667,7 @@ package Sidef::Types::String::String {
     sub scan {
         my ($self, $regex) = @_;
         my $str = $$self;
-        Sidef::Types::Array::Array->new(map { __PACKAGE__->new($_) } $str =~ /$regex->{regex}/g);
+        Sidef::Types::Array::Array->new([map { __PACKAGE__->new($_) } $str =~ /$regex->{regex}/g]);
     }
 
     sub split {
@@ -682,24 +682,32 @@ package Sidef::Types::String::String {
 
         if (!defined($sep)) {
             return
-              Sidef::Types::Array::Array->new(map { __PACKAGE__->new($_) }
-                                                split(' ', $$self, $size));
+              Sidef::Types::Array::Array->new(
+                                              [map { __PACKAGE__->new($_) }
+                                                 split(' ', $$self, $size)
+                                              ]
+                                             );
         }
 
         if (ref($sep) eq 'Sidef::Types::Number::Number') {
             return Sidef::Types::Array::Array->new(
-                map { __PACKAGE__->new($_) } unpack '(a' . do {
-                    local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
-                    $sep->get_value;
-                  }
-                  . ')*',
-                $$self
-                                                  );
+                [
+                 map { __PACKAGE__->new($_) } unpack '(a' . do {
+                     local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
+                     $sep->get_value;
+                   }
+                   . ')*',
+                 $$self
+                ]
+            );
         }
 
         $sep = $self->_string_or_regex($sep);
-        Sidef::Types::Array::Array->new(map { __PACKAGE__->new($_) }
-                                          split(/$sep/, $$self, $size));
+        Sidef::Types::Array::Array->new(
+                                        [map { __PACKAGE__->new($_) }
+                                           split(/$sep/, $$self, $size)
+                                        ]
+                                       );
     }
 
     sub sort {
@@ -729,7 +737,7 @@ package Sidef::Types::String::String {
 
     sub words {
         my ($self) = @_;
-        Sidef::Types::Array::Array->new(map { __PACKAGE__->new($_) } CORE::split(' ', $$self));
+        Sidef::Types::Array::Array->new([map { __PACKAGE__->new($_) } CORE::split(' ', $$self)]);
     }
 
     sub each_word {
@@ -744,7 +752,7 @@ package Sidef::Types::String::String {
 
     sub numbers {
         my ($self) = @_;
-        Sidef::Types::Array::Array->new(map { Sidef::Types::Number::Number->new($_) } CORE::split(' ', $$self));
+        Sidef::Types::Array::Array->new([map { Sidef::Types::Number::Number->new($_) } CORE::split(' ', $$self)]);
     }
 
     *nums = \&numbers;
@@ -766,9 +774,11 @@ package Sidef::Types::String::String {
         my $string = $$self;
         state $x = require bytes;
         Sidef::Types::Array::Array->new(
-            map {
-                Sidef::Types::Number::Number::_new_uint(CORE::ord(bytes::substr($string, $_, 1)))
-              } 0 .. bytes::length($string) - 1
+            [
+             map {
+                 Sidef::Types::Number::Number::_new_uint(CORE::ord(bytes::substr($string, $_, 1)))
+               } 0 .. bytes::length($string) - 1
+            ]
         );
     }
 
@@ -787,7 +797,7 @@ package Sidef::Types::String::String {
 
     sub chars {
         my ($self) = @_;
-        Sidef::Types::Array::Array->new(map { __PACKAGE__->new($_) } CORE::split(//, CORE::join('', $$self)));
+        Sidef::Types::Array::Array->new([map { __PACKAGE__->new($_) } CORE::split(//, CORE::join('', $$self))]);
     }
 
     *to_a     = \&chars;
@@ -807,7 +817,7 @@ package Sidef::Types::String::String {
 
     sub graphemes {
         my ($self) = @_;
-        Sidef::Types::Array::Array->new(map { __PACKAGE__->new($_) } map { /\X/g } $$self);
+        Sidef::Types::Array::Array->new([map { __PACKAGE__->new($_) } map { /\X/g } $$self]);
     }
 
     *graphs = \&graphemes;
@@ -827,7 +837,7 @@ package Sidef::Types::String::String {
 
     sub lines {
         my ($self) = @_;
-        Sidef::Types::Array::Array->new(map { __PACKAGE__->new($_) } CORE::split(/\R/, $$self));
+        Sidef::Types::Array::Array->new([map { __PACKAGE__->new($_) } CORE::split(/\R/, $$self)]);
     }
 
     sub each_line {

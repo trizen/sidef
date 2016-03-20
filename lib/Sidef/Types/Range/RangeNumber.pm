@@ -222,13 +222,13 @@ package Sidef::Types::Range::RangeNumber {
     sub map {
         my ($self, $code) = @_;
 
-        my $values = Sidef::Types::Array::Array->new;
-        my $iter   = $self->iter();
+        my @values;
+        my $iter = $self->iter();
         while (defined(my $num = $iter->())) {
-            push @$values, $code->run($num);
+            push @values, $code->run($num);
         }
 
-        $values;
+        Sidef::Types::Array::Array->new(\@values);
     }
 
     *collect = \&map;
@@ -236,13 +236,13 @@ package Sidef::Types::Range::RangeNumber {
     sub grep {
         my ($self, $code) = @_;
 
-        my $values = Sidef::Types::Array::Array->new;
-        my $iter   = $self->iter();
+        my @values;
+        my $iter = $self->iter();
         while (defined(my $num = $iter->())) {
-            push(@$values, $num) if $code->run($num);
+            push(@values, $num) if $code->run($num);
         }
 
-        $values;
+        Sidef::Types::Array::Array->new(\@values);
     }
 
     *filter = \&grep;
@@ -301,13 +301,15 @@ package Sidef::Types::Range::RangeNumber {
 
         my ($name) = (defined($AUTOLOAD) ? ($AUTOLOAD =~ /^.*[^:]::(.*)$/) : '');
 
-        my $array = Sidef::Types::Array::Array->new;
-        my $iter  = $self->iter();
+        my @array;
+        my $iter = $self->iter();
         while (defined(my $num = $iter->())) {
-            push @$array, $num;
+            push @array, $num;
         }
 
-        $name eq '' ? $array : $array->$name(@args);
+        $name eq ''
+          ? Sidef::Types::Array::Array->new(\@array)
+          : Sidef::Types::Array::Array->new(\@array)->$name(@args);
     }
 
     {

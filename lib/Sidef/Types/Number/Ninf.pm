@@ -295,6 +295,7 @@ package Sidef::Types::Number::Ninf {
     ## -inf.times {} is a no-op
     #
     sub times { $_[1] }
+
     *itimes = \&times;
 
     #
@@ -399,6 +400,12 @@ package Sidef::Types::Number::Ninf {
     }
 
     *commify = \&dump;
+
+    sub of {
+        Sidef::Types::Array::Array->new();
+    }
+
+    *defs = \&of;
 
     sub numerator {
         Sidef::Types::Number::Number::MONE;

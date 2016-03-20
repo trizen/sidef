@@ -318,6 +318,38 @@ package Sidef::Types::Number::Inf {
         $block;
     }
 
+    sub of {
+        my ($x, $block) = @_;
+
+        my @array;
+        my $i = Math::GMPz::Rmpz_init_set_ui(1);
+
+        while (1) {
+            my $num = Math::GMPq::Rmpq_init();
+            Math::GMPq::Rmpq_set_z($num, $i);
+            Math::GMPz::Rmpz_add_ui($i, $i, 1);
+            push @array, $block->run(bless \$num, 'Sidef::Types::Number::Number');
+        }
+
+        Sidef::Types::Array::Array->new(\@array);
+    }
+
+    sub defs {
+        my ($x, $block) = @_;
+
+        my @array;
+        my $i = Math::GMPz::Rmpz_init_set_ui(1);
+
+        while (1) {
+            my $num = Math::GMPq::Rmpq_init();
+            Math::GMPq::Rmpq_set_z($num, $i);
+            Math::GMPz::Rmpz_add_ui($i, $i, 1);
+            push @array, $block->run(bless \$num, 'Sidef::Types::Number::Number') // next;
+        }
+
+        Sidef::Types::Array::Array->new(\@array);
+    }
+
     sub pow {
         my ($x, $y) = @_;
 

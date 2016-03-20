@@ -1556,7 +1556,7 @@ package Sidef::Types::Number::Number {
         my $z = Math::GMPz::Rmpz_init();
         Math::GMPz::Rmpz_set_q($z, ${$_[0]});
         Math::GMPz::Rmpz_abs($z, $z);
-        Sidef::Types::Array::Array->new(map { _new_uint($_) } split(//, Math::GMPz::Rmpz_get_str($z, 10)));
+        Sidef::Types::Array::Array->new([map { _new_uint($_) } split(//, Math::GMPz::Rmpz_get_str($z, 10))]);
     }
 
     sub digit {
@@ -2071,16 +2071,16 @@ package Sidef::Types::Number::Number {
         $to   = $$to;
         $step = $$step;
 
-        my $acc   = Math::GMPq::Rmpq_init();
-        my $array = Sidef::Types::Array::Array->new;
+        my $acc = Math::GMPq::Rmpq_init();
+        my @array;
         for (Math::GMPq::Rmpq_set($acc, $from) ;
              Math::GMPq::Rmpq_cmp($acc, $to) <= 0 ; Math::GMPq::Rmpq_add($acc, $acc, $step)) {
             my $copy = Math::GMPq::Rmpq_init();
             Math::GMPq::Rmpq_set($copy, $acc);
-            push @$array, bless(\$copy, __PACKAGE__);
+            push @array, bless(\$copy, __PACKAGE__);
         }
 
-        $array;
+        Sidef::Types::Array::Array->new(\@array);
     }
 
     *arr_to = \&array_to;
@@ -2100,16 +2100,16 @@ package Sidef::Types::Number::Number {
         $to   = $$to;
         $step = $$step;
 
-        my $acc   = Math::GMPq::Rmpq_init();
-        my $array = Sidef::Types::Array::Array->new;
+        my $acc = Math::GMPq::Rmpq_init();
+        my @array;
         for (Math::GMPq::Rmpq_set($acc, $from) ;
              Math::GMPq::Rmpq_cmp($acc, $to) >= 0 ; Math::GMPq::Rmpq_sub($acc, $acc, $step)) {
             my $copy = Math::GMPq::Rmpq_init();
             Math::GMPq::Rmpq_set($copy, $acc);
-            push @$array, bless(\$copy, __PACKAGE__);
+            push @array, bless(\$copy, __PACKAGE__);
         }
 
-        $array;
+        Sidef::Types::Array::Array->new(\@array);
     }
 
     *arr_downto = \&array_downto;
@@ -2266,9 +2266,24 @@ package Sidef::Types::Number::Number {
 
     sub of {
         my ($x, $obj) = @_;
-        ref($obj) eq 'Sidef::Types::Block::Block'
-          ? Sidef::Types::Array::Array->new(map { $obj->run(_new_uint($_)) } 1 .. Math::GMPq::Rmpq_get_d($$x))
-          : Sidef::Types::Array::Array->new(($obj) x Math::GMPq::Rmpq_get_d($$x));
+
+        if (ref($obj) eq 'Sidef::Types::Block::Block') {
+
+            my @array;
+            my $num = $$x;
+
+            for (my $i = Math::GMPz::Rmpz_init_set_ui(1) ;
+                 Math::GMPz::Rmpz_cmp($i, $num) <= 0 ;
+                 Math::GMPz::Rmpz_add_ui($i, $i, 1)) {
+                my $n = Math::GMPq::Rmpq_init();
+                Math::GMPq::Rmpq_set_z($n, $i);
+                push @array, $obj->run(bless(\$n, __PACKAGE__));
+            }
+
+            return Sidef::Types::Array::Array->new(\@array);
+        }
+
+        Sidef::Types::Array::Array->new([($obj) x Math::GMPq::Rmpq_get_d($$x)]);
     }
 
     sub defs {
@@ -2281,12 +2296,11 @@ package Sidef::Types::Number::Number {
         for (my $i = Math::GMPz::Rmpz_init_set_ui(1) ; ; Math::GMPz::Rmpz_add_ui($i, $i, 1)) {
             my $n = Math::GMPq::Rmpq_init();
             Math::GMPq::Rmpq_set_z($n, $i);
-            my $item = $block->run(bless(\$n, __PACKAGE__)) // next;
-            push @items, $item;
+            push @items, $block->run(bless(\$n, __PACKAGE__)) // next;
             last if ++$j == $end;
         }
 
-        Sidef::Types::Array::Array->new(@items);
+        Sidef::Types::Array::Array->new(\@items);
     }
 
     sub times {

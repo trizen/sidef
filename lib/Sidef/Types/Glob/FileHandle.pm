@@ -201,7 +201,8 @@ package Sidef::Types::Glob::FileHandle {
 
     sub read_lines {
         my ($self) = @_;
-        Sidef::Types::Array::Array->new(map { chomp($_); Sidef::Types::String::String->new($_) } CORE::readline($self->{fh}));
+        Sidef::Types::Array::Array->new(
+                                       [map { chomp($_); Sidef::Types::String::String->new($_) } CORE::readline($self->{fh})]);
     }
 
     *readlines = \&read_lines;
@@ -210,14 +211,14 @@ package Sidef::Types::Glob::FileHandle {
     sub grep {
         my ($self, $obj) = @_;
 
-        my $array = Sidef::Types::Array::Array->new;
+        my @array;
 
         if (ref($obj) eq 'Sidef::Types::Regex::Regex') {
             my $re = $obj->{regex};
             while (defined(my $line = CORE::readline($self->{fh}))) {
                 chomp($line);
                 if ($line =~ $re) {
-                    push @{$array}, Sidef::Types::String::String->new($line);
+                    push @array, Sidef::Types::String::String->new($line);
                 }
             }
         }
@@ -225,42 +226,46 @@ package Sidef::Types::Glob::FileHandle {
             while (defined(my $line = CORE::readline($self->{fh}))) {
                 chomp($line);
                 my $string = Sidef::Types::String::String->new($line);
-                push @{$array}, $string if $obj->run($line);
+                push @array, $string if $obj->run($line);
             }
         }
 
-        $array;
+        Sidef::Types::Array::Array->new(\@array);
     }
 
     sub map {
         my ($self, $block) = @_;
 
-        my $array = Sidef::Types::Array::Array->new;
+        my @array;
         while (defined(my $line = CORE::readline($self->{fh}))) {
             chomp($line);
-            push @{$array}, $block->run(Sidef::Types::String::String->new($line));
+            push @array, $block->run(Sidef::Types::String::String->new($line));
         }
-        $array;
+        Sidef::Types::Array::Array->new(\@array);
     }
 
     sub words {
         my ($self) = @_;
         Sidef::Types::Array::Array->new(
-            map {
-                map    { Sidef::Types::String::String->new($_) }
-                  grep { $_ ne '' }
-                  split(' ', $_)
-              } CORE::readline($self->{fh})
+            [
+             map {
+                 map    { Sidef::Types::String::String->new($_) }
+                   grep { $_ ne '' }
+                   split(' ', $_)
+               } CORE::readline($self->{fh})
+            ]
         );
     }
 
     sub chars {
         my ($self) = @_;
         Sidef::Types::Array::Array->new(
-            map { Sidef::Types::String::String->new($_) } do {
-                local $/;
-                split(//, scalar CORE::readline($self->{fh}));
-              }
+            [
+             map { Sidef::Types::String::String->new($_) } do {
+                 local $/;
+                 split(//, scalar CORE::readline($self->{fh}));
+               }
+            ]
         );
     }
 

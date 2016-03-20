@@ -207,6 +207,16 @@ package Sidef::Types::Number::Nan {
 
     *de = \&denominator;
 
+    sub of {
+        Sidef::Types::Array::Array->new();
+    }
+
+    *defs = \&of;
+
+    sub times { $_[1] }
+
+    *itimes = \&times;
+
     sub parts {
         (Sidef::Types::Number::Number::ZERO, Sidef::Types::Number::Number::ZERO);
     }

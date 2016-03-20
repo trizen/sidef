@@ -158,7 +158,7 @@ package Sidef::Object::Object {
             @parents;
         };
 
-        Sidef::Types::Array::Array->new(map { Sidef::Types::String::String->new($_) } $extract_parents->(CORE::ref($obj)));
+        Sidef::Types::Array::Array->new([map { Sidef::Types::String::String->new($_) } $extract_parents->(CORE::ref($obj))]);
     }
 
     sub interpolate {

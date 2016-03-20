@@ -36,7 +36,7 @@ package Sidef::Types::Glob::DirHandle {
         while (defined(my $file = $self->read)) {
             push @files, $file;
         }
-        Sidef::Types::Array::Array->new(@files);
+        Sidef::Types::Array::Array->new(\@files);
     }
 
     *read_dir = \&get_files;

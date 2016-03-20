@@ -38,7 +38,7 @@ package Sidef::Types::Hash::Hash {
 
     sub items {
         my ($self, @keys) = @_;
-        Sidef::Types::Array::Array->new(map { exists($self->{$_}) ? $self->{$_} : undef } @keys);
+        Sidef::Types::Array::Array->new([map { exists($self->{$_}) ? $self->{$_} : undef } @keys]);
     }
 
     sub item {
@@ -264,12 +264,12 @@ package Sidef::Types::Hash::Hash {
 
     sub keys {
         my ($self) = @_;
-        Sidef::Types::Array::Array->new(map { Sidef::Types::String::String->new($_) } CORE::keys %$self);
+        Sidef::Types::Array::Array->new([map { Sidef::Types::String::String->new($_) } CORE::keys %$self]);
     }
 
     sub values {
         my ($self) = @_;
-        Sidef::Types::Array::Array->new(CORE::values %$self);
+        Sidef::Types::Array::Array->new([CORE::values %$self]);
     }
 
     sub each_value {
@@ -311,7 +311,7 @@ package Sidef::Types::Hash::Hash {
         my ($key, $value) = each(%$self);
 
         $key // return;
-        Sidef::Types::Array::Array->new(Sidef::Types::String::String->new($key), $value);
+        Sidef::Types::Array::Array->new([Sidef::Types::String::String->new($key), $value]);
     }
 
     *each_kv   = \&each;
@@ -326,16 +326,18 @@ package Sidef::Types::Hash::Hash {
             push @array, [$key, $str, $code->run($str, $self->{$key})];
         }
 
-        Sidef::Types::Array::Array->new(map { Sidef::Types::Array::Array->new($_->[1], $self->{$_->[0]}) }
-                                        (sort { $a->[2] cmp $b->[2] } @array));
+        Sidef::Types::Array::Array->new(
+                   [map { Sidef::Types::Array::Array->new($_->[1], $self->{$_->[0]}) } (sort { $a->[2] cmp $b->[2] } @array)]);
     }
 
     sub to_a {
         my ($self) = @_;
         Sidef::Types::Array::Array->new(
-            map {
-                Sidef::Types::Array::Pair->new(Sidef::Types::String::String->new($_), $self->{$_})
-              } CORE::keys %$self
+            [
+             map {
+                 Sidef::Types::Array::Pair->new(Sidef::Types::String::String->new($_), $self->{$_})
+               } CORE::keys %$self
+            ]
         );
     }
 

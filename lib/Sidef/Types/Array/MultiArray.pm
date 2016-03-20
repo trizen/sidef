@@ -43,7 +43,7 @@ package Sidef::Types::Array::MultiArray {
             push @arr, scalar $code->run(map { $_->[$i % @{$_}] } @{$self});
         }
 
-        Sidef::Types::Array::Array->new(@arr);
+        Sidef::Types::Array::Array->new(\@arr);
     }
 
     sub each {
@@ -70,7 +70,7 @@ package Sidef::Types::Array::MultiArray {
 
     sub to_array {
         my ($self) = @_;
-        Sidef::Types::Array::Array->new(map { Sidef::Types::Array::Array->new(@{$_}) } @{$self});
+        Sidef::Types::Array::Array->new([map { Sidef::Types::Array::Array->new(@{$_}) } @{$self}]);
     }
 
     *to_a = \&to_array;

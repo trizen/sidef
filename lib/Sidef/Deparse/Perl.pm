@@ -405,7 +405,7 @@ HEADER
 
     sub _dump_array {
         my ($self, $ref, $array) = @_;
-        $ref . '->new(' . join(', ', map { $self->deparse_expr(ref($_) eq 'HASH' ? $_ : {self => $_}) } @{$array}) . ')';
+        $ref . '->new([' . join(', ', map { $self->deparse_expr(ref($_) eq 'HASH' ? $_ : {self => $_}) } @{$array}) . '])';
     }
 
     sub _dump_indices {

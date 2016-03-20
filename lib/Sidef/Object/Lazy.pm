@@ -30,9 +30,9 @@ package Sidef::Object::Lazy {
 
     sub to_a {
         my ($self) = @_;
-        my $arr = Sidef::Types::Array::Array->new;
-        $self->_xs(sub { push @{$arr}, @_; 0 });
-        $arr;
+        my @arr;
+        $self->_xs(sub { push @arr, @_; 0 });
+        Sidef::Types::Array::Array->new(\@arr);
     }
 
     sub each {
@@ -71,15 +71,16 @@ package Sidef::Object::Lazy {
 
         $n > 0 || return Sidef::Types::Array::Array->new;
 
-        my $arr = Sidef::Types::Array::Array->new;
+        my @arr;
+
         $self->_xs(
             sub {
-                push @{$arr}, @_;
-                @{$arr} >= $n ? 1 : 0;
+                push @arr, @_;
+                @arr >= $n ? 1 : 0;
             }
         );
 
-        $arr;
+        Sidef::Types::Array::Array->new(\@arr);
     }
 
     #

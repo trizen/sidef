@@ -78,12 +78,12 @@ package Sidef::Types::Regex::Match {
 
     sub pos {
         my ($self) = @_;
-        Sidef::Types::Array::Array->new(map { Sidef::Types::Number::Number->new($_) } @{$self->{match_pos}});
+        Sidef::Types::Array::Array->new([map { Sidef::Types::Number::Number->new($_) } @{$self->{match_pos}}]);
     }
 
     sub captures {
         my ($self) = @_;
-        Sidef::Types::Array::Array->new(map { Sidef::Types::String::String->new($_) } @{$self->{captures}});
+        Sidef::Types::Array::Array->new([map { Sidef::Types::String::String->new($_) } @{$self->{captures}}]);
     }
 
     *cap  = \&captures;
