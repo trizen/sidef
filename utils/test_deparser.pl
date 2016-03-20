@@ -53,7 +53,10 @@ sub parse_deparse {
     return ($deparsed, \@statements);
 }
 
-my %ignore = ('module_definition.sf' => 1,);
+my %ignore = (
+              'module_definition.sf' => 1,
+              'barnsley_fern.sf'     => 1,
+             );
 
 my $dir = shift() // die "usage: $0 [scripts dir]\n";
 

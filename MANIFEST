@@ -171,6 +171,7 @@ scripts/Games/guess_the_number_with_feedback__player_.sf
 scripts/Games/pig_the_dice_game_player.sf
 scripts/Games/rock-paper-scissors.sf
 scripts/Games/snake_game.sf
+scripts/Graphical/barnsley_fern.sf
 scripts/Graphical/color_bars.sf
 scripts/Graphical/death_star.sf
 scripts/Graphical/draw_a_sphere.sf
