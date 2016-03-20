@@ -2271,6 +2271,24 @@ package Sidef::Types::Number::Number {
           : Sidef::Types::Array::Array->new(($obj) x Math::GMPq::Rmpq_get_d($$x));
     }
 
+    sub defs {
+        my ($x, $block) = @_;
+
+        my $j   = 0;
+        my $end = Math::GMPq::Rmpq_get_d($$x);
+
+        my @items;
+        for (my $i = Math::GMPz::Rmpz_init_set_ui(1) ; ; Math::GMPz::Rmpz_add_ui($i, $i, 1)) {
+            my $n = Math::GMPq::Rmpq_init();
+            Math::GMPq::Rmpq_set_z($n, $i);
+            my $item = $block->run(bless(\$n, __PACKAGE__)) // next;
+            push @items, $item;
+            last if ++$j == $end;
+        }
+
+        Sidef::Types::Array::Array->new(@items);
+    }
+
     sub times {
         my ($num, $block) = @_;
 

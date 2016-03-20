@@ -40,6 +40,14 @@ Return the
 
 =cut
 
+=head2 iter
+
+Lazy.iter() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 map
 
 Lazy.map() -> I<Obj>
