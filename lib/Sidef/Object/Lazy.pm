@@ -48,13 +48,13 @@ package Sidef::Object::Lazy {
 
         Sidef::Types::Block::Block->new(
             code => sub {
-                {
+              ITEM: {
                     my $item = $iter->() // return;
                     my @arg = ($item);
                     foreach my $call (@{$self->{calls}}) {
                         @arg = $call->(@arg);
+                        @arg || redo ITEM;
                     }
-                    @arg || redo;
                     $arg[0];
                 }
             }
