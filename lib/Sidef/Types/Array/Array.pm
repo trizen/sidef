@@ -905,7 +905,11 @@ package Sidef::Types::Array::Array {
     }
 
     sub freq {
-        my ($self) = @_;
+        my ($self, $code) = @_;
+
+        if (defined($code)) {
+            return $self->freq_by($code);
+        }
 
         my %hash;
         foreach my $item (@{$self}) {
@@ -919,7 +923,20 @@ package Sidef::Types::Array::Array {
         Sidef::Types::Hash::Hash->new(%hash);
     }
 
-    *frequency = \&freq;
+    sub freq_by {
+        my ($self, $code) = @_;
+
+        my %hash;
+        foreach my $item (@{$self}) {
+            $hash{$code->run($item)}++;
+        }
+
+        foreach my $key (keys %hash) {
+            $hash{$key} = Sidef::Types::Number::Number::_new_uint($hash{$key});
+        }
+
+        Sidef::Types::Hash::Hash->new(%hash);
+    }
 
     sub first_by {
         my ($self, $code) = @_;

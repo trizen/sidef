@@ -471,7 +471,13 @@ Array.freq() -> I<Obj>
 
 Return the
 
-Aliases: I<frequency>
+=cut
+
+=head2 freq_by
+
+Array.freq_by() -> I<Obj>
+
+Return the
 
 =cut
 

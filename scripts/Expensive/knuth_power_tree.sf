@@ -10,16 +10,16 @@ var lvl = [[1]]
 func path(n) is cached {
     n || return []
     while (n !~ p) {
-        var q = []
-        for x in lvl[0] {
-            for y in path(x) {
-                break if (x+y ~~ p)
-                y = x+y
-                p{y} = x
-                q << y
+        lvl[0] = gather {
+            for x in lvl[0] {
+                for y in path(x) {
+                    break if (x+y ~~ p)
+                    y = x+y
+                    p{y} = x
+                    take(y)
+                }
             }
         }
-        lvl[0] = q
     }
     path(p{n}) + [n]
 }
