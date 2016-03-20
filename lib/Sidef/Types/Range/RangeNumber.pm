@@ -26,7 +26,14 @@ package Sidef::Types::Range::RangeNumber {
         my (undef, $from, $to, $step) = @_;
 
         if (defined $to) {
-            Sidef::Types::Number::Number::_valid($from, $to, defined($step) ? $step : ());
+            Sidef::Types::Number::Number::_valid(
+                                                 $from,
+                                                 (
+                                                       ref($to) eq 'Sidef::Types::Number::Inf'
+                                                    || ref($to) eq 'Sidef::Types::Number::Ninf' ? () : $to
+                                                 ),
+                                                 defined($step) ? $step : ()
+                                                );
             $from = ref($from) ? $$from : $from;
             $to   = ref($to)   ? $$to   : $to;
             $step = ref($step) ? $$step : defined($step) ? $step : $ONE;
