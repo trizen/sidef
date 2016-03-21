@@ -396,13 +396,13 @@ package Sidef::Parser {
         state $x = require File::Basename;
         my $basename = File::Basename::basename($0);
 
-        my $error = sprintf("%s: %s\n%s:%s: syntax error, %s\n%s\n",
+        my $error = sprintf("%s: %s\n\nFile : %s\nLine : %s\nError: %s\n\n" . ("~" x 80) . "\n%s\n",
                             $basename,
                             $lines[rand @lines],
                             $self->{file_name} // '-',
                             $self->{line}, join(', ', grep { defined } $opt{error}, $opt{reason}), $error_line,);
 
-        $error .= ' ' x ($point) . '^' . "\n";
+        $error .= ' ' x ($point) . '^' . "\n" . ('~' x 80) . "\n";
 
         if (exists($opt{var})) {
 
