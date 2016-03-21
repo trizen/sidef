@@ -11,7 +11,7 @@ class Honeycombs(
     Array letters = ('A' .. 'Z' -> shuffle.first(20)),
 ) {
 
-    define tk   = %s<Tk>
+    define tk   = %S<Tk>
     has changed = Hash()
 
     func altitude(n) {
