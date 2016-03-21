@@ -515,7 +515,10 @@ HEADER
 
     sub _dump_class_name {
         my ($self, $class) = @_;
-        join('::', $self->{environment_name}, $class->{class}, $class->{name});
+        join('::',
+             $self->{environment_name},
+             $class->{class} || 'main',
+             $class->{name}  || (Sidef::normalize_type(ref($class)) . refaddr($class)));
     }
 
     sub deparse_generic {
@@ -764,11 +767,6 @@ HEADER
                     $code .= ($package_name = $self->_get_reftype($obj->{name}));
                 }
                 else {
-
-                    if ($obj->{name} eq '') {
-                        $obj->{name} = '__FUNC__' . $refaddr;
-                    }
-
                     $code .= ($package_name = $self->_dump_class_name($obj));
                 }
 
@@ -781,7 +779,7 @@ HEADER
                 local $self->{class_attributes} = $obj->{attributes} if exists $obj->{attributes};
                 local $self->{ref_class}        = 1 if ref($obj->{name});
                 $code .= $self->deparse_expr({self => $block});
-                $code .= '; ' . $self->_dump_string($package_name) . '}';
+                $code .= "; '$package_name'}";
             }
         }
         elsif ($ref eq 'Sidef::Types::Block::BlockInit') {
@@ -988,7 +986,7 @@ HEADER
             else {
                 $Sidef::SPACES += $Sidef::SPACES_INCR;
                 $code =
-                    "package $name {\n"
+                    "do { package $name {\n"
                   . (' ' x $Sidef::SPACES)
                   . "\$new$refaddr = Sidef::Types::Block::Block->new(code => sub {" . "\n"
                   . (' ' x $Sidef::SPACES)
@@ -1013,7 +1011,8 @@ HEADER
                   . join("\n" . (' ' x $Sidef::SPACES),
                          map { "sub $_->{name} : lvalue { \$_[0]->{$_->{name}} }" } @{$obj->{vars}})
                   . "\n"
-                  . (' ' x ($Sidef::SPACES - $Sidef::SPACES_INCR)) . "}";
+                  . (' ' x ($Sidef::SPACES - $Sidef::SPACES_INCR))
+                  . "}; '$name'}";
 
                 push @{$self->{function_declarations}}, [$refaddr, "my \$new$refaddr;"];
 
