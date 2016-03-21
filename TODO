@@ -1,15 +1,17 @@
 TODO list for Sidef
 
-General:
-    * improve the OO system
-    * implement sidef in Sidef (too optimistic?)
-
 Classes:
-    * implement roles (from Perl 6) and add the `does` trait for classes
+    * Implement roles (from Perl 6) and add the `does` trait for classes
       (http://doc.perl6.org/language/objects#Roles)
 
 Blocks:
-    * find a better way to implement the `next` and `last` statements
+    * Find a better way to implement the `next` and `break` statements (optionally, accept next(n) and break(n))
 
 Method/functions:
-    * implement the `is export` trait for functions and classes (maybe)
+    * Implement the `is export` trait for functions and classes (maybe)
+
+Speculations:
+    * Make all core methods (including user-defined methods) real multimethods, using Class::Multimethods.
+    * Replace the current numerical system with Math::BigNum.
+    * Bootstrap Sidef by writing a code generator in Sidef that generates Perl code.
+    * Rewrite all core libraries in Sidef.
