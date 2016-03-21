@@ -178,6 +178,7 @@ scripts/Graphical/draw_a_sphere.sf
 scripts/Graphical/fractal_tree.sf
 scripts/Graphical/hello_world_graphical.sf
 scripts/Graphical/hello_world_graphical_1.sf
+scripts/Graphical/honeycombs.sf
 scripts/Graphical/munching_squares.sf
 scripts/Graphical/sierpinski_pentagon.sf
 scripts/Graphical/sierpinski_triangle_graphical.sf
