@@ -239,6 +239,7 @@ package Sidef::Parser {
                   static
                   define
                   struct
+                  subset
                   module
 
                   DATA
