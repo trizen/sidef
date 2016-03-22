@@ -320,10 +320,13 @@ package Sidef::Deparse::Sidef {
         }
         elsif ($ref eq 'Sidef::Variable::ClassInit') {
             if ($addr{refaddr($obj)}++) {
-                $code =
-                  $obj->{name} eq '' ? '__CLASS__'
-                  : $self->_dump_class_name(  $obj->{class} ne $self->{class} ? ($obj->{class} . '::' . $obj->{name})
-                                            : $obj->{name});
+                $code = (
+                         $obj->{name} eq '' ? '__CLASS__'
+                         : $self->_dump_class_name(
+                                                     $obj->{class} ne $self->{class} ? ($obj->{class} . '::' . $obj->{name})
+                                                   : $obj->{name}
+                                                  )
+                        );
             }
             else {
                 my $block     = $obj->{block};

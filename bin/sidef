@@ -158,8 +158,8 @@ else {
         if (defined($args{R}) and lc($args{R}) eq 'perl') {
 
             my $header =
-                "\nuse lib ("
-              . join(', ', map { qq{"\Q$_\E"} } @INC)
+                "\nuse lib (" . q{"}
+              . quotemeta(File::Basename::dirname($INC{"Sidef.pm"})) . q{"}
               . ");\n\n"
               . "use Sidef;\n\n"
               . "binmode(STDIN, ':utf8');\n"
