@@ -74,3 +74,24 @@ circle.type   == "Circle"   || die "circle type error";
 square.type   == "Square"   || die "square type error";
 triangle.type == "Triangle" || die "triangle type error";
 circle.name   == "Ringie"   || die "circle name error";
+
+#
+## Test #2
+#
+
+class Example(name) {
+    method hi {
+        "Hi, #{self.name}!"
+    }
+}
+
+class Example {
+    method hello {
+        "Hello, #{self.name}!"
+    }
+}
+
+var obj = Example("Foo")
+
+assert_eq(obj.hi, "Hi, Foo!")
+assert_eq(obj.hello, "Hello, Foo!")
