@@ -240,14 +240,12 @@ package Sidef::Types::String::String {
         $self->times($num // (Sidef::Types::Number::Number::ONE));
     }
 
-    sub equals {
+    sub eq {
         my ($self, $arg) = @_;
         $$self eq $$arg
           ? (Sidef::Types::Bool::Bool::TRUE)
           : (Sidef::Types::Bool::Bool::FALSE);
     }
-
-    *eq = \&equals;
 
     sub ne {
         my ($self, $arg) = @_;
@@ -1477,7 +1475,7 @@ package Sidef::Types::String::String {
         *{__PACKAGE__ . '::' . '+'}   = \&append;
         *{__PACKAGE__ . '::' . '++'}  = \&inc;
         *{__PACKAGE__ . '::' . '-'}   = \&subtract;
-        *{__PACKAGE__ . '::' . '=='}  = \&equals;
+        *{__PACKAGE__ . '::' . '=='}  = \&eq;
         *{__PACKAGE__ . '::' . '!='}  = \&ne;
         *{__PACKAGE__ . '::' . '≠'} = \&ne;
         *{__PACKAGE__ . '::' . '>'}   = \&gt;
