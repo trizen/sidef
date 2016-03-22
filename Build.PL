@@ -36,6 +36,7 @@ my $builder = Module::Build->new(
     requires => {
                  'perl'           => '5.18.0',
                  'utf8'           => 0,
+                 'parent'         => 0,
                  'Memoize'        => 0,
                  'Cwd'            => 0,
                  'File::Spec'     => 0,

@@ -132,6 +132,7 @@ requires:
   Storable: '0'
   Term::ReadLine: '0'
   Time::HiRes: '0'
+  parent: '0'
   perl: v5.18.0
   utf8: '0'
 resources:

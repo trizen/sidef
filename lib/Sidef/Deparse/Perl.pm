@@ -836,7 +836,7 @@ HEADER
                                  || exists($self->{ref_class}) ? '' : ' Sidef::Object::Object');
 
                             if ($base_pkgs ne '') {
-                                $code .= "use base qw($base_pkgs);\n";
+                                $code .= "use parent qw(-norequire $base_pkgs);\n";
                             }
                         }
 
@@ -1052,7 +1052,7 @@ HEADER
                 $code = qq{
                     do {
                         package $name {
-                            use base qw(@parents)
+                            use parent qw(-norequire @parents)
                         };
                         '$name'
                     }
