@@ -46,4 +46,46 @@ assert_eq(job2.salary, 2400);
 assert_eq(woman.age, 24);
 assert_eq(man.age, 31);
 
+#
+## Lexical structures
+#
+
+func bar {
+    struct Foo {
+        String name { |s| s != 'foo' },
+        Number age  { |n| n != 42 },
+    }
+
+    var obj = Foo("bar", 21)
+
+    assert_eq(obj.name, "bar")
+    assert_eq(obj.age, 21)
+}
+
+
+func foo {
+    struct Foo {
+        String name,
+        Number age,
+    }
+
+    var obj = Foo("foo", 42)
+
+    assert_eq(obj.name, "foo")
+    assert_eq(obj.age, 42)
+}
+
+struct Foo {
+    Number x,
+    Number y,
+}
+
+foo()
+bar()
+
+var obj = Foo(5, 6)
+
+assert_eq(obj.x, 5)
+assert_eq(obj.y, 6)
+
 say "** Test passed!";

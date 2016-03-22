@@ -296,3 +296,25 @@ f(2)
 failtest(func { f(43) }, "f(43)")
 failtest(func { f(-42) }, "f(-42)")
 failtest(func { f("foo") }, "f('foo')")
+
+#
+## Subsets inside modules
+#
+
+module Greeting {
+
+    class Hello(name) {
+        method greet { say "Hello, #{self.name}!" }
+    }
+
+    class Hi < Hello {
+        method greet { say "Hi, #{self.name}!" }
+    }
+
+    subset Hello < Hi;
+
+    func greet(obj < Hi) { obj.greet }       # `Hi` is the upper limit
+
+    greet(Hi("Foo"))        # ok
+    greet(Hello("Bar"))     # ok
+}

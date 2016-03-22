@@ -118,6 +118,10 @@ package Sidef::Deparse::Sidef {
 
         my $ref = ref($obj);
 
+        if (exists $self->{data_types}{$ref}) {
+            return $self->{data_types}{$ref};
+        }
+
         ($ref eq 'Sidef::Variable::ClassInit' || $ref eq 'Sidef::Variable::Struct' || $ref eq 'Sidef::Variable::Subset')
           ? $obj->{name}
           : $ref eq 'Sidef::Types::Block::BlockInit' ? 'Block'
@@ -317,11 +321,9 @@ package Sidef::Deparse::Sidef {
         elsif ($ref eq 'Sidef::Variable::ClassInit') {
             if ($addr{refaddr($obj)}++) {
                 $code =
-                  $self->_dump_class_name(
-                                     $obj->{name} eq ''
-                                     ? '__CLASS__'
-                                     : ($obj->{class} ne $self->{class} ? ($obj->{class} . '::' . $obj->{name}) : $obj->{name})
-                  );
+                  $obj->{name} eq '' ? '__CLASS__'
+                  : $self->_dump_class_name(  $obj->{class} ne $self->{class} ? ($obj->{class} . '::' . $obj->{name})
+                                            : $obj->{name});
             }
             else {
                 my $block     = $obj->{block};
@@ -334,13 +336,14 @@ package Sidef::Deparse::Sidef {
                 }
 
                 local $self->{class} = $obj->{class};
-                $code .= "class " . $self->_dump_class_name($obj->{name});
+                my $name = $self->_dump_class_name($obj->{name});
+                $code .= "class " . $name;
                 $code .= '(' . $self->_dump_vars(@{$obj->{vars}}) . ')';
                 if (exists $obj->{inherit}) {
-                    $code .= ' << ' . join(', ', map { $self->deparse_expr({self => $_}) } @{$obj->{inherit}}) . ' ';
-                }
-                elsif (exists $obj->{struct}) {
-                    $code .= ' << ' . join(', ', map { $self->deparse_expr({self => $_}) } @{$obj->{struct}}) . ' ';
+                    my $inherited = join(', ', grep { $_ ne $name } map { $self->_dump_class_name($_) } @{$obj->{inherit}});
+                    if ($inherited ne '') {
+                        $code .= ' < ' . $inherited . ' ';
+                    }
                 }
                 $code .= $self->deparse_expr({self => $block});
 

@@ -1291,7 +1291,7 @@ package Sidef::Parser {
                                       );
                 }
 
-                my $subset = bless({name => $name}, 'Sidef::Variable::Subset');
+                my $subset = bless({name => $name, class => $class_name}, 'Sidef::Variable::Subset');
 
                 unshift @{$self->{vars}{$class_name}},
                   {
@@ -1439,40 +1439,17 @@ package Sidef::Parser {
                 my $name       = '';
                 my $class_name = $self->{class};
                 my $built_in_obj;
-                if ($type eq 'class' and /\G(?![{(])/) {
+                if ($type eq 'class' and /\G($self->{var_name_re})\h*/gco) {
 
-                    my $try_expr;
-                    if (/\G($self->{var_name_re})\h*/gco) {
-                        ($name, $class_name) = $self->get_name_and_class($1);
-                    }
-                    else {
-                        $try_expr = 1;
-                    }
+                    ($name, $class_name) = $self->get_name_and_class($1);
 
-                    if (
-                        $try_expr
-                        or exists($self->{built_in_classes}{$name})
+                    if (exists($self->{built_in_classes}{$name})) {
 
-                        #or do {
-                        #    my $obj = $self->find_var($name, $class_name);
-                        #    defined($obj) and $obj->{type} eq 'class';
-                        #}
-                      ) {
+                        my ($obj) = $self->parse_expr(code => \$name);
 
-                        my ($obj) = $self->parse_expr(code => $try_expr ? $opt{code} : \$name);
-
-                        if (ref($obj) eq 'HASH') {
-                            $self->fatal_error(
-                                               error => "can't use an expression in class declaration",
-                                               code  => $_,
-                                               pos   => pos($_),
-                                              );
-                        }
-
-                        $built_in_obj = $obj;
-
-                        if (defined $built_in_obj) {
-                            $name = '';
+                        if (defined($obj)) {
+                            $name         = '';
+                            $built_in_obj = $obj;
                         }
                     }
                 }
@@ -1510,6 +1487,14 @@ package Sidef::Parser {
                                        code   => $_,
                                        pos    => pos($_),
                                       );
+
+                {
+                    my ($var) = $self->find_var($name, $class_name);
+
+                    if (defined($var) and $var->{type} eq 'class') {
+                        push @{$obj->{inherit}}, ref($var->{obj}{name}) ? $var->{obj}{name} : $var->{obj};
+                    }
+                }
 
                 my $has_kids = 0;
                 my $parent;
@@ -1579,7 +1564,7 @@ package Sidef::Parser {
                             elsif (exists $self->{built_in_classes}{$name}) {
                                 $self->fatal_error(
                                                    error  => "Inheritance from built-in classes is not allowed",
-                                                   reason => "class `$name` is a built-in class",
+                                                   reason => "`$name` is a built-in class",
                                                    code   => $_,
                                                    pos    => pos($_) - length($name) - 1,
                                                   );

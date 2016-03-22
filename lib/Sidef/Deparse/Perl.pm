@@ -180,8 +180,10 @@ HEADER
             return $target;
         }
 
-        ($ref eq 'Sidef::Variable::ClassInit' || $ref eq 'Sidef::Variable::Struct' || $ref eq 'Sidef::Variable::Subset')
-          ? $self->_dump_class_name($obj)
+        ($ref eq 'Sidef::Variable::Struct' || $ref eq 'Sidef::Variable::Subset')
+          ? ($self->_dump_class_name($obj) . refaddr($obj))
+          : $ref eq 'Sidef::Variable::ClassInit'
+          ? (ref($obj->{name}) ? $self->_dump_class_name($obj->{name}) : $self->_dump_class_name($obj))
           : $ref eq 'Sidef::Variable::Ref'           ? 'REF'
           : $ref eq 'Sidef::Types::Block::BlockInit' ? 'Sidef::Types::Block::Block'
           :                                            $ref;
@@ -764,8 +766,9 @@ HEADER
             $code = $self->_dump_init_vars($obj);
         }
         elsif ($ref eq 'Sidef::Variable::ClassInit') {
+            my $name = $self->_get_reftype($obj);
             if ($addr{$refaddr}++) {
-                $code = q{'} . $self->_dump_class_name($obj) . q{'};
+                $code = q{'} . $name . q{'};
             }
             else {
                 my $block = $obj->{block};
@@ -774,15 +777,10 @@ HEADER
 
                 my $package_name;
                 if (ref $obj->{name}) {
-
-                    if (ref $obj->{name} eq 'HASH') {
-                        die "[ERROR] Invalid class name: '$obj->{name}' inside namespace '$obj->{class}'";
-                    }
-
                     $code .= ($package_name = $self->_get_reftype($obj->{name}));
                 }
                 else {
-                    $code .= ($package_name = $self->_dump_class_name($obj));
+                    $code .= ($package_name = $name);
                 }
 
                 local $self->{class}            = refaddr($block);
@@ -822,18 +820,28 @@ HEADER
 
                         if ($is_class) {
                             local $" = " ";
+                            my $class_name = $self->{class_name};
                             $code .= " " x $Sidef::SPACES;
-                            $code .= "use base qw("
-                              . (
-                                 exists($self->{inherit})
-                                 ? (join(' ', map { ref($_) ? $self->_dump_class_name($_) : $_ } @{$self->{inherit}}) . ' ')
-                                 : ''
-                                )
-                              . ($self->{package_name} eq 'Sidef::Object::Object' ? '' : "Sidef::Object::Object") . ");\n";
+
+                            my $base_pkgs = (
+                                             exists($self->{inherit})
+                                             ? (
+                                                join(' ',
+                                                     grep { $_ ne $class_name }
+                                                     map { ref($_) ? $self->_get_reftype($_) : $_ } @{$self->{inherit}})
+                                               )
+                                             : ''
+                                            )
+                              . ($self->{package_name} eq 'Sidef::Object::Object'
+                                 || exists($self->{ref_class}) ? '' : ' Sidef::Object::Object');
+
+                            if ($base_pkgs ne '') {
+                                $code .= "use base qw($base_pkgs);\n";
+                            }
                         }
 
                         ## TODO: find a simpler and more elegant solution
-                        if ($is_class and not $self->{ref_class}) {
+                        if ($is_class and not exists($self->{ref_class})) {
 
                             my @class_vars = do {
                                 my %seen;
@@ -994,7 +1002,7 @@ HEADER
             ## ok
         }
         elsif ($ref eq 'Sidef::Variable::Struct') {
-            my $name = $self->_dump_class_name($obj);
+            my $name = $self->_get_reftype($obj);
             if ($addr{$refaddr}++) {
                 $code = "'$name'";
             }
@@ -1035,7 +1043,7 @@ HEADER
             }
         }
         elsif ($ref eq 'Sidef::Variable::Subset') {
-            my $name = $self->_dump_class_name($obj);
+            my $name = $self->_get_reftype($obj);
             if ($addr{$refaddr}++) {
                 $code = "'$name'";
             }

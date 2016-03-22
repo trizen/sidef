@@ -66,7 +66,7 @@ assert_eq(obj.y, 'b')
 assert_eq(obj.z, 'c')
 
 #
-## Foo class variables are redefined here
+## Foo class variables are NOT redefined here
 #
 class Foo (
     String name,
@@ -79,12 +79,14 @@ class Example << Foo {
     }
 }
 
-var obj1 = Example("foo", 42);
-var obj2 = Example("bar", 22);
+var obj1 = Example(1, "foo", 42);
+var obj2 = Example(2, "bar", 22);
 
 assert_ne(obj1.name, obj2.name);
 assert_ne(obj1.age,  obj2.age);
 
+assert_eq(obj1.x, 1)
+assert_eq(obj2.x, 2)
 assert_eq(obj1.uc, "FOO");
 assert_eq(obj2.uc, "BAR");
 
