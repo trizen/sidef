@@ -35,7 +35,6 @@ var correct = Example(42)
 bar(correct)
 failtest(func{ bar(wrong) }, 'bar(wrong)')
 
-
 #
 ## Union subset
 #
@@ -50,7 +49,6 @@ say concat(1, 2)
 say concat("a", "b")
 
 failtest(func { concat([1], [2]) }, 'concat([],[])')
-
 
 #
 ## Multiple subetting
@@ -175,52 +173,68 @@ failtest(func { stringy(42) }, "stringy(42)")
 ## Multiple class subsetting
 #
 
-class HelloGreeting(name) {
+class Hello(name) {
     method greet {
         say "Hello, #{self.name}!"
     }
 }
 
-class HiGreeting < HelloGreeting {
+class Hi < Hello {
     method greet {
         say "Hi, #{self.name}!"
     }
 }
 
-class HeyGreeting < HiGreeting {
+class Hey < Hi {
     method greet {
         say "Hey, #{self.name}"
     }
 }
 
-func greet(x < HiGreeting) {        # HiGreeting is the upper limit
-    x.greet
+func subset_greet(obj < Hi) {        # `Hi` is the upper limit
+    obj.greet
 }
 
-var hi_obj = HiGreeting("Foo")
-greet(hi_obj)
+var hi_obj = Hi("Foo")
+subset_greet(hi_obj)
 
-var hello_obj = HelloGreeting("Bar")
-greet(hello_obj)
+var hello_obj = Hello("Bar")
+subset_greet(hello_obj)
 
-var hey_obj = HeyGreeting("Baz")
+var hey_obj = Hey("Baz")
 
-failtest(func { greet(42) }, "greet(42)")
-failtest(func { greet(hey_obj) }, "greet(hey_obj)")
+failtest(func { subset_greet(42) }, "subset_greet(42)")
+failtest(func { subset_greet(hey_obj) }, "subset_greet(hey_obj)")
 
 #
 ## Limited greeting
 #
 
-func hi_greet(HiGreeting > x) {     # HiGreeting is the lower limit
-    x.greet
+func type_greet(Hi > obj) {     # HiGreeting is the lower limit
+    obj.greet
 }
 
-hi_greet(hi_obj)
-hi_greet(hey_obj)
+type_greet(hi_obj)
+type_greet(hey_obj)
 
-failtest(func { hi_greet(42) }, "hi_greet(42)")
-failtest(func { hi_greet(hello_obj) }, "hi_greet(hello_obj)")
+failtest(func { type_greet(42) }, "type_greet(42)")
+failtest(func { type_greet(hello_obj) }, "type_greet(hello_obj)")
+
+#
+## Multiple dispatch greeting
+#
+
+func multi_greet(obj < Hi) { obj.greet }       # `Hi` is the upper limit
+
+multi_greet(Hi("Foo"))        # ok
+multi_greet(Hello("Bar"))     # ok
+multi_greet(Hey("Baz"))       # fail: `Hey` is too evolved
+
+func multi_greet(Hi > obj) { obj.greet }        # `Hi` is the lower limit
+
+multi_greet(Hi("Foo"))        # ok
+multi_greet(Hey("Baz"))       # ok
+multi_greet(Hello("Bar"))     # fail: `Hello` is too primitive
 
 #
 ## Subseting with `where` block
