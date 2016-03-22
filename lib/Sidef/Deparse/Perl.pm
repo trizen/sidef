@@ -180,8 +180,8 @@ HEADER
             return $target;
         }
 
-            $ref eq 'Sidef::Variable::ClassInit'     ? $self->_dump_class_name($obj)
-          : $ref eq 'Sidef::Variable::Struct'        ? $self->_dump_class_name($obj)
+        ($ref eq 'Sidef::Variable::ClassInit' || $ref eq 'Sidef::Variable::Struct' || $ref eq 'Sidef::Variable::Subset')
+          ? $self->_dump_class_name($obj)
           : $ref eq 'Sidef::Variable::Ref'           ? 'REF'
           : $ref eq 'Sidef::Types::Block::BlockInit' ? 'Sidef::Types::Block::Block'
           :                                            $ref;
@@ -479,7 +479,22 @@ HEADER
                   . $self->_dump_string($_->{name})
                   . (exists($_->{slurpy})    ? (", slurpy => " . $_->{slurpy})                       : '')
                   . (exists($_->{ref_type})  ? (", type => " . $self->_dump_reftype($_->{ref_type})) : '')
+                  . (exists($_->{subset})    ? (", subset => " . $self->_dump_reftype($_->{subset})) : '')
                   . (exists($_->{has_value}) ? (', has_value => 1')                                  : '')
+                  . (
+                    exists($_->{subset_blocks}) ? (
+                       ', subset_blocks => [' . join(
+                           ', ',
+                           map {
+                                   'sub{'
+                                 . $self->_dump_sub_init_vars($_->{init_vars}{vars}[0])
+                                 . $self->deparse_generic('', ';', '', $_->{code}) . '}'
+                             } @{$_->{subset_blocks}}
+                         )
+                         . ']'
+                      )
+                    : ''
+                    )
                   . (
                      exists($_->{where_block})
                      ? (', where_block => sub{'
@@ -981,7 +996,7 @@ HEADER
         elsif ($ref eq 'Sidef::Variable::Struct') {
             my $name = $self->_dump_class_name($obj);
             if ($addr{$refaddr}++) {
-                $code = $name;
+                $code = "'$name'";
             }
             else {
                 $Sidef::SPACES += $Sidef::SPACES_INCR;
@@ -1017,6 +1032,23 @@ HEADER
                 push @{$self->{function_declarations}}, [$refaddr, "my \$new$refaddr;"];
 
                 $Sidef::SPACES -= $Sidef::SPACES_INCR;
+            }
+        }
+        elsif ($ref eq 'Sidef::Variable::Subset') {
+            my $name = $self->_dump_class_name($obj);
+            if ($addr{$refaddr}++) {
+                $code = "'$name'";
+            }
+            else {
+                my @parents = map { $self->_get_reftype($_) } @{$obj->{inherits}};
+                $code = qq{
+                    do {
+                        package $name {
+                            use base qw(@parents)
+                        };
+                        '$name'
+                    }
+                };
             }
         }
         elsif ($ref eq 'Sidef::Types::Number::Number') {

@@ -46,6 +46,56 @@ func fib2(n)   { __FUNC__(n-1) + __FUNC__(n-2) }
 assert_eq(fib2(12), 144);
 
 #
+## The Fibonacci Nth term (#3)
+#
+
+func fib3(Number n (0)) { n }
+func fib3(Number n (1)) { n }
+func fib3(Number n)   { fib3(n-1) + fib3(n-2) }
+
+assert_eq(fib3(12), 144);
+
+#
+## The Fibonacci Nth term (#4)
+#
+
+func fib4(Number n  {.is_zero}) { n }
+func fib4(Number n  {.is_one }) { n }
+func fib4(Number n) { fib4(n-1) + __FUNC__(n-2) }
+
+assert_eq(fib4(12), 144);
+
+#
+## The Fibonacci Nth term (#5)
+#
+
+func fib5(n (0))    { n }
+func fib5(n (1))    { n }
+func fib5(Number n) { __FUNC__(n-1) + fib5(n-2) }
+
+assert_eq(fib5(12), 144);
+
+#
+## The Fibonacci Nth term (#6)
+#
+
+func fib6(n < Number (0)) { n }
+func fib6(n < Number (1)) { n }
+func fib6(n < Number)     { fib6(n-1) + fib6(n-2) }
+
+assert_eq(fib6(12), 144);
+
+#
+## The Fibonacci Nth term (#7)
+#
+
+func fib7(n < Number {.is_zero}) { n }
+func fib7(n < Number {.is_one})  { n }
+func fib7(n < Number)            { fib7(n-1) + fib7(n-2) }
+
+assert_eq(fib7(12), 144);
+
+#
 ## Slurpy variable with block
 #
 

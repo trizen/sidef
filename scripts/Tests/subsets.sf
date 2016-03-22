@@ -1,0 +1,237 @@
+#!/usr/bin/ruby
+
+#
+## Subsets
+#
+
+func failtest(f, msg) {
+    print "Testing: #{msg} -> "
+    var i = 0
+    try { f() }
+    catch { ++i }
+    assert_eq(i, 1)
+    print "ok\n"
+}
+
+#
+## Inheritance from user-defined types
+#
+
+class Example(Number size) {
+    method display {
+        say "Number #{size}"
+    }
+}
+
+subset Special < Example { .size == 42 }
+
+func bar(x < Special) {
+    x.display
+}
+
+var wrong = Example(3)
+var correct = Example(42)
+
+bar(correct)
+failtest(func{ bar(wrong) }, 'bar(wrong)')
+
+
+#
+## Union subset
+#
+
+subset Union < Number,String;
+
+func concat(x < Union, y < Union) {
+    x + y
+}
+
+say concat(1, 2)
+say concat("a", "b")
+
+failtest(func { concat([1], [2]) }, 'concat([],[])')
+
+
+#
+## Multiple subetting
+#
+
+subset Integer     < Number      { .is_int }
+subset Natural     < Integer     { |n|  n >= 0 }
+subset EvenNatural < Natural     { .is_even }
+subset PowerOfTwo  < EvenNatural { |n| (n & (n-1)) == 0 }
+
+func natural(n < Natural) {
+    say "natural(): #{n}"
+}
+
+func even_natural(n < EvenNatural) {
+    say "even_natural(): #{n}"
+}
+
+func pow_2(n < PowerOfTwo) {
+    say "pow_2(): #{n}"
+}
+
+natural(5)
+even_natural(42)
+pow_2(64)
+
+failtest(func { natural(-10) }, 'natural(-10)')
+failtest(func { natural(3.5) }, 'natural(3.5)')
+
+failtest(func { even_natural(21) }, 'even_natural(21)')
+failtest(func { even_natural(42.5) }, 'even_natural(42.5)')
+
+failtest(func { pow_2(5) }, 'pow_2(5)')
+failtest(func { pow_2(42) }, 'pow_2(42)')
+failtest(func { pow_2(128.1) }, 'pow_2(128.1)')
+
+pow_2(128)
+pow_2(2048)
+
+even_natural(0)
+even_natural(1_000_000)
+
+natural(42)
+natural(12345)
+
+#
+## Re-usage of subsets
+#
+
+func log_pow2(n < PowerOfTwo) {
+    say "log_pow2(): #{n.log(2)}"
+}
+
+log_pow2(1024)
+log_pow2(4096)
+
+failtest(func { log_pow2(42) }, 'log_pow2(42)')
+failtest(func { log_pow2(63) }, 'log_pow2(63)')
+
+#
+## Recomposition
+#
+
+subset FortyTwo < EvenNatural { |n| n == 42 }
+
+func forty_two(n < FortyTwo) {
+    say "forty_two(): #{n}"
+}
+
+forty_two(42)
+
+failtest(func { forty_two(43) }, 'forty_two(43)')
+failtest(func { forty_two(44) }, 'forty_two(44)')
+failtest(func { forty_two("foo") }, 'forty_two("foo")')
+
+#
+## Subseting built-in types
+#
+
+func numeric(x < Number) {
+    say "numeric(): #{x}"
+}
+
+numeric(-42)
+numeric(1234)
+
+failtest(func { numeric("foo") }, 'numeric("foo")')
+failtest(func { numeric({}) }, 'numeric({})')
+
+func only_string (s < String) {
+    say s.dump
+}
+
+only_string("foo")
+
+failtest(func { only_string(42) }, "only_string(42)")
+failtest(func { only_string(File("foo")) }, "only_string(File('foo'))")
+
+func filelish(f < File) {
+    say "filelish(): #{f.dump}"
+}
+
+filelish("foo")             # File includes String
+filelish(File("abc"))
+
+failtest(func { filelish(42) }, "filelish(42)")
+
+#
+## This accepts any types that include the String class
+#
+
+func stringy(String s) {
+    say "stringy(): #{s.dump}"
+}
+
+stringy("foo")
+stringy(File("abc"))
+
+failtest(func { stringy(42) }, "stringy(42)")
+
+#
+## Multiple class subsetting
+#
+
+class HelloGreeting(name) {
+    method greet {
+        say "Hello, #{self.name}!"
+    }
+}
+
+class HiGreeting < HelloGreeting {
+    method greet {
+        say "Hi, #{self.name}!"
+    }
+}
+
+class HeyGreeting < HiGreeting {
+    method greet {
+        say "Hey, #{self.name}"
+    }
+}
+
+func greet(x < HiGreeting) {        # HiGreeting is the upper limit
+    x.greet
+}
+
+var hi_obj = HiGreeting("Foo")
+greet(hi_obj)
+
+var hello_obj = HelloGreeting("Bar")
+greet(hello_obj)
+
+var hey_obj = HeyGreeting("Baz")
+
+failtest(func { greet(42) }, "greet(42)")
+failtest(func { greet(hey_obj) }, "greet(hey_obj)")
+
+#
+## Limited greeting
+#
+
+func hi_greet(HiGreeting > x) {     # HiGreeting is the lower limit
+    x.greet
+}
+
+hi_greet(hi_obj)
+hi_greet(hey_obj)
+
+failtest(func { hi_greet(42) }, "hi_greet(42)")
+failtest(func { hi_greet(hello_obj) }, "hi_greet(hello_obj)")
+
+#
+## Subseting with `where` block
+#
+
+func my_even(Number n < EvenNatural {|n| 10 < n }) {
+    say "my_even(): #{n}"
+}
+
+my_even(42)
+
+failtest(func { my_even(8) }, "my_even(8)")
+failtest(func { my_even(25) }, "my_even(25)")
+failtest(func { my_even("foo") }, "my_even('foo')")

@@ -54,7 +54,6 @@ sub parse_deparse {
 }
 
 my %ignore = (
-              'module_definition.sf' => 1,
               'barnsley_fern.sf'     => 1,
              );
 

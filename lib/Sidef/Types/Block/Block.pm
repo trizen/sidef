@@ -6,6 +6,8 @@ package Sidef::Types::Block::Block {
       Sidef::Convert::Convert
       );
 
+    require List::Util;
+
     use overload
       q{bool} => sub { 1 },
       q{&{}}  => sub { $_[0]->{code} },
@@ -92,25 +94,38 @@ package Sidef::Types::Block::Block {
 
             my @pos_args;
             foreach my $var (@vars) {
-                if (exists $var->{type}) {
+                if (exists($var->{type}) or exists($var->{subset})) {
 
                     if (exists $seen{$var->{name}}) {
                         my $value = $seen{$var->{name}};
-                        if (ref($value) eq $var->{type}
-                            or eval { $value->SUPER::isa($var->{type}) }) {
 
-                            if (exists $var->{where_block}) {
-                                $var->{where_block}($value) or next OUTER;
+                        if (exists($var->{type})) {
+                            (ref($value) eq $var->{type} or eval { $value->SUPER::isa($var->{type}) }) || next OUTER;
+
+                            if (exists($var->{where_block})) {
+                                $var->{where_block}($value) || next OUTER;
+                            }
+                            elsif (exists $var->{where_expr}) {
+                                $value eq $var->{where_expr} or next OUTER;
+                            }
+                        }
+
+                        if (exists($var->{subset})) {
+                            $var->{subset}->SUPER::isa(ref($value)) || next OUTER;
+
+                            if (exists($var->{where_block})) {
+                                $var->{where_block}($value) || next OUTER;
                             }
                             elsif (exists $var->{where_expr}) {
                                 $value eq $var->{where_expr} or next OUTER;
                             }
 
-                            push @pos_args, $value;
+                            if (exists $var->{subset_blocks}) {
+                                List::Util::all(sub { $_->($value) }, @{$var->{subset_blocks}}) || next OUTER;
+                            }
                         }
-                        else {
-                            next OUTER;
-                        }
+
+                        push @pos_args, $value;
                     }
                     elsif (exists $var->{has_value}) {
                         push @pos_args, undef;
@@ -120,13 +135,20 @@ package Sidef::Types::Block::Block {
                     }
                 }
                 elsif (exists $seen{$var->{name}}) {
-                    if (exists $var->{where_block}) {
-                        (
-                         exists($var->{slurpy})
-                         ? $var->{where_block}(Sidef::Types::Array::Array->new(@{$seen{$var->{name}}}))
-                         : $var->{where_block}($seen{$var->{name}})
-                        )
-                          or next OUTER;
+                    if (exists($var->{where_block}) or exists($var->{subset_blocks})) {
+
+                        my $value =
+                          exists($var->{slurpy})
+                          ? Sidef::Types::Array::Array->new([@{$seen{$var->{name}}}])
+                          : $seen{$var->{name}};
+
+                        if (exists $var->{where_block}) {
+                            $var->{where_block}($value) || next OUTER;
+                        }
+
+                        if (exists $var->{subset_blocks}) {
+                            List::Util::all(sub { $_->($value) }, @{$var->{subset_blocks}}) || next OUTER;
+                        }
                     }
                     elsif (exists $var->{where_expr}) {
                         $var->{where_expr} eq $seen{$var->{name}} or next OUTER;
@@ -174,8 +196,9 @@ package Sidef::Types::Block::Block {
                     ', ',
                     map {
                             (exists($_->{slurpy}) ? '*' : '')
+                          . (exists($_->{type}) ? (Sidef::normalize_type($_->{type}) . ' ') : '')
                           . $_->{name}
-                          . (exists($_->{type}) ? (": " . Sidef::normalize_type($_->{type})) : '')
+                          . (exists($_->{subset}) ? (' < ' . Sidef::normalize_type($_->{subset})) : '')
                       } @{$_->{vars}}
                     )
               } ($self, (exists($self->{kids}) ? @{$self->{kids}} : ()))

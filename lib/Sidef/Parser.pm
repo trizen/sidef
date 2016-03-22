@@ -635,7 +635,7 @@ package Sidef::Parser {
         my @vars;
         my %classes;
 
-        while (   /\G(?<type>$self->{var_name_re}\h+$self->{var_name_re})\h*/goc
+        while (   /\G(?<type>$self->{var_name_re}(?:\h+|\h*>>?\h*)$self->{var_name_re})\h*/goc
                || /\G([*:]?$self->{var_name_re})\h*/goc
                || (defined($end_delim) && /\G(?=[({])/)) {
             push @vars, $1;
@@ -654,6 +654,16 @@ package Sidef::Parser {
                     type  => $opt{type},
                     line  => $self->{line},
                   };
+
+                if (/\G<<?\h*/gc) {
+                    my ($var) = /\G($self->{var_name_re})\h*/goc;
+                    $var // $self->fatal_error(
+                                               code  => $_,
+                                               pos   => pos($_),
+                                               error => 'expected a subset name',
+                                              );
+                    $vars[-1] .= " < $var ";
+                }
 
                 if (/\G(?=\{)/) {
                     my $code = substr($_, pos);
@@ -714,7 +724,7 @@ package Sidef::Parser {
         my $end_delim = $self->parse_delim(%opt);
 
         my @var_objs;
-        while (   /\G(?<type>$self->{var_name_re})\h+($self->{var_name_re})\h*/goc
+        while (   /\G(?<type>$self->{var_name_re})(?:\h+|\h*>>?\h*)($self->{var_name_re})\h*/goc
                || /\G([*:]?)($self->{var_name_re})\h*/goc
                || (defined($end_delim) && /\G(?=[({])/)) {
             my ($attr, $name) = ($1, $2);
@@ -747,7 +757,34 @@ package Sidef::Parser {
                                   );
             }
 
-            my ($value, $where_block, $where_expr);
+            my ($subset, $subset_blocks);
+            if (defined($end_delim) and /\G<<?\h*/gc) {
+                my ($name) = /\G($self->{var_name_re})/goc;
+
+                $name // $self->fatal_error(
+                                            code  => $_,
+                                            pos   => pos($_),
+                                            error => "expected the name of the subset",
+                                           );
+
+                my $code = $name;
+                my $obj = $self->parse_expr(code => \$code);
+
+                (defined($obj) and ref($obj) ne 'HASH')
+                  || $self->fatal_error(
+                                        code  => $_,
+                                        pos   => pos($_),
+                                        error => "expected a subset or a type",
+                                       );
+
+                $subset = $obj;
+
+                if (ref($obj) eq 'Sidef::Variable::Subset' and exists($obj->{blocks})) {
+                    $subset_blocks = $obj->{blocks};
+                }
+            }
+
+            my ($value, $where_expr, $where_block);
 
             if (defined($end_delim)) {
 
@@ -777,14 +814,16 @@ package Sidef::Parser {
                              name => $name,
                              type => $opt{type},
                              (defined($ref_type) ? (ref_type => $ref_type) : ()),
+                             (defined($subset)   ? (subset   => $subset)   : ()),
                              class => $class_name,
                              defined($value) ? (value => $value, has_value => 1) : (),
                              defined($attr)
                              ? ($attr eq '*' ? (array => 1, slurpy => 1) : $attr eq ':' ? (hash => 1, slurpy => 1) : ())
                              : (),
-                             defined($where_block) ? (where_block => $where_block) : (),
-                             defined($where_expr)  ? (where_expr  => $where_expr)  : (),
-                             $opt{in_use}          ? (in_use      => 1)            : (),
+                             defined($where_block)   ? (where_block   => $where_block)   : (),
+                             defined($where_expr)    ? (where_expr    => $where_expr)    : (),
+                             defined($subset_blocks) ? (subset_blocks => $subset_blocks) : (),
+                             $opt{in_use}            ? (in_use        => 1)              : (),
                             },
                             'Sidef::Variable::Variable'
                            );
@@ -1226,6 +1265,81 @@ package Sidef::Parser {
                 $struct->{vars} = $vars;
 
                 return $struct;
+            }
+
+            # Subset declaration
+            if (/\Gsubset\b\h*/gc) {
+
+                my ($name, $class_name);
+                if (/\G($self->{var_name_re})\h*/goc) {
+                    ($name, $class_name) = $self->get_name_and_class($1);
+                }
+                else {
+                    $self->fatal_error(
+                                       code  => $_,
+                                       pos   => pos($_),
+                                       error => "expected a name after the keyword 'subset'",
+                                      );
+                }
+
+                if (exists($self->{keywords}{$name}) or exists($self->{built_in_classes}{$name})) {
+                    $self->fatal_error(
+                                       code  => $_,
+                                       pos   => (pos($_) - length($name)),
+                                       error => "'$name' is either a keyword or a predefined variable!",
+                                      );
+                }
+
+                my $subset = bless({name => $name}, 'Sidef::Variable::Subset');
+
+                unshift @{$self->{vars}{$class_name}},
+                  {
+                    obj   => $subset,
+                    name  => $name,
+                    count => 0,
+                    type  => 'subset',
+                    line  => $self->{line},
+                  };
+
+                # Inheritance
+                if (/\G<<?\h*/gc) {
+                    {
+                        my ($name) = /\G($self->{var_name_re})\h*/goc;
+
+                        $name // $self->fatal_error(
+                                                    code  => $_,
+                                                    pos   => pos($_),
+                                                    error => "expected a type name for subsetting",
+                                                   );
+
+                        my $code = $name;
+                        my $type = $self->parse_expr(code => \$code);
+
+                        if (ref($type) eq 'Sidef::Variable::Subset') {
+                            if (exists $type->{blocks}) {
+                                push @{$subset->{blocks}}, @{$type->{blocks}};
+                            }
+                        }
+
+                        push @{$subset->{inherits}}, $type;
+
+                        /\G,\h*/gc && redo;
+                    }
+                }
+                else {
+                    $self->fatal_error(
+                                       code  => $_,
+                                       pos   => pos($_),
+                                       error => "expected a parent type (e.g.: subset $name < Number)",
+                                      );
+                }
+
+                if (/\G(?=\{)/) {
+                    my $block = $self->parse_block(code => $opt{code}, topic_var => 1);
+                    push @{$subset->{blocks}}, $block;
+                }
+
+                return $subset;
             }
 
             # Declaration of enums
