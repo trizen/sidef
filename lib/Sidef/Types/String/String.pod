@@ -150,7 +150,7 @@ I<Obj> B<==> I<Obj> -> I<Obj>
 
 Return the
 
-Aliases: I<eq>, I<equals>
+Aliases: I<eq>
 
 =cut
 

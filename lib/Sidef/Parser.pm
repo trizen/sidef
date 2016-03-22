@@ -36,7 +36,7 @@ package Sidef::Parser {
             },
 
             static_obj_re => qr{\G
-                (?>
+                (?:
                        nil\b                          (?{ state $x = bless({}, 'Sidef::Types::Nil::Nil') })
                      | null\b                         (?{ state $x = Sidef::Types::Null::Null->new })
                      | true\b                         (?{ Sidef::Types::Bool::Bool::TRUE })
