@@ -276,3 +276,23 @@ failtest(func { Point(x: 5, y: 20) }, "Point(x:5, y:20)")
 failtest(func { Point(x: -20, y: 5) }, "Point(x:-20, y:5)")
 failtest(func { Point(-5, 20) }, "Point(-5, 20)")
 failtest(func { Point(30, -4) }, "Point(30, -4)")
+
+#
+## Redeclarations
+#
+
+subset Scalar      < Number,String;
+subset Integer     < Scalar  { |n| n.is_int }
+subset Natural     < Integer { |n| n.is_pos }
+subset EvenNatural < Natural { |n| n.is_even }
+
+func f(n < EvenNatural) {
+     say n
+}
+
+f(42)
+f(2)
+
+failtest(func { f(43) }, "f(43)")
+failtest(func { f(-42) }, "f(-42)")
+failtest(func { f("foo") }, "f('foo')")
