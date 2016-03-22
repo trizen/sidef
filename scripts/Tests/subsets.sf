@@ -249,3 +249,30 @@ my_even(42)
 failtest(func { my_even(8) }, "my_even(8)")
 failtest(func { my_even(25) }, "my_even(25)")
 failtest(func { my_even("foo") }, "my_even('foo')")
+
+#
+## PointLimit example
+#
+
+subset PointLimit < Number {|n| n ~~ (-10 ..^ 10) }
+
+class Point(x < PointLimit, y < PointLimit) {
+    method to_s { "[#{x},#{y}]" }
+}
+
+var p1 = Point(x: 5, y: -6)
+var p2 = Point(y: 5, x: -6)
+var p3 = Point(10, -10)
+
+say p1
+say p2
+say p3
+
+assert_eq("#{p1}", "[5,-6]")
+assert_eq("#{p2}", "[-6,5]")
+assert_eq("#{p3}", "[10,-10]")
+
+failtest(func { Point(x: 5, y: 20) }, "Point(x:5, y:20)")
+failtest(func { Point(x: -20, y: 5) }, "Point(x:-20, y:5)")
+failtest(func { Point(-5, 20) }, "Point(-5, 20)")
+failtest(func { Point(30, -4) }, "Point(30, -4)")
