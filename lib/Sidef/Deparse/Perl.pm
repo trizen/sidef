@@ -832,8 +832,7 @@ HEADER
                                                )
                                              : ''
                                             )
-                              . ($self->{package_name} eq 'Sidef::Object::Object'
-                                 || exists($self->{ref_class}) ? '' : ' Sidef::Object::Object');
+                              . (exists($self->{ref_class}) ? '' : ' Sidef::Object::Object');
 
                             if ($base_pkgs ne '') {
                                 $code .= "use parent qw(-norequire $base_pkgs);\n";
