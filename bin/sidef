@@ -684,6 +684,13 @@ FOOT
 
     if ($opt{type} == NATIVE) {
         $package_content .= $requirify->(_get_loaded_modules());
+
+        my @used_pkgs;
+        while ($opt{code} =~ /^use (Sidef::\S+);$/gm) {
+            push @used_pkgs, $1;
+        }
+
+        $package_content .= $requirify->(@used_pkgs) if @used_pkgs;
         $package_content .= "}\n\n";
     }
 

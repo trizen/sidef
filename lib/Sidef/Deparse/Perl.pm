@@ -173,7 +173,7 @@ HEADER
 
             state $cache = {};
             $cache->{$ref} //= do {
-                $self->{header} .= "defined(&$target\::new) || require $target;\n";
+                $self->top_add("use $target;\n");
                 1;
             };
 
