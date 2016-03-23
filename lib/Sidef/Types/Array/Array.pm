@@ -218,7 +218,36 @@ package Sidef::Types::Array::Array {
 
     sub and {
         my ($self, $array) = @_;
-        $self->_grep($array, 0);
+
+        my @s1 = sort { $a cmp $b } @{$self};
+        my @s2 = sort { $a cmp $b } @{$array};
+
+        my $i = 0;
+        my $j = 0;
+
+        my @new;
+
+        my $end1 = @s1;
+        my $end2 = @s2;
+
+        while ($i < $end1 and $j < $end2) {
+
+            my $cmp = ($s1[$i] cmp $s2[$j]);
+
+            if ($cmp eq Sidef::Types::Number::Number::ONE) {
+                ++$j;
+            }
+            elsif ($cmp eq Sidef::Types::Number::Number::MONE) {
+                ++$i;
+            }
+            else {
+                push @new, $s1[$i];
+                ++$i;
+                ++$j;
+            }
+        }
+
+        $self->new(@new);
     }
 
     sub is_empty {
