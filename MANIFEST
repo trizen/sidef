@@ -858,11 +858,9 @@ utils/Experiments/JuliaBackend/Julia/Sidef.jl
 utils/Experiments/JuliaBackend/Julia/string.jl
 utils/Experiments/JuliaBackend/test.sf
 utils/Experiments/JuliaBackend/test2.sf
-utils/Experiments/Lazy/Lazy.pm
 utils/Experiments/operator_precendece.pl
 utils/Experiments/regexp_grammars_op_precedence.pl
 utils/Experiments/regexp_grammars_parser.pl
-utils/Experiments/struct_optimizer.pl
 utils/find_invalid_types.pl
 utils/grep_errors.sh
 utils/pod_generator.pl
