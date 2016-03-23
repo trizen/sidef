@@ -567,6 +567,7 @@ scripts/Tests/arithmetic_geometric_mean.sf
 scripts/Tests/array_autovivification.sf
 scripts/Tests/array_compare.sf
 scripts/Tests/array_unique.sf
+scripts/Tests/array_xor.sf
 scripts/Tests/array_zipping.sf
 scripts/Tests/arrays.sf
 scripts/Tests/autovivification.sf
