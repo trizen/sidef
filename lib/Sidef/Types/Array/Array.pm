@@ -258,8 +258,8 @@ package Sidef::Types::Array::Array {
             else {
                 while (++$i < $end1 and $s1[$i] eq $s2[$j]) {
                     ++$i;
+                    ++$j;
                 }
-                ++$j;
             }
         }
 
