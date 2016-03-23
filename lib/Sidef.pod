@@ -31,6 +31,8 @@ The main features of Sidef include:
 
 =item * functional pattern matching,
 
+=item * optional lazy evaluation,
+
 =item * multiple dispatch,
 
 =item * metaprogramming,

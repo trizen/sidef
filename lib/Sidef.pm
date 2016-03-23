@@ -29,7 +29,7 @@ package Sidef {
               or $type =~ s/^_:://;
         }
 
-        $type;
+        $type =~ s/[0-9]{8,}\z//r;
     }
 
     sub normalize_method {
