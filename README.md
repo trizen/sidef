@@ -19,6 +19,7 @@ Sidef is a modern, high-level, general-purpose programming language, inspired by
     * object-oriented programming,
     * functional programming,
     * functional pattern matching,
+    * optional lazy evaluation,
     * multiple dispatch,
     * metaprogramming,
     * regular expressions,
