@@ -8,9 +8,9 @@ class Sierpinski {
     method letter_s(n) {
         var c = ['*'];
         {
-            c = (c.map{|x| ' '.times(x.len*2) + x*2 + ' '.times(x.len*1)   } +
-                 c.map{|x| x + ' '.times(x.len) + x + ' '.times(x.len) + x } +
-                 c.map{|x| ' '.times(x.len*1) + x*2 + ' '.times(x.len*2)   }
+            c = (c.map{|x| ' '*(x.len*2) + x*2 + ' '*(x.len*1)   } +
+                 c.map{|x| x + ' '*(x.len) + x + ' '*(x.len) + x } +
+                 c.map{|x| ' '*(x.len*1) + x*2 + ' '*(x.len*2)   }
                 );
         } * n;
         return c;
@@ -36,8 +36,8 @@ class Sierpinski {
     method letter_d(n) {
         var c = ['*'];
         {
-            c = (c.map{|x| x*1 + ' '.times(x.len*2) } +
-                 c.map{|x| x*2 + ' '.times(x.len*1) } +
+            c = (c.map{|x| x*1 + ' '*(x.len*2) } +
+                 c.map{|x| x*2 + ' '*(x.len*1) } +
                  c.map{|x| x*3                      }
                 );
         } * n;
@@ -51,7 +51,7 @@ class Sierpinski {
         var c = ['*'];
         {
             c = (c.map{|x| x*3                    } +
-                 c.map{|x| x*2 + ' '.times(x.len) } +
+                 c.map{|x| x*2 + ' '*(x.len) } +
                  c.map{|x| x*3                    }
                 );
         } * n;
@@ -65,8 +65,8 @@ class Sierpinski {
         var c = ['*'];
         {
             c = (c.map{|x| x*3                      } +
-                 c.map{|x| x*2 + ' '.times(x.len*1) } +
-                 c.map{|x| x*1 + ' '.times(x.len*2) }
+                 c.map{|x| x*2 + ' '*(x.len*1) } +
+                 c.map{|x| x*1 + ' '*(x.len*2) }
                 );
         } * n;
         return c;

@@ -209,7 +209,8 @@ package Sidef::Optimizer {
                methods(STRING, qw(
                    eq ne
 
-                   times
+                   mul
+                   div
                    repeat
                    char
 
@@ -467,8 +468,8 @@ package Sidef::Optimizer {
                    contains
                    contains_type
 
-                   divide
-                   multiply
+                   div
+                   mul
 
                    rotate
 

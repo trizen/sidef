@@ -148,26 +148,7 @@ package Sidef::Types::Array::Array {
         $self->new(\@array);
     }
 
-    sub _grep {
-        my ($self, $array, $bool) = @_;
-
-        my @new_array;
-        foreach my $item (@{$self}) {
-
-            my $exists = 0;
-            my $value  = $item;
-
-            if ($array->contains($value)) {
-                $exists = 1;
-            }
-
-            CORE::push(@new_array, $value) if ($exists - $bool);
-        }
-
-        $self->new(\@new_array);
-    }
-
-    sub multiply {
+    sub mul {
         my ($self, $num) = @_;
 
         {
@@ -178,9 +159,7 @@ package Sidef::Types::Array::Array {
         $self->new([(@{$self}) x $num]);
     }
 
-    *mul = \&multiply;
-
-    sub divide {
+    sub div {
         my ($self, $num) = @_;
 
         my @obj = @{$self};
@@ -204,8 +183,6 @@ package Sidef::Types::Array::Array {
         $self->new(\@array);
     }
 
-    *div = \&divide;
-
     sub or {
         my ($self, $array) = @_;
         $self->xor($array)->concat($self->and($array));
@@ -213,7 +190,7 @@ package Sidef::Types::Array::Array {
 
     sub xor {
         my ($self, $array) = @_;
-        ($self->concat($array))->subtract($self->and($array));
+        ($self->concat($array))->diff($self->and($array));
     }
 
     sub and {
@@ -225,20 +202,19 @@ package Sidef::Types::Array::Array {
         my $i = 0;
         my $j = 0;
 
-        my @new;
-
         my $end1 = @s1;
         my $end2 = @s2;
 
+        my ($cmp, @new);
         while ($i < $end1 and $j < $end2) {
 
-            my $cmp = ($s1[$i] cmp $s2[$j]);
+            $cmp = ($s1[$i] cmp $s2[$j]);
 
-            if ($cmp eq Sidef::Types::Number::Number::ONE) {
-                ++$j;
-            }
-            elsif ($cmp eq Sidef::Types::Number::Number::MONE) {
+            if ($cmp eq Sidef::Types::Number::Number::MONE) {
                 ++$i;
+            }
+            elsif ($cmp eq Sidef::Types::Number::Number::ONE) {
+                ++$j;
             }
             else {
                 push @new, $s1[$i];
@@ -247,7 +223,7 @@ package Sidef::Types::Array::Array {
             }
         }
 
-        $self->new(@new);
+        $self->new(\@new);
     }
 
     sub is_empty {
@@ -255,12 +231,44 @@ package Sidef::Types::Array::Array {
         ($#{$self} == -1) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
-    sub subtract {
+    sub diff {
         my ($self, $array) = @_;
-        $self->_grep($array, 1);
-    }
 
-    *sub = \&subtract;
+        my @s1 = sort { $a cmp $b } @{$self};
+        my @s2 = sort { $a cmp $b } @{$array};
+
+        my $i = 0;
+        my $j = 0;
+
+        my $end1 = @s1;
+        my $end2 = @s2;
+
+        my ($cmp, @new);
+        while ($i < $end1 and $j < $end2) {
+
+            $cmp = $s1[$i] cmp $s2[$j];
+
+            if ($cmp eq Sidef::Types::Number::Number::MONE) {
+                push @new, $s1[$i];
+                ++$i;
+            }
+            elsif ($cmp eq Sidef::Types::Number::Number::ONE) {
+                ++$j;
+            }
+            else {
+                while (++$i < $end1 and $s1[$i] eq $s2[$j]) {
+                    ++$i;
+                }
+                ++$j;
+            }
+        }
+
+        if ($i < $end1) {
+            push @new, @s1[$i .. $#s1];
+        }
+
+        $self->new(\@new);
+    }
 
     sub concat {
         my ($self, $arg) = @_;
@@ -1876,7 +1884,7 @@ package Sidef::Types::Array::Array {
         no strict 'refs';
 
         *{__PACKAGE__ . '::' . '&'}   = \&and;
-        *{__PACKAGE__ . '::' . '*'}   = \&multiply;
+        *{__PACKAGE__ . '::' . '*'}   = \&mul;
         *{__PACKAGE__ . '::' . '<<'}  = \&append;
         *{__PACKAGE__ . '::' . '«'}  = \&append;
         *{__PACKAGE__ . '::' . '>>'}  = \&assign_to;
@@ -1884,12 +1892,12 @@ package Sidef::Types::Array::Array {
         *{__PACKAGE__ . '::' . '|'}   = \&or;
         *{__PACKAGE__ . '::' . '^'}   = \&xor;
         *{__PACKAGE__ . '::' . '+'}   = \&concat;
-        *{__PACKAGE__ . '::' . '-'}   = \&subtract;
+        *{__PACKAGE__ . '::' . '-'}   = \&diff;
         *{__PACKAGE__ . '::' . '=='}  = \&eq;
         *{__PACKAGE__ . '::' . '!='}  = \&ne;
         *{__PACKAGE__ . '::' . '<=>'} = \&cmp;
         *{__PACKAGE__ . '::' . ':'}   = \&pair_with;
-        *{__PACKAGE__ . '::' . '/'}   = \&divide;
+        *{__PACKAGE__ . '::' . '/'}   = \&div;
         *{__PACKAGE__ . '::' . '...'} = \&to_list;
 
         *{__PACKAGE__ . '::' . '++'} = sub {

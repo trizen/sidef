@@ -7,7 +7,7 @@ func sierpinski_penta(n) {
         penta = (
                 penta.map {|x| sp + x + ' ' + x + sp} +
                 penta.map {|x| x + sp + ' ' + sp + x} +
-                penta.map {|x| sp*2 + ' '.times(Math.pow(i-1,2)) + x + ' '.times(Math.pow(i-1,2)) + sp*2}
+                penta.map {|x| sp*2 + ' '*(Math.pow(i-1,2)) + x + ' '*(Math.pow(i-1,2)) + sp*2}
             );
     } * n;
     penta.join("\n");

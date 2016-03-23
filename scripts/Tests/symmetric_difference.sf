@@ -8,6 +8,6 @@ var a = ["John", "Serena", "Bob", "Mary", "Serena"];
 var b = ["Jim", "Mary", "John", "Jim", "Bob"];
 var diff = (a ^ b -> unique);
 
-assert_eq(diff, ["Serena", "Jim"]);
+assert_eq(diff, ["Jim", "Serena"]);
 
 say "** Test passed!";

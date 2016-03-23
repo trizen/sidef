@@ -175,7 +175,7 @@ var arr_2 = ["w", [5], "Y"->lc];
 
 arr_1 - arr_2 -> to_s -> say;
 
-assert_eq(["Paris", "Berlin", "Atena", "London"] - ["London", "Berlin"], ['Paris', 'Atena']);
+assert_eq(["Paris", "Berlin", "Atena", "London"] - ["London", "Berlin"], ['Atena', 'Paris']);
 
 #
 ## joining two arrays

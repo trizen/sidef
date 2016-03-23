@@ -4,10 +4,10 @@
 ## http://rosettacode.org/wiki/Sierpinski_carpet
 #
 
-var c = ['##'];
-{
-    c = (c.map{.times(3)}                     +
-         c.map{|x| x + ' '.times(x.len) + x } +
-         c.map{.times(3)});
-} * 3;
-c.join("\n").say;
+var c = ['##']
+3.times {
+    c = (c.map{|x| x * 3 }             +
+         c.map{|x| x + ' '*x.len + x } +
+         c.map{|x| x * 3 })
+}
+say c.join("\n")

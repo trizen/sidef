@@ -57,10 +57,8 @@ package Sidef::Types::String::String {
          )
           ) < 1
           && return;
-        Sidef::Types::Array::Array->new([map { $self->new($_) } unpack "(a$strlen)*", $$self]);
+        Sidef::Types::Array::Array->new([map { bless(\$_, __PACKAGE__) } unpack "(a$strlen)*", $$self]);
     }
-
-    *divide = \&div;
 
     sub lt {
         my ($self, $string) = @_;
@@ -82,7 +80,7 @@ package Sidef::Types::String::String {
         ($$self ge "$string") ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
-    sub subtract {
+    sub diff {
         my ($self, $obj) = @_;
 
         if (ref($obj) eq 'Sidef::Types::Regex::Regex') {
@@ -223,7 +221,7 @@ package Sidef::Types::String::String {
         $self->new(~$$self);
     }
 
-    sub times {
+    sub mul {
         my ($self, $num) = @_;
         $self->new(
             $$self x do {
@@ -232,8 +230,6 @@ package Sidef::Types::String::String {
               }
         );
     }
-
-    *multiply = \&times;
 
     sub repeat {
         my ($self, $num) = @_;
@@ -362,7 +358,7 @@ package Sidef::Types::String::String {
             $string .= CORE::ucfirst(CORE::lc($1)) . $2;
         }
 
-        $self->new($string);
+        bless(\$string, __PACKAGE__);
     }
 
     *wc = \&wordcase;
@@ -465,7 +461,7 @@ package Sidef::Types::String::String {
           : $max;
 
         if (abs($from) > $max) {
-            return __PACKAGE__->new('');
+            return state $x = bless(\(my $str = ''), __PACKAGE__);
         }
 
         if ($to < 0) {
@@ -506,8 +502,7 @@ package Sidef::Types::String::String {
     }
 
     sub clear {
-        my ($self) = @_;
-        $self->new('');
+        state $x = bless(\(my $str = ''), __PACKAGE__);
     }
 
     sub is_empty {
@@ -569,12 +564,12 @@ package Sidef::Types::String::String {
 
     sub sprintf {
         my ($self, @arguments) = @_;
-        __PACKAGE__->new(CORE::sprintf $$self, @arguments);
+        $self->new(CORE::sprintf $$self, @arguments);
     }
 
     sub sprintlnf {
         my ($self, @arguments) = @_;
-        __PACKAGE__->new(CORE::sprintf($$self . "\n", @arguments));
+        $self->new(CORE::sprintf($$self . "\n", @arguments));
     }
 
     sub _string_or_regex {
@@ -593,8 +588,6 @@ package Sidef::Types::String::String {
         ref($str) eq 'Sidef::Types::Block::Block'
           && return $self->esub($regex, $str);
 
-        $str //= __PACKAGE__->new('');
-
         my $search = $self->_string_or_regex($regex);
         my $value  = "$str";
 
@@ -609,8 +602,6 @@ package Sidef::Types::String::String {
         ref($str) eq 'Sidef::Types::Block::Block'
           && return $self->gesub($regex, $str);
 
-        $str //= __PACKAGE__->new('');
-
         my $search = $self->_string_or_regex($regex);
         my $value  = "$str";
         $self->new($$self =~ s{$search}{$value}gr);
@@ -624,29 +615,27 @@ package Sidef::Types::String::String {
     sub esub {
         my ($self, $regex, $code) = @_;
 
-        $code //= __PACKAGE__->new('');
         my $search = $self->_string_or_regex($regex);
 
         if (ref($code) eq 'Sidef::Types::Block::Block') {
-            return __PACKAGE__->new($$self =~ s{$search}{$code->run(_get_captures($$self))}er);
+            return $self->new($$self =~ s{$search}{$code->run(_get_captures($$self))}er);
         }
 
-        __PACKAGE__->new($$self =~ s{$search}{"$code"}eer);
+        $self->new($$self =~ s{$search}{"$code"}eer);
     }
 
     sub gesub {
         my ($self, $regex, $code) = @_;
 
-        $code //= __PACKAGE__->new('');
         my $search = $self->_string_or_regex($regex);
 
         if (ref($code) eq 'Sidef::Types::Block::Block') {
             my $value = $$self;
-            return __PACKAGE__->new($value =~ s{$search}{$code->run(_get_captures($value))}ger);
+            return $self->new($value =~ s{$search}{$code->run(_get_captures($value))}ger);
         }
 
         my $value = "$code";
-        __PACKAGE__->new($$self =~ s{$search}{$value}geer);
+        $self->new($$self =~ s{$search}{$value}geer);
     }
 
     sub glob {
@@ -657,7 +646,7 @@ package Sidef::Types::String::String {
 
     sub quotemeta {
         my ($self) = @_;
-        __PACKAGE__->new(CORE::quotemeta($$self));
+        $self->new(CORE::quotemeta($$self));
     }
 
     *escape = \&quotemeta;
@@ -665,7 +654,7 @@ package Sidef::Types::String::String {
     sub scan {
         my ($self, $regex) = @_;
         my $str = $$self;
-        Sidef::Types::Array::Array->new([map { __PACKAGE__->new($_) } $str =~ /$regex->{regex}/g]);
+        Sidef::Types::Array::Array->new([map { bless(\$_, __PACKAGE__) } $str =~ /$regex->{regex}/g]);
     }
 
     sub split {
@@ -681,7 +670,7 @@ package Sidef::Types::String::String {
         if (!defined($sep)) {
             return
               Sidef::Types::Array::Array->new(
-                                              [map { __PACKAGE__->new($_) }
+                                              [map { bless(\$_, __PACKAGE__) }
                                                  split(' ', $$self, $size)
                                               ]
                                              );
@@ -690,7 +679,7 @@ package Sidef::Types::String::String {
         if (ref($sep) eq 'Sidef::Types::Number::Number') {
             return Sidef::Types::Array::Array->new(
                 [
-                 map { __PACKAGE__->new($_) } unpack '(a' . do {
+                 map { bless(\$_, __PACKAGE__) } unpack '(a' . do {
                      local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
                      $sep->get_value;
                    }
@@ -702,7 +691,7 @@ package Sidef::Types::String::String {
 
         $sep = $self->_string_or_regex($sep);
         Sidef::Types::Array::Array->new(
-                                        [map { __PACKAGE__->new($_) }
+                                        [map { bless(\$_, __PACKAGE__) }
                                            split(/$sep/, $$self, $size)
                                         ]
                                        );
@@ -735,14 +724,14 @@ package Sidef::Types::String::String {
 
     sub words {
         my ($self) = @_;
-        Sidef::Types::Array::Array->new([map { __PACKAGE__->new($_) } CORE::split(' ', $$self)]);
+        Sidef::Types::Array::Array->new([map { bless(\$_, __PACKAGE__) } CORE::split(' ', $$self)]);
     }
 
     sub each_word {
         my ($self, $code) = @_;
 
         foreach my $word (CORE::split(' ', $$self)) {
-            $code->run(__PACKAGE__->new($word));
+            $code->run(bless(\$word, __PACKAGE__));
         }
 
         $self;
@@ -795,7 +784,7 @@ package Sidef::Types::String::String {
 
     sub chars {
         my ($self) = @_;
-        Sidef::Types::Array::Array->new([map { __PACKAGE__->new($_) } CORE::split(//, CORE::join('', $$self))]);
+        Sidef::Types::Array::Array->new([map { bless(\$_, __PACKAGE__) } CORE::split(//, CORE::join('', $$self))]);
     }
 
     *to_a     = \&chars;
@@ -805,7 +794,7 @@ package Sidef::Types::String::String {
         my ($self, $code) = @_;
 
         foreach my $char (CORE::split(//, $$self)) {
-            $code->run(__PACKAGE__->new($char));
+            $code->run(bless(\$char, __PACKAGE__));
         }
 
         $self;
@@ -815,7 +804,7 @@ package Sidef::Types::String::String {
 
     sub graphemes {
         my ($self) = @_;
-        Sidef::Types::Array::Array->new([map { __PACKAGE__->new($_) } map { /\X/g } $$self]);
+        Sidef::Types::Array::Array->new([map { bless(\$_, __PACKAGE__) } map { /\X/g } $$self]);
     }
 
     *graphs = \&graphemes;
@@ -825,7 +814,7 @@ package Sidef::Types::String::String {
 
         my $str = $$self;
         while ($str =~ /(\X)/g) {
-            $code->run(__PACKAGE__->new($1));
+            $code->run(bless(\(my $str = $1), __PACKAGE__));
         }
 
         $self;
@@ -835,14 +824,14 @@ package Sidef::Types::String::String {
 
     sub lines {
         my ($self) = @_;
-        Sidef::Types::Array::Array->new([map { __PACKAGE__->new($_) } CORE::split(/\R/, $$self)]);
+        Sidef::Types::Array::Array->new([map { bless(\$_, __PACKAGE__) } CORE::split(/\R/, $$self)]);
     }
 
     sub each_line {
         my ($self, $code) = @_;
 
         foreach my $line (CORE::split(/\R/, $$self)) {
-            $code->run(__PACKAGE__->new($line));
+            $code->run(bless(\$line, __PACKAGE__));
         }
 
         $self;
@@ -926,13 +915,13 @@ package Sidef::Types::String::String {
 
     sub unpack {
         my ($self, $arg) = @_;
-        my @values = map { __PACKAGE__->new($_) } CORE::unpack($$self, "$arg");
+        my @values = map { bless(\$_, __PACKAGE__) } CORE::unpack($$self, "$arg");
         @values > 1 ? @values : $values[0];
     }
 
     sub pack {
         my ($self, @list) = @_;
-        __PACKAGE__->new(CORE::pack($$self, @list));
+        $self->new(CORE::pack($$self, @list));
     }
 
     sub chars_length {
@@ -1094,7 +1083,7 @@ package Sidef::Types::String::String {
         }
         elsif (ref($arg) eq 'Sidef::Types::Block::Block') {
             foreach my $char (split //, $s) {
-                ++$counter if $arg->run(__PACKAGE__->new($char));
+                ++$counter if $arg->run(bless(\$char, __PACKAGE__));
             }
             return Sidef::Types::Number::Number::_new_uint($counter);
         }
@@ -1462,7 +1451,7 @@ package Sidef::Types::String::String {
         $x || return $self->basic_dump;
 
         local $Data::Dump::TRY_BASE64 = 0;
-        $self->new(Data::Dump::quote($$self) =~ s<(#\{)>{\\$1}gr);
+        __PACKAGE__->new(Data::Dump::quote($$self) =~ s<(#\{)>{\\$1}gr);
     }
 
     *inspect = \&dump;
@@ -1471,10 +1460,10 @@ package Sidef::Types::String::String {
         no strict 'refs';
 
         *{__PACKAGE__ . '::' . '=~'}  = \&match;
-        *{__PACKAGE__ . '::' . '*'}   = \&times;
+        *{__PACKAGE__ . '::' . '*'}   = \&mul;
         *{__PACKAGE__ . '::' . '+'}   = \&append;
         *{__PACKAGE__ . '::' . '++'}  = \&inc;
-        *{__PACKAGE__ . '::' . '-'}   = \&subtract;
+        *{__PACKAGE__ . '::' . '-'}   = \&diff;
         *{__PACKAGE__ . '::' . '=='}  = \&eq;
         *{__PACKAGE__ . '::' . '!='}  = \&ne;
         *{__PACKAGE__ . '::' . '≠'} = \&ne;

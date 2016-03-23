@@ -50,7 +50,7 @@ I<Obj> B<*> I<Obj> -> I<Obj>
 
 Return the
 
-Aliases: I<times>, I<multiply>
+Aliases: I<mul>
 
 =cut
 
@@ -80,7 +80,7 @@ I<Obj> B<-> I<Obj> -> I<Obj>
 
 Return the
 
-Aliases: I<subtract>
+Aliases: I<diff>
 
 =cut
 
@@ -100,7 +100,7 @@ I<Obj> B</> I<Obj> -> I<Obj>
 
 Return the
 
-Aliases: I<÷()>, I<div>, I<divide>
+Aliases: I<÷()>, I<div>
 
 =cut
 
