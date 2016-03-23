@@ -3261,7 +3261,9 @@ package Sidef::Parser {
                             $methods = $self->parse_methods(code => $opt{code});
                         }
                         else {
-                            my $code = '.' . substr($_, pos);
+                            my $code = substr($_, pos);
+                            if   ($code =~ /^\./) { $code = ". $code" }
+                            else                  { $code = ".$code" }
                             $methods = $self->parse_methods(code => \$code);
                             pos($_) += pos($code) - 1;
                         }
