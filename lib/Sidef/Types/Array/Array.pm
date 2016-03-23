@@ -185,12 +185,16 @@ package Sidef::Types::Array::Array {
 
     sub or {
         my ($self, $array) = @_;
-        $self->xor($array)->concat($self->and($array));
+
+        #$self->xor($array)->concat($self->and($array));
+        $self->concat($array)->uniq;
     }
 
     sub xor {
         my ($self, $array) = @_;
-        ($self->concat($array))->diff($self->and($array));
+
+        #$self->diff($array)->concat($array->diff($self));
+        $self->concat($array)->diff($self->and($array));
     }
 
     sub and {
@@ -256,10 +260,7 @@ package Sidef::Types::Array::Array {
                 ++$j;
             }
             else {
-                while (++$i < $end1 and $s1[$i] eq $s2[$j]) {
-                    ++$i;
-                    ++$j;
-                }
+                1 while (++$i < $end1 and $s1[$i] eq $s2[$j]);
             }
         }
 

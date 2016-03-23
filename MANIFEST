@@ -755,6 +755,8 @@ scripts/Tests/run_length_encoding_3.sf
 scripts/Tests/same_fringe.sf
 scripts/Tests/script.sf
 scripts/Tests/selection_sort.sf
+scripts/Tests/set_consolidation.sf
+scripts/Tests/set_operations.sf
 scripts/Tests/sidef_executor.sf
 scripts/Tests/sidef_keywords.sf
 scripts/Tests/sidef_to_json.sf
