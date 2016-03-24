@@ -39,15 +39,15 @@ package Sidef::Object::Object {
             ($obj1, $obj2) = ($obj2, $obj1);
         }
 
-        if (CORE::ref($obj1) && $obj1->SUPER::isa(CORE::ref($obj2)) or CORE::ref($obj2) && $obj2->SUPER::isa(CORE::ref($obj1)))
-        {
+        if (   CORE::ref($obj1) && $obj1->SUPER::isa(CORE::ref($obj2))
+            or CORE::ref($obj2) && $obj2->SUPER::isa(CORE::ref($obj1))) {
             if (defined(my $sub = $obj1->can('<=>'))) {
                 return $sub->($obj1, $obj2);
             }
         }
 
-        my $cmp =
-          (ref($obj1) ? Scalar::Util::refaddr($obj1) : '-inf') <=> (CORE::ref($obj2) ? Scalar::Util::refaddr($obj2) : -'inf');
+        my $cmp = ((ref($obj1) ? Scalar::Util::refaddr($obj1) : ('-inf' + 0))
+                   <=> (CORE::ref($obj2) ? Scalar::Util::refaddr($obj2) : ('-inf' + 0)));
 
             $cmp < 0 ? Sidef::Types::Number::Number::MONE
           : $cmp > 0 ? Sidef::Types::Number::Number::ONE
