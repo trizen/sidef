@@ -46,7 +46,8 @@ package Sidef::Object::Object {
             }
         }
 
-        my $cmp = Scalar::Util::refaddr($obj1) <=> (CORE::ref($obj2) ? Scalar::Util::refaddr($obj2) : 'inf');
+        my $cmp =
+          (ref($obj1) ? Scalar::Util::refaddr($obj1) : '-inf') <=> (CORE::ref($obj2) ? Scalar::Util::refaddr($obj2) : -'inf');
 
             $cmp < 0 ? Sidef::Types::Number::Number::MONE
           : $cmp > 0 ? Sidef::Types::Number::Number::ONE
