@@ -193,35 +193,73 @@ package Sidef::Types::Array::Array {
     sub xor {
         my ($self, $array) = @_;
 
-        #$self->diff($array)->concat($array->diff($self));
-        $self->concat($array)->diff($self->and($array));
+        my @x = sort { $a cmp $b } @{$self};
+        my @y = sort { $a cmp $b } @{$array};
+
+        my $endx = $#x;
+        my $endy = $#y;
+
+        my $i = 0;
+        my $j = 0;
+
+        my ($cmp, @new);
+
+        while (1) {
+
+            $cmp = $x[$i] cmp $y[$j];
+
+            if (ref($cmp) ? $cmp->is_mone : ($cmp == -1)) {
+                push @new, $x[$i];
+                ++$i;
+            }
+            elsif (ref($cmp) ? $cmp->is_one : ($cmp == 1)) {
+                push @new, $y[$j];
+                ++$j;
+            }
+            else {
+                my $k = $i;
+                do { ++$i } while ($i <= $endx and $x[$i] eq $y[$j]);
+                do { ++$j } while ($j <= $endy and $x[$k] eq $y[$j]);
+            }
+
+            if ($i > $endx) {
+                push @new, @y[$j .. $endy];
+                last;
+            }
+            elsif ($j > $endy) {
+                push @new, @x[$i .. $endx];
+                last;
+            }
+        }
+
+        return $self->new(\@new);
     }
 
     sub and {
         my ($self, $array) = @_;
 
-        my @s1 = sort { $a cmp $b } @{$self};
-        my @s2 = sort { $a cmp $b } @{$array};
+        my @x = sort { $a cmp $b } @{$self};
+        my @y = sort { $a cmp $b } @{$array};
 
         my $i = 0;
         my $j = 0;
 
-        my $end1 = @s1;
-        my $end2 = @s2;
+        my $end1 = @x;
+        my $end2 = @y;
 
         my ($cmp, @new);
         while ($i < $end1 and $j < $end2) {
 
-            $cmp = ($s1[$i] cmp $s2[$j]);
+            $cmp = $x[$i] cmp $y[$j];
 
-            if ($cmp eq Sidef::Types::Number::Number::MONE) {
+            if (ref($cmp) ? $cmp->is_mone : ($cmp == -1)) {
                 ++$i;
             }
-            elsif ($cmp eq Sidef::Types::Number::Number::ONE) {
+            elsif (ref($cmp) ? $cmp->is_one : ($cmp == 1)) {
                 ++$j;
             }
             else {
-                push @new, $s1[$i];
+                push @new, $x[$i];
                 ++$i;
                 ++$j;
             }
@@ -238,34 +276,34 @@ package Sidef::Types::Array::Array {
     sub diff {
         my ($self, $array) = @_;
 
-        my @s1 = sort { $a cmp $b } @{$self};
-        my @s2 = sort { $a cmp $b } @{$array};
+        my @x = sort { $a cmp $b } @{$self};
+        my @y = sort { $a cmp $b } @{$array};
 
         my $i = 0;
         my $j = 0;
 
-        my $end1 = @s1;
-        my $end2 = @s2;
+        my $end1 = @x;
+        my $end2 = @y;
 
         my ($cmp, @new);
         while ($i < $end1 and $j < $end2) {
 
-            $cmp = $s1[$i] cmp $s2[$j];
+            $cmp = $x[$i] cmp $y[$j];
 
-            if ($cmp eq Sidef::Types::Number::Number::MONE) {
-                push @new, $s1[$i];
+            if (ref($cmp) ? $cmp->is_mone : ($cmp == -1)) {
+                push @new, $x[$i];
                 ++$i;
             }
-            elsif ($cmp eq Sidef::Types::Number::Number::ONE) {
+            elsif (ref($cmp) ? $cmp->is_one : ($cmp == -1)) {
                 ++$j;
             }
             else {
-                1 while (++$i < $end1 and $s1[$i] eq $s2[$j]);
+                1 while (++$i < $end1 and $x[$i] eq $y[$j]);
             }
         }
 
         if ($i < $end1) {
-            push @new, @s1[$i .. $#s1];
+            push @new, @x[$i .. $#x];
         }
 
         $self->new(\@new);
@@ -1596,8 +1634,7 @@ package Sidef::Types::Array::Array {
             my $value = $obj1 cmp $obj2;
 
             if (ref($value)) {
-                $value eq Sidef::Types::Number::Number::ZERO
-                  or return $value;
+                $value->is_zero or return $value;
             }
             elsif ($value != 0) {
                 return ($value < 0 ? Sidef::Types::Number::Number::MONE : Sidef::Types::Number::Number::ONE);

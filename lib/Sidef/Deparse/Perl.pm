@@ -1059,7 +1059,18 @@ HEADER
             }
         }
         elsif ($ref eq 'Sidef::Types::Number::Number') {
-            $code = $self->make_constant($ref, 'new', "Number$refaddr", "'" . $obj->_get_frac . "'");
+            if ($obj->is_zero) {
+                $code = '(Sidef::Types::Number::Number::ZERO)';
+            }
+            elsif ($obj->is_one) {
+                $code = '(Sidef::Types::Number::Number::ONE)';
+            }
+            elsif ($obj->is_mone) {
+                $code = '(Sidef::Types::Number::Number::MONE)';
+            }
+            else {
+                $code = $self->make_constant($ref, 'new', "Number$refaddr", "'" . $obj->_get_frac . "'");
+            }
         }
         elsif ($ref eq 'Sidef::Types::Number::Inf') {
             $code = $self->make_constant($ref, 'new', "Inf$refaddr");

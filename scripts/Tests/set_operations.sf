@@ -13,7 +13,7 @@ func test(op, a, b, c) {
     catch {
         say "a: #{a.sort}";
         say "b: #{b.sort}";
-        say "#{a.(op)(b)} != #{c}\n"
+        say "#{a.(op)(b)} != #{c.sort}\n"
         ++errors;
     }
 }
@@ -24,6 +24,21 @@ struct T {
     diff,
     xor,
 }
+
+class Example(name, value) {
+    method <=>(other) {
+        self.value <=> other.value
+    }
+    method to_s {
+        "(#{name}, #{value})";
+    }
+}
+
+var a = Example("a", 1);
+var b = Example("b", 2);
+var c = Example("c", 3);        #| this two
+var d = Example("d", 3);        #| are equal
+var e = Example("e", 4);
 
 var tests = [
     T(
@@ -97,6 +112,30 @@ var tests = [
         b: ["John", "Serena", "Bob", "Mary", "Serena"],
         diff: ["Jim", "Jim"],
         xor: ["Jim", "Jim", "Serena", "Serena"],
+    ),
+    T(
+        a: [a,b,c,a,d,e,a,a],
+        b: [c,c,a],
+        diff: [b, e],
+        xor: [b, e],
+    ),
+    T(
+        a: [a, b, c, a],
+        b: [d, e],
+        diff: [a, a, b],
+        xor: [a, a, b, e],
+    ),
+    T(
+        a: [d, e],
+        b: [e, c, d, a],
+        diff: [],
+        xor: [a],
+    ),
+    T(
+        a: [e],
+        b: [c, a, b, c],
+        diff: [e],
+        xor: [c, c, e, a, b],
     ),
 ]
 

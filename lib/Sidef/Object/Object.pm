@@ -59,13 +59,14 @@ package Sidef::Object::Object {
          || $obj2->SUPER::isa(CORE::ref($obj1) || return (Sidef::Types::Bool::Bool::FALSE)))
           || return (Sidef::Types::Bool::Bool::FALSE);
 
+        return Sidef::Types::Bool::Bool::TRUE
+          if (Scalar::Util::refaddr($obj1) == Scalar::Util::refaddr($obj2));
+
         if (defined(my $sub = $obj1->can('=='))) {
             return $sub->($obj1, $obj2);
         }
 
-        Scalar::Util::refaddr($obj1) == Scalar::Util::refaddr($obj2)
-          ? (Sidef::Types::Bool::Bool::TRUE)
-          : (Sidef::Types::Bool::Bool::FALSE);
+        ($obj1 cmp $obj2)->is_zero;
       };
 
     sub new {
