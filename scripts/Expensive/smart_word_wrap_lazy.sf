@@ -10,25 +10,26 @@
 # Smart word wrap algorithm
 # See: http://en.wikipedia.org/wiki/Word_wrap#Minimum_raggedness
 
-class SmartWordWrap(width=80) {
+class SmartWordWrap {
+
+    has width = 80
 
     # This is the ugliest method! It, recursively,
     # prepares the words for the combine() function.
-    method prepare_words(array) {
+    method prepare_words(array, depth=0, callback) {
 
         var root = []
         var len = 0
-
         var i = -1
+
         var limit = array.end
         while (++i <= limit) {
             len += (var word_len = array[i].len)
 
             if (len > width) {
                 if (word_len > width) {
-                    len -= word_len;
-                    array.insert(i-1, array[i].split(width)...)
-                    array.delete_at(i)
+                    len -= word_len
+                    array.splice(i, 1, array[i].split(width)...)
                     limit = array.end
                     --i; next
                 }
@@ -37,55 +38,36 @@ class SmartWordWrap(width=80) {
 
             root << [
                 array.first(i+1).join(' '),
-                self.prepare_words(array.ft(i+1))
+                self.prepare_words(array.ft(i+1), depth+1, callback)
             ]
+
+            if (depth.is_zero) {
+                callback(root[0])
+                root = []
+            }
+
             break if (++len >= width)
         }
 
-        root || nil
+        root
     }
 
     # This function combines the
     # the parents with the childrens.
-    method combine(root, path) {
-
-        var row = []
+    method combine(root, path, callback) {
         var key = path.shift
         path.each { |value|
             root << key
-            if (defined(value)) {
-                value.each { |item|
-                    row += self.combine(root, item)
-                }
+            if (value.is_empty) {
+                callback(root)
             }
             else {
-                row = [root + []]
+                value.each { |item|
+                    self.combine(root, item, callback)
+                }
             }
             root.pop
         }
-
-        row;
-    }
-
-    # This function finds the best
-    # combination available and returns it.
-    method find_best(arrays) {
-
-        var best = Hash(score => Inf);
-
-        arrays.each { |array|
-            var score = 0;
-            array.each { |line|
-                score += sqr(width - line.len);
-            }
-
-            if (score < best{:score}) {
-                best{:score} = score;
-                best{:value} = array;
-            }
-        }
-
-        best{:value};
     }
 
     # This is the main function of the algorithm
@@ -93,17 +75,29 @@ class SmartWordWrap(width=80) {
     # returns the best possible wrapped string.
     method smart_wrap(text, width) {
 
-        local self{:width} = width;
-        var words = (text.is_a(Array) ? text : text.words);
+        self.width = width
+        var words = (text.kind_of(Array) ? text : text.words)
 
-        var lines = [];
-        self.prepare_words(words).each { |path|
-            lines += self.combine([], path);
-        }
+        var best = Hash(
+            score => Inf,
+            value => [],
+        )
 
-        var best = self.find_best(lines);
-        best == nil && return nil;
-        return best.join("\n");
+        self.prepare_words(words, callback: { |path|
+            self.combine([], path, { |combination|
+                var score = 0
+                combination.each { |line|
+                    score += (width - line.len -> sqr)
+                }
+
+                if (score < best{:score}) {
+                    best{:score} = score
+                    best{:value} = []+combination
+                }
+            })
+        })
+
+        best{:value}.join("\n")
     }
 }
 
