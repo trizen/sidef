@@ -13,3 +13,45 @@ say fib(30);
 say fib("-------");
 
 assert_eq(fib(30), 832040);
+
+#
+## A bit more complex test
+#
+
+subset Integer < Number  { .is_int }
+subset EvenInt < Integer { .is_even }
+
+var a = []
+var b = []
+
+func foo(String t ("abc")) {
+    a << 'expr'
+    b << t
+    say "eq expr: #{t}";
+}
+
+func foo(i < EvenInt) {
+    a << 'even'
+    b << i
+    say "even int: #{i}"
+}
+
+func foo(i < Integer) {
+    a << 'int'
+    b << i
+    say "int: #{i}"
+}
+
+func foo(String t) {
+    a << 'str'
+    b << t
+    say "str: #{t}"
+}
+
+foo(42)
+foo(43)
+foo("abc")
+foo("bar")
+
+assert_eq(a, %w(even int expr str))
+assert_eq(b, [42, 43, 'abc', 'bar'])
