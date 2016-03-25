@@ -488,6 +488,7 @@ HEADER
                        ', subset_blocks => [' . join(
                            ', ',
                            map {
+                               $self->{_subset_cache}{refaddr($_)} //=
                                    'sub{'
                                  . $self->_dump_sub_init_vars($_->{init_vars}{vars}[0])
                                  . $self->deparse_generic('', ';', '', $_->{code}) . '}'
