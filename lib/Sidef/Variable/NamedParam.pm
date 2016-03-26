@@ -16,11 +16,7 @@ package Sidef::Variable::NamedParam {
     sub dump {
         my ($self) = @_;
         my ($name, $args) = @{$self};
-        my @args = map {
-            ref($_) && eval { $_->can('dump') }
-              ? $_->dump
-              : $_
-        } @{$args};
+        my @args = map { ref($_) && defined(UNIVERSAL::can($_, 'dump')) ? $_->dump : $_ } @{$args};
         Sidef::Types::String::String->new("$name: " . (@args == 1 ? $args[0] : ('(' . join(', ', @args) . ')')));
     }
 }

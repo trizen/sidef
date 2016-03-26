@@ -312,7 +312,7 @@ package Sidef::Types::Array::Array {
     sub concat {
         my ($self, $arg) = @_;
 
-        eval { $arg->isa('ARRAY') }
+        UNIVERSAL::isa($arg, 'ARRAY')
           ? $self->new(@{$self}, @{$arg})
           : $self->new(@{$self}, $arg);
     }
@@ -1469,7 +1469,7 @@ package Sidef::Types::Array::Array {
         my $ref = ref($obj);
 
         foreach my $item (@{$self}) {
-            if (ref($item) eq $ref || eval { $item->SUPER::isa($ref) }) {
+            if (ref($item) eq $ref || UNIVERSAL::isa($item, $ref)) {
                 return (Sidef::Types::Bool::Bool::TRUE);
             }
         }
@@ -1789,7 +1789,7 @@ package Sidef::Types::Array::Array {
         my @array;
         my $sub;
         foreach my $item (@{$self}) {
-            if (ref($item) and defined(eval { $sub = $item->SUPER::can('copy') })) {
+            if (ref($item) and defined($sub = UNIVERSAL::can($item, 'copy'))) {
                 CORE::push(@array, $sub->($item));
             }
             else {
@@ -1906,7 +1906,7 @@ package Sidef::Types::Array::Array {
                 ', ',
                 map {
                     my $item = defined($self->[$_]) ? $self->[$_] : 'nil';
-                    ref($item) && defined(eval { $item->can('dump') }) ? $item->dump() : $item;
+                    ref($item) && defined(UNIVERSAL::can($item, 'dump')) ? $item->dump() : $item;
                   } 0 .. $#{$self}
               )
               . ']'

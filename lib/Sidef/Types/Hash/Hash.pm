@@ -399,7 +399,7 @@ package Sidef::Types::Hash::Hash {
                            my $val = $self->{$_};
                            (@keys > 1 ? (' ' x $Sidef::SPACES) : '')
                              . "${Sidef::Types::String::String->new($_)->dump} => "
-                             . (eval { $val->can('dump') } ? ${$val->dump} : defined($val) ? $val : 'nil')
+                             . (defined(UNIVERSAL::can($val, 'dump')) ? ${$val->dump} : defined($val) ? $val : 'nil')
                          } @keys
                      )
                      . (@keys > 1 ? ("\n" . (' ' x ($Sidef::SPACES - $Sidef::SPACES_INCR))) : '')

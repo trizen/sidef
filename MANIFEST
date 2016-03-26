@@ -327,6 +327,7 @@ scripts/RosettaCode/create_an_html_table.sf
 scripts/RosettaCode/date_format.sf
 scripts/RosettaCode/delete_a_file.sf
 scripts/RosettaCode/determine_if_a_string_is_numeric.sf
+scripts/RosettaCode/digital_root.sf
 scripts/RosettaCode/dijkstra_s_algorithm.sf
 scripts/RosettaCode/dinesman_problem_parsing.sf
 scripts/RosettaCode/dinesman_problem_simple.sf

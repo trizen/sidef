@@ -100,7 +100,7 @@ package Sidef::Types::Block::Block {
                         my $value = $seen{$var->{name}};
 
                         if (exists($var->{type})) {
-                            (ref($value) eq $var->{type} or eval { $value->SUPER::isa($var->{type}) }) || next OUTER;
+                            (ref($value) eq $var->{type} or UNIVERSAL::isa($value, $var->{type})) || next OUTER;
 
                             if (exists($var->{where_block})) {
                                 $var->{where_block}($value) || next OUTER;
@@ -180,7 +180,7 @@ package Sidef::Types::Block::Block {
           . join(
             ', ',
             map {
-                    ref($_) && eval { $_->can('dump') } ? $_->dump
+                    ref($_) && defined(UNIVERSAL::can($_, 'dump')) ? $_->dump
                   : ref($_)     ? Sidef::normalize_type(ref($_))
                   : defined($_) ? Sidef::normalize_type($_)
                   : 'nil'
@@ -229,7 +229,7 @@ package Sidef::Types::Block::Block {
             }
 
             foreach my $i (0 .. $#{$self->{returns}}) {
-                if (not(ref($objs[$i]) eq ($self->{returns}[$i]) or eval { $objs[$i]->SUPER::isa($self->{returns}[$i]) })) {
+                if (not(ref($objs[$i]) eq ($self->{returns}[$i]) or UNIVERSAL::isa($objs[$i], $self->{returns}[$i]))) {
                     die qq{[ERROR] Invalid return-type from $self->{type} }
                       . (defined($self->{class}) ? Sidef::normalize_type($self->{class}) . '.' : '')
                       . qq{$self->{name}\(): got `}
@@ -362,7 +362,6 @@ package Sidef::Types::Block::Block {
         my ($self, @args) = @_;
         state $x = do {
             eval { require forks; } // do {
-                warn "[WARN] Can't load the `forks` module. Using `threads` instead...\n";
                 require threads;
             };
             *threads::get  = \&threads::join;
@@ -383,7 +382,7 @@ package Sidef::Types::Block::Block {
     sub for {
         my ($self, @args) = @_;
 
-        if (@args == 1 and eval { $args[0]->can('each') }) {
+        if (@args == 1 and defined(UNIVERSAL::can($args[0], 'each'))) {
             $args[0]->each($self);
         }
         else {

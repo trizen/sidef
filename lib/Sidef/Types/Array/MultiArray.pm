@@ -85,7 +85,7 @@ package Sidef::Types::Array::MultiArray {
                         ", ",
                         map {
                             ref($_)
-                              && defined(eval { $_->can('dump') })
+                              && defined(UNIVERSAL::can($_, 'dump'))
                               ? $_->dump
                               : $_
                           } @{$_}

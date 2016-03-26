@@ -72,7 +72,7 @@ package Sidef::Types::Array::Pair {
                     ", ",
                     map {
                         my $val = $_;
-                        eval { $val->can('dump') } ? ${$val->dump} : defined($val) ? $val : 'nil'
+                        defined(UNIVERSAL::can($val, 'dump')) ? ${$val->dump} : defined($val) ? $val : 'nil'
                       } @{$self}
                 )
               )
