@@ -86,7 +86,7 @@ class SmartWordWrap {
         self.prepare_words(words, callback: { |path|
             self.combine([], path, { |combination|
                 var score = 0
-                combination.each { |line|
+                combination.ft(0, -2).each { |line|
                     score += (width - line.len -> sqr)
                 }
 
