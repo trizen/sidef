@@ -465,12 +465,7 @@ package Sidef::Parser {
                     $self->check_declarations({$class => $variable});
                 }
                 elsif ($self->{interactive}) {
-
-                    # Minor exception for interactive mode
-                    if (ref $variable->{obj} eq 'HASH') {
-                        ++$variable->{obj}{in_use};
-                    }
-
+                    ## Everything is OK in interactive mode
                 }
                 elsif (   $variable->{count} == 0
                        && $variable->{type} ne 'class'
@@ -824,7 +819,6 @@ package Sidef::Parser {
                              defined($where_block)   ? (where_block   => $where_block)   : (),
                              defined($where_expr)    ? (where_expr    => $where_expr)    : (),
                              defined($subset_blocks) ? (subset_blocks => $subset_blocks) : (),
-                             $opt{in_use}            ? (in_use        => 1)              : (),
                             },
                             'Sidef::Variable::Variable'
                            );
@@ -1108,7 +1102,6 @@ package Sidef::Parser {
                                                   code    => $opt{code},
                                                   type    => 'var',
                                                   private => 1,
-                                                  in_use  => 1,
                                                  );
 
                 foreach my $var (@{$vars}) {
@@ -1532,7 +1525,6 @@ package Sidef::Parser {
                                              code         => $opt{code},
                                              with_vals    => 1,
                                              private      => 1,
-                                             in_use       => 1,
                                              type         => 'var',
                                              ignore_delim => {
                                                               '{' => 1,
@@ -1887,9 +1879,6 @@ package Sidef::Parser {
 
                 if (defined(my $var = $self->find_var('_', $self->{class}))) {
                     $var->{count}++;
-                    ref($var->{obj}) eq 'Sidef::Variable::Variable' && do {
-                        $var->{obj}{in_use} = 1;
-                    };
                     return $var->{obj};
                 }
 
@@ -2116,17 +2105,13 @@ package Sidef::Parser {
 
                 if (defined(my $var = $self->find_var($name, $class))) {
                     $var->{count}++;
-                    ref($var->{obj}) eq 'Sidef::Variable::Variable' && do {
-                        $var->{obj}{in_use} = 1;
-                    };
                     return $var->{obj};
                 }
 
                 if ($name eq 'ARGV' or $name eq 'ENV') {
 
                     my $type = 'var';
-                    my $variable =
-                      bless({name => $name, type => $type, class => $class, in_use => 1}, 'Sidef::Variable::Variable');
+                    my $variable = bless({name => $name, type => $type, class => $class}, 'Sidef::Variable::Variable');
 
                     unshift @{$self->{vars}{$class}},
                       {
@@ -2161,7 +2146,6 @@ package Sidef::Parser {
                             }
 
                             $var->{count}++;
-                            $var->{obj}{in_use} = 1;
                             return
                               scalar {
                                       $self->{class} => [

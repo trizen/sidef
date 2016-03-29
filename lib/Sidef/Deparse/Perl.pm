@@ -225,8 +225,6 @@ HEADER
 
         $var->{name} eq '' and return 'undef';
 
-        # $var->{in_use} || exists($var->{value}) || exists($var->{ref_type}) || return 'undef';
-
         (
            exists($var->{array}) ? '@'
          : exists($var->{hash})  ? '%'
@@ -277,8 +275,6 @@ HEADER
                 }
 
                 push @code, (' ' x $Sidef::SPACES) . "\$$name = Sidef::Types::Array::Array->new(\@$name);\n";
-
-                #$var->{in_use} ||= 1;
                 delete $var->{array};
             }
             elsif (exists $var->{hash}) {
@@ -295,8 +291,6 @@ HEADER
                 }
 
                 push @code, (' ' x $Sidef::SPACES) . "\$$name = Sidef::Types::Hash::Hash->new(\%$name);\n";
-
-                #$var->{in_use} ||= 1;
                 delete $var->{hash};
             }
             elsif (exists $var->{value}) {
