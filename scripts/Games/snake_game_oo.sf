@@ -8,13 +8,7 @@ class SnakeGame(w, h) {
     const readkey = frequire('Term::ReadKey')
     const ansi    = frequire('Term::ANSIColor')
 
-    enum(
-        VOID,
-        HEAD,
-        BODY,
-        TAIL,
-        FOOD,
-    )
+    enum (VOID, HEAD, BODY, TAIL, FOOD)
 
     define (
         LEFT  = [+0, -1],
@@ -29,33 +23,15 @@ class SnakeGame(w, h) {
     define SLEEP_SEC   = 0.02
 
     const (
-        U_HEAD = ansi.colored('▲', SNAKE_COLOR),
-        D_HEAD = ansi.colored('▼', SNAKE_COLOR),
-        L_HEAD = ansi.colored('◀', SNAKE_COLOR),
-        R_HEAD = ansi.colored('▶', SNAKE_COLOR),
+        A_VOID  = ansi.colored(' ', BG_COLOR),
+        A_FOOD  = ansi.colored('❇', FOOD_COLOR),
+        A_BLOCK = ansi.colored('■', SNAKE_COLOR),
     )
 
-    const (
-        U_BODY = ansi.colored('╹', SNAKE_COLOR),
-        D_BODY = ansi.colored('╻', SNAKE_COLOR),
-        L_BODY = ansi.colored('╴', SNAKE_COLOR),
-        R_BODY = ansi.colored('╶', SNAKE_COLOR),
-    )
-
-    const (
-        U_TAIL = ansi.colored('╽', SNAKE_COLOR),
-        D_TAIL = ansi.colored('╿', SNAKE_COLOR),
-        L_TAIL = ansi.colored('╼', SNAKE_COLOR),
-        R_TAIL = ansi.colored('╾', SNAKE_COLOR),
-    )
-
-    const A_VOID = ansi.colored(' ', BG_COLOR)
-    const A_FOOD = ansi.colored('❇', FOOD_COLOR)
-
+    has dir = LEFT
     has grid = [[]]
     has head_pos = [0, 0]
     has tail_pos = [0, 0]
-    has dir = LEFT
 
     method init {
         grid = h.of { w.of { [VOID] } }
@@ -81,21 +57,14 @@ class SnakeGame(w, h) {
     }
 
     method display {
-        static i = 0
-
         print("\033[H", grid.map { |row|
             row.map { |cell|
-                if (cell[0] != VOID) {
-                    i = [UP, DOWN, LEFT, RIGHT].index(cell[1])
-                }
                 given (cell[0]) {
                     when (VOID) { A_VOID }
                     when (FOOD) { A_FOOD }
-                    when (BODY) { [U_BODY, D_BODY, L_BODY, R_BODY][i] }
-                    when (HEAD) { [U_HEAD, D_HEAD, L_HEAD, R_HEAD][i] }
-                    when (TAIL) { [U_TAIL, D_TAIL, L_TAIL, R_TAIL][i] }
+                    default     { A_BLOCK }
                 }
-              }.join
+              }.join('')
             }.join("\n")
         )
     }
