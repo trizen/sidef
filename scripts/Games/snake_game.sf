@@ -53,7 +53,7 @@ const (
 const A_VOID = ansi.colored(' ', BG_COLOR);
 const A_FOOD = ansi.colored('❇', FOOD_COLOR);
 
-var sleep    = 0.01;   # sleep duration between updates
+var sleep    = 0.02;   # sleep duration between updates
 var food_num = 10;     # number of initial food sources
 
 var w = `tput cols`.to_i;
@@ -84,19 +84,13 @@ func make_food {
 
 func display {
     static i = 0;
-    static s = [VOID, FOOD];
+    static s = [UP, DOWN, LEFT, RIGHT];
 
     print(r, grid.map { |row|
         row.map { |cell|
-            cell[0] !~ s && (
-                given (cell[1]) {
-                    when (UP)    { i=0 }
-                    when (DOWN)  { i=1 }
-                    when (LEFT)  { i=2 }
-                    when (RIGHT) { i=3 }
-                    }
-                );
-
+            if (cell[0] != VOID) {
+                i = s.index(cell[1])
+            }
             given (cell[0]) {
                 when (VOID) { A_VOID }
                 when (FOOD) { A_FOOD }
@@ -162,9 +156,9 @@ loop {
     }
 
     given (key) {
-        when ("\e[A") { dir = UP    }
-        when ("\e[B") { dir = DOWN  }
-        when ("\e[C") { dir = RIGHT }
-        when ("\e[D") { dir = LEFT  }
+        when ("\e[A") { if (dir != DOWN ) { dir = UP    } }
+        when ("\e[B") { if (dir != UP   ) { dir = DOWN  } }
+        when ("\e[C") { if (dir != LEFT ) { dir = RIGHT } }
+        when ("\e[D") { if (dir != RIGHT) { dir = LEFT  } }
     }
 }

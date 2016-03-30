@@ -124,10 +124,10 @@ class SnakeGame(w, h) {
                 }
 
                 given (key) {
-                    when ("\e[A") { dir = UP    }
-                    when ("\e[B") { dir = DOWN  }
-                    when ("\e[C") { dir = RIGHT }
-                    when ("\e[D") { dir = LEFT  }
+                    when ("\e[A") { if (dir != DOWN ) { dir = UP    } }
+                    when ("\e[B") { if (dir != UP   ) { dir = DOWN  } }
+                    when ("\e[C") { if (dir != LEFT ) { dir = RIGHT } }
+                    when ("\e[D") { if (dir != RIGHT) { dir = LEFT  } }
                 }
             }
         }
