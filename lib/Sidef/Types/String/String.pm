@@ -19,13 +19,9 @@ package Sidef::Types::String::String {
     sub new {
         my (undef, $str) = @_;
         if (@_ > 2) {
-            $str = CORE::join('', map { ref($_) ? "${$_->to_s}" : $_ } @_[1 .. $#_]);
+            $str = CORE::join('', map { "$_" } @_[1 .. $#_]);
         }
-        elsif (ref $str) {
-            return $str->to_s;
-        }
-        $str //= '';
-        bless \$str, __PACKAGE__;
+        bless(\"$str", __PACKAGE__);
     }
 
     *call = \&new;
