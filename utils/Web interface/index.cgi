@@ -1,15 +1,23 @@
 #!/usr/bin/perl
 
+# Run Sidef code inside the browser
+
 use utf8;
-use 5.010;
+use 5.018;
 use strict;
 use autodie;
-use warnings;
 
-use CGI qw(:standard);
+use CGI qw(:standard -utf8);
 use CGI::Carp qw(fatalsToBrowser);
+use Capture::Tiny qw(capture);
 
-my $sidef = 'sidef';    # command or path to sidef
+# Path where Sidef exists (when not installed)
+use lib qw(/home/swampyx/Other/Programare/Sidef/lib);
+
+# Limit the size of Sidef scripts to 500KB
+$CGI::POST_MAX = 1024 * 500;
+
+use Sidef;
 
 binmode(STDOUT, ':utf8');
 print header(-charset => 'UTF-8'),
@@ -20,7 +28,7 @@ print header(-charset => 'UTF-8'),
              -base   => 'true',
              -meta   => {
                        'keywords'  => 'sidef programming language web interface',
-                       'copyright' => 'Copyright © 2015 Daniel "Trizen" Șuteu'
+                       'copyright' => 'Copyright © 2015-2016 Daniel "Trizen" Șuteu'
                       },
              -style  => [{-src => 'css/main.css'}],
              -script => [
@@ -39,32 +47,10 @@ print header(-charset => 'UTF-8'),
 
 print h1("Sidef");
 
-if (param) {
-    if (defined(my $code = param('code'))) {
-        local (*CHLD_OUT, *CHLD_ERR);
-
-        require IPC::Open3;
-        my $pid = IPC::Open3::open3(undef, \*CHLD_OUT, \*CHLD_ERR, $sidef, '-E', $code);
-        waitpid($pid, 0);
-
-        my $stderr = do { local $/; <CHLD_ERR> };
-        my $stdout = do { local $/; <CHLD_OUT> };
-
-        chomp($stderr);
-        chomp($stdout);
-
-        if ($stderr ne "") {
-            print pre($stderr);
-            print hr;
-        }
-
-        print pre($stdout);
-    }
-}
-
 print start_form(
-                 -method => 'POST',
-                 -action => 'index.cgi',
+                 -method          => 'POST',
+                 -action          => 'index.cgi',
+                 'accept-charset' => "UTF-8",
                 ),
   textarea(
            -name    => 'code',
@@ -74,5 +60,91 @@ print start_form(
            -onfocus => 'clearContents(this);',
           ),
   br, submit(-name => "Run!"), end_form;
+
+sub parse {
+    my ($code) = @_;
+
+    @Sidef::NAMESPACES = ();
+    %Sidef::INCLUDED   = ();
+
+    my $errors = '';
+
+    local $SIG{__WARN__} = sub {
+        $errors .= join("\n", @_);
+    };
+
+    local $SIG{__DIE__} = sub {
+        $errors .= join("\n", @_);
+    };
+
+    my $parser = Sidef::Parser->new(file_name   => '-',
+                                    script_name => '-',);
+
+    my $struct = eval { $parser->parse_script(code => \$code) };
+
+    ($struct, $errors);
+}
+
+sub execute {
+    my ($struct) = @_;
+
+    state $count = 0;
+
+    my $environment_name = 'Sidef::Runtime' . CORE::abs(++$count);
+    my $deparser = Sidef::Deparse::Perl->new(namespaces       => [@Sidef::NAMESPACES],
+                                             environment_name => $environment_name,);
+
+    my $errors = '';
+
+    local $SIG{__WARN__} = sub {
+        $errors .= join("\n", @_);
+    };
+
+    local $SIG{__DIE__} = sub {
+        $errors .= join("\n", @_);
+    };
+
+    local $Sidef::DEPARSER = $deparser;
+    my $code = "package $environment_name {" . $deparser->deparse($struct) . "}";
+
+    my ($stdout, $stderr) = capture {
+        alarm 5;
+        eval($code);
+        alarm(0);
+    };
+
+    ($stdout, $errors . $stderr);
+}
+
+if (param) {
+    if (defined(my $code = param('code'))) {
+
+        # Replace any newline characters with "\n"
+        $code =~ s/\R/\n/g;
+
+        my ($struct, $errors) = parse($code);
+
+        if ($errors ne '') {
+            chomp($errors);
+            print pre($errors);
+            print hr;
+            $errors = '';
+        }
+
+        if (ref($struct) eq 'HASH') {
+            my ($output, $errors) = execute($struct);
+
+            if ($errors ne "") {
+                chomp($errors);
+                print pre($errors);
+                print hr;
+            }
+
+            if (defined $output and $output ne '') {
+                print pre($output);
+            }
+        }
+    }
+}
 
 print end_html;
