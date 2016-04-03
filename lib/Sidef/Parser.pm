@@ -394,11 +394,8 @@ package Sidef::Parser {
                      "Invalid code. Feel ashamed for yourself and try again.",
                     );
 
-        state $x = require File::Basename;
-        my $basename = File::Basename::basename($0);
-
         my $error = sprintf("%s: %s\n\nFile : %s\nLine : %s\nError: %s\n\n" . ("~" x 80) . "\n%s\n",
-                            $basename,
+                            'sidef',
                             $lines[rand @lines],
                             $self->{file_name} // '-',
                             $self->{line}, join(', ', grep { defined } $opt{error}, $opt{reason}), $error_line,);
