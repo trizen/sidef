@@ -2249,20 +2249,20 @@ package Sidef::Types::Number::Number {
         bless \$q, __PACKAGE__;
     }
 
-    sub rand_int {
+    sub irand {
         my ($x, $y) = @_;
 
         if (defined $y) {
             _valid($y);
             my $min = Math::GMPq::Rmpq_get_d($$x);
-            _new_int(CORE::int($min + CORE::rand(Math::GMPq::Rmpq_get_d($$y) - $min)));
+            __PACKAGE__->new(CORE::int($min + CORE::rand(Math::GMPq::Rmpq_get_d($$y) - $min)));
         }
         else {
-            _new_int(CORE::int(CORE::rand(Math::GMPq::Rmpq_get_d($$x))));
+            __PACKAGE__->new(CORE::int(CORE::rand(Math::GMPq::Rmpq_get_d($$x))));
         }
     }
 
-    *irand = \&rand_int;
+    *rand_int = \&irand;
 
     sub of {
         my ($x, $obj) = @_;

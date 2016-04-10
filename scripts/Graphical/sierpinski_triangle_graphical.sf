@@ -3,13 +3,13 @@
 # http://rosettacode.org/wiki/Sierpinski_triangle/Graphical#Sidef
 
 func sierpinski_triangle(n) -> Array {
-  var triangle = ['*'];
+  var triangle = ['*']
   { |i|
     var sp = (' ' * Math.pow(2, i-1));
     triangle = (triangle.map {|x| sp + x + sp} +
-                triangle.map {|x| x + ' ' + x});
-  } * n;
-  triangle;
+                triangle.map {|x| x + ' ' + x})
+  } * n
+  triangle
 }
 
 class Array {
@@ -17,37 +17,34 @@ class Array {
 
     var gd = (
       try   { require('GD::Simple') }
-      catch { warn "GD::Simple is not installed!"; return };
+      catch { warn "GD::Simple is not installed!"; return }
     );
 
-    var width = self.max_by{.len}.len;
-    self.map!{|r| "%-#{width}s" % r};
+    var width = self.max_by{.len}.len
+    self.map!{|r| "%-#{width}s" % r}
 
-    var img = gd.new(width * scale, self.len * scale);
+    var img = gd.new(width * scale, self.len * scale)
 
-    self.range.each { |i|
-      range(i * scale, i * scale + scale).each { |j|
-        var row = self[i];
-        img.moveTo(0, j);
-        loop {
-          if (var sp = row.match(/^\s+/)) {
-             row.substr!(sp.pos.last);
-             img.fgcolor(bgcolor);
-             img.line(scale * sp.pos.last);
+    for i in ^self {
+      for j in RangeNum(i*scale, i*scale + scale) {
+        var row = self[i]
+        img.moveTo(0, j)
+        var len = row.len
+        while (len) {
+          row.gsub!(/^\s+/)
+          var color = bgcolor
+          if (len == row.len) {
+            row.gsub!(/^\S+/)
+            color = fgcolor
           }
-          elsif (var nsp = row.match(/^\S+/)) {
-             row.substr!(nsp.pos.last);
-             img.fgcolor(fgcolor);
-             img.line(scale * nsp.pos.last);
-          }
-          else {
-             break;
-          }
+          img.fgcolor(color)
+          var p = len-row.len
+          len = row.len
+          img.line(scale * p)
         }
       }
     }
-
-    return img.png;
+    img.png
   }
 }
 
