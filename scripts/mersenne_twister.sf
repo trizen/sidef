@@ -1,0 +1,65 @@
+#!/usr/bin/ruby
+
+# Implementation of a variation of the Mersenne Twister (unbounded).
+# Returns a random float in the interval [0, 1)
+# See: https://en.wikipedia.org/wiki/Mersenne_Twister
+
+class MT19937(seed) {
+
+    has l = 18
+    has a = 0x9908B0DF16
+    has f = 1812433253
+
+    has (u, d) = (11, 0xFFFFFFFF16)
+    has (s, b) = (7, 0x9D2C568016)
+    has (t, c) = (15, 0xEFC6000016)
+    has (w, n, m, r) = (32, 624, 397, 31)
+
+    has mt = [0]*n
+
+    has index = n+1
+    has decimals = 10**w
+
+    method init {
+
+        index = n
+        mt[0] = seed
+
+        for i in ^(n-1) {
+            mt[i+1] =(f * (mt[i] ^ (mt[i] >> (w-2))) + i+1)
+        }
+    }
+
+    method extract_number {
+        if (index >= n) {
+            if (index > n) {
+                die "Generator was never seeded";
+            }
+            self.twist
+        }
+
+        var y = mt[index]
+        y = (y ^ ((y >> u) & d))
+        y = (y ^ ((y << s) & b))
+        y = (y ^ ((y << t) & c))
+        y = (y ^ (y >> l))
+
+        ++index
+        (y % decimals) / decimals
+    }
+
+    method twist {
+        for i in ^n {
+            var x = (mt[i] + mt[(i+1) % n])
+            var xA = (x >> 1)
+            if ((x % 2) != 0) {
+                xA ^= a
+            }
+            mt[i] = (mt[(i + m) % n] ^ xA)
+        }
+        index = 0
+    }
+}
+
+var obj = MT19937(42)
+10.times { say obj.extract_number }

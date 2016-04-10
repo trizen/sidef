@@ -215,6 +215,7 @@ scripts/langton_s_ant_2.sf
 scripts/linear_congruential_generator.sf
 scripts/mandelbrot_set.sf
 scripts/matrix_multiplication.sf
+scripts/mersenne_twister.sf
 scripts/multiple_dispatch.sf
 scripts/mutual_recursion.sf
 scripts/nth_root.sf
