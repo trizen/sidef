@@ -628,7 +628,7 @@ package Sidef::Parser {
         my @vars;
         my %classes;
 
-        while (   /\G(?<type>$self->{var_name_re}(?:\h+|\h*>>?\h*)$self->{var_name_re})\h*/goc
+        while (   /\G(?<type>$self->{var_name_re}\h+$self->{var_name_re})\h*/goc
                || /\G([*:]?$self->{var_name_re})\h*/goc
                || (defined($end_delim) && /\G(?=[({])/)) {
             push @vars, $1;
@@ -717,7 +717,7 @@ package Sidef::Parser {
         my $end_delim = $self->parse_delim(%opt);
 
         my @var_objs;
-        while (   /\G(?<type>$self->{var_name_re})(?:\h+|\h*>>?\h*)($self->{var_name_re})\h*/goc
+        while (   /\G(?<type>$self->{var_name_re})\h+($self->{var_name_re})\h*/goc
                || /\G([*:]?)($self->{var_name_re})\h*/goc
                || (defined($end_delim) && /\G(?=[({])/)) {
             my ($attr, $name) = ($1, $2);
