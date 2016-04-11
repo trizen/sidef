@@ -167,6 +167,23 @@ package Sidef::Object::Object {
         $_[0]->new(CORE::join('', @_[1 .. $#_]));
     }
 
+    sub dump {
+        my ($obj) = @_;
+        my $type = Sidef::normalize_type(ref($obj) ? ref($obj) : $obj);
+        Scalar::Util::reftype($obj) eq 'HASH' or return $type;
+        my @keys = sort keys(%{$obj});
+        Sidef::Types::String::String->new(
+            "$type(" . join(
+                ', ',
+                map {
+                    my $str = UNIVERSAL::can($obj->{$_}, 'dump') ? $obj->{$_}->dump : "$obj->{$_}";
+                    "$_: $str";
+                  } @keys
+              )
+              . ')'
+        );
+    }
+
     {
         no strict 'refs';
 
