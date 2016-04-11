@@ -80,6 +80,14 @@ Return the
 
 =cut
 
+=head2 dump
+
+Object.dump() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 interpolate
 
 Object.interpolate() -> I<Obj>

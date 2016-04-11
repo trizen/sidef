@@ -379,8 +379,6 @@ package Sidef::Types::Hash::Hash {
         map { (Sidef::Types::String::String->new($_), $self->{$_}) } CORE::keys %$self;
     }
 
-    *as_list = \&to_list;
-
     sub dump {
         my ($self) = @_;
 

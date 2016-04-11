@@ -1896,7 +1896,6 @@ package Sidef::Types::Array::Array {
     *remove_last_if = \&delete_last_if;
 
     sub to_list { @{$_[0]} }
-    *as_list = \&to_list;
 
     sub dump {
         my ($self) = @_;

@@ -33,6 +33,14 @@ Aliases: I<caps>, I<captures>
 
 =cut
 
+=head2 dump
+
+Match.dump() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 join
 
 Match.join() -> I<Obj>

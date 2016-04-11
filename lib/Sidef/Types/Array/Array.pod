@@ -95,7 +95,7 @@ I<Obj> B<...> I<Obj> -> I<Obj>
 
 Return the
 
-Aliases: I<as_list>, I<to_list>
+Aliases: I<to_list>
 
 =cut
 
