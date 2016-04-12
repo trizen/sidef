@@ -4,21 +4,21 @@
 # Returns a random float in the interval [0, 1)
 # See: https://en.wikipedia.org/wiki/Mersenne_Twister
 
-class MT19937(seed) {
+class MT19937(seed, prec = 32) {
 
     has l = 18
-    has a = 0x9908B0DF16
+    has a = 0x9908B0DF
     has f = 1812433253
 
-    has (u, d) = (11, 0xFFFFFFFF16)
-    has (s, b) = (7, 0x9D2C568016)
-    has (t, c) = (15, 0xEFC6000016)
-    has (w, n, m, r) = (32, 624, 397, 31)
+    has (u, d) = (11, 1<<prec - 1)
+    has (s, b) = (7, 0x9D2C5680)
+    has (t, c) = (15, 0xEFC60000)
+    has (n, m) = (624, 397)
 
     has mt = [0]*n
 
     has index = n+1
-    has decimals = 10**w
+    has decimals = 10**prec
 
     method init {
 
@@ -26,7 +26,7 @@ class MT19937(seed) {
         mt[0] = seed
 
         for i in ^(n-1) {
-            mt[i+1] =(f * (mt[i] ^ (mt[i] >> (w-2))) + i+1)
+            mt[i+1] =(f * (mt[i] ^ (mt[i] >> prec)) + i+1)
         }
     }
 
@@ -61,5 +61,5 @@ class MT19937(seed) {
     }
 }
 
-var obj = MT19937(42)
-10.times { say obj.extract_number }
+var obj = MT19937(seed: 42)
+10.times {  say obj.extract_number }
