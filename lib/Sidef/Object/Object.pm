@@ -46,7 +46,7 @@ package Sidef::Object::Object {
             }
         }
 
-        my $cmp = ((ref($obj1) ? Scalar::Util::refaddr($obj1) : ('-inf' + 0))
+        my $cmp = ((CORE::ref($obj1) ? Scalar::Util::refaddr($obj1) : ('-inf' + 0))
                    <=> (CORE::ref($obj2) ? Scalar::Util::refaddr($obj2) : ('-inf' + 0)));
 
             $cmp < 0 ? Sidef::Types::Number::Number::MONE
@@ -169,11 +169,11 @@ package Sidef::Object::Object {
 
     sub dump {
         my ($obj) = @_;
-        my $type = Sidef::normalize_type(ref($obj) ? ref($obj) : $obj);
+        my $type = Sidef::normalize_type(CORE::ref($obj) ? CORE::ref($obj) : $obj);
         Scalar::Util::reftype($obj) eq 'HASH' or return $type;
-        my @keys = sort keys(%{$obj});
+        my @keys = CORE::sort CORE::keys(%{$obj});
         Sidef::Types::String::String->new(
-            "$type(" . join(
+            "$type(" . CORE::join(
                 ', ',
                 map {
                     my $str = UNIVERSAL::can($obj->{$_}, 'dump') ? $obj->{$_}->dump : "$obj->{$_}";

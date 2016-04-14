@@ -338,8 +338,8 @@ package Sidef::Types::Hash::Hash {
               Sidef::Types::Array::Array->new(
                                               [
                                                map { Sidef::Types::Array::Array->new($_->[1], $self->{$_->[0]}) } (
-                                                              sort { scalar $code->run($a->[1], $b->[1]) }
-                                                                map { [$_, Sidef::Types::String::String->new($_)] } keys %$self
+                                                        sort { scalar $code->run($a->[1], $b->[1]) }
+                                                          map { [$_, Sidef::Types::String::String->new($_)] } CORE::keys %$self
                                                )
                                               ]
                                              );
