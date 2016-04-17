@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-Sidef::Variable::LazyMethod
+Sidef::Object::LazyMethod
 
 =head1 DESCRIPTION
 

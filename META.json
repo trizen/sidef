@@ -80,6 +80,9 @@
       "Sidef::Object::Lazy" : {
          "file" : "lib/Sidef/Object/Lazy.pm"
       },
+      "Sidef::Object::LazyMethod" : {
+         "file" : "lib/Sidef/Object/LazyMethod.pm"
+      },
       "Sidef::Object::Object" : {
          "file" : "lib/Sidef/Object/Object.pm"
       },
@@ -190,9 +193,6 @@
       },
       "Sidef::Types::String::String" : {
          "file" : "lib/Sidef/Types/String/String.pm"
-      },
-      "Sidef::Variable::LazyMethod" : {
-         "file" : "lib/Sidef/Variable/LazyMethod.pm"
       },
       "Sidef::Variable::NamedParam" : {
          "file" : "lib/Sidef/Variable/NamedParam.pm"

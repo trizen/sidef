@@ -31,3 +31,21 @@ Dir.cwd.open_r.lazy.grep{.match(/e/)}.map{.lc}.first(3).join("\n").say
     say i
     break
 }
+
+#
+## Lazy type
+#
+
+var lz = (^Inf -> lazy.grep{.is_prime})
+
+func f(Lazy foo) {
+    var i = foo.iter
+    10.times { say i() }
+}
+
+f(lz)
+
+var ok = false
+try { f("asd") }
+catch { ok = true }
+assert_eq(ok, true)

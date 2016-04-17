@@ -82,20 +82,20 @@ package Sidef::Object::Object {
 
     *println = \&say;
 
-    sub lazy {
-        my ($self) = @_;
-        Sidef::Object::Lazy->new(obj => $self);
-    }
-
     sub print {
         (CORE::print @_)
           ? (Sidef::Types::Bool::Bool::TRUE)
           : (Sidef::Types::Bool::Bool::FALSE);
     }
 
+    sub lazy {
+        my ($self) = @_;
+        Sidef::Object::Lazy->new(obj => $self);
+    }
+
     sub method {
         my ($self, $method, @args) = @_;
-        Sidef::Variable::LazyMethod->new(obj => $self, method => $method, args => \@args);
+        Sidef::Object::LazyMethod->new(obj => $self, method => $method, args => \@args);
     }
 
     sub object_id {
@@ -223,10 +223,10 @@ package Sidef::Object::Object {
             foreach my $method (grep { $_ !~ /^[(_]/ and defined(&{$ref . '::' . $_}) } keys %{$ref . '::'}) {
                 $methods{$method} = (
                                      $alias{\&{$ref . '::' . $method}} //=
-                                       Sidef::Variable::LazyMethod->new(
-                                                                        obj    => $self,
-                                                                        method => \&{$ref . '::' . $method}
-                                                                       )
+                                       Sidef::Object::LazyMethod->new(
+                                                                      obj    => $self,
+                                                                      method => \&{$ref . '::' . $method}
+                                                                     )
                                     );
             }
 

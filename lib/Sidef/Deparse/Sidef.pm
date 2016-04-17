@@ -40,7 +40,8 @@ package Sidef::Deparse::Sidef {
                   Sidef::DataTypes::Glob::File            File
                   Sidef::DataTypes::Object::Object        Object
                   Sidef::DataTypes::Sidef::Sidef          Sidef
-                  Sidef::DataTypes::Variable::LazyMethod  LazyMethod
+                  Sidef::DataTypes::Object::Lazy          Lazy
+                  Sidef::DataTypes::Object::LazyMethod    LazyMethod
 
                   Sidef::Math::Math                       Math
                   Sidef::Meta::Glob::ARGF                 ARGF

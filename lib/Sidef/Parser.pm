@@ -68,7 +68,8 @@ package Sidef::Parser {
                      | Socket\b                       (?{ state $x = bless({}, 'Sidef::DataTypes::Glob::Socket') })
                      | Pipe\b                         (?{ state $x = bless({}, 'Sidef::DataTypes::Glob::Pipe') })
                      | Ref\b                          (?{ state $x = bless({}, 'Sidef::Variable::Ref') })
-                     | LazyMethod\b                   (?{ state $x = bless({}, 'Sidef::DataTypes::Variable::LazyMethod') })
+                     | Lazy\b                         (?{ state $x = bless({}, 'Sidef::DataTypes::Object::Lazy') })
+                     | LazyMethod\b                   (?{ state $x = bless({}, 'Sidef::DataTypes::Object::LazyMethod') })
                      | Complex\b                      (?{ state $x = bless({}, 'Sidef::DataTypes::Number::Complex') })
                      | Regexp?\b                      (?{ state $x = bless({}, 'Sidef::DataTypes::Regex::Regex') })
                      | Object\b                       (?{ state $x = bless({}, 'Sidef::DataTypes::Object::Object') })
@@ -200,6 +201,7 @@ package Sidef::Parser {
                   Parser
                   Block
                   Backtick
+                  Lazy
                   LazyMethod
 
                   true false

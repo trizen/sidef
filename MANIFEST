@@ -13,6 +13,8 @@ lib/Sidef/Module/Func.pm
 lib/Sidef/Module/OO.pm
 lib/Sidef/Object/Lazy.pm
 lib/Sidef/Object/Lazy.pod
+lib/Sidef/Object/LazyMethod.pm
+lib/Sidef/Object/LazyMethod.pod
 lib/Sidef/Object/Object.pm
 lib/Sidef/Object/Object.pod
 lib/Sidef/Optimizer.pm
@@ -82,8 +84,6 @@ lib/Sidef/Types/Regex/Regex.pm
 lib/Sidef/Types/Regex/Regex.pod
 lib/Sidef/Types/String/String.pm
 lib/Sidef/Types/String/String.pod
-lib/Sidef/Variable/LazyMethod.pm
-lib/Sidef/Variable/LazyMethod.pod
 lib/Sidef/Variable/NamedParam.pm
 lib/Sidef/Variable/NamedParam.pod
 LICENSE

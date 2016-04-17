@@ -78,7 +78,8 @@ package Sidef::Deparse::Perl {
                   Sidef::DataTypes::Glob::File            Sidef::Types::Glob::File
                   Sidef::DataTypes::Object::Object        Sidef::Object::Object
                   Sidef::DataTypes::Sidef::Sidef          Sidef
-                  Sidef::DataTypes::Variable::LazyMethod  Sidef::Variable::LazyMethod
+                  Sidef::DataTypes::Object::Lazy          Sidef::Object::Lazy
+                  Sidef::DataTypes::Object::LazyMethod    Sidef::Object::LazyMethod
                   )
             },
 

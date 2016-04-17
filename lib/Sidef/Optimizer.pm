@@ -52,7 +52,6 @@ package Sidef::Optimizer {
               Sidef::DataTypes::Glob::Pipe            Sidef::Types::Glob::Pipe
               Sidef::DataTypes::Glob::Dir             Sidef::Types::Glob::Dir
               Sidef::DataTypes::Glob::File            Sidef::Types::Glob::File
-              Sidef::DataTypes::Variable::LazyMethod  Sidef::Variable::LazyMethod
               )
         );
 

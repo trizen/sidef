@@ -1,4 +1,4 @@
-package Sidef::Variable::LazyMethod {
+package Sidef::Object::LazyMethod {
 
     use 5.014;
     use parent qw(

@@ -78,7 +78,7 @@ package Sidef::Deparse::Julia {
                   Sidef::DataTypes::Glob::File            Sidef_Types_Glob_File
                   Sidef::DataTypes::Object::Object        Sidef_Object_Object
                   Sidef::DataTypes::Sidef::Sidef          Sidef
-                  Sidef::DataTypes::Variable::LazyMethod  Sidef_Variable_LazyMethod
+                  Sidef::DataTypes::Object::LazyMethod    Sidef_Variable_LazyMethod
                   )
             },
 
@@ -1360,9 +1360,6 @@ HEADER
         }
         elsif ($ref eq 'Sidef::Object::Object') {
             $code = $self->make_constant($ref, 'new', "Object$refaddr");
-        }
-        elsif ($ref eq 'Sidef::Variable::LazyMethod') {
-            $code = $ref . '->new';
         }
         elsif ($ref eq 'Sidef::Types::Array::MultiArray') {
             $code = $self->make_constant($ref, 'new', "MultiArr$refaddr");
