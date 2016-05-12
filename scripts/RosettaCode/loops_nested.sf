@@ -4,7 +4,7 @@
 ## http://rosettacode.org/wiki/Loops/Nested
 #
 
-var arr = 10.of{ 10.of{ 20.rand.int + 1 } };
+var arr = 10.of{ 10.of{ 20.irand + 1 } };
  
 for (arr) { |row|
     for (row) { |num|

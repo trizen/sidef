@@ -5,7 +5,7 @@ var lingua = Lingua::RO::Numbers::new();
 
 lingua.thousands_separator = (',');
 
-for(var i = -1000000; i <= 1000000; i += 500000.rand.int) {
+for(var i = -1000000; i <= 1000000; i += 500000.irand) {
 
     # From number to RO
     var ro = lingua.number_to_ro(i);

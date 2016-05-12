@@ -190,10 +190,10 @@ var max_tries = 1_000;
 var directions = [up, down, left, right];
 
 while (count != PLANES_NUM) {
-    var x = play_board.len.rand.int;
-    var y = play_board[0].len.rand.int;
+    var x = play_board.len.irand;
+    var y = play_board[0].len.irand;
 
-    var rand = directions.len.rand.int;
+    var rand = directions.len.irand;
     var code = directions[rand];
 
     if (--max_tries <= 0) {
@@ -220,7 +220,7 @@ print_ascii_table();
 while (count > 0) {
 
     var letter = letters.keys.rand;
-    var number = BOARD_SIZE.inc.rand(1).int;
+    var number = 1.irand(BOARD_SIZE + 1);
     var text = "=>> Your guess (e.g.: #{letter}#{number})\n> ";
 
     var input = Sys.scanln(text).lc;

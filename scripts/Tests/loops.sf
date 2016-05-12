@@ -6,9 +6,9 @@
 
 var lim = 20;
 while (true) {
-    say (var n = lim.rand.int);
+    say (var n = lim.irand);
     n == 10 && break;
-    say lim.rand.int;
+    say lim.irand;
 }
 
 
@@ -104,7 +104,7 @@ print "\n";
 ## Nested
 #
 
-var arr = 10.of{ 10.of{ 20.rand.int + 1 } };
+var arr = 10.of{ 10.of{ 20.irand + 1 } };
 
 for (arr) { |row|
     for (row) { |num|

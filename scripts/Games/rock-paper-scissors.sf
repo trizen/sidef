@@ -23,7 +23,7 @@ var plays   = 0;
 var aScore  = 0;
 var pScore  = 0;
 var pcf     = [0,0,0];      # pcf = player choice frequency
-var aChoice = 3.rand.int;   # ai choice for first play is completely random
+var aChoice = 3.irand;      # ai choice for first play is completely random
  
 loop {
     var pi = Sys.scanln("Play: ");
@@ -52,7 +52,7 @@ loop {
     "%-6s".printf("%d:%d" % (pScore, aScore));
  
     # compute ai choice for next play
-    given (var rn = (plays.rand.int)) {
+    given (var rn = (plays.irand)) {
         case (rn < pcf[0])        { aChoice = 1 }
         case (pcf[0]+pcf[1] > rn) { aChoice = 2 }
         default                   { aChoice = 0 }

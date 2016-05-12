@@ -2223,10 +2223,7 @@ package Sidef::Types::Number::Number {
         my ($x, $y) = @_;
 
         state $state = Math::MPFR::Rmpfr_randinit_mt();
-        state $seed  = do {
-            my $seed = srand();
-            Math::MPFR::Rmpfr_randseed_ui($state, $seed);
-        };
+        state $seed = Math::MPFR::Rmpfr_randseed_ui($state, scalar srand());
 
         my $rand = Math::MPFR::Rmpfr_init2($PREC);
         Math::MPFR::Rmpfr_urandom($rand, $state, $ROUND);
@@ -2252,13 +2249,35 @@ package Sidef::Types::Number::Number {
     sub irand {
         my ($x, $y) = @_;
 
-        if (defined $y) {
+        state $state = Math::GMPz::zgmp_randinit_mt();
+        state $seed = Math::GMPz::zgmp_randseed_ui($state, scalar srand());
+
+        $x = _big2mpz($x);
+
+        if (defined($y)) {
             _valid($y);
-            my $min = Math::GMPq::Rmpq_get_d($$x);
-            __PACKAGE__->new(CORE::int($min + CORE::rand(Math::GMPq::Rmpq_get_d($$y) - $min)));
+
+            my $rand = _big2mpz($y);
+            my $cmp = Math::GMPz::Rmpz_cmp($rand, $x);
+
+            if ($cmp == 0) {
+                return _mpz2big($rand);
+            }
+            elsif ($cmp < 0) {
+                ($x, $rand) = ($rand, $x);
+            }
+
+            Math::GMPz::Rmpz_sub($rand, $rand, $x);
+            Math::GMPz::Rmpz_urandomm($rand, $state, $rand, 1);
+            Math::GMPz::Rmpz_add($rand, $rand, $x);
+
+            _mpz2big($rand);
         }
         else {
-            __PACKAGE__->new(CORE::int(CORE::rand(Math::GMPq::Rmpq_get_d($$x))));
+            my $sgn = Math::GMPz::Rmpz_sgn($x);
+            Math::GMPz::Rmpz_urandomm($x, $state, $x, 1);
+            Math::GMPz::Rmpz_neg($x, $x) if $sgn < 0;
+            _mpz2big($x);
         }
     }
 

@@ -1,6 +1,6 @@
 #!/usr/bin/ruby
 
-var arr = (1..10 -> map{10.rand.int});
+var arr = (1..10 -> map{10.irand});
 var arc = (arr.map{|i|i});
 
 arr.grep {|n| n > 3} == (
