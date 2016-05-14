@@ -294,7 +294,7 @@ package Sidef::Types::Array::Array {
                 push @new, $x[$i];
                 ++$i;
             }
-            elsif (ref($cmp) ? $cmp->is_one : ($cmp == -1)) {
+            elsif (ref($cmp) ? $cmp->is_one : ($cmp == 1)) {
                 ++$j;
             }
             else {
