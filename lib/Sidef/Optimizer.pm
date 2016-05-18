@@ -270,7 +270,7 @@ package Sidef::Optimizer {
 
             # Number.method(Number)
             (
-             map { [$_, [table(NUMBER)]] }
+             map { [$_, [table(NUMBER, COMPLEX)]] }
                methods(NUMBER, qw(
                    + - / * % %% **
 
@@ -535,7 +535,6 @@ package Sidef::Optimizer {
                    div
                    add
                    sub
-                   exp
                    log
                    pow
 
@@ -553,6 +552,7 @@ package Sidef::Optimizer {
                    dec
                    abs
 
+                   exp
                    log
                    log2
                    log10

@@ -186,7 +186,7 @@ package Sidef::Types::Array::Array {
     sub or {
         my ($self, $array) = @_;
 
-        #$self->xor($array)->concat($self->and($array));
+        #$self->and($array)->concat($self->xor($array));
         $self->concat($array)->uniq;
     }
 
