@@ -311,9 +311,12 @@ package Sidef::Optimizer {
                    factorial
                    sqrt isqrt
                    next_pow2
-                   abs
+                   abs int
 
-                   exp int
+                   exp
+                   exp2
+                   exp10
+
                    cos sin
 
                    ln
@@ -553,6 +556,9 @@ package Sidef::Optimizer {
                    abs
 
                    exp
+                   exp2
+                   exp10
+
                    log
                    log2
                    log10
