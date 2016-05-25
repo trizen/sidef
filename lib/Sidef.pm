@@ -128,16 +128,8 @@ package Sidef {
     sub has_dbm_driver {
         my ($self) = @_;
 
-        if (exists($self->{_gdbm}) or exists($self->{_db})) {
-            return ($self->{_gdbm} || $self->{_db});
-        }
-
-        if (eval { require GDBM_File; 1 }) {
-            $self->{_gdbm} = 1;
-            return 1;
-        }
-        else {
-            $self->{_gdbm} = 0;
+        if (exists($self->{_db}) or exists($self->{_gdbm})) {
+            return ($self->{_db} || $self->{_gdbm});
         }
 
         if (eval { require DB_File; 1 }) {
@@ -146,6 +138,14 @@ package Sidef {
         }
         else {
             $self->{_db} = 0;
+        }
+
+        if (eval { require GDBM_File; 1 }) {
+            $self->{_gdbm} = 1;
+            return 1;
+        }
+        else {
+            $self->{_gdbm} = 0;
         }
 
         return;
