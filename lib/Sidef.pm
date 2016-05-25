@@ -253,6 +253,7 @@ package Sidef {
 
         if (
             $self->{opt}{s}
+            ##and length($$code) > 1024
             and (defined($self->{dbm_driver})
                  or $self->has_dbm_driver)
           ) {
