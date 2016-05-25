@@ -851,6 +851,7 @@ utils/Concepts/sidef_executor.jl
 utils/Concepts/sidef_executor.lua
 utils/Concepts/sidef_executor.pl6
 utils/Examples/sidef_in_perl.pl
+utils/Examples/sidef_parsing.pl
 utils/Experiments/C-inline-function-call.pl
 utils/Experiments/julia_codegen.jl
 utils/Experiments/JuliaBackend/Julia.pm

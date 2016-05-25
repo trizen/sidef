@@ -2011,10 +2011,18 @@ package Sidef::Parser {
             }
 
             if (/\G__MAIN__\b/gc) {
+                if (-e $self->{script_name}) {
+                    state $x = require File::Spec;
+                    return Sidef::Types::String::String->new(File::Spec->rel2abs($self->{script_name}));
+                }
                 return Sidef::Types::String::String->new($self->{script_name});
             }
 
             if (/\G__FILE__\b/gc) {
+                if (-e $self->{file_name}) {
+                    state $x = require File::Spec;
+                    return Sidef::Types::String::String->new(File::Spec->rel2abs($self->{file_name}));
+                }
                 return Sidef::Types::String::String->new($self->{file_name});
             }
 

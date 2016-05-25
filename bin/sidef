@@ -27,12 +27,20 @@ use Sidef;
 my $name    = 'Sidef';
 my $version = $Sidef::VERSION;
 
-sub NATIVE () { 0 }
-
 my %args;
 if ($#ARGV != -1 and chr ord $ARGV[0] eq '-') {
     require Getopt::Std;
-    Getopt::Std::getopts('e:E:Dho:ivHWwbcrR:ts:CO:kP:M:', \%args);
+    Getopt::Std::getopts('e:E:Dho:ivHWwbcrR:tCO:kP:M:s', \%args);
+}
+
+# Fix potential case mismatches for -R
+if (defined $args{R}) {
+    if (lc($args{R}) eq 'perl') {
+        $args{R} = 'Perl';
+    }
+    elsif (lc($args{R}) eq 'sidef') {
+        $args{R} = 'Sidef';
+    }
 }
 
 # Help
@@ -61,11 +69,6 @@ elsif (defined $args{W}) {
     };
 }
 
-# Number of spaces for indentation
-if (defined(my $num = $args{s})) {
-    $Sidef::SPACES_INCR = int($num);
-}
-
 # Interactive help
 if (defined $args{H}) {
     help_interactive();
@@ -90,12 +93,11 @@ if (defined $args{t}) {
         say "\n** Executing: $script_name";
         say "-" x 80;
 
-        @Sidef::NAMESPACES = ();
-        %Sidef::INCLUDED   = ();
+        my $sidef = Sidef->new(opt  => \%args,
+                               name => $script_name,);
 
-        my $code   = read_script($script_name);
-        my $parser = new_parser(name => $script_name);
-        my $struct = eval { parse_code($parser, $code) };
+        my $code = read_script($script_name);
+        my $deparsed = eval { $sidef->compile_code(\$code, 'Perl') };
 
         my $slept = 0;
         if ($@) {
@@ -104,13 +106,10 @@ if (defined $args{t}) {
             $slept = 1;
         }
         else {
-            local $Sidef::PARSER = $parser;
-
             local $SIG{INT} = sub {
                 die "Stopped by user...";
             };
-
-            execute_struct($struct, 1);
+            $sidef->execute_perl($deparsed);
         }
 
         if (not($slept) and $@) {
@@ -142,20 +141,20 @@ else {
 
     $code // exit 2;
 
-    # Parse the code
-    my $parser = new_parser(name => $script_name);
-    my $struct = parse_code($parser, $code);
+    my $sidef = Sidef->new(opt  => \%args,
+                           name => $script_name,);
 
     # Dump the data structure
     if (defined $args{D}) {
+        my $struct = $sidef->parse_code(\$code);
         dump_structure($struct);
     }
 
     # Deparse code
     elsif (defined($args{r}) or defined($args{R})) {
-        my $deparsed = deparse_structure($struct, $args{R});
+        my $deparsed = $sidef->compile_code(\$code, $args{R});
 
-        if (defined($args{R}) and lc($args{R}) eq 'perl') {
+        if (defined($args{R}) and $args{R} eq 'Perl') {
 
             my $header =
                 "\nuse lib (" . q{"}
@@ -174,7 +173,7 @@ else {
 
     # Compile the struct to a Perl program
     elsif (defined $args{c}) {
-        compile_to_perl(code => deparse_structure($struct, 'Perl'), type => NATIVE);
+        compile_to_perl(code => $sidef->compile_code(\$code, 'Perl'));
     }
 
     # Check the syntax
@@ -184,89 +183,14 @@ else {
 
     # Execute the struct
     else {
-        local $Sidef::PARSER = $parser;
-        execute_struct($struct);
+        $sidef->execute_code(\$code);
+        die $@ if $@;
     }
 }
 
 #
 ## Subroutines
 #
-
-sub read_script {
-    my ($script_name) = @_;
-    open my $fh, '<:utf8', $script_name
-      or die qq{Can't open sidef script "$script_name": $!\n};
-    local $/;
-    <$fh>;
-}
-
-sub new_parser {
-    my (%opt) = @_;
-    Sidef::Parser->new(
-                       opt         => \%args,
-                       file_name   => $opt{name},
-                       script_name => $opt{name},
-                      );
-}
-
-sub optimize_struct {
-    my ($struct) = @_;
-
-    my $optimizer  = Sidef::Optimizer->new;
-    my %opt_struct = $optimizer->optimize($struct);
-
-    return \%opt_struct;
-}
-
-sub parse_code {
-    my ($parser, $code) = @_;
-
-    my $struct = $parser->parse_script(code => \$code);
-
-    # Check for optimization
-    if (defined($args{O})) {
-
-        # Optimize the AST
-        if ($args{O} >= 1) {
-            $struct = optimize_struct($struct);
-        }
-
-        # Deparse the AST into code, then parse the code again.
-        if ($args{O} >= 2) {
-            my $deparser = Sidef::Deparse::Sidef->new(namespaces => [@Sidef::NAMESPACES]);
-            my $code = $deparser->deparse($struct);
-
-            local %Sidef::INCLUDED;
-            local @Sidef::NAMESPACES;
-
-            $struct = Sidef::Parser->new(
-                                         opt         => \%args,
-                                         file_name   => $parser->{file_name},
-                                         script_name => $parser->{script_name},
-                                        )->parse_script(code => \$code);
-
-            $struct = optimize_struct($struct);
-        }
-    }
-
-    $struct;
-}
-
-sub execute_struct {
-    my ($struct, $return) = @_;
-    state $count = 0;
-
-    my $environment_name = 'Sidef::Runtime' . CORE::abs(++$count);
-    my $deparser = Sidef::Deparse::Perl->new(
-                                             opt              => \%args,
-                                             namespaces       => [@Sidef::NAMESPACES],
-                                             environment_name => $environment_name,
-                                            );
-    local $Sidef::DEPARSER = $deparser;
-    my $code = "package $environment_name {" . $deparser->deparse($struct) . "}";
-    $return ? eval($code) : do { eval($code); $@ && die $@; exit };
-}
 
 sub output_usage {
 #<<<
@@ -284,7 +208,7 @@ sub output_usage {
                     '-k'         => 'keep track of potential unsafe parser interpretations',
                     '-E program' => 'one line of program',
                     '-H'         => 'interactive help',
-                    '-s int'     => 'the number of spaces used in code indentation',
+                    '-s'         => 'save compiled code in a database to reduce boot-time',
                     '-v'         => 'print version number and exit',
                     '-t'         => 'treat all command-line arguments as scripts',
                     '-r'         => 'parse and deparse a Sidef program',
@@ -330,6 +254,14 @@ sub output_version {
     print "$name $version\n";
 }
 
+sub read_script {
+    my ($script_name) = @_;
+    open my $fh, '<:utf8', $script_name
+      or die qq{Can't open sidef script "$script_name": $!\n};
+    local $/;
+    <$fh>;
+}
+
 sub help_interactive {
 
     require File::Basename;
@@ -337,6 +269,7 @@ sub help_interactive {
 
     require Encode;
     require Term::ReadLine;
+
     my $term = Term::ReadLine->new("$name $version -- help interactive mode");
 
     print <<"HELP";
@@ -348,6 +281,12 @@ type "quit".
 
 HELP
 
+    my $sidef = Sidef->new(
+                           name       => '-H',
+                           opt        => \%args,
+                           parser_opt => {interactive => 1},
+                          );
+
     {
         my $line = Encode::decode_utf8(
             $term->readline('help> ')
@@ -358,22 +297,14 @@ HELP
             return;
         }
 
-        my $parser = new_parser(name => '-H');
-        $parser->{interactive} = 1;
-
-        my $struct = eval { parse_code($parser, $line) };
+        my $ccode = eval { $sidef->compile_code(\$line, 'Perl') };
 
         if ($@) {
             warn $@;
             redo;
         }
 
-        my @refs = (
-            map { ref($_) } do {
-                local $Sidef::PARSER = $parser;
-                execute_struct($struct, 1);
-              }
-        );
+        my @refs = (map { ref($_) } $sidef->execute_perl($ccode));
 
         foreach my $ref (@refs) {
             $ref eq '' && do { warn "Not an object!\n"; next };
@@ -399,8 +330,16 @@ sub code_interactive {
 
     my $term = Term::ReadLine->new("$name $version -- interactive mode");
 
-    my $parser = new_parser(name => '-i');
-    $parser->{interactive} = 1;
+    my $sidef;
+    my $init_sidef = sub {
+        $sidef = Sidef->new(
+                            name       => '-i',
+                            opt        => \%args,
+                            parser_opt => {interactive => 1},
+                           );
+    };
+
+    $init_sidef->();
 
     print qq{$name $version on $^O\n};
     print qq{Type "help", "copyright" or "license" for more information.\n};
@@ -418,8 +357,8 @@ sub code_interactive {
                 redo MAINLOOP;
             }
             elsif ($line =~ /^#\h*load\h+(.+)/) {
-                @Sidef::NAMESPACES = ();
-                %Sidef::INCLUDED   = ();
+                $init_sidef->();
+
                 my $file = unpack('A*', $1);
                 open my $fh, '<:utf8', $file or do {
                     warn "Can't open file <<$file>> for read: $!\n";
@@ -475,7 +414,7 @@ EOT
             $line =~ s/^\h*var\b\h*//;
         }
 
-        my $struct = eval { parse_code($parser, $line) };
+        my $ccode = eval { $sidef->compile_code(\$line, $args{r} ? 'Sidef' : ($args{R} || 'Perl')) };
 
         if ($@) {
 
@@ -493,14 +432,11 @@ EOT
         }
 
         if (defined($args{r}) or defined($args{R})) {
-            output(deparse_structure($struct, $args{R}));
+            output($ccode);
         }
         else {
             local $Sidef::Types::Number::Number::PREC = 4 * $args{P} if exists($args{P});
-            my $result = do {
-                local $Sidef::PARSER = $parser;
-                execute_struct($struct, 1);
-            };
+            my $result = $sidef->execute_perl($ccode);
             print $@ if $@;
             use overload;
             say "=> ",
@@ -532,20 +468,6 @@ sub _get_loaded_modules {
         }
     }
     return @modules;
-}
-
-sub deparse_structure {
-    my ($struct, $arg) = @_;
-
-    my $lang   = $arg // 'Sidef';
-    my $module = "Sidef::Deparse::\u\L$lang";
-    my $pm     = ($module =~ s{::}{/}gr . '.pm');
-
-    require $pm;
-    my $deparser = $module->new(namespaces => [@Sidef::NAMESPACES], opt => \%args);
-    my $code = $deparser->deparse($struct);
-
-    return $code;
 }
 
 sub output {
@@ -605,9 +527,7 @@ my %REQ;
 my %MODULE;
 HEAD
 
-    if ($opt{type} == NATIVE) {
-        $package_content .= "BEGIN { %MODULE = (\n";
-    }
+    $package_content .= "BEGIN { %MODULE = (\n";
 
     require File::Find;
     File::Find::find(
@@ -682,22 +602,17 @@ FOOT
         join('', map { "__load_sidef_module__('$_');\n" } @_);
     };
 
-    if ($opt{type} == NATIVE) {
-        $package_content .= $requirify->(_get_loaded_modules(), 'Sidef::Module::OO', 'Sidef::Module::Func');
+    $package_content .= $requirify->(_get_loaded_modules(), 'Sidef::Module::OO', 'Sidef::Module::Func');
 
-        my @used_pkgs;
-        while ($opt{code} =~ /^use (Sidef::\S+);$/gm) {
-            push @used_pkgs, $1;
-        }
-
-        $package_content .= $requirify->(@used_pkgs) if @used_pkgs;
-        $package_content .= "}\n\n";
+    my @used_pkgs;
+    while ($opt{code} =~ /^use (Sidef::\S+);$/gm) {
+        push @used_pkgs, $1;
     }
+
+    $package_content .= $requirify->(@used_pkgs) if @used_pkgs;
+    $package_content .= "}\n\n";
 
     my $out_fh = output('');
     print {$out_fh} $package_content;
-
-    if ($opt{type} == NATIVE) {
-        print {$out_fh} $opt{code};
-    }
+    print {$out_fh} $opt{code};
 }

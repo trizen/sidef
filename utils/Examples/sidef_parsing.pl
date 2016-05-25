@@ -21,8 +21,8 @@ my $sidef = Sidef->new(
                        parser_opt => {},        # parser options
                       );
 
-# Execute arbitrary Sidef code
-my $num = $sidef->execute_code(\<<'SIDEF_CODE');
+# Parse arbitrary Sidef code
+my $ast = $sidef->parse_code(\<<'SIDEF_CODE');
 
 func fib(n) {
     n > 1 ? (__FUNC__(n-1) + __FUNC__(n-2)) : n;
@@ -31,6 +31,19 @@ func fib(n) {
 fib(12);
 
 SIDEF_CODE
+
+# Compile the AST as Perl code
+my $perl_code = $sidef->compile_ast($ast, 'Perl');
+
+# Compile the AST as Sidef code
+my $sidef_code = $sidef->compile_ast($ast, 'Sidef');
+
+# Show deparsed code
+say "=> Deparsed Sidef code:";
+print '-' x 80, "\n", $sidef_code, '-' x 80, "\n";
+
+# Evaluated the code
+my $num = eval($perl_code);
 
 # Output the result
 say $num;

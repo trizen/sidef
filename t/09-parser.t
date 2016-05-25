@@ -38,16 +38,12 @@ foreach my $sidef_script (@scripts) {
         <$fh>;
     };
 
-    %Sidef::INCLUDED   = ();
-    @Sidef::NAMESPACES = ();
+    my $sidef = Sidef->new(name => $sidef_script);
+    my $ast = $sidef->parse_code(\$content);
 
-    my $parser = Sidef::Parser->new(script_name => $sidef_script);
-    my $struct = $parser->parse_script(code => \$content);
+    is(ref($ast), 'HASH');
 
-    is(ref($struct), 'HASH');
-
-    my $deparser = Sidef::Deparse::Perl->new(namespaces => \@Sidef::NAMESPACES);
-    my $code = $deparser->deparse($struct);
+    my $code = $sidef->compile_ast($ast, 'Perl');
 
     ok($code ne '');
 }

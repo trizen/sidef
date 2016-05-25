@@ -35,19 +35,12 @@ local $ENV{SIDEF_INC} = rel2abs(catdir(updir(), 'scripts', 'Tests'));
 sub parse_deparse {
     my ($code, $name) = @_;
 
-    local %Sidef::INCLUDED   = ();
-    local @Sidef::NAMESPACES = ();
+    my $sidef = Sidef->new(name => $name);
 
-    my $parser = Sidef::Parser->new(
-                                    file_name   => $name,
-                                    script_name => $name,
-                                    strict      => 1,
-                                   );
+    my $ast = $sidef->parse_code(\$code);
+    my $deparser = Sidef::Deparse::Sidef->new(namespaces => $sidef->{namespaces});
 
-    my $struct = $parser->parse_script(code => \$code);
-
-    my $deparser   = Sidef::Deparse::Sidef->new(namespaces => [@Sidef::NAMESPACES]);
-    my @statements = $deparser->deparse_script($struct);
+    my @statements = $deparser->deparse_script($ast);
     my $deparsed   = $deparser->{before} . join($deparser->{between}, @statements) . $deparser->{after};
 
     return ($deparsed, \@statements);
