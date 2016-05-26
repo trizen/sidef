@@ -37,7 +37,7 @@ sub parse_deparse {
 
     my $sidef = Sidef->new(name => $name);
 
-    my $ast = $sidef->parse_code(\$code);
+    my $ast = $sidef->parse_code($code);
     my $deparser = Sidef::Deparse::Sidef->new(namespaces => $sidef->{namespaces});
 
     my @statements = $deparser->deparse_script($ast);

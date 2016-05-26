@@ -286,7 +286,7 @@ package Sidef {
 
             # Don't store code that contains eval()
             if (keys(%EVALS) == $evals_num) {
-                $self->dbm_store($lang, $md5, \Encode::encode_utf8($deparsed));
+                $self->dbm_store($lang, $md5, Encode::encode_utf8($deparsed));
             }
 
             return $deparsed;

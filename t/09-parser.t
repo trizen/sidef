@@ -39,7 +39,7 @@ foreach my $sidef_script (@scripts) {
     };
 
     my $sidef = Sidef->new(name => $sidef_script);
-    my $ast = $sidef->parse_code(\$content);
+    my $ast = $sidef->parse_code($content);
 
     is(ref($ast), 'HASH');
 

@@ -3,38 +3,38 @@ require 5.018000;
 use ExtUtils::MakeMaker;
 WriteMakefile
 (
+  'PREREQ_PM' => {
+                   'File::Copy' => 0,
+                   'Test::More' => 0,
+                   'Getopt::Std' => 0,
+                   'Fcntl' => 0,
+                   'Cwd' => 0,
+                   'Time::HiRes' => 0,
+                   'Term::ReadLine' => 0,
+                   'File::Basename' => 0,
+                   'Math::MPC' => 0,
+                   'Math::GMPq' => '0.39',
+                   'File::Spec' => 0,
+                   'Socket' => 0,
+                   'POSIX' => 0,
+                   'List::Util' => '1.33',
+                   'Math::GMPz' => 0,
+                   'File::Path' => 0,
+                   'Storable' => 0,
+                   'Memoize' => 0,
+                   'parent' => 0,
+                   'Encode' => 0,
+                   'File::Find' => 0,
+                   'Scalar::Util' => 0,
+                   'utf8' => 0,
+                   'Math::MPFR' => '3.29'
+                 },
+  'VERSION_FROM' => 'lib/Sidef.pm',
   'PL_FILES' => {},
   'EXE_FILES' => [
                    'bin/sidef'
                  ],
-  'NAME' => 'Sidef',
   'INSTALLDIRS' => 'site',
-  'PREREQ_PM' => {
-                   'Math::GMPz' => 0,
-                   'POSIX' => 0,
-                   'List::Util' => '1.33',
-                   'Memoize' => 0,
-                   'Fcntl' => 0,
-                   'Encode' => 0,
-                   'parent' => 0,
-                   'File::Path' => 0,
-                   'Time::HiRes' => 0,
-                   'Socket' => 0,
-                   'File::Find' => 0,
-                   'utf8' => 0,
-                   'File::Basename' => 0,
-                   'File::Copy' => 0,
-                   'Math::MPC' => 0,
-                   'Storable' => 0,
-                   'Scalar::Util' => 0,
-                   'Math::MPFR' => '3.29',
-                   'Getopt::Std' => 0,
-                   'Cwd' => 0,
-                   'Term::ReadLine' => 0,
-                   'Test::More' => 0,
-                   'File::Spec' => 0,
-                   'Math::GMPq' => '0.39'
-                 },
-  'VERSION_FROM' => 'lib/Sidef.pm'
+  'NAME' => 'Sidef'
 )
 ;

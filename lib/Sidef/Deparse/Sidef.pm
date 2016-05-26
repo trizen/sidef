@@ -1,7 +1,6 @@
 package Sidef::Deparse::Sidef {
 
     use 5.014;
-    our @ISA = qw(Sidef);
     use Scalar::Util qw(refaddr reftype);
 
     my %addr;
