@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Test::More;
 
-plan tests => 76;
+plan tests => 106;
 
 use Sidef;
 use Sidef::Types::Number::Number;
@@ -133,6 +133,48 @@ is("$r", "0");
     is(($ninf)->pow($inf->inv),              $one);
     is(($inf)->pow($one->div($ninf)),        $one);
     is(($ninf)->pow($ninf->inv),             $one);
+
+    # NEGATIVE INFINITY
+    is($ninf->pow($inf),  $inf);
+    is($ninf->pow($ninf), $zero);
+    is($ninf->pow($zero), $one);
+    is($ninf->pow($one),  $ninf);
+    is($ninf->pow($mone), $zero);                      # actually -0.0
+
+    # MINUS ONE
+    is($mone->pow($inf),  $one);
+    is($mone->pow($ninf), $one);
+    is($mone->pow($zero), $one);
+    is($mone->pow($one),  $mone);
+    is($mone->pow($mone), $mone);
+
+    # ZERO
+    is($zero->pow($inf),  $zero);
+    is($zero->pow($ninf), $inf);
+    is($zero->pow($zero), $one);
+    is($zero->pow($one),  $zero);
+    is($zero->pow($mone), $inf);
+
+    # ONE
+    is($one->pow($inf),  $one);
+    is($one->pow($ninf), $one);
+    is($one->pow($zero), $one);
+    is($one->pow($one),  $one);
+    is($one->pow($mone), $one);
+
+    # POSITIVE INFINITY
+    is($inf->pow($inf),  $inf);
+    is($inf->pow($ninf), $zero);
+    is($inf->pow($zero), $one);
+    is($inf->pow($one),  $inf);
+    is($inf->pow($mone), $zero);
+
+    # Make sure the constants are the same
+    is($inf,  $o->inf);
+    is($ninf, $o->ninf);
+    is($zero, $o->new(0));
+    is($one,  $o->new(1));
+    is($mone, $o->new(-1));
 }
 
 ##############################################################
