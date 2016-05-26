@@ -100,7 +100,7 @@ Returns a new optimized AST. The original AST is not altered.
 
 Compiles the AST into code and returns it.
 
-Valid values for C<$backend> are: C<'Sidef'>, C<'Perl'>.
+Valid values for the backend are: C<'Sidef'>, C<'Perl'>.
 
 =head2 compile_code
 
@@ -109,7 +109,7 @@ Valid values for C<$backend> are: C<'Sidef'>, C<'Perl'>.
 Parses and compiles the given Sidef code into target code and
 returns it.
 
-Valid values for C<$backend> are: C<'Sidef'>, C<'Perl'>.
+Valid values for the backend are: C<'Sidef'>, C<'Perl'>.
 
 =head2 execute_code
 
