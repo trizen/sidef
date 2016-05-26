@@ -144,10 +144,9 @@ else {
     my $sidef = Sidef->new(opt  => \%args,
                            name => $script_name,);
 
-    # Dump the data structure
+    # Dump the AST
     if (defined $args{D}) {
-        my $struct = $sidef->parse_code(\$code);
-        dump_structure($struct);
+        dump_ast($sidef->parse_code(\$code));
     }
 
     # Deparse code
@@ -171,17 +170,19 @@ else {
         output($deparsed);
     }
 
-    # Compile the struct to a Perl program
+    # Compile the code to a Perl program
     elsif (defined $args{c}) {
         compile_to_perl(code => $sidef->compile_code(\$code, 'Perl'));
     }
 
     # Check the syntax
     elsif (defined $args{C}) {
+        eval { $sidef->parse_code(\$code) };
+        die $@ if $@;
         say "$script_name syntax OK";
     }
 
-    # Execute the struct
+    # Execute the code
     else {
         $sidef->execute_code(\$code);
         die $@ if $@;
@@ -484,8 +485,8 @@ sub output {
     return $out_fh;
 }
 
-sub dump_structure {
-    my ($struct) = @_;
+sub dump_ast {
+    my ($ast) = @_;
 
     eval { require Data::Dump };
 
@@ -501,7 +502,7 @@ sub dump_structure {
 
         print {$out_fh} _get_namespaces();
         print {$out_fh} $requirify->(_get_loaded_modules());
-        print {$out_fh} Data::Dump::pp($struct) . "\n";
+        print {$out_fh} Data::Dump::pp($ast) . "\n";
     }
 }
 
