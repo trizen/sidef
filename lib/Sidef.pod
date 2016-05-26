@@ -95,7 +95,7 @@ Parses a given string as Sidef code and returns the AST.
     my $oast = $s->optimize_ast($ast);
 
 Performs constant-folding and some other optimizations on a given AST.
-Returns a new optimized AST. The original AST is not altered.
+Returns a new optimized AST.
 
 =head2 compile_ast
 
