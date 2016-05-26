@@ -5,18 +5,22 @@
 #
 
 var s1 = "1 + 2";
-var s2 = "'a' + 'b'";
+var s2 = "x";
 
 10.times {
     s1 = %Q<eval(%Q<#{s1}>)>;
     s2 = %Q{eval(%Q{#{s2}})};
 }
 
-assert_eq(eval(s1), 3);
-assert_eq(eval(s2), "ab");
-assert_eq(eval(s1), 3);
-assert_eq(eval(s2), "ab");
+do {
+    var x = 42;
+    assert_eq(eval(s1), 3);
+    assert_eq(eval(s2), x);
 
+    x = "foo";
+    assert_eq(eval(s1), 3);
+    assert_eq(eval(s2), "foo");
+}
 
 var s3 = "0"
 var strs = []
