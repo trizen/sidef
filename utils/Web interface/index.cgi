@@ -61,11 +61,8 @@ print start_form(
           ),
   br, submit(-name => "Run!"), end_form;
 
-sub parse {
-    my ($code) = @_;
-
-    @Sidef::NAMESPACES = ();
-    %Sidef::INCLUDED   = ();
+sub compile {
+    my ($sidef, $code) = @_;
 
     my $errors = '';
 
@@ -77,22 +74,12 @@ sub parse {
         $errors .= join("\n", @_);
     };
 
-    my $parser = Sidef::Parser->new(file_name   => '-',
-                                    script_name => '-',);
-
-    my $struct = eval { $parser->parse_script(code => \$code) };
-
-    ($struct, $errors);
+    my $ccode = eval { $sidef->compile_code($code, 'Perl') };
+    return ($ccode, $errors);
 }
 
 sub execute {
-    my ($struct) = @_;
-
-    state $count = 0;
-
-    my $environment_name = 'Sidef::Runtime' . CORE::abs(++$count);
-    my $deparser = Sidef::Deparse::Perl->new(namespaces       => [@Sidef::NAMESPACES],
-                                             environment_name => $environment_name,);
+    my ($sidef, $ccode) = @_;
 
     my $errors = '';
 
@@ -104,16 +91,13 @@ sub execute {
         $errors .= join("\n", @_);
     };
 
-    local $Sidef::DEPARSER = $deparser;
-    my $code = "package $environment_name {" . $deparser->deparse($struct) . "}";
-
     my ($stdout, $stderr) = capture {
         alarm 5;
-        eval($code);
+        $sidef->execute_perl($ccode);
         alarm(0);
     };
 
-    ($stdout, $errors . $stderr);
+    return ($stdout, $errors . $stderr);
 }
 
 if (param) {
@@ -122,7 +106,8 @@ if (param) {
         # Replace any newline characters with "\n"
         $code =~ s/\R/\n/g;
 
-        my ($struct, $errors) = parse($code);
+        my $sidef = Sidef->new(name => '-');
+        my ($ccode, $errors) = compile($sidef, $code);
 
         if ($errors ne '') {
             chomp($errors);
@@ -131,8 +116,8 @@ if (param) {
             $errors = '';
         }
 
-        if (ref($struct) eq 'HASH') {
-            my ($output, $errors) = execute($struct);
+        if (defined($ccode)) {
+            my ($output, $errors) = execute($sidef, $ccode);
 
             if ($errors ne "") {
                 chomp($errors);
