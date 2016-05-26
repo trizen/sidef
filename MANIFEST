@@ -715,6 +715,7 @@ scripts/Tests/multisplit.sf
 scripts/Tests/named_block_arguments.sf
 scripts/Tests/named_parameters.sf
 scripts/Tests/names_to_numbers.sf
+scripts/Tests/nested_evals.sf
 scripts/Tests/non_continuous_seq.sf
 scripts/Tests/object_copy.sf
 scripts/Tests/objects_init.sf

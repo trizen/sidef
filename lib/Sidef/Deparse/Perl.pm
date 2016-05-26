@@ -1267,7 +1267,7 @@ HEADER
             eval do {
             local \$Sidef::DEPARSER->{before} = '';
             local \$Sidef::DEPARSER->{top_program} = '';
-            local \$Sidef::DEPARSER->{_has_constant} = 0;
+            local \$Sidef::DEPARSER->{_has_constant};
             local \$Sidef::DEPARSER->{function_declarations} = [];
             local \$Sidef::DEPARSER->{block_declarations} = [];
             \$Sidef::DEPARSER->deparse(
