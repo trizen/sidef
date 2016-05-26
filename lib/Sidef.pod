@@ -118,15 +118,8 @@ Valid values for the backend are: C<'Sidef'>, C<'Perl'>.
 
     my $result = $s->execute_code($code);
 
-Parses, compiles and executes a given Sidef code and
-returns the result of the last statement. (recommended)
-
-=head2 execute_perl
-
-    my $result = $s->execute_perl($code);
-
-Executes compiled Perl code and returns the result. (discouraged)
-
+Parses, compiles and executes a given Sidef code and returns
+the result of the last statement.
 
 =head1 WWW
 
