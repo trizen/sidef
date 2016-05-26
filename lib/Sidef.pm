@@ -219,8 +219,6 @@ package Sidef {
         $self->_init_code_db($lang)
           if not exists($self->{$lang}{_code_hash});
 
-        $self->{$lang}{_time_hash}{$md5} = time;
-
         # Sanitize the database, by removing old entries
         if (time - $self->{$lang}{_time_hash}{sanitized} >= SANITIZE_SEC) {
 
@@ -243,6 +241,7 @@ package Sidef {
         IO::Compress::RawDeflate::rawdeflate($code => \my $compressed_code)
           or die "rawdeflate failed: $IO::Compress::RawDeflate::RawDeflateError";
 
+        $self->{$lang}{_time_hash}{$md5} = time;
         $self->{$lang}{_code_hash}{$md5} = $compressed_code;
     }
 
