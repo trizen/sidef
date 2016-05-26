@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Test::More;
 
-plan tests => 74;
+plan tests => 76;
 
 use Sidef;
 use Sidef::Types::Number::Number;
@@ -102,6 +102,8 @@ is("$r", "0");
     my $zero = $o->new('0');
 
     # BigNum
+    is($zero->pow($inf),                     $zero);
+    is($zero->pow($ninf),                    $inf);
     is($zero->pow($zero),                    $one);
     is($one->pow($inf),                      $one);
     is($mone->pow($inf),                     $one);

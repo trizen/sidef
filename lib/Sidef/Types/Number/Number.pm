@@ -622,10 +622,10 @@ package Sidef::Types::Number::Number {
             return $y->new($x)->pow($y);
         }
         elsif (ref($y) eq 'Sidef::Types::Number::Inf') {
-            return (($x->is_one || $x->is_mone) ? (ONE) : $y);
+            return (($x->is_one || $x->is_mone) ? (ONE) : $x->is_zero ? (ZERO) : $y);
         }
         elsif (ref($y) eq 'Sidef::Types::Number::Ninf') {
-            return (($x->is_one || $x->is_mone) ? (ONE) : (ZERO));
+            return (($x->is_one || $x->is_mone) ? (ONE) : $x->is_zero ? inf() : (ZERO));
         }
         elsif (ref($y) eq 'Sidef::Types::Number::Nan') {
             return nan();
