@@ -22,7 +22,7 @@ my $sidef = Sidef->new(
                       );
 
 # Execute arbitrary Sidef code
-my $num = $sidef->execute_code(\<<'SIDEF_CODE');
+my $num = $sidef->execute_code(<<'SIDEF_CODE');
 
 func fib(n) {
     n > 1 ? (__FUNC__(n-1) + __FUNC__(n-2)) : n;

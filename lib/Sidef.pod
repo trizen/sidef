@@ -47,7 +47,85 @@ The main features of Sidef include:
 
 =back
 
-=head2 WWW
+=head1 SYNOPSIS
+
+    use Sidef;
+
+    my $sidef = Sidef->new(
+                           name       => 'test',   # name of the program
+                           opt        => {},       # command-line options
+                           parser_opt => {},       # parser options
+                          );
+
+    # Sidef code
+    my $code = 'say (1 + 2)';
+
+    # Execute the code
+    $sidef->execute_code($code);
+
+    # Compile the code to Perl
+    my $perl = $sidef->compile_code($code, 'Perl');
+
+    # Parse the code into AST
+    my $ast = $sidef->parse_code($code);
+
+    # Deparse the AST back into Sidef code
+    my $deparsed = $sidef->compile_ast($ast, 'Sidef');
+
+
+=head1 SUBROUTINES/METHODS
+
+=head2 new
+
+    my $s = Sidef->new(name => '...');
+
+Creates a new Sidef object and returns it.
+
+=head2 parse_code
+
+    my $ast = $s->parse_code($code);
+
+Parses a given string as Sidef code and returns the AST.
+
+=head2 optimize_ast
+
+    my $oast = $s->optimize_ast($ast);
+
+Performs constant-folding and some other optimizations on a given AST.
+Returns a new optimized AST. The original AST is not altered.
+
+=head2 compile_ast
+
+    my $ccode = $s->compile_ast($ast, $backend);
+
+Compiles the AST into code and returns it.
+
+Valid values for C<$backend> are: C<'Sidef'>, C<'Perl'>.
+
+=head2 compile_code
+
+    my $ccode = $s->compile_code($code, $backend)
+
+Parses and compiles the given Sidef code into target code and
+returns it.
+
+Valid values for C<$backend> are: C<'Sidef'>, C<'Perl'>.
+
+=head2 execute_code
+
+    my $result = $s->execute_code($code);
+
+Parses, compiles and executes a given Sidef code and
+returns the result of the last statement. (recommended)
+
+=head2 execute_perl
+
+    my $result = $s->execute_perl($code);
+
+Executes compiled Perl code and returns the result. (discouraged)
+
+
+=head1 WWW
 
 You can find more info about Sidef, by clicking on the following links:
 
@@ -61,7 +139,7 @@ You can find more info about Sidef, by clicking on the following links:
 
 =back
 
-=head2 LICENSE AND COPYRIGHT
+=head1 LICENSE AND COPYRIGHT
 
 Copyright (C) 2013-2016 Daniel Șuteu, Ioana Fălcușan
 

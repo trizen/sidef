@@ -41,7 +41,7 @@ package Sidef {
                                                ($self->{parser_opt} ? (%{$self->{parser_opt}}) : ()),
                                               );
 
-        my $ast = $self->{parser}->parse_script(code => $code);
+        my $ast = $self->{parser}->parse_script(code => \$code);
         $self->{namespaces} = \@NAMESPACES;
 
         # Check for optimization
@@ -54,8 +54,6 @@ package Sidef {
 
             # Deparse the AST into code, then parse the code again.
             if ($level >= 2) {
-                my $code = $self->compile_ast($ast, 'Sidef');
-
                 my $sidef = Sidef->new(
                                        opt        => $self->{opt},
                                        name       => $self->{name},
@@ -63,7 +61,7 @@ package Sidef {
                                       );
 
                 local $sidef->{opt}{O} = 1;
-                return $sidef->parse_code(\$code);
+                return $sidef->parse_code($self->compile_ast($ast, 'Sidef'));
             }
         }
 
@@ -79,11 +77,6 @@ package Sidef {
     sub execute_code {
         my ($self, $code) = @_;
         $self->execute_perl($self->compile_code($code, 'Perl'));
-    }
-
-    sub execute_ast {
-        my ($self, $ast) = @_;
-        $self->execute_perl($self->compile_ast($ast, 'Perl'));
     }
 
     sub execute_perl {
@@ -238,7 +231,7 @@ package Sidef {
         }
 
         state $x = require IO::Compress::RawDeflate;
-        IO::Compress::RawDeflate::rawdeflate($code => \my $compressed_code)
+        IO::Compress::RawDeflate::rawdeflate(\$code => \my $compressed_code)
           or die "rawdeflate failed: $IO::Compress::RawDeflate::RawDeflateError";
 
         $self->{$lang}{_time_hash}{$md5} = time;
@@ -267,7 +260,7 @@ package Sidef {
             state $x = require Digest::MD5;
             state $y = require Encode;
 
-            my $md5 = Digest::MD5::md5_hex(Encode::encode_utf8($$code));
+            my $md5 = Digest::MD5::md5_hex(Encode::encode_utf8($code));
 
             $self->{dbm_driver} //= (
                                        $self->{_gdbm} ? 'gdbm'
@@ -284,7 +277,7 @@ package Sidef {
 
             my $evals_num = keys(%EVALS);
 
-            $self->{environment_name} = 'Sidef::Runtime' . $md5;
+            local $self->{environment_name} = 'Sidef::Runtime' . $md5;
             my $deparsed = $self->compile_ast($self->parse_code($code), $lang);
 
             if ($lang eq 'Perl') {
@@ -300,7 +293,7 @@ package Sidef {
         }
 
         state $count = 0;
-        $self->{environment_name} = 'Sidef::Runtime' . (CORE::abs($count++) || '');
+        local $self->{environment_name} = 'Sidef::Runtime' . (CORE::abs($count++) || '');
 
         my $deparsed = $self->compile_ast($self->parse_code($code), $lang);
 

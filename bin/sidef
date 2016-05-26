@@ -97,7 +97,7 @@ if (defined $args{t}) {
                                name => $script_name,);
 
         my $code = read_script($script_name);
-        my $deparsed = eval { $sidef->compile_code(\$code, 'Perl') };
+        my $deparsed = eval { $sidef->compile_code($code, 'Perl') };
 
         my $slept = 0;
         if ($@) {
@@ -146,12 +146,12 @@ else {
 
     # Dump the AST
     if (defined $args{D}) {
-        dump_ast($sidef->parse_code(\$code));
+        dump_ast($sidef->parse_code($code));
     }
 
     # Deparse code
     elsif (defined($args{r}) or defined($args{R})) {
-        my $deparsed = $sidef->compile_code(\$code, $args{R});
+        my $deparsed = $sidef->compile_code($code, $args{R});
 
         if (defined($args{R}) and $args{R} eq 'Perl') {
 
@@ -172,19 +172,19 @@ else {
 
     # Compile the code to a Perl program
     elsif (defined $args{c}) {
-        compile_to_perl(code => $sidef->compile_code(\$code, 'Perl'));
+        compile_to_perl(code => $sidef->compile_code($code, 'Perl'));
     }
 
     # Check the syntax
     elsif (defined $args{C}) {
-        eval { $sidef->parse_code(\$code) };
+        eval { $sidef->parse_code($code) };
         die $@ if $@;
         say "$script_name syntax OK";
     }
 
     # Execute the code
     else {
-        $sidef->execute_code(\$code);
+        $sidef->execute_code($code);
         die $@ if $@;
     }
 }
@@ -298,7 +298,7 @@ HELP
             return;
         }
 
-        my $ccode = eval { $sidef->compile_code(\$line, 'Perl') };
+        my $ccode = eval { $sidef->compile_code($line, 'Perl') };
 
         if ($@) {
             warn $@;
@@ -415,7 +415,7 @@ EOT
             $line =~ s/^\h*var\b\h*//;
         }
 
-        my $ccode = eval { $sidef->compile_code(\$line, $args{r} ? 'Sidef' : ($args{R} || 'Perl')) };
+        my $ccode = eval { $sidef->compile_code($line, $args{r} ? 'Sidef' : ($args{R} || 'Perl')) };
 
         if ($@) {
 
