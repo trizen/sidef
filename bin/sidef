@@ -294,13 +294,16 @@ HELP
               // do { print "\n"; return }
         );
 
-        if ($line eq 'quit' or $line eq 'q') {
-            return;
-        }
-
         my $ccode = eval { $sidef->compile_code($line, 'Perl') };
 
         if ($@) {
+
+            # Valid keywords for 'exit'
+            if ($line eq 'quit' or $line eq 'q' or $line eq 'exit') {
+                return;
+            }
+
+            # Otherwise, a syntax error
             warn $@;
             redo;
         }
