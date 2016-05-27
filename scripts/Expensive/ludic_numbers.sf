@@ -1,0 +1,51 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Ludic_numbers
+#
+
+func ludics_upto(nmax=100000) {
+  Enumerator({ |collect|
+    collect(1)
+    var arr = 2..nmax
+    while (arr) {
+      collect(var n = arr[0])
+      arr.range.by(n).each {|i| arr[i] = nil}
+      arr.compact!
+    }
+  })
+}
+
+func ludics_first(n) {
+    ludics_upto(n * n.log2).first(n)
+}
+
+var l_f25 = ludics_first(25)
+var l_c1000 = ludics_upto(1000).len
+var l_2000_05 = ludics_first(2005).last(6)
+
+say("First 25 Ludic numbers: ",     l_f25.join(' '))
+say("Ludics below 1000: ",          l_c1000)
+say("Ludic numbers 2000 to 2005: ", l_2000_05.join(' '))
+
+assert_eq(l_f25, [1, 2, 3, 5, 7, 11, 13, 17, 23, 25, 29, 37, 41, 43, 47, 53, 61, 67, 71, 77, 83, 89, 91, 97, 107]);
+assert_eq(l_c1000, 142);
+assert_eq(l_2000_05, [21475, 21481, 21487, 21493, 21503, 21511]);
+
+var a = ludics_upto(250).to_a
+
+var l_triples = a.grep{|x| a.contains_all([x+2, x+6]) }
+                 .map {|x| '(' + [x, x+2, x+6].join(' ') + ')' }
+
+say("Ludic triples below 250: ", l_triples.join(' '))
+
+assert_eq(l_triples, [
+    "(1 3 7)",
+    "(5 7 11)",
+    "(11 13 17)",
+    "(23 25 29)",
+    "(41 43 47)",
+    "(173 175 179)",
+    "(221 223 227)",
+    "(233 235 239)"
+])

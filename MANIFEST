@@ -34,6 +34,7 @@ lib/Sidef/Time/Time.pod
 lib/Sidef/Types/Array/Array.pm
 lib/Sidef/Types/Array/Array.pod
 lib/Sidef/Types/Array/Enumerator.pm
+lib/Sidef/Types/Array/Enumerator.pod
 lib/Sidef/Types/Array/MultiArray.pm
 lib/Sidef/Types/Array/MultiArray.pod
 lib/Sidef/Types/Array/Pair.pm
@@ -143,6 +144,7 @@ scripts/Expensive/knapsack_problem_bounded.sf
 scripts/Expensive/knapsack_problem_unbounded.sf
 scripts/Expensive/knuth_power_tree.sf
 scripts/Expensive/long_multiplication.sf
+scripts/Expensive/ludic_numbers.sf
 scripts/Expensive/normal_distribution.sf
 scripts/Expensive/numerical_integration.sf
 scripts/Expensive/root_of_a_function.sf
