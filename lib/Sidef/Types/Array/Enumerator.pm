@@ -54,6 +54,24 @@ package Sidef::Types::Array::Enumerator {
         Sidef::Types::Array::Array->new(\@arr);
     }
 
+    sub each {
+        my ($self, $block) = @_;
+
+        $self->{block}->run(
+            Sidef::Types::Block::Block->new(
+                code => sub {
+                    @_
+                      ? @_ == 1
+                          ? $block->run($_[0])
+                          : do { $block->run($_) for @_ }
+                      : ();
+                },
+            )
+        );
+
+        $self;
+    }
+
     sub map {
         my ($self, $block) = @_;
 
