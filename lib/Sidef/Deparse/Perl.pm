@@ -17,9 +17,9 @@ package Sidef::Deparse::Perl {
         my %opts = (
             before      => '',
             header      => '',
-            top_program => "\n",
-            between     => ";\n",
-            after       => ";\n",
+            top_program => '',
+            between     => ';',
+            after       => ';',
             namespaces  => [],
             opt         => {},
 
@@ -102,7 +102,7 @@ HEADER
 
         if (exists $opts{opt}{P}) {
             my $precision = abs(int($opts{opt}{P}));
-            $opts{header} .= "BEGIN { \$Sidef::Types::Number::Number::PREC = 4*$precision; }\n";
+            $opts{header} .= "BEGIN { \$Sidef::Types::Number::Number::PREC = 4*$precision; }";
         }
 
         if (exists $opts{opt}{M}) {
@@ -124,7 +124,7 @@ HEADER
                 $round = 0;
             }
 
-            $opts{header} .= "local \$Sidef::Types::Number::Number::ROUND = $round;\n";
+            $opts{header} .= "local \$Sidef::Types::Number::Number::ROUND = $round;";
         }
 
         %addr    = ();
@@ -140,7 +140,7 @@ HEADER
 
         if (not $self->{_has_constant}) {
             $self->{_has_constant} = 1;
-            $self->{before} .= "use constant {\n";
+            $self->{before} .= "use constant {";
         }
 
         '(' . $self->{environment_name} . '::' . (
@@ -148,8 +148,8 @@ HEADER
              $const{$ref, $#args, @args} //= [
                  $name . @args,
                  do {
-                     local $" = ", ";
-                     $self->{before} .= "\t$name" . @args . " => " . $ref . "->$new_method(@args),\n";
+                     local $" = ',';
+                     $self->{before} .= $name . @args . '=>' . $ref . "->$new_method(@args),";
                    }
              ]
             )->[0]
@@ -175,7 +175,7 @@ HEADER
 
             state $cache = {};
             $cache->{$ref} //= do {
-                $self->top_add("use $target;\n");
+                $self->top_add("use $target;");
                 1;
             };
 
@@ -204,7 +204,7 @@ HEADER
         my ($self, $method) = @_;
 
         my $name = 'OP' . join('', unpack('C*', $method)) . refaddr($self);
-        my $line = "use constant $name => \\" . $self->_dump_string($method) . ";\n";
+        my $line = "use constant $name=>\\" . $self->_dump_string($method) . ';';
         $self->top_add($line);
         '->${(' . $self->{environment_name} . '::' . $name . ')}';
     }
@@ -225,7 +225,7 @@ HEADER
 
     sub _dump_vars {
         my ($self, @vars) = @_;
-        '(' . join(', ', map { $self->_dump_var($_) } @vars) . ')';
+        '(' . join(',', map { $self->_dump_var($_) } @vars) . ')';
     }
 
     sub _dump_init_vars {
@@ -244,7 +244,7 @@ HEADER
         my @code;
         push @code,
             '('
-          . join(', ', map { $self->_dump_var($_) } @vars) . ')'
+          . join(',', map { $self->_dump_var($_) } @vars) . ')'
           . (exists($init_obj->{args}) ? '=' . $self->deparse_args($init_obj->{args}) : '');
 
         foreach my $var (@vars) {
@@ -256,14 +256,10 @@ HEADER
 
                 # Overwrite with the default values, when the array is empty
                 if (exists $var->{value}) {
-                    push @code,
-                      (   (' ' x $Sidef::SPACES) . '@'
-                        . $name . '=('
-                        . $self->deparse_expr({self => $var->{value}})
-                        . ") if not \@$name;\n");
+                    push @code, ('@' . $name . '=(' . $self->deparse_expr({self => $var->{value}}) . ") if not \@$name;");
                 }
 
-                push @code, (' ' x $Sidef::SPACES) . "\$$name = Sidef::Types::Array::Array->new(\@$name);\n";
+                push @code, "\$$name = Sidef::Types::Array::Array->new(\@$name);";
                 delete $var->{array};
             }
             elsif (exists $var->{hash}) {
@@ -272,35 +268,31 @@ HEADER
 
                 # Overwrite with the default values, when the hash has no keys
                 if (exists $var->{value}) {
-                    push @code,
-                      (   (' ' x $Sidef::SPACES) . '%'
-                        . $name . '=('
-                        . $self->deparse_expr({self => $var->{value}})
-                        . ") if not keys \%$name;\n");
+                    push @code, ('%' . $name . '=(' . $self->deparse_expr({self => $var->{value}}) . ") if not keys \%$name;");
                 }
 
-                push @code, (' ' x $Sidef::SPACES) . "\$$name = Sidef::Types::Hash::Hash->new(\%$name);\n";
+                push @code, "\$$name = Sidef::Types::Hash::Hash->new(\%$name);";
                 delete $var->{hash};
             }
             elsif (exists $var->{value}) {
                 my $value = $self->deparse_expr({self => $var->{value}});
                 if ($value ne '') {
-                    push @code, (' ' x $Sidef::SPACES) . "\$$var->{name}" . refaddr($var) . " //= " . $value . ";\n";
+                    push @code, "\$$var->{name}" . refaddr($var) . "//=$value;";
                 }
             }
         }
 
         push @{$self->{block_declarations}},
-          [$self->{current_block} // -1, 'my(' . join(', ', map { $self->_dump_var($_) } @vars) . ')' . ';'];
+          [$self->{current_block} // -1, 'my(' . join(',', map { $self->_dump_var($_) } @vars) . ')' . ';'];
 
         # Return the lvalue variables on assignments
         if (@code > 1 or exists($init_obj->{args})) {
-            push @code, '(' . join(', ', map { $self->_dump_var($_) } @vars) . ')';
-            return 'CORE::sub : lvalue {' . join(';', @code) . '}->()';
+            push @code, '(' . join(',', map { $self->_dump_var($_) } @vars) . ')';
+            return 'CORE::sub:lvalue{' . join(';', @code) . '}->()';
         }
 
         # Return one var as a list
-        '(' . join(', ', @code) . ')';
+        '(' . join(',', @code) . ')';
     }
 
     sub _dump_class_attributes {
@@ -319,20 +311,20 @@ HEADER
 
             unshift @code,
               (   'my('
-                . join(', ', @dumped_vars) . ')'
+                . join(',', @dumped_vars) . ')'
                 . (exists($attr->{args}) ? '=' . $self->deparse_args($attr->{args}) : ''));
             foreach my $var (@vars) {
                 if (exists $var->{value}) {
                     my $value = $self->deparse_expr({self => $var->{value}});
                     if ($value ne '') {
-                        push @code, "\$$var->{name}" . refaddr($var) . " //= " . $value . ";";
+                        push @code, "\$$var->{name}" . refaddr($var) . "//=$value;";
                     }
                 }
             }
 
         }
 
-        @code ? ((' ' x $Sidef::SPACES) . join(";\n" . (' ' x $Sidef::SPACES), @code) . ";\n") : '';
+        @code ? (join(';', @code) . ';') : '';
     }
 
     sub _dump_sub_init_vars {
@@ -347,7 +339,7 @@ HEADER
             return '';
         }
 
-        my $code = (' ' x $Sidef::SPACES) . "my (" . join(', ', @dumped_vars) . ') = @_;' . "\n";
+        my $code = "my(" . join(',', @dumped_vars) . ')=@_;';
 
         foreach my $var (@vars) {
 
@@ -357,10 +349,10 @@ HEADER
 
                 # Overwrite with the default values, when the array is empty
                 if (exists $var->{value}) {
-                    $code .= ('@' . $name . '=(' . $self->deparse_expr({self => $var->{value}}) . ") if not \@$name;\n");
+                    $code .= ('@' . $name . '=(' . $self->deparse_expr({self => $var->{value}}) . ") if not \@$name;");
                 }
 
-                $code .= (' ' x $Sidef::SPACES) . "my \$$name = Sidef::Types::Array::Array->new(\@$name);\n";
+                $code .= "my\$$name=Sidef::Types::Array::Array->new(\@$name);";
                 delete $var->{array};
             }
             elsif (exists $var->{hash}) {
@@ -368,10 +360,10 @@ HEADER
 
                 # Overwrite with the default values, when the hash has no keys
                 if (exists $var->{value}) {
-                    $code .= ('%' . $name . '=(' . $self->deparse_expr({self => $var->{value}}) . ") if not keys \%$name;\n");
+                    $code .= ('%' . $name . '=(' . $self->deparse_expr({self => $var->{value}}) . ") if not keys \%$name;");
                 }
 
-                $code .= (' ' x $Sidef::SPACES) . "my \$$name = Sidef::Types::Hash::Hash->new(\%$name);\n";
+                $code .= "my\$$name=Sidef::Types::Hash::Hash->new(\%$name);";
                 delete $var->{hash};
             }
             else {
@@ -379,7 +371,7 @@ HEADER
                 if (exists $var->{value}) {
                     my $value = $self->deparse_expr({self => $var->{value}});
                     if ($value ne '') {
-                        $code .= (' ' x $Sidef::SPACES) . "\$$var->{name}" . refaddr($var) . " //= " . $value . ";\n";
+                        $code .= "\$$var->{name}" . refaddr($var) . "//=$value;";
                     }
                 }
             }
@@ -390,13 +382,13 @@ HEADER
 
     sub _dump_array {
         my ($self, $ref, $array) = @_;
-        $ref . '->new([' . join(', ', map { $self->deparse_expr(ref($_) eq 'HASH' ? $_ : {self => $_}) } @{$array}) . '])';
+        $ref . '->new([' . join(',', map { $self->deparse_expr(ref($_) eq 'HASH' ? $_ : {self => $_}) } @{$array}) . '])';
     }
 
     sub _dump_indices {
         my ($self, $array) = @_;
         '[' . join(
-            ', ',
+            ',',
             map {
                     ref($_) eq 'Sidef::Types::Number::Number' ? $_->_get_double
                   : ref($_) ? ($self->deparse_expr(ref($_) eq 'HASH' ? $_ : {self => $_}))
@@ -409,7 +401,7 @@ HEADER
     sub _dump_unpacked_indices {
         my ($self, $array) = @_;
         '[' . join(
-            ', ',
+            ',',
             map {
                 '@{'
                   . (
@@ -426,7 +418,7 @@ HEADER
     sub _dump_lookups {
         my ($self, $array) = @_;
         '{' . join(
-            ', ',
+            ',',
             map {
                 (ref($_) eq 'Sidef::Types::String::String' or ref($_) eq 'Sidef::Types::Number::Number')
                   ? $self->_dump_string($_->get_value)
@@ -440,7 +432,7 @@ HEADER
     sub _dump_unpacked_lookups {
         my ($self, $array) = @_;
         '{' . join(
-            ', ',
+            ',',
             map {
                 '@{'
                   . (
@@ -457,19 +449,19 @@ HEADER
     sub _dump_var_attr {
         my ($self, @vars) = @_;
 
-        'vars => [' . join(
-            ', ',
+        'vars=>[' . join(
+            ',',
             map {
-                    "{ name => "
+                    '{name=>'
                   . $self->_dump_string($_->{name})
-                  . (exists($_->{slurpy})    ? (", slurpy => " . $_->{slurpy})                       : '')
-                  . (exists($_->{ref_type})  ? (", type => " . $self->_dump_reftype($_->{ref_type})) : '')
-                  . (exists($_->{subset})    ? (", subset => " . $self->_dump_reftype($_->{subset})) : '')
-                  . (exists($_->{has_value}) ? (', has_value => 1')                                  : '')
+                  . (exists($_->{slurpy})    ? (',slurpy=>' . $_->{slurpy})                       : '')
+                  . (exists($_->{ref_type})  ? (',type=>' . $self->_dump_reftype($_->{ref_type})) : '')
+                  . (exists($_->{subset})    ? (',subset=>' . $self->_dump_reftype($_->{subset})) : '')
+                  . (exists($_->{has_value}) ? (',has_value=>1')                                  : '')
                   . (
                     exists($_->{subset_blocks}) ? (
-                       ', subset_blocks => [' . join(
-                           ', ',
+                       ',subset_blocks=>[' . join(
+                           ',',
                            map {
                                $self->{_subset_cache}{refaddr($_)} //=
                                    'sub{'
@@ -483,21 +475,21 @@ HEADER
                     )
                   . (
                      exists($_->{where_block})
-                     ? (', where_block => sub{'
+                     ? (',where_block=>sub{'
                         . $self->_dump_sub_init_vars($_->{where_block}{init_vars}{vars}[0])
                         . $self->deparse_generic('', ';', '', $_->{where_block}{code}) . '}')
                      : ''
                     )
                   . (
-                     exists($_->{where_expr}) ? (', where_expr => do{' . $self->deparse_expr({self => $_->{where_expr}}) . '}')
+                     exists($_->{where_expr}) ? (',where_expr=>do{' . $self->deparse_expr({self => $_->{where_expr}}) . '}')
                      : ''
                     )
                   . '}'
               } @vars
           )
-          . ']' . ', '
-          . 'table => {'
-          . join(', ', map { $self->_dump_string($vars[$_]{name}) . ' => ' . $_ } 0 .. $#vars) . '}';
+          . ']' . ','
+          . 'table=>{'
+          . join(',', map { $self->_dump_string($vars[$_]{name}) . '=>' . $_ } 0 .. $#vars) . '}';
     }
 
     sub _get_inherited_stuff {
@@ -537,18 +529,12 @@ HEADER
 
     sub deparse_args {
         my ($self, @args) = @_;
-        $self->deparse_generic('(', ', ', ')', @args);
+        $self->deparse_generic('(', ',', ')', @args);
     }
 
     sub deparse_bare_block {
         my ($self, @args) = @_;
-
-        $Sidef::SPACES += $Sidef::SPACES_INCR;
-        my $code = $self->deparse_generic("{\n" . (" " x $Sidef::SPACES),
-                                          ";\n" . (" " x $Sidef::SPACES),
-                                          "\n" . (" " x ($Sidef::SPACES - $Sidef::SPACES_INCR)) . "}", @args);
-        $Sidef::SPACES -= $Sidef::SPACES_INCR;
-
+        my $code = $self->deparse_generic('{', ';', '}', @args);
         $code;
     }
 
@@ -562,7 +548,7 @@ HEADER
         # Self obj
         my $ref = ref($obj);
         if ($ref eq 'HASH') {
-            $code = join(', ', exists($obj->{self}) ? $self->deparse_expr($obj) : $self->deparse_script($obj));
+            $code = join(',', exists($obj->{self}) ? $self->deparse_expr($obj) : $self->deparse_script($obj));
         }
         elsif ($ref eq 'Sidef::Variable::Variable') {
             if ($obj->{type} eq 'var') {
@@ -570,14 +556,14 @@ HEADER
                 my $name = $obj->{name} . $refaddr;
 
                 if ($obj->{name} eq 'ENV') {
-                    $self->top_add("require Encode;\n");
+                    $self->top_add("require Encode;");
                     $self->top_add(  qq{my \$$name = Sidef::Types::Hash::Hash->new}
-                                   . qq{(map{Sidef::Types::String::String->new(Encode::decode_utf8(\$_))} \%ENV);\n});
+                                   . qq{(map{Sidef::Types::String::String->new(Encode::decode_utf8(\$_))} \%ENV);});
                 }
                 elsif ($obj->{name} eq 'ARGV') {
-                    $self->top_add("require Encode;\n");
+                    $self->top_add("require Encode;");
                     $self->top_add(  qq{my \$$name = Sidef::Types::Array::Array->new}
-                                   . qq{(map {Sidef::Types::String::String->new(Encode::decode_utf8(\$_))} \@ARGV);\n});
+                                   . qq{(map {Sidef::Types::String::String->new(Encode::decode_utf8(\$_))} \@ARGV);});
                 }
 
                 $code = $self->_dump_var($obj, $refaddr);
@@ -603,7 +589,7 @@ HEADER
                     }
 
                     # The name of the function
-                    $code .= "\$$obj->{name}$refaddr = ";
+                    $code .= "\$$obj->{name}$refaddr=";
 
                     # Deparse the block of the method/function
                     {
@@ -619,40 +605,35 @@ HEADER
 
                         my @kids = map {
                             local $_->{type} = 'func';
-                            "do{" . $self->deparse_expr({self => $_}) . "}";
+                            'do{' . $self->deparse_expr({self => $_}) . '}';
                         } @{$obj->{value}{kids}};
 
-                        $code .= ', kids => [' . join(', ', @kids) . '])';
+                        $code .= ',kids=>[' . join(',', @kids) . '])';
                     }
 
                     # Check the return value (when "-> Type" is specified)
                     if (exists $obj->{returns}) {
-                        my $types = '[' . join(', ', map { $self->_dump_reftype($_) } @{$obj->{returns}}) . ']';
-                        $code = "do {$code; \$$obj->{name}$refaddr\->{returns} = $types; \$$obj->{name}$refaddr}";
+                        my $types = '[' . join(',', map { $self->_dump_reftype($_) } @{$obj->{returns}}) . ']';
+                        $code = "do{$code;\$$obj->{name}$refaddr\->{returns}=$types;\$$obj->{name}$refaddr}";
                     }
 
                     # Memoize the method/function (when "is cached" trait is specified)
                     if ($obj->{cached}) {
-                        $self->top_add("require Memoize;\n");
+                        $self->top_add("require Memoize;");
                         $code =
-                            "do {$code;\n"
-                          . (' ' x $Sidef::SPACES)
-                          . "\$$obj->{name}$refaddr\->{code} = Memoize::memoize(\$$obj->{name}${refaddr}->{code}); \$$obj->{name}$refaddr}";
+                            "do{$code;"
+                          . "\$$obj->{name}$refaddr\->{code}=Memoize::memoize(\$$obj->{name}${refaddr}->{code});\$$obj->{name}$refaddr}";
                     }
 
                     if ($obj->{type} eq 'method') {
 
                         # Special "AUTOLOAD" method
                         if ($obj->{name} eq 'AUTOLOAD') {
-                            $code .= ";\n"
-                              . (' ' x $Sidef::SPACES)
-                              . "our \$AUTOLOAD;\n"
-                              . (' ' x $Sidef::SPACES)
-                              . "sub $obj->{name} { my \$self = shift;\n"
-                              . (' ' x $Sidef::SPACES)
-                              . "my (\$class, \$method) = (\$AUTOLOAD =~ /^(.*[^:])::(.*)\$/);\n"
-                              . (' ' x $Sidef::SPACES)
-                              . "\$$obj->{name}$refaddr->call(\$self, Sidef::Types::String::String->new(\$class), Sidef::Types::String::String->new(\$method), \@_) }";
+                            $code .= ';'
+                              . "our\$AUTOLOAD;"
+                              . "sub $obj->{name} {my\$self=shift;"
+                              . "my(\$class,\$method)=(\$AUTOLOAD=~/^(.*[^:])::(.*)\$/);"
+                              . "\$$obj->{name}$refaddr->call(\$self,Sidef::Types::String::String->new(\$class),Sidef::Types::String::String->new(\$method),\@_)}";
                         }
 
                         # Anonymous method
@@ -663,24 +644,22 @@ HEADER
 
                         # Other methods
                         else {
-                            $code .= ";\n"
-                              . (' ' x $Sidef::SPACES)
-                              . "state \$_$refaddr = do { no strict 'refs'; *{"
+                            $code .= ";"
+                              . "state\$_$refaddr=do{no strict 'refs';*{"
                               . $self->_dump_string("$self->{package_name}::$name")
-                              . "} = sub { \$$obj->{name}$refaddr->call(\@_) } }";
+                              . "}=sub{\$$obj->{name}$refaddr->call(\@_)}}";
                         }
 
                         # Add the "overload" pragma for some special methods
                         if (exists $self->{overload_methods}{$name}) {
                             my $overload_name = $self->{overload_methods}{$name};
-                            $code .= ";\n"
-                              . (' ' x $Sidef::SPACES)
+                            $code .= ";"
                               . qq(use overload q{$overload_name} =>)
-                              . q( sub { my ($first, $second, $swap) = @_; )
-                              . q( if ($swap) { ($first, $second) = ($second, $first) } )
-                              . q( $first)
+                              . q(sub{my($first,$second,$swap)=@_;)
+                              . q(if($swap){($first,$second)=($second,$first)})
+                              . q($first)
                               . $self->_dump_op_call($name)
-                              . q(($second) }; );
+                              . q(($second)};);
                         }
 
                     }
@@ -704,7 +683,7 @@ HEADER
             my $value = '(' . $self->{environment_name} . '::' . $name . ')';
             if (not exists $obj->{inited}) {
                 $obj->{inited} = 1;
-                $self->top_add('use constant ' . $name . ' => ' . 'do {' . $self->deparse_script($obj->{expr}) . " };\n");
+                $self->top_add('use constant ' . $name . '=>do{' . $self->deparse_script($obj->{expr}) . '};');
             }
             $code = $value;
         }
@@ -716,15 +695,15 @@ HEADER
 
                 # Use dynamical constants inside functions
                 if (exists $self->{function} or exists $self->{class}) {
-                    $self->top_add("use experimental 'lexical_subs';\n");
-                    $code = "state sub $name() { state \$_$refaddr"
-                      . (defined($obj->{expr}) ? (" = do{" . $self->deparse_script($obj->{expr}) . '}') : '') . " }";
+                    $self->top_add("use experimental 'lexical_subs';");
+                    $code = "state sub $name(){state\$_$refaddr"
+                      . (defined($obj->{expr}) ? ('=do{' . $self->deparse_script($obj->{expr}) . '}') : '') . '}';
                 }
 
                 # Otherwise, use static constants
                 else {
-                    $code = "sub $name() { state \$_$refaddr"
-                      . (defined($obj->{expr}) ? " = do{" . ($self->deparse_script($obj->{expr}) . '}') : '') . "}";
+                    $code = "sub $name(){state\$_$refaddr"
+                      . (defined($obj->{expr}) ? '=do{' . ($self->deparse_script($obj->{expr}) . '}') : '') . '}';
                 }
             }
             else {
@@ -736,15 +715,15 @@ HEADER
             my $value = "\$$name";
             if (not exists $obj->{inited}) {
                 $obj->{inited} = 1;
-                $code = "(state \$$name"
-                  . (defined($obj->{expr}) ? (' = do{' . $self->deparse_script($obj->{expr}) . '}') : '') . ")";
+                $code =
+                  "(state\$$name" . (defined($obj->{expr}) ? ('=do{' . $self->deparse_script($obj->{expr}) . '}') : '') . ')';
             }
             else {
                 $code = $value;
             }
         }
         elsif ($ref eq 'Sidef::Variable::ConstInit') {
-            $code = join(";\n" . (" " x $Sidef::SPACES), map { $self->deparse_expr({self => $_}) } @{$obj->{vars}});
+            $code = join(';', map { $self->deparse_expr({self => $_}) } @{$obj->{vars}});
         }
         elsif ($ref eq 'Sidef::Variable::Init') {
             $code = $self->_dump_init_vars($obj);
@@ -757,7 +736,7 @@ HEADER
             else {
                 my $block = $obj->{block};
 
-                $code = "do {package ";
+                $code = 'do{package ';
 
                 my $package_name;
                 if (ref $obj->{name}) {
@@ -776,15 +755,15 @@ HEADER
                 local $self->{class_attributes} = $obj->{attributes} if exists $obj->{attributes};
                 local $self->{ref_class}        = 1 if ref($obj->{name});
                 $code .= $self->deparse_expr({self => $block});
-                $code .= "; '$package_name'}";
+                $code .= ";'$package_name'}";
             }
         }
         elsif ($ref eq 'Sidef::Types::Block::BlockInit') {
             if ($addr{$refaddr}++) {
-                $code = q{Sidef::Types::Block::Block->new(code => __SUB__, type => 'block'};
+                $code = q{Sidef::Types::Block::Block->new(code=>__SUB__,type=>'block'};
 
                 if (exists($obj->{init_vars}) and @{$obj->{init_vars}{vars}}) {
-                    $code .= ', ' . $self->_dump_var_attr(@{$obj->{init_vars}{vars}});
+                    $code .= ',' . $self->_dump_var_attr(@{$obj->{init_vars}{vars}});
                 }
 
                 $code .= ')';
@@ -792,21 +771,16 @@ HEADER
             else {
                 if (%{$obj}) {
 
-                    $Sidef::SPACES += $Sidef::SPACES_INCR;
-
                     my $is_function = exists($self->{function}) && $self->{function} == $refaddr;
                     my $is_class    = exists($self->{class})    && $self->{class} == $refaddr;
 
                     local $self->{current_block} = $refaddr;
 
                     if ($is_class) {
-                        $code = " {\n";
+                        $code = '{';
 
                         if ($is_class) {
-                            local $" = " ";
                             my $class_name = $self->{class_name};
-                            $code .= " " x $Sidef::SPACES;
-
                             my $base_pkgs = (
                                              exists($self->{inherit})
                                              ? (
@@ -819,7 +793,7 @@ HEADER
                               . (exists($self->{ref_class}) ? '' : ' Sidef::Object::Object');
 
                             if ($base_pkgs ne '') {
-                                $code .= "use parent qw(-norequire $base_pkgs);\n";
+                                $code .= "use parent qw(-norequire $base_pkgs);";
                             }
                         }
 
@@ -851,11 +825,9 @@ HEADER
                                 );
                             };
 
-                            $code .=
-                              (" " x $Sidef::SPACES) . "\$new$refaddr = Sidef::Types::Block::Block->new(code => sub {" . "\n";
+                            $code .= "\$new$refaddr=Sidef::Types::Block::Block->new(code=>sub{";
                             push @{$self->{function_declarations}}, [$refaddr, "my \$new$refaddr;"];
 
-                            $Sidef::SPACES += $Sidef::SPACES_INCR;
                             $code .=
                               $self->_dump_sub_init_vars(@class_vars) . $self->_dump_class_attributes(@class_attributes);
 
@@ -864,36 +836,27 @@ HEADER
                                 reverse(grep { !$seen{$_->{name}}++ } map { @{$_->{vars}} } reverse(@class_attributes));
                             };
 
-                            $code .= (' ' x $Sidef::SPACES) . 'my $self = bless {';
+                            $code .= 'my$self=bless{';
                             foreach my $var (@class_vars, @class_var_attributes) {
                                 $code .= qq{"\Q$var->{name}\E"=>} . $self->_dump_var($var) . ', ';
                             }
 
-                            $code .=
-                                '}, __PACKAGE__;' . "\n"
-                              . (' ' x $Sidef::SPACES)
-                              . 'if(defined(my $sub = $self->can("init"))) { $sub->($self) }' . "\n"
-                              . (' ' x $Sidef::SPACES)
-                              . '$self;' . "\n";
+                            $code .= '},__PACKAGE__;' . 'if(defined(my$sub=$self->can("init"))){$sub->($self)}' . '$self;';
 
-                            $Sidef::SPACES -= $Sidef::SPACES_INCR;
                             $code .=
-                                (" " x $Sidef::SPACES . "}") . ', '
+                                '},'
                               . $self->_dump_var_attr(@class_vars)
-                              . ", type => "
+                              . ',type=>'
                               . $self->_dump_string('class')
-                              . ", name => "
-                              . $self->_dump_string($self->{parent_name}[1]) . ");\n"
-                              . (' ' x $Sidef::SPACES)
-                              . "state \$_$refaddr = do { no strict 'refs'; *{"
-                              . $self->_dump_string("$self->{package_name}\::new")
-                              . "} = *{"
+                              . ',name=>'
+                              . $self->_dump_string($self->{parent_name}[1]) . ');'
+                              . "state\$_$refaddr=do{no strict 'refs';*{"
+                              . $self->_dump_string("$self->{package_name}\::new") . '}=*{'
                               . $self->_dump_string("$self->{package_name}\::call")
-                              . "} = sub { CORE::shift(\@_); \$new$refaddr->call(\@_) } };\n";
+                              . "}=sub{CORE::shift(\@_);\$new$refaddr->call(\@_)}};";
 
                             foreach my $var (@class_vars, @class_var_attributes) {
-                                $code .=
-                                  (' ' x $Sidef::SPACES) . qq{sub $var->{name} : lvalue { \$_[0]->{"\Q$var->{name}\E"} }\n};
+                                $code .= qq{sub $var->{name}:lvalue{\$_[0]->{"\Q$var->{name}\E"}}};
                             }
                         }
                     }
@@ -903,14 +866,14 @@ HEADER
 
                     if (not $is_class) {
 
-                        $code .= "\n" . (" " x ($Sidef::SPACES - $Sidef::SPACES_INCR)) . "code => sub {\n";
+                        $code .= 'code=>sub{';
 
                         if (exists($obj->{init_vars}) and @{$obj->{init_vars}{vars}}) {
                             $code .= $self->_dump_sub_init_vars(@{$obj->{init_vars}{vars}});
                         }
 
                         if ($is_function) {
-                            $code .= (' ' x $Sidef::SPACES) . 'my @return;' . "\n";
+                            $code .= 'my @return;';
                         }
                     }
 
@@ -921,7 +884,7 @@ HEADER
                         while (    exists($self->{function_declarations})
                                and @{$self->{function_declarations}}
                                and $self->{function_declarations}[-1][0] != $refaddr) {
-                            $code .= (' ' x $Sidef::SPACES) . pop(@{$self->{function_declarations}})->[1] . "\n";
+                            $code .= pop(@{$self->{function_declarations}})->[1];
                         }
                     }
 
@@ -929,7 +892,7 @@ HEADER
                     while (    exists($self->{block_declarations})
                            and @{$self->{block_declarations}}
                            and $self->{block_declarations}[-1][0] == $refaddr) {
-                        $code .= (' ' x $Sidef::SPACES) . pop(@{$self->{block_declarations}})->[1] . "\n";
+                        $code .= pop(@{$self->{block_declarations}})->[1];
                     }
 
                     # Make the last statement to be the return value
@@ -942,36 +905,31 @@ HEADER
                             $statements[-1] =~ s/^\@return = /return/;
                         }
                         else {
-                            $statements[-1] = 'return do { ' . $statements[-1] . ' }';
+                            $statements[-1] = 'return do{' . $statements[-1] . '}';
                         }
                     }
 
-                    $code .=
-                        (" " x $Sidef::SPACES)
-                      . join(";\n" . (" " x $Sidef::SPACES), @statements)
-                      . ($is_function ? (";\n" . (" " x $Sidef::SPACES) . "END$refaddr: \@return;\n") : '') . "\n"
-                      . (" " x ($Sidef::SPACES -= $Sidef::SPACES_INCR)) . '}';
+                    $code .= join(';', @statements) . ($is_function ? (';' . "END$refaddr: \@return;") : '') . '}';
 
                     if (not $is_class) {
                         if ($is_function) {
-                            $code .= ', '
-                              . join(', ',
-                                     'type => ' . $self->_dump_string($self->{parent_name}[0]),
-                                     'name => ' . $self->_dump_string($self->{parent_name}[1]));
+                            $code .= ','
+                              . join(',',
+                                     'type=>' . $self->_dump_string($self->{parent_name}[0]),
+                                     'name=>' . $self->_dump_string($self->{parent_name}[1]));
                         }
                         else {
-                            $code .= ', '
-                              . join(', ',
-                                     'type => ' . $self->_dump_string('block'),
-                                     'name => ' . $self->_dump_string('__BLOCK__'),);
+                            $code .= ','
+                              . join(',', 'type=>' . $self->_dump_string('block'),
+                                     'name=>' . $self->_dump_string('__BLOCK__'),);
                         }
 
                         if (exists $self->{class_name}) {
-                            $code .= ', ' . 'class => ' . $self->_dump_string($self->{class_name});
+                            $code .= ',' . 'class=>' . $self->_dump_string($self->{class_name});
                         }
 
                         if (exists($obj->{init_vars}) and @{$obj->{init_vars}{vars}}) {
-                            $code .= ', ' . $self->_dump_var_attr(@{$obj->{init_vars}{vars}});
+                            $code .= ',' . $self->_dump_var_attr(@{$obj->{init_vars}{vars}});
                         }
                         $code .= ')';
                     }
@@ -990,39 +948,26 @@ HEADER
                 $code = "'$name'";
             }
             else {
-                $Sidef::SPACES += $Sidef::SPACES_INCR;
                 $code =
-                    "do { package $name {\n"
-                  . (' ' x $Sidef::SPACES)
-                  . "\$new$refaddr = Sidef::Types::Block::Block->new(code => sub {" . "\n"
-                  . (' ' x $Sidef::SPACES)
+                    "do{package $name {"
+                  . "\$new$refaddr=Sidef::Types::Block::Block->new(code=>sub{"
                   . $self->_dump_sub_init_vars(@{$obj->{vars}})
-                  . (' ' x ($Sidef::SPACES * 2))
-                  . "bless {"
-                  . join(", ", map { $self->_dump_string($_->{name}) . " => " . $self->_dump_var($_) } @{$obj->{vars}})
-                  . "}, __PACKAGE__" . "\n"
-                  . (' ' x $Sidef::SPACES) . "}" . ', '
-                  . 'name => '
-                  . $self->_dump_string($name) . ', '
-                  . 'type => '
-                  . $self->_dump_string('struct') . ', '
-                  . $self->_dump_var_attr(@{$obj->{vars}}) . ");\n" . ";\n"
-                  . (' ' x $Sidef::SPACES)
-                  . "state \$_$refaddr = do { no strict 'refs'; *{"
-                  . $self->_dump_string("$name\::new")
-                  . "} = *{"
+                  . 'bless{'
+                  . join(',', map { $self->_dump_string($_->{name}) . '=>' . $self->_dump_var($_) } @{$obj->{vars}})
+                  . "},__PACKAGE__" . '},'
+                  . 'name=>'
+                  . $self->_dump_string($name) . ','
+                  . 'type=>'
+                  . $self->_dump_string('struct') . ','
+                  . $self->_dump_var_attr(@{$obj->{vars}}) . ');'
+                  . "state \$_$refaddr = do{no strict 'refs';*{"
+                  . $self->_dump_string("$name\::new") . "}=*{"
                   . $self->_dump_string("$name\::call")
-                  . "} = sub { CORE::shift(\@_); \$new$refaddr->call(\@_) } };\n"
-                  . (' ' x $Sidef::SPACES)
-                  . join("\n" . (' ' x $Sidef::SPACES),
-                         map { "sub $_->{name} : lvalue { \$_[0]->{$_->{name}} }" } @{$obj->{vars}})
-                  . "\n"
-                  . (' ' x ($Sidef::SPACES - $Sidef::SPACES_INCR))
-                  . "}; '$name'}";
+                  . "}=sub{CORE::shift(\@_);\$new$refaddr->call(\@_)}};"
+                  . join('', map { "sub $_->{name}:lvalue{\$_[0]->{$_->{name}}}" } @{$obj->{vars}})
+                  . "};'$name'}";
 
-                push @{$self->{function_declarations}}, [$refaddr, "my \$new$refaddr;"];
-
-                $Sidef::SPACES -= $Sidef::SPACES_INCR;
+                push @{$self->{function_declarations}}, [$refaddr, "my\$new$refaddr;"];
             }
         }
         elsif ($ref eq 'Sidef::Variable::Subset') {
@@ -1032,14 +977,7 @@ HEADER
             }
             else {
                 my @parents = map { $self->_get_reftype($_) } @{$obj->{inherits}};
-                $code = qq{
-                    do {
-                        package $name {
-                            use parent qw(-norequire @parents)
-                        };
-                        '$name'
-                    }
-                };
+                $code = qq{do{package $name {use parent qw(-norequire @parents)};'$name'}};
             }
         }
         elsif ($ref eq 'Sidef::Types::Number::Number') {
@@ -1081,11 +1019,11 @@ HEADER
                                    $self->_dump_string($obj->{flags} . ($obj->{global} ? 'g' : '')));
         }
         elsif ($ref eq 'Sidef::Types::Block::If') {
-            $code = "do{";
+            $code = 'do{';
             foreach my $i (0 .. $#{$obj->{if}}) {
                 $code .= ($i == 0 ? 'if' : 'elsif');
                 my $info = $obj->{if}[$i];
-                $code .= "(do{" . $self->deparse_args($info->{expr}) . "})" . $self->deparse_bare_block($info->{block}{code});
+                $code .= '(do{' . $self->deparse_args($info->{expr}) . '})' . $self->deparse_bare_block($info->{block}{code});
             }
             if (exists $obj->{else}) {
                 $code .= 'else' . $self->deparse_bare_block($obj->{else}{block}{code});
@@ -1093,7 +1031,7 @@ HEADER
             $code .= '}';
         }
         elsif ($ref eq 'Sidef::Types::Block::While') {
-            $code = "while(do{" . $self->deparse_args($obj->{expr}) . "})" . $self->deparse_bare_block($obj->{block}{code});
+            $code = 'while(do{' . $self->deparse_args($obj->{expr}) . '})' . $self->deparse_bare_block($obj->{block}{code});
         }
         elsif ($ref eq 'Sidef::Types::Block::ForEach') {
             $code = $self->deparse_args($obj->{expr}) . '->each' . '(' . $self->deparse_expr({self => $obj->{block}}) . ')';
@@ -1109,7 +1047,8 @@ HEADER
 
             local $obj->{block}{init_vars} = bless({vars => $obj->{vars}}, 'Sidef::Variable::Init');
 
-            #my $block = $self->deparse_expr({self => $obj->{block}});
+            ## Old way:
+            # my $block = $self->deparse_expr({self => $obj->{block}});
 
             my $vars;
             if (exists($obj->{block}{init_vars}) and @{$obj->{block}{init_vars}{vars}}) {
@@ -1131,25 +1070,25 @@ HEADER
               ) {
 
                 $code =
-                    'do { my $obj = '
+                    'do{my $obj='
                   . $expr . ';'
-                  . 'my $block = '
+                  . 'my $block='
                   . $block . ';'
-                  . 'for my $group(ref($obj) ? $obj->SUPER::isa("ARRAY") ? @$obj : @{$obj->to_a} : ()) {'
-                  . '$block->((ref($group) && $group->SUPER::isa("ARRAY") ? @$group : $group)) }}';
+                  . 'for my$group(ref($obj)?$obj->SUPER::isa("ARRAY")?@$obj:@{$obj->to_a}:()){'
+                  . '$block->((ref($group)&&$group->SUPER::isa("ARRAY")?@$group:$group))}}';
             }
             else {
 
                 $code =
-                    'do { my $obj = '
+                    'do{my$obj='
                   . $expr . ';'
-                  . 'my $block = '
+                  . 'my$block='
                   . $block . ';'
-                  . 'if (ref($obj)) { if (defined(my $sub = $obj->SUPER::can("iter"))) { my $iter = $sub->($obj);'
-                  . 'while (defined(my $item'
-                  . ' = $iter->run )) { $block->($item) } }'
-                  . 'else { for my $item ($obj->SUPER::isa("ARRAY") ? @$obj : @{$obj->to_a}) { '
-                  . '$block->($item) }}}}';
+                  . 'if(ref($obj)){if(defined(my$sub=$obj->SUPER::can("iter"))){my$iter=$sub->($obj);'
+                  . 'while(defined(my$item'
+                  . '=$iter->run)){$block->($item)}}'
+                  . 'else{for my$item($obj->SUPER::isa("ARRAY")?@$obj:@{$obj->to_a}){'
+                  . '$block->($item)}}}}';
             }
         }
         elsif ($ref eq 'Sidef::Types::Bool::Ternary') {
@@ -1167,9 +1106,9 @@ HEADER
         elsif ($ref eq 'Sidef::Types::Hash::Hash') {
             if (keys(%{$obj})) {
                 $code = $ref . '->new(' . join(
-                    ', ',
+                    ',',
                     map {
-                        $self->_dump_string($_) . ' => '
+                        $self->_dump_string($_) . '=>'
                           . (defined($obj->{$_}) ? $self->deparse_expr({self => $obj->{$_}}) : 'undef')
                       } keys(%{$obj})
                   )
@@ -1186,7 +1125,7 @@ HEADER
             $code = 'while(1) ' . $self->deparse_bare_block($obj->{block}{code});
         }
         elsif ($ref eq 'Sidef::Types::Block::Given') {
-            $self->top_add(qq{use experimental 'smartmatch';\n});
+            $self->top_add(qq{use experimental 'smartmatch';});
             my $dvar = $self->_dump_var($obj->{block}{init_vars}->{vars}[0]);
             $code =
                 'do{given (my '
@@ -1195,7 +1134,7 @@ HEADER
               . $self->deparse_bare_block($obj->{block}{code}) . '}';
         }
         elsif ($ref eq 'Sidef::Types::Block::When') {
-            $code = 'when($_ ~~ ' . $self->deparse_args($obj->{expr}) . ')' . $self->deparse_bare_block($obj->{block}{code});
+            $code = 'when($_~~' . $self->deparse_args($obj->{expr}) . ')' . $self->deparse_bare_block($obj->{block}{code});
         }
         elsif ($ref eq 'Sidef::Types::Block::Case') {
             $code = 'when(!!' . $self->deparse_args($obj->{expr}) . ')' . $self->deparse_bare_block($obj->{block}{code});
@@ -1213,15 +1152,15 @@ HEADER
               . ' else { } }';
         }
         elsif ($ref eq 'Sidef::Types::Block::Gather') {
-            $self->top_add("use Sidef::Types::Array::Array;\n");
+            $self->top_add("use Sidef::Types::Array::Array;");
             $code =
-                "do {my \@_$refaddr;"
+                "do{my \@_$refaddr;"
               . $self->deparse_bare_block($obj->{block}->{code})
               . "; bless(\\\@_$refaddr, 'Sidef::Types::Array::Array')}";
         }
         elsif ($ref eq 'Sidef::Types::Block::Take') {
             my $raddr = refaddr($obj->{gather});
-            $code = "do { push \@_$raddr," . $self->deparse_args($obj->{expr}) . "; \$_$raddr\[-1] }";
+            $code = "do{ push \@_$raddr," . $self->deparse_args($obj->{expr}) . "; \$_$raddr\[-1] }";
         }
         elsif ($ref eq 'Sidef::Types::Block::Try') {
             $code = $ref . '->new';
@@ -1268,7 +1207,7 @@ HEADER
             require Encode;
             my $data = $self->_dump_string(Encode::encode_utf8(${$obj->{data}}));
             $code = $self->make_constant('Sidef::Types::Glob::FileHandle',
-                                         'new', "DATA$refaddr", qq{fh => do {open my \$fh, '<:utf8', \\$data; \$fh}});
+                                         'new', "DATA$refaddr", qq{fh => do{open my \$fh, '<:utf8', \\$data; \$fh}});
         }
         elsif ($ref eq 'Sidef::Variable::Magic') {
             $code = $obj->{name};
@@ -1279,14 +1218,14 @@ HEADER
         elsif ($ref eq 'Sidef::Eval::Eval') {
             $Sidef::EVALS{$refaddr} = $obj;
             $code = qq~
-            eval do {
+            eval do{
             local \$Sidef::DEPARSER->{before} = '';
             local \$Sidef::DEPARSER->{top_program} = '';
             local \$Sidef::DEPARSER->{_has_constant};
             local \$Sidef::DEPARSER->{function_declarations} = [];
             local \$Sidef::DEPARSER->{block_declarations} = [];
             \$Sidef::DEPARSER->deparse(
-            do {
+            do{
                 local \$Sidef::PARSER->{line} = 0;
                 local \$Sidef::PARSER->{file_name} = 'eval($refaddr)';
                 local \$Sidef::PARSER->{vars} = \$Sidef::EVALS{$refaddr}{vars};
@@ -1309,7 +1248,7 @@ HEADER
         }
         elsif ($ref eq 'Sidef::Types::Array::Pair') {
             $code =
-              $ref . '->new(' . join(', ', map { defined($_) ? $self->deparse_expr({self => $_}) : 'undef' } @{$obj}) . ')';
+              $ref . '->new(' . join(',', map { defined($_) ? $self->deparse_expr({self => $_}) : 'undef' } @{$obj}) . ')';
         }
         elsif ($ref eq 'Sidef::Types::Null::Null') {
             $code = $self->make_constant($ref, 'new', "Null$refaddr");
@@ -1326,7 +1265,7 @@ HEADER
                 '__new__',
                 "RangeNumber$refaddr",
                 map {
-                        "$_ => do { my \$r = Math::GMPq::Rmpq_init(); Math::GMPq::Rmpq_set_str(\$r,'"
+                        "$_ => do{ my \$r = Math::GMPq::Rmpq_init(); Math::GMPq::Rmpq_set_str(\$r,'"
                       . Math::GMPq::Rmpq_get_str($obj->{$_}, 10)
                       . "', 10); \$r }"
                   } keys(%{$obj})
@@ -1399,7 +1338,7 @@ HEADER
             $code = qq{CORE::die "Unimplemented at " . } . $self->_dump_string($obj->{file}) . qq{. " line $obj->{line}\\n"};
         }
         elsif (exists $self->{data_types}{$ref}) {
-            $self->top_add("use $self->{data_types}{$ref};\n");
+            $self->top_add("use $self->{data_types}{$ref};");
             $code = "'" . $self->{data_types}{$ref} . "'";
         }
 
@@ -1434,10 +1373,10 @@ HEADER
 
                 if ($i < $limit) {
                     if ($expr->{ind}[$i + 1]{array}) {
-                        $code = '(' . $code . ' //= Sidef::Types::Array::Array->new' . ')';
+                        $code = "($code//=Sidef::Types::Array::Array->new)";
                     }
                     else {
-                        $code = '(' . $code . ' //= Sidef::Types::Hash::Hash->new' . ')';
+                        $code = "($code//=Sidef::Types::Hash::Hash->new)";
                     }
                 }
             }
@@ -1459,9 +1398,9 @@ HEADER
                 if ($ref eq 'Sidef::Types::Block::Return') {
 
                     if (exists $self->{function}) {
-                        $code .= 'do {';
+                        $code .= 'do{';
                         if (@{$call->{arg}}) {
-                            $code .= '@return = ' . $self->deparse_args(@{$call->{arg}}) . ';';
+                            $code .= '@return = ' . $self->deparse_args(@{$call->{arg}}) . ';';    # don't edit this line!
                         }
                         $code .= 'goto ' . "END$self->{function}}";
                     }
@@ -1501,19 +1440,14 @@ HEADER
                         # Prefix ++ and -- operators on variables
                         elsif (exists $self->{inc_dec_ops}{$method}) {
                             my $var = $self->deparse_args(@{$call->{arg}});
-
-                            #$code = "($var=$var\->$self->{inc_dec_ops}{$method})[0]";
-                            $code = "do{my \$ref=\\$var; \$\$ref=\$\$ref\->$self->{inc_dec_ops}{$method}}";
+                            $code = "do{my\$r=\\$var;\$\$r=\$\$r\->$self->{inc_dec_ops}{$method}}";
                             next;
                         }
                     }
 
                     # Postfix ++ and -- operators on variables
                     if (exists($self->{inc_dec_ops}{$method})) {
-
-                        #$code = "do{my \$old=$code; $code=$code\->$self->{inc_dec_ops}{$method}; \$old}";
-                        $code =
-                          "do{my \$ref=\\$code; my \$value=\$\$ref; \$\$ref=\$value\->$self->{inc_dec_ops}{$method}; \$value}";
+                        $code = "do{my\$r=\\$code;my\$v=\$\$r;\$\$r=\$v\->$self->{inc_dec_ops}{$method};\$v}";
                         next;
                     }
 
@@ -1530,44 +1464,34 @@ HEADER
 
                     # Reassignment operators, such as: +=, -=, *=, /=, etc...
                     if (exists $self->{reassign_ops}{$method}) {
-
                         $code =
-                            "CORE::sub : lvalue {my \$ref=\\$code; \$\$ref=\$\$ref"
+                            "CORE::sub:lvalue{my\$r=\\$code;\$\$r=\$\$r"
                           . $self->_dump_op_call($self->{reassign_ops}{$method})
-                          . $self->deparse_args(@{$call->{arg}}) . "}->()";
-
-                        #$code =
-                        #    "do {my \$ref="
-                        #  . ($i == 0 ? '\\' : '')
-                        #  . "$code; \$\$ref=\$\$ref\->\${\\'$self->{reassign_ops}{$method}'}"
-                        #  . (exists($call->{arg}) ? $self->deparse_args(@{$call->{arg}}) : '') . "; "
-                        #  . ($i == $end ? '$' : '')
-                        #  . "\$ref}";
-
+                          . $self->deparse_args(@{$call->{arg}}) . '}->()';
                         next;
                     }
 
                     # != and == methods
                     if ($method eq '==' or $method eq '!=') {
                         $code =
-                            'do{ my $bool = do{'
+                            'do{my$bool=do{'
                           . $code
-                          . '} eq do{'
+                          . '}eq do{'
                           . $self->deparse_args(@{$call->{arg}})
-                          . '}; ref($bool) ? $bool : ($bool ? Sidef::Types::Bool::Bool::TRUE : Sidef::Types::Bool::Bool::FALSE) }'
+                          . '};ref($bool)?$bool:($bool?Sidef::Types::Bool::Bool::TRUE:Sidef::Types::Bool::Bool::FALSE)}'
                           . ($method eq '!=' ? '->neg' : '');
                         next;
                     }
 
                     # !~ and ~~ methods
                     if ($method eq '~~' or $method eq '!~') {
-                        $self->top_add(qq{use experimental 'smartmatch';\n});
+                        $self->top_add(qq{use experimental 'smartmatch';});
                         $code =
-                            'do{ my $bool = do{'
+                            'do{my$bool=do{'
                           . $code
-                          . '} ~~ do{'
+                          . '}~~do{'
                           . $self->deparse_args(@{$call->{arg}})
-                          . '}; ref($bool) ? $bool : ($bool ? Sidef::Types::Bool::Bool::TRUE : Sidef::Types::Bool::Bool::FALSE) }'
+                          . '};ref($bool)?$bool:($bool?Sidef::Types::Bool::Bool::TRUE:Sidef::Types::Bool::Bool::FALSE)}'
                           . ($method eq '!~' ? '->neg' : '');
                         next;
                     }
@@ -1575,12 +1499,12 @@ HEADER
                     # <=> method
                     if ($method eq '<=>') {
                         $code =
-                            'do { my $cmp = do { '
+                            'do{my$cmp=do{'
                           . $code
-                          . '} cmp do {'
+                          . '}cmp do{'
                           . $self->deparse_args(@{$call->{arg}})
-                          . '}; ref($cmp) ? $cmp : ($cmp < 0 ? Sidef::Types::Number::Number::MONE : '
-                          . '$cmp > 0 ? Sidef::Types::Number::Number::ONE : Sidef::Types::Number::Number::ZERO )}';
+                          . '};ref($cmp)?$cmp:($cmp<0?Sidef::Types::Number::Number::MONE:'
+                          . '$cmp>0?Sidef::Types::Number::Number::ONE:Sidef::Types::Number::Number::ZERO)}';
                         next;
                     }
 
@@ -1589,7 +1513,7 @@ HEADER
                         if ($method eq '!') {
                             $code = '(do{'
                               . $self->deparse_args(@{$call->{arg}})
-                              . '} ? (Sidef::Types::Bool::Bool::FALSE) : (Sidef::Types::Bool::Bool::TRUE))';
+                              . '}?Sidef::Types::Bool::Bool::FALSE:Sidef::Types::Bool::Bool::TRUE)';
                             next;
                         }
 
@@ -1622,7 +1546,7 @@ HEADER
                             $code =
                                 '((CORE::say'
                               . $self->deparse_args(@{$call->{arg}})
-                              . ') ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE))';
+                              . ')?Sidef::Types::Bool::Bool::TRUE:Sidef::Types::Bool::Bool::FALSE)';
                             next;
                         }
 
@@ -1630,7 +1554,7 @@ HEADER
                             $code =
                                 '((CORE::print'
                               . $self->deparse_args(@{$call->{arg}})
-                              . ') ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE))';
+                              . ')?Sidef::Types::Bool::Bool::TRUE:Sidef::Types::Bool::Bool::FALSE)';
                             next;
                         }
 
@@ -1638,7 +1562,7 @@ HEADER
                             $code =
                                 '((CORE::defined'
                               . $self->deparse_args(@{$call->{arg}})
-                              . ') ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE))';
+                              . ')?Sidef::Types::Bool::Bool::TRUE:Sidef::Types::Bool::Bool::FALSE)';
                             next;
                         }
                     }
@@ -1651,21 +1575,10 @@ HEADER
 
                         # Exclamation mark (!) at the end of a method
                         if (substr($method, -1) eq '!') {
-
                             $code =
-                                "CORE::sub : lvalue {my \$ref=\\$code; \$\$ref=\$\$ref\->"
+                                "CORE::sub:lvalue{my\$r=\\$code;\$\$r=\$\$r\->"
                               . substr($method, 0, -1)
-                              . (exists($call->{arg}) ? $self->deparse_args(@{$call->{arg}}) : '') . "}->()";
-
-                            #$code =
-                            #    "do {my \$ref="
-                            #  . ($i == 0 ? '\\' : '')
-                            #  . "$code; \$\$ref=\$\$ref\->"
-                            #  . substr($method, 0, -1)
-                            #  . (exists($call->{arg}) ? $self->deparse_args(@{$call->{arg}}) : '') . "; "
-                            #  . ($i == $end ? '$' : '')
-                            #  . "\$ref}";
-
+                              . (exists($call->{arg}) ? $self->deparse_args(@{$call->{arg}}) : '') . '}->()';
                             next;
                         }
 
@@ -1679,7 +1592,7 @@ HEADER
 
                         # Postfix dereference method
                         if ($method eq '@' or $method eq '@*') {
-                            $self->top_add(qq{use experimental 'postderef';\n});
+                            $self->top_add(qq{use experimental 'postderef';});
                             $code .= '->' . $method;
                         }
 
@@ -1757,19 +1670,18 @@ HEADER
 
         (
              $self->{before}
-           . ($self->{_has_constant} ? "};\n" : '')
+           . ($self->{_has_constant} ? '};' : '')
            . (
               exists($self->{function_declarations})
-                && @{$self->{function_declarations}}
-              ? ("\n" . join("\n", map { $_->[1] } @{$self->{function_declarations}}) . "\n")
+                && @{$self->{function_declarations}} ? join('', map { $_->[1] } @{$self->{function_declarations}})
               : ''
              )
            . (
               exists($self->{block_declarations})
-                && @{$self->{block_declarations}} ? ("\n" . join("\n", map { $_->[1] } @{$self->{block_declarations}}) . "\n")
+                && @{$self->{block_declarations}} ? join('', map { $_->[1] } @{$self->{block_declarations}})
               : ''
              )
-           . $self->{top_program} . "\n"
+           . $self->{top_program}
            . join($self->{between}, @statements)
            . $self->{after}
         ) =~ s/^\s*/$self->{header}/r;
