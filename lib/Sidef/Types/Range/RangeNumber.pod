@@ -105,7 +105,7 @@ RangeNumber.grep() -> I<Obj>
 
 Return the
 
-Aliases: I<filter>, I<select>
+Aliases: I<select>
 
 =cut
 
@@ -122,8 +122,6 @@ Return the
 RangeNumber.map() -> I<Obj>
 
 Return the
-
-Aliases: I<collect>
 
 =cut
 

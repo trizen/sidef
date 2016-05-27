@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-Sidef::Object::Lazy
+Sidef::Types::Array::Enumerator
 
 =head1 DESCRIPTION
 
@@ -11,22 +11,14 @@ This object is ...
 
 =head1 SYNOPSIS
 
-var obj = Lazy.new(...);
+var obj = Enumerator.new(...);
 
 =head1 METHODS
 
 
-=head2 each
-
-Lazy.each() -> I<Obj>
-
-Return the
-
-=cut
-
 =head2 first
 
-Lazy.first() -> I<Obj>
+Enumerator.first() -> I<Obj>
 
 Return the
 
@@ -34,7 +26,7 @@ Return the
 
 =head2 grep
 
-Lazy.grep() -> I<Obj>
+Enumerator.grep() -> I<Obj>
 
 Return the
 
@@ -42,17 +34,19 @@ Aliases: I<select>
 
 =cut
 
-=head2 iter
+=head2 len
 
-Lazy.iter() -> I<Obj>
+Enumerator.len() -> I<Obj>
 
 Return the
+
+Aliases: I<size>, I<length>
 
 =cut
 
 =head2 map
 
-Lazy.map() -> I<Obj>
+Enumerator.map() -> I<Obj>
 
 Return the
 
@@ -60,15 +54,17 @@ Return the
 
 =head2 new
 
-Lazy.new() -> I<Obj>
+Enumerator.new() -> I<Obj>
 
 Return the
+
+Aliases: I<call>
 
 =cut
 
 =head2 to_a
 
-Lazy.to_a() -> I<Obj>
+Enumerator.to_a() -> I<Obj>
 
 Return the
 

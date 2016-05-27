@@ -203,6 +203,14 @@ Aliases: I<combinations>
 
 =cut
 
+=head2 compact
+
+Array.compact() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 contain
 
 Array.contain() -> I<Obj>
@@ -497,7 +505,7 @@ Array.grep() -> I<Obj>
 
 Return the
 
-Aliases: I<filter>, I<select>
+Aliases: I<select>
 
 =cut
 
@@ -507,7 +515,7 @@ Array.grep_kv() -> I<Obj>
 
 Return the
 
-Aliases: I<filter_kv>, I<select_kv>
+Aliases: I<select_kv>
 
 =cut
 
@@ -683,8 +691,6 @@ Array.map() -> I<Obj>
 
 Return the
 
-Aliases: I<collect>
-
 =cut
 
 =head2 map_kv
@@ -692,8 +698,6 @@ Aliases: I<collect>
 Array.map_kv() -> I<Obj>
 
 Return the
-
-Aliases: I<collect_kv>
 
 =cut
 
@@ -930,6 +934,22 @@ Aliases: I<drop_left>, I<drop_first>
 =head2 shuffle
 
 Array.shuffle() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 slice_after
+
+Array.slice_after() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 slice_before
+
+Array.slice_before() -> I<Obj>
 
 Return the
 
