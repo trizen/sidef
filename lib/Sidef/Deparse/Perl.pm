@@ -1051,7 +1051,7 @@ HEADER
             # my $block = $self->deparse_expr({self => $obj->{block}});
 
             my $vars;
-            if (exists($obj->{block}{init_vars}) and @{$obj->{block}{init_vars}{vars}}) {
+            if (@{$obj->{block}{init_vars}{vars}}) {
                 $vars = $self->_dump_sub_init_vars(@{$obj->{block}{init_vars}{vars}});
             }
 
