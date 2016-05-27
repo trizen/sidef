@@ -163,8 +163,9 @@ package Sidef::Types::Range::RangeString {
                                             . join(', ',
                                                    ${Sidef::Types::String::String->new($self->{from})->dump},
                                                    ${Sidef::Types::String::String->new($self->{to})->dump},
-                                                   Sidef::Types::Bool::Bool->new($self->{asc}),
-                                                  )
+                                                   $self->{asc}
+                                                   ? (Sidef::Types::Bool::Bool::TRUE)
+                                                   : (Sidef::Types::Bool::Bool::FALSE))
                                             . ")"
                                          );
     }
