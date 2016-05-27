@@ -17,7 +17,7 @@ name: Sidef
 provides:
   Sidef:
     file: lib/Sidef.pm
-    version: '2.24'
+    version: '2.25'
   Sidef::Convert::Convert:
     file: lib/Sidef/Convert/Convert.pm
   Sidef::Deparse::Perl:
@@ -54,6 +54,8 @@ provides:
     file: lib/Sidef/Time/Time.pm
   Sidef::Types::Array::Array:
     file: lib/Sidef/Types/Array/Array.pm
+  Sidef::Types::Array::Enumerator:
+    file: lib/Sidef/Types/Array/Enumerator.pm
   Sidef::Types::Array::MultiArray:
     file: lib/Sidef/Types/Array/MultiArray.pm
   Sidef::Types::Array::Pair:
@@ -138,5 +140,5 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/trizen/sidef
-version: '2.24'
+version: '2.25'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
