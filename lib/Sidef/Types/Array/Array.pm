@@ -834,6 +834,36 @@ package Sidef::Types::Array::Array {
         $self;
     }
 
+    sub slice_before {
+        my ($self, $block) = @_;
+
+        my @new;
+        my $i = 0;
+        foreach my $item (@{$self}) {
+            if ($block->run($item)) {
+                ++$i if @new;
+            }
+            push @{$new[$i]}, $item;
+        }
+
+        $self->new([map { $self->new($_) } @new]);
+    }
+
+    sub slice_after {
+        my ($self, $block) = @_;
+
+        my @new;
+        my $i = 0;
+        foreach my $item (@{$self}) {
+            push @{$new[$i]}, $item;
+            if ($block->run($item)) {
+                ++$i;
+            }
+        }
+
+        $self->new([map { $self->new($_) } @new]);
+    }
+
     sub slices {
         my ($self, $n) = @_;
 
@@ -904,8 +934,6 @@ package Sidef::Types::Array::Array {
         $self->new(\@array);
     }
 
-    *collect = \&map;
-
     sub map_kv {
         my ($self, $code) = @_;
 
@@ -916,8 +944,6 @@ package Sidef::Types::Array::Array {
 
         $self->new(\@arr);
     }
-
-    *collect_kv = \&map_kv;
 
     sub flat_map {
         my ($self, $code) = @_;
@@ -948,7 +974,6 @@ package Sidef::Types::Array::Array {
         $self->new(\@array);
     }
 
-    *filter = \&grep;
     *select = \&grep;
 
     sub grep_kv {
@@ -962,7 +987,6 @@ package Sidef::Types::Array::Array {
         $self->new(\@arr);
     }
 
-    *filter_kv = \&grep_kv;
     *select_kv = \&grep_kv;
 
     sub group_by {
@@ -1285,6 +1309,11 @@ package Sidef::Types::Array::Array {
 
         splice(@{$self}, $i, 0, @objects);
         $self;
+    }
+
+    sub compact {
+        my ($self) = @_;
+        $self->new([grep { defined($_) } @{$self}]);
     }
 
     sub unique {

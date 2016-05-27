@@ -58,6 +58,7 @@ package Sidef::Parser {
                      | Arr(?:ay)?+\b                  (?{ state $x = bless({}, 'Sidef::DataTypes::Array::Array') })
                      | MultiArr(?:ay)?+\b             (?{ state $x = bless({}, 'Sidef::DataTypes::Array::MultiArray') })
                      | Pair\b                         (?{ state $x = bless({}, 'Sidef::DataTypes::Array::Pair') })
+                     | Enumerator\b                   (?{ state $x = bless({}, 'Sidef::DataTypes::Array::Enumerator') })
                      | Hash\b                         (?{ state $x = bless({}, 'Sidef::DataTypes::Hash::Hash') })
                      | Str(?:ing)?+\b                 (?{ state $x = bless({}, 'Sidef::DataTypes::String::String') })
                      | Num(?:ber)?+\b                 (?{ state $x = bless({}, 'Sidef::DataTypes::Number::Number') })
@@ -179,6 +180,7 @@ package Sidef::Parser {
                   DirHandle
                   Arr Array
                   Pair
+                  Enumerator
                   MultiArray MultiArr
                   Hash
                   Str String

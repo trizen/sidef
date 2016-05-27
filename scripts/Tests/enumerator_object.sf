@@ -1,0 +1,51 @@
+#!/usr/bin/ruby
+
+#
+## Enumerator() tests
+#
+
+var e1 = Enumerator({ |cb|
+    0..100 -> each { |i|
+        i.is_prime && cb(i)
+    }
+})
+
+var p = (^Inf -> lazy.grep{.is_prime}.first(25))
+
+assert_eq(e1.len, 25)
+assert_eq(e1.to_a, e1.first(25) )
+assert_eq(e1.to_a, p)
+assert_eq(e1.grep{.is_even}, [2])
+assert_eq(e1.map {|x| x-1 }, p.map{|x| x-1 })
+
+var e2 = Enumerator({ |cb|
+    ^Inf -> each { |i|
+        i.is_prime && cb(i)
+    }
+})
+
+assert_eq(e2.first(25), p)
+
+#
+## function test
+#
+
+func primes_less_than(n) {
+    Enumerator({ |cb|
+        for i in range(0, n) {
+            cb(i) if i.is_prime
+        }
+    })
+}
+
+var e3 = primes_less_than(100)
+
+assert_eq(e3.to_a, p)
+assert_eq(e3.len, p.len)
+
+var e4 = primes_less_than(50)
+
+assert_eq(e4.first(5), [2,3,5,7,11])
+assert_eq(e4.len, 15)
+
+say "** Test passed!"

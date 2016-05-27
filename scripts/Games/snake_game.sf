@@ -146,6 +146,7 @@ func move {
 }
 
 readkey.ReadMode(3);
+STDOUT.autoflush(true);
 
 loop {
     var key;

@@ -33,6 +33,7 @@ lib/Sidef/Time/Time.pm
 lib/Sidef/Time/Time.pod
 lib/Sidef/Types/Array/Array.pm
 lib/Sidef/Types/Array/Array.pod
+lib/Sidef/Types/Array/Enumerator.pm
 lib/Sidef/Types/Array/MultiArray.pm
 lib/Sidef/Types/Array/MultiArray.pod
 lib/Sidef/Types/Array/Pair.pm
@@ -621,6 +622,7 @@ scripts/Tests/def_primitive_type_2.sf
 scripts/Tests/default_param_values.sf
 scripts/Tests/default_var_values.sf
 scripts/Tests/echo.sf
+scripts/Tests/enumerator_object.sf
 scripts/Tests/eq_g2.sf
 scripts/Tests/equal_classes.sf
 scripts/Tests/escape_unescape.sf
@@ -815,6 +817,7 @@ scripts/Tests/while_loop.sf
 scripts/Tests/wireworld.sf
 scripts/Tests/word_processing.sf
 scripts/Tests/word_roots.sf
+scripts/Tests/word_wrap_enumerator.sf
 scripts/towers_of_hanoi.sf
 scripts/tree_traversal.sf
 scripts/unique_prefixes.sf

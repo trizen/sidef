@@ -1,8 +1,7 @@
 package Sidef::Object::Lazy {
 
     use 5.014;
-
-    use overload q{""} => \&to_a;
+    ##use overload q{""} => \&to_a;
 
     sub new {
         my (undef, %opt) = @_;
@@ -95,6 +94,8 @@ package Sidef::Object::Lazy {
         };
         $self;
     }
+
+    *select = \&grep;
 
     sub map {
         my ($self, $block) = @_;

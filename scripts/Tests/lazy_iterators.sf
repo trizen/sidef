@@ -7,7 +7,7 @@
 var arr = [1,2,3,4,5,6,7,8,9,10,11,12,13]
 
 ## Array
-say arr.lazy.grep{.is_even}.map{_**2}
+say arr.lazy.grep{.is_even}.map{_**2}.to_a
 
 ## Array
 arr.lazy.grep{.is_even}.map{_**2}.each { |i|

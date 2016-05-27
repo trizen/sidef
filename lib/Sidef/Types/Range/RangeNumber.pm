@@ -238,8 +238,6 @@ package Sidef::Types::Range::RangeNumber {
         Sidef::Types::Array::Array->new(\@values);
     }
 
-    *collect = \&map;
-
     sub grep {
         my ($self, $code) = @_;
 
@@ -252,7 +250,6 @@ package Sidef::Types::Range::RangeNumber {
         Sidef::Types::Array::Array->new(\@values);
     }
 
-    *filter = \&grep;
     *select = \&grep;
 
     sub reduce {

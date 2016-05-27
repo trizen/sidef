@@ -1,0 +1,39 @@
+#!/usr/bin/ruby
+
+#
+## Code from: http://ruby-doc.org/core-2.3.1/Enumeratorerable.html
+#
+
+func wordwrap(words, maxwidth) {
+  Enumerator({|y|
+    var cols = 0
+    words.slice_before { |w|
+      cols += 1 if (cols != 0)
+      cols += w.len
+      if (maxwidth < cols) {
+        cols = w.len
+        true
+      }
+      else {
+        false
+      }
+    }.each {|ws| y(ws) }
+  })
+}
+
+var text = 20.of{ _ }.join(' ')
+var e = wordwrap(text.words, 10)
+
+var arr = []
+
+say '-'*10
+e.each { |ws| say ws.join(" "); arr << ws }
+
+assert_eq(arr,  [["1", "2", "3", "4", "5"],
+                 ["6", "7", "8", "9", "10"],
+                 ["11", "12", "13"],
+                 ["14", "15", "16"],
+                 ["17", "18", "19"],
+                 ["20"]])
+
+say '-'*10
