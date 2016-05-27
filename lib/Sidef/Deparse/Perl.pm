@@ -1107,7 +1107,21 @@ HEADER
             my $expr = $self->deparse_expr({self => $obj->{expr}});
 
             local $obj->{block}{init_vars} = bless({vars => $obj->{vars}}, 'Sidef::Variable::Init');
-            my $block = $self->deparse_expr({self => $obj->{block}});
+
+            #my $block = $self->deparse_expr({self => $obj->{block}});
+
+            my $vars;
+            if (exists($obj->{block}{init_vars}) and @{$obj->{block}{init_vars}{vars}}) {
+                $vars = $self->_dump_sub_init_vars(@{$obj->{block}{init_vars}{vars}});
+            }
+
+            my $block = $self->deparse_bare_block($obj->{block}{code});
+
+            $block = (
+                      defined($vars)
+                      ? ('sub { ' . $vars . 'do ' . $block . '}')
+                      : ('sub ' . $block)
+                     );
 
             if (
                 @{$obj->{vars}} > 1
@@ -1121,20 +1135,20 @@ HEADER
                   . 'my $block = '
                   . $block . ';'
                   . 'for my $group(ref($obj) ? $obj->SUPER::isa("ARRAY") ? @$obj : @{$obj->to_a} : ()) {'
-                  . '; $block->call((ref($group) && $group->SUPER::isa("ARRAY") ? @$group : $group)) }}';
+                  . '$block->((ref($group) && $group->SUPER::isa("ARRAY") ? @$group : $group)) }}';
             }
             else {
 
                 $code =
                     'do { my $obj = '
                   . $expr . ';'
-                  . '; my $block = '
+                  . 'my $block = '
                   . $block . ';'
                   . 'if (ref($obj)) { if (defined(my $sub = $obj->SUPER::can("iter"))) { my $iter = $sub->($obj);'
                   . 'while (defined(my $item'
-                  . ' = $iter->run )) { $block->call($item) } }'
+                  . ' = $iter->run )) { $block->($item) } }'
                   . 'else { for my $item ($obj->SUPER::isa("ARRAY") ? @$obj : @{$obj->to_a}) { '
-                  . '$block->call($item) }}}}';
+                  . '$block->($item) }}}}';
             }
         }
         elsif ($ref eq 'Sidef::Types::Bool::Ternary') {
