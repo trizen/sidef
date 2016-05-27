@@ -48,4 +48,18 @@ var e4 = primes_less_than(50)
 assert_eq(e4.first(5), [2,3,5,7,11])
 assert_eq(e4.len, 15)
 
+#
+## Fibonacci
+#
+
+var fib = Enumerator({ |yield|
+  var (a, b) = (0, 1)
+  loop {
+    yield(a)
+    (a, b) = (b, a + b)
+  }
+})
+
+assert_eq(fib.first(10), [0, 1, 1, 2, 3, 5, 8, 13, 21, 34])
+
 say "** Test passed!"
