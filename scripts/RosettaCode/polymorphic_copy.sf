@@ -18,7 +18,8 @@ class S(value) < T {
  
 var obj1 = T("T");
 var obj2 = S("S");
-var obj3 = Sys.copy(obj2);      # make a copy to obj2
+var obj3 = obj2.clone;          # make a clone of obj2
+                                # use .dclone() for deep cloning
  
 obj1.value = "foo";             # change the value of obj1
 obj2.value = "bar";             # change the value of obj2

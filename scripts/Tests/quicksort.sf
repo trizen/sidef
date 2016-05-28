@@ -9,7 +9,7 @@ func quicksort (a) {
 }
 
 var a = [4, 65, 2, -31, 0, 99, 83, 782, 2, 0, 1].shuffle;
-var s = quicksort(a.copy);
+var s = quicksort(a.clone);
 
 say "Unsorted #{a.dump}";
 say "Sorted   #{s.dump}";

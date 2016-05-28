@@ -28,7 +28,7 @@ find {
     },
 } => $scripts_dir;
 
-plan tests => (scalar(@scripts) * 2);
+plan tests => (scalar(@scripts) * 3);
 
 foreach my $sidef_script (@scripts) {
 
@@ -41,9 +41,14 @@ foreach my $sidef_script (@scripts) {
     my $sidef = Sidef->new(name => $sidef_script);
     my $ast = $sidef->parse_code($content);
 
-    is(ref($ast), 'HASH');
+    is(ref($ast), 'HASH', $sidef_script);
 
-    my $code = $sidef->compile_ast($ast, 'Perl');
+    my $optimizer = Sidef::Optimizer->new();
+    my $oast      = $optimizer->optimize($ast);
 
-    ok($code ne '');
+    ok(ref($oast), $sidef_script);
+
+    my $code = $sidef->compile_ast($oast, 'Perl');
+
+    ok($code ne '', $sidef_script);
 }

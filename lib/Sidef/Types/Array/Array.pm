@@ -1814,22 +1814,8 @@ package Sidef::Types::Array::Array {
 
     sub copy {
         my ($self) = @_;
-
-        my @array;
-        my $sub;
-        foreach my $item (@{$self}) {
-            if (ref($item) and defined($sub = UNIVERSAL::can($item, 'copy'))) {
-                CORE::push(@array, $sub->($item));
-            }
-            else {
-                CORE::push(@array, $item);
-            }
-        }
-
-        $self->new(\@array);
-
-        #state $x = require Storable;
-        #Storable::dclone($self);           # this is buggy
+        state $x = warn "[WARN] Array.copy() is deprecated: use .clone() or .dclone() instead!\n";
+        $self->dclone;
     }
 
     sub delete_first {

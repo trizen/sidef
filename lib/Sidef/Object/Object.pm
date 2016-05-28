@@ -121,6 +121,45 @@ package Sidef::Object::Object {
         bless($arg, (CORE::ref($obj) || $obj));
     }
 
+    sub clone {
+        my ($obj) = @_;
+
+        my $class   = ref($obj);
+        my $reftype = Scalar::Util::reftype($obj);
+
+        if ($reftype eq 'HASH') {
+            bless {%$obj}, $class;
+        }
+        elsif ($reftype eq 'ARRAY') {
+            bless [@$obj], $class;
+        }
+        else {
+            $obj;
+        }
+    }
+
+    sub dclone {
+        my ($obj) = @_;
+
+        my $class   = ref($obj);
+        my $reftype = Scalar::Util::reftype($obj);
+
+        if ($reftype eq 'HASH') {
+            bless {
+                map {
+                    my $v = $obj->{$_};
+                    ($_ => (ref($v) && UNIVERSAL::can($v, 'dclone') ? $v->dclone : $v))
+                  } keys(%{$obj})
+            }, $class;
+        }
+        elsif ($reftype eq 'ARRAY') {
+            bless [map { ref($_) && UNIVERSAL::can($_, 'dclone') ? $_->dclone : $_ } @{$obj}], $class;
+        }
+        else {
+            $obj;
+        }
+    }
+
     sub respond_to {
         my ($self, $method) = @_;
         ($self->can($method))

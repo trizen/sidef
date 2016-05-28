@@ -392,9 +392,8 @@ package Sidef::Types::Hash::Hash {
 
     sub copy {
         my ($self) = @_;
-
-        state $x = require Storable;
-        Storable::dclone($self);
+        state $x = warn "[WARN] Hash.copy() is deprecated: use .clone() or .dclone() instead!\n";
+        $self->dclone;
     }
 
     sub to_list {

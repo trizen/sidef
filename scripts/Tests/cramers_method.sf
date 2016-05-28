@@ -44,8 +44,8 @@ func make_det_matrix (matrix) {
 
 func calculate_delta (matrix, free_terms, position) {
 
-    # Make a copy of the matrix
-    matrix = matrix.map{.map{_}};
+    # Make a deep clone of the matrix
+    matrix = matrix.dclone;
 
     free_terms.range.each { |i|
         matrix[i][position] = free_terms[i];    # substituting the 'pos' column with the free terms

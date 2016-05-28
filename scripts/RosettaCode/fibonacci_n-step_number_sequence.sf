@@ -5,7 +5,7 @@
 #
 
 func fib(n, xs=[1]) {
-    xs.copy!;
+    xs.clone!;
 
     loop {
         var len = xs.len;
