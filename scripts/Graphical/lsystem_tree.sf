@@ -1,0 +1,23 @@
+#!/usr/bin/ruby
+
+include('LSystem/LSystem.sf')
+
+var rules = Hash(
+    S => 'T[-S]+S',
+    T => 'TT',
+);
+
+var lsys = LSystem(
+    width:  1000,
+    height: 1000,
+
+    scale: 0.4,
+    xoff: 100,
+    yoff: 700,
+
+    len:   5,
+    angle: 35,
+    color: 'dark green',
+);
+
+lsys.execute('S', 9, "tree.png", rules);

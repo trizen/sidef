@@ -189,6 +189,7 @@ scripts/Graphical/LSystem/Turtle.sf
 scripts/Graphical/lsystem_plant_1.sf
 scripts/Graphical/lsystem_plant_2.sf
 scripts/Graphical/lsystem_sierpinski_triangle.sf
+scripts/Graphical/lsystem_tree.sf
 scripts/Graphical/munching_squares.sf
 scripts/Graphical/ppm_palette.sf
 scripts/Graphical/sierpinski_pentagon.sf

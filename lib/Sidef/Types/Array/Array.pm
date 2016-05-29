@@ -1914,7 +1914,7 @@ package Sidef::Types::Array::Array {
 
     sub dump {
 
-        my %addr;    # keeps track of deparsed objects
+        my %addr;    # keeps track of dumped objects
 
         my $sub = sub {
             my ($obj) = @_;
