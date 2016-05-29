@@ -1,6 +1,6 @@
 package Sidef::Object::Object {
 
-    use 5.014;
+    use 5.016;
     require Scalar::Util;
 
     use Sidef::Types::Bool::Bool;
@@ -143,8 +143,7 @@ package Sidef::Object::Object {
 
         my %addr;    # keeps track of cloned objects
 
-        my $dclone;
-        $dclone = sub {
+        sub {
             my ($obj) = @_;
 
             my $refaddr = Scalar::Util::refaddr($obj);
@@ -161,7 +160,7 @@ package Sidef::Object::Object {
                 %$o = (
                     map {
                         my $v = $obj->{$_};
-                        ($_ => (ref($v) ? $dclone->($v) : $v))
+                        ($_ => (ref($v) ? __SUB__->($v) : $v))
                       } keys(%{$obj})
                 );
                 $o;
@@ -169,15 +168,14 @@ package Sidef::Object::Object {
             elsif ($reftype eq 'ARRAY') {
                 my $o = bless([], $class);
                 $addr{$refaddr} = $o;
-                @$o = (map { ref($_) ? $dclone->($_) : $_ } @{$obj});
+                @$o = (map { ref($_) ? __SUB__->($_) : $_ } @{$obj});
                 $o;
             }
             else {
                 $obj;
             }
-        };
-
-        $dclone->($self);
+          }
+          ->($self);
     }
 
     sub respond_to {
