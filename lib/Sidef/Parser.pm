@@ -3074,6 +3074,16 @@ package Sidef::Parser {
                 }
                 else {
 
+                    my $orig_dir = File::Spec->rel2abs(File::Spec->curdir());
+                    my $file_dir = File::Basename::dirname(File::Spec->rel2abs($self->{file_name}));
+
+                    my $chdired = 0;
+                    if ($orig_dir ne $file_dir) {
+                        if (chdir($file_dir)) {
+                            $chdired = 1;
+                        }
+                    }
+
                     my $expr = do {
                         my $code = substr($_, pos);
                         my ($obj) = $self->parse_expr(code => \$code);
@@ -3104,8 +3114,12 @@ package Sidef::Parser {
                                pos   => pos($_),
                                error => 'include-error: invalid value of type "' . ref($value) . '" (expected a plain-string)',
                           )
-                          : [$value];
+                          : [  File::Spec->file_name_is_absolute($value) ? $value
+                             : File::Spec->rel2abs($value)
+                            ];
                     } @files;
+
+                    if ($chdired) { chdir($orig_dir) }
                 }
 
                 foreach my $pair (@abs_filenames) {
