@@ -1047,11 +1047,7 @@ package Sidef::Types::String::String {
         if (ref($arg) eq 'Sidef::Types::Regex::Regex') {
             my $regex = $arg->{regex};
             my $s     = $$self;
-
-            if ($start_pos != 0) {
-                pos($s) = $start_pos;
-            }
-
+            pos($s) = $start_pos;
             return (scalar $s =~ /$regex/g) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
         }
 
