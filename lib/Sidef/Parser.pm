@@ -755,7 +755,7 @@ package Sidef::Parser {
             }
 
             my ($subset, $subset_blocks);
-            if (defined($end_delim) and /\G<<?\h*/gc) {
+            if (defined($end_delim) and m{\G<<?\h*}gc) {
                 my ($name) = /\G($self->{var_name_re})/goc;
 
                 $name // $self->fatal_error(
