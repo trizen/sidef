@@ -1,0 +1,24 @@
+#!/usr/bin/ruby
+
+include('LSystem/LSystem.sf')
+
+var rules = Hash(
+    S => 'S--S--S--T',
+    T => 'TT',
+);
+
+var lsys = LSystem(
+    width:  1000,
+    height: 1000,
+
+    scale: 0.4,
+    xoff: -280,
+    yoff: 400,
+
+    len:   30,
+    angle: 120,
+    turn:  30,
+    color: 'dark red',
+);
+
+lsys.execute('S--S--S', 7, "sierpinksi_triangle.png", rules);

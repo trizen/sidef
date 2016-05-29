@@ -1,0 +1,20 @@
+#!/usr/bin/ruby
+
+include('LSystem/LSystem.sf')
+
+var rules = Hash(
+    S => 'SS+[+S-S-S]-[-S+S+S]'
+);
+
+var lsys = LSystem(
+    width:  1000,
+    height: 1000,
+
+    xoff: -600,
+
+    len:   8,
+    angle: 25,
+    color: 'dark green',
+);
+
+lsys.execute('S', 5, "plant_2.png", rules);

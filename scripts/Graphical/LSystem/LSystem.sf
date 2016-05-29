@@ -1,0 +1,58 @@
+#!/usr/bin/ruby
+
+include('Turtle.sf');
+
+class LSystem(
+    angle  = 90,
+    scale  = 1,
+    xoff   = 0,
+    yoff   = 0,
+    len    = 5,
+    color  = 'black',
+    width  = 500,
+    height = 500,
+    turn   = 0,
+) {
+
+    has stack = []
+    has table = Hash()
+    has turtle = Turtle(width, height, turn)
+
+    method init {
+
+        angle.deg2rad!
+        turn.deg2rad!
+
+        table = Hash(
+            '+' => { turtle.turn(angle) },
+            '-' => { turtle.turn(-angle) },
+            ':' => { turtle.mirror },
+            '[' => { stack.push(turtle.state) },
+            ']' => { turtle.setstate(stack.pop) },
+        )
+    }
+
+    method translate(letter) {
+
+        if (table.contains(letter)) {
+            table{letter}()
+        }
+        elsif (letter ~~ /^[[:upper:]]\z/) {
+            turtle.forward(len, self)
+        }
+    }
+
+    method execute(string, repetitions, filename, rules) {
+
+        repetitions.times {
+            string.gsub!(/(.)/, {|c| rules{c} \\ c })
+        }
+
+        string.each_char { |command|
+            self.translate(command)
+        }
+
+        turtle.save_as(filename)
+    }
+
+}

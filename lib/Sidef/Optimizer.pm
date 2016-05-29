@@ -897,6 +897,9 @@ package Sidef::Optimizer {
             my %code = $self->optimize($obj->{block}{code});
             $obj->{block}{code} = \%code;
         }
+        elsif ($ref eq 'Sidef::Variable::NamedParam') {
+            $obj->[1] = [map { {main => [$self->optimize_expr({self => $_})]} } @{$obj->[1]}];
+        }
 
         if (not exists($expr->{ind}) and not exists($expr->{call})) {
             return (ref($obj) eq 'HASH' ? {self => $obj} : $obj);
