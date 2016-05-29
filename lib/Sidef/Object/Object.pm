@@ -139,25 +139,45 @@ package Sidef::Object::Object {
     }
 
     sub dclone {
-        my ($obj) = @_;
+        my ($self) = @_;
 
-        my $class   = ref($obj);
-        my $reftype = Scalar::Util::reftype($obj);
+        my %addr;    # keeps track of cloned objects
 
-        if ($reftype eq 'HASH') {
-            bless {
-                map {
-                    my $v = $obj->{$_};
-                    ($_ => (ref($v) && UNIVERSAL::can($v, 'dclone') ? $v->dclone : $v))
-                  } keys(%{$obj})
-            }, $class;
-        }
-        elsif ($reftype eq 'ARRAY') {
-            bless [map { ref($_) && UNIVERSAL::can($_, 'dclone') ? $_->dclone : $_ } @{$obj}], $class;
-        }
-        else {
-            $obj;
-        }
+        my $dclone;
+        $dclone = sub {
+            my ($obj) = @_;
+
+            my $refaddr = Scalar::Util::refaddr($obj);
+
+            return ($addr{$refaddr})
+              if exists($addr{$refaddr});
+
+            my $class   = ref($obj);
+            my $reftype = Scalar::Util::reftype($obj);
+
+            if ($reftype eq 'HASH') {
+                my $o = bless({}, $class);
+                $addr{$refaddr} = $o;
+                %$o = (
+                    map {
+                        my $v = $obj->{$_};
+                        ($_ => (ref($v) ? $dclone->($v) : $v))
+                      } keys(%{$obj})
+                );
+                $o;
+            }
+            elsif ($reftype eq 'ARRAY') {
+                my $o = bless([], $class);
+                $addr{$refaddr} = $o;
+                @$o = (map { ref($_) ? $dclone->($_) : $_ } @{$obj});
+                $o;
+            }
+            else {
+                $obj;
+            }
+        };
+
+        $dclone->($self);
     }
 
     sub respond_to {
