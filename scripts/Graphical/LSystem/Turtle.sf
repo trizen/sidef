@@ -12,26 +12,26 @@ class Turtle(
     has im = %s<Image::Magick>.new(size => "#{x}x#{y}")
 
     method init {
-        angle.deg2rad!;
-        im.ReadImage('canvas:white');
+        angle.deg2rad!
+        im.ReadImage('canvas:white')
     }
 
     method forward(r, opt) {
-        var (newx, newy) = (x + r*sin(angle), y + r*-cos(angle));
+        var (newx, newy) = (x + r*sin(angle), y + r*-cos(angle))
 
         im.Draw(
             primitive => 'line',
             points    => join(' ',
-                           x    * opt{:scale} + opt{:xoff},
-                           y    * opt{:scale} + opt{:yoff},
-                           newx * opt{:scale} + opt{:xoff},
-                           newy * opt{:scale} + opt{:yoff},
+                           int(x    * opt{:scale} + opt{:xoff}),
+                           int(y    * opt{:scale} + opt{:yoff}),
+                           int(newx * opt{:scale} + opt{:xoff}),
+                           int(newy * opt{:scale} + opt{:yoff}),
                         ),
             stroke      => opt{:color},
             strokewidth => 1,
         )
 
-        (x, y) = (newx, newy);
+        (x, y) = (newx, newy)
     }
 
     method save_as(filename) {
