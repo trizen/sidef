@@ -62,23 +62,41 @@ package Sidef::Types::Array::Pair {
     *to_a = \&to_array;
 
     sub dump {
-        my ($self) = @_;
 
-        Sidef::Types::String::String->new(
-            "Pair(" . "\n" . join(
-                ",\n",
+        my %addr;    # keeps track of dumped objects
 
-                (' ' x ($Sidef::SPACES += $Sidef::SPACES_INCR)) . join(
-                    ", ",
-                    map {
-                        my $val = $_;
-                        defined(UNIVERSAL::can($val, 'dump')) ? ${$val->dump} : defined($val) ? $val : 'nil'
-                      } @{$self}
-                )
-              )
-              . "\n"
-              . (' ' x ($Sidef::SPACES -= $Sidef::SPACES_INCR)) . ")"
-        );
+        my $sub = sub {
+            my ($obj) = @_;
+
+            my $refaddr = Scalar::Util::refaddr($obj);
+
+            (return $addr{$refaddr})
+              if exists($addr{$refaddr});
+
+            my $str = Sidef::Types::String::String->new("Pair(#`($refaddr)...)");
+            $addr{$refaddr} = $str;
+
+            $$str = (
+                "Pair(" . "\n" . join(
+                    ",\n",
+
+                    (' ' x ($Sidef::SPACES += $Sidef::SPACES_INCR)) . join(
+                        ", ",
+                        map {
+                            my $val = $_;
+                            defined(UNIVERSAL::can($val, 'dump')) ? ${$val->dump} : defined($val) ? $val : 'nil'
+                          } @{$obj}
+                    )
+                  )
+                  . "\n"
+                  . (' ' x ($Sidef::SPACES -= $Sidef::SPACES_INCR)) . ")"
+            );
+
+            $str;
+        };
+
+        local *Sidef::Types::Array::Pair::dump = $sub;
+        $sub->($_[0]);
     }
 };
 

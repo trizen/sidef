@@ -76,25 +76,36 @@ package Sidef::Types::Array::MultiArray {
     *to_a = \&to_array;
 
     sub dump {
-        my ($self) = @_;
-        Sidef::Types::String::String->new(
-            'MultiArr(' . join(
-                ",\n\t    ",
-                map {
-                    '[' . join(
-                        ", ",
-                        map {
-                            ref($_)
-                              && defined(UNIVERSAL::can($_, 'dump'))
-                              ? $_->dump
-                              : $_
-                          } @{$_}
-                      )
-                      . ']'
-                  } @{$self}
-              )
-              . ")"
-        );
+
+        my %addr;    # keeps track of dumped objects
+
+        my $sub = sub {
+            my ($obj) = @_;
+
+            my $refaddr = Scalar::Util::refaddr($obj);
+
+            (return $addr{$refaddr})
+              if exists($addr{$refaddr});
+
+            my $str = Sidef::Types::String::String->new("MultiArr(#`($refaddr)...)");
+            $addr{$refaddr} = $str;
+
+            $$str = (
+                'MultiArr(' . join(
+                    ",\n\t ",
+                    map {
+                        '['
+                          . join(", ", map { ref($_) && defined(UNIVERSAL::can($_, 'dump')) ? $_->dump : $_ } @{$_}) . ']'
+                      } @{$obj}
+                  )
+                  . ")"
+            );
+
+            $str;
+        };
+
+        local *Sidef::Types::Array::MultiArray::dump = $sub;
+        $sub->($_[0]);
     }
 };
 

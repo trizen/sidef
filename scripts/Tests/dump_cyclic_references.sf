@@ -1,0 +1,54 @@
+#!/usr/bin/ruby
+
+#
+## Hash cyclic reference
+#
+
+var h = Hash(foo => 0, bar => [0,1])
+h{:baz} = h
+say h;
+
+#
+## Array cyclic reference
+#
+
+var a = [1,2,3,4]
+a[2] = a
+say a
+
+#
+## Triple cyclic references
+#
+
+var a2 = [1,[2,3],4]
+
+a2[3] = a2
+a2[4] = a
+a2[1][2] = a2[1]
+
+say a2
+
+#
+## Mutual cyclic references
+#
+
+a[4] = h
+h{:quix} = a
+
+say h
+
+#
+## Pair cyclic reference
+#
+
+var p = Pair(1, 2)
+p.second = p
+say p
+
+#
+## MultiArray cyclic reference
+#
+
+var m = MultiArray([1,2], [3,4])
+m[1][1] = m
+say m

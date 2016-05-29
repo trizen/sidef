@@ -402,35 +402,50 @@ package Sidef::Types::Hash::Hash {
     }
 
     sub dump {
-        my ($self) = @_;
+        my %addr;    # keeps track of dumped objects
 
-        $Sidef::SPACES += $Sidef::SPACES_INCR;
+        my $sub = sub {
+            my ($obj) = @_;
 
-        # Sort the keys case insensitively
-        my @keys = sort { (lc($a) cmp lc($b)) || ($a cmp $b) } CORE::keys(%$self);
+            my $refaddr = Scalar::Util::refaddr($obj);
 
-        my $str = Sidef::Types::String::String->new(
-            "Hash(" . (
-                @keys
-                ? (
-                   (@keys > 1 ? "\n" : '') . join(
-                       ",\n",
-                       map {
-                           my $val = $self->{$_};
-                           (@keys > 1 ? (' ' x $Sidef::SPACES) : '')
-                             . "${Sidef::Types::String::String->new($_)->dump} => "
-                             . (defined(UNIVERSAL::can($val, 'dump')) ? ${$val->dump} : defined($val) ? $val : 'nil')
-                         } @keys
-                     )
-                     . (@keys > 1 ? ("\n" . (' ' x ($Sidef::SPACES - $Sidef::SPACES_INCR))) : '')
+            (return $addr{$refaddr})
+              if exists($addr{$refaddr});
+
+            $Sidef::SPACES += $Sidef::SPACES_INCR;
+
+            # Sort the keys case insensitively
+            my @keys = sort { (lc($a) cmp lc($b)) || ($a cmp $b) } CORE::keys(%$obj);
+
+            my $str = Sidef::Types::String::String->new("Hash(#`($refaddr)...)");
+            $addr{$refaddr} = $str;
+
+            $$str = (
+                "Hash(" . (
+                    @keys
+                    ? (
+                       (@keys > 1 ? "\n" : '') . join(
+                           ",\n",
+                           map {
+                               my $val = $obj->{$_};
+                               (@keys > 1 ? (' ' x $Sidef::SPACES) : '')
+                                 . "${Sidef::Types::String::String->new($_)->dump} => "
+                                 . (defined(UNIVERSAL::can($val, 'dump')) ? ${$val->dump} : defined($val) ? $val : 'nil')
+                             } @keys
+                         )
+                         . (@keys > 1 ? ("\n" . (' ' x ($Sidef::SPACES - $Sidef::SPACES_INCR))) : '')
+                      )
+                    : ""
                   )
-                : ""
-              )
-              . ")"
-        );
+                  . ")"
+            );
 
-        $Sidef::SPACES -= $Sidef::SPACES_INCR;
-        $str;
+            $Sidef::SPACES -= $Sidef::SPACES_INCR;
+            $str;
+        };
+
+        local *Sidef::Types::Hash::Hash::dump = $sub;
+        $sub->($_[0]);
     }
 
     {

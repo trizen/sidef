@@ -1913,18 +1913,36 @@ package Sidef::Types::Array::Array {
     sub to_list { @{$_[0]} }
 
     sub dump {
-        my ($self) = @_;
 
-        Sidef::Types::String::String->new(
-            '[' . CORE::join(
-                ', ',
-                map {
-                    my $item = defined($self->[$_]) ? $self->[$_] : 'nil';
-                    ref($item) && defined(UNIVERSAL::can($item, 'dump')) ? $item->dump() : $item;
-                  } 0 .. $#{$self}
-              )
-              . ']'
-        );
+        my %addr;    # keeps track of deparsed objects
+
+        my $sub = sub {
+            my ($obj) = @_;
+
+            my $refaddr = Scalar::Util::refaddr($obj);
+
+            (return $addr{$refaddr})
+              if exists($addr{$refaddr});
+
+            my $str = Sidef::Types::String::String->new("Array(#`($refaddr)...)");
+            $addr{$refaddr} = $str;
+
+            $$str = (
+                '[' . CORE::join(
+                    ', ',
+                    map {
+                        my $item = defined($obj->[$_]) ? $obj->[$_] : 'nil';
+                        ref($item) && defined(UNIVERSAL::can($item, 'dump')) ? $item->dump() : $item;
+                      } 0 .. $#{$obj}
+                  )
+                  . ']'
+            );
+
+            $str;
+        };
+
+        local *Sidef::Types::Array::Array::dump = $sub;
+        $sub->($_[0]);
     }
 
     sub to_s {

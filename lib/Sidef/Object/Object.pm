@@ -139,8 +139,6 @@ package Sidef::Object::Object {
     }
 
     sub dclone {
-        my ($self) = @_;
-
         my %addr;    # keeps track of cloned objects
 
         sub {
@@ -148,7 +146,7 @@ package Sidef::Object::Object {
 
             my $refaddr = Scalar::Util::refaddr($obj);
 
-            return ($addr{$refaddr})
+            (return $addr{$refaddr})
               if exists($addr{$refaddr});
 
             my $class   = ref($obj);
@@ -175,7 +173,7 @@ package Sidef::Object::Object {
                 $obj;
             }
           }
-          ->($self);
+          ->($_[0]);
     }
 
     sub respond_to {
