@@ -32,27 +32,21 @@ class LSystem(
         )
     }
 
-    method translate(letter) {
-
-        if (table.contains(letter)) {
-            table{letter}()
-        }
-        elsif (letter ~~ /^[[:upper:]]\z/) {
-            turtle.forward(len, self)
-        }
-    }
-
     method execute(string, repetitions, filename, rules) {
 
         repetitions.times {
             string.gsub!(/(.)/, {|c| rules{c} \\ c })
         }
 
-        string.each_char { |command|
-            self.translate(command)
+        string.each_char { |c|
+            if (table.contains(c)) {
+                table{c}.run
+            }
+            elsif (c.contains(/^[[:upper:]]\z/)) {
+                turtle.forward(len, self)
+            }
         }
 
         turtle.save_as(filename)
     }
-
 }

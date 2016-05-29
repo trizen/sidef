@@ -22,12 +22,12 @@ class Turtle(
         im.Draw(
             primitive => 'line',
             points    => join(' ',
-                           x    * opt.scale + opt.xoff,
-                           y    * opt.scale + opt.yoff,
-                           newx * opt.scale + opt.xoff,
-                           newy * opt.scale + opt.yoff,
+                           x    * opt{:scale} + opt{:xoff},
+                           y    * opt{:scale} + opt{:yoff},
+                           newx * opt{:scale} + opt{:xoff},
+                           newy * opt{:scale} + opt{:yoff},
                         ),
-            stroke      => opt.color,
+            stroke      => opt{:color},
             strokewidth => 1,
         )
 
