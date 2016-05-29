@@ -118,20 +118,20 @@ package Sidef::Object::Object {
 
     sub bless {
         my ($obj, $arg) = @_;
-        bless($arg, (CORE::ref($obj) || $obj));
+        CORE::bless($arg, (CORE::ref($obj) || $obj));
     }
 
     sub clone {
         my ($obj) = @_;
 
-        my $class   = ref($obj);
+        my $class   = CORE::ref($obj);
         my $reftype = Scalar::Util::reftype($obj);
 
         if ($reftype eq 'HASH') {
-            bless {%$obj}, $class;
+            CORE::bless {%$obj}, $class;
         }
         elsif ($reftype eq 'ARRAY') {
-            bless [@$obj], $class;
+            CORE::bless [@$obj], $class;
         }
         else {
             $obj;
@@ -149,24 +149,24 @@ package Sidef::Object::Object {
             (return $addr{$refaddr})
               if exists($addr{$refaddr});
 
-            my $class   = ref($obj);
+            my $class   = CORE::ref($obj);
             my $reftype = Scalar::Util::reftype($obj);
 
             if ($reftype eq 'HASH') {
-                my $o = bless({}, $class);
+                my $o = CORE::bless({}, $class);
                 $addr{$refaddr} = $o;
                 %$o = (
                     map {
                         my $v = $obj->{$_};
-                        ($_ => (ref($v) ? __SUB__->($v) : $v))
-                      } keys(%{$obj})
+                        ($_ => (CORE::ref($v) ? __SUB__->($v) : $v))
+                      } CORE::keys(%{$obj})
                 );
                 $o;
             }
             elsif ($reftype eq 'ARRAY') {
-                my $o = bless([], $class);
+                my $o = CORE::bless([], $class);
                 $addr{$refaddr} = $o;
-                @$o = (map { ref($_) ? __SUB__->($_) : $_ } @{$obj});
+                @$o = (map { CORE::ref($_) ? __SUB__->($_) : $_ } @{$obj});
                 $o;
             }
             else {
