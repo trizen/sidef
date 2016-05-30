@@ -16,7 +16,16 @@ class LSystem(
 
     has stack = []
     has table = Hash()
-    has turtle = Turtle(width, height, turn)
+
+    has turtle = Turtle(
+        x:     width,
+        y:     height,
+        angle: turn,
+        scale: scale,
+        color: color,
+        xoff:  xoff,
+        yoff:  yoff,
+    )
 
     method init {
 
@@ -43,7 +52,7 @@ class LSystem(
                 table{c}.run
             }
             elsif (c.contains(/^[[:upper:]]\z/)) {
-                turtle.forward(len, self)
+                turtle.forward(len)
             }
         }
 

@@ -6,7 +6,11 @@ class Turtle(
     x      = 500,
     y      = 500,
     angle  = 0,
+    scale  = 1,
     mirror = 1,
+    xoff   = 0,
+    yoff   = 0,
+    color  = 'black',
 ) {
 
     has im = %s<Image::Magick>.new(size => "#{x}x#{y}")
@@ -16,18 +20,18 @@ class Turtle(
         im.ReadImage('canvas:white')
     }
 
-    method forward(r, opt) {
+    method forward(r) {
         var (newx, newy) = (x + r*sin(angle), y + r*-cos(angle))
 
         im.Draw(
             primitive => 'line',
             points    => join(' ',
-                           int(x    * opt{:scale} + opt{:xoff}),
-                           int(y    * opt{:scale} + opt{:yoff}),
-                           int(newx * opt{:scale} + opt{:xoff}),
-                           int(newy * opt{:scale} + opt{:yoff}),
+                           int(x    * scale + xoff),
+                           int(y    * scale + yoff),
+                           int(newx * scale + xoff),
+                           int(newy * scale + yoff),
                         ),
-            stroke      => opt{:color},
+            stroke      => color,
             strokewidth => 1,
         )
 
