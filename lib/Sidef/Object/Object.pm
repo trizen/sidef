@@ -142,15 +142,14 @@ package Sidef::Object::Object {
         my %addr;    # keeps track of cloned objects
 
         sub {
-            my ($obj) = @_;
+            my ($obj, $reftype) = @_;
 
             my $refaddr = Scalar::Util::refaddr($obj);
 
             (return $addr{$refaddr})
               if exists($addr{$refaddr});
 
-            my $class   = CORE::ref($obj);
-            my $reftype = Scalar::Util::reftype($obj);
+            my $class = CORE::ref($obj);
 
             if ($reftype eq 'HASH') {
                 my $o = CORE::bless({}, $class);
@@ -158,7 +157,8 @@ package Sidef::Object::Object {
                 %$o = (
                     map {
                         my $v = $obj->{$_};
-                        ($_ => (CORE::ref($v) ? __SUB__->($v) : $v))
+                        my $r = Scalar::Util::reftype($v);
+                        ($_ => ($r eq 'HASH' || $r eq 'ARRAY' ? __SUB__->($v, $r) : $v))
                       } CORE::keys(%{$obj})
                 );
                 $o;
@@ -166,14 +166,19 @@ package Sidef::Object::Object {
             elsif ($reftype eq 'ARRAY') {
                 my $o = CORE::bless([], $class);
                 $addr{$refaddr} = $o;
-                @$o = (map { CORE::ref($_) ? __SUB__->($_) : $_ } @{$obj});
+                @$o = (
+                    map {
+                        my $r = Scalar::Util::reftype($_);
+                        $r eq 'ARRAY' || $r eq 'HASH' ? __SUB__->($_, $r) : $_
+                      } @{$obj}
+                );
                 $o;
             }
             else {
                 $obj;
             }
           }
-          ->($_[0]);
+          ->($_[0], Scalar::Util::reftype($_[0]));
     }
 
     sub respond_to {
@@ -223,20 +228,39 @@ package Sidef::Object::Object {
     }
 
     sub dump {
-        my ($obj) = @_;
-        my $type = Sidef::normalize_type(CORE::ref($obj) ? CORE::ref($obj) : $obj);
-        Scalar::Util::reftype($obj) eq 'HASH' or return $type;
-        my @keys = CORE::sort CORE::keys(%{$obj});
-        Sidef::Types::String::String->new(
-            "$type(" . CORE::join(
-                ', ',
-                map {
-                    my $str = UNIVERSAL::can($obj->{$_}, 'dump') ? $obj->{$_}->dump : "$obj->{$_}";
-                    "$_: $str";
-                  } @keys
-              )
-              . ')'
-        );
+        my %addr;    # keep track of dumped objects
+
+        my $sub = sub {
+            my ($obj) = @_;
+
+            my $refaddr = Scalar::Util::refaddr($obj);
+
+            (return $addr{$refaddr})
+              if exists($addr{$refaddr});
+
+            my $type = Sidef::normalize_type(CORE::ref($obj) ? CORE::ref($obj) : $obj);
+            Scalar::Util::reftype($obj) eq 'HASH' or return $type;
+            my @keys = CORE::sort CORE::keys(%{$obj});
+
+            my $str = Sidef::Types::String::String->new($type . "(#`($refaddr)...)");
+            $addr{$refaddr} = $str;
+
+            $$str = (
+                "$type(" . CORE::join(
+                    ', ',
+                    map {
+                        my $str = UNIVERSAL::can($obj->{$_}, 'dump') ? $obj->{$_}->dump : "$obj->{$_}";
+                        "$_: $str";
+                      } @keys
+                  )
+                  . ')'
+            );
+
+            $str;
+        };
+
+        local *Sidef::Object::Object::dump = $sub;
+        $sub->($_[0]);
     }
 
     {

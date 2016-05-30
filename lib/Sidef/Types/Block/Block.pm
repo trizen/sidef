@@ -396,7 +396,7 @@ package Sidef::Types::Block::Block {
     *foreach = \&for;
 
     sub dump {
-        $_[0];
+        Sidef::Types::String::String->new("$_[0]");
     }
 }
 
