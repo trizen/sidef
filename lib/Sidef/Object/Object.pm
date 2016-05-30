@@ -146,13 +146,18 @@ package Sidef::Object::Object {
 
             my $refaddr = Scalar::Util::refaddr($obj);
 
-            (return $addr{$refaddr})
-              if exists($addr{$refaddr});
+            exists($addr{$refaddr})
+              and return $addr{$refaddr};
 
-            my $class = CORE::ref($obj);
+            my $class = Scalar::Util::blessed($obj);
+
+            if (defined($class) and not UNIVERSAL::isa($class, 'Sidef::Object::Object')) {
+                $addr{$refaddr} = $obj;
+                return $obj;
+            }
 
             if ($reftype eq 'HASH') {
-                my $o = CORE::bless({}, $class);
+                my $o = defined($class) ? CORE::bless({}, $class) : {};
                 $addr{$refaddr} = $o;
                 %$o = (
                     map {
@@ -164,7 +169,7 @@ package Sidef::Object::Object {
                 $o;
             }
             elsif ($reftype eq 'ARRAY') {
-                my $o = CORE::bless([], $class);
+                my $o = defined($class) ? CORE::bless([], $class) : [];
                 $addr{$refaddr} = $o;
                 @$o = (
                     map {
