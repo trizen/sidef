@@ -33,10 +33,10 @@ package Sidef::Types::Number::Complex {
         elsif (ref($x) eq __PACKAGE__) {
             return $x if not defined $y;
             if (ref($y) eq __PACKAGE__) {
-                return $x->add($y);
+                return $x->add($y->mul(i()));
             }
             else {
-                return $x->add(__PACKAGE__->new($y));
+                return $x->add(__PACKAGE__->new($y)->mul(i()));
             }
         }
         elsif (index(ref($x), 'Sidef::') == 0) {
@@ -79,7 +79,7 @@ package Sidef::Types::Number::Complex {
             $y = $$y;
         }
         elsif (ref($y) eq __PACKAGE__) {
-            return $y->add(__PACKAGE__->new($x));
+            return $y->mul(i())->add(__PACKAGE__->new($x));
         }
         elsif (index(ref($y), 'Sidef::') == 0) {
             $y = "$y";
