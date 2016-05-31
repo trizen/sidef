@@ -46,6 +46,14 @@ package Sidef::Types::Number::Number {
         bless \$r, __PACKAGE__;
     }
 
+    sub _set_str {
+        my $r = Math::GMPq::Rmpq_init();
+        index($_[1], '/') == -1
+          ? Math::GMPq::Rmpq_set_str($r, "$_[1]/1", 10)
+          : Math::GMPq::Rmpq_set_str($r, $_[1],     10);
+        bless \$r, __PACKAGE__;
+    }
+
     sub new {
         my (undef, $num, $base) = @_;
 

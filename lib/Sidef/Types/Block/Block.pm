@@ -325,7 +325,7 @@ package Sidef::Types::Block::Block {
         my $ref = ref($obj);
 
         if ($ref eq 'Sidef::Types::Number::Number') {
-            return scalar {dump => ($ref . "->new('" . $obj->_get_frac() . "')"),};
+            return scalar {dump => ($ref . "->_set_str('" . $obj->_get_frac() . "')"),};
         }
         elsif ($ref eq 'Sidef::Types::Number::Complex') {
             my ($re, $im) = $obj->reals();

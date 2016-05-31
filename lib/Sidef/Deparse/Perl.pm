@@ -991,7 +991,7 @@ HEADER
                 $code = '(Sidef::Types::Number::Number::MONE)';
             }
             else {
-                $code = $self->make_constant($ref, 'new', "Number$refaddr", "'" . $obj->_get_frac . "'");
+                $code = $self->make_constant($ref, '_set_str', "Number$refaddr", "'" . $obj->_get_frac . "'");
             }
         }
         elsif ($ref eq 'Sidef::Types::Number::Inf') {

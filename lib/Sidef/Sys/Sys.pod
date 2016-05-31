@@ -47,16 +47,6 @@ Return the
 
 =cut
 
-=head2 copy
-
-Sys.copy() -> I<Obj>
-
-Return the
-
-Aliases: I<clone>
-
-=cut
-
 =head2 defined
 
 Sys.defined() -> I<Obj>

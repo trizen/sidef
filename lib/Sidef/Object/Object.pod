@@ -72,6 +72,22 @@ Return the
 
 =cut
 
+=head2 clone
+
+Object.clone() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 dclone
+
+Object.dclone() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 def_method
 
 Object.def_method() -> I<Obj>
