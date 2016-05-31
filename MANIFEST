@@ -147,6 +147,8 @@ scripts/Expensive/long_multiplication.sf
 scripts/Expensive/ludic_numbers.sf
 scripts/Expensive/normal_distribution.sf
 scripts/Expensive/numerical_integration.sf
+scripts/Expensive/parallel_calculations.sf
+scripts/Expensive/quicksort_in_parallel.sf
 scripts/Expensive/root_of_a_function.sf
 scripts/Expensive/smart_word_wrap.sf
 scripts/Expensive/smart_word_wrap_lazy.sf
