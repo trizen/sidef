@@ -457,6 +457,7 @@ scripts/RosettaCode/ordered_partitions.sf
 scripts/RosettaCode/pangram_checker.sf
 scripts/RosettaCode/partial_function_application.sf
 scripts/RosettaCode/pascal_s_triangle.sf
+scripts/RosettaCode/pascal_s_triangle_puzzle.sf
 scripts/RosettaCode/perfect_shuffle.sf
 scripts/RosettaCode/permutations_by_swapping.sf
 scripts/RosettaCode/pernicious_numbers.sf
