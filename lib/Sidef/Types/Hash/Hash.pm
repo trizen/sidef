@@ -409,8 +409,8 @@ package Sidef::Types::Hash::Hash {
 
             my $refaddr = Scalar::Util::refaddr($obj);
 
-            (return $addr{$refaddr})
-              if exists($addr{$refaddr});
+            exists($addr{$refaddr})
+              and return $addr{$refaddr};
 
             $Sidef::SPACES += $Sidef::SPACES_INCR;
 

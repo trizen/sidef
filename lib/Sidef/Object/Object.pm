@@ -240,8 +240,8 @@ package Sidef::Object::Object {
 
             my $refaddr = Scalar::Util::refaddr($obj);
 
-            (return $addr{$refaddr})
-              if exists($addr{$refaddr});
+            exists($addr{$refaddr})
+              and return $addr{$refaddr};
 
             my $type = Sidef::normalize_type(CORE::ref($obj) ? CORE::ref($obj) : $obj);
             Scalar::Util::reftype($obj) eq 'HASH' or return $type;

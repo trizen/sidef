@@ -1921,8 +1921,8 @@ package Sidef::Types::Array::Array {
 
             my $refaddr = Scalar::Util::refaddr($obj);
 
-            (return $addr{$refaddr})
-              if exists($addr{$refaddr});
+            exists($addr{$refaddr})
+              and return $addr{$refaddr};
 
             my $str = Sidef::Types::String::String->new("Array(#`($refaddr)...)");
             $addr{$refaddr} = $str;

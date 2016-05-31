@@ -70,8 +70,8 @@ package Sidef::Types::Array::Pair {
 
             my $refaddr = Scalar::Util::refaddr($obj);
 
-            (return $addr{$refaddr})
-              if exists($addr{$refaddr});
+            exists($addr{$refaddr})
+              and return $addr{$refaddr};
 
             my $str = Sidef::Types::String::String->new("Pair(#`($refaddr)...)");
             $addr{$refaddr} = $str;
