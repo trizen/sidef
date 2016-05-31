@@ -188,6 +188,7 @@ scripts/Graphical/hello_world_graphical_1.sf
 scripts/Graphical/honeycombs.sf
 scripts/Graphical/LSystem/LSystem.sf
 scripts/Graphical/LSystem/Turtle.sf
+scripts/Graphical/lsystem_complex.sf
 scripts/Graphical/lsystem_plant_1.sf
 scripts/Graphical/lsystem_plant_2.sf
 scripts/Graphical/lsystem_sierpinski_triangle.sf
