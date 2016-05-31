@@ -234,14 +234,6 @@ package Sidef::Sys::Sys {
         (Scalar::Util::unweaken($obj)) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
-    sub copy {
-        my ($self, $obj) = @_;
-        state $x = require Storable;
-        Storable::dclone($obj);
-    }
-
-    *clone = \&copy;
-
     sub select {
         my ($self, $fh) = @_;
         CORE::select(CORE::ref($fh) eq 'GLOB' ? $fh : $fh->get_value);

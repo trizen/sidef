@@ -131,7 +131,6 @@ requires:
   POSIX: '0'
   Scalar::Util: '0'
   Socket: '0'
-  Storable: '0'
   Term::ReadLine: '0'
   Time::HiRes: '0'
   parent: '0'

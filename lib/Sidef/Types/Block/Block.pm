@@ -319,22 +319,48 @@ package Sidef::Types::Block::Block {
         $bool;
     }
 
+    sub __fdump {
+        my ($self, $obj) = @_;
+
+        my $ref = ref($obj);
+
+        if ($ref eq 'Sidef::Types::Number::Number') {
+            return scalar {dump => ($ref . "->new('" . $obj->_get_frac() . "')"),};
+        }
+        elsif ($ref eq 'Sidef::Types::Number::Complex') {
+            my ($re, $im) = $obj->reals();
+            return scalar {dump => $ref . "->new('$re', '$im')",};
+        }
+        elsif ($ref eq 'Sidef::Types::Number::Inf') {
+            return scalar {dump => "$ref->new",};
+        }
+        elsif ($ref eq 'Sidef::Types::Number::Ninf') {
+            return scalar {dump => "$ref->new",};
+        }
+        elsif ($ref eq 'Sidef::Types::Number::Nan') {
+            return scalar {dump => "$ref->new",};
+        }
+
+        return;
+    }
+
     sub ffork {
         my ($self, @args) = @_;
 
-        state $x = require Storable;
+        state $x = require Data::Dump::Filtered;
         open(my $fh, '+>', undef);    # an anonymous temporary file
         my $fork = Sidef::Types::Block::Fork->new(fh => $fh);
 
         # Prevent the destruction of Math::GMPq objects
-        local *Math::GMPq::DESTROY;
+        #local *Math::GMPq::DESTROY;
 
         # Try to fork
         my $pid = fork() // die "[ERROR]: Cannot fork";
+
         if ($pid == 0) {
             srand();
             my $obj = $self->call(@args);
-            ref($obj) && Storable::store_fd($obj, $fh);
+            print $fh scalar Data::Dump::Filtered::dump_filtered($obj, \&__fdump);
             exit 0;
         }
 
@@ -361,9 +387,7 @@ package Sidef::Types::Block::Block {
     sub thread {
         my ($self, @args) = @_;
         state $x = do {
-            eval { require forks; } // do {
-                require threads;
-            };
+            eval { require forks; } // require threads;
             *threads::get  = \&threads::join;
             *threads::wait = \&threads::join;
             1;

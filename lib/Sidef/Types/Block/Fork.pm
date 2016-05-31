@@ -16,9 +16,19 @@ package Sidef::Types::Block::Fork {
         # Return when the fork doesn't hold a file-handle
         exists($self->{fh}) or return;
 
-        state $x = require Storable;
-        seek($self->{fh}, 0, 0);    # rewind at the beginning
-        Storable::fd_retrieve($self->{fh});
+        # Rewind at the beginning
+        seek($self->{fh}, 0, 0);
+
+        # Get the content
+        my $content = do {
+            local $/;
+            readline($self->{fh});
+        };
+
+        # Evaluate the result
+        my $result = eval($content);
+        $@ && die "[FORK ERROR] can't retrieve value: $@";
+        $result;
     }
 
     *wait = \&get;
