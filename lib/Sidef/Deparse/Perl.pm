@@ -165,6 +165,15 @@ HEADER
         }
     }
 
+    sub load_mod {
+        my ($self, $mod) = @_;
+        $self->top_add(
+                       $self->{opt}{c}
+                       ? qq{main::__load_sidef_module__("$mod");}
+                       : "use $mod;"
+                      );
+    }
+
     sub _get_reftype {
         my ($self, $obj) = @_;
 
@@ -173,9 +182,8 @@ HEADER
         if (exists $self->{data_types}{$ref}) {
             my $target = $self->{data_types}{$ref};
 
-            state $cache = {};
-            $cache->{$ref} //= do {
-                $self->top_add("use $target;");
+            $self->{_reftype_cache}{$ref} //= do {
+                $self->load_mod($target);
                 1;
             };
 
@@ -1152,7 +1160,7 @@ HEADER
               . ' else { } }';
         }
         elsif ($ref eq 'Sidef::Types::Block::Gather') {
-            $self->top_add("use Sidef::Types::Array::Array;");
+            $self->load_mod("Sidef::Types::Array::Array");
             $code =
                 "do{my \@_$refaddr;"
               . $self->deparse_bare_block($obj->{block}->{code})
@@ -1338,8 +1346,12 @@ HEADER
             $code = qq{CORE::die "Unimplemented at " . } . $self->_dump_string($obj->{file}) . qq{. " line $obj->{line}\\n"};
         }
         elsif (exists $self->{data_types}{$ref}) {
-            $self->top_add("use $self->{data_types}{$ref};");
-            $code = "'" . $self->{data_types}{$ref} . "'";
+            my $mod = $self->{data_types}{$ref};
+            $self->{_reftype_cache}{$mod} //= do {
+                $self->load_mod($mod);
+                1;
+            };
+            $code = "'" . $mod . "'";
         }
 
         # Array and hash indices
