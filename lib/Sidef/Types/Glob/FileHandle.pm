@@ -48,7 +48,7 @@ package Sidef::Types::Glob::FileHandle {
 
     sub autoflush {
         my ($self, $bool) = @_;
-        select((select($self->{fh}), $| = $bool->get_value)[0]);
+        select((select($self->{fh}), $| = $bool ? 1 : 0)[0]);
         $bool;
     }
 
@@ -96,28 +96,10 @@ package Sidef::Types::Glob::FileHandle {
 
         my $chunk = "$$var_ref";
         my $size = Sidef::Types::Number::Number->new(
-            defined($offset)
-            ? CORE::read(
-                $self->{fh},
-                $chunk,
-                do {
-                    local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
-                    $length->get_value;
-                },
-                do {
-                    local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
-                    $offset->get_value;
-                  }
-              )
-            : CORE::read(
-                $self->{fh},
-                $chunk,
-                do {
-                    local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
-                    $length->get_value;
-                  }
-            )
-        );
+                                                     defined($offset)
+                                                     ? CORE::read($self->{fh}, $chunk, $length, $offset)
+                                                     : CORE::read($self->{fh}, $chunk, $length)
+                                                    );
 
         $$var_ref = Sidef::Types::String::String->new($chunk);
 
@@ -129,28 +111,10 @@ package Sidef::Types::Glob::FileHandle {
 
         my $chunk = "$$var_ref";
         my $size = Sidef::Types::Number::Number->new(
-            defined($offset)
-            ? CORE::sysread(
-                $self->{fh},
-                $chunk,
-                do {
-                    local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
-                    $length->get_value;
-                },
-                do {
-                    local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
-                    $offset->get_value;
-                  }
-              )
-            : CORE::sysread(
-                $self->{fh},
-                $chunk,
-                do {
-                    local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
-                    $length->get_value;
-                  }
-            )
-        );
+                                                     defined($offset)
+                                                     ? CORE::sysread($self->{fh}, $chunk, $length, $offset)
+                                                     : CORE::sysread($self->{fh}, $chunk, $length)
+                                                    );
 
         $$var_ref = Sidef::Types::String::String->new($chunk);
 
@@ -293,7 +257,9 @@ package Sidef::Types::Glob::FileHandle {
 
     sub eof {
         my ($self) = @_;
-        (eof $self->{fh}) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
+        CORE::eof($self->{fh})
+          ? (Sidef::Types::Bool::Bool::TRUE)
+          : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub tell {
@@ -303,38 +269,15 @@ package Sidef::Types::Glob::FileHandle {
 
     sub seek {
         my ($self, $pos, $whence) = @_;
-        (
-         seek(
-             $self->{fh},
-             do {
-                 local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
-                 $pos->get_value;
-             },
-             do {
-                 local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
-                 $whence->get_value;
-               }
-             )
-        )
+        seek($self->{fh}, $pos, $whence,)
           ? (Sidef::Types::Bool::Bool::TRUE)
           : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub sysseek {
         my ($self, $pos, $whence) = @_;
-        (
-         sysseek(
-             $self->{fh},
-             do {
-                 local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
-                 $pos->get_value;
-             },
-             do {
-                 local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
-                 $whence->get_value;
-               }
-         )
-        )
+
+        sysseek($self->{fh}, $pos, $whence,)
           ? (Sidef::Types::Bool::Bool::TRUE)
           : (Sidef::Types::Bool::Bool::FALSE);
     }
@@ -360,12 +303,16 @@ package Sidef::Types::Glob::FileHandle {
 
     sub flock {
         my ($self, $mode) = @_;
-        (CORE::flock($self->{fh}, $mode->get_value)) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
+        CORE::flock($self->{fh}, $mode)
+          ? (Sidef::Types::Bool::Bool::TRUE)
+          : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub close {
         my ($self) = @_;
-        (close $self->{fh}) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
+        CORE::close($self->{fh})
+          ? (Sidef::Types::Bool::Bool::TRUE)
+          : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub stat {
@@ -380,13 +327,9 @@ package Sidef::Types::Glob::FileHandle {
 
     sub truncate {
         my ($self, $length) = @_;
-        my $len = defined($length)
-          ? do {
-            local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
-            $length->get_value;
-          }
-          : 0;
-        (CORE::truncate($self->{fh}, $len)) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
+        CORE::truncate($self->{fh}, $length // 0)
+          ? (Sidef::Types::Bool::Bool::TRUE)
+          : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     # File copy

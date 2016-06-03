@@ -245,7 +245,9 @@ package Sidef::Types::Glob::File {
         my ($self) = @_;
         @_ == 2 && ($self = $_[1]);
         state $x = require File::Spec;
-        (File::Spec->file_name_is_absolute($$self)) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
+        File::Spec->file_name_is_absolute($$self)
+          ? (Sidef::Types::Bool::Bool::TRUE)
+          : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     *is_abs = \&is_absolute;
@@ -279,7 +281,9 @@ package Sidef::Types::Glob::File {
             ($self, $file) = ($file, $_[2]);
         }
 
-        (CORE::rename($$self, "$file")) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
+        CORE::rename($$self, "$file")
+          ? (Sidef::Types::Bool::Bool::TRUE)
+          : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub move {
@@ -290,7 +294,9 @@ package Sidef::Types::Glob::File {
         }
 
         state $x = require File::Copy;
-        (File::Copy::move($$self, "$file")) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
+        File::Copy::move($$self, "$file")
+          ? (Sidef::Types::Bool::Bool::TRUE)
+          : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     *mv = \&move;
@@ -303,7 +309,9 @@ package Sidef::Types::Glob::File {
         }
 
         state $x = require File::Copy;
-        (File::Copy::copy($$self, "$file")) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
+        File::Copy::copy($$self, "$file")
+          ? (Sidef::Types::Bool::Bool::TRUE)
+          : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     *cp = \&copy;
@@ -399,22 +407,15 @@ package Sidef::Types::Glob::File {
     sub sysopen {
         my ($self, $var_ref, $mode, $perm) = @_;
 
-        my $success = sysopen(
-            my $fh,
-            $$self, "$mode",
-            defined($perm)
-            ? do {
-                local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
-                $perm->get_value;
-              }
-            : 0666
-        );
+        my $success = sysopen(my $fh, $$self, "$mode", $perm // 0666);
 
         if ($success) {
-            ${$var_ref} = Sidef::Types::Glob::FileHandle->new(fh => $fh, self => $self);
+            $$var_ref = Sidef::Types::Glob::FileHandle->new(fh => $fh, self => $self);
         }
 
-        ($success) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
+        $success
+          ? (Sidef::Types::Bool::Bool::TRUE)
+          : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub stat {
@@ -436,19 +437,7 @@ package Sidef::Types::Glob::File {
             ($self, $uid, $gid) = ($uid, $gid, $_[3]);
         }
 
-        (
-         CORE::chown(
-             do {
-                 local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
-                 $uid->get_value;
-             },
-             do {
-                 local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
-                 $gid->get_value;
-             },
-             $$self
-                    )
-        )
+        CORE::chown($uid, $gid, $$self)
           ? (Sidef::Types::Bool::Bool::TRUE)
           : (Sidef::Types::Bool::Bool::FALSE);
     }
@@ -460,15 +449,9 @@ package Sidef::Types::Glob::File {
             ($self, $permission) = ($permission, $_[2]);
         }
 
-        (
-         CORE::chmod(
-             do {
-                 local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
-                 $permission->get_value;
-             },
-             $$self
-                    )
-        ) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
+        CORE::chmod($permission, $$self)
+          ? (Sidef::Types::Bool::Bool::TRUE)
+          : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub utime {
@@ -478,19 +461,7 @@ package Sidef::Types::Glob::File {
             ($self, $atime, $mtime) = ($atime, $mtime, $_[3]);
         }
 
-        (
-         CORE::utime(
-             do {
-                 local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
-                 $atime->get_value;
-             },
-             do {
-                 local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
-                 $mtime->get_value;
-             },
-             $$self
-                    )
-        )
+        CORE::utime($atime, $mtime, $$self)
           ? (Sidef::Types::Bool::Bool::TRUE)
           : (Sidef::Types::Bool::Bool::FALSE);
     }
@@ -502,20 +473,16 @@ package Sidef::Types::Glob::File {
             ($self, $length) = ($length, $_[2]);
         }
 
-        my $len = defined($length)
-          ? do {
-            local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
-            $length->get_value;
-          }
-          : 0;
-        (CORE::truncate($$self, $len)) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
+        CORE::truncate($$self, $length // 0)
+          ? (Sidef::Types::Bool::Bool::TRUE)
+          : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub unlink {
         my ($self, @args) = @_;
-        @args                      ? Sidef::Types::Number::Number->new(CORE::unlink(@args))
-          : (CORE::unlink($$self)) ? (Sidef::Types::Bool::Bool::TRUE)
-          :                          (Sidef::Types::Bool::Bool::FALSE);
+        @args                    ? Sidef::Types::Number::Number->new(CORE::unlink(@args))
+          : CORE::unlink($$self) ? (Sidef::Types::Bool::Bool::TRUE)
+          :                        (Sidef::Types::Bool::Bool::FALSE);
     }
 
     *delete = \&unlink;
