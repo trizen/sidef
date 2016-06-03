@@ -291,14 +291,14 @@ package Sidef::Types::Glob::FileHandle {
         my ($self) = @_;
 
         state $x = require Fcntl;
-        $self->flock(Sidef::Types::Number::Number->new(&Fcntl::LOCK_EX));
+        $self->flock(&Fcntl::LOCK_EX);
     }
 
     sub unlock {
         my ($self) = @_;
 
         state $x = require Fcntl;
-        $self->flock(Sidef::Types::Number::Number->new(&Fcntl::LOCK_UN));
+        $self->flock(&Fcntl::LOCK_UN);
     }
 
     sub flock {
