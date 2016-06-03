@@ -2482,7 +2482,7 @@ package Sidef::Parser {
                             $self->fatal_error(
                                                code  => $_,
                                                pos   => pos($_) - 1,
-                                               error => "operator '$method' requires a right-side argument",
+                                               error => "operator '$method' requires a right-side operand",
                                               );
                         }
                     }
@@ -2889,7 +2889,7 @@ package Sidef::Parser {
                             $self->fatal_error(
                                                code  => $_,
                                                pos   => pos($_) - 1,
-                                               error => "operator '$method' requires a right-side argument",
+                                               error => "operator '$method' requires a right-side operand",
                                               );
                         }
                     }
