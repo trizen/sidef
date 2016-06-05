@@ -448,6 +448,7 @@ scripts/RosettaCode/middle_three_digits.sf
 scripts/RosettaCode/modular_arithmetic.sf
 scripts/RosettaCode/modular_exponentiation.sf
 scripts/RosettaCode/modular_inverse.sf
+scripts/RosettaCode/most_frequent_k_chars_distance.sf
 scripts/RosettaCode/move_to_front_algorithm_1.sf
 scripts/RosettaCode/move_to_front_algorithm_2.sf
 scripts/RosettaCode/multifactorial.sf
