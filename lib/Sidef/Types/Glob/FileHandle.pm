@@ -180,7 +180,6 @@ package Sidef::Types::Glob::FileHandle {
         if (ref($obj) eq 'Sidef::Types::Regex::Regex') {
             my $re = $obj->{regex};
             while (defined(my $line = CORE::readline($self->{fh}))) {
-                chomp($line);
                 if ($line =~ $re) {
                     push @array, Sidef::Types::String::String->new($line);
                 }
@@ -188,9 +187,8 @@ package Sidef::Types::Glob::FileHandle {
         }
         else {
             while (defined(my $line = CORE::readline($self->{fh}))) {
-                chomp($line);
                 my $string = Sidef::Types::String::String->new($line);
-                push @array, $string if $obj->run($line);
+                push @array, $string if $obj->run($string);
             }
         }
 
@@ -202,7 +200,6 @@ package Sidef::Types::Glob::FileHandle {
 
         my @array;
         while (defined(my $line = CORE::readline($self->{fh}))) {
-            chomp($line);
             push @array, $block->run(Sidef::Types::String::String->new($line));
         }
         Sidef::Types::Array::Array->new(\@array);
