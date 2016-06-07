@@ -465,6 +465,7 @@ scripts/RosettaCode/partial_function_application.sf
 scripts/RosettaCode/pascal_s_triangle.sf
 scripts/RosettaCode/pascal_s_triangle_puzzle.sf
 scripts/RosettaCode/perfect_shuffle.sf
+scripts/RosettaCode/perlin_noise.sf
 scripts/RosettaCode/permutations_by_swapping.sf
 scripts/RosettaCode/pernicious_numbers.sf
 scripts/RosettaCode/phrase_reversals.sf
@@ -662,6 +663,7 @@ scripts/Tests/functional_modules.sf
 scripts/Tests/functional_style.sf
 scripts/Tests/gather_take.sf
 scripts/Tests/gcd.sf
+scripts/Tests/get_value_cyclic_references.sf
 scripts/Tests/given_when.sf
 scripts/Tests/greatest_subsequential_sum.sf
 scripts/Tests/group_precedence.sf
