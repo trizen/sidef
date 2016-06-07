@@ -40,7 +40,7 @@ package Sidef::Types::Array::MultiArray {
                 push @array, \@row;
             }
 
-            \@array;
+            $addr{$refaddr};
         };
 
         local *Sidef::Types::Array::MultiArray::get_value = $sub;
