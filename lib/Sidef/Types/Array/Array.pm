@@ -23,19 +23,33 @@ package Sidef::Types::Array::Array {
     *call = \&new;
 
     sub get_value {
-        my ($self) = @_;
+        my %addr;
 
-        my @array;
-        foreach my $item (@{$self}) {
-            if (index(ref($item), 'Sidef::') == 0) {
-                CORE::push(@array, $item->get_value);
-            }
-            else {
-                CORE::push(@array, $item);
-            }
-        }
+        my $sub = sub {
+            my ($obj) = @_;
 
-        \@array;
+            my $refaddr = Scalar::Util::refaddr($obj);
+
+            exists($addr{$refaddr})
+              && return $addr{$refaddr};
+
+            my @array;
+            $addr{$refaddr} = \@array;
+
+            foreach my $item (@$obj) {
+                if (index(ref($item), 'Sidef::') == 0) {
+                    CORE::push(@array, $item->get_value);
+                }
+                else {
+                    CORE::push(@array, $item);
+                }
+            }
+
+            $addr{$refaddr};
+        };
+
+        local *Sidef::Types::Array::Array::get_value = $sub;
+        $sub->($_[0]);
     }
 
     sub unroll_operator {

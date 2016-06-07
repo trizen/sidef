@@ -1,0 +1,103 @@
+#!/usr/bin/ruby
+
+var dd = frequire('Data::Dump')
+
+#
+## Hash cyclic reference
+#
+
+var h = Hash(foo => 0, bar => [0,1])
+h{:baz} = h
+
+assert_eq(dd.dump(h.get_value), <<'EOT'.chomp)
+do {
+  my $a = { bar => [0, 1], baz => 'fix', foo => 0 };
+  $a->{baz} = $a;
+  $a;
+}
+EOT
+
+#
+## Array cyclic reference
+#
+
+var a = [1,2,3,4]
+a[2] = a
+
+assert_eq(dd.dump(a.get_value), <<'EOT'.chomp)
+do {
+  my $a = [1, 2, 'fix', 4];
+  $a->[2] = $a;
+  $a;
+}
+EOT
+
+#assert_eq(Perl.to_sidef(a.get_value), a)
+
+#
+## Triple cyclic references
+#
+
+var a2 = [1,[2,3],4]
+
+a2[3] = a2
+a2[4] = a
+a2[1][2] = a2[1]
+
+assert_eq(dd.dump(a2.get_value), <<'EOT'.chomp)
+do {
+  my $a = [1, [2, 3, 'fix'], 4, 'fix', [1, 2, 'fix', 4]];
+  $a->[1][2] = $a->[1];
+  $a->[3] = $a;
+  $a->[4][2] = $a->[4];
+  $a;
+}
+EOT
+
+#
+## Mutual cyclic references
+#
+
+a[4] = h
+h{:quix} = a
+
+assert_eq(dd.dump(h.get_value), <<'EOT'.chomp)
+do {
+  my $a = { bar => [0, 1], baz => 'fix', foo => 0, quix => [1, 2, 'fix', 4, 'fix'] };
+  $a->{baz} = $a;
+  $a->{quix}[2] = $a->{quix};
+  $a->{quix}[4] = $a;
+  $a;
+}
+EOT
+
+#
+## Pair cyclic reference
+#
+
+var p = Pair(1, 2)
+p.second = p
+
+assert_eq(dd.dump(p.get_value), <<'EOT'.chomp)
+do {
+  my $a = [1, 'fix'];
+  $a->[1] = $a;
+  $a;
+}
+EOT
+
+#
+## MultiArray cyclic reference
+#
+
+var m = MultiArray([1,2], [3,4])
+m[1][1] = m
+assert_eq(dd.dump(m.get_value), <<'EOT'.chomp)
+do {
+  my $a = [[1, 2], [3, 'fix']];
+  $a->[1][1] = $a;
+  $a;
+}
+EOT
+
+say "** Test passed!"

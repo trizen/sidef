@@ -21,19 +21,33 @@ package Sidef::Types::Hash::Hash {
     *call = \&new;
 
     sub get_value {
-        my ($self) = @_;
+        my %addr;
 
-        my %hash;
-        foreach my $k (CORE::keys %$self) {
-            my $v = $self->{$k};
-            $hash{$k} = (
-                         index(ref($v), 'Sidef::') == 0
-                         ? $v->get_value
-                         : $v
-                        );
-        }
+        my $sub = sub {
+            my ($obj) = @_;
 
-        \%hash;
+            my $refaddr = Scalar::Util::refaddr($obj);
+
+            exists($addr{$refaddr})
+              && return $addr{$refaddr};
+
+            my %hash;
+            $addr{$refaddr} = \%hash;
+
+            foreach my $k (CORE::keys %$obj) {
+                my $v = $obj->{$k};
+                $hash{$k} = (
+                             index(ref($v), 'Sidef::') == 0
+                             ? $v->get_value
+                             : $v
+                            );
+            }
+
+            $addr{$refaddr};
+        };
+
+        local *Sidef::Types::Hash::Hash::get_value = $sub;
+        $sub->($_[0]);
     }
 
     sub items {

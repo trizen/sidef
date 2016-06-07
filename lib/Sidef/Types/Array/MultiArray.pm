@@ -19,12 +19,32 @@ package Sidef::Types::Array::MultiArray {
     *call = \&new;
 
     sub get_value {
-        my ($self) = @_;
-        [
-         map {
-             [map { index(ref($_), 'Sidef::') == 0 ? $_->get_value : $_ } @{$_}]
-           } @{$self}
-        ];
+        my %addr;
+
+        my $sub = sub {
+            my ($obj) = @_;
+
+            my $refaddr = Scalar::Util::refaddr($obj);
+
+            exists($addr{$refaddr})
+              && return $addr{$refaddr};
+
+            my @array;
+            $addr{$refaddr} = \@array;
+
+            foreach my $arr (@$obj) {
+                my @row;
+                foreach my $item (@$arr) {
+                    push @row, (index(ref($item), 'Sidef::') == 0 ? $item->get_value : $item);
+                }
+                push @array, \@row;
+            }
+
+            \@array;
+        };
+
+        local *Sidef::Types::Array::MultiArray::get_value = $sub;
+        $sub->($_[0]);
     }
 
     sub _max {

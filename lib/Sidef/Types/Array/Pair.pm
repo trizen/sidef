@@ -16,21 +16,35 @@ package Sidef::Types::Array::Pair {
     *call = \&new;
 
     sub get_value {
-        my ($self) = @_;
+        my %addr;
 
-        my @array;
-        foreach my $i (0, 1) {
-            my $item = $self->[$i];
+        my $sub = sub {
+            my ($obj) = @_;
 
-            if (index(ref($item), 'Sidef::') == 0) {
-                push @array, $item->get_value;
+            my $refaddr = Scalar::Util::refaddr($obj);
+
+            exists($addr{$refaddr})
+              && return $addr{$refaddr};
+
+            my @array;
+            $addr{$refaddr} = \@array;
+
+            foreach my $i (0, 1) {
+                my $item = $obj->[$i];
+
+                if (index(ref($item), 'Sidef::') == 0) {
+                    push @array, $item->get_value;
+                }
+                else {
+                    push @array, $item;
+                }
             }
-            else {
-                push @array, $item;
-            }
-        }
 
-        \@array;
+            $addr{$refaddr};
+        };
+
+        local *Sidef::Types::Array::Pair::get_value = $sub;
+        $sub->($_[0]);
     }
 
     sub first : lvalue {
