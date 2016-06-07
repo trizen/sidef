@@ -195,6 +195,7 @@ scripts/Graphical/lsystem_sierpinski_triangle.sf
 scripts/Graphical/lsystem_tree.sf
 scripts/Graphical/munching_squares.sf
 scripts/Graphical/ppm_palette.sf
+scripts/Graphical/pythagoras_tree.sf
 scripts/Graphical/sierpinski_pentagon.sf
 scripts/Graphical/sierpinski_triangle_graphical.sf
 scripts/Graphical/simple_windowed_application.sf
