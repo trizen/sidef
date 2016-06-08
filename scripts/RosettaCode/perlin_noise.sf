@@ -40,4 +40,6 @@ func noise(x, y, z) {
                             grad(p[BB+1], x-1, y-1, z-1))))
 }
 
-say noise(3.14, 42, 7)
+var r = noise(3.14, 42, 7)
+assert_eq(r, 534843589/3906250000)
+say r
