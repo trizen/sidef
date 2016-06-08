@@ -437,6 +437,7 @@ scripts/RosettaCode/loops_foreach_1.sf
 scripts/RosettaCode/loops_n_plus_one_half.sf
 scripts/RosettaCode/loops_nested.sf
 scripts/RosettaCode/loops_while.sf
+scripts/RosettaCode/lu_decomposition.sf
 scripts/RosettaCode/luhn_test_of_credit_card_numbers.sf
 scripts/RosettaCode/lzw_compression.sf
 scripts/RosettaCode/map_range.sf
