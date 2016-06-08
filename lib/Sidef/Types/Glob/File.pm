@@ -11,10 +11,10 @@ package Sidef::Types::Glob::File {
         my (undef, $file) = @_;
         if (@_ > 2) {
             state $x = require File::Spec;
-            $file = File::Spec->catfile(map { ref($_) ? "${$_->to_file}" : $_ } @_[1 .. $#_]);
+            $file = File::Spec->catfile(map { "$_" } @_[1 .. $#_]);
         }
         elsif (ref($file) && ref($file) ne 'SCALAR') {
-            return $file->to_file;
+            $file = "$file";
         }
         bless \$file, __PACKAGE__;
     }
