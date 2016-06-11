@@ -1130,7 +1130,7 @@ package Sidef::Types::Array::Array {
                     $obj->run($self->[$i])
                       && return Sidef::Types::Number::Number::_new_uint($i);
                 }
-                return Sidef::Types::Number::Number::_new_int(-1);
+                return Sidef::Types::Number::Number::MONE;
             }
 
             foreach my $i (0 .. $#{$self}) {
@@ -1138,10 +1138,12 @@ package Sidef::Types::Array::Array {
                   and return Sidef::Types::Number::Number::_new_uint($i);
             }
 
-            return Sidef::Types::Number::Number::_new_int(-1);
+            return Sidef::Types::Number::Number::MONE;
         }
 
-        Sidef::Types::Number::Number::_new_int(@{$self} ? 0 : -1);
+        @$self
+          ? Sidef::Types::Number::Number::ZERO
+          : Sidef::Types::Number::Number::MONE;
     }
 
     *index_by    = \&index;
@@ -1157,7 +1159,7 @@ package Sidef::Types::Array::Array {
                       && return Sidef::Types::Number::Number::_new_uint($i);
                 }
 
-                return Sidef::Types::Number::Number::_new_int(-1);
+                return Sidef::Types::Number::Number::MONE;
             }
 
             for (my $i = $#{$self} ; $i >= 0 ; $i--) {
@@ -1165,10 +1167,10 @@ package Sidef::Types::Array::Array {
                   and return Sidef::Types::Number::Number::_new_uint($i);
             }
 
-            return Sidef::Types::Number::Number::_new_int(-1);
+            return Sidef::Types::Number::Number::MONE;
         }
 
-        Sidef::Types::Number::Number::_new_int($#{$self});
+        $self->end;
     }
 
     *rindex_by  = \&rindex;
@@ -1247,8 +1249,12 @@ package Sidef::Types::Array::Array {
     *size = \&length;
 
     sub end {
-        my ($self) = @_;
-        Sidef::Types::Number::Number::_new_int($#{$self});
+        my $end = $#{$_[0]};
+            $end == -1 ? Sidef::Types::Number::Number::MONE
+          : $end == 0  ? Sidef::Types::Number::Number::ZERO
+          : $end == 1  ? Sidef::Types::Number::Number::ONE
+          : $end > 0   ? Sidef::Types::Number::Number::_new_uint($end)
+          :              Sidef::Types::Number::Number::_new_int($end);
     }
 
     *offset = \&end;
