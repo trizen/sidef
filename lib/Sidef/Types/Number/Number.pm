@@ -30,20 +30,28 @@ package Sidef::Types::Number::Number {
 
     use Sidef::Types::Bool::Bool;
 
+    my @cache;
+
     sub _new {
         bless(\$_[0], __PACKAGE__);
     }
 
     sub _new_int {
+        $_[0] == -1 && return MONE;
+        $_[0] >= 0  && return &_new_uint;
         my $r = Math::GMPq::Rmpq_init();
         Math::GMPq::Rmpq_set_si($r, $_[0], 1);
-        bless \$r, __PACKAGE__;
+        bless(\$r, __PACKAGE__);
     }
 
     sub _new_uint {
+        exists($cache[$_[0]])
+          && return $cache[$_[0]];
         my $r = Math::GMPq::Rmpq_init();
         Math::GMPq::Rmpq_set_ui($r, $_[0], 1);
-        bless \$r, __PACKAGE__;
+        $_[0] <= 8192
+          ? ($cache[$_[0]] = bless(\$r, __PACKAGE__))
+          : bless(\$r, __PACKAGE__);
     }
 
     sub _set_str {
