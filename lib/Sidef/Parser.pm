@@ -1099,9 +1099,10 @@ package Sidef::Parser {
 
             # "has" class attributes
             if (exists($self->{current_class}) and /\Ghas\b\h*/gc) {
+                local $self->{allow_class_variable} = 1;
                 my $vars = $self->parse_init_vars(
                                                   code    => $opt{code},
-                                                  type    => 'var',
+                                                  type    => 'has',
                                                   private => 1,
                                                  );
 
@@ -1526,7 +1527,7 @@ package Sidef::Parser {
                                              code         => $opt{code},
                                              with_vals    => 1,
                                              private      => 1,
-                                             type         => 'var',
+                                             type         => 'has',
                                              ignore_delim => {
                                                               '{' => 1,
                                                               '<' => 1,
@@ -1603,15 +1604,17 @@ package Sidef::Parser {
 
                 if ($type eq 'func' or $type eq 'method') {
 
-                    my $var_names =
-                      $self->get_init_vars(
-                                           code         => $opt{code},
-                                           with_vals    => 1,
-                                           ignore_delim => {
-                                                            '{' => 1,
-                                                            '-' => 1,
-                                                           }
-                                          );
+                    my $var_names = do {
+                        local $self->{allow_class_variable} = 1 if $type eq 'method';
+                        $self->get_init_vars(
+                                             code         => $opt{code},
+                                             with_vals    => 1,
+                                             ignore_delim => {
+                                                              '{' => 1,
+                                                              '-' => 1,
+                                                             }
+                                            );
+                    };
 
                     # Functions and method traits (example: "is cached")
                     if (/\G\h*is\h+(?=\w)/gc) {
@@ -2166,8 +2169,24 @@ package Sidef::Parser {
                                      };
                         }
                     }
-                    else {
+                    elsif (exists $self->{allow_class_variable}) {
                         return $var;
+                    }
+                    elsif ($var->{type} eq 'has') {
+                        $self->fatal_error(
+                                           error => "class variable <<$var->{name}>> can't be used outside a method",
+                                           pos   => (pos($_) - length($name)),
+                                           var   => $var,
+                                           code  => $_,
+                                          );
+                    }
+                    else {    # this should not happen
+                        $self->fatal_error(
+                                           error => "can't use undeclared variable <<$var->{name}>> in this context",
+                                           pos   => (pos($_) - length($name)),
+                                           var   => $var,
+                                           code  => $_,
+                                          );
                     }
                 }
 

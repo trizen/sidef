@@ -559,7 +559,7 @@ HEADER
             $code = join(',', exists($obj->{self}) ? $self->deparse_expr($obj) : $self->deparse_script($obj));
         }
         elsif ($ref eq 'Sidef::Variable::Variable') {
-            if ($obj->{type} eq 'var') {
+            if ($obj->{type} eq 'var' or $obj->{type} eq 'has') {
 
                 my $name = $obj->{name} . $refaddr;
 
@@ -1249,7 +1249,7 @@ HEADER
         }
         elsif ($ref eq 'Sidef::Types::Number::Complex') {
 
-            #$code = $self->make_constant($ref, 'new', "Complex$refaddr", "'" . ${$obj}->Re . "'", "'" . ${$obj}->Im . "'");
+            # TODO: optimize this
             $code = $self->make_constant($ref, 'new', "Complex$refaddr",
                                          "'" . $obj->re->get_value . "'",
                                          "'" . $obj->im->get_value . "'");
