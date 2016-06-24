@@ -16,7 +16,7 @@ iter.times { |k|
         k.times { |n|
             var x = (size*k   + 100*cos(n*Number.pi / k/2));
             var y = (height/2 + 100*sin(n*Number.pi / k/2));
-            take([x.int, y.int]);
+            take([x.round(0), y.round(0)]);
         }
     }
 
