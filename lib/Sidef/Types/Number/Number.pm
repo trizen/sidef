@@ -366,14 +366,12 @@ package Sidef::Types::Number::Number {
     }
 
     sub phi {
-        state $one_f  = (Math::MPFR::Rmpfr_init_set_ui(1, $ROUND))[0];
-        state $two_f  = (Math::MPFR::Rmpfr_init_set_ui(2, $ROUND))[0];
-        state $five_f = (Math::MPFR::Rmpfr_init_set_ui(5, $ROUND))[0];
+        state $five4_f = (Math::MPFR::Rmpfr_init_set_str("1.25", 10, $ROUND))[0];
+        state $half_f  = (Math::MPFR::Rmpfr_init_set_str("0.5",  10, $ROUND))[0];
 
         my $phi = Math::MPFR::Rmpfr_init2($PREC);
-        Math::MPFR::Rmpfr_sqrt($phi, $five_f, $ROUND);
-        Math::MPFR::Rmpfr_add($phi, $phi, $one_f, $ROUND);
-        Math::MPFR::Rmpfr_div($phi, $phi, $two_f, $ROUND);
+        Math::MPFR::Rmpfr_sqrt($phi, $five4_f, $ROUND);
+        Math::MPFR::Rmpfr_add($phi, $phi, $half_f, $ROUND);
 
         _mpfr2big($phi);
     }
