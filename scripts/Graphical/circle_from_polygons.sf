@@ -4,7 +4,7 @@
 
 require('Imager');
 
-var iter = 10;          # the number of polygons
+var iter = 20;          # the number of polygons
 var size = 200;         # the diameter of each polygon in pixels
 
 var (width=(iter*size + size), height=700);
@@ -13,9 +13,9 @@ img.box(filled => 1, color => 'white');
 
 iter.times { |k|
     var points = gather {
-        4*k -> times { |n|
-            var x = (size*k   + 100*cos(n*Number.pi / 2*k));
-            var y = (height/2 + 100*sin(n*Number.pi / 2*k));
+        k.times { |n|
+            var x = (size*k   + 100*cos(n*Number.pi / k/2));
+            var y = (height/2 + 100*sin(n*Number.pi / k/2));
             take([x.int, y.int]);
         }
     }
@@ -23,7 +23,7 @@ iter.times { |k|
     img.polygon(
         points => points,
         color => [0, k, 255/k],
-    );
+    )
 }
 
 img.write(file => 'pythagoras_tree.png');
