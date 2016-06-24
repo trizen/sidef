@@ -345,15 +345,58 @@ sub code_interactive {
 
     $init_sidef->();
 
+    my ($copy_array, $copy_hash);
+
+    $copy_array = sub {
+        my ($array) = @_;
+
+        my @copy;
+        foreach my $item (@$array) {
+            if (ref($item) eq 'ARRAY') {
+                push @copy, $copy_array->($item);
+            }
+            elsif (ref($item) eq 'HASH') {
+                push @copy, $copy_hash->($item);
+            }
+            else {
+                push @copy, $item;
+            }
+        }
+
+        \@copy;
+    };
+
+    $copy_hash = sub {
+        my ($hash) = @_;
+
+        my %copy;
+        foreach my $key (keys %$hash) {
+            my $value = $hash->{$key};
+
+            if (ref($value) eq 'ARRAY') {
+                $copy{$key} = $copy_array->($value);
+            }
+            elsif (ref($value) eq 'HASH') {
+                $copy{$key} = $copy_hash->($value);
+            }
+            else {
+                $copy{$key} = $value;
+            }
+        }
+
+        \%copy;
+    };
+
     print qq{$name $version on $^O\n};
     print qq{Type "help", "copyright" or "license" for more information.\n};
 
     my $valid_lines = '';
+    my ($vars, $ref_vars_refs);
 
   MAINLOOP: {
         my $line = '';
 
-        {
+      LINE: {
             $line .= Encode::decode_utf8($term->readline($line eq '' ? '>> ' : '   ') // return);
 
             if ($line eq 'help') {
@@ -381,10 +424,11 @@ sub code_interactive {
                 close $fh;
                 say "** Updated file <<$file>> successfully!";
             }
-            elsif ($line =~ /\h\z/) {
-                $line .= "\n";
-                redo;
-            }
+
+            #~ elsif ($line =~ /\h\z/) {
+            #~ $line .= "\n";
+            #~ redo;
+            #~ }
             elsif ($line eq 'copyright') {
                 print <<'EOT';
 Copyright © 2013-2016 Daniel Șuteu, Ioana Fălcușan
@@ -411,8 +455,13 @@ EOT
         }
 
         # Remove 'var' declarations (if any)
-        if (not defined($args{r}) and not defined($args{R})) {
-            $line =~ s/^\h*var\b\h*//;
+        ##if (not defined($args{r}) and not defined($args{R})) {
+        ##    $line =~ s/^\h*var\b\h*//;
+        ##}
+
+        if (ref $sidef->{parser}) {
+            $vars          = $copy_hash->($sidef->{parser}{vars});
+            $ref_vars_refs = $copy_hash->($sidef->{parser}{vars});
         }
 
         my $ccode = eval { $sidef->compile_code($line, $args{r} ? 'Sidef' : ($args{R} || 'Perl')) };
@@ -424,9 +473,28 @@ EOT
                 return;
             }
 
-            # Otherwise a syntax-error
-            warn $@;
-            redo;
+            # Reset the parser
+            if ($line eq 'reset') {
+                $init_sidef->();
+                undef $vars;
+                undef $ref_vars_refs;
+                redo;
+            }
+
+            # Restore parser variables
+            if (defined($vars) and defined($ref_vars_refs)) {
+                %{$sidef->{parser}{vars}}          = %$vars;
+                %{$sidef->{parser}{ref_vars_refs}} = %$ref_vars_refs;
+            }
+
+            # Give up if the previous line is blank
+            if ($line =~ /\R\h*\z/) {
+                warn $@;
+                redo;
+            }
+
+            $line .= "\n";
+            goto LINE;
         }
         else {
             $valid_lines .= "$line\n";    # store valid lines
