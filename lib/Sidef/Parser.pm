@@ -1878,7 +1878,7 @@ package Sidef::Parser {
                        );
             }
 
-            # Implicit method call on special variable: _
+            # Implicit method call on special variable: "_"
             if (/\G\./) {
 
                 if (defined(my $var = $self->find_var('_', $self->{class}))) {
@@ -1889,7 +1889,7 @@ package Sidef::Parser {
                 $self->fatal_error(
                                    code  => $_,
                                    pos   => pos($_),
-                                   error => q{attempt to use an implicit method call on the uninitialized variable: "_"},
+                                   error => q{attempt of using an implicit method call on an inexistent "_" variable},
                                   );
             }
 
