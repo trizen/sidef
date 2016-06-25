@@ -1133,7 +1133,7 @@ package Sidef::Parser {
             }
 
             # Declaration of constants and static variables
-            if (/\G(define|const|static)\b\h*/gc) {
+            if (/\G(define|const|static|global)\b\h*/gc) {
                 my $type = $1;
                 my $vars = $self->parse_init_vars(code => $opt{code}, type => $type, private => 1);
 
@@ -1161,14 +1161,18 @@ package Sidef::Parser {
                                                error => qq{expected an expression after $type "$name"},
                                               );
 
+#<<<
                     my $var =
                       $type eq 'define'
-                      ? bless({init => 1, name => $name, class => $class_name, expr => $obj}, 'Sidef::Variable::Define')
+                      ? bless({name => $name, class => $class_name, expr => $obj}, 'Sidef::Variable::Define')
                       : $type eq 'static'
-                      ? bless({init => 1, name => $name, class => $class_name, expr => $obj}, 'Sidef::Variable::Static')
+                      ? bless({name => $name, class => $class_name, expr => $obj}, 'Sidef::Variable::Static')
                       : $type eq 'const'
-                      ? bless({init => 1, name => $name, class => $class_name, expr => $obj}, 'Sidef::Variable::Const')
+                      ? bless({name => $name, class => $class_name, expr => $obj}, 'Sidef::Variable::Const')
+                      : $type eq 'global'
+                      ? bless({name => $name, class => $class_name, expr => $obj}, 'Sidef::Variable::Global')
                       : die "[PARSER ERROR] Invalid variable type: $type";
+#>>>
 
                     unshift @{$self->{vars}{$class_name}},
                       {
@@ -1189,6 +1193,7 @@ package Sidef::Parser {
                     my $name       = $v->{name};
                     my $class_name = $v->{class};
 
+#<<<
                     my $var = (
                                $type eq 'define'
                                ? bless({name => $name, class => $class_name, expr => $obj}, 'Sidef::Variable::Define')
@@ -1196,8 +1201,11 @@ package Sidef::Parser {
                                ? bless({name => $name, class => $class_name, expr => $obj}, 'Sidef::Variable::Static')
                                : $type eq 'const'
                                ? bless({name => $name, class => $class_name, expr => $obj}, 'Sidef::Variable::Const')
+                               : $type eq 'global'
+                               ? bless({name => $name, class => $class_name, expr => $obj}, 'Sidef::Variable::Global')
                                : die "[PARSER ERROR] Invalid variable type: $type"
                               );
+#>>>
 
                     push @var_objs, $var;
 
@@ -1209,10 +1217,9 @@ package Sidef::Parser {
                         type  => $type,
                         line  => $self->{line},
                       };
-
                 }
 
-                return bless({vars => \@var_objs}, 'Sidef::Variable::ConstInit');
+                return bless({vars => \@var_objs, type => $type}, 'Sidef::Variable::ConstInit');
             }
 
             # Struct declaration
@@ -1417,7 +1424,7 @@ package Sidef::Parser {
 
             # Declaration of local variables, classes, methods and functions
             if (
-                   /\G(func|class|global)\b\h*/gc
+                   /\G(func|class)\b\h*/gc
                 || /\G(->)\h*/gc
                 || (exists($self->{current_class})
                     && /\G(method)\b\h*/gc)
@@ -1475,7 +1482,6 @@ package Sidef::Parser {
                   ? bless({name => $name, type => $type, class => $class_name}, 'Sidef::Variable::Variable')
                   : $type eq 'class'
                   ? bless({name => ($built_in_obj // $name), class => $class_name}, 'Sidef::Variable::ClassInit')
-                  : $type eq 'global' ? bless({name => $name, class => $class_name}, 'Sidef::Variable::Global')
                   : $self->fatal_error(
                                        error  => "invalid type",
                                        reason => "expected a magic thing to happen",
@@ -1515,10 +1521,6 @@ package Sidef::Parser {
                         type  => $type,
                         line  => $self->{line},
                       };
-                }
-
-                if ($type eq 'global') {
-                    return $obj;
                 }
 
                 if ($type eq 'class') {
@@ -2942,7 +2944,7 @@ package Sidef::Parser {
                   /\G($self->{var_name_re})\h*/goc
                   ? $1
                   : $self->fatal_error(
-                                       error  => "invalid 'module' declaration",
+                                       error  => "invalid module declaration",
                                        reason => "expected a name",
                                        code   => $_,
                                        pos    => pos($_)

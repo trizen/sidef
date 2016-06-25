@@ -455,13 +455,13 @@ EOT
         }
 
         # Remove 'var' declarations (if any)
-        ##if (not defined($args{r}) and not defined($args{R})) {
-        ##    $line =~ s/^\h*var\b\h*//;
-        ##}
+        if (not defined($args{r}) and not defined($args{R})) {
+            $line =~ s/^\h*var\b/global/;
+        }
 
         if (ref $sidef->{parser}) {
             $vars          = $copy_hash->($sidef->{parser}{vars});
-            $ref_vars_refs = $copy_hash->($sidef->{parser}{vars});
+            $ref_vars_refs = $copy_hash->($sidef->{parser}{ref_vars_refs});
         }
 
         my $ccode = eval { $sidef->compile_code($line, $args{r} ? 'Sidef' : ($args{R} || 'Perl')) };
@@ -487,8 +487,21 @@ EOT
                 %{$sidef->{parser}{ref_vars_refs}} = %$ref_vars_refs;
             }
 
-            # Give up if the previous line is blank
-            if ($line =~ /\R\h*\z/) {
+            # Give up if the previous line is blank,
+            # or when it's impossible to recover from an error
+            if (
+                   $@ =~ /is not declared in the current scope/
+                or $@ =~ /invalid \S+ declaration/
+                or $@ =~ /attempt to call method/
+                or $@ =~ /not declared in the current scope/
+                or $@ =~ /expected a block after/
+                or $@ =~ /invalid module declaration/
+                or (
+                      $@ =~ /unbalanced/ || $@ =~ /string terminator/
+                    ? $line =~ /\R\R\z/
+                    : $line =~ /\R\z/
+                   )
+              ) {
                 warn $@;
                 redo;
             }
@@ -503,21 +516,28 @@ EOT
         if (defined($args{r}) or defined($args{R})) {
             output($ccode);
         }
-        else {
+        elsif ($line =~ /\S/ and not $line =~ /^\s*#.*$/) {
             local $Sidef::Types::Number::Number::PREC = 4 * $args{P} if exists($args{P});
-            my $result = $sidef->execute_perl($ccode);
+            my @results = $sidef->execute_perl($ccode);
             print $@ if $@;
+
             use overload;
-            say "=> ",
-              (
-                  ref($result)
-                ? overload::StrVal($result)
-                      ? "$result"
-                      : eval { $result->can('dump') } ? $result->dump
-                    : $result
-                : defined($result) ? $result
-                :                    'nil'
-              );
+
+            my $dump = join(
+                ', ',
+                map {
+                        ref($_)
+                      ? overload::StrVal($_)
+                          ? "$_"
+                          : UNIVERSAL::can($_, 'dump') ? $_->dump
+                        : $_
+                      : defined($_) ? $_
+                      : 'nil'
+                  } @results
+            );
+            $dump = "($dump)" if @results > 1;
+
+            say "=> $dump";
         }
         redo;
     }

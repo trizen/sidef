@@ -272,7 +272,14 @@ package Sidef::Deparse::Sidef {
             $code = 'local ' . '(' . $self->deparse_script($obj->{expr}) . ')';
         }
         elsif ($ref eq 'Sidef::Variable::Global') {
-            $code = 'global ' . $obj->{class} . '::' . $obj->{name},;
+            my $name = 'global ' . $obj->{class} . '::' . $obj->{name};
+            if (not exists($obj->{inited}) and defined($obj->{expr})) {
+                $obj->{inited} = 1;
+                $code = $name . '=' . $self->deparse_script($obj->{expr});
+            }
+            else {
+                $code = $name;
+            }
         }
         elsif ($ref eq 'Sidef::Variable::ClassVar') {
             $code = $self->_dump_reftype($obj->{class}) . '!' . $obj->{name};
@@ -281,7 +288,14 @@ package Sidef::Deparse::Sidef {
             $code = $self->_dump_init_vars($obj, 'var');
         }
         elsif ($ref eq 'Sidef::Variable::ConstInit') {
-            $code = join(";\n" . (" " x $Sidef::SPACES), map { $self->deparse_expr({self => $_}) } @{$obj->{vars}});
+            $code = join(
+                         (
+                          $obj->{type} eq 'global'
+                          ? ', '
+                          : (";\n" . (" " x $Sidef::SPACES))
+                         ),
+                         map { $self->deparse_expr({self => $_}) } @{$obj->{vars}}
+                        );
         }
         elsif ($ref eq 'Sidef::Variable::Define') {
             my $name = $obj->{name};

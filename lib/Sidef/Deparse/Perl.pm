@@ -597,20 +597,22 @@ HEADER
                     }
 
                     # The name of the function
-                    $code .= "\$$obj->{name}$refaddr=";
+                    $code .= "\$$obj->{name}$refaddr";
 
                     # Deparse the block of the method/function
                     {
                         local $self->{function} = refaddr($block);
                         local $self->{parent_name} = [$obj->{type}, "$obj->{class}::$name"];
                         push @{$self->{function_declarations}}, [$self->{function}, "my \$$obj->{name}$refaddr;"];
-                        $code .= $self->deparse_expr({self => $block});
+
+                        if ((my $content = $self->deparse_expr({self => $block})) ne '') {
+                            $code .= "=$content";
+                        }
                     }
 
                     # Check to see if the method/function has kids (can do multiple dispatch)
                     if (exists $obj->{value}{kids}) {
                         chop $code;
-
                         my @kids = map {
                             local $_->{type} = 'func';
                             'do{' . $self->deparse_expr({self => $_}) . '}';
@@ -681,7 +683,14 @@ HEADER
             $code = 'local ' . $self->deparse_script($obj->{expr});
         }
         elsif ($ref eq 'Sidef::Variable::Global') {
-            $code = '$' . $obj->{class} . '::' . $obj->{name};
+            my $name = '$' . $obj->{class} . '::' . $obj->{name};
+            if (not exists($obj->{inited}) and defined($obj->{expr})) {
+                $obj->{inited} = 1;
+                $code = $name . '=do{' . $self->deparse_script($obj->{expr}) . '}';
+            }
+            else {
+                $code = $name;
+            }
         }
         elsif ($ref eq 'Sidef::Variable::ClassVar') {
             $code = '$' . $self->_get_reftype($obj->{class}) . '::' . $obj->{name};
@@ -731,7 +740,7 @@ HEADER
             }
         }
         elsif ($ref eq 'Sidef::Variable::ConstInit') {
-            $code = join(';', map { $self->deparse_expr({self => $_}) } @{$obj->{vars}});
+            $code = join(($obj->{type} eq 'global' ? ',' : ';'), map { $self->deparse_expr({self => $_}) } @{$obj->{vars}});
         }
         elsif ($ref eq 'Sidef::Variable::Init') {
             $code = $self->_dump_init_vars($obj);
