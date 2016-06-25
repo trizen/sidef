@@ -1,0 +1,30 @@
+#!/usr/bin/ruby
+
+# Author: Daniel "Trizen" Șuteu
+# License: GPLv3
+# Date: 25 June 2016
+# Website: https://github.com/trizen
+
+# Cached method for the computation of the zeta function.
+
+# Based on the following recursive function:
+#
+#    f(n) = n^p * f(n-1) + ((n-1)!)^p
+#    f(1) = 1
+#
+# zeta(n, p) = f(n) / (n!)^p
+#
+#===============================
+# Also notice that:
+#            _n_
+#   (n!)^p = | | k^p
+#            k=1
+
+var iter = 100                      # iterate this many times
+var p = Complex(1/2, 21.022)        # raise each n to this power
+
+func f(n) is cached {
+    n.is_one ? 1 : (pow(n, p) * f(n-1) + pow((n-1)!, p))
+}
+
+say f(iter)/pow(iter!, p)

@@ -114,6 +114,7 @@ scripts/Applications/make_filenames_safe.sf
 scripts/arithmetic_coding.sf
 scripts/bernoulli_numbers.sf
 scripts/bernoulli_numbers_recursive.sf
+scripts/cached_zeta_function.sf
 scripts/caesar_cipher.sf
 scripts/chebyshev_coefficients.sf
 scripts/chinese_remainder_theorem.sf
