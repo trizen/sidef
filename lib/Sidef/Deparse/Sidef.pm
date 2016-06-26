@@ -609,22 +609,12 @@ package Sidef::Deparse::Sidef {
                         }
                     }
                     else {
-
-                        #~ if ($method eq '@') {
-                        #~ $code .= ".$method";
-                        #~ }
-                        #~ elsif ($method eq '@*') {
-                        #~ $code = "\@($code)";
-                        #~ }
-                        #~ else {
                         if ($ref eq 'Sidef::Variable::Ref' or $ref eq 'Sidef::Operator::Unary') {
                             $code .= $method;
                         }
                         else {
                             $code = "($code) $method ";
                         }
-
-                        #~ }
                     }
                 }
 

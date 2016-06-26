@@ -1242,16 +1242,8 @@ HEADER
             $code = $self->make_constant($ref, '__NEW__', "MOD_F$refaddr", $self->_dump_string($obj->{module}));
         }
         elsif ($ref eq 'Sidef::Types::Range::RangeNumber') {
-            $code = $self->make_constant(
-                $ref,
-                '__new__',
-                "RangeNumber$refaddr",
-                map {
-                        "$_ => do{ my \$r = Math::GMPq::Rmpq_init(); Math::GMPq::Rmpq_set_str(\$r,'"
-                      . Math::GMPq::Rmpq_get_str($obj->{$_}, 10)
-                      . "', 10); \$r }"
-                  } keys(%{$obj})
-            );
+            $code = $self->make_constant($ref, 'new', "RangeNumber$refaddr",
+                       map { 'Sidef::Types::Number::Number->_set_str(' . $obj->{$_}->_get_frac . ')' } ('from', 'to', 'step'));
         }
         elsif ($ref eq 'Sidef::Types::Range::RangeString') {
             $code = $self->make_constant($ref, '__new__', "RangeString$refaddr",
