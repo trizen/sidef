@@ -24,7 +24,7 @@ STOP
 var vertices = sides.of {|i| Complex(0, i * Number.tau / sides).exp }
 
 (sides**order).range.each { |i|
-   var vector = ([vertices.@["%#{order}d" % i.base(sides) -> chars]] »*« orders «+»)
+   var vector = ([vertices["%#{order}d" % i.base(sides) -> chars]] »*« orders «+»)
    var points = (vertices »*» orders[-1]*(1-scaling_factor) »+» vector »reals»() «%« '%0.3f')
    say ('<polygon points="' + points.join(' ') + '"/>')
 }

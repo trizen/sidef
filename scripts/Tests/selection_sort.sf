@@ -19,9 +19,9 @@ class Array {
     }
 }
 
-var arr = (0..9 -> shuffle
-                -> selectionsort);
+var r = 10.of { .irand }
+var arr = r.selectionsort;
 
-arr == 0..9
+arr == r.sort
     ? say "** Test passed!"
     : die "Error!";

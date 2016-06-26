@@ -254,7 +254,7 @@ failtest(func { my_even("foo") }, "my_even('foo')")
 ## PointLimit example
 #
 
-subset PointLimit < Number {|n| n ~~ (-10 ..^ 10) }
+subset PointLimit < Number {|n| n ~~ (-10 .. 10) }
 
 class Point(x < PointLimit, y < PointLimit) {
     method to_s { "[#{x},#{y}]" }

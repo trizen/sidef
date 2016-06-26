@@ -18,4 +18,4 @@ func binary_search(array, value, low, high) {
     return middle;
 }
 
-say binary_search(1..100, 23, 0, 99);
+say binary_search(@(1..100), 23, 0, 99);

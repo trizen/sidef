@@ -23,11 +23,73 @@ Inherits methods from:
 =head1 METHODS
 
 
+=head2 !=
+
+I<Obj> B<!=> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<ne>
+
+=cut
+
+=head2 *
+
+I<Obj> B<*> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<mul>
+
+=cut
+
+=head2 +
+
+I<Obj> B<+> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<add>
+
+=cut
+
+=head2 -
+
+I<Obj> B<-> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<sub>
+
+=cut
+
+=head2 ...
+
+I<Obj> B<...> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<to_list>
+
+=cut
+
+=head2 /
+
+I<Obj> B</> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<div>
+
+=cut
+
 =head2 ==
 
 I<Obj> B<==> I<Obj> -> I<Obj>
 
 Return the
+
+Aliases: I<eq>
 
 =cut
 
@@ -70,6 +132,14 @@ RangeNumber.contain() -> I<Obj>
 Return the
 
 Aliases: I<include>, I<contains>, I<includes>
+
+=cut
+
+=head2 cross_operator
+
+RangeNumber.cross_operator() -> I<Obj>
+
+Return the
 
 =cut
 
@@ -117,9 +187,27 @@ Return the
 
 =cut
 
+=head2 len
+
+RangeNumber.len() -> I<Obj>
+
+Return the
+
+Aliases: I<length>
+
+=cut
+
 =head2 map
 
 RangeNumber.map() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 map_operator
+
+RangeNumber.map_operator() -> I<Obj>
 
 Return the
 
@@ -151,9 +239,41 @@ Aliases: I<call>
 
 =cut
 
+=head2 pam_operator
+
+RangeNumber.pam_operator() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 pick
+
+RangeNumber.pick() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 prod
+
+RangeNumber.prod() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 reduce
 
 RangeNumber.reduce() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 reduce_operator
+
+RangeNumber.reduce_operator() -> I<Obj>
 
 Return the
 
@@ -175,6 +295,14 @@ Return the
 
 =cut
 
+=head2 sum
+
+RangeNumber.sum() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 to
 
 RangeNumber.to() -> I<Obj>
@@ -190,5 +318,13 @@ RangeNumber.to_a() -> I<Obj>
 Return the
 
 Aliases: I<to_array>
+
+=cut
+
+=head2 unroll_operator
+
+RangeNumber.unroll_operator() -> I<Obj>
+
+Return the
 
 =cut

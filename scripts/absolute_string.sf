@@ -51,5 +51,5 @@ var strings = [
 
 strings.each { |str|
     var array = abs_str(str);
-    "%-25s" * 3 + "\n" -> printf(array.@[0..2]);
+    "%-25s" * 3 + "\n" -> printf(array[0..2 -> to_list]);
 }

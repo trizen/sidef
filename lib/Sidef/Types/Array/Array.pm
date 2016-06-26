@@ -474,8 +474,6 @@ package Sidef::Types::Array::Array {
         $self->new(\@result);
     }
 
-    *combination = \&combinations;
-
     sub count {
         my ($self, $obj) = @_;
 
@@ -1278,7 +1276,9 @@ package Sidef::Types::Array::Array {
                 local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
                 $amount = $amount->get_value;
             }
-            return $self->new([map { $self->[CORE::rand(scalar @{$self})] } 1 .. $amount]);
+            return @{$self}
+              ? $self->new([map { $self->[CORE::rand(scalar @{$self})] } 1 .. $amount])
+              : Sidef::Types::Array::Array->new([]);
         }
         $self->[CORE::rand(scalar @{$self})];
     }
@@ -1288,18 +1288,10 @@ package Sidef::Types::Array::Array {
 
     sub range {
         my ($self) = @_;
-        Sidef::Types::Range::RangeNumber->__new__(
-            from => ${(Sidef::Types::Number::Number::ZERO)},
-            to   => do {
-                my $r = Math::GMPq::Rmpq_init();
-                my $i = $#{$self};
-                $i < 0
-                  ? Math::GMPq::Rmpq_set_si($r, $i, 1)
-                  : Math::GMPq::Rmpq_set_ui($r, $i, 1);
-                $r;
-            },
-            step => ${(Sidef::Types::Number::Number::ONE)},
-                                                 );
+        Sidef::Types::Range::RangeNumber->new(Sidef::Types::Number::Number::ZERO,
+                                              Sidef::Types::Number::Number::_new_int($#{$self}),
+                                              Sidef::Types::Number::Number::ONE,
+                                             );
     }
 
     sub indices {
@@ -1831,6 +1823,12 @@ package Sidef::Types::Array::Array {
     }
 
     *to_h = \&to_hash;
+
+    sub to_a {
+        $_[0];
+    }
+
+    *to_array = \&to_a;
 
     sub copy {
         my ($self) = @_;

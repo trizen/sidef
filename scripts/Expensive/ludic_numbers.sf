@@ -7,7 +7,7 @@
 func ludics_upto(nmax=100000) {
   Enumerator({ |collect|
     collect(1)
-    var arr = 2..nmax
+    var arr = @(2..nmax)
     while (arr) {
       collect(var n = arr[0])
       arr.range.by(n).each {|i| arr[i] = nil}

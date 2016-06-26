@@ -39,8 +39,8 @@ package Sidef::Types::Number::Complex {
                 return $x->add(__PACKAGE__->new($y)->mul(i()));
             }
         }
-        elsif (index(ref($x), 'Sidef::') == 0) {
-            $x = "$x";
+        elsif (ref($x) eq 'SCALAR' or index(ref($x), 'Sidef::') == 0) {
+            $x = ref($x) eq 'SCALAR' ? $$x : "$x";
             if ($x eq 'i' or $x eq '+i') {
                 return __PACKAGE__->new(__PACKAGE__->new(0, 1), $y);
             }
@@ -81,8 +81,8 @@ package Sidef::Types::Number::Complex {
         elsif (ref($y) eq __PACKAGE__) {
             return $y->mul(i())->add(__PACKAGE__->new($x));
         }
-        elsif (index(ref($y), 'Sidef::') == 0) {
-            $y = "$y";
+        elsif (ref($y) eq 'SCALAR' or index(ref($y), 'Sidef::') == 0) {
+            $y = ref($y) eq 'SCALAR' ? $$y : "$y";
             if ($y eq 'i' or $y eq '+i') {
                 return __PACKAGE__->new($x, __PACKAGE__->new(0, 1));
             }
@@ -144,13 +144,14 @@ package Sidef::Types::Number::Complex {
 
     sub _valid {
         (
-         ref($_) eq __PACKAGE__
-           or die "[ERROR] Invalid argument `$_` of type "
-           . Sidef::normalize_type(ref($_)) . " in "
-           . Sidef::normalize_method((caller(1))[3])
-           . "(). Expected an argument of type Complex!\n"
-        )
-          for @_;
+         ref($$_) eq __PACKAGE__
+           or do {
+             $$_ =
+               ref($$_) eq 'Sidef::Types::Number::Number'
+               ? __PACKAGE__->new($$_)
+               : __PACKAGE__->new(\"$$_");
+           }
+        ) for @_;
     }
 
     sub get_value {
@@ -292,11 +293,12 @@ package Sidef::Types::Number::Complex {
         my ($x, $y) = @_;
         my $r = Math::MPC::Rmpc_init2($PREC);
 
-        if (ref($y) eq __PACKAGE__) {
-            Math::MPC::Rmpc_add($r, $$x, $$y, $ROUND);
+        if (ref($y) eq 'Sidef::Types::Number::Number') {
+            Math::MPC::Rmpc_add_fr($r, $$x, $y->_big2mpfr(), $ROUND);
         }
         else {
-            Math::MPC::Rmpc_add_fr($r, $$x, $y->_big2mpfr(), $ROUND);
+            _valid(\$y);
+            Math::MPC::Rmpc_add($r, $$x, $$y, $ROUND);
         }
 
         bless(\$r, __PACKAGE__);
@@ -306,11 +308,12 @@ package Sidef::Types::Number::Complex {
         my ($x, $y) = @_;
         my $r = Math::MPC::Rmpc_init2($PREC);
 
-        if (ref($y) eq __PACKAGE__) {
-            Math::MPC::Rmpc_sub($r, $$x, $$y, $ROUND);
+        if (ref($y) eq 'Sidef::Types::Number::Number') {
+            Math::MPC::Rmpc_add_fr($r, $$x, -$y->_big2mpfr(), $ROUND);
         }
         else {
-            Math::MPC::Rmpc_add_fr($r, $$x, -$y->_big2mpfr(), $ROUND);
+            _valid(\$y);
+            Math::MPC::Rmpc_sub($r, $$x, $$y, $ROUND);
         }
 
         bless(\$r, __PACKAGE__);
@@ -320,11 +323,12 @@ package Sidef::Types::Number::Complex {
         my ($x, $y) = @_;
         my $r = Math::MPC::Rmpc_init2($PREC);
 
-        if (ref($y) eq __PACKAGE__) {
-            Math::MPC::Rmpc_mul($r, $$x, $$y, $ROUND);
+        if (ref($y) eq 'Sidef::Types::Number::Number') {
+            Math::MPC::Rmpc_mul_fr($r, $$x, $y->_big2mpfr(), $ROUND);
         }
         else {
-            Math::MPC::Rmpc_mul_fr($r, $$x, $y->_big2mpfr(), $ROUND);
+            _valid(\$y);
+            Math::MPC::Rmpc_mul($r, $$x, $$y, $ROUND);
         }
 
         bless(\$r, __PACKAGE__);
@@ -335,11 +339,12 @@ package Sidef::Types::Number::Complex {
 
         my $r = Math::MPC::Rmpc_init2($PREC);
 
-        if (ref($y) eq __PACKAGE__) {
-            Math::MPC::Rmpc_div($r, $$x, $$y, $ROUND);
+        if (ref($y) eq 'Sidef::Types::Number::Number') {
+            Math::MPC::Rmpc_div_fr($r, $$x, $y->_big2mpfr(), $ROUND);
         }
         else {
-            Math::MPC::Rmpc_div_fr($r, $$x, $y->_big2mpfr(), $ROUND);
+            _valid(\$y);
+            Math::MPC::Rmpc_div($r, $$x, $$y, $ROUND);
         }
 
         bless(\$r, __PACKAGE__);
@@ -358,11 +363,12 @@ package Sidef::Types::Number::Complex {
         my ($x, $y) = @_;
         my $r = Math::MPC::Rmpc_init2($PREC);
 
-        if (ref($y) eq __PACKAGE__) {
-            Math::MPC::Rmpc_pow($r, $$x, $$y, $ROUND);
+        if (ref($y) eq 'Sidef::Types::Number::Number') {
+            Math::MPC::Rmpc_pow_fr($r, $$x, $y->_big2mpfr(), $ROUND);
         }
         else {
-            Math::MPC::Rmpc_pow_fr($r, $$x, $y->_big2mpfr(), $ROUND);
+            _valid(\$y);
+            Math::MPC::Rmpc_pow($r, $$x, $$y, $ROUND);
         }
 
         bless(\$r, __PACKAGE__);
@@ -399,15 +405,16 @@ package Sidef::Types::Number::Complex {
         Math::MPC::Rmpc_log($r, $$x, $ROUND);
 
         if (defined $y) {
-            if (ref($y) eq __PACKAGE__) {
-                my $baseln = Math::MPC::Rmpc_init2($PREC);
-                Math::MPC::Rmpc_log($baseln, $$y, $ROUND);
-                Math::MPC::Rmpc_div($r, $r, $baseln, $ROUND);
-            }
-            else {
+            if (ref($y) eq 'Sidef::Types::Number::Number') {
                 my $baseln = $y->_big2mpfr();
                 Math::MPFR::Rmpfr_log($baseln, $baseln, $Sidef::Types::Number::Number::ROUND);
                 Math::MPC::Rmpc_div_fr($r, $r, $baseln, $ROUND);
+            }
+            else {
+                _valid(\$y);
+                my $baseln = Math::MPC::Rmpc_init2($PREC);
+                Math::MPC::Rmpc_log($baseln, $$y, $ROUND);
+                Math::MPC::Rmpc_div($r, $r, $baseln, $ROUND);
             }
         }
 
@@ -723,7 +730,7 @@ package Sidef::Types::Number::Complex {
             $y = __PACKAGE__->new($y);
         }
         else {
-            _valid($y);
+            _valid(\$y);
         }
 
         my $r = Math::MPC::Rmpc_init2($PREC);
@@ -743,7 +750,7 @@ package Sidef::Types::Number::Complex {
             $y = __PACKAGE__->new($y);
         }
         else {
-            _valid($y);
+            _valid(\$y);
         }
 
         if (Math::MPC::Rmpc_cmp($$x, $$y) == 0) {
@@ -761,7 +768,7 @@ package Sidef::Types::Number::Complex {
             $y = __PACKAGE__->new($y);
         }
         else {
-            _valid($y);
+            _valid(\$y);
         }
 
         if (Math::MPC::Rmpc_cmp($$x, $$y) == 0) {
@@ -779,7 +786,7 @@ package Sidef::Types::Number::Complex {
             $y = __PACKAGE__->new($y);
         }
         else {
-            _valid($y);
+            _valid(\$y);
         }
 
         $x->abs->gt($y->abs);
@@ -792,7 +799,7 @@ package Sidef::Types::Number::Complex {
             $y = __PACKAGE__->new($y);
         }
         else {
-            _valid($y);
+            _valid(\$y);
         }
 
         $x->abs->ge($y->abs);
@@ -805,7 +812,7 @@ package Sidef::Types::Number::Complex {
             $y = __PACKAGE__->new($y);
         }
         else {
-            _valid($y);
+            _valid(\$y);
         }
 
         $x->abs->lt($y->abs);
@@ -818,7 +825,7 @@ package Sidef::Types::Number::Complex {
             $y = __PACKAGE__->new($y);
         }
         else {
-            _valid($y);
+            _valid(\$y);
         }
 
         $x->abs->le($y->abs);
@@ -831,7 +838,7 @@ package Sidef::Types::Number::Complex {
             $y = __PACKAGE__->new($y);
         }
         else {
-            _valid($y);
+            _valid(\$y);
         }
 
         $x->abs->cmp($y->abs);

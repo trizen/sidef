@@ -3,7 +3,7 @@
 # http://rosettacode.org/wiki/Levenshtein_distance#Sidef
 
 func lev(s, t) {
-    var d = [0 .. t.len, 1 .. s.len -> map {[_]}...];
+    var d = [@(0..t.len), s.len.of{[_]}...];
     { |i|
         { |j|
             d[i][j] = (

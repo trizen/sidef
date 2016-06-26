@@ -12,128 +12,62 @@ package Sidef::Types::Range::RangeNumber {
     use Sidef::Types::Bool::Bool;
     use Sidef::Types::Number::Number;
 
-    my $ONE  = ${(Sidef::Types::Number::Number::ONE)};
-    my $ZERO = ${(Sidef::Types::Number::Number::ZERO)};
-    my $MONE = ${(Sidef::Types::Number::Number::MONE)};
-
-    use Sidef::Types::Number::Inf;
-    use Sidef::Types::Number::Ninf;
-
-    my $INF  = ${Sidef::Types::Number::Inf->new};
-    my $NINF = ${Sidef::Types::Number::Ninf->new};
+    my $ONE  = Sidef::Types::Number::Number::ONE;
+    my $ZERO = Sidef::Types::Number::Number::ZERO;
+    my $MONE = Sidef::Types::Number::Number::MONE;
 
     sub new {
         my (undef, $from, $to, $step) = @_;
 
-        if (defined $to) {
-            Sidef::Types::Number::Number::_valid(
-                                                 $from,
-                                                 (
-                                                       ref($to) eq 'Sidef::Types::Number::Inf'
-                                                    || ref($to) eq 'Sidef::Types::Number::Ninf' ? () : $to
-                                                 ),
-                                                 defined($step) ? $step : ()
-                                                );
-            $from = ref($from) ? $$from : $from;
-            $to   = ref($to)   ? $$to   : $to;
-            $step = ref($step) ? $$step : defined($step) ? $step : $ONE;
-        }
-        elsif (defined $from) {
-            Sidef::Types::Number::Number::_valid($from);
-            $to   = ref($from) ? $$from : $from;
-            $from = $ZERO;
-            $step = $ONE;
-        }
-        else {
-            ($from, $to, $step) = ($ZERO, $MONE, $ONE);
-        }
-
         bless {
-               from => $from,
-               to   => $to,
-               step => $step,
+               from => $from // $ZERO,
+               to   => $to   // $MONE,
+               step => $step // $ONE,
               },
           __PACKAGE__;
     }
 
     *call = \&new;
 
-    sub __new__ {
-        my (undef, %opt) = @_;
-        bless \%opt, __PACKAGE__;
-    }
-
     sub by {
         my ($self, $step) = @_;
-        Sidef::Types::Number::Number::_valid($step);
-        __PACKAGE__->__new__(
-                             from => $self->{from},
-                             to   => $self->{to},
-                             step => (Math::GMPq::Rmpq_sgn($self->{step}) < 0 ? -$$step : $$step),
-                            );
+        $self->new($self->{from}, $self->{to}, $self->{step}->is_neg ? $step->neg : $step);
     }
 
     sub from {
         my ($self, $from) = @_;
-        Sidef::Types::Number::Number::_valid($from);
-        __PACKAGE__->__new__(
-                             from => $$from,
-                             to   => $self->{to},
-                             step => $self->{step},
-                            );
+        $self->new($from, $self->{to}, $self->{step});
     }
 
     sub to {
         my ($self, $to) = @_;
-        Sidef::Types::Number::Number::_valid($to);
-        __PACKAGE__->__new__(
-                             from => $self->{from},
-                             to   => $$to,
-                             step => $self->{step},
-                            );
+        $self->new($self->{from}, $to, $self->{step});
     }
 
     sub reverse {
         my ($self) = @_;
-
-        if (Math::GMPq::Rmpq_equal($self->{to}, $INF) or Math::GMPq::Rmpq_equal($self->{to}, $NINF)) {
-            die "[ERROR] Can't reverse an infinite range: $self";
-        }
-
-        __PACKAGE__->__new__(
-                             from => $self->{to},
-                             to   => $self->{from},
-                             step => -$self->{step},
-                            );
+        $self->new($self->{to}, $self->{from}, $self->{step}->neg);
     }
 
     sub min {
         my ($self) = @_;
-        Sidef::Types::Number::Number->new(
-            Math::GMPq::Rmpq_sgn($self->{step}) > 0 ? $self->{from} : do {
-                    Math::GMPq::Rmpq_equal($self->{to}, $INF) ? (return Sidef::Types::Number::Inf->new)
-                  : Math::GMPq::Rmpq_equal($self->{to}, $NINF) ? (return Sidef::Types::Number::Ninf->new)
-                  :                                              $self->{to};
-              }
-        );
+
+        $self->{step}->is_pos
+          ? $self->{from}
+          : $self->{to};
     }
 
     sub max {
         my ($self) = @_;
-        Sidef::Types::Number::Number->new(
-            Math::GMPq::Rmpq_sgn($self->{step}) > 0
-            ? do {
-                    Math::GMPq::Rmpq_equal($self->{to}, $INF) ? (return Sidef::Types::Number::Inf->new)
-                  : Math::GMPq::Rmpq_equal($self->{to}, $NINF) ? (return Sidef::Types::Number::Ninf->new)
-                  :                                              $self->{to};
-              }
-            : $self->{from}
-        );
+
+        $self->{step}->is_pos
+          ? $self->{to}
+          : $self->{from};
     }
 
     sub step {
         my ($self) = @_;
-        Sidef::Types::Number::Number->new($self->{step});
+        $self->{step};
     }
 
     sub bounds {
@@ -142,41 +76,21 @@ package Sidef::Types::Range::RangeNumber {
     }
 
     sub contains {
-        my ($self, $num) = @_;
+        my ($self, $value) = @_;
 
-        Sidef::Types::Number::Number::_valid($num);
+        my $step = $self->{step};
+        my $asc  = !!($step->is_pos);
 
-        my $value = $$num;
-        my $step  = $self->{step};
-        my $sgn   = Math::GMPq::Rmpq_sgn($step);
-
-        if (Math::GMPq::Rmpq_equal($self->{to}, $INF)) {
-            ($sgn < 0 ? $value <= $self->{from} : $value >= $self->{from}) or return (Sidef::Types::Bool::Bool::FALSE);
-            Math::GMPq::Rmpq_equal($step, $ONE) and return (Sidef::Types::Bool::Bool::TRUE);
-            return $num->add(bless \$self->{from}, 'Sidef::Types::Number::Number')
-              ->mod(bless(\$step, 'Sidef::Types::Number::Number'))->is_zero;
-        }
-        elsif (Math::GMPq::Rmpq_equal($self->{to}, $NINF)) {
-            ($sgn < 0 ? $value <= $self->{from} : $value >= $self->{from}) or return (Sidef::Types::Bool::Bool::FALSE);
-            Math::GMPq::Rmpq_equal($step, $ONE) and return (Sidef::Types::Bool::Bool::TRUE);
-            return $num->sub(bless \$self->{from}, 'Sidef::Types::Number::Number')
-              ->mod(bless(\$step, 'Sidef::Types::Number::Number'))->is_zero;
-        }
-
-        my ($from, $to) = (
-                           $sgn > 0
-                           ? ($self->{from}, $self->{to})
-                           : ($self->{to}, $self->{from})
-                          );
+        my ($from, $to) = ($asc ? ($self->{from}, $self->{to}) : ($self->{to}, $self->{from}));
 
         (
-         $value >= $from and $value <= $to
+         $value->ge($from) and $value->le($to)
            and (
-                  Math::GMPq::Rmpq_equal($step, $ONE) ? 1
-                : $sgn > 0 ? (int(($value - $from) / $step) * $step == ($value - $from))
-                :            (int(($value - $to) / $step) * $step ==   ($value - $to))
+                  $step->is_one && $value->is_int ? 1
+                : $value->sub($asc ? $from : $to)->div($step)->int->mul($step)->eq($value->sub($asc ? $from : $to))
                )
-        ) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
+          ) ? (Sidef::Types::Bool::Bool::TRUE)
+          : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     *contain  = \&contains;
@@ -190,34 +104,23 @@ package Sidef::Types::Range::RangeNumber {
         my $from = $self->{from};
         my $to   = $self->{to};
 
-        my $sgn = Math::GMPq::Rmpq_sgn($step);
-
-        my $i = Math::GMPq::Rmpq_init();
-        Math::GMPq::Rmpq_set($i, $from);
-
-        my $is_inf  = Math::GMPq::Rmpq_equal($to, $INF);
-        my $is_ninf = Math::GMPq::Rmpq_equal($to, $NINF);
+        my $asc = !!($step->is_pos);
+        my $i   = $from;
 
         Sidef::Types::Block::Block->new(
             code => sub {
-                (
-                 $sgn > 0
-                 ? ($is_inf ? 1 : $is_ninf ? 0 : Math::GMPq::Rmpq_cmp($i, $to) <= 0)
-                 : ($is_inf ? 0 : $is_ninf ? 1 : Math::GMPq::Rmpq_cmp($i, $to) >= 0)
-                )
-                  || return;
-                my $tmp = Math::GMPq::Rmpq_init();
-                Math::GMPq::Rmpq_set($tmp, $i);
-                Math::GMPq::Rmpq_add($i, $i, $step);
-                bless \$tmp, 'Sidef::Types::Number::Number';
-            }
+                ($asc ? $i->le($to) : $i->ge($to)) || return;
+                my $value = $i;
+                $i = $i->add($step);
+                $value;
+            },
         );
     }
 
     sub each {
         my ($self, $code) = @_;
 
-        my $iter = $self->iter();
+        my $iter = $self->iter->{code};
         while (defined(my $num = $iter->())) {
             $code->run($num);
         }
@@ -230,7 +133,7 @@ package Sidef::Types::Range::RangeNumber {
         my ($self, $code) = @_;
 
         my @values;
-        my $iter = $self->iter();
+        my $iter = $self->iter->{code};
         while (defined(my $num = $iter->())) {
             push @values, $code->run($num);
         }
@@ -242,7 +145,7 @@ package Sidef::Types::Range::RangeNumber {
         my ($self, $code) = @_;
 
         my @values;
-        my $iter = $self->iter();
+        my $iter = $self->iter->{code};
         while (defined(my $num = $iter->())) {
             push(@values, $num) if $code->run($num);
         }
@@ -252,23 +155,10 @@ package Sidef::Types::Range::RangeNumber {
 
     *select = \&grep;
 
-    sub reduce {
-        my ($self, $code) = @_;
-
-        my $iter  = $self->iter();
-        my $value = $iter->();
-
-        while (defined(my $num = $iter->())) {
-            $value = $code->run($value, $num);
-        }
-
-        $value;
-    }
-
     sub all {
         my ($self, $code) = @_;
 
-        my $iter = $self->iter();
+        my $iter = $self->iter->{code};
         while (defined(my $num = $iter->())) {
             $code->run($num)
               || return Sidef::Types::Bool::Bool::FALSE;
@@ -280,7 +170,7 @@ package Sidef::Types::Range::RangeNumber {
     sub any {
         my ($self, $code) = @_;
 
-        my $iter = $self->iter();
+        my $iter = $self->iter->{code};
         while (defined(my $num = $iter->())) {
             $code->run($num)
               && return Sidef::Types::Bool::Bool::TRUE;
@@ -289,48 +179,213 @@ package Sidef::Types::Range::RangeNumber {
         Sidef::Types::Bool::Bool::FALSE;
     }
 
-    our $AUTOLOAD;
-    sub DESTROY { }
-
     sub to_array {
         my ($self) = @_;
-        local $AUTOLOAD;
-        $self->AUTOLOAD();
-    }
-
-    *to_a = \&to_array;
-
-    sub AUTOLOAD {
-        my ($self, @args) = @_;
-
-        my ($name) = (defined($AUTOLOAD) ? ($AUTOLOAD =~ /^.*[^:]::(.*)$/) : '');
 
         my @array;
-        my $iter = $self->iter();
+        my $iter = $self->iter->{code};
         while (defined(my $num = $iter->())) {
             push @array, $num;
         }
 
-        $name eq ''
-          ? Sidef::Types::Array::Array->new(\@array)
-          : Sidef::Types::Array::Array->new(\@array)->$name(@args);
+        Sidef::Types::Array::Array->new(\@array);
     }
+
+    *to_a = \&to_array;
+
+    sub to_list {
+        my ($self) = @_;
+
+        my @array;
+        my $iter = $self->iter->{code};
+        while (defined(my $num = $iter->())) {
+            push @array, $num;
+        }
+
+        (@array);
+    }
+
+    sub add {
+        my ($self, $arg) = @_;
+        $self->new($self->{from}->add($arg), $self->{to}->add($arg), $self->{step});
+    }
+
+    sub sub {
+        my ($self, $arg) = @_;
+        $self->new($self->{from}->sub($arg), $self->{to}->sub($arg), $self->{step});
+    }
+
+    sub mul {
+        my ($self, $arg) = @_;
+        $self->new($self->{from}->mul($arg), $self->{to}->mul($arg), $self->{step});
+    }
+
+    sub div {
+        my ($self, $arg) = @_;
+        $self->new($self->{from}->div($arg), $self->{to}->div($arg), $self->{step});
+    }
+
+    sub length {
+        my ($self) = @_;
+        my $len = $self->{to}->sub($self->{from})->add($self->{step})->div($self->{step})->int;
+        $len->is_neg ? $ZERO : $len;
+    }
+
+    *len = \&length;
+
+    sub sum {
+        my ($self, $arg) = @_;
+        my $sum = $arg // $ZERO;
+
+        my $iter = $self->iter->{code};
+        while (defined(my $num = $iter->())) {
+            $sum = $sum->add($num);
+        }
+
+        $sum;
+    }
+
+    sub prod {
+        my ($self, $arg) = @_;
+        my $prod = $arg // $ONE;
+
+        my $iter = $self->iter->{code};
+        while (defined(my $num = $iter->())) {
+            $prod = $prod->mul($num);
+        }
+
+        $prod;
+    }
+
+    sub pick {
+        my ($self, $n) = @_;
+
+        # Check for "empty" range
+        # TODO: replace it with arithmetic
+        if (not defined $self->iter->{code}->()) {
+            return Sidef::Types::Array::Array->new([]);
+        }
+
+        my $from = $self->{from};
+        my $to   = $self->{to};
+        my $step = $self->{step};
+
+        my $limit = $to->sub($from)->div($step)->inc;
+
+        my @array;
+        for (1 .. "$n") {
+            push @array, $limit->irand->mul($step)->add($from);
+        }
+
+        Sidef::Types::Array::Array->new(\@array);
+    }
+
+    sub reduce {
+        my ($self, $obj) = @_;
+
+        if (ref($obj) eq 'Sidef::Types::Block::Block') {
+
+            my $iter  = $self->iter->{code};
+            my $value = $iter->();
+
+            while (defined(my $num = $iter->())) {
+                $value = $obj->run($value, $num);
+            }
+
+            return $value;
+        }
+
+        $self->reduce_operator("$obj");
+    }
+
+    sub reduce_operator {
+        my ($self, $op) = @_;
+
+        $op = "$op" if ref($op);
+
+        my $iter  = $self->iter->{code};
+        my $value = $iter->();
+
+        while (defined(my $num = $iter->())) {
+            $value = $value->$op($num);
+        }
+
+        $value;
+    }
+
+    sub map_operator {
+        my ($self, @args) = @_;
+        $self->to_a->map_operator(@args);
+    }
+
+    sub pam_operator {
+        my ($self, @args) = @_;
+        $self->to_a->pam_operator(@args);
+    }
+
+    sub unroll_operator {
+        my ($self, @args) = @_;
+        $self->to_a->unroll_operator(@args);
+    }
+
+    sub cross_operator {
+        my ($self, @args) = @_;
+        $self->to_a->cross_operator(@args);
+    }
+
+    sub eq {
+        my ($r1, $r2) = @_;
+
+        ref($r1) eq ref($r2)
+          && $r1->{from}->eq($r2->{from})
+          && $r1->{to}->eq($r2->{to})
+          && $r1->{step}->eq($r2->{step})
+
+          ? (Sidef::Types::Bool::Bool::TRUE)
+          : (Sidef::Types::Bool::Bool::FALSE);
+    }
+
+    sub ne {
+        my ($r1, $r2) = @_;
+        $r1->eq($r2)
+          ? (Sidef::Types::Bool::Bool::FALSE)
+          : (Sidef::Types::Bool::Bool::TRUE);
+    }
+
+    #~ our $AUTOLOAD;
+    #~ sub DESTROY { }
+
+    #~ sub AUTOLOAD {
+    #~ my ($self, @args) = @_;
+
+    #~ my ($name) = (defined($AUTOLOAD) ? ($AUTOLOAD =~ /^.*[^:]::(.*)$/) : '');
+
+    #~ my @array;
+    #~ my $iter = $self->iter->{code};
+    #~ while (defined(my $num = $iter->())) {
+    #~ push @array, $num;
+    #~ }
+
+    #~ $name eq ''
+    #~ ? Sidef::Types::Array::Array->new(\@array)
+    #~ : Sidef::Types::Array::Array->new(\@array)->$name(@args);
+    #~ }
 
     {
         no strict 'refs';
-        *{__PACKAGE__ . '::' . '=='} = sub {
-            my ($r1, $r2) = @_;
-            (ref($r1) eq ref($r2) and $r1->{from} == $r2->{from} and $r1->{to} == $r2->{to} and $r1->{step} == $r2->{step})
-              ? (Sidef::Types::Bool::Bool::TRUE)
-              : (Sidef::Types::Bool::Bool::FALSE);
-        };
+        *{__PACKAGE__ . '::' . '=='}  = \&eq;
+        *{__PACKAGE__ . '::' . '!='}  = \&ne;
+        *{__PACKAGE__ . '::' . '+'}   = \&add;
+        *{__PACKAGE__ . '::' . '-'}   = \&sub;
+        *{__PACKAGE__ . '::' . '*'}   = \&mul;
+        *{__PACKAGE__ . '::' . '/'}   = \&div;
+        *{__PACKAGE__ . '::' . '...'} = \&to_list;
     }
 
     sub dump {
         my ($self) = @_;
         Sidef::Types::String::String->new("RangeNum($self->{from}, $self->{to}, $self->{step})");
     }
-
 }
 
 1;

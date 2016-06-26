@@ -6,7 +6,7 @@ define size = 13;
 enum |White, Black|;
 var plane = size.of { size.of (White) };
 
-var (x, y) = @([size/2 -> int]*2);
+var (x, y) = @|([size/2 -> int]*2);
 var dir = dirs.len.irand;
 
 var moves = 0;

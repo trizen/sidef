@@ -26,4 +26,4 @@ iter.times { |k|
     )
 }
 
-img.write(file => 'pythagoras_tree.png');
+img.write(file => 'circle_from_polygons.png');

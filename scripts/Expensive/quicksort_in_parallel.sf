@@ -18,4 +18,4 @@ func quicksort(arr) {
     forks[0].wait + [p] + forks[1].wait
 }
 
-say quicksort(1..50 -> shuffle);
+say quicksort(@(1..50) -> shuffle);

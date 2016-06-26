@@ -11,7 +11,7 @@ func perfect_shuffle(deck) {
 
 [8, 24, 52, 100].each { |size|
 
-    var deck = 1..size;
+    var deck = size.of { _ };
     var shuffled = deck;
 
     var n = 0;

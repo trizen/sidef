@@ -30,24 +30,15 @@ package Sidef::Deparse::Perl {
                               },
 
             lazy_ops => {
-                '?'  => '?',
-                '||' => '||',
-                '&&' => '&&',
-                ':=' => '//=',
-
-                # '='     => '=',
-                '||='   => '||=',
-                '&&='   => '&&=',
-                '\\\\'  => '//',
-                '\\\\=' => '//=',
+                         '?'     => '?',
+                         '||'    => '||',
+                         '&&'    => '&&',
+                         ':='    => '//=',
+                         '||='   => '||=',
+                         '&&='   => '&&=',
+                         '\\\\'  => '//',
+                         '\\\\=' => '//=',
                         },
-
-            #~ overload_methods => {
-            #~ to_str  => q{""},
-            #~ to_s    => q{""},
-            #~ to_bool => q{bool},
-            #~ to_num  => q{0+},
-            #~ },
 
             overload_methods => {
                                  '=='  => 'eq',
@@ -395,7 +386,11 @@ HEADER
 
     sub _dump_indices {
         my ($self, $array) = @_;
-        '[' . join(
+        '[' . 'map { ref($_) eq "Sidef::Types::Number::Number" ? Math::GMPq::Rmpq_get_d($$_) ' . ': ref($_) eq "" ? $_ '
+          ##.': UNIVERSAL::can($_, "to_i") ? $_->to_i '
+          . ': do { my $sub = UNIVERSAL::can($_, "..."); '
+          . 'defined($sub) ? $sub->($_) : $_ } } '
+          . join(
             ',',
             map {
                     ref($_) eq 'Sidef::Types::Number::Number' ? $_->_get_double
@@ -406,49 +401,19 @@ HEADER
           . ']';
     }
 
-    sub _dump_unpacked_indices {
-        my ($self, $array) = @_;
-        '[' . join(
-            ',',
-            map {
-                '@{'
-                  . (
-                     ref($_)
-                     ? ($self->deparse_expr(ref($_) eq 'HASH' ? $_ : {self => $_}))
-                     : die "[ERROR] Value '$_' can't be unpacked in Array index!"
-                    )
-                  . '}'
-              } @{$array}
-          )
-          . ']';
-    }
-
     sub _dump_lookups {
         my ($self, $array) = @_;
-        '{' . join(
+        '{' . 'map { ref($_) eq "Sidef::Types::String::String" ? $$_ ' . ': ref($_) eq "" ? $_ '
+          ##.': UNIVERSAL::can($_, "to_s") ? $_->to_s '
+          . ': do { my $sub = UNIVERSAL::can($_, "..."); '
+          . 'defined($sub) ? $sub->($_) : $_ } } '
+          . join(
             ',',
             map {
                 (ref($_) eq 'Sidef::Types::String::String' or ref($_) eq 'Sidef::Types::Number::Number')
                   ? $self->_dump_string($_->get_value)
                   : ref($_) ? ($self->deparse_expr(ref($_) eq 'HASH' ? $_ : {self => $_}))
-                  : $_
-              } @{$array}
-          )
-          . '}';
-    }
-
-    sub _dump_unpacked_lookups {
-        my ($self, $array) = @_;
-        '{' . join(
-            ',',
-            map {
-                '@{'
-                  . (
-                     ref($_)
-                     ? ($self->deparse_expr(ref($_) eq 'HASH' ? $_ : {self => $_}))
-                     : die "[ERROR] Value '$_' can't be unpacked in Hash lookup!"
-                    )
-                  . '}'
+                  : qq{"\Q$_\E"}
               } @{$array}
           )
           . '}';
@@ -676,7 +641,7 @@ HEADER
                 }
             }
         }
-        elsif ($ref eq 'Sidef::Object::Unary') {
+        elsif ($ref eq 'Sidef::Operator::Unary') {
             ## OK
         }
         elsif ($ref eq 'Sidef::Variable::Local') {
@@ -1370,26 +1335,13 @@ HEADER
 
                 my $ind = $expr->{ind}[$i];
                 if (exists $ind->{array}) {
-
                     my $pos = $ind->{array};
-
-                    if (substr($code, -1) eq '@') {
-                        $code .= $self->_dump_unpacked_indices($pos);
-                    }
-                    else {
-                        $code = '@{' . $code . '}' . $self->_dump_indices($pos);
-                    }
+                    $code = '@{' . $code . '}' . $self->_dump_indices($pos);
                 }
                 else {
 
                     my $key = $ind->{hash};
-
-                    if (substr($code, -1) eq '@') {
-                        $code .= $self->_dump_unpacked_lookups($key);
-                    }
-                    else {
-                        $code = '@{' . $code . '}' . $self->_dump_lookups($key);
-                    }
+                    $code = '@{' . $code . '}' . $self->_dump_lookups($key);
                 }
 
                 if ($i < $limit) {
@@ -1431,16 +1383,6 @@ HEADER
 
                     next;
                 }
-
-                # !!!Experimental!!!
-                #~ if ($ref eq 'Sidef::Types::Block::Break') {
-                #~ $code .= 'return Sidef::Types::Block::Break->new' . $self->deparse_args(@{$call->{arg}});
-                #~ next;
-                #~ }
-                #~ elsif ($ref eq 'Sidef::Types::Block::Next') {
-                #~ $code .= 'return Sidef::Types::Block::Next->new' . $self->deparse_args(@{$call->{arg}});
-                #~ next;
-                #~ }
 
                 if (defined $method) {
 
@@ -1530,7 +1472,7 @@ HEADER
                     }
 
                     # ! prefix-unary
-                    if ($ref eq 'Sidef::Object::Unary') {
+                    if ($ref eq 'Sidef::Operator::Unary') {
                         if ($method eq '!') {
                             $code = '(do{'
                               . $self->deparse_args(@{$call->{arg}})
@@ -1545,6 +1487,24 @@ HEADER
 
                         if ($method eq '+') {
                             $code = $self->deparse_args(@{$call->{arg}});
+                            next;
+                        }
+
+                        if ($method eq '@') {
+                            $code =
+                                '(do{ my $obj = '
+                              . $self->deparse_args(@{$call->{arg}})
+                              . '; my $sub = UNIVERSAL::can($obj, "to_a"); '
+                              . 'defined($sub) ? $sub->($obj) : Sidef::Types::Array::Array->new($obj) })';
+                            next;
+                        }
+
+                        if ($method eq '@|') {
+                            $code =
+                                '(do{ my $obj = '
+                              . $self->deparse_args(@{$call->{arg}})
+                              . '; my $sub = UNIVERSAL::can($obj, "..."); '
+                              . 'defined($sub) ? $sub->($obj) : $obj })';
                             next;
                         }
 
@@ -1610,22 +1570,11 @@ HEADER
                         }
                     }
                     else {
+                        ## Old way:
+                        #$code .= '->${\\' . q{'} . $method . q{'} . '}';
 
-                        # Postfix dereference method
-                        if ($method eq '@' or $method eq '@*') {
-                            $self->top_add(qq{use experimental 'postderef';});
-                            $code .= '->' . $method;
-                        }
-
-                        # Operator-like method call
-                        else {
-
-                            ## Old way:
-                            #$code .= '->${\\' . q{'} . $method . q{'} . '}';
-
-                            ## New way:
-                            $code .= $self->_dump_op_call($method);
-                        }
+                        ## New way:
+                        $code .= $self->_dump_op_call($method);
                     }
                 }
 

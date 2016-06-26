@@ -16,6 +16,6 @@ func combine(n, set) {
     result + __FUNC__(n, set);
 }
 
-combine(3, 0..4).each {|row|
+combine(3, @(0..4)).each {|row|
     say row.join(' ');
 }

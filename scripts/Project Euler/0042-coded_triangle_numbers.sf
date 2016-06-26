@@ -11,8 +11,7 @@
 
 var words = eval('[' + %f'0042-words.txt'.open_r.slurp + ']');
 
-var dict = Hash.new;
-dict.@{'A'..'Z'} = @ 1..26;
+(var dict = Hash()){'A'..'Z'} = @|(1..26);
 
 say words.count { |word|
     sqrt(8*word.chars.map{ dict{_} }.sum + 1).is_int;

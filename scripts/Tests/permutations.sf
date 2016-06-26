@@ -5,7 +5,7 @@
 #
 
 func permute (code, arr) {
-    var idx = arr.range.to_a;
+    var idx = arr.keys;
 
     while (true) {
         code(arr.items(idx...));

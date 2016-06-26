@@ -2,10 +2,10 @@
 
 func permutations(callback, arr) {
     var end = arr.end;
-    var idx = 0..end;
+    var idx = arr.indices;
 
     loop {
-        callback([arr.@[idx]]);
+        callback([arr[idx]]);
 
         var p = end;
         while (idx[p-1] > idx[p]) {p--};

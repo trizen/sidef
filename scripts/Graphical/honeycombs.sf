@@ -43,8 +43,8 @@ class Honeycombs(
     }
 
     method comb(canvas, fromx, fromy, size, count) {
-        for x in (fromx ..^ (3*count*size - 1, 3*size)) {
-            for y in (fromy ..^ (7.5 * size - 1, 2 * altitude(size))) {
+        for x in (fromx .. (3*count*size - 1, 3*size)) {
+            for y in (fromy .. (7.5 * size - 1, 2 * altitude(size))) {
                 var id = canvas.createPolygon(
                                       self.polygon_coordinates(x, y, size),
                                       '-outline' => 'black',

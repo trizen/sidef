@@ -17,7 +17,7 @@ func mergesort(arr) {
 }
 
 # Numeric sort
-var nums = 0..7;
+var nums = @(0..7)
 mergesort(nums.shuffle) == nums
     || "error(123)".die;
 

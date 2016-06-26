@@ -11,8 +11,8 @@
 
 var arr = eval("[" + %f'0022-names.txt'.open_r.slurp + "]").sort;
 
-var alphabet = Hash.new;
-alphabet.@{'A'..'Z'} = @ 1..26;
+var alphabet = Hash();
+alphabet{'A'..'Z'} = @|(1..26);
 
 var total = 0;
 arr.range.each { |i|

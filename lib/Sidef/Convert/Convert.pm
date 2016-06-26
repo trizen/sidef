@@ -28,6 +28,12 @@ package Sidef::Convert::Convert {
 
     *to_int = \&to_i;
 
+    sub to_a {
+        Sidef::Types::Array::Array->new($_[0]);
+    }
+
+    *to_array = \&to_a;
+
     sub to_rat {
         Sidef::Types::Number::Number->new($_[0]);
     }

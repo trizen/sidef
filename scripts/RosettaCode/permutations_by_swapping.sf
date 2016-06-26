@@ -12,7 +12,7 @@ func perms(n) {
         for s,*p in perms {
           var r = range(0, p.len);
           take((s < 0 ? r : r.reverse).map {|i|
-            [sign *= -1, p.@[0..i-1], x, p.@[i..p.end]]
+            [sign *= -1, p[0..i-1], x, p[i..p.end]]
           }...)
         }
       }

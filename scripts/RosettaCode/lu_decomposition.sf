@@ -14,7 +14,7 @@ func pivotize(m) {
     for i in ^size {
         var max = m[i][i]
         var row = i
-        for j in range(i, size-1) {
+        for j in (i ..^ size) {
             if (m[j][i] > max) {
                 max = m[j][i]
                 row = j
@@ -29,7 +29,7 @@ func pivotize(m) {
 
 func mmult(a, b) {
     var p = []
-    for r,c in (^a ~X ^b[0]) {
+    for r,c in (@^a ~X @^b[0]) {
         for i in ^b {
             p[r][c] := 0 += (a[r][i] * b[i][c])
         }
@@ -44,7 +44,7 @@ func lu(a) {
     var Aʼ = mmult(P, a)
     var L = matrix_ident(n)
     var U = matrix_zero(n)
-    for i,j in (^n ~X ^n) {
+    for i,j in (@^n ~X @^n) {
         if (j >= i) {
             U[i][j] = (Aʼ[i][j] - (^i->map { U[_][j] * L[i][_] }.sum(0)))
         } else {

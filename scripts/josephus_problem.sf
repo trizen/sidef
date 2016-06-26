@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 func josephus(n, k) {
-    var prisoners = (0 .. n-1);
+    var prisoners = @(0 ..^ n);
     while (prisoners.len > 1) {
         prisoners.rotate!(k - 1).shift;
     };

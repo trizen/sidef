@@ -30,7 +30,7 @@ func merge_sort(array) {
     __FUNC__(left);
     __FUNC__(right);
 
-    array.@[array.range] = merge(left, right)...;
+    array[array.range...] = merge(left, right)...;
 }
 
 var arr = [3,4,7,6,2,5,1,0].shuffle;

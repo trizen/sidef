@@ -23,8 +23,8 @@ assert(1..^3 == 1..^3);
 assert("a"..^"d" == "a"..^"d");
 
 # Number range
-assert_eq(RangeNum(1,10), 1..^10);
-assert_eq(RangeNum(10), 0..^10);
+assert_eq(RangeNum(1, 10), 1..10);
+assert_eq(RangeNum(10), RangeNum(10, -1, 1));
 assert_eq(RangeNum(1, 10, 2), range(1, 10, 2));
 
 # String range

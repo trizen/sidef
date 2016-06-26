@@ -18,7 +18,7 @@ func align(s, t) {
           A[i][j]{:d} = 1+(
             var min = Math.min(A[i-1][j]{:d}, A[i][j-1]{:d}, A[i-1][j-1]{:d})
           )
-          A[i][j]{:s,:t} = @(A[i-1][j]{:d} == min
+          A[i][j]{:s,:t} = @|(A[i-1][j]{:d} == min
               ? [A[i-1][j]{:s}+s[i], A[i-1][j]{:t}+'-']
               : (A[i][j-1]{:d} == min
               ? [A[i][j-1]{:s}+'-', A[i][j-1]{:t}+t[j]]

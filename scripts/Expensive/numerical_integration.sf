@@ -58,7 +58,7 @@ func quadrature(n, f, a, b, nds = nodes(n)) {
     (b - a) / 2 * nds.map{ .second * f(scale(.first)) }.sum
 }
 
-[@(5..10), 20].each { |i|
+[@|(5..10), 20].each { |i|
     printf("Gauss-Legendre %2d-point quadrature ∫₋₃⁺³ exp(x) dx ≈ %.15f\n",
         i, quadrature(i, {.exp}, -3, +3))
 }

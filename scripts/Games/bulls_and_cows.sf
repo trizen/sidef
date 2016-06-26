@@ -5,7 +5,7 @@
 #
 
 var size = 4;
-var num = (1..9 -> shuffle.first(size));
+var num = (@(1..9) -> shuffle.first(size));
 
 for (var guesses = 1; true; guesses++) {
 

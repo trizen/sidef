@@ -16,7 +16,7 @@ func combSort(Array arr) {
     return arr;
 }
 
-var arr = (1..10 -> shuffle);
+var arr = @(1..10).shuffle;
 say arr;
 combSort(arr);
 say arr;

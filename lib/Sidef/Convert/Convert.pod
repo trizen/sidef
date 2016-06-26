@@ -16,6 +16,16 @@ var obj = Convert.new(...);
 =head1 METHODS
 
 
+=head2 to_a
+
+Convert.to_a() -> I<Obj>
+
+Return the
+
+Aliases: I<to_array>
+
+=cut
+
 =head2 to_b
 
 Convert.to_b() -> I<Obj>

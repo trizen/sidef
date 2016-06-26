@@ -7,5 +7,5 @@ var max = keys.map{.len}.max;
 
 var cols = 3;
 0 ..^ (keys.end, cols) -> each { |i|
-    %(#{"%-#{max+2}s" * cols-1}%s\n) -> printf(keys.@[i .. (i + cols-1)]);
+    %(#{"%-#{max+2}s" * cols-1}%s\n) -> printf(keys[i .. (i + cols-1) -> ...]);
 }

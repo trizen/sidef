@@ -12,10 +12,19 @@ package Sidef::Types::Number::Number {
 
     our $GET_PERL_VALUE = 0;
 
+    my $ONE = Math::GMPq::Rmpq_init();
+    Math::GMPq::Rmpq_set_ui($ONE, 1, 1);
+
+    my $ZERO = Math::GMPq::Rmpq_init();
+    Math::GMPq::Rmpq_set_ui($ZERO, 0, 1);
+
+    my $MONE = Math::GMPq::Rmpq_init();
+    Math::GMPq::Rmpq_set_si($MONE, -1, 1);
+
     use constant {
-                  ONE  => bless(\Math::GMPq->new(1),  __PACKAGE__),
-                  ZERO => bless(\Math::GMPq->new(0),  __PACKAGE__),
-                  MONE => bless(\Math::GMPq->new(-1), __PACKAGE__),
+                  ONE  => bless(\$ONE,  __PACKAGE__),
+                  ZERO => bless(\$ZERO, __PACKAGE__),
+                  MONE => bless(\$MONE, __PACKAGE__),
                  };
 
     use parent qw(
@@ -69,14 +78,17 @@ package Sidef::Types::Number::Number {
           : ref($num) eq __PACKAGE__ ? $num
           : do {
 
-            $base = defined($base) ? ref($base) ? $base->get_value : $base : 10;
+            $base = defined($base) ? ref($base) ? "$base" : $base : 10;
 
-            $num = $num->get_value
+            $num = "$num"
               if (index(ref($num), 'Sidef::') == 0);
 
             my $r = Math::GMPq::Rmpq_init();
             my $rat = $num ? ($base == 10 && $num =~ tr/Ee.//) ? _str2rat($num) : ($num =~ tr/+//dr) : 0;
-            Math::GMPq::Rmpq_set_str($r, $rat, $base);
+            eval { Math::GMPq::Rmpq_set_str($r, $rat, $base) };
+            $@ && return nan();
+
+            #$@ && die "[ERROR] Value <<$num>> is not a valid base-$base number";
             Math::GMPq::Rmpq_canonicalize($r) if index($rat, '/') != -1;
             bless \$r, __PACKAGE__;
           };
@@ -86,13 +98,11 @@ package Sidef::Types::Number::Number {
 
     sub _valid {
         (
-         ref($_) eq __PACKAGE__
-           or die "[ERROR] Invalid argument `$_` of type "
-           . Sidef::normalize_type(ref($_)) . " in "
-           . Sidef::normalize_method((caller(1))[3])
-           . "(). Expected an argument of type Number!\n"
-        )
-          for @_;
+         ref($$_) eq __PACKAGE__
+           or do {
+             $$_ = __PACKAGE__->new("$$_");
+           }
+        ) for @_;
     }
 
     sub _big2mpfr {
@@ -109,7 +119,7 @@ package Sidef::Types::Number::Number {
 
     sub _mpfr2big {
 
-        $PREC = $PREC->get_value if ref($PREC);
+        $PREC = "$PREC" if ref($PREC);
 
         if (Math::MPFR::Rmpfr_inf_p($_[0])) {
             if (Math::MPFR::Rmpfr_sgn($_[0]) > 0) {
@@ -301,7 +311,7 @@ package Sidef::Types::Number::Number {
 
     sub base {
         my ($x, $y) = @_;
-        _valid($y);
+        _valid(\$y);
 
         state $min = Math::GMPq->new(2);
         state $max = Math::GMPq->new(36);
@@ -397,7 +407,7 @@ package Sidef::Types::Number::Number {
             return nan();
         }
 
-        _valid($y);
+        _valid(\$y);
 
         my $r = Math::GMPq::Rmpq_init();
         Math::GMPq::Rmpq_add($r, $$x, $$y);
@@ -406,7 +416,7 @@ package Sidef::Types::Number::Number {
 
     sub iadd {
         my ($x, $y) = @_;
-        _valid($y);
+        _valid(\$y);
         my $r = _big2mpz($x);
         Math::GMPz::Rmpz_add($r, $r, _big2mpz($y));
         _mpz2big($r);
@@ -425,7 +435,7 @@ package Sidef::Types::Number::Number {
             return nan();
         }
 
-        _valid($y);
+        _valid(\$y);
 
         my $r = Math::GMPq::Rmpq_init();
         Math::GMPq::Rmpq_sub($r, $$x, $$y);
@@ -434,7 +444,7 @@ package Sidef::Types::Number::Number {
 
     sub isub {
         my ($x, $y) = @_;
-        _valid($y);
+        _valid(\$y);
         my $r = _big2mpz($x);
         Math::GMPz::Rmpz_sub($r, $r, _big2mpz($y));
         _mpz2big($r);
@@ -454,7 +464,7 @@ package Sidef::Types::Number::Number {
             return nan();
         }
 
-        _valid($y);
+        _valid(\$y);
 
         my $r = Math::GMPq::Rmpq_init();
         Math::GMPq::Rmpq_mul($r, $$x, $$y);
@@ -463,7 +473,7 @@ package Sidef::Types::Number::Number {
 
     sub imul {
         my ($x, $y) = @_;
-        _valid($y);
+        _valid(\$y);
         my $r = _big2mpz($x);
         Math::GMPz::Rmpz_mul($r, $r, _big2mpz($y));
         _mpz2big($r);
@@ -482,7 +492,7 @@ package Sidef::Types::Number::Number {
             return nan();
         }
 
-        _valid($y);
+        _valid(\$y);
 
         if (!Math::GMPq::Rmpq_sgn($$y)) {
             my $sign = Math::GMPq::Rmpq_sgn($$x);
@@ -496,7 +506,7 @@ package Sidef::Types::Number::Number {
 
     sub idiv {
         my ($x, $y) = @_;
-        _valid($y);
+        _valid(\$y);
 
         my $r = _big2mpz($x);
         $y = _big2mpz($y);
@@ -593,7 +603,7 @@ package Sidef::Types::Number::Number {
             return nan();
         }
 
-        _valid($y);
+        _valid(\$y);
         return $x->pow($y->inv);
     }
 
@@ -607,7 +617,7 @@ package Sidef::Types::Number::Number {
             return nan();
         }
 
-        _valid($y);
+        _valid(\$y);
 
         my $r    = _big2mpz($x);
         my $root = CORE::int(Math::GMPq::Rmpq_get_d($$y));
@@ -645,7 +655,7 @@ package Sidef::Types::Number::Number {
             return nan();
         }
 
-        _valid($y);
+        _valid(\$y);
 
         if (Math::GMPq::Rmpq_integer_p($$x) and Math::GMPq::Rmpq_integer_p($$y)) {
 
@@ -687,7 +697,7 @@ package Sidef::Types::Number::Number {
             return nan();
         }
 
-        _valid($y);
+        _valid(\$y);
 
         state $ONE_Z = Math::GMPz::Rmpz_init_set_ui(1);
         my $pow = CORE::int(Math::GMPq::Rmpq_get_d($$y));
@@ -705,7 +715,7 @@ package Sidef::Types::Number::Number {
 
     sub fmod {
         my ($x, $y) = @_;
-        _valid($y);
+        _valid(\$y);
         my $r = _big2mpfr($x);
         Math::MPFR::Rmpfr_fmod($r, $r, _big2mpfr($y), $ROUND);
         _mpfr2big($r);
@@ -730,7 +740,7 @@ package Sidef::Types::Number::Number {
                 return nan();
             }
 
-            _valid($y);
+            _valid(\$y);
             my $baseln = _big2mpfr($y);
             Math::MPFR::Rmpfr_log($baseln, $baseln, $ROUND);
             Math::MPFR::Rmpfr_div($r, $r, $baseln, $ROUND);
@@ -1054,7 +1064,7 @@ package Sidef::Types::Number::Number {
             return nan();
         }
 
-        _valid($y);
+        _valid(\$y);
         my $r = _big2mpfr($x);
         Math::MPFR::Rmpfr_atan2($r, $r, _big2mpfr($y), $ROUND);
         _mpfr2big($r);
@@ -1066,7 +1076,7 @@ package Sidef::Types::Number::Number {
 
     sub agm {
         my ($x, $y) = @_;
-        _valid($y);
+        _valid(\$y);
         my $r = _big2mpfr($x);
         Math::MPFR::Rmpfr_agm($r, $r, _big2mpfr($y), $ROUND);
         _mpfr2big($r);
@@ -1074,7 +1084,7 @@ package Sidef::Types::Number::Number {
 
     sub hypot {
         my ($x, $y) = @_;
-        _valid($y);
+        _valid(\$y);
         my $r = _big2mpfr($x);
         Math::MPFR::Rmpfr_hypot($r, $r, _big2mpfr($y), $ROUND);
         _mpfr2big($r);
@@ -1149,7 +1159,7 @@ package Sidef::Types::Number::Number {
 
     sub eq {
         my ($x, $y) = @_;
-        _valid($y);
+        _valid(\$y);
         if (Math::GMPq::Rmpq_equal($$x, $$y)) {
             (Sidef::Types::Bool::Bool::TRUE);
         }
@@ -1160,7 +1170,7 @@ package Sidef::Types::Number::Number {
 
     sub ne {
         my ($x, $y) = @_;
-        _valid($y);
+        _valid(\$y);
         if (Math::GMPq::Rmpq_equal($$x, $$y)) {
             (Sidef::Types::Bool::Bool::FALSE);
         }
@@ -1182,7 +1192,7 @@ package Sidef::Types::Number::Number {
             return;
         }
 
-        _valid($y);
+        _valid(\$y);
         my $cmp = Math::GMPq::Rmpq_cmp($$x, $$y);
         !$cmp ? (ZERO) : $cmp < 0 ? (MONE) : (ONE);
     }
@@ -1190,7 +1200,7 @@ package Sidef::Types::Number::Number {
     sub acmp {
         my ($x, $y) = @_;
 
-        _valid($y);
+        _valid(\$y);
 
         my $xn = $$x;
         my $yn = $$y;
@@ -1224,7 +1234,7 @@ package Sidef::Types::Number::Number {
             return (Sidef::Types::Bool::Bool::FALSE);
         }
 
-        _valid($y);
+        _valid(\$y);
 
         if (Math::GMPq::Rmpq_cmp($$x, $$y) > 0) {
             (Sidef::Types::Bool::Bool::TRUE);
@@ -1247,7 +1257,7 @@ package Sidef::Types::Number::Number {
             return (Sidef::Types::Bool::Bool::FALSE);
         }
 
-        _valid($y);
+        _valid(\$y);
 
         if (Math::GMPq::Rmpq_cmp($$x, $$y) >= 0) {
             (Sidef::Types::Bool::Bool::TRUE);
@@ -1270,7 +1280,7 @@ package Sidef::Types::Number::Number {
             return (Sidef::Types::Bool::Bool::FALSE);
         }
 
-        _valid($y);
+        _valid(\$y);
 
         if (Math::GMPq::Rmpq_cmp($$x, $$y) < 0) {
             (Sidef::Types::Bool::Bool::TRUE);
@@ -1293,7 +1303,7 @@ package Sidef::Types::Number::Number {
             return (Sidef::Types::Bool::Bool::FALSE);
         }
 
-        _valid($y);
+        _valid(\$y);
 
         if (Math::GMPq::Rmpq_cmp($$x, $$y) <= 0) {
             (Sidef::Types::Bool::Bool::TRUE);
@@ -1315,7 +1325,7 @@ package Sidef::Types::Number::Number {
 
     sub is_one {
         my ($x) = @_;
-        if (Math::GMPq::Rmpq_equal($$x, ${(ONE)})) {
+        if (Math::GMPq::Rmpq_equal($$x, $ONE)) {
             (Sidef::Types::Bool::Bool::TRUE);
         }
         else {
@@ -1325,7 +1335,7 @@ package Sidef::Types::Number::Number {
 
     sub is_mone {
         my ($x) = @_;
-        if (Math::GMPq::Rmpq_equal($$x, ${(MONE)})) {
+        if (Math::GMPq::Rmpq_equal($$x, $MONE)) {
             (Sidef::Types::Bool::Bool::TRUE);
         }
         else {
@@ -1424,7 +1434,7 @@ package Sidef::Types::Number::Number {
 
     sub is_div {
         my ($x, $y) = @_;
-        _valid($y);
+        _valid(\$y);
 
         return Sidef::Types::Bool::Bool::FALSE
           if Math::GMPq::Rmpq_sgn($$y) == 0;
@@ -1454,7 +1464,7 @@ package Sidef::Types::Number::Number {
 
     sub divides {
         my ($x, $y) = @_;
-        _valid($y);
+        _valid(\$y);
 
         return Sidef::Types::Bool::Bool::FALSE
           if Math::GMPq::Rmpq_sgn($$x) == 0;
@@ -1484,13 +1494,13 @@ package Sidef::Types::Number::Number {
 
     sub max {
         my ($x, $y) = @_;
-        _valid($y);
+        _valid(\$y);
         Math::GMPq::Rmpq_cmp($$x, $$y) > 0 ? $x : $y;
     }
 
     sub min {
         my ($x, $y) = @_;
-        _valid($y);
+        _valid(\$y);
         Math::GMPq::Rmpq_cmp($$x, $$y) < 0 ? $x : $y;
     }
 
@@ -1512,7 +1522,7 @@ package Sidef::Types::Number::Number {
         my ($x, $base) = @_;
 
         if (defined $base) {
-            _valid($base);
+            _valid(\$base);
             $base = CORE::int(Math::GMPq::Rmpq_get_d($$base));
             if ($base < 2 or $base > 36) {
                 die "[ERROR] base must be between 2 and 36, got $base\n";
@@ -1531,7 +1541,7 @@ package Sidef::Types::Number::Number {
         my ($x, $prec) = @_;
 
         if (defined $prec) {
-            _valid($prec);
+            _valid(\$prec);
             $prec = Math::GMPq::Rmpq_get_d($$prec);
         }
         else {
@@ -1539,7 +1549,7 @@ package Sidef::Types::Number::Number {
         }
 
         local $Sidef::Types::Number::Number::PREC = 4 * $prec;
-        Sidef::Types::String::String->new($x->get_value);
+        Sidef::Types::String::String->new("$x");
     }
 
     sub as_rat {
@@ -1575,7 +1585,7 @@ package Sidef::Types::Number::Number {
 
     sub digit {
         my ($x, $y) = @_;
-        _valid($y);
+        _valid(\$y);
         my $z = Math::GMPz::Rmpz_init();
         Math::GMPz::Rmpz_set_q($z, $$x);
         Math::GMPz::Rmpz_abs($z, $z);
@@ -1632,14 +1642,14 @@ package Sidef::Types::Number::Number {
     sub inc {
         my ($x) = @_;
         my $r = Math::GMPq::Rmpq_init();
-        Math::GMPq::Rmpq_add($r, $$x, ${(ONE)});
+        Math::GMPq::Rmpq_add($r, $$x, $ONE);
         bless \$r, __PACKAGE__;
     }
 
     sub dec {
         my ($x) = @_;
         my $r = Math::GMPq::Rmpq_init();
-        Math::GMPq::Rmpq_sub($r, $$x, ${(ONE)});
+        Math::GMPq::Rmpq_sub($r, $$x, $ONE);
         bless \$r, __PACKAGE__;
     }
 
@@ -1657,7 +1667,7 @@ package Sidef::Types::Number::Number {
             return nan();
         }
 
-        _valid($y);
+        _valid(\$y);
 
         if (Math::GMPq::Rmpq_integer_p($$x) and Math::GMPq::Rmpq_integer_p($$y)) {
 
@@ -1700,7 +1710,7 @@ package Sidef::Types::Number::Number {
             return nan();
         }
 
-        _valid($y);
+        _valid(\$y);
 
         my $yz     = _big2mpz($y);
         my $sign_y = Math::GMPz::Rmpz_sgn($yz);
@@ -1719,7 +1729,7 @@ package Sidef::Types::Number::Number {
 
     sub modpow {
         my ($x, $y, $z) = @_;
-        _valid($y, $z);
+        _valid(\$y, \$z);
         my $r = _big2mpz($x);
         Math::GMPz::Rmpz_powm($r, $r, _big2mpz($y), _big2mpz($z));
         _mpz2big($r);
@@ -1729,7 +1739,7 @@ package Sidef::Types::Number::Number {
 
     sub modinv {
         my ($x, $y) = @_;
-        _valid($y);
+        _valid(\$y);
         my $r = _big2mpz($x);
         Math::GMPz::Rmpz_invert($r, $r, _big2mpz($y)) || return nan();
         _mpz2big($r);
@@ -1740,7 +1750,7 @@ package Sidef::Types::Number::Number {
     sub divmod {
         my ($x, $y) = @_;
 
-        _valid($y);
+        _valid(\$y);
 
         my $r1 = _big2mpz($x);
         my $r2 = _big2mpz($y);
@@ -1753,7 +1763,7 @@ package Sidef::Types::Number::Number {
 
     sub and {
         my ($x, $y) = @_;
-        _valid($y);
+        _valid(\$y);
         my $r = _big2mpz($x);
         Math::GMPz::Rmpz_and($r, $r, _big2mpz($y));
         _mpz2big($r);
@@ -1761,7 +1771,7 @@ package Sidef::Types::Number::Number {
 
     sub or {
         my ($x, $y) = @_;
-        _valid($y);
+        _valid(\$y);
         my $r = _big2mpz($x);
         Math::GMPz::Rmpz_ior($r, $r, _big2mpz($y));
         _mpz2big($r);
@@ -1769,7 +1779,7 @@ package Sidef::Types::Number::Number {
 
     sub xor {
         my ($x, $y) = @_;
-        _valid($y);
+        _valid(\$y);
         my $r = _big2mpz($x);
         Math::GMPz::Rmpz_xor($r, $r, _big2mpz($y));
         _mpz2big($r);
@@ -1822,7 +1832,7 @@ package Sidef::Types::Number::Number {
 
     sub binomial {
         my ($x, $y) = @_;
-        _valid($y);
+        _valid(\$y);
         my $r = _big2mpz($x);
         Math::GMPz::Rmpz_bin_si($r, $r, CORE::int(Math::GMPq::Rmpq_get_d($$y)));
         _mpz2big($r);
@@ -1832,19 +1842,19 @@ package Sidef::Types::Number::Number {
 
     sub legendre {
         my ($x, $y) = @_;
-        _valid($y);
+        _valid(\$y);
         _new_int(Math::GMPz::Rmpz_legendre(_big2mpz($x), _big2mpz($y)));
     }
 
     sub jacobi {
         my ($x, $y) = @_;
-        _valid($y);
+        _valid(\$y);
         _new_int(Math::GMPz::Rmpz_jacobi(_big2mpz($x), _big2mpz($y)));
     }
 
     sub kronecker {
         my ($x, $y) = @_;
-        _valid($y);
+        _valid(\$y);
         _new_int(Math::GMPz::Rmpz_kronecker(_big2mpz($x), _big2mpz($y)));
     }
 
@@ -1858,7 +1868,7 @@ package Sidef::Types::Number::Number {
 
     sub gcd {
         my ($x, $y) = @_;
-        _valid($y);
+        _valid(\$y);
         my $r = _big2mpz($x);
         Math::GMPz::Rmpz_gcd($r, $r, _big2mpz($y));
         _mpz2big($r);
@@ -1866,7 +1876,7 @@ package Sidef::Types::Number::Number {
 
     sub lcm {
         my ($x, $y) = @_;
-        _valid($y);
+        _valid(\$y);
         my $r = _big2mpz($x);
         Math::GMPz::Rmpz_lcm($r, $r, _big2mpz($y));
         _mpz2big($r);
@@ -1879,7 +1889,7 @@ package Sidef::Types::Number::Number {
         if (
             Math::GMPz::Rmpz_probab_prime_p(_big2mpz($x),
                                             defined($k)
-                                            ? do { _valid($k); CORE::int Math::GMPq::Rmpq_get_d($$k) }
+                                            ? do { _valid(\$k); CORE::int Math::GMPq::Rmpq_get_d($$k) }
                                             : 7) > 0
           ) {
             (Sidef::Types::Bool::Bool::TRUE);
@@ -1958,7 +1968,7 @@ package Sidef::Types::Number::Number {
     sub next_pow {
         my ($x, $y) = @_;
 
-        _valid($y);
+        _valid(\$y);
 
         my $f = Math::MPFR::Rmpfr_init2($PREC);
         Math::MPFR::Rmpfr_set_z($f, _big2mpz($x), $PREC);
@@ -1982,7 +1992,7 @@ package Sidef::Types::Number::Number {
 
     sub shift_left {
         my ($x, $y) = @_;
-        _valid($y);
+        _valid(\$y);
         my $r = _big2mpz($x);
         my $i = CORE::int(Math::GMPq::Rmpq_get_d($$y));
         if ($i < 0) {
@@ -1996,7 +2006,7 @@ package Sidef::Types::Number::Number {
 
     sub shift_right {
         my ($x, $y) = @_;
-        _valid($y);
+        _valid(\$y);
         my $r = _big2mpz($x);
         my $i = CORE::int(Math::GMPq::Rmpq_get_d($$y));
         if ($i < 0) {
@@ -2070,67 +2080,9 @@ package Sidef::Types::Number::Number {
         $i->mul($x);
     }
 
-    sub array_to {
-        my ($from, $to, $step) = @_;
-
-        if (!defined($step)) {
-            _valid($to);
-            $step = (ONE);
-        }
-        else {
-            _valid($to, $step);
-        }
-
-        $from = $$from;
-        $to   = $$to;
-        $step = $$step;
-
-        my $acc = Math::GMPq::Rmpq_init();
-        my @array;
-        for (Math::GMPq::Rmpq_set($acc, $from) ;
-             Math::GMPq::Rmpq_cmp($acc, $to) <= 0 ; Math::GMPq::Rmpq_add($acc, $acc, $step)) {
-            my $copy = Math::GMPq::Rmpq_init();
-            Math::GMPq::Rmpq_set($copy, $acc);
-            push @array, bless(\$copy, __PACKAGE__);
-        }
-
-        Sidef::Types::Array::Array->new(\@array);
-    }
-
-    *arr_to = \&array_to;
-
-    sub array_downto {
-        my ($from, $to, $step) = @_;
-
-        if (!defined($step)) {
-            _valid($to);
-            $step = (ONE);
-        }
-        else {
-            _valid($to, $step);
-        }
-
-        $from = $$from;
-        $to   = $$to;
-        $step = $$step;
-
-        my $acc = Math::GMPq::Rmpq_init();
-        my @array;
-        for (Math::GMPq::Rmpq_set($acc, $from) ;
-             Math::GMPq::Rmpq_cmp($acc, $to) >= 0 ; Math::GMPq::Rmpq_sub($acc, $acc, $step)) {
-            my $copy = Math::GMPq::Rmpq_init();
-            Math::GMPq::Rmpq_set($copy, $acc);
-            push @array, bless(\$copy, __PACKAGE__);
-        }
-
-        Sidef::Types::Array::Array->new(\@array);
-    }
-
-    *arr_downto = \&array_downto;
-
     sub round {
         my ($x, $prec) = @_;
-        _valid($prec);
+        _valid(\$prec);
 
         my $nth = -CORE::int(Math::GMPq::Rmpq_get_d($$prec));
         my $sgn = Math::GMPq::Rmpq_sgn($$x);
@@ -2186,21 +2138,7 @@ package Sidef::Types::Number::Number {
     sub to {
         my ($from, $to, $step) = @_;
 
-        if (ref($to) eq 'Sidef::Types::Number::Inf' or ref($to) eq 'Sidef::Types::Number::Ninf') {
-            _valid($step) if defined($step);
-        }
-        elsif (defined $step) {
-            _valid($to, $step);
-        }
-        else {
-            _valid($to);
-        }
-
-        Sidef::Types::Range::RangeNumber->__new__(
-                                                  from => $$from,
-                                                  to   => $$to,
-                                                  step => (defined($step) ? $$step : ${(ONE)}),
-                                                 );
+        Sidef::Types::Range::RangeNumber->new($from, $to, $step // ONE,);
     }
 
     *upto = \&to;
@@ -2208,21 +2146,31 @@ package Sidef::Types::Number::Number {
     sub downto {
         my ($from, $to, $step) = @_;
 
-        if (ref($to) eq 'Sidef::Types::Number::Inf' or ref($to) eq 'Sidef::Types::Number::Ninf') {
-            _valid($step) if defined($step);
-        }
-        elsif (defined $step) {
-            _valid($to, $step);
-        }
-        else {
-            _valid($to);
-        }
+        Sidef::Types::Range::RangeNumber->new($from, $to, defined($step) ? $step->neg : MONE);
+    }
 
-        Sidef::Types::Range::RangeNumber->__new__(
-                                                  from => $$from,
-                                                  to   => $$to,
-                                                  step => (defined($step) ? -$$step : ${(MONE)}),
-                                                 );
+    sub xto {
+        my ($from, $to, $step) = @_;
+
+        $to =
+          defined($step)
+          ? $to->sub($step)
+          : $to->dec;
+
+        Sidef::Types::Range::RangeNumber->new($from, $to, $step // ONE);
+    }
+
+    *xupto = \&xto;
+
+    sub xdownto {
+        my ($from, $to, $step) = @_;
+
+        $from =
+          defined($step)
+          ? $from->sub($step)
+          : $from->dec;
+
+        Sidef::Types::Range::RangeNumber->new($from, $to, defined($step) ? $step->neg : MONE);
     }
 
     sub range {
@@ -2246,7 +2194,7 @@ package Sidef::Types::Number::Number {
         Math::MPFR::Rmpfr_get_q($q, $rand);
 
         if (defined $y) {
-            _valid($y);
+            _valid(\$y);
 
             my $diff = Math::GMPq::Rmpq_init();
             Math::GMPq::Rmpq_sub($diff, $$y, $$x);
@@ -2269,7 +2217,7 @@ package Sidef::Types::Number::Number {
         $x = _big2mpz($x);
 
         if (defined($y)) {
-            _valid($y);
+            _valid(\$y);
 
             my $rand = _big2mpz($y);
             my $cmp = Math::GMPz::Rmpz_cmp($rand, $x);
@@ -2369,7 +2317,7 @@ package Sidef::Types::Number::Number {
     sub commify {
         my ($self) = @_;
 
-        my $n = $self->get_value;
+        my $n = "$self";
 
         my $x   = $n;
         my $neg = $n =~ s{^-}{};
@@ -2494,9 +2442,9 @@ package Sidef::Types::Number::Number {
         *{__PACKAGE__ . '::' . '=='}  = \&eq;
         *{__PACKAGE__ . '::' . '!='}  = \&ne;
         *{__PACKAGE__ . '::' . '≠'} = \&ne;
-        *{__PACKAGE__ . '::' . '..'}  = \&array_to;
-        *{__PACKAGE__ . '::' . '..^'} = \&to;
-        *{__PACKAGE__ . '::' . '^..'} = \&downto;
+        *{__PACKAGE__ . '::' . '..'}  = \&to;
+        *{__PACKAGE__ . '::' . '..^'} = \&xto;
+        *{__PACKAGE__ . '::' . '^..'} = \&xdownto;
         *{__PACKAGE__ . '::' . '!'}   = \&factorial;
         *{__PACKAGE__ . '::' . '%%'}  = \&is_div;
         *{__PACKAGE__ . '::' . '>>'}  = \&shift_right;

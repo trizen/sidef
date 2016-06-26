@@ -18,7 +18,7 @@ func change(n, pos=0, solution=[]) {
     }
 
     change(n, pos + 1, solution)+
-    change(n, pos, [@solution, denominations[pos]]);
+    change(n, pos, [solution..., denominations[pos]]);
 }
 
 var amount = 0.26;

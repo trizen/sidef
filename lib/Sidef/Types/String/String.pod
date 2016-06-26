@@ -276,6 +276,14 @@ Aliases: I<char_at>
 
 =cut
 
+=head2 chars
+
+String.chars() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 chomp
 
 String.chomp() -> I<Obj>
@@ -897,16 +905,6 @@ String.to() -> I<Obj>
 Return the
 
 Aliases: I<..^()>, I<up_to>, I<upto>
-
-=cut
-
-=head2 to_a
-
-String.to_a() -> I<Obj>
-
-Return the
-
-Aliases: I<chars>, I<to_array>
 
 =cut
 

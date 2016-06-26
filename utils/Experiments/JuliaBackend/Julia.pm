@@ -709,7 +709,7 @@ HEADER
                 }
             }
         }
-        elsif ($ref eq 'Sidef::Object::Unary') {
+        elsif ($ref eq 'Sidef::Operator::Unary') {
             ## OK
         }
         elsif ($ref eq 'Sidef::Variable::Local') {
@@ -1605,7 +1605,7 @@ HEADER
                     }
 
                     # ! prefix-unary
-                    if ($ref eq 'Sidef::Object::Unary') {
+                    if ($ref eq 'Sidef::Operator::Unary') {
                         if ($method eq '!') {
                             $code = 'excl' . $self->deparse_args(@{$call->{arg}});
                             next;

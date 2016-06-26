@@ -17,8 +17,8 @@ class new(diacritics            = true,
     }
 
     # Numbers => text
-    static DIGITS = Hash.new;
-    DIGITS.@{'0'..'19'} = %w(
+    static DIGITS = Hash();
+    DIGITS{'0'..'19'} = %w(
       zero unu doi trei patru cinci șase șapte opt nouă zece
       unsprezece
       doisprezece
@@ -33,11 +33,11 @@ class new(diacritics            = true,
 
     # Text => numbers
     static WORDS = Hash.new;
-    WORDS.@{DIGITS.values.map {|v|_remove_diacritics(v)}} = DIGITS.keys.map{.to_num}...;
-    WORDS.@{%w(o un doua sai)} = (1, 1, 2, 6);
+    WORDS{DIGITS.values.map {|v|_remove_diacritics(v)}} = DIGITS.keys.map{.to_num}...;
+    WORDS{<o un doua sai>} = (1, 1, 2, 6);
 
     # Colocvial
-    WORDS.@{%w(unspe doispe treispe paispe cinspe cinsprezece saispe saptespe saptuspe optspe nouaspe)} =
+    WORDS{<unspe doispe treispe paispe cinspe cinsprezece saispe saptespe saptuspe optspe nouaspe>} =
     (11, 12, 13, 14, 15, 15, 16, 17, 17, 18, 19);
 
     # This array contains number greater than 1000 and it's used to convert numbers into text
@@ -58,7 +58,7 @@ class new(diacritics            = true,
                 ]
                  -> map { |v|
                      var h = Hash.new;
-                     h.@{%w(num sg pl fem)} = v...;
+                     h{%w(num sg pl fem)} = v...;
                      h;
                 }
     );

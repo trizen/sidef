@@ -7,7 +7,7 @@
 # Answer: 2783915460
 
 var i = 0;
-var arr = 0..9;
+var arr = @(0..9);
 
 arr.permutations { |p|
     if (++i == 1e6) {

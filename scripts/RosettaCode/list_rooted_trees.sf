@@ -9,7 +9,7 @@ func bagchain(x, n, bb, start=0) {
 
     var out = []
     start.to(bb.end).each { |i|
-        var (c, s) = @bb[i]
+        var (c, s) = bb[i]...
         if (c <= n) {
             out += bagchain([x[0] + c, x[1] + s], n-c, bb, i)
         }

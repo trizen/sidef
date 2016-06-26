@@ -5,7 +5,7 @@
 #
 
 func lev(s, t) {
-    var d = [ 0 .. t.len, 1 .. s.len -> map {[_]}...];
+    var d = [@^(t.len+1), s.len.of{[_]}...];
     { |i|
         { |j|
             d[i][j] = (
@@ -16,7 +16,7 @@ func lev(s, t) {
         } * t.len;
     } * s.len;
     d[-1][-1] \\ [s.len, t.len].min;
-};
+}
 
 say lev(%c'kitten', %c'sitting');               # prints: 3
 say lev(%c'rosettacode', %c'raisethysword');    # prints: 8

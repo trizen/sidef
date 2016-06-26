@@ -10,15 +10,15 @@ func sieve_iter(limit) {
         is_prime.each_kv { |number, prime|
             if (prime) {
                 take(number);
-                for n in range(number**2, limit) { is_prime[n] = false if n%%number }
+                for n in range(number**2, limit) { is_prime[n] = false if n%%number }     #%
             }
         }
     }
 }
 
-func sieve(Number n) { sieve(2..n) }
+func sieve(Number n) { sieve(@(2..n)) }
 func sieve(Array a   { .first > .last.sqrt }) { a }
-func sieve(Array a)  { [a[0], sieve(a.grep { !(_ %% a[0]) })...] }
+func sieve(Array a)  { [a[0], sieve(a.grep { !(_ %% a[0]) })...] }  #%
 
 var s1 = sieve_iter(100).join(",");
 var s2 = sieve(100).join(",");

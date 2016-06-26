@@ -27,7 +27,7 @@ func mergesort(array) {
 }
  
 # Numeric sort
-var nums = (0..7 -> shuffle);
+var nums = @(0..7).shuffle;
 mergesort(nums).dump.say;
  
 # String sort

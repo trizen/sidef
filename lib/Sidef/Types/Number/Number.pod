@@ -130,7 +130,17 @@ I<Obj> B<..> I<Obj> -> I<Obj>
 
 Return the
 
-Aliases: I<arr_to>, I<array_to>
+Aliases: I<to>, I<upto>
+
+=cut
+
+=head2 ..^
+
+I<Obj> B<..^> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<xto>, I<xupto>
 
 =cut
 
@@ -240,7 +250,7 @@ I<Obj> B<^..> I<Obj> -> I<Obj>
 
 Return the
 
-Aliases: I<downto>
+Aliases: I<xdownto>
 
 =cut
 
@@ -315,16 +325,6 @@ Return the
 Number.agm() -> I<Obj>
 
 Return the
-
-=cut
-
-=head2 arr_downto
-
-Number.arr_downto() -> I<Obj>
-
-Return the
-
-Aliases: I<array_downto>
 
 =cut
 
@@ -593,6 +593,14 @@ Return the
 =head2 divmod
 
 Number.divmod() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 downto
+
+Number.downto() -> I<Obj>
 
 Return the
 
@@ -1391,16 +1399,6 @@ Return the
 Number.times() -> I<Obj>
 
 Return the
-
-=cut
-
-=head2 to
-
-Number.to() -> I<Obj>
-
-Return the
-
-Aliases: I<..^()>, I<upto>
 
 =cut
 

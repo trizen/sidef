@@ -193,13 +193,11 @@ Return the
 
 =cut
 
-=head2 combination
+=head2 combinations
 
-Array.combination() -> I<Obj>
+Array.combinations() -> I<Obj>
 
 Return the
-
-Aliases: I<combinations>
 
 =cut
 
@@ -1018,6 +1016,16 @@ Return the
 Array.take_right() -> I<Obj>
 
 Return the
+
+=cut
+
+=head2 to_a
+
+Array.to_a() -> I<Obj>
+
+Return the
+
+Aliases: I<to_array>
 
 =cut
 

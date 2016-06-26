@@ -10,7 +10,7 @@ func rangex(str) {
             (?(DEFINE) (?<int>[+-]?[0-9]+) )
             (?<from>(?&int))-(?<to>(?&int))
         $/x);
-        m ? ( var ncap = m.ncap; ncap{:from}.to_i .. ncap{:to}.to_i )
+        m ? ( var ncap = m.ncap; @(ncap{:from}.to_i .. ncap{:to}.to_i))
           : range.to_i;
     }
 }

@@ -26,7 +26,7 @@ loop {
     print "\e[H\e[J";
     chars.range.each { |i|
       print position(x + i, y);
-      print [chars[i]@[indices()]].join(' ');
+      print [chars[i][indices()]].join(' ');
     };
     print position(1, 1);
     Sys.sleep(1);

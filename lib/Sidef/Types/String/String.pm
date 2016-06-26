@@ -783,9 +783,6 @@ package Sidef::Types::String::String {
         Sidef::Types::Array::Array->new([map { bless(\$_, __PACKAGE__) } CORE::split(//, CORE::join('', $$self))]);
     }
 
-    *to_a     = \&chars;
-    *to_array = \&chars;
-
     sub each_char {
         my ($self, $code) = @_;
 

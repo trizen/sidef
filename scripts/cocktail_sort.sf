@@ -17,7 +17,7 @@ func cocktailsort(a) {
     return a;
 }
 
-var numbers = (0..10 -> shuffle);
+var numbers = @(0..10).shuffle;
 say cocktailsort(numbers);
 
 var strs = %w(John Kate Zerg Alice Joe Jane).shuffle;

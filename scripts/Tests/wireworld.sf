@@ -4,7 +4,7 @@
 ## http://rosettacode.org/wiki/Wireworld
 #
 
-var f = [[], DATA.lines.map {['', @.chomp.split(''), '']}..., []];
+var f = [[], DATA.lines.map {['', .chomp.chars..., '']}..., []];
 
 var gens = [];
 

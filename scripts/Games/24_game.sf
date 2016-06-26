@@ -5,7 +5,7 @@
 #
 
 const digits  = (1..9 -> pick(4));
-const grammar = Regex.new(
+const grammar = Regex(
     '^ (?&exp) \z
       (?(DEFINE)
           (?<exp> ( (?&term) (?&op) (?&term) )+ )

@@ -22,6 +22,8 @@ package Sidef::Parser {
                              '++'  => 1,
                              '...' => 1,
                              '!'   => 1,
+                             '@'   => 1,
+                             '@|'  => 1,
                            },
 
             hyper_ops => {
@@ -123,12 +125,12 @@ package Sidef::Parser {
                 | read\b                                     (?{ state $x = Sidef::Sys::Sys->new })
                 | goto\b                                     (?{ state $x = bless({}, 'Sidef::Perl::Builtin') })
                 | (?:[*\\&]|\+\+|--)                         (?{ state $x = bless({}, 'Sidef::Variable::Ref') })
-                | (?:>>?|[√+~!\-\^]|
+                | (?:>>?|\@\|?|[√+~!\-\^]|
                     (?:
                         say
                       | print
                       | defined
-                    )\b)                                     (?{ state $x = bless({}, 'Sidef::Object::Unary') })
+                    )\b)                                     (?{ state $x = bless({}, 'Sidef::Operator::Unary') })
                 | :                                          (?{ state $x = bless({}, 'Sidef::DataTypes::Hash::Hash') })
               )
             }x,
@@ -1395,25 +1397,6 @@ package Sidef::Parser {
                 }
 
                 return $value;
-            }
-
-            if (/\G\@(?!:)/gc) {
-                my $pos = pos($_);
-                my $obj = (
-                           /\G(?=\()/
-                           ? $self->parse_arg(code => $opt{code})
-                           : $self->parse_obj(code => $opt{code})
-                          );
-
-                if (not defined $obj) {
-                    $self->fatal_error(
-                                       code  => $_,
-                                       pos   => $pos,
-                                       error => "expected an expression after unary operator: '\@'",
-                                      );
-                }
-
-                return {$self->{class} => [{self => $obj, call => [{method => '@*'}]}]};
             }
 
             # Local variables
@@ -2833,11 +2816,6 @@ package Sidef::Parser {
                     push @{$struct{$self->{class}}[-1]{call}}, @{$methods};
                 }
 
-                if (/\G\h*\.?(\@)\h*(?=[\[\{])/gc) {
-                    push @{$struct{$self->{class}}[-1]{call}}, {method => $1};
-                    redo;
-                }
-
                 if (/\G\h*(?=\()/gc) {
                     my $arg = $self->parse_arg(code => $opt{code});
 
@@ -3287,10 +3265,11 @@ package Sidef::Parser {
                         }
                         else {
                             my $code = substr($_, pos);
-                            if   ($code =~ /^\./) { $code = ". $code" }
-                            else                  { $code = ".$code" }
+                            my $dot_op = $code =~ /^\./;
+                            if   ($dot_op) { $code = ". $code" }
+                            else           { $code = ".$code" }
                             $methods = $self->parse_methods(code => \$code);
-                            pos($_) += pos($code) - 1;
+                            pos($_) += pos($code) - ($dot_op ? 2 : 1);
                         }
 
                         if (@{$methods}) {

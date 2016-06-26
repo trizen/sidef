@@ -19,4 +19,4 @@ func binary_search(a, i) {
     return -1;
 }
 
-say binary_search(1..100, 23);
+say binary_search(@(1..100), 23);
