@@ -2,6 +2,9 @@ package Sidef::Types::Range::Range {
 
     use 5.014;
 
+    use Sidef::Types::Bool::Bool;
+    use Sidef::Types::Number::Number;
+
     use overload '@{}' => sub {
         $_[0]->{_cached_array} //= do {
             my @array;

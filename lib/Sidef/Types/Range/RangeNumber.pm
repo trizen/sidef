@@ -12,27 +12,23 @@ package Sidef::Types::Range::RangeNumber {
     use Sidef::Types::Bool::Bool;
     use Sidef::Types::Number::Number;
 
-    my $ONE  = Sidef::Types::Number::Number::ONE;
-    my $ZERO = Sidef::Types::Number::Number::ZERO;
-    my $MONE = Sidef::Types::Number::Number::MONE;
-
     sub new {
         my (undef, $from, $to, $step) = @_;
 
         if (not defined $from) {
-            $from = $ZERO;
-            $to   = $MONE;
+            $from = Sidef::Types::Number::Number::ZERO;
+            $to   = Sidef::Types::Number::Number::MONE;
         }
 
         if (not defined $to) {
-            $to   = $from->sub($ONE);
-            $from = $ZERO;
+            $to   = $from->sub(Sidef::Types::Number::Number::ONE);
+            $from = Sidef::Types::Number::Number::ZERO;
         }
 
         bless {
                from => $from,
                to   => $to,
-               step => $step // $ONE,
+               step => $step // Sidef::Types::Number::Number::ONE,
               },
           __PACKAGE__;
     }
@@ -61,7 +57,7 @@ package Sidef::Types::Range::RangeNumber {
 
     sub sum {
         my ($self, $arg) = @_;
-        my $sum = $arg // $ZERO;
+        my $sum = $arg // Sidef::Types::Number::Number::ZERO;
 
         my $iter = $self->iter->{code};
         while (defined(my $num = $iter->())) {
@@ -73,7 +69,7 @@ package Sidef::Types::Range::RangeNumber {
 
     sub prod {
         my ($self, $arg) = @_;
-        my $prod = $arg // $ONE;
+        my $prod = $arg // Sidef::Types::Number::Number::ONE;
 
         my $iter = $self->iter->{code};
         while (defined(my $num = $iter->())) {

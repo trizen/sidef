@@ -13,18 +13,13 @@ package Sidef::Types::Range::RangeString {
     use Sidef::Types::Number::Number;
     use Sidef::Types::Number::Nan;
 
-    my $ONE  = Sidef::Types::Number::Number::ONE;
-    my $ZERO = Sidef::Types::Number::Number::ZERO;
-    my $MONE = Sidef::Types::Number::Number::MONE;
-    my $NAN  = Sidef::Types::Number::Nan::NAN;
-
     # This expects numbers
     sub new {
         my (undef, $from, $to, $step) = @_;
 
         if (not defined $from) {
-            $from = $ZERO;
-            $to   = $MONE;
+            $from = Sidef::Types::Number::Number::ZERO;
+            $to   = Sidef::Types::Number::Number::MONE;
         }
 
         if (not defined $to) {
@@ -35,7 +30,7 @@ package Sidef::Types::Range::RangeString {
         bless {
                from => $from,
                to   => $to,
-               step => $step // $ONE,
+               step => $step // Sidef::Types::Number::Number::ONE,
               },
           __PACKAGE__;
     }
@@ -48,7 +43,7 @@ package Sidef::Types::Range::RangeString {
             $from = $from->ord;
         }
         else {
-            $from = $ZERO;
+            $from = Sidef::Types::Number::Number::ZERO;
         }
 
         if (defined $to) {
@@ -62,7 +57,7 @@ package Sidef::Types::Range::RangeString {
         bless {
                from => $from,
                to   => $to,
-               step => $step // $ONE,
+               step => $step // Sidef::Types::Number::Number::ONE,
               },
           __PACKAGE__;
     }
