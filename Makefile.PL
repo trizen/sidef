@@ -3,37 +3,37 @@ require 5.018000;
 use ExtUtils::MakeMaker;
 WriteMakefile
 (
+  'NAME' => 'Sidef',
+  'VERSION_FROM' => 'lib/Sidef.pm',
+  'PREREQ_PM' => {
+                   'Cwd' => 0,
+                   'Encode' => 0,
+                   'Fcntl' => 0,
+                   'File::Basename' => 0,
+                   'File::Copy' => 0,
+                   'File::Find' => 0,
+                   'File::Path' => 0,
+                   'File::Spec' => 0,
+                   'Getopt::Std' => 0,
+                   'List::Util' => '1.33',
+                   'Math::GMPq' => '0.39',
+                   'Math::GMPz' => 0,
+                   'Math::MPC' => 0,
+                   'Math::MPFR' => '3.29',
+                   'Memoize' => 0,
+                   'POSIX' => 0,
+                   'Scalar::Util' => 0,
+                   'Socket' => 0,
+                   'Term::ReadLine' => 0,
+                   'Test::More' => 0,
+                   'Time::HiRes' => 0,
+                   'parent' => 0,
+                   'utf8' => 0
+                 },
+  'INSTALLDIRS' => 'site',
   'EXE_FILES' => [
                    'bin/sidef'
                  ],
-  'PREREQ_PM' => {
-                   'Getopt::Std' => 0,
-                   'Fcntl' => 0,
-                   'Memoize' => 0,
-                   'POSIX' => 0,
-                   'Cwd' => 0,
-                   'parent' => 0,
-                   'File::Copy' => 0,
-                   'File::Path' => 0,
-                   'Math::GMPq' => '0.39',
-                   'Socket' => 0,
-                   'File::Find' => 0,
-                   'Math::GMPz' => 0,
-                   'File::Spec' => 0,
-                   'utf8' => 0,
-                   'Math::MPFR' => '3.29',
-                   'File::Basename' => 0,
-                   'List::Util' => '1.33',
-                   'Encode' => 0,
-                   'Term::ReadLine' => 0,
-                   'Math::MPC' => 0,
-                   'Test::More' => 0,
-                   'Scalar::Util' => 0,
-                   'Time::HiRes' => 0
-                 },
-  'NAME' => 'Sidef',
-  'PL_FILES' => {},
-  'VERSION_FROM' => 'lib/Sidef.pm',
-  'INSTALLDIRS' => 'site'
+  'PL_FILES' => {}
 )
 ;

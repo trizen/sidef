@@ -1026,24 +1026,8 @@ HEADER
         elsif ($ref eq 'Sidef::Types::Block::ForIn') {
 
             my $expr = $self->deparse_expr({self => $obj->{expr}});
-
             local $obj->{block}{init_vars} = bless({vars => $obj->{vars}}, 'Sidef::Variable::Init');
-
-            ## Old way:
-            # my $block = $self->deparse_expr({self => $obj->{block}});
-
-            my $vars;
-            if (@{$obj->{block}{init_vars}{vars}}) {
-                $vars = $self->_dump_sub_init_vars(@{$obj->{block}{init_vars}{vars}});
-            }
-
-            my $block = $self->deparse_bare_block($obj->{block}{code});
-
-            $block = (
-                      defined($vars)
-                      ? ('sub { ' . $vars . 'do ' . $block . '}')
-                      : ('sub ' . $block)
-                     );
+            my $block = $self->deparse_expr({self => $obj->{block}});
 
             if (
                 @{$obj->{vars}} > 1
@@ -1055,7 +1039,8 @@ HEADER
                     'do{my $obj='
                   . $expr . ';'
                   . 'my $block='
-                  . $block . ';'
+                  . $block
+                  . '->{code};'
                   . 'for my$group(ref($obj)?$obj->SUPER::isa("ARRAY")?@$obj:@{$obj->to_a}:()){'
                   . '$block->((ref($group)&&$group->SUPER::isa("ARRAY")?@$group:$group))}}';
             }
@@ -1065,7 +1050,8 @@ HEADER
                     'do{my$obj='
                   . $expr . ';'
                   . 'my$block='
-                  . $block . ';'
+                  . $block
+                  . '->{code};'
                   . 'if(ref($obj)){if(defined(my$sub=$obj->SUPER::can("iter"))){my$iter=$sub->($obj);'
                   . 'while(defined(my$item'
                   . '=$iter->run)){$block->($item)}}'
@@ -1241,13 +1227,9 @@ HEADER
         elsif ($ref eq 'Sidef::Module::Func') {
             $code = $self->make_constant($ref, '__NEW__', "MOD_F$refaddr", $self->_dump_string($obj->{module}));
         }
-        elsif ($ref eq 'Sidef::Types::Range::RangeNumber') {
-            $code = $self->make_constant($ref, 'new', "RangeNumber$refaddr",
+        elsif ($ref eq 'Sidef::Types::Range::RangeNumber' or $ref eq 'Sidef::Types::Range::RangeString') {
+            $code = $self->make_constant($ref, 'new', "Range$refaddr",
                        map { 'Sidef::Types::Number::Number->_set_str(' . $obj->{$_}->_get_frac . ')' } ('from', 'to', 'step'));
-        }
-        elsif ($ref eq 'Sidef::Types::Range::RangeString') {
-            $code =
-              $self->make_constant($ref, '__new__', "RangeString$refaddr", map { "$_ => $obj->{$_}" } ('from', 'to', 'step'));
         }
         elsif ($ref eq 'Sidef::Types::Glob::Backtick') {
             $code = $self->make_constant($ref, 'new', "Backtick$refaddr", $self->_dump_string(${$obj}));

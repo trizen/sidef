@@ -18,130 +18,11 @@ var obj = RangeNumber.new(...);
 
 Inherits methods from:
 
+	* Sidef::Types::Range::Range
 	* Sidef::Object::Object
 
 =head1 METHODS
 
-
-=head2 !=
-
-I<Obj> B<!=> I<Obj> -> I<Obj>
-
-Return the
-
-Aliases: I<ne>
-
-=cut
-
-=head2 *
-
-I<Obj> B<*> I<Obj> -> I<Obj>
-
-Return the
-
-Aliases: I<mul>
-
-=cut
-
-=head2 +
-
-I<Obj> B<+> I<Obj> -> I<Obj>
-
-Return the
-
-Aliases: I<add>
-
-=cut
-
-=head2 -
-
-I<Obj> B<-> I<Obj> -> I<Obj>
-
-Return the
-
-Aliases: I<sub>
-
-=cut
-
-=head2 ...
-
-I<Obj> B<...> I<Obj> -> I<Obj>
-
-Return the
-
-Aliases: I<to_list>
-
-=cut
-
-=head2 /
-
-I<Obj> B</> I<Obj> -> I<Obj>
-
-Return the
-
-Aliases: I<div>
-
-=cut
-
-=head2 ==
-
-I<Obj> B<==> I<Obj> -> I<Obj>
-
-Return the
-
-Aliases: I<eq>
-
-=cut
-
-=head2 all
-
-RangeNumber.all() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 any
-
-RangeNumber.any() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 bounds
-
-RangeNumber.bounds() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 by
-
-RangeNumber.by() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 contain
-
-RangeNumber.contain() -> I<Obj>
-
-Return the
-
-Aliases: I<include>, I<contains>, I<includes>
-
-=cut
-
-=head2 cross_operator
-
-RangeNumber.cross_operator() -> I<Obj>
-
-Return the
-
-=cut
 
 =head2 dump
 
@@ -151,89 +32,9 @@ Return the
 
 =cut
 
-=head2 flip
-
-RangeNumber.flip() -> I<Obj>
-
-Return the
-
-Aliases: I<reverse>
-
-=cut
-
-=head2 for
-
-RangeNumber.for() -> I<Obj>
-
-Return the
-
-Aliases: I<each>, I<foreach>
-
-=cut
-
-=head2 from
-
-RangeNumber.from() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 grep
-
-RangeNumber.grep() -> I<Obj>
-
-Return the
-
-Aliases: I<select>
-
-=cut
-
 =head2 iter
 
 RangeNumber.iter() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 len
-
-RangeNumber.len() -> I<Obj>
-
-Return the
-
-Aliases: I<length>
-
-=cut
-
-=head2 map
-
-RangeNumber.map() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 map_operator
-
-RangeNumber.map_operator() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 max
-
-RangeNumber.max() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 min
-
-RangeNumber.min() -> I<Obj>
 
 Return the
 
@@ -249,22 +50,6 @@ Aliases: I<call>
 
 =cut
 
-=head2 pam_operator
-
-RangeNumber.pam_operator() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 pick
-
-RangeNumber.pick() -> I<Obj>
-
-Return the
-
-=cut
-
 =head2 prod
 
 RangeNumber.prod() -> I<Obj>
@@ -273,59 +58,9 @@ Return the
 
 =cut
 
-=head2 reduce
-
-RangeNumber.reduce() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 reduce_operator
-
-RangeNumber.reduce_operator() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 step
-
-RangeNumber.step() -> I<Obj>
-
-Return the
-
-=cut
-
 =head2 sum
 
 RangeNumber.sum() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 to
-
-RangeNumber.to() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 to_a
-
-RangeNumber.to_a() -> I<Obj>
-
-Return the
-
-Aliases: I<to_array>
-
-=cut
-
-=head2 unroll_operator
-
-RangeNumber.unroll_operator() -> I<Obj>
 
 Return the
 

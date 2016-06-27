@@ -8,7 +8,7 @@ require('GD');
  
 var img = %s'GD::Image'.new(256, 256, 1);
 
-var r = @(0..255);
+var r = 0..255;
 
 for y,x in (r ~X r) {
     var color = img.colorAllocate((255 - x - y).abs, (255-x)^y, x^(255-y));

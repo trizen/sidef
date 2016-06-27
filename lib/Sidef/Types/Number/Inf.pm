@@ -4,8 +4,6 @@ package Sidef::Types::Number::Inf {
     use 5.014;
 
     use parent qw(
-      Sidef::Object::Object
-      Sidef::Convert::Convert
       Sidef::Types::Number::Number
       );
 
@@ -17,7 +15,9 @@ package Sidef::Types::Number::Inf {
     my $INF = Math::GMPq::Rmpq_init();
     Math::GMPq::Rmpq_set_ui($INF, 1, 0);
 
-    use constant {INF => bless(\$INF, __PACKAGE__),};
+    use constant INF => bless(\$INF, __PACKAGE__);
+
+    use Sidef::Types::Number::Nan;
 
     sub new { INF }
 
@@ -25,14 +25,14 @@ package Sidef::Types::Number::Inf {
 
     sub add {
         my ($x, $y) = @_;
-        ref($y) eq 'Sidef::Types::Number::Ninf' ? nan() : $x;
+        ref($y) eq 'Sidef::Types::Number::Ninf' ? Sidef::Types::Number::Nan::NAN : $x;
     }
 
     *iadd = \&add;
 
     sub sub {
         my ($x, $y) = @_;
-        ref($y) eq __PACKAGE__ ? nan() : $x;
+        ref($y) eq __PACKAGE__ ? Sidef::Types::Number::Nan::NAN : $x;
     }
 
     *isub = \&sub;
@@ -40,7 +40,7 @@ package Sidef::Types::Number::Inf {
     sub mul {
         my ($x, $y) = @_;
         ref($y) eq __PACKAGE__ and return $x;
-        $y->is_neg ? $x->neg : $y->is_pos ? $x : nan();
+        $y->is_neg ? $x->neg : $y->is_pos ? $x : Sidef::Types::Number::Nan::NAN;
     }
 
     *imul = \&mul;
@@ -48,22 +48,18 @@ package Sidef::Types::Number::Inf {
     sub div {
         my ($x, $y) = @_;
         if (ref($y) eq __PACKAGE__ or ref($y) eq 'Sidef::Types::Number::Ninf') {
-            return nan();
+            return Sidef::Types::Number::Nan::NAN;
         }
         $y->is_neg ? $x->neg : $x;
     }
 
     *idiv = \&div;
 
-    sub is_pos {
-        (Sidef::Types::Bool::Bool::TRUE);
-    }
+    sub is_pos { Sidef::Types::Bool::Bool::TRUE }
 
     *is_inf = \&is_pos;
 
-    sub is_ninf {
-        (Sidef::Types::Bool::Bool::FALSE);
-    }
+    sub is_ninf { Sidef::Types::Bool::Bool::FALSE }
 
     *is_nan    = \&is_ninf;
     *is_neg    = \&is_ninf;
@@ -81,9 +77,7 @@ package Sidef::Types::Number::Inf {
     *is_one    = \&is_ninf;
     *is_mone   = \&is_ninf;
 
-    sub nan {
-        state $x = Sidef::Types::Number::Nan->new;
-    }
+    sub nan { Sidef::Types::Number::Nan::NAN }
 
     *mod         = \&nan;
     *imod        = \&nan;
@@ -120,7 +114,7 @@ package Sidef::Types::Number::Inf {
 
     sub divmod {
         my ($x, $y) = @_;
-        ($x->div($y), nan());
+        ($x->div($y), Sidef::Types::Number::Nan::NAN);
     }
 
     sub ninf {
@@ -134,7 +128,7 @@ package Sidef::Types::Number::Inf {
         my ($x, $y) = @_;
         ref($y) eq 'Sidef::Types::Number::Inf' || ref($y) eq 'Sidef::Types::Number::Ninf' ? Sidef::Types::Number::Number::ONE
           : $y->is_neg ? Sidef::Types::Number::Number::ZERO
-          :              $x->inf();
+          :              INF;
     }
 
     *iroot = \&root;

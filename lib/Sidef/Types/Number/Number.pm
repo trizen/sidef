@@ -2137,7 +2137,6 @@ package Sidef::Types::Number::Number {
 
     sub to {
         my ($from, $to, $step) = @_;
-
         Sidef::Types::Range::RangeNumber->new($from, $to, $step // ONE,);
     }
 
@@ -2145,7 +2144,6 @@ package Sidef::Types::Number::Number {
 
     sub downto {
         my ($from, $to, $step) = @_;
-
         Sidef::Types::Range::RangeNumber->new($from, $to, defined($step) ? $step->neg : MONE);
     }
 

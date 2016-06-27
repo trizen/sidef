@@ -58,18 +58,16 @@ package Sidef::Types::Array::Array {
         $operator = "$operator" if ref($operator);
 
         my @array;
-        if (defined $arg) {
-            my $argc  = @{$arg};
-            my $selfc = @{$self};
-            my $max   = $argc > $selfc ? $argc - 1 : $selfc - 1;
-            foreach my $i (0 .. $max) {
-                CORE::push(@array, $self->[$i % $selfc]->$operator($arg->[$i % $argc]));
-            }
-        }
-        else {
-            foreach my $i (0 .. $#{$self}) {
-                CORE::push(@array, $self->[$i]->$operator);
-            }
+
+        (my @arg = @$arg) || return $self->clone;
+        my @self  = @$self;
+        my $argc  = @arg;
+        my $selfc = @self;
+
+        my $max = $argc > $selfc ? $argc - 1 : $selfc - 1;
+
+        foreach my $i (0 .. $max) {
+            CORE::push(@array, $self[$i % $selfc]->$operator($arg[$i % $argc]));
         }
 
         $self->new(\@array);
@@ -119,17 +117,19 @@ package Sidef::Types::Array::Array {
 
         $operator = "$operator" if ref($operator);
 
+        my @arg = @{$arg};
+
         my @array;
         if ($operator eq '') {
             foreach my $i (@{$self}) {
-                foreach my $j (@{$arg}) {
+                foreach my $j (@arg) {
                     CORE::push(@array, $self->new($i, $j));
                 }
             }
         }
         else {
             foreach my $i (@{$self}) {
-                foreach my $j (@{$arg}) {
+                foreach my $j (@arg) {
                     CORE::push(@array, $i->$operator($j));
                 }
             }
@@ -143,19 +143,22 @@ package Sidef::Types::Array::Array {
 
         $operator = "$operator" if ref($operator);
 
-        my $self_len = $#{$self};
-        my $arg_len  = $#{$arg};
+        my @arg  = @$arg;
+        my @self = @$self;
+
+        my $self_len = $#self;
+        my $arg_len  = $#arg;
         my $min      = $self_len < $arg_len ? $self_len : $arg_len;
 
         my @array;
         if ($operator eq '') {
             foreach my $i (0 .. $min) {
-                CORE::push(@array, $self->new([$self->[$i], $arg->[$i]]));
+                CORE::push(@array, $self->new([$self[$i], $arg[$i]]));
             }
         }
         else {
             foreach my $i (0 .. $min) {
-                CORE::push(@array, $self->[$i]->$operator($arg->[$i]));
+                CORE::push(@array, $self[$i]->$operator($arg[$i]));
             }
         }
 

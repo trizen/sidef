@@ -13,13 +13,12 @@ package Sidef::Types::Number::Nan {
       q{0+}   => sub { 'NaN' },
       q{""}   => sub { 'NaN' };
 
-    state $NAN = do {
-        my $r = Math::GMPq::Rmpq_init();
-        Math::GMPq::Rmpq_set_si($r, "-0", "-0");
-        bless \$r, __PACKAGE__;
-    };
+    my $NAN = Math::GMPq::Rmpq_init();
+    Math::GMPq::Rmpq_set_si($NAN, "-0", "-0");
 
-    sub new { $NAN }
+    use constant NAN => bless(\$NAN, __PACKAGE__);
+
+    sub new { NAN }
 
     sub get_value { 'NaN' }
 

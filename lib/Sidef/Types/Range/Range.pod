@@ -1,0 +1,315 @@
+
+=encoding utf8
+
+=head1 NAME
+
+Sidef::Types::Range::Range
+
+=head1 DESCRIPTION
+
+This object is ...
+
+=head1 SYNOPSIS
+
+var obj = Range.new(...);
+
+=head1 METHODS
+
+
+=head2 !=
+
+I<Obj> B<!=> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<ne>
+
+=cut
+
+=head2 *
+
+I<Obj> B<*> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<mul>
+
+=cut
+
+=head2 +
+
+I<Obj> B<+> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<add>
+
+=cut
+
+=head2 -
+
+I<Obj> B<-> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<sub>
+
+=cut
+
+=head2 ...
+
+I<Obj> B<...> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<to_list>
+
+=cut
+
+=head2 /
+
+I<Obj> B</> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<div>
+
+=cut
+
+=head2 ==
+
+I<Obj> B<==> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<eq>
+
+=cut
+
+=head2 all
+
+Range.all() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 any
+
+Range.any() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 bounds
+
+Range.bounds() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 by
+
+Range.by() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 contain
+
+Range.contain() -> I<Obj>
+
+Return the
+
+Aliases: I<include>, I<contains>, I<includes>
+
+=cut
+
+=head2 cross_operator
+
+Range.cross_operator() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 first
+
+Range.first() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 first_by
+
+Range.first_by() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 flip
+
+Range.flip() -> I<Obj>
+
+Return the
+
+Aliases: I<reverse>
+
+=cut
+
+=head2 for
+
+Range.for() -> I<Obj>
+
+Return the
+
+Aliases: I<each>, I<foreach>
+
+=cut
+
+=head2 from
+
+Range.from() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 grep
+
+Range.grep() -> I<Obj>
+
+Return the
+
+Aliases: I<select>
+
+=cut
+
+=head2 last
+
+Range.last() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 last_by
+
+Range.last_by() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 len
+
+Range.len() -> I<Obj>
+
+Return the
+
+Aliases: I<length>
+
+=cut
+
+=head2 map
+
+Range.map() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 map_operator
+
+Range.map_operator() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 max
+
+Range.max() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 min
+
+Range.min() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 pam_operator
+
+Range.pam_operator() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 pick
+
+Range.pick() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 reduce
+
+Range.reduce() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 reduce_operator
+
+Range.reduce_operator() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 step
+
+Range.step() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 to
+
+Range.to() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 to_a
+
+Range.to_a() -> I<Obj>
+
+Return the
+
+Aliases: I<to_array>
+
+=cut
+
+=head2 unroll_operator
+
+Range.unroll_operator() -> I<Obj>
+
+Return the
+
+=cut

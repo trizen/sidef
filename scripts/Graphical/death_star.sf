@@ -39,9 +39,9 @@ func draw(k, amb) {
     STDOUT.binmode(':raw');
     print ("P5\n", pos[0]*2 + 3, " ", pos[1]*2 + 3, "\n255\n");
 
-    range((pos[1] - pos[3] - 1), (pos[1] + pos[3] + 1)).each { |y|
+    for y in ((pos[1] - pos[3] - 1) .. (pos[1] + pos[3] + 1)) {
         var row = [];
-        range((pos[0] - pos[3] - 1), (pos[0] + pos[3] + 1)).each { |x|
+        for x in ((pos[0] - pos[3] - 1) .. (pos[0] + pos[3] + 1)) {
             var hit = 0;
             var hs = [];
             var h = hitf(pos, x, y);
@@ -65,7 +65,7 @@ func draw(k, amb) {
                 val = (val > 255 ? 255 : (val < 0 ? 0 : val));
             };
             row.append(val);
-        };
+        }
         print 'C*'.pack(row...);
     }
 }

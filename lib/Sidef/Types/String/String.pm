@@ -15,6 +15,7 @@ package Sidef::Types::String::String {
 
     use Sidef::Types::Bool::Bool;
     use Sidef::Types::Number::Number;
+    use Sidef::Types::Number::Nan;
 
     sub new {
         my (undef, $str) = @_;
@@ -138,16 +139,7 @@ package Sidef::Types::String::String {
 
     sub to {
         my ($from, $to, $step) = @_;
-
-        $from = CORE::ord($$from);
-        $to   = defined($to) ? CORE::ord($to) : ($from - 1);
-        $step = defined($step) ? CORE::int("$step") : 1;
-
-        Sidef::Types::Range::RangeString->__new__(
-                                                  from => $from,
-                                                  to   => $to,
-                                                  step => $step,
-                                                 );
+        Sidef::Types::Range::RangeString->call($from, $to, $step // Sidef::Types::Number::Number::ONE);
     }
 
     *upto = \&to;
@@ -155,20 +147,12 @@ package Sidef::Types::String::String {
     sub downto {
         my ($from, $to, $step) = @_;
 
-        $from = CORE::ord($$from);
-        $to   = defined($to) ? CORE::ord($to) : $from + 1;
-        $step = defined($step) ? CORE::int("$step") : 1;
-
-        Sidef::Types::Range::RangeString->__new__(
-                                                  from => $from,
-                                                  to   => $to,
-                                                  step => -$step,
-                                                 );
+        Sidef::Types::Range::RangeString->call($from, $to, defined($step) ? $step->neg : Sidef::Types::Number::Number::MONE);
     }
 
     sub range {
         my ($from, $to, $step) = @_;
-        Sidef::Types::Range::RangeString->new($from, $to, $step);
+        Sidef::Types::Range::RangeString->call($from, $to, $step);
     }
 
     sub cmp {
@@ -522,7 +506,9 @@ package Sidef::Types::String::String {
 
     sub ord {
         my ($self) = @_;
-        Sidef::Types::Number::Number::_new_uint(CORE::ord($$self));
+        $$self eq ''
+          ? Sidef::Types::Number::Nan::NAN
+          : Sidef::Types::Number::Number::_new_uint(CORE::ord($$self));
     }
 
     sub reverse {
@@ -534,12 +520,16 @@ package Sidef::Types::String::String {
 
     sub printf {
         my ($self, @arguments) = @_;
-        (printf $$self, @arguments) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
+        printf($$self, @arguments)
+          ? Sidef::Types::Bool::Bool::TRUE
+          : Sidef::Types::Bool::Bool::FALSE;
     }
 
     sub printlnf {
         my ($self, @arguments) = @_;
-        (printf($$self . "\n", @arguments)) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
+        printf($$self . "\n", @arguments)
+          ? Sidef::Types::Bool::Bool::TRUE
+          : Sidef::Types::Bool::Bool::FALSE;
     }
 
     sub sprintf {

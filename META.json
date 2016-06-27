@@ -181,6 +181,9 @@
       "Sidef::Types::Number::Number" : {
          "file" : "lib/Sidef/Types/Number/Number.pm"
       },
+      "Sidef::Types::Range::Range" : {
+         "file" : "lib/Sidef/Types/Range/Range.pm"
+      },
       "Sidef::Types::Range::RangeNumber" : {
          "file" : "lib/Sidef/Types/Range/RangeNumber.pm"
       },

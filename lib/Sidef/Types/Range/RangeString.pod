@@ -18,60 +18,15 @@ var obj = RangeString.new(...);
 
 Inherits methods from:
 
+	* Sidef::Types::Range::Range
 	* Sidef::Object::Object
 
 =head1 METHODS
 
 
-=head2 !=
+=head2 call
 
-I<Obj> B<!=> I<Obj> -> I<Obj>
-
-Return the
-
-Aliases: I<ne>
-
-=cut
-
-=head2 ...
-
-I<Obj> B<...> I<Obj> -> I<Obj>
-
-Return the
-
-Aliases: I<to_list>
-
-=cut
-
-=head2 ==
-
-I<Obj> B<==> I<Obj> -> I<Obj>
-
-Return the
-
-Aliases: I<eq>
-
-=cut
-
-=head2 all
-
-RangeString.all() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 any
-
-RangeString.any() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 bounds
-
-RangeString.bounds() -> I<Obj>
+RangeString.call() -> I<Obj>
 
 Return the
 
@@ -87,14 +42,6 @@ Aliases: I<include>, I<contains>, I<includes>
 
 =cut
 
-=head2 cross_operator
-
-RangeString.cross_operator() -> I<Obj>
-
-Return the
-
-=cut
-
 =head2 dump
 
 RangeString.dump() -> I<Obj>
@@ -103,65 +50,17 @@ Return the
 
 =cut
 
-=head2 flip
+=head2 from
 
-RangeString.flip() -> I<Obj>
-
-Return the
-
-Aliases: I<reverse>
-
-=cut
-
-=head2 for
-
-RangeString.for() -> I<Obj>
+RangeString.from() -> I<Obj>
 
 Return the
-
-Aliases: I<each>, I<foreach>
-
-=cut
-
-=head2 grep
-
-RangeString.grep() -> I<Obj>
-
-Return the
-
-Aliases: I<select>
 
 =cut
 
 =head2 iter
 
 RangeString.iter() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 len
-
-RangeString.len() -> I<Obj>
-
-Return the
-
-Aliases: I<length>
-
-=cut
-
-=head2 map
-
-RangeString.map() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 map_operator
-
-RangeString.map_operator() -> I<Obj>
 
 Return the
 
@@ -189,55 +88,19 @@ RangeString.new() -> I<Obj>
 
 Return the
 
-Aliases: I<call>
-
 =cut
 
-=head2 pam_operator
+=head2 pick
 
-RangeString.pam_operator() -> I<Obj>
+RangeString.pick() -> I<Obj>
 
 Return the
 
 =cut
 
-=head2 reduce
+=head2 to
 
-RangeString.reduce() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 reduce_operator
-
-RangeString.reduce_operator() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 step
-
-RangeString.step() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 to_a
-
-RangeString.to_a() -> I<Obj>
-
-Return the
-
-Aliases: I<to_array>
-
-=cut
-
-=head2 unroll_operator
-
-RangeString.unroll_operator() -> I<Obj>
+RangeString.to() -> I<Obj>
 
 Return the
 

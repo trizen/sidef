@@ -76,6 +76,8 @@ lib/Sidef/Types/Number/Nan.pm
 lib/Sidef/Types/Number/Ninf.pm
 lib/Sidef/Types/Number/Number.pm
 lib/Sidef/Types/Number/Number.pod
+lib/Sidef/Types/Range/Range.pm
+lib/Sidef/Types/Range/Range.pod
 lib/Sidef/Types/Range/RangeNumber.pm
 lib/Sidef/Types/Range/RangeNumber.pod
 lib/Sidef/Types/Range/RangeString.pm
