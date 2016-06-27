@@ -292,8 +292,11 @@ package Sidef::Types::Block::Block {
     sub while {
         my ($self, $condition) = @_;
 
-        while ($condition->{code}->()) {
-            $self->{code}->();
+        my $block = $self->{code};
+        $condition = $condition->{code};
+
+        while ($condition->()) {
+            $block->();
         }
 
         $self;
@@ -302,8 +305,10 @@ package Sidef::Types::Block::Block {
     sub loop {
         my ($self) = @_;
 
+        my $code = $self->{code};
+
         while (1) {
-            $self->{code}->();
+            $code->();
         }
 
         $self;
@@ -311,12 +316,7 @@ package Sidef::Types::Block::Block {
 
     sub if {
         my ($self, $bool) = @_;
-
-        if ($bool) {
-            return $self->{code}->();
-        }
-
-        $bool;
+        $bool ? $self->{code}->() : $bool;
     }
 
     sub __fdump {
@@ -410,8 +410,9 @@ package Sidef::Types::Block::Block {
             $args[0]->each($self);
         }
         else {
+            my $code = $self->{code};
             foreach my $item (@args) {
-                $self->{code}->($item);
+                $code->($item);
             }
             $self;
         }
