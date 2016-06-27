@@ -1092,7 +1092,7 @@ HEADER
                     map {
                         $self->_dump_string($_) . '=>'
                           . (defined($obj->{$_}) ? $self->deparse_expr({self => $obj->{$_}}) : 'undef')
-                      } keys(%{$obj})
+                      } sort keys(%{$obj})
                   )
                   . ')';
             }
@@ -1247,7 +1247,7 @@ HEADER
         }
         elsif ($ref eq 'Sidef::Types::Range::RangeString') {
             $code = $self->make_constant($ref, '__new__', "RangeString$refaddr",
-                                         map { "$_ => " . $self->_dump_string($obj->{$_}) } keys(%{$obj}));
+                                         map { "$_ => " . $self->_dump_string($obj->{$_}) } ('from', 'to', 'step'));
         }
         elsif ($ref eq 'Sidef::Types::Glob::Backtick') {
             $code = $self->make_constant($ref, 'new', "Backtick$refaddr", $self->_dump_string(${$obj}));

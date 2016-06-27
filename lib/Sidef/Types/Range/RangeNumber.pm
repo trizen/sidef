@@ -5,8 +5,16 @@ package Sidef::Types::Range::RangeNumber {
       Sidef::Object::Object
       );
 
-    use overload
-      '@{}' => \&to_a,
+    use overload '@{}' => sub {
+        $_[0]->{_cached_array} //= do {
+            my @array;
+            my $iter = $_[0]->iter->{code};
+            while (defined(my $num = $iter->())) {
+                push @array, $num;
+            }
+            \@array;
+        };
+      },
       q{""} => \&dump;
 
     use Sidef::Types::Bool::Bool;
