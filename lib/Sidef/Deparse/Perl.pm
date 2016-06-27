@@ -1246,8 +1246,8 @@ HEADER
                        map { 'Sidef::Types::Number::Number->_set_str(' . $obj->{$_}->_get_frac . ')' } ('from', 'to', 'step'));
         }
         elsif ($ref eq 'Sidef::Types::Range::RangeString') {
-            $code = $self->make_constant($ref, '__new__', "RangeString$refaddr",
-                                         map { "$_ => " . $self->_dump_string($obj->{$_}) } ('from', 'to', 'step'));
+            $code =
+              $self->make_constant($ref, '__new__', "RangeString$refaddr", map { "$_ => $obj->{$_}" } ('from', 'to', 'step'));
         }
         elsif ($ref eq 'Sidef::Types::Glob::Backtick') {
             $code = $self->make_constant($ref, 'new', "Backtick$refaddr", $self->_dump_string(${$obj}));

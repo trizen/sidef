@@ -10,8 +10,8 @@ var array = [['a','b'], ['a'], ['a', 'b'], ['z']];
 assert_eq(array.uniq, [["a", "b"], ["a"], ["z"]]);
 assert_eq(array.last_uniq, [["a"], ["a", "b"], ["z"]]);
 
-var a1 = ('a'..'z' -> shuffle);
-var a2 = ('a'..'z' -> shuffle);
+var a1 = @('a'..'z').shuffle;
+var a2 = @('a'..'z').shuffle;
 
 var nums = (a1 + a2);
 assert_eq(nums.uniq, a1);

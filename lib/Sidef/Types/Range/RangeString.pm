@@ -5,32 +5,46 @@ package Sidef::Types::Range::RangeString {
       Sidef::Object::Object
       );
 
-    use overload
-      '@{}' => \&to_a,
+    use overload '@{}' => sub {
+        $_[0]->{_cached_array} //= do {
+            my @array;
+            my $iter = $_[0]->iter->{code};
+            while (defined(my $chr = $iter->())) {
+                push @array, $chr;
+            }
+            \@array;
+        };
+      },
       q{""} => \&dump;
+
     use Sidef::Types::Bool::Bool;
 
     sub new {
-        my (undef, $from, $to, $direction) = @_;
+        my (undef, $from, $to, $step) = @_;
 
-        if (defined $to) {
-            $from      = ref($from)      ? $from->get_value      : $from;
-            $to        = ref($to)        ? $to->get_value        : $to;
-            $direction = ref($direction) ? $direction->get_value : defined($direction) ? $direction : 1;
-        }
-        elsif (defined $from) {
-            $to        = ref($from) ? $from->get_value : $from;
-            $from      = 'a';
-            $direction = 1;
+        if (defined $from) {
+            $from = "$from";
+            $from = $from eq '' ? -1 : CORE::ord("$from");
         }
         else {
-            ($from, $to, $direction) = ('b', 'a', 1);
+            $from = 0;
         }
+
+        if (defined $to) {
+            $to = "$to";
+            $to = $to eq '' ? -1 : CORE::ord("$to");
+        }
+        else {
+            $to   = $from;
+            $from = ord("a");
+        }
+
+        $step = defined($step) ? CORE::int($step) : 1;
 
         bless {
                from => $from,
                to   => $to,
-               asc  => $direction,
+               step => $step,
               },
           __PACKAGE__;
     }
@@ -44,17 +58,25 @@ package Sidef::Types::Range::RangeString {
 
     sub min {
         my ($self) = @_;
-        Sidef::Types::String::String->new($self->{asc} ? $self->{from} : $self->{to});
+        Sidef::Types::String::String->new(
+                                          $self->{step} > 0
+                                          ? ($self->{from} < 0 ? '' : CORE::chr($self->{from}))
+                                          : ($self->{to} < 0 ? '' : CORE::chr($self->{to}))
+                                         );
     }
 
     sub max {
         my ($self) = @_;
-        Sidef::Types::String::String->new($self->{asc} ? $self->{to} : $self->{from});
+        Sidef::Types::String::String->new(
+                                          $self->{step} > 0
+                                          ? ($self->{to} < 0 ? '' : CORE::chr($self->{to}))
+                                          : ($self->{from} < 0 ? '' : CORE::chr($self->{from}))
+                                         );
     }
 
-    sub asc {
+    sub step {
         my ($self) = @_;
-        $self->{asc} ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
+        Sidef::Types::Number::Number::_new_int($self->{step});
     }
 
     sub bounds {
@@ -64,57 +86,69 @@ package Sidef::Types::Range::RangeString {
 
     sub reverse {
         my ($self) = @_;
-        __PACKAGE__->__new__(
-                             from => $self->{to},
-                             to   => $self->{from},
-                             asc  => $self->{asc} ^ 1,
-                            );
+        $self->__new__(
+                       from => $self->{to},
+                       to   => $self->{from},
+                       step => -$self->{step},
+                      );
     }
 
+    *flip = \&reverse;
+
     sub contains {
-        my ($self, $num) = @_;
+        my ($self, $value) = @_;
 
-        my $value = $num->get_value;
-        my ($min, $max) = map { $_->get_value } ($self->min, $self->max);
+        $value = ord("$value");
 
-        ($value ge $min and $value le $max) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
+        my $step = $self->{step};
+        my $asc  = $step > 0;
+
+        my ($from, $to) = (
+                           $asc
+                           ? ($self->{from}, $self->{to})
+                           : ($self->{to}, $self->{from})
+                          );
+
+        (
+         $value >= $from and $value <= $to
+           and (
+                  CORE::abs($step) == 1 ? 1
+                : CORE::int(($value - ($asc ? $from : $to)) / $step) * $step == $value - ($asc ? $from : $to)
+               )
+          ) ? (Sidef::Types::Bool::Bool::TRUE)
+          : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     *contain  = \&contains;
     *include  = \&contains;
     *includes = \&contains;
 
-    sub each {
-        my ($self, $code) = @_;
+    sub iter {
+        my ($self) = @_;
 
         my $from = $self->{from};
         my $to   = $self->{to};
+        my $step = $self->{step};
 
-        if ($self->{asc}) {
-            if (length($from) == 1 and length($to) == 1) {
-                foreach my $i (ord($from) .. ord($to)) {
-                    $code->run(Sidef::Types::String::String->new(chr($i)));
-                }
-            }
-            else {
-                foreach my $str ($from .. $to) {    # this is lazy
-                    $code->run(Sidef::Types::String::String->new($str));
-                }
-            }
-        }
-        else {
-            if (length($from) == 1 and length($to) == 1) {
-                my $f = ord($from);
-                my $t = ord($to);
-                for (; $f >= $t ; $f--) {
-                    $code->run(Sidef::Types::String::String->new(chr($f)));
-                }
-            }
-            else {
-                foreach my $str (CORE::reverse($from .. $to)) {    # this is not lazy
-                    $code->run(Sidef::Types::String::String->new($str));
-                }
-            }
+        my $i   = $from;
+        my $asc = $step > 0;
+
+        Sidef::Types::Block::Block->new(
+            code => sub {
+                ($asc ? $i <= $to : $i >= $to) || return;
+                my $value = $i;
+                $i += $step;
+                Sidef::Types::String::String->new(CORE::chr($value));
+            },
+        );
+    }
+
+    sub each {
+        my ($self, $code) = @_;
+
+        my $iter = $self->iter->{code};
+        while (defined(my $chr = $iter->())) {
+            $code->run($chr);
         }
 
         $self;
@@ -123,51 +157,205 @@ package Sidef::Types::Range::RangeString {
     *for     = \&each;
     *foreach = \&each;
 
-    our $AUTOLOAD;
-    sub DESTROY { }
+    sub map {
+        my ($self, $code) = @_;
 
-    sub to_array {
+        my @values;
+        my $iter = $self->iter->{code};
+        while (defined(my $chr = $iter->())) {
+            push @values, $code->run($chr);
+        }
+
+        Sidef::Types::Array::Array->new(\@values);
+    }
+
+    sub grep {
+        my ($self, $code) = @_;
+
+        my @values;
+        my $iter = $self->iter->{code};
+        while (defined(my $chr = $iter->())) {
+            push(@values, $chr) if $code->run($chr);
+        }
+
+        Sidef::Types::Array::Array->new(\@values);
+    }
+
+    *select = \&grep;
+
+    sub all {
+        my ($self, $code) = @_;
+
+        my $iter = $self->iter->{code};
+        while (defined(my $chr = $iter->())) {
+            $code->run($chr)
+              || return Sidef::Types::Bool::Bool::FALSE;
+        }
+
+        Sidef::Types::Bool::Bool::TRUE;
+    }
+
+    sub any {
+        my ($self, $code) = @_;
+
+        my $iter = $self->iter->{code};
+        while (defined(my $chr = $iter->())) {
+            $code->run($chr)
+              && return Sidef::Types::Bool::Bool::TRUE;
+        }
+
+        Sidef::Types::Bool::Bool::FALSE;
+    }
+
+    sub length {
         my ($self) = @_;
-        local $AUTOLOAD;
-        $self->AUTOLOAD();
+        my $len = CORE::int(($self->{to} - $self->{from} + $self->{step}) / ($self->{step}));
+        $len <= 0
+          ? Sidef::Types::Number::Number::ZERO
+          : Sidef::Types::Number::Number::_new_uint($len);
     }
 
-    *to_a = \&to_array;
+    *len = \&length;
 
-    sub AUTOLOAD {
+    sub to_a {
+        my ($self) = @_;
+
+        my @array;
+        my $iter = $self->iter->{code};
+        while (defined(my $chr = $iter->())) {
+            push @array, $chr;
+        }
+
+        Sidef::Types::Array::Array->new(\@array);
+    }
+
+    *to_array = \&to_a;
+
+    sub to_list {
+        my ($self) = @_;
+
+        my @array;
+        my $iter = $self->iter->{code};
+        while (defined(my $chr = $iter->())) {
+            push @array, $chr;
+        }
+
+        (@array);
+    }
+
+    sub reduce {
+        my ($self, $obj) = @_;
+
+        if (ref($obj) eq 'Sidef::Types::Block::Block') {
+
+            my $iter  = $self->iter->{code};
+            my $value = $iter->();
+
+            while (defined(my $chr = $iter->())) {
+                $value = $obj->run($value, $chr);
+            }
+
+            return $value;
+        }
+
+        $self->reduce_operator("$obj");
+    }
+
+    sub reduce_operator {
+        my ($self, $op) = @_;
+
+        $op = "$op" if ref($op);
+
+        my $iter  = $self->iter->{code};
+        my $value = $iter->();
+
+        while (defined(my $num = $iter->())) {
+            $value = $value->$op($num);
+        }
+
+        $value;
+    }
+
+    sub map_operator {
         my ($self, @args) = @_;
-
-        my ($name) = (defined($AUTOLOAD) ? ($AUTOLOAD =~ /^.*[^:]::(.*)$/) : '');
-
-        my $array;
-        my $method = $self->{asc} ? 'array_to' : 'array_downto';
-
-        $array = Sidef::Types::String::String->new($self->{from})->$method(Sidef::Types::String::String->new($self->{to}));
-        $name eq '' ? $array : $array->$name(@args);
+        $self->to_a->map_operator(@args);
     }
+
+    sub pam_operator {
+        my ($self, @args) = @_;
+        $self->to_a->pam_operator(@args);
+    }
+
+    sub unroll_operator {
+        my ($self, @args) = @_;
+        $self->to_a->unroll_operator(@args);
+    }
+
+    sub cross_operator {
+        my ($self, @args) = @_;
+        $self->to_a->cross_operator(@args);
+    }
+
+    sub eq {
+        my ($r1, $r2) = @_;
+
+        ref($r1) eq ref($r2)
+          && $r1->{from} eq $r2->{from}
+          && $r1->{to} eq $r2->{to}
+          && $r1->{step} == $r2->{step}
+
+          ? (Sidef::Types::Bool::Bool::TRUE)
+          : (Sidef::Types::Bool::Bool::FALSE);
+    }
+
+    sub ne {
+        my ($r1, $r2) = @_;
+        $r1->eq($r2)
+          ? (Sidef::Types::Bool::Bool::FALSE)
+          : (Sidef::Types::Bool::Bool::TRUE);
+    }
+
+    #~ our $AUTOLOAD;
+    #~ sub DESTROY { }
+
+    #~ sub to_array {
+    #~ my ($self) = @_;
+    #~ local $AUTOLOAD;
+    #~ $self->AUTOLOAD();
+    #~ }
+
+    #~ *to_a = \&to_array;
+
+    #~ sub AUTOLOAD {
+    #~ my ($self, @args) = @_;
+
+    #~ my ($name) = (defined($AUTOLOAD) ? ($AUTOLOAD =~ /^.*[^:]::(.*)$/) : '');
+
+    #~ my $array;
+    #~ my $method = $self->{asc} ? 'array_to' : 'array_downto';
+
+    #~ $array = Sidef::Types::String::String->new($self->{from})->$method(Sidef::Types::String::String->new($self->{to}));
+    #~ $name eq '' ? $array : $array->$name(@args);
+    #~ }
 
     {
         no strict 'refs';
-        *{__PACKAGE__ . '::' . '=='} = sub {
-            my ($r1, $r2) = @_;
-            (ref($r1) eq ref($r2) and $r1->{from} eq $r2->{from} and $r1->{to} eq $r2->{to} and $r1->{asc} eq $r2->{asc})
-              ? (Sidef::Types::Bool::Bool::TRUE)
-              : (Sidef::Types::Bool::Bool::FALSE);
-        };
+        *{__PACKAGE__ . '::' . '=='}  = \&eq;
+        *{__PACKAGE__ . '::' . '!='}  = \&ne;
+        *{__PACKAGE__ . '::' . '...'} = \&to_list;
     }
 
     sub dump {
         my ($self) = @_;
         Sidef::Types::String::String->new(
-                                          "RangeStr("
-                                            . join(', ',
-                                                   ${Sidef::Types::String::String->new($self->{from})->dump},
-                                                   ${Sidef::Types::String::String->new($self->{to})->dump},
-                                                   $self->{asc}
-                                                   ? (Sidef::Types::Bool::Bool::TRUE)
-                                                   : (Sidef::Types::Bool::Bool::FALSE))
-                                            . ")"
-                                         );
+                           "RangeStr("
+                             . join(', ',
+                                    Sidef::Types::String::String->new($self->{from} < 0 ? '' : CORE::chr($self->{from}))->dump,
+                                    Sidef::Types::String::String->new($self->{to} < 0   ? '' : CORE::chr($self->{to}))->dump,
+                                    $self->{step},
+                                   )
+                             . ")"
+        );
     }
 }
 

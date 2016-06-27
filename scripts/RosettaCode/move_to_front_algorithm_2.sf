@@ -6,7 +6,7 @@
 
 module MoveToFront {
 
-  define ABC = "a".."z"
+  define ABC = @("a".."z")
 
   func m2f(ar,i) {
     [ar.delete_index(i)] + ar

@@ -27,9 +27,19 @@ package Sidef::Types::Range::RangeNumber {
     sub new {
         my (undef, $from, $to, $step) = @_;
 
+        if (not defined $from) {
+            $from = $ZERO;
+            $to   = $MONE;
+        }
+
+        if (not defined $to) {
+            $to   = $from->sub($ONE);
+            $from = $ZERO;
+        }
+
         bless {
-               from => $from // $ZERO,
-               to   => $to   // $MONE,
+               from => $from,
+               to   => $to,
                step => $step // $ONE,
               },
           __PACKAGE__;
@@ -56,6 +66,8 @@ package Sidef::Types::Range::RangeNumber {
         my ($self) = @_;
         $self->new($self->{to}, $self->{from}, $self->{step}->neg);
     }
+
+    *flip = \&reverse;
 
     sub min {
         my ($self) = @_;
@@ -89,13 +101,25 @@ package Sidef::Types::Range::RangeNumber {
         my $step = $self->{step};
         my $asc  = !!($step->is_pos);
 
-        my ($from, $to) = ($asc ? ($self->{from}, $self->{to}) : ($self->{to}, $self->{from}));
+        my ($from, $to) = (
+                           $asc
+                           ? ($self->{from}, $self->{to})
+                           : ($self->{to}, $self->{from})
+                          );
 
         (
          $value->ge($from) and $value->le($to)
            and (
-                  $step->is_one && $value->is_int ? 1
-                : $value->sub($asc ? $from : $to)->div($step)->int->mul($step)->eq($value->sub($asc ? $from : $to))
+                $step->abs->is_one && $value->is_int ? 1
+                : $value->sub(
+                                $asc ? $from
+                              : $to
+                )->div($step)->int->mul($step)->eq(
+                                                   $value->sub(
+                                                                 $asc ? $from
+                                                               : $to
+                                                              )
+                                                  )
                )
           ) ? (Sidef::Types::Bool::Bool::TRUE)
           : (Sidef::Types::Bool::Bool::FALSE);
@@ -132,6 +156,8 @@ package Sidef::Types::Range::RangeNumber {
         while (defined(my $num = $iter->())) {
             $code->run($num);
         }
+
+        $self;
     }
 
     *for     = \&each;

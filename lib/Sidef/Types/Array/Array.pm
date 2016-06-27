@@ -1815,7 +1815,7 @@ package Sidef::Types::Array::Array {
         $self->new([CORE::reverse @{$self}]);
     }
 
-    *reversed = \&reverse;    # alias
+    *flip = \&reverse;
 
     sub to_hash {
         my ($self) = @_;

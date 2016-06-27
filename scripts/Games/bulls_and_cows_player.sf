@@ -6,7 +6,7 @@
 
 # Build a list of all possible solutions.  The regular expression weeds
 # out numbers containing zeroes or repeated digits.
-var candidates = ('1234'..'9876' -> grep {|n| !(n =~ /0 | (\d) .*? \1 /x) }.map{.to_i.digits});
+var candidates = (1234..9876 -> grep {|n| !(n.to_s =~ /0 | (\d) .*? \1 /x) }.map{.to_i.digits});
 
 # Repeatedly prompt for input until the user supplies a reasonable score.
 # The regex validates the user's input and then returns two numbers.

@@ -31,5 +31,5 @@ var nums = @(0..7).shuffle;
 mergesort(nums).dump.say;
  
 # String sort
-var strings = ('a'..'e' -> shuffle);
+var strings = @('a'..'e').shuffle;
 mergesort(strings).dump.say;

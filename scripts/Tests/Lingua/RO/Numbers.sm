@@ -18,7 +18,7 @@ class new(diacritics            = true,
 
     # Numbers => text
     static DIGITS = Hash();
-    DIGITS{'0'..'19'} = %w(
+    DIGITS{0..19} = %w(
       zero unu doi trei patru cinci șase șapte opt nouă zece
       unsprezece
       doisprezece

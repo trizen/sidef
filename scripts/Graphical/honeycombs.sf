@@ -8,7 +8,7 @@ require('Tk')
 
 class Honeycombs(
     Number size   = 36,
-    Array letters = ('A' .. 'Z' -> shuffle.first(20)),
+    Array letters = @('A' .. 'Z').shuffle.first(20),
 ) {
 
     define tk   = %S<Tk>

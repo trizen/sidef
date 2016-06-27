@@ -392,7 +392,7 @@ package Sidef::Types::Hash::Hash {
     *include  = \&exists;
     *includes = \&exists;
 
-    sub flip {
+    sub reverse {
         my ($self) = @_;
 
         my $new_hash = $self->new();
@@ -402,7 +402,7 @@ package Sidef::Types::Hash::Hash {
         $new_hash;
     }
 
-    *reverse = \&flip;
+    *flip = \&reverse;
 
     sub copy {
         my ($self) = @_;

@@ -113,7 +113,8 @@ package Sidef::Optimizer {
             (
              map { [$_, [table(STRING)]] }
                methods(STRING, qw(
-                   to downto
+                   to
+                   downto
 
                    concat
                    prepend
@@ -293,8 +294,8 @@ package Sidef::Optimizer {
                    ipow
                    imod
                    range
-                   to
-                   downto
+                   to xto
+                   downto xdownto
 
                    shift_right
                    shift_left

@@ -136,57 +136,39 @@ package Sidef::Types::String::String {
         );
     }
 
-    sub array_to {
-        my ($self, $string) = @_;
-
-        my ($s1, $s2) = ($$self, "$string");
-
-        if (length($s1) == 1 and length($s2) == 1) {
-            return Sidef::Types::Array::Array->new([map { $self->new(chr($_)) } ord($s1) .. ord($s2)]);
-        }
-        Sidef::Types::Array::Array->new([map { $self->new($_) } $s1 .. $s2]);
-    }
-
-    *arr_to = \&array_to;
-
-    sub array_downto {
-        my ($self, $string) = @_;
-        $string->array_to($self)->reverse;
-    }
-
-    *arr_downto = \&array_downto;
-
     sub to {
-        my ($self, $string) = @_;
+        my ($from, $to, $step) = @_;
+
+        $from = CORE::ord($$from);
+        $to   = defined($to) ? CORE::ord($to) : ($from - 1);
+        $step = defined($step) ? CORE::int("$step") : 1;
+
         Sidef::Types::Range::RangeString->__new__(
-                                                  from => $$self,
-                                                  to   => "$string",
-                                                  asc  => 1,
+                                                  from => $from,
+                                                  to   => $to,
+                                                  step => $step,
                                                  );
     }
 
-    *up_to = \&to;
-    *upto  = \&to;
+    *upto = \&to;
 
     sub downto {
-        my ($self, $string) = @_;
+        my ($from, $to, $step) = @_;
+
+        $from = CORE::ord($$from);
+        $to   = defined($to) ? CORE::ord($to) : $from + 1;
+        $step = defined($step) ? CORE::int("$step") : 1;
+
         Sidef::Types::Range::RangeString->__new__(
-                                                  from => $$self,
-                                                  to   => "$string",
-                                                  asc  => 0,
+                                                  from => $from,
+                                                  to   => $to,
+                                                  step => -$step,
                                                  );
     }
 
-    *down_to = \&downto;
-
     sub range {
-        my ($self, $to, $step) = @_;
-
-        state $from = $self->new('a');
-
-        defined($to)
-          ? $self->to($to, $step)
-          : $from->to($self);
+        my ($from, $to, $step) = @_;
+        Sidef::Types::Range::RangeString->new($from, $to, $step);
     }
 
     sub cmp {
@@ -547,6 +529,8 @@ package Sidef::Types::String::String {
         my ($self) = @_;
         $self->new(scalar CORE::reverse($$self));
     }
+
+    *flip = \&reverse;
 
     sub printf {
         my ($self, @arguments) = @_;
@@ -1465,9 +1449,7 @@ package Sidef::Types::String::String {
         *{__PACKAGE__ . '::' . '<=>'} = \&cmp;
         *{__PACKAGE__ . '::' . '÷'}  = \&div;
         *{__PACKAGE__ . '::' . '/'}   = \&div;
-        *{__PACKAGE__ . '::' . '..'}  = \&array_to;
-        *{__PACKAGE__ . '::' . '..^'} = \&to;
-        *{__PACKAGE__ . '::' . '^..'} = \&downto;
+        *{__PACKAGE__ . '::' . '..'}  = \&to;
         *{__PACKAGE__ . '::' . '^'}   = \&xor;
         *{__PACKAGE__ . '::' . '|'}   = \&or;
         *{__PACKAGE__ . '::' . '&'}   = \&and;

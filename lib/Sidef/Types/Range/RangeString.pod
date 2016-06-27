@@ -23,17 +23,47 @@ Inherits methods from:
 =head1 METHODS
 
 
+=head2 !=
+
+I<Obj> B<!=> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<ne>
+
+=cut
+
+=head2 ...
+
+I<Obj> B<...> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<to_list>
+
+=cut
+
 =head2 ==
 
 I<Obj> B<==> I<Obj> -> I<Obj>
 
 Return the
 
+Aliases: I<eq>
+
 =cut
 
-=head2 asc
+=head2 all
 
-RangeString.asc() -> I<Obj>
+RangeString.all() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 any
+
+RangeString.any() -> I<Obj>
 
 Return the
 
@@ -57,11 +87,29 @@ Aliases: I<include>, I<contains>, I<includes>
 
 =cut
 
+=head2 cross_operator
+
+RangeString.cross_operator() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 dump
 
 RangeString.dump() -> I<Obj>
 
 Return the
+
+=cut
+
+=head2 flip
+
+RangeString.flip() -> I<Obj>
+
+Return the
+
+Aliases: I<reverse>
 
 =cut
 
@@ -72,6 +120,50 @@ RangeString.for() -> I<Obj>
 Return the
 
 Aliases: I<each>, I<foreach>
+
+=cut
+
+=head2 grep
+
+RangeString.grep() -> I<Obj>
+
+Return the
+
+Aliases: I<select>
+
+=cut
+
+=head2 iter
+
+RangeString.iter() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 len
+
+RangeString.len() -> I<Obj>
+
+Return the
+
+Aliases: I<length>
+
+=cut
+
+=head2 map
+
+RangeString.map() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 map_operator
+
+RangeString.map_operator() -> I<Obj>
+
+Return the
 
 =cut
 
@@ -101,9 +193,33 @@ Aliases: I<call>
 
 =cut
 
-=head2 reverse
+=head2 pam_operator
 
-RangeString.reverse() -> I<Obj>
+RangeString.pam_operator() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 reduce
+
+RangeString.reduce() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 reduce_operator
+
+RangeString.reduce_operator() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 step
+
+RangeString.step() -> I<Obj>
 
 Return the
 
@@ -116,5 +232,13 @@ RangeString.to_a() -> I<Obj>
 Return the
 
 Aliases: I<to_array>
+
+=cut
+
+=head2 unroll_operator
+
+RangeString.unroll_operator() -> I<Obj>
+
+Return the
 
 =cut

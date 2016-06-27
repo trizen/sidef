@@ -151,6 +151,16 @@ Return the
 
 =cut
 
+=head2 flip
+
+RangeNumber.flip() -> I<Obj>
+
+Return the
+
+Aliases: I<reverse>
+
+=cut
+
 =head2 for
 
 RangeNumber.for() -> I<Obj>
@@ -274,14 +284,6 @@ Return the
 =head2 reduce_operator
 
 RangeNumber.reduce_operator() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 reverse
-
-RangeNumber.reverse() -> I<Obj>
 
 Return the
 

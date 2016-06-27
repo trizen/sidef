@@ -5,7 +5,7 @@
 #
 
 func encode(str) {
-    var table = ('a'..'z' -> join);
+    var table = @('a'..'z').join;
     str.chars.map { |c|
         var s = '';
         table.sub!(Regex('(.*?)' + c), {|s1| s=s1; c + s1});
@@ -14,7 +14,7 @@ func encode(str) {
 }
 
 func decode(nums) {
-    var table = ('a'..'z' -> join);
+    var table = @('a'..'z').join;
     nums.map { |n|
         var s = '';
         table.sub!(Regex('(.{' + n + '})(.)'), {|s1, s2| s=s2; s2 + s1});

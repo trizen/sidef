@@ -90,7 +90,7 @@ I<Obj> B<..> I<Obj> -> I<Obj>
 
 Return the
 
-Aliases: I<arr_to>, I<array_to>
+Aliases: I<to>, I<upto>
 
 =cut
 
@@ -194,31 +194,11 @@ Aliases: I<xor>
 
 =cut
 
-=head2 ^..
-
-I<Obj> B<^..> I<Obj> -> I<Obj>
-
-Return the
-
-Aliases: I<down_to>, I<downto>
-
-=cut
-
 =head2 apply_escapes
 
 String.apply_escapes() -> I<Obj>
 
 Return the
-
-=cut
-
-=head2 arr_downto
-
-String.arr_downto() -> I<Obj>
-
-Return the
-
-Aliases: I<array_downto>
 
 =cut
 
@@ -358,6 +338,14 @@ Return the
 
 =cut
 
+=head2 downto
+
+String.downto() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 dump
 
 String.dump() -> I<Obj>
@@ -479,6 +467,16 @@ Aliases: I<foldcase>
 String.first() -> I<Obj>
 
 Return the
+
+=cut
+
+=head2 flip
+
+String.flip() -> I<Obj>
+
+Return the
+
+Aliases: I<reverse>
 
 =cut
 
@@ -810,14 +808,6 @@ Return the
 
 =cut
 
-=head2 reverse
-
-String.reverse() -> I<Obj>
-
-Return the
-
-=cut
-
 =head2 rindex
 
 String.rindex() -> I<Obj>
@@ -895,16 +885,6 @@ String.tclc() -> I<Obj>
 Return the
 
 Aliases: I<capitalize>
-
-=cut
-
-=head2 to
-
-String.to() -> I<Obj>
-
-Return the
-
-Aliases: I<..^()>, I<up_to>, I<upto>
 
 =cut
 

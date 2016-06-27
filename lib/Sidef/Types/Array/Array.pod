@@ -461,6 +461,16 @@ Return the
 
 =cut
 
+=head2 flip
+
+Array.flip() -> I<Obj>
+
+Return the
+
+Aliases: I<reverse>
+
+=cut
+
 =head2 for
 
 Array.for() -> I<Obj>
@@ -888,16 +898,6 @@ Array.resize() -> I<Obj>
 Return the
 
 Aliases: I<resize_to>
-
-=cut
-
-=head2 reverse
-
-Array.reverse() -> I<Obj>
-
-Return the
-
-Aliases: I<reversed>
 
 =cut
 

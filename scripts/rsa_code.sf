@@ -9,7 +9,7 @@ const e = 65537
 const d = 5617843187844953170308463622230283376298685
 
 module Message {
-    var alphabet = [('A' .. 'Z')..., ' ']
+    var alphabet = [@|('A' .. 'Z'), ' ']
     var rad = alphabet.len
     var code = Hash(^rad -> map {|i| (alphabet[i], i) }...)
     func encode(String t) {
