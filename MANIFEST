@@ -869,6 +869,16 @@ t/03-mod.t
 t/04-inf_nan.t
 t/05-trignometric.t
 t/09-parser.t
+t/accumulator_factory.t
+t/accumulator_factory_oo.t
+t/ackermann_function.t
+t/bernoulli_numbers_rec.t
+t/best_shuffle.t
+t/currying.t
+t/eval.t
+t/fibonacci.t
+t/levenshtein_distance.t
+t/man_or_boy.t
 t/manifest.t
 t/pod.t
 TODO

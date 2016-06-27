@@ -8,7 +8,6 @@ use warnings;
 use Test::More tests => 98;
 
 use Sidef;
-use Sidef::Types::Number::Number;
 
 sub re($) {
     qr/^\Q$_[0]\E\z/;

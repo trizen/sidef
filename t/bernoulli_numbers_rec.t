@@ -1,9 +1,16 @@
-#!/usr/bin/ruby
+#!perl -T
 
-# Recursive computation of Bernoulli numbers.
+use utf8;
+use 5.006;
+use strict;
+use warnings;
+use Test::More;
 
-# See: https://en.wikipedia.org/wiki/Bernoulli_number#Recursive_definition
-#      https://en.wikipedia.org/wiki/Binomial_coefficient#Recursive_formula
+plan tests => 10;
+
+use Sidef;
+
+my $code = <<'EOT';
 
 func bernoulli_number{};    # must be declared before used
 
@@ -27,7 +34,25 @@ bernoulli_number = func(n) is cached {
     n > 0 ? bern_diff(n - 1, 0, 1) : 1;
 }
 
-range(0, 20).each { |i|
-    var num = bernoulli_number(i) || next;
-    printf("B(%2d) = %20s / %s\n", i, num.parts);
+EOT
+
+my $sidef = Sidef->new(name => 'bernoulli_numbers');
+my $bern = $sidef->execute_code($code);
+
+my @bnums = qw(
+  1/1
+  1/6
+  -1/30
+  1/42
+  -1/30
+  5/66
+  -691/2730
+  7/6
+  -3617/510
+  43867/798
+  );
+
+foreach my $i (0 .. 9) {
+    my ($num, $den) = $bern->call(Sidef::Types::Number::Number->new(2 * $i))->parts;
+    is("$num/$den", "$bnums[$i]");
 }

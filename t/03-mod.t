@@ -8,7 +8,6 @@ use Test::More;
 plan tests => 14;
 
 use Sidef;
-use Sidef::Types::Number::Number;
 
 my $o = 'Sidef::Types::Number::Number';
 
