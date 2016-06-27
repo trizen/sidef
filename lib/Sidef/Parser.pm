@@ -22,8 +22,6 @@ package Sidef::Parser {
                              '++'  => 1,
                              '...' => 1,
                              '!'   => 1,
-                             '@'   => 1,
-                             '@|'  => 1,
                            },
 
             hyper_ops => {
@@ -60,7 +58,6 @@ package Sidef::Parser {
                      | Arr(?:ay)?+\b                  (?{ state $x = bless({}, 'Sidef::DataTypes::Array::Array') })
                      | MultiArr(?:ay)?+\b             (?{ state $x = bless({}, 'Sidef::DataTypes::Array::MultiArray') })
                      | Pair\b                         (?{ state $x = bless({}, 'Sidef::DataTypes::Array::Pair') })
-                     | Enumerator\b                   (?{ state $x = bless({}, 'Sidef::DataTypes::Array::Enumerator') })
                      | Hash\b                         (?{ state $x = bless({}, 'Sidef::DataTypes::Hash::Hash') })
                      | Str(?:ing)?+\b                 (?{ state $x = bless({}, 'Sidef::DataTypes::String::String') })
                      | Num(?:ber)?+\b                 (?{ state $x = bless({}, 'Sidef::DataTypes::Number::Number') })
@@ -73,6 +70,7 @@ package Sidef::Parser {
                      | Ref\b                          (?{ state $x = bless({}, 'Sidef::Variable::Ref') })
                      | Lazy\b                         (?{ state $x = bless({}, 'Sidef::DataTypes::Object::Lazy') })
                      | LazyMethod\b                   (?{ state $x = bless({}, 'Sidef::DataTypes::Object::LazyMethod') })
+                     | Enumerator\b                   (?{ state $x = bless({}, 'Sidef::DataTypes::Object::Enumerator') })
                      | Complex\b                      (?{ state $x = bless({}, 'Sidef::DataTypes::Number::Complex') })
                      | Regexp?\b                      (?{ state $x = bless({}, 'Sidef::DataTypes::Regex::Regex') })
                      | Object\b                       (?{ state $x = bless({}, 'Sidef::DataTypes::Object::Object') })

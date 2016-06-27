@@ -1,4 +1,4 @@
-package Sidef::Types::Array::Enumerator {
+package Sidef::Object::Enumerator {
 
     use 5.014;
     ##use overload q{""} => \&to_a;

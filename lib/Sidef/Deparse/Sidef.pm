@@ -21,7 +21,6 @@ package Sidef::Deparse::Sidef {
                   Sidef::DataTypes::Bool::Bool            Bool
                   Sidef::DataTypes::Array::Array          Array
                   Sidef::DataTypes::Array::Pair           Pair
-                  Sidef::DataTypes::Array::Enumerator     Enumerator
                   Sidef::DataTypes::Array::MultiArray     MultiArray
                   Sidef::DataTypes::Hash::Hash            Hash
                   Sidef::DataTypes::Regex::Regex          Regex
@@ -42,6 +41,7 @@ package Sidef::Deparse::Sidef {
                   Sidef::DataTypes::Sidef::Sidef          Sidef
                   Sidef::DataTypes::Object::Lazy          Lazy
                   Sidef::DataTypes::Object::LazyMethod    LazyMethod
+                  Sidef::DataTypes::Object::Enumerator    Enumerator
 
                   Sidef::Math::Math                       Math
                   Sidef::Meta::Glob::ARGF                 ARGF
@@ -63,12 +63,11 @@ package Sidef::Deparse::Sidef {
                   Sidef::Time::Time                       Time
                   Sidef::Sys::Sig                         Sig
                   Sidef::Meta::Unimplemented              ...
-
                   )
             },
             %args,
                    );
-        %addr = ();    # reset the addr map
+        %addr = ();    # reset the `addr` hash
         bless \%opts, __PACKAGE__;
     }
 

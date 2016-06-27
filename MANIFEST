@@ -11,6 +11,8 @@ lib/Sidef/Math/Math.pm
 lib/Sidef/Math/Math.pod
 lib/Sidef/Module/Func.pm
 lib/Sidef/Module/OO.pm
+lib/Sidef/Object/Enumerator.pm
+lib/Sidef/Object/Enumerator.pod
 lib/Sidef/Object/Lazy.pm
 lib/Sidef/Object/Lazy.pod
 lib/Sidef/Object/LazyMethod.pm
@@ -33,8 +35,6 @@ lib/Sidef/Time/Time.pm
 lib/Sidef/Time/Time.pod
 lib/Sidef/Types/Array/Array.pm
 lib/Sidef/Types/Array/Array.pod
-lib/Sidef/Types/Array/Enumerator.pm
-lib/Sidef/Types/Array/Enumerator.pod
 lib/Sidef/Types/Array/MultiArray.pm
 lib/Sidef/Types/Array/MultiArray.pod
 lib/Sidef/Types/Array/Pair.pm

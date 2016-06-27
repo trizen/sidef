@@ -30,6 +30,8 @@ provides:
     file: lib/Sidef/Module/Func.pm
   Sidef::Module::OO:
     file: lib/Sidef/Module/OO.pm
+  Sidef::Object::Enumerator:
+    file: lib/Sidef/Object/Enumerator.pm
   Sidef::Object::Lazy:
     file: lib/Sidef/Object/Lazy.pm
   Sidef::Object::LazyMethod:
@@ -54,8 +56,6 @@ provides:
     file: lib/Sidef/Time/Time.pm
   Sidef::Types::Array::Array:
     file: lib/Sidef/Types/Array/Array.pm
-  Sidef::Types::Array::Enumerator:
-    file: lib/Sidef/Types/Array/Enumerator.pm
   Sidef::Types::Array::MultiArray:
     file: lib/Sidef/Types/Array/MultiArray.pm
   Sidef::Types::Array::Pair:

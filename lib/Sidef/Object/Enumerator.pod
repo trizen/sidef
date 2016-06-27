@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-Sidef::Types::Array::Enumerator
+Sidef::Object::Enumerator
 
 =head1 DESCRIPTION
 

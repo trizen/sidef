@@ -51,7 +51,6 @@ package Sidef::Deparse::Perl {
                   Sidef::DataTypes::Bool::Bool            Sidef::Types::Bool::Bool
                   Sidef::DataTypes::Array::Array          Sidef::Types::Array::Array
                   Sidef::DataTypes::Array::Pair           Sidef::Types::Array::Pair
-                  Sidef::DataTypes::Array::Enumerator     Sidef::Types::Array::Enumerator
                   Sidef::DataTypes::Array::MultiArray     Sidef::Types::Array::MultiArray
                   Sidef::DataTypes::Hash::Hash            Sidef::Types::Hash::Hash
                   Sidef::DataTypes::Regex::Regex          Sidef::Types::Regex::Regex
@@ -72,6 +71,7 @@ package Sidef::Deparse::Perl {
                   Sidef::DataTypes::Sidef::Sidef          Sidef
                   Sidef::DataTypes::Object::Lazy          Sidef::Object::Lazy
                   Sidef::DataTypes::Object::LazyMethod    Sidef::Object::LazyMethod
+                  Sidef::DataTypes::Object::Enumerator    Sidef::Object::Enumerator
                   )
             },
 
