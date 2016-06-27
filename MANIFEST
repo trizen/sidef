@@ -883,6 +883,7 @@ t/levenshtein_distance.t
 t/man_or_boy.t
 t/manifest.t
 t/pod.t
+t/smart_word_wrap.t
 TODO
 utils/auto_perltidy.sh
 utils/bak_cleaner.sh
