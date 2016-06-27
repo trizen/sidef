@@ -16,8 +16,6 @@ class SmartWordWrap {
 
     has width = 80
 
-    # This is the ugliest method! It, recursively,
-    # prepares the words for the combine() function.
     method prepare_words(array, depth=0, callback) {
 
         var root = []
@@ -54,8 +52,6 @@ class SmartWordWrap {
         root
     }
 
-    # This function combines the
-    # the parents with the childrens.
     method combine(root, path, callback) {
         var key = path.shift
         path.each { |value|
@@ -72,9 +68,6 @@ class SmartWordWrap {
         }
     }
 
-    # This is the main function of the algorithm
-    # which calls all the other functions and
-    # returns the best possible wrapped string.
     method smart_wrap(text, width) {
 
         self.width = width
