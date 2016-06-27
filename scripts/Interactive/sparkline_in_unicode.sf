@@ -4,7 +4,7 @@
 ## http://rosettacode.org/wiki/Sparkline_in_unicode
 #
 
-var bar = '▁'..'█';
+var bar = @('▁'..'█');
 loop {
     print 'Numbers, please, separated by space/commas: ';
     var numbers = read(String).trim.split(/[\s,]+/).map{.to_f};

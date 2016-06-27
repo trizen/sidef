@@ -33,7 +33,7 @@ func output(value, type) {
 }
 
 while (true) {
-    var value = try   { eval Sys.scanln("How long ago? (any expression, in years): ") }
+    var value = try   { eval Sys.scanln("How long ago? (any expression, in years): ")\\break }
                 catch { say "Invalid input!"; next };
 
     cosmic_year.each { |bit|
