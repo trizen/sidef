@@ -111,22 +111,6 @@ package Sidef::Types::Number::Ninf {
     *next_power       = \&nan;
     *digit            = \&nan;
 
-    sub as_bin {
-        state $x = Sidef::Types::String::String->new;
-    }
-
-    *as_oct = \&as_bin;
-    *as_hex = \&as_bin;
-
-    sub digits {
-        Sidef::Types::Array::Array->new;
-    }
-
-    sub divmod {
-        my ($x, $y) = @_;
-        ($x->div($y), Sidef::Types::Number::Nan::NAN);
-    }
-
     sub inf { Sidef::Types::Number::Inf::INF }
 
     *neg    = \&inf;
@@ -320,8 +304,7 @@ package Sidef::Types::Number::Ninf {
     #
 
     sub eq {
-        my ($x, $y) = @_;
-        if (ref($y) eq __PACKAGE__) {
+        if (ref($_[1]) eq __PACKAGE__) {
             (Sidef::Types::Bool::Bool::TRUE);
         }
         else {
@@ -330,8 +313,7 @@ package Sidef::Types::Number::Ninf {
     }
 
     sub ne {
-        my ($x, $y) = @_;
-        if (ref($y) eq __PACKAGE__) {
+        if (ref($_[1]) eq __PACKAGE__) {
             (Sidef::Types::Bool::Bool::FALSE);
         }
         else {
@@ -344,8 +326,7 @@ package Sidef::Types::Number::Ninf {
     }
 
     sub ge {
-        my ($x, $y) = @_;
-        if (ref($y) eq __PACKAGE__) {
+        if (ref($_[1]) eq __PACKAGE__) {
             (Sidef::Types::Bool::Bool::TRUE);
         }
         else {
@@ -354,8 +335,7 @@ package Sidef::Types::Number::Ninf {
     }
 
     sub lt {
-        my ($x, $y) = @_;
-        if (ref($y) eq __PACKAGE__) {
+        if (ref($_[1]) eq __PACKAGE__) {
             (Sidef::Types::Bool::Bool::FALSE);
         }
         else {
@@ -368,17 +348,17 @@ package Sidef::Types::Number::Ninf {
     }
 
     sub cmp {
-        my ($x, $y) = @_;
-        ref($y) eq __PACKAGE__ ? (Sidef::Types::Number::Number::ZERO) : (Sidef::Types::Number::Number::MONE);
+        ref($_[1]) eq __PACKAGE__
+          ? Sidef::Types::Number::Number::ZERO
+          : Sidef::Types::Number::Number::MONE;
     }
 
     sub i {
-        my ($x) = @_;
-        Sidef::Types::Number::Complex->new(0, $x);
+        state $x = Sidef::Types::Number::Complex->new(0, NINF);
     }
 
     sub dump {
-        Sidef::Types::String::String->new('-Inf');
+        state $x = Sidef::Types::String::String->new('-Inf');
     }
 
     *commify = \&dump;

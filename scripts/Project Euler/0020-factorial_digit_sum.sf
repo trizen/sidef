@@ -7,5 +7,7 @@
 # Answer: 648
 
 var n = 100!;
+say +(^n.len).map { |i| n.digit(i) }.sum;
 
-say range(0, n.length-1).map { |i| n.digit(i) }.sum;
+# Alternatively:
+say 100!.digits.sum;

@@ -1505,8 +1505,10 @@ package Sidef::Types::Number::Number {
     }
 
     sub int {
+        my $q = ${$_[0]};
+        Math::GMPq::Rmpq_integer_p($q) && return ($_[0]);
         my $z = Math::GMPz::Rmpz_init();
-        Math::GMPz::Rmpz_set_q($z, ${$_[0]});
+        Math::GMPz::Rmpz_set_q($z, $q);
         _mpz2big($z);
     }
 
@@ -1532,8 +1534,12 @@ package Sidef::Types::Number::Number {
             $base = 10;
         }
 
+        my $q = $$x;
+        Math::GMPq::Rmpq_integer_p($q)
+          && return (Sidef::Types::String::String->new(Math::GMPq::Rmpq_get_str($q, $base)));
+
         my $z = Math::GMPz::Rmpz_init();
-        Math::GMPz::Rmpz_set_q($z, $$x);
+        Math::GMPz::Rmpz_set_q($z, $q);
         Sidef::Types::String::String->new(Math::GMPz::Rmpz_get_str($z, $base));
     }
 
@@ -1559,38 +1565,77 @@ package Sidef::Types::Number::Number {
     *dump = \&as_rat;
 
     sub as_bin {
-        my $z = Math::GMPz::Rmpz_init();
-        Math::GMPz::Rmpz_set_q($z, ${$_[0]});
-        Sidef::Types::String::String->new(Math::GMPz::Rmpz_get_str($z, 2));
+        my $q = ${$_[0]};
+        my $str =
+            Math::GMPq::Rmpq_integer_p($q)
+          ? Math::GMPq::Rmpq_get_str($q, 2)
+          : do {
+            my $z = Math::GMPz::Rmpz_init();
+            Math::GMPz::Rmpz_set_q($z, $q);
+            Math::GMPz::Rmpz_get_str($z, 2);
+          };
+        Sidef::Types::String::String->new($str);
     }
 
     sub as_oct {
-        my $z = Math::GMPz::Rmpz_init();
-        Math::GMPz::Rmpz_set_q($z, ${$_[0]});
-        Sidef::Types::String::String->new(Math::GMPz::Rmpz_get_str($z, 8));
+        my $q = ${$_[0]};
+        my $str =
+            Math::GMPq::Rmpq_integer_p($q)
+          ? Math::GMPq::Rmpq_get_str($q, 8)
+          : do {
+            my $z = Math::GMPz::Rmpz_init();
+            Math::GMPz::Rmpz_set_q($z, $q);
+            Math::GMPz::Rmpz_get_str($z, 8);
+          };
+        Sidef::Types::String::String->new($str);
     }
 
     sub as_hex {
-        my $z = Math::GMPz::Rmpz_init();
-        Math::GMPz::Rmpz_set_q($z, ${$_[0]});
-        Sidef::Types::String::String->new(Math::GMPz::Rmpz_get_str($z, 16));
+        my $q = ${$_[0]};
+        my $str =
+            Math::GMPq::Rmpq_integer_p($q)
+          ? Math::GMPq::Rmpq_get_str($q, 16)
+          : do {
+            my $z = Math::GMPz::Rmpz_init();
+            Math::GMPz::Rmpz_set_q($z, $q);
+            Math::GMPz::Rmpz_get_str($z, 16);
+          };
+        Sidef::Types::String::String->new($str);
     }
 
     sub digits {
-        my $z = Math::GMPz::Rmpz_init();
-        Math::GMPz::Rmpz_set_q($z, ${$_[0]});
-        Math::GMPz::Rmpz_abs($z, $z);
-        Sidef::Types::Array::Array->new([map { _new_uint($_) } split(//, Math::GMPz::Rmpz_get_str($z, 10))]);
+        my $q = ${$_[0]};
+
+        my $str =
+            Math::GMPq::Rmpq_integer_p($q)
+          ? Math::GMPq::Rmpq_get_str($q, 10)
+          : do {
+            my $z = Math::GMPz::Rmpz_init();
+            Math::GMPz::Rmpz_set_q($z, $q);
+            Math::GMPz::Rmpz_get_str($z, 10);
+          };
+
+        $str =~ tr/-//d;
+        Sidef::Types::Array::Array->new([map { _new_uint($_) } split(//, $str)]);
     }
 
     sub digit {
         my ($x, $y) = @_;
         _valid(\$y);
-        my $z = Math::GMPz::Rmpz_init();
-        Math::GMPz::Rmpz_set_q($z, $$x);
-        Math::GMPz::Rmpz_abs($z, $z);
-        my $digit = (split(//, Math::GMPz::Rmpz_get_str($z, 10)))[Math::GMPq::Rmpq_get_d($$y)];
-        defined($digit) ? _new_uint($digit) : (MONE);
+
+        my $q = $$x;
+        my $str =
+            Math::GMPq::Rmpq_integer_p($q)
+          ? Math::GMPq::Rmpq_get_str($q, 10)
+          : do {
+            my $z = Math::GMPz::Rmpz_init();
+            Math::GMPz::Rmpz_set_q($z, $q);
+            Math::GMPz::Rmpz_get_str($z, 10);
+          };
+
+        $str =~ tr/-//d;
+        my $digit = substr($str, Math::GMPq::Rmpq_get_d($$y), 1);
+        length($digit) ? _new_uint($digit) : nan();
     }
 
     sub length {
@@ -1598,7 +1643,7 @@ package Sidef::Types::Number::Number {
         Math::GMPz::Rmpz_set_q($z, ${$_[0]});
         Math::GMPz::Rmpz_abs($z, $z);
 
-        #_new_uint(Math::GMPz::Rmpz_sizeinbase($z, 10));        # turns out to be inexact
+        #_new_uint(Math::GMPz::Rmpz_sizeinbase($z, 10));        # turned out to be inexact
         _new_uint(Math::GMPz::Rmpz_snprintf(my $buf, 0, "%Zd", $z, 0));
     }
 

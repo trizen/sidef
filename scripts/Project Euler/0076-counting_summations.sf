@@ -18,6 +18,6 @@ func count(n, i=0, sum=0) is cached {
 }
 
 var n = 100;
-nums = (1 .. n-1);
+nums = @(1 ..^ n);
 
 say count(100);

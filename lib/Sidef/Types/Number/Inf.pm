@@ -134,7 +134,7 @@ package Sidef::Types::Number::Inf {
     *iroot = \&root;
 
     sub min { $_[1] }
-    sub inf { $_[0] }
+    sub inf { INF }
 
     *max              = \&inf;
     *abs              = \&inf;
@@ -196,7 +196,7 @@ package Sidef::Types::Number::Inf {
     *round            = \&inf;
     *roundf           = \&inf;
 
-    sub zero { (Sidef::Types::Number::Number::ZERO) }
+    sub zero { Sidef::Types::Number::Number::ZERO }
 
     *inv = \&zero;
 
@@ -211,7 +211,7 @@ package Sidef::Types::Number::Inf {
     *acoth = \&zero;
     *erfc  = \&zero;
 
-    sub tanh { (Sidef::Types::Number::Number::ONE) }
+    sub tanh { Sidef::Types::Number::Number::ONE }
 
     *coth = \&tanh;
     *zeta = \&tanh;
@@ -354,8 +354,7 @@ package Sidef::Types::Number::Inf {
     #
 
     sub eq {
-        my ($x, $y) = @_;
-        if (ref($y) eq __PACKAGE__) {
+        if (ref($_[1]) eq __PACKAGE__) {
             (Sidef::Types::Bool::Bool::TRUE);
         }
         else {
@@ -364,8 +363,7 @@ package Sidef::Types::Number::Inf {
     }
 
     sub ne {
-        my ($x, $y) = @_;
-        if (ref($y) eq __PACKAGE__) {
+        if (ref($_[1]) eq __PACKAGE__) {
             (Sidef::Types::Bool::Bool::FALSE);
         }
         else {
@@ -374,8 +372,7 @@ package Sidef::Types::Number::Inf {
     }
 
     sub gt {
-        my ($x, $y) = @_;
-        if (ref($y) eq __PACKAGE__) {
+        if (ref($_[1]) eq __PACKAGE__) {
             (Sidef::Types::Bool::Bool::FALSE);
         }
         else {
@@ -392,8 +389,7 @@ package Sidef::Types::Number::Inf {
     }
 
     sub le {
-        my ($x, $y) = @_;
-        if (ref($y) eq __PACKAGE__) {
+        if (ref($_[1]) eq __PACKAGE__) {
             (Sidef::Types::Bool::Bool::TRUE);
         }
         else {
@@ -402,17 +398,17 @@ package Sidef::Types::Number::Inf {
     }
 
     sub cmp {
-        my ($x, $y) = @_;
-        ref($y) eq __PACKAGE__ ? (Sidef::Types::Number::Number::ZERO) : (Sidef::Types::Number::Number::ONE);
+        ref($_[1]) eq __PACKAGE__
+          ? Sidef::Types::Number::Number::ZERO
+          : Sidef::Types::Number::Number::ONE;
     }
 
     sub i {
-        my ($x) = @_;
-        Sidef::Types::Number::Complex->new(0, $x);
+        state $x = Sidef::Types::Number::Complex->new(0, INF);
     }
 
     sub dump {
-        Sidef::Types::String::String->new('Inf');
+        state $x = Sidef::Types::String::String->new('Inf');
     }
 
     *commify = \&dump;

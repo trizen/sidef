@@ -22,11 +22,9 @@ package Sidef::Types::Number::Nan {
 
     sub get_value { 'NaN' }
 
-    sub is_nan {
-        (Sidef::Types::Bool::Bool::TRUE);
-    }
+    sub is_nan { Sidef::Types::Bool::Bool::TRUE }
 
-    sub nan { $_[0] }
+    sub nan { NAN }
 
     *abs         = \&nan;
     *add         = \&nan;
@@ -104,9 +102,7 @@ package Sidef::Types::Number::Nan {
     *max         = \&nan;
     *min         = \&nan;
     *int         = \&nan;
-    *as_int      = \&nan;
     *float       = \&nan;
-    *as_float    = \&nan;
     *sqr         = \&nan;
     *next_pow    = \&nan;
     *next_pow2   = \&nan;
@@ -139,7 +135,9 @@ package Sidef::Types::Number::Nan {
 
     sub eq {
         my ($x, $y) = @_;
-        ref($y) eq ref($x) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
+        ref($y) eq ref($x)
+          ? Sidef::Types::Bool::Bool::TRUE
+          : Sidef::Types::Bool::Bool::FALSE;
     }
 
     sub is_inf {
@@ -170,29 +168,34 @@ package Sidef::Types::Number::Nan {
     sub complex {
         my ($x, $y) = @_;
         if (defined $y) {
-            Sidef::Types::Number::Complex->new($x, $y);
+            Sidef::Types::Number::Complex->new(NAN, $y);
         }
         else {
-            Sidef::Types::Number::Complex->new($x);
+            state $z = Sidef::Types::Number::Complex->new(NAN);
         }
     }
 
     *c = \&complex;
 
     sub i {
-        my ($x) = @_;
-        Sidef::Types::Number::Complex->new(0, $x);
+        state $x = Sidef::Types::Number::Complex->new(0, NAN);
     }
 
     sub dump {
-        Sidef::Types::String::String->new('NaN');
+        state $x = Sidef::Types::String::String->new('NaN');
     }
 
     *commify = \&dump;
 
     sub chr {
-        Sidef::Types::String::String->new('');
+        state $x = Sidef::Types::String::String->new('');
     }
+
+    *as_bin   = \&chr;
+    *as_hex   = \&chr;
+    *as_oct   = \&chr;
+    *as_int   = \&chr;
+    *as_float = \&chr;
 
     sub numerator {
         Sidef::Types::Number::Number::ZERO;
@@ -207,10 +210,11 @@ package Sidef::Types::Number::Nan {
     *de = \&denominator;
 
     sub of {
-        Sidef::Types::Array::Array->new();
+        Sidef::Types::Array::Array->new([]);
     }
 
-    *defs = \&of;
+    *defs   = \&of;
+    *digits = \&of;
 
     sub times { $_[1] }
 
@@ -221,6 +225,8 @@ package Sidef::Types::Number::Nan {
     }
 
     *nude = \&parts;
+
+    sub digits { Sidef::Types::Array::Array->new([]) }
 
     {
         no strict 'refs';
