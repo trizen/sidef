@@ -362,7 +362,7 @@ package Sidef::Types::Glob::File {
 
         $mode = "$mode" if (ref $mode);
 
-        my $success = CORE::open(my $fh, $mode, "$self");
+        my $success = CORE::open(my $fh, $mode, ref($self) eq __PACKAGE__ ? $$self : "$self");
         my $error   = $!;
         my $fh_obj  = Sidef::Types::Glob::FileHandle->new(fh => $fh, self => $self);
 
@@ -382,7 +382,7 @@ package Sidef::Types::Glob::File {
 
     sub open_r {
         my ($self, @rest) = @_;
-        unless (ref($_[0])) {
+        unless (ref($self)) {
             $self = $self->new(shift @rest);
         }
         $self->open('<:utf8', @rest);
@@ -392,7 +392,7 @@ package Sidef::Types::Glob::File {
 
     sub open_w {
         my ($self, @rest) = @_;
-        unless (ref($_[0])) {
+        unless (ref($self)) {
             $self = $self->new(shift @rest);
         }
         $self->open('>:utf8', @rest);
@@ -402,7 +402,7 @@ package Sidef::Types::Glob::File {
 
     sub open_a {
         my ($self, @rest) = @_;
-        unless (ref($_[0])) {
+        unless (ref($self)) {
             $self = $self->new(shift @rest);
         }
         $self->open('>>:utf8', @rest);
@@ -412,7 +412,7 @@ package Sidef::Types::Glob::File {
 
     sub open_rw {
         my ($self, @rest) = @_;
-        unless (ref($_[0])) {
+        unless (ref($self)) {
             $self = $self->new(shift @rest);
         }
         $self->open('+<:utf8', @rest);
