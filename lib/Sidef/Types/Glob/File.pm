@@ -265,8 +265,11 @@ package Sidef::Types::Glob::File {
     *is_abs = \&is_absolute;
 
     sub abs_name {
-        ref($_[0]) || shift(@_);
         my ($self) = @_;
+
+        unless (ref($self)) {
+            $self = $self->new($_[1]);
+        }
 
         state $x = require File::Spec;
         $self->new(File::Spec->rel2abs("$self"));
@@ -277,8 +280,12 @@ package Sidef::Types::Glob::File {
     *rel2abs = \&abs_name;
 
     sub rel_name {
-        ref($_[0]) || shift(@_);
         my ($self, $base) = @_;
+
+        unless (ref($self)) {
+            ($self, $base) = ($self->new($base), $_[2]);
+        }
+
         state $x = require File::Spec;
         $self->new(File::Spec->rel2abs("$self", defined($base) ? "$base" : ()));
     }
@@ -374,32 +381,40 @@ package Sidef::Types::Glob::File {
     }
 
     sub open_r {
-        ref($_[0]) || shift(@_);
         my ($self, @rest) = @_;
+        unless (ref($_[0])) {
+            $self = $self->new(shift @rest);
+        }
         $self->open('<:utf8', @rest);
     }
 
     *open_read = \&open_r;
 
     sub open_w {
-        ref($_[0]) || shift(@_);
         my ($self, @rest) = @_;
+        unless (ref($_[0])) {
+            $self = $self->new(shift @rest);
+        }
         $self->open('>:utf8', @rest);
     }
 
     *open_write = \&open_w;
 
     sub open_a {
-        ref($_[0]) || shift(@_);
         my ($self, @rest) = @_;
+        unless (ref($_[0])) {
+            $self = $self->new(shift @rest);
+        }
         $self->open('>>:utf8', @rest);
     }
 
     *open_append = \&open_a;
 
     sub open_rw {
-        ref($_[0]) || shift(@_);
         my ($self, @rest) = @_;
+        unless (ref($_[0])) {
+            $self = $self->new(shift @rest);
+        }
         $self->open('+<:utf8', @rest);
     }
 

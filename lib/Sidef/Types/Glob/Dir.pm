@@ -25,8 +25,6 @@ package Sidef::Types::Glob::Dir {
     sub to_dir    { $_[0] }
 
     sub root {
-        my ($self) = @_;
-
         state $x = require File::Spec;
         __PACKAGE__->new(File::Spec->rootdir);
     }
@@ -173,7 +171,9 @@ package Sidef::Types::Glob::Dir {
         my ($self, $file) = @_;
 
         state $x = require File::Spec;
-        $file->new(File::Spec->catdir("$self", "$file"));
+        ref($file) eq 'Sidef::Types::Glob::File'
+          ? $file->new(File::Spec->catfile("$self", "$file"))
+          : __PACKAGE__->new(File::Spec->catdir("$self", "$file"));
     }
 
     *catfile = \&concat;
