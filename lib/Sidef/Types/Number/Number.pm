@@ -530,9 +530,10 @@ package Sidef::Types::Number::Number {
     *negative = \&neg;
 
     sub abs {
-        my ($x) = @_;
+        my $q = ${$_[0]};
+        Math::GMPq::Rmpq_sgn($q) >= 0 and return ($_[0]);
         my $r = Math::GMPq::Rmpq_init();
-        Math::GMPq::Rmpq_abs($r, $$x);
+        Math::GMPq::Rmpq_abs($r, $q);
         bless \$r, __PACKAGE__;
     }
 
