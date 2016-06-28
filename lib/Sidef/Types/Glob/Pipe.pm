@@ -24,10 +24,11 @@ package Sidef::Types::Glob::Pipe {
     }
 
     sub open {
+        ref($_[0]) || shift(@_);
         my ($self, $mode, $var_ref) = @_;
 
         if (ref $mode) {
-            $mode = $mode->get_value;
+            $mode = "$mode";
         }
 
         my $pid = open(my $pipe_h, $mode, @{$self});
@@ -45,6 +46,7 @@ package Sidef::Types::Glob::Pipe {
     }
 
     sub open_r {
+        ref($_[0]) || shift(@_);
         my ($self, $var_ref) = @_;
         $self->open('-|:utf8', $var_ref);
     }
@@ -52,6 +54,7 @@ package Sidef::Types::Glob::Pipe {
     *open_read = \&open_r;
 
     sub open_w {
+        ref($_[0]) || shift(@_);
         my ($self, $var_ref) = @_;
         $self->open('|-:utf8', $var_ref);
     }
@@ -61,7 +64,7 @@ package Sidef::Types::Glob::Pipe {
     sub dump {
         my ($self) = @_;
         Sidef::Types::String::String->new(
-                          'Pipe(' . join(', ', map { Sidef::Types::String::String->new($_)->dump->get_value } @{$self}) . ')');
+                                'Pipe(' . join(', ', map { ${Sidef::Types::String::String->new("$_")->dump} } @{$self}) . ')');
     }
 }
 

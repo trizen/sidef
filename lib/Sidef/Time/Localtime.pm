@@ -9,12 +9,14 @@ package Sidef::Time::Localtime {
       q{""}   => \&ctime,
       q{bool} => sub { $_[0]->{sec} };
 
+    use Sidef::Types::Number::Number;
+
     sub new {
         my (undef, $sec) = @_;
 
         bless {
                sec  => $sec,
-               time => [map { Sidef::Types::Number::Number->new($_) } localtime($sec)],
+               time => [map { Sidef::Types::Number::Number::_new_uint($_) } localtime($sec)],
               },
           __PACKAGE__;
     }

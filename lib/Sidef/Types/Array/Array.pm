@@ -59,9 +59,10 @@ package Sidef::Types::Array::Array {
 
         my @array;
 
-        (my @arg = @$arg) || return $self->clone;
-        my @self  = @$self;
-        my $argc  = @arg;
+        my @arg  = @$arg;
+        my @self = @$self;
+
+        (my $argc = @arg) || return $self->new(\@self);
         my $selfc = @self;
 
         my $max = $argc > $selfc ? $argc - 1 : $selfc - 1;

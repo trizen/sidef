@@ -11,7 +11,7 @@ package Sidef::Types::Glob::Dir {
         my (undef, $dir) = @_;
         if (@_ > 2) {
             state $x = require File::Spec;
-            $dir = File::Spec->catdir(map { ref($_) ? $_->to_dir->get_value : $_ } @_[1 .. $#_]);
+            $dir = File::Spec->catdir(map { "$_" } @_[1 .. $#_]);
         }
         elsif (ref($dir)) {
             return $dir->to_dir;
@@ -70,25 +70,25 @@ package Sidef::Types::Glob::Dir {
     }
 
     sub split {
+        ref($_[0]) || shift(@_);
         my ($self) = @_;
-        @_ == 2 && ($self = $_[1]);
         state $x = require File::Spec;
-        Sidef::Types::Array::Array->new(map { Sidef::Types::String::String->new($_) } File::Spec->splitdir($self->get_value));
+        Sidef::Types::Array::Array->new(map { Sidef::Types::String::String->new($_) } File::Spec->splitdir("$self"));
     }
 
     # Returns the parent of the directory
     sub parent {
+        ref($_[0]) || shift(@_);
         my ($self) = @_;
-        @_ == 2 && ($self = $_[1]);
         state $x = require File::Basename;
-        __PACKAGE__->new(File::Basename::dirname($self->get_value));
+        __PACKAGE__->new(File::Basename::dirname("$self"));
     }
 
     # Remove the directory (works only on empty dirs)
     sub remove {
+        ref($_[0]) || shift(@_);
         my ($self) = @_;
-        @_ == 2 && ($self = $_[1]);
-        (rmdir $self->get_value) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
+        CORE::rmdir("$self") ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     *delete = \&remove;
@@ -96,17 +96,18 @@ package Sidef::Types::Glob::Dir {
 
     # Remove the directory with all its content
     sub remove_tree {
+        ref($_[0]) || shift(@_);
         my ($self) = @_;
-        @_ == 2 && ($self = $_[1]);
+
         state $x = require File::Path;
-        (File::Path::remove_tree($self->get_value)) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
+        (File::Path::remove_tree("$self")) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     # Create directory without parents
     sub create {
+        ref($_[0]) || shift(@_);
         my ($self) = @_;
-        @_ == 2 && ($self = $_[1]);
-        (mkdir($self->get_value)) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
+        (CORE::mkdir("$self")) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     *make  = \&create;
@@ -114,10 +115,10 @@ package Sidef::Types::Glob::Dir {
 
     # Create the directory (with parents, if needed)
     sub create_tree {
+        ref($_[0]) || shift(@_);
         my ($self) = @_;
-        @_ == 2 && ($self = $_[1]);
         state $x = require File::Path;
-        my $path = $self->get_value;
+        my $path = "$self";
         -d $path                           ? (Sidef::Types::Bool::Bool::TRUE)
           : (File::Path::make_path($path)) ? (Sidef::Types::Bool::Bool::TRUE)
           :                                  (Sidef::Types::Bool::Bool::FALSE);
@@ -129,9 +130,10 @@ package Sidef::Types::Glob::Dir {
     *mkpath    = \&create_tree;
 
     sub open {
+        ref($_[0]) || shift(@_);
         my ($self, $fh_ref, $err_ref) = @_;
 
-        my $success = opendir(my $dir_h, $self->get_value);
+        my $success = opendir(my $dir_h, "$self");
         my $error   = $!;
         my $dir_obj = Sidef::Types::Glob::DirHandle->new(dir_h => $dir_h, dir => $self);
 
@@ -155,34 +157,31 @@ package Sidef::Types::Glob::Dir {
     sub open_rw { ... }
 
     sub chdir {
+        ref($_[0]) || shift(@_);
         my ($self) = @_;
-        @_ == 2 && ($self = $_[1]);
-        (chdir($self->get_value)) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
+        (chdir("$self")) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub chroot {
+        ref($_[0]) || shift(@_);
         my ($self) = @_;
-        @_ == 2 && ($self = $_[1]);
-        (chroot($self->get_value)) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
+        (chroot("$self")) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub concat {
+        ref($_[0]) || shift(@_);
         my ($self, $file) = @_;
 
-        if (@_ == 3) {
-            ($self, $file) = ($file, $_[2]);
-        }
-
         state $x = require File::Spec;
-        $file->new(File::Spec->catdir($self->get_value, $file->get_value));
+        $file->new(File::Spec->catdir("$self", "$file"));
     }
 
     *catfile = \&concat;
 
     sub is_empty {
+        ref($_[0]) || shift(@_);
         my ($self) = @_;
-        @_ == 2 && ($self = $_[1]);
-        CORE::opendir(my $dir_h, $self->get_value) || return;
+        CORE::opendir(my $dir_h, "$self") || return;
         while (defined(my $file = CORE::readdir $dir_h)) {
             next if $file eq '.' or $file eq '..';
             return (Sidef::Types::Bool::Bool::FALSE);
@@ -192,7 +191,7 @@ package Sidef::Types::Glob::Dir {
 
     sub dump {
         my ($self) = @_;
-        Sidef::Types::String::String->new('Dir(' . ${Sidef::Types::String::String->new($self->get_value)->dump} . ')');
+        Sidef::Types::String::String->new('Dir(' . ${Sidef::Types::String::String->new("$self")->dump} . ')');
     }
 
     {

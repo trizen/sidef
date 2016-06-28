@@ -7,6 +7,8 @@ package Sidef::Types::Glob::File {
       Sidef::Types::String::String
       );
 
+    use Sidef::Types::Number::Number;
+
     sub new {
         my (undef, $file) = @_;
         if (@_ > 2) {
@@ -32,13 +34,18 @@ package Sidef::Types::Glob::File {
         foreach my $name (@Fcntl::EXPORT, @Fcntl::EXPORT_OK) {
             $name =~ /^[a-z]/i or next;
             *{__PACKAGE__ . '::' . $name} = sub {
-                $cache{$name} //= Sidef::Types::Number::Number->new(&{'Fcntl::' . $name});
+                $cache{$name} //= Sidef::Types::Number::Number::_new_uint(&{'Fcntl::' . $name});
             };
         }
     }
 
     sub touch {
         my ($self, @args) = @_;
+
+        if (not ref($self)) {
+            $self = $self->new(shift @args);
+        }
+
         $self->open('>>', @args);
     }
 
@@ -47,205 +54,210 @@ package Sidef::Types::Glob::File {
     *create = \&touch;
 
     sub size {
+        ref($_[0]) || shift(@_);
         my ($self) = @_;
-        @_ == 2 && ($self = $_[1]);
-        Sidef::Types::Number::Number->new(-s $$self);
+        Sidef::Types::Number::Number->new(-s "$self");
     }
 
     sub compare {
+        ref($_[0]) || shift(@_);
         my ($self, $file) = @_;
-        if (@_ == 3) {
-            ($self, $file) = ($file, $_[2]);
-        }
         state $x = require File::Compare;
-        Sidef::Types::Number::Number->new(File::Compare::compare($$self, "$file"));
+        my $cmp = File::Compare::compare("$self", "$file");
+
+            $cmp < 0 ? Sidef::Types::Number::Number::MONE
+          : $cmp > 0 ? Sidef::Types::Number::Number::ONE
+          :            Sidef::Types::Number::Number::ZERO;
     }
 
     sub exists {
+        ref($_[0]) || shift(@_);
         my ($self) = @_;
-        @_ == 2 && ($self = $_[1]);
-        (-e $$self) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
+        (-e "$self") ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub is_empty {
+        ref($_[0]) || shift(@_);
         my ($self) = @_;
-        @_ == 2 && ($self = $_[1]);
-        (-z $$self) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
+        (-z "$self") ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub is_directory {
+        ref($_[0]) || shift(@_);
         my ($self) = @_;
-        @_ == 2 && ($self = $_[1]);
-        (-d $$self) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
+        (-d "$self") ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     *is_dir = \&is_directory;
 
     sub is_link {
+        ref($_[0]) || shift(@_);
         my ($self) = @_;
-        (-l $$self) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
+        (-l "$self") ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub readlink {
+        ref($_[0]) || shift(@_);
         my ($self) = @_;
-        @_ == 2 && ($self = $_[1]);
-        Sidef::Types::String::String->new(CORE::readlink($$self));
+        Sidef::Types::String::String->new(CORE::readlink("$self"));
     }
 
     *read_link = \&readlink;
 
     sub is_socket {
+        ref($_[0]) || shift(@_);
         my ($self) = @_;
-        @_ == 2 && ($self = $_[1]);
-        (-S $$self) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
+        (-S "$self") ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub is_block {
+        ref($_[0]) || shift(@_);
         my ($self) = @_;
-        @_ == 2 && ($self = $_[1]);
-        (-b $$self) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
+        (-b "$self") ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub is_char_device {
+        ref($_[0]) || shift(@_);
         my ($self) = @_;
-        @_ == 2 && ($self = $_[1]);
-        (-c $$self) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
+        (-c "$self") ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub is_readable {
+        ref($_[0]) || shift(@_);
         my ($self) = @_;
-        @_ == 2 && ($self = $_[1]);
-        (-r $$self) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
+        (-r "$self") ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub is_writeable {
+        ref($_[0]) || shift(@_);
         my ($self) = @_;
-        @_ == 2 && ($self = $_[1]);
-        (-w $$self) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
+        (-w "$self") ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub has_setuid_bit {
+        ref($_[0]) || shift(@_);
         my ($self) = @_;
-        @_ == 2 && ($self = $_[1]);
-        (-u $$self) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
+        (-u "$self") ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub has_setgid_bit {
+        ref($_[0]) || shift(@_);
         my ($self) = @_;
-        (-g $$self) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
+        (-g "$self") ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub has_sticky_bit {
+        ref($_[0]) || shift(@_);
         my ($self) = @_;
-        @_ == 2 && ($self = $_[1]);
-        (-k $$self) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
+        (-k "$self") ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub modification_time_days_diff {
+        ref($_[0]) || shift(@_);
         my ($self) = @_;
-        @_ == 2 && ($self = $_[1]);
-        (-M $$self) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
+        (-M "$self") ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub access_time_days_diff {
+        ref($_[0]) || shift(@_);
         my ($self) = @_;
-        @_ == 2 && ($self = $_[1]);
-        (-A $$self) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
+        (-A "$self") ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub change_time_days_diff {
+        ref($_[0]) || shift(@_);
         my ($self) = @_;
-        @_ == 2 && ($self = $_[1]);
-        (-C $$self) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
+        (-C "$self") ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub is_executable {
+        ref($_[0]) || shift(@_);
         my ($self) = @_;
-        @_ == 2 && ($self = $_[1]);
-        (-x $$self) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
+        (-x "$self") ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub is_owned {
+        ref($_[0]) || shift(@_);
         my ($self) = @_;
-        @_ == 2 && ($self = $_[1]);
-        (-o $$self) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
+        (-o "$self") ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub is_real_readable {
+        ref($_[0]) || shift(@_);
         my ($self) = @_;
-        @_ == 2 && ($self = $_[1]);
-        (-R $$self) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
+        (-R "$self") ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub is_real_writeable {
+        ref($_[0]) || shift(@_);
         my ($self) = @_;
-        @_ == 2 && ($self = $_[1]);
-        (-W $$self) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
+        (-W "$self") ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub is_real_executable {
+        ref($_[0]) || shift(@_);
         my ($self) = @_;
-        @_ == 2 && ($self = $_[1]);
-        (-X $$self) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
+        (-X "$self") ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub is_real_owned {
+        ref($_[0]) || shift(@_);
         my ($self) = @_;
-        @_ == 2 && ($self = $_[1]);
-        (-O $$self) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
+        (-O "$self") ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub is_binary {
+        ref($_[0]) || shift(@_);
         my ($self) = @_;
-        @_ == 2 && ($self = $_[1]);
-        (-B $$self) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
+        (-B "$self") ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub is_text {
+        ref($_[0]) || shift(@_);
         my ($self) = @_;
-        @_ == 2 && ($self = $_[1]);
-        (-T $$self) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
+        (-T "$self") ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub is_file {
+        ref($_[0]) || shift(@_);
         my ($self) = @_;
-        @_ == 2 && ($self = $_[1]);
-        (-f $$self) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
+        (-f "$self") ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub name {
+        ref($_[0]) || shift(@_);
         my ($self) = @_;
-        @_ == 2 && ($self = $_[1]);
-        Sidef::Types::String::String->new($$self);
+        Sidef::Types::String::String->new("$self");
     }
 
     sub basename {
+        ref($_[0]) || shift(@_);
         my ($self) = @_;
-        @_ == 2 && ($self = $_[1]);
 
         state $x = require File::Basename;
-        Sidef::Types::String::String->new(File::Basename::basename($$self));
+        Sidef::Types::String::String->new(File::Basename::basename("$self"));
     }
 
     *base      = \&basename;
     *base_name = \&basename;
 
     sub dirname {
+        ref($_[0]) || shift(@_);
         my ($self) = @_;
-        @_ == 2 && ($self = $_[1]);
 
         state $x = require File::Basename;
-        Sidef::Types::Glob::Dir->new(File::Basename::dirname($$self));
+        Sidef::Types::Glob::Dir->new(File::Basename::dirname("$self"));
     }
 
     *dir      = \&dirname;
     *dir_name = \&dirname;
 
     sub is_absolute {
+        ref($_[0]) || shift(@_);
         my ($self) = @_;
-        @_ == 2 && ($self = $_[1]);
+
         state $x = require File::Spec;
-        File::Spec->file_name_is_absolute($$self)
+        File::Spec->file_name_is_absolute("$self")
           ? (Sidef::Types::Bool::Bool::TRUE)
           : (Sidef::Types::Bool::Bool::FALSE);
     }
@@ -253,11 +265,11 @@ package Sidef::Types::Glob::File {
     *is_abs = \&is_absolute;
 
     sub abs_name {
+        ref($_[0]) || shift(@_);
         my ($self) = @_;
-        @_ == 2 && ($self = $_[1]);
 
         state $x = require File::Spec;
-        $self->new(File::Spec->rel2abs($$self));
+        $self->new(File::Spec->rel2abs("$self"));
     }
 
     *abs     = \&abs_name;
@@ -265,9 +277,10 @@ package Sidef::Types::Glob::File {
     *rel2abs = \&abs_name;
 
     sub rel_name {
+        ref($_[0]) || shift(@_);
         my ($self, $base) = @_;
         state $x = require File::Spec;
-        $self->new(File::Spec->rel2abs($$self, defined($base) ? "$base" : ()));
+        $self->new(File::Spec->rel2abs("$self", defined($base) ? "$base" : ()));
     }
 
     *rel     = \&rel_name;
@@ -275,26 +288,20 @@ package Sidef::Types::Glob::File {
     *abs2rel = \&rel_name;
 
     sub rename {
+        ref($_[0]) || shift(@_);
         my ($self, $file) = @_;
 
-        if (@_ == 3) {
-            ($self, $file) = ($file, $_[2]);
-        }
-
-        CORE::rename($$self, "$file")
+        CORE::rename("$self", "$file")
           ? (Sidef::Types::Bool::Bool::TRUE)
           : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub move {
+        ref($_[0]) || shift(@_);
         my ($self, $file) = @_;
 
-        if (@_ == 3) {
-            ($self, $file) = ($file, $_[2]);
-        }
-
         state $x = require File::Copy;
-        File::Copy::move($$self, "$file")
+        File::Copy::move("$self", "$file")
           ? (Sidef::Types::Bool::Bool::TRUE)
           : (Sidef::Types::Bool::Bool::FALSE);
     }
@@ -302,14 +309,11 @@ package Sidef::Types::Glob::File {
     *mv = \&move;
 
     sub copy {
+        ref($_[0]) || shift(@_);
         my ($self, $file) = @_;
 
-        if (@_ == 3) {
-            ($self, $file) = ($file, $_[2]);
-        }
-
         state $x = require File::Copy;
-        File::Copy::copy($$self, "$file")
+        File::Copy::copy("$self", "$file")
           ? (Sidef::Types::Bool::Bool::TRUE)
           : (Sidef::Types::Bool::Bool::FALSE);
     }
@@ -317,25 +321,22 @@ package Sidef::Types::Glob::File {
     *cp = \&copy;
 
     sub edit {
+        ref($_[0]) || shift(@_);
         my ($self, $code) = @_;
 
-        if (@_ == 3) {
-            ($self, $code) = ($code, $_[2]);
-        }
-
         my @lines;
-        open(my $fh, '+<:utf8', $$self) || return (Sidef::Types::Bool::Bool::FALSE);
+        open(my $fh, '+<:utf8', "$self") || return (Sidef::Types::Bool::Bool::FALSE);
         while (defined(my $line = <$fh>)) {
             push @lines, $code->run(Sidef::Types::String::String->new($line));
         }
 
         truncate($fh, 0) || do {
-            warn "[WARN] Can't truncate file `$$self': $!";
+            warn "[WARN] Can't truncate file `$self': $!";
             return;
         };
 
         seek($fh, 0, 0) || do {
-            warn "[WARN] Can't seek the begining of file `$$self': $!";
+            warn "[WARN] Can't seek the begining of file `$self': $!";
             return;
         };
 
@@ -349,11 +350,12 @@ package Sidef::Types::Glob::File {
     }
 
     sub open {
+        ref($_[0]) || shift(@_);
         my ($self, $mode, $fh_ref, $err_ref) = @_;
 
         $mode = "$mode" if (ref $mode);
 
-        my $success = CORE::open(my $fh, $mode, $$self);
+        my $success = CORE::open(my $fh, $mode, "$self");
         my $error   = $!;
         my $fh_obj  = Sidef::Types::Glob::FileHandle->new(fh => $fh, self => $self);
 
@@ -372,6 +374,7 @@ package Sidef::Types::Glob::File {
     }
 
     sub open_r {
+        ref($_[0]) || shift(@_);
         my ($self, @rest) = @_;
         $self->open('<:utf8', @rest);
     }
@@ -379,6 +382,7 @@ package Sidef::Types::Glob::File {
     *open_read = \&open_r;
 
     sub open_w {
+        ref($_[0]) || shift(@_);
         my ($self, @rest) = @_;
         $self->open('>:utf8', @rest);
     }
@@ -386,6 +390,7 @@ package Sidef::Types::Glob::File {
     *open_write = \&open_w;
 
     sub open_a {
+        ref($_[0]) || shift(@_);
         my ($self, @rest) = @_;
         $self->open('>>:utf8', @rest);
     }
@@ -393,6 +398,7 @@ package Sidef::Types::Glob::File {
     *open_append = \&open_a;
 
     sub open_rw {
+        ref($_[0]) || shift(@_);
         my ($self, @rest) = @_;
         $self->open('+<:utf8', @rest);
     }
@@ -400,14 +406,16 @@ package Sidef::Types::Glob::File {
     *open_read_write = \&open_rw;
 
     sub opendir {
+        ref($_[0]) || shift(@_);
         my ($self, @rest) = @_;
-        Sidef::Types::Glob::Dir->new($$self)->open(@rest);
+        Sidef::Types::Glob::Dir->new("$self")->open(@rest);
     }
 
     sub sysopen {
+        ref($_[0]) || shift(@_);
         my ($self, $var_ref, $mode, $perm) = @_;
 
-        my $success = sysopen(my $fh, $$self, "$mode", $perm // 0666);
+        my $success = sysopen(my $fh, "$self", "$mode", $perm // 0666);
 
         if ($success) {
             $$var_ref = Sidef::Types::Glob::FileHandle->new(fh => $fh, self => $self);
@@ -419,70 +427,60 @@ package Sidef::Types::Glob::File {
     }
 
     sub stat {
+        ref($_[0]) || shift(@_);
         my ($self) = @_;
-        @_ == 2 && ($self = $_[1]);
-        Sidef::Types::Glob::Stat->stat($$self, $self);
+        Sidef::Types::Glob::Stat->stat("$self", $self);
     }
 
     sub lstat {
+        ref($_[0]) || shift(@_);
         my ($self) = @_;
-        @_ == 2 && ($self = $_[1]);
-        Sidef::Types::Glob::Stat->lstat($$self, $self);
+        Sidef::Types::Glob::Stat->lstat("$self", $self);
     }
 
     sub chown {
+        ref($_[0]) || shift(@_);
         my ($self, $uid, $gid) = @_;
-
-        if (@_ == 4) {
-            ($self, $uid, $gid) = ($uid, $gid, $_[3]);
-        }
-
-        CORE::chown($uid, $gid, $$self)
+        CORE::chown($uid, $gid, "$self")
           ? (Sidef::Types::Bool::Bool::TRUE)
           : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub chmod {
+        ref($_[0]) || shift(@_);
         my ($self, $permission) = @_;
-
-        if (@_ == 3) {
-            ($self, $permission) = ($permission, $_[2]);
-        }
-
-        CORE::chmod($permission, $$self)
+        CORE::chmod($permission, "$self")
           ? (Sidef::Types::Bool::Bool::TRUE)
           : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub utime {
+        ref($_[0]) || shift(@_);
         my ($self, $atime, $mtime) = @_;
-
-        if (@_ == 4) {
-            ($self, $atime, $mtime) = ($atime, $mtime, $_[3]);
-        }
-
-        CORE::utime($atime, $mtime, $$self)
+        CORE::utime($atime, $mtime, "$self")
           ? (Sidef::Types::Bool::Bool::TRUE)
           : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub truncate {
+        ref($_[0]) || shift(@_);
         my ($self, $length) = @_;
-
-        if (@_ == 3) {
-            ($self, $length) = ($length, $_[2]);
-        }
-
-        CORE::truncate($$self, $length // 0)
+        CORE::truncate("$self", $length // 0)
           ? (Sidef::Types::Bool::Bool::TRUE)
           : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub unlink {
         my ($self, @args) = @_;
-        @args                    ? Sidef::Types::Number::Number->new(CORE::unlink(@args))
-          : CORE::unlink($$self) ? (Sidef::Types::Bool::Bool::TRUE)
-          :                        (Sidef::Types::Bool::Bool::FALSE);
+
+        if (ref($self)) {
+            CORE::unlink("$self")
+              ? (Sidef::Types::Bool::Bool::TRUE)
+              : (Sidef::Types::Bool::Bool::FALSE);
+        }
+        else {
+            Sidef::Types::Number::Number::_new_uint(CORE::unlink(@args));
+        }
     }
 
     *delete = \&unlink;
@@ -490,7 +488,7 @@ package Sidef::Types::Glob::File {
 
     sub dump {
         my ($self) = @_;
-        Sidef::Types::String::String->new('File(' . ${Sidef::Types::String::String->new($$self)->dump} . ')');
+        Sidef::Types::String::String->new('File(' . ${Sidef::Types::String::String->new("$self")->dump} . ')');
     }
 
     # Path split
