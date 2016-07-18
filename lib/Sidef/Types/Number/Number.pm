@@ -100,7 +100,12 @@ package Sidef::Types::Number::Number {
         (
          ref($$_) eq __PACKAGE__
            or do {
-             $$_ = __PACKAGE__->new("$$_");
+             $$_ =
+                 ref($$_) eq 'Sidef::Types::Bool::Bool'
+               ? $$$_
+                   ? ONE
+                   : ZERO
+               : __PACKAGE__->new("$$_");
            }
         ) for @_;
     }

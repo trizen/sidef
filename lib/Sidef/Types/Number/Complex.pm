@@ -149,6 +149,11 @@ package Sidef::Types::Number::Complex {
              $$_ =
                ref($$_) eq 'Sidef::Types::Number::Number'
                ? __PACKAGE__->new($$_)
+               : ref($$_) eq 'Sidef::Types::Bool::Bool' ? __PACKAGE__->new(
+                                                                           $$$_
+                                                                           ? Sidef::Types::Number::Number::ONE
+                                                                           : Sidef::Types::Number::Number::ZERO
+                                                                          )
                : __PACKAGE__->new(\"$$_");
            }
         ) for @_;
