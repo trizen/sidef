@@ -49,7 +49,6 @@ my %ignored_modules = map { $_ => 1 } qw (
   Sidef::Parser
   Sidef::Optimizer
   Sidef::Deparse::Perl
-  Sidef::Deparse::Julia
   Sidef::Deparse::Sidef
   Sidef::Types::Number::Inf
   Sidef::Types::Number::Ninf
