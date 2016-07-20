@@ -184,7 +184,6 @@ package Sidef::Types::Number::Inf {
     *lucas            = \&inf;
     *shift_left       = \&inf;
     *shift_right      = \&inf;
-    *rand_int         = \&inf;
     *irand            = \&inf;
     *rand             = \&inf;
     *rad2deg          = \&inf;

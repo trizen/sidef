@@ -33,7 +33,7 @@ func bitonic_sort(x, bool=true) {
     bitonic_merge(first + second, bool)
 }
 
-var a = 16.of { 100.rand_int }
+var a = 16.of { 100.irand }
 var s = bitonic_sort(a)
 
 assert_eq(a.sort, s)

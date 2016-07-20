@@ -116,9 +116,8 @@ package Sidef::Types::Number::Nan {
     *legendre    = \&nan;
     *jacobi      = \&nan;
     *kronecker   = \&nan;
-    *rand_int    = \&nan;
     *rand        = \&nan;
-    *rand        = \&nan;
+    *irand       = \&nan;
     *rad2deg     = \&nan;
     *rad2grad    = \&nan;
     *deg2grad    = \&nan;

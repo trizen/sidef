@@ -145,7 +145,6 @@ package Sidef::Types::Number::Ninf {
     *ceil        = \&ninf;
     *shift_left  = \&ninf;
     *shift_right = \&ninf;
-    *rand_int    = \&ninf;
     *irand       = \&ninf;
     *rand        = \&ninf;
     *rad2deg     = \&ninf;

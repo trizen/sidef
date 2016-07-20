@@ -2243,6 +2243,13 @@ package Sidef::Types::Number::Number {
         Math::MPFR::Rmpfr_get_q($q, $rand);
 
         if (defined $y) {
+
+            if (   ref($y) eq 'Sidef::Types::Number::Inf'
+                or ref($y) eq 'Sidef::Types::Number::Ninf'
+                or ref($y) eq 'Sidef::Types::Number::Nan') {
+                return $y;
+            }
+
             _valid(\$y);
 
             my $diff = Math::GMPq::Rmpq_init();
@@ -2266,6 +2273,13 @@ package Sidef::Types::Number::Number {
         $x = _big2mpz($x);
 
         if (defined($y)) {
+
+            if (   ref($y) eq 'Sidef::Types::Number::Inf'
+                or ref($y) eq 'Sidef::Types::Number::Ninf'
+                or ref($y) eq 'Sidef::Types::Number::Nan') {
+                return $y;
+            }
+
             _valid(\$y);
 
             my $rand = _big2mpz($y);
@@ -2291,8 +2305,6 @@ package Sidef::Types::Number::Number {
             _mpz2big($x);
         }
     }
-
-    *rand_int = \&irand;
 
     sub of {
         my ($x, $obj) = @_;
