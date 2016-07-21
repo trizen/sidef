@@ -1,0 +1,28 @@
+#!/usr/bin/ruby
+
+class Fraction(num, den) {
+
+    method +(Fraction arg) {
+        Fraction(
+            self.num*arg.den + arg.num*self.den,
+            self.den*arg.den
+        )
+    }
+
+    method to_s {
+        "[#{num}, #{den}]"
+    }
+}
+
+func num(n) { n**0 }
+func den(n) { n**2 }
+
+var from = 1
+var to   = 10
+
+var sum
+for i in (from .. to) {
+    var f = Fraction(num(i), den(i))
+    defined(sum) ? (sum += f) : (sum = f)
+    say sum
+}

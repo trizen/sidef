@@ -590,6 +590,7 @@ scripts/smart_word_wrap_simple.sf
 scripts/space_collisions.sf
 scripts/stack.sf
 scripts/stern-brocot_sequence.sf
+scripts/symmetric_summation_of_fractions.sf
 scripts/Tests/amb.sf
 scripts/Tests/amb_nested_loops.sf
 scripts/Tests/anonymous_recursion.sf
