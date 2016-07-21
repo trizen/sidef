@@ -165,6 +165,7 @@ scripts/faulhaber_s_formula.sf
 scripts/fibonacci_sequence.sf
 scripts/fibonacci_word_fractal.sf
 scripts/first-class_functions.sf
+scripts/functional_summation_of_fractions.sf
 scripts/Games/24_game.sf
 scripts/Games/24_game_solve.sf
 scripts/Games/24_game_solve_no_eval.sf

@@ -1,0 +1,20 @@
+#!/usr/bin/ruby
+
+#
+## Rational summation of fractions
+#
+
+var k = 0       # initial value of the counter
+
+func a(n) { (-1)**n }       # numerator
+func b(n) { 2*n + 1 }       # denominator
+
+func g((k))         { b(k) }
+func g(n) is cached { b(n) * g(n-1) }
+
+func f((k))         { a(k) }
+func f(n) is cached { b(n)*f(n-1) + a(n)*g(n-1) }
+
+for i in (k .. 10) {
+    say [f(i), g(i)]
+}
