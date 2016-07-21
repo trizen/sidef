@@ -12,6 +12,8 @@ package Sidef::Types::Range::RangeNumber {
     use Sidef::Types::Bool::Bool;
     use Sidef::Types::Number::Number;
 
+    my $MAX_UINT = ~0;
+
     sub new {
         my (undef, $from, $to, $step) = @_;
 
@@ -42,15 +44,47 @@ package Sidef::Types::Range::RangeNumber {
         my $from = $self->{from};
         my $to   = $self->{to};
 
-        my $asc = !!($step->is_pos);
-        my $i   = $from;
+        my $asc = ($self->{_asc} //= !!($step->is_pos));
+        my $i = $from;
+
+        my $tmp;
+        my $times = ($self->{_times} //= $to->sub($from)->add($step)->div($step));
+
+        if (ref($times) eq 'Sidef::Types::Number::Number') {
+            my $repetitions = Math::GMPq::Rmpq_get_d($$times);
+
+            if ($repetitions <= $MAX_UINT) {
+
+                if ($repetitions < 0) {
+                    return Sidef::Types::Block::Block->new(code => sub { });
+                }
+
+                return Sidef::Types::Block::Block->new(
+                    code => sub {
+                        --$repetitions >= 0 or return;
+                        $tmp = $i;
+                        $i   = $i->add($step);
+                        $tmp;
+                    },
+                );
+            }
+        }
+        elsif (ref($times) eq 'Sidef::Types::Number::Inf') {
+            return Sidef::Types::Block::Block->new(
+                code => sub {
+                    $tmp = $i;
+                    $i   = $i->add($step);
+                    $tmp;
+                },
+            );
+        }
 
         Sidef::Types::Block::Block->new(
             code => sub {
                 ($asc ? $i->le($to) : $i->ge($to)) || return;
-                my $value = $i;
-                $i = $i->add($step);
-                $value;
+                $tmp = $i;
+                $i   = $i->add($step);
+                $tmp;
             },
         );
     }
