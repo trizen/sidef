@@ -34,6 +34,34 @@ package Sidef::Types::Bool::Bool {
     sub to_bool   { $_[0] }
     *to_b = \&to_bool;
 
+    # Number
+    sub to_num {
+        ${$_[0]}
+          ? Sidef::Types::Number::Number::ONE
+          : Sidef::Types::Number::Number::ZERO;
+    }
+
+    *to_n = \&to_num;
+
+    # Integer
+    *to_i   = \&to_num;
+    *to_int = \&to_num;
+
+    # Rational
+    *to_r   = \&to_num;
+    *to_rat = \&to_num;
+
+    # Float
+    *to_f     = \&to_num;
+    *to_float = \&to_num;
+
+    # Complex
+    sub to_complex {
+        $_[0]->to_num->complex;
+    }
+
+    *to_c = \&to_complex;
+
     *{__PACKAGE__ . '::' . '|'} = sub {
         my ($self, $arg) = @_;
         $$self ? $self : $arg;

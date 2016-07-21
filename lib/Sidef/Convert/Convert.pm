@@ -6,7 +6,7 @@ package Sidef::Convert::Convert {
     use overload;
     use Sidef::Types::Bool::Bool;
 
-    sub to_s {
+    sub to_str {
         my ($self) = @_;
         $self->isa('SCALAR')
           || $self->isa('REF')
@@ -14,7 +14,7 @@ package Sidef::Convert::Convert {
           : $self;
     }
 
-    *to_str = \&to_s;
+    *to_s = \&to_str;
 
     sub to_obj {
         my ($self, $obj) = @_;
@@ -22,24 +22,23 @@ package Sidef::Convert::Convert {
         $obj->new($self);
     }
 
-    sub to_i {
+    sub to_int {
         Sidef::Types::Number::Number->new($_[0])->int;
     }
 
-    *to_int = \&to_i;
+    *to_i = \&to_int;
 
-    sub to_a {
+    sub to_array {
         Sidef::Types::Array::Array->new($_[0]);
     }
 
-    *to_array = \&to_a;
+    *to_a = \&to_array;
 
     sub to_rat {
         Sidef::Types::Number::Number->new($_[0]);
     }
 
-    *to_rational = \&to_rat;
-    *to_r        = \&to_rat;
+    *to_r = \&to_rat;
 
     sub to_complex {
         Sidef::Types::Number::Complex->new($_[0]);
@@ -47,12 +46,11 @@ package Sidef::Convert::Convert {
 
     *to_c = \&to_complex;
 
-    sub to_n {
+    sub to_num {
         Sidef::Types::Number::Number->new($_[0]);
     }
 
-    *to_num    = \&to_n;
-    *to_number = \&to_n;
+    *to_n = \&to_num;
 
     sub to_float {
         Sidef::Types::Number::Number->new($_[0])->float;
