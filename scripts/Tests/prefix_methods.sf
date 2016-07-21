@@ -3,6 +3,7 @@
 # Tests for prefix methods
 
 assert_eq(run { "hi" }, "hi");
+assert_eq(::run { "hi" }, "hi");
 assert_eq(run { var run = 42; run }, 42);
 assert_eq(run { "hi" }, "hi");
 
@@ -14,6 +15,10 @@ assert_eq(ceil(12.1.add(2)), 15);
 
 var int = 42;
 assert_eq(int, 42);
-assert_eq(CORE::int(12.5), 12);
+assert_eq(::int(12.5), 12);         # `::` solves the ambiguity
+
+var x = 25;
+::sqrt!(x);          # sqrt(x) in-place
+assert_eq(x, 5);
 
 say "** Test passed!";

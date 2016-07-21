@@ -1908,6 +1908,71 @@ package Sidef::Parser {
                        );
             }
 
+            if (/\G::($self->{method_name_re})\h*/goc) {
+                my $name = $1;
+
+                my $pos = pos($_);
+                my $arg = (
+                             /\G(?=\()/ ? $self->parse_arg(code => $opt{code})
+                           : /\G(?=\{)/ ? $self->parse_block(code => $opt{code}, topic_var => 1)
+                           : $self->fatal_error(
+                                                code  => $_,
+                                                pos   => ($pos - length($name)),
+                                                var   => $name,
+                                                error => "attempt to call method <$name> on an undefined value",
+                                               )
+                          );
+
+                if (ref($arg) and ref($arg) ne 'HASH') {
+                    return
+                      scalar {
+                              $self->{class} => [
+                                                 {
+                                                  self => $arg,
+                                                  call => [{method => $name}]
+                                                 }
+                                                ]
+                             };
+                }
+                elsif (ref($arg) eq 'HASH') {
+                    if (not exists($arg->{$self->{class}})) {
+                        $self->fatal_error(
+                                           code  => $_,
+                                           pos   => ($pos - length($name)),
+                                           var   => $name,
+                                           error => "attempt to call method <$name> on an undefined value",
+                                          );
+                    }
+
+                    return scalar {
+                        $self->{class} => [
+                            {
+                             self => {
+                                      $self->{class} => [{%{shift(@{$arg->{$self->{class}}})}}]
+                                     },
+                             call => [
+                                 {
+                                  method => $name,
+                                  (
+                                   @{$arg->{$self->{class}}}
+                                   ? (
+                                      arg => [
+                                          map {
+                                              { $self->{class} => [{%{$_}}] }
+                                            } @{$arg->{$self->{class}}}
+                                      ]
+                                     )
+                                   : ()
+                                  ),
+                                 }
+                             ],
+                            }
+                        ]
+                    };
+                }
+
+            }
+
             if (/($self->{prefix_obj_re})\h*/goc) {
                 return ($^R, 1, $1);
             }
@@ -2096,6 +2161,7 @@ package Sidef::Parser {
 
             # Variable call
             if (/\G($self->{var_name_re})/goc) {
+                my $len_var = length($1);
                 my ($name, $class) = $self->get_name_and_class($1);
 
                 if (defined(my $var = $self->find_var($name, $class))) {
@@ -2193,8 +2259,8 @@ package Sidef::Parser {
                     return $var;
                 }
 
-                # Method call in functional style
-                if ($class eq $self->{class} or $class eq 'CORE') {
+                # Method call in functional style (deprecated -- use `::name()` instead)
+                if ($class eq $self->{class} and $len_var == length($name)) {
 
                     if ($self->{opt}{k}) {
                         print STDERR
@@ -2231,7 +2297,7 @@ package Sidef::Parser {
                                                code  => $_,
                                                pos   => ($pos - length($name)),
                                                var   => $name,
-                                               error => "attempt to call method <$name> on an undefined object",
+                                               error => "attempt to call method <$name> on an undefined value",
                                               );
                         }
 
