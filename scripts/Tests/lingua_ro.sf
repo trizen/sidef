@@ -30,8 +30,8 @@ var lingua = Lingua::RO::Numbers::new();
 
     var num = (lingua.number_to_ro(pair[0]));
 
-    num == pair[1]
-        || ("Error on number: <%s> -- got: <%s>\n".sprintf(pair[0], num).die);
+    num == pair[1] ||
+        die "Error on number: <%s> -- got: <%s>\n".sprintf(pair[0], num)
 
     "%12s -> %s\n".printf(pair[0], num);
 }

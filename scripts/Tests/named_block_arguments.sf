@@ -5,19 +5,19 @@ var arc = (arr.map{|i|i});
 
 arr.grep {|n| n > 3} == (
 arr.grep { _ > 3 }
-) || ("grep error".die);
+) || die "grep error"
 
 arr.map {|x| x + 3} == (
 arr.map { _ + 3}
-) || ("map error".die);
+) || die "map error"
 
 {
    |x,y|
     x+y
-}.call(10,32) == 42
-    || ("block error".die);
+}.call(10,32) == 42 ||
+    die "block error"
 
-arc == arr
-    || ("arr modified in place".die);
+arc == arr ||
+    die "arr modified in place"
 
 say "** Test passed!";

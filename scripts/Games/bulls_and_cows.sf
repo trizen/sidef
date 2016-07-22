@@ -12,9 +12,9 @@ for (var guesses = 1; true; guesses++) {
     var bulls = 0;
     var cows  = 0;
 
-    var input = Sys.scanln("Input: ").split(1)
-                                     .unique
-                                     .grep {.~~/^[1-9]$/}
+    var input = Sys.scanln("Input: ").split(1)            \
+                                     .unique              \
+                                     .grep {.~~/^[1-9]$/} \
                                      .map  {.to_i};
 
     input.len == size || (

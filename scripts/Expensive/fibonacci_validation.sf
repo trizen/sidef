@@ -74,6 +74,6 @@ func is_prob_fib(n) {
     assert_eq(fib_pos_funcs.rand()(num), fib_pos_funcs.rand()(num))
     assert_eq(fib_pos_funcs.rand()(num), pos) if bool
 
-    "%21s is on position %3s in the fibonacci sequence: %s\n"
+    "%21s is on position %3s in the fibonacci sequence: %s\n" \
         -> printf(num, pos, bool);
 }

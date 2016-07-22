@@ -12,7 +12,7 @@ var candidates = (1234..9876 -> grep {|n| !(n.to_s =~ /0 | (\d) .*? \1 /x) }.map
 # The regex validates the user's input and then returns two numbers.
 func read_score(guess) {
     loop {
-        "My guess: %s   (from %d possibilities)\n"
+        "My guess: %s   (from %d possibilities)\n" \
             -> printf(guess.join, candidates.len);
 
         if (var m = (Sys.scanln("bulls cows: ") =~ /^\h*(\d)\h*(\d)\h*$/)) {

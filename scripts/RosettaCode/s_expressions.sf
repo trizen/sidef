@@ -9,8 +9,8 @@ var t = frequire('Text::Balanced');
 func sexpr(txt) {
     txt.trim!;
 
-    var m = txt.match(/^\((.*)\)$/s)
-        || die "Not an S-expression: <<#{txt}>>";
+    var m = txt.match(/^\((.*)\)$/s) ||
+        die "Not an S-expression: <<#{txt}>>";
     txt = m[0];
 
     var w;

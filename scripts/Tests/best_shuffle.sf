@@ -10,8 +10,8 @@ func best_shuffle(original_word) {
     s.range.each { |i|
         s.range.each { |j|
             i == j || (
-                  (t[i] == s[j])
-               || (t[j] == s[i])
+                  (t[i] == s[j]) ||
+                  (t[j] == s[i])
             ) && next;
             t[i, j] = t[j, i];
             break;

@@ -122,7 +122,7 @@ package Sidef::Parser {
                 #| break\b                                    (?{ bless({}, 'Sidef::Types::Block::Break') })
                 | read\b                                     (?{ state $x = Sidef::Sys::Sys->new })
                 | goto\b                                     (?{ state $x = bless({}, 'Sidef::Perl::Builtin') })
-                | (?:[*\\&]|\+\+|--)                         (?{ state $x = bless({}, 'Sidef::Variable::Ref') })
+                | (?:[*\\]|\+\+|--)                          (?{ state $x = bless({}, 'Sidef::Variable::Ref') })
                 | (?:>>?|\@\|?|[√+~!\-\^]|
                     (?:
                         say
@@ -302,8 +302,7 @@ package Sidef::Parser {
                   ...
                   != ..
                   \\\\= \\\\
-                  ! \\
-                  : « » ~
+                  ! : « » ~
                   );
 
                 qr{
@@ -478,11 +477,11 @@ package Sidef::Parser {
                        && chr(ord $variable->{name}) ne '_') {
 
                     warn '[WARN] '
-                      . "$variable->{type} '$variable->{name}' has been declared, but not used again, at "
-                      . "$self->{file_name}, line $variable->{line}\n";
+                      . "$variable->{type} '$variable->{name}' has been declared, but not used again at "
+                      . "$self->{file_name} line $variable->{line}\n";
                 }
                 elsif ($DEBUG) {
-                    warn "[WARN] Variable '$variable->{name}' is used $variable->{count} times!\n";
+                    warn "[DEBUG] Variable '$variable->{name}' is used $variable->{count} times!\n";
                 }
             }
         }
@@ -2244,7 +2243,8 @@ package Sidef::Parser {
                     my $var = bless({name => $name, class => $class}, 'Sidef::Variable::Global');
 
                     if (not $self->{interactive}) {
-                        warn "[WARN] Implicit declaration of global variable '$name', at line $self->{line}\n";
+                        warn
+                          "[WARN] Implicit declaration of global variable '$name' at $self->{file_name} line $self->{line}\n";
                     }
 
                     unshift @{$self->{vars}{$class}},
@@ -2264,7 +2264,7 @@ package Sidef::Parser {
 
                     if ($self->{opt}{k}) {
                         print STDERR
-                          "[INFO] `$name` is interpreted as a prefix method-call at $self->{file_name} line $self->{line}\n";
+                          "[INFO] `$name` is interpreted as a prefix method-call at $self->{file_name}, line $self->{line}\n";
                     }
 
                     my $pos = pos($_);
@@ -2520,7 +2520,7 @@ package Sidef::Parser {
         local *_ = $opt{code};
 
         {
-            if ((/\G(?![-=]>)/ && /\G(?=$self->{operators_re})/o) || /\G(\.|\s*(?!\.\.)\.)/gc) {
+            if ((/\G(?![-=]>)/ && /\G(?=$self->{operators_re})/o) || /\G\./gc) {
                 my ($method, $req_arg, $op_type) = $self->get_method_name(code => $opt{code});
 
                 if (defined($method)) {
@@ -2875,11 +2875,19 @@ package Sidef::Parser {
             }
 
             {
+                # Method call
                 if (/\G\h*(?=\.\h*(?:$self->{method_name_re}|[(\$]))/ogc) {
                     my $methods = $self->parse_methods(code => $opt{code});
                     push @{$struct{$self->{class}}[-1]{call}}, @{$methods};
                 }
 
+                # Code extended on a newline
+                if (/\G\h*\\(?!\\)/gc) {
+                    $self->parse_whitespace(code => $opt{code});
+                    redo;
+                }
+
+                # Object call
                 if (/\G\h*(?=\()/gc) {
                     my $arg = $self->parse_arg(code => $opt{code});
 
@@ -2910,7 +2918,19 @@ package Sidef::Parser {
                 # Parse array and hash fetchers ([...] and {...})
                 $self->parse_suffixes(code => $opt{code}, struct => \%struct) && redo;
 
-                if (/\G(?!\h*[=-]>)/ && /\G(?=$self->{operators_re})/o) {
+                # Tight bound operator
+                if (
+                    /\G(?!\h*[=-]>)/
+                    && (
+                        /\G(?=$self->{operators_re})/o
+                        || (
+                            /\G\h*\.(?!\.)/gc
+                            ? do { $self->parse_whitespace(code => $opt{code}); 1 }
+                            : 0
+                           )
+                       )
+                  ) {
+
                     my ($method, $req_arg, $op_type) = $self->get_method_name(code => $opt{code});
 
                     my $has_arg;
@@ -3274,51 +3294,22 @@ package Sidef::Parser {
                 push @{$struct{$self->{class}}}, {self => $obj};
 
                 {
-
                     my $pos_before = pos($_);
                     $self->parse_whitespace(code => $opt{code});
-                    my $pos_after = pos($_);
 
-                    my $has_newline = substr($_, $pos_before, $pos_after - $pos_before) =~ /\R/;
-
-                    if (/\G(?:[;,]+|=>)/gc) {
+                    # End of expression
+                    if (/\G(?:[;,]+|=>)/gc or substr($_, $pos_before, pos($_) - $pos_before) =~ /\R/) {
                         redo MAIN;
                     }
 
-                    state $bin_ops = {
-                        map { $_ => 1 }
-                          qw(
-                          &&=
-                          ||=
-                          \\=
-                          //=
-                          :=
-
-                          &&
-                          ||
-                          \\
-                          //
-
-                          += -= *= /=
-                          |= &= ^= %=
-                          =~
-                          ==
-                          ~~
-                          !~
-                          !=
-                          )
-                    };
+                    # Code extended on a newline
+                    if (/\G\\(?!\\)/gc) {
+                        $self->parse_whitespace(code => $opt{code});
+                    }
 
                     my $is_operator = /\G(?!->)/ && /\G(?=($self->{operators_re}))/o;
-                    my $op = $1;
 
-                    if (
-                           ($is_operator && defined($op) && exists $bin_ops->{$op})
-                        || (!$has_newline && $is_operator)
-                        || /\G(?:->|\.)\h*/gc
-
-                        #|| /\G(?=$self->{method_name_re})/o
-                      ) {
+                    if ($is_operator or /\G(?:->|\.)\h*/gc) {
 
                         # Implicit end of statement -- redo
                         $self->parse_whitespace(code => $opt{code});
@@ -3350,7 +3341,7 @@ package Sidef::Parser {
                         $self->parse_suffixes(code => $opt{code}, struct => \%struct);
                         redo;
                     }
-                    elsif (!$has_newline and /\G(if|while|and|or)\b\h*/gc) {
+                    elsif (/\G(if|while|and|or)\b\h*/gc) {
                         my $keyword = $1;
                         my $obj = (
                                    /\G(?=\()/

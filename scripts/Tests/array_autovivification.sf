@@ -6,29 +6,29 @@ r[2][3] = "x";
 
 r.dump.say;
 
-r == [nil, nil, [nil, nil, nil, 'x']]
-     || ("Error! (1)\n".die);
+r == [nil, nil, [nil, nil, nil, 'x']] ||
+     die "Error! (1)\n"
 
 
 r[2][2] = ["y"];
 
 r.dump.say;
 
-r == [nil, nil, [nil, nil, ['y'], 'x']]
-     || ("Error! (2)\n".die);
+r == [nil, nil, [nil, nil, ['y'], 'x']] ||
+     die "Error! (2)\n"
 
 r[2][5] = "sidef";
 
-r == [nil, nil, [nil, nil, ['y'], 'x', nil, 'sidef']]
-    || die "error!";
+r == [nil, nil, [nil, nil, ['y'], 'x', nil, 'sidef']] ||
+     die "error!"
 
 r[2][2][4] = "z";
 r[2][2][2] = "i";
 
 r.dump.say;
 
-r == [nil, nil, [nil, nil, ['y', nil, 'i', nil, 'z'], 'x', nil, 'sidef']]
-     || ("Error! (3)\n".die);
+r == [nil, nil, [nil, nil, ['y', nil, 'i', nil, 'z'], 'x', nil, 'sidef']] ||
+     die "Error! (3)\n"
 
 
 r[5][5][1][2][3] = 'sidef';
@@ -37,8 +37,8 @@ r.dump.say;
 
 r == [nil, nil, [nil, nil, ['y', nil, 'i', nil, 'z'], 'x', nil, 'sidef'],
       nil, nil, [nil, nil, nil, nil, nil, [nil, [nil, nil,
-     [nil, nil, nil, 'sidef']]]]]
-    || ("Error! (4)\n".die);
+     [nil, nil, nil, 'sidef']]]]] ||
+    die "Error! (4)\n"
 
 #
 ## Array autovivification on slice creation

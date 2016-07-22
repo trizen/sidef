@@ -37,8 +37,8 @@ while (true) {
                 catch { say "Invalid input!"; next };
 
     cosmic_year.each { |bit|
-        value >= bit[0]
-            && output(value / bit[0], bit[1])
+        value >= bit[0]                        ->
+            && output(value / bit[0], bit[1])  ->
             && break;
     }
 }

@@ -16,6 +16,10 @@ var predicates = [
 ];
 
 names.permutations { |candidate|
-    predicates.all {|predicate| predicate(candidate) }
-        && (say candidate.join("\n"); break);
-};
+    predicates.all {|predicate|
+        predicate(candidate)
+    } && do {
+        say candidate.join("\n")
+        break
+    }
+}

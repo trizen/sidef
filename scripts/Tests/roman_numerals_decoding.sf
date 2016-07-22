@@ -31,8 +31,8 @@ func roman2arabic (roman) {
 
 ['MCMXC':1990, 'MMVIII':2008, 'MDCLXVI':1666].each { |pair|
 
-    var arabic = roman2arabic(pair.first) == pair.second
-        || die "Error occurred on #{pair.first}\n";
+    var arabic = roman2arabic(pair.first) == pair.second ||
+        die "Error occurred on #{pair.first}\n";
 
     say "#{pair.first} in arabic is #{arabic}";
 }

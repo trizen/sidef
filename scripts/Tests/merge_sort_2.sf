@@ -18,13 +18,13 @@ func mergesort(arr) {
 
 # Numeric sort
 var nums = @(0..7)
-mergesort(nums.shuffle) == nums
-    || "error(123)".die;
+mergesort(nums.shuffle) == nums ||
+    die "error(123)";
 
 # String sort
 var strings = @('a'..'e');
-mergesort(strings.shuffle) == strings
-    || "error(abc)".die;
+mergesort(strings.shuffle) == strings ||
+    die "error(abc)";
 
 # All OK!
 say "** Test passed!";

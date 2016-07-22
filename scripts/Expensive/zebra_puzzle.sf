@@ -30,25 +30,25 @@ func coincident(n,i,g,e) {
 
 func solve {
   CONTENT{:Nationality}.permutations{|nation|
-    nation.first == :Norwegian
+    nation.first == :Norwegian ->
       && CONTENT{:Colour}.permutations {|colour|
-          leftof(colour,:Green,colour,:White)
-       && coincident(nation,:English,colour,:Red)
-       && adjacent(nation,:Norwegian,colour,:Blue)
+          leftof(colour,:Green,colour,:White) ->
+       && coincident(nation,:English,colour,:Red) ->
+       && adjacent(nation,:Norwegian,colour,:Blue) ->
        && CONTENT{:Pet}.permutations {|pet|
-             coincident(nation,:Swedish,pet,:Dog)
+             coincident(nation,:Swedish,pet,:Dog) ->
           && CONTENT{:Drink}.permutations {|drink|
-               drink[2] == :Milk
-            && coincident(nation,:Danish,drink,:Tea)
-            && coincident(colour,:Green,drink,:Coffee)
+               drink[2] == :Milk ->
+            && coincident(nation,:Danish,drink,:Tea) ->
+            && coincident(colour,:Green,drink,:Coffee) ->
             && CONTENT{:Smoke}.permutations {|smoke|
-                coincident(smoke,:PallMall,pet,:Birds)
-             && coincident(smoke,:Dunhill,colour,:Yellow)
-             && coincident(smoke,:BlueMaster,drink,:Beer)
-             && coincident(smoke,:Prince,nation,:German)
-             && adjacent(smoke,:Blend,pet,:Cats)
-             && adjacent(smoke,:Blend,drink,:Water)
-             && adjacent(smoke,:Dunhill,pet,:Horse)
+                coincident(smoke,:PallMall,pet,:Birds) ->
+             && coincident(smoke,:Dunhill,colour,:Yellow) ->
+             && coincident(smoke,:BlueMaster,drink,:Beer) ->
+             && coincident(smoke,:Prince,nation,:German) ->
+             && adjacent(smoke,:Blend,pet,:Cats) ->
+             && adjacent(smoke,:Blend,drink,:Water) ->
+             && adjacent(smoke,:Dunhill,pet,:Horse) ->
              && return [nation,colour,pet,drink,smoke]
 } } } } } }
 

@@ -1,0 +1,118 @@
+#!/usr/bin/ruby
+
+#
+## Tests for multi-line expressions
+#
+
+say  42 \
+    + 9 \
+    * 3
+
+var a = 42 \
+       + 9 \
+       * 3
+
+assert_eq(a, 69)
+
+var b = (
+      42    \
+     + 9    \
+     -> * 3
+)
+
+assert_eq(b, 153)
+
+assert_eq(1 + 1 * 9,  18)
+assert_eq(1 + 1 .* 9, 10)
+
+var c = (
+    42  \.
+    + 4 \->
+    * 9 \->
+    - 3
+)
+
+assert_eq(c, 411)
+
+var d = (
+    42  .
+    + 4 ->
+    * 9 ->
+    - 3 .
+    * 2
+)
+
+assert_eq(d, 408)
+
+assert_eq(
+     40 \.
+    + 2 \.
+    * 3 \->
+    + 1,
+    40 + (2 * 3) + 1
+)
+
+assert_eq(
+     40 \.
+    + 2 \->
+    * 3 \.
+    + 1,
+    (40 + 2) * (3 + 1)
+)
+
+assert_eq(
+     40 \.
+    + 2 \.
+    * 3 \.
+    + 1,
+    40 + (2 * (3 + 1))
+)
+
+assert_eq(
+     40 \
+    + 2 \->
+    * 3 \->
+    + 1,
+    ((40 + 2) * 3) + 1
+)
+
+assert_eq(
+     40 ->
+    + 2 .
+    * 3 ->
+    + 1,
+    40 + (2 * 3) + 1
+)
+
+assert_eq(
+     40 \->
+    + 2 \->
+    * 3 \->
+    + 1,
+    ((40 + 2) * 3) + 1
+)
+
+assert_eq(
+    "abc"    .
+     uc      .
+     reverse,
+     "CBA"
+)
+
+assert_eq(
+    "abc".uc        \
+         .reverse   \
+         .chars,
+    ["C", "B", "A"]
+)
+
+## Means: 1 + (2 * 3)
+assert_eq(1 + 2 \* 3, 7)
+assert_eq(1 + 2 .* 3, 7)
+
+## Means: (1 + 2) * 3
+assert_eq(1 + 2    * 3, 9)
+assert_eq(1 + 2 \->* 3, 9)
+assert_eq(1 + 2  ->* 3, 9)
+
+say "** Test passed!"

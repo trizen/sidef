@@ -155,7 +155,7 @@ func right(board, x, y) {
 
 func assign(change=false, plane=[], data=[]) {
 
-    plane.len == 0
+    plane.len == 0 ->
         && return false;
 
     change || (
@@ -204,8 +204,7 @@ while (count != PLANES_NUM) {
            change: false,
            plane:  code.call(play_board, x, y),
            data:   parts.map {|c| "#{c}_#{rand}" },
-          )
-    || next;
+    ) || next;
 
     count++;
 }
@@ -250,8 +249,7 @@ while (count > 0) {
                    change: true,
                    data:   [item]*8,
                    plane:  code.call($board, $x, $y),
-                  )
-              || "#{__MAIN__}: unexpected error!".die;
+            ) || die "#{__MAIN__}: unexpected error!"
         }
 
         count--;

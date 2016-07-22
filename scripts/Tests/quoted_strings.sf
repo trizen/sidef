@@ -18,8 +18,8 @@ array == [
     'value(i)',
     '#not_a_comment'
 ] || (
-    "%w() error!\n".die
-);
+    die "%w() error!\n"
+)
 
 #
 ## Double quoted words
@@ -34,7 +34,7 @@ array == [
     "newline:\n",
     'not a new_line!:\n'
 ] || (
-    "%W<> error!\n".die
+    die "%W<> error!\n"
 );
 
 #
@@ -43,8 +43,8 @@ array == [
 
 var single_q = %q «Single quo\ted s«tr»ing: Escaping: \\\««\»» \»\» »;
 
-single_q == 'Single quo\ted s«tr»ing: Escaping: \««»» »» '
-    || ("%q«» error!\n".die);
+single_q == 'Single quo\ted s«tr»ing: Escaping: \««»» »» ' ||
+    die "%q«» error!\n"
 
 #
 ## Escaped unary delimited
@@ -52,8 +52,8 @@ single_q == 'Single quo\ted s«tr»ing: Escaping: \««»» »» '
 
 single_q = %q~hello\~world~;
 
-single_q == 'hello~world'
-    || ("%q~~ error!\n".die);
+single_q == 'hello~world' ||
+    die "%q~~ error!\n"
 
 
 #
@@ -62,8 +62,8 @@ single_q == 'hello~world'
 
 var double_q = %Q\#not a comment\;
 
-double_q == '#not a comment'
-    || ("%Q\\\\ error!\n".die);
+double_q == '#not a comment' ||
+    die "%Q\\\\ error!\n"
 
 
 #
@@ -78,16 +78,16 @@ double_q == '#not a comment'
 ## Real-quote delimiter
 #
 
-„test\n” == "test\n"
-    || ("„” error!\n".die);
+„test\n” == "test\n" ||
+    die "„” error!\n"
 
 #
 ## Unescaping
 #
 
 double_q = %Q „tab:\t -- not a tab: \\t”;
-double_q == ('tab:' + "\t" + ' -- not a tab: \\t')
-    || ("%Q„” error!\n".die);
+double_q == ('tab:' + "\t" + ' -- not a tab: \\t') ||
+    die "%Q„” error!\n"
 
 var str = 'h€ll©';
 %B"#{str}".join_bytes == 'h€ll©'      || die "%B() error";

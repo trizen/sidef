@@ -2,8 +2,8 @@
 
 func fib_iter(n) {
     var fib = [1, 1];
-    { fib = [fib[-1], fib[-2] + fib[-1]] }
-       -> * (n - fib.len);
+    { fib = [fib[-1], fib[-2] + fib[-1]] } \
+        * (n - fib.len);
     return fib[-1];
 }
 
@@ -17,6 +17,13 @@ func fib_mem (n) {
     c[n] := (__FUNC__(n-1) + __FUNC__(n-2));
 }
 
-say fib_iter(12);
-say fib_rec(12);
-say fib_mem(35);
+var a = fib_iter(12)
+var b = fib_rec(12)
+var c = fib_mem(35)
+
+say "fib(12) = #{a}"
+say "fib(35) = #{c}"
+
+assert_eq(a, 144)
+assert_eq(b, a)
+assert_eq(c, 9227465)

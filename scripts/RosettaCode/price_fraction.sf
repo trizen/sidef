@@ -29,8 +29,8 @@ EOT
 
 func price(money) {
     table.each { |row|
-           (row[0] <= money)
-        && (row[1] >  money)
+           (row[0] <= money) ->
+        && (row[1] >  money) ->
         && return row[2];
     }
     die "Out of range";

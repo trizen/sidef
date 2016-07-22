@@ -14,5 +14,4 @@ var s = quicksort(a.clone);
 say "Unsorted #{a.dump}";
 say "Sorted   #{s.dump}";
 
-a.sort == s
-    || die "The array is not sorted!";
+a.sort == s || die "The array is not sorted!";

@@ -90,8 +90,8 @@ module Order {      #1
     var x = 23;
 }
 
-Order::x == 25      #3
-    || "order-error".die;
+Order::x == 25  ||  #3
+    die "order-error"
 
 module Order {      #2
     x += 2;

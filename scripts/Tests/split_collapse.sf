@@ -7,13 +7,10 @@ assert_eq('Hello\sWorld\s!'.split('\s'), ['Hello', 'World', '!']);
 # Split on whitespace
 assert_eq("Sidef\tis awesome!".split(/\s+/), ['Sidef', 'is', 'awesome!']);
 
-
-var parts = (
-        "key1: value1; key2: value2;".split(/\s*;\s*/)
-                                      .map { _.split(/\s*:\s*/) }
-                                      .collapse
-                                      .to_hash
-);
+var parts = "key1: value1; key2: value2;".split(/\s*;\s*/)           \
+                                         .map { _.split(/\s*:\s*/) } \
+                                         .collapse                   \
+                                         .to_hash
 
 assert_eq(parts{:key1}, 'value1');
 assert_eq(parts{:key2}, 'value2');

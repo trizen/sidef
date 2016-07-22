@@ -6,22 +6,22 @@
 
 var str = "abcdefg";
 
-str.sub!(/^\w/,'').sub!(/\w\z/,'').sub(/\w/, '') == "cdef"
-    || die "Error on naked method!\n";
+str.sub!(/^\w/,'').sub!(/\w\z/,'').sub(/\w/, '') == "cdef" ||
+    die "Error on naked method!\n";
 
-str == 'bcdef'
-    || die "Error on: '!'\n";
+str == 'bcdef' ||
+    die "Error on: '!'\n";
 
 #
 ## More testing
 #
 
 str = "Sidef is working...";
-str.uc!.sub(/ .*/, '') == "SIDEF"
-    || die "Error on: ':' and '!'\n";
+str.uc!.sub(/ .*/, '') == "SIDEF" ||
+    die "Error on: ':' and '!'\n";
 
-str.substr(-3) == '...'
-    || die "The string had changed!\n";
+str.substr(-3) == '...' ||
+    die "The string had changed!\n";
 
 #
 ## All done!

@@ -34,7 +34,7 @@ assert_eq(l_2000_05, [21475, 21481, 21487, 21493, 21503, 21511]);
 
 var a = ludics_upto(250).to_a
 
-var l_triples = a.grep{|x| a.contains_all([x+2, x+6]) }
+var l_triples = a.grep{|x| a.contains_all([x+2, x+6]) } \
                  .map {|x| '(' + [x, x+2, x+6].join(' ') + ')' }
 
 say("Ludic triples below 250: ", l_triples.join(' '))

@@ -55,8 +55,7 @@ class new(diacritics            = true,
                     [10**24,  'cvadrilion', 'cvadrilioane', false],
                     [10**27, 'cvadriliard', 'cvadriliarde', false],
                     [Math.inf,  'inifinit',      'infinit', false],
-                ]
-                 -> map { |v|
+                ].map { |v|
                      var h = Hash.new;
                      h{%w(num sg pl fem)} = v...;
                      h;
@@ -176,13 +175,17 @@ class new(diacritics            = true,
                 # It's a small number (lower than 100)
                 (factor = (WORDS.exists(words[0]) ? 1 : (words[0].ends_with('zeci') ? (words[0].sub!(/zeci\z/); 10) : 0));
                 factor > 0 && (amount = words.shift);
-                factor > 0)
-                || (( # It's a big number (e.g.: milion)
-                words.len && (BIGWORDS.has_key(words[0]) && (
-                    factor = BIGWORDS{words.shift};
-                    factor > 0;
-                )))
-                || (    # Ignore invalid words
+                factor > 0) || (
+                # It's a big number (e.g.: milion)
+                (
+                    words.len && (BIGWORDS.has_key(words[0]) && (
+                        factor = BIGWORDS{words.shift};
+                        factor > 0
+                        )
+                    )
+                ) ||
+                # Ignore invalid words
+                (
                     words.shift;
                     __BLOCK__.run;
                 )
