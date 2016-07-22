@@ -367,6 +367,7 @@ package Sidef::Parser {
 
         my $start      = rindex($opt{code}, "\n", $opt{pos}) + 1;
         my $point      = $opt{pos} - $start;
+        my $line       = $opt{line} // $self->{line};
         my $error_line = (split(/\R/, substr($opt{code}, $start, 80)))[0];
 
         my @lines = (
@@ -401,7 +402,7 @@ package Sidef::Parser {
                             'sidef',
                             $lines[rand @lines],
                             $self->{file_name} // '-',
-                            $self->{line}, join(', ', grep { defined } $opt{error}, $opt{reason}), $error_line,);
+                            $line, join(', ', grep { defined } $opt{error}, $opt{reason}), $error_line);
 
         $error .= ' ' x ($point) . '^' . "\n" . ('~' x 80) . "\n";
 
@@ -552,7 +553,7 @@ package Sidef::Parser {
 
         (defined($pair_delim) ? /\G(?<=\Q$pair_delim\E)/ : /\G$beg_delim/gc)
           || $self->fatal_error(
-                                error => sprintf(qq{can't find the quoted string terminator <%s>}, $pair_delim // $delim),
+                                error => sprintf(qq{can't find the quoted string terminator <<%s>>}, $pair_delim // $delim),
                                 code  => $_,
                                 pos   => pos($_)
                                );
@@ -662,25 +663,23 @@ package Sidef::Parser {
                 }
 
                 if (/\G(?=\{)/) {
-                    my $code = substr($_, pos);
-                    $self->parse_block(code => \$code, topic_var => 1);
-                    $vars[-1] .= substr($_, pos($_), pos($code));
-                    pos($_) += pos($code);
+                    my $pos = pos($_);
+                    $self->parse_block(code => $opt{code}, topic_var => 1);
+                    $vars[-1] .= substr($_, $pos, pos($_) - $pos);
                 }
                 elsif (/\G(?=\()/) {
-                    my $code = substr($_, pos);
-                    $self->parse_arg(code => \$code);
-                    $vars[-1] .= substr($_, pos($_), pos($code));
-                    pos($_) += pos($code);
+                    my $pos = pos($_);
+                    $self->parse_arg(code => $opt{code});
+                    $vars[-1] .= substr($_, $pos, pos($_) - $pos);
                 }
 
                 if (/$self->{var_init_sep_re}/goc) {
-                    my $code = substr($_, pos);
-                    $code =~ /^(?=\()/
-                      ? $self->parse_arg(code => \$code)
-                      : $self->parse_obj(code => \$code);
-                    $vars[-1] .= '=' . substr($_, pos($_), pos($code));
-                    pos($_) += pos($code);
+                    my $pos = pos($_);
+                    /\G(?=\()/
+                      ? $self->parse_arg(code => $opt{code})
+                      : $self->parse_obj(code => $opt{code});
+
+                    $vars[-1] .= '=' . substr($_, $pos, pos($_) - $pos);
                 }
             }
 
@@ -886,7 +885,9 @@ package Sidef::Parser {
 
                     # Here-document
                     while ($#{$self->{EOT}} != -1) {
-                        my ($name, $type, $obj) = @{shift @{$self->{EOT}}};
+
+                        my $eot  = shift @{$self->{EOT}};
+                        my $name = $eot->{name};
 
                         my ($indent, $spaces);
                         if (chr ord $name eq '-') {
@@ -910,8 +911,12 @@ package Sidef::Parser {
 
                             /\G\R/gc
                               ? ++$self->{line}
-                              : die sprintf(qq{%s:%s: can't find string terminator "%s" anywhere before EOF.\n},
-                                            $self->{file_name}, $beg_line, $name);
+                              : $self->fatal_error(
+                                                 error => "can't find string terminator <<$name>> anywhere before end-of-file",
+                                                 code  => $_,
+                                                 pos   => $eot->{pos},
+                                                 line  => $eot->{line},
+                              );
                         }
 
                         if ($indent) {
@@ -919,11 +924,13 @@ package Sidef::Parser {
                         }
 
                         ++$self->{line};
-                        push @{$obj->{$self->{class}}},
+                        push @{$eot->{obj}{$self->{class}}},
                           {
-                              self => $type == 0
-                            ? Sidef::Types::String::String->new($acc)
-                            : Sidef::Types::String::String->new($acc)->apply_escapes($self)
+                            self => (
+                                     $eot->{type} == 0
+                                     ? Sidef::Types::String::String->new($acc)
+                                     : Sidef::Types::String::String->new($acc)->apply_escapes($self)
+                                    )
                           };
                     }
 
@@ -2112,6 +2119,7 @@ package Sidef::Parser {
             if (/\G<<(?=\S)/gc) {
                 my ($name, $type) = (undef, 1);
 
+                my $pos = pos($_);
                 if (/\G(?=(['"„]))/) {
                     $type = 0 if $1 eq q{'};
                     my $str = $self->get_quoted_string(code => $opt{code});
@@ -2130,7 +2138,14 @@ package Sidef::Parser {
                 }
 
                 my $obj = {$self->{class} => []};
-                push @{$self->{EOT}}, [$name, $type, $obj];
+                push @{$self->{EOT}},
+                  {
+                    name => $name,
+                    type => $type,
+                    obj  => $obj,
+                    pos  => $pos,
+                    line => $self->{line},
+                  };
 
                 return $obj;
             }
@@ -2264,7 +2279,7 @@ package Sidef::Parser {
 
                     if ($self->{opt}{k}) {
                         print STDERR
-                          "[INFO] `$name` is interpreted as a prefix method-call at $self->{file_name}, line $self->{line}\n";
+                          "[INFO] `$name` is interpreted as a prefix method-call at $self->{file_name} line $self->{line}\n";
                     }
 
                     my $pos = pos($_);
@@ -2531,7 +2546,7 @@ package Sidef::Parser {
                                      /\G(?=\()/ ? $self->parse_arg(code => $opt{code})
                                    : $req_arg ? $self->parse_obj(code => $opt{code})
                                    : /\G(?=\{)/ ? $self->parse_block(code => $opt{code}, topic_var => 1)
-                                   :              die "[PARSING ERROR] Something is wrong in the if condition"
+                                   :              die "[PARSER ERROR] Something is wrong in the if condition"
                                   );
 
                         if (defined $arg) {
@@ -2937,15 +2952,13 @@ package Sidef::Parser {
                     if ($req_arg) {
                         my $lonely_obj = /\G\h*(?=\()/gc;
 
-                        my $code = substr($_, pos);
                         my $arg = (
                                      $lonely_obj
-                                   ? $self->parse_arg(code => \$code)
-                                   : $self->parse_obj(code => \$code)
+                                   ? $self->parse_arg(code => $opt{code})
+                                   : $self->parse_obj(code => $opt{code})
                                   );
 
                         if (defined $arg) {
-                            pos($_) += pos($code);
                             if (ref $arg ne 'HASH') {
                                 $arg = {$self->{class} => [{self => $arg}]};
                             }
@@ -3165,9 +3178,7 @@ package Sidef::Parser {
                     }
 
                     my $expr = do {
-                        my $code = substr($_, pos);
-                        my ($obj) = $self->parse_expr(code => \$code);
-                        pos($_) += pos($code);
+                        my ($obj) = $self->parse_expr(code => $opt{code});
                         $obj;
                     };
 
