@@ -386,37 +386,29 @@ HEADER
 
     sub _dump_indices {
         my ($self, $array) = @_;
-        '[' . 'map { ref($_) eq "Sidef::Types::Number::Number" ? Math::GMPq::Rmpq_get_d($$_) ' . ': ref($_) eq "" ? $_ '
-          ##.': UNIVERSAL::can($_, "to_i") ? $_->to_i '
-          . ': do { my $sub = UNIVERSAL::can($_, "..."); '
-          . 'defined($sub) ? $sub->($_) : $_ } } '
-          . join(
+
+        join(
             ',',
-            map {
+            grep { $_ ne '' } map {
                     ref($_) eq 'Sidef::Types::Number::Number' ? $_->_get_double
                   : ref($_) ? ($self->deparse_expr(ref($_) eq 'HASH' ? $_ : {self => $_}))
                   : $_
               } @{$array}
-          )
-          . ']';
+            );
     }
 
     sub _dump_lookups {
         my ($self, $array) = @_;
-        '{' . 'map { ref($_) eq "Sidef::Types::String::String" ? $$_ ' . ': ref($_) eq "" ? $_ '
-          ##.': UNIVERSAL::can($_, "to_s") ? $_->to_s '
-          . ': do { my $sub = UNIVERSAL::can($_, "..."); '
-          . 'defined($sub) ? $sub->($_) : $_ } } '
-          . join(
+
+        join(
             ',',
-            map {
+            grep { $_ ne '' } map {
                 (ref($_) eq 'Sidef::Types::String::String' or ref($_) eq 'Sidef::Types::Number::Number')
                   ? $self->_dump_string($_->get_value)
                   : ref($_) ? ($self->deparse_expr(ref($_) eq 'HASH' ? $_ : {self => $_}))
                   : qq{"\Q$_\E"}
               } @{$array}
-          )
-          . '}';
+            );
     }
 
     sub _dump_var_attr {
@@ -1328,13 +1320,36 @@ HEADER
 
                 my $ind = $expr->{ind}[$i];
                 if (exists $ind->{array}) {
-                    my $pos = $ind->{array};
-                    $code = '@{' . $code . '}' . $self->_dump_indices($pos);
+                    my $indices = $self->_dump_indices($ind->{array});
+
+                    $code = '@{' . $code . '}';
+
+                    if ($indices ne '') {
+                        $code .= '['
+                          . 'map { ref($_) eq "Sidef::Types::Number::Number" ? Math::GMPq::Rmpq_get_d($$_) '
+                          . ': ref($_) eq "" ? $_ '
+                          ##.': UNIVERSAL::can($_, "to_i") ? $_->to_i '
+                          . ': do { my $sub = UNIVERSAL::can($_, "..."); '
+                          . 'defined($sub) ? $sub->($_) : $_ } } '
+                          . $indices . ']';
+                    }
                 }
                 else {
+                    my $keys = $self->_dump_lookups($ind->{hash});
 
-                    my $key = $ind->{hash};
-                    $code = '@{' . $code . '}' . $self->_dump_lookups($key);
+                    if ($keys eq '') {
+                        $code = '%{' . $code . '}';
+                    }
+                    else {
+                        $code = '@{'
+                          . $code . '}' . '{'
+                          . 'map { ref($_) eq "Sidef::Types::String::String" ? $$_ '
+                          . ': ref($_) eq "" ? $_ '
+                          ##.': UNIVERSAL::can($_, "to_s") ? $_->to_s '
+                          . ': do { my $sub = UNIVERSAL::can($_, "..."); '
+                          . 'defined($sub) ? $sub->($_) : $_ } } '
+                          . $keys . '}';
+                    }
                 }
 
                 if ($i < $limit) {

@@ -5,17 +5,17 @@
 #
 
 func cholesky(matrix) {
-    var chol = matrix.len.of { matrix.len.of(0) };
-    matrix.range.each { |row|
-        (0..row).each { |col|
-            var x = matrix[row][col];
-            (0..col).each { |i|
-                x -= (chol[row][i] * chol[col][i]);
+    var chol = matrix.len.of { matrix.len.of(0) }
+    for row in ^matrix {
+        for col in (0..row) {
+            var x = matrix[row][col]
+            for i in (0..col) {
+                x -= (chol[row][i] * chol[col][i])
             }
-            chol[row][col] = (row == col ? x.sqrt : x/chol[col][col]);
+            chol[row][col] = (row == col ? x.sqrt : x/chol[col][col])
         }
     }
-    return chol;
+    return chol
 }
 
 var example1 = [ [ 25, 15, -5 ],

@@ -6,7 +6,7 @@
 
 # Build a list of all possible solutions.  The regular expression weeds
 # out numbers containing zeroes or repeated digits.
-var candidates = (1234..9876 -> grep {|n| !(n.to_s =~ /0 | (\d) .*? \1 /x) }.map{.to_i.digits});
+var candidates = (1234..9876 -> grep {|n| !("#{n}" =~ /0 | (\d) .*? \1 /x) }.map{.digits});
 
 # Repeatedly prompt for input until the user supplies a reasonable score.
 # The regex validates the user's input and then returns two numbers.
@@ -17,7 +17,7 @@ func read_score(guess) {
 
         if (var m = (Sys.scanln("bulls cows: ") =~ /^\h*(\d)\h*(\d)\h*$/)) {
             var (bulls, cows) = m.cap.map{.to_i}...;
-            bulls+cows <= 4 && return (bulls, cows);
+            bulls+cows <= 4 && return(bulls, cows);
         }
 
         say "Please specify the number of bulls and the number of cows";
@@ -27,12 +27,12 @@ func read_score(guess) {
 func score_correct(a, b, bulls, cows) {
     var (exact, loose) = (0, 0);
 
-    4.range.each { |i|
+    for i in ^4 {
         a[i] == b[i] ? ++exact
-                     : (b.contains(a[i]) && ++loose)
+                     : (a[i]~~b && ++loose)
     }
 
-    (bulls == exact) && (cows == loose);
+    (bulls == exact) && (cows == loose)
 }
 
 # Pick a number, display it, get the score, and discard candidates
@@ -40,12 +40,12 @@ func score_correct(a, b, bulls, cows) {
 loop {
     var guess = candidates.pick;
     var (bulls, cows) = read_score(guess);
-    candidates.grep!{|n| score_correct(n, guess, bulls, cows) };
-    candidates.len > 1 || break;
+    candidates.grep!{|n| score_correct(n, guess, bulls, cows) }
+    candidates.len > 1 || break
 }
 
 # Print the secret number or the error message
-say (
-     candidates.len == 1 ? ("Your secret number is: %d" % candidates[0].join)
-                         : ("I think you made a mistake with your scoring")
-    )
+(
+    candidates.len == 1 ? ("Your secret number is: %d" % candidates[0].join)
+                        : ("I think you made a mistake with your scoring")
+)->say

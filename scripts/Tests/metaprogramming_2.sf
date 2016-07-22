@@ -2,7 +2,7 @@
 
 # http://en.wikipedia.org/wiki/Ruby_(programming_language)#Metaprogramming
 
-var colors = Hash.new(
+var colors = Hash(
                'black'   => "000",
                'red'     => "f00",
                'green'   => "0f0",

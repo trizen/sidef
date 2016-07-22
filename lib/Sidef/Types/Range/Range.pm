@@ -245,15 +245,23 @@ package Sidef::Types::Range::Range {
 
         # Check for "empty" range
         # TODO: replace it with arithmetic
-        if (not defined $self->iter->{code}->()) {
-            return Sidef::Types::Array::Array->new([]);
+        my $is_empty = not defined($self->iter->{code}->());
+
+        if (not defined $n) {
+            $is_empty && return;
         }
+
+        $is_empty && return Sidef::Types::Array::Array->new([]);
 
         my $from = $self->{from};
         my $to   = $self->{to};
         my $step = $self->{step};
 
         my $limit = $to->sub($from)->div($step)->inc;
+
+        if (not defined $n) {
+            return $limit->irand->mul($step)->add($from);
+        }
 
         my @array;
         for (1 .. "$n") {

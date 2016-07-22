@@ -1,0 +1,39 @@
+#!/usr/bin/ruby
+
+# Array and hash lvalues
+
+#
+## Array
+#
+
+var arr = ['a', 'b', 'c', 'd']
+arr[] = arr[^arr -> flip]
+assert_eq(arr, ['d', 'c', 'b', 'a'])
+
+arr[0,1] = arr[-1, -2]
+assert_eq(arr, ['a', 'b', 'b', 'a'])
+
+arr[] = arr[0, 1]
+assert_eq(arr, ['a', 'b'])
+
+assert_eq([arr[]], ['a', 'b'])
+assert_eq([arr[^arr]], ['a', 'b'])
+
+#
+## Hash
+#
+
+var hash = Hash(a => 1, b => 2)
+hash{} = (c => 3, d => 4)       # replaces the entire hash
+
+assert_eq(hash.keys.sort, ['c', 'd'])
+assert_eq(hash.values.sort, [3, 4])
+
+hash{:c, :d, :e} = (42, 43, 44)
+assert_eq(hash.keys.sort, ['c', 'd', 'e'])
+
+hash{} = (a => 1, b => 2)
+assert_eq(hash.keys.sort, ['a', 'b'])
+assert_eq(hash.values.sort, [1, 2])
+
+say "** Test passed!"
