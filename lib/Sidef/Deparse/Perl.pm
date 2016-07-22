@@ -834,7 +834,8 @@ HEADER
                                 $code .= qq{"\Q$var->{name}\E"=>} . $self->_dump_var($var) . ', ';
                             }
 
-                            $code .= '},__PACKAGE__;' . 'if(defined(my$sub=$self->can("init"))){$sub->($self)}' . '$self;';
+                            $code .=
+                              '},__PACKAGE__;' . 'if(defined(my$sub=UNIVERSAL::can($self,"init"))){$sub->($self)}' . '$self;';
 
                             $code .=
                                 '},'
@@ -1052,8 +1053,8 @@ HEADER
                   . 'my $block='
                   . $block
                   . '->{code};'
-                  . 'for my$group(ref($obj)?$obj->SUPER::isa("ARRAY")?@$obj:@{$obj->to_a}:()){'
-                  . '$block->((ref($group)&&$group->SUPER::isa("ARRAY")?@$group:$group))}}';
+                  . 'for my$group(ref($obj)?UNIVERSAL::isa($obj,"ARRAY")?@$obj:@{$obj->to_a}:()){'
+                  . '$block->((ref($group)&&UNIVERSAL::isa($group,"ARRAY")?@$group:$group))}}';
             }
             else {
 
@@ -1063,10 +1064,10 @@ HEADER
                   . 'my$block='
                   . $block
                   . '->{code};'
-                  . 'if(ref($obj)){if(defined(my$sub=$obj->SUPER::can("iter"))){my$iter=$sub->($obj);'
+                  . 'if(ref($obj)){if(defined(my$sub=UNIVERSAL::can($obj,"iter"))){my$iter=$sub->($obj);'
                   . 'while(defined(my$item'
                   . '=$iter->run)){$block->($item)}}'
-                  . 'else{for my$item($obj->SUPER::isa("ARRAY")?@$obj:@{$obj->to_a}){'
+                  . 'else{for my$item(UNIVERSAL::isa($obj,"ARRAY")?@$obj:@{$obj->to_a}){'
                   . '$block->($item)}}}}';
             }
         }

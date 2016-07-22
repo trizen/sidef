@@ -78,9 +78,6 @@ package Sidef::Types::Array::MultiArray {
         $self;
     }
 
-    *iter    = \&each;
-    *iterate = \&each;
-
     sub append {
         my ($self, $array) = @_;
         push @{$self}, [@{$array}];

@@ -9,7 +9,7 @@ package Sidef::Object::Object {
     use overload
       q{~~}   => \&{__PACKAGE__ . '::' . '~~'},
       q{bool} => sub {
-        if (defined(my $sub = $_[0]->can('to_b'))) {
+        if (defined(my $sub = UNIVERSAL::can($_[0], 'to_b'))) {
             $sub->($_[0]);
         }
         else {
@@ -17,7 +17,7 @@ package Sidef::Object::Object {
         }
       },
       q{0+} => sub {
-        if (defined(my $sub = $_[0]->can('to_n'))) {
+        if (defined(my $sub = UNIVERSAL::can($_[0], 'to_n'))) {
             $sub->($_[0]);
         }
         else {
@@ -25,7 +25,7 @@ package Sidef::Object::Object {
         }
       },
       q{""} => sub {
-        if (defined(my $sub = $_[0]->can('to_s'))) {
+        if (defined(my $sub = UNIVERSAL::can($_[0], 'to_s'))) {
             $sub->($_[0]);
         }
         else {
@@ -39,9 +39,9 @@ package Sidef::Object::Object {
             ($obj1, $obj2) = ($obj2, $obj1);
         }
 
-        if (   CORE::ref($obj1) && $obj1->SUPER::isa(CORE::ref($obj2))
-            or CORE::ref($obj2) && $obj2->SUPER::isa(CORE::ref($obj1))) {
-            if (defined(my $sub = $obj1->can('<=>'))) {
+        if (   CORE::ref($obj1) && UNIVERSAL::isa($obj1, CORE::ref($obj2))
+            or CORE::ref($obj2) && UNIVERSAL::isa($obj2, CORE::ref($obj1))) {
+            if (defined(my $sub = UNIVERSAL::can($obj1, '<=>'))) {
                 return $sub->($obj1, $obj2);
             }
         }
@@ -56,14 +56,14 @@ package Sidef::Object::Object {
       q{eq} => sub {
         my ($obj1, $obj2) = @_;
 
-        (   $obj1->SUPER::isa(CORE::ref($obj2) || return (Sidef::Types::Bool::Bool::FALSE))
-         || $obj2->SUPER::isa(CORE::ref($obj1) || return (Sidef::Types::Bool::Bool::FALSE)))
+        (   UNIVERSAL::isa($obj1, CORE::ref($obj2) || return (Sidef::Types::Bool::Bool::FALSE))
+         || UNIVERSAL::isa($obj2, CORE::ref($obj1) || return (Sidef::Types::Bool::Bool::FALSE)))
           || return (Sidef::Types::Bool::Bool::FALSE);
 
         return Sidef::Types::Bool::Bool::TRUE
           if (Scalar::Util::refaddr($obj1) == Scalar::Util::refaddr($obj2));
 
-        if (defined(my $sub = $obj1->can('=='))) {
+        if (defined(my $sub = UNIVERSAL::can($obj1, '=='))) {
             return $sub->($obj1, $obj2);
         }
 
@@ -237,14 +237,14 @@ package Sidef::Object::Object {
 
     sub respond_to {
         my ($self, $method) = @_;
-        ($self->can($method))
+        UNIVERSAL::can($self, "$method")
           ? (Sidef::Types::Bool::Bool::TRUE)
           : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub is_a {
         my ($self, $obj) = @_;
-        ($self->SUPER::isa(CORE::ref($obj) || $obj))
+        UNIVERSAL::isa($self, CORE::ref($obj) || $obj)
           ? (Sidef::Types::Bool::Bool::TRUE)
           : (Sidef::Types::Bool::Bool::FALSE);
     }

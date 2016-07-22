@@ -8,8 +8,8 @@ package Sidef::Convert::Convert {
 
     sub to_str {
         my ($self) = @_;
-        $self->isa('SCALAR')
-          || $self->isa('REF')
+        UNIVERSAL::isa($self, 'SCALAR')
+          || UNIVERSAL::isa($self, 'REF')
           ? Sidef::Types::String::String->new(overload::StrVal($self) ? "$self" : defined($$self) ? "$$self" : "")
           : $self;
     }

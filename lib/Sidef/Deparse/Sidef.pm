@@ -543,7 +543,7 @@ package Sidef::Deparse::Sidef {
         elsif (exists $self->{data_types}{$ref}) {
             $code = $self->{data_types}{$ref};
         }
-        elsif ($ref =~ /^Sidef::/ and $obj->can('dump')) {
+        elsif ($ref =~ /^Sidef::/ and UNIVERSAL::can($obj, 'dump')) {
             $code = $obj->dump->get_value;
         }
 

@@ -865,7 +865,7 @@ package Sidef::Types::String::String {
     sub translit {
         my ($self, $orig, $repl, $modes) = @_;
 
-        $orig->isa('ARRAY') && return $self->trans($orig, $repl);
+        UNIVERSAL::isa($orig, 'ARRAY') && return $self->trans($orig, $repl);
         $self->new(
                        eval qq{"\Q${\$$self}\E"=~tr/}
                      . "$orig" =~ s{([/\\])}{\\$1}gr . "/"

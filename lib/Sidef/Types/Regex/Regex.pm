@@ -45,7 +45,7 @@ package Sidef::Types::Regex::Regex {
 
         $object //= do { state $x = Sidef::Types::String::String->new('') };
 
-        if ($object->SUPER::isa('ARRAY')) {
+        if (UNIVERSAL::isa($object, 'ARRAY')) {
             my $match;
             foreach my $item (@{$object}) {
                 $match = $self->match($item);

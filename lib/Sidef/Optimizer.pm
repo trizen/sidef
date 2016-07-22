@@ -27,7 +27,7 @@ package Sidef::Optimizer {
             exists($INC{$module}) || require($module);
             map {
                 $cache{$package, $_} //= do {
-                    defined(my $method = $package->SUPER::can($_))
+                    defined(my $method = UNIVERSAL::can($package, $_))
                       or die "[ERROR] Invalid method $package: $_";
                     $method;
                   }
@@ -73,7 +73,7 @@ package Sidef::Optimizer {
 
             map {
                 $cache{$type, $_} //= do {
-                    defined(my $method = $type->SUPER::can($_))
+                    defined(my $method = UNIVERSAL::can($type, $_))
                       or die "[ERROR] Invalid method $type: $_";
                     $method;
                   }
@@ -978,7 +978,7 @@ package Sidef::Optimizer {
                     and exists($rules{$ref_obj})
                     and ref($method) eq '') {
 
-                    my $code = ($cache{$ref_obj, $method} //= $ref_obj->SUPER::can($method));
+                    my $code = ($cache{$ref_obj, $method} //= UNIVERSAL::can($ref_obj, $method));
 
                     if (defined $code) {
                         my $obj_call = $obj->{call}[$i];
