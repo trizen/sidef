@@ -570,6 +570,13 @@ HEADER
                         local $self->{parent_name} = [$obj->{type}, "$obj->{class}::$name"];
                         push @{$self->{function_declarations}}, [$self->{function}, "my \$$obj->{name}$refaddr;"];
 
+                        if ($self->{ref_class}) {
+                            push @{$self->{function_declarations}},
+                              [ $self->{function},
+                                qq{state \$$obj->{name}_code$refaddr = UNIVERSAL::can("\Q$self->{class_name}\E", "\Q$name\E");}
+                              ];
+                        }
+
                         if ((my $content = $self->deparse_expr({self => $block})) ne '') {
                             $code .= "=$content";
                         }
@@ -583,7 +590,19 @@ HEADER
                             'do{' . $self->deparse_expr({self => $_}) . '}';
                         } @{$obj->{value}{kids}};
 
-                        $code .= ',kids=>[' . join(',', @kids) . '])';
+                        $code .= ',kids=>[' . join(',', @kids);
+
+                        if ($self->{ref_class}) {
+                            $code .= qq{,(defined(\$$obj->{name}_code$refaddr) ? (}
+                              . qq{Sidef::Types::Block::Block->new(code => sub { (\$$obj->{name}_code$refaddr)->(\@_) })) : ())};
+                        }
+
+                        $code .= '])';
+                    }
+                    elsif ($self->{ref_class}) {
+                        chop $code;
+                        $code .= qq{,(defined(\$$obj->{name}_code$refaddr) ? (kids=>[}
+                          . qq{Sidef::Types::Block::Block->new(code => sub { (\$$obj->{name}_code$refaddr)->(\@_) })]) : ()))};
                     }
 
                     # Check the return value (when "-> Type" is specified)

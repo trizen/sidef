@@ -822,6 +822,7 @@ scripts/Tests/subsets.sf
 scripts/Tests/subtractive_generator.sf
 scripts/Tests/swap.sf
 scripts/Tests/sylvesters_sequence.sf
+scripts/Tests/symbolic_fractions.sf
 scripts/Tests/symmetric_difference.sf
 scripts/Tests/sysopen_and_sysread.sf
 scripts/Tests/tennis_tournament.sf

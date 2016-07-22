@@ -52,6 +52,10 @@ package Sidef::Types::Block::Block {
 
       OUTER: foreach my $method ($self, (exists($self->{kids}) ? @{$self->{kids}} : ())) {
 
+            if ($method->{type} eq 'block') {
+                return ($method, $method->{code}(@args));
+            }
+
             my $table = $self->{table};
 
             my %seen;
