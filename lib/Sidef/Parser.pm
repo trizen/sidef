@@ -1470,7 +1470,7 @@ package Sidef::Parser {
                                        pos    => pos($_),
                                       );
 
-                {
+                if ($name ne '') {
                     my ($var) = $self->find_var($name, $class_name);
 
                     if (defined($var) and $var->{type} eq 'class') {

@@ -1,0 +1,45 @@
+#!/usr/bin/ruby
+
+#
+## Test reopening of built-in classes
+## and built-in multimethod extensions
+#
+
+class Bool {
+    method +(arg) { self.to_i + arg }
+    method -(arg) { self.to_i - arg }
+    method *(arg) { self.to_i * arg }
+    method /(arg) { self.to_i / arg }
+}
+
+class Number {
+    method +(Bool arg) { self + arg.to_i }
+    method -(Bool arg) { self - arg.to_i }
+    method *(Bool arg) { self * arg.to_i }
+    method /(Bool arg) { self / arg.to_i }
+}
+
+class Bool {
+    method is_neg { false }
+    method is_pos { self ? true : false }
+    method to_i   { self ? 1 : 0 }
+}
+
+assert_eq(Bool.kind_of(Number), false)      # Bool is not a Number
+assert_eq(Number.kind_of(Bool), false)      # Number is not a Bool
+
+assert_eq(false+42, 42)
+assert_eq(true+42,  43)
+
+assert_eq(false + 1 + false * true / 4 / false * true, Inf)
+
+assert_eq((42+true) * 9*true / (5-true), 96.75)
+assert_eq(false + true, 1)
+
+assert_eq(42 + true,   43)
+assert_eq(64 - true,   63)
+assert_eq( 1 / false, Inf)
+assert_eq( 5 * false,   0)
+assert_eq(42 * true,   42)
+
+say "** Test passed!"

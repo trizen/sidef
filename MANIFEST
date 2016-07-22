@@ -617,6 +617,7 @@ scripts/Tests/bitonic_sorter.sf
 scripts/Tests/block_return.sf
 scripts/Tests/box_the_compass.sf
 scripts/Tests/break.sf
+scripts/Tests/built_in_class_reopening.sf
 scripts/Tests/built_in_classes.sf
 scripts/Tests/cached_func_method.sf
 scripts/Tests/caesar_cipher.sf
