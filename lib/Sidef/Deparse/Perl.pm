@@ -585,16 +585,16 @@ HEADER
                         $code .= ',kids=>[' . join(',', @kids);
 
                         if ($self->{ref_class}) {
-                            $code .= qq{,(defined(\$$obj->{name}_code$refaddr) ? (}
-                              . qq{Sidef::Types::Block::Block->new(code => sub { (\$$obj->{name}_code$refaddr)->(\@_) })) : ())};
+                            $code .= qq{,(defined(\$$obj->{name}_code$refaddr)?}
+                              . qq{Sidef::Types::Block::Block->new(code=>\$$obj->{name}_code$refaddr):())};
                         }
 
                         $code .= '])';
                     }
                     elsif ($self->{ref_class}) {
                         chop $code;
-                        $code .= qq{,(defined(\$$obj->{name}_code$refaddr) ? (kids=>[}
-                          . qq{Sidef::Types::Block::Block->new(code => sub { (\$$obj->{name}_code$refaddr)->(\@_) })]) : ()))};
+                        $code .= qq{,(defined(\$$obj->{name}_code$refaddr)?(kids=>[}
+                          . qq{Sidef::Types::Block::Block->new(code=>\$$obj->{name}_code$refaddr)]):()))};
                     }
 
                     # Check the return value (when "-> Type" is specified)
