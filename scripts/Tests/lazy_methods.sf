@@ -1,11 +1,11 @@
 #!/usr/bin/ruby
 
-func m_exec(arg) {
-    if (arg.is_a(LazyMethod)) {
-        arg();
-    } else {
-        "[ERROR] Argument `#{arg}' is not a LazyMethod".die;
-    }
+func m_exec(lz, *args) {
+
+    lz.kind_of(LazyMethod) &&
+        return lz(args...);
+
+    die "[ERROR] Argument `#{lz}' is not a LazyMethod"
 }
 
 # Create some simple lazy-methods
@@ -14,13 +14,42 @@ var cos = Math.method(:cos);
 
 # Create some complex lazy-methods
 var lz1 = "h€llo".method(:ucfirst).method(:concat, '!').method(:say);
-var lz2 = Sys.method(:print, "World");
+var lz2 = "World".method(:print)
 var lz3 = "".method(:concat, '!').method(:say);
 
 # Test the simple lazy-methods
 lc()          == "test"          || "error lc()".die;
 lc.index('e') == 1               || "error .index()".die;
 cos(5)        == Math.cos(5)     || "Error cos()".die;
+
+# More tests
+var lz4 = String.method(:uc, 'abc')
+assert_eq(m_exec(lz4), 'ABC')
+assert_eq(m_exec(String.method(:uc), 'abc'), 'ABC')
+
+var lz5 = 'abc'.method(:uc).method(:reverse).method(:chars)
+assert_eq(m_exec(lz5), ['C', 'B', 'A'])
+
+var lz6 = String.method(:uc, 'abc').method(:reverse)
+assert_eq(m_exec(lz6), 'CBA')
+assert_eq(m_exec(lz6), 'CBA')
+assert_eq(lz6.split('B'), ['C', 'A'])
+
+var lz7 = 'abc'.method(:uc).method(:reverse)
+assert_eq(m_exec(lz7), 'CBA')
+assert_eq(lz7.split('B'), ['C', 'A'])
+
+var lz8 = ' '.method(:join, 'a', 'b')
+assert_eq(m_exec(lz8), 'a b')
+assert_eq(m_exec(lz8, 'c'), 'a b c')
+assert_eq(m_exec(lz8.method(:uc).method(:split, ' ')), ['A', 'B'])
+assert_eq(m_exec(lz8.method(:uc).method(:split), ' '), ['A', 'B'])
+
+var lz8 = String.method(:join, ' ', 'a', 'b')
+assert_eq(m_exec(lz8), 'a b')
+assert_eq(m_exec(lz8, 'c'), 'a b c')
+assert_eq(m_exec(lz8.method(:uc).method(:split, ' ')), ['A', 'B'])
+assert_eq(m_exec(lz8.method(:uc).method(:split), ' '), ['A', 'B'])
 
 say "----BEGIN----";
 

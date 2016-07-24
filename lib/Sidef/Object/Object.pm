@@ -144,7 +144,7 @@ package Sidef::Object::Object {
 
     sub method {
         my ($self, $method, @args) = @_;
-        Sidef::Object::LazyMethod->new(obj => $self, method => $method, args => \@args);
+        Sidef::Object::LazyMethod->new({obj => $self, method => "$method", args => \@args});
     }
 
     sub object_id {

@@ -8,26 +8,20 @@ package Sidef::Object::LazyMethod {
     our $AUTOLOAD;
 
     sub new {
-        my (undef, %hash) = @_;
-        bless \%hash, __PACKAGE__;
+        my (undef, @calls) = @_;
+        bless {calls => \@calls}, __PACKAGE__;
     }
 
-    sub to_s {
-        my $self = shift;
-        local $AUTOLOAD = __PACKAGE__ . '::' . 'to_s';
-        $self->AUTOLOAD(@_);
-    }
+    sub method {
+        my ($self, $method, @args) = @_;
 
-    sub to_b {
-        my $self = shift;
-        local $AUTOLOAD = __PACKAGE__ . '::' . 'to_b';
-        $self->AUTOLOAD(@_);
-    }
-
-    sub to_n {
-        my $self = shift;
-        local $AUTOLOAD = __PACKAGE__ . '::' . 'to_n';
-        $self->AUTOLOAD(@_);
+        $self->new(
+                   @{$self->{calls}},
+                   {
+                    method => $method,
+                    args   => \@args,
+                   }
+                  );
     }
 
     sub DESTROY { }
@@ -35,25 +29,41 @@ package Sidef::Object::LazyMethod {
     sub AUTOLOAD {
         my ($self, @args) = @_;
 
-        my ($method) = ($AUTOLOAD =~ /^.*[^:]::(.*)$/);
-        my $call = $self->{method};
+        my ($want) = ($AUTOLOAD =~ /^.*[^:]::(.*)$/);
 
-        if (ref($call) eq 'Sidef::Types::Block::Block') {
-            if ($method eq 'call') {
-                return $call->call($self->{obj}, @{$self->{args}}, @args);
+        my $obj = $self->{calls}[0]{obj};
+
+        foreach my $i (0 .. $#{$self->{calls}} - 1) {
+            my $call   = $self->{calls}[$i];
+            my $method = $call->{method};
+
+            if (ref($obj)) {
+                $obj = $obj->$method(@{$call->{args}});
             }
-            return $call->call($self->{obj}, @{$self->{args}})->$method(@args);
+            else {
+                my $code = UNIVERSAL::can($obj, $method);
+                $obj = $code->(@{$call->{args}});
+            }
         }
 
-        if (ref($call) ne 'CODE') {
-            $call = $call->get_value;
+        my $call   = $self->{calls}[-1];
+        my $method = $call->{method};
+
+        if ($want eq 'call') {
+            if (ref($obj)) {
+                return $obj->$method(@{$call->{args}}, @args);
+            }
+
+            my $code = UNIVERSAL::can($obj, $method);
+            return $code->(@{$call->{args}}, @args);
         }
 
-        if ($method eq 'call') {
-            return $self->{obj}->$call(@{$self->{args}}, @args);
+        if (ref($obj)) {
+            return $obj->$method(@{$call->{args}})->$want(@args);
         }
 
-        $self->{obj}->$call(@{$self->{args}})->$method(@args);
+        my $code = UNIVERSAL::can($obj, $method);
+        $code->(@{$call->{args}})->$want(@args);
     }
 
 };

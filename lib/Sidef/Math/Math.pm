@@ -111,10 +111,24 @@ package Sidef::Math::Math {
 
     our $AUTOLOAD;
 
+    #
+    ## This method is highly deprecated!
+    #
     sub AUTOLOAD {
         my ($self, $x, @args) = @_;
         my ($method) = ($AUTOLOAD =~ /^.*[^:]::(.*)$/);
-        defined($x) ? $x->$method(@args) : 'Sidef::Types::Number::Number'->$method;
+
+        my $code =
+          ref($x)
+          ? UNIVERSAL::can($x,                             $method)
+          : UNIVERSAL::can('Sidef::Types::Number::Number', $method);
+
+        defined($code)
+          ? $code->(defined($x) ? ($x, @args) : ())
+          : do {
+            my $arg = join(', ', map { defined($_) ? $_ : 'nil' } (@_ > 1 ? ($x, @args) : ()));
+            die "[ERROR] Undefined method Math.$method($arg)";
+          };
     }
 
 }
