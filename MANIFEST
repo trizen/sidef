@@ -720,6 +720,7 @@ scripts/Tests/man_or_boy.sf
 scripts/Tests/man_or_boy_2.sf
 scripts/Tests/man_or_boy_3.sf
 scripts/Tests/man_or_boy_cached.sf
+scripts/Tests/matrix_determinant.sf
 scripts/Tests/matrix_multiplication.sf
 scripts/Tests/median.sf
 scripts/Tests/memoize.sf
