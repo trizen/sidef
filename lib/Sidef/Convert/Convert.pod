@@ -104,7 +104,7 @@ Convert.to_n() -> I<Obj>
 
 Return the
 
-Aliases: I<to_num>, I<to_number>
+Aliases: I<to_num>
 
 =cut
 
@@ -122,7 +122,7 @@ Convert.to_r() -> I<Obj>
 
 Return the
 
-Aliases: I<to_rat>, I<to_rational>
+Aliases: I<to_rat>
 
 =cut
 

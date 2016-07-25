@@ -104,6 +104,26 @@ Aliases: I<to_bool>
 
 =cut
 
+=head2 to_c
+
+Bool.to_c() -> I<Obj>
+
+Return the
+
+Aliases: I<to_complex>
+
+=cut
+
+=head2 to_f
+
+Bool.to_f() -> I<Obj>
+
+Return the
+
+Aliases: I<to_i>, I<to_n>, I<to_r>, I<to_int>, I<to_num>, I<to_rat>, I<to_float>
+
+=cut
+
 =head2 true
 
 Bool.true() -> I<Obj>

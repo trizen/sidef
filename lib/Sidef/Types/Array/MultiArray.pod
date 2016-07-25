@@ -37,8 +37,6 @@ MultiArray.each() -> I<Obj>
 
 Return the
 
-Aliases: I<iter>, I<iterate>
-
 =cut
 
 =head2 map

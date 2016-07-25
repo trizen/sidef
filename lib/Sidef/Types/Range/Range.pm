@@ -324,6 +324,11 @@ package Sidef::Types::Range::Range {
         $self->to_a->cross_operator(@args);
     }
 
+    sub zip_operator {
+        my ($self, @args) = @_;
+        $self->to_a->zip_operator(@args);
+    }
+
     sub add {
         my ($self, $arg) = @_;
         $self->new($self->{from}->add($arg), $self->{to}->add($arg), $self->{step});

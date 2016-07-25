@@ -836,8 +836,6 @@ Number.irand() -> I<Obj>
 
 Return the
 
-Aliases: I<rand_int>
-
 =cut
 
 =head2 iroot

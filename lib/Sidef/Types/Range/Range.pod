@@ -313,3 +313,11 @@ Range.unroll_operator() -> I<Obj>
 Return the
 
 =cut
+
+=head2 zip_operator
+
+Range.zip_operator() -> I<Obj>
+
+Return the
+
+=cut
