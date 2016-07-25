@@ -2071,16 +2071,16 @@ package Sidef::Parser {
 
             if (/\G__MAIN__\b/gc) {
                 if (-e $self->{script_name}) {
-                    state $x = require File::Spec;
-                    return Sidef::Types::String::String->new(File::Spec->rel2abs($self->{script_name}));
+                    state $x = require Cwd;
+                    return Sidef::Types::String::String->new(Cwd::abs_path($self->{script_name}));
                 }
                 return Sidef::Types::String::String->new($self->{script_name});
             }
 
             if (/\G__FILE__\b/gc) {
                 if (-e $self->{file_name}) {
-                    state $x = require File::Spec;
-                    return Sidef::Types::String::String->new(File::Spec->rel2abs($self->{file_name}));
+                    state $x = require Cwd;
+                    return Sidef::Types::String::String->new(Cwd::abs_path($self->{file_name}));
                 }
                 return Sidef::Types::String::String->new($self->{file_name});
             }
@@ -3125,13 +3125,17 @@ package Sidef::Parser {
 
             if (/\Ginclude\b\h*/gc) {
 
+                state $x = do {
+                    require File::Spec;
+                    require Cwd;
+                };
+
                 my @abs_filenames;
                 if (/\G($self->{var_name_re})/gc) {
 
                     my $var_name = $1;
                     next if exists $Sidef::INCLUDED{$var_name};
 
-                    state $x = require File::Spec;
                     my @path = split(/::/, $var_name);
                     my $mod_path = File::Spec->catfile(@path[0 .. $#path - 1], $path[-1] . '.sm');
 
@@ -3140,10 +3144,14 @@ package Sidef::Parser {
                     if (@{$self->{inc}} == 0) {
                         state $y = require File::Basename;
                         push @{$self->{inc}}, split(':', $ENV{SIDEF_INC}) if exists($ENV{SIDEF_INC});
+
                         push @{$self->{inc}},
-                          File::Spec->catdir(File::Basename::dirname(File::Spec->rel2abs($0)),
-                                             File::Spec->updir, 'share', 'sidef');
-                        push @{$self->{inc}}, File::Basename::dirname(File::Spec->rel2abs($self->{script_name}));
+                          File::Spec->catdir(File::Basename::dirname(Cwd::abs_path($0)), File::Spec->updir, 'share', 'sidef');
+
+                        if (-f $self->{script_name}) {
+                            push @{$self->{inc}}, File::Basename::dirname(Cwd::abs_path($self->{script_name}));
+                        }
+
                         push @{$self->{inc}}, File::Spec->curdir;
                     }
 
@@ -3167,8 +3175,18 @@ package Sidef::Parser {
                 }
                 else {
 
-                    my $orig_dir = File::Spec->rel2abs(File::Spec->curdir());
-                    my $file_dir = File::Basename::dirname(File::Spec->rel2abs($self->{file_name}));
+                    my $orig_dir  = Cwd::getcwd();
+                    my $orig_file = Cwd::abs_path($self->{file_name});
+                    my $file_dir  = File::Basename::dirname($orig_file);
+
+                    #~ $self->fatal_error(
+                    #~ error => 'circular inclusion',
+                    #~ pos => pos($_),
+                    #~ code => $_,
+                    #~ ) if exists $Sidef::INCLUDED{$orig_file};
+
+                    #my $exists = exists $Sidef::INCLUDED{$orig_file};
+                    #    local $Sidef::INCLUDED{$orig_file} = 1;
 
                     my $chdired = 0;
                     if ($orig_dir ne $file_dir) {
@@ -3194,20 +3212,29 @@ package Sidef::Parser {
                     );
 
                     push @abs_filenames, map {
-                        my $value = $_;
+                        my $filename = $_;
                         do {
-                            $value = $value->get_value;
-                        } while (index(ref($value), 'Sidef::') == 0);
+                            $filename = $filename->get_value;
+                        } while (index(ref($filename), 'Sidef::') == 0);
 
-                        ref($value) ne ''
-                          ? $self->fatal_error(
-                               code  => $_,
-                               pos   => pos($_),
-                               error => 'include-error: invalid value of type "' . ref($value) . '" (expected a plain-string)',
-                          )
-                          : [  File::Spec->file_name_is_absolute($value) ? $value
-                             : File::Spec->rel2abs($value)
-                            ];
+                        ref($filename) ne ''
+                          and $self->fatal_error(
+                            code  => $_,
+                            pos   => pos($_),
+                            error => 'include-error: invalid value of type "' . ref($filename) . '" (expected a plain-string)',
+                          );
+
+                        $filename = Cwd::abs_path(File::Spec->catfile(split(/\//, $filename)));
+
+                        if (exists $Sidef::INCLUDED{$filename}) {
+                            $self->fatal_error(
+                                               code  => $_,
+                                               pos   => pos($_),
+                                               error => "include-error: circular inclusion of file: $filename",
+                                              );
+                        }
+
+                        [$filename];
                     } @files;
 
                     if ($chdired) { chdir($orig_dir) }
@@ -3226,6 +3253,8 @@ package Sidef::Parser {
 
                     my $content = do { local $/; <$fh> };
                     close $fh;
+
+                    local $Sidef::INCLUDED{$full_path} = 1;
 
                     my $parser = __PACKAGE__->new(
                                                   opt         => $self->{opt},
