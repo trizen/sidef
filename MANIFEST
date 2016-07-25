@@ -364,6 +364,7 @@ scripts/RosettaCode/equilibrium_index.sf
 scripts/RosettaCode/euler_method.sf
 scripts/RosettaCode/extreme_floating_point_values.sf
 scripts/RosettaCode/factorial.sf
+scripts/RosettaCode/factors_of_a_mersenne_number.sf
 scripts/RosettaCode/fibonacci_n-step_number_sequence.sf
 scripts/RosettaCode/fibonacci_sequence.sf
 scripts/RosettaCode/fibonacci_sequence_1.sf
@@ -885,6 +886,8 @@ t/bernoulli_numbers_rec.t
 t/best_shuffle.t
 t/currying.t
 t/eval.t
+t/factors_of_a_mersenne.t
+t/fast_fourier_transform.t
 t/fibonacci.t
 t/levenshtein_distance.t
 t/man_or_boy.t
