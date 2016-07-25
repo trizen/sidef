@@ -1,18 +1,18 @@
 #!/usr/bin/ruby
 
 func fft(arr) {
-    arr.len == 1 && return arr;
+    arr.len == 1 && return arr
 
-    var evn = fft([arr[arr.range.grep { .is_even }]]);
-    var odd = fft([arr[arr.range.grep { .is_odd  }]]);
-    var twd = (Complex(0, Number.tau) / arr.len);
+    var evn = fft([arr[^arr -> grep { .is_even }]])
+    var odd = fft([arr[^arr -> grep { .is_odd  }]])
+    var twd = (Num.tau.i / arr.len)
 
-    odd.range.map {|n| odd[n] *= exp(twd * n)};
-    (evn »+« odd) + (evn »-« odd);
+    ^odd -> map {|n| odd[n] *= ::exp(twd * n)}
+    (evn »+« odd) + (evn »-« odd)
 }
 
-var cycles = 3;
-var sequence = 0..15;
-var wave = sequence.map {|n| Complex(sin(n * Number.tau / sequence.len * cycles)) };
-say "wave:#{wave.map{|w| '%6.3f' % w }.join(' ')}";
-say "fft: #{fft(wave).map { '%6.3f' % .abs }.join(' ')}";
+var cycles = 3
+var sequence = 0..15
+var wave = sequence.map {|n| ::sin(n * Num.tau / sequence.len * cycles) }
+say "wave:#{wave.map{|w| '%6.3f' % w }.join(' ')}"
+say "fft: #{fft(wave).map { '%6.3f' % .abs }.join(' ')}"
