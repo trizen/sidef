@@ -3179,15 +3179,6 @@ package Sidef::Parser {
                     my $orig_file = Cwd::abs_path($self->{file_name});
                     my $file_dir  = File::Basename::dirname($orig_file);
 
-                    #~ $self->fatal_error(
-                    #~ error => 'circular inclusion',
-                    #~ pos => pos($_),
-                    #~ code => $_,
-                    #~ ) if exists $Sidef::INCLUDED{$orig_file};
-
-                    #my $exists = exists $Sidef::INCLUDED{$orig_file};
-                    #    local $Sidef::INCLUDED{$orig_file} = 1;
-
                     my $chdired = 0;
                     if ($orig_dir ne $file_dir) {
                         if (chdir($file_dir)) {
