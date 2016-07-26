@@ -42,6 +42,14 @@ Return the
 
 =cut
 
+=head2 append
+
+File.append() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 base
 
 File.base() -> I<Obj>
@@ -420,6 +428,14 @@ Aliases: I<open_write>
 
 =cut
 
+=head2 read
+
+File.read() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 read_link
 
 File.read_link() -> I<Obj>
@@ -499,6 +515,14 @@ Return the
 =head2 utime
 
 File.utime() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 write
+
+File.write() -> I<Obj>
 
 Return the
 

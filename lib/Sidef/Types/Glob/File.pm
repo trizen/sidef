@@ -350,10 +350,71 @@ package Sidef::Types::Glob::File {
         do {
             local $, = q{};
             local $\ = q{};
-            print $fh @lines;
+            (print $fh @lines) || do {
+                warn "[WARN] Can't write to file `$self': $!";
+                return;
+            };
             close $fh;
           }
-          ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
+          ? (Sidef::Types::Bool::Bool::TRUE)
+          : (Sidef::Types::Bool::Bool::FALSE);
+    }
+
+    sub read {
+        ref($_[0]) || shift(@_);
+        my ($self, $mode) = @_;
+
+        $mode = defined($mode) ? "$mode" : 'utf8';
+
+        open(my $fh, "<:$mode", "$self") || do {
+            warn "[WARN] Can't open file `$self' for writing: $!";
+            return;
+        };
+
+        local $/;
+        Sidef::Types::String::String->new(<$fh>);
+    }
+
+    sub write {
+        ref($_[0]) || shift(@_);
+        my ($self, $string, $mode) = @_;
+
+        $mode = defined($mode) ? "$mode" : 'utf8';
+
+        open(my $fh, ">:$mode", "$self") || do {
+            warn "[WARN] Can't open file `$self' for writing: $!";
+            return;
+        };
+
+        (print $fh "$string") || do {
+            warn "[WARN] Can't write to file `$self': $!";
+            return;
+        };
+
+        (close $fh)
+          ? (Sidef::Types::Bool::Bool::TRUE)
+          : (Sidef::Types::Bool::Bool::FALSE);
+    }
+
+    sub append {
+        ref($_[0]) || shift(@_);
+        my ($self, $string, $mode) = @_;
+
+        $mode = defined($mode) ? "$mode" : 'utf8';
+
+        open(my $fh, ">>:$mode", "$self") || do {
+            warn "[WARN] Can't open file `$self' for appending: $!";
+            return;
+        };
+
+        (print $fh "$string") || do {
+            warn "[WARN] Can't append to file `$self': $!";
+            return;
+        };
+
+        (close $fh)
+          ? (Sidef::Types::Bool::Bool::TRUE)
+          : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub open {
