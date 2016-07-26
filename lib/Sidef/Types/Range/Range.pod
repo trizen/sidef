@@ -190,6 +190,14 @@ Aliases: I<select>
 
 =cut
 
+=head2 join
+
+Range.join() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 last
 
 Range.last() -> I<Obj>
@@ -303,6 +311,14 @@ Range.to_a() -> I<Obj>
 Return the
 
 Aliases: I<to_array>
+
+=cut
+
+=head2 to_s
+
+Range.to_s() -> I<Obj>
+
+Return the
 
 =cut
 

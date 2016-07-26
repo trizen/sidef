@@ -240,6 +240,15 @@ package Sidef::Types::Range::Range {
         (@array);
     }
 
+    sub join {
+        my ($self, $sep) = @_;
+        join("$sep", $self->to_list);
+    }
+
+    sub to_s {
+        join(' ', $_[0]->to_list);
+    }
+
     sub pick {
         my ($self, $n) = @_;
 
