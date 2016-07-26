@@ -211,7 +211,7 @@ package Sidef::Types::Number::Number {
         }
         elsif (($i = index($str, '.')) != -1) {
             my ($before, $after) = (substr($str, 0, $i), substr($str, $i + 1));
-            if ($after =~ tr/0// == length($after)) {
+            if (($after =~ tr/0//) == length($after)) {
                 return "$sign$before";
             }
             $sign . ("$before$after/1" =~ s/^0+//r) . ('0' x length($after));
@@ -1569,6 +1569,11 @@ package Sidef::Types::Number::Number {
     }
 
     *dump = \&as_rat;
+
+    sub as_frac {
+        my $rat = Math::GMPq::Rmpq_get_str(${$_[0]}, 10);
+        Sidef::Types::String::String->new(index($rat, '/') != -1 ? $rat : "$rat/1");
+    }
 
     sub as_bin {
         my $q = ${$_[0]};

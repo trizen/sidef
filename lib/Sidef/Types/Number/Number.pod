@@ -360,6 +360,14 @@ Return the
 
 =cut
 
+=head2 as_frac
+
+Number.as_frac() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 as_hex
 
 Number.as_hex() -> I<Obj>
