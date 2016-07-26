@@ -5,29 +5,24 @@
 #
 
 func entropy(s) {
-    var counts = Hash.new;
-    s.each { |c| counts{c} := 0 += 1 };
-    var e = 0;
-    counts.values.each { |v|
-        var freq = (v / s.len);
-        e -= (freq * freq.log2);
+    [0] + (s.chars.freq.values »/» s.len) -> reduce { |a,b|
+        a - b*b.log2
     }
-    return e;
 }
-
-var n_max = 20;
-var words = ['1', '0'];
-
+ 
+var n_max = 20
+var words = ['1', '0']
+ 
 {
-    words.append(words[-1] + words[-2]);
-} * (n_max - words.len);
-
-say ('%3s %10s %15s  %s' % @<N Length Entropy Fibword>);
-
-words.range.each { |i|
-    var word = words[i];
-    say ('%3i %10i %15.12f  %s' % (i+1,
+    words.append(words[-1] + words[-2])
+} * (n_max - words.len)
+ 
+say ('%3s %10s %15s  %s' % <N Length Entropy Fibword>...)
+ 
+for i in ^words {
+    var word = words[i]
+    say ('%3i %10i %15.12f  %s' % (i+1,
                                    word.len,
                                    entropy(word),
-                                   word.len<40 ? word : '<too long>'));
+                                   word.len<30 ? word : '<too long>'))
 }

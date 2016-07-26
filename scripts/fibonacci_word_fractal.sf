@@ -1,66 +1,64 @@
 #!/usr/bin/ruby
 
-var(m=14, scale=3);
+var(m=14, scale=3) = ARGV.map{.to_i}...
 
-var world = Hash.new;
-world{0}{0} = 1;
+(var world = Hash.new){0}{0} = 1
+var loc = Complex(0, 0)
+var dir = Complex.i
 
-var loc = Complex.new(0, 0);
-var dir = Complex.i;
-
-var fib = ['1', '0'];
+var fib = ['1', '0']
 func fib_word(n) {
-    fib[n] \\= (fib_word(n-1) + fib_word(n-2));
+    fib[n] \\= (fib_word(n-1) + fib_word(n-2))
 }
 
 func step {
     scale.times {
-        loc += dir;
-        world{loc.im}{loc.re} = 1;
+        loc += dir
+        world{loc.im}{loc.re} = 1
     }
 }
 
-func turn_left  { dir *=  Complex.i };
-func turn_right { dir *= -Complex.i };
+func turn_left  { dir *=  Complex.i }
+func turn_right { dir *= -Complex.i }
 
-var n = 1;
+var n = 1
 fib_word(m).each_char { |c|
     if (c == '0') {
-        step();
+        step()
         n % 2 == 0 ? turn_left()
                    : turn_right()
     } else { n++ }
 }
 
 func braille_graphics(a) {
-    var (xlo, xhi, ylo, yhi) = +([Inf, -Inf]*2)...;
+    var (xlo, xhi, ylo, yhi) = +([Inf, -Inf]*2)...
 
     a.each_key { |y|
-        ylo.min!(y.to_i);
-        yhi.max!(y.to_i);
+        ylo.min!(y.to_i)
+        yhi.max!(y.to_i)
         a{y}.each_key { |x|
-            xlo.min!(x.to_i);
-            xhi.max!(x.to_i);
+            xlo.min!(x.to_i)
+            xhi.max!(x.to_i)
         }
     }
 
-    range(ylo, yhi, 4).each { |y|
-        range(xlo, xhi, 2).each { |x|
-            var cell = 0x2800;
+    for y in (ylo .. (yhi, 4)) {
+        for x in (xlo .. (xhi, 2)) {
+            var cell = 0x2800
 
-            a{y+0}{x+0} && (cell += 1);
-            a{y+1}{x+0} && (cell += 2);
-            a{y+2}{x+0} && (cell += 4);
-            a{y+0}{x+1} && (cell += 8);
-            a{y+1}{x+1} && (cell += 16);
-            a{y+2}{x+1} && (cell += 32);
-            a{y+3}{x+0} && (cell += 64);
-            a{y+3}{x+1} && (cell += 128);
+            a{y+0}{x+0} && (cell += 1)
+            a{y+1}{x+0} && (cell += 2)
+            a{y+2}{x+0} && (cell += 4)
+            a{y+0}{x+1} && (cell += 8)
+            a{y+1}{x+1} && (cell += 16)
+            a{y+2}{x+1} && (cell += 32)
+            a{y+3}{x+0} && (cell += 64)
+            a{y+3}{x+1} && (cell += 128)
 
-            print cell.chr;
-        };
-        print "\n";
+            print cell.chr
+        }
+        print "\n"
     }
 }
 
-braille_graphics(world);
+braille_graphics(world)
