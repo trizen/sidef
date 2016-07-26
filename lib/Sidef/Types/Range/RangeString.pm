@@ -114,6 +114,8 @@ package Sidef::Types::Range::RangeString {
         $self->SUPER::pick($num)->map_operator('chr');
     }
 
+    *rand = \&pick;
+
     sub dump {
         my ($self) = @_;
         Sidef::Types::String::String->new(

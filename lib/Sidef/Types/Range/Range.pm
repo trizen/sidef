@@ -282,6 +282,32 @@ package Sidef::Types::Range::Range {
 
     *rand = \&pick;
 
+    sub count {
+        my ($self, $arg) = @_;
+
+        if (ref($arg) eq 'Sidef::Types::Block::Block') {
+            my $count = 0;
+            my $iter  = $self->iter->{code};
+
+            while (defined(my $obj = $iter->())) {
+                ++$count if $arg->run($obj);
+            }
+
+            return Sidef::Types::Number::Number::_new_uint($count);
+        }
+
+        $self->contains($arg)
+          ? Sidef::Types::Number::Number::ONE
+          : Sidef::Types::Number::Number::ZERO;
+    }
+
+    *count_by = \&count;
+
+    sub shuffle {
+        state $x = require List::Util;
+        Sidef::Types::Array::Array->new([List::Util::shuffle($_[0]->to_list)]);
+    }
+
     sub reduce {
         my ($self, $op) = @_;
 
