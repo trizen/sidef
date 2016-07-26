@@ -241,7 +241,7 @@ package Sidef::Sys::Sys {
 
     sub system {
         my ($self, @args) = @_;
-        Sidef::Types::Number::Number->new(CORE::system(@args));
+        Sidef::Types::Number::Number->new(scalar CORE::system(@args));
     }
 
     *run = \&system;

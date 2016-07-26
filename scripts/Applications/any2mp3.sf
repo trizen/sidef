@@ -22,16 +22,16 @@ USAGE
 }
 
 func executeCmd(cmd, arg) {
-    Sys.system(cmd, arg...);
+    Sys.run(cmd, arg...);
 }
 
 func wait_th(forks) {
     say "** Running threads: #{forks.len}";
-    say "** FFmpeg exit-code: #{forks.shift.get}";
+    say "** FFmpeg exit-code: #{forks.pop_rand.wait}";
 }
 
 func main() {
-    const remFormat = %r/\.\w{1,5}\z/;
+    const extensionRe = %r/\.\w{1,5}\z/;
     const outputFormat = "mp3";
 
     const ffmpegCmd = "ffmpeg";
@@ -42,44 +42,43 @@ func main() {
     var outputDir = Dir.cwd;
 
     # Command-line flags
-    var glong = frequire('Getopt::Long');
-    glong.GetOptionsFromArray(ARGV,
-        'output-dir|o=s' => func(_, val) { outputDir  = Dir.new(val) },
-        'threads|t=i'    => func(_, val) { maxThreads = Num.new(val) },
-        'files|f=s{1,}'  => func(_, val) { files.push(File.new(val)) },
-        'help|h'         => func         { usage()                   },
+    frequire('Getopt::Long').GetOptionsFromArray(ARGV,
+        'output-dir|o=s' => func(_, val) { outputDir  = Dir(val) },
+        'threads|t=i'    => func(_, val) { maxThreads = Num(val) },
+        'files|f=s{1,}'  => func(_, val) { files.push(File(val)) },
+        'help|h'         => func         { usage()               },
     );
 
-    files.len == 0 && (
+    if (files.len == 0) {
         Sys.warn("\n[!] No input file has been provided!\n");
         usage(2);
-    );
+    }
 
-    outputDir.exists || (
+    if (!outputDir.exists) {
         outputDir.create || die "Can't create dir `#{outputDir}': #{$!}";
-    );
+    }
 
     var forks = [];
     var counter = 0;
     files.each { |file|
 
-        file.exists || (
-            "File `#{file}' does not exists! Skipping file...\n".warn;
+        if (!file.exists) {
+            Sys.warn("File `#{file}' does not exists! Skipping file...\n");
             next;
-        );
+        }
 
-        file.is_file || (
-            "File `#{file}' is not a plain file! Skipping it...\n".warn;
+        if (!file.is_file) {
+            Sys.warn("File `#{file}' is not a plain file! Skipping it...\n");
             next;
-        );
+        }
 
         # Basename only
         var outputFile = file.basename;
 
         # Remove the format suffix
-        outputFile.sub!(remFormat);
+        outputFile.sub!(extensionRe);
 
-        outputFile = (outputDir.concat(outputFile + "." + outputFormat));
+        outputFile = File(outputDir, outputFile + '.' + outputFormat);
         printf("[%2d] %s -> %s\n", counter++, file, outputFile);
 
         var args = ['-i', file.to_s, ffmpegArg..., outputFile];
