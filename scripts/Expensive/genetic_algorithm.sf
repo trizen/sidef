@@ -35,10 +35,7 @@ loop {
     var target_found = false
 
     population.map! {
-        var parrentA = matingpool.rand
-        var parrentB = matingpool.rand
-
-        var child = crossover(parrentA, parrentB)
+        var child = crossover(matingpool.pick(2)...)
         fitness_score += fitness(child)
         target_found = true if child==target
         child
