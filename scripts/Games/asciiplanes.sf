@@ -9,7 +9,7 @@
 # Created on: 21 August 2012
 # Latest edit on: 10 November 2013
 # Translated to Sidef in 21 September 2014
-# Latest edit on: 20 November 2015
+# Latest edit on: 26 July 2016
 # Website: https://github.com/trizen/asciiplanes
 
 # Find the planes' positions on a grid. (text-based game)
@@ -21,7 +21,7 @@ var asciitable = (
 
 ## Package variables
 var pkgname = 'asciiplanes';
-var version = 0.04;
+var version = 0.05;
 
 ## Game variables
 var BOARD_SIZE = 8;

@@ -1,0 +1,54 @@
+#!/usr/bin/ruby
+
+#
+## A simple genetic algorithm in Sidef
+## Inspired by Daniel Shiffman
+## https://www.youtube.com/watch?v=DIXtg5VVz2E
+#
+
+var target = 'sidef lang'.chars
+var parts = [('a'..'z')..., ' '].shuffle
+
+var population_num = 150
+var mutation_rate = 0.01
+
+var population = population_num.of {
+    target.len.of { parts.rand }
+}
+
+func fitness(item) {
+    item ~Z== target -> count_by { _ }
+}
+
+func crossover(a, b) {
+    a ~Z b -> map { |g|
+        1.rand < mutation_rate ? parts.rand : g.rand
+    }
+}
+
+loop {
+    var matingpool = population.map { |item|
+        ([item] * fitness(item))...
+    }
+
+    var fitness_score = 0
+    var target_found = false
+
+    population.map! {
+        var parrentA = matingpool.rand
+        var parrentB = matingpool.rand
+
+        var child = crossover(parrentA, parrentB)
+        fitness_score += fitness(child)
+        target_found = true if child==target
+        child
+    }
+
+    printf("Average fitness score: %.2f%%\n",
+        fitness_score/population_num / target.len * 100)
+
+    if (target_found) {
+        say "** Target found!"
+        break
+    }
+}
