@@ -154,14 +154,6 @@ Return the
 
 =cut
 
-=head2 object_id
-
-Object.object_id() -> I<Obj>
-
-Return the
-
-=cut
-
 =head2 parent_classes
 
 Object.parent_classes() -> I<Obj>
@@ -183,6 +175,16 @@ Return the
 Object.ref() -> I<Obj>
 
 Return the
+
+=cut
+
+=head2 refaddr
+
+Object.refaddr() -> I<Obj>
+
+Return the
+
+Aliases: I<object_id>
 
 =cut
 

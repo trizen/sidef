@@ -743,6 +743,7 @@ scripts/Tests/module_order_and_redeclaration.sf
 scripts/Tests/modulo.sf
 scripts/Tests/multi_file_edit.sf
 scripts/Tests/multi_functions.sf
+scripts/Tests/multi_match_searcher.sf
 scripts/Tests/multi_methods.sf
 scripts/Tests/multi_var_assignment.sf
 scripts/Tests/multiline_expressions.sf

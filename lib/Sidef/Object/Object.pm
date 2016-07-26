@@ -152,6 +152,8 @@ package Sidef::Object::Object {
         Sidef::Types::Number::Number->new(Scalar::Util::refaddr($self));
     }
 
+    *refaddr = \&object_id;
+
     sub class {
         my ($obj) = @_;
         my $ref = CORE::ref($obj) || $obj;

@@ -1,0 +1,139 @@
+#!/usr/bin/ruby
+
+#
+## Tree-based multi-match searcher
+#
+
+enum |DEFAULT, BEST, ANY|
+
+class MultiMatch(table = Hash()) {
+
+    method add(key, value) {
+
+        var k = String(value.refaddr)
+        var p = Pair(k, value)
+
+        for group in key {
+            var ref = table
+            for item in group {
+                ref = (ref{item} := Hash())
+                ref{:values} := [] << p
+            }
+        }
+        self
+    }
+
+    method search(pattern, keep=DEFAULT) {
+
+        var matches = []
+        var seen = Hash()
+
+        for group in pattern {
+            var ref = table
+            for item in group {
+                if (ref.contains(item)) {
+                    ref = ref{item}
+                }
+                else {
+                    ref = nil
+                    break
+                }
+            }
+
+            if (defined(ref)) {
+                for match in ref{:values} {
+                    var k = match.first
+                    if (seen.contains(k)) {
+                        ++seen{k}
+                    }
+                    else {
+                        seen{k} = 1
+                        matches << match
+                    }
+                }
+            }
+            elsif (keep != ANY) {
+                matches[] = ()
+                break
+            }
+        }
+
+        if (keep == BEST) {
+            var max = seen.values.max
+            matches.grep! { seen{.first} == max }
+        }
+
+        matches.map {|match|
+            Hash(
+                match => match.second,
+                score => seen{match.first}
+            )
+        }
+    }
+}
+
+# Creates a SMM object
+var smm = MultiMatch();
+
+# Create a 2D-array key, by splitting the string
+# into words, then each word into characters.
+func make_key(str) {
+    str.lc.words.map { .chars }
+}
+
+var movies = [
+              'My First Lover',
+              'A Lot Like Love',
+              'Funny Games (2007)',
+              'Cinderella Man (2005)',
+              'Pulp Fiction (1994)',
+              'Don\'t Say a Word (2001)',
+              'Secret Window (2004)',
+              'The Lookout (2007)',
+              '88 Minutes (2007)',
+              'The Mothman Prophecies',
+              'Love Actually (2003)',
+              'From Paris with Love (2010)',
+              'P.S. I Love You (2007)',
+             ]
+
+# Add the entries
+for movie in movies {
+    smm.add(make_key(movie), movie)
+}
+
+var pattern = make_key('i love')       # make the search-pattern
+var matches = smm.search(pattern)      # search for the pattern
+
+say matches                            # print the results
+
+
+var expect = [
+    Hash(
+        "match" => "P.S. I Love You (2007)",
+        "score" => 2
+    ),
+    Hash(
+        "match" => "My First Lover",
+        "score" => 1
+    ),
+    Hash(
+        "match" => "A Lot Like Love",
+        "score" => 1
+    ),
+    Hash(
+        "match" => "Love Actually (2003)",
+        "score" => 1
+    ),
+    Hash(
+        "match" => "From Paris with Love (2010)",
+        "score" => 1
+    )
+]
+
+assert_eq(matches, expect)
+assert_eq(matches.len, expect.len)
+
+var i = matches.len.irand
+assert_eq(matches[i]{:match}, expect[i]{:match})
+assert_eq(matches[i]{:score}, expect[i]{:score})
