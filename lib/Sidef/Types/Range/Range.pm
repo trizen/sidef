@@ -280,6 +280,8 @@ package Sidef::Types::Range::Range {
         Sidef::Types::Array::Array->new(\@array);
     }
 
+    *rand = \&pick;
+
     sub reduce {
         my ($self, $op) = @_;
 
