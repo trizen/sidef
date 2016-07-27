@@ -158,7 +158,7 @@ package Sidef::Types::Number::Ninf {
 
     sub max { $_[1] }
 
-    sub zero { (Sidef::Types::Number::Number::ZERO) }
+    sub zero { Sidef::Types::Number::Number::ZERO }
 
     *inv = \&zero;
 

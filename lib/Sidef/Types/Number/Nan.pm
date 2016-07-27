@@ -126,6 +126,8 @@ package Sidef::Types::Number::Nan {
     *grad2deg    = \&nan;
     *round       = \&nan;
     *roundf      = \&nan;
+    *re          = \&nan;
+    *real        = \&nan;
 
     sub cmp { }
 
@@ -196,17 +198,19 @@ package Sidef::Types::Number::Nan {
     *as_int   = \&chr;
     *as_float = \&chr;
 
-    sub numerator {
+    sub zero {
         Sidef::Types::Number::Number::ZERO;
     }
 
-    *nu = \&numerator;
+    *nu        = \&zero;
+    *numerator = \&zero;
 
-    sub denominator {
-        Sidef::Types::Number::Number::ZERO;
-    }
+    *de          = \&zero;
+    *denominator = \&zero;
 
-    *de = \&denominator;
+    *im        = \&zero;
+    *imag      = \&zero;
+    *imaginary = \&zero;
 
     sub of {
         Sidef::Types::Array::Array->new([]);

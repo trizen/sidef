@@ -18,7 +18,6 @@ func gamma(z) {
     ]
 
     var result
-    z = Complex(z)
     const pi = Complex.pi
 
     if (z.real < 0.5) {

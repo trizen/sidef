@@ -1526,6 +1526,14 @@ package Sidef::Types::Number::Number {
 
     sub rat { $_[0] }
 
+    *re   = \&rat;
+    *real = \&rat;
+
+    sub imag { ZERO }
+
+    *im        = \&imag;
+    *imaginary = \&imag;
+
     sub as_int {
         my ($x, $base) = @_;
 
