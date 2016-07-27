@@ -1,0 +1,45 @@
+#!/usr/bin/ruby
+
+#
+## Rejection sampling algorithm
+## https://en.wikipedia.org/wiki/Rejection_sampling
+#
+
+func accept_reject(table) {
+
+    var accepted = nil
+    var max_fitness = table.map{|h| h{:weight} }.max
+    var prob = max_fitness.rand
+
+    loop {
+        var item = table.rand
+
+        if (prob < item{:weight}) {
+            accepted = item
+            break
+        }
+    }
+
+    accepted
+}
+
+var table = [
+    Hash(value => "Sidef",  weight => 1.0.rand(0.5)),
+    Hash(value => "Ruby",   weight => 0.5.rand),
+    Hash(value => "Perl",   weight => 0.5.rand),
+    Hash(value => "Python", weight => 0.5.rand),
+    Hash(value => "Julia",  weight => 0.5.rand),
+]
+
+var picked = accept_reject(table)
+say "Picked #{picked{:value}} with a probability of #{picked{:weight}.round(-2)}%"
+
+var freq = 100.of { accept_reject(table){:value} }.freq
+var max = freq.to_a.max_by { |p| p[1] }
+
+if (max[0] == "Sidef") {
+    say "In average, Sidef is the winner!"
+}
+else {
+    say "In average, #{max[0]} is the winner -- that's sad..."
+}

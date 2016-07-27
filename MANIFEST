@@ -302,6 +302,7 @@ scripts/permutations_rec.sf
 'scripts/Project Euler/0140-modified_fibonacci_golden_nuggets.sf'
 'scripts/Project Euler/0187-semiprimes.sf'
 scripts/pythagorean_means.sf
+scripts/rejection_sampling.sf
 scripts/reverse_the_gender_of_a_string.sf
 scripts/RosettaCode/9_billion_names.sf
 scripts/RosettaCode/abc_problem.sf
