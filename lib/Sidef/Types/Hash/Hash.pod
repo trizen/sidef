@@ -266,9 +266,25 @@ Aliases: I<map_val>
 
 =cut
 
+=head2 max_by
+
+Hash.max_by() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 merge_values
 
 Hash.merge_values() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 min_by
+
+Hash.min_by() -> I<Obj>
 
 Return the
 

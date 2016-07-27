@@ -96,6 +96,8 @@ RangeString.pick() -> I<Obj>
 
 Return the
 
+Aliases: I<rand>
+
 =cut
 
 =head2 to

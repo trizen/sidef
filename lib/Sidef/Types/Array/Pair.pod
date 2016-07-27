@@ -31,11 +31,13 @@ Return the
 
 =cut
 
-=head2 first
+=head2 key
 
-Pair.first() -> I<Obj>
+Pair.key() -> I<Obj>
 
 Return the
+
+Aliases: I<first>
 
 =cut
 
@@ -46,14 +48,6 @@ Pair.new() -> I<Obj>
 Return the
 
 Aliases: I<call>
-
-=cut
-
-=head2 second
-
-Pair.second() -> I<Obj>
-
-Return the
 
 =cut
 
@@ -82,5 +76,15 @@ Pair.to_h() -> I<Obj>
 Return the
 
 Aliases: I<to_hash>
+
+=cut
+
+=head2 value
+
+Pair.value() -> I<Obj>
+
+Return the
+
+Aliases: I<second>
 
 =cut

@@ -780,6 +780,16 @@ Return the
 
 =cut
 
+=head2 im
+
+Number.im() -> I<Obj>
+
+Return the
+
+Aliases: I<imag>, I<imaginary>
+
+=cut
+
 =head2 imod
 
 Number.imod() -> I<Obj>
@@ -1294,11 +1304,13 @@ Return the
 
 =cut
 
-=head2 rat
+=head2 re
 
-Number.rat() -> I<Obj>
+Number.re() -> I<Obj>
 
 Return the
+
+Aliases: I<rat>, I<real>
 
 =cut
 

@@ -128,6 +128,16 @@ Aliases: I<include>, I<contains>, I<includes>
 
 =cut
 
+=head2 count
+
+Range.count() -> I<Obj>
+
+Return the
+
+Aliases: I<count_by>
+
+=cut
+
 =head2 cross_operator
 
 Range.cross_operator() -> I<Obj>
@@ -270,6 +280,8 @@ Range.pick() -> I<Obj>
 
 Return the
 
+Aliases: I<rand>
+
 =cut
 
 =head2 reduce
@@ -283,6 +295,14 @@ Return the
 =head2 reduce_operator
 
 Range.reduce_operator() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 shuffle
+
+Range.shuffle() -> I<Obj>
 
 Return the
 
