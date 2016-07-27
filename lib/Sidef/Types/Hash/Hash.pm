@@ -341,7 +341,7 @@ package Sidef::Types::Hash::Hash {
         }
 
         Sidef::Types::Array::Array->new(
-                   [map { Sidef::Types::Array::Array->new($_->[1], $self->{$_->[0]}) } (sort { $a->[2] cmp $b->[2] } @array)]);
+                    [map { Sidef::Types::Array::Pair->new($_->[1], $self->{$_->[0]}) } (sort { $a->[2] cmp $b->[2] } @array)]);
     }
 
     sub sort {
@@ -351,7 +351,7 @@ package Sidef::Types::Hash::Hash {
             return
               Sidef::Types::Array::Array->new(
                                               [
-                                               map { Sidef::Types::Array::Array->new($_->[1], $self->{$_->[0]}) } (
+                                               map { Sidef::Types::Array::Pair->new($_->[1], $self->{$_->[0]}) } (
                                                         sort { scalar $code->run($a->[1], $b->[1]) }
                                                           map { [$_, Sidef::Types::String::String->new($_)] } CORE::keys %$self
                                                )
@@ -361,7 +361,7 @@ package Sidef::Types::Hash::Hash {
 
         Sidef::Types::Array::Array->new(
             map {
-                Sidef::Types::Array::Array->new(Sidef::Types::String::String->new($_), $self->{$_})
+                Sidef::Types::Array::Pair->new(Sidef::Types::String::String->new($_), $self->{$_})
               }
               sort CORE::keys %$self
         );

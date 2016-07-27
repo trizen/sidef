@@ -51,9 +51,13 @@ package Sidef::Types::Array::Pair {
         $_[0][0];
     }
 
+    *key = \&first;
+
     sub second : lvalue {
         $_[0][1];
     }
+
+    *value = \&second;
 
     sub swap {
         my ($self) = @_;
