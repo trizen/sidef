@@ -35,11 +35,11 @@ var picked = accept_reject(table)
 say "Picked #{picked{:value}} with a probability of #{picked{:weight}.round(-2)}%"
 
 var freq = 100.of { accept_reject(table){:value} }.freq
-var max = freq.to_a.max_by { |p| p[1] }
+var max = freq.max_by { |_,v| v }
 
-if (max[0] == "Sidef") {
+if (max.key == "Sidef") {
     say "In average, Sidef is the winner!"
 }
 else {
-    say "In average, #{max[0]} is the winner -- that's sad..."
+    say "In average, #{max.key} is the winner -- that's sad..."
 }

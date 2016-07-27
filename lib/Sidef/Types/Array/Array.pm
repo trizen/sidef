@@ -625,14 +625,13 @@ package Sidef::Types::Array::Array {
     sub _min_max_by {
         my ($self, $code, $value) = @_;
 
-        @{$self} || return;
+        @$self || return;
 
-        my @pairs = map { [$_, scalar $code->run($_)] } @{$self};
+        my @pairs = map { [$_, scalar $code->run($_)] } @$self;
         my $item = $pairs[0];
 
         foreach my $i (1 .. $#pairs) {
-            my $val = $pairs[$i][1];
-            $item = $pairs[$i] if (($val cmp $item->[1]) eq $value);
+            $item = $pairs[$i] if (($pairs[$i][1] cmp $item->[1]) eq $value);
         }
 
         $item->[0];

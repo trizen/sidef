@@ -367,6 +367,29 @@ package Sidef::Types::Hash::Hash {
         );
     }
 
+    sub _min_max {
+        my ($self, $code, $value) = @_;
+
+        my @pairs = map { [$_, $code->run(Sidef::Types::String::String->new($_), $self->{$_})] } keys %$self;
+
+        my $item = $pairs[0];
+        foreach my $i (1 .. $#pairs) {
+            $item = $pairs[$i] if (($pairs[$i][1] cmp $item->[1]) eq $value);
+        }
+
+        Sidef::Types::Array::Pair->new(Sidef::Types::String::String->new($item->[0]), $self->{$item->[0]});
+    }
+
+    sub max_by {
+        my ($self, $code) = @_;
+        $self->_min_max($code, Sidef::Types::Number::Number::ONE);
+    }
+
+    sub min_by {
+        my ($self, $code) = @_;
+        $self->_min_max($code, Sidef::Types::Number::Number::MONE);
+    }
+
     sub to_a {
         my ($self) = @_;
         Sidef::Types::Array::Array->new(
