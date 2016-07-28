@@ -645,13 +645,13 @@ package Sidef::Types::String::String {
 
         my @chars = split(//, $$self);
 
-        my $i   = 0;
+        my $i   = -1;
         my $end = $#chars;
 
         Sidef::Types::Block::Block->new(
             code => sub {
-                $i <= $end or return;
-                bless \$chars[$i++], __PACKAGE__;
+                ++$i <= $end or return;
+                bless \(my $chr = $chars[$i]), __PACKAGE__;
             }
         );
     }

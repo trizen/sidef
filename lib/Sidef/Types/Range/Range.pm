@@ -250,11 +250,11 @@ package Sidef::Types::Range::Range {
 
     sub join {
         my ($self, $sep) = @_;
-        join("$sep", $self->to_list);
+        Sidef::Types::String::String->new(join("$sep", $self->to_list));
     }
 
     sub to_s {
-        join(' ', $_[0]->to_list);
+        Sidef::Types::String::String->new(join(' ', $_[0]->to_list));
     }
 
     sub pick {
