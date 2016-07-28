@@ -1,5 +1,7 @@
 package Sidef::Types::Bool::Bool {
 
+    use 5.014;
+
     use overload
       q{bool} => \&get_value,
       q{0+}   => \&get_value,
@@ -62,20 +64,24 @@ package Sidef::Types::Bool::Bool {
 
     *to_c = \&to_complex;
 
-    *{__PACKAGE__ . '::' . '|'} = sub {
-        my ($self, $arg) = @_;
-        $$self ? $self : $arg;
-    };
+    {
+        no strict 'refs';
 
-    *{__PACKAGE__ . '::' . '&'} = sub {
-        my ($self, $arg) = @_;
-        $$self ? $arg : $self;
-    };
+        *{__PACKAGE__ . '::' . '|'} = sub {
+            my ($self, $arg) = @_;
+            $$self ? $self : $arg;
+        };
 
-    *{__PACKAGE__ . '::' . '^'} = sub {
-        my ($self, $arg) = @_;
-        ($$self xor $arg) ? (TRUE) : (FALSE);
-    };
+        *{__PACKAGE__ . '::' . '&'} = sub {
+            my ($self, $arg) = @_;
+            $$self ? $arg : $self;
+        };
+
+        *{__PACKAGE__ . '::' . '^'} = sub {
+            my ($self, $arg) = @_;
+            ($$self xor $arg) ? (TRUE) : (FALSE);
+        };
+    }
 
     sub is_true { $_[0] }
 

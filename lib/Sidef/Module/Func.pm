@@ -1,5 +1,6 @@
 package Sidef::Module::Func {
 
+    use 5.014;
     our $AUTOLOAD;
 
     sub __NEW__ {
@@ -24,6 +25,7 @@ package Sidef::Module::Func {
 
         my @results = do {
             local *UNIVERSAL::AUTOLOAD;
+            no strict 'refs';
             ($self->{module} . '::' . $func)->(@args);
         };
 

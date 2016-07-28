@@ -1,5 +1,7 @@
 package Sidef::Types::Glob::Stat {
 
+    use 5.014;
+
     use parent qw(
       Sidef::Object::Object
       );
@@ -15,6 +17,8 @@ package Sidef::Types::Glob::Stat {
     }
 
     {
+        no strict 'refs';
+
         # The order matters!
         my @names = qw(dev ino mode nlink uid gid rdev size atime mtime ctime blksize blocks);
 

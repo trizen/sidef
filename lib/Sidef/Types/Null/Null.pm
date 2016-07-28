@@ -1,5 +1,7 @@
 package Sidef::Types::Null::Null {
 
+    use 5.014;
+
     use overload
       q{bool} => sub { },
       q{0+}   => sub { 0 },
