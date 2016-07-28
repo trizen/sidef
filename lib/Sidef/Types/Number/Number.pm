@@ -2329,7 +2329,7 @@ package Sidef::Types::Number::Number {
         if (ref($obj) eq 'Sidef::Types::Block::Block') {
 
             my @array;
-            my $num = $$x;
+            my $num = _big2mpz($x);
 
             for (my $i = Math::GMPz::Rmpz_init_set_ui(1) ;
                  Math::GMPz::Rmpz_cmp($i, $num) <= 0 ;
@@ -2365,7 +2365,7 @@ package Sidef::Types::Number::Number {
     sub times {
         my ($num, $block) = @_;
 
-        $num = $$num;
+        $num = _big2mpz($num);
 
         for (my $i = Math::GMPz::Rmpz_init_set_ui(1) ;
              Math::GMPz::Rmpz_cmp($i, $num) <= 0 ; Math::GMPz::Rmpz_add_ui($i, $i, 1)) {
@@ -2380,7 +2380,7 @@ package Sidef::Types::Number::Number {
     sub itimes {
         my ($num, $block) = @_;
 
-        $num = $$num;
+        $num = _big2mpz($num);
 
         for (my $i = Math::GMPz::Rmpz_init_set_ui(0) ; Math::GMPz::Rmpz_cmp($i, $num) < 0 ; Math::GMPz::Rmpz_add_ui($i, $i, 1))
         {

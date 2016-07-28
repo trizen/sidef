@@ -1,19 +1,21 @@
 #!/usr/bin/ruby
 
 func josephus(n, k) {
-    var prisoners = @(0 ..^ n);
+    var prisoners = @^n
     while (prisoners.len > 1) {
-        prisoners.rotate!(k - 1).shift;
-    };
-    return prisoners[0];
-};
+        prisoners.rotate!(k - 1).shift
+    }
+    return prisoners[0]
+}
 
 func josephus_rec(n, k) {
     n == 1 ? 0 : ((__FUNC__(n-1, k) + k) % n)
-};
+}
 
-var survivor = josephus(41, 3);
-say "Prisoner #{survivor} survived.";
+var survivor1 = josephus(41, 3);
+say "Prisoner #{survivor1} survived.";
 
 var survivor2 = josephus_rec(41, 3);
 say "Prisoner #{survivor2} survived.";
+
+assert_eq(survivor1, survivor2)

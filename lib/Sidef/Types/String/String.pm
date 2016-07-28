@@ -640,6 +640,22 @@ package Sidef::Types::String::String {
         Sidef::Types::Array::Array->new([map { bless(\$_, __PACKAGE__) } CORE::split(//, CORE::join('', $$self))]);
     }
 
+    sub iter {
+        my ($self) = @_;
+
+        my @chars = split(//, $$self);
+
+        my $i   = 0;
+        my $end = $#chars;
+
+        Sidef::Types::Block::Block->new(
+            code => sub {
+                $i <= $end or return;
+                bless \$chars[$i++], __PACKAGE__;
+            }
+        );
+    }
+
     sub each_char {
         my ($self, $code) = @_;
 
