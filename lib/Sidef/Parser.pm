@@ -65,6 +65,7 @@ package Sidef::Parser {
                      | NaN\b                          (?{ state $x = Sidef::Types::Number::Nan->new })
                      | RangeNum(?:ber)?+\b            (?{ state $x = bless({}, 'Sidef::DataTypes::Range::RangeNumber') })
                      | RangeStr(?:ing)?+\b            (?{ state $x = bless({}, 'Sidef::DataTypes::Range::RangeString') })
+                     | Range\b                        (?{ state $x = bless({}, 'Sidef::DataTypes::Range::Range') })
                      | Socket\b                       (?{ state $x = bless({}, 'Sidef::DataTypes::Glob::Socket') })
                      | Pipe\b                         (?{ state $x = bless({}, 'Sidef::DataTypes::Glob::Pipe') })
                      | Ref\b                          (?{ state $x = bless({}, 'Sidef::Variable::Ref') })
@@ -185,6 +186,7 @@ package Sidef::Parser {
                   Hash
                   Str String
                   Num Number
+                  Range
                   RangeStr RangeString
                   RangeNum RangeNumber
                   Complex

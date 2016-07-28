@@ -16,6 +16,13 @@ package Sidef::Types::Range::Range {
         };
     };
 
+    sub new {
+        my (undef, $from, $to, $step) = @_;
+        $from->range($to, $step);
+    }
+
+    *call = \&new;
+
     sub by {
         my ($self, $step) = @_;
         defined($step)

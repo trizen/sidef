@@ -57,6 +57,7 @@ package Sidef::Deparse::Perl {
                   Sidef::DataTypes::String::String        Sidef::Types::String::String
                   Sidef::DataTypes::Number::Number        Sidef::Types::Number::Number
                   Sidef::DataTypes::Number::Complex       Sidef::Types::Number::Complex
+                  Sidef::DataTypes::Range::Range          Sidef::Types::Range::Range
                   Sidef::DataTypes::Range::RangeNumber    Sidef::Types::Range::RangeNumber
                   Sidef::DataTypes::Range::RangeString    Sidef::Types::Range::RangeString
                   Sidef::DataTypes::Block::Block          Sidef::Types::Block::Block
