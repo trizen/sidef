@@ -88,30 +88,30 @@ package Sidef::Types::Glob::DirHandle {
 
     sub seek {
         my ($self, $pos) = @_;
-        (
-         seekdir(
-             $self->{dir_h},
-             do {
-                 local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
-                 $pos->get_value;
-               }
-         )
-        ) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
+        seekdir($self->{dir_h}, CORE::int($pos))
+          ? (Sidef::Types::Bool::Bool::TRUE)
+          : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub rewind {
         my ($self) = @_;
-        (rewinddir($self->{dir_h})) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
+        rewinddir($self->{dir_h})
+          ? (Sidef::Types::Bool::Bool::TRUE)
+          : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub close {
         my ($self) = @_;
-        (closedir($self->{dir_h})) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
+        closedir($self->{dir_h})
+          ? (Sidef::Types::Bool::Bool::TRUE)
+          : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub chdir {
         my ($self) = @_;
-        (chdir($self->{dir_h})) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
+        chdir($self->{dir_h})
+          ? (Sidef::Types::Bool::Bool::TRUE)
+          : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub stat {

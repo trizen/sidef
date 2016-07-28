@@ -5,7 +5,9 @@ package Sidef::Types::Glob::Pipe {
       Sidef::Object::Object
       );
 
-    use overload q{""} => \&dump;
+    use overload q{""} => sub {
+        'Pipe(' . join(', ', map { ${Sidef::Types::String::String->new("$_")->dump} } @{$_[0]}) . ')';
+    };
 
     sub new {
         my (undef, @command) = @_;
@@ -63,8 +65,7 @@ package Sidef::Types::Glob::Pipe {
 
     sub dump {
         my ($self) = @_;
-        Sidef::Types::String::String->new(
-                                'Pipe(' . join(', ', map { ${Sidef::Types::String::String->new("$_")->dump} } @{$self}) . ')');
+        Sidef::Types::String::String->new("$self");
     }
 }
 

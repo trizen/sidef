@@ -7,7 +7,10 @@ package Sidef::Types::Range::RangeString {
       Sidef::Object::Object
       );
 
-    use overload q{""} => \&dump;
+    use overload q{""} => sub {
+        my ($self) = @_;
+        "RangeStr(" . join(', ', $self->{from}->chr->dump, $self->{to}->chr->dump, "$self->{step}") . ")";
+    };
 
     use Sidef::Types::Bool::Bool;
     use Sidef::Types::Number::Number;
@@ -118,8 +121,7 @@ package Sidef::Types::Range::RangeString {
 
     sub dump {
         my ($self) = @_;
-        Sidef::Types::String::String->new(
-                           "RangeStr(" . join(', ', $self->{from}->chr->dump, $self->{to}->chr->dump, "$self->{step}",) . ")");
+        Sidef::Types::String::String->new("$self");
     }
 }
 

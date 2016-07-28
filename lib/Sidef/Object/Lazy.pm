@@ -61,13 +61,9 @@ package Sidef::Object::Lazy {
     }
 
     sub first {
-        my ($self, $num) = @_;
+        my ($self, $n) = @_;
 
-        my $n = do {
-            local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
-            $num->get_value;
-        };
-
+        $n = CORE::int($n);
         $n > 0 || return Sidef::Types::Array::Array->new;
 
         my @arr;

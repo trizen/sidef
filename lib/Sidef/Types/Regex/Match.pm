@@ -2,8 +2,8 @@ package Sidef::Types::Regex::Match {
 
     use 5.014;
     use overload
-      q{bool} => \&to_bool,
-      q{""}   => \&to_s,
+      q{bool} => \&get_value,
+      q{""}   => sub { CORE::join(' ', @{$_[0]->{captures}}) },
       q{@{}}  => sub {
         $_[0]->{_cached_arr} //= [map { Sidef::Types::String::String->new($_) } @{$_[0]->{captures}}];
       };
@@ -70,7 +70,9 @@ package Sidef::Types::Regex::Match {
     }
 
     sub matched {
-        ($_[0]->{matched}) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
+        $_[0]->{matched}
+          ? (Sidef::Types::Bool::Bool::TRUE)
+          : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     *to_bool       = \&matched;
@@ -109,7 +111,7 @@ package Sidef::Types::Regex::Match {
 
     sub to_s {
         my ($self) = @_;
-        Sidef::Types::String::String->new(CORE::join(' ', @{$self->{captures}}));
+        Sidef::Types::String::String->new("$self");
     }
 
     sub dump {

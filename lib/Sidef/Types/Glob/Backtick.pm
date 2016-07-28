@@ -1,10 +1,14 @@
 package Sidef::Types::Glob::Backtick {
 
+    use 5.014;
+
     use parent qw(
       Sidef::Object::Object
       );
 
-    use overload q{""} => \&dump;
+    use overload q{""} => sub {
+        'Backtick(' . ${Sidef::Types::String::String->new(${$_[0]})->dump} . ')';
+    };
 
     sub new {
         my (undef, $backtick) = @_;
@@ -25,11 +29,14 @@ package Sidef::Types::Glob::Backtick {
     *execute = \&run;
     *exec    = \&run;
 
-    *{__PACKAGE__ . '::' . '`'} = \&run;
+    {
+        no strict 'refs';
+        *{__PACKAGE__ . '::' . '`'} = \&run;
+    }
 
     sub dump {
         my ($self) = @_;
-        Sidef::Types::String::String->new('Backtick(' . ${Sidef::Types::String::String->new($$self)->dump} . ')');
+        Sidef::Types::String::String->new("$self");
     }
 };
 

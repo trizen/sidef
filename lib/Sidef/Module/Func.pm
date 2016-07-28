@@ -17,17 +17,10 @@ package Sidef::Module::Func {
         my ($func) = ($AUTOLOAD =~ /^.*[^:]::(.*)$/);
 
         my @args = (
-            @arg
-            ? (
-               map {
-                   local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
-                   index(ref($_), 'Sidef::') == 0
-                     ? $_->get_value
-                     : $_
-                 } @arg
-              )
-            : ()
-        );
+                    @arg
+                    ? (map { index(ref($_), 'Sidef::') == 0 ? $_->get_value : $_ } @arg)
+                    : ()
+                   );
 
         my @results = do {
             local *UNIVERSAL::AUTOLOAD;

@@ -11,12 +11,9 @@ package Sidef::Object::Enumerator {
     *call = \&new;
 
     sub first {
-        my ($self, $num) = @_;
+        my ($self, $n) = @_;
 
-        my $n = do {
-            local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
-            $num->get_value;
-        };
+        $n = CORE::int($n);
 
         my @arr;
         my $count = 0;

@@ -7,7 +7,10 @@ package Sidef::Types::Range::RangeNumber {
       Sidef::Object::Object
       );
 
-    use overload q{""} => \&dump;
+    use overload q{""} => sub {
+        my ($self) = @_;
+        "RangeNum($self->{from}, $self->{to}, $self->{step})";
+    };
 
     use Sidef::Types::Bool::Bool;
     use Sidef::Types::Number::Number;
@@ -115,7 +118,7 @@ package Sidef::Types::Range::RangeNumber {
 
     sub dump {
         my ($self) = @_;
-        Sidef::Types::String::String->new("RangeNum($self->{from}, $self->{to}, $self->{step})");
+        Sidef::Types::String::String->new("$self");
     }
 }
 

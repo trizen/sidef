@@ -18,16 +18,9 @@ package Sidef::Module::OO {
         my ($method) = ($AUTOLOAD =~ /^.*[^:]::(.*)$/);
 
         my @args = (
-            @arg
-            ? (
-               map {
-                   local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
-                   ref($_) eq __PACKAGE__ ? $_->{module}
-                     : index(ref($_), 'Sidef::') == 0 ? $_->get_value
-                     : $_
-                 } @arg
-              )
-            : ()
+                   @arg
+                   ? (map { ref($_) eq __PACKAGE__ ? $_->{module} : index(ref($_), 'Sidef::') == 0 ? $_->get_value : $_ } @arg)
+                   : ()
         );
 
         my @results = do {
