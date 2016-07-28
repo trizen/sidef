@@ -29,8 +29,7 @@ package Sidef::Types::Glob::Backtick {
 
     sub dump {
         my ($self) = @_;
-        Sidef::Types::String::String->new(
-                                     'Backtick(' . Sidef::Types::String::String->new($self->get_value)->dump->get_value . ')');
+        Sidef::Types::String::String->new('Backtick(' . ${Sidef::Types::String::String->new($$self)->dump} . ')');
     }
 };
 

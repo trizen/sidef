@@ -36,7 +36,7 @@ package Sidef::Types::Block::Fork {
 
     sub kill {
         my ($self, $signal) = @_;
-        kill(defined($signal) ? $signal->get_value : 'KILL', $self->{pid});
+        kill(defined($signal) ? "$signal" : 'KILL', $self->{pid});
     }
 };
 

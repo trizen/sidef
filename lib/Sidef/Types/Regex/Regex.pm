@@ -17,8 +17,8 @@ package Sidef::Types::Regex::Regex {
     sub new {
         my (undef, $regex, $mode) = @_;
 
-        $regex = defined($regex) ? ref($regex) ? $regex->get_value : $regex : '';
-        $mode  = defined($mode)  ? ref($mode)  ? $mode->get_value  : $mode  : '';
+        $regex = defined($regex) ? ref($regex) ? "$regex" : $regex : '';
+        $mode  = defined($mode)  ? ref($mode)  ? "$mode"  : $mode  : '';
 
         my $global_mode = $mode =~ tr/g//d;
         my $compiled_re = $mode eq '' ? qr{$regex} : qr{(?$mode:$regex)};
@@ -45,6 +45,7 @@ package Sidef::Types::Regex::Regex {
 
         $object //= do { state $x = Sidef::Types::String::String->new('') };
 
+        # Matching an array is deprecated
         if (UNIVERSAL::isa($object, 'ARRAY')) {
             my $match;
             foreach my $item (@{$object}) {
@@ -54,10 +55,11 @@ package Sidef::Types::Regex::Regex {
             return $match // $self->match(Sidef::Types::String::String->new);
         }
 
+        # Return a new match object
         Sidef::Types::Regex::Match->new(
-                                        obj  => $object->get_value,
+                                        obj  => "$object",
                                         self => $self,
-                                        pos  => defined($pos) ? $pos->get_value : undef,
+                                        pos  => defined($pos) ? CORE::int($pos) : undef,
                                        );
     }
 

@@ -12,24 +12,14 @@ package Sidef::Types::Glob::SocketHandle {
 
     sub setsockopt {
         my ($self, $level, $optname, $optval) = @_;
-        local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
-        (CORE::setsockopt($self->{fh}, $level->get_value, $optname->get_value, $optval->get_value))
+        (CORE::setsockopt($self->{fh}, $level, "$optname", $optval))
           ? (Sidef::Types::Bool::Bool::TRUE)
           : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub getsockopt {
         my ($self, $level, $optname) = @_;
-        Sidef::Types::String::String->new(
-            CORE::getsockopt(
-                $self->{fh},
-                do {
-                    local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
-                    $level->get_value;
-                },
-                $optname->get_value
-              ) // return
-        );
+        Sidef::Types::String::String->new(CORE::getsockopt($self->{fh}, $level, "$optname") // return);
     }
 
     sub getpeername {
@@ -44,20 +34,15 @@ package Sidef::Types::Glob::SocketHandle {
 
     sub bind {
         my ($self, $name) = @_;
-        (CORE::bind($self->{fh}, $name->get_value)) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
+        CORE::bind($self->{fh}, "$name")
+          ? (Sidef::Types::Bool::Bool::TRUE)
+          : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub listen {
         my ($self, $queuesize) = @_;
-        (
-         CORE::listen(
-             $self->{fh},
-             do {
-                 local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
-                 $queuesize->get_value;
-               }
-         )
-        )
+
+        CORE::listen($self->{fh}, $queuesize)
           ? (Sidef::Types::Bool::Bool::TRUE)
           : (Sidef::Types::Bool::Bool::FALSE);
     }
@@ -70,31 +55,29 @@ package Sidef::Types::Glob::SocketHandle {
 
     sub connect {
         my ($self, $name) = @_;
-        (CORE::connect($self->{fh}, $name->get_value)) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
+        CORE::connect($self->{fh}, "$name")
+          ? (Sidef::Types::Bool::Bool::TRUE)
+          : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub recv {
         my ($self, $length, $flags) = @_;
-        CORE::recv(
-            $self->{fh},
-            (my $content),
-            do {
-                local $Sidef::Types::Number::Number::GET_PERL_VALUE = 1;
-                $length->get_value;
-            },
-            $flags->get_value
-                  ) // return;
+        CORE::recv($self->{fh}, (my $content), $length, "$flags") // return;
         Sidef::Types::String::String->new($content);
     }
 
     sub send {
         my ($self, $msg, $flags, $to) = @_;
-        CORE::send($self->{fh}, $msg->get_value, $flags->get_value, defined($to) ? $to->get_value : ());
+        CORE::send($self->{fh}, "$msg", "$flags", defined($to) ? $to->get_value : ())
+          ? (Sidef::Types::Bool::Bool::TRUE)
+          : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub shutdown {
         my ($self, $how) = @_;
-        (CORE::shutdown($self->{fh}, $how->get_value)) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
+        CORE::shutdown($self->{fh}, $how)
+          ? (Sidef::Types::Bool::Bool::TRUE)
+          : (Sidef::Types::Bool::Bool::FALSE);
     }
 
 };
