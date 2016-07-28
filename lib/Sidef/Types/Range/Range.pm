@@ -17,8 +17,9 @@ package Sidef::Types::Range::Range {
     };
 
     sub new {
-        my (undef, $from, $to, $step) = @_;
-        $from->range($to, $step);
+        shift();
+        my $from = shift;
+        $from->range(@_);
     }
 
     *call = \&new;
