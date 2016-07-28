@@ -12,7 +12,7 @@ Array.def_method('to_json', func (self) {
 });
 
 Hash.def_method('to_json', func (self) {
-    '{ ' + self.pairs.map { .first.to_json + ' : ' + .second.to_json }.join(', ') + ' }'
+    '{ ' + self.to_a.map { .key.to_json + ' : ' + .value.to_json }.join(', ') + ' }'
 });
 
 null.def_method("to_json", func (self) {

@@ -9,6 +9,7 @@ package Sidef::Types::Hash::Hash {
 
     use overload
       q{bool} => sub { scalar(CORE::keys %{$_[0]}) },
+      q{0+}   => sub { scalar(CORE::keys %{$_[0]}) },
       q{""}   => \&dump;
 
     use Sidef::Types::Bool::Bool;
@@ -401,12 +402,23 @@ package Sidef::Types::Hash::Hash {
         );
     }
 
-    *pairs    = \&to_a;
     *to_array = \&to_a;
+
+    sub pairs {
+        my ($self, @keys) = @_;
+        Sidef::Types::Array::Array->new([map { Sidef::Types::Array::Pair->new($_, $self->{$_}) } @keys]);
+    }
+
+    sub pair {
+        my ($self, $key) = @_;
+        Sidef::Types::Array::Pair->new($key, $self->{$key});
+    }
 
     sub exists {
         my ($self, $key) = @_;
-        (CORE::exists $self->{$key}) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
+        CORE::exists($self->{$key})
+          ? (Sidef::Types::Bool::Bool::TRUE)
+          : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     *has_key  = \&exists;

@@ -1330,9 +1330,8 @@ HEADER
                         $code .= '['
                           . 'map { ref($_) eq "Sidef::Types::Number::Number" ? Math::GMPq::Rmpq_get_d($$_) '
                           . ': ref($_) eq "" ? $_ '
-                          ##.': UNIVERSAL::can($_, "to_i") ? $_->to_i '
                           . ': do { my $sub = UNIVERSAL::can($_, "..."); '
-                          . 'defined($sub) ? $sub->($_) : $_ } } '
+                          . 'defined($sub) ? $sub->($_) : CORE::int($_) } } '
                           . $indices . ']';
                     }
                 }
@@ -1347,9 +1346,8 @@ HEADER
                           . $code . '}' . '{'
                           . 'map { ref($_) eq "Sidef::Types::String::String" ? $$_ '
                           . ': ref($_) eq "" ? $_ '
-                          ##.': UNIVERSAL::can($_, "to_s") ? $_->to_s '
                           . ': do { my $sub = UNIVERSAL::can($_, "..."); '
-                          . 'defined($sub) ? $sub->($_) : $_ } } '
+                          . 'defined($sub) ? $sub->($_) : "$_" } } '
                           . $keys . '}';
                     }
                 }

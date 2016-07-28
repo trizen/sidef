@@ -1,0 +1,50 @@
+#!/usr/bin/ruby
+
+#
+## Test implicit numeric conversions
+#
+
+class Foo(val) {
+
+    method to_n {
+        1+val
+    }
+
+    method to_c {
+        Complex(val, 4)
+    }
+}
+
+assert_eq(3+"4", 7)
+assert_eq(42+"1.5", 43.5)
+assert_eq(42+true, 43)
+assert_eq(42+false, 42)
+assert_eq(10/"2", 5)
+assert_eq(1/false, Inf)
+
+var f = Foo(3)
+assert_eq(42+f, 46)
+
+assert_eq(43+[5,2,3,4], 47)
+
+assert_eq(Complex(4,5)+f, Complex(7,9))
+assert_eq(Complex(9,7)+f, Complex(3,4)+Complex(9,7))
+
+assert_eq(42 - "-1.2", 43.2)
+
+assert_eq(Complex(5,6) + "3+4i", Complex(5,6)+Complex(3,4))
+assert_eq(Complex(3,4)*"-9+17i", Complex(-9, 17)*Complex(3,4))
+
+f.val = 42
+assert_eq(Complex(4,5)+f, Complex(46,9))
+assert_eq(42 + f, 85)
+
+assert_eq(Complex(8, 4) + true,  Complex(9,4))
+assert_eq(Complex(10,2) - false, Complex(10, 2))
+
+assert_eq(Complex(1,2) / false, Complex(Inf, Inf))
+assert_eq(Complex(3,4) / true,  Complex(3,4))
+
+assert_eq(Inf + "12", Inf)
+
+say "** Test passed!"

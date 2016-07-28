@@ -290,6 +290,14 @@ Return the
 
 =cut
 
+=head2 pair
+
+Hash.pair() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 same_keys
 
 Hash.same_keys() -> I<Obj>

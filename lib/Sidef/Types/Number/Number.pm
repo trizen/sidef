@@ -98,12 +98,18 @@ package Sidef::Types::Number::Number {
         (
          ref($$_) eq __PACKAGE__
            or do {
-             $$_ =
-                 ref($$_) eq 'Sidef::Types::Bool::Bool'
-               ? $$$_
-                   ? ONE
-                   : ZERO
-               : __PACKAGE__->new("$$_");
+             my $sub = overload::Method($$_, '0+');
+
+             my $tmp = (
+                        defined($sub)
+                        ? __PACKAGE__->new($sub->($$_))
+                        : die "[ERROR] Value <<$$_>> cannot be implicitly converted to a number!"
+                       );
+
+             ref($tmp) eq __PACKAGE__
+               or die "[ERROR] Cannot convert <<$$_>> to a number! (is method \"to_n\" well defined?)";
+
+             $$_ = $tmp;
            }
         ) for @_;
     }

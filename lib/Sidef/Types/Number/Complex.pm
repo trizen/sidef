@@ -146,15 +146,20 @@ package Sidef::Types::Number::Complex {
         (
          ref($$_) eq __PACKAGE__
            or do {
-             $$_ =
-               ref($$_) eq 'Sidef::Types::Number::Number'
-               ? __PACKAGE__->new($$_)
-               : ref($$_) eq 'Sidef::Types::Bool::Bool' ? __PACKAGE__->new(
-                                                                           $$$_
-                                                                           ? Sidef::Types::Number::Number::ONE
-                                                                           : Sidef::Types::Number::Number::ZERO
-                                                                          )
-               : __PACKAGE__->new(\"$$_");
+             ref($$_) eq 'Sidef::Types::Number::Number' ? do { $$_ = __PACKAGE__->new($$_) } : do {
+                 my $sub = UNIVERSAL::can($$_, 'to_c') // overload::Method($$_, '0+');
+
+                 my $tmp = (
+                            defined($sub)
+                            ? __PACKAGE__->new($sub->($$_))
+                            : die "[ERROR] Value <<$$_>> cannot be implicitly converted to a complex number!"
+                           );
+
+                 ref($tmp) eq __PACKAGE__
+                   or die "[ERROR] Cannot convert <<$$_>> to a complex number! (is method \"to_c\" well defined?)";
+
+                 $$_ = $tmp;
+               }
            }
         ) for @_;
     }
