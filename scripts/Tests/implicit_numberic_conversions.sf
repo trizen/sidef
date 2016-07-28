@@ -46,5 +46,9 @@ assert_eq(Complex(1,2) / false, Complex(Inf, Inf))
 assert_eq(Complex(3,4) / true,  Complex(3,4))
 
 assert_eq(Inf + "12", Inf)
+assert_eq(42 / "0", Inf)
+assert_eq(42 + "1/2", 42.5)
+assert_eq(42 * "-1/2", -21)
+assert_eq(42 + "112381628946182648126487125648712487.4124127412741724", 112381628946182648126487125648712529.4124127412741724)
 
 say "** Test passed!"

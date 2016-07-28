@@ -10,7 +10,7 @@ package Sidef::Types::String::String {
 
     use overload
       q{bool} => \&get_value,
-      q{0+}   => sub { 0 + ${$_[0]} },
+      q{0+}   => sub { ${$_[0]} },
       q{""}   => \&get_value;
 
     use Sidef::Types::Bool::Bool;

@@ -298,6 +298,14 @@ Return the
 
 =cut
 
+=head2 pairs
+
+Hash.pairs() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 same_keys
 
 Hash.same_keys() -> I<Obj>
@@ -336,7 +344,7 @@ Hash.to_a() -> I<Obj>
 
 Return the
 
-Aliases: I<pairs>, I<to_array>
+Aliases: I<to_array>
 
 =cut
 
