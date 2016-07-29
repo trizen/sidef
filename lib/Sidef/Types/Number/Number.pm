@@ -107,7 +107,7 @@ package Sidef::Types::Number::Number {
                        );
 
              ref($tmp) eq __PACKAGE__
-               or die "[ERROR] Cannot convert <<$$_>> to a number! (is method \"to_n\" well defined?)";
+               or die "[ERROR] Cannot convert <<$$_>> to a number! (is method \"to_n\" well-defined?)";
 
              $$_ = $tmp;
            }

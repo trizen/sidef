@@ -156,7 +156,7 @@ package Sidef::Types::Number::Complex {
                            );
 
                  ref($tmp) eq __PACKAGE__
-                   or die "[ERROR] Cannot convert <<$$_>> to a complex number! (is method \"to_c\" well defined?)";
+                   or die "[ERROR] Cannot convert <<$$_>> to a complex number! (is method \"to_c\" well-defined?)";
 
                  $$_ = $tmp;
                }
