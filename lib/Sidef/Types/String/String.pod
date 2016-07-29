@@ -606,6 +606,14 @@ Return the
 
 =cut
 
+=head2 iter
+
+String.iter() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 jaro_distance
 
 String.jaro_distance() -> I<Obj>

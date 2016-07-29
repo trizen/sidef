@@ -1,16 +1,16 @@
 #!/usr/bin/ruby
 
-require('MediaWiki::API');
+require('MediaWiki::API')
 
-var api = %s'MediaWiki::API'.new(
-    Hash.new(api_url => 'http://rosettacode.org/mw/api.php')
-);
+var api = %s<MediaWiki::API>.new(
+    Hash(api_url => 'http://rosettacode.org/mw/api.php')
+)
 
-var languages = [];
-var gcmcontinue;
+var languages = []
+var gcmcontinue
 loop {
     var apih = api.api(
-        Hash.new(
+        Hash(
             action      => 'query',
             generator   => 'categorymembers',
             gcmtitle    => 'Category:Programming Languages',
@@ -18,16 +18,16 @@ loop {
             prop        => 'categoryinfo',
             gcmcontinue => gcmcontinue,
         )
-    );
+    )
 
-    languages.append(apih{:query}{:pages}.values...);
-    gcmcontinue = apih{'continue'}{:gcmcontinue};
-    gcmcontinue || break;
+    languages.append(apih{:query}{:pages}.values...)
+    gcmcontinue = apih{:continue}{:gcmcontinue}
+    gcmcontinue || break
 }
 
 languages.each { |lang|
-    lang{:title} -= /^Category:/;
-    lang{:categoryinfo}{:size} := 0;
+    lang{:title} -= /^Category:/
+    lang{:categoryinfo}{:size} := 0
 }
 
 var sorted_languages = languages.sort_by { |lang|
@@ -35,5 +35,5 @@ var sorted_languages = languages.sort_by { |lang|
 }
 
 sorted_languages.each_kv { |i, lang|
-    printf("%3d. %20s - %3d\n", i+1, lang{:title}, lang{:categoryinfo}{:size});
+    printf("%3d. %20s - %3d\n", i+1, lang{:title}, lang{:categoryinfo}{:size})
 }

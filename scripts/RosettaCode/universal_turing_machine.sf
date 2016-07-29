@@ -26,8 +26,7 @@ func run_utm(state="", blank="", rules=[], tape=[blank], halt="", pos=0) {
             break;
         }
 
-        rules.each { |rule|
-            var (s0, v0, v1, dir, s1) = rule...;
+        for s0, v0, v1, dir, s1 in rules {
             if ((s0 != state) || (tape[pos] != v0)) {
                 next;
             }
@@ -47,11 +46,11 @@ func run_utm(state="", blank="", rules=[], tape=[blank], halt="", pos=0) {
             }
 
             state = s1;
-            goto :END_LOOP;
-        };
+            goto :NEXT;
+        }
 
         die 'No matching rules';
-        @:END_LOOP;
+        @:NEXT;
     }
 }
 
