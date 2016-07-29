@@ -188,6 +188,12 @@ package Sidef::Types::Number::Nan {
 
     *commify = \&dump;
 
+    sub as_rat {
+        state $x = Sidef::Types::String::String->new('0/0');
+    }
+
+    *as_frac = \&as_rat;
+
     sub chr {
         state $x = Sidef::Types::String::String->new('');
     }
