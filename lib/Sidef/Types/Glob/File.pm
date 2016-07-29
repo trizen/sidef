@@ -562,13 +562,24 @@ package Sidef::Types::Glob::File {
     *delete = \&unlink;
     *remove = \&unlink;
 
+    sub split {
+        ref($_[0]) || shift(@_);
+        my ($self) = @_;
+        state $x = require File::Spec;
+        Sidef::Types::Array::Array->new([map { Sidef::Types::String::String->new($_) } File::Spec->splitdir("$self")]);
+    }
+
+    sub splitpath {
+        ref($_[0]) || shift(@_);
+        my ($self) = @_;
+        state $x = require File::Spec;
+        Sidef::Types::Array::Array->new([map { Sidef::Types::String::String->new($_) } File::Spec->splitpath("$self")]);
+    }
+
     sub dump {
         my ($self) = @_;
         Sidef::Types::String::String->new('File(' . ${Sidef::Types::String::String->new("$self")->dump} . ')');
     }
-
-    # Path split
-    *split = \&Sidef::Types::Glob::Dir::split;
 
 };
 

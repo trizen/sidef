@@ -188,6 +188,14 @@ Return the
 
 =cut
 
+=head2 splitpath
+
+Dir.splitpath() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 tmp
 
 Dir.tmp() -> I<Obj>

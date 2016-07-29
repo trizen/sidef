@@ -71,7 +71,7 @@ package Sidef::Types::Glob::Dir {
         ref($_[0]) || shift(@_);
         my ($self) = @_;
         state $x = require File::Spec;
-        Sidef::Types::Array::Array->new(map { Sidef::Types::String::String->new($_) } File::Spec->splitdir("$self"));
+        Sidef::Types::Array::Array->new([map { Sidef::Types::String::String->new($_) } File::Spec->splitdir("$self")]);
     }
 
     # Returns the parent of the directory

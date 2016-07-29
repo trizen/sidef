@@ -480,6 +480,14 @@ Return the
 
 =cut
 
+=head2 splitpath
+
+File.splitpath() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 stat
 
 File.stat() -> I<Obj>
