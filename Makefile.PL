@@ -27,6 +27,7 @@ WriteMakefile
                    'Term::ReadLine' => 0,
                    'Test::More' => 0,
                    'Time::HiRes' => 0,
+                   'experimental' => 0,
                    'parent' => 0,
                    'utf8' => 0
                  },
