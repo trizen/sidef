@@ -126,7 +126,9 @@ package Sidef::Types::Number::Inf {
 
     sub root {
         my ($x, $y) = @_;
-        ref($y) eq 'Sidef::Types::Number::Inf' || ref($y) eq 'Sidef::Types::Number::Ninf' ? Sidef::Types::Number::Number::ONE
+        ref($y) eq 'Sidef::Types::Number::Nan' ? $y
+          : (   ref($y) eq 'Sidef::Types::Number::Inf'
+             || ref($y) eq 'Sidef::Types::Number::Ninf') ? Sidef::Types::Number::Number::ONE
           : $y->is_neg ? Sidef::Types::Number::Number::ZERO
           :              INF;
     }

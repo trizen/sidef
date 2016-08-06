@@ -222,6 +222,7 @@ package Sidef::Types::Number::Complex {
             Math::MPC::Rmpc_set_ui_ui($r, 0, 1, $ROUND);
             bless(\$r, __PACKAGE__);
         };
+        ref($_[0]) eq __PACKAGE__ ? $i->mul($_[0]) : $i;
     }
 
     sub phi {

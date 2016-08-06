@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Test::More;
 
-plan tests => 105;
+plan tests => 128;
 
 use Sidef;
 
@@ -87,7 +87,9 @@ is($inf->abs,                    $inf);
 is($ninf->abs,                   $inf);
 is($nan->abs,                    $nan);
 is($inf->sqrt,                   $inf);
-is($ninf->sqrt,                  $inf);
+is($inf->isqrt,                  $inf);
+is($ninf->sqrt,                  $inf);                # should be `inf*i`
+is($ninf->isqrt,                 $inf);                # =//=
 is($inf->erfc,                   $zero);
 is(($ninf)->erfc,                $o->new(2));
 is($inf->fac,                    $inf);
@@ -104,18 +106,43 @@ is($nan->pow($inf),  $nan);
 ##################################################
 # Root
 
-is(($inf)->root($o->new(-12)),  $zero);
-is(($inf)->iroot($o->new(-12)), $zero);
-is(($ninf)->root($o->new(-12)), $zero);
-is(($inf)->root($o->new(2)),    $inf);
-is(($inf)->iroot($o->new(2)),   $inf);
-is(($ninf)->root($o->new(2)),   $inf);    # sqrt($ninf) -- shouldn't be $nan?
-is(($inf)->root($inf),          $one);
-is(($ninf)->root($inf),         $one);
-is(($inf)->root($ninf),         $one);
-is(($ninf)->root($ninf),        $one);
+is($inf->root($o->new(-12)),  $zero);
+is($ninf->root($o->new(-12)), $zero);
+is($inf->root($o->new(2)),    $inf);
+is($ninf->root($o->new(2)),   $inf);    # should be `inf*i`
+is($inf->root($inf),          $one);
+is($ninf->root($inf),         $one);
+is($inf->root($ninf),         $one);
+is($ninf->root($ninf),        $one);
+is($ninf->root($o->new(1)),   $ninf);
+is($ninf->root($o->new(0)),   $inf);
+is($inf->root($o->new(1)),    $inf);
+is($inf->root($o->new(0)),    $inf);
+is($ninf->root($nan),         $nan);
+is($inf->root($nan),          $nan);
+is($nan->root($nan),          $nan);
 
 like($inf->asec, qr/^1\.5707963267/);
+
+#################################################
+# Pow
+
+is($inf->pow($o->new(-12)->inv),  $zero);
+is($ninf->pow($o->new(-12)->inv), $zero);
+is($inf->pow($o->new(2)->inv),    $inf);
+is($inf->pow($o->new(2)->inv),    $inf);
+is($ninf->pow($o->new(2)->inv),   $inf);    # should be `inf*i`
+is($inf->pow($inf->inv),          $one);
+is($ninf->pow($inf->inv),         $one);
+is($inf->pow($ninf->inv),         $one);
+is($ninf->pow($ninf->inv),        $one);
+is($ninf->pow($o->new(1)->inv),   $ninf);
+is($ninf->pow($o->new(0)->inv),   $inf);
+is($inf->pow($o->new(1)->inv),    $inf);
+is($inf->pow($o->new(0)->inv),    $inf);
+is($ninf->pow($nan),              $nan);
+is($inf->pow($nan),               $nan);
+is($nan->pow($nan),               $nan);
 
 ###################################################
 # Infinity <=> Number

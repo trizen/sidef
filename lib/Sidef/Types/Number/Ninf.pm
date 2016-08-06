@@ -192,11 +192,15 @@ package Sidef::Types::Number::Ninf {
     sub asin { state $x = Sidef::Types::Number::Complex->new(0, '@inf@') }
 
     #
-    ## sqrt(-Inf) = (-Inf)**(1/2) == Inf
+    ## sqrt(-inf) = (-inf)^(1/2) == inf*i
     #
-    *isqrt = \&inf;
-    *sqrt  = \&inf;
-    *sqr   = \&inf;
+    *isqrt = \&inf;    # not quite right
+    *sqrt  = \&inf;    # =//=
+
+    #
+    ## (-inf)^2 = inf
+    #
+    *sqr = \&inf;
 
     #
     ## (-inf)^(1/x) = i^(1/x) * inf
@@ -204,12 +208,11 @@ package Sidef::Types::Number::Ninf {
     sub root {
         my ($x, $y) = @_;
 
-        if (ref($y) eq 'Sidef::Types::Number::Nan') {
-            return $y;
-        }
-
-        ref($y) eq 'Sidef::Types::Number::Inf' || ref($y) eq 'Sidef::Types::Number::Ninf' ? Sidef::Types::Number::Number::ONE
+        ref($y) eq 'Sidef::Types::Number::Nan' ? $y
+          : (   ref($y) eq 'Sidef::Types::Number::Inf'
+             || ref($y) eq 'Sidef::Types::Number::Ninf') ? Sidef::Types::Number::Number::ONE
           : $y->is_neg ? Sidef::Types::Number::Number::ZERO
+          : $y->is_one ? $x
           :              Sidef::Types::Number::Inf::INF;
     }
 
