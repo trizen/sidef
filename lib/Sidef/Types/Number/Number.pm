@@ -267,7 +267,7 @@ package Sidef::Types::Number::Number {
             # Too much rounding... Give up and return an MPFR stringified number.
             !Math::GMPz::Rmpz_sgn($z) && $PREC >= 2 && do {
                 my $mpfr = Math::MPFR::Rmpfr_init2($PREC);
-                Math::MPFR::Rmpfr_set_q($mpfr, $$x, $ROUND);
+                Math::MPFR::Rmpfr_set_q($mpfr, $x, $ROUND);
                 return Math::MPFR::Rmpfr_get_str($mpfr, 10, $prec, $ROUND);
             };
 
