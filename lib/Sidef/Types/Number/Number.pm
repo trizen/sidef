@@ -235,13 +235,14 @@ package Sidef::Types::Number::Number {
             my ($str, $exp) = Math::MPFR::Rmpfr_deref2(_big2mpfr($_[0]), 10, $digits, $ROUND);
 
             my $neg = CORE::chr(CORE::ord($str)) eq '-' ? 1 : 0;
+            substr($str, 0, 1, '') if $neg;
 
-            if (CORE::abs($exp) > length($str)) {
-                substr($str, 1 + $neg, 0, '.');
+            my $len = length($str);
+
+            if (CORE::abs($exp) > $len) {
+                substr($str, 1, 0, '.');
                 return $str . 'e' . ($exp - 1);
             }
-
-            substr($str, 0, 1, '') if $neg;
 
             if ($exp <= 0) {
                 substr($str, 0, 0, '0.' . ('0' x (CORE::abs($exp))));
@@ -250,10 +251,13 @@ package Sidef::Types::Number::Number {
                 substr($str, $exp, 0, '.');
             }
 
-            substr($str, -1) eq '0'
-              and $str =~ s/0+\z//;
+            if (substr($str, -1) eq '0') {
+                $str =~ s/0+\z//;
+            }
 
-            $neg ? "-$str" : $str;
+            substr($str, 0, 0, '-') if $neg;
+
+            $str;
           };
     }
 

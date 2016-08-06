@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 100;
+use Test::More tests => 98;
 
 use Sidef;
 
@@ -84,22 +84,20 @@ my $o = 'Sidef::Types::Number::Number';
 # general tests
 
 {
-    like($o->new(2)->sqrt,                        qr/^1\.414213562/);
-    like($o->new(100)->log,                       qr/^4\.605170185/);
-    like($o->new(10)->exp,                        qr/^22026\.46579/);
-    like($o->new(-4.5)->abs,                      qr/^4.5\z/);
-    like($o->new(10)->abs,                        qr/^10\z/);
-    like($o->new(2.9)->floor,                     qr/^2\z/);
-    like($o->new(2.5)->floor,                     qr/^2\z/);
-    like($o->new(2.1)->floor,                     qr/^2\z/);
-    like($o->new(2)->floor,                       qr/^2\z/);
-    like($o->new(2.9)->ceil,                      qr/^3\z/);
-    like($o->new(2.5)->ceil,                      qr/^3\z/);
-    like($o->new(2.1)->ceil,                      qr/^3\z/);
-    like($o->new(2)->ceil,                        qr/^2\z/);
-    like($o->new(2.3)->pow($o->new(5.4)),         qr/^89.811/);
-    like($o->new(1)->div($o->new(100)->fac),      qr/^1\.07151028812.*?e-158\z/);
-    like($o->new(1)->div($o->new(100)->fac->neg), qr/^-1\.07151028812.*?e-158\z/);
+    like($o->new(2)->sqrt,                qr/^1\.414213562/);
+    like($o->new(100)->log,               qr/^4\.605170185/);
+    like($o->new(10)->exp,                qr/^22026\.46579/);
+    like($o->new(-4.5)->abs,              qr/^4.5\z/);
+    like($o->new(10)->abs,                qr/^10\z/);
+    like($o->new(2.9)->floor,             qr/^2\z/);
+    like($o->new(2.5)->floor,             qr/^2\z/);
+    like($o->new(2.1)->floor,             qr/^2\z/);
+    like($o->new(2)->floor,               qr/^2\z/);
+    like($o->new(2.9)->ceil,              qr/^3\z/);
+    like($o->new(2.5)->ceil,              qr/^3\z/);
+    like($o->new(2.1)->ceil,              qr/^3\z/);
+    like($o->new(2)->ceil,                qr/^2\z/);
+    like($o->new(2.3)->pow($o->new(5.4)), qr/^89.811/);
 }
 
 ##############################################################################
