@@ -115,6 +115,9 @@ package Sidef::Types::Number::Number {
     }
 
     sub _big2mpfr {
+
+        $PREC = CORE::int($PREC) if ref($PREC);
+
         my $r = Math::MPFR::Rmpfr_init2($PREC);
         Math::MPFR::Rmpfr_set_q($r, ${$_[0]}, $ROUND);
         $r;
@@ -127,8 +130,6 @@ package Sidef::Types::Number::Number {
     }
 
     sub _mpfr2big {
-
-        $PREC = "$PREC" if ref($PREC);
 
         if (Math::MPFR::Rmpfr_inf_p($_[0])) {
             if (Math::MPFR::Rmpfr_sgn($_[0]) > 0) {
@@ -228,17 +229,17 @@ package Sidef::Types::Number::Number {
     sub get_value { Math::GMPq::Rmpq_get_d(${$_[0]}) }
 
     sub _big2str {
-        my $v = Math::GMPq::Rmpq_get_str(${$_[0]}, 10);
-
-        if (index($v, '/') != -1) {
-            my ($x) = @_;
-            $PREC = "$$PREC" if ref($PREC);
+        my $x = ${$_[0]};
+        Math::GMPq::Rmpq_integer_p($x)
+          ? Math::GMPq::Rmpq_get_str($x, 10)
+          : do {
+            $PREC = CORE::int($PREC) if ref($PREC);
 
             my $prec = CORE::int($PREC / 4);
-            my $sgn  = Math::GMPq::Rmpq_sgn($$x);
+            my $sgn  = Math::GMPq::Rmpq_sgn($x);
 
             my $n = Math::GMPq::Rmpq_init();
-            Math::GMPq::Rmpq_set($n, $$x);
+            Math::GMPq::Rmpq_set($n, $x);
             Math::GMPq::Rmpq_abs($n, $n) if $sgn < 0;
 
             my $z = Math::GMPz::Rmpz_init();
@@ -311,11 +312,8 @@ package Sidef::Types::Number::Number {
                 push(@r, '0' x $s) if ($s > 0);
             }
 
-            ($sgn < 0 ? "-" : '') . ((shift(@r) . '.' . join('', @r)) =~ s/0+\z//r =~ s/\.\z//r);
-        }
-        else {
-            $v;
-        }
+            ($sgn < 0 ? "-" : '') . shift(@r) . (('.' . join('', @r)) =~ s/0+\z//r =~ s/\.\z//r);
+          }
     }
 
     sub base {
