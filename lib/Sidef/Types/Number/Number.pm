@@ -231,22 +231,23 @@ package Sidef::Types::Number::Number {
         Math::GMPq::Rmpq_integer_p(${$_[0]})
           ? Math::GMPq::Rmpq_get_str(${$_[0]}, 10)
           : do {
-            my ($str, $exp) = Math::MPFR::Rmpfr_deref2(_big2mpfr($_[0]), 10, CORE::int($PREC / 4), $ROUND);
+            my $digits = CORE::int($PREC / 4);
+            my ($str, $exp) = Math::MPFR::Rmpfr_deref2(_big2mpfr($_[0]), 10, $digits, $ROUND);
 
             my $neg = CORE::chr(CORE::ord($str)) eq '-' ? 1 : 0;
 
-            if (CORE::abs($exp) >= length($str)) {
+            if (CORE::abs($exp) > length($str)) {
                 substr($str, 1 + $neg, 0, '.');
                 return $str . 'e' . ($exp - 1);
             }
 
             substr($str, 0, 1, '') if $neg;
 
-            if ($exp > 0) {
-                substr($str, $exp, 0, '.');
+            if ($exp <= 0) {
+                substr($str, 0, 0, '0.' . ('0' x (CORE::abs($exp))));
             }
-            else {
-                substr($str, 0, 0, '0.' . ('0' x CORE::abs($exp)));
+            elsif ($exp) {
+                substr($str, $exp, 0, '.');
             }
 
             substr($str, -1) eq '0'
