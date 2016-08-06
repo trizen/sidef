@@ -33,7 +33,7 @@ package Sidef::Types::Number::Number {
     use overload
       q{bool} => sub { Math::GMPq::Rmpq_sgn(${$_[0]}) != 0 },
       q{0+}   => \&get_value,
-      q{""}   => \&_as_str;
+      q{""}   => \&_big2str;
 
     use Sidef::Types::Bool::Bool;
 
@@ -227,7 +227,7 @@ package Sidef::Types::Number::Number {
 
     sub get_value { Math::GMPq::Rmpq_get_d(${$_[0]}) }
 
-    sub _as_str {
+    sub _big2str {
         my $v = Math::GMPq::Rmpq_get_str(${$_[0]}, 10);
 
         if (index($v, '/') != -1) {
@@ -264,7 +264,7 @@ package Sidef::Types::Number::Number {
             Math::GMPz::Rmpz_set_q($z, $n);
 
             # Too much rounding... Give up and return an MPFR stringified number.
-            Math::GMPz::Rmpz_sgn($z) || do {
+            !Math::GMPz::Rmpz_sgn($z) && $PREC >= 2 && do {
                 my $mpfr = Math::MPFR::Rmpfr_init2($PREC);
                 Math::MPFR::Rmpfr_set_q($mpfr, $$x, $ROUND);
                 return Math::MPFR::Rmpfr_get_str($mpfr, 10, $prec, $ROUND);
