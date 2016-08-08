@@ -1,0 +1,34 @@
+#!/usr/bin/ruby
+
+# See: https://projecteuler.net/problem=81
+
+var matrix = [
+    [131, 673, 234, 103, 18],
+    [201, 96, 342, 965, 150],
+    [630, 803, 746, 422, 111],
+    [537, 699, 497, 121, 956],
+    [805, 732, 524, 37, 331],
+]
+
+var end = matrix.end
+
+func path(i, j) is cached {
+
+    var sum = matrix[i][j]
+
+    if ((i < end) && (j < end)) {
+        sum += Math.min(path(i+1, j), path(i, j+1))
+    }
+    elsif (i < end) {
+        sum += path(i+1, j)
+    }
+    elsif (j < end) {
+        sum += path(i, j+1)
+    }
+
+    sum
+}
+
+var sum = path(0, 0)
+assert_eq(sum, 2427)
+say "Minimum path-sum: #{sum}"

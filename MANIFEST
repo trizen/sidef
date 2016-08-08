@@ -238,6 +238,7 @@ scripts/mersenne_twister.sf
 scripts/multiple_dispatch.sf
 scripts/mutual_recursion.sf
 scripts/nth_root.sf
+scripts/path_sum_two_ways.sf
 scripts/permutations_iter.sf
 scripts/permutations_rec.sf
 'scripts/Project Euler/0001-multiples_of_3_and_5.sf'
