@@ -2392,6 +2392,8 @@ package Sidef::Parser {
 
             return $obj;
         }
+
+        return;
     }
 
     sub parse_array {
@@ -2413,6 +2415,8 @@ package Sidef::Parser {
 
             return $obj;
         }
+
+        return;
     }
 
     sub parse_lookup {
@@ -2434,6 +2438,8 @@ package Sidef::Parser {
 
             return $obj;
         }
+
+        return;
     }
 
     sub parse_block {
@@ -2505,6 +2511,8 @@ package Sidef::Parser {
 
             return $block;
         }
+
+        return;
     }
 
     sub append_method {
@@ -2840,7 +2848,14 @@ package Sidef::Parser {
                                     while (/\G\h*elsif\h*(?=\()/gc) {
                                         my $arg = $self->parse_arg(code => $opt{code});
                                         $self->parse_whitespace(code => $opt{code});
-                                        my $block = $self->parse_block(code => $opt{code});
+
+                                        my $block = $self->parse_block(code => $opt{code}) // $self->fatal_error(
+                                                                          code  => $_,
+                                                                          pos   => pos($_) - 1,
+                                                                          error => "invalid declaration of the `if` statement",
+                                                                          reason => "expected a block after `elsif(...)`",
+                                        );
+
                                         push @{$obj->{if}}, {expr => $arg, block => $block};
                                         redo ELSIF;
                                     }
