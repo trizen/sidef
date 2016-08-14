@@ -686,7 +686,7 @@ Number.expmod() -> I<Obj>
 
 Return the
 
-Aliases: I<modpow>
+Aliases: I<modpow>, I<powmod>
 
 =cut
 

@@ -1802,6 +1802,7 @@ package Sidef::Types::Number::Number {
     }
 
     *expmod = \&modpow;
+    *powmod = \&modpow;
 
     sub modinv {
         my ($x, $y) = @_;

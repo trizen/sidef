@@ -85,6 +85,7 @@ package Sidef::Types::Number::Inf {
     *bin         = \&nan;
     *modpow      = \&nan;
     *expmod      = \&nan;
+    *powmod      = \&nan;
     *modinv      = \&nan;
     *invmod      = \&nan;
     *and         = \&nan;

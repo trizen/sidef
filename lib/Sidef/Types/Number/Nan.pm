@@ -48,6 +48,11 @@ package Sidef::Types::Number::Nan {
     *or          = \&nan;
     *xor         = \&nan;
     *inc         = \&nan;
+    *modpow      = \&nan;
+    *powmod      = \&nan;
+    *expmod      = \&nan;
+    *modinv      = \&nan;
+    *invmod      = \&nan;
     *dec         = \&nan;
     *neg         = \&nan;
     *pos         = \&nan;

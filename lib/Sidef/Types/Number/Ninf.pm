@@ -88,6 +88,7 @@ package Sidef::Types::Number::Ninf {
     *bin              = \&nan;
     *modpow           = \&nan;
     *expmod           = \&nan;
+    *powmod           = \&nan;
     *modinv           = \&nan;
     *invmod           = \&nan;
     *and              = \&nan;
