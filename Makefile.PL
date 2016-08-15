@@ -7,6 +7,7 @@ WriteMakefile
   'VERSION_FROM' => 'lib/Sidef.pm',
   'PREREQ_PM' => {
                    'Cwd' => 0,
+                   'Data::Dump' => 0,
                    'Encode' => 0,
                    'Fcntl' => 0,
                    'File::Basename' => 0,

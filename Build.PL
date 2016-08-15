@@ -35,6 +35,7 @@ my $builder = Module::Build->new(
 
     requires => {
                  'perl'           => '5.18.0',
+                 'Data::Dump'     => 0,
                  'experimental'   => 0,
                  'utf8'           => 0,
                  'parent'         => 0,
@@ -59,15 +60,6 @@ my $builder = Module::Build->new(
                  'Getopt::Std'    => 0,
                  'Term::ReadLine' => 0,
                 },
-
-    auto_features => {
-                      dump_support => {
-                                       description => "Dump the AST of a parsed source code. (-D)",
-                                       requires    => {
-                                                    'Data::Dump' => 0,
-                                                   },
-                                      },
-                     },
 
     add_to_cleanup     => ['Sidef-*'],
     create_makefile_pl => 'traditional',

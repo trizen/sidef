@@ -116,6 +116,7 @@ provides:
     file: lib/Sidef/Variable/NamedParam.pm
 requires:
   Cwd: '0'
+  Data::Dump: '0'
   Encode: '0'
   Fcntl: '0'
   File::Basename: '0'
