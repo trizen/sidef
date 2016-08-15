@@ -6,7 +6,7 @@ package Sidef::Types::Block::Block {
       Sidef::Convert::Convert
       );
 
-    require List::Util;
+    use List::Util qw();
 
     use overload
       q{bool} => sub { 1 },
@@ -124,7 +124,7 @@ package Sidef::Types::Block::Block {
                             }
 
                             if (exists $var->{subset_blocks}) {
-                                List::Util::all(sub { $_->($value) }, @{$var->{subset_blocks}}) || next OUTER;
+                                (List::Util::all { $_->($value) } @{$var->{subset_blocks}}) || next OUTER;
                             }
                         }
 
@@ -150,7 +150,7 @@ package Sidef::Types::Block::Block {
                         }
 
                         if (exists $var->{subset_blocks}) {
-                            List::Util::all(sub { $_->($value) }, @{$var->{subset_blocks}}) || next OUTER;
+                            (List::Util::all { $_->($value) } @{$var->{subset_blocks}}) || next OUTER;
                         }
                     }
                     elsif (exists $var->{where_expr}) {

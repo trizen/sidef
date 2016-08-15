@@ -2,6 +2,7 @@ package Sidef::Types::Range::Range {
 
     use 5.014;
 
+    use List::Util qw();
     use Sidef::Types::Bool::Bool;
     use Sidef::Types::Number::Number;
 
@@ -312,7 +313,6 @@ package Sidef::Types::Range::Range {
     *count_by = \&count;
 
     sub shuffle {
-        state $x = require List::Util;
         Sidef::Types::Array::Array->new([List::Util::shuffle($_[0]->to_list)]);
     }
 

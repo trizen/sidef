@@ -1,6 +1,7 @@
 package Sidef::Types::Array::MultiArray {
 
     use 5.014;
+    use List::Util qw();
 
     use parent qw(
       Sidef::Object::Object
@@ -49,7 +50,6 @@ package Sidef::Types::Array::MultiArray {
 
     sub _max {
         my ($self) = @_;
-        state $x = require List::Util;
         List::Util::max(map { $#{$_} } @{$self});
     }
 

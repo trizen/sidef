@@ -3,7 +3,6 @@ package Sidef::Deparse::Perl {
     use utf8;
     use 5.014;
 
-    use List::Util qw(all);
     use Scalar::Util qw(refaddr);
 
     my %addr;
@@ -234,13 +233,6 @@ HEADER
         my @vars = @{$init_obj->{vars}};
         @vars || return '';
 
-        my @dumped_values = map { exists($_->{value}) ? $self->deparse_expr({self => $_->{value}}) : ('undef') } @vars;
-
-        # Ignore "undef" values
-        if (all { $_ eq 'undef' } @dumped_values) {
-            @dumped_values = ();
-        }
-
         my @code;
         push @code,
             '('
@@ -333,15 +325,12 @@ HEADER
         @vars || return '';
 
         my @dumped_vars = map { ref($_) ? $self->_dump_var($_) : $_ } @vars;
-
-        # Return when all variables are "undef"
-        if (all { $_ eq 'undef' } @dumped_vars) {
-            return '';
-        }
-
         my $code = "my(" . join(',', @dumped_vars) . ')=@_;';
 
+        my $valid;
         foreach my $var (@vars) {
+
+            $valid || (shift(@dumped_vars) eq 'undef' ? next : ($valid ||= 1));
 
             ref($var) || next;
             if (exists $var->{array}) {
@@ -366,18 +355,15 @@ HEADER
                 $code .= "my\$$name=Sidef::Types::Hash::Hash->new(\%$name);";
                 delete $var->{hash};
             }
-            else {
-
-                if (exists $var->{value}) {
-                    my $value = $self->deparse_expr({self => $var->{value}});
-                    if ($value ne '') {
-                        $code .= "\$$var->{name}" . refaddr($var) . "//=$value;";
-                    }
+            elsif (exists $var->{value}) {
+                my $value = $self->deparse_expr({self => $var->{value}});
+                if ($value ne '') {
+                    $code .= "\$$var->{name}" . refaddr($var) . "//=$value;";
                 }
             }
         }
 
-        $code;
+        $valid ? $code : '';
     }
 
     sub _dump_array {
@@ -688,12 +674,12 @@ HEADER
                 $obj->{inited} = 1;
 
                 # Use dynamical constants inside functions
-                if (exists $self->{function} or exists $self->{class}) {
+                if (exists $self->{function} or (exists($self->{class}) and $] >= 5.020)) {
 
                     # This is no longer needed in Perl>=5.25.2
                     $] < 5.025002 && $self->top_add(q{use feature 'lexical_subs'; no warnings 'experimental::lexical_subs';});
 
-                    # XXX: this may cause segmentation faults in perl-5.18.*
+                    # XXX: this is know to cause segmentation faults in perl-5.18.* when used in a class
                     $code = "state sub $name(){state\$_$refaddr"
                       . (defined($obj->{expr}) ? ('=do{' . $self->deparse_script($obj->{expr}) . '}') : '') . '}';
                 }

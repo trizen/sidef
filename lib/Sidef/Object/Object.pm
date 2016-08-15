@@ -1,8 +1,9 @@
 package Sidef::Object::Object {
 
     use 5.016;
-    require Scalar::Util;
+    use Scalar::Util qw();
 
+    use Sidef;
     use Sidef::Types::Bool::Bool;
     use Sidef::Types::Number::Number;
 

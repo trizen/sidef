@@ -17,8 +17,8 @@ package Sidef {
                   SANITIZE_SEC => 3 * 24 * 60 * 60,    # 3 days
                  };
 
-    require List::Util;
-    require File::Spec;
+    use List::Util qw();
+    use File::Spec qw();
 
     use Sidef::Types::Bool::Bool;
     use Sidef::Types::Number::Number;
