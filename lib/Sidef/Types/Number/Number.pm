@@ -1901,7 +1901,10 @@ package Sidef::Types::Number::Number {
         my ($x, $y) = @_;
         _valid(\$y);
         my $r = _big2mpz($x);
-        Math::GMPz::Rmpz_bin_si($r, $r, CORE::int(Math::GMPq::Rmpq_get_d($$y)));
+        my $i = CORE::int(Math::GMPq::Rmpq_get_d($$y));
+        $i >= 0
+          ? Math::GMPz::Rmpz_bin_ui($r, $r, $i)
+          : Math::GMPz::Rmpz_bin_si($r, $r, $i);
         _mpz2big($r);
     }
 

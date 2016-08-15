@@ -2207,9 +2207,10 @@ package Sidef::Parser {
                 if (
                     ref($self->{current_class}) eq 'Sidef::Variable::ClassInit'
                     and defined(
-                        my $var =
-                          List::Util::first { $_->{name} eq $name }
-                        (@{$self->{current_class}{vars}}, map { @{$_->{vars}} } @{$self->{current_class}{attributes}})
+                        my $var = (
+                            List::Util::first { $_->{name} eq $name }
+                            (@{$self->{current_class}{vars}}, map { @{$_->{vars}} } @{$self->{current_class}{attributes}})
+                                  )
                                )
                   ) {
                     if (exists $self->{current_method}) {
