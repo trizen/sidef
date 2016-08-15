@@ -689,9 +689,11 @@ HEADER
 
                 # Use dynamical constants inside functions
                 if (exists $self->{function} or exists $self->{class}) {
-                    $self->top_add("use experimental 'lexical_subs';");
 
-                    # XXX: this is a known bug in perl-5.18.*
+                    # This is no longer needed in Perl>=5.25.2
+                    $] < 5.025002 && $self->top_add(q{use feature 'lexical_subs'; no warnings 'experimental::lexical_subs';});
+
+                    # XXX: this may cause segmentation faults in perl-5.18.*
                     $code = "state sub $name(){state\$_$refaddr"
                       . (defined($obj->{expr}) ? ('=do{' . $self->deparse_script($obj->{expr}) . '}') : '') . '}';
                 }
@@ -1108,7 +1110,7 @@ HEADER
             $code = 'while(1) ' . $self->deparse_bare_block($obj->{block}{code});
         }
         elsif ($ref eq 'Sidef::Types::Block::Given') {
-            $self->top_add(qq{use experimental 'smartmatch';});
+            $self->top_add(q{no warnings 'experimental::smartmatch';});
             my $dvar = $self->_dump_var($obj->{block}{init_vars}->{vars}[0]);
             $code =
                 'do{given (my '
@@ -1458,7 +1460,7 @@ HEADER
 
                     # !~ and ~~ methods
                     if ($method eq '~~' or $method eq '!~') {
-                        $self->top_add(qq{use experimental 'smartmatch';});
+                        $self->top_add(q{no warnings 'experimental::smartmatch';});
                         $code =
                             'do{my$bool=do{'
                           . $code
