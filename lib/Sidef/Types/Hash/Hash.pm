@@ -342,7 +342,7 @@ package Sidef::Types::Hash::Hash {
         }
 
         Sidef::Types::Array::Array->new(
-                    [map { Sidef::Types::Array::Pair->new($_->[1], $self->{$_->[0]}) } (sort { $a->[2] cmp $b->[2] } @array)]);
+              [map { Sidef::Types::Array::Pair->new($_->[1], $self->{$_->[0]}) } (CORE::sort { $a->[2] cmp $b->[2] } @array)]);
     }
 
     sub sort {
@@ -353,7 +353,7 @@ package Sidef::Types::Hash::Hash {
               Sidef::Types::Array::Array->new(
                                               [
                                                map { Sidef::Types::Array::Pair->new($_->[1], $self->{$_->[0]}) } (
-                                                        sort { scalar $code->run($a->[1], $b->[1]) }
+                                                        CORE::sort { scalar $code->run($a->[1], $b->[1]) }
                                                           map { [$_, Sidef::Types::String::String->new($_)] } CORE::keys %$self
                                                )
                                               ]
@@ -363,15 +363,14 @@ package Sidef::Types::Hash::Hash {
         Sidef::Types::Array::Array->new(
             map {
                 Sidef::Types::Array::Pair->new(Sidef::Types::String::String->new($_), $self->{$_})
-              }
-              sort CORE::keys %$self
+              } CORE::sort CORE::keys %$self
         );
     }
 
     sub _min_max {
         my ($self, $code, $value) = @_;
 
-        my @pairs = map { [$_, $code->run(Sidef::Types::String::String->new($_), $self->{$_})] } keys %$self;
+        my @pairs = map { [$_, $code->run(Sidef::Types::String::String->new($_), $self->{$_})] } CORE::keys %$self;
 
         my $item = $pairs[0];
         foreach my $i (1 .. $#pairs) {
@@ -464,7 +463,7 @@ package Sidef::Types::Hash::Hash {
             $Sidef::SPACES += $Sidef::SPACES_INCR;
 
             # Sort the keys case insensitively
-            my @keys = sort { (lc($a) cmp lc($b)) || ($a cmp $b) } CORE::keys(%$obj);
+            my @keys = CORE::sort { (lc($a) cmp lc($b)) || ($a cmp $b) } CORE::keys(%$obj);
 
             my $str = Sidef::Types::String::String->new("Hash(#`($refaddr)...)");
             $addr{$refaddr} = $str;
