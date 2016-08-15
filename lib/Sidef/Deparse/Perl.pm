@@ -690,6 +690,8 @@ HEADER
                 # Use dynamical constants inside functions
                 if (exists $self->{function} or exists $self->{class}) {
                     $self->top_add("use experimental 'lexical_subs';");
+
+                    # XXX: this is a known bug in perl-5.18.*
                     $code = "state sub $name(){state\$_$refaddr"
                       . (defined($obj->{expr}) ? ('=do{' . $self->deparse_script($obj->{expr}) . '}') : '') . '}';
                 }

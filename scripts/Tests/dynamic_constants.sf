@@ -1,0 +1,15 @@
+#!/usr/bin/ruby
+
+#
+## This test is known to fail under perl-5.18.*
+#
+
+func f(a) {
+    const x = a;
+    x + 2;
+}
+
+assert_eq(f(40), 42)
+assert_eq(f(33), 42)        # previous value is preserved
+
+say "** Test passed!"
