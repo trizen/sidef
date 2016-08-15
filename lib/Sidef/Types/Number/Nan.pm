@@ -240,8 +240,6 @@ package Sidef::Types::Number::Nan {
 
     *nude = \&parts;
 
-    sub digits { Sidef::Types::Array::Array->new([]) }
-
     {
         no strict 'refs';
         *{__PACKAGE__ . '::' . '/'}   = \&div;
