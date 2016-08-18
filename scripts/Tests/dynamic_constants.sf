@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## This test is known to fail under perl-5.18.*
+## In Sidef<=2.30, this test failed under perl-5.18.*
 #
 
 func f(a) {
