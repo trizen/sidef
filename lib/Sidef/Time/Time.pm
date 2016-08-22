@@ -8,14 +8,15 @@ package Sidef::Time::Time {
 
     use overload
       q{""}   => \&get_value,
-      q{bool} => \&get_value;
+      q{bool} => \&get_value,
+      q{0+}   => \&get_value;
 
     sub new {
         my (undef, $sec) = @_;
 
         if (defined $sec) {
             if (ref($sec)) {
-                $sec = $sec->get_value;
+                $sec = CORE::int($sec);
             }
         }
         else {

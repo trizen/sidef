@@ -30,35 +30,35 @@ package Sidef::Sys::Sys {
         my ($self, $sec) = @_;
 
         state $x = require Time::HiRes;
-        (Time::HiRes::alarm($sec->get_value)) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
+        (Time::HiRes::alarm($sec)) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub ualarm {
         my ($self, $sec) = @_;
 
         state $x = require Time::HiRes;
-        (Time::HiRes::ualarm($sec->get_value)) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
+        (Time::HiRes::ualarm($sec)) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub sleep {
         my ($self, $sec) = @_;
 
         state $x = require Time::HiRes;
-        (Time::HiRes::sleep($sec->get_value)) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
+        (Time::HiRes::sleep($sec)) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub nanosleep {
         my ($self, $sec) = @_;
 
         state $x = require Time::HiRes;
-        (Time::HiRes::nanosleep($sec->get_value)) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
+        (Time::HiRes::nanosleep($sec)) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub usleep {
         my ($self, $sec) = @_;
 
         state $x = require Time::HiRes;
-        (Time::HiRes::usleep($sec->get_value)) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
+        (Time::HiRes::usleep($sec)) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub osname {
@@ -77,7 +77,7 @@ package Sidef::Sys::Sys {
         my ($self, $mode) = @_;
 
         if (defined($mode)) {
-            return Sidef::Types::Number::Number->new(CORE::umask($mode->get_value));
+            return Sidef::Types::Number::Number->new(CORE::umask($mode));
         }
 
         Sidef::Types::Number::Number->new(CORE::umask);
@@ -273,12 +273,12 @@ package Sidef::Sys::Sys {
 
     sub getpwuid {
         my ($self, $uid) = @_;
-        $self->__GETPW__(CORE::getpwuid($uid->get_value));
+        $self->__GETPW__(CORE::getpwuid($uid));
     }
 
     sub getpwnam {
         my ($self, $name) = @_;
-        $self->__GETPW__(CORE::getpwnam($name->get_value));
+        $self->__GETPW__(CORE::getpwnam($name));
     }
 
     sub getpwent {
@@ -311,12 +311,12 @@ package Sidef::Sys::Sys {
 
     sub getgrgid {
         my ($self, $gid) = @_;
-        $self->__GETGR__(CORE::getgrgid($gid->get_value));
+        $self->__GETGR__(CORE::getgrgid($gid));
     }
 
     sub getgrnam {
         my ($self, $name) = @_;
-        $self->__GETGR__(CORE::getgrnam($name->get_value));
+        $self->__GETGR__(CORE::getgrnam($name));
     }
 
     sub __GETHOST__ {
@@ -333,17 +333,17 @@ package Sidef::Sys::Sys {
 
     sub sethostent {
         my ($self, $stayopen) = @_;
-        (CORE::sethostent($stayopen->get_value)) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
+        (CORE::sethostent($stayopen)) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub gethostbyaddr {
         my ($self, $addr, $addrtype) = @_;
-        $self->__GETHOST__(CORE::gethostbyaddr($addr->get_value, $addrtype->get_value));
+        $self->__GETHOST__(CORE::gethostbyaddr($addr, $addrtype));
     }
 
     sub gethostbyname {
         my ($self, $name) = @_;
-        $self->__GETHOST__(CORE::gethostbyname($name->get_value));
+        $self->__GETHOST__(CORE::gethostbyname($name));
     }
 
     sub gethostent {
@@ -364,17 +364,17 @@ package Sidef::Sys::Sys {
 
     sub setnetent {
         my ($self, $stayopen) = @_;
-        (CORE::setnetent($stayopen->get_value)) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
+        (CORE::setnetent($stayopen)) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub getnetbyaddr {
         my ($self, $addr, $addrtype) = @_;
-        $self->__GETNET__(CORE::getnetbyaddr($addr->get_value, $addrtype->get_value));
+        $self->__GETNET__(CORE::getnetbyaddr($addr, $addrtype));
     }
 
     sub getnetbyname {
         my ($self, $name) = @_;
-        $self->__GETNET__(CORE::getnetbyname($name->get_value));
+        $self->__GETNET__(CORE::getnetbyname($name));
     }
 
     sub getnetent {
@@ -394,17 +394,17 @@ package Sidef::Sys::Sys {
 
     sub setprotoent {
         my ($self, $stayopen) = @_;
-        (CORE::setprotoent($stayopen->get_value)) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
+        (CORE::setprotoent($stayopen)) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub getprotobyname {
         my ($self, $name) = @_;
-        $self->__GETPROTO__(CORE::getprotobyname($name->get_value));
+        $self->__GETPROTO__(CORE::getprotobyname($name));
     }
 
     sub getprotobynumber {
         my ($self, $num) = @_;
-        $self->__GETPROTO__(CORE::getprotobynumber($num->get_value));
+        $self->__GETPROTO__(CORE::getprotobynumber($num));
     }
 
     sub getprotoent {
@@ -425,17 +425,17 @@ package Sidef::Sys::Sys {
 
     sub setservent {
         my ($self, $stayopen) = @_;
-        (CORE::setservent($stayopen->get_value)) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
+        (CORE::setservent($stayopen)) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub getservbyname {
         my ($self, $name, $proto) = @_;
-        $self->__GETSERV__(CORE::getservbyname($name->get_value, $proto->get_value));
+        $self->__GETSERV__(CORE::getservbyname($name, $proto));
     }
 
     sub getservbyport {
         my ($self, $port, $proto) = @_;
-        $self->__GETSERV__(CORE::getservbyport($port->get_value, $proto->get_value));
+        $self->__GETSERV__(CORE::getservbyport($port, $proto));
     }
 
     sub getservent {
@@ -448,12 +448,12 @@ package Sidef::Sys::Sys {
     #
     sub getpriority {
         my ($self, $which, $who) = @_;
-        Sidef::Types::Number::Number->new(CORE::getpriority($which->get_value, $who->get_value));
+        Sidef::Types::Number::Number->new(CORE::getpriority($which, $who));
     }
 
     sub setpriority {
         my ($self, $which, $who, $priority) = @_;
-        Sidef::Types::Number::Number->new(CORE::setpriority($which->get_value, $who->get_value, $priority->get_value));
+        Sidef::Types::Number::Number->new(CORE::setpriority($which, $who, $priority));
     }
 
     sub getppid {
@@ -466,13 +466,13 @@ package Sidef::Sys::Sys {
     #
     sub getpgrp {
         my ($self, $pid) = @_;
-        Sidef::Types::Number::Number->new(CORE::getpgrp(defined($pid) ? $pid->get_value : ()));
+        Sidef::Types::Number::Number->new(CORE::getpgrp(defined($pid) ? $pid : ()));
     }
 
     sub setpgrp {
         my ($self, $pid, $pgrp) = @_;
-        $pid  = defined($pid)  ? $pid->get_value  : 0;
-        $pgrp = defined($pgrp) ? $pgrp->get_value : 0;
+        $pid  //= 0;
+        $pgrp //= 0;
         Sidef::Types::Number::Number->new(CORE::setpgrp($pid, $pgrp));
     }
 

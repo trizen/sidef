@@ -1,16 +1,18 @@
 #!/usr/bin/ruby
 
-func usage(code=0) {
-    <<"USAGE".say;
-#{__FILE__}: convert any file to MP3 by running multiple instances
-             of ffmpeg at the same time in a controllable way.
+# Date: 17 June 2014
+# License: GPLv3
+# Website: http://github.com/trizen
 
-Date: 17 June 2014
-License: GPLv3
-Website: http://github.com/trizen
+func usage(code=0) {
+    var name = File(__FILE__).basename
+
+    <<"USAGE".say;
+# Convert any multimedia file to MP3 by executing multiple
+# instances of `ffmpeg` in parallel, in a controllable way.
 
 Usage:
-      #{__FILE__} [options] -f [files]
+      #{name} [options] -f [files]
 
 Options:
        -t int         : use this many threads (default: 2)

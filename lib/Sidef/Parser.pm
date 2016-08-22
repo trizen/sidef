@@ -2218,7 +2218,7 @@ package Sidef::Parser {
 
                             if ($self->{opt}{k}) {
                                 print STDERR
-                                  "[INFO] `$name` is interpreted as `self.$name` at $self->{file_name} line $self->{line}\n";
+                                  "[INFO] `$name` is parsed as `self.$name` at $self->{file_name} line $self->{line}\n";
                             }
 
                             $var->{count}++;
@@ -2280,7 +2280,7 @@ package Sidef::Parser {
 
                     if ($self->{opt}{k}) {
                         print STDERR
-                          "[INFO] `$name` is interpreted as a prefix method-call at $self->{file_name} line $self->{line}\n";
+                          "[INFO] `$name` is parsed as a prefix method-call at $self->{file_name} line $self->{line}\n";
                     }
 
                     my $pos = pos($_);
