@@ -349,6 +349,7 @@ scripts/RosettaCode/count_in_factors.sf
 scripts/RosettaCode/count_occurrences_of_a_substring.sf
 scripts/RosettaCode/count_the_coins.sf
 scripts/RosettaCode/create_an_html_table.sf
+scripts/RosettaCode/cumulative_standard_deviation.sf
 scripts/RosettaCode/date_format.sf
 scripts/RosettaCode/delete_a_file.sf
 scripts/RosettaCode/determine_if_a_string_is_numeric.sf
