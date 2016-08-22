@@ -470,6 +470,7 @@ scripts/RosettaCode/multiple_distinct_objects.sf
 scripts/RosettaCode/multiplication_tables.sf
 scripts/RosettaCode/multisplit.sf
 scripts/RosettaCode/natural_sorting.sf
+scripts/RosettaCode/non_decimal_radices_convert.sf
 scripts/RosettaCode/nth.sf
 scripts/RosettaCode/nth_root.sf
 scripts/RosettaCode/order_disjoint_list_items.sf
