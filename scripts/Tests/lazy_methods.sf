@@ -51,6 +51,10 @@ assert_eq(m_exec(lz8, 'c'), 'a b c')
 assert_eq(m_exec(lz8.method(:uc).method(:split, ' ')), ['A', 'B'])
 assert_eq(m_exec(lz8.method(:uc).method(:split), ' '), ['A', 'B'])
 
+var lzsplit = "a-b-c".method(:uc).method(:split)
+assert_eq(lzsplit(''), ["A", "-", "B", "-", "C"])
+assert_eq(lzsplit('-'), ["A", "B", "C"])
+
 say "----BEGIN----";
 
 # Display "H€llo!\nWorld!"
