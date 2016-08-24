@@ -203,9 +203,9 @@ HEADER
         my ($self, $method) = @_;
 
         my $name = 'OP' . join('', unpack('C*', $method)) . refaddr($self);
-        my $line = "use constant $name=>\\" . $self->_dump_string($method) . ';';
+        my $line = "BEGIN { \$$self->{environment_name}\::$name = " . $self->_dump_string($method) . '};';
         $self->top_add($line);
-        '->${(' . $self->{environment_name} . '::' . $name . ')}';
+        '->$' . $self->{environment_name} . '::' . $name;
     }
 
     sub _dump_var {
