@@ -1,0 +1,55 @@
+#!/usr/bin/ruby
+
+#
+## https://en.wikipedia.org/wiki/Heap%27s_algorithm
+#
+
+func permutation(n, A, callback) {
+    if (n == 1) {
+        callback(A.clone)
+    }
+    else {
+        for i in (0 .. n-2) {
+            permutation(n - 1, A, callback)
+            if (n.is_even) {
+                A.swap(i, n-1)
+            } else {
+                A.swap(0, n-1)
+            }
+        }
+        permutation(n-1, A, callback)
+    }
+}
+
+var arr = [1,2,3,4]
+var got = []
+permutation(arr.len, arr.clone, {|p| say p; got << p })
+
+assert_eq(arr, [1,2,3,4])
+
+assert_eq(got, [
+    [1, 2, 3, 4]
+    [2, 1, 3, 4]
+    [3, 1, 2, 4]
+    [1, 3, 2, 4]
+    [2, 3, 1, 4]
+    [3, 2, 1, 4]
+    [4, 2, 1, 3]
+    [2, 4, 1, 3]
+    [1, 4, 2, 3]
+    [4, 1, 2, 3]
+    [2, 1, 4, 3]
+    [1, 2, 4, 3]
+    [1, 3, 4, 2]
+    [3, 1, 4, 2]
+    [4, 1, 3, 2]
+    [1, 4, 3, 2]
+    [3, 4, 1, 2]
+    [4, 3, 1, 2]
+    [4, 3, 2, 1]
+    [3, 4, 2, 1]
+    [2, 4, 3, 1]
+    [4, 2, 3, 1]
+    [3, 2, 4, 1]
+    [2, 3, 4, 1]
+])

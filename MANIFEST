@@ -695,6 +695,8 @@ scripts/Tests/hash_from_array.sf
 scripts/Tests/hash_grep.sf
 scripts/Tests/hash_join.sf
 scripts/Tests/hash_sort.sf
+scripts/Tests/heap_s_algorithm_iter.sf
+scripts/Tests/heap_s_algorithm_rec.sf
 scripts/Tests/horner_s_rule.sf
 scripts/Tests/http_tiny.sf
 scripts/Tests/i_love_you.sf
