@@ -159,10 +159,12 @@ package Sidef::Optimizer {
                    bytes_len
                    graphs_len
 
+                   pipe
                    chars
                    bytes
                    lines
                    words
+                   backtick
                    graphemes
 
                    ord

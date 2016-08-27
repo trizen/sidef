@@ -12,7 +12,7 @@ package Sidef::Types::Glob::Backtick {
 
     sub new {
         my (undef, $backtick) = @_;
-        bless \$backtick, __PACKAGE__;
+        bless \(my $o = "$backtick"), __PACKAGE__;
     }
 
     *call = \&new;

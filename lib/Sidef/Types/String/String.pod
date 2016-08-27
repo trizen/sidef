@@ -202,6 +202,14 @@ Return the
 
 =cut
 
+=head2 backtick
+
+String.backtick() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 basic_dump
 
 String.basic_dump() -> I<Obj>
@@ -755,6 +763,14 @@ Return the
 =head2 pack
 
 String.pack() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 pipe
+
+String.pipe() -> I<Obj>
 
 Return the
 

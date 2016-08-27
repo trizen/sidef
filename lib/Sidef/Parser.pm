@@ -149,8 +149,8 @@ package Sidef::Parser {
                 | %D\b.                                                    (?{ [qw(1 new Sidef::Types::Glob::Dir)] })
 
                 # Pipe
-                | %p\b.                                                    (?{ [qw(0 new Sidef::Types::Glob::Pipe)] })
-                | %P\b.                                                    (?{ [qw(1 new Sidef::Types::Glob::Pipe)] })
+                | %p\b.                                                    (?{ [qw(0 pipe Sidef::Types::Glob::Pipe)] })
+                | %P\b.                                                    (?{ [qw(1 pipe Sidef::Types::Glob::Pipe)] })
 
                 # Backtick
                 | %x\b.                                                    (?{ [qw(0 new Sidef::Types::Glob::Backtick)] })
@@ -1010,7 +1010,7 @@ package Sidef::Parser {
                     : $package->$method($string =~ s{\\\\}{\\}gr)
                 );
 
-                # Special case for backticks (add method 'exec')
+                # Special case for backticks (add method 'run')
                 if ($package eq 'Sidef::Types::Glob::Backtick') {
                     my $struct =
                         $double_quoted && ref($obj) eq 'HASH'
@@ -1024,7 +1024,7 @@ package Sidef::Parser {
                                            ]
                         };
 
-                    push @{$struct->{$self->{class}}[-1]{call}}, {method => 'exec'};
+                    push @{$struct->{$self->{class}}[-1]{call}}, {method => 'run'};
                     $obj = $struct;
                 }
                 elsif (@array_like) {

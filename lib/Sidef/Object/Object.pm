@@ -281,7 +281,8 @@ package Sidef::Object::Object {
     }
 
     sub interpolate {
-        $_[0]->new(CORE::join('', @_[1 .. $#_]));
+        my $self = shift(@_);
+        $self->new(CORE::join('', @_));
     }
 
     sub dump {

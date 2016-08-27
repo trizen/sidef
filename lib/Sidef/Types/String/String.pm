@@ -703,6 +703,16 @@ package Sidef::Types::String::String {
         $self;
     }
 
+    sub pipe {
+        my ($self) = @_;
+        Sidef::Types::Glob::Pipe->new($$self);
+    }
+
+    sub backtick {
+        my ($self) = @_;
+        Sidef::Types::Glob::Backtick->new($$self);
+    }
+
     sub open_r {
         my ($self, @rest) = @_;
         state $x = require Encode;
@@ -1077,7 +1087,7 @@ package Sidef::Types::String::String {
     sub apply_escapes {
         my ($self, $parser) = @_;
 
-        $$self =~ /\\|#\{/ || return $self;    # fast exit
+        $$self =~ /\\|#\{/ || return $self;    # return faster
 
         state $x = require Encode;
         my $str = $$self;
@@ -1239,12 +1249,14 @@ package Sidef::Types::String::String {
                 splice @chars, $pair->[0] + $i, 0, $pair->[1];
             }
 
-            state $str_dt = bless({}, 'Sidef::DataTypes::String::String');
+            state %cache;
+            my $type = (ref($self) =~ s/::Types::/::DataTypes::/r);
+            my $dt = ($cache{$type} //= bless({}, $type));
 
             my $expr = {
                         $parser->{class} => [
                                              {
-                                              self => $str_dt,
+                                              self => $dt,
                                               call => [{method => 'interpolate'}]
                                              }
                                             ]
