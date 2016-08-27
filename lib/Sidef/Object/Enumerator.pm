@@ -113,7 +113,7 @@ package Sidef::Object::Enumerator {
             )
         );
 
-        Sidef::Types::Number::Number::_new_uint($count);
+        Sidef::Types::Number::Number->_new_uint($count);
     }
 
     *len  = \&length;    # alias

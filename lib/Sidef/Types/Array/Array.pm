@@ -477,14 +477,14 @@ package Sidef::Types::Array::Array {
                 }
             }
 
-            return Sidef::Types::Number::Number::_new_uint($counter);
+            return Sidef::Types::Number::Number->_new_uint($counter);
         }
 
         foreach my $item (@{$self}) {
             $item eq $obj and $counter++;
         }
 
-        Sidef::Types::Number::Number::_new_uint($counter);
+        Sidef::Types::Number::Number->_new_uint($counter);
     }
 
     *count_by = \&count;
@@ -869,7 +869,7 @@ package Sidef::Types::Array::Array {
         my ($self, $code) = @_;
 
         foreach my $i (0 .. $#{$self}) {
-            $code->run(Sidef::Types::Number::Number::_new_uint($i));
+            $code->run(Sidef::Types::Number::Number->_new_uint($i));
         }
 
         $self;
@@ -881,7 +881,7 @@ package Sidef::Types::Array::Array {
         my ($self, $code) = @_;
 
         foreach my $i (0 .. $#{$self}) {
-            $code->run(Sidef::Types::Number::Number::_new_uint($i), $self->[$i]);
+            $code->run(Sidef::Types::Number::Number->_new_uint($i), $self->[$i]);
         }
 
         $self;
@@ -903,7 +903,7 @@ package Sidef::Types::Array::Array {
 
         my @arr;
         foreach my $i (0 .. $#{$self}) {
-            CORE::push(@arr, $code->run(Sidef::Types::Number::Number::_new_uint($i), $self->[$i]));
+            CORE::push(@arr, $code->run(Sidef::Types::Number::Number->_new_uint($i), $self->[$i]));
         }
 
         $self->new(\@arr);
@@ -945,7 +945,7 @@ package Sidef::Types::Array::Array {
 
         my @arr;
         foreach my $i (0 .. $#{$self}) {
-            CORE::push(@arr, $self->[$i]) if $code->run(Sidef::Types::Number::Number::_new_uint($i), $self->[$i]);
+            CORE::push(@arr, $self->[$i]) if $code->run(Sidef::Types::Number::Number->_new_uint($i), $self->[$i]);
         }
 
         $self->new(\@arr);
@@ -993,7 +993,7 @@ package Sidef::Types::Array::Array {
         }
 
         foreach my $key (keys %hash) {
-            $hash{$key} = Sidef::Types::Number::Number::_new_uint($hash{$key});
+            $hash{$key} = Sidef::Types::Number::Number->_new_uint($hash{$key});
         }
 
         Sidef::Types::Hash::Hash->new(%hash);
@@ -1008,7 +1008,7 @@ package Sidef::Types::Array::Array {
         }
 
         foreach my $key (keys %hash) {
-            $hash{$key} = Sidef::Types::Number::Number::_new_uint($hash{$key});
+            $hash{$key} = Sidef::Types::Number::Number->_new_uint($hash{$key});
         }
 
         Sidef::Types::Hash::Hash->new(%hash);
@@ -1078,14 +1078,14 @@ package Sidef::Types::Array::Array {
             if (ref($obj) eq 'Sidef::Types::Block::Block') {
                 foreach my $i (0 .. $#{$self}) {
                     $obj->run($self->[$i])
-                      && return Sidef::Types::Number::Number::_new_uint($i);
+                      && return Sidef::Types::Number::Number->_new_uint($i);
                 }
                 return Sidef::Types::Number::Number::MONE;
             }
 
             foreach my $i (0 .. $#{$self}) {
                 $self->[$i] eq $obj
-                  and return Sidef::Types::Number::Number::_new_uint($i);
+                  and return Sidef::Types::Number::Number->_new_uint($i);
             }
 
             return Sidef::Types::Number::Number::MONE;
@@ -1106,7 +1106,7 @@ package Sidef::Types::Array::Array {
             if (ref($obj) eq 'Sidef::Types::Block::Block') {
                 for (my $i = $#{$self} ; $i >= 0 ; $i--) {
                     $obj->run($self->[$i])
-                      && return Sidef::Types::Number::Number::_new_uint($i);
+                      && return Sidef::Types::Number::Number->_new_uint($i);
                 }
 
                 return Sidef::Types::Number::Number::MONE;
@@ -1114,7 +1114,7 @@ package Sidef::Types::Array::Array {
 
             for (my $i = $#{$self} ; $i >= 0 ; $i--) {
                 $self->[$i] eq $obj
-                  and return Sidef::Types::Number::Number::_new_uint($i);
+                  and return Sidef::Types::Number::Number->_new_uint($i);
             }
 
             return Sidef::Types::Number::Number::MONE;
@@ -1191,7 +1191,7 @@ package Sidef::Types::Array::Array {
 
     sub length {
         my ($self) = @_;
-        Sidef::Types::Number::Number::_new_uint(scalar @{$self});
+        Sidef::Types::Number::Number->_new_uint(scalar @{$self});
     }
 
     *len  = \&length;    # alias
@@ -1202,8 +1202,8 @@ package Sidef::Types::Array::Array {
             $end == -1 ? Sidef::Types::Number::Number::MONE
           : $end == 0  ? Sidef::Types::Number::Number::ZERO
           : $end == 1  ? Sidef::Types::Number::Number::ONE
-          : $end > 0   ? Sidef::Types::Number::Number::_new_uint($end)
-          :              Sidef::Types::Number::Number::_new_int($end);
+          : $end > 0   ? Sidef::Types::Number::Number->_new_uint($end)
+          :              Sidef::Types::Number::Number->_new_int($end);
     }
 
     *offset = \&end;
@@ -1234,14 +1234,14 @@ package Sidef::Types::Array::Array {
     sub range {
         my ($self) = @_;
         Sidef::Types::Range::RangeNumber->new(Sidef::Types::Number::Number::ZERO,
-                                              Sidef::Types::Number::Number::_new_int($#{$self}),
+                                              Sidef::Types::Number::Number->_new_int($#{$self}),
                                               Sidef::Types::Number::Number::ONE,
                                              );
     }
 
     sub indices {
         my ($self) = @_;
-        $self->new([map { Sidef::Types::Number::Number::_new_uint($_) } 0 .. $#{$self}]);
+        $self->new([map { Sidef::Types::Number::Number->_new_uint($_) } 0 .. $#{$self}]);
     }
 
     *keys = \&indices;
@@ -1249,7 +1249,7 @@ package Sidef::Types::Array::Array {
     sub pairs {
         my ($self) = @_;
         $self->new(
-            [map { Sidef::Types::Array::Pair->new(Sidef::Types::Number::Number::_new_uint($_), $self->[$_]) } 0 .. $#{$self}]);
+            [map { Sidef::Types::Array::Pair->new(Sidef::Types::Number::Number->_new_uint($_), $self->[$_]) } 0 .. $#{$self}]);
     }
 
     sub insert {

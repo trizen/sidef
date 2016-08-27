@@ -5,6 +5,12 @@ package Sidef::Deparse::Perl {
 
     use Scalar::Util qw(refaddr);
 
+    my %ints = (
+                '0'  => '(Sidef::Types::Number::Number::ZERO)',
+                '1'  => '(Sidef::Types::Number::Number::ONE)',
+                '-1' => '(Sidef::Types::Number::Number::MONE)',
+               );
+
     my %addr;
     my %type;
     my %const;
@@ -966,18 +972,13 @@ HEADER
             }
         }
         elsif ($ref eq 'Sidef::Types::Number::Number') {
-            if ($obj->is_zero) {
-                $code = '(Sidef::Types::Number::Number::ZERO)';
-            }
-            elsif ($obj->is_one) {
-                $code = '(Sidef::Types::Number::Number::ONE)';
-            }
-            elsif ($obj->is_mone) {
-                $code = '(Sidef::Types::Number::Number::MONE)';
-            }
-            else {
-                $code = $self->make_constant($ref, '_set_str', "Number$refaddr", "'" . $obj->_get_frac . "'");
-            }
+            my ($sgn, $content) = $obj->_dump;
+
+            $code =
+                ($sgn == 2) ? $self->make_constant($ref, '_set_str', "Number$refaddr", "'" . $content . "'")
+              : exists($ints{$content}) ? $ints{$content}
+              : ($sgn == 1) ? $self->make_constant($ref, '_new_uint', "Number$refaddr", "'" . $content . "'")
+              :               $self->make_constant($ref, '_new_int', "Number$refaddr", "'" . $content . "'");
         }
         elsif ($ref eq 'Sidef::Types::Number::Inf') {
             $code = $self->make_constant($ref, 'new', "Inf$refaddr");

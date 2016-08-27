@@ -20,9 +20,12 @@ package Sidef::Types::Number::Number {
     Math::GMPq::Rmpq_set_si($MONE, -1, 1);
 
     use constant {
-                  ONE  => bless(\$ONE,  __PACKAGE__),
-                  ZERO => bless(\$ZERO, __PACKAGE__),
-                  MONE => bless(\$MONE, __PACKAGE__),
+        ONE  => bless(\$ONE,  __PACKAGE__),
+        ZERO => bless(\$ZERO, __PACKAGE__),
+        MONE => bless(\$MONE, __PACKAGE__),
+
+        MAX_UI => Math::GMPq::_ulong_max(),
+        MIN_SI => Math::GMPq::_long_min(),
                  };
 
     use parent qw(
@@ -37,28 +40,41 @@ package Sidef::Types::Number::Number {
 
     use Sidef::Types::Bool::Bool;
 
-    my @cache;
+    my @cache = (ZERO, ONE);
 
     sub _new {
         bless(\$_[0], __PACKAGE__);
     }
 
-    sub _new_int {
-        $_[0] == -1 && return MONE;
-        $_[0] >= 0  && return &_new_uint;
-        my $r = Math::GMPq::Rmpq_init();
-        Math::GMPq::Rmpq_set_si($r, $_[0], 1);
-        bless(\$r, __PACKAGE__);
+    sub _dump {
+        my $x = ${$_[0]};
+
+        if (    Math::GMPq::Rmpq_integer_p($x)
+            and Math::GMPq::Rmpq_cmp_ui($x, MAX_UI, 1) <= 0
+            and Math::GMPq::Rmpq_cmp_si($x, MIN_SI, 1) >= 0) {
+            (Math::GMPq::Rmpq_sgn($x), Math::GMPq::Rmpq_get_str($x, 10));
+        }
+        else {
+            (2, Math::GMPq::Rmpq_get_str($x, 10));
+        }
     }
 
     sub _new_uint {
-        exists($cache[$_[0]])
-          && return $cache[$_[0]];
+        exists($cache[$_[1]])
+          && return $cache[$_[1]];
         my $r = Math::GMPq::Rmpq_init();
-        Math::GMPq::Rmpq_set_ui($r, $_[0], 1);
-        $_[0] <= 8192
-          ? ($cache[$_[0]] = bless(\$r, __PACKAGE__))
+        Math::GMPq::Rmpq_set_ui($r, $_[1], 1);
+        $_[1] <= 8192
+          ? ($cache[$_[1]] = bless(\$r, __PACKAGE__))
           : bless(\$r, __PACKAGE__);
+    }
+
+    sub _new_int {
+        $_[1] == -1 && return MONE;
+        $_[1] >= 0  && return &_new_uint;
+        my $r = Math::GMPq::Rmpq_init();
+        Math::GMPq::Rmpq_set_si($r, $_[1], 1);
+        bless(\$r, __PACKAGE__);
     }
 
     sub _set_str {
@@ -1637,7 +1653,7 @@ package Sidef::Types::Number::Number {
           };
 
         $str =~ tr/-//d;
-        Sidef::Types::Array::Array->new([map { _new_uint($_) } split(//, $str)]);
+        Sidef::Types::Array::Array->new([map { __PACKAGE__->_new_uint($_) } split(//, $str)]);
     }
 
     sub digit {
@@ -1656,7 +1672,7 @@ package Sidef::Types::Number::Number {
 
         $str =~ tr/-//d;
         my $digit = substr($str, Math::GMPq::Rmpq_get_d($$y), 1);
-        length($digit) ? _new_uint($digit) : nan();
+        length($digit) ? __PACKAGE__->_new_uint($digit) : nan();
     }
 
     sub length {
@@ -1664,8 +1680,8 @@ package Sidef::Types::Number::Number {
         Math::GMPz::Rmpz_set_q($z, ${$_[0]});
         Math::GMPz::Rmpz_abs($z, $z);
 
-        #_new_uint(Math::GMPz::Rmpz_sizeinbase($z, 10));        # turned out to be inexact
-        _new_uint(Math::GMPz::Rmpz_snprintf(my $buf, 0, "%Zd", $z, 0));
+        #__PACKAGE__->_new_uint(Math::GMPz::Rmpz_sizeinbase($z, 10));        # turned out to be inexact
+        __PACKAGE__->_new_uint(Math::GMPz::Rmpz_snprintf(my $buf, 0, "%Zd", $z, 0));
     }
 
     *len  = \&length;
@@ -1913,19 +1929,19 @@ package Sidef::Types::Number::Number {
     sub legendre {
         my ($x, $y) = @_;
         _valid(\$y);
-        _new_int(Math::GMPz::Rmpz_legendre(_big2mpz($x), _big2mpz($y)));
+        __PACKAGE__->_new_int(Math::GMPz::Rmpz_legendre(_big2mpz($x), _big2mpz($y)));
     }
 
     sub jacobi {
         my ($x, $y) = @_;
         _valid(\$y);
-        _new_int(Math::GMPz::Rmpz_jacobi(_big2mpz($x), _big2mpz($y)));
+        __PACKAGE__->_new_int(Math::GMPz::Rmpz_jacobi(_big2mpz($x), _big2mpz($y)));
     }
 
     sub kronecker {
         my ($x, $y) = @_;
         _valid(\$y);
-        _new_int(Math::GMPz::Rmpz_kronecker(_big2mpz($x), _big2mpz($y)));
+        __PACKAGE__->_new_int(Math::GMPz::Rmpz_kronecker(_big2mpz($x), _big2mpz($y)));
     }
 
     sub lucas {

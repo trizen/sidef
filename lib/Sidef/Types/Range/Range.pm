@@ -302,7 +302,7 @@ package Sidef::Types::Range::Range {
                 ++$count if $arg->run($obj);
             }
 
-            return Sidef::Types::Number::Number::_new_uint($count);
+            return Sidef::Types::Number::Number->_new_uint($count);
         }
 
         $self->contains($arg)

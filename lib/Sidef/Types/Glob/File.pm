@@ -34,7 +34,7 @@ package Sidef::Types::Glob::File {
         foreach my $name (@Fcntl::EXPORT, @Fcntl::EXPORT_OK) {
             $name =~ /^[a-z]/i or next;
             *{__PACKAGE__ . '::' . $name} = sub {
-                $cache{$name} //= Sidef::Types::Number::Number::_new_uint(&{'Fcntl::' . $name});
+                $cache{$name} //= Sidef::Types::Number::Number->_new_uint(&{'Fcntl::' . $name});
             };
         }
     }
@@ -555,7 +555,7 @@ package Sidef::Types::Glob::File {
               : (Sidef::Types::Bool::Bool::FALSE);
         }
         else {
-            Sidef::Types::Number::Number::_new_uint(CORE::unlink(@args));
+            Sidef::Types::Number::Number->_new_uint(CORE::unlink(@args));
         }
     }
 

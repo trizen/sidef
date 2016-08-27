@@ -388,7 +388,7 @@ package Sidef::Types::String::String {
 
     sub index {
         my ($self, $substr, $pos) = @_;
-        Sidef::Types::Number::Number::_new_int(
+        Sidef::Types::Number::Number->_new_int(
                                                defined($pos)
                                                ? CORE::index($$self, "$substr", CORE::int($pos))
                                                : CORE::index($$self, "$substr")
@@ -397,7 +397,7 @@ package Sidef::Types::String::String {
 
     sub rindex {
         my ($self, $substr, $pos) = @_;
-        Sidef::Types::Number::Number::_new_int(
+        Sidef::Types::Number::Number->_new_int(
                                                defined($pos)
                                                ? CORE::rindex($$self, "$substr", CORE::int($pos))
                                                : CORE::rindex($$self, "$substr")
@@ -408,7 +408,7 @@ package Sidef::Types::String::String {
         my ($self) = @_;
         $$self eq ''
           ? Sidef::Types::Number::Nan::NAN
-          : Sidef::Types::Number::Number::_new_uint(CORE::ord($$self));
+          : Sidef::Types::Number::Number->_new_uint(CORE::ord($$self));
     }
 
     sub reverse {
@@ -616,7 +616,7 @@ package Sidef::Types::String::String {
         Sidef::Types::Array::Array->new(
             [
              map {
-                 Sidef::Types::Number::Number::_new_uint(CORE::ord(bytes::substr($string, $_, 1)))
+                 Sidef::Types::Number::Number->_new_uint(CORE::ord(bytes::substr($string, $_, 1)))
                } 0 .. bytes::length($string) - 1
             ]
         );
@@ -629,7 +629,7 @@ package Sidef::Types::String::String {
 
         state $x = require bytes;
         foreach my $i (0 .. bytes::length($string) - 1) {
-            $code->run(Sidef::Types::Number::Number::_new_uint(CORE::ord bytes::substr($string, $i, 1)));
+            $code->run(Sidef::Types::Number::Number->_new_uint(CORE::ord bytes::substr($string, $i, 1)));
         }
 
         $self;
@@ -801,7 +801,7 @@ package Sidef::Types::String::String {
     }
 
     sub chars_length {
-        Sidef::Types::Number::Number::_new_uint(CORE::length(${$_[0]}));
+        Sidef::Types::Number::Number->_new_uint(CORE::length(${$_[0]}));
     }
 
     *len       = \&chars_length;
@@ -810,7 +810,7 @@ package Sidef::Types::String::String {
     *size      = \&chars_length;
 
     sub graphs_length {
-        Sidef::Types::Number::Number::_new_uint(scalar(() = ${$_[0]} =~ /\X/g));
+        Sidef::Types::Number::Number->_new_uint(scalar(() = ${$_[0]} =~ /\X/g));
     }
 
     *graphs_len = \&graphs_length;
@@ -819,7 +819,7 @@ package Sidef::Types::String::String {
         my ($self) = @_;
 
         state $x = require bytes;
-        Sidef::Types::Number::Number::_new_uint(bytes::length($$self));
+        Sidef::Types::Number::Number->_new_uint(bytes::length($$self));
     }
 
     *bytes_len = \&bytes_length;
@@ -845,7 +845,7 @@ package Sidef::Types::String::String {
             }
         }
 
-        Sidef::Types::Number::Number::_new_int($d[-1][-1]);
+        Sidef::Types::Number::Number->_new_int($d[-1][-1]);
     }
 
     *lev   = \&levenshtein;
@@ -952,18 +952,18 @@ package Sidef::Types::String::String {
         if (ref($arg) eq 'Sidef::Types::Regex::Regex') {
             my $regex = $arg->{regex};
             ++$counter while $s =~ /$regex/g;
-            return Sidef::Types::Number::Number::_new_uint($counter);
+            return Sidef::Types::Number::Number->_new_uint($counter);
         }
         elsif (ref($arg) eq 'Sidef::Types::Block::Block') {
             foreach my $char (split //, $s) {
                 ++$counter if $arg->run(bless(\$char, __PACKAGE__));
             }
-            return Sidef::Types::Number::Number::_new_uint($counter);
+            return Sidef::Types::Number::Number->_new_uint($counter);
         }
 
         my $ss = "$arg";
         ++$counter while $s =~ /\Q$ss\E/g;
-        Sidef::Types::Number::Number::_new_uint($counter);
+        Sidef::Types::Number::Number->_new_uint($counter);
     }
 
     sub overlaps {

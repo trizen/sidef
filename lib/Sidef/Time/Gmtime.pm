@@ -16,7 +16,7 @@ package Sidef::Time::Gmtime {
 
         bless {
                sec  => $sec,
-               time => [map { Sidef::Types::Number::Number::_new_uint($_) } gmtime($sec)],
+               time => [map { Sidef::Types::Number::Number->_new_uint($_) } gmtime($sec)],
               },
           __PACKAGE__;
     }
