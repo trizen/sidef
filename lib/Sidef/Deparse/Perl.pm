@@ -5,12 +5,6 @@ package Sidef::Deparse::Perl {
 
     use Scalar::Util qw(refaddr);
 
-    my %ints = (
-                '0'  => '(Sidef::Types::Number::Number::ZERO)',
-                '1'  => '(Sidef::Types::Number::Number::ONE)',
-                '-1' => '(Sidef::Types::Number::Number::MONE)',
-               );
-
     my %addr;
     my %type;
     my %const;
@@ -973,11 +967,9 @@ HEADER
         }
         elsif ($ref eq 'Sidef::Types::Number::Number') {
             my ($sgn, $content) = $obj->_dump;
-
             $code =
-                ($sgn == 2) ? $self->make_constant($ref, '_set_str', "Number$refaddr", "'" . $content . "'")
-              : exists($ints{$content}) ? $ints{$content}
-              : ($sgn == 1) ? $self->make_constant($ref, '_new_uint', "Number$refaddr", "'" . $content . "'")
+                ($sgn == 2) ? $self->make_constant($ref, '_set_str',  "Number$refaddr", "'" . $content . "'")
+              : ($sgn >= 0) ? $self->make_constant($ref, '_new_uint', "Number$refaddr", "'" . $content . "'")
               :               $self->make_constant($ref, '_new_int', "Number$refaddr", "'" . $content . "'");
         }
         elsif ($ref eq 'Sidef::Types::Number::Inf') {
@@ -1232,8 +1224,13 @@ HEADER
             $code = $self->make_constant($ref, '__NEW__', "MOD_F$refaddr", $self->_dump_string($obj->{module}));
         }
         elsif ($ref eq 'Sidef::Types::Range::RangeNumber' or $ref eq 'Sidef::Types::Range::RangeString') {
-            $code = $self->make_constant($ref, 'new', "Range$refaddr",
-                       map { 'Sidef::Types::Number::Number->_set_str(' . $obj->{$_}->_get_frac . ')' } ('from', 'to', 'step'));
+            $code = $self->make_constant(
+                $ref, 'new',
+                "Range$refaddr",
+                map {
+                    'Sidef::Types::Number::Number->_set_str(' . "'" . $obj->{$_}->_get_frac . "'" . ')'
+                  } ('from', 'to', 'step')
+            );
         }
         elsif ($ref eq 'Sidef::Types::Glob::Backtick') {
             $code = $self->make_constant($ref, 'new', "Backtick$refaddr", $self->_dump_string(${$obj}));
