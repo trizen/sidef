@@ -20,7 +20,8 @@ package Sidef::Types::String::String {
     sub new {
         my (undef, $str) = @_;
         if (@_ > 2) {
-            $str = CORE::join('', map { "$_" } @_[1 .. $#_]);
+            shift(@_);
+            $str = CORE::join('', @_);
         }
         bless(\"$str", __PACKAGE__);
     }

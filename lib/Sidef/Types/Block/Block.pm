@@ -41,7 +41,8 @@ package Sidef::Types::Block::Block {
     }
 
     sub run {
-        $_[0]{code}->(@_[1 .. $#_]);
+        my $self = shift(@_);
+        $self->{code}->(@_);
     }
 
     *do = \&run;

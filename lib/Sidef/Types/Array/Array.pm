@@ -19,7 +19,10 @@ package Sidef::Types::Array::Array {
     sub new {
         @_ == 2 && ref($_[1]) eq 'ARRAY'
           ? bless($_[1], __PACKAGE__)
-          : bless [@_[1 .. $#_]], __PACKAGE__;
+          : do {
+            shift(@_);
+            bless [@_], __PACKAGE__;
+          };
     }
 
     *call = \&new;

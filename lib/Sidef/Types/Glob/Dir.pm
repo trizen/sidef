@@ -10,8 +10,9 @@ package Sidef::Types::Glob::Dir {
     sub new {
         my (undef, $dir) = @_;
         if (@_ > 2) {
+            shift(@_);
             state $x = require File::Spec;
-            $dir = File::Spec->catdir(map { "$_" } @_[1 .. $#_]);
+            $dir = File::Spec->catdir(map { "$_" } @_);
         }
         elsif (ref($dir)) {
             return $dir->to_dir;
