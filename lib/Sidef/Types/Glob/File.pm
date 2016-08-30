@@ -560,8 +560,30 @@ package Sidef::Types::Glob::File {
         }
     }
 
-    *delete = \&unlink;
-    *remove = \&unlink;
+    sub delete {
+        my ($self, @args) = @_;
+
+        if (ref($self)) {
+            my $file = "$self";
+            CORE::unlink($file) || return Sidef::Types::Bool::Bool::FALSE;
+            1 while CORE::unlink($file);
+            return Sidef::Types::Bool::Bool::TRUE;
+        }
+        else {
+            my $count = 0;
+
+            foreach my $arg (@args) {
+                my $file = "$arg";
+                CORE::unlink($file) || next;
+                1 while CORE::unlink($file);
+                ++$count;
+            }
+
+            Sidef::Types::Number::Number->_new_uint($count);
+        }
+    }
+
+    *remove = \&delete;
 
     sub split {
         ref($_[0]) || shift(@_);

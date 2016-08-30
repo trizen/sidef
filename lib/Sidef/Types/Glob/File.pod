@@ -108,7 +108,7 @@ File.delete() -> I<Obj>
 
 Return the
 
-Aliases: I<remove>, I<unlink>
+Aliases: I<remove>
 
 =cut
 
@@ -515,6 +515,14 @@ Return the
 =head2 truncate
 
 File.truncate() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 unlink
+
+File.unlink() -> I<Obj>
 
 Return the
 
