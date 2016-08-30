@@ -17,8 +17,8 @@ class Array {
 
     var gd = (
       try   { require('GD::Simple') }
-      catch { warn "GD::Simple is not installed!"; return }
-    );
+      catch { warn "GD::Simple is not installed!"; return() }
+    )
 
     var width = self.max_by{.len}.len
     self.map!{|r| "%-#{width}s" % r}

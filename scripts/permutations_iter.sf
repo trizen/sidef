@@ -9,7 +9,7 @@ func permutations(callback, arr) {
 
         var p = end;
         while (idx[p-1] > idx[p]) {p--};
-        p == 0 && return;
+        p == 0 && return();
 
         var d = p;
         idx += idx.splice(p).reverse;

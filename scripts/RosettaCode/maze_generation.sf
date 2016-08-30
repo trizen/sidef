@@ -14,7 +14,7 @@ var hor  = (0..h -> map {["+--"] * w });
 
 func walk(x, y) {
     cell[y][x] = false;
-    avail-- > 0 || return;  # no more bottles, er, cells
+    avail-- > 0 || return();  # no more bottles, er, cells
 
     var d = [[-1, 0], [0, 1], [1, 0], [0, -1]];
     while (d.len) {

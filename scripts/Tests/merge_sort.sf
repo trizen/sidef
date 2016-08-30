@@ -21,7 +21,7 @@ func merge(left, right) {
 
 func merge_sort(array) {
     var n = array.len;
-    n < 2 && return;
+    n < 2 && return();
 
     var mid   = (n/2 -> int);
     var left  = array.ft(0, mid-1);

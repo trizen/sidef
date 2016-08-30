@@ -3,7 +3,7 @@
 func rec_reverse(array, code) {
     var len = array.len;
 
-    len == 0 && return;
+    len == 0 && return();
     len == 1 && return code.call(array[0]);
 
     var chunks = array/2;

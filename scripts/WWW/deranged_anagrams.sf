@@ -20,8 +20,8 @@ func main () {
 
     var lwp = (
         try   { frequire('LWP::Simple') }
-        catch { warn("** LWP::Simple is not installed!"); return }
-    );
+        catch { warn("** LWP::Simple is not installed!"); return() }
+    )
 
     "** Retrieving the wordlist...".say;
     var words = lwp.get('http://www.puzzlers.org/pub/wordlists/unixdict.txt').words;

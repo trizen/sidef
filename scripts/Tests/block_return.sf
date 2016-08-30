@@ -17,7 +17,7 @@ func foo(x) {
 
     var b = { |x|
         return "foo" if x==42;
-        return;
+        return nil;
     }
 
     b(x) if x>10;

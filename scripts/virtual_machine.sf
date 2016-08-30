@@ -74,7 +74,7 @@ class VM {
                     }
                 }
                 when (HALT) {
-                    return;
+                    return();
                 }
             }
         }

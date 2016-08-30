@@ -680,7 +680,7 @@ package Sidef::Parser {
                     my $pos = pos($_);
                     /\G(?=\()/
                       ? $self->parse_arg(code => $opt{code})
-                      : $self->parse_obj(code => $opt{code});
+                      : $self->parse_obj(code => $opt{code}, multiline => 1);
 
                     $vars[-1] .= '=' . substr($_, $pos, pos($_) - $pos);
                 }
@@ -797,7 +797,7 @@ package Sidef::Parser {
                     my $obj = (
                                /\G(?=\()/
                                ? $self->parse_arg(code => $opt{code})
-                               : $self->parse_obj(code => $opt{code})
+                               : $self->parse_obj(code => $opt{code}, multiline => 1)
                               );
                     $value = (
                               ref($obj) eq 'HASH'
@@ -1093,7 +1093,7 @@ package Sidef::Parser {
                     my $args = (
                                 /\G\s*(?=\()/gc
                                 ? $self->parse_arg(code => $opt{code})
-                                : $self->parse_obj(code => $opt{code})
+                                : $self->parse_obj(code => $opt{code}, multiline => 1)
                       ) // $self->fatal_error(
                                               code  => $_,
                                               pos   => pos,
@@ -1128,7 +1128,7 @@ package Sidef::Parser {
 
                 my $args;
                 if (/\G\h*=\h*/gc) {
-                    $args = $self->parse_obj(code => $opt{code});
+                    $args = $self->parse_obj(code => $opt{code}, multiline => 1);
                     $args // $self->fatal_error(
                                                 code  => $_,
                                                 pos   => pos($_) - 2,
@@ -1163,7 +1163,7 @@ package Sidef::Parser {
                     my $name       = $v->{name};
                     my $class_name = $v->{class};
 
-                    my $obj = $self->parse_obj(code => $opt{code});
+                    my $obj = $self->parse_obj(code => $opt{code}, multiline => 1);
                     $obj // $self->fatal_error(
                                                code  => $_,
                                                pos   => pos($_) - 2,
@@ -2553,7 +2553,7 @@ package Sidef::Parser {
                     if (/\G\h*(?=[({])/gc || $req_arg) {
                         my $arg = (
                                      /\G(?=\()/ ? $self->parse_arg(code => $opt{code})
-                                   : $req_arg ? $self->parse_obj(code => $opt{code})
+                                   : $req_arg ? $self->parse_obj(code => $opt{code}, multiline => 1)
                                    : /\G(?=\{)/ ? $self->parse_block(code => $opt{code}, topic_var => 1)
                                    :              die "[PARSER ERROR] Something is wrong in the if condition"
                                   );
@@ -2669,6 +2669,14 @@ package Sidef::Parser {
 
         my %struct;
         local *_ = $opt{code};
+
+        if (not($opt{multiline}) and /\G\h*\R/gc) {
+            $self->fatal_error(
+                               code  => $_,
+                               pos   => pos($_) - $-[0],
+                               error => "unexpected end-of-statement",
+                              );
+        }
 
         my ($obj, $obj_key, $method) = $self->parse_expr(code => $opt{code});
 
@@ -2896,7 +2904,7 @@ package Sidef::Parser {
                         push @{$struct{$self->{class}}[-1]{call}}, {method => $method, arg => \@arg};
                     }
                 }
-                elsif (ref($obj) ne 'Sidef::Types::Block::Return') {
+                else {
                     $self->fatal_error(
                                        code  => $_,
                                        error => "expected an argument. Did you mean '$method()' instead?",
@@ -2971,7 +2979,7 @@ package Sidef::Parser {
                         my $arg = (
                                      $lonely_obj
                                    ? $self->parse_arg(code => $opt{code})
-                                   : $self->parse_obj(code => $opt{code})
+                                   : $self->parse_obj(code => $opt{code}, multiline => 1)
                                   );
 
                         if (defined $arg) {

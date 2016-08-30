@@ -4,7 +4,7 @@ func walk(n, s, h) {
     n.exists('a') && (
         h{n{'a'}} = s;
         say "#{n{'a'}}: #{s}";
-        return;
+        return();
     );
     walk(n{'0'}, s+'0', h);
     walk(n{'1'}, s+'1', h);

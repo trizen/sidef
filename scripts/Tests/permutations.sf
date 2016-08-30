@@ -12,7 +12,7 @@ func permute (code, arr) {
 
         var p = idx.end;
         while (idx[p - 1] > idx[p]) { --p };
-        p == 0 && return;
+        p == 0 && return();
 
         idx += idx.splice(p).reverse;
 

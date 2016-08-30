@@ -50,7 +50,7 @@ class AVLtree {
     }
 
     method delete_key(delKey) {
-        if (root == nil) { return }
+        if (root == nil) { return() }
 
         var n = root
         var parent = root
@@ -86,7 +86,7 @@ class AVLtree {
     }
 
     method rebalance(n) {
-        if (n == nil) { return }
+        if (n == nil) { return() }
         self.setBalance(n)
 
         given (n.balance) {

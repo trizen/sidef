@@ -123,7 +123,7 @@ class new(diacritics            = true,
     method ro_to_number(text) {
 
         # When text is not a string
-        text.is_a(String) || return;
+        text.is_a(String) || return();
 
         # If a thousand separator is defined, remove it from text
         if (self.thousands_separator != '' && (self.thousands_separator.len > 1)) {
@@ -231,7 +231,7 @@ class new(diacritics            = true,
         }
 
         # Return undef when no number has been converted
-        nums.len || return;
+        nums.len || return();
 
         # Add all the numbers together (if any)
         var num = _add_numbers(nums).to_s;
