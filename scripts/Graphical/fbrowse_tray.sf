@@ -1,0 +1,379 @@
+#!/usr/bin/ruby
+#
+# Copyright (C) 2014 Daniel "Trizen" Șuteu <echo dHJpemVueEBnbWFpbC5jb20K | base64 -d>.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+# License: GPLv3
+# Date: 30 August 2016
+# Website: http://github.com/trizen
+# A simple system-tray file browser.
+
+# ---------------------------------------------------------
+# Recursively browse filesystem through a GTK+ tray applet.
+# ---------------------------------------------------------
+
+require('Gtk2') -> init
+require('File::MimeInfo')
+
+const pkgname = 'fbrowse-tray'
+const version = 0.06
+
+const ICON_THEME = %s<Gtk2::IconTheme>.get_default
+
+var (
+    FILE_MANAGER = (ENV{:FILEMANAGER} \\ 'pcmanfm'),
+    ICON_SIZE    = 'menu',
+    STATUS_ICON  = 'file-manager',
+    EXT_MIMETYPE = false,
+    TOOLTIP_PATH = false,
+    FILES_FIRST  = false,
+)
+
+func add_content() { }
+
+# -------------------------------------------------------------------------------------
+
+func add_browse_here(menu, dir) {
+
+    # Append 'Browser here...'
+    var browse_here = %s<Gtk2::ImageMenuItem>.new("Browse here...")
+    browse_here.signal_connect(activate => { Sys.run("#{FILE_MANAGER} #{dir.escape} &") })
+    menu.append(browse_here)
+
+    return true
+}
+
+# Add content of a directory as a submenu for an item
+func create_submenu(item, dir) {
+
+    # Create a new menu
+    var menu = %s<Gtk2::Menu>.new
+
+    # Add 'Browse here...'
+    add_browse_here(menu, dir)
+
+    # Append an horizontal separator
+    menu.append(%s<Gtk2::SeparatorMenuItem>.new)
+
+    # Add the dir content in this new menu
+    add_content(menu, dir)
+
+    # Set submenu for item to this new menu
+    item.set_submenu(menu)
+
+    # Make menu content visible
+    menu.show_all
+
+    return true
+}
+
+# -------------------------------------------------------------------------------------
+
+# Append a directory to a submenu
+func append_dir(submenu, dirname, dir) {
+
+    # Create the dir submenu
+    var dirmenu = %s<Gtk2::Menu>.new
+
+    # Create a new menu item
+    var item = %s<Gtk2::ImageMenuItem>.new(dirname)
+
+    # Set icon
+    item.set_image(%s<Gtk2::Image>.new_from_icon_name('inode-directory', ICON_SIZE))
+
+    # Set a signal
+    item.signal_connect(activate => { create_submenu(item, dir); dirmenu.destroy })
+
+    # Set the submenu to the entry item
+    item.set_submenu(dirmenu)
+
+    # Append the item to the submenu
+    submenu.append(item)
+
+    return true
+}
+
+# -------------------------------------------------------------------------------------
+
+# Returns true if a given icon exists in the current icon-theme
+func is_icon_valid(icon) is cached {
+    ICON_THEME.has_icon(icon)
+}
+
+# Returns a valid icon name based on file's mime-type
+func file_icon(filename, file) {
+
+    static alias = Hash()
+    var mime_type = (
+            (
+             (
+                EXT_MIMETYPE ? [%S<File::MimeInfo>.globs(filename)][0]
+                             : %S<File::MimeInfo>.mimetype(file)
+              ) \\ return 'unknown'
+            ).gsub('/', '-')
+    )
+
+    alias.contains(mime_type) ->
+        && return alias{mime_type}
+
+    do {
+        var type = mime_type
+        static re = /.*\K[[:punct:]]\w++$/
+        loop {
+            if (is_icon_valid(type)) {
+                return (alias{mime_type} = type)
+            }
+            elsif (is_icon_valid("gnome-mime-#{type}")) {
+                return (alias{mime_type} = "gnome-mime-#{type}")
+            }
+            type.match(re) ? type.gsub!(re) : break
+        }
+    }
+
+    {
+        var type = mime_type
+        static re = /^application-x-\K.*?-/
+        loop {
+            type.match(re) ? type.gsub!(re) : break
+            if (is_icon_valid(type)) {
+                return (alias{mime_type} = type)
+            }
+        }
+    }
+
+    alias{mime_type} = 'unknown'
+}
+
+# -------------------------------------------------------------------------------------
+
+# Open file
+func open_file(file) {
+    Sys.run("#{FILE_MANAGER} #{file.escape} &")
+}
+
+# -------------------------------------------------------------------------------------
+
+# File action
+func file_actions(obj, event, file) {
+    if ((event.button == 1) || (event.button == 2)) {
+
+        open_file(file);    # open the file
+
+        if (event.button == 1) {
+            return false    # hide the menu when left-clicked
+        }
+
+        return true        # keep the menu when middle-clicked
+    }
+
+    # Right-click menu
+    var menu = %s<Gtk2::Menu>.new
+
+    # Open
+    var open = %s<Gtk2::ImageMenuItem>.new('Open')
+
+    # Set icon
+    open.set_image(%s<Gtk2::Image>.new_from_icon_name('gtk-open', ICON_SIZE))
+
+    # Set a signal (activates on click)
+    open.signal_connect(activate => { open_file(file) })
+
+    # Append the item to the menu
+    menu.append(open)
+
+    # Delete
+    var delete = %s<Gtk2::ImageMenuItem>.new('Delete')
+
+    # Set icon
+    delete.set_image(%s<Gtk2::Image>.new_from_icon_name('gtk-delete', ICON_SIZE))
+
+    # Set a signal (activates on click)
+    delete.signal_connect(activate => { File.delete(file) && obj.destroy })
+
+    # Append the item to the menu
+    menu.append(delete)
+
+    # Show menu
+    menu.show_all
+    menu.popup(nil, nil, nil, [1, 1], 0, 0)
+
+    return true    # don't hide the main menu
+}
+
+# -------------------------------------------------------------------------------------
+
+# Append a file to a submenu
+func append_file(submenu, filename, file) {
+
+    # Create a new menu item
+    var item = %s<Gtk2::ImageMenuItem>.new(filename)
+
+    # Set icon
+    item.set_image(%s<Gtk2::Image>.new_from_icon_name(file_icon(filename, file), ICON_SIZE))
+
+    # Set tooltip
+    TOOLTIP_PATH && item.set_property('tooltip_text', file)
+
+    # Set a signal (activates on click)
+    item.signal_connect('button-release-event' => func(obj, event) { file_actions(obj, event, file) })
+
+    # Append the item to the submenu
+    submenu.append(item)
+
+    return true
+}
+
+# -------------------------------------------------------------------------------------
+
+# Read a content directory and add it to a submenu
+add_content = func(submenu, dir) {
+
+    var dirs = []
+    var files = []
+
+    Dir.open(dir, \var dir_h) || return nil
+
+    struct Entry {
+        String name,
+        File path,
+    }
+
+    dir_h.each { |filename|
+
+        # Ignore hidden files
+        filename.begins_with('.') && next
+
+        # Join directory with the filename
+        var path = File(dir, filename)
+        path.exists || (path = Dir(dir, filename))
+
+        # Resolve absolute path
+        if (path.is_link) {
+            path.abs_path!
+            path.exists || next
+        }
+
+        # Collect the files and dirs
+        (path.is_dir ? dirs : files) << Entry(filename.gsub('_', '__'), path)
+    }
+    dir_h.close
+
+    struct Entries {
+        Array content,
+        Block function,
+    }
+
+    var categories = [Entries(dirs, append_dir),
+                      Entries(files, append_file)]
+
+    for category in (FILES_FIRST ? categories.reverse : categories) {
+        category.content.sort_by { .name.fc }.each { |entry|
+            category.function.call(submenu, entry.name, entry.path)
+        }
+    }
+
+    return true
+}
+
+# -------------------------------------------------------------------------------------
+
+# Create the main menu and populate it with the content of $dir
+func create_main_menu(icon, dir, event) {
+
+    var menu = %s<Gtk2::Menu>.new
+
+    if (event.button == 1) {
+        add_content(menu, dir)
+    }
+    elsif (event.button == 3) {
+
+        # Create a new menu item
+        var exit = %s<Gtk2::ImageMenuItem>.new('Quit')
+
+        # Set icon
+        exit.set_image(%s<Gtk2::Image>.new_from_icon_name('exit', ICON_SIZE))
+
+        # Set a signal (activates on click)
+        exit.signal_connect(activate => { %s<Gtk2>.main_quit })
+
+        # Append the item to the menu
+        menu.append(exit)
+    }
+
+    menu.show_all
+    menu.popup(nil, nil, { %S<Gtk2::StatusIcon>.position_menu(menu, 0, 0, icon) }, [1, 1], 0, 0)
+
+    return true
+}
+
+# -------------------------------------------------------------------------------------
+
+#
+## Main
+#
+
+func usage(code=0) {
+    var main = File(__MAIN__).basename
+    print <<"USAGE"
+usage: #{main} [options] [dir]
+
+options:
+    -r            : order files before directories
+    -t            : set the path of the file as tooltip
+    -e            : get the mimetype by extension only (faster)
+    -i [name]     : change the status icon (default: #{STATUS_ICON})
+    -f [command]  : command to open the files with (default: #{FILE_MANAGER})
+    -m [size]     : size of the menu icons (default: #{ICON_SIZE})
+                    more: dnd, dialog, button, small-toolbar, large-toolbar
+
+example:
+    #{main} -f thunar -m dnd /my/dir
+USAGE
+    Sys.exit(code)
+}
+
+func output_version {
+    say "#{pkgname} #{version}"
+    Sys.exit(0)
+}
+
+# Parse arguments
+if (ARGV && ARGV[0].begins_with('-')) {
+
+    require('Getopt::Long')
+    %S<Getopt::Long>.GetOptionsFromArray(ARGV,
+        't!'  => func(_, v) { TOOLTIP_PATH =   Bool(v) },
+        'r!'  => func(_, v) { FILES_FIRST  =   Bool(v) },
+        'e!'  => func(_, v) { EXT_MIMETYPE =   Bool(v) },
+        'i=s' => func(_, v) { STATUS_ICON  = String(v) },
+        'f=s' => func(_, v) { FILE_MANAGER = String(v) },
+        'm=s' => func(_, v) { ICON_SIZE    = String(v) },
+
+        'h'  => func(*_) { usage() },
+        'v'  => func(*_) { output_version() },
+    ) || die "Error in command-line arguments!"
+}
+
+#
+## Main menu
+#
+var dir = Dir(ARGV.pop)
+dir.exists || usage(2)
+
+var icon = %s<Gtk2::StatusIcon>.new
+icon.set_from_icon_name(STATUS_ICON)
+icon.set_visible(true)
+icon.signal_connect('button-release-event' => func(_, event) { create_main_menu(icon, dir, event) })
+%s<Gtk2>.main

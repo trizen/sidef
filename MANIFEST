@@ -188,6 +188,7 @@ scripts/Graphical/circle_from_polygons.sf
 scripts/Graphical/color_bars.sf
 scripts/Graphical/death_star.sf
 scripts/Graphical/draw_a_sphere.sf
+scripts/Graphical/fbrowse_tray.sf
 scripts/Graphical/fractal_tree.sf
 scripts/Graphical/hello_world_graphical.sf
 scripts/Graphical/hello_world_graphical_1.sf

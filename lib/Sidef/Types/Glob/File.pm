@@ -40,20 +40,6 @@ package Sidef::Types::Glob::File {
         }
     }
 
-    sub touch {
-        my ($self, @args) = @_;
-
-        if (not ref($self)) {
-            $self = $self->new(shift @args);
-        }
-
-        $self->open('>>', @args);
-    }
-
-    *make   = \&touch;
-    *mkfile = \&touch;
-    *create = \&touch;
-
     sub size {
         ref($_[0]) || shift(@_);
         my ($self) = @_;
@@ -100,7 +86,9 @@ package Sidef::Types::Glob::File {
     sub readlink {
         ref($_[0]) || shift(@_);
         my ($self) = @_;
-        Sidef::Types::String::String->new(CORE::readlink("$self"));
+        my $file = "$self";
+        my $pkg = (-d $file) ? 'Sidef::Types::Glob::Dir' : __PACKAGE__;
+        $pkg->new(CORE::readlink("$self"));
     }
 
     *read_link = \&readlink;
@@ -266,14 +254,11 @@ package Sidef::Types::Glob::File {
     *is_abs = \&is_absolute;
 
     sub abs_name {
-        my ($self) = @_;
-
-        unless (ref($self)) {
-            $self = $self->new($_[1]);
-        }
+        ref($_[0]) || shift(@_);
+        my ($self, $base) = @_;
 
         state $x = require File::Spec;
-        $self->new(File::Spec->rel2abs("$self"));
+        __PACKAGE__->new(File::Spec->rel2abs("$self", defined($base) ? "$base" : ()));
     }
 
     *abs     = \&abs_name;
@@ -281,19 +266,26 @@ package Sidef::Types::Glob::File {
     *rel2abs = \&abs_name;
 
     sub rel_name {
+        ref($_[0]) || shift(@_);
         my ($self, $base) = @_;
 
-        unless (ref($self)) {
-            ($self, $base) = ($self->new($base), $_[2]);
-        }
-
         state $x = require File::Spec;
-        $self->new(File::Spec->rel2abs("$self", defined($base) ? "$base" : ()));
+        __PACKAGE__->new(File::Spec->rel2abs("$self", defined($base) ? "$base" : ()));
     }
 
     *rel     = \&rel_name;
     *relname = \&rel_name;
     *abs2rel = \&rel_name;
+
+    sub abs_path {
+        ref($_[0]) || shift(@_);
+        my ($self) = @_;
+
+        state $x = require Cwd;
+        __PACKAGE__->new(Cwd::abs_path("$self"));
+    }
+
+    *realpath = \&abs_path;
 
     sub rename {
         ref($_[0]) || shift(@_);
@@ -442,50 +434,52 @@ package Sidef::Types::Glob::File {
         $success ? $fh_obj : ();
     }
 
+    sub touch {
+        ref($_[0]) || shift(@_);
+        my ($self, @args) = @_;
+        Sidef::Types::Glob::File::open($self, '>>', @args);
+    }
+
+    *make   = \&touch;
+    *mkfile = \&touch;
+    *create = \&touch;
+
     sub open_r {
-        my ($self, @rest) = @_;
-        unless (ref($self)) {
-            $self = $self->new(shift @rest);
-        }
-        $self->open('<:utf8', @rest);
+        ref($_[0]) || shift(@_);
+        my ($self, @args) = @_;
+        Sidef::Types::Glob::File::open($self, '<:utf8', @args);
     }
 
     *open_read = \&open_r;
 
     sub open_w {
-        my ($self, @rest) = @_;
-        unless (ref($self)) {
-            $self = $self->new(shift @rest);
-        }
-        $self->open('>:utf8', @rest);
+        ref($_[0]) || shift(@_);
+        my ($self, @args) = @_;
+        Sidef::Types::Glob::File::open($self, '>:utf8', @args);
     }
 
     *open_write = \&open_w;
 
     sub open_a {
-        my ($self, @rest) = @_;
-        unless (ref($self)) {
-            $self = $self->new(shift @rest);
-        }
-        $self->open('>>:utf8', @rest);
+        ref($_[0]) || shift(@_);
+        my ($self, @args) = @_;
+        Sidef::Types::Glob::File::open($self, '>>:utf8', @args);
     }
 
     *open_append = \&open_a;
 
     sub open_rw {
-        my ($self, @rest) = @_;
-        unless (ref($self)) {
-            $self = $self->new(shift @rest);
-        }
-        $self->open('+<:utf8', @rest);
+        ref($_[0]) || shift(@_);
+        my ($self, @args) = @_;
+        Sidef::Types::Glob::File::open($self, '+<:utf8', @args);
     }
 
     *open_read_write = \&open_rw;
 
     sub opendir {
         ref($_[0]) || shift(@_);
-        my ($self, @rest) = @_;
-        Sidef::Types::Glob::Dir->new("$self")->open(@rest);
+        my ($self, @args) = @_;
+        Sidef::Types::Glob::Dir->new("$self")->open(@args);
     }
 
     sub sysopen {

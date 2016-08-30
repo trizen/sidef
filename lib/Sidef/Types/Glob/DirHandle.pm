@@ -109,7 +109,7 @@ package Sidef::Types::Glob::DirHandle {
 
     sub chdir {
         my ($self) = @_;
-        chdir($self->{dir_h})
+        CORE::chdir($self->{dir_h})
           ? (Sidef::Types::Bool::Bool::TRUE)
           : (Sidef::Types::Bool::Bool::FALSE);
     }
