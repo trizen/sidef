@@ -2670,10 +2670,10 @@ package Sidef::Parser {
         my %struct;
         local *_ = $opt{code};
 
-        if (not($opt{multiline}) and /\G\h*\R/gc) {
+        if (not($opt{multiline}) and /\G\h*(?=\R)/gc) {
             $self->fatal_error(
                                code  => $_,
-                               pos   => pos($_) - $-[0],
+                               pos   => pos($_) - 1,
                                error => "unexpected end-of-statement",
                               );
         }

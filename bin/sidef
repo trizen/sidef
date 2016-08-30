@@ -489,12 +489,13 @@ EOT
             # Give up if the previous line is blank,
             # or when it's impossible to recover from an error
             if (
-                   $@ =~ /is not declared in the current scope/
-                or $@ =~ /invalid \S+ declaration/
-                or $@ =~ /attempt to call method/
-                or $@ =~ /not declared in the current scope/
-                or $@ =~ /expected a block after/
-                or $@ =~ /invalid module declaration/
+                   $@ =~ /is not declared in the current scope/i
+                or $@ =~ /invalid \S+ declaration/i
+                or $@ =~ /attempt to call method/i
+                or $@ =~ /not declared in the current scope/i
+                or $@ =~ /expected a block after/i
+                or $@ =~ /invalid module declaration/i
+                or $@ =~ /unexpected end-of-statement/i
                 or (
                       $@ =~ /unbalanced/ || $@ =~ /string terminator/
                     ? $line =~ /\R\R\z/
