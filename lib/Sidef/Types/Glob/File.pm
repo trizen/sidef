@@ -254,11 +254,11 @@ package Sidef::Types::Glob::File {
     *is_abs = \&is_absolute;
 
     sub abs_name {
-        ref($_[0]) || shift(@_);
+        my $class = ref($_[0]) || shift(@_);
         my ($self, $base) = @_;
 
         state $x = require File::Spec;
-        __PACKAGE__->new(File::Spec->rel2abs("$self", defined($base) ? "$base" : ()));
+        $class->new(File::Spec->rel2abs("$self", defined($base) ? "$base" : ()));
     }
 
     *abs     = \&abs_name;
@@ -266,11 +266,11 @@ package Sidef::Types::Glob::File {
     *rel2abs = \&abs_name;
 
     sub rel_name {
-        ref($_[0]) || shift(@_);
+        my $class = ref($_[0]) || shift(@_);
         my ($self, $base) = @_;
 
         state $x = require File::Spec;
-        __PACKAGE__->new(File::Spec->rel2abs("$self", defined($base) ? "$base" : ()));
+        $class->new(File::Spec->rel2abs("$self", defined($base) ? "$base" : ()));
     }
 
     *rel     = \&rel_name;
@@ -278,11 +278,11 @@ package Sidef::Types::Glob::File {
     *abs2rel = \&rel_name;
 
     sub abs_path {
-        ref($_[0]) || shift(@_);
+        my $class = ref($_[0]) || shift(@_);
         my ($self) = @_;
 
         state $x = require Cwd;
-        __PACKAGE__->new(Cwd::abs_path("$self"));
+        $class->new(Cwd::abs_path("$self"));
     }
 
     *realpath = \&abs_path;
