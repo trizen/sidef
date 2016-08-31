@@ -329,7 +329,12 @@ package Sidef::Types::Block::Block {
         my $ref = ref($obj);
 
         if ($ref eq 'Sidef::Types::Number::Number') {
-            return scalar {dump => ($ref . "->_set_str('" . $obj->_get_frac() . "')"),};
+            my ($code, $value) = $obj->_dump();
+
+            $code < 0  && return scalar {dump => ($ref . "->_new_int('$value')")};
+            $code <= 1 && return scalar {dump => ($ref . "->_new_uint('$value')")};
+
+            return scalar {dump => ($ref . "->_set_str('$value')"),};
         }
         elsif ($ref eq 'Sidef::Types::Number::Complex') {
             my ($re, $im) = $obj->reals();
@@ -343,6 +348,9 @@ package Sidef::Types::Block::Block {
         }
         elsif ($ref eq 'Sidef::Types::Number::Nan') {
             return scalar {dump => "$ref->new",};
+        }
+        elsif ($ref eq 'Sidef::Types::Block::Block') {
+            die "[ERROR] Blocks can't be serialized by Block.ffork()!";
         }
 
         return;
@@ -359,7 +367,7 @@ package Sidef::Types::Block::Block {
         #local *Math::GMPq::DESTROY;
 
         # Try to fork
-        my $pid = fork() // die "[ERROR]: Cannot fork";
+        my $pid = fork() // die "[ERROR] Cannot fork";
 
         if ($pid == 0) {
             srand();
