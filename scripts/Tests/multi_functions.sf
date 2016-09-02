@@ -105,4 +105,22 @@ func f(a, *b { .all{ _ >= 0} }) {
 
 assert_eq(f(2, 3, 4, 5, 6), 36);
 
+#
+## Fizz-Buzz
+#
+
+func fizzbuzz({ _ %% 15 }) { "FizzBuzz" }
+func fizzbuzz({ _ %%  5 }) {     "Buzz" }
+func fizzbuzz({ _ %%  3 }) {     "Fizz" }
+func fizzbuzz(        n  ) {          n }
+
+assert_eq(fizzbuzz(3), 'Fizz');
+assert_eq(fizzbuzz(5), 'Buzz');
+assert_eq(fizzbuzz(15), 'FizzBuzz');
+assert_eq(fizzbuzz(12), 'Fizz');
+assert_eq(fizzbuzz(30), 'FizzBuzz');
+assert_eq(fizzbuzz(25), 'Buzz');
+assert_eq(fizzbuzz(41), 41);
+assert_eq(fizzbuzz(19), 19);
+
 say "** Test passed!";
