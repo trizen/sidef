@@ -1,0 +1,88 @@
+#!/usr/bin/ruby
+
+# Code from a lesson by Keith Peters.
+# See: https://www.youtube.com/watch?v=geqq63WFLr0
+
+require('Imager')
+
+var (width, height) = (500, 500)
+var img = %s<Imager>.new(xsize => width, ysize => height)
+
+struct Rule {
+    a, b, c, d, tx, ty, w
+}
+
+var rules = [
+    Rule(
+        a: 0.85,
+        b: 0.04,
+        c: -0.04,
+        d: 0.85,
+        tx: 0,
+        ty: 1.6,
+        w: 0.85,
+    ),
+    Rule(
+        a: -0.15,
+        b: 0.28,
+        c: 0.26,
+        d: 0.24,
+        tx: 0,
+        ty: 0.44,
+        w: 0.07,
+    ),
+    Rule(
+        a: 0.2,
+        b: -0.26,
+        c: 0.23,
+        d: 0.22,
+        tx: 0,
+        ty: 1.6,
+        w: 0.07,
+    ),
+    Rule(
+        a: 0,
+        b: 0,
+        c: 0,
+        d: 0.16,
+        tx: 0,
+        ty: 0,
+        w: 0.01,
+    )
+]
+
+func plot(x, y) {
+    static green = %s<Imager::Color>.new('#00ff00')
+    img.setpixel(
+        x     => width/2 + Math.map(2*x, 0, 10, 0, width/2),
+        y     => height  - Math.map(2*y, 0, 10, 0, height/2),
+        color => green
+    )
+}
+
+func getRule {
+    var r = 1.rand
+    for rule in (rules) {
+        if (r < rule.w) {
+            return rule
+        }
+        r -= rule.w
+    }
+}
+
+var (x, y) = 2.of { 1.rand }...
+
+func iterate {
+    var rule = getRule()
+
+    var x1 = (x*rule.a + y*rule.b + rule.tx)
+    var y1 = (x*rule.c + y*rule.d + rule.ty)
+
+    x = x1
+    y = y1
+
+    plot(x, y)
+}
+
+iterate * 2000
+img.write(file => 'barnsley_fern.png')
