@@ -1,0 +1,106 @@
+#!/usr/bin/ruby
+
+# Code from a lesson by Keith Peters.
+# See: https://www.youtube.com/watch?v=geqq63WFLr0
+
+require('Imager')
+
+var (width, height) = (800, 800)
+var img = %s<Imager>.new(xsize => width, ysize => height)
+
+struct Rule {
+    a, b, c, d, tx, ty, w
+}
+
+var rules = [
+    Rule(
+        a: 0.05,
+        b: 0,
+        c: 0,
+        d: 0.6,
+        tx: 0,
+        ty: 0,
+        w: 0.17,
+    ),
+    Rule(
+        a: 0.05,
+        b: 0,
+        c: 0,
+        d: -0.5,
+        tx: 0,
+        ty: 1,
+        w: 0.17,
+    ),
+    Rule(
+        a: 0.46,
+        b: -0.321,
+        c: 0.386,
+        d: 0.383,
+        tx: 0,
+        ty: 0.6,
+        w: 0.17,
+    ),
+    Rule(
+        a: 0.47,
+        b: -0.154,
+        c: 0.171,
+        d: 0.423,
+        tx: 0,
+        ty: 1.1,
+        w: 0.17,
+    ),
+    Rule(
+        a: 0.433,
+        b: 0.275,
+        c: -0.25,
+        d: 0.476,
+        tx: 0,
+        ty: 1,
+        w: 0.16,
+    ),
+    Rule(
+        a: 0.421,
+        b: 0.257,
+        c: -0.353,
+        d: 0.306,
+        tx: 0,
+        ty: 0.7,
+        w: 0.16,
+    ),
+]
+
+func plot(x, y) {
+    static green = %s<Imager::Color>.new('#00ff00')
+    img.setpixel(
+        x     => width/2 + Math.map(10*x, 0, 10, 0, width/2),
+        y     => height  - Math.map(10*y, 0, 10, 0, height/2),
+        color => green
+    )
+}
+
+func getRule {
+    var r = 1.rand
+    for rule in (rules) {
+        if (r < rule.w) {
+            return rule
+        }
+        r -= rule.w
+    }
+}
+
+var (x, y) = 2.of { 1.rand }...
+
+func iterate {
+    var rule = getRule()
+
+    var x1 = (x*rule.a + y*rule.b + rule.tx)
+    var y1 = (x*rule.c + y*rule.d + rule.ty)
+
+    x = x1
+    y = y1
+
+    plot(x, y)
+}
+
+iterate * 5000
+img.write(file => 'tree.png')

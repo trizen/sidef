@@ -207,6 +207,7 @@ scripts/Graphical/pythagoras_tree.sf
 scripts/Graphical/sierpinski_pentagon.sf
 scripts/Graphical/sierpinski_triangle_graphical.sf
 scripts/Graphical/simple_windowed_application.sf
+scripts/Graphical/tree_ifs.sf
 scripts/Graphical/ulam_spiral.sf
 scripts/Graphical/user_input.sf
 scripts/Graphical/window_creation.sf
