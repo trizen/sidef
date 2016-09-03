@@ -303,8 +303,8 @@ package Sidef::Types::Number::Number {
             my $num = Math::GMPz::Rmpz_init();
             my $den = Math::GMPz::Rmpz_init();
 
-            Math::GMPq::Rmpq_get_num($num, $n);
-            Math::GMPq::Rmpq_get_den($den, $n);
+            Math::GMPq::Rmpq_numref($num, $n);
+            Math::GMPq::Rmpq_denref($den, $n);
 
             my @r;
             my $c = 0;
@@ -1428,7 +1428,7 @@ package Sidef::Types::Number::Number {
         }
 
         my $nz = Math::GMPz::Rmpz_init();
-        Math::GMPq::Rmpq_get_num($nz, $$x);
+        Math::GMPq::Rmpq_numref($nz, $$x);
 
         if (Math::GMPz::Rmpz_even_p($nz)) {
             (Sidef::Types::Bool::Bool::TRUE);
@@ -1446,7 +1446,7 @@ package Sidef::Types::Number::Number {
         }
 
         my $nz = Math::GMPz::Rmpz_init();
-        Math::GMPq::Rmpq_get_num($nz, $$x);
+        Math::GMPq::Rmpq_numref($nz, $$x);
 
         if (Math::GMPz::Rmpz_odd_p($nz)) {
             (Sidef::Types::Bool::Bool::TRUE);
@@ -2000,7 +2000,7 @@ package Sidef::Types::Number::Number {
         }
 
         my $nz = Math::GMPz::Rmpz_init();
-        Math::GMPq::Rmpq_get_num($nz, $$x);
+        Math::GMPq::Rmpq_numref($nz, $$x);
 
         if (Math::GMPz::Rmpz_perfect_square_p($nz)) {
             (Sidef::Types::Bool::Bool::TRUE);
@@ -2020,7 +2020,7 @@ package Sidef::Types::Number::Number {
         }
 
         my $nz = Math::GMPz::Rmpz_init();
-        Math::GMPq::Rmpq_get_num($nz, $$x);
+        Math::GMPq::Rmpq_numref($nz, $$x);
 
         if (Math::GMPz::Rmpz_perfect_power_p($nz)) {
             (Sidef::Types::Bool::Bool::TRUE);
@@ -2111,7 +2111,7 @@ package Sidef::Types::Number::Number {
     sub numerator {
         my ($x) = @_;
         my $z = Math::GMPz::Rmpz_init();
-        Math::GMPq::Rmpq_get_num($z, $$x);
+        Math::GMPq::Rmpq_numref($z, $$x);
 
         my $r = Math::GMPq::Rmpq_init();
         Math::GMPq::Rmpq_set_z($r, $z);
@@ -2123,7 +2123,7 @@ package Sidef::Types::Number::Number {
     sub denominator {
         my ($x) = @_;
         my $z = Math::GMPz::Rmpz_init();
-        Math::GMPq::Rmpq_get_den($z, $$x);
+        Math::GMPq::Rmpq_denref($z, $$x);
 
         my $r = Math::GMPq::Rmpq_init();
         Math::GMPq::Rmpq_set_z($r, $z);

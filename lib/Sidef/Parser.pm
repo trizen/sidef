@@ -3,7 +3,6 @@ package Sidef::Parser {
     use utf8;
     use 5.014;
 
-    our $DEBUG = 0;
     use Sidef::Types::Bool::Bool;
     use List::Util qw();
 
@@ -486,9 +485,6 @@ package Sidef::Parser {
                     warn '[WARN] '
                       . "$variable->{type} '$variable->{name}' has been declared, but not used again at "
                       . "$self->{file_name} line $variable->{line}\n";
-                }
-                elsif ($DEBUG) {
-                    warn "[DEBUG] Variable '$variable->{name}' is used $variable->{count} times!\n";
                 }
             }
         }
@@ -1111,7 +1107,9 @@ package Sidef::Parser {
 
             # "has" class attributes
             if (exists($self->{current_class}) and /\Ghas\b\h*/gc) {
+
                 local $self->{allow_class_variable} = 1;
+
                 my $vars = $self->parse_init_vars(
                                                   code    => $opt{code},
                                                   type    => 'has',
