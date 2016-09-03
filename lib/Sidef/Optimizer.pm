@@ -883,6 +883,19 @@ package Sidef::Optimizer {
                 $obj->{else}{block}{code} = \%code;
             }
         }
+        elsif ($ref eq 'Sidef::Types::Block::With') {
+            foreach my $i (0 .. $#{$obj->{with}}) {
+                my %code = $self->optimize($obj->{with}[$i]{block}{code});
+                $obj->{with}[$i]{block}{code} = \%code;
+
+                my %expr = $self->optimize($obj->{with}[$i]{expr});
+                $obj->{with}[$i]{expr} = \%expr;
+            }
+            if (exists $obj->{else}) {
+                my %code = $self->optimize($obj->{else}{block}{code});
+                $obj->{else}{block}{code} = \%code;
+            }
+        }
         elsif (   $ref eq 'Sidef::Types::Block::While'
                or $ref eq 'Sidef::Types::Block::ForIn'
                or $ref eq 'Sidef::Types::Block::ForEach') {
