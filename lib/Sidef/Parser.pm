@@ -2332,7 +2332,7 @@ package Sidef::Parser {
                 $self->fatal_error(
                                    code  => $_,
                                    pos   => (pos($_) - length($1)),
-                                   error => "attempt to use the deprecated regex variables",
+                                   error => "regex capture-variables are not supported",
                                   );
             }
 
