@@ -804,6 +804,7 @@ scripts/Tests/variable_references.sf
 scripts/Tests/vigenere_cipher.sf
 scripts/Tests/while_loop.sf
 scripts/Tests/wireworld.sf
+scripts/Tests/with_statement.sf
 scripts/Tests/word_processing.sf
 scripts/Tests/word_roots.sf
 scripts/Tests/word_wrap_enumerator.sf

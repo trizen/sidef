@@ -454,7 +454,14 @@ package Sidef::Deparse::Sidef {
             $code = 'default' . $self->deparse_bare_block($obj->{block}->{code});
         }
         elsif ($ref eq 'Sidef::Types::Block::With') {
-            $code = 'with ' . $self->deparse_args($obj->{expr}) . $self->deparse_expr({self => $obj->{block}});
+            foreach my $i (0 .. $#{$obj->{with}}) {
+                $code .= ($i == 0 ? 'with' : 'orwith');
+                my $info = $obj->{with}[$i];
+                $code .= $self->deparse_args($info->{expr}) . $self->deparse_expr({self => $info->{block}});
+            }
+            if (exists $obj->{else}) {
+                $code .= 'else' . $self->deparse_bare_block($obj->{else}{block}{code});
+            }
         }
         elsif ($ref eq 'Sidef::Types::Block::Return') {
             if (not exists $expr->{call}) {

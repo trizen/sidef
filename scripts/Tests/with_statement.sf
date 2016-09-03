@@ -1,0 +1,47 @@
+#!/usr/bin/ruby
+
+var x = nil
+var z = 42
+
+var ok = []
+
+#
+## orwith
+#
+with(x) {
+    say "x"
+}
+orwith(z) { |value|
+    ok << value
+    ok << "z"
+}
+else {
+    say "something else"
+}
+
+#
+## with
+#
+with(1234) {
+    ok << _
+}
+
+#
+## else
+#
+with(nil) {
+
+}
+orwith(nil) {
+
+}
+orwith(x) {
+
+}
+else {
+    ok << "else"
+}
+
+assert_eq(ok, [42, "z", 1234, "else"])
+
+say "** Test passed!"

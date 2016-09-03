@@ -1107,13 +1107,20 @@ HEADER
             $code = 'default' . $self->deparse_bare_block($obj->{block}->{code});
         }
         elsif ($ref eq 'Sidef::Types::Block::With') {
-            my $dvar = $self->_dump_var($obj->{block}{init_vars}->{vars}[0]);
-            $code =
-                'do{ if (defined(my '
-              . $dvar . '='
-              . $self->deparse_args($obj->{expr}) . ')) '
-              . $self->deparse_bare_block($obj->{block}{code})
-              . ' else { } }';
+            $code = 'do{';
+            foreach my $i (0 .. $#{$obj->{with}}) {
+                $code .= ($i == 0 ? 'if' : 'elsif');
+                my $info = $obj->{with}[$i];
+                my $dvar = $self->_dump_var($info->{block}{init_vars}->{vars}[0]);
+                $code .=
+                    "(defined(my $dvar = do{"
+                  . $self->deparse_args($info->{expr}) . '}))'
+                  . $self->deparse_bare_block($info->{block}{code});
+            }
+            if (exists $obj->{else}) {
+                $code .= 'else' . $self->deparse_bare_block($obj->{else}{block}{code});
+            }
+            $code .= '}';
         }
         elsif ($ref eq 'Sidef::Types::Block::Gather') {
             $self->load_mod("Sidef::Types::Array::Array");
@@ -1228,7 +1235,8 @@ HEADER
                 $ref, 'new',
                 "Range$refaddr",
                 map {
-                    'Sidef::Types::Number::Number->_set_str(' . "'" . $obj->{$_}->_get_frac . "'" . ')'
+                    'Sidef::Types::Number::Number->_set_str(' . "'"
+                      . $obj->{$_}->_get_frac . "'" . ')'
                   } ('from', 'to', 'step')
             );
         }

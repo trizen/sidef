@@ -115,6 +115,7 @@ package Sidef::Parser {
             prefix_obj_re => qr{\G
               (?:
                   if\b                                       (?{ bless({}, 'Sidef::Types::Block::If') })
+                | with\b                                     (?{ bless({}, 'Sidef::Types::Block::With') })
                 | while\b                                    (?{ bless({}, 'Sidef::Types::Block::While') })
                 | try\b                                      (?{ Sidef::Types::Block::Try->new })
                 | foreach\b                                  (?{ bless({}, 'Sidef::Types::Block::ForEach') })
@@ -220,7 +221,9 @@ package Sidef::Parser {
                   break
                   return
                   for foreach
-                  if while
+                  if elsif else
+                  with orwith
+                  while
                   given
                   with
                   try
@@ -1785,34 +1788,6 @@ package Sidef::Parser {
                 return bless({block => $block}, 'Sidef::Types::Block::Default');
             }
 
-            # "with(expr) {...}" construct
-            if (/\Gwith\b\h*/gc) {
-                my $expr = (
-                            /\G(?=\()/
-                            ? $self->parse_arg(code => $opt{code})
-                            : $self->parse_obj(code => $opt{code})
-                           );
-
-                $expr // $self->fatal_error(
-                                            error  => "invalid declaration of the `with` construct",
-                                            reason => "expected `with(expr) {...}`",
-                                            code   => $_,
-                                            pos    => pos($_),
-                                           );
-
-                my $block = (
-                             /\G\h*(?=\{)/gc
-                             ? $self->parse_block(code => $opt{code}, topic_var => 1)
-                             : $self->fatal_error(
-                                                  error => "expected a block after `with(expr)`",
-                                                  code  => $_,
-                                                  pos   => pos($_),
-                                                 )
-                            );
-
-                return bless({expr => $expr, block => $block}, 'Sidef::Types::Block::With');
-            }
-
             # "do {...}" construct
             if (/\Gdo\h*(?=\{)/gc) {
                 my $block = $self->parse_block(code => $opt{code});
@@ -2882,6 +2857,49 @@ package Sidef::Parser {
                                                pos    => pos($_) - 1,
                                                error  => "invalid declaration of the `if` statement",
                                                reason => "expected a block after `if(...)`",
+                                              );
+                        }
+                    }
+                    elsif (ref($obj) eq 'Sidef::Types::Block::With') {
+
+                        if (/\G\h*(?=\{)/gc) {
+                            my $block = $self->parse_block(code => $opt{code}, topic_var => 1);
+                            push @{$obj->{with}}, {expr => $arg, block => $block};
+
+                          ORWITH: {
+                                if (/\G(?=\s*orwith\h*\()/) {
+                                    $self->parse_whitespace(code => $opt{code});
+                                    while (/\G\h*orwith\h*(?=\()/gc) {
+                                        my $arg = $self->parse_arg(code => $opt{code});
+                                        $self->parse_whitespace(code => $opt{code});
+
+                                        my $block = $self->parse_block(code => $opt{code}, topic_var => 1)
+                                          // $self->fatal_error(
+                                                                code   => $_,
+                                                                pos    => pos($_) - 1,
+                                                                error  => "invalid declaration of the `with` statement",
+                                                                reason => "expected a block after `orwith(...)`",
+                                                               );
+
+                                        push @{$obj->{with}}, {expr => $arg, block => $block};
+                                        redo ORWITH;
+                                    }
+                                }
+                            }
+
+                            if (/\G(?=\s*else\h*\{)/) {
+                                $self->parse_whitespace(code => $opt{code});
+                                /\Gelse\h*/gc;
+                                my $block = $self->parse_block(code => $opt{code});
+                                $obj->{else}{block} = $block;
+                            }
+                        }
+                        else {
+                            $self->fatal_error(
+                                               code   => $_,
+                                               pos    => pos($_) - 1,
+                                               error  => "invalid declaration of the `with` statement",
+                                               reason => "expected a block after `with(...)`",
                                               );
                         }
                     }
