@@ -42,6 +42,17 @@ else {
     ok << "else"
 }
 
-assert_eq(ok, [42, "z", 1234, "else"])
+#
+## with/else
+#
+
+with (x) {
+
+}
+else {
+    ok << 'else2'
+}
+
+assert_eq(ok, [42, 'z', 1234, 'else', 'else2'])
 
 say "** Test passed!"
