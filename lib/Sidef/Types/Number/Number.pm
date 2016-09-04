@@ -99,11 +99,22 @@ package Sidef::Types::Number::Number {
 
             my $r = Math::GMPq::Rmpq_init();
             my $rat = $num ? ($base == 10 && $num =~ tr/Ee.//) ? _str2rat($num) : ($num =~ tr/+//dr) : 0;
+
+            # Validate the fraction
+            my $is_frac = index($rat, '/') != -1;
+
+            if ($is_frac and $rat !~ m{^\s*[-+]?[0-9]+(?>\s*/\s*[1-9]+[0-9]*)?\s*\z}) {
+                my ($num, $den) = split(/\//, $rat);
+                return __PACKAGE__->new($num)->div(__PACKAGE__->new($den));
+            }
+
             eval { Math::GMPq::Rmpq_set_str($r, $rat, $base) };
+
+            # Return NaN in case of an error
             $@ && return nan();
 
             #$@ && die "[ERROR] Value <<$num>> is not a valid base-$base number";
-            Math::GMPq::Rmpq_canonicalize($r) if index($rat, '/') != -1;
+            Math::GMPq::Rmpq_canonicalize($r) if $is_frac;
             bless \$r, __PACKAGE__;
           };
     }
