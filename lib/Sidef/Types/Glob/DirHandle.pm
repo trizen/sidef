@@ -49,11 +49,7 @@ package Sidef::Types::Glob::DirHandle {
         state $_z1 = require Encode;
         state $_z2 = require File::Spec;
 
-        my $basedir = (
-            $self->{basedir} // do {
-                $self->{basedir} = $self->{dir}->get_value;
-              }
-        );
+        my $basedir = ($self->{basedir} //= "$self->{dir}");
 
         {
             my $file = CORE::readdir($self->{dh}) // return;
