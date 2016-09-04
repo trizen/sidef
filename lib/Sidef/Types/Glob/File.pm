@@ -418,7 +418,7 @@ package Sidef::Types::Glob::File {
 
         my $success = CORE::open(my $fh, $mode, ref($self) eq __PACKAGE__ ? $$self : "$self");
         my $error   = $!;
-        my $fh_obj  = Sidef::Types::Glob::FileHandle->new(fh => $fh, self => $self);
+        my $fh_obj  = Sidef::Types::Glob::FileHandle->new($fh, $self);
 
         if (defined $fh_ref) {
             ${$fh_ref} = $fh_obj;
@@ -489,7 +489,7 @@ package Sidef::Types::Glob::File {
         my $success = sysopen(my $fh, "$self", "$mode", $perm // 0666);
 
         if ($success) {
-            $$var_ref = Sidef::Types::Glob::FileHandle->new(fh => $fh, self => $self);
+            $$var_ref = Sidef::Types::Glob::FileHandle->new($fh, $self);
         }
 
         $success

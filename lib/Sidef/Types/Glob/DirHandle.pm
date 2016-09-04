@@ -8,24 +8,24 @@ package Sidef::Types::Glob::DirHandle {
     use Sidef::Types::Bool::Bool;
 
     sub new {
-        my (undef, %opt) = @_;
+        my (undef, $dh, $dir) = @_;
 
         bless {
-               dir_h => $opt{dir_h},
-               dir   => $opt{dir},
+               dh  => $dh,
+               dir => $dir,
               },
           __PACKAGE__;
     }
 
+    *call = \&new;
+
     sub get_value {
-        $_[0]->{dir_h};
+        $_[0]{dh};
     }
 
     sub dir {
         $_[0]{dir};
     }
-
-    *parent = \&dir;
 
     sub get_files {
         my ($self) = @_;
@@ -56,7 +56,7 @@ package Sidef::Types::Glob::DirHandle {
         );
 
         {
-            my $file = CORE::readdir($self->{dir_h}) // return;
+            my $file = CORE::readdir($self->{dh}) // return;
 
             if ($file eq '.' or $file eq '..') {
                 redo;
@@ -83,45 +83,45 @@ package Sidef::Types::Glob::DirHandle {
 
     sub tell {
         my ($self) = @_;
-        Sidef::Types::Number::Number->new(telldir($self->{dir_h}));
+        Sidef::Types::Number::Number->new(telldir($self->{dh}));
     }
 
     sub seek {
         my ($self, $pos) = @_;
-        seekdir($self->{dir_h}, CORE::int($pos))
+        seekdir($self->{dh}, CORE::int($pos))
           ? (Sidef::Types::Bool::Bool::TRUE)
           : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub rewind {
         my ($self) = @_;
-        rewinddir($self->{dir_h})
+        rewinddir($self->{dh})
           ? (Sidef::Types::Bool::Bool::TRUE)
           : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub close {
         my ($self) = @_;
-        closedir($self->{dir_h})
+        closedir($self->{dh})
           ? (Sidef::Types::Bool::Bool::TRUE)
           : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub chdir {
         my ($self) = @_;
-        CORE::chdir($self->{dir_h})
+        CORE::chdir($self->{dh})
           ? (Sidef::Types::Bool::Bool::TRUE)
           : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub stat {
         my ($self) = @_;
-        Sidef::Types::Glob::Stat->stat($self->{dir_h}, $self);
+        Sidef::Types::Glob::Stat->stat($self->{dh}, $self);
     }
 
     sub lstat {
         my ($self) = @_;
-        Sidef::Types::Glob::Stat->lstat($self->{dir_h}, $self);
+        Sidef::Types::Glob::Stat->lstat($self->{dh}, $self);
     }
 
     sub iter {
@@ -130,7 +130,7 @@ package Sidef::Types::Glob::DirHandle {
         state $x = require Encode;
         Sidef::Types::Block::Block->new(
             code => sub {
-                Sidef::Types::String::String->new(Encode::decode_utf8(CORE::readdir($self->{dir_h}) // return));
+                Sidef::Types::String::String->new(Encode::decode_utf8(CORE::readdir($self->{dh}) // return));
             }
         );
     }
@@ -139,7 +139,7 @@ package Sidef::Types::Glob::DirHandle {
         my ($self, $code) = @_;
 
         state $x = require Encode;
-        while (defined(my $file = CORE::readdir($self->{dir_h}))) {
+        while (defined(my $file = CORE::readdir($self->{dh}))) {
             $code->run(Sidef::Types::String::String->new(Encode::decode_utf8($file)));
         }
 

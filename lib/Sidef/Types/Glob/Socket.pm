@@ -42,16 +42,16 @@ package Sidef::Types::Glob::Socket {
 
     sub open {
         my ($self, $domain, $type, $protocol) = @_;
-        CORE::socket(my $fh, $domain, $type, $protocol) || return;
-        Sidef::Types::Glob::SocketHandle->new(fh => $fh);
+        CORE::socket(my $sh, $domain, $type, $protocol) || return;
+        Sidef::Types::Glob::SocketHandle->new($sh);
     }
 
     sub socketpair {
         my ($self, $socket1, $socket2, $domain, $type, $protocol) = @_;
         CORE::socketpair(my $sh1, my $sh2, $domain, $type, $protocol)
           || return (Sidef::Types::Bool::Bool::FALSE);
-        ${$socket1} = Sidef::Types::Glob::SocketHandle->new(fh => $sh1);
-        ${$socket2} = Sidef::Types::Glob::SocketHandle->new(fh => $sh2);
+        ${$socket1} = Sidef::Types::Glob::SocketHandle->new($sh1);
+        ${$socket2} = Sidef::Types::Glob::SocketHandle->new($sh2);
         (Sidef::Types::Bool::Bool::TRUE);
     }
 

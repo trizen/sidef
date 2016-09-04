@@ -9,24 +9,24 @@ package Sidef::Types::Glob::FileHandle {
     use Sidef::Types::Bool::Bool;
 
     sub new {
-        my (undef, %opt) = @_;
+        my (undef, $fh, $file) = @_;
 
         bless {
-               fh   => $opt{fh},
-               self => $opt{self},
+               fh     => $fh,
+               parent => $file,
               },
           __PACKAGE__;
     }
 
+    *call = \&new;
+
     sub get_value {
-        $_[0]->{fh};
+        $_[0]{fh};
     }
 
     sub parent {
-        $_[0]{self};
+        $_[0]{parent};
     }
-
-    *self = \&parent;
 
     sub is_on_tty {
         (-t $_[0]{fh}) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
@@ -35,15 +35,15 @@ package Sidef::Types::Glob::FileHandle {
     *isatty = \&is_on_tty;
 
     sub stdout {
-        __PACKAGE__->new(fh => \*STDOUT);
+        __PACKAGE__->new(\*STDOUT);
     }
 
     sub stderr {
-        __PACKAGE__->new(fh => \*STDERR);
+        __PACKAGE__->new(\*STDERR);
     }
 
     sub stdin {
-        __PACKAGE__->new(fh => \*STDIN);
+        __PACKAGE__->new(\*STDIN);
     }
 
     sub autoflush {
@@ -89,6 +89,13 @@ package Sidef::Types::Glob::FileHandle {
                 Sidef::Types::String::String->new(CORE::readline($self->{fh}) // return);
             }
         );
+    }
+
+    sub fcntl {
+        my ($self, $func, $flags) = @_;
+        CORE::fcntl($self->{fh}, CORE::int($func), CORE::int($flags))
+          ? (Sidef::Types::Bool::Bool::TRUE)
+          : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub read {

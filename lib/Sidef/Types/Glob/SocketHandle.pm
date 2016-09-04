@@ -6,9 +6,16 @@ package Sidef::Types::Glob::SocketHandle {
       );
 
     sub new {
-        my (undef, %opt) = @_;
-        bless \%opt, __PACKAGE__;
+        my (undef, $sh, $socket) = @_;
+
+        bless {
+               fh     => $sh,
+               parent => $socket,
+              },
+          __PACKAGE__;
     }
+
+    *call = \&new;
 
     sub setsockopt {
         my ($self, $level, $optname, $optval) = @_;
@@ -48,9 +55,9 @@ package Sidef::Types::Glob::SocketHandle {
     }
 
     sub accept {
-        my ($self, @args) = @_;
-        CORE::accept(my $fh, $self->{fh}) || return;
-        Sidef::Types::Glob::SocketHandle->new(fh => $fh);
+        my ($self) = @_;
+        CORE::accept(my $sh, $self->{fh}) || return;
+        Sidef::Types::Glob::SocketHandle->new($sh);
     }
 
     sub connect {
@@ -62,13 +69,14 @@ package Sidef::Types::Glob::SocketHandle {
 
     sub recv {
         my ($self, $length, $flags) = @_;
-        CORE::recv($self->{fh}, (my $content), $length, "$flags") // return;
+        my $content = "";
+        CORE::recv($self->{fh}, $content, CORE::int($length), CORE::int($flags)) // return;
         Sidef::Types::String::String->new($content);
     }
 
     sub send {
         my ($self, $msg, $flags, $to) = @_;
-        CORE::send($self->{fh}, "$msg", "$flags", defined($to) ? $to->get_value : ())
+        CORE::send($self->{fh}, "$msg", CORE::int($flags), defined($to) ? $to->get_value : ())
           ? (Sidef::Types::Bool::Bool::TRUE)
           : (Sidef::Types::Bool::Bool::FALSE);
     }

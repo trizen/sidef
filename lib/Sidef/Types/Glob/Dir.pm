@@ -134,7 +134,7 @@ package Sidef::Types::Glob::Dir {
 
         my $success = opendir(my $dir_h, "$self");
         my $error   = $!;
-        my $dir_obj = Sidef::Types::Glob::DirHandle->new(dir_h => $dir_h, dir => $self);
+        my $dir_obj = Sidef::Types::Glob::DirHandle->new($dir_h, $self);
 
         if (defined $fh_ref) {
             ${$fh_ref} = $dir_obj;

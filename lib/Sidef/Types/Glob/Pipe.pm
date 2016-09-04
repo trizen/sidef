@@ -34,7 +34,7 @@ package Sidef::Types::Glob::Pipe {
         }
 
         my $pid = open(my $pipe_h, $mode, @{$self});
-        my $pipe_obj = Sidef::Types::Glob::FileHandle->new(fh => $pipe_h, self => $self);
+        my $pipe_obj = Sidef::Types::Glob::FileHandle->new($pipe_h, $self);
 
         if (defined($var_ref)) {
             ${$var_ref} = $pipe_obj;

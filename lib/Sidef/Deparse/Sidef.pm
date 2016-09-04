@@ -36,6 +36,7 @@ package Sidef::Deparse::Sidef {
                   Sidef::DataTypes::Glob::Backtick        Backtick
                   Sidef::DataTypes::Glob::DirHandle       DirHandle
                   Sidef::DataTypes::Glob::FileHandle      FileHandle
+                  Sidef::DataTypes::Glob::SocketHandle    SocketHandle
                   Sidef::DataTypes::Glob::Dir             Dir
                   Sidef::DataTypes::Glob::File            File
                   Sidef::DataTypes::Object::Object        Object

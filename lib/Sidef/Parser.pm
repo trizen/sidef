@@ -53,6 +53,7 @@ package Sidef::Parser {
                      | Bool\b                         (?{ state $x = bless({}, 'Sidef::DataTypes::Bool::Bool') })
                      | FileHandle\b                   (?{ state $x = bless({}, 'Sidef::DataTypes::Glob::FileHandle') })
                      | DirHandle\b                    (?{ state $x = bless({}, 'Sidef::DataTypes::Glob::DirHandle') })
+                     | SocketHandle\b                 (?{ state $x = bless({}, 'Sidef::DataTypes::Glob::SocketHandle') })
                      | Dir\b                          (?{ state $x = bless({}, 'Sidef::DataTypes::Glob::Dir') })
                      | File\b                         (?{ state $x = bless({}, 'Sidef::DataTypes::Glob::File') })
                      | Arr(?:ay)?+\b                  (?{ state $x = bless({}, 'Sidef::DataTypes::Array::Array') })
@@ -195,6 +196,7 @@ package Sidef::Parser {
                   Pipe
                   Ref
                   Socket
+                  SocketHandle
                   Bool
                   Sys
                   Sig

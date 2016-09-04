@@ -65,6 +65,7 @@ package Sidef::Deparse::Perl {
                   Sidef::DataTypes::Glob::Backtick        Sidef::Types::Glob::Backtick
                   Sidef::DataTypes::Glob::DirHandle       Sidef::Types::Glob::DirHandle
                   Sidef::DataTypes::Glob::FileHandle      Sidef::Types::Glob::FileHandle
+                  Sidef::DataTypes::Glob::SocketHandle    Sidef::Types::Glob::SocketHandle
                   Sidef::DataTypes::Glob::Dir             Sidef::Types::Glob::Dir
                   Sidef::DataTypes::Glob::File            Sidef::Types::Glob::File
                   Sidef::DataTypes::Object::Object        Sidef::Object::Object
@@ -1163,22 +1164,22 @@ HEADER
             $code = $self->make_constant($ref, 'new', "Math$refaddr");
         }
         elsif ($ref eq 'Sidef::Meta::Glob::STDIN') {
-            $code = $self->make_constant('Sidef::Types::Glob::FileHandle', 'new', "STDIN$refaddr", 'fh => \*STDIN');
+            $code = $self->make_constant('Sidef::Types::Glob::FileHandle', 'new', "STDIN$refaddr", '\*STDIN');
         }
         elsif ($ref eq 'Sidef::Meta::Glob::STDOUT') {
-            $code = $self->make_constant('Sidef::Types::Glob::FileHandle', 'new', "STDOUT$refaddr", 'fh => \*STDOUT');
+            $code = $self->make_constant('Sidef::Types::Glob::FileHandle', 'new', "STDOUT$refaddr", '\*STDOUT');
         }
         elsif ($ref eq 'Sidef::Meta::Glob::STDERR') {
-            $code = $self->make_constant('Sidef::Types::Glob::FileHandle', 'new', "STDERR$refaddr", 'fh => \*STDERR');
+            $code = $self->make_constant('Sidef::Types::Glob::FileHandle', 'new', "STDERR$refaddr", '\*STDERR');
         }
         elsif ($ref eq 'Sidef::Meta::Glob::ARGF') {
-            $code = $self->make_constant('Sidef::Types::Glob::FileHandle', 'new', "ARGF$refaddr", 'fh => \*ARGV');
+            $code = $self->make_constant('Sidef::Types::Glob::FileHandle', 'new', "ARGF$refaddr", '\*ARGV');
         }
         elsif ($ref eq 'Sidef::Meta::Glob::DATA') {
             require Encode;
             my $data = $self->_dump_string(Encode::encode_utf8(${$obj->{data}}));
-            $code = $self->make_constant('Sidef::Types::Glob::FileHandle',
-                                         'new', "DATA$refaddr", qq{fh => do{open my \$fh, '<:utf8', \\$data; \$fh}});
+            $code = $self->make_constant('Sidef::Types::Glob::FileHandle', 'new',
+                                         "DATA$refaddr",                   qq{do{open my \$fh, '<:utf8', \\$data; \$fh}});
         }
         elsif ($ref eq 'Sidef::Variable::Magic') {
             $code = $obj->{name};
