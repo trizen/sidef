@@ -103,7 +103,7 @@ package Sidef::Types::Number::Number {
             # Validate the fraction
             my $is_frac = index($rat, '/') != -1;
 
-            if ($is_frac and $rat !~ m{^\s*[-+]?[0-9]+(?>\s*/\s*[1-9]+[0-9]*)?\s*\z}) {
+            if ($is_frac and $rat !~ m{^\s*[-+]?[0-9]+(?>\s*/\s*[-+]?[1-9]+[0-9]*)?\s*\z}) {
                 my ($num, $den) = split(/\//, $rat);
                 return __PACKAGE__->new($num)->div(__PACKAGE__->new($den));
             }
