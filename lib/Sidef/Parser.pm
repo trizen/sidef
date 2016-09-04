@@ -1828,7 +1828,13 @@ package Sidef::Parser {
 
             # Integer or float number
             if (/\G([+-]?+(?=\.?[0-9])[0-9_]*+(?:\.[0-9_]++)?(?:[Ee](?:[+-]?+[0-9_]+))?)/gc) {
-                return Sidef::Types::Number::Number->new($1 =~ tr/_//dr);
+                my $num = $1 =~ tr/_//dr;
+
+                if (/\Gi\b/gc) {
+                    return Sidef::Types::Number::Complex->new(0, $num);
+                }
+
+                return Sidef::Types::Number::Number->new($num);
             }
 
             # Prefix `...`
