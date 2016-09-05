@@ -188,6 +188,7 @@ scripts/Graphical/barnsley_fern_ifs.sf
 scripts/Graphical/chaos_game.sf
 scripts/Graphical/circle_from_polygons.sf
 scripts/Graphical/color_bars.sf
+scripts/Graphical/color_wheel.sf
 scripts/Graphical/death_star.sf
 scripts/Graphical/draw_a_sphere.sf
 scripts/Graphical/fbrowse_tray.sf
