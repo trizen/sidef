@@ -158,6 +158,7 @@ scripts/Expensive/smart_word_wrap.sf
 scripts/Expensive/smart_word_wrap_lazy.sf
 scripts/Expensive/subset_sum_problem.sf
 scripts/Expensive/sudoku_solver.sf
+scripts/Expensive/sum_and_product_puzzle.sf
 scripts/Expensive/zebra_puzzle.sf
 scripts/Expensive/zhang_suen_thinning_algorithm.sf
 scripts/extend_your_language.sf
