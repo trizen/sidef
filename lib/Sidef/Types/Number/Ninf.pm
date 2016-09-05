@@ -178,8 +178,7 @@ package Sidef::Types::Number::Ninf {
     *acot  = \&zero;
     *acoth = \&zero;
 
-    sub chr  { state $x = Sidef::Types::String::String->new('') }
-    sub sign { state $x = Sidef::Types::String::String->new('-') }
+    sub chr { state $x = Sidef::Types::String::String->new('') }
 
     #
     ## erfc(-inf) = 2
@@ -259,6 +258,7 @@ package Sidef::Types::Number::Ninf {
 
     *coth = \&tanh;
     *erf  = \&tanh;
+    *sign = \&tanh;
 
     #
     ## -inf.times {} is a no-op

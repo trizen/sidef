@@ -218,9 +218,9 @@ package Sidef::Types::Number::Inf {
     *coth = \&tanh;
     *zeta = \&tanh;
     *erf  = \&tanh;
+    *sign = \&tanh;
 
-    sub chr  { state $x = Sidef::Types::String::String->new('') }
-    sub sign { state $x = Sidef::Types::String::String->new('+') }
+    sub chr { state $x = Sidef::Types::String::String->new('') }
 
     #
     ## asin(inf) = -inf*i
