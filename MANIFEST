@@ -492,6 +492,7 @@ scripts/RosettaCode/singleton.sf
 scripts/RosettaCode/singly-linked_list_element_definition.sf
 scripts/RosettaCode/singly-linked_list_element_insertion.sf
 scripts/RosettaCode/smith_numbers.sf
+scripts/RosettaCode/sort_a_list_of_object_identifiers.sf
 scripts/RosettaCode/sort_an_integer_array.sf
 scripts/RosettaCode/sort_disjoint_sublist.sf
 scripts/RosettaCode/sort_stability.sf
