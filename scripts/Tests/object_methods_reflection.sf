@@ -1,0 +1,30 @@
+#!/usr/bin/ruby
+
+class Example {
+    method foo { }
+    method bar(arg) { "bar(#{arg})" }
+}
+
+var obj = Example()
+var methods = obj.methods
+
+assert(methods.contain(:foo))
+assert(methods.contain(:bar))
+
+var meth = methods.item(:bar)                # `meth` stores a LazyMethod object
+assert_eq(meth.call(123), 'bar(123)')        # calls the Example.bar() method
+
+var meth = ((methods){:bar})
+
+# Call the `bar` method
+assert_eq(meth(42), "bar(42)")
+
+# Redefine the `bar` method
+Example.def_method(:bar,
+    func(self) { "redefined" }
+)
+
+# Call the redefined `bar` method
+assert_eq(meth(), 'redefined')
+
+say "** Test passed!"

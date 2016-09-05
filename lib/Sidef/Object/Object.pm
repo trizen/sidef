@@ -361,8 +361,10 @@ package Sidef::Object::Object {
                 $methods{$method} = (
                                      $alias{\&{$ref . '::' . $method}} //=
                                        Sidef::Object::LazyMethod->new(
-                                                                      obj    => $self,
-                                                                      method => \&{$ref . '::' . $method}
+                                                                      {
+                                                                       obj    => $self,
+                                                                       method => $method,
+                                                                      }
                                                                      )
                                     );
             }
