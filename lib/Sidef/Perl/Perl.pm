@@ -1,6 +1,6 @@
 package Sidef::Perl::Perl {
 
-    use 5.014;
+    use 5.016;
     use Sidef::Types::Number::Number;
     use Scalar::Util qw();
 
@@ -13,8 +13,7 @@ package Sidef::Perl::Perl {
 
         my %refs;
 
-        my $guess_type;
-        $guess_type = sub {
+        sub {
             my ($val) = @_;
 
             my $ref = CORE::ref($val);
@@ -25,11 +24,12 @@ package Sidef::Perl::Perl {
             if ($ref eq 'ARRAY') {
                 my $array = $refs{$val} //= Sidef::Types::Array::Array->new;
                 foreach my $item (@{$val}) {
-                    $array->push(
-                                 ref($item) eq 'ARRAY' && $item eq $val
-                                 ? $array
-                                 : $guess_type->($item)
-                                );
+                    push @$array,
+                      (
+                        ref($item) eq 'ARRAY' && $item eq $val
+                        ? $array
+                        : __SUB__->($item)
+                      );
                 }
                 return $array;
             }
@@ -38,11 +38,11 @@ package Sidef::Perl::Perl {
                 my $hash = $refs{$val} //= Sidef::Types::Hash::Hash->new;
                 foreach my $key (keys %{$val}) {
                     my $value = $val->{$key};
-                    $hash->append(
-                                    $key, ref($value) eq 'HASH' && $value eq $val
-                                  ? $hash
-                                  : $guess_type->($value)
-                                 );
+                    $hash->{$key} = (
+                                       $key, ref($value) eq 'HASH' && $value eq $val
+                                     ? $hash
+                                     : __SUB__->($value)
+                                    );
                 }
                 return $hash;
             }
@@ -92,14 +92,13 @@ package Sidef::Perl::Perl {
             }
 
             $val;
-        };
-
-        $guess_type->($data);
+          }
+          ->($data);
     }
 
     sub eval {
         my ($self, $perl_code) = @_;
-        $self->to_sidef(eval $perl_code->get_value);
+        $self->to_sidef(eval "$perl_code");
     }
 };
 
