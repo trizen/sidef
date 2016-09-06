@@ -52,14 +52,14 @@ package Sidef::Types::Range::Range {
 
     sub min {
         my ($self) = @_;
-        $self->{step}->is_pos
+        ($self->{_asc} //= !!$self->{step}->is_pos)
           ? $self->{from}
           : $self->{to};
     }
 
     sub max {
         my ($self) = @_;
-        $self->{step}->is_pos
+        ($self->{_asc} //= !!$self->{step}->is_pos)
           ? $self->{to}
           : $self->{from};
     }
@@ -121,7 +121,7 @@ package Sidef::Types::Range::Range {
         my ($self, $value) = @_;
 
         my $step = $self->{step};
-        my $asc  = !!($step->is_pos);
+        my $asc = ($self->{_asc} //= !!$step->is_pos);
 
         my ($from, $to) = (
                            $asc

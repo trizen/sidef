@@ -99,8 +99,8 @@ package Sidef::Types::Range::RangeString {
         my $from = $self->{from};
         my $to   = $self->{to};
 
-        my $asc = !!($step->is_pos);
-        my $i   = $from;
+        my $asc = ($self->{_asc} //= !!$step->is_pos);
+        my $i = $from;
 
         Sidef::Types::Block::Block->new(
             code => sub {
