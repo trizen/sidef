@@ -2,6 +2,7 @@ package Sidef::Perl::Perl {
 
     use 5.014;
     use Sidef::Types::Number::Number;
+    use Scalar::Util qw();
 
     sub new {
         bless {}, __PACKAGE__;
@@ -78,8 +79,6 @@ package Sidef::Perl::Perl {
             }
 
             if ($ref eq '') {
-                state $x = require Scalar::Util;
-
                 if (Scalar::Util::looks_like_number($val)) {
                     return Sidef::Types::Number::Number->new($val, 10);
                 }
@@ -88,7 +87,6 @@ package Sidef::Perl::Perl {
             }
 
             # Return an OO object when $val is blessed
-            state $x = require Scalar::Util;
             if (defined Scalar::Util::blessed($val)) {
                 return Sidef::Module::OO->__NEW__($val);
             }

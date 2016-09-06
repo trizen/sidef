@@ -1,0 +1,63 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Orbital_elements
+#
+
+func orbital_state_vectors(
+    semimajor_axis,
+    eccentricity,
+    inclination,
+    longitude_of_ascending_node,
+    argument_of_periapsis,
+    true_anomaly
+) {
+    static vec = frequire('Math::Vector::Real')
+    var (i, j, k) = (vec.V(1,0,0), vec.V(0,1,0), vec.V(0,0,1))
+
+    func muladd(v1, x1, v2, x2) {
+        v1.mul(x1).add(v2.mul(x2))
+    }
+
+    func rotate(Ref i, Ref j, α) {
+        (*i, *j) = (
+            muladd(*i, +cos(α), *j, sin(α)),
+            muladd(*i, -sin(α), *j, cos(α)),
+        )
+    }
+
+    rotate(\i, \j, longitude_of_ascending_node)
+    rotate(\j, \k, inclination)
+    rotate(\i, \j, argument_of_periapsis)
+
+    var l = (eccentricity == 1 ? 2*semimajor_axis
+                               : semimajor_axis*(1 - eccentricity**2))
+
+    var (c, s) = given(true_anomaly) { (.cos, .sin) }
+
+    var r = l/(1 + eccentricity*c)
+    var rprime = (s * r**2 / l)
+    var position = muladd(i, c, j, s).mul(r)
+
+    var speed = muladd(i, rprime*c - r*s, j, rprime*s + r*c)
+    speed.div!(abs(speed))
+    speed.mul!(sqrt(2/r - 1/semimajor_axis))
+
+    struct Result { position, speed }
+    Result([position,speed].map {|v| [v{:module}[]].map{Num(_)} }...)
+}
+
+var r = orbital_state_vectors(
+    semimajor_axis: 1,
+    eccentricity: 0.1,
+    inclination: 0,
+    longitude_of_ascending_node: 355/(113*6),
+    argument_of_periapsis: 0,
+    true_anomaly: 0,
+)
+
+say '['+r.position.join(', ')+']'
+say '['+r.speed.join(', ')+']'
+
+assert_eq(r.position, [0.77942284339868, 0.450000034653684, 0])
+assert_eq(r.speed, [-0.552770840960444, 0.957427083179761, 0])
