@@ -528,6 +528,16 @@ package Sidef::Types::String::String {
         Sidef::Types::Array::Array->new([map { bless(\$_, __PACKAGE__) } $str =~ /$regex->{regex}/g]);
     }
 
+    sub findall {
+        my ($self, $regex) = @_;
+        my $str = $$self;
+        my @matches;
+        while ($str =~ /$regex->{regex}/g) {
+            push @matches, Sidef::Types::Array::Array->new([_get_captures($str)]);
+        }
+        Sidef::Types::Array::Array->new(\@matches);
+    }
+
     sub split {
         my ($self, $sep, $size) = @_;
 

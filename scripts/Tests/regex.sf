@@ -44,3 +44,8 @@ assert([hash{:name}, hash{:address}] == ['John', 'Wall Street no. 4']);
 
 
 /^googl\w/.match(["hei", "google chrome"]) || die "Regex on array fail!";
+
+assert_eq(
+    "asd awer wer side".findall(/(\w+)\s+(\w+)/),
+    [["asd", "awer"], ["wer", "side"]]
+)
