@@ -746,6 +746,7 @@ scripts/Tests/regex_global_matching.sf
 scripts/Tests/regex_match_as_array.sf
 scripts/Tests/return.sf
 scripts/Tests/return_types.sf
+scripts/Tests/reverse_a_base10_integer.sf
 scripts/Tests/reverse_recursive_general_solution.sf
 scripts/Tests/reverse_words_in_a_string.sf
 scripts/Tests/roman_numerals_decoding.sf

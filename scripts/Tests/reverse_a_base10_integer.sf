@@ -1,0 +1,31 @@
+#!/usr/bin/ruby
+
+# Reverse a base 10 positive integer.
+
+func number_length(n) {
+    var len = 0
+    while (n > 0) {
+        n //= 10
+        ++len
+    }
+    return len
+}
+
+func reverse_number(n) {
+    var r = 0
+    var p = 10**(number_length(n)-1)
+    while (n > 0) {
+        r += p*(n%10)
+        n //= 10
+        p /= 10
+    }
+    return r
+}
+
+assert_eq(reverse_number(123456789), 987654321)
+assert_eq(reverse_number( 23456789), 98765432 )
+
+assert_eq(reverse_number(987654321987654321), 123456789123456789)
+assert_eq(reverse_number(98765432_98765432 ),  23456789_23456789)
+
+say "** Test passed!"
