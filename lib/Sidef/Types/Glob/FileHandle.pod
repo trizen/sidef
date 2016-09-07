@@ -39,6 +39,14 @@ Return the
 
 =cut
 
+=head2 call
+
+FileHandle.call() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 char
 
 FileHandle.char() -> I<Obj>
@@ -96,6 +104,14 @@ Return the
 =head2 eof
 
 FileHandle.eof() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 fcntl
+
+FileHandle.fcntl() -> I<Obj>
 
 Return the
 
@@ -187,6 +203,14 @@ Return the
 
 =cut
 
+=head2 parent
+
+FileHandle.parent() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 print
 
 FileHandle.print() -> I<Obj>
@@ -228,16 +252,6 @@ Aliases: I<println>
 FileHandle.seek() -> I<Obj>
 
 Return the
-
-=cut
-
-=head2 self
-
-FileHandle.self() -> I<Obj>
-
-Return the
-
-Aliases: I<parent>
 
 =cut
 

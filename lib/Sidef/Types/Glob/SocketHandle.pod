@@ -85,6 +85,8 @@ SocketHandle.new() -> I<Obj>
 
 Return the
 
+Aliases: I<call>
+
 =cut
 
 =head2 recv

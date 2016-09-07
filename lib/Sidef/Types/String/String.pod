@@ -470,6 +470,14 @@ Aliases: I<foldcase>
 
 =cut
 
+=head2 findall
+
+String.findall() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 first
 
 String.first() -> I<Obj>

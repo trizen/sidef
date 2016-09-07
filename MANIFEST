@@ -113,6 +113,7 @@ scripts/Applications/make_filenames_safe.sf
 'scripts/Applications/Pure OO/booleans.sf'
 'scripts/Applications/Pure OO/if_statement.sf'
 'scripts/Applications/Pure OO/numbers.sf'
+scripts/Applications/resistor_mesh.sf
 scripts/arithmetic_coding.sf
 scripts/bernoulli_numbers.sf
 scripts/bernoulli_numbers_recursive.sf
@@ -529,6 +530,7 @@ scripts/RosettaCode/standard_deviation_2.sf
 scripts/RosettaCode/stem_and_leaf_plot.sf
 scripts/RosettaCode/string_comparison.sf
 scripts/RosettaCode/sum_digits_of_an_integer.sf
+scripts/RosettaCode/sutherland_hodgman.sf
 scripts/RosettaCode/text_processing_1.sf
 scripts/RosettaCode/the_isaac_cipher.sf
 scripts/RosettaCode/thue_morse.sf
