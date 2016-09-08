@@ -1212,11 +1212,12 @@ HEADER
             $code = $self->make_constant($ref, 'new', "Sig$refaddr");
         }
         elsif ($ref eq 'Sidef::Types::Number::Complex') {
-
-            # TODO: optimize this
-            $code = $self->make_constant($ref, 'new', "Complex$refaddr",
-                                         "'" . $obj->re->get_value . "'",
-                                         "'" . $obj->im->get_value . "'");
+            my ($real, $imag) = $obj->parts;
+            my $name = "Complex$refaddr";
+            $self->top_add(  "use constant $name => $ref\->new("
+                           . join(',', $self->deparse_expr({self => $real}), $self->deparse_expr({self => $imag}))
+                           . ');');
+            $code = "($self->{environment_name}\::$name)";
         }
         elsif ($ref eq 'Sidef::Types::Array::Pair') {
             $code =

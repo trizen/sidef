@@ -656,7 +656,6 @@ scripts/Tests/i_love_you.sf
 scripts/Tests/iban.sf
 scripts/Tests/implicit_method_call_on_var_.sf
 scripts/Tests/implicit_numberic_conversions.sf
-scripts/Tests/infinite_ranges.sf
 scripts/Tests/inverted_syntax.sf
 scripts/Tests/is_prime.sf
 scripts/Tests/lazy_iterators.sf
@@ -739,6 +738,7 @@ scripts/Tests/pythagorean_means.sf
 scripts/Tests/quicksort.sf
 scripts/Tests/quoted_strings.sf
 scripts/Tests/range_objects.sf
+scripts/Tests/ranges.sf
 scripts/Tests/read_a_configuration_file.sf
 scripts/Tests/rec_reverse.sf
 scripts/Tests/recursion.sf

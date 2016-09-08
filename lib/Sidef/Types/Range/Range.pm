@@ -130,18 +130,20 @@ package Sidef::Types::Range::Range {
                           );
 
         (
-         $value->ge($from) and $value->le($to)
+               $value->ge($from)
+           and $value->le($to)
            and (
-                $step->abs->is_one && $value->is_int ? 1
-                : $value->sub(
-                                $asc ? $from
-                              : $to
-                )->div($step)->int->mul($step)->eq(
-                                                   $value->sub(
-                                                                 $asc ? $from
-                                                               : $to
-                                                              )
-                                                  )
+             do { $self->{_is_one} //= ($asc ? $step->is_one : $step->abs->is_one) }
+             && $value->is_int ? 1
+             : $value->sub(
+                             $asc ? $from
+                           : $to
+             )->div($step)->int->mul($step)->eq(
+                                                $value->sub(
+                                                              $asc ? $from
+                                                            : $to
+                                                           )
+                                               )
                )
           ) ? (Sidef::Types::Bool::Bool::TRUE)
           : (Sidef::Types::Bool::Bool::FALSE);

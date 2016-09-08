@@ -48,4 +48,20 @@ assert(r.contains(-531341))
 assert(!r.contains(-100))
 assert(r.contains(100))
 
+r = (1..100 -> by(0.5))
+
+assert(r.contains(45))
+assert(!r.contains(101))
+assert(r.contains(100))
+assert(!r.contains(0))
+assert(r.contains(1))
+assert(r.contains(1.5))
+assert(!r.contains(1.05))
+assert(r.contains(45.5))
+assert(!r.contains(45.6))
+assert(!r.contains(45.51))
+assert(r.contains(2))
+assert(r.contains(99.5))
+assert(!r.contains(99.9999))
+
 say "** Test passed!";

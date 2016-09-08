@@ -59,6 +59,14 @@ package Sidef::Types::Number::Number {
         }
     }
 
+    sub _get_frac {
+        Math::GMPq::Rmpq_get_str(${$_[0]}, 10);
+    }
+
+    sub _get_double {
+        Math::GMPq::Rmpq_get_d(${$_[0]});
+    }
+
     sub _new_uint {
         exists($cache[$_[1]])
           && return $cache[$_[1]];
@@ -358,14 +366,6 @@ package Sidef::Types::Number::Number {
     }
 
     *in_base = \&base;
-
-    sub _get_frac {
-        Math::GMPq::Rmpq_get_str(${$_[0]}, 10);
-    }
-
-    sub _get_double {
-        Math::GMPq::Rmpq_get_d(${$_[0]});
-    }
 
     #
     ## Constants
