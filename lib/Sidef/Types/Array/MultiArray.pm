@@ -124,6 +124,11 @@ package Sidef::Types::Array::MultiArray {
         local *Sidef::Types::Array::MultiArray::dump = $sub;
         $sub->($_[0]);
     }
+
+    {
+        no strict 'refs';
+        *{__PACKAGE__ . '::' . '<<' } = \&append;
+    }
 };
 
 1
