@@ -36,6 +36,10 @@ package Sidef::Object::Object {
       q{cmp} => sub {
         my ($obj1, $obj2, $swaped) = @_;
 
+        if (ref($obj1) eq ref($obj2) and Scalar::Util::refaddr($obj1) == Scalar::Util::refaddr($obj2)) {
+            return Sidef::Types::Number::Number::ZERO;
+        }
+
         if ($swaped) {
             ($obj1, $obj2) = ($obj2, $obj1);
         }
@@ -57,12 +61,13 @@ package Sidef::Object::Object {
       q{eq} => sub {
         my ($obj1, $obj2) = @_;
 
+        if (ref($obj1) eq ref($obj2) and Scalar::Util::refaddr($obj1) == Scalar::Util::refaddr($obj2)) {
+            return Sidef::Types::Bool::Bool::TRUE;
+        }
+
         (   UNIVERSAL::isa($obj1, CORE::ref($obj2) || return (Sidef::Types::Bool::Bool::FALSE))
          || UNIVERSAL::isa($obj2, CORE::ref($obj1) || return (Sidef::Types::Bool::Bool::FALSE)))
           || return (Sidef::Types::Bool::Bool::FALSE);
-
-        return Sidef::Types::Bool::Bool::TRUE
-          if (Scalar::Util::refaddr($obj1) == Scalar::Util::refaddr($obj2));
 
         if (defined(my $sub = UNIVERSAL::can($obj1, '=='))) {
             return $sub->($obj1, $obj2);
@@ -71,8 +76,8 @@ package Sidef::Object::Object {
         ($obj1 cmp $obj2)->is_zero;
       };
 
-    # Support for cyclic references
-    # (quite slow -- we don't use it for now)
+    # Alternative way for comparing cyclic references
+    # (quite slow -- we don't use it)
 #<<<
     #~ sub __eq__ {
         #~ my %addr;

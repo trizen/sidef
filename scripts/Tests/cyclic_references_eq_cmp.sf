@@ -1,0 +1,55 @@
+#!/usr/bin/ruby
+
+# Equality and comparison tests for arrays that contain cyclic references.
+
+var x = [1,2,3]
+var y = [1,2,3]
+
+x[3] = x
+y[3] = x
+
+assert_eq(x == y, true)
+assert_eq(y == x, true)
+
+assert_eq(x <=> y, 0)
+assert_eq(y <=> x, 0)
+
+y[0] = 42
+
+assert_eq(x == y, false)
+assert_eq(y == x, false)
+assert_eq(x <=> y, -1)
+assert_eq(y <=> x, 1)
+
+y[0] = 0
+
+assert_eq(x == y, false)
+assert_eq(y == x, false)
+assert_eq(x <=> y, 1)
+assert_eq(y <=> x, -1)
+
+x[0] = 0
+
+assert_eq(x == y, true)
+assert_eq(x <=> y, 0)
+assert_eq(y <=> x, 0)
+
+x[1] = y
+y[1] = y
+
+assert_eq(x == y, true)
+assert_eq(x <=> y, 0)
+assert_eq(y <=> x, 0)
+
+x[2] = x
+
+assert_eq(x == y, false)
+assert_ne(x <=> y, 0)
+
+y[2] = x
+
+assert_eq(x == y, true)
+assert_eq(x <=> y, 0)
+assert_eq(y <=> x, 0)
+
+say "** Test passed!"
