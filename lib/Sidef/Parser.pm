@@ -2264,11 +2264,14 @@ package Sidef::Parser {
                           "[INFO] `$name` is parsed as a prefix method-call at $self->{file_name} line $self->{line}\n";
                     }
 
+                    if ($self->{allow_class_variable}) {
+                        return $name;
+                    }
+
                     my $pos = pos($_);
-                    /\G\h*/gc;    # remove any horizontal whitespace
                     my $arg = (
-                                 /\G(?=\()/ ? $self->parse_arg(code => $opt{code})
-                               : /\G(?=\{)/ ? $self->parse_block(code => $opt{code}, topic_var => 1)
+                               /\G(?=\()/
+                               ? $self->parse_arg(code => $opt{code})
                                : $self->fatal_error(
                                                     code  => $_,
                                                     pos   => ($pos - length($name)),
@@ -2277,53 +2280,40 @@ package Sidef::Parser {
                                                    )
                               );
 
-                    if (ref($arg) and ref($arg) ne 'HASH') {
-                        return
-                          scalar {
-                                  $self->{class} => [
-                                                     {
-                                                      self => $arg,
-                                                      call => [{method => $name}]
-                                                     }
-                                                    ]
-                                 };
+                    if (not exists($arg->{$self->{class}})) {
+                        $self->fatal_error(
+                                           code  => $_,
+                                           pos   => ($pos - length($name)),
+                                           var   => $name,
+                                           error => "attempt to call method <$name> on an undefined value",
+                                          );
                     }
-                    elsif (ref($arg) eq 'HASH') {
-                        if (not exists($arg->{$self->{class}})) {
-                            $self->fatal_error(
-                                               code  => $_,
-                                               pos   => ($pos - length($name)),
-                                               var   => $name,
-                                               error => "attempt to call method <$name> on an undefined value",
-                                              );
-                        }
 
-                        return scalar {
-                            $self->{class} => [
-                                {
-                                 self => {
-                                          $self->{class} => [{%{shift(@{$arg->{$self->{class}}})}}]
-                                         },
-                                 call => [
-                                     {
-                                      method => $name,
-                                      (
-                                       @{$arg->{$self->{class}}}
-                                       ? (
-                                          arg => [
-                                              map {
-                                                  { $self->{class} => [{%{$_}}] }
-                                                } @{$arg->{$self->{class}}}
-                                          ]
-                                         )
-                                       : ()
-                                      ),
-                                     }
-                                 ],
-                                }
-                            ]
-                        };
-                    }
+                    return scalar {
+                        $self->{class} => [
+                            {
+                             self => {
+                                      $self->{class} => [{%{shift(@{$arg->{$self->{class}}})}}]
+                                     },
+                             call => [
+                                 {
+                                  method => $name,
+                                  (
+                                   @{$arg->{$self->{class}}}
+                                   ? (
+                                      arg => [
+                                          map {
+                                              { $self->{class} => [{%{$_}}] }
+                                            } @{$arg->{$self->{class}}}
+                                      ]
+                                     )
+                                   : ()
+                                  ),
+                                 }
+                             ],
+                            }
+                        ]
+                    };
                 }
 
                 # Undeclared variable

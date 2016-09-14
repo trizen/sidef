@@ -2,11 +2,6 @@
 
 # Tests for prefix methods
 
-assert_eq(run { "hi" }, "hi");
-assert_eq(::run { "hi" }, "hi");
-assert_eq(run { var run = 42; run }, 42);
-assert_eq(run { "hi" }, "hi");
-
 var i = int(12.5);
 
 assert_eq(i, 12);

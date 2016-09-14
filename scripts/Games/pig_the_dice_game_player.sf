@@ -1,6 +1,6 @@
 #!/usr/bin/ruby
 
-var (games=100) = @ARGV.map{.to_i};
+var (games=100) = ARGV.map{.to_i}...;
 
 define DIE = 1..6;
 define GOAL = 100;
