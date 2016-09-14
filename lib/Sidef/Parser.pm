@@ -568,8 +568,8 @@ package Sidef::Parser {
 
     ## get_method_name() returns the following values:
     # 1st: method/operator (or undef)
-    # 2nd: does operator require and argument (0 or 1)
-    # 3rd: type of operator (e.g.: »+« is "uop", [+] is "rop")
+    # 2nd: a true value if the operator requires an argument
+    # 3rd: type of operator (e.g.: »+« is "uop", «+» is "rop")
     sub get_method_name {
         my ($self, %opt) = @_;
 
@@ -1823,7 +1823,7 @@ package Sidef::Parser {
                 return bless({expr => $obj, gather => $self->{current_gather}}, 'Sidef::Types::Block::Take');
             }
 
-            # Binary, hexdecimal and octal numbers
+            # Binary, hexadecimal and octal numbers
             if (/\G0(b[10_]*|x[0-9A-Fa-f_]*|[0-9_]+\b)/gc) {
                 return Sidef::Types::Number::Number->new("0" . ($1 =~ tr/_//dr), 0);
             }
@@ -1832,6 +1832,7 @@ package Sidef::Parser {
             if (/\G([+-]?+(?=\.?[0-9])[0-9_]*+(?:\.[0-9_]++)?(?:[Ee](?:[+-]?+[0-9_]+))?)/gc) {
                 my $num = $1 =~ tr/_//dr;
 
+                # Imaginary
                 if (/\Gi\b/gc) {
                     return Sidef::Types::Number::Complex->new(0, $num);
                 }
@@ -1903,64 +1904,45 @@ package Sidef::Parser {
 
                 my $pos = pos($_);
                 my $arg = (
-                             /\G(?=\()/ ? $self->parse_arg(code => $opt{code})
-                           : /\G(?=\{)/ ? $self->parse_block(code => $opt{code}, topic_var => 1)
-                           : $self->fatal_error(
-                                                code  => $_,
-                                                pos   => ($pos - length($name)),
-                                                var   => $name,
-                                                error => "attempt to call method <$name> on an undefined value",
-                                               )
+                           /\G(?=\()/
+                           ? $self->parse_arg(code => $opt{code})
+                           : $self->parse_obj(code => $opt{code})
                           );
 
-                if (ref($arg) and ref($arg) ne 'HASH') {
-                    return
-                      scalar {
-                              $self->{class} => [
-                                                 {
-                                                  self => $arg,
-                                                  call => [{method => $name}]
-                                                 }
-                                                ]
-                             };
-                }
-                elsif (ref($arg) eq 'HASH') {
-                    if (not exists($arg->{$self->{class}})) {
-                        $self->fatal_error(
-                                           code  => $_,
-                                           pos   => ($pos - length($name)),
-                                           var   => $name,
-                                           error => "attempt to call method <$name> on an undefined value",
-                                          );
-                    }
-
-                    return scalar {
-                        $self->{class} => [
-                            {
-                             self => {
-                                      $self->{class} => [{%{shift(@{$arg->{$self->{class}}})}}]
-                                     },
-                             call => [
-                                 {
-                                  method => $name,
-                                  (
-                                   @{$arg->{$self->{class}}}
-                                   ? (
-                                      arg => [
-                                          map {
-                                              { $self->{class} => [{%{$_}}] }
-                                            } @{$arg->{$self->{class}}}
-                                      ]
-                                     )
-                                   : ()
-                                  ),
-                                 }
-                             ],
-                            }
-                        ]
-                    };
+                if (not exists($arg->{$self->{class}})) {
+                    $self->fatal_error(
+                                       code  => $_,
+                                       pos   => ($pos - length($name)),
+                                       var   => $name,
+                                       error => "attempt to call method <$name> on an undefined value",
+                                      );
                 }
 
+                return scalar {
+                    $self->{class} => [
+                        {
+                         self => {
+                                  $self->{class} => [{%{shift(@{$arg->{$self->{class}}})}}]
+                                 },
+                         call => [
+                             {
+                              method => $name,
+                              (
+                               @{$arg->{$self->{class}}}
+                               ? (
+                                  arg => [
+                                      map {
+                                          { $self->{class} => [{%{$_}}] }
+                                        } @{$arg->{$self->{class}}}
+                                  ]
+                                 )
+                               : ()
+                              ),
+                             }
+                         ],
+                        }
+                    ]
+                };
             }
 
             if (/($self->{prefix_obj_re})\h*/goc) {
@@ -2270,7 +2252,7 @@ package Sidef::Parser {
 
                     my $pos = pos($_);
                     my $arg = (
-                               /\G(?=\()/
+                               /\G\h*+(?=\()/gc
                                ? $self->parse_arg(code => $opt{code})
                                : $self->fatal_error(
                                                     code  => $_,
