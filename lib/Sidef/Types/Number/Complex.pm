@@ -460,6 +460,43 @@ package Sidef::Types::Number::Complex {
         bless(\$r, __PACKAGE__);
     }
 
+    sub lgrt {
+        my $c = ${$_[0]};
+
+        my $p = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_ui_pow_ui($p, 10, int($PREC / 4), $Sidef::Types::Number::Number::ROUND);
+        Math::MPFR::Rmpfr_ui_div($p, 1, $p, $Sidef::Types::Number::Number::ROUND);
+
+        my $d = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_log($d, $c, $ROUND);
+
+        my $x = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_set_ui($x, 1, $ROUND);
+
+        my $y = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_set_ui($y, 0, $ROUND);
+
+        my $diff = Math::MPC::Rmpc_init2($PREC);
+        my $tmp  = Math::MPC::Rmpc_init2($PREC);
+        my $abs  = Math::MPFR::Rmpfr_init2($PREC);
+
+        while (1) {
+            Math::MPC::Rmpc_sub($diff, $x, $y, $ROUND);
+            Math::MPC::Rmpc_abs($abs, $diff, $ROUND);
+            Math::MPFR::Rmpfr_cmp($abs, $p) <= 0 and last;
+
+            Math::MPC::Rmpc_set($y, $x, $ROUND);
+
+            Math::MPC::Rmpc_log($tmp, $x, $ROUND);
+            Math::MPC::Rmpc_add_ui($tmp, $tmp, 1, $ROUND);
+
+            Math::MPC::Rmpc_add($x, $x, $d, $ROUND);
+            Math::MPC::Rmpc_div($x, $x, $tmp, $ROUND);
+        }
+
+        bless \$x, __PACKAGE__;
+    }
+
     sub exp {
         my ($x) = @_;
         my $r = Math::MPC::Rmpc_init2($PREC);

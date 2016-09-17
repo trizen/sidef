@@ -486,6 +486,14 @@ Return the
 
 =cut
 
+=head2 lgrt
+
+Complex.lgrt() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 ln
 
 Complex.ln() -> I<Obj>

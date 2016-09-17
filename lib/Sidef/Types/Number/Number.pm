@@ -822,6 +822,48 @@ package Sidef::Types::Number::Number {
         _mpfr2big($x);
     }
 
+    sub lgrt {
+        my ($x) = @_;
+
+        my $sgn = Math::GMPq::Rmpq_sgn($$x);
+
+        $sgn == 0 and return ninf();
+        Math::GMPq::Rmpq_cmp_ui($$x, 7, 10) < 0 and return Sidef::Types::Number::Complex->new($x)->lgrt;
+
+        my $c = _big2mpfr($x);
+
+        my $p = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_ui_pow_ui($p, 10, int($PREC / 4), $ROUND);
+        Math::MPFR::Rmpfr_ui_div($p, 1, $p, $ROUND);
+
+        my $d = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_log($d, $c, $ROUND);
+
+        my $x = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_set_ui($x, 1, $ROUND);
+
+        my $y = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_set_ui($y, 0, $ROUND);
+
+        my $diff = Math::MPFR::Rmpfr_init2($PREC);
+        my $tmp  = Math::MPFR::Rmpfr_init2($PREC);
+
+        while (1) {
+            Math::MPFR::Rmpfr_sub($diff, $x, $y, $ROUND);
+            Math::MPFR::Rmpfr_cmpabs($diff, $p) <= 0 and last;
+
+            Math::MPFR::Rmpfr_set($y, $x, $ROUND);
+
+            Math::MPFR::Rmpfr_log($tmp, $x, $ROUND);
+            Math::MPFR::Rmpfr_add_ui($tmp, $tmp, 1, $ROUND);
+
+            Math::MPFR::Rmpfr_add($x, $x, $d, $ROUND);
+            Math::MPFR::Rmpfr_div($x, $x, $tmp, $ROUND);
+        }
+
+        _mpfr2big($x);
+    }
+
     sub exp {
         my $r = _big2mpfr($_[0]);
         Math::MPFR::Rmpfr_exp($r, $r, $ROUND);

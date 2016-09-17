@@ -1066,6 +1066,14 @@ Return the
 
 =cut
 
+=head2 lgrt
+
+Number.lgrt() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 li2
 
 Number.li2() -> I<Obj>

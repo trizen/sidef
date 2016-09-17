@@ -146,6 +146,7 @@ package Sidef::Types::Number::Inf {
     *cbrt             = \&inf;
     *sqr              = \&inf;
     *log              = \&inf;
+    *lgrt             = \&inf;
     *log2             = \&inf;
     *log10            = \&inf;
     *exp              = \&inf;

@@ -67,6 +67,7 @@ package Sidef::Types::Number::Nan {
     *log         = \&nan;
     *log2        = \&nan;
     *log10       = \&nan;
+    *lgrt        = \&nan;
     *mod         = \&nan;
     *fmod        = \&nan;
     *ln          = \&nan;
