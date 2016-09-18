@@ -1325,19 +1325,38 @@ package Sidef::Types::String::String {
         Sidef::Types::Array::Pair->new($_[0], $_[1]);
     }
 
-    sub basic_dump {
+    sub sdump {
         my ($self) = @_;
         __PACKAGE__->new(q{'} . $$self =~ s{([\\'])}{\\$1}gr . q{'});
     }
 
-    sub dump {
-        my ($self) = @_;
+    {
+        my %esc = (
+                   "\a"    => "\\a",
+                   "\b"    => "\\b",
+                   "\t"    => "\\t",
+                   "\n"    => "\\n",
+                   "\f"    => "\\f",
+                   "\r"    => "\\r",
+                   "\e"    => "\\e",
+                   chr(11) => "\\v",
+                  );
 
-        state $x = eval { require Data::Dump };
-        $x || return $self->basic_dump;
+        # Function by Gisle Aas, copied from `Data::Dump` (thanks).
+        sub dump {
+            my $str = "${$_[0]}";
 
-        local $Data::Dump::TRY_BASE64 = 0;
-        __PACKAGE__->new(Data::Dump::quote($$self) =~ s<(#\{)>{\\$1}gr);
+            $str =~ s/([\\\"]|#\{)/\\$1/g;
+            $str =~ /[^\040-\176]/ or return __PACKAGE__->new(qq("$str"));
+
+            $str =~ s/([\a\b\t\n\f\r\e\13])/$esc{$1}/g;
+            $str =~ s/([\0-\037])(?!\d)/sprintf('\\%o',ord($1))/eg;
+
+            $str =~ s/([\0-\037\177-\377])/sprintf('\\x%02X',ord($1))/eg;
+            $str =~ s/([^\040-\176])/sprintf('\\x{%X}',ord($1))/eg;
+
+            __PACKAGE__->new(qq("$str"));
+        }
     }
 
     *inspect = \&dump;
