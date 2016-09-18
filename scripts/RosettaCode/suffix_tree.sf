@@ -1,0 +1,47 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Suffix_tree
+#
+
+func suffix_tree(Str t) {
+    suffix_tree(^t.len -> map { t.substr(_) })
+}
+
+func suffix_tree({.is_empty})   { Hash() }
+func suffix_tree(a {.len == 1}) { Hash(a[0] => Hash()) }
+
+func suffix_tree(Arr a) {
+    var h = Hash()
+    for k,v in (a.group_by { .char(0) }) {
+        var subtree = suffix_tree(v.map { .substr(1) })
+        var subkeys = subtree.keys
+        if (subkeys.len == 1) {
+            var subk = subkeys[0]
+            h{k + subk} = subtree{subk}
+        }
+        else {
+            h{k} = subtree
+        }
+    }
+    return h
+}
+
+var tree = suffix_tree('banana$')
+say tree
+
+assert_eq(tree, Hash(
+    "$" => Hash(),
+    "a" => Hash(
+        "$" => Hash(),
+        "na" => Hash(
+            "$" => Hash(),
+            "na$" => Hash()
+        )
+    ),
+    "banana$" => Hash(),
+    "na" => Hash(
+        "$" => Hash(),
+        "na$" => Hash()
+    )
+))
