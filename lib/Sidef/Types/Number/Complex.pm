@@ -476,13 +476,12 @@ package Sidef::Types::Number::Complex {
         my $y = Math::MPC::Rmpc_init2($PREC);
         Math::MPC::Rmpc_set_ui($y, 0, $ROUND);
 
-        my $diff = Math::MPC::Rmpc_init2($PREC);
-        my $tmp  = Math::MPC::Rmpc_init2($PREC);
-        my $abs  = Math::MPFR::Rmpfr_init2($PREC);
+        my $tmp = Math::MPC::Rmpc_init2($PREC);
+        my $abs = Math::MPFR::Rmpfr_init2($PREC);
 
         while (1) {
-            Math::MPC::Rmpc_sub($diff, $x, $y, $ROUND);
-            Math::MPC::Rmpc_abs($abs, $diff, $ROUND);
+            Math::MPC::Rmpc_sub($tmp, $x, $y, $ROUND);
+            Math::MPC::Rmpc_abs($abs, $tmp, $ROUND);
             Math::MPFR::Rmpfr_cmp($abs, $p) <= 0 and last;
 
             Math::MPC::Rmpc_set($y, $x, $ROUND);

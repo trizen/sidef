@@ -845,12 +845,11 @@ package Sidef::Types::Number::Number {
         my $y = Math::MPFR::Rmpfr_init2($PREC);
         Math::MPFR::Rmpfr_set_ui($y, 0, $ROUND);
 
-        my $diff = Math::MPFR::Rmpfr_init2($PREC);
-        my $tmp  = Math::MPFR::Rmpfr_init2($PREC);
+        my $tmp = Math::MPFR::Rmpfr_init2($PREC);
 
         while (1) {
-            Math::MPFR::Rmpfr_sub($diff, $x, $y, $ROUND);
-            Math::MPFR::Rmpfr_cmpabs($diff, $p) <= 0 and last;
+            Math::MPFR::Rmpfr_sub($tmp, $x, $y, $ROUND);
+            Math::MPFR::Rmpfr_cmpabs($tmp, $p) <= 0 and last;
 
             Math::MPFR::Rmpfr_set($y, $x, $ROUND);
 
