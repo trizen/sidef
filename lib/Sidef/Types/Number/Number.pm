@@ -830,14 +830,12 @@ package Sidef::Types::Number::Number {
         $sgn == 0 and return ninf();
         Math::GMPq::Rmpq_cmp_ui($$x, 7, 10) < 0 and return Sidef::Types::Number::Complex->new($x)->lgrt;
 
-        my $c = _big2mpfr($x);
+        my $d = _big2mpfr($x);
+        Math::MPFR::Rmpfr_log($d, $d, $ROUND);
 
         my $p = Math::MPFR::Rmpfr_init2($PREC);
         Math::MPFR::Rmpfr_ui_pow_ui($p, 10, int($PREC / 4), $ROUND);
         Math::MPFR::Rmpfr_ui_div($p, 1, $p, $ROUND);
-
-        my $d = Math::MPFR::Rmpfr_init2($PREC);
-        Math::MPFR::Rmpfr_log($d, $c, $ROUND);
 
         my $x = Math::MPFR::Rmpfr_init2($PREC);
         Math::MPFR::Rmpfr_set_ui($x, 1, $ROUND);
