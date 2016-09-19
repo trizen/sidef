@@ -645,6 +645,7 @@ scripts/Tests/greatest_subsequential_sum.sf
 scripts/Tests/group_precedence.sf
 scripts/Tests/hailstone.sf
 scripts/Tests/happy_2_years_old.sf
+scripts/Tests/hash_as_tree.sf
 scripts/Tests/hash_autovivification.sf
 scripts/Tests/hash_from_array.sf
 scripts/Tests/hash_grep.sf

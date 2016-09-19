@@ -403,6 +403,41 @@ package Sidef::Types::Hash::Hash {
 
     *to_array = \&to_a;
 
+    sub as_tree {
+        my ($self, $root) = @_;
+
+        my %addr;
+
+        my $sub = sub {
+            my ($obj, $root) = @_;
+
+            my $refaddr = Scalar::Util::refaddr($obj);
+
+            exists($addr{$refaddr})
+              && return $addr{$refaddr};
+
+            my @body;
+            $addr{$refaddr} = Sidef::Types::Array::Pair->new($root, \@body);
+
+            foreach my $k (sort { (length($a) <=> length($b)) || ($a cmp $b) } CORE::keys %$obj) {
+                my $v = $obj->{$k};
+                if (ref($v) eq __PACKAGE__) {
+                    push @body, $v->as_tree(Sidef::Types::String::String->new($k));
+                }
+                else {
+                    push @body,
+                      Sidef::Types::Array::Pair->new(Sidef::Types::String::String->new($k), Sidef::Types::Array::Array->new);
+                }
+            }
+
+            bless \@body, 'Sidef::Types::Array::Array';
+            $addr{$refaddr};
+        };
+
+        local *Sidef::Types::Hash::Hash::as_tree = $sub;
+        $sub->($_[0], $root);
+    }
+
     sub pairs {
         my ($self, @keys) = @_;
         Sidef::Types::Array::Array->new([map { Sidef::Types::Array::Pair->new($_, $self->{$_}) } @keys]);

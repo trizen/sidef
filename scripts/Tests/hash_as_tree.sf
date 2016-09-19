@@ -1,0 +1,95 @@
+#!/usr/bin/ruby
+
+#
+## Create a suffix tree as an Hash, then
+## convert it into a tree, using Hash.as_tree()
+#
+
+func suffix_tree(Str t) {
+    suffix_tree(^t.len -> map { t.substr(_) })
+}
+
+func suffix_tree(Arr a {.len == 1}) {
+    Hash(a[0] => nil)
+}
+
+func suffix_tree(Arr a) {
+    var h = Hash()
+    for k,v in (a.group_by { .char(0) }) {
+        var subtree = suffix_tree(v.map { .substr(1) })
+        var subkeys = subtree.keys
+        if (subkeys.len == 1) {
+            var subk = subkeys[0]
+            h{k + subk} = subtree{subk}
+        }
+        else {
+            h{k} = subtree
+        }
+    }
+    return h
+}
+
+func visualize_tree(tree, label, children,
+                    indent = '',
+                    mids = ['├─', '│ '],
+                    ends = ['└─', '  '],
+) {
+    func visit(node, pre) {
+        gather {
+            take(pre[0] + label(node))
+            var chldn = children(node)
+            var end = chldn.end
+            chldn.each_kv { |i, child|
+                if (i == end) { take(visit(child, [pre[1]] ~X+ ends)) }
+                else          { take(visit(child, [pre[1]] ~X+ mids)) }
+            }
+        }
+    }
+    visit(tree, [indent] * 2).flatten
+}
+
+var st = suffix_tree('banana$')
+var tree = st.as_tree('*')
+var text = visualize_tree(tree, { .first }, { .second }).join("\n")
+
+say text
+
+assert_eq(tree,
+    Pair(
+        "*", [Pair(
+            "$", []
+        ), Pair(
+            "a", [Pair(
+                "$", []
+            ), Pair(
+                "na", [Pair(
+                    "$", []
+                ), Pair(
+                    "na$", []
+                )]
+            )]
+        ), Pair(
+            "na", [Pair(
+                "$", []
+            ), Pair(
+                "na$", []
+            )]
+        ), Pair(
+            "banana$", []
+        )]
+    )
+)
+
+assert_eq(text, <<'EOT'.trim_end)
+*
+├─$
+├─a
+│ ├─$
+│ └─na
+│   ├─$
+│   └─na$
+├─na
+│ ├─$
+│ └─na$
+└─banana$
+EOT

@@ -9,6 +9,13 @@ h{:baz} = h
 say h;
 
 #
+## Tree cyclic reference
+#
+
+var t = h.as_tree('root')
+say t
+
+#
 ## Array cyclic reference
 #
 
