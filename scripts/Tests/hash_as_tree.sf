@@ -52,6 +52,7 @@ var st = suffix_tree('banana$')
 var tree = st.as_tree('*')
 var text = visualize_tree(tree, { .first }, { .second }).join("\n")
 
+say tree
 say text
 
 assert_eq(tree,

@@ -967,7 +967,7 @@ HEADER
             }
         }
         elsif ($ref eq 'Sidef::Types::Number::Number') {
-            my ($sgn, $content) = $obj->_dump;
+            my ($sgn, $content) = $obj->_deparse;
             $code =
                 ($sgn == 2) ? $self->make_constant($ref, '_set_str',  "Number$refaddr", "'" . $content . "'")
               : ($sgn >= 0) ? $self->make_constant($ref, '_new_uint', "Number$refaddr", "'" . $content . "'")

@@ -8,7 +8,7 @@ package Sidef::Types::Array::MultiArray {
       );
 
     use overload
-      q{""}   => \&dump,
+      q{""}   => \&_dump,
       q{bool} => sub { scalar @{$_[0]} };
 
     sub new {
@@ -92,7 +92,7 @@ package Sidef::Types::Array::MultiArray {
 
     *to_a = \&to_array;
 
-    sub dump {
+    sub _dump {
 
         my %addr;    # keeps track of dumped objects
 
@@ -104,30 +104,34 @@ package Sidef::Types::Array::MultiArray {
             exists($addr{$refaddr})
               and return $addr{$refaddr};
 
-            my $str = Sidef::Types::String::String->new("MultiArr(#`($refaddr)...)");
-            $addr{$refaddr} = $str;
+            $addr{$refaddr} = "MultiArr(#`($refaddr)...)";
 
-            $$str = (
-                'MultiArr(' . join(
-                    ",\n\t ",
-                    map {
-                        '['
-                          . join(", ", map { ref($_) && defined(UNIVERSAL::can($_, 'dump')) ? $_->dump : $_ } @{$_}) . ']'
-                      } @{$obj}
-                  )
-                  . ")"
-            );
+            my $s;
 
-            $str;
+            'MultiArr(' . join(
+                ",\n\t ",
+                map {
+                    '['
+                      . join(", ",
+                             map { (ref($_) && ($s = UNIVERSAL::can($_, 'dump'))) ? $s->($_) : defined($_) ? $_ : 'nil' }
+                               @{$_})
+                      . ']'
+                  } @{$obj}
+              )
+              . ")";
         };
 
         local *Sidef::Types::Array::MultiArray::dump = $sub;
         $sub->($_[0]);
     }
 
+    sub dump {
+        Sidef::Types::String::String->new($_[0]->_dump);
+    }
+
     {
         no strict 'refs';
-        *{__PACKAGE__ . '::' . '<<' } = \&append;
+        *{__PACKAGE__ . '::' . '<<'} = \&append;
     }
 };
 

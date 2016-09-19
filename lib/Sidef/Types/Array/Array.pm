@@ -10,7 +10,7 @@ package Sidef::Types::Array::Array {
       );
 
     use overload
-      q{""}   => \&dump,
+      q{""}   => \&_dump,
       q{0+}   => sub { scalar(@{$_[0]}) },
       q{bool} => sub { scalar(@{$_[0]}) };
 
@@ -1842,7 +1842,7 @@ package Sidef::Types::Array::Array {
 
     sub to_list { @{$_[0]} }
 
-    sub dump {
+    sub _dump {
 
         my %addr;    # keeps track of dumped objects
 
@@ -1854,25 +1854,28 @@ package Sidef::Types::Array::Array {
             exists($addr{$refaddr})
               and return $addr{$refaddr};
 
-            my $str = Sidef::Types::String::String->new("Array(#`($refaddr)...)");
-            $addr{$refaddr} = $str;
+            $addr{$refaddr} = "Array(#`($refaddr)...)";
 
-            $$str = (
-                '[' . CORE::join(
-                    ', ',
-                    map {
-                        my $item = defined($obj->[$_]) ? $obj->[$_] : 'nil';
-                        ref($item) && defined(UNIVERSAL::can($item, 'dump')) ? $item->dump() : $item;
-                      } 0 .. $#{$obj}
-                  )
-                  . ']'
-            );
+            my ($s, $item);
 
-            $str;
+            '[' . CORE::join(
+                ', ',
+                map {
+                    ref($item = $obj->[$_])
+                      && ($s = UNIVERSAL::can($item, 'dump')) ? $s->($item)
+                      : defined($item) ? $item
+                      : 'nil'
+                  } 0 .. $#{$obj}
+              )
+              . ']';
         };
 
         local *Sidef::Types::Array::Array::dump = $sub;
         $sub->($_[0]);
+    }
+
+    sub dump {
+        Sidef::Types::String::String->new($_[0]->_dump);
     }
 
     sub to_s {

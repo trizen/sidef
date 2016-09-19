@@ -10,7 +10,7 @@ package Sidef::Types::Hash::Hash {
     use overload
       q{bool} => sub { scalar(CORE::keys %{$_[0]}) },
       q{0+}   => sub { scalar(CORE::keys %{$_[0]}) },
-      q{""}   => \&dump;
+      q{""}   => \&_dump;
 
     use Sidef::Types::Bool::Bool;
 
@@ -484,7 +484,7 @@ package Sidef::Types::Hash::Hash {
         map { (Sidef::Types::String::String->new($_), $self->{$_}) } CORE::keys %$self;
     }
 
-    sub dump {
+    sub _dump {
         my %addr;    # keeps track of dumped objects
 
         my $sub = sub {
@@ -500,20 +500,25 @@ package Sidef::Types::Hash::Hash {
             # Sort the keys case insensitively
             my @keys = CORE::sort { (lc($a) cmp lc($b)) || ($a cmp $b) } CORE::keys(%$obj);
 
-            my $str = Sidef::Types::String::String->new("Hash(#`($refaddr)...)");
-            $addr{$refaddr} = $str;
+            $addr{$refaddr} = "Hash(#`($refaddr)...)";
 
-            $$str = (
+            my ($s, $val);
+
+            my $str = (
                 "Hash(" . (
                     @keys
                     ? (
                        (@keys > 1 ? "\n" : '') . join(
                            ",\n",
                            map {
-                               my $val = $obj->{$_};
+                               $val = $obj->{$_};
                                (@keys > 1 ? (' ' x $Sidef::SPACES) : '')
                                  . "${Sidef::Types::String::String->new($_)->dump} => "
-                                 . (defined(UNIVERSAL::can($val, 'dump')) ? $val->dump : defined($val) ? $val : 'nil')
+                                 . (
+                                      (ref($val) && ($s = UNIVERSAL::can($val, 'dump'))) ? $s->($val)
+                                    : defined($val) ? $val
+                                    :                 'nil'
+                                   )
                              } @keys
                          )
                          . (@keys > 1 ? ("\n" . (' ' x ($Sidef::SPACES - $Sidef::SPACES_INCR))) : '')
@@ -529,6 +534,10 @@ package Sidef::Types::Hash::Hash {
 
         local *Sidef::Types::Hash::Hash::dump = $sub;
         $sub->($_[0]);
+    }
+
+    sub dump {
+        Sidef::Types::String::String->new($_[0]->_dump);
     }
 
     {

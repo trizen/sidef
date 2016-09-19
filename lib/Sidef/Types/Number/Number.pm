@@ -46,7 +46,7 @@ package Sidef::Types::Number::Number {
         bless(\$_[0], __PACKAGE__);
     }
 
-    sub _dump {
+    sub _deparse {
         my $x = ${$_[0]};
 
         if (    Math::GMPq::Rmpq_integer_p($x)

@@ -6,7 +6,7 @@ package Sidef::Types::Array::Pair {
       Sidef::Types::Array::Array
       );
 
-    use overload q{""} => \&dump;
+    use overload q{""} => \&_dump;
 
     sub new {
         my (undef, $item1, $item2) = @_;
@@ -79,7 +79,7 @@ package Sidef::Types::Array::Pair {
 
     *to_a = \&to_array;
 
-    sub dump {
+    sub _dump {
 
         my %addr;    # keeps track of dumped objects
 
@@ -91,30 +91,27 @@ package Sidef::Types::Array::Pair {
             exists($addr{$refaddr})
               and return $addr{$refaddr};
 
-            my $str = Sidef::Types::String::String->new("Pair(#`($refaddr)...)");
-            $addr{$refaddr} = $str;
+            $addr{$refaddr} = "Pair(#`($refaddr)...)";
 
-            $$str = (
-                "Pair(" . "\n" . join(
-                    ",\n",
+            my $s;
 
-                    (' ' x ($Sidef::SPACES += $Sidef::SPACES_INCR)) . join(
-                        ", ",
-                        map {
-                            my $val = $_;
-                            defined(UNIVERSAL::can($val, 'dump')) ? $val->dump : defined($val) ? $val : 'nil'
-                          } @{$obj}
-                    )
-                  )
-                  . "\n"
-                  . (' ' x ($Sidef::SPACES -= $Sidef::SPACES_INCR)) . ")"
-            );
+            "Pair(" . "\n" . join(
+                ",\n",
 
-            $str;
+                (' ' x ($Sidef::SPACES += $Sidef::SPACES_INCR))
+                  . join(", ",
+                         map { (ref($_) && ($s = UNIVERSAL::can($_, 'dump'))) ? $s->($_) : defined($_) ? $_ : 'nil' } @{$obj})
+              )
+              . "\n"
+              . (' ' x ($Sidef::SPACES -= $Sidef::SPACES_INCR)) . ")";
         };
 
         local *Sidef::Types::Array::Pair::dump = $sub;
         $sub->($_[0]);
+    }
+
+    sub dump {
+        Sidef::Types::String::String->new($_[0]->_dump);
     }
 };
 

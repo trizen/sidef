@@ -149,11 +149,7 @@ package Sidef::Deparse::Sidef {
 
     sub _dump_string {
         my ($self, $str) = @_;
-
-        state $x = eval { require Data::Dump };
-        $x || return ('"' . quotemeta($str) . '"');
-
-        Data::Dump::quote($str);
+        Sidef::Types::String::String->new($str)->dump->get_value;
     }
 
     sub _dump_number {

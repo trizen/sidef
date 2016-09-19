@@ -1347,7 +1347,7 @@ package Sidef::Types::String::String {
             my $str = "${$_[0]}";
 
             $str =~ s/([\\\"]|#\{)/\\$1/g;
-            $str =~ /[^\040-\176]/ or return __PACKAGE__->new(qq("$str"));
+            $str =~ /[^\040-\176]/ or return bless(\qq("$str"), __PACKAGE__);
 
             $str =~ s/([\a\b\t\n\f\r\e\13])/$esc{$1}/g;
             $str =~ s/([\0-\037])(?!\d)/sprintf('\\%o',ord($1))/eg;
@@ -1355,7 +1355,7 @@ package Sidef::Types::String::String {
             $str =~ s/([\0-\037\177-\377])/sprintf('\\x%02X',ord($1))/eg;
             $str =~ s/([^\040-\176])/sprintf('\\x{%X}',ord($1))/eg;
 
-            __PACKAGE__->new(qq("$str"));
+            bless \qq("$str"), __PACKAGE__;
         }
     }
 

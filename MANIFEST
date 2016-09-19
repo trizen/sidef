@@ -182,6 +182,7 @@ scripts/Games/forest_fire_old.sf
 scripts/Games/guess_the_number.sf
 scripts/Games/guess_the_number_with_feedback.sf
 scripts/Games/guess_the_number_with_feedback__player_.sf
+scripts/Games/iq_puzzle.sf
 scripts/Games/pig_the_dice_game_player.sf
 scripts/Games/rock-paper-scissors.sf
 scripts/Games/snake_game.sf

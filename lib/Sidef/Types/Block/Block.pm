@@ -329,7 +329,7 @@ package Sidef::Types::Block::Block {
         my $ref = ref($obj);
 
         if ($ref eq 'Sidef::Types::Number::Number') {
-            my ($code, $value) = $obj->_dump();
+            my ($code, $value) = $obj->_deparse();
 
             $code < 0  && return scalar {dump => ($ref . "->_new_int('$value')")};
             $code <= 1 && return scalar {dump => ($ref . "->_new_uint('$value')")};
