@@ -15,12 +15,15 @@ func is_even_perfect(n) {
     (tp-1).is_prime ? true : false
 }
 
+var i = 0;
+
 DATA.each { |line|
     var n = line.numbers[-1]
     is_even_perfect(n) || die "false negative: #{n}"
 
-    var r = (n + n.irand + 1)
+    var r = i.irand(n)
     is_even_perfect(r) && die "false positive: #{r}"
+    i = n+1
 }
 
 say "** Test passed!"
