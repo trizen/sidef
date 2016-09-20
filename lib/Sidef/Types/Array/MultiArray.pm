@@ -113,10 +113,9 @@ package Sidef::Types::Array::MultiArray {
                 map {
                     '['
                       . join(", ",
-                             map { (ref($_) && ($s = UNIVERSAL::can($_, 'dump'))) ? $s->($_) : defined($_) ? $_ : 'nil' }
-                               @{$_})
+                             map { (ref($_) && ($s = UNIVERSAL::can($_, 'dump'))) ? $s->($_) : defined($_) ? $_ : 'nil' } @$_)
                       . ']'
-                  } @{$obj}
+                  } @$obj
               )
               . ")";
         };

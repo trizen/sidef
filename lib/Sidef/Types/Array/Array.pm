@@ -1856,17 +1856,11 @@ package Sidef::Types::Array::Array {
 
             $addr{$refaddr} = "Array(#`($refaddr)...)";
 
-            my ($s, $item);
+            my $s;
 
-            '[' . CORE::join(
-                ', ',
-                map {
-                    ref($item = $obj->[$_])
-                      && ($s = UNIVERSAL::can($item, 'dump')) ? $s->($item)
-                      : defined($item) ? $item
-                      : 'nil'
-                  } 0 .. $#{$obj}
-              )
+            '['
+              . CORE::join(', ',
+                           map { ref($_) && ($s = UNIVERSAL::can($_, 'dump')) ? $s->($_) : defined($_) ? $_ : 'nil' } @$obj)
               . ']';
         };
 

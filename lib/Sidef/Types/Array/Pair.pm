@@ -100,7 +100,7 @@ package Sidef::Types::Array::Pair {
 
                 (' ' x ($Sidef::SPACES += $Sidef::SPACES_INCR))
                   . join(", ",
-                         map { (ref($_) && ($s = UNIVERSAL::can($_, 'dump'))) ? $s->($_) : defined($_) ? $_ : 'nil' } @{$obj})
+                         map { (ref($_) && ($s = UNIVERSAL::can($_, 'dump'))) ? $s->($_) : defined($_) ? $_ : 'nil' } @$obj)
               )
               . "\n"
               . (' ' x ($Sidef::SPACES -= $Sidef::SPACES_INCR)) . ")";

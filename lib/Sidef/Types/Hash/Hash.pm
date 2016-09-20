@@ -511,11 +511,10 @@ package Sidef::Types::Hash::Hash {
                        (@keys > 1 ? "\n" : '') . join(
                            ",\n",
                            map {
-                               $val = $obj->{$_};
-                               (@keys > 1 ? (' ' x $Sidef::SPACES) : '')
+                                   (@keys > 1 ? (' ' x $Sidef::SPACES) : '')
                                  . "${Sidef::Types::String::String->new($_)->dump} => "
                                  . (
-                                      (ref($val) && ($s = UNIVERSAL::can($val, 'dump'))) ? $s->($val)
+                                      (ref($val = $obj->{$_}) && ($s = UNIVERSAL::can($val, 'dump'))) ? $s->($val)
                                     : defined($val) ? $val
                                     :                 'nil'
                                    )
