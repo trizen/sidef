@@ -151,6 +151,7 @@ scripts/Expensive/knapsack_problem_unbounded.sf
 scripts/Expensive/knuth_power_tree.sf
 scripts/Expensive/long_multiplication.sf
 scripts/Expensive/ludic_numbers.sf
+scripts/Expensive/md5.sf
 scripts/Expensive/normal_distribution.sf
 scripts/Expensive/numerical_integration.sf
 scripts/Expensive/parallel_calculations.sf
