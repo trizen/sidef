@@ -955,6 +955,11 @@ package Sidef::Optimizer {
                 if (defined $method) {
                     if (ref($method) eq 'HASH') {
                         $method = $self->optimize_expr($method) // {self => {}};
+
+                        # Optimize `obj.("method")` to `obj.method`
+                        if (ref($method) eq 'Sidef::Types::String::String') {
+                            $method = $$method;
+                        }
                     }
 
                     $obj->{call}[$i] = {method => $method};
