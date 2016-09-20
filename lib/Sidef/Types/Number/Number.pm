@@ -1671,36 +1671,24 @@ package Sidef::Types::Number::Number {
 
     sub floor {
         my ($x) = @_;
+
         Math::GMPq::Rmpq_integer_p($$x) && return $x;
 
-        if (Math::GMPq::Rmpq_sgn($$x) > 0) {
-            my $z = Math::GMPz::Rmpz_init();
-            Math::GMPz::Rmpz_set_q($z, $$x);
-            _mpz2big($z);
-        }
-        else {
-            my $z = Math::GMPz::Rmpz_init();
-            Math::GMPz::Rmpz_set_q($z, $$x);
-            Math::GMPz::Rmpz_sub_ui($z, $z, 1);
-            _mpz2big($z);
-        }
+        my $z = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_set_q($z, $$x);
+        Math::GMPz::Rmpz_sub_ui($z, $z, 1) if Math::GMPq::Rmpq_sgn($$x) < 0;
+        _mpz2big($z);
     }
 
     sub ceil {
         my ($x) = @_;
+
         Math::GMPq::Rmpq_integer_p($$x) && return $x;
 
-        if (Math::GMPq::Rmpq_sgn($$x) > 0) {
-            my $z = Math::GMPz::Rmpz_init();
-            Math::GMPz::Rmpz_set_q($z, $$x);
-            Math::GMPz::Rmpz_add_ui($z, $z, 1);
-            _mpz2big($z);
-        }
-        else {
-            my $z = Math::GMPz::Rmpz_init();
-            Math::GMPz::Rmpz_set_q($z, $$x);
-            _mpz2big($z);
-        }
+        my $z = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_set_q($z, $$x);
+        Math::GMPz::Rmpz_add_ui($z, $z, 1) if Math::GMPq::Rmpq_sgn($$x) > 0;
+        _mpz2big($z);
     }
 
     sub inc {
