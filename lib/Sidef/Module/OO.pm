@@ -28,8 +28,11 @@ package Sidef::Module::OO {
             $self->{module}->$method(@args);
         };
 
+        my $multi_values = wantarray // return;
+
         if (@results > 1) {
-            return (map { Sidef::Perl::Perl->to_sidef($_) } @results);
+            @results = map { Sidef::Perl::Perl->to_sidef($_) } @results;
+            return ($multi_values ? @results : Sidef::Types::Array::Array->new(\@results));
         }
 
         Sidef::Perl::Perl->to_sidef($results[0]);
