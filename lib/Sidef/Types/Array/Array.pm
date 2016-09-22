@@ -129,7 +129,7 @@ package Sidef::Types::Array::Array {
         if ($operator eq '') {
             foreach my $i (@{$self}) {
                 foreach my $j (@arg) {
-                    CORE::push(@array, $self->new($i, $j));
+                    CORE::push(@array, $self->new([$i, $j]));
                 }
             }
         }
@@ -327,8 +327,8 @@ package Sidef::Types::Array::Array {
         my ($self, $arg) = @_;
 
         UNIVERSAL::isa($arg, 'ARRAY')
-          ? $self->new(@{$self}, @{$arg})
-          : $self->new(@{$self}, $arg);
+          ? $self->new([@{$self}, @{$arg}])
+          : $self->new([@{$self}, $arg]);
     }
 
     sub levenshtein {
@@ -434,7 +434,7 @@ package Sidef::Types::Array::Array {
             my @c = (0 .. $k - 1);
 
             while (1) {
-                $block->run($self->new(@{$self}[@c]));
+                $block->run($self->new([@{$self}[@c]]));
                 next if ($c[$k - 1]++ < $n - 1);
                 my $i = $k - 2;
                 $i-- while ($i >= 0 && $c[$i] >= $n - ($k - $i));
@@ -667,7 +667,7 @@ package Sidef::Types::Array::Array {
             }
 
             my $from = @{$self} - CORE::int($arg);
-            return $self->new(@{$self}[($from < 0 ? 0 : $from) .. $#{$self}]);
+            return $self->new([@{$self}[($from < 0 ? 0 : $from) .. $#{$self}]]);
         }
 
         @{$self} ? $self->[-1] : ();
@@ -1144,7 +1144,7 @@ package Sidef::Types::Array::Array {
 
     sub shuffle {
         my ($self) = @_;
-        $self->new(List::Util::shuffle(@{$self}));
+        $self->new([List::Util::shuffle(@{$self})]);
     }
 
     sub best_shuffle {

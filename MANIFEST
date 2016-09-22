@@ -144,6 +144,7 @@ scripts/Expensive/factorial_approximations.sf
 scripts/Expensive/fibonacci_validation.sf
 scripts/Expensive/fibonacci_word.sf
 scripts/Expensive/genetic_algorithm.sf
+scripts/Expensive/julia_set.sf
 scripts/Expensive/kd_tree.sf
 scripts/Expensive/knapsack_problem_0_1.sf
 scripts/Expensive/knapsack_problem_bounded.sf
