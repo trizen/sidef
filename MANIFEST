@@ -212,6 +212,7 @@ scripts/Graphical/lsystem_sierpinski_triangle.sf
 scripts/Graphical/lsystem_tree.sf
 scripts/Graphical/munching_squares.sf
 scripts/Graphical/pentagram.sf
+scripts/Graphical/plasma_effect.sf
 scripts/Graphical/ppm_palette.sf
 scripts/Graphical/pythagoras_tree.sf
 scripts/Graphical/sierpinski_pentagon.sf
@@ -337,6 +338,7 @@ scripts/RosettaCode/first-class_functions.sf
 scripts/RosettaCode/first_class_environments.sf
 scripts/RosettaCode/five_weekends.sf
 scripts/RosettaCode/flatten_a_list.sf
+scripts/RosettaCode/floyd_warshall_algorithm.sf
 scripts/RosettaCode/fork.sf
 scripts/RosettaCode/formatted_numeric_output.sf
 scripts/RosettaCode/formatted_numeric_output_1.sf
@@ -446,6 +448,7 @@ scripts/RosettaCode/playing_cards.sf
 scripts/RosettaCode/pointers_and_references.sf
 scripts/RosettaCode/polymorphic_copy.sf
 scripts/RosettaCode/polymorphism.sf
+scripts/RosettaCode/polynomial_synthetic_division.sf
 scripts/RosettaCode/price_fraction.sf
 scripts/RosettaCode/primality_by_trial_division.sf
 scripts/RosettaCode/priority_queue.sf
