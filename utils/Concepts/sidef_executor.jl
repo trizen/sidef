@@ -59,7 +59,7 @@ function execute_expr(statement)
 
         if haskey(statement, :call)
             for call in statement[:call]
-                method = symbol(call[:method]);
+                method = Symbol(call[:method]);
 
                 if haskey(call, :arg)
 

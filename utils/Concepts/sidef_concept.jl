@@ -39,14 +39,14 @@ Any[
 
     println(n1 / n2);
 
-    method = symbol("/");
+    method = Symbol("/");
     println(eval(:($method(n1, n2))));
 ]
 
 #########################################
 
 Any[
-    d = symbol("/");
+    d = Symbol("/");
     x = S_Number(12);
     y = S_Number(4);
     println("$x / $y == ", eval(:($d(x, y))));
@@ -64,7 +64,7 @@ if (m = match(r"\G(\d+(?:\.\d+)?)", code)) != nothing
         if (m = match(r"\G(\w+)", code, pos)) != nothing
             cap = m.captures[1];
             pos += length(cap);
-            method = symbol(cap);
+            method = Symbol(cap);
             print(n, "->", cap);
             n = eval(:($method(n)));
             println(" == ", n);
