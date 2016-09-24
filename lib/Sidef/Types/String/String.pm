@@ -1325,11 +1325,6 @@ package Sidef::Types::String::String {
         Sidef::Types::Array::Pair->new($_[0], $_[1]);
     }
 
-    sub sdump {
-        my ($self) = @_;
-        __PACKAGE__->new(q{'} . $$self =~ s{([\\'])}{\\$1}gr . q{'});
-    }
-
     {
         my %esc = (
                    "\a"    => "\\a",

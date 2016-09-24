@@ -848,14 +848,6 @@ Return the
 
 =cut
 
-=head2 sdump
-
-String.sdump() -> I<Obj>
-
-Return the
-
-=cut
-
 =head2 sort
 
 String.sort() -> I<Obj>
