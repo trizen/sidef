@@ -807,6 +807,16 @@ Return the
 
 =cut
 
+=head2 part
+
+Array.part() -> I<Obj>
+
+Return the
+
+Aliases: I<partition>
+
+=cut
+
 =head2 permute
 
 Array.permute() -> I<Obj>

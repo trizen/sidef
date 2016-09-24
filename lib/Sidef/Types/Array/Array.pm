@@ -197,6 +197,17 @@ package Sidef::Types::Array::Array {
         $self->new(\@array);
     }
 
+    sub part {
+        my ($self, $num) = @_;
+
+        my @first = @$self;
+        my @second = splice(@first, CORE::int($num));
+
+        ($self->new(\@first), $self->new(\@second));
+    }
+
+    *partition = \&part;
+
     sub or {
         my ($self, $array) = @_;
 

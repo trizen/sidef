@@ -210,14 +210,6 @@ Return the
 
 =cut
 
-=head2 basic_dump
-
-String.basic_dump() -> I<Obj>
-
-Return the
-
-=cut
-
 =head2 begins_with
 
 String.begins_with() -> I<Obj>
@@ -851,6 +843,14 @@ Return the
 =head2 scan
 
 String.scan() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 sdump
+
+String.sdump() -> I<Obj>
 
 Return the
 

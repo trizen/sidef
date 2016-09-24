@@ -84,6 +84,14 @@ Aliases: I<append>
 
 =cut
 
+=head2 as_tree
+
+Hash.as_tree() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 copy
 
 Hash.copy() -> I<Obj>
