@@ -1174,13 +1174,12 @@ package Sidef::Types::Array::Array {
     }
 
     sub reduce {
-        my ($self, $obj) = @_;
+        my ($self, $obj, $initial) = @_;
 
         if (ref($obj) eq 'Sidef::Types::Block::Block') {
             (my $end = $#{$self}) >= 0 || return;
-
-            my $x = $self->[0];
-            foreach my $i (1 .. $end) {
+            my ($beg, $x) = defined($initial) ? (0, $initial) : (1, $self->[0]);
+            foreach my $i ($beg .. $end) {
                 $x = $obj->run($x, $self->[$i]);
             }
 

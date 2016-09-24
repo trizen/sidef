@@ -319,12 +319,12 @@ package Sidef::Types::Range::Range {
     }
 
     sub reduce {
-        my ($self, $op) = @_;
+        my ($self, $op, $initial) = @_;
 
         if (ref($op) eq 'Sidef::Types::Block::Block') {
 
-            my $iter  = $self->iter->{code};
-            my $value = $iter->();
+            my $iter = $self->iter->{code};
+            my $value = $initial // $iter->();
 
             while (defined(my $obj = $iter->())) {
                 $value = $op->run($value, $obj);
