@@ -3,17 +3,18 @@
 # http://rosettacode.org/wiki/Sorting_algorithms/Merge_sort
 
 func merge(left, right) {
-    var result = [];
-    while (!left.is_empty && !right.is_empty) {
-        result.append([right,left][left.first <= right.first].shift);
-    };
-    result + left + right;
+    gather {
+        while (!left.is_empty && !right.is_empty) {
+            take([right,left][left.first <= right.first].shift)
+        }
+    } + left + right
 }
 
 func mergesort(arr) {
-    var len = arr.len;
-    len < 2 && return arr;
-    merge(__FUNC__(arr.ft(0, len/2 -> int - 1)), __FUNC__(arr.ft(len/2 -> int)));
+    var len = arr.len
+    len < 2 && return arr
+    var (left, right) = arr.part(len // 2)
+    merge(__FUNC__(left), __FUNC__(right))
 }
 
 # Numeric sort

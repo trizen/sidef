@@ -10,31 +10,28 @@ func merge(left, right) {
 
     var(i=0, j=0);
     while (i<nL && j<nR) {
-        array.append(left[i] <= right[j] ? left[i++] : right[j++]);
+        array << (left[i] <= right[j] ? left[i++] : right[j++]);
     }
 
-    array += left.ft(i, left.end);
-    array += right.ft(j, right.end);
+    array += left.ft(i);
+    array += right.ft(j);
 
     return array;
 }
 
+func merge_sort(array { .len < 2 }) { array }
+
 func merge_sort(array) {
-    var n = array.len;
-    n < 2 && return();
+    var (left, right) = @|array/2
 
-    var mid   = (n/2 -> int);
-    var left  = array.ft(0, mid-1);
-    var right = array.ft(mid, array.end);
+    __FUNC__(left)
+    __FUNC__(right)
 
-    __FUNC__(left);
-    __FUNC__(right);
-
-    array[array.range...] = merge(left, right)...;
+    array[] = merge(left, right)...
 }
 
-var arr = [3,4,7,6,2,5,1,0].shuffle;
-merge_sort(arr);
+var arr = [3,4,7,6,2,5,1,0].shuffle
+merge_sort(arr)
 
-assert_eq(arr, arr.sort);
-say "** Test passed!";
+assert_eq(arr, arr.sort)
+say "** Test passed!"
