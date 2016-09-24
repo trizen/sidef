@@ -6,5 +6,5 @@
 
 var fh = File.new(__FILE__).open_r;
 while (fh.readline(\var line)) {
-    print line;
+    say line;
 }

@@ -5,13 +5,13 @@ var info = []
 # Pipe (read-only)
 %p(uname -r).open_r.each { |line|
     info << line
-    print line;
+    say line;
 }
 
 # Pipe with interpolation (read-only)
 %P(uname #{"-" + "r"}).open_r.each { |line|
     info << line
-    print line;
+    say line;
 }
 
 var str1 = `uname -r`;              # backtick: returns a string
@@ -19,10 +19,10 @@ var str2 = `uname #{"-" + "r"}`     # backtick with interpolation
 var str3 = %x(uname -r);            # ditto, alternative syntax
 var str4 = %X(uname #{"-" + "r"})   # bactick with interpolation
 
-info << str1
-info << str2
-info << str3
-info << str4
+info << str1.chomp
+info << str2.chomp
+info << str3.chomp
+info << str4.chomp
 
 print str1;
 print str2;

@@ -86,7 +86,9 @@ package Sidef::Types::Glob::FileHandle {
         my ($self) = @_;
         Sidef::Types::Block::Block->new(
             code => sub {
-                Sidef::Types::String::String->new(CORE::readline($self->{fh}) // return);
+                my $line = CORE::readline($self->{fh}) // return;
+                chomp($line);
+                Sidef::Types::String::String->new($line);
             }
         );
     }
@@ -141,13 +143,18 @@ package Sidef::Types::Glob::FileHandle {
     sub read_line {
         my ($self, $var_ref) = @_;
 
+        my $line = CORE::readline($self->{fh});
+
         if (defined $var_ref) {
-            ${$var_ref} =
-              (Sidef::Types::String::String->new(CORE::readline($self->{fh}) // return (Sidef::Types::Bool::Bool::FALSE)));
-            return (Sidef::Types::Bool::Bool::TRUE);
+            $line // return Sidef::Types::Bool::Bool::FALSE;
+            chomp($line);
+            $$var_ref = Sidef::Types::String::String->new($line);
+            return Sidef::Types::Bool::Bool::TRUE;
         }
 
-        Sidef::Types::String::String->new(CORE::readline($self->{fh}) // return);
+        $line // return;
+        chomp($line);
+        Sidef::Types::String::String->new($line);
     }
 
     *readln   = \&read_line;
@@ -158,13 +165,14 @@ package Sidef::Types::Glob::FileHandle {
     sub read_char {
         my ($self, $var_ref) = @_;
 
+        my $char = CORE::getc($self->{fh});
+
         if (defined $var_ref) {
-            ${$var_ref} =
-              (Sidef::Types::String::String->new(CORE::getc($self->{fh}) // return (Sidef::Types::Bool::Bool::FALSE)));
-            return (Sidef::Types::Bool::Bool::TRUE);
+            $$var_ref = Sidef::Types::String::String->new($char // return Sidef::Types::Bool::Bool::FALSE);
+            return Sidef::Types::Bool::Bool::TRUE;
         }
 
-        Sidef::Types::String::String->new(getc($self->{fh}) // return);
+        Sidef::Types::String::String->new($char // return);
     }
 
     *char = \&read_char;
@@ -187,6 +195,7 @@ package Sidef::Types::Glob::FileHandle {
         if (ref($obj) eq 'Sidef::Types::Regex::Regex') {
             my $re = $obj->{regex};
             while (defined(my $line = CORE::readline($self->{fh}))) {
+                chomp($line);
                 if ($line =~ $re) {
                     push @array, Sidef::Types::String::String->new($line);
                 }
@@ -194,6 +203,7 @@ package Sidef::Types::Glob::FileHandle {
         }
         else {
             while (defined(my $line = CORE::readline($self->{fh}))) {
+                chomp($line);
                 my $string = Sidef::Types::String::String->new($line);
                 push @array, $string if $obj->run($string);
             }
@@ -207,6 +217,7 @@ package Sidef::Types::Glob::FileHandle {
 
         my @array;
         while (defined(my $line = CORE::readline($self->{fh}))) {
+            chomp($line);
             push @array, $block->run(Sidef::Types::String::String->new($line));
         }
         Sidef::Types::Array::Array->new(\@array);
@@ -241,6 +252,7 @@ package Sidef::Types::Glob::FileHandle {
         my ($self, $code) = @_;
 
         while (defined(my $line = CORE::readline($self->{fh}))) {
+            chomp($line);
             $code->run(Sidef::Types::String::String->new($line));
         }
 
@@ -345,12 +357,17 @@ package Sidef::Types::Glob::FileHandle {
 
     sub read_to {
         my ($self, $var_ref) = @_;
-        ${$var_ref} = Sidef::Types::String::String->new(
-            do {
-                chomp(my $line = CORE::readline($self->{fh}));
-                $line;
-              }
-        );
+
+        my $line = CORE::readline($self->{fh});
+
+        if (defined($line)) {
+            chomp($line);
+            $$var_ref = Sidef::Types::String::String->new($line);
+        }
+        else {
+            undef $$var_ref;
+        }
+
         $self;
     }
 

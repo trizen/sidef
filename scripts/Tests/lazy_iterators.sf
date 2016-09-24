@@ -18,7 +18,7 @@ arr.lazy.grep{.is_even}.map{_**2}.each { |i|
 (1..^Inf) -> lazy.grep{.is_even}.first(5).say;
 
 ## FileHandle
-File(__FILE__).open_r.lazy.grep{.match(/\S/)}.map{.uc}.first(4).join("").print;
+File(__FILE__).open_r.lazy.grep{.match(/\S/)}.map{.uc}.first(4).join("\n").say;
 
 ## DirHandle
 Dir.cwd.open_r.lazy.grep{.match(/e/)}.map{.lc}.first(3).join("\n").say

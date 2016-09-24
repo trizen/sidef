@@ -5,7 +5,7 @@ var file = File(__FILE__)
 if (file.open_r(\var fh)) {
     say "** File successfully accessed!";
 
-    fh.readline == "#!/usr/bin/ruby\n" ||
+    fh.readline == "#!/usr/bin/ruby" ||
         die "fh.readline error!\n";
 }
 else {
