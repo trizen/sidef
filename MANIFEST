@@ -313,6 +313,7 @@ scripts/RosettaCode/dijkstra_s_algorithm.sf
 scripts/RosettaCode/dinesman_problem_parsing.sf
 scripts/RosettaCode/dinesman_problem_simple.sf
 scripts/RosettaCode/dot_product.sf
+scripts/RosettaCode/emirp_primes.sf
 scripts/RosettaCode/empty_directory.sf
 scripts/RosettaCode/empty_directory_1.sf
 scripts/RosettaCode/entropy.sf
