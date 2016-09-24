@@ -286,6 +286,7 @@ scripts/RosettaCode/character_codes.sf
 scripts/RosettaCode/check_machin_like_formulas.sf
 scripts/RosettaCode/check_that_file_exists.sf
 scripts/RosettaCode/cholesky_decomposition.sf
+scripts/RosettaCode/cipolla_algorithm.sf
 scripts/RosettaCode/classes.sf
 scripts/RosettaCode/closures_value_capture.sf
 scripts/RosettaCode/compare_a_list_of_strings.sf
