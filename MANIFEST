@@ -306,6 +306,7 @@ scripts/RosettaCode/create_an_html_table.sf
 scripts/RosettaCode/cumulative_standard_deviation.sf
 scripts/RosettaCode/currency.sf
 scripts/RosettaCode/date_format.sf
+scripts/RosettaCode/decimal_float_to_binary.sf
 scripts/RosettaCode/delete_a_file.sf
 scripts/RosettaCode/determine_if_a_string_is_numeric.sf
 scripts/RosettaCode/digital_root.sf
