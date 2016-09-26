@@ -987,9 +987,7 @@ package Sidef::Types::Array::Array {
         my $i = 0;
         Sidef::Types::Block::Block->new(
             code => sub {
-                my $result = exists($self->[$i]) ? $self->[$i] : return;
-                ++$i;
-                $result;
+                $self->[$i++];
             }
         );
     }
