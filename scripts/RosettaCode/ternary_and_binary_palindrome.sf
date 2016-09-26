@@ -1,0 +1,23 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Find_palindromic_numbers_in_both_binary_and_ternary_bases
+#
+
+var format = "%11s %24s %38s\n"
+format.printf("decimal", "ternary", "binary")
+format.printf(0, 0, 0)
+
+var nums = []
+
+for n in (0 .. 1e3) {
+    var pal = n.base(3)||''
+    var b3 = (pal + '1' + pal.flip)
+    var b2 = Num(b3, 3).base(2)
+    if (b2 == b2.flip) {
+        nums << Num(b2, 2)
+        format.printf(Num(b2, 2), b3, b2)
+    }
+}
+
+assert_eq(nums, [1, 6643, 1422773, 5415589])

@@ -402,6 +402,7 @@ package Sidef::Types::Hash::Hash {
     }
 
     *to_array = \&to_a;
+    *kv       = \&to_a;
 
     sub as_tree {
         my ($self, $root) = @_;

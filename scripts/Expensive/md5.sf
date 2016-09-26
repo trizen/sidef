@@ -72,7 +72,7 @@ class MD5(String msg) {
                 ), B, C)
         }
 
-        for k,v in ([A, B, C, D].pairs) {
+        for k,v in ([A, B, C, D].kv) {
             H[k] = block(H[k], v)
         }
 

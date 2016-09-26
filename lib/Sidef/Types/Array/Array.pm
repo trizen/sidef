@@ -1265,6 +1265,8 @@ package Sidef::Types::Array::Array {
             [map { Sidef::Types::Array::Pair->new(Sidef::Types::Number::Number->_new_uint($_), $self->[$_]) } 0 .. $#{$self}]);
     }
 
+    *kv = \&pairs;
+
     sub insert {
         my ($self, $i, @objects) = @_;
 

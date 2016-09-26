@@ -5,7 +5,7 @@
 #
 
 static to = [@|'0'..'9', @|'a'..'z']
-static from = Hash(to.pairs.map{@|_}.flip...)
+static from = Hash(to.kv.map{@|_}.flip...)
 
 func base_to(n, b) {
     var s = ""

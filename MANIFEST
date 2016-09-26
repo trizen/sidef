@@ -374,6 +374,7 @@ scripts/RosettaCode/inheritance_multiple.sf
 scripts/RosettaCode/inheritance_single.sf
 scripts/RosettaCode/kaprekar_numbers.sf
 scripts/RosettaCode/knapsack_problem_continuous.sf
+scripts/RosettaCode/knight_s_tour.sf
 scripts/RosettaCode/largest_int_from_concatenated_ints.sf
 scripts/RosettaCode/last_sunday_of_each_month.sf
 scripts/RosettaCode/left_factorials.sf
@@ -545,6 +546,7 @@ scripts/RosettaCode/string_comparison.sf
 scripts/RosettaCode/suffix_tree.sf
 scripts/RosettaCode/sum_digits_of_an_integer.sf
 scripts/RosettaCode/sutherland_hodgman.sf
+scripts/RosettaCode/ternary_and_binary_palindrome.sf
 scripts/RosettaCode/text_processing_1.sf
 scripts/RosettaCode/the_isaac_cipher.sf
 scripts/RosettaCode/thue_morse.sf

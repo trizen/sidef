@@ -244,6 +244,16 @@ Return the
 
 =cut
 
+=head2 kv
+
+Hash.kv() -> I<Obj>
+
+Return the
+
+Aliases: I<to_a>, I<to_array>
+
+=cut
+
 =head2 len
 
 Hash.len() -> I<Obj>
@@ -343,16 +353,6 @@ Return the
 Hash.sort_by() -> I<Obj>
 
 Return the
-
-=cut
-
-=head2 to_a
-
-Hash.to_a() -> I<Obj>
-
-Return the
-
-Aliases: I<to_array>
 
 =cut
 

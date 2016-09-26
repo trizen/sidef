@@ -629,6 +629,16 @@ Aliases: I<indices>
 
 =cut
 
+=head2 kv
+
+Array.kv() -> I<Obj>
+
+Return the
+
+Aliases: I<pairs>
+
+=cut
+
 =head2 last
 
 Array.last() -> I<Obj>
@@ -786,14 +796,6 @@ Return the
 =head2 pairmap
 
 Array.pairmap() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 pairs
-
-Array.pairs() -> I<Obj>
 
 Return the
 
