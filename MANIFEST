@@ -288,6 +288,7 @@ scripts/RosettaCode/check_that_file_exists.sf
 scripts/RosettaCode/cholesky_decomposition.sf
 scripts/RosettaCode/cipolla_algorithm.sf
 scripts/RosettaCode/classes.sf
+scripts/RosettaCode/closest_pair_problem.sf
 scripts/RosettaCode/closures_value_capture.sf
 scripts/RosettaCode/compare_a_list_of_strings.sf
 scripts/RosettaCode/compare_a_list_of_strings_1.sf
