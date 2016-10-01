@@ -690,28 +690,43 @@ package Sidef::Types::Number::Number {
 
         _valid(\$y);
 
-        if (Math::GMPq::Rmpq_integer_p($$x) and Math::GMPq::Rmpq_integer_p($$y)) {
+        if (Math::GMPq::Rmpq_integer_p($$y)) {
 
+            my $z   = Math::GMPz::Rmpz_init();
+            my $q   = Math::GMPq::Rmpq_init();
             my $pow = Math::GMPq::Rmpq_get_d($$y);
 
-            my $z = Math::GMPz::Rmpz_init();
-            Math::GMPz::Rmpz_set_q($z, $$x);
-            Math::GMPz::Rmpz_pow_ui($z, $z, CORE::abs($pow));
+            if (Math::GMPq::Rmpq_integer_p($$x)) {
+                Math::GMPz::Rmpz_set_q($z, $$x);
+                Math::GMPz::Rmpz_pow_ui($z, $z, CORE::abs($pow));
 
-            my $q = Math::GMPq::Rmpq_init();
-            Math::GMPq::Rmpq_set_z($q, $z);
+                Math::GMPq::Rmpq_set_z($q, $z);
 
-            if ($pow < 0) {
-                if (!Math::GMPq::Rmpq_sgn($q)) {
-                    return inf();
+                if ($pow < 0) {
+                    if (!Math::GMPq::Rmpq_sgn($q)) {
+                        return inf();
+                    }
+                    Math::GMPq::Rmpq_inv($q, $q);
                 }
-                Math::GMPq::Rmpq_inv($q, $q);
+            }
+            else {
+                Math::GMPq::Rmpq_numref($z, $$x);
+                Math::GMPz::Rmpz_pow_ui($z, $z, CORE::abs($pow));
+
+                Math::GMPq::Rmpq_set_num($q, $z);
+
+                Math::GMPq::Rmpq_denref($z, $$x);
+                Math::GMPz::Rmpz_pow_ui($z, $z, CORE::abs($pow));
+
+                Math::GMPq::Rmpq_set_den($q, $z);
+                Math::GMPq::Rmpq_canonicalize($q);
+
+                Math::GMPq::Rmpq_inv($q, $q) if $pow < 0;
             }
 
             return bless \$q, __PACKAGE__;
         }
-
-        if (Math::GMPq::Rmpq_sgn($$x) < 0 and !Math::GMPq::Rmpq_integer_p($$y)) {
+        elsif (Math::GMPq::Rmpq_sgn($$x) < 0) {
             return Sidef::Types::Number::Complex->new($x)->pow($y);
         }
 
