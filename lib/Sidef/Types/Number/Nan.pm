@@ -104,7 +104,9 @@ package Sidef::Types::Number::Nan {
     *erf         = \&nan;
     *erfc        = \&nan;
     *eint        = \&nan;
+    *ei          = \&nan;
     *li2         = \&nan;
+    *li          = \&nan;
     *max         = \&nan;
     *min         = \&nan;
     *int         = \&nan;

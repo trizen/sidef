@@ -129,6 +129,7 @@ package Sidef::Types::Number::Ninf {
     *len    = \&inf;
     *size   = \&inf;
     *not    = \&inf;
+    *li     = \&inf;
 
     sub ninf { NINF }
 
@@ -173,6 +174,7 @@ package Sidef::Types::Number::Ninf {
     *acsc  = \&zero;
     *acsch = \&zero;
     *eint  = \&zero;
+    *ei    = \&zero;
     *exp   = \&zero;
     *exp2  = \&zero;
     *exp10 = \&zero;

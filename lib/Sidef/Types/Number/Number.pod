@@ -632,11 +632,13 @@ Return the
 
 =cut
 
-=head2 eint
+=head2 ei
 
-Number.eint() -> I<Obj>
+Number.ei() -> I<Obj>
 
 Return the
+
+Aliases: I<eint>
 
 =cut
 
@@ -1069,6 +1071,14 @@ Return the
 =head2 lgrt
 
 Number.lgrt() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 li
+
+Number.li() -> I<Obj>
 
 Return the
 

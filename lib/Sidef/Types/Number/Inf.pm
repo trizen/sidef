@@ -166,7 +166,9 @@ package Sidef::Types::Number::Inf {
     *digamma          = \&inf;
     *lngamma          = \&inf;
     *eint             = \&inf;
-    *li2              = \&inf;
+    *ei               = \&inf;
+    *li2              = \&ninf;
+    *li               = \&inf;
     *inc              = \&inf;
     *dec              = \&inf;
     *int              = \&inf;

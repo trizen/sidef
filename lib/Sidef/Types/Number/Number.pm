@@ -1212,6 +1212,15 @@ package Sidef::Types::Number::Number {
         _mpfr2big($r);
     }
 
+    *ei = \&eint;
+
+    sub li {
+        my $r = _big2mpfr($_[0]);
+        Math::MPFR::Rmpfr_log($r, $r, $ROUND);
+        Math::MPFR::Rmpfr_eint($r, $r, $ROUND);
+        _mpfr2big($r);
+    }
+
     sub li2 {
         my $r = _big2mpfr($_[0]);
         Math::MPFR::Rmpfr_li2($r, $r, $ROUND);
