@@ -1,0 +1,23 @@
+#!/usr/bin/ruby
+
+#
+## Closed-form for Zeta(2n)
+#
+
+# See also: https://en.wikipedia.org/wiki/Riemann_zeta_function
+
+func bernoulli_number(n) is cached {
+
+    n.is_one && return 1/2
+    n.is_odd && return 0
+
+    ^n -> reduce({|a, k| a - (__FUNC__(k) * binomial(n, k) / (n - k + 1))}, 1)
+}
+
+func zeta_2n(Number n {.is_even}) {
+    ((-1)**(n/2 + 1) * 2**(n - 1) * Num.pi**n * bernoulli_number(n)) / n!
+}
+
+for n in (1 .. 10) {
+    say "zeta(#{2*n}) = #{zeta_2n(2*n)}"
+}

@@ -857,6 +857,7 @@ scripts/WWW/socket.sf
 scripts/WWW/socket_inet.sf
 scripts/xiaolin_wu_s_line_algorithm.sf
 scripts/y_combinator.sf
+scripts/zeta_2n.sf
 share/sidef/Memoize.sm
 share/sidef/ntheory.sm
 t/00-load.t
