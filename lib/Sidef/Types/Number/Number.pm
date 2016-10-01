@@ -1934,15 +1934,13 @@ package Sidef::Types::Number::Number {
         _mpz2big($x);
     }
 
-    # By default, the test is correct up to a maximum value of 341,550,071,728,320
-    # See: https://en.wikipedia.org/wiki/Miller%E2%80%93Rabin_primality_test#Deterministic_variants_of_the_test
     sub is_prime {
         my ($x, $k) = @_;
         if (
             Math::GMPz::Rmpz_probab_prime_p(_big2mpz($x),
                                             defined($k)
                                             ? do { _valid(\$k); CORE::int Math::GMPq::Rmpq_get_d($$k) }
-                                            : 15) > 0
+                                            : 20) > 0
           ) {
             (Sidef::Types::Bool::Bool::TRUE);
         }

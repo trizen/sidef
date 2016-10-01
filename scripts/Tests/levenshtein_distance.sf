@@ -13,8 +13,8 @@ func levenshtein(s, t) {
     d.range.each { |i| d[i][0] = i }
     d[0].range.each { |i| d[0][i] = i }
 
-    range(1, t.len).each { |j|
-        range(1, s.len).each { |i|
+    for j in (1 .. t.len) {
+        for i in (1 .. s.len) {
 
             if (s[i-1] == t[j-1]) {
                 d[i][j] = d[i-1][j-1];

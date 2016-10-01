@@ -30,6 +30,7 @@ func is_prime(_n, _k)  { false }
 
 var numbers = [
     61_794_479,
+    2867561004669023153611,
     803_086_491,
     171_659_461_843,
     902_802_468_593,
@@ -39,7 +40,7 @@ var numbers = [
 ];
 
 numbers.each { |n|
-    var p = is_prime(n, 10);
+    var p = is_prime(n, 12);
     say ("#{n} is" + (p ? ' ' : ' NOT ') + 'prime');
     assert_eq(p, n.is_prime);
 }
