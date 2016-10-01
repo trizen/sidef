@@ -29,6 +29,7 @@ package Sidef::Types::Number::Inf {
     }
 
     *iadd = \&add;
+    *fadd = \&add;
 
     sub sub {
         my ($x, $y) = @_;
@@ -36,6 +37,7 @@ package Sidef::Types::Number::Inf {
     }
 
     *isub = \&sub;
+    *fsub = \&sub;
 
     sub mul {
         my ($x, $y) = @_;
@@ -44,6 +46,7 @@ package Sidef::Types::Number::Inf {
     }
 
     *imul = \&mul;
+    *fmul = \&mul;
 
     sub div {
         my ($x, $y) = @_;
@@ -54,6 +57,7 @@ package Sidef::Types::Number::Inf {
     }
 
     *idiv = \&div;
+    *fdiv = \&div;
 
     sub is_pos { Sidef::Types::Bool::Bool::TRUE }
 
@@ -349,6 +353,8 @@ package Sidef::Types::Number::Inf {
           : $y->is_zero ? (Sidef::Types::Number::Number::ONE)
           :               $x;
     }
+
+    *fpow = \&pow;
 
     sub ipow {
         $_[0]->pow($_[1]->int);

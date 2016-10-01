@@ -27,6 +27,7 @@ package Sidef::Types::Number::Ninf {
     }
 
     *iadd = \&add;
+    *fadd = \&add;
 
     sub sub {
         my ($x, $y) = @_;
@@ -34,6 +35,7 @@ package Sidef::Types::Number::Ninf {
     }
 
     *isub = \&sub;
+    *fsub = \&sub;
 
     sub mul {
         my ($x, $y) = @_;
@@ -42,6 +44,7 @@ package Sidef::Types::Number::Ninf {
     }
 
     *imul = \&mul;
+    *fmul = \&mul;
 
     sub div {
         my ($x, $y) = @_;
@@ -52,6 +55,7 @@ package Sidef::Types::Number::Ninf {
     }
 
     *idiv = \&div;
+    *fdiv = \&div;
 
     sub is_pos { Sidef::Types::Bool::Bool::FALSE }
 
@@ -286,7 +290,11 @@ package Sidef::Types::Number::Ninf {
           :               $x->neg;
     }
 
-    *ipow = \&pow;
+    *fpow = \&pow;
+
+    sub ipow {
+        $_[0]->pow($_[1]->int);
+    }
 
     #
     ## binomial(-inf, x) = 0        | with x < 0

@@ -452,6 +452,14 @@ package Sidef::Types::Number::Number {
         _mpz2big($x);
     }
 
+    sub fadd {
+        my ($x, $y) = @_;
+        _valid(\$y);
+        $x = _big2mpfr($x);
+        Math::MPFR::Rmpfr_add($x, $x, _big2mpfr($y), $ROUND);
+        _mpfr2big($x);
+    }
+
     sub sub {
         my ($x, $y) = @_;
 
@@ -478,6 +486,14 @@ package Sidef::Types::Number::Number {
         $x = _big2mpz($x);
         Math::GMPz::Rmpz_sub($x, $x, _big2mpz($y));
         _mpz2big($x);
+    }
+
+    sub fsub {
+        my ($x, $y) = @_;
+        _valid(\$y);
+        $x = _big2mpfr($x);
+        Math::MPFR::Rmpfr_sub($x, $x, _big2mpfr($y), $ROUND);
+        _mpfr2big($x);
     }
 
     sub mul {
@@ -509,6 +525,14 @@ package Sidef::Types::Number::Number {
         _mpz2big($x);
     }
 
+    sub fmul {
+        my ($x, $y) = @_;
+        _valid(\$y);
+        $x = _big2mpfr($x);
+        Math::MPFR::Rmpfr_mul($x, $x, _big2mpfr($y), $ROUND);
+        _mpfr2big($x);
+    }
+
     sub div {
         my ($x, $y) = @_;
 
@@ -532,6 +556,14 @@ package Sidef::Types::Number::Number {
         my $r = Math::GMPq::Rmpq_init();
         Math::GMPq::Rmpq_div($r, $$x, $$y);
         bless \$r, __PACKAGE__;
+    }
+
+    sub fdiv {
+        my ($x, $y) = @_;
+        _valid(\$y);
+        $x = _big2mpfr($x);
+        Math::MPFR::Rmpfr_div($x, $x, _big2mpfr($y), $ROUND);
+        _mpfr2big($x);
     }
 
     sub idiv {
@@ -637,7 +669,15 @@ package Sidef::Types::Number::Number {
         }
 
         _valid(\$y);
-        return $x->pow($y->inv);
+
+        if (Math::GMPq::Rmpq_sgn($$y) > 0 and Math::GMPq::Rmpq_integer_p($$y)) {
+            $x = _big2mpfr($x);
+            Math::MPFR::Rmpfr_root($x, $x, Math::GMPq::Rmpq_get_d($$y), $ROUND);
+            _mpfr2big($x);
+        }
+        else {
+            $x->pow($y->inv);
+        }
     }
 
     sub iroot {
@@ -730,6 +770,14 @@ package Sidef::Types::Number::Number {
             return Sidef::Types::Number::Complex->new($x)->pow($y);
         }
 
+        $x = _big2mpfr($x);
+        Math::MPFR::Rmpfr_pow($x, $x, _big2mpfr($y), $ROUND);
+        _mpfr2big($x);
+    }
+
+    sub fpow {
+        my ($x, $y) = @_;
+        _valid(\$y);
         $x = _big2mpfr($x);
         Math::MPFR::Rmpfr_pow($x, $x, _big2mpfr($y), $ROUND);
         _mpfr2big($x);
