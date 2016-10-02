@@ -205,6 +205,7 @@ package Sidef::Types::Number::Inf {
     *grad2deg         = \&inf;
     *round            = \&inf;
     *roundf           = \&inf;
+    *popcount         = \&nan;
 
     sub zero { Sidef::Types::Number::Number::ZERO }
 

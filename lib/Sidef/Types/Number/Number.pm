@@ -1486,6 +1486,13 @@ package Sidef::Types::Number::Number {
         }
     }
 
+    sub popcount {
+        my $z = _big2mpz($_[0]);
+        Math::GMPz::Rmpz_neg($z, $z) if Math::GMPz::Rmpz_sgn($z) < 0;
+        my $count = Math::GMPz::Rmpz_popcount($z);
+        __PACKAGE__->_new_uint($count);
+    }
+
     sub is_int {
         my ($x) = @_;
         Math::GMPq::Rmpq_integer_p($$x)
