@@ -140,6 +140,7 @@ package Sidef::Types::Number::Nan {
     *roundf      = \&nan;
     *re          = \&nan;
     *real        = \&nan;
+    *bernreal    = \&nan;
 
     sub cmp { }
 

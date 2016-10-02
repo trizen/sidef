@@ -114,13 +114,12 @@ package Sidef::Types::Number::Number {
                 return __PACKAGE__->new($num)->div(__PACKAGE__->new($den));
             }
 
-            eval { Math::GMPq::Rmpq_set_str($r, $rat, $base) };
+            # Set the string
+            eval { Math::GMPq::Rmpq_set_str($r, $rat, $base); 1 } // return nan();
 
-            # Return NaN in case of an error
-            $@ && return nan();
-
-            #$@ && die "[ERROR] Value <<$num>> is not a valid base-$base number";
+            # Canonicalize the fraction
             Math::GMPq::Rmpq_canonicalize($r) if $is_frac;
+
             bless \$r, __PACKAGE__;
           };
     }
@@ -803,7 +802,7 @@ package Sidef::Types::Number::Number {
 
         if ($pow < 0) {
             return inf() if !Math::GMPz::Rmpz_sgn($x);
-            Math::GMPz::Rmpz_div($x, $ONE_Z, $x);
+            Math::GMPz::Rmpz_tdiv_q($x, $ONE_Z, $x);
         }
 
         _mpz2big($x);
@@ -1239,6 +1238,23 @@ package Sidef::Types::Number::Number {
     sub zeta {
         my $r = _big2mpfr($_[0]);
         Math::MPFR::Rmpfr_zeta($r, $r, $ROUND);
+        _mpfr2big($r);
+    }
+
+    sub bernreal {
+        my $r = _big2mpfr($_[0]);
+
+        Math::MPFR::Rmpfr_trunc($r, $r);
+        Math::MPFR::Rmpfr_zero_p($r)  && return ONE;
+        Math::MPFR::Rmpfr_sgn($r) < 0 && return nan();
+        Math::MPFR::Rmpfr_neg($r, $r, $ROUND);
+
+        my $zeta = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_set($zeta, $r, $ROUND);
+        Math::MPFR::Rmpfr_add_ui($zeta, $zeta, 1, $ROUND);
+        Math::MPFR::Rmpfr_zeta($zeta, $zeta, $ROUND);
+        Math::MPFR::Rmpfr_mul($r, $r, $zeta, $ROUND);
+
         _mpfr2big($r);
     }
 

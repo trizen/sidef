@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Test::More;
 
-plan tests => 106;
+plan tests => 114;
 
 use Sidef;
 
@@ -174,6 +174,22 @@ is("$r", "0");
     is($zero, $o->new(0));
     is($one,  $o->new(1));
     is($mone, $o->new(-1));
+
+##############################################################
+    # special integer truncations
+
+    is($o->new(-3)->ipow($o->new(-5)), $zero);
+    is($o->new(-3)->ipow($o->new(-4)), $zero);
+    is($o->new(-1)->ipow($o->new(-5)), $mone);
+    is($o->new(-1)->ipow($o->new(-4)), $one);
+
+##############################################################
+    # pow + int truncation
+
+    is($o->new(-3)->pow($o->new(-5))->int, $zero);
+    is($o->new(-3)->pow($o->new(-4))->int, $zero);
+    is($o->new(-1)->pow($o->new(-5))->int, $mone);
+    is($o->new(-1)->pow($o->new(-4))->int, $one);
 }
 
 ##############################################################
