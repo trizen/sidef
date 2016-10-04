@@ -420,7 +420,7 @@ package Sidef::Types::Hash::Hash {
             my @body;
             $addr{$refaddr} = Sidef::Types::Array::Pair->new($root, \@body);
 
-            foreach my $k (sort { (length($a) <=> length($b)) || ($a cmp $b) } CORE::keys %$obj) {
+            foreach my $k (sort { (CORE::length($a) <=> CORE::length($b)) || ($a cmp $b) } CORE::keys %$obj) {
                 my $v = $obj->{$k};
                 if (ref($v) eq __PACKAGE__) {
                     push @body, $v->as_tree(Sidef::Types::String::String->new($k));

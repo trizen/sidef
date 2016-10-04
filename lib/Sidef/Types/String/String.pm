@@ -1345,10 +1345,10 @@ package Sidef::Types::String::String {
             $str =~ /[^\040-\176]/ or return bless(\qq("$str"), __PACKAGE__);
 
             $str =~ s/([\a\b\t\n\f\r\e\13])/$esc{$1}/g;
-            $str =~ s/([\0-\037])(?!\d)/sprintf('\\%o',ord($1))/eg;
+            $str =~ s/([\0-\037])(?!\d)/CORE::sprintf('\\%o',CORE::ord($1))/eg;
 
-            $str =~ s/([\0-\037\177-\377])/sprintf('\\x%02X',ord($1))/eg;
-            $str =~ s/([^\040-\176])/sprintf('\\x{%X}',ord($1))/eg;
+            $str =~ s/([\0-\037\177-\377])/CORE::sprintf('\\x%02X',CORE::ord($1))/eg;
+            $str =~ s/([^\040-\176])/CORE::sprintf('\\x{%X}',CORE::ord($1))/eg;
 
             bless \qq("$str"), __PACKAGE__;
         }

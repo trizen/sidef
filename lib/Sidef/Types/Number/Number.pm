@@ -892,10 +892,10 @@ package Sidef::Types::Number::Number {
         Math::MPFR::Rmpfr_log($d, $d, $ROUND);
 
         my $p = Math::MPFR::Rmpfr_init2($PREC);
-        Math::MPFR::Rmpfr_ui_pow_ui($p, 10, int($PREC / 4), $ROUND);
+        Math::MPFR::Rmpfr_ui_pow_ui($p, 10, CORE::int($PREC / 4), $ROUND);
         Math::MPFR::Rmpfr_ui_div($p, 1, $p, $ROUND);
 
-        my $x = Math::MPFR::Rmpfr_init2($PREC);
+        $x = Math::MPFR::Rmpfr_init2($PREC);
         Math::MPFR::Rmpfr_set_ui($x, 1, $ROUND);
 
         my $y = Math::MPFR::Rmpfr_init2($PREC);
@@ -2092,7 +2092,7 @@ package Sidef::Types::Number::Number {
             Math::GMPz::Rmpz_root($r, $z, $pow);
 
             return (
-                    (Math::GMPz::Rmpz_remove($z, $z, $r) == $pow)
+                    (Math::GMPz::Rmpz_remove($z, $z, $r) == $pow and Math::GMPz::Rmpz_cmp_ui($z, 1) == 0)
                     ? Sidef::Types::Bool::Bool::TRUE
                     : Sidef::Types::Bool::Bool::FALSE
                    );
