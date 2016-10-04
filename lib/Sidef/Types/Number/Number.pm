@@ -1489,8 +1489,7 @@ package Sidef::Types::Number::Number {
     sub popcount {
         my $z = _big2mpz($_[0]);
         Math::GMPz::Rmpz_neg($z, $z) if Math::GMPz::Rmpz_sgn($z) < 0;
-        my $count = Math::GMPz::Rmpz_popcount($z);
-        __PACKAGE__->_new_uint($count);
+        __PACKAGE__->_new_uint(Math::GMPz::Rmpz_popcount($z));
     }
 
     sub is_int {
@@ -2072,21 +2071,37 @@ package Sidef::Types::Number::Number {
     *is_sqr = \&is_square;
 
     sub is_power {
-        my ($x) = @_;
+        my ($x, $y) = @_;
 
         if (!Math::GMPq::Rmpq_integer_p($$x)) {
             return (Sidef::Types::Bool::Bool::FALSE);
         }
 
+        if (defined $y) {
+            _valid(\$y);
+            my $pow = CORE::int(Math::GMPq::Rmpq_get_d($$y));
+
+            # Don't accept a negative power
+            $pow <= 0 && return 0;
+
+            my $z = Math::GMPz::Rmpz_init();
+            my $r = Math::GMPz::Rmpz_init();
+            Math::GMPq::Rmpq_numref($z, $$x);
+            Math::GMPz::Rmpz_root($r, $z, $pow);
+
+            return (
+                    (Math::GMPz::Rmpz_remove($z, $z, $r) == $pow)
+                    ? Sidef::Types::Bool::Bool::TRUE
+                    : Sidef::Types::Bool::Bool::FALSE
+                   );
+        }
+
         my $nz = Math::GMPz::Rmpz_init();
         Math::GMPq::Rmpq_numref($nz, $$x);
 
-        if (Math::GMPz::Rmpz_perfect_power_p($nz)) {
-            (Sidef::Types::Bool::Bool::TRUE);
-        }
-        else {
-            (Sidef::Types::Bool::Bool::FALSE);
-        }
+        Math::GMPz::Rmpz_perfect_power_p($nz)
+          ? Sidef::Types::Bool::Bool::TRUE
+          : Sidef::Types::Bool::Bool::FALSE;
     }
 
     *is_pow = \&is_power;
