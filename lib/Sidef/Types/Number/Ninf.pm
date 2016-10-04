@@ -117,6 +117,7 @@ package Sidef::Types::Number::Ninf {
     *digit            = \&nan;
     *bernreal         = \&nan;
     *popcount         = \&nan;
+    *valuation        = \&nan;
 
     sub inf { Sidef::Types::Number::Inf::INF }
 

@@ -106,6 +106,7 @@ package Sidef::Types::Number::Inf {
     *next_power  = \&nan;
     *digit       = \&nan;
     *bernreal    = \&nan;
+    *valuation   = \&nan;
 
     sub as_bin {
         state $x = Sidef::Types::String::String->new;

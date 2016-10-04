@@ -142,6 +142,7 @@ package Sidef::Types::Number::Nan {
     *real        = \&nan;
     *bernreal    = \&nan;
     *popcount    = \&nan;
+    *valuation   = \&nan;
 
     sub cmp { }
 

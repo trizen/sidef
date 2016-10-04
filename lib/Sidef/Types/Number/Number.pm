@@ -2028,19 +2028,21 @@ package Sidef::Types::Number::Number {
         _mpz2big($x);
     }
 
+    sub valuation {
+        my ($x, $y) = @_;
+        _valid(\$y);
+        my $r = _big2mpz($x);
+        __PACKAGE__->_new_uint(Math::GMPz::Rmpz_remove($r, $r, _big2mpz($y)));
+    }
+
     sub is_prime {
         my ($x, $k) = @_;
-        if (
-            Math::GMPz::Rmpz_probab_prime_p(_big2mpz($x),
-                                            defined($k)
-                                            ? do { _valid(\$k); CORE::int Math::GMPq::Rmpq_get_d($$k) }
-                                            : 20) > 0
-          ) {
-            (Sidef::Types::Bool::Bool::TRUE);
-        }
-        else {
-            (Sidef::Types::Bool::Bool::FALSE);
-        }
+        (
+         Math::GMPz::Rmpz_probab_prime_p(_big2mpz($x),
+                                         defined($k) ? do { _valid(\$k); CORE::int Math::GMPq::Rmpq_get_d($$k) }
+                                         : 20) > 0
+          ) ? Sidef::Types::Bool::Bool::TRUE
+          : Sidef::Types::Bool::Bool::FALSE;
     }
 
     sub next_prime {
