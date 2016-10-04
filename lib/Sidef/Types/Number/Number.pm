@@ -8,7 +8,7 @@ package Sidef::Types::Number::Number {
     use Math::MPFR qw();
 
     our $ROUND = Math::MPFR::MPFR_RNDN();
-    our $PREC  = 128;
+    our $PREC  = 200;
 
     my $ONE = Math::GMPq::Rmpq_init();
     Math::GMPq::Rmpq_set_ui($ONE, 1, 1);
