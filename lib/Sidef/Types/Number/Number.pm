@@ -163,17 +163,19 @@ package Sidef::Types::Number::Number {
 
     sub _mpfr2big {
 
-        if (Math::MPFR::Rmpfr_inf_p($_[0])) {
-            if (Math::MPFR::Rmpfr_sgn($_[0]) > 0) {
-                return state $x = inf();
+        if (!Math::MPFR::Rmpfr_number_p($_[0])) {
+            if (Math::MPFR::Rmpfr_inf_p($_[0])) {
+                if (Math::MPFR::Rmpfr_sgn($_[0]) > 0) {
+                    return state $x = inf();
+                }
+                else {
+                    return state $x = ninf();
+                }
             }
-            else {
-                return state $x = ninf();
-            }
-        }
 
-        if (Math::MPFR::Rmpfr_nan_p($_[0])) {
-            return state $x = nan();
+            if (Math::MPFR::Rmpfr_nan_p($_[0])) {
+                return state $x = nan();
+            }
         }
 
         my $r = Math::GMPq::Rmpq_init();
