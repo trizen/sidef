@@ -1875,8 +1875,10 @@ package Sidef::Types::Number::Number {
     sub modpow {
         my ($x, $y, $z) = @_;
         _valid(\$y, \$z);
+        my $mod = _big2mpz($z);
+        Math::GMPz::Rmpz_sgn($mod) || return nan();
         $x = _big2mpz($x);
-        Math::GMPz::Rmpz_powm($x, $x, _big2mpz($y), _big2mpz($z));
+        Math::GMPz::Rmpz_powm($x, $x, _big2mpz($y), $mod);
         _mpz2big($x);
     }
 
