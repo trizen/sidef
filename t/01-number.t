@@ -1,11 +1,11 @@
-#!perl
+#!perl -T
 
 ###############################################################################
 
 use strict;
 use warnings;
 
-use Test::More tests => 115;
+use Test::More tests => 119;
 
 use Sidef;
 
@@ -103,23 +103,33 @@ my $o = 'Sidef::Types::Number::Number';
     my $pow  = $o->new(42);
     my $bint = $x->ipow($pow);
 
+    my $zero = $o->new(0);
+    my $one  = $o->new(1);
+    my $mone = $o->new(-1);
+
+    ok($mone->is_pow($o->new(3)));
+    ok(!($mone->is_pow($o->new(2))));
+
+    ok($mone->is_pow($o->new(-3)));
+    ok(!($mone->is_pow($o->new(-2))));
+
     ok($bint->is_pow($pow));
     ok($o->new(-27)->is_pow($o->new(3)));
 
     ok(!($o->new(-25)->is_pow($o->new(2))));
     ok(!($o->new(-27)->is_pow($o->new(-3))));
 
-    ok($o->new(1)->is_pow($o->new(3)));
-    ok($o->new(1)->is_pow($o->new(-2)));
+    ok($one->is_pow($o->new(3)));
+    ok($one->is_pow($o->new(-2)));
 
-    ok($o->new(0)->is_pow($o->new(1)));
-    ok($o->new(0)->is_pow($o->new(3)));
+    ok($zero->is_pow($one));
+    ok($zero->is_pow($o->new(3)));
 
-    ok(!($o->new(0)->is_pow($o->new(0))));
-    ok(!($o->new(0)->is_pow($o->new(-3))));
-    ok(!($o->new(0)->is_pow($o->new(-4))));
-    ok(!($o->new(0)->is_pow($o->new(-2))));
-    ok(!($o->new(0)->is_pow($o->new(0))));
+    ok(!($zero->is_pow($zero)));
+    ok(!($zero->is_pow($o->new(-3))));
+    ok(!($zero->is_pow($o->new(-4))));
+    ok(!($zero->is_pow($o->new(-2))));
+    ok(!($zero->is_pow($zero)));
 
     ok($bint->is_pow($o->new(2)));
     ok($bint->is_pow($o->new(3)));

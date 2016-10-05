@@ -686,6 +686,7 @@ package Sidef::Types::Number::Number {
         _valid(\$y);
 
         $x = _big2mpz($x);
+
         my $root = CORE::int(Math::GMPq::Rmpq_get_d($$y));
 
         if ($root == 0) {
@@ -698,15 +699,12 @@ package Sidef::Types::Number::Number {
             Math::GMPz::Rmpz_cmp_ui($x, 1) == 0 and return ONE;       # 1 / 1^k = 1
             return $sign < 0 ? nan() : ZERO;
         }
+        elsif ($root % 2 == 0 and Math::GMPz::Rmpz_sgn($x) < 0) {
+            return nan();
+        }
 
-        my ($is_even, $is_neg) = $root % 2 == 0;
-        ($is_neg = Math::GMPz::Rmpz_sgn($x) < 0) if $is_even;
-        Math::GMPz::Rmpz_abs($x, $x) if ($is_even && $is_neg);
         Math::GMPz::Rmpz_root($x, $x, $root);
-
-        $is_even && $is_neg
-          ? Sidef::Types::Number::Complex->new(0, _mpz2big($x))
-          : _mpz2big($x);
+        _mpz2big($x);
     }
 
     sub sqr {
@@ -2036,8 +2034,10 @@ package Sidef::Types::Number::Number {
     sub valuation {
         my ($x, $y) = @_;
         _valid(\$y);
-        my $r = _big2mpz($x);
-        __PACKAGE__->_new_uint(Math::GMPz::Rmpz_remove($r, $r, _big2mpz($y)));
+        my $z = _big2mpz($y);
+        Math::GMPz::Rmpz_sgn($z) || return ZERO;
+        $x = _big2mpz($x);
+        __PACKAGE__->_new_uint(Math::GMPz::Rmpz_remove($x, $x, $z));
     }
 
     sub is_prime {
@@ -2091,6 +2091,11 @@ package Sidef::Types::Number::Number {
               && return Sidef::Types::Bool::Bool::TRUE;
 
             my $pow = CORE::int(Math::GMPq::Rmpq_get_d($$y));
+
+            # Return a true value when $x=-1 and $y is odd
+            Math::GMPq::Rmpq_equal($$x, $MONE)
+              and $pow % 2
+              and return Sidef::Types::Bool::Bool::TRUE;
 
             # Don't accept a non-positive power
             # Also, when $x is negative and $y is even, return faster

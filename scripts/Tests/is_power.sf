@@ -1,0 +1,21 @@
+#!/usr/bin/ruby
+
+# Test the built-in method `is_pow`;
+# And also test `iroot` and `ipow`;
+
+func is_power(n, k) {
+    n.iroot(k).ipow(k) == n
+}
+
+for i in (-100 .. 100) {
+    say "3: #{i}" if is_power(i, 3)
+    say "4: #{i}" if is_power(i, 4)
+
+    if (is_power(i, 3) != i.is_pow(3)) {
+        die "error is_power(#{i}, 3)"
+    }
+
+    if (is_power(i, 4) != i.is_pow(4)) {
+        die "error is_power(#{i}, 4)"
+    }
+}

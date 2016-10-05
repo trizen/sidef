@@ -145,7 +145,7 @@ my $two  = $one->add($one);
 my $mtwo = $two->neg;
 
 is($mone->root($two),  $i);
-is($mone->iroot($two), $i);
+is($mone->iroot($two), $nan);
 
 is($one->root($mtwo),  $one);
 is($one->iroot($mtwo), $one);
