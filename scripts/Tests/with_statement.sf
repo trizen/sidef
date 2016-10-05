@@ -55,4 +55,34 @@ else {
 
 assert_eq(ok, [42, 'z', 1234, 'else', 'else2'])
 
+#
+## Return tests
+#
+
+var tests = [
+    [1, nil, 'a'],
+    [nil, 1, 'b'],
+    [1, 1, 'a'],
+    [nil, nil, 'c'],
+]
+
+for a,b,c in tests {
+
+    var x = (
+        with(a) {
+            'a'
+        }
+        orwith(b) {
+            'b'
+        }
+        else {
+            'c'
+        }
+    )
+
+    if (x != c) {
+        die "error for [#{a}, #{b}] - got: #{x}, but expected #{c}"
+    }
+}
+
 say "** Test passed!"
