@@ -1940,9 +1940,10 @@ package Sidef::Types::Number::Number {
 
     sub factorial {
         my ($x) = @_;
-        return nan() if Math::GMPq::Rmpq_sgn($$x) < 0;
+        my $n = CORE::int(Math::GMPq::Rmpq_get_d($$x));
+        return nan() if $n < 0;
         my $r = Math::GMPz::Rmpz_init();
-        Math::GMPz::Rmpz_fac_ui($r, CORE::int(Math::GMPq::Rmpq_get_d($$x)));
+        Math::GMPz::Rmpz_fac_ui($r, $n);
         _mpz2big($r);
     }
 
@@ -1950,9 +1951,10 @@ package Sidef::Types::Number::Number {
 
     sub double_factorial {
         my ($x) = @_;
-        return nan() if Math::GMPq::Rmpq_sgn($$x) < 0;
+        my $n = CORE::int(Math::GMPq::Rmpq_get_d($$x));
+        return nan() if $n < 0;
         my $r = Math::GMPz::Rmpz_init();
-        Math::GMPz::Rmpz_2fac_ui($r, CORE::int(Math::GMPq::Rmpq_get_d($$x)));
+        Math::GMPz::Rmpz_2fac_ui($r, $n);
         _mpz2big($r);
     }
 
@@ -1960,17 +1962,28 @@ package Sidef::Types::Number::Number {
 
     sub primorial {
         my ($x) = @_;
-        return nan() if Math::GMPq::Rmpq_sgn($$x) < 0;
+        my $n = CORE::int(Math::GMPq::Rmpq_get_d($$x));
+        return nan() if $n < 0;
         my $r = Math::GMPz::Rmpz_init();
-        Math::GMPz::Rmpz_primorial_ui($r, CORE::int(Math::GMPq::Rmpq_get_d($$x)));
+        Math::GMPz::Rmpz_primorial_ui($r, $n);
+        _mpz2big($r);
+    }
+
+    sub lucas {
+        my ($x) = @_;
+        my $n = CORE::int(Math::GMPq::Rmpq_get_d($$x));
+        return nan() if $n < 0;
+        my $r = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_lucnum_ui($r, $n);
         _mpz2big($r);
     }
 
     sub fibonacci {
         my ($x) = @_;
-        return nan() if Math::GMPq::Rmpq_sgn($$x) < 0;
+        my $n = CORE::int(Math::GMPq::Rmpq_get_d($$x));
+        return nan() if $n < 0;
         my $r = Math::GMPz::Rmpz_init();
-        Math::GMPz::Rmpz_fib_ui($r, CORE::int(Math::GMPq::Rmpq_get_d($$x)));
+        Math::GMPz::Rmpz_fib_ui($r, $n);
         _mpz2big($r);
     }
 
@@ -2005,14 +2018,6 @@ package Sidef::Types::Number::Number {
         my ($x, $y) = @_;
         _valid(\$y);
         __PACKAGE__->_new_int(Math::GMPz::Rmpz_kronecker(_big2mpz($x), _big2mpz($y)));
-    }
-
-    sub lucas {
-        my ($x) = @_;
-        return nan() if Math::GMPq::Rmpq_sgn($$x) < 0;
-        my $r = Math::GMPz::Rmpz_init();
-        Math::GMPz::Rmpz_lucnum_ui($r, CORE::int(Math::GMPq::Rmpq_get_d($$x)));
-        _mpz2big($r);
     }
 
     sub gcd {
