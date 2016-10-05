@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Test::More;
 
-plan tests => 128;
+plan tests => 151;
 
 use Sidef;
 
@@ -20,6 +20,8 @@ my $five = $o->new(5);
 my $inf  = $o->inf;
 my $nan  = $o->nan;
 my $ninf = $o->ninf;
+
+my $i = Sidef::Types::Number::Complex->new(0, 1);
 
 my $true  = Sidef::Types::Bool::Bool::TRUE;
 my $false = Sidef::Types::Bool::Bool::FALSE;
@@ -98,7 +100,7 @@ like($o->new("-1.01")->acos, qr/^3\.141592653.*?-0\.14130376.*i\z/);
 like($o->new("1.01")->acos,  qr/^-0\.1413037.*i\z/);
 like($o->new("-1.01")->asin, qr/^-1\.5707963.*?\+0\.141303769.*i\z/);
 like($o->new("1.01")->asin,  qr/^1\.57079632.*?\+0\.141303769.*i\z/);
-is($mone->sqrt, Sidef::Types::Number::Complex->new(0, 1));
+is($mone->sqrt,      $i);
 is($inf->pow($nan),  $nan);
 is($ninf->pow($nan), $nan);
 is($nan->pow($inf),  $nan);
@@ -123,6 +125,44 @@ is($inf->root($nan),          $nan);
 is($nan->root($nan),          $nan);
 
 like($inf->asec, qr/^1\.5707963267/);
+
+is($one->root($mone),  $one);
+is($one->iroot($mone), $one);
+
+is($zero->root($zero),  $zero);
+is($zero->iroot($zero), $zero);
+
+is($zero->root($mone),  $inf);
+is($zero->iroot($mone), $inf);
+
+is($mone->root($zero),  $one);
+is($mone->iroot($zero), $one);
+
+is($mone->root($one),  $mone);
+is($mone->iroot($one), $mone);
+
+my $two  = $one->add($one);
+my $mtwo = $two->neg;
+
+is($mone->root($two),  $i);
+is($mone->iroot($two), $i);
+
+is($one->root($mtwo),  $one);
+is($one->iroot($mtwo), $one);
+
+is($mone->root($mtwo),  $i->neg);
+is($mone->iroot($mtwo), $nan);
+
+is($mtwo->root($mtwo)->abs->int, $zero);
+is($mtwo->iroot($mtwo),          $nan);
+
+is($zero->root($mone),  $inf);
+is($zero->iroot($mone), $inf);
+
+is($two->root($mone), $one->div($two));
+
+is($two->iroot($mone), $zero);
+is($two->iroot($mtwo), $zero);
 
 #################################################
 # Pow

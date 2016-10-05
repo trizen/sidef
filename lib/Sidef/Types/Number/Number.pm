@@ -670,15 +670,7 @@ package Sidef::Types::Number::Number {
         }
 
         _valid(\$y);
-
-        if (Math::GMPq::Rmpq_sgn($$y) > 0 and Math::GMPq::Rmpq_integer_p($$y)) {
-            $x = _big2mpfr($x);
-            Math::MPFR::Rmpfr_root($x, $x, Math::GMPq::Rmpq_get_d($$y), $ROUND);
-            _mpfr2big($x);
-        }
-        else {
-            $x->pow($y->inv);
-        }
+        $x->pow($y->inv);
     }
 
     sub iroot {
@@ -695,6 +687,17 @@ package Sidef::Types::Number::Number {
 
         $x = _big2mpz($x);
         my $root = CORE::int(Math::GMPq::Rmpq_get_d($$y));
+
+        if ($root == 0) {
+            Math::GMPz::Rmpz_sgn($x) || return ZERO;    # 0^Inf = 0
+            Math::GMPz::Rmpz_cmpabs_ui($x, 1) == 0 and return ONE;    # 1^Inf = 1 ; (-1)^Inf = 1
+            return inf();
+        }
+        elsif ($root < 0) {
+            my $sign = Math::GMPz::Rmpz_sgn($x) || return inf();      # 1 / 0^k = Inf
+            Math::GMPz::Rmpz_cmp_ui($x, 1) == 0 and return ONE;       # 1 / 1^k = 1
+            return $sign < 0 ? nan() : ZERO;
+        }
 
         my ($is_even, $is_neg) = $root % 2 == 0;
         ($is_neg = Math::GMPz::Rmpz_sgn($x) < 0) if $is_even;
