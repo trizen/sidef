@@ -2081,15 +2081,23 @@ package Sidef::Types::Number::Number {
 
         if (defined $y) {
             _valid(\$y);
+
+            Math::GMPq::Rmpq_equal($$x, $ONE)
+              && return Sidef::Types::Bool::Bool::TRUE;
+
             my $pow = CORE::int(Math::GMPq::Rmpq_get_d($$y));
 
-            # Don't accept a negative power
-            $pow <= 0 && return 0;
+            # Don't accept a non-positive power
+            # Also, when $x is negative and $y is even, return faster
+            if ($pow <= 0 or ($pow % 2 == 0 and Math::GMPq::Rmpq_sgn($$x) < 0)) {
+                return Sidef::Types::Bool::Bool::FALSE;
+            }
 
             my $z = Math::GMPz::Rmpz_init();
             my $r = Math::GMPz::Rmpz_init();
             Math::GMPq::Rmpq_numref($z, $$x);
             Math::GMPz::Rmpz_root($r, $z, $pow);
+            Math::GMPz::Rmpz_sgn($r) || return Sidef::Types::Bool::Bool::TRUE;    # $x was zero
 
             return (
                     (Math::GMPz::Rmpz_remove($z, $z, $r) == $pow and Math::GMPz::Rmpz_cmp_ui($z, 1) == 0)

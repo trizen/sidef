@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 98;
+use Test::More tests => 115;
 
 use Sidef;
 
@@ -98,6 +98,34 @@ my $o = 'Sidef::Types::Number::Number';
     like($o->new(2.1)->ceil,              qr/^3\z/);
     like($o->new(2)->ceil,                qr/^2\z/);
     like($o->new(2.3)->pow($o->new(5.4)), qr/^89.811/);
+
+    my $x    = $o->new(1227);
+    my $pow  = $o->new(42);
+    my $bint = $x->ipow($pow);
+
+    ok($bint->is_pow($pow));
+    ok($o->new(-27)->is_pow($o->new(3)));
+
+    ok(!($o->new(-25)->is_pow($o->new(2))));
+    ok(!($o->new(-27)->is_pow($o->new(-3))));
+
+    ok($o->new(1)->is_pow($o->new(3)));
+    ok($o->new(1)->is_pow($o->new(-2)));
+
+    ok($o->new(0)->is_pow($o->new(1)));
+    ok($o->new(0)->is_pow($o->new(3)));
+
+    ok(!($o->new(0)->is_pow($o->new(0))));
+    ok(!($o->new(0)->is_pow($o->new(-3))));
+    ok(!($o->new(0)->is_pow($o->new(-4))));
+    ok(!($o->new(0)->is_pow($o->new(-2))));
+    ok(!($o->new(0)->is_pow($o->new(0))));
+
+    ok($bint->is_pow($o->new(2)));
+    ok($bint->is_pow($o->new(3)));
+
+    ok(!$bint->is_pow($o->new(4)));
+    ok(!$bint->is_pow($o->new(5)));
 }
 
 ##############################################################################
