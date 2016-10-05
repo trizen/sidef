@@ -2100,8 +2100,8 @@ package Sidef::Types::Number::Number {
             my $pow = CORE::int(Math::GMPq::Rmpq_get_d($$y));
 
             # Return a true value when $x=-1 and $y is odd
-            Math::GMPq::Rmpq_equal($$x, $MONE)
-              and $pow % 2
+            $pow % 2
+              and Math::GMPq::Rmpq_equal($$x, $MONE)
               and return Sidef::Types::Bool::Bool::TRUE;
 
             # Don't accept a non-positive power
