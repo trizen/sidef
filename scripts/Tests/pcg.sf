@@ -1,0 +1,20 @@
+#!/usr/bin/ruby
+
+# Translation of M.E. O'Neill's C code:
+#   http://www.pcg-random.org/download.html
+
+struct PCG32 {
+    Number state,
+    Number inc,
+}
+
+func pcg32(rng) {
+    var oldstate = rng.state
+    rng.state = (oldstate * 6364136223846793005 + (rng.inc | 1))
+    var xorshifted = (((oldstate >> 18) ^ oldstate) >> 27)
+    var rot = (oldstate >> 59)
+    (xorshifted >> rot) | (xorshifted << ((-rot) & 31))
+}
+
+var rng = PCG32(42, 3)
+say 10.of { pcg32(rng) }
