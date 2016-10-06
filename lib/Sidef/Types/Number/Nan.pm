@@ -141,6 +141,8 @@ package Sidef::Types::Number::Nan {
     *re          = \&nan;
     *real        = \&nan;
     *bernreal    = \&nan;
+    *bernfrac    = \&nan;
+    *bern        = \&nan;
     *popcount    = \&nan;
     *valuation   = \&nan;
 

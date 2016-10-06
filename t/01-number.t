@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 119;
+use Test::More tests => 127;
 
 use Sidef;
 
@@ -136,6 +136,29 @@ my $o = 'Sidef::Types::Number::Number';
 
     ok(!$bint->is_pow($o->new(4)));
     ok(!$bint->is_pow($o->new(5)));
+}
+
+##############################################################################
+
+# Bernoulli numbers
+{
+    my %results = qw(
+      0   1
+      1   1/2
+      2   1/6
+      3   0
+      4   -1/30
+      5   0
+      6   1/42
+      );
+
+    foreach my $i (keys %results) {
+        my $bn = $o->new($i)->bernfrac->as_rat;
+        is("$bn", $results{$i});
+    }
+
+    my $bneg = $o->new(-2)->bernfrac;
+    is("$bneg", 'NaN');    # make sure we check for even correctly
 }
 
 ##############################################################################

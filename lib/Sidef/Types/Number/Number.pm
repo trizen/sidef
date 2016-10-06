@@ -1244,6 +1244,47 @@ package Sidef::Types::Number::Number {
         _mpfr2big($r);
     }
 
+    sub bernfrac {
+        my ($n) = @_;
+
+        $n = CORE::int(Math::GMPq::Rmpq_get_d($$n));
+
+        $n == 0 and return ONE;
+        $n > 1 and $n % 2 and return ZERO;    # Bn=0 for odd n>1
+        $n < 0 and return nan();
+
+        state $ONE_Z  = Math::GMPz::Rmpz_init_set_ui(1);
+        state $ZERO_Z = Math::GMPz::Rmpz_init_set_ui(0);
+
+        my @D = ($ZERO_Z, $ONE_Z, ($ZERO_Z) x $n);
+
+        my ($h, $w) = (1, 1);
+        foreach my $i (0 .. $n - 1) {
+            if ($w ^= 1) {
+                $D[$_] += $D[$_ - 1] for (1 .. $h - 1);
+            }
+            else {
+                for (my $k = $h++ ; $k ; --$k) {
+                    $D[$k] += $D[$k + 1];
+                }
+            }
+        }
+
+        my $den = Math::GMPz::Rmpz_init_set($ONE_Z);
+        Math::GMPz::Rmpz_mul_2exp($den, $den, $n + 1);
+        Math::GMPz::Rmpz_sub_ui($den, $den, 2);
+        Math::GMPz::Rmpz_neg($den, $den) if $n % 4 == 0;
+
+        my $r = Math::GMPq::Rmpq_init();
+        Math::GMPq::Rmpq_set_num($r, $D[$h - 1]);
+        Math::GMPq::Rmpq_set_den($r, $den);
+        Math::GMPq::Rmpq_canonicalize($r);
+
+        bless \$r, __PACKAGE__;
+    }
+
+    *bern = \&bernfrac;
+
     sub bernreal {
         my $r = _big2mpfr($_[0]);
 

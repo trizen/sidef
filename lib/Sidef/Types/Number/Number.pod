@@ -442,6 +442,24 @@ Aliases: I<in_base>
 
 =cut
 
+=head2 bern
+
+Number.bern() -> I<Obj>
+
+Return the
+
+Aliases: I<bernfrac>
+
+=cut
+
+=head2 bernreal
+
+Number.bernreal() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 cbrt
 
 Number.cbrt() -> I<Obj>
@@ -692,6 +710,22 @@ Aliases: I<modpow>, I<powmod>
 
 =cut
 
+=head2 fadd
+
+Number.fadd() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 fdiv
+
+Number.fdiv() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 fib
 
 Number.fib() -> I<Obj>
@@ -721,6 +755,30 @@ Return the
 =head2 fmod
 
 Number.fmod() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 fmul
+
+Number.fmul() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 fpow
+
+Number.fpow() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 fsub
+
+Number.fsub() -> I<Obj>
 
 Return the
 
@@ -1282,6 +1340,14 @@ Return the
 
 =cut
 
+=head2 popcount
+
+Number.popcount() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 primorial
 
 Number.primorial() -> I<Obj>
@@ -1433,6 +1499,14 @@ Return the
 =head2 times
 
 Number.times() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 valuation
+
+Number.valuation() -> I<Obj>
 
 Return the
 

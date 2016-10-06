@@ -106,6 +106,8 @@ package Sidef::Types::Number::Inf {
     *next_power  = \&nan;
     *digit       = \&nan;
     *bernreal    = \&nan;
+    *bernfrac    = \&nan;
+    *bern        = \&nan;
     *valuation   = \&nan;
 
     sub as_bin {
