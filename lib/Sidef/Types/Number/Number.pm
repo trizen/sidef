@@ -2042,7 +2042,8 @@ package Sidef::Types::Number::Number {
         my ($x, $y) = @_;
         _valid(\$y);
         my $z = _big2mpz($y);
-        Math::GMPz::Rmpz_sgn($z) || return ZERO;
+        my $sgn = Math::GMPz::Rmpz_sgn($z) || return ZERO;
+        Math::GMPz::Rmpz_abs($z, $z) if $sgn < 0;
         $x = _big2mpz($x);
         __PACKAGE__->_new_uint(Math::GMPz::Rmpz_remove($x, $x, $z));
     }
