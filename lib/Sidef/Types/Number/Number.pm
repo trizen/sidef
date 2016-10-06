@@ -1258,13 +1258,14 @@ package Sidef::Types::Number::Number {
 
         my @D = ($ZERO_Z, $ONE_Z, ($ZERO_Z) x $n);
 
-        my ($h, $w) = (1, 1);
+        my ($h, $w, $k) = (1, 1);
         foreach my $i (0 .. $n - 1) {
             if ($w ^= 1) {
                 $D[$_] += $D[$_ - 1] for (1 .. $h - 1);
             }
             else {
-                for (my $k = $h++ ; $k ; --$k) {
+                $k = $h++;
+                while (--$k) {
                     $D[$k] += $D[$k + 1];
                 }
             }
