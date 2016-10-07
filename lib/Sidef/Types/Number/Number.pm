@@ -2155,10 +2155,11 @@ package Sidef::Types::Number::Number {
             my $r = Math::GMPz::Rmpz_init();
             Math::GMPq::Rmpq_numref($z, $$x);
             Math::GMPz::Rmpz_root($r, $z, $pow);
-            Math::GMPz::Rmpz_sgn($r) || return Sidef::Types::Bool::Bool::TRUE;    # $x was zero
+            my $sgn = Math::GMPz::Rmpz_sgn($r) || return Sidef::Types::Bool::Bool::TRUE;    # $x was zero
+            Math::GMPz::Rmpz_neg($r, $r) if $sgn < 0;
 
             return (
-                    (Math::GMPz::Rmpz_remove($z, $z, $r) == $pow and Math::GMPz::Rmpz_cmp_ui($z, 1) == 0)
+                    (Math::GMPz::Rmpz_remove($z, $z, $r) == $pow and Math::GMPz::Rmpz_cmpabs_ui($z, 1) == 0)
                     ? Sidef::Types::Bool::Bool::TRUE
                     : Sidef::Types::Bool::Bool::FALSE
                    );
