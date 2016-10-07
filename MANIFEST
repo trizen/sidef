@@ -869,7 +869,6 @@ t/02-pow.t
 t/03-mod.t
 t/04-inf_nan.t
 t/05-trignometric.t
-t/09-parser.t
 t/accumulator_factory.t
 t/accumulator_factory_oo.t
 t/ackermann_function.t
@@ -903,6 +902,7 @@ utils/find_invalid_types.pl
 utils/grep_errors.sh
 utils/pod_generator.pl
 utils/test_deparser.pl
+utils/test_parser.pl
 'utils/Web interface/css/main.css'
 'utils/Web interface/index.cgi'
 'utils/Web interface/js/jquery-2.1.3.min.js'

@@ -50,7 +50,7 @@ my %ignore = (
               'barnsley_fern.sf'     => 1,
              );
 
-my $dir = shift() // die "usage: $0 [scripts dir]\n";
+my $dir = catdir(updir, 'scripts');
 
 find {
       wanted => sub { /\.s[fm]\z/ && (-f $_) && test_file($_) },

@@ -1,4 +1,4 @@
-#!perl
+#!/usr/bin/perl
 
 use 5.010;
 use strict;
@@ -10,12 +10,12 @@ no warnings 'once';
 
 use File::Find qw(find);
 use List::Util qw(first);
-use File::Spec::Functions qw(catfile catdir);
+use File::Spec::Functions qw(catfile catdir updir);
 
-use lib 'lib';
+use lib catdir(updir(), 'lib');
 require Sidef;
 
-my $scripts_dir = 'scripts';
+my $scripts_dir = catdir(updir(), 'scripts');
 
 my @scripts;
 find {
@@ -27,7 +27,7 @@ find {
     },
 } => $scripts_dir;
 
-plan tests => (scalar(@scripts) * 3);
+plan tests => (scalar(@scripts) * 2);
 
 foreach my $sidef_script (@scripts) {
 
@@ -44,8 +44,6 @@ foreach my $sidef_script (@scripts) {
 
     my $optimizer = Sidef::Optimizer->new();
     my $oast      = $optimizer->optimize($ast);
-
-    ok(ref($oast), $sidef_script);
 
     my $code = $sidef->compile_ast($oast, 'Perl');
 
