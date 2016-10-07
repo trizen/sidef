@@ -13,17 +13,15 @@ use Sidef;
 my $code = <<'EOT';
 
 func lev(s, t) {
-    var d = [@^(t.len+1), s.len.of{[_]}...];
-    { |i|
-        { |j|
-            d[i][j] = (
-              s[i-1] == t[j-1]
-                ? d[i-1][j-1]
-                : [d[i-1][j], d[i][j-1], d[i-1][j-1]].min+1;
-              );
-        } * t.len;
-    } * s.len;
-    d[-1][-1] \\ [s.len, t.len].min;
+    var d = [@(0 .. t.len), s.len.of {[_]}...]
+    for i,j in (^s ~X ^t) {
+        d[i+1][j+1] = (
+            s[i] == t[j]
+                ? d[i][j]
+                : 1+Math.min(d[i][j+1], d[i+1][j], d[i][j])
+        )
+    }
+    d[-1][-1]
 }
 
 EOT
