@@ -17,7 +17,7 @@ name: Sidef
 provides:
   Sidef:
     file: lib/Sidef.pm
-    version: '2.31'
+    version: '2.32'
   Sidef::Convert::Convert:
     file: lib/Sidef/Convert/Convert.pm
   Sidef::Deparse::Perl:
@@ -142,5 +142,5 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/trizen/sidef
-version: '2.31'
+version: '2.32'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
