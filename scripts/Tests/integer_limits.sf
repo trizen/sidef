@@ -1,0 +1,22 @@
+#!/usr/bin/ruby
+
+#
+## Test the integer limits (32-bit and 64-bit)
+#
+
+var min32 = -2147483648
+var min64 = -9223372036854775808
+
+var max32 = 4294967295
+var max64 = 18446744073709551615
+
+assert_eq(max32 - 1, 4294967294)
+assert_eq(max64 - 1, 18446744073709551614)
+
+assert_eq(log2(max32+1), 32)
+assert_eq(log2(max64+1), 64)
+
+assert_eq(min64.abs.root(63), 2)
+assert_eq(min32.abs.root(31), 2)
+
+say "** Test passed!"

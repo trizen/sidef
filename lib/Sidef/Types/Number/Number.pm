@@ -68,8 +68,9 @@ package Sidef::Types::Number::Number {
     }
 
     sub _new_uint {
-        exists($cache[$_[1]])
-          && return $cache[$_[1]];
+        $_[1] <= 8192
+          and exists($cache[$_[1]])
+          and return $cache[$_[1]];
         my $r = Math::GMPq::Rmpq_init();
         Math::GMPq::Rmpq_set_ui($r, $_[1], 1);
         $_[1] <= 8192
