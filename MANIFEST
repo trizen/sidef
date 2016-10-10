@@ -901,6 +901,7 @@ utils/Experiments/regexp_grammars_parser.pl
 utils/find_invalid_types.pl
 utils/grep_errors.sh
 utils/pod_generator.pl
+utils/sidef2bin.sh
 utils/test_deparser.pl
 utils/test_parser.pl
 'utils/Web interface/css/main.css'
