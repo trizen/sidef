@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 127;
+use Test::More tests => 131;
 
 use Sidef;
 
@@ -150,6 +150,10 @@ my $o = 'Sidef::Types::Number::Number';
       4   -1/30
       5   0
       6   1/42
+      10  5/66
+      12  -691/2730
+      20  -174611/330
+      22  854513/138
       );
 
     foreach my $i (keys %results) {

@@ -1257,7 +1257,7 @@ package Sidef::Types::Number::Number {
         state $ONE_Z  = Math::GMPz::Rmpz_init_set_ui(1);
         state $ZERO_Z = Math::GMPz::Rmpz_init_set_ui(0);
 
-        my @D = ($ZERO_Z, $ONE_Z, ($ZERO_Z) x $n);
+        my @D = ($ZERO_Z, $ONE_Z, ($ZERO_Z) x ($n / 2));
 
         my ($h, $w) = (1, 1);
         foreach my $i (0 .. $n - 1) {
