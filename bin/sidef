@@ -670,7 +670,7 @@ sub __load_sidef_module__ {
                     exists($REQ{$_})
                         ? ()
                         : "BEGIN{ main::__load_sidef_module__('$_') }" } split(' ', $+)
-                  ) . (defined($1) ? "\nuse parent qw($+);\n" : '')
+                  ) . (defined($1) ? "\nuse parent qw(-norequire $1);\n" : '')
             }gxmse;
 
             $INC{$module} = 1;
