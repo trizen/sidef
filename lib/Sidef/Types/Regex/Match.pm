@@ -5,7 +5,7 @@ package Sidef::Types::Regex::Match {
       q{bool} => \&get_value,
       q{""}   => sub { CORE::join(' ', @{$_[0]->{captures}}) },
       q{@{}}  => sub {
-        $_[0]->{_cached_arr} //= [map { Sidef::Types::String::String->new($_) } @{$_[0]->{captures}}];
+        $_[0]->{_cached_cap} //= [map { Sidef::Types::String::String->new($_) } @{$_[0]->{captures}}];
       };
 
     use parent qw(
@@ -80,12 +80,14 @@ package Sidef::Types::Regex::Match {
 
     sub pos {
         my ($self) = @_;
-        Sidef::Types::Array::Array->new([map { Sidef::Types::Number::Number->new($_) } @{$self->{match_pos}}]);
+        Sidef::Types::Array::Array->new(
+                    [@{$self->{_cached_pos} //= [map { Sidef::Types::Number::Number->_new_uint($_) } @{$self->{match_pos}}]}]);
     }
 
     sub captures {
         my ($self) = @_;
-        Sidef::Types::Array::Array->new([map { Sidef::Types::String::String->new($_) } @{$self->{captures}}]);
+        Sidef::Types::Array::Array->new(
+                           [@{$self->{_cached_cap} //= [map { Sidef::Types::String::String->new($_) } @{$self->{captures}}]}]);
     }
 
     *cap  = \&captures;
@@ -118,6 +120,13 @@ package Sidef::Types::Regex::Match {
         my ($self) = @_;
         my $re = $self->{self}->dump;
         Sidef::Types::String::String->new("(${Sidef::Types::String::String->new($self->{obj})->dump} =~ $re)");
+    }
+
+    {
+        no strict 'refs';
+        *{__PACKAGE__ . '::' . '...'} = sub {
+            @{$_[0]->{_cached_cap} //= [map { Sidef::Types::String::String->new($_) } @{$_[0]->{captures}}]};
+        };
     }
 };
 

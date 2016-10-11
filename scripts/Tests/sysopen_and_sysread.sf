@@ -23,8 +23,8 @@ desktopFilesPaths.each { |path|
         var regex = Regex.new(/^(\w.*?)=(.*\S)/m);
 
         while (var match = content.gmatch(regex)) {
-            var (key, value) = match.captures...;
-            fields{key} = value;
+            var (key, value) = match...
+            fields{key} = value
         }
 
         apps.append(fields);
