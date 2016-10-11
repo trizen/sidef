@@ -156,10 +156,42 @@ package Sidef::Types::Number::Number {
         $r;
     }
 
+    ################ CACHE FOR TEMPORARY MPZ OBJECTS ################
+    ## Unfortunately, it turned out to be slightly slower in general.
+#<<<
+    #~ my @tmp_mpz = ((map { scalar Math::GMPz::Rmpz_init() } 1 .. 5), undef);
+
+    #~ {
+        #~ my $limit = @tmp_mpz;
+        #~ my $ptr   = 0;
+
+        #~ sub _big2mpz {
+            #~ my $mpz;
+
+            #~ do {
+                #~ $mpz = $tmp_mpz[$ptr++];
+                #~ if (not defined $mpz) {
+                    #~ #say "here - ", ++$count, "\t",  (caller(1))[3];
+                    #~ $ptr = 0;
+                    #~ $mpz = Math::GMPz::Rmpz_init();
+                #~ }
+            #~ } while (&Internals::SvREFCNT($mpz) > 1);
+
+            #~ if ($ptr == $limit - 1) {
+                #~ $ptr = 0;
+            #~ }
+
+            #~ Math::GMPz::Rmpz_set_q($mpz, ${$_[0]});
+            #~ $mpz;
+        #~ }
+    #~ }
+#>>>
+    #################################################################
+
     sub _big2mpz {
-        my $i = Math::GMPz::Rmpz_init();
-        Math::GMPz::Rmpz_set_q($i, ${$_[0]});
-        $i;
+        my $z = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_set_q($z, ${$_[0]});
+        $z;
     }
 
     sub _mpfr2big {
