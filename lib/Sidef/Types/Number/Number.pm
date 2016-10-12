@@ -2088,13 +2088,13 @@ package Sidef::Types::Number::Number {
     sub is_power {
         my ($x, $y) = @_;
 
-        Math::GMPq::Rmpq_integer_p($$x)
+         $x = $$x;
+
+        Math::GMPq::Rmpq_integer_p($x)
           || return Sidef::Types::Bool::Bool::FALSE;
 
         if (defined $y) {
             _valid(\$y);
-
-            $x = $$x;
 
             Math::GMPq::Rmpq_equal($x, $ONE)
               && return Sidef::Types::Bool::Bool::TRUE;
