@@ -2094,37 +2094,49 @@ package Sidef::Types::Number::Number {
         if (defined $y) {
             _valid(\$y);
 
-            Math::GMPq::Rmpq_equal($$x, $ONE)
+            $x = $$x;
+
+            Math::GMPq::Rmpq_equal($x, $ONE)
               && return Sidef::Types::Bool::Bool::TRUE;
 
-            my $pow = CORE::int(Math::GMPq::Rmpq_get_d($$y));
+            $y = CORE::int(Math::GMPq::Rmpq_get_d($$y));
+
+            # Everything is a first power
+            $y == 1 and return Sidef::Types::Bool::Bool::TRUE;
 
             # Return a true value when $x=-1 and $y is odd
-            $pow % 2
-              and Math::GMPq::Rmpq_equal($$x, $MONE)
+            $y % 2
+              and Math::GMPq::Rmpq_equal($x, $MONE)
               and return Sidef::Types::Bool::Bool::TRUE;
 
             # Don't accept a non-positive power
             # Also, when $x is negative and $y is even, return faster
-            if ($pow <= 0 or ($pow % 2 == 0 and Math::GMPq::Rmpq_sgn($$x) < 0)) {
+            if ($y <= 0 or ($y % 2 == 0 and Math::GMPq::Rmpq_sgn($x) < 0)) {
                 return Sidef::Types::Bool::Bool::FALSE;
             }
 
-            my $z = Math::GMPz::Rmpz_init_set($$x);
-            Math::GMPz::Rmpz_root((my $r = Math::GMPz::Rmpz_init()), $z, $pow);
-            my $sgn = Math::GMPz::Rmpz_sgn($r) || return Sidef::Types::Bool::Bool::TRUE;    # $x was zero
-            Math::GMPz::Rmpz_neg($r, $r) if $sgn < 0;
+            my $z = Math::GMPz::Rmpz_init_set($x);
 
-            return (
-                    (Math::GMPz::Rmpz_remove($z, $z, $r) == $pow and Math::GMPz::Rmpz_cmpabs_ui($z, 1) == 0)
-                    ? Sidef::Types::Bool::Bool::TRUE
-                    : Sidef::Types::Bool::Bool::FALSE
-                   );
+            # Optimization for perfect squares
+            $y == 2
+              and return (
+                          Math::GMPz::Rmpz_perfect_square_p($z)
+                          ? Sidef::Types::Bool::Bool::TRUE
+                          : Sidef::Types::Bool::Bool::FALSE
+                         );
+
+            Math::GMPz::Rmpz_perfect_power_p($z)
+                || return Sidef::Types::Bool::Bool::FALSE;
+
+            Math::GMPz::Rmpz_root($z, $z, $y)
+              ? Sidef::Types::Bool::Bool::TRUE
+              : Sidef::Types::Bool::Bool::FALSE;
         }
-
-        Math::GMPz::Rmpz_perfect_power_p(Math::GMPz::Rmpz_init_set($$x))
-          ? Sidef::Types::Bool::Bool::TRUE
-          : Sidef::Types::Bool::Bool::FALSE;
+        else {
+            Math::GMPz::Rmpz_perfect_power_p(Math::GMPz::Rmpz_init_set($x))
+              ? Sidef::Types::Bool::Bool::TRUE
+              : Sidef::Types::Bool::Bool::FALSE;
+        }
     }
 
     *is_pow = \&is_power;
