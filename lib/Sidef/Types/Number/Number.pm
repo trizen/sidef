@@ -1251,7 +1251,7 @@ package Sidef::Types::Number::Number {
             Math::MPFR::Rmpfr_pow_ui($p, $p, $n, $ROUND);                  # p = p^n
 
             Math::MPFR::Rmpfr_div($f, $f, $p, $ROUND);                     # f = f/p
-            Math::MPFR::Rmpfr_div_2ui($f, $f, $n - 1, $ROUND);             # f = f/2^(-n + 1)
+            Math::MPFR::Rmpfr_div_2ui($f, $f, $n - 1, $ROUND);             # f = f/2^(n-1)
 
             Math::GMPz::Rmpz_set_ui($z, 1);                                # z = 1
             Math::GMPz::Rmpz_mul_2exp($z, $z, $n + 1);                     # z = 2^(n+1)
@@ -1272,7 +1272,7 @@ package Sidef::Types::Number::Number {
         my @D = (
                  Math::GMPz::Rmpz_init_set_ui(0),
                  Math::GMPz::Rmpz_init_set_ui(1),
-                 map { Math::GMPz::Rmpz_init_set_ui(0) } 1 .. ($n / 2)
+                 map { Math::GMPz::Rmpz_init_set_ui(0) } (1 .. $n / 2 - 1)
                 );
 
         my ($h, $w) = (1, 1);
