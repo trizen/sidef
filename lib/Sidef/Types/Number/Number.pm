@@ -1228,6 +1228,47 @@ package Sidef::Types::Number::Number {
         $n > 1 and $n % 2 and return ZERO;    # Bn=0 for odd n>1
         $n < 0 and return nan();
 
+        # Use a faster algorithm based on values of the Zeta function.
+        # B(n) = (-1)^(n/2 + 1) * zeta(n)*2*n! / (2*pi)^n
+        if ($n >= 50) {
+
+            my $prec = (
+                $n <= 156
+                ? CORE::int($n * CORE::log($n) + 1)
+                : CORE::int($n * CORE::log($n) / CORE::log(2) - 3 * $n)    # TODO: optimize for large n (>50_000)
+            );
+
+            my $f = Math::MPFR::Rmpfr_init2($prec);
+            Math::MPFR::Rmpfr_zeta_ui($f, $n, $ROUND);                     # f = zeta(n)
+
+            my $z = Math::GMPz::Rmpz_init();
+            Math::GMPz::Rmpz_fac_ui($z, $n);                               # z = n!
+
+            Math::MPFR::Rmpfr_mul_z($f, $f, $z, $ROUND);                   # f = f*z
+
+            my $p = Math::MPFR::Rmpfr_init2($prec);
+            Math::MPFR::Rmpfr_const_pi($p, $ROUND);                        # p = PI
+            Math::MPFR::Rmpfr_pow_ui($p, $p, $n, $ROUND);                  # p = p^n
+
+            Math::MPFR::Rmpfr_div($f, $f, $p, $ROUND);                     # f = f/p
+            Math::MPFR::Rmpfr_div_2ui($f, $f, $n - 1, $ROUND);             # f = f/2^(-n + 1)
+
+            Math::GMPz::Rmpz_set_ui($z, 1);                                # z = 1
+            Math::GMPz::Rmpz_mul_2exp($z, $z, $n + 1);                     # z = 2^(n+1)
+            Math::GMPz::Rmpz_sub_ui($z, $z, 2);                            # z = z-2
+
+            Math::MPFR::Rmpfr_mul_z($f, $f, $z, $ROUND);                   # f = f*z
+            Math::MPFR::Rmpfr_round($f, $f);                               # f = [f]
+
+            my $q = Math::GMPq::Rmpq_init();
+            Math::MPFR::Rmpfr_get_q($q, $f);                               # q = f
+            Math::GMPq::Rmpq_set_den($q, $z);                              # q = q/z
+            Math::GMPq::Rmpq_canonicalize($q);                             # remove common factors
+
+            Math::GMPq::Rmpq_neg($q, $q) if $n % 4 == 0;                   # q = -q    (iff 4|n)
+            return bless \$q, __PACKAGE__;
+        }
+
         my @D = (
                  Math::GMPz::Rmpz_init_set_ui(0),
                  Math::GMPz::Rmpz_init_set_ui(1),
@@ -1260,19 +1301,31 @@ package Sidef::Types::Number::Number {
     *bern = \&bernfrac;
 
     sub bernreal {
-        my $r = _big2mpfr($_[0]);
+        my $n = CORE::int(Math::GMPq::Rmpq_get_d(${$_[0]}));
 
-        Math::MPFR::Rmpfr_trunc($r, $r);
-        Math::MPFR::Rmpfr_zero_p($r)  && return ONE;
-        Math::MPFR::Rmpfr_sgn($r) < 0 && return nan();
-        Math::MPFR::Rmpfr_neg($r, $r, $ROUND);
+        $n < 0  and return nan();
+        $n == 0 and return ONE;
+        $n == 1 and return do { state $x = __PACKAGE__->new('1/2') };
+        $n % 2 and return ZERO;    # Bn = 0 for odd n>1
 
-        Math::MPFR::Rmpfr_set((my $zeta = Math::MPFR::Rmpfr_init2($PREC)), $r, $ROUND);
-        Math::MPFR::Rmpfr_add_ui($zeta, $zeta, 1, $ROUND);
-        Math::MPFR::Rmpfr_zeta($zeta, $zeta, $ROUND);
-        Math::MPFR::Rmpfr_mul($r, $r, $zeta, $ROUND);
+        #local $PREC = CORE::int($n*CORE::log($n)+1);
 
-        _mpfr2big($r);
+        my $bern = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_zeta_ui($bern, $n, $ROUND);    # bern = zeta(n)
+
+        my $f = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_fac_ui($f, $n, $ROUND);        # f = n!
+        Math::MPFR::Rmpfr_mul($bern, $bern, $f, $ROUND); # bern = bern*f
+
+        Math::MPFR::Rmpfr_const_pi($f, $ROUND);          # f = PI
+        Math::MPFR::Rmpfr_pow_ui($f, $f, $n, $ROUND);    # f = f^n
+
+        Math::MPFR::Rmpfr_div($bern, $bern, $f, $ROUND); # bern = bern/f
+        Math::MPFR::Rmpfr_div_2ui($bern, $bern, $n - 1, $ROUND);    # bern = bern / 2^(-n)
+
+        Math::MPFR::Rmpfr_neg($bern, $bern, $ROUND) if $n % 4 == 0;
+
+        _mpfr2big($bern);
     }
 
     sub erf {
@@ -2088,7 +2141,7 @@ package Sidef::Types::Number::Number {
     sub is_power {
         my ($x, $y) = @_;
 
-         $x = $$x;
+        $x = $$x;
 
         Math::GMPq::Rmpq_integer_p($x)
           || return Sidef::Types::Bool::Bool::FALSE;
@@ -2126,7 +2179,7 @@ package Sidef::Types::Number::Number {
                          );
 
             Math::GMPz::Rmpz_perfect_power_p($z)
-                || return Sidef::Types::Bool::Bool::FALSE;
+              || return Sidef::Types::Bool::Bool::FALSE;
 
             Math::GMPz::Rmpz_root($z, $z, $y)
               ? Sidef::Types::Bool::Bool::TRUE

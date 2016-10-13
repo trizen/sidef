@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 131;
+use Test::More tests => 139;
 
 use Sidef;
 
@@ -156,13 +156,31 @@ my $o = 'Sidef::Types::Number::Number';
       22  854513/138
       );
 
+    #
+    ## bernfrac()
+    #
     foreach my $i (keys %results) {
         my $bn = $o->new($i)->bernfrac->as_rat;
         is("$bn", $results{$i});
     }
 
-    my $bneg = $o->new(-2)->bernfrac;
-    is("$bneg", 'NaN');    # make sure we check for even correctly
+    is("${\($o->new(-2)->bernfrac)}", 'NaN');    # make sure we check for even correctly
+
+    is($o->new(52)->bernfrac->as_frac->get_value, '-801165718135489957347924991853/1590');
+    is($o->new(106)->bernfrac->as_frac->get_value,
+        '36373903172617414408151820151593427169231298640581690038930816378281879873386202346572901/642');
+
+    #
+    ## bernreal()
+    #
+    my $r = $o->new(10);
+    is("${\($o->new(-2)->bernreal)}", "NaN");    # check negative values
+
+    is($o->new(1)->bernreal->get_value,                0.5);
+    is($o->new(0)->bernreal->get_value,                1);
+    is($o->new(3)->bernreal->get_value,                0);
+    is($o->new(2)->bernreal->as_float($r)->get_value,  '0.1666666667');
+    is($o->new(52)->bernreal->as_float($r)->get_value, '-503877810148106891413789303.0522012579');
 }
 
 ##############################################################################
