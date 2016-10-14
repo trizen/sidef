@@ -1303,29 +1303,31 @@ package Sidef::Types::Number::Number {
     sub bernreal {
         my $n = CORE::int(Math::GMPq::Rmpq_get_d(${$_[0]}));
 
+        # |B(n)| = zeta(n) * n! / 2^(n-1) / pi^n
+
         $n < 0  and return nan();
         $n == 0 and return ONE;
-        $n == 1 and return do { state $x = __PACKAGE__->new('1/2') };
+        $n == 1 and return do { state $x = __PACKAGE__->_set_str('1/2') };
         $n % 2 and return ZERO;    # Bn = 0 for odd n>1
 
         #local $PREC = CORE::int($n*CORE::log($n)+1);
 
-        my $bern = Math::MPFR::Rmpfr_init2($PREC);
-        Math::MPFR::Rmpfr_zeta_ui($bern, $n, $ROUND);    # bern = zeta(n)
-
         my $f = Math::MPFR::Rmpfr_init2($PREC);
-        Math::MPFR::Rmpfr_fac_ui($f, $n, $ROUND);        # f = n!
-        Math::MPFR::Rmpfr_mul($bern, $bern, $f, $ROUND); # bern = bern*f
+        my $p = Math::MPFR::Rmpfr_init2($PREC);
 
-        Math::MPFR::Rmpfr_const_pi($f, $ROUND);          # f = PI
-        Math::MPFR::Rmpfr_pow_ui($f, $f, $n, $ROUND);    # f = f^n
+        Math::MPFR::Rmpfr_zeta_ui($f, $n, $ROUND);    # f = zeta(n)
+        Math::MPFR::Rmpfr_const_pi($p, $ROUND);       # p = PI
+        Math::MPFR::Rmpfr_pow_ui($p, $p, $n, $ROUND); # p = p^n
 
-        Math::MPFR::Rmpfr_div($bern, $bern, $f, $ROUND); # bern = bern/f
-        Math::MPFR::Rmpfr_div_2ui($bern, $bern, $n - 1, $ROUND);    # bern = bern / 2^(-n)
+        my $z = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_fac_ui($z, $n);              # z = n!
+        Math::GMPz::Rmpz_div_2exp($z, $z, $n - 1);    # z = z / 2^(n-1)
+        Math::MPFR::Rmpfr_mul_z($f, $f, $z, $ROUND);  # f = f * z
 
-        Math::MPFR::Rmpfr_neg($bern, $bern, $ROUND) if $n % 4 == 0;
+        Math::MPFR::Rmpfr_div($f, $f, $p, $ROUND);    # f = f/p
+        Math::MPFR::Rmpfr_neg($f, $f, $ROUND) if $n % 4 == 0;
 
-        _mpfr2big($bern);
+        _mpfr2big($f);
     }
 
     sub erf {
