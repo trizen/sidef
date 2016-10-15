@@ -115,22 +115,15 @@ package Sidef::Types::Number::Number {
 
             my $rat = (!$is_frac and $base == 10 and $num =~ tr/Ee.//)
               ? do {
-                my $r = _str2rat($num);
+                my $r = _str2rat($num =~ tr/_//dr);
                 $is_frac = index($r, '/') != -1;
                 $r;
               }
-              : ($num =~ tr/+//dr);
+              : ($num =~ tr/_+//dr);
 
-            if (
-                $is_frac
-                and (
-                     $base == 10
-                     ? ($rat !~ m{^\s*[-+]?[0-9]+(?>\s*/\s*[-+]?[1-9]+[0-9]*)?\s*\z})
-                     : 1
-                    )
-              ) {
-                my ($num, $den) = split(/\//, $rat);
-                return __PACKAGE__->new($num, $base)->div(__PACKAGE__->new($den, $base));
+            if ($is_frac and ($base == 10 ? ($rat !~ m{^\s*[-+]?[0-9]+(?>\s*/\s*[-+]?[1-9]+[0-9]*)?\s*\z}) : 1)) {
+                my ($num, $den) = split(/\//, $rat, 2);
+                return ($den eq '' ? nan() : __PACKAGE__->new($num, $base)->div(__PACKAGE__->new($den, $base)));
             }
 
             my $r = Math::GMPq::Rmpq_init();

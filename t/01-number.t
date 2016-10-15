@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 164;
+use Test::More tests => 173;
 
 use Sidef;
 
@@ -67,8 +67,32 @@ my $o = 'Sidef::Types::Number::Number';
     $x = $o->new("-inf");
     is("$x", "-Inf");
 
-    #$x = $o->new("1/");        # not sure what this should be: Inf or Nan
-    #is($x, "NaN");
+    $x = $o->new("1/");
+    is("$x", "NaN");
+
+    $x = $o->new("1/+");
+    is("$x", "NaN");
+
+    $x = $o->new("1/-");
+    is("$x", "NaN");
+
+    $x = $o->new("1/_");
+    is("$x", "NaN");
+
+    $x = $o->new("+");
+    is("$x", "NaN");
+
+    $x = $o->new("-");
+    is("$x", "NaN");
+
+    $x = $o->new("_");
+    is("$x", "NaN");
+
+    $x = $o->new("1_000_000");
+    is("$x", "1000000");
+
+    $x = $o->new("1/2/3/4/5/6");    # is parsed as: (1 / (2 / (3 / (4 / (5 / 6)))))
+    like($x->as_rat, re '5/16');
 
     $x = $o->new("1/0");
     is("$x", "Inf");
