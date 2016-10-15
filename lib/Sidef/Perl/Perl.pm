@@ -74,6 +74,10 @@ package Sidef::Perl::Perl {
                 return Sidef::Types::Number::Number::_mpz2big($val);
             }
 
+            if ($ref eq 'Math::MPC') {
+                return bless(\$val, 'Sidef::Types::Number::Complex');
+            }
+
             if ($ref eq 'Math::GMPq') {
                 return bless(\$val, 'Sidef::Types::Number::Number');
             }
