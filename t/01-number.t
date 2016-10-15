@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 139;
+use Test::More tests => 164;
 
 use Sidef;
 
@@ -18,36 +18,36 @@ sub re($) {
 
 my $o = 'Sidef::Types::Number::Number';
 
-{    ## Some tests doesn't pass, yet.
+{
     my $x = $o->new(1234);
-    is("$x", 1234);
+    is("$x", "1234");
 
     $x = $o->new("1234/1");
-    is("$x", 1234);
+    is("$x", "1234");
 
     $x = $o->new("1234/2");
-    is("$x", 617);
+    is("$x", "617");
 
-    #$x = $o->new("100/1.0");
-    #is($x, 100, qq|\$x = $o->new("100/1.0")|);
+    $x = $o->new("100/1.0");
+    is("$x", "100");
 
-    #$x = $o->new("10.0/1.0");
-    #is($x, 10, qq|\$x = $o->new("10.0/1.0")|);
+    $x = $o->new("10.0/1.0");
+    is("$x", "10");
 
-    #$x = $o->new("0.1/10");
-    #is($x, "1/100", qq|\$x = $o->new("0.1/10")|);
+    $x = $o->new("0.1/10");
+    is("$x", "0.01");
 
-    #$x = $o->new("0.1/0.1");
-    #is($x, "1", qq|\$x = $o->new("0.1/0.1")|);
+    $x = $o->new("0.1/0.1");
+    is("$x", "1");
 
-    #$x = $o->new("1e2/10");
-    #is($x, 10, qq|\$x = $o->new("1e2/10")|);
+    $x = $o->new("1e2/10");
+    is("$x", "10");
 
-    #$x = $o->new("5/1e2");
-    #is($x, "1/20", qq|\$x = $o->new("5/1e2")|);
+    $x = $o->new("5/1e2");
+    is("$x", "0.05");
 
-    #$x = $o->new("1e2/1e1");
-    #is($x, 10, qq|\$x = $o->new("1e2/1e1")|);
+    $x = $o->new("1e2/1e1");
+    is("$x", "10");
 
     $x = $o->new("1 / 3");
     like($x->as_rat, re '1/3');
@@ -55,29 +55,68 @@ my $o = 'Sidef::Types::Number::Number';
     $x = $o->new("-1 / 3");
     like($x->as_rat, re '-1/3');
 
-    #$x = $o->new("NaN");
-    #is($x, "NaN", qq|\$x = $o->new("NaN")|);
+    $x = $o->new("1 / -3");
+    like($x->as_rat, re '-1/3');
 
-    #$x = $o->new("inf");
-    #is($x, "inf", qq|\$x = $o->new("inf")|);
+    $x = $o->new("abc");
+    is("$x", "NaN");
 
-    #$x = $o->new("-inf");
-    #is($x, "-inf", qq|\$x = $o->new("-inf")|);
+    $x = $o->new("inf");
+    is("$x", "Inf");
 
-    #$x = $o->new("1/");
-    #is($x, "NaN", qq|\$x = $o->new("1/")|);
+    $x = $o->new("-inf");
+    is("$x", "-Inf");
+
+    #$x = $o->new("1/");        # not sure what this should be: Inf or Nan
+    #is($x, "NaN");
+
+    $x = $o->new("1/0");
+    is("$x", "Inf");
+
+    $x = $o->new("-1/0");
+    is("$x", "-Inf");
+
+    $x = $o->new("-h5/0", 36);
+    is("$x", "-Inf");
+
+    $x = $o->new("ff/f", 16);
+    is("$x", "17");
 
     $x = $o->new("7e", 16);
     is("$x", 126);
 
-    #$x = $o->new("1/1.2");
-    #like($x->as_rat, re "5/6");
+    $x = $o->new("inf", 36);
+    is("$x", "24171");
 
-    #$x = $o->new("1.3/1.2");
-    #is($x, "13/12", qq|\$x = $o->new("1.3/1.2")|);
+    $x = $o->new("-Inf", 36);
+    is("$x", "-24171");
 
-    #$x = $o->new("1.2/1");
-    #is($x, "6/5", qq|\$x = $o->new("1.2/1")|);
+    $x = $o->new("nan", 36);
+    is("$x", "30191");
+
+    # fraction in base 10
+    $x = $o->new('123/45');
+    like($x->as_rat, re '41/15');
+
+    # fraction in base 36
+    $x = $o->new("h5/1e", 36);
+    like($x->as_float, re "12.34");
+
+    $x = $o->new("14/1e", 36);
+    like($x->as_rat, re "4/5");
+
+    # base-10 number, converted to another base
+    $x = $o->new($o->new("1211"), 3);
+    is("$x", "49");
+
+    $x = $o->new("1/1.2");
+    like($x->as_rat, re "5/6");
+
+    $x = $o->new("1.3/1.2");
+    like($x->as_rat, re "13/12");
+
+    $x = $o->new("1.2/1");
+    like($x->as_rat, re "6/5");
 }
 
 ###############################################################################
