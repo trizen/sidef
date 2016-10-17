@@ -463,6 +463,8 @@ package Sidef::Types::Number::Complex {
     sub lgrt {
         my $c = ${$_[0]};
 
+        $PREC = CORE::int($PREC);
+
         my $p = Math::MPFR::Rmpfr_init2($PREC);
         Math::MPFR::Rmpfr_ui_pow_ui($p, 10, int($PREC / 4), $Sidef::Types::Number::Number::ROUND);
         Math::MPFR::Rmpfr_ui_div($p, 1, $p, $Sidef::Types::Number::Number::ROUND);
@@ -479,8 +481,10 @@ package Sidef::Types::Number::Complex {
         my $tmp = Math::MPC::Rmpc_init2($PREC);
         my $abs = Math::MPFR::Rmpfr_init2($PREC);
 
+        my $count = 0;
         while (1) {
             Math::MPC::Rmpc_sub($tmp, $x, $y, $ROUND);
+
             Math::MPC::Rmpc_abs($abs, $tmp, $ROUND);
             Math::MPFR::Rmpfr_cmp($abs, $p) <= 0 and last;
 
@@ -491,6 +495,7 @@ package Sidef::Types::Number::Complex {
 
             Math::MPC::Rmpc_add($x, $x, $d, $ROUND);
             Math::MPC::Rmpc_div($x, $x, $tmp, $ROUND);
+            last if ++$count > $PREC;
         }
 
         bless \$x, __PACKAGE__;

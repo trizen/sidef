@@ -893,6 +893,7 @@ package Sidef::Types::Number::Number {
         my $d = _big2mpfr($x);
         Math::MPFR::Rmpfr_log($d, $d, $ROUND);
 
+        $PREC = CORE::int($PREC);
         Math::MPFR::Rmpfr_ui_pow_ui((my $p = Math::MPFR::Rmpfr_init2($PREC)), 10, CORE::int($PREC / 4), $ROUND);
         Math::MPFR::Rmpfr_ui_div($p, 1, $p, $ROUND);
 
@@ -901,6 +902,7 @@ package Sidef::Types::Number::Number {
 
         my $tmp = Math::MPFR::Rmpfr_init2($PREC);
 
+        my $count = 0;
         while (1) {
             Math::MPFR::Rmpfr_sub($tmp, $x, $y, $ROUND);
             Math::MPFR::Rmpfr_cmpabs($tmp, $p) <= 0 and last;
@@ -912,6 +914,7 @@ package Sidef::Types::Number::Number {
 
             Math::MPFR::Rmpfr_add($x, $x, $d, $ROUND);
             Math::MPFR::Rmpfr_div($x, $x, $tmp, $ROUND);
+            last if ++$count > $PREC;
         }
 
         _mpfr2big($x);
