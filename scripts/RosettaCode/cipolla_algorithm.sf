@@ -5,18 +5,11 @@
 #
 
 func cipolla(n, p) {
-    func legendre_symbol(a) {
-        expmod(a, (p-1)//2, p)
-    }
-
-    if (legendre_symbol(n) != 1) {
-        return nil
-    }
 
     var (a = 0, ω2 = 0)
     loop {
         ω2 = ((a*a - n) % p)
-        if (legendre_symbol(ω2) == p-1) {
+        if (kronecker(ω2, p) == -1) {
             break
         }
         ++a

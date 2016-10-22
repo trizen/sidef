@@ -550,6 +550,7 @@ scripts/RosettaCode/ternary_and_binary_palindrome.sf
 scripts/RosettaCode/text_processing_1.sf
 scripts/RosettaCode/the_isaac_cipher.sf
 scripts/RosettaCode/thue_morse.sf
+scripts/RosettaCode/tonelli_shanks_algorithm.sf
 scripts/RosettaCode/truncatable_primes.sf
 scripts/RosettaCode/universal_turing_machine.sf
 scripts/RosettaCode/van_der_corput_sequence.sf
