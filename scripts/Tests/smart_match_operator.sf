@@ -75,3 +75,43 @@ if ("Xena" ~~ "Xena") {
 else {
     die "s ~~ s error";
 }
+
+#
+## Array ~~ Regex
+#
+
+var a = ['a', [[['z'],'foo','z']], 'c'];
+
+unshift(a, a)
+
+assert(a.match(/^a/))
+assert(a.match(/^foo/))
+assert(a.match(/^c/))
+assert(!a.match(/^d/))
+
+assert(a ~~ /^a/)
+assert(a ~~ /^foo/)
+assert(a ~~ /^c/)
+assert(!(a ~~ /^d/))
+
+assert(a ~~ /^a/)
+assert(a ~~ /^foo/)
+assert(a ~~ /^z/)
+assert(a ~~ /^c/)
+assert(!(a ~~ /^d/))
+
+assert(/^a/ ~~ a)
+assert(/^foo/ ~~ a)
+assert(/^z/ ~~ a)
+assert(/^c/ ~~ a)
+assert(!(/^d/ ~~ a))
+
+#
+## Hash ~~ Regex
+#
+
+assert(:(a => 1, b => 2) ~~ /^b/)
+assert(/^b/ ~~ :(a => 1, b => 2))
+
+assert(!(:(a => 1, b => 2) ~~ /^c/))
+assert(!(/^c/ ~~ :(a => 1, b => 2)))

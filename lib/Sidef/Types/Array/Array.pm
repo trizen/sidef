@@ -981,6 +981,38 @@ package Sidef::Types::Array::Array {
         $hash;
     }
 
+    sub match {
+        my ($self, $regex) = @_;
+
+        my %addr;
+
+        my $sub = sub {
+            my ($obj) = @_;
+
+            my $refaddr = Scalar::Util::refaddr($obj);
+
+            exists($addr{$refaddr})
+              && return Sidef::Types::Bool::Bool::FALSE;
+
+            undef $addr{$refaddr};
+
+            foreach my $item (@$obj) {
+                if (defined(my $sub = UNIVERSAL::can($item, 'match'))) {
+                    $sub->($item, $regex)
+                      && return Sidef::Types::Bool::Bool::TRUE;
+                }
+                elsif ("$item" =~ $regex->{regex}) {
+                    return Sidef::Types::Bool::Bool::TRUE;
+                }
+            }
+
+            Sidef::Types::Bool::Bool::FALSE;
+        };
+
+        local *Sidef::Types::Array::Array::match = $sub;
+        $sub->($_[0]);
+    }
+
     sub iter {
         my ($self) = @_;
 

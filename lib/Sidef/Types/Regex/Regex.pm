@@ -43,19 +43,7 @@ package Sidef::Types::Regex::Regex {
     sub match {
         my ($self, $object, $pos) = @_;
 
-        $object //= do { state $x = Sidef::Types::String::String->new('') };
-
-        # Matching an array is deprecated
-        if (UNIVERSAL::isa($object, 'ARRAY')) {
-            my $match;
-            foreach my $item (@{$object}) {
-                $match = $self->match($item);
-                $match->matched && return $match;
-            }
-            return $match // $self->match(Sidef::Types::String::String->new);
-        }
-
-        # Return a new match object
+        # Return a new Match object
         Sidef::Types::Regex::Match->new(
                                         obj  => "$object",
                                         self => $self,

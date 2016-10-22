@@ -43,7 +43,7 @@ assert([hash{:name}, hash{:address}] == ['John', 'Wall Street no. 4']);
 '/'    =~ /^\/\z/     || ("Regex escape fail!\n".die);
 
 
-/^googl\w/.match(["hei", "google chrome"]) || die "Regex on array fail!";
+["hei", "google chrome"].match(/^googl\w/) || die "Regex on array fail!";
 
 assert_eq(
     "asd awer wer side".findall(/(\w+)\s+(\w+)/),

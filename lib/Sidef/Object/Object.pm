@@ -473,7 +473,7 @@ package Sidef::Object::Object {
 
                 # Array ~~ Regex
                 if ($s_type eq 'Sidef::Types::Regex::Regex') {
-                    return $second->match($first)->is_successful;
+                    return $first->match($second);
                 }
 
                 # Array ~~ Hash
@@ -500,7 +500,7 @@ package Sidef::Object::Object {
 
                 # Hash ~~ Regex
                 if ($s_type eq 'Sidef::Types::Regex::Regex') {
-                    return $second->match($first->keys)->is_successful;
+                    return $first->keys->match($second);
                 }
 
                 # Hash ~~ Any
@@ -512,12 +512,12 @@ package Sidef::Object::Object {
 
                 # Regex ~~ Array
                 if ($s_type eq 'Sidef::Types::Array::Array') {
-                    return $first->match($second)->is_successful;
+                    return $second->match($first);
                 }
 
                 # Regex ~~ Hash
                 if ($s_type eq 'Sidef::Types::Hash::Hash') {
-                    return $first->match($second->keys)->is_successful;
+                    return $second->keys->match($first);
                 }
 
                 # Regex ~~ Any
