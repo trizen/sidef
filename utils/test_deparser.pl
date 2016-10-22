@@ -30,8 +30,6 @@ use File::Find qw(find);
 use File::Basename qw(basename);
 use File::Spec::Functions qw(catdir updir rel2abs);
 
-local $ENV{SIDEF_INC} = rel2abs(catdir(updir(), 'scripts', 'Tests'));
-
 sub parse_deparse {
     my ($code, $name) = @_;
 

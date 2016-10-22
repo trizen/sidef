@@ -764,7 +764,6 @@ package Sidef::Types::Number::Number {
                 Math::GMPz::Rmpz_pow_ui($z, $z, CORE::abs($pow));
 
                 Math::GMPq::Rmpq_set_den($q, $z);
-                Math::GMPq::Rmpq_canonicalize($q);
 
                 Math::GMPq::Rmpq_inv($q, $q) if $pow < 0;
             }

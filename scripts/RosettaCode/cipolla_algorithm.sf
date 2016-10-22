@@ -6,6 +6,8 @@
 
 func cipolla(n, p) {
 
+    legendre(n, p) == 1 || return nil
+
     var (a = 0, ω2 = 0)
     loop {
         ω2 = ((a*a - n) % p)
