@@ -117,6 +117,7 @@ scripts/Applications/resistor_mesh.sf
 scripts/arithmetic_coding.sf
 scripts/bernoulli_numbers.sf
 scripts/bernoulli_numbers_recursive.sf
+scripts/bernoulli_numbers_seidel.sf
 scripts/cached_zeta_function.sf
 scripts/caesar_cipher.sf
 scripts/chebyshev_coefficients.sf

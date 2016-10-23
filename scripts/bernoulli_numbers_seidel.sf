@@ -1,0 +1,32 @@
+#!/usr/bin/ruby
+
+# Seidel's algorithm for computing Bernoulli numbers.
+
+# Algorithm from:
+#   http://oeis.org/wiki/User:Peter_Luschny/ComputationAndAsymptoticsOfBernoulliNumbers#Seidel
+
+func bernoulli_seidel(n) {
+
+    n == 0   && return 1
+    n == 1   && return 1/2
+    n.is_odd && return 0
+
+    var D = [0, 1, (n/2 - 1).of(0)...]
+
+    var (h=1, w=1)
+    n.times {
+        if (w ^= 1) {
+            (h-1).times { |k| D[k] += D[k-1] }
+        }
+        else {
+            w = h++
+            while (--w) { D[w] += D[w+1] }
+        }
+    }
+
+    D[h-1] / ((1 << (n+1)) - 2) * (4.divides(n) ? -1 : 1)
+}
+
+for i in (0 .. 10) {
+    printf("B(%2d) = %20s / %s\n", 2*i, bernoulli_seidel(2*i).parts)
+}
