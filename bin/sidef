@@ -203,7 +203,7 @@ sub output_usage {
                     '-o file'    => 'file where to dump the output',
                     '-O level'   => ['perform code optimizations before execution',
                                      'valid levels: [0], 1, 2'],
-                    '-P int'     => 'set the precision of floating-point numbers (default: 32)',
+                    '-P int'     => 'set the precision of floating-point numbers (default: ' . int($Sidef::Types::Number::Number::PREC / 4) . ')',
                     '-M mode'    => ['set the rounding mode of floating-point numbers',
                                      'valid modes: [near], zero, inf, +inf, -inf'],
                     '-k'         => 'keep track of potential unsafe parser interpretations',
