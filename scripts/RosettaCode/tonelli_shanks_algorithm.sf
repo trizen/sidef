@@ -7,21 +7,9 @@
 func tonelli(n, p) {
     legendre(n, p) == 1 || die "not a square (mod p)"
     var q = p-1
-    var s = 0
-    while (q.is_even) {
-        q >>= 1
-        s += 1
-    }
-    if (s == 1) {
-        return powmod(n, (p + 1) >> 2, p)
-    }
-    var c
-    for z in (2 ..^ p) {
-        if (legendre(z, p) == -1) {
-            c = powmod(z, q, p)
-            break
-        }
-    }
+    var s = valuation(q, 2)
+    s == 1 ? return(powmod(n, (p + 1) >> 2, p)) : (q >>= s)
+    var c = powmod(2 ..^ p -> first {|z| legendre(z, p) == -1 }, q, p)
     var r = powmod(n, (q + 1) >> 1, p)
     var t = powmod(n, q, p)
     var m = s
