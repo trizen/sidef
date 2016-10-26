@@ -1,0 +1,25 @@
+
+=encoding utf8
+
+=head1 NAME
+
+Sidef::Variable::GetOpt
+
+=head1 DESCRIPTION
+
+This object is ...
+
+=head1 SYNOPSIS
+
+var obj = GetOpt.new(...);
+
+=head1 METHODS
+
+
+=head2 new
+
+GetOpt.new() -> I<Obj>
+
+Return the
+
+=cut

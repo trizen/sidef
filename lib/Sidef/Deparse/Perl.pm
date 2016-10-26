@@ -566,7 +566,8 @@ HEADER
                     if (exists $obj->{value}{kids}) {
                         chop $code;
                         my @kids = map {
-                            local $_->{type} = 'func';
+                            local $_->{type}   = 'func';
+                            local $_->{is_kid} = 1;
                             'do{' . $self->deparse_expr({self => $_}) . '}';
                         } @{$obj->{value}{kids}};
 
@@ -599,7 +600,17 @@ HEADER
                           . "\$$obj->{name}$refaddr\->{code}=Memoize::memoize(\$$obj->{name}${refaddr}->{code});\$$obj->{name}$refaddr}";
                     }
 
-                    if ($obj->{type} eq 'method') {
+                    if ($obj->{type} eq 'func' and not $obj->{is_kid}) {
+
+                        # Special "MAIN" function
+                        if ($obj->{name} eq 'MAIN') {
+                            $self->top_add('require Encode;');
+                            $code .=
+                              ";Sidef::Variable::GetOpt->new([map{Encode::decode_utf8(\$_)}\@ARGV],\$$obj->{name}$refaddr)";
+                        }
+
+                    }
+                    elsif ($obj->{type} eq 'method') {
 
                         # Special "AUTOLOAD" method
                         if ($obj->{name} eq 'AUTOLOAD') {

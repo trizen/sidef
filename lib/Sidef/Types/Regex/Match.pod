@@ -23,6 +23,14 @@ Inherits methods from:
 =head1 METHODS
 
 
+=head2 ...
+
+I<Obj> B<...> I<Obj> -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 cap
 
 Match.cap() -> I<Obj>
