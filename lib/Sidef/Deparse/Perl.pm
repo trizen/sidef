@@ -894,16 +894,7 @@ HEADER
 
                     # Make the last statement to be the return value
                     if ($is_function && @statements) {
-
-                        if ($statements[-1] =~ /^\@return = /) {
-
-                            # Make a minor improvement by removing the 'goto'
-                            $statements[-1] =~ s/;\h*goto END$refaddr\z//;
-                            $statements[-1] =~ s/^\@return = /return/;
-                        }
-                        else {
-                            $statements[-1] = 'return do{' . $statements[-1] . '}';
-                        }
+                        $statements[-1] = 'return do{' . $statements[-1] . '}';
                     }
 
                     $code .= join(';', @statements) . ($is_function ? (';' . "END$refaddr: \@return;") : '') . '}';
@@ -1390,7 +1381,7 @@ HEADER
                     if (exists $self->{function}) {
                         $code .= 'do{';
                         if (@{$call->{arg}}) {
-                            $code .= '@return = ' . $self->deparse_args(@{$call->{arg}}) . ';';    # don't edit this line!
+                            $code .= '@return=' . $self->deparse_args(@{$call->{arg}}) . ';';
                         }
                         $code .= 'goto ' . "END$self->{function}}";
                     }
