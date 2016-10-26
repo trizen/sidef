@@ -884,6 +884,7 @@ t/fibonacci.t
 t/levenshtein_distance.t
 t/man_or_boy.t
 t/manifest.t
+t/md5.t
 t/pod.t
 t/smart_word_wrap.t
 TODO
