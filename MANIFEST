@@ -88,6 +88,8 @@ lib/Sidef/Types/Regex/Regex.pm
 lib/Sidef/Types/Regex/Regex.pod
 lib/Sidef/Types/String/String.pm
 lib/Sidef/Types/String/String.pod
+lib/Sidef/Variable/GetOpt.pm
+lib/Sidef/Variable/GetOpt.pod
 lib/Sidef/Variable/NamedParam.pm
 lib/Sidef/Variable/NamedParam.pod
 LICENSE

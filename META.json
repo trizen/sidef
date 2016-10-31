@@ -200,6 +200,9 @@
       "Sidef::Types::String::String" : {
          "file" : "lib/Sidef/Types/String/String.pm"
       },
+      "Sidef::Variable::GetOpt" : {
+         "file" : "lib/Sidef/Variable/GetOpt.pm"
+      },
       "Sidef::Variable::NamedParam" : {
          "file" : "lib/Sidef/Variable/NamedParam.pm"
       }

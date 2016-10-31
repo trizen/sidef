@@ -112,6 +112,8 @@ provides:
     file: lib/Sidef/Types/Regex/Regex.pm
   Sidef::Types::String::String:
     file: lib/Sidef/Types/String/String.pm
+  Sidef::Variable::GetOpt:
+    file: lib/Sidef/Variable/GetOpt.pm
   Sidef::Variable::NamedParam:
     file: lib/Sidef/Variable/NamedParam.pm
 requires:
