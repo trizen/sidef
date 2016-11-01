@@ -118,8 +118,13 @@ package Sidef::Types::Number::Ninf {
     *bernreal         = \&nan;
     *bernfrac         = \&nan;
     *bern             = \&nan;
+    *bernoulli        = \&nan;
     *popcount         = \&nan;
     *valuation        = \&nan;
+    *harm             = \&nan;
+    *harmonic         = \&nan;
+    *harmfrac         = \&nan;
+    *harmreal         = \&nan;
 
     sub inf { Sidef::Types::Number::Inf::INF }
 

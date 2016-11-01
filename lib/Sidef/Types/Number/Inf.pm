@@ -108,7 +108,13 @@ package Sidef::Types::Number::Inf {
     *bernreal    = \&nan;
     *bernfrac    = \&nan;
     *bern        = \&nan;
+    *bernoulli   = \&nan;
     *valuation   = \&nan;
+
+    *harm     = \&inf;
+    *harmonic = \&inf;
+    *harmfrac = \&inf;
+    *harmreal = \&inf;
 
     sub as_bin {
         state $x = Sidef::Types::String::String->new;

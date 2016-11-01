@@ -143,8 +143,13 @@ package Sidef::Types::Number::Nan {
     *bernreal    = \&nan;
     *bernfrac    = \&nan;
     *bern        = \&nan;
+    *bernoulli   = \&nan;
     *popcount    = \&nan;
     *valuation   = \&nan;
+    *harm        = \&nan;
+    *harmonic    = \&nan;
+    *harmfrac    = \&nan;
+    *harmreal    = \&nan;
 
     sub cmp { }
 
