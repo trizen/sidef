@@ -1,7 +1,7 @@
 package Sidef::Types::Number::Number {
 
     use utf8;
-    use 5.014;
+    use 5.016;
 
     use Math::GMPq qw();
     use Math::GMPz qw();
@@ -1312,7 +1312,8 @@ package Sidef::Types::Number::Number {
         bless \$r, __PACKAGE__;
     }
 
-    *bern = \&bernfrac;
+    *bern      = \&bernfrac;
+    *bernoulli = \&bernfrac;
 
     sub bernreal {
         my $n = CORE::int(Math::GMPq::Rmpq_get_d(${$_[0]}));
@@ -1342,6 +1343,99 @@ package Sidef::Types::Number::Number {
         Math::MPFR::Rmpfr_neg($f, $f, $ROUND) if $n % 4 == 0;
 
         _mpfr2big($f);
+    }
+
+    # Inspired by Dana Jacobsen's code from Math::Prime::Util::PP.
+    # https://metacpan.org/pod/Math::Prime::Util::PP
+    # TODO: convert recursion to iteration and modify the mpz objects in-place.
+    my $harmonic_split = sub {
+        my ($num, $den) = @_;
+
+        my $diff = $den - $num;
+
+        if ($diff == 1) {
+            ($diff, $num);
+        }
+        elsif ($diff == 2) {
+            (($num << 1) + 1, $num * $num + $num);
+        }
+        else {
+            my $m = Math::GMPz::Rmpz_init_set($num);
+            Math::GMPz::Rmpz_add($m, $m, $den);
+            Math::GMPz::Rmpz_div_2exp($m, $m, 1);
+
+            my ($p, $q) = __SUB__->($num, $m);
+            my ($r, $s) = __SUB__->($m,   $den);
+
+            Math::GMPz::Rmpz_mul($p, $p, $s);
+            Math::GMPz::Rmpz_mul($r, $r, $q);
+            Math::GMPz::Rmpz_add($p, $p, $r);
+            Math::GMPz::Rmpz_mul($q, $q, $s);
+
+            ($p, $q);
+        }
+    };
+
+    sub harmfrac {
+        my ($n) = @_;
+
+        my $ui = CORE::int(Math::GMPq::Rmpq_get_d($$n));
+
+        $ui || return ZERO();
+        $ui < 0 and return nan();
+
+        # Use binary splitting for large values of n. (by Fredrik Johansson)
+        # http://fredrik-j.blogspot.ro/2009/02/how-not-to-compute-harmonic-numbers.html
+        if ($ui > 15000) {
+            my $num = Math::GMPz::Rmpz_init_set_ui(1);
+            my $den = Math::GMPz::Rmpz_init_set_ui($ui + 1);
+
+            ($num, $den) = $harmonic_split->($num, $den);
+
+            my $q = Math::GMPq::Rmpq_init();
+            Math::GMPq::Rmpq_set_num($q, $num);
+            Math::GMPq::Rmpq_set_den($q, $den);
+            Math::GMPq::Rmpq_canonicalize($q);
+
+            return bless \$q, __PACKAGE__;
+        }
+
+        my $num = Math::GMPz::Rmpz_init_set_ui(1);
+        my $den = Math::GMPz::Rmpz_init_set_ui(1);
+
+        for (my $k = 2 ; $k <= $ui ; ++$k) {
+            Math::GMPz::Rmpz_mul_ui($num, $num, $k);    # num = num * k
+            Math::GMPz::Rmpz_add($num, $num, $den);     # num = num + den
+            Math::GMPz::Rmpz_mul_ui($den, $den, $k);    # den = den * k
+        }
+
+        my $r = Math::GMPq::Rmpq_init();
+        Math::GMPq::Rmpq_set_num($r, $num);
+        Math::GMPq::Rmpq_set_den($r, $den);
+        Math::GMPq::Rmpq_canonicalize($r);
+
+        bless \$r, __PACKAGE__;
+    }
+
+    *harm     = \&harmfrac;
+    *harmonic = \&harmfrac;
+
+    sub harmreal {
+        my ($n) = @_;
+
+        my $ui = CORE::int(Math::GMPq::Rmpq_get_d($$n));
+
+        $ui < 0 and return nan();
+
+        $n = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_set_ui($n, $ui + 1, $ROUND);
+        Math::MPFR::Rmpfr_digamma($n, $n, $ROUND);
+
+        my $y = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_const_euler($y, $ROUND);
+        Math::MPFR::Rmpfr_add($n, $n, $y, $ROUND);
+
+        _mpfr2big($n);
     }
 
     sub erf {

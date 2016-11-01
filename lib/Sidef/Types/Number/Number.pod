@@ -448,7 +448,7 @@ Number.bern() -> I<Obj>
 
 Return the
 
-Aliases: I<bernfrac>
+Aliases: I<bernfrac>, I<bernoulli>
 
 =cut
 
@@ -811,6 +811,24 @@ Return the
 =head2 grad2rad
 
 Number.grad2rad() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 harm
+
+Number.harm() -> I<Obj>
+
+Return the
+
+Aliases: I<harmfrac>, I<harmonic>
+
+=cut
+
+=head2 harmreal
+
+Number.harmreal() -> I<Obj>
 
 Return the
 
