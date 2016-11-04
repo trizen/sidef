@@ -1379,8 +1379,13 @@ package Sidef::Types::Number::Number {
     sub harmfrac {
         my ($n) = @_;
 
-        my $ui = CORE::int(Math::GMPq::Rmpq_get_d($$n));
+        my $ui = Math::GMPq::Rmpq_get_d($$n);
 
+        # Make sure $ui+1 does not exceed MAX_UI
+        $ui >= MAX_UI
+          and return $n->harmreal;
+
+        $ui = CORE::int($ui);
         $ui || return ZERO();
         $ui < 0 and return nan();
 
@@ -1423,12 +1428,8 @@ package Sidef::Types::Number::Number {
     sub harmreal {
         my ($n) = @_;
 
-        my $ui = CORE::int(Math::GMPq::Rmpq_get_d($$n));
-
-        $ui < 0 and return nan();
-
-        $n = Math::MPFR::Rmpfr_init2($PREC);
-        Math::MPFR::Rmpfr_set_ui($n, $ui + 1, $ROUND);
+        $n = _big2mpfr($n);
+        Math::MPFR::Rmpfr_add_ui($n, $n, 1, $ROUND);
         Math::MPFR::Rmpfr_digamma($n, $n, $ROUND);
 
         my $y = Math::MPFR::Rmpfr_init2($PREC);
