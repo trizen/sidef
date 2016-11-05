@@ -1,0 +1,101 @@
+#!/usr/bin/ruby
+
+#
+## Test 1
+#
+
+var args = ['-foo=2', '--bar', '3.14159', '--baz', 'sidef']
+
+var bar = 1.23
+var baz = 'baz'
+var qux = 42
+
+args.getopt(
+    'foo=i' => \var foo,
+    'bar=f' => \bar,
+    'baz=s' => \baz,
+    'qux=i' => \qux,
+)
+
+assert_eq(foo, 2)
+assert_eq(bar, 3.14159)
+assert_eq(baz, 'sidef')
+assert_eq(qux, 42)
+
+
+#
+## Test 2
+#
+
+args = ['-f', '42']
+
+args.getopt!(
+    'foo=i' => \foo,
+    'bar=s' => \bar,
+)
+
+assert_eq(args, [])
+assert_eq(foo, 42)
+assert_eq(bar, 3.14159)
+
+
+#
+## Test 3
+#
+
+args = ['--baz=hi', '-f=1.234']
+
+args.getopt(
+    'baz=s' => \baz,
+    'foo=f' => \foo,
+)
+
+assert_eq(args, ['--baz=hi', '-f=1.234'])
+
+assert_eq(baz, 'hi')
+assert_eq(foo, 1.234)
+
+
+#
+## Test 4
+#
+
+class Example(value) { }
+
+var obj = Example(1234)
+
+args = ['--bool', '--foo', '42', 'extra', 'arguments', '--baz', '69']
+
+var bool = false
+
+args.getopt!(
+    'foo=i' => \obj,
+    'baz=s' => \baz,
+    'bool!' => \bool,
+)
+
+assert_eq(bool, true)
+assert_eq(obj.value, 42)
+assert_eq(baz, '69')
+assert_eq(args, ['extra', 'arguments'])
+
+#
+## Test 5
+#
+
+var b1 = false
+var b2 = true
+var b3 = false
+
+['--no-b1', '--no-b2', '--b3'].getopt!(
+    'b1!' => \bool,
+    'b2!' => \b2,
+    'b3!' => \b3,
+)
+
+assert_eq(b1, false)
+assert_eq(b2, false)
+assert_eq(b3, true)
+
+
+say "** Test passed!"

@@ -349,27 +349,19 @@ func output_version {
     Sys.exit(0)
 }
 
-# Parse arguments
-if (ARGV && ARGV[0].begins_with('-')) {
+ARGV.getopt!(
+    't!'  => \TOOLTIP_PATH,
+    'r!'  => \FILES_FIRST,
+    'e!'  => \EXT_MIMETYPE,
+    'i=s' => \STATUS_ICON,
+    'f=s' => \FILE_MANAGER,
+    'm=s' => \ICON_SIZE,
 
-    require('Getopt::Long')
-    %S<Getopt::Long>.GetOptionsFromArray(ARGV,
-        't!'  => func(_, v) { TOOLTIP_PATH =   Bool(v) },
-        'r!'  => func(_, v) { FILES_FIRST  =   Bool(v) },
-        'e!'  => func(_, v) { EXT_MIMETYPE =   Bool(v) },
-        'i=s' => func(_, v) { STATUS_ICON  = String(v) },
-        'f=s' => func(_, v) { FILE_MANAGER = String(v) },
-        'm=s' => func(_, v) { ICON_SIZE    = String(v) },
+    'h' => usage,
+    'v' => output_version,
+)
 
-        'h'  => func(*_) { usage() },
-        'v'  => func(*_) { output_version() },
-    ) || die "Error in command-line arguments!"
-}
-
-#
-## Main menu
-#
-var dir = Dir(ARGV.pop)
+var dir = Dir(ARGV.shift)
 dir.exists || usage(2)
 
 var icon = %s<Gtk2::StatusIcon>.new

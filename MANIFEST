@@ -660,6 +660,7 @@ scripts/Tests/functional_style.sf
 scripts/Tests/gather_take.sf
 scripts/Tests/gcd.sf
 scripts/Tests/get_value_cyclic_references.sf
+scripts/Tests/getopt.sf
 scripts/Tests/given_when.sf
 scripts/Tests/greatest_subsequential_sum.sf
 scripts/Tests/group_precedence.sf

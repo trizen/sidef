@@ -1884,6 +1884,78 @@ package Sidef::Types::Array::Array {
 
     sub to_list { @{$_[0]} }
 
+    sub getopt {
+        my ($self, %opts) = @_;
+
+        state $x = require Getopt::Long;
+
+        my @argv = map { "$_" } @$self;
+        my @opts = CORE::keys %opts;
+
+        my %parsed;
+        Getopt::Long::GetOptionsFromArray(\@argv, \%parsed, @opts);
+
+        my %lookup = map {
+            my ($name) = Getopt::Long::ParseOptionSpec($_, \my %info);
+            defined($name) ? ($name => {obj => $opts{$_}, type => $info{$name}[0]}) : ();
+        } @opts;
+
+        foreach my $key (CORE::keys %parsed) {
+
+            my $rec  = $lookup{$key};
+            my $obj  = $rec->{obj};
+            my $type = $rec->{type};
+
+            if (ref($obj) eq 'REF' or ref($obj) eq 'SCALAR') {
+                my $ref = ref($$obj);
+
+                # Determine the type for undefined references
+                if ($ref eq '') {
+                    if ($type eq 'i' or $type eq 'f') {
+                        $ref = 'Sidef::Types::Number::Number';
+                    }
+                    elsif ($type eq '') {
+                        $ref = 'Sidef::Types::Bool::Bool';
+                    }
+                    else {
+                        $ref = 'Sidef::Types::String::String';
+                    }
+                }
+
+                if (   $ref eq 'Sidef::Types::String::String'
+                    or $ref eq 'Sidef::Types::Number::Number') {
+                    $$obj = $ref->new($parsed{$key});
+                }
+                elsif ($ref eq 'Sidef::Types::Bool::Bool') {
+                    $$obj =
+                      $parsed{$key}
+                      ? Sidef::Types::Bool::Bool::TRUE
+                      : Sidef::Types::Bool::Bool::FALSE;
+                }
+                else {
+                    if ($type eq '') {
+                        $$obj = $ref->new(
+                                          $parsed{$key}
+                                          ? Sidef::Types::Bool::Bool::TRUE
+                                          : Sidef::Types::Bool::Bool::FALSE
+                                         );
+                    }
+                    elsif ($type eq 'i' or $type eq 'f') {
+                        $$obj = $ref->new(Sidef::Types::Number::Number->new($parsed{$key}));
+                    }
+                    else {
+                        $$obj = $ref->new(Sidef::Types::String::String->new($parsed{$key}));
+                    }
+                }
+            }
+            else {
+                $obj->call();
+            }
+        }
+
+        $self->new([map { Sidef::Types::String::String->new($_) } @argv]);
+    }
+
     sub _dump {
 
         my %addr;    # keeps track of dumped objects
