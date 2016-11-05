@@ -12,8 +12,7 @@ package Sidef::Types::Number::Ninf {
       q{0+}   => sub { -'inf' },
       q{""}   => sub { '-Inf' };
 
-    my $NINF = Math::GMPq::Rmpq_init();
-    Math::GMPq::Rmpq_set_si($NINF, -1, 0);
+    Math::GMPq::Rmpq_set_si((state $NINF = Math::GMPq::Rmpq_init_nobless()), -1, 0);
 
     use constant NINF => bless(\$NINF, __PACKAGE__);
 

@@ -10,9 +10,9 @@ package Sidef::Types::Number::Number {
     our $ROUND = Math::MPFR::MPFR_RNDN();
     our $PREC  = 200;
 
-    Math::GMPq::Rmpq_set_ui((my $ONE  = Math::GMPq::Rmpq_init()), 1, 1);
-    Math::GMPq::Rmpq_set_ui((my $ZERO = Math::GMPq::Rmpq_init()), 0, 1);
-    Math::GMPq::Rmpq_set_si((my $MONE = Math::GMPq::Rmpq_init()), -1, 1);
+    Math::GMPq::Rmpq_set_ui((state $ONE  = Math::GMPq::Rmpq_init_nobless()), 1, 1);
+    Math::GMPq::Rmpq_set_ui((state $ZERO = Math::GMPq::Rmpq_init_nobless()), 0, 1);
+    Math::GMPq::Rmpq_set_si((state $MONE = Math::GMPq::Rmpq_init_nobless()), -1, 1);
 
     use constant {
         ONE  => bless(\$ONE,  __PACKAGE__),
@@ -64,12 +64,15 @@ package Sidef::Types::Number::Number {
 
     sub _new_uint {
         $_[1] <= 8192
-          and exists($cache[$_[1]])
-          and return $cache[$_[1]];
-        Math::GMPq::Rmpq_set_ui((my $r = Math::GMPq::Rmpq_init()), $_[1], 1);
-        $_[1] <= 8192
-          ? ($cache[$_[1]] = bless(\$r, __PACKAGE__))
-          : bless(\$r, __PACKAGE__);
+          ? do {
+            exists($cache[$_[1]]) and return $cache[$_[1]];
+            Math::GMPq::Rmpq_set_ui((my $r = Math::GMPq::Rmpq_init()), $_[1], 1);
+            ($cache[$_[1]] = bless(\$r, __PACKAGE__));
+          }
+          : do {
+            Math::GMPq::Rmpq_set_ui((my $r = Math::GMPq::Rmpq_init()), $_[1], 1);
+            bless(\$r, __PACKAGE__);
+          };
     }
 
     sub _new_int {
@@ -322,7 +325,7 @@ package Sidef::Types::Number::Number {
             }
 
             state $half = do {
-                Math::GMPq::Rmpq_set_ui((my $q = Math::GMPq::Rmpq_init()), 1, 2);
+                Math::GMPq::Rmpq_set_ui((my $q = Math::GMPq::Rmpq_init_nobless()), 1, 2);
                 $q;
             };
 
@@ -381,11 +384,20 @@ package Sidef::Types::Number::Number {
         my ($x, $y) = @_;
         _valid(\$y);
 
-        state $min = Math::GMPq->new(2);
-        state $max = Math::GMPq->new(36);
+        state $min = do {
+            my $q = Math::GMPq::Rmpq_init_nobless();
+            Math::GMPq::Rmpq_set_ui($q, 2, 1);
+            $q;
+        };
+
+        state $max = do {
+            my $q = Math::GMPq::Rmpq_init_nobless();
+            Math::GMPq::Rmpq_set_ui($q, 36, 1);
+            $q;
+        };
 
         if (Math::GMPq::Rmpq_cmp($$y, $min) < 0 or Math::GMPq::Rmpq_cmp($$y, $max) > 0) {
-            die "[ERROR] base must be between 2 and 36, got $$y\n";
+            die "[ERROR] base must be between 2 and 36, got " . Math::GMPq::Rmpq_get_str($$y, 10) . "\n";
         }
 
         Sidef::Types::String::String->new(Math::GMPq::Rmpq_get_str(${$_[0]}, $$y));
@@ -424,14 +436,14 @@ package Sidef::Types::Number::Number {
     }
 
     sub e {
-        state $one_f = (Math::MPFR::Rmpfr_init_set_ui(1, $ROUND))[0];
+        state $one_f = (Math::MPFR::Rmpfr_init_set_ui_nobless(1, $ROUND))[0];
         Math::MPFR::Rmpfr_exp((my $e = Math::MPFR::Rmpfr_init2($PREC)), $one_f, $ROUND);
         _mpfr2big($e);
     }
 
     sub phi {
-        state $five4_f = (Math::MPFR::Rmpfr_init_set_str("1.25", 10, $ROUND))[0];
-        state $half_f  = (Math::MPFR::Rmpfr_init_set_str("0.5",  10, $ROUND))[0];
+        state $five4_f = (Math::MPFR::Rmpfr_init_set_str_nobless("1.25", 10, $ROUND))[0];
+        state $half_f  = (Math::MPFR::Rmpfr_init_set_str_nobless("0.5",  10, $ROUND))[0];
 
         Math::MPFR::Rmpfr_sqrt((my $phi = Math::MPFR::Rmpfr_init2($PREC)), $five4_f, $ROUND);
         Math::MPFR::Rmpfr_add($phi, $phi, $half_f, $ROUND);
@@ -799,7 +811,7 @@ package Sidef::Types::Number::Number {
 
         _valid(\$y);
 
-        state $ONE_Z = Math::GMPz::Rmpz_init_set_ui(1);
+        state $ONE_Z = Math::GMPz::Rmpz_init_set_ui_nobless(1);
         my $pow = CORE::int(Math::GMPq::Rmpq_get_d($$y));
 
         $x = _big2mpz($x);
@@ -2456,7 +2468,7 @@ package Sidef::Types::Number::Number {
           : Math::GMPq::Rmpq_mul($n, $n, $p);
 
         state $half = do {
-            my $q = Math::GMPq::Rmpq_init();
+            my $q = Math::GMPq::Rmpq_init_nobless();
             Math::GMPq::Rmpq_set_ui($q, 1, 2);
             $q;
         };
@@ -2529,7 +2541,7 @@ package Sidef::Types::Number::Number {
     sub rand {
         my ($x, $y) = @_;
 
-        state $state = Math::MPFR::Rmpfr_randinit_mt();
+        state $state = Math::MPFR::Rmpfr_randinit_mt_nobless();
         state $seed = Math::MPFR::Rmpfr_randseed_ui($state, scalar srand());
 
         Math::MPFR::Rmpfr_urandom((my $rand = Math::MPFR::Rmpfr_init2($PREC)), $state, $ROUND);
@@ -2559,7 +2571,7 @@ package Sidef::Types::Number::Number {
     sub irand {
         my ($x, $y) = @_;
 
-        state $state = Math::GMPz::zgmp_randinit_mt();
+        state $state = Math::GMPz::zgmp_randinit_mt_nobless();
         state $seed = Math::GMPz::zgmp_randseed_ui($state, scalar srand());
 
         $x = _big2mpz($x);
@@ -2737,7 +2749,7 @@ package Sidef::Types::Number::Number {
     sub grad2deg {
         my ($x) = @_;
         state $factor = do {
-            Math::GMPq::Rmpq_set_ui((my $q = Math::GMPq::Rmpq_init()), 9, 10);
+            Math::GMPq::Rmpq_set_ui((my $q = Math::GMPq::Rmpq_init_nobless()), 9, 10);
             $q;
         };
         Math::GMPq::Rmpq_mul((my $r = Math::GMPq::Rmpq_init()), $factor, $$x);
@@ -2747,7 +2759,7 @@ package Sidef::Types::Number::Number {
     sub deg2grad {
         my ($x) = @_;
         state $factor = do {
-            Math::GMPq::Rmpq_set_ui((my $q = Math::GMPq::Rmpq_init()), 10, 9);
+            Math::GMPq::Rmpq_set_ui((my $q = Math::GMPq::Rmpq_init_nobless()), 10, 9);
             $q;
         };
         Math::GMPq::Rmpq_mul((my $r = Math::GMPq::Rmpq_init()), $factor, $$x);

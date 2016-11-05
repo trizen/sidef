@@ -12,8 +12,7 @@ package Sidef::Types::Number::Inf {
       q{0+}   => sub { 'inf' },
       q{""}   => sub { 'Inf' };
 
-    my $INF = Math::GMPq::Rmpq_init();
-    Math::GMPq::Rmpq_set_ui($INF, 1, 0);
+    Math::GMPq::Rmpq_set_ui((state $INF = Math::GMPq::Rmpq_init_nobless()), 1, 0);
 
     use constant INF => bless(\$INF, __PACKAGE__);
 
