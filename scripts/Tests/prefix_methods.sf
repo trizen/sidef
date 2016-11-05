@@ -12,8 +12,10 @@ var int = 42;
 assert_eq(int, 42);
 assert_eq(::int(12.5), 12);         # `::` solves the ambiguity
 
-var x = 25;
-::sqrt!(x);          # sqrt(x) in-place
-assert_eq(x, 5);
+var l1 = lcm([3,4]...)
+assert_eq(l1, 12)
+
+var l2 = ::lcm [3,4]...
+assert_eq(l2, 12)
 
 say "** Test passed!";

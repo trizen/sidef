@@ -1899,7 +1899,8 @@ package Sidef::Parser {
                        );
             }
 
-            if (/\G::($self->{method_name_re})\h*/goc) {
+            # Prefix method call (`::name(...)` or `::name ...`)
+            if (/\G::($self->{var_name_re})\h*/goc) {
                 my $name = $1;
 
                 my $pos = pos($_);
@@ -1918,31 +1919,12 @@ package Sidef::Parser {
                                       );
                 }
 
-                return scalar {
-                    $self->{class} => [
-                        {
-                         self => {
-                                  $self->{class} => [{%{shift(@{$arg->{$self->{class}}})}}]
-                                 },
-                         call => [
-                             {
-                              method => $name,
-                              (
-                               @{$arg->{$self->{class}}}
-                               ? (
-                                  arg => [
-                                      map {
-                                          { $self->{class} => [{%{$_}}] }
-                                        } @{$arg->{$self->{class}}}
-                                  ]
-                                 )
-                               : ()
-                              ),
-                             }
-                         ],
-                        }
-                    ]
-                };
+                return
+                  bless {
+                         name => $name,
+                         expr => $arg,
+                        },
+                  'Sidef::Meta::PrefixMethod';
             }
 
             if (/($self->{prefix_obj_re})\h*/goc) {
@@ -2271,31 +2253,12 @@ package Sidef::Parser {
                                           );
                     }
 
-                    return scalar {
-                        $self->{class} => [
-                            {
-                             self => {
-                                      $self->{class} => [{%{shift(@{$arg->{$self->{class}}})}}]
-                                     },
-                             call => [
-                                 {
-                                  method => $name,
-                                  (
-                                   @{$arg->{$self->{class}}}
-                                   ? (
-                                      arg => [
-                                          map {
-                                              { $self->{class} => [{%{$_}}] }
-                                            } @{$arg->{$self->{class}}}
-                                      ]
-                                     )
-                                   : ()
-                                  ),
-                                 }
-                             ],
-                            }
-                        ]
-                    };
+                    return
+                      bless {
+                             name => $name,
+                             expr => $arg,
+                            },
+                      'Sidef::Meta::PrefixMethod';
                 }
 
                 # Undeclared variable

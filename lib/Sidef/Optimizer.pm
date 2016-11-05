@@ -916,6 +916,10 @@ package Sidef::Optimizer {
         elsif ($ref eq 'Sidef::Variable::NamedParam') {
             $obj->[1] = [map { {main => [$self->optimize_expr({self => $_})]} } @{$obj->[1]}];
         }
+        elsif ($ref eq 'Sidef::Meta::PrefixMethod') {
+            my %expr = $self->optimize($obj->{expr});
+            $obj->{expr} = \%expr;
+        }
 
         if (not exists($expr->{ind}) and not exists($expr->{call})) {
             return (ref($obj) eq 'HASH' ? {self => $obj} : $obj);

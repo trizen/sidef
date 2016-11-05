@@ -420,6 +420,9 @@ package Sidef::Deparse::Sidef {
         elsif ($ref eq 'Sidef::Sys::Sys') {
             $code = exists($obj->{file_name}) ? '' : 'Sys';
         }
+        elsif ($ref eq 'Sidef::Meta::PrefixMethod') {
+            $code = "::$obj->{name}" . $self->deparse_args($obj->{expr});
+        }
         elsif ($ref eq 'Sidef::Meta::Assert') {
             $code = $obj->{act} . $self->deparse_args($obj->{arg});
         }

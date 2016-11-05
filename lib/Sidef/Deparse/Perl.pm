@@ -1085,6 +1085,9 @@ HEADER
                 $code = $self->make_constant($ref, 'new', "Hash$refaddr");
             }
         }
+        elsif ($ref eq 'Sidef::Meta::PrefixMethod') {
+            $code = 'do{my($self,@args)=' . $self->deparse_args($obj->{expr}) . ';$self->' . $obj->{name} . '(@args)}';
+        }
         elsif ($ref eq 'Sidef::Types::Block::Do') {
             $code = 'do ' . $self->deparse_bare_block($obj->{block}{code});
         }
