@@ -66,7 +66,7 @@ package Sidef::Types::Number::Number {
         $_[1] <= 8192
           ? do {
             exists($cache[$_[1]]) and return $cache[$_[1]];
-            Math::GMPq::Rmpq_set_ui((my $r = Math::GMPq::Rmpq_init()), $_[1], 1);
+            Math::GMPq::Rmpq_set_ui((my $r = Math::GMPq::Rmpq_init_nobless()), $_[1], 1);
             ($cache[$_[1]] = bless(\$r, __PACKAGE__));
           }
           : do {
@@ -77,7 +77,7 @@ package Sidef::Types::Number::Number {
 
     sub _new_int {
         $_[1] == -1 && return MONE;
-        $_[1] >= 0  && return &_new_uint;
+        $_[1] >= 0  && goto &_new_uint;
         Math::GMPq::Rmpq_set_si((my $r = Math::GMPq::Rmpq_init()), $_[1], 1);
         bless(\$r, __PACKAGE__);
     }
@@ -384,23 +384,13 @@ package Sidef::Types::Number::Number {
         my ($x, $y) = @_;
         _valid(\$y);
 
-        state $min = do {
-            my $q = Math::GMPq::Rmpq_init_nobless();
-            Math::GMPq::Rmpq_set_ui($q, 2, 1);
-            $q;
-        };
+        $y = CORE::int(Math::GMPq::Rmpq_get_d($$y));
 
-        state $max = do {
-            my $q = Math::GMPq::Rmpq_init_nobless();
-            Math::GMPq::Rmpq_set_ui($q, 36, 1);
-            $q;
-        };
-
-        if (Math::GMPq::Rmpq_cmp($$y, $min) < 0 or Math::GMPq::Rmpq_cmp($$y, $max) > 0) {
-            die "[ERROR] base must be between 2 and 36, got " . Math::GMPq::Rmpq_get_str($$y, 10) . "\n";
+        if ($y < 2 or $y > 36) {
+            die "[ERROR] base must be between 2 and 36, got $y\n";
         }
 
-        Sidef::Types::String::String->new(Math::GMPq::Rmpq_get_str(${$_[0]}, $$y));
+        Sidef::Types::String::String->new(Math::GMPq::Rmpq_get_str($$x, $y));
     }
 
     *in_base = \&base;
