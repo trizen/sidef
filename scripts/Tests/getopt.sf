@@ -97,5 +97,25 @@ assert_eq(b1, false)
 assert_eq(b2, false)
 assert_eq(b3, true)
 
+#
+## Test 6
+#
+
+var file = File('file.dat')
+var length = 42
+var verbose = false
+
+var args = ['--file', 'foo.txt', '--length', '1234', '--verbose']
+
+args.getopt(
+    'length=i' => \length,
+    'file=s'   => \file,
+    'verbose'  => \verbose
+)
+
+assert_eq(file, File('foo.txt'))
+assert_eq(length, 1234)
+assert_eq(verbose, true)
+
 
 say "** Test passed!"
