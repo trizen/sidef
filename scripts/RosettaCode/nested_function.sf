@@ -1,0 +1,17 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Nested_function
+#
+
+func make_list(separator = ') ') {
+
+    var count = 1
+    func make_item(item) {
+        [count++, separator, item].join
+    }
+
+    <first second third> «call« make_item -> join("\n")
+}
+
+say make_list('. ')
