@@ -1350,21 +1350,21 @@ package Sidef::Types::Number::Number {
     sub harmfrac {
         my ($n) = @_;
 
-        my $ui = Math::GMPq::Rmpq_get_d($$n);
+        my $ui = CORE::int(Math::GMPq::Rmpq_get_d($$n));
 
-        # Make sure $ui+1 does not exceed MAX_UI
-        $ui >= MAX_UI
-          and return $n->harmreal;
-
-        $ui = CORE::int($ui);
         $ui || return ZERO();
         $ui < 0 and return nan();
 
         # Use binary splitting for large values of n. (by Fredrik Johansson)
         # http://fredrik-j.blogspot.ro/2009/02/how-not-to-compute-harmonic-numbers.html
         if ($ui > 7000) {
-            my $num  = Math::GMPz::Rmpz_init_set_ui(1);
-            my $den  = Math::GMPz::Rmpz_init_set_ui($ui + 1);
+
+            my $num = Math::GMPz::Rmpz_init_set_ui(1);
+
+            my $den = Math::GMPz::Rmpz_init();
+            Math::GMPz::Rmpz_set_q($den, $$n);
+            Math::GMPz::Rmpz_add_ui($den, $den, 1);
+
             my $temp = Math::GMPz::Rmpz_init();
 
             # Inspired by Dana Jacobsen's code from Math::Prime::Util::{PP,GMP}.
