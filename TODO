@@ -10,6 +10,9 @@ Blocks:
 Method/functions:
     * Implement the `is export` trait for functions and classes (maybe)
 
+Perl:
+    * Switch to subroutine `signatures` (as soon as this feature becomes stable).
+
 Speculations:
     * Make all core methods (including user-defined methods) real multimethods, using Class::Multimethods.
     * Replace the current numerical system with Math::BigNum.

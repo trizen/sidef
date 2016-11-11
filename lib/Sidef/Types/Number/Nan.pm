@@ -166,26 +166,28 @@ package Sidef::Types::Number::Nan {
         Sidef::Types::Bool::Bool::FALSE;
     }
 
-    *le          = \&is_inf;
-    *lt          = \&is_inf;
-    *gt          = \&is_inf;
-    *ge          = \&is_inf;
-    *is_div      = \&is_inf;
-    *ne          = \&is_inf;
-    *is_zero     = \&is_inf;
-    *is_one      = \&is_inf;
-    *is_mone     = \&is_inf;
-    *is_ninf     = \&is_inf;
-    *is_positive = \&is_inf;
-    *is_negative = \&is_inf;
-    *is_pos      = \&is_inf;
-    *is_neg      = \&is_inf;
-    *is_real     = \&is_inf;
-    *is_even     = \&is_inf;
-    *is_odd      = \&is_inf;
-    *divides     = \&is_inf;
-    *is_square   = \&is_inf;
-    *is_sqr      = \&is_inf;
+    *le            = \&is_inf;
+    *lt            = \&is_inf;
+    *gt            = \&is_inf;
+    *ge            = \&is_inf;
+    *is_div        = \&is_inf;
+    *ne            = \&is_inf;
+    *is_zero       = \&is_inf;
+    *is_one        = \&is_inf;
+    *is_mone       = \&is_inf;
+    *is_ninf       = \&is_inf;
+    *is_positive   = \&is_inf;
+    *is_negative   = \&is_inf;
+    *is_pos        = \&is_inf;
+    *is_neg        = \&is_inf;
+    *is_real       = \&is_inf;
+    *is_even       = \&is_inf;
+    *is_odd        = \&is_inf;
+    *divides       = \&is_inf;
+    *is_square     = \&is_inf;
+    *is_sqr        = \&is_inf;
+    *is_prime      = \&is_inf;
+    *is_prob_prime = \&is_inf;
 
     sub complex {
         my ($x, $y) = @_;
@@ -243,8 +245,10 @@ package Sidef::Types::Number::Nan {
         Sidef::Types::Array::Array->new([]);
     }
 
-    *defs   = \&of;
-    *digits = \&of;
+    *defs    = \&of;
+    *digits  = \&of;
+    *factor  = \&of;
+    *factors = \&of;
 
     sub times { $_[1] }
 

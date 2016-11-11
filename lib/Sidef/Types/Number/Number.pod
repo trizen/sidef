@@ -710,6 +710,16 @@ Aliases: I<modpow>, I<powmod>
 
 =cut
 
+=head2 factor
+
+Number.factor() -> I<Obj>
+
+Return the
+
+Aliases: I<factors>
+
+=cut
+
 =head2 fadd
 
 Number.fadd() -> I<Obj>
@@ -1039,6 +1049,14 @@ Aliases: I<is_power>
 =head2 is_prime
 
 Number.is_prime() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 is_prob_prime
+
+Number.is_prob_prime() -> I<Obj>
 
 Return the
 

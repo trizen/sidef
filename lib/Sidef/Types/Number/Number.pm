@@ -2238,17 +2238,30 @@ package Sidef::Types::Number::Number {
         __PACKAGE__->_set_uint(Math::GMPz::Rmpz_remove($x, $x, $z));
     }
 
-    sub is_prime {
+    sub is_prob_prime {
         my ($x, $k) = @_;
 
-        Math::GMPq::Rmpq_integer_p($$x)
+        $x = $$x;
+
+        Math::GMPq::Rmpq_integer_p($x)
           || return (Sidef::Types::Bool::Bool::FALSE);
 
         (
-         Math::GMPz::Rmpz_probab_prime_p(Math::GMPz::Rmpz_init_set($$x),
+         Math::GMPz::Rmpz_probab_prime_p(Math::GMPz::Rmpz_init_set($x),
                                          defined($k) ? do { _valid(\$k); CORE::int Math::GMPq::Rmpq_get_d($$k) }
                                          : 20) > 0
           ) ? Sidef::Types::Bool::Bool::TRUE
+          : Sidef::Types::Bool::Bool::FALSE;
+    }
+
+    sub is_prime {
+        my $x = ${$_[0]};
+
+        Math::GMPq::Rmpq_integer_p($x)
+          || return (Sidef::Types::Bool::Bool::FALSE);
+
+        Math::Prime::Util::GMP::is_prime(Math::GMPq::Rmpq_get_str($x, 10))
+          ? Sidef::Types::Bool::Bool::TRUE
           : Sidef::Types::Bool::Bool::FALSE;
     }
 
@@ -2275,13 +2288,15 @@ package Sidef::Types::Number::Number {
         );
     }
 
-    sub is_square {
-        my ($x) = @_;
+    *factors = \&factor;
 
-        Math::GMPq::Rmpq_integer_p($$x)
+    sub is_square {
+        my $x = ${$_[0]};
+
+        Math::GMPq::Rmpq_integer_p($x)
           || return (Sidef::Types::Bool::Bool::FALSE);
 
-        Math::GMPz::Rmpz_perfect_square_p(Math::GMPz::Rmpz_init_set($$x))
+        Math::GMPz::Rmpz_perfect_square_p(Math::GMPz::Rmpz_init_set($x))
           ? Sidef::Types::Bool::Bool::TRUE
           : Sidef::Types::Bool::Bool::FALSE;
     }

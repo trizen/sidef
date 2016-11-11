@@ -64,21 +64,22 @@ package Sidef::Types::Number::Inf {
 
     sub is_ninf { Sidef::Types::Bool::Bool::FALSE }
 
-    *is_nan    = \&is_ninf;
-    *is_neg    = \&is_ninf;
-    *is_prime  = \&is_ninf;
-    *is_square = \&is_ninf;
-    *is_sqr    = \&is_ninf;
-    *is_power  = \&is_ninf;
-    *is_pow    = \&is_ninf;
-    *is_div    = \&is_ninf;
-    *is_even   = \&is_ninf;
-    *is_odd    = \&is_ninf;
-    *divides   = \&is_ninf;
-    *is_real   = \&is_ninf;
-    *is_zero   = \&is_ninf;
-    *is_one    = \&is_ninf;
-    *is_mone   = \&is_ninf;
+    *is_nan        = \&is_ninf;
+    *is_neg        = \&is_ninf;
+    *is_prime      = \&is_ninf;
+    *is_prob_prime = \&is_ninf;
+    *is_square     = \&is_ninf;
+    *is_sqr        = \&is_ninf;
+    *is_power      = \&is_ninf;
+    *is_pow        = \&is_ninf;
+    *is_div        = \&is_ninf;
+    *is_even       = \&is_ninf;
+    *is_odd        = \&is_ninf;
+    *divides       = \&is_ninf;
+    *is_real       = \&is_ninf;
+    *is_zero       = \&is_ninf;
+    *is_one        = \&is_ninf;
+    *is_mone       = \&is_ninf;
 
     sub nan { Sidef::Types::Number::Nan::NAN }
 
@@ -123,8 +124,11 @@ package Sidef::Types::Number::Inf {
     *as_hex = \&as_bin;
 
     sub digits {
-        Sidef::Types::Array::Array->new;
+        Sidef::Types::Array::Array->new([]);
     }
+
+    *factor  = \&digits;
+    *factors = \&digits;
 
     sub divmod {
         my ($x, $y) = @_;

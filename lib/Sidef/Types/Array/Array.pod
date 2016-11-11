@@ -507,6 +507,14 @@ Aliases: I<slice>
 
 =cut
 
+=head2 getopt
+
+Array.getopt() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 grep
 
 Array.grep() -> I<Obj>

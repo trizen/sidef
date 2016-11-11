@@ -516,7 +516,7 @@ HEADER
                 elsif ($obj->{name} eq 'ARGV') {
                     $self->top_add("require Encode;");
                     $self->top_add(  qq{my \$$name = Sidef::Types::Array::Array->new}
-                                   . qq{(map {Sidef::Types::String::String->new(Encode::decode_utf8(\$_))} \@ARGV);});
+                                   . qq{([map {Sidef::Types::String::String->new(Encode::decode_utf8(\$_))} \@ARGV]);});
                 }
 
                 $code = $self->_dump_var($obj, $refaddr);
@@ -1357,7 +1357,7 @@ HEADER
 
                 if ($i < $limit) {
                     if ($expr->{ind}[$i + 1]{array}) {
-                        $code = "($code//=Sidef::Types::Array::Array->new)";
+                        $code = "($code//=Sidef::Types::Array::Array->new([]))";
                     }
                     else {
                         $code = "($code//=Sidef::Types::Hash::Hash->new)";

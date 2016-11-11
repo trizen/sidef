@@ -64,7 +64,7 @@ package Sidef::Object::Lazy {
         my ($self, $n) = @_;
 
         $n = CORE::int($n);
-        $n > 0 || return Sidef::Types::Array::Array->new;
+        $n > 0 || return Sidef::Types::Array::Array->new([]);
 
         my @arr;
 

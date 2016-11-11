@@ -22,7 +22,7 @@ package Sidef::Perl::Perl {
             }
 
             if ($ref eq 'ARRAY') {
-                my $array = $refs{$val} //= Sidef::Types::Array::Array->new;
+                my $array = $refs{$val} //= Sidef::Types::Array::Array->new([]);
                 foreach my $item (@{$val}) {
                     push @$array,
                       (

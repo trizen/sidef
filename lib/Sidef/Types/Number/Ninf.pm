@@ -58,21 +58,6 @@ package Sidef::Types::Number::Ninf {
 
     sub is_pos { Sidef::Types::Bool::Bool::FALSE }
 
-    *is_nan    = \&is_pos;
-    *is_prime  = \&is_pos;
-    *is_square = \&is_pos;
-    *is_sqr    = \&is_pos;
-    *is_power  = \&is_pos;
-    *is_pow    = \&is_pos;
-    *is_div    = \&is_pos;
-    *is_even   = \&is_pos;
-    *is_odd    = \&is_pos;
-    *divides   = \&is_pos;
-    *is_real   = \&is_pos;
-    *is_zero   = \&is_pos;
-    *is_one    = \&is_pos;
-    *is_mone   = \&is_pos;
-
     sub is_neg { Sidef::Types::Bool::Bool::TRUE }
 
     *is_inf  = \&is_neg;
@@ -387,7 +372,7 @@ package Sidef::Types::Number::Ninf {
     *commify = \&dump;
 
     sub of {
-        Sidef::Types::Array::Array->new();
+        Sidef::Types::Array::Array->new([]);
     }
 
     *defs = \&of;
