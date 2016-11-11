@@ -83,7 +83,7 @@ package Sidef::Math::Math {
     sub range_sum {
         my ($self, $from, $to, $step) = @_;
         $step //= Sidef::Types::Number::Number::ONE;
-        state $two = Sidef::Types::Number::Number->_new_uint(2);
+        state $two = Sidef::Types::Number::Number->_set_uint(2);
         ($from->add($to))->mul($to->sub($from)->div($step)->add(Sidef::Types::Number::Number::ONE))->div($two);
     }
 
@@ -103,7 +103,7 @@ package Sidef::Math::Math {
         my $sum  = $to->sub($from)->abs;
         my $dist = $num->sub($to)->abs;
 
-        state $hundred = Sidef::Types::Number::Number->_new_uint(100);
+        state $hundred = Sidef::Types::Number::Number->_set_uint(100);
         ($sum->sub($dist))->div($sum)->mul($hundred);
     }
 

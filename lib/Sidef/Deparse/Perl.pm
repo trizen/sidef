@@ -972,8 +972,8 @@ HEADER
             my ($sgn, $content) = $obj->_deparse;
             $code =
                 ($sgn == 2) ? $self->make_constant($ref, '_set_str',  "Number$refaddr", "'" . $content . "'")
-              : ($sgn >= 0) ? $self->make_constant($ref, '_new_uint', "Number$refaddr", "'" . $content . "'")
-              :               $self->make_constant($ref, '_new_int', "Number$refaddr", "'" . $content . "'");
+              : ($sgn >= 0) ? $self->make_constant($ref, '_set_uint', "Number$refaddr", "'" . $content . "'")
+              :               $self->make_constant($ref, '_set_int', "Number$refaddr", "'" . $content . "'");
         }
         elsif ($ref eq 'Sidef::Types::Number::Inf') {
             $code = $self->make_constant($ref, 'new', "Inf$refaddr");

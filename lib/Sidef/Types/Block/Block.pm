@@ -331,8 +331,8 @@ package Sidef::Types::Block::Block {
         if ($ref eq 'Sidef::Types::Number::Number') {
             my ($code, $value) = $obj->_deparse();
 
-            $code < 0  && return scalar {dump => ($ref . "->_new_int('$value')")};
-            $code <= 1 && return scalar {dump => ($ref . "->_new_uint('$value')")};
+            $code < 0  && return scalar {dump => ($ref . "->_set_int('$value')")};
+            $code <= 1 && return scalar {dump => ($ref . "->_set_uint('$value')")};
 
             return scalar {dump => ($ref . "->_set_str('$value')"),};
         }

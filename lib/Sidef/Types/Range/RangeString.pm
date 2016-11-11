@@ -27,7 +27,7 @@ package Sidef::Types::Range::RangeString {
 
         if (not defined $to) {
             $to   = $from;
-            $from = Sidef::Types::Number::Number->_new_uint(CORE::ord("a"));
+            $from = Sidef::Types::Number::Number->_set_uint(CORE::ord("a"));
         }
 
         bless {
@@ -54,7 +54,7 @@ package Sidef::Types::Range::RangeString {
         }
         else {
             $to   = $from;
-            $from = Sidef::Types::Number::Number->_new_uint(CORE::ord("a"));
+            $from = Sidef::Types::Number::Number->_set_uint(CORE::ord("a"));
         }
 
         bless {

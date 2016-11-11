@@ -63,7 +63,7 @@ package Sidef::Types::Number::Number {
         Math::GMPq::Rmpq_get_d(${$_[0]});
     }
 
-    sub _new_uint {
+    sub _set_uint {
         $_[1] <= 8192
           ? do {
             exists($cache[$_[1]]) and return $cache[$_[1]];
@@ -76,9 +76,9 @@ package Sidef::Types::Number::Number {
           };
     }
 
-    sub _new_int {
+    sub _set_int {
         $_[1] == -1 && return MONE;
-        $_[1] >= 0  && goto &_new_uint;
+        $_[1] >= 0  && goto &_set_uint;
         Math::GMPq::Rmpq_set_si((my $r = Math::GMPq::Rmpq_init()), $_[1], 1);
         bless(\$r, __PACKAGE__);
     }
@@ -1679,7 +1679,7 @@ package Sidef::Types::Number::Number {
     sub popcount {
         my $z = _big2mpz($_[0]);
         Math::GMPz::Rmpz_neg($z, $z) if Math::GMPz::Rmpz_sgn($z) < 0;
-        __PACKAGE__->_new_uint(Math::GMPz::Rmpz_popcount($z));
+        __PACKAGE__->_set_uint(Math::GMPz::Rmpz_popcount($z));
     }
 
     sub is_int {
@@ -1910,7 +1910,7 @@ package Sidef::Types::Number::Number {
           };
 
         $str =~ tr/-//d;
-        Sidef::Types::Array::Array->new([map { __PACKAGE__->_new_uint($_) } split(//, $str)]);
+        Sidef::Types::Array::Array->new([map { __PACKAGE__->_set_uint($_) } split(//, $str)]);
     }
 
     sub digit {
@@ -1928,15 +1928,15 @@ package Sidef::Types::Number::Number {
 
         $str =~ tr/-//d;
         my $digit = substr($str, Math::GMPq::Rmpq_get_d($$y), 1);
-        length($digit) ? __PACKAGE__->_new_uint($digit) : nan();
+        length($digit) ? __PACKAGE__->_set_uint($digit) : nan();
     }
 
     sub length {
         Math::GMPz::Rmpz_set_q((my $z = Math::GMPz::Rmpz_init()), ${$_[0]});
         Math::GMPz::Rmpz_abs($z, $z);
 
-        #__PACKAGE__->_new_uint(Math::GMPz::Rmpz_sizeinbase($z, 10));        # turned out to be inexact
-        __PACKAGE__->_new_uint(Math::GMPz::Rmpz_snprintf(my $buf, 0, "%Zd", $z, 0));
+        #__PACKAGE__->_set_uint(Math::GMPz::Rmpz_sizeinbase($z, 10));        # turned out to be inexact
+        __PACKAGE__->_set_uint(Math::GMPz::Rmpz_snprintf(my $buf, 0, "%Zd", $z, 0));
     }
 
     *len  = \&length;
@@ -2235,7 +2235,7 @@ package Sidef::Types::Number::Number {
         my $sgn = Math::GMPz::Rmpz_sgn($z) || return ZERO;
         Math::GMPz::Rmpz_abs($z, $z) if $sgn < 0;
         $x = _big2mpz($x);
-        __PACKAGE__->_new_uint(Math::GMPz::Rmpz_remove($x, $x, $z));
+        __PACKAGE__->_set_uint(Math::GMPz::Rmpz_remove($x, $x, $z));
     }
 
     sub is_prime {
@@ -2266,7 +2266,7 @@ package Sidef::Types::Number::Number {
              map {
 
                  $_ <= MAX_UI
-                   ? __PACKAGE__->_new_uint($_)
+                   ? __PACKAGE__->_set_uint($_)
                    : __PACKAGE__->_set_str($_)
                }
 

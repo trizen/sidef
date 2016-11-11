@@ -16,7 +16,7 @@ package Sidef::Time::Localtime {
 
         bless {
                sec  => $sec,
-               time => [map { Sidef::Types::Number::Number->_new_uint($_) } localtime($sec)],
+               time => [map { Sidef::Types::Number::Number->_set_uint($_) } localtime($sec)],
               },
           __PACKAGE__;
     }
