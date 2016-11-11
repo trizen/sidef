@@ -6,6 +6,7 @@ package Sidef::Types::Number::Number {
     use Math::GMPq qw();
     use Math::GMPz qw();
     use Math::MPFR qw();
+    use Math::Prime::Util::GMP qw();
 
     our $ROUND = Math::MPFR::MPFR_RNDN();
     our $PREC  = 200;
@@ -170,6 +171,14 @@ package Sidef::Types::Number::Number {
         my $r = Math::MPFR::Rmpfr_init2($PREC);
         Math::MPFR::Rmpfr_set_q($r, ${$_[0]}, $ROUND);
         $r;
+    }
+
+    sub _big2istr {
+        my $q = ${$_[0]};
+        Math::GMPq::Rmpq_integer_p($q) ? Math::GMPq::Rmpq_get_str($q, 10) : do {
+            Math::GMPz::Rmpz_set_q((my $z = Math::GMPz::Rmpz_init()), $q);
+            Math::GMPz::Rmpz_get_str($z, 10);
+        };
     }
 
     ################ CACHE FOR TEMPORARY MPZ OBJECTS ################
@@ -2248,6 +2257,22 @@ package Sidef::Types::Number::Number {
         $x = _big2mpz($x);
         Math::GMPz::Rmpz_nextprime($x, $x);
         _mpz2big($x);
+    }
+
+    sub factor {
+        my ($x) = @_;
+        Sidef::Types::Array::Array->new(
+            [
+             map {
+
+                 $_ <= MAX_UI
+                   ? __PACKAGE__->_new_uint($_)
+                   : __PACKAGE__->_set_str($_)
+               }
+
+               Math::Prime::Util::GMP::factor(_big2istr($x))
+            ]
+        );
     }
 
     sub is_square {

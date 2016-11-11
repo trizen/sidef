@@ -1327,7 +1327,7 @@ HEADER
                 if (exists $ind->{array}) {
                     my $indices = $self->_dump_indices($ind->{array});
 
-                    $code = '@{' . $code . '}';
+                    $code = '@{(' . $code . ')}';
 
                     if ($indices ne '') {
                         $code .= '['
@@ -1342,7 +1342,7 @@ HEADER
                     my $keys = $self->_dump_lookups($ind->{hash});
 
                     if ($keys eq '') {
-                        $code = '%{' . $code . '}';
+                        $code = '%{(' . $code . ')}';
                     }
                     else {
                         $code = '@{'
