@@ -616,6 +616,14 @@ Return the
 
 =cut
 
+=head2 divisors
+
+Number.divisors() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 divmod
 
 Number.divmod() -> I<Obj>
@@ -1054,6 +1062,14 @@ Return the
 
 =cut
 
+=head2 is_prime_power
+
+Number.is_prime_power() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 is_prob_prime
 
 Number.is_prob_prime() -> I<Obj>
@@ -1062,9 +1078,25 @@ Return the
 
 =cut
 
+=head2 is_prov_prime
+
+Number.is_prov_prime() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 isqrt
 
 Number.isqrt() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 isqrtrem
+
+Number.isqrtrem() -> I<Obj>
 
 Return the
 
@@ -1085,6 +1117,14 @@ Number.is_sqr() -> I<Obj>
 Return the
 
 Aliases: I<is_square>
+
+=cut
+
+=head2 is_square_free
+
+Number.is_square_free() -> I<Obj>
+
+Return the
 
 =cut
 
@@ -1258,6 +1298,14 @@ Return the
 
 =cut
 
+=head2 moebius
+
+Number.moebius() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 nan
 
 Number.nan() -> I<Obj>
@@ -1376,9 +1424,49 @@ Return the
 
 =cut
 
+=head2 pn_primorial
+
+Number.pn_primorial() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 popcount
 
 Number.popcount() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 prev_prime
+
+Number.prev_prime() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 prime_power
+
+Number.prime_power() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 prime_root
+
+Number.prime_root() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 primes
+
+Number.primes() -> I<Obj>
 
 Return the
 
@@ -1463,6 +1551,14 @@ Return the
 =head2 sech
 
 Number.sech() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 sigma
+
+Number.sigma() -> I<Obj>
 
 Return the
 

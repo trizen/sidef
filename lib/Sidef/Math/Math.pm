@@ -46,6 +46,19 @@ package Sidef::Math::Math {
         $sum;
     }
 
+    sub prod {
+        my ($self, @list) = @_;
+
+        my $prod = Sidef::Types::Number::Number::ONE;
+        foreach my $n (@list) {
+            $prod = $prod->mul($n);
+        }
+
+        $prod;
+    }
+
+    *product = \&prod;
+
     sub max {
         my ($self, @list) = @_;
 

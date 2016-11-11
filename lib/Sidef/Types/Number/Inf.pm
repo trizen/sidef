@@ -62,24 +62,27 @@ package Sidef::Types::Number::Inf {
 
     *is_inf = \&is_pos;
 
-    sub is_ninf { Sidef::Types::Bool::Bool::FALSE }
+    sub is_real { Sidef::Types::Bool::Bool::FALSE }
 
-    *is_nan        = \&is_ninf;
-    *is_neg        = \&is_ninf;
-    *is_prime      = \&is_ninf;
-    *is_prob_prime = \&is_ninf;
-    *is_square     = \&is_ninf;
-    *is_sqr        = \&is_ninf;
-    *is_power      = \&is_ninf;
-    *is_pow        = \&is_ninf;
-    *is_div        = \&is_ninf;
-    *is_even       = \&is_ninf;
-    *is_odd        = \&is_ninf;
-    *divides       = \&is_ninf;
-    *is_real       = \&is_ninf;
-    *is_zero       = \&is_ninf;
-    *is_one        = \&is_ninf;
-    *is_mone       = \&is_ninf;
+    *is_nan         = \&is_real;
+    *is_neg         = \&is_real;
+    *is_prime       = \&is_real;
+    *is_prob_prime  = \&is_real;
+    *is_prov_prime  = \&is_real;
+    *is_square      = \&is_real;
+    *is_sqr         = \&is_real;
+    *is_power       = \&is_real;
+    *is_pow         = \&is_real;
+    *is_div         = \&is_real;
+    *is_even        = \&is_real;
+    *is_odd         = \&is_real;
+    *divides        = \&is_real;
+    *is_ninf        = \&is_real;
+    *is_zero        = \&is_real;
+    *is_one         = \&is_real;
+    *is_mone        = \&is_real;
+    *is_square_free = \&is_real;
+    *is_prime_power = \&is_real;
 
     sub nan { Sidef::Types::Number::Nan::NAN }
 
@@ -104,12 +107,19 @@ package Sidef::Types::Number::Inf {
     *next_pow2   = \&nan;
     *next_pow    = \&nan;
     *next_power  = \&nan;
+    *next_prime  = \&nan;
+    *prev_prime  = \&nan;
     *digit       = \&nan;
     *bernreal    = \&nan;
     *bernfrac    = \&nan;
     *bern        = \&nan;
     *bernoulli   = \&nan;
     *valuation   = \&nan;
+    *popcount    = \&nan;
+    *moebius     = \&nan;
+    *sigma       = \&nan;
+    *prime_root  = \&nan;
+    *prime_power = \&nan;
 
     *harm     = \&inf;
     *harmonic = \&inf;
@@ -127,12 +137,20 @@ package Sidef::Types::Number::Inf {
         Sidef::Types::Array::Array->new([]);
     }
 
-    *factor  = \&digits;
-    *factors = \&digits;
+    *factor   = \&digits;
+    *factors  = \&digits;
+    *primes   = \&digits;
+    *divisors = \&digits;
 
     sub divmod {
         my ($x, $y) = @_;
         ($x->div($y), Sidef::Types::Number::Nan::NAN);
+    }
+
+    sub isqrtrem {
+        my ($x) = @_;
+        my $sqrt = $x->isqrt;
+        ($sqrt, $x->sub($sqrt));
     }
 
     sub ninf {
@@ -217,7 +235,6 @@ package Sidef::Types::Number::Inf {
     *grad2deg         = \&inf;
     *round            = \&inf;
     *roundf           = \&inf;
-    *popcount         = \&nan;
 
     sub zero { Sidef::Types::Number::Number::ZERO }
 

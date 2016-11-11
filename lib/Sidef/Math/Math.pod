@@ -89,6 +89,16 @@ Aliases: I<number_to_percentage>
 
 =cut
 
+=head2 prod
+
+Math.prod() -> I<Obj>
+
+Return the
+
+Aliases: I<product>
+
+=cut
+
 =head2 range_sum
 
 Math.range_sum() -> I<Obj>

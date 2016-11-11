@@ -115,9 +115,12 @@ package Sidef::Types::Number::Nan {
     *int         = \&nan;
     *float       = \&nan;
     *sqr         = \&nan;
-    *next_pow    = \&nan;
+    *next_power2 = \&nan;
     *next_pow2   = \&nan;
+    *next_pow    = \&nan;
+    *next_power  = \&nan;
     *next_prime  = \&nan;
+    *prev_prime  = \&nan;
     *primorial   = \&nan;
     *lcm         = \&nan;
     *gcd         = \&nan;
@@ -149,6 +152,10 @@ package Sidef::Types::Number::Nan {
     *harmonic    = \&nan;
     *harmfrac    = \&nan;
     *harmreal    = \&nan;
+    *moebius     = \&nan;
+    *sigma       = \&nan;
+    *prime_root  = \&nan;
+    *prime_power = \&nan;
 
     sub cmp { }
 
@@ -162,32 +169,35 @@ package Sidef::Types::Number::Nan {
           : Sidef::Types::Bool::Bool::FALSE;
     }
 
-    sub is_inf {
+    sub is_real {
         Sidef::Types::Bool::Bool::FALSE;
     }
 
-    *le            = \&is_inf;
-    *lt            = \&is_inf;
-    *gt            = \&is_inf;
-    *ge            = \&is_inf;
-    *is_div        = \&is_inf;
-    *ne            = \&is_inf;
-    *is_zero       = \&is_inf;
-    *is_one        = \&is_inf;
-    *is_mone       = \&is_inf;
-    *is_ninf       = \&is_inf;
-    *is_positive   = \&is_inf;
-    *is_negative   = \&is_inf;
-    *is_pos        = \&is_inf;
-    *is_neg        = \&is_inf;
-    *is_real       = \&is_inf;
-    *is_even       = \&is_inf;
-    *is_odd        = \&is_inf;
-    *divides       = \&is_inf;
-    *is_square     = \&is_inf;
-    *is_sqr        = \&is_inf;
-    *is_prime      = \&is_inf;
-    *is_prob_prime = \&is_inf;
+    *le             = \&is_real;
+    *lt             = \&is_real;
+    *gt             = \&is_real;
+    *ge             = \&is_real;
+    *is_div         = \&is_real;
+    *ne             = \&is_real;
+    *is_zero        = \&is_real;
+    *is_one         = \&is_real;
+    *is_mone        = \&is_real;
+    *is_ninf        = \&is_real;
+    *is_positive    = \&is_real;
+    *is_negative    = \&is_real;
+    *is_pos         = \&is_real;
+    *is_neg         = \&is_real;
+    *is_inf         = \&is_real;
+    *is_even        = \&is_real;
+    *is_odd         = \&is_real;
+    *divides        = \&is_real;
+    *is_square      = \&is_real;
+    *is_sqr         = \&is_real;
+    *is_prime       = \&is_real;
+    *is_prob_prime  = \&is_real;
+    *is_prov_prime  = \&is_real;
+    *is_square_free = \&is_real;
+    *is_prime_power = \&is_real;
 
     sub complex {
         my ($x, $y) = @_;
@@ -245,10 +255,12 @@ package Sidef::Types::Number::Nan {
         Sidef::Types::Array::Array->new([]);
     }
 
-    *defs    = \&of;
-    *digits  = \&of;
-    *factor  = \&of;
-    *factors = \&of;
+    *defs     = \&of;
+    *digits   = \&of;
+    *factor   = \&of;
+    *factors  = \&of;
+    *primes   = \&of;
+    *divisors = \&of;
 
     sub times { $_[1] }
 
@@ -259,6 +271,12 @@ package Sidef::Types::Number::Nan {
     }
 
     *nude = \&parts;
+
+    sub divmod {
+        ($_[0], $_[0]);
+    }
+
+    *isqrtrem = \&divmod;
 
     {
         no strict 'refs';
