@@ -3104,6 +3104,11 @@ package Sidef::Types::Number::Number {
         *{__PACKAGE__ . '::' . 'γ'}  = \&Y;
         *{__PACKAGE__ . '::' . 'Γ'}  = \&gamma;
         *{__PACKAGE__ . '::' . 'Ψ'}  = \&digamma;
+        *{__PACKAGE__ . '::' . 'ϕ'}  = \&euler_totient;
+        *{__PACKAGE__ . '::' . 'σ'}  = \&sigma;
+        *{__PACKAGE__ . '::' . 'Ω'}  = \&omega;
+        *{__PACKAGE__ . '::' . 'ζ'}  = \&zeta;
+        *{__PACKAGE__ . '::' . 'μ'}  = \&mobius;
     }
 }
 

@@ -397,6 +397,7 @@ package Sidef::Types::Number::Ninf {
         *{__PACKAGE__ . '::' . '//'}  = \&div;
         *{__PACKAGE__ . '::' . 'Γ'}  = \&nan;
         *{__PACKAGE__ . '::' . 'Ψ'}  = \&nan;
+        *{__PACKAGE__ . '::' . 'ζ'}  = \&zeta;
     }
 }
 

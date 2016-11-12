@@ -1,5 +1,6 @@
 package Sidef::Types::Number::Nan {
 
+    use utf8;
     use 5.014;
     use Math::GMPq qw();
 
@@ -334,6 +335,11 @@ package Sidef::Types::Number::Nan {
         *{__PACKAGE__ . '::' . '//'}  = \&idiv;
         *{__PACKAGE__ . '::' . 'Γ'}  = \&gamma;
         *{__PACKAGE__ . '::' . 'Ψ'}  = \&digamma;
+        *{__PACKAGE__ . '::' . 'ϕ'}  = \&euler_totient;
+        *{__PACKAGE__ . '::' . 'σ'}  = \&sigma;
+        *{__PACKAGE__ . '::' . 'Ω'}  = \&omega;
+        *{__PACKAGE__ . '::' . 'ζ'}  = \&zeta;
+        *{__PACKAGE__ . '::' . 'μ'}  = \&mobius;
     }
 }
 

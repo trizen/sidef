@@ -533,6 +533,11 @@ package Sidef::Types::Number::Inf {
         *{__PACKAGE__ . '::' . '//'}  = \&div;
         *{__PACKAGE__ . '::' . 'Γ'}  = \&inf;
         *{__PACKAGE__ . '::' . 'Ψ'}  = \&inf;
+        *{__PACKAGE__ . '::' . 'ϕ'}  = \&euler_totient;
+        *{__PACKAGE__ . '::' . 'σ'}  = \&sigma;
+        *{__PACKAGE__ . '::' . 'Ω'}  = \&omega;
+        *{__PACKAGE__ . '::' . 'ζ'}  = \&zeta;
+        *{__PACKAGE__ . '::' . 'μ'}  = \&mobius;
     }
 }
 
