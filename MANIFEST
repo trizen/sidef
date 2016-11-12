@@ -314,6 +314,7 @@ scripts/RosettaCode/date_format.sf
 scripts/RosettaCode/decimal_float_to_binary.sf
 scripts/RosettaCode/delete_a_file.sf
 scripts/RosettaCode/determine_if_a_string_is_numeric.sf
+scripts/RosettaCode/dice_game_probabilities.sf
 scripts/RosettaCode/digital_root.sf
 scripts/RosettaCode/dijkstra_s_algorithm.sf
 scripts/RosettaCode/dinesman_problem_parsing.sf
@@ -906,6 +907,7 @@ utils/Experiments/operator_precendece.pl
 utils/Experiments/regexp_grammars_op_precedence.pl
 utils/Experiments/regexp_grammars_parser.pl
 utils/find_invalid_types.pl
+utils/find_undefined_methods.pl
 utils/grep_errors.sh
 utils/pod_generator.pl
 utils/sidef2bin.sh
