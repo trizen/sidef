@@ -2247,6 +2247,32 @@ package Sidef::Types::Number::Number {
         }
     }
 
+    *mobius = \&moebius;
+
+    # Currently (0.41), this method is very slow for wide ranges.
+    # It's included with the hope that it will become faster someday.
+    sub prime_count {
+        my ($x, $y) = @_;
+
+        if (ref($y) eq 'Sidef::Types::Number::Inf') {
+            return $y;
+        }
+        elsif (ref($y) eq 'Sidef::Types::Number::Ninf') {
+            return ZERO;
+        }
+        elsif (ref($y) eq 'Sidef::Types::Number::Nan') {
+            return nan();
+        }
+
+        my $n = defined($y)
+          ? do {
+            _valid(\$y);
+            Math::Prime::Util::GMP::prime_count(_big2istr($x), _big2istr($y));
+          }
+          : Math::Prime::Util::GMP::prime_count(2, _big2istr($x));
+        $n <= MAX_UI ? __PACKAGE__->_set_uint($n) : __PACKAGE__->_set_str($n);
+    }
+
     sub legendre {
         my ($x, $y) = @_;
         _valid(\$y);

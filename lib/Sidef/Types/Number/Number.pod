@@ -1354,11 +1354,13 @@ Return the
 
 =cut
 
-=head2 moebius
+=head2 mobius
 
-Number.moebius() -> I<Obj>
+Number.mobius() -> I<Obj>
 
 Return the
+
+Aliases: I<moebius>
 
 =cut
 
@@ -1515,6 +1517,14 @@ Return the
 =head2 prev_prime
 
 Number.prev_prime() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 prime_count
+
+Number.prime_count() -> I<Obj>
 
 Return the
 

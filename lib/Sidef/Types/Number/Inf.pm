@@ -117,6 +117,7 @@ package Sidef::Types::Number::Inf {
     *bernoulli         = \&nan;
     *valuation         = \&nan;
     *popcount          = \&nan;
+    *mobius            = \&nan;
     *moebius           = \&nan;
     *sigma             = \&nan;
     *sigma0            = \&nan;
@@ -136,6 +137,7 @@ package Sidef::Types::Number::Inf {
     *znorder           = \&nan;
     *znprimroot        = \&nan;
     *ramanujan_tau     = \&nan;
+    *prime_count       = \&nan;
 
     *harm     = \&inf;
     *harmonic = \&inf;

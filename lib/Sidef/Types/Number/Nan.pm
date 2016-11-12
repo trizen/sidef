@@ -153,6 +153,7 @@ package Sidef::Types::Number::Nan {
     *harmonic          = \&nan;
     *harmfrac          = \&nan;
     *harmreal          = \&nan;
+    *mobius            = \&nan;
     *moebius           = \&nan;
     *sigma             = \&nan;
     *sigma0            = \&nan;
@@ -174,6 +175,7 @@ package Sidef::Types::Number::Nan {
     *znorder           = \&nan;
     *znprimroot        = \&nan;
     *ramanujan_tau     = \&nan;
+    *prime_count       = \&nan;
 
     sub cmp { }
 
