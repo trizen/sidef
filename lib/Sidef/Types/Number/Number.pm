@@ -2191,6 +2191,27 @@ package Sidef::Types::Number::Number {
 
     *fib = \&fibonacci;
 
+    sub stirling {
+        my ($x, $y) = @_;
+        _valid(\$y);
+        my $n = Math::Prime::Util::GMP::stirling(_big2istr($x), _big2istr($y));
+        __PACKAGE__->_set_str($n);
+    }
+
+    sub stirling2 {
+        my ($x, $y) = @_;
+        _valid(\$y);
+        my $n = Math::Prime::Util::GMP::stirling(_big2istr($x), _big2istr($y), 2);
+        __PACKAGE__->_set_str($n);
+    }
+
+    sub stirling3 {
+        my ($x, $y) = @_;
+        _valid(\$y);
+        my $n = Math::Prime::Util::GMP::stirling(_big2istr($x), _big2istr($y), 3);
+        __PACKAGE__->_set_str($n);
+    }
+
     sub binomial {
         my ($x, $y) = @_;
         _valid(\$y);
@@ -2364,6 +2385,30 @@ package Sidef::Types::Number::Number {
 
     *factors = \&factor;
 
+    sub factor_pairs {
+        my %count;
+        foreach my $f (Math::Prime::Util::GMP::factor(&_big2istr)) {
+            ++$count{$f};
+        }
+
+        my @pairs;
+        foreach my $factor (sort keys(%count)) {
+            push @pairs,
+              Sidef::Types::Array::Array->new(
+                                              [
+                                               (
+                                                $_ <= MAX_UI
+                                                ? __PACKAGE__->_set_uint($factor)
+                                                : __PACKAGE__->_set_str($factor)
+                                               ),
+                                               __PACKAGE__->_set_uint($count{$factor})
+                                              ]
+                                             );
+        }
+
+        Sidef::Types::Array::Array->new(\@pairs);
+    }
+
     sub divisors {
         Sidef::Types::Array::Array->new(
             [
@@ -2379,12 +2424,35 @@ package Sidef::Types::Number::Number {
         );
     }
 
+    sub exp_mangoldt {
+        my $n = Math::Prime::Util::GMP::exp_mangoldt(&_big2istr);
+        $n == 1 and return ONE;
+        $n <= MAX_UI ? __PACKAGE__->_set_uint($n) : __PACKAGE__->_set_str($n);
+    }
+
     sub totient {
         my $n = Math::Prime::Util::GMP::totient(&_big2istr);
         $n <= MAX_UI ? __PACKAGE__->_set_uint($n) : __PACKAGE__->_set_str($n);
     }
 
-    *euler_phi = \&totient;
+    *euler_phi     = \&totient;
+    *euler_totient = \&totient;
+
+    sub jordan_totient {
+        my ($x, $y) = @_;
+        _valid(\$y);
+        my $n = Math::Prime::Util::GMP::jordan_totient(_big2istr($x), _big2istr($y));
+        $n <= MAX_UI ? __PACKAGE__->_set_uint($n) : __PACKAGE__->_set_str($n);
+    }
+
+    sub carmichael_lambda {
+        my $n = Math::Prime::Util::GMP::carmichael_lambda(&_big2istr);
+        $n <= MAX_UI ? __PACKAGE__->_set_uint($n) : __PACKAGE__->_set_str($n);
+    }
+
+    sub liouville {
+        Math::Prime::Util::GMP::liouville(&_big2istr) == 1 ? ONE : MONE;
+    }
 
     sub omega {
         my $n = Math::Prime::Util::GMP::factor(&_big2istr);

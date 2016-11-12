@@ -460,6 +460,14 @@ Return the
 
 =cut
 
+=head2 carmichael_lambda
+
+Number.carmichael_lambda() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 cbrt
 
 Number.cbrt() -> I<Obj>
@@ -708,6 +716,14 @@ Return the
 
 =cut
 
+=head2 exp_mangoldt
+
+Number.exp_mangoldt() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 expmod
 
 Number.expmod() -> I<Obj>
@@ -725,6 +741,14 @@ Number.factor() -> I<Obj>
 Return the
 
 Aliases: I<factors>
+
+=cut
+
+=head2 factor_pairs
+
+Number.factor_pairs() -> I<Obj>
+
+Return the
 
 =cut
 
@@ -1160,6 +1184,14 @@ Return the
 
 =cut
 
+=head2 jordan_totient
+
+Number.jordan_totient() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 kronecker
 
 Number.kronecker() -> I<Obj>
@@ -1221,6 +1253,14 @@ Return the
 =head2 li2
 
 Number.li2() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 liouville
+
+Number.liouville() -> I<Obj>
 
 Return the
 
@@ -1628,6 +1668,30 @@ Return the
 
 =cut
 
+=head2 stirling
+
+Number.stirling() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 stirling2
+
+Number.stirling2() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 stirling3
+
+Number.stirling3() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 tan
 
 Number.tan() -> I<Obj>
@@ -1666,7 +1730,7 @@ Number.totient() -> I<Obj>
 
 Return the
 
-Aliases: I<euler_phi>
+Aliases: I<euler_phi>, I<euler_totient>
 
 =cut
 

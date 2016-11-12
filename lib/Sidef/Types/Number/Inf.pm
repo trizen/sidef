@@ -86,43 +86,51 @@ package Sidef::Types::Number::Inf {
 
     sub nan { Sidef::Types::Number::Nan::NAN }
 
-    *mod         = \&nan;
-    *imod        = \&nan;
-    *fmod        = \&nan;
-    *bin         = \&nan;
-    *modpow      = \&nan;
-    *expmod      = \&nan;
-    *powmod      = \&nan;
-    *modinv      = \&nan;
-    *invmod      = \&nan;
-    *and         = \&nan;
-    *or          = \&nan;
-    *xor         = \&nan;
-    *legendre    = \&nan;
-    *jacobi      = \&nan;
-    *kronecker   = \&nan;
-    *gcd         = \&nan;
-    *lcm         = \&nan;
-    *next_power2 = \&nan;
-    *next_pow2   = \&nan;
-    *next_pow    = \&nan;
-    *next_power  = \&nan;
-    *next_prime  = \&nan;
-    *prev_prime  = \&nan;
-    *digit       = \&nan;
-    *bernreal    = \&nan;
-    *bernfrac    = \&nan;
-    *bern        = \&nan;
-    *bernoulli   = \&nan;
-    *valuation   = \&nan;
-    *popcount    = \&nan;
-    *moebius     = \&nan;
-    *sigma       = \&nan;
-    *omega       = \&nan;
-    *prime_root  = \&nan;
-    *prime_power = \&nan;
-    *totient     = \&nan;
-    *euler_phi   = \&nan;
+    *mod               = \&nan;
+    *imod              = \&nan;
+    *fmod              = \&nan;
+    *bin               = \&nan;
+    *modpow            = \&nan;
+    *expmod            = \&nan;
+    *powmod            = \&nan;
+    *modinv            = \&nan;
+    *invmod            = \&nan;
+    *and               = \&nan;
+    *or                = \&nan;
+    *xor               = \&nan;
+    *legendre          = \&nan;
+    *jacobi            = \&nan;
+    *kronecker         = \&nan;
+    *gcd               = \&nan;
+    *lcm               = \&nan;
+    *next_power2       = \&nan;
+    *next_pow2         = \&nan;
+    *next_pow          = \&nan;
+    *next_power        = \&nan;
+    *next_prime        = \&nan;
+    *prev_prime        = \&nan;
+    *digit             = \&nan;
+    *bernreal          = \&nan;
+    *bernfrac          = \&nan;
+    *bern              = \&nan;
+    *bernoulli         = \&nan;
+    *valuation         = \&nan;
+    *popcount          = \&nan;
+    *moebius           = \&nan;
+    *sigma             = \&nan;
+    *omega             = \&nan;
+    *prime_root        = \&nan;
+    *prime_power       = \&nan;
+    *totient           = \&nan;
+    *euler_phi         = \&nan;
+    *euler_totient     = \&nan;
+    *jordan_totient    = \&nan;
+    *carmichael_lambda = \&nan;
+    *liouville         = \&nan;
+    *exp_mangoldt      = \&nan;
+    *stirling          = \&nan;
+    *stirling2         = \&nan;
+    *stirling3         = \&nan;
 
     *harm     = \&inf;
     *harmonic = \&inf;
@@ -140,10 +148,11 @@ package Sidef::Types::Number::Inf {
         Sidef::Types::Array::Array->new([]);
     }
 
-    *factor   = \&digits;
-    *factors  = \&digits;
-    *primes   = \&digits;
-    *divisors = \&digits;
+    *factor       = \&digits;
+    *factors      = \&digits;
+    *factor_pairs = \&digits;
+    *primes       = \&digits;
+    *divisors     = \&digits;
 
     sub divmod {
         my ($x, $y) = @_;
