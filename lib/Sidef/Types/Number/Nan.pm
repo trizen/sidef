@@ -169,6 +169,7 @@ package Sidef::Types::Number::Nan {
     *stirling          = \&nan;
     *stirling2         = \&nan;
     *stirling3         = \&nan;
+    *bell              = \&nan;
 
     sub cmp { }
 

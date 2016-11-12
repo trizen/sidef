@@ -442,6 +442,14 @@ Aliases: I<in_base>
 
 =cut
 
+=head2 bell
+
+Number.bell() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 bern
 
 Number.bern() -> I<Obj>

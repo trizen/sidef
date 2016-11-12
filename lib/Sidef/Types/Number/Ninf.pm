@@ -83,6 +83,7 @@ package Sidef::Types::Number::Ninf {
     *harmfrac         = \&nan;
     *harmreal         = \&nan;
     *partitions       = \&nan;
+    *bell             = \&nan;
 
     sub inf { Sidef::Types::Number::Inf::INF }
 

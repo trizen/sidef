@@ -2212,6 +2212,11 @@ package Sidef::Types::Number::Number {
         __PACKAGE__->_set_str($n);
     }
 
+    sub bell {
+        my $n = Math::GMPq::Rmpq_get_d(${$_[0]});
+        __PACKAGE__->_set_str(Math::Prime::Util::GMP::vecsum(map { Math::Prime::Util::GMP::stirling($n, $_, 2) } 0 .. $n));
+    }
+
     sub binomial {
         my ($x, $y) = @_;
         _valid(\$y);

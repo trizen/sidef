@@ -251,6 +251,7 @@ package Sidef::Types::Number::Inf {
     *round            = \&inf;
     *roundf           = \&inf;
     *partitions       = \&inf;
+    *bell             = \&inf;
 
     sub zero { Sidef::Types::Number::Number::ZERO }
 
