@@ -2642,7 +2642,7 @@ package Sidef::Parser {
                     /\G\h*,\h*/gc || last;
                 }
 
-                /\G\h*in\h*/gc
+                /\G\h*(?:in|∈)\h*/gc
                   || $self->fatal_error(
                                         error => "expected the token 'in' after variable declaration in for-loop",
                                         code  => $_,
