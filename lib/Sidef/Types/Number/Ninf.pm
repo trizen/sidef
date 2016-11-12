@@ -75,12 +75,14 @@ package Sidef::Types::Number::Ninf {
     *double_factorial = \&nan;
     *dfac             = \&nan;
     *primorial        = \&nan;
+    *pn_primorial     = \&nan;
     *fibonacci        = \&nan;
     *lucas            = \&nan;
     *harm             = \&nan;
     *harmonic         = \&nan;
     *harmfrac         = \&nan;
     *harmreal         = \&nan;
+    *partitions       = \&nan;
 
     sub inf { Sidef::Types::Number::Inf::INF }
 

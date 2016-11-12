@@ -118,8 +118,11 @@ package Sidef::Types::Number::Inf {
     *popcount    = \&nan;
     *moebius     = \&nan;
     *sigma       = \&nan;
+    *omega       = \&nan;
     *prime_root  = \&nan;
     *prime_power = \&nan;
+    *totient     = \&nan;
+    *euler_phi   = \&nan;
 
     *harm     = \&inf;
     *harmonic = \&inf;
@@ -147,11 +150,13 @@ package Sidef::Types::Number::Inf {
         ($x->div($y), Sidef::Types::Number::Nan::NAN);
     }
 
-    sub isqrtrem {
+    sub sqrtrem {
         my ($x) = @_;
         my $sqrt = $x->isqrt;
         ($sqrt, $x->sub($sqrt));
     }
+
+    *isqrtrem = \&sqrtrem;
 
     sub ninf {
         state $x = Sidef::Types::Number::Ninf->new;
@@ -221,6 +226,7 @@ package Sidef::Types::Number::Inf {
     *double_factorial = \&inf;
     *dfac             = \&inf;
     *primorial        = \&inf;
+    *pn_primorial     = \&inf;
     *fibonacci        = \&inf;
     *lucas            = \&inf;
     *shift_left       = \&inf;
@@ -235,6 +241,7 @@ package Sidef::Types::Number::Inf {
     *grad2deg         = \&inf;
     *round            = \&inf;
     *roundf           = \&inf;
+    *partitions       = \&inf;
 
     sub zero { Sidef::Types::Number::Number::ZERO }
 

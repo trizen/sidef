@@ -1408,6 +1408,22 @@ Return the
 
 =cut
 
+=head2 omega
+
+Number.omega() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 partitions
+
+Number.partitions() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 phi
 
 Number.phi() -> I<Obj>
@@ -1604,6 +1620,14 @@ Return the
 
 =cut
 
+=head2 sqrtrem
+
+Number.sqrtrem() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 tan
 
 Number.tan() -> I<Obj>
@@ -1633,6 +1657,16 @@ Return the
 Number.times() -> I<Obj>
 
 Return the
+
+=cut
+
+=head2 totient
+
+Number.totient() -> I<Obj>
+
+Return the
+
+Aliases: I<euler_phi>
 
 =cut
 

@@ -660,9 +660,31 @@ package Sidef::Types::Number::Number {
     sub isqrtrem {
         my ($x) = @_;
         $x = _big2mpz($x);
+        Math::GMPz::Rmpz_sgn($x) < 0 and return ((nan()) x 2);
         my $r = Math::GMPz::Rmpz_init();
         Math::GMPz::Rmpz_sqrtrem($x, $r, $x);
         (_mpz2big($x), _mpz2big($r));
+    }
+
+    sub sqrtrem {
+        my ($x) = @_;
+        my $z = _big2mpz($x);
+        Math::GMPz::Rmpz_sgn($z) < 0 and return ((nan()) x 2);
+        my $r = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_sqrtrem($z, $r, $z);
+
+        # Return faster when $x is an integer
+        Math::GMPq::Rmpq_integer_p($$x)
+          && return (_mpz2big($z), _mpz2big($r));
+
+        # Compute the exact fractional remainder
+        my $q = Math::GMPq::Rmpq_init();
+        Math::GMPq::Rmpq_set_z($q, $z);
+        Math::GMPq::Rmpq_mul($q, $q, $q);
+        Math::GMPq::Rmpq_sub($q, $q, $$x);
+        Math::GMPq::Rmpq_neg($q, $q);
+
+        (_mpz2big($z), bless \$q, __PACKAGE__);
     }
 
     sub cbrt {
@@ -2183,8 +2205,7 @@ package Sidef::Types::Number::Number {
     *nok = \&binomial;
 
     sub moebius {
-        my ($n) = @_;
-        my $mob = Math::Prime::Util::GMP::moebius(_big2istr($n));
+        my $mob = Math::Prime::Util::GMP::moebius(&_big2istr);
         if (!$mob) {
             ZERO;
         }
@@ -2315,8 +2336,7 @@ package Sidef::Types::Number::Number {
     }
 
     sub prev_prime {
-        my ($x) = @_;
-        my $p = Math::Prime::Util::GMP::prev_prime(_big2istr($x)) || return nan();
+        my $p = Math::Prime::Util::GMP::prev_prime(&_big2istr) || return nan();
         $p <= MAX_UI ? __PACKAGE__->_set_uint($p) : __PACKAGE__->_set_str($p);
     }
 
@@ -2328,7 +2348,6 @@ package Sidef::Types::Number::Number {
     }
 
     sub factor {
-        my ($x) = @_;
         Sidef::Types::Array::Array->new(
             [
              map {
@@ -2338,7 +2357,7 @@ package Sidef::Types::Number::Number {
                    : __PACKAGE__->_set_str($_)
                }
 
-               Math::Prime::Util::GMP::factor(_big2istr($x))
+               Math::Prime::Util::GMP::factor(&_big2istr)
             ]
         );
     }
@@ -2346,7 +2365,6 @@ package Sidef::Types::Number::Number {
     *factors = \&factor;
 
     sub divisors {
-        my ($x) = @_;
         Sidef::Types::Array::Array->new(
             [
              map {
@@ -2356,14 +2374,30 @@ package Sidef::Types::Number::Number {
                    : __PACKAGE__->_set_str($_)
                }
 
-               Math::Prime::Util::GMP::divisors(_big2istr($x))
+               Math::Prime::Util::GMP::divisors(&_big2istr)
             ]
         );
     }
 
+    sub totient {
+        my $n = Math::Prime::Util::GMP::totient(&_big2istr);
+        $n <= MAX_UI ? __PACKAGE__->_set_uint($n) : __PACKAGE__->_set_str($n);
+    }
+
+    *euler_phi = \&totient;
+
+    sub omega {
+        my $n = Math::Prime::Util::GMP::factor(&_big2istr);
+        $n <= MAX_UI ? __PACKAGE__->_set_uint($n) : __PACKAGE__->_set_str($n);
+    }
+
     sub sigma {
-        my ($x) = @_;
-        my $n = Math::Prime::Util::GMP::divisors(_big2istr($x));
+        my $n = Math::Prime::Util::GMP::divisors(&_big2istr);
+        $n <= MAX_UI ? __PACKAGE__->_set_uint($n) : __PACKAGE__->_set_str($n);
+    }
+
+    sub partitions {
+        my $n = Math::Prime::Util::GMP::partitions(&_big2istr);
         $n <= MAX_UI ? __PACKAGE__->_set_uint($n) : __PACKAGE__->_set_str($n);
     }
 
