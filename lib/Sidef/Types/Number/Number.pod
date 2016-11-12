@@ -600,14 +600,6 @@ Aliases: I<double_factorial>
 
 =cut
 
-=head2 digamma
-
-Number.digamma() -> I<Obj>
-
-Return the
-
-=cut
-
 =head2 digit
 
 Number.digit() -> I<Obj>
@@ -834,9 +826,9 @@ Return the
 
 =cut
 
-=head2 gamma
+=head2 G
 
-Number.gamma() -> I<Obj>
+Number.G() -> I<Obj>
 
 Return the
 
@@ -1464,14 +1456,6 @@ Return the
 
 =cut
 
-=head2 omega
-
-Number.omega() -> I<Obj>
-
-Return the
-
-=cut
-
 =head2 partitions
 
 Number.partitions() -> I<Obj>
@@ -1756,6 +1740,16 @@ Return the
 
 =cut
 
+=head2 Y
+
+Number.Y() -> I<Obj>
+
+Return the
+
+Aliases: I<γ>
+
+=cut
+
 =head2 znorder
 
 Number.znorder() -> I<Obj>
@@ -1792,11 +1786,13 @@ Aliases: I<not>
 
 =cut
 
-=head2 γ
+=head2 Γ
 
-Number.γ() -> I<Obj>
+Number.Γ() -> I<Obj>
 
 Return the
+
+Aliases: I<gamma>
 
 =cut
 
@@ -1827,6 +1823,36 @@ Number.σ() -> I<Obj>
 Return the
 
 Aliases: I<sigma>
+
+=cut
+
+=head2 Ψ
+
+Number.Ψ() -> I<Obj>
+
+Return the
+
+Aliases: I<digamma>
+
+=cut
+
+=head2 Ω
+
+Number.Ω() -> I<Obj>
+
+Return the
+
+Aliases: I<big_omega>
+
+=cut
+
+=head2 ω
+
+Number.ω() -> I<Obj>
+
+Return the
+
+Aliases: I<omega>
 
 =cut
 

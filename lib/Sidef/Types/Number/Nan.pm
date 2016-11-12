@@ -159,6 +159,7 @@ package Sidef::Types::Number::Nan {
     *sigma             = \&nan;
     *sigma0            = \&nan;
     *omega             = \&nan;
+    *big_omega         = \&nan;
     *prime_root        = \&nan;
     *prime_power       = \&nan;
     *partitions        = \&nan;
@@ -337,7 +338,8 @@ package Sidef::Types::Number::Nan {
         *{__PACKAGE__ . '::' . 'Ψ'}  = \&digamma;
         *{__PACKAGE__ . '::' . 'ϕ'}  = \&euler_totient;
         *{__PACKAGE__ . '::' . 'σ'}  = \&sigma;
-        *{__PACKAGE__ . '::' . 'Ω'}  = \&omega;
+        *{__PACKAGE__ . '::' . 'Ω'}  = \&big_omega;
+        *{__PACKAGE__ . '::' . 'ω'}  = \&omega;
         *{__PACKAGE__ . '::' . 'ζ'}  = \&zeta;
         *{__PACKAGE__ . '::' . 'μ'}  = \&mobius;
     }

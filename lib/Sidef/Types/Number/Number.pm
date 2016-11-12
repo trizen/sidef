@@ -2491,9 +2491,14 @@ package Sidef::Types::Number::Number {
         Math::Prime::Util::GMP::liouville(&_big2istr) == 1 ? ONE : MONE;
     }
 
+    sub big_omega {
+        __PACKAGE__->_set_uint(scalar Math::Prime::Util::GMP::factor(&_big2istr));
+    }
+
     sub omega {
-        my $n = Math::Prime::Util::GMP::factor(&_big2istr);
-        $n <= MAX_UI ? __PACKAGE__->_set_uint($n) : __PACKAGE__->_set_str($n);
+        my %factors;
+        undef @factors{Math::Prime::Util::GMP::factor(&_big2istr)};
+        __PACKAGE__->_set_uint(scalar keys %factors);
     }
 
     sub sigma0 {
@@ -3106,7 +3111,8 @@ package Sidef::Types::Number::Number {
         *{__PACKAGE__ . '::' . 'Ψ'}  = \&digamma;
         *{__PACKAGE__ . '::' . 'ϕ'}  = \&euler_totient;
         *{__PACKAGE__ . '::' . 'σ'}  = \&sigma;
-        *{__PACKAGE__ . '::' . 'Ω'}  = \&omega;
+        *{__PACKAGE__ . '::' . 'Ω'}  = \&big_omega;
+        *{__PACKAGE__ . '::' . 'ω'}  = \&omega;
         *{__PACKAGE__ . '::' . 'ζ'}  = \&zeta;
         *{__PACKAGE__ . '::' . 'μ'}  = \&mobius;
     }
