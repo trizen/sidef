@@ -1362,16 +1362,6 @@ Return the
 
 =cut
 
-=head2 mobius
-
-Number.mobius() -> I<Obj>
-
-Return the
-
-Aliases: I<moebius>
-
-=cut
-
 =head2 nan
 
 Number.nan() -> I<Obj>
@@ -1654,14 +1644,6 @@ Return the
 
 =cut
 
-=head2 sigma
-
-Number.sigma() -> I<Obj>
-
-Return the
-
-=cut
-
 =head2 sigma0
 
 Number.sigma0() -> I<Obj>
@@ -1766,27 +1748,9 @@ Return the
 
 =cut
 
-=head2 totient
-
-Number.totient() -> I<Obj>
-
-Return the
-
-Aliases: I<euler_phi>, I<euler_totient>
-
-=cut
-
 =head2 valuation
 
 Number.valuation() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 zeta
-
-Number.zeta() -> I<Obj>
 
 Return the
 
@@ -1833,6 +1797,46 @@ Aliases: I<not>
 Number.γ() -> I<Obj>
 
 Return the
+
+=cut
+
+=head2 ζ
+
+Number.ζ() -> I<Obj>
+
+Return the
+
+Aliases: I<zeta>
+
+=cut
+
+=head2 μ
+
+Number.μ() -> I<Obj>
+
+Return the
+
+Aliases: I<mobius>, I<moebius>
+
+=cut
+
+=head2 σ
+
+Number.σ() -> I<Obj>
+
+Return the
+
+Aliases: I<sigma>
+
+=cut
+
+=head2 ϕ
+
+Number.ϕ() -> I<Obj>
+
+Return the
+
+Aliases: I<totient>, I<euler_phi>, I<euler_totient>
 
 =cut
 
