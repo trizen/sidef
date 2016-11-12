@@ -2142,6 +2142,10 @@ package Sidef::Types::Number::Number {
         _mpz2big($x);
     }
 
+    sub ramanujan_tau {
+        __PACKAGE__->_set_str(Math::Prime::Util::GMP::ramanujan_tau(&_big2istr));
+    }
+
     sub factorial {
         my $n = CORE::int(Math::GMPq::Rmpq_get_d(${$_[0]}));
         return nan() if $n < 0;
@@ -2373,6 +2377,18 @@ package Sidef::Types::Number::Number {
         _mpz2big($x);
     }
 
+    sub znorder {
+        my ($x, $y) = @_;
+        _valid(\$y);
+        my $n = Math::Prime::Util::GMP::znorder(_big2istr($x), _big2istr($y)) // return nan();
+        $n <= MAX_UI ? __PACKAGE__->_set_uint($n) : __PACKAGE__->_set_str($n);
+    }
+
+    sub znprimroot {
+        my $n = Math::Prime::Util::GMP::znprimroot(&_big2istr) || return nan();
+        $n <= MAX_UI ? __PACKAGE__->_set_uint($n) : __PACKAGE__->_set_str($n);
+    }
+
     sub factor {
         Sidef::Types::Array::Array->new(
             [
@@ -2464,14 +2480,37 @@ package Sidef::Types::Number::Number {
         $n <= MAX_UI ? __PACKAGE__->_set_uint($n) : __PACKAGE__->_set_str($n);
     }
 
+    sub sigma0 {
+        my $n = Math::Prime::Util::GMP::sigma(&_big2istr, 0);
+        $n <= MAX_UI ? __PACKAGE__->_set_uint($n) : __PACKAGE__->_set_str($n);
+    }
+
     sub sigma {
-        my $n = Math::Prime::Util::GMP::divisors(&_big2istr);
+        my ($x, $y) = @_;
+
+        my $n = defined($y)
+          ? do {
+            _valid(\$y);
+            Math::Prime::Util::GMP::sigma(_big2istr($x), _big2istr($y));
+          }
+          : Math::Prime::Util::GMP::sigma(&_big2istr, 1);
+
         $n <= MAX_UI ? __PACKAGE__->_set_uint($n) : __PACKAGE__->_set_str($n);
     }
 
     sub partitions {
         my $n = Math::Prime::Util::GMP::partitions(&_big2istr);
         $n <= MAX_UI ? __PACKAGE__->_set_uint($n) : __PACKAGE__->_set_str($n);
+    }
+
+    sub is_primitive_root {
+        my ($x, $y) = @_;
+        _valid(\$y);
+        Math::GMPq::Rmpq_integer_p($$x)
+          && Math::GMPq::Rmpq_integer_p($$y)
+          && Math::Prime::Util::GMP::is_primitive_root(_big2istr($x), _big2istr($y))
+          ? Sidef::Types::Bool::Bool::TRUE
+          : Sidef::Types::Bool::Bool::FALSE;
     }
 
     sub is_square_free {

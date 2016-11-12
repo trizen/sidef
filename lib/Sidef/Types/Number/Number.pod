@@ -1102,6 +1102,14 @@ Return the
 
 =cut
 
+=head2 is_primitive_root
+
+Number.is_primitive_root() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 is_prob_prime
 
 Number.is_prob_prime() -> I<Obj>
@@ -1560,6 +1568,14 @@ Return the
 
 =cut
 
+=head2 ramanujan_tau
+
+Number.ramanujan_tau() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 rand
 
 Number.rand() -> I<Obj>
@@ -1623,6 +1639,14 @@ Return the
 =head2 sigma
 
 Number.sigma() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 sigma0
+
+Number.sigma0() -> I<Obj>
 
 Return the
 
@@ -1753,6 +1777,22 @@ Return the
 =head2 zeta
 
 Number.zeta() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 znorder
+
+Number.znorder() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 znprimroot
+
+Number.znprimroot() -> I<Obj>
 
 Return the
 

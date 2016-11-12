@@ -64,25 +64,26 @@ package Sidef::Types::Number::Inf {
 
     sub is_real { Sidef::Types::Bool::Bool::FALSE }
 
-    *is_nan         = \&is_real;
-    *is_neg         = \&is_real;
-    *is_prime       = \&is_real;
-    *is_prob_prime  = \&is_real;
-    *is_prov_prime  = \&is_real;
-    *is_square      = \&is_real;
-    *is_sqr         = \&is_real;
-    *is_power       = \&is_real;
-    *is_pow         = \&is_real;
-    *is_div         = \&is_real;
-    *is_even        = \&is_real;
-    *is_odd         = \&is_real;
-    *divides        = \&is_real;
-    *is_ninf        = \&is_real;
-    *is_zero        = \&is_real;
-    *is_one         = \&is_real;
-    *is_mone        = \&is_real;
-    *is_square_free = \&is_real;
-    *is_prime_power = \&is_real;
+    *is_nan            = \&is_real;
+    *is_neg            = \&is_real;
+    *is_prime          = \&is_real;
+    *is_prob_prime     = \&is_real;
+    *is_prov_prime     = \&is_real;
+    *is_square         = \&is_real;
+    *is_sqr            = \&is_real;
+    *is_power          = \&is_real;
+    *is_pow            = \&is_real;
+    *is_div            = \&is_real;
+    *is_even           = \&is_real;
+    *is_odd            = \&is_real;
+    *divides           = \&is_real;
+    *is_ninf           = \&is_real;
+    *is_zero           = \&is_real;
+    *is_one            = \&is_real;
+    *is_mone           = \&is_real;
+    *is_square_free    = \&is_real;
+    *is_prime_power    = \&is_real;
+    *is_primitive_root = \&is_real;
 
     sub nan { Sidef::Types::Number::Nan::NAN }
 
@@ -118,6 +119,7 @@ package Sidef::Types::Number::Inf {
     *popcount          = \&nan;
     *moebius           = \&nan;
     *sigma             = \&nan;
+    *sigma0            = \&nan;
     *omega             = \&nan;
     *prime_root        = \&nan;
     *prime_power       = \&nan;
@@ -131,6 +133,9 @@ package Sidef::Types::Number::Inf {
     *stirling          = \&nan;
     *stirling2         = \&nan;
     *stirling3         = \&nan;
+    *znorder           = \&nan;
+    *znprimroot        = \&nan;
+    *ramanujan_tau     = \&nan;
 
     *harm     = \&inf;
     *harmonic = \&inf;
