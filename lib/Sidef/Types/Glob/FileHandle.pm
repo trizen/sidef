@@ -352,9 +352,6 @@ package Sidef::Types::Glob::FileHandle {
     *copy = \&Sidef::Types::Glob::File::copy;
     *cp   = \&copy;
 
-    # File compare
-    *compare = \&File::Types::Glob::File::compare;
-
     sub read_to {
         my ($self, $var_ref) = @_;
 
@@ -379,11 +376,10 @@ package Sidef::Types::Glob::FileHandle {
 
     {
         no strict 'refs';
-        *{__PACKAGE__ . '::' . '>>'}  = \&read_to;
-        *{__PACKAGE__ . '::' . '»'}  = \&read_to;
-        *{__PACKAGE__ . '::' . '<<'}  = \&write_from;
-        *{__PACKAGE__ . '::' . '«'}  = \&write_from;
-        *{__PACKAGE__ . '::' . '<=>'} = \&compare;
+        *{__PACKAGE__ . '::' . '>>'} = \&read_to;
+        *{__PACKAGE__ . '::' . '»'} = \&read_to;
+        *{__PACKAGE__ . '::' . '<<'} = \&write_from;
+        *{__PACKAGE__ . '::' . '«'} = \&write_from;
     }
 
 };
