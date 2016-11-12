@@ -377,11 +377,7 @@ package Sidef::Types::Number::Ninf {
         *{__PACKAGE__ . '::' . '*'}   = \&mul;
         *{__PACKAGE__ . '::' . '/'}   = \&div;
         *{__PACKAGE__ . '::' . '÷'}  = \&div;
-        *{__PACKAGE__ . '::' . '%'}   = \&mod;
         *{__PACKAGE__ . '::' . '**'}  = \&pow;
-        *{__PACKAGE__ . '::' . '&'}   = \&and;
-        *{__PACKAGE__ . '::' . '|'}   = \&or;
-        *{__PACKAGE__ . '::' . '^'}   = \&xor;
         *{__PACKAGE__ . '::' . '++'}  = \&inc;
         *{__PACKAGE__ . '::' . '--'}  = \&dec;
         *{__PACKAGE__ . '::' . '=='}  = \&eq;
@@ -395,7 +391,6 @@ package Sidef::Types::Number::Ninf {
         *{__PACKAGE__ . '::' . '≤'} = \&le;
         *{__PACKAGE__ . '::' . '<=>'} = \&cmp;
         *{__PACKAGE__ . '::' . '!'}   = \&factorial;
-        *{__PACKAGE__ . '::' . '%%'}  = \&is_div;
         *{__PACKAGE__ . '::' . '~'}   = \&not;
         *{__PACKAGE__ . '::' . '>>'}  = \&shift_right;
         *{__PACKAGE__ . '::' . '<<'}  = \&shift_left;

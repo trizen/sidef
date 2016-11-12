@@ -298,8 +298,8 @@ package Sidef::Types::Number::Nan {
         ($_[0], $_[0]);
     }
 
-    *sqrtrem  = \&divmod;
     *isqrtrem = \&divmod;
+    *irootrem = \&divmod;
 
     {
         no strict 'refs';

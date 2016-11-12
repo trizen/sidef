@@ -992,6 +992,14 @@ Return the
 
 =cut
 
+=head2 irootrem
+
+Number.irootrem() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 is_even
 
 Number.is_even() -> I<Obj>
@@ -1697,14 +1705,6 @@ Return the
 =head2 sqrt
 
 Number.sqrt() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 sqrtrem
-
-Number.sqrtrem() -> I<Obj>
 
 Return the
 

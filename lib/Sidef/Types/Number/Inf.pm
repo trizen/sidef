@@ -166,13 +166,17 @@ package Sidef::Types::Number::Inf {
         ($x->div($y), Sidef::Types::Number::Nan::NAN);
     }
 
-    sub sqrtrem {
+    sub isqrtrem {
         my ($x) = @_;
         my $sqrt = $x->isqrt;
         ($sqrt, $x->sub($sqrt));
     }
 
-    *isqrtrem = \&sqrtrem;
+    sub irootrem {
+        my ($x, $y) = @_;
+        my $root = $x->iroot($y);
+        ($root, $x->sub($root));
+    }
 
     sub ninf {
         state $x = Sidef::Types::Number::Ninf->new;

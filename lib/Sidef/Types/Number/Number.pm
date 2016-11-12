@@ -666,25 +666,15 @@ package Sidef::Types::Number::Number {
         (_mpz2big($x), _mpz2big($r));
     }
 
-    sub sqrtrem {
-        my ($x) = @_;
-        my $z = _big2mpz($x);
-        Math::GMPz::Rmpz_sgn($z) < 0 and return ((nan()) x 2);
+    sub irootrem {
+        my ($x, $y) = @_;
+        _valid(\$y);
+        $x = _big2mpz($x);
+        my $root = CORE::int(Math::GMPq::Rmpq_get_d($$y));
+        ($root <= 0 or Math::GMPz::Rmpz_sgn($x) < 0) and return ((nan()) x 2);
         my $r = Math::GMPz::Rmpz_init();
-        Math::GMPz::Rmpz_sqrtrem($z, $r, $z);
-
-        # Return faster when $x is an integer
-        Math::GMPq::Rmpq_integer_p($$x)
-          && return (_mpz2big($z), _mpz2big($r));
-
-        # Compute the exact fractional remainder
-        my $q = Math::GMPq::Rmpq_init();
-        Math::GMPq::Rmpq_set_z($q, $z);
-        Math::GMPq::Rmpq_mul($q, $q, $q);
-        Math::GMPq::Rmpq_sub($q, $q, $$x);
-        Math::GMPq::Rmpq_neg($q, $q);
-
-        (_mpz2big($z), bless \$q, __PACKAGE__);
+        Math::GMPz::Rmpz_rootrem($x, $r, $x, $root);
+        (_mpz2big($x), _mpz2big($r));
     }
 
     sub cbrt {
