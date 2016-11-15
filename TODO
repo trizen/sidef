@@ -4,11 +4,16 @@ Classes:
     * Implement roles (from Perl 6) and add the `does` trait for classes
       (http://doc.perl6.org/language/objects#Roles)
 
-Blocks:
-    * Find a better way to implement the `next` and `break` statements (optionally, accept next(n) and break(n))
-
 Method/functions:
-    * Implement the `is export` trait for functions and classes (maybe)
+    * Implement the `is exported` trait for functions and classes (maybe)
+
+New built-in classes:
+    * Implement a native Matrix class (as `Sidef::Types::Array::Matrix`) with functionality close to that of the `Math::Matrix` Perl module.
+    * Implement a native Vector class (as `Sidef::Types::Array::Vector`) with appropriate methods, such as: `dist`, `+`, `-`, `*`, `/`, etc...
+    * Implement a native Set class (as `Sidef::Types::Set::Set`) with appropriate methods, such as: `contains`, `remove`, `union`, `intersect`, etc...
+
+New built-in methods:
+    * Implement the Number `seed` and `iseed` methods, which would re-seed the pseudorandom number generator.
 
 Perl:
     * Switch to subroutine `signatures` (as soon as this feature becomes stable).
