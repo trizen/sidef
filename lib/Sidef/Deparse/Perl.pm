@@ -655,7 +655,7 @@ HEADER
             ## OK
         }
         elsif ($ref eq 'Sidef::Variable::Local') {
-            $code = 'local ' . $self->deparse_script($obj->{expr});
+            $code = 'local ' . $self->deparse_args($obj->{expr});
         }
         elsif ($ref eq 'Sidef::Variable::Global') {
             my $name = '$' . $obj->{class} . '::' . $obj->{name};

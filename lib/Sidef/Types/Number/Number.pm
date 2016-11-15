@@ -1274,7 +1274,7 @@ package Sidef::Types::Number::Number {
         Math::GMPq::Rmpq_set_str((my $q = Math::GMPq::Rmpq_init()), "$num/$den", 10);
         bless \$q, __PACKAGE__;
 
-        # Old-code for computing nth-Bernoulli number internally.
+        # Old-code for computing the nth-Bernoulli number internally.
 #<<<
         #~ # Use a faster algorithm based on values of the Zeta function.
         #~ # B(n) = (-1)^(n/2 + 1) * zeta(n)*2*n! / (2*pi)^n

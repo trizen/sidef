@@ -39,5 +39,20 @@ do {
 
 assert_eq(x, 42);
 
+#
+## Test 3 (multi-local)
+#
+
+global y = 99
+
+do {
+    local(x, y) = (1, 2)
+    assert_eq(x, 1)
+    assert_eq(y, 2)
+}
+
+assert_eq(x, 42)
+assert_eq(y, 99)
+
 
 say "** Test passed!";
