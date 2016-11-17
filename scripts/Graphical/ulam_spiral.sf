@@ -2,7 +2,13 @@
 
 require('Imager');
  
-var (n=512, start=1, file='ulam.png') = ARGV»to_i»()...;
+var (n=512, start=1, file='ulam.png');
+
+ARGV.getopt(
+    'n=i' => \n,
+    's=i' => \start,
+    'f=s' => \file,
+);
  
 func cell(n, x, y, start) {
     y -= (n   >> 1);
@@ -20,8 +26,9 @@ img.box(filled => 1, color => white);
  
 for y,x in (^n ~X ^n) {
     var v = cell(n, x, y, start);
-    v.is_prime &&
+    if (v.is_prime) {
         img.setpixel(x => x, y => y, color => black);
+    }
 }
  
 img.write(file => file);

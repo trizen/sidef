@@ -686,12 +686,12 @@ HEADER
                 $obj->{inited} = 1;
 
                 # Use dynamical constants inside functions
-                if (exists $self->{function} or (exists($self->{class}) and $] >= 5.020)) {
+                if (exists($self->{function}) or (exists($self->{class}) and $] >= 5.022)) {
 
                     # This is no longer needed in Perl>=5.25.2
                     $] < 5.025002 && $self->top_add(q{use feature 'lexical_subs'; no warnings 'experimental::lexical_subs';});
 
-                    # XXX: this is known to cause segmentation faults in perl-5.18.* when used in a class
+                    # XXX: this is known to cause segmentation faults in perl-5.18.* and perl-5.20.* when used in a class
                     $code = "state sub $name(){state\$_$refaddr"
                       . (defined($obj->{expr}) ? ('=do{' . $self->deparse_script($obj->{expr}) . '}') : '') . '}';
                 }
