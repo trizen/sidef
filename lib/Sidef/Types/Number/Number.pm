@@ -2431,16 +2431,14 @@ package Sidef::Types::Number::Number {
         my @pairs;
         foreach my $factor (sort keys(%count)) {
             push @pairs,
-              Sidef::Types::Array::Array->new(
-                                              [
-                                               (
-                                                $_ <= MAX_UI
-                                                ? __PACKAGE__->_set_uint($factor)
-                                                : __PACKAGE__->_set_str($factor)
-                                               ),
-                                               __PACKAGE__->_set_uint($count{$factor})
-                                              ]
-                                             );
+              Sidef::Types::Array::Pair->new(
+                                             (
+                                              $_ <= MAX_UI
+                                              ? __PACKAGE__->_set_uint($factor)
+                                              : __PACKAGE__->_set_str($factor)
+                                             ),
+                                             __PACKAGE__->_set_uint($count{$factor})
+                                            );
         }
 
         Sidef::Types::Array::Array->new(\@pairs);
