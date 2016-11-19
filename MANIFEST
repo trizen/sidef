@@ -214,6 +214,7 @@ scripts/Graphical/lsystem_plant_2.sf
 scripts/Graphical/lsystem_sierpinski_triangle.sf
 scripts/Graphical/lsystem_tree.sf
 scripts/Graphical/munching_squares.sf
+scripts/Graphical/pendulum_animation.sf
 scripts/Graphical/pentagram.sf
 scripts/Graphical/plasma_effect.sf
 scripts/Graphical/ppm_palette.sf
