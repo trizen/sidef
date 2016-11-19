@@ -235,6 +235,7 @@ HEADER
         @vars || return '';
 
         my @code;
+
         push @code,
             '('
           . join(',', map { $self->_dump_var($_) } @vars) . ')'
@@ -1033,18 +1034,16 @@ HEADER
                 or (@{$obj->{vars}} == 1
                     and exists($obj->{vars}[0]{slurpy}))
               ) {
-
                 $code =
-                    'do{my $obj='
+                    'do{my$obj='
                   . $expr . ';'
-                  . 'my $block='
+                  . 'my$block='
                   . $block
                   . '->{code};'
                   . 'for my$group(ref($obj)?UNIVERSAL::isa($obj,"ARRAY")?@$obj:@{$obj->to_a}:()){'
                   . '$block->((ref($group)&&UNIVERSAL::isa($group,"ARRAY")?@$group:$group))}}';
             }
             else {
-
                 $code =
                     'do{my$obj='
                   . $expr . ';'
@@ -1052,9 +1051,8 @@ HEADER
                   . $block
                   . '->{code};'
                   . 'if(ref($obj)){if(defined(my$sub=UNIVERSAL::can($obj,"iter"))){my$iter=$sub->($obj);'
-                  . 'while(defined(my$item'
-                  . '=$iter->run)){$block->($item)}}'
-                  . 'else{for my$item(UNIVERSAL::isa($obj,"ARRAY")?@$obj:@{$obj->to_a}){'
+                  . 'while(1){$block->($iter->run//last)}'
+                  . '}else{for my$item(UNIVERSAL::isa($obj,"ARRAY")?@$obj:@{$obj->to_a}){'
                   . '$block->($item)}}}}';
             }
         }
@@ -1285,7 +1283,8 @@ HEADER
                   . "my \$a$refaddr = do{$args[0]};"
                   . "my \$b$refaddr = do{$args[1]};"
                   . ($obj->{act} eq 'assert_ne' ? qq{CORE::not(\$a$refaddr eq \$b$refaddr)} : qq{\$a$refaddr eq \$b$refaddr})
-                  . qq~ or CORE::die "$obj->{act}(\$a$refaddr, \$b$refaddr) failed at \Q$obj->{file}\E line $obj->{line}\\n"}~;
+                  . qq~ or CORE::die "$obj->{act}(\${\\join(', ',map{UNIVERSAL::can(\$_,'dump') ? \$_->dump : \$_}(\$a$refaddr, \$b$refaddr))})~
+                  . qq~ failed at \Q$obj->{file}\E line $obj->{line}\\n"}~;
             }
         }
         elsif ($ref eq 'Sidef::Meta::Error') {
@@ -1332,8 +1331,8 @@ HEADER
                     if ($indices ne '') {
                         $code .= '['
                           . 'map { ref($_) eq "Sidef::Types::Number::Number" ? Math::GMPq::Rmpq_get_d($$_) '
-                          . ': ref($_) eq "" ? $_ '
-                          . ': do { my $sub = UNIVERSAL::can($_, "..."); '
+                          . ': !ref($_) ? $_ '
+                          . ': do {state$sub;$sub=UNIVERSAL::can($_, "..."); '
                           . 'defined($sub) ? $sub->($_) : CORE::int($_) } } '
                           . $indices . ']';
                     }
@@ -1348,8 +1347,8 @@ HEADER
                         $code = '@{'
                           . $code . '}' . '{'
                           . 'map { ref($_) eq "Sidef::Types::String::String" ? $$_ '
-                          . ': ref($_) eq "" ? $_ '
-                          . ': do { my $sub = UNIVERSAL::can($_, "..."); '
+                          . ': !ref($_) ? $_ '
+                          . ': do {state$sub;$sub=UNIVERSAL::can($_, "..."); '
                           . 'defined($sub) ? $sub->($_) : "$_" } } '
                           . $keys . '}';
                     }
@@ -1414,14 +1413,14 @@ HEADER
                         # Prefix ++ and -- operators on variables
                         elsif (exists $self->{inc_dec_ops}{$method}) {
                             my $var = $self->deparse_args(@{$call->{arg}});
-                            $code = "do{my\$r=\\$var;\$\$r=\$\$r\->$self->{inc_dec_ops}{$method}}";
+                            $code = "do{state\$r;\$r=\\$var;\$\$r=\$\$r\->$self->{inc_dec_ops}{$method}}";
                             next;
                         }
                     }
 
                     # Postfix ++ and -- operators on variables
                     if (exists($self->{inc_dec_ops}{$method})) {
-                        $code = "do{my\$r=\\$code;my\$v=\$\$r;\$\$r=\$v\->$self->{inc_dec_ops}{$method};\$v}";
+                        $code = "do{state(\$r,\$v);\$r=\\$code;\$v=\$\$r;\$\$r=\$v\->$self->{inc_dec_ops}{$method};\$v}";
                         next;
                     }
 
@@ -1439,7 +1438,7 @@ HEADER
                     # Reassignment operators, such as: +=, -=, *=, /=, etc...
                     if (exists $self->{reassign_ops}{$method}) {
                         $code =
-                            "CORE::sub:lvalue{my\$r=\\$code;\$\$r=\$\$r"
+                            "CORE::sub:lvalue{state\$r;\$r=\\$code;\$\$r=\$\$r"
                           . $self->_dump_op_call($self->{reassign_ops}{$method})
                           . $self->deparse_args(@{$call->{arg}}) . '}->()';
                         next;
@@ -1448,11 +1447,10 @@ HEADER
                     # != and == methods
                     if ($method eq '==' or $method eq '!=') {
                         $code =
-                            'do{my$bool=do{'
-                          . $code
-                          . '}eq do{'
+                            'do{state$bool;$bool='
+                          . $code . 'eq'
                           . $self->deparse_args(@{$call->{arg}})
-                          . '};ref($bool)?$bool:($bool?Sidef::Types::Bool::Bool::TRUE:Sidef::Types::Bool::Bool::FALSE)}'
+                          . ';ref($bool)?$bool:($bool?Sidef::Types::Bool::Bool::TRUE:Sidef::Types::Bool::Bool::FALSE)}'
                           . ($method eq '!=' ? '->neg' : '');
                         next;
                     }
@@ -1461,7 +1459,7 @@ HEADER
                     if ($method eq '~~' or $method eq '!~') {
                         $self->top_add(q{no warnings 'experimental::smartmatch';});
                         $code =
-                            'do{my$bool=do{'
+                            'do{state$bool;$bool=do{'
                           . $code
                           . '}~~do{'
                           . $self->deparse_args(@{$call->{arg}})
@@ -1473,11 +1471,10 @@ HEADER
                     # <=> method
                     if ($method eq '<=>') {
                         $code =
-                            'do{my$cmp=do{'
-                          . $code
-                          . '}cmp do{'
+                            'do{state$cmp;$cmp='
+                          . $code . 'cmp'
                           . $self->deparse_args(@{$call->{arg}})
-                          . '};ref($cmp)?$cmp:($cmp<0?Sidef::Types::Number::Number::MONE:'
+                          . ';ref($cmp)?$cmp:($cmp<0?Sidef::Types::Number::Number::MONE:'
                           . '$cmp>0?Sidef::Types::Number::Number::ONE:Sidef::Types::Number::Number::ZERO)}';
                         next;
                     }
@@ -1485,9 +1482,9 @@ HEADER
                     # ! prefix-unary
                     if ($ref eq 'Sidef::Operator::Unary') {
                         if ($method eq '!') {
-                            $code = '(do{'
+                            $code = '('
                               . $self->deparse_args(@{$call->{arg}})
-                              . '}?Sidef::Types::Bool::Bool::FALSE:Sidef::Types::Bool::Bool::TRUE)';
+                              . '?Sidef::Types::Bool::Bool::FALSE:Sidef::Types::Bool::Bool::TRUE)';
                             next;
                         }
 
@@ -1503,18 +1500,18 @@ HEADER
 
                         if ($method eq '@') {
                             $code =
-                                '(do{ my $obj = '
+                                '(do{state$obj;$obj='
                               . $self->deparse_args(@{$call->{arg}})
-                              . '; my $sub = UNIVERSAL::can($obj, "to_a"); '
+                              . ';state$sub;$sub=UNIVERSAL::can($obj, "to_a"); '
                               . 'defined($sub) ? $sub->($obj) : Sidef::Types::Array::Array->new($obj) })';
                             next;
                         }
 
                         if ($method eq '@|') {
                             $code =
-                                '(do{ my $obj = '
+                                '(do{state$obj;$obj='
                               . $self->deparse_args(@{$call->{arg}})
-                              . '; my $sub = UNIVERSAL::can($obj, "..."); '
+                              . ';state$sub;$sub=UNIVERSAL::can($obj, "..."); '
                               . 'defined($sub) ? $sub->($obj) : $obj })';
                             next;
                         }
@@ -1568,7 +1565,7 @@ HEADER
                         # Exclamation mark (!) at the end of a method
                         if (substr($method, -1) eq '!') {
                             $code =
-                                "CORE::sub:lvalue{my\$r=\\$code;\$\$r=\$\$r\->"
+                                "CORE::sub:lvalue{state\$r;\$r=\\$code;\$\$r=\$\$r\->"
                               . substr($method, 0, -1)
                               . (exists($call->{arg}) ? $self->deparse_args(@{$call->{arg}}) : '') . '}->()';
                             next;

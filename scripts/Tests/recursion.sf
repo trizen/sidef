@@ -7,3 +7,44 @@ func f(x) {
 }
 
 f(5);
+
+func t1(arg) {
+    arg += (arg == 'foo' ? t1(42) : 99)
+}
+
+func t2(arg) {
+    arg + (arg == 'foo' ? t2(42) : 99)
+}
+
+func t3(arg) {
+    arg.and!(arg == 'foo' ? t3(42) : 99)
+}
+
+func t4(arg) {
+    arg <=> (arg == '-1' ? Str(t4(42)) : 99)
+}
+
+func t5(arg) {
+    arg <=> (arg == '0' ? Str(t5(42)) : 42)
+}
+
+func t6(arg) {
+    arg <=> (arg == '1' ? Str(t6(99)) : 42)
+}
+
+func t7(arg) {
+    arg == (arg == true ? t7(99) : 99)
+}
+
+func t8(arg) {
+    arg != (arg == false ? t8(42) : 42)
+}
+
+assert_eq(t1('foo'), 'foo141')
+assert_eq(t2('foo'), 'foo141')
+assert_eq(t3('foo'), 'foo' & Str(42 & 99))
+assert_eq(t4('-1'), 0)
+assert_eq(t5('0'), 0)
+assert_eq(t6('1'), 0)
+assert_eq(t7(true), true)
+assert_eq(t8(false), false)
