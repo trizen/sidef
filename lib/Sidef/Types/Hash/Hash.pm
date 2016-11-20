@@ -403,6 +403,7 @@ package Sidef::Types::Hash::Hash {
 
     *to_array = \&to_a;
     *kv       = \&to_a;
+    *pairs    = \&to_a;
 
     sub as_tree {
         my ($self, $root) = @_;
@@ -439,12 +440,12 @@ package Sidef::Types::Hash::Hash {
         $sub->($_[0], $root);
     }
 
-    sub pairs {
+    sub get_pairs {
         my ($self, @keys) = @_;
         Sidef::Types::Array::Array->new([map { Sidef::Types::Array::Pair->new($_, $self->{$_}) } @keys]);
     }
 
-    sub pair {
+    sub get_pair {
         my ($self, $key) = @_;
         Sidef::Types::Array::Pair->new($key, $self->{$key});
     }
