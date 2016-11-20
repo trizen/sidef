@@ -502,6 +502,9 @@ package Sidef::Types::Number::Inf {
 
     *nude = \&parts;
 
+    sub seed { }
+    *iseed = \&seed;
+
     {
         no strict 'refs';
         *{__PACKAGE__ . '::' . '+'}   = \&add;

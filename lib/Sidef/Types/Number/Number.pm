@@ -2841,75 +2841,89 @@ package Sidef::Types::Number::Number {
           : (ZERO)->to($from->dec);
     }
 
-    sub rand {
-        my ($x, $y) = @_;
-
+    {
         state $state = Math::MPFR::Rmpfr_randinit_mt_nobless();
-        state $seed = Math::MPFR::Rmpfr_randseed_ui($state, scalar srand());
+        Math::MPFR::Rmpfr_randseed_ui($state, scalar srand());
 
-        Math::MPFR::Rmpfr_urandom((my $rand = Math::MPFR::Rmpfr_init2($PREC)), $state, $ROUND);
-        Math::MPFR::Rmpfr_get_q((my $q = Math::GMPq::Rmpq_init()), $rand);
+        sub rand {
+            my ($x, $y) = @_;
 
-        if (defined $y) {
+            Math::MPFR::Rmpfr_urandom((my $rand = Math::MPFR::Rmpfr_init2($PREC)), $state, $ROUND);
+            Math::MPFR::Rmpfr_get_q((my $q = Math::GMPq::Rmpq_init()), $rand);
 
-            if (   ref($y) eq 'Sidef::Types::Number::Inf'
-                or ref($y) eq 'Sidef::Types::Number::Ninf'
-                or ref($y) eq 'Sidef::Types::Number::Nan') {
-                return $y;
+            if (defined $y) {
+
+                if (   ref($y) eq 'Sidef::Types::Number::Inf'
+                    or ref($y) eq 'Sidef::Types::Number::Ninf'
+                    or ref($y) eq 'Sidef::Types::Number::Nan') {
+                    return $y;
+                }
+
+                _valid(\$y);
+
+                Math::GMPq::Rmpq_sub((my $diff = Math::GMPq::Rmpq_init()), $$y, $$x);
+                Math::GMPq::Rmpq_mul($q, $q, $diff);
+                Math::GMPq::Rmpq_add($q, $q, $$x);
+            }
+            else {
+                Math::GMPq::Rmpq_mul($q, $q, $$x);
             }
 
-            _valid(\$y);
-
-            Math::GMPq::Rmpq_sub((my $diff = Math::GMPq::Rmpq_init()), $$y, $$x);
-            Math::GMPq::Rmpq_mul($q, $q, $diff);
-            Math::GMPq::Rmpq_add($q, $q, $$x);
-        }
-        else {
-            Math::GMPq::Rmpq_mul($q, $q, $$x);
+            bless \$q, __PACKAGE__;
         }
 
-        bless \$q, __PACKAGE__;
+        sub seed {
+            Math::MPFR::Rmpfr_randseed($state, _big2mpz($_[0]));
+            $_[0];
+        }
     }
 
-    sub irand {
-        my ($x, $y) = @_;
-
+    {
         state $state = Math::GMPz::zgmp_randinit_mt_nobless();
-        state $seed = Math::GMPz::zgmp_randseed_ui($state, scalar srand());
+        Math::GMPz::zgmp_randseed_ui($state, scalar srand());
 
-        $x = _big2mpz($x);
+        sub irand {
+            my ($x, $y) = @_;
 
-        if (defined($y)) {
+            $x = _big2mpz($x);
 
-            if (   ref($y) eq 'Sidef::Types::Number::Inf'
-                or ref($y) eq 'Sidef::Types::Number::Ninf'
-                or ref($y) eq 'Sidef::Types::Number::Nan') {
-                return $y;
+            if (defined($y)) {
+
+                if (   ref($y) eq 'Sidef::Types::Number::Inf'
+                    or ref($y) eq 'Sidef::Types::Number::Ninf'
+                    or ref($y) eq 'Sidef::Types::Number::Nan') {
+                    return $y;
+                }
+
+                _valid(\$y);
+
+                my $rand = _big2mpz($y);
+                my $cmp = Math::GMPz::Rmpz_cmp($rand, $x);
+
+                if ($cmp == 0) {
+                    return _mpz2big($rand);
+                }
+                elsif ($cmp < 0) {
+                    ($x, $rand) = ($rand, $x);
+                }
+
+                Math::GMPz::Rmpz_sub($rand, $rand, $x);
+                Math::GMPz::Rmpz_urandomm($rand, $state, $rand, 1);
+                Math::GMPz::Rmpz_add($rand, $rand, $x);
+
+                _mpz2big($rand);
             }
-
-            _valid(\$y);
-
-            my $rand = _big2mpz($y);
-            my $cmp = Math::GMPz::Rmpz_cmp($rand, $x);
-
-            if ($cmp == 0) {
-                return _mpz2big($rand);
+            else {
+                my $sgn = Math::GMPz::Rmpz_sgn($x);
+                Math::GMPz::Rmpz_urandomm($x, $state, $x, 1);
+                Math::GMPz::Rmpz_neg($x, $x) if $sgn < 0;
+                _mpz2big($x);
             }
-            elsif ($cmp < 0) {
-                ($x, $rand) = ($rand, $x);
-            }
-
-            Math::GMPz::Rmpz_sub($rand, $rand, $x);
-            Math::GMPz::Rmpz_urandomm($rand, $state, $rand, 1);
-            Math::GMPz::Rmpz_add($rand, $rand, $x);
-
-            _mpz2big($rand);
         }
-        else {
-            my $sgn = Math::GMPz::Rmpz_sgn($x);
-            Math::GMPz::Rmpz_urandomm($x, $state, $x, 1);
-            Math::GMPz::Rmpz_neg($x, $x) if $sgn < 0;
-            _mpz2big($x);
+
+        sub iseed {
+            Math::GMPz::zgmp_randseed($state, _big2mpz($_[0]));
+            $_[0];
         }
     }
 

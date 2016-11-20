@@ -303,6 +303,9 @@ package Sidef::Types::Number::Nan {
     *isqrtrem = \&divmod;
     *irootrem = \&divmod;
 
+    sub seed { }
+    *iseed = \&seed;
+
     {
         no strict 'refs';
         *{__PACKAGE__ . '::' . '/'}   = \&div;
