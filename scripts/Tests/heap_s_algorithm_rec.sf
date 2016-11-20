@@ -11,7 +11,7 @@ func permutation(n, A, callback) {
     else {
         for i in (0 .. n-2) {
             permutation(n - 1, A, callback)
-            if (n.is_even) {
+            if (is_even(n)) {
                 A.swap(i, n-1)
             } else {
                 A.swap(0, n-1)

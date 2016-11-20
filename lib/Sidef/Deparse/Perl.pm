@@ -1035,7 +1035,7 @@ HEADER
                     and exists($obj->{vars}[0]{slurpy}))
               ) {
                 $code =
-                    'do{my$obj='
+                    'do{state$obj;$obj='
                   . $expr . ';'
                   . 'my$block='
                   . $block
@@ -1045,7 +1045,7 @@ HEADER
             }
             else {
                 $code =
-                    'do{my$obj='
+                    'do{state$obj;$obj='
                   . $expr . ';'
                   . 'my$block='
                   . $block
@@ -1084,7 +1084,12 @@ HEADER
             }
         }
         elsif ($ref eq 'Sidef::Meta::PrefixMethod') {
-            $code = 'do{my($self,@args)=' . $self->deparse_args($obj->{expr}) . ';$self->' . $obj->{name} . '(@args)}';
+            $code =
+                'do{state($self,@args);($self,@args)='
+              . $self->deparse_args($obj->{expr})
+              . ';$self->'
+              . $obj->{name}
+              . '(@args)}';
         }
         elsif ($ref eq 'Sidef::Types::Block::Do') {
             $code = 'do ' . $self->deparse_bare_block($obj->{block}{code});

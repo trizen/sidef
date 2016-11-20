@@ -9,15 +9,15 @@ func f(x) {
 f(5);
 
 func t1(arg) {
-    arg += (arg == 'foo' ? t1(42) : 99)
+    arg += (arg == 'foo' ? t1(42)+t1(23) : 99)
 }
 
 func t2(arg) {
-    arg + (arg == 'foo' ? t2(42) : 99)
+    arg + (arg == 'foo' ? t2(42)+t2(23) : 99)
 }
 
 func t3(arg) {
-    arg.and!(arg == 'foo' ? t3(42) : 99)
+    arg.and!(arg == 'foo' ? t3(42)+t3(23) : 99)
 }
 
 func t4(arg) {
@@ -40,11 +40,39 @@ func t8(arg) {
     arg != (arg == false ? t8(42) : 42)
 }
 
-assert_eq(t1('foo'), 'foo141')
-assert_eq(t2('foo'), 'foo141')
-assert_eq(t3('foo'), 'foo' & Str(42 & 99))
+func t9(arg) {
+    ::and(arg, (arg == 'foo' ? t9(42)+t9(37) : 99))
+}
+
+func t10(arg) {
+    ::and(arg, (arg == 'foo' ? ::and(t10(42), t10(37)) : 99))
+}
+
+func t11(arg) {
+    gather {
+        for x in (arg == ['foo'] ? arg+t11(['bar','baz'])+t11(['biz','bax']) : arg+['qux']) {
+            take(x)
+        }
+    }
+}
+
+func t12(arg) {
+    gather {
+        for x in (arg == ['foo'] ? arg+t12(['bar','baz'])+t12(['biz','bax']) : arg+['qux']) {
+            take([x] + (arg == ['bar','baz'] ? t12(['quz'])+t12(['tar']) : ['zor']))
+        }
+    }
+}
+
+assert_eq(t1('foo'), 'foo263')
+assert_eq(t2('foo'), 'foo263')
+assert_eq(t3('foo'), 'foo' & Str(42&99 + 23&99))
 assert_eq(t4('-1'), 0)
 assert_eq(t5('0'), 0)
 assert_eq(t6('1'), 0)
 assert_eq(t7(true), true)
 assert_eq(t8(false), false)
+assert_eq(t9('foo'), 'foo' & Str(42&99 + 37&99))
+assert_eq(t10('foo'), 'foo' & Str(42&99 & 37&99))
+assert_eq(t11(['foo']), ["foo", "bar", "baz", "qux", "biz", "bax", "qux"])
+assert_eq(t12(['foo']), [["foo", "zor"], [["bar", ["quz", "zor"], ["qux", "zor"], ["tar", "zor"], ["qux", "zor"]], "zor"], [["baz", ["quz", "zor"], ["qux", "zor"], ["tar", "zor"], ["qux", "zor"]], "zor"], [["qux", ["quz", "zor"], ["qux", "zor"], ["tar", "zor"], ["qux", "zor"]], "zor"], [["biz", "zor"], "zor"], [["bax", "zor"], "zor"], [["qux", "zor"], "zor"]])
