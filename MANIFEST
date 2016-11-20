@@ -466,6 +466,7 @@ scripts/RosettaCode/priority_queue.sf
 scripts/RosettaCode/probabilistic_choice.sf
 scripts/RosettaCode/problem_of_apollonius.sf
 scripts/RosettaCode/program_name.sf
+scripts/RosettaCode/quaternion_type.sf
 scripts/RosettaCode/queue_definition.sf
 scripts/RosettaCode/queue_definition_2.sf
 scripts/RosettaCode/quickselect_algorithm.sf
