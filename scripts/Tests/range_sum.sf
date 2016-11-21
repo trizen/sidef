@@ -1,0 +1,25 @@
+#!/usr/bin/ruby
+
+for i in (1..10) {
+    var r = RangeNum(100.irand, 100.irand, 1)
+
+    var s1 = Math.sum(r..., i)
+    var s2 = r.sum(i)
+
+    if (s1 != s2) {
+        die "error: #{r} -> #{s1} != #{s2} (from #{i})\n";
+    }
+}
+
+for i in (1..10) {
+    var r = RangeNum(100.irand, 100.irand, 1)
+
+    var s1 = Math.sum(r...)
+    var s2 = r.sum
+
+    if (s1 != s2) {
+        die "error: #{r} -> #{s1} != #{s2}\n";
+    }
+}
+
+say "** Test passed!"

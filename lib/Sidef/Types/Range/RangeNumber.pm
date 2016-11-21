@@ -94,6 +94,15 @@ package Sidef::Types::Range::RangeNumber {
 
     sub sum {
         my ($self, $arg) = @_;
+
+        if ($self->{step}->is_one) {
+            $self->{_asc} //= 1;
+            state $two = Sidef::Types::Number::Number->_set_uint(2);
+            my ($from, $to) = @{$self}{'from', 'to'};
+            my $sum = ($from->add($to))->mul($to->sub($from)->add(Sidef::Types::Number::Number::ONE))->div($two);
+            return ($sum->is_neg ? ($arg // Sidef::Types::Number::Number::ZERO) : defined($arg) ? $sum->add($arg) : $sum);
+        }
+
         my $sum = $arg // Sidef::Types::Number::Number::ZERO;
 
         my $iter = $self->iter->{code};
@@ -106,6 +115,15 @@ package Sidef::Types::Range::RangeNumber {
 
     sub prod {
         my ($self, $arg) = @_;
+
+        if (    $self->{step}->is_one
+            and $self->{from}->is_one
+            and $self->{to}->is_pos) {
+            $self->{_asc} //= 1;
+            my $prod = $self->{to}->factorial;
+            return (defined($arg) ? $prod->mul($arg) : $prod);
+        }
+
         my $prod = $arg // Sidef::Types::Number::Number::ONE;
 
         my $iter = $self->iter->{code};

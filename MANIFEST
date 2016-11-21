@@ -770,6 +770,8 @@ scripts/Tests/pythagorean_means.sf
 scripts/Tests/quicksort.sf
 scripts/Tests/quoted_strings.sf
 scripts/Tests/range_objects.sf
+scripts/Tests/range_prod.sf
+scripts/Tests/range_sum.sf
 scripts/Tests/ranges.sf
 scripts/Tests/read_a_configuration_file.sf
 scripts/Tests/rec_reverse.sf
