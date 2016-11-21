@@ -379,8 +379,12 @@ HEADER
         join(
             ',',
             grep { $_ ne '' } map {
-                    ref($_) eq 'Sidef::Types::Number::Number' ? $_->_get_double
-                  : ref($_) ? ($self->deparse_expr(ref($_) eq 'HASH' ? $_ : {self => $_}))
+                ref($_) eq 'Sidef::Types::Number::Number'
+                  ? $_->_get_double
+                  : ref($_) ? ('(map { ref($_) eq "Sidef::Types::Number::Number" ? Math::GMPq::Rmpq_get_d($$_) '
+                               . ': do {state$sub;$sub=UNIVERSAL::can($_, "..."); '
+                               . 'defined($sub) ? $sub->($_) : CORE::int($_) } } '
+                               . ($self->deparse_expr(ref($_) eq 'HASH' ? $_ : {self => $_})) . ')')
                   : $_
               } @{$array}
             );
@@ -394,7 +398,10 @@ HEADER
             grep { $_ ne '' } map {
                 (ref($_) eq 'Sidef::Types::String::String' or ref($_) eq 'Sidef::Types::Number::Number')
                   ? $self->_dump_string($_->get_value)
-                  : ref($_) ? ($self->deparse_expr(ref($_) eq 'HASH' ? $_ : {self => $_}))
+                  : ref($_) ? ('(map { ref($_) eq "Sidef::Types::String::String" ? $$_ '
+                               . ': do {state$sub;$sub=UNIVERSAL::can($_, "..."); '
+                               . 'defined($sub) ? $sub->($_) : "$_" } } '
+                               . ($self->deparse_expr(ref($_) eq 'HASH' ? $_ : {self => $_})) . ')')
                   : qq{"\Q$_\E"}
               } @{$array}
             );
@@ -1334,12 +1341,7 @@ HEADER
                     $code = '@{(' . $code . ')}';
 
                     if ($indices ne '') {
-                        $code .= '['
-                          . 'map { ref($_) eq "Sidef::Types::Number::Number" ? Math::GMPq::Rmpq_get_d($$_) '
-                          . ': !ref($_) ? $_ '
-                          . ': do {state$sub;$sub=UNIVERSAL::can($_, "..."); '
-                          . 'defined($sub) ? $sub->($_) : CORE::int($_) } } '
-                          . $indices . ']';
+                        $code .= "[$indices]";
                     }
                 }
                 else {
@@ -1349,13 +1351,7 @@ HEADER
                         $code = '%{(' . $code . ')}';
                     }
                     else {
-                        $code = '@{'
-                          . $code . '}' . '{'
-                          . 'map { ref($_) eq "Sidef::Types::String::String" ? $$_ '
-                          . ': !ref($_) ? $_ '
-                          . ': do {state$sub;$sub=UNIVERSAL::can($_, "..."); '
-                          . 'defined($sub) ? $sub->($_) : "$_" } } '
-                          . $keys . '}';
+                        $code = "\@{$code}{$keys}";
                     }
                 }
 
