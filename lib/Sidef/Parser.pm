@@ -324,8 +324,8 @@ package Sidef::Parser {
                       »(?<unroll>[_\pL][_\pL\pN]*|(?&ops))«          # unroll operator (e.g.: »add« or »+«)
                     | >>(?<unroll>[_\pL][_\pL\pN]*|(?&ops))<<        # unroll operator (e.g.: >>add<< or >>+<<)
 
-                    | ~X(?<cross>(?&ops)|)                           # cross operator (e.g.: ~X or ~X+)
-                    | ~Z(?<zip>(?&ops)|)                             # zip operator (e.g.: ~Z or ~Z+)
+                    | ~X(?<cross>[_\pL][_\pL\pN]*|(?&ops)|)          # cross operator (e.g.: ~X or ~X+)
+                    | ~Z(?<zip>[_\pL][_\pL\pN]*|(?&ops)|)            # zip operator (e.g.: ~Z or ~Z+)
 
                     | »(?<map>[_\pL][_\pL\pN]*|(?&ops))»             # mapping operator (e.g.: »add» or »+»)
                     | >>(?<map>[_\pL][_\pL\pN]*|(?&ops))>>           # mapping operator (e.g.: >>add>> or >>+>>)

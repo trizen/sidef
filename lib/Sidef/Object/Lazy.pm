@@ -85,8 +85,7 @@ package Sidef::Object::Lazy {
     sub grep {
         my ($self, $block) = @_;
         push @{$self->{calls}}, sub {
-            my ($self) = @_;
-            $block->run($self) ? $self : ();
+            $block->run($_[0]) ? $_[0] : ();
         };
         $self;
     }
@@ -96,8 +95,7 @@ package Sidef::Object::Lazy {
     sub map {
         my ($self, $block) = @_;
         push @{$self->{calls}}, sub {
-            my ($self) = @_;
-            $block->run($self);
+            $block->run($_[0]);
         };
         $self;
     }
