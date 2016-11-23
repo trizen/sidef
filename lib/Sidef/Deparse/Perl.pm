@@ -1217,7 +1217,7 @@ HEADER
                 local \$Sidef::PARSER->{file_name} = 'eval($refaddr)';
                 local \$Sidef::PARSER->{vars} = \$Sidef::EVALS{$refaddr}{vars};
                 local \$Sidef::PARSER->{ref_vars_refs} = \$Sidef::EVALS{$refaddr}{ref_vars_refs};
-                \$Sidef::PARSER->parse_script(code => \\(~ . $self->deparse_script($obj->{expr}) . qq~->get_value));
+                \$Sidef::PARSER->parse_script(code => do{my\$o=~ . $self->deparse_args($obj->{expr}) . qq~;\\"\$o"});
             })}~;
         }
         elsif ($ref eq 'Sidef::Time::Time') {
