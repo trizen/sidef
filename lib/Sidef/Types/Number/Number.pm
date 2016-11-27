@@ -30,7 +30,7 @@ package Sidef::Types::Number::Number {
       );
 
     use overload
-      q{bool} => sub { Math::GMPq::Rmpq_sgn(${$_[0]}) != 0 },
+      q{bool} => sub { !!Math::GMPq::Rmpq_sgn(${$_[0]}) },
       q{0+}   => \&get_value,
       q{""}   => \&_big2str;
 
