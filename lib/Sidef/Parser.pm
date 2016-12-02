@@ -3187,15 +3187,16 @@ package Sidef::Parser {
 
                     push @abs_filenames, map {
                         my $filename = $_;
-                        do {
+
+                        if (index(ref($filename), 'Sidef::') == 0) {
                             $filename = $filename->get_value;
-                        } while (index(ref($filename), 'Sidef::') == 0);
+                        }
 
                         ref($filename) ne ''
                           and $self->fatal_error(
-                            code  => $_,
-                            pos   => pos($_),
-                            error => 'include-error: invalid value of type "' . ref($filename) . '" (expected a plain-string)',
+                                  code  => $_,
+                                  pos   => pos($_),
+                                  error => 'include-error: invalid value of type "' . ref($filename) . '" (expected a string)',
                           );
 
                         $filename = Cwd::abs_path(File::Spec->catfile(split(/\//, $filename)));
