@@ -159,6 +159,7 @@ package Sidef::Types::Number::Inf {
     *factor       = \&digits;
     *factors      = \&digits;
     *factor_pairs = \&digits;
+    *pfactor      = \&digits;
     *primes       = \&digits;
     *divisors     = \&digits;
 

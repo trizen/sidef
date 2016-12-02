@@ -283,6 +283,7 @@ package Sidef::Types::Number::Nan {
     *factor       = \&of;
     *factors      = \&of;
     *factor_pairs = \&of;
+    *pfactor      = \&of;
     *primes       = \&of;
     *divisors     = \&of;
 

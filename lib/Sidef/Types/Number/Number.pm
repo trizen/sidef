@@ -2429,7 +2429,7 @@ package Sidef::Types::Number::Number {
         }
 
         my @pairs;
-        foreach my $factor (sort keys(%count)) {
+        foreach my $factor (sort { (length($a) <=> length($b)) || ($a cmp $b) } keys(%count)) {
             push @pairs,
               Sidef::Types::Array::Pair->new(
                                              (
@@ -2443,6 +2443,8 @@ package Sidef::Types::Number::Number {
 
         Sidef::Types::Array::Array->new(\@pairs);
     }
+
+    *pfactor = \&factor_pairs;
 
     sub divisors {
         Sidef::Types::Array::Array->new(
