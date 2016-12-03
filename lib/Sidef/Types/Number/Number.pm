@@ -2433,7 +2433,7 @@ package Sidef::Types::Number::Number {
             push @pairs,
               Sidef::Types::Array::Pair->new(
                                              (
-                                              $_ <= MAX_UI
+                                              $factor <= MAX_UI
                                               ? __PACKAGE__->_set_uint($factor)
                                               : __PACKAGE__->_set_str($factor)
                                              ),
