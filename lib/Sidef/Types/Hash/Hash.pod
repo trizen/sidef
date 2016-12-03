@@ -200,6 +200,22 @@ Aliases: I<reverse>
 
 =cut
 
+=head2 get_pair
+
+Hash.get_pair() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 get_pairs
+
+Hash.get_pairs() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 grep
 
 Hash.grep() -> I<Obj>
@@ -250,7 +266,7 @@ Hash.kv() -> I<Obj>
 
 Return the
 
-Aliases: I<to_a>, I<to_array>
+Aliases: I<to_a>, I<pairs>, I<to_array>
 
 =cut
 
@@ -303,22 +319,6 @@ Return the
 =head2 min_by
 
 Hash.min_by() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 pair
-
-Hash.pair() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 pairs
-
-Hash.pairs() -> I<Obj>
 
 Return the
 

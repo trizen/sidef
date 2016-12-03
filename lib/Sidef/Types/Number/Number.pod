@@ -744,14 +744,6 @@ Aliases: I<factors>
 
 =cut
 
-=head2 factor_pairs
-
-Number.factor_pairs() -> I<Obj>
-
-Return the
-
-=cut
-
 =head2 fadd
 
 Number.fadd() -> I<Obj>
@@ -987,6 +979,14 @@ Return the
 =head2 irootrem
 
 Number.irootrem() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 iseed
+
+Number.iseed() -> I<Obj>
 
 Return the
 
@@ -1464,6 +1464,16 @@ Return the
 
 =cut
 
+=head2 pfactor
+
+Number.pfactor() -> I<Obj>
+
+Return the
+
+Aliases: I<pfactors>
+
+=cut
+
 =head2 phi
 
 Number.phi() -> I<Obj>
@@ -1623,6 +1633,14 @@ Return the
 =head2 sech
 
 Number.sech() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 seed
+
+Number.seed() -> I<Obj>
 
 Return the
 

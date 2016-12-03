@@ -156,12 +156,12 @@ package Sidef::Types::Number::Inf {
         Sidef::Types::Array::Array->new([]);
     }
 
-    *factor       = \&digits;
-    *factors      = \&digits;
-    *factor_pairs = \&digits;
-    *pfactor      = \&digits;
-    *primes       = \&digits;
-    *divisors     = \&digits;
+    *factor   = \&digits;
+    *factors  = \&digits;
+    *pfactor  = \&digits;
+    *pfactors = \&digits;
+    *primes   = \&digits;
+    *divisors = \&digits;
 
     sub divmod {
         my ($x, $y) = @_;
