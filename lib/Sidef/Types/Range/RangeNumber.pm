@@ -95,6 +95,18 @@ package Sidef::Types::Range::RangeNumber {
     sub sum {
         my ($self, $arg) = @_;
 
+        # Sum by mapping each value to a block
+        if (ref($arg) eq 'Sidef::Types::Block::Block') {
+            my $sum = Sidef::Types::Number::Number::ZERO;
+
+            my $iter = $self->iter->{code};
+            while (1) {
+                $sum = $sum->add($arg->run($iter->() // last));
+            }
+
+            return $sum;
+        }
+
         if ($self->{step}->is_one) {
             $self->{_asc} //= 1;
             state $two = Sidef::Types::Number::Number->_set_uint(2);
@@ -106,8 +118,8 @@ package Sidef::Types::Range::RangeNumber {
         my $sum = $arg // Sidef::Types::Number::Number::ZERO;
 
         my $iter = $self->iter->{code};
-        while (defined(my $num = $iter->())) {
-            $sum = $sum->add($num);
+        while (1) {
+            $sum = $sum->add($iter->() // last);
         }
 
         $sum;
@@ -115,6 +127,18 @@ package Sidef::Types::Range::RangeNumber {
 
     sub prod {
         my ($self, $arg) = @_;
+
+        # Product by mapping each value to a block
+        if (ref($arg) eq 'Sidef::Types::Block::Block') {
+            my $prod = Sidef::Types::Number::Number::ONE;
+
+            my $iter = $self->iter->{code};
+            while (1) {
+                $prod = $prod->mul($arg->run($iter->() // last));
+            }
+
+            return $prod;
+        }
 
         if (    $self->{step}->is_one
             and $self->{from}->is_one
@@ -127,8 +151,8 @@ package Sidef::Types::Range::RangeNumber {
         my $prod = $arg // Sidef::Types::Number::Number::ONE;
 
         my $iter = $self->iter->{code};
-        while (defined(my $num = $iter->())) {
-            $prod = $prod->mul($num);
+        while (1) {
+            $prod = $prod->mul($iter->() // last);
         }
 
         $prod;

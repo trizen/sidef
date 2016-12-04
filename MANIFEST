@@ -826,6 +826,7 @@ scripts/Tests/strip_non_ascii_chars.sf
 scripts/Tests/structures.sf
 scripts/Tests/subsets.sf
 scripts/Tests/subtractive_generator.sf
+scripts/Tests/sum_and_prod.sf
 scripts/Tests/swap.sf
 scripts/Tests/sylvesters_sequence.sf
 scripts/Tests/symbolic_fractions.sf

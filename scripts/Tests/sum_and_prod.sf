@@ -1,0 +1,43 @@
+#!/usr/bin/ruby
+
+#
+## Test Array#sum and Array#prod
+#
+
+var a = [1,2,3,4,5]
+
+assert_eq(a.prod, 120)
+assert_eq(a.sum,  15)
+
+assert_eq(a.sum  { _*_ }, 55)
+assert_eq(a.prod { _*_ }, 14400)
+
+# This may change in the future
+assert_eq(a.sum(42),  57)
+assert_eq(a.prod(2), 240)
+
+# Empty array
+assert_eq([].sum,  0)
+assert_eq([].prod, 1)
+
+#
+## Test RangeNumber#sum and RangeNumber#prod
+#
+
+var r = 1..5
+
+assert_eq(r.prod, 120)
+assert_eq(r.sum,  15)
+
+assert_eq(r.sum  { _*_ }, 55)
+assert_eq(r.prod { _*_ }, 14400)
+
+# This may change in the future
+assert_eq(r.sum(42),  57)
+assert_eq(r.prod(2), 240)
+
+# Empty range
+assert_eq((5..4).sum,  0)
+assert_eq((5..4).prod, 1)
+
+say "** Test passed!"

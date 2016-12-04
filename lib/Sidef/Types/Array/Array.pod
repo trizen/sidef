@@ -193,6 +193,14 @@ Return the
 
 =cut
 
+=head2 collapse
+
+Array.collapse() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 combinations
 
 Array.combinations() -> I<Obj>
@@ -899,8 +907,6 @@ Array.prod() -> I<Obj>
 
 Return the
 
-Aliases: I<product>
-
 =cut
 
 =head2 range
@@ -1018,8 +1024,6 @@ Return the
 Array.sum() -> I<Obj>
 
 Return the
-
-Aliases: I<collapse>
 
 =cut
 

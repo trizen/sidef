@@ -586,35 +586,55 @@ package Sidef::Types::Array::Array {
         ($self->min, $self->max);
     }
 
-    sub sum {
-        defined($_[1])
-          ? do {
-            my $sum = $_[1];
-            state $method = '+';
-            foreach my $obj (@{$_[0]}) {
-                $sum = $sum->$method($obj);
-            }
-            $sum;
-          }
-          : $_[0]->reduce_operator('+');
+    sub collapse {
+        $_[0]->reduce_operator('+');
     }
 
-    *collapse = \&sum;
+    sub sum {
+        my ($self, $arg) = @_;
+
+        # Sum by mapping each value to a block
+        if (ref($arg) eq 'Sidef::Types::Block::Block') {
+            my $sum = Sidef::Types::Number::Number::ZERO;
+
+            foreach my $obj (@$self) {
+                $sum = $sum->add($arg->run($obj));
+            }
+
+            return $sum;
+        }
+
+        my $sum = $arg // Sidef::Types::Number::Number::ZERO;
+
+        foreach my $obj (@$self) {
+            $sum = $sum->add($obj);
+        }
+
+        $sum;
+    }
 
     sub prod {
-        defined($_[1])
-          ? do {
-            my $prod = $_[1];
-            state $method = '*';
-            foreach my $obj (@{$_[0]}) {
-                $prod = $prod->$method($obj);
-            }
-            $prod;
-          }
-          : $_[0]->reduce_operator('*');
-    }
+        my ($self, $arg) = @_;
 
-    *product = \&prod;
+        # Product by mapping each value to a block
+        if (ref($arg) eq 'Sidef::Types::Block::Block') {
+            my $prod = Sidef::Types::Number::Number::ONE;
+
+            foreach my $obj (@$self) {
+                $prod = $prod->mul($arg->run($obj));
+            }
+
+            return $prod;
+        }
+
+        my $prod = $arg // Sidef::Types::Number::Number::ONE;
+
+        foreach my $obj (@$self) {
+            $prod = $prod->mul($obj);
+        }
+
+        $prod;
+    }
 
     sub _min_max_by {
         my ($self, $code, $value) = @_;
