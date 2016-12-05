@@ -9,7 +9,7 @@ configure_requires:
   Module::Build: '0'
 dynamic_config: 1
 generated_by: 'Module::Build version 0.422, CPAN::Meta::Converter version 2.150010'
-license: perl
+license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -143,7 +143,7 @@ requires:
   perl: v5.18.0
   utf8: '0'
 resources:
-  license: http://dev.perl.org/licenses/
+  license: http://www.perlfoundation.org/artistic_license_2_0
   repository: https://github.com/trizen/sidef
 version: '2.33'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

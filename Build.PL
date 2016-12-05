@@ -12,7 +12,7 @@ use Module::Build;
 my $builder = Module::Build->new(
 
     module_name        => 'Sidef',
-    license            => 'perl',
+    license            => 'artistic_2',
     dist_author        => [
                             q{Daniel Șuteu   (<trizenx@gmail.com>)},
                             q{Ioana Fălcușan (<ioanaflavia@gmail.com>)},
