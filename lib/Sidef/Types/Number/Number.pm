@@ -1177,10 +1177,17 @@ package Sidef::Types::Number::Number {
     ## acoth(x) = atanh(1/x)
     #
     sub acoth {
-        my $r = _big2mpfr($_[0]);
-        Math::MPFR::Rmpfr_ui_div($r, 1, $r, $ROUND);
-        Math::MPFR::Rmpfr_atanh($r, $r, $ROUND);
-        _mpfr2big($r);
+        my ($x) = @_;
+
+        # Return a complex number for x > -1 and x < 1
+        if (Math::GMPq::Rmpq_cmp_ui($$x, 1, 1) < 0 and Math::GMPq::Rmpq_cmp_si($$x, -1, 1) > 0) {
+            return Sidef::Types::Number::Complex->new($x)->acoth;
+        }
+
+        $x = _big2mpfr($x);
+        Math::MPFR::Rmpfr_ui_div($x, 1, $x, $ROUND);
+        Math::MPFR::Rmpfr_atanh($x, $x, $ROUND);
+        _mpfr2big($x);
     }
 
     sub atan2 {
