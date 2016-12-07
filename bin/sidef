@@ -327,7 +327,7 @@ HELP
             }
             else {
                 system 'man', $ref;
-                $? && system 'perdoc', $ref;
+                $? && system 'perldoc', $ref;
             }
         }
 
