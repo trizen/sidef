@@ -413,7 +413,7 @@ sub code_interactive {
             }
             elsif ($line =~ /^#\h*load\h+(.+)/) {
                 $init_sidef->();
-
+                $sidef->execute_code('');
                 my $file = unpack('A*', $1);
                 open my $fh, '<:utf8', $file or do {
                     warn "Can't open file <<$file>> for read: $!\n";
@@ -430,7 +430,7 @@ sub code_interactive {
                 };
                 print $fh $valid_lines;
                 close $fh;
-                say "** Updated file <<$file>> successfully!";
+                say "** Created file: $file";
             }
 
             #~ elsif ($line =~ /\h\z/) {
