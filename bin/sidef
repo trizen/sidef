@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 use utf8;
-use 5.014;
+use 5.016;
 
 BEGIN {    # support for running sidef locally from everywhere
     require File::Spec;
@@ -321,7 +321,14 @@ HELP
                     last;
                 }
             }
-            system 'perldoc', defined($pod) ? $pod : $ref;
+            if (defined($pod)) {
+                system 'perldoc', $pod;
+                $? && system 'man', $ref;
+            }
+            else {
+                system 'man', $ref;
+                $? && system 'perdoc', $ref;
+            }
         }
 
         redo;
@@ -344,7 +351,7 @@ sub code_interactive {
     };
 
     $init_sidef->();
-    $sidef->execute_code("1");    # warm-up
+    $sidef->execute_code('');    # warm-up
 
     my ($copy_array, $copy_hash);
 
@@ -354,7 +361,7 @@ sub code_interactive {
         my @copy;
         foreach my $item (@$array) {
             if (ref($item) eq 'ARRAY') {
-                push @copy, $copy_array->($item);
+                push @copy, __SUB__->($item);
             }
             elsif (ref($item) eq 'HASH') {
                 push @copy, $copy_hash->($item);
@@ -378,7 +385,7 @@ sub code_interactive {
                 $copy{$key} = $copy_array->($value);
             }
             elsif (ref($value) eq 'HASH') {
-                $copy{$key} = $copy_hash->($value);
+                $copy{$key} = __SUB__->($value);
             }
             else {
                 $copy{$key} = $value;
@@ -441,14 +448,14 @@ EOT
                 print <<'EOT';
 
 This program is free software; you can redistribute it
-and/or modify it under the same terms as Perl. For more
-details, see the full text in the LICENSE file.
+and/or modify it under the terms of the Artistic License (2.0).
+For more details, see the full text in the LICENSE file.
 
 This program is distributed in the hope that it will be
 useful, but without any warranty; without even the implied
 warranty of merchantability or fitness for a particular purpose.
 
-See http://dev.perl.org/licenses/ for more information.
+See http://www.perlfoundation.org/artistic_license_2_0 for more information.
 
 EOT
                 redo MAINLOOP;
