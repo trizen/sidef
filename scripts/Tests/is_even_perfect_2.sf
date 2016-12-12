@@ -5,12 +5,11 @@
 #
 
 func is_even_perfect(n) {
-    var v1 = n.valuation(2) || return false
-    var m  = 1+(n >> v1)
-    var v2 = m.valuation(2)
-    v2 == (v1+1)            || return false
-    (m >> v2).is_one        || return false
-    v2.is_mersenne_prime
+    var v = valuation(n, 2) || return false
+    var m = (n >> v)
+    (m & (m+1)).is_zero     || return false
+    (m >> v   ).is_one      || return false
+    is_mersenne_prime(v+1)
 }
 
 var i = 0;
