@@ -2369,6 +2369,14 @@ package Sidef::Types::Number::Number {
           : Sidef::Types::Bool::Bool::FALSE;
     }
 
+    sub is_mersenne_prime {
+        my $x = ${$_[0]};
+        Math::GMPq::Rmpq_integer_p($x)
+          && Math::Prime::Util::GMP::is_mersenne_prime(Math::GMPq::Rmpq_get_str($x, 10))
+          ? Sidef::Types::Bool::Bool::TRUE
+          : Sidef::Types::Bool::Bool::FALSE;
+    }
+
     sub primes {
         my ($x, $y) = @_;
 

@@ -1016,6 +1016,14 @@ Return the
 
 =cut
 
+=head2 is_mersenne_prime
+
+Number.is_mersenne_prime() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 is_mone
 
 Number.is_mone() -> I<Obj>

@@ -218,6 +218,7 @@ package Sidef::Types::Number::Nan {
     *is_prime          = \&is_real;
     *is_prob_prime     = \&is_real;
     *is_prov_prime     = \&is_real;
+    *is_mersenne_prime = \&is_real;
     *is_square_free    = \&is_real;
     *is_prime_power    = \&is_real;
     *is_primitive_root = \&is_real;
