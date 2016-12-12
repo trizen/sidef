@@ -178,6 +178,7 @@ package Sidef::Types::Number::Nan {
     *znprimroot        = \&nan;
     *ramanujan_tau     = \&nan;
     *prime_count       = \&nan;
+    *remove            = \&nan;
 
     sub cmp { }
 

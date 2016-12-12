@@ -2341,6 +2341,16 @@ package Sidef::Types::Number::Number {
         __PACKAGE__->_set_uint(Math::GMPz::Rmpz_remove($x, $x, $z));
     }
 
+    sub remove {
+        my ($x, $y) = @_;
+        _valid(\$y);
+        my $z = _big2mpz($y);
+        Math::GMPz::Rmpz_sgn($z) || return ZERO;
+        $x = _big2mpz($x);
+        Math::GMPz::Rmpz_remove($x, $x, $z);
+        _mpz2big($x);
+    }
+
     sub is_prime {
         my $x = ${$_[0]};
         Math::GMPq::Rmpq_integer_p($x)

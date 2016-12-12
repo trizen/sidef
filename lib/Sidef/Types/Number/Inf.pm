@@ -140,6 +140,7 @@ package Sidef::Types::Number::Inf {
     *znprimroot        = \&nan;
     *ramanujan_tau     = \&nan;
     *prime_count       = \&nan;
+    *remove            = \&nan;
 
     *harm     = \&inf;
     *harmonic = \&inf;
