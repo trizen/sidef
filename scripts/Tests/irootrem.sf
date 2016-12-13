@@ -1,0 +1,25 @@
+#!/usr/bin/ruby
+
+var range = (-50 .. 50 -> by(15.irand(5)))
+
+for k in range {
+    for j in range {
+
+        var (x, y) = k.irootrem(j)
+        var r      = k.iroot(j)
+        var m      = (k - r.ipow(j))
+
+        #say "#{k} #{j}"
+
+        assert_eq(x, r)
+        assert_eq(y, m)
+
+        if (x.is_pos) {
+            var r = k.root(j).int
+            assert_eq(x, r)
+            assert_eq(y, k - r**j)
+        }
+    }
+}
+
+say "** Test passed!"

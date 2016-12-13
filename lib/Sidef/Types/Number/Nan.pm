@@ -74,6 +74,7 @@ package Sidef::Types::Number::Nan {
     *mod               = \&nan;
     *imod              = \&nan;
     *fmod              = \&nan;
+    *frem              = \&nan;
     *ln                = \&nan;
     *exp               = \&nan;
     *exp2              = \&nan;

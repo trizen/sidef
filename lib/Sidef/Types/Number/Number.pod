@@ -810,6 +810,14 @@ Return the
 
 =cut
 
+=head2 frem
+
+Number.frem() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 fsub
 
 Number.fsub() -> I<Obj>
@@ -1609,6 +1617,14 @@ Number.re() -> I<Obj>
 Return the
 
 Aliases: I<rat>, I<real>
+
+=cut
+
+=head2 remove
+
+Number.remove() -> I<Obj>
+
+Return the
 
 =cut
 

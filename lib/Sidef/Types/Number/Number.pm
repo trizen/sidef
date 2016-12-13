@@ -478,6 +478,14 @@ package Sidef::Types::Number::Number {
 
     sub iadd {
         my ($x, $y) = @_;
+
+        if (ref($y) eq 'Sidef::Types::Number::Inf' or ref($y) eq 'Sidef::Types::Number::Ninf') {
+            return $y;
+        }
+        elsif (ref($y) eq 'Sidef::Types::Number::Nan') {
+            return nan();
+        }
+
         _valid(\$y);
         $x = _big2mpz($x);
         Math::GMPz::Rmpz_add($x, $x, _big2mpz($y));
@@ -486,6 +494,14 @@ package Sidef::Types::Number::Number {
 
     sub fadd {
         my ($x, $y) = @_;
+
+        if (ref($y) eq 'Sidef::Types::Number::Inf' or ref($y) eq 'Sidef::Types::Number::Ninf') {
+            return $y;
+        }
+        elsif (ref($y) eq 'Sidef::Types::Number::Nan') {
+            return nan();
+        }
+
         _valid(\$y);
         $x = _big2mpfr($x);
         Math::MPFR::Rmpfr_add($x, $x, _big2mpfr($y), $ROUND);
@@ -512,6 +528,14 @@ package Sidef::Types::Number::Number {
 
     sub isub {
         my ($x, $y) = @_;
+
+        if (ref($y) eq 'Sidef::Types::Number::Inf' or ref($y) eq 'Sidef::Types::Number::Ninf') {
+            return $y->neg;
+        }
+        elsif (ref($y) eq 'Sidef::Types::Number::Nan') {
+            return nan();
+        }
+
         _valid(\$y);
         $x = _big2mpz($x);
         Math::GMPz::Rmpz_sub($x, $x, _big2mpz($y));
@@ -520,6 +544,14 @@ package Sidef::Types::Number::Number {
 
     sub fsub {
         my ($x, $y) = @_;
+
+        if (ref($y) eq 'Sidef::Types::Number::Inf' or ref($y) eq 'Sidef::Types::Number::Ninf') {
+            return $y->neg;
+        }
+        elsif (ref($y) eq 'Sidef::Types::Number::Nan') {
+            return nan();
+        }
+
         _valid(\$y);
         $x = _big2mpfr($x);
         Math::MPFR::Rmpfr_sub($x, $x, _big2mpfr($y), $ROUND);
@@ -547,6 +579,15 @@ package Sidef::Types::Number::Number {
 
     sub imul {
         my ($x, $y) = @_;
+
+        if (ref($y) eq 'Sidef::Types::Number::Inf' or ref($y) eq 'Sidef::Types::Number::Ninf') {
+            my $sign = Math::GMPq::Rmpq_sgn($$x);
+            return ($sign < 0 ? $y->neg : $sign > 0 ? $y : nan());
+        }
+        elsif (ref($y) eq 'Sidef::Types::Number::Nan') {
+            return nan();
+        }
+
         _valid(\$y);
         $x = _big2mpz($x);
         Math::GMPz::Rmpz_mul($x, $x, _big2mpz($y));
@@ -555,6 +596,15 @@ package Sidef::Types::Number::Number {
 
     sub fmul {
         my ($x, $y) = @_;
+
+        if (ref($y) eq 'Sidef::Types::Number::Inf' or ref($y) eq 'Sidef::Types::Number::Ninf') {
+            my $sign = Math::GMPq::Rmpq_sgn($$x);
+            return ($sign < 0 ? $y->neg : $sign > 0 ? $y : nan());
+        }
+        elsif (ref($y) eq 'Sidef::Types::Number::Nan') {
+            return nan();
+        }
+
         _valid(\$y);
         $x = _big2mpfr($x);
         Math::MPFR::Rmpfr_mul($x, $x, _big2mpfr($y), $ROUND);
@@ -590,6 +640,14 @@ package Sidef::Types::Number::Number {
 
     sub fdiv {
         my ($x, $y) = @_;
+
+        if (ref($y) eq 'Sidef::Types::Number::Inf' or ref($y) eq 'Sidef::Types::Number::Ninf') {
+            return (ZERO);
+        }
+        elsif (ref($y) eq 'Sidef::Types::Number::Nan') {
+            return nan();
+        }
+
         _valid(\$y);
         $x = _big2mpfr($x);
         Math::MPFR::Rmpfr_div($x, $x, _big2mpfr($y), $ROUND);
@@ -598,6 +656,14 @@ package Sidef::Types::Number::Number {
 
     sub idiv {
         my ($x, $y) = @_;
+
+        if (ref($y) eq 'Sidef::Types::Number::Inf' or ref($y) eq 'Sidef::Types::Number::Ninf') {
+            return (ZERO);
+        }
+        elsif (ref($y) eq 'Sidef::Types::Number::Nan') {
+            return nan();
+        }
+
         _valid(\$y);
 
         $x = _big2mpz($x);
@@ -668,10 +734,33 @@ package Sidef::Types::Number::Number {
 
     sub irootrem {
         my ($x, $y) = @_;
+
+        if (ref($y) eq 'Sidef::Types::Number::Inf' or ref($y) eq 'Sidef::Types::Number::Ninf') {
+            my $root = $x->iroot($y);
+            return ($root, $x->isub($root->ipow($y)));
+        }
+        elsif (ref($y) eq 'Sidef::Types::Number::Nan') {
+            return ((nan()) x 2);
+        }
+
         _valid(\$y);
         $x = _big2mpz($x);
         my $root = CORE::int(Math::GMPq::Rmpq_get_d($$y));
-        ($root <= 0 or Math::GMPz::Rmpz_sgn($x) < 0) and return ((nan()) x 2);
+
+        if ($root == 0) {
+            Math::GMPz::Rmpz_sgn($x) || return (ZERO, MONE);    # 0^Inf = 0
+            Math::GMPz::Rmpz_cmpabs_ui($x, 1) == 0 and return (ONE, _mpz2big($x)->dec);    # 1^Inf = 1 ; (-1)^Inf = 1
+            return (inf(), _mpz2big($x)->dec);
+        }
+        elsif ($root < 0) {
+            my $sign = Math::GMPz::Rmpz_sgn($x) || return (inf(), ZERO);                   # 1 / 0^k = Inf
+            Math::GMPz::Rmpz_cmp_ui($x, 1) == 0 and return (ONE, ZERO);                    # 1 / 1^k = 1
+            return ($sign < 0 ? (nan(), nan()) : (ZERO, ninf()));
+        }
+        elsif ($root % 2 == 0 and Math::GMPz::Rmpz_sgn($x) < 0) {
+            return (nan(), nan());
+        }
+
         my $r = Math::GMPz::Rmpz_init();
         Math::GMPz::Rmpz_rootrem($x, $r, $x, $root);
         (_mpz2big($x), _mpz2big($r));
@@ -836,14 +925,6 @@ package Sidef::Types::Number::Number {
         }
 
         _mpz2big($x);
-    }
-
-    sub fmod {
-        my ($x, $y) = @_;
-        _valid(\$y);
-        $x = _big2mpfr($x);
-        Math::MPFR::Rmpfr_fmod($x, $x, _big2mpfr($y), $ROUND);
-        _mpfr2big($x);
     }
 
     sub log {
@@ -1526,6 +1607,10 @@ package Sidef::Types::Number::Number {
 
     sub eq {
         my ($x, $y) = @_;
+
+        ref($y) ne __PACKAGE__
+          and return Sidef::Types::Bool::Bool::FALSE;
+
         _valid(\$y);
         Math::GMPq::Rmpq_equal($$x, $$y)
           ? (Sidef::Types::Bool::Bool::TRUE)
@@ -1534,6 +1619,10 @@ package Sidef::Types::Number::Number {
 
     sub ne {
         my ($x, $y) = @_;
+
+        ref($y) ne __PACKAGE__
+          and return Sidef::Types::Bool::Bool::TRUE;
+
         _valid(\$y);
         Math::GMPq::Rmpq_equal($$x, $$y)
           ? (Sidef::Types::Bool::Bool::FALSE)
@@ -2048,6 +2137,34 @@ package Sidef::Types::Number::Number {
         }
     }
 
+    sub fmod {
+        my ($x, $y) = @_;
+
+        if (ref($y) eq 'Sidef::Types::Number::Inf' or ref($y) eq 'Sidef::Types::Number::Ninf') {
+            return (Math::GMPq::Rmpq_sgn($$x) == Math::GMPq::Rmpq_sgn($$y) ? $x : $y);
+        }
+        elsif (ref($y) eq 'Sidef::Types::Number::Nan') {
+            return nan();
+        }
+
+        _valid(\$y);
+
+        my $r  = _big2mpfr($x);
+        my $yf = _big2mpfr($y);
+
+        Math::MPFR::Rmpfr_fmod($r, $r, $yf, $ROUND);
+
+        my $sign_r = Math::MPFR::Rmpfr_sgn($r);
+        if (!$sign_r) {
+            return ZERO;    # return faster
+        }
+        elsif ($sign_r > 0 xor Math::MPFR::Rmpfr_sgn($yf) > 0) {
+            Math::MPFR::Rmpfr_add($r, $r, $yf, $ROUND);
+        }
+
+        _mpfr2big($r);
+    }
+
     sub imod {
         my ($x, $y) = @_;
 
@@ -2069,6 +2186,22 @@ package Sidef::Types::Number::Number {
         Math::GMPz::Rmpz_sgn($x) || return ZERO;
         Math::GMPz::Rmpz_add($x, $x, $y) if $sign_y < 0;
         _mpz2big($x);
+    }
+
+    sub frem {
+        my ($x, $y) = @_;
+
+        if (ref($y) eq 'Sidef::Types::Number::Inf' or ref($y) eq 'Sidef::Types::Number::Ninf') {
+            return $x;
+        }
+        elsif (ref($y) eq 'Sidef::Types::Number::Nan') {
+            return nan();
+        }
+
+        _valid(\$y);
+        $x = _big2mpfr($x);
+        Math::MPFR::Rmpfr_fmod($x, $x, _big2mpfr($y), $ROUND);
+        _mpfr2big($x);
     }
 
     sub modpow {

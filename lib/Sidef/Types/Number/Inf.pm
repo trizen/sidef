@@ -91,6 +91,7 @@ package Sidef::Types::Number::Inf {
     *mod               = \&nan;
     *imod              = \&nan;
     *fmod              = \&nan;
+    *frem              = \&nan;
     *bin               = \&nan;
     *modpow            = \&nan;
     *expmod            = \&nan;
@@ -173,13 +174,13 @@ package Sidef::Types::Number::Inf {
     sub isqrtrem {
         my ($x) = @_;
         my $sqrt = $x->isqrt;
-        ($sqrt, $x->sub($sqrt));
+        ($sqrt, $x->isub($sqrt->imul($sqrt)));
     }
 
     sub irootrem {
         my ($x, $y) = @_;
         my $root = $x->iroot($y);
-        ($root, $x->sub($root));
+        ($root, $x->isub($root->ipow($y)));
     }
 
     sub ninf {
