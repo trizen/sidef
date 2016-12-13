@@ -2149,20 +2149,20 @@ package Sidef::Types::Number::Number {
 
         _valid(\$y);
 
-        my $r  = _big2mpfr($x);
-        my $yf = _big2mpfr($y);
+        $x = _big2mpfr($x);
+        $y = _big2mpfr($y);
 
-        Math::MPFR::Rmpfr_fmod($r, $r, $yf, $ROUND);
+        Math::MPFR::Rmpfr_fmod($x, $x, $y, $ROUND);
 
-        my $sign_r = Math::MPFR::Rmpfr_sgn($r);
+        my $sign_r = Math::MPFR::Rmpfr_sgn($x);
         if (!$sign_r) {
             return ZERO;    # return faster
         }
-        elsif ($sign_r > 0 xor Math::MPFR::Rmpfr_sgn($yf) > 0) {
-            Math::MPFR::Rmpfr_add($r, $r, $yf, $ROUND);
+        elsif ($sign_r > 0 xor Math::MPFR::Rmpfr_sgn($y) > 0) {
+            Math::MPFR::Rmpfr_add($x, $x, $y, $ROUND);
         }
 
-        _mpfr2big($r);
+        _mpfr2big($x);
     }
 
     sub imod {
@@ -2587,7 +2587,7 @@ package Sidef::Types::Number::Number {
         }
 
         my @pairs;
-        foreach my $factor (sort { (length($a) <=> length($b)) || ($a cmp $b) } keys(%count)) {
+        foreach my $factor (sort { (CORE::length($a) <=> CORE::length($b)) || ($a cmp $b) } keys(%count)) {
             push @pairs,
               Sidef::Types::Array::Pair->new(
                                              (
