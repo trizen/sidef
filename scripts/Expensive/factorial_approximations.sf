@@ -3,61 +3,69 @@
 define ℯ = Num.e
 define π = Num.pi
 define τ = Num.tau
+define γ = Num.Y
+define ϕ = Num.phi
 
-define NAMES = %w(Unknown Ramanujan Stirling Stirling+Laplace Ramanujan2 Batir Batir2 Batir2WA)
+define NAMES = %w(Unknown Ramanujan Stirling+Trizen Stirling Stirling+Laplace Ramanujan2 Batir Batir2 Batir2WA)
 
 # Unknown
 # sqrt(2*pi*e) * e^(-((3 - sqrt(3)) / 6)) * (((3 - sqrt(3)) / 6 + n) / e)^(n + 1/2)
 func f1(n) {
-    define w = ((3 - 3.sqrt) / 6)
-    define d = (sqrt(τ * ℯ) * exp(-w))
+    define w = ((3 - √3) / 6)
+    define d = (√(τ * ℯ) * exp(-w))
     d * pow((n+w) / ℯ, n + 1/2)
 }
 
 # S. Ramanujan's formula (simplified)
 # sqrt(pi) * (n/e)^n * (n*(4*n*(2*n + 1) + 1))^(1/6)
 func f2(n) {
-    define d = π.sqrt
+    define d = √π
     d * exp(-n) * n**n * root(n*(4*n*(2*n + 1) + 1), 6)
+}
+
+# Stirling's formula + Trizen's approximation
+# sqrt(2*pi*n) * (n/e)^n * (digamma(n+1) + gamma) / (log(n + 1/(phi * sqrt(n))) + gamma) * zeta(n)
+func f3(n) {
+    √(τ*n) * exp(-n) * n**n * ((digamma(n+1) + γ) / (log(n + 1/(ϕ * √n)) + γ)) * zeta(n)
 }
 
 # Stirling's formula
 # sqrt(2*pi*n) * (n/e)^n
 func f4(n) {
-    τ * n -> sqrt * exp(-n) * n**n
+    √(τ * n) * exp(-n) * n**n
 }
 
 # Stirling's formula + Laplace's method (1)
 # sqrt(2*pi*n) * (n/e)^n * (1 + 1/(12*n))
 func f5(n) {
-    τ * n -> sqrt * exp(-n) * n**n * (1 + 1/(12*n))
+    √(τ * n) * exp(-n) * n**n * (1 + 1/(12*n))
 }
 
 # S. Ramanujan (2)
 # sqrt(pi) * n^n * e^(-n) * ((8 * n^3) + (4 * n^2) + n + 1/30)^(1/6)
 func f6(n) {
-    define w = π.sqrt
+    define w = √π
     w * pow(n, n) * exp(-n) * pow(((8 * n**3) + (4 * n**2) + n + 1/30), 1/6)
 }
 
 # N. Batir
 # sqrt(2*pi) * n^n * e^(-n) * sqrt(n + 1/2) * e^(-(1 / (6 * (n + 3/8))))
 func f7(n) {
-    define w = τ.sqrt
-    w * pow(n, n) * exp(-n) * sqrt(n + 1/2) * exp(-(1 / (6 * (n + 3/8))))
+    define w = √τ
+    w * pow(n, n) * exp(-n) * √(n + 1/2) * exp(-(1 / (6 * (n + 3/8))))
 }
 
 # N. Batir(2)
 # sqrt(2*pi) * n^n * e^(-n) * sqrt(n + 1/6 + 1/(72*n) - 31/(6480 * n^2) - 139/(155520 * n^3) + 9871/(6531840 * n^4))
 func f8(n) {
-    define w = τ.sqrt
-    w * pow(n, n) * exp(-n) * sqrt(n + 1/6 + 1/(72*n) - 31/(6480 * n**2) - 139/(155520 * n**3) + 9871/(6531840 * n**4))
+    define w = √τ
+    w * pow(n, n) * exp(-n) * √(n + 1/6 + 1/(72*n) - 31/(6480 * n**2) - 139/(155520 * n**3) + 9871/(6531840 * n**4))
 }
 
 # N. Batir(2) derivation by WolframAlpha
 # 1/216 * sqrt(pi/70) * exp(-n) * n^(n-2) * sqrt(42*n*(24*n*(90*n*(12*n*(6*n + 1) + 1) - 31) - 139) + 9871)
 func f9(n) {
-    1/216 * sqrt(π/70) * exp(-n) * n**(n-2) * sqrt(42*n*(24*n*(90*n*(12*n*(6*n + 1) + 1) - 31) - 139) + 9871);
+    1/216 * √(π/70) * exp(-n) * n**(n-2) * √(42*n*(24*n*(90*n*(12*n*(6*n + 1) + 1) - 31) - 139) + 9871);
 }
 
 #
@@ -68,7 +76,7 @@ var report = Hash()
 for x in (10..20) {
 
     var xfact = x!;
-    var arr = [f1(x), f2(x), f4(x), f5(x), f6(x), f7(x), f8(x), f9(x)];
+    var arr = [f1(x), f2(x), f3(x), f4(x), f5(x), f6(x), f7(x), f8(x), f9(x)];
 
     for name in NAMES {
         report{name} := [] += arr.shift;
