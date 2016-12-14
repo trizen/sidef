@@ -142,6 +142,7 @@ package Sidef::Types::Number::Inf {
     *ramanujan_tau     = \&nan;
     *prime_count       = \&nan;
     *remove            = \&nan;
+    *rad               = \&nan;
 
     *harm     = \&inf;
     *harmonic = \&inf;

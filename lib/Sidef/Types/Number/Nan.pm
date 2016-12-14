@@ -180,6 +180,7 @@ package Sidef::Types::Number::Nan {
     *ramanujan_tau     = \&nan;
     *prime_count       = \&nan;
     *remove            = \&nan;
+    *rad               = \&nan;
 
     sub cmp { }
 
