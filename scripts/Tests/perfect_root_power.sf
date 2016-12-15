@@ -1,0 +1,12 @@
+#!/usr/bin/ruby
+
+for n in (-10 .. 10) {
+    var r = perfect_root(n)
+    var k = perfect_power(n)
+
+    if (r**k != n) {
+        die "error for: #{n}"
+    }
+
+    say "#{r}^#{k} = #{n}"
+}
