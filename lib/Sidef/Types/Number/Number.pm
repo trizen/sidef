@@ -2799,6 +2799,22 @@ package Sidef::Types::Number::Number {
         $pow == 1 ? ONE : __PACKAGE__->_set_uint($pow);
     }
 
+    sub perfect_root {
+        my $str = &_big2istr;
+
+        my $pow = Math::Prime::Util::GMP::is_power($str) || return $_[0];
+
+        my $x = Math::GMPz::Rmpz_init_set_str($str, 10);
+        $pow == 2
+          ? Math::GMPz::Rmpz_sqrt($x, $x)
+          : Math::GMPz::Rmpz_root($x, $x, $pow);
+        _mpz2big($x);
+    }
+
+    sub perfect_power {
+        __PACKAGE__->_set_uint(Math::Prime::Util::GMP::is_power(&_big2istr) || return ONE);
+    }
+
     sub next_pow2 {
         my ($x) = @_;
 

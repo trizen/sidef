@@ -163,6 +163,8 @@ package Sidef::Types::Number::Nan {
     *big_omega         = \&nan;
     *prime_root        = \&nan;
     *prime_power       = \&nan;
+    *perfect_root      = \&nan;
+    *perfect_power     = \&nan;
     *partitions        = \&nan;
     *totient           = \&nan;
     *euler_phi         = \&nan;
