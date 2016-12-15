@@ -446,7 +446,7 @@ package Sidef {
         eval { require $self =~ s{::}{/}rg . '.pm' };
 
         if ($@) {
-            if (defined &main::__load_sidef_module__) {
+            if (defined(&main::__load_sidef_module__)) {
                 main::__load_sidef_module__($self);
             }
             else {
@@ -455,7 +455,10 @@ package Sidef {
         }
 
         if (defined(&$AUTOLOAD)) {
-            return $AUTOLOAD->($self, @args);
+            goto \&$AUTOLOAD;
+
+            ## The above `goto` is roughly equivalent with:
+            #return $AUTOLOAD->($self, @args);
         }
     }
 
