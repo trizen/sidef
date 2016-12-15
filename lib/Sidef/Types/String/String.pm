@@ -1230,9 +1230,6 @@ package Sidef::Types::String::String {
                         splice @chars, $i, 1 + $+[0], CORE::chr(CORE::oct($1));
                     }
                 }
-                elsif ($char eq 'd') {
-                    splice(@chars, $i - 1, 3);
-                }
                 elsif ($char eq 'c') {
                     if (exists $chars[$i + 2]) {    # bug for: "\c\\"
                         splice(@chars, $i, 3, chr((CORE::ord(CORE::uc($chars[$i + 2])) + 64) % 128));
@@ -1260,7 +1257,7 @@ package Sidef::Types::String::String {
                 }
             }
 
-            if ($spec ne 'E') {
+            if ($spec ne 'E' and defined($chars[$i])) {
                 if ($spec eq 'U') {
                     $chars[$i] = CORE::uc($chars[$i]);
                 }
