@@ -61,6 +61,11 @@ my $builder = Module::Build->new(
                  'Math::Prime::Util::GMP' => 0.41,
                 },
 
+    recommends => {
+            'Digest::MD5' => 0,
+            'Digest::SHA' => 0,
+    },
+
     add_to_cleanup     => ['Sidef-*'],
     create_makefile_pl => 'traditional',
 );

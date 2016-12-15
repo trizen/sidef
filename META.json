@@ -26,6 +26,10 @@
          }
       },
       "runtime" : {
+         "recommends" : {
+            "Digest::MD5" : "0",
+            "Digest::SHA" : "0"
+         },
          "requires" : {
             "Cwd" : "0",
             "Data::Dump" : "0",

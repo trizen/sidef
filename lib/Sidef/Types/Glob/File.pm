@@ -46,6 +46,42 @@ package Sidef::Types::Glob::File {
         Sidef::Types::Number::Number->new(-s "$self");
     }
 
+    sub md5 {
+        ref($_[0]) || shift(@_);
+        state $x = require Digest::MD5;
+        open my $fh, '<:raw', "$_[0]" or return;
+        my $o = Digest::MD5->new;
+        $o->addfile($fh);
+        Sidef::Types::String::String->new(scalar $o->hexdigest);
+    }
+
+    sub sha1 {
+        ref($_[0]) || shift(@_);
+        state $x = require Digest::SHA;
+        open my $fh, '<:raw', "$_[0]" or return;
+        my $o = Digest::SHA->new(1);
+        $o->addfile($fh);
+        Sidef::Types::String::String->new(scalar $o->hexdigest);
+    }
+
+    sub sha256 {
+        ref($_[0]) || shift(@_);
+        state $x = require Digest::SHA;
+        open my $fh, '<:raw', "$_[0]" or return;
+        my $o = Digest::SHA->new(256);
+        $o->addfile($fh);
+        Sidef::Types::String::String->new(scalar $o->hexdigest);
+    }
+
+    sub sha512 {
+        ref($_[0]) || shift(@_);
+        state $x = require Digest::SHA;
+        open my $fh, '<:raw', "$_[0]" or return;
+        my $o = Digest::SHA->new(512);
+        $o->addfile($fh);
+        Sidef::Types::String::String->new(scalar $o->hexdigest);
+    }
+
     sub compare {
         ref($_[0]) || shift(@_);
         my ($self, $file) = @_;

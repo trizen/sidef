@@ -333,6 +333,26 @@ package Sidef::Types::String::String {
         Sidef::Types::Number::Number->new($$self, 16);
     }
 
+    sub md5 {
+        state $x = require Digest::MD5;
+        bless(\(my $o = Digest::MD5::md5_hex(${$_[0]})), __PACKAGE__);
+    }
+
+    sub sha1 {
+        state $x = require Digest::SHA;
+        bless(\(my $o = Digest::SHA::sha1_hex(${$_[0]})), __PACKAGE__);
+    }
+
+    sub sha256 {
+        state $x = require Digest::SHA;
+        bless(\(my $o = Digest::SHA::sha256_hex(${$_[0]})), __PACKAGE__);
+    }
+
+    sub sha512 {
+        state $x = require Digest::SHA;
+        bless(\(my $o = Digest::SHA::sha512_hex(${$_[0]})), __PACKAGE__);
+    }
+
     sub substr {
         my ($self, $offs, $len) = @_;
         __PACKAGE__->new(

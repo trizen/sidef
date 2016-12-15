@@ -116,6 +116,9 @@ provides:
     file: lib/Sidef/Variable/GetOpt.pm
   Sidef::Variable::NamedParam:
     file: lib/Sidef/Variable/NamedParam.pm
+recommends:
+  Digest::MD5: '0'
+  Digest::SHA: '0'
 requires:
   Cwd: '0'
   Data::Dump: '0'
