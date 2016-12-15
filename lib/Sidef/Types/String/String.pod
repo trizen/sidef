@@ -692,6 +692,14 @@ Return the
 
 =cut
 
+=head2 md5
+
+String.md5() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 new
 
 String.new() -> I<Obj>
@@ -843,6 +851,30 @@ Return the
 =head2 scan
 
 String.scan() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 sha1
+
+String.sha1() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 sha256
+
+String.sha256() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 sha512
+
+String.sha512() -> I<Obj>
 
 Return the
 

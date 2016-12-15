@@ -346,6 +346,14 @@ Aliases: I<touch>, I<create>, I<mkfile>
 
 =cut
 
+=head2 md5
+
+File.md5() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 modification_time_days_diff
 
 File.modification_time_days_diff() -> I<Obj>
@@ -469,6 +477,30 @@ Aliases: I<abs2rel>, I<rel_name>, I<relname>
 =head2 rename
 
 File.rename() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 sha1
+
+File.sha1() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 sha256
+
+File.sha256() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 sha512
+
+File.sha512() -> I<Obj>
 
 Return the
 
