@@ -1298,6 +1298,21 @@ package Sidef::Types::Number::Number {
         _mpfr2big($x);
     }
 
+    sub cis {
+        state $_x = require Math::MPC;
+
+        my $cos = _big2mpfr($_[0]);
+        my $sin = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_set($sin, $cos, $ROUND);
+
+        Math::MPFR::Rmpfr_cos($cos, $cos, $ROUND);
+        Math::MPFR::Rmpfr_sin($sin, $sin, $ROUND);
+
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_set_fr_fr($r, $cos, $sin, $ROUND);
+        Sidef::Types::Number::Complex->new($r);
+    }
+
     #
     ## Special functions
     #
@@ -1342,6 +1357,9 @@ package Sidef::Types::Number::Number {
         _mpfr2big($r);
     }
 
+    #
+    ## eta(s) = (1 - 2^(1-s)) * zeta(s)
+    #
     sub eta {
         my $r = _big2mpfr($_[0]);
 

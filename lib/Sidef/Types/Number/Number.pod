@@ -500,6 +500,14 @@ Return the
 
 =cut
 
+=head2 cis
+
+Number.cis() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 commify
 
 Number.commify() -> I<Obj>

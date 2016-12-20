@@ -334,6 +334,10 @@ package Sidef::Types::Number::Inf {
         Sidef::Types::Number::Number->pi->div($two)->i;
     }
 
+    sub cis {
+        state $x = Sidef::Types::Number::Complex->new((Sidef::Types::Number::Nan::NAN) x 2);
+    }
+
     #
     ## binomial(inf, x) = 0       | with x < 0
     ## binomial(inf, inf) = 1

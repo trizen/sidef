@@ -245,6 +245,10 @@ package Sidef::Types::Number::Nan {
         state $x = Sidef::Types::Number::Complex->new(0, NAN);
     }
 
+    sub cis {
+        state $x = Sidef::Types::Number::Complex->new(NAN, NAN);
+    }
+
     sub dump {
         state $x = Sidef::Types::String::String->new('NaN');
     }
