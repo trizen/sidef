@@ -1342,6 +1342,28 @@ package Sidef::Types::Number::Number {
         _mpfr2big($r);
     }
 
+    sub eta {
+        my $r = _big2mpfr($_[0]);
+
+        # Special case for eta(1) = log(2)
+        if (!Math::MPFR::Rmpfr_cmp_ui($r, 1)) {
+            Math::MPFR::Rmpfr_add_ui($r, $r, 1, $ROUND);
+            Math::MPFR::Rmpfr_log($r, $r, $ROUND);
+            return _mpfr2big($r);
+        }
+
+        my $p = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_set($p, $r, $ROUND);
+        Math::MPFR::Rmpfr_ui_sub($p, 1, $p, $ROUND);
+        Math::MPFR::Rmpfr_ui_pow($p, 2, $p, $ROUND);
+        Math::MPFR::Rmpfr_ui_sub($p, 1, $p, $ROUND);
+
+        Math::MPFR::Rmpfr_zeta($r, $r, $ROUND);
+        Math::MPFR::Rmpfr_mul($r, $r, $p, $ROUND);
+
+        _mpfr2big($r);
+    }
+
     sub zeta {
         my $r = _big2mpfr($_[0]);
         Math::MPFR::Rmpfr_zeta($r, $r, $ROUND);
@@ -3309,6 +3331,7 @@ package Sidef::Types::Number::Number {
         *{__PACKAGE__ . '::' . 'Ω'}  = \&big_omega;
         *{__PACKAGE__ . '::' . 'ω'}  = \&omega;
         *{__PACKAGE__ . '::' . 'ζ'}  = \&zeta;
+        *{__PACKAGE__ . '::' . 'η'}  = \&eta;
         *{__PACKAGE__ . '::' . 'μ'}  = \&mobius;
     }
 }

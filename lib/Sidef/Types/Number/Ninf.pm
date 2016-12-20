@@ -70,6 +70,7 @@ package Sidef::Types::Number::Ninf {
     *digamma          = \&nan;
     *lngamma          = \&nan;
     *zeta             = \&nan;
+    *eta              = \&nan;
     *factorial        = \&nan;
     *fac              = \&nan;
     *double_factorial = \&nan;
@@ -398,6 +399,7 @@ package Sidef::Types::Number::Ninf {
         *{__PACKAGE__ . '::' . 'Γ'}  = \&nan;
         *{__PACKAGE__ . '::' . 'Ψ'}  = \&nan;
         *{__PACKAGE__ . '::' . 'ζ'}  = \&zeta;
+        *{__PACKAGE__ . '::' . 'η'}  = \&eta;
     }
 }
 

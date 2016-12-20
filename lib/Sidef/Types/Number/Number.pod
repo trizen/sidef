@@ -1872,6 +1872,16 @@ Aliases: I<zeta>
 
 =cut
 
+=head2 η
+
+Number.η() -> I<Obj>
+
+Return the
+
+Aliases: I<eta>
+
+=cut
+
 =head2 μ
 
 Number.μ() -> I<Obj>

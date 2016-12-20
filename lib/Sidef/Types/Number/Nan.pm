@@ -67,6 +67,7 @@ package Sidef::Types::Number::Nan {
     *gamma             = \&nan;
     *digamma           = \&nan;
     *zeta              = \&nan;
+    *eta               = \&nan;
     *log               = \&nan;
     *log2              = \&nan;
     *log10             = \&nan;
@@ -351,6 +352,7 @@ package Sidef::Types::Number::Nan {
         *{__PACKAGE__ . '::' . 'Ω'}  = \&big_omega;
         *{__PACKAGE__ . '::' . 'ω'}  = \&omega;
         *{__PACKAGE__ . '::' . 'ζ'}  = \&zeta;
+        *{__PACKAGE__ . '::' . 'η'}  = \&eta;
         *{__PACKAGE__ . '::' . 'μ'}  = \&mobius;
     }
 }

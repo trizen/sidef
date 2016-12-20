@@ -291,6 +291,7 @@ package Sidef::Types::Number::Inf {
 
     *coth = \&tanh;
     *zeta = \&tanh;
+    *eta  = \&tanh;
     *erf  = \&tanh;
     *sign = \&tanh;
 
@@ -549,6 +550,7 @@ package Sidef::Types::Number::Inf {
         *{__PACKAGE__ . '::' . 'Ω'}  = \&big_omega;
         *{__PACKAGE__ . '::' . 'ω'}  = \&omega;
         *{__PACKAGE__ . '::' . 'ζ'}  = \&zeta;
+        *{__PACKAGE__ . '::' . 'η'}  = \&eta;
         *{__PACKAGE__ . '::' . 'μ'}  = \&mobius;
     }
 }
