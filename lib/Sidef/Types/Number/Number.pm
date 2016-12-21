@@ -2604,7 +2604,6 @@ package Sidef::Types::Number::Number {
     }
 
     sub rad {
-        my ($n) = @_;
         state $x = require List::Util;
         my $n = Math::Prime::Util::GMP::vecprod(List::Util::uniq(Math::Prime::Util::GMP::factor(&_big2istr)));
         $n <= MAX_UI ? __PACKAGE__->_set_uint($n) : __PACKAGE__->_set_str($n);
