@@ -3137,7 +3137,7 @@ package Sidef::Types::Number::Number {
                 _mpz2big($rand);
             }
             else {
-                my $sgn = Math::GMPz::Rmpz_sgn($x);
+                my $sgn = Math::GMPz::Rmpz_sgn($x) || return ZERO;
                 Math::GMPz::Rmpz_urandomm($x, $state, $x, 1);
                 Math::GMPz::Rmpz_neg($x, $x) if $sgn < 0;
                 _mpz2big($x);
