@@ -1497,10 +1497,10 @@ package Sidef::Types::Number::Number {
 
         my $z = Math::GMPz::Rmpz_init();
         Math::GMPz::Rmpz_fac_ui($z, $n);              # z = n!
-        Math::GMPz::Rmpz_div_2exp($z, $z, $n - 1);    # z = z / 2^(n-1)
         Math::MPFR::Rmpfr_mul_z($f, $f, $z, $ROUND);  # f = f * z
+        Math::MPFR::Rmpfr_div_2exp($f, $f, $n - 1, $ROUND);    # f = f / 2^(n-1)
 
-        Math::MPFR::Rmpfr_div($f, $f, $p, $ROUND);    # f = f/p
+        Math::MPFR::Rmpfr_div($f, $f, $p, $ROUND);             # f = f/p
         Math::MPFR::Rmpfr_neg($f, $f, $ROUND) if $n % 4 == 0;
 
         _mpfr2big($f);
