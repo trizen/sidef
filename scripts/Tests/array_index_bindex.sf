@@ -1,0 +1,26 @@
+#!/usr/bin/ruby
+
+# Array.index() and Array.bindex()
+
+var a = ["Alice", "Jane", "Joe", "John", "Kate", "Zerg"]
+
+assert_eq(a.bindex {|t| t <=> 'Kate'  }, a.index('Kate'))
+assert_eq(a.bindex {|t| t <=> 'Zerg'  }, a.index('Zerg'))
+assert_eq(a.bindex {|t| t <=> 'Alice' }, a.index('Alice'))
+
+assert_eq(a.bindex { _ <=> 'Aaa'  }, -1)
+assert_eq(a.bindex { _ <=> 'Zzz'  }, -1)
+assert_eq(a.bindex { _ <=> 'Jack' }, -1)
+assert_eq(a.bindex { _ <=> 'Joey' }, -1)
+
+assert_eq(a.bindex('Jane'),  a.index { _ == 'Jane'  })
+assert_eq(a.bindex('Alice'), a.index { _ == 'Alice' })
+assert_eq(a.bindex('John'),  a.index { _ == 'John'  })
+assert_eq(a.bindex('Zerg'),  a.index { _ == 'Zerg'  })
+
+assert_eq(a.bindex('Aaa'), -1)
+assert_eq(a.bindex('Zzz'), -1)
+assert_eq(a.bindex('Jack'), -1)
+assert_eq(a.bindex('Joey'), -1)
+
+say "** Test passed!"

@@ -175,6 +175,16 @@ Return the
 
 =cut
 
+=head2 bindex
+
+Array.bindex() -> I<Obj>
+
+Return the
+
+Aliases: I<bindex_by>
+
+=cut
+
 =head2 bshuffle
 
 Array.bshuffle() -> I<Obj>

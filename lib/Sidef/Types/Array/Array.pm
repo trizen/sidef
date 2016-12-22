@@ -1134,6 +1134,53 @@ package Sidef::Types::Array::Array {
         $self->new(\@values);
     }
 
+    sub bindex {
+        my ($self, $obj) = @_;
+
+        my $left  = 0;
+        my $right = $#$self;
+        my ($middle, $item, $cmp);
+
+        if (ref($obj) eq 'Sidef::Types::Block::Block') {
+
+            while ($left <= $right) {
+                $middle = int(($right + $left) >> 1);
+                $item   = $self->[$middle];
+                $cmp    = $obj->run($item) || return Sidef::Types::Number::Number->_set_uint($middle);
+
+                if ($cmp eq Sidef::Types::Number::Number::ONE) {
+                    $right = $middle - 1;
+                }
+                else {
+                    $left = $middle + 1;
+                }
+
+            }
+
+            return Sidef::Types::Number::Number::MONE;
+        }
+
+        while ($left <= $right) {
+            $middle = int(($right + $left) >> 1);
+            $item   = $self->[$middle];
+            $cmp    = $item cmp $obj;
+
+            if (!$cmp) {
+                return Sidef::Types::Number::Number->_set_uint($middle);
+            }
+            elsif ($cmp eq Sidef::Types::Number::Number::ONE) {
+                $right = $middle - 1;
+            }
+            else {
+                $left = $middle + 1;
+            }
+        }
+
+        return Sidef::Types::Number::Number::MONE;
+    }
+
+    *bindex_by = \&bindex;
+
     sub index {
         my ($self, $obj) = @_;
 
