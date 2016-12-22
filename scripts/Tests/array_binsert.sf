@@ -25,4 +25,11 @@ assert_eq(list[0], 'Arturo')
 assert_eq(list[-1], 'Tiffanie')
 assert_eq(list, ["Arturo", "Britteny", "Diego", "Elinor", "Emmaline", "Jane", "Joe", "John", "Kate", "Lizzette", "Marilu", "Nicolasa", "Shonna", "Tiffanie"])
 
+var sorted = []
+var nums = @(1..10)
+for n in (nums.shuffle) {
+    sorted.binsert(n)
+}
+assert_eq(sorted, nums)
+
 say "** Test passed!"

@@ -1386,6 +1386,11 @@ package Sidef::Types::Array::Array {
         my $right = $#$self;
         my ($middle, $item, $cmp);
 
+        if ($right < 0) {
+            CORE::push(@$self, $obj);
+            return $self;
+        }
+
         while (1) {
             $middle = (($right + $left) >> 1);
             $item   = $self->[$middle];
