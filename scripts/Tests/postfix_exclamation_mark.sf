@@ -1,0 +1,29 @@
+#!/usr/bin/ruby
+
+# Test the `!` and `!!` postfix operators.
+
+class Example {
+    method ! {
+        "single"
+    }
+
+    method !! {
+        "double"
+    }
+}
+
+var obj = Example()
+
+assert_eq(obj!, 'single')
+assert_eq(obj!!, 'double')
+
+var k = obj!
+var j = obj!!
+
+assert_eq(k, 'single')
+assert_eq(j, 'double')
+
+assert_eq((2*5)!, 3628800)
+assert_eq((2*5)!!, 3840)
+
+say "** Test passed!"

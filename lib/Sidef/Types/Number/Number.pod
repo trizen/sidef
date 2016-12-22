@@ -34,6 +34,16 @@ Aliases: I<fac>, I<factorial>
 
 =cut
 
+=head2 !!
+
+I<Obj> B<!!> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<dfac>, I<double_factorial>
+
+=cut
+
 =head2 %
 
 I<Obj> B<%> I<Obj> -> I<Obj>
@@ -595,16 +605,6 @@ Return the
 Number.deg2rad() -> I<Obj>
 
 Return the
-
-=cut
-
-=head2 dfac
-
-Number.dfac() -> I<Obj>
-
-Return the
-
-Aliases: I<double_factorial>
 
 =cut
 
