@@ -27,17 +27,18 @@
       },
       "runtime" : {
          "recommends" : {
+            "Data::Dump" : "0",
+            "Data::Dump::Filtered" : "0",
             "Digest::MD5" : "0",
-            "Digest::SHA" : "0"
+            "Digest::SHA" : "0",
+            "File::Find" : "0"
          },
          "requires" : {
             "Cwd" : "0",
-            "Data::Dump" : "0",
             "Encode" : "0",
             "Fcntl" : "0",
             "File::Basename" : "0",
             "File::Copy" : "0",
-            "File::Find" : "0",
             "File::Path" : "0",
             "File::Spec" : "0",
             "Getopt::Std" : "0",

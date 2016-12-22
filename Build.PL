@@ -35,7 +35,6 @@ my $builder = Module::Build->new(
 
     requires => {
                  'perl'                   => '5.18.0',
-                 'Data::Dump'             => 0,
                  'utf8'                   => 0,
                  'parent'                 => 0,
                  'Memoize'                => 0,
@@ -43,7 +42,6 @@ my $builder = Module::Build->new(
                  'File::Spec'             => 0,
                  'File::Path'             => 0,
                  'File::Copy'             => 0,
-                 'File::Find'             => 0,
                  'File::Basename'         => 0,
                  'List::Util'             => 1.33,
                  'Math::MPFR'             => 3.29,
@@ -62,9 +60,12 @@ my $builder = Module::Build->new(
                 },
 
     recommends => {
-            'Digest::MD5' => 0,
-            'Digest::SHA' => 0,
-    },
+                   'File::Find'           => 0,     # for: `sidef -c`
+                   'Digest::MD5'          => 0,     # for: File.md5(), Str.md5()
+                   'Digest::SHA'          => 0,     # for: File.sha*(), Str.sha*()
+                   'Data::Dump'           => 0,     # for: `sidef -D`
+                   'Data::Dump::Filtered' => 0,     # for: Block.ffork()
+                  },
 
     add_to_cleanup     => ['Sidef-*'],
     create_makefile_pl => 'traditional',
