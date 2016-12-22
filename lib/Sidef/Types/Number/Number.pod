@@ -478,6 +478,22 @@ Return the
 
 =cut
 
+=head2 bessel_j
+
+Number.bessel_j() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 bessel_y
+
+Number.bessel_y() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 carmichael_lambda
 
 Number.carmichael_lambda() -> I<Obj>

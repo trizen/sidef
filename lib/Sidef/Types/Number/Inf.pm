@@ -145,6 +145,8 @@ package Sidef::Types::Number::Inf {
     *prime_count       = \&nan;
     *remove            = \&nan;
     *rad               = \&nan;
+    *bessel_j          = \&nan;
+    *bessel_y          = \&nan;
 
     *harm     = \&inf;
     *harmonic = \&inf;

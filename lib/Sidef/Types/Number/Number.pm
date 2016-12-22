@@ -1620,6 +1620,54 @@ package Sidef::Types::Number::Number {
         _mpfr2big($r);
     }
 
+    sub bessel_j {
+        my ($x, $n) = @_;
+
+        $n = defined($n)
+          ? do {
+            _valid(\$n);
+            CORE::int(Math::GMPq::Rmpq_get_d($$n));
+          }
+          : 0;
+
+        $x = _big2mpfr($x);
+        if (!$n) {
+            Math::MPFR::Rmpfr_j0($x, $x, $ROUND);
+        }
+        elsif ($n == 1) {
+            Math::MPFR::Rmpfr_j1($x, $x, $ROUND);
+        }
+        else {
+            Math::MPFR::Rmpfr_jn($x, $n, $x, $ROUND);
+        }
+
+        _mpfr2big($x);
+    }
+
+    sub bessel_y {
+        my ($x, $n) = @_;
+
+        $n = defined($n)
+          ? do {
+            _valid(\$n);
+            CORE::int(Math::GMPq::Rmpq_get_d($$n));
+          }
+          : 0;
+
+        $x = _big2mpfr($x);
+        if (!$n) {
+            Math::MPFR::Rmpfr_y0($x, $x, $ROUND);
+        }
+        elsif ($n == 1) {
+            Math::MPFR::Rmpfr_y1($x, $x, $ROUND);
+        }
+        else {
+            Math::MPFR::Rmpfr_yn($x, $n, $x, $ROUND);
+        }
+
+        _mpfr2big($x);
+    }
+
     sub eint {
         my $r = _big2mpfr($_[0]);
         Math::MPFR::Rmpfr_eint($r, $r, $ROUND);

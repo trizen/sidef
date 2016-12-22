@@ -184,6 +184,8 @@ package Sidef::Types::Number::Nan {
     *prime_count       = \&nan;
     *remove            = \&nan;
     *rad               = \&nan;
+    *bessel_j          = \&nan;
+    *bessel_y          = \&nan;
 
     sub cmp { }
 
