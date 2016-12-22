@@ -3247,43 +3247,31 @@ package Sidef::Types::Number::Number {
     #
 
     sub rad2deg {
-        my ($x) = @_;
-        state $factor = do {
-            Math::MPFR::Rmpfr_const_pi((my $pi = Math::MPFR::Rmpfr_init2($PREC)), $ROUND);
-            Math::MPFR::Rmpfr_ui_div((my $fr = Math::MPFR::Rmpfr_init2($PREC)), 180, $pi, $ROUND);
-            _mpfr2big($fr);
-        };
-        $factor->mul($x);
+        Math::MPFR::Rmpfr_const_pi((my $pi = Math::MPFR::Rmpfr_init2($PREC)), $ROUND);
+        Math::MPFR::Rmpfr_ui_div((my $fr = Math::MPFR::Rmpfr_init2($PREC)), 180, $pi, $ROUND);
+        Math::MPFR::Rmpfr_mul_q($fr, $fr, ${$_[0]}, $ROUND);
+        _mpfr2big($fr);
     }
 
     sub deg2rad {
-        my ($x) = @_;
-        state $factor = do {
-            Math::MPFR::Rmpfr_const_pi((my $pi = Math::MPFR::Rmpfr_init2($PREC)), $ROUND);
-            Math::MPFR::Rmpfr_div_ui((my $fr = Math::MPFR::Rmpfr_init2($PREC)), $pi, 180, $ROUND);
-            _mpfr2big($fr);
-        };
-        $factor->mul($x);
+        Math::MPFR::Rmpfr_const_pi((my $pi = Math::MPFR::Rmpfr_init2($PREC)), $ROUND);
+        Math::MPFR::Rmpfr_div_ui((my $fr = Math::MPFR::Rmpfr_init2($PREC)), $pi, 180, $ROUND);
+        Math::MPFR::Rmpfr_mul_q($fr, $fr, ${$_[0]}, $ROUND);
+        _mpfr2big($fr);
     }
 
     sub rad2grad {
-        my ($x) = @_;
-        state $factor = do {
-            Math::MPFR::Rmpfr_const_pi((my $pi = Math::MPFR::Rmpfr_init2($PREC)), $ROUND);
-            Math::MPFR::Rmpfr_ui_div((my $fr = Math::MPFR::Rmpfr_init2($PREC)), 200, $pi, $ROUND);
-            _mpfr2big($fr);
-        };
-        $factor->mul($x);
+        Math::MPFR::Rmpfr_const_pi((my $pi = Math::MPFR::Rmpfr_init2($PREC)), $ROUND);
+        Math::MPFR::Rmpfr_ui_div((my $fr = Math::MPFR::Rmpfr_init2($PREC)), 200, $pi, $ROUND);
+        Math::MPFR::Rmpfr_mul_q($fr, $fr, ${$_[0]}, $ROUND);
+        _mpfr2big($fr);
     }
 
     sub grad2rad {
-        my ($x) = @_;
-        state $factor = do {
-            Math::MPFR::Rmpfr_const_pi((my $pi = Math::MPFR::Rmpfr_init2($PREC)), $ROUND);
-            Math::MPFR::Rmpfr_div_ui((my $fr = Math::MPFR::Rmpfr_init2($PREC)), $pi, 200, $ROUND);
-            _mpfr2big($fr);
-        };
-        $factor->mul($x);
+        Math::MPFR::Rmpfr_const_pi((my $pi = Math::MPFR::Rmpfr_init2($PREC)), $ROUND);
+        Math::MPFR::Rmpfr_div_ui((my $fr = Math::MPFR::Rmpfr_init2($PREC)), $pi, 200, $ROUND);
+        Math::MPFR::Rmpfr_mul_q($fr, $fr, ${$_[0]}, $ROUND);
+        _mpfr2big($fr);
     }
 
     sub grad2deg {
