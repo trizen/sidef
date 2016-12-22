@@ -586,6 +586,7 @@ scripts/Tests/arithmetic_geometric_mean.sf
 scripts/Tests/array_and_hash_lookup.sf
 scripts/Tests/array_and_hash_lvalues.sf
 scripts/Tests/array_autovivification.sf
+scripts/Tests/array_binsert.sf
 scripts/Tests/array_compare.sf
 scripts/Tests/array_index_bindex.sf
 scripts/Tests/array_unique.sf

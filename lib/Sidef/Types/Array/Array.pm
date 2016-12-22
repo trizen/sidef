@@ -187,7 +187,7 @@ package Sidef::Types::Array::Array {
         my $i   = 1;
         my $pos = $len;
         while (@obj) {
-            my $j = $pos - $i * int($len);
+            my $j = $pos - $i * CORE::int($len);
             $pos -= $j if $j >= 1;
             CORE::push(@array, $self->new([splice @obj, 0, $len + $j]));
             $pos += $len;
@@ -380,7 +380,7 @@ package Sidef::Types::Array::Array {
             return 1;
         }
 
-        my $match_distance = int(List::Util::max($s_len, $t_len) / 2) - 1;
+        my $match_distance = CORE::int(List::Util::max($s_len, $t_len) / 2) - 1;
 
         my @s_matches;
         my @t_matches;
@@ -1144,7 +1144,7 @@ package Sidef::Types::Array::Array {
         if (ref($obj) eq 'Sidef::Types::Block::Block') {
 
             while ($left <= $right) {
-                $middle = int(($right + $left) >> 1);
+                $middle = (($right + $left) >> 1);
                 $item   = $self->[$middle];
                 $cmp    = $obj->run($item) || return Sidef::Types::Number::Number->_set_uint($middle);
 
@@ -1375,7 +1375,36 @@ package Sidef::Types::Array::Array {
             $#$self = $i - 1;
         }
 
-        splice(@$self, $i, 0, @objects);
+        CORE::splice(@$self, $i, 0, @objects);
+        $self;
+    }
+
+    sub binsert {
+        my ($self, $obj) = @_;
+
+        my $left  = 0;
+        my $right = $#$self;
+        my ($middle, $item, $cmp);
+
+        while (1) {
+            $middle = (($right + $left) >> 1);
+            $item   = $self->[$middle];
+            $cmp    = ($item cmp $obj) || last;
+
+            if ($cmp eq Sidef::Types::Number::Number::MONE) {
+                $left = $middle + 1;
+                if ($left > $right) {
+                    ++$middle;
+                    last;
+                }
+            }
+            else {
+                $right = $middle - 1;
+                $left > $right && last;
+            }
+        }
+
+        CORE::splice(@$self, $middle, 0, $obj);
         $self;
     }
 

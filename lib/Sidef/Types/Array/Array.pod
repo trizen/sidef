@@ -185,6 +185,14 @@ Aliases: I<bindex_by>
 
 =cut
 
+=head2 binsert
+
+Array.binsert() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 bshuffle
 
 Array.bshuffle() -> I<Obj>

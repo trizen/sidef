@@ -1,0 +1,28 @@
+#!/usr/bin/ruby
+
+# Array.binsert()
+
+var list  = ["Jane", "Joe", "John", "Kate"]
+var names = %w(Emmaline
+           Britteny
+           Shonna
+           Nicolasa
+           Marilu
+           Lizzette
+           Elinor
+           Tiffanie
+           Diego
+           Arturo
+        ).shuffle
+
+
+for name in names {
+    list.binsert(name)
+    assert_eq(list, list.sort)
+}
+
+assert_eq(list[0], 'Arturo')
+assert_eq(list[-1], 'Tiffanie')
+assert_eq(list, ["Arturo", "Britteny", "Diego", "Elinor", "Emmaline", "Jane", "Joe", "John", "Kate", "Lizzette", "Marilu", "Nicolasa", "Shonna", "Tiffanie"])
+
+say "** Test passed!"
