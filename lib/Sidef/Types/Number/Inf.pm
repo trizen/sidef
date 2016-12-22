@@ -541,7 +541,8 @@ package Sidef::Types::Number::Inf {
         *{__PACKAGE__ . '::' . '<='}  = \&le;
         *{__PACKAGE__ . '::' . '≤'} = \&le;
         *{__PACKAGE__ . '::' . '<=>'} = \&cmp;
-        *{__PACKAGE__ . '::' . '!'}   = \&factorial;
+        *{__PACKAGE__ . '::' . '!'}   = \&fac;
+        *{__PACKAGE__ . '::' . '!!'}  = \&dfac;
         *{__PACKAGE__ . '::' . '%%'}  = \&is_div;
         *{__PACKAGE__ . '::' . '~'}   = \&not;
         *{__PACKAGE__ . '::' . '>>'}  = \&shift_right;

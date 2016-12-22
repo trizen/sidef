@@ -342,7 +342,8 @@ package Sidef::Types::Number::Nan {
         *{__PACKAGE__ . '::' . '=='}  = \&eq;
         *{__PACKAGE__ . '::' . '!='}  = \&ne;
         *{__PACKAGE__ . '::' . '≠'} = \&ne;
-        *{__PACKAGE__ . '::' . '!'}   = \&factorial;
+        *{__PACKAGE__ . '::' . '!'}   = \&fac;
+        *{__PACKAGE__ . '::' . '!!'}  = \&dfac;
         *{__PACKAGE__ . '::' . '%%'}  = \&is_div;
         *{__PACKAGE__ . '::' . '>>'}  = \&shift_right;
         *{__PACKAGE__ . '::' . '<<'}  = \&shift_left;

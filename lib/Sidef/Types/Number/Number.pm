@@ -3322,7 +3322,8 @@ package Sidef::Types::Number::Number {
         *{__PACKAGE__ . '::' . '..'}  = \&to;
         *{__PACKAGE__ . '::' . '..^'} = \&xto;
         *{__PACKAGE__ . '::' . '^..'} = \&xdownto;
-        *{__PACKAGE__ . '::' . '!'}   = \&factorial;
+        *{__PACKAGE__ . '::' . '!'}   = \&fac;
+        *{__PACKAGE__ . '::' . '!!'}  = \&dfac;
         *{__PACKAGE__ . '::' . '%%'}  = \&is_div;
         *{__PACKAGE__ . '::' . '>>'}  = \&shift_right;
         *{__PACKAGE__ . '::' . '<<'}  = \&shift_left;

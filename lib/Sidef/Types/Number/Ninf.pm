@@ -391,7 +391,8 @@ package Sidef::Types::Number::Ninf {
         *{__PACKAGE__ . '::' . '<='}  = \&le;
         *{__PACKAGE__ . '::' . '≤'} = \&le;
         *{__PACKAGE__ . '::' . '<=>'} = \&cmp;
-        *{__PACKAGE__ . '::' . '!'}   = \&factorial;
+        *{__PACKAGE__ . '::' . '!'}   = \&fac;
+        *{__PACKAGE__ . '::' . '!!'}  = \&dfac;
         *{__PACKAGE__ . '::' . '~'}   = \&not;
         *{__PACKAGE__ . '::' . '>>'}  = \&shift_right;
         *{__PACKAGE__ . '::' . '<<'}  = \&shift_left;
