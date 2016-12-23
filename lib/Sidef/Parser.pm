@@ -2469,8 +2469,8 @@ package Sidef::Parser {
                     my $has_arg;
                     if (/\G\h*(?=[({])/gc || $req_arg) {
                         my $arg = (
-                                     /\G(?=\()/ ? $self->parse_arg(code => $opt{code})
-                                   : $req_arg ? $self->parse_obj(code => $opt{code}, multiline => 1)
+                                     $req_arg ? $self->parse_obj(code => $opt{code}, multiline => 1)
+                                   : /\G(?=\()/ ? $self->parse_arg(code => $opt{code})
                                    : /\G(?=\{)/ ? $self->parse_block(code => $opt{code}, topic_var => 1)
                                    :              die "[PARSER ERROR] Something is wrong in the if condition"
                                   );
