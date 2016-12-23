@@ -40,7 +40,7 @@ I<Obj> B<*> I<Obj> -> I<Obj>
 
 Return the
 
-Aliases: I<mul>
+Aliases: I<mul>, I<fmul>
 
 =cut
 
@@ -50,7 +50,7 @@ I<Obj> B<**> I<Obj> -> I<Obj>
 
 Return the
 
-Aliases: I<pow>
+Aliases: I<pow>, I<fpow>
 
 =cut
 
@@ -60,7 +60,7 @@ I<Obj> B<+> I<Obj> -> I<Obj>
 
 Return the
 
-Aliases: I<add>
+Aliases: I<add>, I<fadd>
 
 =cut
 
@@ -80,7 +80,7 @@ I<Obj> B<-> I<Obj> -> I<Obj>
 
 Return the
 
-Aliases: I<sub>
+Aliases: I<sub>, I<fsub>
 
 =cut
 
@@ -100,7 +100,7 @@ I<Obj> B</> I<Obj> -> I<Obj>
 
 Return the
 
-Aliases: I<÷()>, I<div>
+Aliases: I<÷()>, I<div>, I<fdiv>
 
 =cut
 
@@ -375,6 +375,14 @@ Return the
 =head2 exp2
 
 Complex.exp2() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 float
+
+Complex.float() -> I<Obj>
 
 Return the
 

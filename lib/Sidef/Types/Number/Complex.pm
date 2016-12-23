@@ -315,6 +315,8 @@ package Sidef::Types::Number::Complex {
         bless(\$r, __PACKAGE__);
     }
 
+    *fadd = \&add;
+
     sub sub {
         my ($x, $y) = @_;
         my $r = Math::MPC::Rmpc_init2($PREC);
@@ -329,6 +331,8 @@ package Sidef::Types::Number::Complex {
 
         bless(\$r, __PACKAGE__);
     }
+
+    *fsub = \&sub;
 
     sub mul {
         my ($x, $y) = @_;
@@ -345,6 +349,8 @@ package Sidef::Types::Number::Complex {
         bless(\$r, __PACKAGE__);
     }
 
+    *fmul = \&mul;
+
     sub div {
         my ($x, $y) = @_;
 
@@ -360,6 +366,8 @@ package Sidef::Types::Number::Complex {
 
         bless(\$r, __PACKAGE__);
     }
+
+    *fdiv = \&div;
 
     sub inv {
         my ($x) = @_;
@@ -384,6 +392,8 @@ package Sidef::Types::Number::Complex {
 
         bless(\$r, __PACKAGE__);
     }
+
+    *fpow = \&pow;
 
     sub root {
         my ($x, $y) = @_;
@@ -968,6 +978,8 @@ package Sidef::Types::Number::Complex {
     sub is_ninf {
         (Sidef::Types::Bool::Bool::FALSE);
     }
+
+    sub float { $_[0] }
 
     {
         no strict 'refs';

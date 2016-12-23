@@ -146,6 +146,7 @@ scripts/Expensive/dice_game_solver.sf
 scripts/Expensive/factorial_approximations.sf
 scripts/Expensive/fibonacci_validation.sf
 scripts/Expensive/fibonacci_word.sf
+scripts/Expensive/gauss_logarithm_approx.sf
 scripts/Expensive/genetic_algorithm.sf
 scripts/Expensive/julia_set.sf
 scripts/Expensive/kd_tree.sf

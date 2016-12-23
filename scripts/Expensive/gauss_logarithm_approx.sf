@@ -1,0 +1,36 @@
+#!/usr/bin/ruby
+
+# Approximation for the natural logarithm of a given
+# number, using a formula due to Carl Friedrich Gauss.
+
+# The formula is:
+#   log(x) ≈  π / (2 * M(1, 2^(2-P) / x)) - P * log(2)
+
+# See also:
+#   https://en.wikipedia.org/wiki/Logarithm#Arithmetic.E2.80.93geometric_mean_approximation
+
+define π = Num.pi
+define log2 = log(2)
+
+func M(a, g, p) {
+    loop {
+        var a1 = ((a+g)/2)
+        var g1 = sqrt(a*g)
+
+        if ((a1.re.round(-p) == a.re.round(-p)) && (g1.re.round(-p) == g.re.round(-p))) {
+            return a
+        }
+
+        (a, g) = (a1, g1)
+    }
+}
+
+func gauss_log(x, p) {
+    π / 2*M(1, 2**(2-p) / x, p) - p*log2
+}
+
+say gauss_log(        2, 100)        # 0.69314718055994530941723212145817656807550013436026
+say gauss_log(       -2, 100)        # 0.69314718055994363166115731719424653785695888288578-3.14159265358979323846264338327950288419716939937511i
+say gauss_log(    -2.34, 100)        # 0.85015092936960838246915232323588813675500496603394-3.14159265358979323846264338327950288419716939937511i
+say gauss_log(   3 + 4i, 100)        # 1.60943791243409869684468452896225760930706010279404+0.92729521800161223242851246292242880405707410857224i
+say gauss_log(-42 - 23i, 100)        # 3.86880814142895054249561036425701508230238930773225-2.64057926678620379072688927950864468829687609303423i
