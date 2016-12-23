@@ -77,7 +77,8 @@ package Sidef::Deparse::Sidef {
         my ($self, $before, $sep, $after, @args) = @_;
         $before . join(
             $sep,
-            map {
+            grep { $_ ne '' }
+              map {
                     ref($_) eq 'HASH' ? $self->deparse_script($_)
                   : ref($_) ? $self->deparse_expr({self => $_})
                   : $self->_dump_string($_)
@@ -585,7 +586,7 @@ package Sidef::Deparse::Sidef {
                 if (defined $method) {
 
                     if (ref($method) ne '') {
-                        $code .= '.'
+                        $code .= '->'
                           . (
                              '('
                                . $self->deparse_expr(

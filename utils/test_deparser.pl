@@ -78,8 +78,8 @@ sub test_file {
         require Algorithm::Diff;
         my $diff = Algorithm::Diff::diff($statements_1, $statements_2);
 
-        require Data::Dump;
-        Data::Dump::pp($diff);
-        die "[!] Error detected on file: $file\n";
+        require Data::Dumper;
+        print Data::Dumper::Dumper($diff);
+        warn "\n[!] Error detected on file: $file\n\n";
     }
 }
