@@ -637,6 +637,7 @@ scripts/Tests/cyclic_dclone.sf
 scripts/Tests/cyclic_references_eq_cmp.sf
 scripts/Tests/data_digging.sf
 scripts/Tests/data_handle.sf
+scripts/Tests/dec_2016_changes.sf
 scripts/Tests/def_primitive_type.sf
 scripts/Tests/def_primitive_type_2.sf
 scripts/Tests/default_param_values.sf

@@ -34,6 +34,7 @@ package Sidef::Parser {
                 cross  => [1, 'cross_operator'],
                 unroll => [1, 'unroll_operator'],
                 reduce => [0, 'reduce_operator'],
+                lmap   => [0, 'map_operator'],
             },
 
             static_obj_re => qr{\G
@@ -333,6 +334,9 @@ package Sidef::Parser {
 
                     | «(?<pam>[_\pL][_\pL\pN]*|(?&ops))«             # reverse mapping operator (e.g.: «add« or «+«)
                     | <<(?<pam>[_\pL][_\pL\pN]*|(?&ops))<<           # reverse mapping operator (e.g.: <<add<< or <<+<<)
+
+                    | »(?<lmap>[_\pL][_\pL\pN]*|(?&ops))\(\)»        # mapping operator (e.g.: »add()» or »+()»)
+                    | >>(?<lmap>[_\pL][_\pL\pN]*|(?&ops))\(\)>>      # mapping operator (e.g.: >>add()>> or >>+()>>)
 
                     | <<(?<reduce>[_\pL][_\pL\pN]*|(?&ops))>>        # reduce operator (e.g.: <<add>> or <<+>>)
                     | «(?<reduce>[_\pL][_\pL\pN]*|(?&ops))»          # reduce operator (e.g.: «add» or «+»)
@@ -680,10 +684,7 @@ package Sidef::Parser {
 
                 if (/$self->{var_init_sep_re}/goc) {
                     my $pos = pos($_);
-                    /\G(?=\()/
-                      ? $self->parse_arg(code => $opt{code})
-                      : $self->parse_obj(code => $opt{code}, multiline => 1);
-
+                    $self->parse_obj(code => $opt{code}, multiline => 1);
                     $vars[-1] .= '=' . substr($_, $pos, pos($_) - $pos);
                 }
             }
@@ -796,11 +797,7 @@ package Sidef::Parser {
                 }
 
                 if (/$self->{var_init_sep_re}/goc) {
-                    my $obj = (
-                               /\G(?=\()/
-                               ? $self->parse_arg(code => $opt{code})
-                               : $self->parse_obj(code => $opt{code}, multiline => 1)
-                              );
+                    my $obj = $self->parse_obj(code => $opt{code}, multiline => 1);
                     $value = (
                               ref($obj) eq 'HASH'
                               ? $obj
@@ -1077,11 +1074,7 @@ package Sidef::Parser {
 
             if (/\G([_\pL][_\pL\pN]*):(?![=:])/gc) {
                 my $name = $1;
-                my $obj = (
-                           /\G\s*(?=\()/gc
-                           ? $self->parse_arg(code => $opt{code})
-                           : $self->parse_obj(code => $opt{code})
-                          );
+                my $obj = $self->parse_obj(code => $opt{code});
                 return Sidef::Variable::NamedParam->new($name, $obj);
             }
 
@@ -1092,15 +1085,11 @@ package Sidef::Parser {
                 my $init_obj = bless({vars => $vars}, 'Sidef::Variable::Init');
 
                 if (/\G\h*=\h*/gc) {
-                    my $args = (
-                                /\G\s*(?=\()/gc
-                                ? $self->parse_arg(code => $opt{code})
-                                : $self->parse_obj(code => $opt{code}, multiline => 1)
-                      ) // $self->fatal_error(
-                                              code  => $_,
-                                              pos   => pos,
-                                              error => "expected an expression after variable declaration",
-                                             );
+                    my $args = $self->parse_obj(code => $opt{code}, multiline => 1) // $self->fatal_error(
+                                                                  code  => $_,
+                                                                  pos   => pos,
+                                                                  error => "expected an expression after variable declaration",
+                    );
 
                     $init_obj->{args} = $args;
                 }
@@ -2934,24 +2923,16 @@ package Sidef::Parser {
 
                     my $has_arg;
                     if ($req_arg) {
-                        my $lonely_obj = /\G\h*(?=\()/gc;
-
-                        my $arg = (
-                                     $lonely_obj
-                                   ? $self->parse_arg(code => $opt{code})
-                                   : $self->parse_obj(code => $opt{code}, multiline => 1)
-                                  );
+                        my $arg = $self->parse_obj(code => $opt{code}, multiline => 1);
 
                         if (defined $arg) {
                             if (ref $arg ne 'HASH') {
                                 $arg = {$self->{class} => [{self => $arg}]};
                             }
 
-                            if (not $lonely_obj) {
-                                my $methods = $self->parse_methods(code => $opt{code});
-                                if (@{$methods}) {
-                                    push @{$arg->{$self->{class}}[-1]{call}}, @{$methods};
-                                }
+                            my $methods = $self->parse_methods(code => $opt{code});
+                            if (@{$methods}) {
+                                push @{$arg->{$self->{class}}[-1]{call}}, @{$methods};
                             }
 
                             $has_arg = 1;
@@ -3359,11 +3340,7 @@ package Sidef::Parser {
                     }
                     elsif (/\G(if|while|and|or)\b\h*/gc) {
                         my $keyword = $1;
-                        my $obj = (
-                                   /\G(?=\()/
-                                   ? $self->parse_arg(code => $opt{code})
-                                   : $self->parse_obj(code => $opt{code})
-                                  );
+                        my $obj = $self->parse_obj(code => $opt{code});
                         push @{$struct{$self->{class}}[-1]{call}}, {keyword => $keyword, arg => [$obj]};
                         redo;
                     }

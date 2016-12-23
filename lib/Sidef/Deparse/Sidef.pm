@@ -558,6 +558,7 @@ package Sidef::Deparse::Sidef {
 
         # Array and hash indices
         if (exists $expr->{ind}) {
+            $code = "($code)";
             foreach my $ind (@{$expr->{ind}}) {
                 if (exists $ind->{array}) {
                     $code .= $self->_dump_array($ind->{array});
@@ -621,7 +622,7 @@ package Sidef::Deparse::Sidef {
                             $code .= $method;
                         }
                         else {
-                            $code = "($code) $method ";
+                            $code = "($code)->$method";
                         }
                     }
                 }
