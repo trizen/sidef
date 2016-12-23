@@ -420,6 +420,25 @@ package Sidef::Types::Number::Complex {
         bless(\$r, __PACKAGE__);
     }
 
+    sub hypot {
+        my ($x, $y) = @_;
+
+        my $r = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPC::Rmpc_abs($r, $$x, $ROUND);
+
+        if (ref($y) eq 'Sidef::Types::Number::Number') {
+            Math::MPFR::Rmpfr_hypot($r, $r, $y->_big2mpfr, $Sidef::Types::Number::Number::ROUND);
+        }
+        else {
+            _valid(\$y);
+            my $f = Math::MPFR::Rmpfr_init2($PREC);
+            Math::MPC::Rmpc_abs($f, $$y, $ROUND);
+            Math::MPFR::Rmpfr_hypot($r, $r, $f, $Sidef::Types::Number::Number::ROUND);
+        }
+
+        Sidef::Types::Number::Number::_mpfr2big($r);
+    }
+
     sub log {
         my ($x, $y) = @_;
         my $r = Math::MPC::Rmpc_init2($PREC);

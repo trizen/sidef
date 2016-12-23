@@ -683,6 +683,7 @@ scripts/Tests/heap_s_algorithm_iter.sf
 scripts/Tests/heap_s_algorithm_rec.sf
 scripts/Tests/horner_s_rule.sf
 scripts/Tests/http_tiny.sf
+scripts/Tests/hypot.sf
 scripts/Tests/i_love_you.sf
 scripts/Tests/iban.sf
 scripts/Tests/implicit_method_call_on_var_.sf

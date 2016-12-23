@@ -1,0 +1,16 @@
+#!/usr/bin/ruby
+
+# Tests for Number.hypot() and Complex.hypot()
+
+assert_eq(hypot( 3,  4), 5)
+assert_eq(hypot(-3, -4), 5)
+
+assert_eq("#{hypot( 3+4i, -2)}".first(7), '5.38516')
+assert_eq("#{hypot(-3-4i, -2)}".first(7), '5.38516')
+assert_eq("#{hypot(-3+4i,  2)}".first(7), '5.38516')
+
+assert_eq("#{hypot(3+4i,  5+23i)}".first(7), '24.0624')
+assert_eq("#{hypot(3+4i, -5-23i)}".first(7), '24.0624')
+assert_eq("#{hypot(3-4i,  5-23i)}".first(7), '24.0624')
+
+say "** Test passed!"
