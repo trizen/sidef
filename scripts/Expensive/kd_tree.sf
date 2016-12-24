@@ -32,7 +32,7 @@ class Kd_tree(n, bounds) {
         }
 
         var s2 = ((split + 1) % d.len);     # cycle coordinates
-        Kd_node(d: d, split :split,
+        Kd_node(d: d, split: split,
                 left:  self.nk2(s2, exset.first(m)),
                 right: self.nk2(s2, exset.last(m-1)));
     }
