@@ -231,13 +231,13 @@ package Sidef::Types::Array::Array {
 
         while (1) {
 
-            $cmp = $x[$i] cmp $y[$j];
+            $cmp = CORE::int($x[$i] cmp $y[$j]);
 
-            if (ref($cmp) ? $cmp->is_mone : ($cmp == -1)) {
+            if ($cmp < 0) {
                 push @new, $x[$i];
                 ++$i;
             }
-            elsif (ref($cmp) ? $cmp->is_one : ($cmp == 1)) {
+            elsif ($cmp > 0) {
                 push @new, $y[$j];
                 ++$j;
             }
@@ -275,12 +275,12 @@ package Sidef::Types::Array::Array {
         my ($cmp, @new);
         while ($i < $end1 and $j < $end2) {
 
-            $cmp = $x[$i] cmp $y[$j];
+            $cmp = CORE::int($x[$i] cmp $y[$j]);
 
-            if (ref($cmp) ? $cmp->is_mone : ($cmp == -1)) {
+            if ($cmp < 0) {
                 ++$i;
             }
-            elsif (ref($cmp) ? $cmp->is_one : ($cmp == 1)) {
+            elsif ($cmp > 0) {
                 ++$j;
             }
             else {
@@ -313,13 +313,13 @@ package Sidef::Types::Array::Array {
         my ($cmp, @new);
         while ($i < $end1 and $j < $end2) {
 
-            $cmp = $x[$i] cmp $y[$j];
+            $cmp = CORE::int($x[$i] cmp $y[$j]);
 
-            if (ref($cmp) ? $cmp->is_mone : ($cmp == -1)) {
+            if ($cmp < 0) {
                 push @new, $x[$i];
                 ++$i;
             }
-            elsif (ref($cmp) ? $cmp->is_one : ($cmp == 1)) {
+            elsif ($cmp > 0) {
                 ++$j;
             }
             else {
@@ -567,18 +567,18 @@ package Sidef::Types::Array::Array {
         my $item = $self->[0];
         foreach my $i (1 .. $#$self) {
             my $val = $self->[$i];
-            $item = $val if (($val cmp $item) eq $value);
+            $item = $val if (CORE::int($val cmp $item) == $value);
         }
 
         $item;
     }
 
     sub max {
-        $_[0]->_min_max(Sidef::Types::Number::Number::ONE);
+        $_[0]->_min_max(1);
     }
 
     sub min {
-        $_[0]->_min_max(Sidef::Types::Number::Number::MONE);
+        $_[0]->_min_max(-1);
     }
 
     sub minmax {
@@ -645,18 +645,18 @@ package Sidef::Types::Array::Array {
         my $item = $pairs[0];
 
         foreach my $i (1 .. $#pairs) {
-            $item = $pairs[$i] if (($pairs[$i][1] cmp $item->[1]) eq $value);
+            $item = $pairs[$i] if (CORE::int($pairs[$i][1] cmp $item->[1]) == $value);
         }
 
         $item->[0];
     }
 
     sub max_by {
-        $_[0]->_min_max_by($_[1], Sidef::Types::Number::Number::ONE);
+        $_[0]->_min_max_by($_[1], 1);
     }
 
     sub min_by {
-        $_[0]->_min_max_by($_[1], Sidef::Types::Number::Number::MONE);
+        $_[0]->_min_max_by($_[1], -1);
     }
 
     sub swap {
@@ -1146,15 +1146,14 @@ package Sidef::Types::Array::Array {
             while ($left <= $right) {
                 $middle = (($right + $left) >> 1);
                 $item   = $self->[$middle];
-                $cmp    = $obj->run($item) || return Sidef::Types::Number::Number->_set_uint($middle);
+                $cmp    = CORE::int($obj->run($item)) || return Sidef::Types::Number::Number->_set_uint($middle);
 
-                if ($cmp eq Sidef::Types::Number::Number::ONE) {
+                if ($cmp > 0) {
                     $right = $middle - 1;
                 }
                 else {
                     $left = $middle + 1;
                 }
-
             }
 
             return Sidef::Types::Number::Number::MONE;
@@ -1163,12 +1162,12 @@ package Sidef::Types::Array::Array {
         while ($left <= $right) {
             $middle = int(($right + $left) >> 1);
             $item   = $self->[$middle];
-            $cmp    = $item cmp $obj;
+            $cmp    = CORE::int($item cmp $obj);
 
             if (!$cmp) {
                 return Sidef::Types::Number::Number->_set_uint($middle);
             }
-            elsif ($cmp eq Sidef::Types::Number::Number::ONE) {
+            elsif ($cmp > 0) {
                 $right = $middle - 1;
             }
             else {
@@ -1394,9 +1393,9 @@ package Sidef::Types::Array::Array {
         while (1) {
             $middle = (($right + $left) >> 1);
             $item   = $self->[$middle];
-            $cmp    = ($item cmp $obj) || last;
+            $cmp    = CORE::int($item cmp $obj) || last;
 
-            if ($cmp eq Sidef::Types::Number::Number::MONE) {
+            if ($cmp < 0) {
                 $left = $middle + 1;
                 if ($left > $right) {
                     ++$middle;
@@ -1733,13 +1732,10 @@ package Sidef::Types::Array::Array {
             my $obj1 = $self->[$i];
             my $obj2 = $arg->[$i];
 
-            my $value = $obj1 cmp $obj2;
+            my $cmp = CORE::int($obj1 cmp $obj2);
 
-            if (ref($value)) {
-                $value->is_zero or return $value;
-            }
-            elsif ($value != 0) {
-                return ($value < 0 ? Sidef::Types::Number::Number::MONE : Sidef::Types::Number::Number::ONE);
+            if ($cmp) {
+                return ($cmp < 0 ? Sidef::Types::Number::Number::MONE : Sidef::Types::Number::Number::ONE);
             }
         }
 

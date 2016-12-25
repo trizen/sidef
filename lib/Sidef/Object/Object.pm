@@ -73,7 +73,7 @@ package Sidef::Object::Object {
             return $sub->($obj1, $obj2);
         }
 
-        ($obj1 cmp $obj2)->is_zero;
+        !CORE::int($obj1 cmp $obj2);
       };
 
     # Alternative way for comparing cyclic references
