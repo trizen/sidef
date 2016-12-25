@@ -2634,7 +2634,7 @@ package Sidef::Parser {
 
                 /\G\h*(?:in|∈)\h*/gc
                   || $self->fatal_error(
-                                        error => "expected the token 'in' after variable declaration in for-loop",
+                                        error => "expected the token <<in>> after variable declaration in for-loop",
                                         code  => $_,
                                         pos   => pos($_),
                                        );
@@ -2649,7 +2649,7 @@ package Sidef::Parser {
                              /\G\h*(?=\{)/gc
                              ? $self->parse_block(code => $opt{code})
                              : $self->fatal_error(
-                                                  error => "expected a block after the token 'in': for (...) in { ... }",
+                                                  error => "expected a block",
                                                   code  => $_,
                                                   pos   => pos($_),
                                                  )
