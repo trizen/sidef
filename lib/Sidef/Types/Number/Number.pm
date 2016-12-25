@@ -1358,6 +1358,34 @@ package Sidef::Types::Number::Number {
     }
 
     #
+    ## beta(x, y) = gamma(x)*gamma(y) / gamma(x+y)
+    #
+    sub beta {
+        my ($x, $y) = @_;
+
+        if (   ref($y) eq 'Sidef::Types::Number::Inf'
+            or ref($y) eq 'Sidef::Types::Number::Ninf'
+            or ref($y) eq 'Sidef::Types::Number::Nan') {
+            return nan();
+        }
+
+        _valid(\$y);
+
+        $x = _big2mpfr($x);
+        $y = _big2mpfr($y);
+
+        my $t = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_add($t, $x, $y, $ROUND);
+        Math::MPFR::Rmpfr_gamma($t, $t, $ROUND);
+        Math::MPFR::Rmpfr_gamma($x, $x, $ROUND);
+        Math::MPFR::Rmpfr_gamma($y, $y, $ROUND);
+        Math::MPFR::Rmpfr_mul($x, $x, $y, $ROUND);
+        Math::MPFR::Rmpfr_div($x, $x, $t, $ROUND);
+
+        _mpfr2big($x);
+    }
+
+    #
     ## eta(s) = (1 - 2^(1-s)) * zeta(s)
     #
     sub eta {

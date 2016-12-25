@@ -494,6 +494,14 @@ Return the
 
 =cut
 
+=head2 beta
+
+Number.beta() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 carmichael_lambda
 
 Number.carmichael_lambda() -> I<Obj>

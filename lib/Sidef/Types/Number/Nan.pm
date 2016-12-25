@@ -189,6 +189,7 @@ package Sidef::Types::Number::Nan {
     *rad               = \&nan;
     *bessel_j          = \&nan;
     *bessel_y          = \&nan;
+    *beta              = \&nan;
 
     sub cmp { }
 

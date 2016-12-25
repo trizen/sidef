@@ -147,6 +147,7 @@ package Sidef::Types::Number::Inf {
     *rad               = \&nan;
     *bessel_j          = \&nan;
     *bessel_y          = \&nan;
+    *beta              = \&nan;
 
     *harm     = \&inf;
     *harmonic = \&inf;
