@@ -1,0 +1,67 @@
+#!/usr/bin/ruby
+
+#
+## LambertW(x) = log(lgrt(exp(x)))
+#
+
+for x in ((-3 .. 3) -> by(1/10.irand(1))) {
+
+    var l = log(lgrt(exp(x)))
+    var w = lambert_w(x)
+
+    if (l.abs.round(-10) != w.abs.round(-10)) {
+        die "Number error at #{x}: got #{w}, but expected #{l}"
+    }
+
+    l = log(lgrt(exp(Complex(x))))
+    w = lambert_w(Complex(x))
+
+    if (l.abs.round(-10) != w.abs.round(-10)) {
+        die "Complex error at #{x}: got #{w}, but expected #{l}"
+    }
+
+    var im = 1.irand.i
+    l = log(lgrt(exp(x + im)))
+    w = lambert_w(x + im)
+
+    if (l.abs.round(-10) != w.abs.round(-10)) {
+        die "Complex error at #{x + im}, got #{w}, but expected #{l}"
+    }
+}
+
+assert_eq(lambert_w(Num.e), 1)
+assert_eq(lambert_w(Complex(Num.e)).abs, 1)
+assert_eq(lambert_w(Complex(Num.e)).im, 0)
+assert_eq(lgrt(exp(Num.e)), Num.e)
+assert_eq(lambert_w(-0.5).abs.as_float(8), '1.10613997')
+assert_eq(lambert_w(Complex(0)), Complex(0))
+assert_eq(lambert_w(0), 0)
+assert_eq(lambert_w(-1).abs.as_float(8), '1.37455701')
+assert_eq(lgrt(-1).abs.as_float(8), '2.52070688')
+assert_eq(lgrt(-1)**lgrt(-1) -> re.round(-10), -1)
+assert_eq(exp(lambert_w(log(100))), lgrt(100))
+assert_eq(exp(lambert_w(log(-100))).re.round(-20), lgrt(-100).re.round(-20))
+assert_eq(exp(lambert_w(log(-100))).im.round(-20), lgrt(-100).im.round(-20))
+
+assert_eq(exp(lambert_w(log(-1))).re.round(-20), lgrt(-1).re.round(-20))
+assert_eq(exp(lambert_w(log(-1))).im.round(-20), lgrt(-1).im.round(-20))
+assert_eq(exp(lambert_w(log(1))).re.round(-20), lgrt(1).re.round(-20))
+assert_eq(exp(lambert_w(log(1))).im.round(-20), lgrt(1).im.round(-20))
+
+assert_eq(exp(lambert_w(log(0.5))).re.round(-20), lgrt(0.5).re.round(-20))
+assert_eq(exp(lambert_w(log(0.5))).im.round(-20), lgrt(0.5).im.round(-20))
+
+assert_eq(exp(lambert_w(log(-0.5))).re.round(-20), lgrt(Complex(-0.5)).re.round(-20))
+assert_eq(exp(lambert_w(log(-0.5))).im.round(-20), lgrt(Complex(-0.5)).im.round(-20))
+
+assert_eq(exp(lambert_w(log(Complex(3)))).re.round(-20), lgrt(3).re.round(-20))
+assert_eq(exp(lambert_w(log(Complex(3)))).im.round(-20), lgrt(3).im.round(-20))
+
+assert_eq(exp(lambert_w(log(3))).re.round(-20), lgrt(Complex(3)).re.round(-20))
+assert_eq(exp(lambert_w(log(3))).im.round(-20), lgrt(Complex(3)).im.round(-20))
+
+assert_eq(lambert_w(100**100), lambert_w(Complex(100**100)).re)
+assert_eq(lgrt(100**100), lgrt(Complex(100**100)).re)
+assert_eq(lgrt(100**100), 100)
+
+say "** Test passed!"

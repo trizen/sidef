@@ -1264,6 +1264,14 @@ Return the
 
 =cut
 
+=head2 lambert_w
+
+Number.lambert_w() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 lcm
 
 Number.lcm() -> I<Obj>

@@ -502,7 +502,10 @@ package Sidef::Types::Number::Complex {
         Math::MPC::Rmpc_log($d, $c, $ROUND);
 
         my $x = Math::MPC::Rmpc_init2($PREC);
-        Math::MPC::Rmpc_set_ui($x, 1, $ROUND);
+        Math::MPC::Rmpc_set($x, $c, $ROUND);
+        Math::MPC::Rmpc_sqr($x, $x, $ROUND);
+        Math::MPC::Rmpc_add_ui($x, $x, 1, $ROUND);
+        Math::MPC::Rmpc_log($x, $x, $ROUND);
 
         my $y = Math::MPC::Rmpc_init2($PREC);
         Math::MPC::Rmpc_set_ui($y, 0, $ROUND);
@@ -527,6 +530,51 @@ package Sidef::Types::Number::Complex {
             last if ++$count > $PREC;
         }
 
+        #~ say "Complex.lgrt(): $count";
+
+        bless \$x, __PACKAGE__;
+    }
+
+    sub lambert_w {
+        my $c = ${$_[0]};
+
+        $PREC = CORE::int($PREC);
+
+        my $p = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_ui_pow_ui($p, 10, CORE::int($PREC / 4), $Sidef::Types::Number::Number::ROUND);
+        Math::MPFR::Rmpfr_ui_div($p, 1, $p, $Sidef::Types::Number::Number::ROUND);
+
+        my $x = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_set($x, $c, $ROUND);
+        Math::MPC::Rmpc_sqrt($x, $x, $ROUND);
+        Math::MPC::Rmpc_add_ui($x, $x, 1, $ROUND);
+
+        my $y = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_set_ui($y, 0, $ROUND);
+
+        my $tmp = Math::MPC::Rmpc_init2($PREC);
+        my $abs = Math::MPFR::Rmpfr_init2($PREC);
+
+        my $count = 0;
+        while (1) {
+            Math::MPC::Rmpc_sub($tmp, $x, $y, $ROUND);
+
+            Math::MPC::Rmpc_abs($abs, $tmp, $ROUND);
+            Math::MPFR::Rmpfr_cmp($abs, $p) <= 0 and last;
+
+            Math::MPC::Rmpc_set($y, $x, $ROUND);
+
+            Math::MPC::Rmpc_log($tmp, $x, $ROUND);
+            Math::MPC::Rmpc_add_ui($tmp, $tmp, 1, $ROUND);
+
+            Math::MPC::Rmpc_add($x, $x, $c, $ROUND);
+            Math::MPC::Rmpc_div($x, $x, $tmp, $ROUND);
+            last if ++$count > $PREC;
+        }
+
+        #~ say "Complex.lambert_w(): $count";
+
+        Math::MPC::Rmpc_log($x, $x, $ROUND);
         bless \$x, __PACKAGE__;
     }
 

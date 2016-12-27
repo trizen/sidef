@@ -1022,6 +1022,48 @@ package Sidef::Types::Number::Number {
             last if ++$count > $PREC;
         }
 
+        #~ say "Number.lgrt(): $count";
+
+        _mpfr2big($x);
+    }
+
+    sub lambert_w {
+        my ($x) = @_;
+
+        my $sgn = Math::GMPq::Rmpq_sgn($$x);
+
+        $sgn == 0 and return ZERO;
+        $sgn < 0  and return Sidef::Types::Number::Complex->new($x)->lambert_w;
+
+        my $d = _big2mpfr($x);
+
+        $PREC = CORE::int($PREC);
+        Math::MPFR::Rmpfr_ui_pow_ui((my $p = Math::MPFR::Rmpfr_init2($PREC)), 10, CORE::int($PREC / 4), $ROUND);
+        Math::MPFR::Rmpfr_ui_div($p, 1, $p, $ROUND);
+
+        Math::MPFR::Rmpfr_set_ui(($x = Math::MPFR::Rmpfr_init2($PREC)), 1, $ROUND);
+        Math::MPFR::Rmpfr_set_ui((my $y = Math::MPFR::Rmpfr_init2($PREC)), 0, $ROUND);
+
+        my $tmp = Math::MPFR::Rmpfr_init2($PREC);
+
+        my $count = 0;
+        while (1) {
+            Math::MPFR::Rmpfr_sub($tmp, $x, $y, $ROUND);
+            Math::MPFR::Rmpfr_cmpabs($tmp, $p) <= 0 and last;
+
+            Math::MPFR::Rmpfr_set($y, $x, $ROUND);
+
+            Math::MPFR::Rmpfr_log($tmp, $x, $ROUND);
+            Math::MPFR::Rmpfr_add_ui($tmp, $tmp, 1, $ROUND);
+
+            Math::MPFR::Rmpfr_add($x, $x, $d, $ROUND);
+            Math::MPFR::Rmpfr_div($x, $x, $tmp, $ROUND);
+            last if ++$count > $PREC;
+        }
+
+        #~ say "Number.lambert_w(): $count";
+
+        Math::MPFR::Rmpfr_log($x, $x, $ROUND);
         _mpfr2big($x);
     }
 

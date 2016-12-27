@@ -502,6 +502,14 @@ Return the
 
 =cut
 
+=head2 lambert_w
+
+Complex.lambert_w() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 lgrt
 
 Complex.lgrt() -> I<Obj>

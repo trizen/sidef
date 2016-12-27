@@ -696,6 +696,7 @@ scripts/Tests/is_even_perfect.sf
 scripts/Tests/is_even_perfect_2.sf
 scripts/Tests/is_power.sf
 scripts/Tests/is_prime.sf
+scripts/Tests/lambert_w_and_lgrt.sf
 scripts/Tests/lazy_iterators.sf
 scripts/Tests/lazy_iterators_2.sf
 scripts/Tests/lazy_methods.sf
