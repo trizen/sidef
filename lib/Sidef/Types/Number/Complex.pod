@@ -664,6 +664,14 @@ Return the
 
 =cut
 
+=head2 sqr
+
+Complex.sqr() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 sqrt
 
 Complex.sqrt() -> I<Obj>

@@ -395,6 +395,13 @@ package Sidef::Types::Number::Complex {
 
     *fpow = \&pow;
 
+    sub sqr {
+        my ($x) = @_;
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_sqr($r, $$x, $ROUND);
+        bless(\$r, __PACKAGE__);
+    }
+
     sub root {
         my ($x, $y) = @_;
         return $x->pow($y->inv);
