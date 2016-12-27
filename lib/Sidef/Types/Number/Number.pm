@@ -2651,13 +2651,20 @@ package Sidef::Types::Number::Number {
     sub is_prob_prime {
         my ($x, $k) = @_;
         $x = $$x;
-        (
-         Math::GMPq::Rmpq_integer_p($x)
-           && Math::GMPz::Rmpz_probab_prime_p(Math::GMPz::Rmpz_init_set($x),
-                                              defined($k) ? do { _valid(\$k); CORE::int Math::GMPq::Rmpq_get_d($$k) }
-                                              : 20) > 0
-          ) ? Sidef::Types::Bool::Bool::TRUE
-          : Sidef::Types::Bool::Bool::FALSE;
+
+        if (defined($k)) {
+            _valid(\$k);
+            (    Math::GMPq::Rmpq_integer_p($x)
+             and Math::GMPz::Rmpz_probab_prime_p(Math::GMPz::Rmpz_init_set($x), CORE::int(Math::GMPq::Rmpq_get_d($$k))) > 0)
+              ? Sidef::Types::Bool::Bool::TRUE
+              : Sidef::Types::Bool::Bool::FALSE;
+        }
+        else {
+            Math::GMPq::Rmpq_integer_p($x)
+              && Math::Prime::Util::GMP::is_prob_prime(Math::GMPq::Rmpq_get_str($x, 10))
+              ? Sidef::Types::Bool::Bool::TRUE
+              : Sidef::Types::Bool::Bool::FALSE;
+        }
     }
 
     sub is_prov_prime {
