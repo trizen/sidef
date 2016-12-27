@@ -690,6 +690,7 @@ scripts/Tests/iban.sf
 scripts/Tests/implicit_method_call_on_var_.sf
 scripts/Tests/implicit_numberic_conversions.sf
 scripts/Tests/integer_limits.sf
+scripts/Tests/inverse_of_factorial.sf
 scripts/Tests/inverted_syntax.sf
 scripts/Tests/irootrem.sf
 scripts/Tests/is_even_perfect.sf

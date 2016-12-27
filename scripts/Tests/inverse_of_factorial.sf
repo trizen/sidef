@@ -1,0 +1,45 @@
+#!/usr/bin/ruby
+
+# Daniel "Trizen" Șuteu
+# License: GPLv3
+# Date: 27 September 2016
+# Website: https://github.com/trizen
+
+# The inverse of n factorial, based on the inverse of Stirling's approximation.
+
+define τ = Num.tau
+define e = Num.e
+define S = τ.sqrt.ln
+define T = τ.root(-2*e)
+
+func inv_fac_W(n) {
+    var l = (n.ln - S)
+    l / lambert_w(l / e) - 1/2
+}
+
+func inv_fac_lgrt(n) {
+    lgrt(T * n.root(e)) * e - 1/2
+}
+
+var tests = [
+    [3, 6],
+    [4, 24],
+    [5, 120],
+    [10, 3628800],
+    [15, 1307674368000],
+]
+
+for n,f in tests {
+    var a = inv_fac_W(f)
+    var b = inv_fac_lgrt(f)
+
+    printf("F(%2s!) =~ (%.10g, %.10g)\n", n, a, b)
+
+    if (a.round(-20) != b.round(-20)) {
+        die "#{a} != #{b}"
+    }
+
+    if (a.round(0) != n) {
+        die "a=#{a} is incorrect!"
+    }
+}
