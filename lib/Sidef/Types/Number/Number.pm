@@ -991,8 +991,6 @@ package Sidef::Types::Number::Number {
         my ($x) = @_;
 
         my $sgn = Math::GMPq::Rmpq_sgn($$x);
-
-        $sgn == 0 and return ninf();
         Math::GMPq::Rmpq_cmp_ui($$x, 7, 10) < 0 and return Sidef::Types::Number::Complex->new($x)->lgrt;
 
         my $d = _big2mpfr($x);
