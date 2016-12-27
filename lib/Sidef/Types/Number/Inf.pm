@@ -218,6 +218,7 @@ package Sidef::Types::Number::Inf {
     *sqr              = \&inf;
     *log              = \&inf;
     *lgrt             = \&inf;
+    *lambert_w        = \&inf;
     *log2             = \&inf;
     *log10            = \&inf;
     *exp              = \&inf;

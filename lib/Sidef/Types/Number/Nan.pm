@@ -75,6 +75,7 @@ package Sidef::Types::Number::Nan {
     *log2              = \&nan;
     *log10             = \&nan;
     *lgrt              = \&nan;
+    *lambert_w         = \&nan;
     *mod               = \&nan;
     *imod              = \&nan;
     *fmod              = \&nan;
