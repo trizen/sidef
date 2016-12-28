@@ -927,6 +927,34 @@ package Sidef::Types::Number::Number {
         _mpz2big($x);
     }
 
+    sub ilog {
+        my ($x, $y) = @_;
+
+        Math::GMPq::Rmpq_sgn($$x) < 0
+          and return nan();
+
+        $x = _big2mpfr($x);
+        Math::MPFR::Rmpfr_log($x, $x, $ROUND);
+
+        if (defined $y) {
+
+            if (ref($y) eq 'Sidef::Types::Number::Inf' or ref($y) eq 'Sidef::Types::Number::Ninf') {
+                return (ZERO);
+            }
+            elsif (ref($y) eq 'Sidef::Types::Number::Nan') {
+                return nan();
+            }
+
+            _valid(\$y);
+            my $baseln = _big2mpfr($y);
+            Math::MPFR::Rmpfr_log($baseln, $baseln, $ROUND);
+            Math::MPFR::Rmpfr_div($x, $x, $baseln, $ROUND);
+        }
+
+        Math::MPFR::Rmpfr_trunc($x, $x);
+        _mpfr2big($x);
+    }
+
     sub log {
         my ($x, $y) = @_;
 
@@ -965,6 +993,18 @@ package Sidef::Types::Number::Number {
         _mpfr2big($x);
     }
 
+    sub ilog2 {
+        my ($x) = @_;
+
+        Math::GMPq::Rmpq_sgn($$x) < 0
+          and return nan();
+
+        $x = _big2mpfr($x);
+        Math::MPFR::Rmpfr_log2($x, $x, $ROUND);
+        Math::MPFR::Rmpfr_trunc($x, $x);
+        _mpfr2big($x);
+    }
+
     sub log2 {
         my ($x) = @_;
 
@@ -973,6 +1013,18 @@ package Sidef::Types::Number::Number {
 
         $x = _big2mpfr($x);
         Math::MPFR::Rmpfr_log2($x, $x, $ROUND);
+        _mpfr2big($x);
+    }
+
+    sub ilog10 {
+        my ($x) = @_;
+
+        Math::GMPq::Rmpq_sgn($$x) < 0
+          and return nan();
+
+        $x = _big2mpfr($x);
+        Math::MPFR::Rmpfr_log10($x, $x, $ROUND);
+        Math::MPFR::Rmpfr_trunc($x, $x);
         _mpfr2big($x);
     }
 

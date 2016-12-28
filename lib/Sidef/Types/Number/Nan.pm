@@ -72,8 +72,11 @@ package Sidef::Types::Number::Nan {
     *zeta              = \&nan;
     *eta               = \&nan;
     *log               = \&nan;
+    *ilog              = \&nan;
     *log2              = \&nan;
+    *ilog2             = \&nan;
     *log10             = \&nan;
+    *ilog10            = \&nan;
     *lgrt              = \&nan;
     *lambert_w         = \&nan;
     *mod               = \&nan;

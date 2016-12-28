@@ -90,7 +90,6 @@ package Sidef::Types::Number::Ninf {
 
     *neg    = \&inf;
     *abs    = \&inf;
-    *log    = \&inf;
     *lgrt   = \&inf;
     *cosh   = \&inf;
     *acosh  = \&inf;

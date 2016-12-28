@@ -217,10 +217,13 @@ package Sidef::Types::Number::Inf {
     *cbrt             = \&inf;
     *sqr              = \&inf;
     *log              = \&inf;
+    *ilog             = \&inf;
     *lgrt             = \&inf;
     *lambert_w        = \&inf;
     *log2             = \&inf;
+    *ilog2            = \&inf;
     *log10            = \&inf;
+    *ilog10           = \&inf;
     *exp              = \&inf;
     *exp2             = \&inf;
     *exp10            = \&inf;

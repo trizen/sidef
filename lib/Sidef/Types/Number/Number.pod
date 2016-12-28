@@ -932,6 +932,30 @@ Return the
 
 =cut
 
+=head2 ilog
+
+Number.ilog() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 ilog10
+
+Number.ilog10() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 ilog2
+
+Number.ilog2() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 im
 
 Number.im() -> I<Obj>
