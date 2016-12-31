@@ -1739,15 +1739,28 @@ package Sidef::Types::Number::Number {
     sub bessel_j {
         my ($x, $n) = @_;
 
+        if (ref($n) eq 'Sidef::Types::Number::Inf' or ref($n) eq 'Sidef::Types::Number::Ninf') {
+            return ZERO;
+        }
+        elsif (ref($n) eq 'Sidef::Types::Number::Nan') {
+            return nan();
+        }
+
         $n = defined($n)
           ? do {
             _valid(\$n);
-            CORE::int(Math::GMPq::Rmpq_get_d($$n));
+            Math::GMPq::Rmpq_get_d($$n);
           }
           : 0;
 
+        if ($n < MIN_SI or $n > MAX_UI) {
+            return ZERO;
+        }
+
+        $n = CORE::int($n);
         $x = _big2mpfr($x);
-        if (!$n) {
+
+        if ($n == 0) {
             Math::MPFR::Rmpfr_j0($x, $x, $ROUND);
         }
         elsif ($n == 1) {
@@ -1763,15 +1776,33 @@ package Sidef::Types::Number::Number {
     sub bessel_y {
         my ($x, $n) = @_;
 
+        if (ref($n) eq 'Sidef::Types::Number::Inf' or ref($n) eq 'Sidef::Types::Number::Ninf') {
+            return (Math::GMPq::Rmpq_sgn(${$_[0]}) < 0 ? nan() : $n->neg);
+        }
+        elsif (ref($n) eq 'Sidef::Types::Number::Nan') {
+            return nan();
+        }
+
         $n = defined($n)
           ? do {
             _valid(\$n);
-            CORE::int(Math::GMPq::Rmpq_get_d($$n));
+            Math::GMPq::Rmpq_get_d($$n);
           }
           : 0;
 
+        if ($n < MIN_SI or $n > MAX_UI) {
+
+            if (Math::GMPq::Rmpq_sgn($$x) < 0) {
+                return nan();
+            }
+
+            return ($n < 0 ? inf() : ninf());
+        }
+
         $x = _big2mpfr($x);
-        if (!$n) {
+        $n = CORE::int($n);
+
+        if ($n == 0) {
             Math::MPFR::Rmpfr_y0($x, $x, $ROUND);
         }
         elsif ($n == 1) {
