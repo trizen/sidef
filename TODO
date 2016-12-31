@@ -13,10 +13,8 @@ New built-in classes:
     * Implement a native `Set` class (as `Sidef::Types::Set::Set`) with appropriate methods, such as: `contains`, `remove`, `union`, `intersect`, etc...
     * Implement a native `Bag` class (as `Sidef::Types::Set::Bag`) which would behave exactly like a multiset.
 
-Perl:
-    * Switch to subroutine `signatures` (as soon as this feature becomes stable).
-
 Internal:
+    * Switch to subroutine `signatures` (as soon as this feature becomes stable).
     * Unify `Sidef::Types::Number::Ninf` into `Sidef::Types::Number::Inf`.
 
 Speculations:
