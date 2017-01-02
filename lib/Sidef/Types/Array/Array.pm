@@ -1725,16 +1725,11 @@ package Sidef::Types::Array::Array {
         my $l1 = $#$self;
         my $l2 = $#$arg;
 
+        my $cmp;
         my $min = $l1 < $l2 ? $l1 : $l2;
 
         foreach my $i (0 .. $min) {
-
-            my $obj1 = $self->[$i];
-            my $obj2 = $arg->[$i];
-
-            my $cmp = CORE::int($obj1 cmp $obj2);
-
-            if ($cmp) {
+            if ($cmp = CORE::int($self->[$i] cmp $arg->[$i])) {
                 return ($cmp < 0 ? Sidef::Types::Number::Number::MONE : Sidef::Types::Number::Number::ONE);
             }
         }
