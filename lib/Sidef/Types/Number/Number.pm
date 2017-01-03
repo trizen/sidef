@@ -20,8 +20,8 @@ package Sidef::Types::Number::Number {
         ZERO => bless(\$ZERO, __PACKAGE__),
         MONE => bless(\$MONE, __PACKAGE__),
 
-        MAX_UI => Math::GMPq::_ulong_max(),
-        MIN_SI => Math::GMPq::_long_min(),
+        MAX_UI => defined(&Math::GMPq::_ulong_max) ? Math::GMPq::_ulong_max() : unpack('I', pack('I', -1)),
+        MIN_SI => defined(&Math::GMPq::_long_min) ? Math::GMPq::_long_min() : (-(unpack('I', pack('I', -1)) >> 1) - 1),
                  };
 
     use parent qw(
