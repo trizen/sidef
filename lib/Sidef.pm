@@ -455,7 +455,7 @@ package Sidef {
         }
 
         if (defined(&$AUTOLOAD)) {
-            goto \&$AUTOLOAD;
+            goto &$AUTOLOAD;
 
             ## The above `goto` is roughly equivalent with:
             #return $AUTOLOAD->($self, @args);

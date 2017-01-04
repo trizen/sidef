@@ -41,8 +41,7 @@ package Sidef::Types::Block::Block {
     }
 
     sub run {
-        my $self = shift(@_);
-        $self->{code}->(@_);
+        goto shift(@_)->{code};
     }
 
     *do = \&run;
@@ -215,7 +214,8 @@ package Sidef::Types::Block::Block {
 
         # Handle block calls
         if ($block->{type} eq 'block') {
-            return $block->{code}->(@args);
+            shift @_;
+            goto $block->{code};
         }
 
         my ($self, @objs) = $block->_multiple_dispatch(@args);

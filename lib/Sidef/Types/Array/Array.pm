@@ -2051,7 +2051,6 @@ package Sidef::Types::Array::Array {
     }
 
     sub _dump {
-
         my %addr;    # keeps track of dumped objects
 
         my $sub = sub {

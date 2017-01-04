@@ -11,27 +11,24 @@ package Sidef::Object::Object {
       q{~~}   => \&{__PACKAGE__ . '::' . '~~'},
       q{bool} => sub {
         if (defined(my $sub = UNIVERSAL::can($_[0], 'to_b'))) {
-            $sub->($_[0]);
+            @_ = ($_[0]);
+            goto $sub;
         }
-        else {
-            $_[0];
-        }
+        $_[0];
       },
       q{0+} => sub {
         if (defined(my $sub = UNIVERSAL::can($_[0], 'to_n'))) {
-            $sub->($_[0]);
+            @_ = ($_[0]);
+            goto $sub;
         }
-        else {
-            $_[0];
-        }
+        $_[0];
       },
       q{""} => sub {
         if (defined(my $sub = UNIVERSAL::can($_[0], 'to_s'))) {
-            $sub->($_[0]);
+            @_ = ($_[0]);
+            goto $sub;
         }
-        else {
-            $_[0];
-        }
+        $_[0];
       },
       q{cmp} => sub {
         my ($obj1, $obj2, $swaped) = @_;
@@ -47,7 +44,8 @@ package Sidef::Object::Object {
         if (   CORE::ref($obj1) && UNIVERSAL::isa($obj1, CORE::ref($obj2))
             or CORE::ref($obj2) && UNIVERSAL::isa($obj2, CORE::ref($obj1))) {
             if (defined(my $sub = UNIVERSAL::can($obj1, '<=>'))) {
-                return $sub->($obj1, $obj2);
+                @_ = ($obj1, $obj2);
+                goto $sub;
             }
         }
 
@@ -70,7 +68,8 @@ package Sidef::Object::Object {
           || return (Sidef::Types::Bool::Bool::FALSE);
 
         if (defined(my $sub = UNIVERSAL::can($obj1, '=='))) {
-            return $sub->($obj1, $obj2);
+            @_ = ($obj1, $obj2);
+            goto $sub;
         }
 
         !CORE::int($obj1 cmp $obj2);

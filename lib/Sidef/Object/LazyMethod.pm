@@ -55,7 +55,8 @@ package Sidef::Object::LazyMethod {
             }
 
             my $code = UNIVERSAL::can($obj, $method);
-            return $code->(@{$call->{args}}, @args);
+            @_ = (@{$call->{args}}, @args);
+            goto $code;
         }
 
         if (ref($obj)) {
