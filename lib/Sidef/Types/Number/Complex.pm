@@ -984,7 +984,7 @@ package Sidef::Types::Number::Complex {
 
     sub round {
         my ($x, $prec) = @_;
-        $x->abs->round($prec);
+        $x->abs->round(defined($prec) ? $prec : ());
     }
 
     *roundf = \&round;

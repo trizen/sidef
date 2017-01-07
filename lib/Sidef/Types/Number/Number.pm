@@ -3181,9 +3181,11 @@ package Sidef::Types::Number::Number {
 
     sub round {
         my ($x, $prec) = @_;
-        _valid(\$prec);
 
-        my $nth = -CORE::int(Math::GMPq::Rmpq_get_d($$prec));
+        my $nth =
+          defined($prec)
+          ? do { _valid(\$prec); -CORE::int(Math::GMPq::Rmpq_get_d($$prec)) }
+          : 0;
         my $sgn = Math::GMPq::Rmpq_sgn($$x);
 
         Math::GMPq::Rmpq_set((my $n = Math::GMPq::Rmpq_init()), $$x);

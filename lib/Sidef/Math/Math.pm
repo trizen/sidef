@@ -107,7 +107,7 @@ package Sidef::Math::Math {
 
     sub map_range {
         my ($self, $amount, $from, $to) = @_;
-        Sidef::Types::Range::RangeNumber->new($from, $to, $to->sub($from)->div($amount),);
+        Sidef::Types::Range::RangeNumber->new($from, $to, $to->sub($from)->div($amount));
     }
 
     sub number_to_percentage {
