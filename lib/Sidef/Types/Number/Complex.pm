@@ -75,7 +75,7 @@ package Sidef::Types::Number::Complex {
                 Math::MPC::Rmpc_set_q($r, $x, $ROUND);
             }
             else {
-                Math::MPC::Rmpc_set_str($r, "$x", 10, $ROUND);
+                Math::MPC::Rmpc_set_str($r, (defined($x) ? "$x" : 0), 10, $ROUND);
             }
 
             return (bless \$r, __PACKAGE__);
