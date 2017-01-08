@@ -65,12 +65,17 @@ package Sidef::Types::Number::Complex {
         }
 
         if (not defined($y)) {
+
+            if (ref($x) eq 'Math::MPC') {
+                return bless \$x, __PACKAGE__;
+            }
+
             my $r = Math::MPC::Rmpc_init2($PREC);
             if (ref($x) eq 'Math::GMPq' or ref($x) eq 'SCALAR') {
                 Math::MPC::Rmpc_set_q($r, $x, $ROUND);
             }
             else {
-                Math::MPC::Rmpc_set_str($r, $x, 10, $ROUND);
+                Math::MPC::Rmpc_set_str($r, "$x", 10, $ROUND);
             }
 
             return (bless \$r, __PACKAGE__);
@@ -114,21 +119,21 @@ package Sidef::Types::Number::Complex {
             }
             else {
                 my $y_fr = Math::MPFR::Rmpfr_init2($PREC);
-                Math::MPFR::Rmpfr_set_str($y_fr, $y, 10, $Sidef::Types::Number::Number::ROUND);
+                Math::MPFR::Rmpfr_set_str($y_fr, "$y", 10, $Sidef::Types::Number::Number::ROUND);
                 Math::MPC::Rmpc_set_q_fr($r, $x, $y_fr, $ROUND);
             }
         }
         elsif (ref($y) eq 'Math::GMPq' or ref($y) eq 'SCALAR') {
             my $x_fr = Math::MPFR::Rmpfr_init2($PREC);
-            Math::MPFR::Rmpfr_set_str($x_fr, $x, 10, $Sidef::Types::Number::Number::ROUND);
+            Math::MPFR::Rmpfr_set_str($x_fr, "$x", 10, $Sidef::Types::Number::Number::ROUND);
             Math::MPC::Rmpc_set_fr_q($r, $x_fr, $y, $ROUND);
         }
         else {
             my $x_fr = Math::MPFR::Rmpfr_init2($PREC);
-            Math::MPFR::Rmpfr_set_str($x_fr, $x, 10, $Sidef::Types::Number::Number::ROUND);
+            Math::MPFR::Rmpfr_set_str($x_fr, "$x", 10, $Sidef::Types::Number::Number::ROUND);
 
             my $y_fr = Math::MPFR::Rmpfr_init2($PREC);
-            Math::MPFR::Rmpfr_set_str($y_fr, $y, 10, $Sidef::Types::Number::Number::ROUND);
+            Math::MPFR::Rmpfr_set_str($y_fr, "$y", 10, $Sidef::Types::Number::Number::ROUND);
 
             Math::MPC::Rmpc_set_fr_fr($r, $x_fr, $y_fr, $ROUND);
 
