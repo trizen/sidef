@@ -29,8 +29,10 @@ my $builder = Module::Build->new(
 
     meta_merge => {
                    resources => {
-                                 repository => 'https://github.com/trizen/sidef'
-                                }
+                                 bugtracker => "https://github.com/trizen/sidef/issues",
+                                 homepage   => "https://github.com/trizen/sidef",
+                                 repository => "https://github.com/trizen/sidef",
+                                },
                   },
 
     requires => {
@@ -60,11 +62,11 @@ my $builder = Module::Build->new(
                 },
 
     recommends => {
-                   'File::Find'           => 0,     # for: `sidef -c`
-                   'Digest::MD5'          => 0,     # for: File.md5(), Str.md5()
-                   'Digest::SHA'          => 0,     # for: File.sha*(), Str.sha*()
-                   'Data::Dump'           => 0,     # for: `sidef -D`
-                   'Data::Dump::Filtered' => 0,     # for: Block.ffork()
+                   'File::Find'           => 0,    # for: `sidef -c`
+                   'Digest::MD5'          => 0,    # for: File.md5(), Str.md5()
+                   'Digest::SHA'          => 0,    # for: File.sha*(), Str.sha*()
+                   'Data::Dump'           => 0,    # for: `sidef -D`
+                   'Data::Dump::Filtered' => 0,    # for: Block.ffork()
                   },
 
     add_to_cleanup     => ['Sidef-*'],

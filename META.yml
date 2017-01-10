@@ -147,6 +147,8 @@ requires:
   perl: v5.18.0
   utf8: '0'
 resources:
+  bugtracker: https://github.com/trizen/sidef/issues
+  homepage: https://github.com/trizen/sidef
   license: http://www.perlfoundation.org/artistic_license_2_0
   repository: https://github.com/trizen/sidef
 version: '2.34'

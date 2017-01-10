@@ -215,6 +215,10 @@
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/trizen/sidef/issues"
+      },
+      "homepage" : "https://github.com/trizen/sidef",
       "license" : [
          "http://www.perlfoundation.org/artistic_license_2_0"
       ],
