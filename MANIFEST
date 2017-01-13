@@ -124,7 +124,6 @@ scripts/cached_zeta_function.sf
 scripts/caesar_cipher.sf
 scripts/chebyshev_coefficients.sf
 scripts/chinese_remainder_theorem.sf
-scripts/cocktail_sort.sf
 scripts/comb_sort.sf
 scripts/combinations.sf
 scripts/combinations_and_permutations.sf
@@ -252,11 +251,9 @@ scripts/langton_s_ant.sf
 scripts/langton_s_ant_2.sf
 scripts/linear_congruential_generator.sf
 scripts/mandelbrot_set.sf
-scripts/matrix_multiplication.sf
 scripts/mersenne_twister.sf
 scripts/multiple_dispatch.sf
 scripts/mutual_recursion.sf
-scripts/nth_root.sf
 scripts/path_sum_two_ways.sf
 scripts/permutations_iter.sf
 scripts/permutations_rec.sf
@@ -570,13 +567,11 @@ scripts/RosettaCode/zig-zag_matrix.sf
 scripts/rsa_code.sf
 scripts/sets.sf
 scripts/sierpinski_carpet.sf
-scripts/sierpinski_triangle.sf
 scripts/simple_moving_average.sf
 scripts/simple_moving_average_oo.sf
 scripts/smart_word_wrap.sf
 scripts/smart_word_wrap_simple.sf
 scripts/space_collisions.sf
-scripts/stack.sf
 scripts/stern-brocot_sequence.sf
 scripts/symmetric_summation_of_fractions.sf
 scripts/Tests/amb.sf
@@ -596,7 +591,6 @@ scripts/Tests/array_zipping.sf
 scripts/Tests/arrays.sf
 scripts/Tests/autovivification.sf
 scripts/Tests/averages_mode.sf
-scripts/Tests/avg_mode.sf
 scripts/Tests/balanced_brakets.sf
 scripts/Tests/bare_multiplication.sf
 scripts/Tests/base64_decoder.sf
@@ -623,11 +617,9 @@ scripts/Tests/class_redefinition.sf
 scripts/Tests/class_var_inheritance.sf
 scripts/Tests/classes.sf
 scripts/Tests/classes_and_objects.sf
-scripts/Tests/closure_generator.sf
 scripts/Tests/cnp.sf
 scripts/Tests/code_interpolation.sf
 scripts/Tests/complex_numbers.sf
-scripts/Tests/count_in_factors.sf
 scripts/Tests/cpp_input_output.sf
 scripts/Tests/cramers_method.sf
 scripts/Tests/cramers_rule.sf
@@ -678,7 +670,6 @@ scripts/Tests/hash_as_tree.sf
 scripts/Tests/hash_autovivification.sf
 scripts/Tests/hash_from_array.sf
 scripts/Tests/hash_grep.sf
-scripts/Tests/hash_join.sf
 scripts/Tests/hash_sort.sf
 scripts/Tests/heap_s_algorithm_iter.sf
 scripts/Tests/heap_s_algorithm_rec.sf
@@ -714,7 +705,6 @@ scripts/Tests/long_division.sf
 scripts/Tests/longest_common_prefix.sf
 scripts/Tests/longest_common_subsequence.sf
 scripts/Tests/longest_common_subsequence_2.sf
-scripts/Tests/look_and_say_seq.sf
 scripts/Tests/loops.sf
 scripts/Tests/luhn_test_of_credit_card_numbers.sf
 scripts/Tests/lvalues.sf
@@ -795,14 +785,12 @@ scripts/Tests/return.sf
 scripts/Tests/return_types.sf
 scripts/Tests/reverse_a_base10_integer.sf
 scripts/Tests/reverse_recursive_general_solution.sf
-scripts/Tests/reverse_words_in_a_string.sf
 scripts/Tests/roman_numerals_decoding.sf
 scripts/Tests/roman_numerals_decoding_2.sf
 scripts/Tests/roman_numerals_decoding_3.sf
 scripts/Tests/roman_numerals_encoding.sf
 scripts/Tests/roman_numerals_encoding_2.sf
 scripts/Tests/root_mean_square.sf
-scripts/Tests/roots_of_a_quadratic_function.sf
 scripts/Tests/round_half_to_even.sf
 scripts/Tests/roundf.sf
 scripts/Tests/run_length_encoding.sf

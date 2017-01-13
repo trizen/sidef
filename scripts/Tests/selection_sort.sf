@@ -11,17 +11,16 @@ class Array {
             range(i+1, self.len-1).each { |j|
                 self[j] < self[min_idx] && (
                     min_idx = j;
-                );
-            };
+                )
+            }
             self[i, min_idx] = self[min_idx, i];
-        };
+        }
         return self;
     }
 }
 
 var r = 10.of { .irand }
 var arr = r.selectionsort;
+assert_eq(arr, r.sort)
 
-arr == r.sort
-    ? say "** Test passed!"
-    : die "Error!";
+say "** Test passed!"
