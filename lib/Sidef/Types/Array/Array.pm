@@ -887,6 +887,19 @@ package Sidef::Types::Array::Array {
         $self->new(\@slices);
     }
 
+    sub cons {
+        my ($self, $n) = @_;
+
+        $n = CORE::int($n);
+
+        my @array;
+        foreach my $i ($n - 1 .. $#$self) {
+            push @array, $self->new([@$self[$i - $n + 1 .. $i]]);
+        }
+
+        $self->new(\@array);
+    }
+
     sub each_cons {
         my ($self, $n, $code) = @_;
 

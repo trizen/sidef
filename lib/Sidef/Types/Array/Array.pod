@@ -235,6 +235,14 @@ Return the
 
 =cut
 
+=head2 cons
+
+Array.cons() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 contain
 
 Array.contain() -> I<Obj>

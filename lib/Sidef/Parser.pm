@@ -649,7 +649,7 @@ package Sidef::Parser {
             if ($opt{with_vals} && defined($end_delim)) {
 
                 # Add the variables into the symbol table
-                my ($name, $class_name) = $self->get_name_and_class($vars[-1]);
+                my ($name, $class_name) = $self->get_name_and_class((split(' ', $vars[-1]))[-1]);
 
                 undef $classes{$class_name};
                 unshift @{$self->{vars}{$class_name}},

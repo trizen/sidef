@@ -378,6 +378,7 @@ scripts/RosettaCode/identity_matrix.sf
 scripts/RosettaCode/infinity.sf
 scripts/RosettaCode/inheritance_multiple.sf
 scripts/RosettaCode/inheritance_single.sf
+scripts/RosettaCode/intersection_of_two_lines.sf
 scripts/RosettaCode/kaprekar_numbers.sf
 scripts/RosettaCode/knapsack_problem_continuous.sf
 scripts/RosettaCode/knight_s_tour.sf
@@ -440,6 +441,7 @@ scripts/RosettaCode/multiple_distinct_objects.sf
 scripts/RosettaCode/multiplication_tables.sf
 scripts/RosettaCode/multisplit.sf
 scripts/RosettaCode/natural_sorting.sf
+scripts/RosettaCode/negative_base_numbers.sf
 scripts/RosettaCode/nested_function.sf
 scripts/RosettaCode/non_decimal_radices_convert.sf
 scripts/RosettaCode/nth.sf
@@ -473,6 +475,7 @@ scripts/RosettaCode/queue_definition.sf
 scripts/RosettaCode/queue_definition_2.sf
 scripts/RosettaCode/quickselect_algorithm.sf
 scripts/RosettaCode/quine_1.sf
+scripts/RosettaCode/ramer_line_simplification.sf
 scripts/RosettaCode/ramsey_s_theorem.sf
 scripts/RosettaCode/random_number_generator__device_.sf
 scripts/RosettaCode/range_expansion.sf
@@ -546,6 +549,7 @@ scripts/RosettaCode/sorting_algorithms_sleep_sort.sf
 scripts/RosettaCode/sorting_algorithms_stooge_sort.sf
 scripts/RosettaCode/sorting_algorithms_strand_sort.sf
 scripts/RosettaCode/spiral_matrix.sf
+scripts/RosettaCode/split_repchar_string.sf
 scripts/RosettaCode/stable_marriage_problem.sf
 scripts/RosettaCode/stack.sf
 scripts/RosettaCode/stack_1.sf
@@ -565,6 +569,7 @@ scripts/RosettaCode/truncatable_primes.sf
 scripts/RosettaCode/universal_turing_machine.sf
 scripts/RosettaCode/van_der_corput_sequence.sf
 scripts/RosettaCode/walk_a_dir_non_recursively.sf
+scripts/RosettaCode/water_collected_between_towers.sf
 scripts/RosettaCode/word_wrap.sf
 scripts/RosettaCode/zeckendorf_number_representation.sf
 scripts/RosettaCode/zig-zag_matrix.sf
