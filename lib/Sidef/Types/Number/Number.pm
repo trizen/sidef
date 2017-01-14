@@ -2297,7 +2297,9 @@ package Sidef::Types::Number::Number {
         Math::GMPz::Rmpz_abs($z, $z);
 
         #__PACKAGE__->_set_uint(Math::GMPz::Rmpz_sizeinbase($z, 10));        # turned out to be inexact
-        __PACKAGE__->_set_uint(Math::GMPz::Rmpz_snprintf(my $buf, 0, "%Zd", $z, 0));
+        #__PACKAGE__->_set_uint(Math::GMPz::Rmpz_snprintf(my $buf, 0, "%Zd", $z, 0));
+
+        __PACKAGE__->_set_uint(CORE::length(Math::GMPz::Rmpz_get_str($z, 10)));
     }
 
     *len  = \&length;
