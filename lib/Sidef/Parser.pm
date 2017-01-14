@@ -275,8 +275,8 @@ package Sidef::Parser {
                   )
             },
             match_flags_re  => qr{[msixpogcaludn]+},
-            var_name_re     => qr/[_\pL][_\pL\pN]*(?>::[_\pL][_\pL\pN]*)*/,
-            method_name_re  => qr/[_\pL][_\pL\pN]*!?/,
+            var_name_re     => qr/[_\pL][\pL\pN\w]*(?>::[_\pL][\pL\pN\w]*)*/,
+            method_name_re  => qr/[_\pL][\pL\pN\w]*!?/,
             var_init_sep_re => qr/\G\h*(?:=>|[=:])\h*/,
             operators_re    => do {
                 local $" = q{|};
@@ -323,25 +323,25 @@ package Sidef::Parser {
                         )
                     )
 
-                      »(?<unroll>[_\pL][_\pL\pN]*|(?&ops))«          # unroll operator (e.g.: »add« or »+«)
-                    | >>(?<unroll>[_\pL][_\pL\pN]*|(?&ops))<<        # unroll operator (e.g.: >>add<< or >>+<<)
+                      »(?<unroll>[_\pL][\pL\pN\w]*|(?&ops))«          # unroll operator (e.g.: »add« or »+«)
+                    | >>(?<unroll>[_\pL][\pL\pN\w]*|(?&ops))<<        # unroll operator (e.g.: >>add<< or >>+<<)
 
-                    | ~X(?<cross>[_\pL][_\pL\pN]*|(?&ops)|)          # cross operator (e.g.: ~X or ~X+)
-                    | ~Z(?<zip>[_\pL][_\pL\pN]*|(?&ops)|)            # zip operator (e.g.: ~Z or ~Z+)
+                    | ~X(?<cross>[_\pL][\pL\pN\w]*|(?&ops)|)          # cross operator (e.g.: ~X or ~X+)
+                    | ~Z(?<zip>[_\pL][\pL\pN\w]*|(?&ops)|)            # zip operator (e.g.: ~Z or ~Z+)
 
-                    | »(?<map>[_\pL][_\pL\pN]*|(?&ops))»             # mapping operator (e.g.: »add» or »+»)
-                    | >>(?<map>[_\pL][_\pL\pN]*|(?&ops))>>           # mapping operator (e.g.: >>add>> or >>+>>)
+                    | »(?<map>[_\pL][\pL\pN\w]*|(?&ops))»             # mapping operator (e.g.: »add» or »+»)
+                    | >>(?<map>[_\pL][\pL\pN\w]*|(?&ops))>>           # mapping operator (e.g.: >>add>> or >>+>>)
 
-                    | «(?<pam>[_\pL][_\pL\pN]*|(?&ops))«             # reverse mapping operator (e.g.: «add« or «+«)
-                    | <<(?<pam>[_\pL][_\pL\pN]*|(?&ops))<<           # reverse mapping operator (e.g.: <<add<< or <<+<<)
+                    | «(?<pam>[_\pL][\pL\pN\w]*|(?&ops))«             # reverse mapping operator (e.g.: «add« or «+«)
+                    | <<(?<pam>[_\pL][\pL\pN\w]*|(?&ops))<<           # reverse mapping operator (e.g.: <<add<< or <<+<<)
 
-                    | »(?<lmap>[_\pL][_\pL\pN]*|(?&ops))\(\)»        # mapping operator (e.g.: »add()» or »+()»)
-                    | >>(?<lmap>[_\pL][_\pL\pN]*|(?&ops))\(\)>>      # mapping operator (e.g.: >>add()>> or >>+()>>)
+                    | »(?<lmap>[_\pL][\pL\pN\w]*|(?&ops))\(\)»        # mapping operator (e.g.: »add()» or »+()»)
+                    | >>(?<lmap>[_\pL][\pL\pN\w]*|(?&ops))\(\)>>      # mapping operator (e.g.: >>add()>> or >>+()>>)
 
-                    | <<(?<reduce>[_\pL][_\pL\pN]*|(?&ops))>>        # reduce operator (e.g.: <<add>> or <<+>>)
-                    | «(?<reduce>[_\pL][_\pL\pN]*|(?&ops))»          # reduce operator (e.g.: «add» or «+»)
+                    | <<(?<reduce>[_\pL][\pL\pN\w]*|(?&ops))>>        # reduce operator (e.g.: <<add>> or <<+>>)
+                    | «(?<reduce>[_\pL][\pL\pN\w]*|(?&ops))»          # reduce operator (e.g.: «add» or «+»)
 
-                    | \^(?<op>[_\pL][_\pL\pN]*[!:?]?)\^              # method-like operator (e.g.: ^add^)
+                    | \^(?<op>[_\pL][\pL\pN\w]*[!:?]?)\^              # method-like operator (e.g.: ^add^)
                     | (?<op>(?&ops))                                 # primitive operator   (e.g.: +, -, *, /)
                 }x;
             },
@@ -1065,14 +1065,14 @@ package Sidef::Parser {
             }
 
             # Bareword followed by a fat comma or preceded by a colon
-            if (   /\G:([_\pL\pN]+)/gc
-                || /\G([_\pL][_\pL\pN]*)(?=\h*=>)/gc) {
+            if (   /\G:([\pL\pN\w]+)/gc
+                || /\G([_\pL][\pL\pN\w]*)(?=\h*=>)/gc) {
 
-                # || /\G([_\pL][_\pL\pN]*)(?=\h*=>|:(?![=:]))/gc) {
+                # || /\G([_\pL][\pL\pN\w]*)(?=\h*=>|:(?![=:]))/gc) {
                 return Sidef::Types::String::String->new($1);
             }
 
-            if (/\G([_\pL][_\pL\pN]*):(?![=:])/gc) {
+            if (/\G([_\pL][\pL\pN\w]*):(?![=:])/gc) {
                 my $name = $1;
                 my $obj = $self->parse_obj(code => $opt{code});
                 return Sidef::Variable::NamedParam->new($name, $obj);
@@ -2063,7 +2063,7 @@ package Sidef::Parser {
                     my $str = $self->get_quoted_string(code => $opt{code});
                     $name = $str;
                 }
-                elsif (/\G(-?[_\pL\pN]+)/gc) {
+                elsif (/\G(-?[\pL\pN\w]+)/gc) {
                     $name = $1;
                 }
                 else {
@@ -3083,7 +3083,7 @@ package Sidef::Parser {
                 redo;
             }
 
-            if (/\G\@:([\pL_][\pL\pN_]*)/gc) {
+            if (/\G\@:([\pL_][\pL\pN\w]*)/gc) {
                 push @{$struct{$self->{class}}}, {self => bless({name => $1}, 'Sidef::Variable::Label')};
                 redo;
             }

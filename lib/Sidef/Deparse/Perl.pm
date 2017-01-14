@@ -545,7 +545,7 @@ HEADER
                     my $name = $obj->{name};
 
                     # Check for alphanumeric name
-                    if (not $obj->{name} =~ /^[_\pL][_\pL\pN]*\z/) {
+                    if (not $obj->{name} =~ /^[_\pL][\pL\pN\w]*\z/) {
                         $obj->{name} = '__NONANN__';    # use this name for non-alphanumeric names
                     }
 
