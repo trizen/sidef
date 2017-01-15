@@ -668,7 +668,7 @@ package Sidef::Types::String::String {
 
     sub chars {
         my ($self) = @_;
-        Sidef::Types::Array::Array->new([map { bless(\$_, __PACKAGE__) } CORE::split(//, CORE::join('', $$self))]);
+        Sidef::Types::Array::Array->new([map { bless(\$_, __PACKAGE__) } CORE::split(//, $$self)]);
     }
 
     sub iter {
