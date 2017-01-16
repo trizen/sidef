@@ -427,7 +427,7 @@ package Sidef {
 };
 
 #
-## Some UNIVERSAL magic
+## UNIVERSAL methods
 #
 
 *UNIVERSAL::get_value = sub {
@@ -456,9 +456,6 @@ package Sidef {
 
         if (defined(&$AUTOLOAD)) {
             goto &$AUTOLOAD;
-
-            ## The above `goto` is roughly equivalent with:
-            #return $AUTOLOAD->($self, @args);
         }
     }
 
