@@ -93,6 +93,33 @@ package Sidef::Math::Math {
         $sum->div($n);
     }
 
+    sub chinese {
+        my ($self, @arrs) = @_;
+
+        state $x = require Scalar::Util;
+
+        my @pairs;
+        foreach my $pair (@arrs) {
+            if (    Scalar::Util::reftype($pair) eq 'ARRAY'
+                and @$pair == 2
+                and ref($pair->[0]) eq 'Sidef::Types::Number::Number'
+                and ref($pair->[1]) eq 'Sidef::Types::Number::Number') {
+                push @pairs, [map { $_->_big2istr } @$pair];
+            }
+            else {
+                return Sidef::Types::Number::Number->nan;
+            }
+        }
+
+        my $res = eval { Math::Prime::Util::GMP::chinese(@pairs) } // return Sidef::Types::Number::Number->nan;
+
+        if ($res <= Sidef::Types::Number::Number::MAX_UI and $res >= 0) {
+            return Sidef::Types::Number::Number->_set_uint($res);
+        }
+
+        Sidef::Types::Number::Number->_set_str($res);
+    }
+
     sub range_sum {
         my ($self, $from, $to, $step) = @_;
         $step //= Sidef::Types::Number::Number::ONE;

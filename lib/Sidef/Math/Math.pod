@@ -31,6 +31,14 @@ Return the
 
 =cut
 
+=head2 chinese
+
+Math.chinese() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 gcd
 
 Math.gcd() -> I<Obj>
