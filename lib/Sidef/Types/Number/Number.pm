@@ -1389,16 +1389,21 @@ package Sidef::Types::Number::Number {
     sub cis {
         state $_x = require Math::MPC;
 
-        my $cos = _big2mpfr($_[0]);
+        my $cos = Math::MPFR::Rmpfr_init2($PREC);
         my $sin = Math::MPFR::Rmpfr_init2($PREC);
-        Math::MPFR::Rmpfr_set($sin, $cos, $ROUND);
 
-        Math::MPFR::Rmpfr_cos($cos, $cos, $ROUND);
-        Math::MPFR::Rmpfr_sin($sin, $sin, $ROUND);
+        Math::MPFR::Rmpfr_sin_cos($sin, $cos, _big2mpfr($_[0]), $ROUND);
 
         my $r = Math::MPC::Rmpc_init2($PREC);
         Math::MPC::Rmpc_set_fr_fr($r, $cos, $sin, $ROUND);
         Sidef::Types::Number::Complex->new($r);
+    }
+
+    sub sin_cos {
+        my $cos = Math::MPFR::Rmpfr_init2($PREC);
+        my $sin = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_sin_cos($sin, $cos, _big2mpfr($_[0]), $ROUND);
+        (_mpfr2big($sin), _mpfr2big($cos));
     }
 
     #

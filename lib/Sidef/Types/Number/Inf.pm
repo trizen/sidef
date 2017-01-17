@@ -345,6 +345,10 @@ package Sidef::Types::Number::Inf {
         state $x = Sidef::Types::Number::Complex->new((Sidef::Types::Number::Nan::NAN) x 2);
     }
 
+    sub sin_cos {
+        ((Sidef::Types::Number::Nan::NAN) x 2);
+    }
+
     #
     ## binomial(inf, x) = 0       | with x < 0
     ## binomial(inf, inf) = 1

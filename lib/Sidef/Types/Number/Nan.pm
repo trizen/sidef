@@ -259,6 +259,10 @@ package Sidef::Types::Number::Nan {
         state $x = Sidef::Types::Number::Complex->new(NAN, NAN);
     }
 
+    sub sin_cos {
+        ((Sidef::Types::Number::Nan::NAN) x 2);
+    }
+
     sub dump {
         state $x = Sidef::Types::String::String->new('NaN');
     }

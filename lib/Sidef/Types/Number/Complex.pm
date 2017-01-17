@@ -874,6 +874,13 @@ package Sidef::Types::Number::Complex {
         bless(\$r, __PACKAGE__);
     }
 
+    sub sin_cos {
+        my $cos = Math::MPC::Rmpc_init2($PREC);
+        my $sin = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_sin_cos($sin, $cos, ${$_[0]}, $ROUND, $ROUND);
+        (bless(\$sin, __PACKAGE__), bless(\$cos, __PACKAGE__));
+    }
+
     #
     ## Testing
     #

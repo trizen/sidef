@@ -656,6 +656,14 @@ Return the
 
 =cut
 
+=head2 sin_cos
+
+Complex.sin_cos() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 sinh
 
 Complex.sinh() -> I<Obj>

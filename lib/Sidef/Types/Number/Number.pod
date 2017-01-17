@@ -1782,6 +1782,14 @@ Return the
 
 =cut
 
+=head2 sin_cos
+
+Number.sin_cos() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 sinh
 
 Number.sinh() -> I<Obj>
