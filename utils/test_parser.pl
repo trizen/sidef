@@ -10,11 +10,19 @@ no warnings 'once';
 
 use File::Find qw(find);
 use List::Util qw(first);
+use File::Temp qw(tempfile);
 use File::Spec::Functions qw(catfile catdir updir);
 
-use lib catdir(updir(), 'lib');
+my $libdir;
+
+BEGIN {
+    $libdir = catdir(updir(), 'lib');
+}
+
+use lib $libdir;
 require Sidef;
 
+my (undef, $tempfile) = tempfile();
 my $scripts_dir = catdir(updir(), 'scripts');
 
 my @scripts;
@@ -27,7 +35,7 @@ find {
     },
 } => $scripts_dir;
 
-plan tests => (scalar(@scripts) * 2);
+plan tests => (scalar(@scripts) * 3);
 
 foreach my $sidef_script (@scripts) {
 
@@ -48,4 +56,12 @@ foreach my $sidef_script (@scripts) {
     my $code = $sidef->compile_ast($oast, 'Perl');
 
     ok($code ne '', $sidef_script);
+
+    open my $fh, '>:utf8', $tempfile;
+    print $fh $code;
+    close $fh;
+
+    ok(system($^X, '-Mlib=' . $libdir, '-MSidef', '-c', $tempfile) == 0, $sidef_script);
+
+    $? && die "error for: $sidef_script";
 }
