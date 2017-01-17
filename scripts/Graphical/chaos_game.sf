@@ -15,12 +15,12 @@ var points = [
     [height-1, height-1],
 ]
 
-var img = %s|Imager|.new(
+var img = %O|Imager|.new(
                       xsize => width,
                       ysize => height,
                      )
 
-var color = %s|Imager::Color|.new('#ff0000')
+var color = %O|Imager::Color|.new('#ff0000')
 var r = [width.irand, height.irand]
 
 30000.times {

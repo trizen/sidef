@@ -172,7 +172,7 @@ package Sidef::Parser {
                 | %G\b.                                                    (?{ [qw(1 graphemes Sidef::Types::Array::Array)] })
 
                 # Symbols
-                | %s\b.                                                    (?{ [qw(0 __NEW__ Sidef::Module::OO)] })
+                | %[Os]\b.                                                 (?{ [qw(0 __NEW__ Sidef::Module::OO)] })
                 | %S\b.                                                    (?{ [qw(0 __NEW__ Sidef::Module::Func)] })
              )
             }xs,

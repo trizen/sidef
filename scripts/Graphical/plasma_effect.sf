@@ -11,7 +11,7 @@ class Plasma(width=400, height=400) {
     has img = nil
 
     method init {
-        img = %s|Imager|.new(xsize => width, ysize => height)
+        img = %O|Imager|.new(xsize => width, ysize => height)
     }
 
     method generate {
