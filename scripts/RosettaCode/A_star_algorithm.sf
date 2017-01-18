@@ -96,12 +96,12 @@ func AStarSearch(start, end, graph) {
 var graph = AStarGraph()
 var (route, cost) = AStarSearch([0,0], [7,7], graph)
 
-var width = 10
-var height = 10
+var w = 10
+var h = 10
 
-var grid = height.of { width.of { "." } }
-for y in (^height) { grid[y][0] = "█"; grid[y][-1] = "█" }
-for x in (^width) { grid[0][x] = "█"; grid[-1][x] = "█" }
+var grid = h.of { w.of { "." } }
+for y in (^h) { grid[y][0] = "█"; grid[y][-1] = "█" }
+for x in (^w) { grid[0][x] = "█"; grid[-1][x] = "█" }
 
 for x,y in (graph.barriers) { grid[x+1][y+1] = "█" }
 for x,y in (route)          { grid[x+1][y+1] = "x" }
