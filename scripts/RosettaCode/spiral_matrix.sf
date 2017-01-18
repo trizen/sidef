@@ -9,12 +9,12 @@ func spiral(n) {
     { |i|
         a[y][x] = i;
         var (nx, ny) = (x+dx, y+dy);
-        (  if (dx ==  1 && (nx == n || a[ny][nx]!=nil)) { [ 0,  1] }
-        elsif (dy ==  1 && (ny == n || a[ny][nx]!=nil)) { [-1,  0] }
-        elsif (dx == -1 && (nx  < 0 || a[ny][nx]!=nil)) { [ 0, -1] }
-        elsif (dy == -1 && (ny  < 0 || a[ny][nx]!=nil)) { [ 1,  0] }
-        else                                            { [dx, dy] }
-        ) » (\dx, \dy);
+        (dx, dy) =
+            (  if (dx ==  1 && (nx == n || a[ny][nx]!=nil)) { ( 0,  1) }
+            elsif (dy ==  1 && (ny == n || a[ny][nx]!=nil)) { (-1,  0) }
+            elsif (dx == -1 && (nx  < 0 || a[ny][nx]!=nil)) { ( 0, -1) }
+            elsif (dy == -1 && (ny  < 0 || a[ny][nx]!=nil)) { ( 1,  0) }
+            else                                            { (dx, dy) })
         x = x+dx;
         y = y+dy;
     } * n**2;

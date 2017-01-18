@@ -1140,6 +1140,7 @@ package Sidef::Types::Array::Array {
 
         for my $i (0 .. $#vars) {
             if (exists $values[$i]) {
+                ref($vars[$i]) eq 'REF' || return;
                 ${$vars[$i]} = $values[$i];
             }
         }
@@ -1820,6 +1821,7 @@ package Sidef::Types::Array::Array {
         $self;
     }
 
+    *add    = \&push;
     *append = \&push;
 
     sub unshift {
@@ -1901,8 +1903,7 @@ package Sidef::Types::Array::Array {
         my ($self, $obj) = @_;
 
         foreach my $i (0 .. $#$self) {
-            my $item = $self->[$i];
-            if ($item eq $obj) {
+            if ($self->[$i] eq $obj) {
                 CORE::splice(@$self, $i, 1);
                 return (Sidef::Types::Bool::Bool::TRUE);
             }
@@ -1917,8 +1918,7 @@ package Sidef::Types::Array::Array {
         my ($self, $obj) = @_;
 
         for (my $i = $#$self ; $i >= 0 ; $i--) {
-            my $item = $self->[$i];
-            if ($item eq $obj) {
+            if ($self->[$i] eq $obj) {
                 CORE::splice(@$self, $i, 1);
                 return (Sidef::Types::Bool::Bool::TRUE);
             }
@@ -1932,10 +1932,9 @@ package Sidef::Types::Array::Array {
     sub delete {
         my ($self, $obj) = @_;
 
-        for (my $i = 0 ; $i <= $#$self ; $i++) {
-            my $item = $self->[$i];
-            if ($item eq $obj) {
-                CORE::splice(@$self, $i--, 1);
+        for (my $i = $#$self ; $i >= 0 ; --$i) {
+            if ($self->[$i] eq $obj) {
+                CORE::splice(@$self, $i, 1);
             }
         }
 
@@ -1948,8 +1947,9 @@ package Sidef::Types::Array::Array {
         my ($self, $code) = @_;
 
         for (my $i = 0 ; $i <= $#$self ; $i++) {
-            $code->run($self->[$i])
-              && CORE::splice(@$self, $i--, 1);
+            if ($code->run($self->[$i])) {
+                CORE::splice(@$self, $i--, 1);
+            }
         }
 
         $self;
@@ -1961,11 +1961,10 @@ package Sidef::Types::Array::Array {
         my ($self, $code) = @_;
 
         foreach my $i (0 .. $#$self) {
-            my $item = $self->[$i];
-            $code->run($item) && do {
+            if ($code->run($self->[$i])) {
                 CORE::splice(@$self, $i, 1);
                 return (Sidef::Types::Bool::Bool::TRUE);
-            };
+            }
         }
 
         (Sidef::Types::Bool::Bool::FALSE);
@@ -1978,10 +1977,10 @@ package Sidef::Types::Array::Array {
 
         for (my $i = $#$self ; $i >= 0 ; --$i) {
             my $item = $self->[$i];
-            $code->run($item) && do {
+            if ($code->run($item)) {
                 CORE::splice(@$self, $i, 1);
                 return (Sidef::Types::Bool::Bool::TRUE);
-              }
+            }
         }
 
         (Sidef::Types::Bool::Bool::FALSE);

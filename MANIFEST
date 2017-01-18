@@ -187,7 +187,7 @@ scripts/Games/forest_fire.sf
 scripts/Games/forest_fire_old.sf
 scripts/Games/guess_the_number.sf
 scripts/Games/guess_the_number_with_feedback.sf
-scripts/Games/guess_the_number_with_feedback__player_.sf
+scripts/Games/guess_the_number_with_feedback_player.sf
 scripts/Games/iq_puzzle.sf
 scripts/Games/pig_the_dice_game_player.sf
 scripts/Games/rock-paper-scissors.sf
@@ -261,6 +261,7 @@ scripts/pythagorean_means.sf
 scripts/rejection_sampling.sf
 scripts/reverse_the_gender_of_a_string.sf
 scripts/RosettaCode/9_billion_names.sf
+scripts/RosettaCode/A_star_algorithm.sf
 scripts/RosettaCode/abc_problem.sf
 scripts/RosettaCode/almost_prime.sf
 scripts/RosettaCode/angle_difference_between_two_bearings.sf

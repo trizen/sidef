@@ -18,7 +18,7 @@ class new(diacritics            = true,
 
     # Numbers => text
     static DIGITS = Hash();
-    DIGITS{0..19} = %w(
+    DIGITS{@|0..19} = %w(
       zero unu doi trei patru cinci șase șapte opt nouă zece
       unsprezece
       doisprezece
@@ -32,12 +32,12 @@ class new(diacritics            = true,
     )...;
 
     # Text => numbers
-    static WORDS = Hash.new;
-    WORDS{DIGITS.values.map {|v|_remove_diacritics(v)}} = DIGITS.keys.map{.to_num}...;
-    WORDS{<o un doua sai>} = (1, 1, 2, 6);
+    static WORDS = Hash()
+    WORDS{@|DIGITS.values.map {|v|_remove_diacritics(v)}} = DIGITS.keys.map{.to_num}...
+    WORDS{@|<o un doua sai>} = (1, 1, 2, 6)
 
     # Colocvial
-    WORDS{<unspe doispe treispe paispe cinspe cinsprezece saispe saptespe saptuspe optspe nouaspe>} =
+    WORDS{@|<unspe doispe treispe paispe cinspe cinsprezece saispe saptespe saptuspe optspe nouaspe>} =
     (11, 12, 13, 14, 15, 15, 16, 17, 17, 18, 19);
 
     # This array contains number greater than 1000 and it's used to convert numbers into text
@@ -56,17 +56,18 @@ class new(diacritics            = true,
                     [10**27, 'cvadriliard', 'cvadriliarde', false],
                     [Math.inf,  'inifinit',      'infinit', false],
                 ].map { |v|
-                     var h = Hash.new;
-                     h{%w(num sg pl fem)} = v...;
-                     h;
+                     var h = Hash()
+                     h{@|<num sg pl fem>} = v...
+                     h
                 }
     );
 
     # This hash is a reversed version of the above array and it's used to convert text into numbers
-    static BIGWORDS = Hash.new;
+    static BIGWORDS = Hash()
+
     BIGNUMS.each { |x|
         BIGWORDS{x{:sg},x{:pl}} = (x{:num}, x{:num});
-    };
+    }
 
     # Change 'suta' to 'sută'
     BIGNUMS[0]{:sg} = 'sută';

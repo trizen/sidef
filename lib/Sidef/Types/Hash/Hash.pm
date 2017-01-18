@@ -148,6 +148,8 @@ package Sidef::Types::Hash::Hash {
           : (delete @{$self}{@keys});
     }
 
+    *remove = \&delete;
+
     sub map_val {
         my ($self, $code) = @_;
 

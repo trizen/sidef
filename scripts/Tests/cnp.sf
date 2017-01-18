@@ -113,7 +113,7 @@ var months = %w(
   Decembrie
 );
 
-(var days = Hash.new){months} = (
+(var days = Hash()){months...} = (
   31,
   29,
   31,

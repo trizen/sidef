@@ -9,8 +9,8 @@ func align(s, t) {
     t.chars!.prepend!('^')
 
     var A = []
-    for i in ^s { A[i][0]{<d s t>} = (i, s.ft(1, i).join, '~' * i) }
-    for i in ^t { A[0][i]{<d s t>} = (i, '-' * i, t.ft(1, i).join) }
+    for i in ^s { A[i][0]{@|<d s t>} = (i, s.ft(1, i).join, '~' * i) }
+    for i in ^t { A[0][i]{@|<d s t>} = (i, '-' * i, t.ft(1, i).join) }
 
     s.end.times { |i|
       t.end.times { |j|
@@ -18,14 +18,14 @@ func align(s, t) {
           A[i][j]{:d} = 1+(
             var min = Math.min(A[i-1][j]{:d}, A[i][j-1]{:d}, A[i-1][j-1]{:d})
           )
-          A[i][j]{<s t>} = @|(A[i-1][j]{:d} == min
+          A[i][j]{@|<s t>} = @|(A[i-1][j]{:d} == min
               ? [A[i-1][j]{:s}+s[i], A[i-1][j]{:t}+'-']
               : (A[i][j-1]{:d} == min
               ? [A[i][j-1]{:s}+'-', A[i][j-1]{:t}+t[j]]
               : [A[i-1][j-1]{:s}+s[i], A[i-1][j-1]{:t}+t[j]]))
         }
         else {
-          A[i][j]{<d s t>} = (
+          A[i][j]{@|<d s t>} = (
               A[i-1][j-1]{:d},
               A[i-1][j-1]{:s}+s[i],
               A[i-1][j-1]{:t}+t[j],
@@ -33,7 +33,7 @@ func align(s, t) {
         }
       }
     }
-    return [A[-1][-1]{<s t>}]
+    return [A[-1][-1]{@|<s t>}]
 }
 
 say (var r = align("rosettacode", "raisethysword"))

@@ -4,7 +4,7 @@
 ## http://rosettacode.org/wiki/Top_rank_per_group
 #
 
-var data = <<'EOF'.lines.map{ (var h = Hash.new){<name id salary dept>} = .split(',')...; h }
+var data = <<'EOF'.lines.map{ (var h = Hash()){@|<name id salary dept>} = .split(',')...; h }
 Tyler Bennett,E10297,32000,D101
 John Rappl,E21437,47000,D050
 George Woltman,E00127,53500,D101
@@ -29,8 +29,8 @@ data.map {|h| h{:dept} }.uniq.sort.each { |d|
     n.times {
         es || break;
         var e = es.shift;
-        printf("%-15s | %-6s | %5d\n", e{<name id salary>});
-        names[-1] << e{<name id salary>};
+        printf("%-15s | %-6s | %5d\n", e{@|<name id salary>});
+        names[-1] << e{@|<name id salary>}
     }
     names << [];
     print "\n";
