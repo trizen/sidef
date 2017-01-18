@@ -75,55 +75,6 @@ package Sidef::Object::Object {
         !CORE::int($obj1 cmp $obj2);
       };
 
-    # Alternative way for comparing cyclic references
-    # (quite slow -- we don't use it)
-#<<<
-    #~ sub __eq__ {
-        #~ my %addr;
-
-        #~ my $sub = sub {
-            #~ my ($obj1, $obj2) = @_;
-
-            #~ my $refaddr1 = Scalar::Util::refaddr($obj1);
-            #~ my $refaddr2 = Scalar::Util::refaddr($obj2);
-
-            #~ if ($refaddr1 > $refaddr2) {
-                #~ ($refaddr1, $refaddr2) = ($refaddr2, $refaddr1);
-            #~ }
-
-            #~ (   $obj1->SUPER::isa(CORE::ref($obj2) || return (Sidef::Types::Bool::Bool::FALSE))
-             #~ || $obj2->SUPER::isa(CORE::ref($obj1) || return (Sidef::Types::Bool::Bool::FALSE)))
-              #~ || return (Sidef::Types::Bool::Bool::FALSE);
-
-            #~ return Sidef::Types::Bool::Bool::TRUE
-              #~ if ($refaddr1 == $refaddr2);
-
-            #~ if (defined(my $sub = $obj1->can('=='))) {
-
-                #~ my $key = join(' ', $refaddr1, $refaddr2);
-
-                #~ exists($addr{$key})
-                  #~ && return $addr{$key};
-
-                #~ my $bool = 1;
-                #~ my $bool_obj = bless \$bool, 'Sidef::Types::Bool::Bool';
-
-                #~ $addr{$key} = $bool_obj;
-                #~ $bool = $sub->($obj1, $obj2);
-                #~ return $bool_obj;
-            #~ }
-
-            #~ ($obj1 cmp $obj2)->is_zero;
-        #~ };
-
-        #~ eval 'use overload "eq" => $sub;';
-        #~ my $result = $sub->(@_);
-        #~ eval 'use overload "eq" => \&__eq__;';
-
-        #~ $result;
-    #~ }
-#>>>
-
     sub new {
         bless {}, __PACKAGE__;
     }
