@@ -379,14 +379,6 @@ Return the
 
 =cut
 
-=head2 dump
-
-Array.dump() -> I<Obj>
-
-Return the
-
-=cut
-
 =head2 each_cons
 
 Array.each_cons() -> I<Obj>
@@ -1103,6 +1095,8 @@ Array.to_s() -> I<Obj>
 
 Return the
 
+Aliases: I<dump>
+
 =cut
 
 =head2 uniq
@@ -1165,7 +1159,7 @@ I<Obj> B<«> I<Obj> -> I<Obj>
 
 Return the
 
-Aliases: I<E<lt>E<lt>>, I<push>, I<append>
+Aliases: I<E<lt>E<lt>>, I<add>, I<push>, I<append>
 
 =cut
 

@@ -116,6 +116,8 @@ Hash.delete() -> I<Obj>
 
 Return the
 
+Aliases: I<remove>
+
 =cut
 
 =head2 delete_if
