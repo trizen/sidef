@@ -44,10 +44,7 @@ sub parse_deparse {
     return ($deparsed, \@statements);
 }
 
-my %ignore = (
-              'barnsley_fern.sf'     => 1,
-             );
-
+my %ignore = ();
 my $dir = catdir(updir, 'scripts');
 
 find {

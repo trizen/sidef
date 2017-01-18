@@ -96,9 +96,9 @@ package Sidef::Deparse::Sidef {
         my ($self, @args) = @_;
 
         $Sidef::SPACES += $Sidef::SPACES_INCR;
-        my $code = $self->deparse_generic("{\n" . " " x ($Sidef::SPACES),
-                                          ";\n" . (" " x ($Sidef::SPACES)),
-                                          "\n" .  (" " x ($Sidef::SPACES - $Sidef::SPACES_INCR)) . "}", @args);
+        my $code = $self->deparse_generic("{(\n" . " " x ($Sidef::SPACES),
+                                          ");(\n" . (" " x ($Sidef::SPACES)),
+                                          "\n" . (" " x ($Sidef::SPACES - $Sidef::SPACES_INCR)) . ")}", @args);
 
         $Sidef::SPACES -= $Sidef::SPACES_INCR;
 
