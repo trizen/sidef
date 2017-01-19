@@ -397,10 +397,8 @@ HEADER
             ',',
             grep { $_ ne '' } map {
                 (ref($_) eq 'Sidef::Types::String::String' or ref($_) eq 'Sidef::Types::Number::Number')
-                  ? $self->_dump_string($_->get_value)
-                  : ref($_) ? ('(map { ref($_) eq "Sidef::Types::String::String" ? $$_ '
-                               . ': do {state$sub;$sub=UNIVERSAL::can($_, "dump"); '
-                               . 'defined($sub) ? $sub->($_) : "$_" } } '
+                  ? $self->_dump_string("$_")
+                  : ref($_) ?    ('(map { ref($_) eq "Sidef::Types::String::String" ? $$_ : "$_" }'
                                . ($self->deparse_expr(ref($_) eq 'HASH' ? $_ : {self => $_})) . ')')
                   : qq{"\Q$_\E"}
               } @{$array}
