@@ -462,9 +462,9 @@ EOT
             }
         }
 
-        # Remove 'var' declarations (if any)
+        # Replace top-level variables and constants with globals
         if (not defined($args{r}) and not defined($args{R})) {
-            $line =~ s/^\h*var\b/global/;
+            $line =~ s/^\h*(?:var|define|const|static)\b/global/;
         }
 
         $vars          = $copy_hash->($sidef->{parser}{vars});
