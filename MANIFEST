@@ -847,6 +847,7 @@ scripts/Tests/token_recursive.sf
 scripts/Tests/top_rank_per_group.sf
 scripts/Tests/topological_sort.sf
 scripts/Tests/triangle_path.sf
+scripts/Tests/tribonacci_closed_form.sf
 scripts/Tests/trizen_s_pair_numbers.sf
 scripts/Tests/two_dimensional_array.sf
 scripts/Tests/type_comparisons.sf
