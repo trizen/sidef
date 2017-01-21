@@ -1,0 +1,16 @@
+#!/usr/bin/ruby
+
+module Trizen {
+
+    var private = 42
+
+    func foo {
+        1 + private
+    }
+}
+
+assert_eq(Trizen::foo(), 43)
+Trizen::private = 99
+assert_eq(Trizen::foo(), 100)
+
+say "** Test passed!"

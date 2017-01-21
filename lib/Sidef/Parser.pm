@@ -644,22 +644,26 @@ package Sidef::Parser {
         while (   /\G(?<type>$self->{var_name_re}\h+$self->{var_name_re})\h*/goc
                || /\G([*:]?$self->{var_name_re})\h*/goc
                || (defined($end_delim) && /\G(?=[({])/)) {
-            push @vars, $1;
+
+            my $declaration = $1;
 
             if ($opt{with_vals} && defined($end_delim)) {
 
-                # Add the variables into the symbol table
-                my ($name, $class_name) = $self->get_name_and_class((split(' ', $vars[-1]))[-1]);
+                # Add the variable into the symbol table
+                if (defined $declaration) {
 
-                undef $classes{$class_name};
-                unshift @{$self->{vars}{$class_name}},
-                  {
-                    obj   => '',
-                    name  => $name,
-                    count => 0,
-                    type  => $opt{type},
-                    line  => $self->{line},
-                  };
+                    my ($name, $class_name) = $self->get_name_and_class((split(' ', $declaration))[-1]);
+
+                    undef $classes{$class_name};
+                    unshift @{$self->{vars}{$class_name}},
+                      {
+                        obj   => '',
+                        name  => $name,
+                        count => 0,
+                        type  => $opt{type},
+                        line  => $self->{line},
+                      };
+                }
 
                 if (/\G<<?\h*/gc) {
                     my ($var) = /\G($self->{var_name_re})\h*/goc;
@@ -668,26 +672,28 @@ package Sidef::Parser {
                                                pos   => pos($_),
                                                error => 'expected a subset name',
                                               );
-                    $vars[-1] .= " < $var ";
+                    $declaration .= " < $var ";
                 }
 
                 if (/\G(?=\{)/) {
                     my $pos = pos($_);
                     $self->parse_block(code => $opt{code}, topic_var => 1);
-                    $vars[-1] .= substr($_, $pos, pos($_) - $pos);
+                    $declaration .= substr($_, $pos, pos($_) - $pos);
                 }
                 elsif (/\G(?=\()/) {
                     my $pos = pos($_);
                     $self->parse_arg(code => $opt{code});
-                    $vars[-1] .= substr($_, $pos, pos($_) - $pos);
+                    $declaration .= substr($_, $pos, pos($_) - $pos);
                 }
 
                 if (/$self->{var_init_sep_re}/goc) {
                     my $pos = pos($_);
                     $self->parse_obj(code => $opt{code}, multiline => 1);
-                    $vars[-1] .= '=' . substr($_, $pos, pos($_) - $pos);
+                    $declaration .= '=' . substr($_, $pos, pos($_) - $pos);
                 }
             }
+
+            push @vars, $declaration;
 
             (defined($end_delim) && /\G\h*,\h*/gc) || last;
             $self->parse_whitespace(code => $opt{code});
