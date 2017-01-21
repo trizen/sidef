@@ -753,28 +753,27 @@ package Sidef::Parser {
                 $ref_type = $obj;
             }
 
-            my $class_name;
-            ($name, $class_name) = $self->get_name_and_class($name);
+            my ($var_name, $class_name) = $self->get_name_and_class($name);
 
-            if (exists($self->{keywords}{$name}) or exists($self->{built_in_classes}{$name})) {
+            if (exists($self->{keywords}{$var_name}) or exists($self->{built_in_classes}{$var_name})) {
                 $self->fatal_error(
                                    code  => $_,
                                    pos   => $-[2],
-                                   error => "'$name' is either a keyword or a predefined variable!",
+                                   error => "'$var_name' is either a keyword or a predefined variable!",
                                   );
             }
 
             my ($subset, $subset_blocks);
             if (defined($end_delim) and m{\G<<?\h*}gc) {
-                my ($name) = /\G($self->{var_name_re})/goc;
+                my ($subset_name) = /\G($self->{var_name_re})/goc;
 
-                $name // $self->fatal_error(
-                                            code  => $_,
-                                            pos   => pos($_),
-                                            error => "expected the name of the subset",
-                                           );
+                $subset_name // $self->fatal_error(
+                                                   code  => $_,
+                                                   pos   => pos($_),
+                                                   error => "expected the name of the subset",
+                                                  );
 
-                my $code = $name;
+                my $code = $subset_name;
                 my $obj = $self->parse_expr(code => \$code);
 
                 (defined($obj) and ref($obj) ne 'HASH')
@@ -814,7 +813,7 @@ package Sidef::Parser {
 
             my $obj = bless(
                             {
-                             name => $name,
+                             name => $var_name,
                              type => $opt{type},
                              (defined($ref_type) ? (ref_type => $ref_type) : ()),
                              (defined($subset)   ? (subset   => $subset)   : ()),
@@ -830,11 +829,11 @@ package Sidef::Parser {
                             'Sidef::Variable::Variable'
                            );
 
-            if (!$opt{private}) {
+            if (!$opt{private} and $var_name ne '') {
                 unshift @{$self->{vars}{$class_name}},
                   {
                     obj   => $obj,
-                    name  => $name,
+                    name  => $var_name,
                     count => 0,
                     type  => $opt{type},
                     line  => $self->{line},
@@ -844,13 +843,13 @@ package Sidef::Parser {
             push @var_objs, $obj;
             (defined($end_delim) && /\G\h*,\h*/gc) || last;
 
-            #~ if ($obj->{slurpy}) {
-            #~ $self->fatal_error(
-            #~ error => "can't declare more parameters after a slurpy parameter",
-            #~ code => $_,
-            #~ pos => pos($_),
-            #~ )
-            #~ }
+            if ($opt{params} and $obj->{slurpy}) {
+                $self->fatal_error(
+                                   error => "can't declare more parameters after a slurpy parameter",
+                                   code  => $_,
+                                   pos   => pos($_),
+                                  );
+            }
 
             $self->parse_whitespace(code => $opt{code});
         }
@@ -1143,7 +1142,11 @@ package Sidef::Parser {
             # Declaration of constants and static variables
             if (/\G(define|const|static|global)\b\h*/gc) {
                 my $type = $1;
-                my $vars = $self->parse_init_vars(code => $opt{code}, type => $type, private => 1);
+                my $vars = $self->parse_init_vars(
+                                                  code    => $opt{code},
+                                                  type    => $type,
+                                                  private => 1,
+                                                 );
 
                 foreach my $var (@{$vars}) {
                     my $name = $var->{name};
@@ -1267,10 +1270,9 @@ package Sidef::Parser {
 
                 my $vars =
                   $self->parse_init_vars(
-                                         code      => $opt{code},
-                                         with_vals => 1,
-                                         private   => 1,
-                                         type      => 'var',
+                                         code    => $opt{code},
+                                         type    => 'var',
+                                         private => 1,
                                         );
 
                 $struct->{vars} = $vars;
@@ -1357,10 +1359,9 @@ package Sidef::Parser {
             if (/\Genum\b\h*/gc) {
                 my $vars =
                   $self->parse_init_vars(
-                                         code      => $opt{code},
-                                         with_vals => 1,
-                                         private   => 1,
-                                         type      => 'var',
+                                         code    => $opt{code},
+                                         type    => 'var',
+                                         private => 1,
                                         );
 
                 @{$vars}
@@ -1516,7 +1517,7 @@ package Sidef::Parser {
                     my $var_names =
                       $self->parse_init_vars(
                                              code         => $opt{code},
-                                             with_vals    => 1,
+                                             params       => 1,
                                              private      => 1,
                                              type         => 'has',
                                              ignore_delim => {
@@ -2379,8 +2380,11 @@ package Sidef::Parser {
             my $var_objs = [];
             if (/\G(?=\|)/) {
                 $has_vars = 1;
-                $var_objs = $self->parse_init_vars(code => $opt{code},
-                                                   type => 'var',);
+                $var_objs = $self->parse_init_vars(
+                                                   params => 1,
+                                                   code   => $opt{code},
+                                                   type   => 'var',
+                                                  );
             }
 
             # Special '_' variable
