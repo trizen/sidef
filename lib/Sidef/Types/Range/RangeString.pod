@@ -104,6 +104,8 @@ RangeString.rand() -> I<Obj>
 
 Return the
 
+Aliases: I<sample>
+
 =cut
 
 =head2 to

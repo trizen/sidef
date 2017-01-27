@@ -127,6 +127,8 @@ package Sidef::Types::Range::RangeString {
           : $self->SUPER::rand->chr;
     }
 
+    *sample = \&rand;
+
     sub dump {
         my ($self) = @_;
         Sidef::Types::String::String->new("$self");
