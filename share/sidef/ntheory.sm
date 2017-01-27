@@ -1,12 +1,12 @@
 
 #
-## OO interface to "ntheory" Perl module
+## OO interface to the "ntheory" Perl module
 #
 
-require 'ntheory';
+require('ntheory')
 
 class new {
     method AUTOLOAD(_, meth, *args) {
-        %S'ntheory'.(meth)(args...);
+        %S<ntheory>.(meth)(args...)
     }
 }

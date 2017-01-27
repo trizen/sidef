@@ -3,8 +3,12 @@
 ## Memoize functions and methods
 #
 
-require('Memoize');
+require('Memoize')
 
 func memoize(Block f) {
-    f{:code} = %S'Memoize'.memoize(f{:code});
+    f{:code} = %S<Memoize>.memoize(f{:code})
+}
+
+func unmemoize(Block f) {
+    f{:code} = %S<Memoize>.unmemoize(f{:code})
 }
