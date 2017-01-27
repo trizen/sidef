@@ -104,7 +104,7 @@ package Sidef::Types::Range::RangeString {
 
         Sidef::Types::Block::Block->new(
             code => sub {
-                ($asc ? $i->le($to) : $i->ge($to)) || return;
+                ($asc ? $i->le($to) : $i->ge($to)) || return undef;
                 my $value = $i;
                 $i = $i->add($step);
                 $value->chr;

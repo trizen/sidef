@@ -48,7 +48,7 @@ package Sidef::Object::Lazy {
         Sidef::Types::Block::Block->new(
             code => sub {
               ITEM: {
-                    my $item = $iter->() // return;
+                    my $item = $iter->() // return undef;
                     my @arg = ($item);
                     foreach my $call (@{$self->{calls}}) {
                         @arg = $call->(@arg);

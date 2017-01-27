@@ -1163,6 +1163,8 @@ HEADER
             $code = 'continue';
         }
         elsif ($ref eq 'Sidef::Types::Block::Return') {
+
+            # This is no longer supported
             if (not exists $expr->{call}) {
 
                 if (exists $self->{function}) {

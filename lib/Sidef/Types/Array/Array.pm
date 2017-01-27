@@ -109,7 +109,7 @@ package Sidef::Types::Array::Array {
         my ($self, $operator) = @_;
 
         $operator = "$operator" if ref($operator);
-        (my $end = $#$self) >= 0 || return;
+        (my $end = $#$self) >= 0 || return undef;
 
         my $x = $self->[0];
         foreach my $i (1 .. $end) {
@@ -562,7 +562,7 @@ package Sidef::Types::Array::Array {
     sub _min_max {
         my ($self, $value) = @_;
 
-        @$self || return;
+        @$self || return undef;
 
         my $item = $self->[0];
         foreach my $i (1 .. $#$self) {
@@ -639,7 +639,7 @@ package Sidef::Types::Array::Array {
     sub _min_max_by {
         my ($self, $code, $value) = @_;
 
-        @$self || return;
+        @$self || return undef;
 
         my @pairs = map { [$_, scalar $code->run($_)] } @$self;
         my $item = $pairs[0];
@@ -764,10 +764,10 @@ package Sidef::Types::Array::Array {
     sub dig {
         my ($self, $key, @keys) = @_;
 
-        my $value = $self->fetch($key) // return;
+        my $value = $self->fetch($key) // return undef;
 
         foreach my $key (@keys) {
-            $value = $value->fetch($key) // return;
+            $value = $value->fetch($key) // return undef;
         }
 
         $value;
@@ -1096,7 +1096,7 @@ package Sidef::Types::Array::Array {
         foreach my $val (@$self) {
             return $val if $code->run($val);
         }
-        return;
+        return undef;
     }
 
     *find = \&first_by;
@@ -1106,7 +1106,7 @@ package Sidef::Types::Array::Array {
         for (my $i = $#$self ; $i >= 0 ; --$i) {
             return $self->[$i] if $code->run($self->[$i]);
         }
-        return;
+        return undef;
     }
 
     sub any {
@@ -1140,7 +1140,7 @@ package Sidef::Types::Array::Array {
 
         for my $i (0 .. $#vars) {
             if (exists $values[$i]) {
-                ref($vars[$i]) eq 'REF' || return;
+                ref($vars[$i]) eq 'REF' || return undef;
                 ${$vars[$i]} = $values[$i];
             }
         }
@@ -1300,7 +1300,7 @@ package Sidef::Types::Array::Array {
         my ($self, $obj, $initial) = @_;
 
         if (ref($obj) eq 'Sidef::Types::Block::Block') {
-            (my $end = $#$self) >= 0 || return;
+            (my $end = $#$self) >= 0 || return undef;
             my ($beg, $x) = defined($initial) ? (0, $initial) : (1, $self->[0]);
             foreach my $i ($beg .. $end) {
                 $x = $obj->run($x, $self->[$i]);
@@ -1682,7 +1682,7 @@ package Sidef::Types::Array::Array {
             return $self->new([CORE::splice(@$self, 0, $num,)]);
         }
 
-        @$self || return;
+        @$self || return undef;
         shift(@$self);
     }
 
@@ -1698,7 +1698,7 @@ package Sidef::Types::Array::Array {
             return $self->new([CORE::splice(@$self, $num)]);
         }
 
-        @$self || return;
+        @$self || return undef;
         pop(@$self);
     }
 
@@ -1707,7 +1707,7 @@ package Sidef::Types::Array::Array {
 
     sub pop_rand {
         my ($self) = @_;
-        $#$self > -1 || return;
+        $#$self > -1 || return undef;
         CORE::splice(@$self, CORE::rand(scalar @$self), 1);
     }
 
@@ -1804,6 +1804,7 @@ package Sidef::Types::Array::Array {
 
         if (defined($code)) {
             my $perm;
+
             while (1) {
                 $perm = $self->new([@$self[@idx]]);
 
@@ -1822,7 +1823,7 @@ package Sidef::Types::Array::Array {
                 $code->run($perm);
             }
 
-            return;
+            return $self;    # should not reach here
         }
 
         my @array;

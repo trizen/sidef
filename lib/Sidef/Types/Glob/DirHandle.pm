@@ -52,7 +52,7 @@ package Sidef::Types::Glob::DirHandle {
         my $basedir = ($self->{basedir} //= "$self->{dir}");
 
         {
-            my $file = CORE::readdir($self->{dh}) // return;
+            my $file = CORE::readdir($self->{dh}) // return undef;
 
             if ($file eq '.' or $file eq '..') {
                 redo;
@@ -72,7 +72,7 @@ package Sidef::Types::Glob::DirHandle {
                    );
         }
 
-        return;
+        return undef;
     }
 
     *read = \&get_file;
@@ -126,7 +126,7 @@ package Sidef::Types::Glob::DirHandle {
         state $x = require Encode;
         Sidef::Types::Block::Block->new(
             code => sub {
-                Sidef::Types::String::String->new(Encode::decode_utf8(CORE::readdir($self->{dh}) // return));
+                Sidef::Types::String::String->new(Encode::decode_utf8(CORE::readdir($self->{dh}) // return undef));
             }
         );
     }

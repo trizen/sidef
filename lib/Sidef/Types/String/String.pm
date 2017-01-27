@@ -46,7 +46,7 @@ package Sidef::Types::String::String {
 
     sub div {
         my ($self, $num) = @_;
-        (my $strlen = int(length($$self) / CORE::int($num))) < 1 and return;
+        (my $strlen = CORE::int(length($$self) / CORE::int($num))) < 1 and return $self->chars;
         Sidef::Types::Array::Array->new([map { bless(\$_, __PACKAGE__) } unpack "(a$strlen)*", $$self]);
     }
 
@@ -681,7 +681,7 @@ package Sidef::Types::String::String {
 
         Sidef::Types::Block::Block->new(
             code => sub {
-                ++$i <= $end or return;
+                ++$i <= $end or return undef;
                 bless \(my $chr = $chars[$i]), __PACKAGE__;
             }
         );

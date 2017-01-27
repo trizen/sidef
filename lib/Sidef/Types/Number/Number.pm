@@ -1879,7 +1879,7 @@ package Sidef::Types::Number::Number {
             return (ONE);
         }
         elsif (ref($y) eq 'Sidef::Types::Number::Nan') {
-            return;
+            return undef;
         }
 
         _valid(\$y);

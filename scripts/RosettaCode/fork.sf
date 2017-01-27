@@ -5,6 +5,6 @@
 #
 
 var x = 42;
-var child = { x += 1 }.fork;
+var child = { x += 1 }.ffork;
 say child.wait; # prints: 43
 say x;          # but x is still 42

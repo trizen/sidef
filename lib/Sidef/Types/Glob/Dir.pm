@@ -182,7 +182,7 @@ package Sidef::Types::Glob::Dir {
     sub is_empty {
         ref($_[0]) || shift(@_);
         my ($self) = @_;
-        CORE::opendir(my $dir_h, "$self") || return;
+        CORE::opendir(my $dir_h, "$self") || return undef;
         while (defined(my $file = CORE::readdir $dir_h)) {
             next if $file eq '.' or $file eq '..';
             return (Sidef::Types::Bool::Bool::FALSE);

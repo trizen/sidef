@@ -14,7 +14,7 @@ package Sidef::Types::Block::Fork {
         waitpid($self->{pid}, 0);
 
         # Return when the fork doesn't hold a file-handle
-        exists($self->{fh}) or return;
+        exists($self->{fh}) or return undef;
 
         # Rewind at the beginning
         seek($self->{fh}, 0, 0);

@@ -86,7 +86,7 @@ package Sidef::Types::Glob::FileHandle {
         my ($self) = @_;
         Sidef::Types::Block::Block->new(
             code => sub {
-                my $line = CORE::readline($self->{fh}) // return;
+                my $line = CORE::readline($self->{fh}) // return undef;
                 chomp($line);
                 Sidef::Types::String::String->new($line);
             }
@@ -152,7 +152,7 @@ package Sidef::Types::Glob::FileHandle {
             return Sidef::Types::Bool::Bool::TRUE;
         }
 
-        $line // return;
+        $line // return undef;
         chomp($line);
         Sidef::Types::String::String->new($line);
     }
@@ -172,7 +172,7 @@ package Sidef::Types::Glob::FileHandle {
             return Sidef::Types::Bool::Bool::TRUE;
         }
 
-        Sidef::Types::String::String->new($char // return);
+        Sidef::Types::String::String->new($char // return undef);
     }
 
     *char = \&read_char;

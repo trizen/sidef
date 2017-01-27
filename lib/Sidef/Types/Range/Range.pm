@@ -99,7 +99,7 @@ package Sidef::Types::Range::Range {
             return Sidef::Types::Array::Array->new(\@array);
         }
 
-        $iter->();
+        $iter->() // undef;
     }
 
     sub first_by {
@@ -111,7 +111,7 @@ package Sidef::Types::Range::Range {
             return $obj if $code->run($obj);
         }
 
-        return;
+        undef;
     }
 
     sub last {

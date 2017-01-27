@@ -49,7 +49,7 @@ package Sidef::Types::Glob::File {
     sub md5 {
         ref($_[0]) || shift(@_);
         state $x = require Digest::MD5;
-        open my $fh, '<:raw', "$_[0]" or return;
+        open my $fh, '<:raw', "$_[0]" or return undef;
         my $o = Digest::MD5->new;
         $o->addfile($fh);
         Sidef::Types::String::String->new(scalar $o->hexdigest);
@@ -58,7 +58,7 @@ package Sidef::Types::Glob::File {
     sub sha1 {
         ref($_[0]) || shift(@_);
         state $x = require Digest::SHA;
-        open my $fh, '<:raw', "$_[0]" or return;
+        open my $fh, '<:raw', "$_[0]" or return undef;
         my $o = Digest::SHA->new(1);
         $o->addfile($fh);
         Sidef::Types::String::String->new(scalar $o->hexdigest);
@@ -67,7 +67,7 @@ package Sidef::Types::Glob::File {
     sub sha256 {
         ref($_[0]) || shift(@_);
         state $x = require Digest::SHA;
-        open my $fh, '<:raw', "$_[0]" or return;
+        open my $fh, '<:raw', "$_[0]" or return undef;
         my $o = Digest::SHA->new(256);
         $o->addfile($fh);
         Sidef::Types::String::String->new(scalar $o->hexdigest);
@@ -76,7 +76,7 @@ package Sidef::Types::Glob::File {
     sub sha512 {
         ref($_[0]) || shift(@_);
         state $x = require Digest::SHA;
-        open my $fh, '<:raw', "$_[0]" or return;
+        open my $fh, '<:raw', "$_[0]" or return undef;
         my $o = Digest::SHA->new(512);
         $o->addfile($fh);
         Sidef::Types::String::String->new(scalar $o->hexdigest);
@@ -368,12 +368,12 @@ package Sidef::Types::Glob::File {
 
         truncate($fh, 0) || do {
             warn "[WARN] Can't truncate file `$self': $!";
-            return;
+            return undef;
         };
 
         seek($fh, 0, 0) || do {
             warn "[WARN] Can't seek the begining of file `$self': $!";
-            return;
+            return undef;
         };
 
         do {
@@ -381,7 +381,7 @@ package Sidef::Types::Glob::File {
             local $\ = q{};
             (print $fh @lines) || do {
                 warn "[WARN] Can't write to file `$self': $!";
-                return;
+                return undef;
             };
             close $fh;
           }
@@ -397,7 +397,7 @@ package Sidef::Types::Glob::File {
 
         open(my $fh, "<:$mode", "$self") || do {
             warn "[WARN] Can't open file `$self' for writing: $!";
-            return;
+            return undef;
         };
 
         local $/;
@@ -412,12 +412,12 @@ package Sidef::Types::Glob::File {
 
         open(my $fh, ">:$mode", "$self") || do {
             warn "[WARN] Can't open file `$self' for writing: $!";
-            return;
+            return undef;
         };
 
         (print $fh "$string") || do {
             warn "[WARN] Can't write to file `$self': $!";
-            return;
+            return undef;
         };
 
         (close $fh)
@@ -433,12 +433,12 @@ package Sidef::Types::Glob::File {
 
         open(my $fh, ">>:$mode", "$self") || do {
             warn "[WARN] Can't open file `$self' for appending: $!";
-            return;
+            return undef;
         };
 
         (print $fh "$string") || do {
             warn "[WARN] Can't append to file `$self': $!";
-            return;
+            return undef;
         };
 
         (close $fh)

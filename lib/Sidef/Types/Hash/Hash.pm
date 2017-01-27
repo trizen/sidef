@@ -69,10 +69,10 @@ package Sidef::Types::Hash::Hash {
     sub dig {
         my ($self, $key, @keys) = @_;
 
-        my $value = $self->fetch($key) // return;
+        my $value = $self->fetch($key) // return undef;
 
         foreach my $key (@keys) {
-            $value = $value->fetch($key) // return;
+            $value = $value->fetch($key) // return undef;
         }
 
         $value;
@@ -327,7 +327,7 @@ package Sidef::Types::Hash::Hash {
 
         my ($key, $value) = each(%$self);
 
-        $key // return;
+        $key // return undef;
         Sidef::Types::Array::Array->new([Sidef::Types::String::String->new($key), $value]);
     }
 

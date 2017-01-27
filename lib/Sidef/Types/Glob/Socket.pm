@@ -42,7 +42,7 @@ package Sidef::Types::Glob::Socket {
 
     sub open {
         my ($self, $domain, $type, $protocol) = @_;
-        CORE::socket(my $sh, $domain, $type, $protocol) || return;
+        CORE::socket(my $sh, $domain, $type, $protocol) || return undef;
         Sidef::Types::Glob::SocketHandle->new($sh);
     }
 
@@ -60,17 +60,17 @@ package Sidef::Types::Glob::Socket {
     #
     sub gethostbyname {
         my ($self, $name) = @_;
-        Sidef::Types::String::String->new(CORE::gethostbyname("$name") // return);
+        Sidef::Types::String::String->new(CORE::gethostbyname("$name") // return undef);
     }
 
     sub gethostbyaddr {
         my ($self, $addr, $addrtype) = @_;
-        Sidef::Types::String::String->new(CORE::gethostbyaddr("$addr", "$addrtype") // return);
+        Sidef::Types::String::String->new(CORE::gethostbyaddr("$addr", "$addrtype") // return undef);
     }
 
     sub gethostent {
         my ($self) = @_;
-        Sidef::Types::String::String->new(CORE::gethostent() // return);
+        Sidef::Types::String::String->new(CORE::gethostent() // return undef);
     }
 
     #
@@ -78,17 +78,17 @@ package Sidef::Types::Glob::Socket {
     #
     sub getnetbyname {
         my ($self, $name) = @_;
-        Sidef::Types::String::String->new(CORE::getnetbyname("$name") // return);
+        Sidef::Types::String::String->new(CORE::getnetbyname("$name") // return undef);
     }
 
     sub getnetbyaddr {
         my ($self, $addr, $addrtype) = @_;
-        Sidef::Types::String::String->new(CORE::getnetbyaddr("$addr", "$addrtype") // return);
+        Sidef::Types::String::String->new(CORE::getnetbyaddr("$addr", "$addrtype") // return undef);
     }
 
     sub getnetent {
         my ($self) = @_;
-        Sidef::Types::String::String->new(CORE::getnetent() // return);
+        Sidef::Types::String::String->new(CORE::getnetent() // return undef);
     }
 
     #
@@ -96,17 +96,17 @@ package Sidef::Types::Glob::Socket {
     #
     sub getservbyname {
         my ($self, $name, $proto) = @_;
-        Sidef::Types::String::String->new(CORE::getservbyname("$name", $proto) // return);
+        Sidef::Types::String::String->new(CORE::getservbyname("$name", $proto) // return undef);
     }
 
     sub getservbyport {
         my ($self, $port, $proto) = @_;
-        Sidef::Types::String::String->new(CORE::getservbyport($port, $proto) // return);
+        Sidef::Types::String::String->new(CORE::getservbyport($port, $proto) // return undef);
     }
 
     sub getservent {
         my ($self) = @_;
-        Sidef::Types::String::String->new(CORE::getservent() // return);
+        Sidef::Types::String::String->new(CORE::getservent() // return undef);
     }
 
     #
@@ -114,17 +114,17 @@ package Sidef::Types::Glob::Socket {
     #
     sub getprotobynumber {
         my ($self, $num) = @_;
-        Sidef::Types::String::String->new(CORE::getprotobynumber(CORE::int($num)) // return);
+        Sidef::Types::String::String->new(CORE::getprotobynumber(CORE::int($num)) // return undef);
     }
 
     sub getprotobyname {
         my ($self, $name) = @_;
-        Sidef::Types::Number::Number->new(CORE::getprotobyname("$name") // (return), 10);
+        Sidef::Types::Number::Number->new(CORE::getprotobyname("$name") // (return undef), 10);
     }
 
     sub getprotoent {
         my ($self) = @_;
-        Sidef::Types::Number::Number->new(CORE::getprotoent() // (return), 10);
+        Sidef::Types::Number::Number->new(CORE::getprotoent() // (return undef), 10);
     }
 
     #

@@ -20,3 +20,13 @@ arr_test->len->to_s->say;
 
 ["zzzz","ioana"][1]->say;
 [[["zzz","trizen","zzz"]]][0][0][1]->say;
+
+#
+## Test `nil` return-values
+#
+
+var a = [4, 8, 10, 12]
+var r = [a.first_by { .is_odd }, a.last_by { .is_odd }]
+
+assert_eq(r.len, 2)
+assert_eq(r, [nil, nil])

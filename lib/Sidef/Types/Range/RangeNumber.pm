@@ -64,7 +64,7 @@ package Sidef::Types::Range::RangeNumber {
 
                 return Sidef::Types::Block::Block->new(
                     code => sub {
-                        --$repetitions >= 0 or return;
+                        --$repetitions >= 0 or return undef;
                         $tmp = $i;
                         $i   = $i->add($step);
                         $tmp;
@@ -84,7 +84,7 @@ package Sidef::Types::Range::RangeNumber {
 
         Sidef::Types::Block::Block->new(
             code => sub {
-                ($asc ? $i->le($to) : $i->ge($to)) || return;
+                ($asc ? $i->le($to) : $i->ge($to)) || return undef;
                 $tmp = $i;
                 $i   = $i->add($step);
                 $tmp;

@@ -23,7 +23,7 @@ package Sidef::Sys::Sys {
 
     sub fork {
         my ($self) = @_;
-        Sidef::Types::Number::Number->new(fork() // return);
+        Sidef::Types::Number::Number->new(fork() // return undef);
     }
 
     sub alarm {
@@ -150,7 +150,7 @@ package Sidef::Sys::Sys {
     sub scanln {
         my ($self, $text) = @_;
         CORE::print $text;
-        Sidef::Types::String::String->new(scalar unpack("A*", scalar(<STDIN>) // return));
+        Sidef::Types::String::String->new(scalar unpack("A*", scalar(<STDIN>) // return undef));
     }
 
     *readln = \&scanln;
@@ -164,11 +164,11 @@ package Sidef::Sys::Sys {
         }
 
         if (defined $type) {
-            chomp(my $input = <STDIN> // return);
+            chomp(my $input = <STDIN> // return undef);
             return $type->new($input);
         }
 
-        chomp(my $input = <STDIN> // return);
+        chomp(my $input = <STDIN> // return undef);
         Sidef::Types::String::String->new($input);
     }
 
@@ -253,7 +253,7 @@ package Sidef::Sys::Sys {
 
     sub __GETPW__ {
         my ($self, $name, $passwd, $uid, $gid, $quota, $comment, $gcos, $dir, $shell) = @_;
-        $name // return;
+        $name // return undef;
         Sidef::Types::Array::Array->new(
                                         Sidef::Types::String::String->new($name),
                                         Sidef::Types::String::String->new($passwd),
@@ -321,7 +321,7 @@ package Sidef::Sys::Sys {
 
     sub __GETHOST__ {
         my ($self, $name, $aliases, $addrtype, $length, @addrs) = @_;
-        $name // return;
+        $name // return undef;
         Sidef::Types::Array::Array->new(
                                         Sidef::Types::String::String->new($name),
                                         Sidef::Types::String::String->new($aliases),
@@ -353,7 +353,7 @@ package Sidef::Sys::Sys {
 
     sub __GETNET__ {
         my ($self, $name, $aliases, $addrtype, $net) = @_;
-        $name // return;
+        $name // return undef;
         Sidef::Types::Array::Array->new(
                                         Sidef::Types::String::String->new($name),
                                         Sidef::Types::String::String->new($aliases),
@@ -384,7 +384,7 @@ package Sidef::Sys::Sys {
 
     sub __GETPROTO__ {
         my ($self, $name, $aliases, $proto) = @_;
-        $name // return;
+        $name // return undef;
         Sidef::Types::Array::Array->new(
                                         Sidef::Types::String::String->new($name),
                                         Sidef::Types::String::String->new($aliases),
@@ -414,7 +414,7 @@ package Sidef::Sys::Sys {
 
     sub __GETSERV__ {
         my ($self, $name, $aliases, $port, $proto) = @_;
-        $name // return;
+        $name // return undef;
         Sidef::Types::Array::Array->new(
                                         Sidef::Types::String::String->new($name),
                                         Sidef::Types::String::String->new($aliases),

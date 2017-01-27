@@ -26,12 +26,12 @@ package Sidef::Types::Glob::SocketHandle {
 
     sub getsockopt {
         my ($self, $level, $optname) = @_;
-        Sidef::Types::String::String->new(CORE::getsockopt($self->{fh}, $level, "$optname") // return);
+        Sidef::Types::String::String->new(CORE::getsockopt($self->{fh}, $level, "$optname") // return undef);
     }
 
     sub getpeername {
         my ($self) = @_;
-        Sidef::Types::String::String->new(CORE::getpeername($self->{fh}) // return);
+        Sidef::Types::String::String->new(CORE::getpeername($self->{fh}) // return undef);
     }
 
     sub getsockname {
@@ -56,7 +56,7 @@ package Sidef::Types::Glob::SocketHandle {
 
     sub accept {
         my ($self) = @_;
-        CORE::accept(my $sh, $self->{fh}) || return;
+        CORE::accept(my $sh, $self->{fh}) || return undef;
         Sidef::Types::Glob::SocketHandle->new($sh);
     }
 
@@ -70,7 +70,7 @@ package Sidef::Types::Glob::SocketHandle {
     sub recv {
         my ($self, $length, $flags) = @_;
         my $content = "";
-        CORE::recv($self->{fh}, $content, CORE::int($length), CORE::int($flags)) // return;
+        CORE::recv($self->{fh}, $content, CORE::int($length), CORE::int($flags)) // return undef;
         Sidef::Types::String::String->new($content);
     }
 
