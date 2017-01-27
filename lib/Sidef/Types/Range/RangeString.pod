@@ -96,7 +96,13 @@ RangeString.pick() -> I<Obj>
 
 Return the
 
-Aliases: I<rand>
+=cut
+
+=head2 rand
+
+RangeString.rand() -> I<Obj>
+
+Return the
 
 =cut
 

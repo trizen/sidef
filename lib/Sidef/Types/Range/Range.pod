@@ -290,7 +290,15 @@ Range.pick() -> I<Obj>
 
 Return the
 
-Aliases: I<rand>
+=cut
+
+=head2 rand
+
+Range.rand() -> I<Obj>
+
+Return the
+
+Aliases: I<sample>
 
 =cut
 

@@ -877,8 +877,6 @@ Array.pick() -> I<Obj>
 
 Return the
 
-Aliases: I<rand>, I<sample>
-
 =cut
 
 =head2 pop
@@ -924,6 +922,16 @@ Aliases: I<unshift>
 Array.prod() -> I<Obj>
 
 Return the
+
+=cut
+
+=head2 rand
+
+Array.rand() -> I<Obj>
+
+Return the
+
+Aliases: I<sample>
 
 =cut
 
