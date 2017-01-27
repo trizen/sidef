@@ -90,12 +90,10 @@ package Sidef::Types::Range::Range {
         my $iter = $self->iter->{code};
 
         if (defined $num) {
-            $num = CORE::int($num);
 
             my @array;
-
-            foreach my $i (1 .. $num) {
-                push @array, $iter->();
+            foreach my $i (1 .. CORE::int($num)) {
+                push @array, $iter->() // last;
             }
 
             return Sidef::Types::Array::Array->new(\@array);
