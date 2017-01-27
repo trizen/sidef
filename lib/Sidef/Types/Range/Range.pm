@@ -81,13 +81,27 @@ package Sidef::Types::Range::Range {
     *flip = \&reverse;
 
     sub first {
-        my ($self, $code) = @_;
+        my ($self, $num) = @_;
 
-        if (defined($code)) {
-            return $self->first_by($code);
+        if (ref($num) eq 'Sidef::Types::Block::Block') {
+            return $self->first_by($num);
         }
 
-        $self->iter->{code}->();
+        my $iter = $self->iter->{code};
+
+        if (defined $num) {
+            $num = CORE::int($num);
+
+            my @array;
+
+            foreach my $i (1 .. $num) {
+                push @array, $iter->();
+            }
+
+            return Sidef::Types::Array::Array->new(\@array);
+        }
+
+        $iter->();
     }
 
     sub first_by {
@@ -103,13 +117,15 @@ package Sidef::Types::Range::Range {
     }
 
     sub last {
-        my ($self, $code) = @_;
+        my ($self, $num) = @_;
 
-        if (defined($code)) {
-            return $self->reverse->first_by($code);
+        if (ref($num) eq 'Sidef::Types::Block::Block') {
+            return $self->reverse->first_by($num);
         }
 
-        $self->reverse->iter->{code}->();
+        defined($num)
+          ? $self->reverse->first($num)->reverse
+          : $self->reverse->first;
     }
 
     sub last_by {
@@ -260,38 +276,70 @@ package Sidef::Types::Range::Range {
         Sidef::Types::String::String->new(CORE::join(' ', $_[0]->to_list));
     }
 
-    sub pick {
+    sub rand {
         my ($self, $n) = @_;
-
-        # Check for "empty" range
-        # TODO: replace it with arithmetic
-        my $is_empty = not defined($self->iter->{code}->());
-
-        if (not defined $n) {
-            $is_empty && return;
-        }
-
-        $is_empty && return Sidef::Types::Array::Array->new([]);
 
         my $from = $self->{from};
         my $to   = $self->{to};
         my $step = $self->{step};
 
-        my $limit = $to->sub($from)->div($step)->inc;
+        my $limit    = $to->sub($from)->div($step)->inc;
+        my $is_empty = $limit->lt(Sidef::Types::Number::Number::ONE);
+
+        if ($is_empty) {
+            return (defined($n) ? Sidef::Types::Array::Array->new([]) : undef);
+        }
 
         if (not defined $n) {
             return $limit->irand->mul($step)->add($from);
         }
 
         my @array;
-        for (1 .. "$n") {
+        for (1 .. CORE::int($n)) {
             push @array, $limit->irand->mul($step)->add($from);
         }
 
         Sidef::Types::Array::Array->new(\@array);
     }
 
-    *rand = \&pick;
+    *sample = \&rand;
+
+    sub pick {
+        my ($self, $n) = @_;
+
+        my $from = $self->{from};
+        my $to   = $self->{to};
+        my $step = $self->{step};
+
+        my $limit    = $to->sub($from)->div($step)->inc;
+        my $is_empty = $limit->lt(Sidef::Types::Number::Number::ONE);
+
+        if ($is_empty) {
+            return (defined($n) ? Sidef::Types::Array::Array->new([]) : undef);
+        }
+
+        if (not defined $n) {
+            return $limit->irand->mul($step)->add($from);
+        }
+
+        my (%seen, @array);
+        my $amount = CORE::int($n);
+        my $total  = CORE::int($limit);
+
+        if ($amount <= 0) {
+            return Sidef::Types::Array::Array->new([]);
+        }
+
+        while (1) {
+            my $rand = $limit->irand->mul($step)->add($from);
+            last if keys(%seen) == $total;
+            next if $seen{$rand}++;
+            push @array, $rand;
+            last if --$amount == 0;
+        }
+
+        Sidef::Types::Array::Array->new(\@array);
+    }
 
     sub count {
         my ($self, $arg) = @_;

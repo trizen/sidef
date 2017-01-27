@@ -1341,19 +1341,49 @@ package Sidef::Types::Array::Array {
 
     *resize_to = \&resize;
 
+    sub pick {
+        my ($self, $amount) = @_;
+
+        if (defined $amount) {
+            $amount = CORE::int($amount);
+
+            my $len = @$self;
+            if ($amount >= $len) {
+                return Sidef::Types::Array::Array->new([List::Util::shuffle(@$self)]);
+            }
+
+            my @result;
+            for (my ($i, $amount_left) = (0, $len) ; $amount > 0 ; ++$i, --$amount_left) {
+                my $rand = CORE::int(CORE::rand($amount_left));
+                if ($rand < $amount) {
+                    push @result, $self->[$i];
+                    $amount--;
+                }
+            }
+
+            return Sidef::Types::Array::Array->new([List::Util::shuffle(@result)]);
+        }
+
+        $self->[CORE::rand(scalar @$self)];
+    }
+
     sub rand {
         my ($self, $amount) = @_;
 
         if (defined $amount) {
             $amount = CORE::int($amount);
-            return @$self
-              ? $self->new([map { $self->[CORE::rand(scalar @$self)] } 1 .. $amount])
-              : Sidef::Types::Array::Array->new([]);
+
+            my $len = @$self;
+            return (
+                    $len > 0
+                    ? Sidef::Types::Array::Array->new([map { $self->[CORE::rand($len)] } 1 .. $amount])
+                    : Sidef::Types::Array::Array->new([])
+                   );
         }
+
         $self->[CORE::rand(scalar @$self)];
     }
 
-    *pick   = \&rand;
     *sample = \&rand;
 
     sub range {

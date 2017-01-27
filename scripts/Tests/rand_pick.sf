@@ -1,0 +1,90 @@
+#!/usr/bin/ruby
+
+#
+## Range.pick()
+#
+
+assert_eq('z'..'x' -> pick(10).len, 0)
+assert_eq('a'..'d' -> pick(15).uniq.len, 4)
+assert_eq('a'..'z' -> pick(26).uniq.len, 26)
+
+assert_eq('b'..'x' -> pick(0), [])
+assert_eq('k'..'q' -> pick(1).len, 1)
+assert_eq('s'..'t' -> pick(-5).len 0)
+
+assert('a'..'z' -> pick ~~ 'a'..'z')
+
+assert_eq(1..20 -> pick(20).uniq.len, 20)
+assert_eq(1..11 -> pick(10).uniq.len, 10)
+assert_eq(1..100 -> by(2).pick(50).uniq.grep{.is_odd}.len, 50)
+assert_eq(1..40 -> by(2).pick(50).len, 20)
+assert_eq(40..1 -> by(2).pick(50).len, 0)
+assert_eq(40..1 -> by(2).pick(5).len, 0)
+assert_eq(1..50 -> pick(100).uniq.len, 50)
+assert_eq(1..50 -> by(3).pick(18).uniq.len, 17)
+assert_eq(1..50 -> by(3).pick(18).grep{ _ % 3 == 0 }.len, 0)
+assert_eq(5..20 -> by(2).pick(20).uniq.grep{.is_odd}.len, 8)
+
+assert_eq(1..11 -> reverse.pick(10).uniq.len, 10)
+assert_eq(1..10 -> by(2).reverse.pick(3).uniq.len, 3)
+assert_eq(1..40 -> by(2).reverse.pick(10).uniq.grep{.is_even}.len, 10)
+assert_eq(5..20 -> by(2).reverse.pick(20).uniq.grep{.is_even}.len, 8)
+assert_eq(5..20 -> by(2).reverse.pick(7).uniq.grep{.is_even}.len, 7)
+
+assert_eq(10..1 -> by(-1).pick(5).uniq.len, 5)
+assert_eq(20..5 -> by(-2).pick(20).uniq.grep{.is_even}.len, 8)
+assert_eq(20..5 -> by(-2).pick(7).uniq.grep{.is_even}.len, 7)
+
+assert_eq(1..300 -> pick(0), [])
+assert_eq(1..123 -> pick(1).len, 1)
+assert_eq(1..432 -> pick(-5).len 0)
+assert_eq(1..1e9 -> pick(5).uniq.len, 5)
+assert_eq(1..1e9 -> by(2).pick(10).uniq.grep{.is_odd}.len, 10)
+assert_eq(-1000 .. -100 -> pick(30).uniq.grep{.is_neg}.len, 30)
+
+assert_eq(-1e9..1e9 -> by(5).pick(20).uniq.grep { _ % 5 == 0 }.len, 20)
+
+
+assert(1..10  -> pick ~~ 1..10)
+assert(3..1e9 -> pick ~~ 3..1e9)
+assert(-1e9..1e9 -> by(5).contains(-1e9..1e9 -> by(5).pick))
+
+
+#
+## Range.rand()
+#
+
+assert_eq('a'..'d' -> rand(10).len, 10)
+assert_eq('d'..'a' -> rand(5).len, 0)
+
+assert_eq(1..30 -> rand(0), [])
+assert_eq(1..20 -> rand(1).len, 1)
+assert_eq(1..35 -> rand(-4), [])
+
+assert_eq(1..50 -> by(3).rand(18).len, 18)
+assert_eq(1..50 -> by(3).rand(19).grep{ _ % 3 == 0 }.len, 0)
+
+assert_eq('a'..'z' -> rand(0), [])
+assert_eq('a'..'z' -> rand(1).len, 1)
+assert_eq('a'..'f' -> rand(-3), [])
+
+assert('a'..'z' -> rand ~~ 'a'..'z')
+assert(1..13 -> contains(1..13 -> rand))
+assert(-1e9..1e9 -> by(5).contains(-1e9..1e9 -> by(5).rand))
+
+
+#
+## Array.pick()
+#
+
+var a = [1,2,3,4,5,6]
+
+assert_eq(a.pick(7).uniq.len, 6)
+assert_eq(a.pick(5).uniq.len, 5)
+assert_eq(a.pick(0), [])
+assert_eq(a.pick(1).len, 1)
+assert_eq(a.pick(-1).len, 0)
+
+assert(a.pick ~~ a)
+
+say "** Test passed!"

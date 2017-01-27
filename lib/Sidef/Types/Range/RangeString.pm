@@ -114,10 +114,18 @@ package Sidef::Types::Range::RangeString {
 
     sub pick {
         my ($self, $num) = @_;
-        $self->SUPER::pick($num)->map_operator('chr');
+
+        defined($num)
+          ? $self->SUPER::pick($num)->map_operator('chr')
+          : $self->SUPER::pick->chr;
     }
 
-    *rand = \&pick;
+    sub rand {
+        my ($self, $num) = @_;
+        defined($num)
+          ? $self->SUPER::rand($num)->map_operator('chr')
+          : $self->SUPER::rand->chr;
+    }
 
     sub dump {
         my ($self) = @_;
