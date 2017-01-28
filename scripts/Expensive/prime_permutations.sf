@@ -1,0 +1,32 @@
+#!/usr/bin/ruby
+
+var perms = Hash()
+
+for p in (primes(1000, 9999)) {
+    perms{p.digits.sort.join} := [] << p
+}
+
+var seq = []
+
+perms.each_v { |p|
+    p.len >= 3 || next
+
+    var diffs = Hash()
+    for i in (0 .. p.end) {
+        for j in (i+1 .. p.end) {
+            diffs{p[j] - p[i]} := [] << (p[i], p[j])
+        }
+    }
+
+    diffs.each_kv { |k,v|
+        if (v.uniq.len == 3) {
+            say    "#{k}: #{v.uniq}"
+            seq << "#{k}: #{v.uniq}"
+        }
+    }
+}
+
+assert_eq(seq.sort, [
+    "3330: [1487, 4817, 8147]",
+    "3330: [2969, 6299, 9629]"
+])

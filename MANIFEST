@@ -159,6 +159,7 @@ scripts/Expensive/md5.sf
 scripts/Expensive/normal_distribution.sf
 scripts/Expensive/numerical_integration.sf
 scripts/Expensive/parallel_calculations.sf
+scripts/Expensive/prime_permutations.sf
 scripts/Expensive/quicksort_in_parallel.sf
 scripts/Expensive/root_of_a_function.sf
 scripts/Expensive/smart_word_wrap.sf
