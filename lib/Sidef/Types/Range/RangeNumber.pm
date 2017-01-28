@@ -59,7 +59,7 @@ package Sidef::Types::Range::RangeNumber {
             if ($repetitions <= $MAX_UINT) {
 
                 if ($repetitions < 0) {
-                    return Sidef::Types::Block::Block->new(code => sub { });
+                    return Sidef::Types::Block::Block->new(code => sub { undef; });
                 }
 
                 return Sidef::Types::Block::Block->new(

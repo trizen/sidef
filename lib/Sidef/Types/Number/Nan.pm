@@ -329,8 +329,15 @@ package Sidef::Types::Number::Nan {
     *isqrtrem = \&divmod;
     *irootrem = \&divmod;
 
-    sub seed { }
+    sub seed { undef; }
+
     *iseed = \&seed;
+
+    *forperm = \&seed;
+    *forcomb = \&seed;
+
+    *permutations = \&seed;
+    *combinations = \&seed;
 
     {
         no strict 'refs';

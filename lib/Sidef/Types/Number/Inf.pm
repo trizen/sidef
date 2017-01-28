@@ -525,8 +525,15 @@ package Sidef::Types::Number::Inf {
 
     *nude = \&parts;
 
-    sub seed { }
+    sub seed { undef; }
+
     *iseed = \&seed;
+
+    *forperm = \&seed;
+    *forcomb = \&seed;
+
+    *permutations = \&seed;
+    *combinations = \&seed;
 
     {
         no strict 'refs';
