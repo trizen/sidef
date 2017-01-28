@@ -80,11 +80,23 @@ package Sidef::Types::Range::Range {
 
     *flip = \&reverse;
 
+    sub first_by {
+        my ($self, $code) = @_;
+
+        my $iter = $self->iter->{code};
+
+        while (defined(my $obj = $iter->())) {
+            return $obj if $code->run($obj);
+        }
+
+        undef;
+    }
+
     sub first {
         my ($self, $num) = @_;
 
         if (ref($num) eq 'Sidef::Types::Block::Block') {
-            return $self->first_by($num);
+            goto \&first_by;
         }
 
         my $iter = $self->iter->{code};
@@ -100,18 +112,6 @@ package Sidef::Types::Range::Range {
         }
 
         $iter->() // undef;
-    }
-
-    sub first_by {
-        my ($self, $code) = @_;
-
-        my $iter = $self->iter->{code};
-
-        while (defined(my $obj = $iter->())) {
-            return $obj if $code->run($obj);
-        }
-
-        undef;
     }
 
     sub last {

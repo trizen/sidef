@@ -58,9 +58,25 @@ Return the
 
 =cut
 
+=head2 prod_by
+
+RangeNumber.prod_by() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 sum
 
 RangeNumber.sum() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 sum_by
+
+RangeNumber.sum_by() -> I<Obj>
 
 Return the
 

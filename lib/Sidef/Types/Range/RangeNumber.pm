@@ -92,19 +92,23 @@ package Sidef::Types::Range::RangeNumber {
         );
     }
 
+    sub sum_by {
+        my ($self, $arg) = @_;
+        my $sum = Sidef::Types::Number::Number::ZERO;
+
+        my $iter = $self->iter->{code};
+        while (1) {
+            $sum = $sum->add($arg->run($iter->() // last));
+        }
+
+        $sum;
+    }
+
     sub sum {
         my ($self, $arg) = @_;
 
-        # Sum by mapping each value to a block
         if (ref($arg) eq 'Sidef::Types::Block::Block') {
-            my $sum = Sidef::Types::Number::Number::ZERO;
-
-            my $iter = $self->iter->{code};
-            while (1) {
-                $sum = $sum->add($arg->run($iter->() // last));
-            }
-
-            return $sum;
+            goto \&sum_by;
         }
 
         if ($self->{step}->is_one) {
@@ -125,19 +129,24 @@ package Sidef::Types::Range::RangeNumber {
         $sum;
     }
 
+    sub prod_by {
+        my ($self, $arg) = @_;
+
+        my $prod = Sidef::Types::Number::Number::ONE;
+
+        my $iter = $self->iter->{code};
+        while (1) {
+            $prod = $prod->mul($arg->run($iter->() // last));
+        }
+
+        $prod;
+    }
+
     sub prod {
         my ($self, $arg) = @_;
 
-        # Product by mapping each value to a block
         if (ref($arg) eq 'Sidef::Types::Block::Block') {
-            my $prod = Sidef::Types::Number::Number::ONE;
-
-            my $iter = $self->iter->{code};
-            while (1) {
-                $prod = $prod->mul($arg->run($iter->() // last));
-            }
-
-            return $prod;
+            goto \&prod_by;
         }
 
         if (    $self->{step}->is_one

@@ -536,18 +536,23 @@ package Sidef::Types::Array::Array {
         $_[0]->reduce_operator('+');
     }
 
+    sub sum_by {
+        my ($self, $arg) = @_;
+
+        my $sum = Sidef::Types::Number::Number::ZERO;
+
+        foreach my $obj (@$self) {
+            $sum = $sum->add($arg->run($obj));
+        }
+
+        return $sum;
+    }
+
     sub sum {
         my ($self, $arg) = @_;
 
-        # Sum by mapping each value to a block
         if (ref($arg) eq 'Sidef::Types::Block::Block') {
-            my $sum = Sidef::Types::Number::Number::ZERO;
-
-            foreach my $obj (@$self) {
-                $sum = $sum->add($arg->run($obj));
-            }
-
-            return $sum;
+            goto \&sum_by;
         }
 
         my $sum = $arg // Sidef::Types::Number::Number::ZERO;
@@ -559,18 +564,23 @@ package Sidef::Types::Array::Array {
         $sum;
     }
 
+    sub prod_by {
+        my ($self, $arg) = @_;
+
+        my $prod = Sidef::Types::Number::Number::ONE;
+
+        foreach my $obj (@$self) {
+            $prod = $prod->mul($arg->run($obj));
+        }
+
+        return $prod;
+    }
+
     sub prod {
         my ($self, $arg) = @_;
 
-        # Product by mapping each value to a block
         if (ref($arg) eq 'Sidef::Types::Block::Block') {
-            my $prod = Sidef::Types::Number::Number::ONE;
-
-            foreach my $obj (@$self) {
-                $prod = $prod->mul($arg->run($obj));
-            }
-
-            return $prod;
+            goto \&prod_by;
         }
 
         my $prod = $arg // Sidef::Types::Number::Number::ONE;
@@ -598,11 +608,13 @@ package Sidef::Types::Array::Array {
     }
 
     sub max_by {
-        $_[0]->_min_max_by($_[1], 1);
+        push @_, 1;
+        goto \&_min_max_by;
     }
 
     sub min_by {
-        $_[0]->_min_max_by($_[1], -1);
+        push @_, -1;
+        goto \&_min_max_by;
     }
 
     sub swap {
@@ -623,7 +635,7 @@ package Sidef::Types::Array::Array {
         if (defined $arg) {
 
             if (ref($arg) eq 'Sidef::Types::Block::Block') {
-                return $self->first_by($arg);
+                goto \&first_by;
             }
 
             my $max = $#$self;
@@ -640,7 +652,7 @@ package Sidef::Types::Array::Array {
         if (defined $arg) {
 
             if (ref($arg) eq 'Sidef::Types::Block::Block') {
-                return $self->last_by($arg);
+                goto \&last_by;
             }
 
             my $from = @$self - CORE::int($arg);
@@ -1003,16 +1015,12 @@ package Sidef::Types::Array::Array {
         );
     }
 
-    sub freq {
+    sub freq_by {
         my ($self, $code) = @_;
-
-        if (defined($code)) {
-            return $self->freq_by($code);
-        }
 
         my %hash;
         foreach my $item (@$self) {
-            $hash{$item}++;
+            $hash{$code->run($item)}++;
         }
 
         foreach my $key (keys %hash) {
@@ -1022,12 +1030,16 @@ package Sidef::Types::Array::Array {
         Sidef::Types::Hash::Hash->new(%hash);
     }
 
-    sub freq_by {
+    sub freq {
         my ($self, $code) = @_;
+
+        if (defined($code)) {
+            goto \&freq_by;
+        }
 
         my %hash;
         foreach my $item (@$self) {
-            $hash{$code->run($item)}++;
+            $hash{$item}++;
         }
 
         foreach my $key (keys %hash) {

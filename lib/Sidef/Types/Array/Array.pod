@@ -927,6 +927,14 @@ Return the
 
 =cut
 
+=head2 prod_by
+
+Array.prod_by() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 rand
 
 Array.rand() -> I<Obj>
@@ -1050,6 +1058,14 @@ Return the
 =head2 sum
 
 Array.sum() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 sum_by
+
+Array.sum_by() -> I<Obj>
 
 Return the
 
