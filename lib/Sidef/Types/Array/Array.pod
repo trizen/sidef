@@ -219,14 +219,6 @@ Return the
 
 =cut
 
-=head2 combinations
-
-Array.combinations() -> I<Obj>
-
-Return the
-
-=cut
-
 =head2 compact
 
 Array.compact() -> I<Obj>
@@ -376,6 +368,16 @@ Aliases: I<remove_last_if>
 Array.dig() -> I<Obj>
 
 Return the
+
+=cut
+
+=head2 each_comb
+
+Array.each_comb() -> I<Obj>
+
+Return the
+
+Aliases: I<combinations>
 
 =cut
 
@@ -867,7 +869,7 @@ Array.permute() -> I<Obj>
 
 Return the
 
-Aliases: I<permutation>, I<permutations>
+Aliases: I<each_perm>, I<permutation>, I<permutations>
 
 =cut
 

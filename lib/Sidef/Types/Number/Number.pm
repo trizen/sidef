@@ -268,7 +268,7 @@ package Sidef::Types::Number::Number {
 
             my ($before, $after) = split(/\./, substr($str, 0, $i));
 
-            if (not defined($after)) {    # return faster for numbers like "13e2"
+            if (!defined($after)) {    # return faster for numbers like "13e2"
                 if ($exp >= 0) {
                     return ("$sign$before" . ('0' x $exp));
                 }
@@ -3425,6 +3425,89 @@ package Sidef::Types::Number::Number {
 
         $block;
     }
+
+    sub forperm {
+        my ($n, $block) = @_;
+
+        $n = CORE::int(Math::GMPq::Rmpq_get_d($$n));
+
+        if (!defined $block) {
+            return Sidef::Types::Array::Array->new(map { __PACKAGE__->_set_uint($_) } 0 .. $n - 1)->permutations;
+        }
+
+        if ($n == 0) {
+            $block->run(Sidef::Types::Array::Array->new([]));
+            return $block;
+        }
+
+        if ($n < 0) {
+            return $block;
+        }
+
+        my @idx = (0 .. $n - 1);
+        my @nums = map { __PACKAGE__->_set_uint($_) } @idx;
+
+        my $perm;
+        while (1) {
+            $perm = Sidef::Types::Array::Array->new([@nums[@idx]]);
+
+            my $p = $#idx;
+            --$p while $idx[$p - 1] > $idx[$p];
+
+            my $q = $p || do {
+                $block->run($perm);
+                return $block;
+            };
+
+            CORE::push(@idx, CORE::reverse CORE::splice @idx, $p);
+            ++$q while $idx[$p - 1] > $idx[$q];
+            @idx[$p - 1, $q] = @idx[$q, $p - 1];
+
+            $block->run($perm);
+        }
+
+        return $block;
+    }
+
+    *permutations = \&forperm;
+
+    sub forcomb {
+        my ($n, $k, $block) = @_;
+        _valid(\$k);
+
+        $n = CORE::int(Math::GMPq::Rmpq_get_d($$n));
+
+        if (!defined $block) {
+            return Sidef::Types::Array::Array->new(map { __PACKAGE__->_set_uint($_) } 0 .. $n - 1)->combinations($k);
+        }
+
+        $k = CORE::int(Math::GMPq::Rmpq_get_d($$k));
+
+        if ($k == 0) {
+            $block->run(Sidef::Types::Array::Array->new([]));
+            return $block;
+        }
+
+        ($k < 0 or $k > $n or $n == 0)
+          && return $block;
+
+        my @c = (0 .. $k - 1);
+        my @nums = map { __PACKAGE__->_set_uint($_) } (0 .. $n - 1);
+
+        while (1) {
+            $block->run(Sidef::Types::Array::Array->new([@nums[@c]]));
+            next if ($c[$k - 1]++ < $n - 1);
+            my $i = $k - 2;
+            $i-- while ($i >= 0 && $c[$i] >= $n - ($k - $i));
+            last if $i < 0;
+            $c[$i]++;
+            while (++$i < $k) { $c[$i] = $c[$i - 1] + 1; }
+        }
+
+        return $block;
+    }
+
+    *combinations = \&forcomb;
 
     sub commify {
         my ($self) = @_;

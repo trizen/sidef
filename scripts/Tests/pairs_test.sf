@@ -12,8 +12,10 @@ while (true) {
     tree = tree.second;
 }
 
-Pair.new('root',
-    Pair.new('child',
-        Pair.new('grandchild', 'end')
+say(
+    Pair.new('root',
+        Pair.new('child',
+            Pair.new('grandchild', 'end')
+        )
     )
-).dump.say;
+)

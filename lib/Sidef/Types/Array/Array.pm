@@ -67,7 +67,7 @@ package Sidef::Types::Array::Array {
         my @arg  = @$arg;
         my @self = @$self;
 
-        (my $argc = @arg) || return $self->new(\@self);
+        (my $argc = @arg) || return $self->new(@self);
         my $selfc = @self;
 
         my $max = $argc > $selfc ? $argc - 1 : $selfc - 1;
@@ -76,7 +76,7 @@ package Sidef::Types::Array::Array {
             CORE::push(@array, $self[$i % $selfc]->$operator($arg[$i % $argc]));
         }
 
-        $self->new(\@array);
+        $self->new(@array);
     }
 
     sub map_operator {
@@ -89,7 +89,7 @@ package Sidef::Types::Array::Array {
             CORE::push(@array, $self->[$i]->$operator(@args));
         }
 
-        $self->new(\@array);
+        $self->new(@array);
     }
 
     sub pam_operator {
@@ -102,7 +102,7 @@ package Sidef::Types::Array::Array {
             CORE::push(@array, $arg->$operator($self->[$i]));
         }
 
-        $self->new(\@array);
+        $self->new(@array);
     }
 
     sub reduce_operator {
@@ -129,7 +129,7 @@ package Sidef::Types::Array::Array {
         if ($operator eq '') {
             foreach my $i (@$self) {
                 foreach my $j (@arg) {
-                    CORE::push(@array, $self->new([$i, $j]));
+                    CORE::push(@array, $self->new($i, $j));
                 }
             }
         }
@@ -141,7 +141,7 @@ package Sidef::Types::Array::Array {
             }
         }
 
-        $self->new(\@array);
+        $self->new(@array);
     }
 
     sub zip_operator {
@@ -159,7 +159,7 @@ package Sidef::Types::Array::Array {
         my @array;
         if ($operator eq '') {
             foreach my $i (0 .. $min) {
-                CORE::push(@array, $self->new([$self[$i], $arg[$i]]));
+                CORE::push(@array, $self->new($self[$i], $arg[$i]));
             }
         }
         else {
@@ -168,12 +168,12 @@ package Sidef::Types::Array::Array {
             }
         }
 
-        $self->new(\@array);
+        $self->new(@array);
     }
 
     sub mul {
         my ($self, $num) = @_;
-        $self->new([(@$self) x $num]);
+        $self->new((@$self) x $num);
     }
 
     sub div {
@@ -189,12 +189,12 @@ package Sidef::Types::Array::Array {
         while (@obj) {
             my $j = $pos - $i * CORE::int($len);
             $pos -= $j if $j >= 1;
-            CORE::push(@array, $self->new([splice @obj, 0, $len + $j]));
+            CORE::push(@array, $self->new(splice @obj, 0, $len + $j));
             $pos += $len;
             $i++;
         }
 
-        $self->new(\@array);
+        $self->new(@array);
     }
 
     sub part {
@@ -203,7 +203,7 @@ package Sidef::Types::Array::Array {
         my @first = @$self;
         my @second = splice(@first, CORE::int($num));
 
-        ($self->new(\@first), $self->new(\@second));
+        ($self->new(@first), $self->new(@second));
     }
 
     *partition = \&part;
@@ -257,7 +257,7 @@ package Sidef::Types::Array::Array {
             }
         }
 
-        return $self->new(\@new);
+        return $self->new(@new);
     }
 
     sub and {
@@ -290,7 +290,7 @@ package Sidef::Types::Array::Array {
             }
         }
 
-        $self->new(\@new);
+        $self->new(@new);
     }
 
     sub is_empty {
@@ -331,15 +331,15 @@ package Sidef::Types::Array::Array {
             push @new, @x[$i .. $#x];
         }
 
-        $self->new(\@new);
+        $self->new(@new);
     }
 
     sub concat {
         my ($self, $arg) = @_;
 
         UNIVERSAL::isa($arg, 'ARRAY')
-          ? $self->new([@$self, @$arg])
-          : $self->new([@$self, $arg]);
+          ? $self->new(@$self, @$arg)
+          : $self->new(@$self, $arg);
     }
 
     sub levenshtein {
@@ -425,60 +425,6 @@ package Sidef::Types::Array::Array {
         Sidef::Types::Number::Number->new($jaro + $prefix * 0.1 * (1 - $jaro));
     }
 
-    sub combinations {
-        my ($self, $k, $block) = @_;
-
-        $k = CORE::int($k);
-
-        if (defined($block)) {
-
-            if ($k == 0) {
-                $block->run($self->new);
-                return $self;
-            }
-
-            return if $k < 0;
-
-            my $n = @$self;
-            return $self if ($k > $n or $n == 0);
-
-            my @c = (0 .. $k - 1);
-
-            while (1) {
-                $block->run($self->new([@$self[@c]]));
-                next if ($c[$k - 1]++ < $n - 1);
-                my $i = $k - 2;
-                $i-- while ($i >= 0 && $c[$i] >= $n - ($k - $i));
-                last if $i < 0;
-                $c[$i]++;
-                while (++$i < $k) { $c[$i] = $c[$i - 1] + 1; }
-            }
-
-            return $self;
-        }
-
-        return $self->new($self->new) if $k == 0;
-        return if $k < 0;
-
-        my $n = @$self;
-        return $self->new if ($k > $n or $n == 0);
-
-        my @c = (0 .. $k - 1);
-        my @result;
-
-        while (1) {
-            CORE::push(@result, $self->new(@$self[@c]));
-            next if ($c[$k - 1]++ < $n - 1);
-            my $i = $k - 2;
-            $i-- while ($i >= 0 && $c[$i] >= $n - ($k - $i));
-            last if $i < 0;
-            $c[$i]++;
-            while (++$i < $k) { $c[$i] = $c[$i - 1] + 1; }
-        }
-
-        $self->new(\@result);
-    }
-
     sub count {
         my ($self, $obj) = @_;
 
@@ -535,10 +481,10 @@ package Sidef::Types::Array::Array {
                 CORE::push(@tmp_array, $array->[$i]);
             }
 
-            CORE::push(@new_array, $self->new(\@tmp_array));
+            CORE::push(@new_array, $self->new(@tmp_array));
         }
 
-        $self->new(\@new_array);
+        $self->new(@new_array);
     }
 
     sub mzip {
@@ -551,12 +497,12 @@ package Sidef::Types::Array::Array {
             CORE::push(@new_array, $self->[$i], $array->[$i % $arr_max]);
         }
 
-        $self->new(\@new_array);
+        $self->new(@new_array);
     }
 
     sub make {
         my ($self, $size, $type) = @_;
-        $self->new([($type) x $size]);
+        $self->new(($type) x $size);
     }
 
     sub _min_max {
@@ -698,7 +644,7 @@ package Sidef::Types::Array::Array {
             }
 
             my $from = @$self - CORE::int($arg);
-            return $self->new([@$self[($from < 0 ? 0 : $from) .. $#$self]]);
+            return $self->new(@$self[($from < 0 ? 0 : $from) .. $#$self]);
         }
 
         @$self ? $self->[-1] : ();
@@ -725,7 +671,7 @@ package Sidef::Types::Array::Array {
             CORE::push(@new_array, ref($item) eq ref($self) ? ($item->_flatten) : $item);
         }
 
-        $self->new(\@new_array);
+        $self->new(@new_array);
     }
 
     *flat = \&flatten;
@@ -748,7 +694,7 @@ package Sidef::Types::Array::Array {
 
     sub items {
         my ($self, @indices) = @_;
-        $self->new([map { exists($self->[$_]) ? $self->[$_] : undef } @indices]);
+        $self->new(map { exists($self->[$_]) ? $self->[$_] : undef } @indices);
     }
 
     sub item {
@@ -802,7 +748,7 @@ package Sidef::Types::Array::Array {
 
     sub ft {
         my ($self) = @_;
-        $self->new([_slice(@_)]);
+        $self->new(_slice(@_));
     }
 
     *slice = \&ft;
@@ -827,12 +773,12 @@ package Sidef::Types::Array::Array {
 
         my $end = @$self;
         for (my $i = $n - 1 ; $i < $end ; $i += $n) {
-            $code->run($self->new([@$self[$i - ($n - 1) .. $i]]));
+            $code->run($self->new(@$self[$i - ($n - 1) .. $i]));
         }
 
         my $mod = $end % $n;
         if ($mod != 0) {
-            $code->run($self->new([@$self[$end - $mod .. $end - 1]]));
+            $code->run($self->new(@$self[$end - $mod .. $end - 1]));
         }
 
         $self;
@@ -850,7 +796,7 @@ package Sidef::Types::Array::Array {
             push @{$new[$i]}, $item;
         }
 
-        $self->new([map { $self->new($_) } @new]);
+        $self->new(map { $self->new($_) } @new);
     }
 
     sub slice_after {
@@ -865,7 +811,7 @@ package Sidef::Types::Array::Array {
             }
         }
 
-        $self->new([map { $self->new($_) } @new]);
+        $self->new(map { $self->new($_) } @new);
     }
 
     sub slices {
@@ -876,15 +822,15 @@ package Sidef::Types::Array::Array {
         my @slices;
         my $end = @$self;
         for (my $i = $n - 1 ; $i < $end ; $i += $n) {
-            CORE::push(@slices, $self->new([@$self[$i - ($n - 1) .. $i]]));
+            CORE::push(@slices, $self->new(@$self[$i - ($n - 1) .. $i]));
         }
 
         my $mod = $end % $n;
         if ($mod != 0) {
-            CORE::push(@slices, $self->new([@$self[$end - $mod .. $end - 1]]));
+            CORE::push(@slices, $self->new(@$self[$end - $mod .. $end - 1]));
         }
 
-        $self->new(\@slices);
+        $self->new(@slices);
     }
 
     sub cons {
@@ -894,10 +840,10 @@ package Sidef::Types::Array::Array {
 
         my @array;
         foreach my $i ($n - 1 .. $#$self) {
-            push @array, $self->new([@$self[$i - $n + 1 .. $i]]);
+            push @array, $self->new(@$self[$i - $n + 1 .. $i]);
         }
 
-        $self->new(\@array);
+        $self->new(@array);
     }
 
     sub each_cons {
@@ -906,7 +852,7 @@ package Sidef::Types::Array::Array {
         $n = CORE::int($n);
 
         foreach my $i ($n - 1 .. $#$self) {
-            $code->run($self->new([@$self[$i - $n + 1 .. $i]]));
+            $code->run($self->new(@$self[$i - $n + 1 .. $i]));
         }
 
         $self;
@@ -942,7 +888,7 @@ package Sidef::Types::Array::Array {
             CORE::push(@array, $code->run($item));
         }
 
-        $self->new(\@array);
+        $self->new(@array);
     }
 
     sub map_kv {
@@ -953,7 +899,7 @@ package Sidef::Types::Array::Array {
             CORE::push(@arr, $code->run(Sidef::Types::Number::Number->_set_uint($i), $self->[$i]));
         }
 
-        $self->new(\@arr);
+        $self->new(@arr);
     }
 
     sub flat_map {
@@ -964,7 +910,7 @@ package Sidef::Types::Array::Array {
             CORE::push(@array, @{scalar $code->run($item)});
         }
 
-        $self->new(\@array);
+        $self->new(@array);
     }
 
     sub grep {
@@ -982,7 +928,7 @@ package Sidef::Types::Array::Array {
             }
         }
 
-        $self->new(\@array);
+        $self->new(@array);
     }
 
     *select = \&grep;
@@ -995,7 +941,7 @@ package Sidef::Types::Array::Array {
             CORE::push(@arr, $self->[$i]) if $code->run(Sidef::Types::Number::Number->_set_uint($i), $self->[$i]);
         }
 
-        $self->new(\@arr);
+        $self->new(@arr);
     }
 
     *select_kv = \&grep_kv;
@@ -1145,7 +1091,7 @@ package Sidef::Types::Array::Array {
             }
         }
 
-        $self->new(\@values);
+        $self->new(@values);
     }
 
     sub bindex {
@@ -1260,12 +1206,12 @@ package Sidef::Types::Array::Array {
             CORE::push(@array, scalar $obj->run(@$self[$i - 1, $i]));
         }
 
-        $self->new(\@array);
+        $self->new(@array);
     }
 
     sub shuffle {
         my ($self) = @_;
-        $self->new([List::Util::shuffle(@$self)]);
+        $self->new(List::Util::shuffle(@$self));
     }
 
     sub best_shuffle {
@@ -1396,15 +1342,15 @@ package Sidef::Types::Array::Array {
 
     sub indices {
         my ($self) = @_;
-        $self->new([map { Sidef::Types::Number::Number->_set_uint($_) } 0 .. $#$self]);
+        $self->new(map { Sidef::Types::Number::Number->_set_uint($_) } 0 .. $#$self);
     }
 
     *keys = \&indices;
 
     sub pairs {
         my ($self) = @_;
-        $self->new(
-              [map { Sidef::Types::Array::Pair->new(Sidef::Types::Number::Number->_set_uint($_), $self->[$_]) } 0 .. $#$self]);
+        $self->new(map { Sidef::Types::Array::Pair->new(Sidef::Types::Number::Number->_set_uint($_), $self->[$_]) }
+                   0 .. $#$self);
     }
 
     *kv = \&pairs;
@@ -1458,7 +1404,7 @@ package Sidef::Types::Array::Array {
 
     sub compact {
         my ($self) = @_;
-        $self->new([grep { defined($_) } @$self]);
+        $self->new(grep { defined($_) } @$self);
     }
 
     sub unique {
@@ -1480,7 +1426,7 @@ package Sidef::Types::Array::Array {
             ++$i while ($i < $max and $sorted[$i][1] eq $sorted[$i + 1][1]);
         }
 
-        $self->new([grep { defined } @unique]);
+        $self->new(grep { defined } @unique);
     }
 
     *uniq     = \&unique;
@@ -1505,7 +1451,7 @@ package Sidef::Types::Array::Array {
             $unique[$sorted[$i][0]] = $sorted[$i][1];
         }
 
-        $self->new([grep { defined } @unique]);
+        $self->new(grep { defined } @unique);
     }
 
     *last_uniq = \&last_unique;
@@ -1530,7 +1476,7 @@ package Sidef::Types::Array::Array {
             ++$i while ($i < $max and $sorted[$i][2] eq $sorted[$i + 1][2]);
         }
 
-        $self->new([grep { defined } @unique]);
+        $self->new(grep { defined } @unique);
     }
 
     *unique_by = \&uniq_by;
@@ -1555,7 +1501,7 @@ package Sidef::Types::Array::Array {
             $unique[$sorted[$i][0]] = $sorted[$i][1];
         }
 
-        $self->new([grep { defined } @unique]);
+        $self->new(grep { defined } @unique);
     }
 
     *last_unique_by = \&last_uniq_by;
@@ -1590,10 +1536,10 @@ package Sidef::Types::Array::Array {
                         if ($key eq $tail) {
 
                             if ($callback) {
-                                $block->run($self->new([@{$ref->{$key}}[0 .. $#{$ref->{$key}} - $count]]));
+                                $block->run($self->new(@{$ref->{$key}}[0 .. $#{$ref->{$key}} - $count]));
                             }
                             else {
-                                CORE::push(@abbrev, $self->new([@{$ref->{$key}}[0 .. $#{$ref->{$key}} - $count]]));
+                                CORE::push(@abbrev, $self->new(@{$ref->{$key}}[0 .. $#{$ref->{$key}} - $count]));
                             }
 
                             last;
@@ -1606,7 +1552,7 @@ package Sidef::Types::Array::Array {
           }
           ->(\%table);
 
-        $self->new(\@abbrev);
+        $self->new(@abbrev);
     }
 
     *abbreviations = \&abbrev;
@@ -1679,7 +1625,7 @@ package Sidef::Types::Array::Array {
         my ($self, $num) = @_;
 
         if (defined $num) {
-            return $self->new([CORE::splice(@$self, 0, $num,)]);
+            return $self->new(CORE::splice(@$self, 0, $num));
         }
 
         @$self || return undef;
@@ -1695,7 +1641,7 @@ package Sidef::Types::Array::Array {
         if (defined $num) {
             $num = CORE::int($num);
             $num = $num > $#$self ? 0 : @$self - $num;
-            return $self->new([CORE::splice(@$self, $num)]);
+            return $self->new(CORE::splice(@$self, $num));
         }
 
         @$self || return undef;
@@ -1725,7 +1671,7 @@ package Sidef::Types::Array::Array {
         $offset = defined($offset) ? CORE::int($offset) : 0;
         $length = defined($length) ? CORE::int($length) : scalar(@$self);
 
-        $self->new([CORE::splice(@$self, $offset, $length, @objects)]);
+        $self->new(CORE::splice(@$self, $offset, $length, @objects));
     }
 
     sub take_right {
@@ -1735,7 +1681,7 @@ package Sidef::Types::Array::Array {
         $amount = CORE::int($amount);
         $amount = $end > ($amount - 1) ? $amount - 1 : $end;
 
-        $self->new([@$self[$end - $amount .. $end]]);
+        $self->new(@$self[$end - $amount .. $end]);
     }
 
     sub take_left {
@@ -1745,22 +1691,22 @@ package Sidef::Types::Array::Array {
         $amount = CORE::int($amount);
         $amount = $end > ($amount - 1) ? $amount - 1 : $end;
 
-        $self->new([@$self[0 .. $amount]]);
+        $self->new(@$self[0 .. $amount]);
     }
 
     sub sort {
         my ($self, $code) = @_;
 
         if (defined $code) {
-            return $self->new([CORE::sort { scalar $code->run($a, $b) } @$self]);
+            return $self->new(CORE::sort { scalar $code->run($a, $b) } @$self);
         }
 
-        $self->new([CORE::sort { $a cmp $b } @$self]);
+        $self->new(CORE::sort { $a cmp $b } @$self);
     }
 
     sub sort_by {
         my ($self, $code) = @_;
-        $self->new([map { $_->[0] } sort { $a->[1] cmp $b->[1] } map { [$_, scalar $code->run($_)] } @$self]);
+        $self->new(map { $_->[0] } sort { $a->[1] cmp $b->[1] } map { [$_, scalar $code->run($_)] } @$self);
     }
 
     sub cmp {
@@ -1793,25 +1739,90 @@ package Sidef::Types::Array::Array {
         foreach my $i (1 .. $#$self) {
             CORE::push(@array, $delim_obj, $self->[$i]);
         }
-        $self->new(\@array);
+        $self->new(@array);
     }
 
-    sub permute {
+    sub combinations {
+        my ($self, $k, $block) = @_;
+
+        $k = CORE::int($k);
+
+        if (defined($block)) {
+
+            if ($k == 0) {
+                $block->run($self->new);
+                return $self;
+            }
+
+            my $n = @$self;
+            return $self if ($k < 0 or $k > $n or $n == 0);
+
+            my @c = (0 .. $k - 1);
+
+            while (1) {
+                $block->run($self->new(@$self[@c]));
+                next if ($c[$k - 1]++ < $n - 1);
+                my $i = $k - 2;
+                $i-- while ($i >= 0 && $c[$i] >= $n - ($k - $i));
+                last if $i < 0;
+                $c[$i]++;
+                while (++$i < $k) { $c[$i] = $c[$i - 1] + 1; }
+            }
+
+            return $self;
+        }
+
+        ($k == 0)
+          && return $self->new($self->new);
+
+        my $n = @$self;
+
+        ($k < 0 or $k > $n or $n == 0)
+          && return $self->new;
+
+        my @c = (0 .. $k - 1);
+        my @result;
+
+        while (1) {
+            CORE::push(@result, $self->new(@$self[@c]));
+            next if ($c[$k - 1]++ < $n - 1);
+            my $i = $k - 2;
+            $i-- while ($i >= 0 && $c[$i] >= $n - ($k - $i));
+            last if $i < 0;
+            $c[$i]++;
+            while (++$i < $k) { $c[$i] = $c[$i - 1] + 1; }
+        }
+
+        $self->new(@result);
+    }
+
+    *each_comb = \&combinations;
+
+    sub permutations {
         my ($self, $code) = @_;
 
-        @$self || return $self;
         my @idx = 0 .. $#$self;
+
+        if (not @idx) {
+
+            if (defined $code) {
+                $code->run($self->new);
+                return $self;
+            }
+
+            return $self->new($self->new);
+        }
 
         if (defined($code)) {
             my $perm;
 
             while (1) {
-                $perm = $self->new([@$self[@idx]]);
+                $perm = $self->new(@$self[@idx]);
 
                 my $p = $#idx;
                 --$p while $idx[$p - 1] > $idx[$p];
 
-                my $q = $p or do {
+                my $q = $p || do {
                     $code->run($perm);
                     return $self;
                 };
@@ -1823,23 +1834,24 @@ package Sidef::Types::Array::Array {
                 $code->run($perm);
             }
 
-            return $self;    # should not reach here
+            return $self;
         }
 
         my @array;
         while (1) {
-            CORE::push(@array, $self->new([@$self[@idx]]));
+            CORE::push(@array, $self->new(@$self[@idx]));
             my $p = $#idx;
             --$p while $idx[$p - 1] > $idx[$p];
-            my $q = $p or (return $self->new(\@array));
+            my $q = $p or (return $self->new(@array));
             CORE::push(@idx, CORE::reverse CORE::splice @idx, $p);
             ++$q while $idx[$p - 1] > $idx[$q];
             @idx[$p - 1, $q] = @idx[$q, $p - 1];
         }
     }
 
-    *permutations = \&permute;
-    *permutation  = \&permute;
+    *permute     = \&permutations;    # deprecated
+    *permutation = \&permutations;    # deprecated
+    *each_perm   = \&permutations;
 
     sub pack {
         my ($self, $format) = @_;
@@ -1868,7 +1880,7 @@ package Sidef::Types::Array::Array {
 
         $num = CORE::int($num);
         $num %= ($#$self + 1);
-        return $self->new([@$self]) if $num == 0;
+        return $self->new(@$self) if $num == 0;
 
         # Surprisingly, this is slower:
         # $self->new(@$self[$num .. $#$self], @$self[0 .. $num - 1]);
@@ -1876,7 +1888,7 @@ package Sidef::Types::Array::Array {
         # Surprisingly, this is 73% faster:
         my @array = @$self;
         CORE::unshift(@array, CORE::splice(@array, $num));
-        $self->new(\@array);
+        $self->new(@array);
     }
 
     # Join the array as string
@@ -1906,7 +1918,7 @@ package Sidef::Types::Array::Array {
 
     sub reverse {
         my ($self) = @_;
-        $self->new([CORE::reverse @$self]);
+        $self->new(CORE::reverse @$self);
     }
 
     *flip = \&reverse;
@@ -2090,7 +2102,7 @@ package Sidef::Types::Array::Array {
             }
         }
 
-        $self->new([map { Sidef::Types::String::String->new($_) } @argv]);
+        $self->new(map { Sidef::Types::String::String->new($_) } @argv);
     }
 
     sub _dump {

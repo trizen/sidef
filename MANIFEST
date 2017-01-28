@@ -630,6 +630,7 @@ scripts/Tests/classes.sf
 scripts/Tests/classes_and_objects.sf
 scripts/Tests/cnp.sf
 scripts/Tests/code_interpolation.sf
+scripts/Tests/combs_and_perms.sf
 scripts/Tests/complex_numbers.sf
 scripts/Tests/cpp_input_output.sf
 scripts/Tests/cramers_method.sf

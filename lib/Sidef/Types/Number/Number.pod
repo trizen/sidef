@@ -834,6 +834,26 @@ Return the
 
 =cut
 
+=head2 forcomb
+
+Number.forcomb() -> I<Obj>
+
+Return the
+
+Aliases: I<combinations>
+
+=cut
+
+=head2 forperm
+
+Number.forperm() -> I<Obj>
+
+Return the
+
+Aliases: I<permutations>
+
+=cut
+
 =head2 fpow
 
 Number.fpow() -> I<Obj>
