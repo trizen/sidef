@@ -539,7 +539,7 @@ package Sidef::Parser {
         }
         else {
             $self->fatal_error(
-                               error => qq{can't find the beginning of a string quote delimitator},
+                               error => qq{can't find the beginning of a string quote delimiter},
                                code  => $_,
                                pos   => pos($_),
                               );
