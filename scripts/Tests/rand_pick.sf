@@ -10,7 +10,7 @@ assert_eq('a'..'z' -> pick(26).uniq.len, 26)
 
 assert_eq('b'..'x' -> pick(0), [])
 assert_eq('k'..'q' -> pick(1).len, 1)
-assert_eq('s'..'t' -> pick(-5).len 0)
+assert_eq('s'..'t' -> pick(-5).len, 0)
 
 assert('a'..'z' -> pick ~~ 'a'..'z')
 
@@ -37,8 +37,8 @@ assert_eq(20..5 -> by(-2).pick(7).uniq.grep{.is_even}.len, 7)
 
 assert_eq(1..300 -> pick(0), [])
 assert_eq(1..123 -> pick(1).len, 1)
-assert_eq(1..432 -> pick(-5).len 0)
-assert_eq(1..1e9 -> pick(5).uniq.len, 5)
+assert_eq(1..432 -> pick(-5).len, 0)
+assert_eq(1..1e9 -> pick(5).len, 5)
 assert_eq(1..1e9 -> by(2).pick(10).uniq.grep{.is_odd}.len, 10)
 assert_eq(-1000 .. -100 -> pick(30).uniq.grep{.is_neg}.len, 30)
 

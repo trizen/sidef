@@ -105,7 +105,8 @@ package Sidef::Types::Range::Range {
 
             my @array;
             foreach my $i (1 .. CORE::int($num)) {
-                push @array, $iter->() // last;
+                my $item = $iter->() // last;
+                push @array, $item;
             }
 
             return Sidef::Types::Array::Array->new(\@array);

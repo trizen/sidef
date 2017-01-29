@@ -39,7 +39,7 @@ package Sidef::Perl::Perl {
                 foreach my $key (keys %{$val}) {
                     my $value = $val->{$key};
                     $hash->{$key} = (
-                                       $key, ref($value) eq 'HASH' && $value eq $val
+                                     ref($value) eq 'HASH' && $value eq $val
                                      ? $hash
                                      : __SUB__->($value)
                                     );
