@@ -110,6 +110,13 @@ package Sidef::Object::Object {
 
     *refaddr = \&object_id;
 
+    sub object_type {
+        my ($self) = @_;
+        Sidef::Types::String::String->new(Scalar::Util::reftype($self));
+    }
+
+    *reftype = \&object_type;
+
     sub class {
         my ($obj) = @_;
         my $ref = CORE::ref($obj) || $obj;

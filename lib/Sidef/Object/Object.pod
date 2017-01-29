@@ -188,6 +188,16 @@ Aliases: I<object_id>
 
 =cut
 
+=head2 reftype
+
+Object.reftype() -> I<Obj>
+
+Return the
+
+Aliases: I<object_type>
+
+=cut
+
 =head2 respond_to
 
 Object.respond_to() -> I<Obj>

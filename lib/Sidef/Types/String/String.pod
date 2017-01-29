@@ -246,6 +246,14 @@ Aliases: I<bytes_length>
 
 =cut
 
+=head2 center
+
+String.center() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 char
 
 String.char() -> I<Obj>
@@ -692,6 +700,16 @@ Return the
 
 =cut
 
+=head2 ltrim
+
+String.ltrim() -> I<Obj>
+
+Return the
+
+Aliases: I<trim_beg>, I<strip_beg>
+
+=cut
+
 =head2 md5
 
 String.md5() -> I<Obj>
@@ -848,6 +866,16 @@ Return the
 
 =cut
 
+=head2 rtrim
+
+String.rtrim() -> I<Obj>
+
+Return the
+
+Aliases: I<trim_end>, I<strip_end>
+
+=cut
+
 =head2 scan
 
 String.scan() -> I<Obj>
@@ -979,26 +1007,6 @@ String.trim() -> I<Obj>
 Return the
 
 Aliases: I<strip>
-
-=cut
-
-=head2 trim_beg
-
-String.trim_beg() -> I<Obj>
-
-Return the
-
-Aliases: I<strip_beg>
-
-=cut
-
-=head2 trim_end
-
-String.trim_end() -> I<Obj>
-
-Return the
-
-Aliases: I<strip_end>
 
 =cut
 

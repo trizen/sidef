@@ -758,6 +758,30 @@ package Sidef::Types::String::String {
         Sidef::Types::Glob::File->new(\$string)->open(@rest);
     }
 
+    sub center {
+        my ($self, $size, $char) = @_;
+
+        my $string = $$self;
+
+        $size = defined($size) ? CORE::int($size) : 0;
+        $char = defined($char) ? "$char"          : ' ';
+
+        if (CORE::length($char) > 1) {
+            $char = CORE::substr($char, 0, 1);
+        }
+
+        my $len = CORE::length($string);
+
+        $size <= $len
+          && return $string;
+
+        my $padlen = $size - $len;
+        my $lpad   = $padlen >> 1;
+        my $rpad   = $padlen - $lpad;
+
+        $self->new(($char x $lpad) . $string . ($char x $rpad));
+    }
+
     sub trim {
         my ($self) = @_;
         $self->new(unpack('A*', $$self) =~ s/^\s+//r);
@@ -770,6 +794,7 @@ package Sidef::Types::String::String {
         $self->new($$self =~ s/^\s+//r);
     }
 
+    *ltrim    = \&strip_beg;
     *trim_beg = \&strip_beg;
 
     sub strip_end {
@@ -777,6 +802,7 @@ package Sidef::Types::String::String {
         $self->new(unpack('A*', $$self));
     }
 
+    *rtrim    = \&strip_end;
     *trim_end = \&strip_end;
 
     sub trans {
