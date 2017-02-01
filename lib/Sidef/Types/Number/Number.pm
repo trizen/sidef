@@ -2660,7 +2660,127 @@ package Sidef::Types::Number::Number {
             return __PACKAGE__->_set_uint(3);
         }
 
-        if ($n >= 10 and $n <= 1_000_000) {
+        if ($n >= 100_000) {
+
+            my $i          = 2;
+            my $count      = 0;
+            my $prev_count = 0;
+
+            my $approx = CORE::int($n * CORE::log($n) + $n * (CORE::log(CORE::log($n)) - 1));
+
+            state $checkpoints = [[5e10, 2119654578],
+                                  [4e10, 1711955433],
+                                  [3e10, 1300005926],
+                                  [2e10, 882206716],
+                                  [1e10, 455052511],
+                                  [9e9,  411523195],
+                                  [8e9,  367783654],
+                                  [7e9,  323804352],
+                                  [6e9,  279545368],
+                                  [5e9,  234954223],
+                                  [4e9,  189961812],
+                                  [3e9,  144449537],
+                                  [2e9,  98222287],
+                                  [1e9,  50847534],
+                                  [95e7, 48431471],
+                                  [9e8,  46009215],
+                                  [85e7, 43581966],
+                                  [8e8,  41146179],
+                                  [75e7, 38703181],
+                                  [7e8,  36252931],
+                                  [65e7, 33793395],
+                                  [6e8,  31324703],
+                                  [55e7, 28845356],
+                                  [5e8,  26355867],
+                                  [45e7, 23853038],
+                                  [4e8,  21336326],
+                                  [35e7, 18803526],
+                                  [3e8,  16252325],
+                                  [25e7, 13679318],
+                                  [2e8,  11078937],
+                                  [17e7, 9503083],
+                                  [16e7, 8974458],
+                                  [15e7, 8444396],
+                                  [14e7, 7912199],
+                                  [1e8,  5761455],
+                                  [95e6, 5489749],
+                                  [9e7,  5216954],
+                                  [85e6, 4943731],
+                                  [8e7,  4669382],
+                                  [75e6, 4394304],
+                                  [7e7,  4118064],
+                                  [65e6, 3840554],
+                                  [6e7,  3562115],
+                                  [55e6, 3282200],
+                                  [5e7,  3001134],
+                                  [45e6, 2718160],
+                                  [4e7,  2433654],
+                                  [35e6, 2146775],
+                                  [3e7,  1857859],
+                                  [25e6, 1565927],
+                                  [2e7,  1270607],
+                                  [15e6, 970704],
+                                  [1e7,  664579],
+                                  [9e6,  602489],
+                                  [5e6,  348513],
+                                  [4e6,  283146],
+                                  [3e6,  216816],
+                                  [2e6,  148933],
+                                  [1e6,  78498],
+                                 ];
+
+            {
+                state $end = $#{$checkpoints};
+
+                my $left  = 0;
+                my $right = $end;
+
+                my ($middle, $item, $cmp);
+
+                while (1) {
+                    $middle = (($right + $left) >> 1);
+                    $item   = $checkpoints->[$middle][0];
+                    $cmp    = ($approx <=> $item) || last;
+
+                    if ($cmp < 0) {
+                        $left = $middle + 1;
+                        if ($left > $right) {
+                            ++$middle;
+                            last;
+                        }
+                    }
+                    else {
+                        $right = $middle - 1;
+                        $left > $right && last;
+                    }
+                }
+
+                my $point = $checkpoints->[$middle];
+
+                $count      = $point->[1];
+                $i          = $point->[0];
+                $prev_count = $count;
+            }
+
+            # The upper-bound can definitely be improved.
+            my $up_approx    = CORE::int($n * CORE::log($n) + $n * CORE::log(CORE::log($n)));
+            my $count_approx = $up_approx - $i;
+            my $step         = $count_approx < 1e6 ? $count_approx : $n > 1e8 ? 1e7 : 1e6;
+
+            for (; ; $i += $step) {
+                my $primes = Math::Prime::Util::GMP::primes($i, $i + $step);
+                $count += $#$primes + 1;
+
+                if ($count >= $n) {
+                    my $p = $primes->[$n - $prev_count - 1];
+                    return ($p <= MAX_UI ? __PACKAGE__->_set_uint($p) : __PACKAGE__->_set_str($p));
+                }
+
+                $prev_count = $count;
+            }
+        }
+
+        if ($n >= 10) {
             my $up = CORE::int($n * CORE::log($n) + $n * CORE::log(CORE::log($n)));
             return __PACKAGE__->_set_uint(Math::Prime::Util::GMP::primes($up)->[$n - 1]);
         }

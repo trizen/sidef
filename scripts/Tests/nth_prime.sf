@@ -1,0 +1,30 @@
+#!/usr/bin/ruby
+
+var p = gather {
+    1..100 -> each {|i|
+        take(i.nth_prime)
+    }
+}
+
+assert_eq(p, 1..Inf -> lazy.grep{.is_prime}.first(100))
+
+assert_eq(1e3.nth_prime, 7919)
+assert_eq(1e4.nth_prime, 104729)
+assert_eq(1e5.nth_prime, 1299709)
+assert_eq(2e5.nth_prime, 2750159)
+assert_eq((2e5 + 1).nth_prime, 2750161)
+assert_eq((2e5 + 2).nth_prime, 2750171)
+assert_eq((2e5 + 3).nth_prime, 2750177)
+assert_eq((2e5 - 1).nth_prime, 2750131)
+assert_eq((2e5 - 2).nth_prime, 2750123)
+assert_eq((2e5 - 3).nth_prime, 2750071)
+assert_eq(3e5.nth_prime, 4256233)
+assert_eq(5e5.nth_prime, 7368787)
+assert_eq(1e6.nth_prime, 15485863)
+assert_eq(2e6.nth_prime, 32452843)
+assert_eq(5e6.nth_prime, 86028121)
+assert_eq(1e7.nth_prime, 179424673)
+assert_eq(5e7.nth_prime, 982451653)
+#assert_eq(1e8.nth_prime, 2038074743)
+
+say "** Test passed!"
