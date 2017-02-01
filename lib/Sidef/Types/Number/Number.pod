@@ -1630,6 +1630,16 @@ Return the
 
 =cut
 
+=head2 prime
+
+Number.prime() -> I<Obj>
+
+Return the
+
+Aliases: I<nth_prime>
+
+=cut
+
 =head2 prime_count
 
 Number.prime_count() -> I<Obj>

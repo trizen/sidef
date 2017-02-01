@@ -2645,6 +2645,33 @@ package Sidef::Types::Number::Number {
         $n <= MAX_UI ? __PACKAGE__->_set_uint($n) : __PACKAGE__->_set_str($n);
     }
 
+    sub nth_prime {
+        my ($n) = @_;
+
+        $n = CORE::int(Math::GMPq::Rmpq_get_d($$n));
+
+        if ($n <= 0) {
+            return nan();
+        }
+        if ($n == 1) {
+            return __PACKAGE__->_set_uint(2);
+        }
+        elsif ($n == 2) {
+            return __PACKAGE__->_set_uint(3);
+        }
+
+        my $p = CORE::int($n * CORE::log($n) + $n * (CORE::log(CORE::log($n)) - 1));
+        my $count = Math::Prime::Util::GMP::prime_count(2, $p);
+
+        foreach my $i (1 .. $n - $count) {
+            $p = Math::Prime::Util::GMP::next_prime($p);
+        }
+
+        $p <= MAX_UI ? __PACKAGE__->_set_uint($p) : __PACKAGE__->_set_str($p);
+    }
+
+    *prime = \&nth_prime;
+
     sub legendre {
         my ($x, $y) = @_;
         _valid(\$y);

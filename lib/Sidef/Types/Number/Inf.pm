@@ -148,6 +148,8 @@ package Sidef::Types::Number::Inf {
     *bessel_j          = \&nan;
     *bessel_y          = \&nan;
     *beta              = \&nan;
+    *prime             = \&nan;
+    *nth_prime         = \&nan;
 
     *harm     = \&inf;
     *harmonic = \&inf;
