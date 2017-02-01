@@ -2660,6 +2660,11 @@ package Sidef::Types::Number::Number {
             return __PACKAGE__->_set_uint(3);
         }
 
+        if ($n >= 10 and $n <= 1_000_000) {
+            my $up = CORE::int($n * CORE::log($n) + $n * CORE::log(CORE::log($n)));
+            return __PACKAGE__->_set_uint(Math::Prime::Util::GMP::primes($up)->[$n - 1]);
+        }
+
         my $p = CORE::int($n * CORE::log($n) + $n * (CORE::log(CORE::log($n)) - 1));
         my $count = Math::Prime::Util::GMP::prime_count(2, $p);
 
