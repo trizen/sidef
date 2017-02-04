@@ -500,7 +500,7 @@ package Sidef::Types::Number::Number {
 
         _valid(\$y);
         $x = _big2mpfr($x);
-        Math::MPFR::Rmpfr_add($x, $x, _big2mpfr($y), $ROUND);
+        Math::MPFR::Rmpfr_add_q($x, $x, $$y, $ROUND);
         _mpfr2big($x);
     }
 
@@ -550,7 +550,7 @@ package Sidef::Types::Number::Number {
 
         _valid(\$y);
         $x = _big2mpfr($x);
-        Math::MPFR::Rmpfr_sub($x, $x, _big2mpfr($y), $ROUND);
+        Math::MPFR::Rmpfr_sub_q($x, $x, $$y, $ROUND);
         _mpfr2big($x);
     }
 
@@ -603,7 +603,7 @@ package Sidef::Types::Number::Number {
 
         _valid(\$y);
         $x = _big2mpfr($x);
-        Math::MPFR::Rmpfr_mul($x, $x, _big2mpfr($y), $ROUND);
+        Math::MPFR::Rmpfr_mul_q($x, $x, $$y, $ROUND);
         _mpfr2big($x);
     }
 
@@ -646,7 +646,7 @@ package Sidef::Types::Number::Number {
 
         _valid(\$y);
         $x = _big2mpfr($x);
-        Math::MPFR::Rmpfr_div($x, $x, _big2mpfr($y), $ROUND);
+        Math::MPFR::Rmpfr_div_q($x, $x, $$y, $ROUND);
         _mpfr2big($x);
     }
 
@@ -2696,6 +2696,7 @@ package Sidef::Types::Number::Number {
                                   [9000000000,    411523195],
                                   [8700000000,    398425675],
                                   [8500000000,    389682427],
+                                  [8300000000,    380930729],
                                   [8000000000,    367783654],
                                   [7500000000,    345826612],
                                   [7300000000,    337024801],
