@@ -11,12 +11,8 @@ func check(i, j) is cached {
     jd == id && return true
     jm == im && return true
 
-    var id2 = id//3
-    var jd2 = jd//3
-
-    jd2 == id2 || return false
-
-    jm//3 == im//3
+    (id//3 == jd//3) &&
+    (jm//3 == im//3)
 }
 
 func solve(board) {
