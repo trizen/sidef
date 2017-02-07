@@ -2660,7 +2660,7 @@ package Sidef::Types::Number::Number {
             return __PACKAGE__->_set_uint(3);
         }
 
-        if ($n >= 100_000) {
+        if ($n > 100_000) {
 
             my $i          = 2;
             my $count      = 0;
@@ -2849,19 +2849,8 @@ package Sidef::Types::Number::Number {
             }
         }
 
-        if ($n >= 10) {
-            my $up = CORE::int($n * CORE::log($n) + $n * CORE::log(CORE::log($n)));
-            return __PACKAGE__->_set_uint(Math::Prime::Util::GMP::primes($up)->[$n - 1]);
-        }
-
-        my $p = CORE::int($n * CORE::log($n) + $n * (CORE::log(CORE::log($n)) - 1));
-        my $count = Math::Prime::Util::GMP::prime_count(2, $p);
-
-        foreach my $i (1 .. $n - $count) {
-            $p = Math::Prime::Util::GMP::next_prime($p);
-        }
-
-        $p <= MAX_UI ? __PACKAGE__->_set_uint($p) : __PACKAGE__->_set_str($p);
+        state $table = Math::Prime::Util::GMP::primes(1_299_709);    # primes up to prime(100_000)
+        __PACKAGE__->_set_uint($table->[$n - 1]);
     }
 
     *prime = \&nth_prime;
