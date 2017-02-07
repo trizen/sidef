@@ -2653,12 +2653,6 @@ package Sidef::Types::Number::Number {
         if ($n <= 0) {
             return nan();
         }
-        if ($n == 1) {
-            return __PACKAGE__->_set_uint(2);
-        }
-        elsif ($n == 2) {
-            return __PACKAGE__->_set_uint(3);
-        }
 
         if ($n > 100_000) {
 
