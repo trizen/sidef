@@ -773,7 +773,7 @@ package Sidef::Types::String::String {
         my $len = CORE::length($string);
 
         $size <= $len
-          && return $string;
+          && return $self;
 
         my $padlen = $size - $len;
         my $lpad   = $padlen >> 1;
