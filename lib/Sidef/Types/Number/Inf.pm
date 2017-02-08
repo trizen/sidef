@@ -167,12 +167,13 @@ package Sidef::Types::Number::Inf {
         Sidef::Types::Array::Array->new([]);
     }
 
-    *factor   = \&digits;
-    *factors  = \&digits;
-    *pfactor  = \&digits;
-    *pfactors = \&digits;
-    *primes   = \&digits;
-    *divisors = \&digits;
+    *factor     = \&digits;
+    *factors    = \&digits;
+    *pfactor    = \&digits;
+    *pfactors   = \&digits;
+    *factor_exp = \&digits;
+    *primes     = \&digits;
+    *divisors   = \&digits;
 
     sub divmod {
         my ($x, $y) = @_;

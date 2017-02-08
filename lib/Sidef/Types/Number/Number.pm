@@ -3062,7 +3062,8 @@ package Sidef::Types::Number::Number {
         Sidef::Types::Array::Array->new(\@pairs);
     }
 
-    *pfactors = \&pfactor;
+    *factor_exp = \&pfactor;
+    *pfactors   = \&pfactor;
 
     sub divisors {
         Sidef::Types::Array::Array->new(
