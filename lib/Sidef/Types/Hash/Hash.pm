@@ -150,6 +150,12 @@ package Sidef::Types::Hash::Hash {
 
     *remove = \&delete;
 
+    sub set_keys {
+        my ($self, @keys) = @_;
+        undef @{$self}{@keys};
+        $self;
+    }
+
     sub map_val {
         my ($self, $code) = @_;
 

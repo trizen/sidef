@@ -334,6 +334,14 @@ Return the
 
 =cut
 
+=head2 set_keys
+
+Hash.set_keys() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 slice
 
 Hash.slice() -> I<Obj>

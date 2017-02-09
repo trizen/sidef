@@ -1586,7 +1586,7 @@ Number.pfactor() -> I<Obj>
 
 Return the
 
-Aliases: I<pfactors>
+Aliases: I<pfactors>, I<factor_exp>
 
 =cut
 
