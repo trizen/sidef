@@ -2662,7 +2662,7 @@ package Sidef::Types::Number::Number {
             my $s = CORE::int(CORE::sqrt($n));
 
             # Using moebius(1, sqrt(n)) for values of n <= 2^40
-            if ($n <= 2**40) {
+            if ($n <= (1 << 40)) {
 
                 my ($count, $k) = (0, 0);
 
