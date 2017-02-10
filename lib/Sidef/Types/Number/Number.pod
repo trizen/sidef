@@ -1844,6 +1844,14 @@ Return the
 
 =cut
 
+=head2 square_free_count
+
+Number.square_free_count() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 stirling
 
 Number.stirling() -> I<Obj>

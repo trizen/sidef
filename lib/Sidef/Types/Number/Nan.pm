@@ -189,6 +189,7 @@ package Sidef::Types::Number::Nan {
     *znprimroot        = \&nan;
     *ramanujan_tau     = \&nan;
     *prime_count       = \&nan;
+    *square_free_count = \&nan;
     *prime             = \&nan;
     *nth_prime         = \&nan;
     *remove            = \&nan;

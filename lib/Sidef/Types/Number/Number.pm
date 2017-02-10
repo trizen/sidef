@@ -2645,6 +2645,74 @@ package Sidef::Types::Number::Number {
         $n <= MAX_UI ? __PACKAGE__->_set_uint($n) : __PACKAGE__->_set_str($n);
     }
 
+    sub square_free_count {
+        my ($from, $to) = @_;
+
+        if (defined($to)) {
+            _valid(\$to);
+            return $to->square_free_count->sub($from->dec->square_free_count);
+        }
+
+        (my $n = Math::GMPq::Rmpq_get_d($$from)) <= 0 && return ZERO;
+
+        # Optimization for native integers
+        if ($n <= MAX_UI) {
+
+            $n = CORE::int($n);
+            my $s = CORE::int(CORE::sqrt($n));
+
+            # Using moebius(1, sqrt(n)) for values of n <= 2^40
+            if ($n <= 2**40) {
+
+                my ($count, $k) = (0, 0);
+
+                foreach my $m (Math::Prime::Util::GMP::moebius(1, $s)) {
+                    ++$k;
+                    if ($m) {
+                        $count += $m * CORE::int($n / ($k * $k));
+                    }
+                }
+
+                return __PACKAGE__->_set_uint($count);
+            }
+
+            # Linear counting up to sqrt(n)
+            my ($count, $m) = 0;
+            foreach my $k (1 .. $s) {
+                if ($m = Math::Prime::Util::GMP::moebius($k)) {
+                    $count += $m * CORE::int($n / ($k * $k));
+                }
+            }
+            return __PACKAGE__->_set_uint($count);
+        }
+
+        # Implementation for large values of n
+        my $c = Math::GMPz::Rmpz_init_set_ui(0);
+        my $t = Math::GMPz::Rmpz_init();
+
+        my $z = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_set_q($z, $$from);
+
+        my $s = Math::GMPz::Rmpz_init_set($z);
+        Math::GMPz::Rmpz_sqrt($s, $s);
+
+        for (my $k = Math::GMPz::Rmpz_init_set_ui(1) ; Math::GMPz::Rmpz_cmp($k, $s) <= 0 ; Math::GMPz::Rmpz_add_ui($k, $k, 1))
+        {
+            my $m = Math::Prime::Util::GMP::moebius(Math::GMPz::Rmpz_get_str($k, 10));
+
+            if ($m) {
+                Math::GMPz::Rmpz_set($t, $z);
+                Math::GMPz::Rmpz_div($t, $t, $k);
+                Math::GMPz::Rmpz_div($t, $t, $k);
+                ($m == -1)
+                  ? Math::GMPz::Rmpz_sub($c, $c, $t)
+                  : Math::GMPz::Rmpz_add($c, $c, $t);
+            }
+        }
+
+        _mpz2big($c);
+    }
+
     sub nth_prime {
         my ($n) = @_;
 

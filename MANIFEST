@@ -832,6 +832,7 @@ scripts/Tests/sort_with_custom_cmp.sf
 scripts/Tests/soundex.sf
 scripts/Tests/special_methods.sf
 scripts/Tests/split_collapse.sf
+scripts/Tests/square_free_count.sf
 scripts/Tests/static_const_lazy_init.sf
 scripts/Tests/string_encodings.sf
 scripts/Tests/string_escapes.sf

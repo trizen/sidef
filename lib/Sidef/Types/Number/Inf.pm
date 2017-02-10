@@ -143,6 +143,7 @@ package Sidef::Types::Number::Inf {
     *znprimroot        = \&nan;
     *ramanujan_tau     = \&nan;
     *prime_count       = \&nan;
+    *square_free_count = \&nan;
     *remove            = \&nan;
     *rad               = \&nan;
     *bessel_j          = \&nan;
