@@ -849,10 +849,15 @@ package Sidef::Types::Number::Number {
 
         _valid(\$y);
 
-        if (Math::GMPq::Rmpq_integer_p($$y)) {
+        my $pow;
 
-            my $q   = Math::GMPq::Rmpq_init();
-            my $pow = Math::GMPq::Rmpq_get_d($$y);
+        if (Math::GMPq::Rmpq_integer_p($$y)) {
+            $pow = Math::GMPq::Rmpq_get_d($$y);
+        }
+
+        if (defined($pow) and $pow <= MAX_UI and $pow >= MIN_SI) {
+
+            my $q = Math::GMPq::Rmpq_init();
 
             if (Math::GMPq::Rmpq_integer_p($$x)) {
                 my $z = Math::GMPz::Rmpz_init_set($$x);
