@@ -3139,6 +3139,11 @@ package Sidef::Types::Number::Number {
     *pfactors   = \&pfactor;
 
     sub divisors {
+        my $n = &_big2istr;
+
+        $n eq '1' and return Sidef::Types::Array::Array->new(ONE);
+        $n eq '0' and return Sidef::Types::Array::Array->new();
+
         Sidef::Types::Array::Array->new(
             [
              map {
@@ -3148,14 +3153,14 @@ package Sidef::Types::Number::Number {
                    : __PACKAGE__->_set_str($_)
                }
 
-               Math::Prime::Util::GMP::divisors(&_big2istr)
+               Math::Prime::Util::GMP::divisors($n)
             ]
         );
     }
 
     sub exp_mangoldt {
         my $n = Math::Prime::Util::GMP::exp_mangoldt(&_big2istr);
-        $n == 1 and return ONE;
+        $n eq '1' and return ONE;
         $n <= MAX_UI ? __PACKAGE__->_set_uint($n) : __PACKAGE__->_set_str($n);
     }
 

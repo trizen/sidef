@@ -61,7 +61,7 @@ func tans(xs {.len == 1}) {
 }
 
 func tans(xs) {
-    var (aa, bb) = @|(xs/2)
+    var (aa, bb) = (xs/2)...
     var (a, b) = (tans(aa), tans(bb))
     (a + b) / (1 - a*b)
 }
