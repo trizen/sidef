@@ -95,7 +95,7 @@ package Sidef::Types::Range::Range {
             my $curr = $iter->() // last;
             my $curr_value = $block->run($curr);
 
-            if (CORE::int($max_value cmp $curr_value) < 0) {
+            if (CORE::int($curr_value cmp $max_value) > 0) {
                 $max       = $curr;
                 $max_value = $curr_value;
             }

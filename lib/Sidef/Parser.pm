@@ -3191,17 +3191,19 @@ package Sidef::Parser {
                                   error => 'include-error: invalid value of type "' . ref($filename) . '" (expected a string)',
                           );
 
-                        $filename = Cwd::abs_path(File::Spec->catfile(split(/\//, $filename)));
+                        my @files = map { Cwd::abs_path($_) } glob($filename);
 
-                        if (exists $Sidef::INCLUDED{$filename}) {
-                            $self->fatal_error(
-                                               code  => $_,
-                                               pos   => pos($_),
-                                               error => "include-error: circular inclusion of file: $filename",
-                                              );
+                        foreach my $file (@files) {
+                            if (exists $Sidef::INCLUDED{$file}) {
+                                $self->fatal_error(
+                                                   code  => $_,
+                                                   pos   => pos($_),
+                                                   error => "include-error: circular inclusion of file: $file",
+                                                  );
+                            }
                         }
 
-                        [$filename];
+                        map { [$_] } @files
                     } @files;
 
                     if ($chdired) { chdir($orig_dir) }
