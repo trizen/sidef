@@ -15,14 +15,21 @@ package Sidef::Types::Number::Number {
     Math::GMPq::Rmpq_set_ui((state $ZERO = Math::GMPq::Rmpq_init_nobless()), 0, 1);
     Math::GMPq::Rmpq_set_si((state $MONE = Math::GMPq::Rmpq_init_nobless()), -1, 1);
 
+#<<<
     use constant {
-        ONE  => bless(\$ONE,  __PACKAGE__),
-        ZERO => bless(\$ZERO, __PACKAGE__),
-        MONE => bless(\$MONE, __PACKAGE__),
+          ONE  => bless(\$ONE,  __PACKAGE__),
+          ZERO => bless(\$ZERO, __PACKAGE__),
+          MONE => bless(\$MONE, __PACKAGE__),
 
-        MAX_UI => defined(&Math::GMPq::_ulong_max) ? Math::GMPq::_ulong_max() : unpack('I', pack('I', -1)),
-        MIN_SI => defined(&Math::GMPq::_long_min) ? Math::GMPq::_long_min() : (-(unpack('I', pack('I', -1)) >> 1) - 1),
-                 };
+          MAX_UI => defined(&Math::GMPq::_ulong_max)
+                           ? Math::GMPq::_ulong_max()
+                           : unpack('I', pack('I', -1)),
+
+          MIN_SI => defined(&Math::GMPq::_long_min)
+                           ? Math::GMPq::_long_min()
+                           : -(unpack('I', pack('I', -1)) >> 1),
+    };
+#>>>
 
     use parent qw(
       Sidef::Object::Object
@@ -3194,7 +3201,7 @@ package Sidef::Types::Number::Number {
 
     sub omega {
         my %factors;
-        undef @factors{Math::Prime::Util::GMP::factor(&_big2istr)};
+        @factors{Math::Prime::Util::GMP::factor(&_big2istr)} = ();
         __PACKAGE__->_set_uint(scalar keys %factors);
     }
 

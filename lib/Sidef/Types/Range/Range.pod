@@ -258,9 +258,25 @@ Return the
 
 =cut
 
+=head2 max_by
+
+Range.max_by() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 min
 
 Range.min() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 min_by
+
+Range.min_by() -> I<Obj>
 
 Return the
 

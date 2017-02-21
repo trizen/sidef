@@ -50,15 +50,67 @@ package Sidef::Types::Range::Range {
           : $self->{to};
     }
 
+    sub min_by {
+        my ($self, $block) = @_;
+
+        my $iter = $self->iter->{code};
+
+        my $min = $iter->() // return undef;
+        my $min_value = $block->run($min);
+
+        while (1) {
+            my $curr = $iter->() // last;
+            my $curr_value = $block->run($curr);
+
+            if (CORE::int($curr_value cmp $min_value) < 0) {
+                $min       = $curr;
+                $min_value = $curr_value;
+            }
+        }
+
+        $min;
+    }
+
     sub min {
-        my ($self) = @_;
+        my ($self, $block) = @_;
+
+        if (defined($block)) {
+            goto \&min_by;
+        }
+
         ($self->{_asc} //= !!$self->{step}->is_pos)
           ? $self->{from}
           : $self->{to};
     }
 
+    sub max_by {
+        my ($self, $block) = @_;
+
+        my $iter = $self->iter->{code};
+
+        my $max = $iter->() // return undef;
+        my $max_value = $block->run($max);
+
+        while (1) {
+            my $curr = $iter->() // last;
+            my $curr_value = $block->run($curr);
+
+            if (CORE::int($max_value cmp $curr_value) < 0) {
+                $max       = $curr;
+                $max_value = $curr_value;
+            }
+        }
+
+        $max;
+    }
+
     sub max {
-        my ($self) = @_;
+        my ($self, $block) = @_;
+
+        if (defined($block)) {
+            goto \&max_by;
+        }
+
         ($self->{_asc} //= !!$self->{step}->is_pos)
           ? $self->{to}
           : $self->{from};
