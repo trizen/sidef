@@ -3120,7 +3120,7 @@ package Sidef::Types::Number::Number {
 
     *factors = \&factor;
 
-    sub pfactor {
+    sub factor_exp {
         my %count;
         foreach my $f (Math::Prime::Util::GMP::factor(&_big2istr)) {
             ++$count{$f};
@@ -3142,8 +3142,7 @@ package Sidef::Types::Number::Number {
         Sidef::Types::Array::Array->new(\@pairs);
     }
 
-    *factor_exp = \&pfactor;
-    *pfactors   = \&pfactor;
+    *factors_exp = \&factor_exp;
 
     sub divisors {
         my $n = &_big2istr;

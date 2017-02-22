@@ -306,15 +306,14 @@ package Sidef::Types::Number::Nan {
         Sidef::Types::Array::Array->new([]);
     }
 
-    *defs       = \&of;
-    *digits     = \&of;
-    *factor     = \&of;
-    *factors    = \&of;
-    *factor_exp = \&of;
-    *pfactor    = \&of;
-    *pfactors   = \&of;
-    *primes     = \&of;
-    *divisors   = \&of;
+    *defs        = \&of;
+    *digits      = \&of;
+    *factor      = \&of;
+    *factors     = \&of;
+    *factor_exp  = \&of;
+    *factors_exp = \&of;
+    *primes      = \&of;
+    *divisors    = \&of;
 
     sub times { $_[1] }
 

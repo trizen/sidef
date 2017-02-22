@@ -776,6 +776,16 @@ Aliases: I<factors>
 
 =cut
 
+=head2 factor_exp
+
+Number.factor_exp() -> I<Obj>
+
+Return the
+
+Aliases: I<factors_exp>
+
+=cut
+
 =head2 fadd
 
 Number.fadd() -> I<Obj>
@@ -1577,16 +1587,6 @@ Return the
 Number.perfect_root() -> I<Obj>
 
 Return the
-
-=cut
-
-=head2 pfactor
-
-Number.pfactor() -> I<Obj>
-
-Return the
-
-Aliases: I<pfactors>, I<factor_exp>
 
 =cut
 
