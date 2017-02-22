@@ -497,9 +497,9 @@ package Sidef::Object::Object {
 
             my $bool = $first eq $second;
 #<<<
-            ref($bool) ? $bool : (
-                 $bool ? Sidef::Types::Bool::Bool::TRUE
-                       : Sidef::Types::Bool::Bool::FALSE
+            CORE::ref($bool) ? $bool : (
+                       $bool ? Sidef::Types::Bool::Bool::TRUE
+                             : Sidef::Types::Bool::Bool::FALSE
             );
 #>>>
         };
