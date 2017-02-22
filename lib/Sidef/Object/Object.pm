@@ -496,11 +496,12 @@ package Sidef::Object::Object {
             }
 
             my $bool = $first eq $second;
-            ref($bool) ? $bool
-              : (
+#<<<
+            ref($bool) ? $bool : (
                  $bool ? Sidef::Types::Bool::Bool::TRUE
-                 : Sidef::Types::Bool::Bool::FALSE
-                );
+                       : Sidef::Types::Bool::Bool::FALSE
+            );
+#>>>
         };
 
         # Negation of smart match
