@@ -495,9 +495,12 @@ package Sidef::Object::Object {
                 return $second->exists($first);
             }
 
-            ($first eq $second)
-              ? (Sidef::Types::Bool::Bool::TRUE)
-              : (Sidef::Types::Bool::Bool::FALSE);
+            my $bool = $first eq $second;
+            ref($bool) ? $bool
+              : (
+                 $bool ? Sidef::Types::Bool::Bool::TRUE
+                 : Sidef::Types::Bool::Bool::FALSE
+                );
         };
 
         # Negation of smart match
