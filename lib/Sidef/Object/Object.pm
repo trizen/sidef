@@ -5,7 +5,6 @@ package Sidef::Object::Object {
 
     use Sidef;
     use Sidef::Types::Bool::Bool;
-    use Sidef::Types::Number::Number;
 
     use overload
       q{~~}   => \&{__PACKAGE__ . '::' . '~~'},
@@ -31,13 +30,13 @@ package Sidef::Object::Object {
         $_[0];
       },
       q{cmp} => sub {
-        my ($obj1, $obj2, $swaped) = @_;
+        my ($obj1, $obj2, $swapped) = @_;
 
         if (ref($obj1) eq ref($obj2) and Scalar::Util::refaddr($obj1) == Scalar::Util::refaddr($obj2)) {
-            return Sidef::Types::Number::Number::ZERO;
+            return 0;
         }
 
-        if ($swaped) {
+        if ($swapped) {
             ($obj1, $obj2) = ($obj2, $obj1);
         }
 
@@ -49,23 +48,24 @@ package Sidef::Object::Object {
             }
         }
 
-        my $cmp = ((CORE::ref($obj1) ? Scalar::Util::refaddr($obj1) : ('-inf' + 0))
-                   <=> (CORE::ref($obj2) ? Scalar::Util::refaddr($obj2) : ('-inf' + 0)));
-
-            $cmp < 0 ? Sidef::Types::Number::Number::MONE
-          : $cmp > 0 ? Sidef::Types::Number::Number::ONE
-          :            Sidef::Types::Number::Number::ZERO;
+#<<<
+        (CORE::ref($obj1) ? Scalar::Util::refaddr($obj1) : ('-inf' + 0)) <=>
+        (CORE::ref($obj2) ? Scalar::Util::refaddr($obj2) : ('-inf' + 0));
+#>>>
       },
       q{eq} => sub {
         my ($obj1, $obj2) = @_;
 
         if (ref($obj1) eq ref($obj2) and Scalar::Util::refaddr($obj1) == Scalar::Util::refaddr($obj2)) {
-            return Sidef::Types::Bool::Bool::TRUE;
+            return 1;
         }
 
-        (   UNIVERSAL::isa($obj1, CORE::ref($obj2) || return (Sidef::Types::Bool::Bool::FALSE))
-         || UNIVERSAL::isa($obj2, CORE::ref($obj1) || return (Sidef::Types::Bool::Bool::FALSE)))
-          || return (Sidef::Types::Bool::Bool::FALSE);
+#<<<
+        (
+             UNIVERSAL::isa($obj1, CORE::ref($obj2) || return 0) ||
+             UNIVERSAL::isa($obj2, CORE::ref($obj1) || return 0)
+        ) || return 0;
+#>>>
 
         if (defined(my $sub = UNIVERSAL::can($obj1, '=='))) {
             @_ = ($obj1, $obj2);
@@ -358,9 +358,9 @@ package Sidef::Object::Object {
 
         # Smart match operator
         *{__PACKAGE__ . '::' . '~~'} = sub {
-            my ($first, $second, $swaped) = @_;
+            my ($first, $second, $swapped) = @_;
 
-            if ($swaped) {
+            if ($swapped) {
                 ($first, $second) = ($second, $first);
             }
 
