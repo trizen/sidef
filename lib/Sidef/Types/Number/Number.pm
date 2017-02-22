@@ -2725,6 +2725,36 @@ package Sidef::Types::Number::Number {
         _mpz2big($c);
     }
 
+    sub _Li_inverse {
+        my ($x) = @_;
+
+        # Function translated from:
+        #   https://github.com/kimwalisch/primecount
+
+        my $logx  = CORE::log($x);
+        my $first = CORE::int($x * $logx);
+        my $last  = CORE::int($x * $logx * 2 + 2);
+
+        my $mpfr = Math::MPFR::Rmpfr_init2(64);
+
+        # Find Li^-1(x) using binary search
+        while ($first < $last) {
+            my $mid = $first + (($last - $first) >> 1);
+
+            Math::MPFR::Rmpfr_set_d($mpfr, CORE::log($mid), $ROUND);
+            Math::MPFR::Rmpfr_eint($mpfr, $mpfr, $ROUND);
+
+            if (Math::MPFR::Rmpfr_get_d($mpfr, $ROUND) - 1.045163780117 < $x) {
+                $first = $mid + 1;
+            }
+            else {
+                $last = $mid;
+            }
+        }
+
+        return $first;
+    }
+
     sub nth_prime {
         my ($n) = @_;
 
@@ -2740,7 +2770,16 @@ package Sidef::Types::Number::Number {
             my $count      = 0;
             my $prev_count = 0;
 
-            my $approx = CORE::int($n * CORE::log($n) + $n * (CORE::log(CORE::log($n)) - 1));
+            #my $approx    = CORE::int($n * CORE::log($n) + $n * (CORE::log(CORE::log($n)) - 1));
+            #my $up_approx = CORE::int($n * CORE::log($n) + $n * CORE::log(CORE::log($n)));
+
+            my $li_inv_n  = _Li_inverse($n);
+            my $li_inv_sn = _Li_inverse(CORE::int(CORE::sqrt($n)));
+
+            ## Formula due to Dana Jacobsen:
+            ## Nth prime ≈ Li^-1(n) + Li^-1(sqrt(n)) / 4
+            my $approx    = CORE::int($li_inv_n + $li_inv_sn / 4);
+            my $up_approx = CORE::int($li_inv_n + $li_inv_sn);       # conjecture
 
             state $checkpoints = [[1000000000000, 37607912018],
                                   [100000000000,  4118054813],
@@ -2905,10 +2944,8 @@ package Sidef::Types::Number::Number {
                 $prev_count = $count;
             }
 
-            # The upper-bound can definitely be improved.
-            my $up_approx    = CORE::int($n * CORE::log($n) + $n * CORE::log(CORE::log($n)));
             my $count_approx = $up_approx - $i;
-            my $step         = $count_approx < 1e6 ? $count_approx : $n > 1e8 ? 1e7 : 1e6;
+            my $step = $count_approx < 1e6 ? $count_approx : $n > 1e8 ? 1e7 : 1e6;
 
             for (; ; $i += $step) {
                 my $primes = Math::Prime::Util::GMP::primes($i, $i + $step);
