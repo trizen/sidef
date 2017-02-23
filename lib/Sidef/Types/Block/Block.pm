@@ -114,7 +114,7 @@ package Sidef::Types::Block::Block {
                         }
 
                         if (exists($var->{subset})) {
-                            $var->{subset}->SUPER::isa(ref($value)) || next OUTER;
+                            UNIVERSAL::isa($var->{subset}, ref($value)) || next OUTER;
 
                             if (exists($var->{where_block})) {
                                 $var->{where_block}($value) || next OUTER;
