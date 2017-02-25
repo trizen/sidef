@@ -209,7 +209,7 @@ package Sidef::Object::Object {
 
     sub is_a {
         my ($self, $obj) = @_;
-        UNIVERSAL::isa($self, CORE::ref($obj) || $obj)
+        UNIVERSAL::isa($self, "$obj")
           ? (Sidef::Types::Bool::Bool::TRUE)
           : (Sidef::Types::Bool::Bool::FALSE);
     }

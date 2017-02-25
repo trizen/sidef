@@ -1549,7 +1549,7 @@ package Sidef::Parser {
                             }
                             elsif (exists $self->{built_in_classes}{$name}) {
                                 $self->fatal_error(
-                                                   error  => "Inheritance from built-in classes is not allowed",
+                                                   error  => "Inheriting from built-in classes is not allowed",
                                                    reason => "`$name` is a built-in class",
                                                    code   => $_,
                                                    pos    => pos($_) - length($name) - 1,
