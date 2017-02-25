@@ -3224,14 +3224,13 @@ package Sidef::Parser {
                     close $fh;
 
                     local $Sidef::INCLUDED{$full_path} = 1;
+                    my $parser = defined($name) ? __PACKAGE__->new() : $self;
 
-                    my $parser = __PACKAGE__->new(
-                                                  opt         => $self->{opt},
-                                                  file_name   => $full_path,
-                                                  script_name => $self->{script_name},
-                                                 );
+                    local $parser->{opt}         = $self->{opt};
+                    local $parser->{script_name} = $self->{script_name};
+                    local $parser->{file_name}   = $full_path;
+                    local $parser->{class}       = $name if defined $name;
 
-                    local $parser->{class} = $name if defined $name;
                     if (defined $name and $name ne 'main' and not grep $_ eq $name, @Sidef::NAMESPACES) {
                         unshift @Sidef::NAMESPACES, $name;
                     }
