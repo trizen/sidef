@@ -1869,6 +1869,31 @@ package Sidef::Types::Array::Array {
     *permutation = \&permutations;    # deprecated
     *each_perm   = \&permutations;
 
+    sub cartesian {
+        my ($self, $block) = @_;
+
+        my @C = @$self;
+        my @c = ();
+
+        my $p;
+        $p = sub {
+            if (@c < @C) {
+                for (@{$C[@c]}) {
+                    push @c, $_;
+                    __SUB__->();
+                    pop @c;
+                }
+            }
+            else {
+                $block->run(bless [@c], __PACKAGE__);
+            }
+        };
+
+        $p->();
+        $p = undef;
+        $self;
+    }
+
     sub pack {
         my ($self, $format) = @_;
         Sidef::Types::String::String->new(CORE::pack("$format", @$self));
