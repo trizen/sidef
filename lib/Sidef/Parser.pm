@@ -3230,7 +3230,7 @@ package Sidef::Parser {
                     local $parser->{script_name} = $self->{script_name};
                     local $parser->{file_name}   = $full_path;
                     local $parser->{class}       = $name if defined $name;
-                    local $parser->{line}        = 0;
+                    local $parser->{line}        = 1;
 
                     if (defined $name and $name ne 'main' and not grep $_ eq $name, @Sidef::NAMESPACES) {
                         unshift @Sidef::NAMESPACES, $name;
