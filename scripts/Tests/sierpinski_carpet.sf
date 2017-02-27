@@ -1,0 +1,9 @@
+#!/usr/bin/ruby
+
+var c = ['##'];
+
+{
+    c = ( c.map{.*3} + c.map{|l| l + (' ' * l.len) + l } + c.map{.*3} );
+} * 3;
+
+c.join("\n").say;

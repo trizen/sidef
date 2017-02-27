@@ -522,8 +522,6 @@ scripts/RosettaCode/short-circuit_evaluation.sf
 scripts/RosettaCode/show_the_epoch.sf
 scripts/RosettaCode/shunting-yard_algorithm.sf
 scripts/RosettaCode/sidef_3d_ascii.sf
-scripts/RosettaCode/sierpinski_carpet.sf
-scripts/RosettaCode/sierpinski_triangle.sf
 scripts/RosettaCode/sieve_of_eratosthenes.sf
 scripts/RosettaCode/singleton.sf
 scripts/RosettaCode/singly-linked_list_element_definition.sf
@@ -579,6 +577,7 @@ scripts/RosettaCode/zig-zag_matrix.sf
 scripts/rsa_code.sf
 scripts/sets.sf
 scripts/sierpinski_carpet.sf
+scripts/sierpinski_triangle.sf
 scripts/simple_moving_average.sf
 scripts/simple_moving_average_oo.sf
 scripts/smart_word_wrap.sf
@@ -823,6 +822,7 @@ scripts/Tests/sidef_executor.sf
 scripts/Tests/sidef_keywords.sf
 scripts/Tests/sidef_to_json.sf
 scripts/Tests/sierpinski_alphabet.sf
+scripts/Tests/sierpinski_carpet.sf
 scripts/Tests/sierpinski_diamond.sf
 scripts/Tests/sierpinski_penta.sf
 scripts/Tests/sierpinski_sidef.sf
