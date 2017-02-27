@@ -2299,7 +2299,7 @@ package Sidef::Parser {
               && $self->fatal_error(
                                     code  => $_,
                                     pos   => $p - 1,
-                                    error => "unbalanced parentheses",
+                                    error => "unbalanced parenthesis",
                                    );
 
             return $obj;
@@ -2322,7 +2322,7 @@ package Sidef::Parser {
               && $self->fatal_error(
                                     code  => $_,
                                     pos   => $p - 1,
-                                    error => "unbalanced right brackets",
+                                    error => "unbalanced right bracket",
                                    );
 
             return $obj;
@@ -2345,7 +2345,7 @@ package Sidef::Parser {
               && $self->fatal_error(
                                     code  => $_,
                                     pos   => $p - 1,
-                                    error => "unbalanced curly brackets",
+                                    error => "unbalanced curly bracket",
                                    );
 
             return $obj;
@@ -2410,7 +2410,7 @@ package Sidef::Parser {
               && $self->fatal_error(
                                     code  => $_,
                                     pos   => $p - 1,
-                                    error => "unbalanced curly brackets",
+                                    error => "unbalanced curly bracket",
                                    );
 
             #$block->{vars} = [
@@ -3230,6 +3230,7 @@ package Sidef::Parser {
                     local $parser->{script_name} = $self->{script_name};
                     local $parser->{file_name}   = $full_path;
                     local $parser->{class}       = $name if defined $name;
+                    local $parser->{line}        = 0;
 
                     if (defined $name and $name ne 'main' and not grep $_ eq $name, @Sidef::NAMESPACES) {
                         unshift @Sidef::NAMESPACES, $name;
@@ -3376,7 +3377,7 @@ package Sidef::Parser {
 
                 if (--$self->{right_brackets} < 0) {
                     $self->fatal_error(
-                                       error => 'unbalanced right brackets',
+                                       error => 'unbalanced right bracket',
                                        code  => $_,
                                        pos   => pos($_) - 1,
                                       );
@@ -3389,7 +3390,7 @@ package Sidef::Parser {
 
                 if (--$self->{curly_brackets} < 0) {
                     $self->fatal_error(
-                                       error => 'unbalanced curly brackets',
+                                       error => 'unbalanced curly bracket',
                                        code  => $_,
                                        pos   => pos($_) - 1,
                                       );
@@ -3403,7 +3404,7 @@ package Sidef::Parser {
 
                 if (--$self->{parentheses} < 0) {
                     $self->fatal_error(
-                                       error => 'unbalanced parentheses',
+                                       error => 'unbalanced parenthesis',
                                        code  => $_,
                                        pos   => pos($_) - 1,
                                       );

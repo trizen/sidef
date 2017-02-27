@@ -55,6 +55,8 @@ package Sidef::Types::Block::Block {
 
             my $name = $self->{name};
 
+            #say "$self->{class} -> $name";
+
             my @isa = do {
                 no strict 'refs';
                 @{$self->{class} . '::' . 'ISA'};
