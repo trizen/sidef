@@ -382,7 +382,7 @@ HEADER
                 ref($_) eq 'Sidef::Types::Number::Number'
                   ? $_->_get_double
                   : ref($_) ? ('(map { ref($_) eq "Sidef::Types::Number::Number" ? Math::GMPq::Rmpq_get_d($$_) '
-                               . ': do {state$sub;$sub=UNIVERSAL::can($_, "..."); '
+                               . ': do {my$sub=UNIVERSAL::can($_, "..."); '
                                . 'defined($sub) ? $sub->($_) : CORE::int($_) } } '
                                . ($self->deparse_expr(ref($_) eq 'HASH' ? $_ : {self => $_})) . ')')
                   : $_
@@ -1042,7 +1042,7 @@ HEADER
                     and exists($obj->{vars}[0]{slurpy}))
               ) {
                 $code =
-                    'do{state$obj;$obj='
+                    'do{my$obj='
                   . $expr . ';'
                   . 'my$block='
                   . $block
@@ -1052,7 +1052,7 @@ HEADER
             }
             else {
                 $code =
-                    'do{state$obj;$obj='
+                    'do{my$obj='
                   . $expr . ';'
                   . 'my$block='
                   . $block
@@ -1091,12 +1091,7 @@ HEADER
             }
         }
         elsif ($ref eq 'Sidef::Meta::PrefixMethod') {
-            $code =
-                'do{state($self,@args);($self,@args)='
-              . $self->deparse_args($obj->{expr})
-              . ';$self->'
-              . $obj->{name}
-              . '(@args)}';
+            $code = 'do{my($self,@args)=' . $self->deparse_args($obj->{expr}) . ';$self->' . $obj->{name} . '(@args)}';
         }
         elsif ($ref eq 'Sidef::Types::Block::Do') {
             $code = 'do ' . $self->deparse_bare_block($obj->{block}{code});
@@ -1416,14 +1411,14 @@ HEADER
                         # Prefix ++ and -- operators on variables
                         elsif (exists $self->{inc_dec_ops}{$method}) {
                             my $var = $self->deparse_args(@{$call->{arg}});
-                            $code = "do{state\$r;\$r=\\$var;\$\$r=\$\$r\->$self->{inc_dec_ops}{$method}}";
+                            $code = "do{my\$r=\\$var;\$\$r=\$\$r\->$self->{inc_dec_ops}{$method}}";
                             next;
                         }
                     }
 
                     # Postfix ++ and -- operators on variables
                     if (exists($self->{inc_dec_ops}{$method})) {
-                        $code = "do{state(\$r,\$v);\$r=\\$code;\$v=\$\$r;\$\$r=\$v\->$self->{inc_dec_ops}{$method};\$v}";
+                        $code = "do{my\$r=\\$code;my\$v=\$\$r;\$\$r=\$v\->$self->{inc_dec_ops}{$method};\$v}";
                         next;
                     }
 
@@ -1441,7 +1436,7 @@ HEADER
                     # Reassignment operators, such as: +=, -=, *=, /=, etc...
                     if (exists $self->{reassign_ops}{$method}) {
                         $code =
-                            "CORE::sub:lvalue{state\$r;\$r=\\$code;\$\$r=\$\$r"
+                            "CORE::sub:lvalue{my\$r=\\$code;\$\$r=\$\$r"
                           . $self->_dump_op_call($self->{reassign_ops}{$method})
                           . $self->deparse_args(@{$call->{arg}}) . '}->()';
                         next;
@@ -1450,7 +1445,7 @@ HEADER
                     # != and == methods
                     if ($method eq '==' or $method eq '!=') {
                         $code =
-                            'do{state$bool;$bool='
+                            'do{my$bool='
                           . $code . 'eq'
                           . $self->deparse_args(@{$call->{arg}})
                           . ';ref($bool)?$bool:($bool?Sidef::Types::Bool::Bool::TRUE:Sidef::Types::Bool::Bool::FALSE)}'
@@ -1462,7 +1457,7 @@ HEADER
                     if ($method eq '~~' or $method eq '!~') {
                         $self->top_add(q{no warnings 'experimental::smartmatch';});
                         $code =
-                            'do{state$bool;$bool=do{'
+                            'do{my$bool=do{'
                           . $code
                           . '}~~do{'
                           . $self->deparse_args(@{$call->{arg}})
@@ -1474,7 +1469,7 @@ HEADER
                     # <=> method
                     if ($method eq '<=>') {
                         $code =
-                            'do{state$cmp;$cmp='
+                            'do{my$cmp='
                           . $code . 'cmp'
                           . $self->deparse_args(@{$call->{arg}})
                           . ';ref($cmp)?$cmp:($cmp<0?Sidef::Types::Number::Number::MONE:'
@@ -1503,18 +1498,18 @@ HEADER
 
                         if ($method eq '@') {
                             $code =
-                                '(do{state$obj;$obj='
+                                '(do{my$obj='
                               . $self->deparse_args(@{$call->{arg}})
-                              . ';state$sub;$sub=UNIVERSAL::can($obj, "to_a"); '
+                              . ';my$sub=UNIVERSAL::can($obj, "to_a"); '
                               . 'defined($sub) ? $sub->($obj) : Sidef::Types::Array::Array->new($obj) })';
                             next;
                         }
 
                         if ($method eq '@|') {
                             $code =
-                                '(do{state$obj;$obj='
+                                '(do{my$obj='
                               . $self->deparse_args(@{$call->{arg}})
-                              . ';state$sub;$sub=UNIVERSAL::can($obj, "..."); '
+                              . ';my$sub=UNIVERSAL::can($obj, "..."); '
                               . 'defined($sub) ? $sub->($obj) : $obj })';
                             next;
                         }
@@ -1568,7 +1563,7 @@ HEADER
                         # Exclamation mark (!) at the end of a method
                         if (substr($method, -1) eq '!') {
                             $code =
-                                "CORE::sub:lvalue{state\$r;\$r=\\$code;\$\$r=\$\$r\->"
+                                "CORE::sub:lvalue{my\$r=\\$code;\$\$r=\$\$r\->"
                               . substr($method, 0, -1)
                               . (exists($call->{arg}) ? $self->deparse_args(@{$call->{arg}}) : '') . '}->()';
                             next;

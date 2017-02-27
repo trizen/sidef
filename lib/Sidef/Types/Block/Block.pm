@@ -61,6 +61,7 @@ package Sidef::Types::Block::Block {
             };
 
             foreach my $class (@isa) {
+                next if index($class, 'Sidef::Runtime') != 0;
                 my @array = do {
                     no strict 'refs';
                     @{$class . '::' . '__SIDEF_CLASS_METHODS__'};
