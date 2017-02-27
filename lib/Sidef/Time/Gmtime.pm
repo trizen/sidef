@@ -51,7 +51,7 @@ package Sidef::Time::Gmtime {
         my ($self, $format) = @_;
 
         state $x = require POSIX;
-        Sidef::Types::String::String->new(POSIX::strftime($format->get_value, @{$self->{time}}));
+        Sidef::Types::String::String->new(POSIX::strftime("$format", @{$self->{time}}));
     }
 
     *format = \&strftime;
