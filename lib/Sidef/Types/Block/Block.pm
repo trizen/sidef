@@ -71,6 +71,10 @@ package Sidef::Types::Block::Block {
                 foreach my $method (@array) {
                     if ($method->{name} eq $name) {
                         push @methods, $method;
+
+                        if (exists($method->{kids})) {
+                            push @methods, @{$method->{kids}};
+                        }
                     }
                 }
             }

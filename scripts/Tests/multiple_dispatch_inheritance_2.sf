@@ -34,7 +34,7 @@ class Log(v) {
 
 class Sin(v) {
 
-    method *(Exp o) {
+    method *(Log o) {
         "Sin: #{self} * #{o}"
     }
 
@@ -45,8 +45,12 @@ class Sin(v) {
 
 class Base {
 
+    method *(Exp o) {
+        "Base1: #{self} * #{o}"
+    }
+
     method *(Object o) {
-        "Base: #{self} * #{o}"
+        "Base2: #{self} * #{o}"
     }
 }
 
@@ -59,13 +63,14 @@ say l*e
 say s*l
 
 assert_eq(l*l, "Log: Log * Log")
-assert_eq(l*e, "Base: Log * Exp")
+assert_eq(l*e, "Base1: Log * Exp")
 assert_eq(e*e, "Exp: Exp * Exp")
 assert_eq(e*l, "Exp: Exp * Log")
-assert_eq(e*s, "Base: Exp * Sin")
-assert_eq(l*s, "Base: Log * Sin")
-assert_eq(s*s, "Base: Sin * Sin")
-assert_eq(s*l, "Base: Sin * Log")
-assert_eq(s*e, "Sin: Sin * Exp")
-assert_eq(l*3, "Base: Log * 3")
-assert_eq(e*4, "Base: Exp * 4")
+assert_eq(e*s, "Base2: Exp * Sin")
+assert_eq(l*s, "Base2: Log * Sin")
+assert_eq(s*s, "Base2: Sin * Sin")
+assert_eq(s*l, "Sin: Sin * Log")
+assert_eq(s*e, "Base1: Sin * Exp")
+assert_eq(l*3, "Base2: Log * 3")
+assert_eq(e*4, "Base2: Exp * 4")
+assert_eq(s*e, "Base1: Sin * Exp")
