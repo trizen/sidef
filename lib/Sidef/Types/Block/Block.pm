@@ -49,7 +49,31 @@ package Sidef::Types::Block::Block {
     sub _multiple_dispatch {
         my ($self, @args) = @_;
 
-      OUTER: foreach my $method ($self, (exists($self->{kids}) ? @{$self->{kids}} : ())) {
+        my @methods = ($self, exists($self->{kids}) ? @{$self->{kids}} : ());
+
+        if (defined($self->{class}) and length($self->{name})) {
+
+            my $name = $self->{name};
+
+            my @isa = do {
+                no strict 'refs';
+                @{$self->{class} . '::' . 'ISA'};
+            };
+
+            foreach my $class (@isa) {
+                my @array = do {
+                    no strict 'refs';
+                    @{$class . '::' . '__SIDEF_CLASS_METHODS__'};
+                };
+                foreach my $method (@array) {
+                    if ($method->{name} eq $name) {
+                        push @methods, $method;
+                    }
+                }
+            }
+        }
+
+      OUTER: foreach my $method (@methods) {
 
             if ($method->{type} eq 'block') {
                 return ($method, $method->{code}(@args));

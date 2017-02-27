@@ -636,7 +636,9 @@ HEADER
                         # Other methods
                         else {
                             $code .= ";"
-                              . "state\$_$refaddr=do{no strict 'refs';*{"
+                              . "state\$_$refaddr=do{no strict 'refs';"
+                              . "CORE::push(\@$self->{package_name}::__SIDEF_CLASS_METHODS__, \$$obj->{name}$refaddr);"
+                              . '*{'
                               . $self->_dump_string("$self->{package_name}::$name")
                               . "}=sub{\$$obj->{name}$refaddr->call(\@_)}}";
                         }

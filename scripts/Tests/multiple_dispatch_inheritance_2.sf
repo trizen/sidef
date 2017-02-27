@@ -1,0 +1,71 @@
+#!/usr/bin/ruby
+
+class Base { }
+
+class Log < Base {}
+class Exp < Base {}
+class Sin < Base {}
+
+class Exp(v) {
+
+    method *(Exp o) {
+        "Exp: #{self} * #{o}"
+    }
+
+    method *(Log o) {
+        "Exp: #{self} * #{o}"
+    }
+
+    method to_s {
+        "Exp"
+    }
+}
+
+class Log(v) {
+
+    method *(Log o) {
+        "Log: #{self} * #{o}"
+    }
+
+    method to_s {
+        "Log"
+    }
+}
+
+class Sin(v) {
+
+    method *(Exp o) {
+        "Sin: #{self} * #{o}"
+    }
+
+    method to_s {
+        "Sin"
+    }
+}
+
+class Base {
+
+    method *(Object o) {
+        "Base: #{self} * #{o}"
+    }
+}
+
+var e = Exp(1)
+var l = Log(5)
+var s = Sin(7)
+
+say l*l
+say l*e
+say s*l
+
+assert_eq(l*l, "Log: Log * Log")
+assert_eq(l*e, "Base: Log * Exp")
+assert_eq(e*e, "Exp: Exp * Exp")
+assert_eq(e*l, "Exp: Exp * Log")
+assert_eq(e*s, "Base: Exp * Sin")
+assert_eq(l*s, "Base: Log * Sin")
+assert_eq(s*s, "Base: Sin * Sin")
+assert_eq(s*l, "Base: Sin * Log")
+assert_eq(s*e, "Sin: Sin * Exp")
+assert_eq(l*3, "Base: Log * 3")
+assert_eq(e*4, "Base: Exp * 4")

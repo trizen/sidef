@@ -1,0 +1,40 @@
+#!/usr/bin/ruby
+
+class Base {
+    method *(Object o) {
+        "Base: #{self} * #{o}"
+    }
+}
+
+class Exp(v) < Base {
+
+    method *(Exp o) {
+        "Exp: #{self} * #{o}"
+    }
+
+    method to_s {
+        "Exp"
+    }
+}
+
+class Log(v) < Base {
+
+    method *(Log o) {
+        "Log: #{self} * #{o}"
+    }
+
+    method to_s {
+        "Log"
+    }
+}
+
+var e = Exp(1)
+var l = Log(5)
+
+say l*l
+say l*e
+
+assert_eq(l*l, "Log: Log * Log")
+assert_eq(l*e, "Base: Log * Exp")
+assert_eq(e*e, "Exp: Exp * Exp")
+assert_eq(e*l, "Base: Exp * Log")
