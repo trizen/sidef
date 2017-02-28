@@ -1261,7 +1261,7 @@ package Sidef::Types::String::String {
                         splice(@chars, $i, 3, chr((CORE::ord(CORE::uc($chars[$i + 2])) + 64) % 128));
                     }
                     else {
-                        CORE::warn "[WARN] Missing control char name in \\c, within string\n";
+                        CORE::warn "[WARNING] Missing control char name in \\c, within string\n";
                         splice(@chars, $i, 2);
                     }
                 }

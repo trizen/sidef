@@ -1975,7 +1975,7 @@ package Sidef::Types::Array::Array {
 
     sub copy {
         my ($self) = @_;
-        state $x = warn "[WARN] Array.copy() is deprecated: use .clone() or .dclone() instead!\n";
+        state $x = warn "[WARNING] Array.copy() is deprecated: use .clone() or .dclone() instead!\n";
         $self->dclone;
     }
 

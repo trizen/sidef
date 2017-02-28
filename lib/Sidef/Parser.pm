@@ -489,7 +489,7 @@ package Sidef::Parser {
                        && $variable->{name} ne ''
                        && chr(ord $variable->{name}) ne '_') {
 
-                    warn '[WARN] '
+                    warn '[WARNING] '
                       . "$variable->{type} '$variable->{name}' has been declared, but not used again at "
                       . "$self->{file_name} line $variable->{line}\n";
                 }
@@ -2201,8 +2201,8 @@ package Sidef::Parser {
                     my $var = bless({name => $name, class => $class}, 'Sidef::Variable::Global');
 
                     if (not $self->{interactive}) {
-                        warn
-                          "[WARN] Implicit declaration of global variable '$name' at $self->{file_name} line $self->{line}\n";
+                        warn "[WARNING] Implicit declaration of global variable '$name'"
+                          . " at $self->{file_name} line $self->{line}\n";
                     }
 
                     unshift @{$self->{vars}{$class}},

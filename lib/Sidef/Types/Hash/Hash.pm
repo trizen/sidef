@@ -485,7 +485,7 @@ package Sidef::Types::Hash::Hash {
 
     sub copy {
         my ($self) = @_;
-        state $x = warn "[WARN] Hash.copy() is deprecated: use .clone() or .dclone() instead!\n";
+        state $x = warn "[WARNING] Hash.copy() is deprecated: use .clone() or .dclone() instead!\n";
         $self->dclone;
     }
 
