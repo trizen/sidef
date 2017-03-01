@@ -203,6 +203,14 @@ Aliases: I<best_shuffle>
 
 =cut
 
+=head2 cartesian
+
+Array.cartesian() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 change_to
 
 Array.change_to() -> I<Obj>
