@@ -254,6 +254,7 @@ package Sidef::Types::Number::Inf {
     *inc              = \&inf;
     *dec              = \&inf;
     *int              = \&inf;
+    *trunc            = \&inf;
     *as_int           = \&inf;
     *float            = \&inf;
     *as_float         = \&inf;

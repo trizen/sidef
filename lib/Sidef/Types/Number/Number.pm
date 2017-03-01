@@ -2177,6 +2177,8 @@ package Sidef::Types::Number::Number {
         _mpz2big($z);
     }
 
+    *trunc = \&int;
+
     sub float {
         Math::MPFR::Rmpfr_set_q((my $f = Math::MPFR::Rmpfr_init2($PREC)), ${$_[0]}, $ROUND);
         _mpfr2big($f);

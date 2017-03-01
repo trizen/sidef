@@ -507,7 +507,7 @@ package Sidef::Types::Number::Complex {
         $PREC = CORE::int($PREC);
 
         my $p = Math::MPFR::Rmpfr_init2($PREC);
-        Math::MPFR::Rmpfr_ui_pow_ui($p, 10, int($PREC / 4), $Sidef::Types::Number::Number::ROUND);
+        Math::MPFR::Rmpfr_ui_pow_ui($p, 10, CORE::int($PREC / 4), $Sidef::Types::Number::Number::ROUND);
         Math::MPFR::Rmpfr_ui_div($p, 1, $p, $Sidef::Types::Number::Number::ROUND);
 
         my $d = Math::MPC::Rmpc_init2($PREC);

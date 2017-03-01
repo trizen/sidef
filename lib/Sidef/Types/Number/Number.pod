@@ -1026,6 +1026,8 @@ Number.int() -> I<Obj>
 
 Return the
 
+Aliases: I<trunc>
+
 =cut
 
 =head2 inv

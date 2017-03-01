@@ -123,6 +123,7 @@ package Sidef::Types::Number::Nan {
     *max                 = \&nan;
     *min                 = \&nan;
     *int                 = \&nan;
+    *trunc               = \&nan;
     *float               = \&nan;
     *sqr                 = \&nan;
     *next_power2         = \&nan;

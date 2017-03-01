@@ -113,6 +113,7 @@ package Sidef::Types::Number::Ninf {
     *inc         = \&ninf;
     *dec         = \&ninf;
     *int         = \&ninf;
+    *trunc       = \&ninf;
     *as_int      = \&ninf;
     *float       = \&ninf;
     *as_float    = \&ninf;
