@@ -1878,8 +1878,8 @@ package Sidef::Types::Array::Array {
         my $p;
         $p = sub {
             if (@c < @C) {
-                for (@{$C[@c]}) {
-                    CORE::push(@c, $_);
+                for my $item (@{$C[@c]}) {
+                    CORE::push(@c, $item);
                     __SUB__->();
                     CORE::pop(@c);
                 }
