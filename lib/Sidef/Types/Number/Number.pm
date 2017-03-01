@@ -3058,6 +3058,24 @@ package Sidef::Types::Number::Number {
         _mpz2big($x);
     }
 
+    sub random_prime {
+        my ($from, $to) = @_;
+
+        my $prime;
+        if (defined($to)) {
+            _valid(\$to);
+            $prime = Math::Prime::Util::GMP::random_prime(_big2istr($from), _big2istr($to));
+        }
+        else {
+            $prime = Math::Prime::Util::GMP::random_prime(2, _big2istr($from));
+        }
+
+        $prime // return nan();
+        $prime <= MAX_UI
+          ? __PACKAGE__->_set_uint($prime)
+          : __PACKAGE__->_set_str($prime);
+    }
+
     sub is_semiprime {
         my $x = ${$_[0]};
         Math::GMPq::Rmpq_integer_p($x)

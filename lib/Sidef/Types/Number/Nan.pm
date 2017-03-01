@@ -192,6 +192,7 @@ package Sidef::Types::Number::Nan {
     *square_free_count = \&nan;
     *prime             = \&nan;
     *nth_prime         = \&nan;
+    *random_prime      = \&nan;
     *remove            = \&nan;
     *rad               = \&nan;
     *bessel_j          = \&nan;

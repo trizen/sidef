@@ -152,6 +152,7 @@ package Sidef::Types::Number::Inf {
     *beta              = \&nan;
     *prime             = \&nan;
     *nth_prime         = \&nan;
+    *random_prime      = \&nan;
 
     *harm     = \&inf;
     *harmonic = \&inf;

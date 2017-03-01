@@ -1252,6 +1252,14 @@ Return the
 
 =cut
 
+=head2 is_semiprime
+
+Number.is_semiprime() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 is_sqr
 
 Number.is_sqr() -> I<Obj>
@@ -1715,6 +1723,14 @@ Return the
 =head2 rand
 
 Number.rand() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 random_prime
+
+Number.random_prime() -> I<Obj>
 
 Return the
 
