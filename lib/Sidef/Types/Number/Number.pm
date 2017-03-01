@@ -3076,6 +3076,18 @@ package Sidef::Types::Number::Number {
           : __PACKAGE__->_set_str($prime);
     }
 
+    sub random_nbit_prime {
+        my $n = &_big2istr;
+        $n <= 1 && return nan();
+        __PACKAGE__->_set_str(Math::Prime::Util::GMP::random_nbit_prime($n));
+    }
+
+    sub random_ndigit_prime {
+        my $n = &_big2istr;
+        $n <= 1 && return nan();
+        __PACKAGE__->_set_str(Math::Prime::Util::GMP::random_ndigit_prime($n));
+    }
+
     sub is_semiprime {
         my $x = ${$_[0]};
         Math::GMPq::Rmpq_integer_p($x)

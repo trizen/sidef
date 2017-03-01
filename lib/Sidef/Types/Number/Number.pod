@@ -1728,6 +1728,22 @@ Return the
 
 =cut
 
+=head2 random_nbit_prime
+
+Number.random_nbit_prime() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 random_ndigit_prime
+
+Number.random_ndigit_prime() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 random_prime
 
 Number.random_prime() -> I<Obj>
