@@ -235,6 +235,7 @@ package Sidef::Types::Number::Nan {
     *is_square         = \&is_real;
     *is_sqr            = \&is_real;
     *is_prime          = \&is_real;
+    *is_semiprime      = \&is_real;
     *is_prob_prime     = \&is_real;
     *is_prov_prime     = \&is_real;
     *is_mersenne_prime = \&is_real;

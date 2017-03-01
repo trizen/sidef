@@ -58,7 +58,7 @@ my $builder = Module::Build->new(
                  'Time::HiRes'            => 0,
                  'Getopt::Std'            => 0,
                  'Term::ReadLine'         => 0,
-                 'Math::Prime::Util::GMP' => 0.41,
+                 'Math::Prime::Util::GMP' => 0.42,
                 },
 
     recommends => {

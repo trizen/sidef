@@ -3058,6 +3058,14 @@ package Sidef::Types::Number::Number {
         _mpz2big($x);
     }
 
+    sub is_semiprime {
+        my $x = ${$_[0]};
+        Math::GMPq::Rmpq_integer_p($x)
+          && Math::Prime::Util::GMP::is_semiprime(Math::GMPq::Rmpq_get_str($x, 10))
+          ? Sidef::Types::Bool::Bool::TRUE
+          : Sidef::Types::Bool::Bool::FALSE;
+    }
+
     sub is_prime {
         my $x = ${$_[0]};
         Math::GMPq::Rmpq_integer_p($x)
