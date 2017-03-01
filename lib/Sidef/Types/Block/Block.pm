@@ -1,6 +1,6 @@
 package Sidef::Types::Block::Block {
 
-    use 5.014;
+    use 5.016;
     use parent qw(
       Sidef::Object::Object
       Sidef::Convert::Convert
@@ -53,31 +53,46 @@ package Sidef::Types::Block::Block {
 
         if (defined($self->{class}) and length($self->{name})) {
 
-            my $name = $self->{name};
+            my $limit = 4096;
 
-            #say "$self->{class} -> $name";
+            sub {
+                my ($block) = @_;
 
-            my @isa = do {
-                no strict 'refs';
-                @{$self->{class} . '::' . 'ISA'};
-            };
+                my $name = $block->{name};
 
-            foreach my $class (@isa) {
-                next if index($class, 'Sidef::Runtime') != 0;
-                my @array = do {
+                my @isa = do {
                     no strict 'refs';
-                    @{$class . '::' . '__SIDEF_CLASS_METHODS__'};
+                    @{$block->{class} . '::' . 'ISA'};
                 };
-                foreach my $method (@array) {
-                    if ($method->{name} eq $name) {
-                        push @methods, $method;
 
-                        if (exists($method->{kids})) {
-                            push @methods, @{$method->{kids}};
+                foreach my $class (@isa) {
+
+                    next if index($class, 'Sidef::Runtime') != 0;
+
+                    my @array = do {
+                        no strict 'refs';
+                        @{$class . '::' . '__SIDEF_CLASS_METHODS__'};
+                    };
+
+                    foreach my $method (@array) {
+                        if ($method->{name} eq $name) {
+                            push @methods, $method;
+
+                            if (exists($method->{kids})) {
+                                push @methods, @{$method->{kids}};
+                            }
+
+                            if (--$limit == 0) {
+                                die "[ERROR] Too deep or cyclic class inheritance!";
+                            }
+
+                            __SUB__->($method);
+                            last;
                         }
                     }
                 }
-            }
+              }
+              ->($self);
         }
 
       OUTER: foreach my $method (@methods) {
