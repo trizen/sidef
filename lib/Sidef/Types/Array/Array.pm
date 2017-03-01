@@ -1872,26 +1872,34 @@ package Sidef::Types::Array::Array {
     sub cartesian {
         my ($self, $block) = @_;
 
+        my (@c, @r);
         my @C = @$self;
-        my @c = ();
 
         my $p;
         $p = sub {
             if (@c < @C) {
                 for (@{$C[@c]}) {
-                    push @c, $_;
+                    CORE::push(@c, $_);
                     __SUB__->();
-                    pop @c;
+                    CORE::pop(@c);
                 }
             }
             else {
-                $block->run(bless [@c], __PACKAGE__);
+                if (defined($block)) {
+                    $block->run(bless [@c], __PACKAGE__);
+                }
+                else {
+                    CORE::push @r, bless [@c], __PACKAGE__;
+                }
             }
         };
 
         $p->();
         $p = undef;
-        $self;
+
+        defined($block)
+          ? $self
+          : bless(\@r, __PACKAGE__);
     }
 
     sub pack {
