@@ -934,8 +934,7 @@ package Sidef::Types::Array::Array {
 
         my %hash;
         foreach my $item (@$self) {
-            my $key = $code->run(my $val = $item);
-            CORE::push(@{$hash{$key}}, $val);
+            CORE::push(@{$hash{$code->run($item)}}, $item);
         }
 
         Sidef::Types::Hash::Hash->new(map { $_ => bless($hash{$_}, __PACKAGE__) } CORE::keys(%hash));
