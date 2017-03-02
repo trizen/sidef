@@ -16,7 +16,6 @@ New built-in classes:
 Internal:
     * Switch to subroutine `signatures` (as soon as this feature becomes stable).
     * Unify `Sidef::Types::Number::Ninf` into `Sidef::Types::Number::Inf`.
-    * Generalize the Array cross-product operator (~X) to work with an arbitrary number of arrays (Cartesian product).
 
 Speculations:
     * Make all core methods (including user-defined methods) real multimethods, using Class::Multimethods.
