@@ -578,12 +578,12 @@ package Sidef::Types::Array::Array {
     }
 
     sub max_by {
-        push @_, 1;
+        @_ = (@_[0, 1], 1);
         goto \&_min_max_by;
     }
 
     sub min_by {
-        push @_, -1;
+        @_ = (@_[0, 1], -1);
         goto \&_min_max_by;
     }
 
@@ -935,12 +935,10 @@ package Sidef::Types::Array::Array {
         my %hash;
         foreach my $item (@$self) {
             my $key = $code->run(my $val = $item);
-            my $str_key = "$key";
-            exists($hash{$str_key}) or do { $hash{$str_key} = bless([], __PACKAGE__) };
-            CORE::push(@{$hash{$str_key}}, $val);
+            CORE::push(@{$hash{$key}}, $val);
         }
 
-        Sidef::Types::Hash::Hash->new(%hash);
+        Sidef::Types::Hash::Hash->new(map { $_ => bless($hash{$_}, __PACKAGE__) } CORE::keys(%hash));
     }
 
     sub match {
@@ -991,14 +989,22 @@ package Sidef::Types::Array::Array {
 
         my %hash;
         foreach my $item (@$self) {
-            $hash{$code->run($item)}++;
+            my $r = $hash{$code->run($item)} //= {
+                                                  count => 0,
+                                                  items => [],
+                                                 };
+            CORE::push(@{$r->{items}}, $item);
+            ++$r->{count};
         }
 
-        foreach my $key (keys %hash) {
-            $hash{$key} = Sidef::Types::Number::Number->_set_uint($hash{$key});
+        my %freq;
+        foreach my $key (CORE::keys(%hash)) {
+            my $r = $hash{$key};
+            my $n = Sidef::Types::Number::Number->_set_uint($r->{count});
+            @freq{@{$r->{items}}} = ($n) x scalar(@{$r->{items}});
         }
 
-        Sidef::Types::Hash::Hash->new(%hash);
+        Sidef::Types::Hash::Hash->new(%freq);
     }
 
     sub freq {
@@ -1013,7 +1019,7 @@ package Sidef::Types::Array::Array {
             $hash{$item}++;
         }
 
-        foreach my $key (keys %hash) {
+        foreach my $key (CORE::keys %hash) {
             $hash{$key} = Sidef::Types::Number::Number->_set_uint($hash{$key});
         }
 
