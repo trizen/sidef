@@ -47,7 +47,7 @@
             "Math::GMPz" : "0.39",
             "Math::MPC" : "0",
             "Math::MPFR" : "3.29",
-            "Math::Prime::Util::GMP" : "0.41",
+            "Math::Prime::Util::GMP" : "0.42",
             "Memoize" : "0",
             "POSIX" : "0",
             "Scalar::Util" : "0",
@@ -63,7 +63,7 @@
    "provides" : {
       "Sidef" : {
          "file" : "lib/Sidef.pm",
-         "version" : "2.35"
+         "version" : "2.36"
       },
       "Sidef::Convert::Convert" : {
          "file" : "lib/Sidef/Convert/Convert.pm"
@@ -226,6 +226,6 @@
          "url" : "https://github.com/trizen/sidef"
       }
    },
-   "version" : "2.35",
+   "version" : "2.36",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

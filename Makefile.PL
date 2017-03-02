@@ -19,7 +19,7 @@ WriteMakefile
                    'Math::GMPz' => '0.39',
                    'Math::MPC' => 0,
                    'Math::MPFR' => '3.29',
-                   'Math::Prime::Util::GMP' => '0.41',
+                   'Math::Prime::Util::GMP' => '0.42',
                    'Memoize' => 0,
                    'POSIX' => 0,
                    'Scalar::Util' => 0,
