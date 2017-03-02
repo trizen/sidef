@@ -6,7 +6,7 @@
 
 func perfect_shuffle(deck) {
      var mid = deck.len/2;
-     deck.ft(0, mid-1).zip(deck.ft(mid)).flatten;
+     [deck.part(mid)].zip.flatten
 }
 
 [8, 24, 52, 100].each { |size|

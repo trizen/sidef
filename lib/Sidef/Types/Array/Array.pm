@@ -470,36 +470,6 @@ package Sidef::Types::Array::Array {
         $self->eq($array)->neg;
     }
 
-    sub zip {
-        my ($self, @arrays) = @_;
-
-        my @new_array;
-        foreach my $i (0 .. $#$self) {
-
-            my @tmp_array = ($self->[$i]);
-            foreach my $array (@arrays) {
-                CORE::push(@tmp_array, $array->[$i]);
-            }
-
-            CORE::push(@new_array, bless(\@tmp_array, __PACKAGE__));
-        }
-
-        bless(\@new_array, __PACKAGE__);
-    }
-
-    sub mzip {
-        my ($self, $array) = @_;
-
-        my $arr_max = @$array;
-
-        my @new_array;
-        foreach my $i (0 .. $#$self) {
-            CORE::push(@new_array, $self->[$i], $array->[$i % $arr_max]);
-        }
-
-        bless(\@new_array, __PACKAGE__);
-    }
-
     sub make {
         my ($self, $size, $type) = @_;
         bless([($type) x $size], __PACKAGE__);
@@ -1900,6 +1870,54 @@ package Sidef::Types::Array::Array {
         defined($block)
           ? $self
           : bless(\@r, __PACKAGE__);
+    }
+
+    sub zip {
+        my ($self, $block) = @_;
+
+        my @arrays = @{$self};
+        my $min = List::Util::min(map { scalar @$_ } @arrays);
+
+        my @first = @{CORE::shift(@arrays)};
+
+        my @new_array;
+        foreach my $i (0 .. $min - 1) {
+
+            my @tmp = ($first[$i], map { $_->[$i] } @arrays);
+
+            if (defined($block)) {
+                $block->run(bless(\@tmp, __PACKAGE__));
+            }
+            else {
+                CORE::push(@new_array, bless(\@tmp, __PACKAGE__));
+            }
+        }
+
+        defined($block) ? $self : bless(\@new_array, __PACKAGE__);
+    }
+
+    sub mzip {
+        my ($self, $block) = @_;
+
+        my @arrays = @{$self};
+        my $min = List::Util::min(map { scalar @$_ } @arrays);
+
+        my @first = @{CORE::shift(@arrays)};
+
+        my @new_array;
+        foreach my $i (0 .. $#first) {
+
+            my @tmp = ($first[$i], map { $_->[$i % $min] } @arrays);
+
+            if (defined($block)) {
+                $block->run(bless(\@tmp, __PACKAGE__));
+            }
+            else {
+                CORE::push(@new_array, bless(\@tmp, __PACKAGE__));
+            }
+        }
+
+        defined($block) ? $self : bless(\@new_array, __PACKAGE__);
     }
 
     sub pack {
