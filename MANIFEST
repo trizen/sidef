@@ -783,6 +783,7 @@ scripts/Tests/pi_machin_like_formula.sf
 scripts/Tests/postfix_exclamation_mark.sf
 scripts/Tests/power_numbers.sf
 scripts/Tests/prefix_methods.sf
+scripts/Tests/prefix_unary_operators.sf
 scripts/Tests/problem_of_apollonius.sf
 scripts/Tests/pythagorean_means.sf
 scripts/Tests/quicksort.sf

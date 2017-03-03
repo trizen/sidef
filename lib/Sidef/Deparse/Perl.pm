@@ -1366,7 +1366,9 @@ HEADER
         # Method call on the self obj (+optional arguments)
         if (exists $expr->{call}) {
 
+            my $unary;
             my $end = $#{$expr->{call}};
+
             foreach my $i (0 .. $end) {
 
                 my $call   = $expr->{call}[$i];
@@ -1477,8 +1479,11 @@ HEADER
                         next;
                     }
 
-                    # ! prefix-unary
-                    if ($ref eq 'Sidef::Operator::Unary') {
+                    # Unary prefix operator
+                    if ($ref eq 'Sidef::Operator::Unary' and !$unary) {
+
+                        $unary = 1;    # once per call
+
                         if ($method eq '!') {
                             $code = '('
                               . $self->deparse_args(@{$call->{arg}})

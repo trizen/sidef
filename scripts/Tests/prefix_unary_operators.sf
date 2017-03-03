@@ -1,0 +1,15 @@
+#!/usr/bin/ruby
+
+var x = 3
+var y = 4
+
+assert_eq(-x, -3)
+assert_eq(-y, -4)
+assert_eq(+(3)-4, -1)
+assert_eq(-(x)-y, -7)
+assert_eq(-(x)-(4), -7)
+assert_eq([-(3)+4], [1])
+assert_eq([-(3)-4], [-7])
+assert_eq(@(1..9)-[3,5], [1,2,4,6,7,8,9])
+
+say "** Test passed!"
