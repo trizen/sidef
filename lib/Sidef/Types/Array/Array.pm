@@ -1982,7 +1982,8 @@ package Sidef::Types::Array::Array {
         );
     }
 
-    *encode = \&join_bytes;
+    *encode = \&join_bytes;     # somehow, I got this alias wrong...
+    *decode = \&join_bytes;
 
     sub reverse {
         my ($self) = @_;
