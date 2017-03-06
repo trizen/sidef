@@ -26,6 +26,8 @@ use lib qw(../lib);
 
 use Sidef;
 
+binmode(STDERR, ':utf8');
+
 use File::Find qw(find);
 use File::Basename qw(basename);
 use File::Spec::Functions qw(catdir updir rel2abs);

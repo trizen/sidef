@@ -341,8 +341,8 @@ package Sidef::Parser {
                     | <<(?<reduce>[_\pL][\pL\pN\w]*|(?&ops))>>        # reduce operator (e.g.: <<add>> or <<+>>)
                     | «(?<reduce>[_\pL][\pL\pN\w]*|(?&ops))»          # reduce operator (e.g.: «add» or «+»)
 
-                    | \^(?<op>[_\pL][\pL\pN\w]*[!:?]?)\^              # method-like operator (e.g.: ^add^)
-                    | (?<op>(?&ops))                                 # primitive operator   (e.g.: +, -, *, /)
+                    | `(?<op>[_\pL][\pL\pN\w]*[!:?]?)`                # method-like operator (e.g.: `add`)
+                    | (?<op>(?&ops))                                  # primitive operator   (e.g.: +, -, *, /)
                 }x;
             },
 
