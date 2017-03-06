@@ -1,0 +1,29 @@
+#!/usr/bin/ruby
+
+class Animal(String name, Number age)  {
+    method speak { "..." }
+}
+
+class Dog(String color) < Animal {
+    method speak { "woof" }
+    method ageHumanYears { self.age * 7 }
+}
+
+class Cat < Animal {
+    method speak { "meow" }
+}
+
+var dog = Dog(name: "Sparky", age: 6, color: "white")
+var cat = Cat(name: "Mitten", age: 3)
+
+say dog.speak          #=> woof
+say cat.speak          #=> meow
+say cat.age            #=> 3
+say dog.ageHumanYears  #=> 42
+say dog.color          #=> white
+
+assert_eq(dog.speak, "woof")
+assert_eq(cat.speak, "meow")
+assert_eq(cat.age, 3)
+assert_eq(dog.ageHumanYears, 42)
+assert_eq(dog.color, "white")
