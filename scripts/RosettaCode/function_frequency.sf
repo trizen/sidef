@@ -4,22 +4,21 @@
 ## http://rosettacode.org/wiki/Function_frequency
 #
 
-var program = <<'EOT'
 func foo { }
 func bar { }
 
 foo(); foo(); foo()
 bar(); bar();
-EOT
 
-var parser = Parser.new                     # initialize a new parser
-parser.parse_script( code => program )      # parse the code
-
-var data = Perl.to_sidef(parser{:vars}{:main}).flatten
+var info = []
+var data = Perl.to_sidef(Parser{:vars}{:main}).flatten
 
 data.sort_by { |v| -v{:count} }.first(10).each { |entry|
     if (entry{:type} == :func) {
+        info << [entry{:name}, entry{:line}, entry{:count}]
         say ("Function `#{entry{:name}}` (declared at line",
              " #{entry{:line}}) is used #{entry{:count}} times")
     }
 }
+
+assert_eq(info, [["foo", 7, 3], ["bar", 8, 2]])
