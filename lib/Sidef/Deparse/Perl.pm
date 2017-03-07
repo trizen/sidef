@@ -1309,7 +1309,7 @@ HEADER
             $code = $self->make_constant($ref, 'new', "Pipe$refaddr", map { $self->_dump_string($_) } @{$obj});
         }
         elsif ($ref eq 'Sidef::Parser') {
-            $code = $self->make_constant($ref, 'new', "Parser$refaddr");
+            $code = '$Sidef::PARSER';
         }
         elsif ($ref eq 'Sidef::Perl::Perl') {
             $code = $self->make_constant($ref, 'new', "Perl$refaddr");
