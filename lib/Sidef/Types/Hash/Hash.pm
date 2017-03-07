@@ -15,7 +15,7 @@ package Sidef::Types::Hash::Hash {
     use Sidef::Types::Bool::Bool;
 
     sub new {
-        my ($class, %pairs) = @_;
+        my (undef, %pairs) = @_;
         bless \%pairs, __PACKAGE__;
     }
 
@@ -80,7 +80,7 @@ package Sidef::Types::Hash::Hash {
 
     sub slice {
         my ($self, @keys) = @_;
-        $self->new(map { ($_ => exists($self->{$_}) ? $self->{$_} : undef) } @keys);
+        bless {map { ($_ => $self->{$_}) } @keys}, __PACKAGE__;
     }
 
     sub length {
@@ -164,7 +164,7 @@ package Sidef::Types::Hash::Hash {
             $hash{$key} = $code->run(Sidef::Types::String::String->new($key), $self->{$key});
         }
 
-        $self->new(%hash);
+        bless \%hash, __PACKAGE__;
     }
 
     *map_v = \&map_val;
@@ -178,7 +178,7 @@ package Sidef::Types::Hash::Hash {
             $hash{$k} = $v;
         }
 
-        $self->new(%hash);
+        bless \%hash, __PACKAGE__;
     }
 
     *map_kv = \&map;
@@ -201,7 +201,7 @@ package Sidef::Types::Hash::Hash {
             }
         }
 
-        $self->new(%hash);
+        bless \%hash, __PACKAGE__;
     }
 
     *grep_kv = \&grep;
@@ -224,7 +224,7 @@ package Sidef::Types::Hash::Hash {
             }
         }
 
-        $self->new(%hash);
+        bless \%hash, __PACKAGE__;
     }
 
     *grep_v = \&grep_val;
@@ -268,7 +268,7 @@ package Sidef::Types::Hash::Hash {
             push @list, $key, $val;
         }
 
-        $self->new(@list);
+        bless {@list}, __PACKAGE__;
     }
 
     *merge = \&concat;
@@ -473,12 +473,9 @@ package Sidef::Types::Hash::Hash {
 
     sub reverse {
         my ($self) = @_;
-
-        my $new_hash = $self->new();
-        @{$new_hash}{CORE::values %$self} =
-          (map { Sidef::Types::String::String->new($_) } CORE::keys %$self);
-
-        $new_hash;
+        my %hash;
+        @hash{CORE::values %$self} = (map { Sidef::Types::String::String->new($_) } CORE::keys %$self);
+        bless \%hash, __PACKAGE__;
     }
 
     *flip = \&reverse;

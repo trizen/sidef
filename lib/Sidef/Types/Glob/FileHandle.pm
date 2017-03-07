@@ -212,6 +212,8 @@ package Sidef::Types::Glob::FileHandle {
         Sidef::Types::Array::Array->new(\@array);
     }
 
+    *select = \&grep;
+
     sub map {
         my ($self, $block) = @_;
 

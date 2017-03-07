@@ -149,6 +149,8 @@ FileHandle.grep() -> I<Obj>
 
 Return the
 
+Aliases: I<select>
+
 =cut
 
 =head2 isatty

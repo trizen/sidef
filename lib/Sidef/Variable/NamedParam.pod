@@ -24,9 +24,25 @@ Return the
 
 =cut
 
+=head2 name
+
+NamedParam.name() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 new
 
 NamedParam.new() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 value
+
+NamedParam.value() -> I<Obj>
 
 Return the
 

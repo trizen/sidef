@@ -303,6 +303,16 @@ Return the
 
 =cut
 
+=head2 decode
+
+Array.decode() -> I<Obj>
+
+Return the
+
+Aliases: I<encode>, I<join_bytes>
+
+=cut
+
 =head2 defined
 
 Array.defined() -> I<Obj>
@@ -420,16 +430,6 @@ Return the
 Array.each_slice() -> I<Obj>
 
 Return the
-
-=cut
-
-=head2 encode
-
-Array.encode() -> I<Obj>
-
-Return the
-
-Aliases: I<join_bytes>
 
 =cut
 
