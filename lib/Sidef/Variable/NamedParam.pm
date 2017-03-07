@@ -8,6 +8,16 @@ package Sidef::Variable::NamedParam {
         bless [$name, \@args], __PACKAGE__;
     }
 
+    sub name {
+        my ($self) = @_;
+        Sidef::Types::String::String->new($self->[0]);
+    }
+
+    sub value {
+        my ($self) = @_;
+        (@{$self->[1]});
+    }
+
     sub get_value {
         my ($self) = @_;
         map { $_->get_value } @{$self->[1]};
