@@ -237,11 +237,11 @@ package Sidef::Types::Block::Block {
           )
           . ')'
           . "\n\nPossible candidates are: "
-          . "\n    $name("
+          . "\n    "
           . join(
-            ")\n    $name(",
+            "\n    ",
             map {
-                join(
+                Sidef::normalize_type($_->{class}) . '::' . Sidef::normalize_type($_->{name}) . '(' . join(
                     ', ',
                     map {
                             (exists($_->{slurpy}) ? '*' : '')
@@ -249,10 +249,11 @@ package Sidef::Types::Block::Block {
                           . $_->{name}
                           . (exists($_->{subset}) ? (' < ' . Sidef::normalize_type($_->{subset})) : '')
                       } @{$_->{vars}}
-                    )
-              } ($self, (exists($self->{kids}) ? @{$self->{kids}} : ()))
+                  )
+                  . ')'
+              } @methods
           )
-          . ")\n\n ";
+          . "\n\n ";
     }
 
     sub call {
