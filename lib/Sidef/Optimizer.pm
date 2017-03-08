@@ -854,21 +854,23 @@ package Sidef::Optimizer {
             }
         }
         elsif ($ref eq 'Sidef::Types::Array::HCArray') {
-            my $has_expr = 0;
+
+            #~ my $has_expr = 0;
 
             foreach my $i (0 .. $#{$obj}) {
                 if (ref($obj->[$i]) eq 'HASH') {
                     $obj->[$i] = $self->optimize_expr($obj->[$i]);
-                    $has_expr ||= ref($obj->[$i]) eq 'HASH';
+
+                    #~ $has_expr ||= ref($obj->[$i]) eq 'HASH';
                 }
             }
 
             # Has no expressions, so let's convert it into an Array
-            if (not $has_expr) {
+            #~ if (not $has_expr) {
 
-                #$obj = Sidef::Types::Array::Array->new(@{$obj});
-                bless $obj, 'Sidef::Types::Array::Array';
-            }
+            #~ #$obj = Sidef::Types::Array::Array->new(@{$obj});
+            #~ bless $obj, 'Sidef::Types::Array::Array';
+            #~ }
         }
         elsif ($ref eq 'Sidef::Types::Block::If') {
             foreach my $i (0 .. $#{$obj->{if}}) {
