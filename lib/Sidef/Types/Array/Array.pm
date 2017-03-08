@@ -1850,8 +1850,7 @@ package Sidef::Types::Array::Array {
         my (@c, @r);
         my @C = @$self;
 
-        my $p;
-        $p = sub {
+        sub {
             if (@c < @C) {
                 for my $item (@{$C[@c]}) {
                     CORE::push(@c, $item);
@@ -1867,10 +1866,8 @@ package Sidef::Types::Array::Array {
                     CORE::push @r, bless [@c], __PACKAGE__;
                 }
             }
-        };
-
-        $p->();
-        $p = undef;
+          }
+          ->();
 
         defined($block)
           ? $self
@@ -1982,7 +1979,7 @@ package Sidef::Types::Array::Array {
         );
     }
 
-    *encode = \&join_bytes;     # somehow, I got this alias wrong...
+    *encode = \&join_bytes;    # somehow, I got this alias wrong...
     *decode = \&join_bytes;
 
     sub reverse {
