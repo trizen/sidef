@@ -241,7 +241,9 @@ package Sidef::Types::Block::Block {
           . join(
             "\n    ",
             map {
-                Sidef::normalize_type($_->{class}) . '::' . Sidef::normalize_type($_->{name}) . '(' . join(
+                    ($_->{class} ? (Sidef::normalize_type($_->{class}) . '::') : '')
+                  . Sidef::normalize_type($_->{name}) . '('
+                  . join(
                     ', ',
                     map {
                             (exists($_->{slurpy}) ? '*' : '')
