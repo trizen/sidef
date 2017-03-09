@@ -2463,10 +2463,20 @@ package Sidef::Types::Number::Number {
     sub modpow {
         my ($x, $y, $z) = @_;
         _valid(\$y, \$z);
-        my $mod = _big2mpz($z);
-        Math::GMPz::Rmpz_sgn($mod) || return nan();
+
+        $z = _big2mpz($z);
+        Math::GMPz::Rmpz_sgn($z) || return nan();
+
         $x = _big2mpz($x);
-        Math::GMPz::Rmpz_powm($x, $x, _big2mpz($y), $mod);
+        $y = _big2mpz($y);
+
+        if (Math::GMPz::Rmpz_sgn($y) < 0) {
+            my $t = Math::GMPz::Rmpz_init();
+            Math::GMPz::Rmpz_gcd($t, $x, $z);
+            Math::GMPz::Rmpz_cmp_ui($t, 1) == 0 or return nan();
+        }
+
+        Math::GMPz::Rmpz_powm($x, $x, $y, $z);
         _mpz2big($x);
     }
 
