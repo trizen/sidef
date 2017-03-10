@@ -3064,7 +3064,7 @@ package Sidef::Types::Number::Number {
         my ($x, $y) = @_;
         _valid(\$y);
         my $z = _big2mpz($y);
-        Math::GMPz::Rmpz_sgn($z) || return ZERO;
+        Math::GMPz::Rmpz_sgn($z) || return $x;
         $x = _big2mpz($x);
         Math::GMPz::Rmpz_remove($x, $x, $z);
         _mpz2big($x);
