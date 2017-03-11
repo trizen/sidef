@@ -795,7 +795,16 @@ package Sidef::Types::Number::Number {
         }
 
         _valid(\$y);
-        $x->pow($y->inv);
+        if (    Math::GMPq::Rmpq_sgn($$x) > 0
+            and Math::GMPq::Rmpq_sgn($$y) > 0
+            and Math::GMPq::Rmpq_integer_p($$y)) {
+            $x = _big2mpfr($x);
+            Math::MPFR::Rmpfr_root($x, $x, Math::GMPq::Rmpq_get_d($$y), $ROUND);
+            _mpfr2big($x);
+        }
+        else {
+            $x->pow($y->inv);
+        }
     }
 
     sub iroot {
@@ -1050,8 +1059,9 @@ package Sidef::Types::Number::Number {
     sub lgrt {
         my ($x) = @_;
 
-        my $sgn = Math::GMPq::Rmpq_sgn($$x);
-        Math::GMPq::Rmpq_cmp_ui($$x, 7, 10) < 0 and return Sidef::Types::Number::Complex->new($x)->lgrt;
+        # Return a complex number for x < e^(-1/e)
+        Math::GMPq::Rmpq_cmp_ui($$x, 67108864, 96950019) < 0
+          and return Sidef::Types::Number::Complex->new($x)->lgrt;
 
         my $d = _big2mpfr($x);
         Math::MPFR::Rmpfr_log($d, $d, $ROUND);
@@ -1088,10 +1098,9 @@ package Sidef::Types::Number::Number {
     sub lambert_w {
         my ($x) = @_;
 
-        my $sgn = Math::GMPq::Rmpq_sgn($$x);
-
-        $sgn == 0 and return ZERO;
-        $sgn < 0  and return Sidef::Types::Number::Complex->new($x)->lambert_w;
+        # Return a complex number for x < -1/e
+        Math::GMPq::Rmpq_cmp_si($$x, -33554432, 91210403) < 0
+          and return Sidef::Types::Number::Complex->new($x)->lambert_w;
 
         my $d = _big2mpfr($x);
 
