@@ -60,12 +60,15 @@ package Sidef::Types::Number::Inf {
 
     sub is_pos { Sidef::Types::Bool::Bool::TRUE }
 
-    *is_inf = \&is_pos;
+    *is_inf      = \&is_pos;
+    *is_positive = \&is_pos;
 
     sub is_real { Sidef::Types::Bool::Bool::FALSE }
 
     *is_nan            = \&is_real;
     *is_neg            = \&is_real;
+    *is_negative       = \&is_real;
+    *is_int            = \&is_real;
     *is_prime          = \&is_real;
     *is_semiprime      = \&is_real;
     *is_prob_prime     = \&is_real;

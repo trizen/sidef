@@ -58,10 +58,13 @@ package Sidef::Types::Number::Ninf {
 
     sub is_pos { Sidef::Types::Bool::Bool::FALSE }
 
+    *is_positive = \&is_pos;
+
     sub is_neg { Sidef::Types::Bool::Bool::TRUE }
 
-    *is_inf  = \&is_neg;
-    *is_ninf = \&is_neg;
+    *is_inf      = \&is_neg;
+    *is_ninf     = \&is_neg;
+    *is_negative = \&is_neg;
 
     sub nan { Sidef::Types::Number::Nan::NAN }
 

@@ -235,6 +235,7 @@ package Sidef::Types::Number::Nan {
     *is_inf            = \&is_real;
     *is_even           = \&is_real;
     *is_odd            = \&is_real;
+    *is_int            = \&is_real;
     *divides           = \&is_real;
     *is_square         = \&is_real;
     *is_sqr            = \&is_real;
