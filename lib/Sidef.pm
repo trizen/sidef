@@ -9,6 +9,7 @@ package Sidef {
     our @NAMESPACES;         # will keep track of declared modules
     our %INCLUDED;           # will keep track of included modules
 
+    our %MODULES;            # will contain info about modules
     our %EVALS;              # will contain info required for eval()
 
     use constant {

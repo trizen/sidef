@@ -1,5 +1,9 @@
 #!/usr/bin/ruby
 
+# No longer a valid test...
+
+__END__
+
 #
 ## Module redeclaration
 #

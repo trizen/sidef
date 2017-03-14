@@ -3016,15 +3016,26 @@ package Sidef::Parser {
                 local $parser->{line}  = $self->{line};
                 local $parser->{class} = $name;
                 local $parser->{ref_vars}{$name} = $self->{ref_vars}{$name} if exists($self->{ref_vars}{$name});
+                local $parser->{_in_module} = 1;
 
                 if ($name ne 'main' and not grep $_ eq $name, @Sidef::NAMESPACES) {
-                    unshift @Sidef::NAMESPACES, $name;
+                    if ($self->{_in_module}) {
+                        unshift @Sidef::NAMESPACES, $name;
+                    }
+                    else {
+                        push @Sidef::NAMESPACES, $name;
+                    }
                 }
 
                 my $code = '{' . substr($_, pos);
                 my ($struct, $pos) = $parser->parse_block(code => \$code);
                 pos($_) += pos($code) - 1;
                 $self->{line} = $parser->{line};
+
+                $Sidef::MODULES{$name} = {
+                                          parser => $parser,
+                                          struct => $struct,
+                                         };
 
                 foreach my $class (keys %{$struct->{code}}) {
                     push @{$struct{$class}}, @{$struct->{code}{$class}};
@@ -3064,7 +3075,7 @@ package Sidef::Parser {
                         $self->fatal_error(
                                            code  => $_,
                                            pos   => pos($_),
-                                           error => "can't import '${class}::${name}' inside the same class",
+                                           error => "can't import '${class}::${name}' inside the same namespace",
                                           );
                     }
 
@@ -3107,8 +3118,29 @@ package Sidef::Parser {
 
                 my @abs_filenames;
                 if (/\G($self->{var_name_re})/gc) {
-
                     my $var_name = $1;
+
+                    if (exists $Sidef::MODULES{$var_name}) {
+
+                        my $parser = $Sidef::MODULES{$var_name}{parser};
+                        my $struct = $Sidef::MODULES{$var_name}{struct};
+
+                        foreach my $class (keys %{$struct->{code}}) {
+                            if (exists $self->{ref_vars}{$class}) {
+                                unshift @{$self->{ref_vars}{$class}}, @{$parser->{ref_vars}{$class}[0]};
+                            }
+                            else {
+                                push @{$self->{ref_vars}{$class}},
+                                  @{
+                                      $#{$parser->{ref_vars}{$class}} == 0 && ref($parser->{ref_vars}{$class}[0]) eq 'ARRAY'
+                                    ? $parser->{ref_vars}{$class}[0]
+                                    : $parser->{ref_vars}{$class}
+                                   };
+                            }
+                        }
+                        redo;
+                    }
+
                     next if exists $Sidef::INCLUDED{$var_name};
 
                     my @path = split(/::/, $var_name);
@@ -3232,8 +3264,13 @@ package Sidef::Parser {
                     local $parser->{class}       = $name if defined $name;
                     local $parser->{line}        = 1;
 
-                    if (defined $name and $name ne 'main' and not grep $_ eq $name, @Sidef::NAMESPACES) {
-                        unshift @Sidef::NAMESPACES, $name;
+                    if (defined($name) and $name ne 'main' and not grep $_ eq $name, @Sidef::NAMESPACES) {
+                        if ($self->{_in_module}) {
+                            unshift @Sidef::NAMESPACES, $name;
+                        }
+                        else {
+                            push @Sidef::NAMESPACES, $name;
+                        }
                     }
                     my $struct = $parser->parse_script(code => \$content);
 

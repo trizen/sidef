@@ -1,0 +1,63 @@
+#!/usr/bin/ruby
+
+#
+## Module inclusion
+#
+
+module Foo {
+    var hi = 42
+    var zz = 51
+}
+
+module Bar {
+    include Foo
+    import Foo::hi
+
+    assert_eq(hi, 42)
+
+    hi = 99
+
+    assert_eq(Foo::zz, 51)
+}
+
+module Baz {
+    include Foo
+
+    assert_eq(Foo::hi, 99)
+    assert_eq(Foo::zz, 51)
+
+    Foo::hi = 1234
+    Foo::zz = 8
+}
+
+module Qux {
+    include Foo
+
+    import(Foo::hi, Foo::zz)
+
+    assert_eq(hi, 1234)
+    assert_eq(zz, 8)
+
+    hi = 1
+    zz = 2
+}
+
+module Baz {    # re-opened before Qux
+    include Foo
+
+    import Foo::hi
+    import Foo::zz
+
+    assert_eq(hi, 1234)
+    assert_eq(zz, 8)
+}
+
+assert_eq(Foo::hi, 1)
+assert_eq(Foo::zz, 2)
+
+import(Foo::hi, Foo::zz)
+
+assert_eq(hi, 1)
+assert_eq(zz, 2)
+
+say "** Test passed!"
