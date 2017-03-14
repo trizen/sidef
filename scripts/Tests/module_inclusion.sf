@@ -4,10 +4,19 @@
 ## Module inclusion
 #
 
+var hi = 'hello'
+var zz = 'world'
+
+assert_eq(hi, 'hello')
+assert_eq(zz, 'world')
+
 module Foo {
     var hi = 42
     var zz = 51
 }
+
+assert_eq(hi, 'hello')
+assert_eq(zz, 'world')
 
 module Bar {
     include Foo
@@ -20,6 +29,9 @@ module Bar {
     assert_eq(Foo::zz, 51)
 }
 
+assert_eq(hi, 'hello')
+assert_eq(zz, 'world')
+
 module Baz {
     include Foo
 
@@ -29,6 +41,9 @@ module Baz {
     Foo::hi = 1234
     Foo::zz = 8
 }
+
+assert_eq(hi, 'hello')
+assert_eq(zz, 'world')
 
 module Qux {
     include Foo
@@ -42,6 +57,9 @@ module Qux {
     zz = 2
 }
 
+assert_eq(hi, 'hello')
+assert_eq(zz, 'world')
+
 module Baz {    # re-opened before Qux
     include Foo
 
@@ -51,6 +69,9 @@ module Baz {    # re-opened before Qux
     assert_eq(hi, 1234)
     assert_eq(zz, 8)
 }
+
+assert_eq(hi, 'hello')
+assert_eq(zz, 'world')
 
 assert_eq(Foo::hi, 1)
 assert_eq(Foo::zz, 2)
