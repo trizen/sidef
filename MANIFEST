@@ -747,6 +747,8 @@ scripts/Tests/Module/YouTube.sm
 scripts/Tests/module_access_namespace.sf
 scripts/Tests/module_definition.sf
 scripts/Tests/module_inclusion.sf
+scripts/Tests/module_inclusion_2.sf
+scripts/Tests/module_inclusion_3.sf
 scripts/Tests/module_loading.sf
 scripts/Tests/module_order_and_redeclaration.sf
 scripts/Tests/modulo.sf

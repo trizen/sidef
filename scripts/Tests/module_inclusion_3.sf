@@ -1,0 +1,27 @@
+#!/usr/bin/ruby
+
+#
+## Module inclusion
+#
+
+module Foo {
+    var uuu = 99
+    module Bar {
+        var vvv = 42
+    }
+}
+
+module Baz {
+    include Foo
+    assert_eq(Foo::uuu, 99)
+    assert_eq(Bar::vvv, 42)
+}
+
+module Zero {
+    include Foo
+    assert_eq(Bar::vvv, 42)
+    assert_eq(Foo::uuu, 99)
+}
+
+assert_eq(Bar::vvv, 42)
+assert_eq(Foo::uuu, 99)

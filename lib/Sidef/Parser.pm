@@ -3016,7 +3016,8 @@ package Sidef::Parser {
                 local $parser->{line}  = $self->{line};
                 local $parser->{class} = $name;
                 local $parser->{ref_vars}{$name} = $self->{ref_vars}{$name} if exists($self->{ref_vars}{$name});
-                local $parser->{_in_module} = 1;
+                local $parser->{_in_module}      = 1;
+                local $parser->{_parent}         = $self;
 
                 if ($name ne 'main' and not grep $_ eq $name, @Sidef::NAMESPACES) {
                     if ($self->{_in_module}) {
@@ -3027,15 +3028,16 @@ package Sidef::Parser {
                     }
                 }
 
+                my $data = {parser => $parser};
+                push @{$self->{_modules}{$name}}, $data;
+
                 my $code = '{' . substr($_, pos);
                 my ($struct, $pos) = $parser->parse_block(code => \$code);
-                pos($_) += pos($code) - 1;
-                $self->{line} = $parser->{line};
 
-                $Sidef::MODULES{$name} = {
-                                          parser => $parser,
-                                          struct => $struct,
-                                         };
+                pos($_) += pos($code) - 1;
+
+                $self->{line}   = $parser->{line};
+                $data->{struct} = $struct;
 
                 foreach my $class (keys %{$struct->{code}}) {
                     push @{$struct{$class}}, @{$struct->{code}{$class}};
@@ -3120,16 +3122,14 @@ package Sidef::Parser {
                 if (/\G($self->{var_name_re})/gc) {
                     my $var_name = $1;
 
-                    if (exists $Sidef::MODULES{$var_name}) {
+                    if (exists $self->{_parent}{_modules}{$var_name}) {
 
-                        my $parser = $Sidef::MODULES{$var_name}{parser};
-                        my $struct = $Sidef::MODULES{$var_name}{struct};
+                        foreach my $info (@{$self->{_parent}{_modules}{$var_name}}) {
 
-                        foreach my $class (keys %{$struct->{code}}) {
-                            if (exists $self->{ref_vars}{$class}) {
-                                unshift @{$self->{ref_vars}{$class}}, @{$parser->{ref_vars}{$class}[0]};
-                            }
-                            else {
+                            my $parser = $info->{parser};
+                            my $struct = $info->{struct};
+
+                            foreach my $class (keys %{$struct->{code}}) {
                                 push @{$self->{ref_vars}{$class}},
                                   @{
                                       $#{$parser->{ref_vars}{$class}} == 0 && ref($parser->{ref_vars}{$class}[0]) eq 'ARRAY'
