@@ -148,12 +148,12 @@ package Sidef {
         my ($self, $hash, $db_file) = @_;
 
         if ($self->{dbm_driver} eq 'gdbm') {
-            state $x = require GDBM_File;
+            require GDBM_File;
             tie %$hash, 'GDBM_File', $db_file, &GDBM_File::GDBM_WRCREAT, 0640;
         }
         elsif ($self->{dbm_driver} eq 'bdbm') {
-            state $x = require DB_File;
-            state $y = require Fcntl;
+            require DB_File;
+            require Fcntl;
             tie %$hash, 'DB_File', $db_file, &Fcntl::O_CREAT | &Fcntl::O_RDWR, 0640, $DB_File::DB_HASH;
         }
     }
@@ -196,7 +196,7 @@ package Sidef {
 
             my $compressed_code = $self->{$lang}{_code_hash}{$md5};
 
-            state $x = require IO::Uncompress::RawInflate;
+            state $_x = require IO::Uncompress::RawInflate;
             IO::Uncompress::RawInflate::rawinflate(\$compressed_code => \my $decompressed_code)
               or die "rawinflate failed: $IO::Uncompress::RawInflate::RawInflateError";
 
@@ -230,7 +230,7 @@ package Sidef {
             }
         }
 
-        state $x = require IO::Compress::RawDeflate;
+        state $_x = require IO::Compress::RawDeflate;
         IO::Compress::RawDeflate::rawdeflate(\$code => \my $compressed_code)
           or die "rawdeflate failed: $IO::Compress::RawDeflate::RawDeflateError";
 
@@ -257,8 +257,10 @@ package Sidef {
                 File::Path::make_path($db_dir);
             }
 
-            state $x = require Digest::MD5;
-            state $y = require Encode;
+            state $_x = do {
+                require Encode;
+                require Digest::MD5;
+            };
 
             my $md5 = Digest::MD5::md5_hex(Encode::encode_utf8($code));
 

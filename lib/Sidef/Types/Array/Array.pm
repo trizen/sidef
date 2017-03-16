@@ -298,7 +298,7 @@ package Sidef::Types::Array::Array {
         ($#$self == -1) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
-    sub diff {
+    sub sub {
         my ($self, $array) = @_;
 
         my @x = sort { $a cmp $b } @$self;
@@ -334,6 +334,43 @@ package Sidef::Types::Array::Array {
         bless \@new, __PACKAGE__;
     }
 
+    sub diff {
+        my ($self, $array) = @_;
+
+        my @x = sort { $a cmp $b } @$self;
+        my @y = sort { $a cmp $b } @$array;
+
+        my $i = 0;
+        my $j = 0;
+
+        my $end1 = @x;
+        my $end2 = @y;
+
+        my ($cmp, @new);
+        while ($i < $end1 and $j < $end2) {
+
+            $cmp = CORE::int($x[$i] cmp $y[$j]);
+
+            if ($cmp < 0) {
+                push @new, $x[$i];
+                ++$i;
+            }
+            elsif ($cmp > 0) {
+                ++$j;
+            }
+            else {
+                ++$i;
+                ++$j;
+            }
+        }
+
+        if ($i < $end1) {
+            push @new, @x[$i .. $#x];
+        }
+
+        bless \@new, __PACKAGE__;
+    }
+
     sub concat {
         my ($self, $arg) = @_;
 
@@ -341,6 +378,8 @@ package Sidef::Types::Array::Array {
           ? bless([@$self, @$arg], __PACKAGE__)
           : bless([@$self, $arg],  __PACKAGE__);
     }
+
+    *add = \&concat;
 
     sub levenshtein {
         my ($self, $arg) = @_;
@@ -1933,7 +1972,6 @@ package Sidef::Types::Array::Array {
         $self;
     }
 
-    *add    = \&push;
     *append = \&push;
 
     sub unshift {
@@ -2213,8 +2251,8 @@ package Sidef::Types::Array::Array {
         *{__PACKAGE__ . '::' . '»'}  = \&assign_to;
         *{__PACKAGE__ . '::' . '|'}   = \&or;
         *{__PACKAGE__ . '::' . '^'}   = \&xor;
-        *{__PACKAGE__ . '::' . '+'}   = \&concat;
-        *{__PACKAGE__ . '::' . '-'}   = \&diff;
+        *{__PACKAGE__ . '::' . '+'}   = \&add;
+        *{__PACKAGE__ . '::' . '-'}   = \&sub;
         *{__PACKAGE__ . '::' . '=='}  = \&eq;
         *{__PACKAGE__ . '::' . '!='}  = \&ne;
         *{__PACKAGE__ . '::' . '<=>'} = \&cmp;
