@@ -149,6 +149,7 @@ package Sidef::Types::Number::Inf {
     *prime_count         = \&nan;
     *square_free_count   = \&nan;
     *remove              = \&nan;
+    *make_coprime        = \&nan;
     *rad                 = \&nan;
     *bessel_j            = \&nan;
     *bessel_y            = \&nan;

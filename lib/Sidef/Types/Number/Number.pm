@@ -3079,6 +3079,31 @@ package Sidef::Types::Number::Number {
         _mpz2big($x);
     }
 
+    sub make_coprime {
+        my ($x, $y) = @_;
+        _valid(\$y);
+
+        my $z = _big2mpz($x);
+
+        my %factors;
+        @factors{Math::Prime::Util::GMP::factor(_big2istr($y))} = ();
+
+        my $t = Math::GMPz::Rmpz_init();
+        foreach my $f (keys %factors) {
+            if ($f <= MAX_UI) {
+                Math::GMPz::Rmpz_divisible_ui_p($z, $f)
+                  ? Math::GMPz::Rmpz_set_ui($t, $f)
+                  : next;
+            }
+            else {
+                Math::GMPz::Rmpz_set_str($t, $f);
+            }
+            Math::GMPz::Rmpz_remove($z, $z, $t);
+        }
+
+        _mpz2big($z);
+    }
+
     sub random_prime {
         my ($from, $to) = @_;
 
