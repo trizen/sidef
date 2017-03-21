@@ -17,7 +17,7 @@ func M(a, g, p) {
         var a1 = ((a+g)/2)
         var g1 = sqrt(a*g)
 
-        if ((a1.re.round(-p) == a.re.round(-p)) && (g1.re.round(-p) == g.re.round(-p))) {
+        if ((a1.round(-p) == a.round(-p)) && (g1.round(-p) == g.round(-p))) {
             return a
         }
 
