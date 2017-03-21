@@ -3611,15 +3611,18 @@ package Sidef::Types::Number::Number {
         my ($x, $prec) = @_;
 
         my $nth = (
-                   defined($prec)
-                   ? do { _valid(\$prec); -CORE::int(Math::GMPq::Rmpq_get_d($$prec)) }
-                   : 0
-                  );
+            defined($prec)
+            ? do {
+                _valid(\$prec);
+                -CORE::int(Math::GMPq::Rmpq_get_d($$prec));
+              }
+            : 0
+        );
 
         my $sgn = Math::GMPq::Rmpq_sgn($$x);
 
         Math::GMPq::Rmpq_set((my $n = Math::GMPq::Rmpq_init()), $$x);
-        Math::GMPq::Rmpq_abs($n, $n) if $sgn < 0;
+        Math::GMPq::Rmpq_neg($n, $n) if $sgn < 0;
 
         Math::GMPq::Rmpq_set_str((my $p = Math::GMPq::Rmpq_init()), '1' . ('0' x CORE::abs($nth)), 10);
 
