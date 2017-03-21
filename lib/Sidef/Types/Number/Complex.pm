@@ -997,9 +997,6 @@ package Sidef::Types::Number::Complex {
     sub _round {
         my ($n, $nth) = @_;
 
-        my $sgn = Math::MPFR::Rmpfr_sgn($n);
-        Math::MPFR::Rmpfr_abs($n, $n, $Sidef::Types::Number::Number::ROUND) if $sgn < 0;
-
         my $p = Math::MPFR::Rmpfr_init2($PREC);
         Math::MPFR::Rmpfr_set_str($p, '1e' . CORE::abs($nth), 10, $Sidef::Types::Number::Number::ROUND);
 
@@ -1018,22 +1015,19 @@ package Sidef::Types::Number::Complex {
         else {
             Math::MPFR::Rmpfr_div($n, $n, $p, $Sidef::Types::Number::Number::ROUND);
         }
-
-        if ($sgn < 0) {
-            Math::MPFR::Rmpfr_neg($n, $n, $Sidef::Types::Number::Number::ROUND);
-        }
-
-        $n;
     }
 
     sub round {
         my ($x, $prec) = @_;
 
         my $nth = (
-                   defined($prec)
-                   ? do { Sidef::Types::Number::Number::_valid(\$prec); -CORE::int(Math::GMPq::Rmpq_get_d($$prec)) }
-                   : 0
-                  );
+            defined($prec)
+            ? do {
+                Sidef::Types::Number::Number::_valid(\$prec);
+                -CORE::int(Math::GMPq::Rmpq_get_d($$prec));
+              }
+            : 0
+        );
 
         my $real = Math::MPFR::Rmpfr_init2($PREC);
         my $imag = Math::MPFR::Rmpfr_init2($PREC);
@@ -1041,8 +1035,8 @@ package Sidef::Types::Number::Complex {
         Math::MPC::RMPC_RE($real, $$x);
         Math::MPC::RMPC_IM($imag, $$x);
 
-        $real = _round($real, $nth);
-        $imag = _round($imag, $nth);
+        _round($real, $nth);
+        _round($imag, $nth);
 
         if (Math::MPFR::Rmpfr_zero_p($imag)) {
             return Sidef::Types::Number::Number::_mpfr2big($real);
