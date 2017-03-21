@@ -2112,7 +2112,7 @@ package Sidef::Types::Number::Number {
 
 #<<<
         #---------------------------------------------------------------------------------
-        ## Optimization for integers, but it turns out to be slower for small integers...
+        ## Optimization for integers, but it turned out to be slower for small integers...
         #---------------------------------------------------------------------------------
         #~ if (Math::GMPq::Rmpq_integer_p($$y) and Math::GMPq::Rmpq_integer_p($$x)) {
             #~ my $d = CORE::int(CORE::abs(Math::GMPq::Rmpq_get_d($$y)));
@@ -3610,10 +3610,12 @@ package Sidef::Types::Number::Number {
     sub round {
         my ($x, $prec) = @_;
 
-        my $nth =
-          defined($prec)
-          ? do { _valid(\$prec); -CORE::int(Math::GMPq::Rmpq_get_d($$prec)) }
-          : 0;
+        my $nth = (
+                   defined($prec)
+                   ? do { _valid(\$prec); -CORE::int(Math::GMPq::Rmpq_get_d($$prec)) }
+                   : 0
+                  );
+
         my $sgn = Math::GMPq::Rmpq_sgn($$x);
 
         Math::GMPq::Rmpq_set((my $n = Math::GMPq::Rmpq_init()), $$x);

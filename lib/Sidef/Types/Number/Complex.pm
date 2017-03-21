@@ -994,9 +994,63 @@ package Sidef::Types::Number::Complex {
         $_[0]->abs->ceil;
     }
 
+    sub _round {
+        my ($n, $nth) = @_;
+
+        my $sgn = Math::MPFR::Rmpfr_sgn($n);
+        Math::MPFR::Rmpfr_abs($n, $n, $Sidef::Types::Number::Number::ROUND) if $sgn < 0;
+
+        my $p = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_set_str($p, '1e' . CORE::abs($nth), 10, $Sidef::Types::Number::Number::ROUND);
+
+        if ($nth < 0) {
+            Math::MPFR::Rmpfr_div($n, $n, $p, $Sidef::Types::Number::Number::ROUND);
+        }
+        else {
+            Math::MPFR::Rmpfr_mul($n, $n, $p, $Sidef::Types::Number::Number::ROUND);
+        }
+
+        Math::MPFR::Rmpfr_round($n, $n);
+
+        if ($nth < 0) {
+            Math::MPFR::Rmpfr_mul($n, $n, $p, $Sidef::Types::Number::Number::ROUND);
+        }
+        else {
+            Math::MPFR::Rmpfr_div($n, $n, $p, $Sidef::Types::Number::Number::ROUND);
+        }
+
+        if ($sgn < 0) {
+            Math::MPFR::Rmpfr_neg($n, $n, $Sidef::Types::Number::Number::ROUND);
+        }
+
+        $n;
+    }
+
     sub round {
         my ($x, $prec) = @_;
-        $x->abs->round(defined($prec) ? $prec : ());
+
+        my $nth = (
+                   defined($prec)
+                   ? do { Sidef::Types::Number::Number::_valid(\$prec); -CORE::int(Math::GMPq::Rmpq_get_d($$prec)) }
+                   : 0
+                  );
+
+        my $real = Math::MPFR::Rmpfr_init2($PREC);
+        my $imag = Math::MPFR::Rmpfr_init2($PREC);
+
+        Math::MPC::RMPC_RE($real, $$x);
+        Math::MPC::RMPC_IM($imag, $$x);
+
+        $real = _round($real, $nth);
+        $imag = _round($imag, $nth);
+
+        if (Math::MPFR::Rmpfr_zero_p($imag)) {
+            return Sidef::Types::Number::Number::_mpfr2big($real);
+        }
+
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_set_fr_fr($r, $real, $imag, $ROUND);
+        bless \$r, __PACKAGE__;
     }
 
     *roundf = \&round;
@@ -1024,19 +1078,16 @@ package Sidef::Types::Number::Complex {
         my $im = Math::MPFR::Rmpfr_init2($PREC);
         Math::MPC::Rmpc_imag($im, ${$_[0]}, $ROUND);
 
-        if (Math::MPFR::Rmpfr_sgn($im) != 0) {
+        if (!Math::MPFR::Rmpfr_zero_p($im)) {
             return (Sidef::Types::Bool::Bool::FALSE);
         }
 
         my $re = Math::MPFR::Rmpfr_init2($PREC);
         Math::MPC::Rmpc_real($re, ${$_[0]}, $ROUND);
 
-        if (Math::MPFR::Rmpfr_integer_p($re)) {
-            (Sidef::Types::Bool::Bool::TRUE);
-        }
-        else {
-            (Sidef::Types::Bool::Bool::FALSE);
-        }
+        Math::MPFR::Rmpfr_integer_p($re)
+          ? (Sidef::Types::Bool::Bool::TRUE)
+          : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     # Returns true when the imaginary part is zero
@@ -1045,12 +1096,9 @@ package Sidef::Types::Number::Complex {
         my $im = Math::MPFR::Rmpfr_init2($PREC);
         Math::MPC::Rmpc_imag($im, ${$_[0]}, $ROUND);
 
-        if (Math::MPFR::Rmpfr_sgn($im) == 0) {
-            (Sidef::Types::Bool::Bool::TRUE);
-        }
-        else {
-            (Sidef::Types::Bool::Bool::FALSE);
-        }
+        Math::MPFR::Rmpfr_zero_p($im)
+          ? (Sidef::Types::Bool::Bool::TRUE)
+          : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub is_nan {

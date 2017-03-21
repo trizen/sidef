@@ -5,7 +5,7 @@ var T = Math.sqrt(1.25)-0.5;
 var W = S+T;    #=> sqrt(5);
 
 func fib(n) {
-    Math.pow(S, n) - Math.pow(-T, n) / W -> roundf(0);
+    Math.pow(S, n) - Math.pow(-T, n) / W -> round;
 }
 
 func is_fib (i, fib) {
@@ -16,21 +16,21 @@ func is_fib (i, fib) {
 ## log(n*sqrt(5) + (((1-sqrt(5))/2) ^ ((log(n)+(log(5))/2) / (log(1+sqrt(5))-log(2))))) / (log(1+sqrt(5))-log(2))
 #
 func fib_pos1(n) {
-    W*n + pow(-T, log(5 * n**2) / (W+1)) -> log(S).roundf(0)
+    W*n + pow(-T, log(5 * n**2) / (W+1)) -> log(S).round
 }
 
 #
 ## (log((2/(sqrt(5)-1))^(log((1+sqrt(5))/(5 * n^2)))+sqrt(5)*n))/(log(1/2 (1+sqrt(5))))
 #
 func fib_pos2(n) {
-    W*n + pow(2 / (W-1), log((1+W) / (5 * n**2))) -> log((1+W) / 2) -> roundf(0)
+    W*n + pow(2 / (W-1), log((1+W) / (5 * n**2))) -> log((1+W) / 2) -> round
 }
 
 #
 ## (log(n*sqrt(5) + (((1-sqrt(5))/2) ^ (log(n * sqrt(5)) / log((1+sqrt(5))/2))))) / log((1+sqrt(5))/2)
 #
 func fib_pos3(n) {
-    ((n * W) + Math.pow(-T, (((n * W)).log(S)))).log(S).roundf(0);
+    ((n * W) + Math.pow(-T, (((n * W)).log(S)))).log(S).round;
 }
 
 #
@@ -38,14 +38,14 @@ func fib_pos3(n) {
 #
 func fib_pos4(n) {
     (Math.log((S+T)*n + ((0.5 * (1-(S+T)))**((Math.log(n) + (Math.log(5)/2)) / (Math.log(1+(S+T))-Math.log(2)))))) /
-                                (Math.log(1+(S+T))-Math.log(2)) -> roundf(0);
+                                (Math.log(1+(S+T))-Math.log(2)) -> round;
 }
 
 #
 ## log(n*sqrt(5)) / log(PHI)
 #
 func fib_pos5(n) {
-    n * sqrt(5) -> log(S).roundf(0)
+    n * sqrt(5) -> log(S).round
 }
 
 var fib_pos_funcs = [fib_pos1, fib_pos2, fib_pos3, fib_pos4, fib_pos5];
