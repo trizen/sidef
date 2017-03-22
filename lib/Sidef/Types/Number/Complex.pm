@@ -921,6 +921,14 @@ package Sidef::Types::Number::Complex {
         }
     }
 
+    sub _cmp {
+        my ($x, $y) = @_;
+        my $si = Math::MPC::Rmpc_cmp($x, $y);
+        my $re_cmp = Math::MPC::RMPC_INEX_RE($si);
+        $re_cmp == 0 or return $re_cmp;
+        Math::MPC::RMPC_INEX_IM($si);
+    }
+
     sub gt {
         my ($x, $y) = @_;
 
@@ -931,7 +939,12 @@ package Sidef::Types::Number::Complex {
             _valid(\$y);
         }
 
-        $x->abs->gt($y->abs);
+        if (_cmp($$x, $$y) > 0) {
+            (Sidef::Types::Bool::Bool::TRUE);
+        }
+        else {
+            (Sidef::Types::Bool::Bool::FALSE);
+        }
     }
 
     sub ge {
@@ -944,7 +957,12 @@ package Sidef::Types::Number::Complex {
             _valid(\$y);
         }
 
-        $x->abs->ge($y->abs);
+        if (_cmp($$x, $$y) >= 0) {
+            (Sidef::Types::Bool::Bool::TRUE);
+        }
+        else {
+            (Sidef::Types::Bool::Bool::FALSE);
+        }
     }
 
     sub lt {
@@ -957,7 +975,12 @@ package Sidef::Types::Number::Complex {
             _valid(\$y);
         }
 
-        $x->abs->lt($y->abs);
+        if (_cmp($$x, $$y) < 0) {
+            (Sidef::Types::Bool::Bool::TRUE);
+        }
+        else {
+            (Sidef::Types::Bool::Bool::FALSE);
+        }
     }
 
     sub le {
@@ -970,7 +993,12 @@ package Sidef::Types::Number::Complex {
             _valid(\$y);
         }
 
-        $x->abs->le($y->abs);
+        if (_cmp($$x, $$y) <= 0) {
+            (Sidef::Types::Bool::Bool::TRUE);
+        }
+        else {
+            (Sidef::Types::Bool::Bool::FALSE);
+        }
     }
 
     sub cmp {
@@ -983,15 +1011,52 @@ package Sidef::Types::Number::Complex {
             _valid(\$y);
         }
 
-        $x->abs->cmp($y->abs);
+        my $i = _cmp($$x, $$y);
+            $i < 0 ? (Sidef::Types::Number::Number::MONE)
+          : $i > 0 ? (Sidef::Types::Number::Number::ONE)
+          :          (Sidef::Types::Number::Number::ZERO);
     }
 
     sub floor {
-        $_[0]->abs->floor;
+        my ($x) = @_;
+
+        my $real = Math::MPFR::Rmpfr_init2($PREC);
+        my $imag = Math::MPFR::Rmpfr_init2($PREC);
+
+        Math::MPC::RMPC_RE($real, $$x);
+        Math::MPC::RMPC_IM($imag, $$x);
+
+        Math::MPFR::Rmpfr_floor($real, $real);
+        Math::MPFR::Rmpfr_floor($imag, $imag);
+
+        if (Math::MPFR::Rmpfr_zero_p($imag)) {
+            return Sidef::Types::Number::Number::_mpfr2big($real);
+        }
+
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_set_fr_fr($r, $real, $imag, $ROUND);
+        bless \$r, __PACKAGE__;
     }
 
     sub ceil {
-        $_[0]->abs->ceil;
+        my ($x) = @_;
+
+        my $real = Math::MPFR::Rmpfr_init2($PREC);
+        my $imag = Math::MPFR::Rmpfr_init2($PREC);
+
+        Math::MPC::RMPC_RE($real, $$x);
+        Math::MPC::RMPC_IM($imag, $$x);
+
+        Math::MPFR::Rmpfr_ceil($real, $real);
+        Math::MPFR::Rmpfr_ceil($imag, $imag);
+
+        if (Math::MPFR::Rmpfr_zero_p($imag)) {
+            return Sidef::Types::Number::Number::_mpfr2big($real);
+        }
+
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_set_fr_fr($r, $real, $imag, $ROUND);
+        bless \$r, __PACKAGE__;
     }
 
     sub _round {
@@ -1050,11 +1115,18 @@ package Sidef::Types::Number::Complex {
     *roundf = \&round;
 
     sub is_zero {
-        $_[0]->abs->is_zero;
+        $_[0]->imag->is_zero
+          and $_[0]->real->is_zero;
     }
 
     sub is_one {
-        $_[0]->abs->is_one;
+        $_[0]->imag->is_zero
+          and $_[0]->real->is_one;
+    }
+
+    sub is_mone {
+        $_[0]->imag->is_zero
+          and $_[0]->real->is_mone;
     }
 
     sub is_even {
