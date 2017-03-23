@@ -454,6 +454,14 @@ Return the
 
 =cut
 
+=head2 is_mone
+
+Complex.is_mone() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 is_nan
 
 Complex.is_nan() -> I<Obj>

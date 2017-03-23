@@ -59,7 +59,7 @@ I<Obj> B<+> I<Obj> -> I<Obj>
 
 Return the
 
-Aliases: I<concat>
+Aliases: I<add>, I<concat>
 
 =cut
 
@@ -77,7 +77,7 @@ I<Obj> B<-> I<Obj> -> I<Obj>
 
 Return the
 
-Aliases: I<diff>
+Aliases: I<sub>
 
 =cut
 
@@ -378,6 +378,14 @@ Array.delete_last_if() -> I<Obj>
 Return the
 
 Aliases: I<remove_last_if>
+
+=cut
+
+=head2 diff
+
+Array.diff() -> I<Obj>
+
+Return the
 
 =cut
 
@@ -1193,7 +1201,7 @@ I<Obj> B<«> I<Obj> -> I<Obj>
 
 Return the
 
-Aliases: I<E<lt>E<lt>>, I<add>, I<push>, I<append>
+Aliases: I<E<lt>E<lt>>, I<push>, I<append>
 
 =cut
 

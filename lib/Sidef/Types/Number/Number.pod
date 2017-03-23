@@ -1458,6 +1458,14 @@ Return the
 
 =cut
 
+=head2 make_coprime
+
+Number.make_coprime() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 max
 
 Number.max() -> I<Obj>
