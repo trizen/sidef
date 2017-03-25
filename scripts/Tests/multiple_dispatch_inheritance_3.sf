@@ -7,6 +7,87 @@ class Log < Base {}
 class Exp < Base {}
 class Sin < Base {}
 
+module InsideModule {
+
+    class Fundamental {}
+    class Base < Fundamental { }
+
+    class Log < Base {}
+    class Exp < Base {}
+
+    class Exp(v) {
+
+        method *(Exp o) {
+            "MExp: #{self} * #{o}"
+        }
+
+        method *(Log o) {
+            "MExp: #{self} * #{o}"
+        }
+
+        method to_s {
+            "MExp"
+        }
+    }
+
+    class Log(v) {
+
+        method *(Log o) {
+            "MLog: #{self} * #{o}"
+        }
+
+        method to_s {
+            "MLog"
+        }
+    }
+
+    class Base {
+        method *(Object o) {
+            "MBase: #{self} * #{o}"
+        }
+
+        method +(Number o) {
+            "MBaseNumber: #{self} + #{o}"
+        }
+    }
+
+    class Fundamental {
+        method /(Number o) {
+            "MFundamentalNumber: #{self} / #{o}"
+        }
+
+        method /(Object o) {
+            "MFundamental: #{self} / #{o}"
+        }
+
+        method +(String o) {
+            "MFundamentalString: #{self} + #{o}"
+        }
+
+        method +(Array o) {
+            "MFundamentalArray: #{self} + #{o}"
+        }
+    }
+
+    assert_eq(Exp(42) * Exp(12), "MExp: MExp * MExp")
+
+    func test() {
+        assert_eq(Exp(42) * Exp(12), "MExp: MExp * MExp")
+        assert_eq(Log(1) * Log(2), "MLog: MLog * MLog")
+        assert_eq(Log(5) * 12, "MBase: MLog * 12")
+        assert_eq(Log(5) * "abc", "MBase: MLog * abc")
+        assert_eq(Log(5) / "abc", "MFundamental: MLog / abc")
+        assert_eq(Log(5) / 123, "MFundamentalNumber: MLog / 123")
+        assert_eq(Log(5) + 123, "MBaseNumber: MLog + 123")
+        assert_eq(Log(5) + "abc", "MFundamentalString: MLog + abc")
+        assert_eq(Log(5) + [1,2,3], "MFundamentalArray: MLog + [1, 2, 3]")
+    }
+
+    test()
+}
+
+InsideModule::test()
+
 class Exp(v) {
 
     method *(Exp o) {
@@ -99,3 +180,5 @@ assert_eq(s*"a", "Fundamental: Sin * a")
 assert_eq(l*"a", "Fundamental: Log * a")
 assert_eq(e*"a", "Fundamental: Exp * a")
 assert_eq(l*s,   "Fundamental: Log * Sin")
+
+InsideModule::test()

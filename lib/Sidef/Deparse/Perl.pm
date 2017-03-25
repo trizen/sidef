@@ -552,8 +552,9 @@ HEADER
 
                     # Deparse the block of the method/function
                     {
-                        local $self->{function} = refaddr($block);
-                        local $self->{parent_name} = [$obj->{type}, "$obj->{class}::$name"];
+                        local $self->{function}          = refaddr($block);
+                        local $self->{parent_name}       = [$obj->{type}, $name];
+                        local $self->{current_namespace} = $obj->{class};
                         push @{$self->{function_declarations}}, [$self->{function}, "my \$$obj->{name}$refaddr;"];
 
                         if ($self->{ref_class}) {
@@ -637,7 +638,7 @@ HEADER
                         else {
                             $code .= ";"
                               . "state\$_$refaddr=do{no strict 'refs';"
-                              . "CORE::push(\@$self->{package_name}::__SIDEF_CLASS_METHODS__, \$$obj->{name}$refaddr);"
+                              . "\$$self->{package_name}::__SIDEF_CLASS_METHODS__{'$name'} = \$$obj->{name}$refaddr;"
                               . '*{'
                               . $self->_dump_string("$self->{package_name}::$name")
                               . "}=sub{\$$obj->{name}$refaddr->call(\@_)}}";
@@ -921,7 +922,11 @@ HEADER
                         }
 
                         if (exists $self->{class_name}) {
-                            $code .= ',' . 'class=>' . $self->_dump_string($self->{class_name});
+                            $code .= ',class=>' . $self->_dump_string($self->{class_name});
+                        }
+
+                        if ($self->{current_namespace} ne 'main') {
+                            $code .= ',namespace=>' . $self->_dump_string($self->{current_namespace});
                         }
 
                         if (exists($obj->{init_vars}) and @{$obj->{init_vars}{vars}}) {

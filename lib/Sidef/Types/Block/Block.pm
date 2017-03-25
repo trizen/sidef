@@ -69,26 +69,23 @@ package Sidef::Types::Block::Block {
 
                     next if index($class, 'Sidef::Runtime') != 0;
 
-                    my @array = do {
+                    my $method = do {
                         no strict 'refs';
-                        @{$class . '::' . '__SIDEF_CLASS_METHODS__'};
+                        ${$class . '::' . '__SIDEF_CLASS_METHODS__'}{$name};
                     };
 
-                    foreach my $method (@array) {
-                        if ($method->{name} eq $name) {
-                            push @methods, $method;
+                    if (defined($method)) {
+                        push @methods, $method;
 
-                            if (exists($method->{kids})) {
-                                push @methods, @{$method->{kids}};
-                            }
-
-                            if (--$limit == 0) {
-                                die "[ERROR] Too deep or cyclic class inheritance!";
-                            }
-
-                            __SUB__->($method);
-                            last;
+                        if (exists($method->{kids})) {
+                            push @methods, @{$method->{kids}};
                         }
+
+                        if (--$limit == 0) {
+                            die "[ERROR] Too deep or cyclic class inheritance!";
+                        }
+
+                        __SUB__->($method);
                     }
                 }
               }
@@ -241,7 +238,8 @@ package Sidef::Types::Block::Block {
           . join(
             "\n    ",
             map {
-                    ($_->{class} ? (Sidef::normalize_type($_->{class}) . '::') : '')
+                    (exists($_->{namespace}) ? ($_->{namespace} . '::') : '')
+                  . (exists($_->{class}) ? (Sidef::normalize_type($_->{class}) . '.') : '')
                   . Sidef::normalize_type($_->{name}) . '('
                   . join(
                     ', ',
@@ -255,7 +253,7 @@ package Sidef::Types::Block::Block {
                   . ')'
               } @methods
           )
-          . "\n\n ";
+          . "\n\n";
     }
 
     sub call {
