@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Test::More;
 
-plan tests => 14;
+plan tests => 18;
 
 use Sidef;
 
@@ -18,6 +18,26 @@ my $y = $o->new(23);
 my $inf  = $o->inf;
 my $nan  = $o->nan;
 my $ninf = $o->ninf;
+
+{
+    my $r = $o->new('1234.45')->mod($o->new('43.56'));
+    is($r->as_frac->get_value, '1477/100');
+}
+
+{
+    my $r = $o->new('-1234.45')->mod($o->new('-43.56'));
+    is($r->as_frac->get_value, '-1477/100');
+}
+
+{
+    my $r = $o->new('1234.45')->mod($o->new('-43.56'));
+    is($r->as_frac->get_value, '-2879/100');
+}
+
+{
+    my $r = $o->new('-1234.45')->mod($o->new('43.56'));
+    is($r->as_frac->get_value, '2879/100');
+}
 
 ##################################################
 # extreme
