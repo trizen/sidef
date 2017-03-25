@@ -2398,8 +2398,7 @@ package Sidef::Types::Number::Number {
         }
 
         Math::GMPq::Rmpq_mul($quo, $quo, $y);
-        Math::GMPq::Rmpq_neg($quo, $quo);
-        Math::GMPq::Rmpq_add($quo, $quo, $x);
+        Math::GMPq::Rmpq_sub($quo, $x, $quo);
         bless \$quo, __PACKAGE__;
     }
 
