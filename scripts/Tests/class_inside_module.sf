@@ -1,0 +1,18 @@
+#!/usr/bin/ruby
+
+module Hi {
+    func foo(a, b) {
+        "Hi #{a} #{b}"
+    }
+
+    class Hey {
+        method foo(a, b) {
+            "Hey #{a} #{b}"
+        }
+    }
+}
+
+assert_eq(Hi::foo(1,2), "Hi 1 2")
+assert_eq(Hi::Hey().foo(1,2), "Hey 1 2")
+
+say "** Test passed!"
