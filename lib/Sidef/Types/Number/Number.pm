@@ -2379,27 +2379,28 @@ package Sidef::Types::Number::Number {
 
         _valid(\$y);
 
-        if (Math::GMPq::Rmpq_integer_p($$x) and Math::GMPq::Rmpq_integer_p($$y)) {
+        $x = $$x;
+        $y = $$y;
 
-            $y = _big2mpz($y);
-            my $sign_y = Math::GMPz::Rmpz_sgn($y) || return nan();
+        Math::GMPq::Rmpq_sgn($y)
+          || return nan();
 
-            $x = _big2mpz($x);
-            Math::GMPz::Rmpz_mod($x, $x, $y);
-            Math::GMPz::Rmpz_sgn($x) || return ZERO;
-            Math::GMPz::Rmpz_add($x, $x, $y) if $sign_y < 0;
-            _mpz2big($x);
+        my $quo = Math::GMPq::Rmpq_init();
+        Math::GMPq::Rmpq_set($quo, $x);
+        Math::GMPq::Rmpq_div($quo, $quo, $y);
+
+        # Floor
+        if (!Math::GMPq::Rmpq_integer_p($quo)) {
+            my $z = Math::GMPz::Rmpz_init();
+            Math::GMPz::Rmpz_set_q($z, $quo);
+            Math::GMPz::Rmpz_sub_ui($z, $z, 1) if Math::GMPq::Rmpq_sgn($quo) < 0;
+            Math::GMPq::Rmpq_set_z($quo, $z);
         }
-        else {
-            $x = _big2mpfr($x);
-            $y = _big2mpfr($y);
-            Math::MPFR::Rmpfr_fmod($x, $x, $y, $ROUND);
-            my $sign = Math::MPFR::Rmpfr_sgn($x) || return ZERO;
-            if ($sign > 0 xor Math::MPFR::Rmpfr_sgn($y) > 0) {
-                Math::MPFR::Rmpfr_add($x, $x, $y, $ROUND);
-            }
-            _mpfr2big($x);
-        }
+
+        Math::GMPq::Rmpq_mul($quo, $quo, $y);
+        Math::GMPq::Rmpq_neg($quo, $quo);
+        Math::GMPq::Rmpq_add($quo, $quo, $x);
+        bless \$quo, __PACKAGE__;
     }
 
     sub fmod {
