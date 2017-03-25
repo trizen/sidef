@@ -374,6 +374,43 @@ package Sidef::Types::Number::Complex {
 
     *fdiv = \&div;
 
+    sub mod {
+        my ($x, $y) = @_;
+
+        if (ref($y) eq 'Sidef::Types::Number::Number') {
+            $y = __PACKAGE__->new($y);
+        }
+        else {
+            _valid(\$y);
+        }
+
+        $x = $$x;
+        $y = $$y;
+
+        my $quo = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_set($quo, $x, $ROUND);
+        Math::MPC::Rmpc_div($quo, $quo, $y, $ROUND);
+
+        my $real = Math::MPFR::Rmpfr_init2($PREC);
+        my $imag = Math::MPFR::Rmpfr_init2($PREC);
+
+        Math::MPC::RMPC_RE($real, $quo);
+        Math::MPC::RMPC_IM($imag, $quo);
+
+        Math::MPFR::Rmpfr_floor($real, $real);
+        Math::MPFR::Rmpfr_floor($imag, $imag);
+
+        Math::MPC::Rmpc_set_fr_fr($quo, $real, $imag, $ROUND);
+
+        Math::MPC::Rmpc_mul($quo, $quo, $y, $ROUND);
+        Math::MPC::Rmpc_neg($quo, $quo, $ROUND);
+        Math::MPC::Rmpc_add($quo, $quo, $x, $ROUND);
+
+        bless \$quo, __PACKAGE__;
+    }
+
+    *fmod = \&mod;
+
     sub inv {
         my ($x) = @_;
 
@@ -1200,6 +1237,7 @@ package Sidef::Types::Number::Complex {
         *{__PACKAGE__ . '::' . '-'}   = \&sub;
         *{__PACKAGE__ . '::' . '+'}   = \&add;
         *{__PACKAGE__ . '::' . '~'}   = \&not;
+        *{__PACKAGE__ . '::' . '%'}   = \&mod;
     }
 }
 

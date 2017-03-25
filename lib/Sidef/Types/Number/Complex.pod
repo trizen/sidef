@@ -34,6 +34,16 @@ Aliases: I<ne>
 
 =cut
 
+=head2 %
+
+I<Obj> B<%> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<mod>, I<fmod>
+
+=cut
+
 =head2 *
 
 I<Obj> B<*> I<Obj> -> I<Obj>
