@@ -67,7 +67,8 @@ package Sidef::Types::Block::Block {
 
                 foreach my $class (@isa) {
 
-                    next if index($class, 'Sidef::Runtime') != 0;
+                    (substr($class, 0, 14) eq 'Sidef::Runtime')
+                      || next;
 
                     my $method = do {
                         no strict 'refs';
