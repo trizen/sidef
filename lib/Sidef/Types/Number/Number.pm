@@ -9,7 +9,7 @@ package Sidef::Types::Number::Number {
     use Math::Prime::Util::GMP qw();
 
     our $ROUND = Math::MPFR::MPFR_RNDN();
-    our $PREC  = 200;
+    our $PREC  = 192;
 
     Math::GMPq::Rmpq_set_ui((state $ONE  = Math::GMPq::Rmpq_init_nobless()), 1, 1);
     Math::GMPq::Rmpq_set_ui((state $ZERO = Math::GMPq::Rmpq_init_nobless()), 0, 1);

@@ -61,7 +61,7 @@ assert_eq(exp(lambert_w(log(3))).re.round(-20), lgrt(Complex(3)).re.round(-20))
 assert_eq(exp(lambert_w(log(3))).im.round(-20), lgrt(Complex(3)).im.round(-20))
 
 assert_eq(lambert_w(100**100), lambert_w(Complex(100**100)).re)
-assert_eq(lgrt(100**100), lgrt(Complex(100**100)).re)
-assert_eq(lgrt(100**100), 100)
+assert_eq(lgrt(100**100).round(-20), lgrt(Complex(100**100)).re.round(-20))
+assert_eq(lgrt(100**100).round(-20), 100)
 
 say "** Test passed!"
