@@ -1,6 +1,6 @@
 #!/usr/bin/ruby
 
-var mons = Hash.new(
+var mons = Hash(
                 1  => 31,
                 2  => 28,
                 3  => 31,
@@ -13,9 +13,9 @@ var mons = Hash.new(
                 10 => 31,
                 11 => 30,
                 12 => 31,
-           );
+           )
 
-var t = Time.local;
+var t = Time.local
 
 var day  = (t.day);
 var mon  = (t.mon + 1);
@@ -25,9 +25,9 @@ if (year % 400 == 0 || (year % 4 == 0 && (year % 100 != 0))) {
     mons{2} = 29
 }
 
-year--;
-var st = int(1 + year*365 + year/4 - year/100 + year/400);
-{|i| st += mons{i} } * (mon-1);
+year--
+var st = (1 + year*365 + year//4 - year//100 + year//400);
+{|i| st += mons{i} } * (mon-1)
 
 #
 ## Displaying the calendar
