@@ -372,7 +372,7 @@ package Sidef::Types::Number::Number {
 
             my @r;
             while (1) {
-                Math::GMPz::Rmpz_div($z, $num, $den);
+                Math::GMPz::Rmpz_tdiv_q($z, $num, $den);
                 push @r, Math::GMPz::Rmpz_get_str($z, 10);
 
                 Math::GMPz::Rmpz_mul($z, $z, $den);
@@ -677,7 +677,7 @@ package Sidef::Types::Number::Number {
             return (!$sign ? nan() : $sign > 0 ? inf() : ninf());
         };
 
-        Math::GMPz::Rmpz_div($x, $x, $y);
+        Math::GMPz::Rmpz_tdiv_q($x, $x, $y);
         _mpz2big($x);
     }
 
@@ -2735,8 +2735,8 @@ package Sidef::Types::Number::Number {
 
             if ($m) {
                 Math::GMPz::Rmpz_set($t, $z);
-                Math::GMPz::Rmpz_div($t, $t, $k);
-                Math::GMPz::Rmpz_div($t, $t, $k);
+                Math::GMPz::Rmpz_tdiv_q($t, $t, $k);
+                Math::GMPz::Rmpz_tdiv_q($t, $t, $k);
                 ($m == -1)
                   ? Math::GMPz::Rmpz_sub($c, $c, $t)
                   : Math::GMPz::Rmpz_add($c, $c, $t);
