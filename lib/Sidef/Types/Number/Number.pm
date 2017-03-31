@@ -1634,12 +1634,12 @@ package Sidef::Types::Number::Number {
         my $p = Math::MPFR::Rmpfr_init2($PREC);
 
         Math::MPFR::Rmpfr_zeta_ui($f, $n, $ROUND);    # f = zeta(n)
+        Math::MPFR::Rmpfr_fac_ui($p, $n, $ROUND);     # p = n!
+        Math::MPFR::Rmpfr_mul($f, $f, $p, $ROUND);    # f = f * p
+
         Math::MPFR::Rmpfr_const_pi($p, $ROUND);       # p = PI
         Math::MPFR::Rmpfr_pow_ui($p, $p, $n, $ROUND); # p = p^n
 
-        my $z = Math::GMPz::Rmpz_init();
-        Math::GMPz::Rmpz_fac_ui($z, $n);              # z = n!
-        Math::MPFR::Rmpfr_mul_z($f, $f, $z, $ROUND);  # f = f * z
         Math::MPFR::Rmpfr_div_2exp($f, $f, $n - 1, $ROUND);    # f = f / 2^(n-1)
 
         Math::MPFR::Rmpfr_div($f, $f, $p, $ROUND);             # f = f/p
