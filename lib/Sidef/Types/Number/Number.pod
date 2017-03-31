@@ -338,6 +338,16 @@ Return the
 
 =cut
 
+=head2 ai
+
+Number.ai() -> I<Obj>
+
+Return the
+
+Aliases: I<airy>
+
+=cut
+
 =head2 as_bin
 
 Number.as_bin() -> I<Obj>

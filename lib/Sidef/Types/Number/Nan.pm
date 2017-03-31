@@ -118,8 +118,14 @@ package Sidef::Types::Number::Nan {
     *erfc                = \&nan;
     *eint                = \&nan;
     *ei                  = \&nan;
+    *Ei                  = \&nan;
+    *ai                  = \&nan;
+    *Ai                  = \&nan;
+    *airy                = \&nan;
     *li2                 = \&nan;
+    *Li2                 = \&nan;
     *li                  = \&nan;
+    *Li                  = \&nan;
     *max                 = \&nan;
     *min                 = \&nan;
     *int                 = \&nan;

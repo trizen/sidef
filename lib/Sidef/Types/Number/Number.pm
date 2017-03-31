@@ -1848,6 +1848,16 @@ package Sidef::Types::Number::Number {
     }
 
     *ei = \&eint;
+    *Ei = \&eint;
+
+    sub ai {
+        my $r = _big2mpfr($_[0]);
+        Math::MPFR::Rmpfr_ai($r, $r, $ROUND);
+        _mpfr2big($r);
+    }
+
+    *airy = \&ai;
+    *Ai   = \&ai;
 
     sub li {
         my $r = _big2mpfr($_[0]);
@@ -1856,11 +1866,15 @@ package Sidef::Types::Number::Number {
         _mpfr2big($r);
     }
 
+    *Li = \&li;
+
     sub li2 {
         my $r = _big2mpfr($_[0]);
         Math::MPFR::Rmpfr_li2($r, $r, $ROUND);
         _mpfr2big($r);
     }
+
+    *Li2 = \&li2;
 
     #
     ## Comparison and testing operations

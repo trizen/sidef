@@ -253,8 +253,11 @@ package Sidef::Types::Number::Inf {
     *lngamma          = \&inf;
     *eint             = \&inf;
     *ei               = \&inf;
+    *Ei               = \&inf;
     *li2              = \&ninf;
+    *Li2              = \&ninf;
     *li               = \&inf;
+    *Li               = \&inf;
     *inc              = \&inf;
     *dec              = \&inf;
     *int              = \&inf;
@@ -294,6 +297,10 @@ package Sidef::Types::Number::Inf {
     sub zero { Sidef::Types::Number::Number::ZERO }
 
     *inv = \&zero;
+
+    *ai   = \&zero;
+    *airy = \&zero;
+    *Ai   = \&zero;
 
     *sin = \&nan;    # -1 to 1
     *cos = \&nan;    # -1 to 1
