@@ -2433,15 +2433,12 @@ package Sidef::Types::Number::Number {
         $x = _big2mpfr($x);
         $y = _big2mpfr($y);
 
-        Math::MPFR::Rmpfr_fmod($x, $x, $y, $ROUND);
-
-        my $sign_r = Math::MPFR::Rmpfr_sgn($x);
-        if (!$sign_r) {
-            return ZERO;    # return faster
-        }
-        elsif ($sign_r > 0 xor Math::MPFR::Rmpfr_sgn($y) > 0) {
-            Math::MPFR::Rmpfr_add($x, $x, $y, $ROUND);
-        }
+        my $quo = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_set($quo, $x, $ROUND);
+        Math::MPFR::Rmpfr_div($quo, $quo, $y, $ROUND);
+        Math::MPFR::Rmpfr_floor($quo, $quo);
+        Math::MPFR::Rmpfr_mul($quo, $quo, $y, $ROUND);
+        Math::MPFR::Rmpfr_sub($x, $x, $quo, $ROUND);
 
         _mpfr2big($x);
     }
