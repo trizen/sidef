@@ -1054,6 +1054,27 @@ package Sidef::Types::Number::Complex {
           :          (Sidef::Types::Number::Number::ZERO);
     }
 
+    #
+    ## sgn(x) = x / abs(x)
+    #
+
+    sub sign {
+        my ($x) = @_;
+
+        my $abs = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPC::Rmpc_abs($abs, $$x, $ROUND);
+
+        if (Math::MPFR::Rmpfr_zero_p($abs)) {    # it's zero
+            return (Sidef::Types::Number::Number::ZERO);
+        }
+
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        Math::MPC::Rmpc_div_fr($r, $$x, $abs, $ROUND);
+        bless \$r, __PACKAGE__;
+    }
+
+    *sgn = \&sign;
+
     sub floor {
         my ($x) = @_;
 

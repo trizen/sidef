@@ -239,6 +239,7 @@ package Sidef::Types::Number::Ninf {
     *coth = \&tanh;
     *erf  = \&tanh;
     *sign = \&tanh;
+    *sgn  = \&tanh;
 
     #
     ## -inf.times {} is a no-op

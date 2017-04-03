@@ -320,6 +320,7 @@ package Sidef::Types::Number::Inf {
     *eta  = \&tanh;
     *erf  = \&tanh;
     *sign = \&tanh;
+    *sgn  = \&tanh;
 
     sub chr { state $x = Sidef::Types::String::String->new('') }
 

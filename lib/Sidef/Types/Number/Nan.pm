@@ -215,6 +215,7 @@ package Sidef::Types::Number::Nan {
 
     *acmp = \&cmp;
     *sign = \&cmp;
+    *sgn  = \&cmp;
 
     sub eq {
         my ($x, $y) = @_;

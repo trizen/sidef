@@ -2077,6 +2077,8 @@ package Sidef::Types::Number::Number {
         }
     }
 
+    *sgn = \&sign;
+
     sub popcount {
         my $z = _big2mpz($_[0]);
         Math::GMPz::Rmpz_neg($z, $z) if Math::GMPz::Rmpz_sgn($z) < 0;
@@ -2336,7 +2338,7 @@ package Sidef::Types::Number::Number {
 
     sub length {
         Math::GMPz::Rmpz_set_q((my $z = Math::GMPz::Rmpz_init()), ${$_[0]});
-        Math::GMPz::Rmpz_abs($z, $z);
+        Math::GMPz::Rmpz_neg($z, $z) if Math::GMPz::Rmpz_sgn($z) < 0;
 
         #__PACKAGE__->_set_uint(Math::GMPz::Rmpz_sizeinbase($z, 10));        # turned out to be inexact
         #__PACKAGE__->_set_uint(Math::GMPz::Rmpz_snprintf(my $buf, 0, "%Zd", $z, 0));
