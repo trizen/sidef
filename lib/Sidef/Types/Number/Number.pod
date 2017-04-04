@@ -1840,17 +1840,19 @@ Return the
 
 =cut
 
-=head2 sigma0
+=head2 sgn
 
-Number.sigma0() -> I<Obj>
+Number.sgn() -> I<Obj>
 
 Return the
 
+Aliases: I<sign>
+
 =cut
 
-=head2 sign
+=head2 sigma0
 
-Number.sign() -> I<Obj>
+Number.sigma0() -> I<Obj>
 
 Return the
 

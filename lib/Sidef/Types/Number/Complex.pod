@@ -182,6 +182,14 @@ Return the
 
 =cut
 
+=head2 acmp
+
+Complex.acmp() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 acos
 
 Complex.acos() -> I<Obj>
@@ -663,6 +671,16 @@ Return the
 Complex.sech() -> I<Obj>
 
 Return the
+
+=cut
+
+=head2 sgn
+
+Complex.sgn() -> I<Obj>
+
+Return the
+
+Aliases: I<sign>
 
 =cut
 
