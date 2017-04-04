@@ -78,6 +78,9 @@ package Sidef::Types::Number::Ninf {
     *fac              = \&nan;
     *double_factorial = \&nan;
     *dfac             = \&nan;
+    *dfactorial       = \&nan;
+    *mfac             = \&nan;
+    *mfactorial       = \&nan;
     *primorial        = \&nan;
     *pn_primorial     = \&nan;
     *fibonacci        = \&nan;

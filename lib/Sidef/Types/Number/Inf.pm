@@ -275,6 +275,9 @@ package Sidef::Types::Number::Inf {
     *fac              = \&inf;
     *double_factorial = \&inf;
     *dfac             = \&inf;
+    *dfactorial       = \&inf;
+    *mfac             = \&inf;
+    *mfactorial       = \&inf;
     *primorial        = \&inf;
     *pn_primorial     = \&inf;
     *fibonacci        = \&inf;

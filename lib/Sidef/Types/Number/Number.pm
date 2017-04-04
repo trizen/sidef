@@ -2588,7 +2588,25 @@ package Sidef::Types::Number::Number {
         _mpz2big($r);
     }
 
-    *dfac = \&double_factorial;
+    *dfac       = \&double_factorial;
+    *dfactorial = \&double_factorial;
+
+    sub mfactorial {
+        my ($x, $y) = @_;
+        _valid(\$y);
+
+        my $n = CORE::int(Math::GMPq::Rmpq_get_d($$x));
+        return nan() if $n < 0;
+
+        my $m = CORE::int(Math::GMPq::Rmpq_get_d($$y));
+        return nan() if $m < 0;
+
+        my $r = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_mfac_uiui($r, $n, $m);
+        _mpz2big($r);
+    }
+
+    *mfac = \&mfactorial;
 
     sub primorial {
         my $n = CORE::int(Math::GMPq::Rmpq_get_d(${$_[0]}));

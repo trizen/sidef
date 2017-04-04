@@ -40,7 +40,7 @@ I<Obj> B<!!> I<Obj> -> I<Obj>
 
 Return the
 
-Aliases: I<dfac>, I<double_factorial>
+Aliases: I<dfac>, I<dfactorial>, I<double_factorial>
 
 =cut
 
@@ -1481,6 +1481,16 @@ Return the
 Number.max() -> I<Obj>
 
 Return the
+
+=cut
+
+=head2 mfac
+
+Number.mfac() -> I<Obj>
+
+Return the
+
+Aliases: I<mfactorial>
 
 =cut
 

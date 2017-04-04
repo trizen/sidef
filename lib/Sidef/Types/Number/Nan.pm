@@ -65,6 +65,9 @@ package Sidef::Types::Number::Nan {
     *fac                 = \&nan;
     *double_factorial    = \&nan;
     *dfac                = \&nan;
+    *dfactorial          = \&nan;
+    *mfac                = \&nan;
+    *mfactorial          = \&nan;
     *not                 = \&nan;
     *idiv                = \&nan;
     *gamma               = \&nan;
