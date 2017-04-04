@@ -1925,6 +1925,14 @@ package Sidef::Types::Number::Number {
     sub acmp {
         my ($x, $y) = @_;
 
+        if (ref($y) eq 'Sidef::Types::Number::Complex') {
+            $y = $y->abs;
+        }
+        elsif (   ref($y) eq 'Sidef::Types::Number::Inf'
+               or ref($y) eq 'Sidef::Types::Number::Ninf') {
+            return MONE;
+        }
+
         _valid(\$y);
 
         $x = $$x;

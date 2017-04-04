@@ -1054,6 +1054,29 @@ package Sidef::Types::Number::Complex {
           :          (Sidef::Types::Number::Number::ZERO);
     }
 
+    sub acmp {
+        my ($x, $y) = @_;
+
+        my $i = do {
+            if (ref($y) eq 'Sidef::Types::Number::Number') {
+                my $n = Math::MPFR::Rmpfr_init2($PREC);
+                Math::MPC::Rmpc_abs($n, $$x, $ROUND);
+                Math::MPFR::Rmpfr_cmpabs($n, $y->_big2mpfr);
+            }
+            else {
+                _valid(\$y);
+                my $n = Math::MPFR::Rmpfr_init2($PREC);
+                my $m = Math::MPFR::Rmpfr_init2($PREC);
+                Math::MPC::Rmpc_abs($n, $$x, $ROUND);
+                Math::MPC::Rmpc_abs($m, $$y, $ROUND);
+                Math::MPFR::Rmpfr_cmpabs($n, $m);
+            }
+        };
+            $i < 0 ? (Sidef::Types::Number::Number::MONE)
+          : $i > 0 ? (Sidef::Types::Number::Number::ONE)
+          :          (Sidef::Types::Number::Number::ZERO);
+    }
+
     #
     ## sgn(x) = x / abs(x)
     #
