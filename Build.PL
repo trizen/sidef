@@ -40,6 +40,7 @@ my $builder = Module::Build->new(
                  'utf8'                   => 0,
                  'parent'                 => 0,
                  'Memoize'                => 0,
+                 'POSIX'                  => 0,
                  'Cwd'                    => 0,
                  'File::Spec'             => 0,
                  'File::Path'             => 0,

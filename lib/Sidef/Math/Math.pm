@@ -113,7 +113,7 @@ package Sidef::Math::Math {
 
         my $res = eval { Math::Prime::Util::GMP::chinese(@pairs) } // return Sidef::Types::Number::Number->nan;
 
-        if ($res <= Sidef::Types::Number::Number::MAX_UI and $res >= 0) {
+        if ($res <= Sidef::Types::Number::Number::ULONG_MAX and $res >= 0) {
             return Sidef::Types::Number::Number->_set_uint($res);
         }
 

@@ -15,8 +15,6 @@ package Sidef::Types::Range::RangeNumber {
     use Sidef::Types::Bool::Bool;
     use Sidef::Types::Number::Number;
 
-    my $MAX_UINT = ~0;
-
     sub new {
         my (undef, $from, $to, $step) = @_;
 
@@ -56,7 +54,7 @@ package Sidef::Types::Range::RangeNumber {
         if (ref($times) eq 'Sidef::Types::Number::Number') {
             my $repetitions = Math::GMPq::Rmpq_get_d($$times);
 
-            if ($repetitions <= $MAX_UINT) {
+            if ($repetitions <= Sidef::Types::Number::Number::ULONG_MAX) {
 
                 if ($repetitions < 0) {
                     return Sidef::Types::Block::Block->new(code => sub { undef; });
