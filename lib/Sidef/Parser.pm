@@ -893,15 +893,11 @@ package Sidef::Parser {
                     # Here-document
                     while ($#{$self->{EOT}} != -1) {
 
-                        my $eot  = shift @{$self->{EOT}};
-                        my $name = $eot->{name};
+                        my $eot    = shift @{$self->{EOT}};
+                        my $name   = $eot->{name};
+                        my $indent = $eot->{indent};
 
-                        my ($indent, $spaces);
-                        if (chr ord $name eq '-') {
-                            $name = substr($name, 1);
-                            $indent = 1;
-                        }
-
+                        my $spaces;
                         my $acc = '';
                         until (/\G$name(?:\R|\z)/gc) {
 
@@ -2061,7 +2057,8 @@ package Sidef::Parser {
             }
 
             # Beginning of a here-document (<<"EOT", <<'EOT', <<EOT)
-            if (/\G<<(?=\S)/gc) {
+            if (/\G<<(-)?+(?=\S)/gc) {
+                my $indent = $1 ? 1 : 0;
                 my ($name, $type) = (undef, 1);
 
                 my $pos = pos($_);
@@ -2070,7 +2067,7 @@ package Sidef::Parser {
                     my $str = $self->get_quoted_string(code => $opt{code});
                     $name = $str;
                 }
-                elsif (/\G(-?[\pL\pN\w]+)/gc) {
+                elsif (/\G([\pL\pN\w]+)/gc) {
                     $name = $1;
                 }
                 else {
@@ -2085,11 +2082,12 @@ package Sidef::Parser {
                 my $obj = {$self->{class} => []};
                 push @{$self->{EOT}},
                   {
-                    name => $name,
-                    type => $type,
-                    obj  => $obj,
-                    pos  => $pos,
-                    line => $self->{line},
+                    name   => $name,
+                    indent => $indent,
+                    type   => $type,
+                    obj    => $obj,
+                    pos    => $pos,
+                    line   => $self->{line},
                   };
 
                 return $obj;

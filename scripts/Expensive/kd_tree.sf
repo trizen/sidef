@@ -102,12 +102,12 @@ func find_nearest(k, t, p) {
 }
 
 func show_nearest(k, heading, kd, p) {
-    print <<"-END"
+    print <<-"END"
         #{heading}:
         Point:            [#{p.join(',')}]
         END
     var n = find_nearest(k, kd, p);
-    print <<"-END"
+    print <<-"END"
         Nearest neighbor: [#{n.nearest.join(',')}]
         Distance:         #{sqrt(n.dist_sqd)}
         Nodes visited:    #{n.nodes_visited()}

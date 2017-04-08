@@ -2380,10 +2380,6 @@ package Sidef::Types::Number::Number {
         bless \$r, __PACKAGE__;
     }
 
-    #
-    ## Integer operations
-    #
-
     sub mod {
         my ($x, $y) = @_;
 
