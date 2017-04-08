@@ -897,8 +897,8 @@ package Sidef::Parser {
                         my $name   = $eot->{name};
                         my $indent = $eot->{indent};
 
-                        my $spaces;
-                        my $acc = '';
+                        my $spaces = 0;
+                        my $acc    = '';
                         until (/\G$name(?:\R|\z)/gc) {
 
                             if (/\G(.*)/gc) {
@@ -906,9 +906,9 @@ package Sidef::Parser {
                             }
 
                             # Indentation is true
-                            if ($indent && /\G\R(\h+)$name(?:\R|\z)/gc) {
-                                ++$self->{line};
+                            if ($indent && /\G\R(\h*)$name(?:\R|\z)/gc) {
                                 $spaces = length($1);
+                                ++$self->{line};
                                 last;
                             }
 
@@ -922,7 +922,7 @@ package Sidef::Parser {
                               );
                         }
 
-                        if ($indent) {
+                        if ($indent and $spaces > 0) {
                             $acc =~ s/^\h{1,$spaces}//gm;
                         }
 
