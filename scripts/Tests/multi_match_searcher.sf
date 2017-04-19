@@ -134,6 +134,6 @@ var expect = [
 assert_eq(matches, expect)
 assert_eq(matches.len, expect.len)
 
-var i = matches.len.irand
+var i = matches.end.irand
 assert_eq(matches[i]{:match}, expect[i]{:match})
 assert_eq(matches[i]{:score}, expect[i]{:score})

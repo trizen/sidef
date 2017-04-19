@@ -8,12 +8,12 @@ func bubble_sort(Array arr) -> Array {
     loop {
         var swapped = false;
         { |i|
-            arr[i-1] > arr[i] && (
-                arr[i-1, i] = arr[i, i-1];
-                swapped = true;
-            );
-        } * arr.end;
-        swapped || break;
+            if (arr[i] > arr[i+1]) {
+                arr[i, i+1] = arr[i+1, i];
+                swapped = true
+            }
+        } * arr.end
+        swapped || break
     }
     return arr;
 }
@@ -23,3 +23,5 @@ say bubble_sort(numbers);
  
 var strs = ["John", "Kate", "Zerg", "Alice", "Joe", "Jane"];
 say bubble_sort(strs);
+
+assert_eq(strs, sort(strs))

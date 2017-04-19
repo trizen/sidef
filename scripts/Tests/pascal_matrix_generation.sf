@@ -9,13 +9,13 @@ func grow_matrix(matrix, callback) {
     var s = m.len;
     m[s][0] = callback(0, m[s-1][0], 0);
     m[0][s] = callback(m[0][s-1], 0, 0);
-    {|i| m[i][s] = callback(m[i][s-1], m[i-1][s], m[i-1][s-1])} * (s-1);
-    {|i| m[s][i] = callback(m[s][i-1], m[s-1][i], m[s-1][i-1])} * (s);
+    {|i| m[i+1][s] = callback(m[i+1][s-1], m[i][s], m[i][s-1])} * (s-1);
+    {|i| m[s][i+1] = callback(m[s][i], m[s-1][i+1], m[s-1][i])} * (s);
     return m;
 }
 
 func transpose(matrix) {
-    matrix[0].range.map{|i| matrix.map{_[i]}};
+    matrix[0].range.map{|i| matrix.map{_[i]} };
 }
 
 func madd_n_nw(m) { grow_matrix(m, ->(_, n, nw) { n + nw }) };

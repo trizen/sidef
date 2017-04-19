@@ -45,7 +45,7 @@ class MT19937(seed, prec = 32) {
         y = (y ^ (y >> l))
 
         ++index
-        (y % decimals) / decimals
+        float((y % decimals) / decimals)
     }
 
     method twist {

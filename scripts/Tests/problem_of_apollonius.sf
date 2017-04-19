@@ -50,8 +50,9 @@ var b = solve_apollonius(c, %n<-1 -1 -1>);
 say a;
 say b;
 
-a.x == 2     || die "error";
-a.y == 21/10 || die "error";
-a.r == 39/10 || die "error";
-b.x == 2     || die "error";
-b.r == 7/6   || die "error";
+assert_eq("#{a.x}", "2")
+assert_eq("#{a.y}", "2.1")
+assert_eq("#{a.r}", "3.9")
+assert_eq("#{b.x}", "2")
+
+assert("#{b.r}" =~ /^1\.16666666666666666666666666666666666/)

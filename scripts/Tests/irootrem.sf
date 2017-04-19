@@ -1,6 +1,6 @@
 #!/usr/bin/ruby
 
-var range = (-50 .. 50 -> by(15.irand(5)))
+var range = (1 .. 50 -> by(irand(1, 15)))
 
 for k in range {
     for j in range {
@@ -9,15 +9,15 @@ for k in range {
         var r      = k.iroot(j)
         var m      = (k - r.ipow(j))
 
-        #say "#{k} #{j}"
+        #say "#{k} #{j} (#{x}, #{y}) (#{r}, #{m})"
 
-        assert_eq(x, r)
-        assert_eq(y, m)
+        assert_eq("#{x}", "#{r}")
+        assert_eq("#{y}", "#{m}")
 
         if (x.is_pos) {
             var r = k.root(j).int
-            assert_eq(x, r)
-            assert_eq(y, k - r**j)
+            assert_eq("#{x}", "#{r}")
+            assert_eq("#{y}", "#{k - r**j}")
         }
     }
 }

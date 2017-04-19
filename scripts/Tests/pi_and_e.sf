@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 func pi(n) {
-    var pi = 0;
+    var pi = 0.0;
 
     for ((var i = 1; var j = 0) ; j <= n ; (i += 2; j++)) {
         pi += (1/i -> (%w(neg pos)[j.is_even]));
@@ -11,7 +11,7 @@ func pi(n) {
 }
 
 func e(n) {
-    var e = 1;
+    var e = 1.0;
 
     for (1..n) { |i|
         e += (1 / i.factorial);
@@ -21,5 +21,5 @@ func e(n) {
 }
 
 
-say pi(120);    # Real PI is Math.pi(n)
+say pi(120);
 say e(10);

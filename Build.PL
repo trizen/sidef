@@ -49,7 +49,7 @@ my $builder = Module::Build->new(
                  'List::Util'             => 1.33,
                  'Math::MPFR'             => 3.29,
                  'Math::MPC'              => 0,
-                 'Math::GMPq'             => 0.41,
+                 'Math::GMPq'             => 0.44,
                  'Math::GMPz'             => 0.39,
                  'Socket'                 => 0,
                  'Fcntl'                  => 0,
@@ -59,7 +59,7 @@ my $builder = Module::Build->new(
                  'Time::HiRes'            => 0,
                  'Getopt::Std'            => 0,
                  'Term::ReadLine'         => 0,
-                 'Math::Prime::Util::GMP' => 0.42,
+                 'Math::Prime::Util::GMP' => 0.44,
                 },
 
     recommends => {

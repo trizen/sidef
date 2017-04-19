@@ -81,6 +81,15 @@ if (defined $args{i}) {
     exit 0;
 }
 
+# Precision
+if (defined $args{P}) {
+    require Sidef::Types::Number::Number;
+    if ($args{P} <= 0) {
+        die "Invalid precision: <<$args{P}>> (expected a positive integer)\n";
+    }
+    $Sidef::Types::Number::Number::PREC = $args{P} << 2;
+}
+
 # Test mode
 if (defined $args{t}) {
     my @argv = splice(@ARGV);
@@ -136,7 +145,7 @@ else {
         $script_name = shift @ARGV;
         read_script($script_name);
       }
-      : (-t STDIN) ? do { code_interactive(); exit }
+      : (-t STDIN) ? do { code_interactive(); exit 0; }
       :              do { local $/;           <STDIN> };
 
     $code // exit 2;
@@ -401,6 +410,17 @@ sub code_interactive {
     my $valid_lines = '';
     my ($vars, $ref_vars_refs);
 
+    my $history_support = $term->can('ReadHistory') && $term->can('WriteHistory');
+    my $history_file = File::Spec->catfile($sidef->get_sidef_config_dir(), 'sidef_history.txt');
+
+    if ($history_support) {
+        if (not -e $history_file) {
+            open my $fh, '>', $history_file;
+        }
+
+        $term->ReadHistory($history_file);
+    }
+
   MAINLOOP: {
         my $line = '';
 
@@ -432,11 +452,6 @@ sub code_interactive {
                 close $fh;
                 say "** Created file: $file";
             }
-
-            #~ elsif ($line =~ /\h\z/) {
-            #~ $line .= "\n";
-            #~ redo;
-            #~ }
             elsif ($line eq 'copyright') {
                 print <<'EOT';
 Copyright © 2013-2017 Daniel Șuteu, Ioana Fălcușan
@@ -520,11 +535,17 @@ EOT
             $valid_lines .= "$line\n";    # store valid lines
         }
 
+        if ($history_support) {
+            if ($line =~ /\R/) {
+                $term->addhistory($line);
+            }
+            $term->append_history(1, $history_file);
+        }
+
         if (defined($args{r}) or defined($args{R})) {
             output($ccode);
         }
         elsif ($line =~ /\S/ and not $line =~ /^\s*#.*$/) {
-            local $Sidef::Types::Number::Number::PREC = 4 * $args{P} if exists($args{P});
             my @results = $sidef->execute_perl($ccode);
             print $@ if $@;
 

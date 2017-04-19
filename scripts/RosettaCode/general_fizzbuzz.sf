@@ -19,7 +19,7 @@ func GeneralFizzBuzz(upto, schema) {
     defined(schema) && (
         ping.schema = schema.to_hash;
     );
-    upto.of {|i| ping.filter(i) };
+    upto.of {|i| ping.filter(i+1) };
 }
 
 GeneralFizzBuzz(20, <3 Fizz 5 Buzz 7 Baxx>).each { .say };

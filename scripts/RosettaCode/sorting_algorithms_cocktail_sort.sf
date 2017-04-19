@@ -14,9 +14,9 @@ func cocktailsort(a) {
     }
     var max = a.end;
     do {
-        { |i| cmpsw(i-1) } * max;
+        { |i| cmpsw(i) } * max;
         swapped.not! && break;
-        { |i| cmpsw(max-i) } * max;
+        { |i| cmpsw(max - i - 1) } * max;
     } while (swapped);
     return a;
 }

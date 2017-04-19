@@ -10,8 +10,8 @@ package Sidef::Types::Range::Range {
         $_[0]->{_cached_array} //= do {
             my @array;
             my $iter = $_[0]->iter->{code};
-            while (defined(my $obj = $iter->())) {
-                push @array, $obj;
+            while (1) {
+                push @array, $iter->() // last;
             }
             \@array;
         };
@@ -334,8 +334,8 @@ package Sidef::Types::Range::Range {
         my $to   = $self->{to};
         my $step = $self->{step};
 
-        my $limit    = $to->sub($from)->div($step)->inc;
-        my $is_empty = $limit->lt(Sidef::Types::Number::Number::ONE);
+        my $limit    = $to->sub($from)->div($step);
+        my $is_empty = $limit->lt(Sidef::Types::Number::Number::ZERO);
 
         if ($is_empty) {
             return (defined($n) ? Sidef::Types::Array::Array->new([]) : undef);
@@ -362,8 +362,8 @@ package Sidef::Types::Range::Range {
         my $to   = $self->{to};
         my $step = $self->{step};
 
-        my $limit    = $to->sub($from)->div($step)->inc;
-        my $is_empty = $limit->lt(Sidef::Types::Number::Number::ONE);
+        my $limit    = $to->sub($from)->div($step);
+        my $is_empty = $limit->lt(Sidef::Types::Number::Number::ZERO);
 
         if ($is_empty) {
             return (defined($n) ? Sidef::Types::Array::Array->new([]) : undef);
@@ -375,7 +375,7 @@ package Sidef::Types::Range::Range {
 
         my (%seen, @array);
         my $amount = CORE::int($n);
-        my $total  = CORE::int($limit);
+        my $total  = CORE::int($limit)+1;
 
         if ($amount <= 0) {
             return Sidef::Types::Array::Array->new([]);

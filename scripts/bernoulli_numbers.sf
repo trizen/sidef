@@ -8,7 +8,7 @@ func bernoulli_print {
             (a[j-1] -= a[j]) *= j
         }
         a[0] || next
-        printf("B(%2d) = %20s / %s\n", m, a[0].parts)
+        printf("B(%2d) = %20s / %s\n", m, a[0].nude)
     }
 }
 

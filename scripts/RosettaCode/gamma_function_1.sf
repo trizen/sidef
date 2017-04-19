@@ -9,7 +9,7 @@ define pi = Number.pi;
  
 func Γ(t) {
     t < 20 ? (__FUNC__(t + 1) / t)
-           : (Math.sqrt(2*pi*t) * Math.pow(t/e + 1/(12*e*t), t) / t);
+           : (sqrt(2*pi*t) * pow(t/e + 1/(12*e*t), t) / t);
 }
  
 (1..10).each { |i|

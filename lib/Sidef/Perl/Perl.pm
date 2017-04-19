@@ -51,35 +51,24 @@ package Sidef::Perl::Perl {
                 return Sidef::Types::Regex::Regex->new($val);
             }
 
-            if ($ref eq 'Math::BigFloat' or $ref eq 'Math::BigInt' or $ref eq 'Math::BigRat') {
-                return (
-                        $val->is_nan
-                        ? Sidef::Types::Number::Nan->new
-                        : $val->is_inf ? $val->is_inf('-')
-                              ? Sidef::Types::Number::Ninf->new
-                              : Sidef::Types::Number::Inf->new
-                          : Sidef::Types::Number::Number->new($val->bstr, 10)
-                       );
+            if (   $ref eq 'Math::BigFloat'
+                or $ref eq 'Math::BigInt'
+                or $ref eq 'Math::BigRat'
+                or $ref eq 'Math::BigInt::Lite'
+            ) {
+                return Sidef::Types::Number::Number->new($val->bstr);
             }
 
             if ($ref eq 'Math::Complex') {
                 return Sidef::Types::Number::Complex->new($val->Re, $val->Im);
             }
 
-            if ($ref eq 'Math::MPFR') {
-                return Sidef::Types::Number::Number::_mpfr2big($val);
-            }
-
-            if ($ref eq 'Math::GMPz') {
-                return Sidef::Types::Number::Number::_mpz2big($val);
-            }
-
-            if ($ref eq 'Math::MPC') {
-                return bless(\$val, 'Sidef::Types::Number::Complex');
-            }
-
-            if ($ref eq 'Math::GMPq') {
-                return bless(\$val, 'Sidef::Types::Number::Number');
+            if ($ref eq 'Math::MPFR'
+            or $ref eq 'Math::GMPz'
+            or $ref eq 'Math::GMPq'
+            or $ref eq 'Math::MPC'
+            ) {
+                return Sidef::Types::Number::Number->new($val);
             }
 
             if ($ref eq '') {

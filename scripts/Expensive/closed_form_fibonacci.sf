@@ -6,7 +6,7 @@ func fib_cf(n) {
     define T = ((1+S) / 2);
     define U = (2 / (1+S));
 
-    (T**n - (U**n * cos(Math.pi(2*n) * n))) / S -> roundf(0);
+    (T**n - (U**n * cos(Num.pi(2*n) * n))) / S -> round(0);
 }
 
 func fib_rec(n) is cached {

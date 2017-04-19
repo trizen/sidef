@@ -18,10 +18,10 @@ func gamma(z) {
     ]
 
     var result
-    const pi = Complex.pi
+    const pi = Num.pi
 
     if (z.real < 0.5) {
-        result = (pi / (sin(pi * z) * gamma(Complex(1) - z)))
+        result = (pi / (sin(pi * z) * gamma(1 - z)))
     }
     else {
         z--

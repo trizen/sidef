@@ -4,6 +4,6 @@ func A(a) { a.sum / a.len };
 func G(a) { a.prod.root(a.len) };
 func H(a) { a.len / a.map{1/_}.sum };
 
-say("A(1,...,10) = ", A(10.of{_}));
-say("G(1,...,10) = ", G(10.of{_}));
-say("H(1,...,10) = ", H(10.of{_}));
+say("A(1,...,10) = ", A(10.of{1+_}));
+say("G(1,...,10) = ", G(10.of{1+_}));
+say("H(1,...,10) = ", H(10.of{1+_}));

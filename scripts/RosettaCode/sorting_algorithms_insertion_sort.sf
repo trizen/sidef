@@ -8,12 +8,12 @@ class Array {
     method insertion_sort {
         { |i|
             var j = i;
-            var k = self[i];
-            while ((j > 0) && (k < self[j - 1])) {
-                self[j] = self[j - 1];
+            var k = self[i+1];
+            while ((j >= 0) && (k < self[j])) {
+                self[j+1] = self[j];
                 j--;
-            };
-            self[j] = k;
+            }
+            self[j+1] = k;
         } * self.end;
         return self;
     }
@@ -24,3 +24,5 @@ say numbers.insertion_sort;
  
 var strs = ["John", "Kate", "Zerg", "Alice", "Joe", "Jane"];
 say insertion_sort(strs);
+
+assert_eq(strs, sort(strs))

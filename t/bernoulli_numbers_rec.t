@@ -53,6 +53,6 @@ my @bnums = qw(
   );
 
 foreach my $i (0 .. 9) {
-    my ($num, $den) = $bern->call(Sidef::Types::Number::Number->new(2 * $i))->parts;
+    my ($num, $den) = $bern->call(Sidef::Types::Number::Number->new(2 * $i))->nude;
     is("$num/$den", "$bnums[$i]");
 }

@@ -10,7 +10,7 @@ func is_prime(n { .is_odd && (_ > 2) }, k) {
     (d >>= 1; ++s) while d.is_even
 
     k.times {
-        var a = 2.irand(n)
+        var a = irand(2, n-1)
         var x = expmod(a, d, n)
         next if (x ~~ [1, n-1])
 
@@ -44,3 +44,11 @@ numbers.each { |n|
     say ("#{n} is" + (p ? ' ' : ' NOT ') + 'prime');
     assert_eq(p, n.is_prime);
 }
+
+var p = gather {
+    for n in (1..100) {
+        is_prime(n, 10) && take(n)
+    }
+}
+
+assert_eq(p, primes(100))

@@ -6,7 +6,7 @@
 
 # set up triangle
 var rows = 5;
-var tri = rows.of {|i| i.of { Hash(x => 0, z => 0, v => 0, rhs => nil) } }
+var tri = rows.of {|i| i+1 -> of { Hash(x => 0, z => 0, v => 0, rhs => nil) } }
 tri[0][0]{:rhs} = 151;
 tri[2][0]{:rhs} = 40;
 tri[4][0]{:x} = 1;

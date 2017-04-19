@@ -10,8 +10,8 @@ var b = 3.14159:1.25;       # Complex(3.14159, 1.25)
 [   a + b,                  # addition
     a * b,                  # multiplication
     -a,                     # negation
-    Complex(1) / a,         # multiplicative inverse
-    ~a,                     # complex conjugate
+    a.inv,                  # multiplicative inverse
+    a.conj,                 # complex conjugate
     a.abs,                  # abs
     a.sqrt,                 # sqrt
     b.re,                   # real

@@ -380,11 +380,12 @@ HEADER
             ',',
             grep { $_ ne '' } map {
                 ref($_) eq 'Sidef::Types::Number::Number'
-                  ? $_->_get_double
-                  : ref($_) ? ('(map { ref($_) eq "Sidef::Types::Number::Number" ? Math::GMPq::Rmpq_get_d($$_) '
-                               . ': do {my$sub=UNIVERSAL::can($_, "..."); '
-                               . 'defined($sub) ? $sub->($_) : CORE::int($_) } } '
-                               . ($self->deparse_expr(ref($_) eq 'HASH' ? $_ : {self => $_})) . ')')
+                  ? Sidef::Types::Number::Number::__numify__($$_)
+                  : ref($_)
+                  ? ('(map { ref($_) eq "Sidef::Types::Number::Number" ? Sidef::Types::Number::Number::__numify__($$_) '
+                     . ': do {my$sub=UNIVERSAL::can($_, "..."); '
+                     . 'defined($sub) ? $sub->($_) : CORE::int($_) } } '
+                     . ($self->deparse_expr(ref($_) eq 'HASH' ? $_ : {self => $_})) . ')')
                   : $_
               } @{$array}
             );
@@ -982,20 +983,8 @@ HEADER
             }
         }
         elsif ($ref eq 'Sidef::Types::Number::Number') {
-            my ($sgn, $content) = $obj->_deparse;
-            $code =
-                ($sgn == 2) ? $self->make_constant($ref, '_set_str',  "Number$refaddr", "'" . $content . "'")
-              : ($sgn >= 0) ? $self->make_constant($ref, '_set_uint', "Number$refaddr", "'" . $content . "'")
-              :               $self->make_constant($ref, '_set_int', "Number$refaddr", "'" . $content . "'");
-        }
-        elsif ($ref eq 'Sidef::Types::Number::Inf') {
-            $code = $self->make_constant($ref, 'new', "Inf$refaddr");
-        }
-        elsif ($ref eq 'Sidef::Types::Number::Ninf') {
-            $code = $self->make_constant($ref, 'new', "Ninf$refaddr");
-        }
-        elsif ($ref eq 'Sidef::Types::Number::Nan') {
-            $code = $self->make_constant($ref, 'new', "Nan$refaddr");
+            my ($type, $content) = $obj->_deparse;
+            $code = $self->make_constant($ref, '_set_str', "Number$refaddr", "'$type'", "'$content'");
         }
         elsif ($ref eq 'Sidef::Types::String::String') {
             $code = $self->make_constant($ref, 'new', "String$refaddr", $self->_dump_string(${$obj}));
@@ -1037,7 +1026,7 @@ HEADER
         }
         elsif ($ref eq 'Sidef::Types::Block::ForIn') {
 
-            my $expr = $self->deparse_expr({self => $obj->{expr}});
+            my $expr = $self->deparse_args($obj->{expr});
             local $obj->{block}{init_vars} = bless({vars => $obj->{vars}}, 'Sidef::Variable::Init');
             my $block = $self->deparse_expr({self => $obj->{block}});
 
@@ -1046,26 +1035,45 @@ HEADER
                 or (@{$obj->{vars}} == 1
                     and exists($obj->{vars}[0]{slurpy}))
               ) {
-                $code =
-                    'do{my$obj='
-                  . $expr . ';'
-                  . 'my$block='
-                  . $block
-                  . '->{code};'
-                  . 'for my$group(ref($obj)?UNIVERSAL::isa($obj,"ARRAY")?@$obj:@{$obj->to_a}:()){'
-                  . '$block->((ref($group)&&UNIVERSAL::isa($group,"ARRAY")?@$group:$group))}}';
+                $code = 'do{my@objs=' . $expr . ';' . 'my$block=' . $block . '->{code};' . <<'EOT';
+                    foreach my $obj (@objs) {
+                        my $break = 0;
+                        foreach my $group (UNIVERSAL::isa($obj, 'ARRAY') ? @$obj : @{$obj->to_a}) {
+                            $break = 1;
+                            $block->(UNIVERSAL::isa($group, 'ARRAY') ? @$group : $group);
+                            $break = 0;
+                        }
+                        last if $break;
+                    }
+                }
+EOT
             }
             else {
-                $code =
-                    'do{my$obj='
-                  . $expr . ';'
-                  . 'my$block='
-                  . $block
-                  . '->{code};'
-                  . 'if(ref($obj)){if(defined(my$sub=UNIVERSAL::can($obj,"iter"))){my$iter=$sub->($obj);'
-                  . 'while(1){$block->($iter->run//last)}'
-                  . '}else{for my$item(UNIVERSAL::isa($obj,"ARRAY")?@$obj:@{$obj->to_a}){'
-                  . '$block->($item)}}}}';
+                $code = 'do{my@objs=' . $expr . ';' . 'my$block=' . $block . '->{code};' . <<'EOT';
+                  foreach my $obj (@objs) {
+                      if (defined(my $sub = UNIVERSAL::can($obj, 'iter'))) {
+                            my $iter = $sub->($obj);
+                            my $break = 0;
+                            while (1) {
+                                $break = 1;
+                                $block->($iter->run // do { $break = 0; last });
+                                $break = 0;
+                            }
+                            last if $break;
+                      }
+                      else {
+                          my $break = 0;
+                          foreach my $item (UNIVERSAL::isa($obj, 'ARRAY') ? @$obj : @{$obj->to_a}) {
+                              $break = 1;
+                              $block->($item);
+                              $break = 0;
+                          }
+                          last if $break;
+                      }
+                  }
+              }
+EOT
+
             }
         }
         elsif ($ref eq 'Sidef::Types::Bool::Ternary') {
@@ -1229,7 +1237,7 @@ HEADER
             $code = $self->make_constant($ref, 'new', "Sig$refaddr");
         }
         elsif ($ref eq 'Sidef::Types::Number::Complex') {
-            my ($real, $imag) = $obj->parts;
+            my ($real, $imag) = $obj->reals;
             my $name = "Complex$refaddr";
             $self->top_add(  "use constant $name => $ref\->new("
                            . join(',', $self->deparse_expr({self => $real}), $self->deparse_expr({self => $imag}))
@@ -1254,8 +1262,8 @@ HEADER
                 $ref, 'new',
                 "Range$refaddr",
                 map {
-                    'Sidef::Types::Number::Number->_set_str(' . "'"
-                      . $obj->{$_}->_get_frac . "'" . ')'
+                    my ($type, $content) = $obj->{$_}->_deparse;
+                    'Sidef::Types::Number::Number->_set_str(' . "'$type', '$content'" . ')'
                   } ('from', 'to', 'step')
             );
         }

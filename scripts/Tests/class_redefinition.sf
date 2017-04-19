@@ -12,7 +12,7 @@ class Circle {
 
 class Square(side) {
     method diagonal {
-        Math.sqrt(self.side**2 * 2);
+        sqrt(self.side**2 * 2);
     };
 };
 

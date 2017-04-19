@@ -18,13 +18,13 @@ say <<"EOT";
 ** Enter 'q' to exit the game.
 ** Running score shown as <your wins>:<my wins>
 EOT
- 
+
 var plays   = 0;
 var aScore  = 0;
 var pScore  = 0;
 var pcf     = [0,0,0];      # pcf = player choice frequency
-var aChoice = 3.irand;      # ai choice for first play is completely random
- 
+var aChoice = irand(0, 2);  # ai choice for first play is completely random
+
 loop {
     var pi = Sys.scanln("Play: ");
     pi == 'q' && break;

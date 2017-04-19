@@ -377,25 +377,8 @@ package Sidef::Types::Block::Block {
         my $ref = ref($obj);
 
         if ($ref eq 'Sidef::Types::Number::Number') {
-            my ($code, $value) = $obj->_deparse();
-
-            $code < 0  && return scalar {dump => ($ref . "->_set_int('$value')")};
-            $code <= 1 && return scalar {dump => ($ref . "->_set_uint('$value')")};
-
-            return scalar {dump => ($ref . "->_set_str('$value')"),};
-        }
-        elsif ($ref eq 'Sidef::Types::Number::Complex') {
-            my ($re, $im) = $obj->reals();
-            return scalar {dump => $ref . "->new('$re', '$im')",};
-        }
-        elsif ($ref eq 'Sidef::Types::Number::Inf') {
-            return scalar {dump => "$ref->new",};
-        }
-        elsif ($ref eq 'Sidef::Types::Number::Ninf') {
-            return scalar {dump => "$ref->new",};
-        }
-        elsif ($ref eq 'Sidef::Types::Number::Nan') {
-            return scalar {dump => "$ref->new",};
+            my ($type, $str) = $obj->_deparse();
+            return scalar {dump => ($ref . "->_set_str('$type', '$str')"),};
         }
         elsif ($ref eq 'Sidef::Types::Block::Block') {
             die "[ERROR] Blocks can't be serialized by Block.ffork()!";

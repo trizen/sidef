@@ -15,10 +15,8 @@ New built-in classes:
 
 Internal:
     * Switch to subroutine `signatures` (as soon as this feature becomes stable).
-    * Unify `Sidef::Types::Number::Ninf` into `Sidef::Types::Number::Inf`.
 
 Speculations:
     * Make all core methods (including user-defined methods) real multimethods, using Class::Multimethods.
-    * Replace the current numerical system with Math::AnyNum.
     * Bootstrap Sidef by writing a code generator in Sidef that generates Perl code.
     * Rewrite all core libraries in Sidef.

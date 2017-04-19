@@ -64,8 +64,8 @@ package Sidef::Parser {
                      | Hash\b                         (?{ state $x = bless({}, 'Sidef::DataTypes::Hash::Hash') })
                      | Str(?:ing)?+\b                 (?{ state $x = bless({}, 'Sidef::DataTypes::String::String') })
                      | Num(?:ber)?+\b                 (?{ state $x = bless({}, 'Sidef::DataTypes::Number::Number') })
-                     | Inf\b                          (?{ state $x = Sidef::Types::Number::Inf->new })
-                     | NaN\b                          (?{ state $x = Sidef::Types::Number::Nan->new })
+                     | Inf\b                          (?{ state $x = Sidef::Types::Number::Number->inf })
+                     | NaN\b                          (?{ state $x = Sidef::Types::Number::Number->nan })
                      | RangeNum(?:ber)?+\b            (?{ state $x = bless({}, 'Sidef::DataTypes::Range::RangeNumber') })
                      | RangeStr(?:ing)?+\b            (?{ state $x = bless({}, 'Sidef::DataTypes::Range::RangeString') })
                      | Range\b                        (?{ state $x = bless({}, 'Sidef::DataTypes::Range::Range') })
@@ -111,7 +111,7 @@ package Sidef::Parser {
                      | \$\(                           (?{ state $x = bless({name => '$('}, 'Sidef::Variable::Magic') })
                      | \$<                            (?{ state $x = bless({name => '$<'}, 'Sidef::Variable::Magic') })
                      | \$>                            (?{ state $x = bless({name => '$>'}, 'Sidef::Variable::Magic') })
-                     | ∞                              (?{ state $x = Sidef::Types::Number::Inf->new })
+                     | ∞                              (?{ state $x = Sidef::Types::Number::Number->inf })
                 ) (?!::)
             }x,
             prefix_obj_re => qr{\G
@@ -1818,15 +1818,20 @@ package Sidef::Parser {
 
             # Binary, hexadecimal and octal numbers
             if (/\G0(b[10_]*|x[0-9A-Fa-f_]*|[0-9_]+\b)/gc) {
-                return Sidef::Types::Number::Number->new("0" . ($1 =~ tr/_//dr), 0);
+                my $num = $1 =~ tr/_//dr;
+                return
+                  Sidef::Types::Number::Number->new(
+                                                      $num =~ /^b/ ? (substr($num, 1), 2)
+                                                    : $num =~ /^x/ ? (substr($num, 1), 16)
+                                                    :                ($num, 8)
+                                                   );
             }
 
             # Integer or float number
             if (/\G([+-]?+(?=\.?[0-9])[0-9_]*+(?:\.[0-9_]++)?(?:[Ee](?:[+-]?+[0-9_]+))?)/gc) {
                 my $num = $1 =~ tr/_//dr;
 
-                # Imaginary
-                if (/\Gi\b/gc) {
+                if (/\Gi\b/gc) {    # imaginary
                     return Sidef::Types::Number::Complex->new(0, $num);
                 }
 
@@ -2640,7 +2645,7 @@ package Sidef::Parser {
                     /\G\h*,\h*/gc || last;
                 }
 
-                /\G\h*(?:in|∈)\h*/gc
+                /\G\h*(?:in|∈|)\h*/gc
                   || $self->fatal_error(
                                         error => "expected the token <<in>> after variable declaration in for-loop",
                                         code  => $_,

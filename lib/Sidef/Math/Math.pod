@@ -63,14 +63,6 @@ Return the
 
 =cut
 
-=head2 map_range
-
-Math.map_range() -> I<Obj>
-
-Return the
-
-=cut
-
 =head2 max
 
 Math.max() -> I<Obj>
@@ -93,8 +85,6 @@ Math.num2percent() -> I<Obj>
 
 Return the
 
-Aliases: I<number_to_percentage>
-
 =cut
 
 =head2 prod
@@ -104,6 +94,14 @@ Math.prod() -> I<Obj>
 Return the
 
 Aliases: I<product>
+
+=cut
+
+=head2 range_map
+
+Math.range_map() -> I<Obj>
+
+Return the
 
 =cut
 

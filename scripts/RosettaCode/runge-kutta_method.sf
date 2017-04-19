@@ -11,7 +11,7 @@ func runge_kutta(yp) {
         var c = (δt * yp(t + δt/2, y + b/2));
         var d = (δt * yp(t + δt, y + c));
         (a + 2*(b + c) + d) / 6;
-    };
+    }
 }
 
 define δt = 0.1;

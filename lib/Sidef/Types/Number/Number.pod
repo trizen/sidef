@@ -180,7 +180,7 @@ I<Obj> B<:> I<Obj> -> I<Obj>
 
 Return the
 
-Aliases: I<c>, I<complex>
+Aliases: I<pair>
 
 =cut
 
@@ -200,7 +200,7 @@ I<Obj> B<E<lt>E<lt>> I<Obj> -> I<Obj>
 
 Return the
 
-Aliases: I<shift_left>
+Aliases: I<lsft>, I<shift_left>
 
 =cut
 
@@ -240,7 +240,7 @@ I<Obj> B<E<gt>E<gt>> I<Obj> -> I<Obj>
 
 Return the
 
-Aliases: I<shift_right>
+Aliases: I<rsft>, I<shift_right>
 
 =cut
 
@@ -271,14 +271,6 @@ Number.abs() -> I<Obj>
 Return the
 
 Aliases: I<pos>, I<positive>
-
-=cut
-
-=head2 acmp
-
-Number.acmp() -> I<Obj>
-
-Return the
 
 =cut
 
@@ -356,6 +348,16 @@ Return the
 
 =cut
 
+=head2 as_dec
+
+Number.as_dec() -> I<Obj>
+
+Return the
+
+Aliases: I<as_float>
+
+=cut
+
 =head2 asec
 
 Number.asec() -> I<Obj>
@@ -367,14 +369,6 @@ Return the
 =head2 asech
 
 Number.asech() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 as_float
-
-Number.as_float() -> I<Obj>
 
 Return the
 
@@ -423,6 +417,14 @@ Return the
 =head2 as_oct
 
 Number.as_oct() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 as_rat
+
+Number.as_rat() -> I<Obj>
 
 Return the
 
@@ -512,6 +514,16 @@ Return the
 
 =cut
 
+=head2 C
+
+Number.C() -> I<Obj>
+
+Return the
+
+Aliases: I<catalan>
+
+=cut
+
 =head2 carmichael_lambda
 
 Number.carmichael_lambda() -> I<Obj>
@@ -557,6 +569,24 @@ Return the
 Number.commify() -> I<Obj>
 
 Return the
+
+=cut
+
+=head2 complex
+
+Number.complex() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 conj
+
+Number.conj() -> I<Obj>
+
+Return the
+
+Aliases: I<conjug>, I<conjugate>
 
 =cut
 
@@ -626,14 +656,6 @@ Return the
 
 =cut
 
-=head2 deg2grad
-
-Number.deg2grad() -> I<Obj>
-
-Return the
-
-=cut
-
 =head2 deg2rad
 
 Number.deg2rad() -> I<Obj>
@@ -695,8 +717,6 @@ Return the
 Number.dump() -> I<Obj>
 
 Return the
-
-Aliases: I<as_rat>
 
 =cut
 
@@ -796,22 +816,6 @@ Aliases: I<factors_exp>
 
 =cut
 
-=head2 fadd
-
-Number.fadd() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 fdiv
-
-Number.fdiv() -> I<Obj>
-
-Return the
-
-=cut
-
 =head2 fib
 
 Number.fib() -> I<Obj>
@@ -838,22 +842,6 @@ Return the
 
 =cut
 
-=head2 fmod
-
-Number.fmod() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 fmul
-
-Number.fmul() -> I<Obj>
-
-Return the
-
-=cut
-
 =head2 forcomb
 
 Number.forcomb() -> I<Obj>
@@ -874,57 +862,9 @@ Aliases: I<permutations>
 
 =cut
 
-=head2 fpow
-
-Number.fpow() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 frem
-
-Number.frem() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 fsub
-
-Number.fsub() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 G
-
-Number.G() -> I<Obj>
-
-Return the
-
-=cut
-
 =head2 gcd
 
 Number.gcd() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 grad2deg
-
-Number.grad2deg() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 grad2rad
-
-Number.grad2rad() -> I<Obj>
 
 Return the
 
@@ -967,6 +907,14 @@ Return the
 =head2 iadd
 
 Number.iadd() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 icbrt
+
+Number.icbrt() -> I<Obj>
 
 Return the
 
@@ -1090,6 +1038,14 @@ Return the
 
 =cut
 
+=head2 is_complex
+
+Number.is_complex() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 iseed
 
 Number.iseed() -> I<Obj>
@@ -1101,6 +1057,14 @@ Return the
 =head2 is_even
 
 Number.is_even() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 is_imag
+
+Number.is_imag() -> I<Obj>
 
 Return the
 
@@ -1256,6 +1220,14 @@ Return the
 
 =cut
 
+=head2 is_rat
+
+Number.is_rat() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 is_real
 
 Number.is_real() -> I<Obj>
@@ -1301,14 +1273,6 @@ Return the
 =head2 is_zero
 
 Number.is_zero() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 itimes
-
-Number.itimes() -> I<Obj>
 
 Return the
 
@@ -1502,6 +1466,14 @@ Return the
 
 =cut
 
+=head2 mone
+
+Number.mone() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 nan
 
 Number.nan() -> I<Obj>
@@ -1576,6 +1548,14 @@ Aliases: I<binomial>
 
 =cut
 
+=head2 norm
+
+Number.norm() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 nu
 
 Number.nu() -> I<Obj>
@@ -1592,13 +1572,19 @@ Number.nude() -> I<Obj>
 
 Return the
 
-Aliases: I<parts>
-
 =cut
 
 =head2 of
 
 Number.of() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 one
+
+Number.one() -> I<Obj>
 
 Return the
 
@@ -1734,14 +1720,6 @@ Return the
 
 =cut
 
-=head2 rad2grad
-
-Number.rad2grad() -> I<Obj>
-
-Return the
-
-=cut
-
 =head2 ramanujan_tau
 
 Number.ramanujan_tau() -> I<Obj>
@@ -1790,21 +1768,39 @@ Return the
 
 =cut
 
+=head2 rat
+
+Number.rat() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 re
 
 Number.re() -> I<Obj>
 
 Return the
 
-Aliases: I<rat>, I<real>
+Aliases: I<real>
 
 =cut
 
-=head2 remove
+=head2 reals
 
-Number.remove() -> I<Obj>
+Number.reals() -> I<Obj>
 
 Return the
+
+=cut
+
+=head2 remdiv
+
+Number.remdiv() -> I<Obj>
+
+Return the
+
+Aliases: I<remove>
 
 =cut
 
@@ -1986,7 +1982,15 @@ Number.Y() -> I<Obj>
 
 Return the
 
-Aliases: I<γ>
+Aliases: I<γ>, I<euler>
+
+=cut
+
+=head2 zero
+
+Number.zero() -> I<Obj>
+
+Return the
 
 =cut
 

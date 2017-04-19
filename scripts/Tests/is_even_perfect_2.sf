@@ -18,7 +18,7 @@ DATA.each { |line|
     var n = line.numbers[-1]
     is_even_perfect(n) || die "false negative: #{n}"
 
-    var r = i.irand(n)
+    var r = i.irand(n-1)
     is_even_perfect(r) && die "false positive: #{r}"
     i = n+1
 }

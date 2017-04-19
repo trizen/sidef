@@ -6,10 +6,10 @@
 
 func agm(a, g) {
     loop {
-        var x = [a+g / 2, Math.sqrt(a*g)];
-        x.map{.float} == [a, g].map{.float} && return a;
+        var x = [(a+g) / 2, sqrt(a*g)];
+        x == [a, g] && return a;
         (a, g) = x...;
     }
 }
  
-say agm(1, 1/Math.sqrt(2));
+say agm(1, 1/sqrt(2));

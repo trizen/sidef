@@ -9,7 +9,6 @@ package Sidef::Optimizer {
                   REGEX       => 'Sidef::Types::Regex::Regex',
                   BOOL        => 'Sidef::Types::Bool::Bool',
                   ARRAY       => 'Sidef::Types::Array::Array',
-                  COMPLEX     => 'Sidef::Types::Number::Complex',
                   NUMBER_DT   => 'Sidef::DataTypes::Number::Number',
                   STRING_DT   => 'Sidef::DataTypes::String::String',
                   COMPLEX_DT  => 'Sidef::DataTypes::Number::Complex',
@@ -273,11 +272,11 @@ package Sidef::Optimizer {
 
             # Number.method(Number)
             (
-             map { [$_, [table(NUMBER, COMPLEX)]] }
+             map { [$_, [table(NUMBER)]] }
                methods(NUMBER, qw(
                    + - / * % %% **
 
-                   lt gt le ge cmp acmp
+                   lt gt le ge cmp
                    eq ne
                    and or xor
 
@@ -314,7 +313,17 @@ package Sidef::Optimizer {
                    factorial
                    sqrt isqrt
                    next_pow2
-                   abs int
+                   abs int rat float i
+                   norm conj sqr
+
+                   zeta
+                   eta
+                   beta
+                   gamma
+                   Ai
+                   Li
+                   Li2
+                   Ei
 
                    exp
                    exp2
@@ -372,23 +381,33 @@ package Sidef::Optimizer {
                    phi
                    tau
                    e
-                   Y
-                   G
+                   euler
+                   catalan
 
                    is_zero
                    is_one
                    is_nan
-                   is_positive
-                   is_negative
+                   is_pos
+                   is_neg
                    is_even
                    is_odd
                    is_inf
                    is_ninf
                    is_int
 
+                   is_prime
+                   is_square
+
+                   sgn
                    ceil
                    floor
                    length
+
+                   ilog
+                   ilog2
+                   ilog10
+
+                   isqrt
 
                    numerator
                    denominator
@@ -399,9 +418,7 @@ package Sidef::Optimizer {
                    as_oct
                    as_hex
                    as_rat
-
-                   rat
-                   complex i
+                   as_frac
 
                    dump
                    commify
@@ -528,92 +545,6 @@ package Sidef::Optimizer {
             (map { [$_, [table('')]] } methods(ARRAY, qw(reduce_operator))),
                              ),
 
-        (COMPLEX) => build_tree(
-
-            # Complex.method(Complex|Number)
-            (
-             map { [$_, [table(COMPLEX, NUMBER)]] }
-               methods(COMPLEX, qw(
-                   cmp gt lt ge le eq ne
-                   roundf
-
-                   mul
-                   div
-                   add
-                   sub
-                   log
-                   pow
-
-                   atan2
-                   )
-               )
-            ),
-
-            # Complex.method()
-            (
-             map { [$_, []] }
-               methods(COMPLEX, qw(
-
-                   inc
-                   dec
-                   abs
-
-                   exp
-                   exp2
-                   exp10
-
-                   log
-                   log2
-                   log10
-                   sqrt
-
-                   cos
-                   sin
-                   tan
-                   csc
-                   sec
-                   cot
-                   asin
-                   acos
-                   atan
-                   acsc
-                   asec
-                   acot
-                   sinh
-                   cosh
-                   tanh
-                   csch
-                   sech
-                   coth
-                   asinh
-                   acosh
-                   atanh
-                   acsch
-                   asech
-                   acoth
-
-                   neg
-                   not
-
-                   real
-                   imaginary
-
-                   is_zero
-                   is_one
-                   is_nan
-                   is_real
-                   is_inf
-                   is_int
-
-                   ceil
-                   floor
-
-                   dump
-                   )
-               )
-            ),
-        ),
-
         (NUMBER_DT) => build_tree(
 
             # Number.method()
@@ -623,8 +554,8 @@ package Sidef::Optimizer {
                    pi
                    tau
                    ln2
-                   Y
-                   G
+                   euler
+                   catalan
                    e
                    phi
                    nan

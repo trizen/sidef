@@ -28,24 +28,6 @@ package Sidef::Convert::Convert {
 
     *to_i = \&to_int;
 
-    sub to_array {
-        Sidef::Types::Array::Array->new($_[0]);
-    }
-
-    *to_a = \&to_array;
-
-    sub to_rat {
-        Sidef::Types::Number::Number->new($_[0]);
-    }
-
-    *to_r = \&to_rat;
-
-    sub to_complex {
-        Sidef::Types::Number::Complex->new($_[0]);
-    }
-
-    *to_c = \&to_complex;
-
     sub to_num {
         Sidef::Types::Number::Number->new($_[0]);
     }
@@ -57,6 +39,18 @@ package Sidef::Convert::Convert {
     }
 
     *to_f = \&to_float;
+
+    sub to_rat {
+        Sidef::Types::Number::Number->new($_[0])->rat;
+    }
+
+    *to_r = \&to_rat;
+
+    sub to_array {
+        Sidef::Types::Array::Array->new($_[0]);
+    }
+
+    *to_a = \&to_array;
 
     sub to_file {
         Sidef::Types::Glob::File->new("$_[0]");

@@ -2,6 +2,7 @@ package Sidef::Math::Math {
 
     use utf8;
     use 5.014;
+
     use parent qw(
       Sidef::Object::Object
       );
@@ -127,17 +128,17 @@ package Sidef::Math::Math {
         ($from->add($to))->mul($to->sub($from)->div($step)->add(Sidef::Types::Number::Number::ONE))->div($two);
     }
 
+    sub range_map {
+        my ($self, $amount, $from, $to) = @_;
+        Sidef::Types::Range::RangeNumber->new($from, $to, $to->sub($from)->div($amount));
+    }
+
     sub map {
         my ($self, $value, $in_min, $in_max, $out_min, $out_max) = @_;
         ($value->sub($in_min))->mul($out_max->sub($out_min))->div($in_max->sub($in_min))->add($out_min);
     }
 
-    sub map_range {
-        my ($self, $amount, $from, $to) = @_;
-        Sidef::Types::Range::RangeNumber->new($from, $to, $to->sub($from)->div($amount));
-    }
-
-    sub number_to_percentage {
+    sub num2percent {
         my ($self, $num, $from, $to) = @_;
 
         my $sum  = $to->sub($from)->abs;
@@ -147,30 +148,27 @@ package Sidef::Math::Math {
         ($sum->sub($dist))->div($sum)->mul($hundred);
     }
 
-    *num2percent = \&number_to_percentage;
+    #~ our $AUTOLOAD;
 
-    our $AUTOLOAD;
+    #~ #
+    #~ ## This method is highly deprecated!
+    #~ #
+    #~ sub AUTOLOAD {
+    #~ my ($self, $x, @args) = @_;
+    #~ my ($method) = ($AUTOLOAD =~ /^.*[^:]::(.*)$/);
 
-    #
-    ## This method is highly deprecated!
-    #
-    sub AUTOLOAD {
-        my ($self, $x, @args) = @_;
-        my ($method) = ($AUTOLOAD =~ /^.*[^:]::(.*)$/);
+    #~ my $code =
+    #~ ref($x)
+    #~ ? UNIVERSAL::can($x,                             $method)
+    #~ : UNIVERSAL::can('Sidef::Types::Number::Number', $method);
 
-        my $code =
-          ref($x)
-          ? UNIVERSAL::can($x,                             $method)
-          : UNIVERSAL::can('Sidef::Types::Number::Number', $method);
-
-        defined($code)
-          ? $code->(defined($x) ? ($x, @args) : ())
-          : do {
-            my $arg = join(', ', map { defined($_) ? $_ : 'nil' } (@_ > 1 ? ($x, @args) : ()));
-            die "[ERROR] Undefined method Math.$method($arg)";
-          };
-    }
-
+    #~ defined($code)
+    #~ ? $code->(defined($x) ? ($x, @args) : ())
+    #~ : do {
+    #~ my $arg = join(', ', map { defined($_) ? $_ : 'nil' } (@_ > 1 ? ($x, @args) : ()));
+    #~ die "[ERROR] Undefined method Math.$method($arg)";
+    #~ };
+    #~ }
 }
 
 1

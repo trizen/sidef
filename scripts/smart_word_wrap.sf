@@ -101,13 +101,13 @@ class SmartWordWrap(WIDTH=80) {
     ## combination avaiable and returns it.
     method find_best(arrays) {
 
-        var best = Hash.new('score' => Math.inf);
+        var best = Hash.new('score' => Inf);
 
         arrays.each { |array_ref|
             var score = 0;
 
             array_ref.each { |string|
-                score += Math.pow(self.WIDTH - string.len, 2);
+                score += ::pow(self.WIDTH - string.len, 2);
             }
 
             score < best{:score} && (

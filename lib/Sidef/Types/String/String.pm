@@ -15,7 +15,6 @@ package Sidef::Types::String::String {
 
     use Sidef::Types::Bool::Bool;
     use Sidef::Types::Number::Number;
-    use Sidef::Types::Number::Nan;
 
     sub new {
         my (undef, $str) = @_;
@@ -428,7 +427,7 @@ package Sidef::Types::String::String {
     sub ord {
         my ($self) = @_;
         $$self eq ''
-          ? Sidef::Types::Number::Nan::NAN
+          ? Sidef::Types::Number::Number->nan
           : Sidef::Types::Number::Number->_set_uint(CORE::ord($$self));
     }
 

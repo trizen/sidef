@@ -6,7 +6,7 @@
 
 func is_square(m) { m.all { .len == m.len } }
 func matrix_zero(n, m=n) { m.of { n.of(0) } }
-func matrix_ident(n) { n.of {|i| [(i-1).of(0)..., 1, (n-i).of(0)...] } }
+func matrix_ident(n) { n.of {|i| [i.of(0)..., 1, (n - i - 1).of(0)...] } }
 
 func pivotize(m) {
     var size = m.len

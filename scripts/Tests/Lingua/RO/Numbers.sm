@@ -54,7 +54,7 @@ class new(diacritics            = true,
                     [10**21,    'triliard',    'triliarde', false],
                     [10**24,  'cvadrilion', 'cvadrilioane', false],
                     [10**27, 'cvadriliard', 'cvadriliarde', false],
-                    [Math.inf,  'inifinit',      'infinit', false],
+                    [Inf,       'inifinit',      'infinit', false],
                 ].map { |v|
                      var h = Hash()
                      h{@|<num sg pl fem>} = v...
@@ -160,13 +160,13 @@ class new(diacritics            = true,
                 # Infinity
                 var inf = _normalize_text(self.infinity);
                 if (words[0] == inf) {
-                    return(neg ? Math.inf.neg : Math.inf);
+                    return(neg ? -Inf : Inf);
                 }
 
                 # Not a number
                 var nan = _normalize_text(self.not_a_number);
                 if (words[0] == nan) {
-                    return Num.nan;
+                    return NaN
                 }
             }
         }

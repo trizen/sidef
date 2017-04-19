@@ -14,7 +14,6 @@ package Sidef::Types::Range::RangeString {
 
     use Sidef::Types::Bool::Bool;
     use Sidef::Types::Number::Number;
-    use Sidef::Types::Number::Nan;
 
     # This expects numbers
     sub new {

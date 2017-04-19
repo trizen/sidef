@@ -35,14 +35,14 @@ func fmt_month (year, month) {
 }
 
 func fmt_year (year) {
-    var month_strs = 12.of { |i| fmt_month(year, i).lines }
+    var month_strs = 12.of { |i| fmt_month(year, i+1).lines }
 
     var str = (' '*30 + year + "\n")
     for (var month = 0; month < 12; month += months_per_col) {
         while (month_strs[month]) {
             months_per_col.times { |i|
-                month_strs[month + i - 1] || next;
-                str += month_strs[month + i - 1].shift;
+                month_strs[month + i] || next;
+                str += month_strs[month + i].shift;
                 str += ' '*3
             }
             str += "\n"

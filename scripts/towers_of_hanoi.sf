@@ -2,7 +2,7 @@
 
 var n = 3
 var tije = 3.of { [] }
-n.times { |i| tije[0] << (n - i + 1) }
+n.times { |i| tije[0] << (n - i) }
 
 func display() {
     n.range.reverse.each { |i|

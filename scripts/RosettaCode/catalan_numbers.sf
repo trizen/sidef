@@ -7,6 +7,6 @@
 func f(i) { i==0 ? 1 : (i * f(i-1)) };
 func c(n) { f(2*n) / f(n) / f(n+1) };
 
-15.times { |i|
-    say "#{i-1}\t#{c(i-1)}";
+for i in (0..15) {
+    say "#{i}\t#{c(i)}";
 }

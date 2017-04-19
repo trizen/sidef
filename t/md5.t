@@ -31,7 +31,7 @@ class MD5(String msg) {
         [6, 10, 15, 21] * 4,
     ].flat
 
-    const T = 64.of {|i| floor(abs(sin(i)) * 1<<32) }
+    const T = 64.of {|i| floor(abs(sin(i+1)) * 1<<32) }
 
     const K = [
         ^16 -> map {|n|    n           },

@@ -13,7 +13,7 @@ class StdDevAccumulator(n=0, sum=0, sumofsquares=0) {
   }
 
   method stddev {
-    Math.sqrt(sumofsquares/n - Math.pow(sum/n, 2));
+    sqrt(sumofsquares/n - pow(sum/n, 2));
   }
 
   method to_s {

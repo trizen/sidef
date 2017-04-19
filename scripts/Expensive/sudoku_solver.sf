@@ -20,11 +20,11 @@ func solve(grid) {
         grid[i] && next
         var t = [grid[^grid->grep{|j| check(i, j) }]].freq
 
-        { |k|
+        for k in (1..9) {
             t.has_key(k) && next
             grid[i] = k
             solve(grid)
-        } * 9
+        }
 
         grid[i] = 0
         return nil

@@ -9,8 +9,8 @@ class Sierpinski(c='*', s=' ') {
         # needs more work
         var c = [self.c];
         { |i|
-            var xp = s*(Math.pow(2, i-1) * i + 1);
-            var sp = s*(Math.pow(2, i-1));
+            var xp = s*(pow(2, i-1) * i + 1);
+            var sp = s*(pow(2, i-1));
             c = [c.map{|x| xp + x + xp          },
                  c.map{|x| sp + x + s*i + x + sp},
                  c.map{|x| x + sp + xp + x      },

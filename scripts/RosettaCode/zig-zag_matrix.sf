@@ -11,7 +11,7 @@ func zig_zag(w, h) {
 
     h.of { |e|
         w.of { |f|
-            [e-1, f-1]
+            [e, f]
         }
     } \
     -> reduce('+') \

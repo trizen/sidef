@@ -4,16 +4,16 @@ func cuboid (x=1,y=1,z=1,s=' ',c='+',h='-',v='|',d='/') {
     say("cuboid %d %d %d:" % (x, y, z));
     ' ' * z+1 + c + h*x + c -> say;
 
-    { |i|
+    for i in (1..z) {
         ' ' * (z - i + 1) + d + s*x + d +
               (s * (i - (i > y ? i-y : 1))) +
               (i - 1 == y ? c : (i > y ? d : v)) -> say
-    } * z;
+    }
 
     c + h*x + c + (s * (z < y ? z : y) +
         (z < y ? v : (z == y ? c : d))) -> say;
 
-    { |i|
+    for i in (1..y) {
         v + s*x + v + (z > y
             ? (i >= z ? (s*x + c) : (s * y-i + d))
             : (y - i > z
@@ -21,7 +21,7 @@ func cuboid (x=1,y=1,z=1,s=' ',c='+',h='-',v='|',d='/') {
                 : (s * y-i + (y-i == z ? c : d))
                )
         ) -> say;
-    } * y;
+    }
 
     c + h*x + c -> say;
 };

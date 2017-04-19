@@ -5,5 +5,5 @@
 #
 
 '0.9054054 0.518518 0.75'.split.each { |d|
-    say d.to_r;
+    say Num(d)
 }

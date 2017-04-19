@@ -50,9 +50,6 @@ my %ignored_modules = map { $_ => 1 } qw (
   Sidef::Optimizer
   Sidef::Deparse::Perl
   Sidef::Deparse::Sidef
-  Sidef::Types::Number::Inf
-  Sidef::Types::Number::Ninf
-  Sidef::Types::Number::Nan
   );
 
 my $name = basename($dir);

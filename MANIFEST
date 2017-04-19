@@ -71,9 +71,6 @@ lib/Sidef/Types/Null/Null.pm
 lib/Sidef/Types/Null/Null.pod
 lib/Sidef/Types/Number/Complex.pm
 lib/Sidef/Types/Number/Complex.pod
-lib/Sidef/Types/Number/Inf.pm
-lib/Sidef/Types/Number/Nan.pm
-lib/Sidef/Types/Number/Ninf.pm
 lib/Sidef/Types/Number/Number.pm
 lib/Sidef/Types/Number/Number.pod
 lib/Sidef/Types/Range/Range.pm
@@ -665,6 +662,7 @@ scripts/Tests/fibonacci_mystery.sf
 scripts/Tests/find_the_missing_permutation.sf
 scripts/Tests/first_class_functions_analogously.sf
 scripts/Tests/floyds_triangle.sf
+scripts/Tests/for_in_extended.sf
 scripts/Tests/for_in_range.sf
 scripts/Tests/for_two_vars.sf
 scripts/Tests/for_var_in_array.sf

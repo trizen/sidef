@@ -10,7 +10,7 @@ func m_exec(lz, *args) {
 
 # Create some simple lazy-methods
 var lc = "TEST".method(:lc);
-var cos = Math.method(:cos);
+var cos = Number.method(:cos);
 
 # Create some complex lazy-methods
 var lz1 = "h€llo".method(:ucfirst).method(:concat, '!').method(:say);
@@ -20,7 +20,7 @@ var lz3 = "".method(:concat, '!').method(:say);
 # Test the simple lazy-methods
 lc()          == "test"          || "error lc()".die;
 lc.index('e') == 1               || "error .index()".die;
-cos(5)        == Math.cos(5)     || "Error cos()".die;
+cos(5)        == cos(5)          || "Error cos()".die;
 
 # More tests
 var lz4 = String.method(:uc, 'abc')

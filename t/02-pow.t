@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Test::More;
 
-plan tests => 114;
+plan tests => 112;
 
 use Sidef;
 
@@ -80,11 +80,11 @@ $r = $float2->pow($int2->abs);
 is("$r", "1033.55177121");
 
 $r = $float2->pow($o->new("4.23"));
-is(ref($r), 'Sidef::Types::Number::Complex');
+is(ref($r), 'Sidef::Types::Number::Number');
 like("$r", qr/^1155\.531831861.*?\+1018\.7383470368.*?i\z/);
 
 $r = $o->new(0)->pow($int2);
-is(ref($r),  'Sidef::Types::Number::Inf');
+is(ref($r),  'Sidef::Types::Number::Number');
 is(lc("$r"), 'inf');
 
 $r = $o->new(0)->pow($int1);
@@ -100,7 +100,6 @@ is("$r", "0");
     my $mone = $o->new('-1');
     my $zero = $o->new('0');
 
-    # BigNum
     is($zero->pow($inf),                     $zero);
     is($zero->pow($ninf),                    $inf);
     is($zero->pow($zero),                    $one);
@@ -112,7 +111,6 @@ is("$r", "0");
     is(($ninf)->pow($zero),                  $one);
     is(($ninf)->pow($o->new(2)),             $inf);
     is(($ninf)->pow($o->new(3)),             $ninf);
-    is(($ninf)->pow($o->new(2.3)),           $inf);
     is($inf->pow($o->new(2.3)),              $inf);
     is($inf->pow($o->new(-2.3)),             $zero);
     is(($ninf)->pow($o->new(-3)),            $zero);
@@ -127,7 +125,6 @@ is("$r", "0");
     is(($inf)->pow($one->div($o->new(-12))), $zero);
     is(($ninf)->pow($o->new(-12)->inv),      $zero);
     is(($inf)->pow($o->new(2)->inv),         $inf);
-    is(($ninf)->pow($one->div($o->new(2))),  $inf);    # sqrt($ninf)
     is(($inf)->pow($one->div($inf)),         $one);
     is(($ninf)->pow($inf->inv),              $one);
     is(($inf)->pow($one->div($ninf)),        $one);
@@ -138,7 +135,7 @@ is("$r", "0");
     is($ninf->pow($ninf), $zero);
     is($ninf->pow($zero), $one);
     is($ninf->pow($one),  $ninf);
-    is($ninf->pow($mone), $zero);                      # actually -0.0
+    is($ninf->pow($mone), $zero);    # actually -0.0
 
     # MINUS ONE
     is($mone->pow($inf),  $one);

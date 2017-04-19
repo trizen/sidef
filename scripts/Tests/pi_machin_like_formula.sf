@@ -4,19 +4,18 @@
 ## See: http://en.wikipedia.org/wiki/Machin-like_formula
 #
 
-
 # After 黃見利 (Hwang Chien-Lih) (1997)
 
 say(
     4 * (
-             (183 * Math.atan2(1,     239)) +
-             ( 32 * Math.atan2(1,    1023)) -
-             ( 68 * Math.atan2(1,    5832)) +
-             ( 12 * Math.atan2(1,  110443)) -
-             ( 12 * Math.atan2(1, 4841182)) -
-             (100 * Math.atan2(1, 6826318))
+             (183 * atan2(1,     239)) +
+             ( 32 * atan2(1,    1023)) -
+             ( 68 * atan2(1,    5832)) +
+             ( 12 * atan2(1,  110443)) -
+             ( 12 * atan2(1, 4841182)) -
+             (100 * atan2(1, 6826318))
         )
    );
 
 
-say Math.pi(64);
+say Num.pi;

@@ -62,7 +62,7 @@ class SmartWordWrap(WIDTH=80) {
     method find_best(arrays) {
 
         var best = Hash.new(
-            score => Math.inf,
+            score => Inf,
             value => [],
         );
 
@@ -70,7 +70,7 @@ class SmartWordWrap(WIDTH=80) {
             var score = 0;
 
             array_ref.each { |string|
-                score += Math.pow(WIDTH - string.len, 2);
+                score += ::pow(WIDTH - string.len, 2);
             }
 
             score < best{:score} && (

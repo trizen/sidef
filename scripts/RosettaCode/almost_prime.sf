@@ -11,10 +11,10 @@ func is_k_almost_prime(n, k) {
     f + (n > 1 ? 1 : 0) == k
 }
 
-5.times { |k|
+for k in (1..5) {
     var x = 10
     say gather {
-        Math.inf.times { |i|
+        for i in (1 .. Inf) {
             if (is_k_almost_prime(i, k)) {
                 take(i); (--x).is_zero && break;
             }

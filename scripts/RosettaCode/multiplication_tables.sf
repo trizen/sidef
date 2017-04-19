@@ -14,6 +14,6 @@ func fmt_row(*items) {
 say fmt_row('x┃', (1..max)...);
 say "#{'━' * (width - 1)}╋#{'━' * (max * width)}";
  
-max.times { |i|
+for i in (1..max) {
     say fmt_row("#{i}┃", (1..max).map {|j| i <= j ? i*j : ''}...);
-};
+}

@@ -21,7 +21,7 @@ var img = %O|Imager|.new(
                      )
 
 var color = %O|Imager::Color|.new('#ff0000')
-var r = [width.irand, height.irand]
+var r = [(width-1).irand, (height-1).irand]
 
 30000.times {
     var p = points.rand

@@ -1,4 +1,3 @@
-
 #!start included /usr/share/perl5/core_perl/ExtUtils/MANIFEST.SKIP
 # Avoid version control files.
 \bRCS\b

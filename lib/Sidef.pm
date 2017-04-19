@@ -1,7 +1,7 @@
 package Sidef {
 
     use 5.014;
-    our $VERSION = '2.37';
+    our $VERSION = '3.00';
 
     our $SPACES      = 0;    # the current number of spaces
     our $SPACES_INCR = 4;    # the number of spaces incrementor
@@ -86,36 +86,29 @@ package Sidef {
         eval($code);
     }
 
+    sub get_sidef_config_dir {
+        my ($self) = @_;
+        $self->{sidef_config_dir} //= $ENV{SIDEF_CONFIG_DIR}
+          || File::Spec->catdir(
+                                $ENV{XDG_CONFIG_DIR}
+                                  || (
+                                         $ENV{HOME}
+                                      || $ENV{LOGDIR}
+                                      || (
+                                          $^O eq 'MSWin32'
+                                          ? '\Local Settings\Application Data'
+                                          : eval { ((getpwuid($<))[7] || `echo -n ~`) }
+                                         )
+                                      || File::Spec->curdir()
+                                     ),
+                                '.config',
+                                'sidef'
+                               );
+    }
+
     sub get_sidef_vdir {
         my ($self) = @_;
-
-        return $self->{_sidef_vdir}
-          if exists($self->{_sidef_vdir});
-
-        $self->{_sidef_vdir} = File::Spec->catdir(
-                                                  $self->{sidef_config_dir}
-                                                    || $ENV{SIDEF_CONFIG_DIR}
-                                                    || File::Spec->catdir(
-                                                                      $ENV{XDG_CONFIG_DIR}
-                                                                        || File::Spec->catdir(
-                                                                          (
-                                                                                $ENV{HOME}
-                                                                             || $ENV{LOGDIR}
-                                                                             || (
-                                                                                 $^O eq 'MSWin32'
-                                                                                 ? '\Local Settings\Application Data'
-                                                                                 : eval { ((getpwuid($<))[7] || `echo -n ~`) }
-                                                                                )
-                                                                             || File::Spec->curdir()
-                                                                          ),
-                                                                          '.config'
-                                                                        ),
-                                                                      'sidef'
-                                                    ),
-                                                  "v$VERSION"
-                                                 );
-
-        $self->{_sidef_vdir};
+        $self->{_sidef_vdir} //= File::Spec->catdir($self->get_sidef_config_dir, "v$VERSION");
     }
 
     sub has_dbm_driver {

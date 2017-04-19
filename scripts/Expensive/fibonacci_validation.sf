@@ -1,15 +1,15 @@
 #!/usr/bin/ruby
 
-var S = Math.sqrt(1.25)+0.5;
-var T = Math.sqrt(1.25)-0.5;
+var S = sqrt(1.25)+0.5;
+var T = sqrt(1.25)-0.5;
 var W = S+T;    #=> sqrt(5);
 
 func fib(n) {
-    Math.pow(S, n) - Math.pow(-T, n) / W -> round;
+    pow(S, n) - pow(-T, n) / W -> round;
 }
 
 func is_fib (i, fib) {
-    (((fib * W) + Math.pow(-T, i)).log(S) -> roundf(-i)) == i;
+    (((fib * W) + pow(-T, i)).log(S) -> roundf(-i)) == i;
 }
 
 #
@@ -30,15 +30,15 @@ func fib_pos2(n) {
 ## (log(n*sqrt(5) + (((1-sqrt(5))/2) ^ (log(n * sqrt(5)) / log((1+sqrt(5))/2))))) / log((1+sqrt(5))/2)
 #
 func fib_pos3(n) {
-    ((n * W) + Math.pow(-T, (((n * W)).log(S)))).log(S).round;
+    ((n * W) + pow(-T, (((n * W)).log(S)))).log(S).round;
 }
 
 #
 ## log((W*n + ((-T)**((log(n) + log(5)/2) / S)))) / log(S)
 #
 func fib_pos4(n) {
-    (Math.log((S+T)*n + ((0.5 * (1-(S+T)))**((Math.log(n) + (Math.log(5)/2)) / (Math.log(1+(S+T))-Math.log(2)))))) /
-                                (Math.log(1+(S+T))-Math.log(2)) -> round;
+    (log((S+T)*n + ((0.5 * (1-(S+T)))**((log(n) + (log(5)/2)) / (log(1+(S+T))-log(2)))))) /
+                                (log(1+(S+T))-log(2)) -> round;
 }
 
 #

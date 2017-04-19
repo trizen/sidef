@@ -8,53 +8,55 @@ var b = Complex(3.14159, 1.25);
 [   a + b,                  # addition
     a * b,                  # multiplication
     -a,                     # negation
-    a.reciprocal,           # multiplicative inverse
-    ~a,                     # complex conjugate
+    a.inv,                  # multiplicative inverse
+    a.conj,                 # complex conjugate
     a.abs,                  # abs
     a.sqrt,                 # sqrt
     b.re,                   # real part
     b.im,                   # imaginary part
 ].each { |c| say c };
 
+define i = 1i
+
 assert_eq(Complex(3, 4), 3:4)
 assert_eq(Complex(0, 4), 4.i)
-assert_eq(Complex(3, 0), 3.c)
-assert_eq(Complex(0, 1), Complex.i)
-assert_eq(Complex(3, 4).conj, ~(3:4))
+assert_eq(Complex(3, 0), 3)
+assert_eq(Complex(0, 1), i)
+assert_eq(Complex(3, 4).conj, conj(3:4))
 assert_eq(Complex("3+4i"), Complex(3, 4));
-assert_eq(Complex("i"), Complex.i);
-assert_eq(Complex("-i"), -Complex.i);
+assert_eq(Complex("i"), i);
+assert_eq(Complex("-i"), -i);
 assert_eq(Complex("-4-2i"), Complex(-4, -2));
 assert_eq(Complex("+2i"), Complex(0, 2));
 assert_eq(Complex("4i"), Complex(0, 4));
 assert_eq(Complex("-1i"), Complex(0, -1));
 assert_eq(Complex("-32"), Complex(-32, 0));
 assert_eq(Complex("1+i"), Complex(1, 1));
-assert_eq(Complex(4, "3+i"), 4 + Complex(3, 1)*Complex.i);
-assert_eq(Complex("-12", "i"), -12 + Complex.i**2);
-assert_eq(Complex("12", "-i"), 12 + (-Complex.i * Complex.i));
-assert_eq(Complex("-32i", 42), (-32)*Complex.i + 42*Complex.i);
-assert_eq(Complex("1-i", "2-i"), Complex(1, -1) + Complex(2, -1)*Complex.i);
-assert_eq(Complex("+3+i", "+2+i"), Complex(3, 1) + Complex(2, 1)*Complex.i);
-assert_eq(Complex("-3+2i", "-9+3i"), Complex(-3, 2) + Complex(-9, 3)*Complex.i);
-assert_eq(Complex(Complex(5,9), Complex(42, 12)), Complex(5,9) + Complex(42, 12)*Complex.i);
-assert_eq(Complex(42, Complex(4, 5)), 42 + Complex(4,5)*Complex.i)
-assert_eq(Complex(Complex(3,9), 42), Complex(3,9) + 42*Complex.i)
-assert_eq(Complex(12, 42), 12 + 42*Complex.i)
-assert_eq(Complex(Complex(5, 9), "42+3i"), (5 + 9*Complex.i) + Complex.i*(42 + 3*Complex.i))
-assert_eq(Complex("42+5i", Complex(3, 7)), (42 + 5*Complex.i) + Complex.i*(3 + 7*Complex.i))
-assert_eq(Complex("i", Complex(3, 7)), Complex.i + Complex.i*(3 + 7*Complex.i))
-assert_eq(Complex(Complex(3, 7), "i"), (3 + 7*Complex.i) + Complex.i*Complex.i)
-assert_eq(Complex(Complex(3, 13), "5i"), (3 + 13*Complex.i) + 5*Complex.i*Complex.i)
-assert_eq(Complex(Complex(3, 13), "-i"), (3 + 13*Complex.i) + Complex.i*(-Complex.i))
-assert_eq(Complex(Complex(3, 13), "-12i"), (3 + 13*Complex.i) + Complex.i*(-Complex.i * 12))
-assert_eq(Complex("i", "-12i"), Complex.i + Complex.i*(-Complex.i * 12))
-assert_eq(Complex("-i", "-12i"), -Complex.i + Complex.i*(-Complex.i * 12))
-assert_eq(Complex("-i", "-i"), -Complex.i + Complex.i*(-Complex.i))
-assert_eq(Complex("-5i", "-i"), (-Complex.i * 5) + Complex.i*(-Complex.i))
-assert_eq(Complex("-5i", Complex(0, -1)), (-Complex.i * 5) + Complex.i*(-Complex.i))
-assert_eq(Complex("-5i", -Complex(0, 1)), (-Complex.i * 5) + Complex.i*(-Complex.i))
-assert_eq(Complex("-5i", -Complex(13, -17)), (-Complex.i * 5) + Complex.i*(-(13 + (-17 * Complex.i))))
-assert_eq(Complex(Complex(13, 0), Complex(17, 0)), 13 + 17*Complex.i)
-assert_eq(Complex(13, Complex(17, 0)), 13 + 17*Complex.i)
-assert_eq(Complex(Complex(13, 0), 17), 13 + 17*Complex.i)
+assert_eq(Complex(4, "3+i"), 4 + Complex(3, 1)*i);
+assert_eq(Complex("-12", "i"), -12 + i**2);
+assert_eq(Complex("12", "-i"), 12 + (-i * i));
+assert_eq(Complex("-32i", 42), (-32)*i + 42*i);
+assert_eq(Complex("1-i", "2-i"), Complex(1, -1) + Complex(2, -1)*i);
+assert_eq(Complex("+3+i", "+2+i"), Complex(3, 1) + Complex(2, 1)*i);
+assert_eq(Complex("-3+2i", "-9+3i"), Complex(-3, 2) + Complex(-9, 3)*i);
+assert_eq(Complex(Complex(5,9), Complex(42, 12)), Complex(5,9) + Complex(42, 12)*i);
+assert_eq(Complex(42, Complex(4, 5)), 42 + Complex(4,5)*i)
+assert_eq(Complex(Complex(3,9), 42), Complex(3,9) + 42*i)
+assert_eq(Complex(12, 42), 12 + 42*i)
+assert_eq(Complex(Complex(5, 9), "42+3i"), (5 + 9*i) + i*(42 + 3*i))
+assert_eq(Complex("42+5i", Complex(3, 7)), (42 + 5*i) + i*(3 + 7*i))
+assert_eq(Complex("i", Complex(3, 7)), i + i*(3 + 7*i))
+assert_eq(Complex(Complex(3, 7), "i"), (3 + 7*i) + i*i)
+assert_eq(Complex(Complex(3, 13), "5i"), (3 + 13*i) + 5*i*i)
+assert_eq(Complex(Complex(3, 13), "-i"), (3 + 13*i) + i*(-i))
+assert_eq(Complex(Complex(3, 13), "-12i"), (3 + 13*i) + i*(-i * 12))
+assert_eq(Complex("i", "-12i"), i + i*(-i * 12))
+assert_eq(Complex("-i", "-12i"), -i + i*(-i * 12))
+assert_eq(Complex("-i", "-i"), -i + i*(-i))
+assert_eq(Complex("-5i", "-i"), (-i * 5) + i*(-i))
+assert_eq(Complex("-5i", Complex(0, -1)), (-i * 5) + i*(-i))
+assert_eq(Complex("-5i", -Complex(0, 1)), (-i * 5) + i*(-i))
+assert_eq(Complex("-5i", -Complex(13, -17)), (-i * 5) + i*(-(13 + (-17 * i))))
+assert_eq(Complex(Complex(13, 0), Complex(17, 0)), 13 + 17*i)
+assert_eq(Complex(13, Complex(17, 0)), 13 + 17*i)
+assert_eq(Complex(Complex(13, 0), 17), 13 + 17*i)

@@ -7,7 +7,7 @@ func evalArithmeticExp(s) {
     func evalExp(s) {
 
         func operate(s, op) {
-           s.split(op).map{|c| c.to_num }.reduce(op);
+           s.split(op).map{|c| Number(c) }.reduce(op);
         }
 
         func add(s) {
@@ -22,7 +22,7 @@ func evalArithmeticExp(s) {
             }
 
             var b = s.split('-');
-            b.len == 3 ? (-1*b[1].to_num - b[2].to_num)
+            b.len == 3 ? (-1*Number(b[1]) - Number(b[2]))
                        : operate(s, '-');
         }
 
@@ -36,14 +36,14 @@ func evalArithmeticExp(s) {
 
         while (var match = reMD.match(s)) {
             match[0] ~~ reM
-                ? s.sub!(reMD, operate(match[0], '*').to_s)
-                : s.sub!(reMD, operate(match[0], '/').to_s);
+                ? s.sub!(reMD, operate(match[0], '*').as_float)
+                : s.sub!(reMD, operate(match[0], '/').as_float);
         }
 
         while (var match = reAS.match(s)) {
             match[0] ~~ reA
-                ? s.sub!(reAS,      add(match[0]).to_s)
-                : s.sub!(reAS, subtract(match[0]).to_s);
+                ? s.sub!(reAS,      add(match[0]).as_float)
+                : s.sub!(reAS, subtract(match[0]).as_float);
         }
 
         return s;
@@ -56,7 +56,7 @@ func evalArithmeticExp(s) {
         s.sub!(rePara, evalExp(match[0]));
     }
 
-    return evalExp(s).to_num;
+    return Number(evalExp(s));
 }
 
 
@@ -74,11 +74,11 @@ func evalArithmeticExp(s) {
      ['2 * (3 + (4 * 5 + (6 * 7) * 8) - 9) * 10' =>     7000],
 ].each { |arr|
 
-    var (expr, res) = arr...;
-    var num = evalArithmeticExp(expr);
+    var (expr, res) = arr...
+    var num = evalArithmeticExp(expr)
     num == res || (
-            "Error occurred on expression '#{expr}': got '#{num}' instead of '#{res}'\n".die;
-    );
+        die "Error occurred on expression '#{expr}': got '#{num}' instead of '#{res}'\n"
+    )
 
-    "%-45s == %10g\n".printf(expr, num);
+    "%-45s == %10g\n".printf(expr, num)
 }

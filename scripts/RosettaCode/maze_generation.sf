@@ -29,7 +29,7 @@ func walk(x, y) {
     }
 }
 
-walk(w.irand, h.irand);   # generate
+walk(w.rand.int, h.rand.int);   # generate
 
 for i in range(0, h) {
     say (hor[i].join('') + '+');

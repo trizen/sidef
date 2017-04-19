@@ -52,7 +52,18 @@ package Sidef::Types::Range::RangeNumber {
         my $times = ($self->{_times} //= $to->sub($from)->add($step)->div($step));
 
         if (ref($times) eq 'Sidef::Types::Number::Number') {
-            my $repetitions = Math::GMPq::Rmpq_get_d($$times);
+            my $repetitions = Sidef::Types::Number::Number::__numify__($$times);
+
+            # An infinite number of repetitions
+            if ($repetitions == 'inf') {
+                return Sidef::Types::Block::Block->new(
+                    code => sub {
+                        $tmp = $i;
+                        $i   = $i->add($step);
+                        $tmp;
+                    },
+                );
+            }
 
             if ($repetitions <= Sidef::Types::Number::Number::ULONG_MAX) {
 
@@ -69,15 +80,6 @@ package Sidef::Types::Range::RangeNumber {
                     },
                 );
             }
-        }
-        elsif (ref($times) eq 'Sidef::Types::Number::Inf') {
-            return Sidef::Types::Block::Block->new(
-                code => sub {
-                    $tmp = $i;
-                    $i   = $i->add($step);
-                    $tmp;
-                },
-            );
         }
 
         Sidef::Types::Block::Block->new(

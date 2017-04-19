@@ -55,32 +55,31 @@ var ngifts = (cols.end - 1);    # the number of gifts
 
 # Map the limit of gifts
 var limit = Hash.new;
-{ |i|
-    limit{cols[i]} = lim[i].to_i;
-} * ngifts;
-
+for i in (1..ngifts) {
+    limit{cols[i]} = Num(lim[i])
+}
 
 var people = table.range.map { |i|
     [
-     # [0] == people name
-     table[i][0],
+       # [0] == people name
+       table[i][0],
 
-    # [1] == gift preferences
-    range(1, ngifts).map { |j|
-        [
-            cols[j],              # [1][0] == gift name
-            table[i][j].to_i,     # [1][1] == gift rank
-        ]
-     },
+      # [1] == gift preferences
+      range(1, ngifts).map { |j|
+          [
+              cols[j],              # [1][0] == gift name
+              Num(table[i][j]),     # [1][1] == gift rank
+          ]
+       },
 
-    # [2] == weight
-    table[i][-1].to_i,
+      # [2] == weight
+      Num(table[i][-1]),
     ]
 };
 
 # Put each preference into a distinct group
 var rank = [];
-{ |i|
+for i in (1..ngifts) {
     rank.append(
         # By shuffling the results, we treat everyone equally
         # (here we can sort by weight, if we provide different weights)
@@ -88,7 +87,7 @@ var rank = [];
             [row[0], row[1].find {|item| item[1] == i}, row[2]]
         }.shuffle;
     );
-} * ngifts;
+}
 
 
 var served = Hash.new;
@@ -116,16 +115,16 @@ matches.sort {|a,b| a[0] <=> b[0]}.each { |match|
     var cols       = new_table[0];
     var column_pos = Hash.new;
 
-    { |i|
+    for i in (1..ngifts) {
         column_pos{cols[i]} = i;
-    } * ngifts;
+    }
 
     # Fill in the matches
-    { |i|
+    for i in (1 .. (new_table.end - 1)) {
         var match = matches.find {|item| item[0] == new_table[i][0]};
         var pos = column_pos{match[1][0]};
         new_table[i][pos] = 'match';
-    } * (new_table.end - 1);
+    }
 
     # Update the limit number of gifts
     limit.keys.each { |key|

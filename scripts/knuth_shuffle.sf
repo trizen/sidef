@@ -7,9 +7,9 @@
 func shuffle (a) {
 
     { |n|
-        var k = (n + 1 -> irand);
+        var k = (n -> irand);
         k == n || (a[k, n] = a[n, k]);
-    } * a.end;
+    } * a.len;
 
     return a;
 }

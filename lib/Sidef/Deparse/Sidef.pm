@@ -50,9 +50,6 @@ package Sidef::Deparse::Sidef {
                   Sidef::Meta::Glob::STDIN                STDIN
                   Sidef::Meta::Glob::STDOUT               STDOUT
                   Sidef::Meta::Glob::STDERR               STDERR
-                  Sidef::Types::Number::Inf               Inf
-                  Sidef::Types::Number::Ninf              Inf.neg
-                  Sidef::Types::Number::Nan               NaN
                   Sidef::Parser                           Parser
 
                   Sidef::Types::Nil::Nil                  nil
@@ -154,17 +151,28 @@ package Sidef::Deparse::Sidef {
     }
 
     sub _dump_number {
-        my ($self, $num) = @_;
+        my ($self, $type, $str) = @_;
+
+        if ($type eq 'complex') {
+            my ($real, $imag) = split(' ', substr($str, 1, -1));
+            ($real, $imag) = map { [Sidef::Types::Number::Number->new($_)->_deparse] } ($real, $imag);
+            return "Complex($real->[1], $imag->[1])";
+        }
 
         state $table = {
-                        'inf'  => q{Inf},
-                        '-inf' => q{Inf.neg},
-                        'nan'  => q{NaN},
-                        '1/0'  => q{Inf},
-                        '-1/0' => q{Inf.neg},
+                        '@inf@'  => q{Inf},
+                        '-@inf@' => q{-(Inf)},
+                        '@nan@'  => q{NaN},
                        };
 
-        exists($table->{lc($num)}) ? $table->{lc($num)} : $num;
+        exists($table->{lc($str)}) ? $table->{lc($str)} : do {
+            if (index($str, '/') != -1) {
+                "Number(\"$str\")";
+            }
+            else {
+                $str;
+            }
+        };
     }
 
     sub _dump_array {
@@ -541,10 +549,7 @@ package Sidef::Deparse::Sidef {
             $code = keys(%{$obj}) ? $obj->dump->get_value : 'Hash';
         }
         elsif ($ref eq 'Sidef::Types::Number::Number') {
-            $code = $self->_dump_number($obj->_get_frac);
-            if (index($code, '/') != -1) {
-                $code = qq{Number("$code")};
-            }
+            $code = $self->_dump_number($obj->_deparse);
         }
         elsif ($ref eq 'Sidef::Types::Array::Array' or $ref eq 'Sidef::Types::Array::HCArray') {
             $code = $self->_dump_array($obj);

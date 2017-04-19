@@ -25,13 +25,13 @@ do {
 var s3 = "0"
 var strs = []
 
-10.times { |i|
+for i in (1..10) {
     s3 = %Q<#{i} + eval(%Q<#{s3}>)>
     strs << s3;
 }
 
 assert_eq(eval(s3), 55);
-assert_eq(strs.map {|s| eval(s) }, 10.of { |i| i * (i+1) / 2 });
+assert_eq(strs.map {|s| eval(s) }, 10.of { |i| (i+1) * (i+2) / 2 });
 assert_eq(eval(s3), 55);
 
 say "** Test passed!";

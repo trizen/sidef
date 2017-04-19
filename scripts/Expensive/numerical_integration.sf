@@ -25,7 +25,7 @@ func legendre_prime(n, x) {
 func approximate_legendre_root(n, k) {
     # Approximation due to Francesco Tricomi
     var t = ((4*k - 1) / (4*n + 2));
-    (1 - ((n - 1)/(8 * n**3))) * (Math.pi * t -> cos);
+    (1 - ((n - 1)/(8 * n**3))) * (Num.pi * t -> cos);
 }
 
 func newton_raphson(f, f_prime, r, eps = 2e-16) {
@@ -45,7 +45,7 @@ func weight(n, r) { 2 / ((1 - r**2) * legendre_prime(n, r)**2) }
 func nodes(n) {
     gather {
         take(Pair(0, weight(n, 0))) if n.is_odd;
-        (n/2 -> int).times { |i|
+        for i in (1 .. n>>1) {
             var r = legendre_root(n, i);
             var w = weight(n, r);
             take(Pair(r, w), Pair(-r, w));

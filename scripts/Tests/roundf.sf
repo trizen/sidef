@@ -57,7 +57,7 @@
     [+2.7,      3,          0],
 ].each { |g|
     var (n, expected, nth) = g...;
-    var r = n.roundf(nth);
+    var r = n.round(nth);
 
     print "roundf(#{n}, #{nth}) = #{r} "
 

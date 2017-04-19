@@ -26,6 +26,6 @@ func showcf(f) {
     [14142/10000, 141421/100000, 1414214/1000000, 14142136/10000000],
     [314285714/100000000],
 ].each { |seq|
-    seq.each { |r| showcf(r2cf(r.parts)) }
+    seq.each { |r| showcf(r2cf(r.nude)) }
     print "\n"
 }

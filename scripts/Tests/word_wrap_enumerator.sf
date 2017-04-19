@@ -21,7 +21,7 @@ func wordwrap(words, maxwidth) {
   })
 }
 
-var text = 20.of{ _ }.join(' ')
+var text = (1..20 -> join(' '))
 var e = wordwrap(text.words, 10)
 
 var arr = []

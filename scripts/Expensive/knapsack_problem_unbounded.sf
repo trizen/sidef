@@ -30,10 +30,10 @@ func solve(i, w, v) is cached {
     var x = solve(i.dec, w, v);
 
     var (w1, v1);
-    Inf.times { |t|
+    for t in (1..Inf) {
         var item = items[i];
-        break if ((w1 = (w - t*item.weight)).is_neg)
-        break if ((v1 = (v - t*item.volume)).is_neg)
+        break if ((w1 = (w - t*item.weight)) < 0)
+        break if ((v1 = (v - t*item.volume)) < 0)
 
         var y = solve(i.dec, w1, v1);
         if ((var tmp = (y[0] + t*item.value)) > x[0]) {

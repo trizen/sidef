@@ -7,9 +7,9 @@ var cache = [[1]];
 func cumu (n) {
     for l in range(cache.len, n) {
         var r = [0];
-        { |i|
+        for i in (1..l) {
             r.append(r[-1] + cache[l-i][[i, l-i].min])
-        } * l;
+        }
         cache.append(r);
     }
 
@@ -22,9 +22,9 @@ func row (n) {
 }
 
 "rows:".say;
-{ |i|
+for i in (1..10) {
     "%2d: %s\n".printf(i, row(i).dump);
-} * 10;
+}
 
 "\nsums:".say;
 

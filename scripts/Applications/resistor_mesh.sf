@@ -27,9 +27,9 @@ func set_boundary {
 }
 
 func calc_diff {
-    var total_diff = 0
+    var total_diff = 0.0
     for i,j in (^h ~X ^w) {
-        var w = n[i][j].map { |a| v.dig(a...) }.sum
+        var w = n[i][j].map { |a| v.dig(a...) }.sum(0.0)
         d[i][j] = (w = (v[i][j] - w/n[i][j].len))
         f[i][j] || (total_diff += w*w)
     }
@@ -37,7 +37,7 @@ func calc_diff {
 }
 
 func iter {
-    var diff = 1
+    var diff = 1.0
     while (diff > 1e-24) {
         set_boundary()
         diff = calc_diff()
@@ -46,7 +46,7 @@ func iter {
         }
     }
 
-    var current = 3.of(0)
+    var current = 3.of(0.0)
     for i,j in (^h ~X ^w) {
         current[ f[i][j] ] += (d[i][j] * n[i][j].len)
     }

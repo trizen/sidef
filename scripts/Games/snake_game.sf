@@ -73,8 +73,8 @@ func make_food {
     var (food_x, food_y);
 
     do {
-        food_x = w.irand;
-        food_y = h.irand;
+        food_x = w.rand.int;
+        food_y = h.rand.int;
     } while (grid[food_y][food_x][0] != VOID);
 
     grid[food_y][food_x][0] = FOOD;

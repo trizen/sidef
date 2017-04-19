@@ -7,7 +7,7 @@
 func spiral(n) {
     var (x, y, dx, dy, a) = (0, 0, 1, 0, []);
     { |i|
-        a[y][x] = i;
+        a[y][x] = i+1;
         var (nx, ny) = (x+dx, y+dy);
         (dx, dy) =
             (  if (dx ==  1 && (nx == n || a[ny][nx]!=nil)) { ( 0,  1) }

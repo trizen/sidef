@@ -29,5 +29,5 @@ bernoulli_number = func(n) is cached {
 
 for i in range(0, 20, 2) {
     var num = bernoulli_number(i);
-    printf("B(%2d) = %20s / %s\n", i, num.parts);
+    printf("B(%2d) = %20s / %s\n", i, num.nude);
 }
