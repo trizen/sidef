@@ -1,0 +1,36 @@
+#!/usr/bin/ruby
+
+class Foo2 {}
+class Foo1 < Foo2 {}
+#class Foo2 < Foo2 {}       # not allowed
+
+var data = []
+
+class Foo1 {
+    method hi (Foo1 x) {
+        data << "Foo1"
+        assert_eq(x.class, "Foo1")
+    }
+}
+
+class Foo2 {
+    subset T1 < Foo1, Foo2;
+
+    method hi(x < T1) {
+        data << "Foo2"
+        assert(x.class ~~ /^Foo[12]\z/)
+    }
+}
+
+var a = Foo1();
+var b = Foo2();
+
+a.hi(a)
+a.hi(b)
+
+b.hi(a)
+b.hi(b)
+
+assert_eq(data, %w(Foo1 Foo2 Foo2 Foo2))
+
+say "** Test passed!"

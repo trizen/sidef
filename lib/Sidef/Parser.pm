@@ -1528,9 +1528,20 @@ package Sidef::Parser {
                     # Class inheritance (class Name(...) << Name1, Name2)
                     if (/\G\h*<<?\h*/gc) {
                         while (/\G($self->{var_name_re})\h*/gco) {
-                            my ($name) = $1;
+                            my $name = $1;
                             if (defined(my $class = $self->find_var($name, $class_name))) {
                                 if ($class->{type} eq 'class') {
+
+                                    # Detect inheritance from the same class
+                                    require Scalar::Util;
+                                    if (Scalar::Util::refaddr($obj) == Scalar::Util::refaddr($class->{obj})) {
+                                        $self->fatal_error(
+                                                           error => "Inheriting from the same class does is not allowed",
+                                                           code  => $_,
+                                                           pos   => pos($_) - length($name) - 1,
+                                                          );
+                                    }
+
                                     ++$class->{count};
                                     push @{$obj->{inherit}}, $class->{obj};
                                 }
