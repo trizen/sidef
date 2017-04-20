@@ -983,7 +983,7 @@ HEADER
             }
         }
         elsif ($ref eq 'Sidef::Types::Number::Number') {
-            my ($type, $content) = $obj->_deparse;
+            my ($type, $content) = $obj->_dump;
             $code = $self->make_constant($ref, '_set_str', "Number$refaddr", "'$type'", "'$content'");
         }
         elsif ($ref eq 'Sidef::Types::String::String') {
@@ -1262,7 +1262,7 @@ EOT
                 $ref, 'new',
                 "Range$refaddr",
                 map {
-                    my ($type, $content) = $obj->{$_}->_deparse;
+                    my ($type, $content) = $obj->{$_}->_dump;
                     'Sidef::Types::Number::Number->_set_str(' . "'$type', '$content'" . ')'
                   } ('from', 'to', 'step')
             );

@@ -192,7 +192,7 @@ package Sidef::Types::Number::Number {
         bless \Math::GMPz::Rmpz_init_set_si($_[1]);
     }
 
-    sub _deparse {
+    sub _dump {
         my $x = ${$_[0]};
 
         my $ref = ref($x);

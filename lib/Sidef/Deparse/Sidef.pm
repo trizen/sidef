@@ -151,11 +151,13 @@ package Sidef::Deparse::Sidef {
     }
 
     sub _dump_number {
-        my ($self, $type, $str) = @_;
+        my ($self, $num) = @_;
+
+        my ($type, $str) = $num->_dump;
 
         if ($type eq 'complex') {
             my ($real, $imag) = split(' ', substr($str, 1, -1));
-            ($real, $imag) = map { [Sidef::Types::Number::Number->new($_)->_deparse] } ($real, $imag);
+            ($real, $imag) = map { [Sidef::Types::Number::Number->new($_)->_dump] } ($real, $imag);
             return "Complex($real->[1], $imag->[1])";
         }
 
@@ -549,7 +551,7 @@ package Sidef::Deparse::Sidef {
             $code = keys(%{$obj}) ? $obj->dump->get_value : 'Hash';
         }
         elsif ($ref eq 'Sidef::Types::Number::Number') {
-            $code = $self->_dump_number($obj->_deparse);
+            $code = $self->_dump_number($obj);
         }
         elsif ($ref eq 'Sidef::Types::Array::Array' or $ref eq 'Sidef::Types::Array::HCArray') {
             $code = $self->_dump_array($obj);

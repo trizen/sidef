@@ -377,11 +377,11 @@ package Sidef::Types::Block::Block {
         my $ref = ref($obj);
 
         if ($ref eq 'Sidef::Types::Number::Number') {
-            my ($type, $str) = $obj->_deparse();
+            my ($type, $str) = $obj->_dump();
             return scalar {dump => ($ref . "->_set_str('$type', '$str')"),};
         }
         elsif ($ref eq 'Sidef::Types::Block::Block') {
-            die "[ERROR] Blocks can't be serialized by Block.ffork()!";
+            die "[ERROR] Blocks cannot be serialized by Block.ffork()!";
         }
 
         return;
