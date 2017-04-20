@@ -622,10 +622,33 @@ package Sidef::Types::String::String {
 
     sub numbers {
         my ($self) = @_;
-        Sidef::Types::Array::Array->new([map { Sidef::Types::Number::Number->new($_) } CORE::split(' ', $$self)]);
+        require Scalar::Util;
+        Sidef::Types::Array::Array->new(
+                                        [map { Sidef::Types::Number::Number->new($_) }
+                                         grep { Scalar::Util::looks_like_number($_) } CORE::split(' ', $$self)
+                                        ]
+                                       );
     }
 
     *nums = \&numbers;
+
+    sub integers {
+        my ($self) = @_;
+        require Scalar::Util;
+        Sidef::Types::Array::Array->new(
+                                        [map { Sidef::Types::Number::Number->new($_)->int }
+                                         grep { Scalar::Util::looks_like_number($_) } CORE::split(' ', $$self)
+                                        ]
+                                       );
+    }
+
+    *ints = \&integers;
+
+    sub digits {
+        my ($self) = @_;
+        Sidef::Types::Array::Array->new(
+                            [map { Sidef::Types::Number::Number->_set_uint($_) } grep { /^[0-9]\z/ } CORE::split(//, $$self)]);
+    }
 
     sub each_number {
         my ($self, $code) = @_;
@@ -642,7 +665,7 @@ package Sidef::Types::String::String {
     sub bytes {
         my ($self) = @_;
         my $string = $$self;
-        state $x = require bytes;
+        require bytes;
         Sidef::Types::Array::Array->new(
             [
              map {
@@ -657,7 +680,7 @@ package Sidef::Types::String::String {
 
         my $string = $$self;
 
-        state $x = require bytes;
+        require bytes;
         foreach my $i (0 .. bytes::length($string) - 1) {
             $code->run(Sidef::Types::Number::Number->_set_uint(CORE::ord bytes::substr($string, $i, 1)));
         }
@@ -745,14 +768,14 @@ package Sidef::Types::String::String {
 
     sub open_r {
         my ($self, @rest) = @_;
-        state $x = require Encode;
+        require Encode;
         my $string = Encode::encode_utf8($$self);
         Sidef::Types::Glob::File->new(\$string)->open_r(@rest);
     }
 
     sub open {
         my ($self, @rest) = @_;
-        state $x = require Encode;
+        require Encode;
         my $string = Encode::encode_utf8($$self);
         Sidef::Types::Glob::File->new(\$string)->open(@rest);
     }
@@ -874,7 +897,7 @@ package Sidef::Types::String::String {
     sub bytes_length {
         my ($self) = @_;
 
-        state $x = require bytes;
+        require bytes;
         Sidef::Types::Number::Number->_set_uint(bytes::length($$self));
     }
 
@@ -889,7 +912,7 @@ package Sidef::Types::String::String {
         my $len1 = scalar(@s);
         my $len2 = scalar(@t);
 
-        state $x = require List::Util;
+        require List::Util;
 
         my @d = ([0 .. $len2], map { [$_] } 1 .. $len1);
         foreach my $i (1 .. $len1) {
@@ -920,7 +943,7 @@ package Sidef::Types::String::String {
             return 1;
         }
 
-        state $x = require List::Util;
+        require List::Util;
 
         my $match_distance = int(List::Util::max($s_len, $t_len) / 2) - 1;
 
@@ -1061,7 +1084,7 @@ package Sidef::Types::String::String {
 
     sub looks_like_number {
         my ($self) = @_;
-        state $x = require Scalar::Util;
+        require Scalar::Util;
         Scalar::Util::looks_like_number($$self)
           ? (Sidef::Types::Bool::Bool::TRUE)
           : (Sidef::Types::Bool::Bool::FALSE);
@@ -1089,26 +1112,26 @@ package Sidef::Types::String::String {
     sub encode {
         my ($self, $enc) = @_;
 
-        state $x = require Encode;
+        require Encode;
         $self->new(Encode::encode("$enc", $$self));
     }
 
     sub decode {
         my ($self, $enc) = @_;
 
-        state $x = require Encode;
+        require Encode;
         $self->new(Encode::decode("$enc", $$self));
     }
 
     sub encode_utf8 {
         my ($self) = @_;
-        state $x = require Encode;
+        require Encode;
         $self->new(Encode::encode_utf8($$self));
     }
 
     sub decode_utf8 {
         my ($self) = @_;
-        state $x = require Encode;
+        require Encode;
         $self->new(Encode::decode_utf8($$self));
     }
 
@@ -1145,7 +1168,7 @@ package Sidef::Types::String::String {
 
         $$self =~ /\\|#\{/ || return $self;    # return faster
 
-        state $x = require Encode;
+        require Encode;
         my $str = $$self;
 
         state $esc = {
@@ -1203,7 +1226,7 @@ package Sidef::Types::String::String {
                     if (exists $chars[$i + 2] and $chars[$i + 2] eq '{') {
                         my $str = CORE::join('', @chars[$i + 2 .. $#chars]);
                         if ($str =~ /^\{(.*?)\}/) {
-                            state $x = require charnames;
+                            require charnames;
                             my $char = charnames::string_vianame($1);
                             if (defined $char) {
                                 splice(@chars, $i--, 2 + $+[0], $char);

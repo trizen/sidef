@@ -346,6 +346,14 @@ Return the
 
 =cut
 
+=head2 digits
+
+String.digits() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 downto
 
 String.downto() -> I<Obj>
@@ -593,6 +601,16 @@ Return the
 String.insert() -> I<Obj>
 
 Return the
+
+=cut
+
+=head2 ints
+
+String.ints() -> I<Obj>
+
+Return the
+
+Aliases: I<integers>
 
 =cut
 

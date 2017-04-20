@@ -446,13 +446,27 @@ package Sidef::Types::Block::Block {
 
         my $block = $self->{code};
         foreach my $obj (@objs) {
-            my $break = 0;
-            foreach my $group (UNIVERSAL::isa($obj, 'ARRAY') ? @$obj : @{$obj->to_a}) {
-                $break = 1;
-                $block->(UNIVERSAL::isa($group, 'ARRAY') ? @$group : $group);
-                $break = 0;
+            if (defined(my $sub = UNIVERSAL::can($obj, 'iter'))) {
+                my $iter  = $sub->($obj);
+                my $break = 0;
+                while (1) {
+                    $break = 1;
+                    $block->(
+                             $iter->run // do { $break = 0; last }
+                            );
+                    $break = 0;
+                }
+                last if $break;
             }
-            last if $break;
+            else {
+                my $break = 0;
+                foreach my $item (UNIVERSAL::isa($obj, 'ARRAY') ? @$obj : @{$obj->to_a}) {
+                    $break = 1;
+                    $block->($item);
+                    $break = 0;
+                }
+                last if $break;
+            }
         }
     }
 

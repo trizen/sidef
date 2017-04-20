@@ -13,10 +13,10 @@ use Sidef;
 my $code = <<'EOT';
 
 func mtest(b, p) {
-    var bits = b.base(2).to_i.digits
+    var bits = b.base(2).digits
     for (var sq = 1; bits; sq %= p) {
         sq *= sq;
-        sq += sq if bits.shift.is_one
+        sq += sq if bits.shift==1
     }
     sq == 1
 }
@@ -27,11 +27,11 @@ for m in (2..53 -> lazy.grep{.is_prime}) {
     var f = 0
     var x = (2**m - 1)
     var q
-    Inf.times { |k|
+    { |k|
         q = (2*k*m + 1)
         q%8 ~~ [1,7] || q.is_prime || next
         q*q > x || (f = mtest(m, q)) && break
-    }
+    } << 1..Inf
     results << (f ? "#{m}:#{q}" :  "#{m}:p")
 }
 
