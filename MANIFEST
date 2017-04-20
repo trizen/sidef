@@ -153,6 +153,7 @@ scripts/Expensive/knuth_power_tree.sf
 scripts/Expensive/long_multiplication.sf
 scripts/Expensive/ludic_numbers.sf
 scripts/Expensive/md5.sf
+scripts/Expensive/multiplicative_digital_root.sf
 scripts/Expensive/normal_distribution.sf
 scripts/Expensive/numerical_integration.sf
 scripts/Expensive/parallel_calculations.sf

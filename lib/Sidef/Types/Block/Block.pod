@@ -34,6 +34,16 @@ Aliases: I<repeat>
 
 =cut
 
+=head2 <<
+
+I<Obj> B<E<lt>E<lt>> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<for>, I<foreach>
+
+=cut
+
 =head2 call
 
 Block.call() -> I<Obj>
@@ -83,16 +93,6 @@ Return the
 Block.ffork() -> I<Obj>
 
 Return the
-
-=cut
-
-=head2 for
-
-Block.for() -> I<Obj>
-
-Return the
-
-Aliases: I<foreach>
 
 =cut
 

@@ -310,11 +310,6 @@ package Sidef::Types::Block::Block {
         }
     }
 
-    {
-        no strict 'refs';
-        *{__PACKAGE__ . '::' . '*'} = \&repeat;
-    }
-
     sub capture {
         my ($self) = @_;
 
@@ -465,6 +460,12 @@ package Sidef::Types::Block::Block {
 
     sub dump {
         Sidef::Types::String::String->new("$_[0]");
+    }
+
+    {
+        no strict 'refs';
+        *{__PACKAGE__ . '::' . '*'}  = \&repeat;
+        *{__PACKAGE__ . '::' . '<<'} = \&for;
     }
 }
 
