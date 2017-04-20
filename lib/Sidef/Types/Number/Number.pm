@@ -18,10 +18,6 @@ package Sidef::Types::Number::Number {
         $PREC  = 192;
     }
 
-    #Math::GMPq::Rmpq_set_ui((state $ONE  = Math::GMPq::Rmpq_init()), 1, 1);
-    #Math::GMPq::Rmpq_set_ui((state $ZERO = Math::GMPq::Rmpq_init()), 0, 1);
-    #Math::GMPq::Rmpq_set_si((state $MONE = Math::GMPq::Rmpq_init()), -1, 1);
-
     my $ONE  = Math::GMPz::Rmpz_init_set_ui(1);
     my $ZERO = Math::GMPz::Rmpz_init_set_ui(0);
     my $MONE = Math::GMPz::Rmpz_init_set_si(-1);
@@ -73,8 +69,7 @@ package Sidef::Types::Number::Number {
             my $int_base = CORE::int($base);
 
             if ($int_base < 2 or $int_base > 36) {
-                require Carp;
-                Carp::croak("base must be between 2 and 36, got $base");
+                die "[ERROR] Number(): base must be between 2 and 36, got $base";
             }
 
             $num = defined($num) ? "$num" : '0';
@@ -1684,8 +1679,6 @@ package Sidef::Types::Number::Number {
                 (@_) = (_mpz2mpfr($x), $y);
                 goto __SUB__;
             };
-
-            Math::GMPz::Rmpz_sgn($x) || return $x;
 
             my $q = Math::GMPq::Rmpq_init();
             Math::GMPq::Rmpq_z_div($q, $x, $y);

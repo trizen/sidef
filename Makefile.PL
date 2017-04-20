@@ -15,7 +15,7 @@ WriteMakefile
                    'File::Spec' => 0,
                    'Getopt::Std' => 0,
                    'List::Util' => '1.33',
-                   'Math::GMPq' => '0.44',
+                   'Math::GMPq' => '0.45',
                    'Math::GMPz' => '0.39',
                    'Math::MPC' => 0,
                    'Math::MPFR' => '3.29',

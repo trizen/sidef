@@ -228,6 +228,7 @@ scripts/Graphical/window_creation_1.sf
 scripts/Graphical/yin_and_yang.sf
 scripts/happy_numbers.sf
 scripts/huffman_coding.sf
+scripts/inheritance_and_subset.sf
 scripts/Interactive/cosmic_calendar.sf
 scripts/Interactive/draw_a_clock.sf
 scripts/Interactive/execute_brainfuck.sf
