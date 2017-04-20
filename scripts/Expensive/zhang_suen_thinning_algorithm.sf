@@ -34,8 +34,8 @@ class ZhangSuen(str, black="1") {
     return 0 if ((bp1 < 2) || (6 < bp1));
 
     var ap1 = 0;
-    CIRCULARS.map {|p| ng[x+p[0]][y+p[1]] }.each_cons(2, {|p|
-        ++ap1 if (p[0] < p[1])                                  # A(P1)
+    CIRCULARS.map {|p| ng[x+p[0]][y+p[1]] }.each_cons(2, {|a,b|
+        ++ap1 if (a < b)                                  # A(P1)
     })
 
     return 0 if (ap1 != 1);

@@ -6,9 +6,9 @@
 
 func createSubstrings(String word) -> Array {
   gather {
-    for i,j in (@^(word.len+1) -> combinations(2)) {
+    (word.len+1).combinations(2, {|i,j|
         take(word.substr(i, j-i))
-    }
+    })
   }
 }
 

@@ -6559,7 +6559,7 @@ package Sidef::Types::Number::Number {
         }
 
         if ($n == 0) {
-            $block->run(Sidef::Types::Array::Array->new([]));
+            $block->run();
             return $block;
         }
 
@@ -6570,15 +6570,15 @@ package Sidef::Types::Number::Number {
         my @idx = (0 .. $n - 1);
         my @nums = map { __PACKAGE__->_set_uint($_) } @idx;
 
-        my $perm;
+        my @perm;
         while (1) {
-            $perm = Sidef::Types::Array::Array->new([@nums[@idx]]);
+            @perm = @nums[@idx];
 
             my $p = $#idx;
             --$p while $idx[$p - 1] > $idx[$p];
 
             my $q = $p || do {
-                $block->run($perm);
+                $block->run(@perm);
                 return $block;
             };
 
@@ -6586,7 +6586,7 @@ package Sidef::Types::Number::Number {
             ++$q while $idx[$p - 1] > $idx[$q];
             @idx[$p - 1, $q] = @idx[$q, $p - 1];
 
-            $block->run($perm);
+            $block->run(@perm);
         }
 
         return $block;
@@ -6607,7 +6607,7 @@ package Sidef::Types::Number::Number {
         $k = CORE::int(__numify__($$k));
 
         if ($k == 0) {
-            $block->run(Sidef::Types::Array::Array->new([]));
+            $block->run();
             return $block;
         }
 
@@ -6618,7 +6618,7 @@ package Sidef::Types::Number::Number {
         my @nums = map { __PACKAGE__->_set_uint($_) } (0 .. $n - 1);
 
         while (1) {
-            $block->run(Sidef::Types::Array::Array->new([@nums[@c]]));
+            $block->run(@nums[@c]);
             next if ($c[$k - 1]++ < $n - 1);
             my $i = $k - 2;
             $i-- while ($i >= 0 && $c[$i] >= $n - ($k - $i));

@@ -8,7 +8,7 @@
 
 assert_eq(
     gather {
-        [0,1,2].permutations { |p|
+        [0,1,2].permutations { |*p|
             take(p)
         }
     },
@@ -17,7 +17,7 @@ assert_eq(
 
 assert_eq(
     gather {
-        [].permutations { |p|
+        [].permutations { |*p|
             take(p)
         }
     },
@@ -26,7 +26,7 @@ assert_eq(
 
 assert_eq(
     gather {
-        [0].permutations { |p|
+        [0].permutations { |*p|
             take(p)
         }
     },
@@ -54,7 +54,7 @@ assert_eq(
 
 assert_eq(
     gather {
-        3.permutations { |p|
+        3.permutations { |*p|
             take(p)
         }
     },
@@ -63,7 +63,7 @@ assert_eq(
 
 assert_eq(
     gather {
-        0.permutations { |p|
+        0.permutations { |*p|
             take(p)
         }
     },
@@ -72,7 +72,7 @@ assert_eq(
 
 assert_eq(
     gather {
-        (-1).permutations { |p|
+        (-1).permutations { |*p|
             take(p)
         }
     },
@@ -81,7 +81,7 @@ assert_eq(
 
 assert_eq(
     gather {
-        1.permutations { |p|
+        1.permutations { |*p|
             take(p)
         }
     },
@@ -93,7 +93,7 @@ assert_eq(
 
 assert_eq(
     gather {
-        [1,2,3].combinations(0, { |c|
+        [1,2,3].combinations(0, { |*c|
             take(c)
         })
     },
@@ -102,7 +102,7 @@ assert_eq(
 
 assert_eq(
     gather {
-        [].combinations(1, { |c|
+        [].combinations(1, { |*c|
             take(c)
         })
     },
@@ -111,7 +111,7 @@ assert_eq(
 
 assert_eq(
     gather {
-        [1].combinations(1, { |c|
+        [1].combinations(1, { |*c|
             take(c)
         })
     },
@@ -120,7 +120,7 @@ assert_eq(
 
 assert_eq(
     gather {
-        [1].combinations(2, { |c|
+        [1].combinations(2, { |*c|
             take(c)
         })
     },
@@ -129,7 +129,7 @@ assert_eq(
 
 assert_eq(
     gather {
-        [0,1,2,3].combinations(3, { |c|
+        [0,1,2,3].combinations(3, { |*c|
             take(c)
         })
     },
@@ -138,7 +138,7 @@ assert_eq(
 
 assert_eq(
     gather {
-        [0,1,2,3].combinations(-2, { |c|
+        [0,1,2,3].combinations(-2, { |*c|
             take(c)
         })
     },
@@ -147,7 +147,7 @@ assert_eq(
 
 assert_eq(
     gather {
-        [0,1,2,3].combinations(2, { |c|
+        [0,1,2,3].combinations(2, { |*c|
             take(c)
         })
     },
@@ -156,7 +156,7 @@ assert_eq(
 
 assert_eq(
     gather {
-        [0,1,2,3].combinations(4, { |c|
+        [0,1,2,3].combinations(4, { |*c|
             take(c)
         })
     },
@@ -209,7 +209,7 @@ assert_eq(
 
 assert_eq(
     gather {
-        3.combinations(0, { |c|
+        3.combinations(0, { |*c|
             take(c)
         })
     },
@@ -218,7 +218,7 @@ assert_eq(
 
 assert_eq(
     gather {
-        0.combinations(1, { |c|
+        0.combinations(1, { |*c|
             take(c)
         })
     },
@@ -227,7 +227,7 @@ assert_eq(
 
 assert_eq(
     gather {
-        1.combinations(1, { |c|
+        1.combinations(1, { |*c|
             take(c)
         })
     },
@@ -236,7 +236,7 @@ assert_eq(
 
 assert_eq(
     gather {
-        1.combinations(2, { |c|
+        1.combinations(2, { |*c|
             take(c)
         })
     },
@@ -245,7 +245,7 @@ assert_eq(
 
 assert_eq(
     gather {
-        4.combinations(3, { |c|
+        4.combinations(3, { |*c|
             take(c)
         })
     },
@@ -254,7 +254,7 @@ assert_eq(
 
 assert_eq(
     gather {
-        4.combinations(-2, { |c|
+        4.combinations(-2, { |*c|
             take(c)
         })
     },
@@ -263,7 +263,7 @@ assert_eq(
 
 assert_eq(
     gather {
-        4.combinations(2, { |c|
+        4.combinations(2, { |*c|
             take(c)
         })
     },
@@ -272,7 +272,7 @@ assert_eq(
 
 assert_eq(
     gather {
-        4.combinations(4, { |c|
+        4.combinations(4, { |*c|
             take(c)
         })
     },

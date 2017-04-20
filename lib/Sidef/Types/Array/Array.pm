@@ -794,12 +794,12 @@ package Sidef::Types::Array::Array {
 
         my $end = @$self;
         for (my $i = $n - 1 ; $i < $end ; $i += $n) {
-            $code->run(bless([@$self[$i - ($n - 1) .. $i]], __PACKAGE__));
+            $code->run(@$self[$i - ($n - 1) .. $i]);
         }
 
         my $mod = $end % $n;
         if ($mod != 0) {
-            $code->run(bless([@$self[$end - $mod .. $end - 1]], __PACKAGE__));
+            $code->run(@$self[$end - $mod .. $end - 1]);
         }
 
         $self;
@@ -874,7 +874,7 @@ package Sidef::Types::Array::Array {
         $n = CORE::int($n);
 
         foreach my $i ($n - 1 .. $#$self) {
-            $code->run(bless([@$self[$i - $n + 1 .. $i]], __PACKAGE__));
+            $code->run(@$self[$i - $n + 1 .. $i]);
         }
 
         $self;
@@ -1564,7 +1564,7 @@ package Sidef::Types::Array::Array {
                         if ($key eq $tail) {
 
                             if ($callback) {
-                                $block->run(bless([@{$ref->{$key}}[0 .. $#{$ref->{$key}} - $count]], __PACKAGE__));
+                                $block->run(@{$ref->{$key}}[0 .. $#{$ref->{$key}} - $count]);
                             }
                             else {
                                 CORE::push(@abbrev, bless([@{$ref->{$key}}[0 .. $#{$ref->{$key}} - $count]], __PACKAGE__));
@@ -1780,7 +1780,7 @@ package Sidef::Types::Array::Array {
         if (defined($block)) {
 
             if ($k == 0) {
-                $block->run(bless [], __PACKAGE__);
+                $block->run();
                 return $self;
             }
 
@@ -1790,7 +1790,7 @@ package Sidef::Types::Array::Array {
             my @c = (0 .. $k - 1);
 
             while (1) {
-                $block->run(bless [@$self[@c]], __PACKAGE__);
+                $block->run(@$self[@c]);
                 next if ($c[$k - 1]++ < $n - 1);
                 my $i = $k - 2;
                 $i-- while ($i >= 0 && $c[$i] >= $n - ($k - $i));
@@ -1836,7 +1836,7 @@ package Sidef::Types::Array::Array {
         if (not @idx) {
 
             if (defined $code) {
-                $code->run(bless [], __PACKAGE__);
+                $code->run();
                 return $self;
             }
 
@@ -1844,16 +1844,16 @@ package Sidef::Types::Array::Array {
         }
 
         if (defined($code)) {
-            my $perm;
+            my @perm;
 
             while (1) {
-                $perm = bless([@$self[@idx]], __PACKAGE__);
+                @perm = @$self[@idx];
 
                 my $p = $#idx;
                 --$p while $idx[$p - 1] > $idx[$p];
 
                 my $q = $p || do {
-                    $code->run($perm);
+                    $code->run(@perm);
                     return $self;
                 };
 
@@ -1861,7 +1861,7 @@ package Sidef::Types::Array::Array {
                 ++$q while $idx[$p - 1] > $idx[$q];
                 @idx[$p - 1, $q] = @idx[$q, $p - 1];
 
-                $code->run($perm);
+                $code->run(@perm);
             }
 
             return $self;
@@ -1899,7 +1899,7 @@ package Sidef::Types::Array::Array {
             }
             else {
                 if (defined($block)) {
-                    $block->run(bless [@c], __PACKAGE__);
+                    $block->run(@c);
                 }
                 else {
                     CORE::push @r, bless [@c], __PACKAGE__;
@@ -1927,7 +1927,7 @@ package Sidef::Types::Array::Array {
             my @tmp = ($first[$i], map { $_->[$i] } @arrays);
 
             if (defined($block)) {
-                $block->run(bless(\@tmp, __PACKAGE__));
+                $block->run(@tmp);
             }
             else {
                 CORE::push(@new_array, bless(\@tmp, __PACKAGE__));
@@ -1951,7 +1951,7 @@ package Sidef::Types::Array::Array {
             my @tmp = ($first[$i], map { $_->[$i % $min] } @arrays);
 
             if (defined($block)) {
-                $block->run(bless(\@tmp, __PACKAGE__));
+                $block->run(@tmp);
             }
             else {
                 CORE::push(@new_array, bless(\@tmp, __PACKAGE__));

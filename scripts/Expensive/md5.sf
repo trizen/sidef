@@ -51,7 +51,7 @@ class MD5(String msg) {
         var padded = [msg..., 128, [0] * (-(floor(bits / 8) + 1 + 8) % 64)].flat
 
         gather {
-            padded.each_slice(4, {|a|
+            padded.each_slice(4, {|*a|
                 take(radix(256, a))
             })
             take(little_endian(32, 2, [bits]))
