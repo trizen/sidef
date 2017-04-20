@@ -24,6 +24,16 @@ Inherits methods from:
 =head1 METHODS
 
 
+=head2 &
+
+I<Obj> B<&> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<grep>
+
+=cut
+
 =head2 *
 
 I<Obj> B<*> I<Obj> -> I<Obj>
@@ -40,7 +50,17 @@ I<Obj> B<E<lt>E<lt>> I<Obj> -> I<Obj>
 
 Return the
 
-Aliases: I<for>, I<foreach>
+Aliases: I<for>, I<each>, I<foreach>
+
+=cut
+
+=head2 >>
+
+I<Obj> B<E<gt>E<gt>> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<map>
 
 =cut
 

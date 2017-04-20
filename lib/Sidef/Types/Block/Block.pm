@@ -445,6 +445,7 @@ package Sidef::Types::Block::Block {
         my ($self, @objs) = @_;
 
         my $block = $self->{code};
+
         foreach my $obj (@objs) {
             if (defined(my $sub = UNIVERSAL::can($obj, 'iter'))) {
                 my $iter  = $sub->($obj);
@@ -472,7 +473,74 @@ package Sidef::Types::Block::Block {
         $self;
     }
 
+    *each    = \&for;
     *foreach = \&for;
+
+    sub map {
+        my ($self, @objs) = @_;
+
+        my @array;
+        my $block = $self->{code};
+
+        foreach my $obj (@objs) {
+            if (defined(my $sub = UNIVERSAL::can($obj, 'iter'))) {
+                my $iter  = $sub->($obj);
+                my $break = 0;
+                while (1) {
+                    $break = 1;
+                    push @array, $block->(
+                                          $iter->run // do { $break = 0; last }
+                                         );
+                    $break = 0;
+                }
+                last if $break;
+            }
+            else {
+                my $break = 0;
+                foreach my $item (UNIVERSAL::isa($obj, 'ARRAY') ? @$obj : @{$obj->to_a}) {
+                    $break = 1;
+                    push @array, $block->($item);
+                    $break = 0;
+                }
+                last if $break;
+            }
+        }
+
+        Sidef::Types::Array::Array->new(\@array);
+    }
+
+    sub grep {
+        my ($self, @objs) = @_;
+
+        my @array;
+        my $block = $self->{code};
+
+        foreach my $obj (@objs) {
+            if (defined(my $sub = UNIVERSAL::can($obj, 'iter'))) {
+                my $iter  = $sub->($obj);
+                my $break = 0;
+                my $item;
+                while (1) {
+                    $break = 1;
+                    $item = $iter->run // do { $break = 0; last };
+                    push(@array, $item) if $block->($item);
+                    $break = 0;
+                }
+                last if $break;
+            }
+            else {
+                my $break = 0;
+                foreach my $item (UNIVERSAL::isa($obj, 'ARRAY') ? @$obj : @{$obj->to_a}) {
+                    $break = 1;
+                    push(@array, $item) if $block->($item);
+                    $break = 0;
+                }
+                last if $break;
+            }
+        }
+
+        Sidef::Types::Array::Array->new(\@array);
+    }
 
     sub dump {
         Sidef::Types::String::String->new("$_[0]");
@@ -482,6 +550,8 @@ package Sidef::Types::Block::Block {
         no strict 'refs';
         *{__PACKAGE__ . '::' . '*'}  = \&repeat;
         *{__PACKAGE__ . '::' . '<<'} = \&for;
+        *{__PACKAGE__ . '::' . '>>'} = \&map;
+        *{__PACKAGE__ . '::' . '&'}  = \&grep;
     }
 }
 
