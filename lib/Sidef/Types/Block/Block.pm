@@ -447,17 +447,17 @@ package Sidef::Types::Block::Block {
     *thr = \&thread;
 
     sub for {
-        my ($self, @args) = @_;
+        my ($self, @objs) = @_;
 
-        if (@args == 1 and defined(UNIVERSAL::can($args[0], 'each'))) {
-            $args[0]->each($self);
-        }
-        else {
-            my $code = $self->{code};
-            foreach my $item (@args) {
-                $code->($item);
+        my $block = $self->{code};
+        foreach my $obj (@objs) {
+            my $break = 0;
+            foreach my $group (UNIVERSAL::isa($obj, 'ARRAY') ? @$obj : @{$obj->to_a}) {
+                $break = 1;
+                $block->(UNIVERSAL::isa($group, 'ARRAY') ? @$group : $group);
+                $break = 0;
             }
-            $self;
+            last if $break;
         }
     }
 

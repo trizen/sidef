@@ -9,11 +9,10 @@ var dirs = [[-1,-1], [-1, 0], [-1, 1], [ 0,-1],
 
 var universe = h.of { w.of {1.rand < 0.1} }
 
-var xr = (h.range ~X w.range);
-
 func iterate {
     var new = h.of { w.of(false) }
-    for i,j in xr {
+    static rx = (^h ~X ^w)
+    for i,j in rx {
         var neighbor = 0
         for y,x in (dirs.map {|dir| dir »+« [i, j] }) {
             universe[y % h][x % w] && ++neighbor
