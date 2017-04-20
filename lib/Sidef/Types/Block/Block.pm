@@ -468,6 +468,8 @@ package Sidef::Types::Block::Block {
                 last if $break;
             }
         }
+
+        $self;
     }
 
     *foreach = \&for;

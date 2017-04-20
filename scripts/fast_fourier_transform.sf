@@ -7,12 +7,12 @@ func fft(arr) {
     var odd = fft([arr[^arr -> grep { .is_odd  }]])
     var twd = (Num.tau.i / arr.len)
 
-    ^odd -> map {|n| odd[n] *= ::exp(twd * n)}
+    ^odd -> map {|n| odd[n] *= exp(twd * n) }
     (evn »+« odd) + (evn »-« odd)
 }
 
 var cycles = 3
 var sequence = 0..15
-var wave = sequence.map {|n| ::sin(n * Num.tau / sequence.len * cycles) }
+var wave = sequence.map {|n| sin(n * Num.tau / sequence.len * cycles) }
 say "wave:#{wave.map{|w| '%6.3f' % w }.join(' ')}"
 say "fft: #{fft(wave).map { '%6.3f' % .abs }.join(' ')}"

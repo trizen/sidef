@@ -1,0 +1,17 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Factors_of_an_integer
+#
+
+func factors(n) {
+  gather {
+    { |d|
+        take(d, n//d) if d.divides(n)
+    } << 1..n.isqrt
+  }.sort.uniq
+}
+ 
+for n [53, 64, 32766] {
+    say "factors(#{n}): #{factors(n)}"
+}

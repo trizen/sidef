@@ -336,6 +336,8 @@ scripts/RosettaCode/extract_file_extension.sf
 scripts/RosettaCode/extreme_floating_point_values.sf
 scripts/RosettaCode/factorial.sf
 scripts/RosettaCode/factors_of_a_mersenne_number.sf
+scripts/RosettaCode/factors_of_an_integers.sf
+scripts/RosettaCode/faulhaber_s_formula_2.sf
 scripts/RosettaCode/fibonacci_n-step_number_sequence.sf
 scripts/RosettaCode/fibonacci_sequence.sf
 scripts/RosettaCode/fibonacci_sequence_1.sf
