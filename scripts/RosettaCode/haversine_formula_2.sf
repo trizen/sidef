@@ -14,21 +14,22 @@ class EarthPoint(lat, lon) {
     method lonR { self.lon * radian_ratio }
 
     method haversine_dist(EarthPoint p) {
-        var arc = __CLASS__(
-            self.lat - p.lat,
-            self.lon - p.lon,
+        var arc = EarthPoint(
+              self.lat - p.lat,
+              self.lon - p.lon,
         )
 
-        var a = [ pow(sin(arc.latR / 2), 2),
-                  pow(sin(arc.lonR / 2), 2) *
-                  cos(self.latR) * cos(p.latR),
-                ].sum
+        var a = Math.sum(
+                  (arc.latR / 2).sin**2,
+                  (arc.lonR / 2).sin**2 *
+                    self.latR.cos * p.latR.cos
+                )
 
-        earth_radius * asin(sqrt(a)) * 2
+        earth_radius * a.sqrt.asin * 2
     }
 }
 
 var BNA = EarthPoint.new(lat: 36.12, lon: -86.67)
 var LAX = EarthPoint.new(lat: 33.94, lon: -118.4)
 
-say BNA.haversine_dist(LAX)   # => 2886.444442837983299747157823945...
+say BNA.haversine_dist(LAX)   #=> 2886.444442837983299747157823945746716...

@@ -1,0 +1,29 @@
+#!/usr/bin/ruby
+
+#
+## http://rosettacode.org/wiki/Horizontal_sundial_calculations
+#
+
+var latitude  = -4.95
+var longitude = -150.5
+var meridian  = -150
+ 
+var lat_sin = latitude.deg2rad.sin
+var offset = (meridian - longitude)
+ 
+say('Sine of latitude: ', "%.4f" % lat_sin)
+say('Longitude offset: ', offset)
+say('=' * 48)
+say(' Hour  : Sun hour angle° : Dial hour line angle°')
+ 
+for hour (-6 .. 6) {
+    var sun_deg  = (15*hour + offset)
+    var line_deg = rad2deg(
+        atan2(
+            sin(deg2rad(sun_deg)) * lat_sin,
+            cos(deg2rad(sun_deg))
+        )
+    )
+    printf("%2d %s      %7.3f             %7.3f\n",
+      (hour + 12) % 12 || 12, (hour < 0 ? 'AM' : 'PM'), sun_deg, line_deg)
+}

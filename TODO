@@ -15,7 +15,6 @@ New built-in classes:
 
 Internal:
     * Switch to subroutine `signatures` (as soon as this feature becomes stable).
-    * Re-implement Array.cartesian() with an iterative algorithm (http://stackoverflow.com/questions/1719594/iterative-cartesian-product-in-java).
 
 Speculations:
     * Make all core methods (including user-defined methods) real multimethods, using Class::Multimethods.

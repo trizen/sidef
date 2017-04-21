@@ -1,0 +1,40 @@
+#!/usr/bin/ruby
+
+#
+## Tests for Array.cartesian()
+#
+
+assert_eq(
+    gather {
+        [^3, ^3, ^3].cartesian { |a,b,c|
+            take([a,b,c])
+            if (b==2 && c==1) {
+                break
+            }
+        }
+    }, [[0, 0, 0],[0, 0, 1],[0, 0, 2],[0, 1, 0],[0, 1, 1],[0, 1, 2],[0, 2, 0],[0, 2, 1]]
+)
+
+var arr = [[:a,:b], [:c,:d], [:e,:f,:g]]
+
+assert_eq(
+    gather {
+        arr.cartesian { |*a| take(a) }
+    },
+    [["a", "c", "e"],
+     ["a", "c", "f"],
+     ["a", "c", "g"],
+     ["a", "d", "e"],
+     ["a", "d", "f"],
+     ["a", "d", "g"],
+     ["b", "c", "e"],
+     ["b", "c", "f"],
+     ["b", "c", "g"],
+     ["b", "d", "e"],
+     ["b", "d", "f"],
+     ["b", "d", "g"]]
+)
+
+assert_eq(arr, [[:a,:b], [:c,:d], [:e,:f,:g]])
+
+say "** Test passed!"

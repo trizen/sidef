@@ -1886,31 +1886,51 @@ package Sidef::Types::Array::Array {
     sub cartesian {
         my ($self, $block) = @_;
 
-        my (@c, @r);
-        my @C = @$self;
+        my ($more, @arrs, @lengths);
 
-        sub {
-            if (@c < @C) {
-                for my $item (@{$C[@c]}) {
-                    CORE::push(@c, $item);
-                    __SUB__->();
-                    CORE::pop(@c);
-                }
+        foreach my $arr (@$self) {
+            my @arr = @$arr;
+
+            if (@arr) {
+                $more ||= 1;
             }
             else {
-                if (defined($block)) {
-                    $block->run(@c);
+                $more = 0;
+                last;
+            }
+
+            push @arrs,    \@arr;
+            push @lengths, $#arr;
+        }
+
+        my @indices = (0) x @arrs;
+        my (@temp, @cartesian);
+
+      OUTER: while ($more) {
+            @temp = @indices;
+
+            for (my $i = $#indices ; $i >= 0 ; --$i) {
+                if ($indices[$i] == $lengths[$i]) {
+                    $indices[$i] = 0;
+                    $more = 0 if $i == 0;
                 }
                 else {
-                    CORE::push @r, bless [@c], __PACKAGE__;
+                    ++$indices[$i];
+                    last;
                 }
             }
-          }
-          ->();
+
+            if (defined($block)) {
+                $block->run(map { @$_ ? $_->[CORE::shift(@temp)] : () } @arrs);
+            }
+            else {
+                push @cartesian, bless [map { @$_ ? $_->[CORE::shift(@temp)] : () } @arrs], __PACKAGE__;
+            }
+        }
 
         defined($block)
           ? $self
-          : bless(\@r, __PACKAGE__);
+          : bless(\@cartesian, __PACKAGE__);
     }
 
     sub zip {

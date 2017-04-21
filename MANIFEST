@@ -374,9 +374,12 @@ scripts/RosettaCode/greatest_element_of_a_list.sf
 scripts/RosettaCode/hash_from_two_arrays.sf
 scripts/RosettaCode/hash_join.sf
 scripts/RosettaCode/haversine_formula.sf
+scripts/RosettaCode/haversine_formula_2.sf
 scripts/RosettaCode/hickerson_series_of_almost_integers.sf
 scripts/RosettaCode/higher-order_functions.sf
 scripts/RosettaCode/history_variables.sf
+scripts/RosettaCode/holidays_related_to_easter.sf
+scripts/RosettaCode/horizontal_sundial_calculations.sf
 scripts/RosettaCode/hostname.sf
 scripts/RosettaCode/identity_matrix.sf
 scripts/RosettaCode/infinity.sf
@@ -621,6 +624,7 @@ scripts/Tests/cached_func_method.sf
 scripts/Tests/caesar_cipher.sf
 scripts/Tests/calendar.sf
 scripts/Tests/call_an_object_method.sf
+scripts/Tests/cartesian.sf
 scripts/Tests/catalan_numbers.sf
 scripts/Tests/catalan_numbers_2.sf
 scripts/Tests/class_attr_inheritance.sf
