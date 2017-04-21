@@ -16,7 +16,7 @@ var a = 17.of { 17.of(0) }
 
 a.each {|row| say row.join(' ') }
 
-17.combinations(4, { |*quartet|
+combinations(17, 4, { |*quartet|
   var links = quartet.combinations(2).map{|p| a.dig(p...) }.sum
   ((0 < links) && (links < 6)) || die "Bogus!"
 })

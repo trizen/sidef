@@ -6,13 +6,13 @@
 
 func createSubstrings(String word) -> Array {
   gather {
-    (word.len+1).combinations(2, {|i,j|
+    combinations(word.len+1, 2, {|i,j|
         take(word.substr(i, j-i))
     })
   }
 }
 
-func findLongestCommon(String first, String second) -> Str {
+func findLongestCommon(String first, String second) -> String {
     createSubstrings(first) & createSubstrings(second) -> max_by { .len }
 }
 

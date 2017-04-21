@@ -25,3 +25,5 @@ module Zero {
 
 assert_eq(Bar::vvv, 42)
 assert_eq(Foo::uuu, 99)
+
+say "** Test passed!"

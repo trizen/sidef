@@ -926,7 +926,7 @@ HEADER
                             $code .= ',class=>' . $self->_dump_string($self->{class_name});
                         }
 
-                        if ($self->{current_namespace} ne 'main') {
+                        if (exists($self->{current_namespace}) and $self->{current_namespace} ne 'main') {
                             $code .= ',namespace=>' . $self->_dump_string($self->{current_namespace});
                         }
 
