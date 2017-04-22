@@ -6,16 +6,16 @@
 
 func bubble_sort(Array arr) -> Array {
     loop {
-        var swapped = false;
+        var swapped = false
         { |i|
             if (arr[i] > arr[i+1]) {
-                arr[i, i+1] = arr[i+1, i];
+                arr[i, i+1] = arr[i+1, i]
                 swapped = true
             }
-        } * arr.end
+        } << ^arr.end
         swapped || break
     }
-    return arr;
+    return arr
 }
 
 var numbers = [7,6,5,9,8,4,3,1,2,0];
