@@ -6,15 +6,15 @@
 
 func is_square(m) { m.all { .len == m.len } }
 func matrix_zero(n, m=n) { m.of { n.of(0) } }
-func matrix_ident(n) { n.of {|i| [i.of(0)..., 1, (n - i - 1).of(0)...] } }
+func matrix_ident(n) { n.of {|i| n.of {|j| i==j ? 1 : 0 } } }
 
 func pivotize(m) {
     var size = m.len
     var id = matrix_ident(size)
-    for i in ^size {
+    for i (^size) {
         var max = m[i][i]
         var row = i
-        for j in (i ..^ size) {
+        for j (i ..^ size) {
             if (m[j][i] > max) {
                 max = m[j][i]
                 row = j
@@ -29,8 +29,8 @@ func pivotize(m) {
 
 func mmult(a, b) {
     var p = []
-    for r,c in (@^a ~X @^b[0]) {
-        for i in ^b {
+    for r,c (^a ~X ^b[0]) {
+        for i (^b) {
             p[r][c] := 0 += (a[r][i] * b[i][c])
         }
     }
@@ -44,11 +44,11 @@ func lu(a) {
     var Aʼ = mmult(P, a)
     var L = matrix_ident(n)
     var U = matrix_zero(n)
-    for i,j in (@^n ~X @^n) {
+    for i,j (^n ~X ^n) {
         if (j >= i) {
-            U[i][j] = (Aʼ[i][j] - (^i->map { U[_][j] * L[i][_] }.sum(0)))
+            U[i][j] = (Aʼ[i][j] - ({ U[_][j] * L[i][_] }.map(^i).sum))
         } else {
-            L[i][j] = ((Aʼ[i][j] - (^j->map { U[_][j] * L[i][_] }.sum(0))) / U[j][j])
+            L[i][j] = (Aʼ[i][j] - ({ U[_][j] * L[i][_] }.map(^j).sum))/U[j][j]
         }
     }
     return [P, Aʼ, L, U]
@@ -72,9 +72,9 @@ var t = [[
    %n( 2  5  7  1),
 ]]
 
-t.each { |test|
+for test (t) {
     say_it('A Matrix', test);
-    for a in (['P Matrix', 'Aʼ Matrix', 'L Matrix', 'U Matrix'] ~Z lu(test)) {
-        say_it(a[0], a[1])
+    for a,b (['P Matrix', 'Aʼ Matrix', 'L Matrix', 'U Matrix'] ~Z lu(test)) {
+        say_it(a, b)
     }
 }
