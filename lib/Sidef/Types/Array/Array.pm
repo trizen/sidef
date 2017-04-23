@@ -1921,7 +1921,7 @@ package Sidef::Types::Array::Array {
             }
 
             if (defined($block)) {
-                $block->run(map { @$_ ? $_->[CORE::shift(@temp)] : () } @arrs);
+                $block->run(map { $_->[CORE::shift(@temp)] } @arrs);
             }
             else {
                 push @cartesian, bless([map { $_->[CORE::shift(@temp)] } @arrs], __PACKAGE__);
