@@ -1906,7 +1906,7 @@ package Sidef::Types::Array::Array {
         my @indices = (0) x @arrs;
         my (@temp, @cartesian);
 
-      OUTER: while ($more) {
+        while ($more) {
             @temp = @indices;
 
             for (my $i = $#indices ; $i >= 0 ; --$i) {
@@ -1924,7 +1924,7 @@ package Sidef::Types::Array::Array {
                 $block->run(map { @$_ ? $_->[CORE::shift(@temp)] : () } @arrs);
             }
             else {
-                push @cartesian, bless [map { @$_ ? $_->[CORE::shift(@temp)] : () } @arrs], __PACKAGE__;
+                push @cartesian, bless([map { $_->[CORE::shift(@temp)] } @arrs], __PACKAGE__);
             }
         }
 
