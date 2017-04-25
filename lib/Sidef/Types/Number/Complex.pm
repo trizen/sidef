@@ -26,7 +26,7 @@ package Sidef::Types::Number::Complex {
             $real =
               defined($real)
               ? Sidef::Types::Number::Number::_str2obj("$real")
-              : Sidef::Types::Number::Number::ZERO;
+              : ${(Sidef::Types::Number::Number::ZERO)};
         }
 
         if (defined($imag)) {
