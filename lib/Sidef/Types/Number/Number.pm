@@ -1665,6 +1665,12 @@ package Sidef::Types::Number::Number {
                 goto __SUB__;
             };
 
+            # Check for exact divisibility
+            if (Math::GMPz::Rmpz_divisible_p($x, $y)) {
+                Math::GMPz::Rmpz_divexact($x, $x, $y);
+                return $x;
+            }
+
             my $r = Math::GMPq::Rmpq_init();
             Math::GMPq::Rmpq_set_num($r, $x);
             Math::GMPq::Rmpq_set_den($r, $y);
