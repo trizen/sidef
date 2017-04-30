@@ -6094,9 +6094,9 @@ package Sidef::Types::Number::Number {
         my ($x) = @_;
 
         my $f = _copy2mpfr($$x);
+
         Math::MPFR::Rmpfr_log2($f, $f, $ROUND);
-        Math::MPFR::Rmpfr_add_ui($f, $f, 1, $ROUND);
-        Math::MPFR::Rmpfr_floor($f, $f);
+        Math::MPFR::Rmpfr_ceil($f, $f);
 
         my $z = Math::GMPz::Rmpz_init_set_ui(1);
         my $ui = Math::MPFR::Rmpfr_get_ui($f, $ROUND);
@@ -6118,9 +6118,7 @@ package Sidef::Types::Number::Number {
         Math::MPFR::Rmpfr_log($f2, $f2, $ROUND);
 
         Math::MPFR::Rmpfr_div($f1, $f1, $f2, $ROUND);
-
-        Math::MPFR::Rmpfr_add_ui($f1, $f1, 1, $ROUND);
-        Math::MPFR::Rmpfr_floor($f1, $f1);
+        Math::MPFR::Rmpfr_ceil($f1, $f1);
 
         $y = _copy2mpz($$y) // goto &nan;
         my $ui = Math::MPFR::Rmpfr_get_ui($f1, $ROUND);

@@ -97,8 +97,6 @@ package Sidef::Math::Math {
     sub chinese {
         my ($self, @arrs) = @_;
 
-        state $x = require Scalar::Util;
-
         my @pairs;
         foreach my $pair (@arrs) {
             if (    Scalar::Util::reftype($pair) eq 'ARRAY'
@@ -147,28 +145,6 @@ package Sidef::Math::Math {
         state $hundred = Sidef::Types::Number::Number->_set_uint(100);
         ($sum->sub($dist))->div($sum)->mul($hundred);
     }
-
-    #~ our $AUTOLOAD;
-
-    #~ #
-    #~ ## This method is highly deprecated!
-    #~ #
-    #~ sub AUTOLOAD {
-    #~ my ($self, $x, @args) = @_;
-    #~ my ($method) = ($AUTOLOAD =~ /^.*[^:]::(.*)$/);
-
-    #~ my $code =
-    #~ ref($x)
-    #~ ? UNIVERSAL::can($x,                             $method)
-    #~ : UNIVERSAL::can('Sidef::Types::Number::Number', $method);
-
-    #~ defined($code)
-    #~ ? $code->(defined($x) ? ($x, @args) : ())
-    #~ : do {
-    #~ my $arg = join(', ', map { defined($_) ? $_ : 'nil' } (@_ > 1 ? ($x, @args) : ()));
-    #~ die "[ERROR] Undefined method Math.$method($arg)";
-    #~ };
-    #~ }
 }
 
-1
+1;
