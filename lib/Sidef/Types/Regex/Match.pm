@@ -92,6 +92,7 @@ package Sidef::Types::Regex::Match {
 
     *cap  = \&captures;
     *caps = \&captures;
+    *to_a = \&captures;
 
     sub named_captures {
         my ($self) = @_;
