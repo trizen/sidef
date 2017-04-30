@@ -14,8 +14,6 @@ package Sidef::Types::Block::Block {
       q{""}   => sub {
         my ($self) = @_;
 
-        state $x = require Scalar::Util;
-
         my $name = Sidef::normalize_type($self->{name});
         my $addr = Scalar::Util::refaddr($self->{code});
         my @vars = map { ($_->{slurpy} ? '*' : '') . Sidef::normalize_type($_->{name}) . ($_->{has_value} ? '=(nil)' : '') }

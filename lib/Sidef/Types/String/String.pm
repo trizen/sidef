@@ -622,7 +622,6 @@ package Sidef::Types::String::String {
 
     sub numbers {
         my ($self) = @_;
-        require Scalar::Util;
         Sidef::Types::Array::Array->new(
                                         [map { Sidef::Types::Number::Number->new($_) }
                                          grep { Scalar::Util::looks_like_number($_) } CORE::split(' ', $$self)
@@ -634,7 +633,6 @@ package Sidef::Types::String::String {
 
     sub integers {
         my ($self) = @_;
-        require Scalar::Util;
         Sidef::Types::Array::Array->new(
                                         [map { Sidef::Types::Number::Number->new($_)->int }
                                          grep { Scalar::Util::looks_like_number($_) } CORE::split(' ', $$self)
@@ -1084,7 +1082,6 @@ package Sidef::Types::String::String {
 
     sub looks_like_number {
         my ($self) = @_;
-        require Scalar::Util;
         Scalar::Util::looks_like_number($$self)
           ? (Sidef::Types::Bool::Bool::TRUE)
           : (Sidef::Types::Bool::Bool::FALSE);

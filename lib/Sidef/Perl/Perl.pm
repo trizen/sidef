@@ -2,7 +2,6 @@ package Sidef::Perl::Perl {
 
     use 5.016;
     use Sidef::Types::Number::Number;
-    use Scalar::Util qw();
 
     sub new {
         bless {}, __PACKAGE__;

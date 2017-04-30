@@ -206,31 +206,26 @@ package Sidef::Sys::Sys {
 
     sub refaddr {
         my ($self, $obj) = @_;
-        state $x = require Scalar::Util;
         Sidef::Types::Number::Number->new(Scalar::Util::refaddr($obj));
     }
 
     sub reftype {
         my ($self, $obj) = @_;
-        state $x = require Scalar::Util;
         Sidef::Types::String::String->new(Scalar::Util::reftype($obj));
     }
 
     sub weaken {
         my ($self, $obj) = @_;
-        state $x = require Scalar::Util;
         (Scalar::Util::weaken($obj)) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub isweak {
         my ($self, $obj) = @_;
-        state $x = require Scalar::Util;
         (Scalar::Util::isweak($obj)) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub unweaken {
         my ($self, $obj) = @_;
-        state $x = require Scalar::Util;
         (Scalar::Util::unweaken($obj)) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
