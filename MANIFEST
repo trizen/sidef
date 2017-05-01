@@ -205,6 +205,7 @@ scripts/Graphical/fractal_tree.sf
 scripts/Graphical/hello_world_graphical.sf
 scripts/Graphical/hello_world_graphical_1.sf
 scripts/Graphical/honeycombs.sf
+scripts/Graphical/kronecker_fractal.sf
 scripts/Graphical/LSystem/LSystem.sf
 scripts/Graphical/LSystem/Turtle.sf
 scripts/Graphical/lsystem_complex.sf

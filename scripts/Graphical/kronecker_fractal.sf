@@ -1,0 +1,26 @@
+#!/usr/bin/ruby
+
+#
+## https://rosettacode.org/wiki/Kronecker_product_based_fractals
+#
+
+func kronecker_product (a, b) { a ~X b -> map { _[0] ~X* _[1] } }
+
+func kronecker_fractal(pattern, order=4) {
+    var kronecker = pattern
+    { kronecker = kronecker_product(kronecker, pattern) } * order
+    return kronecker
+}
+
+var order = 5
+var shape = [[1, 1, 1], [0, 1, 0], [0, 1, 0]]
+
+require("Imager")
+
+var pat = kronecker_fractal(shape, order)
+var img = %O<Imager>.new(xsize => pat[0].len, ysize => pat.len)
+for x,y in (^pat[0].len ~X ^pat.len) {
+    img.setpixel(x => x, y => y, color => (pat[y][x] ? <255 255 32> : <16 16 16>))
+}
+
+img.write(file => "kronecker_fractal.png")
