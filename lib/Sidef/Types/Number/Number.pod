@@ -1244,6 +1244,14 @@ Return the
 
 =cut
 
+=head2 is_smooth
+
+Number.is_smooth() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 is_sqr
 
 Number.is_sqr() -> I<Obj>

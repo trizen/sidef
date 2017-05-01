@@ -5985,6 +5985,33 @@ package Sidef::Types::Number::Number {
           : Sidef::Types::Bool::Bool::FALSE;
     }
 
+    sub is_smooth {
+        my ($x, $n) = @_;
+
+        _valid(\$n);
+        __is_int__($$x) || return Sidef::Types::Bool::Bool::FALSE;
+
+        $x = _copy2mpz($$x) // return Sidef::Types::Bool::Bool::FALSE;
+        $n = _any2mpz($$n)  // return Sidef::Types::Bool::Bool::FALSE;
+
+        Math::GMPz::Rmpz_cmp_ui($n, 1) < 0
+          and return Sidef::Types::Bool::Bool::FALSE;
+
+        my $p = Math::GMPz::Rmpz_init_set_ui(2);
+
+        while (Math::GMPz::Rmpz_cmp($p, $n) <= 0) {
+            if (Math::GMPz::Rmpz_remove($x, $x, $p)) {
+                Math::GMPz::Rmpz_cmp_ui($x, 1) == 0
+                  and return Sidef::Types::Bool::Bool::TRUE;
+            }
+            Math::GMPz::Rmpz_nextprime($p, $p);
+        }
+
+        (Math::GMPz::Rmpz_cmp_ui($x, 1) == 0)
+          ? Sidef::Types::Bool::Bool::TRUE
+          : Sidef::Types::Bool::Bool::FALSE;
+    }
+
     sub is_square {
         my ($x) = @_;
         __is_int__($$x)

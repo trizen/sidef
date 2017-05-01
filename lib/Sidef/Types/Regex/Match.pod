@@ -37,7 +37,7 @@ Match.cap() -> I<Obj>
 
 Return the
 
-Aliases: I<caps>, I<captures>
+Aliases: I<to_a>, I<caps>, I<captures>
 
 =cut
 
