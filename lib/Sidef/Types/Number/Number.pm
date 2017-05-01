@@ -6123,7 +6123,7 @@ package Sidef::Types::Number::Number {
 
         my $f = _copy2mpfr($$x);
 
-        Math::MPFR::Rmpfr_log2($f, $f, $ROUND);
+        Math::MPFR::Rmpfr_log2($f, $f, Math::MPFR::MPFR_RNDZ);
         Math::MPFR::Rmpfr_ceil($f, $f);
 
         my $z = Math::GMPz::Rmpz_init_set_ui(1);
@@ -6142,8 +6142,8 @@ package Sidef::Types::Number::Number {
         my $f1 = _copy2mpfr($$x);
         my $f2 = _copy2mpfr($$y);
 
-        Math::MPFR::Rmpfr_log($f1, $f1, $ROUND);
-        Math::MPFR::Rmpfr_log($f2, $f2, $ROUND);
+        Math::MPFR::Rmpfr_log($f1, $f1, Math::MPFR::MPFR_RNDZ);
+        Math::MPFR::Rmpfr_log($f2, $f2, Math::MPFR::MPFR_RNDZ);
 
         Math::MPFR::Rmpfr_div($f1, $f1, $f2, $ROUND);
         Math::MPFR::Rmpfr_ceil($f1, $f1);
