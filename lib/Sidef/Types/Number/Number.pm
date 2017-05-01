@@ -6000,7 +6000,8 @@ package Sidef::Types::Number::Number {
         my $p = Math::GMPz::Rmpz_init_set_ui(2);
 
         while (Math::GMPz::Rmpz_cmp($p, $n) <= 0) {
-            if (Math::GMPz::Rmpz_remove($x, $x, $p)) {
+            if (Math::GMPz::Rmpz_divisible_p($x, $p)) {
+                Math::GMPz::Rmpz_remove($x, $x, $p);
                 Math::GMPz::Rmpz_cmp_ui($x, 1) == 0
                   and return Sidef::Types::Bool::Bool::TRUE;
             }
