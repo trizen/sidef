@@ -5994,7 +5994,7 @@ package Sidef::Types::Number::Number {
         $x = _copy2mpz($$x) // return Sidef::Types::Bool::Bool::FALSE;
         $n = _any2mpz($$n)  // return Sidef::Types::Bool::Bool::FALSE;
 
-        Math::GMPz::Rmpz_cmp_ui($n, 1) < 0
+        Math::GMPz::Rmpz_sgn($n) <= 0
           and return Sidef::Types::Bool::Bool::FALSE;
 
         my $p = Math::GMPz::Rmpz_init_set_ui(2);
