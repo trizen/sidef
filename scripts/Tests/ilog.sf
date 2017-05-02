@@ -10,6 +10,7 @@ for n in (1..100) {
     assert_eq(ilog10(10**n), n)
     assert_eq(ilog(3**n), log(3**n).int)
     assert_eq(ilog2(exp(n)), log2(exp(n)).int)
+    assert_eq(ilog(exp(n), 3), log(exp(n), 3).int)
 }
 
 say "** Test passed!"
