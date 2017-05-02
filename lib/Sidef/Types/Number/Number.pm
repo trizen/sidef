@@ -2403,7 +2403,17 @@ package Sidef::Types::Number::Number {
 
         if (defined($y)) {
             _valid(\$y);
-            bless \(_any2mpz(__div__(__log__(_copy2mpfr_mpc($$x)), __log__(_copy2mpfr_mpc($$y)))) // goto &nan);
+            my $log = __div__(__log__(_copy2mpfr_mpc($$x)), __log__(_copy2mpfr_mpc($$y)));
+
+            if (ref($log) eq 'Math::MPC') {
+                $log = _any2mpfr($log);
+            }
+
+            Math::MPFR::Rmpfr_number_p($log) || goto &nan;
+
+            my $z = Math::GMPz::Rmpz_init();
+            Math::MPFR::Rmpfr_get_z($z, $log, Math::MPFR::MPFR_RNDN);
+            bless \$z;
         }
         else {
             bless \(_any2mpz(__log__(_copy2mpfr_mpc($$x))) // goto &nan);

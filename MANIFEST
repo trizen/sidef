@@ -704,6 +704,7 @@ scripts/Tests/http_tiny.sf
 scripts/Tests/hypot.sf
 scripts/Tests/i_love_you.sf
 scripts/Tests/iban.sf
+scripts/Tests/ilog.sf
 scripts/Tests/implicit_method_call_on_var_.sf
 scripts/Tests/implicit_numberic_conversions.sf
 scripts/Tests/integer_limits.sf

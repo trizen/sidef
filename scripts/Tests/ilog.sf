@@ -1,0 +1,15 @@
+#!/usr/bin/ruby
+
+#
+## Tests for ilog(), ilog2() and ilog10().
+#
+
+for n in (1..100) {
+    assert_eq(ilog(3**n, 3), n)
+    assert_eq(ilog2(2**n), n)
+    assert_eq(ilog10(10**n), n)
+    assert_eq(ilog(3**n), log(3**n).int)
+    assert_eq(ilog2(exp(n)), log2(exp(n)).int)
+}
+
+say "** Test passed!"
