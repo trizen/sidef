@@ -1334,8 +1334,7 @@ package Sidef::Types::Number::Number {
 
         elsif ($sig eq q(Math::MPFR Math::MPC)) {
             my $c = Math::MPC::Rmpc_init2(CORE::int($PREC));
-            Math::MPC::Rmpc_set($c, $y, $ROUND);
-            Math::MPC::Rmpc_add_fr($c, $c, $x, $ROUND);
+            Math::MPC::Rmpc_add_fr($c, $y, $x, $ROUND);
             $c;
         }
 
@@ -1570,8 +1569,7 @@ package Sidef::Types::Number::Number {
 
         elsif ($sig eq q(Math::MPFR Math::MPC)) {
             my $c = Math::MPC::Rmpc_init2(CORE::int($PREC));
-            Math::MPC::Rmpc_set($c, $y, $ROUND);
-            Math::MPC::Rmpc_mul_fr($c, $c, $x, $ROUND);
+            Math::MPC::Rmpc_mul_fr($c, $y, $x, $ROUND);
             $c;
         }
 
@@ -4965,8 +4963,7 @@ package Sidef::Types::Number::Number {
         elsif ($sig eq q(Math::MPC Math::MPC)) {
 
             my $quo = Math::MPC::Rmpc_init2(CORE::int($PREC));
-            Math::MPC::Rmpc_set($quo, $x, $ROUND);
-            Math::MPC::Rmpc_div($quo, $quo, $y, $ROUND);
+            Math::MPC::Rmpc_div($quo, $x, $y, $ROUND);
 
             my $real = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
             my $imag = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
@@ -4988,8 +4985,7 @@ package Sidef::Types::Number::Number {
         elsif ($sig eq q(Math::MPC $)) {
 
             my $quo = Math::MPC::Rmpc_init2(CORE::int($PREC));
-            Math::MPC::Rmpc_set($quo, $x, $ROUND);
-            Math::MPC::Rmpc_div_ui($quo, $quo, $y, $ROUND);
+            Math::MPC::Rmpc_div_ui($quo, $x, $y, $ROUND);
 
             my $real = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
             my $imag = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
