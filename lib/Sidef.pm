@@ -430,7 +430,9 @@ package Sidef {
       ? $_[0]->{module}
       : $_[0];
 };
+
 *UNIVERSAL::DESTROY = sub { };
+
 *UNIVERSAL::AUTOLOAD = sub {
     my ($self, @args) = @_;
 

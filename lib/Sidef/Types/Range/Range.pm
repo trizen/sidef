@@ -375,7 +375,7 @@ package Sidef::Types::Range::Range {
 
         my (%seen, @array);
         my $amount = CORE::int($n);
-        my $total  = CORE::int($limit)+1;
+        my $total  = CORE::int($limit) + 1;
 
         if ($amount <= 0) {
             return Sidef::Types::Array::Array->new([]);
