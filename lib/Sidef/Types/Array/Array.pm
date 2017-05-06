@@ -1828,6 +1828,42 @@ package Sidef::Types::Array::Array {
 
     *each_comb = \&combinations;
 
+    sub nth_permutation {
+        my ($self, $n) = @_;
+
+        my @perm;
+        my @arr = @$self;
+
+        $n = $n->int;
+
+        my $cmp = CORE::int($n->cmp(Sidef::Types::Number::Number::ZERO));
+
+        if ($cmp < 0) {
+            $n   = $n->neg->dec;
+            @arr = CORE::reverse(@arr);
+        }
+        elsif ($cmp == 0) {
+            return bless \@arr, __PACKAGE__;
+        }
+        else {
+            $n = $n->dec;
+        }
+
+        while (@arr) {
+            my $end = $#arr;
+            my $f   = Sidef::Types::Number::Number->_set_uint($end)->factorial;
+            (my $q, $n) = $n->divmod($f);
+            $q = $q->imod(Sidef::Types::Number::Number->_set_uint($end + 1));
+            my $i = CORE::int($q);
+            push @perm, $arr[$i];
+            @arr = (@arr[0 .. $i - 1, $i + 1 .. $end]);
+        }
+
+        bless \@perm, __PACKAGE__;
+    }
+
+    *nth_perm = \&nth_permutation;
+
     sub permutations {
         my ($self, $code) = @_;
 

@@ -845,6 +845,16 @@ Aliases: I<call>
 
 =cut
 
+=head2 nth_perm
+
+Array.nth_perm() -> I<Obj>
+
+Return the
+
+Aliases: I<nth_permutation>
+
+=cut
+
 =head2 pack
 
 Array.pack() -> I<Obj>

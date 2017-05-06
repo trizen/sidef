@@ -5035,7 +5035,7 @@ package Sidef::Types::Number::Number {
         $y = _any2mpz($$y)  // (goto &nan);
 
         my $sign_y = Math::GMPz::Rmpz_sgn($y)
-          || goto nan;
+          || goto &nan;
 
         Math::GMPz::Rmpz_mod($x, $x, $y);
 
