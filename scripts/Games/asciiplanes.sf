@@ -174,7 +174,7 @@ func assign(change=false, plane=[], data=[]) {
 func print_ascii_table {
     var table = asciitable.new(Hash(headingText => "#{pkgname} #{version}"));
 
-    table.setCols(' ', BOARD_SIZE.of { _ }...);
+    table.setCols(' ', (1..BOARD_SIZE)...);
 
     var char = 'a';
     info_board.each { |row|
