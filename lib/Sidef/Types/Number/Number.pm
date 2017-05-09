@@ -4327,7 +4327,7 @@ package Sidef::Types::Number::Number {
             bless \$r;
         }
         else {
-            !$r ? ZERO : ($r > 0) ? ONE : MONE;
+            ($r < 0) ? MONE : ($r > 0) ? ONE : ZERO;
         }
     }
 
@@ -4803,7 +4803,7 @@ package Sidef::Types::Number::Number {
         }
 
         elsif ($sig eq q(Math::MPFR)) {
-            my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
+            my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
             Math::MPFR::Rmpfr_add_ui($r, $x, 1, $ROUND);
             $r;
         }
