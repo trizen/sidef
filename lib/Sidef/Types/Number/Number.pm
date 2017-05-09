@@ -4568,6 +4568,7 @@ package Sidef::Types::Number::Number {
             Math::MPC::RMPC_RE($fr, $x);
             my $real = __base__($fr, $base);
             Math::MPC::RMPC_IM($fr, $x);
+            return $real if Math::MPFR::Rmpfr_zero_p($fr);
             my $imag = __base__($fr, $base);
             "($real $imag)";
         }
