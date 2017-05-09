@@ -32,7 +32,9 @@ package Sidef::Object::Object {
       q{cmp} => sub {
         my ($obj1, $obj2, $swapped) = @_;
 
-        if (ref($obj1) eq ref($obj2) and Scalar::Util::refaddr($obj1) == Scalar::Util::refaddr($obj2)) {
+        if (    ref($obj1) eq ref($obj2)
+            and ref($obj1) ne 'Sidef::Types::Number::Number'
+            and Scalar::Util::refaddr($obj1) == Scalar::Util::refaddr($obj2)) {
             return 0;
         }
 
@@ -56,7 +58,9 @@ package Sidef::Object::Object {
       q{eq} => sub {
         my ($obj1, $obj2) = @_;
 
-        if (ref($obj1) eq ref($obj2) and Scalar::Util::refaddr($obj1) == Scalar::Util::refaddr($obj2)) {
+        if (    ref($obj1) eq ref($obj2)
+            and ref($obj1) ne 'Sidef::Types::Number::Number'
+            and Scalar::Util::refaddr($obj1) == Scalar::Util::refaddr($obj2)) {
             return 1;
         }
 

@@ -76,18 +76,9 @@ package Sidef::Types::Number::Number {
 
             if (index($num, '/') != -1) {
                 my $r = Math::GMPq::Rmpq_init();
-                eval {
-                    Math::GMPq::Rmpq_set_str($r, $num, $int_base);
-                    1;
-                  } // do {
-                    my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-                    Math::MPFR::Rmpfr_set_nan($r);
-                    return bless \$r;
-                  };
+                eval { Math::GMPq::Rmpq_set_str($r, $num, $int_base); 1 } // goto &nan;
                 if (Math::GMPq::Rmpq_get_str($r, 10) !~ m{^\s*[-+]?[0-9]+\s*/\s*[-+]?[1-9]+[0-9]*\s*\z}) {
-                    my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-                    Math::MPFR::Rmpfr_set_nan($r);
-                    return bless \$r;
+                    goto &nan;
                 }
                 Math::GMPq::Rmpq_canonicalize($r);
                 return bless \$r;
@@ -95,24 +86,19 @@ package Sidef::Types::Number::Number {
             elsif (substr($num, 0, 1) eq '(' and substr($num, -1) eq ')') {
                 my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
                 if (Math::MPC::Rmpc_set_str($r, $num, $int_base, $ROUND)) {
-                    $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-                    Math::MPFR::Rmpfr_set_nan($r);
+                    goto &nan;
                 }
                 return bless \$r;
             }
             elsif (index($num, '.') != -1) {
                 my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
                 if (Math::MPFR::Rmpfr_set_str($r, $num, $int_base, $ROUND)) {
-                    Math::MPFR::Rmpfr_set_nan($r);
+                    goto &nan;
                 }
                 return bless \$r;
             }
             else {
-                my $r = eval { Math::GMPz::Rmpz_init_set_str($num, $int_base) } // do {
-                    my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-                    Math::MPFR::Rmpfr_set_nan($r);
-                    $r;
-                };
+                my $r = eval { Math::GMPz::Rmpz_init_set_str($num, $int_base) } // goto &nan;
                 return bless \$r;
             }
         }
@@ -320,19 +306,13 @@ package Sidef::Types::Number::Number {
         $s = lc($s);
 
         if ($s eq 'inf' or $s eq '+inf') {
-            my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-            Math::MPFR::Rmpfr_set_inf($r, 1);
-            return $r;
+            goto &_inf;
         }
         elsif ($s eq '-inf') {
-            my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-            Math::MPFR::Rmpfr_set_inf($r, -1);
-            return $r;
+            goto &_ninf;
         }
         elsif ($s eq 'nan') {
-            my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-            Math::MPFR::Rmpfr_set_nan($r);
-            return $r;
+            goto &_nan;
         }
 
         # Remove underscores
@@ -445,11 +425,7 @@ package Sidef::Types::Number::Number {
 
         $s =~ s/^\+//;
 
-        eval { Math::GMPz::Rmpz_init_set_str($s, 10) } // do {
-            my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-            Math::MPFR::Rmpfr_set_nan($r);
-            $r;
-        };
+        eval { Math::GMPz::Rmpz_init_set_str($s, 10) } // goto &_nan;
     }
 
     #
@@ -2530,7 +2506,7 @@ package Sidef::Types::Number::Number {
             # Return a complex number for x < -1/e
             if (Math::MPFR::Rmpfr_cmp_d($x, -1 / CORE::exp(1)) < 0) {
                 (@_) = _mpfr2mpc($x);
-                goto &__LambertW__;
+                goto __SUB__;
             }
 
             $PREC = CORE::int($PREC);
@@ -4863,7 +4839,7 @@ package Sidef::Types::Number::Number {
         }
 
         elsif ($sig eq q(Math::MPFR)) {
-            my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
+            my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
             Math::MPFR::Rmpfr_sub_ui($r, $x, 1, $ROUND);
             $r;
         }

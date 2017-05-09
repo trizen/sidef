@@ -9,7 +9,7 @@ package Sidef::Types::Range::RangeNumber {
 
     use overload q{""} => sub {
         my ($self) = @_;
-        "RangeNum($self->{from}, $self->{to}, $self->{step})";
+        "RangeNum(" . join(', ', $self->{from}->dump, $self->{to}->dump, $self->{step}->dump) . ")";
     };
 
     use Sidef::Types::Bool::Bool;

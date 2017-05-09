@@ -66,6 +66,8 @@ package Sidef::Parser {
                      | Num(?:ber)?+\b                 (?{ state $x = bless({}, 'Sidef::DataTypes::Number::Number') })
                      | Inf\b                          (?{ state $x = Sidef::Types::Number::Number->inf })
                      | NaN\b                          (?{ state $x = Sidef::Types::Number::Number->nan })
+                     | Infi\b                         (?{ state $x = Sidef::Types::Number::Number->inf->i })
+                     | NaNi\b                         (?{ state $x = Sidef::Types::Number::Number->nan->i })
                      | RangeNum(?:ber)?+\b            (?{ state $x = bless({}, 'Sidef::DataTypes::Range::RangeNumber') })
                      | RangeStr(?:ing)?+\b            (?{ state $x = bless({}, 'Sidef::DataTypes::Range::RangeString') })
                      | Range\b                        (?{ state $x = bless({}, 'Sidef::DataTypes::Range::Range') })
