@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Test::More;
 
-plan(tests => 107);
+plan(tests => 106);
 
 use Sidef;
 
@@ -65,7 +65,6 @@ is($ninf->abs,            $inf);
 is($inf->sqrt,            $inf);
 is($inf->erfc,            $zero);
 is(($ninf)->erfc,         $o->new(2));
-is(($ninf)->fac,          $nan);
 like($o->new("-1.01")->acos, qr/^3\.141592653.*?-0\.14130376.*i\z/);
 like($o->new("1.01")->acos,  qr/^-0\.1413037.*i\z/);
 like($o->new("-1.01")->asin, qr/^-1\.5707963.*?\+0\.141303769.*i\z/);
