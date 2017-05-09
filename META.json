@@ -63,7 +63,7 @@
    "provides" : {
       "Sidef" : {
          "file" : "lib/Sidef.pm",
-         "version" : "3.00"
+         "version" : "3.01"
       },
       "Sidef::Convert::Convert" : {
          "file" : "lib/Sidef/Convert/Convert.pm"
@@ -217,6 +217,6 @@
          "url" : "https://github.com/trizen/sidef"
       }
    },
-   "version" : "3.00",
+   "version" : "3.01",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }
