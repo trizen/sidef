@@ -10,7 +10,7 @@ define order = 5
 define sides = 5
 define dim   = 500
 define scaling_factor = ((3 - 5**0.5) / 2)
-var orders = order.of {|i| ((1-scaling_factor) * dim) * scaling_factor**(i-1) }
+var orders = order.of {|i| ((1-scaling_factor) * dim) * scaling_factor**i }
 
 say <<"STOP";
 <?xml version="1.0" standalone="no"?>
