@@ -5721,6 +5721,25 @@ package Sidef::Types::Number::Number {
         }
     }
 
+    sub is_coprime {
+        my ($x, $y) = @_;
+
+        _valid(\$y);
+
+        (__is_int__($$x) && __is_int__($$y))
+          || return Sidef::Types::Bool::Bool::FALSE;
+
+        $x = _any2mpz($$x) // return Sidef::Types::Bool::Bool::FALSE;
+        $y = _any2mpz($$y) // return Sidef::Types::Bool::Bool::FALSE;
+
+        state $t = Math::GMPz::Rmpz_init_nobless();
+        Math::GMPz::Rmpz_gcd($t, $x, $y);
+
+        (Math::GMPz::Rmpz_cmp_ui($t, 1) == 0)
+          ? Sidef::Types::Bool::Bool::TRUE
+          : Sidef::Types::Bool::Bool::FALSE;
+    }
+
     sub gcd {
         my ($x, $y) = @_;
 

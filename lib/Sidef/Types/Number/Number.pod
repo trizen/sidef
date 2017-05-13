@@ -1046,6 +1046,14 @@ Return the
 
 =cut
 
+=head2 is_coprime
+
+Number.is_coprime() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 iseed
 
 Number.iseed() -> I<Obj>
