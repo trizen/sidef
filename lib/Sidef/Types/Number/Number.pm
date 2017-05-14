@@ -662,225 +662,211 @@ package Sidef::Types::Number::Number {
 
     sub __boolify__ {
         my ($x) = @_;
-        my $sig = ref($x);
+        goto(ref($x) =~ tr/:/_/rs);
 
-        if ($sig eq q(Math::MPFR)) {
-            !Math::MPFR::Rmpfr_zero_p($_[0]);
-        }
+      Math_MPFR:
+        return !Math::MPFR::Rmpfr_zero_p($x);
 
-        elsif ($sig eq q(Math::GMPq)) {
-            !!Math::GMPq::Rmpq_sgn($_[0]);
-        }
+      Math_GMPq:
+        return !!Math::GMPq::Rmpq_sgn($x);
 
-        elsif ($sig eq q(Math::GMPz)) {
-            !!Math::GMPz::Rmpz_sgn($_[0]);
-        }
+      Math_GMPz:
+        return !!Math::GMPz::Rmpz_sgn($x);
 
-        elsif ($sig eq q(Math::MPC)) {
-            my ($x) = @_;
-            my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-            Math::MPC::RMPC_RE($r, $x);
-            Math::MPFR::Rmpfr_zero_p($r) || return 1;
-            Math::MPC::RMPC_IM($r, $x);
-            !Math::MPFR::Rmpfr_zero_p($r);
-        }
+      Math_MPC:
+        my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        Math::MPC::RMPC_RE($r, $x);
+        Math::MPFR::Rmpfr_zero_p($r) || return 1;
+        Math::MPC::RMPC_IM($r, $x);
+        return !Math::MPFR::Rmpfr_zero_p($r);
     }
 
     sub __numify__ {
         my ($x) = @_;
-        my $sig = ref($x);
+        goto(ref($x) =~ tr/:/_/rs);
 
-        if ($sig eq q(Math::MPFR)) {
-            Math::MPFR::Rmpfr_get_d($x, $ROUND);
-        }
+      Math_MPFR:
+        return Math::MPFR::Rmpfr_get_d($x, $ROUND);
 
-        elsif ($sig eq q(Math::GMPq)) {
-            goto &Math::GMPq::Rmpq_get_d;
-        }
+      Math_GMPq:
+        goto &Math::GMPq::Rmpq_get_d;
 
-        elsif ($sig eq q(Math::GMPz)) {
-            goto &Math::GMPz::Rmpz_get_d;
-        }
+      Math_GMPz:
+        goto &Math::GMPz::Rmpz_get_d;
 
-        elsif ($sig eq q(Math::MPC)) {
-            my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-            Math::MPC::RMPC_RE($r, $x);
-            Math::MPFR::Rmpfr_get_d($r, $ROUND);
-        }
+      Math_MPC:
+        my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        Math::MPC::RMPC_RE($r, $x);
+        return Math::MPFR::Rmpfr_get_d($r, $ROUND);
     }
 
     sub __stringify__ {
         my ($x) = @_;
+        goto(ref($x) =~ tr/:/_/rs);
 
-        my $sig = ref($x);
+      Math_GMPz:
+        return Math::GMPz::Rmpz_get_str($x, 10);
 
-        if ($sig eq q(Math::GMPz)) {
-            Math::GMPz::Rmpz_get_str($x, 10);
+      Math_GMPq:
+
+        #~ return Math::GMPq::Rmpq_get_str($x, 10);
+        Math::GMPq::Rmpq_integer_p($x) && return Math::GMPq::Rmpq_get_str($x, 10);
+
+        $PREC = CORE::int($PREC);
+
+        my $prec = $PREC >> 2;
+        my $sgn  = Math::GMPq::Rmpq_sgn($x);
+
+        my $n = Math::GMPq::Rmpq_init();
+        Math::GMPq::Rmpq_set($n, $x);
+        Math::GMPq::Rmpq_abs($n, $n) if $sgn < 0;
+
+        my $p = Math::GMPq::Rmpq_init();
+        Math::GMPq::Rmpq_set_str($p, '1' . ('0' x CORE::abs($prec)), 10);
+
+        if ($prec < 0) {
+            Math::GMPq::Rmpq_div($n, $n, $p);
+        }
+        else {
+            Math::GMPq::Rmpq_mul($n, $n, $p);
         }
 
-        elsif ($sig eq q(Math::GMPq)) {
+        state $half = do {
+            my $q = Math::GMPq::Rmpq_init_nobless();
+            Math::GMPq::Rmpq_set_ui($q, 1, 2);
+            $q;
+        };
 
-            #~ return Math::GMPq::Rmpq_get_str($x, 10);
-            Math::GMPq::Rmpq_integer_p($x) && return Math::GMPq::Rmpq_get_str($x, 10);
+        my $z = Math::GMPz::Rmpz_init();
+        Math::GMPq::Rmpq_add($n, $n, $half);
+        Math::GMPz::Rmpz_set_q($z, $n);
 
-            $PREC = CORE::int($PREC);
+        # Too much rounding... Give up and return an MPFR stringified number.
+        !Math::GMPz::Rmpz_sgn($z) && $PREC >= 2 && do {
+            my $mpfr = Math::MPFR::Rmpfr_init2($PREC);
+            Math::MPFR::Rmpfr_set_q($mpfr, $x, $ROUND);
+            return Math::MPFR::Rmpfr_get_str($mpfr, 10, $prec, $ROUND);
+        };
 
-            my $prec = $PREC >> 2;
-            my $sgn  = Math::GMPq::Rmpq_sgn($x);
-
-            my $n = Math::GMPq::Rmpq_init();
-            Math::GMPq::Rmpq_set($n, $x);
-            Math::GMPq::Rmpq_abs($n, $n) if $sgn < 0;
-
-            my $p = Math::GMPq::Rmpq_init();
-            Math::GMPq::Rmpq_set_str($p, '1' . ('0' x CORE::abs($prec)), 10);
-
-            if ($prec < 0) {
-                Math::GMPq::Rmpq_div($n, $n, $p);
-            }
-            else {
-                Math::GMPq::Rmpq_mul($n, $n, $p);
-            }
-
-            state $half = do {
-                my $q = Math::GMPq::Rmpq_init_nobless();
-                Math::GMPq::Rmpq_set_ui($q, 1, 2);
-                $q;
-            };
-
-            my $z = Math::GMPz::Rmpz_init();
-            Math::GMPq::Rmpq_add($n, $n, $half);
-            Math::GMPz::Rmpz_set_q($z, $n);
-
-            # Too much rounding... Give up and return an MPFR stringified number.
-            !Math::GMPz::Rmpz_sgn($z) && $PREC >= 2 && do {
-                my $mpfr = Math::MPFR::Rmpfr_init2($PREC);
-                Math::MPFR::Rmpfr_set_q($mpfr, $x, $ROUND);
-                return Math::MPFR::Rmpfr_get_str($mpfr, 10, $prec, $ROUND);
-            };
-
-            if (Math::GMPz::Rmpz_odd_p($z) and Math::GMPq::Rmpq_integer_p($n)) {
-                Math::GMPz::Rmpz_sub_ui($z, $z, 1);
-            }
-
-            Math::GMPq::Rmpq_set_z($n, $z);
-
-            if ($prec < 0) {
-                Math::GMPq::Rmpq_mul($n, $n, $p);
-            }
-            else {
-                Math::GMPq::Rmpq_div($n, $n, $p);
-            }
-
-            my $num = Math::GMPz::Rmpz_init();
-            my $den = Math::GMPz::Rmpz_init();
-
-            Math::GMPq::Rmpq_numref($num, $n);
-            Math::GMPq::Rmpq_denref($den, $n);
-
-            my @r;
-            while (1) {
-                Math::GMPz::Rmpz_div($z, $num, $den);
-                push @r, Math::GMPz::Rmpz_get_str($z, 10);
-
-                Math::GMPz::Rmpz_mul($z, $z, $den);
-                Math::GMPz::Rmpz_sub($num, $num, $z);
-                last if !Math::GMPz::Rmpz_sgn($num);
-
-                my $s = -1;
-                while (Math::GMPz::Rmpz_cmp($den, $num) > 0) {
-                    Math::GMPz::Rmpz_mul_ui($num, $num, 10);
-                    ++$s;
-                }
-
-                push(@r, '0' x $s) if ($s > 0);
-            }
-
-            ($sgn < 0 ? "-" : '') . shift(@r) . (('.' . join('', @r)) =~ s/0+\z//r =~ s/\.\z//r);
+        if (Math::GMPz::Rmpz_odd_p($z) and Math::GMPq::Rmpq_integer_p($n)) {
+            Math::GMPz::Rmpz_sub_ui($z, $z, 1);
         }
 
-        elsif ($sig eq q(Math::MPFR)) {
+        Math::GMPq::Rmpq_set_z($n, $z);
 
-            Math::MPFR::Rmpfr_number_p($x)
-              || return (
-                           Math::MPFR::Rmpfr_nan_p($x)   ? 'NaN'
-                         : Math::MPFR::Rmpfr_sgn($x) < 0 ? '-Inf'
-                         :                                 'Inf'
-                        );
+        if ($prec < 0) {
+            Math::GMPq::Rmpq_mul($n, $n, $p);
+        }
+        else {
+            Math::GMPq::Rmpq_div($n, $n, $p);
+        }
 
-            # log(10)/log(2) =~ 3.3219280948873623
-            my $digits = CORE::int($PREC) >> 2;
-            my $str = Math::MPFR::Rmpfr_get_str($x, 10, $digits, $ROUND);
+        my $num = Math::GMPz::Rmpz_init();
+        my $den = Math::GMPz::Rmpz_init();
 
-            if ($str =~ s/e(-?[0-9]+)\z//) {
-                my $exp = $1;
+        Math::GMPq::Rmpq_numref($num, $n);
+        Math::GMPq::Rmpq_denref($den, $n);
 
-                my $sgn = '';
-                if (substr($str, 0, 1) eq '-') {
-                    $sgn = '-';
-                    substr($str, 0, 1, '');
-                }
+        my @r;
+        while (1) {
+            Math::GMPz::Rmpz_div($z, $num, $den);
+            push @r, Math::GMPz::Rmpz_get_str($z, 10);
 
-                my ($before, $after) = split(/\./, $str);
+            Math::GMPz::Rmpz_mul($z, $z, $den);
+            Math::GMPz::Rmpz_sub($num, $num, $z);
+            last if !Math::GMPz::Rmpz_sgn($num);
 
-                if ($exp > 0) {
-                    if ($exp >= CORE::length($after)) {
-                        $after = '.' . $after . "e$exp";
-                    }
-                    else {
-                        substr($after, $exp, 0, '.');
-                    }
+            my $s = -1;
+            while (Math::GMPz::Rmpz_cmp($den, $num) > 0) {
+                Math::GMPz::Rmpz_mul_ui($num, $num, 10);
+                ++$s;
+            }
+
+            push(@r, '0' x $s) if ($s > 0);
+        }
+
+        return (($sgn < 0 ? "-" : '') . shift(@r) . (('.' . join('', @r)) =~ s/0+\z//r =~ s/\.\z//r));
+
+      Math_MPFR:
+
+        Math::MPFR::Rmpfr_number_p($x)
+          || return (
+                       Math::MPFR::Rmpfr_nan_p($x)   ? 'NaN'
+                     : Math::MPFR::Rmpfr_sgn($x) < 0 ? '-Inf'
+                     :                                 'Inf'
+                    );
+
+        # log(10)/log(2) =~ 3.3219280948873623
+        my $digits = CORE::int($PREC) >> 2;
+        my $str = Math::MPFR::Rmpfr_get_str($x, 10, $digits, $ROUND);
+
+        if ($str =~ s/e(-?[0-9]+)\z//) {
+            my $exp = $1;
+
+            my $sgn = '';
+            if (substr($str, 0, 1) eq '-') {
+                $sgn = '-';
+                substr($str, 0, 1, '');
+            }
+
+            my ($before, $after) = split(/\./, $str);
+
+            if ($exp > 0) {
+                if ($exp >= CORE::length($after)) {
+                    $after = '.' . $after . "e$exp";
                 }
                 else {
-                    if (CORE::abs($exp) >= CORE::length($before)) {
+                    substr($after, $exp, 0, '.');
+                }
+            }
+            else {
+                if (CORE::abs($exp) >= CORE::length($before)) {
 
-                        my $diff = CORE::abs($exp) - CORE::length($before);
+                    my $diff = CORE::abs($exp) - CORE::length($before);
 
-                        if ($diff <= $digits) {
-                            $before = ('0' x (CORE::abs($exp) - CORE::length($before) + 1)) . $before;
-                            substr($before, $exp, 0, '.');
-                        }
-                        else {
-                            $before .= '.';
-                            $after  .= "e$exp";
-                        }
+                    if ($diff <= $digits) {
+                        $before = ('0' x (CORE::abs($exp) - CORE::length($before) + 1)) . $before;
+                        substr($before, $exp, 0, '.');
+                    }
+                    else {
+                        $before .= '.';
+                        $after  .= "e$exp";
                     }
                 }
-
-                $str = $sgn . $before . $after;
             }
 
-            if (index($str, 'e') == -1) {
-                $str =~ s/0+\z//;
-                $str =~ s/\.\z//;
-            }
-
-            (!$str or $str eq '-') ? '0' : $str;
+            $str = $sgn . $before . $after;
         }
 
-        elsif ($sig eq q(Math::MPC)) {
-            my $fr = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-
-            Math::MPC::RMPC_RE($fr, $x);
-            my $re = __SUB__->($fr);
-
-            Math::MPC::RMPC_IM($fr, $x);
-            my $im = __SUB__->($fr);
-
-            if ($im eq '0' or $im eq '-0') {
-                return $re;
-            }
-
-            my $sign = '+';
-
-            if (substr($im, 0, 1) eq '-') {
-                $sign = '-';
-                substr($im, 0, 1, '');
-            }
-
-            $im = '' if $im eq '1';
-            $re eq '0' ? $sign eq '+' ? "${im}i" : "$sign${im}i" : "$re$sign${im}i";
+        if (index($str, 'e') == -1) {
+            $str =~ s/0+\z//;
+            $str =~ s/\.\z//;
         }
+
+        return ((!$str or $str eq '-') ? '0' : $str);
+
+      Math_MPC:
+        my $fr = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+
+        Math::MPC::RMPC_RE($fr, $x);
+        my $re = __SUB__->($fr);
+
+        Math::MPC::RMPC_IM($fr, $x);
+        my $im = __SUB__->($fr);
+
+        if ($im eq '0' or $im eq '-0') {
+            return $re;
+        }
+
+        my $sign = '+';
+
+        if (substr($im, 0, 1) eq '-') {
+            $sign = '-';
+            substr($im, 0, 1, '');
+        }
+
+        $im = '' if $im eq '1';
+        return ($re eq '0' ? $sign eq '+' ? "${im}i" : "$sign${im}i" : "$re$sign${im}i");
     }
 
     sub get_value {
@@ -921,28 +907,28 @@ package Sidef::Types::Number::Number {
 
     sub __norm__ {
         my ($x) = @_;
-        my $sig = ref($x);
 
-        if ($sig eq q(Math::MPC)) {
-            my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-            Math::MPC::Rmpc_norm($r, $x, $ROUND);
-            $r;
-        }
-        elsif ($sig eq q(Math::MPFR)) {
-            my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-            Math::MPFR::Rmpfr_sqr($r, $x, $ROUND);
-            $r;
-        }
-        elsif ($sig eq q(Math::GMPz)) {
-            my $r = Math::GMPz::Rmpz_init();
-            Math::GMPz::Rmpz_mul($r, $x, $x);
-            $r;
-        }
-        elsif ($sig eq q(Math::GMPq)) {
-            my $r = Math::GMPq::Rmpq_init();
-            Math::GMPq::Rmpq_mul($r, $x, $x);
-            $r;
-        }
+        goto(ref($x) =~ tr/:/_/rs);
+
+      Math_MPC:
+        my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        Math::MPC::Rmpc_norm($r, $x, $ROUND);
+        return $r;
+
+      Math_MPFR:
+        my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        Math::MPFR::Rmpfr_sqr($r, $x, $ROUND);
+        return $r;
+
+      Math_GMPz:
+        my $r = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_mul($r, $x, $x);
+        return $r;
+
+      Math_GMPq:
+        my $r = Math::GMPq::Rmpq_init();
+        Math::GMPq::Rmpq_mul($r, $x, $x);
+        return $r;
     }
 
     sub norm {
@@ -1153,119 +1139,104 @@ package Sidef::Types::Number::Number {
 
     sub __add__ {
         my ($x, $y) = @_;
-        my $sig = join(' ', ref($x), ref($y));
+
+        goto(join('__', ref($x), ref($y)) =~ tr/:/_/rs);
 
         #
         ## GMPz
         #
-        if ($sig eq q(Math::GMPz Math::GMPz)) {
-            my $r = Math::GMPz::Rmpz_init();
-            Math::GMPz::Rmpz_add($r, $x, $y);
-            $r;
-        }
+      Math_GMPz__Math_GMPz:
+        my $r = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_add($r, $x, $y);
+        return $r;
 
-        elsif ($sig eq q(Math::GMPz Math::GMPq)) {
-            my $r = Math::GMPq::Rmpq_init();
-            Math::GMPq::Rmpq_add_z($r, $y, $x);
-            $r;
-        }
+      Math_GMPz__Math_GMPq:
+        my $r = Math::GMPq::Rmpq_init();
+        Math::GMPq::Rmpq_add_z($r, $y, $x);
+        return $r;
 
-        elsif ($sig eq q(Math::GMPz Math::MPFR)) {
-            my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-            Math::MPFR::Rmpfr_add_z($r, $y, $x, $ROUND);
-            $r;
-        }
+      Math_GMPz__Math_MPFR:
+        my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        Math::MPFR::Rmpfr_add_z($r, $y, $x, $ROUND);
+        return $r;
 
-        elsif ($sig eq q(Math::GMPz Math::MPC)) {
-            my $c = Math::MPC::Rmpc_init2(CORE::int($PREC));
-            Math::MPC::Rmpc_set_z($c, $x, $ROUND);
-            Math::MPC::Rmpc_add($c, $c, $y, $ROUND);
-            $c;
-        }
+      Math_GMPz__Math_MPC:
+        my $c = Math::MPC::Rmpc_init2(CORE::int($PREC));
+        Math::MPC::Rmpc_set_z($c, $x, $ROUND);
+        Math::MPC::Rmpc_add($c, $c, $y, $ROUND);
+        return $c;
 
         #
         ## GMPq
         #
-        elsif ($sig eq q(Math::GMPq Math::GMPq)) {
-            my $r = Math::GMPq::Rmpq_init();
-            Math::GMPq::Rmpq_add($r, $x, $y);
-            $r;
-        }
+      Math_GMPq__Math_GMPq:
+        my $r = Math::GMPq::Rmpq_init();
+        Math::GMPq::Rmpq_add($r, $x, $y);
+        return $r;
 
-        elsif ($sig eq q(Math::GMPq Math::GMPz)) {
-            my $r = Math::GMPq::Rmpq_init();
-            Math::GMPq::Rmpq_add_z($r, $x, $y);
-            $r;
-        }
+      Math_GMPq__Math_GMPz:
+        my $r = Math::GMPq::Rmpq_init();
+        Math::GMPq::Rmpq_add_z($r, $x, $y);
+        return $r;
 
-        elsif ($sig eq q(Math::GMPq Math::MPFR)) {
-            my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-            Math::MPFR::Rmpfr_add_q($r, $y, $x, $ROUND);
-            $r;
-        }
+      Math_GMPq__Math_MPFR:
+        my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        Math::MPFR::Rmpfr_add_q($r, $y, $x, $ROUND);
+        return $r;
 
-        elsif ($sig eq q(Math::GMPq Math::MPC)) {
-            my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
-            Math::MPC::Rmpc_set_q($r, $x, $ROUND);
-            Math::MPC::Rmpc_add($r, $r, $y, $ROUND);
-            $r;
-        }
+      Math_GMPq__Math_MPC:
+        my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
+        Math::MPC::Rmpc_set_q($r, $x, $ROUND);
+        Math::MPC::Rmpc_add($r, $r, $y, $ROUND);
+        return $r;
 
         #
         ## MPFR
         #
-        elsif ($sig eq q(Math::MPFR Math::MPFR)) {
-            my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-            Math::MPFR::Rmpfr_add($r, $x, $y, $ROUND);
-            $r;
-        }
+      Math_MPFR__Math_MPFR:
+        my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        Math::MPFR::Rmpfr_add($r, $x, $y, $ROUND);
+        return $r;
 
-        elsif ($sig eq q(Math::MPFR Math::GMPq)) {
-            my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-            Math::MPFR::Rmpfr_add_q($r, $x, $y, $ROUND);
-            $r;
-        }
+      Math_MPFR__Math_GMPq:
+        my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        Math::MPFR::Rmpfr_add_q($r, $x, $y, $ROUND);
+        return $r;
 
-        elsif ($sig eq q(Math::MPFR Math::GMPz)) {
-            my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-            Math::MPFR::Rmpfr_add_z($r, $x, $y, $ROUND);
-            $r;
-        }
+      Math_MPFR__Math_GMPz:
+        my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        Math::MPFR::Rmpfr_add_z($r, $x, $y, $ROUND);
+        return $r;
 
-        elsif ($sig eq q(Math::MPFR Math::MPC)) {
-            my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
-            Math::MPC::Rmpc_add_fr($r, $y, $x, $ROUND);
-            $r;
-        }
+      Math_MPFR__Math_MPC:
+        my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
+        Math::MPC::Rmpc_add_fr($r, $y, $x, $ROUND);
+        return $r;
 
         #
         ## MPC
         #
-        elsif ($sig eq q(Math::MPC Math::MPC)) {
-            my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
-            Math::MPC::Rmpc_add($r, $x, $y, $ROUND);
-            $r;
-        }
+      Math_MPC__Math_MPC:
+        my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
+        Math::MPC::Rmpc_add($r, $x, $y, $ROUND);
+        return $r;
 
-        elsif ($sig eq q(Math::MPC Math::MPFR)) {
-            my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
-            Math::MPC::Rmpc_add_fr($r, $x, $y, $ROUND);
-            $r;
-        }
+      Math_MPC__Math_MPFR:
+        my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
+        Math::MPC::Rmpc_add_fr($r, $x, $y, $ROUND);
+        return $r;
 
-        elsif ($sig eq q(Math::MPC Math::GMPz)) {
-            my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
-            Math::MPC::Rmpc_set_z($r, $y, $ROUND);
-            Math::MPC::Rmpc_add($r, $r, $x, $ROUND);
-            $r;
-        }
+      Math_MPC__Math_GMPz:
+        my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
+        Math::MPC::Rmpc_set_z($r, $y, $ROUND);
+        Math::MPC::Rmpc_add($r, $r, $x, $ROUND);
+        return $r;
 
-        elsif ($sig eq q(Math::MPC Math::GMPq)) {
-            my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
-            Math::MPC::Rmpc_set_q($r, $y, $ROUND);
-            Math::MPC::Rmpc_add($r, $r, $x, $ROUND);
-            $r;
-        }
+      Math_MPC__Math_GMPq:
+        my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
+        Math::MPC::Rmpc_set_q($r, $y, $ROUND);
+        Math::MPC::Rmpc_add($r, $r, $x, $ROUND);
+        return $r;
     }
 
     sub add {
@@ -1276,123 +1247,108 @@ package Sidef::Types::Number::Number {
 
     sub __sub__ {
         my ($x, $y) = @_;
-        my $sig = join(' ', ref($x), ref($y));
+
+        goto(join('__', ref($x), ref($y)) =~ tr/:/_/rs);
 
         #
         ## GMPq
         #
-        if ($sig eq q(Math::GMPq Math::GMPq)) {
-            my $r = Math::GMPq::Rmpq_init();
-            Math::GMPq::Rmpq_sub($r, $x, $y);
-            $r;
-        }
+      Math_GMPq__Math_GMPq:
+        my $r = Math::GMPq::Rmpq_init();
+        Math::GMPq::Rmpq_sub($r, $x, $y);
+        return $r;
 
-        elsif ($sig eq q(Math::GMPq Math::GMPz)) {
-            my $r = Math::GMPq::Rmpq_init();
-            Math::GMPq::Rmpq_sub_z($r, $x, $y);
-            $r;
-        }
+      Math_GMPq__Math_GMPz:
+        my $r = Math::GMPq::Rmpq_init();
+        Math::GMPq::Rmpq_sub_z($r, $x, $y);
+        return $r;
 
-        elsif ($sig eq q(Math::GMPq Math::MPFR)) {
-            my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-            Math::MPFR::Rmpfr_set_q($r, $x, $ROUND);
-            Math::MPFR::Rmpfr_sub($r, $r, $y, $ROUND);
-            $r;
-        }
+      Math_GMPq__Math_MPFR:
+        my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        Math::MPFR::Rmpfr_set_q($r, $x, $ROUND);
+        Math::MPFR::Rmpfr_sub($r, $r, $y, $ROUND);
+        return $r;
 
-        elsif ($sig eq q(Math::GMPq Math::MPC)) {
-            my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
-            Math::MPC::Rmpc_set_q($r, $x, $ROUND);
-            Math::MPC::Rmpc_sub($r, $r, $y, $ROUND);
-            $r;
-        }
+      Math_GMPq__Math_MPC:
+        my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
+        Math::MPC::Rmpc_set_q($r, $x, $ROUND);
+        Math::MPC::Rmpc_sub($r, $r, $y, $ROUND);
+        return $r;
 
         #
         ## GMPz
         #
-        elsif ($sig eq q(Math::GMPz Math::GMPz)) {
-            my $r = Math::GMPz::Rmpz_init();
-            Math::GMPz::Rmpz_sub($r, $x, $y);
-            $r;
-        }
+      Math_GMPz__Math_GMPz:
+        my $r = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_sub($r, $x, $y);
+        return $r;
 
-        elsif ($sig eq q(Math::GMPz Math::GMPq)) {
-            my $r = Math::GMPq::Rmpq_init();
-            Math::GMPq::Rmpq_z_sub($r, $x, $y);
-            $r;
-        }
+      Math_GMPz__Math_GMPq:
+        my $r = Math::GMPq::Rmpq_init();
+        Math::GMPq::Rmpq_z_sub($r, $x, $y);
+        return $r;
 
-        elsif ($sig eq q(Math::GMPz Math::MPFR)) {
-            my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-            Math::MPFR::Rmpfr_set_z($r, $x, $ROUND);
-            Math::MPFR::Rmpfr_sub($r, $r, $y, $ROUND);
-            $r;
-        }
+      Math_GMPz__Math_MPFR:
+        my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        Math::MPFR::Rmpfr_set_z($r, $x, $ROUND);
+        Math::MPFR::Rmpfr_sub($r, $r, $y, $ROUND);
+        return $r;
 
-        elsif ($sig eq q(Math::GMPz Math::MPC)) {
-            my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
-            Math::MPC::Rmpc_set_z($r, $x, $ROUND);
-            Math::MPC::Rmpc_sub($r, $r, $y, $ROUND);
-            $r;
-        }
+      Math_GMPz__Math_MPC:
+        my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
+        Math::MPC::Rmpc_set_z($r, $x, $ROUND);
+        Math::MPC::Rmpc_sub($r, $r, $y, $ROUND);
+        return $r;
 
         #
         ## MPFR
         #
-        elsif ($sig eq q(Math::MPFR Math::MPFR)) {
-            my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-            Math::MPFR::Rmpfr_sub($r, $x, $y, $ROUND);
-            $r;
-        }
+      Math_MPFR__Math_MPFR:
+        my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        Math::MPFR::Rmpfr_sub($r, $x, $y, $ROUND);
+        return $r;
 
-        elsif ($sig eq q(Math::MPFR Math::GMPq)) {
-            my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-            Math::MPFR::Rmpfr_sub_q($r, $x, $y, $ROUND);
-            $r;
-        }
+      Math_MPFR__Math_GMPq:
+        my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        Math::MPFR::Rmpfr_sub_q($r, $x, $y, $ROUND);
+        return $r;
 
-        elsif ($sig eq q(Math::MPFR Math::GMPz)) {
-            my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-            Math::MPFR::Rmpfr_sub_z($r, $x, $y, $ROUND);
-            $r;
-        }
+      Math_MPFR__Math_GMPz:
+        my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        Math::MPFR::Rmpfr_sub_z($r, $x, $y, $ROUND);
+        return $r;
 
-        elsif ($sig eq q(Math::MPFR Math::MPC)) {
-            my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
-            Math::MPC::Rmpc_set_fr($r, $x, $ROUND);
-            Math::MPC::Rmpc_sub($r, $r, $y, $ROUND);
-            $r;
-        }
+      Math_MPFR__Math_MPC:
+        my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
+        Math::MPC::Rmpc_set_fr($r, $x, $ROUND);
+        Math::MPC::Rmpc_sub($r, $r, $y, $ROUND);
+        return $r;
 
         #
         ## MPC
         #
-        elsif ($sig eq q(Math::MPC Math::MPC)) {
-            my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
-            Math::MPC::Rmpc_sub($r, $x, $y, $ROUND);
-            $r;
-        }
+      Math_MPC__Math_MPC:
+        my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
+        Math::MPC::Rmpc_sub($r, $x, $y, $ROUND);
+        return $r;
 
-        elsif ($sig eq q(Math::MPC Math::MPFR)) {
-            my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
-            Math::MPC::Rmpc_set_fr($r, $y, $ROUND);
-            Math::MPC::Rmpc_sub($r, $x, $r, $ROUND);
-            $r;
-        }
+      Math_MPC__Math_MPFR:
+        my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
+        Math::MPC::Rmpc_set_fr($r, $y, $ROUND);
+        Math::MPC::Rmpc_sub($r, $x, $r, $ROUND);
+        return $r;
 
-        elsif ($sig eq q(Math::MPC Math::GMPz)) {
-            my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
-            Math::MPC::Rmpc_set_z($r, $y, $ROUND);
-            Math::MPC::Rmpc_sub($r, $x, $r, $ROUND);
-            $r;
-        }
+      Math_MPC__Math_GMPz:
+        my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
+        Math::MPC::Rmpc_set_z($r, $y, $ROUND);
+        Math::MPC::Rmpc_sub($r, $x, $r, $ROUND);
+        return $r;
 
-        elsif ($sig eq q(Math::MPC Math::GMPq)) {
-            my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
-            Math::MPC::Rmpc_set_q($r, $y, $ROUND);
-            Math::MPC::Rmpc_sub($r, $x, $r, $ROUND);
-            $r;
-        }
+      Math_MPC__Math_GMPq:
+        my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
+        Math::MPC::Rmpc_set_q($r, $y, $ROUND);
+        Math::MPC::Rmpc_sub($r, $x, $r, $ROUND);
+        return $r;
     }
 
     sub sub {
@@ -1403,119 +1359,104 @@ package Sidef::Types::Number::Number {
 
     sub __mul__ {
         my ($x, $y) = @_;
-        my $sig = join(' ', ref($x), ref($y));
+
+        goto(join('__', ref($x), ref($y)) =~ tr/:/_/rs);
 
         #
         ## GMPq
         #
-        if ($sig eq q(Math::GMPq Math::GMPq)) {
-            my $r = Math::GMPq::Rmpq_init();
-            Math::GMPq::Rmpq_mul($r, $x, $y);
-            $r;
-        }
+      Math_GMPq__Math_GMPq:
+        my $r = Math::GMPq::Rmpq_init();
+        Math::GMPq::Rmpq_mul($r, $x, $y);
+        return $r;
 
-        elsif ($sig eq q(Math::GMPq Math::GMPz)) {
-            my $r = Math::GMPq::Rmpq_init();
-            Math::GMPq::Rmpq_mul_z($r, $x, $y);
-            $r;
-        }
+      Math_GMPq__Math_GMPz:
+        my $r = Math::GMPq::Rmpq_init();
+        Math::GMPq::Rmpq_mul_z($r, $x, $y);
+        return $r;
 
-        elsif ($sig eq q(Math::GMPq Math::MPFR)) {
-            my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-            Math::MPFR::Rmpfr_mul_q($r, $y, $x, $ROUND);
-            $r;
-        }
+      Math_GMPq__Math_MPFR:
+        my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        Math::MPFR::Rmpfr_mul_q($r, $y, $x, $ROUND);
+        return $r;
 
-        elsif ($sig eq q(Math::GMPq Math::MPC)) {
-            my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
-            Math::MPC::Rmpc_set_q($r, $x, $ROUND);
-            Math::MPC::Rmpc_mul($r, $r, $y, $ROUND);
-            $r;
-        }
+      Math_GMPq__Math_MPC:
+        my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
+        Math::MPC::Rmpc_set_q($r, $x, $ROUND);
+        Math::MPC::Rmpc_mul($r, $r, $y, $ROUND);
+        return $r;
 
         #
         ## GMPz
         #
-        elsif ($sig eq q(Math::GMPz Math::GMPz)) {
-            my $r = Math::GMPz::Rmpz_init();
-            Math::GMPz::Rmpz_mul($r, $x, $y);
-            $r;
-        }
+      Math_GMPz__Math_GMPz:
+        my $r = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_mul($r, $x, $y);
+        return $r;
 
-        elsif ($sig eq q(Math::GMPz Math::GMPq)) {
-            my $r = Math::GMPq::Rmpq_init();
-            Math::GMPq::Rmpq_mul_z($r, $y, $x);
-            $r;
-        }
+      Math_GMPz__Math_GMPq:
+        my $r = Math::GMPq::Rmpq_init();
+        Math::GMPq::Rmpq_mul_z($r, $y, $x);
+        return $r;
 
-        elsif ($sig eq q(Math::GMPz Math::MPFR)) {
-            my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-            Math::MPFR::Rmpfr_mul_z($r, $y, $x, $ROUND);
-            $r;
-        }
+      Math_GMPz__Math_MPFR:
+        my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        Math::MPFR::Rmpfr_mul_z($r, $y, $x, $ROUND);
+        return $r;
 
-        elsif ($sig eq q(Math::GMPz Math::MPC)) {
-            my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
-            Math::MPC::Rmpc_set_z($r, $x, $ROUND);
-            Math::MPC::Rmpc_mul($r, $r, $y, $ROUND);
-            $r;
-        }
+      Math_GMPz__Math_MPC:
+        my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
+        Math::MPC::Rmpc_set_z($r, $x, $ROUND);
+        Math::MPC::Rmpc_mul($r, $r, $y, $ROUND);
+        return $r;
 
         #
         ## MPFR
         #
-        elsif ($sig eq q(Math::MPFR Math::MPFR)) {
-            my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-            Math::MPFR::Rmpfr_mul($r, $x, $y, $ROUND);
-            $r;
-        }
+      Math_MPFR__Math_MPFR:
+        my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        Math::MPFR::Rmpfr_mul($r, $x, $y, $ROUND);
+        return $r;
 
-        elsif ($sig eq q(Math::MPFR Math::GMPq)) {
-            my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-            Math::MPFR::Rmpfr_mul_q($r, $x, $y, $ROUND);
-            $r;
-        }
+      Math_MPFR__Math_GMPq:
+        my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        Math::MPFR::Rmpfr_mul_q($r, $x, $y, $ROUND);
+        return $r;
 
-        elsif ($sig eq q(Math::MPFR Math::GMPz)) {
-            my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-            Math::MPFR::Rmpfr_mul_z($r, $x, $y, $ROUND);
-            $r;
-        }
+      Math_MPFR__Math_GMPz:
+        my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        Math::MPFR::Rmpfr_mul_z($r, $x, $y, $ROUND);
+        return $r;
 
-        elsif ($sig eq q(Math::MPFR Math::MPC)) {
-            my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
-            Math::MPC::Rmpc_mul_fr($r, $y, $x, $ROUND);
-            $r;
-        }
+      Math_MPFR__Math_MPC:
+        my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
+        Math::MPC::Rmpc_mul_fr($r, $y, $x, $ROUND);
+        return $r;
 
         #
         ## MPC
         #
-        elsif ($sig eq q(Math::MPC Math::MPC)) {
-            my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
-            Math::MPC::Rmpc_mul($r, $x, $y, $ROUND);
-            $r;
-        }
+      Math_MPC__Math_MPC:
+        my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
+        Math::MPC::Rmpc_mul($r, $x, $y, $ROUND);
+        return $r;
 
-        elsif ($sig eq q(Math::MPC Math::MPFR)) {
-            my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
-            Math::MPC::Rmpc_mul_fr($r, $x, $y, $ROUND);
-            $r;
-        }
+      Math_MPC__Math_MPFR:
+        my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
+        Math::MPC::Rmpc_mul_fr($r, $x, $y, $ROUND);
+        return $r;
 
-        elsif ($sig eq q(Math::MPC Math::GMPz)) {
-            my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
-            Math::MPC::Rmpc_set_z($r, $y, $ROUND);
-            Math::MPC::Rmpc_mul($r, $r, $x, $ROUND);
-            $r;
-        }
+      Math_MPC__Math_GMPz:
+        my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
+        Math::MPC::Rmpc_set_z($r, $y, $ROUND);
+        Math::MPC::Rmpc_mul($r, $r, $x, $ROUND);
+        return $r;
 
-        elsif ($sig eq q(Math::MPC Math::GMPq)) {
-            my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
-            Math::MPC::Rmpc_set_q($r, $y, $ROUND);
-            Math::MPC::Rmpc_mul($r, $r, $x, $ROUND);
-            $r;
-        }
+      Math_MPC__Math_GMPq:
+        my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
+        Math::MPC::Rmpc_set_q($r, $y, $ROUND);
+        Math::MPC::Rmpc_mul($r, $r, $x, $ROUND);
+        return $r;
     }
 
     sub mul {
@@ -1526,159 +1467,144 @@ package Sidef::Types::Number::Number {
 
     sub __div__ {
         my ($x, $y) = @_;
-        my $sig = join(' ', ref($x), ref($y));
+
+        goto(join('__', ref($x), ref($y)) =~ tr/:/_/rs);
 
         #
         ## GMPq
         #
-        if ($sig eq q(Math::GMPq Math::GMPq)) {
+      Math_GMPq__Math_GMPq:
 
-            # Check for division by zero
-            Math::GMPq::Rmpq_sgn($y) || do {
-                (@_) = (_mpq2mpfr($x), $y);
-                goto __SUB__;
-            };
+        # Check for division by zero
+        Math::GMPq::Rmpq_sgn($y) || do {
+            $x = _mpq2mpfr($x);
+            goto Math_MPFR__Math_GMPq;
+        };
 
-            my $r = Math::GMPq::Rmpq_init();
-            Math::GMPq::Rmpq_div($r, $x, $y);
-            $r;
-        }
+        my $r = Math::GMPq::Rmpq_init();
+        Math::GMPq::Rmpq_div($r, $x, $y);
+        return $r;
 
-        elsif ($sig eq q(Math::GMPq Math::GMPz)) {
+      Math_GMPq__Math_GMPz:
 
-            # Check for division by zero
-            Math::GMPz::Rmpz_sgn($y) || do {
-                (@_) = (_mpq2mpfr($x), $y);
-                goto __SUB__;
-            };
+        # Check for division by zero
+        Math::GMPz::Rmpz_sgn($y) || do {
+            $x = _mpq2mpfr($x);
+            goto Math_MPFR__Math_GMPz;
+        };
 
-            my $r = Math::GMPq::Rmpq_init();
-            Math::GMPq::Rmpq_div_z($r, $x, $y);
-            $r;
-        }
+        my $r = Math::GMPq::Rmpq_init();
+        Math::GMPq::Rmpq_div_z($r, $x, $y);
+        return $r;
 
-        elsif ($sig eq q(Math::GMPq Math::MPFR)) {
-            my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-            Math::MPFR::Rmpfr_set_q($r, $x, $ROUND);
-            Math::MPFR::Rmpfr_div($r, $r, $y, $ROUND);
-            $r;
-        }
+      Math_GMPq__Math_MPFR:
+        my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        Math::MPFR::Rmpfr_set_q($r, $x, $ROUND);
+        Math::MPFR::Rmpfr_div($r, $r, $y, $ROUND);
+        return $r;
 
-        elsif ($sig eq q(Math::GMPq Math::MPC)) {
-            my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
-            Math::MPC::Rmpc_set_q($r, $x, $ROUND);
-            Math::MPC::Rmpc_div($r, $r, $y, $ROUND);
-            $r;
-        }
+      Math_GMPq__Math_MPC:
+        my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
+        Math::MPC::Rmpc_set_q($r, $x, $ROUND);
+        Math::MPC::Rmpc_div($r, $r, $y, $ROUND);
+        return $r;
 
         #
         ## GMPz
         #
-        elsif ($sig eq q(Math::GMPz Math::GMPz)) {
+      Math_GMPz__Math_GMPz:
 
-            # Check for division by zero
-            Math::GMPz::Rmpz_sgn($y) || do {
-                (@_) = (_mpz2mpfr($x), $y);
-                goto __SUB__;
-            };
+        # Check for division by zero
+        Math::GMPz::Rmpz_sgn($y) || do {
+            $x = _mpz2mpfr($x);
+            goto Math_MPFR__Math_GMPz;
+        };
 
-            # Check for exact divisibility
-            if (Math::GMPz::Rmpz_divisible_p($x, $y)) {
-                my $r = Math::GMPz::Rmpz_init();
-                Math::GMPz::Rmpz_divexact($r, $x, $y);
-                return $r;
-            }
-
-            my $r = Math::GMPq::Rmpq_init();
-            Math::GMPq::Rmpq_set_num($r, $x);
-            Math::GMPq::Rmpq_set_den($r, $y);
-            Math::GMPq::Rmpq_canonicalize($r);
-            $r;
+        # Check for exact divisibility
+        if (Math::GMPz::Rmpz_divisible_p($x, $y)) {
+            my $r = Math::GMPz::Rmpz_init();
+            Math::GMPz::Rmpz_divexact($r, $x, $y);
+            return $r;
         }
 
-        elsif ($sig eq q(Math::GMPz Math::GMPq)) {
+        my $r = Math::GMPq::Rmpq_init();
+        Math::GMPq::Rmpq_set_num($r, $x);
+        Math::GMPq::Rmpq_set_den($r, $y);
+        Math::GMPq::Rmpq_canonicalize($r);
+        return $r;
 
-            # Check for division by zero
-            Math::GMPq::Rmpq_sgn($y) || do {
-                (@_) = (_mpz2mpfr($x), $y);
-                goto __SUB__;
-            };
+      Math_GMPz__Math_GMPq:
 
-            my $r = Math::GMPq::Rmpq_init();
-            Math::GMPq::Rmpq_z_div($r, $x, $y);
-            $r;
-        }
+        # Check for division by zero
+        Math::GMPq::Rmpq_sgn($y) || do {
+            $x = _mpz2mpfr($x);
+            goto Math_MPFR__Math_GMPq;
+        };
 
-        elsif ($sig eq q(Math::GMPz Math::MPFR)) {
-            my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-            Math::MPFR::Rmpfr_set_z($r, $x, $ROUND);
-            Math::MPFR::Rmpfr_div($r, $r, $y, $ROUND);
-            $r;
-        }
+        my $r = Math::GMPq::Rmpq_init();
+        Math::GMPq::Rmpq_z_div($r, $x, $y);
+        return $r;
 
-        elsif ($sig eq q(Math::GMPz Math::MPC)) {
-            my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
-            Math::MPC::Rmpc_set_z($r, $x, $ROUND);
-            Math::MPC::Rmpc_div($r, $r, $y, $ROUND);
-            $r;
-        }
+      Math_GMPz__Math_MPFR:
+        my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        Math::MPFR::Rmpfr_set_z($r, $x, $ROUND);
+        Math::MPFR::Rmpfr_div($r, $r, $y, $ROUND);
+        return $r;
+
+      Math_GMPz__Math_MPC:
+        my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
+        Math::MPC::Rmpc_set_z($r, $x, $ROUND);
+        Math::MPC::Rmpc_div($r, $r, $y, $ROUND);
+        return $r;
 
         #
         ## MPFR
         #
-        elsif ($sig eq q(Math::MPFR Math::MPFR)) {
-            my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-            Math::MPFR::Rmpfr_div($r, $x, $y, $ROUND);
-            $r;
-        }
+      Math_MPFR__Math_MPFR:
+        my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        Math::MPFR::Rmpfr_div($r, $x, $y, $ROUND);
+        return $r;
 
-        elsif ($sig eq q(Math::MPFR Math::GMPq)) {
-            my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-            Math::MPFR::Rmpfr_div_q($r, $x, $y, $ROUND);
-            $r;
-        }
+      Math_MPFR__Math_GMPq:
+        my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        Math::MPFR::Rmpfr_div_q($r, $x, $y, $ROUND);
+        return $r;
 
-        elsif ($sig eq q(Math::MPFR Math::GMPz)) {
-            my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-            Math::MPFR::Rmpfr_div_z($r, $x, $y, $ROUND);
-            $r;
-        }
+      Math_MPFR__Math_GMPz:
+        my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        Math::MPFR::Rmpfr_div_z($r, $x, $y, $ROUND);
+        return $r;
 
-        elsif ($sig eq q(Math::MPFR Math::MPC)) {
-            my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
-            Math::MPC::Rmpc_set_fr($r, $x, $ROUND);
-            Math::MPC::Rmpc_div($r, $r, $y, $ROUND);
-            $r;
-        }
+      Math_MPFR__Math_MPC:
+        my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
+        Math::MPC::Rmpc_set_fr($r, $x, $ROUND);
+        Math::MPC::Rmpc_div($r, $r, $y, $ROUND);
+        return $r;
 
         #
         ## MPC
         #
-        elsif ($sig eq q(Math::MPC Math::MPC)) {
-            my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
-            Math::MPC::Rmpc_div($r, $x, $y, $ROUND);
-            $r;
-        }
+      Math_MPC__Math_MPC:
+        my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
+        Math::MPC::Rmpc_div($r, $x, $y, $ROUND);
+        return $r;
 
-        elsif ($sig eq q(Math::MPC Math::MPFR)) {
-            my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
-            Math::MPC::Rmpc_div_fr($r, $x, $y, $ROUND);
-            $r;
-        }
+      Math_MPC__Math_MPFR:
+        my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
+        Math::MPC::Rmpc_div_fr($r, $x, $y, $ROUND);
+        return $r;
 
-        elsif ($sig eq q(Math::MPC Math::GMPz)) {
-            my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
-            Math::MPC::Rmpc_set_z($r, $y, $ROUND);
-            Math::MPC::Rmpc_div($r, $x, $r, $ROUND);
-            $r;
-        }
+      Math_MPC__Math_GMPz:
+        my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
+        Math::MPC::Rmpc_set_z($r, $y, $ROUND);
+        Math::MPC::Rmpc_div($r, $x, $r, $ROUND);
+        return $r;
 
-        elsif ($sig eq q(Math::MPC Math::GMPq)) {
-            my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
-            Math::MPC::Rmpc_set_q($r, $y, $ROUND);
-            Math::MPC::Rmpc_div($r, $x, $r, $ROUND);
-            $r;
-        }
+      Math_MPC__Math_GMPq:
+        my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
+        Math::MPC::Rmpc_set_q($r, $y, $ROUND);
+        Math::MPC::Rmpc_div($r, $x, $r, $ROUND);
+        return $r;
     }
 
     sub div {
@@ -1762,28 +1688,27 @@ package Sidef::Types::Number::Number {
         my ($x) = @_;
 
         $x = $$x;
-        my $sig = ref($x);
+        goto(ref($x) =~ tr/:/_/rs);
 
-        if ($sig eq q(Math::GMPz)) {
-            my $r = Math::GMPz::Rmpz_init_set($x);
-            Math::GMPz::Rmpz_neg($r, $r);
-            bless \$r;
-        }
-        elsif ($sig eq q(Math::GMPq)) {
-            my $r = Math::GMPq::Rmpq_init();
-            Math::GMPq::Rmpq_neg($r, $x);
-            bless \$r;
-        }
-        elsif ($sig eq q(Math::MPFR)) {
-            my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-            Math::MPFR::Rmpfr_neg($r, $x, $ROUND);
-            bless \$r;
-        }
-        elsif ($sig eq q(Math::MPC)) {
-            my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
-            Math::MPC::Rmpc_neg($r, $x, $ROUND);
-            bless \$r;
-        }
+      Math_GMPz:
+        my $r = Math::GMPz::Rmpz_init_set($x);
+        Math::GMPz::Rmpz_neg($r, $r);
+        return bless \$r;
+
+      Math_GMPq:
+        my $r = Math::GMPq::Rmpq_init();
+        Math::GMPq::Rmpq_neg($r, $x);
+        return bless \$r;
+
+      Math_MPFR:
+        my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        Math::MPFR::Rmpfr_neg($r, $x, $ROUND);
+        return bless \$r;
+
+      Math_MPC:
+        my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
+        Math::MPC::Rmpc_neg($r, $x, $ROUND);
+        return bless \$r;
     }
 
     *negative = \&neg;
@@ -1792,31 +1717,30 @@ package Sidef::Types::Number::Number {
         my ($x) = @_;
 
         $x = $$x;
-        my $sig = ref($x);
+        goto(ref($x) =~ tr/:/_/rs);
 
-        if ($sig eq q(Math::GMPz)) {
-            Math::GMPz::Rmpz_sgn($x) >= 0 and return $_[0];
-            my $r = Math::GMPz::Rmpz_init_set($x);
-            Math::GMPz::Rmpz_abs($r, $r);
-            bless \$r;
-        }
-        elsif ($sig eq q(Math::GMPq)) {
-            Math::GMPq::Rmpq_sgn($x) >= 0 and return $_[0];
-            my $r = Math::GMPq::Rmpq_init();
-            Math::GMPq::Rmpq_abs($r, $x);
-            bless \$r;
-        }
-        elsif ($sig eq q(Math::MPFR)) {
-            Math::MPFR::Rmpfr_sgn($x) >= 0 and return $_[0];
-            my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-            Math::MPFR::Rmpfr_abs($r, $x, $ROUND);
-            bless \$r;
-        }
-        elsif ($sig eq q(Math::MPC)) {
-            my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-            Math::MPC::Rmpc_abs($r, $x, $ROUND);
-            bless \$r;
-        }
+      Math_GMPz:
+        Math::GMPz::Rmpz_sgn($x) >= 0 and return $_[0];
+        my $r = Math::GMPz::Rmpz_init_set($x);
+        Math::GMPz::Rmpz_abs($r, $r);
+        return bless \$r;
+
+      Math_GMPq:
+        Math::GMPq::Rmpq_sgn($x) >= 0 and return $_[0];
+        my $r = Math::GMPq::Rmpq_init();
+        Math::GMPq::Rmpq_abs($r, $x);
+        return bless \$r;
+
+      Math_MPFR:
+        Math::MPFR::Rmpfr_sgn($x) >= 0 and return $_[0];
+        my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        Math::MPFR::Rmpfr_abs($r, $x, $ROUND);
+        return bless \$r;
+
+      Math_MPC:
+        my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        Math::MPC::Rmpc_abs($r, $x, $ROUND);
+        return bless \$r;
     }
 
     *pos      = \&abs;
@@ -1824,37 +1748,43 @@ package Sidef::Types::Number::Number {
 
     sub __inv__ {
         my ($x) = @_;
-        my $sig = ref($x);
 
-        if ($sig eq q(Math::GMPq)) {
+        goto(ref($x) =~ tr/:/_/rs);
 
-            # Check for division by zero
-            Math::GMPq::Rmpq_sgn($x) || do {
-                (@_) = _mpq2mpfr($x);
-                goto __SUB__;
-            };
+      Math_GMPq:
 
-            my $r = Math::GMPq::Rmpq_init();
-            Math::GMPq::Rmpq_inv($r, $x);
-            $r;
-        }
+        # Check for division by zero
+        Math::GMPq::Rmpq_sgn($x) || do {
+            $x = _mpq2mpfr($x);
+            goto Math_MPFR;
+        };
 
-        elsif ($sig eq q(Math::MPFR)) {
-            my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-            Math::MPFR::Rmpfr_ui_div($r, 1, $x, $ROUND);
-            $r;
-        }
+        my $r = Math::GMPq::Rmpq_init();
+        Math::GMPq::Rmpq_inv($r, $x);
+        return $r;
 
-        elsif ($sig eq q(Math::GMPz)) {
-            (@_) = _mpz2mpq($x);
-            goto __SUB__;
-        }
+      Math_MPFR:
+        my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        Math::MPFR::Rmpfr_ui_div($r, 1, $x, $ROUND);
+        return $r;
 
-        elsif ($sig eq q(Math::MPC)) {
-            my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
-            Math::MPC::Rmpc_ui_div($r, 1, $x, $ROUND);
-            $r;
-        }
+      Math_GMPz:
+
+        # Check for division by zero
+        Math::GMPz::Rmpz_sgn($x) || do {
+            $x = _mpz2mpfr($x);
+            goto Math_MPFR;
+        };
+
+        my $r = Math::GMPq::Rmpq_init();
+        Math::GMPq::Rmpq_set_z($r, $x);
+        Math::GMPq::Rmpq_inv($r, $r);
+        return $r;
+
+      Math_MPC:
+        my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
+        Math::MPC::Rmpc_ui_div($r, 1, $x, $ROUND);
+        return $r;
     }
 
     sub inv {
@@ -1869,26 +1799,25 @@ package Sidef::Types::Number::Number {
 
     sub __sqrt__ {
         my ($x) = @_;
-        my $sig = ref($x);
 
-        if ($sig eq q(Math::MPFR)) {
+        goto(ref($x) =~ tr/:/_/rs);
 
-            # Complex for x < 0
-            if (Math::MPFR::Rmpfr_sgn($x) < 0) {
-                (@_) = _mpfr2mpc($_[0]);
-                goto __SUB__;
-            }
+      Math_MPFR:
 
-            my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-            Math::MPFR::Rmpfr_sqrt($r, $x, $ROUND);
-            $r;
+        # Complex for x < 0
+        if (Math::MPFR::Rmpfr_sgn($x) < 0) {
+            $x = _mpfr2mpc($x);
+            goto Math_MPC;
         }
 
-        elsif ($sig eq q(Math::MPC)) {
-            my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
-            Math::MPC::Rmpc_sqrt($r, $x, $ROUND);
-            $r;
-        }
+        my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        Math::MPFR::Rmpfr_sqrt($r, $x, $ROUND);
+        return $r;
+
+      Math_MPC:
+        my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
+        Math::MPC::Rmpc_sqrt($r, $x, $ROUND);
+        return $r;
     }
 
     sub sqrt {
@@ -1898,34 +1827,32 @@ package Sidef::Types::Number::Number {
 
     sub __cbrt__ {
         my ($x) = @_;
-        my $sig = ref($x);
 
-        if ($sig eq q(Math::MPFR)) {
+        goto(ref($x) =~ tr/:/_/rs);
 
-            # Complex for x < 0
-            if (Math::MPFR::Rmpfr_sgn($x) < 0) {
-                (@_) = _mpfr2mpc($_[0]);
-                goto __SUB__;
-            }
+      Math_MPFR:
 
-            my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-            Math::MPFR::Rmpfr_cbrt($r, $x, $ROUND);
-            $r;
+        # Complex for x < 0
+        if (Math::MPFR::Rmpfr_sgn($x) < 0) {
+            $x = _mpfr2mpc($x);
+            goto Math_MPC;
         }
 
-        elsif ($sig eq q(Math::MPC)) {
+        my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        Math::MPFR::Rmpfr_cbrt($r, $x, $ROUND);
+        return $r;
 
-            state $three_inv = do {
-                my $r = Math::MPC::Rmpc_init2_nobless(CORE::int($PREC));
-                Math::MPC::Rmpc_set_ui($r, 3, $ROUND);
-                Math::MPC::Rmpc_ui_div($r, 1, $r, $ROUND);
-                $r;
-            };
-
-            my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
-            Math::MPC::Rmpc_pow($r, $x, $three_inv, $ROUND);
+      Math_MPC:
+        state $three_inv = do {
+            my $r = Math::MPC::Rmpc_init2_nobless(CORE::int($PREC));
+            Math::MPC::Rmpc_set_ui($r, 3, $ROUND);
+            Math::MPC::Rmpc_ui_div($r, 1, $r, $ROUND);
             $r;
-        }
+        };
+
+        my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
+        Math::MPC::Rmpc_pow($r, $x, $three_inv, $ROUND);
+        return $r;
     }
 
     sub cbrt {
@@ -2040,177 +1967,156 @@ package Sidef::Types::Number::Number {
 
     sub __pow__ {
         my ($x, $y) = @_;
-        my $sig = join(' ', ref($x), ref($y) || '$');
+
+        goto(join('__', ref($x), ref($y) || 'Scalar') =~ tr/:/_/rs);
 
         #
         ## GMPq
         #
-        if ($sig eq q(Math::GMPq $)) {
+      Math_GMPq__Scalar:
 
-            my $r = Math::GMPq::Rmpq_init();
-            Math::GMPq::Rmpq_pow_ui($r, $x, CORE::abs($y));
+        my $r = Math::GMPq::Rmpq_init();
+        Math::GMPq::Rmpq_pow_ui($r, $x, CORE::abs($y));
 
-            if ($y < 0) {
-                Math::GMPq::Rmpq_sgn($r) || goto &_inf;
-                Math::GMPq::Rmpq_inv($r, $r);
-            }
-
-            $r;
+        if ($y < 0) {
+            Math::GMPq::Rmpq_sgn($r) || goto &_inf;
+            Math::GMPq::Rmpq_inv($r, $r);
         }
 
-        elsif ($sig eq q(Math::GMPq Math::GMPq)) {
+        return $r;
 
-            # Integer power
-            if (Math::GMPq::Rmpq_integer_p($y)) {
-                (@_) = ($x, Math::GMPq::Rmpq_get_d($y));
-                goto __SUB__;
-            }
+      Math_GMPq__Math_GMPq:
 
-            # (-x)^(a/b) is a complex number
-            elsif (Math::GMPq::Rmpq_sgn($x) < 0) {
-                (@_) = (_mpq2mpc($x), _mpq2mpc($y));
-                goto __SUB__;
-            }
-
-            (@_) = (_mpq2mpfr($x), _mpq2mpfr($y));
-            goto __SUB__;
+        # Integer power
+        if (Math::GMPq::Rmpq_integer_p($y)) {
+            $y = Math::GMPq::Rmpq_get_d($y);
+            goto Math_GMPq__Scalar;
         }
 
-        elsif ($sig eq q(Math::GMPq Math::GMPz)) {
-            (@_) = ($x, Math::GMPz::Rmpz_get_d($y));
-            goto __SUB__;
+        # (-x)^(a/b) is a complex number
+        elsif (Math::GMPq::Rmpq_sgn($x) < 0) {
+            ($x, $y) = (_mpq2mpc($x), _mpq2mpc($y));
+            goto Math_MPC__Math_MPC;
         }
 
-        elsif ($sig eq q(Math::GMPq Math::MPFR)) {
-            (@_) = (_mpq2mpfr($x), $y);
-            goto __SUB__;
-        }
+        ($x, $y) = (_mpq2mpfr($x), _mpq2mpfr($y));
+        goto Math_MPFR__Math_MPFR;
 
-        elsif ($sig eq q(Math::GMPq Math::MPC)) {
-            (@_) = (_mpq2mpc($x), $y);
-            goto __SUB__;
-        }
+      Math_GMPq__Math_GMPz:
+        $y = Math::GMPz::Rmpz_get_d($y);
+        goto Math_GMPq__Scalar;
+
+      Math_GMPq__Math_MPFR:
+        $x = _mpq2mpfr($x);
+        goto Math_MPFR__Math_MPFR;
+
+      Math_GMPq__Math_MPC:
+        $x = _mpq2mpc($x);
+        goto Math_MPC__Math_MPC;
 
         #
         ## GMPz
         #
+      Math_GMPz__Scalar:
 
-        elsif ($sig eq q(Math::GMPz $)) {
+        my $r = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_pow_ui($r, $x, CORE::abs($y));
 
-            my $r = Math::GMPz::Rmpz_init();
-            Math::GMPz::Rmpz_pow_ui($r, $x, CORE::abs($y));
+        if ($y < 0) {
+            Math::GMPz::Rmpz_sgn($r) || goto &_inf;
 
-            if ($y < 0) {
-                Math::GMPz::Rmpz_sgn($r) || goto &_inf;
-
-                my $q = Math::GMPq::Rmpq_init();
-                Math::GMPq::Rmpq_set_z($q, $r);
-                Math::GMPq::Rmpq_inv($q, $q);
-                return $q;
-            }
-
-            $r;
+            my $q = Math::GMPq::Rmpq_init();
+            Math::GMPq::Rmpq_set_z($q, $r);
+            Math::GMPq::Rmpq_inv($q, $q);
+            return $q;
         }
 
-        elsif ($sig eq q(Math::GMPz Math::GMPz)) {
-            (@_) = ($x, Math::GMPz::Rmpz_get_d($y));
-            goto __SUB__;
+        return $r;
+
+      Math_GMPz__Math_GMPz:
+        $y = Math::GMPz::Rmpz_get_d($y);
+        goto Math_GMPz__Scalar;
+
+      Math_GMPz__Math_GMPq:
+        if (Math::GMPq::Rmpq_integer_p($y)) {
+            $y = Math::GMPq::Rmpq_get_d($y);
+            goto Math_GMPz__Scalar;
         }
 
-        elsif ($sig eq q(Math::GMPz Math::GMPq)) {
-            if (Math::GMPq::Rmpq_integer_p($y)) {
-                (@_) = ($x, Math::GMPq::Rmpq_get_d($y));
-            }
-            else {
-                (@_) = (_mpz2mpfr($x), _mpq2mpfr($y));
-            }
-            goto __SUB__;
-        }
+        ($x, $y) = (_mpz2mpfr($x), _mpq2mpfr($y));
+        goto Math_MPFR__Math_MPFR;
 
-        elsif ($sig eq q(Math::GMPz Math::MPFR)) {
-            (@_) = (_mpz2mpfr($x), $y);
-            goto __SUB__;
-        }
+      Math_GMPz__Math_MPFR:
+        $x = _mpz2mpfr($x);
+        goto Math_MPFR__Math_MPFR;
 
-        elsif ($sig eq q(Math::GMPz Math::MPC)) {
-            (@_) = (_mpz2mpc($x), $y);
-            goto __SUB__;
-        }
+      Math_GMPz__Math_MPC:
+        $x = _mpz2mpc($x);
+        goto Math_MPC__Math_MPC;
 
         #
         ## MPFR
         #
-        elsif ($sig eq q(Math::MPFR Math::MPFR)) {
-
-            if (    Math::MPFR::Rmpfr_sgn($x) < 0
-                and !Math::MPFR::Rmpfr_integer_p($y)
-                and Math::MPFR::Rmpfr_number_p($y)) {
-                (@_) = (_mpfr2mpc($x), $y);
-                goto __SUB__;
-            }
-
-            my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-            Math::MPFR::Rmpfr_pow($r, $x, $y, $ROUND);
-            $r;
+      Math_MPFR__Math_MPFR:
+        if (    Math::MPFR::Rmpfr_sgn($x) < 0
+            and !Math::MPFR::Rmpfr_integer_p($y)
+            and Math::MPFR::Rmpfr_number_p($y)) {
+            $x = _mpfr2mpc($x);
+            goto Math_MPC__Math_MPFR;
         }
 
-        elsif ($sig eq q(Math::MPFR $)) {
-            my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-            $y < 0
-              ? Math::MPFR::Rmpfr_pow_si($r, $x, $y, $ROUND)
-              : Math::MPFR::Rmpfr_pow_ui($r, $x, $y, $ROUND);
-            $r;
-        }
+        my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        Math::MPFR::Rmpfr_pow($r, $x, $y, $ROUND);
+        return $r;
 
-        elsif ($sig eq q(Math::MPFR Math::GMPq)) {
-            (@_) = ($x, _mpq2mpfr($y));
-            goto __SUB__;
-        }
+      Math_MPFR__Scalar:
+        my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        $y < 0
+          ? Math::MPFR::Rmpfr_pow_si($r, $x, $y, $ROUND)
+          : Math::MPFR::Rmpfr_pow_ui($r, $x, $y, $ROUND);
+        return $r;
 
-        elsif ($sig eq q(Math::MPFR Math::GMPz)) {
-            my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-            Math::MPFR::Rmpfr_pow_z($r, $x, $y, $ROUND);
-            $r;
-        }
+      Math_MPFR__Math_GMPq:
+        $y = _mpq2mpfr($y);
+        goto Math_MPFR__Math_MPFR;
 
-        elsif ($sig eq q(Math::MPFR Math::MPC)) {
-            (@_) = (_mpfr2mpc($x), $y);
-            goto __SUB__;
-        }
+      Math_MPFR__Math_GMPz:
+        my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        Math::MPFR::Rmpfr_pow_z($r, $x, $y, $ROUND);
+        return $r;
+
+      Math_MPFR__Math_MPC:
+        $x = _mpfr2mpc($x);
+        goto Math_MPC__Math_MPC;
 
         #
         ## MPC
         #
-        elsif ($sig eq q(Math::MPC Math::MPC)) {
-            my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
-            Math::MPC::Rmpc_pow($r, $x, $y, $ROUND);
-            $r;
-        }
+      Math_MPC__Math_MPC:
+        my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
+        Math::MPC::Rmpc_pow($r, $x, $y, $ROUND);
+        return $r;
 
-        elsif ($sig eq q(Math::MPC $)) {
-            my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
-            $y < 0
-              ? Math::MPC::Rmpc_pow_si($r, $x, $y, $ROUND)
-              : Math::MPC::Rmpc_pow_ui($r, $x, $y, $ROUND);
-            $r;
-        }
+      Math_MPC__Scalar:
+        my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
+        $y < 0
+          ? Math::MPC::Rmpc_pow_si($r, $x, $y, $ROUND)
+          : Math::MPC::Rmpc_pow_ui($r, $x, $y, $ROUND);
+        return $r;
 
-        elsif ($sig eq q(Math::MPC Math::MPFR)) {
-            my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
-            Math::MPC::Rmpc_pow_fr($r, $x, $y, $ROUND);
-            $r;
-        }
+      Math_MPC__Math_MPFR:
+        my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
+        Math::MPC::Rmpc_pow_fr($r, $x, $y, $ROUND);
+        return $r;
 
-        elsif ($sig eq q(Math::MPC Math::GMPz)) {
-            my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
-            Math::MPC::Rmpc_pow_z($r, $x, $y, $ROUND);
-            $r;
-        }
+      Math_MPC__Math_GMPz:
+        my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
+        Math::MPC::Rmpc_pow_z($r, $x, $y, $ROUND);
+        return $r;
 
-        elsif ($sig eq q(Math::MPC Math::GMPq)) {
-            (@_) = ($_[0], _mpq2mpc($_[1]));
-            goto __SUB__;
-        }
+      Math_MPC__Math_GMPq:
+        $y = _mpq2mpc($y);
+        goto Math_MPC__Math_MPC;
     }
 
     sub root {
@@ -2246,99 +2152,93 @@ package Sidef::Types::Number::Number {
 
     sub __log2__ {
         my ($x) = @_;
-        my $sig = ref($x);
 
-        if ($sig eq q(Math::MPFR)) {
+        goto(ref($x) =~ tr/:/_/rs);
 
-            # Complex for x < 0
-            if (Math::MPFR::Rmpfr_sgn($x) < 0) {
-                (@_) = _mpfr2mpc($x);
-                goto __SUB__;
-            }
+      Math_MPFR:
 
-            my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-            Math::MPFR::Rmpfr_log2($r, $x, $ROUND);
-            $r;
+        # Complex for x < 0
+        if (Math::MPFR::Rmpfr_sgn($x) < 0) {
+            $x = _mpfr2mpc($x);
+            goto Math_MPC;
         }
 
-        elsif ($sig eq q(Math::MPC)) {
-            my $ln2 = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-            Math::MPFR::Rmpfr_const_log2($ln2, $ROUND);
-            my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
-            Math::MPC::Rmpc_log($r, $x, $ROUND);
-            Math::MPC::Rmpc_div_fr($r, $r, $ln2, $ROUND);
-            $r;
-        }
+        my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        Math::MPFR::Rmpfr_log2($r, $x, $ROUND);
+        return $r;
+
+      Math_MPC:
+        my $ln2 = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        Math::MPFR::Rmpfr_const_log2($ln2, $ROUND);
+        my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
+        Math::MPC::Rmpc_log($r, $x, $ROUND);
+        Math::MPC::Rmpc_div_fr($r, $r, $ln2, $ROUND);
+        return $r;
     }
 
     sub __log10__ {
         my ($x) = @_;
-        my $sig = ref($x);
 
-        if ($sig eq q(Math::MPFR)) {
+        goto(ref($x) =~ tr/:/_/rs);
 
-            # Complex for x < 0
-            if (Math::MPFR::Rmpfr_sgn($x) < 0) {
-                (@_) = _mpfr2mpc($x);
-                goto __SUB__;
-            }
+      Math_MPFR:
 
-            my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-            Math::MPFR::Rmpfr_log10($r, $x, $ROUND);
-            $r;
+        # Complex for x < 0
+        if (Math::MPFR::Rmpfr_sgn($x) < 0) {
+            $x = _mpfr2mpc($x);
+            goto Math_MPC;
         }
 
-        elsif ($sig eq q(Math::MPC)) {
+        my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        Math::MPFR::Rmpfr_log10($r, $x, $ROUND);
+        return $r;
 
-            state $MPC_VERSION = Math::MPC::MPC_VERSION();
+      Math_MPC:
+        state $MPC_VERSION = Math::MPC::MPC_VERSION();
 
-            my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
+        my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
 
-            if ($MPC_VERSION >= 65536) {    # available only in mpc>=1.0.0
-                Math::MPC::Rmpc_log10($r, $x, $ROUND);
-            }
-            else {
-                my $ln10 = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-                Math::MPFR::Rmpfr_set_ui($ln10, 10, $ROUND);
-                Math::MPFR::Rmpfr_log($ln10, $ln10, $ROUND);
-                Math::MPC::Rmpc_log($r, $x, $ROUND);
-                Math::MPC::Rmpc_div_fr($r, $r, $ln10, $ROUND);
-            }
-
-            $r;
+        if ($MPC_VERSION >= 65536) {    # available only in mpc>=1.0.0
+            Math::MPC::Rmpc_log10($r, $x, $ROUND);
         }
+        else {
+            my $ln10 = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+            Math::MPFR::Rmpfr_set_ui($ln10, 10, $ROUND);
+            Math::MPFR::Rmpfr_log($ln10, $ln10, $ROUND);
+            Math::MPC::Rmpc_log($r, $x, $ROUND);
+            Math::MPC::Rmpc_div_fr($r, $r, $ln10, $ROUND);
+        }
+
+        return $r;
     }
 
     sub __log__ {
         my ($x) = @_;
 
-        my $sig = ref($x);
+        goto(ref($x) =~ tr/:/_/rs);
 
         #
         ## MPFR
         #
-        if ($sig eq q(Math::MPFR)) {
+      Math_MPFR:
 
-            # Complex for x < 0
-            if (Math::MPFR::Rmpfr_sgn($x) < 0) {
-                (@_) = _mpfr2mpc($x);
-                goto __SUB__;
-            }
-
-            my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-            Math::MPFR::Rmpfr_log($r, $x, $ROUND);
-            $r;
+        # Complex for x < 0
+        if (Math::MPFR::Rmpfr_sgn($x) < 0) {
+            $x = _mpfr2mpc($x);
+            goto Math_MPC;
         }
+
+        my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        Math::MPFR::Rmpfr_log($r, $x, $ROUND);
+        return $r;
 
         #
         ## MPC
         #
-
-        elsif ($sig eq q(Math::MPC)) {
-            my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
-            Math::MPC::Rmpc_log($r, $x, $ROUND);
-            $r;
-        }
+      Math_MPC:
+        my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
+        Math::MPC::Rmpc_log($r, $x, $ROUND);
+        return $r;
     }
 
     sub log {
@@ -2585,19 +2485,17 @@ package Sidef::Types::Number::Number {
 
     sub __exp__ {
         my ($x) = @_;
-        my $sig = ref($x);
+        goto(ref($x) =~ tr/:/_/rs);
 
-        if ($sig eq q(Math::MPFR)) {
-            my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-            Math::MPFR::Rmpfr_exp($r, $x, $ROUND);
-            $r;
-        }
+      Math_MPFR:
+        my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        Math::MPFR::Rmpfr_exp($r, $x, $ROUND);
+        return $r;
 
-        elsif ($sig eq q(Math::MPC)) {
-            my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
-            Math::MPC::Rmpc_exp($r, $x, $ROUND);
-            $r;
-        }
+      Math_MPC:
+        my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
+        Math::MPC::Rmpc_exp($r, $x, $ROUND);
+        return $r;
     }
 
     sub exp {
@@ -2623,18 +2521,17 @@ package Sidef::Types::Number::Number {
 
     sub __sin__ {
         my ($x) = @_;
-        my $sig = ref($x);
+        goto(ref($x) =~ tr/:/_/rs);
 
-        if ($sig eq q(Math::MPFR)) {
-            my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-            Math::MPFR::Rmpfr_sin($r, $x, $ROUND);
-            $r;
-        }
-        elsif ($sig eq q(Math::MPC)) {
-            my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
-            Math::MPC::Rmpc_sin($r, $x, $ROUND);
-            $r;
-        }
+      Math_MPFR:
+        my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        Math::MPFR::Rmpfr_sin($r, $x, $ROUND);
+        return $r;
+
+      Math_MPC:
+        my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
+        Math::MPC::Rmpc_sin($r, $x, $ROUND);
+        return $r;
     }
 
     sub sin {
@@ -2644,18 +2541,17 @@ package Sidef::Types::Number::Number {
 
     sub __sinh__ {
         my ($x) = @_;
-        my $sig = ref($x);
+        goto(ref($x) =~ tr/:/_/rs);
 
-        if ($sig eq q(Math::MPFR)) {
-            my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-            Math::MPFR::Rmpfr_sinh($r, $x, $ROUND);
-            $r;
-        }
-        elsif ($sig eq q(Math::MPC)) {
-            my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
-            Math::MPC::Rmpc_sinh($r, $x, $ROUND);
-            $r;
-        }
+      Math_MPFR:
+        my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        Math::MPFR::Rmpfr_sinh($r, $x, $ROUND);
+        return $r;
+
+      Math_MPC:
+        my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
+        Math::MPC::Rmpc_sinh($r, $x, $ROUND);
+        return $r;
     }
 
     sub sinh {
@@ -2665,27 +2561,26 @@ package Sidef::Types::Number::Number {
 
     sub __asin__ {
         my ($x) = @_;
-        my $sig = ref($x);
+        goto(ref($x) =~ tr/:/_/rs);
 
-        if ($sig eq q(Math::MPFR)) {
+      Math_MPFR:
 
-            # Return a complex number for x < -1 or x > 1
-            if (   Math::MPFR::Rmpfr_cmp_ui($x, 1) > 0
-                or Math::MPFR::Rmpfr_cmp_si($x, -1) < 0) {
-                my $r = _mpfr2mpc($x);
-                Math::MPC::Rmpc_asin($r, $r, $ROUND);
-                return $r;
-            }
-
-            my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-            Math::MPFR::Rmpfr_asin($r, $x, $ROUND);
-            $r;
+        # Return a complex number for x < -1 or x > 1
+        if (   Math::MPFR::Rmpfr_cmp_ui($x, 1) > 0
+            or Math::MPFR::Rmpfr_cmp_si($x, -1) < 0) {
+            my $r = _mpfr2mpc($x);
+            Math::MPC::Rmpc_asin($r, $r, $ROUND);
+            return $r;
         }
-        elsif ($sig eq q(Math::MPC)) {
-            my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
-            Math::MPC::Rmpc_asin($r, $x, $ROUND);
-            $r;
-        }
+
+        my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        Math::MPFR::Rmpfr_asin($r, $x, $ROUND);
+        return $r;
+
+      Math_MPC:
+        my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
+        Math::MPC::Rmpc_asin($r, $x, $ROUND);
+        return $r;
     }
 
     sub asin {
@@ -2695,18 +2590,17 @@ package Sidef::Types::Number::Number {
 
     sub __asinh__ {
         my ($x) = @_;
-        my $sig = ref($x);
+        goto(ref($x) =~ tr/:/_/rs);
 
-        if ($sig eq q(Math::MPFR)) {
-            my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-            Math::MPFR::Rmpfr_asinh($r, $x, $ROUND);
-            $r;
-        }
-        elsif ($sig eq q(Math::MPC)) {
-            my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
-            Math::MPC::Rmpc_asinh($r, $x, $ROUND);
-            $r;
-        }
+      Math_MPFR:
+        my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        Math::MPFR::Rmpfr_asinh($r, $x, $ROUND);
+        return $r;
+
+      Math_MPC:
+        my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
+        Math::MPC::Rmpc_asinh($r, $x, $ROUND);
+        return $r;
     }
 
     sub asinh {
@@ -2720,18 +2614,17 @@ package Sidef::Types::Number::Number {
 
     sub __cos__ {
         my ($x) = @_;
-        my $sig = ref($x);
+        goto(ref($x) =~ tr/:/_/rs);
 
-        if ($sig eq q(Math::MPFR)) {
-            my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-            Math::MPFR::Rmpfr_cos($r, $x, $ROUND);
-            $r;
-        }
-        elsif ($sig eq q(Math::MPC)) {
-            my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
-            Math::MPC::Rmpc_cos($r, $x, $ROUND);
-            $r;
-        }
+      Math_MPFR:
+        my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        Math::MPFR::Rmpfr_cos($r, $x, $ROUND);
+        return $r;
+
+      Math_MPC:
+        my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
+        Math::MPC::Rmpc_cos($r, $x, $ROUND);
+        return $r;
     }
 
     sub cos {
@@ -2741,18 +2634,17 @@ package Sidef::Types::Number::Number {
 
     sub __cosh__ {
         my ($x) = @_;
-        my $sig = ref($x);
+        goto(ref($x) =~ tr/:/_/rs);
 
-        if ($sig eq q(Math::MPFR)) {
-            my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-            Math::MPFR::Rmpfr_cosh($r, $x, $ROUND);
-            $r;
-        }
-        elsif ($sig eq q(Math::MPC)) {
-            my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
-            Math::MPC::Rmpc_cosh($r, $x, $ROUND);
-            $r;
-        }
+      Math_MPFR:
+        my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        Math::MPFR::Rmpfr_cosh($r, $x, $ROUND);
+        return $r;
+
+      Math_MPC:
+        my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
+        Math::MPC::Rmpc_cosh($r, $x, $ROUND);
+        return $r;
     }
 
     sub cosh {
@@ -2762,28 +2654,26 @@ package Sidef::Types::Number::Number {
 
     sub __acos__ {
         my ($x) = @_;
-        my $sig = ref($x);
+        goto(ref($x) =~ tr/:/_/rs);
 
-        if ($sig eq q(Math::MPFR)) {
+      Math_MPFR:
 
-            # Return a complex number for x < -1 or x > 1
-            if (   Math::MPFR::Rmpfr_cmp_ui($x, 1) > 0
-                or Math::MPFR::Rmpfr_cmp_si($x, -1) < 0) {
-                my $r = _mpfr2mpc($x);
-                Math::MPC::Rmpc_acos($r, $r, $ROUND);
-                return $r;
-            }
-
-            my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-            Math::MPFR::Rmpfr_acos($r, $x, $ROUND);
-            $r;
+        # Return a complex number for x < -1 or x > 1
+        if (   Math::MPFR::Rmpfr_cmp_ui($x, 1) > 0
+            or Math::MPFR::Rmpfr_cmp_si($x, -1) < 0) {
+            my $r = _mpfr2mpc($x);
+            Math::MPC::Rmpc_acos($r, $r, $ROUND);
+            return $r;
         }
 
-        elsif ($sig eq q(Math::MPC)) {
-            my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
-            Math::MPC::Rmpc_acos($r, $x, $ROUND);
-            $r;
-        }
+        my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        Math::MPFR::Rmpfr_acos($r, $x, $ROUND);
+        return $r;
+
+      Math_MPC:
+        my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
+        Math::MPC::Rmpc_acos($r, $x, $ROUND);
+        return $r;
     }
 
     sub acos {
@@ -2793,26 +2683,25 @@ package Sidef::Types::Number::Number {
 
     sub __acosh__ {
         my ($x) = @_;
-        my $sig = ref($x);
+        goto(ref($x) =~ tr/:/_/rs);
 
-        if ($sig eq q(Math::MPFR)) {
+      Math_MPFR:
 
-            # Return a complex number for x < 1
-            if (Math::MPFR::Rmpfr_cmp_ui($x, 1) < 0) {
-                my $r = _mpfr2mpc($x);
-                Math::MPC::Rmpc_acosh($r, $r, $ROUND);
-                return $r;
-            }
-
-            my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-            Math::MPFR::Rmpfr_acosh($r, $x, $ROUND);
-            $r;
+        # Return a complex number for x < 1
+        if (Math::MPFR::Rmpfr_cmp_ui($x, 1) < 0) {
+            my $r = _mpfr2mpc($x);
+            Math::MPC::Rmpc_acosh($r, $r, $ROUND);
+            return $r;
         }
-        elsif ($sig eq q(Math::MPC)) {
-            my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
-            Math::MPC::Rmpc_acosh($r, $x, $ROUND);
-            $r;
-        }
+
+        my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        Math::MPFR::Rmpfr_acosh($r, $x, $ROUND);
+        return $r;
+
+      Math_MPC:
+        my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
+        Math::MPC::Rmpc_acosh($r, $x, $ROUND);
+        return $r;
     }
 
     sub acosh {
@@ -2826,19 +2715,17 @@ package Sidef::Types::Number::Number {
 
     sub __tan__ {
         my ($x) = @_;
-        my $sig = ref($x);
+        goto(ref($x) =~ tr/:/_/rs);
 
-        if ($sig eq q(Math::MPFR)) {
-            my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-            Math::MPFR::Rmpfr_tan($r, $x, $ROUND);
-            $r;
-        }
+      Math_MPFR:
+        my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        Math::MPFR::Rmpfr_tan($r, $x, $ROUND);
+        return $r;
 
-        elsif ($sig eq q(Math::MPC)) {
-            my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
-            Math::MPC::Rmpc_tan($r, $x, $ROUND);
-            $r;
-        }
+      Math_MPC:
+        my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
+        Math::MPC::Rmpc_tan($r, $x, $ROUND);
+        return $r;
     }
 
     sub tan {
@@ -2848,18 +2735,17 @@ package Sidef::Types::Number::Number {
 
     sub __tanh__ {
         my ($x) = @_;
-        my $sig = ref($x);
+        goto(ref($x) =~ tr/:/_/rs);
 
-        if ($sig eq q(Math::MPFR)) {
-            my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-            Math::MPFR::Rmpfr_tanh($r, $x, $ROUND);
-            $r;
-        }
-        elsif ($sig eq q(Math::MPC)) {
-            my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
-            Math::MPC::Rmpc_tanh($r, $x, $ROUND);
-            $r;
-        }
+      Math_MPFR:
+        my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        Math::MPFR::Rmpfr_tanh($r, $x, $ROUND);
+        return $r;
+
+      Math_MPC:
+        my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
+        Math::MPC::Rmpc_tanh($r, $x, $ROUND);
+        return $r;
     }
 
     sub tanh {
@@ -2869,18 +2755,17 @@ package Sidef::Types::Number::Number {
 
     sub __atan__ {
         my ($x) = @_;
-        my $sig = ref($x);
+        goto(ref($x) =~ tr/:/_/rs);
 
-        if ($sig eq q(Math::MPFR)) {
-            my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-            Math::MPFR::Rmpfr_atan($r, $x, $ROUND);
-            $r;
-        }
-        elsif ($sig eq q(Math::MPC)) {
-            my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
-            Math::MPC::Rmpc_atan($r, $x, $ROUND);
-            $r;
-        }
+      Math_MPFR:
+        my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        Math::MPFR::Rmpfr_atan($r, $x, $ROUND);
+        return $r;
+
+      Math_MPC:
+        my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
+        Math::MPC::Rmpc_atan($r, $x, $ROUND);
+        return $r;
     }
 
     sub atan {
@@ -2890,27 +2775,26 @@ package Sidef::Types::Number::Number {
 
     sub __atanh__ {
         my ($x) = @_;
-        my $sig = ref($x);
+        goto(ref($x) =~ tr/:/_/rs);
 
-        if ($sig eq q(Math::MPFR)) {
+      Math_MPFR:
 
-            # Return a complex number for x <= -1 or x >= 1
-            if (   Math::MPFR::Rmpfr_cmp_ui($x, 1) >= 0
-                or Math::MPFR::Rmpfr_cmp_si($x, -1) <= 0) {
-                my $r = _mpfr2mpc($x);
-                Math::MPC::Rmpc_atanh($r, $r, $ROUND);
-                return $r;
-            }
-
-            my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-            Math::MPFR::Rmpfr_atanh($r, $x, $ROUND);
-            $r;
+        # Return a complex number for x <= -1 or x >= 1
+        if (   Math::MPFR::Rmpfr_cmp_ui($x, 1) >= 0
+            or Math::MPFR::Rmpfr_cmp_si($x, -1) <= 0) {
+            my $r = _mpfr2mpc($x);
+            Math::MPC::Rmpc_atanh($r, $r, $ROUND);
+            return $r;
         }
-        elsif ($sig eq q(Math::MPC)) {
-            my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
-            Math::MPC::Rmpc_atanh($r, $x, $ROUND);
-            $r;
-        }
+
+        my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        Math::MPFR::Rmpfr_atanh($r, $x, $ROUND);
+        return $r;
+
+      Math_MPC:
+        my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
+        Math::MPC::Rmpc_atanh($r, $x, $ROUND);
+        return $r;
     }
 
     sub atanh {
@@ -2920,35 +2804,30 @@ package Sidef::Types::Number::Number {
 
     sub __atan2__ {
         my ($x, $y) = @_;
+        goto(join('__', ref($x), ref($y)) =~ tr/:/_/rs);
 
-        my $sig = join(' ', ref($x), ref($y));
+      Math_MPFR__Math_MPFR:
+        my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        Math::MPFR::Rmpfr_atan2($r, $x, $y, $ROUND);
+        return $r;
 
-        if ($sig eq q(Math::MPFR Math::MPFR)) {
-            my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-            Math::MPFR::Rmpfr_atan2($r, $x, $y, $ROUND);
-            $r;
-        }
-
-        elsif ($sig eq q(Math::MPFR Math::MPC)) {
-            (@_) = (_mpfr2mpc($x), $y);
-            goto __SUB__;
-        }
+      Math_MPFR__Math_MPC:
+        $x = _mpfr2mpc($x);
+        goto Math_MPC__Math_MPC;
 
         # atan2(x, y) = atan(x/y)
-        elsif ($sig eq q(Math::MPC Math::MPFR)) {
-            my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
-            Math::MPC::Rmpc_div_fr($r, $x, $y, $ROUND);
-            Math::MPC::Rmpc_atan($r, $r, $ROUND);
-            $r;
-        }
+      Math_MPC__Math_MPFR:
+        my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
+        Math::MPC::Rmpc_div_fr($r, $x, $y, $ROUND);
+        Math::MPC::Rmpc_atan($r, $r, $ROUND);
+        return $r;
 
         # atan2(x, y) = atan(x/y)
-        elsif ($sig eq q(Math::MPC Math::MPC)) {
-            my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
-            Math::MPC::Rmpc_div($r, $x, $y, $ROUND);
-            Math::MPC::Rmpc_atan($r, $r, $ROUND);
-            $r;
-        }
+      Math_MPC__Math_MPC:
+        my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
+        Math::MPC::Rmpc_div($r, $x, $y, $ROUND);
+        Math::MPC::Rmpc_atan($r, $r, $ROUND);
+        return $r;
     }
 
     sub atan2 {
@@ -2963,21 +2842,19 @@ package Sidef::Types::Number::Number {
 
     sub __sec__ {
         my ($x) = @_;
-        my $sig = ref($x);
+        goto(ref($x) =~ tr/:/_/rs);
 
-        if ($sig eq q(Math::MPFR)) {
-            my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-            Math::MPFR::Rmpfr_sec($r, $x, $ROUND);
-            $r;
-        }
+      Math_MPFR:
+        my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        Math::MPFR::Rmpfr_sec($r, $x, $ROUND);
+        return $r;
 
         # sec(x) = 1/cos(x)
-        elsif ($sig eq q(Math::MPC)) {
-            my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
-            Math::MPC::Rmpc_cos($r, $x, $ROUND);
-            Math::MPC::Rmpc_ui_div($r, 1, $r, $ROUND);
-            $r;
-        }
+      Math_MPC:
+        my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
+        Math::MPC::Rmpc_cos($r, $x, $ROUND);
+        Math::MPC::Rmpc_ui_div($r, 1, $r, $ROUND);
+        return $r;
     }
 
     sub sec {
@@ -2987,21 +2864,19 @@ package Sidef::Types::Number::Number {
 
     sub __sech__ {
         my ($x) = @_;
-        my $sig = ref($x);
+        goto(ref($x) =~ tr/:/_/rs);
 
-        if ($sig eq q(Math::MPFR)) {
-            my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-            Math::MPFR::Rmpfr_sech($r, $x, $ROUND);
-            $r;
-        }
+      Math_MPFR:
+        my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        Math::MPFR::Rmpfr_sech($r, $x, $ROUND);
+        return $r;
 
         # sech(x) = 1/cosh(x)
-        elsif ($sig eq q(Math::MPC)) {
-            my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
-            Math::MPC::Rmpc_cosh($r, $x, $ROUND);
-            Math::MPC::Rmpc_ui_div($r, 1, $r, $ROUND);
-            $r;
-        }
+      Math_MPC:
+        my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
+        Math::MPC::Rmpc_cosh($r, $x, $ROUND);
+        Math::MPC::Rmpc_ui_div($r, 1, $r, $ROUND);
+        return $r;
     }
 
     sub sech {
@@ -3011,31 +2886,29 @@ package Sidef::Types::Number::Number {
 
     sub __asec__ {
         my ($x) = @_;
-        my $sig = ref($x);
+        goto(ref($x) =~ tr/:/_/rs);
 
         # asec(x) = acos(1/x)
-        if ($sig eq q(Math::MPFR)) {
+      Math_MPFR:
 
-            # Return a complex number for x > -1 and x < 1
-            if (    Math::MPFR::Rmpfr_cmp_ui($x, 1) < 0
-                and Math::MPFR::Rmpfr_cmp_si($x, -1) > 0) {
-                (@_) = _mpfr2mpc($x);
-                goto __SUB__;
-            }
-
-            my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-            Math::MPFR::Rmpfr_ui_div($r, 1, $x, $ROUND);
-            Math::MPFR::Rmpfr_acos($r, $r, $ROUND);
-            $r;
+        # Return a complex number for x > -1 and x < 1
+        if (    Math::MPFR::Rmpfr_cmp_ui($x, 1) < 0
+            and Math::MPFR::Rmpfr_cmp_si($x, -1) > 0) {
+            $x = _mpfr2mpc($x);
+            goto Math_MPC;
         }
+
+        my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        Math::MPFR::Rmpfr_ui_div($r, 1, $x, $ROUND);
+        Math::MPFR::Rmpfr_acos($r, $r, $ROUND);
+        return $r;
 
         # asec(x) = acos(1/x)
-        elsif ($sig eq q(Math::MPC)) {
-            my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
-            Math::MPC::Rmpc_ui_div($r, 1, $x, $ROUND);
-            Math::MPC::Rmpc_acos($r, $r, $ROUND);
-            $r;
-        }
+      Math_MPC:
+        my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
+        Math::MPC::Rmpc_ui_div($r, 1, $x, $ROUND);
+        Math::MPC::Rmpc_acos($r, $r, $ROUND);
+        return $r;
     }
 
     sub asec {
@@ -3045,31 +2918,29 @@ package Sidef::Types::Number::Number {
 
     sub __asech__ {
         my ($x) = @_;
-        my $sig = ref($x);
+        goto(ref($x) =~ tr/:/_/rs);
 
         # asech(x) = acosh(1/x)
-        if ($sig eq q(Math::MPFR)) {
+      Math_MPFR:
 
-            # Return a complex number for x < 0 or x > 1
-            if (   Math::MPFR::Rmpfr_cmp_ui($x, 1) > 0
-                or Math::MPFR::Rmpfr_cmp_ui($x, 0) < 0) {
-                (@_) = _mpfr2mpc($x);
-                goto __SUB__;
-            }
-
-            my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-            Math::MPFR::Rmpfr_ui_div($r, 1, $x, $ROUND);
-            Math::MPFR::Rmpfr_acosh($r, $r, $ROUND);
-            $r;
+        # Return a complex number for x < 0 or x > 1
+        if (   Math::MPFR::Rmpfr_cmp_ui($x, 1) > 0
+            or Math::MPFR::Rmpfr_cmp_ui($x, 0) < 0) {
+            $x = _mpfr2mpc($x);
+            goto Math_MPC;
         }
+
+        my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        Math::MPFR::Rmpfr_ui_div($r, 1, $x, $ROUND);
+        Math::MPFR::Rmpfr_acosh($r, $r, $ROUND);
+        return $r;
 
         # asech(x) = acosh(1/x)
-        elsif ($sig eq q(Math::MPC)) {
-            my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
-            Math::MPC::Rmpc_ui_div($r, 1, $x, $ROUND);
-            Math::MPC::Rmpc_acosh($r, $r, $ROUND);
-            $r;
-        }
+      Math_MPC:
+        my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
+        Math::MPC::Rmpc_ui_div($r, 1, $x, $ROUND);
+        Math::MPC::Rmpc_acosh($r, $r, $ROUND);
+        return $r;
     }
 
     sub asech {
@@ -3083,21 +2954,19 @@ package Sidef::Types::Number::Number {
 
     sub __csc__ {
         my ($x) = @_;
-        my $sig = ref($x);
+        goto(ref($x) =~ tr/:/_/rs);
 
-        if ($sig eq q(Math::MPFR)) {
-            my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-            Math::MPFR::Rmpfr_csc($r, $x, $ROUND);
-            $r;
-        }
+      Math_MPFR:
+        my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        Math::MPFR::Rmpfr_csc($r, $x, $ROUND);
+        return $r;
 
         # csc(x) = 1/sin(x)
-        elsif ($sig eq q(Math::MPC)) {
-            my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
-            Math::MPC::Rmpc_sin($r, $x, $ROUND);
-            Math::MPC::Rmpc_ui_div($r, 1, $r, $ROUND);
-            $r;
-        }
+      Math_MPC:
+        my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
+        Math::MPC::Rmpc_sin($r, $x, $ROUND);
+        Math::MPC::Rmpc_ui_div($r, 1, $r, $ROUND);
+        return $r;
     }
 
     sub csc {
@@ -3107,21 +2976,19 @@ package Sidef::Types::Number::Number {
 
     sub __csch__ {
         my ($x) = @_;
-        my $sig = ref($x);
+        goto(ref($x) =~ tr/:/_/rs);
 
-        if ($sig eq q(Math::MPFR)) {
-            my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-            Math::MPFR::Rmpfr_csch($r, $x, $ROUND);
-            $r;
-        }
+      Math_MPFR:
+        my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        Math::MPFR::Rmpfr_csch($r, $x, $ROUND);
+        return $r;
 
         # csch(x) = 1/sinh(x)
-        elsif ($sig eq q(Math::MPC)) {
-            my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
-            Math::MPC::Rmpc_sinh($r, $x, $ROUND);
-            Math::MPC::Rmpc_ui_div($r, 1, $r, $ROUND);
-            $r;
-        }
+      Math_MPC:
+        my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
+        Math::MPC::Rmpc_sinh($r, $x, $ROUND);
+        Math::MPC::Rmpc_ui_div($r, 1, $r, $ROUND);
+        return $r;
     }
 
     sub csch {
@@ -3131,31 +2998,29 @@ package Sidef::Types::Number::Number {
 
     sub __acsc__ {
         my ($x) = @_;
-        my $sig = ref($x);
+        goto(ref($x) =~ tr/:/_/rs);
 
         # acsc(x) = asin(1/x)
-        if ($sig eq q(Math::MPFR)) {
+      Math_MPFR:
 
-            # Return a complex number for x > -1 and x < 1
-            if (    Math::MPFR::Rmpfr_cmp_ui($x, 1) < 0
-                and Math::MPFR::Rmpfr_cmp_si($x, -1) > 0) {
-                (@_) = _mpfr2mpc($x);
-                goto __SUB__;
-            }
-
-            my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-            Math::MPFR::Rmpfr_ui_div($r, 1, $x, $ROUND);
-            Math::MPFR::Rmpfr_asin($r, $r, $ROUND);
-            $r;
+        # Return a complex number for x > -1 and x < 1
+        if (    Math::MPFR::Rmpfr_cmp_ui($x, 1) < 0
+            and Math::MPFR::Rmpfr_cmp_si($x, -1) > 0) {
+            $x = _mpfr2mpc($x);
+            goto Math_MPC;
         }
+
+        my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        Math::MPFR::Rmpfr_ui_div($r, 1, $x, $ROUND);
+        Math::MPFR::Rmpfr_asin($r, $r, $ROUND);
+        return $r;
 
         # acsc(x) = asin(1/x)
-        elsif ($sig eq q(Math::MPC)) {
-            my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
-            Math::MPC::Rmpc_ui_div($r, 1, $x, $ROUND);
-            Math::MPC::Rmpc_asin($r, $r, $ROUND);
-            $r;
-        }
+      Math_MPC:
+        my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
+        Math::MPC::Rmpc_ui_div($r, 1, $x, $ROUND);
+        Math::MPC::Rmpc_asin($r, $r, $ROUND);
+        return $r;
     }
 
     sub acsc {
@@ -3165,23 +3030,21 @@ package Sidef::Types::Number::Number {
 
     sub __acsch__ {
         my ($x) = @_;
-        my $sig = ref($x);
+        goto(ref($x) =~ tr/:/_/rs);
 
         # acsch(x) = asinh(1/x)
-        if ($sig eq q(Math::MPFR)) {
-            my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-            Math::MPFR::Rmpfr_ui_div($r, 1, $x, $ROUND);
-            Math::MPFR::Rmpfr_asinh($r, $r, $ROUND);
-            $r;
-        }
+      Math_MPFR:
+        my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        Math::MPFR::Rmpfr_ui_div($r, 1, $x, $ROUND);
+        Math::MPFR::Rmpfr_asinh($r, $r, $ROUND);
+        return $r;
 
         # acsch(x) = asinh(1/x)
-        elsif ($sig eq q(Math::MPC)) {
-            my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
-            Math::MPC::Rmpc_ui_div($r, 1, $x, $ROUND);
-            Math::MPC::Rmpc_asinh($r, $r, $ROUND);
-            $r;
-        }
+      Math_MPC:
+        my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
+        Math::MPC::Rmpc_ui_div($r, 1, $x, $ROUND);
+        Math::MPC::Rmpc_asinh($r, $r, $ROUND);
+        return $r;
     }
 
     sub acsch {
@@ -3195,21 +3058,19 @@ package Sidef::Types::Number::Number {
 
     sub __cot__ {
         my ($x) = @_;
-        my $sig = ref($x);
+        goto(ref($x) =~ tr/:/_/rs);
 
-        if ($sig eq q(Math::MPFR)) {
-            my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-            Math::MPFR::Rmpfr_cot($r, $x, $ROUND);
-            $r;
-        }
+      Math_MPFR:
+        my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        Math::MPFR::Rmpfr_cot($r, $x, $ROUND);
+        return $r;
 
         # cot(x) = 1/tan(x)
-        elsif ($sig eq q(Math::MPC)) {
-            my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
-            Math::MPC::Rmpc_tan($r, $x, $ROUND);
-            Math::MPC::Rmpc_ui_div($r, 1, $r, $ROUND);
-            $r;
-        }
+      Math_MPC:
+        my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
+        Math::MPC::Rmpc_tan($r, $x, $ROUND);
+        Math::MPC::Rmpc_ui_div($r, 1, $r, $ROUND);
+        return $r;
     }
 
     sub cot {
@@ -3219,21 +3080,19 @@ package Sidef::Types::Number::Number {
 
     sub __coth__ {
         my ($x) = @_;
-        my $sig = ref($x);
+        goto(ref($x) =~ tr/:/_/rs);
 
-        if ($sig eq q(Math::MPFR)) {
-            my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-            Math::MPFR::Rmpfr_coth($r, $x, $ROUND);
-            $r;
-        }
+      Math_MPFR:
+        my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        Math::MPFR::Rmpfr_coth($r, $x, $ROUND);
+        return $r;
 
         # coth(x) = 1/tanh(x)
-        elsif ($sig eq q(Math::MPC)) {
-            my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
-            Math::MPC::Rmpc_tanh($r, $x, $ROUND);
-            Math::MPC::Rmpc_ui_div($r, 1, $r, $ROUND);
-            $r;
-        }
+      Math_MPC:
+        my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
+        Math::MPC::Rmpc_tanh($r, $x, $ROUND);
+        Math::MPC::Rmpc_ui_div($r, 1, $r, $ROUND);
+        return $r;
     }
 
     sub coth {
@@ -3243,23 +3102,21 @@ package Sidef::Types::Number::Number {
 
     sub __acot__ {
         my ($x) = @_;
-        my $sig = ref($x);
+        goto(ref($x) =~ tr/:/_/rs);
 
         # acot(x) = atan(1/x)
-        if ($sig eq q(Math::MPFR)) {
-            my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-            Math::MPFR::Rmpfr_ui_div($r, 1, $x, $ROUND);
-            Math::MPFR::Rmpfr_atan($r, $r, $ROUND);
-            $r;
-        }
+      Math_MPFR:
+        my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        Math::MPFR::Rmpfr_ui_div($r, 1, $x, $ROUND);
+        Math::MPFR::Rmpfr_atan($r, $r, $ROUND);
+        return $r;
 
         # acot(x) = atan(1/x)
-        elsif ($sig eq q(Math::MPC)) {
-            my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
-            Math::MPC::Rmpc_ui_div($r, 1, $x, $ROUND);
-            Math::MPC::Rmpc_atan($r, $r, $ROUND);
-            $r;
-        }
+      Math_MPC:
+        my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
+        Math::MPC::Rmpc_ui_div($r, 1, $x, $ROUND);
+        Math::MPC::Rmpc_atan($r, $r, $ROUND);
+        return $r;
     }
 
     sub acot {
@@ -3269,31 +3126,29 @@ package Sidef::Types::Number::Number {
 
     sub __acoth__ {
         my ($x) = @_;
-        my $sig = ref($x);
+        goto(ref($x) =~ tr/:/_/rs);
 
         # acoth(x) = atanh(1/x)
-        if ($sig eq q(Math::MPFR)) {
+      Math_MPFR:
 
-            # Return a complex number for x > -1 and x < 1
-            if (    Math::MPFR::Rmpfr_cmp_ui($x, 1) < 0
-                and Math::MPFR::Rmpfr_cmp_si($x, -1) > 0) {
-                (@_) = _mpfr2mpc($x);
-                goto __SUB__;
-            }
-
-            my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-            Math::MPFR::Rmpfr_ui_div($r, 1, $x, $ROUND);
-            Math::MPFR::Rmpfr_atanh($r, $r, $ROUND);
-            $r;
+        # Return a complex number for x > -1 and x < 1
+        if (    Math::MPFR::Rmpfr_cmp_ui($x, 1) < 0
+            and Math::MPFR::Rmpfr_cmp_si($x, -1) > 0) {
+            $x = _mpfr2mpc($x);
+            goto Math_MPC;
         }
+
+        my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        Math::MPFR::Rmpfr_ui_div($r, 1, $x, $ROUND);
+        Math::MPFR::Rmpfr_atanh($r, $r, $ROUND);
+        return $r;
 
         # acoth(x) = atanh(1/x)
-        elsif ($sig eq q(Math::MPC)) {
-            my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
-            Math::MPC::Rmpc_ui_div($r, 1, $x, $ROUND);
-            Math::MPC::Rmpc_atanh($r, $r, $ROUND);
-            $r;
-        }
+      Math_MPC:
+        my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
+        Math::MPC::Rmpc_ui_div($r, 1, $x, $ROUND);
+        Math::MPC::Rmpc_atanh($r, $r, $ROUND);
+        return $r;
     }
 
     sub acoth {
@@ -3303,29 +3158,28 @@ package Sidef::Types::Number::Number {
 
     sub __cis__ {
         my ($x) = @_;
-        my $sig = ref($x);
+        goto(ref($x) =~ tr/:/_/rs);
 
-        if ($sig eq q(Math::MPFR)) {
-            my $cos = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-            my $sin = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+      Math_MPFR:
+        my $cos = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        my $sin = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
 
-            Math::MPFR::Rmpfr_sin_cos($sin, $cos, $x, $ROUND);
+        Math::MPFR::Rmpfr_sin_cos($sin, $cos, $x, $ROUND);
 
-            my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
-            Math::MPC::Rmpc_set_fr_fr($r, $cos, $sin, $ROUND);
-            $r;
-        }
-        elsif ($sig eq q(Math::MPC)) {
-            my $cos = Math::MPC::Rmpc_init2(CORE::int($PREC));
-            my $sin = Math::MPC::Rmpc_init2(CORE::int($PREC));
+        my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
+        Math::MPC::Rmpc_set_fr_fr($r, $cos, $sin, $ROUND);
+        return $r;
 
-            Math::MPC::Rmpc_sin_cos($sin, $cos, $x, $ROUND, $ROUND);
+      Math_MPC:
+        my $cos = Math::MPC::Rmpc_init2(CORE::int($PREC));
+        my $sin = Math::MPC::Rmpc_init2(CORE::int($PREC));
 
-            Math::MPC::Rmpc_mul_i($sin, $sin, 1, $ROUND);
-            Math::MPC::Rmpc_add($cos, $cos, $sin, $ROUND);
+        Math::MPC::Rmpc_sin_cos($sin, $cos, $x, $ROUND, $ROUND);
 
-            $cos;
-        }
+        Math::MPC::Rmpc_mul_i($sin, $sin, 1, $ROUND);
+        Math::MPC::Rmpc_add($cos, $cos, $sin, $ROUND);
+
+        return $cos;
     }
 
     sub cis {
@@ -3335,25 +3189,23 @@ package Sidef::Types::Number::Number {
 
     sub __sin_cos__ {
         my ($x) = @_;
-        my $sig = ref($x);
+        goto(ref($x) =~ tr/:/_/rs);
 
-        if ($sig eq q(Math::MPFR)) {
-            my $cos = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-            my $sin = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+      Math_MPFR:
+        my $cos = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        my $sin = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
 
-            Math::MPFR::Rmpfr_sin_cos($sin, $cos, $x, $ROUND);
+        Math::MPFR::Rmpfr_sin_cos($sin, $cos, $x, $ROUND);
 
-            return ($sin, $cos);
-        }
+        return ($sin, $cos);
 
-        if ($sig eq q(Math::MPC)) {
-            my $cos = Math::MPC::Rmpc_init2(CORE::int($PREC));
-            my $sin = Math::MPC::Rmpc_init2(CORE::int($PREC));
+      Math_MPC:
+        my $cos = Math::MPC::Rmpc_init2(CORE::int($PREC));
+        my $sin = Math::MPC::Rmpc_init2(CORE::int($PREC));
 
-            Math::MPC::Rmpc_sin_cos($sin, $cos, $x, $ROUND, $ROUND);
+        Math::MPC::Rmpc_sin_cos($sin, $cos, $x, $ROUND, $ROUND);
 
-            return ($sin, $cos);
-        }
+        return ($sin, $cos);
     }
 
     sub sin_cos {
@@ -3368,72 +3220,70 @@ package Sidef::Types::Number::Number {
 
     sub __agm__ {
         my ($x, $y) = @_;
-        my $sig = join(' ', ref($x), ref($y));
+        goto(join('__', ref($x), ref($y)) =~ tr/:/_/rs);
 
-        if ($sig eq q(Math::MPFR Math::MPFR)) {
+      Math_MPFR__Math_MPFR:
+        if (   Math::MPFR::Rmpfr_sgn($x) < 0
+            or Math::MPFR::Rmpfr_sgn($y) < 0) {
+            ($x, $y) = (_mpfr2mpc($x), _mpfr2mpc($y));
+            goto Math_MPC__Math_MPC;
+        }
 
-            if (   Math::MPFR::Rmpfr_sgn($x) < 0
-                or Math::MPFR::Rmpfr_sgn($y) < 0) {
-                (@_) = (_mpfr2mpc($x), _mpfr2mpc($y));
-                goto __SUB__;
+        my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        Math::MPFR::Rmpfr_agm($r, $x, $y, $ROUND);
+        return $r;
+
+      Math_MPC__Math_MPC:
+
+        # agm(0,  x) = 0
+        Math::MPC::Rmpc_cmp_si_si($x, 0, 0) || return $x;
+
+        # agm(x, 0) = 0
+        Math::MPC::Rmpc_cmp_si_si($y, 0, 0) || return $y;
+
+        $PREC = CORE::int($PREC);
+
+        my $a0 = Math::MPC::Rmpc_init2($PREC);
+        my $g0 = Math::MPC::Rmpc_init2($PREC);
+
+        my $a1 = Math::MPC::Rmpc_init2($PREC);
+        my $g1 = Math::MPC::Rmpc_init2($PREC);
+
+        my $t = Math::MPC::Rmpc_init2($PREC);
+
+        Math::MPC::Rmpc_set($a0, $x, $ROUND);
+        Math::MPC::Rmpc_set($g0, $y, $ROUND);
+
+        my $count = 0;
+        {
+            Math::MPC::Rmpc_add($a1, $a0, $g0, $ROUND);
+            Math::MPC::Rmpc_div_2exp($a1, $a1, 1, $ROUND);
+
+            Math::MPC::Rmpc_mul($g1, $a0, $g0, $ROUND);
+            Math::MPC::Rmpc_add($t, $a0, $g0, $ROUND);
+            Math::MPC::Rmpc_sqr($t, $t, $ROUND);
+            Math::MPC::Rmpc_cmp_si_si($t, 0, 0) || return $t;
+            Math::MPC::Rmpc_div($g1, $g1, $t, $ROUND);
+            Math::MPC::Rmpc_sqrt($g1, $g1, $ROUND);
+            Math::MPC::Rmpc_add($t, $a0, $g0, $ROUND);
+            Math::MPC::Rmpc_mul($g1, $g1, $t, $ROUND);
+
+            if (Math::MPC::Rmpc_cmp($a0, $a1) and ++$count < $PREC) {
+                Math::MPC::Rmpc_set($a0, $a1, $ROUND);
+                Math::MPC::Rmpc_set($g0, $g1, $ROUND);
+                redo;
             }
-
-            my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-            Math::MPFR::Rmpfr_agm($r, $x, $y, $ROUND);
-            $r;
         }
-        elsif ($sig eq q(Math::MPC Math::MPC)) {    # both arguments are modified
 
-            # agm(0,  x) = 0
-            Math::MPC::Rmpc_cmp_si_si($x, 0, 0) || return $x;
+        return $g0;
 
-            # agm(x, 0) = 0
-            Math::MPC::Rmpc_cmp_si_si($y, 0, 0) || return $y;
+      Math_MPFR__Math_MPC:
+        $x = _mpfr2mpc($x);
+        goto Math_MPC__Math_MPC;
 
-            $PREC = CORE::int($PREC);
-
-            my $a0 = Math::MPC::Rmpc_init2($PREC);
-            my $g0 = Math::MPC::Rmpc_init2($PREC);
-
-            my $a1 = Math::MPC::Rmpc_init2($PREC);
-            my $g1 = Math::MPC::Rmpc_init2($PREC);
-
-            my $t = Math::MPC::Rmpc_init2($PREC);
-
-            Math::MPC::Rmpc_set($a0, $x, $ROUND);
-            Math::MPC::Rmpc_set($g0, $y, $ROUND);
-
-            my $count = 0;
-            {
-                Math::MPC::Rmpc_add($a1, $a0, $g0, $ROUND);
-                Math::MPC::Rmpc_div_2exp($a1, $a1, 1, $ROUND);
-
-                Math::MPC::Rmpc_mul($g1, $a0, $g0, $ROUND);
-                Math::MPC::Rmpc_add($t, $a0, $g0, $ROUND);
-                Math::MPC::Rmpc_sqr($t, $t, $ROUND);
-                Math::MPC::Rmpc_cmp_si_si($t, 0, 0) || return $t;
-                Math::MPC::Rmpc_div($g1, $g1, $t, $ROUND);
-                Math::MPC::Rmpc_sqrt($g1, $g1, $ROUND);
-                Math::MPC::Rmpc_add($t, $a0, $g0, $ROUND);
-                Math::MPC::Rmpc_mul($g1, $g1, $t, $ROUND);
-
-                if (Math::MPC::Rmpc_cmp($a0, $a1) and ++$count < $PREC) {
-                    Math::MPC::Rmpc_set($a0, $a1, $ROUND);
-                    Math::MPC::Rmpc_set($g0, $g1, $ROUND);
-                    redo;
-                }
-            }
-
-            $g0;
-        }
-        elsif ($sig eq q(Math::MPFR Math::MPC)) {
-            (@_) = (_mpfr2mpc($x), $y);
-            goto __SUB__;
-        }
-        elsif ($sig eq q(Math::MPC Math::MPFR)) {
-            (@_) = ($x, _mpfr2mpc($y));
-            goto __SUB__;
-        }
+      Math_MPC__Math_MPFR:
+        $y = _mpfr2mpc($y);
+        goto Math_MPC__Math_MPC;
     }
 
     sub agm {
@@ -3444,34 +3294,35 @@ package Sidef::Types::Number::Number {
 
     sub __hypot__ {
         my ($x, $y) = @_;
-        my $sig = join(' ', ref($x), ref($y));
 
         # hypot(x, y) = sqrt(x^2 + y^2)
-        if ($sig eq q(Math::MPFR Math::MPFR)) {
-            my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-            Math::MPFR::Rmpfr_hypot($r, $x, $y, $ROUND);
-            $r;
-        }
-        elsif ($sig eq q(Math::MPFR Math::MPC)) {
-            my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-            Math::MPC::Rmpc_abs($r, $y, $ROUND);
-            Math::MPFR::Rmpfr_hypot($r, $r, $x, $ROUND);
-            $r;
-        }
-        elsif ($sig eq q(Math::MPC Math::MPFR)) {
-            my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-            Math::MPC::Rmpc_abs($r, $x, $ROUND);
-            Math::MPFR::Rmpfr_hypot($r, $r, $y, $ROUND);
-            $r;
-        }
-        elsif ($sig eq q(Math::MPC Math::MPC)) {
-            my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-            Math::MPC::Rmpc_abs($r, $x, $ROUND);
-            my $t = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-            Math::MPC::Rmpc_abs($t, $y, $ROUND);
-            Math::MPFR::Rmpfr_hypot($r, $r, $t, $ROUND);
-            $r;
-        }
+
+        goto(join('__', ref($x), ref($y)) =~ tr/:/_/rs);
+
+      Math_MPFR__Math_MPFR:
+        my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        Math::MPFR::Rmpfr_hypot($r, $x, $y, $ROUND);
+        return $r;
+
+      Math_MPFR__Math_MPC:
+        my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        Math::MPC::Rmpc_abs($r, $y, $ROUND);
+        Math::MPFR::Rmpfr_hypot($r, $r, $x, $ROUND);
+        return $r;
+
+      Math_MPC__Math_MPFR:
+        my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        Math::MPC::Rmpc_abs($r, $x, $ROUND);
+        Math::MPFR::Rmpfr_hypot($r, $r, $y, $ROUND);
+        return $r;
+
+      Math_MPC__Math_MPC:
+        my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        Math::MPC::Rmpc_abs($r, $x, $ROUND);
+        my $t = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        Math::MPC::Rmpc_abs($t, $y, $ROUND);
+        Math::MPFR::Rmpfr_hypot($r, $r, $t, $ROUND);
+        return $r;
     }
 
     sub hypot {
@@ -3772,142 +3623,122 @@ package Sidef::Types::Number::Number {
 
     sub __eq__ {
         my ($x, $y) = @_;
-        my $sig = join(' ', ref($x), ref($y) || '$');
+
+        goto(join('__', ref($x), ref($y) || 'Scalar') =~ tr/:/_/rs);
 
         #
         ## MPFR
         #
-        if ($sig eq q(Math::MPFR Math::MPFR)) {
-            Math::MPFR::Rmpfr_equal_p($x, $y);
-        }
+      Math_MPFR__Math_MPFR:
+        return Math::MPFR::Rmpfr_equal_p($x, $y);
 
-        elsif ($sig eq q(Math::MPFR Math::GMPz)) {
-            Math::MPFR::Rmpfr_integer_p($x)
-              and Math::MPFR::Rmpfr_cmp_z($x, $y) == 0;
-        }
+      Math_MPFR__Math_GMPz:
+        return (Math::MPFR::Rmpfr_integer_p($x) and Math::MPFR::Rmpfr_cmp_z($x, $y) == 0);
 
-        elsif ($sig eq q(Math::MPFR Math::GMPq)) {
-            Math::MPFR::Rmpfr_number_p($x)
-              and Math::MPFR::Rmpfr_cmp_q($x, $y) == 0;
-        }
+      Math_MPFR__Math_GMPq:
+        return (Math::MPFR::Rmpfr_number_p($x) and Math::MPFR::Rmpfr_cmp_q($x, $y) == 0);
 
-        elsif ($sig eq q(Math::MPFR Math::MPC)) {
-            (@_) = (_mpfr2mpc($x), $y);
-            goto __SUB__;
-        }
+      Math_MPFR__Math_MPC:
+        $x = _mpfr2mpc($x);
+        goto Math_MPC__Math_MPC;
 
-        elsif ($sig eq q(Math::MPFR $)) {
-            Math::MPFR::Rmpfr_integer_p($x)
-              and (
-                   $y < 0
-                   ? Math::MPFR::Rmpfr_cmp_si($x, $y)
-                   : Math::MPFR::Rmpfr_cmp_ui($x, $y)
-                  ) == 0;
-        }
+      Math_MPFR__Scalar:
+        return (
+                Math::MPFR::Rmpfr_integer_p($x)
+                  and (
+                       $y < 0
+                       ? Math::MPFR::Rmpfr_cmp_si($x, $y)
+                       : Math::MPFR::Rmpfr_cmp_ui($x, $y)
+                  ) == 0
+               );
 
         #
         ## GMPq
         #
-        elsif ($sig eq q(Math::GMPq Math::GMPq)) {
-            Math::GMPq::Rmpq_equal($x, $y);
-        }
+      Math_GMPq__Math_GMPq:
+        return Math::GMPq::Rmpq_equal($x, $y);
 
-        elsif ($sig eq q(Math::GMPq Math::GMPz)) {
-            Math::GMPq::Rmpq_integer_p($x)
-              and Math::GMPq::Rmpq_cmp_z($x, $y) == 0;
-        }
+      Math_GMPq__Math_GMPz:
+        return (Math::GMPq::Rmpq_integer_p($x) and Math::GMPq::Rmpq_cmp_z($x, $y) == 0);
 
-        elsif ($sig eq q(Math::GMPq Math::MPFR)) {
-            Math::MPFR::Rmpfr_number_p($y)
-              and Math::MPFR::Rmpfr_cmp_q($y, $x) == 0;
-        }
+      Math_GMPq__Math_MPFR:
+        return (Math::MPFR::Rmpfr_number_p($y) and Math::MPFR::Rmpfr_cmp_q($y, $x) == 0);
 
-        elsif ($sig eq q(Math::GMPq Math::MPC)) {
-            (@_) = (_mpq2mpc($x), $y);
-            goto __SUB__;
-        }
+      Math_GMPq__Math_MPC:
+        $x = _mpq2mpc($x);
+        goto Math_MPC__Math_MPC;
 
-        elsif ($sig eq q(Math::GMPq $)) {
-            Math::GMPq::Rmpq_integer_p($x)
-              and (
-                   $y < 0
-                   ? Math::GMPq::Rmpq_cmp_si($x, $y, 1)
-                   : Math::GMPq::Rmpq_cmp_ui($x, $y, 1)
-                  ) == 0;
-        }
+      Math_GMPq__Scalar:
+        return (
+                Math::GMPq::Rmpq_integer_p($x)
+                  and (
+                       $y < 0
+                       ? Math::GMPq::Rmpq_cmp_si($x, $y, 1)
+                       : Math::GMPq::Rmpq_cmp_ui($x, $y, 1)
+                  ) == 0
+               );
 
         #
         ## GMPz
         #
-        elsif ($sig eq q(Math::GMPz Math::GMPz)) {
-            Math::GMPz::Rmpz_cmp($x, $y) == 0;
-        }
+      Math_GMPz__Math_GMPz:
+        return (Math::GMPz::Rmpz_cmp($x, $y) == 0);
 
-        elsif ($sig eq q(Math::GMPz Math::GMPq)) {
-            Math::GMPq::Rmpq_integer_p($y)
-              and Math::GMPq::Rmpq_cmp_z($y, $x) == 0;
-        }
+      Math_GMPz__Math_GMPq:
+        return (Math::GMPq::Rmpq_integer_p($y) and Math::GMPq::Rmpq_cmp_z($y, $x) == 0);
 
-        elsif ($sig eq q(Math::GMPz Math::MPFR)) {
-            Math::MPFR::Rmpfr_integer_p($y)
-              and Math::MPFR::Rmpfr_cmp_z($y, $x) == 0;
-        }
+      Math_GMPz__Math_MPFR:
+        return (Math::MPFR::Rmpfr_integer_p($y) and Math::MPFR::Rmpfr_cmp_z($y, $x) == 0);
 
-        elsif ($sig eq q(Math::GMPz Math::MPC)) {
-            (@_) = (_mpz2mpc($x), $y);
-            goto __SUB__;
-        }
+      Math_GMPz__Math_MPC:
+        $x = _mpz2mpc($x);
+        goto Math_MPC__Math_MPC;
 
-        elsif ($sig eq q(Math::GMPz $)) {
-            (
-             $y < 0
-             ? Math::GMPz::Rmpz_cmp_si($x, $y)
-             : Math::GMPz::Rmpz_cmp_ui($x, $y)
-            ) == 0;
-        }
+      Math_GMPz__Scalar:
+        return (
+                (
+                 $y < 0
+                 ? Math::GMPz::Rmpz_cmp_si($x, $y)
+                 : Math::GMPz::Rmpz_cmp_ui($x, $y)
+                ) == 0
+               );
 
         #
         ## MPC
         #
-        elsif ($sig eq q(Math::MPC Math::MPC)) {
+      Math_MPC__Math_MPC:
+        my $f1 = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        my $f2 = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
 
-            my $f1 = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-            my $f2 = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        Math::MPC::RMPC_RE($f1, $x);
+        Math::MPC::RMPC_RE($f2, $y);
 
-            Math::MPC::RMPC_RE($f1, $x);
-            Math::MPC::RMPC_RE($f2, $y);
+        Math::MPFR::Rmpfr_equal_p($f1, $f2) || return 0;
 
-            Math::MPFR::Rmpfr_equal_p($f1, $f2) || return 0;
+        Math::MPC::RMPC_IM($f1, $x);
+        Math::MPC::RMPC_IM($f2, $y);
 
-            Math::MPC::RMPC_IM($f1, $x);
-            Math::MPC::RMPC_IM($f2, $y);
+        return Math::MPFR::Rmpfr_equal_p($f1, $f2);
 
-            Math::MPFR::Rmpfr_equal_p($f1, $f2);
-        }
+      Math_MPC__Math_GMPz:
+        $y = _mpz2mpc($y);
+        goto Math_MPC__Math_MPC;
 
-        elsif ($sig eq q(Math::MPC Math::GMPz)) {
-            (@_) = ($x, _mpz2mpc($y));
-            goto __SUB__;
-        }
+      Math_MPC__Math_GMPq:
+        $y = _mpq2mpc($y);
+        goto Math_MPC__Math_MPC;
 
-        elsif ($sig eq q(Math::MPC Math::GMPq)) {
-            (@_) = ($x, _mpq2mpc($y));
-            goto __SUB__;
-        }
+      Math_MPC__Math_MPFR:
+        $y = _mpfr2mpc($y);
+        goto Math_MPC__Math_MPC;
 
-        elsif ($sig eq q(Math::MPC Math::MPFR)) {
-            (@_) = ($x, _mpfr2mpc($y));
-            goto __SUB__;
-        }
-
-        elsif ($sig eq q(Math::MPC $)) {
-            my $f = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-            Math::MPC::RMPC_IM($f, $x);
-            Math::MPFR::Rmpfr_zero_p($f) || return 0;
-            Math::MPC::RMPC_RE($f, $x);
-            (@_) = ($f, $y);
-            goto __SUB__;
-        }
+      Math_MPC__Scalar:
+        my $f = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        Math::MPC::RMPC_IM($f, $x);
+        Math::MPFR::Rmpfr_zero_p($f) || return 0;
+        Math::MPC::RMPC_RE($f, $x);
+        $x = $f;
+        goto Math_MPFR__Scalar;
     }
 
     sub eq {
@@ -3924,142 +3755,122 @@ package Sidef::Types::Number::Number {
     sub __ne__ {
         my ($x, $y) = @_;
 
-        my $sig = join(' ', ref($x), ref($y) || '$');
+        goto(join('__', ref($x), ref($y) || 'Scalar') =~ tr/:/_/rs);
 
         #
         ## MPFR
         #
-        if ($sig eq q(Math::MPFR Math::MPFR)) {
-            !Math::MPFR::Rmpfr_equal_p($x, $y);
-        }
+      Math_MPFR__Math_MPFR:
+        return !Math::MPFR::Rmpfr_equal_p($x, $y);
 
-        elsif ($sig eq q(Math::MPFR Math::GMPz)) {
-            !Math::MPFR::Rmpfr_integer_p($x)
-              or Math::MPFR::Rmpfr_cmp_z($x, $y) != 0;
-        }
+      Math_MPFR__Math_GMPz:
+        return (!Math::MPFR::Rmpfr_integer_p($x) or Math::MPFR::Rmpfr_cmp_z($x, $y) != 0);
 
-        elsif ($sig eq q(Math::MPFR Math::GMPq)) {
-            !Math::MPFR::Rmpfr_number_p($x)
-              or Math::MPFR::Rmpfr_cmp_q($x, $y) != 0;
-        }
+      Math_MPFR__Math_GMPq:
+        return (!Math::MPFR::Rmpfr_number_p($x) or Math::MPFR::Rmpfr_cmp_q($x, $y) != 0);
 
-        elsif ($sig eq q(Math::MPFR Math::MPC)) {
-            (@_) = (_mpfr2mpc($x), $y);
-            goto __SUB__;
-        }
+      Math_MPFR__Math_MPC:
+        $x = _mpfr2mpc($x);
+        goto Math_MPC__Math_MPC;
 
-        elsif ($sig eq q(Math::MPFR $)) {
-            !Math::MPFR::Rmpfr_integer_p($x)
-              or (
-                  $y < 0
-                  ? Math::MPFR::Rmpfr_cmp_si($x, $y)
-                  : Math::MPFR::Rmpfr_cmp_ui($x, $y)
-                 ) != 0;
-        }
+      Math_MPFR__Scalar:
+        return (
+                !Math::MPFR::Rmpfr_integer_p($x)
+                  or (
+                      $y < 0
+                      ? Math::MPFR::Rmpfr_cmp_si($x, $y)
+                      : Math::MPFR::Rmpfr_cmp_ui($x, $y)
+                  ) != 0
+               );
 
         #
         ## GMPq
         #
-        elsif ($sig eq q(Math::GMPq Math::GMPq)) {
-            !Math::GMPq::Rmpq_equal($x, $y);
-        }
+      Math_GMPq__Math_GMPq:
+        return !Math::GMPq::Rmpq_equal($x, $y);
 
-        elsif ($sig eq q(Math::GMPq Math::GMPz)) {
-            !Math::GMPq::Rmpq_integer_p($x)
-              or Math::GMPq::Rmpq_cmp_z($x, $y) != 0;
-        }
+      Math_GMPq__Math_GMPz:
+        return (!Math::GMPq::Rmpq_integer_p($x) or Math::GMPq::Rmpq_cmp_z($x, $y) != 0);
 
-        elsif ($sig eq q(Math::GMPq Math::MPFR)) {
-            !Math::MPFR::Rmpfr_number_p($y)
-              or Math::MPFR::Rmpfr_cmp_q($y, $x) != 0;
-        }
+      Math_GMPq__Math_MPFR:
+        return (!Math::MPFR::Rmpfr_number_p($y) or Math::MPFR::Rmpfr_cmp_q($y, $x) != 0);
 
-        elsif ($sig eq q(Math::GMPq Math::MPC)) {
-            (@_) = (_mpq2mpc($x), $y);
-            goto __SUB__;
-        }
+      Math_GMPq__Math_MPC:
+        $x = _mpq2mpc($x);
+        goto Math_MPC__Math_MPC;
 
-        elsif ($sig eq q(Math::GMPq $)) {
-            !Math::GMPq::Rmpq_integer_p($x)
-              or (
-                  $y < 0
-                  ? Math::GMPq::Rmpq_cmp_si($x, $y, 1)
-                  : Math::GMPq::Rmpq_cmp_ui($x, $y, 1)
-                 ) != 0;
-        }
+      Math_GMPq__Scalar:
+        return (
+                !Math::GMPq::Rmpq_integer_p($x)
+                  or (
+                      $y < 0
+                      ? Math::GMPq::Rmpq_cmp_si($x, $y, 1)
+                      : Math::GMPq::Rmpq_cmp_ui($x, $y, 1)
+                  ) != 0
+               );
 
         #
         ## GMPz
         #
-        elsif ($sig eq q(Math::GMPz Math::GMPz)) {
-            Math::GMPz::Rmpz_cmp($x, $y) != 0;
-        }
+      Math_GMPz__Math_GMPz:
+        return (Math::GMPz::Rmpz_cmp($x, $y) != 0);
 
-        elsif ($sig eq q(Math::GMPz Math::GMPq)) {
-            !Math::GMPq::Rmpq_integer_p($y)
-              or Math::GMPq::Rmpq_cmp_z($y, $x) != 0;
-        }
+      Math_GMPz__Math_GMPq:
+        return (!Math::GMPq::Rmpq_integer_p($y) or Math::GMPq::Rmpq_cmp_z($y, $x) != 0);
 
-        elsif ($sig eq q(Math::GMPz Math::MPFR)) {
-            !Math::MPFR::Rmpfr_integer_p($y)
-              or Math::MPFR::Rmpfr_cmp_z($y, $x) != 0;
-        }
+      Math_GMPz__Math_MPFR:
+        return (!Math::MPFR::Rmpfr_integer_p($y) or Math::MPFR::Rmpfr_cmp_z($y, $x) != 0);
 
-        elsif ($sig eq q(Math::GMPz Math::MPC)) {
-            (@_) = (_mpz2mpc($x), $y);
-            goto __SUB__;
-        }
+      Math_GMPz__Math_MPC:
+        $x = _mpz2mpc($x);
+        goto Math_MPC__Math_MPC;
 
-        elsif ($sig eq q(Math::GMPz $)) {
-            (
-             $y < 0
-             ? Math::GMPz::Rmpz_cmp_si($x, $y)
-             : Math::GMPz::Rmpz_cmp_ui($x, $y)
-            ) != 0;
-        }
+      Math_GMPz__Scalar:
+        return (
+                (
+                 $y < 0
+                 ? Math::GMPz::Rmpz_cmp_si($x, $y)
+                 : Math::GMPz::Rmpz_cmp_ui($x, $y)
+                ) != 0
+               );
 
         #
         ## MPC
         #
-        elsif ($sig eq q(Math::MPC Math::MPC)) {
+      Math_MPC__Math_MPC:
 
-            my $f1 = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-            my $f2 = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        my $f1 = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        my $f2 = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
 
-            Math::MPC::RMPC_RE($f1, $x);
-            Math::MPC::RMPC_RE($f2, $y);
+        Math::MPC::RMPC_RE($f1, $x);
+        Math::MPC::RMPC_RE($f2, $y);
 
-            Math::MPFR::Rmpfr_equal_p($f1, $f2) || return 1;
+        Math::MPFR::Rmpfr_equal_p($f1, $f2) || return 1;
 
-            Math::MPC::RMPC_IM($f1, $x);
-            Math::MPC::RMPC_IM($f2, $y);
+        Math::MPC::RMPC_IM($f1, $x);
+        Math::MPC::RMPC_IM($f2, $y);
 
-            !Math::MPFR::Rmpfr_equal_p($f1, $f2);
-        }
+        return !Math::MPFR::Rmpfr_equal_p($f1, $f2);
 
-        elsif ($sig eq q(Math::MPC Math::GMPz)) {
-            (@_) = ($x, _mpz2mpc($y));
-            goto __SUB__;
-        }
+      Math_MPC__Math_GMPz:
+        $y = _mpz2mpc($y);
+        goto Math_MPC__Math_MPC;
 
-        elsif ($sig eq q(Math::MPC Math::GMPq)) {
-            (@_) = ($x, _mpq2mpc($y));
-            goto __SUB__;
-        }
+      Math_MPC__Math_GMPq:
+        $y = _mpq2mpc($y);
+        goto Math_MPC__Math_MPC;
 
-        elsif ($sig eq q(Math::MPC Math::MPFR)) {
-            (@_) = ($x, _mpfr2mpc($y));
-            goto __SUB__;
-        }
+      Math_MPC__Math_MPFR:
+        $y = _mpfr2mpc($y);
+        goto Math_MPC__Math_MPC;
 
-        elsif ($sig eq q(Math::MPC $)) {
-            my $f = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-            Math::MPC::RMPC_IM($f, $x);
-            Math::MPFR::Rmpfr_zero_p($f) || return 1;
-            Math::MPC::RMPC_RE($f, $x);
-            (@_) = ($f, $y);
-            goto __SUB__;
-        }
+      Math_MPC__Scalar:
+        my $f = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        Math::MPC::RMPC_IM($f, $x);
+        Math::MPFR::Rmpfr_zero_p($f) || return 1;
+        Math::MPC::RMPC_RE($f, $x);
+        $x = $f;
+        goto Math_MPFR__Scalar;
     }
 
     sub ne {
@@ -4075,141 +3886,126 @@ package Sidef::Types::Number::Number {
 
     sub __cmp__ {
         my ($x, $y) = @_;
-        my $sig = join(' ', ref($x), ref($y) || '$');
+
+        goto(join('__', ref($x), ref($y) || 'Scalar') =~ tr/:/_/rs);
 
         #
         ## MPFR
         #
-        if ($sig eq q(Math::MPFR Math::MPFR)) {
-
-            if (   Math::MPFR::Rmpfr_nan_p($x)
-                or Math::MPFR::Rmpfr_nan_p($y)) {
-                return undef;
-            }
-
-            Math::MPFR::Rmpfr_cmp($x, $y);
+      Math_MPFR__Math_MPFR:
+        if (   Math::MPFR::Rmpfr_nan_p($x)
+            or Math::MPFR::Rmpfr_nan_p($y)) {
+            return undef;
         }
 
-        elsif ($sig eq q(Math::MPFR Math::GMPz)) {
-            Math::MPFR::Rmpfr_nan_p($x) && return undef;
-            Math::MPFR::Rmpfr_cmp_z($x, $y);
-        }
+        return Math::MPFR::Rmpfr_cmp($x, $y);
 
-        elsif ($sig eq q(Math::MPFR Math::GMPq)) {
-            Math::MPFR::Rmpfr_nan_p($x) && return undef;
-            Math::MPFR::Rmpfr_cmp_q($x, $y);
-        }
+      Math_MPFR__Math_GMPz:
+        Math::MPFR::Rmpfr_nan_p($x) && return undef;
+        return Math::MPFR::Rmpfr_cmp_z($x, $y);
 
-        elsif ($sig eq q(Math::MPFR Math::MPC)) {
-            (@_) = (_mpfr2mpc($x), $y);
-            goto __SUB__;
-        }
+      Math_MPFR__Math_GMPq:
+        Math::MPFR::Rmpfr_nan_p($x) && return undef;
+        return Math::MPFR::Rmpfr_cmp_q($x, $y);
 
-        elsif ($sig eq q(Math::MPFR $)) {
-            Math::MPFR::Rmpfr_nan_p($x) && return undef;
-            $y < 0
-              ? Math::MPFR::Rmpfr_cmp_si($x, $y)
-              : Math::MPFR::Rmpfr_cmp_ui($x, $y);
-        }
+      Math_MPFR__Math_MPC:
+        $x = _mpfr2mpc($x);
+        goto Math_MPC__Math_MPC;
+
+      Math_MPFR__Scalar:
+        Math::MPFR::Rmpfr_nan_p($x) && return undef;
+        return (
+                $y < 0
+                ? Math::MPFR::Rmpfr_cmp_si($x, $y)
+                : Math::MPFR::Rmpfr_cmp_ui($x, $y)
+               );
 
         #
         ## GMPq
         #
-        elsif ($sig eq q(Math::GMPq Math::GMPq)) {
-            Math::GMPq::Rmpq_cmp($x, $y);
-        }
+      Math_GMPq__Math_GMPq:
+        return Math::GMPq::Rmpq_cmp($x, $y);
 
-        elsif ($sig eq q(Math::GMPq Math::GMPz)) {
-            Math::GMPq::Rmpq_cmp_z($x, $y);
-        }
+      Math_GMPq__Math_GMPz:
+        return Math::GMPq::Rmpq_cmp_z($x, $y);
 
-        elsif ($sig eq q(Math::GMPq Math::MPFR)) {
-            Math::MPFR::Rmpfr_nan_p($y) && return undef;
-            -(Math::MPFR::Rmpfr_cmp_q($y, $x));
-        }
+      Math_GMPq__Math_MPFR:
+        Math::MPFR::Rmpfr_nan_p($y) && return undef;
+        return -(Math::MPFR::Rmpfr_cmp_q($y, $x));
 
-        elsif ($sig eq q(Math::GMPq Math::MPC)) {
-            (@_) = (_mpq2mpc($x), $y);
-            goto __SUB__;
-        }
+      Math_GMPq__Math_MPC:
+        $x = _mpq2mpc($x);
+        goto Math_MPC__Math_MPC;
 
-        elsif ($sig eq q(Math::GMPq $)) {
-            $y < 0
-              ? Math::GMPq::Rmpq_cmp_si($x, $y, 1)
-              : Math::GMPq::Rmpq_cmp_ui($x, $y, 1);
-        }
+      Math_GMPq__Scalar:
+        return (
+                $y < 0
+                ? Math::GMPq::Rmpq_cmp_si($x, $y, 1)
+                : Math::GMPq::Rmpq_cmp_ui($x, $y, 1)
+               );
 
         #
         ## GMPz
         #
-        elsif ($sig eq q(Math::GMPz Math::GMPz)) {
-            Math::GMPz::Rmpz_cmp($x, $y);
-        }
+      Math_GMPz__Math_GMPz:
+        return Math::GMPz::Rmpz_cmp($x, $y);
 
-        elsif ($sig eq q(Math::GMPz Math::GMPq)) {
-            -(Math::GMPq::Rmpq_cmp_z($y, $x));
-        }
+      Math_GMPz__Math_GMPq:
+        return -(Math::GMPq::Rmpq_cmp_z($y, $x));
 
-        elsif ($sig eq q(Math::GMPz Math::MPFR)) {
-            Math::MPFR::Rmpfr_nan_p($y) && return undef;
-            -(Math::MPFR::Rmpfr_cmp_z($y, $x));
-        }
+      Math_GMPz__Math_MPFR:
+        Math::MPFR::Rmpfr_nan_p($y) && return undef;
+        return -(Math::MPFR::Rmpfr_cmp_z($y, $x));
 
-        elsif ($sig eq q(Math::GMPz Math::MPC)) {
-            (@_) = (_mpz2mpc($x), $y);
-            goto __SUB__;
-        }
+      Math_GMPz__Math_MPC:
+        $x = _mpz2mpc($x);
+        goto Math_MPC__Math_MPC;
 
-        elsif ($sig eq q(Math::GMPz $)) {
-            $y < 0
-              ? Math::GMPz::Rmpz_cmp_si($x, $y)
-              : Math::GMPz::Rmpz_cmp_ui($x, $y);
-        }
+      Math_GMPz__Scalar:
+        return (
+                $y < 0
+                ? Math::GMPz::Rmpz_cmp_si($x, $y)
+                : Math::GMPz::Rmpz_cmp_ui($x, $y)
+               );
 
         #
         ## MPC
         #
-        elsif ($sig eq q(Math::MPC Math::MPC)) {
+      Math_MPC__Math_MPC:
+        my $f = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
 
-            my $f = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        Math::MPC::RMPC_RE($f, $x);
+        Math::MPFR::Rmpfr_nan_p($f) && return undef;
 
-            Math::MPC::RMPC_RE($f, $x);
-            Math::MPFR::Rmpfr_nan_p($f) && return undef;
+        Math::MPC::RMPC_RE($f, $y);
+        Math::MPFR::Rmpfr_nan_p($f) && return undef;
 
-            Math::MPC::RMPC_RE($f, $y);
-            Math::MPFR::Rmpfr_nan_p($f) && return undef;
+        Math::MPC::RMPC_IM($f, $x);
+        Math::MPFR::Rmpfr_nan_p($f) && return undef;
 
-            Math::MPC::RMPC_IM($f, $x);
-            Math::MPFR::Rmpfr_nan_p($f) && return undef;
+        Math::MPC::RMPC_IM($f, $y);
+        Math::MPFR::Rmpfr_nan_p($f) && return undef;
 
-            Math::MPC::RMPC_IM($f, $y);
-            Math::MPFR::Rmpfr_nan_p($f) && return undef;
+        my $si = Math::MPC::Rmpc_cmp($x, $y);
+        my $re_cmp = Math::MPC::RMPC_INEX_RE($si);
+        $re_cmp == 0 or return $re_cmp;
+        Math::MPC::RMPC_INEX_IM($si);
 
-            my $si = Math::MPC::Rmpc_cmp($x, $y);
-            my $re_cmp = Math::MPC::RMPC_INEX_RE($si);
-            $re_cmp == 0 or return $re_cmp;
-            Math::MPC::RMPC_INEX_IM($si);
-        }
+      Math_MPC__Math_GMPz:
+        $y = _mpz2mpc($y);
+        goto Math_MPC__Math_MPC;
 
-        elsif ($sig eq q(Math::MPC Math::GMPz)) {
-            (@_) = ($x, _mpz2mpc($y));
-            goto __SUB__;
-        }
+      Math_MPC__Math_GMPq:
+        $y = _mpq2mpc($y);
+        goto Math_MPC__Math_MPC;
 
-        elsif ($sig eq q(Math::MPC Math::GMPq)) {
-            (@_) = ($x, _mpq2mpc($y));
-            goto __SUB__;
-        }
+      Math_MPC__Math_MPFR:
+        $y = _mpfr2mpc($y);
+        goto Math_MPC__Math_MPC;
 
-        elsif ($sig eq q(Math::MPC Math::MPFR)) {
-            (@_) = ($x, _mpfr2mpc($y));
-            goto __SUB__;
-        }
-
-        elsif ($sig eq q(Math::MPC $)) {
-            (@_) = ($x, _any2mpc(_str2obj($y)));
-            goto __SUB__;
-        }
+      Math_MPC__Scalar:
+        $y = _any2mpc(_str2obj($y));
+        goto Math_MPC__Math_MPC;
     }
 
     sub cmp {
@@ -4294,29 +4090,28 @@ package Sidef::Types::Number::Number {
 
     sub __sgn__ {
         my ($x) = @_;
-        my $sig = ref($x);
+        goto(ref($x) =~ tr/:/_/rs);
 
-        if ($sig eq q(Math::MPFR)) {
-            goto &Math::MPFR::Rmpfr_sgn;
-        }
-        elsif ($sig eq q(Math::GMPq)) {
-            goto &Math::GMPq::Rmpq_sgn;
-        }
-        elsif ($sig eq q(Math::GMPz)) {
-            goto &Math::GMPz::Rmpz_sgn;
-        }
-        elsif ($sig eq q(Math::MPC)) {
-            my $abs = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-            Math::MPC::Rmpc_abs($abs, $x, $ROUND);
+      Math_MPFR:
+        goto &Math::MPFR::Rmpfr_sgn;
 
-            if (Math::MPFR::Rmpfr_zero_p($abs)) {    # it's zero
-                return 0;
-            }
+      Math_GMPq:
+        goto &Math::GMPq::Rmpq_sgn;
 
-            my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
-            Math::MPC::Rmpc_div_fr($r, $x, $abs, $ROUND);
-            $r;
+      Math_GMPz:
+        goto &Math::GMPz::Rmpz_sgn;
+
+      Math_MPC:
+        my $abs = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        Math::MPC::Rmpc_abs($abs, $x, $ROUND);
+
+        if (Math::MPFR::Rmpfr_zero_p($abs)) {    # it's zero
+            return 0;
         }
+
+        my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
+        Math::MPC::Rmpc_div_fr($r, $x, $abs, $ROUND);
+        return $r;
     }
 
     sub sign {
@@ -4551,26 +4346,25 @@ package Sidef::Types::Number::Number {
 
     sub __base__ {
         my ($x, $base) = @_;
-        my $sig = ref($x);
+        goto(ref($x) =~ tr/:/_/rs);
 
-        if ($sig eq 'Math::GMPz') {
-            Math::GMPz::Rmpz_get_str($x, $base);
-        }
-        elsif ($sig eq 'Math::GMPq') {
-            Math::GMPq::Rmpq_get_str($x, $base);
-        }
-        elsif ($sig eq 'Math::MPFR') {
-            Math::MPFR::Rmpfr_get_str($x, $base, CORE::int($PREC) >> 2, $ROUND);
-        }
-        elsif ($sig eq 'Math::MPC') {
-            my $fr = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-            Math::MPC::RMPC_RE($fr, $x);
-            my $real = __base__($fr, $base);
-            Math::MPC::RMPC_IM($fr, $x);
-            return $real if Math::MPFR::Rmpfr_zero_p($fr);
-            my $imag = __base__($fr, $base);
-            "($real $imag)";
-        }
+      Math_GMPz:
+        return Math::GMPz::Rmpz_get_str($x, $base);
+
+      Math_GMPq:
+        return Math::GMPq::Rmpq_get_str($x, $base);
+
+      Math_MPFR:
+        return Math::MPFR::Rmpfr_get_str($x, $base, CORE::int($PREC) >> 2, $ROUND);
+
+      Math_MPC:
+        my $fr = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        Math::MPC::RMPC_RE($fr, $x);
+        my $real = __base__($fr, $base);
+        Math::MPC::RMPC_IM($fr, $x);
+        return $real if Math::MPFR::Rmpfr_zero_p($fr);
+        my $imag = __base__($fr, $base);
+        return "($real $imag)";
     }
 
     sub base {
@@ -4585,7 +4379,7 @@ package Sidef::Types::Number::Number {
             }
         }
 
-        Sidef::Types::String::String->new(__base__($$x, $base));
+        Sidef::Types::String::String->new(($base == 10) ? __stringify__($$x) : __base__($$x, $base));
     }
 
     *in_base = \&base;
@@ -4701,42 +4495,37 @@ package Sidef::Types::Number::Number {
 
     sub __floor__ {
         my ($x) = @_;
+        goto(ref($x) =~ tr/:/_/rs);
 
-        my $sig = ref($x);
+      Math_MPFR:
+        my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        Math::MPFR::Rmpfr_floor($r, $x);
+        return $r;
 
-        if ($sig eq q(Math::MPFR)) {
-            my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-            Math::MPFR::Rmpfr_floor($r, $x);
-            $r;
+      Math_GMPq:
+        my $r = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_set_q($r, $x);
+        Math::GMPq::Rmpq_integer_p($x) && return $r;
+        Math::GMPz::Rmpz_sub_ui($r, $r, 1) if Math::GMPq::Rmpq_sgn($x) < 0;
+        return $r;
+
+      Math_MPC:
+        my $real = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        my $imag = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+
+        Math::MPC::RMPC_RE($real, $x);
+        Math::MPC::RMPC_IM($imag, $x);
+
+        Math::MPFR::Rmpfr_floor($real, $real);
+        Math::MPFR::Rmpfr_floor($imag, $imag);
+
+        if (Math::MPFR::Rmpfr_zero_p($imag)) {
+            return $real;
         }
 
-        elsif ($sig eq q(Math::GMPq)) {
-            my $r = Math::GMPz::Rmpz_init();
-            Math::GMPz::Rmpz_set_q($r, $x);
-            Math::GMPq::Rmpq_integer_p($x) && return $r;
-            Math::GMPz::Rmpz_sub_ui($r, $r, 1) if Math::GMPq::Rmpq_sgn($x) < 0;
-            $r;
-        }
-
-        elsif ($sig eq q(Math::MPC)) {
-
-            my $real = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-            my $imag = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-
-            Math::MPC::RMPC_RE($real, $x);
-            Math::MPC::RMPC_IM($imag, $x);
-
-            Math::MPFR::Rmpfr_floor($real, $real);
-            Math::MPFR::Rmpfr_floor($imag, $imag);
-
-            if (Math::MPFR::Rmpfr_zero_p($imag)) {
-                return $real;
-            }
-
-            my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
-            Math::MPC::Rmpc_set_fr_fr($r, $real, $imag, $ROUND);
-            $r;
-        }
+        my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
+        Math::MPC::Rmpc_set_fr_fr($r, $real, $imag, $ROUND);
+        return $r;
     }
 
     sub floor {
@@ -4747,42 +4536,37 @@ package Sidef::Types::Number::Number {
 
     sub __ceil__ {
         my ($x) = @_;
+        goto(ref($x) =~ tr/:/_/rs);
 
-        my $sig = ref($x);
+      Math_MPFR:
+        my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        Math::MPFR::Rmpfr_ceil($r, $x);
+        return $r;
 
-        if ($sig eq q(Math::MPFR)) {
-            my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-            Math::MPFR::Rmpfr_ceil($r, $x);
-            $r;
+      Math_GMPq:
+        my $r = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_set_q($r, $x);
+        Math::GMPq::Rmpq_integer_p($x) && return $r;
+        Math::GMPz::Rmpz_add_ui($r, $r, 1) if Math::GMPq::Rmpq_sgn($x) > 0;
+        return $r;
+
+      Math_MPC:
+        my $real = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        my $imag = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+
+        Math::MPC::RMPC_RE($real, $x);
+        Math::MPC::RMPC_IM($imag, $x);
+
+        Math::MPFR::Rmpfr_ceil($real, $real);
+        Math::MPFR::Rmpfr_ceil($imag, $imag);
+
+        if (Math::MPFR::Rmpfr_zero_p($imag)) {
+            return $real;
         }
 
-        elsif ($sig eq q(Math::GMPq)) {
-            my $r = Math::GMPz::Rmpz_init();
-            Math::GMPz::Rmpz_set_q($r, $x);
-            Math::GMPq::Rmpq_integer_p($x) && return $r;
-            Math::GMPz::Rmpz_add_ui($r, $r, 1) if Math::GMPq::Rmpq_sgn($x) > 0;
-            $r;
-        }
-
-        elsif ($sig eq q(Math::MPC)) {
-
-            my $real = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-            my $imag = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-
-            Math::MPC::RMPC_RE($real, $x);
-            Math::MPC::RMPC_IM($imag, $x);
-
-            Math::MPFR::Rmpfr_ceil($real, $real);
-            Math::MPFR::Rmpfr_ceil($imag, $imag);
-
-            if (Math::MPFR::Rmpfr_zero_p($imag)) {
-                return $real;
-            }
-
-            my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
-            Math::MPC::Rmpc_set_fr_fr($r, $real, $imag, $ROUND);
-            $r;
-        }
+        my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
+        Math::MPC::Rmpc_set_fr_fr($r, $real, $imag, $ROUND);
+        return $r;
     }
 
     sub ceil {
@@ -4793,33 +4577,28 @@ package Sidef::Types::Number::Number {
 
     sub __inc__ {
         my ($x) = @_;
+        goto(ref($x) =~ tr/:/_/rs);
 
-        my $sig = ref($x);
+      Math_GMPz:
+        my $r = Math::GMPz::Rmpz_init_set($x);
+        Math::GMPz::Rmpz_add_ui($r, $r, 1);
+        return $r;
 
-        if ($sig eq q(Math::GMPz)) {
-            my $r = Math::GMPz::Rmpz_init_set($x);
-            Math::GMPz::Rmpz_add_ui($r, $r, 1);
-            $r;
-        }
+      Math_MPFR:
+        my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        Math::MPFR::Rmpfr_add_ui($r, $x, 1, $ROUND);
+        return $r;
 
-        elsif ($sig eq q(Math::MPFR)) {
-            my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-            Math::MPFR::Rmpfr_add_ui($r, $x, 1, $ROUND);
-            $r;
-        }
+      Math_GMPq:
+        state $one = Math::GMPz::Rmpz_init_set_ui_nobless(1);
+        my $r = Math::GMPq::Rmpq_init();
+        Math::GMPq::Rmpq_add_z($r, $x, $one);
+        return $r;
 
-        elsif ($sig eq q(Math::GMPq)) {
-            state $one = Math::GMPz::Rmpz_init_set_ui_nobless(1);
-            my $r = Math::GMPq::Rmpq_init();
-            Math::GMPq::Rmpq_add_z($r, $x, $one);
-            $r;
-        }
-
-        elsif ($sig eq q(Math::MPC)) {
-            my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
-            Math::MPC::Rmpc_add_ui($r, $x, 1, $ROUND);
-            $r;
-        }
+      Math_MPC:
+        my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
+        Math::MPC::Rmpc_add_ui($r, $x, 1, $ROUND);
+        return $r;
     }
 
     sub inc {
@@ -4829,33 +4608,28 @@ package Sidef::Types::Number::Number {
 
     sub __dec__ {
         my ($x) = @_;
+        goto(ref($x) =~ tr/:/_/rs);
 
-        my $sig = ref($x);
+      Math_GMPz:
+        my $r = Math::GMPz::Rmpz_init_set($x);
+        Math::GMPz::Rmpz_sub_ui($r, $r, 1);
+        return $r;
 
-        if ($sig eq q(Math::GMPz)) {
-            my $r = Math::GMPz::Rmpz_init_set($x);
-            Math::GMPz::Rmpz_sub_ui($r, $r, 1);
-            $r;
-        }
+      Math_MPFR:
+        my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        Math::MPFR::Rmpfr_sub_ui($r, $x, 1, $ROUND);
+        return $r;
 
-        elsif ($sig eq q(Math::MPFR)) {
-            my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-            Math::MPFR::Rmpfr_sub_ui($r, $x, 1, $ROUND);
-            $r;
-        }
+      Math_GMPq:
+        state $mone = Math::GMPz::Rmpz_init_set_si_nobless(-1);
+        my $r = Math::GMPq::Rmpq_init();
+        Math::GMPq::Rmpq_add_z($r, $x, $mone);
+        return $r;
 
-        elsif ($sig eq q(Math::GMPq)) {
-            state $mone = Math::GMPz::Rmpz_init_set_si_nobless(-1);
-            my $r = Math::GMPq::Rmpq_init();
-            Math::GMPq::Rmpq_add_z($r, $x, $mone);
-            $r;
-        }
-
-        elsif ($sig eq q(Math::MPC)) {
-            my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
-            Math::MPC::Rmpc_sub_ui($r, $x, 1, $ROUND);
-            $r;
-        }
+      Math_MPC:
+        my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
+        Math::MPC::Rmpc_sub_ui($r, $x, 1, $ROUND);
+        return $r;
     }
 
     sub dec {
@@ -4865,203 +4639,175 @@ package Sidef::Types::Number::Number {
 
     sub __mod__ {
         my ($x, $y) = @_;
-
-        my $sig = join(' ', ref($x), ref($y) || '$');
+        goto(join('__', ref($x), ref($y) || 'Scalar') =~ tr/:/_/rs);
 
         #
         ## GMPq
         #
-        if ($sig eq q(Math::GMPq Math::GMPq)) {
-            my ($x, $y) = @_;
+      Math_GMPq__Math_GMPq:
 
-            Math::GMPq::Rmpq_sgn($y)
-              || goto &_nan;
+        Math::GMPq::Rmpq_sgn($y)
+          || goto &_nan;
 
-            my $quo = Math::GMPq::Rmpq_init();
-            Math::GMPq::Rmpq_set($quo, $x);
-            Math::GMPq::Rmpq_div($quo, $quo, $y);
+        my $quo = Math::GMPq::Rmpq_init();
+        Math::GMPq::Rmpq_set($quo, $x);
+        Math::GMPq::Rmpq_div($quo, $quo, $y);
 
-            # Floor
-            if (!Math::GMPq::Rmpq_integer_p($quo)) {
-                my $z = Math::GMPz::Rmpz_init();
-                Math::GMPz::Rmpz_set_q($z, $quo);
-                Math::GMPz::Rmpz_sub_ui($z, $z, 1) if Math::GMPq::Rmpq_sgn($quo) < 0;
-                Math::GMPq::Rmpq_set_z($quo, $z);
-            }
-
-            Math::GMPq::Rmpq_mul($quo, $quo, $y);
-            Math::GMPq::Rmpq_sub($quo, $x, $quo);
-
-            $quo;
+        # Floor
+        if (!Math::GMPq::Rmpq_integer_p($quo)) {
+            my $z = Math::GMPz::Rmpz_init();
+            Math::GMPz::Rmpz_set_q($z, $quo);
+            Math::GMPz::Rmpz_sub_ui($z, $z, 1) if Math::GMPq::Rmpq_sgn($quo) < 0;
+            Math::GMPq::Rmpq_set_z($quo, $z);
         }
 
-        elsif ($sig eq q(Math::GMPq Math::GMPz)) {
-            (@_) = ($x, _mpz2mpq($y));
-            goto __SUB__;
-        }
+        Math::GMPq::Rmpq_mul($quo, $quo, $y);
+        Math::GMPq::Rmpq_sub($quo, $x, $quo);
 
-        elsif ($sig eq q(Math::GMPq Math::MPFR)) {
-            (@_) = (_mpq2mpfr($x), $y);
-            goto __SUB__;
-        }
+        return $quo;
 
-        elsif ($sig eq q(Math::GMPq Math::MPC)) {
-            (@_) = (_mpq2mpc($x), $y);
-            goto __SUB__;
-        }
+      Math_GMPq__Math_GMPz:
+        $y = _mpz2mpq($y);
+        goto Math_GMPq__Math_GMPq;
+
+      Math_GMPq__Math_MPFR:
+        $x = _mpq2mpfr($x);
+        goto Math_MPFR__Math_MPFR;
+
+      Math_GMPq__Math_MPC:
+        $x = _mpq2mpc($x);
+        goto Math_MPC__Math_MPC;
 
         #
         ## GMPz
         #
-        elsif ($sig eq q(Math::GMPz Math::GMPz)) {
+      Math_GMPz__Math_GMPz:
 
-            my $sgn_y = Math::GMPz::Rmpz_sgn($y)
-              || goto &_nan;
+        my $sgn_y = Math::GMPz::Rmpz_sgn($y)
+          || goto &_nan;
 
-            my $r = Math::GMPz::Rmpz_init();
-            Math::GMPz::Rmpz_mod($r, $x, $y);
+        my $r = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_mod($r, $x, $y);
 
-            if (!Math::GMPz::Rmpz_sgn($r)) {
-                ## ok
-            }
-            elsif ($sgn_y < 0) {
-                Math::GMPz::Rmpz_add($r, $r, $y);
-            }
-
-            $r;
+        if (!Math::GMPz::Rmpz_sgn($r)) {
+            ## ok
+        }
+        elsif ($sgn_y < 0) {
+            Math::GMPz::Rmpz_add($r, $r, $y);
         }
 
-        elsif ($sig eq q(Math::GMPz $)) {
-            my $r = Math::GMPz::Rmpz_init();
-            Math::GMPz::Rmpz_mod_ui($r, $x, $y);
-            $r;
-        }
+        return $r;
 
-        elsif ($sig eq q(Math::GMPz Math::GMPq)) {
-            (@_) = (_mpz2mpq($x), $y);
-            goto __SUB__;
-        }
+      Math_GMPz__Scalar:
+        my $r = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_mod_ui($r, $x, $y);
+        return $r;
 
-        elsif ($sig eq q(Math::GMPz Math::MPFR)) {
-            (@_) = (_mpz2mpfr($x), $y);
-            goto __SUB__;
-        }
+      Math_GMPz__Math_GMPq:
+        $x = _mpz2mpq($x);
+        goto Math_GMPq__Math_GMPq;
 
-        elsif ($sig eq q(Math::GMPz Math::MPC)) {
-            (@_) = (_mpz2mpc($x), $y);
-            goto __SUB__;
-        }
+      Math_GMPz__Math_MPFR:
+        $x = _mpz2mpfr($x);
+        goto Math_MPFR__Math_MPFR;
+
+      Math_GMPz__Math_MPC:
+        $x = _mpz2mpc($x);
+        goto Math_MPC__Math_MPC;
 
         #
         ## MPFR
         #
-        elsif ($sig eq q(Math::MPFR Math::MPFR)) {
+      Math_MPFR__Math_MPFR:
+        my $quo = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        Math::MPFR::Rmpfr_div($quo, $x, $y, $ROUND);
+        Math::MPFR::Rmpfr_floor($quo, $quo);
+        Math::MPFR::Rmpfr_mul($quo, $quo, $y, $ROUND);
+        Math::MPFR::Rmpfr_sub($quo, $x, $quo, $ROUND);
+        return $quo;
 
-            my $quo = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-            Math::MPFR::Rmpfr_div($quo, $x, $y, $ROUND);
-            Math::MPFR::Rmpfr_floor($quo, $quo);
-            Math::MPFR::Rmpfr_mul($quo, $quo, $y, $ROUND);
-            Math::MPFR::Rmpfr_sub($quo, $x, $quo, $ROUND);
-            $quo;
-        }
+      Math_MPFR__Scalar:
+        my $quo = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        Math::MPFR::Rmpfr_div_ui($quo, $x, $y, $ROUND);
+        Math::MPFR::Rmpfr_floor($quo, $quo);
+        Math::MPFR::Rmpfr_mul_ui($quo, $quo, $y, $ROUND);
+        Math::MPFR::Rmpfr_sub($quo, $x, $quo, $ROUND);
+        return $quo;
 
-        elsif ($sig eq q(Math::MPFR $)) {
+      Math_MPFR__Math_GMPq:
+        my $quo = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        Math::MPFR::Rmpfr_div_q($quo, $x, $y, $ROUND);
+        Math::MPFR::Rmpfr_floor($quo, $quo);
+        Math::MPFR::Rmpfr_mul_q($quo, $quo, $y, $ROUND);
+        Math::MPFR::Rmpfr_sub($quo, $x, $quo, $ROUND);
+        return $quo;
 
-            my $quo = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-            Math::MPFR::Rmpfr_div_ui($quo, $x, $y, $ROUND);
-            Math::MPFR::Rmpfr_floor($quo, $quo);
-            Math::MPFR::Rmpfr_mul_ui($quo, $quo, $y, $ROUND);
-            Math::MPFR::Rmpfr_sub($quo, $x, $quo, $ROUND);
-            $quo;
-        }
+      Math_MPFR__Math_GMPz:
+        my $quo = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        Math::MPFR::Rmpfr_div_z($quo, $x, $y, $ROUND);
+        Math::MPFR::Rmpfr_floor($quo, $quo);
+        Math::MPFR::Rmpfr_mul_z($quo, $quo, $y, $ROUND);
+        Math::MPFR::Rmpfr_sub($quo, $x, $quo, $ROUND);
+        return $quo;
 
-        elsif ($sig eq q(Math::MPFR Math::GMPq)) {
-
-            my $quo = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-            Math::MPFR::Rmpfr_div_q($quo, $x, $y, $ROUND);
-            Math::MPFR::Rmpfr_floor($quo, $quo);
-            Math::MPFR::Rmpfr_mul_q($quo, $quo, $y, $ROUND);
-            Math::MPFR::Rmpfr_sub($quo, $x, $quo, $ROUND);
-            $quo;
-        }
-
-        elsif ($sig eq q(Math::MPFR Math::GMPz)) {
-
-            my $quo = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-            Math::MPFR::Rmpfr_div_z($quo, $x, $y, $ROUND);
-            Math::MPFR::Rmpfr_floor($quo, $quo);
-            Math::MPFR::Rmpfr_mul_z($quo, $quo, $y, $ROUND);
-            Math::MPFR::Rmpfr_sub($quo, $x, $quo, $ROUND);
-
-            $quo;
-        }
-
-        elsif ($sig eq q(Math::MPFR Math::MPC)) {
-            (@_) = (_mpfr2mpc($x), $y);
-            goto __SUB__;
-        }
+      Math_MPFR__Math_MPC:
+        $x = _mpfr2mpc($x);
+        goto Math_MPC__Math_MPC;
 
         #
         ## MPC
         #
-        elsif ($sig eq q(Math::MPC Math::MPC)) {
+      Math_MPC__Math_MPC:
+        my $quo = Math::MPC::Rmpc_init2(CORE::int($PREC));
+        Math::MPC::Rmpc_div($quo, $x, $y, $ROUND);
 
-            my $quo = Math::MPC::Rmpc_init2(CORE::int($PREC));
-            Math::MPC::Rmpc_div($quo, $x, $y, $ROUND);
+        my $real = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        my $imag = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
 
-            my $real = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-            my $imag = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        Math::MPC::RMPC_RE($real, $quo);
+        Math::MPC::RMPC_IM($imag, $quo);
 
-            Math::MPC::RMPC_RE($real, $quo);
-            Math::MPC::RMPC_IM($imag, $quo);
+        Math::MPFR::Rmpfr_floor($real, $real);
+        Math::MPFR::Rmpfr_floor($imag, $imag);
 
-            Math::MPFR::Rmpfr_floor($real, $real);
-            Math::MPFR::Rmpfr_floor($imag, $imag);
+        Math::MPC::Rmpc_set_fr_fr($quo, $real, $imag, $ROUND);
 
-            Math::MPC::Rmpc_set_fr_fr($quo, $real, $imag, $ROUND);
+        Math::MPC::Rmpc_mul($quo, $quo, $y, $ROUND);
+        Math::MPC::Rmpc_sub($quo, $x, $quo, $ROUND);
 
-            Math::MPC::Rmpc_mul($quo, $quo, $y, $ROUND);
-            Math::MPC::Rmpc_sub($quo, $x, $quo, $ROUND);
+        return $quo;
 
-            $quo;
-        }
+      Math_MPC__Scalar:
+        my $quo = Math::MPC::Rmpc_init2(CORE::int($PREC));
+        Math::MPC::Rmpc_div_ui($quo, $x, $y, $ROUND);
 
-        elsif ($sig eq q(Math::MPC $)) {
+        my $real = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        my $imag = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
 
-            my $quo = Math::MPC::Rmpc_init2(CORE::int($PREC));
-            Math::MPC::Rmpc_div_ui($quo, $x, $y, $ROUND);
+        Math::MPC::RMPC_RE($real, $quo);
+        Math::MPC::RMPC_IM($imag, $quo);
 
-            my $real = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-            my $imag = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        Math::MPFR::Rmpfr_floor($real, $real);
+        Math::MPFR::Rmpfr_floor($imag, $imag);
 
-            Math::MPC::RMPC_RE($real, $quo);
-            Math::MPC::RMPC_IM($imag, $quo);
+        Math::MPC::Rmpc_set_fr_fr($quo, $real, $imag, $ROUND);
 
-            Math::MPFR::Rmpfr_floor($real, $real);
-            Math::MPFR::Rmpfr_floor($imag, $imag);
+        Math::MPC::Rmpc_mul_ui($quo, $quo, $y, $ROUND);
+        Math::MPC::Rmpc_sub($quo, $x, $quo, $ROUND);
 
-            Math::MPC::Rmpc_set_fr_fr($quo, $real, $imag, $ROUND);
+        return $quo;
 
-            Math::MPC::Rmpc_mul_ui($quo, $quo, $y, $ROUND);
-            Math::MPC::Rmpc_sub($quo, $x, $quo, $ROUND);
+      Math_MPC__Math_MPFR:
+        $y = _mpfr2mpc($y);
+        goto Math_MPC__Math_MPC;
 
-            $quo;
-        }
+      Math_MPC__Math_GMPz:
+        $y = _mpz2mpc($y);
+        goto Math_MPC__Math_MPC;
 
-        elsif ($sig eq q(Math::MPC Math::MPFR)) {
-            (@_) = ($x, _mpfr2mpc($y));
-            goto __SUB__;
-        }
-
-        elsif ($sig eq q(Math::MPC Math::GMPz)) {
-            (@_) = ($x, _mpz2mpc($y));
-            goto __SUB__;
-        }
-
-        elsif ($sig eq q(Math::MPC Math::GMPq)) {
-            (@_) = ($x, _mpq2mpc($y));
-            goto __SUB__;
-        }
+      Math_MPC__Math_GMPq:
+        $y = _mpq2mpc($y);
+        goto Math_MPC__Math_MPC;
     }
 
     sub mod {
@@ -6361,118 +6107,111 @@ package Sidef::Types::Number::Number {
     sub __round__ {
         my ($x, $prec) = @_;
 
-        my $sig = join(' ', ref($x), '$');
+        goto(ref($x) =~ tr/:/_/rs);
 
-        if ($sig eq q(Math::MPFR $)) {
+      Math_MPFR:
+        my $xth = -CORE::int($prec);
 
-            my $xth = -CORE::int($prec);
+        my $p = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        Math::MPFR::Rmpfr_set_str($p, '1e' . CORE::abs($xth), 10, $ROUND);
 
-            my $p = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-            Math::MPFR::Rmpfr_set_str($p, '1e' . CORE::abs($xth), 10, $ROUND);
+        my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
 
-            my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-
-            if ($xth < 0) {
-                Math::MPFR::Rmpfr_div($r, $x, $p, $ROUND);
-            }
-            else {
-                Math::MPFR::Rmpfr_mul($r, $x, $p, $ROUND);
-            }
-
-            Math::MPFR::Rmpfr_round($r, $r);
-
-            if ($xth < 0) {
-                Math::MPFR::Rmpfr_mul($r, $r, $p, $ROUND);
-            }
-            else {
-                Math::MPFR::Rmpfr_div($r, $r, $p, $ROUND);
-            }
-
-            $r;
+        if ($xth < 0) {
+            Math::MPFR::Rmpfr_div($r, $x, $p, $ROUND);
+        }
+        else {
+            Math::MPFR::Rmpfr_mul($r, $x, $p, $ROUND);
         }
 
-        elsif ($sig eq q(Math::MPC $)) {
+        Math::MPFR::Rmpfr_round($r, $r);
 
-            my $real = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-            my $imag = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-
-            Math::MPC::RMPC_RE($real, $x);
-            Math::MPC::RMPC_IM($imag, $x);
-
-            $real = __round__($real, $prec);
-            $imag = __round__($imag, $prec);
-
-            if (Math::MPFR::Rmpfr_zero_p($imag)) {
-                return $real;
-            }
-
-            my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
-            Math::MPC::Rmpc_set_fr_fr($r, $real, $imag, $ROUND);
-            $r;
+        if ($xth < 0) {
+            Math::MPFR::Rmpfr_mul($r, $r, $p, $ROUND);
+        }
+        else {
+            Math::MPFR::Rmpfr_div($r, $r, $p, $ROUND);
         }
 
-        elsif ($sig eq q(Math::GMPq $)) {
+        return $r;
 
-            my $nth = -CORE::int($prec);
+      Math_MPC:
+        my $real = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        my $imag = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
 
-            my $r = Math::GMPq::Rmpq_init();
-            Math::GMPq::Rmpq_set($r, $x);
+        Math::MPC::RMPC_RE($real, $x);
+        Math::MPC::RMPC_IM($imag, $x);
 
-            my $sgn = Math::GMPq::Rmpq_sgn($r);
+        $real = __SUB__->($real, $prec);
+        $imag = __SUB__->($imag, $prec);
 
-            if ($sgn < 0) {
-                Math::GMPq::Rmpq_neg($r, $r);
-            }
+        if (Math::MPFR::Rmpfr_zero_p($imag)) {
+            return $real;
+        }
 
-            my $p = Math::GMPz::Rmpz_init_set_str('1' . ('0' x CORE::abs($nth)), 10);
+        my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
+        Math::MPC::Rmpc_set_fr_fr($r, $real, $imag, $ROUND);
+        return $r;
 
-            if ($nth < 0) {
-                Math::GMPq::Rmpq_div_z($r, $r, $p);
-            }
-            else {
-                Math::GMPq::Rmpq_mul_z($r, $r, $p);
-            }
+      Math_GMPq:
+        my $nth = -CORE::int($prec);
 
-            state $half = do {
-                my $q = Math::GMPq::Rmpq_init_nobless();
-                Math::GMPq::Rmpq_set_ui($q, 1, 2);
-                $q;
-            };
+        my $r = Math::GMPq::Rmpq_init();
+        Math::GMPq::Rmpq_set($r, $x);
 
-            Math::GMPq::Rmpq_add($r, $r, $half);
+        my $sgn = Math::GMPq::Rmpq_sgn($r);
 
-            my $z = Math::GMPz::Rmpz_init();
+        if ($sgn < 0) {
+            Math::GMPq::Rmpq_neg($r, $r);
+        }
+
+        my $p = Math::GMPz::Rmpz_init_set_str('1' . ('0' x CORE::abs($nth)), 10);
+
+        if ($nth < 0) {
+            Math::GMPq::Rmpq_div_z($r, $r, $p);
+        }
+        else {
+            Math::GMPq::Rmpq_mul_z($r, $r, $p);
+        }
+
+        state $half = do {
+            my $q = Math::GMPq::Rmpq_init_nobless();
+            Math::GMPq::Rmpq_set_ui($q, 1, 2);
+            $q;
+        };
+
+        Math::GMPq::Rmpq_add($r, $r, $half);
+
+        my $z = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_set_q($z, $r);
+
+        if (Math::GMPz::Rmpz_odd_p($z) and Math::GMPq::Rmpq_integer_p($r)) {
+            Math::GMPz::Rmpz_sub_ui($z, $z, 1);
+        }
+
+        Math::GMPq::Rmpq_set_z($r, $z);
+
+        if ($nth < 0) {
+            Math::GMPq::Rmpq_mul_z($r, $r, $p);
+        }
+        else {
+            Math::GMPq::Rmpq_div_z($r, $r, $p);
+        }
+
+        if ($sgn < 0) {
+            Math::GMPq::Rmpq_neg($r, $r);
+        }
+
+        if (Math::GMPq::Rmpq_integer_p($r)) {
             Math::GMPz::Rmpz_set_q($z, $r);
-
-            if (Math::GMPz::Rmpz_odd_p($z) and Math::GMPq::Rmpq_integer_p($r)) {
-                Math::GMPz::Rmpz_sub_ui($z, $z, 1);
-            }
-
-            Math::GMPq::Rmpq_set_z($r, $z);
-
-            if ($nth < 0) {
-                Math::GMPq::Rmpq_mul_z($r, $r, $p);
-            }
-            else {
-                Math::GMPq::Rmpq_div_z($r, $r, $p);
-            }
-
-            if ($sgn < 0) {
-                Math::GMPq::Rmpq_neg($r, $r);
-            }
-
-            if (Math::GMPq::Rmpq_integer_p($r)) {
-                Math::GMPz::Rmpz_set_q($z, $r);
-                return $z;
-            }
-
-            $r;
+            return $z;
         }
 
-        elsif ($sig eq q(Math::GMPz $)) {
-            (@_) = (_mpz2mpq($x), $prec);
-            goto __SUB__;
-        }
+        return $r;
+
+      Math_GMPz:
+        $x = _mpz2mpq($x);
+        goto Math_GMPq;
     }
 
     sub round {
