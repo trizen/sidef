@@ -3989,7 +3989,7 @@ package Sidef::Types::Number::Number {
         my $si = Math::MPC::Rmpc_cmp($x, $y);
         my $re_cmp = Math::MPC::RMPC_INEX_RE($si);
         $re_cmp == 0 or return $re_cmp;
-        Math::MPC::RMPC_INEX_IM($si);
+        return Math::MPC::RMPC_INEX_IM($si);
 
       Math_MPC__Math_GMPz:
         $y = _mpz2mpc($y);
