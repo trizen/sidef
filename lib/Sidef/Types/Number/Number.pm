@@ -4469,7 +4469,13 @@ package Sidef::Types::Number::Number {
         my @digits = split(//, "$str");
         shift(@digits) if $digits[0] eq '-';
 
-        Sidef::Types::Array::Array->new(map { __PACKAGE__->_set_uint($_) } @digits);
+        Sidef::Types::Array::Array->new(
+            map {
+                defined($y)
+                  ? Sidef::Types::String::String->new($_)
+                  : __PACKAGE__->_set_uint($_)
+              } @digits
+        );
     }
 
     sub digit {
@@ -4482,7 +4488,13 @@ package Sidef::Types::Number::Number {
         shift(@digits) if $digits[0] eq '-';
 
         $y = _any2si($$y) // return undef;
-        exists($digits[$y]) ? __PACKAGE__->_set_uint($digits[$y]) : undef;
+        exists($digits[$y])
+          ? (
+             defined($z)
+             ? Sidef::Types::String::String->new($_)
+             : __PACKAGE__->_set_uint($digits[$y])
+            )
+          : undef;
     }
 
     sub length {
