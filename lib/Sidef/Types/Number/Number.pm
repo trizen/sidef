@@ -3456,7 +3456,9 @@ package Sidef::Types::Number::Number {
         my $p = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
 
         Math::MPFR::Rmpfr_zeta_ui($f, $n, $ROUND);                      # f = zeta(n)
-        Math::MPFR::Rmpfr_fac_ui($p, $n, $ROUND);                       # p = n!
+        Math::MPFR::Rmpfr_set_ui($p, $n + 1, $ROUND);                   # p = n+1
+        Math::MPFR::Rmpfr_gamma($p, $p, $ROUND);                        # p = gamma(p)
+
         Math::MPFR::Rmpfr_mul($f, $f, $p, $ROUND);                      # f = f * p
 
         Math::MPFR::Rmpfr_const_pi($p, $ROUND);                         # p = PI
