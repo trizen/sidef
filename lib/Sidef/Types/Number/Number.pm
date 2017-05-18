@@ -4491,7 +4491,7 @@ package Sidef::Types::Number::Number {
         exists($digits[$y])
           ? (
              defined($z)
-             ? Sidef::Types::String::String->new($_)
+             ? Sidef::Types::String::String->new($digits[$y])
              : __PACKAGE__->_set_uint($digits[$y])
             )
           : undef;
