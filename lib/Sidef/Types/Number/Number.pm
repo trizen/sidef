@@ -3502,7 +3502,7 @@ package Sidef::Types::Number::Number {
         Math::MPFR::Rmpfr_const_euler($t, $ROUND);
         Math::MPFR::Rmpfr_add($r, $r, $t, $ROUND);
 
-        $r;
+        bless \$r;
     }
 
     sub erf {
