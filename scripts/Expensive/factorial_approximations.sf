@@ -6,7 +6,7 @@ define τ = Num.tau
 define γ = Num.Y
 define ϕ = Num.phi
 
-define NAMES = %w(Unknown Ramanujan Stirling+Trizen Stirling Stirling+Laplace Ramanujan2 Batir Batir2 Batir2WA)
+define NAMES = %w(Unknown Ramanujan Stirling+Trizen Stirling Stirling+Laplace Ramanujan2 Batir Batir2 Batir2WA Gamma Gamma2)
 
 # Unknown
 # sqrt(2*pi*e) * e^(-((3 - sqrt(3)) / 6)) * (((3 - sqrt(3)) / 6 + n) / e)^(n + 1/2)
@@ -62,10 +62,24 @@ func f8(n) {
     w * pow(n, n) * exp(-n) * √(n + 1/6 + 1/(72*n) - 31/(6480 * n**2) - 139/(155520 * n**3) + 9871/(6531840 * n**4))
 }
 
-# N. Batir(2) derivation by WolframAlpha
+# N. Batir(2) derivation by Wolfram|Alpha
 # 1/216 * sqrt(pi/70) * exp(-n) * n^(n-2) * sqrt(42*n*(24*n*(90*n*(12*n*(6*n + 1) + 1) - 31) - 139) + 9871)
 func f9(n) {
     1/216 * √(π/70) * exp(-n) * n**(n-2) * √(42*n*(24*n*(90*n*(12*n*(6*n + 1) + 1) - 31) - 139) + 9871);
+}
+
+# Gamma approximation
+# n! ~ (1-i) * (-1)^(1/4) * sqrt(pi) * 12^(-n) * exp(-2*n) * sqrt(n) * ((12*e*n^2 + e)/n)^n
+# n! ~ sqrt(pi) * 2^(1/2 - 2*n) * exp(-n) * n^(1/2-n) * (4*n^2 + 1/3)^n
+func f10(n) {
+    sqrt(π) * 2**(1/2 - 2*n) * exp(-n) * n**(1/2 - n) * (4 * n**2 + 1/3)**n
+}
+
+# Gamma approximation (2)
+# n! ~ limit_{k -> Infinity} sqrt(2*pi) * ((12*n^2 + 24*k*n + 12*k^2 + 1)/(12*e*n + 12*k*e))^(n+k) / ((n+k-1)!/(k!)) / sqrt(n+k)
+func f11(n) {
+    define k = 50       # higher values of k => higher precision
+    sqrt(τ) * ((12*n**2 + (24*k)*n + 12*k**2 + 1)/(12*ℯ*n + 12*k*ℯ))**(n+k) / prod(1..^k, {|j| n + j }) / sqrt(n+k)
 }
 
 #
@@ -76,7 +90,7 @@ var report = Hash()
 for x in (10..20) {
 
     var xfact = x!;
-    var arr = [f1(x), f2(x), f3(x), f4(x), f5(x), f6(x), f7(x), f8(x), f9(x)];
+    var arr = [f1(x), f2(x), f3(x), f4(x), f5(x), f6(x), f7(x), f8(x), f9(x), f10(x), f11(x)];
 
     for name in NAMES {
         report{name} := [] += arr.shift;
