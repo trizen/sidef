@@ -672,12 +672,11 @@ package Sidef::Types::Array::Array {
     }
 
     sub _flatten {    # this exists for performance reasons
-        my ($self) = @_;
+        my ($self, $class) = @_;
 
         my @array;
-        foreach my $i (0 .. $#$self) {
-            my $item = $self->[$i];
-            CORE::push(@array, ref($item) eq ref($self) ? $item->_flatten : $item);
+        foreach my $item (@{$self}) {
+            CORE::push(@array, ref($item) eq $class ? _flatten($item, $class) : $item);
         }
 
         @array;
@@ -686,13 +685,13 @@ package Sidef::Types::Array::Array {
     sub flatten {
         my ($self) = @_;
 
-        my @new_array;
-        foreach my $i (0 .. $#$self) {
-            my $item = $self->[$i];
-            CORE::push(@new_array, ref($item) eq ref($self) ? ($item->_flatten) : $item);
+        my @flat;
+        my $class = ref($self);
+        foreach my $item (@{$self}) {
+            CORE::push(@flat, ref($item) eq $class ? _flatten($item, $class) : $item);
         }
 
-        bless \@new_array, __PACKAGE__;
+        bless \@flat, __PACKAGE__;
     }
 
     *flat = \&flatten;
