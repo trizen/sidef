@@ -198,7 +198,7 @@ Hash.flip() -> I<Obj>
 
 Return the
 
-Aliases: I<reverse>
+Aliases: I<invert>, I<reverse>
 
 =cut
 
