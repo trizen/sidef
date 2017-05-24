@@ -478,7 +478,8 @@ package Sidef::Types::Hash::Hash {
         bless \%hash, __PACKAGE__;
     }
 
-    *flip = \&reverse;
+    *flip   = \&reverse;
+    *invert = \&reverse;
 
     sub copy {
         my ($self) = @_;
