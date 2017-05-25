@@ -6,7 +6,7 @@ define τ = Num.tau
 define γ = Num.Y
 define ϕ = Num.phi
 
-define NAMES = %w(Unknown Ramanujan Stirling+Trizen Stirling Stirling+Laplace Ramanujan2 Batir Batir2 Batir2WA Gamma Gamma2)
+define NAMES = %w(Unknown Ramanujan Stirling+Trizen Stirling Stirling+Laplace Ramanujan2 Batir Batir2 Batir2WA Gamma Gamma2 Gamma3)
 
 # Unknown
 # sqrt(2*pi*e) * e^(-((3 - sqrt(3)) / 6)) * (((3 - sqrt(3)) / 6 + n) / e)^(n + 1/2)
@@ -82,6 +82,12 @@ func f11(n) {
     sqrt(τ) * ((12*n**2 + (24*k)*n + 12*k**2 + 1)/(12*ℯ*n + 12*k*ℯ))**(n+k) / prod(1..^k, {|j| n + j }) / sqrt(n+k)
 }
 
+# Gamma approximation (3)
+# n! ~ (sqrt(2*pi) * ((12*n^2 + 24*n + 12 + 1)/(12*e*n + 12*e))^(n + 1))/sqrt(n + 1)
+func f12(n) {
+    sqrt(τ) * ((12*n**2 + 24*n + 12 + 1)/(12*ℯ*n + 12*ℯ))**(n+1) / sqrt(n+1)
+}
+
 #
 ## TESTS
 #
@@ -90,7 +96,7 @@ var report = Hash()
 for x in (10..20) {
 
     var xfact = x!;
-    var arr = [f1(x), f2(x), f3(x), f4(x), f5(x), f6(x), f7(x), f8(x), f9(x), f10(x), f11(x)];
+    var arr = [f1(x), f2(x), f3(x), f4(x), f5(x), f6(x), f7(x), f8(x), f9(x), f10(x), f11(x), f12(x)];
 
     for name in NAMES {
         report{name} := [] += arr.shift;
