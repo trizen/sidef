@@ -13,10 +13,6 @@ func pentagram(dim=200, sides=5) {
     <rect height="100%" width="100%" style="fill:black;" />
     EOT
 
-    func cis(x) {
-        cos(x) + sin(x).i
-    }
-
     func pline(q) {
         <<-EOT
         <polyline points="#{[q..., q[0], q[1]].map{|n| '%0.3f' % n }.join(' ')}"

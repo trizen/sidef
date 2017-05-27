@@ -222,7 +222,7 @@ while (count > 0) {
     var number = irand(1, BOARD_SIZE);
     var text = "=>> Your guess (e.g.: #{letter}#{number})\n> ";
 
-    var input = Sys.scanln(text).lc;
+    var input = lc(Sys.scanln(text) \\ break);
     input ~~ ['q', 'quit'] && break;
 
     var m = input.match(/^\h*([a-z]+)\D*([0-9]+)/) || next;

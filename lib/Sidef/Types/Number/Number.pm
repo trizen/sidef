@@ -3161,25 +3161,16 @@ package Sidef::Types::Number::Number {
         goto(ref($x) =~ tr/:/_/rs);
 
       Math_MPFR:
-        my $cos = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-        my $sin = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-
-        Math::MPFR::Rmpfr_sin_cos($sin, $cos, $x, $ROUND);
-
         my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
-        Math::MPC::Rmpc_set_fr_fr($r, $cos, $sin, $ROUND);
+        Math::MPC::Rmpc_set_ui_fr($r, 0, $x, $ROUND);
+        Math::MPC::Rmpc_exp($r, $r, $ROUND);
         return $r;
 
       Math_MPC:
-        my $cos = Math::MPC::Rmpc_init2(CORE::int($PREC));
-        my $sin = Math::MPC::Rmpc_init2(CORE::int($PREC));
-
-        Math::MPC::Rmpc_sin_cos($sin, $cos, $x, $ROUND, $ROUND);
-
-        Math::MPC::Rmpc_mul_i($sin, $sin, 1, $ROUND);
-        Math::MPC::Rmpc_add($cos, $cos, $sin, $ROUND);
-
-        return $cos;
+        my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
+        Math::MPC::Rmpc_mul_i($r, $x, 1, $ROUND);
+        Math::MPC::Rmpc_exp($r, $r, $ROUND);
+        return $r;
     }
 
     sub cis {
