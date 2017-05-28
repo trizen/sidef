@@ -2274,8 +2274,8 @@ package Sidef::Types::Number::Number {
         # ilog(x, y <= 1) = NaN
         Math::GMPz::Rmpz_cmp_ui($y, 1) <= 0 and goto &_nan;
 
-        # ilog(x < 0, y) = NaN
-        Math::GMPz::Rmpz_sgn($x) < 0 and goto &_nan;
+        # ilog(x <= 0, y) = NaN
+        Math::GMPz::Rmpz_sgn($x) <= 0 and goto &_nan;
 
         # Return faster for y <= 62
         if (Math::GMPz::Rmpz_cmp_ui($y, 62) <= 0) {
