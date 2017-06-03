@@ -5734,7 +5734,7 @@ package Sidef::Types::Number::Number {
 
             for (; ; $i += $step) {
                 my @primes = Math::Prime::Util::GMP::sieve_primes($i, $i + $step);
-                $count += $#primes + 1;
+                $count += @primes;
 
                 if ($count >= $n) {
                     my $p = $primes[$n - $prev_count - 1];
