@@ -5733,11 +5733,11 @@ package Sidef::Types::Number::Number {
             my $step = $count_approx < 1e6 ? $count_approx : $n > 1e8 ? 1e7 : 1e6;
 
             for (; ; $i += $step) {
-                my $primes = Math::Prime::Util::GMP::primes($i, $i + $step);
-                $count += $#$primes + 1;
+                my @primes = Math::Prime::Util::GMP::sieve_primes($i, $i + $step);
+                $count += $#primes + 1;
 
                 if ($count >= $n) {
-                    my $p = $primes->[$n - $prev_count - 1];
+                    my $p = $primes[$n - $prev_count - 1];
                     return __PACKAGE__->_set_str('int', $p);
                 }
 
@@ -5745,7 +5745,7 @@ package Sidef::Types::Number::Number {
             }
         }
 
-        state $table = Math::Prime::Util::GMP::primes(1_299_709);    # primes up to prime(100_000)
+        state $table = [Math::Prime::Util::GMP::sieve_primes(2, 1_299_709)];    # primes up to prime(100_000)
         __PACKAGE__->_set_uint($table->[$n - 1]);
     }
 
@@ -5996,7 +5996,9 @@ package Sidef::Types::Number::Number {
                    : __PACKAGE__->_set_str('int', $_)
                }
 
-               @{Math::Prime::Util::GMP::primes(_big2uistr($x) // 0, defined($y) ? (_big2uistr($y) // 0) : ())}
+               defined($y)
+             ? Math::Prime::Util::GMP::sieve_primes((_big2uistr($x) // 0), (_big2uistr($y) // 0), 0)
+             : Math::Prime::Util::GMP::sieve_primes(2, (_big2uistr($x) // 0), 0)
             ]
         );
     }
