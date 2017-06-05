@@ -73,4 +73,4 @@ func optimal(i, w) {
 }
 
 var sol = optimal(items.end, max_weight)
-say "#{sol[0]}: #{sol[1]}"
+say "#{sol[0]}: #{sol[1].join(' ')}"

@@ -1,6 +1,6 @@
 package Sidef::Types::Number::Complex {
 
-    # No reference is blessed on this class.
+    # No reference is blessed in this class.
 
     use utf8;
     use 5.014;
