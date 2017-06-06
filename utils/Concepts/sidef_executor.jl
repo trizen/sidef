@@ -6,7 +6,7 @@ import Base.+;
 #
 ## Boolean type
 #
-type SBool
+mutable struct SBool
     value::Bool;
 
     function SBool(b::Bool)
@@ -19,7 +19,7 @@ end
 #
 ## String type
 #
-type SString
+mutable struct SString
     value::AbstractString;
 
     function SString(s::AbstractString)

@@ -5,7 +5,7 @@
 import Base.sqrt
 import Base./;
 
-type S_Number
+mutable struct S_Number
     value::Number;
 
     function S_Number(x::Number)
