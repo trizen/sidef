@@ -538,6 +538,7 @@ scripts/RosettaCode/sort_a_list_of_object_identifiers.sf
 scripts/RosettaCode/sort_an_integer_array.sf
 scripts/RosettaCode/sort_disjoint_sublist.sf
 scripts/RosettaCode/sort_stability.sf
+scripts/RosettaCode/sort_three_variables.sf
 scripts/RosettaCode/sort_using_a_custom_comparator.sf
 scripts/RosettaCode/sorting_algorithms_bubble_sort.sf
 scripts/RosettaCode/sorting_algorithms_circlesort.sf

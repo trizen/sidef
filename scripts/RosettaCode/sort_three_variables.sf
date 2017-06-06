@@ -1,0 +1,23 @@
+#!/usr/bin/ruby
+
+#
+## https://rosettacode.org/wiki/Sort_three_variables
+#
+
+func sort_refs(*arr) {
+    arr.map{ *_ }.sort ~Z arr -> each { *_[1] = _[0] }
+}
+
+var x = 77444
+var y =   -12
+var z =     0
+
+sort_refs(\x, \y, \z)
+
+say x
+say y
+say z
+
+assert_eq(x,   -12)
+assert_eq(y,     0)
+assert_eq(z, 77444)
