@@ -1534,6 +1534,60 @@ package Sidef::Types::Array::Array {
     *last_unique_by = \&last_uniq_by;
 
     sub abbrev {
+        my ($self, $pattern) = @_;
+
+        my (%seen, %table);
+
+        if (defined($pattern)) {
+            if (ref($pattern) eq 'Sidef::Types::Regex::Regex') {
+                $pattern = $pattern->get_value;
+            }
+            else {
+                $pattern = qr/\Q$pattern\E/;
+            }
+        }
+
+        foreach my $item (@$self) {
+            my $word = "$item";
+            my $length = CORE::length($word) || next;
+
+            for (my $len = $length ; $len >= 1 ; --$len) {
+                my $abbrev = substr($word, 0, $len);
+
+                if (defined($pattern)) {
+                    ($abbrev =~ $pattern) || next;
+                }
+
+                my $count = ++$seen{$abbrev};
+
+                if ($count == 1) {
+                    $table{$abbrev} = $item;
+                }
+                elsif ($count == 2) {
+                    CORE::delete($table{$abbrev});
+                }
+                else {
+                    last;
+                }
+            }
+        }
+
+        foreach my $item (@$self) {
+            my $word = "$item";
+
+            if (defined($pattern)) {
+                ($word =~ $pattern) || next;
+            }
+
+            $table{$word} = $item;
+        }
+
+        Sidef::Types::Hash::Hash->new(%table);
+    }
+
+    *abbreviations = \&abbrev;
+
+    sub uniq_prefs {
         my ($self, $block) = @_;
 
         my $tail     = {};                # some unique value
@@ -1582,7 +1636,7 @@ package Sidef::Types::Array::Array {
         bless \@abbrev, __PACKAGE__;
     }
 
-    *abbreviations = \&abbrev;
+    *unique_prefixes = \&uniq_prefs;
 
     sub contains {
         my ($self, $obj) = @_;

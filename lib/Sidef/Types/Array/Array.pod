@@ -1171,6 +1171,16 @@ Aliases: I<unique_by>
 
 =cut
 
+=head2 uniq_prefs
+
+Array.uniq_prefs() -> I<Obj>
+
+Return the
+
+Aliases: I<unique_prefixes>
+
+=cut
+
 =head2 unroll_operator
 
 Array.unroll_operator() -> I<Obj>
