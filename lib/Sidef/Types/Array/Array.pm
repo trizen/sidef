@@ -1536,8 +1536,6 @@ package Sidef::Types::Array::Array {
     sub abbrev {
         my ($self, $pattern) = @_;
 
-        my (%seen, %table);
-
         if (defined($pattern)) {
             if (ref($pattern) eq 'Sidef::Types::Regex::Regex') {
                 $pattern = $pattern->get_value;
@@ -1547,6 +1545,7 @@ package Sidef::Types::Array::Array {
             }
         }
 
+        my (%seen, %table);
         foreach my $item (@$self) {
             my $word = "$item";
             my $length = CORE::length($word) || next;

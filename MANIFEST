@@ -129,6 +129,7 @@ scripts/continued_fraction.sf
 scripts/currying.sf
 scripts/draw_a_cuboid.sf
 scripts/draw_a_cuboid_2.sf
+scripts/draw_grid_of_squares.sf
 scripts/elementary_cellular_automaton.sf
 scripts/elementary_cellular_automaton_regex.sf
 scripts/ethiopian_multiplication.sf

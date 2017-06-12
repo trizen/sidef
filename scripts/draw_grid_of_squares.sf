@@ -1,0 +1,35 @@
+#!/usr/bin/ruby
+
+func draw_grid(n, k) {
+
+    if (n % k != 0) {
+        warn "#{n} is not divisible by #{k}"
+    }
+
+    for a in (0 .. n) {
+        for b in (0 .. n) {
+
+            var u = (a %% n/k)
+            var v = (b %% n/k)
+
+            if (u && v) {
+                print '+'
+            }
+            elsif (u) {
+                print '-'
+            }
+            elsif (v) {
+                print '|'
+            }
+            else {
+                print ' '
+            }
+
+        }
+        print "\n"
+    }
+}
+
+draw_grid(25, 5)
+draw_grid(16, 2)
+draw_grid(12, 3)
