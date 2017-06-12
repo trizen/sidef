@@ -4,7 +4,8 @@ package Sidef::Parser {
     use 5.014;
 
     use Sidef::Types::Bool::Bool;
-    use List::Util qw();
+    use List::Util qw(first);
+    use Scalar::Util qw(refaddr);
 
     sub new {
         my (undef, %opts) = @_;
@@ -842,6 +843,10 @@ package Sidef::Parser {
                   };
             }
 
+            if ($var_name eq '') {
+                $obj->{name} = '__ANON__' . refaddr($obj);
+            }
+
             push @var_objs, $obj;
             (defined($end_delim) && /\G\h*,\h*/gc) || last;
 
@@ -1535,8 +1540,7 @@ package Sidef::Parser {
                                 if ($class->{type} eq 'class') {
 
                                     # Detect inheritance from the same class
-                                    require Scalar::Util;
-                                    if (Scalar::Util::refaddr($obj) == Scalar::Util::refaddr($class->{obj})) {
+                                    if (refaddr($obj) == refaddr($class->{obj})) {
                                         $self->fatal_error(
                                                            error => "Inheriting from the same class does is not allowed",
                                                            code  => $_,
@@ -2166,7 +2170,7 @@ package Sidef::Parser {
                     ref($self->{current_class}) eq 'Sidef::Variable::ClassInit'
                     and defined(
                         my $var = (
-                            List::Util::first { $_->{name} eq $name }
+                            first { $_->{name} eq $name }
                             (@{$self->{current_class}{vars}}, map { @{$_->{vars}} } @{$self->{current_class}{attributes}})
                                   )
                                )
