@@ -1,0 +1,23 @@
+#!/usr/bin/ruby
+
+func draw_grid(n, k) {
+
+    if (n % k != 0) {
+        warn "#{n} is not divisible by #{k}"
+    }
+
+    func sym(  (true),  (true) ) { '+' }
+    func sym(  (true), (false) ) { '-' }
+    func sym( (false),  (true) ) { '|' }
+    func sym( (false), (false) ) { ' ' }
+
+    0..n -> map {|a|
+        0..n -> map {|b|
+            sym(a %% n/k, b %% n/k)
+        }.join
+    }.join("\n").say
+}
+
+draw_grid(25, 5)
+draw_grid(16, 2)
+draw_grid(12, 3)
