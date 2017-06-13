@@ -6,10 +6,10 @@ func draw_grid(n, k) {
         warn "#{n} is not divisible by #{k}"
     }
 
-    func sym(  (true),  (true) ) { '+' }
-    func sym(  (true), (false) ) { '-' }
-    func sym( (false),  (true) ) { '|' }
-    func sym( (false), (false) ) { ' ' }
+    func sym(  {_},  {_} ) { '+' }
+    func sym(  {_}, {!_} ) { '-' }
+    func sym( {!_},  {_} ) { '|' }
+    func sym( {!_}, {!_} ) { ' ' }
 
     0..n -> map {|a|
         0..n -> map {|b|
