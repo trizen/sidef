@@ -12,7 +12,7 @@ var h = 640
 var img = %s<Imager>.new(xsize => w, ysize => h, channels => 3)
 var green = %s<Imager::Color>.new('#00FF00')
 
-var (x, y) = (0, 0)
+var (x, y) = (float(0), float(0))
 
 for r in (^1e4 -> lazy.map { 100.irand }) {
   (x, y) = (

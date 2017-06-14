@@ -6,8 +6,6 @@ define τ = Num.tau
 define γ = Num.Y
 define ϕ = Num.phi
 
-define NAMES = %w(Unknown Ramanujan Stirling+Trizen Stirling Stirling+Laplace Ramanujan2 Batir Batir2 Batir2WA Gamma Gamma2 Gamma3)
-
 # Unknown
 # sqrt(2*pi*e) * e^(-((3 - sqrt(3)) / 6)) * (((3 - sqrt(3)) / 6 + n) / e)^(n + 1/2)
 func f1(n) {
@@ -24,9 +22,9 @@ func f2(n) {
 }
 
 # Stirling's formula + Trizen's approximation
-# sqrt(2*pi*n) * (n/e)^n * (digamma(n+1) + gamma) / (log(n + 1/(phi * sqrt(n))) + gamma) * zeta(n)
+# sqrt(2*pi*n) * (n/e)^n * (digamma(n+1) + gamma) / (log(n + 1/(phi * sqrt(n))) + gamma) / zeta(n)
 func f3(n) {
-    √(τ*n) * exp(-n) * n**n * ((digamma(n+1) + γ) / (log(n + 1/(ϕ * √n)) + γ)) * zeta(n)
+    (√(τ*n) * exp(-n) * n**n * ((digamma(n+1) + γ) / (log(n + 1/(ϕ * √n)) + γ)) / zeta(n))
 }
 
 # Stirling's formula
@@ -78,7 +76,7 @@ func f10(n) {
 # Gamma approximation (2)
 # n! ~ limit_{k -> Infinity} sqrt(2*pi) * ((12*n^2 + 24*k*n + 12*k^2 + 1)/(12*e*n + 12*k*e))^(n+k) / ((n+k-1)!/(n!)) / sqrt(n+k)
 func f11(n) {
-    define k = 50       # higher values of k => higher precision
+    define k = 50       # higher value of k => higher precision
     sqrt(τ) * ((12*n**2 + (24*k)*n + 12*k**2 + 1)/(12*ℯ*n + 12*k*ℯ))**(n+k) / prod(1..^k, {|j| n + j }) / sqrt(n+k)
 }
 
@@ -88,27 +86,38 @@ func f12(n) {
     sqrt(τ) * ((12*n**2 + 24*n + 12 + 1)/(12*ℯ*n + 12*ℯ))**(n+1) / sqrt(n+1)
 }
 
+const FORMULAS = [
+    [Unknown            => f1],
+    [Ramanujan          => f2],
+    ["Stirling+Trizen"  => f3],
+    [Stirling           => f4],
+    ["Stirling+Laplace" => f5],
+    [Ramanujan2         => f6],
+    [Batir              => f7],
+    [Batir2             => f8],
+    [Batir2WA           => f9],
+    [Gamma              => f10],
+    [Gamma2             => f11],
+    [Gamma3             => f12],
+]
+
 #
 ## TESTS
 #
 
 var report = Hash()
-for x in (10..20) {
+for n in (15..30) {
 
-    var xfact = x!;
-    var arr = [f1(x), f2(x), f3(x), f4(x), f5(x), f6(x), f7(x), f8(x), f9(x), f10(x), f11(x), f12(x)];
-
-    for name in NAMES {
-        report{name} := [] += arr.shift;
+    for name,f in (FORMULAS) {
+        report{name} := [] << f(n)
     }
 
-    "\n%-22d%s\n".printf(x, xfact);
-    for name in NAMES {
-        "%20s: %s\n".printf(name, report{name}[-1]);
-    }
+    report{:EXACT} := [] << n!
 
-    report{:REAL} \\= [];
-    report{:REAL}.append(xfact);
+    say "\n=> #{n}!"
+    for k,v in (report.sort_by {|_,v| v }) {
+        "%20s: %s\n".printf(k, v[-1]);
+    }
 }
 
 func A(a) { a.sum / a.len }
@@ -119,11 +128,12 @@ var r1 = Hash()
 var r2 = Hash()
 var r3 = Hash()
 
-NAMES.each {|name|
-    var arr = report{name}.range.map {|i| report{:REAL}[i] - report{name}[i] -> abs}
-    r1{name} = A(arr);
-    r2{name} = G(arr);
-    r3{name} = H(arr);
+for k,v in (report) {
+    k == :EXACT && next;
+    var arr = v.range.map {|i| abs(report{:EXACT}[i] - v[i])}
+    r1{k} = A(arr);
+    r2{k} = G(arr);
+    r3{k} = H(arr);
 }
 
 func print_report(h) {
