@@ -4687,7 +4687,12 @@ package Sidef::Types::Number::Number {
             }
         }
 
-        Sidef::Types::String::String->new(Math::GMPq::Rmpq_get_str((_any2mpq($$x) // return undef), $base));
+        my $str =
+          ref($$x) eq 'Math::GMPz'
+          ? Math::GMPz::Rmpz_get_str($$x, $base)
+          : Math::GMPq::Rmpq_get_str((_any2mpq($$x) // return undef), $base);
+
+        Sidef::Types::String::String->new($str);
     }
 
     sub as_frac {
@@ -4702,8 +4707,13 @@ package Sidef::Types::Number::Number {
             }
         }
 
-        my $str = Math::GMPq::Rmpq_get_str((_any2mpq($$x) // return undef), $base);
-        if (index($str, '/') == -1) { $str .= '/1' }
+        my $str =
+          ref($$x) eq 'Math::GMPz'
+          ? Math::GMPz::Rmpz_get_str($$x, $base)
+          : Math::GMPq::Rmpq_get_str((_any2mpq($$x) // return undef), $base);
+
+        $str .= '/1' if (index($str, '/') == -1);
+
         Sidef::Types::String::String->new($str);
     }
 
