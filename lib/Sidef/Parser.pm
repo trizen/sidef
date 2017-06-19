@@ -284,7 +284,7 @@ package Sidef::Parser {
             operators_re    => do {
                 local $" = q{|};
 
-                # The order matters! (in a way)
+                # The order matters: longer first
                 my @operators = map { quotemeta } qw(
 
                   ||= ||
@@ -814,6 +814,7 @@ package Sidef::Parser {
                 }
             }
 
+#<<<
             my $obj = bless(
                             {
                              name => $var_name,
@@ -823,7 +824,8 @@ package Sidef::Parser {
                              class => $class_name,
                              defined($value) ? (value => $value, has_value => 1) : (),
                              defined($attr)
-                             ? ($attr eq '*' ? (array => 1, slurpy => 1) : $attr eq ':' ? (hash => 1, slurpy => 1) : ())
+                             ? ($attr eq '*' ? (array => 1, slurpy => 1)
+                              : $attr eq ':' ? (hash  => 1, slurpy => 1) : ())
                              : (),
                              defined($where_block)   ? (where_block   => $where_block)   : (),
                              defined($where_expr)    ? (where_expr    => $where_expr)    : (),
@@ -831,6 +833,7 @@ package Sidef::Parser {
                             },
                             'Sidef::Variable::Variable'
                            );
+#>>>
 
             if (!$opt{private} and $var_name ne '') {
                 unshift @{$self->{vars}{$class_name}},
@@ -1415,7 +1418,7 @@ package Sidef::Parser {
                 return bless({expr => $expr}, 'Sidef::Variable::Local');
             }
 
-            # Declaration of local variables, classes, methods and functions
+            # Declaration of classes, methods and functions
             if (
                    /\G(func|class)\b\h*/gc
                 || /\G(->)\h*/gc
@@ -1567,11 +1570,6 @@ package Sidef::Parser {
                                                    code   => $_,
                                                    pos    => pos($_) - length($name) - 1,
                                                   );
-
-                                #if ($name ne 'Sidef') {
-                                #    my $ref = $self->parse_expr(code => \$name);
-                                #    push @{$obj->{inherit}}, ref($ref);
-                                #}
                             }
                             else {
                                 $self->fatal_error(
@@ -2536,18 +2534,21 @@ package Sidef::Parser {
         my $parsed = 0;
 
         if (/\G(?=[\{\[])/) {
-
+#<<<
             $struct->{$self->{class}}[-1]{self} = {
                         $self->{class} => [
                             {
                              self => $struct->{$self->{class}}[-1]{self},
-                             exists($struct->{$self->{class}}[-1]{call}) ? (call => delete $struct->{$self->{class}}[-1]{call})
-                             : (),
-                             exists($struct->{$self->{class}}[-1]{ind}) ? (ind => delete $struct->{$self->{class}}[-1]{ind})
-                             : (),
+                             exists($struct->{$self->{class}}[-1]{call})
+                                ? (call => delete $struct->{$self->{class}}[-1]{call})
+                                : (),
+                             exists($struct->{$self->{class}}[-1]{ind})
+                                ? (ind => delete $struct->{$self->{class}}[-1]{ind})
+                                : (),
                             }
                         ]
             };
+#>>>
         }
 
         {
@@ -2572,18 +2573,21 @@ package Sidef::Parser {
             }
 
             if (/\G\h*(?=\()/gc) {
-
+#<<<
                 $struct->{$self->{class}}[-1]{self} = {
                         $self->{class} => [
                             {
                              self => $struct->{$self->{class}}[-1]{self},
-                             exists($struct->{$self->{class}}[-1]{call}) ? (call => delete $struct->{$self->{class}}[-1]{call})
-                             : (),
-                             exists($struct->{$self->{class}}[-1]{ind}) ? (ind => delete $struct->{$self->{class}}[-1]{ind})
-                             : (),
+                             exists($struct->{$self->{class}}[-1]{call})
+                                ? (call => delete $struct->{$self->{class}}[-1]{call})
+                                : (),
+                             exists($struct->{$self->{class}}[-1]{ind})
+                                ? (ind => delete $struct->{$self->{class}}[-1]{ind})
+                                : (),
                             }
                         ]
                 };
+#>>>
 
                 my $arg = $self->parse_arg(code => $opt{code});
 
