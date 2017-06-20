@@ -106,13 +106,16 @@ package Sidef::Types::Array::Array {
     }
 
     sub reduce_operator {
-        my ($self, $operator) = @_;
+        my ($self, $operator, $initial) = @_;
 
         $operator = "$operator" if ref($operator);
-        (my $end = $#$self) >= 0 || return undef;
 
-        my $x = $self->[0];
-        foreach my $i (1 .. $end) {
+        my ($x, $beg) =
+          defined($initial)
+          ? ($initial, 0)
+          : ($self->[0], 1);
+
+        foreach my $i ($beg .. $#$self) {
             $x = $x->$operator($self->[$i]);
         }
         $x;
@@ -295,7 +298,9 @@ package Sidef::Types::Array::Array {
 
     sub is_empty {
         my ($self) = @_;
-        ($#$self == -1) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
+        ($#$self < 0)
+          ? (Sidef::Types::Bool::Bool::TRUE)
+          : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub sub {
@@ -542,7 +547,8 @@ package Sidef::Types::Array::Array {
     }
 
     sub collapse {
-        $_[0]->reduce_operator('+');
+        my ($self, $initial) = @_;
+        $self->reduce_operator('+', $initial);
     }
 
     sub sum_by {
@@ -1282,7 +1288,7 @@ package Sidef::Types::Array::Array {
             return $x;
         }
 
-        $self->reduce_operator("$obj");
+        $self->reduce_operator("$obj", $initial);
     }
 
     *inject = \&reduce;
