@@ -25,4 +25,36 @@ init();
 init();
 init();
 
+#
+## Lexical const test
+#
+func lex_const() {
+    func(a) {
+        const x = a
+        x
+    }
+}
+
+assert_eq(lex_const()(3), 3)
+assert_eq(lex_const()(4), 4)
+
+#
+## Static inside a closure
+#
+
+func lex_static() {
+    func {
+        static a = 42
+        ++a
+    }
+}
+
+assert_eq(lex_static()(), 43)
+assert_eq(lex_static()(), 43)
+
+var l = lex_static()
+assert_eq(l(), 43)
+assert_eq(l(), 44)
+assert_eq(l(), 45)
+
 say "** Test passed!";
