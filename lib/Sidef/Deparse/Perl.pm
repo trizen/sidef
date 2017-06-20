@@ -4,6 +4,7 @@ package Sidef::Deparse::Perl {
     use 5.014;
 
     use Scalar::Util qw(refaddr);
+    use Sidef::Types::Number::Number;
 
     my %addr;
     my %type;
@@ -984,7 +985,16 @@ HEADER
         }
         elsif ($ref eq 'Sidef::Types::Number::Number') {
             my ($type, $content) = $obj->_dump;
-            $code = $self->make_constant($ref, '_set_str', "Number$refaddr", "'$type'", "'$content'");
+
+            if ($type eq 'int' and $content >= 0 and $content <= Sidef::Types::Number::Number::ULONG_MAX) {
+                $code = $self->make_constant($ref, '_set_uint', "Number$refaddr", "'$content'");
+            }
+            elsif ($type eq 'int' and $content < 0 and $content >= Sidef::Types::Number::Number::LONG_MIN) {
+                $code = $self->make_constant($ref, '_set_int', "Number$refaddr", "'$content'");
+            }
+            else {
+                $code = $self->make_constant($ref, '_set_str', "Number$refaddr", "'$type'", "'$content'");
+            }
         }
         elsif ($ref eq 'Sidef::Types::String::String') {
             $code = $self->make_constant($ref, 'new', "String$refaddr", $self->_dump_string(${$obj}));
