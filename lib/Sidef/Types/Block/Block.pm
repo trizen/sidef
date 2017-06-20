@@ -49,7 +49,7 @@ package Sidef::Types::Block::Block {
 
         my @methods = ($self, exists($self->{kids}) ? @{$self->{kids}} : ());
 
-        if (defined($self->{class}) and length($self->{name})) {
+        if (defined($self->{class}) and defined($self->{name})) {
 
             my $limit = 4096;
 
