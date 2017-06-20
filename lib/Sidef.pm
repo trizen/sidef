@@ -114,27 +114,19 @@ package Sidef {
     sub has_dbm_driver {
         my ($self) = @_;
 
-        if (exists($self->{_db}) or exists($self->{_gdbm})) {
-            return ($self->{_db} || $self->{_gdbm});
+        if (exists $self->{dbm_driver}) {
+            return $self->{dbm_driver};
         }
 
         if (eval { require DB_File; 1 }) {
-            $self->{_db} = 1;
-            return 1;
-        }
-        else {
-            $self->{_db} = 0;
+            return ($self->{dbm_driver} = 'bdbm');
         }
 
         if (eval { require GDBM_File; 1 }) {
-            $self->{_gdbm} = 1;
-            return 1;
-        }
-        else {
-            $self->{_gdbm} = 0;
+            return ($self->{dbm_driver} = 'gdbm');
         }
 
-        return;
+        ($self->{dbm_driver} = undef);
     }
 
     sub _init_db {
@@ -256,12 +248,6 @@ package Sidef {
             };
 
             my $md5 = Digest::MD5::md5_hex(Encode::encode_utf8($code));
-
-            $self->{dbm_driver} //= (
-                                       $self->{_gdbm} ? 'gdbm'
-                                     : $self->{_db}   ? 'bdbm'
-                                     :                  die "unknown DBM driver"
-                                    );
 
             $self->{$lang}{time_db} //= File::Spec->catfile($db_dir, 'Sidef_Time_' . $self->{dbm_driver} . '.db');
             $self->{$lang}{code_db} //= File::Spec->catfile($db_dir, 'Sidef_Code_' . $self->{dbm_driver} . '.db');
