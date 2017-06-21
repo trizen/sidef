@@ -3637,7 +3637,16 @@ package Sidef::Types::Number::Number {
     sub zeta {
         my ($x) = @_;
         my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-        Math::MPFR::Rmpfr_zeta($r, _any2mpfr($$x), $ROUND);
+
+        my $f = _any2mpfr($$x);
+        if (    Math::MPFR::Rmpfr_integer_p($f)
+            and Math::MPFR::Rmpfr_sgn($f) >= 0
+            and Math::MPFR::Rmpfr_fits_ulong_p($f, $ROUND)) {
+            Math::MPFR::Rmpfr_zeta_ui($r, Math::MPFR::Rmpfr_get_ui($f, $ROUND), $ROUND);
+        }
+        else {
+            Math::MPFR::Rmpfr_zeta($r, $f, $ROUND);
+        }
         bless \$r;
     }
 
