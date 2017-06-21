@@ -461,6 +461,16 @@ Aliases: I<has_index>
 
 =cut
 
+=head2 expand
+
+Array.expand() -> I<Obj>
+
+Return the
+
+Aliases: I<expand_by>
+
+=cut
+
 =head2 fetch
 
 Array.fetch() -> I<Obj>
@@ -579,11 +589,13 @@ Aliases: I<select_kv>
 
 =cut
 
-=head2 group_by
+=head2 group
 
-Array.group_by() -> I<Obj>
+Array.group() -> I<Obj>
 
 Return the
+
+Aliases: I<group_by>
 
 =cut
 
@@ -974,6 +986,14 @@ Aliases: I<sample>
 =head2 range
 
 Array.range() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 recmap
+
+Array.recmap() -> I<Obj>
 
 Return the
 
