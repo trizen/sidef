@@ -441,7 +441,7 @@ package Sidef::Types::Range::Range {
         $op = "$op" if ref($op);
 
         my $iter = $self->iter->{code};
-        my $value = defined($initial) ? $initial : $iter->();
+        my $value = $initial // $iter->();
 
         while (defined(my $num = $iter->())) {
             $value = $value->$op($num);

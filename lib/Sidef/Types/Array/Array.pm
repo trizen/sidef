@@ -110,10 +110,11 @@ package Sidef::Types::Array::Array {
 
         $operator = "$operator" if ref($operator);
 
-        my ($x, $beg) =
-          defined($initial)
-          ? ($initial, 0)
-          : ($self->[0], 1);
+        my ($x, $beg) = (
+                         defined($initial)
+                         ? ($initial, 0)
+                         : ($self->[0], 1)
+                        );
 
         foreach my $i ($beg .. $#$self) {
             $x = $x->$operator($self->[$i]);
@@ -1279,9 +1280,14 @@ package Sidef::Types::Array::Array {
         my ($self, $obj, $initial) = @_;
 
         if (ref($obj) eq 'Sidef::Types::Block::Block') {
-            (my $end = $#$self) >= 0 || return undef;
-            my ($beg, $x) = defined($initial) ? (0, $initial) : (1, $self->[0]);
-            foreach my $i ($beg .. $end) {
+
+            my ($beg, $x) = (
+                             defined($initial)
+                             ? (0, $initial)
+                             : (1, $self->[0])
+                            );
+
+            foreach my $i ($beg .. $#$self) {
                 $x = $obj->run($x, $self->[$i]);
             }
 
