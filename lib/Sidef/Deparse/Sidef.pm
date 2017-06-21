@@ -168,7 +168,10 @@ package Sidef::Deparse::Sidef {
                        };
 
         exists($table->{lc($str)}) ? $table->{lc($str)} : do {
-            if (index($str, '/') != -1) {
+            if ($type eq 'float') {
+                "$str.float";
+            }
+            elsif (index($str, '/') != -1) {
                 "Number(\"$str\")";
             }
             else {
