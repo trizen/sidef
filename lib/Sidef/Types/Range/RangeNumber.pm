@@ -45,7 +45,6 @@ package Sidef::Types::Range::RangeNumber {
         my $from = $self->{from};
         my $to   = $self->{to};
 
-        my $asc = ($self->{_asc} //= !!($step->is_pos));
         my $i = $from;
 
         my $tmp;
@@ -81,6 +80,8 @@ package Sidef::Types::Range::RangeNumber {
                 );
             }
         }
+
+        my $asc = ($self->{_asc} //= !!($step->is_pos));
 
         Sidef::Types::Block::Block->new(
             code => sub {

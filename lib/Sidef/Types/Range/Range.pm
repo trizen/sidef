@@ -432,16 +432,16 @@ package Sidef::Types::Range::Range {
             return $value;
         }
 
-        $self->reduce_operator("$op");
+        $self->reduce_operator("$op", $initial);
     }
 
     sub reduce_operator {
-        my ($self, $op) = @_;
+        my ($self, $op, $initial) = @_;
 
         $op = "$op" if ref($op);
 
-        my $iter  = $self->iter->{code};
-        my $value = $iter->();
+        my $iter = $self->iter->{code};
+        my $value = $initial // $iter->();
 
         while (defined(my $num = $iter->())) {
             $value = $value->$op($num);
