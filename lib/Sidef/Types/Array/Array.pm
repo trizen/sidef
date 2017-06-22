@@ -908,6 +908,52 @@ package Sidef::Types::Array::Array {
         $self;
     }
 
+    sub expand {
+        my ($self, $code) = @_;
+
+        if (not defined($code)) {
+            $code = Sidef::Types::Block::Block->new(code => sub { $_[0] });
+        }
+
+        my @new;
+        my @copy = @$self;
+
+        foreach my $item (@copy) {
+            my $res = $code->run($item);
+
+            if (ref($res) eq __PACKAGE__) {
+                CORE::push(@copy, @$res);
+            }
+            else {
+                CORE::push(@new, $res);
+            }
+        }
+
+        bless \@new, __PACKAGE__;
+    }
+
+    *expand_by = \&expand;
+
+    sub recmap {
+        my ($self, $code) = @_;
+
+        if (not defined($code)) {
+            $code = Sidef::Types::Block::Block->new(code => sub { $_[0] });
+        }
+
+        my @copy = @$self;
+
+        foreach my $item (@copy) {
+            my $res = $code->run($item);
+
+            if (ref($res) eq __PACKAGE__) {
+                CORE::push(@copy, @$res);
+            }
+        }
+
+        bless \@copy, __PACKAGE__;
+    }
+
     sub map {
         my ($self, $code) = @_;
 
@@ -974,7 +1020,7 @@ package Sidef::Types::Array::Array {
 
     *select_kv = \&grep_kv;
 
-    sub group_by {
+    sub group {
         my ($self, $code) = @_;
 
         my %hash;
@@ -984,6 +1030,8 @@ package Sidef::Types::Array::Array {
 
         Sidef::Types::Hash::Hash->new(map { $_ => bless($hash{$_}, __PACKAGE__) } CORE::keys(%hash));
     }
+
+    *group_by = \&group;
 
     sub match {
         my ($self, $regex) = @_;
