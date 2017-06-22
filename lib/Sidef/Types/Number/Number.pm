@@ -2968,8 +2968,11 @@ package Sidef::Types::Number::Number {
       Math_MPFR: {
 
             # Return a complex number for x <= -1 or x >= 1
-            if (   Math::MPFR::Rmpfr_cmp_ui($x, 1) >= 0
-                or Math::MPFR::Rmpfr_cmp_si($x, -1) <= 0) {
+            if (
+                !Math::MPFR::Rmpfr_nan_p($x)
+                and (   Math::MPFR::Rmpfr_cmp_ui($x, +1) >= 0
+                     or Math::MPFR::Rmpfr_cmp_si($x, -1) <= 0)
+              ) {
                 my $r = _mpfr2mpc($x);
                 Math::MPC::Rmpc_atanh($r, $r, $ROUND);
                 return $r;
@@ -3617,7 +3620,8 @@ package Sidef::Types::Number::Number {
         my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
 
         # Special case for eta(1) = log(2)
-        if (Math::MPFR::Rmpfr_cmp_ui($x, 1) == 0) {
+        if (    Math::MPFR::Rmpfr_integer_p($x)
+            and Math::MPFR::Rmpfr_cmp_ui($x, 1) == 0) {
             Math::MPFR::Rmpfr_const_log2($r, $ROUND);
             return bless \$r;
         }
@@ -3637,7 +3641,16 @@ package Sidef::Types::Number::Number {
     sub zeta {
         my ($x) = @_;
         my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-        Math::MPFR::Rmpfr_zeta($r, _any2mpfr($$x), $ROUND);
+
+        my $f = _any2mpfr($$x);
+        if (    Math::MPFR::Rmpfr_integer_p($f)
+            and Math::MPFR::Rmpfr_sgn($f) >= 0
+            and Math::MPFR::Rmpfr_fits_ulong_p($f, $ROUND)) {
+            Math::MPFR::Rmpfr_zeta_ui($r, Math::MPFR::Rmpfr_get_ui($f, $ROUND), $ROUND);
+        }
+        else {
+            Math::MPFR::Rmpfr_zeta($r, $f, $ROUND);
+        }
         bless \$r;
     }
 
