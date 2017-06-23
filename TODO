@@ -16,7 +16,14 @@ New built-in classes:
 Internal:
     * Switch to subroutine `signatures` (as soon as this feature becomes stable).
 
+Performance:
+    * Add dynamic cache inside all the immutable built-in objects (except IO-related) that take only one argument (the self-object), such that calling the same method again on
+      the same object, will return the previous result from cache. When the object is destroyed, the cache is also destroyed with the object itself. This requires making all built-in
+      objects blessed HASH references. Currently, the String class blesses a scalar string, which do not allow any other fields inside the object to be stored. The Number class blsesses
+      a REF, etc... This change would require quite a lot of work, but the performance improvements may pay off in the end.
+
 Speculations:
+    * Make all built-in objects immutable, allowing dynamic cache to be applied to all built-in objects.
     * Make all core methods (including user-defined methods) real multimethods, using Class::Multimethods.
     * Bootstrap Sidef by writing a code generator in Sidef that generates Perl code.
     * Rewrite all core libraries in Sidef.
