@@ -270,8 +270,6 @@ Number.abs() -> I<Obj>
 
 Return the
 
-Aliases: I<pos>, I<positive>
-
 =cut
 
 =head2 acos
@@ -1503,8 +1501,6 @@ Return the
 Number.neg() -> I<Obj>
 
 Return the
-
-Aliases: I<negative>
 
 =cut
 

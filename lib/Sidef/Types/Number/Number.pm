@@ -1794,8 +1794,6 @@ package Sidef::Types::Number::Number {
         }
     }
 
-    *negative = \&neg;
-
     sub abs {
         my ($x) = @_;
 
@@ -1829,9 +1827,6 @@ package Sidef::Types::Number::Number {
             return bless \$r;
         }
     }
-
-    *pos      = \&abs;
-    *positive = \&abs;
 
     sub __inv__ {
         my ($x) = @_;

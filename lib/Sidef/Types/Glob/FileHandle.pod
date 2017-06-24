@@ -73,6 +73,16 @@ Return the
 
 =cut
 
+=head2 cp
+
+FileHandle.cp() -> I<Obj>
+
+Return the
+
+Aliases: I<copy>
+
+=cut
+
 =head2 each
 
 FileHandle.each() -> I<Obj>
