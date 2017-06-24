@@ -2,6 +2,7 @@ package Sidef::Types::Glob::FileHandle {
 
     use utf8;
     use 5.014;
+
     use parent qw(
       Sidef::Object::Object
       );
@@ -350,10 +351,6 @@ package Sidef::Types::Glob::FileHandle {
           : (Sidef::Types::Bool::Bool::FALSE);
     }
 
-    # File copy
-    *copy = \&Sidef::Types::Glob::File::copy;
-    *cp   = \&copy;
-
     sub read_to {
         my ($self, $var_ref) = @_;
 
@@ -375,6 +372,21 @@ package Sidef::Types::Glob::FileHandle {
         CORE::print {$self->{fh}} $string;
         $self;
     }
+
+    sub copy {
+        my ($self, $fh) = @_;
+
+        if (ref($fh) ne __PACKAGE__) {
+            return;
+        }
+
+        state $x = require File::Copy;
+        File::Copy::copy($self->{fh}, $fh->{fh})
+          ? (Sidef::Types::Bool::Bool::TRUE)
+          : (Sidef::Types::Bool::Bool::FALSE);
+    }
+
+    *cp = \&copy;
 
     {
         no strict 'refs';
