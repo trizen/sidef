@@ -958,6 +958,7 @@ utils/Experiments/C-inline-function-call.pl
 utils/Experiments/operator_precendece.pl
 utils/Experiments/regexp_grammars_op_precedence.pl
 utils/Experiments/regexp_grammars_parser.pl
+utils/find_class_typos.pl
 utils/find_invalid_types.pl
 utils/find_undefined_methods.pl
 utils/grep_errors.sh
