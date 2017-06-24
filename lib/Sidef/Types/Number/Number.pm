@@ -2508,7 +2508,6 @@ package Sidef::Types::Number::Number {
         }
 
       Math_MPC: {
-
             my $p = Math::MPFR::Rmpfr_init2($PREC);
             Math::MPFR::Rmpfr_set_str($p, '1e-' . ($PREC >> 2), 10, $ROUND);
 
