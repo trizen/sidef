@@ -4,7 +4,7 @@ func pi(n) {
     var pi = 0.0;
 
     for ((var i = 1; var j = 0) ; j <= n ; (i += 2; j++)) {
-        pi += (1/i -> (%w(neg pos)[j.is_even]));
+        pi += (1/i -> (%w(neg abs)[j.is_even]));
     }
 
     return (pi * 4);
