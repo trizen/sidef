@@ -243,7 +243,7 @@ package Sidef::Types::Number::Number {
 
             # Handle specially numbers with very big exponents
             # (it's not a very good solution, but I hope it's only temporary)
-            if (abs($exp) >= 1000000) {
+            if (CORE::abs($exp) >= 1000000) {
                 Math::MPFR::Rmpfr_set_str((my $mpfr = Math::MPFR::Rmpfr_init2($PREC)), "$sign$str", 10, $ROUND);
                 Math::MPFR::Rmpfr_get_q((my $mpq = Math::GMPq::Rmpq_init()), $mpfr);
                 return Math::GMPq::Rmpq_get_str($mpq, 10);
@@ -264,16 +264,16 @@ package Sidef::Types::Number::Number {
             my $denominator = "1";
 
             if ($exp < 1) {
-                $denominator .= '0' x (abs($exp) + length($after));
+                $denominator .= '0' x (CORE::abs($exp) + CORE::length($after));
             }
             else {
-                my $diff = ($exp - length($after));
+                my $diff = ($exp - CORE::length($after));
                 if ($diff >= 0) {
                     $numerator .= '0' x $diff;
                 }
                 else {
                     my $s = "$before$after";
-                    substr($s, $exp + length($before), 0, '.');
+                    substr($s, $exp + CORE::length($before), 0, '.');
                     return __SUB__->("$sign$s");
                 }
             }
@@ -282,10 +282,10 @@ package Sidef::Types::Number::Number {
         }
         elsif (($i = index($str, '.')) != -1) {
             my ($before, $after) = (substr($str, 0, $i), substr($str, $i + 1));
-            if (($after =~ tr/0//) == length($after)) {
+            if (($after =~ tr/0//) == CORE::length($after)) {
                 return "$sign$before";
             }
-            $sign . ("$before$after/1" =~ s/^0+//r) . ('0' x length($after));
+            $sign . ("$before$after/1" =~ s/^0+//r) . ('0' x CORE::length($after));
         }
         else {
             "$sign$str";
