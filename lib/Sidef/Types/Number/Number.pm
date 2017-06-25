@@ -243,7 +243,7 @@ package Sidef::Types::Number::Number {
 
             # Handle specially numbers with very big exponents
             # (it's not a very good solution, but I hope it's only temporary)
-            if (abs($exp) >= 1000000) {
+            if (CORE::abs($exp) >= 1000000) {
                 Math::MPFR::Rmpfr_set_str((my $mpfr = Math::MPFR::Rmpfr_init2($PREC)), "$sign$str", 10, $ROUND);
                 Math::MPFR::Rmpfr_get_q((my $mpq = Math::GMPq::Rmpq_init()), $mpfr);
                 return Math::GMPq::Rmpq_get_str($mpq, 10);
@@ -264,16 +264,16 @@ package Sidef::Types::Number::Number {
             my $denominator = "1";
 
             if ($exp < 1) {
-                $denominator .= '0' x (abs($exp) + length($after));
+                $denominator .= '0' x (CORE::abs($exp) + CORE::length($after));
             }
             else {
-                my $diff = ($exp - length($after));
+                my $diff = ($exp - CORE::length($after));
                 if ($diff >= 0) {
                     $numerator .= '0' x $diff;
                 }
                 else {
                     my $s = "$before$after";
-                    substr($s, $exp + length($before), 0, '.');
+                    substr($s, $exp + CORE::length($before), 0, '.');
                     return __SUB__->("$sign$s");
                 }
             }
@@ -282,10 +282,10 @@ package Sidef::Types::Number::Number {
         }
         elsif (($i = index($str, '.')) != -1) {
             my ($before, $after) = (substr($str, 0, $i), substr($str, $i + 1));
-            if (($after =~ tr/0//) == length($after)) {
+            if (($after =~ tr/0//) == CORE::length($after)) {
                 return "$sign$before";
             }
-            $sign . ("$before$after/1" =~ s/^0+//r) . ('0' x length($after));
+            $sign . ("$before$after/1" =~ s/^0+//r) . ('0' x CORE::length($after));
         }
         else {
             "$sign$str";
@@ -721,7 +721,7 @@ package Sidef::Types::Number::Number {
             #~ return Math::GMPq::Rmpq_get_str($x, 10);
             Math::GMPq::Rmpq_integer_p($x) && return Math::GMPq::Rmpq_get_str($x, 10);
 
-            $PREC = CORE::int($PREC);
+            $PREC = CORE::int($PREC) if ref($PREC);
 
             my $prec = $PREC >> 2;
             my $sgn  = Math::GMPq::Rmpq_sgn($x);
@@ -1794,8 +1794,6 @@ package Sidef::Types::Number::Number {
         }
     }
 
-    *negative = \&neg;
-
     sub abs {
         my ($x) = @_;
 
@@ -1829,9 +1827,6 @@ package Sidef::Types::Number::Number {
             return bless \$r;
         }
     }
-
-    *pos      = \&abs;
-    *positive = \&abs;
 
     sub __inv__ {
         my ($x) = @_;
@@ -2472,21 +2467,21 @@ package Sidef::Types::Number::Number {
     }
 
     sub __lgrt__ {
-        my $sig = ref($_[0]);
+        my ($c) = @_;
+        goto(ref($c) =~ tr/:/_/rs);
 
-        if ($sig eq q(Math::MPFR)) {
-            my ($d) = @_;
+        $PREC = CORE::int($PREC) if ref($PREC);
+
+      Math_MPFR: {
 
             # Return a complex number for x < e^(-1/e)
-            if (Math::MPFR::Rmpfr_cmp_d($d, CORE::exp(-1 / CORE::exp(1))) < 0) {
-                (@_) = _mpfr2mpc($d);
-                goto __SUB__;
+            if (Math::MPFR::Rmpfr_cmp_d($c, CORE::exp(-1 / CORE::exp(1))) < 0) {
+                $c = _mpfr2mpc($c);
+                goto Math_MPC;
             }
 
-            $PREC = CORE::int($PREC);
-
             my $r = Math::MPFR::Rmpfr_init2($PREC);
-            Math::MPFR::Rmpfr_log($r, $d, $ROUND);
+            Math::MPFR::Rmpfr_log($r, $c, $ROUND);
 
             Math::MPFR::Rmpfr_set_str((my $p = Math::MPFR::Rmpfr_init2($PREC)), '1e-' . ($PREC >> 2), 10, $ROUND);
             Math::MPFR::Rmpfr_set_ui((my $x = Math::MPFR::Rmpfr_init2($PREC)), 1, $ROUND);
@@ -2509,14 +2504,10 @@ package Sidef::Types::Number::Number {
                 last if ++$count > $PREC;
             }
 
-            $x;
+            return $x;
         }
 
-        elsif ($sig eq q(Math::MPC)) {
-            my ($c) = @_;
-
-            $PREC = CORE::int($PREC);
-
+      Math_MPC: {
             my $p = Math::MPFR::Rmpfr_init2($PREC);
             Math::MPFR::Rmpfr_set_str($p, '1e-' . ($PREC >> 2), 10, $ROUND);
 
@@ -2551,9 +2542,8 @@ package Sidef::Types::Number::Number {
                 last if ++$count > $PREC;
             }
 
-            $x;
+            return $x;
         }
-
     }
 
     sub lgrt {
@@ -2562,18 +2552,18 @@ package Sidef::Types::Number::Number {
     }
 
     sub __LambertW__ {
-        my $sig = ref($_[0]);
+        my ($x) = @_;
+        goto(ref($x) =~ tr/:/_/rs);
 
-        if ($sig eq q(Math::MPFR)) {
-            my ($x) = @_;
+        $PREC = CORE::int($PREC) if ref($PREC);
+
+      Math_MPFR: {
 
             # Return a complex number for x < -1/e
             if (Math::MPFR::Rmpfr_cmp_d($x, -1 / CORE::exp(1)) < 0) {
-                (@_) = _mpfr2mpc($x);
-                goto __SUB__;
+                $x = _mpfr2mpc($x);
+                goto Math_MPC;
             }
-
-            $PREC = CORE::int($PREC);
 
             Math::MPFR::Rmpfr_set_str((my $p = Math::MPFR::Rmpfr_init2($PREC)), '1e-' . ($PREC >> 2), 10, $ROUND);
             Math::MPFR::Rmpfr_set_ui((my $r = Math::MPFR::Rmpfr_init2($PREC)), 1, $ROUND);
@@ -2597,14 +2587,10 @@ package Sidef::Types::Number::Number {
             }
 
             Math::MPFR::Rmpfr_log($r, $r, $ROUND);
-            $r;
+            return $r;
         }
 
-        elsif ($sig eq q(Math::MPC)) {
-            my ($x) = @_;
-
-            $PREC = CORE::int($PREC);
-
+      Math_MPC: {
             my $p = Math::MPFR::Rmpfr_init2($PREC);
             Math::MPFR::Rmpfr_set_str($p, '1e-' . ($PREC >> 2), 10, $ROUND);
 
@@ -2636,7 +2622,7 @@ package Sidef::Types::Number::Number {
             }
 
             Math::MPC::Rmpc_log($r, $r, $ROUND);
-            $r;
+            return $r;
         }
     }
 
@@ -3458,7 +3444,7 @@ package Sidef::Types::Number::Number {
             # agm(x, 0) = 0
             Math::MPC::Rmpc_cmp_si_si($y, 0, 0) || return $y;
 
-            $PREC = CORE::int($PREC);
+            $PREC = CORE::int($PREC) if ref($PREC);
 
             my $a0 = Math::MPC::Rmpc_init2($PREC);
             my $g0 = Math::MPC::Rmpc_init2($PREC);
@@ -3474,7 +3460,7 @@ package Sidef::Types::Number::Number {
             my $count = 0;
             {
                 Math::MPC::Rmpc_add($a1, $a0, $g0, $ROUND);
-                Math::MPC::Rmpc_div_2exp($a1, $a1, 1, $ROUND);
+                Math::MPC::Rmpc_div_2ui($a1, $a1, 1, $ROUND);
 
                 Math::MPC::Rmpc_mul($g1, $a0, $g0, $ROUND);
                 Math::MPC::Rmpc_add($t, $a0, $g0, $ROUND);
