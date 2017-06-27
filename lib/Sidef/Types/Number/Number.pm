@@ -848,8 +848,10 @@ package Sidef::Types::Number::Number {
             }
 
             if (index($str, 'e') == -1) {
-                $str =~ s/0+\z//;
-                $str =~ s/\.\z//;
+                $str = reverse($str);
+                $str =~ s/^0+//;
+                $str =~ s/^\.//;
+                $str = reverse($str);
             }
 
             return ((!$str or $str eq '-') ? '0' : $str);
