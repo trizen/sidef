@@ -1173,7 +1173,7 @@ EOT
             foreach my $i (0 .. $#{$obj->{with}}) {
                 $code .= ($i == 0 ? 'if' : 'elsif');
                 my $info = $obj->{with}[$i];
-                my $vars = join(',', map { $self->_dump_var($_) } @{$info->{block}{init_vars}->{vars}});
+                my $vars = join(',', map { $self->_dump_var($_) } @{$info->{block}{init_vars}{vars}});
                 $code .=
                     "(defined((my ($vars) = do{"
                   . $self->deparse_args($info->{expr})
