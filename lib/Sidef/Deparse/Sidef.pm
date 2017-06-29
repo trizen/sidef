@@ -459,10 +459,10 @@ package Sidef::Deparse::Sidef {
             $code = 'given ' . $self->deparse_args($obj->{expr}) . $self->deparse_expr({self => $obj->{block}});
         }
         elsif ($ref eq 'Sidef::Types::Block::When') {
-            $code = 'when(' . $self->deparse_args($obj->{expr}) . ')' . $self->deparse_bare_block($obj->{block}{code});
+            $code = 'when(' . $self->deparse_args($obj->{expr}) . ')' . $self->deparse_expr({self => $obj->{block}});
         }
         elsif ($ref eq 'Sidef::Types::Block::Case') {
-            $code = 'case(' . $self->deparse_args($obj->{expr}) . ')' . $self->deparse_bare_block($obj->{block}{code});
+            $code = 'case(' . $self->deparse_args($obj->{expr}) . ')' . $self->deparse_expr({self => $obj->{block}});
         }
         elsif ($ref eq 'Sidef::Types::Block::Default') {
             $code = 'default' . $self->deparse_bare_block($obj->{block}->{code});
@@ -513,14 +513,14 @@ package Sidef::Deparse::Sidef {
             foreach my $i (0 .. $#{$obj->{if}}) {
                 $code .= ($i == 0 ? 'if' : 'elsif');
                 my $info = $obj->{if}[$i];
-                $code .= $self->deparse_args($info->{expr}) . $self->deparse_bare_block($info->{block}{code});
+                $code .= $self->deparse_args($info->{expr}) . $self->deparse_expr({self => $info->{block}});
             }
             if (exists $obj->{else}) {
                 $code .= 'else' . $self->deparse_bare_block($obj->{else}{block}{code});
             }
         }
         elsif ($ref eq 'Sidef::Types::Block::While') {
-            $code = "while" . $self->deparse_args($obj->{expr}) . $self->deparse_bare_block($obj->{block}{code});
+            $code = "while" . $self->deparse_args($obj->{expr}) . $self->deparse_expr({self => $obj->{block}});
         }
         elsif ($ref eq 'Sidef::Types::Block::ForEach') {
             $code = 'foreach' . $self->deparse_args($obj->{expr}) . $self->deparse_expr({self => $obj->{block}});
