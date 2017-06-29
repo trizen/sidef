@@ -1016,7 +1016,12 @@ HEADER
             foreach my $i (0 .. $#{$obj->{if}}) {
                 $code .= ($i == 0 ? 'if' : 'elsif');
                 my $info = $obj->{if}[$i];
-                $code .= '(do{' . $self->deparse_args($info->{expr}) . '})' . $self->deparse_bare_block($info->{block}{code});
+                my $var  = $self->_dump_var($info->{block}{init_vars}->{vars}[0]);
+                $code .=
+                    "((my ($var) = do{"
+                  . $self->deparse_args($info->{expr})
+                  . '})[0])'
+                  . $self->deparse_bare_block($info->{block}{code});
             }
             if (exists $obj->{else}) {
                 $code .= 'else' . $self->deparse_bare_block($obj->{else}{block}{code});
@@ -1145,9 +1150,9 @@ EOT
             foreach my $i (0 .. $#{$obj->{with}}) {
                 $code .= ($i == 0 ? 'if' : 'elsif');
                 my $info = $obj->{with}[$i];
-                my $dvar = $self->_dump_var($info->{block}{init_vars}->{vars}[0]);
+                my $var  = $self->_dump_var($info->{block}{init_vars}->{vars}[0]);
                 $code .=
-                    "(defined(my $dvar = do{"
+                    "(defined(my $var = do{"
                   . $self->deparse_args($info->{expr}) . '}))'
                   . $self->deparse_bare_block($info->{block}{code});
             }
