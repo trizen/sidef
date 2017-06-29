@@ -1016,12 +1016,19 @@ HEADER
             foreach my $i (0 .. $#{$obj->{if}}) {
                 $code .= ($i == 0 ? 'if' : 'elsif');
                 my $info = $obj->{if}[$i];
-                my $var  = $self->_dump_var($info->{block}{init_vars}->{vars}[0]);
-                $code .=
-                    "((my ($var) = do{"
-                  . $self->deparse_args($info->{expr})
-                  . '})[0])'
-                  . $self->deparse_bare_block($info->{block}{code});
+                my $vars = join(',', map { $self->_dump_var($_) } @{$info->{block}{init_vars}->{vars}});
+
+                if ($vars eq '') {
+                    $code .=
+                      '(do{' . $self->deparse_args($info->{expr}) . '})' . $self->deparse_bare_block($info->{block}{code});
+                }
+                else {
+                    $code .=
+                        "((my ($vars) = do{"
+                      . $self->deparse_args($info->{expr})
+                      . '})[-1])'
+                      . $self->deparse_bare_block($info->{block}{code});
+                }
             }
             if (exists $obj->{else}) {
                 $code .= 'else' . $self->deparse_bare_block($obj->{else}{block}{code});
@@ -1150,10 +1157,11 @@ EOT
             foreach my $i (0 .. $#{$obj->{with}}) {
                 $code .= ($i == 0 ? 'if' : 'elsif');
                 my $info = $obj->{with}[$i];
-                my $var  = $self->_dump_var($info->{block}{init_vars}->{vars}[0]);
+                my $vars = join(',', map { $self->_dump_var($_) } @{$info->{block}{init_vars}->{vars}});
                 $code .=
-                    "(defined(my $var = do{"
-                  . $self->deparse_args($info->{expr}) . '}))'
+                    "(defined((my ($vars) = do{"
+                  . $self->deparse_args($info->{expr})
+                  . '})[-1]))'
                   . $self->deparse_bare_block($info->{block}{code});
             }
             if (exists $obj->{else}) {
