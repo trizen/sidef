@@ -177,7 +177,7 @@ package Sidef::Types::Array::Array {
 
     sub mul {
         my ($self, $num) = @_;
-        bless [(@$self) x $num], __PACKAGE__;
+        bless [(@$self) x CORE::int($num)], __PACKAGE__;
     }
 
     sub div {
