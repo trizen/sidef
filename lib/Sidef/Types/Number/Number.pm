@@ -244,7 +244,7 @@ package Sidef::Types::Number::Number {
             # Handle specially numbers with very big exponents
             # (it's not a very good solution, but I hope it's only temporary)
             if (CORE::abs($exp) >= 1000000) {
-                Math::MPFR::Rmpfr_set_str((my $mpfr = Math::MPFR::Rmpfr_init2($PREC)), "$sign$str", 10, $ROUND);
+                Math::MPFR::Rmpfr_set_str((my $mpfr = Math::MPFR::Rmpfr_init2(CORE::int($PREC))), "$sign$str", 10, $ROUND);
                 Math::MPFR::Rmpfr_get_q((my $mpq = Math::GMPq::Rmpq_init()), $mpfr);
                 return Math::GMPq::Rmpq_get_str($mpq, 10);
             }
@@ -799,7 +799,7 @@ package Sidef::Types::Number::Number {
                         );
 
             # log(10)/log(2) =~ 3.3219280948873623
-            my $digits = $PREC >> 2;
+            my $digits = CORE::int($PREC) >> 2;
             my ($mantissa, $exponent) = Math::MPFR::Rmpfr_deref2($x, 10, $digits, $ROUND);
 
             my $sgn = '';
