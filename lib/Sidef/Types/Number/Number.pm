@@ -3659,7 +3659,7 @@ package Sidef::Types::Number::Number {
         Math::MPFR::Rmpfr_const_pi($p, $ROUND);                         # p = PI
         Math::MPFR::Rmpfr_pow_ui($p, $p, $n, $ROUND);                   # p = p^n
 
-        Math::MPFR::Rmpfr_div_2exp($f, $f, $n - 1, $ROUND);             # f = f / 2^(n-1)
+        Math::MPFR::Rmpfr_div_2ui($f, $f, $n - 1, $ROUND);              # f = f / 2^(n-1)
 
         Math::MPFR::Rmpfr_div($f, $f, $p, $ROUND);                      # f = f/p
         Math::MPFR::Rmpfr_neg($f, $f, $ROUND) if $n % 4 == 0;
