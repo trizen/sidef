@@ -2450,7 +2450,7 @@ package Sidef::Types::Number::Number {
         $PREC = CORE::int($PREC) if ref($PREC);
 
         my $p = Math::MPFR::Rmpfr_init2($PREC);
-        Math::MPFR::Rmpfr_set_si_2exp($p, 1, -$PREC + 3, $ROUND);
+        Math::MPFR::Rmpfr_set_str($p, '1e-' . CORE::int($PREC >> 2), 10, $ROUND);
 
         goto(ref($c) =~ tr/:/_/rs);
 
@@ -2535,7 +2535,7 @@ package Sidef::Types::Number::Number {
         $PREC = CORE::int($PREC) if ref($PREC);
 
         my $p = Math::MPFR::Rmpfr_init2($PREC);
-        Math::MPFR::Rmpfr_set_si_2exp($p, 1, -$PREC + 3, $ROUND);
+        Math::MPFR::Rmpfr_set_str($p, '1e-' . CORE::int($PREC >> 2), 10, $ROUND);
 
         goto(ref($x) =~ tr/:/_/rs);
 
@@ -6432,14 +6432,14 @@ package Sidef::Types::Number::Number {
         goto(ref($x) =~ tr/:/_/rs);
 
       Math_MPFR: {
-            my $xth = -CORE::int($prec);
+            my $nth = -CORE::int($prec);
 
             my $p = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-            Math::MPFR::Rmpfr_set_str($p, '1e' . CORE::abs($xth), 10, $ROUND);
+            Math::MPFR::Rmpfr_set_str($p, '1e' . CORE::abs($nth), 10, $ROUND);
 
             my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
 
-            if ($xth < 0) {
+            if ($nth < 0) {
                 Math::MPFR::Rmpfr_div($r, $x, $p, $ROUND);
             }
             else {
@@ -6448,7 +6448,7 @@ package Sidef::Types::Number::Number {
 
             Math::MPFR::Rmpfr_round($r, $r);
 
-            if ($xth < 0) {
+            if ($nth < 0) {
                 Math::MPFR::Rmpfr_mul($r, $r, $p, $ROUND);
             }
             else {
