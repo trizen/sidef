@@ -826,7 +826,10 @@ package Sidef::Types::Number::Number {
                 return ($sgn . $mantissa);
             }
 
-            substr($mantissa, 1, 0, '.');
+            if (CORE::length($mantissa) > 1) {
+                substr($mantissa, 1, 0, '.');
+            }
+
             return ($sgn . $mantissa . 'e' . ($exponent - 1));
         }
 
@@ -2443,9 +2446,13 @@ package Sidef::Types::Number::Number {
 
     sub __lgrt__ {
         my ($c) = @_;
-        goto(ref($c) =~ tr/:/_/rs);
 
         $PREC = CORE::int($PREC) if ref($PREC);
+
+        my $p = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_set_str($p, '1e-' . CORE::int($PREC >> 2), 10, $ROUND);
+
+        goto(ref($c) =~ tr/:/_/rs);
 
       Math_MPFR: {
 
@@ -2458,7 +2465,6 @@ package Sidef::Types::Number::Number {
             my $r = Math::MPFR::Rmpfr_init2($PREC);
             Math::MPFR::Rmpfr_log($r, $c, $ROUND);
 
-            Math::MPFR::Rmpfr_set_str((my $p = Math::MPFR::Rmpfr_init2($PREC)), '1e-' . ($PREC >> 2), 10, $ROUND);
             Math::MPFR::Rmpfr_set_ui((my $x = Math::MPFR::Rmpfr_init2($PREC)), 1, $ROUND);
             Math::MPFR::Rmpfr_set_ui((my $y = Math::MPFR::Rmpfr_init2($PREC)), 0, $ROUND);
 
@@ -2483,9 +2489,6 @@ package Sidef::Types::Number::Number {
         }
 
       Math_MPC: {
-            my $p = Math::MPFR::Rmpfr_init2($PREC);
-            Math::MPFR::Rmpfr_set_str($p, '1e-' . ($PREC >> 2), 10, $ROUND);
-
             my $d = Math::MPC::Rmpc_init2($PREC);
             Math::MPC::Rmpc_log($d, $c, $ROUND);
 
@@ -2528,9 +2531,13 @@ package Sidef::Types::Number::Number {
 
     sub __LambertW__ {
         my ($x) = @_;
-        goto(ref($x) =~ tr/:/_/rs);
 
         $PREC = CORE::int($PREC) if ref($PREC);
+
+        my $p = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_set_str($p, '1e-' . CORE::int($PREC >> 2), 10, $ROUND);
+
+        goto(ref($x) =~ tr/:/_/rs);
 
       Math_MPFR: {
 
@@ -2540,7 +2547,6 @@ package Sidef::Types::Number::Number {
                 goto Math_MPC;
             }
 
-            Math::MPFR::Rmpfr_set_str((my $p = Math::MPFR::Rmpfr_init2($PREC)), '1e-' . ($PREC >> 2), 10, $ROUND);
             Math::MPFR::Rmpfr_set_ui((my $r = Math::MPFR::Rmpfr_init2($PREC)), 1, $ROUND);
             Math::MPFR::Rmpfr_set_ui((my $y = Math::MPFR::Rmpfr_init2($PREC)), 0, $ROUND);
 
@@ -2566,9 +2572,6 @@ package Sidef::Types::Number::Number {
         }
 
       Math_MPC: {
-            my $p = Math::MPFR::Rmpfr_init2($PREC);
-            Math::MPFR::Rmpfr_set_str($p, '1e-' . ($PREC >> 2), 10, $ROUND);
-
             my $r = Math::MPC::Rmpc_init2($PREC);
             Math::MPC::Rmpc_sqrt($r, $x, $ROUND);
             Math::MPC::Rmpc_add_ui($r, $r, 1, $ROUND);
@@ -2579,7 +2582,7 @@ package Sidef::Types::Number::Number {
             my $tmp = Math::MPC::Rmpc_init2($PREC);
             my $abs = Math::MPFR::Rmpfr_init2($PREC);
 
-            my $xount = 0;
+            my $count = 0;
             while (1) {
                 Math::MPC::Rmpc_sub($tmp, $r, $y, $ROUND);
 
@@ -2593,7 +2596,7 @@ package Sidef::Types::Number::Number {
 
                 Math::MPC::Rmpc_add($r, $r, $x, $ROUND);
                 Math::MPC::Rmpc_div($r, $r, $tmp, $ROUND);
-                last if ++$xount > $PREC;
+                last if ++$count > $PREC;
             }
 
             Math::MPC::Rmpc_log($r, $r, $ROUND);
@@ -3656,7 +3659,7 @@ package Sidef::Types::Number::Number {
         Math::MPFR::Rmpfr_const_pi($p, $ROUND);                         # p = PI
         Math::MPFR::Rmpfr_pow_ui($p, $p, $n, $ROUND);                   # p = p^n
 
-        Math::MPFR::Rmpfr_div_2exp($f, $f, $n - 1, $ROUND);             # f = f / 2^(n-1)
+        Math::MPFR::Rmpfr_div_2ui($f, $f, $n - 1, $ROUND);              # f = f / 2^(n-1)
 
         Math::MPFR::Rmpfr_div($f, $f, $p, $ROUND);                      # f = f/p
         Math::MPFR::Rmpfr_neg($f, $f, $ROUND) if $n % 4 == 0;
@@ -6429,14 +6432,14 @@ package Sidef::Types::Number::Number {
         goto(ref($x) =~ tr/:/_/rs);
 
       Math_MPFR: {
-            my $xth = -CORE::int($prec);
+            my $nth = -CORE::int($prec);
 
             my $p = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-            Math::MPFR::Rmpfr_set_str($p, '1e' . CORE::abs($xth), 10, $ROUND);
+            Math::MPFR::Rmpfr_set_str($p, '1e' . CORE::abs($nth), 10, $ROUND);
 
             my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
 
-            if ($xth < 0) {
+            if ($nth < 0) {
                 Math::MPFR::Rmpfr_div($r, $x, $p, $ROUND);
             }
             else {
@@ -6445,7 +6448,7 @@ package Sidef::Types::Number::Number {
 
             Math::MPFR::Rmpfr_round($r, $r);
 
-            if ($xth < 0) {
+            if ($nth < 0) {
                 Math::MPFR::Rmpfr_mul($r, $r, $p, $ROUND);
             }
             else {
