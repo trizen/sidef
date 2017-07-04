@@ -1,0 +1,17 @@
+#!/usr/bin/ruby
+
+# Test the `__BLOCK__` keyword.
+
+var closures = 5.of { |k|
+    { |n|
+        n <= 1 ? n : (k * (__BLOCK__(n-1) + __BLOCK__(n-2)))
+    }
+}
+
+assert_eq(closures[0](10), 0)
+assert_eq(closures[1](10), 55)
+assert_eq(closures[3](10), 133893)
+assert_eq(closures[2](10), 6688)
+assert_eq(closures[1](12), 144)
+
+say "** Test passed!"

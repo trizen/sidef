@@ -819,6 +819,7 @@ scripts/Tests/ranges.sf
 scripts/Tests/read_a_configuration_file.sf
 scripts/Tests/rec_reverse.sf
 scripts/Tests/recursion.sf
+scripts/Tests/recursive_block_closures.sf
 scripts/Tests/regex.sf
 scripts/Tests/regex_bool.sf
 scripts/Tests/regex_global_matching.sf
