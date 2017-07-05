@@ -2493,7 +2493,7 @@ package Sidef::Types::Number::Number {
             Math::MPC::Rmpc_log($d, $c, $ROUND);
 
             my $x = Math::MPC::Rmpc_init2($PREC);
-            Math::MPC::Rmpc_sqr($x, $c, $ROUND);
+            Math::MPC::Rmpc_sqrt($x, $c, $ROUND);
             Math::MPC::Rmpc_add_ui($x, $x, 1, $ROUND);
             Math::MPC::Rmpc_log($x, $x, $ROUND);
 
