@@ -767,7 +767,7 @@ HEADER
         }
         elsif ($ref eq 'Sidef::Types::Block::BlockInit') {
             if ($addr{$refaddr}++) {
-                $code = q{Sidef::Types::Block::Block->new(code=>__SUB__,type=>'block'};
+                $code = "state\$_$refaddr=" . q{Sidef::Types::Block::Block->new(code=>__SUB__,type=>'block'};
 
                 if (exists($obj->{init_vars}) and @{$obj->{init_vars}{vars}}) {
                     $code .= ',' . $self->_dump_var_attr(@{$obj->{init_vars}{vars}});
