@@ -1012,6 +1012,22 @@ Return the
 
 =cut
 
+=head2 ipow10
+
+Number.ipow10() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 ipow2
+
+Number.ipow2() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 irand
 
 Number.irand() -> I<Obj>
