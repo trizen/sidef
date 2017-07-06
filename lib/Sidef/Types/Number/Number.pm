@@ -2417,8 +2417,8 @@ package Sidef::Types::Number::Number {
 
         state $round_z = Math::MPFR::MPFR_RNDZ();
 
-        state $logx = Math::MPFR::Rmpfr_init2_nobless(92);
-        state $logy = Math::MPFR::Rmpfr_init2_nobless(92);
+        state $logx = Math::MPFR::Rmpfr_init2_nobless(64);
+        state $logy = Math::MPFR::Rmpfr_init2_nobless(64);
 
         Math::MPFR::Rmpfr_set_z($logx, $x, $round_z);
         Math::MPFR::Rmpfr_set_z($logy, $y, $round_z);
