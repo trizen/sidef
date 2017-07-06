@@ -89,7 +89,7 @@ package Sidef::Deparse::Perl {
         $opts{header} .= <<"HEADER";
 
 use utf8;
-use $];
+use ${\($] <= 5.026 ? $] : 5.026)};
 
 HEADER
 
