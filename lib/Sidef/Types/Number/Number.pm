@@ -1039,12 +1039,11 @@ package Sidef::Types::Number::Number {
     }
 
     sub phi {
-        state $five4_f = (Math::MPFR::Rmpfr_init_set_str_nobless("1.25", 10, $ROUND))[0];
-        state $half_f  = (Math::MPFR::Rmpfr_init_set_str_nobless("0.5",  10, $ROUND))[0];
+        state $five4_f = (Math::MPFR::Rmpfr_init_set_d_nobless(1.25, $ROUND))[0];
 
         my $phi = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
         Math::MPFR::Rmpfr_sqrt($phi, $five4_f, $ROUND);
-        Math::MPFR::Rmpfr_add($phi, $phi, $half_f, $ROUND);
+        Math::MPFR::Rmpfr_add_d($phi, $phi, 0.5, $ROUND);
 
         bless \$phi;
     }
@@ -2235,6 +2234,31 @@ package Sidef::Types::Number::Number {
             Math::GMPz::Rmpz_tdiv_q($r, $ONE_Z, $r);
         }
 
+        bless \$r;
+    }
+
+    sub ipow2 {
+        my ($n) = @_;
+
+        $n = _any2si($$n) // goto &nan;
+
+        goto &zero if $n < 0;
+        state $one = Math::GMPz::Rmpz_init_set_ui_nobless(1);
+
+        my $r = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_mul_2exp($r, $one, $n);
+        bless \$r;
+    }
+
+    sub ipow10 {
+        my ($n) = @_;
+
+        $n = _any2si($$n) // goto &nan;
+
+        goto &zero if $n < 0;
+
+        my $r = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_ui_pow_ui($r, 10, $n);
         bless \$r;
     }
 
