@@ -4741,7 +4741,13 @@ package Sidef::Types::Number::Number {
 
     sub dump {
         my ($x) = @_;
-        Sidef::Types::String::String->new(__stringify__($$x));
+
+        $x = $$x;
+        Sidef::Types::String::String->new(
+                                            ref($x) eq 'Math::GMPq' ? Math::GMPq::Rmpq_get_str($x, 10)
+                                          : ref($x) eq 'Math::GMPz' ? Math::GMPz::Rmpz_get_str($x, 10)
+                                          :                           __stringify__($x)
+                                         );
     }
 
     sub as_bin {
