@@ -2417,8 +2417,8 @@ package Sidef::Types::Number::Number {
 
         state $round_z = Math::MPFR::MPFR_RNDZ();
 
-        my $logx = Math::MPFR::Rmpfr_init2(92);
-        my $logy = Math::MPFR::Rmpfr_init2(92);
+        state $logx = Math::MPFR::Rmpfr_init2_nobless(92);
+        state $logy = Math::MPFR::Rmpfr_init2_nobless(92);
 
         Math::MPFR::Rmpfr_set_z($logx, $x, $round_z);
         Math::MPFR::Rmpfr_set_z($logy, $y, $round_z);
@@ -5523,7 +5523,7 @@ package Sidef::Types::Number::Number {
         my $first = CORE::int($x * $logx);
         my $last  = CORE::int($x * $logx * 2 + 2);
 
-        my $mpfr = Math::MPFR::Rmpfr_init2(64);
+        state $mpfr = Math::MPFR::Rmpfr_init2_nobless(64);
 
         # Find Li^-1(x) using binary search
         while ($first < $last) {
@@ -5752,7 +5752,11 @@ package Sidef::Types::Number::Number {
 
                 if ($count >= $n) {
                     my $p = $primes[$n - $prev_count - 1];
-                    return __PACKAGE__->_set_str('int', $p);
+                    return (
+                            $p <= ULONG_MAX
+                            ? __PACKAGE__->_set_uint($p)
+                            : __PACKAGE__->_set_str('int', $p)
+                           );
                 }
 
                 $prev_count = $count;
