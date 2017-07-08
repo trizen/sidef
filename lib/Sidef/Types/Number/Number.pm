@@ -5334,6 +5334,58 @@ package Sidef::Types::Number::Number {
 
     *mfac = \&mfactorial;
 
+    #
+    ## falling_factorial(x, y) = binomial(x, y) * y!
+    #
+
+    sub falling_factorial {
+        my ($x, $y) = @_;
+        _valid(\$y);
+
+        $x = _any2mpz($$x) // (goto &nan);
+        $y = _any2ui($$y)  // (goto &nan);
+
+        my $r = Math::GMPz::Rmpz_init();
+
+        Math::GMPz::Rmpz_fits_ulong_p($x)
+          ? Math::GMPz::Rmpz_bin_uiui($r, Math::GMPz::Rmpz_get_ui($x), $y)
+          : Math::GMPz::Rmpz_bin_ui($r, $x, $y);
+
+        Math::GMPz::Rmpz_sgn($r) || goto &zero;
+
+        state $t = Math::GMPz::Rmpz_init_nobless();
+        Math::GMPz::Rmpz_fac_ui($t, $y);
+        Math::GMPz::Rmpz_mul($r, $r, $t);
+        bless \$r;
+    }
+
+    #
+    ## rising_factorial(x, y) = binomial(x + y - 1, y) * y!
+    #
+
+    sub rising_factorial {
+        my ($x, $y) = @_;
+        _valid(\$y);
+
+        $x = _any2mpz($$x) // (goto &nan);
+        $y = _any2ui($$y)  // (goto &nan);
+
+        my $r = Math::GMPz::Rmpz_init_set($x);
+        Math::GMPz::Rmpz_add_ui($r, $r, $y);
+        Math::GMPz::Rmpz_sub_ui($r, $r, 1);
+
+        Math::GMPz::Rmpz_fits_ulong_p($r)
+          ? Math::GMPz::Rmpz_bin_uiui($r, Math::GMPz::Rmpz_get_ui($r), $y)
+          : Math::GMPz::Rmpz_bin_ui($r, $r, $y);
+
+        Math::GMPz::Rmpz_sgn($r) || goto &zero;
+
+        state $t = Math::GMPz::Rmpz_init_nobless();
+        Math::GMPz::Rmpz_fac_ui($t, $y);
+        Math::GMPz::Rmpz_mul($r, $r, $t);
+        bless \$r;
+    }
+
     sub primorial {
         my ($x) = @_;
         my $ui = _any2ui($$x) // (goto &nan);
@@ -5405,14 +5457,19 @@ package Sidef::Types::Number::Number {
         my ($x, $y) = @_;
         _valid(\$y);
 
-        $y = _any2si($$y)  // (goto &nan);
         $x = _any2mpz($$x) // (goto &nan);
+        $y = _any2si($$y)  // (goto &nan);
 
         my $r = Math::GMPz::Rmpz_init();
 
-        $y < 0
-          ? Math::GMPz::Rmpz_bin_si($r, $x, $y)
-          : Math::GMPz::Rmpz_bin_ui($r, $x, $y);
+        if ($y >= 0 and Math::GMPz::Rmpz_fits_ulong_p($x)) {
+            Math::GMPz::Rmpz_bin_uiui($r, Math::GMPz::Rmpz_get_ui($x), $y);
+        }
+        else {
+            $y < 0
+              ? Math::GMPz::Rmpz_bin_si($r, $x, $y)
+              : Math::GMPz::Rmpz_bin_ui($r, $x, $y);
+        }
 
         bless \$r;
     }

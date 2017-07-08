@@ -814,6 +814,14 @@ Aliases: I<factors_exp>
 
 =cut
 
+=head2 falling_factorial
+
+Number.falling_factorial() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 fib
 
 Number.fib() -> I<Obj>
@@ -1829,6 +1837,14 @@ Number.remdiv() -> I<Obj>
 Return the
 
 Aliases: I<remove>
+
+=cut
+
+=head2 rising_factorial
+
+Number.rising_factorial() -> I<Obj>
+
+Return the
 
 =cut
 
