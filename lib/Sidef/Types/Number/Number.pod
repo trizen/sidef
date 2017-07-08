@@ -270,8 +270,6 @@ Number.abs() -> I<Obj>
 
 Return the
 
-Aliases: I<pos>, I<positive>
-
 =cut
 
 =head2 acos
@@ -816,6 +814,14 @@ Aliases: I<factors_exp>
 
 =cut
 
+=head2 falling_factorial
+
+Number.falling_factorial() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 fib
 
 Number.fib() -> I<Obj>
@@ -1009,6 +1015,22 @@ Aliases: I<modinv>
 =head2 ipow
 
 Number.ipow() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 ipow10
+
+Number.ipow10() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 ipow2
+
+Number.ipow2() -> I<Obj>
 
 Return the
 
@@ -1504,8 +1526,6 @@ Number.neg() -> I<Obj>
 
 Return the
 
-Aliases: I<negative>
-
 =cut
 
 =head2 new
@@ -1817,6 +1837,14 @@ Number.remdiv() -> I<Obj>
 Return the
 
 Aliases: I<remove>
+
+=cut
+
+=head2 rising_factorial
+
+Number.rising_factorial() -> I<Obj>
+
+Return the
 
 =cut
 
