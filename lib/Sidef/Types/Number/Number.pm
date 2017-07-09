@@ -5335,7 +5335,8 @@ package Sidef::Types::Number::Number {
     *mfac = \&mfactorial;
 
     #
-    ## falling_factorial(x, y) = binomial(x, y) * y!
+    ## falling_factorial(x, +y) = binomial(x, y) * y!
+    ## falling_factorial(x, -y) = 1/falling_factorial(x + y, y)
     #
 
     sub falling_factorial {
@@ -5343,24 +5344,42 @@ package Sidef::Types::Number::Number {
         _valid(\$y);
 
         $x = _any2mpz($$x) // (goto &nan);
-        $y = _any2ui($$y)  // (goto &nan);
+        $y = _any2si($$y)  // (goto &nan);
 
-        my $r = Math::GMPz::Rmpz_init();
+        my $r = Math::GMPz::Rmpz_init_set($x);
 
-        Math::GMPz::Rmpz_fits_ulong_p($x)
-          ? Math::GMPz::Rmpz_bin_uiui($r, Math::GMPz::Rmpz_get_ui($x), $y)
-          : Math::GMPz::Rmpz_bin_ui($r, $x, $y);
+        if ($y < 0) {
+            Math::GMPz::Rmpz_add_ui($r, $r, CORE::abs($y));
+        }
 
-        Math::GMPz::Rmpz_sgn($r) || goto &zero;
+        Math::GMPz::Rmpz_fits_ulong_p($r)
+          ? Math::GMPz::Rmpz_bin_uiui($r, Math::GMPz::Rmpz_get_ui($r), CORE::abs($y))
+          : Math::GMPz::Rmpz_bin_ui($r, $r, CORE::abs($y));
+
+        if (!Math::GMPz::Rmpz_sgn($r)) {
+            $y < 0
+              ? (goto &inf)
+              : (goto &zero);
+        }
 
         state $t = Math::GMPz::Rmpz_init_nobless();
-        Math::GMPz::Rmpz_fac_ui($t, $y);
+        Math::GMPz::Rmpz_fac_ui($t, CORE::abs($y));
         Math::GMPz::Rmpz_mul($r, $r, $t);
+
+        if ($y < 0) {
+            my $q = Math::GMPq::Rmpq_init();
+            Math::GMPq::Rmpq_set_ui($q, 1, 1);
+            Math::GMPq::Rmpq_set_den($q, $r);
+            Math::GMPq::Rmpq_canonicalize($q);
+            return bless \$q;
+        }
+
         bless \$r;
     }
 
     #
-    ## rising_factorial(x, y) = binomial(x + y - 1, y) * y!
+    ## rising_factorial(x, +y) = binomial(x + y - 1, y) * y!
+    ## rising_factorial(x, -y) = 1/rising_factorial(x - y, y)
     #
 
     sub rising_factorial {
@@ -5368,21 +5387,38 @@ package Sidef::Types::Number::Number {
         _valid(\$y);
 
         $x = _any2mpz($$x) // (goto &nan);
-        $y = _any2ui($$y)  // (goto &nan);
+        $y = _any2si($$y)  // (goto &nan);
 
         my $r = Math::GMPz::Rmpz_init_set($x);
-        Math::GMPz::Rmpz_add_ui($r, $r, $y);
+        Math::GMPz::Rmpz_add_ui($r, $r, CORE::abs($y));
         Math::GMPz::Rmpz_sub_ui($r, $r, 1);
 
-        Math::GMPz::Rmpz_fits_ulong_p($r)
-          ? Math::GMPz::Rmpz_bin_uiui($r, Math::GMPz::Rmpz_get_ui($r), $y)
-          : Math::GMPz::Rmpz_bin_ui($r, $r, $y);
+        if ($y < 0) {
+            Math::GMPz::Rmpz_sub_ui($r, $r, CORE::abs($y));
+        }
 
-        Math::GMPz::Rmpz_sgn($r) || goto &zero;
+        Math::GMPz::Rmpz_fits_ulong_p($r)
+          ? Math::GMPz::Rmpz_bin_uiui($r, Math::GMPz::Rmpz_get_ui($r), CORE::abs($y))
+          : Math::GMPz::Rmpz_bin_ui($r, $r, CORE::abs($y));
+
+        if (!Math::GMPz::Rmpz_sgn($r)) {
+            $y < 0
+              ? (goto &inf)
+              : (goto &zero);
+        }
 
         state $t = Math::GMPz::Rmpz_init_nobless();
-        Math::GMPz::Rmpz_fac_ui($t, $y);
+        Math::GMPz::Rmpz_fac_ui($t, CORE::abs($y));
         Math::GMPz::Rmpz_mul($r, $r, $t);
+
+        if ($y < 0) {
+            my $q = Math::GMPq::Rmpq_init();
+            Math::GMPq::Rmpq_set_ui($q, 1, 1);
+            Math::GMPq::Rmpq_set_den($q, $r);
+            Math::GMPq::Rmpq_canonicalize($q);
+            return bless \$q;
+        }
+
         bless \$r;
     }
 
