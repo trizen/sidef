@@ -1,0 +1,29 @@
+#!/usr/bin/ruby
+
+# A simple implementation of the Karatsuba multiplication,
+# which was the first subquadratic-time algorithm ever invented.
+
+func karatsuba_multiplication(x, y, n=8) {
+    if (n <= 1) {
+        x * y
+    }
+    else {
+        var m = ceil(n/2)
+
+        var (a, b) = divmod(x, ipow2(m))
+        var (c, d) = divmod(y, ipow2(m))
+
+        var e = karatsuba_multiplication(a, c, m)
+        var f = karatsuba_multiplication(b, d, m)
+        var g = karatsuba_multiplication(a - b, c - d, m)
+
+        (ipow2(2*m) * e) + (ipow2(m) * (e + f - g)) + f
+    }
+}
+
+say karatsuba_multiplication(122, 422)       # 122 * 422 = 51484
+
+assert_eq(karatsuba_multiplication(122, 422), 51484)
+assert_eq(karatsuba_multiplication(413, -921, 12), -380373)
+assert_eq(karatsuba_multiplication(-132, 713, 9), -94116)
+assert_eq(karatsuba_multiplication(-993, -375, 5), 372375)
