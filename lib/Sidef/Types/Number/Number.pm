@@ -3629,7 +3629,6 @@ package Sidef::Types::Number::Number {
 
         my $f = _any2mpfr($$x);
         if (    Math::MPFR::Rmpfr_integer_p($f)
-            and Math::MPFR::Rmpfr_sgn($f) >= 0
             and Math::MPFR::Rmpfr_fits_ulong_p($f, $ROUND)) {
             Math::MPFR::Rmpfr_zeta_ui($r, Math::MPFR::Rmpfr_get_ui($f, $ROUND), $ROUND);
         }
