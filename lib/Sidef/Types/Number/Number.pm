@@ -5357,7 +5357,7 @@ package Sidef::Types::Number::Number {
 
         if (!Math::GMPz::Rmpz_sgn($r)) {
             $y < 0
-              ? (goto &inf)
+              ? (goto &nan)
               : (goto &zero);
         }
 
@@ -5401,7 +5401,7 @@ package Sidef::Types::Number::Number {
 
         if (!Math::GMPz::Rmpz_sgn($r)) {
             $y < 0
-              ? (goto &inf)
+              ? (goto &nan)
               : (goto &zero);
         }
 
