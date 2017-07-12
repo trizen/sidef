@@ -1275,8 +1275,8 @@ package Sidef::Types::Number::Number {
 
       Math_GMPq__Math_MPFR: {
             my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-            Math::MPFR::Rmpfr_set_q($r, $x, $ROUND);
-            Math::MPFR::Rmpfr_sub($r, $r, $y, $ROUND);
+            Math::MPFR::Rmpfr_sub_q($r, $y, $x, $ROUND);
+            Math::MPFR::Rmpfr_neg($r, $r, $ROUND);
             return $r;
         }
 
