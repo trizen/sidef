@@ -896,7 +896,7 @@ package Sidef::Types::Number::Number {
 
         $x = _any2mpfr($$x);
 
-        Math::MPFR::Rmpfr_number_p($x) || return undef;
+        Math::MPFR::Rmpfr_number_p($x) || goto &nan;
 
         my $t = Math::MPFR::Rmpfr_init2(CORE::int($PREC));    # temporary variable
         my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
