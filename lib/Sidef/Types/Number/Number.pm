@@ -18,9 +18,11 @@ package Sidef::Types::Number::Number {
         $PREC  = 192;
     }
 
-    my $ONE  = Math::GMPz::Rmpz_init_set_ui(1);
-    my $ZERO = Math::GMPz::Rmpz_init_set_ui(0);
-    my $MONE = Math::GMPz::Rmpz_init_set_si(-1);
+    state $round_z = Math::MPFR::MPFR_RNDZ();
+
+    state $ONE  = Math::GMPz::Rmpz_init_set_ui(1);
+    state $ZERO = Math::GMPz::Rmpz_init_set_ui(0);
+    state $MONE = Math::GMPz::Rmpz_init_set_si(-1);
 
 #<<<
     use constant {
@@ -543,7 +545,7 @@ package Sidef::Types::Number::Number {
         if (ref($x) eq 'Math::MPFR') {
             if (Math::MPFR::Rmpfr_number_p($x)) {
                 my $z = Math::GMPz::Rmpz_init();
-                Math::MPFR::Rmpfr_get_z($z, $x, Math::MPFR::MPFR_RNDZ);
+                Math::MPFR::Rmpfr_get_z($z, $x, $round_z);
                 return $z;
             }
             return;
@@ -887,6 +889,69 @@ package Sidef::Types::Number::Number {
     sub complex {
         my ($x) = @_;
         ref($$x) eq 'Math::MPC' ? $x : bless \_any2mpc($$x);
+    }
+
+    sub frac_approx {
+        my ($x) = @_;
+
+        $x = _any2mpfr($$x);
+
+        Math::MPFR::Rmpfr_number_p($x) || goto &nan;
+
+        my $t = Math::MPFR::Rmpfr_init2(CORE::int($PREC));    # temporary variable
+        my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+
+        Math::MPFR::Rmpfr_set($r, $x, $ROUND);
+
+        my $num2cfrac = sub {
+            my ($callback, $n) = @_;
+
+            while (1) {
+                Math::MPFR::Rmpfr_floor($t, $r);
+
+                my $z = Math::GMPz::Rmpz_init();
+                Math::MPFR::Rmpfr_get_z($z, $t, $round_z);
+
+                $callback->($z) && return 1;
+
+                Math::MPFR::Rmpfr_sub($r, $r, $t, $ROUND);
+                Math::MPFR::Rmpfr_zero_p($r) && last;
+                Math::MPFR::Rmpfr_ui_div($r, 1, $r, $ROUND);
+            }
+        };
+
+        my $q = Math::GMPq::Rmpq_init();
+
+        my $cfrac2num = sub {
+            my (@f) = @_;
+
+            Math::GMPq::Rmpq_set_ui($q, 0, 1);
+
+            for (1 .. $#f) {
+                Math::GMPq::Rmpq_add_z($q, $q, CORE::pop(@f));
+                Math::GMPq::Rmpq_inv($q, $q);
+            }
+
+            Math::GMPq::Rmpq_add_z($q, $q, $f[0]);
+        };
+
+        my @cfrac;
+        my $s = __stringify__($x);
+        my $u = Math::MPFR::Rmpfr_init2(CORE::int($PREC));    # temporary variable
+
+#<<<
+        $num2cfrac->(
+            sub {
+                my ($n) = @_;
+                CORE::push(@cfrac, $n);
+                $cfrac2num->(@cfrac);
+                Math::MPFR::Rmpfr_set_q($u, $q, $ROUND);
+                CORE::index(__stringify__($u), $s) == 0;
+            }, $x
+        );
+#>>>
+
+        bless \$q;
     }
 
     sub pair {
@@ -2414,8 +2479,6 @@ package Sidef::Types::Number::Number {
 
         my $e = 0;
         my $t = Math::GMPz::Rmpz_init();
-
-        state $round_z = Math::MPFR::MPFR_RNDZ();
 
         state $logx = Math::MPFR::Rmpfr_init2_nobless(64);
         state $logy = Math::MPFR::Rmpfr_init2_nobless(64);
@@ -6422,7 +6485,7 @@ package Sidef::Types::Number::Number {
 
         my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
 
-        Math::MPFR::Rmpfr_log2($r, _any2mpfr($$x), Math::MPFR::MPFR_RNDZ);
+        Math::MPFR::Rmpfr_log2($r, _any2mpfr($$x), $round_z);
         Math::MPFR::Rmpfr_ceil($r, $r);
 
         my $z = Math::GMPz::Rmpz_init_set_ui(1);
@@ -6441,8 +6504,8 @@ package Sidef::Types::Number::Number {
         my $f1 = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
         my $f2 = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
 
-        Math::MPFR::Rmpfr_log($f1, _any2mpfr($$x), Math::MPFR::MPFR_RNDZ);
-        Math::MPFR::Rmpfr_log($f2, _any2mpfr($$y), Math::MPFR::MPFR_RNDZ);
+        Math::MPFR::Rmpfr_log($f1, _any2mpfr($$x), $round_z);
+        Math::MPFR::Rmpfr_log($f2, _any2mpfr($$y), $round_z);
 
         Math::MPFR::Rmpfr_div($f1, $f1, $f2, $ROUND);
         Math::MPFR::Rmpfr_ceil($f1, $f1);
