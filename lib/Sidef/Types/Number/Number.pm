@@ -891,7 +891,7 @@ package Sidef::Types::Number::Number {
         ref($$x) eq 'Math::MPC' ? $x : bless \_any2mpc($$x);
     }
 
-    sub frac_approx {
+    sub rat_approx {
         my ($x) = @_;
 
         $x = _any2mpfr($$x);
