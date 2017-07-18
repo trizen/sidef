@@ -87,7 +87,7 @@ class MD5(String msg) {
         var M = md5_pad(msg)
         var H = [0x67452301, 0xefcdab89, 0x98badcfe, 0x10325476]
 
-        for i in (range(0, M.end, 16)) {
+        for i in (^M `by` 16) {
             md5_block(H, M.ft(i, i+15))
         }
 
