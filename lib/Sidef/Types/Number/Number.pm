@@ -302,8 +302,7 @@ package Sidef::Types::Number::Number {
     sub _str2obj {
         my ($s) = @_;
 
-        $s
-          || return Math::GMPz::Rmpz_init_set_ui(0);
+        $s || return $ZERO;
 
         $s = lc($s);
 
@@ -5043,8 +5042,7 @@ package Sidef::Types::Number::Number {
               || goto &_nan;
 
             my $quo = Math::GMPq::Rmpq_init();
-            Math::GMPq::Rmpq_set($quo, $x);
-            Math::GMPq::Rmpq_div($quo, $quo, $y);
+            Math::GMPq::Rmpq_div($quo, $x, $y);
 
             # Floor
             if (!Math::GMPq::Rmpq_integer_p($quo)) {
@@ -5061,8 +5059,25 @@ package Sidef::Types::Number::Number {
         }
 
       Math_GMPq__Math_GMPz: {
-            $y = _mpz2mpq($y);
-            goto Math_GMPq__Math_GMPq;
+
+            Math::GMPz::Rmpz_sgn($y)
+              || goto &_nan;
+
+            my $quo = Math::GMPq::Rmpq_init();
+            Math::GMPq::Rmpq_div_z($quo, $x, $y);
+
+            # Floor
+            if (!Math::GMPq::Rmpq_integer_p($quo)) {
+                my $z = Math::GMPz::Rmpz_init();
+                Math::GMPz::Rmpz_set_q($z, $quo);
+                Math::GMPz::Rmpz_sub_ui($z, $z, 1) if Math::GMPq::Rmpq_sgn($quo) < 0;
+                Math::GMPq::Rmpq_set_z($quo, $z);
+            }
+
+            Math::GMPq::Rmpq_mul_z($quo, $quo, $y);
+            Math::GMPq::Rmpq_sub($quo, $x, $quo);
+
+            return $quo;
         }
 
       Math_GMPq__Math_MPFR: {
