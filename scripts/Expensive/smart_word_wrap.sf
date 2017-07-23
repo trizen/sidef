@@ -46,7 +46,7 @@ class SmartWordWrap(width=80) {
     }
 
     # This function combines the
-    # the parents with the childrens.
+    # the parents with the children.
     method combine(root, path) {
 
         var row = []
