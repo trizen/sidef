@@ -51,6 +51,8 @@ package Sidef::Types::Regex::Regex {
                                        );
     }
 
+    *run = \&match;
+
     sub gmatch {
         my ($self, $obj, $pos) = @_;
         local $self->{global} = 1;

@@ -187,17 +187,10 @@ package Sidef::Types::Hash::Hash {
         my ($self, $obj) = @_;
 
         my %hash;
-        if (ref($obj) eq 'Sidef::Types::Regex::Regex') {
-            my $re = $obj->{regex};
-            my @keys = grep { $_ =~ $re } CORE::keys(%$self);
-            @hash{@keys} = @$self{@keys};
-        }
-        else {
-            foreach my $key (CORE::keys %$self) {
-                my $value = $self->{$key};
-                if ($obj->run(Sidef::Types::String::String->new($key), $value)) {
-                    $hash{$key} = $value;
-                }
+        foreach my $key (CORE::keys %$self) {
+            my $value = $self->{$key};
+            if ($obj->run(Sidef::Types::String::String->new($key), $value)) {
+                $hash{$key} = $value;
             }
         }
 
@@ -211,16 +204,10 @@ package Sidef::Types::Hash::Hash {
         my ($self, $obj) = @_;
 
         my %hash;
-        if (ref($obj) eq 'Sidef::Types::Regex::Regex') {
-            my @keys = grep { $obj->match($self->{$_}) } CORE::keys(%$self);
-            @hash{@keys} = @$self{@keys};
-        }
-        else {
-            foreach my $key (CORE::keys %$self) {
-                my $value = $self->{$key};
-                if ($obj->run($value)) {
-                    $hash{$key} = $value;
-                }
+        foreach my $key (CORE::keys %$self) {
+            my $value = $self->{$key};
+            if ($obj->run($value)) {
+                $hash{$key} = $value;
             }
         }
 

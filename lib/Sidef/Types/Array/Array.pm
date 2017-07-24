@@ -991,15 +991,8 @@ package Sidef::Types::Array::Array {
         my ($self, $obj) = @_;
 
         my @array;
-        if (ref($obj) eq 'Sidef::Types::Regex::Regex') {
-            foreach my $item (@$self) {
-                CORE::push(@array, $item) if $obj->match($item);
-            }
-        }
-        else {
-            foreach my $item (@$self) {
-                CORE::push(@array, $item) if $obj->run($item);
-            }
+        foreach my $item (@$self) {
+            CORE::push(@array, $item) if $obj->run($item);
         }
 
         bless \@array, __PACKAGE__;
