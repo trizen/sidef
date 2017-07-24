@@ -103,27 +103,29 @@ package Sidef::Types::String::String {
     sub match {
         my ($self, $regex, $pos) = @_;
 
-        $regex = $regex->to_re
-          if ref($regex) ne 'Sidef::Types::Regex::Regex';
+        if (ref($regex) ne 'Sidef::Types::Regex::Regex') {
+            $regex = Sidef::Types::Regex::Regex->new("$regex");
+        }
 
         Sidef::Types::Regex::Match->new(
-                                        obj  => $$self,
-                                        self => $regex,
-                                        pos  => (defined($pos) ? CORE::int($pos) : undef),
+                                        string => $$self,
+                                        regex  => $regex,
+                                        pos    => (defined($pos) ? CORE::int($pos) : undef),
                                        );
     }
 
     sub gmatch {
         my ($self, $regex, $pos) = @_;
 
-        $regex = $regex->to_re
-          if ref($regex) ne 'Sidef::Types::Regex::Regex';
+        if (ref($regex) ne 'Sidef::Types::Regex::Regex') {
+            $regex = Sidef::Types::Regex::Regex->new("$regex");
+        }
 
         local $regex->{global} = 1;
         Sidef::Types::Regex::Match->new(
-                                        obj  => $$self,
-                                        self => $regex,
-                                        pos  => (defined($pos) ? CORE::int($pos) : undef),
+                                        string => $$self,
+                                        regex  => $regex,
+                                        pos    => (defined($pos) ? CORE::int($pos) : undef),
                                        );
     }
 
