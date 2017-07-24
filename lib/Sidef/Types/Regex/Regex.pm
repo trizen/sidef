@@ -45,11 +45,13 @@ package Sidef::Types::Regex::Regex {
 
         # Return a new Match object
         Sidef::Types::Regex::Match->new(
-                                        obj  => "$object",
-                                        self => $self,
-                                        pos  => defined($pos) ? CORE::int($pos) : undef,
+                                        string => "$object",
+                                        regex  => $self,
+                                        pos    => defined($pos) ? CORE::int($pos) : undef,
                                        );
     }
+
+    *run = \&match;
 
     sub gmatch {
         my ($self, $obj, $pos) = @_;

@@ -18,21 +18,21 @@ package Sidef::Types::Regex::Match {
         my (undef, %hash) = @_;
 
         my @captures;
-        if ($hash{self}{global}) {
-            pos($hash{obj}) = $hash{self}{pos};
-            my $match = $hash{obj} =~ /$hash{self}{regex}/g;
+        if ($hash{regex}{global}) {
+            pos($hash{string}) = $hash{regex}{pos};
+            my $match = $hash{string} =~ /$hash{regex}{regex}/g;
 
             if ($match) {
-                $hash{self}{pos} = pos($hash{obj});
+                $hash{regex}{pos} = pos($hash{string});
 
                 foreach my $i (1 .. $#{+}) {
-                    push @captures, substr($hash{obj}, $-[$i], $+[$i] - $-[$i]);
+                    push @captures, substr($hash{string}, $-[$i], $+[$i] - $-[$i]);
                 }
 
                 $hash{matched} = 1;
             }
             else {
-                $hash{self}{pos} = 0;
+                $hash{regex}{pos} = 0;
                 $hash{matched} = 0;
             }
 
@@ -43,8 +43,8 @@ package Sidef::Types::Regex::Match {
         else {
             @captures =
               defined($hash{pos})
-              ? (substr($hash{obj}, $hash{pos}) =~ $hash{self}{regex})
-              : ($hash{obj} =~ $hash{self}{regex});
+              ? (substr($hash{string}, $hash{pos}) =~ $hash{regex}{regex})
+              : ($hash{string} =~ $hash{regex}{regex});
 
             $hash{matched} = (@captures != 0);
             $hash{match_pos} = $hash{matched} ? [$-[0] + ($hash{pos} // 0), $+[0] + ($hash{pos} // 0)] : [];
@@ -112,6 +112,16 @@ package Sidef::Types::Regex::Match {
         Sidef::Types::String::String->new(CORE::join("$sep", @{$self->{captures}}));
     }
 
+    sub string {
+        my ($self) = @_;
+        Sidef::Types::String::String->new($self->{string});
+    }
+
+    sub regex {
+        my ($self) = @_;
+        $self->{regex};
+    }
+
     sub to_s {
         my ($self) = @_;
         Sidef::Types::String::String->new("$self");
@@ -119,8 +129,9 @@ package Sidef::Types::Regex::Match {
 
     sub dump {
         my ($self) = @_;
-        my $re = $self->{self}->dump;
-        Sidef::Types::String::String->new("(${Sidef::Types::String::String->new($self->{obj})->dump} =~ $re)");
+        my $re     = $self->{regex}->dump;
+        my $str    = Sidef::Types::String::String->new($self->{string})->dump;
+        Sidef::Types::String::String->new("($str =~ $re)");
     }
 
     {
