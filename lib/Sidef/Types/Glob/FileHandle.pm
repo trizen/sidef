@@ -193,21 +193,10 @@ package Sidef::Types::Glob::FileHandle {
 
         my @array;
 
-        if (ref($obj) eq 'Sidef::Types::Regex::Regex') {
-            my $re = $obj->{regex};
-            while (defined(my $line = CORE::readline($self->{fh}))) {
-                chomp($line);
-                if ($line =~ $re) {
-                    push @array, Sidef::Types::String::String->new($line);
-                }
-            }
-        }
-        else {
-            while (defined(my $line = CORE::readline($self->{fh}))) {
-                chomp($line);
-                my $string = Sidef::Types::String::String->new($line);
-                push @array, $string if $obj->run($string);
-            }
+        while (defined(my $line = CORE::readline($self->{fh}))) {
+            chomp($line);
+            my $string = Sidef::Types::String::String->new($line);
+            push @array, $string if $obj->run($string);
         }
 
         Sidef::Types::Array::Array->new(\@array);
