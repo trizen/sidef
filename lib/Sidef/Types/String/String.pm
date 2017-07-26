@@ -102,31 +102,13 @@ package Sidef::Types::String::String {
 
     sub match {
         my ($self, $regex, $pos) = @_;
-
-        if (ref($regex) ne 'Sidef::Types::Regex::Regex') {
-            $regex = Sidef::Types::Regex::Regex->new("$regex");
-        }
-
-        Sidef::Types::Regex::Match->new(
-                                        string => $$self,
-                                        regex  => $regex,
-                                        pos    => (defined($pos) ? CORE::int($pos) : undef),
-                                       );
+        $regex->run($self, (defined($pos) ? $pos : ()));
     }
 
     sub gmatch {
         my ($self, $regex, $pos) = @_;
-
-        if (ref($regex) ne 'Sidef::Types::Regex::Regex') {
-            $regex = Sidef::Types::Regex::Regex->new("$regex");
-        }
-
         local $regex->{global} = 1;
-        Sidef::Types::Regex::Match->new(
-                                        string => $$self,
-                                        regex  => $regex,
-                                        pos    => (defined($pos) ? CORE::int($pos) : undef),
-                                       );
+        $regex->run($self, (defined($pos) ? $pos : ()));
     }
 
     sub to {
