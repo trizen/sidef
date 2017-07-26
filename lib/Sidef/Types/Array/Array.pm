@@ -1046,7 +1046,7 @@ package Sidef::Types::Array::Array {
                     $sub->($item, $regex)
                       && return Sidef::Types::Bool::Bool::TRUE;
                 }
-                elsif ("$item" =~ $regex->{regex}) {
+                elsif ($regex->run($item)) {
                     return Sidef::Types::Bool::Bool::TRUE;
                 }
             }

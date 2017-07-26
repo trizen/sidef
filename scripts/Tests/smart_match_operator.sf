@@ -115,3 +115,12 @@ assert(/^b/ ~~ :(a => 1, b => 2))
 
 assert(!(:(a => 1, b => 2) ~~ /^c/))
 assert(!(/^c/ ~~ :(a => 1, b => 2)))
+
+#
+## Pair ~~ Array
+#
+
+assert(Pair(1,2) ~~ [42, Pair(1,2), 99])
+assert(1 ~~ Pair(1,2))
+assert(2 ~~ Pair(1,2))
+assert([1,2] ~~ Pair([1,2],42))

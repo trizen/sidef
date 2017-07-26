@@ -19,8 +19,8 @@ desktopFilesPaths.each { |path|
 
         content.decode_utf8!;
 
-        var fields = Hash.new;
-        var regex = Regex.new(/^(\w.*?)=(.*\S)/m);
+        var fields = Hash();
+        var regex = /^(\w.*?)=(.*\S)/m;
 
         while (var match = content.gmatch(regex)) {
             var (key, value) = match...
