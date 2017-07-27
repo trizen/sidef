@@ -368,135 +368,136 @@ package Sidef::Object::Object {
                 ($first, $second) = ($second, $first);
             }
 
-            my $f_type = CORE::ref($first);
-            my $s_type = CORE::ref($second);
-
             # First is String
-            if (   $f_type eq 'Sidef::Types::String::String'
-                or $f_type eq 'Sidef::Types::Glob::File'
-                or $f_type eq 'Sidef::Types::Glob::Dir') {
+            if (UNIVERSAL::isa($first, 'Sidef::Types::String::String')) {
 
                 # String ~~ RangeString
-                if ($s_type eq 'Sidef::Types::Range::RangeString') {
+                if (UNIVERSAL::isa($second, 'Sidef::Types::Range::RangeString')) {
                     return $second->contains($first);
                 }
 
                 # String ~~ String
-                if ($s_type eq 'Sidef::Types::String::String') {
+                if (CORE::ref($first) eq CORE::ref($second)) {
                     return $second->eq($first);
-                }
-
-                # String ~~ Regex
-                if ($s_type eq 'Sidef::Types::Regex::Regex') {
-                    return $second->match($first)->is_successful;
                 }
             }
 
             # First is Number
-            if ($f_type eq 'Sidef::Types::Number::Number') {
+            if (UNIVERSAL::isa($first, 'Sidef::Types::Number::Number')) {
 
                 # Number ~~ RangeNumber
-                if ($s_type eq 'Sidef::Types::Range::RangeNumber') {
-                    return $second->contains($first);
-                }
-
-                # Number ~~ Array
-                if ($s_type eq 'Sidef::Types::Array::Array') {
+                if (UNIVERSAL::isa($second, 'Sidef::Types::Range::RangeNumber')) {
                     return $second->contains($first);
                 }
             }
 
             # First is RangeNumber
-            if ($f_type eq 'Sidef::Types::Range::RangeNumber') {
+            if (UNIVERSAL::isa($first, 'Sidef::Types::Range::RangeNumber')) {
 
                 # RangeNumber ~~ Number
-                if ($s_type eq 'Sidef::Types::Number::Number') {
+                if (UNIVERSAL::isa($second, 'Sidef::Types::Number::Number')) {
                     return $first->contains($second);
                 }
             }
 
             # First is RangeString
-            if ($f_type eq 'Sidef::Types::Range::RangeString') {
+            if (UNIVERSAL::isa($first, 'Sidef::Types::Range::RangeString')) {
 
                 # RangeString ~~ String
-                if ($s_type eq 'Sidef::Types::String::String') {
+                if (UNIVERSAL::isa($second, 'Sidef::Types::String::String')) {
                     return $first->contains($second);
                 }
             }
 
             # First is Array
-            if ($f_type eq 'Sidef::Types::Array::Array') {
+            if (UNIVERSAL::isa($first, 'Sidef::Types::Array::Array')) {
 
                 # Array ~~ Array
-                if ($s_type eq 'Sidef::Types::Array::Array') {
-                    return $second->eq($first);
+                if (CORE::ref($first) eq CORE::ref($second)) {
+                    return $first->eq($second);
                 }
 
                 # Array ~~ Regex
-                if ($s_type eq 'Sidef::Types::Regex::Regex') {
+                if (UNIVERSAL::isa($second, 'Sidef::Types::Regex::Regex')) {
                     return $first->match($second);
                 }
 
                 # Array ~~ Hash
-                if ($s_type eq 'Sidef::Types::Hash::Hash') {
+                if (UNIVERSAL::isa($second, 'Sidef::Types::Hash::Hash')) {
                     return $second->keys->contains_all($first);
                 }
 
                 # Array ~~ Any
-                return $first->contains($second);
+                if (!UNIVERSAL::isa($second, 'Sidef::Types::Array::Array')) {
+                    return $first->contains($second);
+                }
             }
 
             # First is Hash
-            if ($f_type eq 'Sidef::Types::Hash::Hash') {
+            if (UNIVERSAL::isa($first, 'Sidef::Types::Hash::Hash')) {
 
                 # Hash ~~ Array
-                if ($s_type eq 'Sidef::Types::Array::Array') {
+                if (UNIVERSAL::isa($second, 'Sidef::Types::Array::Array')) {
                     return $second->contains_all($first->keys);
                 }
 
                 # Hash ~~ Hash
-                if ($s_type eq 'Sidef::Types::Hash::Hash') {
+                if (CORE::ref($first) eq CORE::ref($second)) {
                     return $second->eq($first->keys);
                 }
 
                 # Hash ~~ Regex
-                if ($s_type eq 'Sidef::Types::Regex::Regex') {
+                if (UNIVERSAL::isa($second, 'Sidef::Types::Regex::Regex')) {
                     return $first->keys->match($second);
                 }
 
                 # Hash ~~ Any
-                return $first->exists($second);
+                if (!UNIVERSAL::isa($second, 'Sidef::Types::Hash::Hash')) {
+                    return $first->exists($second);
+                }
             }
 
             # First is Regex
-            if ($f_type eq 'Sidef::Types::Regex::Regex') {
+            if (UNIVERSAL::isa($first, 'Sidef::Types::Regex::Regex')) {
+
+                # Regex ~~ Regex
+                if (CORE::ref($first) eq CORE::ref($second)) {
+                    return $first->eq($second);
+                }
 
                 # Regex ~~ Array
-                if ($s_type eq 'Sidef::Types::Array::Array') {
+                if (UNIVERSAL::isa($second, 'Sidef::Types::Array::Array')) {
                     return $second->match($first);
                 }
 
                 # Regex ~~ Hash
-                if ($s_type eq 'Sidef::Types::Hash::Hash') {
+                if (UNIVERSAL::isa($second, 'Sidef::Types::Hash::Hash')) {
                     return $second->keys->match($first);
                 }
 
                 # Regex ~~ Any
-                return $first->match($second)->is_successful;
+                if (!UNIVERSAL::isa($second, 'Sidef::Types::Regex::Regex')) {
+                    return $first->match($second)->is_successful;
+                }
             }
 
             # Second is Array
-            if ($s_type eq 'Sidef::Types::Array::Array') {
+            if (UNIVERSAL::isa($second, 'Sidef::Types::Array::Array')) {
 
                 # Any ~~ Array
                 return $second->contains($first);
             }
 
             # Second is Hash
-            if ($s_type eq 'Sidef::Types::Hash::Hash') {
+            if (UNIVERSAL::isa($second, 'Sidef::Types::Hash::Hash')) {
 
                 # Any ~~ Hash
                 return $second->exists($first);
+            }
+
+            # Second is Regex
+            if (UNIVERSAL::isa($second, 'Sidef::Types::Regex::Regex')) {
+                return $second->match($first)->is_successful;
             }
 
             my $bool = $first eq $second;
