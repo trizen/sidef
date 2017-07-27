@@ -56,12 +56,6 @@ package Sidef::Types::Regex::Match {
 
         $hash{captures} = \@captures;
 
-        #if (defined $hash{parser}) {
-        #    while (my ($key, $value) = each %{$hash{parser}{regexp_vars}}) {
-        #        $value->set_value(Sidef::Types::String::String->new($captures[$key - 1]));
-        #    }
-        #}
-
         bless \%hash, __PACKAGE__;
     }
 

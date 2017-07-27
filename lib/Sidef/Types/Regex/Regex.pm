@@ -37,6 +37,32 @@ package Sidef::Types::Regex::Regex {
 
     sub get_value { $_[0]{regex} }
 
+    sub eq {
+        my ($x, $y) = @_;
+
+        ($x->{regex} eq $y->{regex})
+          ? (Sidef::Types::Bool::Bool::TRUE)
+          : (Sidef::Types::Bool::Bool::FALSE);
+    }
+
+    sub ne {
+        my ($x, $y) = @_;
+
+        ($x->{regex} ne $y->{regex})
+          ? (Sidef::Types::Bool::Bool::TRUE)
+          : (Sidef::Types::Bool::Bool::FALSE);
+    }
+
+    sub cmp {
+        my ($x, $y) = @_;
+
+        my $cmp = $x->{regex} cmp $y->{regex};
+
+        return Sidef::Types::Number::Number::MONE if ($cmp < 0);
+        return Sidef::Types::Number::Number::ONE  if ($cmp > 0);
+        return Sidef::Types::Number::Number::ZERO;
+    }
+
     sub to_regex { $_[0] }
     *to_re = \&to_regex;
 
@@ -72,7 +98,10 @@ package Sidef::Types::Regex::Regex {
 
     {
         no strict 'refs';
-        *{__PACKAGE__ . '::' . '=~'} = \&match;
+        *{__PACKAGE__ . '::' . '=~'}  = \&match;
+        *{__PACKAGE__ . '::' . '=='}  = \&eq;
+        *{__PACKAGE__ . '::' . '!='}  = \&ne;
+        *{__PACKAGE__ . '::' . '<=>'} = \&cmp;
     }
 
 };
