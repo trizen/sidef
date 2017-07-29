@@ -6195,11 +6195,8 @@ package Sidef::Types::Number::Number {
     }
 
     sub next_prime {
-        my ($x) = @_;
-        $x = _any2mpz($$x) // goto &nan;
-        my $r = Math::GMPz::Rmpz_init();
-        Math::GMPz::Rmpz_nextprime($r, $x);
-        bless \$r;
+        my $p = Math::Prime::Util::GMP::next_prime(&_big2uistr // goto &nan) || goto &nan;
+        $p <= ULONG_MAX ? __PACKAGE__->_set_uint($p) : __PACKAGE__->_set_str('int', $p);
     }
 
     sub znorder {
