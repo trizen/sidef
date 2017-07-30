@@ -1785,7 +1785,7 @@ package Sidef::Types::Number::Number {
         $y = _any2mpz($$y) // (goto &nan);
 
         # Detect division by zero
-        if (!Math::GMPz::Rmpz_sgn($y)) {
+        Math::GMPz::Rmpz_sgn($y) || do {
             my $sign = Math::GMPz::Rmpz_sgn($x);
 
             if ($sign == 0) {    # 0/0
@@ -1797,7 +1797,7 @@ package Sidef::Types::Number::Number {
             else {                 # x/0 where: x < 0
                 goto &ninf;
             }
-        }
+        };
 
         my $r = Math::GMPz::Rmpz_init();
         Math::GMPz::Rmpz_tdiv_q($r, $x, $y);
@@ -5045,12 +5045,12 @@ package Sidef::Types::Number::Number {
             Math::GMPq::Rmpq_div($quo, $x, $y);
 
             # Floor
-            if (!Math::GMPq::Rmpq_integer_p($quo)) {
+            Math::GMPq::Rmpq_integer_p($quo) || do {
                 my $z = Math::GMPz::Rmpz_init();
                 Math::GMPz::Rmpz_set_q($z, $quo);
                 Math::GMPz::Rmpz_sub_ui($z, $z, 1) if Math::GMPq::Rmpq_sgn($quo) < 0;
                 Math::GMPq::Rmpq_set_z($quo, $z);
-            }
+            };
 
             Math::GMPq::Rmpq_mul($quo, $quo, $y);
             Math::GMPq::Rmpq_sub($quo, $x, $quo);
@@ -5067,12 +5067,12 @@ package Sidef::Types::Number::Number {
             Math::GMPq::Rmpq_div_z($quo, $x, $y);
 
             # Floor
-            if (!Math::GMPq::Rmpq_integer_p($quo)) {
+            Math::GMPq::Rmpq_integer_p($quo) || do {
                 my $z = Math::GMPz::Rmpz_init();
                 Math::GMPz::Rmpz_set_q($z, $quo);
                 Math::GMPz::Rmpz_sub_ui($z, $z, 1) if Math::GMPq::Rmpq_sgn($quo) < 0;
                 Math::GMPq::Rmpq_set_z($quo, $z);
-            }
+            };
 
             Math::GMPq::Rmpq_mul_z($quo, $quo, $y);
             Math::GMPq::Rmpq_sub($quo, $x, $quo);
@@ -5433,11 +5433,11 @@ package Sidef::Types::Number::Number {
           ? Math::GMPz::Rmpz_bin_uiui($r, Math::GMPz::Rmpz_get_ui($r), CORE::abs($y))
           : Math::GMPz::Rmpz_bin_ui($r, $r, CORE::abs($y));
 
-        if (!Math::GMPz::Rmpz_sgn($r)) {
+        Math::GMPz::Rmpz_sgn($r) || do {
             $y < 0
               ? (goto &nan)
               : (goto &zero);
-        }
+        };
 
         state $t = Math::GMPz::Rmpz_init_nobless();
         Math::GMPz::Rmpz_fac_ui($t, CORE::abs($y));
@@ -5477,11 +5477,11 @@ package Sidef::Types::Number::Number {
           ? Math::GMPz::Rmpz_bin_uiui($r, Math::GMPz::Rmpz_get_ui($r), CORE::abs($y))
           : Math::GMPz::Rmpz_bin_ui($r, $r, CORE::abs($y));
 
-        if (!Math::GMPz::Rmpz_sgn($r)) {
+        Math::GMPz::Rmpz_sgn($r) || do {
             $y < 0
               ? (goto &nan)
               : (goto &zero);
-        }
+        };
 
         state $t = Math::GMPz::Rmpz_init_nobless();
         Math::GMPz::Rmpz_fac_ui($t, CORE::abs($y));
@@ -6195,11 +6195,8 @@ package Sidef::Types::Number::Number {
     }
 
     sub next_prime {
-        my ($x) = @_;
-        $x = _any2mpz($$x) // goto &nan;
-        my $r = Math::GMPz::Rmpz_init();
-        Math::GMPz::Rmpz_nextprime($r, $x);
-        bless \$r;
+        my $p = Math::Prime::Util::GMP::next_prime(&_big2uistr // goto &nan) || goto &nan;
+        $p <= ULONG_MAX ? __PACKAGE__->_set_uint($p) : __PACKAGE__->_set_str('int', $p);
     }
 
     sub znorder {
