@@ -346,6 +346,14 @@ Return the
 
 =cut
 
+=head2 as_cfrac
+
+Number.as_cfrac() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 as_dec
 
 Number.as_dec() -> I<Obj>
@@ -1807,6 +1815,14 @@ Return the
 =head2 rat
 
 Number.rat() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 rat_approx
+
+Number.rat_approx() -> I<Obj>
 
 Return the
 

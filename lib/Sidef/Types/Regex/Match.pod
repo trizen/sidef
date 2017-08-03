@@ -75,6 +75,22 @@ Return the
 
 =cut
 
+=head2 regex
+
+Match.regex() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 string
+
+Match.string() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 to_bool
 
 Match.to_bool() -> I<Obj>

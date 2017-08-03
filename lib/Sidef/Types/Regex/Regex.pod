@@ -24,13 +24,43 @@ Inherits methods from:
 =head1 METHODS
 
 
+=head2 !=
+
+I<Obj> B<!=> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<ne>
+
+=cut
+
+=head2 <=>
+
+I<Obj> B<E<lt>=E<gt>> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<cmp>
+
+=cut
+
+=head2 ==
+
+I<Obj> B<==> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<eq>
+
+=cut
+
 =head2 =~
 
 I<Obj> B<=~> I<Obj> -> I<Obj>
 
 Return the
 
-Aliases: I<match>
+Aliases: I<run>, I<match>
 
 =cut
 
