@@ -4779,8 +4779,10 @@ package Sidef::Types::Number::Number {
     sub as_cfrac {
         my ($x, $n) = @_;
 
+        my $p = CORE::int($PREC) >> 1;
+
         $x = $$x;
-        $n = defined($n) ? (_any2ui($$n) // 0) : (CORE::int($PREC) >> 2);
+        $n = defined($n) ? do { _valid(\$n); _any2ui($$n) // 0 } : ($p >> 1);
 
         goto(ref($x) =~ tr/:/_/rs);
 
@@ -4811,7 +4813,7 @@ package Sidef::Types::Number::Number {
                 my $t = __floor__($f);
                 push @cfrac, bless \$t;
 
-                Math::MPFR::Rmpfr_eq($f, $t, $n) && last;
+                Math::MPFR::Rmpfr_eq($f, $t, $p) && last;
                 Math::MPFR::Rmpfr_sub($f, $f, $t, $ROUND);
                 Math::MPFR::Rmpfr_ui_div($f, 1, $f, $ROUND);
             }
@@ -4854,8 +4856,8 @@ package Sidef::Types::Number::Number {
                 }
 
 #<<<
-                   Math::MPFR::Rmpfr_eq($real_1, $real_2, $n)
-                && Math::MPFR::Rmpfr_eq($imag_1, $imag_2, $n)
+                   Math::MPFR::Rmpfr_eq($real_1, $real_2, $p)
+                && Math::MPFR::Rmpfr_eq($imag_1, $imag_2, $p)
                 && last;
 #>>>
 
