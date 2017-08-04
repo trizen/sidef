@@ -487,8 +487,8 @@ package Sidef::Types::Number::Number {
         my ($x) = @_;
 
         ref($x) eq 'Math::MPC'  && return $x;
-        ref($x) eq 'Math::GMPq' && goto &_mpq2mpc;
         ref($x) eq 'Math::GMPz' && goto &_mpz2mpc;
+        ref($x) eq 'Math::GMPq' && goto &_mpq2mpc;
 
         goto &_mpfr2mpc;
     }
@@ -500,8 +500,8 @@ package Sidef::Types::Number::Number {
         my ($x) = @_;
 
         ref($x) eq 'Math::MPFR' && return $x;
-        ref($x) eq 'Math::GMPq' && goto &_mpq2mpfr;
         ref($x) eq 'Math::GMPz' && goto &_mpz2mpfr;
+        ref($x) eq 'Math::GMPq' && goto &_mpq2mpfr;
 
         my $fr = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
         Math::MPC::RMPC_IM($fr, $x);
@@ -4774,6 +4774,102 @@ package Sidef::Types::Number::Number {
         $str .= '/1' if (index($str, '/') == -1);
 
         Sidef::Types::String::String->new($str);
+    }
+
+    sub as_cfrac {
+        my ($x, $n) = @_;
+
+        my $p = CORE::int($PREC) >> 1;
+
+        $x = $$x;
+        $n = defined($n) ? do { _valid(\$n); _any2ui($$n) // 0 } : ($p >> 1);
+
+        goto(ref($x) =~ tr/:/_/rs);
+
+      Math_GMPq: {
+            my @cfrac;
+            my $q = Math::GMPq::Rmpq_init();
+
+            Math::GMPq::Rmpq_set($q, $x);
+
+            for (1 .. $n) {
+                my $z = __floor__($q);
+                push @cfrac, bless \$z;
+                Math::GMPq::Rmpq_sub_z($q, $q, $z);
+                Math::GMPq::Rmpq_sgn($q) || last;
+                Math::GMPq::Rmpq_inv($q, $q);
+            }
+
+            return Sidef::Types::Array::Array->new(\@cfrac);
+        }
+
+      Math_MPFR: {
+            my @cfrac;
+            my $f = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+
+            Math::MPFR::Rmpfr_set($f, $x, $ROUND);
+
+            for (1 .. $n) {
+                my $t = __floor__($f);
+                push @cfrac, bless \$t;
+
+                Math::MPFR::Rmpfr_eq($f, $t, $p) && last;
+                Math::MPFR::Rmpfr_sub($f, $f, $t, $ROUND);
+                Math::MPFR::Rmpfr_ui_div($f, 1, $f, $ROUND);
+            }
+
+            return Sidef::Types::Array::Array->new(\@cfrac);
+        }
+
+      Math_MPC: {
+            my @cfrac;
+            my $c = Math::MPC::Rmpc_init2(CORE::int($PREC));
+
+            my $real_1 = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+            my $real_2 = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+
+            my $imag_1 = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+            my $imag_2 = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+
+            Math::MPC::Rmpc_set($c, $x, $ROUND);
+
+            for (1 .. $n) {
+                my $t = __floor__($c);
+                push @cfrac, bless \$t;
+
+                Math::MPC::Rmpc_real($real_1, $c, $ROUND);
+                Math::MPC::Rmpc_imag($imag_1, $c, $ROUND);
+
+                if (ref($t) eq 'Math::MPFR') {
+                    Math::MPFR::Rmpfr_neg($t, $t, $ROUND);
+                    Math::MPC::Rmpc_add_fr($c, $c, $t, $ROUND);
+                    Math::MPFR::Rmpfr_neg($t, $t, $ROUND);
+
+                    Math::MPFR::Rmpfr_set($real_2, $t, $ROUND);
+                    Math::MPFR::Rmpfr_set_ui($imag_2, 0, $ROUND);
+                }
+                else {
+                    Math::MPC::Rmpc_sub($c, $c, $t, $ROUND);
+
+                    Math::MPC::Rmpc_real($real_2, $t, $ROUND);
+                    Math::MPC::Rmpc_imag($imag_2, $t, $ROUND);
+                }
+
+#<<<
+                   Math::MPFR::Rmpfr_eq($real_1, $real_2, $p)
+                && Math::MPFR::Rmpfr_eq($imag_1, $imag_2, $p)
+                && last;
+#>>>
+
+                Math::MPC::Rmpc_ui_div($c, 1, $c, $ROUND);
+            }
+
+            return Sidef::Types::Array::Array->new(\@cfrac);
+        }
+
+      Math_GMPz: {
+            return Sidef::Types::Array::Array->new([bless \$x]);
+        }
     }
 
     sub as_float {
