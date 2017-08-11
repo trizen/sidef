@@ -278,8 +278,8 @@ package Sidef::Parser {
                   )
             },
             match_flags_re  => qr{[msixpogcaludn]+},
-            var_name_re     => qr/[_\pL][\pL\pN\w]*(?>::[_\pL][\pL\pN\w]*)*/,
-            method_name_re  => qr/[_\pL][\pL\pN\w]*!?/,
+            var_name_re     => qr/[^\W\d]\w*+(?>::[^\W\d]\w*)*/,
+            method_name_re  => qr/[^\W\d]\w*+!?/,
             var_init_sep_re => qr/\G\h*(?:=>|[=:])\h*/,
             operators_re    => do {
                 local $" = q{|};
@@ -326,25 +326,25 @@ package Sidef::Parser {
                         )
                     )
 
-                      »(?<unroll>[_\pL][\pL\pN\w]*|(?&ops))«          # unroll operator (e.g.: »add« or »+«)
-                    | >>(?<unroll>[_\pL][\pL\pN\w]*|(?&ops))<<        # unroll operator (e.g.: >>add<< or >>+<<)
+                      »(?<unroll>[^\W\d]\w*+|(?&ops))«                # unroll operator (e.g.: »add« or »+«)
+                    | >>(?<unroll>[^\W\d]\w*+|(?&ops))<<              # unroll operator (e.g.: >>add<< or >>+<<)
 
-                    | ~X(?<cross>[_\pL][\pL\pN\w]*|(?&ops)|)          # cross operator (e.g.: ~X or ~X+)
-                    | ~Z(?<zip>[_\pL][\pL\pN\w]*|(?&ops)|)            # zip operator (e.g.: ~Z or ~Z+)
+                    | ~X(?<cross>[^\W\d]\w*+|(?&ops)|)                # cross operator (e.g.: ~X or ~X+)
+                    | ~Z(?<zip>[^\W\d]\w*+|(?&ops)|)                  # zip operator (e.g.: ~Z or ~Z+)
 
-                    | »(?<map>[_\pL][\pL\pN\w]*|(?&ops))»             # mapping operator (e.g.: »add» or »+»)
-                    | >>(?<map>[_\pL][\pL\pN\w]*|(?&ops))>>           # mapping operator (e.g.: >>add>> or >>+>>)
+                    | »(?<map>[^\W\d]\w*+|(?&ops))»                   # mapping operator (e.g.: »add» or »+»)
+                    | >>(?<map>[^\W\d]\w*+|(?&ops))>>                 # mapping operator (e.g.: >>add>> or >>+>>)
 
-                    | «(?<pam>[_\pL][\pL\pN\w]*|(?&ops))«             # reverse mapping operator (e.g.: «add« or «+«)
-                    | <<(?<pam>[_\pL][\pL\pN\w]*|(?&ops))<<           # reverse mapping operator (e.g.: <<add<< or <<+<<)
+                    | «(?<pam>[^\W\d]\w*+|(?&ops))«                   # reverse mapping operator (e.g.: «add« or «+«)
+                    | <<(?<pam>[^\W\d]\w*+|(?&ops))<<                 # reverse mapping operator (e.g.: <<add<< or <<+<<)
 
-                    | »(?<lmap>[_\pL][\pL\pN\w]*|(?&ops))\(\)»        # mapping operator (e.g.: »add()» or »+()»)
-                    | >>(?<lmap>[_\pL][\pL\pN\w]*|(?&ops))\(\)>>      # mapping operator (e.g.: >>add()>> or >>+()>>)
+                    | »(?<lmap>[^\W\d]\w*+|(?&ops))\(\)»              # mapping operator (e.g.: »add()» or »+()»)
+                    | >>(?<lmap>[^\W\d]\w*+|(?&ops))\(\)>>            # mapping operator (e.g.: >>add()>> or >>+()>>)
 
-                    | <<(?<reduce>[_\pL][\pL\pN\w]*|(?&ops))>>        # reduce operator (e.g.: <<add>> or <<+>>)
-                    | «(?<reduce>[_\pL][\pL\pN\w]*|(?&ops))»          # reduce operator (e.g.: «add» or «+»)
+                    | <<(?<reduce>[^\W\d]\w*+|(?&ops))>>              # reduce operator (e.g.: <<add>> or <<+>>)
+                    | «(?<reduce>[^\W\d]\w*+|(?&ops))»                # reduce operator (e.g.: «add» or «+»)
 
-                    | `(?<op>[_\pL][\pL\pN\w]*[!:?]?)`                # method-like operator (e.g.: `add`)
+                    | `(?<op>[^\W\d]\w*+[!:?]?)`                      # method-like operator (e.g.: `add`)
                     | (?<op>(?&ops))                                  # primitive operator   (e.g.: +, -, *, /)
                 }x;
             },
@@ -390,7 +390,7 @@ package Sidef::Parser {
                      "I thought that... Oh, you got me!",
                      "LOL! I expected... Oh, my! This is funny!",
                      "Oh, oh... Wait a second! Did you mean...? Damn!",
-                     "You're emberesing me! That's not funny!",
+                     "You're embarrassing me! That's not funny!",
                      "My brain just exploded.",
                      "Sorry, I don't know how to help in this situation.",
                      "I'm broken. Fix me, or show this to someone who can fix",
@@ -400,7 +400,7 @@ package Sidef::Parser {
                      "Ouch, That HURTS!",
                      "Who are you!?",
                      "Death before dishonour?",
-                     "Good afternoon, gentelman, I'm a HAL 9000 Computer",
+                     "Good afternoon, gentleman, I'm a HAL 9000 Computer",
                      "Okie dokie, I'm dead",
                      "Help is not available for you.",
                      "Your expression has defeated me",
@@ -1076,14 +1076,14 @@ package Sidef::Parser {
             }
 
             # Bareword followed by a fat comma or preceded by a colon
-            if (   /\G:([\pL\pN\w]+)/gc
-                || /\G([_\pL][\pL\pN\w]*)(?=\h*=>)/gc) {
+            if (   /\G:(\w+)/gc
+                || /\G([^\W\d]\w*+)(?=\h*=>)/gc) {
 
-                # || /\G([_\pL][\pL\pN\w]*)(?=\h*=>|:(?![=:]))/gc) {
+                # || /\G([^\W\d]\w*+)(?=\h*=>|:(?![=:]))/gc) {
                 return Sidef::Types::String::String->new($1);
             }
 
-            if (/\G([_\pL][\pL\pN\w]*):(?![=:])/gc) {
+            if (/\G([^\W\d]\w*+):(?![=:])/gc) {
                 my $name = $1;
                 my $obj = $self->parse_obj(code => $opt{code});
                 return Sidef::Variable::NamedParam->new($name, $obj);
@@ -2087,7 +2087,7 @@ package Sidef::Parser {
                     my $str = $self->get_quoted_string(code => $opt{code});
                     $name = $str;
                 }
-                elsif (/\G([\pL\pN\w]+)/gc) {
+                elsif (/\G(\w+)/gc) {
                     $name = $1;
                 }
                 else {
@@ -3130,7 +3130,7 @@ package Sidef::Parser {
                 redo;
             }
 
-            if (/\G\@:([\pL_][\pL\pN\w]*)/gc) {
+            if (/\G\@:([^\W\d]\w*+)/gc) {
                 push @{$struct{$self->{class}}}, {self => bless({name => $1}, 'Sidef::Variable::Label')};
                 redo;
             }
