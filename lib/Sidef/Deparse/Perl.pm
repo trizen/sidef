@@ -545,7 +545,7 @@ HEADER
                     my $name = $obj->{name};
 
                     # Check for alphanumeric name
-                    if (not $obj->{name} =~ /^[_\pL][\pL\pN\w]*\z/) {
+                    if (not $obj->{name} =~ /^[^\W\d]\w*+\z/) {
                         $obj->{name} = '__NONANN__';    # use this name for non-alphanumeric names
                     }
 
@@ -1615,7 +1615,7 @@ EOT
                         $code .=
                           '->${\\do{' . $self->deparse_expr(ref($method) eq 'HASH' ? $method : {self => $method}) . '}}';
                     }
-                    elsif ($method =~ /^[\pL_]/) {
+                    elsif ($method =~ /^[^\W\d]/) {
 
                         # Exclamation mark (!) at the end of a method
                         if (substr($method, -1) eq '!') {

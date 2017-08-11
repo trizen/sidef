@@ -609,7 +609,7 @@ package Sidef::Deparse::Sidef {
                             );
 
                     }
-                    elsif ($method =~ /^[\pL_]/) {
+                    elsif ($method =~ /^[^\W\d]/) {
 
                         if ($ref eq 'Sidef::Types::Block::BlockInit' and $method eq 'loop') {
                             $code = "loop $code";
