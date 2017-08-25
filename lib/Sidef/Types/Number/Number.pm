@@ -7063,42 +7063,26 @@ package Sidef::Types::Number::Number {
 
         $n = CORE::int(__numify__($$n));
 
-        if (!defined $block) {
-            return Sidef::Types::Array::Array->new(map { __PACKAGE__->_set_uint($_) } 0 .. $n - 1)->permutations;
+        require Algorithm::Combinatorics;
+
+        my $iter = do {
+            local $SIG{__WARN__} = sub { };
+            Algorithm::Combinatorics::permutations([map { __PACKAGE__->_set_uint($_) } 0 .. $n - 1]);
+        };
+
+        if (defined($block)) {
+            while (defined(my $arr = $iter->next)) {
+                $block->run(@$arr);
+            }
+            return $_[0];
         }
 
-        if ($n == 0) {
-            $block->run();
-            return $block;
+        my @permutations;
+        while (defined(my $arr = $iter->next)) {
+            push @permutations, Sidef::Types::Array::Array->new([@$arr]);
         }
 
-        if ($n < 0) {
-            return $block;
-        }
-
-        my @idx = (0 .. $n - 1);
-        my @nums = map { __PACKAGE__->_set_uint($_) } @idx;
-
-        my @perm;
-        while (1) {
-            @perm = @nums[@idx];
-
-            my $p = $#idx;
-            --$p while $idx[$p - 1] > $idx[$p];
-
-            my $q = $p || do {
-                $block->run(@perm);
-                return $block;
-            };
-
-            CORE::push(@idx, CORE::reverse CORE::splice @idx, $p);
-            ++$q while $idx[$p - 1] > $idx[$q];
-            @idx[$p - 1, $q] = @idx[$q, $p - 1];
-
-            $block->run(@perm);
-        }
-
-        return $block;
+        Sidef::Types::Array::Array->new(\@permutations);
     }
 
     *permutations = \&forperm;
@@ -7108,35 +7092,28 @@ package Sidef::Types::Number::Number {
         _valid(\$k);
 
         $n = CORE::int(__numify__($$n));
-
-        if (!defined $block) {
-            return Sidef::Types::Array::Array->new(map { __PACKAGE__->_set_uint($_) } 0 .. $n - 1)->combinations($k);
-        }
-
         $k = CORE::int(__numify__($$k));
 
-        if ($k == 0) {
-            $block->run();
-            return $block;
+        require Algorithm::Combinatorics;
+
+        my $iter = do {
+            local $SIG{__WARN__} = sub { };
+            Algorithm::Combinatorics::combinations([map { __PACKAGE__->_set_uint($_) } 0 .. $n - 1], $k);
+        };
+
+        if (defined($block)) {
+            while (defined(my $arr = $iter->next)) {
+                $block->run(@$arr);
+            }
+            return $_[0];
         }
 
-        ($k < 0 or $k > $n or $n == 0)
-          && return $block;
-
-        my @c = (0 .. $k - 1);
-        my @nums = map { __PACKAGE__->_set_uint($_) } (0 .. $n - 1);
-
-        while (1) {
-            $block->run(@nums[@c]);
-            next if ($c[$k - 1]++ < $n - 1);
-            my $i = $k - 2;
-            $i-- while ($i >= 0 && $c[$i] >= $n - ($k - $i));
-            last if $i < 0;
-            $c[$i]++;
-            while (++$i < $k) { $c[$i] = $c[$i - 1] + 1; }
+        my @combinations;
+        while (defined(my $arr = $iter->next)) {
+            push @combinations, Sidef::Types::Array::Array->new([@$arr]);
         }
 
-        return $block;
+        Sidef::Types::Array::Array->new(\@combinations);
     }
 
     *combinations = \&forcomb;

@@ -1882,56 +1882,57 @@ package Sidef::Types::Array::Array {
 
         $k = CORE::int($k);
 
+        require Algorithm::Combinatorics;
+        my $iter = do {
+            local $SIG{__WARN__} = sub { };
+            Algorithm::Combinatorics::combinations([@$self], $k);
+        };
+
         if (defined($block)) {
-
-            if ($k == 0) {
-                $block->run();
-                return $self;
+            while (defined(my $arr = $iter->next)) {
+                $block->run(@$arr);
             }
-
-            my $n = @$self;
-            return $self if ($k < 0 or $k > $n or $n == 0);
-
-            my @c = (0 .. $k - 1);
-
-            while (1) {
-                $block->run(@$self[@c]);
-                next if ($c[$k - 1]++ < $n - 1);
-                my $i = $k - 2;
-                $i-- while ($i >= 0 && $c[$i] >= $n - ($k - $i));
-                last if $i < 0;
-                $c[$i]++;
-                while (++$i < $k) { $c[$i] = $c[$i - 1] + 1; }
-            }
-
             return $self;
         }
 
-        ($k == 0)
-          && return bless [bless [], __PACKAGE__], __PACKAGE__;
-
-        my $n = @$self;
-
-        ($k < 0 or $k > $n or $n == 0)
-          && return bless([], __PACKAGE__);
-
-        my @c = (0 .. $k - 1);
-        my @result;
-
-        while (1) {
-            CORE::push(@result, bless([@$self[@c]], __PACKAGE__));
-            next if ($c[$k - 1]++ < $n - 1);
-            my $i = $k - 2;
-            $i-- while ($i >= 0 && $c[$i] >= $n - ($k - $i));
-            last if $i < 0;
-            $c[$i]++;
-            while (++$i < $k) { $c[$i] = $c[$i - 1] + 1; }
+        my @combinations;
+        while (defined(my $arr = $iter->next)) {
+            push @combinations, bless [@$arr], __PACKAGE__;
         }
 
-        bless \@result, __PACKAGE__;
+        bless \@combinations, __PACKAGE__;
     }
 
     *each_comb = \&combinations;
+
+    sub permutations {
+        my ($self, $block) = @_;
+
+        require Algorithm::Combinatorics;
+
+        my $iter = do {
+            local $SIG{__WARN__} = sub { };
+            Algorithm::Combinatorics::permutations([@$self]);
+        };
+
+        if (defined($block)) {
+            while (defined(my $arr = $iter->next)) {
+                $block->run(@$arr);
+            }
+            return $self;
+        }
+
+        my @permutations;
+        while (defined(my $arr = $iter->next)) {
+            push @permutations, bless [@$arr], __PACKAGE__;
+        }
+
+        bless \@permutations, __PACKAGE__;
+    }
+
+    *permute     = \&permutations;    # deprecated
+    *permutation = \&permutations;    # deprecated
+    *each_perm   = \&permutations;
 
     sub nth_permutation {
         my ($self, $n) = @_;
@@ -1968,61 +1969,6 @@ package Sidef::Types::Array::Array {
     }
 
     *nth_perm = \&nth_permutation;
-
-    sub permutations {
-        my ($self, $code) = @_;
-
-        my @idx = 0 .. $#$self;
-
-        if (not @idx) {
-
-            if (defined $code) {
-                $code->run();
-                return $self;
-            }
-
-            return bless [bless [], __PACKAGE__], __PACKAGE__;
-        }
-
-        if (defined($code)) {
-            my @perm;
-
-            while (1) {
-                @perm = @$self[@idx];
-
-                my $p = $#idx;
-                --$p while $idx[$p - 1] > $idx[$p];
-
-                my $q = $p || do {
-                    $code->run(@perm);
-                    return $self;
-                };
-
-                CORE::push(@idx, CORE::reverse CORE::splice @idx, $p);
-                ++$q while $idx[$p - 1] > $idx[$q];
-                @idx[$p - 1, $q] = @idx[$q, $p - 1];
-
-                $code->run(@perm);
-            }
-
-            return $self;
-        }
-
-        my @array;
-        while (1) {
-            CORE::push(@array, bless([@$self[@idx]], __PACKAGE__));
-            my $p = $#idx;
-            --$p while $idx[$p - 1] > $idx[$p];
-            my $q = $p || (return bless(\@array, __PACKAGE__));
-            CORE::push(@idx, CORE::reverse CORE::splice @idx, $p);
-            ++$q while $idx[$p - 1] > $idx[$q];
-            @idx[$p - 1, $q] = @idx[$q, $p - 1];
-        }
-    }
-
-    *permute     = \&permutations;    # deprecated
-    *permutation = \&permutations;    # deprecated
-    *each_perm   = \&permutations;
 
     sub cartesian {
         my ($self, $block) = @_;

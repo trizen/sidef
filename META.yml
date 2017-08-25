@@ -117,6 +117,7 @@ recommends:
   Digest::SHA: '0'
   File::Find: '0'
 requires:
+  Algorithm::Combinatorics: '0'
   Cwd: '0'
   Encode: '0'
   Fcntl: '0'

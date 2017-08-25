@@ -69,14 +69,13 @@ assert_eq(
     },
     [[]]
 )
-
 assert_eq(
     gather {
         (-1).permutations { |*p|
             take(p)
         }
     },
-    []
+    [[]]
 )
 
 assert_eq(
