@@ -1877,62 +1877,103 @@ package Sidef::Types::Array::Array {
         bless \@array, __PACKAGE__;
     }
 
-    sub combinations {
+    foreach my $name (
+                      qw(
+                      derangements
+                      permutations
+                      circular_permutations
+                      complete_permutations
+                      )
+      ) {
+
+        no strict 'refs';
+
+        *{__PACKAGE__ . '::' . $name} = sub {
+            my ($self, $block) = @_;
+
+            require Algorithm::Combinatorics;
+            my $iter = &{'Algorithm::Combinatorics::' . $name}([@$self]);
+
+            if (defined($block)) {
+                while (defined(my $arr = $iter->next)) {
+                    $block->run(@$arr);
+                }
+                return $self;
+            }
+
+            my @result;
+            while (defined(my $arr = $iter->next)) {
+                push @result, bless [@$arr], __PACKAGE__;
+            }
+
+            bless \@result, __PACKAGE__;
+        };
+    }
+
+    foreach my $name (
+                      qw(
+                      variations
+                      variations_with_repetition
+                      tuples
+                      tuples_with_repetition
+                      combinations
+                      combinations_with_repetition
+                      subsets
+                      )
+      ) {
+
+        no strict 'refs';
+
+        *{__PACKAGE__ . '::' . $name} = sub {
+            my ($self, $k, $block) = @_;
+
+            require Algorithm::Combinatorics;
+
+            my $iter = do {
+                local $SIG{__WARN__} = sub { };
+                &{'Algorithm::Combinatorics::' . $name}([@$self], defined($k) ? CORE::int($k) : ());
+            };
+
+            if (defined($block)) {
+                while (defined(my $arr = $iter->next)) {
+                    $block->run(@$arr);
+                }
+                return $self;
+            }
+
+            my @result;
+            while (defined(my $arr = $iter->next)) {
+                push @result, bless [@$arr], __PACKAGE__;
+            }
+
+            bless \@result, __PACKAGE__;
+        };
+    }
+
+    sub partitions {
         my ($self, $k, $block) = @_;
 
-        $k = CORE::int($k);
-
-        require Algorithm::Combinatorics;
-        my $iter = do {
-            local $SIG{__WARN__} = sub { };
-            Algorithm::Combinatorics::combinations([@$self], $k);
-        };
-
-        if (defined($block)) {
-            while (defined(my $arr = $iter->next)) {
-                $block->run(@$arr);
-            }
-            return $self;
-        }
-
-        my @combinations;
-        while (defined(my $arr = $iter->next)) {
-            push @combinations, bless [@$arr], __PACKAGE__;
-        }
-
-        bless \@combinations, __PACKAGE__;
-    }
-
-    *each_comb = \&combinations;
-
-    sub permutations {
-        my ($self, $block) = @_;
-
         require Algorithm::Combinatorics;
 
         my $iter = do {
             local $SIG{__WARN__} = sub { };
-            Algorithm::Combinatorics::permutations([@$self]);
+            Algorithm::Combinatorics::partitions([@$self], defined($k) ? CORE::int($k) : ());
         };
 
         if (defined($block)) {
             while (defined(my $arr = $iter->next)) {
-                $block->run(@$arr);
+                $block->run(map { __PACKAGE__->new($_) } @$arr);
             }
             return $self;
         }
 
-        my @permutations;
+        my @result;
         while (defined(my $arr = $iter->next)) {
-            push @permutations, bless [@$arr], __PACKAGE__;
+            push @result, bless [map { __PACKAGE__->new($_) } @$arr], __PACKAGE__;
         }
 
-        bless \@permutations, __PACKAGE__;
+        bless \@result, __PACKAGE__;
     }
-
-    *permute     = \&permutations;    # deprecated
-    *permutation = \&permutations;    # deprecated
-    *each_perm   = \&permutations;
 
     sub nth_permutation {
         my ($self, $n) = @_;
