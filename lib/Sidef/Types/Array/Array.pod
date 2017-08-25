@@ -219,6 +219,14 @@ Return the
 
 =cut
 
+=head2 circular_permutations
+
+Array.circular_permutations() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 collapse
 
 Array.collapse() -> I<Obj>
@@ -227,9 +235,33 @@ Return the
 
 =cut
 
+=head2 combinations
+
+Array.combinations() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 combinations_with_repetition
+
+Array.combinations_with_repetition() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 compact
 
 Array.compact() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 complete_permutations
+
+Array.complete_permutations() -> I<Obj>
 
 Return the
 
@@ -381,6 +413,14 @@ Aliases: I<remove_last_if>
 
 =cut
 
+=head2 derangements
+
+Array.derangements() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 diff
 
 Array.diff() -> I<Obj>
@@ -394,16 +434,6 @@ Return the
 Array.dig() -> I<Obj>
 
 Return the
-
-=cut
-
-=head2 each_comb
-
-Array.each_comb() -> I<Obj>
-
-Return the
-
-Aliases: I<combinations>
 
 =cut
 
@@ -901,13 +931,19 @@ Aliases: I<partition>
 
 =cut
 
-=head2 permute
+=head2 partitions
 
-Array.permute() -> I<Obj>
+Array.partitions() -> I<Obj>
 
 Return the
 
-Aliases: I<each_perm>, I<permutation>, I<permutations>
+=cut
+
+=head2 permutations
+
+Array.permutations() -> I<Obj>
+
+Return the
 
 =cut
 
@@ -1101,6 +1137,14 @@ Return the
 
 =cut
 
+=head2 subsets
+
+Array.subsets() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 sum
 
 Array.sum() -> I<Obj>
@@ -1171,6 +1215,22 @@ Aliases: I<dump>
 
 =cut
 
+=head2 tuples
+
+Array.tuples() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 tuples_with_repetition
+
+Array.tuples_with_repetition() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 uniq
 
 Array.uniq() -> I<Obj>
@@ -1204,6 +1264,22 @@ Aliases: I<unique_prefixes>
 =head2 unroll_operator
 
 Array.unroll_operator() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 variations
+
+Array.variations() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 variations_with_repetition
+
+Array.variations_with_repetition() -> I<Obj>
 
 Return the
 
