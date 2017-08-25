@@ -7060,60 +7060,15 @@ package Sidef::Types::Number::Number {
 
     sub forperm {
         my ($n, $block) = @_;
-
-        $n = CORE::int(__numify__($$n));
-
-        require Algorithm::Combinatorics;
-
-        my $iter = do {
-            local $SIG{__WARN__} = sub { };
-            Algorithm::Combinatorics::permutations([map { __PACKAGE__->_set_uint($_) } 0 .. $n - 1]);
-        };
-
-        if (defined($block)) {
-            while (defined(my $arr = $iter->next)) {
-                $block->run(@$arr);
-            }
-            return $_[0];
-        }
-
-        my @permutations;
-        while (defined(my $arr = $iter->next)) {
-            push @permutations, Sidef::Types::Array::Array->new([@$arr]);
-        }
-
-        Sidef::Types::Array::Array->new(\@permutations);
+        Sidef::Types::Array::Array->new([map { __PACKAGE__->_set_uint($_) } 0 .. __numify__($$n) - 1])->permutations($block);
     }
 
     *permutations = \&forperm;
 
     sub forcomb {
         my ($n, $k, $block) = @_;
-        _valid(\$k);
-
-        $n = CORE::int(__numify__($$n));
-        $k = CORE::int(__numify__($$k));
-
-        require Algorithm::Combinatorics;
-
-        my $iter = do {
-            local $SIG{__WARN__} = sub { };
-            Algorithm::Combinatorics::combinations([map { __PACKAGE__->_set_uint($_) } 0 .. $n - 1], $k);
-        };
-
-        if (defined($block)) {
-            while (defined(my $arr = $iter->next)) {
-                $block->run(@$arr);
-            }
-            return $_[0];
-        }
-
-        my @combinations;
-        while (defined(my $arr = $iter->next)) {
-            push @combinations, Sidef::Types::Array::Array->new([@$arr]);
-        }
-
-        Sidef::Types::Array::Array->new(\@combinations);
+        Sidef::Types::Array::Array->new([map { __PACKAGE__->_set_uint($_) } 0 .. __numify__($$n) - 1])
+          ->combinations($k, $block);
     }
 
     *combinations = \&forcomb;
