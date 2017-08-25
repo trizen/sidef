@@ -7058,20 +7058,44 @@ package Sidef::Types::Number::Number {
         $_[0];
     }
 
-    sub forperm {
-        my ($n, $block) = @_;
-        Sidef::Types::Array::Array->new([map { __PACKAGE__->_set_uint($_) } 0 .. __numify__($$n) - 1])->permutations($block);
+    foreach my $name (
+                      qw(
+                      permutations
+                      circular_permutations
+                      derangements
+                      )
+      ) {
+        no strict 'refs';
+        *{__PACKAGE__ . '::' . $name} = sub {
+#<<<
+            my ($n, $block) = @_;
+            Sidef::Types::Array::Array->new([map { __PACKAGE__->_set_uint($_) } 0 .. __numify__($$n) - 1])->$name($block);
+#>>>
+        };
     }
 
-    *permutations = \&forperm;
+    *complete_permutations = \&derangements;
 
-    sub forcomb {
-        my ($n, $k, $block) = @_;
-        Sidef::Types::Array::Array->new([map { __PACKAGE__->_set_uint($_) } 0 .. __numify__($$n) - 1])
-          ->combinations($k, $block);
+    foreach my $name (
+                      qw(
+                      subsets
+                      variations
+                      variations_with_repetition
+                      combinations
+                      combinations_with_repetition
+                      )
+      ) {
+        no strict 'refs';
+        *{__PACKAGE__ . '::' . $name} = sub {
+#<<<
+            my ($n, $k, $block) = @_;
+            Sidef::Types::Array::Array->new([map { __PACKAGE__->_set_uint($_) } 0 .. __numify__($$n) - 1])->$name($k, $block);
+#>>>
+        };
     }
 
-    *combinations = \&forcomb;
+    *tuples                 = \&variations;
+    *tuples_with_repetition = \&variations_with_repetition;
 
     sub commify {
         my ($self) = @_;

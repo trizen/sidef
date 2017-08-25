@@ -562,9 +562,33 @@ Return the
 
 =cut
 
+=head2 circular_permutations
+
+Number.circular_permutations() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 cis
 
 Number.cis() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 combinations
+
+Number.combinations() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 combinations_with_repetition
+
+Number.combinations_with_repetition() -> I<Obj>
 
 Return the
 
@@ -667,6 +691,16 @@ Return the
 Number.deg2rad() -> I<Obj>
 
 Return the
+
+=cut
+
+=head2 derangements
+
+Number.derangements() -> I<Obj>
+
+Return the
+
+Aliases: I<complete_permutations>
 
 =cut
 
@@ -853,26 +887,6 @@ Return the
 Number.floor() -> I<Obj>
 
 Return the
-
-=cut
-
-=head2 forcomb
-
-Number.forcomb() -> I<Obj>
-
-Return the
-
-Aliases: I<combinations>
-
-=cut
-
-=head2 forperm
-
-Number.forperm() -> I<Obj>
-
-Return the
-
-Aliases: I<permutations>
 
 =cut
 
@@ -1658,6 +1672,14 @@ Return the
 
 =cut
 
+=head2 permutations
+
+Number.permutations() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 phi
 
 Number.phi() -> I<Obj>
@@ -1996,6 +2018,14 @@ Return the
 
 =cut
 
+=head2 subsets
+
+Number.subsets() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 tan
 
 Number.tan() -> I<Obj>
@@ -2025,6 +2055,26 @@ Return the
 Number.times() -> I<Obj>
 
 Return the
+
+=cut
+
+=head2 tuples
+
+Number.tuples() -> I<Obj>
+
+Return the
+
+Aliases: I<variations>
+
+=cut
+
+=head2 tuples_with_repetition
+
+Number.tuples_with_repetition() -> I<Obj>
+
+Return the
+
+Aliases: I<variations_with_repetition>
 
 =cut
 

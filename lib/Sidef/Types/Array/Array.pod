@@ -259,14 +259,6 @@ Return the
 
 =cut
 
-=head2 complete_permutations
-
-Array.complete_permutations() -> I<Obj>
-
-Return the
-
-=cut
-
 =head2 cons
 
 Array.cons() -> I<Obj>
@@ -418,6 +410,8 @@ Aliases: I<remove_last_if>
 Array.derangements() -> I<Obj>
 
 Return the
+
+Aliases: I<complete_permutations>
 
 =cut
 
@@ -1221,6 +1215,8 @@ Array.tuples() -> I<Obj>
 
 Return the
 
+Aliases: I<variations>
+
 =cut
 
 =head2 tuples_with_repetition
@@ -1228,6 +1224,8 @@ Return the
 Array.tuples_with_repetition() -> I<Obj>
 
 Return the
+
+Aliases: I<variations_with_repetition>
 
 =cut
 
@@ -1264,22 +1262,6 @@ Aliases: I<unique_prefixes>
 =head2 unroll_operator
 
 Array.unroll_operator() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 variations
-
-Array.variations() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 variations_with_repetition
-
-Array.variations_with_repetition() -> I<Obj>
 
 Return the
 

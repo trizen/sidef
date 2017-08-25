@@ -1882,7 +1882,6 @@ package Sidef::Types::Array::Array {
                       derangements
                       permutations
                       circular_permutations
-                      complete_permutations
                       )
       ) {
 
@@ -1910,12 +1909,12 @@ package Sidef::Types::Array::Array {
         };
     }
 
+    *complete_permutations = \&derangements;
+
     foreach my $name (
                       qw(
                       variations
                       variations_with_repetition
-                      tuples
-                      tuples_with_repetition
                       combinations
                       combinations_with_repetition
                       subsets
@@ -1928,6 +1927,10 @@ package Sidef::Types::Array::Array {
             my ($self, $k, $block) = @_;
 
             require Algorithm::Combinatorics;
+
+            if (not defined($block) and ref($k) eq 'Sidef::Types::Block::Block') {
+                ($block, $k) = ($k, undef);
+            }
 
             my $iter = do {
                 local $SIG{__WARN__} = sub { };
@@ -1949,6 +1952,9 @@ package Sidef::Types::Array::Array {
             bless \@result, __PACKAGE__;
         };
     }
+
+    *tuples                 = \&variations;
+    *tuples_with_repetition = \&variations_with_repetition;
 
     sub partitions {
         my ($self, $k, $block) = @_;
