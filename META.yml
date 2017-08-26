@@ -118,6 +118,7 @@ recommends:
   File::Find: '0'
 requires:
   Algorithm::Combinatorics: '0'
+  Algorithm::Loops: '0'
   Cwd: '0'
   Encode: '0'
   Fcntl: '0'
@@ -144,7 +145,7 @@ requires:
 resources:
   bugtracker: https://github.com/trizen/sidef/issues
   homepage: https://github.com/trizen/sidef
-  license: http://www.perlfoundation.org/artistic_license_2_0
+  license: http://opensource.org/licenses/artistic-license-2.0.php
   repository: https://github.com/trizen/sidef
 version: '3.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

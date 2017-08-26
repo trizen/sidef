@@ -7,6 +7,7 @@ WriteMakefile
   'VERSION_FROM' => 'lib/Sidef.pm',
   'PREREQ_PM' => {
                    'Algorithm::Combinatorics' => 0,
+                   'Algorithm::Loops' => 0,
                    'Cwd' => 0,
                    'Encode' => 0,
                    'Fcntl' => 0,
