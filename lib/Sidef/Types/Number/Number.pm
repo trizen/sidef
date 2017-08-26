@@ -5337,6 +5337,28 @@ package Sidef::Types::Number::Number {
         bless \__mod__($$x, $$y);
     }
 
+    sub polymod {
+        my ($x, @m) = @_;
+
+        _valid(map { \$_ } @m);
+
+        $x = $$x;
+        @m = map { $$_ } @m;
+
+        my @r;
+        foreach my $m (@m) {
+            my $mod = __mod__($x, $m);
+
+            $x = __sub__($x, $mod);
+            $x = __div__($x, $m);
+
+            push @r, $mod;
+        }
+
+        push @r, $x;
+        map { bless \$_ } @r;
+    }
+
     sub imod {
         my ($x, $y) = @_;
 

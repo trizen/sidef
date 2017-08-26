@@ -1704,6 +1704,14 @@ Return the
 
 =cut
 
+=head2 polymod
+
+Number.polymod() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 popcount
 
 Number.popcount() -> I<Obj>
