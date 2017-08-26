@@ -303,6 +303,7 @@ scripts/RosettaCode/compile-time_calculation.sf
 scripts/RosettaCode/compile-time_calculation_1.sf
 scripts/RosettaCode/compound_data_type.sf
 scripts/RosettaCode/concurrent_computing.sf
+scripts/RosettaCode/conjugate_transpose.sf
 scripts/RosettaCode/constrained_random_points_on_a_circle.sf
 scripts/RosettaCode/continued_fractions_from_rationals.sf
 scripts/RosettaCode/convert_decimal_number_to_rational.sf
