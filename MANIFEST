@@ -307,6 +307,7 @@ scripts/RosettaCode/constrained_random_points_on_a_circle.sf
 scripts/RosettaCode/continued_fractions_from_rationals.sf
 scripts/RosettaCode/convert_decimal_number_to_rational.sf
 scripts/RosettaCode/convert_seconds_to_compound_duration.sf
+scripts/RosettaCode/convex_hull.sf
 scripts/RosettaCode/copy_a_string.sf
 scripts/RosettaCode/count_in_factors.sf
 scripts/RosettaCode/count_occurrences_of_a_substring.sf
