@@ -2020,51 +2020,22 @@ package Sidef::Types::Array::Array {
     sub cartesian {
         my ($self, $block) = @_;
 
-        my ($more, @arrs, @lengths);
+        require Algorithm::Loops;
 
-        foreach my $arr (@$self) {
-            my @arr = @$arr;
+        my $iter = Algorithm::Loops::NestedLoops([map { [@$_] } @$self]);
 
-            if (@arr) {
-                $more ||= 1;
+        if (defined($block)) {
+            while (my @arr = $iter->()) {
+                $block->run(@arr);
             }
-            else {
-                $more = 0;
-                last;
-            }
-
-            push @arrs,    \@arr;
-            push @lengths, $#arr;
+            return $self;
         }
 
-        my @indices = (0) x @arrs;
-        my (@temp, @cartesian);
-
-        while ($more) {
-            @temp = @indices;
-
-            for (my $i = $#indices ; $i >= 0 ; --$i) {
-                if ($indices[$i] == $lengths[$i]) {
-                    $indices[$i] = 0;
-                    $more = 0 if $i == 0;
-                }
-                else {
-                    ++$indices[$i];
-                    last;
-                }
-            }
-
-            if (defined($block)) {
-                $block->run(map { $_->[CORE::shift(@temp)] } @arrs);
-            }
-            else {
-                push @cartesian, bless([map { $_->[CORE::shift(@temp)] } @arrs], __PACKAGE__);
-            }
+        my @result;
+        while (my @arr = $iter->()) {
+            push @result, bless(\@arr, __PACKAGE__);
         }
-
-        defined($block)
-          ? $self
-          : bless(\@cartesian, __PACKAGE__);
+        bless \@result, __PACKAGE__;
     }
 
     sub zip {

@@ -61,6 +61,7 @@ my $builder = Module::Build->new(
                  'Term::ReadLine'           => 0,
                  'Math::Prime::Util::GMP'   => 0.44,
                  'Algorithm::Combinatorics' => 0,
+                 'Algorithm::Loops'         => 0,
                 },
 
     recommends => {
