@@ -620,6 +620,14 @@ Aliases: I<conjug>, I<conjugate>
 
 =cut
 
+=head2 convergents
+
+Number.convergents() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 cos
 
 Number.cos() -> I<Obj>

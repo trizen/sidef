@@ -4894,6 +4894,34 @@ package Sidef::Types::Number::Number {
 
     *as_dec = \&as_float;
 
+    sub convergents {
+        my ($x, $n) = @_;
+
+        my @cfrac = @{$x->as_cfrac($n)};
+
+        if (defined($n)) {
+            $n = _any2ui($$n) // 0;
+            $n = @cfrac if $n > @cfrac;
+        }
+        else {
+            $n = @cfrac;
+        }
+
+        my @convergents;
+        foreach my $k (1 .. $n) {
+            my @terms = map { $$_ } reverse(@cfrac[0 .. $k - 1]);
+
+            my $convergent = $terms[0];
+            foreach my $i (1 .. $#terms) {
+                $convergent = __add__($terms[$i], __inv__($convergent));
+            }
+
+            push @convergents, bless \$convergent;
+        }
+
+        Sidef::Types::Array::Array->new(\@convergents);
+    }
+
     sub dump {
         my ($x) = @_;
 
