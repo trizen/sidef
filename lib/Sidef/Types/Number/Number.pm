@@ -4809,7 +4809,7 @@ package Sidef::Types::Number::Number {
 
             for (1 .. $n) {
                 my $t = __floor__($f);
-                push @cfrac, bless \$t;
+                push @cfrac, bless \(_any2mpz($t) // $t);
 
                 Math::MPFR::Rmpfr_eq($f, $t, $p) && last;
                 Math::MPFR::Rmpfr_sub($f, $f, $t, $ROUND);
@@ -4833,7 +4833,7 @@ package Sidef::Types::Number::Number {
 
             for (1 .. $n) {
                 my $t = __floor__($c);
-                push @cfrac, bless \$t;
+                push @cfrac, bless \(_any2mpz($t) // $t);
 
                 Math::MPC::Rmpc_real($real_1, $c, $ROUND);
                 Math::MPC::Rmpc_imag($imag_1, $c, $ROUND);
