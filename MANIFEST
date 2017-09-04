@@ -472,6 +472,7 @@ scripts/RosettaCode/permutations_by_swapping.sf
 scripts/RosettaCode/pernicious_numbers.sf
 scripts/RosettaCode/phrase_reversals.sf
 scripts/RosettaCode/pick_random_element.sf
+scripts/RosettaCode/playfair_cipher.sf
 scripts/RosettaCode/playing_cards.sf
 scripts/RosettaCode/pointers_and_references.sf
 scripts/RosettaCode/polymorphic_copy.sf

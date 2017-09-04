@@ -156,9 +156,9 @@ package Sidef::Deparse::Sidef {
         my ($type, $str) = $num->_dump;
 
         if ($type eq 'complex') {
-            my ($real, $imag) = split(' ', substr($str, 1, -1));
-            ($real, $imag) = map { [Sidef::Types::Number::Number->new($_)->_dump] } ($real, $imag);
-            return "Complex($real->[1], $imag->[1])";
+            my ($real, $imag) =
+              map { $self->_dump_number(Sidef::Types::Number::Number->new($_)) } split(' ', substr($str, 1, -1));
+            return "Complex($real, $imag)";
         }
 
         state $table = {

@@ -664,31 +664,7 @@ package Sidef::Optimizer {
 
             # Complex.method(NUMBER|STRING, NUMBER|STRING)
             (
-             map { [$_, [table(STRING), table(STRING)]] }
-               dtypes(COMPLEX_DT, qw(
-                   new
-                   )
-               )
-            ),
-
-            (
-             map { [$_, [table(STRING), table(NUMBER)]] }
-               dtypes(COMPLEX_DT, qw(
-                   new
-                   )
-               )
-            ),
-
-            (
-             map { [$_, [table(NUMBER), table(STRING)]] }
-               dtypes(COMPLEX_DT, qw(
-                   new
-                   )
-               )
-            ),
-
-            (
-             map { [$_, [table(NUMBER), table(NUMBER)]] }
+             map { [$_, [table(STRING, NUMBER), table(STRING, NUMBER)]] }
                dtypes(COMPLEX_DT, qw(
                    new
                    )
