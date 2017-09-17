@@ -707,7 +707,8 @@ package Sidef::Types::Number::Number {
         goto(ref($x) =~ tr/:/_/rs);
 
       Math_GMPz: {
-            return Math::GMPz::Rmpz_get_str($x, 10);
+            push @_, 10;
+            goto &Math::GMPz::Rmpz_get_str;
         }
 
       Math_GMPq: {
