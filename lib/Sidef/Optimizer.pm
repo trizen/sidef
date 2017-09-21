@@ -466,6 +466,12 @@ package Sidef::Optimizer {
                    sum
                    prod
 
+                   zip
+                   cartesian
+                   permutations
+                   derangements
+                   circular_permutations
+
                    sort
                    reverse
 
@@ -488,7 +494,15 @@ package Sidef::Optimizer {
                    exists
                    defined
                    contains
-                   contains_type
+
+                   subsets
+                   partitions
+                   variations
+                   variations_with_repetition
+                   combinations
+                   combinations_with_repetition
+
+                   nth_permutation
 
                    div
                    mul
@@ -518,7 +532,6 @@ package Sidef::Optimizer {
                    concat
 
                    eq ne
-                   mzip
                    contains_type
                    contains_any
                    contains_all

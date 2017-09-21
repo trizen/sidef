@@ -2044,12 +2044,10 @@ package Sidef::Types::Array::Array {
         my @arrays = @{$self};
         my $min = List::Util::min(map { scalar @$_ } @arrays);
 
-        my @first = @{CORE::shift(@arrays)};
-
         my @new_array;
         foreach my $i (0 .. $min - 1) {
 
-            my @tmp = ($first[$i], map { $_->[$i] } @arrays);
+            my @tmp = (map { $_->[$i] } @arrays);
 
             if (defined($block)) {
                 $block->run(@tmp);
@@ -2062,28 +2060,18 @@ package Sidef::Types::Array::Array {
         defined($block) ? $self : bless(\@new_array, __PACKAGE__);
     }
 
-    sub mzip {
+    sub zip_by {
         my ($self, $block) = @_;
 
         my @arrays = @{$self};
         my $min = List::Util::min(map { scalar @$_ } @arrays);
 
-        my @first = @{CORE::shift(@arrays)};
-
         my @new_array;
-        foreach my $i (0 .. $#first) {
-
-            my @tmp = ($first[$i], map { $_->[$i % $min] } @arrays);
-
-            if (defined($block)) {
-                $block->run(@tmp);
-            }
-            else {
-                CORE::push(@new_array, bless(\@tmp, __PACKAGE__));
-            }
+        foreach my $i (0 .. $min - 1) {
+            CORE::push(@new_array, $block->run(map { $_->[$i] } @arrays));
         }
 
-        defined($block) ? $self : bless(\@new_array, __PACKAGE__);
+        bless(\@new_array, __PACKAGE__);
     }
 
     sub pack {
@@ -2228,6 +2216,8 @@ package Sidef::Types::Array::Array {
     }
 
     *remove_if = \&delete_if;
+    *remove_by = \&delete_if;
+    *delete_by = \&delete_if;
 
     sub delete_first_if {
         my ($self, $code) = @_;
@@ -2243,6 +2233,8 @@ package Sidef::Types::Array::Array {
     }
 
     *remove_first_if = \&delete_first_if;
+    *remove_first_by = \&delete_first_if;
+    *delete_first_by = \&delete_first_if;
 
     sub delete_last_if {
         my ($self, $code) = @_;
@@ -2259,6 +2251,8 @@ package Sidef::Types::Array::Array {
     }
 
     *remove_last_if = \&delete_last_if;
+    *remove_last_by = \&delete_last_if;
+    *delete_last_by = \&delete_last_if;
 
     sub to_list { @{$_[0]} }
 

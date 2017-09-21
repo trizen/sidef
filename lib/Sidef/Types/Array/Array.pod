@@ -355,6 +355,16 @@ Aliases: I<remove>
 
 =cut
 
+=head2 delete_by
+
+Array.delete_by() -> I<Obj>
+
+Return the
+
+Aliases: I<delete_if>, I<remove_by>, I<remove_if>
+
+=cut
+
 =head2 delete_first
 
 Array.delete_first() -> I<Obj>
@@ -365,23 +375,13 @@ Aliases: I<remove_first>
 
 =cut
 
-=head2 delete_first_if
+=head2 delete_first_by
 
-Array.delete_first_if() -> I<Obj>
-
-Return the
-
-Aliases: I<remove_first_if>
-
-=cut
-
-=head2 delete_if
-
-Array.delete_if() -> I<Obj>
+Array.delete_first_by() -> I<Obj>
 
 Return the
 
-Aliases: I<remove_if>
+Aliases: I<delete_first_if>, I<remove_first_by>, I<remove_first_if>
 
 =cut
 
@@ -395,13 +395,13 @@ Aliases: I<remove_last>
 
 =cut
 
-=head2 delete_last_if
+=head2 delete_last_by
 
-Array.delete_last_if() -> I<Obj>
+Array.delete_last_by() -> I<Obj>
 
 Return the
 
-Aliases: I<remove_last_if>
+Aliases: I<delete_last_if>, I<remove_last_by>, I<remove_last_if>
 
 =cut
 
@@ -863,14 +863,6 @@ Return the
 
 =cut
 
-=head2 mzip
-
-Array.mzip() -> I<Obj>
-
-Return the
-
-=cut
-
 =head2 new
 
 Array.new() -> I<Obj>
@@ -1270,6 +1262,14 @@ Return the
 =head2 zip
 
 Array.zip() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 zip_by
+
+Array.zip_by() -> I<Obj>
 
 Return the
 
