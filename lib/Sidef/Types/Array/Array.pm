@@ -568,7 +568,7 @@ package Sidef::Types::Array::Array {
         my ($self, $arg) = @_;
 
         if (ref($arg) eq 'Sidef::Types::Block::Block') {
-            goto \&sum_by;
+            goto &sum_by;
         }
 
         my $sum = $arg // Sidef::Types::Number::Number::ZERO;
@@ -596,7 +596,7 @@ package Sidef::Types::Array::Array {
         my ($self, $arg) = @_;
 
         if (ref($arg) eq 'Sidef::Types::Block::Block') {
-            goto \&prod_by;
+            goto &prod_by;
         }
 
         my $prod = $arg // Sidef::Types::Number::Number::ONE;
@@ -625,12 +625,12 @@ package Sidef::Types::Array::Array {
 
     sub max_by {
         @_ = (@_[0, 1], 1);
-        goto \&_min_max_by;
+        goto &_min_max_by;
     }
 
     sub min_by {
         @_ = (@_[0, 1], -1);
-        goto \&_min_max_by;
+        goto &_min_max_by;
     }
 
     sub swap {
@@ -651,7 +651,7 @@ package Sidef::Types::Array::Array {
         if (defined $arg) {
 
             if (ref($arg) eq 'Sidef::Types::Block::Block') {
-                goto \&first_by;
+                goto &first_by;
             }
 
             my $max = $#$self;
@@ -668,7 +668,7 @@ package Sidef::Types::Array::Array {
         if (defined $arg) {
 
             if (ref($arg) eq 'Sidef::Types::Block::Block') {
-                goto \&last_by;
+                goto &last_by;
             }
 
             my $from = @$self - CORE::int($arg);

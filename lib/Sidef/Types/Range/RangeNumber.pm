@@ -109,7 +109,7 @@ package Sidef::Types::Range::RangeNumber {
         my ($self, $arg) = @_;
 
         if (ref($arg) eq 'Sidef::Types::Block::Block') {
-            goto \&sum_by;
+            goto &sum_by;
         }
 
         if ($self->{step}->is_one) {
@@ -147,7 +147,7 @@ package Sidef::Types::Range::RangeNumber {
         my ($self, $arg) = @_;
 
         if (ref($arg) eq 'Sidef::Types::Block::Block') {
-            goto \&prod_by;
+            goto &prod_by;
         }
 
         if (    $self->{step}->is_one
