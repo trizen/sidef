@@ -1289,6 +1289,35 @@ package Sidef::Types::Array::Array {
         bless [List::Util::shuffle(@$self)], __PACKAGE__;
     }
 
+    sub weighted_shuffle_by {
+        my ($self, $block) = @_;
+
+#<<<
+        my @weights = map {
+            Sidef::Types::Number::Number::__numify__(${Sidef::Types::Number::Number->new(scalar $block->run($_))})
+        } @$self;
+#>>>
+
+        my @vals  = @$self;
+        my $total = List::Util::sum(@weights);
+
+        my @shuffled;
+        while (@vals > 1) {
+            my $select = CORE::int(CORE::rand($total));
+
+            my $idx = 0;
+            while ($select >= $weights[$idx]) {
+                $select -= $weights[$idx++];
+            }
+
+            CORE::push(@shuffled, CORE::splice(@vals, $idx, 1));
+            $total -= CORE::splice(@weights, $idx, 1);
+        }
+
+        CORE::push(@shuffled, @vals) if @vals;
+        bless \@shuffled, __PACKAGE__;
+    }
+
     sub best_shuffle {
         my ($s) = @_;
         my ($t) = $s->shuffle;

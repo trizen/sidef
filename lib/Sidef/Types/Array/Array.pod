@@ -1291,6 +1291,14 @@ Return the
 
 =cut
 
+=head2 weighted_shuffle_by
+
+Array.weighted_shuffle_by() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 zip
 
 Array.zip() -> I<Obj>
