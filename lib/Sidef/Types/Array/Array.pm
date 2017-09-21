@@ -2074,6 +2074,30 @@ package Sidef::Types::Array::Array {
         bless(\@new_array, __PACKAGE__);
     }
 
+    sub unzip_by {
+        my ($self, $block) = @_;
+
+        my @matrix;
+        foreach my $i (0 .. $#$self) {
+
+            my @tmp = $block->run($self->[$i]);
+
+            if (@tmp < @matrix) {
+                $#tmp = $#matrix;
+            }
+
+            foreach my $j (0 .. $#tmp) {
+                $matrix[$j][$i] = $tmp[$j];
+            }
+        }
+
+        foreach my $row (@matrix) {
+            bless($row, __PACKAGE__);
+        }
+
+        bless(\@matrix, __PACKAGE__);
+    }
+
     sub pack {
         my ($self, $format) = @_;
         Sidef::Types::String::String->new(CORE::pack("$format", @$self));

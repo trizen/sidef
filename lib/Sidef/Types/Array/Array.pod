@@ -1267,6 +1267,14 @@ Return the
 
 =cut
 
+=head2 unzip_by
+
+Array.unzip_by() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 zip
 
 Array.zip() -> I<Obj>
