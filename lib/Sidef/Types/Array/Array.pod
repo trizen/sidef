@@ -503,6 +503,22 @@ Return the
 
 =cut
 
+=head2 extract_first_by
+
+Array.extract_first_by() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 extract_last_by
+
+Array.extract_last_by() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 fetch
 
 Array.fetch() -> I<Obj>

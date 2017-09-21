@@ -2256,6 +2256,30 @@ package Sidef::Types::Array::Array {
         bless(\@extracted, __PACKAGE__);
     }
 
+    sub extract_first_by {
+        my ($self, $block) = @_;
+
+        foreach my $i (0 .. $#$self) {
+            if ($block->run($self->[$i])) {
+                return CORE::splice(@$self, $i--, 1);
+            }
+        }
+
+        return undef;
+    }
+
+    sub extract_last_by {
+        my ($self, $block) = @_;
+
+        for (my $i = $#$self ; $i >= 0 ; --$i) {
+            if ($block->run($self->[$i])) {
+                return CORE::splice(@$self, $i, 1);
+            }
+        }
+
+        return undef;
+    }
+
     sub delete_first_if {
         my ($self, $block) = @_;
 
@@ -2277,8 +2301,7 @@ package Sidef::Types::Array::Array {
         my ($self, $block) = @_;
 
         for (my $i = $#$self ; $i >= 0 ; --$i) {
-            my $item = $self->[$i];
-            if ($block->run($item)) {
+            if ($block->run($self->[$i])) {
                 CORE::splice(@$self, $i, 1);
                 return (Sidef::Types::Bool::Bool::TRUE);
             }
