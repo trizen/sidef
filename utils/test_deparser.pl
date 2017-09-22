@@ -10,9 +10,10 @@
 #
 
 ## Algorithm:
-# - parse the code
-# - deparse the code as D1
-# - deparse the deparsed code as D2
+# - parse the code as C1
+# - deparse the C1 code as D1
+# - parse the D1 code as C2
+# - deparse the C2 code as D2
 # - if D1 != D2: throw an error
 
 use utf8;
