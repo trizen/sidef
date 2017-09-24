@@ -146,14 +146,6 @@ Return the
 
 =cut
 
-=head2 first
-
-Range.first() -> I<Obj>
-
-Return the
-
-=cut
-
 =head2 first_by
 
 Range.first_by() -> I<Obj>
@@ -200,6 +192,16 @@ Aliases: I<select>
 
 =cut
 
+=head2 head
+
+Range.head() -> I<Obj>
+
+Return the
+
+Aliases: I<first>
+
+=cut
+
 =head2 join
 
 Range.join() -> I<Obj>
@@ -213,6 +215,8 @@ Return the
 Range.last() -> I<Obj>
 
 Return the
+
+Aliases: I<tail>
 
 =cut
 

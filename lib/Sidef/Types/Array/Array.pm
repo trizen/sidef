@@ -662,6 +662,8 @@ package Sidef::Types::Array::Array {
         @$self ? $self->[0] : ();
     }
 
+    *head = \&first;
+
     sub last {
         my ($self, $arg) = @_;
 
@@ -677,6 +679,8 @@ package Sidef::Types::Array::Array {
 
         @$self ? $self->[-1] : ();
     }
+
+    *tail = \&last;
 
     sub _flatten {    # this exists for performance reasons
         my ($self, $class) = @_;

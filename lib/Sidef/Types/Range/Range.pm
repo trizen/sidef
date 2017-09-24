@@ -167,6 +167,8 @@ package Sidef::Types::Range::Range {
         $iter->() // undef;
     }
 
+    *head = \&first;
+
     sub last {
         my ($self, $num) = @_;
 
@@ -178,6 +180,8 @@ package Sidef::Types::Range::Range {
           ? $self->reverse->first($num)->reverse
           : $self->reverse->first;
     }
+
+    *tail = \&last;
 
     sub last_by {
         my ($self, $code) = @_;
