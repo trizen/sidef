@@ -1042,6 +1042,14 @@ Aliases: I<modinv>
 
 =cut
 
+=head2 ipolygonal_root
+
+Number.ipolygonal_root() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 ipow
 
 Number.ipow() -> I<Obj>
@@ -1199,6 +1207,14 @@ Return the
 =head2 is_one
 
 Number.is_one() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 is_polygonal
+
+Number.is_polygonal() -> I<Obj>
 
 Return the
 
@@ -1707,6 +1723,14 @@ Return the
 =head2 pn_primorial
 
 Number.pn_primorial() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 polygonal
+
+Number.polygonal() -> I<Obj>
 
 Return the
 
