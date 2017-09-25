@@ -1050,6 +1050,14 @@ Return the
 
 =cut
 
+=head2 ipolygonal_root2
+
+Number.ipolygonal_root2() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 ipow
 
 Number.ipow() -> I<Obj>
@@ -1215,6 +1223,14 @@ Return the
 =head2 is_polygonal
 
 Number.is_polygonal() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 is_polygonal2
+
+Number.is_polygonal2() -> I<Obj>
 
 Return the
 
@@ -1731,6 +1747,22 @@ Return the
 =head2 polygonal
 
 Number.polygonal() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 polygonal_root
+
+Number.polygonal_root() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 polygonal_root2
+
+Number.polygonal_root2() -> I<Obj>
 
 Return the
 

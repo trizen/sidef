@@ -2187,7 +2187,7 @@ package Sidef::Types::Array::Array {
         );
     }
 
-    *encode = \&join_bytes;    # somehow, I got this alias wrong...
+    *chrs   = \&join_bytes;
     *decode = \&join_bytes;
 
     sub reverse {

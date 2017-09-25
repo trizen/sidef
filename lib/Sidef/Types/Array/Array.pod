@@ -219,6 +219,16 @@ Return the
 
 =cut
 
+=head2 chrs
+
+Array.chrs() -> I<Obj>
+
+Return the
+
+Aliases: I<decode>, I<join_bytes>
+
+=cut
+
 =head2 circular_permutations
 
 Array.circular_permutations() -> I<Obj>
@@ -324,16 +334,6 @@ Aliases: I<count_by>
 Array.cross_operator() -> I<Obj>
 
 Return the
-
-=cut
-
-=head2 decode
-
-Array.decode() -> I<Obj>
-
-Return the
-
-Aliases: I<encode>, I<join_bytes>
 
 =cut
 
