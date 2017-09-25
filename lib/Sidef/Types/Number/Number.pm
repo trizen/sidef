@@ -6679,6 +6679,44 @@ package Sidef::Types::Number::Number {
     ## Is a polygonal number?
     #
 
+    # $n is a Math::GMPz object
+    # $k is a Math::GMPz object
+    # $second is a boolean
+
+    sub __is_polygonal__ {
+        my ($n, $k, $second) = @_;
+
+        Math::GMPz::Rmpz_sgn($n) || return 1;
+
+        # polygonal_root(n, k)
+        #   = (sqrt(8 * (k - 2) * n + (k - 4)^2) ± (k - 4)) / (2 * (k - 2))
+
+        state $t = Math::GMPz::Rmpz_init();
+        state $u = Math::GMPz::Rmpz_init();
+
+        Math::GMPz::Rmpz_sub_ui($u, $k, 2);    # u = k-2
+        Math::GMPz::Rmpz_mul($t, $n, $u);      # t = n*u
+        Math::GMPz::Rmpz_mul_2exp($t, $t, 3);  # t = t*8
+
+        Math::GMPz::Rmpz_sub_ui($u, $u, 2);    # u = u-2
+        Math::GMPz::Rmpz_mul($u, $u, $u);      # u = u^2
+
+        Math::GMPz::Rmpz_add($t, $t, $u);      # t = t+u
+        Math::GMPz::Rmpz_perfect_square_p($t) || return 0;
+        Math::GMPz::Rmpz_sqrt($t, $t);         # t = sqrt(t)
+
+        Math::GMPz::Rmpz_sub_ui($u, $k, 4);    # u = k-4
+
+        $second
+          ? Math::GMPz::Rmpz_sub($t, $t, $u)    # t = t-u
+          : Math::GMPz::Rmpz_add($t, $t, $u);   # t = t+u
+
+        Math::GMPz::Rmpz_add_ui($u, $u, 2);     # u = u+2
+        Math::GMPz::Rmpz_mul_2exp($u, $u, 1);   # u = u*2
+
+        Math::GMPz::Rmpz_divisible_p($t, $u);   # true iff u|t
+    }
+
     sub is_polygonal {
         my ($n, $k) = @_;
 
@@ -6689,10 +6727,39 @@ package Sidef::Types::Number::Number {
         $n = _any2mpz($$n) // return Sidef::Types::Bool::Bool::FALSE;
         $k = _any2mpz($$k) // return Sidef::Types::Bool::Bool::FALSE;
 
-        Math::GMPz::Rmpz_sgn($n) || return Sidef::Types::Bool::Bool::TRUE;
+        __is_polygonal__($n, $k)
+          ? Sidef::Types::Bool::Bool::TRUE
+          : Sidef::Types::Bool::Bool::FALSE;
+    }
+
+    sub is_polygonal2 {
+        my ($n, $k) = @_;
+
+        _valid(\$k);
+
+        __is_int__($$n) || return Sidef::Types::Bool::Bool::FALSE;
+
+        $n = _any2mpz($$n) // return Sidef::Types::Bool::Bool::FALSE;
+        $k = _any2mpz($$k) // return Sidef::Types::Bool::Bool::FALSE;
+
+        __is_polygonal__($n, $k, 1)
+          ? Sidef::Types::Bool::Bool::TRUE
+          : Sidef::Types::Bool::Bool::FALSE;
+    }
+
+    #
+    ## Integer polygonal root
+    #
+
+    # $n is a Math::GMPz object
+    # $k is a Math::GMPz object
+    # $second is a boolean
+
+    sub __ipolygonal_root__ {
+        my ($n, $k, $second) = @_;
 
         # polygonal_root(n, k)
-        #   = (sqrt(8 * (k - 2) * n + (k - 4)^2) + k - 4) / (2 * (k - 2))
+        #   = (sqrt(8 * (k - 2) * n + (k - 4)^2) ± (k - 4)) / (2 * (k - 2))
 
         state $t = Math::GMPz::Rmpz_init();
         state $u = Math::GMPz::Rmpz_init();
@@ -6703,24 +6770,29 @@ package Sidef::Types::Number::Number {
 
         Math::GMPz::Rmpz_sub_ui($u, $u, 2);    # u = u-2
         Math::GMPz::Rmpz_mul($u, $u, $u);      # u = u^2
-
-        Math::GMPz::Rmpz_add($t, $t, $u);      # t = t+u
-        Math::GMPz::Rmpz_perfect_square_p($t) || return Sidef::Types::Bool::Bool::FALSE;
-        Math::GMPz::Rmpz_sqrt($t, $t);         # t = sqrt(t)
-
-        Math::GMPz::Rmpz_sub_ui($u, $k, 4);    # u = k-4
         Math::GMPz::Rmpz_add($t, $t, $u);      # t = t+u
 
-        Math::GMPz::Rmpz_add_ui($u, $u, 2);    # u = u+2
-        Math::GMPz::Rmpz_mul_2exp($u, $u, 1);  # u = u*2
+        Math::GMPz::Rmpz_sgn($t) < 0 && goto &_nan;    # `t` is negative
 
-        Math::GMPz::Rmpz_divisible_p($t, $u)   # true iff u|t
-          ? Sidef::Types::Bool::Bool::TRUE
-          : Sidef::Types::Bool::Bool::FALSE;
+        Math::GMPz::Rmpz_sqrt($t, $t);                 # t = sqrt(t)
+        Math::GMPz::Rmpz_sub_ui($u, $k, 4);            # u = k-4
+
+        $second
+          ? Math::GMPz::Rmpz_sub($t, $t, $u)           # t = t+u
+          : Math::GMPz::Rmpz_add($t, $t, $u);          # t = t+u
+
+        Math::GMPz::Rmpz_add_ui($u, $u, 2);            # u = u+2
+        Math::GMPz::Rmpz_mul_2exp($u, $u, 1);          # u = u*2
+
+        Math::GMPz::Rmpz_sgn($u) || return $n;         # `u` is zero
+
+        my $r = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_div($r, $t, $u);              # r = floor(t/u)
+        return $r;
     }
 
     #
-    ## Integer polygonal root
+    ## Integer k-gonal root of `n`
     #
 
     sub ipolygonal_root {
@@ -6731,34 +6803,22 @@ package Sidef::Types::Number::Number {
         $n = _any2mpz($$n) // goto &nan;
         $k = _any2mpz($$k) // goto &nan;
 
-        # polygonal_root(n, k)
-        #   = (sqrt(8 * (k - 2) * n + (k - 4)^2) + k - 4) / (2 * (k - 2))
+        bless \__ipolygonal_root__($n, $k);
+    }
 
-        state $t = Math::GMPz::Rmpz_init();
-        state $u = Math::GMPz::Rmpz_init();
+    #
+    ## Second integer k-gonal root of `n`
+    #
 
-        Math::GMPz::Rmpz_sub_ui($u, $k, 2);    # u = k-2
-        Math::GMPz::Rmpz_mul($t, $n, $u);      # t = n*u
-        Math::GMPz::Rmpz_mul_2exp($t, $t, 3);  # t = t*8
+    sub ipolygonal_root2 {
+        my ($n, $k) = @_;
 
-        Math::GMPz::Rmpz_sub_ui($u, $u, 2);    # u = u-2
-        Math::GMPz::Rmpz_mul($u, $u, $u);      # u = u^2
-        Math::GMPz::Rmpz_add($t, $t, $u);      # t = t+u
+        _valid(\$k);
 
-        Math::GMPz::Rmpz_sgn($t) < 0 && goto &nan;    # `t` is negative
+        $n = _any2mpz($$n) // goto &nan;
+        $k = _any2mpz($$k) // goto &nan;
 
-        Math::GMPz::Rmpz_sqrt($t, $t);                # t = sqrt(t)
-        Math::GMPz::Rmpz_sub_ui($u, $k, 4);           # u = k-4
-        Math::GMPz::Rmpz_add($t, $t, $u);             # t = t+u
-
-        Math::GMPz::Rmpz_add_ui($u, $u, 2);           # u = u+2
-        Math::GMPz::Rmpz_mul_2exp($u, $u, 1);         # u = u*2
-
-        Math::GMPz::Rmpz_sgn($u) || return bless \$n; # `u` is zero
-
-        my $r = Math::GMPz::Rmpz_init();
-        Math::GMPz::Rmpz_div($r, $t, $u);
-        bless \$r;
+        bless \__ipolygonal_root__($n, $k, 1);
     }
 
     #
@@ -6793,7 +6853,7 @@ package Sidef::Types::Number::Number {
     #
 
     sub __polygonal_root__ {
-        my ($n, $k) = @_;
+        my ($n, $k, $second) = @_;
         goto(join('__', ref($n), ref($k)) =~ tr/:/_/rs);
 
         # polygonal_root(n, k)
@@ -6820,13 +6880,16 @@ package Sidef::Types::Number::Number {
 
             Math::MPFR::Rmpfr_sqrt($t, $t, $ROUND);         # t = sqrt(t)
             Math::MPFR::Rmpfr_sub_ui($u, $k, 4, $ROUND);    # u = k-4
-            Math::MPFR::Rmpfr_add($t, $t, $u, $ROUND);      # t = t+u
 
-            Math::MPFR::Rmpfr_add_ui($u, $u, 2, $ROUND);    # u = u+2
-            Math::MPFR::Rmpfr_mul_2ui($u, $u, 1, $ROUND);   # u = u*2
+            $second
+              ? Math::MPFR::Rmpfr_sub($t, $t, $u, $ROUND)    # t = t-u
+              : Math::MPFR::Rmpfr_add($t, $t, $u, $ROUND);   # t = t+u
 
-            Math::MPFR::Rmpfr_sgn($u) || return $n;         # `u` is zero
-            Math::MPFR::Rmpfr_div($t, $t, $u, $ROUND);      # t = t/u
+            Math::MPFR::Rmpfr_add_ui($u, $u, 2, $ROUND);     # u = u+2
+            Math::MPFR::Rmpfr_mul_2ui($u, $u, 1, $ROUND);    # u = u*2
+
+            Math::MPFR::Rmpfr_sgn($u) || return $n;          # `u` is zero
+            Math::MPFR::Rmpfr_div($t, $t, $u, $ROUND);       # t = t/u
             return $t;
         }
 
@@ -6854,24 +6917,41 @@ package Sidef::Types::Number::Number {
 
             Math::MPC::Rmpc_sqrt($t, $t, $ROUND);         # t = sqrt(t)
             Math::MPC::Rmpc_sub_ui($u, $k, 4, $ROUND);    # u = k-4
-            Math::MPC::Rmpc_add($t, $t, $u, $ROUND);      # t = t+u
 
-            Math::MPC::Rmpc_add_ui($u, $u, 2, $ROUND);    # u = u+2
-            Math::MPC::Rmpc_mul_2ui($u, $u, 1, $ROUND);   # u = u*2
+            $second
+              ? Math::MPC::Rmpc_sub($t, $t, $u, $ROUND)    # t = t-u
+              : Math::MPC::Rmpc_add($t, $t, $u, $ROUND);   # t = t+u
 
-            if (Math::MPC::Rmpc_cmp_si($t, 0) == 0) {     # `u` is zero
+            Math::MPC::Rmpc_add_ui($u, $u, 2, $ROUND);     # u = u+2
+            Math::MPC::Rmpc_mul_2ui($u, $u, 1, $ROUND);    # u = u*2
+
+            if (Math::MPC::Rmpc_cmp_si($t, 0) == 0) {      # `u` is zero
                 return $n;
             }
 
-            Math::MPC::Rmpc_div($t, $t, $u, $ROUND);      # t = t/u
+            Math::MPC::Rmpc_div($t, $t, $u, $ROUND);       # t = t/u
             return $t;
         }
     }
+
+    #
+    ## k-gonal root of `n`
+    #
 
     sub polygonal_root {
         my ($x, $y) = @_;
         _valid(\$y);
         bless \__polygonal_root__(_any2mpfr_mpc($$x), _any2mpfr_mpc($$y));
+    }
+
+    #
+    ## Second k-gonal root of `n`
+    #
+
+    sub polygonal_root2 {
+        my ($x, $y) = @_;
+        _valid(\$y);
+        bless \__polygonal_root__(_any2mpfr_mpc($$x), _any2mpfr_mpc($$y), 1);
     }
 
     sub shift_left {
