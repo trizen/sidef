@@ -5725,8 +5725,8 @@ package Sidef::Types::Number::Number {
             $n        = Math::GMPz::Rmpz_get_ui($n);
         }
 
-        my $t1 = Math::GMPz::Rmpz_init();
-        my $t2 = Math::GMPz::Rmpz_init();
+        my $t = Math::GMPz::Rmpz_init();
+        my $u = Math::GMPz::Rmpz_init();
 
         my $numerator   = Math::GMPz::Rmpz_init_set_ui(0);
         my $denominator = Math::GMPz::Rmpz_init_set_ui(1);
@@ -5735,53 +5735,60 @@ package Sidef::Types::Number::Number {
 
             $j % 2 == 0 or $j == 1 or next;
 
-            Math::GMPz::Rmpz_bin_uiui($t1, $p + 1, $j);    # t1 = binomial(p+1, j)
+            Math::GMPz::Rmpz_bin_uiui($t, $p + 1, $j);    # t = binomial(p+1, j)
 
-            # t2 = n^(p+1 - j)
+#<<<
             $native_n
-              ? Math::GMPz::Rmpz_ui_pow_ui($t2, $n, $p + 1 - $j)
-              : Math::GMPz::Rmpz_pow_ui($t2, $n, $p + 1 - $j);
+              ? Math::GMPz::Rmpz_ui_pow_ui($u, $n, $p + 1 - $j)     # u = n^(p+1 - j)
+              : Math::GMPz::Rmpz_pow_ui(   $u, $n, $p + 1 - $j);    # ==//==
+#>>>
 
-            # Bernouli(j) as `bern_num` and `bern_den`
-            my ($bern_num, $bern_den) = Math::Prime::Util::GMP::bernfrac($j);
+            # Bernouli(j) as `bn` and `bd`
+            my ($bn, $bd) = Math::Prime::Util::GMP::bernfrac($j);
 
-            Math::GMPz::Rmpz_mul($t1, $t1, $t2);           # t1 = t1 * t2
+            Math::GMPz::Rmpz_mul($t, $t, $u);             # t = t * u
 
-            # True if `bern_num` is a native integer
-            if ($bern_num < ULONG_MAX and $bern_num > LONG_MIN) {
-                if ($bern_num == 1) {
+            # True if `bn` is a native integer
+            if ($bn < ULONG_MAX and $bn > LONG_MIN) {
+                if ($bn == 1) {
                     ## ok
                 }
-                elsif ($bern_num == -1) {
-                    Math::GMPz::Rmpz_neg($t1, $t1);        # t1 = -t1
+                elsif ($bn == -1) {
+                    Math::GMPz::Rmpz_neg($t, $t);         # t = -t
                 }
                 else {
-                    $bern_num < 0
-                      ? Math::GMPz::Rmpz_mul_si($t1, $t1, $bern_num)    # t1 = t1 * bern_num
-                      : Math::GMPz::Rmpz_mul_ui($t1, $t1, $bern_num);   # ==//==
+                    $bn < 0
+                      ? Math::GMPz::Rmpz_mul_si($t, $t, $bn)    # t = t * bn
+                      : Math::GMPz::Rmpz_mul_ui($t, $t, $bn);   # ==//==
                 }
             }
             else {
-                Math::GMPz::Rmpz_set_str($t2, $bern_num, 10);           # t2 = bern_num
-                Math::GMPz::Rmpz_mul($t1, $t1, $t2);                    # t1 = t1 * t2
+                Math::GMPz::Rmpz_set_str($u, $bn, 10);          # u = bn
+                Math::GMPz::Rmpz_mul($t, $t, $u);               # t = t * u
             }
 
-            # `bern_den` is always positive
-            if ($bern_den < ULONG_MAX) {
-                Math::GMPz::Rmpz_mul_ui($numerator, $numerator, $bern_den);    # numerator  = numerator * bern_den
-                Math::GMPz::Rmpz_addmul($numerator, $denominator, $t1);        # numerator += denominator * t1
-                Math::GMPz::Rmpz_mul_ui($denominator, $denominator, $bern_den);    # denominator = denominator * bern_den
+            # `bd` is always positive
+            if ($bd < ULONG_MAX) {
+#<<<
+                Math::GMPz::Rmpz_mul_ui($numerator,   $numerator,   $bd);    # numerator   = numerator   * bd
+                Math::GMPz::Rmpz_addmul($numerator,   $denominator, $t);     # numerator  += denominator * t
+                Math::GMPz::Rmpz_mul_ui($denominator, $denominator, $bd);    # denominator = denominator * bd
+#>>>
             }
             else {
-                Math::GMPz::Rmpz_set_str($t2, $bern_den, 10);                      # t2 = bern_den
-                Math::GMPz::Rmpz_mul($numerator, $numerator, $t2);                 # numerator  = numerator * t2
-                Math::GMPz::Rmpz_addmul($numerator, $denominator, $t1);            # numerator += denominator * t1
-                Math::GMPz::Rmpz_mul($denominator, $denominator, $t2);             # denominator = denominator * t2
+#<<<
+                Math::GMPz::Rmpz_set_str($u, $bd, 10);                       # u = bd
+                Math::GMPz::Rmpz_mul(   $numerator,   $numerator,   $u);     # numerator   = numerator * u
+                Math::GMPz::Rmpz_addmul($numerator,   $denominator, $t);     # numerator  += denominator * t
+                Math::GMPz::Rmpz_mul(   $denominator, $denominator, $u);     # denominator = denominator * u
+#>>>
             }
         }
 
-        Math::GMPz::Rmpz_mul_ui($denominator, $denominator, $p + 1);               # denominator = denominator * (p+1)
-        Math::GMPz::Rmpz_divexact($numerator, $numerator, $denominator);           # numerator = numerator / denominator
+#<<<
+        Math::GMPz::Rmpz_mul_ui($denominator, $denominator, $p + 1);        # denominator = denominator * (p+1)
+        Math::GMPz::Rmpz_divexact($numerator, $numerator, $denominator);    # numerator = numerator / denominator
+#>>>
 
         bless \$numerator;
     }
