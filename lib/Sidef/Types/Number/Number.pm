@@ -6794,7 +6794,7 @@ package Sidef::Types::Number::Number {
         Math::GMPz::Rmpz_sub_ui($u, $k, 4);    # u = k-4
 
         $second
-          ? Math::GMPz::Rmpz_sub($t, $t, $u)    # t = t-u
+          ? Math::GMPz::Rmpz_sub($t, $u, $t)    # t = t-u
           : Math::GMPz::Rmpz_add($t, $t, $u);   # t = t+u
 
         Math::GMPz::Rmpz_add_ui($u, $u, 2);     # u = u+2
@@ -6864,7 +6864,7 @@ package Sidef::Types::Number::Number {
         Math::GMPz::Rmpz_sub_ui($u, $k, 4);            # u = k-4
 
         $second
-          ? Math::GMPz::Rmpz_sub($t, $t, $u)           # t = t+u
+          ? Math::GMPz::Rmpz_sub($t, $u, $t)           # t = u-t
           : Math::GMPz::Rmpz_add($t, $t, $u);          # t = t+u
 
         Math::GMPz::Rmpz_add_ui($u, $u, 2);            # u = u+2
@@ -6968,7 +6968,7 @@ package Sidef::Types::Number::Number {
             Math::MPFR::Rmpfr_sub_ui($u, $k, 4, $ROUND);    # u = k-4
 
             $second
-              ? Math::MPFR::Rmpfr_sub($t, $t, $u, $ROUND)    # t = t-u
+              ? Math::MPFR::Rmpfr_sub($t, $u, $t, $ROUND)    # t = u-t
               : Math::MPFR::Rmpfr_add($t, $t, $u, $ROUND);   # t = t+u
 
             Math::MPFR::Rmpfr_add_ui($u, $u, 2, $ROUND);     # u = u+2
@@ -7005,7 +7005,7 @@ package Sidef::Types::Number::Number {
             Math::MPC::Rmpc_sub_ui($u, $k, 4, $ROUND);    # u = k-4
 
             $second
-              ? Math::MPC::Rmpc_sub($t, $t, $u, $ROUND)    # t = t-u
+              ? Math::MPC::Rmpc_sub($t, $u, $t, $ROUND)    # t = u-t
               : Math::MPC::Rmpc_add($t, $t, $u, $ROUND);   # t = t+u
 
             Math::MPC::Rmpc_add_ui($u, $u, 2, $ROUND);     # u = u+2
