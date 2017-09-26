@@ -5709,6 +5709,85 @@ package Sidef::Types::Number::Number {
                               Math::Prime::Util::GMP::vecsum(map { Math::Prime::Util::GMP::stirling($n, $_, 2) } 0 .. $n));
     }
 
+    sub faulhaber_sum {
+        my ($n, $p) = @_;
+
+        _valid(\$p);
+
+        $n = _any2mpz($$n) // goto &nan;
+        $p = _any2ui($$p)  // goto &nan;
+
+        # Unbox `n` when it fits inside a native unsinged integer
+        my $native_n = 0;
+
+        if (Math::GMPz::Rmpz_fits_ulong_p($n)) {
+            $native_n = 1;
+            $n        = Math::GMPz::Rmpz_get_ui($n);
+        }
+
+        my $t1 = Math::GMPz::Rmpz_init();
+        my $t2 = Math::GMPz::Rmpz_init();
+
+        my $numerator   = Math::GMPz::Rmpz_init_set_ui(0);
+        my $denominator = Math::GMPz::Rmpz_init_set_ui(1);
+
+        foreach my $j (0 .. $p) {
+
+            $j % 2 == 0 or $j == 1 or next;
+
+            Math::GMPz::Rmpz_bin_uiui($t1, $p + 1, $j);    # t1 = binomial(p+1, j)
+
+            # t2 = n^(p+1 - j)
+            $native_n
+              ? Math::GMPz::Rmpz_ui_pow_ui($t2, $n, $p + 1 - $j)
+              : Math::GMPz::Rmpz_pow_ui($t2, $n, $p + 1 - $j);
+
+            # Bernouli(j) as `bern_num` and `bern_den`
+            my ($bern_num, $bern_den) = Math::Prime::Util::GMP::bernfrac($j);
+
+            Math::GMPz::Rmpz_mul($t1, $t1, $t2);           # t1 = t1 * t2
+
+            # True if `bern_num` is a native integer
+            if ($bern_num < ULONG_MAX and $bern_num > LONG_MIN) {
+                if ($bern_num == 1) {
+                    ## ok
+                }
+                elsif ($bern_num == -1) {
+                    Math::GMPz::Rmpz_neg($t1, $t1);        # t1 = -t1
+                }
+                else {
+                    $bern_num < 0
+                      ? Math::GMPz::Rmpz_mul_si($t1, $t1, $bern_num)    # t1 = t1 * bern_num
+                      : Math::GMPz::Rmpz_mul_ui($t1, $t1, $bern_num);   # ==//==
+                }
+            }
+            else {
+                Math::GMPz::Rmpz_set_str($t2, $bern_num, 10);           # t2 = bern_num
+                Math::GMPz::Rmpz_mul($t1, $t1, $t2);                    # t1 = t1 * t2
+            }
+
+            # `bern_den` is always positive
+            if ($bern_den < ULONG_MAX) {
+                Math::GMPz::Rmpz_mul_ui($numerator, $numerator, $bern_den);    # numerator  = numerator * bern_den
+                Math::GMPz::Rmpz_addmul($numerator, $denominator, $t1);        # numerator += denominator * t1
+                Math::GMPz::Rmpz_mul_ui($denominator, $denominator, $bern_den);    # denominator = denominator * bern_den
+            }
+            else {
+                Math::GMPz::Rmpz_set_str($t2, $bern_den, 10);                      # t2 = bern_den
+                Math::GMPz::Rmpz_mul($numerator, $numerator, $t2);                 # numerator  = numerator * t2
+                Math::GMPz::Rmpz_addmul($numerator, $denominator, $t1);            # numerator += denominator * t1
+                Math::GMPz::Rmpz_mul($denominator, $denominator, $t2);             # denominator = denominator * t2
+            }
+        }
+
+        Math::GMPz::Rmpz_mul_ui($denominator, $denominator, $p + 1);               # denominator = denominator * (p+1)
+        Math::GMPz::Rmpz_divexact($numerator, $numerator, $denominator);           # numerator = numerator / denominator
+
+        bless \$numerator;
+    }
+
+    *faulhaber = \&faulhaber_sum;
+
     sub binomial {
         my ($x, $y) = @_;
         _valid(\$y);
@@ -6691,8 +6770,8 @@ package Sidef::Types::Number::Number {
         # polygonal_root(n, k)
         #   = (sqrt(8 * (k - 2) * n + (k - 4)^2) ± (k - 4)) / (2 * (k - 2))
 
-        state $t = Math::GMPz::Rmpz_init();
-        state $u = Math::GMPz::Rmpz_init();
+        state $t = Math::GMPz::Rmpz_init_nobless();
+        state $u = Math::GMPz::Rmpz_init_nobless();
 
         Math::GMPz::Rmpz_sub_ui($u, $k, 2);    # u = k-2
         Math::GMPz::Rmpz_mul($t, $n, $u);      # t = n*u
@@ -6761,8 +6840,8 @@ package Sidef::Types::Number::Number {
         # polygonal_root(n, k)
         #   = (sqrt(8 * (k - 2) * n + (k - 4)^2) ± (k - 4)) / (2 * (k - 2))
 
-        state $t = Math::GMPz::Rmpz_init();
-        state $u = Math::GMPz::Rmpz_init();
+        state $t = Math::GMPz::Rmpz_init_nobless();
+        state $u = Math::GMPz::Rmpz_init_nobless();
 
         Math::GMPz::Rmpz_sub_ui($u, $k, 2);    # u = k-2
         Math::GMPz::Rmpz_mul($t, $n, $u);      # t = n*u

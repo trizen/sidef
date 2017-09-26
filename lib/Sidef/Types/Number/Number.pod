@@ -872,6 +872,16 @@ Return the
 
 =cut
 
+=head2 faulhaber
+
+Number.faulhaber() -> I<Obj>
+
+Return the
+
+Aliases: I<faulhaber_sum>
+
+=cut
+
 =head2 fib
 
 Number.fib() -> I<Obj>
