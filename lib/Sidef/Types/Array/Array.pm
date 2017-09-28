@@ -2020,29 +2020,29 @@ package Sidef::Types::Array::Array {
         my @perm;
         my @arr = @$self;
 
-        $n = $n->int;
+        $n = Sidef::Types::Number::Number->new($n)->int;
+        $n = ref($$n) eq 'Math::GMPz' ? Math::GMPz::Rmpz_init_set($$n) : return undef;
 
-        my $cmp = CORE::int($n->cmp(Sidef::Types::Number::Number::ZERO));
+        my $cmp = Math::GMPz::Rmpz_cmp_ui($n, 0);
 
         if ($cmp < 0) {
-            $n   = $n->neg->dec;
+            Math::GMPz::Rmpz_neg($n, $n);
             @arr = CORE::reverse(@arr);
         }
         elsif ($cmp == 0) {
             return bless \@arr, __PACKAGE__;
         }
-        else {
-            $n = $n->dec;
-        }
 
-        while (@arr) {
-            my $end = $#arr;
-            my $f   = Sidef::Types::Number::Number->_set_uint($end)->factorial;
-            (my $q, $n) = $n->divmod($f);
-            $q = $q->imod(Sidef::Types::Number::Number->_set_uint($end + 1));
-            my $i = CORE::int($q);
-            push @perm, $arr[$i];
-            @arr = (@arr[0 .. $i - 1, $i + 1 .. $end]);
+        state $f = Math::GMPz::Rmpz_init_nobless();
+        state $q = Math::GMPz::Rmpz_init_nobless();
+
+        Math::GMPz::Rmpz_fac_ui($f, scalar(@arr));    # f = factorial(len)
+
+        while (my $len = scalar(@arr)) {
+            Math::GMPz::Rmpz_divexact_ui($f, $f, $len);    # f = f/len
+            Math::GMPz::Rmpz_divmod($q, $n, $n, $f);       # q = n//f ;; n = n%f
+            Math::GMPz::Rmpz_mod_ui($q, $q, $len);         # q = q%len
+            CORE::push(@perm, CORE::splice(@arr, Math::GMPz::Rmpz_get_ui($q), 1));
         }
 
         bless \@perm, __PACKAGE__;
