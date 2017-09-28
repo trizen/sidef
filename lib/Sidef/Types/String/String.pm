@@ -481,6 +481,8 @@ package Sidef::Types::String::String {
         $self->new($$self =~ s{$search}{$value}gr);
     }
 
+    *replace_all = \&gsub;
+
     sub _get_captures {
         my ($string) = @_;
         map { __PACKAGE__->new(CORE::substr($string, $-[$_], $+[$_] - $-[$_])) } 1 .. $#{-};
