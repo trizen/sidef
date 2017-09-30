@@ -30,7 +30,6 @@ Sidef is a modern, high-level, general-purpose programming language, inspired by
     * support for using Perl modules
     * optional dynamic type checking
     * big integers, rationals, floats and complex numbers
-    * and a rich core library
 
 ### WWW
 
