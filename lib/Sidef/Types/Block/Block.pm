@@ -537,6 +537,20 @@ package Sidef::Types::Block::Block {
         Sidef::Types::Array::Array->new(\@array);
     }
 
+    sub cache {
+        my ($self) = @_;
+        require Memoize;
+        $self->{code} = Memoize::memoize($self->{code});
+        $self;
+    }
+
+    sub uncache {
+        my ($self) = @_;
+        require Memoize;
+        $self->{code} = Memoize::unmemoize($self->{code});
+        $self;
+    }
+
     sub dump {
         Sidef::Types::String::String->new("$_[0]");
     }
