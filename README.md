@@ -17,19 +17,20 @@ Sidef is a modern, high-level, general-purpose programming language, inspired by
 
 * The main features of Sidef include:
 
-    * object-oriented programming,
-    * functional programming,
-    * functional pattern matching,
-    * optional lazy evaluation,
-    * multiple dispatch,
-    * lexical closures,
-    * lexical scoping,
-    * keyword arguments,
-    * regular expressions,
-    * support for metaprogramming,
-    * support for using Perl modules,
-    * optional dynamic type checking,
-    * and a reasonable number of built-in types.
+    * object-oriented programming
+    * functional programming
+    * functional pattern matching
+    * optional lazy evaluation
+    * multiple dispatch
+    * lexical scoping
+    * lexical closures
+    * keyword arguments
+    * regular expressions
+    * support for metaprogramming
+    * support for using Perl modules
+    * optional dynamic type checking
+    * big integers, rationals, floats and complex numbers
+    * and a rich core library
 
 ### WWW
 
