@@ -3249,7 +3249,7 @@ package Sidef::Parser {
 
                         my @files;
                         foreach my $file (glob($filename)) {
-                            my $abs = Cwd::abs_path($_);
+                            my $abs = Cwd::abs_path($file);
 
                             if (!defined($abs) or $abs eq '') {
                                 $self->fatal_error(
