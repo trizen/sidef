@@ -254,7 +254,7 @@ HEADER
                     push @code, ('@' . $name . '=(' . $self->deparse_expr({self => $var->{value}}) . ") if not \@$name;");
                 }
 
-                push @code, "\$$name = Sidef::Types::Array::Array->new(\@$name);";
+                push @code, "\$$name = Sidef::Types::Array::Array->new(\\\@$name);";
                 delete $var->{array};
             }
             elsif (exists $var->{hash}) {
@@ -344,7 +344,7 @@ HEADER
                     $code .= ('@' . $name . '=(' . $self->deparse_expr({self => $var->{value}}) . ") if not \@$name;");
                 }
 
-                $code .= "my\$$name=Sidef::Types::Array::Array->new(\@$name);";
+                $code .= "my\$$name=Sidef::Types::Array::Array->new(\\\@$name);";
                 delete $var->{array};
             }
             elsif (exists $var->{hash}) {
