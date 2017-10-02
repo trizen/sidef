@@ -3247,7 +3247,20 @@ package Sidef::Parser {
                                   error => 'include-error: invalid value of type "' . ref($filename) . '" (expected a string)',
                           );
 
-                        my @files = map { Cwd::abs_path($_) } glob($filename);
+                        my @files;
+                        foreach my $file (glob($filename)) {
+                            my $abs = Cwd::abs_path($_);
+
+                            if (!defined($abs) or $abs eq '') {
+                                $self->fatal_error(
+                                          code  => $_,
+                                          pos   => pos($_),
+                                          error => 'include-error: cannot resolve the absolute path to file <<' . $file . '>>',
+                                );
+                            }
+
+                            push @files, $abs;
+                        }
 
                         foreach my $file (@files) {
                             if (exists $Sidef::INCLUDED{$file}) {
