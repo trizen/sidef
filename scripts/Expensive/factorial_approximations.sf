@@ -77,7 +77,7 @@ func f10(n) {
 # n! ~ limit_{k -> Infinity} sqrt(2*pi) * ((12*n^2 + 24*k*n + 12*k^2 + 1)/(12*e*n + 12*k*e))^(n+k) / ((n+k-1)!/(n!)) / sqrt(n+k)
 func f11(n) {
     define k = 50       # higher value of k => higher precision
-    sqrt(τ) * ((12*n**2 + (24*k)*n + 12*k**2 + 1)/(12*ℯ*n + 12*k*ℯ))**(n+k) / prod(1..^k, {|j| n + j }) / sqrt(n+k)
+    sqrt(τ) * ((12*n**2 + (24*k)*n + 12*k**2 + 1)/(12*ℯ*n + 12*k*ℯ))**(n+k) / rising_factorial(n+1, k-1) / sqrt(n+k)
 }
 
 # Gamma approximation (3)

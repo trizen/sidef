@@ -5717,7 +5717,7 @@ package Sidef::Types::Number::Number {
         $n = _any2mpz($$n) // goto &nan;
         $p = _any2ui($$p)  // goto &nan;
 
-        # Unbox `n` when it fits inside a native unsinged integer
+        # Unbox `n` when it fits inside a native unsigned integer
         my $native_n = 0;
 
         if (Math::GMPz::Rmpz_fits_ulong_p($n)) {
