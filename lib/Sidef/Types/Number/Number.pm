@@ -1810,8 +1810,8 @@ package Sidef::Types::Number::Number {
         goto(ref($x) =~ tr/:/_/rs);
 
       Math_GMPz: {
-            my $r = Math::GMPz::Rmpz_init_set($x);
-            Math::GMPz::Rmpz_neg($r, $r);
+            my $r = Math::GMPz::Rmpz_init();
+            Math::GMPz::Rmpz_neg($r, $x);
             return bless \$r;
         }
 
@@ -1842,8 +1842,8 @@ package Sidef::Types::Number::Number {
 
       Math_GMPz: {
             Math::GMPz::Rmpz_sgn($x) >= 0 and return $_[0];
-            my $r = Math::GMPz::Rmpz_init_set($x);
-            Math::GMPz::Rmpz_abs($r, $r);
+            my $r = Math::GMPz::Rmpz_init();
+            Math::GMPz::Rmpz_abs($r, $x);
             return bless \$r;
         }
 
@@ -5087,8 +5087,8 @@ package Sidef::Types::Number::Number {
         goto(ref($x) =~ tr/:/_/rs);
 
       Math_GMPz: {
-            my $r = Math::GMPz::Rmpz_init_set($x);
-            Math::GMPz::Rmpz_add_ui($r, $r, 1);
+            my $r = Math::GMPz::Rmpz_init();
+            Math::GMPz::Rmpz_add_ui($r, $x, 1);
             return $r;
         }
 
@@ -5122,8 +5122,8 @@ package Sidef::Types::Number::Number {
         goto(ref($x) =~ tr/:/_/rs);
 
       Math_GMPz: {
-            my $r = Math::GMPz::Rmpz_init_set($x);
-            Math::GMPz::Rmpz_sub_ui($r, $r, 1);
+            my $r = Math::GMPz::Rmpz_init();
+            Math::GMPz::Rmpz_sub_ui($r, $x, 1);
             return $r;
         }
 

@@ -64,6 +64,14 @@ Aliases: I<map>
 
 =cut
 
+=head2 cache
+
+Block.cache() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 call
 
 Block.call() -> I<Obj>
@@ -155,6 +163,14 @@ Block.thr() -> I<Obj>
 Return the
 
 Aliases: I<thread>
+
+=cut
+
+=head2 uncache
+
+Block.uncache() -> I<Obj>
+
+Return the
 
 =cut
 
