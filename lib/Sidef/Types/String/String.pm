@@ -447,7 +447,7 @@ package Sidef::Types::String::String {
     }
 
     sub _string_or_regex {
-        my ($self, $obj) = @_;
+        my ($obj) = @_;
 
         if (ref($obj) eq 'Sidef::Types::Regex::Regex') {
             return $obj->{regex};
@@ -462,7 +462,7 @@ package Sidef::Types::String::String {
         ref($str) eq 'Sidef::Types::Block::Block'
           && return $self->esub($regex, $str);
 
-        my $search = $self->_string_or_regex($regex);
+        my $search = _string_or_regex($regex);
         my $value  = "$str";
 
         $self->new($$self =~ s{$search}{$value}r);
@@ -476,7 +476,7 @@ package Sidef::Types::String::String {
         ref($str) eq 'Sidef::Types::Block::Block'
           && return $self->gesub($regex, $str);
 
-        my $search = $self->_string_or_regex($regex);
+        my $search = _string_or_regex($regex);
         my $value  = "$str";
         $self->new($$self =~ s{$search}{$value}gr);
     }
@@ -491,7 +491,7 @@ package Sidef::Types::String::String {
     sub esub {
         my ($self, $regex, $code) = @_;
 
-        my $search = $self->_string_or_regex($regex);
+        my $search = _string_or_regex($regex);
 
         if (ref($code) eq 'Sidef::Types::Block::Block') {
             return $self->new($$self =~ s{$search}{$code->run(_get_captures($$self))}er);
@@ -503,7 +503,7 @@ package Sidef::Types::String::String {
     sub gesub {
         my ($self, $regex, $code) = @_;
 
-        my $search = $self->_string_or_regex($regex);
+        my $search = _string_or_regex($regex);
 
         if (ref($code) eq 'Sidef::Types::Block::Block') {
             my $value = $$self;
@@ -562,7 +562,7 @@ package Sidef::Types::String::String {
                                                [map { bless(\$_, __PACKAGE__) } unpack '(a' . CORE::int($sep) . ')*', $$self]);
         }
 
-        $sep = $self->_string_or_regex($sep);
+        $sep = _string_or_regex($sep);
         Sidef::Types::Array::Array->new([map { bless(\$_, __PACKAGE__) } split(/$sep/, $$self, $size)]);
     }
 
