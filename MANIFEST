@@ -670,6 +670,7 @@ scripts/Tests/default_var_values.sf
 scripts/Tests/draw_grid_of_squares_multi.sf
 scripts/Tests/draw_grid_of_squares_multi_2.sf
 scripts/Tests/dump_cyclic_references.sf
+scripts/Tests/dynamic_block_scoping.sf
 scripts/Tests/dynamic_constants.sf
 scripts/Tests/echo.sf
 scripts/Tests/enumerator_object.sf
