@@ -581,20 +581,30 @@ package Sidef::Types::Number::Number {
     #
     sub _any2ui {
         my ($x) = @_;
+        goto(ref($x) =~ tr/:/_/rs);
 
-        if (ref($x) eq 'Math::GMPz') {
-            my $d = CORE::int(Math::GMPz::Rmpz_get_d($x));
-            ($d < 0 or $d > ULONG_MAX) && return;
-            return $d;
+      Math_GMPz: {
+
+            if (Math::GMPz::Rmpz_fits_ulong_p($x)) {
+                goto &Math::GMPz::Rmpz_get_ui;
+            }
+
+            return;
         }
 
-        if (ref($x) eq 'Math::GMPq') {
+      Math_GMPq: {
+
+            if (Math::GMPq::Rmpq_integer_p($x)) {
+                @_ = ($x = _mpq2mpz($x));
+                goto Math_GMPz;
+            }
+
             my $d = CORE::int(Math::GMPq::Rmpq_get_d($x));
             ($d < 0 or $d > ULONG_MAX) && return;
             return $d;
         }
 
-        if (ref($x) eq 'Math::MPFR') {
+      Math_MPFR: {
             if (Math::MPFR::Rmpfr_number_p($x)) {
                 my $d = CORE::int(Math::MPFR::Rmpfr_get_d($x, $ROUND));
                 ($d < 0 or $d > ULONG_MAX) && return;
@@ -603,8 +613,10 @@ package Sidef::Types::Number::Number {
             return;
         }
 
-        (@_) = _any2mpfr($x);
-        goto &_any2ui;
+      Math_MPC: {
+            $x = _any2mpfr($x);
+            goto Math_MPFR;
+        }
     }
 
     #
@@ -612,20 +624,32 @@ package Sidef::Types::Number::Number {
     #
     sub _any2si {
         my ($x) = @_;
+        goto(ref($x) =~ tr/:/_/rs);
 
-        if (ref($x) eq 'Math::GMPz') {
-            my $d = CORE::int(Math::GMPz::Rmpz_get_d($x));
-            ($d < LONG_MIN or $d > ULONG_MAX) && return;
-            return $d;
+      Math_GMPz: {
+            if (Math::GMPz::Rmpz_fits_slong_p($x)) {
+                goto &Math::GMPz::Rmpz_get_si;
+            }
+
+            if (Math::GMPz::Rmpz_fits_ulong_p($x)) {
+                goto &Math::GMPz::Rmpz_get_ui;
+            }
+
+            return;
         }
 
-        if (ref($x) eq 'Math::GMPq') {
+      Math_GMPq: {
+            if (Math::GMPq::Rmpq_integer_p($x)) {
+                @_ = ($x = _mpq2mpz($x));
+                goto Math_GMPz;
+            }
+
             my $d = CORE::int(Math::GMPq::Rmpq_get_d($x));
             ($d < LONG_MIN or $d > ULONG_MAX) && return;
             return $d;
         }
 
-        if (ref($x) eq 'Math::MPFR') {
+      Math_MPFR: {
             if (Math::MPFR::Rmpfr_number_p($x)) {
                 my $d = CORE::int(Math::MPFR::Rmpfr_get_d($x, $ROUND));
                 ($d < LONG_MIN or $d > ULONG_MAX) && return;
@@ -634,8 +658,10 @@ package Sidef::Types::Number::Number {
             return;
         }
 
-        (@_) = _any2mpfr($x);
-        goto &_any2si;
+      Math_MPC: {
+            $x = _any2mpfr($x);
+            goto Math_MPFR;
+        }
     }
 
     sub _big2istr {
@@ -688,10 +714,25 @@ package Sidef::Types::Number::Number {
         }
 
       Math_GMPq: {
+
+            if (Math::GMPq::Rmpq_integer_p($x)) {
+                @_ = ($x = _mpq2mpz($x));
+                goto Math_GMPz;
+            }
+
             goto &Math::GMPq::Rmpq_get_d;
         }
 
       Math_GMPz: {
+
+            if (Math::GMPz::Rmpz_fits_slong_p($x)) {
+                goto &Math::GMPz::Rmpz_get_si;
+            }
+
+            if (Math::GMPz::Rmpz_fits_ulong_p($x)) {
+                goto &Math::GMPz::Rmpz_get_ui;
+            }
+
             goto &Math::GMPz::Rmpz_get_d;
         }
 
