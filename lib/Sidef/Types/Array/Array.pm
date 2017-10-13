@@ -2282,7 +2282,7 @@ package Sidef::Types::Array::Array {
         my @extracted;
         for (my $i = 0 ; $i <= $#$self ; $i++) {
             if ($block->run($self->[$i])) {
-                push @extracted, CORE::splice(@$self, $i--, 1);
+                CORE::push(@extracted, CORE::splice(@$self, $i--, 1));
             }
         }
 
