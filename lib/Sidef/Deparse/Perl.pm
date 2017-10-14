@@ -4,7 +4,7 @@ package Sidef::Deparse::Perl {
     use 5.014;
 
     use Scalar::Util qw(refaddr);
-    use Sidef::Types::Number::Number;
+    use Sidef::Types::Number::Number;
 
     my %addr;
     my %type;
