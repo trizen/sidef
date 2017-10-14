@@ -1075,65 +1075,40 @@ HEADER
             my $block = 'do' . $self->deparse_block_with_scope($obj->{block});
             my $expr  = $self->deparse_args($obj->{expr});
 
+            my $multi = 0;
             if (
                 @{$obj->{vars}} > 1
                 or (@{$obj->{vars}} == 1
                     and exists($obj->{vars}[0]{slurpy}))
               ) {
-                $code = 'do{my@objs=' . $expr . ';' . <<'EOT';
-                    foreach my $obj (@objs) {
-                        my $break = 0;
-                        foreach my $group (UNIVERSAL::isa($obj, 'ARRAY') ? @$obj : @{$obj->to_a}) {
-                            $break = 1;
+                $multi = 1;
+            }
+
+            $code = 'do {
+                foreach my $obj (my @tmp = ' . $expr . ') {' . <<'EOT';    # 'my @tmp' is really needed!
+                    my $sub = UNIVERSAL::can($obj, 'iter') // UNIVERSAL::can(eval { $obj = $obj->to_a }, 'iter');
+                    my $iter = defined($sub) ? $sub->($obj) : $obj->iter;
+                    $iter = $iter->{code} if (my $is_block = ref($iter) eq 'Sidef::Types::Block::Block');
+                    my $break;
+                    while (1) {
+                        $break = 1;
 EOT
 
-                $code .= "do{local \@_ = (UNIVERSAL::isa(\$group, 'ARRAY') ? \@\$group : \$group); $vars; $block; };";
+            $code .=
+                'do {local @_ = ('
+              . ($multi ? '@{(' : '')
+              . '($is_block ? $iter->() : $iter->run) // do { undef $break; last }'
+              . ($multi ? ')->to_a}' : '')
+              . "); $vars; $block };";
 
-                $code .= <<'EOT';
-                            $break = 0;
-                        }
-                        last if $break;
+            $code .= <<'EOT';
+                        undef $break;
                     }
+                    last if $break;
                 }
-EOT
             }
-            else {
-                $code = 'do{
-
-                my@objs=' . $expr . ';' . <<'EOT';
-                  foreach my $obj (@objs) {
-                      if (defined(my $sub = UNIVERSAL::can($obj, 'iter'))) {
-                            my $iter = $sub->($obj);
-                            my $break = 0;
-                            while (1) {
-                                $break = 1;
 EOT
 
-                $code .= "do {local \@_ = (\$iter->run // do { \$break = 0; last }); $vars; $block };";
-
-                $code .= <<'EOT';
-                                $break = 0;
-                            }
-                            last if $break;
-                      }
-                      else {
-                          my $break = 0;
-                          foreach my $item (UNIVERSAL::isa($obj, 'ARRAY') ? @$obj : @{$obj->to_a}) {
-                              $break = 1;
-EOT
-
-                $code .= "do{local \@_ = \$item; $vars; $block };";
-
-                $code .= <<'EOT';
-                              $break = 0;
-                          }
-                          last if $break;
-                      }
-                  }
-              }
-EOT
-
-            }
         }
         elsif ($ref eq 'Sidef::Types::Bool::Ternary') {
             $code = '('

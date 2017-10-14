@@ -130,4 +130,24 @@ assert_eq(
     [6,7,1,2]
 )
 
+assert_eq(
+    gather {
+        var hash = Hash(a => 1, b => 2, c => 3)
+        for k,v in (hash) {
+            take(v, hash{k})
+        }
+    }.sort,
+    [1, 1, 2, 2, 3, 3]
+)
+
+assert_eq(
+    gather {
+        var hash = Hash(a => 1, b => 2, c => 3)
+        for k,v in (hash) {
+            take([\k, \v])
+        }
+    }.map {|p| [*p[0], *p[1]]}.sort_by {|p| p[1] }
+    [[:a, 1], [:b, 2], [:c, 3]]
+)
+
 say "** Test passed!"
