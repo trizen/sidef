@@ -20,10 +20,8 @@ class SmartWordWrap {
 
         var root = []
         var len = 0
-        var i = -1
 
-        var limit = array.end
-        while (++i <= limit) {
+        for (var(i, limit) = (0, array.end); i <= limit; ++i) {
             len += (var word_len = array[i].len)
 
             if (len > width) {

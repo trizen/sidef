@@ -1,0 +1,98 @@
+#!/usr/bin/ruby
+
+assert_eq(
+    gather {
+        var i = 4
+        while (--i) { |a|
+            take(a)
+        }
+    },
+    [3,2,1]
+)
+
+assert_eq(
+    gather {
+        var i = 4
+        while (--i) { |a|
+            take(\a)
+        }
+    }.map {|x| *x },
+    [3,2,1]
+)
+
+assert_eq(
+    gather {
+        for i in (1..5) {
+            var x = i**2
+            take(\x)
+        }
+    }.map {|x| *x },
+    [1, 4, 9, 16, 25]
+)
+
+assert_eq(
+    gather {
+        var i = 1
+        while (i <= 5) {
+            var x = i**2
+            take(\x)
+            ++i
+        }
+    }.map {|x| *x },
+    [1, 4, 9, 16, 25]
+)
+
+assert_eq(
+    gather {
+        var i = 1
+        loop {
+            break if (i > 5)
+            var x = i**2
+            take(\x)
+            ++i
+        }
+    }.map {|x| *x },
+    [1, 4, 9, 16, 25]
+)
+
+assert_eq(
+    gather {
+        for (var i = 1; i <= 5; ++i) {
+            var x = i**2
+            take(\x)
+        }
+    }.map {|x| *x },
+    [1, 4, 9, 16, 25]
+)
+
+assert_eq(
+    gather {
+        for n in [1,2,3,4] {
+            take(\n)
+        }
+    }.map {|x| *x },
+    [1,2,3,4]
+)
+
+assert_eq(
+    gather {
+        for a,b in [[1,2],[3,4]] {
+            take(\a, \b)
+        }
+    }.map {|x| *x },
+    [1,2,3,4]
+)
+
+assert_eq(
+    gather {
+        var n = 0
+        @:HERE if (true) {
+            var x = n;
+            take(\x)
+            goto :HERE if (++n < 3)
+        }
+    }.map{ *_ },
+    [0, 1, 2]
+)
+
+say "** Test passed!"

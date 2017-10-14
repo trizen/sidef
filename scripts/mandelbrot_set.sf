@@ -9,8 +9,8 @@ func mandelbrot(z) {
     return false
 }
 
-1 ^.. (-1, 0.05) -> each { |y|
-    -2 ..^ (0.5, 0.0315) -> each { |x|
+for y in (1 `downto` -1 `by` 0.05) {
+    for x in (-2 `upto` 0.5 `by` 0.0315) {
         print(mandelbrot(Complex(x, y)) ? ' ' : '#')
     }
     print "\n"
