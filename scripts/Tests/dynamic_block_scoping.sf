@@ -83,4 +83,16 @@ assert_eq(
     [1,2,3,4]
 )
 
+assert_eq(
+    gather {
+        var n = 0
+        @:HERE if (true) {
+            var x = n;
+            take(\x)
+            goto :HERE if (++n < 3)
+        }
+    }.map{ *_ },
+    [0, 1, 2]
+)
+
 say "** Test passed!"
