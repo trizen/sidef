@@ -710,7 +710,19 @@ package Sidef::Types::Number::Number {
         goto(ref($x) =~ tr/:/_/rs);
 
       Math_MPFR: {
-            return Math::MPFR::Rmpfr_get_d($x, $ROUND);
+            push @_, $ROUND;
+
+            if (Math::MPFR::Rmpfr_integer_p($x)) {
+                if (Math::MPFR::Rmpfr_fits_slong_p($x, $ROUND)) {
+                    goto &Math::MPFR::Rmpfr_get_si;
+                }
+
+                if (Math::MPFR::Rmpfr_fits_ulong_p($x, $ROUND)) {
+                    goto &Math::MPFR::Rmpfr_get_ui;
+                }
+            }
+
+            goto &Math::MPFR::Rmpfr_get_d;
         }
 
       Math_GMPq: {
@@ -739,7 +751,8 @@ package Sidef::Types::Number::Number {
       Math_MPC: {
             my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
             Math::MPC::RMPC_RE($r, $x);
-            return Math::MPFR::Rmpfr_get_d($r, $ROUND);
+            @_ = ($x = $r);
+            goto Math_MPFR;
         }
     }
 
