@@ -577,7 +577,7 @@ package Sidef::Types::Number::Number {
     }
 
     #
-    ## Any to unsigned integer
+    ## Anything to an unsigned native integer
     #
     sub _any2ui {
         my ($x) = @_;
@@ -600,33 +600,39 @@ package Sidef::Types::Number::Number {
             }
 
             my $d = CORE::int(Math::GMPq::Rmpq_get_d($x));
-            ($d < 0 or $d > ULONG_MAX) && return;
-            return $d;
+            return (($d < 0 or $d > ULONG_MAX) ? undef : $d);
         }
 
       Math_MPFR: {
+
+            if (Math::MPFR::Rmpfr_integer_p($x) and Math::MPFR::Rmpfr_fits_ulong_p($x, $ROUND)) {
+                push @_, $ROUND;
+                goto &Math::MPFR::Rmpfr_get_ui;
+            }
+
             if (Math::MPFR::Rmpfr_number_p($x)) {
                 my $d = CORE::int(Math::MPFR::Rmpfr_get_d($x, $ROUND));
-                ($d < 0 or $d > ULONG_MAX) && return;
-                return $d;
+                return (($d < 0 or $d > ULONG_MAX) ? undef : $d);
             }
+
             return;
         }
 
       Math_MPC: {
-            $x = _any2mpfr($x);
+            @_ = ($x = _any2mpfr($x));
             goto Math_MPFR;
         }
     }
 
     #
-    ## Any to signed integer
+    ## Anything to a signed native integer
     #
     sub _any2si {
         my ($x) = @_;
         goto(ref($x) =~ tr/:/_/rs);
 
       Math_GMPz: {
+
             if (Math::GMPz::Rmpz_fits_slong_p($x)) {
                 goto &Math::GMPz::Rmpz_get_si;
             }
@@ -639,27 +645,40 @@ package Sidef::Types::Number::Number {
         }
 
       Math_GMPq: {
+
             if (Math::GMPq::Rmpq_integer_p($x)) {
                 @_ = ($x = _mpq2mpz($x));
                 goto Math_GMPz;
             }
 
             my $d = CORE::int(Math::GMPq::Rmpq_get_d($x));
-            ($d < LONG_MIN or $d > ULONG_MAX) && return;
-            return $d;
+            return (($d < LONG_MIN or $d > ULONG_MAX) ? undef : $d);
         }
 
       Math_MPFR: {
+
+            if (Math::MPFR::Rmpfr_integer_p($x)) {
+                if (Math::MPFR::Rmpfr_fits_slong_p($x, $ROUND)) {
+                    push @_, $ROUND;
+                    goto &Math::MPFR::Rmpfr_get_si;
+                }
+
+                if (Math::MPFR::Rmpfr_fits_ulong_p($x, $ROUND)) {
+                    push @_, $ROUND;
+                    goto &Math::MPFR::Rmpfr_get_ui;
+                }
+            }
+
             if (Math::MPFR::Rmpfr_number_p($x)) {
                 my $d = CORE::int(Math::MPFR::Rmpfr_get_d($x, $ROUND));
-                ($d < LONG_MIN or $d > ULONG_MAX) && return;
-                return $d;
+                return (($d < LONG_MIN or $d > ULONG_MAX) ? undef : $d);
             }
+
             return;
         }
 
       Math_MPC: {
-            $x = _any2mpfr($x);
+            @_ = ($x = _any2mpfr($x));
             goto Math_MPFR;
         }
     }
@@ -710,7 +729,19 @@ package Sidef::Types::Number::Number {
         goto(ref($x) =~ tr/:/_/rs);
 
       Math_MPFR: {
-            return Math::MPFR::Rmpfr_get_d($x, $ROUND);
+            push @_, $ROUND;
+
+            if (Math::MPFR::Rmpfr_integer_p($x)) {
+                if (Math::MPFR::Rmpfr_fits_slong_p($x, $ROUND)) {
+                    goto &Math::MPFR::Rmpfr_get_si;
+                }
+
+                if (Math::MPFR::Rmpfr_fits_ulong_p($x, $ROUND)) {
+                    goto &Math::MPFR::Rmpfr_get_ui;
+                }
+            }
+
+            goto &Math::MPFR::Rmpfr_get_d;
         }
 
       Math_GMPq: {
@@ -739,7 +770,8 @@ package Sidef::Types::Number::Number {
       Math_MPC: {
             my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
             Math::MPC::RMPC_RE($r, $x);
-            return Math::MPFR::Rmpfr_get_d($r, $ROUND);
+            @_ = ($x = $r);
+            goto Math_MPFR;
         }
     }
 
