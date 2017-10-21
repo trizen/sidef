@@ -18,8 +18,6 @@ provides:
   Sidef:
     file: lib/Sidef.pm
     version: '3.04'
-  Sidef::Convert::Convert:
-    file: lib/Sidef/Convert/Convert.pm
   Sidef::Deparse::Perl:
     file: lib/Sidef/Deparse/Perl.pm
   Sidef::Deparse::Sidef:
@@ -30,6 +28,8 @@ provides:
     file: lib/Sidef/Module/Func.pm
   Sidef::Module::OO:
     file: lib/Sidef/Module/OO.pm
+  Sidef::Object::Convert:
+    file: lib/Sidef/Object/Convert.pm
   Sidef::Object::Enumerator:
     file: lib/Sidef/Object/Enumerator.pm
   Sidef::Object::Lazy:

@@ -1,10 +1,7 @@
 package Sidef::Types::Block::Block {
 
     use 5.016;
-    use parent qw(
-      Sidef::Object::Object
-      Sidef::Convert::Convert
-      );
+    use parent qw(Sidef::Object::Object);
 
     use List::Util qw();
 

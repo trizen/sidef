@@ -7,10 +7,7 @@ package Sidef::Types::Null::Null {
       q{0+}   => sub { 0 },
       q{""}   => sub { '' };
 
-    use parent qw(
-      Sidef::Object::Object
-      Sidef::Convert::Convert
-      );
+    use parent qw(Sidef::Object::Object);
 
     sub new {
         bless \(my $nil = undef), __PACKAGE__;

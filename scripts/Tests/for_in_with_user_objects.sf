@@ -1,0 +1,68 @@
+#!/usr/bin/ruby
+
+#
+## `to_a` implicitly inherited from Object::Convert
+#
+
+class Example1 {
+
+}
+
+var obj1 = Example1()
+
+assert_eq(
+    gather {
+        for x in (obj1) {
+            take(x)
+        }
+    },
+    [obj1]
+)
+
+#
+## Redefined `to_a` method
+#
+
+class Example2 {
+    method to_a {
+        [1,2,3,4]
+    }
+}
+
+var obj2 = Example2()
+
+assert_eq(
+    gather {
+        for x in (obj2) {
+            take(x)
+        }
+    },
+    [1,2,3,4]
+)
+
+#
+## User definition of the `iter` method
+#
+
+class Example3 {
+    method iter {
+        var arr = [10, 20, 30]
+        var i = 0
+        {
+            arr[i++]
+        }
+    }
+}
+
+var obj3 = Example3()
+
+assert_eq(
+    gather {
+        for x in (obj3) {
+            take(x)
+        }
+    },
+    [10, 20, 30]
+)
+
+say "** Test passed!"

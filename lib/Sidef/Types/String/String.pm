@@ -3,10 +3,7 @@ package Sidef::Types::String::String {
     use utf8;
     use 5.014;
 
-    use parent qw(
-      Sidef::Object::Object
-      Sidef::Convert::Convert
-      );
+    use parent qw(Sidef::Object::Object);
 
     use overload
       q{bool} => \&get_value,

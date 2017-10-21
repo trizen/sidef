@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-Sidef::Convert::Convert
+Sidef::Object::Convert
 
 =head1 DESCRIPTION
 
@@ -23,16 +23,6 @@ Convert.to_a() -> I<Obj>
 Return the
 
 Aliases: I<to_array>
-
-=cut
-
-=head2 to_b
-
-Convert.to_b() -> I<Obj>
-
-Return the
-
-Aliases: I<to_bool>
 
 =cut
 
@@ -98,14 +88,6 @@ Aliases: I<to_num>
 
 =cut
 
-=head2 to_obj
-
-Convert.to_obj() -> I<Obj>
-
-Return the
-
-=cut
-
 =head2 to_r
 
 Convert.to_r() -> I<Obj>
@@ -133,5 +115,13 @@ Convert.to_s() -> I<Obj>
 Return the
 
 Aliases: I<to_str>
+
+=cut
+
+=head2 to_type
+
+Convert.to_type() -> I<Obj>
+
+Return the
 
 =cut

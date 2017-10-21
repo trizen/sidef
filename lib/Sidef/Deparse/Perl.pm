@@ -1086,7 +1086,7 @@ HEADER
 
             $code = 'do {
                 foreach my $obj (my @tmp = ' . $expr . ') {' . <<'EOT';    # 'my @tmp' is really needed!
-                    my $sub = UNIVERSAL::can($obj, 'iter') // UNIVERSAL::can(eval { $obj = $obj->to_a }, 'iter');
+                    my $sub = UNIVERSAL::can($obj, 'iter') // do { my $arr = eval { $obj->to_a }; ref($arr) ? do { $obj = $arr; UNIVERSAL::can($obj, 'iter') } : () };
                     my $iter = defined($sub) ? $sub->($obj) : $obj->iter;
                     $iter = $iter->{code} if (my $is_block = ref($iter) eq 'Sidef::Types::Block::Block');
                     my $break;

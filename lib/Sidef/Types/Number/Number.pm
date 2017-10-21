@@ -32,10 +32,7 @@ package Sidef::Types::Number::Number {
     };
 #>>>
 
-    use parent qw(
-      Sidef::Object::Object
-      Sidef::Convert::Convert
-      );
+    use parent qw(Sidef::Object::Object);
 
     use overload
       q{bool} => sub { (@_) = (${$_[0]}); goto &__boolify__ },

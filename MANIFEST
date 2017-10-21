@@ -3,14 +3,14 @@ Build.PL
 Changes
 lib/Sidef.pm
 lib/Sidef.pod
-lib/Sidef/Convert/Convert.pm
-lib/Sidef/Convert/Convert.pod
 lib/Sidef/Deparse/Perl.pm
 lib/Sidef/Deparse/Sidef.pm
 lib/Sidef/Math/Math.pm
 lib/Sidef/Math/Math.pod
 lib/Sidef/Module/Func.pm
 lib/Sidef/Module/OO.pm
+lib/Sidef/Object/Convert.pm
+lib/Sidef/Object/Convert.pod
 lib/Sidef/Object/Enumerator.pm
 lib/Sidef/Object/Enumerator.pod
 lib/Sidef/Object/Lazy.pm
@@ -688,6 +688,7 @@ scripts/Tests/first_class_functions_analogously.sf
 scripts/Tests/floyds_triangle.sf
 scripts/Tests/for_in_extended.sf
 scripts/Tests/for_in_range.sf
+scripts/Tests/for_in_with_user_objects.sf
 scripts/Tests/for_two_vars.sf
 scripts/Tests/for_var_in_array.sf
 scripts/Tests/forward_difference.sf

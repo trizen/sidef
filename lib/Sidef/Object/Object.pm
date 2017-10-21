@@ -6,6 +6,8 @@ package Sidef::Object::Object {
     use Sidef;
     use Sidef::Types::Bool::Bool;
 
+    use parent qw(Sidef::Object::Convert);
+
     use overload
       q{~~}   => \&{__PACKAGE__ . '::' . '~~'},
       q{bool} => sub {

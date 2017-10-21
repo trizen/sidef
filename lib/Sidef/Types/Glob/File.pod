@@ -18,7 +18,6 @@ var obj = File.new(...);
 
 Inherits methods from:
 
-	* Sidef::Convert::Convert
 	* Sidef::Types::String::String
 
 =head1 METHODS

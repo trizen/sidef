@@ -2,10 +2,7 @@ package Sidef::Types::Glob::Dir {
 
     use 5.014;
 
-    use parent qw(
-      Sidef::Convert::Convert
-      Sidef::Types::Glob::File
-      );
+    use parent qw(Sidef::Types::Glob::File);
 
     sub new {
         my (undef, $dir) = @_;

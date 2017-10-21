@@ -13,6 +13,13 @@ This object is ...
 
 var obj = Object.new(...);
 
+
+=head1 INHERITS
+
+Inherits methods from:
+
+	* Sidef::Object::Convert
+
 =head1 METHODS
 
 

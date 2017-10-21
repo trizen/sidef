@@ -2,10 +2,7 @@ package Sidef::Types::Glob::File {
 
     use 5.014;
 
-    use parent qw(
-      Sidef::Convert::Convert
-      Sidef::Types::String::String
-      );
+    use parent qw(Sidef::Types::String::String);
 
     use Sidef::Types::Number::Number;
 

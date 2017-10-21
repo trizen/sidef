@@ -12,10 +12,7 @@ package Sidef::Types::Bool::Bool {
                   FALSE => (bless \(my $f = 0), __PACKAGE__),
                  };
 
-    use parent qw(
-      Sidef::Object::Object
-      Sidef::Convert::Convert
-      );
+    use parent qw(Sidef::Object::Object);
 
     sub new {
         $_[1] ? (TRUE) : (FALSE);

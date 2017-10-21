@@ -4,10 +4,7 @@ package Sidef::Types::Regex::Regex {
 
     use re 'eval';    # XXX: do we really want this?
 
-    use parent qw(
-      Sidef::Object::Object
-      Sidef::Convert::Convert
-      );
+    use parent qw(Sidef::Object::Object);
 
     use overload
       q{""}   => \&get_value,

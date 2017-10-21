@@ -18,7 +18,6 @@ var obj = Dir.new(...);
 
 Inherits methods from:
 
-	* Sidef::Convert::Convert
 	* Sidef::Types::Glob::File
 
 =head1 METHODS

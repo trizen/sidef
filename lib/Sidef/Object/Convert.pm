@@ -1,10 +1,9 @@
-package Sidef::Convert::Convert {
+package Sidef::Object::Convert {
 
-    # This module is used only as parent!
+    # Used as parent by Sidef::Object::Object.
 
     use 5.014;
     use overload;
-    use Sidef::Types::Bool::Bool;
 
     sub to_str {
         my ($self) = @_;
@@ -16,9 +15,8 @@ package Sidef::Convert::Convert {
 
     *to_s = \&to_str;
 
-    sub to_obj {
+    sub to_type {
         my ($self, $obj) = @_;
-        return $self if ref($self) eq ref($obj);
         $obj->new($self);
     }
 
@@ -59,14 +57,6 @@ package Sidef::Convert::Convert {
     sub to_dir {
         Sidef::Types::Glob::Dir->new("$_[0]");
     }
-
-    sub to_bool {
-        $_[0]
-          ? (Sidef::Types::Bool::Bool::TRUE)
-          : (Sidef::Types::Bool::Bool::FALSE);
-    }
-
-    *to_b = \&to_bool;
 
     sub to_regex {
         Sidef::Types::Regex::Regex->new("$_[0]");
