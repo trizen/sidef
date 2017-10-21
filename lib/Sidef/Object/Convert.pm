@@ -4,6 +4,7 @@ package Sidef::Object::Convert {
 
     use 5.014;
     use overload;
+    use Sidef::Types::Bool::Bool;
 
     sub to_str {
         my ($self) = @_;
@@ -63,6 +64,12 @@ package Sidef::Object::Convert {
     }
 
     *to_re = \&to_regex;
+
+    sub to_bool {
+        Sidef::Types::Bool::Bool::TRUE;
+    }
+
+    *to_b = \&to_bool;
 
     sub to_caller {
         Sidef::Module::OO->__NEW__("$_[0]");

@@ -26,6 +26,16 @@ Aliases: I<to_array>
 
 =cut
 
+=head2 to_b
+
+Convert.to_b() -> I<Obj>
+
+Return the
+
+Aliases: I<to_bool>
+
+=cut
+
 =head2 to_caller
 
 Convert.to_caller() -> I<Obj>
