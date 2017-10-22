@@ -1,3 +1,9 @@
+#!/usr/bin/ruby
+
+#
+## https://rosettacode.org/wiki/Imaginary_base_numbers
+#
+
 func base (Number num, Number radix { _ ~~ (-36 .. -2) }, precision = -15) -> String {
     num || return '0'
 
