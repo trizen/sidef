@@ -863,6 +863,14 @@ Aliases: I<factors_exp>
 
 =cut
 
+=head2 factorialmod
+
+Number.factorialmod() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 falling_factorial
 
 Number.falling_factorial() -> I<Obj>
@@ -910,6 +918,14 @@ Return the
 =head2 gcd
 
 Number.gcd() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 gcdext
+
+Number.gcdext() -> I<Obj>
 
 Return the
 
@@ -1115,6 +1131,14 @@ Return the
 
 =cut
 
+=head2 is_carmichael
+
+Number.is_carmichael() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 is_complex
 
 Number.is_complex() -> I<Obj>
@@ -1142,6 +1166,14 @@ Return the
 =head2 is_even
 
 Number.is_even() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 is_fundamental
+
+Number.is_fundamental() -> I<Obj>
 
 Return the
 
@@ -1366,6 +1398,14 @@ Aliases: I<is_square>
 =head2 is_square_free
 
 Number.is_square_free() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 is_totient
+
+Number.is_totient() -> I<Obj>
 
 Return the
 
@@ -2062,6 +2102,14 @@ Return the
 =head2 sqrt
 
 Number.sqrt() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 sqrtmod
+
+Number.sqrtmod() -> I<Obj>
 
 Return the
 

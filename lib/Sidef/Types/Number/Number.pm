@@ -5482,6 +5482,13 @@ package Sidef::Types::Number::Number {
         bless \$r;
     }
 
+    sub sqrtmod {
+        my ($x, $y) = @_;
+        _valid(\$y);
+        my $n = Math::Prime::Util::GMP::sqrtmod(_big2istr($x) // (goto &nan), _big2uistr($y) // (goto &nan)) // goto &nan;
+        $n <= ULONG_MAX ? __PACKAGE__->_set_uint($n) : __PACKAGE__->_set_str('int', $n);
+    }
+
     sub modpow {
         my ($x, $y, $z) = @_;
 
@@ -5602,6 +5609,14 @@ package Sidef::Types::Number::Number {
     }
 
     *fac = \&factorial;
+
+    sub factorialmod {
+        my ($n, $m) = @_;
+        _valid(\$m);
+        my $r = Math::Prime::Util::GMP::factorialmod(_big2uistr($n) // (goto &nan), _big2uistr($m) // (goto &nan))
+          // goto &nan;
+        $r <= ULONG_MAX ? __PACKAGE__->_set_uint($r) : __PACKAGE__->_set_str('int', $r);
+    }
 
     sub double_factorial {
         my ($x) = @_;
@@ -6321,6 +6336,17 @@ package Sidef::Types::Number::Number {
         bless \$r;
     }
 
+    sub gcdext {
+        my ($x, $y) = @_;
+
+        _valid(\$y);
+
+        my ($u, $v, $d) = Math::Prime::Util::GMP::gcdext(_big2istr($x) // 0, _big2istr($y) // 0);
+
+        map { ($_ >= LONG_MIN and $_ <= ULONG_MAX) ? __PACKAGE__->_set_int($_) : __PACKAGE__->_set_str('int', $_) }
+          ($u, $v, $d);
+    }
+
     sub lcm {
         my ($x, $y) = @_;
 
@@ -6655,6 +6681,30 @@ package Sidef::Types::Number::Number {
         my ($x) = @_;
         __is_int__($$x)
           && Math::Prime::Util::GMP::moebius(_big2uistr($x) // return Sidef::Types::Bool::Bool::FALSE)
+          ? Sidef::Types::Bool::Bool::TRUE
+          : Sidef::Types::Bool::Bool::FALSE;
+    }
+
+    sub is_totient {
+        my ($x) = @_;
+        __is_int__($$x)
+          && Math::Prime::Util::GMP::is_totient(_big2uistr($x) // return Sidef::Types::Bool::Bool::FALSE)
+          ? Sidef::Types::Bool::Bool::TRUE
+          : Sidef::Types::Bool::Bool::FALSE;
+    }
+
+    sub is_carmichael {
+        my ($x) = @_;
+        __is_int__($$x)
+          && Math::Prime::Util::GMP::is_carmichael(_big2uistr($x) // return Sidef::Types::Bool::Bool::FALSE)
+          ? Sidef::Types::Bool::Bool::TRUE
+          : Sidef::Types::Bool::Bool::FALSE;
+    }
+
+    sub is_fundamental {
+        my ($x) = @_;
+        __is_int__($$x)
+          && Math::Prime::Util::GMP::is_fundamental(_big2uistr($x) // return Sidef::Types::Bool::Bool::FALSE)
           ? Sidef::Types::Bool::Bool::TRUE
           : Sidef::Types::Bool::Bool::FALSE;
     }
