@@ -116,7 +116,7 @@ package Sidef::Math::Math {
             return Sidef::Types::Number::Number->_set_uint($res);
         }
 
-        Sidef::Types::Number::Number->_set_str($res);
+        Sidef::Types::Number::Number->_set_str('int', $res);
     }
 
     sub range_sum {
