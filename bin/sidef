@@ -206,7 +206,7 @@ sub output_usage {
 #<<<
     my %switches = (
                     '-i'         => 'interactive mode',
-                    '-c'         => 'compile the code as a stand-alone Perl program',
+                    '-c'         => 'compile the code into a Perl program',
                     '-C'         => 'check syntax only',
                     '-D'         => 'dump the syntax tree of a program',
                     '-o file'    => 'file where to dump the output',
@@ -255,7 +255,7 @@ USAGE
 
     print <<"END";
 
-Run '$basename -H' for interactive help.
+Run '$basename -i' for interactive mode.
 
 END
 }
