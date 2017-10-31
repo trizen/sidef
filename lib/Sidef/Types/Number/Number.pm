@@ -4658,7 +4658,19 @@ package Sidef::Types::Number::Number {
     sub is_div {
         my ($x, $y) = @_;
         _valid(\$y);
-        __eq__(__mod__($$x, $$y), 0)
+
+        $x = $$x;
+        $y = $$y;
+
+        if (ref($x) eq 'Math::GMPz' and ref($y) eq 'Math::GMPz') {
+            return (
+                      (Math::GMPz::Rmpz_divisible_p($x, $y) && Math::GMPz::Rmpz_sgn($y))
+                    ? (Sidef::Types::Bool::Bool::TRUE)
+                    : (Sidef::Types::Bool::Bool::FALSE)
+                   );
+        }
+
+        __eq__(__mod__($x, $y), 0)
           ? (Sidef::Types::Bool::Bool::TRUE)
           : (Sidef::Types::Bool::Bool::FALSE);
     }
@@ -4666,7 +4678,19 @@ package Sidef::Types::Number::Number {
     sub divides {
         my ($x, $y) = @_;
         _valid(\$y);
-        __eq__(__mod__($$y, $$x), 0)
+
+        $x = $$x;
+        $y = $$y;
+
+        if (ref($x) eq 'Math::GMPz' and ref($y) eq 'Math::GMPz') {
+            return (
+                      (Math::GMPz::Rmpz_divisible_p($y, $x) && Math::GMPz::Rmpz_sgn($x))
+                    ? (Sidef::Types::Bool::Bool::TRUE)
+                    : (Sidef::Types::Bool::Bool::FALSE)
+                   );
+        }
+
+        __eq__(__mod__($y, $x), 0)
           ? (Sidef::Types::Bool::Bool::TRUE)
           : (Sidef::Types::Bool::Bool::FALSE);
     }
@@ -5863,7 +5887,7 @@ package Sidef::Types::Number::Number {
             else {
 #<<<
                 Math::GMPz::Rmpz_set_str($u, $bd, 10);                       # u = bd
-                Math::GMPz::Rmpz_mul(   $numerator,   $numerator,   $u);     # numerator   = numerator * u
+                Math::GMPz::Rmpz_mul(   $numerator,   $numerator,   $u);     # numerator   = numerator   * u
                 Math::GMPz::Rmpz_addmul($numerator,   $denominator, $t);     # numerator  += denominator * t
                 Math::GMPz::Rmpz_mul(   $denominator, $denominator, $u);     # denominator = denominator * u
 #>>>
