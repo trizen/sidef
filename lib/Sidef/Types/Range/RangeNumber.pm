@@ -45,8 +45,6 @@ package Sidef::Types::Range::RangeNumber {
         my $from = $self->{from};
         my $to   = $self->{to};
 
-        my $i = $from;
-
         my $tmp;
         my $times = ($self->{_times} //= $to->sub($from)->add($step)->div($step));
 
@@ -57,8 +55,8 @@ package Sidef::Types::Range::RangeNumber {
             if ($repetitions == 'inf') {
                 return Sidef::Types::Block::Block->new(
                     code => sub {
-                        $tmp = $i;
-                        $i   = $i->add($step);
+                        $tmp  = $from;
+                        $from = $from->add($step);
                         $tmp;
                     },
                 );
@@ -70,11 +68,50 @@ package Sidef::Types::Range::RangeNumber {
                     return Sidef::Types::Block::Block->new(code => sub { undef; });
                 }
 
+                if (    ref($step) eq 'Sidef::Types::Number::Number'
+                    and ref($from) eq 'Sidef::Types::Number::Number'
+                    and ref($$from) eq 'Math::GMPz'
+                    and ref($$step) eq 'Math::GMPz') {
+
+                    $from = $$from;
+                    $step = $$step;
+
+                    if (    ref($to) eq 'Sidef::Types::Number::Number'
+                        and ref($$to) eq 'Math::GMPz'
+                        and Math::GMPz::Rmpz_fits_slong_p($$to)
+                        and Math::GMPz::Rmpz_fits_slong_p($from)
+                        and Math::GMPz::Rmpz_fits_slong_p($step)) {
+
+                        $from = Math::GMPz::Rmpz_get_si($from);
+                        $step = Math::GMPz::Rmpz_get_si($step);
+
+                        return Sidef::Types::Block::Block->new(
+                            code => sub {
+                                --$repetitions >= 0 or return undef;
+                                $tmp = bless(\Math::GMPz::Rmpz_init_set_si($from), 'Sidef::Types::Number::Number');
+                                $from += $step;
+                                $tmp;
+                            },
+                        );
+                    }
+
+                    my $counter_mpz = Math::GMPz::Rmpz_init_set($from);
+
+                    return Sidef::Types::Block::Block->new(
+                        code => sub {
+                            --$repetitions >= 0 or return undef;
+                            $tmp = bless(\Math::GMPz::Rmpz_init_set($counter_mpz), 'Sidef::Types::Number::Number');
+                            Math::GMPz::Rmpz_add($counter_mpz, $counter_mpz, $step);
+                            $tmp;
+                        },
+                    );
+                }
+
                 return Sidef::Types::Block::Block->new(
                     code => sub {
                         --$repetitions >= 0 or return undef;
-                        $tmp = $i;
-                        $i   = $i->add($step);
+                        $tmp  = $from;
+                        $from = $from->add($step);
                         $tmp;
                     },
                 );
@@ -85,9 +122,9 @@ package Sidef::Types::Range::RangeNumber {
 
         Sidef::Types::Block::Block->new(
             code => sub {
-                ($asc ? $i->le($to) : $i->ge($to)) || return undef;
-                $tmp = $i;
-                $i   = $i->add($step);
+                ($asc ? $from->le($to) : $from->ge($to)) || return undef;
+                $tmp  = $from;
+                $from = $from->add($step);
                 $tmp;
             },
         );

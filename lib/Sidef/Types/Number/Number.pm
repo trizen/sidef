@@ -317,7 +317,7 @@ package Sidef::Types::Number::Number {
         $s =~ tr/_//d;
 
         # Performance improvement for Perl integers
-        if (CORE::int($s) eq $s and $s >= LONG_MIN and $s <= ULONG_MAX) {
+        if (CORE::int($s) eq $s and $s > LONG_MIN and $s < ULONG_MAX) {
             return (
                     $s < 0
                     ? Math::GMPz::Rmpz_init_set_si($s)
@@ -5510,7 +5510,7 @@ package Sidef::Types::Number::Number {
         my ($x, $y) = @_;
         _valid(\$y);
         my $n = Math::Prime::Util::GMP::sqrtmod(_big2istr($x) // (goto &nan), _big2uistr($y) // (goto &nan)) // goto &nan;
-        $n <= ULONG_MAX ? __PACKAGE__->_set_uint($n) : __PACKAGE__->_set_str('int', $n);
+        $n < ULONG_MAX ? __PACKAGE__->_set_uint($n) : __PACKAGE__->_set_str('int', $n);
     }
 
     sub modpow {
@@ -5639,7 +5639,7 @@ package Sidef::Types::Number::Number {
         _valid(\$m);
         my $r = Math::Prime::Util::GMP::factorialmod(_big2uistr($n) // (goto &nan), _big2uistr($m) // (goto &nan))
           // goto &nan;
-        $r <= ULONG_MAX ? __PACKAGE__->_set_uint($r) : __PACKAGE__->_set_str('int', $r);
+        $r < ULONG_MAX ? __PACKAGE__->_set_uint($r) : __PACKAGE__->_set_str('int', $r);
     }
 
     sub double_factorial {
@@ -5952,7 +5952,7 @@ package Sidef::Types::Number::Number {
             Math::Prime::Util::GMP::prime_count(_big2istr($x) // (goto &nan), _big2istr($y) // (goto &nan));
           }
           : Math::Prime::Util::GMP::prime_count(2, _big2istr($x) // (goto &nan));
-        $n <= ULONG_MAX ? __PACKAGE__->_set_uint($n) : __PACKAGE__->_set_str('int', $n);
+        $n < ULONG_MAX ? __PACKAGE__->_set_uint($n) : __PACKAGE__->_set_str('int', $n);
     }
 
     sub square_free_count {
@@ -5966,7 +5966,7 @@ package Sidef::Types::Number::Number {
         (my $n = __numify__($$from)) <= 0 && return ZERO;
 
         # Optimization for native integers
-        if ($n <= ULONG_MAX) {
+        if ($n < ULONG_MAX) {
 
             $n = CORE::int($n);
             my $s = CORE::int(CORE::sqrt($n));
@@ -6261,7 +6261,7 @@ package Sidef::Types::Number::Number {
                 if ($count >= $n) {
                     my $p = $primes[$n - $prev_count - 1];
                     return (
-                            $p <= ULONG_MAX
+                            $p < ULONG_MAX
                             ? __PACKAGE__->_set_uint($p)
                             : __PACKAGE__->_set_str('int', $p)
                            );
@@ -6367,8 +6367,7 @@ package Sidef::Types::Number::Number {
 
         my ($u, $v, $d) = Math::Prime::Util::GMP::gcdext(_big2istr($x) // 0, _big2istr($y) // 0);
 
-        map { ($_ >= LONG_MIN and $_ <= ULONG_MAX) ? __PACKAGE__->_set_int($_) : __PACKAGE__->_set_str('int', $_) }
-          ($u, $v, $d);
+        map { ($_ > LONG_MIN and $_ < ULONG_MAX) ? __PACKAGE__->_set_int($_) : __PACKAGE__->_set_str('int', $_) } ($u, $v, $d);
     }
 
     sub lcm {
@@ -6428,7 +6427,7 @@ package Sidef::Types::Number::Number {
 
         my $t = Math::GMPz::Rmpz_init();
         foreach my $f (keys %factors) {
-            if ($f <= ULONG_MAX) {
+            if ($f < ULONG_MAX) {
                 Math::GMPz::Rmpz_divisible_ui_p($r, $f)
                   ? Math::GMPz::Rmpz_set_ui($t, $f)
                   : next;
@@ -6526,12 +6525,7 @@ package Sidef::Types::Number::Number {
         _valid(\$y) if defined($y);
 
         Sidef::Types::Array::Array->new(
-            [
-             map {
-                 $_ <= ULONG_MAX
-                   ? __PACKAGE__->_set_uint($_)
-                   : __PACKAGE__->_set_str('int', $_)
-               }
+            [map { $_ < ULONG_MAX ? __PACKAGE__->_set_uint($_) : __PACKAGE__->_set_str('int', $_) }
 
                defined($y)
              ? Math::Prime::Util::GMP::sieve_primes((_big2uistr($x) // 0), (_big2uistr($y) // 0), 0)
@@ -6542,41 +6536,36 @@ package Sidef::Types::Number::Number {
 
     sub prev_prime {
         my $p = Math::Prime::Util::GMP::prev_prime(&_big2uistr // goto &nan) || goto &nan;
-        $p <= ULONG_MAX ? __PACKAGE__->_set_uint($p) : __PACKAGE__->_set_str('int', $p);
+        $p < ULONG_MAX ? __PACKAGE__->_set_uint($p) : __PACKAGE__->_set_str('int', $p);
     }
 
     sub next_prime {
         my $p = Math::Prime::Util::GMP::next_prime(&_big2uistr // goto &nan) || goto &nan;
-        $p <= ULONG_MAX ? __PACKAGE__->_set_uint($p) : __PACKAGE__->_set_str('int', $p);
+        $p < ULONG_MAX ? __PACKAGE__->_set_uint($p) : __PACKAGE__->_set_str('int', $p);
     }
 
     sub znorder {
         my ($x, $y) = @_;
         _valid(\$y);
         my $z = Math::Prime::Util::GMP::znorder(_big2uistr($x) // (goto &nan), _big2uistr($y) // (goto &nan)) // goto &nan;
-        $z <= ULONG_MAX ? __PACKAGE__->_set_uint($z) : __PACKAGE__->_set_str('int', $z);
+        $z < ULONG_MAX ? __PACKAGE__->_set_uint($z) : __PACKAGE__->_set_str('int', $z);
     }
 
     sub znprimroot {
         my $z = Math::Prime::Util::GMP::znprimroot(&_big2uistr // (goto &nan)) // goto &nan;
-        $z <= ULONG_MAX ? __PACKAGE__->_set_uint($z) : __PACKAGE__->_set_str('int', $z);
+        $z < ULONG_MAX ? __PACKAGE__->_set_uint($z) : __PACKAGE__->_set_str('int', $z);
     }
 
     sub rad {
         my %f;
         @f{Math::Prime::Util::GMP::factor(&_big2uistr // goto &nan)} = ();
         my $r = Math::Prime::Util::GMP::vecprod(CORE::keys %f);
-        $r <= ULONG_MAX ? __PACKAGE__->_set_uint($r) : __PACKAGE__->_set_str('int', $r);
+        $r < ULONG_MAX ? __PACKAGE__->_set_uint($r) : __PACKAGE__->_set_str('int', $r);
     }
 
     sub factor {
         Sidef::Types::Array::Array->new(
-            [
-             map {
-                 $_ <= ULONG_MAX
-                   ? __PACKAGE__->_set_uint($_)
-                   : __PACKAGE__->_set_str('int', $_)
-               }
+            [map { $_ < ULONG_MAX ? __PACKAGE__->_set_uint($_) : __PACKAGE__->_set_str('int', $_) }
 
                Math::Prime::Util::GMP::factor(&_big2uistr || return Sidef::Types::Array::Array->new())
             ]
@@ -6597,7 +6586,7 @@ package Sidef::Types::Number::Number {
               Sidef::Types::Array::Array->new(
                                               [
                                                (
-                                                $factor <= ULONG_MAX
+                                                $factor < ULONG_MAX
                                                 ? __PACKAGE__->_set_uint($factor)
                                                 : __PACKAGE__->_set_str('int', $factor)
                                                ),
@@ -6615,25 +6604,21 @@ package Sidef::Types::Number::Number {
         my $n = &_big2uistr || return Sidef::Types::Array::Array->new();
 
         Sidef::Types::Array::Array->new(
-            [
-             map {
-                 $_ <= ULONG_MAX
-                   ? __PACKAGE__->_set_uint($_)
-                   : __PACKAGE__->_set_str('int', $_)
-               } Math::Prime::Util::GMP::divisors($n)
-            ]
-        );
+                                        [map { $_ < ULONG_MAX ? __PACKAGE__->_set_uint($_) : __PACKAGE__->_set_str('int', $_) }
+                                           Math::Prime::Util::GMP::divisors($n)
+                                        ]
+                                       );
     }
 
     sub exp_mangoldt {
         my $n = Math::Prime::Util::GMP::exp_mangoldt(&_big2uistr || return ONE);
         $n eq '1' and return ONE;
-        $n <= ULONG_MAX ? __PACKAGE__->_set_uint($n) : __PACKAGE__->_set_str('int', $n);
+        $n < ULONG_MAX ? __PACKAGE__->_set_uint($n) : __PACKAGE__->_set_str('int', $n);
     }
 
     sub totient {
         my $n = Math::Prime::Util::GMP::totient(&_big2uistr // goto &nan);
-        $n <= ULONG_MAX ? __PACKAGE__->_set_uint($n) : __PACKAGE__->_set_str('int', $n);
+        $n < ULONG_MAX ? __PACKAGE__->_set_uint($n) : __PACKAGE__->_set_str('int', $n);
     }
 
     *euler_phi     = \&totient;
@@ -6643,12 +6628,12 @@ package Sidef::Types::Number::Number {
         my ($x, $y) = @_;
         _valid(\$y);
         my $n = Math::Prime::Util::GMP::jordan_totient(_big2istr($x) // (goto &nan), _big2istr($y) // (goto &nan));
-        $n <= ULONG_MAX ? __PACKAGE__->_set_uint($n) : __PACKAGE__->_set_str('int', $n);
+        $n < ULONG_MAX ? __PACKAGE__->_set_uint($n) : __PACKAGE__->_set_str('int', $n);
     }
 
     sub carmichael_lambda {
         my $n = Math::Prime::Util::GMP::carmichael_lambda(&_big2uistr // goto &nan);
-        $n <= ULONG_MAX ? __PACKAGE__->_set_uint($n) : __PACKAGE__->_set_str('int', $n);
+        $n < ULONG_MAX ? __PACKAGE__->_set_uint($n) : __PACKAGE__->_set_str('int', $n);
     }
 
     sub liouville {
@@ -6669,7 +6654,7 @@ package Sidef::Types::Number::Number {
         my $str = &_big2uistr // goto &nan;
         $str eq '0' && return ZERO;
         my $n = Math::Prime::Util::GMP::sigma($str, 0);
-        $n <= ULONG_MAX ? __PACKAGE__->_set_uint($n) : __PACKAGE__->_set_str('int', $n);
+        $n < ULONG_MAX ? __PACKAGE__->_set_uint($n) : __PACKAGE__->_set_str('int', $n);
     }
 
     sub sigma {
@@ -6682,12 +6667,12 @@ package Sidef::Types::Number::Number {
           }
           : Math::Prime::Util::GMP::sigma(&_big2uistr // (goto &nan), 1);
 
-        $n <= ULONG_MAX ? __PACKAGE__->_set_uint($n) : __PACKAGE__->_set_str('int', $n);
+        $n < ULONG_MAX ? __PACKAGE__->_set_uint($n) : __PACKAGE__->_set_str('int', $n);
     }
 
     sub partitions {
         my $n = Math::Prime::Util::GMP::partitions(&_big2uistr // goto &nan);
-        $n <= ULONG_MAX ? __PACKAGE__->_set_uint($n) : __PACKAGE__->_set_str('int', $n);
+        $n < ULONG_MAX ? __PACKAGE__->_set_uint($n) : __PACKAGE__->_set_str('int', $n);
     }
 
     sub is_primitive_root {
