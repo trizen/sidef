@@ -2523,10 +2523,10 @@ package Sidef::Types::Number::Number {
         my ($x, $y) = @_;
 
         # ilog(x, y <= 1) = NaN
-        Math::GMPz::Rmpz_cmp_ui($y, 1) <= 0 and goto &_nan;
+        Math::GMPz::Rmpz_cmp_ui($y, 1) <= 0 and return;
 
         # ilog(x <= 0, y) = NaN
-        Math::GMPz::Rmpz_sgn($x) <= 0 and goto &_nan;
+        Math::GMPz::Rmpz_sgn($x) <= 0 and return;
 
         # Return faster for y <= 62
         if (Math::GMPz::Rmpz_cmp_ui($y, 62) <= 0) {
@@ -2534,15 +2534,14 @@ package Sidef::Types::Number::Number {
             $y = Math::GMPz::Rmpz_get_ui($y);
 
             my $t = Math::GMPz::Rmpz_init();
-            my $e = (Math::GMPz::Rmpz_sizeinbase($x, $y) || goto &_nan) - 1;
+            my $e = (Math::GMPz::Rmpz_sizeinbase($x, $y) || return) - 1;
 
             if ($e > 0) {
                 Math::GMPz::Rmpz_ui_pow_ui($t, $y, $e);
                 Math::GMPz::Rmpz_cmp($t, $x) > 0 and --$e;
             }
 
-            Math::GMPz::Rmpz_set_ui($t, $e);
-            return $t;
+            return $e;
         }
 
         my $e = 0;
@@ -2571,8 +2570,7 @@ package Sidef::Types::Number::Number {
             ++$e;
         }
 
-        Math::GMPz::Rmpz_set_ui($t, $e);
-        $t;
+        return $e;
     }
 
     sub ilog {
@@ -2580,7 +2578,7 @@ package Sidef::Types::Number::Number {
 
         if (defined($y)) {
             _valid(\$y);
-            bless \__ilog__((_any2mpz($$x) // goto &nan), (_any2mpz($$y) // goto &nan));
+            __PACKAGE__->_set_uint(__ilog__((_any2mpz($$x) // goto &nan), (_any2mpz($$y) // goto &nan)) // goto &nan);
         }
         else {
             bless \(_any2mpz(__log__(_any2mpfr_mpc($$x))) // goto &nan);
@@ -2590,13 +2588,13 @@ package Sidef::Types::Number::Number {
     sub ilog2 {
         my ($x) = @_;
         state $two = Math::GMPz::Rmpz_init_set_ui(2);
-        bless \__ilog__((_any2mpz($$x) // goto &nan), $two);
+        __PACKAGE__->_set_uint(__ilog__((_any2mpz($$x) // goto &nan), $two) // goto &nan);
     }
 
     sub ilog10 {
         my ($x) = @_;
         state $ten = Math::GMPz::Rmpz_init_set_ui(10);
-        bless \__ilog__((_any2mpz($$x) // goto &nan), $ten);
+        __PACKAGE__->_set_uint(__ilog__((_any2mpz($$x) // goto &nan), $ten) // goto &nan);
     }
 
     sub __lgrt__ {
@@ -6858,54 +6856,50 @@ package Sidef::Types::Number::Number {
         __PACKAGE__->_set_uint(Math::Prime::Util::GMP::is_power(&_big2istr // return ONE) || return ONE);
     }
 
-    sub next_pow2 {
-        my ($x) = @_;
-
-        my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-
-        Math::MPFR::Rmpfr_log2($r, _any2mpfr($$x), $round_z);
-        Math::MPFR::Rmpfr_ceil($r, $r);
-
-        my $z = Math::GMPz::Rmpz_init_set_ui(1);
-        my $ui = Math::MPFR::Rmpfr_get_ui($r, $ROUND);
-        Math::GMPz::Rmpz_mul_2exp($z, $z, $ui);
-        bless \$z;
-    }
-
-    *next_power2 = \&next_pow2;
-
     sub next_pow {
         my ($x, $y) = @_;
 
         _valid(\$y);
 
-        my $f1 = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-        my $f2 = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        $x = _any2mpz($$x) // goto &nan;
+        $y = _any2mpz($$y) // goto &nan;
 
-        Math::MPFR::Rmpfr_log($f1, _any2mpfr($$x), $round_z);
-        Math::MPFR::Rmpfr_log($f2, _any2mpfr($$y), $round_z);
+        Math::GMPz::Rmpz_sgn($x) <= 0 and return ONE;
 
-        Math::MPFR::Rmpfr_div($f1, $f1, $f2, $ROUND);
-        Math::MPFR::Rmpfr_ceil($f1, $f1);
+        my $log = 1 + (__ilog__($x, $y) // goto &nan);
 
         my $r = Math::GMPz::Rmpz_init();
-        my $ui = Math::MPFR::Rmpfr_get_ui($f1, $ROUND);
-        Math::GMPz::Rmpz_pow_ui($r, (_any2mpz($$y) // goto &nan), $ui);
+
+        Math::GMPz::Rmpz_fits_ulong_p($y)
+          ? Math::GMPz::Rmpz_ui_pow_ui($r, Math::GMPz::Rmpz_get_ui($y), $log)
+          : Math::GMPz::Rmpz_pow_ui($r, $y, $log);
+
         bless \$r;
     }
 
     *next_power = \&next_pow;
 
+    sub next_pow2 {
+        my ($x) = @_;
+
+        state $two = bless \Math::GMPz::Rmpz_init_set_ui(2);
+
+        @_ = ($x, $two);
+        goto &next_pow;
+    }
+
+    *next_power2 = \&next_pow2;
+
     #
     ## Is a polygonal number?
     #
 
-    # $n is a Math::GMPz object
-    # $k is a Math::GMPz object
-    # $second is a boolean
-
     sub __is_polygonal__ {
         my ($n, $k, $second) = @_;
+
+        # $n is a Math::GMPz object
+        # $k is a Math::GMPz object
+        # $second is a boolean
 
         Math::GMPz::Rmpz_sgn($n) || return 1;
 
@@ -6972,12 +6966,12 @@ package Sidef::Types::Number::Number {
     ## Integer polygonal root
     #
 
-    # $n is a Math::GMPz object
-    # $k is a Math::GMPz object
-    # $second is a boolean
-
     sub __ipolygonal_root__ {
         my ($n, $k, $second) = @_;
+
+        # $n is a Math::GMPz object
+        # $k is a Math::GMPz object
+        # $second is a boolean
 
         # polygonal_root(n, k)
         #   = ((k - 4) ± sqrt(8 * (k - 2) * n + (k - 4)^2)) / (2 * (k - 2))
