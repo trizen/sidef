@@ -140,6 +140,25 @@ assert_eq( Inf ..  Inf -> first(3), [ Inf,  Inf,  Inf])
 assert_eq(-Inf ..  Inf -> first(3), [-Inf, -Inf, -Inf])
 assert_eq(-Inf .. -Inf -> first(3), [-Inf, -Inf, -Inf])
 
+assert_eq( Inf .. Inf `by` Inf -> first(3), [ Inf,  Inf,  Inf])
+assert_eq(-Inf .. Inf `by` Inf -> first(3), [-Inf])                # counter-intuitive?
+
+assert_eq(1 .. 100 `by` -Inf -> first(3), [])
+assert_eq(100 .. 1 `by`  Inf -> first(3), [])
+
+assert_eq(1 .. Inf `by` -Inf -> first(3), [])
+assert_eq(Inf .. 1 `by`  Inf -> first(3), [])
+
+assert_eq(-Inf ..  Inf `by` -Inf -> first(3), [])
+assert_eq( Inf .. -Inf `by`  Inf -> first(3), [])
+
+assert_eq(1 .. Inf `by`  Inf -> first(3), [1, Inf, Inf])
+assert_eq(Inf .. 1 `by` -Inf -> first(3), [Inf])                   # counter-intutive?
+
+assert_eq( Inf ..  Inf `by` Inf -> first(3), [Inf, Inf, Inf])
+assert_eq( Inf .. -Inf `by` Inf -> first(3), [])
+assert_eq(-Inf ..  Inf `by` Inf -> first(3), [-Inf])               # counter-intuitive?
+
 assert_eq( NaN ..  NaN -> first(3), [])
 assert_eq( NaN ..  Inf -> first(3), [])
 assert_eq( NaN .. -Inf -> first(3), [])
