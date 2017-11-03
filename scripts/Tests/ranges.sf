@@ -130,4 +130,35 @@ assert_eq(-3 .. 2**2048 -> first(7), [-3,-2,-1,0,1,2,3])
 
 assert_eq(2**2048 .. 2**4096 -> first(3), [2**2048, 2**2048 + 1, 2**2048 + 2])
 
-say "** Test passed!";
+assert_eq(1 .. 100 `by`  Inf -> map { _ }, [1])
+assert_eq(100 .. 1 `by` -Inf -> map { _ }, [100])
+
+assert_eq(100 .. 1 `by` NaN -> map { _ }, [])
+assert_eq(1 .. 100 `by` NaN -> map { _ }, [])
+
+assert_eq( Inf ..  Inf -> first(3), [ Inf,  Inf,  Inf])
+assert_eq(-Inf ..  Inf -> first(3), [-Inf, -Inf, -Inf])
+assert_eq(-Inf .. -Inf -> first(3), [-Inf, -Inf, -Inf])
+
+assert_eq( NaN ..  NaN -> first(3), [])
+assert_eq( NaN ..  Inf -> first(3), [])
+assert_eq( NaN .. -Inf -> first(3), [])
+assert_eq( Inf ..  NaN -> first(3), [])
+assert_eq(-Inf ..  NaN -> first(3), [])
+
+assert_eq(NaN ..   10 -> first(3), [])
+assert_eq( 10 ..  NaN -> first(3), [])
+assert_eq( 10 .. -Inf -> first(3), [])
+
+assert_eq(   1 .. Inf `by` NaN -> first(3), [])
+assert_eq( Inf .. Inf `by` NaN -> first(3), [])
+assert_eq(-Inf .. Inf `by` NaN -> first(3), [])
+
+assert_eq( Inf .. 3 -> first(3), [])
+assert_eq( Inf .. 3 `by` NaN -> first(3), [])
+assert_eq( Inf .. 3 `by` -1 -> first(3), [Inf, Inf, Inf])
+assert_eq(-Inf .. 3 `by` -1 -> first(3), [])
+assert_eq(-Inf .. 3 `by` NaN -> first(3), [])
+assert_eq(-Inf .. 3 `by` 100 -> first(3), [-Inf, -Inf, -Inf])
+
+say "** Test passed!"

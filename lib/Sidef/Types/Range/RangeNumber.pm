@@ -95,7 +95,7 @@ package Sidef::Types::Range::RangeNumber {
             }
         }
 
-        my $asc = ($self->{_asc} //= !!($step->is_pos));
+        my $asc = ($self->{_asc} //= !!($step->is_pos // return Sidef::Types::Block::Block->new(code => sub { undef; })));
 
         Sidef::Types::Block::Block->new(
             code => sub {
