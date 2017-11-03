@@ -393,7 +393,7 @@ package Sidef::Types::Glob::File {
         $mode = defined($mode) ? "$mode" : 'utf8';
 
         open(my $fh, "<:$mode", "$self") || do {
-            warn "[WARNING] Can't open file `$self' for writing: $!";
+            warn "[WARNING] Can't open file `$self' for reading: $!";
             return undef;
         };
 
