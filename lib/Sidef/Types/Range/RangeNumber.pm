@@ -51,67 +51,44 @@ package Sidef::Types::Range::RangeNumber {
         if (ref($times) eq 'Sidef::Types::Number::Number') {
             my $repetitions = Sidef::Types::Number::Number::__numify__($$times);
 
-            # An infinite number of repetitions
-            if ($repetitions == 'inf') {
-                return Sidef::Types::Block::Block->new(
-                    code => sub {
-                        $tmp  = $from;
-                        $from = $from->add($step);
-                        $tmp;
-                    },
-                );
+            if ($repetitions < 0) {
+                return Sidef::Types::Block::Block->new(code => sub { undef; });
             }
 
-            if ($repetitions <= Sidef::Types::Number::Number::ULONG_MAX) {
+            if (    ref($step) eq 'Sidef::Types::Number::Number'
+                and ref($from) eq 'Sidef::Types::Number::Number'
+                and ref($$from) eq 'Math::GMPz'
+                and ref($$step) eq 'Math::GMPz') {
 
-                if ($repetitions < 0) {
-                    return Sidef::Types::Block::Block->new(code => sub { undef; });
-                }
+                $from = $$from;
+                $step = $$step;
 
-                if (    ref($step) eq 'Sidef::Types::Number::Number'
-                    and ref($from) eq 'Sidef::Types::Number::Number'
-                    and ref($$from) eq 'Math::GMPz'
-                    and ref($$step) eq 'Math::GMPz') {
+                if (    ref($to) eq 'Sidef::Types::Number::Number'
+                    and ref($$to) eq 'Math::GMPz'
+                    and Math::GMPz::Rmpz_fits_slong_p($$to)
+                    and Math::GMPz::Rmpz_fits_slong_p($from)
+                    and Math::GMPz::Rmpz_fits_slong_p($step)) {
 
-                    $from = $$from;
-                    $step = $$step;
-
-                    if (    ref($to) eq 'Sidef::Types::Number::Number'
-                        and ref($$to) eq 'Math::GMPz'
-                        and Math::GMPz::Rmpz_fits_slong_p($$to)
-                        and Math::GMPz::Rmpz_fits_slong_p($from)
-                        and Math::GMPz::Rmpz_fits_slong_p($step)) {
-
-                        $from = Math::GMPz::Rmpz_get_si($from);
-                        $step = Math::GMPz::Rmpz_get_si($step);
-
-                        return Sidef::Types::Block::Block->new(
-                            code => sub {
-                                --$repetitions >= 0 or return undef;
-                                $tmp = bless(\Math::GMPz::Rmpz_init_set_si($from), 'Sidef::Types::Number::Number');
-                                $from += $step;
-                                $tmp;
-                            },
-                        );
-                    }
-
-                    my $counter_mpz = Math::GMPz::Rmpz_init_set($from);
+                    $from = Math::GMPz::Rmpz_get_si($from);
+                    $step = Math::GMPz::Rmpz_get_si($step);
 
                     return Sidef::Types::Block::Block->new(
                         code => sub {
                             --$repetitions >= 0 or return undef;
-                            $tmp = bless(\Math::GMPz::Rmpz_init_set($counter_mpz), 'Sidef::Types::Number::Number');
-                            Math::GMPz::Rmpz_add($counter_mpz, $counter_mpz, $step);
+                            $tmp = bless(\Math::GMPz::Rmpz_init_set_si($from), 'Sidef::Types::Number::Number');
+                            $from += $step;
                             $tmp;
                         },
                     );
                 }
 
+                my $counter_mpz = Math::GMPz::Rmpz_init_set($from);
+
                 return Sidef::Types::Block::Block->new(
                     code => sub {
                         --$repetitions >= 0 or return undef;
-                        $tmp  = $from;
-                        $from = $from->add($step);
+                        $tmp = bless(\Math::GMPz::Rmpz_init_set($counter_mpz), 'Sidef::Types::Number::Number');
+                        Math::GMPz::Rmpz_add($counter_mpz, $counter_mpz, $step);
                         $tmp;
                     },
                 );
