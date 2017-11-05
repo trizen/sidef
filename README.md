@@ -167,6 +167,13 @@ for y in (1 `downto` -1 `by` 0.05) {
 The [read-eval-print loop](https://en.wikipedia.org/wiki/Read%E2%80%93eval%E2%80%93print_loop) is available by executing `sidef -i`:
 ![sidef](https://user-images.githubusercontent.com/614513/32416918-e687f938-c259-11e7-8c06-a4f34241c087.png)
 
+### AVAILABILITY
+
+* CPAN: [https://metacpan.org/release/Sidef](https://metacpan.org/release/Sidef)
+* PKGS.org: [https://pkgs.org/download/sidef](https://pkgs.org/download/sidef)
+* Arch Linux: [https://aur.archlinux.org/packages/sidef/](https://aur.archlinux.org/packages/sidef/)
+* Slackware: [https://slackbuilds.org/repository/14.2/perl/perl-Sidef/](https://slackbuilds.org/repository/14.2/perl/perl-Sidef/)
+
 ### LICENSE AND COPYRIGHT
 
 * Copyright (C) 2013-2017 Daniel Șuteu, Ioana Fălcușan
