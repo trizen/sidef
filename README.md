@@ -101,9 +101,9 @@ say sierpinski_triangle(4)
 
 * ASCII generation of the [Mandelbrot set](https://en.wikipedia.org/wiki/Mandelbrot_set):
 ```ruby
-func mandelbrot(z) {
+func mandelbrot(z, r=20) {
     var c = z
-    20.times {
+    r.times {
         z = (z*z + c)
         return true if (z.abs > 2)
     }
