@@ -163,8 +163,8 @@ for y in (1 `downto` -1 `by` 0.05) {
 * For more examples, see:
    * [https://github.com/trizen/sidef-scripts](https://github.com/trizen/sidef-scripts)
 
-### REPL
-The [read-eval-print loop](https://en.wikipedia.org/wiki/Read%E2%80%93eval%E2%80%93print_loop) is available by executing `sidef -i`:
+### INTERACTIVE MODE
+
 ![sidef](https://user-images.githubusercontent.com/614513/32416918-e687f938-c259-11e7-8c06-a4f34241c087.png)
 
 ### AVAILABILITY
