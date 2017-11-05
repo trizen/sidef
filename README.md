@@ -165,7 +165,7 @@ for y in (1 `downto` -1 `by` 0.05) {
 
 ### INTERACTIVE MODE
 
-![sidef](https://user-images.githubusercontent.com/614513/32416918-e687f938-c259-11e7-8c06-a4f34241c087.png)
+![sidef](https://user-images.githubusercontent.com/614513/32420413-973f20a2-c292-11e7-9c60-d58d84666232.png)
 
 ### AVAILABILITY
 
