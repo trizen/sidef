@@ -170,7 +170,7 @@ The [read-eval-print loop](https://en.wikipedia.org/wiki/Read%E2%80%93eval%E2%80
 ### AVAILABILITY
 
 * CPAN: [https://metacpan.org/release/Sidef](https://metacpan.org/release/Sidef)
-* PKGS.org: [https://pkgs.org/download/sidef](https://pkgs.org/download/sidef)
+* PKGS.org: [https://pkgs.org/download/Sidef](https://pkgs.org/download/Sidef)
 * Arch Linux: [https://aur.archlinux.org/packages/sidef/](https://aur.archlinux.org/packages/sidef/)
 * Slackware: [https://slackbuilds.org/repository/14.2/perl/perl-Sidef/](https://slackbuilds.org/repository/14.2/perl/perl-Sidef/)
 
