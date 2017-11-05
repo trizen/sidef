@@ -79,7 +79,7 @@ func sierpinski_triangle(n) {
 
 say sierpinski_triangle(4)
 ```
-...producing:
+Output:
 ```text
                *               
               * *              
@@ -117,7 +117,7 @@ for y in (1 `downto` -1 `by` 0.05) {
     print "\n"
 }
 ```
-...producing:
+Output:
 ```text
                                                                                 
                                                             #                   
