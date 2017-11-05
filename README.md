@@ -37,9 +37,9 @@ Sidef is a modern, high-level, general-purpose programming language, inspired by
 * Tutorial: https://github.com/trizen/sidef/wiki
 * RosettaCode: http://rosettacode.org/wiki/Sidef
 
-### EXAMPLES
+## EXAMPLES
 
-* The [Y combinator](https://en.wikipedia.org/wiki/Fixed-point_combinator#Fixed_point_combinators_in_lambda_calculus):
+### The [Y combinator](https://en.wikipedia.org/wiki/Fixed-point_combinator#Fixed_point_combinators_in_lambda_calculus):
 ```ruby
 var y = ->(f) {->(g) {g(g)}(->(g) { f(->(*args) {g(g)(args...)})})}
 
@@ -50,7 +50,7 @@ var fib = ->(f) { ->(n) { n < 2 ? n : (f(n-2) + f(n-1)) } }
 say 10.of { |i| y(fib)(i) }     #=> [0, 1, 1, 2, 3, 5, 8, 13, 21, 34]
 ```
 
-* Approximation of the [gamma function](https://en.wikipedia.org/wiki/Gamma_function):
+### Approximation of the [gamma function](https://en.wikipedia.org/wiki/Gamma_function):
 ```ruby
 define ℯ = Num.e
 define τ = Num.tau
@@ -65,7 +65,7 @@ for i in (1..10) {
 }
 ```
 
-* ASCII generation of the [Sierpinksi triangle](https://en.wikipedia.org/wiki/Sierpinski_triangle):
+### ASCII generation of the [Sierpinksi triangle](https://en.wikipedia.org/wiki/Sierpinski_triangle):
 ```ruby
 func sierpinski_triangle(n) {
     var triangle = ['*']
@@ -99,7 +99,7 @@ say sierpinski_triangle(4)
 * * * * * * * * * * * * * * * *
 ```
 
-* ASCII generation of the [Mandelbrot set](https://en.wikipedia.org/wiki/Mandelbrot_set):
+### ASCII generation of the [Mandelbrot set](https://en.wikipedia.org/wiki/Mandelbrot_set):
 ```ruby
 func mandelbrot(z, r=20) {
     var c = z
@@ -160,8 +160,8 @@ for y in (1 `downto` -1 `by` 0.05) {
                                                                                 
 ```
 
-* For more examples, see:
-   * [https://github.com/trizen/sidef-scripts](https://github.com/trizen/sidef-scripts)
+### More examples:
+   * For more examples, see: [https://github.com/trizen/sidef-scripts](https://github.com/trizen/sidef-scripts)
 
 ### INTERACTIVE MODE
 
