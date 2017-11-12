@@ -2023,13 +2023,13 @@ package Sidef::Types::Array::Array {
         $n = Sidef::Types::Number::Number->new($n)->int;
         $n = ref($$n) eq 'Math::GMPz' ? Math::GMPz::Rmpz_init_set($$n) : return undef;
 
-        my $cmp = Math::GMPz::Rmpz_cmp_ui($n, 0);
+        my $sgn = Math::GMPz::Rmpz_sgn($n);
 
-        if ($cmp < 0) {
+        if ($sgn < 0) {
             Math::GMPz::Rmpz_neg($n, $n);
             @arr = CORE::reverse(@arr);
         }
-        elsif ($cmp == 0) {
+        elsif ($sgn == 0) {
             return bless \@arr, __PACKAGE__;
         }
 
