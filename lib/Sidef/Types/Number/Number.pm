@@ -4005,7 +4005,7 @@ package Sidef::Types::Number::Number {
             return (
                     Math::MPFR::Rmpfr_integer_p($x)
                       and (
-                           $y < 0
+                           ($y || return !Math::MPFR::Rmpfr_sgn($x)) < 0
                            ? Math::MPFR::Rmpfr_cmp_si($x, $y)
                            : Math::MPFR::Rmpfr_cmp_ui($x, $y)
                       ) == 0
@@ -4036,7 +4036,7 @@ package Sidef::Types::Number::Number {
             return (
                     Math::GMPq::Rmpq_integer_p($x)
                       and (
-                           $y < 0
+                           ($y || return !Math::GMPq::Rmpq_sgn($x)) < 0
                            ? Math::GMPq::Rmpq_cmp_si($x, $y, 1)
                            : Math::GMPq::Rmpq_cmp_ui($x, $y, 1)
                       ) == 0
@@ -4066,7 +4066,7 @@ package Sidef::Types::Number::Number {
       Math_GMPz__Scalar: {
             return (
                     (
-                     $y < 0
+                     ($y || return !Math::GMPz::Rmpz_sgn($x)) < 0
                      ? Math::GMPz::Rmpz_cmp_si($x, $y)
                      : Math::GMPz::Rmpz_cmp_ui($x, $y)
                     ) == 0
@@ -4156,7 +4156,7 @@ package Sidef::Types::Number::Number {
             return (
                     !Math::MPFR::Rmpfr_integer_p($x)
                       or (
-                          $y < 0
+                          ($y || return !!Math::MPFR::Rmpfr_sgn($x)) < 0
                           ? Math::MPFR::Rmpfr_cmp_si($x, $y)
                           : Math::MPFR::Rmpfr_cmp_ui($x, $y)
                       ) != 0
@@ -4187,7 +4187,7 @@ package Sidef::Types::Number::Number {
             return (
                     !Math::GMPq::Rmpq_integer_p($x)
                       or (
-                          $y < 0
+                          ($y || return !!Math::GMPq::Rmpq_sgn($x)) < 0
                           ? Math::GMPq::Rmpq_cmp_si($x, $y, 1)
                           : Math::GMPq::Rmpq_cmp_ui($x, $y, 1)
                       ) != 0
@@ -4217,7 +4217,7 @@ package Sidef::Types::Number::Number {
       Math_GMPz__Scalar: {
             return (
                     (
-                     $y < 0
+                     ($y || return !!Math::GMPz::Rmpz_sgn($x)) < 0
                      ? Math::GMPz::Rmpz_cmp_si($x, $y)
                      : Math::GMPz::Rmpz_cmp_ui($x, $y)
                     ) != 0
@@ -4314,7 +4314,7 @@ package Sidef::Types::Number::Number {
       Math_MPFR__Scalar: {
             Math::MPFR::Rmpfr_nan_p($x) && return undef;
             return (
-                    $y < 0
+                    ($y || return Math::MPFR::Rmpfr_sgn($x)) < 0
                     ? Math::MPFR::Rmpfr_cmp_si($x, $y)
                     : Math::MPFR::Rmpfr_cmp_ui($x, $y)
                    );
@@ -4343,7 +4343,7 @@ package Sidef::Types::Number::Number {
 
       Math_GMPq__Scalar: {
             return (
-                    $y < 0
+                    ($y || return Math::GMPq::Rmpq_sgn($x)) < 0
                     ? Math::GMPq::Rmpq_cmp_si($x, $y, 1)
                     : Math::GMPq::Rmpq_cmp_ui($x, $y, 1)
                    );
@@ -4372,7 +4372,7 @@ package Sidef::Types::Number::Number {
 
       Math_GMPz__Scalar: {
             return (
-                    $y < 0
+                    ($y || return Math::GMPz::Rmpz_sgn($x)) < 0
                     ? Math::GMPz::Rmpz_cmp_si($x, $y)
                     : Math::GMPz::Rmpz_cmp_ui($x, $y)
                    );
