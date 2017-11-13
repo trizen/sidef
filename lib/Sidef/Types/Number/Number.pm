@@ -278,7 +278,7 @@ package Sidef::Types::Number::Number {
         if ((my $i = index($str, '.')) != -1) {
             my ($before, $after) = (substr($str, 0, $i), substr($str, $i + 1));
 
-            if (($after =~ tr/0//) == CORE::length($after)) {
+            if ($after == 0) {
                 return "$sign$before";
             }
 
