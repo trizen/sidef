@@ -7102,7 +7102,7 @@ package Sidef::Types::Number::Number {
             Math::MPFR::Rmpfr_add_ui($u, $u, 2, $ROUND);     # u = u+2
             Math::MPFR::Rmpfr_mul_2ui($u, $u, 1, $ROUND);    # u = u*2
 
-            Math::MPFR::Rmpfr_sgn($u) || return $n;          # `u` is zero
+            Math::MPFR::Rmpfr_zero_p($u) && return $n;       # `u` is zero
             Math::MPFR::Rmpfr_div($t, $t, $u, $ROUND);       # t = t/u
             return $t;
         }
