@@ -76,7 +76,7 @@ package Sidef::Types::Number::Number {
             if (index($num, '/') != -1) {
                 my $r = Math::GMPq::Rmpq_init();
                 eval { Math::GMPq::Rmpq_set_str($r, $num, $int_base); 1 } // goto &nan;
-                if (Math::GMPq::Rmpq_get_str($r, 10) !~ m{^\s*[-+]?[0-9]+\s*/\s*[-+]?[1-9]+[0-9]*\s*\z}) {
+                if (Math::GMPq::Rmpq_get_str($r, 10) !~ m{^\s*[-+]?[0-9]+\s*(?:/\s*[-+]?[1-9]+[0-9]*\s*)?\z}) {
                     goto &nan;
                 }
                 Math::GMPq::Rmpq_canonicalize($r);
@@ -329,6 +329,14 @@ package Sidef::Types::Number::Number {
                 my $q = Math::GMPq::Rmpq_init();
                 Math::GMPq::Rmpq_set_str($q, $frac, 10);
                 Math::GMPq::Rmpq_canonicalize($q);
+
+                # Return a mpz object when `q` is an integer
+                if (Math::GMPq::Rmpq_integer_p($q)) {
+                    my $z = Math::GMPz::Rmpz_init();
+                    Math::GMPz::Rmpz_set_q($z, $q);
+                    return $z;
+                }
+
                 return $q;
             }
             else {
