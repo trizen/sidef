@@ -235,8 +235,7 @@ package Sidef::Types::Number::Number {
             $sign = '';
         }
 
-        my $i;
-        if (($i = index($str, 'e')) != -1) {
+        if ((my $i = index($str, 'e')) != -1) {
 
             my $exp = substr($str, $i + 1);
 
@@ -277,18 +276,15 @@ package Sidef::Types::Number::Number {
                 }
             }
 
-            "$sign$numerator/$denominator";
+            return "$sign$numerator/$denominator";
         }
-        elsif (($i = index($str, '.')) != -1) {
+
+        if ((my $i = index($str, '.')) != -1) {
             my ($before, $after) = (substr($str, 0, $i), substr($str, $i + 1));
-            if (($after =~ tr/0//) == CORE::length($after)) {
-                return "$sign$before";
-            }
-            $sign . ("$before$after/1" =~ s/^0+//r) . ('0' x CORE::length($after));
+            return ($sign . "$before$after/1" . ('0' x CORE::length($after)));
         }
-        else {
-            "$sign$str";
-        }
+
+        return "$sign$str";
     }
 
     #
