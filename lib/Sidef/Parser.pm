@@ -284,7 +284,7 @@ package Sidef::Parser {
             operators_re    => do {
                 local $" = q{|};
 
-                # The order matters: longer first
+                # Longest prefix first
                 my @operators = map { quotemeta } qw(
 
                   ||= ||
