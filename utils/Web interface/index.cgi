@@ -24,7 +24,7 @@ print header(-charset => 'UTF-8'),
   start_html(
              -lang   => 'en',
              -title  => 'Sidef Programming Language',
-             -author => 'trizenx@gmail.com',
+             -author => 'trizen@protonmail.com',
              -base   => 'true',
              -meta   => {
                        'keywords'  => 'sidef programming language web interface',
