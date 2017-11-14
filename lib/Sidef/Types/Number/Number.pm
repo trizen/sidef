@@ -816,7 +816,7 @@ package Sidef::Types::Number::Number {
                 $sgn = substr($mantissa, 0, 1, '');
             }
 
-            $mantissa =~ /[^0]/ or return '0';
+            $mantissa == 0 and return '0';
 
             if (CORE::abs($exponent) < CORE::length($mantissa)) {
 
