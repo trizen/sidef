@@ -7505,38 +7505,19 @@ package Sidef::Types::Number::Number {
     }
 
     sub times {
-        my ($num, $block) = @_;
+        my ($x, $block) = @_;
 
-        if (__is_inf__($$num)) {
-            for (my $i = 0 ; ; ++$i) {
-                $block->run(
-                            $i <= 8192
-                            ? __PACKAGE__->_set_uint($i)
-                            : bless \Math::GMPz::Rmpz_init_set_ui($i)
-                           );
-            }
-            return $_[0];
+        $x = CORE::int(__numify__($$x));
+
+        for (my $i = 0 ; $i < $x ; ++$i) {
+            $block->run(
+                        $i <= 8192
+                        ? __PACKAGE__->_set_uint($i)
+                        : bless \Math::GMPz::Rmpz_init_set_ui($i)
+                       );
         }
 
-        $num = _any2mpz($$num) // return undef;
-
-        if (defined(my $ui = _any2ui($num))) {
-            for (my $i = 0 ; $i < $ui ; ++$i) {
-                $block->run(
-                            $i <= 8192
-                            ? __PACKAGE__->_set_uint($i)
-                            : bless \Math::GMPz::Rmpz_init_set_ui($i)
-                           );
-            }
-            return $_[0];
-        }
-
-        for (my $i = Math::GMPz::Rmpz_init_set_ui(0) ; Math::GMPz::Rmpz_cmp($i, $num) < 0 ; Math::GMPz::Rmpz_add_ui($i, $i, 1))
-        {
-            $block->run(bless(\Math::GMPz::Rmpz_init_set($i)));
-        }
-
-        $_[0];
+        return $_[0];
     }
 
     foreach my $name (
