@@ -1,12 +1,9 @@
 #!/usr/bin/ruby
 
-var p = gather {
-    1..100 -> each {|i|
-        take(i.nth_prime)
-    }
-}
-
-assert_eq(p, 1..Inf -> lazy.grep{.is_prime}.first(100))
+assert_eq(
+    1..100 -> map { .nth_prime },
+    1..Inf -> lazy.grep{.is_prime}.first(100)
+)
 
 assert_eq(1e3.nth_prime, 7919)
 assert_eq(1e4.nth_prime, 104729)
