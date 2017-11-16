@@ -6028,9 +6028,13 @@ package Sidef::Types::Number::Number {
 
         state $mpfr = Math::MPFR::Rmpfr_init2_nobless(64);
 
+        my $prev = 0;
+
         # Find Li^-1(x) using binary search
         while ($first < $last) {
-            my $mid = $first + (($last - $first) >> 1);
+            my $mid = $first + (($last - $first) / 2);
+
+            last if $prev == $mid;
 
             Math::MPFR::Rmpfr_set_d($mpfr, CORE::log($mid), $ROUND);
             Math::MPFR::Rmpfr_eint($mpfr, $mpfr, $ROUND);
@@ -6041,6 +6045,8 @@ package Sidef::Types::Number::Number {
             else {
                 $last = $mid;
             }
+
+            $prev = $mid;
         }
 
         return $first;
@@ -6246,11 +6252,17 @@ package Sidef::Types::Number::Number {
                 $prev_count = $count;
             }
 
+            my $nth_prime_upper = sub {
+                my ($n) = @_;
+                CORE::int($n * CORE::log($n) + $n * CORE::log(CORE::log($n)));
+            };
+
             my $count_approx = $up_approx - $i;
-            my $step = $count_approx < 1e6 ? $count_approx : $n > 1e8 ? 1e7 : 1e6;
+            my $step = $count_approx < 1e6 ? $count_approx : ($nth_prime_upper->($i + log($n) * 1e4) - $nth_prime_upper->($i));
 
             for (; ; $i += $step) {
                 my @primes = Math::Prime::Util::GMP::sieve_primes($i, $i + $step);
+
                 $count += @primes;
 
                 if ($count >= $n) {
