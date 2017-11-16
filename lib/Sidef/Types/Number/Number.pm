@@ -5014,6 +5014,10 @@ package Sidef::Types::Number::Number {
         my @digits;
         my $t = Math::GMPz::Rmpz_init_set($x);
 
+        if (!Math::GMPz::Rmpz_sgn($t)) {
+            push @digits, ZERO;
+        }
+
         while (Math::GMPz::Rmpz_cmpabs_ui($t, 0) > 0) {
             my $m = Math::GMPz::Rmpz_init();
 
