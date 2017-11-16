@@ -6258,7 +6258,11 @@ package Sidef::Types::Number::Number {
             };
 
             my $count_approx = $up_approx - $i;
-            my $step = $count_approx < 1e6 ? $count_approx : ($nth_prime_lower->($i + CORE::log($n) * 1e4) - $nth_prime_lower->($i));
+            my $step         = $nth_prime_lower->($i + CORE::log($n) * 1e4) - $nth_prime_lower->($i);
+
+            if ($count_approx < $step) {
+                $step = $count_approx;
+            }
 
             for (; ; $i += $step) {
                 my @primes = Math::Prime::Util::GMP::sieve_primes($i, $i + $step);
