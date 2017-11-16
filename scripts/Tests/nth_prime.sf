@@ -22,6 +22,7 @@ assert_eq(2e6.nth_prime, 32452843)
 assert_eq(5e6.nth_prime, 86028121)
 assert_eq(1e7.nth_prime, 179424673)
 assert_eq(5e7.nth_prime, 982451653)
+assert_eq(3e6.nth_prime, 49979687)
 #assert_eq(1e8.nth_prime, 2038074743)
 
 say "** Test passed!"

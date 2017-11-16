@@ -6032,7 +6032,7 @@ package Sidef::Types::Number::Number {
 
         # Find Li^-1(x) using binary search
         while ($first < $last) {
-            my $mid = $first + (($last - $first) / 2);
+            my $mid = $first + CORE::int(($last - $first) / 2);
 
             last if $prev == $mid;
 
@@ -6252,13 +6252,13 @@ package Sidef::Types::Number::Number {
                 $prev_count = $count;
             }
 
-            my $nth_prime_upper = sub {
+            my $nth_prime_lower = sub {
                 my ($n) = @_;
-                CORE::int($n * CORE::log($n) + $n * CORE::log(CORE::log($n)));
+                CORE::int($n * CORE::log($n) + $n * (CORE::log(CORE::log($n)) - 1));
             };
 
             my $count_approx = $up_approx - $i;
-            my $step = $count_approx < 1e6 ? $count_approx : ($nth_prime_upper->($i + CORE::log($n) * 1e4) - $nth_prime_upper->($i));
+            my $step = $count_approx < 1e6 ? $count_approx : ($nth_prime_lower->($i + CORE::log($n) * 1e4) - $nth_prime_lower->($i));
 
             for (; ; $i += $step) {
                 my @primes = Math::Prime::Util::GMP::sieve_primes($i, $i + $step);
