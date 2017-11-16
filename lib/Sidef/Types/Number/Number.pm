@@ -4987,8 +4987,6 @@ package Sidef::Types::Number::Number {
     sub digits {
         my ($x, $y) = @_;
 
-        my $native_base;    # true when `y` fits inside a native integer
-
         $x = _any2mpz($$x) // return undef;
 
         if (defined($y)) {
@@ -5000,15 +4998,10 @@ package Sidef::Types::Number::Number {
             if (Math::GMPz::Rmpz_cmpabs_ui($y, 1) <= 0) {
                 return undef;
             }
-
-            if (Math::GMPz::Rmpz_fits_ulong_p($y)) {
-                $y           = Math::GMPz::Rmpz_get_ui($y);
-                $native_base = 1;
-            }
         }
         else {
-            $y           = 10;
-            $native_base = 1;
+            state $ten = Math::GMPz::Rmpz_init_set_ui(10);
+            $y = $ten;
         }
 
         my @digits;
@@ -5020,16 +5013,8 @@ package Sidef::Types::Number::Number {
 
         while (Math::GMPz::Rmpz_cmpabs_ui($t, 0) > 0) {
             my $m = Math::GMPz::Rmpz_init();
-
-            if ($native_base) {
-                Math::GMPz::Rmpz_mod_ui($m, $t, $y);
-                Math::GMPz::Rmpz_tdiv_q_ui($t, $t, $y);
-            }
-            else {
-                Math::GMPz::Rmpz_mod($m, $t, $y);
-                Math::GMPz::Rmpz_tdiv_q($t, $t, $y);
-            }
-
+            Math::GMPz::Rmpz_mod($m, $t, $y);
+            Math::GMPz::Rmpz_tdiv_q($t, $t, $y);
             push @digits, bless \$m;
         }
 
@@ -5041,18 +5026,37 @@ package Sidef::Types::Number::Number {
 
         _valid(\$y);
 
-        my $str = as_int($x, $z) // return undef;
-        my @digits = split(//, "$str");
-        shift(@digits) if $digits[0] eq '-';
+        $x = _any2mpz($$x) // return undef;
+        $y = _any2si($$y)  // return undef;
 
-        $y = _any2si($$y) // return undef;
-        exists($digits[$y])
-          ? (
-             defined($z)
-             ? Sidef::Types::String::String->new($digits[$y])
-             : __PACKAGE__->_set_uint($digits[$y])
-            )
-          : undef;
+        if (defined($z)) {
+            _valid(\$z);
+
+            $z = _any2mpz($$z) // return undef;
+
+            # Not defined for z = {-1, 0, 1}
+            if (Math::GMPz::Rmpz_cmpabs_ui($z, 1) <= 0) {
+                return undef;
+            }
+        }
+        else {
+            state $ten = Math::GMPz::Rmpz_init_set_ui(10);
+            $z = $ten;
+        }
+
+        if ($y < 0) {
+            $y += __ilog__($x, $z) + 1;
+            return undef if ($y < 0);
+        }
+
+        my $t = Math::GMPz::Rmpz_init();
+        my $u = Math::GMPz::Rmpz_init();
+
+        Math::GMPz::Rmpz_pow_ui($t, $z, $y);
+        Math::GMPz::Rmpz_tdiv_q($u, $x, $t);
+        Math::GMPz::Rmpz_mod($u, $u, $z);
+
+        bless \$u;
     }
 
     sub length {
