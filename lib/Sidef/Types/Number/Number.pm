@@ -5007,8 +5007,13 @@ package Sidef::Types::Number::Number {
         my @digits;
         my $t = Math::GMPz::Rmpz_init_set($x);
 
-        if (!Math::GMPz::Rmpz_sgn($t)) {
+        my $sgn = Math::GMPz::Rmpz_sgn($t);
+
+        if ($sgn == 0) {
             push @digits, ZERO;
+        }
+        elsif ($sgn < 0) {
+            Math::GMPz::Rmpz_abs($t, $t);
         }
 
         while (Math::GMPz::Rmpz_cmpabs_ui($t, 0) > 0) {
@@ -5044,16 +5049,25 @@ package Sidef::Types::Number::Number {
             $z = $ten;
         }
 
+        my $t = Math::GMPz::Rmpz_init();
+        my $u = Math::GMPz::Rmpz_init_set($x);
+
+        my $sgn = Math::GMPz::Rmpz_sgn($u);
+
+        if ($sgn == 0) {
+            return ZERO;
+        }
+        elsif ($sgn < 0) {
+            Math::GMPz::Rmpz_abs($u, $u);
+        }
+
         if ($y < 0) {
-            $y += __ilog__($x, $z) + 1;
+            $y += __ilog__($u, $z) + 1;
             return undef if ($y < 0);
         }
 
-        my $t = Math::GMPz::Rmpz_init();
-        my $u = Math::GMPz::Rmpz_init();
-
         Math::GMPz::Rmpz_pow_ui($t, $z, $y);
-        Math::GMPz::Rmpz_tdiv_q($u, $x, $t);
+        Math::GMPz::Rmpz_tdiv_q($u, $u, $t);
         Math::GMPz::Rmpz_mod($u, $u, $z);
 
         bless \$u;
