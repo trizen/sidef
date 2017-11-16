@@ -4987,17 +4987,49 @@ package Sidef::Types::Number::Number {
     sub digits {
         my ($x, $y) = @_;
 
-        my $str = as_int($x, $y) // return undef;
-        my @digits = split(//, "$str");
-        shift(@digits) if $digits[0] eq '-';
+        my $native_base;    # true when `y` fits inside a native integer
 
-        Sidef::Types::Array::Array->new(
-            map {
-                defined($y)
-                  ? Sidef::Types::String::String->new($_)
-                  : __PACKAGE__->_set_uint($_)
-              } @digits
-        );
+        $x = _any2mpz($$x) // return undef;
+
+        if (defined($y)) {
+            _valid(\$y);
+
+            $y = _any2mpz($$y) // return undef;
+
+            # Not defined for y = {-1, 0, 1}
+            if (Math::GMPz::Rmpz_cmpabs_ui($y, 1) <= 0) {
+                return undef;
+            }
+
+            if (Math::GMPz::Rmpz_fits_ulong_p($y)) {
+                $y           = Math::GMPz::Rmpz_get_ui($y);
+                $native_base = 1;
+            }
+        }
+        else {
+            $y           = 10;
+            $native_base = 1;
+        }
+
+        my @digits;
+        my $t = Math::GMPz::Rmpz_init_set($x);
+
+        while (Math::GMPz::Rmpz_cmpabs_ui($t, 0) > 0) {
+            my $m = Math::GMPz::Rmpz_init();
+
+            if ($native_base) {
+                Math::GMPz::Rmpz_mod_ui($m, $t, $y);
+                Math::GMPz::Rmpz_tdiv_q_ui($t, $t, $y);
+            }
+            else {
+                Math::GMPz::Rmpz_mod($m, $t, $y);
+                Math::GMPz::Rmpz_tdiv_q($t, $t, $y);
+            }
+
+            push @digits, bless \$m;
+        }
+
+        Sidef::Types::Array::Array->new(\@digits);
     }
 
     sub digit {
