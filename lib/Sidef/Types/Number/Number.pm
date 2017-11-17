@@ -4994,8 +4994,8 @@ package Sidef::Types::Number::Number {
 
             $y = _any2mpz($$y) // return undef;
 
-            # Not defined for y = {-1, 0, 1}
-            if (Math::GMPz::Rmpz_cmpabs_ui($y, 1) <= 0) {
+            # Not defined for y <= 1
+            if (Math::GMPz::Rmpz_cmp_ui($y, 1) <= 0) {
                 return undef;
             }
         }
@@ -5004,22 +5004,28 @@ package Sidef::Types::Number::Number {
             $y = $ten;
         }
 
+        # Return faster when y <= 10
+        if (Math::GMPz::Rmpz_cmp_ui($y, 10) <= 0) {
+            my @digits = split(//, scalar reverse scalar Math::GMPz::Rmpz_get_str($x, Math::GMPz::Rmpz_get_ui($y)));
+            pop(@digits) if $digits[-1] eq '-';
+            return Sidef::Types::Array::Array->new([map { __PACKAGE__->_set_uint($_) } @digits]);
+        }
+
         my @digits;
         my $t = Math::GMPz::Rmpz_init_set($x);
 
         my $sgn = Math::GMPz::Rmpz_sgn($t);
 
         if ($sgn == 0) {
-            push @digits, ZERO;
+            return Sidef::Types::Array::Array->new([ZERO]);
         }
         elsif ($sgn < 0) {
             Math::GMPz::Rmpz_abs($t, $t);
         }
 
-        while (Math::GMPz::Rmpz_cmpabs_ui($t, 0) > 0) {
+        while (Math::GMPz::Rmpz_sgn($t) > 0) {
             my $m = Math::GMPz::Rmpz_init();
-            Math::GMPz::Rmpz_mod($m, $t, $y);
-            Math::GMPz::Rmpz_tdiv_q($t, $t, $y);
+            Math::GMPz::Rmpz_divmod($t, $m, $t, $y);
             push @digits, bless \$m;
         }
 
@@ -5039,8 +5045,8 @@ package Sidef::Types::Number::Number {
 
             $z = _any2mpz($$z) // return undef;
 
-            # Not defined for z = {-1, 0, 1}
-            if (Math::GMPz::Rmpz_cmpabs_ui($z, 1) <= 0) {
+            # Not defined for z <= 1
+            if (Math::GMPz::Rmpz_cmp_ui($z, 1) <= 0) {
                 return undef;
             }
         }
