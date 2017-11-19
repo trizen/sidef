@@ -1851,11 +1851,13 @@ Aliases: I<nth_prime>
 
 =cut
 
-=head2 prime_count
+=head2 primepi
 
-Number.prime_count() -> I<Obj>
+Number.primepi() -> I<Obj>
 
 Return the
+
+Aliases: I<prime_count>
 
 =cut
 

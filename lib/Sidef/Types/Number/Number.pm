@@ -6098,6 +6098,8 @@ package Sidef::Types::Number::Number {
               [7000000,        476648],         [6000000,         412849],        [5000000,        348513],
               [4000000,        283146],         [3500000,         250150],        [3000000,        216816],
               [2500000,        183072],         [2000000,         148933],        [1000000,        78498],
+              [500000,          41538],         [100000,            9592],        [50000,           5133],
+              [10000,            1229],         [5000,               669],        [1000,             168],
         ];
 #>>>
 
@@ -6190,14 +6192,18 @@ package Sidef::Types::Number::Number {
         }
 
         my ($x_n, $x_pi);
-        my ($y_n, $y_pi) = _prime_count_checkpoint($y);
+        my ($y_n, $y_pi);
 
-        if ($x < 1e6) {
-            $x_n = $x;
-            $x_pi = () = Math::Prime::Util::GMP::sieve_primes(2, $x);
+        if ($y >= 1e3) {
+            ($y_n, $y_pi) = _prime_count_checkpoint($y);
+        }
+
+        if ($x >= 1e3) {
+            ($x_n, $x_pi) = _prime_count_checkpoint($x);
         }
         else {
-            ($x_n, $x_pi) = _prime_count_checkpoint($x);
+            $x_n = $x;
+            ($x == 2) ? ($x_pi = 1) : ($x_pi = () = Math::Prime::Util::GMP::sieve_primes(2, $x));
         }
 
         if (defined($x_n) and defined($y_n)) {
@@ -6214,7 +6220,7 @@ package Sidef::Types::Number::Number {
 #>>>
 
                 my $prime_count = $y_count - $x_count;
-                $prime_count += 1 if Math::Prime::Util::GMP::is_prime($x);
+                $prime_count += 1 if ($x == 2 or Math::Prime::Util::GMP::is_prime($x));
 
                 return (
                         $prime_count < ULONG_MAX
@@ -6235,6 +6241,8 @@ package Sidef::Types::Number::Number {
                 : __PACKAGE__->_set_str('int', $prime_count)
                );
     }
+
+    *primepi = \&prime_count;
 
     sub nth_prime {
         my ($n) = @_;
