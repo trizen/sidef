@@ -6195,15 +6195,16 @@ package Sidef::Types::Number::Number {
         my ($y_n, $y_pi);
 
         if ($y >= 1e3) {
-            ($y_n, $y_pi) = _prime_count_checkpoint($y);
-        }
 
-        if ($x >= 1e3) {
-            ($x_n, $x_pi) = _prime_count_checkpoint($x);
-        }
-        else {
-            $x_n = $x;
-            ($x == 2) ? ($x_pi = 1) : ($x_pi = () = Math::Prime::Util::GMP::sieve_primes(2, $x));
+            ($y_n, $y_pi) = _prime_count_checkpoint($y);
+
+            if ($x >= 1e3) {
+                ($x_n, $x_pi) = _prime_count_checkpoint($x);
+            }
+            else {
+                $x_n = $x;
+                ($x == 2) ? ($x_pi = 1) : ($x_pi = () = Math::Prime::Util::GMP::sieve_primes(2, $x));
+            }
         }
 
         if (defined($x_n) and defined($y_n)) {
