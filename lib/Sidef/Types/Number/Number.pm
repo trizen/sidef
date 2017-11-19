@@ -6180,7 +6180,7 @@ package Sidef::Types::Number::Number {
         return ZERO if ($y < $x);
 
         # Support for arbitrary large integers (slow for wide ranges)
-        if ($y > ULONG_MAX) {
+        if ($y >= ULONG_MAX) {
 
             my $prime_count = Math::Prime::Util::GMP::prime_count("$x", "$y");
 
