@@ -6148,7 +6148,7 @@ package Sidef::Types::Number::Number {
         };
 
         my $count = 0;
-        my $step  = $nth_prime_lower->($y + CORE::log($y - $x + 1) * 2e3) - $nth_prime_lower->($y);
+        my $step  = $nth_prime_lower->($y + CORE::log($y) * 2e3) - $nth_prime_lower->($y);
 
         for (my $i = $x - 1 ; $i <= $y ; $i += $step) {
 
@@ -6221,7 +6221,7 @@ package Sidef::Types::Number::Number {
 #>>>
 
                 my $prime_count = $y_count - $x_count;
-                $prime_count += 1 if ($x == 2 or Math::Prime::Util::GMP::is_prime($x));
+                ++$prime_count if ($x == 2 or Math::Prime::Util::GMP::is_prime($x));
 
                 return (
                         $prime_count < ULONG_MAX
@@ -6274,12 +6274,7 @@ package Sidef::Types::Number::Number {
                 CORE::int($n * CORE::log($n) + $n * (CORE::log(CORE::log($n)) - 1));
             };
 
-            my $count_approx = $up_approx - $i;
-            my $step         = $nth_prime_lower->($i + CORE::log($n) * 2e3) - $nth_prime_lower->($i);
-
-            if ($count_approx < $step) {
-                $step = $count_approx;
-            }
+            my $step = $nth_prime_lower->($i + CORE::log($n) * 2e3) - $nth_prime_lower->($i);
 
             for (my $prev_count = $count ; ; $i += $step) {
 

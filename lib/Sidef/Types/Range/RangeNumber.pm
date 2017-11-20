@@ -126,22 +126,22 @@ package Sidef::Types::Range::RangeNumber {
             goto &sum_by;
         }
 
-        if ($self->{step}->is_one) {
-            $self->{_asc} //= 1;
-            state $two = Sidef::Types::Number::Number->_set_uint(2);
-            my ($from, $to) = @{$self}{'from', 'to'};
-            my $sum = ($from->add($to))->mul($to->sub($from)->add(Sidef::Types::Number::Number::ONE))->div($two);
-            return ($sum->is_neg ? ($arg // Sidef::Types::Number::Number::ZERO) : defined($arg) ? $sum->add($arg) : $sum);
+        # Formula:
+        #   sum(x .. y `by` z) = (floor((y - x)/z) + 1) * (z * floor((y - x)/z) + 2*x) / 2
+
+        my ($x, $y, $z) = @{$self}{'from', 'to', 'step'};
+
+        my $n = $y->sub($x)->div($z);
+
+        if ($n->is_neg) {
+            return ($arg // Sidef::Types::Number::Number::ZERO);
         }
 
-        my $sum = $arg // Sidef::Types::Number::Number::ZERO;
+        state $two = Sidef::Types::Number::Number->_set_uint(2);
 
-        my $iter = $self->iter->{code};
-        while (1) {
-            $sum = $sum->add($iter->() // last);
-        }
-
-        $sum;
+        $n = $n->int;
+        my $sum = $n->inc->mul($z->mul($n)->add($x->mul($two)))->div($two);
+        return (defined($arg) ? $sum->add($arg) : $sum);
     }
 
     sub prod_by {
