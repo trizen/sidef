@@ -160,8 +160,8 @@ Output:
                                                                                 
 ```
 
-### More examples:
-   * For more examples, see: [https://github.com/trizen/sidef-scripts](https://github.com/trizen/sidef-scripts)
+### More examples
+   * For more examples, please see: [https://github.com/trizen/sidef-scripts](https://github.com/trizen/sidef-scripts)
 
 ### INTERACTIVE MODE
 
@@ -169,10 +169,10 @@ Output:
 
 ### AVAILABILITY
 
-* CPAN: [https://metacpan.org/release/Sidef](https://metacpan.org/release/Sidef)
-* PKGS.org: [https://pkgs.org/download/Sidef](https://pkgs.org/download/Sidef)
-* Arch Linux: [https://aur.archlinux.org/packages/sidef/](https://aur.archlinux.org/packages/sidef/)
-* Slackware: [https://slackbuilds.org/repository/14.2/perl/perl-Sidef/](https://slackbuilds.org/repository/14.2/perl/perl-Sidef/)
+* **CPAN**: [https://metacpan.org/release/Sidef](https://metacpan.org/release/Sidef)
+* **PKGS.org**: [https://pkgs.org/download/Sidef](https://pkgs.org/download/Sidef)
+* **Arch Linux**: [https://aur.archlinux.org/packages/sidef/](https://aur.archlinux.org/packages/sidef/)
+* **Slackware**: [https://slackbuilds.org/repository/14.2/perl/perl-Sidef/](https://slackbuilds.org/repository/14.2/perl/perl-Sidef/)
 
 ### LICENSE AND COPYRIGHT
 
