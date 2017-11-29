@@ -433,36 +433,58 @@ package Sidef::Types::Block::Block {
 
     *thr = \&thread;
 
+    sub _iterate {
+        my ($callback, @objs) = @_;
+
+        foreach my $obj (@objs) {
+
+            my $sub = UNIVERSAL::can($obj, 'iter') // do {
+                my $arr = eval { $obj->to_a };
+                ref($arr) ? do { $obj = $arr; UNIVERSAL::can($obj, 'iter') } : ();
+            };
+
+            my $break;
+            my $iter = defined($sub) ? $sub->($obj) : $obj->iter;
+
+            # Optimization for Block iterator (almost always)
+            if (ref($iter) eq 'Sidef::Types::Block::Block') {
+
+                $iter = $iter->{code};
+
+                while (1) {
+                    $break = 1;
+                    $callback->(
+                        $iter->()
+                          // do { undef $break; last }
+                    );
+                    undef $break;
+                }
+            }
+            else {
+                while (1) {
+                    $break = 1;
+                    $callback->(
+                                $iter->run // do { undef $break; last }
+                               );
+                    undef $break;
+                }
+            }
+
+            last if $break;
+        }
+    }
+
     sub for {
         my ($self, @objs) = @_;
 
         my $block = $self->{code};
 
-        foreach my $obj (@objs) {
-            if (defined(my $sub = UNIVERSAL::can($obj, 'iter'))) {
-                my $iter  = $sub->($obj);
-                my $break = 0;
-                while (1) {
-                    $break = 1;
-                    $block->(
-                             $iter->run // do { $break = 0; last }
-                            );
-                    $break = 0;
-                }
-                last if $break;
-            }
-            else {
-                my $break = 0;
-                foreach my $item (UNIVERSAL::isa($obj, 'ARRAY') ? @$obj : @{$obj->to_a}) {
-                    $break = 1;
-                    $block->($item);
-                    $break = 0;
-                }
-                last if $break;
-            }
-        }
-
-        $self;
+        _iterate(
+            sub {
+                $block->(@_);
+            },
+            @objs
+                );
     }
 
     *each    = \&for;
@@ -474,29 +496,12 @@ package Sidef::Types::Block::Block {
         my @array;
         my $block = $self->{code};
 
-        foreach my $obj (@objs) {
-            if (defined(my $sub = UNIVERSAL::can($obj, 'iter'))) {
-                my $iter  = $sub->($obj);
-                my $break = 0;
-                while (1) {
-                    $break = 1;
-                    push @array, $block->(
-                                          $iter->run // do { $break = 0; last }
-                                         );
-                    $break = 0;
-                }
-                last if $break;
-            }
-            else {
-                my $break = 0;
-                foreach my $item (UNIVERSAL::isa($obj, 'ARRAY') ? @$obj : @{$obj->to_a}) {
-                    $break = 1;
-                    push @array, $block->($item);
-                    $break = 0;
-                }
-                last if $break;
-            }
-        }
+        _iterate(
+            sub {
+                push @array, $block->(@_);
+            },
+            @objs
+                );
 
         Sidef::Types::Array::Array->new(\@array);
     }
@@ -507,29 +512,14 @@ package Sidef::Types::Block::Block {
         my @array;
         my $block = $self->{code};
 
-        foreach my $obj (@objs) {
-            if (defined(my $sub = UNIVERSAL::can($obj, 'iter'))) {
-                my $iter  = $sub->($obj);
-                my $break = 0;
-                my $item;
-                while (1) {
-                    $break = 1;
-                    $item = $iter->run // do { $break = 0; last };
-                    push(@array, $item) if $block->($item);
-                    $break = 0;
+        _iterate(
+            sub {
+                if ($block->(@_)) {
+                    push @array, @_;
                 }
-                last if $break;
-            }
-            else {
-                my $break = 0;
-                foreach my $item (UNIVERSAL::isa($obj, 'ARRAY') ? @$obj : @{$obj->to_a}) {
-                    $break = 1;
-                    push(@array, $item) if $block->($item);
-                    $break = 0;
-                }
-                last if $break;
-            }
-        }
+            },
+            @objs
+                );
 
         Sidef::Types::Array::Array->new(\@array);
     }

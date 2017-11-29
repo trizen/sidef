@@ -1090,31 +1090,15 @@ HEADER
                 $multi = 1;
             }
 
-            $code = 'do {
-                foreach my $obj (my @tmp = ' . $expr . ') {' . <<'EOT';    # 'my @tmp' is really needed!
-                    my $sub = UNIVERSAL::can($obj, 'iter') // do { my $arr = eval { $obj->to_a }; ref($arr) ? do { $obj = $arr; UNIVERSAL::can($obj, 'iter') } : () };
-                    my $iter = defined($sub) ? $sub->($obj) : $obj->iter;
-                    $iter = $iter->{code} if (my $is_block = ref($iter) eq 'Sidef::Types::Block::Block');
-                    my $break;
-                    while (1) {
-                        $break = 1;
-EOT
+            $self->load_mod('Sidef::Types::Block::Block');
 
-            $code .=
-                'do {local @_ = ('
-              . ($multi ? '@{(' : '')
-              . '($is_block ? $iter->() : $iter->run) // do { undef $break; last }'
+            $code =
+                'Sidef::Types::Block::Block::_iterate(sub { '
+              . 'my ($item) = @_; '
+              . 'local @_ = '
+              . ($multi ? '@{('      : '') . '$item'
               . ($multi ? ')->to_a}' : '')
-              . "); $vars; $block };";
-
-            $code .= <<'EOT';
-                        undef $break;
-                    }
-                    last if $break;
-                }
-            }
-EOT
-
+              . "; $vars; $block }, $expr)";
         }
         elsif ($ref eq 'Sidef::Types::Bool::Ternary') {
             $code = '('
