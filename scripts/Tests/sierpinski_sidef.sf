@@ -21,10 +21,10 @@ class Sierpinski {
     # *
     method letter_i(n) {
         var c = ['*'];
-        { |i|
-            c = (c.map{|x| x*i } +
-                 c.map{|x| x*i } +
-                 c.map{|x| x*i }
+        {
+            c = (c.map{|x| x*2 } +
+                 c.map{|x| x*2 } +
+                 c.map{|x| x*2 }
                 );
         } * n;
         return c;
