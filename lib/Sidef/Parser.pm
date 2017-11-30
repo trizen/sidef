@@ -2938,7 +2938,9 @@ package Sidef::Parser {
                 }
 
                 # Parse array and hash fetchers ([...] and {...})
-                $self->parse_suffixes(code => $opt{code}, struct => \%struct) && redo;
+                if (/\G\.\h*(?=[\[\{])/gc or 1) {
+                    $self->parse_suffixes(code => $opt{code}, struct => \%struct) && redo;
+                }
 
                 # Tight bound operator
                 if (
