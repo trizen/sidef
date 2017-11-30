@@ -595,6 +595,7 @@ scripts/RosettaCode/zeckendorf_number_representation.sf
 scripts/RosettaCode/zig-zag_matrix.sf
 scripts/rsa_code.sf
 scripts/sets.sf
+scripts/sidef_from_sidef_logo.sf
 scripts/sidef_from_symbols.sf
 scripts/sierpinski_carpet.sf
 scripts/sierpinski_triangle.sf
