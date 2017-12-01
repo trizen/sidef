@@ -2050,6 +2050,42 @@ package Sidef::Types::Array::Array {
 
     *nth_perm = \&nth_permutation;
 
+    sub determinant {
+        my ($self) = @_;
+
+        my @m = map { [@$_] } @$self;
+
+        my $neg   = 0;
+        my $pivot = Sidef::Types::Number::Number::ONE;
+        my $end   = $#m;
+
+        foreach my $k (0 .. $end) {
+            my @r = ($k + 1 .. $end);
+
+            my $prev_pivot = $pivot;
+            $pivot = $m[$k][$k];
+
+            if ($pivot eq Sidef::Types::Number::Number::ZERO) {
+                my $i = List::Util::first(sub { $m[$_][$k] }, @r) // return Sidef::Types::Number::Number::ZERO;
+                @m[$i, $k] = @m[$k, $i];
+                $pivot = $m[$k][$k];
+                $neg ^= 1;
+            }
+
+            foreach my $i (@r) {
+                foreach my $j (@r) {
+                    $m[$i][$j] = $m[$i][$j]->mul($pivot);
+                    $m[$i][$j] = $m[$i][$j]->sub($m[$i][$k]->mul($m[$k][$j]));
+                    $m[$i][$j] = $m[$i][$j]->div($prev_pivot);
+                }
+            }
+        }
+
+        $neg ? $pivot->neg : $pivot;
+    }
+
+    *det = \&determinant;
+
     sub cartesian {
         my ($self, $block) = @_;
 

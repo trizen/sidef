@@ -4,30 +4,6 @@
 ## Determinant of a (square) matrix
 #
 
-func det(a) {
-    a = a.map{.map{_}}
-    var sign = +1
-    var pivot = 1
-
-    for k in ^a {
-      var r = (k+1 .. a.end)
-      var previous_pivot = pivot
-
-      if ((pivot = a[k][k]) == 0) {
-        a.swap(r.first_by { a[_][k] != 0 } \\ return 0, k)
-        pivot = a[k][k]
-        sign.neg!
-      }
-
-      for i,j in (r ~X r) {
-        a[i][j] *= pivot           ->
-                -= a[i][k]*a[k][j] ->
-                /= previous_pivot
-      }
-    }
-    sign * pivot
-}
-
 var d1 = det(
     [
         [1, 2,  3],
