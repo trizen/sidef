@@ -415,6 +415,16 @@ Aliases: I<complete_permutations>
 
 =cut
 
+=head2 det
+
+Array.det() -> I<Obj>
+
+Return the
+
+Aliases: I<determinant>
+
+=cut
+
 =head2 diff
 
 Array.diff() -> I<Obj>
