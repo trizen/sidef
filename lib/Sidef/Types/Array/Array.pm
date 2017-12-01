@@ -2063,7 +2063,7 @@ package Sidef::Types::Array::Array {
             my @r = ($k + 1 .. $end);
 
             my $prev_pivot = $pivot;
-            $pivot = $m[$k][$k];
+            $pivot = $m[$k][$k] // return Sidef::Types::Number::Number::ONE;
 
             if ($pivot eq Sidef::Types::Number::Number::ZERO) {
                 my $i = List::Util::first(sub { $m[$_][$k] }, @r) // return Sidef::Types::Number::Number::ZERO;
