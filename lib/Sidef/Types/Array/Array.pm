@@ -1346,8 +1346,8 @@ package Sidef::Types::Array::Array {
     *bshuffle = \&best_shuffle;
 
     sub pair_with {
-        my ($self, @args) = @_;
-        Sidef::Types::Array::MultiArray->new($self, @args);
+        my ($self, $arr) = @_;
+        Sidef::Types::Array::Pair->new($self, $arr);
     }
 
     sub reduce {
@@ -2110,7 +2110,7 @@ package Sidef::Types::Array::Array {
     sub zip {
         my ($self, $block) = @_;
 
-        my @arrays = @{$self};
+        my @arrays = @$self;
         my $min = List::Util::min(map { scalar @$_ } @arrays);
 
         my @new_array;
@@ -2129,10 +2129,12 @@ package Sidef::Types::Array::Array {
         defined($block) ? $self : bless(\@new_array, __PACKAGE__);
     }
 
+    *transpose = \&zip;
+
     sub zip_by {
         my ($self, $block) = @_;
 
-        my @arrays = @{$self};
+        my @arrays = @$self;
         my $min = List::Util::min(map { scalar @$_ } @arrays);
 
         my @new_array;

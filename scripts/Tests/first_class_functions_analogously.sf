@@ -20,6 +20,6 @@ var zi = (1 / (x + y));
 var numbers = [x, y, z];
 var inverses = [xi, yi, zi];
 
-numbers.pair_with(inverses).each { |g, f|
+[numbers, inverses].zip { |g,f|
     say multiplier(g, f)(0.5);
 }

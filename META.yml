@@ -56,8 +56,6 @@ provides:
     file: lib/Sidef/Time/Time.pm
   Sidef::Types::Array::Array:
     file: lib/Sidef/Types/Array/Array.pm
-  Sidef::Types::Array::MultiArray:
-    file: lib/Sidef/Types/Array/MultiArray.pm
   Sidef::Types::Array::Pair:
     file: lib/Sidef/Types/Array/Pair.pm
   Sidef::Types::Block::Block:

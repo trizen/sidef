@@ -86,18 +86,4 @@ do {
 }
 EOT
 
-#
-## MultiArray cyclic reference
-#
-
-var m = MultiArray([1,2], [3,4])
-m[1][1] = m
-assert_eq(dd.dump(m.get_value), <<'EOT'.chomp)
-do {
-  my $a = [[1, 2], [3, 'fix']];
-  $a->[1][1] = $a;
-  $a;
-}
-EOT
-
 say "** Test passed!"

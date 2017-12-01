@@ -51,11 +51,3 @@ say h
 var p = Pair(1, 2)
 p.second = p
 say p
-
-#
-## MultiArray cyclic reference
-#
-
-var m = MultiArray([1,2], [3,4])
-m[1][1] = m
-say m

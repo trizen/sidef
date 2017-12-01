@@ -82,6 +82,6 @@ str.each { |char|
     chars.append(ski.('letter_' + char)(size));
 }
 
-var marry = MultiArr.new;
-chars.each {|line| marry.append(line) };
-marry.each { |*a| say a.join('   ') };
+chars.zip { |*a|
+    say a.join('   ')
+}

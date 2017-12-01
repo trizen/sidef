@@ -35,8 +35,6 @@ lib/Sidef/Time/Time.pm
 lib/Sidef/Time/Time.pod
 lib/Sidef/Types/Array/Array.pm
 lib/Sidef/Types/Array/Array.pod
-lib/Sidef/Types/Array/MultiArray.pm
-lib/Sidef/Types/Array/MultiArray.pod
 lib/Sidef/Types/Array/Pair.pm
 lib/Sidef/Types/Array/Pair.pod
 lib/Sidef/Types/Block/Block.pm

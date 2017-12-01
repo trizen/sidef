@@ -232,9 +232,9 @@ var ski = Sierpinski('*');
 var word = "best";
 var chars = word.chars.map {|char| ski.("letter_#{char}")(size)};
 
-var marry = MultiArr.new;
-chars.each {|line| marry.append(line) };
-marry.each {|*a| a.join("   ").say };
+chars.zip { |*a|
+    say a.join('   ')
+};
 
 __END__
 

@@ -21,7 +21,6 @@ package Sidef::Deparse::Sidef {
                   Sidef::DataTypes::Bool::Bool            Bool
                   Sidef::DataTypes::Array::Array          Array
                   Sidef::DataTypes::Array::Pair           Pair
-                  Sidef::DataTypes::Array::MultiArray     MultiArray
                   Sidef::DataTypes::Hash::Hash            Hash
                   Sidef::DataTypes::Regex::Regex          Regex
                   Sidef::DataTypes::String::String        String
