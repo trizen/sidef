@@ -2133,7 +2133,7 @@ package Sidef::Types::Array::Array {
         return ($N, \@A, \@P);
     }
 
-    sub msolve {
+    sub matrix_solve {
         my ($self, $vector) = @_;
 
         my ($N, $A, $P) = $self->_LUP_decompose;
@@ -2155,6 +2155,8 @@ package Sidef::Types::Array::Array {
 
         bless \@x;
     }
+
+    *msolve = \&matrix_solve;
 
     sub invert {
         my ($self) = @_;
@@ -2186,11 +2188,7 @@ package Sidef::Types::Array::Array {
             }
         }
 
-        # Bless each row of the inverted matrix
-        foreach my $row (@I) {
-            bless $row;
-        }
-
+        bless $_ for @I;
         bless \@I;
     }
 
@@ -2217,7 +2215,7 @@ package Sidef::Types::Array::Array {
 
     *det = \&determinant;
 
-    sub mmul {
+    sub matrix_mul {
         my ($m1, $m2) = @_;
 
         my @a = map { [@$_] } @$m1;
@@ -2245,13 +2243,102 @@ package Sidef::Types::Array::Array {
             }
         }
 
-        # Bless each row of the new matrix
-        foreach my $row (@c) {
-            bless $row;
-        }
-
+        bless $_ for @c;
         bless \@c;
     }
+
+    *mmul = \&matrix_mul;
+
+    sub scalar_operator {
+        my ($self, $scalar, $op) = @_;
+
+        $op = "$op";
+
+        sub {    # XXX: cyclic references are not (yet) supported!
+            my @row;
+
+            foreach my $item (@_) {
+                if (ref($item) eq __PACKAGE__) {
+                    CORE::push(@row, __SUB__->(@$item));
+                }
+                else {
+                    CORE::push(@row, $item->$op($scalar));
+                }
+            }
+
+            bless \@row;
+          }
+          ->(@$self);
+    }
+
+    *scalar_op = \&scalar_operator;
+
+    sub scalar_add {
+        my ($self, $scalar) = @_;
+        $self->scalar_operator($scalar, '+');
+    }
+
+    *sadd = \&scalar_add;
+
+    sub scalar_sub {
+        my ($self, $scalar) = @_;
+        $self->scalar_operator($scalar, '-');
+    }
+
+    *ssub = \&scalar_sub;
+
+    sub scalar_mul {
+        my ($self, $scalar) = @_;
+        $self->scalar_operator($scalar, '*');
+    }
+
+    *smul = \&scalar_mul;
+
+    sub scalar_div {
+        my ($self, $scalar) = @_;
+        $self->scalar_operator($scalar, '/');
+    }
+
+    *sdiv = \&scalar_div;
+
+    sub wise_operator {
+        my ($m1, $m2, $op) = @_;
+
+        $op = "$op";
+
+        sub {    # XXX: cyclic references are not (yet) supported!
+            my ($r1, $r2) = @_;
+
+            my @row;
+            foreach my $i (0 .. $#{$r1}) {
+                if (ref($r1->[$i]) eq __PACKAGE__) {
+                    CORE::push(@row, __SUB__->($r1->[$i], $r2->[$i]));
+                }
+                else {
+                    $row[$i] = $r1->[$i]->$op($r2->[$i]);
+                }
+            }
+
+            bless \@row;
+          }
+          ->($m1, $m2);
+    }
+
+    *wise_op = \&wise_operator;
+
+    sub matrix_add {
+        my ($m1, $m2) = @_;
+        $m1->wise_operator($m2, '+');
+    }
+
+    *madd = \&matrix_add;
+
+    sub matrix_sub {
+        my ($m1, $m2) = @_;
+        $m1->wise_operator($m2, '-');
+    }
+
+    *msub = \&matrix_sub;
 
     sub cartesian {
         my ($self, $block) = @_;
