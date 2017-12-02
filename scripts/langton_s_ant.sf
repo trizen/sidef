@@ -19,7 +19,7 @@ loop {
     }
 
     ++moves;
-    [\x, \y]:dirs[dir %= dirs.len] -> each {|a,b| *a += b };
+    [[\x, \y], dirs[dir %= dirs.len]].zip {|a,b| *a += b }
 }
 
 say "Out of bounds after #{moves} moves at (#{x}, #{y})";

@@ -2050,7 +2050,7 @@ package Sidef::Types::Array::Array {
 
     *nth_perm = \&nth_permutation;
 
-    sub determinant {
+    sub det_bareiss {
         my ($self) = @_;
 
         my @m = map { [@$_] } @$self;
@@ -2082,6 +2082,137 @@ package Sidef::Types::Array::Array {
         }
 
         $neg ? $pivot->neg : $pivot;
+    }
+
+    # Code translated from Wikipedia (+ minor tweaks):
+    #   https://en.wikipedia.org/wiki/LU_decomposition#C_code_examples
+
+    sub _LUP_decompose {
+        my ($self) = @_;
+
+        my @A = map { [@$_] } @$self;
+        my $N = $#A;
+        my @P = (0 .. $N + 1);
+
+        foreach my $i (0 .. $N) {
+
+            my $maxA = 0;
+            my $imax = $i;
+
+            foreach my $k ($i .. $N) {
+                my $absA = ($A[$k][$i] // return ($N, \@A, \@P))->abs;
+
+                if (CORE::int($absA cmp $maxA) > 0) {
+                    $maxA = $absA;
+                    $imax = $k;
+                }
+            }
+
+            if ($imax != $i) {
+
+                @P[$i, $imax] = @P[$imax, $i];
+                @A[$i, $imax] = @A[$imax, $i];
+
+                ++$P[$N + 1];
+            }
+
+            foreach my $j ($i + 1 .. $N) {
+
+                if ($A[$i][$i] eq Sidef::Types::Number::Number::ZERO) {
+                    return ($N, \@A, \@P);
+                }
+
+                $A[$j][$i] = $A[$j][$i]->div($A[$i][$i]);
+
+                foreach my $k ($i + 1 .. $N) {
+                    $A[$j][$k] = $A[$j][$k]->sub($A[$j][$i]->mul($A[$i][$k]));
+                }
+            }
+        }
+
+        return ($N, \@A, \@P);
+    }
+
+    sub msolve {
+        my ($self, $vector) = @_;
+
+        my ($N, $A, $P) = $self->_LUP_decompose;
+
+        my @x = map { $vector->[$P->[$_]] } 0 .. $N;
+
+        foreach my $i (1 .. $N) {
+            foreach my $k (0 .. $i - 1) {
+                $x[$i] = $x[$i]->sub($A->[$i][$k]->mul($x[$k]));
+            }
+        }
+
+        for (my $i = $N ; $i >= 0 ; --$i) {
+            foreach my $k ($i + 1 .. $N) {
+                $x[$i] = $x[$i]->sub($A->[$i][$k]->mul($x[$k]));
+            }
+            $x[$i] = $x[$i]->div($A->[$i][$i]);
+        }
+
+        bless \@x;
+    }
+
+    sub invert {
+        my ($self) = @_;
+
+        my ($N, $A, $P) = $self->_LUP_decompose;
+
+        my @I;
+
+        foreach my $j (0 .. $N) {
+            foreach my $i (0 .. $N) {
+
+                $I[$i][$j] = (
+                              ($P->[$i] == $j)
+                              ? Sidef::Types::Number::Number::ONE
+                              : Sidef::Types::Number::Number::ZERO
+                             );
+
+                foreach my $k (0 .. $i - 1) {
+                    $I[$i][$j] = $I[$i][$j]->sub($A->[$i][$k]->mul($I[$k][$j]));
+                }
+            }
+
+            for (my $i = $N ; $i >= 0 ; --$i) {
+                foreach my $k ($i + 1 .. $N) {
+                    $I[$i][$j] = $I[$i][$j]->sub($A->[$i][$k]->mul($I[$k][$j]));
+                }
+
+                $I[$i][$j] = $I[$i][$j]->div($A->[$i][$i] // return __PACKAGE__->new(__PACKAGE__->new));
+            }
+        }
+
+        # Bless each row of the inverted matrix
+        foreach my $row (@I) {
+            bless $row;
+        }
+
+        bless \@I;
+    }
+
+    *inv     = \&invert;
+    *inverse = \&invert;
+
+    sub determinant {
+        my ($self) = @_;
+
+        my ($N, $A, $P) = $self->_LUP_decompose;
+
+        my $det = $A->[0][0] // return Sidef::Types::Number::Number::ONE;
+
+        foreach my $i (1 .. $N) {
+            $det = $det->mul($A->[$i][$i]);
+        }
+
+        if (($P->[$N + 1] - $N - 1) % 2 != 0) {
+            $det = $det->neg;
+        }
+
+        return $det;
     }
 
     *det = \&determinant;
