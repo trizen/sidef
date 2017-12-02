@@ -175,6 +175,55 @@ package Sidef::Types::Array::Array {
         bless \@array, __PACKAGE__;
     }
 
+    sub scalar_operator {
+        my ($self, $operator, $scalar) = @_;
+
+        $operator = "$operator" if ref($operator);
+
+        sub {    # XXX: cyclic references are not (yet) supported!
+            my @row;
+
+            foreach my $item (@_) {
+                if (ref($item) eq __PACKAGE__) {
+                    CORE::push(@row, __SUB__->(@$item));
+                }
+                else {
+                    CORE::push(@row, $item->$operator($scalar));
+                }
+            }
+
+            bless \@row;
+          }
+          ->(@$self);
+    }
+
+    *scalar_op = \&scalar_operator;
+
+    sub wise_operator {
+        my ($m1, $operator, $m2) = @_;
+
+        $operator = "$operator" if ref($operator);
+
+        sub {    # XXX: cyclic references are not (yet) supported!
+            my ($r1, $r2) = @_;
+
+            my @row;
+            foreach my $i (0 .. $#{$r1}) {
+                if (ref($r1->[$i]) eq __PACKAGE__) {
+                    CORE::push(@row, __SUB__->($r1->[$i], $r2->[$i]));
+                }
+                else {
+                    CORE::push(@row, $r1->[$i]->$operator($r2->[$i]));
+                }
+            }
+
+            bless \@row;
+          }
+          ->($m1, $m2);
+    }
+
+    *wise_op = \&wise_operator;
+
     sub mul {
         my ($self, $num) = @_;
         bless [(@$self) x CORE::int($num)], __PACKAGE__;
@@ -2249,93 +2298,44 @@ package Sidef::Types::Array::Array {
 
     *mmul = \&matrix_mul;
 
-    sub scalar_operator {
-        my ($self, $scalar, $op) = @_;
-
-        $op = "$op";
-
-        sub {    # XXX: cyclic references are not (yet) supported!
-            my @row;
-
-            foreach my $item (@_) {
-                if (ref($item) eq __PACKAGE__) {
-                    CORE::push(@row, __SUB__->(@$item));
-                }
-                else {
-                    CORE::push(@row, $item->$op($scalar));
-                }
-            }
-
-            bless \@row;
-          }
-          ->(@$self);
-    }
-
-    *scalar_op = \&scalar_operator;
-
     sub scalar_add {
         my ($self, $scalar) = @_;
-        $self->scalar_operator($scalar, '+');
+        $self->scalar_operator('+', $scalar);
     }
 
     *sadd = \&scalar_add;
 
     sub scalar_sub {
         my ($self, $scalar) = @_;
-        $self->scalar_operator($scalar, '-');
+        $self->scalar_operator('-', $scalar);
     }
 
     *ssub = \&scalar_sub;
 
     sub scalar_mul {
         my ($self, $scalar) = @_;
-        $self->scalar_operator($scalar, '*');
+        $self->scalar_operator('*', $scalar);
     }
 
     *smul = \&scalar_mul;
 
     sub scalar_div {
         my ($self, $scalar) = @_;
-        $self->scalar_operator($scalar, '/');
+        $self->scalar_operator('/', $scalar);
     }
 
     *sdiv = \&scalar_div;
 
-    sub wise_operator {
-        my ($m1, $m2, $op) = @_;
-
-        $op = "$op";
-
-        sub {    # XXX: cyclic references are not (yet) supported!
-            my ($r1, $r2) = @_;
-
-            my @row;
-            foreach my $i (0 .. $#{$r1}) {
-                if (ref($r1->[$i]) eq __PACKAGE__) {
-                    CORE::push(@row, __SUB__->($r1->[$i], $r2->[$i]));
-                }
-                else {
-                    $row[$i] = $r1->[$i]->$op($r2->[$i]);
-                }
-            }
-
-            bless \@row;
-          }
-          ->($m1, $m2);
-    }
-
-    *wise_op = \&wise_operator;
-
     sub matrix_add {
         my ($m1, $m2) = @_;
-        $m1->wise_operator($m2, '+');
+        $m1->wise_operator('+', $m2);
     }
 
     *madd = \&matrix_add;
 
     sub matrix_sub {
         my ($m1, $m2) = @_;
-        $m1->wise_operator($m2, '-');
+        $m1->wise_operator('-', $m2);
     }
 
     *msub = \&matrix_sub;
