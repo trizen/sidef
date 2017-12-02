@@ -29,15 +29,16 @@ package Sidef::Parser {
             hyper_ops => {
 
                 # type => [takes args, method name]
-                map    => [1, 'map_operator'],
-                pam    => [1, 'pam_operator'],
-                zip    => [1, 'zip_operator'],
-                wise   => [1, 'wise_operator'],
-                scalar => [1, 'scalar_operator'],
-                cross  => [1, 'cross_operator'],
-                unroll => [1, 'unroll_operator'],
-                reduce => [0, 'reduce_operator'],
-                lmap   => [0, 'map_operator'],
+                map     => [1, 'map_operator'],
+                pam     => [1, 'pam_operator'],
+                zip     => [1, 'zip_operator'],
+                wise    => [1, 'wise_operator'],
+                scalar  => [1, 'scalar_operator'],
+                rscalar => [1, 'rscalar_operator'],
+                cross   => [1, 'cross_operator'],
+                unroll  => [1, 'unroll_operator'],
+                reduce  => [0, 'reduce_operator'],
+                lmap    => [0, 'map_operator'],
             },
 
             static_obj_re => qr{\G
@@ -329,10 +330,11 @@ package Sidef::Parser {
                       »(?<unroll>[^\W\d]\w*+|(?&ops))«                # unroll operator (e.g.: »add« or »+«)
                     | >>(?<unroll>[^\W\d]\w*+|(?&ops))<<              # unroll operator (e.g.: >>add<< or >>+<<)
 
-                    | ~X(?<cross>[^\W\d]\w*+|(?&ops)|)                # cross operator (e.g.: ~X or ~X+)
-                    | ~Z(?<zip>[^\W\d]\w*+|(?&ops)|)                  # zip operator (e.g.: ~Z or ~Z+)
-                    | ~W(?<wise>[^\W\d]\w*+|(?&ops)|)                 # wise operator (e.g.: ~W or ~W+)
-                    | ~S(?<scalar>[^\W\d]\w*+|(?&ops)|)               # scalar operator (e.g.: ~S or ~S+)
+                    | ~X(?<cross>[^\W\d]\w*+|(?&ops)|)                # cross operator          (e.g.: ~X or ~X+)
+                    | ~Z(?<zip>[^\W\d]\w*+|(?&ops)|)                  # zip operator            (e.g.: ~Z or ~Z+)
+                    | ~W(?<wise>[^\W\d]\w*+|(?&ops)|)                 # wise operator           (e.g.: ~W or ~W+)
+                    | ~S(?<scalar>[^\W\d]\w*+|(?&ops)|)               # scalar operator         (e.g.: ~S or ~S+)
+                    | ~RS(?<rscalar>[^\W\d]\w*+|(?&ops)|)             # reverse scalar operator (e.g.: ~RS or ~RS/)
 
                     | »(?<map>[^\W\d]\w*+|(?&ops))»                   # mapping operator (e.g.: »add» or »+»)
                     | >>(?<map>[^\W\d]\w*+|(?&ops))>>                 # mapping operator (e.g.: >>add>> or >>+>>)

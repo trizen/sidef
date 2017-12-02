@@ -79,6 +79,8 @@ package Sidef::Types::Array::Array {
         bless \@array, __PACKAGE__;
     }
 
+    *unroll_op = \&unroll_operator;
+
     sub map_operator {
         my ($self, $operator, @args) = @_;
 
@@ -92,6 +94,8 @@ package Sidef::Types::Array::Array {
         bless \@array, __PACKAGE__;
     }
 
+    *map_op = \&map_operator;
+
     sub pam_operator {
         my ($self, $operator, $arg) = @_;
 
@@ -104,6 +108,8 @@ package Sidef::Types::Array::Array {
 
         bless \@array, __PACKAGE__;
     }
+
+    *pam_op = \&pam_operator;
 
     sub reduce_operator {
         my ($self, $operator, $initial) = @_;
@@ -121,6 +127,8 @@ package Sidef::Types::Array::Array {
         }
         $x;
     }
+
+    *reduce_op = \&reduce_operator;
 
     sub cross_operator {
         my ($self, $operator, $arg) = @_;
@@ -148,6 +156,8 @@ package Sidef::Types::Array::Array {
         bless \@array, __PACKAGE__;
     }
 
+    *cross_op = \&cross_operator;
+
     sub zip_operator {
         my ($self, $operator, $arg) = @_;
 
@@ -174,6 +184,8 @@ package Sidef::Types::Array::Array {
 
         bless \@array, __PACKAGE__;
     }
+
+    *zip_op = \&zip_operator;
 
     sub scalar_operator {
         my ($self, $operator, $scalar) = @_;
@@ -203,6 +215,35 @@ package Sidef::Types::Array::Array {
     }
 
     *scalar_op = \&scalar_operator;
+
+    sub rscalar_operator {
+        my ($self, $operator, $scalar) = @_;
+
+        $operator = "$operator" if ref($operator);
+
+        sub {    # XXX: cyclic references are not (yet) supported!
+            my @row;
+
+            foreach my $item (@_) {
+                if (ref($item) eq __PACKAGE__) {
+                    CORE::push(@row, __SUB__->(@$item));
+                }
+                else {
+                    if ($operator eq '') {
+                        CORE::push(@row, bless [$scalar, $item]);
+                    }
+                    else {
+                        CORE::push(@row, $scalar->$operator($item));
+                    }
+                }
+            }
+
+            bless \@row;
+          }
+          ->(@$self);
+    }
+
+    *rscalar_op = \&rscalar_operator;
 
     sub wise_operator {
         my ($m1, $operator, $m2) = @_;

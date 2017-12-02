@@ -329,11 +329,13 @@ Aliases: I<count_by>
 
 =cut
 
-=head2 cross_operator
+=head2 cross_op
 
-Array.cross_operator() -> I<Obj>
+Array.cross_op() -> I<Obj>
 
 Return the
+
+Aliases: I<cross_operator>
 
 =cut
 
@@ -873,11 +875,13 @@ Return the
 
 =cut
 
-=head2 map_operator
+=head2 map_op
 
-Array.map_operator() -> I<Obj>
+Array.map_op() -> I<Obj>
 
 Return the
+
+Aliases: I<map_operator>
 
 =cut
 
@@ -995,11 +999,13 @@ Return the
 
 =cut
 
-=head2 pam_operator
+=head2 pam_op
 
-Array.pam_operator() -> I<Obj>
+Array.pam_op() -> I<Obj>
 
 Return the
+
+Aliases: I<pam_operator>
 
 =cut
 
@@ -1117,11 +1123,13 @@ Return the
 
 =cut
 
-=head2 reduce_operator
+=head2 reduce_op
 
-Array.reduce_operator() -> I<Obj>
+Array.reduce_op() -> I<Obj>
 
 Return the
+
+Aliases: I<reduce_operator>
 
 =cut
 
@@ -1150,6 +1158,16 @@ Aliases: I<rindex_by>, I<last_index>
 Array.rotate() -> I<Obj>
 
 Return the
+
+=cut
+
+=head2 rscalar_op
+
+Array.rscalar_op() -> I<Obj>
+
+Return the
+
+Aliases: I<rscalar_operator>
 
 =cut
 
@@ -1397,11 +1415,13 @@ Aliases: I<unique_prefixes>
 
 =cut
 
-=head2 unroll_operator
+=head2 unroll_op
 
-Array.unroll_operator() -> I<Obj>
+Array.unroll_op() -> I<Obj>
 
 Return the
+
+Aliases: I<unroll_operator>
 
 =cut
 
@@ -1449,11 +1469,13 @@ Return the
 
 =cut
 
-=head2 zip_operator
+=head2 zip_op
 
-Array.zip_operator() -> I<Obj>
+Array.zip_op() -> I<Obj>
 
 Return the
+
+Aliases: I<zip_operator>
 
 =cut
 
