@@ -2096,13 +2096,13 @@ package Sidef::Types::Array::Array {
 
         foreach my $i (0 .. $N) {
 
-            my $maxA = 0;
+            my $maxA = Sidef::Types::Number::Number::ZERO;
             my $imax = $i;
 
             foreach my $k ($i .. $N) {
                 my $absA = ($A[$k][$i] // return ($N, \@A, \@P))->abs;
 
-                if (CORE::int($absA cmp $maxA) > 0) {
+                if ($absA->gt($maxA)) {
                     $maxA = $absA;
                     $imax = $k;
                 }
@@ -2118,7 +2118,7 @@ package Sidef::Types::Array::Array {
 
             foreach my $j ($i + 1 .. $N) {
 
-                if ($A[$i][$i] eq Sidef::Types::Number::Number::ZERO) {
+                if ($A[$i][$i]->is_zero) {
                     return ($N, \@A, \@P);
                 }
 
@@ -2208,7 +2208,7 @@ package Sidef::Types::Array::Array {
             $det = $det->mul($A->[$i][$i]);
         }
 
-        if (($P->[$N + 1] - $N - 1) % 2 != 0) {
+        if (($P->[$N + 1] - $N) % 2 == 0) {
             $det = $det->neg;
         }
 
