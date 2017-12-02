@@ -98,5 +98,6 @@ assert_eq(b `madd` (b `smul` 3), [
     ])
 
 assert_eq(wise_op([1,2,[3]], '+', [4,5,[6]]), [5, 7, [9]])
+assert_eq(wise_op([1,2,3], '', [4,5,6]), [[1, 4], [2, 5], [3, 6]])
 
 say "** Test passed!"

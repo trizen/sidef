@@ -213,7 +213,12 @@ package Sidef::Types::Array::Array {
                     CORE::push(@row, __SUB__->($r1->[$i], $r2->[$i]));
                 }
                 else {
-                    CORE::push(@row, $r1->[$i]->$operator($r2->[$i]));
+                    if ($operator eq '') {
+                        CORE::push(@row, bless [$r1->[$i], $r2->[$i]]);
+                    }
+                    else {
+                        CORE::push(@row, $r1->[$i]->$operator($r2->[$i]));
+                    }
                 }
             }
 
