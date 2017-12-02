@@ -839,6 +839,16 @@ Aliases: I<leven>, I<levenshtein>
 
 =cut
 
+=head2 madd
+
+Array.madd() -> I<Obj>
+
+Return the
+
+Aliases: I<matrix_add>
+
+=cut
+
 =head2 make
 
 Array.make() -> I<Obj>
@@ -925,6 +935,8 @@ Array.mmul() -> I<Obj>
 
 Return the
 
+Aliases: I<matrix_mul>
+
 =cut
 
 =head2 msolve
@@ -932,6 +944,18 @@ Return the
 Array.msolve() -> I<Obj>
 
 Return the
+
+Aliases: I<matrix_solve>
+
+=cut
+
+=head2 msub
+
+Array.msub() -> I<Obj>
+
+Return the
+
+Aliases: I<matrix_sub>
 
 =cut
 
@@ -1129,6 +1153,36 @@ Return the
 
 =cut
 
+=head2 sadd
+
+Array.sadd() -> I<Obj>
+
+Return the
+
+Aliases: I<scalar_add>
+
+=cut
+
+=head2 scalar_op
+
+Array.scalar_op() -> I<Obj>
+
+Return the
+
+Aliases: I<scalar_operator>
+
+=cut
+
+=head2 sdiv
+
+Array.sdiv() -> I<Obj>
+
+Return the
+
+Aliases: I<scalar_div>
+
+=cut
+
 =head2 shift
 
 Array.shift() -> I<Obj>
@@ -1171,6 +1225,16 @@ Return the
 
 =cut
 
+=head2 smul
+
+Array.smul() -> I<Obj>
+
+Return the
+
+Aliases: I<scalar_mul>
+
+=cut
+
 =head2 sort
 
 Array.sort() -> I<Obj>
@@ -1192,6 +1256,16 @@ Return the
 Array.splice() -> I<Obj>
 
 Return the
+
+=cut
+
+=head2 ssub
+
+Array.ssub() -> I<Obj>
+
+Return the
+
+Aliases: I<scalar_sub>
 
 =cut
 
@@ -1344,6 +1418,16 @@ Return the
 Array.weighted_shuffle_by() -> I<Obj>
 
 Return the
+
+=cut
+
+=head2 wise_op
+
+Array.wise_op() -> I<Obj>
+
+Return the
+
+Aliases: I<wise_operator>
 
 =cut
 
