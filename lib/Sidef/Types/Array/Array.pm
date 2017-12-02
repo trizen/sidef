@@ -188,7 +188,12 @@ package Sidef::Types::Array::Array {
                     CORE::push(@row, __SUB__->(@$item));
                 }
                 else {
-                    CORE::push(@row, $item->$operator($scalar));
+                    if ($operator eq '') {
+                        CORE::push(@row, bless [$item, $scalar]);
+                    }
+                    else {
+                        CORE::push(@row, $item->$operator($scalar));
+                    }
                 }
             }
 

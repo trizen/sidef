@@ -32,6 +32,8 @@ package Sidef::Parser {
                 map    => [1, 'map_operator'],
                 pam    => [1, 'pam_operator'],
                 zip    => [1, 'zip_operator'],
+                wise   => [1, 'wise_operator'],
+                scalar => [1, 'scalar_operator'],
                 cross  => [1, 'cross_operator'],
                 unroll => [1, 'unroll_operator'],
                 reduce => [0, 'reduce_operator'],
@@ -329,6 +331,8 @@ package Sidef::Parser {
 
                     | ~X(?<cross>[^\W\d]\w*+|(?&ops)|)                # cross operator (e.g.: ~X or ~X+)
                     | ~Z(?<zip>[^\W\d]\w*+|(?&ops)|)                  # zip operator (e.g.: ~Z or ~Z+)
+                    | ~W(?<wise>[^\W\d]\w*+|(?&ops)|)                 # wise operator (e.g.: ~W or ~W+)
+                    | ~S(?<scalar>[^\W\d]\w*+|(?&ops)|)               # scalar operator (e.g.: ~S or ~S+)
 
                     | »(?<map>[^\W\d]\w*+|(?&ops))»                   # mapping operator (e.g.: »add» or »+»)
                     | >>(?<map>[^\W\d]\w*+|(?&ops))>>                 # mapping operator (e.g.: >>add>> or >>+>>)
