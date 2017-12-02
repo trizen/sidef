@@ -901,6 +901,14 @@ Return the
 
 =cut
 
+=head2 mmul
+
+Array.mmul() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 new
 
 Array.new() -> I<Obj>

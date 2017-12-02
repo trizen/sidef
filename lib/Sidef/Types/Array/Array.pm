@@ -2086,6 +2086,42 @@ package Sidef::Types::Array::Array {
 
     *det = \&determinant;
 
+    sub mmul {
+        my ($m1, $m2) = @_;
+
+        my @a = map { [@$_] } @$m1;
+        my @b = map { [@$_] } @$m2;
+
+        my @c;
+
+        my $a_rows = $#a;
+        my $b_rows = $#b;
+        my $b_cols = $#{$b[0]};
+
+        foreach my $i (0 .. $a_rows) {
+            foreach my $j (0 .. $b_cols) {
+                foreach my $k (0 .. $b_rows) {
+
+                    my $t = $a[$i][$k]->mul($b[$k][$j]);
+
+                    if (!defined($c[$i][$j])) {
+                        $c[$i][$j] = $t;
+                    }
+                    else {
+                        $c[$i][$j] = $c[$i][$j]->add($t);
+                    }
+                }
+            }
+        }
+
+        # Bless each row of the new matrix
+        foreach my $row (@c) {
+            bless $row;
+        }
+
+        bless \@c;
+    }
+
     sub cartesian {
         my ($self, $block) = @_;
 
