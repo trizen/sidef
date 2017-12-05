@@ -192,26 +192,36 @@ package Sidef::Types::Array::Array {
 
         $operator = "$operator" if ref($operator);
 
-        sub {    # XXX: cyclic references are not (yet) supported!
-            my @row;
+        my %addr;    # support for cyclic references
 
-            foreach my $item (@_) {
+        sub {
+            my ($obj) = @_;
+
+            my $refaddr = Scalar::Util::refaddr($obj);
+
+            exists($addr{$refaddr})
+              && return $addr{$refaddr};
+
+            my @array;
+            $addr{$refaddr} = bless \@array;
+
+            foreach my $item (@$obj) {
                 if (ref($item) eq __PACKAGE__) {
-                    CORE::push(@row, __SUB__->(@$item));
+                    CORE::push(@array, __SUB__->($item));
                 }
                 else {
                     if ($operator eq '') {
-                        CORE::push(@row, bless [$item, $scalar]);
+                        CORE::push(@array, bless [$item, $scalar]);
                     }
                     else {
-                        CORE::push(@row, $item->$operator($scalar));
+                        CORE::push(@array, $item->$operator($scalar));
                     }
                 }
             }
 
-            bless \@row;
+            $addr{$refaddr};
           }
-          ->(@$self);
+          ->($self);
     }
 
     *scalar_op = \&scalar_operator;
@@ -221,26 +231,36 @@ package Sidef::Types::Array::Array {
 
         $operator = "$operator" if ref($operator);
 
-        sub {    # XXX: cyclic references are not (yet) supported!
-            my @row;
+        my %addr;    # support for cyclic references
 
-            foreach my $item (@_) {
+        sub {
+            my ($obj) = @_;
+
+            my $refaddr = Scalar::Util::refaddr($obj);
+
+            exists($addr{$refaddr})
+              && return $addr{$refaddr};
+
+            my @array;
+            $addr{$refaddr} = bless \@array;
+
+            foreach my $item (@$obj) {
                 if (ref($item) eq __PACKAGE__) {
-                    CORE::push(@row, __SUB__->(@$item));
+                    CORE::push(@array, __SUB__->($item));
                 }
                 else {
                     if ($operator eq '') {
-                        CORE::push(@row, bless [$scalar, $item]);
+                        CORE::push(@array, bless [$scalar, $item]);
                     }
                     else {
-                        CORE::push(@row, $scalar->$operator($item));
+                        CORE::push(@array, $scalar->$operator($item));
                     }
                 }
             }
 
-            bless \@row;
+            $addr{$refaddr};
           }
-          ->(@$self);
+          ->($self);
     }
 
     *rscalar_op = \&rscalar_operator;
@@ -250,25 +270,39 @@ package Sidef::Types::Array::Array {
 
         $operator = "$operator" if ref($operator);
 
-        sub {    # XXX: cyclic references are not (yet) supported!
-            my ($r1, $r2) = @_;
+        my %addr;    # support for cyclic references
 
-            my @row;
-            foreach my $i (0 .. $#{$r1}) {
-                if (ref($r1->[$i]) eq __PACKAGE__) {
-                    CORE::push(@row, __SUB__->($r1->[$i], $r2->[$i]));
+        sub {
+            my ($obj1, $obj2) = @_;
+
+            my $refaddr1 = Scalar::Util::refaddr($obj1);
+            my $refaddr2 = Scalar::Util::refaddr($obj2);
+
+            exists($addr{$refaddr1})
+              && return $addr{$refaddr1};
+
+            exists($addr{$refaddr2})
+              && return $addr{$refaddr2};
+
+            my @array;
+
+            $addr{$refaddr2} = $addr{$refaddr1} = bless \@array;
+
+            for my $i (0 .. $#{$obj1}) {
+                if (ref($obj1->[$i]) eq __PACKAGE__) {
+                    CORE::push(@array, __SUB__->($obj1->[$i], $obj2->[$i]));
                 }
                 else {
                     if ($operator eq '') {
-                        CORE::push(@row, bless [$r1->[$i], $r2->[$i]]);
+                        CORE::push(@array, bless [$obj1->[$i], $obj2->[$i]]);
                     }
                     else {
-                        CORE::push(@row, $r1->[$i]->$operator($r2->[$i]));
+                        CORE::push(@array, $obj1->[$i]->$operator($obj2->[$i]));
                     }
                 }
             }
 
-            bless \@row;
+            $addr{$refaddr1};
           }
           ->($m1, $m2);
     }
@@ -597,17 +631,44 @@ package Sidef::Types::Array::Array {
     sub eq {
         my ($self, $array) = @_;
 
-        if ($#$self != $#$array) {
-            return (Sidef::Types::Bool::Bool::FALSE);
-        }
+        my %addr;    # support for cyclic references
 
-        my $i = -1;
-        foreach my $item (@$self) {
-            ($item eq $array->[++$i])
-              or return (Sidef::Types::Bool::Bool::FALSE);
-        }
+        my $sub = sub {
+            my ($a1, $a2) = @_;
 
-        (Sidef::Types::Bool::Bool::TRUE);
+            if ($#$a1 != $#$a2) {
+                return Sidef::Types::Bool::Bool::FALSE;
+            }
+
+            my $refaddr1 = Scalar::Util::refaddr($a1);
+            my $refaddr2 = Scalar::Util::refaddr($a2);
+
+            if ($refaddr1 == $refaddr2) {
+                return Sidef::Types::Bool::Bool::TRUE;
+            }
+
+            exists($addr{$refaddr1})
+              and return $addr{$refaddr1};
+
+            exists($addr{$refaddr2})
+              and return $addr{$refaddr2};
+
+            $addr{$refaddr1} = Sidef::Types::Bool::Bool::FALSE;
+            $addr{$refaddr2} = Sidef::Types::Bool::Bool::FALSE;
+
+            my $i = -1;
+            foreach my $item (@$a1) {
+                ($item eq $a2->[++$i])
+                  or return Sidef::Types::Bool::Bool::FALSE;
+            }
+
+            (Sidef::Types::Bool::Bool::TRUE);
+        };
+
+        no strict 'refs';
+        local *Sidef::Types::Array::Array::eq = $sub;
+        local *{'Sidef::Types::Array::Array::=='} = $sub;
+        $sub->($self, $array);
     }
 
     sub ne {
