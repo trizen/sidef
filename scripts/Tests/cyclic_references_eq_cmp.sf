@@ -52,4 +52,40 @@ assert_eq(x == y, true)
 assert_eq(x <=> y, 0)
 assert_eq(y <=> x, 0)
 
+do {
+    var x = Hash(a => 1, b => 2)
+    x{:c} = x
+
+    var z = Hash(a => 1, b => 2)
+    z{:c} = z
+
+    assert_eq(x, x)
+    assert_eq(z, z)
+    assert_ne(z, x)
+    assert_ne(x, z)
+
+    assert_eq(z{:c}, z)
+    assert_eq(x, x{:c})
+
+    assert_ne(x{:c}, z)
+}
+
+do {
+    var x = [1,2,3]
+    x[1] = x
+
+    var y = [1,2,3]
+    y[1] = y
+
+    assert_eq(x, x)
+    assert_ne(x, y)
+    assert_ne(y, x)
+
+    assert_eq(x[1], x)
+    assert_eq(y, y[1])
+
+    assert_ne(y[1], x)
+    assert_ne(y, x[1])
+}
+
 say "** Test passed!"

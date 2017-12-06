@@ -89,20 +89,48 @@ package Sidef::Types::Hash::Hash {
     *size = \&length;
 
     sub eq {
-        my ($self, $obj) = @_;
+        my ($self, $hash) = @_;
 
-        (%$self eq %{$obj})
-          or return (Sidef::Types::Bool::Bool::FALSE);
+        my %addr;    # support for cyclic references
 
-        while (my ($key, $value) = each %$self) {
-            exists($obj->{$key})
+        my $sub = sub {
+            my ($h1, $h2) = @_;
+
+            scalar(%$h1) eq scalar(%$h2)
               or return (Sidef::Types::Bool::Bool::FALSE);
 
-            $value eq $obj->{$key}
-              or return (Sidef::Types::Bool::Bool::FALSE);
-        }
+            my $refaddr1 = Scalar::Util::refaddr($h1);
+            my $refaddr2 = Scalar::Util::refaddr($h2);
 
-        (Sidef::Types::Bool::Bool::TRUE);
+            if ($refaddr1 == $refaddr2) {
+                return Sidef::Types::Bool::Bool::TRUE;
+            }
+
+            CORE::exists($addr{$refaddr1})
+              and return $addr{$refaddr1};
+
+            CORE::exists($addr{$refaddr2})
+              and return $addr{$refaddr2};
+
+            $addr{$refaddr1} = Sidef::Types::Bool::Bool::FALSE;
+            $addr{$refaddr2} = Sidef::Types::Bool::Bool::FALSE;
+
+            foreach my $key (CORE::keys(%$h1)) {
+
+                CORE::exists($h2->{$key})
+                  or return (Sidef::Types::Bool::Bool::FALSE);
+
+                $h1->{$key} eq $h2->{$key}
+                  or return (Sidef::Types::Bool::Bool::FALSE);
+            }
+
+            (Sidef::Types::Bool::Bool::TRUE);
+        };
+
+        no strict 'refs';
+        local *Sidef::Types::Hash::Hash::eq = $sub;
+        local *{'Sidef::Types::Hash::Hash::=='} = $sub;
+        $sub->($self, $hash);
     }
 
     sub ne {
@@ -118,7 +146,7 @@ package Sidef::Types::Hash::Hash {
             return (Sidef::Types::Bool::Bool::FALSE);
         }
 
-        while (my ($key) = each %$self) {
+        foreach my $key (CORE::keys(%$self)) {
             exists($obj->{$key})
               or return (Sidef::Types::Bool::Bool::FALSE);
         }
@@ -260,7 +288,7 @@ package Sidef::Types::Hash::Hash {
     sub merge_values {
         my ($self, $obj) = @_;
 
-        while (my ($key, undef) = each %$self) {
+        foreach my $key (CORE::keys(%$self)) {
             if (exists $obj->{$key}) {
                 $self->{$key} = $obj->{$key};
             }
