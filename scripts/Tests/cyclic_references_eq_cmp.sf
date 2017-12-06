@@ -68,6 +68,9 @@ do {
     assert_eq(x, x{:c})
 
     assert_ne(x{:c}, z)
+
+    assert_ne(x, Hash(a => 1, b => 2))
+    assert_ne(Hash(a => 1, b => 2), x)
 }
 
 do {
@@ -86,6 +89,9 @@ do {
 
     assert_ne(y[1], x)
     assert_ne(y, x[1])
+
+    assert_ne(x, [1,2,3])
+    assert_ne([1,2,3], y)
 }
 
 say "** Test passed!"
