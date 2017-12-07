@@ -64,6 +64,18 @@ do {
     assert_ne(z, x)
     assert_ne(x, z)
 
+    assert_eq(x <=> x, 0)
+    assert_eq(z <=> z, 0)
+
+    assert_ne(z <=> x, 0)
+    assert_ne(x <=> z, 0)
+
+    assert_eq(x <=> x{:c}, 0)
+    assert_eq(z{:c} <=> z, 0)
+
+    assert_ne(z{:c} <=> x, 0)
+    assert_ne(x <=> z{:c}, 0)
+
     assert_eq(z{:c}, z)
     assert_eq(x, x{:c})
 
@@ -84,6 +96,13 @@ do {
     assert_ne(x, y)
     assert_ne(y, x)
 
+    assert_eq(x <=> x, 0)
+    assert_ne(y <=> x, 0)
+    assert_ne(x <=> y, 0)
+
+    assert_eq(x <=> x[1], 0)
+    assert_eq(y[1] <=> y, 0)
+
     assert_eq(x[1], x)
     assert_eq(y, y[1])
 
@@ -92,6 +111,24 @@ do {
 
     assert_ne(x, [1,2,3])
     assert_ne([1,2,3], y)
+}
+
+do {
+    var p = Pair(1, 2)
+    p.second = p
+
+    var q = Pair(1, 2)
+    q.second = q
+
+    assert_ne(p, q)
+    assert_eq(q, q)
+    assert_eq(p, p)
+
+    assert_eq(p, p.second)
+    assert_eq(q.second, q)
+
+    assert_ne(p, q.second)
+    assert_ne(q.second, p)
 }
 
 say "** Test passed!"

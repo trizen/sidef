@@ -628,6 +628,68 @@ package Sidef::Types::Array::Array {
 
     *count_by = \&count;
 
+    sub cmp {
+        my ($self, $array) = @_;
+
+        my %addr;    # support for cyclic references
+
+        my $sub = sub {
+            my ($a1, $a2) = @_;
+
+            my $l1 = $#$a1;
+            my $l2 = $#$a2;
+
+            my $min = $l1 < $l2 ? $l1 : $l2;
+
+            my $refaddr1 = Scalar::Util::refaddr($a1);
+            my $refaddr2 = Scalar::Util::refaddr($a2);
+
+            if ($refaddr1 == $refaddr2) {
+                return Sidef::Types::Number::Number::ZERO;
+            }
+
+            exists($addr{$refaddr1})
+              and return $addr{$refaddr1};
+
+            exists($addr{$refaddr2})
+              and return $addr{$refaddr2};
+
+            my $cmp1 = $refaddr1 <=> $refaddr2;
+            my $cmp2 = $refaddr2 <=> $refaddr1;
+
+            $addr{$refaddr1} = (
+                                  $cmp1 == $cmp2 ? Sidef::Types::Number::Number::ZERO
+                                : $cmp1 < 0      ? Sidef::Types::Number::Number::MONE
+                                :                  Sidef::Types::Number::Number::ONE
+                               );
+
+            $addr{$refaddr2} = (
+                                  $cmp1 == $cmp2 ? Sidef::Types::Number::Number::ZERO
+                                : $cmp2 < 0      ? Sidef::Types::Number::Number::MONE
+                                :                  Sidef::Types::Number::Number::ONE
+                               );
+
+            foreach my $i (0 .. $min) {
+                if (my $cmp = CORE::int($a1->[$i] cmp $a2->[$i])) {
+                    return (
+                            $cmp < 0
+                            ? Sidef::Types::Number::Number::MONE
+                            : Sidef::Types::Number::Number::ONE
+                           );
+                }
+            }
+
+                $l1 == $l2 ? Sidef::Types::Number::Number::ZERO
+              : $l1 < $l2  ? Sidef::Types::Number::Number::MONE
+              :              Sidef::Types::Number::Number::ONE;
+        };
+
+        no strict 'refs';
+        local *Sidef::Types::Array::Array::cmp = $sub;
+        local *{'Sidef::Types::Array::Array::<=>'} = $sub;
+        $sub->($self, $array);
+    }
+
     sub eq {
         my ($self, $array) = @_;
 
@@ -2032,26 +2094,6 @@ package Sidef::Types::Array::Array {
     sub sort_by {
         my ($self, $block) = @_;
         bless [map { $_->[0] } sort { $a->[1] cmp $b->[1] } map { [$_, scalar $block->run($_)] } @$self], __PACKAGE__;
-    }
-
-    sub cmp {
-        my ($self, $arg) = @_;
-
-        my $l1 = $#$self;
-        my $l2 = $#$arg;
-
-        my $cmp;
-        my $min = $l1 < $l2 ? $l1 : $l2;
-
-        foreach my $i (0 .. $min) {
-            if ($cmp = CORE::int($self->[$i] cmp $arg->[$i])) {
-                return ($cmp < 0 ? Sidef::Types::Number::Number::MONE : Sidef::Types::Number::Number::ONE);
-            }
-        }
-
-            $l1 == $l2 ? Sidef::Types::Number::Number::ZERO
-          : $l1 < $l2  ? Sidef::Types::Number::Number::MONE
-          :              Sidef::Types::Number::Number::ONE;
     }
 
     # Inserts an object between each element
