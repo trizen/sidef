@@ -81,6 +81,21 @@ do {
 
     assert_ne(x{:c}, z)
 
+    assert_ne(x.values, z.values)
+    assert_ne(x.values <=> z.values, 0)
+
+    assert_eq(x.values, x{:c}.values)
+    assert_eq(x.values <=> x{:c}.values, 0)
+
+    assert_ne(x.values.sort <=> z.values.sort, 0)
+    assert_ne(x.values.sort.flip <=> z.values.sort.flip, 0)
+
+    assert_eq(x.values.sort <=> x{:c}.values.sort, 0)
+    assert_eq(x.values.sort.flip <=> x{:c}.values.sort.flip, 0)
+
+    assert_eq(x.values.sort <=> x.values.sort.flip, -1)
+    assert_eq(x.values.sort.flip <=> x.values.sort, 1)
+
     assert_ne(x, Hash(a => 1, b => 2))
     assert_ne(Hash(a => 1, b => 2), x)
 }
