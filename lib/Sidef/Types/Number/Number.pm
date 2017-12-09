@@ -3649,6 +3649,14 @@ package Sidef::Types::Number::Number {
         $x = _any2mpfr($$x);
         $y = _any2mpfr($$y);
 
+        state $has_beta = Math::MPFR::MPFR_VERSION_MAJOR() >= 4;
+
+        if ($has_beta) {    # available since mpfr-4.0.0
+            my $r = Math::MPFR::Rmpfr_init2($PREC);
+            Math::MPFR::Rmpfr_beta($r, $x, $y, $ROUND);
+            return bless \$r;
+        }
+
         my $t1 = Math::MPFR::Rmpfr_init2(CORE::int($PREC));    # gamma(x+y)
         my $t2 = Math::MPFR::Rmpfr_init2(CORE::int($PREC));    # gamma(y)
 
