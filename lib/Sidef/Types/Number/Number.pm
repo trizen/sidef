@@ -240,11 +240,14 @@ package Sidef::Types::Number::Number {
             my $exp = substr($str, $i + 1);
 
             # Handle specially numbers with very big exponents
-            # (it's not a very good solution, but I hope it's only temporary)
+            # (not a very good solution, but this will happen very rarely, if ever)
             if (CORE::abs($exp) >= 1000000) {
-                Math::MPFR::Rmpfr_set_str((my $mpfr = Math::MPFR::Rmpfr_init2(CORE::int($PREC))), "$sign$str", 10, $ROUND);
-                Math::MPFR::Rmpfr_get_q((my $mpq = Math::GMPq::Rmpq_init()), $mpfr);
-                return Math::GMPq::Rmpq_get_str($mpq, 10);
+                my $fr = Math::MPFR::Rmpfr_init2($PREC);
+                Math::MPFR::Rmpfr_set_str($fr, "$sign$str", 10, $ROUND);
+                my $q = Math::GMPq::Rmpq_init();
+                Math::MPFR::Rmpfr_get_q($q, $fr);
+                Math::GMPq::Rmpq_canonicalize($q);
+                return Math::GMPq::Rmpq_get_str($q, 10);
             }
 
             my ($before, $after) = split(/\./, substr($str, 0, $i));
@@ -561,6 +564,7 @@ package Sidef::Types::Number::Number {
             if (Math::MPFR::Rmpfr_number_p($x)) {
                 my $q = Math::GMPq::Rmpq_init();
                 Math::MPFR::Rmpfr_get_q($q, $x);
+                Math::GMPq::Rmpq_canonicalize($q);
                 return $q;
             }
             return;
