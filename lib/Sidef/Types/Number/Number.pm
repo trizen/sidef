@@ -1379,9 +1379,22 @@ package Sidef::Types::Number::Number {
         }
 
       Math_GMPz__Math_MPFR: {
+
+#<<<
+            state $has_z_sub = (Math::MPFR::MPFR_VERSION_MAJOR() == 3
+                             && Math::MPFR::MPFR_VERSION_MINOR() >= 1)
+                             || Math::MPFR::MPFR_VERSION_MAJOR() > 3;
+#>>>
+
             my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-            Math::MPFR::Rmpfr_sub_z($r, $y, $x, $ROUND);
-            Math::MPFR::Rmpfr_neg($r, $r, $ROUND);
+
+            $has_z_sub
+              ? Math::MPFR::Rmpfr_z_sub($r, $x, $y, $ROUND)
+              : do {
+                Math::MPFR::Rmpfr_sub_z($r, $y, $x, $ROUND);
+                Math::MPFR::Rmpfr_neg($r, $r, $ROUND);
+              };
+
             return $r;
         }
 
