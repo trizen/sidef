@@ -139,7 +139,7 @@ package Sidef::Types::Range::RangeNumber {
 
         state $two = Sidef::Types::Number::Number->_set_uint(2);
 
-        $n = $n->int;
+        $n = $n->floor;
         my $sum = $n->inc->mul($z->mul($n)->add($x->mul($two)))->div($two);
         return (defined($arg) ? $sum->add($arg) : $sum);
     }
