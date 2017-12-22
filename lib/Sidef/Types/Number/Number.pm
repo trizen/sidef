@@ -553,7 +553,6 @@ package Sidef::Types::Number::Number {
             if (Math::MPFR::Rmpfr_number_p($x)) {
                 my $q = Math::GMPq::Rmpq_init();
                 Math::MPFR::Rmpfr_get_q($q, $x);
-                Math::GMPq::Rmpq_canonicalize($q);
                 return $q;
             }
             return;
@@ -2081,7 +2080,7 @@ package Sidef::Types::Number::Number {
         _valid(\$y);
 
         $x = _any2mpz($$x) // goto &nan;
-        $y = _any2si($$y)  // goto &nan;
+        $y = _any2si($$y) // goto &nan;
 
         if ($y == 0) {
             Math::GMPz::Rmpz_sgn($x) || return (ZERO, MONE);    # 0^Inf = 0
@@ -2299,7 +2298,7 @@ package Sidef::Types::Number::Number {
         _valid(\$y);
 
         $x = _any2mpz($$x) // goto &nan;
-        $y = _any2si($$y)  // goto &nan;
+        $y = _any2si($$y) // goto &nan;
 
         my $r = Math::GMPz::Rmpz_init();
         Math::GMPz::Rmpz_pow_ui($r, $x, CORE::abs($y));
@@ -5052,7 +5051,7 @@ package Sidef::Types::Number::Number {
         _valid(\$y);
 
         $x = _any2mpz($$x) // return undef;
-        $y = _any2si($$y)  // return undef;
+        $y = _any2si($$y) // return undef;
 
         if (defined($z)) {
             _valid(\$z);
@@ -5690,7 +5689,7 @@ package Sidef::Types::Number::Number {
         _valid(\$y);
 
         $x = _any2mpz($$x) // (goto &nan);
-        $y = _any2si($$y)  // (goto &nan);
+        $y = _any2si($$y) //  (goto &nan);
 
         my $r = Math::GMPz::Rmpz_init_set($x);
 
@@ -5732,7 +5731,7 @@ package Sidef::Types::Number::Number {
         _valid(\$y);
 
         $x = _any2mpz($$x) // (goto &nan);
-        $y = _any2si($$y)  // (goto &nan);
+        $y = _any2si($$y) //  (goto &nan);
 
         my $r = Math::GMPz::Rmpz_init_set($x);
         Math::GMPz::Rmpz_add_ui($r, $r, CORE::abs($y));
@@ -5839,7 +5838,7 @@ package Sidef::Types::Number::Number {
         _valid(\$p);
 
         $n = _any2mpz($$n) // goto &nan;
-        $p = _any2ui($$p)  // goto &nan;
+        $p = _any2ui($$p) // goto &nan;
 
         # Unbox `n` when it fits inside a native unsigned integer
         my $native_n = 0;
@@ -5924,7 +5923,7 @@ package Sidef::Types::Number::Number {
         _valid(\$y);
 
         $x = _any2mpz($$x) // (goto &nan);
-        $y = _any2si($$y)  // (goto &nan);
+        $y = _any2si($$y) //  (goto &nan);
 
         my $r = Math::GMPz::Rmpz_init();
 
@@ -7213,7 +7212,7 @@ package Sidef::Types::Number::Number {
 
         _valid(\$y);
 
-        $y = _any2si($$y)  // (goto &nan);
+        $y = _any2si($$y) //  (goto &nan);
         $x = _any2mpz($$x) // (goto &nan);
 
         my $r = Math::GMPz::Rmpz_init();
@@ -7232,7 +7231,7 @@ package Sidef::Types::Number::Number {
 
         _valid(\$y);
 
-        $y = _any2si($$y)  // (goto &nan);
+        $y = _any2si($$y) //  (goto &nan);
         $x = _any2mpz($$x) // (goto &nan);
 
         my $r = Math::GMPz::Rmpz_init();

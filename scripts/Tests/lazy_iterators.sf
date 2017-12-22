@@ -49,3 +49,7 @@ var ok = false
 try { f("asd") }
 catch { ok = true }
 assert_eq(ok, true)
+
+assert_eq(^Inf -> lazy.map { polygonal(_, 3) }.first_by { |n|
+    n.sigma0 > 10
+}, 120)
