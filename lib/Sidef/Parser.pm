@@ -49,7 +49,6 @@ package Sidef::Parser {
                      | false\b                        (?{ Sidef::Types::Bool::Bool::FALSE })
                      | next\b                         (?{ state $x = bless({}, 'Sidef::Types::Block::Next') })
                      | break\b                        (?{ state $x = bless({}, 'Sidef::Types::Block::Break') })
-                     | continue\b                     (?{ state $x = bless({}, 'Sidef::Types::Block::Continue') })
                      | Block\b                        (?{ state $x = bless({}, 'Sidef::DataTypes::Block::Block') })
                      | Backtick\b                     (?{ state $x = bless({}, 'Sidef::DataTypes::Glob::Backtick') })
                      | ARGF\b                         (?{ state $x = bless({}, 'Sidef::Meta::Glob::ARGF') })
@@ -1794,10 +1793,16 @@ package Sidef::Parser {
                 return bless({expr => $expr, block => $block}, 'Sidef::Types::Block::Case');
             }
 
-            # "default {...}" construct
-            if (exists($self->{current_given}) && /\Gdefault\h*(?=\{)/gc) {
+            # "default {...}" or "else { ... }" construct for `given/when`
+            if (exists($self->{current_given}) && /\G(?:default|else)\h*(?=\{)/gc) {
                 my $block = $self->parse_block(code => $opt{code});
                 return bless({block => $block}, 'Sidef::Types::Block::Default');
+            }
+
+            # `continue` keyword inside a given/when construct
+            if (exists($self->{current_given}) && /\Gcontinue\b/gc) {
+                state $x = bless({}, 'Sidef::Types::Block::Continue');
+                return $x;
             }
 
             # "do {...}" construct

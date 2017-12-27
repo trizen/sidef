@@ -33,7 +33,7 @@ func orbital_state_vectors(
     var l = (eccentricity == 1 ? 2*semimajor_axis
                                : semimajor_axis*(1 - eccentricity**2))
 
-    var (c, s) = given(true_anomaly) { (.cos, .sin) }
+    var (c, s) = with(true_anomaly) { (.cos, .sin) }
 
     var r = l/(1 + eccentricity*c)
     var rprime = (s * r**2 / l)

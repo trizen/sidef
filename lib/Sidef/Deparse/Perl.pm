@@ -1137,12 +1137,15 @@ HEADER
         }
         elsif ($ref eq 'Sidef::Types::Block::Given') {
             $self->top_add(q{no warnings 'experimental::smartmatch';});
+
             my $vars = join(',', map { $self->_dump_var($_) } @{$obj->{block}{init_vars}{vars}});
+
             $code =
-                "do{given ((my ($vars) = "
+                "do { my \@given_values; my \$continue = 1; my \$given_value = (my ($vars) = "
               . $self->deparse_args($obj->{expr})
-              . ')[-1])'
-              . $self->deparse_block_with_scope($obj->{block}) . '}';
+              . ')[-1];' . 'do '
+              . $self->deparse_block_with_scope($obj->{block})
+              . '; @given_values }';
         }
         elsif ($ref eq 'Sidef::Types::Block::When') {
             my $vars = join(',', map { $self->_dump_var($_) } @{$obj->{block}{init_vars}{vars}});
@@ -1152,17 +1155,11 @@ HEADER
                 $arg = "(my ($vars) = $arg)[-1]";
             }
 
-            my $temp = $self->deparse_block_with_scope($obj->{block});
-
-            if ($] >= 5.027007) {
-                $code =
-                    "do { my \$t = $arg; my \$v = "
-                  . "( defined(\$t) &&  defined(\$_)) ? do { whereis(\$t) $temp } : "
-                  . "(!defined(\$t) && !defined(\$_)) ? do { whereso(1) $temp   } : (); \$v };";
-            }
-            else {
-                $code = 'when($_~~' . $arg . ')' . $temp;
-            }
+            $code =
+                "do{my \$t = $arg;"
+              . "if (\$continue and (defined(\$given_value) ? defined(\$t) ? (\$given_value ~~ \$t) : 0 : 1)) {"
+              . "\$continue = 0; \@given_values = do"
+              . $self->deparse_block_with_scope($obj->{block}) . "}};";
         }
         elsif ($ref eq 'Sidef::Types::Block::Case') {
             my $vars = join(',', map { $self->_dump_var($_) } @{$obj->{block}{init_vars}{vars}});
@@ -1172,25 +1169,17 @@ HEADER
                 $arg = "(my ($vars) = $arg)[-1]";
             }
 
-            my $temp = $self->deparse_block_with_scope($obj->{block});
-
-            if ($] >= 5.027007) {
-                $code = 'whereso(' . $arg . ')' . $temp;
-            }
-            else {
-                $code = 'when(!!' . $arg . ')' . $temp;
-            }
+            $code =
+                "if (\$continue and $arg) { \$continue = 0;"
+              . "\@given_values = do"
+              . $self->deparse_block_with_scope($obj->{block}) . '}';
         }
         elsif ($ref eq 'Sidef::Types::Block::Default') {
-
-            my $temp = $self->deparse_block_with_scope($obj->{block});
-
-            if ($] >= 5.027007) {
-                $code = $temp;
-            }
-            else {
-                $code = 'default' . $temp;
-            }
+            $code =
+              "if (\$continue) { \$continue = 0; \@given_values = do" . $self->deparse_block_with_scope($obj->{block}) . '}';
+        }
+        elsif ($ref eq 'Sidef::Types::Block::Continue') {
+            $code = '$continue = 1';
         }
         elsif ($ref eq 'Sidef::Types::Block::With') {
             $code = 'do{';
@@ -1231,9 +1220,6 @@ HEADER
         }
         elsif ($ref eq 'Sidef::Types::Block::Next') {
             $code = 'next';
-        }
-        elsif ($ref eq 'Sidef::Types::Block::Continue') {
-            $code = 'continue';
         }
         elsif ($ref eq 'Sidef::Types::Block::Return') {
 
