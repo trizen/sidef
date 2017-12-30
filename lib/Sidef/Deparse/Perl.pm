@@ -1156,8 +1156,8 @@ HEADER
             }
 
             $code =
-                "do{my \$t = $arg;"
-              . "if (\$continue and (defined(\$given_value) ? defined(\$t) ? (\$given_value ~~ \$t) : 0 : 1)) {"
+                "if (\$continue) {my \$t = $arg;"
+              . "if (defined(\$given_value) ? defined(\$t) ? (\$given_value ~~ \$t) : 0 : 1) {"
               . "\$continue = 0; \@given_values = do"
               . $self->deparse_block_with_scope($obj->{block}) . "}};";
         }
