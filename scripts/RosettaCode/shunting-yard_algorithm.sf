@@ -31,7 +31,7 @@ func shunting_yard(prog) {
     func reduce (t)  { report("reduce #{t}"); res << t }
 
     while (inp) {
-        given(var t = inp.shift) {
+        given (inp.shift) { |t|
            when (/\d/) { reduce(t) }
            when ('(')  { shift(t) }
            when (')')  { var x; while (ops && (x = ops.pop) && (x != '(')) { reduce(x) } }

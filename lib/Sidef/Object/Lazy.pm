@@ -63,6 +63,12 @@ package Sidef::Object::Lazy {
     sub first {
         my ($self, $n) = @_;
 
+        if (!defined($n)) {
+            my @arr;
+            $self->_xs(sub { push(@arr, @_); 1; });
+            return $arr[0];
+        }
+
         if (ref($n) eq 'Sidef::Types::Block::Block') {
             return $self->first_by($n);
         }
