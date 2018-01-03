@@ -3066,19 +3066,32 @@ package Sidef::Types::Number::Number {
             goto Math_MPC__Math_MPC;
         }
 
-        # atan2(x, y) = atan(x/y)
       Math_MPC__Math_MPFR: {
-            my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
-            Math::MPC::Rmpc_div_fr($r, $x, $y, $ROUND);
-            Math::MPC::Rmpc_atan($r, $r, $ROUND);
-            return $r;
+            $y = _mpfr2mpc($y);
+            goto Math_MPC__Math_MPC;
         }
 
-        # atan2(x, y) = atan(x/y)
+        #
+        ## atan2(x, y) = -i * log((y + x*i) / sqrt(x^2 + y^2))
+        #
       Math_MPC__Math_MPC: {
-            my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
-            Math::MPC::Rmpc_div($r, $x, $y, $ROUND);
-            Math::MPC::Rmpc_atan($r, $r, $ROUND);
+            my $r = Math::MPC::Rmpc_init2($PREC);
+
+            Math::MPC::Rmpc_mul_i($r, $x, 1, $ROUND);
+            Math::MPC::Rmpc_add($r, $r, $y, $ROUND);
+
+            my $t1 = Math::MPC::Rmpc_init2($PREC);
+            my $t2 = Math::MPC::Rmpc_init2($PREC);
+
+            Math::MPC::Rmpc_sqr($t1, $x, $ROUND);
+            Math::MPC::Rmpc_sqr($t2, $y, $ROUND);
+            Math::MPC::Rmpc_add($t1, $t1, $t2, $ROUND);
+            Math::MPC::Rmpc_sqrt($t1, $t1, $ROUND);
+
+            Math::MPC::Rmpc_div($r, $r, $t1, $ROUND);
+            Math::MPC::Rmpc_log($r, $r, $ROUND);
+            Math::MPC::Rmpc_mul_i($r, $r, -1, $ROUND);
+
             return $r;
         }
     }

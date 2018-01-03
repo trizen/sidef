@@ -454,7 +454,7 @@ sub code_interactive {
             }
             elsif ($line eq 'copyright') {
                 print <<'EOT';
-Copyright © 2013-2017 Daniel Șuteu, Ioana Fălcușan
+Copyright © 2013-2018 Daniel Șuteu, Ioana Fălcușan
 All Rights Reserved.
 EOT
                 redo MAINLOOP;
