@@ -886,7 +886,12 @@ package Sidef::Types::Number::Number {
     }
 
     sub complex {
-        my ($x) = @_;
+        my ($x, $y) = @_;
+
+        if (defined $y) {
+            return Sidef::Types::Number::Complex->new($x, $y);
+        }
+
         ref($$x) eq 'Math::MPC' ? $x : bless \_any2mpc($$x);
     }
 
