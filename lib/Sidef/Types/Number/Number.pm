@@ -4899,7 +4899,7 @@ package Sidef::Types::Number::Number {
             Math::MPC::Rmpc_set($c, $x, $ROUND);
 
             for (1 .. $n) {
-                my $t = __floor__($c);
+                my $t = __round__($c, 0);
                 push @cfrac, bless \(_any2mpz($t) // $t);
 
                 Math::MPC::Rmpc_real($real_1, $c, $ROUND);
