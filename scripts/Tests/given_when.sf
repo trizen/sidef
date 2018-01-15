@@ -100,5 +100,7 @@ given([1,2,3]) {
 
 assert_eq(c2, 6);
 
+assert_eq( given(42) { when(42) { (3, 4) } } * 10, 40)
+assert_eq([given(42) { when(42) { (3, 4) } }], [3, 4])
 
 say "** Test passed!";

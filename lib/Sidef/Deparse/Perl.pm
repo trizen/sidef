@@ -387,8 +387,8 @@ HEADER
                      . 'defined($sub) ? $sub->($_) : CORE::int($_) } } '
                      . ($self->deparse_expr(ref($_) eq 'HASH' ? $_ : {self => $_})) . ')')
                   : $_
-              } @{$array}
-            );
+            } @{$array}
+        );
     }
 
     sub _dump_lookups {
@@ -402,8 +402,8 @@ HEADER
                   : ref($_) ?    ('(map { ref($_) eq "Sidef::Types::String::String" ? $$_ : "$_" }'
                                . ($self->deparse_expr(ref($_) eq 'HASH' ? $_ : {self => $_})) . ')')
                   : qq{"\Q$_\E"}
-              } @{$array}
-            );
+            } @{$array}
+        );
     }
 
     sub _dump_var_attr {
@@ -427,7 +427,7 @@ HEADER
                                    'sub{'
                                  . $self->_dump_sub_init_vars($_->{init_vars}{vars}[0])
                                  . $self->deparse_generic('', ';', '', $_->{code}) . '}'
-                             } @{$_->{subset_blocks}}
+                           } @{$_->{subset_blocks}}
                          )
                          . ']'
                       )
@@ -1118,7 +1118,7 @@ HEADER
                     map {
                         $self->_dump_string($_) . '=>'
                           . (defined($obj->{$_}) ? $self->deparse_expr({self => $obj->{$_}}) : 'undef')
-                      } sort keys(%{$obj})
+                    } sort keys(%{$obj})
                   )
                   . ')';
             }
@@ -1141,11 +1141,11 @@ HEADER
             my $vars = join(',', map { $self->_dump_var($_) } @{$obj->{block}{init_vars}{vars}});
 
             $code =
-                "do { my \@given_values; my \$continue = 1; my \$given_value = (my ($vars) = "
+                "sub { my \@given_values; my \$continue = 1; my \$given_value = (my ($vars) = "
               . $self->deparse_args($obj->{expr})
               . ')[-1];' . 'do '
               . $self->deparse_block_with_scope($obj->{block})
-              . '; @given_values }';
+              . '; wantarray ? @given_values : $given_values[-1] }->()';
         }
         elsif ($ref eq 'Sidef::Types::Block::When') {
             my $vars = join(',', map { $self->_dump_var($_) } @{$obj->{block}{init_vars}{vars}});
@@ -1313,7 +1313,7 @@ HEADER
                 map {
                     my ($type, $content) = $obj->{$_}->_dump;
                     'Sidef::Types::Number::Number->_set_str(' . "'$type', '$content'" . ')'
-                  } ('from', 'to', 'step')
+                } ('from', 'to', 'step')
             );
         }
         elsif ($ref eq 'Sidef::Types::Glob::Backtick') {
