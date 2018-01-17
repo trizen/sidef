@@ -911,10 +911,10 @@ package Sidef::Types::Number::Number {
             my ($callback, $n) = @_;
 
             while (1) {
-                Math::MPFR::Rmpfr_floor($t, $r);
+                Math::MPFR::Rmpfr_round($t, $r);
 
                 my $z = Math::GMPz::Rmpz_init();
-                Math::MPFR::Rmpfr_get_z($z, $t, $round_z);
+                Math::MPFR::Rmpfr_get_z($z, $t, $ROUND);
 
                 $callback->($z) && return 1;
 
