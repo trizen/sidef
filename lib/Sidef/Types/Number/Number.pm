@@ -4962,16 +4962,16 @@ package Sidef::Types::Number::Number {
             $n = @cfrac;
         }
 
+        my ($n1, $n2) = ($ZERO, $ONE);
+        my ($d1, $d2) = ($ONE,  $ZERO);
+
         my @convergents;
-        foreach my $k (1 .. $n) {
-            my @terms = map { $$_ } reverse(@cfrac[0 .. $k - 1]);
+        foreach my $z (map { $$_ } @cfrac) {
 
-            my $convergent = $terms[0];
-            foreach my $i (1 .. $#terms) {
-                $convergent = __add__($terms[$i], __inv__($convergent));
-            }
+            ($n1, $n2) = ($n2, __add__(__mul__($n2, $z), $n1));
+            ($d1, $d2) = ($d2, __add__(__mul__($d2, $z), $d1));
 
-            push @convergents, bless \$convergent;
+            push @convergents, bless \__div__($n2, $d2);
         }
 
         Sidef::Types::Array::Array->new(\@convergents);
