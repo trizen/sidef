@@ -721,7 +721,7 @@ package Sidef::Parser {
               /\G\h*\Q$end_delim\E/gc
               || $self->fatal_error(
                                     code  => $_,
-                                    pos   => pos,
+                                    pos   => pos($_),
                                     error => "can't find the closing delimiter: '$end_delim'",
                                    )
              );
@@ -750,7 +750,7 @@ package Sidef::Parser {
                 if (not defined($obj) or ref($obj) eq 'HASH') {
                     $self->fatal_error(
                                        code   => $_,
-                                       pos    => pos,
+                                       pos    => pos($_),
                                        error  => "invalid type <<$type>> for variable '$name'",
                                        reason => "expected a type, such as: Str, Num, File, etc...",
                                       );
@@ -874,7 +874,7 @@ package Sidef::Parser {
               /\G\h*\Q$end_delim\E/gc
               || $self->fatal_error(
                                     code  => $_,
-                                    pos   => pos,
+                                    pos   => pos($_),
                                     error => "can't find the closing delimiter: '$end_delim'",
                                    )
              );
@@ -1101,7 +1101,7 @@ package Sidef::Parser {
                 if (/\G\h*=\h*/gc) {
                     my $args = $self->parse_obj(code => $opt{code}, multiline => 1) // $self->fatal_error(
                                                                   code  => $_,
-                                                                  pos   => pos,
+                                                                  pos   => pos($_),
                                                                   error => "expected an expression after variable declaration",
                     );
 
@@ -1376,7 +1376,7 @@ package Sidef::Parser {
                 @{$vars}
                   || $self->fatal_error(
                                         code  => $_,
-                                        pos   => pos,
+                                        pos   => pos($_),
                                         error => q{expected one or more variable names after <enum>},
                                        );
 
@@ -2727,7 +2727,7 @@ package Sidef::Parser {
                             @arg = (
                                 map {
                                     { $self->{class} => [$_] }
-                                  } @{$arg->{$self->{class}}}
+                                } @{$arg->{$self->{class}}}
                             );
 
                             if (/\G\h*(?=\{)/gc) {

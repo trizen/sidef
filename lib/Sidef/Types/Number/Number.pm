@@ -902,58 +902,46 @@ package Sidef::Types::Number::Number {
 
         Math::MPFR::Rmpfr_number_p($x) || goto &nan;
 
-        my $t = Math::MPFR::Rmpfr_init2(CORE::int($PREC));    # temporary variable
-        my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        my $n1 = Math::GMPz::Rmpz_init_set_ui(0);
+        my $n2 = Math::GMPz::Rmpz_init_set_ui(1);
 
-        Math::MPFR::Rmpfr_set($r, $x, $ROUND);
-
-        my $num2cfrac = sub {
-            my ($callback, $n) = @_;
-
-            while (1) {
-                Math::MPFR::Rmpfr_round($t, $r);
-
-                my $z = Math::GMPz::Rmpz_init();
-                Math::MPFR::Rmpfr_get_z($z, $t, $ROUND);
-
-                $callback->($z) && return 1;
-
-                Math::MPFR::Rmpfr_sub($r, $r, $t, $ROUND);
-                Math::MPFR::Rmpfr_zero_p($r) && last;
-                Math::MPFR::Rmpfr_ui_div($r, 1, $r, $ROUND);
-            }
-        };
+        my $d1 = Math::GMPz::Rmpz_init_set_ui(1);
+        my $d2 = Math::GMPz::Rmpz_init_set_ui(0);
 
         my $q = Math::GMPq::Rmpq_init();
+        my $z = Math::GMPz::Rmpz_init();
 
-        my $cfrac2num = sub {
-            my (@f) = @_;
-
-            Math::GMPq::Rmpq_set_ui($q, 0, 1);
-
-            for (1 .. $#f) {
-                Math::GMPq::Rmpq_add_z($q, $q, CORE::pop(@f));
-                Math::GMPq::Rmpq_inv($q, $q);
-            }
-
-            Math::GMPq::Rmpq_add_z($q, $q, $f[0]);
-        };
-
-        my @cfrac;
         my $s = __stringify__($x);
-        my $u = Math::MPFR::Rmpfr_init2(CORE::int($PREC));    # temporary variable
 
-#<<<
-        $num2cfrac->(
-            sub {
-                my ($n) = @_;
-                CORE::push(@cfrac, $n);
-                $cfrac2num->(@cfrac);
-                Math::MPFR::Rmpfr_set_q($u, $q, $ROUND);
-                CORE::index(__stringify__($u), $s) == 0;
-            }, $x
-        );
-#>>>
+        my $f1 = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        my $f2 = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        my $f3 = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+
+        Math::MPFR::Rmpfr_set($f1, $x, $ROUND);
+
+        while (1) {
+            Math::MPFR::Rmpfr_round($f2, $f1);
+            Math::MPFR::Rmpfr_get_z($z, $f2, $ROUND);
+
+            Math::GMPz::Rmpz_addmul($n1, $n2, $z);    # n1 += n2 * z
+            Math::GMPz::Rmpz_addmul($d1, $d2, $z);    # d1 += d2 * z
+
+            ($n1, $n2) = ($n2, $n1);
+            ($d1, $d2) = ($d2, $d1);
+
+            # q = n2 / d2
+            Math::GMPq::Rmpq_set_num($q, $n2);
+            Math::GMPq::Rmpq_set_den($q, $d2);
+            Math::GMPq::Rmpq_canonicalize($q);
+
+            Math::MPFR::Rmpfr_set_q($f3, $q, $ROUND);
+            CORE::index(__stringify__($f3), $s) == 0 and last;
+
+            # f1 = 1 / (f1 - f2)
+            Math::MPFR::Rmpfr_sub($f1, $f1, $f2, $ROUND);
+            Math::MPFR::Rmpfr_zero_p($f1) && last;
+            Math::MPFR::Rmpfr_ui_div($f1, 1, $f1, $ROUND);
+        }
 
         bless \$q;
     }
