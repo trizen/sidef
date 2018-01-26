@@ -5644,6 +5644,28 @@ package Sidef::Types::Number::Number {
         __PACKAGE__->_set_str('int', Math::Prime::Util::GMP::ramanujan_tau(&_big2uistr // (goto &nan)));
     }
 
+    sub subfactorial {
+        my ($x) = @_;
+
+        my $ui = (_any2ui($$x) // (goto &nan)) || return ONE;
+
+        my $tau  = 6.28318530717958647692528676655900576839433879875;
+        my $prec = 4 + CORE::int($ui * CORE::log($ui) / CORE::log(2) + CORE::log($tau * $ui) / CORE::log(2) / 2 - $ui);
+
+        my $z = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_fac_ui($z, $ui);
+
+        my $f = Math::MPFR::Rmpfr_init2($prec);
+        Math::MPFR::Rmpfr_set_ui($f, 1, $round_z);
+        Math::MPFR::Rmpfr_exp($f, $f, $round_z);
+        Math::MPFR::Rmpfr_z_div($f, $z, $f, $round_z);
+        Math::MPFR::Rmpfr_add_d($f, $f, 0.5, $round_z);
+        Math::MPFR::Rmpfr_floor($f, $f);
+        Math::MPFR::Rmpfr_get_z($z, $f, $round_z);
+
+        bless \$z;
+    }
+
     sub factorial {
         my ($x) = @_;
         my $ui = _any2ui($$x) // (goto &nan);
