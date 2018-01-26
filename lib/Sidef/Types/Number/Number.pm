@@ -5650,7 +5650,7 @@ package Sidef::Types::Number::Number {
         my $ui = (_any2ui($$x) // (goto &nan)) || return ONE;
 
         my $tau  = 6.28318530717958647692528676655900576839433879875;
-        my $prec = 4 + CORE::int($ui * CORE::log($ui) / CORE::log(2) + CORE::log($tau * $ui) / CORE::log(2) / 2 - $ui);
+        my $prec = 4 + CORE::int(($ui * CORE::log($ui) + CORE::log($tau * $ui) / 2 - $ui) / CORE::log(2));
 
         my $z = Math::GMPz::Rmpz_init();
         Math::GMPz::Rmpz_fac_ui($z, $ui);
