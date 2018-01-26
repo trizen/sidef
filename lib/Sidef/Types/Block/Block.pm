@@ -36,6 +36,12 @@ package Sidef::Types::Block::Block {
     }
 
     sub run {
+
+        # Handle function calls
+        if ($_[0]->{type} eq 'func') {
+            return shift(@_)->call(@_);
+        }
+
         goto shift(@_)->{code};
     }
 
