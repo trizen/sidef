@@ -16,9 +16,6 @@ New built-in classes:
 Internal:
     * Switch to subroutine `signatures` (as soon as this feature becomes stable).
 
-Funtionality:
-    * Add breaking support for the one-line nested for-in loops.
-
 Performance:
     * Add dynamic cache inside all the immutable built-in objects (except IO-related) that take only one argument (the self-object), such that calling the same method again on
       the same object, will return the previous result from cache. When the object is destroyed, the cache is also destroyed with the object itself. This requires making all built-in

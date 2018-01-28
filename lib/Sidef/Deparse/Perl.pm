@@ -1104,7 +1104,8 @@ HEADER
                   . 'local @_ = '
                   . ($multi ? '@{('      : '') . '$item'
                   . ($multi ? ')->to_a}' : '')
-                  . "; $vars; $code }, $expr);";
+                  . "; $vars; $code }, $expr)"
+                  . (@loops ? ' // last' : '') . ';';
             }
         }
         elsif ($ref eq 'Sidef::Types::Bool::Ternary') {

@@ -250,7 +250,7 @@ package Sidef::Types::Block::Block {
                           . (exists($_->{type}) ? (Sidef::normalize_type($_->{type}) . ' ') : '')
                           . $_->{name}
                           . (exists($_->{subset}) ? (' < ' . Sidef::normalize_type($_->{subset})) : '')
-                      } @{$_->{vars}}
+                    } @{$_->{vars}}
                   )
                   . ')'
               } @methods
@@ -476,8 +476,10 @@ package Sidef::Types::Block::Block {
                 }
             }
 
-            last if $break;
+            return if $break;
         }
+
+        return 1;
     }
 
     sub for {
