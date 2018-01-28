@@ -24,7 +24,7 @@ var white = %s'Imager::Color'.new('#FFFFFF');
 var img = %s'Imager'.new(xsize => n, ysize => n, channels => 1);
 img.box(filled => 1, color => white);
  
-for y,x in (^n ~X ^n) {
+for y=(^n), x=(^n) {
     var v = cell(n, x, y, start);
     if (v.is_prime) {
         img.setpixel(x => x, y => y, color => black);

@@ -72,7 +72,7 @@ func getRule {
 
 var (x, y) = 2.of { 1.rand }...
 
-func iterate {
+var iterate = {
     var rule = getRule()
 
     var x1 = (x*rule.a + y*rule.b + rule.tx)

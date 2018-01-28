@@ -16,21 +16,20 @@ var light = normalize([ 3, 2, -5 ])
 var depth = 255
 
 func draw_sphere(rad, k, ambient) {
-    var pixels = []
     var r2 = (rad * rad)
     var r = (-rad .. rad)
-    for x,y in (r ~X r) {
-        if ((var x2 = x*x) + (var y2 = y*y) < r2) {
-            var vector = normalize([x, y, (r2 - x2 - y2).sqrt])
-            var intensity = (dot(light, vector)**k + ambient)
-            var pixel = (0 `max` (intensity*depth -> int) `min` depth)
-            pixels << pixel
-        }
-        else {
-            pixels << 0
+    gather {
+        for x in (r), y in (r) {
+            if ((var x2 = x*x) + (var y2 = y*y) < r2) {
+                var vector = normalize([x, y, (r2 - x2 - y2).sqrt])
+                var intensity = (dot(light, vector)**k + ambient)
+                take(0 `max` (intensity*depth -> int) `min` depth)
+            }
+            else {
+                take(0)
+            }
         }
     }
-    return pixels
 }
 
 var outfile = %f'sphere-sidef.pgm'

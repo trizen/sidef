@@ -14,7 +14,7 @@ var img = %O|Imager|.new(
                       ysize => height,
                      )
 
-for y, x in (^height ~X ^width) {
+for y=(^height), x=(^width) {
     var vector = (center - x - y.i)
     var magnitude = (vector.abs * 2 / width)
     var direction = ((Num.pi + atan2(vector.real, vector.imag)) / Num.tau)
