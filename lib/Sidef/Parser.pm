@@ -2636,9 +2636,6 @@ package Sidef::Parser {
             if (ref($obj) eq 'Sidef::Types::Block::For' and /\G\h*(?=[*:]?$self->{var_name_re})/goc) {
 
                 my $class_name = $self->{class};
-                my $vars_end   = $#{$self->{vars}{$class_name}};
-
-                my $var_count = 0;
 
                 my @loops;
                 {
@@ -2691,8 +2688,6 @@ package Sidef::Parser {
                                 : $self->parse_obj(code => $opt{code})
                                );
 
-                    $var_count += scalar(@vars);
-
                     push @loops,
                       {
                         vars => \@vars,
@@ -2713,7 +2708,16 @@ package Sidef::Parser {
                             );
 
                 # Remove the for-loop variables from the outer scope
-                splice(@{$self->{vars}{$class_name}}, $#{$self->{vars}{$class_name}} - $vars_end - $var_count, $var_count);
+#<<<
+                my %loop_vars = map {
+                    map { refaddr($_) => 1 } @{$_->{vars}}
+                } @loops;
+
+                @{$self->{vars}{$class_name}} = grep {
+                       ref($_) ne 'HASH'
+                    or not exists $loop_vars{refaddr($_->{obj})}
+                } @{$self->{vars}{$class_name}};
+#>>>
 
                 # Store the info
                 $obj->{block} = $block;
