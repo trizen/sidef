@@ -17,21 +17,7 @@ Internal:
     * Switch to subroutine `signatures` (as soon as this feature becomes stable).
 
 Funtionality:
-    * Add support for arbitrary nested for-loops as one for-in loop (same as in Julia):
-
-        for x in (...), y in (...) {
-            ...
-        }
-
-        for x in (...), y in (...), z in (...) {
-            ...
-        }
-
-        Additionally, we should also be able to use the previously declared loop variables:
-
-        for i in (1..10), j in (i..10) {
-            say [i, j]
-        }
+    * Add breaking and deparsing support for one-line nested for-in loops.
 
 Performance:
     * Add dynamic cache inside all the immutable built-in objects (except IO-related) that take only one argument (the self-object), such that calling the same method again on

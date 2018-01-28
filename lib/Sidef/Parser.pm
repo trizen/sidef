@@ -2638,55 +2638,69 @@ package Sidef::Parser {
                 my $class_name = $self->{class};
                 my $vars_end   = $#{$self->{vars}{$class_name}};
 
-                my @vars;
+                my $var_count = 0;
 
-                while (/\G([*:])?($self->{var_name_re})/gc) {
+                my @loops;
+                {
+                    my @vars;
+                    while (/\G([*:])?($self->{var_name_re})/gc) {
 
-                    my $type = $1;
-                    my $name = $2;
-                    push @vars,
-                      bless(
-                            {
-                             name  => $name,
-                             type  => 'var',
-                             class => $class_name,
-                             (
-                              $type
-                              ? (
-                                 slurpy => 1,
-                                 ($type eq '*' ? (array => 1) : (hash => 1)),
-                                )
-                              : ()
-                             ),
-                            },
-                            'Sidef::Variable::Variable'
-                           );
+                        my $type = $1;
+                        my $name = $2;
+                        push @vars,
+                          bless(
+                                {
+                                 name  => $name,
+                                 type  => 'var',
+                                 class => $class_name,
+                                 (
+                                  $type
+                                  ? (
+                                     slurpy => 1,
+                                     ($type eq '*' ? (array => 1) : (hash => 1)),
+                                    )
+                                  : ()
+                                 ),
+                                },
+                                'Sidef::Variable::Variable'
+                               );
 
-                    unshift @{$self->{vars}{$class_name}},
+                        unshift @{$self->{vars}{$class_name}},
+                          {
+                            obj   => $vars[-1],
+                            name  => $name,
+                            count => 1,
+                            type  => 'var',
+                            line  => $self->{line},
+                          };
+
+                        $type && last;
+                        /\G\h*,\h*/gc || last;
+                    }
+
+                    /\G\h*(?:in|∈|=|)\h*/gc
+                      || $self->fatal_error(
+                                            error => "expected the token <<in>> after variable declaration in for-loop",
+                                            code  => $_,
+                                            pos   => pos($_),
+                                           );
+
+                    my $expr = (
+                                /\G(?=\()/
+                                ? $self->parse_arg(code => $opt{code})
+                                : $self->parse_obj(code => $opt{code})
+                               );
+
+                    $var_count += scalar(@vars);
+
+                    push @loops,
                       {
-                        obj   => $vars[-1],
-                        name  => $name,
-                        count => 1,
-                        type  => 'var',
-                        line  => $self->{line},
+                        vars => \@vars,
+                        expr => $expr,
                       };
 
-                    $type && last;
-                    /\G\h*,\h*/gc || last;
+                    /\G\h*,\h*/gc && redo;
                 }
-
-                /\G\h*(?:in|∈|)\h*/gc
-                  || $self->fatal_error(
-                                        error => "expected the token <<in>> after variable declaration in for-loop",
-                                        code  => $_,
-                                        pos   => pos($_),
-                                       );
-
-                my $expr = (
-                            /\G(?=\()/
-                            ? $self->parse_arg(code => $opt{code})
-                            : $self->parse_obj(code => $opt{code})
-                           );
 
                 my $block = (
                              /\G\h*(?=\{)/gc
@@ -2698,15 +2712,12 @@ package Sidef::Parser {
                                                  )
                             );
 
-                # Remove the for-loop variables from the current scope
-                splice(@{$self->{vars}{$class_name}},
-                       $#{$self->{vars}{$class_name}} - $vars_end - scalar(@vars),
-                       scalar(@vars));
+                # Remove the for-loop variables from the outer scope
+                splice(@{$self->{vars}{$class_name}}, $#{$self->{vars}{$class_name}} - $vars_end - $var_count, $var_count);
 
                 # Store the info
-                $obj->{vars}  = \@vars;
                 $obj->{block} = $block;
-                $obj->{expr}  = $expr;
+                $obj->{loops} = \@loops;
 
                 # Re-bless the $obj into a different class
                 bless $obj, 'Sidef::Types::Block::ForIn';

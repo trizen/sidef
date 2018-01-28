@@ -1074,30 +1074,38 @@ HEADER
               . $self->deparse_block_with_scope($obj->{block});
         }
         elsif ($ref eq 'Sidef::Types::Block::ForIn') {
-
-            my $vars = $self->_dump_sub_init_vars(@{$obj->{vars}});
-
-            my $block = 'do' . $self->deparse_block_with_scope($obj->{block});
-            my $expr  = $self->deparse_args($obj->{expr});
-
-            my $multi = 0;
-            if (
-                @{$obj->{vars}} > 1
-                or (@{$obj->{vars}} == 1
-                    and exists($obj->{vars}[0]{slurpy}))
-              ) {
-                $multi = 1;
-            }
-
             $self->load_mod('Sidef::Types::Block::Block');
 
-            $code =
-                'Sidef::Types::Block::Block::_iterate(sub { '
-              . 'my ($item) = @_; '
-              . 'local @_ = '
-              . ($multi ? '@{('      : '') . '$item'
-              . ($multi ? ')->to_a}' : '')
-              . "; $vars; $block }, $expr)";
+            my @vars = map { $self->_dump_sub_init_vars(@{$_->{vars}}) } @{$obj->{loops}};
+            my $block = 'do' . $self->deparse_block_with_scope($obj->{block});
+
+            my @loops = @{$obj->{loops}};
+
+            $code = $block;
+
+            while (@loops) {
+
+                my $loop = pop(@loops);
+                my $vars = pop @vars;
+                my $expr = $self->deparse_args($loop->{expr});
+
+                my $multi = 0;
+                if (
+                    @{$loop->{vars}} > 1
+                    or (@{$loop->{vars}} == 1
+                        and exists($loop->{vars}[0]{slurpy}))
+                  ) {
+                    $multi = 1;
+                }
+
+                $code =
+                    'Sidef::Types::Block::Block::_iterate(sub { '
+                  . 'my ($item) = @_; '
+                  . 'local @_ = '
+                  . ($multi ? '@{('      : '') . '$item'
+                  . ($multi ? ')->to_a}' : '')
+                  . "; $vars; $code }, $expr);";
+            }
         }
         elsif ($ref eq 'Sidef::Types::Bool::Ternary') {
             $code = '('
