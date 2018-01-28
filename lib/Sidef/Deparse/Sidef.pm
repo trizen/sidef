@@ -531,12 +531,17 @@ package Sidef::Deparse::Sidef {
               . $self->deparse_bare_block($obj->{block}{code});
         }
         elsif ($ref eq 'Sidef::Types::Block::ForIn') {
-            $code = 'for '
-              . join(',',
-                     map { ($_->{slurpy} ? ($_->{array} ? '*' : ':') : '') . $self->deparse_expr({self => $_}) }
-                       @{$obj->{vars}})
-              . ' in ('
-              . $self->deparse_expr({self => $obj->{expr}}) . ') '
+            $code = 'for ' . join(
+                ', ',
+                map {
+                    join(',',
+                         map { ($_->{slurpy} ? ($_->{array} ? '*' : ':') : '') . $self->deparse_expr({self => $_}) }
+                           @{$_->{vars}})
+                      . ' in ('
+                      . $self->deparse_expr({self => $_->{expr}}) . ')'
+                } @{$obj->{loops}}
+              )
+              . ' '
               . $self->deparse_bare_block($obj->{block}->{code});
         }
         elsif ($ref eq 'Sidef::Meta::Glob::DATA') {
