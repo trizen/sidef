@@ -32,6 +32,14 @@ Return the
 
 =cut
 
+=head2 first_by
+
+Lazy.first_by() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 grep
 
 Lazy.grep() -> I<Obj>
@@ -55,6 +63,8 @@ Return the
 Lazy.map() -> I<Obj>
 
 Return the
+
+Aliases: I<collect>
 
 =cut
 

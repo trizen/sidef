@@ -91,6 +91,16 @@ Return the
 
 =cut
 
+=head2 collect
+
+Hash.collect() -> I<Obj>
+
+Return the
+
+Aliases: I<collect_kv>
+
+=cut
+
 =head2 copy
 
 Hash.copy() -> I<Obj>

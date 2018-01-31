@@ -1192,6 +1192,8 @@ package Sidef::Types::Array::Array {
         bless \@array, __PACKAGE__;
     }
 
+    *collect = \&map;
+
     sub map_kv {
         my ($self, $block) = @_;
 
@@ -1202,6 +1204,8 @@ package Sidef::Types::Array::Array {
 
         bless \@arr, __PACKAGE__;
     }
+
+    *collect_kv = \&map_kv;
 
     sub flat_map {
         my ($self, $block) = @_;

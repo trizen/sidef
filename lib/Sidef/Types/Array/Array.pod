@@ -865,6 +865,8 @@ Array.map() -> I<Obj>
 
 Return the
 
+Aliases: I<collect>
+
 =cut
 
 =head2 map_kv
@@ -872,6 +874,8 @@ Return the
 Array.map_kv() -> I<Obj>
 
 Return the
+
+Aliases: I<collect_kv>
 
 =cut
 

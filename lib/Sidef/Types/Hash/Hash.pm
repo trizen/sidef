@@ -208,6 +208,19 @@ package Sidef::Types::Hash::Hash {
 
     *map_kv = \&map;
 
+    sub collect {
+        my ($self, $code) = @_;
+
+        my @array;
+        foreach my $key (CORE::keys %$self) {
+            CORE::push(@array, $code->run(Sidef::Types::String::String->new($key), $self->{$key}));
+        }
+
+        Sidef::Types::Array::Array->new(\@array);
+    }
+
+    *collect_kv = \&collect;
+
     sub grep {
         my ($self, $obj) = @_;
 

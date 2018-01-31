@@ -84,6 +84,8 @@ package Sidef::Object::Enumerator {
         Sidef::Types::Array::Array->new(\@arr);
     }
 
+    *collect = \&map;
+
     sub grep {
         my ($self, $block) = @_;
 

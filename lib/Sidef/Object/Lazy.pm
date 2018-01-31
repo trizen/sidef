@@ -115,6 +115,8 @@ package Sidef::Object::Lazy {
         $self;
     }
 
+    *collect = \&map;
+
 }
 
 1;

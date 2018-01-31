@@ -203,6 +203,8 @@ FileHandle.map() -> I<Obj>
 
 Return the
 
+Aliases: I<collect>
+
 =cut
 
 =head2 parent

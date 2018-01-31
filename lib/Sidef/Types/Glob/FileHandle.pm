@@ -215,6 +215,8 @@ package Sidef::Types::Glob::FileHandle {
         Sidef::Types::Array::Array->new(\@array);
     }
 
+    *collect = \&map;
+
     sub words {
         my ($self) = @_;
         Sidef::Types::Array::Array->new(
@@ -223,7 +225,7 @@ package Sidef::Types::Glob::FileHandle {
                  map    { Sidef::Types::String::String->new($_) }
                    grep { $_ ne '' }
                    split(' ', $_)
-               } CORE::readline($self->{fh})
+             } CORE::readline($self->{fh})
             ]
         );
     }

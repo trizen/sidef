@@ -2149,6 +2149,14 @@ Return the
 
 =cut
 
+=head2 subfactorial
+
+Number.subfactorial() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 subsets
 
 Number.subsets() -> I<Obj>
