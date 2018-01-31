@@ -1152,7 +1152,7 @@ HEADER
             $code =
                 "sub { my \@given_values; my \$continue = 1; my \$given_value = (my ($vars) = "
               . $self->deparse_args($obj->{expr})
-              . ')[-1];' . 'do '
+              . ')[-1];' . 'do'
               . $self->deparse_block_with_scope($obj->{block})
               . '; wantarray ? @given_values : $given_values[-1] }->()';
         }
@@ -1210,7 +1210,7 @@ HEADER
         elsif ($ref eq 'Sidef::Types::Block::Gather') {
             $self->load_mod("Sidef::Types::Array::Array");
             $code =
-                "do{my \@_$refaddr;"
+                "do{my \@_$refaddr;" . 'do'
               . $self->deparse_block_with_scope($obj->{block})
               . "; bless(\\\@_$refaddr, 'Sidef::Types::Array::Array')}";
         }
