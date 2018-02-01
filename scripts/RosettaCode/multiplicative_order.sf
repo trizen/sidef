@@ -1,0 +1,37 @@
+#!/usr/bin/ruby
+
+#
+## https://rosettacode.org/wiki/Multiplicative_order
+#
+
+func mo_prime(a, p, e) {
+    var m  = p**e
+    var t  = (p-1)*(p**(e-1))
+    var qs = [1]
+
+    for p,x in (t.factor_exp) {
+        qs.map! {|q|
+            0..x -> map {|j| q * p**j }...
+        }
+    }
+
+    qs.sort.first_by {|q| powmod(a, q, m) == 1 }
+}
+
+func mo(a, m) {
+    gcd(a, m) == 1 || die "#{a} and #{m} are not relatively prime"
+    Math.lcm(1, m.factor_exp.map {|r| mo_prime(a, r...) }...)
+}
+
+say mo(37, 1000)
+say mo(54, 100001)
+
+with (10**20 - 1) {|b|
+    say mo(2, b)
+    say mo(17, b)
+}
+
+assert_eq(mo(37, 1000), 100)
+assert_eq(mo(54, 100001), 9090)
+assert_eq(mo(2, 10**20 - 1), 3748806900)
+assert_eq(mo(17, 10**20 - 1), 1499522760)
