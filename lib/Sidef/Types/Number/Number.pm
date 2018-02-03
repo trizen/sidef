@@ -5018,14 +5018,11 @@ package Sidef::Types::Number::Number {
                 return undef;
             }
         }
-        else {
-            state $ten = Math::GMPz::Rmpz_init_set_ui(10);
-            $y = $ten;
-        }
 
         # Return faster when y <= 10
-        if (Math::GMPz::Rmpz_cmp_ui($y, 10) <= 0) {
-            my @digits = split(//, scalar reverse scalar Math::GMPz::Rmpz_get_str($x, Math::GMPz::Rmpz_get_ui($y)));
+        if (!defined($y) or Math::GMPz::Rmpz_cmp_ui($y, 10) <= 0) {
+            my @digits =
+              split(//, scalar reverse scalar Math::GMPz::Rmpz_get_str($x, defined($y) ? Math::GMPz::Rmpz_get_ui($y) : 10));
             pop(@digits) if $digits[-1] eq '-';
             return Sidef::Types::Array::Array->new([map { __PACKAGE__->_set_uint($_) } @digits]);
         }
