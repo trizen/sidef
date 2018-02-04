@@ -5956,6 +5956,39 @@ package Sidef::Types::Number::Number {
 
     *faulhaber = \&faulhaber_sum;
 
+    sub multinomial {
+        my ($n, @mset) = @_;
+
+        $n = _any2mpz($$n) // goto &nan;
+
+        my $bin  = Math::GMPz::Rmpz_init();
+        my $sum  = Math::GMPz::Rmpz_init_set($n);
+        my $prod = Math::GMPz::Rmpz_init_set_ui(1);
+
+        foreach my $k (@mset) {
+            _valid(\$k);
+
+            $k = _any2si($$k) // goto &nan;
+
+            $k < 0
+              ? Math::GMPz::Rmpz_sub_ui($sum, $sum, -$k)
+              : Math::GMPz::Rmpz_add_ui($sum, $sum, $k);
+
+            if ($k >= 0 and Math::GMPz::Rmpz_fits_ulong_p($sum)) {
+                Math::GMPz::Rmpz_bin_uiui($bin, Math::GMPz::Rmpz_get_ui($sum), $k);
+            }
+            else {
+                $k < 0
+                  ? Math::GMPz::Rmpz_bin_si($bin, $sum, $k)
+                  : Math::GMPz::Rmpz_bin_ui($bin, $sum, $k);
+            }
+
+            Math::GMPz::Rmpz_mul($prod, $prod, $bin);
+        }
+
+        bless \$prod;
+    }
+
     sub binomial {
         my ($x, $y) = @_;
         _valid(\$y);

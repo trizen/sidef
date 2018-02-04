@@ -1623,6 +1623,14 @@ Return the
 
 =cut
 
+=head2 multinomial
+
+Number.multinomial() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 nan
 
 Number.nan() -> I<Obj>
