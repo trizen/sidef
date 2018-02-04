@@ -5,6 +5,9 @@ package Sidef::Types::Glob::DirHandle {
       Sidef::Object::Object
       );
 
+    require Encode;
+    require File::Spec;
+
     use Sidef::Types::Bool::Bool;
 
     sub new {
@@ -45,9 +48,6 @@ package Sidef::Types::Glob::DirHandle {
 
     sub get_file {
         my ($self) = @_;
-
-        state $_z1 = require Encode;
-        state $_z2 = require File::Spec;
 
         my $basedir = ($self->{basedir} //= "$self->{dir}");
 
@@ -123,7 +123,6 @@ package Sidef::Types::Glob::DirHandle {
     sub iter {
         my ($self) = @_;
 
-        state $x = require Encode;
         Sidef::Types::Block::Block->new(
             code => sub {
                 Sidef::Types::String::String->new(Encode::decode_utf8(CORE::readdir($self->{dh}) // return undef));
@@ -134,7 +133,6 @@ package Sidef::Types::Glob::DirHandle {
     sub each {
         my ($self, $code) = @_;
 
-        state $x = require Encode;
         while (defined(my $file = CORE::readdir($self->{dh}))) {
             $code->run(Sidef::Types::String::String->new(Encode::decode_utf8($file)));
         }

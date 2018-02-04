@@ -4,13 +4,13 @@ package Sidef::Types::Glob::File {
 
     use parent qw(Sidef::Types::String::String);
 
+    require File::Spec;
     use Sidef::Types::Number::Number;
 
     sub new {
         my (undef, $file) = @_;
         if (@_ > 2) {
             shift(@_);
-            state $x = require File::Spec;
             $file = File::Spec->catfile(map { "$_" } @_);
         }
         elsif (ref($file) && ref($file) ne 'SCALAR') {
@@ -278,7 +278,6 @@ package Sidef::Types::Glob::File {
         ref($_[0]) || shift(@_);
         my ($self) = @_;
 
-        state $x = require File::Spec;
         File::Spec->file_name_is_absolute("$self")
           ? (Sidef::Types::Bool::Bool::TRUE)
           : (Sidef::Types::Bool::Bool::FALSE);
@@ -289,8 +288,6 @@ package Sidef::Types::Glob::File {
     sub abs_name {
         my $class = ref($_[0]) || shift(@_);
         my ($self, $base) = @_;
-
-        state $x = require File::Spec;
         $class->new(File::Spec->rel2abs("$self", defined($base) ? "$base" : ()));
     }
 
@@ -301,8 +298,6 @@ package Sidef::Types::Glob::File {
     sub rel_name {
         my $class = ref($_[0]) || shift(@_);
         my ($self, $base) = @_;
-
-        state $x = require File::Spec;
         $class->new(File::Spec->rel2abs("$self", defined($base) ? "$base" : ()));
     }
 
@@ -615,14 +610,12 @@ package Sidef::Types::Glob::File {
     sub split {
         ref($_[0]) || shift(@_);
         my ($self) = @_;
-        state $x = require File::Spec;
         Sidef::Types::Array::Array->new([map { Sidef::Types::String::String->new($_) } File::Spec->splitdir("$self")]);
     }
 
     sub splitpath {
         ref($_[0]) || shift(@_);
         my ($self) = @_;
-        state $x = require File::Spec;
         Sidef::Types::Array::Array->new([map { Sidef::Types::String::String->new($_) } File::Spec->splitpath("$self")]);
     }
 

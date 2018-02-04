@@ -4,11 +4,12 @@ package Sidef::Types::Glob::Dir {
 
     use parent qw(Sidef::Types::Glob::File);
 
+    require File::Spec;
+
     sub new {
         my (undef, $dir) = @_;
         if (@_ > 2) {
             shift(@_);
-            state $x = require File::Spec;
             $dir = File::Spec->catdir(map { "$_" } @_);
         }
         elsif (ref($dir)) {
@@ -23,7 +24,6 @@ package Sidef::Types::Glob::Dir {
     sub to_dir    { $_[0] }
 
     sub root {
-        state $x = require File::Spec;
         __PACKAGE__->new(File::Spec->rootdir);
     }
 
@@ -36,14 +36,13 @@ package Sidef::Types::Glob::Dir {
           || (getpwuid($<))[7]
           || `echo -n ~`;
 
-        defined($home) ? __PACKAGE__->new($home) : do {
+        $home ? __PACKAGE__->new($home) : do {
             state $x = require File::HomeDir;
             __PACKAGE__->new(File::HomeDir->my_home);
         };
     }
 
     sub tmp {
-        state $x = require File::Spec;
         __PACKAGE__->new(File::Spec->tmpdir);
     }
 
@@ -55,20 +54,17 @@ package Sidef::Types::Glob::Dir {
     }
 
     sub pwd {
-        state $x = require File::Spec;
         __PACKAGE__->new(File::Spec->curdir);
     }
 
     sub up {
         my ($self) = @_;
-        state $x = require File::Spec;
         __PACKAGE__->new(File::Spec->catdir(ref($self) ? $$self : (), File::Spec->updir));
     }
 
     sub split {
         ref($_[0]) || shift(@_);
         my ($self) = @_;
-        state $x = require File::Spec;
         Sidef::Types::Array::Array->new([map { Sidef::Types::String::String->new($_) } File::Spec->splitdir("$self")]);
     }
 
@@ -168,7 +164,6 @@ package Sidef::Types::Glob::Dir {
         ref($_[0]) || shift(@_);
         my ($self, $file) = @_;
 
-        state $x = require File::Spec;
         ref($file) eq 'Sidef::Types::Glob::File'
           ? $file->new(File::Spec->catfile("$self", "$file"))
           : __PACKAGE__->new(File::Spec->catdir("$self", "$file"));
