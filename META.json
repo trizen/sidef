@@ -31,7 +31,8 @@
             "Data::Dump::Filtered" : "0",
             "Digest::MD5" : "0",
             "Digest::SHA" : "0",
-            "File::Find" : "0"
+            "File::Find" : "0",
+            "MIME::Base64" : "0"
          },
          "requires" : {
             "Algorithm::Combinatorics" : "0",

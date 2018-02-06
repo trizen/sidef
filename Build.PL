@@ -68,6 +68,7 @@ my $builder = Module::Build->new(
                    'File::Find'           => 0,    # for: `sidef -c`
                    'Digest::MD5'          => 0,    # for: File.md5(), Str.md5()
                    'Digest::SHA'          => 0,    # for: File.sha*(), Str.sha*()
+                   'MIME::Base64'         => 0,    # for: Str.encode_base64(), Str.decode_base64()
                    'Data::Dump'           => 0,    # for: `sidef -D`
                    'Data::Dump::Filtered' => 0,    # for: Block.ffork()
                   },

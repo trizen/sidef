@@ -209,6 +209,26 @@ Return the
 
 =cut
 
+=head2 base64_decode
+
+String.base64_decode() -> I<Obj>
+
+Return the
+
+Aliases: I<decode_base64>
+
+=cut
+
+=head2 base64_encode
+
+String.base64_encode() -> I<Obj>
+
+Return the
+
+Aliases: I<encode_base64>
+
+=cut
+
 =head2 begins_with
 
 String.begins_with() -> I<Obj>
