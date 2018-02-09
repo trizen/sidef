@@ -12,6 +12,7 @@ package Sidef::Types::Range::RangeNumber {
         "RangeNum(" . join(', ', $self->{from}->dump, $self->{to}->dump, $self->{step}->dump) . ")";
     };
 
+    use Sidef::Math::Math;
     use Sidef::Types::Bool::Bool;
     use Sidef::Types::Number::Number;
 
@@ -108,12 +109,12 @@ package Sidef::Types::Range::RangeNumber {
     }
 
     sub sum_by {
-        my ($self, $arg) = @_;
+        my ($self, $block) = @_;
         my $sum = Sidef::Types::Number::Number::ZERO;
 
         my $iter = $self->iter->{code};
         while (1) {
-            $sum = $sum->add($arg->run($iter->() // last));
+            $sum = $sum->add($block->run($iter->() // last));
         }
 
         $sum;
@@ -145,13 +146,26 @@ package Sidef::Types::Range::RangeNumber {
     }
 
     sub prod_by {
-        my ($self, $arg) = @_;
+        my ($self, $block) = @_;
 
         my $prod = Sidef::Types::Number::Number::ONE;
 
+        my @list;
+        my $count = 0;
+
         my $iter = $self->iter->{code};
+
         while (1) {
-            $prod = $prod->mul($arg->run($iter->() // last));
+            push @list, $block->run($iter->() // last);
+
+            if (++$count > 1e5) {
+                $count = 0;
+                $prod  = $prod->mul(Sidef::Math::Math->prod(splice(@list)));
+            }
+        }
+
+        if (@list) {
+            $prod = $prod->mul(Sidef::Math::Math->prod(splice(@list)));
         }
 
         $prod;
@@ -172,11 +186,34 @@ package Sidef::Types::Range::RangeNumber {
             return (defined($arg) ? $prod->mul($arg) : $prod);
         }
 
-        my $prod = $arg // Sidef::Types::Number::Number::ONE;
-
         my $iter = $self->iter->{code};
+
+        if (defined($arg)) {
+            my $prod = $arg;
+
+            while (1) {
+                $prod = $prod->mul($iter->() // last);
+            }
+
+            return $prod;
+        }
+
+        my $prod = Sidef::Types::Number::Number::ONE;
+
+        my @list;
+        my $count = 0;
+
         while (1) {
-            $prod = $prod->mul($iter->() // last);
+            push @list, ($iter->() // last);
+
+            if (++$count > 1e5) {
+                $count = 0;
+                $prod  = $prod->mul(Sidef::Math::Math->prod(splice(@list)));
+            }
+        }
+
+        if (@list) {
+            $prod = $prod->mul(Sidef::Math::Math->prod(splice(@list)));
         }
 
         $prod;

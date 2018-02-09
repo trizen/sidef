@@ -1,7 +1,7 @@
 package Sidef::Math::Math {
 
     use utf8;
-    use 5.014;
+    use 5.016;
 
     use parent qw(
       Sidef::Object::Object
@@ -47,15 +47,20 @@ package Sidef::Math::Math {
         $sum;
     }
 
+    sub _binsplit_product {
+        my ($s, $n, $m) = @_;
+
+        $n > $m  and return Sidef::Types::Number::Number::ONE;
+        $n == $m and return $s->[$n];
+
+        my $k = ($n + $m) >> 1;
+
+        __SUB__->($s, $n, $k)->mul(__SUB__->($s, $k + 1, $m));
+    }
+
     sub prod {
         my ($self, @list) = @_;
-
-        my $prod = Sidef::Types::Number::Number::ONE;
-        foreach my $n (@list) {
-            $prod = $prod->mul($n);
-        }
-
-        $prod;
+        _binsplit_product(\@list, 0, $#list);
     }
 
     *product = \&prod;

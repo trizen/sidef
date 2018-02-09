@@ -14,6 +14,7 @@ package Sidef::Types::Array::Array {
       q{0+}   => sub { scalar(@{$_[0]}) },
       q{bool} => sub { scalar(@{$_[0]}) };
 
+    use Sidef::Math::Math;
     use Sidef::Types::Number::Number;
 
     sub new {
@@ -776,12 +777,12 @@ package Sidef::Types::Array::Array {
     }
 
     sub sum_by {
-        my ($self, $arg) = @_;
+        my ($self, $block) = @_;
 
         my $sum = Sidef::Types::Number::Number::ZERO;
 
         foreach my $obj (@$self) {
-            $sum = $sum->add($arg->run($obj));
+            $sum = $sum->add($block->run($obj));
         }
 
         return $sum;
@@ -804,12 +805,24 @@ package Sidef::Types::Array::Array {
     }
 
     sub prod_by {
-        my ($self, $arg) = @_;
+        my ($self, $block) = @_;
 
         my $prod = Sidef::Types::Number::Number::ONE;
 
+        my @list;
+        my $count = 0;
+
         foreach my $obj (@$self) {
-            $prod = $prod->mul($arg->run($obj));
+            CORE::push(@list, $block->run($obj));
+
+            if (++$count > 1e5) {
+                $count = 0;
+                $prod  = $prod->mul(Sidef::Math::Math->prod(CORE::splice(@list)));
+            }
+        }
+
+        if (@list) {
+            $prod = $prod->mul(Sidef::Math::Math->prod(CORE::splice(@list)));
         }
 
         return $prod;
@@ -822,13 +835,17 @@ package Sidef::Types::Array::Array {
             goto &prod_by;
         }
 
-        my $prod = $arg // Sidef::Types::Number::Number::ONE;
+        if (defined($arg)) {
+            my $prod = $arg;
 
-        foreach my $obj (@$self) {
-            $prod = $prod->mul($obj);
+            foreach my $obj (@$self) {
+                $prod = $prod->mul($obj);
+            }
+
+            return $prod;
         }
 
-        $prod;
+        Sidef::Math::Math->prod(@$self);
     }
 
     sub _min_max_by {
