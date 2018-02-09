@@ -781,8 +781,20 @@ package Sidef::Types::Array::Array {
 
         my $sum = Sidef::Types::Number::Number::ZERO;
 
+        my @list;
+        my $count = 0;
+
         foreach my $obj (@$self) {
-            $sum = $sum->add($block->run($obj));
+            CORE::push(@list, $block->run($obj));
+
+            if (++$count > 1e5) {
+                $count = 0;
+                $sum   = $sum->add(Sidef::Math::Math->sum(CORE::splice(@list)));
+            }
+        }
+
+        if (@list) {
+            $sum = $sum->add(Sidef::Math::Math->sum(CORE::splice(@list)));
         }
 
         return $sum;
@@ -795,13 +807,17 @@ package Sidef::Types::Array::Array {
             goto &sum_by;
         }
 
-        my $sum = $arg // Sidef::Types::Number::Number::ZERO;
+        if (defined($arg)) {
+            my $sum = $arg;
 
-        foreach my $obj (@$self) {
-            $sum = $sum->add($obj);
+            foreach my $obj (@$self) {
+                $sum = $sum->add($obj);
+            }
+
+            return $sum;
         }
 
-        $sum;
+        Sidef::Math::Math->sum(@$self);
     }
 
     sub prod_by {

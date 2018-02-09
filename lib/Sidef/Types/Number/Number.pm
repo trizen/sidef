@@ -5841,6 +5841,8 @@ package Sidef::Types::Number::Number {
                               Math::Prime::Util::GMP::stirling(_big2uistr($x) // (goto &nan), _big2uistr($y) // (goto &nan)));
     }
 
+    *stirling1 = \&stirling;
+
     sub stirling2 {
         my ($x, $y) = @_;
         _valid(\$y);

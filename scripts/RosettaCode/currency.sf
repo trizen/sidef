@@ -22,7 +22,7 @@ var subtotal = check.map { |item|
     var extension = Num(item.price)*Num(item.quant)
     printf(fmt, item.name, item.price, item.quant, extension.round(-2))
     extension
-}.sum(0)
+}.sum
 
 printf(fmt, '', '', '', '-----------------')
 printf(fmt, '', '', 'Subtotal ', subtotal)

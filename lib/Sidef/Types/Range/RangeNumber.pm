@@ -110,11 +110,25 @@ package Sidef::Types::Range::RangeNumber {
 
     sub sum_by {
         my ($self, $block) = @_;
+
         my $sum = Sidef::Types::Number::Number::ZERO;
 
+        my @list;
+        my $count = 0;
+
         my $iter = $self->iter->{code};
+
         while (1) {
-            $sum = $sum->add($block->run($iter->() // last));
+            push @list, $block->run($iter->() // last);
+
+            if (++$count > 1e5) {
+                $count = 0;
+                $sum   = $sum->add(Sidef::Math::Math->sum(splice(@list)));
+            }
+        }
+
+        if (@list) {
+            $sum = $sum->add(Sidef::Math::Math->sum(splice(@list)));
         }
 
         $sum;

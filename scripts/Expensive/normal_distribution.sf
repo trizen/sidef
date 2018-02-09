@@ -20,7 +20,7 @@ var dataset = size.of { normdist(mean, stddev) }
 var m = (dataset.sum(0) / size)
 say ("m: #{m}")
 
-var σ = sqrt(dataset »**» 2 -> sum(0) / size - m**2)
+var σ = sqrt(dataset »**» 2 -> sum / size - m**2)
 say ("s: #{σ}")
 
 var hash = Hash()
