@@ -5868,8 +5868,33 @@ package Sidef::Types::Number::Number {
     sub bell {
         my ($x) = @_;
         my $n = _any2ui($$x) // goto &nan;
-        __PACKAGE__->_set_str('int',
-                              Math::Prime::Util::GMP::vecsum(map { Math::Prime::Util::GMP::stirling($n, $_, 2) } 0 .. $n));
+
+#<<<
+        if ($n < 100) {
+              return __PACKAGE__->_set_str('int',
+                    Math::Prime::Util::GMP::vecsum(map { Math::Prime::Util::GMP::stirling($n, $_, 2) } 0 .. $n));
+        }
+#>>>
+
+        my @acc;
+
+        my $t    = Math::GMPz::Rmpz_init();
+        my $bell = Math::GMPz::Rmpz_init_set_ui(1);
+
+        foreach my $k (1 .. $n) {
+
+            Math::GMPz::Rmpz_set($t, $bell);
+
+            foreach my $item (@acc) {
+                Math::GMPz::Rmpz_add($t, $t, $item);
+                Math::GMPz::Rmpz_set($item, $t);
+            }
+
+            unshift @acc, $bell;
+            $bell = Math::GMPz::Rmpz_init_set($acc[-1]);
+        }
+
+        bless \$bell;
     }
 
     sub faulhaber_sum {

@@ -182,6 +182,7 @@ package Sidef::Types::String::String {
         $self->new($$self . "$string");
     }
 
+    *add    = \&append;
     *concat = \&append;
 
     sub prepend {

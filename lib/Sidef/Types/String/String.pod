@@ -59,7 +59,7 @@ I<Obj> B<+> I<Obj> -> I<Obj>
 
 Return the
 
-Aliases: I<append>, I<concat>
+Aliases: I<add>, I<append>, I<concat>
 
 =cut
 
