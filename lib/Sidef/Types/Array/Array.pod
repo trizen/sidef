@@ -159,6 +159,14 @@ Aliases: I<abbreviations>
 
 =cut
 
+=head2 accumulate
+
+Array.accumulate() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 all
 
 Array.all() -> I<Obj>

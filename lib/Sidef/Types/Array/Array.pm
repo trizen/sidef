@@ -1610,6 +1610,24 @@ package Sidef::Types::Array::Array {
         Sidef::Types::Array::Pair->new($self, $arr);
     }
 
+    sub accumulate {
+        my ($self) = @_;
+
+        my @acc;
+        my $prev;
+
+        foreach my $item (@$self) {
+            if (defined($prev)) {
+                CORE::push(@acc, $prev = $prev->add($item));
+            }
+            else {
+                CORE::push(@acc, $prev = $item);
+            }
+        }
+
+        bless \@acc;
+    }
+
     sub reduce {
         my ($self, $obj, $initial) = @_;
 

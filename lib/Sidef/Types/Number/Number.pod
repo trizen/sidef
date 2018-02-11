@@ -2139,6 +2139,8 @@ Number.stirling() -> I<Obj>
 
 Return the
 
+Aliases: I<stirling1>
+
 =cut
 
 =head2 stirling2
