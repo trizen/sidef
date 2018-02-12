@@ -6747,6 +6747,79 @@ package Sidef::Types::Number::Number {
         $r < ULONG_MAX ? __PACKAGE__->_set_uint($r) : __PACKAGE__->_set_str('int', $r);
     }
 
+    sub arithmetic_derivative {
+        my ($x) = @_;
+
+        my $deriv = sub {
+            my ($n) = @_;
+
+            # (-a)' = -(a')
+            if (Math::GMPz::Rmpz_sgn($n) < 0) {
+                my $t = Math::GMPz::Rmpz_init();
+                Math::GMPz::Rmpz_neg($t, $n);
+                $t = __SUB__->($t);
+                Math::GMPz::Rmpz_neg($t, $t);
+                return $t;
+            }
+
+            my $t = Math::GMPz::Rmpz_init();
+            my $u = Math::GMPz::Rmpz_init();
+            my $d = Math::GMPz::Rmpz_init_set_ui(0);
+
+            my $s = Math::GMPz::Rmpz_get_str($n, 10);
+
+            $s eq '0' and return $d;
+            $s eq '1' and return Math::GMPz::Rmpz_init_set_ui(1);
+
+            my @factors = Math::Prime::Util::GMP::factor($s);
+
+            foreach my $p (@factors) {
+
+                if ($p < ULONG_MAX) {
+                    Math::GMPz::Rmpz_divexact_ui($u, $n, $p);
+                }
+                else {
+                    Math::GMPz::Rmpz_set_str($t, "$p", 10);
+                    Math::GMPz::Rmpz_divexact($u, $n, $t);
+                }
+
+                Math::GMPz::Rmpz_add($d, $d, $u);
+            }
+
+            return $d;
+        };
+
+        my $n = $$x;
+
+        # (a/b)' = (a'b - b'a) / b^2
+        if (ref($n) eq 'Math::GMPq') {
+
+            my $t1 = Math::GMPz::Rmpz_init();
+            my $t2 = Math::GMPz::Rmpz_init();
+
+            Math::GMPq::Rmpq_get_num($t1, $n);    # a
+            Math::GMPq::Rmpq_get_den($t2, $n);    # b
+
+            my $d1 = $deriv->($t1);               # a'
+            my $d2 = $deriv->($t2);               # b'
+
+            Math::GMPz::Rmpz_mul($d1, $d1, $t2);  # d1 = a' * b
+            Math::GMPz::Rmpz_mul($d2, $d2, $t1);  # d2 = b' * a
+
+            Math::GMPz::Rmpz_sub($d1, $d1, $d2);  # d1 = (a'b - b'a)
+            Math::GMPz::Rmpz_mul($t2, $t2, $t2);  # t2 = b^2
+
+            # q = d1 / t2
+            my $q = Math::GMPq::Rmpq_init();
+            Math::GMPq::Rmpq_set_num($q, $d1);
+            Math::GMPq::Rmpq_set_den($q, $t2);
+            Math::GMPq::Rmpq_canonicalize($q);
+            return bless \$q;
+        }
+
+        bless \($deriv->(_any2mpz($n) // goto &nan));
+    }
+
     sub factor {
         Sidef::Types::Array::Array->new(
             [map { $_ < ULONG_MAX ? __PACKAGE__->_set_uint($_) : __PACKAGE__->_set_str('int', $_) }

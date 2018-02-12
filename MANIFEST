@@ -610,6 +610,7 @@ scripts/symmetric_summation_of_fractions.sf
 scripts/Tests/amb.sf
 scripts/Tests/amb_nested_loops.sf
 scripts/Tests/anonymous_recursion.sf
+scripts/Tests/arithmetic_derivative.sf
 scripts/Tests/arithmetic_evaluation.sf
 scripts/Tests/arithmetic_geometric_mean.sf
 scripts/Tests/array_and_hash_lookup.sf

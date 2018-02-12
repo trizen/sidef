@@ -337,6 +337,14 @@ Aliases: I<airy>
 
 =cut
 
+=head2 arithmetic_derivative
+
+Number.arithmetic_derivative() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 as_bin
 
 Number.as_bin() -> I<Obj>

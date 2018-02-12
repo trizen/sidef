@@ -1,0 +1,49 @@
+#!/usr/bin/ruby
+
+# Recursive implementation of the arithmetic derivative rule.
+#     (with support for rational and negative values)
+
+# See also:
+#   https://oeis.org/A003415
+#   https://en.wikipedia.org/wiki/Arithmetic_derivative
+
+subset Integer  < Number   { .is_int   }
+subset Positive < Integer  { .is_pos   }
+subset Negative < Integer  { .is_neg   }
+subset Prime    < Positive { .is_prime }
+
+func arithmetic_derivative((0)) { 0 }
+func arithmetic_derivative((1)) { 1 }
+
+func arithmetic_derivative(_ < Prime) { 1 }
+
+func arithmetic_derivative(n < Negative) {
+    -arithmetic_derivative(-n)
+}
+
+func arithmetic_derivative(n < Positive) is cached {
+
+    var a = n.factor.rand
+    var b = n/a
+
+    arithmetic_derivative(a)*b + a*arithmetic_derivative(b)
+}
+
+func arithmetic_derivative(Number n) {
+    var (a, b) = n.nude
+    (arithmetic_derivative(a)*b - arithmetic_derivative(b)*a) / b**2
+}
+
+for n in (-10..20) {
+    assert_eq(arithmetic_derivative(n), n.arithmetic_derivative)
+}
+
+assert_eq(arithmetic_derivative(97), 97.arithmetic_derivative)
+assert_eq(arithmetic_derivative(3/4), (3/4).arithmetic_derivative)
+assert_eq(arithmetic_derivative(24/7), (24/7).arithmetic_derivative)
+assert_eq(arithmetic_derivative(-2520/5617), (-2520/5617).arithmetic_derivative)
+assert_eq(arithmetic_derivative(-5617/2520), (-5617/2520).arithmetic_derivative)
+assert_eq(arithmetic_derivative(7!), (7!).arithmetic_derivative)
+assert_eq(arithmetic_derivative(11.primorial), 11.primorial.arithmetic_derivative)
+
+say "** Test passed!"
