@@ -9,7 +9,11 @@ package Sidef::Types::Number::Number {
     use Math::MPC qw();
 
     use Math::Prime::Util::GMP qw();
-    use POSIX qw(ULONG_MAX LONG_MIN);
+
+    use constant {
+                  ULONG_MAX => Math::GMPq::_ulong_max(),
+                  LONG_MIN  => Math::GMPq::_long_min(),
+                 };
 
     our ($ROUND, $PREC);
 

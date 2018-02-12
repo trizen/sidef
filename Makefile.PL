@@ -23,7 +23,6 @@ WriteMakefile
                    'Math::MPFR' => '3.36',
                    'Math::Prime::Util::GMP' => '0.44',
                    'Memoize' => 0,
-                   'POSIX' => 0,
                    'Scalar::Util' => 0,
                    'Socket' => 0,
                    'Term::ReadLine' => 0,
