@@ -4949,6 +4949,49 @@ package Sidef::Types::Number::Number {
 
     *as_dec = \&as_float;
 
+    sub sqrt_cfrac {
+        my ($n) = @_;
+
+        $n = _any2mpz($$n) // return Sidef::Types::Array::Array->new();
+
+        Math::GMPz::Rmpz_sgn($n) < 0
+          and return Sidef::Types::Array::Array->new();
+
+        my $x = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_sqrt($x, $n);
+
+        my @cfrac = (bless \$x);
+
+        Math::GMPz::Rmpz_perfect_square_p($n)
+          and return Sidef::Types::Array::Array->new(\@cfrac);
+
+        my $y = Math::GMPz::Rmpz_init_set($x);
+        my $z = Math::GMPz::Rmpz_init_set_ui(1);
+
+        do {
+            my $t = Math::GMPz::Rmpz_init_set($y);    # t = y
+
+            # y = floor((x + y) / z) * z - y
+            Math::GMPz::Rmpz_add($y, $y, $x);         # y = y+x
+            Math::GMPz::Rmpz_tdiv_q($y, $y, $z);      # y = floor(y/z)
+            Math::GMPz::Rmpz_mul($y, $y, $z);         # y = y*z
+            Math::GMPz::Rmpz_sub($y, $y, $t);         # y = y*t
+
+            # z = floor((n - y*y) / z)
+            Math::GMPz::Rmpz_mul($t, $y, $y);         # t = y*y
+            Math::GMPz::Rmpz_sub($t, $n, $t);         # t = n-t
+            Math::GMPz::Rmpz_tdiv_q($z, $t, $z);      # z = floor(t/z)
+
+            # t = floor((x + y) / z)
+            Math::GMPz::Rmpz_add($t, $x, $y);         # t = x+y
+            Math::GMPz::Rmpz_tdiv_q($t, $t, $z);      # t = floor(t/z)
+
+            push @cfrac, bless \$t;
+        } until (Math::GMPz::Rmpz_cmp($x, $y) == 0 and Math::GMPz::Rmpz_cmp_ui($z, 1) == 0);
+
+        Sidef::Types::Array::Array->new(\@cfrac);
+    }
+
     sub convergents {
         my ($x, $n) = @_;
 

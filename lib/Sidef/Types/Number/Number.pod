@@ -2117,6 +2117,14 @@ Return the
 
 =cut
 
+=head2 sqrt_cfrac
+
+Number.sqrt_cfrac() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 sqrtmod
 
 Number.sqrtmod() -> I<Obj>

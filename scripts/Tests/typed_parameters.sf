@@ -8,10 +8,10 @@ func add_nums(Number a, Number b) -> Object {   # requires two numbers
     a + b
 }
 
-assert_eq(add(1, 2), 3);
+assert_eq(add_nums(1, 2), 3);
 
 var count = 0;
-try   { say add("a", "b");      #`(run-time error: invalid type for parameters) }
+try   { say add_nums("a", "b");      #`(run-time error: invalid type for parameters) }
 catch { ++count }
 assert_eq(count, 1);
 
