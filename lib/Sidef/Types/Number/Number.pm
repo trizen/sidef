@@ -4975,7 +4975,7 @@ package Sidef::Types::Number::Number {
             Math::GMPz::Rmpz_add($y, $y, $x);         # y = y+x
             Math::GMPz::Rmpz_tdiv_q($y, $y, $z);      # y = floor(y/z)
             Math::GMPz::Rmpz_mul($y, $y, $z);         # y = y*z
-            Math::GMPz::Rmpz_sub($y, $y, $t);         # y = y*t
+            Math::GMPz::Rmpz_sub($y, $y, $t);         # y = y-t
 
             # z = floor((n - y*y) / z)
             Math::GMPz::Rmpz_mul($t, $y, $y);         # t = y*y
@@ -4987,7 +4987,7 @@ package Sidef::Types::Number::Number {
             Math::GMPz::Rmpz_tdiv_q($t, $t, $z);      # t = floor(t/z)
 
             push @cfrac, bless \$t;
-        } until (Math::GMPz::Rmpz_cmp($x, $y) == 0 and Math::GMPz::Rmpz_cmp_ui($z, 1) == 0);
+        } until (Math::GMPz::Rmpz_cmp_ui($z, 1) == 0);
 
         Sidef::Types::Array::Array->new(\@cfrac);
     }
