@@ -5372,8 +5372,13 @@ package Sidef::Types::Number::Number {
         #
       Math_GMPz__Math_GMPz: {
 
-            my $sgn_y = Math::GMPz::Rmpz_sgn($y)
-              || goto &_nan;
+            if (Math::GMPz::Rmpz_fits_ulong_p($y)) {
+                my $r = Math::GMPz::Rmpz_init();
+                Math::GMPz::Rmpz_mod_ui($r, $x, Math::GMPz::Rmpz_get_ui($y) || goto &_nan);
+                return $r;
+            }
+
+            my $sgn_y = Math::GMPz::Rmpz_sgn($y) || goto &_nan;
 
             my $r = Math::GMPz::Rmpz_init();
             Math::GMPz::Rmpz_mod($r, $x, $y);
@@ -6805,9 +6810,8 @@ package Sidef::Types::Number::Number {
 
             Math::GMPz::Rmpz_mul($d1, $d1, $t2);  # d1 = a' * b
             Math::GMPz::Rmpz_mul($d2, $d2, $t1);  # d2 = b' * a
-
-            Math::GMPz::Rmpz_sub($d1, $d1, $d2);  # d1 = (a'b - b'a)
             Math::GMPz::Rmpz_mul($t2, $t2, $t2);  # t2 = b^2
+            Math::GMPz::Rmpz_sub($d1, $d1, $d2);  # d1 = (a'b - b'a)
 
             # q = d1 / t2
             my $q = Math::GMPq::Rmpq_init();

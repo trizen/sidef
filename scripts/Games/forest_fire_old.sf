@@ -26,27 +26,24 @@ var range_h = h.range
 var range_w = w.range
 
 func iterate {
-    var new = h.of{ w.of(0) }
-    for i in range_h {
-        for j in range_w {
-            given (new[i][j] = forest[i][j]) {
-              when (Tree) {
-                1.rand < burn_prob && (new[i][j] = Heating; next)
-                dirs.each { |pair|
-                    var y = pair[0]+i
-                    range_h.contains(y) || next
-                    var x = pair[1]+j
-                    range_w.contains(x) || next
-                    forest[y][x] == Heating && (new[i][j] = Heating; break)
-                }
-              }
-              when (Heating)            { new[i][j] = Burning }
-              when (Burning)            { new[i][j] = Empty   }
-              case (1.rand < tree_prob) { new[i][j] = Tree    }
+    var new_forest = h.of{ w.of(0) }
+    for i = range_h, j = range_w {
+        given (new_forest[i][j] = forest[i][j]) {
+          when (Tree) {
+            1.rand < burn_prob && (new_forest[i][j] = Heating; next)
+            for y,x in (dirs) {
+                y += i; x += j
+                range_h.contains(y) || next
+                range_w.contains(x) || next
+                new_forest[i][j] = Heating if (forest[y][x] == Heating)
             }
+          }
+          when (Heating)            { new_forest[i][j] = Burning }
+          when (Burning)            { new_forest[i][j] = Empty   }
+          case (1.rand < tree_prob) { new_forest[i][j] = Tree    }
         }
     }
-    forest = new
+    forest = new_forest
 }
 
 STDOUT.autoflush(true)

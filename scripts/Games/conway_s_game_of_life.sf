@@ -4,6 +4,9 @@ var w = `tput cols`.to_i
 var h = `tput lines`.to_i
 var r = "\033[H"
 
+var rh = ^h
+var rw = ^w
+
 var dirs = [[-1,-1], [-1, 0], [-1, 1], [ 0,-1],
             [ 0, 1], [ 1,-1], [ 1, 0], [ 1, 1]]
 
@@ -11,8 +14,7 @@ var universe = h.of { w.of {1.rand < 0.1} }
 
 func iterate {
     var new = h.of { w.of(false) }
-    static rx = (^h ~X ^w)
-    for i,j in rx {
+    for i=rh, j=rw {
         var neighbor = 0
         for y,x in (dirs.map {|dir| dir »+« [i, j] }) {
             universe[y % h][x % w] && ++neighbor

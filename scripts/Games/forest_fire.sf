@@ -15,18 +15,19 @@ define pix = [' ', GREEN + "*", YELLOW + "*", RED + "*"];
 
 class Forest(p=0.01, f=0.001, height, width) {
 
-    has coords = [];
-    has spot = [];
-    has neighbors = [];
+    has rw = ^width
+    has rh = ^height
+
+    has spot = []
+    has neighbors = []
 
     method init {
-        coords = (0..height ~X 0..width)
         spot = height.of { width.of { [true, false].pick ? Tree : Empty } }
         self.init_neighbors
     }
 
     method init_neighbors {
-        for i,j in coords {
+        for i=rh, j=rw {
             neighbors[i][j] = gather {
                 for dir in DIRS {
                     take(\(spot[i + dir[0]][j + dir[1]] \\ next));
@@ -36,9 +37,9 @@ class Forest(p=0.01, f=0.001, height, width) {
     }
 
     method step {
-        var heat = [];
+        var heat = []
 
-        for i,j in coords {
+        for i=rh, j=rw {
             given (spot[i][j]) {
                 when Empty   { spot[i][j] = Tree    if (1.rand < p) }
                 when Tree    { spot[i][j] = Heating if (1.rand < f) }
@@ -49,14 +50,14 @@ class Forest(p=0.01, f=0.001, height, width) {
 
         for i,j in heat {
             neighbors[i][j].each { |ref|
-                *ref = Heating if (*ref == Tree);
+                *ref = Heating if (*ref == Tree)
             }
         }
     }
 
     method show {
         for i in ^height {
-            say pix[spot[i]];
+            say pix[spot[i]]
         }
     }
 }
