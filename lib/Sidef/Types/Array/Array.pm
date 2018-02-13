@@ -1610,8 +1610,30 @@ package Sidef::Types::Array::Array {
         Sidef::Types::Array::Pair->new($self, $arr);
     }
 
+    sub accumulate_by {
+        my ($self, $block) = @_;
+
+        my @acc;
+        my $prev;
+
+        foreach my $item (@$self) {
+            if (defined($prev)) {
+                CORE::push(@acc, $prev = $prev->add($block->run($item)));
+            }
+            else {
+                CORE::push(@acc, $prev = $block->run($item));
+            }
+        }
+
+        bless \@acc;
+    }
+
     sub accumulate {
-        my ($self) = @_;
+        my ($self, $block) = @_;
+
+        if (defined($block)) {
+            goto &accumulate_by;
+        }
 
         my @acc;
         my $prev;

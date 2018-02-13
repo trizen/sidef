@@ -167,6 +167,14 @@ Return the
 
 =cut
 
+=head2 accumulate_by
+
+Array.accumulate_by() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 all
 
 Array.all() -> I<Obj>
