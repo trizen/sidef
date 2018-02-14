@@ -1753,8 +1753,37 @@ package Sidef::Types::Array::Array {
                                              );
     }
 
+    sub indices_by {
+        my ($self, $arg) = @_;
+
+        my @indices;
+        if (ref($arg) eq 'Sidef::Types::Block::Block') {
+            foreach my $i (0 .. $#$self) {
+                if ($arg->run($self->[$i])) {
+                    CORE::push(@indices, Sidef::Types::Number::Number->_set_uint($i));
+                }
+            }
+        }
+        else {
+            foreach my $i (0 .. $#$self) {
+                if ($self->[$i] eq $arg) {
+                    CORE::push(@indices, Sidef::Types::Number::Number->_set_uint($i));
+                }
+            }
+        }
+
+        bless \@indices;
+    }
+
+    *keys_by = \&indices_by;
+
     sub indices {
-        my ($self) = @_;
+        my ($self, $arg) = @_;
+
+        if (defined($arg)) {
+            goto &indices_by;
+        }
+
         bless [map { Sidef::Types::Number::Number->_set_uint($_) } 0 .. $#$self], __PACKAGE__;
     }
 

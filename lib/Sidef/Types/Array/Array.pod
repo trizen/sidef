@@ -789,6 +789,16 @@ Aliases: I<indices>
 
 =cut
 
+=head2 keys_by
+
+Array.keys_by() -> I<Obj>
+
+Return the
+
+Aliases: I<indices_by>
+
+=cut
+
 =head2 kv
 
 Array.kv() -> I<Obj>
