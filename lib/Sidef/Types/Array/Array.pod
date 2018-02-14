@@ -1091,6 +1091,14 @@ Return the
 
 =cut
 
+=head2 pop_while
+
+Array.pop_while() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 prepend
 
 Array.prepend() -> I<Obj>
@@ -1228,6 +1236,14 @@ Array.shift() -> I<Obj>
 Return the
 
 Aliases: I<drop_left>, I<drop_first>
+
+=cut
+
+=head2 shift_while
+
+Array.shift_while() -> I<Obj>
+
+Return the
 
 =cut
 

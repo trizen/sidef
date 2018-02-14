@@ -2100,6 +2100,16 @@ package Sidef::Types::Array::Array {
     *drop_first = \&shift;
     *drop_left  = \&shift;
 
+    sub shift_while {
+        my ($self, $block) = @_;
+
+        while (@$self and $block->run($self->[0])) {
+            CORE::shift(@$self);
+        }
+
+        $self;
+    }
+
     sub pop {
         my ($self, $num) = @_;
 
@@ -2114,6 +2124,16 @@ package Sidef::Types::Array::Array {
 
     *drop_last  = \&pop;
     *drop_right = \&pop;
+
+    sub pop_while {
+        my ($self, $block) = @_;
+
+        while (@$self and $block->run($self->[-1])) {
+            CORE::pop(@$self);
+        }
+
+        $self;
+    }
 
     sub pop_rand {
         my ($self) = @_;
