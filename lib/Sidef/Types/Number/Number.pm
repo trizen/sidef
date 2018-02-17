@@ -6778,7 +6778,6 @@ package Sidef::Types::Number::Number {
             my $s = Math::GMPz::Rmpz_get_str($n, 10);
 
             $s eq '0' and return $d;
-            $s eq '1' and return Math::GMPz::Rmpz_init_set_ui(1);
 
             my @factors = Math::Prime::Util::GMP::factor($s);
 

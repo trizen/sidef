@@ -13,7 +13,7 @@ subset Negative < Integer  { .is_neg   }
 subset Prime    < Positive { .is_prime }
 
 func arithmetic_derivative((0)) { 0 }
-func arithmetic_derivative((1)) { 1 }
+func arithmetic_derivative((1)) { 0 }
 
 func arithmetic_derivative(_ < Prime) { 1 }
 
