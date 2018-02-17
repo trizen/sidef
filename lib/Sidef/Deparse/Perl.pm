@@ -1343,27 +1343,32 @@ HEADER
             if ($obj->{act} eq 'assert') {
 
                 # Check arity
-                @args == 1
-                  or die "[ERROR] Incorrect number of arguments for $obj->{act}\() at"
-                  . " $obj->{file} line $obj->{line} (expected 1 argument)\n";
+                @args > 2
+                  and die "[ERROR] Incorrect number of arguments for $obj->{act}\() at"
+                  . " $obj->{file} line $obj->{line} (expected 1 or 2 arguments)\n";
 
                 # Generate code
-                $code = qq~do{my \$a$refaddr = do{$args[0]}; \$a$refaddr or CORE::die "$obj->{act}(\$a$refaddr) failed ~
+                $code =
+                    qq~do{my \$a$refaddr = do{$args[0]}; ~
+                  . qq~my \$m$refaddr = do{$args[1]} // "$obj->{act}(\$a$refaddr)";~
+                  . qq~\$a$refaddr or CORE::die "\$m$refaddr failed ~
                   . qq~at \Q$obj->{file}\E line $obj->{line}\\n"}~;
             }
             elsif ($obj->{act} eq 'assert_eq' or $obj->{act} eq 'assert_ne') {
 
                 # Check arity
-                @args == 2
-                  or die "[ERROR] Incorrect number of arguments for $obj->{act}\() at"
-                  . " $obj->{file} line $obj->{line} (expected 2 arguments)\n";
+                @args > 3
+                  and die "[ERROR] Incorrect number of arguments for $obj->{act}\() at"
+                  . " $obj->{file} line $obj->{line} (expected 2 or 3 arguments)\n";
 
                 # Generate code
                 $code = "do{"
                   . "my \$a$refaddr = do{$args[0]};"
                   . "my \$b$refaddr = do{$args[1]};"
-                  . ($obj->{act} eq 'assert_ne' ? qq{CORE::not(\$a$refaddr eq \$b$refaddr)} : qq{\$a$refaddr eq \$b$refaddr})
-                  . qq~ or CORE::die "$obj->{act}(\${\\join(', ',map{UNIVERSAL::can(\$_,'dump') ? \$_->dump : \$_}(\$a$refaddr, \$b$refaddr))})~
+                  . "my \$m$refaddr = do{$args[2]} // ('$obj->{act}('."
+                  . qq~join(', ',map{UNIVERSAL::can(\$_,'dump') ? \$_->dump : \$_}(\$a$refaddr, \$b$refaddr)) . ')');~
+                  . ($obj->{act} eq 'assert_ne' ? qq{!(\$a$refaddr eq \$b$refaddr)} : qq{\$a$refaddr eq \$b$refaddr})
+                  . qq~ or CORE::die "\$m$refaddr~
                   . qq~ failed at \Q$obj->{file}\E line $obj->{line}\\n"}~;
             }
         }

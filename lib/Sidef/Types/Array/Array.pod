@@ -547,13 +547,13 @@ Return the
 
 =cut
 
-=head2 each_key
+=head2 each_k
 
-Array.each_key() -> I<Obj>
+Array.each_k() -> I<Obj>
 
 Return the
 
-Aliases: I<each_index>
+Aliases: I<each_key>, I<each_index>
 
 =cut
 

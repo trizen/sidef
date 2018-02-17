@@ -1,0 +1,78 @@
+#!/usr/bin/ruby
+
+#
+## https://rosettacode.org/wiki/Brace_expansion
+#
+
+func brace_expand (input) {
+    var current = ['']
+    var stack = [[current]]
+
+    loop {
+        var t = input.match(
+            /\G ((?:[^\\{,}]++ | \\(?:.|\z))++ | . )/gx
+        )[0] \\ break
+
+        if (t == '{') {
+            stack << [current = ['']]
+        }
+        elsif ((t == ',') && (stack.len > 1)) {
+            stack[-1] << (current = [''])
+        }
+        elsif ((t == '}') && (stack.len > 1)) {
+            var group = stack.pop
+            current   = stack[-1][-1]
+
+            # handle the case of brace pairs without commas:
+            group[0][] = group[0].map{ '{'+_+'}' }... if (group.len == 1)
+
+            current[] = current.map { |c|
+                group.map { .map { c + _ }... }...
+            }...
+        }
+        else {
+            current[] = current.map { _ + t }...
+        }
+    }
+
+    # handle the case of missing closing braces:
+    while (stack.len > 1) {
+
+        var right = stack[-1].pop
+        var sep = ','
+
+        if (stack[-1].is_empty) {
+            sep = '{'
+            stack.pop
+        }
+
+        current = stack[-1][-1]
+        current[] = current.map  { |c|
+            right.map { c + sep + _ }...
+        }...
+    }
+
+    return current
+}
+
+DATA.each { |line|
+    say line
+    say "\t"+brace_expand(line).join("\n\t")+"\n"
+}
+
+assert_eq(
+    brace_expand("It{{em,alic}iz,erat}e{d,}, please."),
+    ["Itemized, please.", "Itemize, please.", "Italicized, please.", "Italicize, please.", "Iterated, please.", "Iterate, please."]
+)
+
+assert_eq(
+    brace_expand('{}} some }{,{\\\\{ edge, edge} \\,}{ cases, {here} \\\\\\\\\\}'),
+    ["{}} some }{,{\\\\ edge \\,}{ cases, {here} \\\\\\\\\\}",
+     "{}} some }{,{\\\\ edge \\,}{ cases, {here} \\\\\\\\\\}"]
+)
+
+__DATA__
+~/{Downloads,Pictures}/*.{jpg,gif,png}
+It{{em,alic}iz,erat}e{d,}, please.
+{,{,gotta have{ ,\, again\, }}more }cowbell!
+{}} some }{,{\\{ edge, edge} \,}{ cases, {here} \\\\\}

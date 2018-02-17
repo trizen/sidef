@@ -1156,6 +1156,7 @@ package Sidef::Types::Array::Array {
         $self;
     }
 
+    *each_k   = \&each_index;
     *each_key = \&each_index;
 
     sub each_kv {
