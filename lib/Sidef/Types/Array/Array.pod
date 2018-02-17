@@ -197,7 +197,49 @@ Array.bindex() -> I<Obj>
 
 Return the
 
-Aliases: I<bindex_by>
+Aliases: I<bsearch_index>
+
+=cut
+
+=head2 bindex_by
+
+Array.bindex_by() -> I<Obj>
+
+Return the
+
+Aliases: I<bsearch_index_by>
+
+=cut
+
+=head2 bindex_ge
+
+Array.bindex_ge() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 bindex_ge_by
+
+Array.bindex_ge_by() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 bindex_le
+
+Array.bindex_le() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 bindex_le_by
+
+Array.bindex_le_by() -> I<Obj>
+
+Return the
 
 =cut
 
@@ -206,6 +248,36 @@ Aliases: I<bindex_by>
 Array.binsert() -> I<Obj>
 
 Return the
+
+=cut
+
+=head2 bsearch
+
+Array.bsearch() -> I<Obj>
+
+Return the
+
+Aliases: I<bsearch_by>
+
+=cut
+
+=head2 bsearch_ge
+
+Array.bsearch_ge() -> I<Obj>
+
+Return the
+
+Aliases: I<bsearch_ge_by>
+
+=cut
+
+=head2 bsearch_le
+
+Array.bsearch_le() -> I<Obj>
+
+Return the
+
+Aliases: I<bsearch_le_by>
 
 =cut
 

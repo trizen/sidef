@@ -1433,40 +1433,19 @@ package Sidef::Types::Array::Array {
         bless \@values, __PACKAGE__;
     }
 
-    sub bindex {
+    sub bindex_by {
         my ($self, $obj) = @_;
 
         my $left  = 0;
         my $right = $#$self;
         my ($middle, $item, $cmp);
 
-        if (ref($obj) eq 'Sidef::Types::Block::Block') {
-
-            while ($left <= $right) {
-                $middle = (($right + $left) >> 1);
-                $item   = $self->[$middle];
-                $cmp    = CORE::int($obj->run($item)) || return Sidef::Types::Number::Number->_set_uint($middle);
-
-                if ($cmp > 0) {
-                    $right = $middle - 1;
-                }
-                else {
-                    $left = $middle + 1;
-                }
-            }
-
-            return Sidef::Types::Number::Number::MONE;
-        }
-
         while ($left <= $right) {
-            $middle = int(($right + $left) >> 1);
+            $middle = (($right + $left) >> 1);
             $item   = $self->[$middle];
-            $cmp    = CORE::int($item cmp $obj);
+            $cmp    = CORE::int($obj->run($item)) || return Sidef::Types::Number::Number->_set_uint($middle);
 
-            if (!$cmp) {
-                return Sidef::Types::Number::Number->_set_uint($middle);
-            }
-            elsif ($cmp > 0) {
+            if ($cmp > 0) {
                 $right = $middle - 1;
             }
             else {
@@ -1474,10 +1453,187 @@ package Sidef::Types::Array::Array {
             }
         }
 
-        return Sidef::Types::Number::Number::MONE;
+        Sidef::Types::Number::Number::MONE;
     }
 
-    *bindex_by = \&bindex;
+    *bsearch_index_by = \&bindex_by;
+
+    sub bindex {
+        my ($self, $obj) = @_;
+
+        if (ref($obj) eq 'Sidef::Types::Block::Block') {
+            goto &bindex_by;
+        }
+
+        my $left  = 0;
+        my $right = $#$self;
+        my ($middle, $item, $cmp);
+
+        while ($left <= $right) {
+            $middle = (($right + $left) >> 1);
+            $item   = $self->[$middle];
+            $cmp    = CORE::int($item cmp $obj) || return Sidef::Types::Number::Number->_set_uint($middle);
+
+            if ($cmp > 0) {
+                $right = $middle - 1;
+            }
+            else {
+                $left = $middle + 1;
+            }
+        }
+
+        Sidef::Types::Number::Number::MONE;
+    }
+
+    *bsearch_index = \&bindex;
+
+    sub bsearch {
+        my ($self, $obj) = @_;
+        my $index = $self->bindex($obj);
+        $index->is_mone ? undef : $self->[CORE::int($index)];
+    }
+
+    *bsearch_by = \&bsearch;
+
+    sub bindex_ge_by {
+        my ($self, $obj) = @_;
+
+        my $left  = 0;
+        my $right = $#$self;
+        my ($middle, $item, $cmp);
+
+        while (1) {
+
+            $middle = (($right + $left) >> 1);
+            $item   = $self->[$middle];
+            $cmp    = CORE::int($obj->run($item)) || return Sidef::Types::Number::Number->_set_uint($middle);
+
+            if ($cmp < 0) {
+                $left = $middle + 1;
+                if ($left > $right) {
+                    ++$middle;
+                    last;
+                }
+            }
+            else {
+                $right = $middle - 1;
+                $left > $right && last;
+            }
+        }
+
+        Sidef::Types::Number::Number->_set_uint($middle);
+    }
+
+    sub bindex_ge {
+        my ($self, $obj) = @_;
+
+        if (ref($obj) eq 'Sidef::Types::Block::Block') {
+            goto &bindex_ge_by;
+        }
+
+        my $left  = 0;
+        my $right = $#$self;
+        my ($middle, $item, $cmp);
+
+        while (1) {
+
+            $middle = (($right + $left) >> 1);
+            $item   = $self->[$middle];
+            $cmp    = CORE::int($item cmp $obj) || return Sidef::Types::Number::Number->_set_uint($middle);
+
+            if ($cmp < 0) {
+                $left = $middle + 1;
+                if ($left > $right) {
+                    ++$middle;
+                    last;
+                }
+            }
+            else {
+                $right = $middle - 1;
+                $left > $right && last;
+            }
+        }
+
+        Sidef::Types::Number::Number->_set_uint($middle);
+    }
+
+    sub bindex_le_by {
+        my ($self, $obj) = @_;
+
+        my $left  = 0;
+        my $right = $#$self;
+        my ($middle, $item, $cmp);
+
+        while (1) {
+
+            $middle = (($right + $left) >> 1);
+            $item   = $self->[$middle];
+            $cmp    = CORE::int($obj->run($item)) || return Sidef::Types::Number::Number->_set_uint($middle);
+
+            if ($cmp < 0) {
+                $left = $middle + 1;
+                $left > $right && last;
+            }
+            else {
+                $right = $middle - 1;
+                if ($left > $right) {
+                    --$middle;
+                    last;
+                }
+            }
+        }
+
+        Sidef::Types::Number::Number->_set_uint($middle);
+    }
+
+    sub bindex_le {
+        my ($self, $obj) = @_;
+
+        if (ref($obj) eq 'Sidef::Types::Block::Block') {
+            goto &bindex_le_by;
+        }
+
+        my $left  = 0;
+        my $right = $#$self;
+        my ($middle, $item, $cmp);
+
+        while (1) {
+
+            $middle = (($right + $left) >> 1);
+            $item   = $self->[$middle];
+            $cmp    = CORE::int($item cmp $obj) || return Sidef::Types::Number::Number->_set_uint($middle);
+
+            if ($cmp < 0) {
+                $left = $middle + 1;
+                $left > $right && last;
+            }
+            else {
+                $right = $middle - 1;
+                if ($left > $right) {
+                    --$middle;
+                    last;
+                }
+            }
+        }
+
+        Sidef::Types::Number::Number->_set_uint($middle);
+    }
+
+    sub bsearch_le {
+        my ($self, $obj) = @_;
+        my $index = $self->bindex_le($obj);
+        $index->is_mone ? undef : $self->[CORE::int($index)];
+    }
+
+    *bsearch_le_by = \&bsearch_le;
+
+    sub bsearch_ge {
+        my ($self, $obj) = @_;
+        my $index = $self->bindex_ge($obj);
+        $index->is_mone ? undef : $self->[CORE::int($index)];
+    }
+
+    *bsearch_ge_by = \&bsearch_ge;
 
     sub index {
         my ($self, $obj) = @_;

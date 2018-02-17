@@ -1,0 +1,71 @@
+#!/usr/bin/ruby
+
+var a = 100.of {|n| 6*n + 1 }
+
+for k in (1 .. a.end-2) {
+
+    var i = a.bindex_le { _ <=> (a[k] + 1) }
+
+    assert_eq(a[i],   a[k])
+    assert_eq(a[i-1], a[k-1])
+    assert_eq(a[i+1], a[k+1])
+
+    var j = a.bindex_ge { _ <=> (a[k] + 1) }
+
+    assert_eq(a[j+1], a[k+2])
+    assert_eq(a[j],   a[k+1])
+    assert_eq(a[j-1], a[k])
+}
+
+var b = 100.of { 1e5.irand }.uniq.sort
+
+for k in (1 .. 20) {
+
+    var r = irand(b[1], b[-2])
+    var i = b.bindex_le { _ <=> r }
+
+    assert(b[i] <= r)
+    assert(b[i-1] < r)
+    assert(b[i+1] > r)
+
+    var j = b.bindex_ge { _ <=> r }
+
+    assert(b[j] >= r)
+    assert(b[j-1] < r)
+    assert(b[j+1] > r)
+}
+
+var c = [14, 19, 31, 44, 74, 79, 84, 90, 93]
+
+assert_eq(c.bsearch_le { _ <=> 44 }, 44)
+assert_eq(c.bsearch_ge { _ <=> 44 }, 44)
+
+assert_eq(c.bsearch_le { _ <=> 45 }, 44)
+assert_eq(c.bsearch_ge { _ <=> 45 }, 74)
+
+assert_eq(c.bsearch { _ <=> 14 }, 14)
+assert_eq(c.bsearch { _ <=> 93 }, 93)
+
+assert_eq(c.bsearch(14), 14)
+assert_eq(c.bsearch(93), 93)
+
+assert_eq(c.bsearch_le { _ <=> 14 }, 14)
+assert_eq(c.bsearch_ge { _ <=> 93 }, 93)
+
+assert_eq(c.bsearch_le(14), 14)
+assert_eq(c.bsearch_ge(93), 93)
+
+assert_eq(c.bsearch_le(32), 31)
+assert_eq(c.bsearch_ge(32), 44)
+
+assert_eq(c.bsearch_le(92), 90)
+assert_eq(c.bsearch_ge(92), 93)
+
+assert_eq(c.bsearch_ge(13), 14)
+assert_eq(c.bsearch_le(94), 93)
+
+assert_eq(c.bsearch(35), nil)
+assert_eq(c.bsearch_le(13), nil)
+assert_eq(c.bsearch_ge(94), nil)
+
+say "** Test passed!"
