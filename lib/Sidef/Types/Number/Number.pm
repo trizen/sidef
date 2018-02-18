@@ -786,7 +786,7 @@ package Sidef::Types::Number::Number {
             state $z = Math::GMPz::Rmpz_init_nobless();
             Math::GMPz::Rmpz_set_q($z, $x);
 
-            my $size = Math::GMPz::Rmpz_sizeinbase($z, 10);
+            my $size = Math::GMPz::Rmpz_sizeinbase($z, 10) - 1;
 
             my $f = Math::MPFR::Rmpfr_init2(CORE::int(($size + $PREC / 4) * CORE::log(10) / CORE::log(2)) + 10);
             Math::MPFR::Rmpfr_set_q($f, $x, $ROUND);
