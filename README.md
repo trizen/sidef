@@ -167,6 +167,10 @@ Output:
 
 ![sidef](https://user-images.githubusercontent.com/614513/32420413-973f20a2-c292-11e7-9c60-d58d84666232.png)
 
+### TRY IT ONLINE
+
+* https://tio.run/#sidef
+
 ### AVAILABILITY
 
 * **CPAN**: [https://metacpan.org/release/Sidef](https://metacpan.org/release/Sidef)
