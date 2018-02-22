@@ -745,25 +745,28 @@ package Sidef::Types::Array::Array {
     }
 
     sub _min_max {
-        my ($self, $value) = @_;
+        my ($self, $order) = @_;
 
         @$self || return undef;
 
         my $item = $self->[0];
+
         foreach my $i (1 .. $#$self) {
-            my $val = $self->[$i];
-            $item = $val if (CORE::int($val cmp $item) == $value);
+            my $value = $self->[$i];
+            $item = $value if (CORE::int($value cmp $item) == $order);
         }
 
         $item;
     }
 
     sub max {
-        $_[0]->_min_max(1);
+        @_ = ($_[0], 1);
+        goto &_min_max;
     }
 
     sub min {
-        $_[0]->_min_max(-1);
+        @_ = ($_[0], -1);
+        goto &_min_max;
     }
 
     sub minmax {
@@ -865,18 +868,24 @@ package Sidef::Types::Array::Array {
     }
 
     sub _min_max_by {
-        my ($self, $block, $value) = @_;
+        my ($self, $block, $order) = @_;
 
         @$self || return undef;
 
-        my @pairs = map { [$_, scalar $block->run($_)] } @$self;
-        my $item = $pairs[0];
+        my $minmax  = $self->[0];
+        my $old_key = $block->run($minmax);
 
-        foreach my $i (1 .. $#pairs) {
-            $item = $pairs[$i] if (CORE::int($pairs[$i][1] cmp $item->[1]) == $value);
+        foreach my $i (1 .. $#$self) {
+            my $value   = $self->[$i];
+            my $new_key = $block->run($value);
+
+            if (CORE::int($new_key cmp $old_key) == $order) {
+                $minmax  = $value;
+                $old_key = $new_key;
+            }
         }
 
-        $item->[0];
+        $minmax;
     }
 
     sub max_by {
@@ -2376,7 +2385,8 @@ package Sidef::Types::Array::Array {
 
     sub sort_by {
         my ($self, $block) = @_;
-        bless [map { $_->[0] } sort { $a->[1] cmp $b->[1] } map { [$_, scalar $block->run($_)] } @$self], __PACKAGE__;
+        my @keys = map { scalar $block->run($_) } @$self;
+        bless [@{$self}[sort { $keys[$a] cmp $keys[$b] } 0 .. $#$self]], __PACKAGE__;
     }
 
     # Inserts an object between each element
