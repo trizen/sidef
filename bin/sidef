@@ -118,6 +118,12 @@ if (defined $args{t}) {
             local $SIG{INT} = sub {
                 die "Stopped by user...";
             };
+
+            if (defined $args{C}) {
+                say "$script_name syntax OK";
+                next;
+            }
+
             $sidef->execute_perl($deparsed);
         }
 
