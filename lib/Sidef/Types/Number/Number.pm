@@ -5689,6 +5689,19 @@ package Sidef::Types::Number::Number {
         bless \$r;
     }
 
+    sub bit {
+        my ($x, $k) = @_;
+
+        _valid(\$k);
+
+        $x = _any2mpz($$x) // return undef;
+        $k = _any2ui($$k) // return undef;
+
+        Math::GMPz::Rmpz_tstbit($x, $k) ? ONE : ZERO;
+    }
+
+    *testbit = \&bit;
+
     sub ramanujan_tau {
         __PACKAGE__->_set_str('int', Math::Prime::Util::GMP::ramanujan_tau(&_big2uistr // (goto &nan)));
     }

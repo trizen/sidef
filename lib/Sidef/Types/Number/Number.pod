@@ -527,6 +527,16 @@ Return the
 
 =cut
 
+=head2 bit
+
+Number.bit() -> I<Obj>
+
+Return the
+
+Aliases: I<testbit>
+
+=cut
+
 =head2 C
 
 Number.C() -> I<Obj>
