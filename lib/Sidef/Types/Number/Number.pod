@@ -533,7 +533,7 @@ Number.bit() -> I<Obj>
 
 Return the
 
-Aliases: I<testbit>
+Aliases: I<getbit>, I<testbit>
 
 =cut
 
@@ -590,6 +590,14 @@ Return the
 =head2 cis
 
 Number.cis() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 clearbit
+
+Number.clearbit() -> I<Obj>
 
 Return the
 
@@ -2072,6 +2080,14 @@ Return the
 =head2 seed
 
 Number.seed() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 setbit
+
+Number.setbit() -> I<Obj>
 
 Return the
 

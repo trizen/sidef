@@ -5700,7 +5700,34 @@ package Sidef::Types::Number::Number {
         Math::GMPz::Rmpz_tstbit($x, $k) ? ONE : ZERO;
     }
 
+    *getbit  = \&bit;
     *testbit = \&bit;
+
+    sub setbit {
+        my ($x, $k) = @_;
+
+        _valid(\$k);
+
+        $x = _any2mpz($$x) // return undef;
+        $k = _any2ui($$k) // return undef;
+
+        my $r = Math::GMPz::Rmpz_init_set($x);
+        Math::GMPz::Rmpz_setbit($r, $k);
+        bless \$r;
+    }
+
+    sub clearbit {
+        my ($x, $k) = @_;
+
+        _valid(\$k);
+
+        $x = _any2mpz($$x) // return undef;
+        $k = _any2ui($$k) // return undef;
+
+        my $r = Math::GMPz::Rmpz_init_set($x);
+        Math::GMPz::Rmpz_clrbit($r, $k);
+        bless \$r;
+    }
 
     sub ramanujan_tau {
         __PACKAGE__->_set_str('int', Math::Prime::Util::GMP::ramanujan_tau(&_big2uistr // (goto &nan)));
