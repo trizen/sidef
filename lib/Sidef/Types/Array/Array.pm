@@ -1671,8 +1671,9 @@ package Sidef::Types::Array::Array {
           : Sidef::Types::Number::Number::MONE;
     }
 
-    *index_by    = \&index;
-    *first_index = \&index;
+    *index_by       = \&index;
+    *first_index    = \&index;
+    *first_index_by = \&index;
 
     sub rindex {
         my ($self, $obj) = @_;
@@ -1698,8 +1699,9 @@ package Sidef::Types::Array::Array {
         $self->end;
     }
 
-    *rindex_by  = \&rindex;
-    *last_index = \&rindex;
+    *rindex_by     = \&rindex;
+    *last_index    = \&rindex;
+    *last_index_by = \&rindex;
 
     sub pairmap {
         my ($self, $obj) = @_;
