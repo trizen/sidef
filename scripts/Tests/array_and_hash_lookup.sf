@@ -35,15 +35,15 @@ var f = Foo("c", 3)
 var g = Foo("b", 2)
 
 assert_eq(a[f], 'd')
-#assert_eq(h{f}, 3)
+assert_eq(h{f}, 3)
 
 assert_eq([a[f,g,f]], ['d','c','d'])
-#assert_eq([h{f,g,f}], [3,2,3])
+assert_eq([h{f,g,f}], [3,2,3])
 
 g.k = 'a'
 
-#assert_eq(h{g}, 1)
-#assert_eq(h{f}, 3)
+assert_eq(h{g}, 1)
+assert_eq(h{f}, 3)
 
 g.i = -1
 

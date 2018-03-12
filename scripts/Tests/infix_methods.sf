@@ -1,0 +1,26 @@
+#!/usr/bin/perl
+
+# Test for infix methods
+
+var a = 42
+a `add!` 5
+assert_eq(a, 47)
+
+var b = (a `mul` 2)
+assert_eq(b, 94)
+assert_eq(a, 47)
+
+a `mul!` 2 `add!` 3
+assert_eq(a, 97)
+
+var c = (a `mul!` 2 `add` 3)
+
+assert_eq(a, 194)
+assert_eq(c, 197)
+
+var d = (a `add!` 5 `mul!` 2 `sub` 1)
+
+assert_eq(a, 398)
+assert_eq(d, 397)
+
+say "** Test passed!"

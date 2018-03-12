@@ -21,9 +21,9 @@ assert_eq(nums.uniq_by { _ }, a1);
 assert_eq(nums.last_uniq_by { _ }, a2);
 
 ## This is experimental
-#var ary = [1,1,2,1,'redundant',[1,2,3],[1,2,3],'redundant'];
-#assert_eq(ary.uniq, [1, 2, "redundant", [1, 2, 3]]);
-#assert_eq(ary.last_uniq, [2, 1, [1, 2, 3], "redundant"]);
+var ary = [1,1,2,1,'redundant',[1,2,3],[1,2,3],'redundant'];
+assert_eq(ary.uniq, [1, 2, "redundant", [1, 2, 3]]);
+assert_eq(ary.last_uniq, [2, 1, [1, 2, 3], "redundant"]);
 
 #
 ## Same thing, made simple
