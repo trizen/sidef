@@ -894,6 +894,7 @@ scripts/Tests/symbolic_fractions.sf
 scripts/Tests/symmetric_difference.sf
 scripts/Tests/sysopen_and_sysread.sf
 scripts/Tests/tennis_tournament.sf
+scripts/Tests/ternary_operator.sf
 scripts/Tests/token_recursive.sf
 scripts/Tests/top_rank_per_group.sf
 scripts/Tests/topological_sort.sf

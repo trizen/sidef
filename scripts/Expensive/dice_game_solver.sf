@@ -51,13 +51,13 @@ loop {
         var dir = (
          map.has_key(current_num)
           ? map{current_num}
-          : (
+          : do {
             var d = '';
             do {
                 d = directions[directions.len.rand]
             } while (map.values.contains(d));
             d;
-          )
+          }
         );
 
         var pos = moves{dir};

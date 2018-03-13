@@ -174,16 +174,15 @@ class new(diacritics            = true,
         # Iterate over the @words
         while ( {words.len && (
                 # It's a small number (lower than 100)
-                (factor = (WORDS.exists(words[0]) ? 1 : (words[0].ends_with('zeci') ? (words[0].sub!(/zeci\z/); 10) : 0));
+                (factor = (WORDS.exists(words[0]) ? 1 : (words[0].ends_with('zeci') ? do { words[0].sub!(/zeci\z/); 10 } : 0));
                 factor > 0 && (amount = words.shift);
                 factor > 0) || (
                 # It's a big number (e.g.: milion)
                 (
-                    words.len && (BIGWORDS.has_key(words[0]) && (
+                    words.len && BIGWORDS.has_key(words[0]) && do {
                         factor = BIGWORDS{words.shift};
                         factor > 0
-                        )
-                    )
+                    }
                 ) ||
                 # Ignore invalid words
                 (
@@ -213,9 +212,9 @@ class new(diacritics            = true,
                             num *= BIGWORDS{words.shift};
                         }
 
-                        (words.len && (words[0] == 'de')) && (
+                        if (words.len && (words[0] == 'de')) {
                             __BLOCK__.run;
-                        );
+                        }
                     }.run;
                 }
             }
@@ -288,7 +287,7 @@ class new(diacritics            = true,
                     var cat = (number / BIGNUMS[j-1]{:num} -> int);
                     number -= (BIGNUMS[j-1]{:num} * (number / BIGNUMS[j-1]{:num} -> int));
 
-                    var of = (cat <= 2 ? [] : (
+                    var of = (cat <= 2 ? [] : do {
                         var w = (
                             DIGITS.has_key(cat)
                                 ? [DIGITS{cat}]
@@ -296,7 +295,7 @@ class new(diacritics            = true,
                             );
                         w.len > 2 && (w[-2] == DIGITS{2} && (w[-2] = 'două'));
                         w;
-                    ));
+                    });
 
                     if (cat >= 100 && (cat < 1000)) {
                         var rest = (cat - (100 * (cat / 100 -> int)));
@@ -306,19 +305,19 @@ class new(diacritics            = true,
                     }
 
                     words += (
-                        cat == 1 ? ([BIGNUMS[j-1]{:fem} ? 'o' : 'un', BIGNUMS[j-1]{:sg}])
-                                 : (cat == 2 ? (['două', BIGNUMS[j-1]{:pl}])
+                        cat == 1 ? [BIGNUMS[j-1]{:fem} ? 'o' : 'un', BIGNUMS[j-1]{:sg}]
+                                 : (cat == 2 ? ['două', BIGNUMS[j-1]{:pl}]
                                              : (of + [BIGNUMS[j-1]{:pl}]));
                     );
 
-                    number > 0 && (
-                        BIGNUMS[j]{:num} > 1000 && (
+                    if (number > 0) {
+                        if (BIGNUMS[j]{:num} > 1000) {
                             words[-1] += self.thousands_separator
-                        );
+                        }
                         words.append(__METHOD__(self, number)...)
-                    );
+                    }
 
-                    break;
+                    break
                 }
             }
         }
