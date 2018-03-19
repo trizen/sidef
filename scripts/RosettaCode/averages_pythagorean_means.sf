@@ -6,8 +6,12 @@
 
 func A(a) { a.sum / a.len };
 func G(a) { a.prod.root(a.len) };
-func H(a) { a.len / a.map{1/_}.sum };
+func H(a) { a.len / a.map{.inv}.sum };
  
 say("A(1,...,10) = ", A(1..10));
 say("G(1,...,10) = ", G(1..10));
 say("H(1,...,10) = ", H(1..10));
+
+assert_eq(Math.arithmetic_mean(1..10 -> ...), A(1..10))
+assert_eq(Math.geometric_mean(1..10 -> ...), G(1..10))
+assert_eq(Math.harmonic_mean(1..10 -> ...), H(1..10))
