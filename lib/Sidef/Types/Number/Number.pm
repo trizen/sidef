@@ -4971,26 +4971,29 @@ package Sidef::Types::Number::Number {
 
         my $y = Math::GMPz::Rmpz_init_set($x);
         my $z = Math::GMPz::Rmpz_init_set_ui(1);
+        my $r = Math::GMPz::Rmpz_init();
+
+        Math::GMPz::Rmpz_add($r, $x, $y);    # r = x+y
 
         do {
-            my $t = Math::GMPz::Rmpz_init_set($y);    # t = y
+            my $t = Math::GMPz::Rmpz_init();
 
-            # y = floor((x + y) / z) * z - y
-            Math::GMPz::Rmpz_add($y, $y, $x);         # y = y+x
-            Math::GMPz::Rmpz_tdiv_q($y, $y, $z);      # y = floor(y/z)
-            Math::GMPz::Rmpz_mul($y, $y, $z);         # y = y*z
-            Math::GMPz::Rmpz_sub($y, $y, $t);         # y = y-t
+            # y = (r*z - y)
+            Math::GMPz::Rmpz_mul($t, $z, $r);    # t = z*r
+            Math::GMPz::Rmpz_sub($y, $t, $y);    # y = t-y
 
             # z = floor((n - y*y) / z)
-            Math::GMPz::Rmpz_mul($t, $y, $y);         # t = y*y
-            Math::GMPz::Rmpz_sub($t, $n, $t);         # t = n-t
-            Math::GMPz::Rmpz_tdiv_q($z, $t, $z);      # z = floor(t/z)
+            Math::GMPz::Rmpz_mul($t, $y, $y);    # t = y*y
+            Math::GMPz::Rmpz_sub($t, $n, $t);    # t = n-t
+            Math::GMPz::Rmpz_tdiv_q($z, $t, $z); # z = floor(t/z)
 
             # t = floor((x + y) / z)
-            Math::GMPz::Rmpz_add($t, $x, $y);         # t = x+y
-            Math::GMPz::Rmpz_tdiv_q($t, $t, $z);      # t = floor(t/z)
+            Math::GMPz::Rmpz_add($t, $x, $y);    # t = x+y
+            Math::GMPz::Rmpz_tdiv_q($t, $t, $z); # t = floor(t/z)
 
+            $r = $t;
             push @cfrac, bless \$t;
+
         } until (Math::GMPz::Rmpz_cmp_ui($z, 1) == 0);
 
         Sidef::Types::Array::Array->new(\@cfrac);
