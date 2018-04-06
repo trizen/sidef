@@ -6931,6 +6931,73 @@ package Sidef::Types::Number::Number {
     *euler_phi     = \&totient;
     *euler_totient = \&totient;
 
+    sub inv_euler_phi {
+        my ($n) = @_;
+
+        # Based on Dana Jacobsen's code from Math::Prime::Util,
+        # which in turn is based on invphi.gp v1.3 by Max Alekseyev.
+
+        $n = _any2mpz($$n) // return Sidef::Types::Array::Array->new;
+
+        if (Math::GMPz::Rmpz_sgn($n) <= 0) {
+            return Sidef::Types::Array::Array->new(ZERO) if !Math::GMPz::Rmpz_sgn($n);
+            return Sidef::Types::Array::Array->new;
+        }
+
+        my $u = Math::GMPz::Rmpz_init();
+        my $v = Math::GMPz::Rmpz_init();
+        my $w = Math::GMPz::Rmpz_init();
+
+        my $nstr = Math::GMPz::Rmpz_get_str($n, 10);
+
+        my %r = (1 => [$ONE]);
+
+        foreach my $d (Math::Prime::Util::GMP::divisors($nstr)) {
+
+            my $t = $d + 1 < ULONG_MAX ? $d : Math::GMPz::Rmpz_init_set_str("$d", 10);
+            my $tt = $t + 1;
+
+            Math::Prime::Util::GMP::is_prime($tt) || next;
+
+            my %temp;
+            foreach my $k (1 .. Math::Prime::Util::GMP::valuation($nstr, $tt) + 1) {
+
+                if (ref($tt)) {
+                    Math::GMPz::Rmpz_pow_ui($u, $tt, $k - 1);
+                    Math::GMPz::Rmpz_set($v, $u);
+                    Math::GMPz::Rmpz_mul($v, $v, $tt);
+                    Math::GMPz::Rmpz_mul($u, $u, $t);
+                }
+                else {
+                    Math::GMPz::Rmpz_ui_pow_ui($u, $tt, $k - 1);
+                    Math::GMPz::Rmpz_set($v, $u);
+                    Math::GMPz::Rmpz_mul_ui($v, $v, $tt);
+                    Math::GMPz::Rmpz_mul_ui($u, $u, $t);
+                }
+
+                Math::GMPz::Rmpz_divexact($w, $n, $u);
+
+                foreach my $f (Math::Prime::Util::GMP::divisors($w)) {
+                    if (exists $r{$f}) {
+                        push @{$temp{$u * $f}}, map { $v * $_ } @{$r{$f}};
+                    }
+                }
+            }
+
+            foreach my $i (keys %temp) {
+                push @{$r{$i}}, @{$temp{$i}};
+            }
+        }
+
+        if (not exists $r{$n}) {
+            return Sidef::Types::Array::Array->new;
+        }
+
+        Sidef::Types::Array::Array->new([map { bless \$_ } sort { $a <=> $b } @{$r{$n}}]);
+    }
+
+    *inverse_euler_phi = \&inv_euler_phi;
+
     sub jordan_totient {
         my ($x, $y) = @_;
         _valid(\$y);
