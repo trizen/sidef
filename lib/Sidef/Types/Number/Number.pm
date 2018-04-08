@@ -6993,9 +6993,11 @@ package Sidef::Types::Number::Number {
             return Sidef::Types::Array::Array->new;
         }
 
-        Sidef::Types::Array::Array->new([map { bless \$_ } sort { $a <=> $b } @{$r{$n}}]);
+        Sidef::Types::Array::Array->new([map { bless \$_ } sort { Math::GMPz::Rmpz_cmp($a, $b) } @{$r{$n}}]);
     }
 
+    *inv_totient       = \&inv_euler_phi;
+    *inverse_totient   = \&inv_euler_phi;
     *inverse_euler_phi = \&inv_euler_phi;
 
     sub jordan_totient {

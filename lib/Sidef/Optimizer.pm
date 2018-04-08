@@ -9,6 +9,7 @@ package Sidef::Optimizer {
                   REGEX       => 'Sidef::Types::Regex::Regex',
                   BOOL        => 'Sidef::Types::Bool::Bool',
                   ARRAY       => 'Sidef::Types::Array::Array',
+                  RANGENUM    => 'Sidef::Types::Range::RangeNumber',
                   NUMBER_DT   => 'Sidef::DataTypes::Number::Number',
                   STRING_DT   => 'Sidef::DataTypes::String::String',
                   COMPLEX_DT  => 'Sidef::DataTypes::Number::Complex',
@@ -557,6 +558,30 @@ package Sidef::Optimizer {
             (map { [$_, [table('')]] } methods(ARRAY, qw(reduce_operator))),
                              ),
 
+        (RANGENUM) => build_tree(
+
+            # RangeNum.method(Number)
+            (
+             map { [$_, [table(NUMBER)]] }
+               methods(RANGENUM, qw(
+                   from to by
+                   sum add sub mul div
+                   )
+               )
+            ),
+
+            # RangeNum.method()
+            (
+             map { [$_, []] }
+               methods(RANGENUM, qw(
+                   first last reverse
+                   min max step
+                   sum length
+                   )
+               )
+            ),
+        ),
+
         (NUMBER_DT) => build_tree(
 
             # Number.method()
@@ -640,7 +665,7 @@ package Sidef::Optimizer {
                )
             ),
 
-            # RangeNum.method(NUMBER, NUMBER)
+            # RangeNum.method(NUMBER, NUMBER, NUMBER)
             (
              map { [$_, [table(NUMBER), table(NUMBER), table(NUMBER)]] }
                dtypes(RANGENUM_DT, qw(
@@ -817,8 +842,16 @@ package Sidef::Optimizer {
                 $obj->{else}{block}{code} = \%code;
             }
         }
+        elsif ($ref eq 'Sidef::Types::Block::ForIn') {
+            foreach my $loop (@{$obj->{loops}}) {
+                my %expr = $self->optimize($loop->{expr});
+                $loop->{expr} = \%expr;
+            }
+
+            my %code = $self->optimize($obj->{block}{code});
+            $obj->{block}{code} = \%code;
+        }
         elsif (   $ref eq 'Sidef::Types::Block::While'
-               or $ref eq 'Sidef::Types::Block::ForIn'
                or $ref eq 'Sidef::Types::Block::ForEach') {
             my %expr = $self->optimize($obj->{expr});
             $obj->{expr} = \%expr;

@@ -29,6 +29,8 @@ Math.avg() -> I<Obj>
 
 Return the
 
+Aliases: I<arithmetic_mean>
+
 =cut
 
 =head2 chinese
@@ -42,6 +44,22 @@ Return the
 =head2 gcd
 
 Math.gcd() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 geometric_mean
+
+Math.geometric_mean() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 harmonic_mean
+
+Math.harmonic_mean() -> I<Obj>
 
 Return the
 

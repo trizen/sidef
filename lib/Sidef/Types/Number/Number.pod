@@ -1093,6 +1093,16 @@ Aliases: I<modinv>
 
 =cut
 
+=head2 inv_totient
+
+Number.inv_totient() -> I<Obj>
+
+Return the
+
+Aliases: I<inv_euler_phi>, I<inverse_totient>, I<inverse_euler_phi>
+
+=cut
+
 =head2 ipolygonal_root
 
 Number.ipolygonal_root() -> I<Obj>
