@@ -5719,6 +5719,23 @@ package Sidef::Types::Number::Number {
         bless \$r;
     }
 
+    sub flipbit {
+        my ($x, $k) = @_;
+
+        _valid(\$k);
+
+        $x = _any2mpz($$x) // return undef;
+        $k = _any2ui($$k) // return undef;
+
+        my $r = Math::GMPz::Rmpz_init_set($x);
+
+        Math::GMPz::Rmpz_tstbit($r, $k)
+          ? Math::GMPz::Rmpz_clrbit($r, $k)
+          : Math::GMPz::Rmpz_setbit($r, $k);
+
+        bless \$r;
+    }
+
     sub clearbit {
         my ($x, $k) = @_;
 

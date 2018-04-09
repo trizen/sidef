@@ -925,6 +925,14 @@ Aliases: I<fibonacci>
 
 =cut
 
+=head2 flipbit
+
+Number.flipbit() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 float
 
 Number.float() -> I<Obj>
