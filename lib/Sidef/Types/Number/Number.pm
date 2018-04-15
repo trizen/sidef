@@ -680,9 +680,11 @@ package Sidef::Types::Number::Number {
 
     sub _big2uistr {
         my ($x) = @_;
-        my $str = Math::GMPz::Rmpz_get_str((_any2mpz($$x) // return undef), 10);
-        $str < 0 && return undef;
-        "$str";
+
+        $x = _any2mpz($$x) // return undef;
+        Math::GMPz::Rmpz_sgn($x) >= 0 or return undef;
+
+        Math::GMPz::Rmpz_get_str($x, 10);
     }
 
     #
