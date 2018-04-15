@@ -675,13 +675,18 @@ package Sidef::Types::Number::Number {
 
     sub _big2istr {
         my ($x) = @_;
-        Math::GMPz::Rmpz_get_str((_any2mpz($$x) // return undef), 10);
+
+        $x = $$x;
+        $x = (_any2mpz($x) // return undef) if ref($x) ne 'Math::GMPz';
+
+        Math::GMPz::Rmpz_get_str($x, 10);
     }
 
     sub _big2uistr {
         my ($x) = @_;
 
-        $x = _any2mpz($$x) // return undef;
+        $x = $$x;
+        $x = (_any2mpz($x) // return undef) if ref($x) ne 'Math::GMPz';
         Math::GMPz::Rmpz_sgn($x) >= 0 or return undef;
 
         Math::GMPz::Rmpz_get_str($x, 10);
