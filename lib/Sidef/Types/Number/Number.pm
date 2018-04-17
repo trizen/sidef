@@ -5152,6 +5152,70 @@ package Sidef::Types::Number::Number {
         bless \$u;
     }
 
+    sub sumdigits {
+        my ($x, $y) = @_;
+
+        $x = _any2mpz($$x) // return undef;
+
+        if (defined($y)) {
+            _valid(\$y);
+
+            $y = _any2mpz($$y) // return undef;
+
+            # Not defined for y <= 1
+            if (Math::GMPz::Rmpz_cmp_ui($y, 1) <= 0) {
+                return undef;
+            }
+        }
+        else {
+            state $ten = Math::GMPz::Rmpz_init_set_ui(10);
+            $y = $ten;
+        }
+
+        my $m   = Math::GMPz::Rmpz_init();
+        my $t   = Math::GMPz::Rmpz_init_set($x);
+        my $sgn = Math::GMPz::Rmpz_sgn($t);
+
+        if ($sgn == 0) {
+            return ZERO;
+        }
+        elsif ($sgn < 0) {
+            Math::GMPz::Rmpz_abs($t, $t);
+        }
+
+        my $sum = Math::GMPz::Rmpz_init_set_ui(0);
+
+        while (Math::GMPz::Rmpz_sgn($t) > 0) {
+            Math::GMPz::Rmpz_divmod($t, $m, $t, $y);
+            Math::GMPz::Rmpz_add($sum, $sum, $m);
+        }
+
+        bless \$sum;
+    }
+
+    *digits_sum = \&sumdigits;
+    *sum_digits = \&sumdigits;
+
+    sub factorial_power {
+        my ($n, $p) = @_;
+
+        _valid(\$p);
+
+        my $sum = $n->sumdigits($p) // return undef;
+
+        $n = _any2mpz($$n) // return undef;
+        $p = _any2mpz($$p) // return undef;
+
+        my $r = Math::GMPz::Rmpz_init();
+        my $t = Math::GMPz::Rmpz_init();
+
+        Math::GMPz::Rmpz_sub_ui($t, $p, 1);    # t = p-1
+        Math::GMPz::Rmpz_sub($r, $n, $$sum);   # r = n-sum
+        Math::GMPz::Rmpz_divexact($r, $r, $t); # r = r/t
+
+        bless \$r;
+    }
+
     sub length {
         my ($x) = @_;
         my ($z) = _any2mpz($$x) // return MONE;
