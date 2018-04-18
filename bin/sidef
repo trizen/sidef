@@ -410,6 +410,8 @@ sub code_interactive {
         \%copy;
     };
 
+    require Time::HiRes;
+
     print qq{$name $version on $^O\n};
     print qq{Type "help", "copyright" or "license" for more information.\n};
 
@@ -427,6 +429,8 @@ sub code_interactive {
         $term->ReadHistory($history_file);
     }
 
+    my $tΔ = 0;
+
   MAINLOOP: {
         my $line = '';
 
@@ -435,6 +439,10 @@ sub code_interactive {
 
             if ($line eq 'help') {
                 help_interactive();
+                redo MAINLOOP;
+            }
+            elsif ($line eq '##') {
+                say "  ***   last result computed in $tΔ seconds";
                 redo MAINLOOP;
             }
             elsif ($line =~ /^#\h*load\h+(.+)/) {
@@ -552,7 +560,13 @@ EOT
             output($ccode);
         }
         elsif ($line =~ /\S/ and not $line =~ /^\s*#.*$/) {
+
+            my $t0 = eval { [Time::HiRes::gettimeofday()] };
+
             my @results = $sidef->execute_perl($ccode);
+
+            $tΔ = eval { Time::HiRes::tv_interval($t0) };
+
             print $@ if $@;
 
             use overload;
