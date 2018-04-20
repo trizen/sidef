@@ -565,9 +565,9 @@ EOT
 
             my @results = $sidef->execute_perl($ccode);
 
-            $tΔ = eval { Time::HiRes::tv_interval($t0) };
-
             print $@ if $@;
+
+            $tΔ = eval { Time::HiRes::tv_interval($t0) };
 
             use overload;
 
