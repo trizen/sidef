@@ -4246,6 +4246,38 @@ package Sidef::Types::Number::Number {
           : (Sidef::Types::Bool::Bool::FALSE);
     }
 
+    sub approx_eq {
+        my ($x, $y, $places) = @_;
+
+        _valid(\$y);
+
+        if (defined($places)) {
+            _valid(\$places);
+            $places = _any2si($$places) // return undef;
+        }
+        else {
+            $places = -((CORE::int($PREC) >> 2) - 1);
+        }
+
+        $x = $$x;
+        $y = $$y;
+
+        if (   ref($x) eq 'Math::MPFR'
+            or ref($y) eq 'Math::MPFR'
+            or ref($x) eq 'Math::MPC'
+            or ref($y) eq 'Math::MPC') {
+            $x = _any2mpfr_mpc($x);
+            $y = _any2mpfr_mpc($y);
+        }
+
+        $x = __round__($x, $places);
+        $y = __round__($y, $places);
+
+        __eq__($x, $y)
+          ? Sidef::Types::Bool::Bool::TRUE
+          : Sidef::Types::Bool::Bool::FALSE;
+    }
+
     sub __cmp__ {
         my ($x, $y) = @_;
 
@@ -8175,6 +8207,7 @@ package Sidef::Types::Number::Number {
         *{__PACKAGE__ . '::' . 'ζ'}  = \&zeta;
         *{__PACKAGE__ . '::' . 'η'}  = \&eta;
         *{__PACKAGE__ . '::' . 'μ'}  = \&mobius;
+        *{__PACKAGE__ . '::' . '=~='} = \&approx_eq;
     }
 }
 

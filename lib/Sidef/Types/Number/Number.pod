@@ -223,6 +223,16 @@ Aliases: I<eq>
 
 =cut
 
+=head2 =~=
+
+I<Obj> B<=~=> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<approx_eq>
+
+=cut
+
 =head2 >
 
 I<Obj> B<E<gt>> I<Obj> -> I<Obj>
@@ -753,6 +763,16 @@ Return the
 
 =cut
 
+=head2 digits_sum
+
+Number.digits_sum() -> I<Obj>
+
+Return the
+
+Aliases: I<sum_digits>, I<sumdigits>
+
+=cut
+
 =head2 divides
 
 Number.divides() -> I<Obj>
@@ -892,6 +912,14 @@ Aliases: I<factors_exp>
 =head2 factorialmod
 
 Number.factorialmod() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 factorial_power
+
+Number.factorial_power() -> I<Obj>
 
 Return the
 
