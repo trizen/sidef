@@ -490,6 +490,7 @@ package Sidef::Types::Hash::Hash {
           : (Sidef::Types::Bool::Bool::FALSE);
     }
 
+    *haskey   = \&exists;
     *has_key  = \&exists;
     *contain  = \&exists;
     *contains = \&exists;
