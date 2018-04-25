@@ -6040,10 +6040,51 @@ package Sidef::Types::Number::Number {
     }
 
     sub fibonacci {
-        my ($x) = @_;
-        my $ui = _any2ui($$x) // (goto &nan);
+        my ($n, $k) = @_;
+
+        $n = _any2ui($$n) // (goto &nan);
+
+        if (defined($k)) {
+            _valid(\$k);
+
+            $k = _any2ui($$k) // (goto &nan);
+
+            if ($k == 2) {
+                my $z = Math::GMPz::Rmpz_init();
+                Math::GMPz::Rmpz_fib_ui($z, $n);
+                return bless \$z;
+            }
+
+            # Algorithm after M. F. Hasler
+            # See: https://oeis.org/A302990
+
+            my @f = map {
+                $_ < $k
+                  ? do {
+                    my $z = Math::GMPz::Rmpz_init();
+                    Math::GMPz::Rmpz_setbit($z, $_);
+                    $z;
+                  }
+                  : Math::GMPz::Rmpz_init_set_ui(1)
+            } 1 .. ($k + 1);
+
+            if ($n < $k - 1) {
+                return ZERO;
+            }
+
+            my $t = Math::GMPz::Rmpz_init();
+
+            foreach my $i (2 * ++$k - 2 .. $n) {
+                Math::GMPz::Rmpz_mul_2exp($t, $f[($i - 1) % $k], 1);
+                Math::GMPz::Rmpz_sub($f[$i % $k], $t, $f[$i % $k]);
+            }
+
+            my $r = $f[$n % $k];
+            return bless \$r;
+        }
+
         my $z = Math::GMPz::Rmpz_init();
-        Math::GMPz::Rmpz_fib_ui($z, $ui);
+        Math::GMPz::Rmpz_fib_ui($z, $n);
         bless \$z;
     }
 
