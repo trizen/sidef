@@ -6383,8 +6383,8 @@ package Sidef::Types::Number::Number {
         #   https://github.com/kimwalisch/primecount
 
         my $logx  = CORE::log($x);
-        my $first = CORE::int($x * $logx);
-        my $last  = CORE::int($x * $logx * 2 + 2);
+        my $first = CORE::int($x * ($logx + CORE::log($logx) - 1));
+        my $last  = CORE::int($x * ($logx + CORE::log($logx)));
 
         state $mpfr = Math::MPFR::Rmpfr_init2_nobless(64);
 
@@ -6399,7 +6399,7 @@ package Sidef::Types::Number::Number {
             Math::MPFR::Rmpfr_set_d($mpfr, CORE::log($mid), $ROUND);
             Math::MPFR::Rmpfr_eint($mpfr, $mpfr, $ROUND);
 
-            if (Math::MPFR::Rmpfr_get_d($mpfr, $ROUND) - 1.045163780117 < $x) {
+            if (Math::MPFR::Rmpfr_get_d($mpfr, $ROUND) < $x) {
                 $first = $mid + 1;
             }
             else {
@@ -6623,8 +6623,8 @@ package Sidef::Types::Number::Number {
 
         if ($n > 100_000) {
 
-            my $approx = CORE::int($n * CORE::log($n) + $n * (CORE::log(CORE::log($n)) - 1));
-            my $up_approx = CORE::int($n * CORE::log($n) + $n * CORE::log(CORE::log($n)));
+            my $approx    = CORE::int($n * (CORE::log($n) + CORE::log(CORE::log($n)) - 1));
+            my $up_approx = CORE::int($n * (CORE::log($n) + CORE::log(CORE::log($n))));
 
             if ($n >= 1e7) {
                 my $li_inv_n  = _Li_inverse($n);
