@@ -6055,6 +6055,10 @@ package Sidef::Types::Number::Number {
                 return bless \$z;
             }
 
+            if ($n < $k - 1) {
+                return ZERO;
+            }
+
             # Algorithm after M. F. Hasler
             # See: https://oeis.org/A302990
 
@@ -6067,10 +6071,6 @@ package Sidef::Types::Number::Number {
                   }
                   : Math::GMPz::Rmpz_init_set_ui(1)
             } 1 .. ($k + 1);
-
-            if ($n < $k - 1) {
-                return ZERO;
-            }
 
             my $t = Math::GMPz::Rmpz_init();
 
@@ -6623,16 +6623,18 @@ package Sidef::Types::Number::Number {
 
         if ($n > 100_000) {
 
-            #my $approx    = CORE::int($n * CORE::log($n) + $n * (CORE::log(CORE::log($n)) - 1));
-            #my $up_approx = CORE::int($n * CORE::log($n) + $n * CORE::log(CORE::log($n)));
+            my $approx = CORE::int($n * CORE::log($n) + $n * (CORE::log(CORE::log($n)) - 1));
+            my $up_approx = CORE::int($n * CORE::log($n) + $n * CORE::log(CORE::log($n)));
 
-            my $li_inv_n  = _Li_inverse($n);
-            my $li_inv_sn = _Li_inverse(CORE::int(CORE::sqrt($n)));
+            if ($n >= 1e7) {
+                my $li_inv_n  = _Li_inverse($n);
+                my $li_inv_sn = _Li_inverse(CORE::int(CORE::sqrt($n)));
 
-            ## Formula due to Dana Jacobsen:
-            ## Nth prime ≈ Li^-1(n) + Li^-1(sqrt(n)) / 4
-            my $approx    = CORE::int($li_inv_n + $li_inv_sn / 4);
-            my $up_approx = CORE::int($li_inv_n + $li_inv_sn);       # conjecture
+                ## Formula due to Dana Jacobsen:
+                ## Nth prime ≈ Li^-1(n) + Li^-1(sqrt(n)) / 4
+                $approx    = CORE::int($li_inv_n + $li_inv_sn / 4);
+                $up_approx = CORE::int($li_inv_n + $li_inv_sn);       # conjecture
+            }
 
             my ($i, $count) = _prime_count_checkpoint($approx);
 
