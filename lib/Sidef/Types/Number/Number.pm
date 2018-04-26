@@ -6399,7 +6399,7 @@ package Sidef::Types::Number::Number {
             Math::MPFR::Rmpfr_set_d($mpfr, CORE::log($mid), $ROUND);
             Math::MPFR::Rmpfr_eint($mpfr, $mpfr, $ROUND);
 
-            if (Math::MPFR::Rmpfr_get_d($mpfr, $ROUND) < $x) {
+            if (Math::MPFR::Rmpfr_cmp_d($mpfr, $x) < 0) {
                 $first = $mid + 1;
             }
             else {
@@ -6511,7 +6511,7 @@ package Sidef::Types::Number::Number {
 
         my $nth_prime_lower = sub {
             my ($n) = @_;
-            CORE::int($n * CORE::log($n) + $n * (CORE::log(CORE::log($n)) - 1));
+            CORE::int($n * (CORE::log($n) + CORE::log(CORE::log($n)) - 1));
         };
 
         my $count = 0;
@@ -6640,7 +6640,7 @@ package Sidef::Types::Number::Number {
 
             my $nth_prime_lower = sub {
                 my ($n) = @_;
-                CORE::int($n * CORE::log($n) + $n * (CORE::log(CORE::log($n)) - 1));
+                CORE::int($n * (CORE::log($n) + CORE::log(CORE::log($n)) - 1));
             };
 
             my $step = $nth_prime_lower->($i + CORE::log($n) * 2e3) - $nth_prime_lower->($i);
