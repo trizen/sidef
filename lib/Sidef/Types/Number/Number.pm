@@ -8,6 +8,7 @@ package Sidef::Types::Number::Number {
     use Math::GMPz qw();
     use Math::MPC qw();
 
+    use List::Util qw();
     use Math::Prime::Util::GMP qw();
 
     use constant {
@@ -5214,6 +5215,20 @@ package Sidef::Types::Number::Number {
         elsif ($sgn < 0) {
             Math::GMPz::Rmpz_abs($t, $t);
         }
+
+#<<<
+        if (Math::GMPz::Rmpz_cmp_ui($y, 2) == 0) {
+            return __PACKAGE__->_set_uint(scalar Math::GMPz::Rmpz_popcount($t));
+        }
+
+        if (Math::GMPz::Rmpz_cmp_ui($y, 10) <= 0) {
+            return __PACKAGE__->_set_uint(List::Util::sum(split(//, Math::GMPz::Rmpz_get_str($t, Math::GMPz::Rmpz_get_ui($y)))));
+        }
+
+        if (Math::GMPz::Rmpz_cmp_ui($y, 16) == 0) {
+            return __PACKAGE__->_set_uint(List::Util::sum(map { hex($_) } split(//, Math::GMPz::Rmpz_get_str($t, 16))));
+        }
+#>>>
 
         my $sum = Math::GMPz::Rmpz_init_set_ui(0);
 
