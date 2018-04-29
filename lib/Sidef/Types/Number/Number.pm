@@ -5109,17 +5109,7 @@ package Sidef::Types::Number::Number {
             }
         }
 
-        # Return faster when y <= 10
-        if (!defined($y) or Math::GMPz::Rmpz_cmp_ui($y, 10) <= 0) {
-            my @digits =
-              split(//, scalar reverse scalar Math::GMPz::Rmpz_get_str($x, defined($y) ? Math::GMPz::Rmpz_get_ui($y) : 10));
-            pop(@digits) if $digits[-1] eq '-';
-            return Sidef::Types::Array::Array->new([map { __PACKAGE__->_set_uint($_) } @digits]);
-        }
-
-        my @digits;
         my $t = Math::GMPz::Rmpz_init_set($x);
-
         my $sgn = Math::GMPz::Rmpz_sgn($t);
 
         if ($sgn == 0) {
@@ -5128,6 +5118,24 @@ package Sidef::Types::Number::Number {
         elsif ($sgn < 0) {
             Math::GMPz::Rmpz_abs($t, $t);
         }
+
+#<<<
+        if (!defined($y) or Math::GMPz::Rmpz_cmp_ui($y, 10) <= 0) {
+            return Sidef::Types::Array::Array->new([
+                map { __PACKAGE__->_set_uint($_) }
+                    split(//, scalar reverse scalar Math::GMPz::Rmpz_get_str($t, defined($y) ? Math::GMPz::Rmpz_get_ui($y) : 10))
+            ]);
+        }
+
+        if (Math::GMPz::Rmpz_cmp_ui($y, 16) <= 0) {
+            return Sidef::Types::Array::Array->new([
+                map { __PACKAGE__->_set_uint(hex($_)) }
+                    split(//, scalar reverse scalar Math::GMPz::Rmpz_get_str($t, Math::GMPz::Rmpz_get_ui($y)))
+            ]);
+        }
+#>>>
+
+        my @digits;
 
         while (Math::GMPz::Rmpz_sgn($t) > 0) {
             my $m = Math::GMPz::Rmpz_init();
@@ -5200,10 +5208,6 @@ package Sidef::Types::Number::Number {
                 return undef;
             }
         }
-        else {
-            state $ten = Math::GMPz::Rmpz_init_set_ui(10);
-            $y = $ten;
-        }
 
         my $m   = Math::GMPz::Rmpz_init();
         my $t   = Math::GMPz::Rmpz_init_set($x);
@@ -5217,16 +5221,16 @@ package Sidef::Types::Number::Number {
         }
 
 #<<<
-        if (Math::GMPz::Rmpz_cmp_ui($y, 2) == 0) {
+        if (defined($y) and Math::GMPz::Rmpz_cmp_ui($y, 2) == 0) {
             return __PACKAGE__->_set_uint(scalar Math::GMPz::Rmpz_popcount($t));
         }
 
-        if (Math::GMPz::Rmpz_cmp_ui($y, 10) <= 0) {
-            return __PACKAGE__->_set_uint(List::Util::sum(split(//, Math::GMPz::Rmpz_get_str($t, Math::GMPz::Rmpz_get_ui($y)))));
+        if (!defined($y) or Math::GMPz::Rmpz_cmp_ui($y, 10) <= 0) {
+            return __PACKAGE__->_set_uint(List::Util::sum(split(//, Math::GMPz::Rmpz_get_str($t, defined($y) ? Math::GMPz::Rmpz_get_ui($y) : 10))));
         }
 
-        if (Math::GMPz::Rmpz_cmp_ui($y, 16) == 0) {
-            return __PACKAGE__->_set_uint(List::Util::sum(map { hex($_) } split(//, Math::GMPz::Rmpz_get_str($t, 16))));
+        if (Math::GMPz::Rmpz_cmp_ui($y, 16) <= 0) {
+            return __PACKAGE__->_set_uint(List::Util::sum(map { hex($_) } split(//, Math::GMPz::Rmpz_get_str($t, Math::GMPz::Rmpz_get_ui($y)))));
         }
 #>>>
 
