@@ -5878,7 +5878,7 @@ package Sidef::Types::Number::Number {
     sub subfactorial {
         my ($x, $y) = @_;
 
-        my $m = _any2ui($$x) // (goto &nan);
+        my $m = _any2ui($$x) // goto &nan;
         my $k = defined($y) ? do { _valid(\$y); _any2si($$y) // goto &nan } : 0;
 
         my $n = $m - $k;
@@ -5910,12 +5910,27 @@ package Sidef::Types::Number::Number {
         bless \$z;
     }
 
+    sub superfactorial {
+        my ($n) = @_;
+
+        $n = _any2ui($$n) // goto &nan;
+
+        my @list;
+        foreach my $k (2 .. $n) {
+            my $z = Math::GMPz::Rmpz_init();
+            Math::GMPz::Rmpz_fac_ui($z, $k);
+            push @list, bless \$z;
+        }
+
+        Sidef::Types::Array::Array->new(\@list)->prod;
+    }
+
     sub factorial {
-        my ($x) = @_;
-        my $ui = _any2ui($$x) // (goto &nan);
-        my $z = Math::GMPz::Rmpz_init();
-        Math::GMPz::Rmpz_fac_ui($z, $ui);
-        bless \$z;
+        my ($n) = @_;
+        $n = _any2ui($$n) // goto &nan;
+        my $r = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_fac_ui($r, $n);
+        bless \$r;
     }
 
     *fac = \&factorial;

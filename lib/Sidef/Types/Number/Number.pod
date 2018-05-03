@@ -2263,6 +2263,14 @@ Return the
 
 =cut
 
+=head2 superfactorial
+
+Number.superfactorial() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 tan
 
 Number.tan() -> I<Obj>
