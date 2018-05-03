@@ -165,7 +165,7 @@ Output:
 
 ### INTERACTIVE MODE
 
-![sidef](https://user-images.githubusercontent.com/614513/32420413-973f20a2-c292-11e7-9c60-d58d84666232.png)
+![sidef](https://user-images.githubusercontent.com/614513/39590990-123bd3ea-4f0b-11e8-9717-abc0ec48622e.png)
 
 ### TRY IT ONLINE
 
