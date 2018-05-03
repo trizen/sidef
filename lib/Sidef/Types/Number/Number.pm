@@ -5094,22 +5094,22 @@ package Sidef::Types::Number::Number {
     }
 
     sub digits {
-        my ($x, $y) = @_;
+        my ($n, $k) = @_;
 
-        $x = _any2mpz($$x) // return undef;
+        $n = _any2mpz($$n) // return undef;
 
-        if (defined($y)) {
-            _valid(\$y);
+        if (defined($k)) {
+            _valid(\$k);
 
-            $y = _any2mpz($$y) // return undef;
+            $k = _any2mpz($$k) // return undef;
 
-            # Not defined for y <= 1
-            if (Math::GMPz::Rmpz_cmp_ui($y, 1) <= 0) {
+            # Not defined for k <= 1
+            if (Math::GMPz::Rmpz_cmp_ui($k, 1) <= 0) {
                 return undef;
             }
         }
 
-        my $t = Math::GMPz::Rmpz_init_set($x);
+        my $t   = Math::GMPz::Rmpz_init_set($n);
         my $sgn = Math::GMPz::Rmpz_sgn($t);
 
         if ($sgn == 0) {
@@ -5120,17 +5120,17 @@ package Sidef::Types::Number::Number {
         }
 
 #<<<
-        if (!defined($y) or Math::GMPz::Rmpz_cmp_ui($y, 10) <= 0) {
+        if (!defined($k) or Math::GMPz::Rmpz_cmp_ui($k, 10) <= 0) {
             return Sidef::Types::Array::Array->new([
                 map { __PACKAGE__->_set_uint($_) }
-                    split(//, scalar reverse scalar Math::GMPz::Rmpz_get_str($t, defined($y) ? Math::GMPz::Rmpz_get_ui($y) : 10))
+                    split(//, scalar reverse scalar Math::GMPz::Rmpz_get_str($t, defined($k) ? Math::GMPz::Rmpz_get_ui($k) : 10))
             ]);
         }
 
-        if (Math::GMPz::Rmpz_cmp_ui($y, 16) <= 0) {
+        if (Math::GMPz::Rmpz_cmp_ui($k, 16) <= 0) {
             return Sidef::Types::Array::Array->new([
                 map { __PACKAGE__->_set_uint(hex($_)) }
-                    split(//, scalar reverse scalar Math::GMPz::Rmpz_get_str($t, Math::GMPz::Rmpz_get_ui($y)))
+                    split(//, scalar reverse scalar Math::GMPz::Rmpz_get_str($t, Math::GMPz::Rmpz_get_ui($k)))
             ]);
         }
 #>>>
@@ -5139,7 +5139,7 @@ package Sidef::Types::Number::Number {
 
         while (Math::GMPz::Rmpz_sgn($t) > 0) {
             my $m = Math::GMPz::Rmpz_init();
-            Math::GMPz::Rmpz_divmod($t, $m, $t, $y);
+            Math::GMPz::Rmpz_divmod($t, $m, $t, $k);
             push @digits, bless \$m;
         }
 
@@ -5147,30 +5147,30 @@ package Sidef::Types::Number::Number {
     }
 
     sub digit {
-        my ($x, $y, $z) = @_;
+        my ($n, $i, $k) = @_;
 
-        _valid(\$y);
+        _valid(\$i);
 
-        $x = _any2mpz($$x) // return undef;
-        $y = _any2si($$y) // return undef;
+        $n = _any2mpz($$n) // return undef;
+        $i = _any2si($$i) // return undef;
 
-        if (defined($z)) {
-            _valid(\$z);
+        if (defined($k)) {
+            _valid(\$k);
 
-            $z = _any2mpz($$z) // return undef;
+            $k = _any2mpz($$k) // return undef;
 
-            # Not defined for z <= 1
-            if (Math::GMPz::Rmpz_cmp_ui($z, 1) <= 0) {
+            # Not defined for k <= 1
+            if (Math::GMPz::Rmpz_cmp_ui($k, 1) <= 0) {
                 return undef;
             }
         }
         else {
             state $ten = Math::GMPz::Rmpz_init_set_ui(10);
-            $z = $ten;
+            $k = $ten;
         }
 
         my $t = Math::GMPz::Rmpz_init();
-        my $u = Math::GMPz::Rmpz_init_set($x);
+        my $u = Math::GMPz::Rmpz_init_set($n);
 
         my $sgn = Math::GMPz::Rmpz_sgn($u);
 
@@ -5181,36 +5181,36 @@ package Sidef::Types::Number::Number {
             Math::GMPz::Rmpz_abs($u, $u);
         }
 
-        if ($y < 0) {
-            $y += __ilog__($u, $z) + 1;
-            return undef if ($y < 0);
+        if ($i < 0) {
+            $i += __ilog__($u, $k) + 1;
+            return undef if ($i < 0);
         }
 
-        Math::GMPz::Rmpz_pow_ui($t, $z, $y);
+        Math::GMPz::Rmpz_pow_ui($t, $k, $i);
         Math::GMPz::Rmpz_tdiv_q($u, $u, $t);
-        Math::GMPz::Rmpz_mod($u, $u, $z);
+        Math::GMPz::Rmpz_mod($u, $u, $k);
 
         bless \$u;
     }
 
     sub sumdigits {
-        my ($x, $y) = @_;
+        my ($n, $k) = @_;
 
-        $x = _any2mpz($$x) // return undef;
+        $n = _any2mpz($$n) // return undef;
 
-        if (defined($y)) {
-            _valid(\$y);
+        if (defined($k)) {
+            _valid(\$k);
 
-            $y = _any2mpz($$y) // return undef;
+            $k = _any2mpz($$k) // return undef;
 
-            # Not defined for y <= 1
-            if (Math::GMPz::Rmpz_cmp_ui($y, 1) <= 0) {
+            # Not defined for k <= 1
+            if (Math::GMPz::Rmpz_cmp_ui($k, 1) <= 0) {
                 return undef;
             }
         }
 
         my $m   = Math::GMPz::Rmpz_init();
-        my $t   = Math::GMPz::Rmpz_init_set($x);
+        my $t   = Math::GMPz::Rmpz_init_set($n);
         my $sgn = Math::GMPz::Rmpz_sgn($t);
 
         if ($sgn == 0) {
@@ -5221,23 +5221,23 @@ package Sidef::Types::Number::Number {
         }
 
 #<<<
-        if (defined($y) and Math::GMPz::Rmpz_cmp_ui($y, 2) == 0) {
+        if (defined($k) and Math::GMPz::Rmpz_cmp_ui($k, 2) == 0) {
             return __PACKAGE__->_set_uint(scalar Math::GMPz::Rmpz_popcount($t));
         }
 
-        if (!defined($y) or Math::GMPz::Rmpz_cmp_ui($y, 10) <= 0) {
-            return __PACKAGE__->_set_uint(List::Util::sum(split(//, Math::GMPz::Rmpz_get_str($t, defined($y) ? Math::GMPz::Rmpz_get_ui($y) : 10))));
+        if (!defined($k) or Math::GMPz::Rmpz_cmp_ui($k, 10) <= 0) {
+            return __PACKAGE__->_set_uint(List::Util::sum(split(//, Math::GMPz::Rmpz_get_str($t, defined($k) ? Math::GMPz::Rmpz_get_ui($k) : 10))));
         }
 
-        if (Math::GMPz::Rmpz_cmp_ui($y, 16) <= 0) {
-            return __PACKAGE__->_set_uint(List::Util::sum(map { hex($_) } split(//, Math::GMPz::Rmpz_get_str($t, Math::GMPz::Rmpz_get_ui($y)))));
+        if (Math::GMPz::Rmpz_cmp_ui($k, 16) <= 0) {
+            return __PACKAGE__->_set_uint(List::Util::sum(map { hex($_) } split(//, Math::GMPz::Rmpz_get_str($t, Math::GMPz::Rmpz_get_ui($k)))));
         }
 #>>>
 
         my $sum = Math::GMPz::Rmpz_init_set_ui(0);
 
         while (Math::GMPz::Rmpz_sgn($t) > 0) {
-            Math::GMPz::Rmpz_divmod($t, $m, $t, $y);
+            Math::GMPz::Rmpz_divmod($t, $m, $t, $k);
             Math::GMPz::Rmpz_add($sum, $sum, $m);
         }
 

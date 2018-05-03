@@ -30,11 +30,11 @@ package Sidef::Types::Glob::Dir {
     sub home {
         my ($self) = @_;
 
-        my $home =
-             $ENV{HOME}
-          || $ENV{LOGDIR}
-          || (getpwuid($<))[7]
-          || `echo -n ~`;
+        my $home = $ENV{HOME} || $ENV{LOGDIR};
+
+        if (not $home and $^O ne 'MSWin32') {
+            $home = (getpwuid($<))[7];
+        }
 
         $home ? __PACKAGE__->new($home) : do {
             state $x = require File::HomeDir;
