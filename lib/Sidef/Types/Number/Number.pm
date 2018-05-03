@@ -8285,6 +8285,7 @@ package Sidef::Types::Number::Number {
         *{__PACKAGE__ . '::' . 'η'}  = \&eta;
         *{__PACKAGE__ . '::' . 'μ'}  = \&mobius;
         *{__PACKAGE__ . '::' . '=~='} = \&approx_eq;
+        *{__PACKAGE__ . '::' . '≅'} = \&approx_eq;
     }
 }
 
