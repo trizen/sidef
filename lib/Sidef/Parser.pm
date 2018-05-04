@@ -594,6 +594,11 @@ package Sidef::Parser {
             return ($1, 0, '');
         }
 
+        # Super-script power
+        if (/\G(?=[⁰¹²³⁴⁵⁶⁷⁸⁹])/) {
+            return ('**', 1, 'op');
+        }
+
         # Operator-like method name
         if (m{\G$self->{operators_re}}goc) {
             my ($key) = keys(%+);
@@ -1840,6 +1845,12 @@ package Sidef::Parser {
                 return bless({expr => $obj, gather => $self->{current_gather}}, 'Sidef::Types::Block::Take');
             }
 
+            # Super-script power
+            if (/\G([⁰¹²³⁴⁵⁶⁷⁸⁹]+)/gc) {
+                my $num = ($1 =~ tr/⁰¹²³⁴⁵⁶⁷⁸⁹/0-9/r);
+                return Sidef::Types::Number::Number->new($num);
+            }
+
             # Binary, hexadecimal and octal numbers
             if (/\G0(b[10_]*|x[0-9A-Fa-f_]*|[0-9_]+\b)/gc) {
                 my $num = $1 =~ tr/_//dr;
@@ -2976,6 +2987,7 @@ package Sidef::Parser {
                             ? do { $self->parse_whitespace(code => $opt{code}); 1 }
                             : 0
                            )
+                        || /\G(?=[⁰¹²³⁴⁵⁶⁷⁸⁹])/
                        )
                   ) {
 
