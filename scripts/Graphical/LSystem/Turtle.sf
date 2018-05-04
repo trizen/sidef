@@ -13,7 +13,7 @@ class Turtle(
     color  = 'black',
 ) {
 
-    has im = %s<Image::Magick>.new(size => "#{x}x#{y}")
+    has im = %O<Image::Magick>.new(size => "#{x}x#{y}")
 
     method init {
         angle.deg2rad!
