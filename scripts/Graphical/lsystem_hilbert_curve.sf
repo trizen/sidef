@@ -5,7 +5,7 @@ include('LSystem/LSystem.sf')
 var rules = Hash(
     a => '-bF+aFa+Fb-',
     b => '+aF-bFb-Fa+',
-);
+)
 
 var lsys = LSystem(
     width:  600,
@@ -20,4 +20,4 @@ var lsys = LSystem(
     color: 'dark green',
 )
 
-lsys.execute('a', 6, "plant_1.png", rules);
+lsys.execute('a', 6, "hilbert_curve.png", rules)

@@ -209,6 +209,7 @@ scripts/Graphical/LSystem/LSystem.sf
 scripts/Graphical/LSystem/Turtle.sf
 scripts/Graphical/lsystem_complex.sf
 scripts/Graphical/lsystem_hilbert_curve.sf
+scripts/Graphical/lsystem_koch_snowflake.sf
 scripts/Graphical/lsystem_plant_1.sf
 scripts/Graphical/lsystem_plant_2.sf
 scripts/Graphical/lsystem_sierpinski_triangle.sf
