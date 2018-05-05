@@ -25,6 +25,6 @@ func intersection(ax, ay, bx, by,
     [x_numerator / denominator, y_numerator / denominator]
 }
 
-say ('Intersection point: ', intersection(4,0, 6,10, 0,3, 10,7).)
+say ('Intersection point: ', intersection(4,0, 6,10, 0,3, 10,7))
 say ('Intersection point: ', intersection(4,0, 6,10, 0,3, 10,7.1))
 say ('Intersection point: ', intersection(0,0, 1,1, 1,2, 4,5))

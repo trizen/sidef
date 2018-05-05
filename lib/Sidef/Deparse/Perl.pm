@@ -1127,7 +1127,7 @@ HEADER
                     map {
                         $self->_dump_string($_) . '=>'
                           . (defined($obj->{$_}) ? $self->deparse_expr({self => $obj->{$_}}) : 'undef')
-                    } sort keys(%{$obj})
+                    } sort(keys(%{$obj}))
                   )
                   . ')';
             }

@@ -7234,7 +7234,7 @@ package Sidef::Types::Number::Number {
             }
         }
 
-        if (not exists $r{$n}) {
+        if (!exists $r{$n}) {
             return Sidef::Types::Array::Array->new;
         }
 

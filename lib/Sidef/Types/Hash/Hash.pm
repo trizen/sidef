@@ -5,8 +5,8 @@ package Sidef::Types::Hash::Hash {
     use parent qw(Sidef::Object::Object);
 
     use overload
-      q{bool} => sub { scalar(CORE::keys %{$_[0]}) },
-      q{0+}   => sub { scalar(CORE::keys %{$_[0]}) },
+      q{bool} => sub { scalar(CORE::keys(%{$_[0]})) },
+      q{0+}   => sub { scalar(CORE::keys(%{$_[0]})) },
       q{""}   => \&_dump;
 
     use Sidef::Types::Bool::Bool;
@@ -32,7 +32,7 @@ package Sidef::Types::Hash::Hash {
             my %hash;
             $addr{$refaddr} = \%hash;
 
-            foreach my $k (CORE::keys %$obj) {
+            foreach my $k (CORE::keys(%$obj)) {
                 my $v = $obj->{$k};
                 $hash{$k} = (
                              index(ref($v), 'Sidef::') == 0
@@ -82,7 +82,7 @@ package Sidef::Types::Hash::Hash {
 
     sub length {
         my ($self) = @_;
-        Sidef::Types::Number::Number->new(scalar CORE::keys %$self);
+        Sidef::Types::Number::Number->new(scalar CORE::keys(%$self));
     }
 
     *len  = \&length;
@@ -157,7 +157,7 @@ package Sidef::Types::Hash::Hash {
     sub append {
         my ($self, %pairs) = @_;
 
-        foreach my $key (CORE::keys %pairs) {
+        foreach my $key (CORE::keys(%pairs)) {
             $self->{$key} = $pairs{$key};
         }
 
@@ -185,7 +185,7 @@ package Sidef::Types::Hash::Hash {
         my ($self, $code) = @_;
 
         my %hash;
-        foreach my $key (CORE::keys %$self) {
+        foreach my $key (CORE::keys(%$self)) {
             $hash{$key} = $code->run(Sidef::Types::String::String->new($key), $self->{$key});
         }
 
@@ -198,7 +198,7 @@ package Sidef::Types::Hash::Hash {
         my ($self, $code) = @_;
 
         my %hash;
-        foreach my $key (CORE::keys %$self) {
+        foreach my $key (CORE::keys(%$self)) {
             my ($k, $v) = $code->run(Sidef::Types::String::String->new($key), $self->{$key});
             $hash{$k} = $v;
         }
@@ -212,7 +212,7 @@ package Sidef::Types::Hash::Hash {
         my ($self, $code) = @_;
 
         my @array;
-        foreach my $key (CORE::keys %$self) {
+        foreach my $key (CORE::keys(%$self)) {
             CORE::push(@array, $code->run(Sidef::Types::String::String->new($key), $self->{$key}));
         }
 
@@ -225,7 +225,7 @@ package Sidef::Types::Hash::Hash {
         my ($self, $obj) = @_;
 
         my %hash;
-        foreach my $key (CORE::keys %$self) {
+        foreach my $key (CORE::keys(%$self)) {
             my $value = $self->{$key};
             if ($obj->run(Sidef::Types::String::String->new($key), $value)) {
                 $hash{$key} = $value;
@@ -242,7 +242,7 @@ package Sidef::Types::Hash::Hash {
         my ($self, $obj) = @_;
 
         my %hash;
-        foreach my $key (CORE::keys %$self) {
+        foreach my $key (CORE::keys(%$self)) {
             my $value = $self->{$key};
             if ($obj->run($value)) {
                 $hash{$key} = $value;
@@ -258,7 +258,7 @@ package Sidef::Types::Hash::Hash {
         my ($self, $code) = @_;
 
         my $count = 0;
-        foreach my $key (CORE::keys %$self) {
+        foreach my $key (CORE::keys(%$self)) {
             if ($code->run(Sidef::Types::String::String->new($key), $self->{$key})) {
                 ++$count;
             }
@@ -272,7 +272,7 @@ package Sidef::Types::Hash::Hash {
     sub delete_if {
         my ($self, $code) = @_;
 
-        foreach my $key (CORE::keys %$self) {
+        foreach my $key (CORE::keys(%$self)) {
             if ($code->run(Sidef::Types::String::String->new($key), $self->{$key})) {
                 delete($self->{$key});
             }
@@ -312,7 +312,7 @@ package Sidef::Types::Hash::Hash {
 
     sub keys {
         my ($self) = @_;
-        Sidef::Types::Array::Array->new([map { Sidef::Types::String::String->new($_) } CORE::keys %$self]);
+        Sidef::Types::Array::Array->new([map { Sidef::Types::String::String->new($_) } CORE::keys(%$self)]);
     }
 
     sub values {
@@ -335,7 +335,7 @@ package Sidef::Types::Hash::Hash {
     sub each_key {
         my ($self, $code) = @_;
 
-        foreach my $key (CORE::keys %$self) {
+        foreach my $key (CORE::keys(%$self)) {
             $code->run(Sidef::Types::String::String->new($key));
         }
 
@@ -349,7 +349,7 @@ package Sidef::Types::Hash::Hash {
 
         if (defined($obj)) {
 
-            foreach my $key (CORE::keys %$self) {
+            foreach my $key (CORE::keys(%$self)) {
                 $obj->run(Sidef::Types::String::String->new($key), $self->{$key});
             }
 
@@ -369,7 +369,7 @@ package Sidef::Types::Hash::Hash {
         my ($self, $code) = @_;
 
         my @array;
-        foreach my $key (CORE::keys %$self) {
+        foreach my $key (CORE::keys(%$self)) {
             my $str = Sidef::Types::String::String->new($key);
             push @array, [$key, $str, $code->run($str, $self->{$key})];
         }
@@ -386,8 +386,8 @@ package Sidef::Types::Hash::Hash {
               Sidef::Types::Array::Array->new(
                                               [
                                                map { Sidef::Types::Array::Pair->new($_->[1], $self->{$_->[0]}) } (
-                                                        CORE::sort { scalar $code->run($a->[1], $b->[1]) }
-                                                          map { [$_, Sidef::Types::String::String->new($_)] } CORE::keys %$self
+                                                       CORE::sort { scalar $code->run($a->[1], $b->[1]) }
+                                                         map { [$_, Sidef::Types::String::String->new($_)] } CORE::keys(%$self)
                                                )
                                               ]
                                              );
@@ -396,14 +396,14 @@ package Sidef::Types::Hash::Hash {
         Sidef::Types::Array::Array->new(
             map {
                 Sidef::Types::Array::Pair->new(Sidef::Types::String::String->new($_), $self->{$_})
-              } CORE::sort CORE::keys %$self
+            } CORE::sort(CORE::keys(%$self))
         );
     }
 
     sub _min_max {
         my ($self, $code, $value) = @_;
 
-        my @pairs = map { [$_, $code->run(Sidef::Types::String::String->new($_), $self->{$_})] } CORE::keys %$self;
+        my @pairs = map { [$_, $code->run(Sidef::Types::String::String->new($_), $self->{$_})] } CORE::keys(%$self);
 
         my $item = $pairs[0];
         foreach my $i (1 .. $#pairs) {
@@ -429,7 +429,7 @@ package Sidef::Types::Hash::Hash {
             [
              map {
                  Sidef::Types::Array::Pair->new(Sidef::Types::String::String->new($_), $self->{$_})
-               } CORE::keys %$self
+             } CORE::keys(%$self)
             ]
         );
     }
@@ -454,7 +454,7 @@ package Sidef::Types::Hash::Hash {
             my @body;
             $addr{$refaddr} = Sidef::Types::Array::Pair->new($root, \@body);
 
-            foreach my $k (sort { (CORE::length($a) <=> CORE::length($b)) || ($a cmp $b) } CORE::keys %$obj) {
+            foreach my $k (sort { (CORE::length($a) <=> CORE::length($b)) || ($a cmp $b) } CORE::keys(%$obj)) {
                 my $v = $obj->{$k};
                 if (ref($v) eq __PACKAGE__) {
                     push @body, $v->as_tree(Sidef::Types::String::String->new($k));
@@ -500,7 +500,7 @@ package Sidef::Types::Hash::Hash {
     sub reverse {
         my ($self) = @_;
         my %hash;
-        @hash{CORE::values %$self} = (map { Sidef::Types::String::String->new($_) } CORE::keys %$self);
+        @hash{CORE::values %$self} = (map { Sidef::Types::String::String->new($_) } CORE::keys(%$self));
         bless \%hash, __PACKAGE__;
     }
 
@@ -515,7 +515,7 @@ package Sidef::Types::Hash::Hash {
 
     sub to_list {
         my ($self) = @_;
-        map { (Sidef::Types::String::String->new($_), $self->{$_}) } CORE::keys %$self;
+        map { (Sidef::Types::String::String->new($_), $self->{$_}) } CORE::keys(%$self);
     }
 
     sub _dump {

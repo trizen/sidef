@@ -266,7 +266,7 @@ package Sidef::Object::Object {
 
             my $type = Sidef::normalize_type(CORE::ref($obj) ? CORE::ref($obj) : $obj);
             Scalar::Util::reftype($obj) eq 'HASH' or return $type;
-            my @keys = CORE::sort CORE::keys(%{$obj});
+            my @keys = CORE::sort(CORE::keys(%{$obj}));
 
             my $str = Sidef::Types::String::String->new($type . "(#`($refaddr)...)");
 

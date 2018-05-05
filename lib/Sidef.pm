@@ -457,7 +457,7 @@ package Sidef {
     die(  "[AUTOLOAD] Undefined method `"
         . $method . q{'}
         . " called from $from\n"
-        . (@candidates ? ("[?] Did you mean: " . join("\n" . (' ' x 18), sort @candidates) . "\n") : ''));
+        . (@candidates ? ("[?] Did you mean: " . join("\n" . (' ' x 18), sort(@candidates)) . "\n") : ''));
     return;
 };
 

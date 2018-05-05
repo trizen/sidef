@@ -357,8 +357,8 @@ package Sidef::Types::Array::Array {
     sub xor {
         my ($self, $array) = @_;
 
-        my @x = sort { $a cmp $b } @$self;
-        my @y = sort { $a cmp $b } @$array;
+        my @x = CORE::sort { $a cmp $b } @$self;
+        my @y = CORE::sort { $a cmp $b } @$array;
 
         my $endx = $#x;
         my $endy = $#y;
@@ -402,8 +402,8 @@ package Sidef::Types::Array::Array {
     sub and {
         my ($self, $array) = @_;
 
-        my @x = sort { $a cmp $b } @$self;
-        my @y = sort { $a cmp $b } @$array;
+        my @x = CORE::sort { $a cmp $b } @$self;
+        my @y = CORE::sort { $a cmp $b } @$array;
 
         my $i = 0;
         my $j = 0;
@@ -442,8 +442,8 @@ package Sidef::Types::Array::Array {
     sub sub {
         my ($self, $array) = @_;
 
-        my @x = sort { $a cmp $b } @$self;
-        my @y = sort { $a cmp $b } @$array;
+        my @x = CORE::sort { $a cmp $b } @$self;
+        my @y = CORE::sort { $a cmp $b } @$array;
 
         my $i = 0;
         my $j = 0;
@@ -478,8 +478,8 @@ package Sidef::Types::Array::Array {
     sub diff {
         my ($self, $array) = @_;
 
-        my @x = sort { $a cmp $b } @$self;
-        my @y = sort { $a cmp $b } @$array;
+        my @x = CORE::sort { $a cmp $b } @$self;
+        my @y = CORE::sort { $a cmp $b } @$array;
 
         my $i = 0;
         my $j = 0;
@@ -2188,7 +2188,7 @@ package Sidef::Types::Array::Array {
         sub {
             my ($hash) = @_;
 
-            foreach my $key (my @keys = CORE::sort keys %{$hash}) {
+            foreach my $key (my @keys = CORE::sort(keys(%{$hash}))) {
                 next if $key eq $tail;
                 __SUB__->($hash->{$key});
 
@@ -2388,7 +2388,7 @@ package Sidef::Types::Array::Array {
     sub sort_by {
         my ($self, $block) = @_;
         my @keys = map { scalar $block->run($_) } @$self;
-        bless [@{$self}[sort { $keys[$a] cmp $keys[$b] } 0 .. $#$self]], __PACKAGE__;
+        bless [@{$self}[CORE::sort { $keys[$a] cmp $keys[$b] } 0 .. $#$self]], __PACKAGE__;
     }
 
     # Inserts an object between each element
