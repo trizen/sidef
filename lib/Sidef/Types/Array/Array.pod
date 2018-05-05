@@ -1129,6 +1129,14 @@ Return the
 
 =cut
 
+=head2 perm2num
+
+Array.perm2num() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 permutations
 
 Array.permutations() -> I<Obj>

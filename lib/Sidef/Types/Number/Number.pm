@@ -6073,6 +6073,30 @@ package Sidef::Types::Number::Number {
         bless \$z;
     }
 
+    sub lucasu {
+        my ($p, $q, $n) = @_;
+
+        _valid(\$q, \$n);
+
+        $p = _big2istr($p) // goto &nan;
+        $q = _big2istr($q) // goto &nan;
+        $n = _big2istr($n) // goto &nan;
+
+        __PACKAGE__->_set_str('int', Math::Prime::Util::GMP::lucasu($p, $q, $n));
+    }
+
+    sub lucasv {
+        my ($p, $q, $n) = @_;
+
+        _valid(\$q, \$n);
+
+        $p = _big2istr($p) // goto &nan;
+        $q = _big2istr($q) // goto &nan;
+        $n = _big2istr($n) // goto &nan;
+
+        __PACKAGE__->_set_str('int', Math::Prime::Util::GMP::lucasv($p, $q, $n));
+    }
+
     sub fibonacci {
         my ($n, $k) = @_;
 
@@ -6816,6 +6840,18 @@ package Sidef::Types::Number::Number {
         bless \$r;
     }
 
+    sub consecutive_integer_lcm {
+        __PACKAGE__->_set_str('int', Math::Prime::Util::GMP::consecutive_integer_lcm(&_big2uistr // goto &nan));
+    }
+
+    sub num2perm {
+        my ($n, $k) = @_;
+        _valid(\$k);
+        my @perm = map { __PACKAGE__->_set_uint($_) }
+          Math::Prime::Util::GMP::numtoperm(_big2uistr($n) // (return undef), _big2uistr($k) // (return undef));
+        Sidef::Types::Array::Array->new(\@perm);
+    }
+
     sub valuation {
         my ($x, $y) = @_;
 
@@ -6887,6 +6923,18 @@ package Sidef::Types::Number::Number {
         }
 
         __PACKAGE__->_set_str('int', $prime // goto &nan);
+    }
+
+    sub random_bytes {
+        Sidef::Types::Array::Array->new(
+                                        [map { __PACKAGE__->_set_uint(ord($_)) }
+                                           split(//, Math::Prime::Util::GMP::random_bytes(&_big2uistr // (return undef)))
+                                        ]
+                                       );
+    }
+
+    sub random_string {
+        Sidef::Types::String::String->new(Math::Prime::Util::GMP::random_bytes(&_big2uistr // (return undef)));
     }
 
     sub random_nbit_prime {

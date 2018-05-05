@@ -223,16 +223,6 @@ Aliases: I<eq>
 
 =cut
 
-=head2 =~=
-
-I<Obj> B<=~=> I<Obj> -> I<Obj>
-
-Return the
-
-Aliases: I<approx_eq>
-
-=cut
-
 =head2 >
 
 I<Obj> B<E<gt>> I<Obj> -> I<Obj>
@@ -652,6 +642,14 @@ Number.conj() -> I<Obj>
 Return the
 
 Aliases: I<conjug>, I<conjugate>
+
+=cut
+
+=head2 consecutive_integer_lcm
+
+Number.consecutive_integer_lcm() -> I<Obj>
+
+Return the
 
 =cut
 
@@ -1653,6 +1651,22 @@ Return the
 
 =cut
 
+=head2 lucasu
+
+Number.lucasu() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 lucasv
+
+Number.lucasv() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 make_coprime
 
 Number.make_coprime() -> I<Obj>
@@ -1796,6 +1810,14 @@ Aliases: I<numerator>
 =head2 nude
 
 Number.nude() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 num2perm
+
+Number.num2perm() -> I<Obj>
 
 Return the
 
@@ -2005,6 +2027,14 @@ Return the
 
 =cut
 
+=head2 random_bytes
+
+Number.random_bytes() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 random_nbit_prime
 
 Number.random_nbit_prime() -> I<Obj>
@@ -2024,6 +2054,14 @@ Return the
 =head2 random_prime
 
 Number.random_prime() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 random_string
+
+Number.random_string() -> I<Obj>
 
 Return the
 
@@ -2472,6 +2510,16 @@ Number.ϕ() -> I<Obj>
 Return the
 
 Aliases: I<totient>, I<euler_phi>, I<euler_totient>
+
+=cut
+
+=head2 ≅
+
+I<Obj> B<≅> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<=~=()>, I<approx_eq>
 
 =cut
 

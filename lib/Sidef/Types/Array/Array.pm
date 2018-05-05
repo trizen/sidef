@@ -2548,6 +2548,12 @@ package Sidef::Types::Array::Array {
 
     *nth_perm = \&nth_permutation;
 
+    sub perm2num {
+        my ($self) = @_;
+        Sidef::Types::Number::Number->_set_str('int',
+                                            Math::Prime::Util::GMP::permtonum([map { CORE::int($_) } @$self]) // return undef);
+    }
+
     sub det_bareiss {
         my ($self) = @_;
 
