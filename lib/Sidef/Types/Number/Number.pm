@@ -5093,6 +5093,17 @@ package Sidef::Types::Number::Number {
         Sidef::Types::String::String->new(Math::GMPz::Rmpz_get_str((_any2mpz($$x) // return undef), 16));
     }
 
+#<<<
+    my %DIGITS = (
+       0 => 0, 6 =>  6, c => 12, i => 18, o => 24, u => 30,
+       1 => 1, 7 =>  7, d => 13, j => 19, p => 25, v => 31,
+       2 => 2, 8 =>  8, e => 14, k => 20, q => 26, w => 32,
+       3 => 3, 9 =>  9, f => 15, l => 21, r => 27, x => 33,
+       4 => 4, a => 10, g => 16, m => 22, s => 28, y => 34,
+       5 => 5, b => 11, h => 17, n => 23, t => 29, z => 35,
+    );
+#>>>
+
     sub digits {
         my ($n, $k) = @_;
 
@@ -5120,17 +5131,10 @@ package Sidef::Types::Number::Number {
         }
 
 #<<<
-        if (!defined($k) or Math::GMPz::Rmpz_cmp_ui($k, 10) <= 0) {
+        if (!defined($k) or Math::GMPz::Rmpz_cmp_ui($k, 36) <= 0) {
             return Sidef::Types::Array::Array->new([
-                map { __PACKAGE__->_set_uint($_) }
-                    split(//, scalar reverse scalar Math::GMPz::Rmpz_get_str($t, defined($k) ? Math::GMPz::Rmpz_get_ui($k) : 10))
-            ]);
-        }
-
-        if (Math::GMPz::Rmpz_cmp_ui($k, 16) <= 0) {
-            return Sidef::Types::Array::Array->new([
-                map { __PACKAGE__->_set_uint(hex($_)) }
-                    split(//, scalar reverse scalar Math::GMPz::Rmpz_get_str($t, Math::GMPz::Rmpz_get_ui($k)))
+                map { __PACKAGE__->_set_uint($DIGITS{$_}) }
+                    split(//, scalar reverse lc Math::GMPz::Rmpz_get_str($t, defined($k) ? Math::GMPz::Rmpz_get_ui($k) : 10))
             ]);
         }
 #>>>
@@ -5225,12 +5229,8 @@ package Sidef::Types::Number::Number {
             return __PACKAGE__->_set_uint(scalar Math::GMPz::Rmpz_popcount($t));
         }
 
-        if (!defined($k) or Math::GMPz::Rmpz_cmp_ui($k, 10) <= 0) {
-            return __PACKAGE__->_set_uint(List::Util::sum(split(//, Math::GMPz::Rmpz_get_str($t, defined($k) ? Math::GMPz::Rmpz_get_ui($k) : 10))));
-        }
-
-        if (Math::GMPz::Rmpz_cmp_ui($k, 16) <= 0) {
-            return __PACKAGE__->_set_uint(List::Util::sum(map { hex($_) } split(//, Math::GMPz::Rmpz_get_str($t, Math::GMPz::Rmpz_get_ui($k)))));
+        if (!defined($k) or Math::GMPz::Rmpz_cmp_ui($k, 36) <= 0) {
+            return __PACKAGE__->_set_uint(List::Util::sum(map { $DIGITS{$_} } split(//, lc Math::GMPz::Rmpz_get_str($t, defined($k) ? Math::GMPz::Rmpz_get_ui($k) : 10))));
         }
 #>>>
 
