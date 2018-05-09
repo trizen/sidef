@@ -369,6 +369,7 @@ scripts/RosettaCode/function_definition.sf
 scripts/RosettaCode/function_frequency.sf
 scripts/RosettaCode/gamma_function.sf
 scripts/RosettaCode/gamma_function_1.sf
+scripts/RosettaCode/gauss_jordan_matrix_inversion.sf
 scripts/RosettaCode/general_fizzbuzz.sf
 scripts/RosettaCode/generate_lower_case_ascii_alphabet.sf
 scripts/RosettaCode/generator_exponential.sf
