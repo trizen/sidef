@@ -5221,12 +5221,9 @@ package Sidef::Types::Number::Number {
         }
 
 #<<<
-        if (defined($k) and Math::GMPz::Rmpz_cmp_ui($k, 2) == 0) {
-            return __PACKAGE__->_set_uint(scalar Math::GMPz::Rmpz_popcount($t));
-        }
-
         if (!defined($k) or Math::GMPz::Rmpz_cmp_ui($k, 62) <= 0) {
             $k = defined($k) ? Math::GMPz::Rmpz_get_ui($k) : 10;
+            return __PACKAGE__->_set_uint(scalar Math::GMPz::Rmpz_popcount($t)) if ($k == 2);
             return __PACKAGE__->_set_uint(List::Util::sum(map { $k <= 36 ? $DIGITS_36{$_} : $DIGITS_62{$_} } split(//, Math::GMPz::Rmpz_get_str($t, $k))));
         }
 #>>>
