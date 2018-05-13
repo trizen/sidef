@@ -2588,6 +2588,78 @@ package Sidef::Types::Array::Array {
         $neg ? $pivot->neg : $pivot;
     }
 
+    # Reduced row echelon form
+    sub rref {
+        my ($self) = @_;
+
+        my @m = map { [@$_] } @$self;
+
+        @m || return Sidef::Types::Array::Array->new();
+
+        my ($j, $rows, $cols) = (0, scalar(@m), scalar(@{$m[0]}));
+
+      OUTER: foreach my $r (0 .. $rows - 1) {
+
+            $j < $cols or last;
+
+            my $i = $r;
+
+            while ($m[$i][$j]->is_zero) {
+                ++$i == $rows or next;
+                $i = $r;
+                ++$j == $cols and last OUTER;
+            }
+
+            @m[$i, $r] = @m[$r, $i];
+
+            my $t = $m[$r][$j];
+            foreach my $k (0 .. $cols - 1) {
+                $m[$r][$k] = $m[$r][$k]->div($t);
+            }
+
+            foreach my $i (0 .. $rows - 1) {
+
+                $i == $r and next;
+
+                my $t = $m[$i][$j];
+                foreach my $k (0 .. $cols - 1) {
+                    $m[$i][$k] = $m[$i][$k]->sub($t->mul($m[$r][$k]));
+                }
+            }
+
+            ++$j;
+        }
+
+        bless $_ for @m;
+        bless \@m;
+    }
+
+    sub gauss_jordan_invert {
+        my ($self) = @_;
+
+        my $n = $#$self;
+
+        my @I = map {
+            my $i = $_;
+            [map { $i == $_ ? Sidef::Types::Number::Number::ONE : Sidef::Types::Number::Number::ZERO } 0 .. $n]
+        } 0 .. $n;
+
+        my @A = map { [@{$self->[$_]}, @{$I[$_]}] } 0 .. $n;
+
+        my $r = rref(\@A);
+        @A = map { bless [@{$_}[$n + 1 .. $#$_]] } @$r;
+        bless \@A;
+    }
+
+    sub gauss_jordan_solve {
+        my ($self, $vector) = @_;
+
+        my @A = map { [@{$self->[$_]}, $vector->[$_]] } 0 .. $#$vector;
+
+        my $r = rref(\@A);
+        bless [map { $_->[-1] } @$r];
+    }
+
     # Code translated from Wikipedia (+ minor tweaks):
     #   https://en.wikipedia.org/wiki/LU_decomposition#C_code_examples
 
