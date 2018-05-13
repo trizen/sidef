@@ -2323,10 +2323,9 @@ package Sidef::Types::Number::Number {
         $n = _any2si($$n) // goto &nan;
 
         goto &zero if $n < 0;
-        state $one = Math::GMPz::Rmpz_init_set_ui_nobless(1);
 
-        my $r = Math::GMPz::Rmpz_init();
-        Math::GMPz::Rmpz_mul_2exp($r, $one, $n);
+        my $r = Math::GMPz::Rmpz_init_set_ui(0);
+        Math::GMPz::Rmpz_setbit($r, $n);
         bless \$r;
     }
 
