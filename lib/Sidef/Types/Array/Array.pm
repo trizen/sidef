@@ -3101,6 +3101,8 @@ package Sidef::Types::Array::Array {
 
         state $x = require Getopt::Long;
 
+        Getopt::Long::Configure('no_ignore_case');
+
         my @argv = map { "$_" } @$self;
         my @opts = CORE::keys %opts;
 

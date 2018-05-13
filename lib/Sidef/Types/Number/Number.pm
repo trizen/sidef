@@ -2310,8 +2310,7 @@ package Sidef::Types::Number::Number {
 
         if ($y < 0) {
             Math::GMPz::Rmpz_sgn($r) || goto &inf;    # 0^(-y) = Inf
-            state $ONE_Z = Math::GMPz::Rmpz_init_set_ui_nobless(1);
-            Math::GMPz::Rmpz_tdiv_q($r, $ONE_Z, $r);
+            Math::GMPz::Rmpz_tdiv_q($r, ${(ONE)}, $r);
         }
 
         bless \$r;
@@ -2322,7 +2321,7 @@ package Sidef::Types::Number::Number {
 
         $n = _any2si($$n) // goto &nan;
 
-        goto &zero if $n < 0;
+        return ZERO if $n < 0;
 
         my $r = Math::GMPz::Rmpz_init_set_ui(0);
         Math::GMPz::Rmpz_setbit($r, $n);
@@ -2334,7 +2333,7 @@ package Sidef::Types::Number::Number {
 
         $n = _any2si($$n) // goto &nan;
 
-        goto &zero if $n < 0;
+        return ZERO if $n < 0;
 
         my $r = Math::GMPz::Rmpz_init();
         Math::GMPz::Rmpz_ui_pow_ui($r, 10, $n);
@@ -5984,7 +5983,7 @@ package Sidef::Types::Number::Number {
         Math::GMPz::Rmpz_sgn($r) || do {
             $y < 0
               ? (goto &nan)
-              : (goto &zero);
+              : (return ZERO);
         };
 
         state $t = Math::GMPz::Rmpz_init_nobless();
@@ -6028,7 +6027,7 @@ package Sidef::Types::Number::Number {
         Math::GMPz::Rmpz_sgn($r) || do {
             $y < 0
               ? (goto &nan)
-              : (goto &zero);
+              : (return ZERO);
         };
 
         state $t = Math::GMPz::Rmpz_init_nobless();
