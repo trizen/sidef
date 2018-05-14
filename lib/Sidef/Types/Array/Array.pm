@@ -2638,10 +2638,16 @@ package Sidef::Types::Array::Array {
 
         my $n = $#$self;
 
+#<<<
         my @I = map {
             my $i = $_;
-            [map { $i == $_ ? Sidef::Types::Number::Number::ONE : Sidef::Types::Number::Number::ZERO } 0 .. $n]
+            [map {
+                $i == $_
+                    ? Sidef::Types::Number::Number::ONE
+                    : Sidef::Types::Number::Number::ZERO
+            } 0 .. $n]
         } 0 .. $n;
+#>>>
 
         my @A = map { [@{$self->[$_]}, @{$I[$_]}] } 0 .. $n;
 
