@@ -537,6 +537,30 @@ Aliases: I<getbit>, I<testbit>
 
 =cut
 
+=head2 bsearch
+
+Number.bsearch() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 bsearch_ge
+
+Number.bsearch_ge() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 bsearch_le
+
+Number.bsearch_le() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 C
 
 Number.C() -> I<Obj>

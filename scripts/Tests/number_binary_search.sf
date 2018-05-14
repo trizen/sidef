@@ -1,0 +1,33 @@
+#!/usr/bin/ruby
+
+var n = 10**19
+
+assert_eq(n.bsearch_le { |k|
+    ((k*(log(k)-1) + log(Num.tau*k)/2)) / log(10) <=> n
+}, 577134533044522749)  # see also: https://oeis.org/A119906
+
+assert_eq(n.bsearch_ge { |k|
+    ((k*(log(k)-1) + log(Num.tau*k)/2)) / log(10) <=> n
+}, 577134533044522750)
+
+
+assert_eq(bsearch_le(100, 200, {|n| exp(n) <=> 10**65 }), 149)   # i.e.: exp(149) <= 10^65
+assert_eq(bsearch_ge(100, 200, {|n| exp(n) <=> 10**65 }),150)    # i.e.: exp(150) >= 10^65
+
+assert_eq(100.bsearch {|n| n! <=> 120 }, 5)           # 5! = 120
+assert_eq(bsearch(50, 80, {|n| n**2 <=> 4225 }), 65)  # 65^2 = 4225
+
+define τ = Num.tau
+
+func number_of_required_terms(n) {
+    n.bsearch_le { |k|
+        ((k*(log(k)-1) + log(τ*k)/2)) / log(10) <=> n
+    }
+}
+
+assert_eq(number_of_required_terms(100), 69)
+assert_eq(number_of_required_terms(500), 253)
+assert_eq(number_of_required_terms(1e20), 5463531774867094396)
+assert_eq(number_of_required_terms(1e21), 51865645374019695121)
+
+say "** Test passed!"

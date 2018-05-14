@@ -1451,9 +1451,10 @@ package Sidef::Types::Array::Array {
         my ($middle, $item, $cmp);
 
         while ($left <= $right) {
+
             $middle = (($right + $left) >> 1);
             $item   = $self->[$middle];
-            $cmp    = CORE::int($obj->run($item)) || return Sidef::Types::Number::Number->_set_uint($middle);
+            $cmp    = CORE::int($obj->run($item)) || return Sidef::Types::Number::Number->_set_int($middle);
 
             if ($cmp > 0) {
                 $right = $middle - 1;
@@ -1482,7 +1483,7 @@ package Sidef::Types::Array::Array {
         while ($left <= $right) {
             $middle = (($right + $left) >> 1);
             $item   = $self->[$middle];
-            $cmp    = CORE::int($item cmp $obj) || return Sidef::Types::Number::Number->_set_uint($middle);
+            $cmp    = CORE::int($item cmp $obj) || return Sidef::Types::Number::Number->_set_int($middle);
 
             if ($cmp > 0) {
                 $right = $middle - 1;
@@ -1516,7 +1517,7 @@ package Sidef::Types::Array::Array {
 
             $middle = (($right + $left) >> 1);
             $item   = $self->[$middle];
-            $cmp    = CORE::int($obj->run($item)) || return Sidef::Types::Number::Number->_set_uint($middle);
+            $cmp    = CORE::int($obj->run($item)) || return Sidef::Types::Number::Number->_set_int($middle);
 
             if ($cmp < 0) {
                 $left = $middle + 1;
@@ -1531,7 +1532,7 @@ package Sidef::Types::Array::Array {
             }
         }
 
-        Sidef::Types::Number::Number->_set_uint($middle);
+        Sidef::Types::Number::Number->_set_int($middle);
     }
 
     sub bindex_ge {
@@ -1549,7 +1550,7 @@ package Sidef::Types::Array::Array {
 
             $middle = (($right + $left) >> 1);
             $item   = $self->[$middle];
-            $cmp    = CORE::int($item cmp $obj) || return Sidef::Types::Number::Number->_set_uint($middle);
+            $cmp    = CORE::int($item cmp $obj) || return Sidef::Types::Number::Number->_set_int($middle);
 
             if ($cmp < 0) {
                 $left = $middle + 1;
@@ -1564,7 +1565,7 @@ package Sidef::Types::Array::Array {
             }
         }
 
-        Sidef::Types::Number::Number->_set_uint($middle);
+        Sidef::Types::Number::Number->_set_int($middle);
     }
 
     sub bindex_le_by {
@@ -1578,7 +1579,7 @@ package Sidef::Types::Array::Array {
 
             $middle = (($right + $left) >> 1);
             $item   = $self->[$middle];
-            $cmp    = CORE::int($obj->run($item)) || return Sidef::Types::Number::Number->_set_uint($middle);
+            $cmp    = CORE::int($obj->run($item)) || return Sidef::Types::Number::Number->_set_int($middle);
 
             if ($cmp < 0) {
                 $left = $middle + 1;
@@ -1593,7 +1594,7 @@ package Sidef::Types::Array::Array {
             }
         }
 
-        Sidef::Types::Number::Number->_set_uint($middle);
+        Sidef::Types::Number::Number->_set_int($middle);
     }
 
     sub bindex_le {
@@ -1611,7 +1612,7 @@ package Sidef::Types::Array::Array {
 
             $middle = (($right + $left) >> 1);
             $item   = $self->[$middle];
-            $cmp    = CORE::int($item cmp $obj) || return Sidef::Types::Number::Number->_set_uint($middle);
+            $cmp    = CORE::int($item cmp $obj) || return Sidef::Types::Number::Number->_set_int($middle);
 
             if ($cmp < 0) {
                 $left = $middle + 1;
@@ -1626,7 +1627,7 @@ package Sidef::Types::Array::Array {
             }
         }
 
-        Sidef::Types::Number::Number->_set_uint($middle);
+        Sidef::Types::Number::Number->_set_int($middle);
     }
 
     sub bsearch_le {
@@ -1851,11 +1852,9 @@ package Sidef::Types::Array::Array {
 
     sub end {
         my $end = $#{$_[0]};
-            $end == -1 ? Sidef::Types::Number::Number::MONE
-          : $end == 0  ? Sidef::Types::Number::Number::ZERO
-          : $end == 1  ? Sidef::Types::Number::Number::ONE
-          : $end > 0   ? Sidef::Types::Number::Number->_set_uint($end)
-          :              Sidef::Types::Number::Number->_set_int($end);
+        $end >= 0
+          ? Sidef::Types::Number::Number->_set_uint($end)
+          : Sidef::Types::Number::Number->_set_int($end);
     }
 
     *offset = \&end;

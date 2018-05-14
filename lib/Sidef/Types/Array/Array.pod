@@ -709,6 +709,22 @@ Aliases: I<slice>
 
 =cut
 
+=head2 gauss_jordan_invert
+
+Array.gauss_jordan_invert() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 gauss_jordan_solve
+
+Array.gauss_jordan_solve() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 getopt
 
 Array.getopt() -> I<Obj>
@@ -1274,6 +1290,14 @@ Aliases: I<rindex_by>, I<last_index>, I<last_index_by>
 =head2 rotate
 
 Array.rotate() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 rref
+
+Array.rref() -> I<Obj>
 
 Return the
 

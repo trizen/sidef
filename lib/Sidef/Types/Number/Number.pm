@@ -8231,6 +8231,125 @@ package Sidef::Types::Number::Number {
     *tuples                 = \&variations;
     *tuples_with_repetition = \&variations_with_repetition;
 
+    sub bsearch {
+        my ($left, $right, $block) = @_;
+
+        if (defined($block)) {
+            _valid(\$right);
+            $left  = Math::GMPz::Rmpz_init_set(_any2mpz($$left) // return undef);
+            $right = Math::GMPz::Rmpz_init_set(_any2mpz($$right) // return undef);
+        }
+        else {
+            $block = $right;
+            $right = Math::GMPz::Rmpz_init_set(_any2mpz($$left) // return undef);
+            $left  = Math::GMPz::Rmpz_init_set_ui(0);
+        }
+
+        my ($item, $cmp);
+        my $middle = Math::GMPz::Rmpz_init();
+
+        while (Math::GMPz::Rmpz_cmp($left, $right) <= 0) {
+
+            Math::GMPz::Rmpz_add($middle, $left, $right);
+            Math::GMPz::Rmpz_div_2exp($middle, $middle, 1);
+
+            $item = bless \Math::GMPz::Rmpz_init_set($middle);
+            $cmp = CORE::int($block->run($item)) || return $item;
+
+            if ($cmp > 0) {
+                Math::GMPz::Rmpz_sub_ui($right, $middle, 1);
+            }
+            else {
+                Math::GMPz::Rmpz_add_ui($left, $middle, 1);
+            }
+        }
+
+        return undef;
+    }
+
+    sub bsearch_ge {
+        my ($left, $right, $block) = @_;
+
+        if (defined($block)) {
+            _valid(\$right);
+            $left  = Math::GMPz::Rmpz_init_set(_any2mpz($$left) // return undef);
+            $right = Math::GMPz::Rmpz_init_set(_any2mpz($$right) // return undef);
+        }
+        else {
+            $block = $right;
+            $right = Math::GMPz::Rmpz_init_set(_any2mpz($$left) // return undef);
+            $left  = Math::GMPz::Rmpz_init_set_ui(0);
+        }
+
+        my ($item, $cmp);
+        my $middle = Math::GMPz::Rmpz_init();
+
+        while (1) {
+
+            Math::GMPz::Rmpz_add($middle, $left, $right);
+            Math::GMPz::Rmpz_div_2exp($middle, $middle, 1);
+
+            $item = bless \Math::GMPz::Rmpz_init_set($middle);
+            $cmp = CORE::int($block->run($item)) || return $item;
+
+            if ($cmp < 0) {
+                Math::GMPz::Rmpz_add_ui($left, $middle, 1);
+
+                if (Math::GMPz::Rmpz_cmp($left, $right) > 0) {
+                    Math::GMPz::Rmpz_add_ui($middle, $middle, 1);
+                    last;
+                }
+            }
+            else {
+                Math::GMPz::Rmpz_sub_ui($right, $middle, 1);
+                Math::GMPz::Rmpz_cmp($left, $right) > 0 and last;
+            }
+        }
+
+        bless \$middle;
+    }
+
+    sub bsearch_le {
+        my ($left, $right, $block) = @_;
+
+        if (defined($block)) {
+            _valid(\$right);
+            $left  = Math::GMPz::Rmpz_init_set(_any2mpz($$left) // return undef);
+            $right = Math::GMPz::Rmpz_init_set(_any2mpz($$right) // return undef);
+        }
+        else {
+            $block = $right;
+            $right = Math::GMPz::Rmpz_init_set(_any2mpz($$left) // return undef);
+            $left  = Math::GMPz::Rmpz_init_set_ui(0);
+        }
+
+        my ($item, $cmp);
+        my $middle = Math::GMPz::Rmpz_init();
+
+        while (1) {
+
+            Math::GMPz::Rmpz_add($middle, $left, $right);
+            Math::GMPz::Rmpz_div_2exp($middle, $middle, 1);
+
+            $item = bless \Math::GMPz::Rmpz_init_set($middle);
+            $cmp = CORE::int($block->run($item)) || return $item;
+
+            if ($cmp < 0) {
+                Math::GMPz::Rmpz_add_ui($left, $middle, 1);
+                Math::GMPz::Rmpz_cmp($left, $right) > 0 and last;
+            }
+            else {
+                Math::GMPz::Rmpz_sub_ui($right, $middle, 1);
+                if (Math::GMPz::Rmpz_cmp($left, $right) > 0) {
+                    Math::GMPz::Rmpz_sub_ui($middle, $middle, 1);
+                    last;
+                }
+            }
+        }
+
+        bless \$middle;
+    }
+
     sub commify {
         my ($self) = @_;
 
