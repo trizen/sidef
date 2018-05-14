@@ -3791,6 +3791,69 @@ package Sidef::Types::Number::Number {
         bless \$f;
     }
 
+    # lnbernreal(n) = natural logarithm of bernoulli(n)
+
+    sub lnbernreal {
+        my ($n) = @_;
+
+        $n = _any2mpz($$n) // goto &nan;
+
+        # log(|B(n)|) = (1 - n)*log(2) - n*log(π) + log(zeta(n)) + log(n!)
+
+        (Math::GMPz::Rmpz_sgn($n) || return ZERO) < 0 and goto &nan;
+
+        my $L = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        Math::MPFR::Rmpfr_const_log2($L, $ROUND);
+
+        if (Math::GMPz::Rmpz_cmp_ui($n, 1) == 0) {
+            Math::MPFR::Rmpfr_neg($L, $L, $ROUND);
+            return bless \$L;
+        }
+
+        Math::GMPz::Rmpz_odd_p($n) && goto &ninf;    # log(Bn) = -Inf for odd n>1
+
+        my $pi = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        Math::MPFR::Rmpfr_const_pi($pi, $ROUND);     # pi = π
+
+        my $t = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        Math::MPFR::Rmpfr_log($t, $pi, $ROUND);      # t = log(π)
+        Math::MPFR::Rmpfr_mul_z($t, $t, $n, $ROUND); # t = n*log(π)
+
+        my $s = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_ui_sub($s, 1, $n);          # s = 1-n
+
+        Math::MPFR::Rmpfr_mul_z($L, $L, $s, $ROUND); # L = (1 - n)*log(2)
+        Math::MPFR::Rmpfr_sub($L, $L, $t, $ROUND);   # L -= n*log(π)
+
+        if (Math::GMPz::Rmpz_fits_ulong_p($n)) {     # n is a native unsigned integer
+            Math::MPFR::Rmpfr_zeta_ui($t, Math::GMPz::Rmpz_get_ui($n), $ROUND);
+        }
+        else {
+            Math::MPFR::Rmpfr_set_z($t, $n, $ROUND);    # t = n
+            Math::MPFR::Rmpfr_zeta($t, $t, $ROUND);     # t = zeta(n)
+        }
+
+        Math::MPFR::Rmpfr_log($t, $t, $ROUND);          # t = log(zeta(n))
+        Math::MPFR::Rmpfr_add($L, $L, $t, $ROUND);      # L += log(zeta(n))
+
+        Math::MPFR::Rmpfr_set_z($t, $n, $ROUND);        # t = n
+        Math::MPFR::Rmpfr_add_ui($t, $t, 1, $ROUND);    # t = n+1
+        Math::MPFR::Rmpfr_lngamma($t, $t, $ROUND);      # t = log(gamma(n+1)) = log(n!)
+
+        Math::MPFR::Rmpfr_add($L, $L, $t, $ROUND);      # L += log(n!)
+
+        # If 4|n, then B_n is negative; log(-Re(x)) = log(Re(x)) + π*i, for x>0
+        if (Math::GMPz::Rmpz_divisible_2exp_p($n, 2)) {
+            my $c = Math::MPC::Rmpc_init2(CORE::int($PREC));
+            Math::MPC::Rmpc_set_fr_fr($c, $L, $pi, $ROUND);
+            return bless \$c;
+        }
+
+        bless \$L;
+    }
+
+    *lnbern = \&lnbernreal;
+
     sub harmfrac {
         my ($n) = @_;
 

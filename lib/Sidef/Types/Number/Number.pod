@@ -1635,6 +1635,16 @@ Return the
 
 =cut
 
+=head2 lnbern
+
+Number.lnbern() -> I<Obj>
+
+Return the
+
+Aliases: I<lnbernreal>
+
+=cut
+
 =head2 lngamma
 
 Number.lngamma() -> I<Obj>
