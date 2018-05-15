@@ -2310,7 +2310,7 @@ package Sidef::Types::Number::Number {
 
         if ($y < 0) {
             Math::GMPz::Rmpz_sgn($r) || goto &inf;    # 0^(-y) = Inf
-            Math::GMPz::Rmpz_tdiv_q($r, ${(ONE)}, $r);
+            Math::GMPz::Rmpz_tdiv_q($r, $ONE, $r);
         }
 
         bless \$r;
@@ -5974,6 +5974,21 @@ package Sidef::Types::Number::Number {
         foreach my $k (2 .. $n) {
             my $z = Math::GMPz::Rmpz_init();
             Math::GMPz::Rmpz_fac_ui($z, $k);
+            push @list, bless \$z;
+        }
+
+        Sidef::Types::Array::Array->new(\@list)->prod;
+    }
+
+    sub hyperfactorial {
+        my ($n) = @_;
+
+        $n = _any2ui($$n) // goto &nan;
+
+        my @list;
+        foreach my $k (2 .. $n) {
+            my $z = Math::GMPz::Rmpz_init();
+            Math::GMPz::Rmpz_ui_pow_ui($z, $k, $k);
             push @list, bless \$z;
         }
 

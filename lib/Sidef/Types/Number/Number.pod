@@ -1033,6 +1033,14 @@ Return the
 
 =cut
 
+=head2 hyperfactorial
+
+Number.hyperfactorial() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 hypot
 
 Number.hypot() -> I<Obj>
