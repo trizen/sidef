@@ -1593,6 +1593,8 @@ Number.lgamma() -> I<Obj>
 
 Return the
 
+Aliases: I<gamma_abs_log>
+
 =cut
 
 =head2 lgrt
@@ -1649,7 +1651,7 @@ Number.lnbern() -> I<Obj>
 
 Return the
 
-Aliases: I<lnbernreal>
+Aliases: I<bern_log>, I<lnbernreal>, I<bernoulli_log>
 
 =cut
 
@@ -1658,6 +1660,28 @@ Aliases: I<lnbernreal>
 Number.lngamma() -> I<Obj>
 
 Return the
+
+Aliases: I<gamma_log>
+
+=cut
+
+=head2 lnhyperfactorial
+
+Number.lnhyperfactorial() -> I<Obj>
+
+Return the
+
+Aliases: I<hyperfactorial_log>
+
+=cut
+
+=head2 lnsuperfactorial
+
+Number.lnsuperfactorial() -> I<Obj>
+
+Return the
+
+Aliases: I<superfactorial_log>
 
 =cut
 

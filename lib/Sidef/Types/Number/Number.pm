@@ -3641,12 +3641,16 @@ package Sidef::Types::Number::Number {
         bless \$r;
     }
 
+    *gamma_log = \&lngamma;
+
     sub lgamma {
         my ($x) = @_;
         my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
         Math::MPFR::Rmpfr_lgamma($r, _any2mpfr($$x), $ROUND);
         bless \$r;
     }
+
+    *gamma_abs_log = \&lgamma;
 
     sub digamma {
         my ($x) = @_;
@@ -3852,7 +3856,9 @@ package Sidef::Types::Number::Number {
         bless \$L;
     }
 
-    *lnbern = \&lnbernreal;
+    *lnbern        = \&lnbernreal;
+    *bern_log      = \&lnbernreal;
+    *bernoulli_log = \&lnbernreal;
 
     sub harmfrac {
         my ($n) = @_;
@@ -5980,6 +5986,27 @@ package Sidef::Types::Number::Number {
         Sidef::Types::Array::Array->new(\@list)->prod;
     }
 
+    sub lnsuperfactorial {
+        my ($n) = @_;
+
+        $n = _any2ui($$n) // goto &nan;
+
+        my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        my $t = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+
+        Math::MPFR::Rmpfr_set_ui($r, 0, $ROUND);
+
+        foreach my $k (3 .. $n + 1) {
+            Math::MPFR::Rmpfr_set_ui($t, $k, $ROUND);
+            Math::MPFR::Rmpfr_lngamma($t, $t, $ROUND);
+            Math::MPFR::Rmpfr_add($r, $r, $t, $ROUND);
+        }
+
+        bless \$r;
+    }
+
+    *superfactorial_log = \&lnsuperfactorial;
+
     sub hyperfactorial {
         my ($n) = @_;
 
@@ -5994,6 +6021,28 @@ package Sidef::Types::Number::Number {
 
         Sidef::Types::Array::Array->new(\@list)->prod;
     }
+
+    sub lnhyperfactorial {
+        my ($n) = @_;
+
+        $n = _any2ui($$n) // goto &nan;
+
+        my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        my $t = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+
+        Math::MPFR::Rmpfr_set_ui($r, 0, $ROUND);
+
+        foreach my $k (2 .. $n) {
+            Math::MPFR::Rmpfr_set_ui($t, $k, $ROUND);
+            Math::MPFR::Rmpfr_log($t, $t, $ROUND);
+            Math::MPFR::Rmpfr_mul_ui($t, $t, $k, $ROUND);
+            Math::MPFR::Rmpfr_add($r, $r, $t, $ROUND);
+        }
+
+        bless \$r;
+    }
+
+    *hyperfactorial_log = \&lnhyperfactorial;
 
     sub factorial {
         my ($n) = @_;
