@@ -4533,21 +4533,21 @@ package Sidef::Types::Number::Number {
 
     sub is_zero {
         my ($x) = @_;
-        __eq__($$x, 0)
+        __eq__($$x, $ZERO)
           ? (Sidef::Types::Bool::Bool::TRUE)
           : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub is_one {
         my ($x) = @_;
-        __eq__($$x, 1)
+        __eq__($$x, $ONE)
           ? (Sidef::Types::Bool::Bool::TRUE)
           : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub is_mone {
         my ($x) = @_;
-        __eq__($$x, -1)
+        __eq__($$x, $MONE)
           ? (Sidef::Types::Bool::Bool::TRUE)
           : (Sidef::Types::Bool::Bool::FALSE);
     }

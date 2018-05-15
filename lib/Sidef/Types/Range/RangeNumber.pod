@@ -24,6 +24,30 @@ Inherits methods from:
 =head1 METHODS
 
 
+=head2 bsearch
+
+RangeNumber.bsearch() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 bsearch_ge
+
+RangeNumber.bsearch_ge() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 bsearch_le
+
+RangeNumber.bsearch_le() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 dump
 
 RangeNumber.dump() -> I<Obj>

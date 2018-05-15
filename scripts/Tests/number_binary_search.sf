@@ -30,4 +30,8 @@ assert_eq(number_of_required_terms(500), 253)
 assert_eq(number_of_required_terms(1e20), 5463531774867094396)
 assert_eq(number_of_required_terms(1e21), 51865645374019695121)
 
+assert_eq(20..100 -> bsearch { |n| n! <=> 30! }, 30)
+assert_eq(42..100 -> bsearch_le { |n| exp(n) <=> 10**28 }, 64)   # i.e.: exp(64) <= 10^28
+assert_eq(42..100 -> bsearch_ge { |n| exp(n) <=> 10**28 }, 65)   # i.e.: exp(65) >= 10^28
+
 say "** Test passed!"
