@@ -7236,6 +7236,13 @@ package Sidef::Types::Number::Number {
         bless \($deriv->(_any2mpz($n) // goto &nan));
     }
 
+    *derivative = \&arithmetic_derivative;
+
+    sub logarithmic_derivative {
+        my ($n) = @_;
+        $n->arithmetic_derivative->div($n);
+    }
+
     sub factor {
         Sidef::Types::Array::Array->new(
             [map { $_ < ULONG_MAX ? __PACKAGE__->_set_uint($_) : __PACKAGE__->_set_str('int', $_) }

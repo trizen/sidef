@@ -337,14 +337,6 @@ Aliases: I<airy>
 
 =cut
 
-=head2 arithmetic_derivative
-
-Number.arithmetic_derivative() -> I<Obj>
-
-Return the
-
-=cut
-
 =head2 as_bin
 
 Number.as_bin() -> I<Obj>
@@ -768,6 +760,16 @@ Number.derangements() -> I<Obj>
 Return the
 
 Aliases: I<complete_permutations>
+
+=cut
+
+=head2 derivative
+
+Number.derivative() -> I<Obj>
+
+Return the
+
+Aliases: I<arithmetic_derivative>
 
 =cut
 
@@ -1706,6 +1708,14 @@ Return the
 =head2 log2
 
 Number.log2() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 logarithmic_derivative
+
+Number.logarithmic_derivative() -> I<Obj>
 
 Return the
 
