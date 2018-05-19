@@ -669,11 +669,13 @@ Aliases: I<conjug>, I<conjugate>
 
 =cut
 
-=head2 consecutive_integer_lcm
+=head2 consecutive_lcm
 
-Number.consecutive_integer_lcm() -> I<Obj>
+Number.consecutive_lcm() -> I<Obj>
 
 Return the
+
+Aliases: I<consecutive_integer_lcm>
 
 =cut
 

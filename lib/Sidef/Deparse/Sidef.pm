@@ -555,7 +555,7 @@ package Sidef::Deparse::Sidef {
             $code = $obj->{name};
         }
         elsif ($ref eq 'Sidef::Types::Hash::Hash') {
-            $code = keys(%{$obj}) ? $obj->dump->get_value : 'Hash';
+            $code = $obj->dump->get_value;
         }
         elsif ($ref eq 'Sidef::Types::Number::Number') {
             $code = $self->_dump_number($obj);

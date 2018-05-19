@@ -1,0 +1,11 @@
+#!/usr/bin/ruby
+
+var a = %w(a b c b).freq
+var b = %w().freq
+var c = %w().freq
+
+assert_eq(b, c)
+assert_ne(b.object_id, c.object_id)
+assert_eq(a, Hash(a => 1, b => 2, c => 1))
+
+say "** Test passed!"

@@ -459,6 +459,7 @@ package Sidef::Optimizer {
                    first
                    last
 
+                   freq
                    len end
                    is_empty
                    min max

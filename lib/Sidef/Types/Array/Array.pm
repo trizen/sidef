@@ -2633,6 +2633,8 @@ package Sidef::Types::Array::Array {
         bless \@m;
     }
 
+    *reduced_row_echelon_form = \&rref;
+
     sub gauss_jordan_invert {
         my ($self) = @_;
 

@@ -1301,6 +1301,8 @@ Array.rref() -> I<Obj>
 
 Return the
 
+Aliases: I<reduced_row_echelon_form>
+
 =cut
 
 =head2 rscalar_op

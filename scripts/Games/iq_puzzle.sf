@@ -15,7 +15,7 @@ const G = [
     [10,11,12],[11,12,13],[12,13,14],
 ]
 
-const format = (5.of {|i| "#{' '*(5-i)}#{'%d '*i}\n" }.join + "\n")
+const format = ({"#{' '*(5-_)}#{'%d '*_}\n"}.map(1..5).join + "\n")
 
 func solve(n, i, g) is cached {
     i == N.end && return "Solved"

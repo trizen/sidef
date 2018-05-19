@@ -6963,6 +6963,8 @@ package Sidef::Types::Number::Number {
         __PACKAGE__->_set_str('int', Math::Prime::Util::GMP::consecutive_integer_lcm(&_big2uistr // goto &nan));
     }
 
+    *consecutive_lcm = \&consecutive_integer_lcm;
+
     sub num2perm {
         my ($n, $k) = @_;
         _valid(\$k);

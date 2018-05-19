@@ -253,7 +253,8 @@ HEADER
                     push @code, ('@' . $name . '=(' . $self->deparse_expr({self => $var->{value}}) . ") if not \@$name;");
                 }
 
-                push @code, "\$$name = Sidef::Types::Array::Array->new(\@$name);";
+                $self->load_mod('Sidef::Types::Array::Array');
+                push @code, "\$$name = bless(\\\@$name, 'Sidef::Types::Array::Array');";
                 delete $var->{array};
             }
             elsif (exists $var->{hash}) {
@@ -265,7 +266,8 @@ HEADER
                     push @code, ('%' . $name . '=(' . $self->deparse_expr({self => $var->{value}}) . ") if not keys \%$name;");
                 }
 
-                push @code, "\$$name = Sidef::Types::Hash::Hash->new(\%$name);";
+                $self->load_mod('Sidef::Types::Hash::Hash');
+                push @code, "\$$name = bless(\\\%$name, 'Sidef::Types::Hash::Hash');";
                 delete $var->{hash};
             }
             elsif (exists $var->{value}) {
@@ -343,7 +345,8 @@ HEADER
                     $code .= ('@' . $name . '=(' . $self->deparse_expr({self => $var->{value}}) . ") if not \@$name;");
                 }
 
-                $code .= "my\$$name=Sidef::Types::Array::Array->new(\@$name);";
+                $self->load_mod('Sidef::Types::Array::Array');
+                $code .= "my \$$name = bless(\\\@$name, 'Sidef::Types::Array::Array');";
                 delete $var->{array};
             }
             elsif (exists $var->{hash}) {
@@ -354,7 +357,8 @@ HEADER
                     $code .= ('%' . $name . '=(' . $self->deparse_expr({self => $var->{value}}) . ") if not keys \%$name;");
                 }
 
-                $code .= "my\$$name=Sidef::Types::Hash::Hash->new(\%$name);";
+                $self->load_mod('Sidef::Types::Hash::Hash');
+                $code .= "my \$$name = bless(\\\%$name, 'Sidef::Types::Hash::Hash');";
                 delete $var->{hash};
             }
             elsif (exists $var->{value}) {
@@ -370,7 +374,8 @@ HEADER
 
     sub _dump_array {
         my ($self, $ref, $array) = @_;
-        $ref . '->new([' . join(',', map { $self->deparse_expr(ref($_) eq 'HASH' ? $_ : {self => $_}) } @{$array}) . '])';
+        $self->load_mod($ref);
+        'bless([' . join(',', map { $self->deparse_expr(ref($_) eq 'HASH' ? $_ : {self => $_}) } @{$array}) . "], '$ref')";
     }
 
     sub _dump_indices {
@@ -1121,19 +1126,15 @@ HEADER
             $code = 'undef';
         }
         elsif ($ref eq 'Sidef::Types::Hash::Hash') {
-            if (keys(%{$obj})) {
-                $code = $ref . '->new(' . join(
-                    ',',
-                    map {
-                        $self->_dump_string($_) . '=>'
-                          . (defined($obj->{$_}) ? $self->deparse_expr({self => $obj->{$_}}) : 'undef')
-                    } sort(keys(%{$obj}))
-                  )
-                  . ')';
-            }
-            else {
-                $code = $self->make_constant($ref, 'new', "Hash$refaddr");
-            }
+            $self->load_mod($ref);
+            $code = 'bless({' . join(
+                ',',
+                map {
+                    $self->_dump_string($_) . '=>'
+                      . (defined($obj->{$_}) ? $self->deparse_expr({self => $obj->{$_}}) : 'undef')
+                } sort(keys(%{$obj}))
+              )
+              . "}, '$ref')";
         }
         elsif ($ref eq 'Sidef::Meta::PrefixMethod') {
             $code = 'do{my($self,@args)=' . $self->deparse_args($obj->{expr}) . ';$self->' . $obj->{name} . '(@args)}';
@@ -1430,10 +1431,12 @@ HEADER
 
                 if ($i < $limit) {
                     if ($expr->{ind}[$i + 1]{array}) {
-                        $code = "($code//=Sidef::Types::Array::Array->new([]))";
+                        $self->load_mod('Sidef::Types::Array::Array');
+                        $code = "($code//=bless([], 'Sidef::Types::Array::Array'))";
                     }
                     else {
-                        $code = "($code//=Sidef::Types::Hash::Hash->new)";
+                        $self->load_mod('Sidef::Types::Hash::Hash');
+                        $code = "($code//=bless({}, 'Sidef::Types::Hash::Hash'))";
                     }
                 }
             }
@@ -1454,6 +1457,19 @@ HEADER
                     $code = '(' . $code . ')';
                 }
 
+                # Optimization for hashes
+                if (
+                        $ref eq 'Sidef::DataTypes::Hash::Hash'
+                    and $i == 0
+                    and (   $method eq 'call'
+                         or $method eq 'new'
+                         or $method eq ':')
+                  ) {
+                    $code = 'bless({' . $self->deparse_args(@{$call->{arg}}) . "}, '$self->{data_types}{$ref}')";
+                    next;
+                }
+
+                # Handle the return statement
                 if ($ref eq 'Sidef::Types::Block::Return') {
 
                     if (exists $self->{function}) {
@@ -1578,11 +1594,12 @@ HEADER
                         }
 
                         if ($method eq '@') {
+                            $self->load_mod('Sidef::Types::Array::Array');
                             $code =
                                 '(do{my$obj='
                               . $self->deparse_args(@{$call->{arg}})
                               . ';my$sub=UNIVERSAL::can($obj, "to_a"); '
-                              . 'defined($sub) ? $sub->($obj) : Sidef::Types::Array::Array->new($obj) })';
+                              . 'defined($sub) ? $sub->($obj) : bless([$obj], "Sidef::Types::Array::Array")})';
                             next;
                         }
 
