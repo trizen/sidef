@@ -3840,8 +3840,8 @@ package Sidef::Types::Number::Number {
         Math::MPFR::Rmpfr_log($t, $t, $ROUND);          # t = log(zeta(n))
         Math::MPFR::Rmpfr_add($L, $L, $t, $ROUND);      # L += log(zeta(n))
 
-        Math::MPFR::Rmpfr_set_z($t, $n, $ROUND);        # t = n
-        Math::MPFR::Rmpfr_add_ui($t, $t, 1, $ROUND);    # t = n+1
+        Math::GMPz::Rmpz_add_ui($s, $n, 1);             # s = n+1
+        Math::MPFR::Rmpfr_set_z($t, $s, $ROUND);        # t = n+1
         Math::MPFR::Rmpfr_lngamma($t, $t, $ROUND);      # t = log(gamma(n+1)) = log(n!)
 
         Math::MPFR::Rmpfr_add($L, $L, $t, $ROUND);      # L += log(n!)
