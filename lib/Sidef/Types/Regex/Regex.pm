@@ -1,10 +1,12 @@
 package Sidef::Types::Regex::Regex {
 
-    use 5.014;
+    use utf8;
+    use 5.016;
 
     use re 'eval';    # XXX: do we really want this?
 
     use parent qw(Sidef::Object::Object);
+    use Sidef::Types::Number::Number;
 
     use overload
       q{""}   => \&get_value,
@@ -60,6 +62,34 @@ package Sidef::Types::Regex::Regex {
         return Sidef::Types::Number::Number::ZERO;
     }
 
+    sub lt {
+        my ($x, $y) = @_;
+        Math::GMPz::Rmpz_sgn(${$x->cmp($y)}) < 0
+          ? Sidef::Types::Bool::Bool::TRUE
+          : Sidef::Types::Bool::Bool::FALSE;
+    }
+
+    sub le {
+        my ($x, $y) = @_;
+        Math::GMPz::Rmpz_sgn(${$x->cmp($y)}) <= 0
+          ? Sidef::Types::Bool::Bool::TRUE
+          : Sidef::Types::Bool::Bool::FALSE;
+    }
+
+    sub gt {
+        my ($x, $y) = @_;
+        Math::GMPz::Rmpz_sgn(${$x->cmp($y)}) > 0
+          ? Sidef::Types::Bool::Bool::TRUE
+          : Sidef::Types::Bool::Bool::FALSE;
+    }
+
+    sub ge {
+        my ($x, $y) = @_;
+        Math::GMPz::Rmpz_sgn(${$x->cmp($y)}) >= 0
+          ? Sidef::Types::Bool::Bool::TRUE
+          : Sidef::Types::Bool::Bool::FALSE;
+    }
+
     sub to_regex { $_[0] }
     *to_re = \&to_regex;
 
@@ -98,7 +128,14 @@ package Sidef::Types::Regex::Regex {
         *{__PACKAGE__ . '::' . '=~'}  = \&match;
         *{__PACKAGE__ . '::' . '=='}  = \&eq;
         *{__PACKAGE__ . '::' . '!='}  = \&ne;
+        *{__PACKAGE__ . '::' . '≠'} = \&ne;
         *{__PACKAGE__ . '::' . '<=>'} = \&cmp;
+        *{__PACKAGE__ . '::' . '<'}   = \&lt;
+        *{__PACKAGE__ . '::' . '<='}  = \&le;
+        *{__PACKAGE__ . '::' . '≤'} = \&le;
+        *{__PACKAGE__ . '::' . '>'}   = \&gt;
+        *{__PACKAGE__ . '::' . '≥'} = \&ge;
+        *{__PACKAGE__ . '::' . '>='}  = \&ge;
     }
 
 };

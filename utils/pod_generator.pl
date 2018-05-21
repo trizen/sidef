@@ -180,7 +180,7 @@ __POD2__
                 map {
                     my $sub = $_;
                     $sub =~ s{([<>])}{E<$esc{$1}>}g;
-                    lc($sub) eq uc($sub) ? "I<$sub()>" : "I<$sub>";
+                    "I<$sub>";
                   } @{$value->{aliases}}
               )
               . "\n";

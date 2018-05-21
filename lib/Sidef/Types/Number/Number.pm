@@ -4314,10 +4314,13 @@ package Sidef::Types::Number::Number {
           : (Sidef::Types::Bool::Bool::FALSE);
     }
 
-    sub approx_eq {
-        my ($x, $y, $places) = @_;
+    sub __approx_cmp__ {
+        my ($x, $y, $places, $equal) = @_;
 
         _valid(\$y);
+
+        $x = $$x;
+        $y = $$y;
 
         if (defined($places)) {
             _valid(\$places);
@@ -4326,9 +4329,6 @@ package Sidef::Types::Number::Number {
         else {
             $places = -((CORE::int($PREC) >> 2) - 1);
         }
-
-        $x = $$x;
-        $y = $$y;
 
         if (   ref($x) eq 'Math::MPFR'
             or ref($y) eq 'Math::MPFR'
@@ -4341,9 +4341,54 @@ package Sidef::Types::Number::Number {
         $x = __round__($x, $places);
         $y = __round__($y, $places);
 
-        __eq__($x, $y)
+        $equal ? __eq__($x, $y) : __cmp__($x, $y);
+    }
+
+    sub approx_cmp {
+        my ($x, $y, $places) = @_;
+        ((__approx_cmp__($x, $y, $places) // return undef) || return ZERO) > 0 ? ONE : MONE;
+    }
+
+    sub approx_lt {
+        my ($x, $y, $places) = @_;
+        (__approx_cmp__($x, $y, $places) // return undef) < 0
           ? Sidef::Types::Bool::Bool::TRUE
           : Sidef::Types::Bool::Bool::FALSE;
+    }
+
+    sub approx_le {
+        my ($x, $y, $places) = @_;
+        (__approx_cmp__($x, $y, $places) // return undef) <= 0
+          ? Sidef::Types::Bool::Bool::TRUE
+          : Sidef::Types::Bool::Bool::FALSE;
+    }
+
+    sub approx_gt {
+        my ($x, $y, $places) = @_;
+        (__approx_cmp__($x, $y, $places) // return undef) > 0
+          ? Sidef::Types::Bool::Bool::TRUE
+          : Sidef::Types::Bool::Bool::FALSE;
+    }
+
+    sub approx_ge {
+        my ($x, $y, $places) = @_;
+        (__approx_cmp__($x, $y, $places) // return undef) >= 0
+          ? Sidef::Types::Bool::Bool::TRUE
+          : Sidef::Types::Bool::Bool::FALSE;
+    }
+
+    sub approx_eq {
+        my ($x, $y, $places) = @_;
+        (__approx_cmp__($x, $y, $places, 1) // return undef)
+          ? Sidef::Types::Bool::Bool::TRUE
+          : Sidef::Types::Bool::Bool::FALSE;
+    }
+
+    sub approx_ne {
+        my ($x, $y, $places) = @_;
+        (__approx_cmp__($x, $y, $places, 1) // return undef)
+          ? Sidef::Types::Bool::Bool::FALSE
+          : Sidef::Types::Bool::Bool::TRUE;
     }
 
     sub __cmp__ {
@@ -6951,8 +6996,13 @@ package Sidef::Types::Number::Number {
         _valid(\$y);
 
         my ($u, $v, $d) = Math::Prime::Util::GMP::gcdext(_big2istr($x) // 0, _big2istr($y) // 0);
-
-        map { ($_ > LONG_MIN and $_ < ULONG_MAX) ? __PACKAGE__->_set_int($_) : __PACKAGE__->_set_str('int', $_) } ($u, $v, $d);
+#<<<
+        map {
+            ($_ > LONG_MIN and $_ < ULONG_MAX)
+                ? __PACKAGE__->_set_int($_)
+                : __PACKAGE__->_set_str('int', $_)
+        } ($u, $v, $d);
+#>>>
     }
 
     sub lcm {

@@ -99,7 +99,7 @@ I<Obj> B</> I<Obj> -> I<Obj>
 
 Return the
 
-Aliases: I<÷()>, I<div>
+Aliases: I<÷>, I<div>
 
 =cut
 
@@ -1127,7 +1127,7 @@ I<Obj> B<≠> I<Obj> -> I<Obj>
 
 Return the
 
-Aliases: I<!=()>, I<ne>
+Aliases: I<!=>, I<ne>
 
 =cut
 

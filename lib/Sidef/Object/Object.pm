@@ -1,5 +1,6 @@
 package Sidef::Object::Object {
 
+    use utf8;
     use 5.016;
     use Scalar::Util qw();
 

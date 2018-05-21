@@ -1543,7 +1543,7 @@ HEADER
                           . $code . 'eq'
                           . $self->deparse_args(@{$call->{arg}})
                           . ';ref($bool)?$bool:($bool?Sidef::Types::Bool::Bool::TRUE:Sidef::Types::Bool::Bool::FALSE)}'
-                          . ($method eq '!=' ? '->neg' : '');
+                          . ($method eq '!=' ? '->not' : '');
                         next;
                     }
 
@@ -1556,7 +1556,7 @@ HEADER
                           . '}~~do{'
                           . $self->deparse_args(@{$call->{arg}})
                           . '};ref($bool)?$bool:($bool?Sidef::Types::Bool::Bool::TRUE:Sidef::Types::Bool::Bool::FALSE)}'
-                          . ($method eq '!~' ? '->neg' : '');
+                          . ($method eq '!~' ? '->not' : '');
                         next;
                     }
 

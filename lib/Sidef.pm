@@ -1,6 +1,8 @@
 package Sidef {
 
+    use utf8;
     use 5.014;
+
     our $VERSION = '3.16';
 
     our $SPACES      = 0;    # the current number of indentation spaces

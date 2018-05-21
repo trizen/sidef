@@ -1,5 +1,6 @@
 package Sidef::Types::Array::Pair {
 
+    use utf8;
     use 5.014;
 
     use parent qw(

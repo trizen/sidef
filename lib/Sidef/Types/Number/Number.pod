@@ -159,7 +159,7 @@ I<Obj> B</> I<Obj> -> I<Obj>
 
 Return the
 
-Aliases: I<÷()>, I<div>
+Aliases: I<÷>, I<div>
 
 =cut
 
@@ -334,6 +334,54 @@ Number.ai() -> I<Obj>
 Return the
 
 Aliases: I<airy>
+
+=cut
+
+=head2 approx_cmp
+
+Number.approx_cmp() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 approx_ge
+
+Number.approx_ge() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 approx_gt
+
+Number.approx_gt() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 approx_le
+
+Number.approx_le() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 approx_lt
+
+Number.approx_lt() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 approx_ne
+
+Number.approx_ne() -> I<Obj>
+
+Return the
 
 =cut
 
@@ -2605,7 +2653,7 @@ I<Obj> B<≅> I<Obj> -> I<Obj>
 
 Return the
 
-Aliases: I<=~=()>, I<approx_eq>
+Aliases: I<=~=>, I<approx_eq>
 
 =cut
 
@@ -2615,7 +2663,7 @@ I<Obj> B<≠> I<Obj> -> I<Obj>
 
 Return the
 
-Aliases: I<!=()>, I<ne>
+Aliases: I<!=>, I<ne>
 
 =cut
 

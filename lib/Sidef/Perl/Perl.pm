@@ -1,5 +1,6 @@
 package Sidef::Perl::Perl {
 
+    use utf8;
     use 5.016;
     use Sidef::Types::Number::Number;
 

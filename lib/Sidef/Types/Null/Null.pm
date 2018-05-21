@@ -1,5 +1,6 @@
 package Sidef::Types::Null::Null {
 
+    use utf8;
     use 5.014;
 
     use overload

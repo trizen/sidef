@@ -1,5 +1,6 @@
 package Sidef::Types::Bool::Bool {
 
+    use utf8;
     use 5.014;
 
     use overload

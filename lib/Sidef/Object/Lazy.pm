@@ -1,5 +1,6 @@
 package Sidef::Object::Lazy {
 
+    use utf8;
     use 5.014;
     ##use overload q{""} => \&to_a;
 

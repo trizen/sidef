@@ -691,6 +691,34 @@ package Sidef::Types::Array::Array {
         $sub->($self, $array);
     }
 
+    sub lt {
+        my ($self, $array) = @_;
+        Math::GMPz::Rmpz_sgn(${$self->cmp($array)}) < 0
+          ? Sidef::Types::Bool::Bool::TRUE
+          : Sidef::Types::Bool::Bool::FALSE;
+    }
+
+    sub le {
+        my ($self, $array) = @_;
+        Math::GMPz::Rmpz_sgn(${$self->cmp($array)}) <= 0
+          ? Sidef::Types::Bool::Bool::TRUE
+          : Sidef::Types::Bool::Bool::FALSE;
+    }
+
+    sub gt {
+        my ($self, $array) = @_;
+        Math::GMPz::Rmpz_sgn(${$self->cmp($array)}) > 0
+          ? Sidef::Types::Bool::Bool::TRUE
+          : Sidef::Types::Bool::Bool::FALSE;
+    }
+
+    sub ge {
+        my ($self, $array) = @_;
+        Math::GMPz::Rmpz_sgn(${$self->cmp($array)}) >= 0
+          ? Sidef::Types::Bool::Bool::TRUE
+          : Sidef::Types::Bool::Bool::FALSE;
+    }
+
     sub eq {
         my ($self, $array) = @_;
 
@@ -736,7 +764,7 @@ package Sidef::Types::Array::Array {
 
     sub ne {
         my ($self, $array) = @_;
-        $self->eq($array)->neg;
+        $self->eq($array)->not;
     }
 
     sub make {
@@ -3290,10 +3318,18 @@ package Sidef::Types::Array::Array {
         *{__PACKAGE__ . '::' . '+'}   = \&add;
         *{__PACKAGE__ . '::' . '-'}   = \&sub;
         *{__PACKAGE__ . '::' . '=='}  = \&eq;
+        *{__PACKAGE__ . '::' . '<'}   = \&lt;
+        *{__PACKAGE__ . '::' . '<='}  = \&le;
+        *{__PACKAGE__ . '::' . '≤'} = \&le;
+        *{__PACKAGE__ . '::' . '>'}   = \&gt;
+        *{__PACKAGE__ . '::' . '≥'} = \&ge;
+        *{__PACKAGE__ . '::' . '>='}  = \&ge;
         *{__PACKAGE__ . '::' . '!='}  = \&ne;
+        *{__PACKAGE__ . '::' . '≠'} = \&ne;
         *{__PACKAGE__ . '::' . '<=>'} = \&cmp;
         *{__PACKAGE__ . '::' . ':'}   = \&pair_with;
         *{__PACKAGE__ . '::' . '/'}   = \&div;
+        *{__PACKAGE__ . '::' . '÷'}  = \&div;
         *{__PACKAGE__ . '::' . '...'} = \&to_list;
 
         *{__PACKAGE__ . '::' . '++'} = sub {

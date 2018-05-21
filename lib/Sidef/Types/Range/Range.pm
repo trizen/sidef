@@ -1,5 +1,6 @@
 package Sidef::Types::Range::Range {
 
+    use utf8;
     use 5.014;
 
     use List::Util qw();
@@ -55,11 +56,11 @@ package Sidef::Types::Range::Range {
 
         my $iter = $self->iter->{code};
 
-        my $min = $iter->() // return undef;
+        my $min       = $iter->() // return undef;
         my $min_value = $block->run($min);
 
         while (1) {
-            my $curr = $iter->() // last;
+            my $curr       = $iter->() // last;
             my $curr_value = $block->run($curr);
 
             if (CORE::int($curr_value cmp $min_value) < 0) {
@@ -88,11 +89,11 @@ package Sidef::Types::Range::Range {
 
         my $iter = $self->iter->{code};
 
-        my $max = $iter->() // return undef;
+        my $max       = $iter->() // return undef;
         my $max_value = $block->run($max);
 
         while (1) {
-            my $curr = $iter->() // last;
+            my $curr       = $iter->() // last;
             my $curr_value = $block->run($curr);
 
             if (CORE::int($curr_value cmp $max_value) > 0) {
@@ -426,7 +427,7 @@ package Sidef::Types::Range::Range {
 
         if (ref($op) eq 'Sidef::Types::Block::Block') {
 
-            my $iter = $self->iter->{code};
+            my $iter  = $self->iter->{code};
             my $value = $initial // $iter->();
 
             while (defined(my $obj = $iter->())) {
@@ -444,7 +445,7 @@ package Sidef::Types::Range::Range {
 
         $op = "$op" if ref($op);
 
-        my $iter = $self->iter->{code};
+        my $iter  = $self->iter->{code};
         my $value = $initial // $iter->();
 
         while (defined(my $num = $iter->())) {
@@ -513,9 +514,7 @@ package Sidef::Types::Range::Range {
 
     sub ne {
         my ($r1, $r2) = @_;
-        $r1->eq($r2)
-          ? (Sidef::Types::Bool::Bool::FALSE)
-          : (Sidef::Types::Bool::Bool::TRUE);
+        $r1->eq($r2)->not;
     }
 
     {
@@ -524,8 +523,10 @@ package Sidef::Types::Range::Range {
         *{__PACKAGE__ . '::' . '-'}   = \&sub;
         *{__PACKAGE__ . '::' . '*'}   = \&mul;
         *{__PACKAGE__ . '::' . '/'}   = \&div;
+        *{__PACKAGE__ . '::' . '÷'}  = \&div;
         *{__PACKAGE__ . '::' . '=='}  = \&eq;
         *{__PACKAGE__ . '::' . '!='}  = \&ne;
+        *{__PACKAGE__ . '::' . '≠'} = \&ne;
         *{__PACKAGE__ . '::' . '...'} = \&to_list;
     }
 

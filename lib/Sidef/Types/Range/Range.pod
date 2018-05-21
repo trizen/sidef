@@ -16,16 +16,6 @@ var obj = Range.new(...);
 =head1 METHODS
 
 
-=head2 !=
-
-I<Obj> B<!=> I<Obj> -> I<Obj>
-
-Return the
-
-Aliases: I<ne>
-
-=cut
-
 =head2 *
 
 I<Obj> B<*> I<Obj> -> I<Obj>
@@ -72,7 +62,7 @@ I<Obj> B</> I<Obj> -> I<Obj>
 
 Return the
 
-Aliases: I<div>
+Aliases: I<÷>, I<div>
 
 =cut
 
@@ -393,5 +383,15 @@ Return the
 Range.zip_operator() -> I<Obj>
 
 Return the
+
+=cut
+
+=head2 ≠
+
+I<Obj> B<≠> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<!=>, I<ne>
 
 =cut

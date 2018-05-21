@@ -1,5 +1,6 @@
 package Sidef::Types::Block::Fork {
 
+    use utf8;
     use 5.014;
 
     sub new {

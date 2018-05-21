@@ -23,16 +23,6 @@ Inherits methods from:
 =head1 METHODS
 
 
-=head2 !=
-
-I<Obj> B<!=> I<Obj> -> I<Obj>
-
-Return the
-
-Aliases: I<ne>
-
-=cut
-
 =head2 &
 
 I<Obj> B<&> I<Obj> -> I<Obj>
@@ -105,7 +95,7 @@ I<Obj> B</> I<Obj> -> I<Obj>
 
 Return the
 
-Aliases: I<div>
+Aliases: I<÷>, I<div>
 
 =cut
 
@@ -116,6 +106,16 @@ I<Obj> B<:> I<Obj> -> I<Obj>
 Return the
 
 Aliases: I<pair_with>
+
+=cut
+
+=head2 <
+
+I<Obj> B<E<lt>> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<lt>
 
 =cut
 
@@ -136,6 +136,16 @@ I<Obj> B<==> I<Obj> -> I<Obj>
 Return the
 
 Aliases: I<eq>
+
+=cut
+
+=head2 >
+
+I<Obj> B<E<gt>> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<gt>
 
 =cut
 
@@ -1658,5 +1668,35 @@ I<Obj> B<»> I<Obj> -> I<Obj>
 Return the
 
 Aliases: I<E<gt>E<gt>>, I<assign_to>
+
+=cut
+
+=head2 ≠
+
+I<Obj> B<≠> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<!=>, I<ne>
+
+=cut
+
+=head2 ≤
+
+I<Obj> B<≤> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<E<lt>=>, I<le>
+
+=cut
+
+=head2 ≥
+
+I<Obj> B<≥> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<E<gt>=>, I<ge>
 
 =cut

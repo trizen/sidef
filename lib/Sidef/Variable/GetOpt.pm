@@ -1,5 +1,6 @@
 package Sidef::Variable::GetOpt {
 
+    use utf8;
     use 5.014;
     require Getopt::Long;
 
@@ -40,7 +41,7 @@ package Sidef::Variable::GetOpt {
 
             my @params;
             foreach my $key (keys %opt) {
-                my $var = $func->{vars}[$func->{table}{$key} // die "[ERROR] unknown command-line argument <<<$key>>>"];
+                my $var   = $func->{vars}[$func->{table}{$key} // die "[ERROR] unknown command-line argument <<<$key>>>"];
                 my $value = $opt{$key};
 
                 if (exists $var->{type}) {

@@ -1,5 +1,6 @@
 package Sidef::Types::Glob::DirHandle {
 
+    use utf8;
     use 5.014;
     use parent qw(
       Sidef::Object::Object

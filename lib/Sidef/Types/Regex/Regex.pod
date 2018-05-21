@@ -23,13 +23,13 @@ Inherits methods from:
 =head1 METHODS
 
 
-=head2 !=
+=head2 <
 
-I<Obj> B<!=> I<Obj> -> I<Obj>
+I<Obj> B<E<lt>> I<Obj> -> I<Obj>
 
 Return the
 
-Aliases: I<ne>
+Aliases: I<lt>
 
 =cut
 
@@ -60,6 +60,16 @@ I<Obj> B<=~> I<Obj> -> I<Obj>
 Return the
 
 Aliases: I<run>, I<match>
+
+=cut
+
+=head2 >
+
+I<Obj> B<E<gt>> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<gt>
 
 =cut
 
@@ -96,5 +106,35 @@ Regex.to_s() -> I<Obj>
 Return the
 
 Aliases: I<dump>
+
+=cut
+
+=head2 ≠
+
+I<Obj> B<≠> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<!=>, I<ne>
+
+=cut
+
+=head2 ≤
+
+I<Obj> B<≤> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<E<lt>=>, I<le>
+
+=cut
+
+=head2 ≥
+
+I<Obj> B<≥> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<E<gt>=>, I<ge>
 
 =cut

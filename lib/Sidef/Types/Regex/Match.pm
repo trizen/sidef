@@ -1,6 +1,8 @@
 package Sidef::Types::Regex::Match {
 
-    use 5.014;
+    use utf8;
+    use 5.016;
+
     use overload
       q{bool} => \&get_value,
       q{""}   => sub { CORE::join(' ', @{$_[0]->{captures}}) },

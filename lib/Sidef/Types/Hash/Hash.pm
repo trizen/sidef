@@ -1,5 +1,6 @@
 package Sidef::Types::Hash::Hash {
 
+    use utf8;
     use 5.014;
 
     use parent qw(Sidef::Object::Object);
@@ -135,7 +136,7 @@ package Sidef::Types::Hash::Hash {
 
     sub ne {
         my ($self, $obj) = @_;
-        $self->eq($obj)->neg;
+        $self->eq($obj)->not;
     }
 
     sub same_keys {
@@ -579,6 +580,7 @@ package Sidef::Types::Hash::Hash {
         *{__PACKAGE__ . '::' . '+'}   = \&concat;
         *{__PACKAGE__ . '::' . '=='}  = \&eq;
         *{__PACKAGE__ . '::' . '!='}  = \&ne;
+        *{__PACKAGE__ . '::' . '≠'} = \&ne;
         *{__PACKAGE__ . '::' . ':'}   = \&new;
         *{__PACKAGE__ . '::' . '...'} = \&to_list;
     }
