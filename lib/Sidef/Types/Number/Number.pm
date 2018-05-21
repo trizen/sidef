@@ -1820,35 +1820,39 @@ package Sidef::Types::Number::Number {
         bless \$r;
     }
 
-    sub neg {
+    sub __neg__ {
         my ($x) = @_;
 
-        $x = $$x;
         goto(ref($x) =~ tr/:/_/rs);
 
       Math_GMPz: {
             my $r = Math::GMPz::Rmpz_init();
             Math::GMPz::Rmpz_neg($r, $x);
-            return bless \$r;
+            return $r;
         }
 
       Math_GMPq: {
             my $r = Math::GMPq::Rmpq_init();
             Math::GMPq::Rmpq_neg($r, $x);
-            return bless \$r;
+            return $r;
         }
 
       Math_MPFR: {
             my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
             Math::MPFR::Rmpfr_neg($r, $x, $ROUND);
-            return bless \$r;
+            return $r;
         }
 
       Math_MPC: {
             my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
             Math::MPC::Rmpc_neg($r, $x, $ROUND);
-            return bless \$r;
+            return $r;
         }
+    }
+
+    sub neg {
+        my ($x) = @_;
+        bless \__neg__($$x);
     }
 
     sub abs {
@@ -6374,6 +6378,82 @@ package Sidef::Types::Number::Number {
 
         bless \$bell;
     }
+
+    sub quadratic_formula {
+        my ($x, $y, $z) = @_;
+
+        $x //= ZERO;
+        $y //= ZERO;
+        $z //= ZERO;
+
+        _valid(\$y, \$z);
+
+        state $four = Math::GMPz::Rmpz_init_set_ui(4);
+
+        $x = $$x;
+        $y = $$y;
+        $z = $$z;
+
+        #
+        ## (-b ± sqrt(b^2 - 4ac)) / (2a)
+        #
+
+        my $u = __mul__($y, $y);    # b^2
+        my $t = __mul__(__mul__($x, $z), $four);    # 4ac
+        my $s = __sqrt__(_any2mpfr_mpc(__sub__($u, $t)));    # sqrt(b^2 - 4ac)
+
+        my $n1 = __sub__($s, $y);                            #   sqrt(b^2 - 4ac) - b
+        my $n2 = __neg__(__add__($s, $y));                   # -(sqrt(b^2 - 4ac) + b)
+
+        my $d = __add__($x, $x);                             # 2a
+
+        my $x1 = __div__($n1, $d);                           # solution 1
+        my $x2 = __div__($n2, $d);                           # solution 2
+
+        ((bless \$x1), (bless \$x2));
+    }
+
+    sub iquadratic_formula {
+        my ($x, $y, $z) = @_;
+
+        $x //= ZERO;
+        $y //= ZERO;
+        $z //= ZERO;
+
+        _valid(\$y, \$z);
+
+        $x = _any2mpz($$x) // goto &nan;
+        $y = _any2mpz($$y) // goto &nan;
+        $z = _any2mpz($$z) // goto &nan;
+
+        #
+        ## floor((-b ± isqrt(b^2 - 4ac)) / (2a))
+        #
+
+        my $u = Math::GMPz::Rmpz_init();
+        my $t = Math::GMPz::Rmpz_init();
+
+        Math::GMPz::Rmpz_mul($t, $y, $y);    # b^2
+        Math::GMPz::Rmpz_mul($u, $x, $z);    # ac
+        Math::GMPz::Rmpz_mul_2exp($u, $u, 2);    # 4ac
+
+        Math::GMPz::Rmpz_sub($t, $t, $u);        # b^2 - 4ac
+        Math::GMPz::Rmpz_sqrt($t, $t);           # isqrt(b^2 - 4ac)
+
+        Math::GMPz::Rmpz_sub($u, $t, $y);        #   sqrt(b^2 - 4ac) - b
+        Math::GMPz::Rmpz_add($t, $t, $y);        #   sqrt(b^2 - 4ac) + b
+        Math::GMPz::Rmpz_neg($t, $t);            # -(sqrt(b^2 - 4ac) + b)
+
+        Math::GMPz::Rmpz_div($u, $u, $x);
+        Math::GMPz::Rmpz_div($t, $t, $x);
+
+        Math::GMPz::Rmpz_div_2exp($u, $u, 1);
+        Math::GMPz::Rmpz_div_2exp($t, $t, 1);
+
+        ((bless \$u), (bless \$t));
+    }
+
+    *integer_quadratic_formula = \&iquadratic_formula;
 
     sub geometric_sum {
         my ($n, $r) = @_;

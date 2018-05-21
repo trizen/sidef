@@ -1269,6 +1269,16 @@ Return the
 
 =cut
 
+=head2 iquadratic_formula
+
+Number.iquadratic_formula() -> I<Obj>
+
+Return the
+
+Aliases: I<integer_quadratic_formula>
+
+=cut
+
 =head2 irand
 
 Number.irand() -> I<Obj>
@@ -2124,6 +2134,14 @@ Return the
 =head2 primorial
 
 Number.primorial() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 quadratic_formula
+
+Number.quadratic_formula() -> I<Obj>
 
 Return the
 
