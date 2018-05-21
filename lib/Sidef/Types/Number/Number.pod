@@ -1019,6 +1019,14 @@ Return the
 
 =cut
 
+=head2 geometric_sum
+
+Number.geometric_sum() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 harm
 
 Number.harm() -> I<Obj>

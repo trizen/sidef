@@ -6330,6 +6330,12 @@ package Sidef::Types::Number::Number {
         bless \$bell;
     }
 
+    sub geometric_sum {
+        my ($n, $r) = @_;
+        _valid(\$r);
+        bless \__div__(__sub__($ONE, __pow__($$r, $$n)), __sub__($ONE, $$r));
+    }
+
     sub faulhaber_sum {
         my ($n, $p) = @_;
 
