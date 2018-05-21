@@ -2327,7 +2327,7 @@ package Sidef::Types::Number::Number {
 
         return ZERO if $n < 0;
 
-        my $r = Math::GMPz::Rmpz_init_set_ui(0);
+        my $r = Math::GMPz::Rmpz_init();
         Math::GMPz::Rmpz_setbit($r, $n);
         bless \$r;
     }
@@ -6028,7 +6028,7 @@ package Sidef::Types::Number::Number {
         my @list;
         foreach my $k (2 .. $n) {
             my $z = Math::GMPz::Rmpz_init();
-            Math::GMPz::Rmpz_fac_ui($z, $k);
+            Math::GMPz::Rmpz_ui_pow_ui($z, $k, $n - $k + 1);
             push @list, bless \$z;
         }
 
@@ -6045,9 +6045,10 @@ package Sidef::Types::Number::Number {
 
         Math::MPFR::Rmpfr_set_ui($r, 0, $ROUND);
 
-        foreach my $k (3 .. $n + 1) {
+        foreach my $k (2 .. $n) {
             Math::MPFR::Rmpfr_set_ui($t, $k, $ROUND);
-            Math::MPFR::Rmpfr_lngamma($t, $t, $ROUND);
+            Math::MPFR::Rmpfr_log($t, $t, $ROUND);
+            Math::MPFR::Rmpfr_mul_ui($t, $t, $n - $k + 1, $ROUND);
             Math::MPFR::Rmpfr_add($r, $r, $t, $ROUND);
         }
 
