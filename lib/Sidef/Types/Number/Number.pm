@@ -3769,34 +3769,89 @@ package Sidef::Types::Number::Number {
 
     sub bernoulli_polynomial {
         my ($n, $x) = @_;
-        _valid(\$x);
-
-        $n = _any2ui($$n) // goto &nan;
-        $x = $$x;
-
-        my $p = $x;
-        my $z = Math::GMPz::Rmpz_init();
-        my $q = Math::GMPq::Rmpq_init();
 
         #
         ## B_n(x) = Sum_{k=0..n} binomial(n, k) * bernoulli(n-k) * x^k
         #
 
+        _valid(\$x);
+
+        $n = _any2ui($$n) // goto &nan;
+        $x = $$x;
+
+        my $u = $n;
+        my $p = $x;
+        my $z = Math::GMPz::Rmpz_init();
+        my $q = Math::GMPq::Rmpq_init();
+
         my @list;
 
         foreach my $k (1 .. $n) {
             $p = __mul__($p, $x) if $k > 1;
-            my $u = $n - $k;
-            next if ($u % 2 and $u != 1);
+
+            --$u & 1 and $u != 1 and next;    # B_n = 0 for odd n > 1
+
             my ($num, $den) = Math::Prime::Util::GMP::bernfrac($u);
+
             Math::GMPq::Rmpq_set_str($q, "$num/$den", 10);
             Math::GMPq::Rmpq_neg($q, $q) if $u == 1;    # with B_1 = -1/2
             Math::GMPz::Rmpz_bin_uiui($z, $n, $k);
             Math::GMPq::Rmpq_mul_z($q, $q, $z);
+
             push @list, bless \__mul__($p, $q);
         }
 
         Sidef::Types::Array::Array->new(\@list)->sum;
+    }
+
+    sub euler_number {
+        my ($n) = @_;
+
+        #
+        ## E_n = 2^n * (2^(n+1) / (n+1)) * (bernoulli_polynomial(n+1, 3/4) - bernoulli_polynomial(n+1, 1/4))
+        #
+
+        $n = _any2ui($$n) // goto &nan;
+
+        $n & 1 and return ZERO;    # E_n = 0 for all odd indices
+
+        my $m = $n + 1;
+        my $u = $m;
+
+        my $z = Math::GMPz::Rmpz_init();
+        my $t = Math::GMPz::Rmpz_init_set_ui(1);
+
+        my $q1 = Math::GMPq::Rmpq_init();
+        my $q2 = Math::GMPq::Rmpq_init();
+
+        my $sum = Math::GMPq::Rmpq_init();
+        Math::GMPq::Rmpq_set_ui($sum, 0, 1);
+
+        foreach my $k (1 .. $m) {
+            Math::GMPz::Rmpz_mul_ui($t, $t, 3);
+
+            --$u & 1 and $u != 1 and next;    # B_n = 0 for odd n > 1
+
+            my ($num, $den) = Math::Prime::Util::GMP::bernfrac($u);
+
+            Math::GMPq::Rmpq_set_str($q1, "$num/$den", 10);
+            Math::GMPq::Rmpq_neg($q1, $q1) if $u == 1;    # with B_1 = -1/2
+            Math::GMPz::Rmpz_bin_uiui($z, $m, $k);
+            Math::GMPq::Rmpq_mul_z($q1, $q1, $z);
+
+            Math::GMPq::Rmpq_div_2exp($q1, $q1, 2 * $k);
+            Math::GMPq::Rmpq_set($q2, $q1);
+            Math::GMPq::Rmpq_mul_z($q1, $q1, $t);
+
+            Math::GMPq::Rmpq_sub($q1, $q1, $q2);
+            Math::GMPq::Rmpq_add($sum, $sum, $q1);
+        }
+
+        Math::GMPq::Rmpq_mul_2exp($sum, $sum, 2 * $n + 1);
+        Math::GMPz::Rmpz_set_ui($z, $m);
+        Math::GMPq::Rmpq_div_z($sum, $sum, $z);
+
+        bless \$sum;
     }
 
     sub bernreal {

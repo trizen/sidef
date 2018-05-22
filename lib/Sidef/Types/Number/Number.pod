@@ -931,6 +931,14 @@ Return the
 
 =cut
 
+=head2 euler_number
+
+Number.euler_number() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 exp
 
 Number.exp() -> I<Obj>
