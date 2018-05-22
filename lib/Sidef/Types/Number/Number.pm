@@ -3817,8 +3817,7 @@ package Sidef::Types::Number::Number {
 
         foreach my $k (1 .. $n) {
             foreach my $j ($k + 1 .. $n) {
-                Math::GMPz::Rmpz_mul_ui($S[$j], $S[$j], $j - $k + 1);
-                Math::GMPz::Rmpz_addmul_ui($S[$j], $S[$j - 1], $j - $k);
+                Math::GMPz::Rmpz_addmul_ui($S[$j], $S[$j - 1], ($j - $k) * ($j - $k + 2));
             }
         }
 
@@ -3858,8 +3857,8 @@ package Sidef::Types::Number::Number {
         }
 
         my $sum = ${Sidef::Types::Array::Array->new(\@list)->sum};
-        Math::GMPz::Rmpz_set_ui($z, 1);
-        Math::GMPz::Rmpz_mul_2exp($z, $z, $n);
+        Math::GMPz::Rmpz_set_ui($z, 0);
+        Math::GMPz::Rmpz_setbit($z, $n);
         bless \__div__($sum, $z);
     }
 
@@ -3874,7 +3873,7 @@ package Sidef::Types::Number::Number {
         $n & 1 and return ZERO;    # E_n = 0 for all odd indices
 
         # Use a faster algorithm for large values of n
-        if ($n > 1300) {
+        if ($n > 1000) {
             my $e = (_secant_numbers($n >> 1))[-1];
             Math::GMPz::Rmpz_neg($e, $e) if (($n >> 1) & 1);
             return bless \$e;
