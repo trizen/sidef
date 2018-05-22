@@ -3812,8 +3812,7 @@ package Sidef::Types::Number::Number {
         my @S = (Math::GMPz::Rmpz_init_set_ui(1));
 
         foreach my $k (1 .. $n) {
-            $S[$k] = Math::GMPz::Rmpz_init_set($S[$k - 1]);
-            Math::GMPz::Rmpz_mul_ui($S[$k], $S[$k], $k);
+            Math::GMPz::Rmpz_mul_ui($S[$k] = Math::GMPz::Rmpz_init(), $S[$k - 1], $k);
         }
 
         foreach my $k (1 .. $n) {
@@ -3830,7 +3829,6 @@ package Sidef::Types::Number::Number {
         my ($n, $x) = @_;
 
         #
-        ## E_n(x) = Sum_{k=0..n} binomial(n, k) * euler_number(k) / 2^k * (x - 1/2)^(n-k)
         ## E_n(x) = Sum_{k=0..n} binomial(n, n-k) * euler_number(n-k) / 2^(n-k) * (x - 1/2)^k
         #
 
@@ -3879,8 +3877,7 @@ package Sidef::Types::Number::Number {
 
         # Use a faster algorithm for large values of n
         if ($n > 1300) {
-            my @S = _secant_numbers($n >> 1);
-            my $e = $S[-1];
+            my $e = (_secant_numbers($n >> 1))[-1];
             Math::GMPz::Rmpz_neg($e, $e) if (($n >> 1) & 1);
             return bless \$e;
         }
@@ -3928,6 +3925,7 @@ package Sidef::Types::Number::Number {
 
     *euler_number = \&euler;
 
+    # TODO: add support for an optional argument and return B_n(x)
     sub bernreal {
         my ($n) = @_;
 
@@ -3961,8 +3959,7 @@ package Sidef::Types::Number::Number {
         bless \$f;
     }
 
-    # lnbernreal(n) = natural logarithm of bernoulli(n)
-
+    # TODO: add support for an optional argument and return log(B_n(x))
     sub lnbernreal {
         my ($n) = @_;
 
