@@ -3822,11 +3822,9 @@ package Sidef::Types::Number::Number {
         my $m = $n + 1;
         my $u = $m;
 
+        my $q = Math::GMPq::Rmpq_init();
         my $z = Math::GMPz::Rmpz_init();
         my $t = Math::GMPz::Rmpz_init_set_ui(1);
-
-        my $q1 = Math::GMPq::Rmpq_init();
-        my $q2 = Math::GMPq::Rmpq_init();
 
         my $sum = Math::GMPq::Rmpq_init();
         Math::GMPq::Rmpq_set_ui($sum, 0, 1);
@@ -3838,17 +3836,16 @@ package Sidef::Types::Number::Number {
 
             my ($num, $den) = Math::Prime::Util::GMP::bernfrac($u);
 
-            Math::GMPq::Rmpq_set_str($q1, "$num/$den", 10);
-            Math::GMPq::Rmpq_neg($q1, $q1) if $u == 1;    # with B_1 = -1/2
+            Math::GMPq::Rmpq_set_str($q, "$num/$den", 10);
+            Math::GMPq::Rmpq_neg($q, $q) if $u == 1;    # with B_1 = -1/2
             Math::GMPz::Rmpz_bin_uiui($z, $m, $k);
-            Math::GMPq::Rmpq_mul_z($q1, $q1, $z);
+            Math::GMPq::Rmpq_mul_z($q, $q, $z);
 
-            Math::GMPq::Rmpq_div_2exp($q1, $q1, 2 * $k);
-            Math::GMPq::Rmpq_set($q2, $q1);
-            Math::GMPq::Rmpq_mul_z($q1, $q1, $t);
+            Math::GMPq::Rmpq_div_2exp($q, $q, 2 * $k);
+            Math::GMPz::Rmpz_sub_ui($z, $t, 1);
+            Math::GMPq::Rmpq_mul_z($q, $q, $z);
 
-            Math::GMPq::Rmpq_sub($q1, $q1, $q2);
-            Math::GMPq::Rmpq_add($sum, $sum, $q1);
+            Math::GMPq::Rmpq_add($sum, $sum, $q);
         }
 
         Math::GMPq::Rmpq_mul_2exp($sum, $sum, 2 * $n + 1);
