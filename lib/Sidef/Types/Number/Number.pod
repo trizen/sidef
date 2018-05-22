@@ -931,9 +931,19 @@ Return the
 
 =cut
 
-=head2 euler_number
+=head2 euler
 
-Number.euler_number() -> I<Obj>
+Number.euler() -> I<Obj>
+
+Return the
+
+Aliases: I<euler_number>
+
+=cut
+
+=head2 euler_polynomial
+
+Number.euler_polynomial() -> I<Obj>
 
 Return the
 
@@ -2547,7 +2557,7 @@ Number.Y() -> I<Obj>
 
 Return the
 
-Aliases: I<γ>, I<euler>
+Aliases: I<γ>, I<euler_gamma>
 
 =cut
 

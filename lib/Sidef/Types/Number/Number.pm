@@ -1067,13 +1067,13 @@ package Sidef::Types::Number::Number {
         bless \$ln2;
     }
 
-    sub euler {
+    sub euler_gamma {
         my $euler = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
         Math::MPFR::Rmpfr_const_euler($euler, $ROUND);
         bless \$euler;
     }
 
-    *Y = \&euler;
+    *Y = \&euler_gamma;
 
     sub catalan {
         my $catalan = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
@@ -3785,11 +3785,9 @@ package Sidef::Types::Number::Number {
     }
 
     sub bernfrac {
-        my ($n, $k) = @_;
+        my ($n, $x) = @_;
 
-        if (defined($k)) {
-            goto &bernoulli_polynomial;
-        }
+        defined($x) && goto &bernoulli_polynomial;
 
         $n = _any2ui($$n) // goto &nan;
 
@@ -3808,8 +3806,50 @@ package Sidef::Types::Number::Number {
     *bernoulli        = \&bernfrac;
     *bernoulli_number = \&bernfrac;
 
-    sub euler_number {
-        my ($n) = @_;
+    sub euler_polynomial {
+        my ($n, $x) = @_;
+
+        #
+        ## E_n(x) = Sum_{k=0..n} binomial(n, k) * euler_number(k) / 2^k * (x - 1/2)^(n-k)
+        ## E_n(x) = Sum_{k=0..n} binomial(n, n-k) * euler_number(n-k) / 2^(n-k) * (x - 1/2)^k
+        #
+
+        $n = _any2ui($$n) // goto &nan;
+        $x = $$x;
+
+        my $u = $n + 1;
+        my $p = $ONE;
+        my $z = Math::GMPz::Rmpz_init();
+        my $q = Math::GMPq::Rmpq_init();
+
+        $x = __dec__(__add__($x, $x));    # x = 2*x - 1
+
+        my @list;
+
+        foreach my $k (0 .. $n) {
+            $p = __mul__($p, $x) if $k > 0;
+
+            --$u & 1 and next;            # E_n = 0 for all odd n
+
+            Math::GMPz::Rmpz_bin_uiui($z, $n, $u);
+
+            my $e = ${euler_number(bless \Math::GMPz::Rmpz_init_set_ui($u))};
+
+            Math::GMPz::Rmpz_mul($z, $z, $e);
+            Math::GMPq::Rmpq_set_z($q, $z);
+            Math::GMPq::Rmpq_div_2exp($q, $q, $n);
+
+            push @list, bless \__mul__($q, $p);
+        }
+
+        Sidef::Types::Array::Array->new(\@list)->sum;
+    }
+
+    sub euler {
+        my ($n, $x) = @_;
+
+        ref($n) || goto &euler_gamma;
+        defined($x) && goto &euler_polynomial;
 
         #
         ## E_n = 2^n * (2^(n+1) / (n+1)) * (bernoulli_polynomial(n+1, 3/4) - bernoulli_polynomial(n+1, 1/4))
@@ -3855,6 +3895,8 @@ package Sidef::Types::Number::Number {
 
         bless \$z;
     }
+
+    *euler_number = \&euler;
 
     sub bernreal {
         my ($n) = @_;
@@ -8809,7 +8851,7 @@ package Sidef::Types::Number::Number {
         *{__PACKAGE__ . '::' . '~'}   = \&not;
         *{__PACKAGE__ . '::' . ':'}   = \&pair;
         *{__PACKAGE__ . '::' . '//'}  = \&idiv;
-        *{__PACKAGE__ . '::' . 'γ'}  = \&Y;
+        *{__PACKAGE__ . '::' . 'γ'}  = \&euler_gamma;
         *{__PACKAGE__ . '::' . 'Γ'}  = \&gamma;
         *{__PACKAGE__ . '::' . 'Ψ'}  = \&digamma;
         *{__PACKAGE__ . '::' . 'ϕ'}  = \&euler_totient;

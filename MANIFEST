@@ -636,7 +636,6 @@ scripts/Tests/balanced_brakets.sf
 scripts/Tests/bare_multiplication.sf
 scripts/Tests/base64_decoder.sf
 scripts/Tests/beadsort.sf
-scripts/Tests/bernoulli_numbers.sf
 scripts/Tests/best_shuffle.sf
 scripts/Tests/binary_search.sf
 scripts/Tests/binary_search_recursive.sf
@@ -691,6 +690,7 @@ scripts/Tests/enumerator_object.sf
 scripts/Tests/eq_g2.sf
 scripts/Tests/equal_classes.sf
 scripts/Tests/escape_unescape.sf
+scripts/Tests/euler_and_bernoulli_numbers.sf
 scripts/Tests/eval.sf
 scripts/Tests/execute_system_command.sf
 scripts/Tests/extreme_floating_point_values.sf
