@@ -3840,7 +3840,6 @@ package Sidef::Types::Number::Number {
         my $u = $n + 1;
         my $p = $ONE;
         my $z = Math::GMPz::Rmpz_init();
-        my $q = Math::GMPq::Rmpq_init();
 
         $x = __dec__(__add__($x, $x));    # x = 2*x - 1
 
@@ -3851,18 +3850,17 @@ package Sidef::Types::Number::Number {
 
             --$u & 1 and next;            # E_n = 0 for all odd n
 
-            Math::GMPz::Rmpz_bin_uiui($z, $n, $u);
-
             my $e = $S[$u >> 1];
             Math::GMPz::Rmpz_neg($e, $e) if (($u >> 1) & 1);
+            Math::GMPz::Rmpz_bin_uiui($z, $n, $u);
             Math::GMPz::Rmpz_mul($z, $z, $e);
-            Math::GMPq::Rmpq_set_z($q, $z);
-            Math::GMPq::Rmpq_div_2exp($q, $q, $n);
-
-            push @list, bless \__mul__($q, $p);
+            push @list, bless \__mul__($p, $z);
         }
 
-        Sidef::Types::Array::Array->new(\@list)->sum;
+        my $sum = ${Sidef::Types::Array::Array->new(\@list)->sum};
+        Math::GMPz::Rmpz_set_ui($z, 1);
+        Math::GMPz::Rmpz_mul_2exp($z, $z, $n);
+        bless \__div__($sum, $z);
     }
 
     sub euler {
@@ -5687,7 +5685,7 @@ package Sidef::Types::Number::Number {
 
       Math_GMPq: {
             my $r = Math::GMPq::Rmpq_init();
-            Math::GMPq::Rmpq_add_z($r, $x, $MONE);
+            Math::GMPq::Rmpq_sub_z($r, $x, $ONE);
             return $r;
         }
 
