@@ -3806,6 +3806,26 @@ package Sidef::Types::Number::Number {
     *bernoulli        = \&bernfrac;
     *bernoulli_number = \&bernfrac;
 
+    sub _secant_numbers {
+        my ($n) = @_;
+
+        my @S = (Math::GMPz::Rmpz_init_set_ui(1));
+
+        foreach my $k (1 .. $n) {
+            $S[$k] = Math::GMPz::Rmpz_init_set($S[$k - 1]);
+            Math::GMPz::Rmpz_mul_ui($S[$k], $S[$k], $k);
+        }
+
+        foreach my $k (1 .. $n) {
+            foreach my $j ($k + 1 .. $n) {
+                Math::GMPz::Rmpz_mul_ui($S[$j], $S[$j], $j - $k + 1);
+                Math::GMPz::Rmpz_addmul_ui($S[$j], $S[$j - 1], $j - $k);
+            }
+        }
+
+        return @S;
+    }
+
     sub euler_polynomial {
         my ($n, $x) = @_;
 
@@ -3816,6 +3836,8 @@ package Sidef::Types::Number::Number {
 
         $n = _any2ui($$n) // goto &nan;
         $x = $$x;
+
+        my @S = _secant_numbers($n >> 1);
 
         my $u = $n + 1;
         my $p = $ONE;
@@ -3833,8 +3855,8 @@ package Sidef::Types::Number::Number {
 
             Math::GMPz::Rmpz_bin_uiui($z, $n, $u);
 
-            my $e = ${euler_number(bless \Math::GMPz::Rmpz_init_set_ui($u))};
-
+            my $e = $S[$u >> 1];
+            Math::GMPz::Rmpz_neg($e, $e) if (($u >> 1) & 1);
             Math::GMPz::Rmpz_mul($z, $z, $e);
             Math::GMPq::Rmpq_set_z($q, $z);
             Math::GMPq::Rmpq_div_2exp($q, $q, $n);
@@ -3851,13 +3873,21 @@ package Sidef::Types::Number::Number {
         ref($n) || goto &euler_gamma;
         defined($x) && goto &euler_polynomial;
 
-        #
-        ## E_n = 2^n * (2^(n+1) / (n+1)) * (bernoulli_polynomial(n+1, 3/4) - bernoulli_polynomial(n+1, 1/4))
-        #
-
         $n = _any2ui($$n) // goto &nan;
 
         $n & 1 and return ZERO;    # E_n = 0 for all odd indices
+
+        # Use a faster algorithm for large values of n
+        if ($n > 1300) {
+            my @S = _secant_numbers($n >> 1);
+            my $e = $S[-1];
+            Math::GMPz::Rmpz_neg($e, $e) if (($n >> 1) & 1);
+            return bless \$e;
+        }
+
+        #
+        ## E_n = 2^n * (2^(n+1) / (n+1)) * (bernoulli_polynomial(n+1, 3/4) - bernoulli_polynomial(n+1, 1/4))
+        #
 
         my $m = $n + 1;
         my $u = $m;
@@ -5625,9 +5655,8 @@ package Sidef::Types::Number::Number {
         }
 
       Math_GMPq: {
-            state $one = Math::GMPz::Rmpz_init_set_ui_nobless(1);
             my $r = Math::GMPq::Rmpq_init();
-            Math::GMPq::Rmpq_add_z($r, $x, $one);
+            Math::GMPq::Rmpq_add_z($r, $x, $ONE);
             return $r;
         }
 
@@ -5660,9 +5689,8 @@ package Sidef::Types::Number::Number {
         }
 
       Math_GMPq: {
-            state $mone = Math::GMPz::Rmpz_init_set_si_nobless(-1);
             my $r = Math::GMPq::Rmpq_init();
-            Math::GMPq::Rmpq_add_z($r, $x, $mone);
+            Math::GMPq::Rmpq_add_z($r, $x, $MONE);
             return $r;
         }
 
