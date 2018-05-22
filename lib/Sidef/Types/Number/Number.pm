@@ -3763,8 +3763,41 @@ package Sidef::Types::Number::Number {
         bless \$q;
     }
 
-    *bern      = \&bernfrac;
-    *bernoulli = \&bernfrac;
+    *bern             = \&bernfrac;
+    *bernoulli        = \&bernfrac;
+    *bernoulli_number = \&bernfrac;
+
+    sub bernoulli_polynomial {
+        my ($n, $x) = @_;
+        _valid(\$x);
+
+        $n = _any2ui($$n) // goto &nan;
+        $x = $$x;
+
+        my $p = $x;
+        my $z = Math::GMPz::Rmpz_init();
+        my $q = Math::GMPq::Rmpq_init();
+
+        #
+        ## B_n(x) = Sum_{k=0..n} binomial(n, k) * bernoulli(n-k) * x^k
+        #
+
+        my @list;
+
+        foreach my $k (1 .. $n) {
+            $p = __mul__($p, $x) if $k > 1;
+            my $u = $n - $k;
+            next if ($u % 2 and $u != 1);
+            my ($num, $den) = Math::Prime::Util::GMP::bernfrac($u);
+            Math::GMPq::Rmpq_set_str($q, "$num/$den", 10);
+            Math::GMPq::Rmpq_neg($q, $q) if $u == 1;    # with B_1 = -1/2
+            Math::GMPz::Rmpz_bin_uiui($z, $n, $k);
+            Math::GMPq::Rmpq_mul_z($q, $q, $z);
+            push @list, bless \__mul__($p, $q);
+        }
+
+        Sidef::Types::Array::Array->new(\@list)->sum;
+    }
 
     sub bernreal {
         my ($n) = @_;
@@ -3878,8 +3911,9 @@ package Sidef::Types::Number::Number {
         bless \$q;
     }
 
-    *harm     = \&harmfrac;
-    *harmonic = \&harmfrac;
+    *harm            = \&harmfrac;
+    *harmonic        = \&harmfrac;
+    *harmonic_number = \&harmfrac;
 
     sub harmreal {
         my ($x) = @_;
@@ -6380,6 +6414,8 @@ package Sidef::Types::Number::Number {
         bless \$bell;
     }
 
+    *bell_number = \&bell;
+
     sub quadratic_formula {
         my ($x, $y, $z) = @_;
 
@@ -7563,6 +7599,8 @@ package Sidef::Types::Number::Number {
         my $n = Math::Prime::Util::GMP::partitions(&_big2uistr // goto &nan);
         $n < ULONG_MAX ? __PACKAGE__->_set_uint($n) : __PACKAGE__->_set_str('int', $n);
     }
+
+    *number_of_partitions = \&partitions;
 
     sub is_primitive_root {
         my ($x, $y) = @_;

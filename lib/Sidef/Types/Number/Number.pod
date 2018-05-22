@@ -523,6 +523,8 @@ Number.bell() -> I<Obj>
 
 Return the
 
+Aliases: I<bell_number>
+
 =cut
 
 =head2 bern
@@ -531,7 +533,15 @@ Number.bern() -> I<Obj>
 
 Return the
 
-Aliases: I<bernfrac>, I<bernoulli>
+Aliases: I<bernfrac>, I<bernoulli>, I<bernoulli_number>
+
+=cut
+
+=head2 bernoulli_polynomial
+
+Number.bernoulli_polynomial() -> I<Obj>
+
+Return the
 
 =cut
 
@@ -1081,7 +1091,7 @@ Number.harm() -> I<Obj>
 
 Return the
 
-Aliases: I<harmfrac>, I<harmonic>
+Aliases: I<harmfrac>, I<harmonic>, I<harmonic_number>
 
 =cut
 
@@ -1988,6 +1998,8 @@ Return the
 Number.partitions() -> I<Obj>
 
 Return the
+
+Aliases: I<number_of_partitions>
 
 =cut
 
