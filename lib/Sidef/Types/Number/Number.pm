@@ -3854,8 +3854,9 @@ package Sidef::Types::Number::Number {
         Math::GMPq::Rmpq_mul_2exp($sum, $sum, 2 * $n + 1);
         Math::GMPz::Rmpz_set_ui($z, $m);
         Math::GMPq::Rmpq_div_z($sum, $sum, $z);
+        Math::GMPz::Rmpz_set_q($z, $sum);
 
-        bless \$sum;
+        bless \$z;
     }
 
     sub bernreal {
