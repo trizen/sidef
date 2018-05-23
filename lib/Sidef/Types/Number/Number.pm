@@ -1067,21 +1067,21 @@ package Sidef::Types::Number::Number {
         bless \$ln2;
     }
 
-    sub euler_gamma {
+    sub EulerGamma {
         my $euler = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
         Math::MPFR::Rmpfr_const_euler($euler, $ROUND);
         bless \$euler;
     }
 
-    *Y = \&euler_gamma;
+    *Y = \&EulerGamma;
 
-    sub catalan {
+    sub CatalanG {
         my $catalan = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
         Math::MPFR::Rmpfr_const_catalan($catalan, $ROUND);
         bless \$catalan;
     }
 
-    *C = \&catalan;
+    *C = \&CatalanG;
 
     sub i {
         my ($x) = @_;
@@ -3752,10 +3752,6 @@ package Sidef::Types::Number::Number {
 
         state @cache;
 
-        if (!@cache) {
-            @cache = (Math::GMPz::Rmpz_init_set_ui(1));
-        }
-
         if ($n <= $#cache) {
             return @cache;
         }
@@ -3781,10 +3777,6 @@ package Sidef::Types::Number::Number {
         my ($n) = @_;
 
         state @cache;
-
-        if (!@cache) {
-            @cache = (Math::GMPz::Rmpz_init_set_ui(1));
-        }
 
         if ($n <= $#cache) {
             return @cache;
@@ -3920,7 +3912,7 @@ package Sidef::Types::Number::Number {
     sub euler {
         my ($n, $x) = @_;
 
-        ref($n) || goto &euler_gamma;
+        ref($n) || goto &EulerGamma;
         defined($x) && goto &euler_polynomial;
 
         $n = _any2ui($$n) // goto &nan;
@@ -6639,7 +6631,6 @@ package Sidef::Types::Number::Number {
         $n = _any2mpz($$n) // goto &nan;
         $p = _any2ui($$p) // goto &nan;
 
-        # Unbox `n` when it fits inside a native unsigned integer
         my $native_n = 0;
 
         if (Math::GMPz::Rmpz_fits_ulong_p($n)) {
@@ -8870,7 +8861,7 @@ package Sidef::Types::Number::Number {
         *{__PACKAGE__ . '::' . '~'}   = \&not;
         *{__PACKAGE__ . '::' . ':'}   = \&pair;
         *{__PACKAGE__ . '::' . '//'}  = \&idiv;
-        *{__PACKAGE__ . '::' . 'γ'}  = \&euler_gamma;
+        *{__PACKAGE__ . '::' . 'γ'}  = \&EulerGamma;
         *{__PACKAGE__ . '::' . 'Γ'}  = \&gamma;
         *{__PACKAGE__ . '::' . 'Ψ'}  = \&digamma;
         *{__PACKAGE__ . '::' . 'ϕ'}  = \&euler_totient;

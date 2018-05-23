@@ -617,8 +617,6 @@ Number.C() -> I<Obj>
 
 Return the
 
-Aliases: I<catalan>
-
 =cut
 
 =head2 carmichael_lambda
@@ -2557,7 +2555,7 @@ Number.Y() -> I<Obj>
 
 Return the
 
-Aliases: I<γ>, I<euler_gamma>
+Aliases: I<γ>
 
 =cut
 

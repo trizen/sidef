@@ -313,7 +313,7 @@ package Sidef::Optimizer {
                    factorial
                    sqrt isqrt
                    next_pow2
-                   abs int rat float i
+                   abs int rat float
                    norm conj sqr
 
                    zeta
@@ -376,13 +376,11 @@ package Sidef::Optimizer {
                    sign
                    nan
                    chr
-                   pi
-                   ln2
-                   phi
-                   tau
-                   e
-                   euler
-                   catalan
+
+                   i pi tau
+                   e ln2 phi
+                   EulerGamma
+                   CatalanG
 
                    is_zero
                    is_one
@@ -592,9 +590,9 @@ package Sidef::Optimizer {
                    pi
                    tau
                    ln2
-                   euler
-                   catalan
-                   e
+                   EulerGamma
+                   CatalanG
+                   e i
                    phi
                    nan
                    inf
