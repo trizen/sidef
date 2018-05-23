@@ -3747,8 +3747,48 @@ package Sidef::Types::Number::Number {
         bless \$r;
     }
 
+    sub _secant_numbers {
+        my ($n) = @_;
+
+        state @cache;
+
+        if (!@cache) {
+            @cache = (Math::GMPz::Rmpz_init_set_ui(1));
+        }
+
+        if ($n <= $#cache) {
+            return @cache;
+        }
+
+        my @S = (Math::GMPz::Rmpz_init_set_ui(1));
+
+        foreach my $k (1 .. $n) {
+            Math::GMPz::Rmpz_mul_ui($S[$k] = Math::GMPz::Rmpz_init(), $S[$k - 1], $k);
+        }
+
+        foreach my $k (1 .. $n) {
+            foreach my $j ($k + 1 .. $n) {
+                Math::GMPz::Rmpz_addmul_ui($S[$j], $S[$j - 1], ($j - $k) * ($j - $k + 2));
+            }
+        }
+
+        push @cache, @S[@cache .. ((@S <= 1000) ? $#S : 1000)];
+
+        return @S;
+    }
+
     sub _tangent_numbers {
         my ($n) = @_;
+
+        state @cache;
+
+        if (!@cache) {
+            @cache = (Math::GMPz::Rmpz_init_set_ui(1));
+        }
+
+        if ($n <= $#cache) {
+            return @cache;
+        }
 
         my @T = (Math::GMPz::Rmpz_init_set_ui(1));
 
@@ -3762,6 +3802,8 @@ package Sidef::Types::Number::Number {
                 Math::GMPz::Rmpz_addmul_ui($T[$j], $T[$j - 1], $j - $k);
             }
         }
+
+        push @cache, @T[@cache .. ((@T <= 1000) ? $#T : 1000)];
 
         return @T;
     }
@@ -3799,10 +3841,9 @@ package Sidef::Types::Number::Number {
                 Math::GMPq::Rmpq_set_si($q, -1, 2);
             }
             else {
-                my $t = $T[($u >> 1) - 1];
-                Math::GMPz::Rmpz_mul_ui($t, $t, $u);
-                Math::GMPz::Rmpz_neg($t, $t) if ((($u >> 1) - 1) & 1);
-                Math::GMPq::Rmpq_set_z($q, $t);
+                Math::GMPz::Rmpz_mul_ui($z, $T[($u >> 1) - 1], $u);
+                Math::GMPz::Rmpz_neg($z, $z) if ((($u >> 1) - 1) & 1);
+                Math::GMPq::Rmpq_set_z($q, $z);
 
                 # z = (2^n - 1) * 2^n
                 Math::GMPz::Rmpz_set_ui($z, 0);
@@ -3844,24 +3885,6 @@ package Sidef::Types::Number::Number {
     *bernoulli        = \&bernfrac;
     *bernoulli_number = \&bernfrac;
 
-    sub _secant_numbers {
-        my ($n) = @_;
-
-        my @S = (Math::GMPz::Rmpz_init_set_ui(1));
-
-        foreach my $k (1 .. $n) {
-            Math::GMPz::Rmpz_mul_ui($S[$k] = Math::GMPz::Rmpz_init(), $S[$k - 1], $k);
-        }
-
-        foreach my $k (1 .. $n) {
-            foreach my $j ($k + 1 .. $n) {
-                Math::GMPz::Rmpz_addmul_ui($S[$j], $S[$j - 1], ($j - $k) * ($j - $k + 2));
-            }
-        }
-
-        return @S;
-    }
-
     sub euler_polynomial {
         my ($n, $x) = @_;
 
@@ -3887,10 +3910,9 @@ package Sidef::Types::Number::Number {
 
             --$u & 1 and next;            # E_n = 0 for all odd n
 
-            my $e = $S[$u >> 1];
-            Math::GMPz::Rmpz_neg($e, $e) if (($u >> 1) & 1);
             Math::GMPz::Rmpz_bin_uiui($z, $n, $u);
-            Math::GMPz::Rmpz_mul($z, $z, $e);
+            Math::GMPz::Rmpz_mul($z, $z, $S[$u >> 1]);
+            Math::GMPz::Rmpz_neg($z, $z) if (($u >> 1) & 1);
             push @list, bless \__mul__($p, $z);
         }
 
@@ -3910,52 +3932,9 @@ package Sidef::Types::Number::Number {
 
         $n & 1 and return ZERO;    # E_n = 0 for all odd indices
 
-        # Use a faster algorithm for large values of n
-        if ($n > 1000) {
-            my $e = (_secant_numbers($n >> 1))[-1];
-            Math::GMPz::Rmpz_neg($e, $e) if (($n >> 1) & 1);
-            return bless \$e;
-        }
-
-        #
-        ## E_n = 2^n * (2^(n+1) / (n+1)) * (bernoulli_polynomial(n+1, 3/4) - bernoulli_polynomial(n+1, 1/4))
-        #
-
-        my $m = $n + 1;
-        my $u = $m;
-
-        my $q = Math::GMPq::Rmpq_init();
-        my $z = Math::GMPz::Rmpz_init();
-        my $t = Math::GMPz::Rmpz_init_set_ui(1);
-
-        my $sum = Math::GMPq::Rmpq_init();
-        Math::GMPq::Rmpq_set_ui($sum, 0, 1);
-
-        foreach my $k (1 .. $m) {
-            Math::GMPz::Rmpz_mul_ui($t, $t, 3);
-
-            --$u & 1 and $u != 1 and next;    # B_n = 0 for odd n > 1
-
-            my ($num, $den) = Math::Prime::Util::GMP::bernfrac($u);
-
-            Math::GMPq::Rmpq_set_str($q, "$num/$den", 10);
-            Math::GMPq::Rmpq_neg($q, $q) if $u == 1;    # with B_1 = -1/2
-            Math::GMPz::Rmpz_bin_uiui($z, $m, $k);
-            Math::GMPq::Rmpq_mul_z($q, $q, $z);
-
-            Math::GMPq::Rmpq_div_2exp($q, $q, 2 * $k);
-            Math::GMPz::Rmpz_sub_ui($z, $t, 1);
-            Math::GMPq::Rmpq_mul_z($q, $q, $z);
-
-            Math::GMPq::Rmpq_add($sum, $sum, $q);
-        }
-
-        Math::GMPq::Rmpq_mul_2exp($sum, $sum, 2 * $n + 1);
-        Math::GMPz::Rmpz_set_ui($z, $m);
-        Math::GMPq::Rmpq_div_z($sum, $sum, $z);
-        Math::GMPz::Rmpz_set_q($z, $sum);
-
-        bless \$z;
+        my $e = Math::GMPz::Rmpz_init_set((_secant_numbers($n >> 1))[$n >> 1]);
+        Math::GMPz::Rmpz_neg($e, $e) if (($n >> 1) & 1);
+        bless \$e;
     }
 
     *euler_number = \&euler;
@@ -6702,9 +6681,9 @@ package Sidef::Types::Number::Number {
                 Math::GMPq::Rmpq_set_ui($q, 1, 2);
             }
             else {
-                my $t = $T[($j >> 1) - 1];
-                Math::GMPz::Rmpz_mul_ui($t, $t, $j);
-                Math::GMPz::Rmpz_neg($t, $t) if ((($j >> 1) - 1) & 1);
+                Math::GMPz::Rmpz_mul_ui($u, $T[($j >> 1) - 1], $j);
+                Math::GMPz::Rmpz_neg($u, $u) if ((($j >> 1) - 1) & 1);
+                Math::GMPq::Rmpq_set_z($q, $u);
 
                 # (2^n - 1) * 2^n
                 Math::GMPz::Rmpz_set_ui($u, 0);
@@ -6712,8 +6691,7 @@ package Sidef::Types::Number::Number {
                 Math::GMPz::Rmpz_sub_ui($u, $u, 1);
                 Math::GMPz::Rmpz_mul_2exp($u, $u, $j);
 
-                # B_j = t/u
-                Math::GMPq::Rmpq_set_z($q, $t);
+                # B_j = q
                 Math::GMPq::Rmpq_div_z($q, $q, $u);
             }
 
