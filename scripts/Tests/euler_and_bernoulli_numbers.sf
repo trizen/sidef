@@ -13,6 +13,8 @@
     assert_eq((bernoulli(x+1, n+1) - bernoulli(x+1)) / (x+1), faulhaber_sum(n,x), "error for faulhaber_sum(#{n}, #{x})")
     assert_eq(euler(n, x) + (1/2 * sum(^n, {|k| binomial(n, k) * euler(k, x) })), x**n, "error for euler -> #{x}^#{n}")
     assert_eq(sum(0..n, {|k| binomial(n+1, k) * bernoulli(k, x) }) / (n+1), x**n, "error for bernoulli -> #{x}^#{n}")
+    assert_eq(euler(n, x), 2**(n+1) / (n+1) * (bernoulli(n+1, (x+1)/2) - bernoulli(n+1, x/2)), "euler-bernoulli relation with (#{n}, #{x})")
+    assert_eq(euler(n), 2**n * euler(n, 1/2), "euler number from euler polyonimial with (#{n}, #{x})")
 }
 
 assert_eq(euler_number(18), -2404879675441)

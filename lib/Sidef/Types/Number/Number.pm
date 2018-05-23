@@ -3747,6 +3747,25 @@ package Sidef::Types::Number::Number {
         bless \$r;
     }
 
+    sub _tangent_numbers {
+        my ($n) = @_;
+
+        my @T = (Math::GMPz::Rmpz_init_set_ui(1));
+
+        foreach my $k (1 .. $n) {
+            Math::GMPz::Rmpz_mul_ui($T[$k] = Math::GMPz::Rmpz_init(), $T[$k - 1], $k);
+        }
+
+        foreach my $k (1 .. $n) {
+            foreach my $j ($k .. $n) {
+                Math::GMPz::Rmpz_mul_ui($T[$j], $T[$j], $j - $k + 2);
+                Math::GMPz::Rmpz_addmul_ui($T[$j], $T[$j - 1], $j - $k);
+            }
+        }
+
+        return @T;
+    }
+
     sub bernoulli_polynomial {
         my ($n, $x) = @_;
 
@@ -3759,6 +3778,8 @@ package Sidef::Types::Number::Number {
         $n = _any2ui($$n) // goto &nan;
         $x = $$x;
 
+        my @T = _tangent_numbers(($n >> 1) - 1);
+
         my $u = $n + 1;
         my $p = $ONE;
         my $z = Math::GMPz::Rmpz_init();
@@ -3769,12 +3790,29 @@ package Sidef::Types::Number::Number {
         foreach my $k (0 .. $n) {
             $p = __mul__($p, $x) if $k > 0;
 
-            --$u & 1 and $u != 1 and next;    # B_n = 0 for odd n > 1
+            --$u & 1 and $u > 1 and next;    # B_n = 0 for odd n > 1
 
-            my ($num, $den) = Math::Prime::Util::GMP::bernfrac($u);
+            if ($u == 0) {
+                Math::GMPq::Rmpq_set_ui($q, 1, 1);
+            }
+            elsif ($u == 1) {
+                Math::GMPq::Rmpq_set_si($q, -1, 2);
+            }
+            else {
+                my $t = $T[($u >> 1) - 1];
+                Math::GMPz::Rmpz_mul_ui($t, $t, $u);
+                Math::GMPz::Rmpz_neg($t, $t) if ((($u >> 1) - 1) & 1);
+                Math::GMPq::Rmpq_set_z($q, $t);
 
-            Math::GMPq::Rmpq_set_str($q, "$num/$den", 10);
-            Math::GMPq::Rmpq_neg($q, $q) if $u == 1;    # with B_1 = -1/2
+                # z = (2^n - 1) * 2^n
+                Math::GMPz::Rmpz_set_ui($z, 0);
+                Math::GMPz::Rmpz_setbit($z, $u);
+                Math::GMPz::Rmpz_sub_ui($z, $z, 1);
+                Math::GMPz::Rmpz_mul_2exp($z, $z, $u);
+
+                Math::GMPq::Rmpq_div_z($q, $q, $z);
+            }
+
             Math::GMPz::Rmpz_bin_uiui($z, $n, $k);
             Math::GMPq::Rmpq_mul_z($q, $q, $z);
 
