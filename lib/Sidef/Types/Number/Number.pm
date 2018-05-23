@@ -3823,15 +3823,12 @@ package Sidef::Types::Number::Number {
         my @T = _tangent_numbers(($n >> 1) - 1);
 
         my $u = $n + 1;
-        my $p = $ONE;
         my $z = Math::GMPz::Rmpz_init();
         my $q = Math::GMPq::Rmpq_init();
 
         my @list;
 
         foreach my $k (0 .. $n) {
-            $p = __mul__($p, $x) if $k > 0;
-
             --$u & 1 and $u > 1 and next;    # B_n = 0 for odd n > 1
 
             if ($u == 0) {
@@ -3857,7 +3854,7 @@ package Sidef::Types::Number::Number {
             Math::GMPz::Rmpz_bin_uiui($z, $n, $k);
             Math::GMPq::Rmpq_mul_z($q, $q, $z);
 
-            push @list, bless \__mul__($p, $q);
+            push @list, bless \__mul__($k ? __pow__($x, $k) : $ONE, $q);
         }
 
         Sidef::Types::Array::Array->new(\@list)->sum;
@@ -3898,7 +3895,6 @@ package Sidef::Types::Number::Number {
         my @S = _secant_numbers($n >> 1);
 
         my $u = $n + 1;
-        my $p = $ONE;
         my $z = Math::GMPz::Rmpz_init();
 
         $x = __dec__(__add__($x, $x));    # x = 2*x - 1
@@ -3906,14 +3902,13 @@ package Sidef::Types::Number::Number {
         my @list;
 
         foreach my $k (0 .. $n) {
-            $p = __mul__($p, $x) if $k > 0;
-
             --$u & 1 and next;            # E_n = 0 for all odd n
 
             Math::GMPz::Rmpz_bin_uiui($z, $n, $u);
             Math::GMPz::Rmpz_mul($z, $z, $S[$u >> 1]);
             Math::GMPz::Rmpz_neg($z, $z) if (($u >> 1) & 1);
-            push @list, bless \__mul__($p, $z);
+
+            push @list, bless \__mul__($k ? __pow__($x, $k) : $ONE, $z);
         }
 
         my $sum = ${Sidef::Types::Array::Array->new(\@list)->sum};
