@@ -627,6 +627,14 @@ Return the
 
 =cut
 
+=head2 catalan
+
+Number.catalan() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 cbrt
 
 Number.cbrt() -> I<Obj>
@@ -1124,6 +1132,16 @@ Return the
 Number.hyperfactorial() -> I<Obj>
 
 Return the
+
+=cut
+
+=head2 hyperfactorial_ln
+
+Number.hyperfactorial_ln() -> I<Obj>
+
+Return the
+
+Aliases: I<lnhyperfactorial>, I<hyperfactorial_log>
 
 =cut
 
@@ -1761,23 +1779,13 @@ Aliases: I<gamma_log>
 
 =cut
 
-=head2 lnhyperfactorial
-
-Number.lnhyperfactorial() -> I<Obj>
-
-Return the
-
-Aliases: I<hyperfactorial_log>
-
-=cut
-
 =head2 lnsuperfactorial
 
 Number.lnsuperfactorial() -> I<Obj>
 
 Return the
 
-Aliases: I<superfactorial_log>
+Aliases: I<superfactorial_ln>, I<superfactorial_log>
 
 =cut
 

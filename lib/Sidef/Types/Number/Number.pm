@@ -6214,6 +6214,7 @@ package Sidef::Types::Number::Number {
         bless \$r;
     }
 
+    *superfactorial_ln  = \&lnsuperfactorial;
     *superfactorial_log = \&lnsuperfactorial;
 
     sub hyperfactorial {
@@ -6251,6 +6252,7 @@ package Sidef::Types::Number::Number {
         bless \$r;
     }
 
+    *hyperfactorial_ln  = \&lnhyperfactorial;
     *hyperfactorial_log = \&lnhyperfactorial;
 
     sub factorial {
@@ -6724,6 +6726,17 @@ package Sidef::Types::Number::Number {
         }
 
         bless \$prod;
+    }
+
+    sub catalan {
+        my ($n) = @_;
+
+        $n = _any2ui($$n) // goto &nan;
+
+        my $r = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_bin_uiui($r, $n << 1, $n);
+        Math::GMPz::Rmpz_divexact_ui($r, $r, $n+1);
+        bless \$r;
     }
 
     sub binomial {

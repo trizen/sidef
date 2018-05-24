@@ -8,7 +8,7 @@
     var x = 100.irand(2)
 
     assert_eq(sum(0..n, {|k| binomial(n, k) * euler_number(k) / 2**k * (x - 1/2)**(n-k) }), euler(n, x), "error for euler(#{n}, #{x})")
-    assert_eq(sum(0..n, {|k| binomial(n, k) * (n-k == 1 ? -1/2 : bernoulli(n-k)) * x**k }), bernoulli(n, x), "error for bernoulli(#{n}, #{x})")
+    assert_eq(sum(0..n, {|k| binomial(n, k) * (-1)**(n-k) * bernoulli(n-k) * x**k }), bernoulli(n, x), "error for bernoulli(#{n}, #{x})")
     assert_eq(2**n * (2**(n+1) / (n+1)) * (bernoulli(n+1, 3/4) - bernoulli(n+1, 1/4)), euler_number(n), "error for euler_number(#{n})")
     assert_eq((bernoulli(x+1, n+1) - bernoulli(x+1)) / (x+1), faulhaber_sum(n,x), "error for faulhaber_sum(#{n}, #{x})")
     assert_eq(euler(n, x) + (1/2 * sum(^n, {|k| binomial(n, k) * euler(k, x) })), x**n, "error for euler -> #{x}^#{n}")
@@ -16,9 +16,6 @@
     assert_eq(euler(n, x), 2**(n+1) / (n+1) * (bernoulli(n+1, (x+1)/2) - bernoulli(n+1, x/2)), "euler-bernoulli relation with (#{n}, #{x})")
     assert_eq(euler(n), 2**n * euler(n, 1/2), "euler number from euler polyonimial with (#{n}, #{x})")
 }
-
-assert_eq(euler_number(18), -2404879675441)
-assert_eq(euler_number(20), 370371188237525)
 
 assert_eq(0..10 -> map {|n| euler_number(n) }, [1, 0, -1, 0, 5, 0, -61, 0, 1385, 0, -50521])
 assert_eq(1..10 -> map {|n| 2*n*euler_polynomial(2*n - 1, 0) }, [-1, 1, -3, 17, -155, 2073, -38227, 929569, -28820619, 1109652905])
