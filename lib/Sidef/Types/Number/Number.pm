@@ -1374,9 +1374,9 @@ package Sidef::Types::Number::Number {
       Math_GMPz__Math_MPFR: {
 
 #<<<
-            state $has_z_sub = (Math::MPFR::MPFR_VERSION_MAJOR() == 3
-                             && Math::MPFR::MPFR_VERSION_MINOR() >= 1)
-                             || Math::MPFR::MPFR_VERSION_MAJOR() > 3;
+            state $has_z_sub = (Math::MPFR::MPFR_VERSION_MAJOR() >  3)
+                            || (Math::MPFR::MPFR_VERSION_MAJOR() == 3
+                            &&  Math::MPFR::MPFR_VERSION_MINOR() >= 1);
 #>>>
 
             my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
@@ -6622,7 +6622,11 @@ package Sidef::Types::Number::Number {
     sub geometric_sum {
         my ($n, $r) = @_;
         _valid(\$r);
-        bless \__div__(__sub__($ONE, __pow__($$r, $$n)), __sub__($ONE, $$r));
+
+        $n = $$n;
+        $r = $$r;
+
+        bless \__div__(__sub__(__pow__($r, __add__($n, $ONE)), $ONE), __sub__($r, $ONE));
     }
 
     sub faulhaber_sum {
