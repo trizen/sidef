@@ -894,7 +894,7 @@ package Sidef::Types::Number::Number {
 
     sub float {
         my ($x) = @_;
-        ref($$x) eq 'Math::MPFR' ? $x : bless \_any2mpfr($$x);
+        (ref($$x) eq 'Math::MPFR' || ref($$x) eq 'Math::MPC') ? $x : bless \_any2mpfr_mpc($$x);
     }
 
     sub complex {
@@ -6739,7 +6739,7 @@ package Sidef::Types::Number::Number {
 
         my $r = Math::GMPz::Rmpz_init();
         Math::GMPz::Rmpz_bin_uiui($r, $n << 1, $n);
-        Math::GMPz::Rmpz_divexact_ui($r, $r, $n+1);
+        Math::GMPz::Rmpz_divexact_ui($r, $r, $n + 1);
         bless \$r;
     }
 
