@@ -993,6 +993,14 @@ Aliases: I<collect>
 
 =cut
 
+=head2 map_cons
+
+Array.map_cons() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 map_kv
 
 Array.map_kv() -> I<Obj>

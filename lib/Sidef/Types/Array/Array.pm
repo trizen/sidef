@@ -1129,7 +1129,7 @@ package Sidef::Types::Array::Array {
         my @new;
         my $i = 0;
         foreach my $item (@$self) {
-            push @{$new[$i]}, $item;
+            CORE::push(@{$new[$i]}, $item);
             ++$i if $block->run($item);
         }
 
@@ -1165,7 +1165,7 @@ package Sidef::Types::Array::Array {
 
         my @array;
         foreach my $i ($n - 1 .. $#$self) {
-            push @array, bless([@$self[$i - $n + 1 .. $i]]);
+            CORE::push(@array, bless([@$self[$i - $n + 1 .. $i]]));
         }
 
         bless \@array;
@@ -1181,6 +1181,19 @@ package Sidef::Types::Array::Array {
         }
 
         $self;
+    }
+
+    sub map_cons {
+        my ($self, $n, $block) = @_;
+
+        $n = CORE::int($n);
+
+        my @array;
+        foreach my $i ($n - 1 .. $#$self) {
+            CORE::push(@array, $block->run(@$self[$i - $n + 1 .. $i]));
+        }
+
+        bless \@array;
     }
 
     sub each_index {
