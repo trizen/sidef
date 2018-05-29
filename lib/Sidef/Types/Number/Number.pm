@@ -5294,9 +5294,8 @@ package Sidef::Types::Number::Number {
             return (undef, undef);
         }
 
-        # No solutions to `x^2 - d*y^2 = 1` if `d` is a perfect square
-        if (    Math::GMPz::Rmpz_cmp_ui($n, 1) == 0
-            and Math::GMPz::Rmpz_perfect_square_p($d)) {
+        # No solutions to `x^2 - d*y^2 = n` if `d` is a perfect square
+        if (Math::GMPz::Rmpz_perfect_square_p($d)) {
             return (undef, undef);
         }
 
