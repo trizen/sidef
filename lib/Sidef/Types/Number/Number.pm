@@ -716,7 +716,8 @@ package Sidef::Types::Number::Number {
       Math_MPC: {
             my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
             Math::MPC::RMPC_RE($r, $x);
-            Math::MPFR::Rmpfr_sgn($r) && return 1;
+            Math::MPFR::Rmpfr_sgn($r)   && return 1;
+            Math::MPFR::Rmpfr_nan_p($r) && return 0;
             Math::MPC::RMPC_IM($r, $x);
             return !!Math::MPFR::Rmpfr_sgn($r);
         }
@@ -5272,6 +5273,99 @@ package Sidef::Types::Number::Number {
 
     *as_dec = \&as_float;
 
+    # Solution in integers to `x^2 - d*y^2 = n`
+    # where `d` and `n` are provided (n=1 by default).
+
+    sub solve_pell {
+        my ($d, $n) = @_;
+
+        $d = _any2mpz($$d) // return (undef, undef);
+
+        if (defined($n)) {
+            _valid(\$n);
+            $n = _any2mpz($$n) // return (undef, undef);
+        }
+        else {
+            $n = $ONE;
+        }
+
+        # No solutions for d <= 0
+        if (Math::GMPz::Rmpz_sgn($d) <= 0) {
+            return (undef, undef);
+        }
+
+        # No solutions to `x^2 - d*y^2 = 1` if `d` is a perfect square
+        if (    Math::GMPz::Rmpz_cmp_ui($n, 1) == 0
+            and Math::GMPz::Rmpz_perfect_square_p($d)) {
+            return (undef, undef);
+        }
+
+        my $x = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_sqrt($x, $d);
+
+        my $y = Math::GMPz::Rmpz_init_set($x);
+        my $z = Math::GMPz::Rmpz_init_set_ui(1);
+
+        my $t = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_add($t, $x, $x);    # t = x+x
+
+        my $t2 = Math::GMPz::Rmpz_init();
+        my $t3 = Math::GMPz::Rmpz_init();
+
+        my $f1 = Math::GMPz::Rmpz_init_set_ui(1);
+        my $f2 = Math::GMPz::Rmpz_init_set($x);
+
+        # The bound of the square root period is: O(sqrt(d)*log(d))
+        # We set: max = 2*sqrt(d)*log(d) = 4*sqrt(d)*log(sqrt(d))
+        my $max = Math::GMPz::Rmpz_get_d($x);
+        $max = CORE::int(4 * $max * CORE::log($max) + 10);
+
+        my $p = Math::GMPz::Rmpz_init();
+
+        foreach (my $i = 0 ; $i <= $max ; ++$i) {
+
+            # y = (r*z - y)
+            Math::GMPz::Rmpz_submul($y, $t, $z);    # y = y - t*z
+            Math::GMPz::Rmpz_neg($y, $y);           # y = -y
+
+            Math::GMPz::Rmpz_sgn($z) || return (undef, undef);
+
+            # z = floor((n - y*y) / z)
+            Math::GMPz::Rmpz_mul($t, $y, $y);       # t = y*y
+            Math::GMPz::Rmpz_sub($t, $d, $t);       # t = d-t
+            Math::GMPz::Rmpz_tdiv_q($z, $t, $z);    # z = floor(t/z)
+
+            Math::GMPz::Rmpz_sgn($z) || return (undef, undef);
+
+            # t = floor((x + y) / z)
+            Math::GMPz::Rmpz_add($t, $x, $y);       # t = x+y
+            Math::GMPz::Rmpz_tdiv_q($t, $t, $z);    # t = floor(t/z)
+
+            Math::GMPz::Rmpz_addmul($f1, $f2, $t);
+            ($f1, $f2) = ($f2, $f1);
+
+            Math::GMPz::Rmpz_mul($p, $f1, $f1);
+            Math::GMPz::Rmpz_sub($p, $p, $n);
+            Math::GMPz::Rmpz_mul($p, $p, $d);
+            Math::GMPz::Rmpz_mul_2exp($p, $p, 2);
+
+            if (Math::GMPz::Rmpz_perfect_square_p($p)) {
+
+                Math::GMPz::Rmpz_sqrt($p, $p);
+                Math::GMPz::Rmpz_div_2exp($p, $p, 1);
+                Math::GMPz::Rmpz_divisible_p($p, $d) || next;
+                Math::GMPz::Rmpz_divexact($p, $p, $d);
+                Math::GMPz::Rmpz_sgn($p) || next;
+
+                # Solution in positive integers
+                return ((bless \$f1), (bless \$p));
+            }
+        }
+
+        # No solution could be found
+        return (undef, undef);
+    }
+
     sub sqrt_cfrac {
         my ($n) = @_;
 
@@ -5292,23 +5386,23 @@ package Sidef::Types::Number::Number {
         my $z = Math::GMPz::Rmpz_init_set_ui(1);
         my $r = Math::GMPz::Rmpz_init();
 
-        Math::GMPz::Rmpz_add($r, $x, $y);    # r = x+y
+        Math::GMPz::Rmpz_add($r, $x, $x);    # r = x+x
 
         do {
             my $t = Math::GMPz::Rmpz_init();
 
             # y = (r*z - y)
-            Math::GMPz::Rmpz_mul($t, $z, $r);    # t = z*r
-            Math::GMPz::Rmpz_sub($y, $t, $y);    # y = t-y
+            Math::GMPz::Rmpz_submul($y, $r, $z);    # y = y - t*z
+            Math::GMPz::Rmpz_neg($y, $y);           # y = -y
 
             # z = floor((n - y*y) / z)
-            Math::GMPz::Rmpz_mul($t, $y, $y);    # t = y*y
-            Math::GMPz::Rmpz_sub($t, $n, $t);    # t = n-t
-            Math::GMPz::Rmpz_tdiv_q($z, $t, $z); # z = floor(t/z)
+            Math::GMPz::Rmpz_mul($t, $y, $y);       # t = y*y
+            Math::GMPz::Rmpz_sub($t, $n, $t);       # t = n-t
+            Math::GMPz::Rmpz_tdiv_q($z, $t, $z);    # z = floor(t/z)
 
             # t = floor((x + y) / z)
-            Math::GMPz::Rmpz_add($t, $x, $y);    # t = x+y
-            Math::GMPz::Rmpz_tdiv_q($t, $t, $z); # t = floor(t/z)
+            Math::GMPz::Rmpz_add($t, $x, $y);       # t = x+y
+            Math::GMPz::Rmpz_tdiv_q($t, $t, $z);    # t = floor(t/z)
 
             $r = $t;
             push @cfrac, bless \$t;

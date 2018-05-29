@@ -2409,6 +2409,14 @@ Return the
 
 =cut
 
+=head2 solve_pell
+
+Number.solve_pell() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 sqr
 
 Number.sqr() -> I<Obj>
