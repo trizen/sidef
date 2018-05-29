@@ -500,7 +500,7 @@ package Sidef::Types::String::String {
 
     sub _get_captures {
         my ($string) = @_;
-        map { bless \(my $s = CORE::substr($string, $-[$_], $+[$_] - $-[$_])) } 1 .. $#{-};
+        map { bless \CORE::substr($string, $-[$_], $+[$_] - $-[$_]) } 1 .. $#{-};
     }
 
     sub esub {

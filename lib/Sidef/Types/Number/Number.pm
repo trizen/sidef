@@ -1073,7 +1073,8 @@ package Sidef::Types::Number::Number {
         bless \$euler;
     }
 
-    *Y = \&EulerGamma;
+    *Y           = \&EulerGamma;
+    *euler_gamma = \&EulerGamma;
 
     sub CatalanG {
         my $catalan = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
@@ -1081,7 +1082,8 @@ package Sidef::Types::Number::Number {
         bless \$catalan;
     }
 
-    *C = \&CatalanG;
+    *C         = \&CatalanG;
+    *catalan_G = \&CatalanG;
 
     sub i {
         my ($x) = @_;
