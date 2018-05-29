@@ -19,7 +19,7 @@ package Sidef::Types::String::String {
             shift(@_);
             $str = CORE::join('', @_);
         }
-        bless(\"$str", __PACKAGE__);
+        bless \"$str";
     }
 
     *call = \&new;
@@ -43,7 +43,7 @@ package Sidef::Types::String::String {
     sub div {
         my ($self, $num) = @_;
         (my $strlen = CORE::int(length($$self) / CORE::int($num))) < 1 and return $self->chars;
-        Sidef::Types::Array::Array->new([map { bless(\$_, __PACKAGE__) } unpack "(a$strlen)*", $$self]);
+        Sidef::Types::Array::Array->new([map { bless \$_ } unpack "(a$strlen)*", $$self]);
     }
 
     sub lt {
@@ -228,17 +228,17 @@ package Sidef::Types::String::String {
 
     sub first {
         my ($self, $num) = @_;
-        __PACKAGE__->new(CORE::substr($$self, 0, defined($num) ? CORE::int($num) : 1));
+        bless \CORE::substr($$self, 0, defined($num) ? CORE::int($num) : 1);
     }
 
     sub last {
         my ($self, $num) = @_;
-        __PACKAGE__->new(CORE::substr($$self, defined($num) ? -CORE::int($num) : -1));
+        bless \CORE::substr($$self, defined($num) ? -CORE::int($num) : -1);
     }
 
     sub char {
         my ($self, $pos) = @_;
-        __PACKAGE__->new(CORE::substr($$self, CORE::int($pos), 1));
+        bless \CORE::substr($$self, CORE::int($pos), 1);
     }
 
     *char_at = \&char;
@@ -257,7 +257,7 @@ package Sidef::Types::String::String {
             $string .= CORE::ucfirst(CORE::lc($1)) . $2;
         }
 
-        bless(\$string, __PACKAGE__);
+        bless \$string;
     }
 
     *wc = \&wordcase;
@@ -330,31 +330,31 @@ package Sidef::Types::String::String {
 
     sub md5 {
         state $x = require Digest::MD5;
-        bless(\(my $o = Digest::MD5::md5_hex(${$_[0]})), __PACKAGE__);
+        bless \Digest::MD5::md5_hex(${$_[0]});
     }
 
     sub sha1 {
         state $x = require Digest::SHA;
-        bless(\(my $o = Digest::SHA::sha1_hex(${$_[0]})), __PACKAGE__);
+        bless \Digest::SHA::sha1_hex(${$_[0]});
     }
 
     sub sha256 {
         state $x = require Digest::SHA;
-        bless(\(my $o = Digest::SHA::sha256_hex(${$_[0]})), __PACKAGE__);
+        bless \Digest::SHA::sha256_hex(${$_[0]});
     }
 
     sub sha512 {
         state $x = require Digest::SHA;
-        bless(\(my $o = Digest::SHA::sha512_hex(${$_[0]})), __PACKAGE__);
+        bless \Digest::SHA::sha512_hex(${$_[0]});
     }
 
     sub substr {
         my ($self, $offs, $len) = @_;
-        __PACKAGE__->new(
-                         defined($len)
-                         ? CORE::substr($$self, CORE::int($offs), CORE::int($len))
-                         : CORE::substr($$self, CORE::int($offs))
-                        );
+        bless \(
+                defined($len)
+                ? CORE::substr($$self, CORE::int($offs), CORE::int($len))
+                : CORE::substr($$self, CORE::int($offs))
+               );
     }
 
     *substring = \&substr;
@@ -368,7 +368,7 @@ package Sidef::Types::String::String {
         $to   = defined($to)   ? CORE::int($to)   : $max;
 
         if (abs($from) > $max) {
-            return state $x = bless(\(my $str = ''), __PACKAGE__);
+            return state $x = bless \(my $str = '');
         }
 
         if ($to < 0) {
@@ -384,22 +384,25 @@ package Sidef::Types::String::String {
 
     sub insert {
         my ($self, $string, $pos, $len) = @_;
-        CORE::substr((my $copy_str = $$self), CORE::int($pos), (defined($len) ? CORE::int($len) : 0), "$string");
-        __PACKAGE__->new($copy_str);
+        my $copy_str = $$self;
+        CORE::substr($copy_str, CORE::int($pos), (defined($len) ? CORE::int($len) : 0), "$string");
+        bless \$copy_str;
     }
 
     sub join {
         my ($self, @rest) = @_;
-        __PACKAGE__->new(CORE::join($$self, @rest));
+        bless \CORE::join($$self, @rest);
     }
 
     sub clear {
-        state $x = bless(\(my $str = ''), __PACKAGE__);
+        state $x = bless \(my $str = '');
     }
 
     sub is_empty {
         my ($self) = @_;
-        ($$self eq '') ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
+        ($$self eq '')
+          ? (Sidef::Types::Bool::Bool::TRUE)
+          : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub index {
@@ -497,7 +500,7 @@ package Sidef::Types::String::String {
 
     sub _get_captures {
         my ($string) = @_;
-        map { __PACKAGE__->new(CORE::substr($string, $-[$_], $+[$_] - $-[$_])) } 1 .. $#{-};
+        map { bless \(my $s = CORE::substr($string, $-[$_], $+[$_] - $-[$_])) } 1 .. $#{-};
     }
 
     sub esub {
@@ -529,7 +532,7 @@ package Sidef::Types::String::String {
     sub glob {
         my ($self) = @_;
         state $x = require Encode;
-        Sidef::Types::Array::Array->new([map { __PACKAGE__->new(Encode::decode_utf8($_)) } CORE::glob($$self)]);
+        Sidef::Types::Array::Array->new([map { bless \Encode::decode_utf8($_) } CORE::glob($$self)]);
     }
 
     sub quotemeta {
@@ -542,7 +545,7 @@ package Sidef::Types::String::String {
     sub scan {
         my ($self, $regex) = @_;
         my $str = $$self;
-        Sidef::Types::Array::Array->new([map { bless(\$_, __PACKAGE__) } $str =~ /$regex->{regex}/g]);
+        Sidef::Types::Array::Array->new([map { bless \$_ } $str =~ /$regex->{regex}/g]);
     }
 
     sub findall {
@@ -563,19 +566,18 @@ package Sidef::Types::String::String {
         if (!defined($sep)) {
             return
               Sidef::Types::Array::Array->new(
-                                              [map { bless(\$_, __PACKAGE__) }
+                                              [map { bless \$_ }
                                                  split(' ', $$self, $size)
                                               ]
                                              );
         }
 
         if (ref($sep) eq 'Sidef::Types::Number::Number') {
-            return Sidef::Types::Array::Array->new(
-                                               [map { bless(\$_, __PACKAGE__) } unpack '(a' . CORE::int($sep) . ')*', $$self]);
+            return Sidef::Types::Array::Array->new([map { bless \$_ } unpack '(a' . CORE::int($sep) . ')*', $$self]);
         }
 
         $sep = _string_or_regex($sep);
-        Sidef::Types::Array::Array->new([map { bless(\$_, __PACKAGE__) } split(/$sep/, $$self, $size)]);
+        Sidef::Types::Array::Array->new([map { bless \$_ } split(/$sep/, $$self, $size)]);
     }
 
     sub sort {
@@ -600,19 +602,19 @@ package Sidef::Types::String::String {
         select($old_h);
         close $str_h;
 
-        __PACKAGE__->new($acc);
+        bless \$acc;
     }
 
     sub words {
         my ($self) = @_;
-        Sidef::Types::Array::Array->new([map { bless(\$_, __PACKAGE__) } CORE::split(' ', $$self)]);
+        Sidef::Types::Array::Array->new([map { bless \$_ } CORE::split(' ', $$self)]);
     }
 
     sub each_word {
         my ($self, $code) = @_;
 
         foreach my $word (CORE::split(' ', $$self)) {
-            $code->run(bless(\$word, __PACKAGE__));
+            $code->run(bless \$word);
         }
 
         $self;
@@ -686,7 +688,7 @@ package Sidef::Types::String::String {
 
     sub chars {
         my ($self) = @_;
-        Sidef::Types::Array::Array->new([map { bless(\$_, __PACKAGE__) } CORE::split(//, $$self)]);
+        Sidef::Types::Array::Array->new([map { bless \$_ } CORE::split(//, $$self)]);
     }
 
     sub iter {
@@ -700,7 +702,7 @@ package Sidef::Types::String::String {
         Sidef::Types::Block::Block->new(
             code => sub {
                 ++$i <= $end or return undef;
-                bless \(my $chr = $chars[$i]), __PACKAGE__;
+                bless \(my $chr = $chars[$i]);
             }
         );
     }
@@ -709,7 +711,7 @@ package Sidef::Types::String::String {
         my ($self, $code) = @_;
 
         foreach my $char (CORE::split(//, $$self)) {
-            $code->run(bless(\$char, __PACKAGE__));
+            $code->run(bless \$char);
         }
 
         $self;
@@ -719,7 +721,7 @@ package Sidef::Types::String::String {
 
     sub graphemes {
         my ($self) = @_;
-        Sidef::Types::Array::Array->new([map { bless(\$_, __PACKAGE__) } map { /\X/g } $$self]);
+        Sidef::Types::Array::Array->new([map { bless \$_ } map { /\X/g } $$self]);
     }
 
     *graphs = \&graphemes;
@@ -729,7 +731,7 @@ package Sidef::Types::String::String {
 
         my $str = $$self;
         while ($str =~ /(\X)/g) {
-            $code->run(bless(\(my $str = $1), __PACKAGE__));
+            $code->run(bless \(my $str = $1));
         }
 
         $self;
@@ -739,14 +741,14 @@ package Sidef::Types::String::String {
 
     sub lines {
         my ($self) = @_;
-        Sidef::Types::Array::Array->new([map { bless(\$_, __PACKAGE__) } CORE::split(/\R/, $$self)]);
+        Sidef::Types::Array::Array->new([map { bless \$_ } CORE::split(/\R/, $$self)]);
     }
 
     sub each_line {
         my ($self, $code) = @_;
 
         foreach my $line (CORE::split(/\R/, $$self)) {
-            $code->run(bless(\$line, __PACKAGE__));
+            $code->run(bless \$line);
         }
 
         $self;
@@ -866,7 +868,7 @@ package Sidef::Types::String::String {
 
     sub unpack {
         my ($self, $arg) = @_;
-        my @values = map { bless(\$_, __PACKAGE__) } CORE::unpack($$self, "$arg");
+        my @values = map { bless \$_ } CORE::unpack($$self, "$arg");
         @values > 1 ? @values : $values[0];
     }
 
@@ -1031,7 +1033,7 @@ package Sidef::Types::String::String {
         }
         elsif (ref($arg) eq 'Sidef::Types::Block::Block') {
             foreach my $char (split //, $s) {
-                ++$counter if $arg->run(bless(\$char, __PACKAGE__));
+                ++$counter if $arg->run(bless \$char);
             }
             return Sidef::Types::Number::Number->_set_uint($counter);
         }
@@ -1402,7 +1404,7 @@ package Sidef::Types::String::String {
             my $str = "${$_[0]}";
 
             $str =~ s/([\\\"]|#\{)/\\$1/g;
-            $str =~ /[^\040-\176]/ or return bless(\qq("$str"), __PACKAGE__);
+            $str =~ /[^\040-\176]/ or return bless \qq("$str");
 
             $str =~ s/([\a\b\t\n\f\r\e\13])/$esc{$1}/g;
             $str =~ s/([\0-\037])(?!\d)/CORE::sprintf('\\%o',CORE::ord($1))/eg;
@@ -1410,7 +1412,7 @@ package Sidef::Types::String::String {
             $str =~ s/([\0-\037\177-\377])/CORE::sprintf('\\x%02X',CORE::ord($1))/eg;
             $str =~ s/([^\040-\176])/CORE::sprintf('\\x{%X}',CORE::ord($1))/eg;
 
-            bless \qq("$str"), __PACKAGE__;
+            bless \qq("$str");
         }
     }
 
