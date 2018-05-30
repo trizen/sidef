@@ -5289,8 +5289,9 @@ package Sidef::Types::Number::Number {
             $n = $ONE;
         }
 
-        # No solutions for d <= 0
-        if (Math::GMPz::Rmpz_sgn($d) <= 0) {
+        # No solutions for d <= 0 or n = 0
+        if (   Math::GMPz::Rmpz_sgn($d) <= 0
+            or Math::GMPz::Rmpz_sgn($n) == 0) {
             return (undef, undef);
         }
 
@@ -5635,7 +5636,7 @@ package Sidef::Types::Number::Number {
 
     sub length {
         my ($x) = @_;
-        my ($z) = _any2mpz($$x) // return MONE;
+        my $z = _any2mpz($$x) // return MONE;
         my $neg = (Math::GMPz::Rmpz_sgn($z) < 0) ? 1 : 0;
         __PACKAGE__->_set_uint(CORE::length(Math::GMPz::Rmpz_get_str($z, 10)) - $neg);
     }
