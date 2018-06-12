@@ -494,15 +494,7 @@ package Sidef::Types::Block::Block {
 
     sub for {
         my ($self, @objs) = @_;
-
-        my $block = $self->{code};
-
-        _iterate(
-            sub {
-                $block->(@_);
-            },
-            @objs
-                );
+        _iterate($self->{code}, @objs);
     }
 
     *each    = \&for;

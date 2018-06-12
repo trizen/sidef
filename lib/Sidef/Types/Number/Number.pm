@@ -7969,16 +7969,21 @@ package Sidef::Types::Number::Number {
     }
 
     sub prime_root {
-        my $str = &_big2uistr // return $_[0];
+        my ($n) = @_;
 
-        my $pow = Math::Prime::Util::GMP::is_prime_power($str) || return $_[0];
-        $pow == 1 and return $_[0];
+        my $str = _big2uistr($n) // return $n;
+        my $pow = Math::Prime::Util::GMP::is_prime_power($str) || return $n;
 
-        my $x = Math::GMPz::Rmpz_init_set_str($str, 10);
+        $pow == 1 and return $n;
+
+        my $t = _any2mpz($$n) // return $n;
+        my $r = Math::GMPz::Rmpz_init();
+
         $pow == 2
-          ? Math::GMPz::Rmpz_sqrt($x, $x)
-          : Math::GMPz::Rmpz_root($x, $x, $pow);
-        bless \$x;
+          ? Math::GMPz::Rmpz_sqrt($r, $t)
+          : Math::GMPz::Rmpz_root($r, $t, $pow);
+
+        bless \$r;
     }
 
     sub prime_power {
