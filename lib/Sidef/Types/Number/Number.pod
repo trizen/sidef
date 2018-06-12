@@ -2343,6 +2343,14 @@ Return the
 
 =cut
 
+=head2 secant_number
+
+Number.secant_number() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 sech
 
 Number.sech() -> I<Obj>
@@ -2510,6 +2518,14 @@ Return the
 =head2 tan
 
 Number.tan() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 tangent_number
+
+Number.tangent_number() -> I<Obj>
 
 Return the
 

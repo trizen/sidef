@@ -2489,7 +2489,11 @@ package Sidef::Types::Number::Number {
             my $e = (Math::GMPz::Rmpz_sizeinbase($x, $y) || return) - 1;
 
             if ($e > 0) {
-                Math::GMPz::Rmpz_ui_pow_ui($t, $y, $e);
+
+                $y == 2
+                  ? Math::GMPz::Rmpz_setbit($t, $e)
+                  : Math::GMPz::Rmpz_ui_pow_ui($t, $y, $e);
+
                 Math::GMPz::Rmpz_cmp($t, $x) > 0 and --$e;
             }
 
@@ -3928,6 +3932,43 @@ package Sidef::Types::Number::Number {
     }
 
     *euler_number = \&euler;
+
+    sub secant_number {
+        my ($n) = @_;
+
+        $n = _any2ui($$n) // goto &nan;
+
+        my @E = _secant_numbers($n);
+        bless \Math::GMPz::Rmpz_init_set($E[$n]);
+    }
+
+    sub tangent_number {
+        my ($n) = @_;
+
+        #
+        ## T_n = 2^(2*n) * (2^(2*n) - 1) * abs(bernoulli(2*n)) / (2*n)
+        #
+
+        $n = _any2ui($$n) // goto &nan;
+        $n || goto &zero;
+        $n <<= 1;
+
+        my ($num, $den) = Math::Prime::Util::GMP::bernfrac($n);
+
+        $num = Math::GMPz::Rmpz_init_set_str($num, 10);
+        $den = Math::GMPz::Rmpz_init_set_str($den, 10);
+
+        Math::GMPz::Rmpz_abs($num, $num);
+
+        my $r = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_setbit($r, $n);
+        Math::GMPz::Rmpz_sub_ui($r, $r, 1);
+        Math::GMPz::Rmpz_mul_2exp($r, $r, $n);
+        Math::GMPz::Rmpz_mul($r, $r, $num);
+        Math::GMPz::Rmpz_mul_ui($den, $den, $n);
+        Math::GMPz::Rmpz_divexact($r, $r, $den);
+        bless \$r;
+    }
 
     # TODO: add support for an optional argument and return B_n(x)
     sub bernreal {
