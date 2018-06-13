@@ -6932,11 +6932,13 @@ package Sidef::Types::Number::Number {
 
         foreach my $d (Math::Prime::Util::GMP::divisors(Math::GMPz::Rmpz_get_str($n, 10))) {
 
-            ($d || next) < ULONG_MAX
-              ? Math::GMPz::Rmpz_set_ui($t, $d)
-              : Math::GMPz::Rmpz_set_str($t, "$d", 10);
-
-            Math::GMPz::Rmpz_divexact($t, $n, $t);
+            if (($d || next) < ULONG_MAX) {
+                Math::GMPz::Rmpz_divexact_ui($t, $n, $d);
+            }
+            else {
+                Math::GMPz::Rmpz_set_str($t, "$d", 10);
+                Math::GMPz::Rmpz_divexact($t, $n, $t);
+            }
 
             my $mu = Math::Prime::Util::GMP::moebius(Math::GMPz::Rmpz_get_str($t, 10)) || next;
             my $base = __dec__(__pow__($x, $d));
