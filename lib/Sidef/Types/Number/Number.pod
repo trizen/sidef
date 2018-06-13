@@ -793,6 +793,16 @@ Return the
 
 =cut
 
+=head2 cyclotomic
+
+Number.cyclotomic() -> I<Obj>
+
+Return the
+
+Aliases: I<cyclotomic_polynomial>
+
+=cut
+
 =head2 de
 
 Number.de() -> I<Obj>

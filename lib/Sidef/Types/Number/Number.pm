@@ -6918,6 +6918,37 @@ package Sidef::Types::Number::Number {
 
     *mobius = \&moebius;
 
+    sub cyclotomic_polynomial {
+        my ($n, $x) = @_;
+
+        _valid(\$x);
+
+        $n = _any2mpz($$n) // goto &nan;
+        $x = $$x;
+
+        my $t = Math::GMPz::Rmpz_init();
+
+        my @terms;
+
+        foreach my $d (Math::Prime::Util::GMP::divisors(Math::GMPz::Rmpz_get_str($n, 10))) {
+
+            ($d || next) < ULONG_MAX
+              ? Math::GMPz::Rmpz_set_ui($t, $d)
+              : Math::GMPz::Rmpz_set_str($t, "$d", 10);
+
+            Math::GMPz::Rmpz_divexact($t, $n, $t);
+
+            my $mu = Math::Prime::Util::GMP::moebius(Math::GMPz::Rmpz_get_str($t, 10)) || next;
+            my $base = __dec__(__pow__($x, $d));
+
+            push @terms, bless \($mu == 1 ? $base : __inv__($base));
+        }
+
+        Sidef::Types::Array::Array->new(\@terms)->prod;
+    }
+
+    *cyclotomic = \&cyclotomic_polynomial;
+
     sub square_free_count {
         my ($from, $to) = @_;
 
