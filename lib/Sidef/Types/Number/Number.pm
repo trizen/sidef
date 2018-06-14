@@ -6281,6 +6281,52 @@ package Sidef::Types::Number::Number {
         __PACKAGE__->_set_str('int', Math::Prime::Util::GMP::ramanujan_tau(&_big2uistr // (goto &nan)));
     }
 
+    sub ramanujan_sum {
+        my ($k, $n) = @_;
+
+        #
+        ## ramanujan_sum(k, n) = μ(k/gcd(n, k)) * φ(k) / φ(k/gcd(n, k))
+        #
+
+        _valid(\$k);
+
+        $n = _any2mpz($$n) // goto &nan;
+        $k = _any2mpz($$k) // goto &nan;
+
+        # Make `k` positive if it is negative
+        if (Math::GMPz::Rmpz_sgn($k) < 0) {
+            $k = Math::GMPz::Rmpz_init_set($k);
+            Math::GMPz::Rmpz_neg($k, $k);
+        }
+
+        my $r = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_gcd($r, $n, $k);
+        Math::GMPz::Rmpz_divexact($r, $k, $r) if Math::GMPz::Rmpz_sgn($r);
+
+        my $r_str = Math::GMPz::Rmpz_get_str($r, 10);
+        my $mu = Math::Prime::Util::GMP::moebius($r_str) || return ZERO;
+
+        my $k_str = Math::GMPz::Rmpz_get_str($k, 10);
+        my $phi_k = Math::Prime::Util::GMP::totient($k_str);
+        my $phi_r = Math::Prime::Util::GMP::totient($r_str);
+
+        ($phi_k < ULONG_MAX)
+          ? Math::GMPz::Rmpz_set_ui($r, $phi_k)
+          : Math::GMPz::Rmpz_set_str($r, "$phi_k", 10);
+
+        if ($phi_r < ULONG_MAX) {
+            Math::GMPz::Rmpz_divexact_ui($r, $r, $phi_r);
+        }
+        else {
+            my $t = Math::GMPz::Rmpz_init();
+            Math::GMPz::Rmpz_set_str($t, "$phi_r", 10);
+            Math::GMPz::Rmpz_divexact($r, $r, $t);
+        }
+
+        Math::GMPz::Rmpz_neg($r, $r) if ($mu == -1);
+        bless \$r;
+    }
+
     sub subfactorial {
         my ($x, $y) = @_;
 

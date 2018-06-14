@@ -2211,6 +2211,14 @@ Return the
 
 =cut
 
+=head2 ramanujan_sum
+
+Number.ramanujan_sum() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 ramanujan_tau
 
 Number.ramanujan_tau() -> I<Obj>
