@@ -1,0 +1,30 @@
+#!/usr/bin/ruby
+
+#
+## https://rosettacode.org/wiki/Dinesman%27s_multiple-dwelling_problem
+#
+
+func solve(n, pred) {
+    gather {
+        n.permutations { |*candidate|
+            if (pred.all { |p| p(candidate) }) {
+                take(candidate)
+            }
+        }
+    }
+}
+
+var predicates = [
+    ->(s) { last(s) != "Baker" },
+    ->(s) { first(s) != "Cooper" },
+    ->(s) { (first(s) != "Fletcher") && (last(s) != "Fletcher") },
+    ->(s) { index(s, "Miller") > index(s, "Cooper") },
+    ->(s) { abs(index(s, "Smith")  - index(s, "Fletcher")) != 1 },
+    ->(s) { abs(index(s, "Cooper") - index(s, "Fletcher")) != 1 },
+]
+
+var Names = ["Baker", "Cooper", "Fletcher", "Miller", "Smith"]
+
+var solutions = solve(Names, predicates)
+solutions.each { .join(', ').say }
+assert_eq(solutions, [["Smith", "Cooper", "Baker", "Fletcher", "Miller"]])

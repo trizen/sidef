@@ -328,6 +328,7 @@ scripts/RosettaCode/digital_root.sf
 scripts/RosettaCode/dijkstra_s_algorithm.sf
 scripts/RosettaCode/dinesman_problem_parsing.sf
 scripts/RosettaCode/dinesman_problem_simple.sf
+scripts/RosettaCode/dinesman_problem_simple_2.sf
 scripts/RosettaCode/diversity_prediction_theorem.sf
 scripts/RosettaCode/dot_product.sf
 scripts/RosettaCode/elliptic_curve_arithmetic.sf
