@@ -6598,6 +6598,9 @@ package Sidef::Types::Number::Number {
         __PACKAGE__->_set_str('int', Math::Prime::Util::GMP::lucasu($p, $q, $n));
     }
 
+    *lucasU  = \&lucasu;
+    *lucas_U = \&lucasu;
+
     sub lucasv {
         my ($p, $q, $n) = @_;
 
@@ -6609,6 +6612,70 @@ package Sidef::Types::Number::Number {
 
         __PACKAGE__->_set_str('int', Math::Prime::Util::GMP::lucasv($p, $q, $n));
     }
+
+    *lucasV  = \&lucasv;
+    *lucas_V = \&lucasv;
+
+    sub chebyshevt {
+        my ($n, $x) = @_;
+
+        _valid(\$x);
+
+        $n = _any2si($$n) // goto &nan;
+
+        $n = -$n if $n < 0;
+        $n == 0 and return ONE;
+        $n == 1 and return $x;
+
+        $x = $$x;
+
+        my $t = __add__($x, $x);
+        my ($u, $v) = ($ONE, $x);
+
+        foreach my $i (1 .. $n - 1) {
+            ($u, $v) = ($v, __sub__(__mul__($t, $v), $u));
+        }
+
+        bless \$v;
+    }
+
+    *chebyshevT  = \&chebyshevt;
+    *chebyshev_T = \&chebyshevt;
+
+    sub chebyshevu {
+        my ($n, $x) = @_;
+
+        _valid(\$x);
+
+        $n = _any2si($$n) // goto &nan;
+        $n == 0 and return ONE;
+
+        my $negative = 0;
+
+        if ($n < 0) {
+
+            $n == -1 and return ZERO;
+            $n == -2 and return MONE;
+
+            $n        = -$n - 2;
+            $negative = 1;
+        }
+
+        $x = $$x;
+
+        my $t = __add__($x, $x);
+        my ($u, $v) = ($ONE, $t);
+
+        foreach my $i (1 .. $n - 1) {
+            ($u, $v) = ($v, __sub__(__mul__($t, $v), $u));
+        }
+
+        $v = __neg__($v) if $negative;
+        bless \$v;
+    }
+
+    *chebyshevU  = \&chebyshevu;
+    *chebyshev_U = \&chebyshevu;
 
     sub fibonacci {
         my ($n, $k) = @_;

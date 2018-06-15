@@ -653,6 +653,26 @@ Return the
 
 =cut
 
+=head2 chebyshev_T
+
+Number.chebyshev_T() -> I<Obj>
+
+Return the
+
+Aliases: I<chebyshevt>, I<chebyshevT>
+
+=cut
+
+=head2 chebyshev_U
+
+Number.chebyshev_U() -> I<Obj>
+
+Return the
+
+Aliases: I<chebyshevu>, I<chebyshevU>
+
+=cut
+
 =head2 chr
 
 Number.chr() -> I<Obj>
@@ -1841,19 +1861,23 @@ Return the
 
 =cut
 
-=head2 lucasu
+=head2 lucas_U
 
-Number.lucasu() -> I<Obj>
+Number.lucas_U() -> I<Obj>
 
 Return the
+
+Aliases: I<lucasu>, I<lucasU>
 
 =cut
 
-=head2 lucasv
+=head2 lucas_V
 
-Number.lucasv() -> I<Obj>
+Number.lucas_V() -> I<Obj>
 
 Return the
+
+Aliases: I<lucasv>, I<lucasV>
 
 =cut
 
