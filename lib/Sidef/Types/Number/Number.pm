@@ -3938,7 +3938,7 @@ package Sidef::Types::Number::Number {
 
         $n = _any2ui($$n) // goto &nan;
 
-        my @E = _secant_numbers($n);
+        my @E = _secant_numbers($n < 500 ? 500 : $n);
         bless \Math::GMPz::Rmpz_init_set($E[$n]);
     }
 
