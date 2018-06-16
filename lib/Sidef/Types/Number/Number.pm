@@ -6747,18 +6747,24 @@ package Sidef::Types::Number::Number {
         my $t = Math::GMPz::Rmpz_init();
         my $u = Math::GMPz::Rmpz_init_set_ui(1);
 
+        my $v = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_fac_ui($v, $n);
+
         my @terms;
         foreach my $m (0 .. $n >> 1) {
-            Math::GMPz::Rmpz_fac_ui($t, $n - ($m << 1));
-            Math::GMPz::Rmpz_mul($t, $t, $u);
+            Math::GMPz::Rmpz_mul($t, $v, $u);
             Math::GMPz::Rmpz_neg($t, $t) if ($m & 1);
+
             push @terms, bless \__div__(__pow__($x, $n - ($m << 1)), $t);
+
+            my $d = ($n - ($m << 1)) * ($n - ($m << 1) - 1);
+            Math::GMPz::Rmpz_divexact_ui($v, $v, $d) if $d;
             Math::GMPz::Rmpz_mul_ui($u, $u, $m + 1);
         }
 
         my $sum = Sidef::Types::Array::Array->new(\@terms)->sum;
-        Math::GMPz::Rmpz_fac_ui($t, $n);
-        bless \__mul__($$sum, $t);
+        Math::GMPz::Rmpz_fac_ui($v, $n);
+        bless \__mul__($$sum, $v);
     }
 
     *HermiteH             = \&hermiteH;
@@ -6782,19 +6788,25 @@ package Sidef::Types::Number::Number {
         my $t = Math::GMPz::Rmpz_init();
         my $u = Math::GMPz::Rmpz_init_set_ui(1);
 
+        my $v = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_fac_ui($v, $n);
+
         my @terms;
         foreach my $m (0 .. $n >> 1) {
-            Math::GMPz::Rmpz_fac_ui($t, $n - ($m << 1));
-            Math::GMPz::Rmpz_mul($t, $t, $u);
+            Math::GMPz::Rmpz_mul($t, $v, $u);
             Math::GMPz::Rmpz_mul_2exp($t, $t, $m);
             Math::GMPz::Rmpz_neg($t, $t) if ($m & 1);
+
             push @terms, bless \__div__(__pow__($x, $n - ($m << 1)), $t);
+
+            my $d = ($n - ($m << 1)) * ($n - ($m << 1) - 1);
+            Math::GMPz::Rmpz_divexact_ui($v, $v, $d) if $d;
             Math::GMPz::Rmpz_mul_ui($u, $u, $m + 1);
         }
 
         my $sum = Sidef::Types::Array::Array->new(\@terms)->sum;
-        Math::GMPz::Rmpz_fac_ui($t, $n);
-        bless \__mul__($$sum, $t);
+        Math::GMPz::Rmpz_fac_ui($v, $n);
+        bless \__mul__($$sum, $v);
     }
 
     *HermiteHe             = \&hermiteHe;
