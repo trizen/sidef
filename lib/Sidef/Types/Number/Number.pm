@@ -6749,13 +6749,10 @@ package Sidef::Types::Number::Number {
 
         my @terms;
         foreach my $m (0 .. $n >> 1) {
-
             Math::GMPz::Rmpz_fac_ui($t, $n - ($m << 1));
             Math::GMPz::Rmpz_mul($t, $t, $u);
             Math::GMPz::Rmpz_neg($t, $t) if ($m & 1);
-
             push @terms, bless \__div__(__pow__($x, $n - ($m << 1)), $t);
-
             Math::GMPz::Rmpz_mul_ui($u, $u, $m + 1);
         }
 
@@ -6787,14 +6784,11 @@ package Sidef::Types::Number::Number {
 
         my @terms;
         foreach my $m (0 .. $n >> 1) {
-
             Math::GMPz::Rmpz_fac_ui($t, $n - ($m << 1));
             Math::GMPz::Rmpz_mul($t, $t, $u);
             Math::GMPz::Rmpz_mul_2exp($t, $t, $m);
             Math::GMPz::Rmpz_neg($t, $t) if ($m & 1);
-
             push @terms, bless \__div__(__pow__($x, $n - ($m << 1)), $t);
-
             Math::GMPz::Rmpz_mul_ui($u, $u, $m + 1);
         }
 
@@ -6807,6 +6801,36 @@ package Sidef::Types::Number::Number {
     *hermite_He            = \&hermiteHe;
     *hermite_polynomialHe  = \&hermiteHe;
     *hermite_polynomial_He = \&hermiteHe;
+
+    sub laguerreL {
+        my ($n, $x) = @_;
+
+        _valid(\$x);
+
+        $n = _any2ui($$n) // goto &nan;
+        $n == 0 && return ONE;
+
+        $x = $$x;
+
+        my $t = Math::GMPz::Rmpz_init();
+        my $u = Math::GMPz::Rmpz_init_set_ui(1);
+
+        my @terms;
+        foreach my $k (0 .. $n) {
+            Math::GMPz::Rmpz_bin_uiui($t, $n, $k);
+            Math::GMPz::Rmpz_neg($t, $t) if ($k & 1);
+            push @terms, bless \__div__(__mul__(__pow__($x, $k), $t), $u);
+            Math::GMPz::Rmpz_mul_ui($u, $u, $k + 1);
+        }
+
+        Sidef::Types::Array::Array->new(\@terms)->sum;
+    }
+
+    *laguerre            = \&laguerreL;
+    *Laguerre            = \&laguerreL;
+    *LaguerreL           = \&laguerreL;
+    *Laguerre_L          = \&laguerreL;
+    *laguerre_polynomial = \&laguerreL;
 
     sub fibonacci {
         my ($n, $k) = @_;

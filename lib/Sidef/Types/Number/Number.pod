@@ -1719,6 +1719,16 @@ Return the
 
 =cut
 
+=head2 laguerre
+
+Number.laguerre() -> I<Obj>
+
+Return the
+
+Aliases: I<laguerreL>, I<laguerre_polynomial>
+
+=cut
+
 =head2 lambert_w
 
 Number.lambert_w() -> I<Obj>
