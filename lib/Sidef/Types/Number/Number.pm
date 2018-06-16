@@ -694,6 +694,37 @@ package Sidef::Types::Number::Number {
     }
 
     #
+    ## Binary splitting
+    #
+
+    sub _binsplit {
+        my ($arr, $func) = @_;
+
+        my $sub = sub {
+            my ($s, $n, $m) = @_;
+
+            $n == $m
+              ? $s->[$n]
+              : $func->(__SUB__->($s, $n, ($n + $m) >> 1), __SUB__->($s, (($n + $m) >> 1) + 1, $m));
+        };
+
+        my $end = $#$arr;
+
+        if ($end <= 1e5) {
+            return $sub->($arr, 0, $end);
+        }
+
+        my @partial;
+
+        while (@$arr) {
+            my @head = splice(@$arr, 0, 1e5);
+            push @partial, $sub->(\@head, 0, $#head);
+        }
+
+        __SUB__->(\@partial, $func);
+    }
+
+    #
     ## Internal conversion methods
     #
 
@@ -3825,7 +3856,7 @@ package Sidef::Types::Number::Number {
         my $z = Math::GMPz::Rmpz_init();
         my $q = Math::GMPq::Rmpq_init();
 
-        my @list;
+        my @terms;
 
         foreach my $k (0 .. $n) {
             --$u & 1 and $u > 1 and next;    # B_n = 0 for odd n > 1
@@ -3853,10 +3884,10 @@ package Sidef::Types::Number::Number {
             Math::GMPz::Rmpz_bin_uiui($z, $n, $k);
             Math::GMPq::Rmpq_mul_z($q, $q, $z);
 
-            push @list, bless \__mul__($k ? __pow__($x, $k) : $ONE, $q);
+            push @terms, __mul__($k ? __pow__($x, $k) : $ONE, $q);
         }
 
-        Sidef::Types::Array::Array->new(\@list)->sum;
+        bless \_binsplit(\@terms, \&__add__);
     }
 
     sub bernfrac {
@@ -3899,7 +3930,7 @@ package Sidef::Types::Number::Number {
 
         $x = __dec__(__add__($x, $x));    # x = 2*x - 1
 
-        my @list;
+        my @terms;
 
         foreach my $k (0 .. $n) {
             --$u & 1 and next;            # E_n = 0 for all odd n
@@ -3908,10 +3939,10 @@ package Sidef::Types::Number::Number {
             Math::GMPz::Rmpz_mul($z, $z, $S[$u >> 1]);
             Math::GMPz::Rmpz_neg($z, $z) if (($u >> 1) & 1);
 
-            push @list, bless \__mul__($k ? __pow__($x, $k) : $ONE, $z);
+            push @terms, ($k ? __mul__(__pow__($x, $k), $z) : Math::GMPz::Rmpz_init_set($z));
         }
 
-        my $sum = ${Sidef::Types::Array::Array->new(\@list)->sum};
+        my $sum = _binsplit(\@terms, \&__add__);
         Math::GMPz::Rmpz_set_ui($z, 0);
         Math::GMPz::Rmpz_setbit($z, $n);
         bless \__div__($sum, $z);
@@ -6381,14 +6412,15 @@ package Sidef::Types::Number::Number {
 
         $n = _any2ui($$n) // goto &nan;
 
-        my @list;
+        my @terms;
         foreach my $k (2 .. $n) {
             my $z = Math::GMPz::Rmpz_init();
             Math::GMPz::Rmpz_ui_pow_ui($z, $k, $n - $k + 1);
-            push @list, bless \$z;
+            push @terms, $z;
         }
 
-        Sidef::Types::Array::Array->new(\@list)->prod;
+        @terms || return ONE;
+        bless \_binsplit(\@terms, \&__mul__);
     }
 
     sub lnsuperfactorial {
@@ -6419,14 +6451,15 @@ package Sidef::Types::Number::Number {
 
         $n = _any2ui($$n) // goto &nan;
 
-        my @list;
+        my @terms;
         foreach my $k (2 .. $n) {
             my $z = Math::GMPz::Rmpz_init();
             Math::GMPz::Rmpz_ui_pow_ui($z, $k, $k);
-            push @list, bless \$z;
+            push @terms, $z;
         }
 
-        Sidef::Types::Array::Array->new(\@list)->prod;
+        @terms || return ONE;
+        bless \_binsplit(\@terms, \&__mul__);
     }
 
     sub lnhyperfactorial {
@@ -6716,15 +6749,15 @@ package Sidef::Types::Number::Number {
         foreach my $k (0 .. $n) {
             Math::GMPz::Rmpz_bin_uiui($t, $n, $k);
             Math::GMPz::Rmpz_mul($t, $t, $t);
-            push @terms, bless \__mul__(__mul__(__pow__($x1, $n - $k), __pow__($x2, $k)), $t);
+            push @terms, __mul__(__mul__(__pow__($x1, $n - $k), __pow__($x2, $k)), $t);
         }
 
-        my $sum = Sidef::Types::Array::Array->new(\@terms)->sum;
+        my $sum = _binsplit(\@terms, \&__add__);
 
         Math::GMPz::Rmpz_set_ui($t, 0);
         Math::GMPz::Rmpz_setbit($t, $n);
 
-        bless \__div__($$sum, $t);
+        bless \__div__($sum, $t);
     }
 
     *LegendreP  = \&legendre_polynomial;
@@ -6755,16 +6788,16 @@ package Sidef::Types::Number::Number {
             Math::GMPz::Rmpz_mul($t, $v, $u);
             Math::GMPz::Rmpz_neg($t, $t) if ($m & 1);
 
-            push @terms, bless \__div__(__pow__($x, $n - ($m << 1)), $t);
+            push @terms, __div__(__pow__($x, $n - ($m << 1)), $t);
 
             my $d = ($n - ($m << 1)) * ($n - ($m << 1) - 1);
             Math::GMPz::Rmpz_divexact_ui($v, $v, $d) if $d;
             Math::GMPz::Rmpz_mul_ui($u, $u, $m + 1);
         }
 
-        my $sum = Sidef::Types::Array::Array->new(\@terms)->sum;
+        my $sum = _binsplit(\@terms, \&__add__);
         Math::GMPz::Rmpz_fac_ui($v, $n);
-        bless \__mul__($$sum, $v);
+        bless \__mul__($sum, $v);
     }
 
     *HermiteH             = \&hermiteH;
@@ -6797,16 +6830,16 @@ package Sidef::Types::Number::Number {
             Math::GMPz::Rmpz_mul_2exp($t, $t, $m);
             Math::GMPz::Rmpz_neg($t, $t) if ($m & 1);
 
-            push @terms, bless \__div__(__pow__($x, $n - ($m << 1)), $t);
+            push @terms, __div__(__pow__($x, $n - ($m << 1)), $t);
 
             my $d = ($n - ($m << 1)) * ($n - ($m << 1) - 1);
             Math::GMPz::Rmpz_divexact_ui($v, $v, $d) if $d;
             Math::GMPz::Rmpz_mul_ui($u, $u, $m + 1);
         }
 
-        my $sum = Sidef::Types::Array::Array->new(\@terms)->sum;
+        my $sum = _binsplit(\@terms, \&__add__);
         Math::GMPz::Rmpz_fac_ui($v, $n);
-        bless \__mul__($$sum, $v);
+        bless \__mul__($sum, $v);
     }
 
     *HermiteHe             = \&hermiteHe;
@@ -6831,11 +6864,11 @@ package Sidef::Types::Number::Number {
         foreach my $k (0 .. $n) {
             Math::GMPz::Rmpz_bin_uiui($t, $n, $k);
             Math::GMPz::Rmpz_neg($t, $t) if ($k & 1);
-            push @terms, bless \__div__(__mul__(__pow__($x, $k), $t), $u);
+            push @terms, __div__(__mul__(__pow__($x, $k), $t), $u);
             Math::GMPz::Rmpz_mul_ui($u, $u, $k + 1);
         }
 
-        Sidef::Types::Array::Array->new(\@terms)->sum;
+        bless \_binsplit(\@terms, \&__add__);
     }
 
     *laguerre            = \&laguerreL;
@@ -7235,10 +7268,11 @@ package Sidef::Types::Number::Number {
             my $mu = Math::Prime::Util::GMP::moebius(Math::GMPz::Rmpz_get_str($t, 10)) || next;
             my $base = __dec__(__pow__($x, $d));
 
-            push @terms, bless \($mu == 1 ? $base : __inv__($base));
+            push @terms, ($mu == 1 ? $base : __inv__($base));
         }
 
-        Sidef::Types::Array::Array->new(\@terms)->prod;
+        @terms || return ONE;
+        bless \_binsplit(\@terms, \&__mul__);
     }
 
     *cyclotomic = \&cyclotomic_polynomial;
