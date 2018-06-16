@@ -6131,7 +6131,11 @@ package Sidef::Types::Number::Number {
         }
 
         my $r = Math::GMPz::Rmpz_init();
-        Math::GMPz::Rmpz_powm($r, $x, $y, $z);
+
+        Math::GMPz::Rmpz_fits_ulong_p($y)
+          ? Math::GMPz::Rmpz_powm_ui($r, $x, Math::GMPz::Rmpz_get_ui($y), $z)
+          : Math::GMPz::Rmpz_powm($r, $x, $y, $z);
+
         bless \$r;
     }
 
@@ -6307,6 +6311,11 @@ package Sidef::Types::Number::Number {
         my $mu = Math::Prime::Util::GMP::moebius($r_str) || return ZERO;
 
         my $k_str = Math::GMPz::Rmpz_get_str($k, 10);
+
+        if ($k_str eq $r_str) {
+            return ($mu == 1 ? ONE : MONE);
+        }
+
         my $phi_k = Math::Prime::Util::GMP::totient($k_str);
         my $phi_r = Math::Prime::Util::GMP::totient($r_str);
 
@@ -6632,7 +6641,7 @@ package Sidef::Types::Number::Number {
         my $t = __add__($x, $x);
         my ($u, $v) = ($ONE, $x);
 
-        foreach my $i (1 .. $n - 1) {
+        foreach my $i (2 .. $n) {
             ($u, $v) = ($v, __sub__(__mul__($t, $v), $u));
         }
 
@@ -6666,7 +6675,7 @@ package Sidef::Types::Number::Number {
         my $t = __add__($x, $x);
         my ($u, $v) = ($ONE, $t);
 
-        foreach my $i (1 .. $n - 1) {
+        foreach my $i (2 .. $n) {
             ($u, $v) = ($v, __sub__(__mul__($t, $v), $u));
         }
 

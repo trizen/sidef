@@ -1351,9 +1351,8 @@ HEADER
                 # Generate code
                 $code =
                     qq~do{my \$a$refaddr = do{$args[0]}; ~
-                  . qq~my \$m$refaddr = do{$args[1]} // "$obj->{act}(\$a$refaddr)";~
-                  . qq~\$a$refaddr or CORE::die "\$m$refaddr failed ~
-                  . qq~at \Q$obj->{file}\E line $obj->{line}\\n"}~;
+                  . qq~\$a$refaddr or CORE::die((do{$args[1]} // "$obj->{act}(\$a$refaddr)") . " failed ~
+                  . qq~at \Q$obj->{file}\E line $obj->{line}\\n")}~;
             }
             elsif ($obj->{act} eq 'assert_eq' or $obj->{act} eq 'assert_ne') {
 
@@ -1366,11 +1365,10 @@ HEADER
                 $code = "do{"
                   . "my \$a$refaddr = do{$args[0]};"
                   . "my \$b$refaddr = do{$args[1]};"
-                  . "my \$m$refaddr = do{$args[2]} // ('$obj->{act}('."
-                  . qq~join(', ',map{UNIVERSAL::can(\$_,'dump') ? \$_->dump : \$_}(\$a$refaddr, \$b$refaddr)) . ')');~
                   . ($obj->{act} eq 'assert_ne' ? qq{!(\$a$refaddr eq \$b$refaddr)} : qq{\$a$refaddr eq \$b$refaddr})
-                  . qq~ or CORE::die "\$m$refaddr~
-                  . qq~ failed at \Q$obj->{file}\E line $obj->{line}\\n"}~;
+                  . qq~ or CORE::die((do{$args[2]} // ('$obj->{act}('.~
+                  . qq~join(', ',map{UNIVERSAL::can(\$_,'dump') ? \$_->dump : \$_}(\$a$refaddr, \$b$refaddr)) . ')'))~
+                  . qq~." failed at \Q$obj->{file}\E line $obj->{line}\\n")}~;
             }
         }
         elsif ($ref eq 'Sidef::Meta::Error') {
