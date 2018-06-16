@@ -3879,6 +3879,7 @@ package Sidef::Types::Number::Number {
 
     *bern             = \&bernfrac;
     *bernoulli        = \&bernfrac;
+    *Bernoulli        = \&bernfrac;
     *bernoulli_number = \&bernfrac;
 
     sub euler_polynomial {
@@ -3931,6 +3932,7 @@ package Sidef::Types::Number::Number {
         bless \$e;
     }
 
+    *Euler        = \&euler;
     *euler_number = \&euler;
 
     sub secant_number {
@@ -6285,6 +6287,8 @@ package Sidef::Types::Number::Number {
         __PACKAGE__->_set_str('int', Math::Prime::Util::GMP::ramanujan_tau(&_big2uistr // (goto &nan)));
     }
 
+    *RamanujanTau = \&ramanujan_tau;
+
     sub ramanujan_sum {
         my ($k, $n) = @_;
 
@@ -6334,6 +6338,8 @@ package Sidef::Types::Number::Number {
         Math::GMPz::Rmpz_neg($r, $r) if ($mu == -1);
         bless \$r;
     }
+
+    *RamanujanSum = \&ramanujan_sum;
 
     sub subfactorial {
         my ($x, $y) = @_;
@@ -6594,6 +6600,8 @@ package Sidef::Types::Number::Number {
         bless \$z;
     }
 
+    *Lucas = \&lucas;
+
     sub lucasu {
         my ($p, $q, $n) = @_;
 
@@ -6607,6 +6615,7 @@ package Sidef::Types::Number::Number {
     }
 
     *lucasU  = \&lucasu;
+    *LucasU  = \&lucasu;
     *lucas_U = \&lucasu;
 
     sub lucasv {
@@ -6622,6 +6631,7 @@ package Sidef::Types::Number::Number {
     }
 
     *lucasV  = \&lucasv;
+    *LucasV  = \&lucasv;
     *lucas_V = \&lucasv;
 
     sub chebyshevt {
@@ -6648,6 +6658,7 @@ package Sidef::Types::Number::Number {
     }
 
     *chebyshevT  = \&chebyshevt;
+    *ChebyshevT  = \&chebyshevt;
     *chebyshev_T = \&chebyshevt;
 
     sub chebyshevu {
@@ -6682,10 +6693,11 @@ package Sidef::Types::Number::Number {
         bless \$v;
     }
 
+    *ChebyshevU  = \&chebyshevu;
     *chebyshevU  = \&chebyshevu;
     *chebyshev_U = \&chebyshevu;
 
-    sub legendrep {
+    sub legendre_polynomial {
         my ($n, $x) = @_;
 
         _valid(\$x);
@@ -6715,9 +6727,86 @@ package Sidef::Types::Number::Number {
         bless \__div__($$sum, $t);
     }
 
-    *legendreP           = \&legendrep;
-    *legendre_P          = \&legendrep;
-    *legendre_polynomial = \&legendrep;
+    *LegendreP  = \&legendre_polynomial;
+    *legendrep  = \&legendre_polynomial;
+    *legendreP  = \&legendre_polynomial;
+    *legendre_P = \&legendre_polynomial;
+
+    # The physicists' Hermite polynomials H_n(x)
+    sub hermiteH {
+        my ($n, $x) = @_;
+
+        _valid(\$x);
+
+        $n = _any2ui($$n) // goto &nan;
+
+        $n == 0 && return ONE;
+        $x = __add__($$x, $$x);
+        $n == 1 && return bless \$x;
+
+        my $t = Math::GMPz::Rmpz_init();
+        my $u = Math::GMPz::Rmpz_init_set_ui(1);
+
+        my @terms;
+        foreach my $m (0 .. $n >> 1) {
+
+            Math::GMPz::Rmpz_fac_ui($t, $n - ($m << 1));
+            Math::GMPz::Rmpz_mul($t, $t, $u);
+            Math::GMPz::Rmpz_neg($t, $t) if ($m & 1);
+
+            push @terms, bless \__div__(__pow__($x, $n - ($m << 1)), $t);
+
+            Math::GMPz::Rmpz_mul_ui($u, $u, $m + 1);
+        }
+
+        my $sum = Sidef::Types::Array::Array->new(\@terms)->sum;
+        Math::GMPz::Rmpz_fac_ui($t, $n);
+        bless \__mul__($$sum, $t);
+    }
+
+    *HermiteH             = \&hermiteH;
+    *hermite_H            = \&hermiteH;
+    *hermite_polynomialH  = \&hermiteH;
+    *hermite_polynomial_H = \&hermiteH;
+
+    # The probabilists' Hermite polynomials He_n(x)
+    sub hermiteHe {
+        my ($n, $x) = @_;
+
+        _valid(\$x);
+
+        $n = _any2ui($$n) // goto &nan;
+
+        $n == 0 && return ONE;
+        $n == 1 && return $x;
+
+        $x = $$x;
+
+        my $t = Math::GMPz::Rmpz_init();
+        my $u = Math::GMPz::Rmpz_init_set_ui(1);
+
+        my @terms;
+        foreach my $m (0 .. $n >> 1) {
+
+            Math::GMPz::Rmpz_fac_ui($t, $n - ($m << 1));
+            Math::GMPz::Rmpz_mul($t, $t, $u);
+            Math::GMPz::Rmpz_mul_2exp($t, $t, $m);
+            Math::GMPz::Rmpz_neg($t, $t) if ($m & 1);
+
+            push @terms, bless \__div__(__pow__($x, $n - ($m << 1)), $t);
+
+            Math::GMPz::Rmpz_mul_ui($u, $u, $m + 1);
+        }
+
+        my $sum = Sidef::Types::Array::Array->new(\@terms)->sum;
+        Math::GMPz::Rmpz_fac_ui($t, $n);
+        bless \__mul__($$sum, $t);
+    }
+
+    *HermiteHe             = \&hermiteHe;
+    *hermite_He            = \&hermiteHe;
+    *hermite_polynomialHe  = \&hermiteHe;
+    *hermite_polynomial_He = \&hermiteHe;
 
     sub fibonacci {
         my ($n, $k) = @_;
@@ -6768,7 +6857,8 @@ package Sidef::Types::Number::Number {
         bless \$z;
     }
 
-    *fib = \&fibonacci;
+    *fib       = \&fibonacci;
+    *Fibonacci = \&fibonacci;
 
     sub stirling {
         my ($x, $y) = @_;
@@ -6777,7 +6867,9 @@ package Sidef::Types::Number::Number {
                               Math::Prime::Util::GMP::stirling(_big2uistr($x) // (goto &nan), _big2uistr($y) // (goto &nan)));
     }
 
+    *Stirling  = \&stirling;
     *stirling1 = \&stirling;
+    *Stirling1 = \&stirling;
 
     sub stirling2 {
         my ($x, $y) = @_;
@@ -6790,6 +6882,8 @@ package Sidef::Types::Number::Number {
                              );
     }
 
+    *Stirling2 = \&stirling2;
+
     sub stirling3 {
         my ($x, $y) = @_;
         _valid(\$y);
@@ -6800,6 +6894,8 @@ package Sidef::Types::Number::Number {
                                                               )
                              );
     }
+
+    *Stirling3 = \&stirling3;
 
     sub bell {
         my ($x) = @_;
@@ -6834,6 +6930,7 @@ package Sidef::Types::Number::Number {
     }
 
     *bell_number = \&bell;
+    *Bell        = \&bell;
 
     sub quadratic_formula {
         my ($x, $y, $z) = @_;
@@ -6989,7 +7086,9 @@ package Sidef::Types::Number::Number {
         bless \$z;
     }
 
-    *faulhaber = \&faulhaber_sum;
+    *faulhaber    = \&faulhaber_sum;
+    *Faulhaber    = \&faulhaber_sum;
+    *FaulhaberSum = \&faulhaber_sum;
 
     sub multinomial {
         my ($n, @mset) = @_;
@@ -7035,6 +7134,8 @@ package Sidef::Types::Number::Number {
         bless \$r;
     }
 
+    *Catalan = \&catalan;
+
     sub binomial {
         my ($x, $y) = @_;
         _valid(\$y);
@@ -7071,7 +7172,8 @@ package Sidef::Types::Number::Number {
         }
     }
 
-    *mobius = \&moebius;
+    *mobius  = \&moebius;
+    *Moebius = \&moebius;
 
     sub cyclotomic_polynomial {
         my ($n, $x) = @_;
@@ -7491,6 +7593,8 @@ package Sidef::Types::Number::Number {
         }
     }
 
+    *Legendre = \&legendre;
+
     sub jacobi {
         my ($x, $y) = @_;
         _valid(\$y);
@@ -7508,6 +7612,8 @@ package Sidef::Types::Number::Number {
         }
     }
 
+    *Jacobi = \&jacobi;
+
     sub kronecker {
         my ($x, $y) = @_;
         _valid(\$y);
@@ -7524,6 +7630,8 @@ package Sidef::Types::Number::Number {
             MONE;
         }
     }
+
+    *Kronecker = \&kronecker;
 
     sub is_coprime {
         my ($x, $y) = @_;
@@ -7927,6 +8035,7 @@ package Sidef::Types::Number::Number {
         $n < ULONG_MAX ? __PACKAGE__->_set_uint($n) : __PACKAGE__->_set_str('int', $n);
     }
 
+    *EulerPhi      = \&totient;
     *euler_phi     = \&totient;
     *euler_totient = \&totient;
 
@@ -8006,18 +8115,26 @@ package Sidef::Types::Number::Number {
         $n < ULONG_MAX ? __PACKAGE__->_set_uint($n) : __PACKAGE__->_set_str('int', $n);
     }
 
+    *JordanTotient = \&jordan_totient;
+
     sub carmichael_lambda {
         my $n = Math::Prime::Util::GMP::carmichael_lambda(&_big2uistr // goto &nan);
         $n < ULONG_MAX ? __PACKAGE__->_set_uint($n) : __PACKAGE__->_set_str('int', $n);
     }
 
+    *CarmichaelLambda = \&carmichael_lambda;
+
     sub liouville {
         Math::Prime::Util::GMP::liouville(&_big2uistr // goto &nan) == 1 ? ONE : MONE;
     }
 
+    *Liouville = \&liouville;
+
     sub big_omega {
         __PACKAGE__->_set_uint(scalar Math::Prime::Util::GMP::factor(&_big2uistr // goto &nan));
     }
+
+    *Omega = \&big_omega;
 
     sub omega {
         my %factors;
@@ -9216,9 +9333,12 @@ package Sidef::Types::Number::Number {
         *{__PACKAGE__ . '::' . 'ω'}  = \&omega;
         *{__PACKAGE__ . '::' . 'ζ'}  = \&zeta;
         *{__PACKAGE__ . '::' . 'η'}  = \&eta;
-        *{__PACKAGE__ . '::' . 'μ'}  = \&mobius;
+        *{__PACKAGE__ . '::' . 'μ'}  = \&moebius;
         *{__PACKAGE__ . '::' . '=~='} = \&approx_eq;
         *{__PACKAGE__ . '::' . '≅'} = \&approx_eq;
+
+        *{__PACKAGE__ . '::' . 'Möbius'} = \&moebius;
+        *{__PACKAGE__ . '::' . 'möbius'} = \&moebius;
     }
 }
 

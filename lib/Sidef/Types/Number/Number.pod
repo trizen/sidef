@@ -1159,6 +1159,26 @@ Return the
 
 =cut
 
+=head2 hermite_H
+
+Number.hermite_H() -> I<Obj>
+
+Return the
+
+Aliases: I<hermiteH>, I<hermite_polynomial_H>, I<hermite_polynomialH>
+
+=cut
+
+=head2 hermite_He
+
+Number.hermite_He() -> I<Obj>
+
+Return the
+
+Aliases: I<hermiteHe>, I<hermite_polynomial_He>, I<hermite_polynomialHe>
+
+=cut
+
 =head2 hyperfactorial
 
 Number.hyperfactorial() -> I<Obj>
@@ -2725,7 +2745,7 @@ Number.μ() -> I<Obj>
 
 Return the
 
-Aliases: I<mobius>, I<moebius>
+Aliases: I<mobius>, I<möbius>, I<moebius>
 
 =cut
 
