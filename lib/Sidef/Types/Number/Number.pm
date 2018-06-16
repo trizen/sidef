@@ -6310,12 +6310,11 @@ package Sidef::Types::Number::Number {
         my $r_str = Math::GMPz::Rmpz_get_str($r, 10);
         my $mu = Math::Prime::Util::GMP::moebius($r_str) || return ZERO;
 
-        my $k_str = Math::GMPz::Rmpz_get_str($k, 10);
-
-        if ($k_str eq $r_str) {
+        if (Math::GMPz::Rmpz_cmp($r, $k) == 0) {
             return ($mu == 1 ? ONE : MONE);
         }
 
+        my $k_str = Math::GMPz::Rmpz_get_str($k, 10);
         my $phi_k = Math::Prime::Util::GMP::totient($k_str);
         my $phi_r = Math::Prime::Util::GMP::totient($r_str);
 
@@ -6686,6 +6685,40 @@ package Sidef::Types::Number::Number {
     *chebyshevU  = \&chebyshevu;
     *chebyshev_U = \&chebyshevu;
 
+    sub legendrep {
+        my ($n, $x) = @_;
+
+        _valid(\$x);
+
+        $n = _any2ui($$n) // goto &nan;
+
+        $n == 0 && return ONE;
+        $n == 1 && return $x;
+
+        my $x1 = __dec__($$x);
+        my $x2 = __inc__($$x);
+
+        my $t = Math::GMPz::Rmpz_init();
+
+        my @terms;
+        foreach my $k (0 .. $n) {
+            Math::GMPz::Rmpz_bin_uiui($t, $n, $k);
+            Math::GMPz::Rmpz_mul($t, $t, $t);
+            push @terms, bless \__mul__(__mul__(__pow__($x1, $n - $k), __pow__($x2, $k)), $t);
+        }
+
+        my $sum = Sidef::Types::Array::Array->new(\@terms)->sum;
+
+        Math::GMPz::Rmpz_set_ui($t, 0);
+        Math::GMPz::Rmpz_setbit($t, $n);
+
+        bless \__div__($$sum, $t);
+    }
+
+    *legendreP           = \&legendrep;
+    *legendre_P          = \&legendrep;
+    *legendre_polynomial = \&legendrep;
+
     sub fibonacci {
         my ($n, $k) = @_;
 
@@ -7051,7 +7084,6 @@ package Sidef::Types::Number::Number {
         my $t = Math::GMPz::Rmpz_init();
 
         my @terms;
-
         foreach my $d (Math::Prime::Util::GMP::divisors(Math::GMPz::Rmpz_get_str($n, 10))) {
 
             if (($d || next) < ULONG_MAX) {

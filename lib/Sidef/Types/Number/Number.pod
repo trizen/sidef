@@ -1723,6 +1723,16 @@ Return the
 
 =cut
 
+=head2 legendre_P
+
+Number.legendre_P() -> I<Obj>
+
+Return the
+
+Aliases: I<legendrep>, I<legendreP>, I<legendre_polynomial>
+
+=cut
+
 =head2 len
 
 Number.len() -> I<Obj>
