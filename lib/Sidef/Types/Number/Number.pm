@@ -8106,6 +8106,7 @@ package Sidef::Types::Number::Number {
     }
 
     *EulerPhi      = \&totient;
+    *eulerphi      = \&totient;
     *euler_phi     = \&totient;
     *euler_totient = \&totient;
 

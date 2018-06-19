@@ -43,6 +43,16 @@ Aliases: I<mul>
 
 =cut
 
+=head2 **
+
+I<Obj> B<**> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<mpow>, I<matrix_pow>
+
+=cut
+
 =head2 +
 
 I<Obj> B<+> I<Obj> -> I<Obj>

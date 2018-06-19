@@ -2805,7 +2805,7 @@ Number.ϕ() -> I<Obj>
 
 Return the
 
-Aliases: I<totient>, I<euler_phi>, I<euler_totient>
+Aliases: I<totient>, I<euler_phi>, I<eulerphi>, I<euler_totient>
 
 =cut
 
