@@ -2919,6 +2919,13 @@ package Sidef::Types::Array::Array {
 
         $pow = CORE::int($pow);
 
+        my $neg = 0;
+
+        if ($pow < 0) {
+            $neg = 1;
+            $pow = -$pow;
+        }
+
 #<<<
         my $n = $#$A;
         my $B = bless [map {
@@ -2931,13 +2938,15 @@ package Sidef::Types::Array::Array {
         } 0 .. $n];
 #>>>
 
+        return $B if ($pow == 0);
+
         while (1) {
             $B = $B->mmul($A) if ($pow & 1);
             $pow >>= 1 or last;
             $A = $A->mmul($A);
         }
 
-        return $B;
+        $neg ? $B->inv : $B;
     }
 
     *mpow = \&matrix_pow;
