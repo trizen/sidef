@@ -6877,6 +6877,92 @@ package Sidef::Types::Number::Number {
     *Laguerre_L          = \&laguerreL;
     *laguerre_polynomial = \&laguerreL;
 
+    sub __fibmod__ {
+        my ($n, $m, $T1, $T2) = @_;
+
+        # T1 = 0, T2 = 1 for Fibonacci numbers
+        # T1 = 2, T2 = 1 for Lucas numbers
+
+        $n = Math::GMPz::Rmpz_init_set($n);
+
+        state $t = Math::GMPz::Rmpz_init_nobless();
+        state $u = Math::GMPz::Rmpz_init_nobless();
+
+        my $f = Math::GMPz::Rmpz_init_set_ui($T1 // 0);
+        my $g = Math::GMPz::Rmpz_init_set_ui($T2 // 1);
+
+        my $A = Math::GMPz::Rmpz_init_set_ui(0);
+        my $B = Math::GMPz::Rmpz_init_set_ui(1);
+        my $C = Math::GMPz::Rmpz_init_set_ui(1);
+        my $D = Math::GMPz::Rmpz_init_set_ui(1);
+
+        for (; ;) {
+
+            if (Math::GMPz::Rmpz_odd_p($n)) {
+
+                Math::GMPz::Rmpz_mul($t, $f, $A);
+                Math::GMPz::Rmpz_addmul($t, $g, $C);
+
+                Math::GMPz::Rmpz_mul($g, $g, $D);
+                Math::GMPz::Rmpz_addmul($g, $f, $B);
+
+                Math::GMPz::Rmpz_mod($g, $g, $m);
+                Math::GMPz::Rmpz_mod($f, $t, $m);
+            }
+
+            Math::GMPz::Rmpz_div_2exp($n, $n, 1);
+            Math::GMPz::Rmpz_sgn($n) || last;
+
+            Math::GMPz::Rmpz_mul($u, $B, $C);
+
+            Math::GMPz::Rmpz_mul($t, $B, $D);
+            Math::GMPz::Rmpz_addmul($t, $B, $A);
+            Math::GMPz::Rmpz_mod($B, $t, $m);
+
+            Math::GMPz::Rmpz_mul($t, $C, $A);
+            Math::GMPz::Rmpz_addmul($t, $C, $D);
+            Math::GMPz::Rmpz_mod($C, $t, $m);
+
+            Math::GMPz::Rmpz_mul($A, $A, $A);
+            Math::GMPz::Rmpz_mul($D, $D, $D);
+
+            Math::GMPz::Rmpz_add($A, $A, $u);
+            Math::GMPz::Rmpz_add($D, $D, $u);
+
+            Math::GMPz::Rmpz_mod($A, $A, $m);
+            Math::GMPz::Rmpz_mod($D, $D, $m);
+        }
+
+        return $f;
+    }
+
+    sub fibonaccimod {
+        my ($n, $m) = @_;
+        _valid(\$m);
+
+        $n = _any2mpz($$n) // goto &nan;
+        $m = _any2mpz($$m) // goto &nan;
+
+        bless \__fibmod__($n, $m, 0, 1);
+    }
+
+    *fibmod        = \&fibonaccimod;
+    *fibonacci_mod = \&fibonaccimod;
+    *FibonacciMod  = \&fibonaccimod;
+
+    sub lucasmod {
+        my ($n, $m) = @_;
+        _valid(\$m);
+
+        $n = _any2mpz($$n) // goto &nan;
+        $m = _any2mpz($$m) // goto &nan;
+
+        bless \__fibmod__($n, $m, 2, 1);
+    }
+
+    *lucas_mod = \&lucasmod;
+    *LucasMod  = \&lucasmod;
+
     sub fibonacci {
         my ($n, $k) = @_;
 

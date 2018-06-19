@@ -1093,6 +1093,16 @@ Aliases: I<fibonacci>
 
 =cut
 
+=head2 fibmod
+
+Number.fibmod() -> I<Obj>
+
+Return the
+
+Aliases: I<fibonacci_mod>, I<fibonaccimod>
+
+=cut
+
 =head2 flipbit
 
 Number.flipbit() -> I<Obj>
@@ -1898,6 +1908,16 @@ Return the
 Number.lucas() -> I<Obj>
 
 Return the
+
+=cut
+
+=head2 lucas_mod
+
+Number.lucas_mod() -> I<Obj>
+
+Return the
+
+Aliases: I<lucasmod>
 
 =cut
 
