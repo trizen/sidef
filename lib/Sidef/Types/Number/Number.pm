@@ -6893,44 +6893,42 @@ package Sidef::Types::Number::Number {
 
         my $A = Math::GMPz::Rmpz_init_set_ui(0);
         my $B = Math::GMPz::Rmpz_init_set_ui(1);
-        my $C = Math::GMPz::Rmpz_init_set_ui(1);
-        my $D = Math::GMPz::Rmpz_init_set_ui(1);
 
         for (; ;) {
 
             if (Math::GMPz::Rmpz_odd_p($n)) {
 
-                Math::GMPz::Rmpz_mul($t, $f, $A);
-                Math::GMPz::Rmpz_addmul($t, $g, $C);
+                # (f, g) = (f*a + g*b, f*b + g*(a+b))  mod m
 
-                Math::GMPz::Rmpz_mul($g, $g, $D);
+                Math::GMPz::Rmpz_mul($u, $g, $B);
+                Math::GMPz::Rmpz_mul($t, $f, $A);
+                Math::GMPz::Rmpz_mul($g, $g, $A);
+
+                Math::GMPz::Rmpz_add($t, $t, $u);
+                Math::GMPz::Rmpz_add($g, $g, $u);
+
                 Math::GMPz::Rmpz_addmul($g, $f, $B);
 
-                Math::GMPz::Rmpz_mod($g, $g, $m);
                 Math::GMPz::Rmpz_mod($f, $t, $m);
+                Math::GMPz::Rmpz_mod($g, $g, $m);
             }
+
+            # (a, b) = (a*a + b*b, a*b + b*(a+b))  mod m
 
             Math::GMPz::Rmpz_div_2exp($n, $n, 1);
             Math::GMPz::Rmpz_sgn($n) || last;
 
-            Math::GMPz::Rmpz_mul($u, $B, $C);
+            Math::GMPz::Rmpz_mul($t, $A, $A);
+            Math::GMPz::Rmpz_mul($u, $B, $B);
+            Math::GMPz::Rmpz_mul($B, $B, $A);
 
-            Math::GMPz::Rmpz_mul($t, $B, $D);
-            Math::GMPz::Rmpz_addmul($t, $B, $A);
-            Math::GMPz::Rmpz_mod($B, $t, $m);
+            Math::GMPz::Rmpz_mul_2exp($B, $B, 1);
 
-            Math::GMPz::Rmpz_mul($t, $C, $A);
-            Math::GMPz::Rmpz_addmul($t, $C, $D);
-            Math::GMPz::Rmpz_mod($C, $t, $m);
+            Math::GMPz::Rmpz_add($B, $B, $u);
+            Math::GMPz::Rmpz_add($t, $t, $u);
 
-            Math::GMPz::Rmpz_mul($A, $A, $A);
-            Math::GMPz::Rmpz_mul($D, $D, $D);
-
-            Math::GMPz::Rmpz_add($A, $A, $u);
-            Math::GMPz::Rmpz_add($D, $D, $u);
-
-            Math::GMPz::Rmpz_mod($A, $A, $m);
-            Math::GMPz::Rmpz_mod($D, $D, $m);
+            Math::GMPz::Rmpz_mod($A, $t, $m);
+            Math::GMPz::Rmpz_mod($B, $B, $m);
         }
 
         return $f;
@@ -6942,6 +6940,8 @@ package Sidef::Types::Number::Number {
 
         $n = _any2mpz($$n) // goto &nan;
         $m = _any2mpz($$m) // goto &nan;
+
+        Math::GMPz::Rmpz_sgn($n) < 0 and goto &nan;
 
         bless \__fibmod__($n, $m, 0, 1);
     }
@@ -6956,6 +6956,8 @@ package Sidef::Types::Number::Number {
 
         $n = _any2mpz($$n) // goto &nan;
         $m = _any2mpz($$m) // goto &nan;
+
+        Math::GMPz::Rmpz_sgn($n) < 0 and goto &nan;
 
         bless \__fibmod__($n, $m, 2, 1);
     }
