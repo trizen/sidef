@@ -3794,6 +3794,8 @@ package Sidef::Types::Number::Number {
             return @cache;
         }
 
+        $n <<= 1 if ($n <= 250);
+
         my @S = (Math::GMPz::Rmpz_init_set_ui(1));
 
         foreach my $k (1 .. $n) {
@@ -3819,6 +3821,8 @@ package Sidef::Types::Number::Number {
         if ($n <= $#cache) {
             return @cache;
         }
+
+        $n <<= 1 if ($n <= 250);
 
         my @T = (Math::GMPz::Rmpz_init_set_ui(1));
 
@@ -3971,7 +3975,7 @@ package Sidef::Types::Number::Number {
 
         $n = _any2ui($$n) // goto &nan;
 
-        my @E = _secant_numbers($n < 500 ? 500 : $n);
+        my @E = _secant_numbers($n);
         bless \Math::GMPz::Rmpz_init_set($E[$n]);
     }
 
