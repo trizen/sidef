@@ -6945,7 +6945,8 @@ package Sidef::Types::Number::Number {
         $n = _any2mpz($$n) // goto &nan;
         $m = _any2mpz($$m) // goto &nan;
 
-        Math::GMPz::Rmpz_sgn($n) < 0 and goto &nan;
+        Math::GMPz::Rmpz_sgn($n) < 0  and goto &nan;
+        Math::GMPz::Rmpz_sgn($m) == 0 and goto &nan;
 
         bless \__fibmod__($n, $m, 0, 1);
     }
@@ -6961,7 +6962,8 @@ package Sidef::Types::Number::Number {
         $n = _any2mpz($$n) // goto &nan;
         $m = _any2mpz($$m) // goto &nan;
 
-        Math::GMPz::Rmpz_sgn($n) < 0 and goto &nan;
+        Math::GMPz::Rmpz_sgn($n) < 0  and goto &nan;
+        Math::GMPz::Rmpz_sgn($m) == 0 and goto &nan;
 
         bless \__fibmod__($n, $m, 2, 1);
     }

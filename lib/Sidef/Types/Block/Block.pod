@@ -121,6 +121,8 @@ Block.ffork() -> I<Obj>
 
 Return the
 
+Aliases: I<start>
+
 =cut
 
 =head2 fork

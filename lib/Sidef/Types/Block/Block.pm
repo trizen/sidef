@@ -387,7 +387,7 @@ package Sidef::Types::Block::Block {
             return scalar {dump => ($ref . "->_set_str('$type', '$str')")};
         }
         elsif ($ref eq 'Sidef::Types::Block::Block') {
-            die "[ERROR] Blocks cannot be serialized by Block.ffork()!";
+            die "[ERROR] Blocks cannot be serialized!";
         }
 
         return;
@@ -413,6 +413,8 @@ package Sidef::Types::Block::Block {
         $fork->{pid} = $pid;
         $fork;
     }
+
+    *start = \&ffork;
 
     sub fork {
         my ($self, @args) = @_;
