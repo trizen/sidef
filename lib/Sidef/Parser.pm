@@ -727,7 +727,7 @@ package Sidef::Parser {
               || $self->fatal_error(
                                     code  => $_,
                                     pos   => pos($_),
-                                    error => "can't find the closing delimiter: '$end_delim'",
+                                    error => "can't find the closing delimiter: `$end_delim`",
                                    )
              );
 
@@ -756,7 +756,7 @@ package Sidef::Parser {
                     $self->fatal_error(
                                        code   => $_,
                                        pos    => pos($_),
-                                       error  => "invalid type <<$type>> for variable '$name'",
+                                       error  => "invalid type <<$type>> for variable `$name`",
                                        reason => "expected a type, such as: Str, Num, File, etc...",
                                       );
                 }
@@ -770,7 +770,7 @@ package Sidef::Parser {
                 $self->fatal_error(
                                    code  => $_,
                                    pos   => $-[2],
-                                   error => "'$var_name' is either a keyword or a predefined variable!",
+                                   error => "`$var_name` is either a keyword or a predefined variable!",
                                   );
             }
 
@@ -880,7 +880,7 @@ package Sidef::Parser {
               || $self->fatal_error(
                                     code  => $_,
                                     pos   => pos($_),
-                                    error => "can't find the closing delimiter: '$end_delim'",
+                                    error => "can't find the closing delimiter: `$end_delim`",
                                    )
              );
 
@@ -1133,7 +1133,7 @@ package Sidef::Parser {
                         $self->fatal_error(
                                            code  => $_,
                                            pos   => (pos($_) - length($name)),
-                                           error => "'$name' is either a keyword or a predefined variable!",
+                                           error => "`$name` is either a keyword or a predefined variable!",
                                           );
                     }
                 }
@@ -1168,7 +1168,7 @@ package Sidef::Parser {
                         $self->fatal_error(
                                            code  => $_,
                                            pos   => (pos($_) - length($name)),
-                                           error => "'$name' is either a keyword or a predefined variable!",
+                                           error => "`$name` is either a keyword or a predefined variable!",
                                           );
                     }
                 }
@@ -1259,7 +1259,7 @@ package Sidef::Parser {
                     $self->fatal_error(
                                        code  => $_,
                                        pos   => (pos($_) - length($name)),
-                                       error => "'$name' is either a keyword or a predefined variable!",
+                                       error => "`$name` is either a keyword or a predefined variable!",
                                       );
                 }
 
@@ -1313,7 +1313,7 @@ package Sidef::Parser {
                     $self->fatal_error(
                                        code  => $_,
                                        pos   => (pos($_) - length($name)),
-                                       error => "'$name' is either a keyword or a predefined variable!",
+                                       error => "`$name` is either a keyword or a predefined variable!",
                                       );
                 }
 
@@ -1403,7 +1403,7 @@ package Sidef::Parser {
                         $self->fatal_error(
                                            code  => $_,
                                            pos   => (pos($_) - length($name)),
-                                           error => "'$name' is either a keyword or a predefined variable!",
+                                           error => "`$name` is either a keyword or a predefined variable!",
                                           );
                     }
 
@@ -1477,7 +1477,7 @@ package Sidef::Parser {
                     $self->fatal_error(
                                        code  => $_,
                                        pos   => $-[0],
-                                       error => "'$name' is either a keyword or a predefined variable!",
+                                       error => "`$name` is either a keyword or a predefined variable!",
                                       );
                 }
 
@@ -1581,7 +1581,7 @@ package Sidef::Parser {
                             }
                             else {
                                 $self->fatal_error(
-                                                   error  => "can't find '$name' class",
+                                                   error  => "can't find `$name` class",
                                                    reason => "expected an existent class name",
                                                    var    => $name,
                                                    code   => $_,
@@ -1690,7 +1690,7 @@ package Sidef::Parser {
 
                     /\G\h*\{\h*/gc
                       || $self->fatal_error(
-                                            error  => "invalid '$type' declaration",
+                                            error  => "invalid `$type` declaration",
                                             reason => "expected: $type $name(...){...}",
                                             code   => $_,
                                             pos    => pos($_)
@@ -2239,7 +2239,7 @@ package Sidef::Parser {
                     my $var = bless({name => $name, class => $class}, 'Sidef::Variable::Global');
 
                     if (not $self->{interactive}) {
-                        warn "[WARNING] Implicit declaration of global variable '$name'"
+                        warn "[WARNING] Implicit declaration of global variable `$name`"
                           . " at $self->{file_name} line $self->{line}\n";
                     }
 
@@ -2525,7 +2525,7 @@ package Sidef::Parser {
                             $self->fatal_error(
                                                code  => $_,
                                                pos   => pos($_) - 1,
-                                               error => "operator '$method' requires a right-side operand",
+                                               error => "operator `$method` requires a right-side operand",
                                               );
                         }
                     }
@@ -3021,7 +3021,7 @@ package Sidef::Parser {
                                 $self->fatal_error(
                                                    code  => $_,
                                                    pos   => pos($_) - 1,
-                                                   error => "operator '$method' requires a right-side operand",
+                                                   error => "operator `$method` requires a right-side operand",
                                                   );
                             }
                         }
@@ -3327,7 +3327,7 @@ package Sidef::Parser {
                       || $self->fatal_error(
                                             code  => $_,
                                             pos   => pos($_),
-                                            error => "can't open file '$full_path': $!"
+                                            error => "can't open file `$full_path`: $!"
                                            );
 
                     my $content = do { local $/; <$fh> };

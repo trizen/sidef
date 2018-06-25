@@ -6671,6 +6671,10 @@ package Sidef::Types::Number::Number {
     *LucasV  = \&lucasv;
     *lucas_V = \&lucasv;
 
+    #
+    ## Chebyshev polynomials: T_n(x)
+    #
+
     sub chebyshevt {
         my ($n, $x) = @_;
 
@@ -6697,6 +6701,10 @@ package Sidef::Types::Number::Number {
     *chebyshevT  = \&chebyshevt;
     *ChebyshevT  = \&chebyshevt;
     *chebyshev_T = \&chebyshevt;
+
+    #
+    ## Chebyshev polynomials: U_n(x)
+    #
 
     sub chebyshevu {
         my ($n, $x) = @_;
@@ -6734,6 +6742,10 @@ package Sidef::Types::Number::Number {
     *chebyshevU  = \&chebyshevu;
     *chebyshev_U = \&chebyshevu;
 
+    #
+    ## Legendre polynomials: P_n(x)
+    #
+
     sub legendre_polynomial {
         my ($n, $x) = @_;
 
@@ -6769,7 +6781,10 @@ package Sidef::Types::Number::Number {
     *legendreP  = \&legendre_polynomial;
     *legendre_P = \&legendre_polynomial;
 
-    # The physicists' Hermite polynomials H_n(x)
+    #
+    ## The physicists' Hermite polynomials H_n(x)
+    #
+
     sub hermiteH {
         my ($n, $x) = @_;
 
@@ -6809,7 +6824,10 @@ package Sidef::Types::Number::Number {
     *hermite_polynomialH  = \&hermiteH;
     *hermite_polynomial_H = \&hermiteH;
 
-    # The probabilists' Hermite polynomials He_n(x)
+    #
+    ## The probabilists' Hermite polynomials He_n(x)
+    #
+
     sub hermiteHe {
         my ($n, $x) = @_;
 
@@ -6851,13 +6869,17 @@ package Sidef::Types::Number::Number {
     *hermite_polynomialHe  = \&hermiteHe;
     *hermite_polynomial_He = \&hermiteHe;
 
+    #
+    ## Laguerre polynomials: L_n(x)
+    #
+
     sub laguerreL {
         my ($n, $x) = @_;
 
         _valid(\$x);
 
         $n = _any2ui($$n) // goto &nan;
-        $n == 0 && return ONE;
+        $n || return ONE;
 
         $x = $$x;
 

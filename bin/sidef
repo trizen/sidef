@@ -128,7 +128,7 @@ if (defined $args{t}) {
         }
 
         if (not($slept) and $@) {
-            warn "[ERROR] Error encountered on script `$script_name': $@";
+            warn "[ERROR] Error encountered on script `$script_name`: $@";
             sleep(2) if @argv;
         }
     }
@@ -675,13 +675,13 @@ HEAD
 
                  local $/;
                  open my $fh, '<:utf8', $_
-                   or die "Can't open file `$_' for reading: $!";
+                   or die "Can't open file `$_` for reading: $!";
 
                  my $token   = tr/A-Za-z0-9/_/cr;
                  my $content = <$fh>;
 
                  if ($content =~ /^package\h+([\w:]+)/) {
-                     $package_content .= qq{'$1' => };
+                     $package_content .= qq{'${1}' => };
                  }
                  else {
                      die qq{ERROR: can't get the package name from file `$_`};
@@ -717,7 +717,7 @@ sub __load_sidef_module__ {
                   ";\n" => map{
                     exists($REQ{$_})
                         ? ()
-                        : "BEGIN{ main::__load_sidef_module__('$_') }" } split(' ', $+)
+                        : "BEGIN{ main::__load_sidef_module__('${_}') }" } split(' ', $+)
                   ) . (defined($1) ? "\nuse parent qw(-norequire $1);\n" : '')
             }gxmse;
 
@@ -736,7 +736,7 @@ sub __load_sidef_module__ {
 FOOT
 
     my $requirify = sub {
-        join('', map { "__load_sidef_module__('$_');\n" } @_);
+        join('', map { "__load_sidef_module__('${_}');\n" } @_);
     };
 
     $package_content .= $requirify->(_get_loaded_modules(), 'Sidef::Module::OO', 'Sidef::Module::Func');

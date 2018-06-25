@@ -375,7 +375,7 @@ HEADER
     sub _dump_array {
         my ($self, $ref, $array) = @_;
         $self->load_mod($ref);
-        'bless([' . join(',', map { $self->deparse_expr(ref($_) eq 'HASH' ? $_ : {self => $_}) } @{$array}) . "], '$ref')";
+        'bless([' . join(',', map { $self->deparse_expr(ref($_) eq 'HASH' ? $_ : {self => $_}) } @{$array}) . "], '${ref}')";
     }
 
     sub _dump_indices {
@@ -664,7 +664,7 @@ HEADER
                         else {
                             $code .= ";"
                               . "state\$_$refaddr=do{no strict 'refs';"
-                              . "\$$self->{package_name}::__SIDEF_CLASS_METHODS__{'$name'} = \$$obj->{name}$refaddr;"
+                              . "\$$self->{package_name}::__SIDEF_CLASS_METHODS__{'${name}'} = \$$obj->{name}$refaddr;"
                               . '*{'
                               . $self->_dump_string("$self->{package_name}::$name")
                               . "}=sub{\$$obj->{name}$refaddr->call(\@_)}}";
@@ -786,7 +786,7 @@ HEADER
                 local $self->{class_attributes} = $obj->{attributes} if exists $obj->{attributes};
                 local $self->{ref_class}        = 1 if ref($obj->{name});
                 $code .= $self->deparse_expr({self => $block});
-                $code .= ";'$package_name'}";
+                $code .= ";'${package_name}'}";
             }
         }
         elsif ($ref eq 'Sidef::Types::Block::BlockInit') {
@@ -972,7 +972,7 @@ HEADER
         elsif ($ref eq 'Sidef::Variable::Struct') {
             my $name = $self->_get_reftype($obj);
             if ($addr{$refaddr}++) {
-                $code = "'$name'";
+                $code = "'${name}'";
             }
             else {
                 $code =
@@ -992,7 +992,7 @@ HEADER
                   . $self->_dump_string("$name\::call")
                   . "}=sub{CORE::shift(\@_);\$new$refaddr->call(\@_)}};"
                   . join('', map { "sub $_->{name}:lvalue{\$_[0]->{$_->{name}}}" } @{$obj->{vars}})
-                  . "};'$name'}";
+                  . "};'${name}'}";
 
                 push @{$self->{function_declarations}}, [$refaddr, "my\$new$refaddr;"];
             }
@@ -1000,11 +1000,11 @@ HEADER
         elsif ($ref eq 'Sidef::Variable::Subset') {
             my $name = $self->_get_reftype($obj);
             if ($addr{$refaddr}++) {
-                $code = "'$name'";
+                $code = "'${name}'";
             }
             else {
                 my @parents = map { $self->_get_reftype($_) } @{$obj->{inherits}};
-                $code = qq{do{package $name {use parent qw(-norequire @parents)};'$name'}};
+                $code = qq{do{package $name {use parent qw(-norequire @parents)};'${name}'}};
             }
         }
         elsif ($ref eq 'Sidef::Types::Number::Number') {
@@ -1014,16 +1014,16 @@ HEADER
                 and CORE::int($content) eq $content
                 and $content >= 0
                 and $content < Sidef::Types::Number::Number::ULONG_MAX) {
-                $code = $self->make_constant($ref, '_set_uint', "Number$refaddr", "'$content'");
+                $code = $self->make_constant($ref, '_set_uint', "Number$refaddr", "'${content}'");
             }
             elsif (    $type eq 'int'
                    and CORE::int($content) eq $content
                    and $content < 0
                    and $content > Sidef::Types::Number::Number::LONG_MIN) {
-                $code = $self->make_constant($ref, '_set_int', "Number$refaddr", "'$content'");
+                $code = $self->make_constant($ref, '_set_int', "Number$refaddr", "'${content}'");
             }
             else {
-                $code = $self->make_constant($ref, '_set_str', "Number$refaddr", "'$type'", "'$content'");
+                $code = $self->make_constant($ref, '_set_str', "Number$refaddr", "'${type}'", "'${content}'");
             }
         }
         elsif ($ref eq 'Sidef::Types::String::String') {
@@ -1134,7 +1134,7 @@ HEADER
                       . (defined($obj->{$_}) ? $self->deparse_expr({self => $obj->{$_}}) : 'undef')
                 } sort(keys(%{$obj}))
               )
-              . "}, '$ref')";
+              . "}, '${ref}')";
         }
         elsif ($ref eq 'Sidef::Meta::PrefixMethod') {
             $code = 'do{my($self,@args)=' . $self->deparse_args($obj->{expr}) . ';$self->' . $obj->{name} . '(@args)}';
@@ -1322,7 +1322,7 @@ HEADER
                 "Range$refaddr",
                 map {
                     my ($type, $content) = $obj->{$_}->_dump;
-                    'Sidef::Types::Number::Number->_set_str(' . "'$type', '$content'" . ')'
+                    'Sidef::Types::Number::Number->_set_str(' . "'${type}', '${content}'" . ')'
                 } ('from', 'to', 'step')
             );
         }

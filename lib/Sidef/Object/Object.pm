@@ -319,7 +319,7 @@ package Sidef::Object::Object {
             my $to = \&{$ref . '::' . $old};
 
             if (not defined &$to) {
-                die "[ERROR] Can't alias the nonexistent method '$old' as '$new'!";
+                die "[ERROR] Can't alias the nonexistent method `$old` as `$new`!";
             }
 
             *{$ref . '::' . $new} = $to;

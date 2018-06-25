@@ -360,12 +360,12 @@ package Sidef::Types::Glob::File {
         }
 
         truncate($fh, 0) || do {
-            warn "[WARNING] Can't truncate file `$self': $!";
+            warn "[WARNING] Can't truncate file `$self`: $!";
             return undef;
         };
 
         seek($fh, 0, 0) || do {
-            warn "[WARNING] Can't seek the begining of file `$self': $!";
+            warn "[WARNING] Can't seek the begining of file `$self`: $!";
             return undef;
         };
 
@@ -373,7 +373,7 @@ package Sidef::Types::Glob::File {
             local $, = q{};
             local $\ = q{};
             (print $fh @lines) || do {
-                warn "[WARNING] Can't write to file `$self': $!";
+                warn "[WARNING] Can't write to file `$self`: $!";
                 return undef;
             };
             close $fh;
@@ -389,7 +389,7 @@ package Sidef::Types::Glob::File {
         $mode = defined($mode) ? "$mode" : 'utf8';
 
         open(my $fh, "<:$mode", "$self") || do {
-            warn "[WARNING] Can't open file `$self' for reading: $!";
+            warn "[WARNING] Can't open file `$self` for reading: $!";
             return undef;
         };
 
@@ -404,12 +404,12 @@ package Sidef::Types::Glob::File {
         $mode = defined($mode) ? "$mode" : 'utf8';
 
         open(my $fh, ">:$mode", "$self") || do {
-            warn "[WARNING] Can't open file `$self' for writing: $!";
+            warn "[WARNING] Can't open file `$self` for writing: $!";
             return undef;
         };
 
         (print $fh "$string") || do {
-            warn "[WARNING] Can't write to file `$self': $!";
+            warn "[WARNING] Can't write to file `$self`: $!";
             return undef;
         };
 
@@ -425,12 +425,12 @@ package Sidef::Types::Glob::File {
         $mode = defined($mode) ? "$mode" : 'utf8';
 
         open(my $fh, ">>:$mode", "$self") || do {
-            warn "[WARNING] Can't open file `$self' for appending: $!";
+            warn "[WARNING] Can't open file `$self` for appending: $!";
             return undef;
         };
 
         (print $fh "$string") || do {
-            warn "[WARNING] Can't append to file `$self': $!";
+            warn "[WARNING] Can't append to file `$self`: $!";
             return undef;
         };
 
