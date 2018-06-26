@@ -8,7 +8,8 @@ package Sidef::Types::String::String {
     use overload
       q{bool} => \&get_value,
       q{0+}   => \&get_value,
-      q{""}   => \&get_value;
+      q{""}   => \&get_value,
+      q{@{}}  => \&chars;
 
     use Sidef::Types::Bool::Bool;
     use Sidef::Types::Number::Number;
