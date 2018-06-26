@@ -2516,10 +2516,10 @@ package Sidef::Types::Number::Number {
 
             $y = Math::GMPz::Rmpz_get_ui($y);
 
-            my $t = Math::GMPz::Rmpz_init();
             my $e = (Math::GMPz::Rmpz_sizeinbase($x, $y) || return) - 1;
 
             if ($e > 0) {
+                my $t = Math::GMPz::Rmpz_init();
 
                 $y == 2
                   ? Math::GMPz::Rmpz_setbit($t, $e)
@@ -8100,7 +8100,6 @@ package Sidef::Types::Number::Number {
                 return $t;
             }
 
-            my $t = Math::GMPz::Rmpz_init();
             my $u = Math::GMPz::Rmpz_init();
             my $d = Math::GMPz::Rmpz_init_set_ui(0);
 
@@ -8116,8 +8115,8 @@ package Sidef::Types::Number::Number {
                     Math::GMPz::Rmpz_divexact_ui($u, $n, $p);
                 }
                 else {
-                    Math::GMPz::Rmpz_set_str($t, "$p", 10);
-                    Math::GMPz::Rmpz_divexact($u, $n, $t);
+                    Math::GMPz::Rmpz_set_str($u, "$p", 10);
+                    Math::GMPz::Rmpz_divexact($u, $n, $u);
                 }
 
                 Math::GMPz::Rmpz_add($d, $d, $u);
