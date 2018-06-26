@@ -736,7 +736,7 @@ sub __load_sidef_module__ {
 FOOT
 
     my $requirify = sub {
-        join('', map { "__load_sidef_module__('${_}');\n" } @_);
+        join('', map { "__load_sidef_module__('${_}');\n" } grep { $_ ne 'Sidef::Optimizer' } @_);
     };
 
     $package_content .= $requirify->(_get_loaded_modules(), 'Sidef::Module::OO', 'Sidef::Module::Func');
