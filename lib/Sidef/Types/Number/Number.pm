@@ -8328,6 +8328,64 @@ package Sidef::Types::Number::Number {
         __PACKAGE__->_set_uint(scalar keys %factors);
     }
 
+    sub usigma0 {
+
+        # Identity:
+        #   usigma0(n) = 2^omega(n)
+
+        my %factors;
+        @factors{Math::Prime::Util::GMP::factor(&_big2uistr // goto &nan)} = ();
+        my $r = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_setbit($r, scalar keys %factors);
+        bless \$r;
+    }
+
+    sub usigma {
+        my ($n, $k) = @_;
+
+        # Interesting identity:
+        #   usigma(n, k) = sigma(n^(2*k) / rad(n)) / sigma(n^k / rad(n))
+
+        # Multiplicative with:
+        #   usigma(p^e, k) = p^(k*e) + 1
+
+        if (defined($k)) {
+            _valid(\$k);
+            $k = _any2ui($$k) // goto &nan;
+        }
+        else {
+            $k = 1;
+        }
+
+        my %factors;
+        ++$factors{$_} for Math::Prime::Util::GMP::factor(&_big2uistr // goto &nan);
+
+        my $t = Math::GMPz::Rmpz_init();
+
+        if ($k == 0) {
+            Math::GMPz::Rmpz_setbit($t, scalar keys %factors);
+            return bless \$t;
+        }
+
+        my $s = Math::GMPz::Rmpz_init_set_ui(1);
+
+        while (my ($p, $e) = each %factors) {
+
+            if ($p > ULONG_MAX) {
+                Math::GMPz::Rmpz_set_str($t, "$p", 10);
+                Math::GMPz::Rmpz_pow_ui($t, $t, $k * $e);
+            }
+            else {
+                Math::GMPz::Rmpz_ui_pow_ui($t, $p, $k * $e);
+            }
+
+            Math::GMPz::Rmpz_add_ui($t, $t, 1);
+            Math::GMPz::Rmpz_mul($s, $s, $t);
+        }
+
+        bless \$s;
+    }
+
     sub sigma0 {
         my $str = &_big2uistr // goto &nan;
         $str eq '0' && return ZERO;
@@ -8336,16 +8394,16 @@ package Sidef::Types::Number::Number {
     }
 
     sub sigma {
-        my ($x, $y) = @_;
+        my ($n, $k) = @_;
 
-        my $n = defined($y)
+        my $s = defined($k)
           ? do {
-            _valid(\$y);
-            Math::Prime::Util::GMP::sigma(_big2uistr($x) // (goto &nan), _big2uistr($y) // (goto &nan));
+            _valid(\$k);
+            Math::Prime::Util::GMP::sigma(_big2uistr($n) // (goto &nan), _any2ui($$k) // (goto &nan));
           }
           : Math::Prime::Util::GMP::sigma(&_big2uistr // (goto &nan), 1);
 
-        $n < ULONG_MAX ? __PACKAGE__->_set_uint($n) : __PACKAGE__->_set_str('int', $n);
+        $s < ULONG_MAX ? __PACKAGE__->_set_uint($s) : __PACKAGE__->_set_str('int', $s);
     }
 
     sub partitions {

@@ -2677,6 +2677,22 @@ Aliases: I<variations_with_repetition>
 
 =cut
 
+=head2 usigma
+
+Number.usigma() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 usigma0
+
+Number.usigma0() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 valuation
 
 Number.valuation() -> I<Obj>
