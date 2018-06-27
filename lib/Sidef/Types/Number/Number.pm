@@ -8081,6 +8081,7 @@ package Sidef::Types::Number::Number {
     sub rad {
         my %f;
         @f{Math::Prime::Util::GMP::factor(&_big2uistr // goto &nan)} = ();
+        exists($f{'0'}) and return ONE;
         my $r = Math::Prime::Util::GMP::vecprod(CORE::keys %f);
         $r < ULONG_MAX ? __PACKAGE__->_set_uint($r) : __PACKAGE__->_set_str('int', $r);
     }
