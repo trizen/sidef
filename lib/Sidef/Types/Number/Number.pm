@@ -8335,6 +8335,9 @@ package Sidef::Types::Number::Number {
 
         my %factors;
         @factors{Math::Prime::Util::GMP::factor(&_big2uistr // goto &nan)} = ();
+
+        exists($factors{'0'}) and return ZERO;
+
         my $r = Math::GMPz::Rmpz_init();
         Math::GMPz::Rmpz_setbit($r, scalar keys %factors);
         bless \$r;
@@ -8359,6 +8362,8 @@ package Sidef::Types::Number::Number {
 
         my %factors;
         ++$factors{$_} for Math::Prime::Util::GMP::factor(&_big2uistr // goto &nan);
+
+        exists($factors{'0'}) and return ZERO;
 
         my $t = Math::GMPz::Rmpz_init();
 
