@@ -8210,6 +8210,67 @@ package Sidef::Types::Number::Number {
                                        );
     }
 
+    sub udivisors {
+        my ($n) = @_;
+
+        $n = _any2mpz($$n) // return Sidef::Types::Array::Array->new();
+
+        my %factors;
+        ++$factors{$_} for Math::Prime::Util::GMP::factor(scalar Math::GMPz::Rmpz_get_str($n, 10));
+
+        exists($factors{'0'}) and return Sidef::Types::Array::Array->new();
+
+        my @pp;
+        while (my ($p, $e) = each %factors) {
+
+            # Optimization for values of e <= 2
+            if ($e <= 2) {
+
+                if ($p < ULONG_MAX) {
+                    push @pp, scalar Math::GMPz::Rmpz_init_set_ui($p);
+                }
+                else {
+                    push @pp, scalar Math::GMPz::Rmpz_init_set_str("$p", 10);
+                }
+
+                if ($e == 2) {
+                    Math::GMPz::Rmpz_mul($pp[-1], $pp[-1], $pp[-1]);
+                }
+
+                next;
+            }
+
+            my $z = Math::GMPz::Rmpz_init();
+
+            if ($p < ULONG_MAX) {
+                Math::GMPz::Rmpz_ui_pow_ui($z, $p, $e);
+            }
+            else {
+                Math::GMPz::Rmpz_set_str($z, "$p", 10);
+                Math::GMPz::Rmpz_pow_ui($z, $z, $e);
+            }
+
+            push @pp, $z;
+        }
+
+        require Algorithm::Combinatorics;
+        my $iter = Algorithm::Combinatorics::subsets(\@pp);
+
+        my @d;
+        while (my $arr = $iter->next) {
+            my $t = Math::GMPz::Rmpz_init_set($n);
+            Math::GMPz::Rmpz_divexact($t, $t, $_) for @$arr;
+            push @d, $t;
+        }
+
+        @d = sort { Math::GMPz::Rmpz_cmp($a, $b) } @d;
+        @d = map { bless \$_ } @d;
+
+        Sidef::Types::Array::Array->new(\@d);
+    }
+
+    *unitary_divisors = \&udivisors;
+
     sub exp_mangoldt {
         my $n = Math::Prime::Util::GMP::exp_mangoldt(&_big2uistr || return ONE);
         $n eq '1' and return ONE;

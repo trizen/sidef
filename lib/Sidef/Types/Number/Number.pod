@@ -2677,6 +2677,16 @@ Aliases: I<variations_with_repetition>
 
 =cut
 
+=head2 udivisors
+
+Number.udivisors() -> I<Obj>
+
+Return the
+
+Aliases: I<unitary_divisors>
+
+=cut
+
 =head2 usigma
 
 Number.usigma() -> I<Obj>
