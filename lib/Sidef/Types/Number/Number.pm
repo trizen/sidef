@@ -8220,51 +8220,53 @@ package Sidef::Types::Number::Number {
 
         exists($factors{'0'}) and return Sidef::Types::Array::Array->new();
 
-        my @pp;
+        my @d;
         while (my ($p, $e) = each %factors) {
 
-            # Optimization for values of e <= 2
-            if ($e <= 2) {
+            my $pp;
+
+            if ($e <= 2) {    # p^e where e <= 2
 
                 if ($p < ULONG_MAX) {
-                    push @pp, scalar Math::GMPz::Rmpz_init_set_ui($p);
+                    $pp = Math::GMPz::Rmpz_init_set_ui($p);
                 }
                 else {
-                    push @pp, scalar Math::GMPz::Rmpz_init_set_str("$p", 10);
+                    $pp = Math::GMPz::Rmpz_init_set_str("$p", 10);
                 }
 
                 if ($e == 2) {
-                    Math::GMPz::Rmpz_mul($pp[-1], $pp[-1], $pp[-1]);
+                    Math::GMPz::Rmpz_mul($pp, $pp, $pp);
                 }
+            }
+            else {    # p^e where e >= 3
 
-                next;
+                $pp = Math::GMPz::Rmpz_init();
+
+                if ($p < ULONG_MAX) {
+                    Math::GMPz::Rmpz_ui_pow_ui($pp, $p, $e);
+                }
+                else {
+                    Math::GMPz::Rmpz_set_str($pp, "$p", 10);
+                    Math::GMPz::Rmpz_pow_ui($pp, $pp, $e);
+                }
             }
 
-            my $z = Math::GMPz::Rmpz_init();
+            my @t;
 
-            if ($p < ULONG_MAX) {
-                Math::GMPz::Rmpz_ui_pow_ui($z, $p, $e);
-            }
-            else {
-                Math::GMPz::Rmpz_set_str($z, "$p", 10);
-                Math::GMPz::Rmpz_pow_ui($z, $z, $e);
+            foreach my $d (@d) {
+                my $t = Math::GMPz::Rmpz_init();
+                Math::GMPz::Rmpz_mul($t, $d, $pp);
+                push @t, $t;
             }
 
-            push @pp, $z;
-        }
-
-        require Algorithm::Combinatorics;
-        my $iter = Algorithm::Combinatorics::subsets(\@pp);
-
-        my @d;
-        while (my $arr = $iter->next) {
-            my $t = Math::GMPz::Rmpz_init_set($n);
-            Math::GMPz::Rmpz_divexact($t, $t, $_) for @$arr;
-            push @d, $t;
+            push @d, $pp;
+            push @d, @t;
         }
 
         @d = sort { Math::GMPz::Rmpz_cmp($a, $b) } @d;
         @d = map { bless \$_ } @d;
+
+        unshift @d, ONE;
 
         Sidef::Types::Array::Array->new(\@d);
     }
