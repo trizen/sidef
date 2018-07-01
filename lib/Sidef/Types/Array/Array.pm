@@ -2531,6 +2531,10 @@ package Sidef::Types::Array::Array {
 
         require Algorithm::Combinatorics;
 
+        if (not defined($block) and ref($k) eq 'Sidef::Types::Block::Block') {
+            ($block, $k) = ($k, undef);
+        }
+
         my $iter = do {
             local $SIG{__WARN__} = sub { };
             Algorithm::Combinatorics::partitions([@$self], defined($k) ? CORE::int($k) : ());
