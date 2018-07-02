@@ -8211,12 +8211,10 @@ package Sidef::Types::Number::Number {
     }
 
     sub udivisors {
-        my ($n) = @_;
-
-        $n = _any2mpz($$n) // return Sidef::Types::Array::Array->new();
+        my $n = &_big2uistr || return Sidef::Types::Array::Array->new();
 
         my %factors;
-        ++$factors{$_} for Math::Prime::Util::GMP::factor(scalar Math::GMPz::Rmpz_get_str($n, 10));
+        ++$factors{$_} for Math::Prime::Util::GMP::factor($n);
 
         exists($factors{'0'}) and return Sidef::Types::Array::Array->new();
 
