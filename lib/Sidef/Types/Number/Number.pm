@@ -3995,7 +3995,7 @@ package Sidef::Types::Number::Number {
         $num = Math::GMPz::Rmpz_init_set_str($num, 10);
         $den = Math::GMPz::Rmpz_init_set_str($den, 10);
 
-        Math::GMPz::Rmpz_abs($num, $num);
+        Math::GMPz::Rmpz_abs($num, $num) if !($n & 1);
 
         my $r = Math::GMPz::Rmpz_init();
         Math::GMPz::Rmpz_setbit($r, $n);
