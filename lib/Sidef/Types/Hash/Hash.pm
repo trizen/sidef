@@ -143,7 +143,7 @@ package Sidef::Types::Hash::Hash {
         my ($self, $obj) = @_;
 
         if (ref($self) ne ref($obj)
-            or %$self ne %{$obj}) {
+            or scalar(CORE::keys(%$self)) != scalar(CORE::keys(%{$obj}))) {
             return (Sidef::Types::Bool::Bool::FALSE);
         }
 
