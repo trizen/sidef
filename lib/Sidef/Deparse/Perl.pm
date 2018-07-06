@@ -1486,9 +1486,9 @@ HEADER
 
                 if (defined $method) {
 
-                    if ($ref eq 'Sidef::Variable::Ref') {    # variable refs
+                    if ($ref eq 'Sidef::Variable::Ref') {    # variables
 
-                        # Variable refencing
+                        # Variable referencing
                         if ($method eq '\\' or $method eq '&') {
                             $code = '\\' . $self->deparse_args(@{$call->{arg}});
                             next;

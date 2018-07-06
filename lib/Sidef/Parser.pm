@@ -2977,7 +2977,7 @@ package Sidef::Parser {
                     $self->parse_suffixes(code => $opt{code}, struct => \%struct) && redo;
                 }
 
-                # Tight bound operator
+                # Tight-binded operator
                 if (
                     /\G(?!\h*[=-]>)/
                     && (
