@@ -720,8 +720,12 @@ HEADER
             if (not exists $obj->{inited}) {
                 $obj->{inited} = 1;
 
-                # Use dynamical constants inside functions
-                if (exists($self->{function}) or (exists($self->{class}) and $] >= 5.022)) {
+                # Use dynamical constants inside blocks or classes
+                if (
+                    exists($self->{class})
+                    ? ($] >= 5.022 or $self->{class} != $self->{current_block})
+                    : exists($self->{current_block})
+                  ) {
 
                     # This is no longer needed in Perl>=5.25.2
                     $] < 5.025002 && $self->top_add(q{use feature 'lexical_subs'; no warnings 'experimental::lexical_subs';});

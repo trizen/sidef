@@ -8,4 +8,66 @@ func f(a) {
 assert_eq(f(40), 42)
 assert_eq(f(33), 35)
 
+var arr = []
+
+for n in (1..3) {
+    const x = 42+n
+    arr << x
+}
+
+assert_eq(arr, [43, 44, 45])
+
+class Example() {
+
+    var arr = []
+
+    for n in (1..3) {
+        const x = 13+n
+        arr << x
+    }
+
+    assert_eq(arr, [14, 15, 16])
+
+    var arrs = []
+    for k in (1..3) {
+        var arr = []
+
+        for n in (k! .. k!+2) {
+            const x = 13+n
+            arr << x
+        }
+
+        arrs << arr
+    }
+
+    assert_eq(arrs[0], [14, 15, 16])
+    assert_eq(arrs[1], [15, 16, 17])
+    assert_eq(arrs[2], [19, 20, 21])
+
+    var t = 42
+    const z = t+8
+    assert_eq(z, 50)
+
+    method test(v) {
+        const u = v+5
+        assert_eq(u, v+5)
+        self
+    }
+}
+
+Example().test(42).test(30)
+Example().test(99)
+
+var z = 0
+while (z < 3) {
+    const x = 42+z
+    assert_eq(x, 42+z)
+    ++z
+}
+
+for (var a = 0; a < 3; ++a) {
+    const x = 42+a
+    assert_eq(x, 42+a)
+}
+
 say "** Test passed!"
