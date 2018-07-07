@@ -918,6 +918,7 @@ scripts/Tests/unary_inc_dec.sf
 scripts/Tests/unexecuted_arguments.sf
 scripts/Tests/unicode.sf
 scripts/Tests/unicode_support.sf
+scripts/Tests/unicode_whitespaces.sf
 scripts/Tests/url_encoding_decoding.sf
 scripts/Tests/var_ref.sf
 scripts/Tests/var_scoping.sf
