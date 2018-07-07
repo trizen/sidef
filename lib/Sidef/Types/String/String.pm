@@ -722,7 +722,7 @@ package Sidef::Types::String::String {
 
     sub graphemes {
         my ($self) = @_;
-        Sidef::Types::Array::Array->new([map { bless \$_ } map { /\X/g } $$self]);
+        Sidef::Types::Array::Array->new([map { bless \$_ } $$self =~ /(\X)/g]);
     }
 
     *graphs = \&graphemes;

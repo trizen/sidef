@@ -11,6 +11,7 @@ package Sidef::Types::Hash::Hash {
       q{""}   => \&_dump;
 
     use Sidef::Types::Bool::Bool;
+    use Sidef::Types::Number::Number;
 
     sub new {
         my (undef, %pairs) = @_;
@@ -83,7 +84,7 @@ package Sidef::Types::Hash::Hash {
 
     sub length {
         my ($self) = @_;
-        Sidef::Types::Number::Number->new(scalar CORE::keys(%$self));
+        Sidef::Types::Number::Number->_set_uint(scalar CORE::keys(%$self));
     }
 
     *len  = \&length;
@@ -265,7 +266,7 @@ package Sidef::Types::Hash::Hash {
             }
         }
 
-        Sidef::Types::Number::Number->new($count);
+        Sidef::Types::Number::Number->_set_uint($count);
     }
 
     *count_by = \&count;
