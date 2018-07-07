@@ -5160,7 +5160,7 @@ package Sidef::Types::Number::Number {
         }
 
       Math_MPFR: {
-            return Math::MPFR::Rmpfr_get_str($x, $base, CORE::int($PREC) >> 2, $ROUND);
+            return Math::MPFR::Rmpfr_get_str($x, $base, 0, $ROUND);
         }
 
       Math_MPC: {
@@ -5178,6 +5178,7 @@ package Sidef::Types::Number::Number {
         my ($x, $y) = @_;
 
         my $base = 10;
+
         if (defined($y)) {
             _valid(\$y);
             $base = _any2ui($$y) // 0;
@@ -5186,7 +5187,13 @@ package Sidef::Types::Number::Number {
             }
         }
 
-        Sidef::Types::String::String->new(($base == 10) ? __stringify__($$x) : __base__($$x, $base));
+        $x = $$x;
+
+        Sidef::Types::String::String->new(
+                                          ($base == 10 and (ref($x) eq 'Math::MPFR' or ref($x) eq 'Math::MPC'))
+                                          ? __stringify__($x)
+                                          : __base__($x, $base)
+                                         );
     }
 
     *in_base = \&base;
