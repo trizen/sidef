@@ -30,6 +30,10 @@ package Sidef::Types::Range::RangeNumber {
             $from = Sidef::Types::Number::Number::ZERO;
         }
 
+        if (ref($to) eq __PACKAGE__) {
+            $to = $to->{to};
+        }
+
         bless {
                from => $from,
                to   => $to,
