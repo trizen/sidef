@@ -8317,6 +8317,45 @@ package Sidef::Types::Number::Number {
         Sidef::Types::Array::Array->new(\@d);
     }
 
+    sub unitary_squarefree_divisors {
+        my $n = &_big2uistr || return Sidef::Types::Array::Array->new();
+
+        my %factors;
+        ++$factors{$_} for Math::Prime::Util::GMP::factor($n);
+        exists($factors{'0'}) and return Sidef::Types::Array::Array->new();
+
+        my @d;
+        while (my ($p, $e) = each %factors) {
+
+            $e == 1 or next;
+
+            $p = (
+                  $p < ULONG_MAX
+                  ? Math::GMPz::Rmpz_init_set_ui($p)
+                  : Math::GMPz::Rmpz_init_set_str("$p", 10)
+                 );
+
+            my @t;
+            foreach my $d (@d) {
+                my $t = Math::GMPz::Rmpz_init();
+                Math::GMPz::Rmpz_mul($t, $d, $p);
+                push @t, $t;
+            }
+
+            push @d, @t;
+            push @d, $p;
+        }
+
+        @d = sort { Math::GMPz::Rmpz_cmp($a, $b) } @d;
+        @d = map { bless \$_ } @d;
+
+        unshift @d, ONE;
+
+        Sidef::Types::Array::Array->new(\@d);
+    }
+
+    *squarefree_udivisors = \&unitary_squarefree_divisors;
+
     sub exp_mangoldt {
         my $n = Math::Prime::Util::GMP::exp_mangoldt(&_big2uistr || return ONE);
         $n eq '1' and return ONE;

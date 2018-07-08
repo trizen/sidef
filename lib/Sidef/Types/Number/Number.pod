@@ -2579,6 +2579,16 @@ Return the
 
 =cut
 
+=head2 squarefree_udivisors
+
+Number.squarefree_udivisors() -> I<Obj>
+
+Return the
+
+Aliases: I<unitary_squarefree_divisors>
+
+=cut
+
 =head2 stirling
 
 Number.stirling() -> I<Obj>
