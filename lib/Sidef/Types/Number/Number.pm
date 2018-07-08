@@ -7402,12 +7402,12 @@ package Sidef::Types::Number::Number {
 
     *cyclotomic = \&cyclotomic_polynomial;
 
-    sub square_free_count {
+    sub squarefree_count {
         my ($from, $to) = @_;
 
         if (defined($to)) {
             _valid(\$to);
-            return $to->square_free_count->sub($from->dec->square_free_count);
+            return $to->squarefree_count->sub($from->dec->squarefree_count);
         }
 
         (my $n = __numify__($$from)) <= 0 && return ZERO;
@@ -7467,6 +7467,8 @@ package Sidef::Types::Number::Number {
 
         bless \$c;
     }
+
+    *square_free_count = \&squarefree_count;
 
     sub _Li_inverse {
         my ($x) = @_;
@@ -8280,6 +8282,41 @@ package Sidef::Types::Number::Number {
 
     *unitary_divisors = \&udivisors;
 
+    sub squarefree_divisors {
+        my $n = &_big2uistr || return Sidef::Types::Array::Array->new();
+
+        my %factors;
+        @factors{Math::Prime::Util::GMP::factor($n)} = ();
+        exists($factors{'0'}) and return Sidef::Types::Array::Array->new();
+
+        my @d;
+        foreach my $p (keys %factors) {
+
+            $p = (
+                  $p < ULONG_MAX
+                  ? Math::GMPz::Rmpz_init_set_ui($p)
+                  : Math::GMPz::Rmpz_init_set_str("$p", 10)
+                 );
+
+            my @t;
+            foreach my $d (@d) {
+                my $t = Math::GMPz::Rmpz_init();
+                Math::GMPz::Rmpz_mul($t, $d, $p);
+                push @t, $t;
+            }
+
+            push @d, @t;
+            push @d, $p;
+        }
+
+        @d = sort { Math::GMPz::Rmpz_cmp($a, $b) } @d;
+        @d = map { bless \$_ } @d;
+
+        unshift @d, ONE;
+
+        Sidef::Types::Array::Array->new(\@d);
+    }
+
     sub exp_mangoldt {
         my $n = Math::Prime::Util::GMP::exp_mangoldt(&_big2uistr || return ONE);
         $n eq '1' and return ONE;
@@ -8500,13 +8537,15 @@ package Sidef::Types::Number::Number {
           : Sidef::Types::Bool::Bool::FALSE;
     }
 
-    sub is_square_free {
+    sub is_squarefree {
         my ($x) = @_;
         __is_int__($$x)
           && Math::Prime::Util::GMP::moebius(_big2uistr($x) // return Sidef::Types::Bool::Bool::FALSE)
           ? Sidef::Types::Bool::Bool::TRUE
           : Sidef::Types::Bool::Bool::FALSE;
     }
+
+    *is_square_free = \&is_squarefree;
 
     sub is_totient {
         my ($x) = @_;

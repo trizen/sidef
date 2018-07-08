@@ -1679,6 +1679,8 @@ Number.is_square_free() -> I<Obj>
 
 Return the
 
+Aliases: I<is_squarefree>
+
 =cut
 
 =head2 is_totient
@@ -2562,6 +2564,16 @@ Return the
 =head2 square_free_count
 
 Number.square_free_count() -> I<Obj>
+
+Return the
+
+Aliases: I<squarefree_count>
+
+=cut
+
+=head2 squarefree_divisors
+
+Number.squarefree_divisors() -> I<Obj>
 
 Return the
 
