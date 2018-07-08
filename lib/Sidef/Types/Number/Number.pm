@@ -8354,7 +8354,8 @@ package Sidef::Types::Number::Number {
         Sidef::Types::Array::Array->new(\@d);
     }
 
-    *squarefree_udivisors = \&unitary_squarefree_divisors;
+    *squarefree_udivisors        = \&unitary_squarefree_divisors;
+    *squarefree_unitary_divisors = \&unitary_squarefree_divisors;
 
     sub exp_mangoldt {
         my $n = Math::Prime::Util::GMP::exp_mangoldt(&_big2uistr || return ONE);
@@ -8582,6 +8583,61 @@ package Sidef::Types::Number::Number {
         while (my ($p, $e) = each %factors) {
 
             $e == 1 or next;
+
+            if ($p < ULONG_MAX) {
+                Math::GMPz::Rmpz_ui_pow_ui($t, $p, $k);
+            }
+            else {
+                Math::GMPz::Rmpz_set_str($t, "$p", 10);
+                Math::GMPz::Rmpz_pow_ui($t, $t, $k);
+            }
+
+            Math::GMPz::Rmpz_add_ui($t, $t, 1);
+            Math::GMPz::Rmpz_mul($s, $s, $t);
+        }
+
+        bless \$s;
+    }
+
+    sub squarefree_sigma0 {
+
+        my %factors;
+        @factors{Math::Prime::Util::GMP::factor(&_big2uistr // goto &nan)} = ();
+        exists($factors{'0'}) and return ZERO;
+
+        my $r = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_setbit($r, scalar keys %factors);
+        bless \$r;
+    }
+
+    sub squarefree_sigma {
+        my ($n, $k) = @_;
+
+        # Multiplicative with:
+        #   a(p^e, k) = p^k + 1
+
+        if (defined($k)) {
+            _valid(\$k);
+            $k = _any2ui($$k) // goto &nan;
+        }
+        else {
+            $k = 1;
+        }
+
+        my %factors;
+        @factors{Math::Prime::Util::GMP::factor(&_big2uistr // goto &nan)} = ();
+        exists($factors{'0'}) and return ZERO;
+
+        my $t = Math::GMPz::Rmpz_init();
+
+        if ($k == 0) {
+            Math::GMPz::Rmpz_setbit($t, scalar keys %factors);
+            return bless \$t;
+        }
+
+        my $s = Math::GMPz::Rmpz_init_set_ui(1);
+
+        foreach my $p (keys %factors) {
 
             if ($p < ULONG_MAX) {
                 Math::GMPz::Rmpz_ui_pow_ui($t, $p, $k);

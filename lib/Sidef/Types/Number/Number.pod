@@ -2579,13 +2579,29 @@ Return the
 
 =cut
 
+=head2 squarefree_sigma
+
+Number.squarefree_sigma() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 squarefree_sigma0
+
+Number.squarefree_sigma0() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 squarefree_udivisors
 
 Number.squarefree_udivisors() -> I<Obj>
 
 Return the
 
-Aliases: I<unitary_squarefree_divisors>
+Aliases: I<squarefree_unitary_divisors>, I<unitary_squarefree_divisors>
 
 =cut
 
