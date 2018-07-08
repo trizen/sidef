@@ -2589,6 +2589,22 @@ Aliases: I<unitary_squarefree_divisors>
 
 =cut
 
+=head2 squarefree_usigma
+
+Number.squarefree_usigma() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 squarefree_usigma0
+
+Number.squarefree_usigma0() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 stirling
 
 Number.stirling() -> I<Obj>

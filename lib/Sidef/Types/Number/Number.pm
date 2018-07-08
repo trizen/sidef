@@ -8523,12 +8523,72 @@ package Sidef::Types::Number::Number {
 
         while (my ($p, $e) = each %factors) {
 
-            if ($p > ULONG_MAX) {
+            if ($p < ULONG_MAX) {
+                Math::GMPz::Rmpz_ui_pow_ui($t, $p, $k * $e);
+            }
+            else {
                 Math::GMPz::Rmpz_set_str($t, "$p", 10);
                 Math::GMPz::Rmpz_pow_ui($t, $t, $k * $e);
             }
+
+            Math::GMPz::Rmpz_add_ui($t, $t, 1);
+            Math::GMPz::Rmpz_mul($s, $s, $t);
+        }
+
+        bless \$s;
+    }
+
+    sub squarefree_usigma0 {
+
+        my %factors;
+        ++$factors{$_} for Math::Prime::Util::GMP::factor(&_big2uistr // goto &nan);
+
+        exists($factors{'0'}) and return ZERO;
+
+        my $r = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_setbit($r, scalar grep { $factors{$_} == 1 } keys %factors);
+        bless \$r;
+    }
+
+    sub squarefree_usigma {
+        my ($n, $k) = @_;
+
+        # Multiplicative with:
+        #   a(p, k)   = p^k + 1
+        #   a(p^e, k) = 1, for e>1
+
+        if (defined($k)) {
+            _valid(\$k);
+            $k = _any2ui($$k) // goto &nan;
+        }
+        else {
+            $k = 1;
+        }
+
+        my %factors;
+        ++$factors{$_} for Math::Prime::Util::GMP::factor(&_big2uistr // goto &nan);
+
+        exists($factors{'0'}) and return ZERO;
+
+        my $t = Math::GMPz::Rmpz_init();
+
+        if ($k == 0) {
+            Math::GMPz::Rmpz_setbit($t, scalar grep { $factors{$_} == 1 } keys %factors);
+            return bless \$t;
+        }
+
+        my $s = Math::GMPz::Rmpz_init_set_ui(1);
+
+        while (my ($p, $e) = each %factors) {
+
+            $e == 1 or next;
+
+            if ($p < ULONG_MAX) {
+                Math::GMPz::Rmpz_ui_pow_ui($t, $p, $k);
+            }
             else {
-                Math::GMPz::Rmpz_ui_pow_ui($t, $p, $k * $e);
+                Math::GMPz::Rmpz_set_str($t, "$p", 10);
+                Math::GMPz::Rmpz_pow_ui($t, $t, $k);
             }
 
             Math::GMPz::Rmpz_add_ui($t, $t, 1);
