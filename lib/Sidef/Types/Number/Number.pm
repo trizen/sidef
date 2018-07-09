@@ -674,6 +674,7 @@ package Sidef::Types::Number::Number {
         }
     }
 
+    # Big to (signed) integer-string
     sub _big2istr {
         my ($x) = @_;
 
@@ -683,12 +684,24 @@ package Sidef::Types::Number::Number {
         Math::GMPz::Rmpz_get_str($x, 10);
     }
 
+    # Big to unsigned (non-negative) integer-string
     sub _big2uistr {
         my ($x) = @_;
 
         $x = $$x;
         $x = (_any2mpz($x) // return undef) if ref($x) ne 'Math::GMPz';
         Math::GMPz::Rmpz_sgn($x) >= 0 or return undef;
+
+        Math::GMPz::Rmpz_get_str($x, 10);
+    }
+
+    # Big to positive integer-string
+    sub _big2pistr {
+        my ($x) = @_;
+
+        $x = $$x;
+        $x = (_any2mpz($x) // return undef) if ref($x) ne 'Math::GMPz';
+        Math::GMPz::Rmpz_sgn($x) > 0 or return undef;
 
         Math::GMPz::Rmpz_get_str($x, 10);
     }
@@ -8176,10 +8189,9 @@ package Sidef::Types::Number::Number {
 
     sub factor {
         Sidef::Types::Array::Array->new(
-            [map { $_ < ULONG_MAX ? __PACKAGE__->_set_uint($_) : __PACKAGE__->_set_str('int', $_) }
-
-               Math::Prime::Util::GMP::factor(&_big2uistr || return Sidef::Types::Array::Array->new())
-            ]
+                                     [map { $_ < ULONG_MAX ? __PACKAGE__->_set_uint($_) : __PACKAGE__->_set_str('int', $_) }
+                                        Math::Prime::Util::GMP::factor(&_big2pistr || return Sidef::Types::Array::Array->new())
+                                     ]
         );
     }
 
@@ -8187,7 +8199,7 @@ package Sidef::Types::Number::Number {
 
     sub factor_exp {
         my %count;
-        foreach my $f (Math::Prime::Util::GMP::factor(&_big2uistr || return Sidef::Types::Array::Array->new())) {
+        foreach my $f (Math::Prime::Util::GMP::factor(&_big2pistr || return Sidef::Types::Array::Array->new())) {
             ++$count{$f};
         }
 
@@ -8212,7 +8224,7 @@ package Sidef::Types::Number::Number {
     *factors_exp = \&factor_exp;
 
     sub divisors {
-        my $n = &_big2uistr || return Sidef::Types::Array::Array->new();
+        my $n = &_big2pistr || return Sidef::Types::Array::Array->new();
 
         Sidef::Types::Array::Array->new(
                                         [map { $_ < ULONG_MAX ? __PACKAGE__->_set_uint($_) : __PACKAGE__->_set_str('int', $_) }
@@ -8222,12 +8234,10 @@ package Sidef::Types::Number::Number {
     }
 
     sub udivisors {
-        my $n = &_big2uistr || return Sidef::Types::Array::Array->new();
+        my $n = &_big2pistr || return Sidef::Types::Array::Array->new();
 
         my %factors;
         ++$factors{$_} for Math::Prime::Util::GMP::factor($n);
-
-        exists($factors{'0'}) and return Sidef::Types::Array::Array->new();
 
         my @d;
         while (my ($p, $e) = each %factors) {
@@ -8283,11 +8293,10 @@ package Sidef::Types::Number::Number {
     *unitary_divisors = \&udivisors;
 
     sub squarefree_divisors {
-        my $n = &_big2uistr || return Sidef::Types::Array::Array->new();
+        my $n = &_big2pistr || return Sidef::Types::Array::Array->new();
 
         my %factors;
         @factors{Math::Prime::Util::GMP::factor($n)} = ();
-        exists($factors{'0'}) and return Sidef::Types::Array::Array->new();
 
         my @d;
         foreach my $p (keys %factors) {
@@ -8318,11 +8327,10 @@ package Sidef::Types::Number::Number {
     }
 
     sub unitary_squarefree_divisors {
-        my $n = &_big2uistr || return Sidef::Types::Array::Array->new();
+        my $n = &_big2pistr || return Sidef::Types::Array::Array->new();
 
         my %factors;
         ++$factors{$_} for Math::Prime::Util::GMP::factor($n);
-        exists($factors{'0'}) and return Sidef::Types::Array::Array->new();
 
         my @d;
         while (my ($p, $e) = each %factors) {
@@ -8356,6 +8364,51 @@ package Sidef::Types::Number::Number {
 
     *squarefree_udivisors        = \&unitary_squarefree_divisors;
     *squarefree_unitary_divisors = \&unitary_squarefree_divisors;
+
+    sub prime_divisors {
+        my $n = &_big2pistr || return Sidef::Types::Array::Array->new();
+
+        my %factors;
+        @factors{Math::Prime::Util::GMP::factor($n)} = ();
+
+        my @d;
+        foreach my $p (sort { (length($a) <=> length($b)) || ($a cmp $b) } keys %factors) {
+            push @d,
+              (
+                $p < ULONG_MAX
+                ? __PACKAGE__->_set_uint($p)
+                : bless \Math::GMPz::Rmpz_init_set_str("$p", 10)
+              );
+        }
+
+        Sidef::Types::Array::Array->new(\@d);
+    }
+
+    sub prime_udivisors {
+        my $n = &_big2pistr || return Sidef::Types::Array::Array->new();
+
+        my %factors;
+        ++$factors{$_} for Math::Prime::Util::GMP::factor($n);
+
+        my @factors;
+        while (my ($p, $e) = each %factors) {
+            if ($e == 1) {
+                push @factors, $p;
+            }
+        }
+
+        my @d;
+        foreach my $p (sort { (length($a) <=> length($b)) || ($a cmp $b) } @factors) {
+            push @d,
+              (
+                $p < ULONG_MAX
+                ? __PACKAGE__->_set_uint($p)
+                : bless \Math::GMPz::Rmpz_init_set_str("$p", 10)
+              );
+        }
+
+        Sidef::Types::Array::Array->new(\@d);
+    }
 
     sub exp_mangoldt {
         my $n = Math::Prime::Util::GMP::exp_mangoldt(&_big2uistr || return ONE);

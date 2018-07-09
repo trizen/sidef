@@ -2231,6 +2231,14 @@ Aliases: I<nth_prime>
 
 =cut
 
+=head2 prime_divisors
+
+Number.prime_divisors() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 primepi
 
 Number.primepi() -> I<Obj>
@@ -2260,6 +2268,14 @@ Return the
 =head2 primes
 
 Number.primes() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 prime_udivisors
+
+Number.prime_udivisors() -> I<Obj>
 
 Return the
 
