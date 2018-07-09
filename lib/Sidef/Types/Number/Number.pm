@@ -8655,22 +8655,27 @@ package Sidef::Types::Number::Number {
     }
 
     sub sigma0 {
-        my $str = &_big2uistr // goto &nan;
-        $str eq '0' && return ZERO;
-        my $n = Math::Prime::Util::GMP::sigma($str, 0);
-        $n < ULONG_MAX ? __PACKAGE__->_set_uint($n) : __PACKAGE__->_set_str('int', $n);
+        my $n = &_big2uistr // goto &nan;
+        $n eq '0' and return ZERO;
+        my $s = Math::Prime::Util::GMP::sigma($n, 0);
+        $s < ULONG_MAX ? __PACKAGE__->_set_uint($s) : __PACKAGE__->_set_str('int', $s);
     }
 
     sub sigma {
         my ($n, $k) = @_;
 
-        my $s = defined($k)
-          ? do {
+        if (defined($k)) {
             _valid(\$k);
-            Math::Prime::Util::GMP::sigma(_big2uistr($n) // (goto &nan), _any2ui($$k) // (goto &nan));
-          }
-          : Math::Prime::Util::GMP::sigma(&_big2uistr // (goto &nan), 1);
+            $k = _any2ui($$k) // goto &nan;
+        }
+        else {
+            $k = 1;
+        }
 
+        $n = _big2uistr($n) // (goto &nan);
+        $n eq '0' and return ZERO;
+
+        my $s = Math::Prime::Util::GMP::sigma($n, $k);
         $s < ULONG_MAX ? __PACKAGE__->_set_uint($s) : __PACKAGE__->_set_str('int', $s);
     }
 
