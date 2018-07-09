@@ -8518,7 +8518,9 @@ package Sidef::Types::Number::Number {
     *Liouville = \&liouville;
 
     sub big_omega {
-        __PACKAGE__->_set_uint(scalar Math::Prime::Util::GMP::factor(&_big2uistr // goto &nan));
+        my $n = &_big2uistr // goto &nan;
+        $n eq '0' and return ZERO;
+        __PACKAGE__->_set_uint(scalar Math::Prime::Util::GMP::factor($n));
     }
 
     *Omega = \&big_omega;
@@ -8526,8 +8528,11 @@ package Sidef::Types::Number::Number {
     sub omega {
         my %factors;
         @factors{Math::Prime::Util::GMP::factor(&_big2uistr // goto &nan)} = ();
+        exists($factors{'0'}) and return ZERO;
         __PACKAGE__->_set_uint(scalar keys %factors);
     }
+
+    *prime_sigma0 = \&omega;
 
     sub usigma0 {
 
@@ -8536,7 +8541,6 @@ package Sidef::Types::Number::Number {
 
         my %factors;
         @factors{Math::Prime::Util::GMP::factor(&_big2uistr // goto &nan)} = ();
-
         exists($factors{'0'}) and return ZERO;
 
         my $r = Math::GMPz::Rmpz_init();
@@ -8562,8 +8566,7 @@ package Sidef::Types::Number::Number {
         }
 
         my %factors;
-        ++$factors{$_} for Math::Prime::Util::GMP::factor(&_big2uistr // goto &nan);
-
+        ++$factors{$_} for Math::Prime::Util::GMP::factor(_big2uistr($n) // goto &nan);
         exists($factors{'0'}) and return ZERO;
 
         my $t = Math::GMPz::Rmpz_init();
@@ -8620,8 +8623,7 @@ package Sidef::Types::Number::Number {
         }
 
         my %factors;
-        ++$factors{$_} for Math::Prime::Util::GMP::factor(&_big2uistr // goto &nan);
-
+        ++$factors{$_} for Math::Prime::Util::GMP::factor(_big2uistr($n) // goto &nan);
         exists($factors{'0'}) and return ZERO;
 
         my $t = Math::GMPz::Rmpz_init();
@@ -8678,7 +8680,7 @@ package Sidef::Types::Number::Number {
         }
 
         my %factors;
-        @factors{Math::Prime::Util::GMP::factor(&_big2uistr // goto &nan)} = ();
+        @factors{Math::Prime::Util::GMP::factor(_big2uistr($n) // goto &nan)} = ();
         exists($factors{'0'}) and return ZERO;
 
         my $t = Math::GMPz::Rmpz_init();
@@ -8702,6 +8704,105 @@ package Sidef::Types::Number::Number {
 
             Math::GMPz::Rmpz_add_ui($t, $t, 1);
             Math::GMPz::Rmpz_mul($s, $s, $t);
+        }
+
+        bless \$s;
+    }
+
+    sub prime_sigma {
+        my ($n, $k) = @_;
+
+        # Additive with:
+        #   a(p^e, k) = p^k
+
+        if (defined($k)) {
+            _valid(\$k);
+            $k = _any2ui($$k) // goto &nan;
+        }
+        else {
+            $k = 1;
+        }
+
+        my %factors;
+        @factors{Math::Prime::Util::GMP::factor(_big2uistr($n) // goto &nan)} = ();
+        exists($factors{'0'}) and return ZERO;
+
+        if ($k == 0) {
+            return __PACKAGE__->_set_uint(scalar keys %factors);
+        }
+
+        my $t = Math::GMPz::Rmpz_init();
+        my $s = Math::GMPz::Rmpz_init_set_ui(0);
+
+        foreach my $p (keys %factors) {
+
+            if ($p < ULONG_MAX) {
+                Math::GMPz::Rmpz_ui_pow_ui($t, $p, $k);
+            }
+            else {
+                Math::GMPz::Rmpz_set_str($t, "$p", 10);
+                Math::GMPz::Rmpz_pow_ui($t, $t, $k);
+            }
+
+            Math::GMPz::Rmpz_add($s, $s, $t);
+        }
+
+        bless \$s;
+    }
+
+    sub prime_usigma0 {
+
+        my %factors;
+        ++$factors{$_} for Math::Prime::Util::GMP::factor(&_big2uistr // goto &nan);
+        exists($factors{'0'}) and return ZERO;
+
+        __PACKAGE__->_set_uint(scalar grep { $factors{$_} == 1 } keys %factors);
+    }
+
+    sub prime_usigma {
+        my ($n, $k) = @_;
+
+        # Additive with:
+        #   a(p,   k) = p^k
+        #   a(p^e, k) = 0 for e>1
+
+        if (defined($k)) {
+            _valid(\$k);
+            $k = _any2ui($$k) // goto &nan;
+        }
+        else {
+            $k = 1;
+        }
+
+        my %factors;
+        ++$factors{$_} for Math::Prime::Util::GMP::factor(_big2uistr($n) // goto &nan);
+        exists($factors{'0'}) and return ZERO;
+
+        my @factors;
+        while (my ($p, $e) = each %factors) {
+            if ($e == 1) {
+                push @factors, $p;
+            }
+        }
+
+        if ($k == 0) {
+            return __PACKAGE__->_set_uint(scalar @factors);
+        }
+
+        my $t = Math::GMPz::Rmpz_init();
+        my $s = Math::GMPz::Rmpz_init_set_ui(0);
+
+        foreach my $p (@factors) {
+
+            if ($p < ULONG_MAX) {
+                Math::GMPz::Rmpz_ui_pow_ui($t, $p, $k);
+            }
+            else {
+                Math::GMPz::Rmpz_set_str($t, "$p", 10);
+                Math::GMPz::Rmpz_pow_ui($t, $t, $k);
+            }
+
+            Math::GMPz::Rmpz_add($s, $s, $t);
         }
 
         bless \$s;

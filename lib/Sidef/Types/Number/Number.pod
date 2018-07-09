@@ -2273,9 +2273,33 @@ Return the
 
 =cut
 
+=head2 prime_sigma
+
+Number.prime_sigma() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 prime_udivisors
 
 Number.prime_udivisors() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 prime_usigma
+
+Number.prime_usigma() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 prime_usigma0
+
+Number.prime_usigma0() -> I<Obj>
 
 Return the
 
@@ -2911,7 +2935,7 @@ Number.ω() -> I<Obj>
 
 Return the
 
-Aliases: I<omega>
+Aliases: I<omega>, I<prime_sigma0>
 
 =cut
 
