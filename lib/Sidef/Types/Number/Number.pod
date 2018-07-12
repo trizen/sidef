@@ -2287,6 +2287,8 @@ Number.prime_udivisors() -> I<Obj>
 
 Return the
 
+Aliases: I<prime_unitary_divisors>, I<unitary_prime_divisors>
+
 =cut
 
 =head2 prime_usigma

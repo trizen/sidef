@@ -8326,7 +8326,7 @@ package Sidef::Types::Number::Number {
         Sidef::Types::Array::Array->new(\@d);
     }
 
-    sub unitary_squarefree_divisors {
+    sub squarefree_udivisors {
         my $n = &_big2pistr || return Sidef::Types::Array::Array->new();
 
         my %factors;
@@ -8362,8 +8362,8 @@ package Sidef::Types::Number::Number {
         Sidef::Types::Array::Array->new(\@d);
     }
 
-    *squarefree_udivisors        = \&unitary_squarefree_divisors;
-    *squarefree_unitary_divisors = \&unitary_squarefree_divisors;
+    *unitary_squarefree_divisors = \&squarefree_udivisors;
+    *squarefree_unitary_divisors = \&squarefree_udivisors;
 
     sub prime_divisors {
         my $n = &_big2pistr || return Sidef::Types::Array::Array->new();
@@ -8409,6 +8409,9 @@ package Sidef::Types::Number::Number {
 
         Sidef::Types::Array::Array->new(\@d);
     }
+
+    *unitary_prime_divisors = \&prime_udivisors;
+    *prime_unitary_divisors = \&prime_udivisors;
 
     sub exp_mangoldt {
         my $n = Math::Prime::Util::GMP::exp_mangoldt(&_big2uistr || return ONE);

@@ -137,7 +137,7 @@ class SnakeGame(w, h) {
     }
 }
 
-var w = `tput cols`.to_i
-var h = `tput lines`.to_i
+var w = Number(`tput cols`  || 80)
+var h = Number(`tput lines` || 24)
 
 SnakeGame(w || 80, h || 24).play

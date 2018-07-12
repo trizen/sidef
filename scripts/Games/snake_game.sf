@@ -56,8 +56,8 @@ const A_FOOD = ansi.colored('❇', FOOD_COLOR);
 var sleep    = 0.02;   # sleep duration between updates
 var food_num = 10;     # number of initial food sources
 
-var w = `tput cols`.to_i;
-var h = `tput lines`.to_i;
+var w = Number(`tput cols`  || 80)
+var h = Number(`tput lines` || 24)
 var r = "\033[H";
 
 var dir = LEFT;

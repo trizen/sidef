@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
-define w = `tput cols`.to_i
-define h = `tput lines`.to_i
+define w = Number(`tput cols`  || 80)
+define h = Number(`tput lines` || 24)
 define r = "\033[H"
 
 define red = "\033[31m"

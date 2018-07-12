@@ -64,8 +64,8 @@ class Forest(p=0.01, f=0.001, height, width) {
 
 STDOUT.autoflush(true)
 
-var width  = Num(`tput cols`)-1
-var height = Num(`tput lines`)-1
+var width  = Num(`tput cols`  || 80)-1
+var height = Num(`tput lines` || 24)-1
 
 var forest = Forest(height: height, width: width)
 print "\e[2J";
