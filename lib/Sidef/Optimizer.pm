@@ -10,6 +10,8 @@ package Sidef::Optimizer {
                   BOOL        => 'Sidef::Types::Bool::Bool',
                   ARRAY       => 'Sidef::Types::Array::Array',
                   RANGENUM    => 'Sidef::Types::Range::RangeNumber',
+                  DIR_DT      => 'Sidef::DataTypes::Glob::Dir',
+                  FILE_DT     => 'Sidef::DataTypes::Glob::File',
                   NUMBER_DT   => 'Sidef::DataTypes::Number::Number',
                   STRING_DT   => 'Sidef::DataTypes::String::String',
                   COMPLEX_DT  => 'Sidef::DataTypes::Number::Complex',
@@ -647,6 +649,30 @@ package Sidef::Optimizer {
             (
              map { [$_, [table(STRING)]] }
                dtypes(REGEX_DT, qw(
+                   new
+                   )
+               )
+            ),
+        ),
+
+        (FILE_DT) => build_tree(
+
+            # File.method(STRING)
+            (
+             map { [$_, [table(STRING)]] }
+               dtypes(FILE_DT, qw(
+                   new
+                   )
+               )
+            ),
+        ),
+
+        (DIR_DT) => build_tree(
+
+            # Dir.method(STRING)
+            (
+             map { [$_, [table(STRING)]] }
+               dtypes(DIR_DT, qw(
                    new
                    )
                )
