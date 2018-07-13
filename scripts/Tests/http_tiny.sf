@@ -3,7 +3,7 @@
 var req = require('HTTP::Tiny');
 var http = req.new;
 
-var response = http.get('http://www.example.net');
+var response = http.get('https://www.wikipedia.org');
 if (!response{:success}) {
     "GET failed!\n".die;
 }

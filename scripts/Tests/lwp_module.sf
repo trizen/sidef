@@ -16,7 +16,7 @@ func get_response(url) {
     lwp.get(url);
 }
 
-var resp = get_response("http://www.example.net");
+var resp = get_response("https://www.wikipedia.org");
 
 if (!defined resp) {
     STDERR.print("** LWP::UserAgent is not installed!\n");

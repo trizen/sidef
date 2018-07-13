@@ -8332,9 +8332,7 @@ package Sidef::Types::Number::Number {
         ++$factors{$_} for Math::Prime::Util::GMP::factor($n);
 
         my @d;
-        while (my ($p, $e) = each %factors) {
-
-            $e == 1 or next;
+        foreach my $p (grep { $factors{$_} == 1 } keys %factors) {
 
             $p = (
                   $p < ULONG_MAX
@@ -8389,12 +8387,7 @@ package Sidef::Types::Number::Number {
         my %factors;
         ++$factors{$_} for Math::Prime::Util::GMP::factor($n);
 
-        my @factors;
-        while (my ($p, $e) = each %factors) {
-            if ($e == 1) {
-                push @factors, $p;
-            }
-        }
+        my @factors = grep { $factors{$_} == 1 } keys %factors;
 
         my @d;
         foreach my $p (sort { (length($a) <=> length($b)) || ($a cmp $b) } @factors) {
@@ -8637,9 +8630,7 @@ package Sidef::Types::Number::Number {
 
         my $s = Math::GMPz::Rmpz_init_set_ui(1);
 
-        while (my ($p, $e) = each %factors) {
-
-            $e == 1 or next;
+        foreach my $p (grep { $factors{$_} == 1 } keys %factors) {
 
             if ($p < ULONG_MAX) {
                 Math::GMPz::Rmpz_ui_pow_ui($t, $p, $k);
@@ -8780,12 +8771,7 @@ package Sidef::Types::Number::Number {
         ++$factors{$_} for Math::Prime::Util::GMP::factor(_big2uistr($n) // goto &nan);
         exists($factors{'0'}) and return ZERO;
 
-        my @factors;
-        while (my ($p, $e) = each %factors) {
-            if ($e == 1) {
-                push @factors, $p;
-            }
-        }
+        my @factors = grep { $factors{$_} == 1 } keys %factors;
 
         if ($k == 0) {
             return __PACKAGE__->_set_uint(scalar @factors);
