@@ -35,8 +35,8 @@ package Sidef::Object::Object {
       q{cmp} => sub {
         my ($obj1, $obj2, $swapped) = @_;
 
-        if (    ref($obj1) eq ref($obj2)
-            and ref($obj1) ne 'Sidef::Types::Number::Number'
+        if (    CORE::ref($obj1) eq CORE::ref($obj2)
+            and CORE::ref($obj1) ne 'Sidef::Types::Number::Number'
             and Scalar::Util::refaddr($obj1) == Scalar::Util::refaddr($obj2)) {
             return 0;
         }
@@ -45,7 +45,8 @@ package Sidef::Object::Object {
             ($obj1, $obj2) = ($obj2, $obj1);
         }
 
-        if (   CORE::ref($obj1) && UNIVERSAL::isa($obj1, CORE::ref($obj2))
+        if (   CORE::ref($obj1) eq CORE::ref($obj2)
+            or CORE::ref($obj1) && UNIVERSAL::isa($obj1, CORE::ref($obj2))
             or CORE::ref($obj2) && UNIVERSAL::isa($obj2, CORE::ref($obj1))) {
             if (defined(my $sub = UNIVERSAL::can($obj1, '<=>'))) {
                 @_ = ($obj1, $obj2);
@@ -61,14 +62,15 @@ package Sidef::Object::Object {
       q{eq} => sub {
         my ($obj1, $obj2) = @_;
 
-        if (    ref($obj1) eq ref($obj2)
-            and ref($obj1) ne 'Sidef::Types::Number::Number'
+        if (    CORE::ref($obj1) eq CORE::ref($obj2)
+            and CORE::ref($obj1) ne 'Sidef::Types::Number::Number'
             and Scalar::Util::refaddr($obj1) == Scalar::Util::refaddr($obj2)) {
             return 1;
         }
 
 #<<<
         (
+             CORE::ref($obj1) eq CORE::ref($obj2)                ||
              UNIVERSAL::isa($obj1, CORE::ref($obj2) || return 0) ||
              UNIVERSAL::isa($obj2, CORE::ref($obj1) || return 0)
         ) || return 0;

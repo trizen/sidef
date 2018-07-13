@@ -8198,10 +8198,9 @@ package Sidef::Types::Number::Number {
     *factors = \&factor;
 
     sub factor_exp {
+
         my %count;
-        foreach my $f (Math::Prime::Util::GMP::factor(&_big2pistr || return Sidef::Types::Array::Array->new())) {
-            ++$count{$f};
-        }
+        ++$count{$_} for Math::Prime::Util::GMP::factor(&_big2pistr || return Sidef::Types::Array::Array->new());
 
         my @pairs;
         foreach my $factor (sort { (CORE::length($a) <=> CORE::length($b)) || ($a cmp $b) } keys(%count)) {
