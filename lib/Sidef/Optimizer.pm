@@ -282,13 +282,22 @@ package Sidef::Optimizer {
                    eq ne
                    and or xor
 
+                   sigma
+                   usigma
+
+                   prime_sigma
+                   prime_usigma
+
+                   is_power
+
                    complex
                    root iroot
                    log
                    next_pow
                    max min
                    roundf
-                   nok
+                   binomial
+                   subfactorial
                    modinv
                    isub
                    iadd
@@ -313,9 +322,14 @@ package Sidef::Optimizer {
                    inc dec not
 
                    factorial
+                   subfactorial
+                   superfactorial
+                   hyperfactorial
+                   lnsuperfactorial
+                   lnhyperfactorial
                    sqrt isqrt
                    next_pow2
-                   abs int rat float
+                   abs int rat float complex
                    norm conj sqr
 
                    zeta
@@ -326,6 +340,21 @@ package Sidef::Optimizer {
                    Li
                    Li2
                    Ei
+
+                   sigma
+                   sigma0
+
+                   usigma
+                   usigma0
+
+                   prime_sigma
+                   prime_usigma
+
+                   divisors
+                   udivisors
+
+                   factor
+                   factor_exp
 
                    exp
                    exp2
@@ -397,6 +426,7 @@ package Sidef::Optimizer {
 
                    is_prime
                    is_square
+                   is_power
 
                    sgn
                    ceil
@@ -898,6 +928,10 @@ package Sidef::Optimizer {
         elsif ($ref eq 'Sidef::Meta::PrefixMethod') {
             my %expr = $self->optimize($obj->{expr});
             $obj->{expr} = \%expr;
+        }
+        elsif ($ref eq 'Sidef::Meta::Assert') {
+            my %arg = $self->optimize($obj->{arg});
+            $obj->{arg} = \%arg;
         }
 
         if (not exists($expr->{ind}) and not exists($expr->{call})) {

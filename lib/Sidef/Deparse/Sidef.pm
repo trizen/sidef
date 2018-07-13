@@ -155,19 +155,26 @@ package Sidef::Deparse::Sidef {
 
         my ($type, $str) = $num->_dump;
 
-        if ($type eq 'complex') {
-            my ($real, $imag) =
-              map { $self->_dump_number(Sidef::Types::Number::Number->new($_)) } split(' ', substr($str, 1, -1));
-            return "Complex($real, $imag)";
-        }
-
         state $table = {
                         '@inf@'  => q{Inf},
-                        '-@inf@' => q{-(Inf)},
+                        '-@inf@' => q{Inf.neg},
                         '@nan@'  => q{NaN},
                        };
 
-        exists($table->{lc($str)}) ? $table->{lc($str)} : do {
+        state $special_values = {
+                                 '@inf@'  => Sidef::Types::Number::Number->inf,
+                                 '-@inf@' => Sidef::Types::Number::Number->ninf,
+                                 '@nan@'  => Sidef::Types::Number::Number->nan,
+                                };
+
+        if ($type eq 'complex') {
+            my ($real, $imag) =
+              map { $self->_dump_number($special_values->{lc($_)} // Sidef::Types::Number::Number->new($_)) }
+              split(' ', substr($str, 1, -1));
+            return "Complex($real, $imag)";
+        }
+
+        $table->{lc($str)} // do {
             if ($type eq 'float') {
                 "$str.float";
             }
