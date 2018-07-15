@@ -4839,7 +4839,7 @@ package Sidef::Types::Number::Number {
 
     sub is_zero {
         my ($x) = @_;
-        __eq__($$x, $ZERO)
+        __eq__($$x, 0)
           ? (Sidef::Types::Bool::Bool::TRUE)
           : (Sidef::Types::Bool::Bool::FALSE);
     }
