@@ -6198,7 +6198,7 @@ package Sidef::Types::Number::Number {
                 my $e = $factors{$p};
 
                 if ($e == 1) {
-                    push @congruences, [1, 2];
+                    push @congruences, [(Math::GMPz::Rmpz_odd_p($x) ? 1 : 0), 2];
                     next;
                 }
 
@@ -6259,7 +6259,12 @@ package Sidef::Types::Number::Number {
         }
 
         my $n = Math::Prime::Util::GMP::chinese(@congruences) // goto &nan;
-        $n < ULONG_MAX ? __PACKAGE__->_set_uint($n) : __PACKAGE__->_set_str('int', $n);
+
+        ($n < ULONG_MAX)
+          ? Math::GMPz::Rmpz_set_ui($t, $n)
+          : Math::GMPz::Rmpz_set_str($t, "$n", 10);
+
+        bless \$t;
     }
 
     sub modpow {
