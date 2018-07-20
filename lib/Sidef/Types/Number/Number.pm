@@ -208,18 +208,18 @@ package Sidef::Types::Number::Number {
         my (undef, $type, $str) = @_;
 
         if ($type eq 'int') {
-            bless \Math::GMPz::Rmpz_init_set_str($str, 10);
+            bless \Math::GMPz::Rmpz_init_set_str("$str", 10);
         }
         elsif ($type eq 'rat') {
-            Math::GMPq::Rmpq_set_str((my $r = Math::GMPq::Rmpq_init()), $str, 10);
+            Math::GMPq::Rmpq_set_str((my $r = Math::GMPq::Rmpq_init()), "$str", 10);
             bless \$r;
         }
         elsif ($type eq 'float') {
-            Math::MPFR::Rmpfr_set_str((my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC))), $str, 10, $ROUND);
+            Math::MPFR::Rmpfr_set_str((my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC))), "$str", 10, $ROUND);
             bless \$r;
         }
         elsif ($type eq 'complex') {
-            Math::MPC::Rmpc_set_str((my $r = Math::MPC::Rmpc_init2(CORE::int($PREC))), $str, 10, $ROUND);
+            Math::MPC::Rmpc_set_str((my $r = Math::MPC::Rmpc_init2(CORE::int($PREC))), "$str", 10, $ROUND);
             bless \$r;
         }
         else {
@@ -417,7 +417,7 @@ package Sidef::Types::Number::Number {
 
         $s =~ s/^\+//;
 
-        eval { Math::GMPz::Rmpz_init_set_str($s, 10) } // goto &_nan;
+        eval { Math::GMPz::Rmpz_init_set_str("$s", 10) } // goto &_nan;
     }
 
     #
@@ -4007,8 +4007,8 @@ package Sidef::Types::Number::Number {
 
         my ($num, $den) = Math::Prime::Util::GMP::bernfrac($n);
 
-        $num = Math::GMPz::Rmpz_init_set_str($num, 10);
-        $den = Math::GMPz::Rmpz_init_set_str($den, 10);
+        $num = Math::GMPz::Rmpz_init_set_str("$num", 10);
+        $den = Math::GMPz::Rmpz_init_set_str("$den", 10);
 
         Math::GMPz::Rmpz_abs($num, $num) if !($n & 1);
 
@@ -6168,7 +6168,97 @@ package Sidef::Types::Number::Number {
     sub sqrtmod {
         my ($x, $y) = @_;
         _valid(\$y);
-        my $n = Math::Prime::Util::GMP::sqrtmod(_big2istr($x) // (goto &nan), _big2uistr($y) // (goto &nan)) // goto &nan;
+
+        $x = _any2mpz($$x) // goto &nan;
+        $y = _any2mpz($$y) // goto &nan;
+
+        Math::GMPz::Rmpz_sgn($y) <= 0 and goto &nan;
+
+        my $xstr = Math::GMPz::Rmpz_get_str($x, 10);
+        my $ystr = Math::GMPz::Rmpz_get_str($y, 10);
+
+        if (Math::Prime::Util::GMP::is_prob_prime($ystr)) {
+            my $n = Math::Prime::Util::GMP::sqrtmod($xstr, $ystr) // goto &nan;
+            return ($n < ULONG_MAX ? __PACKAGE__->_set_uint($n) : __PACKAGE__->_set_str('int', $n));
+        }
+
+        my %factors;
+        ++$factors{$_} for Math::Prime::Util::GMP::factor($ystr);
+
+        my @congruences;
+
+        my $t = Math::GMPz::Rmpz_init();
+        my $u = Math::GMPz::Rmpz_init();
+        my $v = Math::GMPz::Rmpz_init();
+        my $w = Math::GMPz::Rmpz_init();
+
+        foreach my $p (keys %factors) {
+
+            if ($p eq '2') {
+                my $e = $factors{$p};
+
+                if ($e == 1) {
+                    push @congruences, [1, 2];
+                    next;
+                }
+
+                if ($e == 2) {
+                    Math::GMPz::Rmpz_mod_ui($t, $x, 4);
+                    Math::GMPz::Rmpz_cmp_ui($t, 1) == 0 or goto &nan;
+                    push @congruences, [1, 4];
+                    next;
+                }
+
+                Math::GMPz::Rmpz_mod_ui($t, $x, 8);
+                Math::GMPz::Rmpz_cmp_ui($t, 1) == 0 or goto &nan;
+                Math::GMPz::Rmpz_ui_pow_ui($v, 2, $e - 1);
+
+                my $r = ${(bless \$x)->sqrtmod(bless \$v)};
+
+                Math::GMPz::Rmpz_mul($t, $r, $r);
+                Math::GMPz::Rmpz_sub($t, $t, $x);
+                Math::GMPz::Rmpz_div_2exp($t, $t, $e - 1);
+                Math::GMPz::Rmpz_mod_ui($t, $t, 2);
+
+                Math::GMPz::Rmpz_mul_2exp($t, $t, $e - 2);
+                Math::GMPz::Rmpz_add($t, $t, $r);
+
+                push @congruences, [Math::GMPz::Rmpz_get_str($t, 10), Math::GMPz::Rmpz_get_str($v, 10)];
+                next;
+            }
+
+            my $s = Math::Prime::Util::GMP::sqrtmod($xstr, $p) // goto &nan;
+
+            ($p < ULONG_MAX)
+              ? Math::GMPz::Rmpz_set_ui($t, $p)
+              : Math::GMPz::Rmpz_set_str($t, "$p", 10);
+
+            ($s < ULONG_MAX)
+              ? Math::GMPz::Rmpz_set_ui($w, $s)
+              : Math::GMPz::Rmpz_set_str($w, "$s", 10);
+
+            # v = p^k
+            Math::GMPz::Rmpz_pow_ui($v, $t, $factors{"$p"});
+
+            # t = p^(k-1)
+            Math::GMPz::Rmpz_divexact($t, $v, $t);
+
+            # u = (p^k - 2*(p^(k-1)) + 1) / 2
+            Math::GMPz::Rmpz_mul_2exp($u, $t, 1);
+            Math::GMPz::Rmpz_sub($u, $v, $u);
+            Math::GMPz::Rmpz_add_ui($u, $u, 1);
+            Math::GMPz::Rmpz_div_2exp($u, $u, 1);
+
+            # sqrtmod(a, p^k) = (powmod(sqrtmod(a, p), p^(k-1), p^k) * powmod(a, u, p^k)) % p^k
+            Math::GMPz::Rmpz_powm($w, $w, $t, $v);
+            Math::GMPz::Rmpz_powm($u, $x, $u, $v);
+            Math::GMPz::Rmpz_mul($w, $w, $u);
+            Math::GMPz::Rmpz_mod($w, $w, $v);
+
+            push @congruences, [Math::GMPz::Rmpz_get_str($w, 10), Math::GMPz::Rmpz_get_str($v, 10)];
+        }
+
+        my $n = Math::Prime::Util::GMP::chinese(@congruences) // goto &nan;
         $n < ULONG_MAX ? __PACKAGE__->_set_uint($n) : __PACKAGE__->_set_str('int', $n);
     }
 
