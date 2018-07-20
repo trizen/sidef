@@ -6203,14 +6203,12 @@ package Sidef::Types::Number::Number {
                 }
 
                 if ($e == 2) {
-                    Math::GMPz::Rmpz_mod_ui($t, $x, 4);
-                    Math::GMPz::Rmpz_cmp_ui($t, 1) == 0 or goto &nan;
+                    Math::GMPz::Rmpz_congruent_ui_p($x, 1, 4) or goto &nan;
                     push @congruences, [1, 4];
                     next;
                 }
 
-                Math::GMPz::Rmpz_mod_ui($t, $x, 8);
-                Math::GMPz::Rmpz_cmp_ui($t, 1) == 0 or goto &nan;
+                Math::GMPz::Rmpz_congruent_ui_p($x, 1, 8) or goto &nan;
                 Math::GMPz::Rmpz_ui_pow_ui($v, 2, $e - 1);
 
                 my $r = ${(bless \$x)->sqrtmod(bless \$v)};
