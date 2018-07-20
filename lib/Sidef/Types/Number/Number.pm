@@ -8384,6 +8384,40 @@ package Sidef::Types::Number::Number {
 
     *unitary_divisors = \&udivisors;
 
+    sub prime_power_divisors {
+        my $n = &_big2pistr || return Sidef::Types::Array::Array->new();
+
+        my %factors;
+        ++$factors{$_} for Math::Prime::Util::GMP::factor($n);
+
+        my $u = Math::GMPz::Rmpz_init();
+
+        my @d;
+        while (my ($p, $e) = each %factors) {
+
+            my $t = (
+                     ($p < ULONG_MAX)
+                     ? Math::GMPz::Rmpz_init_set_ui($p)
+                     : Math::GMPz::Rmpz_init_set_str("$p", 10)
+                    );
+
+            push @d, $t;
+            next if ($e == 1);
+
+            Math::GMPz::Rmpz_set($u, $t);
+
+            foreach my $i (2 .. $e) {
+                Math::GMPz::Rmpz_mul($u, $u, $t);
+                push @d, Math::GMPz::Rmpz_init_set($u);
+            }
+        }
+
+        @d = sort { Math::GMPz::Rmpz_cmp($a, $b) } @d;
+        @d = map { bless \$_ } @d;
+
+        Sidef::Types::Array::Array->new(\@d);
+    }
+
     sub prime_power_udivisors {
         my $n = &_big2pistr || return Sidef::Types::Array::Array->new();
 

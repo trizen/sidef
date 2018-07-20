@@ -2257,6 +2257,14 @@ Return the
 
 =cut
 
+=head2 prime_power_divisors
+
+Number.prime_power_divisors() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 prime_power_sigma
 
 Number.prime_power_sigma() -> I<Obj>
