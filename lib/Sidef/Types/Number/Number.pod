@@ -2257,6 +2257,14 @@ Return the
 
 =cut
 
+=head2 prime_power_sigma
+
+Number.prime_power_sigma() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 prime_power_udivisors
 
 Number.prime_power_udivisors() -> I<Obj>
@@ -2945,7 +2953,7 @@ Number.Ω() -> I<Obj>
 
 Return the
 
-Aliases: I<big_omega>
+Aliases: I<big_omega>, I<bigomega>, I<prime_power_sigma0>
 
 =cut
 

@@ -8660,7 +8660,9 @@ package Sidef::Types::Number::Number {
         __PACKAGE__->_set_uint(scalar Math::Prime::Util::GMP::factor($n));
     }
 
-    *Omega = \&big_omega;
+    *Omega              = \&big_omega;
+    *bigomega           = \&big_omega;
+    *prime_power_sigma0 = \&big_omega;
 
     sub omega {
         my %factors;
@@ -8733,11 +8735,61 @@ package Sidef::Types::Number::Number {
         bless \$s;
     }
 
+    sub prime_power_sigma {
+        my ($n, $k) = @_;
+
+        # Additive with:
+        #   a(p^e, k) = (p^(k*(e+1)) - p^k) / (p^k - 1)
+
+        if (defined($k)) {
+            _valid(\$k);
+            $k = _any2ui($$k) // goto &nan;
+        }
+        else {
+            $k = 1;
+        }
+
+        my %factors;
+        ++$factors{$_} for Math::Prime::Util::GMP::factor(_big2uistr($n) // goto &nan);
+        exists($factors{'0'}) and return ZERO;
+
+        my $t = Math::GMPz::Rmpz_init();
+        my $u = Math::GMPz::Rmpz_init();
+
+        if ($k == 0) {
+            Math::GMPz::Rmpz_set_ui($t, List::Util::sum(values %factors));
+            return bless \$t;
+        }
+
+        my $s = Math::GMPz::Rmpz_init_set_ui(0);
+
+        while (my ($p, $e) = each %factors) {
+
+            if ($p < ULONG_MAX) {
+                ($k == 1)
+                  ? Math::GMPz::Rmpz_set_ui($u, $p)
+                  : Math::GMPz::Rmpz_ui_pow_ui($u, $p, $k);
+            }
+            else {
+                Math::GMPz::Rmpz_set_str($u, "$p", 10);
+                Math::GMPz::Rmpz_pow_ui($u, $u, $k) if ($k > 1);
+            }
+
+            Math::GMPz::Rmpz_pow_ui($t, $u, $e + 1);
+            Math::GMPz::Rmpz_sub($t, $t, $u);
+            Math::GMPz::Rmpz_sub_ui($u, $u, 1);
+            Math::GMPz::Rmpz_divexact($t, $t, $u);
+            Math::GMPz::Rmpz_add($s, $s, $t);
+        }
+
+        bless \$s;
+    }
+
     sub prime_power_usigma {
         my ($n, $k) = @_;
 
         # Additive with:
-        #   prime_power_usigma(p^e, k) = p^(e*k)
+        #   a(p^e, k) = p^(e*k)
 
         if (defined($k)) {
             _valid(\$k);
