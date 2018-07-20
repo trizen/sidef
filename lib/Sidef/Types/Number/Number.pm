@@ -9182,66 +9182,94 @@ package Sidef::Types::Number::Number {
           : Sidef::Types::Bool::Bool::FALSE;
     }
 
-    *is_sqr = \&is_square;
+    *is_sqr            = \&is_square;
+    *is_perfect_square = \&is_square;
 
     sub is_power {
-        my ($x, $y) = @_;
+        my ($n, $k) = @_;
 
-        __is_int__($$x) || return Sidef::Types::Bool::Bool::FALSE;
-        $x = _any2mpz($$x) // return Sidef::Types::Bool::Bool::FALSE;
+        __is_int__($$n) || return Sidef::Types::Bool::Bool::FALSE;
+        $n = _any2mpz($$n) // return Sidef::Types::Bool::Bool::FALSE;
 
-        if (defined $y) {
-            _valid(\$y);
+        if (defined $k) {
+            _valid(\$k);
 
-            if (Math::GMPz::Rmpz_cmp_ui($x, 1) == 0) {
+            if (Math::GMPz::Rmpz_cmp_ui($n, 1) == 0) {
                 return Sidef::Types::Bool::Bool::TRUE;
             }
 
-            $y = _any2si($$y) // return undef;
+            $k = _any2si($$k) // return undef;
 
             # Everything is a first power
-            $y == 1 and return Sidef::Types::Bool::Bool::TRUE;
+            $k == 1 and return Sidef::Types::Bool::Bool::TRUE;
 
-            # Return a true value when $x=-1 and $y is odd
-            $y % 2
-              and (Math::GMPz::Rmpz_cmp_si($x, -1) == 0)
+            # Return a true value when $n=-1 and $k is odd
+            $k % 2
+              and (Math::GMPz::Rmpz_cmp_si($n, -1) == 0)
               and return Sidef::Types::Bool::Bool::TRUE;
 
             # Don't accept a non-positive power
-            # Also, when $x is negative and $y is even, return faster
-            if ($y <= 0 or ($y % 2 == 0 and Math::GMPz::Rmpz_sgn($x) < 0)) {
+            # Also, when $n is negative and $k is even, return faster
+            if ($k <= 0 or ($k % 2 == 0 and Math::GMPz::Rmpz_sgn($n) < 0)) {
                 return Sidef::Types::Bool::Bool::FALSE;
             }
 
             # Optimization for perfect squares (thanks to Dana Jacobsen)
-            $y == 2
+            $k == 2
               and return (
-                          Math::GMPz::Rmpz_perfect_square_p($x)
+                          Math::GMPz::Rmpz_perfect_square_p($n)
                           ? Sidef::Types::Bool::Bool::TRUE
                           : Sidef::Types::Bool::Bool::FALSE
                          );
 
-            Math::GMPz::Rmpz_perfect_power_p($x)
+            Math::GMPz::Rmpz_perfect_power_p($n)
               || return Sidef::Types::Bool::Bool::FALSE;
 
             state $t = Math::GMPz::Rmpz_init_nobless();
-            Math::GMPz::Rmpz_root($t, $x, $y)
+            Math::GMPz::Rmpz_root($t, $n, $k)
               ? Sidef::Types::Bool::Bool::TRUE
               : Sidef::Types::Bool::Bool::FALSE;
         }
         else {
-            Math::GMPz::Rmpz_perfect_power_p($x)
+            Math::GMPz::Rmpz_perfect_power_p($n)
               ? Sidef::Types::Bool::Bool::TRUE
               : Sidef::Types::Bool::Bool::FALSE;
         }
     }
 
-    *is_pow = \&is_power;
+    *is_pow           = \&is_power;
+    *is_perfect_power = \&is_power;
+
+    sub is_powerful {
+        my ($n) = @_;
+
+        __is_int__($$n) || return Sidef::Types::Bool::Bool::FALSE;
+        $n = _any2mpz($$n) // return Sidef::Types::Bool::Bool::FALSE;
+
+        Math::GMPz::Rmpz_divisible_2exp_p($n, 1)
+          and !Math::GMPz::Rmpz_divisible_2exp_p($n, 2)
+          and return Sidef::Types::Bool::Bool::FALSE;
+
+        foreach my $p (3, 5, 7, 11, 13) {
+            Math::GMPz::Rmpz_divisible_ui_p($n, $p)
+              and !Math::GMPz::Rmpz_divisible_ui_p($n, $p * $p)
+              and return Sidef::Types::Bool::Bool::FALSE;
+        }
+
+        my %factors;
+        ++$factors{$_} for Math::Prime::Util::GMP::factor(Math::GMPz::Rmpz_get_str($n, 10));
+
+        foreach my $e (values %factors) {
+            $e == 1 and return Sidef::Types::Bool::Bool::FALSE;
+        }
+
+        return Sidef::Types::Bool::Bool::TRUE;
+    }
 
     sub is_prime_power {
-        my ($x) = @_;
-        __is_int__($$x)
-          && Math::Prime::Util::GMP::is_prime_power(_big2uistr($x) // return Sidef::Types::Bool::Bool::FALSE)
+        my ($n) = @_;
+        __is_int__($$n)
+          && Math::Prime::Util::GMP::is_prime_power(_big2uistr($n) // return Sidef::Types::Bool::Bool::FALSE)
           ? Sidef::Types::Bool::Bool::TRUE
           : Sidef::Types::Bool::Bool::FALSE;
     }

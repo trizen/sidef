@@ -1571,7 +1571,15 @@ Number.is_pow() -> I<Obj>
 
 Return the
 
-Aliases: I<is_power>
+Aliases: I<is_power>, I<is_perfect_power>
+
+=cut
+
+=head2 is_powerful
+
+Number.is_powerful() -> I<Obj>
+
+Return the
 
 =cut
 
@@ -1669,7 +1677,7 @@ Number.is_sqr() -> I<Obj>
 
 Return the
 
-Aliases: I<is_square>
+Aliases: I<is_square>, I<is_perfect_square>
 
 =cut
 
