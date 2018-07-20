@@ -8733,6 +8733,49 @@ package Sidef::Types::Number::Number {
         bless \$s;
     }
 
+    sub prime_power_usigma {
+        my ($n, $k) = @_;
+
+        # Additive with:
+        #   prime_power_usigma(p^e, k) = p^(e*k)
+
+        if (defined($k)) {
+            _valid(\$k);
+            $k = _any2ui($$k) // goto &nan;
+        }
+        else {
+            $k = 1;
+        }
+
+        my %factors;
+        ++$factors{$_} for Math::Prime::Util::GMP::factor(_big2uistr($n) // goto &nan);
+        exists($factors{'0'}) and return ZERO;
+
+        my $t = Math::GMPz::Rmpz_init();
+
+        if ($k == 0) {
+            Math::GMPz::Rmpz_set_ui($t, scalar keys %factors);
+            return bless \$t;
+        }
+
+        my $s = Math::GMPz::Rmpz_init_set_ui(0);
+
+        while (my ($p, $e) = each %factors) {
+
+            if ($p < ULONG_MAX) {
+                Math::GMPz::Rmpz_ui_pow_ui($t, $p, $k * $e);
+            }
+            else {
+                Math::GMPz::Rmpz_set_str($t, "$p", 10);
+                Math::GMPz::Rmpz_pow_ui($t, $t, $k * $e);
+            }
+
+            Math::GMPz::Rmpz_add($s, $s, $t);
+        }
+
+        bless \$s;
+    }
+
     sub squarefree_usigma0 {
 
         my %factors;

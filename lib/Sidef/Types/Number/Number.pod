@@ -2267,6 +2267,14 @@ Aliases: I<prime_power_unitary_divisors>, I<unitary_prime_power_divisors>
 
 =cut
 
+=head2 prime_power_usigma
+
+Number.prime_power_usigma() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 prime_root
 
 Number.prime_root() -> I<Obj>
