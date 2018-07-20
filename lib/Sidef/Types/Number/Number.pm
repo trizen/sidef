@@ -8384,6 +8384,55 @@ package Sidef::Types::Number::Number {
 
     *unitary_divisors = \&udivisors;
 
+    sub prime_power_udivisors {
+        my $n = &_big2pistr || return Sidef::Types::Array::Array->new();
+
+        my %factors;
+        ++$factors{$_} for Math::Prime::Util::GMP::factor($n);
+
+        my @d;
+        while (my ($p, $e) = each %factors) {
+
+            my $pp;
+
+            if ($e <= 2) {    # p^e where e <= 2
+
+                if ($p < ULONG_MAX) {
+                    $pp = Math::GMPz::Rmpz_init_set_ui($p);
+                }
+                else {
+                    $pp = Math::GMPz::Rmpz_init_set_str("$p", 10);
+                }
+
+                if ($e == 2) {
+                    Math::GMPz::Rmpz_mul($pp, $pp, $pp);
+                }
+            }
+            else {    # p^e where e >= 3
+
+                $pp = Math::GMPz::Rmpz_init();
+
+                if ($p < ULONG_MAX) {
+                    Math::GMPz::Rmpz_ui_pow_ui($pp, $p, $e);
+                }
+                else {
+                    Math::GMPz::Rmpz_set_str($pp, "$p", 10);
+                    Math::GMPz::Rmpz_pow_ui($pp, $pp, $e);
+                }
+            }
+
+            push @d, $pp;
+        }
+
+        @d = sort { Math::GMPz::Rmpz_cmp($a, $b) } @d;
+        @d = map { bless \$_ } @d;
+
+        Sidef::Types::Array::Array->new(\@d);
+    }
+
+    *prime_power_unitary_divisors = \&prime_power_udivisors;
+    *unitary_prime_power_divisors = \&prime_power_udivisors;
+
     sub squarefree_divisors {
         my $n = &_big2pistr || return Sidef::Types::Array::Array->new();
 
@@ -8620,7 +8669,8 @@ package Sidef::Types::Number::Number {
         __PACKAGE__->_set_uint(scalar keys %factors);
     }
 
-    *prime_sigma0 = \&omega;
+    *prime_sigma0        = \&omega;
+    *prime_power_usigma0 = \&omega;
 
     sub usigma0 {
 

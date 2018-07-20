@@ -2257,6 +2257,16 @@ Return the
 
 =cut
 
+=head2 prime_power_udivisors
+
+Number.prime_power_udivisors() -> I<Obj>
+
+Return the
+
+Aliases: I<prime_power_unitary_divisors>, I<unitary_prime_power_divisors>
+
+=cut
+
 =head2 prime_root
 
 Number.prime_root() -> I<Obj>
@@ -2937,7 +2947,7 @@ Number.ω() -> I<Obj>
 
 Return the
 
-Aliases: I<omega>, I<prime_sigma0>
+Aliases: I<omega>, I<prime_sigma0>, I<prime_power_usigma0>
 
 =cut
 
