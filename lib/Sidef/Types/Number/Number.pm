@@ -5032,6 +5032,28 @@ package Sidef::Types::Number::Number {
           : (Sidef::Types::Bool::Bool::FALSE);
     }
 
+    sub is_congruent {
+        my ($n, $k, $m) = @_;
+        _valid(\$k, \$m);
+
+        $n = $$n;
+        $k = $$k;
+        $m = $$m;
+
+        if (ref($n) eq 'Math::GMPz' and ref($k) eq 'Math::GMPz' and ref($m) eq 'Math::GMPz') {
+            Math::GMPz::Rmpz_sgn($m) || return Sidef::Types::Bool::Bool::FALSE;
+            return (
+                    Math::GMPz::Rmpz_congruent_p($n, $k, $m)
+                    ? (Sidef::Types::Bool::Bool::TRUE)
+                    : (Sidef::Types::Bool::Bool::FALSE)
+                   );
+        }
+
+        __eq__(__mod__($n, $m), __mod__($k, $m))
+          ? (Sidef::Types::Bool::Bool::TRUE)
+          : (Sidef::Types::Bool::Bool::FALSE);
+    }
+
     sub is_div {
         my ($x, $y) = @_;
         _valid(\$y);
