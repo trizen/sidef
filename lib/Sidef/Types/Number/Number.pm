@@ -6203,8 +6203,7 @@ package Sidef::Types::Number::Number {
                 }
 
                 if ($e == 2) {
-                    Math::GMPz::Rmpz_congruent_ui_p($x, 1, 4) or goto &nan;
-                    push @congruences, [1, 4];
+                    push @congruences, [(Math::GMPz::Rmpz_congruent_ui_p($x, 1, 4) ? 1 : 0), 4];
                     next;
                 }
 
