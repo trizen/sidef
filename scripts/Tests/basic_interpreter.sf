@@ -1,0 +1,21 @@
+#!/usr/bin/ruby
+
+var AST = Hash(
+    self => Number(1),
+    call => [
+              Hash(method => "add", arg => [Hash(self => Number(2))]),
+              Hash(method => "add", arg => [Hash(self => Number(3))]),
+            ],
+)
+
+func execute(expr) {
+    var self_obj = expr{"self"}
+    for call in (expr{"call"}) {
+         self_obj = self_obj.(call{"method"})(call{"arg"}.map{execute(_)}...)
+    }
+    return self_obj
+}
+
+assert_eq(execute(AST), 6)
+
+say "** Test passed!"

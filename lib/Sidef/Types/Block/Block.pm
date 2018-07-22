@@ -456,6 +456,8 @@ package Sidef::Types::Block::Block {
 
         foreach my $obj (@objs) {
 
+            $obj // last;
+
             my $sub = UNIVERSAL::can($obj, 'iter') // do {
                 my $arr = eval { $obj->to_a };
                 ref($arr) ? do { $obj = $arr; UNIVERSAL::can($obj, 'iter') } : ();

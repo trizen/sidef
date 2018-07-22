@@ -636,6 +636,7 @@ scripts/Tests/averages_mode.sf
 scripts/Tests/balanced_brakets.sf
 scripts/Tests/bare_multiplication.sf
 scripts/Tests/base64_decoder.sf
+scripts/Tests/basic_interpreter.sf
 scripts/Tests/beadsort.sf
 scripts/Tests/best_shuffle.sf
 scripts/Tests/binary_search.sf
