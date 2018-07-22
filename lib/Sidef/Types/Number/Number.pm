@@ -8688,13 +8688,50 @@ package Sidef::Types::Number::Number {
     *inverse_euler_phi = \&inv_euler_phi;
 
     sub jordan_totient {
-        my ($x, $y) = @_;
-        _valid(\$y);
-        my $n = Math::Prime::Util::GMP::jordan_totient(_big2istr($x) // (goto &nan), _big2istr($y) // (goto &nan));
-        $n < ULONG_MAX ? __PACKAGE__->_set_uint($n) : __PACKAGE__->_set_str('int', $n);
+        my ($n, $k) = @_;
+        _valid(\$k);
+        my $r = Math::Prime::Util::GMP::jordan_totient(_big2uistr($n) // (goto &nan), _big2uistr($k) // (goto &nan));
+        $r < ULONG_MAX ? __PACKAGE__->_set_uint($r) : __PACKAGE__->_set_str('int', $r);
     }
 
     *JordanTotient = \&jordan_totient;
+
+    sub dedekind_psi {
+        my ($n, $k) = @_;
+
+        if (defined($k)) {
+            _valid(\$k);
+            $k = _any2ui($$k) // goto &nan;
+        }
+        else {
+            $k = 1;
+        }
+
+        my $nstr = _big2uistr($n) // goto &nan;
+
+        my $t = Math::Prime::Util::GMP::jordan_totient(2 * $k, $nstr);
+        my $u = Math::Prime::Util::GMP::jordan_totient($k,     $nstr);
+
+        $u eq '0' and return ZERO;
+
+        my $r = (
+                 $t < ULONG_MAX
+                 ? Math::GMPz::Rmpz_init_set_ui($t)
+                 : Math::GMPz::Rmpz_init_set_str("$t", 10)
+                );
+
+        if ($u < ULONG_MAX) {
+            Math::GMPz::Rmpz_divexact_ui($r, $r, $u);
+        }
+        else {
+            $u = Math::GMPz::Rmpz_init_set_str("$u", 10);
+            Math::GMPz::Rmpz_divexact($r, $r, $u);
+        }
+
+        bless \$r;
+    }
+
+    *DedekindPsi = \&dedekind_psi;
 
     sub carmichael_lambda {
         my $n = Math::Prime::Util::GMP::carmichael_lambda(&_big2uistr // goto &nan);

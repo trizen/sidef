@@ -833,6 +833,14 @@ Aliases: I<denominator>
 
 =cut
 
+=head2 dedekind_psi
+
+Number.dedekind_psi() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 defs
 
 Number.defs() -> I<Obj>
