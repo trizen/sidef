@@ -1929,6 +1929,14 @@ Return the
 
 =cut
 
+=head2 lsb
+
+Number.lsb() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 lucas
 
 Number.lucas() -> I<Obj>
@@ -2004,6 +2012,14 @@ Return the
 =head2 mone
 
 Number.mone() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 msb
+
+Number.msb() -> I<Obj>
 
 Return the
 
