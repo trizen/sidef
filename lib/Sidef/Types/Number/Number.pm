@@ -2612,6 +2612,7 @@ package Sidef::Types::Number::Number {
         my ($n) = @_;
 
         $n = _any2mpz($$n) // return undef;
+        Math::GMPz::Rmpz_sgn($n) || return undef;
 
         __PACKAGE__->_set_uint(Math::GMPz::Rmpz_scan1($n, 0));
     }
