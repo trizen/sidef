@@ -1021,6 +1021,12 @@ package Sidef::Types::String::String {
     *include  = \&contains;
     *includes = \&contains;
 
+    sub rotate {
+        my ($self, $n) = @_;
+        $n = (CORE::int($n) % CORE::length($$self)) || return $self;
+        $self->new(CORE::substr($$self, $n) . CORE::substr($$self, 0, $n));
+    }
+
     sub count {
         my ($self, $arg) = @_;
 

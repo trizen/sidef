@@ -905,6 +905,14 @@ Return the
 
 =cut
 
+=head2 rotate
+
+String.rotate() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 rtrim
 
 String.rtrim() -> I<Obj>
