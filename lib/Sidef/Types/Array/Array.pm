@@ -3059,8 +3059,9 @@ package Sidef::Types::Array::Array {
     sub rotate {
         my ($self, $num) = @_;
 
-        $num = CORE::int($num);
-        $num %= ($#$self + 1);
+        my $len = $#$self + 1;
+        return bless([]) if $len == 0;
+        $num = CORE::int($num) % $len;
         return bless([@$self]) if $num == 0;
 
         my @array = @$self;

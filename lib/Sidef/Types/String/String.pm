@@ -1023,7 +1023,7 @@ package Sidef::Types::String::String {
 
     sub rotate {
         my ($self, $n) = @_;
-        $n = (CORE::int($n) % CORE::length($$self)) || return $self;
+        $n = (CORE::int($n) % (CORE::length($$self) || return $self)) || return $self;
         $self->new(CORE::substr($$self, $n) . CORE::substr($$self, 0, $n));
     }
 
