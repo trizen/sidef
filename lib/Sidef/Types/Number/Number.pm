@@ -6231,6 +6231,9 @@ package Sidef::Types::Number::Number {
         my $u = Math::GMPz::Rmpz_init();
         my $v = Math::GMPz::Rmpz_init();
         my $w = Math::GMPz::Rmpz_init();
+        my $m = Math::GMPz::Rmpz_init();
+
+        Math::GMPz::Rmpz_mod($m, $x, $y);
 
         foreach my $p (keys %factors) {
 
@@ -6238,22 +6241,22 @@ package Sidef::Types::Number::Number {
                 my $e = $factors{$p};
 
                 if ($e == 1) {
-                    push @congruences, [(Math::GMPz::Rmpz_odd_p($x) ? 1 : 0), 2];
+                    push @congruences, [(Math::GMPz::Rmpz_odd_p($m) ? 1 : 0), 2];
                     next;
                 }
 
                 if ($e == 2) {
-                    push @congruences, [(Math::GMPz::Rmpz_congruent_ui_p($x, 1, 4) ? 1 : 0), 4];
+                    push @congruences, [(Math::GMPz::Rmpz_congruent_ui_p($m, 1, 4) ? 1 : 0), 4];
                     next;
                 }
 
-                Math::GMPz::Rmpz_congruent_ui_p($x, 1, 8) or goto &nan;
+                Math::GMPz::Rmpz_congruent_ui_p($m, 1, 8) or goto &nan;
                 Math::GMPz::Rmpz_ui_pow_ui($v, 2, $e - 1);
 
-                my $r = ${(bless \$x)->sqrtmod(bless \$v)};
+                my $r = ${(bless \$m)->sqrtmod(bless \$v)};
 
                 Math::GMPz::Rmpz_mul($t, $r, $r);
-                Math::GMPz::Rmpz_sub($t, $t, $x);
+                Math::GMPz::Rmpz_sub($t, $t, $m);
                 Math::GMPz::Rmpz_div_2exp($t, $t, $e - 1);
                 Math::GMPz::Rmpz_mod_ui($t, $t, 2);
 
@@ -6288,7 +6291,7 @@ package Sidef::Types::Number::Number {
 
             # sqrtmod(a, p^k) = (powmod(sqrtmod(a, p), p^(k-1), p^k) * powmod(a, u, p^k)) % p^k
             Math::GMPz::Rmpz_powm($w, $w, $t, $v);
-            Math::GMPz::Rmpz_powm($u, $x, $u, $v);
+            Math::GMPz::Rmpz_powm($u, $m, $u, $v);
             Math::GMPz::Rmpz_mul($w, $w, $u);
             Math::GMPz::Rmpz_mod($w, $w, $v);
 
@@ -6300,6 +6303,10 @@ package Sidef::Types::Number::Number {
         ($n < ULONG_MAX)
           ? Math::GMPz::Rmpz_set_ui($t, $n)
           : Math::GMPz::Rmpz_set_str($t, "$n", 10);
+
+        # Check that t^2 = m (mod y)
+        Math::GMPz::Rmpz_powm_ui($u, $t, 2, $y);
+        Math::GMPz::Rmpz_cmp($u, $m) == 0 or goto &nan;
 
         bless \$t;
     }
