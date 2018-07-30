@@ -2771,6 +2771,22 @@ Aliases: I<square_unitary_divisors>, I<unitary_square_divisors>
 
 =cut
 
+=head2 square_usigma
+
+Number.square_usigma() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 square_usigma0
+
+Number.square_usigma0() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 stirling
 
 Number.stirling() -> I<Obj>
