@@ -2745,6 +2745,22 @@ Return the
 
 =cut
 
+=head2 square_sigma
+
+Number.square_sigma() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 square_sigma0
+
+Number.square_sigma0() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 square_udivisors
 
 Number.square_udivisors() -> I<Obj>

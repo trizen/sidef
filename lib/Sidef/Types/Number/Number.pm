@@ -9135,6 +9135,70 @@ package Sidef::Types::Number::Number {
         bless \$s;
     }
 
+    sub square_sigma0 {
+
+        # Multiplicative with:
+        #   a(p^e) = floor(e/2) + 1
+
+        my %factors;
+        ++$factors{$_} for Math::Prime::Util::GMP::factor(&_big2uistr // goto &nan);
+        exists($factors{'0'}) and return ZERO;
+
+        __PACKAGE__->_set_uint(List::Util::product(map { ($_ >> 1) + 1 } values %factors));
+    }
+
+    sub square_sigma {
+        my ($n, $k) = @_;
+
+        # Multiplicative with:
+        #   a(p^e, k) = (p^((e+2)*k) - 1)/(p^(2*k) - 1) ; for even e
+        #   a(p^e, k) = (p^((e+1)*k) - 1)/(p^(2*k) - 1) ; for odd e
+
+        if (defined($k)) {
+            _valid(\$k);
+            $k = _any2ui($$k) // goto &nan;
+        }
+        else {
+            $k = 1;
+        }
+
+        my %factors;
+        ++$factors{$_} for Math::Prime::Util::GMP::factor(_big2uistr($n) // goto &nan);
+        exists($factors{'0'}) and return ZERO;
+
+        if ($k == 0) {
+            return __PACKAGE__->_set_uint(List::Util::product(map { ($_ >> 1) + 1 } values %factors));
+        }
+
+        my $t = Math::GMPz::Rmpz_init();
+        my $u = Math::GMPz::Rmpz_init();
+
+        my $s = Math::GMPz::Rmpz_init_set_ui(1);
+
+        while (my ($p, $e) = each %factors) {
+
+            $e += 2 - ($e % 2);
+
+            if ($p < ULONG_MAX) {
+                Math::GMPz::Rmpz_ui_pow_ui($t, $p, $e * $k);
+                Math::GMPz::Rmpz_ui_pow_ui($u, $p, 2 * $k);
+            }
+            else {
+                Math::GMPz::Rmpz_set_str($t, "$p", 10);
+                Math::GMPz::Rmpz_pow_ui($u, $t, 2 * $k);
+                Math::GMPz::Rmpz_pow_ui($t, $t, $e * $k);
+            }
+
+            Math::GMPz::Rmpz_sub_ui($t, $t, 1);
+            Math::GMPz::Rmpz_sub_ui($u, $u, 1);
+
+            Math::GMPz::Rmpz_divexact($t, $t, $u);
+            Math::GMPz::Rmpz_mul($s, $s, $t);
+        }
+
+        bless \$s;
+    }
+
     sub prime_sigma {
         my ($n, $k) = @_;
 
