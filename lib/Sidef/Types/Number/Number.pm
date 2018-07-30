@@ -8583,6 +8583,48 @@ package Sidef::Types::Number::Number {
         Sidef::Types::Array::Array->new(\@d);
     }
 
+    sub square_udivisors {
+        my $n = &_big2pistr || return Sidef::Types::Array::Array->new();
+
+        my %factors;
+        ++$factors{$_} for Math::Prime::Util::GMP::factor($n);
+
+        my @d = (Math::GMPz::Rmpz_init_set_ui(1));
+        foreach my $p (grep { $factors{$_} > 1 and $factors{$_} % 2 == 0 } keys %factors) {
+
+            my $e = $factors{$p};
+
+            my $pp = (
+                      ($p < ULONG_MAX)
+                      ? Math::GMPz::Rmpz_init_set_ui($p)
+                      : Math::GMPz::Rmpz_init_set_str("$p", 10)
+                     );
+
+            if ($e == 2) {
+                Math::GMPz::Rmpz_mul($pp, $pp, $pp);
+            }
+            else {
+                Math::GMPz::Rmpz_pow_ui($pp, $pp, $e);
+            }
+
+            my @t;
+            foreach my $d (@d) {
+                my $z = Math::GMPz::Rmpz_init();
+                Math::GMPz::Rmpz_mul($z, $pp, $d);
+                push @t, $z;
+            }
+            push @d, @t;
+        }
+
+        @d = sort { Math::GMPz::Rmpz_cmp($a, $b) } @d;
+        @d = map { bless \$_ } @d;
+
+        Sidef::Types::Array::Array->new(\@d);
+    }
+
+    *unitary_square_divisors = \&square_udivisors;
+    *square_unitary_divisors = \&square_udivisors;
+
     sub squarefree_udivisors {
         my $n = &_big2pistr || return Sidef::Types::Array::Array->new();
 
