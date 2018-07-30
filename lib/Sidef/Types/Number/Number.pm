@@ -8547,6 +8547,42 @@ package Sidef::Types::Number::Number {
         Sidef::Types::Array::Array->new(\@d);
     }
 
+    sub square_divisors {
+        my $n = &_big2pistr || return Sidef::Types::Array::Array->new();
+
+        my %factors;
+        ++$factors{$_} for Math::Prime::Util::GMP::factor($n);
+
+        my @d = (Math::GMPz::Rmpz_init_set_ui(1));
+        foreach my $p (grep { $factors{$_} > 1 } keys %factors) {
+
+            my $e = $factors{$p};
+
+            $p = (
+                  $p < ULONG_MAX
+                  ? Math::GMPz::Rmpz_init_set_ui($p)
+                  : Math::GMPz::Rmpz_init_set_str("$p", 10)
+                 );
+
+            my @t;
+            for (my $i = 2 ; $i <= $e ; $i += 2) {
+                foreach my $d (@d) {
+                    my $z = Math::GMPz::Rmpz_init();
+                    Math::GMPz::Rmpz_pow_ui($z, $p, $i);
+                    Math::GMPz::Rmpz_mul($z, $z, $d);
+                    push @t, $z;
+                }
+            }
+
+            push @d, @t;
+        }
+
+        @d = sort { Math::GMPz::Rmpz_cmp($a, $b) } @d;
+        @d = map { bless \$_ } @d;
+
+        Sidef::Types::Array::Array->new(\@d);
+    }
+
     sub squarefree_udivisors {
         my $n = &_big2pistr || return Sidef::Types::Array::Array->new();
 

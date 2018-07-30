@@ -2677,6 +2677,14 @@ Return the
 
 =cut
 
+=head2 square_divisors
+
+Number.square_divisors() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 square_free_count
 
 Number.square_free_count() -> I<Obj>
