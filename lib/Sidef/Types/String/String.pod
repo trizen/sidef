@@ -745,7 +745,7 @@ String.ltrim() -> I<Obj>
 
 Return the
 
-Aliases: I<trim_beg>, I<strip_beg>
+Aliases: I<lstrip>, I<trim_beg>, I<strip_beg>, I<trim_left>, I<strip_left>
 
 =cut
 
@@ -919,7 +919,7 @@ String.rtrim() -> I<Obj>
 
 Return the
 
-Aliases: I<trim_end>, I<strip_end>
+Aliases: I<rstrip>, I<trim_end>, I<strip_end>, I<trim_right>, I<strip_right>
 
 =cut
 
