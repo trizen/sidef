@@ -3,7 +3,7 @@ package Sidef {
     use utf8;
     use 5.014;
 
-    our $VERSION = '3.18';
+    our $VERSION = '3.19';
 
     our $SPACES      = 0;    # the current number of indentation spaces
     our $SPACES_INCR = 4;    # the number of indentation spaces
