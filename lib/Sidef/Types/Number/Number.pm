@@ -8744,7 +8744,7 @@ package Sidef::Types::Number::Number {
 
         foreach my $d (Math::Prime::Util::GMP::divisors($nstr)) {
 
-            my $t = $d + 1 < ULONG_MAX ? $d : Math::GMPz::Rmpz_init_set_str("$d", 10);
+            my $t = ($d + 1) < ULONG_MAX ? $d : Math::GMPz::Rmpz_init_set_str("$d", 10);
             my $tt = $t + 1;
 
             Math::Prime::Util::GMP::is_prime($tt) || next;
@@ -9168,8 +9168,9 @@ package Sidef::Types::Number::Number {
         my $u = Math::GMPz::Rmpz_init();
         my $s = Math::GMPz::Rmpz_init_set_ui(1);
 
-        while (my ($p, $e) = each %factors) {
+        foreach my $p (grep { $factors{$_} > 1 } keys %factors) {
 
+            my $e = $factors{$p};
             $e += 2 - ($e % 2);
 
             if ($p < ULONG_MAX) {
