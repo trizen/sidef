@@ -7622,44 +7622,10 @@ package Sidef::Types::Number::Number {
 
     *square_free_count = \&squarefree_count;
 
-    sub _Li_inverse {
-        my ($x) = @_;
-
-        # Function translated from:
-        #   https://github.com/kimwalisch/primecount
-
-        my $logx  = CORE::log($x);
-        my $first = CORE::int($x * ($logx + CORE::log($logx) - 1));
-        my $last  = CORE::int($x * ($logx + CORE::log($logx)));
-
-        state $mpfr = Math::MPFR::Rmpfr_init2_nobless(64);
-
-        my $prev = 0;
-
-        # Find Li^-1(x) using binary search
-        while ($first < $last) {
-            my $mid = $first + CORE::int(($last - $first) / 2);
-
-            last if $prev == $mid;
-
-            Math::MPFR::Rmpfr_set_d($mpfr, CORE::log($mid), $ROUND);
-            Math::MPFR::Rmpfr_eint($mpfr, $mpfr, $ROUND);
-
-            if (Math::MPFR::Rmpfr_cmp_d($mpfr, $x) < 0) {
-                $first = $mid + 1;
-            }
-            else {
-                $last = $mid;
-            }
-
-            $prev = $mid;
-        }
-
-        return $first;
-    }
-
     sub _prime_count_checkpoint {
-        my ($n) = @_;
+        my ($n, $i) = @_;
+
+        $i //= 0;
 
 #<<<
         state $checkpoints = [
@@ -7728,7 +7694,7 @@ package Sidef::Types::Number::Number {
 
         while (1) {
             $middle = (($right + $left) >> 1);
-            $item   = $checkpoints->[$middle][0];
+            $item   = $checkpoints->[$middle][$i];
             $cmp    = ($n <=> $item) || last;
 
             if ($cmp < 0) {
@@ -7872,20 +7838,15 @@ package Sidef::Types::Number::Number {
 
         if ($n > 100_000) {
 
-            my $approx    = CORE::int($n * (CORE::log($n) + CORE::log(CORE::log($n)) - 1));
-            my $up_approx = CORE::int($n * (CORE::log($n) + CORE::log(CORE::log($n))));
+            my ($i, $count) = _prime_count_checkpoint($n, 1);
 
-            if ($n >= 1e7) {
-                my $li_inv_n  = _Li_inverse($n);
-                my $li_inv_sn = _Li_inverse(CORE::int(CORE::sqrt($n)));
-
-                ## Formula due to Dana Jacobsen:
-                ## Nth prime ≈ Li^-1(n) + Li^-1(sqrt(n)) / 4
-                $approx    = CORE::int($li_inv_n + $li_inv_sn / 4);
-                $up_approx = CORE::int($li_inv_n + $li_inv_sn);       # conjecture
+            if ($count == $n) {
+                return (
+                        $i < ULONG_MAX
+                        ? __PACKAGE__->_set_uint($i)
+                        : __PACKAGE__->_set_str('int', $i)
+                       );
             }
-
-            my ($i, $count) = _prime_count_checkpoint($approx);
 
             my $nth_prime_lower = sub {
                 my ($n) = @_;
@@ -7893,6 +7854,7 @@ package Sidef::Types::Number::Number {
             };
 
             my $step = $nth_prime_lower->($i + CORE::log($n) * 2e3) - $nth_prime_lower->($i);
+            my $up_approx = CORE::int($n * (CORE::log($n) + CORE::log(CORE::log($n))));
 
             for (my $prev_count = $count ; ; $i += $step) {
 
