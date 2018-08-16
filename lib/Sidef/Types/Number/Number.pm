@@ -4950,6 +4950,8 @@ package Sidef::Types::Number::Number {
         __PACKAGE__->_set_uint(Math::GMPz::Rmpz_popcount($z));
     }
 
+    *hammingweight = \&popcount;
+
     sub __is_int__ {
         my ($x) = @_;
 
@@ -7827,6 +7829,20 @@ package Sidef::Types::Number::Number {
 
     *primepi = \&prime_count;
 
+    sub prime_count_lower {
+        my $prime_pi = Math::Prime::Util::GMP::prime_count_lower(&_big2uistr // return ZERO) // 0;
+        $prime_pi < ULONG_MAX ? __PACKAGE__->_set_uint($prime_pi) : __PACKAGE__->_set_str('int', $prime_pi);
+    }
+
+    *primepi_lower = \&prime_count_lower;
+
+    sub prime_count_upper {
+        my $prime_pi = Math::Prime::Util::GMP::prime_count_upper(&_big2uistr // return ZERO) // 0;
+        $prime_pi < ULONG_MAX ? __PACKAGE__->_set_uint($prime_pi) : __PACKAGE__->_set_str('int', $prime_pi);
+    }
+
+    *primepi_upper = \&prime_count_upper;
+
     sub nth_prime {
         my ($n) = @_;
 
@@ -7854,14 +7870,14 @@ package Sidef::Types::Number::Number {
             };
 
             my $step = $nth_prime_lower->($i + CORE::log($n) * 2e3) - $nth_prime_lower->($i);
-            my $up_approx = CORE::int($n * (CORE::log($n) + CORE::log(CORE::log($n))));
+            my $upper_approx = CORE::int($n * (CORE::log($n) + CORE::log(CORE::log($n))));
 
             for (my $prev_count = $count ; ; $i += $step) {
 
                 my $from = $i + 1;
                 my $to   = $i + $step;
 
-                $to = $up_approx if ($to > $up_approx);
+                $to = $upper_approx if ($to > $upper_approx);
 
                 my @primes = Math::Prime::Util::GMP::sieve_primes($from, $to);
 
