@@ -2251,6 +2251,8 @@ Number.popcount() -> I<Obj>
 
 Return the
 
+Aliases: I<hammingweight>
+
 =cut
 
 =head2 prev_prime
@@ -2286,6 +2288,26 @@ Number.primepi() -> I<Obj>
 Return the
 
 Aliases: I<prime_count>
+
+=cut
+
+=head2 primepi_lower
+
+Number.primepi_lower() -> I<Obj>
+
+Return the
+
+Aliases: I<prime_count_lower>
+
+=cut
+
+=head2 primepi_upper
+
+Number.primepi_upper() -> I<Obj>
+
+Return the
+
+Aliases: I<prime_count_upper>
 
 =cut
 
