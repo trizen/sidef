@@ -7472,7 +7472,28 @@ package Sidef::Types::Number::Number {
     }
 
     sub catalan {
-        my ($n) = @_;
+        my ($n, $k) = @_;
+
+        # Catalan triangle
+        # catalan(n, k) = binomial(n+k, k) - binomial(n+k, k-1)
+        if (defined($k)) {
+            _valid(\$k);
+
+            $n = _any2mpz($$n) // goto &nan;
+            $k = _any2ui($$k) // goto &nan;
+
+            my $t = Math::GMPz::Rmpz_init();
+            my $u = Math::GMPz::Rmpz_init();
+
+            Math::GMPz::Rmpz_add_ui($t, $n, $k);
+            Math::GMPz::Rmpz_bin_ui($u, $t, $k);
+            ($k > 0)
+              ? Math::GMPz::Rmpz_bin_ui($t, $t, $k - 1)
+              : Math::GMPz::Rmpz_bin_si($t, $t, $k - 1);
+            Math::GMPz::Rmpz_sub($u, $u, $t);
+
+            return bless \$u;
+        }
 
         $n = _any2ui($$n) // goto &nan;
 
