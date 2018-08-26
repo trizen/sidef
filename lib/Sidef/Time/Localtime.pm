@@ -16,7 +16,7 @@ package Sidef::Time::Localtime {
 
         bless {
                sec  => $sec,
-               time => [map { Sidef::Types::Number::Number->_set_uint($_) } localtime($sec)],
+               time => Sidef::Types::Array::Array->new([map { Sidef::Types::Number::Number->_set_uint($_) } localtime($sec)]),
               },
           __PACKAGE__;
     }
@@ -46,6 +46,9 @@ package Sidef::Time::Localtime {
         my ($self) = @_;
         Sidef::Types::String::String->new(scalar localtime($self->{sec}));
     }
+
+    *to_s   = \&ctime;
+    *to_str = \&ctime;
 };
 
 1;

@@ -23,14 +23,6 @@ Inherits methods from:
 =head1 METHODS
 
 
-=head2 ctime
-
-Gmtime.ctime() -> I<Obj>
-
-Return the
-
-=cut
-
 =head2 day
 
 Gmtime.day() -> I<Obj>
@@ -86,6 +78,16 @@ Gmtime.strf() -> I<Obj>
 Return the
 
 Aliases: I<format>, I<strftime>
+
+=cut
+
+=head2 to_s
+
+Gmtime.to_s() -> I<Obj>
+
+Return the
+
+Aliases: I<ctime>, I<to_str>
 
 =cut
 

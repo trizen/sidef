@@ -12,7 +12,7 @@ package Sidef::Types::Glob::Stat {
 
         bless {
                obj  => $opt{obj},
-               stat => [map { Sidef::Types::Number::Number->new($_) } @{$opt{stat}}],
+               stat => Sidef::Types::Array::Array->new([map { Sidef::Types::Number::Number->new($_) } @{$opt{stat}}]),
               },
           __PACKAGE__;
     }

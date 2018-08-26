@@ -36,6 +36,14 @@ Aliases: I<to_bool>
 
 =cut
 
+=head2 to_bag
+
+Convert.to_bag() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 to_caller
 
 Convert.to_caller() -> I<Obj>
@@ -125,6 +133,14 @@ Convert.to_s() -> I<Obj>
 Return the
 
 Aliases: I<to_str>
+
+=cut
+
+=head2 to_set
+
+Convert.to_set() -> I<Obj>
+
+Return the
 
 =cut
 

@@ -556,6 +556,9 @@ package Sidef::Types::Block::Block {
         Sidef::Types::String::String->new("$_[0]");
     }
 
+    *to_s   = \&dump;
+    *to_str = \&dump;
+
     {
         no strict 'refs';
         *{__PACKAGE__ . '::' . '*'}  = \&repeat;

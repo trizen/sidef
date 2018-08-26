@@ -508,7 +508,7 @@ package Sidef::Types::Array::Array {
     sub concat {
         my ($self, $arg) = @_;
 
-        UNIVERSAL::isa($arg, 'ARRAY')
+        ref($self) eq ref($arg)
           ? bless([@$self, @$arg])
           : bless([@$self, $arg]);
     }
@@ -598,29 +598,36 @@ package Sidef::Types::Array::Array {
         Sidef::Types::Number::Number->new($jaro + $prefix * 0.1 * (1 - $jaro));
     }
 
-    sub count {
-        my ($self, $obj) = @_;
+    sub count_by {
+        my ($self, $block) = @_;
 
         my $counter = 0;
-        if (ref($obj) eq 'Sidef::Types::Block::Block') {
-
-            foreach my $item (@$self) {
-                if ($obj->run($item)) {
-                    ++$counter;
-                }
-            }
-
-            return Sidef::Types::Number::Number->_set_uint($counter);
-        }
 
         foreach my $item (@$self) {
-            $item eq $obj and $counter++;
+            if ($block->run($item)) {
+                ++$counter;
+            }
         }
 
         Sidef::Types::Number::Number->_set_uint($counter);
     }
 
-    *count_by = \&count;
+    sub count {
+        my ($self, $obj) = @_;
+
+        if (ref($obj) eq 'Sidef::Types::Block::Block') {
+            goto &count_by;
+        }
+
+        my $counter = 0;
+        foreach my $item (@$self) {
+            if ($item eq $obj) {
+                ++$counter;
+            }
+        }
+
+        Sidef::Types::Number::Number->_set_uint($counter);
+    }
 
     sub cmp {
         my ($self, $array) = @_;
@@ -3108,19 +3115,6 @@ package Sidef::Types::Array::Array {
 
     *flip = \&reverse;
 
-    sub to_hash {
-        my ($self) = @_;
-        Sidef::Types::Hash::Hash->new(@$self);
-    }
-
-    *to_h = \&to_hash;
-
-    sub to_a {
-        $_[0];
-    }
-
-    *to_array = \&to_a;
-
     sub delete_first {
         my ($self, $obj) = @_;
 
@@ -3357,7 +3351,31 @@ package Sidef::Types::Array::Array {
         Sidef::Types::String::String->new($_[0]->_dump);
     }
 
-    *to_s = \&dump;
+    *to_s   = \&dump;
+    *to_str = \&dump;
+
+    sub to_hash {
+        my ($self) = @_;
+        Sidef::Types::Hash::Hash->new(@$self);
+    }
+
+    *to_h = \&to_hash;
+
+    sub to_a {
+        $_[0];
+    }
+
+    *to_array = \&to_a;
+
+    sub to_set {
+        my ($self) = @_;
+        Sidef::Types::Set::Set->new(@$self);
+    }
+
+    sub to_bag {
+        my ($self) = @_;
+        Sidef::Types::Set::Bag->new(@$self);
+    }
 
     {
         no strict 'refs';

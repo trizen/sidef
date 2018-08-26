@@ -118,10 +118,12 @@ package Sidef::Types::Regex::Match {
         $self->{regex};
     }
 
-    sub to_s {
+    sub to_str {
         my ($self) = @_;
         Sidef::Types::String::String->new("$self");
     }
+
+    *to_s = \&to_str;
 
     sub dump {
         my ($self) = @_;

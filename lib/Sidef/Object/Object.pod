@@ -93,6 +93,8 @@ Object.dclone() -> I<Obj>
 
 Return the
 
+Aliases: I<deep_clone>
+
 =cut
 
 =head2 def_method

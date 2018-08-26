@@ -41,14 +41,7 @@ package Sidef::Types::Set::Set {
             $addr{$refaddr} = \@set;
 
             foreach my $v (CORE::values(%$obj)) {
-                CORE::push(
-                           @set,
-                           (
-                            index(ref($v), 'Sidef::') == 0
-                            ? $v->get_value
-                            : $v
-                           )
-                          );
+                CORE::push(@set, (index(ref($v), 'Sidef::') == 0) ? $v->get_value : $v);
             }
 
             $addr{$refaddr};
@@ -58,18 +51,10 @@ package Sidef::Types::Set::Set {
         $sub->($_[0]);
     }
 
-    sub length {
-        my ($self) = @_;
-        Sidef::Types::Number::Number->_set_uint(scalar CORE::keys(%$self));
-    }
-
-    *len  = \&length;
-    *size = \&length;
-
     sub concat {
         my ($A, $B) = @_;
 
-        UNIVERSAL::isa($B, 'HASH')
+        ref($A) eq ref($B)
           ? bless({%$A, %$B}, ref($A))
           : bless({%$A, $serialize->($B) => $B}, ref($A));
     }
@@ -170,7 +155,7 @@ package Sidef::Types::Set::Set {
 
     sub delete {
         my ($self, @objects) = @_;
-        delete @{$self}{map { $serialize->($_) } @objects};
+        CORE::delete(@{$self}{map { $serialize->($_) } @objects});
     }
 
     *remove  = \&delete;
@@ -215,7 +200,7 @@ package Sidef::Types::Set::Set {
 
     *select = \&grep;
 
-    sub count {
+    sub count_by {
         my ($self, $block) = @_;
 
         my $count = 0;
@@ -228,7 +213,20 @@ package Sidef::Types::Set::Set {
         Sidef::Types::Number::Number->_set_uint($count);
     }
 
-    *count_by = \&count;
+    sub count {
+        my ($self, $obj) = @_;
+
+        if (ref($obj) eq 'Sidef::Types::Block::Block') {
+            goto &count_by;
+        }
+
+        my $key = $serialize->($obj);
+        if (CORE::exists($self->{$key})) {
+            return Sidef::Types::Number::Number::ONE;
+        }
+
+        return Sidef::Types::Number::Number::ZERO;
+    }
 
     sub delete_if {
         my ($self, $block) = @_;
@@ -236,6 +234,19 @@ package Sidef::Types::Set::Set {
         foreach my $key (CORE::keys(%$self)) {
             if ($block->run($self->{$key})) {
                 CORE::delete($self->{$key});
+            }
+        }
+
+        $self;
+    }
+
+    sub delete_first_if {
+        my ($self, $block) = @_;
+
+        foreach my $key (CORE::keys(%$self)) {
+            if ($block->run($self->{$key})) {
+                CORE::delete($self->{$key});
+                last;
             }
         }
 
@@ -345,19 +356,6 @@ package Sidef::Types::Set::Set {
         return Sidef::Types::Bool::Bool::TRUE;
     }
 
-    sub to_a {
-        my ($self) = @_;
-        Sidef::Types::Array::Array->new([CORE::values(%$self)]);
-    }
-
-    *values   = \&to_a;
-    *to_array = \&to_a;
-
-    sub to_list {
-        my ($self) = @_;
-        CORE::values(%$self);
-    }
-
     sub _dump {
         my %addr;    # keeps track of dumped objects
 
@@ -386,10 +384,33 @@ package Sidef::Types::Set::Set {
         Sidef::Types::String::String->new($_[0]->_dump);
     }
 
+    sub to_a {
+        my ($self) = @_;
+        Sidef::Types::Array::Array->new([CORE::values(%$self)]);
+    }
+
+    *values   = \&to_a;
+    *to_array = \&to_a;
+
+    sub to_list {
+        my ($self) = @_;
+        CORE::values(%$self);
+    }
+
+    sub to_bag {
+        my ($self) = @_;
+        Sidef::Types::Set::Bag->new(CORE::values(%$self));
+    }
+
+    sub to_set {
+        $_[0];
+    }
+
     {
         no strict 'refs';
 
         *{__PACKAGE__ . '::' . '+'}   = \&concat;
+        *{__PACKAGE__ . '::' . '<<'}  = \&append;
         *{__PACKAGE__ . '::' . '∪'} = \&union;
         *{__PACKAGE__ . '::' . '|'}   = \&union;
         *{__PACKAGE__ . '::' . '&'}   = \&intersection;

@@ -205,6 +205,16 @@ Return the
 
 =cut
 
+=head2 to_s
+
+Dir.to_s() -> I<Obj>
+
+Return the
+
+Aliases: I<to_str>
+
+=cut
+
 =head2 up
 
 Dir.up() -> I<Obj>

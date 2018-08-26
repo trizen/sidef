@@ -53,6 +53,7 @@ package Sidef::Deparse::Perl {
                   Sidef::DataTypes::Array::Pair           Sidef::Types::Array::Pair
                   Sidef::DataTypes::Hash::Hash            Sidef::Types::Hash::Hash
                   Sidef::DataTypes::Set::Set              Sidef::Types::Set::Set
+                  Sidef::DataTypes::Set::Bag              Sidef::Types::Set::Bag
                   Sidef::DataTypes::Regex::Regex          Sidef::Types::Regex::Regex
                   Sidef::DataTypes::String::String        Sidef::Types::String::String
                   Sidef::DataTypes::Number::Number        Sidef::Types::Number::Number

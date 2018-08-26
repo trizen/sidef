@@ -86,3 +86,13 @@ Return the
 Aliases: I<time>
 
 =cut
+
+=head2 to_s
+
+Time.to_s() -> I<Obj>
+
+Return the
+
+Aliases: I<to_str>
+
+=cut

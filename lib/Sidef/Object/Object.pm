@@ -209,6 +209,8 @@ package Sidef::Object::Object {
           ->($_[0], Scalar::Util::reftype($_[0]));
     }
 
+    *deep_clone = \&dclone;
+
     sub respond_to {
         my ($self, $method) = @_;
         UNIVERSAL::can($self, "$method")

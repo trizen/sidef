@@ -99,14 +99,6 @@ Aliases: I<run>
 
 =cut
 
-=head2 dump
-
-Block.dump() -> I<Obj>
-
-Return the
-
-=cut
-
 =head2 exec
 
 Block.exec() -> I<Obj>
@@ -164,6 +156,16 @@ Block.thr() -> I<Obj>
 Return the
 
 Aliases: I<thread>
+
+=cut
+
+=head2 to_s
+
+Block.to_s() -> I<Obj>
+
+Return the
+
+Aliases: I<dump>, I<to_str>
 
 =cut
 

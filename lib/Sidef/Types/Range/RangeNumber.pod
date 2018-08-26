@@ -48,14 +48,6 @@ Return the
 
 =cut
 
-=head2 dump
-
-RangeNumber.dump() -> I<Obj>
-
-Return the
-
-=cut
-
 =head2 iter
 
 RangeNumber.iter() -> I<Obj>
@@ -103,5 +95,15 @@ Return the
 RangeNumber.sum_by() -> I<Obj>
 
 Return the
+
+=cut
+
+=head2 to_s
+
+RangeNumber.to_s() -> I<Obj>
+
+Return the
+
+Aliases: I<dump>, I<to_str>
 
 =cut

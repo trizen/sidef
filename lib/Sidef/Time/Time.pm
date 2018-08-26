@@ -66,6 +66,13 @@ package Sidef::Time::Time {
         Sidef::Types::String::String->new('Time(' . $self->get_value . ')');
     }
 
+    sub to_str {
+        my ($self) = @_;
+        Sidef::Types::String::String->new($self->get_value);
+    }
+
+    *to_s = \&to_str;
+
 };
 
 1;

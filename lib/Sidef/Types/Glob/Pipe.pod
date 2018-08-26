@@ -31,14 +31,6 @@ Return the
 
 =cut
 
-=head2 dump
-
-Pipe.dump() -> I<Obj>
-
-Return the
-
-=cut
-
 =head2 new
 
 Pipe.new() -> I<Obj>
@@ -74,5 +66,15 @@ Pipe.open_w() -> I<Obj>
 Return the
 
 Aliases: I<open_write>
+
+=cut
+
+=head2 to_s
+
+Pipe.to_s() -> I<Obj>
+
+Return the
+
+Aliases: I<dump>, I<to_str>
 
 =cut

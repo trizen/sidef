@@ -433,7 +433,13 @@ Array.count() -> I<Obj>
 
 Return the
 
-Aliases: I<count_by>
+=cut
+
+=head2 count_by
+
+Array.count_by() -> I<Obj>
+
+Return the
 
 =cut
 
@@ -1525,6 +1531,14 @@ Aliases: I<to_array>
 
 =cut
 
+=head2 to_bag
+
+Array.to_bag() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 to_h
 
 Array.to_h() -> I<Obj>
@@ -1541,7 +1555,15 @@ Array.to_s() -> I<Obj>
 
 Return the
 
-Aliases: I<dump>
+Aliases: I<dump>, I<to_str>
+
+=cut
+
+=head2 to_set
+
+Array.to_set() -> I<Obj>
+
+Return the
 
 =cut
 

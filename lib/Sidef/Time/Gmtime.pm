@@ -16,7 +16,7 @@ package Sidef::Time::Gmtime {
 
         bless {
                sec  => $sec,
-               time => [map { Sidef::Types::Number::Number->_set_uint($_) } gmtime($sec)],
+               time => Sidef::Types::Array::Array->new([map { Sidef::Types::Number::Number->_set_uint($_) } gmtime($sec)]),
               },
           __PACKAGE__;
     }
@@ -46,6 +46,9 @@ package Sidef::Time::Gmtime {
         my ($self) = @_;
         Sidef::Types::String::String->new(scalar gmtime($self->{sec}));
     }
+
+    *to_s   = \&ctime;
+    *to_str = \&ctime;
 
     sub strftime {
         my ($self, $format) = @_;

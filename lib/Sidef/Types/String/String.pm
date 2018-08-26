@@ -29,12 +29,6 @@ package Sidef::Types::String::String {
         ${$_[0]};
     }
 
-    sub to_s {
-        $_[0];
-    }
-
-    *to_str = \&to_s;
-
     sub inc {
         my ($self) = @_;
         my $copy = $$self;
@@ -1447,6 +1441,26 @@ package Sidef::Types::String::String {
     sub pair_with {
         Sidef::Types::Array::Pair->new($_[0], $_[1]);
     }
+
+    sub to_str {
+        $_[0];
+    }
+
+    *to_s = \&to_str;
+
+    sub to_int {
+        my ($self) = @_;
+        Sidef::Types::Number::Number->new($$self)->int;
+    }
+
+    *to_i = \&to_int;
+
+    sub to_num {
+        my ($self) = @_;
+        Sidef::Types::Number::Number->new($$self);
+    }
+
+    *to_n = \&to_num;
 
     {
         my %esc = (

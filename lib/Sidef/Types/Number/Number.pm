@@ -930,17 +930,25 @@ package Sidef::Types::Number::Number {
         ref($$x) eq 'Math::GMPz' ? $x : bless \(_any2mpz($$x) // (goto &nan));
     }
 
-    *trunc = \&int;
+    *trunc  = \&int;
+    *to_i   = \&int;
+    *to_int = \&int;
 
     sub rat {
         my ($x) = @_;
         ref($$x) eq 'Math::GMPq' ? $x : bless \(_any2mpq($$x) // (goto &nan));
     }
 
+    *to_r   = \&rat;
+    *to_rat = \&rat;
+
     sub float {
         my ($x) = @_;
         (ref($$x) eq 'Math::MPFR' || ref($$x) eq 'Math::MPC') ? $x : bless \_any2mpfr_mpc($$x);
     }
+
+    *to_f     = \&float;
+    *to_float = \&float;
 
     sub complex {
         my ($x, $y) = @_;
@@ -5592,6 +5600,19 @@ package Sidef::Types::Number::Number {
                                           :                           __stringify__($x)
                                          );
     }
+
+    sub to_str {
+        my ($x) = @_;
+        Sidef::Types::String::String->new(__stringify__($$x));
+    }
+
+    *to_s = \&to_str;
+
+    sub to_num {
+        $_[0];
+    }
+
+    *to_n = \&to_num;
 
     sub as_bin {
         my ($x) = @_;

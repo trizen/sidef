@@ -1,11 +1,11 @@
 #!/usr/bin/ruby
 
-# Tests for sets
+# Tests for the Bag() class
 
-var x = Set(1, 2, 3)
+var x = Bag(1, 2, 3)
 5..7 -> each { |i| x += i }
 
-var y = Set(1, 2, 4, x)
+var y = Bag(1, 2, 4, x)
 
 say "set x is: #{x}"
 say "set y is: #{y}"
@@ -53,4 +53,4 @@ x << x
 
 say x
 assert_eq(x, x)
-#assert_eq(Set(Set(5, 4, x), 2, 3), Set(3, Set(4,x,5), 2))
+#assert_eq(Bag(Bag(5, 4, 4, x,4), 2, 3,3), Bag(3, Bag(4,x,5,4,4), 2,3))

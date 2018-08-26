@@ -103,7 +103,13 @@ Hash.count() -> I<Obj>
 
 Return the
 
-Aliases: I<count_by>
+=cut
+
+=head2 count_by
+
+Hash.count_by() -> I<Obj>
+
+Return the
 
 =cut
 
@@ -128,14 +134,6 @@ Return the
 =head2 dig
 
 Hash.dig() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 dump
-
-Hash.dump() -> I<Obj>
 
 Return the
 
@@ -168,16 +166,6 @@ Hash.each_v() -> I<Obj>
 Return the
 
 Aliases: I<each_value>
-
-=cut
-
-=head2 exists
-
-Hash.exists() -> I<Obj>
-
-Return the
-
-Aliases: I<has_key>, I<haskey>, I<contain>, I<include>, I<contains>, I<includes>
 
 =cut
 
@@ -232,6 +220,16 @@ Hash.grep_v() -> I<Obj>
 Return the
 
 Aliases: I<grep_val>
+
+=cut
+
+=head2 has
+
+Hash.has() -> I<Obj>
+
+Return the
+
+Aliases: I<exists>, I<has_key>, I<haskey>, I<contain>, I<include>, I<contains>, I<includes>
 
 =cut
 
@@ -368,6 +366,16 @@ Return the
 Hash.sort_by() -> I<Obj>
 
 Return the
+
+=cut
+
+=head2 to_s
+
+Hash.to_s() -> I<Obj>
+
+Return the
+
+Aliases: I<dump>, I<to_str>
 
 =cut
 

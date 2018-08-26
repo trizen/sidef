@@ -23,14 +23,6 @@ Inherits methods from:
 =head1 METHODS
 
 
-=head2 dump
-
-Null.dump() -> I<Obj>
-
-Return the
-
-=cut
-
 =head2 new
 
 Null.new() -> I<Obj>
@@ -38,5 +30,15 @@ Null.new() -> I<Obj>
 Return the
 
 Aliases: I<call>
+
+=cut
+
+=head2 to_s
+
+Null.to_s() -> I<Obj>
+
+Return the
+
+Aliases: I<dump>, I<to_str>
 
 =cut

@@ -114,6 +114,9 @@ package Sidef::Types::Array::Pair {
     sub dump {
         Sidef::Types::String::String->new($_[0]->_dump);
     }
+
+    *to_s   = \&dump;
+    *to_str = \&dump;
 };
 
 1

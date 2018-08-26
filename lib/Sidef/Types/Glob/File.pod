@@ -553,6 +553,16 @@ Return the
 
 =cut
 
+=head2 to_s
+
+File.to_s() -> I<Obj>
+
+Return the
+
+Aliases: I<to_str>
+
+=cut
+
 =head2 truncate
 
 File.truncate() -> I<Obj>

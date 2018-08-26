@@ -1119,14 +1119,6 @@ Return the
 
 =cut
 
-=head2 float
-
-Number.float() -> I<Obj>
-
-Return the
-
-=cut
-
 =head2 floor
 
 Number.floor() -> I<Obj>
@@ -1311,7 +1303,7 @@ Number.int() -> I<Obj>
 
 Return the
 
-Aliases: I<trunc>
+Aliases: I<to_i>, I<to_int>, I<trunc>
 
 =cut
 
@@ -2513,6 +2505,8 @@ Number.rat() -> I<Obj>
 
 Return the
 
+Aliases: I<to_r>, I<to_rat>
+
 =cut
 
 =head2 rat_approx
@@ -2896,6 +2890,36 @@ Return the
 Number.times() -> I<Obj>
 
 Return the
+
+=cut
+
+=head2 to_f
+
+Number.to_f() -> I<Obj>
+
+Return the
+
+Aliases: I<float>, I<to_float>
+
+=cut
+
+=head2 to_n
+
+Number.to_n() -> I<Obj>
+
+Return the
+
+Aliases: I<to_num>
+
+=cut
+
+=head2 to_s
+
+Number.to_s() -> I<Obj>
+
+Return the
+
+Aliases: I<to_str>
 
 =cut
 

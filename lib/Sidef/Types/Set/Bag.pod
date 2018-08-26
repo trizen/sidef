@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-Sidef::Types::Set::Set
+Sidef::Types::Set::Bag
 
 =head1 DESCRIPTION
 
@@ -11,14 +11,14 @@ This class implements ...
 
 =head1 SYNOPSIS
 
-var obj = Set(...)
+var obj = Bag(...)
 
 
 =head1 INHERITS
 
 Inherits methods from:
 
-	* Sidef::Types::Hash::Hash
+	* Sidef::Types::Set::Set
 
 =head1 METHODS
 
@@ -83,9 +83,37 @@ Aliases: I<xor>, I<symdiff>, I<symmetric_difference>
 
 =cut
 
+=head2 add_pair
+
+Bag.add_pair() -> I<Obj>
+
+Return the
+
+Aliases: I<push_pair>, I<append_pair>
+
+=cut
+
+=head2 add_pairs
+
+Bag.add_pairs() -> I<Obj>
+
+Return the
+
+Aliases: I<push_pairs>, I<append_pairs>
+
+=cut
+
+=head2 clone
+
+Bag.clone() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 collect
 
-Set.collect() -> I<Obj>
+Bag.collect() -> I<Obj>
 
 Return the
 
@@ -93,7 +121,7 @@ Return the
 
 =head2 contains_all
 
-Set.contains_all() -> I<Obj>
+Bag.contains_all() -> I<Obj>
 
 Return the
 
@@ -101,7 +129,7 @@ Return the
 
 =head2 count
 
-Set.count() -> I<Obj>
+Bag.count() -> I<Obj>
 
 Return the
 
@@ -109,7 +137,7 @@ Return the
 
 =head2 count_by
 
-Set.count_by() -> I<Obj>
+Bag.count_by() -> I<Obj>
 
 Return the
 
@@ -117,7 +145,7 @@ Return the
 
 =head2 delete
 
-Set.delete() -> I<Obj>
+Bag.delete() -> I<Obj>
 
 Return the
 
@@ -125,9 +153,19 @@ Aliases: I<remove>, I<discard>
 
 =cut
 
+=head2 delete_all
+
+Bag.delete_all() -> I<Obj>
+
+Return the
+
+Aliases: I<remove_all>, I<discard_all>
+
+=cut
+
 =head2 delete_first_if
 
-Set.delete_first_if() -> I<Obj>
+Bag.delete_first_if() -> I<Obj>
 
 Return the
 
@@ -135,15 +173,25 @@ Return the
 
 =head2 delete_if
 
-Set.delete_if() -> I<Obj>
+Bag.delete_if() -> I<Obj>
 
 Return the
 
 =cut
 
+=head2 delete_key
+
+Bag.delete_key() -> I<Obj>
+
+Return the
+
+Aliases: I<remove_key>, I<discard_key>
+
+=cut
+
 =head2 dump
 
-Set.dump() -> I<Obj>
+Bag.dump() -> I<Obj>
 
 Return the
 
@@ -151,7 +199,33 @@ Return the
 
 =head2 each
 
-Set.each() -> I<Obj>
+Bag.each() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 each_kv
+
+Bag.each_kv() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 elems
+
+Bag.elems() -> I<Obj>
+
+Return the
+
+Aliases: I<keys_len>
+
+=cut
+
+=head2 freq
+
+Bag.freq() -> I<Obj>
 
 Return the
 
@@ -159,7 +233,7 @@ Return the
 
 =head2 grep
 
-Set.grep() -> I<Obj>
+Bag.grep() -> I<Obj>
 
 Return the
 
@@ -169,7 +243,7 @@ Aliases: I<select>
 
 =head2 has
 
-Set.has() -> I<Obj>
+Bag.has() -> I<Obj>
 
 Return the
 
@@ -177,15 +251,33 @@ Return the
 
 =head2 iter
 
-Set.iter() -> I<Obj>
+Bag.iter() -> I<Obj>
 
 Return the
 
 =cut
 
+=head2 keys
+
+Bag.keys() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 len
+
+Bag.len() -> I<Obj>
+
+Return the
+
+Aliases: I<size>, I<length>
+
+=cut
+
 =head2 map
 
-Set.map() -> I<Obj>
+Bag.map() -> I<Obj>
 
 Return the
 
@@ -193,7 +285,7 @@ Return the
 
 =head2 max
 
-Set.max() -> I<Obj>
+Bag.max() -> I<Obj>
 
 Return the
 
@@ -201,7 +293,7 @@ Return the
 
 =head2 max_by
 
-Set.max_by() -> I<Obj>
+Bag.max_by() -> I<Obj>
 
 Return the
 
@@ -209,7 +301,7 @@ Return the
 
 =head2 min
 
-Set.min() -> I<Obj>
+Bag.min() -> I<Obj>
 
 Return the
 
@@ -217,7 +309,7 @@ Return the
 
 =head2 min_by
 
-Set.min_by() -> I<Obj>
+Bag.min_by() -> I<Obj>
 
 Return the
 
@@ -225,7 +317,7 @@ Return the
 
 =head2 new
 
-Set.new() -> I<Obj>
+Bag.new() -> I<Obj>
 
 Return the
 
@@ -233,9 +325,33 @@ Aliases: I<call>
 
 =cut
 
+=head2 pairs
+
+Bag.pairs() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 pop
 
-Set.pop() -> I<Obj>
+Bag.pop() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 replace_pair
+
+Bag.replace_pair() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 replace_pairs
+
+Bag.replace_pairs() -> I<Obj>
 
 Return the
 
@@ -243,7 +359,7 @@ Return the
 
 =head2 shift
 
-Set.shift() -> I<Obj>
+Bag.shift() -> I<Obj>
 
 Return the
 
@@ -251,7 +367,7 @@ Return the
 
 =head2 sort
 
-Set.sort() -> I<Obj>
+Bag.sort() -> I<Obj>
 
 Return the
 
@@ -259,7 +375,7 @@ Return the
 
 =head2 sort_by
 
-Set.sort_by() -> I<Obj>
+Bag.sort_by() -> I<Obj>
 
 Return the
 
@@ -267,17 +383,17 @@ Return the
 
 =head2 to_a
 
-Set.to_a() -> I<Obj>
+Bag.to_a() -> I<Obj>
 
 Return the
 
-Aliases: I<values>, I<to_array>
+Aliases: I<expand>, I<to_array>
 
 =cut
 
 =head2 to_bag
 
-Set.to_bag() -> I<Obj>
+Bag.to_bag() -> I<Obj>
 
 Return the
 
@@ -285,7 +401,25 @@ Return the
 
 =head2 to_set
 
-Set.to_set() -> I<Obj>
+Bag.to_set() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 uniq
+
+Bag.uniq() -> I<Obj>
+
+Return the
+
+Aliases: I<unique>
+
+=cut
+
+=head2 values
+
+Bag.values() -> I<Obj>
 
 Return the
 
@@ -301,11 +435,23 @@ Aliases: I<∪>, I<or>, I<union>
 
 =cut
 
+=head2 ≠
+
+I<Obj> B<≠> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<!=>, I<ne>
+
+=cut
+
 =head2 ≡
 
 I<Obj> B<≡> I<Obj> -> I<Obj>
 
 Return the
+
+Aliases: I<==>, I<eq>
 
 =cut
 

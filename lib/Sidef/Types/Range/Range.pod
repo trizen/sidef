@@ -362,14 +362,6 @@ Aliases: I<to_array>
 
 =cut
 
-=head2 to_s
-
-Range.to_s() -> I<Obj>
-
-Return the
-
-=cut
-
 =head2 unroll_operator
 
 Range.unroll_operator() -> I<Obj>

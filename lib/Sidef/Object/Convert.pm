@@ -8,32 +8,28 @@ package Sidef::Object::Convert {
     use overload;
     use Sidef::Types::Bool::Bool;
 
-    sub to_str {
-        my ($self) = @_;
-        UNIVERSAL::isa($self, 'SCALAR')
-          || UNIVERSAL::isa($self, 'REF')
-          ? Sidef::Types::String::String->new(overload::StrVal($self) ? "$self" : defined($$self) ? "$$self" : "")
-          : $self;
-    }
-
-    *to_s = \&to_str;
-
     sub to_type {
         my ($self, $obj) = @_;
         $obj->new($self);
     }
 
-    sub to_int {
-        Sidef::Types::Number::Number->new($_[0])->int;
+    sub to_str {
+        $_[0];
     }
 
-    *to_i = \&to_int;
+    *to_s = \&to_str;
 
     sub to_num {
         Sidef::Types::Number::Number->new($_[0]);
     }
 
     *to_n = \&to_num;
+
+    sub to_int {
+        Sidef::Types::Number::Number->new($_[0])->int;
+    }
+
+    *to_i = \&to_int;
 
     sub to_float {
         Sidef::Types::Number::Number->new($_[0])->float;
@@ -72,6 +68,14 @@ package Sidef::Object::Convert {
     }
 
     *to_b = \&to_bool;
+
+    sub to_set {
+        Sidef::Types::Set::Set->new($_[0]);
+    }
+
+    sub to_bag {
+        Sidef::Types::Set::Bag->new($_[0]);
+    }
 
     sub to_caller {
         Sidef::Module::OO->__NEW__("$_[0]");

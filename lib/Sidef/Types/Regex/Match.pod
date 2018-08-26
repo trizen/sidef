@@ -107,4 +107,6 @@ Match.to_s() -> I<Obj>
 
 Return the
 
+Aliases: I<to_str>
+
 =cut

@@ -1019,6 +1019,26 @@ Aliases: I<capitalize>
 
 =cut
 
+=head2 to_i
+
+String.to_i() -> I<Obj>
+
+Return the
+
+Aliases: I<to_int>
+
+=cut
+
+=head2 to_n
+
+String.to_n() -> I<Obj>
+
+Return the
+
+Aliases: I<to_num>
+
+=cut
+
 =head2 to_s
 
 String.to_s() -> I<Obj>

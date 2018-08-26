@@ -23,14 +23,6 @@ Inherits methods from:
 =head1 METHODS
 
 
-=head2 ctime
-
-Localtime.ctime() -> I<Obj>
-
-Return the
-
-=cut
-
 =head2 day
 
 Localtime.day() -> I<Obj>
@@ -84,6 +76,16 @@ Localtime.sec() -> I<Obj>
 Return the
 
 Aliases: I<second>
+
+=cut
+
+=head2 to_s
+
+Localtime.to_s() -> I<Obj>
+
+Return the
+
+Aliases: I<ctime>, I<to_str>
 
 =cut
 

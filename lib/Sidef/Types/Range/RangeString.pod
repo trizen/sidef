@@ -42,14 +42,6 @@ Aliases: I<include>, I<contains>, I<includes>
 
 =cut
 
-=head2 dump
-
-RangeString.dump() -> I<Obj>
-
-Return the
-
-=cut
-
 =head2 from
 
 RangeString.from() -> I<Obj>
@@ -113,5 +105,15 @@ Aliases: I<sample>
 RangeString.to() -> I<Obj>
 
 Return the
+
+=cut
+
+=head2 to_s
+
+RangeString.to_s() -> I<Obj>
+
+Return the
+
+Aliases: I<dump>, I<to_str>
 
 =cut

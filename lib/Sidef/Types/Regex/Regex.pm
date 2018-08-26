@@ -121,7 +121,8 @@ package Sidef::Types::Regex::Regex {
         Sidef::Types::String::String->new('/' . $str =~ s{/}{\\/}gr . '/' . $flags . ($self->{global} ? 'g' : ''));
     }
 
-    *to_s = \&dump;
+    *to_s   = \&dump;
+    *to_str = \&dump;
 
     {
         no strict 'refs';

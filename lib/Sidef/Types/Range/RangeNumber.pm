@@ -278,6 +278,9 @@ package Sidef::Types::Range::RangeNumber {
         my ($self) = @_;
         Sidef::Types::String::String->new("$self");
     }
+
+    *to_s   = \&dump;
+    *to_str = \&dump;
 }
 
 1;

@@ -23,6 +23,9 @@ package Sidef::Types::Null::Null {
     sub dump {
         Sidef::Types::String::String->new('null');
     }
+
+    *to_s   = \&dump;
+    *to_str = \&dump;
 };
 
 1

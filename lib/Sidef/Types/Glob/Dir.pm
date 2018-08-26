@@ -188,6 +188,13 @@ package Sidef::Types::Glob::Dir {
         Sidef::Types::String::String->new('Dir(' . ${Sidef::Types::String::String->new("$self")->dump} . ')');
     }
 
+    sub to_str {
+        my ($self) = @_;
+        Sidef::Types::String::String->new($$self);
+    }
+
+    *to_s = \&to_str;
+
     {
         no strict 'refs';
         *{__PACKAGE__ . '::' . '+'} = \&concat;

@@ -625,6 +625,12 @@ package Sidef::Types::Glob::File {
         Sidef::Types::String::String->new('File(' . ${Sidef::Types::String::String->new("$self")->dump} . ')');
     }
 
+    sub to_str {
+        my ($self) = @_;
+        Sidef::Types::String::String->new($$self);
+    }
+
+    *to_s = \&to_str;
 };
 
 1

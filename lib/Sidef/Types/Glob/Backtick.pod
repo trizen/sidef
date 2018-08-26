@@ -41,10 +41,12 @@ Return the
 
 =cut
 
-=head2 dump
+=head2 to_s
 
-Backtick.dump() -> I<Obj>
+Backtick.to_s() -> I<Obj>
 
 Return the
+
+Aliases: I<dump>, I<to_str>
 
 =cut

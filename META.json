@@ -193,6 +193,9 @@
       "Sidef::Types::Regex::Regex" : {
          "file" : "lib/Sidef/Types/Regex/Regex.pm"
       },
+      "Sidef::Types::Set::Bag" : {
+         "file" : "lib/Sidef/Types/Set/Bag.pm"
+      },
       "Sidef::Types::Set::Set" : {
          "file" : "lib/Sidef/Types/Set/Set.pm"
       },

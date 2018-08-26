@@ -1,0 +1,72 @@
+#!/usr/bin/ruby
+
+# Tests for sets
+
+var engineers = Bag('John', 'Jane', 'Jack', 'Janice')   #=> Bag("Janice", "Jack", "John", "Jane")
+var programmers = Bag('Jack', 'Sam', 'Susan', 'Janice') #=> Bag("Janice", "Jack", "Susan", "Sam")
+var managers = Bag('Jane', 'Jack', 'Susan', 'Zack')     #=> Bag("Jack", "Zack", "Susan", "Jane")
+
+var employees = (engineers | programmers | managers)    #=> Bag("Jane", "Jack", "Zack", "Susan", "John", "Sam", "Janice")
+assert_eq(employees.sort, ["Jack", "Jane", "Janice", "John", "Sam", "Susan", "Zack"])
+
+var engineering_management = (engineers & managers)     #=> Bag("Jane", "Jack")
+assert_eq(engineering_management.sort, ["Jack", "Jane"])
+
+var fulltime_management = (managers - engineers - programmers)  #=> Bag("Zack")
+
+assert_eq(fulltime_management.sort, ["Zack"])
+assert_eq(fulltime_management, Bag("Zack"))
+assert_ne(fulltime_management, Bag("Foo"))
+
+engineers.add('Marvin')    # add "Marvin" to the engineers set
+assert_eq(engineers.len, 5)
+assert_eq(engineers.sort, ["Jack", "Jane", "Janice", "John", "Marvin"])
+
+assert(!employees.is_superset(engineers), "employees is not a superset of engineers")
+employees |= engineers
+
+assert(employees.is_superset(engineers), "employees is not a superset of engineers")
+assert_eq(employees, Bag("Jack", "Jane", "Janice", "John", "Marvin", "Sam", "Susan", "Zack"))
+
+var tests = [
+    ["Jack", "Jane", "Janice", "John", "Marvin"],
+    ["Jack", "Janice", "Sam"],
+    ["Jack", "Jane", "Zack"],
+    ["Jack", "Jane", "Janice", "John", "Marvin", "Sam", "Zack"]
+]
+
+for group in [engineers, programmers, managers, employees] {
+   group.discard("Susan")
+   say group
+   assert_eq(group.sort, tests.shift)
+}
+
+var a = Bag()
+for k,v in (Bag("a", "a", "b", "c", 42)) {
+    a.add(k)
+}
+
+assert_eq(a, Bag(42, "a", "b", "c"))
+assert_eq(a, Bag("a", "b", "c", 42))
+
+assert_eq(Bag(42, 99, 12, 17).map {|n| n+1 }, Bag(43, 100, 13, 18))
+assert_eq(Bag(42, 99, 12, 17).map {|n| n+1 }.sort, [13, 18, 43, 100])
+
+assert_eq(Bag(42, 99, 13, 20).grep{.is_even}, Bag(42, 20))
+assert_eq(Bag(42, 99, 13, 20).grep{.is_even}.sort, [20, 42])
+
+do {
+    var a = Bag("John", "Serena", "Bob", "Mary", "Serena")
+    var b = Bag("Jim", "Mary", "John", "Jim", "Bob")
+    assert_eq(a ^ b, Bag("Serena", "Serena", "Jim", "Jim"))
+    assert_eq(b ^ a, Bag("Jim", "Serena", "Jim", "Serena"))
+    assert_eq((a ^ b).sort, ["Jim", "Jim", "Serena", "Serena"])
+}
+
+assert(Bag(3,4)   ≡ Bag(3,4))
+assert(Bag(3,3,4) >= Bag(4,3))
+assert(Bag(3,3,4) <= Bag(4,3,4,4,3,3,3))
+
+assert(!(Bag(3,4) ≡ Bag(4,3,5)))
+assert(!(Bag(3,4) ≡ Bag(4,3,5)))
+assert(!(Bag(3,4) ≡ Bag(2,3)))

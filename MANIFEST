@@ -81,6 +81,8 @@ lib/Sidef/Types/Regex/Match.pm
 lib/Sidef/Types/Regex/Match.pod
 lib/Sidef/Types/Regex/Regex.pm
 lib/Sidef/Types/Regex/Regex.pod
+lib/Sidef/Types/Set/Bag.pm
+lib/Sidef/Types/Set/Bag.pod
 lib/Sidef/Types/Set/Set.pm
 lib/Sidef/Types/Set/Set.pod
 lib/Sidef/Types/String/String.pm
@@ -636,6 +638,9 @@ scripts/Tests/array_zipping.sf
 scripts/Tests/arrays.sf
 scripts/Tests/autovivification.sf
 scripts/Tests/averages_mode.sf
+scripts/Tests/bags_1.sf
+scripts/Tests/bags_2.sf
+scripts/Tests/bags_3.sf
 scripts/Tests/balanced_brakets.sf
 scripts/Tests/bare_multiplication.sf
 scripts/Tests/base64_decoder.sf

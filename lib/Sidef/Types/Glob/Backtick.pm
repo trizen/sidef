@@ -39,6 +39,9 @@ package Sidef::Types::Glob::Backtick {
         my ($self) = @_;
         Sidef::Types::String::String->new("$self");
     }
+
+    *to_s   = \&dump;
+    *to_str = \&dump;
 };
 
 1

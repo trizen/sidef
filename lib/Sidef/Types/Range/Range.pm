@@ -328,10 +328,6 @@ package Sidef::Types::Range::Range {
         Sidef::Types::String::String->new(CORE::join("$sep", $self->to_list));
     }
 
-    sub to_s {
-        Sidef::Types::String::String->new(CORE::join(' ', $_[0]->to_list));
-    }
-
     sub rand {
         my ($self, $n) = @_;
 

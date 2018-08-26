@@ -32,6 +32,7 @@ package Sidef::Types::Bool::Bool {
 
     sub get_value { ${$_[0]} }
     sub to_bool   { $_[0] }
+
     *to_b = \&to_bool;
 
     {
@@ -68,6 +69,9 @@ package Sidef::Types::Bool::Bool {
         my ($self) = @_;
         Sidef::Types::String::String->new($$self ? 'true' : 'false');
     }
+
+    *to_s   = \&dump;
+    *to_str = \&dump;
 
 };
 

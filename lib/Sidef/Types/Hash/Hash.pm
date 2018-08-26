@@ -265,7 +265,7 @@ package Sidef::Types::Hash::Hash {
 
     *grep_v = \&grep_val;
 
-    sub count {
+    sub count_by {
         my ($self, $block) = @_;
 
         my $count = 0;
@@ -278,7 +278,19 @@ package Sidef::Types::Hash::Hash {
         Sidef::Types::Number::Number->_set_uint($count);
     }
 
-    *count_by = \&count;
+    sub count {
+        my ($self, $obj) = @_;
+
+        if (ref($obj) eq 'Sidef::Types::Block::Block') {
+            goto &count_by;
+        }
+
+        if (CORE::exists($self->{$obj})) {
+            return Sidef::Types::Number::Number::ONE;
+        }
+
+        Sidef::Types::Number::Number::ZERO;
+    }
 
     sub delete_if {
         my ($self, $block) = @_;
@@ -490,6 +502,7 @@ package Sidef::Types::Hash::Hash {
           : (Sidef::Types::Bool::Bool::FALSE);
     }
 
+    *has      = \&exists;
     *haskey   = \&exists;
     *has_key  = \&exists;
     *contain  = \&exists;
@@ -566,6 +579,9 @@ package Sidef::Types::Hash::Hash {
     sub dump {
         Sidef::Types::String::String->new($_[0]->_dump);
     }
+
+    *to_s   = \&dump;
+    *to_str = \&dump;
 
     {
         no strict 'refs';

@@ -23,14 +23,6 @@ Inherits methods from:
 =head1 METHODS
 
 
-=head2 dump
-
-Pair.dump() -> I<Obj>
-
-Return the
-
-=cut
-
 =head2 key
 
 Pair.key() -> I<Obj>
@@ -76,6 +68,16 @@ Pair.to_h() -> I<Obj>
 Return the
 
 Aliases: I<to_hash>
+
+=cut
+
+=head2 to_s
+
+Pair.to_s() -> I<Obj>
+
+Return the
+
+Aliases: I<dump>, I<to_str>
 
 =cut
 
