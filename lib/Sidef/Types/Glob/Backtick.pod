@@ -7,11 +7,11 @@ Sidef::Types::Glob::Backtick
 
 =head1 DESCRIPTION
 
-This object is ...
+This class implements ...
 
 =head1 SYNOPSIS
 
-var obj = Backtick.new(...);
+var obj = Backtick(...)
 
 
 =head1 INHERITS

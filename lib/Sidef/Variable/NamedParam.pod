@@ -7,11 +7,11 @@ Sidef::Variable::NamedParam
 
 =head1 DESCRIPTION
 
-This object is ...
+This class implements ...
 
 =head1 SYNOPSIS
 
-var obj = NamedParam.new(...);
+var obj = NamedParam(...)
 
 =head1 METHODS
 

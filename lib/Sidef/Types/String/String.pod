@@ -7,11 +7,11 @@ Sidef::Types::String::String
 
 =head1 DESCRIPTION
 
-This object is ...
+This class implements ...
 
 =head1 SYNOPSIS
 
-var obj = String.new(...);
+var obj = String(...)
 
 
 =head1 INHERITS

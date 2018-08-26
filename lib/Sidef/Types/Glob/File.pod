@@ -7,11 +7,11 @@ Sidef::Types::Glob::File
 
 =head1 DESCRIPTION
 
-This object is ...
+This class implements ...
 
 =head1 SYNOPSIS
 
-var obj = File.new(...);
+var obj = File(...)
 
 
 =head1 INHERITS

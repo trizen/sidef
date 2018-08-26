@@ -7,11 +7,11 @@ Sidef::Object::Lazy
 
 =head1 DESCRIPTION
 
-This object is ...
+This class implements ...
 
 =head1 SYNOPSIS
 
-var obj = Lazy.new(...);
+var obj = Lazy(...)
 
 =head1 METHODS
 

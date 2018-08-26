@@ -81,6 +81,8 @@ lib/Sidef/Types/Regex/Match.pm
 lib/Sidef/Types/Regex/Match.pod
 lib/Sidef/Types/Regex/Regex.pm
 lib/Sidef/Types/Regex/Regex.pod
+lib/Sidef/Types/Set/Set.pm
+lib/Sidef/Types/Set/Set.pod
 lib/Sidef/Types/String/String.pm
 lib/Sidef/Types/String/String.pod
 lib/Sidef/Variable/GetOpt.pm
@@ -873,6 +875,8 @@ scripts/Tests/script.sf
 scripts/Tests/selection_sort.sf
 scripts/Tests/set_consolidation.sf
 scripts/Tests/set_operations.sf
+scripts/Tests/sets_1.sf
+scripts/Tests/sets_2.sf
 scripts/Tests/sidef_executor.sf
 scripts/Tests/sidef_keywords.sf
 scripts/Tests/sidef_to_json.sf

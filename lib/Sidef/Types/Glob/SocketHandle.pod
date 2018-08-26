@@ -7,11 +7,11 @@ Sidef::Types::Glob::SocketHandle
 
 =head1 DESCRIPTION
 
-This object is ...
+This class implements ...
 
 =head1 SYNOPSIS
 
-var obj = SocketHandle.new(...);
+var obj = SocketHandle(...)
 
 
 =head1 INHERITS

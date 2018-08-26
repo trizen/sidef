@@ -432,13 +432,6 @@ package Sidef::Types::Array::Array {
         bless \@new;
     }
 
-    sub is_empty {
-        my ($self) = @_;
-        ($#$self < 0)
-          ? (Sidef::Types::Bool::Bool::TRUE)
-          : (Sidef::Types::Bool::Bool::FALSE);
-    }
-
     sub sub {
         my ($self, $array) = @_;
 
@@ -2414,6 +2407,19 @@ package Sidef::Types::Array::Array {
         bless [@$self[0 .. $amount]];
     }
 
+    sub is_empty {
+        my ($self) = @_;
+        ($#$self < 0)
+          ? (Sidef::Types::Bool::Bool::TRUE)
+          : (Sidef::Types::Bool::Bool::FALSE);
+    }
+
+    sub clear {
+        my ($self) = @_;
+        @$self = ();
+        $self;
+    }
+
     sub sort {
         my ($self, $block) = @_;
 
@@ -3114,12 +3120,6 @@ package Sidef::Types::Array::Array {
     }
 
     *to_array = \&to_a;
-
-    sub copy {
-        my ($self) = @_;
-        state $x = warn "[WARNING] Array.copy() is deprecated: use .clone() or .dclone() instead!\n";
-        $self->dclone;
-    }
 
     sub delete_first {
         my ($self, $obj) = @_;

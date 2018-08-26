@@ -7,11 +7,11 @@ Sidef::Object::Enumerator
 
 =head1 DESCRIPTION
 
-This object is ...
+This class implements ...
 
 =head1 SYNOPSIS
 
-var obj = Enumerator.new(...);
+var obj = Enumerator(...)
 
 =head1 METHODS
 

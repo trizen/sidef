@@ -7,11 +7,11 @@ Sidef::Types::Hash::Hash
 
 =head1 DESCRIPTION
 
-This object is ...
+This class implements ...
 
 =head1 SYNOPSIS
 
-var obj = Hash.new(...);
+var obj = Hash(...)
 
 
 =head1 INHERITS
@@ -63,19 +63,25 @@ Aliases: I<eq>
 
 =cut
 
-=head2 add
+=head2 append
 
-Hash.add() -> I<Obj>
+Hash.append() -> I<Obj>
 
 Return the
-
-Aliases: I<append>
 
 =cut
 
 =head2 as_tree
 
 Hash.as_tree() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 clear
+
+Hash.clear() -> I<Obj>
 
 Return the
 
@@ -88,14 +94,6 @@ Hash.collect() -> I<Obj>
 Return the
 
 Aliases: I<collect_kv>
-
-=cut
-
-=head2 copy
-
-Hash.copy() -> I<Obj>
-
-Return the
 
 =cut
 
@@ -234,6 +232,14 @@ Hash.grep_v() -> I<Obj>
 Return the
 
 Aliases: I<grep_val>
+
+=cut
+
+=head2 is_empty
+
+Hash.is_empty() -> I<Obj>
+
+Return the
 
 =cut
 

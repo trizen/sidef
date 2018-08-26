@@ -10,7 +10,6 @@ Method/functions:
 New built-in classes:
     * Implement a native `Matrix` class (as `Sidef::Types::Array::Matrix`) with functionality close to that of the `Math::Matrix` Perl module.
     * Implement a native `Vector` class (as `Sidef::Types::Array::Vector`) with appropriate methods, such as: `dist`, `+`, `-`, `*`, `/`, etc...
-    * Implement a native `Set` class (as `Sidef::Types::Set::Set`) with appropriate methods, such as: `contains`, `remove`, `union`, `intersect`, etc...
     * Implement a native `Bag` class (as `Sidef::Types::Set::Bag`) which would behave exactly like a multiset.
 
 Internal:

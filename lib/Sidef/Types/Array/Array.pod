@@ -7,11 +7,11 @@ Sidef::Types::Array::Array
 
 =head1 DESCRIPTION
 
-This object is ...
+This class implements ...
 
 =head1 SYNOPSIS
 
-var obj = Array.new(...);
+var obj = Array(...)
 
 
 =head1 INHERITS
@@ -345,6 +345,14 @@ Return the
 
 =cut
 
+=head2 clear
+
+Array.clear() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 collapse
 
 Array.collapse() -> I<Obj>
@@ -414,14 +422,6 @@ Return the
 =head2 contains_type
 
 Array.contains_type() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 copy
-
-Array.copy() -> I<Obj>
 
 Return the
 

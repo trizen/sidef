@@ -229,7 +229,7 @@ __POD2__
 
     my $header = $pod_data->{__HEADER__};
 
-    if (not defined($header) or $header =~ /^This object is \.\.\.$/m) {
+    if (not defined($header) or $header =~ /^This class implements \.\.\.$/m) {
         $header = <<"HEADER";
 
 \=encoding utf8
@@ -240,11 +240,11 @@ $module
 
 \=head1 DESCRIPTION
 
-This object is ...
+This class implements ...
 
 \=head1 SYNOPSIS
 
-var obj = $parts[-1].new(...);
+var obj = $parts[-1]\(...)
 
 HEADER
 

@@ -7,11 +7,11 @@ Sidef::Types::Glob::Stat
 
 =head1 DESCRIPTION
 
-This object is ...
+This class implements ...
 
 =head1 SYNOPSIS
 
-var obj = Stat.new(...);
+var obj = Stat(...)
 
 
 =head1 INHERITS

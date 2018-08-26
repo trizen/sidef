@@ -1,0 +1,50 @@
+#!/usr/bin/ruby
+
+# Tests for sets
+
+var x = Set(1, 2, 3)
+5..7 -> each { |i| x += i }
+
+var y = Set(1, 2, 4, x)
+
+say "set x is: #{x}"
+say "set y is: #{y}"
+
+[1,2,3,4,x].each { |elem|
+    say ("#{elem} is ", y.has(elem) ? '' : 'not', " in y")
+
+    elem == 3 ? assert(!y.has(elem), "#{elem} does not exists in #{y}")
+              : assert( y.has(elem), "#{elem} exists in #{y}")
+}
+
+var (w, z)
+say ("union: ", x ∪ y)
+say ("intersect: ", x ∩ y)
+say ("z = x ∖ y = ", z = (x ∖ y) )
+
+say ("y is ", y ⊆ x ? "" : "not ", "a subset of x")
+say ("z is ", z ⊆ x ? "" : "not ", "a subset of x")
+
+assert(!(y ⊆ x), "y is not a subset of x")
+assert(z ⊆ x, "z is a subset of x")
+
+say ("z = (x ∪ y) ∖ (x ∩ y) = ", z = ((x ∪ y) ∖ (x ∩ y)))
+say ("w = x ^ y = ", w = (x ^ y))
+say ("w is ", w ≡ z ? "" : "not ", "equal to z")
+say ("w is ", w ≡ x ? "" : "not ", "equal to x")
+
+assert_eq(w, z)
+assert_ne(w, x)
+
+assert_eq((w - y).sort, [3, 5, 6, 7])
+assert_eq((w ^ y).sort, [1, 2, 3, 5, 6, 7])
+assert_eq((w & x).sort, [3, 5, 6, 7])
+assert_eq((w | x - y).sort, [3, 5, 6, 7])
+assert_eq((w & x - y).sort, [3, 5, 6, 7])
+assert_eq((w ^ x | y), y)
+assert_eq((w - x | y), y)
+assert_eq((w ^ x), y)
+assert_eq((w - x ^ y).sort, [1, 2])
+assert_eq((w - x | y - y).sort, [])
+assert_eq((w - x | y ^ y).sort, [])
+assert_eq((w - x | y | x - y).sort, [3, 5, 6, 7])

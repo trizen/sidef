@@ -7,11 +7,11 @@ Sidef::Types::Range::RangeString
 
 =head1 DESCRIPTION
 
-This object is ...
+This class implements ...
 
 =head1 SYNOPSIS
 
-var obj = RangeString.new(...);
+var obj = RangeString(...)
 
 
 =head1 INHERITS

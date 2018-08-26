@@ -1,0 +1,310 @@
+
+=encoding utf8
+
+=head1 NAME
+
+Sidef::Types::Set::Set
+
+=head1 DESCRIPTION
+
+This class implements ...
+
+=head1 SYNOPSIS
+
+var obj = Set(...)
+
+
+=head1 INHERITS
+
+Inherits methods from:
+
+	* Sidef::Types::Hash::Hash
+
+=head1 METHODS
+
+
+=head2 &
+
+I<Obj> B<&> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<∩>, I<and>, I<intersection>
+
+=cut
+
+=head2 +
+
+I<Obj> B<+> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<concat>
+
+=cut
+
+=head2 -
+
+I<Obj> B<-> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<∖>, I<diff>, I<difference>
+
+=cut
+
+=head2 ...
+
+I<Obj> B<...> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<to_list>
+
+=cut
+
+=head2 ^
+
+I<Obj> B<^> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<xor>, I<symdiff>, I<symmetric_difference>
+
+=cut
+
+=head2 add
+
+Set.add() -> I<Obj>
+
+Return the
+
+Aliases: I<push>, I<append>
+
+=cut
+
+=head2 collect
+
+Set.collect() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 contains_all
+
+Set.contains_all() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 count
+
+Set.count() -> I<Obj>
+
+Return the
+
+Aliases: I<count_by>
+
+=cut
+
+=head2 delete
+
+Set.delete() -> I<Obj>
+
+Return the
+
+Aliases: I<remove>, I<discard>
+
+=cut
+
+=head2 delete_if
+
+Set.delete_if() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 dump
+
+Set.dump() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 each
+
+Set.each() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 grep
+
+Set.grep() -> I<Obj>
+
+Return the
+
+Aliases: I<select>
+
+=cut
+
+=head2 has
+
+Set.has() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 iter
+
+Set.iter() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 len
+
+Set.len() -> I<Obj>
+
+Return the
+
+Aliases: I<size>, I<length>
+
+=cut
+
+=head2 map
+
+Set.map() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 max
+
+Set.max() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 max_by
+
+Set.max_by() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 min
+
+Set.min() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 min_by
+
+Set.min_by() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 new
+
+Set.new() -> I<Obj>
+
+Return the
+
+Aliases: I<call>
+
+=cut
+
+=head2 pop
+
+Set.pop() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 shift
+
+Set.shift() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 sort
+
+Set.sort() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 sort_by
+
+Set.sort_by() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 to_a
+
+Set.to_a() -> I<Obj>
+
+Return the
+
+Aliases: I<values>, I<to_array>
+
+=cut
+
+=head2 |
+
+I<Obj> B<|> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<∪>, I<or>, I<union>
+
+=cut
+
+=head2 ≡
+
+I<Obj> B<≡> I<Obj> -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 ≤
+
+I<Obj> B<≤> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<⊆>, I<E<lt>=>, I<is_subset>, I<contained_in>
+
+=cut
+
+=head2 ≥
+
+I<Obj> B<≥> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<⊇>, I<E<gt>=>, I<contain>, I<include>, I<contains>, I<includes>, I<is_superset>
+
+=cut

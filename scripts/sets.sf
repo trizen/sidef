@@ -1,10 +1,10 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Set#Sidef
+## http://rosettacode.org/wiki/MySet#Sidef
 #
 
-class Set(*set) {
+class MySet(*set) {
 
     method init {
         var elems = set;
@@ -25,34 +25,34 @@ class Set(*set) {
         set.has_key(elem);
     }
 
-    method ∪(Set that) {
-        Set(set.values..., that.values...);
+    method ∪(MySet that) {
+        MySet(set.values..., that.values...);
     }
 
-    method ∩(Set that) {
-        Set(set.keys.grep{ |k| k ∈ that }   \
+    method ∩(MySet that) {
+        MySet(set.keys.grep{ |k| k ∈ that }   \
                     .map { |k| set{k} }...);
     }
 
-    method ∖(Set that) {
-        Set(set.keys.grep{|k| !(k ∈ that) } \
+    method ∖(MySet that) {
+        MySet(set.keys.grep{|k| !(k ∈ that) } \
                     .map {|k| set{k} }...);
     }
 
-    method ^(Set that) {
+    method ^(MySet that) {
         var d = ((self ∖ that) ∪ (that ∖ self));
-        Set(d.values...);
+        MySet(d.values...);
     }
 
     method count { set.len }
 
-    method ≡(Set that) {
+    method ≡(MySet that) {
         (self ∖ that -> count.is_zero) && (that ∖ self -> count.is_zero);
     }
 
     method values { set.values }
 
-    method ⊆(Set that) {
+    method ⊆(MySet that) {
         that.set.keys.each { |k|
             k ∈ self || return false;
         }
@@ -65,7 +65,7 @@ class Set(*set) {
 }
 
 class Object {
-    method ∈(Set set) {
+    method ∈(MySet set) {
         set.has(self);
     }
 }
@@ -74,10 +74,10 @@ class Object {
 ## Testing
 #
 
-var x = Set(1, 2, 3);
+var x = MySet(1, 2, 3);
 5..7 -> each { |i| x += i };
 
-var y = Set(1, 2, 4, x);
+var y = MySet(1, 2, 4, x);
 
 say "set x is: #{x}";
 say "set y is: #{y}";

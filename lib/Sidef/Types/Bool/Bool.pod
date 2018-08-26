@@ -7,11 +7,11 @@ Sidef::Types::Bool::Bool
 
 =head1 DESCRIPTION
 
-This object is ...
+This class implements ...
 
 =head1 SYNOPSIS
 
-var obj = Bool.new(...);
+var obj = Bool(...)
 
 
 =head1 INHERITS

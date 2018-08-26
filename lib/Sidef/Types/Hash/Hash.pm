@@ -15,7 +15,7 @@ package Sidef::Types::Hash::Hash {
 
     sub new {
         my (undef, %pairs) = @_;
-        bless \%pairs, __PACKAGE__;
+        bless \%pairs;
     }
 
     *call = \&new;
@@ -28,7 +28,7 @@ package Sidef::Types::Hash::Hash {
 
             my $refaddr = Scalar::Util::refaddr($obj);
 
-            exists($addr{$refaddr})
+            CORE::exists($addr{$refaddr})
               && return $addr{$refaddr};
 
             my %hash;
@@ -50,19 +50,32 @@ package Sidef::Types::Hash::Hash {
         $sub->($_[0]);
     }
 
+    sub is_empty {
+        my ($self) = @_;
+        CORE::keys(%$self)
+          ? Sidef::Types::Bool::Bool::FALSE
+          : Sidef::Types::Bool::Bool::TRUE;
+    }
+
+    sub clear {
+        my ($self) = @_;
+        %$self = ();
+        $self;
+    }
+
     sub items {
         my ($self, @keys) = @_;
-        Sidef::Types::Array::Array->new([map { exists($self->{$_}) ? $self->{$_} : undef } @keys]);
+        Sidef::Types::Array::Array->new([map { CORE::exists($self->{$_}) ? $self->{$_} : undef } @keys]);
     }
 
     sub item {
         my ($self, $key) = @_;
-        exists($self->{$key}) ? $self->{$key} : ();
+        CORE::exists($self->{$key}) ? $self->{$key} : ();
     }
 
     sub fetch {
         my ($self, $key, $default) = @_;
-        exists($self->{$key}) ? $self->{$key} : $default;
+        CORE::exists($self->{$key}) ? $self->{$key} : $default;
     }
 
     sub dig {
@@ -79,7 +92,7 @@ package Sidef::Types::Hash::Hash {
 
     sub slice {
         my ($self, @keys) = @_;
-        bless {map { ($_ => $self->{$_}) } @keys}, __PACKAGE__;
+        bless {map { ($_ => $self->{$_}) } @keys}, ref($self);
     }
 
     sub length {
@@ -130,8 +143,8 @@ package Sidef::Types::Hash::Hash {
         };
 
         no strict 'refs';
-        local *Sidef::Types::Hash::Hash::eq = $sub;
-        local *{'Sidef::Types::Hash::Hash::=='} = $sub;
+        local *{__PACKAGE__ . '::' . 'eq'} = $sub;
+        local *{__PACKAGE__ . '::' . '=='} = $sub;
         $sub->($self, $hash);
     }
 
@@ -149,7 +162,7 @@ package Sidef::Types::Hash::Hash {
         }
 
         foreach my $key (CORE::keys(%$self)) {
-            exists($obj->{$key})
+            CORE::exists($obj->{$key})
               or return (Sidef::Types::Bool::Bool::FALSE);
         }
 
@@ -166,13 +179,9 @@ package Sidef::Types::Hash::Hash {
         $self;
     }
 
-    *add = \&append;
-
     sub delete {
         my ($self, @keys) = @_;
-        @keys == 1
-          ? delete($self->{$keys[0]})
-          : (delete @{$self}{@keys});
+        CORE::delete(@{$self}{@keys});
     }
 
     *remove = \&delete;
@@ -184,38 +193,38 @@ package Sidef::Types::Hash::Hash {
     }
 
     sub map_val {
-        my ($self, $code) = @_;
+        my ($self, $block) = @_;
 
         my %hash;
         foreach my $key (CORE::keys(%$self)) {
-            $hash{$key} = $code->run(Sidef::Types::String::String->new($key), $self->{$key});
+            $hash{$key} = $block->run(Sidef::Types::String::String->new($key), $self->{$key});
         }
 
-        bless \%hash, __PACKAGE__;
+        bless \%hash, ref($self);
     }
 
     *map_v = \&map_val;
 
     sub map {
-        my ($self, $code) = @_;
+        my ($self, $block) = @_;
 
         my %hash;
         foreach my $key (CORE::keys(%$self)) {
-            my ($k, $v) = $code->run(Sidef::Types::String::String->new($key), $self->{$key});
+            my ($k, $v) = $block->run(Sidef::Types::String::String->new($key), $self->{$key});
             $hash{$k} = $v;
         }
 
-        bless \%hash, __PACKAGE__;
+        bless \%hash, ref($self);
     }
 
     *map_kv = \&map;
 
     sub collect {
-        my ($self, $code) = @_;
+        my ($self, $block) = @_;
 
         my @array;
         foreach my $key (CORE::keys(%$self)) {
-            CORE::push(@array, $code->run(Sidef::Types::String::String->new($key), $self->{$key}));
+            CORE::push(@array, $block->run(Sidef::Types::String::String->new($key), $self->{$key}));
         }
 
         Sidef::Types::Array::Array->new(\@array);
@@ -234,7 +243,7 @@ package Sidef::Types::Hash::Hash {
             }
         }
 
-        bless \%hash, __PACKAGE__;
+        bless \%hash, ref($self);
     }
 
     *grep_kv = \&grep;
@@ -251,17 +260,17 @@ package Sidef::Types::Hash::Hash {
             }
         }
 
-        bless \%hash, __PACKAGE__;
+        bless \%hash, ref($self);
     }
 
     *grep_v = \&grep_val;
 
     sub count {
-        my ($self, $code) = @_;
+        my ($self, $block) = @_;
 
         my $count = 0;
         foreach my $key (CORE::keys(%$self)) {
-            if ($code->run(Sidef::Types::String::String->new($key), $self->{$key})) {
+            if ($block->run(Sidef::Types::String::String->new($key), $self->{$key})) {
                 ++$count;
             }
         }
@@ -272,11 +281,11 @@ package Sidef::Types::Hash::Hash {
     *count_by = \&count;
 
     sub delete_if {
-        my ($self, $code) = @_;
+        my ($self, $block) = @_;
 
         foreach my $key (CORE::keys(%$self)) {
-            if ($code->run(Sidef::Types::String::String->new($key), $self->{$key})) {
-                delete($self->{$key});
+            if ($block->run(Sidef::Types::String::String->new($key), $self->{$key})) {
+                CORE::delete($self->{$key});
             }
         }
 
@@ -285,17 +294,7 @@ package Sidef::Types::Hash::Hash {
 
     sub concat {
         my ($self, $obj) = @_;
-
-        my @list;
-        while (my ($key, $val) = each %$self) {
-            push @list, $key, $val;
-        }
-
-        while (my ($key, $val) = each %$obj) {
-            push @list, $key, $val;
-        }
-
-        bless {@list}, __PACKAGE__;
+        bless {%$self, %$obj}, ref($self);
     }
 
     *merge = \&concat;
@@ -304,7 +303,7 @@ package Sidef::Types::Hash::Hash {
         my ($self, $obj) = @_;
 
         foreach my $key (CORE::keys(%$self)) {
-            if (exists $obj->{$key}) {
+            if (CORE::exists($obj->{$key})) {
                 $self->{$key} = $obj->{$key};
             }
         }
@@ -319,29 +318,29 @@ package Sidef::Types::Hash::Hash {
 
     sub values {
         my ($self) = @_;
-        Sidef::Types::Array::Array->new([CORE::values %$self]);
+        Sidef::Types::Array::Array->new([CORE::values(%$self)]);
     }
 
     sub each_value {
-        my ($self, $code) = @_;
+        my ($self, $block) = @_;
 
-        foreach my $value (CORE::values %$self) {
-            $code->run($value);
+        foreach my $value (CORE::values(%$self)) {
+            $block->run($value);
         }
 
-        $code;
+        $self;
     }
 
     *each_v = \&each_value;
 
     sub each_key {
-        my ($self, $code) = @_;
+        my ($self, $block) = @_;
 
         foreach my $key (CORE::keys(%$self)) {
-            $code->run(Sidef::Types::String::String->new($key));
+            $block->run(Sidef::Types::String::String->new($key));
         }
 
-        $code;
+        $self;
     }
 
     *each_k = \&each_key;
@@ -359,21 +358,20 @@ package Sidef::Types::Hash::Hash {
         }
 
         my ($key, $value) = each(%$self);
-
         $key // return undef;
-        Sidef::Types::Array::Array->new([Sidef::Types::String::String->new($key), $value]);
+        (Sidef::Types::String::String->new($key), $value);
     }
 
     *each_kv   = \&each;
     *each_pair = \&each;
 
     sub sort_by {
-        my ($self, $code) = @_;
+        my ($self, $block) = @_;
 
         my @array;
         foreach my $key (CORE::keys(%$self)) {
             my $str = Sidef::Types::String::String->new($key);
-            push @array, [$key, $str, $code->run($str, $self->{$key})];
+            push @array, [$key, $str, $block->run($str, $self->{$key})];
         }
 
         Sidef::Types::Array::Array->new(
@@ -381,14 +379,14 @@ package Sidef::Types::Hash::Hash {
     }
 
     sub sort {
-        my ($self, $code) = @_;
+        my ($self, $block) = @_;
 
-        if (defined $code) {
+        if (defined $block) {
             return
               Sidef::Types::Array::Array->new(
                                               [
                                                map { Sidef::Types::Array::Pair->new($_->[1], $self->{$_->[0]}) } (
-                                                       CORE::sort { scalar $code->run($a->[1], $b->[1]) }
+                                                       CORE::sort { scalar $block->run($a->[1], $b->[1]) }
                                                          map { [$_, Sidef::Types::String::String->new($_)] } CORE::keys(%$self)
                                                )
                                               ]
@@ -403,9 +401,9 @@ package Sidef::Types::Hash::Hash {
     }
 
     sub _min_max {
-        my ($self, $code, $value) = @_;
+        my ($self, $block, $value) = @_;
 
-        my @pairs = map { [$_, $code->run(Sidef::Types::String::String->new($_), $self->{$_})] } CORE::keys(%$self);
+        my @pairs = map { [$_, $block->run(Sidef::Types::String::String->new($_), $self->{$_})] } CORE::keys(%$self);
 
         my $item = $pairs[0];
         foreach my $i (1 .. $#pairs) {
@@ -416,13 +414,13 @@ package Sidef::Types::Hash::Hash {
     }
 
     sub max_by {
-        my ($self, $code) = @_;
-        $self->_min_max($code, Sidef::Types::Number::Number::ONE);
+        my ($self, $block) = @_;
+        $self->_min_max($block, Sidef::Types::Number::Number::ONE);
     }
 
     sub min_by {
-        my ($self, $code) = @_;
-        $self->_min_max($code, Sidef::Types::Number::Number::MONE);
+        my ($self, $block) = @_;
+        $self->_min_max($block, Sidef::Types::Number::Number::MONE);
     }
 
     sub to_a {
@@ -450,7 +448,7 @@ package Sidef::Types::Hash::Hash {
 
             my $refaddr = Scalar::Util::refaddr($obj);
 
-            exists($addr{$refaddr})
+            CORE::exists($addr{$refaddr})
               && return $addr{$refaddr};
 
             my @body;
@@ -503,17 +501,11 @@ package Sidef::Types::Hash::Hash {
         my ($self) = @_;
         my %hash;
         @hash{CORE::values %$self} = (map { Sidef::Types::String::String->new($_) } CORE::keys(%$self));
-        bless \%hash, __PACKAGE__;
+        bless \%hash, ref($self);
     }
 
     *flip   = \&reverse;
     *invert = \&reverse;
-
-    sub copy {
-        my ($self) = @_;
-        state $x = warn "[WARNING] Hash.copy() is deprecated: use .clone() or .dclone() instead!\n";
-        $self->dclone;
-    }
 
     sub to_list {
         my ($self) = @_;
@@ -528,7 +520,7 @@ package Sidef::Types::Hash::Hash {
 
             my $refaddr = Scalar::Util::refaddr($obj);
 
-            exists($addr{$refaddr})
+            CORE::exists($addr{$refaddr})
               and return $addr{$refaddr};
 
             $Sidef::SPACES += $Sidef::SPACES_INCR;

@@ -64,6 +64,7 @@ package Sidef::Parser {
                      | Arr(?:ay)?+\b                  (?{ state $x = bless({}, 'Sidef::DataTypes::Array::Array') })
                      | Pair\b                         (?{ state $x = bless({}, 'Sidef::DataTypes::Array::Pair') })
                      | Hash\b                         (?{ state $x = bless({}, 'Sidef::DataTypes::Hash::Hash') })
+                     | Set\b                          (?{ state $x = bless({}, 'Sidef::DataTypes::Set::Set') })
                      | Str(?:ing)?+\b                 (?{ state $x = bless({}, 'Sidef::DataTypes::String::String') })
                      | Num(?:ber)?+\b                 (?{ state $x = bless({}, 'Sidef::DataTypes::Number::Number') })
                      | Inf\b                          (?{ state $x = Sidef::Types::Number::Number->inf })
@@ -191,6 +192,7 @@ package Sidef::Parser {
                   Pair
                   Enumerator
                   Hash
+                  Set
                   Str String
                   Num Number
                   Range

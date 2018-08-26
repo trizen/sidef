@@ -7,11 +7,11 @@ Sidef::Types::Number::Number
 
 =head1 DESCRIPTION
 
-This object is ...
+This class implements ...
 
 =head1 SYNOPSIS
 
-var obj = Number.new(...);
+var obj = Number(...)
 
 
 =head1 INHERITS

@@ -7,11 +7,11 @@ Sidef::Time::Gmtime
 
 =head1 DESCRIPTION
 
-This object is ...
+This class implements ...
 
 =head1 SYNOPSIS
 
-var obj = Gmtime.new(...);
+var obj = Gmtime(...)
 
 
 =head1 INHERITS

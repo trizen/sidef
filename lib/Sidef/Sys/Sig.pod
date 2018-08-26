@@ -7,11 +7,11 @@ Sidef::Sys::Sig
 
 =head1 DESCRIPTION
 
-This object is ...
+This class implements ...
 
 =head1 SYNOPSIS
 
-var obj = Sig.new(...);
+var obj = Sig(...)
 
 =head1 METHODS
 

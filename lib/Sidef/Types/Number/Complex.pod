@@ -7,11 +7,11 @@ Sidef::Types::Number::Complex
 
 =head1 DESCRIPTION
 
-This object is ...
+This class implements ...
 
 =head1 SYNOPSIS
 
-var obj = Complex.new(...);
+var obj = Complex(...)
 
 
 =head1 INHERITS

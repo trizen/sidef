@@ -7,11 +7,11 @@ Sidef::Types::Regex::Match
 
 =head1 DESCRIPTION
 
-This object is ...
+This class implements ...
 
 =head1 SYNOPSIS
 
-var obj = Match.new(...);
+var obj = Match(...)
 
 
 =head1 INHERITS

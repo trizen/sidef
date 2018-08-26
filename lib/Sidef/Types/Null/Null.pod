@@ -7,11 +7,11 @@ Sidef::Types::Null::Null
 
 =head1 DESCRIPTION
 
-This object is ...
+This class implements ...
 
 =head1 SYNOPSIS
 
-var obj = Null.new(...);
+var obj = Null(...)
 
 
 =head1 INHERITS

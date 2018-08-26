@@ -7,11 +7,11 @@ Sidef::Object::LazyMethod
 
 =head1 DESCRIPTION
 
-This object is ...
+This class implements ...
 
 =head1 SYNOPSIS
 
-var obj = LazyMethod.new(...);
+var obj = LazyMethod(...)
 
 
 =head1 INHERITS

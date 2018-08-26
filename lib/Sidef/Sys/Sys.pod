@@ -7,11 +7,11 @@ Sidef::Sys::Sys
 
 =head1 DESCRIPTION
 
-This object is ...
+This class implements ...
 
 =head1 SYNOPSIS
 
-var obj = Sys.new(...);
+var obj = Sys(...)
 
 
 =head1 INHERITS
