@@ -183,6 +183,14 @@ Return the
 
 =cut
 
+=head2 join
+
+Set.join() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 map
 
 Set.map() -> I<Obj>

@@ -257,6 +257,14 @@ Return the
 
 =cut
 
+=head2 join
+
+Bag.join() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 keys
 
 Bag.keys() -> I<Obj>
@@ -396,6 +404,16 @@ Aliases: I<expand>, I<to_array>
 Bag.to_bag() -> I<Obj>
 
 Return the
+
+=cut
+
+=head2 top
+
+Bag.top() -> I<Obj>
+
+Return the
+
+Aliases: I<most_common>
 
 =cut
 

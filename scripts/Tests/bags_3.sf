@@ -143,6 +143,9 @@ do {
     assert_eq(a.len, 6)
     assert_eq(a.keys_len, 3)
     assert_eq(a.keys.sort, ["bacon", "eggs", "spam"])
+
+    assert_eq(Bag("abracadabra".chars...).top(1), [["a", 5]])
+    assert_eq(Bag("abracadabra".chars...).top(3).sort, [["a", 5], ["b", 2], ["r", 2]])
 }
 
 func createSubstrings(String word) -> Array {

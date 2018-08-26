@@ -356,6 +356,11 @@ package Sidef::Types::Set::Set {
         return Sidef::Types::Bool::Bool::TRUE;
     }
 
+    sub join {
+        my ($self, @rest) = @_;
+        $self->to_a->join(@rest);
+    }
+
     sub _dump {
         my %addr;    # keeps track of dumped objects
 

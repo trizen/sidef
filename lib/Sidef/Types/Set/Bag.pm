@@ -66,7 +66,7 @@ package Sidef::Types::Set::Bag {
 
         if (ref($A) eq ref($B)) {
 
-            my %C = map { $_ => {count => $A->{$_}{count}, value => $A->{$_}{value}} } CORE::keys(%$A);
+            my %C = map { $_ => {%{$A->{$_}}} } CORE::keys(%$A);
 
             foreach my $key (CORE::keys(%$B)) {
                 ($C{$key} //= {value => $B->{$key}{value}})->{count} += $B->{$key}{count};
@@ -500,11 +500,25 @@ package Sidef::Types::Set::Bag {
         my ($self) = @_;
         Sidef::Types::Array::Array->new(
             map {
-                Sidef::Types::Array::Array->new(
-                                             [$self->{$_}{value}, Sidef::Types::Number::Number->_set_uint($self->{$_}{count})])
-            } CORE::keys(%$self)
+                Sidef::Types::Array::Array->new([$_->{value}, Sidef::Types::Number::Number->_set_uint($_->{count})])
+            } CORE::values(%$self)
         );
     }
+
+    sub most_common {
+        my ($self, $n) = @_;
+
+        my @sorted = sort { $b->{count} <=> $a->{count} } CORE::values(%$self);
+        my @top = splice(@sorted, 0, CORE::int($n));
+
+        Sidef::Types::Array::Array->new(
+            map {
+                Sidef::Types::Array::Array->new([$_->{value}, Sidef::Types::Number::Number->_set_uint($_->{count})])
+              } @top
+        );
+    }
+
+    *top = \&most_common;
 
     sub uniq {
         my ($self) = @_;
@@ -654,6 +668,11 @@ package Sidef::Types::Set::Bag {
     sub contains_all {
         my ($self, @objects) = @_;
         __PACKAGE__->new(@objects)->is_subset($self);
+    }
+
+    sub join {
+        my ($self, @rest) = @_;
+        $self->to_a->join(@rest);
     }
 
     sub to_a {
