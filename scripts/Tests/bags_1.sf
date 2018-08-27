@@ -10,6 +10,9 @@ var y = Bag(1, 2, 4, x)
 say "set x is: #{x}"
 say "set y is: #{y}"
 
+assert_eq(y.clone, y)
+assert_eq(y.dclone, y)
+
 [1,2,3,4,x].each { |elem|
     say ("#{elem} is ", y.has(elem) ? '' : 'not', " in y")
 
@@ -52,5 +55,7 @@ assert_eq((w - x | y | x - y).sort, [3, 5, 6, 7])
 x << x
 
 say x
+
 assert_eq(x, x)
+assert_eq(x.clone, x)
 #assert_eq(Bag(Bag(5, 4, 4, x,4), 2, 3,3), Bag(3, Bag(4,x,5,4,4), 2,3))

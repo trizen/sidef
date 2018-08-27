@@ -49,11 +49,17 @@ for x in (Set("a", "a", "b", "c", 42)) {
 assert_eq(a, Set(42, "a", "b", "c"))
 assert_eq(a, Set("a", "b", "c", 42))
 
+assert_eq(a.clone, a)
+assert_eq(a.dclone, a)
+
 assert_eq(Set(42, 99, 12, 17).map {|n| n+1 }, Set(43, 100, 13, 18))
 assert_eq(Set(42, 99, 12, 17).map {|n| n+1 }.sort, [13, 18, 43, 100])
 
 assert_eq(Set(42, 99, 13, 20).grep{.is_even}, Set(42, 20))
 assert_eq(Set(42, 99, 13, 20).grep{.is_even}.sort, [20, 42])
+assert_eq(Set(12, 3, 4, 2, 4).to_bag, Bag(2, 3, 4, 12))
+assert_eq(Set(12, 3, 4, 2, 4).to_bag.to_set, Set(2, 3, 4, 12))
+assert_eq(Set(12, 3, 4, 2, 4).to_bag.to_set.sort, [2, 3, 4, 12])
 
 do {
     var a = Set("John", "Serena", "Bob", "Mary", "Serena")

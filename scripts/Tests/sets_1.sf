@@ -10,6 +10,9 @@ var y = Set(1, 2, 4, x)
 say "set x is: #{x}"
 say "set y is: #{y}"
 
+assert_eq(y, y.clone)
+assert_eq(y, y.dclone)
+
 [1,2,3,4,x].each { |elem|
     say ("#{elem} is ", y.has(elem) ? '' : 'not', " in y")
 

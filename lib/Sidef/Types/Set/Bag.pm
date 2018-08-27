@@ -94,14 +94,11 @@ package Sidef::Types::Set::Bag {
                 my $c2   = $B->{$key}{count};
 
                 if ($c2 > $c1) {
-                    $C{$key}{count} += $c2 - $c1;
+                    $elem->{count} = $c2;
                 }
             }
             else {
-                $C{$key} = {
-                            value => $B->{$key}{value},
-                            count => $B->{$key}{count},
-                           };
+                $C{$key} = {%{$B->{$key}}};
             }
         }
 
@@ -158,12 +155,7 @@ package Sidef::Types::Set::Bag {
                 }
             }
             else {
-                my $h_A = $A->{$key};
-
-                $C{$key} = {
-                            count => $h_A->{count},
-                            value => $h_A->{value},
-                           };
+                $C{$key} = {%{$A->{$key}}};
             }
         }
 
@@ -194,12 +186,7 @@ package Sidef::Types::Set::Bag {
                 }
             }
             else {
-                my $h_A = $A->{$key};
-
-                $C{$key} = {
-                            count => $h_A->{count},
-                            value => $h_A->{value},
-                           };
+                $C{$key} = {%{$A->{$key}}};
             }
         }
 
@@ -220,12 +207,7 @@ package Sidef::Types::Set::Bag {
                 }
             }
             else {
-                my $h_B = $B->{$key};
-
-                $C{$key} = {
-                            count => $h_B->{count},
-                            value => $h_B->{value},
-                           };
+                $C{$key} = {%{$B->{$key}}};
             }
         }
 
@@ -263,6 +245,8 @@ package Sidef::Types::Set::Bag {
         $self;
     }
 
+    *update_pair = \&replace_pair;
+
     sub replace_pairs {
         my ($self, @pairs) = @_;
 
@@ -273,6 +257,8 @@ package Sidef::Types::Set::Bag {
 
         $self;
     }
+
+    *update_pairs = \&replace_pairs;
 
     sub add_pair {
         my ($self, $obj, $n) = @_;
@@ -711,7 +697,7 @@ package Sidef::Types::Set::Bag {
 
     sub to_set {
         my ($self) = @_;
-        Sidef::Types::Set::Set->new(map { $_->{value} } CORE::values(%$self));
+        bless {map { $_ => $self->{$_}{value} } CORE::keys(%$self)}, 'Sidef::Types::Set::Set';
     }
 
     sub to_bag {
@@ -723,11 +709,7 @@ package Sidef::Types::Set::Bag {
 
         my %new;
         foreach my $key (CORE::keys(%$self)) {
-            my $elem = $self->{$key};
-            $new{$key} = {
-                          value => $elem->{value},
-                          count => $elem->{count},
-                         };
+            $new{$key} = {%{$self->{$key}}};
         }
 
         bless \%new, ref($self);

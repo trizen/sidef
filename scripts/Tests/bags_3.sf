@@ -135,6 +135,9 @@ do {
     assert_eq(a, Bag(1, 1, 1, 2, 42, 99))
     a.push(42, 42, 5)
     assert_eq(a, Bag(1, 1, 1, 2, 5, 42, 42, 42, 99))
+    assert_eq(a.to_set, Set(1, 2, 5, 42, 99))
+    assert_eq(a.clone, a)
+    assert_eq(a.dclone, a)
 }
 
 do {
