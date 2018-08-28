@@ -1419,6 +1419,14 @@ Return the
 
 =cut
 
+=head2 is_bpsw_prime
+
+Number.is_bpsw_prime() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 is_carmichael
 
 Number.is_carmichael() -> I<Obj>
@@ -1483,25 +1491,9 @@ Return the
 
 =cut
 
-=head2 is_frobenius_khashin_pseudoprime
-
-Number.is_frobenius_khashin_pseudoprime() -> I<Obj>
-
-Return the
-
-=cut
-
 =head2 is_frobenius_pseudoprime
 
 Number.is_frobenius_pseudoprime() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 is_frobenius_underwood_pseudoprime
-
-Number.is_frobenius_underwood_pseudoprime() -> I<Obj>
 
 Return the
 
@@ -1536,6 +1528,16 @@ Return the
 Number.is_int() -> I<Obj>
 
 Return the
+
+=cut
+
+=head2 is_khashin_pseudoprime
+
+Number.is_khashin_pseudoprime() -> I<Obj>
+
+Return the
+
+Aliases: I<is_frobenius_khashin_pseudoprime>
 
 =cut
 
@@ -1697,6 +1699,8 @@ Number.is_prov_prime() -> I<Obj>
 
 Return the
 
+Aliases: I<is_provable_prime>
+
 =cut
 
 =head2 isqrt
@@ -1814,6 +1818,16 @@ Return the
 Number.isub() -> I<Obj>
 
 Return the
+
+=cut
+
+=head2 is_underwood_pseudoprime
+
+Number.is_underwood_pseudoprime() -> I<Obj>
+
+Return the
+
+Aliases: I<is_frobenius_underwood_pseudoprime>
 
 =cut
 

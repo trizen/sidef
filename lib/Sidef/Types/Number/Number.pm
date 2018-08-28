@@ -8325,11 +8325,23 @@ package Sidef::Types::Number::Number {
           : Sidef::Types::Bool::Bool::FALSE;
     }
 
+    *is_underwood_pseudoprime = \&is_frobenius_underwood_pseudoprime;
+
     sub is_frobenius_khashin_pseudoprime {
         my ($n) = @_;
         __is_int__($$n)
           && Math::Prime::Util::GMP::is_frobenius_khashin_pseudoprime(_big2uistr($n)
                                                                       // (return Sidef::Types::Bool::Bool::FALSE),)
+          ? Sidef::Types::Bool::Bool::TRUE
+          : Sidef::Types::Bool::Bool::FALSE;
+    }
+
+    *is_khashin_pseudoprime = \&is_frobenius_khashin_pseudoprime;
+
+    sub is_bpsw_prime {
+        my ($n) = @_;
+        __is_int__($$n)
+          && Math::Prime::Util::GMP::is_bpsw_prime(_big2uistr($n) // (return Sidef::Types::Bool::Bool::FALSE),)
           ? Sidef::Types::Bool::Bool::TRUE
           : Sidef::Types::Bool::Bool::FALSE;
     }
@@ -8359,6 +8371,8 @@ package Sidef::Types::Number::Number {
           ? Sidef::Types::Bool::Bool::TRUE
           : Sidef::Types::Bool::Bool::FALSE;
     }
+
+    *is_provable_prime = \&is_prov_prime;
 
     sub is_mersenne_prime {
         my ($x) = @_;
