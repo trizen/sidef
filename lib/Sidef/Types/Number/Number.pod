@@ -2623,6 +2623,16 @@ Return the
 
 =cut
 
+=head2 random_nbit_strong_prime
+
+Number.random_nbit_strong_prime() -> I<Obj>
+
+Return the
+
+Aliases: I<random_strong_nbit_prime>
+
+=cut
+
 =head2 random_ndigit_prime
 
 Number.random_ndigit_prime() -> I<Obj>

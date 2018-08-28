@@ -8177,6 +8177,15 @@ package Sidef::Types::Number::Number {
         __PACKAGE__->_set_str('int', Math::Prime::Util::GMP::random_nbit_prime($n));
     }
 
+    sub random_nbit_strong_prime {
+        my ($x) = @_;
+        my $n = _any2ui($$x) // goto &nan;
+        $n < 128 && goto &random_nbit_prime;
+        __PACKAGE__->_set_str('int', Math::Prime::Util::GMP::random_strong_prime($n));
+    }
+
+    *random_strong_nbit_prime = \&random_nbit_strong_prime;
+
     sub random_ndigit_prime {
         my ($x) = @_;
         my $n = _any2ui($$x) || goto &nan;
