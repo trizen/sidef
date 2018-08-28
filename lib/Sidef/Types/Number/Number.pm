@@ -8600,6 +8600,125 @@ package Sidef::Types::Number::Number {
 
     *factors_exp = \&factor_exp;
 
+    sub trial_factor {
+        my ($n, $k) = @_;
+        _valid(\$k) if defined($k);
+        Sidef::Types::Array::Array->new(
+                                        [map { $_ < ULONG_MAX ? __PACKAGE__->_set_uint($_) : __PACKAGE__->_set_str('int', $_) }
+                                           Math::Prime::Util::GMP::trial_factor(
+                                                                  _big2pistr($n) || (return Sidef::Types::Array::Array->new()),
+                                                                  (defined($k) ? _big2uistr($k) // () : ()),
+                                           )
+                                        ]
+                                       );
+    }
+
+    sub prho_factor {
+        my ($n, $k) = @_;
+        _valid(\$k) if defined($k);
+        Sidef::Types::Array::Array->new(
+                                        [map { $_ < ULONG_MAX ? __PACKAGE__->_set_uint($_) : __PACKAGE__->_set_str('int', $_) }
+                                           Math::Prime::Util::GMP::prho_factor(
+                                                                  _big2pistr($n) || (return Sidef::Types::Array::Array->new()),
+                                                                  (defined($k) ? _big2uistr($k) // () : ()),
+                                           )
+                                        ]
+                                       );
+    }
+
+    sub pbrent_factor {
+        my ($n, $k) = @_;
+        _valid(\$k) if defined($k);
+        Sidef::Types::Array::Array->new(
+                                        [map { $_ < ULONG_MAX ? __PACKAGE__->_set_uint($_) : __PACKAGE__->_set_str('int', $_) }
+                                           Math::Prime::Util::GMP::pbrent_factor(
+                                                                  _big2pistr($n) || (return Sidef::Types::Array::Array->new()),
+                                                                  (defined($k) ? _big2uistr($k) // () : ()),
+                                           )
+                                        ]
+                                       );
+    }
+
+    sub pminus1_factor {
+        my ($n, $k) = @_;
+        _valid(\$k) if defined($k);
+        Sidef::Types::Array::Array->new(
+                                        [map { $_ < ULONG_MAX ? __PACKAGE__->_set_uint($_) : __PACKAGE__->_set_str('int', $_) }
+                                           Math::Prime::Util::GMP::pminus1_factor(
+                                                                  _big2pistr($n) || (return Sidef::Types::Array::Array->new()),
+                                                                  (defined($k) ? _big2uistr($k) // () : ()),
+                                           )
+                                        ]
+                                       );
+    }
+
+    sub pplus1_factor {
+        my ($n, $k) = @_;
+        _valid(\$k) if defined($k);
+        Sidef::Types::Array::Array->new(
+                                        [map { $_ < ULONG_MAX ? __PACKAGE__->_set_uint($_) : __PACKAGE__->_set_str('int', $_) }
+                                           Math::Prime::Util::GMP::pplus1_factor(
+                                                                  _big2pistr($n) || (return Sidef::Types::Array::Array->new()),
+                                                                  (defined($k) ? _big2uistr($k) // () : ()),
+                                           )
+                                        ]
+                                       );
+    }
+
+    sub holf_factor {
+        my ($n, $k) = @_;
+        _valid(\$k) if defined($k);
+        Sidef::Types::Array::Array->new(
+                                        [map { $_ < ULONG_MAX ? __PACKAGE__->_set_uint($_) : __PACKAGE__->_set_str('int', $_) }
+                                           Math::Prime::Util::GMP::holf_factor(
+                                                                  _big2pistr($n) || (return Sidef::Types::Array::Array->new()),
+                                                                  (defined($k) ? _big2uistr($k) // () : ()),
+                                           )
+                                        ]
+                                       );
+    }
+
+    *fermat_factor = \&holf_factor;
+
+    sub squfof_factor {
+        my ($n, $k) = @_;
+        _valid(\$k) if defined($k);
+        Sidef::Types::Array::Array->new(
+                                        [map { $_ < ULONG_MAX ? __PACKAGE__->_set_uint($_) : __PACKAGE__->_set_str('int', $_) }
+                                           Math::Prime::Util::GMP::squfof_factor(
+                                                                  _big2pistr($n) || (return Sidef::Types::Array::Array->new()),
+                                                                  (defined($k) ? _big2uistr($k) // () : ()),
+                                           )
+                                        ]
+                                       );
+    }
+
+    sub ecm_factor {
+        my ($n, $k, $m) = @_;
+
+        _valid(\$k) if defined($k);
+        _valid(\$m) if defined($m);
+
+        Sidef::Types::Array::Array->new(
+            [map { $_ < ULONG_MAX ? __PACKAGE__->_set_uint($_) : __PACKAGE__->_set_str('int', $_) }
+               Math::Prime::Util::GMP::ecm_factor(
+                 _big2pistr($n) || (return Sidef::Types::Array::Array->new()),
+                 (defined($k) ? _big2uistr($k) // () : ()),    # B1
+                 (defined($m) ? _big2uistr($m) // () : ()),    # number of curves
+                                                 )
+            ]
+        );
+    }
+
+    sub qs_factor {
+        my ($n) = @_;
+        Sidef::Types::Array::Array->new(
+                             [map { $_ < ULONG_MAX ? __PACKAGE__->_set_uint($_) : __PACKAGE__->_set_str('int', $_) }
+                                Math::Prime::Util::GMP::qs_factor(_big2pistr($n) || (return Sidef::Types::Array::Array->new()))
+                             ]
+        );
+    }
+
     sub divisors {
         my $n = &_big2pistr || return Sidef::Types::Array::Array->new();
 

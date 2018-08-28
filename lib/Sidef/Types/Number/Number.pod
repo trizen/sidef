@@ -951,6 +951,14 @@ Return the
 
 =cut
 
+=head2 ecm_factor
+
+Number.ecm_factor() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 ei
 
 Number.ei() -> I<Obj>
@@ -1196,6 +1204,16 @@ Number.hermite_He() -> I<Obj>
 Return the
 
 Aliases: I<hermiteHe>, I<hermite_polynomial_He>, I<hermite_polynomialHe>
+
+=cut
+
+=head2 holf_factor
+
+Number.holf_factor() -> I<Obj>
+
+Return the
+
+Aliases: I<fermat_factor>
 
 =cut
 
@@ -2321,6 +2339,14 @@ Aliases: I<number_of_partitions>
 
 =cut
 
+=head2 pbrent_factor
+
+Number.pbrent_factor() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 perfect_power
 
 Number.perfect_power() -> I<Obj>
@@ -2356,6 +2382,14 @@ Return the
 =head2 pi
 
 Number.pi() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 pminus1_factor
+
+Number.pminus1_factor() -> I<Obj>
 
 Return the
 
@@ -2411,9 +2445,25 @@ Aliases: I<hammingweight>
 
 =cut
 
+=head2 pplus1_factor
+
+Number.pplus1_factor() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 prev_prime
 
 Number.prev_prime() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 prho_factor
+
+Number.prho_factor() -> I<Obj>
 
 Return the
 
@@ -2562,6 +2612,14 @@ Return the
 =head2 primorial
 
 Number.primorial() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 qs_factor
+
+Number.qs_factor() -> I<Obj>
 
 Return the
 
@@ -2987,6 +3045,14 @@ Return the
 
 =cut
 
+=head2 squfof_factor
+
+Number.squfof_factor() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 stirling
 
 Number.stirling() -> I<Obj>
@@ -3104,6 +3170,14 @@ Number.to_s() -> I<Obj>
 Return the
 
 Aliases: I<to_str>
+
+=cut
+
+=head2 trial_factor
+
+Number.trial_factor() -> I<Obj>
+
+Return the
 
 =cut
 
