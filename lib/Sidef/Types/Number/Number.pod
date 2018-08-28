@@ -1491,6 +1491,14 @@ Return the
 
 =cut
 
+=head2 is_frobenius_underwood_pseudoprime
+
+Number.is_frobenius_underwood_pseudoprime() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 is_fundamental
 
 Number.is_fundamental() -> I<Obj>
