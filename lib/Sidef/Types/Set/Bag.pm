@@ -690,6 +690,8 @@ package Sidef::Types::Set::Bag {
         );
     }
 
+    *kv = \&pairs;
+
     sub to_list {
         my ($self) = @_;
         map { ($_->{value}) x $_->{count} } CORE::values(%$self);

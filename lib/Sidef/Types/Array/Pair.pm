@@ -96,15 +96,8 @@ package Sidef::Types::Array::Pair {
 
             my $s;
 
-            "Pair(" . "\n" . join(
-                ",\n",
-
-                (' ' x ($Sidef::SPACES += $Sidef::SPACES_INCR))
-                  . join(", ",
-                         map { (ref($_) && ($s = UNIVERSAL::can($_, 'dump'))) ? $s->($_) : defined($_) ? $_ : 'nil' } @$obj)
-              )
-              . "\n"
-              . (' ' x ($Sidef::SPACES -= $Sidef::SPACES_INCR)) . ")";
+            'Pair('
+              . join(', ', map { (ref($_) && ($s = UNIVERSAL::can($_, 'dump'))) ? $s->($_) : ($_ // 'nil') } @$obj) . ')';
         };
 
         local *Sidef::Types::Array::Pair::dump = $sub;

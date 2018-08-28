@@ -555,9 +555,9 @@ package Sidef::Types::Hash::Hash {
                                    (@keys > 1 ? (' ' x $Sidef::SPACES) : '')
                                  . "${Sidef::Types::String::String->new($_)->dump} => "
                                  . (
-                                      (ref($val = $obj->{$_}) && ($s = UNIVERSAL::can($val, 'dump'))) ? $s->($val)
-                                    : defined($val) ? $val
-                                    :                 'nil'
+                                    (ref($val = $obj->{$_}) && ($s = UNIVERSAL::can($val, 'dump')))
+                                    ? $s->($val)
+                                    : ($val // 'nil')
                                    )
                              } @keys
                          )

@@ -3338,9 +3338,7 @@ package Sidef::Types::Array::Array {
             my $s;
 
             '['
-              . CORE::join(', ',
-                           map { ref($_) && ($s = UNIVERSAL::can($_, 'dump')) ? $s->($_) : defined($_) ? $_ : 'nil' } @$obj)
-              . ']';
+              . CORE::join(', ', map { ref($_) && ($s = UNIVERSAL::can($_, 'dump')) ? $s->($_) : ($_ // 'nil') } @$obj) . ']';
         };
 
         local *Sidef::Types::Array::Array::dump = $sub;

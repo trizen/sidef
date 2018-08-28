@@ -273,6 +273,16 @@ Return the
 
 =cut
 
+=head2 kv
+
+Bag.kv() -> I<Obj>
+
+Return the
+
+Aliases: I<pairs>
+
+=cut
+
 =head2 len
 
 Bag.len() -> I<Obj>
@@ -330,14 +340,6 @@ Bag.new() -> I<Obj>
 Return the
 
 Aliases: I<call>
-
-=cut
-
-=head2 pairs
-
-Bag.pairs() -> I<Obj>
-
-Return the
 
 =cut
 

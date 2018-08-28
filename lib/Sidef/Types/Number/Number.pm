@@ -8640,26 +8640,30 @@ package Sidef::Types::Number::Number {
     }
 
     sub pminus1_factor {
-        my ($n, $k) = @_;
-        _valid(\$k) if defined($k);
+        my ($n, $B1, $B2) = @_;
+
+        _valid(\$B1) if defined($B1);
+        _valid(\$B2) if defined($B2);
+
         Sidef::Types::Array::Array->new(
                                         [map { $_ < ULONG_MAX ? __PACKAGE__->_set_uint($_) : __PACKAGE__->_set_str('int', $_) }
                                            Math::Prime::Util::GMP::pminus1_factor(
                                                                   _big2pistr($n) || (return Sidef::Types::Array::Array->new()),
-                                                                  (defined($k) ? _big2uistr($k) // () : ()),
+                                                                  (defined($B1) ? _big2uistr($B1) // () : ()),
+                                                                  (defined($B2) ? _big2uistr($B2) // () : ()),
                                            )
                                         ]
                                        );
     }
 
     sub pplus1_factor {
-        my ($n, $k) = @_;
-        _valid(\$k) if defined($k);
+        my ($n, $B1) = @_;
+        _valid(\$B1) if defined($B1);
         Sidef::Types::Array::Array->new(
                                         [map { $_ < ULONG_MAX ? __PACKAGE__->_set_uint($_) : __PACKAGE__->_set_str('int', $_) }
                                            Math::Prime::Util::GMP::pplus1_factor(
                                                                   _big2pistr($n) || (return Sidef::Types::Array::Array->new()),
-                                                                  (defined($k) ? _big2uistr($k) // () : ()),
+                                                                  (defined($B1) ? _big2uistr($B1) // () : ()),
                                            )
                                         ]
                                        );
@@ -8694,17 +8698,17 @@ package Sidef::Types::Number::Number {
     }
 
     sub ecm_factor {
-        my ($n, $k, $m) = @_;
+        my ($n, $B1, $curves) = @_;
 
-        _valid(\$k) if defined($k);
-        _valid(\$m) if defined($m);
+        _valid(\$B1)     if defined($B1);
+        _valid(\$curves) if defined($curves);
 
         Sidef::Types::Array::Array->new(
             [map { $_ < ULONG_MAX ? __PACKAGE__->_set_uint($_) : __PACKAGE__->_set_str('int', $_) }
                Math::Prime::Util::GMP::ecm_factor(
                  _big2pistr($n) || (return Sidef::Types::Array::Array->new()),
-                 (defined($k) ? _big2uistr($k) // () : ()),    # B1
-                 (defined($m) ? _big2uistr($m) // () : ()),    # number of curves
+                 (defined($B1)     ? _big2uistr($B1) //     () : ()),    # B1
+                 (defined($curves) ? _big2uistr($curves) // () : ()),    # number of curves
                                                  )
             ]
         );
