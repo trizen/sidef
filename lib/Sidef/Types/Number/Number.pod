@@ -2123,6 +2123,14 @@ Return the
 
 =cut
 
+=head2 mangoldt
+
+Number.mangoldt() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 max
 
 Number.max() -> I<Obj>
@@ -2612,6 +2620,16 @@ Return the
 Number.random_bytes() -> I<Obj>
 
 Return the
+
+=cut
+
+=head2 random_maurer_nbit_prime
+
+Number.random_maurer_nbit_prime() -> I<Obj>
+
+Return the
+
+Aliases: I<random_nbit_maurer_prime>
 
 =cut
 

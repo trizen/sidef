@@ -8186,6 +8186,15 @@ package Sidef::Types::Number::Number {
 
     *random_strong_nbit_prime = \&random_nbit_strong_prime;
 
+    sub random_nbit_maurer_prime {
+        my ($x) = @_;
+        my $n = _any2ui($$x) // goto &nan;
+        $n <= 1 && goto &nan;
+        __PACKAGE__->_set_str('int', Math::Prime::Util::GMP::random_maurer_prime($n));
+    }
+
+    *random_maurer_nbit_prime = \&random_nbit_maurer_prime;
+
     sub random_ndigit_prime {
         my ($x) = @_;
         my $n = _any2ui($$x) || goto &nan;
@@ -8939,6 +8948,12 @@ package Sidef::Types::Number::Number {
         my $n = Math::Prime::Util::GMP::exp_mangoldt(&_big2uistr || return ONE);
         $n eq '1' and return ONE;
         $n < ULONG_MAX ? __PACKAGE__->_set_uint($n) : __PACKAGE__->_set_str('int', $n);
+    }
+
+    sub mangoldt {
+        my $n = Math::Prime::Util::GMP::exp_mangoldt(&_big2uistr || return ZERO);
+        $n eq '1' and return ZERO;
+        ($n < ULONG_MAX ? __PACKAGE__->_set_uint($n) : __PACKAGE__->_set_str('int', $n))->log;
     }
 
     sub totient {
