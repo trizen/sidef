@@ -8381,6 +8381,30 @@ package Sidef::Types::Number::Number {
 
     *is_provable_prime = \&is_prov_prime;
 
+    sub is_nminus1_prime {
+        my ($x) = @_;
+
+        __is_int__($$x) || return Sidef::Types::Bool::Bool::FALSE;
+        $x = _big2uistr($x) // return Sidef::Types::Bool::Bool::FALSE;
+
+        Math::Prime::Util::GMP::is_prob_prime($x)
+          && Math::Prime::Util::GMP::is_nminus1_prime($x)
+          ? Sidef::Types::Bool::Bool::TRUE
+          : Sidef::Types::Bool::Bool::FALSE;
+    }
+
+    sub is_nplus1_prime {
+        my ($x) = @_;
+
+        __is_int__($$x) || return Sidef::Types::Bool::Bool::FALSE;
+        $x = _big2uistr($x) // return Sidef::Types::Bool::Bool::FALSE;
+
+        Math::Prime::Util::GMP::is_prob_prime($x)
+          && Math::Prime::Util::GMP::is_nplus1_prime($x)
+          ? Sidef::Types::Bool::Bool::TRUE
+          : Sidef::Types::Bool::Bool::FALSE;
+    }
+
     sub is_mersenne_prime {
         my ($x) = @_;
         __is_int__($$x)

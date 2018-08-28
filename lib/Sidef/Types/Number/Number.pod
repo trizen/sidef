@@ -1599,6 +1599,22 @@ Return the
 
 =cut
 
+=head2 is_nminus1_prime
+
+Number.is_nminus1_prime() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 is_nplus1_prime
+
+Number.is_nplus1_prime() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 is_odd
 
 Number.is_odd() -> I<Obj>
