@@ -1725,6 +1725,14 @@ Aliases: I<is_squarefree>
 
 =cut
 
+=head2 is_strong_pseudoprime
+
+Number.is_strong_pseudoprime() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 is_totient
 
 Number.is_totient() -> I<Obj>

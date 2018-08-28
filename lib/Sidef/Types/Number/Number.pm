@@ -8227,6 +8227,20 @@ package Sidef::Types::Number::Number {
           : Sidef::Types::Bool::Bool::FALSE;
     }
 
+    sub is_strong_pseudoprime {
+        my ($n, @bases) = @_;
+        __is_int__($$n)
+          && Math::Prime::Util::GMP::is_strong_pseudoprime(
+            _big2uistr($n) // (return Sidef::Types::Bool::Bool::FALSE),
+            do {
+                @bases = grep { defined($_) and $_ > 1 } map { _big2uistr($_) } @bases;
+                @bases ? (@bases) : (2);
+              }
+          )
+          ? Sidef::Types::Bool::Bool::TRUE
+          : Sidef::Types::Bool::Bool::FALSE;
+    }
+
     sub is_prob_prime {
         my ($x, $k) = @_;
 
