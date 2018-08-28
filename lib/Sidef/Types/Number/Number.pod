@@ -1459,6 +1459,14 @@ Return the
 
 =cut
 
+=head2 is_euler_pseudoprime
+
+Number.is_euler_pseudoprime() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 is_even
 
 Number.is_even() -> I<Obj>
