@@ -1581,6 +1581,16 @@ Return the
 
 =cut
 
+=head2 is_plumb_pseudoprime
+
+Number.is_plumb_pseudoprime() -> I<Obj>
+
+Return the
+
+Aliases: I<is_euler_plumb_pseudoprime>
+
+=cut
+
 =head2 is_polygonal
 
 Number.is_polygonal() -> I<Obj>
