@@ -1515,6 +1515,14 @@ Return the
 
 =cut
 
+=head2 is_lucas_pseudoprime
+
+Number.is_lucas_pseudoprime() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 is_mersenne_prime
 
 Number.is_mersenne_prime() -> I<Obj>
@@ -1722,6 +1730,14 @@ Number.is_square_free() -> I<Obj>
 Return the
 
 Aliases: I<is_squarefree>
+
+=cut
+
+=head2 is_strong_lucas_pseudoprime
+
+Number.is_strong_lucas_pseudoprime() -> I<Obj>
+
+Return the
 
 =cut
 
