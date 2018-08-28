@@ -1467,6 +1467,14 @@ Return the
 
 =cut
 
+=head2 is_ecpp_prime
+
+Number.is_ecpp_prime() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 iseed
 
 Number.iseed() -> I<Obj>
