@@ -8300,6 +8300,21 @@ package Sidef::Types::Number::Number {
 
     *is_euler_plumb_pseudoprime = \&is_plumb_pseudoprime;
 
+    sub is_frobenius_pseudoprime {
+        my ($n, $k, $m) = @_;
+
+        _valid(\$k, \$m) if defined($k);
+
+        __is_int__($$n)
+          && Math::Prime::Util::GMP::is_frobenius_pseudoprime(
+                                                              _big2uistr($n) // (return Sidef::Types::Bool::Bool::FALSE),
+                                                              (defined($k) ? _big2istr($k) // () : ()),
+                                                              (defined($m) ? _big2istr($m) // () : ()),
+                                                             )
+          ? Sidef::Types::Bool::Bool::TRUE
+          : Sidef::Types::Bool::Bool::FALSE;
+    }
+
     sub is_prob_prime {
         my ($x, $k) = @_;
 
