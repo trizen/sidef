@@ -1483,6 +1483,14 @@ Return the
 
 =cut
 
+=head2 is_frobenius_khashin_pseudoprime
+
+Number.is_frobenius_khashin_pseudoprime() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 is_frobenius_pseudoprime
 
 Number.is_frobenius_pseudoprime() -> I<Obj>

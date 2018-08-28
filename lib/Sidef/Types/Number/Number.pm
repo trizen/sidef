@@ -8325,6 +8325,15 @@ package Sidef::Types::Number::Number {
           : Sidef::Types::Bool::Bool::FALSE;
     }
 
+    sub is_frobenius_khashin_pseudoprime {
+        my ($n) = @_;
+        __is_int__($$n)
+          && Math::Prime::Util::GMP::is_frobenius_khashin_pseudoprime(_big2uistr($n)
+                                                                      // (return Sidef::Types::Bool::Bool::FALSE),)
+          ? Sidef::Types::Bool::Bool::TRUE
+          : Sidef::Types::Bool::Bool::FALSE;
+    }
+
     sub is_prob_prime {
         my ($x, $k) = @_;
 
