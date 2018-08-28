@@ -8319,8 +8319,7 @@ package Sidef::Types::Number::Number {
         my ($n) = @_;
         __is_int__($$n)
           && Math::Prime::Util::GMP::is_frobenius_underwood_pseudoprime(_big2uistr($n)
-                                                                        // (return Sidef::Types::Bool::Bool::FALSE),
-                                                                       )
+                                                                        // (return Sidef::Types::Bool::Bool::FALSE))
           ? Sidef::Types::Bool::Bool::TRUE
           : Sidef::Types::Bool::Bool::FALSE;
     }
@@ -8331,7 +8330,7 @@ package Sidef::Types::Number::Number {
         my ($n) = @_;
         __is_int__($$n)
           && Math::Prime::Util::GMP::is_frobenius_khashin_pseudoprime(_big2uistr($n)
-                                                                      // (return Sidef::Types::Bool::Bool::FALSE),)
+                                                                      // (return Sidef::Types::Bool::Bool::FALSE))
           ? Sidef::Types::Bool::Bool::TRUE
           : Sidef::Types::Bool::Bool::FALSE;
     }
@@ -8341,7 +8340,15 @@ package Sidef::Types::Number::Number {
     sub is_bpsw_prime {
         my ($n) = @_;
         __is_int__($$n)
-          && Math::Prime::Util::GMP::is_bpsw_prime(_big2uistr($n) // (return Sidef::Types::Bool::Bool::FALSE),)
+          && Math::Prime::Util::GMP::is_bpsw_prime(_big2uistr($n) // (return Sidef::Types::Bool::Bool::FALSE))
+          ? Sidef::Types::Bool::Bool::TRUE
+          : Sidef::Types::Bool::Bool::FALSE;
+    }
+
+    sub is_aks_prime {
+        my ($n) = @_;
+        __is_int__($$n)
+          && Math::Prime::Util::GMP::is_aks_prime(_big2uistr($n) // (return Sidef::Types::Bool::Bool::FALSE))
           ? Sidef::Types::Bool::Bool::TRUE
           : Sidef::Types::Bool::Bool::FALSE;
     }

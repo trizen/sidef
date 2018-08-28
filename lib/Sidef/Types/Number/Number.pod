@@ -1419,6 +1419,14 @@ Return the
 
 =cut
 
+=head2 is_aks_prime
+
+Number.is_aks_prime() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 is_bpsw_prime
 
 Number.is_bpsw_prime() -> I<Obj>
