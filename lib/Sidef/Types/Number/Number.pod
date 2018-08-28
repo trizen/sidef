@@ -1743,6 +1743,14 @@ Aliases: I<is_extra_strong_lucas_pseudoprime>
 
 =cut
 
+=head2 is_strongish_lucas_pseudoprime
+
+Number.is_strongish_lucas_pseudoprime() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 is_strong_lucas_pseudoprime
 
 Number.is_strong_lucas_pseudoprime() -> I<Obj>
