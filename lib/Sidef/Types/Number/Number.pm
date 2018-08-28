@@ -8199,8 +8199,19 @@ package Sidef::Types::Number::Number {
           : Sidef::Types::Bool::Bool::FALSE;
     }
 
+    sub miller_rabin_random {
+        my ($n, $k) = @_;
+        _valid(\$k);
+        __is_int__($$n)
+          && Math::Prime::Util::GMP::miller_rabin_random(_big2uistr($n) // (return Sidef::Types::Bool::Bool::FALSE),
+                                                         _any2ui($$k) // 20,)
+          ? Sidef::Types::Bool::Bool::TRUE
+          : Sidef::Types::Bool::Bool::FALSE;
+    }
+
     sub is_fermat_pseudoprime {
         my ($n, @bases) = @_;
+        _valid(\(@bases));
         __is_int__($$n)
           && Math::Prime::Util::GMP::is_pseudoprime(
             _big2uistr($n) // (return Sidef::Types::Bool::Bool::FALSE),
@@ -8215,6 +8226,7 @@ package Sidef::Types::Number::Number {
 
     sub is_euler_pseudoprime {
         my ($n, @bases) = @_;
+        _valid(\(@bases));
         __is_int__($$n)
           && Math::Prime::Util::GMP::is_euler_pseudoprime(
             _big2uistr($n) // (return Sidef::Types::Bool::Bool::FALSE),
@@ -8229,6 +8241,7 @@ package Sidef::Types::Number::Number {
 
     sub is_strong_pseudoprime {
         my ($n, @bases) = @_;
+        _valid(\(@bases));
         __is_int__($$n)
           && Math::Prime::Util::GMP::is_strong_pseudoprime(
             _big2uistr($n) // (return Sidef::Types::Bool::Bool::FALSE),

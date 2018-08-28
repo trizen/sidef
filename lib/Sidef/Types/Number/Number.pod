@@ -2027,6 +2027,14 @@ Aliases: I<mfactorial>, I<multi_factorial>
 
 =cut
 
+=head2 miller_rabin_random
+
+Number.miller_rabin_random() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 min
 
 Number.min() -> I<Obj>
