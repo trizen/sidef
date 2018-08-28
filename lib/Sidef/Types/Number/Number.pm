@@ -6595,6 +6595,14 @@ package Sidef::Types::Number::Number {
         bless \$z;
     }
 
+    sub factorial_sum {
+        my ($n) = @_;
+        $n = _any2ui($$n) // goto &nan;
+        __PACKAGE__->_set_str('int', Math::Prime::Util::GMP::factorial_sum($n));
+    }
+
+    *left_factorial = \&factorial_sum;
+
     sub superfactorial {
         my ($n) = @_;
 
@@ -6702,7 +6710,7 @@ package Sidef::Types::Number::Number {
     *dfac       = \&double_factorial;
     *dfactorial = \&double_factorial;
 
-    sub mfactorial {
+    sub multi_factorial {
         my ($x, $y) = @_;
         _valid(\$y);
         my $ui1 = _any2ui($$x) // (goto &nan);
@@ -6712,7 +6720,8 @@ package Sidef::Types::Number::Number {
         bless \$z;
     }
 
-    *mfac = \&mfactorial;
+    *mfac       = \&multi_factorial;
+    *mfactorial = \&multi_factorial;
 
     #
     ## falling_factorial(x, +y) = binomial(x, y) * y!
