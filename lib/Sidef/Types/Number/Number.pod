@@ -1467,6 +1467,14 @@ Return the
 
 =cut
 
+=head2 is_fermat_pseudoprime
+
+Number.is_fermat_pseudoprime() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 is_fundamental
 
 Number.is_fundamental() -> I<Obj>
