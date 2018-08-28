@@ -1073,6 +1073,16 @@ Return the
 
 =cut
 
+=head2 factorial_sum
+
+Number.factorial_sum() -> I<Obj>
+
+Return the
+
+Aliases: I<left_factorial>
+
+=cut
+
 =head2 falling_factorial
 
 Number.falling_factorial() -> I<Obj>
@@ -1989,7 +1999,7 @@ Number.mfac() -> I<Obj>
 
 Return the
 
-Aliases: I<mfactorial>
+Aliases: I<mfactorial>, I<multi_factorial>
 
 =cut
 

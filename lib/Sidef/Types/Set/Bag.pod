@@ -349,22 +349,6 @@ Return the
 
 =cut
 
-=head2 replace_pair
-
-Bag.replace_pair() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 replace_pairs
-
-Bag.replace_pairs() -> I<Obj>
-
-Return the
-
-=cut
-
 =head2 shift
 
 Bag.shift() -> I<Obj>
@@ -432,6 +416,26 @@ Bag.uniq() -> I<Obj>
 Return the
 
 Aliases: I<unique>
+
+=cut
+
+=head2 update_pair
+
+Bag.update_pair() -> I<Obj>
+
+Return the
+
+Aliases: I<replace_pair>
+
+=cut
+
+=head2 update_pairs
+
+Bag.update_pairs() -> I<Obj>
+
+Return the
+
+Aliases: I<replace_pairs>
 
 =cut
 
