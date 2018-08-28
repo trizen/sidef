@@ -1733,6 +1733,16 @@ Aliases: I<is_squarefree>
 
 =cut
 
+=head2 is_stronger_lucas_pseudoprime
+
+Number.is_stronger_lucas_pseudoprime() -> I<Obj>
+
+Return the
+
+Aliases: I<is_extra_strong_lucas_pseudoprime>
+
+=cut
+
 =head2 is_strong_lucas_pseudoprime
 
 Number.is_strong_lucas_pseudoprime() -> I<Obj>

@@ -8270,6 +8270,17 @@ package Sidef::Types::Number::Number {
           : Sidef::Types::Bool::Bool::FALSE;
     }
 
+    sub is_stronger_lucas_pseudoprime {
+        my ($n) = @_;
+        __is_int__($$n)
+          && Math::Prime::Util::GMP::is_extra_strong_lucas_pseudoprime(_big2uistr($n)
+                                                                       // (return Sidef::Types::Bool::Bool::FALSE))
+          ? Sidef::Types::Bool::Bool::TRUE
+          : Sidef::Types::Bool::Bool::FALSE;
+    }
+
+    *is_extra_strong_lucas_pseudoprime = \&is_stronger_lucas_pseudoprime;
+
     sub is_prob_prime {
         my ($x, $k) = @_;
 
