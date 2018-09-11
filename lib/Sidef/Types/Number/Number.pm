@@ -78,6 +78,9 @@ package Sidef::Types::Number::Number {
 
             $num = defined($num) ? "$num" : '0';
 
+            # Remove the leading plus sign (if any)
+            $num =~ s/^\+// if substr($num, 0, 1) eq '+';
+
             if (index($num, '/') != -1) {
                 my $r = Math::GMPq::Rmpq_init();
                 eval { Math::GMPq::Rmpq_set_str($r, $num, $int_base); 1 } // goto &nan;
@@ -407,6 +410,9 @@ package Sidef::Types::Number::Number {
             return $r;
         }
 
+        # Remove the plus sign (if any)
+        $s =~ s/^\+// if substr($s, 0, 1) eq '+';
+
         # Fractional value
         if (index($s, '/') != -1 and $s =~ m{^\s*[-+]?[0-9]+\s*/\s*[-+]?[1-9]+[0-9]*\s*\z}) {
             my $r = Math::GMPq::Rmpq_init();
@@ -414,8 +420,6 @@ package Sidef::Types::Number::Number {
             Math::GMPq::Rmpq_canonicalize($r);
             return $r;
         }
-
-        $s =~ s/^\+//;
 
         eval { Math::GMPz::Rmpz_init_set_str("$s", 10) } // goto &_nan;
     }
