@@ -30,34 +30,30 @@ function sqrt(x::S_Number)
     S_Number(sqrt(x.value));
 end
 
-Any[
-    n1 = S_Number(42);
-    n2 = S_Number(2);
+n1 = S_Number(42);
+n2 = S_Number(2);
 
-    println(n1);
-    println(n2);
+println(n1);
+println(n2);
 
-    println(n1 / n2);
+println(n1 / n2);
 
-    method = Symbol("/");
-    println(eval(:($method(n1, n2))));
-]
+method = Symbol("/");
+println(eval(:($method(n1, n2))));
 
 #########################################
 
-Any[
-    d = Symbol("/");
-    x = S_Number(12);
-    y = S_Number(4);
-    println("$x / $y == ", eval(:($d(x, y))));
-]
+d = Symbol("/");
+x = S_Number(12);
+y = S_Number(4);
+println("$x / $y == ", eval(:($d(x, y))));
 
 code = "25.3->int->sqrt";
 
 if (m = match(r"\G(\d+(?:\.\d+)?)", code)) != nothing
     str = m.captures[1];
-    n = S_Number(float(str));
-    pos = length(str)+1;
+    n = S_Number(parse(Float64, str));
+    pos = length(str);
 
     while (m = match(r"\G(->|\.)", code, pos)) != nothing
         pos += length(m.captures[1]);
