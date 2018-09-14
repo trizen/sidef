@@ -15,34 +15,34 @@ func hi (i) {
             return "IF(3) RETURN";
         }
 
-        "Error! (1)".die;
+        die "Error! (1)"
     }
     elsif (i == 3) {
-        "ERROR: re-true elsif!".die;
+        die "ERROR: re-true elsif!"
     }
     elsif (i == 1) {
         return "ELSIF(1) RETURN";
-        "Error! (2)".die;
+        die "Error! (2)"
     }
 
     i == 3 && (
         return "&& RETURN";
-        "Error! (3)".die;
+        die "Error! (3)"
     );
 
     if (i == 2) {
         return "IF(2) RETURN";
-        "Error! (4)".die;
+        die "Error! (4)"
     }
 
     return "FUNC RETURN";
     "ERROR RETURN";
 }
 
-hi(1) == "ELSIF(1) RETURN" || "Error hi(1)!".die;
-hi(2) == "IF(2) RETURN"    || "Error hi(2)!".die;
-hi(3) == "IF(3) RETURN"    || "Error hi(3)!".die;
-hi(4) == "FUNC RETURN"     || "Error hi(4)!".die;
+hi(1) == "ELSIF(1) RETURN" || die "Error hi(1)!"
+hi(2) == "IF(2) RETURN"    || die "Error hi(2)!"
+hi(3) == "IF(3) RETURN"    || die "Error hi(3)!"
+hi(4) == "FUNC RETURN"     || die "Error hi(4)!"
 
 #
 ## Return from 'for' loop
@@ -51,19 +51,19 @@ hi(4) == "FUNC RETURN"     || "Error hi(4)!".die;
 func for_loop {
 
     for (["a", "z", "f"]) { |c|
+
         if (c == "z") {
             return "LOOP RETURN";
         }
 
         if (c == "f") {
-            "LOOP ERROR!".die;
+            die "LOOP ERROR!";
         }
     }
 
-    "Error hello(name)!".die;
+    die "Error hello(name)!";
 }
 
-for_loop() == "LOOP RETURN" || "Error hello(Sidef)!".die;
+for_loop() == "LOOP RETURN" || die "Error hello(Sidef)!";
 
-
-say "Test passed!";
+say "** Test passed!";

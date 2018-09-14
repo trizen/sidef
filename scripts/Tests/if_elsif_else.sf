@@ -1,0 +1,103 @@
+#!/usr/bin/ruby
+
+# Tests for the if/elsif/else construct with comments in between (not supported yet)
+
+__END__
+
+assert_eq(do {
+
+    # If branch
+    if (true) {
+        'if'
+    }
+
+    # Elsif 1 branch
+    elsif (false) {
+        'elsif'
+    }
+
+    # Elsif 2 branch
+    elsif (true) {
+        'elsif2'
+    }
+
+    # Else branch
+    else {
+        'else'
+    }
+
+}, 'if');
+
+assert_eq(do {
+
+    # If branch
+    if (false) {
+        'if'
+    }
+
+    # Elsif 1 branch
+    elsif (true) {
+        'elsif #1'
+    }
+
+    # Elsif 2 branch
+    elsif (true) {
+        'elsif #2'
+    }
+
+    # Else branch
+    else {
+        'else'
+    }
+
+}, 'elsif #1');
+
+assert_eq(do {
+
+    # If branch
+    if (false) {
+        'if'
+    }
+
+    # Elsif 1 branch
+    elsif (false) {
+        'elsif #1'
+    }
+
+    # Elsif 2 branch
+    elsif (true) {
+        'elsif #2'
+    }
+
+    # Else branch
+    else {
+        'else'
+    }
+
+}, 'elsif #2');
+
+assert_eq(do {
+
+    # If branch
+    if (false) {
+        'if'
+    }
+
+    # Elsif 1 branch
+    elsif (false) {
+        'elsif #1'
+    }
+
+    # Elsif 2 branch
+    elsif (false) {
+        'elsif #2'
+    }
+
+    # Else branch
+    else {
+        'else'
+    }
+
+}, 'else');
+
+say '** Test passed!'
