@@ -1,8 +1,6 @@
 #!/usr/bin/ruby
 
-# Tests for the if/elsif/else construct with comments in between (not supported yet)
-
-__END__
+# Tests for the if/elsif/else construct with comments in between
 
 assert_eq(do {
 
@@ -60,20 +58,23 @@ assert_eq(do {
     }
 
     # Elsif 1 branch
+    #     ...
+
     elsif (false) {
         'elsif #1'
     }
 
     # Elsif 2 branch
+
     elsif (true) {
         'elsif #2'
     }
 
     # Else branch
+
     else {
         'else'
     }
-
 }, 'elsif #2');
 
 assert_eq(do {
@@ -89,15 +90,109 @@ assert_eq(do {
     }
 
     # Elsif 2 branch
+    #     ...
     elsif (false) {
         'elsif #2'
     }
 
     # Else branch
+    #    ...
     else {
         'else'
     }
 
 }, 'else');
+
+assert_eq(do {
+
+    # If branch
+    if (true) {
+        'if'
+    }
+
+    # Else branch
+    #    ...
+    else {
+        'else'
+    }
+}, 'if')
+
+assert_eq(do {
+
+    # If branch
+    if (false) {
+        'if'
+    }
+
+    # Else branch
+    #   ....
+    else {
+        'else'
+    }
+}, 'else')
+
+do {
+    var n = 1
+    if (true) {
+        n += 1
+    }# Foo bar
+if (false) {
+        n += 42
+    }
+
+    assert_eq(n, 2)
+}
+
+do {
+    var n = 1
+    if (true) {
+        n += 1
+    }
+# Foo bar
+if (true) {
+        n += 42
+    }
+
+    assert_eq(n, 44)
+}
+
+do {
+    var n = 1
+    if (true) {
+        n += 1
+    }
+# Foo bar
+if (false) {
+        n += 42
+    }
+
+    assert_eq(n, 2)
+}
+
+do {
+    var n = 1
+    if (true) {
+        n += 1
+    }
+# Foo bar
+while (false) {
+        n += 42
+    }
+
+    assert_eq(n, 2)
+}
+
+if (true) {
+    assert_eq(__LINE__, 186)
+}
+
+## comment
+## comment
+
+if (true) {
+    assert_eq(__LINE__, 193)
+}
+
+assert_eq(__LINE__, 196)
 
 say '** Test passed!'

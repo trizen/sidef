@@ -1,0 +1,204 @@
+#!/usr/bin/ruby
+
+# Tests for the with/orwith/else construct with comments in between
+
+assert_eq(do {
+
+    # with branch
+    with ('foo') { |x|
+        x
+    }
+
+    # orwith 1 branch
+    orwith ('bar') {|x|
+        x
+    }
+
+    # orwith 2 branch
+    orwith ('baz') {|x|
+        x
+    }
+
+    # Else branch
+    else {
+        'else'
+    }
+
+}, 'foo')
+
+assert_eq(do {
+
+    # with branch
+    with (nil) { |x|
+        x
+    }
+
+    # orwith 1 branch
+    orwith ('bar') {|x|
+        x
+    }
+
+    # orwith 2 branch
+    orwith ('baz') {|x|
+        x
+    }
+
+    # Else branch
+    else {
+        'else'
+    }
+
+}, 'bar')
+
+assert_eq(do {
+
+    # with branch
+    with (nil) { |x|
+        x
+    }
+
+    # orwith 1 branch
+    orwith (nil) {|x|
+        x
+    }
+
+    # orwith 2 branch
+    orwith ('baz') {|x|
+        x
+    }
+
+    # Else branch
+    else {
+        'else'
+    }
+
+}, 'baz')
+
+assert_eq(do {
+# with branch
+with (nil) { |x|
+x
+}
+# orwith 1 branch
+orwith (nil) {|x|
+x
+}
+# orwith 2 branch
+orwith ('baz') {|x|
+x
+}
+# Else branch
+else {
+'else'
+}
+}, 'baz')
+
+assert_eq(do {
+
+    # with branch
+    with (nil) { |x|
+        x
+    }
+
+    # orwith 1 branch
+    orwith (nil) {|x|
+        x
+    }
+
+    # orwith 2 branch
+    orwith (nil) {|x|
+        x
+    }
+
+    # Else branch
+    else {
+        'else'
+    }
+
+}, 'else')
+
+assert_eq(do {
+
+    # with branch
+    with ('foo') { |x|
+        x
+    }
+
+    # Else branch
+    else {
+        'else'
+    }
+}, 'foo')
+
+assert_eq(do {
+
+    # with branch
+    with (nil) { |x|
+        x
+    }
+
+    # Else branch
+    else {
+        'else'
+    }
+}, 'else')
+
+
+do {
+    var str = 'foo'
+    with ('bar') {|x|
+        str += x
+    }
+
+    if (false) {
+        str += 'error'
+    }
+
+    assert_eq(str, 'foobar')
+}
+
+
+do {
+    var str = 'foo'
+    with ('bar') {|x|
+        str += x
+    }
+if (false) {
+        str += 'error'
+    }
+
+    assert_eq(str, 'foobar')
+}
+
+do {
+    var str = 'foo'
+    with ('bar') {|x|
+        str += x
+    }
+
+    # Foo bar
+    # -------
+    if (false) {
+        str += 'error'
+    }
+
+    assert_eq(str, 'foobar')
+}
+
+
+do {
+var str = 'foo'
+with ('bar') {|x|
+str += x
+}
+# Foo bar
+# -------
+if (false) {
+str += 'error'
+}
+assert_eq(str, 'foobar')
+}
+
+assert_eq(__LINE__, 202)
+
+say "** Test passed!"
