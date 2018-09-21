@@ -9510,7 +9510,8 @@ package Sidef::Types::Number::Number {
         ++$factors{$_} for Math::Prime::Util::GMP::factor(&_big2uistr // goto &nan);
         exists($factors{'0'}) and return ZERO;
 
-        __PACKAGE__->_set_uint(List::Util::product(map { ($_ >> 1) + 1 } values %factors));
+        my $r = Math::Prime::Util::GMP::vecprod(map { ($_ >> 1) + 1 } values %factors);
+        $r < ULONG_MAX ? __PACKAGE__->_set_uint($r) : __PACKAGE__->_set_str('int', $r);
     }
 
     sub square_sigma {
