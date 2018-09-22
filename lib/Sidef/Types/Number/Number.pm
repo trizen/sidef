@@ -6878,7 +6878,7 @@ package Sidef::Types::Number::Number {
         $n = _big2istr($n) // goto &nan;
         $m = _big2istr($m) // goto &nan;
 
-        my($U, $V, $Qk) = Math::Prime::Util::GMP::lucas_sequence($m, $p, $q, $n);
+        my ($U, $V, $Qk) = Math::Prime::Util::GMP::lucas_sequence($m, $p, $q, $n);
 
         $U < ULONG_MAX ? __PACKAGE__->_set_uint($U) : __PACKAGE__->_set_str('int', $U);
     }
@@ -6896,7 +6896,7 @@ package Sidef::Types::Number::Number {
         $n = _big2istr($n) // goto &nan;
         $m = _big2istr($m) // goto &nan;
 
-        my($U, $V, $Qk) = Math::Prime::Util::GMP::lucas_sequence($m, $p, $q, $n);
+        my ($U, $V, $Qk) = Math::Prime::Util::GMP::lucas_sequence($m, $p, $q, $n);
 
         $V < ULONG_MAX ? __PACKAGE__->_set_uint($V) : __PACKAGE__->_set_str('int', $V);
     }
@@ -6914,7 +6914,7 @@ package Sidef::Types::Number::Number {
         $n = _big2istr($n) // goto &nan;
         $m = _big2istr($m) // goto &nan;
 
-        my($U, $V, $Qk) = Math::Prime::Util::GMP::lucas_sequence($m, $p, $q, $n);
+        my ($U, $V, $Qk) = Math::Prime::Util::GMP::lucas_sequence($m, $p, $q, $n);
 
         $U = $U < ULONG_MAX ? __PACKAGE__->_set_uint($U) : __PACKAGE__->_set_str('int', $U);
         $V = $V < ULONG_MAX ? __PACKAGE__->_set_uint($V) : __PACKAGE__->_set_str('int', $V);
@@ -7157,74 +7157,15 @@ package Sidef::Types::Number::Number {
     *Laguerre_L          = \&laguerreL;
     *laguerre_polynomial = \&laguerreL;
 
-    sub __fibmod__ {
-        my ($n, $m, $T1, $T2) = @_;
-
-        # T1 = 0, T2 = 1 for Fibonacci numbers
-        # T1 = 2, T2 = 1 for Lucas numbers
-
-        $n = Math::GMPz::Rmpz_init_set($n);
-
-        state $t = Math::GMPz::Rmpz_init_nobless();
-        state $u = Math::GMPz::Rmpz_init_nobless();
-
-        my $f = Math::GMPz::Rmpz_init_set_ui($T1 // 0);
-        my $g = Math::GMPz::Rmpz_init_set_ui($T2 // 1);
-
-        my $A = Math::GMPz::Rmpz_init_set_ui(0);
-        my $B = Math::GMPz::Rmpz_init_set_ui(1);
-
-        for (; ;) {
-
-            if (Math::GMPz::Rmpz_odd_p($n)) {
-
-                # (f, g) = (f*a + g*b, f*b + g*(a+b))  mod m
-
-                Math::GMPz::Rmpz_mul($u, $g, $B);
-                Math::GMPz::Rmpz_mul($t, $f, $A);
-                Math::GMPz::Rmpz_mul($g, $g, $A);
-
-                Math::GMPz::Rmpz_add($t, $t, $u);
-                Math::GMPz::Rmpz_add($g, $g, $u);
-
-                Math::GMPz::Rmpz_addmul($g, $f, $B);
-
-                Math::GMPz::Rmpz_mod($f, $t, $m);
-                Math::GMPz::Rmpz_mod($g, $g, $m);
-            }
-
-            # (a, b) = (a*a + b*b, a*b + b*(a+b))  mod m
-
-            Math::GMPz::Rmpz_div_2exp($n, $n, 1);
-            Math::GMPz::Rmpz_sgn($n) || last;
-
-            Math::GMPz::Rmpz_mul($t, $A, $A);
-            Math::GMPz::Rmpz_mul($u, $B, $B);
-            Math::GMPz::Rmpz_mul($B, $B, $A);
-
-            Math::GMPz::Rmpz_mul_2exp($B, $B, 1);
-
-            Math::GMPz::Rmpz_add($B, $B, $u);
-            Math::GMPz::Rmpz_add($t, $t, $u);
-
-            Math::GMPz::Rmpz_mod($A, $t, $m);
-            Math::GMPz::Rmpz_mod($B, $B, $m);
-        }
-
-        return $f;
-    }
-
     sub fibonaccimod {
         my ($n, $m) = @_;
         _valid(\$m);
 
-        $n = _any2mpz($$n) // goto &nan;
-        $m = _any2mpz($$m) // goto &nan;
+        $n = _big2uistr($n) // goto &nan;
+        $m = _big2uistr($m) // goto &nan;
 
-        Math::GMPz::Rmpz_sgn($n) < 0  and goto &nan;
-        Math::GMPz::Rmpz_sgn($m) == 0 and goto &nan;
-
-        bless \__fibmod__($n, $m, 0, 1);
+        my ($r) = Math::Prime::Util::GMP::lucas_sequence($m, 1, -1, $n);
+        $r < ULONG_MAX ? __PACKAGE__->_set_uint($r) : __PACKAGE__->_set_str('int', $r);
     }
 
     *fibmod        = \&fibonaccimod;
@@ -7235,13 +7176,11 @@ package Sidef::Types::Number::Number {
         my ($n, $m) = @_;
         _valid(\$m);
 
-        $n = _any2mpz($$n) // goto &nan;
-        $m = _any2mpz($$m) // goto &nan;
+        $n = _big2uistr($n) // goto &nan;
+        $m = _big2uistr($m) // goto &nan;
 
-        Math::GMPz::Rmpz_sgn($n) < 0  and goto &nan;
-        Math::GMPz::Rmpz_sgn($m) == 0 and goto &nan;
-
-        bless \__fibmod__($n, $m, 2, 1);
+        my (undef, $r) = Math::Prime::Util::GMP::lucas_sequence($m, 1, -1, $n);
+        $r < ULONG_MAX ? __PACKAGE__->_set_uint($r) : __PACKAGE__->_set_str('int', $r);
     }
 
     *lucas_mod = \&lucasmod;

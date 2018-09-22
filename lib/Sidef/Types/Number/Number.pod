@@ -2123,6 +2123,26 @@ Aliases: I<lucasu>, I<lucasU>
 
 =cut
 
+=head2 lucasumod
+
+Number.lucasumod() -> I<Obj>
+
+Return the
+
+Aliases: I<lucasUmod>
+
+=cut
+
+=head2 lucasuvmod
+
+Number.lucasuvmod() -> I<Obj>
+
+Return the
+
+Aliases: I<lucasUVmod>
+
+=cut
+
 =head2 lucas_V
 
 Number.lucas_V() -> I<Obj>
@@ -2130,6 +2150,16 @@ Number.lucas_V() -> I<Obj>
 Return the
 
 Aliases: I<lucasv>, I<lucasV>
+
+=cut
+
+=head2 lucasvmod
+
+Number.lucasvmod() -> I<Obj>
+
+Return the
+
+Aliases: I<lucasVmod>
 
 =cut
 
