@@ -7164,6 +7164,9 @@ package Sidef::Types::Number::Number {
         $n = _big2uistr($n) // goto &nan;
         $m = _big2uistr($m) // goto &nan;
 
+        goto &zero if $m eq '1';
+        goto &nan  if $m eq '0';
+
         my ($r) = Math::Prime::Util::GMP::lucas_sequence($m, 1, -1, $n);
         $r < ULONG_MAX ? __PACKAGE__->_set_uint($r) : __PACKAGE__->_set_str('int', $r);
     }
@@ -7178,6 +7181,9 @@ package Sidef::Types::Number::Number {
 
         $n = _big2uistr($n) // goto &nan;
         $m = _big2uistr($m) // goto &nan;
+
+        goto &zero if $m eq '1';
+        goto &nan  if $m eq '0';
 
         my (undef, $r) = Math::Prime::Util::GMP::lucas_sequence($m, 1, -1, $n);
         $r < ULONG_MAX ? __PACKAGE__->_set_uint($r) : __PACKAGE__->_set_str('int', $r);
