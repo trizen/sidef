@@ -6868,6 +6868,63 @@ package Sidef::Types::Number::Number {
     *LucasV  = \&lucasv;
     *lucas_V = \&lucasv;
 
+    sub lucasumod {
+        my ($p, $q, $n, $m) = @_;
+
+        _valid(\$q, \$n, \$m);
+
+        $p = _big2istr($p) // goto &nan;
+        $q = _big2istr($q) // goto &nan;
+        $n = _big2istr($n) // goto &nan;
+        $m = _big2istr($m) // goto &nan;
+
+        my($U, $V, $Qk) = Math::Prime::Util::GMP::lucas_sequence($m, $p, $q, $n);
+
+        $U < ULONG_MAX ? __PACKAGE__->_set_uint($U) : __PACKAGE__->_set_str('int', $U);
+    }
+
+    *LucasUmod = \&lucasumod;
+    *lucasUmod = \&lucasumod;
+
+    sub lucasvmod {
+        my ($p, $q, $n, $m) = @_;
+
+        _valid(\$q, \$n, \$m);
+
+        $p = _big2istr($p) // goto &nan;
+        $q = _big2istr($q) // goto &nan;
+        $n = _big2istr($n) // goto &nan;
+        $m = _big2istr($m) // goto &nan;
+
+        my($U, $V, $Qk) = Math::Prime::Util::GMP::lucas_sequence($m, $p, $q, $n);
+
+        $V < ULONG_MAX ? __PACKAGE__->_set_uint($V) : __PACKAGE__->_set_str('int', $V);
+    }
+
+    *LucasVmod = \&lucasvmod;
+    *lucasVmod = \&lucasvmod;
+
+    sub lucasuvmod {
+        my ($p, $q, $n, $m) = @_;
+
+        _valid(\$q, \$n, \$m);
+
+        $p = _big2istr($p) // goto &nan;
+        $q = _big2istr($q) // goto &nan;
+        $n = _big2istr($n) // goto &nan;
+        $m = _big2istr($m) // goto &nan;
+
+        my($U, $V, $Qk) = Math::Prime::Util::GMP::lucas_sequence($m, $p, $q, $n);
+
+        $U = $U < ULONG_MAX ? __PACKAGE__->_set_uint($U) : __PACKAGE__->_set_str('int', $U);
+        $V = $V < ULONG_MAX ? __PACKAGE__->_set_uint($V) : __PACKAGE__->_set_str('int', $V);
+
+        ($U, $V);
+    }
+
+    *LucasUVmod = \&lucasuvmod;
+    *lucasUVmod = \&lucasuvmod;
+
     #
     ## Chebyshev polynomials: T_n(x)
     #
