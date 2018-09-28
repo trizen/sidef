@@ -8050,18 +8050,20 @@ package Sidef::Types::Number::Number {
     }
 
     sub gcdext {
-        my ($x, $y) = @_;
+        my ($n, $k) = @_;
 
-        _valid(\$y);
+        _valid(\$k);
 
-        my ($u, $v, $d) = Math::Prime::Util::GMP::gcdext(_big2istr($x) // 0, _big2istr($y) // 0);
-#<<<
-        map {
-            ($_ > LONG_MIN and $_ < ULONG_MAX)
-                ? __PACKAGE__->_set_int($_)
-                : __PACKAGE__->_set_str('int', $_)
-        } ($u, $v, $d);
-#>>>
+        $n = _any2mpz($$n) // return (nan(), nan());
+        $k = _any2mpz($$k) // return (nan(), nan());
+
+        my $g = Math::GMPz::Rmpz_init();
+        my $u = Math::GMPz::Rmpz_init();
+        my $v = Math::GMPz::Rmpz_init();
+
+        Math::GMPz::Rmpz_gcdext($g, $u, $v, $n, $k);
+
+        ((bless \$u), (bless \$v), (bless \$g));
     }
 
     sub lcm {
