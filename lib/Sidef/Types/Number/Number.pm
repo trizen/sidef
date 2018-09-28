@@ -4951,7 +4951,7 @@ package Sidef::Types::Number::Number {
 
     sub popcount {
         my ($x) = @_;
-        my $z = _any2mpz($$x) // return MONE;
+        my $z = _any2mpz($$x) // return undef;
 
         if (Math::GMPz::Rmpz_sgn($z) < 0) {
             my $t = Math::GMPz::Rmpz_init();
@@ -4963,6 +4963,18 @@ package Sidef::Types::Number::Number {
     }
 
     *hammingweight = \&popcount;
+
+    # Hamming distance
+    sub hamdist {
+        my ($n, $k) = @_;
+
+        _valid(\$k);
+
+        $n = _any2mpz($$n) // return undef;
+        $k = _any2mpz($$k) // return undef;
+
+        __PACKAGE__->_set_uint(Math::GMPz::Rmpz_hamdist($n, $k));
+    }
 
     sub __is_int__ {
         my ($x) = @_;
@@ -5803,7 +5815,7 @@ package Sidef::Types::Number::Number {
 
     sub length {
         my ($x) = @_;
-        my $z = _any2mpz($$x) // return MONE;
+        my $z = _any2mpz($$x) // return undef;
         my $neg = (Math::GMPz::Rmpz_sgn($z) < 0) ? 1 : 0;
         __PACKAGE__->_set_uint(CORE::length(Math::GMPz::Rmpz_get_str($z, 10)) - $neg);
     }
@@ -6504,6 +6516,38 @@ package Sidef::Types::Number::Number {
         my $r = Math::GMPz::Rmpz_init_set($x);
         Math::GMPz::Rmpz_clrbit($r, $k);
         bless \$r;
+    }
+
+    sub bit_scan0 {
+        my ($n, $k) = @_;
+
+        if (defined($k)) {
+            _valid(\$k);
+            $k = _any2ui($$k) // return undef;
+        }
+        else {
+            $k = 0;
+        }
+
+        $n = _any2mpz($$n) // return undef;
+
+        __PACKAGE__->_set_uint(Math::GMPz::Rmpz_scan0($n, $k));
+    }
+
+    sub bit_scan1 {
+        my ($n, $k) = @_;
+
+        if (defined($k)) {
+            _valid(\$k);
+            $k = _any2ui($$k) // return undef;
+        }
+        else {
+            $k = 0;
+        }
+
+        $n = _any2mpz($$n) // return undef;
+
+        __PACKAGE__->_set_uint(Math::GMPz::Rmpz_scan1($n, $k));
     }
 
     sub ramanujan_tau {

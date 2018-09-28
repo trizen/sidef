@@ -587,6 +587,22 @@ Aliases: I<getbit>, I<testbit>
 
 =cut
 
+=head2 bit_scan0
+
+Number.bit_scan0() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 bit_scan1
+
+Number.bit_scan1() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 bsearch
 
 Number.bsearch() -> I<Obj>
@@ -1164,6 +1180,14 @@ Return the
 =head2 geometric_sum
 
 Number.geometric_sum() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 hamdist
+
+Number.hamdist() -> I<Obj>
 
 Return the
 
