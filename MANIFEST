@@ -238,8 +238,6 @@ scripts/huffman_coding.sf
 scripts/inheritance_and_subset.sf
 scripts/Interactive/cosmic_calendar.sf
 scripts/Interactive/draw_a_clock.sf
-scripts/Interactive/execute_brainfuck.sf
-scripts/Interactive/hello_world.bf
 scripts/Interactive/integer_comparison.sf
 scripts/Interactive/menu.sf
 scripts/Interactive/pi.sf
