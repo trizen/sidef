@@ -8083,12 +8083,30 @@ package Sidef::Types::Number::Number {
     sub gcd {
         my ($x, $y) = @_;
 
+        @_ || return ZERO;
+        @_ == 1 and return $x;
+
+        my $r = Math::GMPz::Rmpz_init();
+
+        if (@_ > 2) {
+            _valid(\(@_));
+            my @terms = map { _any2mpz($$_) // goto &nan } @_;
+
+            Math::GMPz::Rmpz_set($r, shift(@terms));
+
+            foreach my $z (@terms) {
+                Math::GMPz::Rmpz_gcd($r, $r, $z);
+                Math::GMPz::Rmpz_cmp_ui($r, 1) || last;
+            }
+
+            return bless \$r;
+        }
+
         _valid(\$y);
 
         $x = _any2mpz($$x) // goto &nan;
         $y = _any2mpz($$y) // goto &nan;
 
-        my $r = Math::GMPz::Rmpz_init();
         Math::GMPz::Rmpz_gcd($r, $x, $y);
         bless \$r;
     }
@@ -8110,8 +8128,24 @@ package Sidef::Types::Number::Number {
         ((bless \$u), (bless \$v), (bless \$g));
     }
 
+    sub __lcm__ {
+        my ($n, $k) = @_;
+        my $r = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_lcm($r, $n, $k);
+        $r;
+    }
+
     sub lcm {
         my ($x, $y) = @_;
+
+        @_ or goto &zero;
+        @_ == 1 and return $x;
+
+        if (@_ > 2) {
+            _valid(\(@_));
+            my @terms = map { _any2mpz($$_) // goto &nan } @_;
+            return bless \_binsplit(\@terms, \&__lcm__);
+        }
 
         _valid(\$y);
 
@@ -8225,7 +8259,7 @@ package Sidef::Types::Number::Number {
     sub random_nbit_prime {
         my ($x) = @_;
         my $n = _any2ui($$x) // goto &nan;
-        $n <= 1 && goto &nan;
+        $n <= 1 && return __PACKAGE__->_set_uint(2);
         __PACKAGE__->_set_str('int', Math::Prime::Util::GMP::random_nbit_prime($n));
     }
 
