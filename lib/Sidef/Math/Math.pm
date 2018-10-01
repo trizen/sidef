@@ -47,9 +47,11 @@ package Sidef::Math::Math {
     sub gcd {
         my ($self, @list) = @_;
 
+        @list || return Sidef::Types::Number::Number::ZERO;
+
         my $gcd = $list[0];
         foreach my $i (1 .. $#list) {
-            last if ($gcd->is_one);
+            last if $gcd->is_one;
             $gcd = $gcd->gcd($list[$i]);
         }
 
@@ -58,7 +60,7 @@ package Sidef::Math::Math {
 
     sub lcm {
         my ($self, @list) = @_;
-        @list || return Sidef::Types::Number::Number::ONE;
+        @list || return Sidef::Types::Number::Number::ZERO;
         _binsplit(\@list, 'lcm');
     }
 

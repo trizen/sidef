@@ -895,6 +895,48 @@ package Sidef::Types::Array::Array {
         Sidef::Math::Math->prod(@$self);
     }
 
+    sub gcd_by {
+        my ($self, $block) = @_;
+
+        my @list;
+        foreach my $n (@$self) {
+            push @list, $block->run($n);
+        }
+
+        Sidef::Math::Math->gcd(@list);
+    }
+
+    sub gcd {
+        my ($self, $block) = @_;
+
+        if (defined($block)) {
+            goto &gcd_by;
+        }
+
+        Sidef::Math::Math->gcd(@$self);
+    }
+
+    sub lcm_by {
+        my ($self, $block) = @_;
+
+        my @list;
+        foreach my $n (@$self) {
+            push @list, $block->run($n);
+        }
+
+        Sidef::Math::Math->lcm(@list);
+    }
+
+    sub lcm {
+        my ($self, $block) = @_;
+
+        if (defined($block)) {
+            goto &lcm_by;
+        }
+
+        Sidef::Math::Math->lcm(@$self);
+    }
+
     sub _min_max_by {
         my ($self, $block, $order) = @_;
 

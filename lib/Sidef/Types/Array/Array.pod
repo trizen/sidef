@@ -751,6 +751,22 @@ Return the
 
 =cut
 
+=head2 gcd
+
+Array.gcd() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 gcd_by
+
+Array.gcd_by() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 getopt
 
 Array.getopt() -> I<Obj>
@@ -958,6 +974,22 @@ Array.last_uniq_by() -> I<Obj>
 Return the
 
 Aliases: I<last_unique_by>
+
+=cut
+
+=head2 lcm
+
+Array.lcm() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 lcm_by
+
+Array.lcm_by() -> I<Obj>
+
+Return the
 
 =cut
 
