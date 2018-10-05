@@ -585,6 +585,7 @@ scripts/RosettaCode/substitution_cipher.sf
 scripts/RosettaCode/suffix_tree.sf
 scripts/RosettaCode/sum_digits_of_an_integer.sf
 scripts/RosettaCode/sutherland_hodgman.sf
+scripts/RosettaCode/tarjan_s_algorithm.sf
 scripts/RosettaCode/taxicab_numbers.sf
 scripts/RosettaCode/ternary_and_binary_palindrome.sf
 scripts/RosettaCode/text_processing_1.sf
