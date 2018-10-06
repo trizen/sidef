@@ -796,7 +796,7 @@ package Sidef::Optimizer {
         if ($ref eq 'HASH') {
             $obj = $self->optimize($obj);
         }
-        elsif ($ref eq "Sidef::Variable::Variable") {
+        elsif ($ref eq 'Sidef::Variable::Variable') {
             if ($obj->{type} eq 'var') {
                 ## ok
             }
@@ -809,13 +809,14 @@ package Sidef::Optimizer {
                 }
             }
         }
-        elsif ($ref eq 'Sidef::Variable::Static') {
+        elsif (   $ref eq 'Sidef::Variable::Static'
+               or $ref eq 'Sidef::Variable::Const'
+               or $ref eq 'Sidef::Variable::Define') {
             if ($addr{refaddr($obj)}++) {
                 ## ok
             }
             else {
-                my %code = $self->optimize($obj->{expr});
-                $obj->{expr} = \%code;
+                $obj->{expr} = {$self->optimize($obj->{expr})};
             }
         }
         elsif ($ref eq 'Sidef::Variable::Init') {
@@ -824,8 +825,7 @@ package Sidef::Optimizer {
             }
             else {
                 if (exists $obj->{args}) {
-                    my %code = $self->optimize($obj->{args});
-                    $obj->{args} = \%code;
+                    $obj->{args} = {$self->optimize($obj->{args})};
                 }
             }
         }
@@ -840,8 +840,7 @@ package Sidef::Optimizer {
                 ## ok
             }
             else {
-                my %code = $self->optimize($obj->{block}{code});
-                $obj->{block}{code} = \%code;
+                $obj->{block}{code} = {$self->optimize($obj->{block}{code})};
             }
         }
         elsif ($ref eq 'Sidef::Types::Block::BlockInit') {
@@ -849,8 +848,7 @@ package Sidef::Optimizer {
                 ## ok
             }
             else {
-                my %code = $self->optimize($obj->{code});
-                $obj->{code} = \%code;
+                $obj->{code} = {$self->optimize($obj->{code})};
             }
         }
         elsif ($ref eq 'Sidef::Types::Array::HCArray') {
@@ -867,72 +865,54 @@ package Sidef::Optimizer {
 
             # Has no expressions, so let's convert it into an Array
             #~ if (not $has_expr) {
-
             #~ #$obj = Sidef::Types::Array::Array->new(@{$obj});
             #~ bless $obj, 'Sidef::Types::Array::Array';
             #~ }
         }
         elsif ($ref eq 'Sidef::Types::Block::If') {
             foreach my $i (0 .. $#{$obj->{if}}) {
-                my %code = $self->optimize($obj->{if}[$i]{block}{code});
-                $obj->{if}[$i]{block}{code} = \%code;
-
-                my %expr = $self->optimize($obj->{if}[$i]{expr});
-                $obj->{if}[$i]{expr} = \%expr;
+                $obj->{if}[$i]{block}{code} = {$self->optimize($obj->{if}[$i]{block}{code})};
+                $obj->{if}[$i]{expr} = {$self->optimize($obj->{if}[$i]{expr})};
             }
             if (exists $obj->{else}) {
-                my %code = $self->optimize($obj->{else}{block}{code});
-                $obj->{else}{block}{code} = \%code;
+                $obj->{else}{block}{code} = {$self->optimize($obj->{else}{block}{code})};
             }
         }
         elsif ($ref eq 'Sidef::Types::Block::With') {
             foreach my $i (0 .. $#{$obj->{with}}) {
-                my %code = $self->optimize($obj->{with}[$i]{block}{code});
-                $obj->{with}[$i]{block}{code} = \%code;
-
-                my %expr = $self->optimize($obj->{with}[$i]{expr});
-                $obj->{with}[$i]{expr} = \%expr;
+                $obj->{with}[$i]{block}{code} = {$self->optimize($obj->{with}[$i]{block}{code})};
+                $obj->{with}[$i]{expr} = {$self->optimize($obj->{with}[$i]{expr})};
             }
             if (exists $obj->{else}) {
-                my %code = $self->optimize($obj->{else}{block}{code});
-                $obj->{else}{block}{code} = \%code;
+                $obj->{else}{block}{code} = {$self->optimize($obj->{else}{block}{code})};
             }
         }
         elsif ($ref eq 'Sidef::Types::Block::ForIn') {
             foreach my $loop (@{$obj->{loops}}) {
-                my %expr = $self->optimize($loop->{expr});
-                $loop->{expr} = \%expr;
+                $loop->{expr} = {$self->optimize($loop->{expr})};
             }
 
-            my %code = $self->optimize($obj->{block}{code});
-            $obj->{block}{code} = \%code;
+            $obj->{block}{code} = {$self->optimize($obj->{block}{code})};
         }
         elsif (   $ref eq 'Sidef::Types::Block::While'
                or $ref eq 'Sidef::Types::Block::ForEach') {
-            my %expr = $self->optimize($obj->{expr});
-            $obj->{expr} = \%expr;
-
-            my %code = $self->optimize($obj->{block}{code});
-            $obj->{block}{code} = \%code;
+            $obj->{expr} = {$self->optimize($obj->{expr})};
+            $obj->{block}{code} = {$self->optimize($obj->{block}{code})};
         }
         elsif ($ref eq 'Sidef::Types::Block::CFor') {
             foreach my $i (0 .. $#{$obj->{expr}}) {
-                my %expr = $self->optimize($obj->{expr}[$i]);
-                $obj->{expr}[$i] = \%expr;
+                $obj->{expr}[$i] = {$self->optimize($obj->{expr}[$i])};
             }
-            my %code = $self->optimize($obj->{block}{code});
-            $obj->{block}{code} = \%code;
+            $obj->{block}{code} = {$self->optimize($obj->{block}{code})};
         }
         elsif ($ref eq 'Sidef::Variable::NamedParam') {
             $obj->[1] = [map { {main => [$self->optimize_expr({self => $_})]} } @{$obj->[1]}];
         }
         elsif ($ref eq 'Sidef::Meta::PrefixMethod') {
-            my %expr = $self->optimize($obj->{expr});
-            $obj->{expr} = \%expr;
+            $obj->{expr} = {$self->optimize($obj->{expr})};
         }
         elsif ($ref eq 'Sidef::Meta::Assert') {
-            my %arg = $self->optimize($obj->{arg});
-            $obj->{arg} = \%arg;
+            $obj->{arg} = {$self->optimize($obj->{arg})};
         }
 
         if (not exists($expr->{ind}) and not exists($expr->{call})) {
@@ -991,7 +971,7 @@ package Sidef::Optimizer {
                     foreach my $j (0 .. $#{$call->{arg}}) {
                         my $arg = $call->{arg}[$j];
                         push @{$obj->{call}[$i]{arg}},
-                            ref($arg) eq 'HASH' ? do { my %arg = $self->optimize($arg); \%arg }
+                            ref($arg) eq 'HASH' ? {$self->optimize($arg)}
                           : ref($arg) ? $self->optimize_expr({self => $arg})
                           :             $arg;
                     }
@@ -1002,7 +982,7 @@ package Sidef::Optimizer {
                     foreach my $j (0 .. $#{$call->{block}}) {
                         my $arg = $call->{block}[$j];
                         push @{$obj->{call}[$i]{block}},
-                            ref $arg eq 'HASH' ? do { my %arg = $self->optimize($arg); \%arg }
+                            ref $arg eq 'HASH' ? {$self->optimize($arg)}
                           : ref($arg) ? $self->optimize_expr({self => $arg})
                           :             $arg;
                     }
