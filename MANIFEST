@@ -35,6 +35,8 @@ lib/Sidef/Time/Time.pm
 lib/Sidef/Time/Time.pod
 lib/Sidef/Types/Array/Array.pm
 lib/Sidef/Types/Array/Array.pod
+lib/Sidef/Types/Array/Matrix.pm
+lib/Sidef/Types/Array/Matrix.pod
 lib/Sidef/Types/Array/Pair.pm
 lib/Sidef/Types/Array/Pair.pod
 lib/Sidef/Types/Block/Block.pm
@@ -780,6 +782,7 @@ scripts/Tests/man_or_boy.sf
 scripts/Tests/man_or_boy_2.sf
 scripts/Tests/man_or_boy_3.sf
 scripts/Tests/man_or_boy_cached.sf
+scripts/Tests/matrix_class.sf
 scripts/Tests/matrix_determinant.sf
 scripts/Tests/matrix_multiplication.sf
 scripts/Tests/matrix_operations.sf

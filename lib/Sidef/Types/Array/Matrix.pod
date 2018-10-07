@@ -1,0 +1,154 @@
+
+=encoding utf8
+
+=head1 NAME
+
+Sidef::Types::Array::Matrix
+
+=head1 DESCRIPTION
+
+This class implements ...
+
+=head1 SYNOPSIS
+
+var obj = Matrix(...)
+
+
+=head1 INHERITS
+
+Inherits methods from:
+
+	* Sidef::Types::Array::Array
+
+=head1 METHODS
+
+
+=head2 *
+
+I<Obj> B<*> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<mul>
+
+=cut
+
+=head2 **
+
+I<Obj> B<**> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<pow>
+
+=cut
+
+=head2 +
+
+I<Obj> B<+> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<add>
+
+=cut
+
+=head2 -
+
+I<Obj> B<-> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<sub>
+
+=cut
+
+=head2 /
+
+I<Obj> B</> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<÷>, I<div>
+
+=cut
+
+=head2 det
+
+Matrix.det() -> I<Obj>
+
+Return the
+
+Aliases: I<determinant>
+
+=cut
+
+=head2 det_bareiss
+
+Matrix.det_bareiss() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 gauss_jordan_invert
+
+Matrix.gauss_jordan_invert() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 gauss_jordan_solve
+
+Matrix.gauss_jordan_solve() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 inv
+
+Matrix.inv() -> I<Obj>
+
+Return the
+
+Aliases: I<invert>, I<inverse>
+
+=cut
+
+=head2 new
+
+Matrix.new() -> I<Obj>
+
+Return the
+
+Aliases: I<call>
+
+=cut
+
+=head2 rref
+
+Matrix.rref() -> I<Obj>
+
+Return the
+
+Aliases: I<reduced_row_echelon_form>
+
+=cut
+
+=head2 solve
+
+Matrix.solve() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 transpose
+
+Matrix.transpose() -> I<Obj>
+
+Return the
+
+=cut

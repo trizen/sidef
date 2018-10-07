@@ -124,6 +124,9 @@
       "Sidef::Types::Array::Array" : {
          "file" : "lib/Sidef/Types/Array/Array.pm"
       },
+      "Sidef::Types::Array::Matrix" : {
+         "file" : "lib/Sidef/Types/Array/Matrix.pm"
+      },
       "Sidef::Types::Array::Pair" : {
          "file" : "lib/Sidef/Types/Array/Pair.pm"
       },

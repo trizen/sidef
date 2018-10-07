@@ -63,14 +63,6 @@ Aliases: I<add>, I<concat>
 
 =cut
 
-=head2 ++
-
-I<Obj> B<++> I<Obj> -> I<Obj>
-
-Return the
-
-=cut
-
 =head2 -
 
 I<Obj> B<-> I<Obj> -> I<Obj>
@@ -78,14 +70,6 @@ I<Obj> B<-> I<Obj> -> I<Obj>
 Return the
 
 Aliases: I<sub>
-
-=cut
-
-=head2 --
-
-I<Obj> B<--> I<Obj> -> I<Obj>
-
-Return the
 
 =cut
 
@@ -1093,6 +1077,16 @@ Return the
 
 =cut
 
+=head2 mdiv
+
+Array.mdiv() -> I<Obj>
+
+Return the
+
+Aliases: I<matrix_div>
+
+=cut
+
 =head2 min
 
 Array.min() -> I<Obj>
@@ -1578,6 +1572,14 @@ Array.to_h() -> I<Obj>
 Return the
 
 Aliases: I<to_hash>
+
+=cut
+
+=head2 to_matrix
+
+Array.to_matrix() -> I<Obj>
+
+Return the
 
 =cut
 

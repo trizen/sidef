@@ -22,6 +22,7 @@ package Sidef::Deparse::Sidef {
                   Sidef::DataTypes::Bool::Bool            Bool
                   Sidef::DataTypes::Array::Array          Array
                   Sidef::DataTypes::Array::Pair           Pair
+                  Sidef::DataTypes::Array::Matrix         Matrix
                   Sidef::DataTypes::Hash::Hash            Hash
                   Sidef::DataTypes::Set::Set              Set
                   Sidef::DataTypes::Set::Bag              Bag

@@ -63,6 +63,7 @@ package Sidef::Parser {
                      | File\b                         (?{ state $x = bless({}, 'Sidef::DataTypes::Glob::File') })
                      | Arr(?:ay)?+\b                  (?{ state $x = bless({}, 'Sidef::DataTypes::Array::Array') })
                      | Pair\b                         (?{ state $x = bless({}, 'Sidef::DataTypes::Array::Pair') })
+                     | Matrix\b                       (?{ state $x = bless({}, 'Sidef::DataTypes::Array::Matrix') })
                      | Hash\b                         (?{ state $x = bless({}, 'Sidef::DataTypes::Hash::Hash') })
                      | Set\b                          (?{ state $x = bless({}, 'Sidef::DataTypes::Set::Set') })
                      | Bag\b                          (?{ state $x = bless({}, 'Sidef::DataTypes::Set::Bag') })
@@ -191,6 +192,7 @@ package Sidef::Parser {
                   DirHandle
                   Arr Array
                   Pair
+                  Matrix
                   Enumerator
                   Hash
                   Set
