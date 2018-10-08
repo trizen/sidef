@@ -811,9 +811,15 @@ package Sidef::Optimizer {
                 }
             }
         }
-        elsif (   $ref eq 'Sidef::Variable::Static'
-               or $ref eq 'Sidef::Variable::Const'
-               or $ref eq 'Sidef::Variable::Define') {
+        elsif (
+               (
+                   $ref eq 'Sidef::Variable::Static'
+                or $ref eq 'Sidef::Variable::Const'
+                or $ref eq 'Sidef::Variable::Define'
+                or $ref eq 'Sidef::Variable::Global'
+               )
+               and exists($obj->{expr})
+          ) {
             if ($addr{refaddr($obj)}++) {
                 ## ok
             }
