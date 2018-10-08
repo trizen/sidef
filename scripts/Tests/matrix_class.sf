@@ -56,6 +56,10 @@ assert_eq(B**-1, B.inv)
 assert_eq(A.inv, [[-10/3, -1/3, 8/3], [-7/3, -1/3, 5/3], [2/3, -1/3, -1/3]])
 assert_eq(B.inv, [[18/115, -8/115, -1/10], [19/115, -34/115, -3/10], [-1/23, 3/23, 0]])
 
+assert_eq(A.gauss_jordan_invert, A.inv)
+assert_eq(B.gauss_jordan_invert, B.inv)
+assert_eq(C.gauss_jordan_invert, C.inv)
+
 assert_eq(A.det, 3)
 assert_eq(B.det, 230)
 assert_eq(C.det, 684)

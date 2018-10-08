@@ -80,7 +80,7 @@ package Sidef::Types::Array::Matrix {
             }
         }
 
-        bless $_ for @c;
+        bless($_, 'Sidef::Types::Array::Array') for @c;
         bless \@c;
     }
 
@@ -100,20 +100,20 @@ package Sidef::Types::Array::Matrix {
         my $n = $#$A;
         my $B = bless [map {
             my $i = $_;
-            bless [map {
+            (bless [map {
                 $i == $_
                     ? Sidef::Types::Number::Number::ONE
                     : Sidef::Types::Number::Number::ZERO
-            } 0 .. $n]
+            } 0 .. $n], 'Sidef::Types::Array::Array')
         } 0 .. $n];
 #>>>
 
         return $B if ($pow == 0);
 
         while (1) {
-            $B = $B->mmul($A) if ($pow & 1);
+            $B = $B->mul($A) if ($pow & 1);
             $pow >>= 1 or last;
-            $A = $A->mmul($A);
+            $A = $A->mul($A);
         }
 
         $neg ? $B->inv : $B;
@@ -188,7 +188,7 @@ package Sidef::Types::Array::Matrix {
             $x[$i] = $x[$i]->div($A->[$i][$i]);
         }
 
-        bless \@x;
+        bless(\@x, 'Sidef::Types::Array::Array');
     }
 
     sub invert {
@@ -217,11 +217,11 @@ package Sidef::Types::Array::Matrix {
                     $I[$i][$j] = $I[$i][$j]->sub($A->[$i][$k]->mul($I[$k][$j]));
                 }
 
-                $I[$i][$j] = $I[$i][$j]->div($A->[$i][$i] // return bless [bless []]);
+                $I[$i][$j] = $I[$i][$j]->div($A->[$i][$i] // return bless [bless([], 'Sidef::Types::Array::Array')]);
             }
         }
 
-        bless $_ for @I;
+        bless($_, 'Sidef::Types::Array::Array') for @I;
         bless \@I;
     }
 
@@ -254,7 +254,7 @@ package Sidef::Types::Array::Matrix {
 
         my @m = map { [@$_] } @$self;
 
-        @m || return Sidef::Types::Array::Array->new();
+        @m || return bless [];
 
         my ($j, $rows, $cols) = (0, scalar(@m), scalar(@{$m[0]}));
 
@@ -290,7 +290,7 @@ package Sidef::Types::Array::Matrix {
             ++$j;
         }
 
-        bless $_ for @m;
+        bless($_, 'Sidef::Types::Array::Array') for @m;
         bless \@m;
     }
 
@@ -315,7 +315,7 @@ package Sidef::Types::Array::Matrix {
         my @A = map { [@{$self->[$_]}, @{$I[$_]}] } 0 .. $n;
 
         my $r = rref(\@A);
-        @A = map { bless [@{$_}[$n + 1 .. $#$_]] } @$r;
+        @A = map { bless([@{$_}[$n + 1 .. $#$_]], 'Sidef::Types::Array::Array') } @$r;
         bless \@A;
     }
 
@@ -325,7 +325,7 @@ package Sidef::Types::Array::Matrix {
         my @A = map { [@{$self->[$_]}, $vector->[$_]] } 0 .. $#$vector;
 
         my $r = rref(\@A);
-        bless [map { $_->[-1] } @$r];
+        bless([map { $_->[-1] } @$r], 'Sidef::Types::Array::Array');
     }
 
     sub det_bareiss {
