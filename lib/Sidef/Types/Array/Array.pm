@@ -207,7 +207,7 @@ package Sidef::Types::Array::Array {
             $addr{$refaddr} = bless \@array;
 
             foreach my $item (@$obj) {
-                if (ref($item) eq __PACKAGE__) {
+                if (ref($item) eq __PACKAGE__ or UNIVERSAL::isa($item, __PACKAGE__)) {
                     CORE::push(@array, __SUB__->($item));
                 }
                 else {
@@ -246,7 +246,7 @@ package Sidef::Types::Array::Array {
             $addr{$refaddr} = bless \@array;
 
             foreach my $item (@$obj) {
-                if (ref($item) eq __PACKAGE__) {
+                if (ref($item) eq __PACKAGE__ or UNIVERSAL::isa($item, __PACKAGE__)) {
                     CORE::push(@array, __SUB__->($item));
                 }
                 else {
@@ -290,7 +290,7 @@ package Sidef::Types::Array::Array {
             $addr{$refaddr2} = $addr{$refaddr1} = bless \@array;
 
             for my $i (0 .. $#{$obj1}) {
-                if (ref($obj1->[$i]) eq __PACKAGE__) {
+                if (ref($obj1->[$i]) eq __PACKAGE__ or UNIVERSAL::isa($obj1->[$i], __PACKAGE__)) {
                     CORE::push(@array, __SUB__->($obj1->[$i], $obj2->[$i]));
                 }
                 else {
@@ -309,6 +309,47 @@ package Sidef::Types::Array::Array {
     }
 
     *wise_op = \&wise_operator;
+
+    sub combine {
+        my ($self, $block) = @_;
+
+        my %addr;    # support for cyclic references
+
+        sub {
+            my (@arrays) = @_;
+
+            my @array;
+            my $blessed_array = bless \@array;
+
+            # Check any references already computed
+            foreach my $obj (@arrays) {
+                my $refaddr = Scalar::Util::refaddr($obj);
+                exists($addr{$refaddr}) && return $addr{$refaddr};
+            }
+
+            # Store the references of each object
+            foreach my $obj (@arrays) {
+                my $refaddr = Scalar::Util::refaddr($obj);
+                $addr{$refaddr} = $blessed_array;
+            }
+
+            @arrays || return $blessed_array;
+
+            my $first = $arrays[0];
+
+            foreach my $i (0 .. $#{$first}) {
+                if (ref($first->[$i]) eq __PACKAGE__ or UNIVERSAL::isa($first->[$i], __PACKAGE__)) {
+                    CORE::push(@array, __SUB__->(map { $_->[$i] } @arrays));
+                }
+                else {
+                    CORE::push(@array, $block->run(map { $_->[$i] } @arrays));
+                }
+            }
+
+            $blessed_array;
+          }
+          ->(@$self);
+    }
 
     sub mul {
         my ($self, $num) = @_;
@@ -1274,7 +1315,7 @@ package Sidef::Types::Array::Array {
         foreach my $item (@copy) {
             my $res = $block->run($item);
 
-            if (ref($res) eq __PACKAGE__) {
+            if (ref($res) eq __PACKAGE__ or UNIVERSAL::isa($res, __PACKAGE__)) {
                 CORE::push(@copy, @$res);
             }
             else {
@@ -1299,7 +1340,7 @@ package Sidef::Types::Array::Array {
         foreach my $item (@copy) {
             my $res = $block->run($item);
 
-            if (ref($res) eq __PACKAGE__) {
+            if (ref($res) eq __PACKAGE__ or UNIVERSAL::isa($res, __PACKAGE__)) {
                 CORE::push(@copy, @$res);
             }
         }

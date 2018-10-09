@@ -468,7 +468,7 @@ package Sidef::Types::Hash::Hash {
 
             foreach my $k (sort { (CORE::length($a) <=> CORE::length($b)) || ($a cmp $b) } CORE::keys(%$obj)) {
                 my $v = $obj->{$k};
-                if (ref($v) eq __PACKAGE__) {
+                if (ref($v) eq __PACKAGE__ or UNIVERSAL::isa($v, __PACKAGE__)) {
                     push @body, $v->as_tree(Sidef::Types::String::String->new($k));
                 }
                 else {

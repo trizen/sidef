@@ -361,6 +361,14 @@ Return the
 
 =cut
 
+=head2 combine
+
+Array.combine() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 compact
 
 Array.compact() -> I<Obj>
