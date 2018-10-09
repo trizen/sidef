@@ -367,6 +367,27 @@ package Sidef::Types::Array::Matrix {
         bless($matrix->SUPER::transpose);
     }
 
+    sub set_row {
+        my ($A, $k, $row) = @_;
+        $k = CORE::int($k);
+        $A->[$k] = bless([@$row], 'Sidef::Types::Array::Array');
+        $A;
+    }
+
+    sub set_column {
+        my ($A, $k, $col) = @_;
+
+        $k = CORE::int($k);
+
+        foreach my $i (0 .. $#{$col}) {
+            $A->[$i][$k] = $col->[$i];
+        }
+
+        $A;
+    }
+
+    *set_col = \&set_column;
+
     {
         no strict 'refs';
 

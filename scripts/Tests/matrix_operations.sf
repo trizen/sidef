@@ -172,6 +172,9 @@ do {
     assert_eq(z, z)
     assert_eq(z2, z2)
 
+    assert_eq([z...], [z...])
+    assert_eq([z2...], [z2...])
+
     var z2 = (a ~S* 3)
     assert_eq(z2[0], 3)
     assert_eq(z2[1], z2)
