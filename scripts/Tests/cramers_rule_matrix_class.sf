@@ -1,0 +1,23 @@
+#!/usr/bin/ruby
+
+# Cramer's rule, using the Matrix class
+# https://rosettacode.org/wiki/Cramer%27s_rule
+
+func cramers_rule(A, terms) {
+    ^A -> map {|i|
+        A.dclone.set_column(i, terms).det
+    } »/» A.det
+}
+
+var matrix = Matrix(
+    [2, -1,  5,  1],
+    [3,  2,  2, -6],
+    [1,  3,  3, -1],
+    [5, -2, -3,  3],
+)
+
+var free_terms = [-3, -32, -47, 49]
+
+assert_eq(cramers_rule(matrix, free_terms), [2, -12, -4, 1])
+
+say "** Test passed!"
