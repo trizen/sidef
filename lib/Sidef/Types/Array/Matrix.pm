@@ -388,6 +388,26 @@ package Sidef::Types::Array::Matrix {
 
     *set_col = \&set_column;
 
+    sub column_count {
+        my ($A) = @_;
+        @$A || return Sidef::Types::Number::Number::ZERO;
+        Sidef::Types::Number::Number->_set_uint(scalar @{$A->[0]});
+    }
+
+    *column_len  = \&column_count;
+    *column_size = \&column_count;
+    *col_size    = \&column_count;
+    *col_count   = \&column_count;
+    *col_len     = \&column_count;
+
+    sub row_count {
+        my ($A) = @_;
+        Sidef::Types::Number::Number->_set_uint(scalar @$A);
+    }
+
+    *row_len  = \&row_count;
+    *row_size = \&row_count;
+
     {
         no strict 'refs';
 

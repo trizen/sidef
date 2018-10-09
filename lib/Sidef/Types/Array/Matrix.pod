@@ -73,6 +73,16 @@ Aliases: I<÷>, I<div>
 
 =cut
 
+=head2 col_len
+
+Matrix.col_len() -> I<Obj>
+
+Return the
+
+Aliases: I<col_size>, I<col_count>, I<column_len>, I<column_size>, I<column_count>
+
+=cut
+
 =head2 det
 
 Matrix.det() -> I<Obj>
@@ -127,6 +137,16 @@ Aliases: I<call>
 
 =cut
 
+=head2 row_len
+
+Matrix.row_len() -> I<Obj>
+
+Return the
+
+Aliases: I<row_size>, I<row_count>
+
+=cut
+
 =head2 rref
 
 Matrix.rref() -> I<Obj>
@@ -134,6 +154,24 @@ Matrix.rref() -> I<Obj>
 Return the
 
 Aliases: I<reduced_row_echelon_form>
+
+=cut
+
+=head2 set_col
+
+Matrix.set_col() -> I<Obj>
+
+Return the
+
+Aliases: I<set_column>
+
+=cut
+
+=head2 set_row
+
+Matrix.set_row() -> I<Obj>
+
+Return the
 
 =cut
 
