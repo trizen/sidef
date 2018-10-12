@@ -5,18 +5,144 @@ package Sidef::Types::Array::Matrix {
 
     use parent qw(Sidef::Types::Array::Array);
 
-    sub new {
-        my (undef, @rows) = @_;
-        bless \@rows;
-    }
-
-    *call = \&new;
+    require List::Util;
 
     my %array_like = (
                       'Sidef::Types::Array::Array'  => 1,
                       'Sidef::Types::Array::Matrix' => 1,
                       'Sidef::Types::Array::Pair'   => 1,
                      );
+
+    sub new {
+        my (undef, @rows) = @_;
+        bless [map { bless [@$_] } @rows];
+    }
+
+    *call = \&new;
+
+    sub identity {
+        my (undef, $n) = @_;
+
+        $n = CORE::int($n);
+
+#<<<
+        bless [
+            map {
+                my $i = $_;
+                bless([map {
+                        $i == $_
+                            ? Sidef::Types::Number::Number::ONE
+                            : Sidef::Types::Number::Number::ZERO
+                } 1 .. $n], 'Sidef::Types::Array::Array')
+              } 1 .. $n
+        ];
+#>>>
+    }
+
+    *I = \&identity;
+
+    sub zero {
+        my (undef, $n, $m) = @_;
+
+        $n = CORE::int($n);
+        $m = defined($m) ? CORE::int($m) : $n;
+
+#<<<
+        bless [
+            map {
+                bless([(Sidef::Types::Number::Number::ZERO) x $m], 'Sidef::Types::Array::Array')
+            } 1 .. $n
+        ];
+#>>>
+    }
+
+    sub rand {
+        my (undef, $n, $m) = @_;
+
+        $n = CORE::int($n);
+        $m = defined($m) ? CORE::int($m) : $n;
+
+#<<<
+        bless [
+            map {
+                bless([map {
+                    (Sidef::Types::Number::Number::ONE)->rand
+                } 1 .. $m], 'Sidef::Types::Array::Array')
+            } 1 .. $n
+        ];
+#>>>
+    }
+
+    sub scalar {
+        my (undef, $n, $value) = @_;
+
+        $n = CORE::int($n);
+
+#<<<
+        bless [
+            map {
+                my $i = $_;
+                bless([map {
+                            $i == $_
+                                ? $value
+                                : Sidef::Types::Number::Number::ZERO
+                    } 1 .. $n], 'Sidef::Types::Array::Array')
+              } 1 .. $n
+        ];
+#>>>
+    }
+
+    sub row_vector {
+        my (undef, @list) = @_;
+        bless [bless(\@list, 'Sidef::Types::Array::Array')];
+    }
+
+    sub column_vector {
+        my (undef, @list) = @_;
+        bless [map { bless([$_], 'Sidef::Types::Array::Array') } @list];
+    }
+
+    *col_vector = \&column_vector;
+
+    sub diagonal {
+        my (undef, @diag) = @_;
+
+        my $n = scalar(@diag);
+
+#<<<
+        bless [
+            map {
+                my $i = $_;
+                bless([map {
+                    $i == $_
+                        ? shift(@diag)
+                        : Sidef::Types::Number::Number::ZERO
+                } 1 .. $n], 'Sidef::Types::Array::Array')
+            } 1 .. $n
+        ];
+#>>>
+    }
+
+    sub rows {
+        my (undef, @rows) = @_;
+
+        bless [map { bless([@$_], 'Sidef::Types::Array::Array') } @rows];
+    }
+
+    sub columns {
+        my (undef, @cols) = @_;
+
+        my $max = List::Util::max(map { scalar(@$_) } @cols);
+
+        bless [
+            map {
+                my $i = $_;
+                bless [map { $_->[$i] } @cols]
+              } 0 .. $max - 1
+        ];
+    }
+
+    *cols = \&columns;
 
     sub add {
         my ($m1, $m2) = @_;

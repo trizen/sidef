@@ -83,6 +83,26 @@ Aliases: I<col_size>, I<col_count>, I<column_len>, I<column_size>, I<column_coun
 
 =cut
 
+=head2 cols
+
+Matrix.cols() -> I<Obj>
+
+Return the
+
+Aliases: I<columns>
+
+=cut
+
+=head2 col_vector
+
+Matrix.col_vector() -> I<Obj>
+
+Return the
+
+Aliases: I<column_vector>
+
+=cut
+
 =head2 det
 
 Matrix.det() -> I<Obj>
@@ -101,6 +121,14 @@ Return the
 
 =cut
 
+=head2 diagonal
+
+Matrix.diagonal() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 gauss_jordan_invert
 
 Matrix.gauss_jordan_invert() -> I<Obj>
@@ -114,6 +142,16 @@ Return the
 Matrix.gauss_jordan_solve() -> I<Obj>
 
 Return the
+
+=cut
+
+=head2 I
+
+Matrix.I() -> I<Obj>
+
+Return the
+
+Aliases: I<identity>
 
 =cut
 
@@ -137,6 +175,14 @@ Aliases: I<call>
 
 =cut
 
+=head2 rand
+
+Matrix.rand() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 row_len
 
 Matrix.row_len() -> I<Obj>
@@ -147,6 +193,22 @@ Aliases: I<row_size>, I<row_count>
 
 =cut
 
+=head2 rows
+
+Matrix.rows() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 row_vector
+
+Matrix.row_vector() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 rref
 
 Matrix.rref() -> I<Obj>
@@ -154,6 +216,14 @@ Matrix.rref() -> I<Obj>
 Return the
 
 Aliases: I<reduced_row_echelon_form>
+
+=cut
+
+=head2 scalar
+
+Matrix.scalar() -> I<Obj>
+
+Return the
 
 =cut
 
@@ -186,6 +256,14 @@ Return the
 =head2 transpose
 
 Matrix.transpose() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 zero
+
+Matrix.zero() -> I<Obj>
 
 Return the
 
