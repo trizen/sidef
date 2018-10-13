@@ -20,6 +20,32 @@ package Sidef::Types::Array::Matrix {
 
     *call = \&new;
 
+    sub build {
+        my (undef, $n, $m, $block) = @_;
+
+        $n = CORE::int($n);
+
+        if (ref($m) eq 'Sidef::Types::Block::Block') {
+            ($m, $block) = ($n, $m);
+        }
+        else {
+            $m = CORE::int($m);
+        }
+
+#<<<
+        bless [
+            map {
+                my $i = Sidef::Types::Number::Number->_set_uint($_);
+                bless([map {
+                    $block->run(
+                        $i, Sidef::Types::Number::Number->_set_uint($_)
+                    );
+                } 0 .. $m-1], 'Sidef::Types::Array::Array')
+            } 0 .. $n-1
+        ];
+#>>>
+    }
+
     sub identity {
         my (undef, $n) = @_;
 

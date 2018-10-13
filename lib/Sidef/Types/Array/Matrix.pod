@@ -73,6 +73,14 @@ Aliases: I<÷>, I<div>
 
 =cut
 
+=head2 build
+
+Matrix.build() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 col_len
 
 Matrix.col_len() -> I<Obj>
