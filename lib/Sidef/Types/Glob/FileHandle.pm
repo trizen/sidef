@@ -382,9 +382,9 @@ package Sidef::Types::Glob::FileHandle {
     {
         no strict 'refs';
         *{__PACKAGE__ . '::' . '>>'} = \&read_to;
-        *{__PACKAGE__ . '::' . '»'} = \&read_to;
+        *{__PACKAGE__ . '::' . '»'}  = \&read_to;
         *{__PACKAGE__ . '::' . '<<'} = \&write_from;
-        *{__PACKAGE__ . '::' . '«'} = \&write_from;
+        *{__PACKAGE__ . '::' . '«'}  = \&write_from;
     }
 
 };

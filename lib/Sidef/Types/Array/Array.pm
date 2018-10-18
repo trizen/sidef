@@ -3220,9 +3220,9 @@ package Sidef::Types::Array::Array {
         *{__PACKAGE__ . '::' . '*'}   = \&mul;
         *{__PACKAGE__ . '::' . '**'}  = \&mpow;
         *{__PACKAGE__ . '::' . '<<'}  = \&append;
-        *{__PACKAGE__ . '::' . '«'}  = \&append;
+        *{__PACKAGE__ . '::' . '«'}   = \&append;
         *{__PACKAGE__ . '::' . '>>'}  = \&assign_to;
-        *{__PACKAGE__ . '::' . '»'}  = \&assign_to;
+        *{__PACKAGE__ . '::' . '»'}   = \&assign_to;
         *{__PACKAGE__ . '::' . '|'}   = \&or;
         *{__PACKAGE__ . '::' . '^'}   = \&xor;
         *{__PACKAGE__ . '::' . '+'}   = \&add;
@@ -3230,16 +3230,16 @@ package Sidef::Types::Array::Array {
         *{__PACKAGE__ . '::' . '=='}  = \&eq;
         *{__PACKAGE__ . '::' . '<'}   = \&lt;
         *{__PACKAGE__ . '::' . '<='}  = \&le;
-        *{__PACKAGE__ . '::' . '≤'} = \&le;
+        *{__PACKAGE__ . '::' . '≤'}   = \&le;
         *{__PACKAGE__ . '::' . '>'}   = \&gt;
-        *{__PACKAGE__ . '::' . '≥'} = \&ge;
+        *{__PACKAGE__ . '::' . '≥'}   = \&ge;
         *{__PACKAGE__ . '::' . '>='}  = \&ge;
         *{__PACKAGE__ . '::' . '!='}  = \&ne;
-        *{__PACKAGE__ . '::' . '≠'} = \&ne;
+        *{__PACKAGE__ . '::' . '≠'}   = \&ne;
         *{__PACKAGE__ . '::' . '<=>'} = \&cmp;
         *{__PACKAGE__ . '::' . ':'}   = \&pair_with;
         *{__PACKAGE__ . '::' . '/'}   = \&div;
-        *{__PACKAGE__ . '::' . '÷'}  = \&div;
+        *{__PACKAGE__ . '::' . '÷'}   = \&div;
         *{__PACKAGE__ . '::' . '...'} = \&to_list;
     }
 

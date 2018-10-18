@@ -40,7 +40,7 @@ package Sidef::Types::Set::Bag {
 
             my $refaddr = Scalar::Util::refaddr($obj);
 
-            exists($addr{$refaddr})
+            CORE::exists($addr{$refaddr})
               && return $addr{$refaddr};
 
             my @bag;
@@ -620,6 +620,8 @@ package Sidef::Types::Set::Bag {
           : (Sidef::Types::Bool::Bool::FALSE);
     }
 
+    *exists = \&has;
+
     sub is_subset {
         my ($A, $B) = @_;
 
@@ -778,7 +780,7 @@ package Sidef::Types::Set::Bag {
 
             my $refaddr = Scalar::Util::refaddr($obj);
 
-            exists($addr{$refaddr})
+            CORE::exists($addr{$refaddr})
               and return $addr{$refaddr};
 
             my @values = CORE::values(%$obj);
@@ -786,7 +788,7 @@ package Sidef::Types::Set::Bag {
             $addr{$refaddr} = "Bag(#`($refaddr)...)";
 
             my ($s, $v);
-            "Bag(" . join(
+            "Bag(" . CORE::join(
                 ', ',
                 map {
                     ((ref($v = $_->{value}) && ($s = UNIVERSAL::can($v, 'dump'))) ? $s->($v) : ($v // 'nil')) x $_->{count}
@@ -807,23 +809,23 @@ package Sidef::Types::Set::Bag {
         no strict 'refs';
 
         *{__PACKAGE__ . '::' . '+'}   = \&concat;
-        *{__PACKAGE__ . '::' . '∪'} = \&union;
+        *{__PACKAGE__ . '::' . '∪'}   = \&union;
         *{__PACKAGE__ . '::' . '|'}   = \&union;
         *{__PACKAGE__ . '::' . '&'}   = \&intersection;
-        *{__PACKAGE__ . '::' . '∩'} = \&intersection;
+        *{__PACKAGE__ . '::' . '∩'}   = \&intersection;
         *{__PACKAGE__ . '::' . '-'}   = \&difference;
-        *{__PACKAGE__ . '::' . '∖'} = \&difference;
+        *{__PACKAGE__ . '::' . '∖'}   = \&difference;
         *{__PACKAGE__ . '::' . '^'}   = \&symmetric_difference;
         *{__PACKAGE__ . '::' . '<='}  = \&is_subset;
-        *{__PACKAGE__ . '::' . '≤'} = \&is_subset;
+        *{__PACKAGE__ . '::' . '≤'}   = \&is_subset;
         *{__PACKAGE__ . '::' . '>='}  = \&is_superset;
-        *{__PACKAGE__ . '::' . '≥'} = \&is_superset;
-        *{__PACKAGE__ . '::' . '⊆'} = \&is_subset;
-        *{__PACKAGE__ . '::' . '⊇'} = \&is_superset;
+        *{__PACKAGE__ . '::' . '≥'}   = \&is_superset;
+        *{__PACKAGE__ . '::' . '⊆'}   = \&is_subset;
+        *{__PACKAGE__ . '::' . '⊇'}   = \&is_superset;
         *{__PACKAGE__ . '::' . '...'} = \&to_list;
-        *{__PACKAGE__ . '::' . '≡'} = \&eq;
+        *{__PACKAGE__ . '::' . '≡'}   = \&eq;
         *{__PACKAGE__ . '::' . '=='}  = \&eq;
-        *{__PACKAGE__ . '::' . '≠'} = \&ne;
+        *{__PACKAGE__ . '::' . '≠'}   = \&ne;
         *{__PACKAGE__ . '::' . '!='}  = \&ne;
         *{__PACKAGE__ . '::' . '<<'}  = \&append;
     }

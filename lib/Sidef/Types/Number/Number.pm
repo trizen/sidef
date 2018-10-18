@@ -9117,7 +9117,7 @@ package Sidef::Types::Number::Number {
         @factors{Math::Prime::Util::GMP::factor($n)} = ();
 
         my @d;
-        foreach my $p (sort { (length($a) <=> length($b)) || ($a cmp $b) } keys %factors) {
+        foreach my $p (sort { (CORE::length($a) <=> CORE::length($b)) || ($a cmp $b) } keys %factors) {
             push @d,
               (
                 $p < ULONG_MAX
@@ -9138,7 +9138,7 @@ package Sidef::Types::Number::Number {
         my @factors = grep { $factors{$_} == 1 } keys %factors;
 
         my @d;
-        foreach my $p (sort { (length($a) <=> length($b)) || ($a cmp $b) } @factors) {
+        foreach my $p (sort { (CORE::length($a) <=> CORE::length($b)) || ($a cmp $b) } @factors) {
             push @d,
               (
                 $p < ULONG_MAX
@@ -10987,7 +10987,7 @@ package Sidef::Types::Number::Number {
         no strict 'refs';
 
         *{__PACKAGE__ . '::' . '/'}   = \&div;
-        *{__PACKAGE__ . '::' . '÷'}  = \&div;
+        *{__PACKAGE__ . '::' . '÷'}   = \&div;
         *{__PACKAGE__ . '::' . '*'}   = \&mul;
         *{__PACKAGE__ . '::' . '+'}   = \&add;
         *{__PACKAGE__ . '::' . '-'}   = \&sub;
@@ -11002,12 +11002,12 @@ package Sidef::Types::Number::Number {
         *{__PACKAGE__ . '::' . '^'}   = \&xor;
         *{__PACKAGE__ . '::' . '<=>'} = \&cmp;
         *{__PACKAGE__ . '::' . '<='}  = \&le;
-        *{__PACKAGE__ . '::' . '≤'} = \&le;
+        *{__PACKAGE__ . '::' . '≤'}   = \&le;
         *{__PACKAGE__ . '::' . '>='}  = \&ge;
-        *{__PACKAGE__ . '::' . '≥'} = \&ge;
+        *{__PACKAGE__ . '::' . '≥'}   = \&ge;
         *{__PACKAGE__ . '::' . '=='}  = \&eq;
         *{__PACKAGE__ . '::' . '!='}  = \&ne;
-        *{__PACKAGE__ . '::' . '≠'} = \&ne;
+        *{__PACKAGE__ . '::' . '≠'}   = \&ne;
         *{__PACKAGE__ . '::' . '..'}  = \&to;
         *{__PACKAGE__ . '::' . '..^'} = \&xto;
         *{__PACKAGE__ . '::' . '^..'} = \&xdownto;
@@ -11019,18 +11019,18 @@ package Sidef::Types::Number::Number {
         *{__PACKAGE__ . '::' . '~'}   = \&not;
         *{__PACKAGE__ . '::' . ':'}   = \&pair;
         *{__PACKAGE__ . '::' . '//'}  = \&idiv;
-        *{__PACKAGE__ . '::' . 'γ'}  = \&EulerGamma;
-        *{__PACKAGE__ . '::' . 'Γ'}  = \&gamma;
-        *{__PACKAGE__ . '::' . 'Ψ'}  = \&digamma;
-        *{__PACKAGE__ . '::' . 'ϕ'}  = \&euler_totient;
-        *{__PACKAGE__ . '::' . 'σ'}  = \&sigma;
-        *{__PACKAGE__ . '::' . 'Ω'}  = \&big_omega;
-        *{__PACKAGE__ . '::' . 'ω'}  = \&omega;
-        *{__PACKAGE__ . '::' . 'ζ'}  = \&zeta;
-        *{__PACKAGE__ . '::' . 'η'}  = \&eta;
-        *{__PACKAGE__ . '::' . 'μ'}  = \&moebius;
+        *{__PACKAGE__ . '::' . 'γ'}   = \&EulerGamma;
+        *{__PACKAGE__ . '::' . 'Γ'}   = \&gamma;
+        *{__PACKAGE__ . '::' . 'Ψ'}   = \&digamma;
+        *{__PACKAGE__ . '::' . 'ϕ'}   = \&euler_totient;
+        *{__PACKAGE__ . '::' . 'σ'}   = \&sigma;
+        *{__PACKAGE__ . '::' . 'Ω'}   = \&big_omega;
+        *{__PACKAGE__ . '::' . 'ω'}   = \&omega;
+        *{__PACKAGE__ . '::' . 'ζ'}   = \&zeta;
+        *{__PACKAGE__ . '::' . 'η'}   = \&eta;
+        *{__PACKAGE__ . '::' . 'μ'}   = \&moebius;
         *{__PACKAGE__ . '::' . '=~='} = \&approx_eq;
-        *{__PACKAGE__ . '::' . '≅'} = \&approx_eq;
+        *{__PACKAGE__ . '::' . '≅'}   = \&approx_eq;
 
         *{__PACKAGE__ . '::' . 'Möbius'} = \&moebius;
         *{__PACKAGE__ . '::' . 'möbius'} = \&moebius;

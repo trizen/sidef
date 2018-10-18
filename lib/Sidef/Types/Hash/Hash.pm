@@ -589,7 +589,7 @@ package Sidef::Types::Hash::Hash {
         *{__PACKAGE__ . '::' . '+'}   = \&concat;
         *{__PACKAGE__ . '::' . '=='}  = \&eq;
         *{__PACKAGE__ . '::' . '!='}  = \&ne;
-        *{__PACKAGE__ . '::' . '≠'} = \&ne;
+        *{__PACKAGE__ . '::' . '≠'}   = \&ne;
         *{__PACKAGE__ . '::' . ':'}   = \&new;
         *{__PACKAGE__ . '::' . '...'} = \&to_list;
     }

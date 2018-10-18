@@ -378,7 +378,8 @@ package Sidef::Types::Set::Set {
 
             my $s;
             "Set("
-              . join(', ', map { (ref($_) && ($s = UNIVERSAL::can($_, 'dump'))) ? $s->($_) : ($_ // 'nil') } @values) . ')';
+              . CORE::join(', ', map { (ref($_) && ($s = UNIVERSAL::can($_, 'dump'))) ? $s->($_) : ($_ // 'nil') } @values)
+              . ')';
         };
 
         local *Sidef::Types::Set::Set::dump = $sub;
@@ -416,21 +417,21 @@ package Sidef::Types::Set::Set {
 
         *{__PACKAGE__ . '::' . '+'}   = \&concat;
         *{__PACKAGE__ . '::' . '<<'}  = \&append;
-        *{__PACKAGE__ . '::' . '∪'} = \&union;
+        *{__PACKAGE__ . '::' . '∪'}   = \&union;
         *{__PACKAGE__ . '::' . '|'}   = \&union;
         *{__PACKAGE__ . '::' . '&'}   = \&intersection;
-        *{__PACKAGE__ . '::' . '∩'} = \&intersection;
+        *{__PACKAGE__ . '::' . '∩'}   = \&intersection;
         *{__PACKAGE__ . '::' . '-'}   = \&difference;
-        *{__PACKAGE__ . '::' . '∖'} = \&difference;
+        *{__PACKAGE__ . '::' . '∖'}   = \&difference;
         *{__PACKAGE__ . '::' . '^'}   = \&symmetric_difference;
         *{__PACKAGE__ . '::' . '<='}  = \&is_subset;
-        *{__PACKAGE__ . '::' . '≤'} = \&is_subset;
+        *{__PACKAGE__ . '::' . '≤'}   = \&is_subset;
         *{__PACKAGE__ . '::' . '>='}  = \&is_superset;
-        *{__PACKAGE__ . '::' . '≥'} = \&is_superset;
-        *{__PACKAGE__ . '::' . '⊆'} = \&is_subset;
-        *{__PACKAGE__ . '::' . '⊇'} = \&is_superset;
+        *{__PACKAGE__ . '::' . '≥'}   = \&is_superset;
+        *{__PACKAGE__ . '::' . '⊆'}   = \&is_subset;
+        *{__PACKAGE__ . '::' . '⊇'}   = \&is_superset;
         *{__PACKAGE__ . '::' . '...'} = \&to_list;
-        *{__PACKAGE__ . '::' . '≡'} = \&Sidef::Types::Hash::Hash::eq;
+        *{__PACKAGE__ . '::' . '≡'}   = \&Sidef::Types::Hash::Hash::eq;
     }
 };
 

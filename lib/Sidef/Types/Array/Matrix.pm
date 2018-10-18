@@ -568,7 +568,7 @@ package Sidef::Types::Array::Matrix {
         *{__PACKAGE__ . '::' . '+'}  = \&add;
         *{__PACKAGE__ . '::' . '-'}  = \&sub;
         *{__PACKAGE__ . '::' . '/'}  = \&div;
-        *{__PACKAGE__ . '::' . '÷'} = \&div;
+        *{__PACKAGE__ . '::' . '÷'}  = \&div;
     }
 };
 
