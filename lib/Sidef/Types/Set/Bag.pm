@@ -620,7 +620,13 @@ package Sidef::Types::Set::Bag {
           : (Sidef::Types::Bool::Bool::FALSE);
     }
 
-    *exists = \&has;
+    *haskey   = \&has;
+    *has_key  = \&has;
+    *exists   = \&has;
+    *include  = \&has;
+    *includes = \&has;
+    *contain  = \&has;
+    *contains = \&has;
 
     sub is_subset {
         my ($A, $B) = @_;
@@ -634,8 +640,6 @@ package Sidef::Types::Set::Bag {
         return Sidef::Types::Bool::Bool::TRUE;
     }
 
-    *contained_in = \&is_subset;
-
     sub is_superset {
         my ($A, $B) = @_;
 
@@ -647,11 +651,6 @@ package Sidef::Types::Set::Bag {
 
         return Sidef::Types::Bool::Bool::TRUE;
     }
-
-    *include  = \&is_superset;
-    *includes = \&is_superset;
-    *contain  = \&is_superset;
-    *contains = \&is_superset;
 
     sub contains_all {
         my ($self, @objects) = @_;

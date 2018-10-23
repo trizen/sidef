@@ -247,6 +247,8 @@ Bag.has() -> I<Obj>
 
 Return the
 
+Aliases: I<exists>, I<has_key>, I<haskey>, I<contain>, I<include>, I<contains>, I<includes>
+
 =cut
 
 =head2 iter
@@ -485,7 +487,7 @@ I<Obj> B<≤> I<Obj> -> I<Obj>
 
 Return the
 
-Aliases: I<⊆>, I<E<lt>=>, I<is_subset>, I<contained_in>
+Aliases: I<⊆>, I<E<lt>=>, I<is_subset>
 
 =cut
 
@@ -495,6 +497,6 @@ I<Obj> B<≥> I<Obj> -> I<Obj>
 
 Return the
 
-Aliases: I<⊇>, I<E<gt>=>, I<contain>, I<include>, I<contains>, I<includes>, I<is_superset>
+Aliases: I<⊇>, I<E<gt>=>, I<is_superset>
 
 =cut
