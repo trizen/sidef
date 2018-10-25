@@ -1825,6 +1825,14 @@ Return the
 
 =cut
 
+=head2 is_smooth_over_prod
+
+Number.is_smooth_over_prod() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 is_sqr
 
 Number.is_sqr() -> I<Obj>
