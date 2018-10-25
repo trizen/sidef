@@ -9880,32 +9880,91 @@ package Sidef::Types::Number::Number {
     }
 
     sub is_smooth {
-        my ($x, $n) = @_;
+        my ($n, $k) = @_;
 
-        _valid(\$n);
-        __is_int__($$x) || return Sidef::Types::Bool::Bool::FALSE;
+        _valid(\$k);
+        __is_int__($$n) || return Sidef::Types::Bool::Bool::FALSE;
 
-        $x = _any2mpz($$x) // return Sidef::Types::Bool::Bool::FALSE;
         $n = _any2mpz($$n) // return Sidef::Types::Bool::Bool::FALSE;
+        $k = _any2ui($$k) // return Sidef::Types::Bool::Bool::FALSE;
 
-        Math::GMPz::Rmpz_sgn($n) <= 0
-          and return Sidef::Types::Bool::Bool::FALSE;
+        return Sidef::Types::Bool::Bool::FALSE if (Math::GMPz::Rmpz_sgn($n) <= 0);
+        return Sidef::Types::Bool::Bool::FALSE if $k <= 0;
+        return Sidef::Types::Bool::Bool::TRUE  if Math::GMPz::Rmpz_cmp_ui($n, 1) == 0;
 
-        my $p = Math::GMPz::Rmpz_init_set_ui(2);
-        my $t = Math::GMPz::Rmpz_init_set($x);
+        state %cache;
 
-        while (Math::GMPz::Rmpz_cmp($p, $n) <= 0) {
-            if (Math::GMPz::Rmpz_divisible_p($t, $p)) {
-                Math::GMPz::Rmpz_remove($t, $t, $p);
-                Math::GMPz::Rmpz_cmp_ui($t, 1) == 0
-                  and return Sidef::Types::Bool::Bool::TRUE;
-            }
-            Math::GMPz::Rmpz_nextprime($p, $p);
+        # Clear the cache when there are too many values
+        if (scalar(keys(%cache)) > 100) {
+            Math::GMPz::Rmpz_clear($_) for values(%cache);
+            undef %cache;
         }
 
-        (Math::GMPz::Rmpz_cmp_ui($t, 1) == 0)
-          ? Sidef::Types::Bool::Bool::TRUE
-          : Sidef::Types::Bool::Bool::FALSE;
+        my $B = exists($cache{$k}) ? $cache{$k} : do {
+
+            state $GMP_V_MAJOR = Math::GMPz::__GNU_MP_VERSION();
+            state $GMP_V_MINOR = Math::GMPz::__GNU_MP_VERSION_MINOR();
+            state $OLD_GMP     = ($GMP_V_MAJOR < 5 or ($GMP_V_MAJOR == 5 and $GMP_V_MINOR < 1));
+
+            my $t = Math::GMPz::Rmpz_init_nobless();
+
+            if ($OLD_GMP) {
+                Math::GMPz::Rmpz_set_ui($t, 1);
+                for (my $p = Math::GMPz::Rmpz_init_set_ui(2) ;
+                     Math::GMPz::Rmpz_cmp_ui($p, $k) <= 0 ;
+                     Math::GMPz::Rmpz_nextprime($p, $p)) {
+                    Math::GMPz::Rmpz_mul($t, $t, $p);
+                }
+            }
+            else {
+                Math::GMPz::Rmpz_primorial_ui($t, $k);
+            }
+
+            $cache{$k} = $t;
+        };
+
+        my $g = Math::GMPz::Rmpz_init();
+        my $t = Math::GMPz::Rmpz_init_set($n);
+
+        Math::GMPz::Rmpz_gcd($g, $t, $B);
+
+        while (Math::GMPz::Rmpz_cmp_ui($g, 1) > 0) {
+            Math::GMPz::Rmpz_remove($t, $t, $g);
+            return Sidef::Types::Bool::Bool::TRUE if Math::GMPz::Rmpz_cmp_ui($t, 1) == 0;
+            Math::GMPz::Rmpz_gcd($g, $t, $B);
+        }
+
+        return Sidef::Types::Bool::Bool::FALSE;
+    }
+
+    sub is_smooth_over_prod {
+        my ($n, $k) = @_;
+
+        _valid(\$k);
+
+        __is_int__($$n) || return Sidef::Types::Bool::Bool::FALSE;
+        $n = _any2mpz($$n) // return Sidef::Types::Bool::Bool::FALSE;
+
+        return Sidef::Types::Bool::Bool::FALSE if Math::GMPz::Rmpz_sgn($n) <= 0;
+
+        __is_int__($$k) || return Sidef::Types::Bool::Bool::FALSE;
+        $k = _any2mpz($$k) // return Sidef::Types::Bool::Bool::FALSE;
+
+        return Sidef::Types::Bool::Bool::FALSE if Math::GMPz::Rmpz_sgn($k) <= 0;
+        return Sidef::Types::Bool::Bool::TRUE if Math::GMPz::Rmpz_cmp_ui($n, 1) == 0;
+
+        my $g = Math::GMPz::Rmpz_init();
+        my $t = Math::GMPz::Rmpz_init_set($n);
+
+        Math::GMPz::Rmpz_gcd($g, $t, $k);
+
+        while (Math::GMPz::Rmpz_cmp_ui($g, 1) > 0) {
+            Math::GMPz::Rmpz_remove($t, $t, $g);
+            return Sidef::Types::Bool::Bool::TRUE if Math::GMPz::Rmpz_cmp_ui($t, 1) == 0;
+            Math::GMPz::Rmpz_gcd($g, $t, $k);
+        }
+
+        return Sidef::Types::Bool::Bool::FALSE;
     }
 
     sub is_square {

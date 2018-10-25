@@ -601,6 +601,7 @@ scripts/RosettaCode/utf8_encode_decode.sf
 scripts/RosettaCode/van_der_corput_sequence.sf
 scripts/RosettaCode/variable_length_quantity.sf
 scripts/RosettaCode/vogel_s_approximation_method.sf
+scripts/RosettaCode/vogel_s_approximation_method_2.sf
 scripts/RosettaCode/walk_a_dir_non_recursively.sf
 scripts/RosettaCode/water_collected_between_towers.sf
 scripts/RosettaCode/word_wrap.sf
