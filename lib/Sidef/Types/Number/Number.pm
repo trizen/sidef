@@ -5062,6 +5062,14 @@ package Sidef::Types::Number::Number {
           : (Sidef::Types::Bool::Bool::FALSE);
     }
 
+    sub is_between {
+        my ($x, $min, $max) = @_;
+        _valid(\$min, \$max);
+        (__cmp__($$x, $$min) >= 0 and __cmp__($$x, $$max) <= 0)
+          ? (Sidef::Types::Bool::Bool::TRUE)
+          : (Sidef::Types::Bool::Bool::FALSE);
+    }
+
     sub is_even {
         my ($x) = @_;
         (__is_int__($$x) && Math::GMPz::Rmpz_even_p(_any2mpz($$x) // (return Sidef::Types::Bool::Bool::FALSE)))

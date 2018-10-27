@@ -1469,6 +1469,14 @@ Return the
 
 =cut
 
+=head2 is_between
+
+Number.is_between() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 is_bpsw_prime
 
 Number.is_bpsw_prime() -> I<Obj>
