@@ -1,0 +1,22 @@
+#!/usr/bin/ruby
+
+func increment(n) {
+    n+1
+}
+
+func double(n) {
+    2*n
+}
+
+func triple(n) {
+    3*n
+}
+
+var a = increment(double(triple(42)))
+var b = (42 |> triple |> double |> increment)
+var c = [triple, double, increment].reduce({|a,b| b(a) }, 42)
+
+assert_eq(a, b)
+assert_eq(a, c)
+
+say "** Test passed!"

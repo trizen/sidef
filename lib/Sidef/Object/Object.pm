@@ -350,6 +350,12 @@ package Sidef::Object::Object {
             Sidef::Types::Hash::Hash->new(%methods);
         }
 
+        # Pipeline operator
+        *{__PACKAGE__ . '::' . '|>'} = sub {
+            my ($arg, $func) = @_;
+            $func->call($arg);
+        };
+
         # Logical AND
         *{__PACKAGE__ . '::' . '&&'} = sub {
             $_[0] ? $_[1] : $_[0];
