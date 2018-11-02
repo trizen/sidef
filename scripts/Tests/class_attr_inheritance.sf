@@ -22,12 +22,13 @@ assert_eq(obj.z, 42)
 assert_eq(obj.b, 10)
 
 class Baz < Foo {
-    has x = 3
+    has x2 = 3
 }
 
 obj = Baz(21)
 
-assert_eq(obj.x, 3)
+assert_eq(obj.x, 21)
+assert_eq(obj.x2, 3)
 assert_eq(obj.y, 21)
 assert_eq(obj.z, 42)
 

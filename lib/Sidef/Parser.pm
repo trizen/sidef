@@ -1504,6 +1504,7 @@ package Sidef::Parser {
                     my ($var) = $self->find_var($name, $class_name);
 
                     if (defined($var) and $var->{type} eq 'class') {
+                        $obj->{parent} = $var->{obj};
                         push @{$obj->{inherit}}, ref($var->{obj}{name}) ? $var->{obj}{name} : $var->{obj};
                     }
                 }

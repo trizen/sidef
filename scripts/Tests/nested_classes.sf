@@ -1,0 +1,75 @@
+
+do {
+    class ArgParse () {
+
+      class Option (long, bar=99) < ArgParse {
+        method foo {
+            self.bar
+        }
+      }
+
+      has bar = 42
+
+      method option(name) {
+          Option(name)
+      }
+    }
+
+    var opt = ArgParse().option(:f)
+
+    assert_eq(opt.foo, 99)
+    assert_eq(opt.bar, 99)
+}
+
+do {
+    class ArgParse () {
+
+      class Option (long) < ArgParse {
+        method foo {
+            self.bar
+        }
+      }
+
+      has bar = 42
+
+      method option(name) {
+          Option(name)
+      }
+    }
+
+    var opt = ArgParse().option(:f)
+
+    assert_eq(opt.foo, 42)
+    assert_eq(opt.bar, 42)
+}
+
+do {
+    class ArgParse () {
+
+      class Option (long) {
+        method foo {
+            self.bar
+        }
+      }
+
+      has bar = 42
+
+      method option(name) {
+          Option(name)
+      }
+    }
+
+    var opt = ArgParse().option(:f)
+
+    var error = 0
+    try {
+        opt.foo     # must fail
+    }
+    catch {
+        ++error
+    }
+
+    assert_eq(error, 1)
+}
+
+say "** Test passed!"

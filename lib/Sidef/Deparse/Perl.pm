@@ -466,7 +466,7 @@ HEADER
         my @vars;
         foreach my $class (@{$classes}) {
             push @vars, $callback->($class);
-            if (exists $class->{inherit}) {
+            if (defined $class->{inherit}) {
                 unshift @vars, $self->_get_inherited_stuff($class->{inherit}, $callback);
             }
         }
@@ -476,10 +476,15 @@ HEADER
 
     sub _dump_class_name {
         my ($self, $class) = @_;
-        join('::',
-             $self->{environment_name},
-             $class->{class} || 'main',
-             $class->{name}  || (Sidef::normalize_type(ref($class)) . refaddr($class)));
+
+        join(
+            '::',
+            $self->{environment_name},
+
+            #$class->{class} || 'main',
+            refaddr($class->{parent} || $class),
+            $class->{name} || (Sidef::normalize_type(ref($class)) . refaddr($class))
+            );
     }
 
     sub deparse_generic {
@@ -788,10 +793,11 @@ HEADER
                 local $self->{class_name}       = $package_name;
                 local $self->{parent_name}      = ['class', $package_name];
                 local $self->{package_name}     = $package_name;
-                local $self->{inherit}          = $obj->{inherit} if exists $obj->{inherit};
-                local $self->{class_vars}       = $obj->{vars} if exists $obj->{vars};
-                local $self->{class_attributes} = $obj->{attributes} if exists $obj->{attributes};
-                local $self->{ref_class}        = 1 if ref($obj->{name});
+                local $self->{inherit}          = $obj->{inherit};
+                local $self->{class_vars}       = $obj->{vars};
+                local $self->{class_attributes} = $obj->{attributes};
+                local $self->{ref_class}        = ref($obj->{name}) ? 1 : 0;
+
                 $code .= $self->deparse_expr({self => $block});
                 $code .= ";'${package_name}'}";
             }
@@ -820,7 +826,7 @@ HEADER
                         if ($is_class) {
                             my $class_name = $self->{class_name};
                             my $base_pkgs = (
-                                             exists($self->{inherit})
+                                             defined($self->{inherit})
                                              ? (
                                                 join(' ',
                                                      grep { $_ ne $class_name }
@@ -828,7 +834,7 @@ HEADER
                                                )
                                              : ''
                                             )
-                              . (exists($self->{ref_class}) ? '' : ' Sidef::Object::Object');
+                              . ($self->{ref_class} ? '' : ' Sidef::Object::Object');
 
                             if ($base_pkgs ne '') {
                                 $code .= "use parent qw(-norequire $base_pkgs);";
@@ -836,46 +842,61 @@ HEADER
                         }
 
                         ## TODO: find a simpler and more elegant solution
-                        if ($is_class and not exists($self->{ref_class})) {
+                        if ($is_class and not $self->{ref_class}) {
 
-                            my @class_vars = do {
-                                my %seen;
-                                reverse grep { !$seen{$_->{name}}++ }
-                                  reverse(
-                                          exists($self->{inherit})
-                                          ? $self->_get_inherited_stuff($self->{inherit},
-                                                                        sub { exists($_[0]->{vars}) ? @{$_[0]->{vars}} : () })
-                                          : (),
-                                          @{$self->{class_vars}}
-                                         );
-                            };
+                            my @self_class_vars = @{$self->{class_vars}};
+                            my @inherited_class_vars = (
+                                                        defined($self->{inherit})
+                                                        ? $self->_get_inherited_stuff($self->{inherit},
+                                                                         sub { exists($_[0]->{vars}) ? @{$_[0]->{vars}} : () })
+                                                        : (),
+                                                       );
 
-                            my @class_attributes = do {
-                                my %seen;
-                                (
-                                 exists($self->{inherit})
-                                 ? $self->_get_inherited_stuff(
-                                                              $self->{inherit},
-                                                              sub { exists($_[0]->{attributes}) ? @{$_[0]->{attributes}} : () }
-                                   )
-                                 : (),
-                                 (exists($self->{class_attributes}) ? @{$self->{class_attributes}} : ())
-                                );
-                            };
+                            my @self_class_attr = (defined($self->{class_attributes}) ? @{$self->{class_attributes}} : ());
+                            my @inherited_class_attr = (
+                                defined($self->{inherit})
+                                ? $self->_get_inherited_stuff(
+                                    $self->{inherit},
+                                    sub {
+                                        defined($_[0]->{attributes}) ? @{$_[0]->{attributes}} : ();
+                                    }
+                                  )
+                                : ()
+                            );
+
+                            my %in_self;
+                            foreach my $var (@self_class_vars) {
+                                $in_self{$var->{name}} = 1;
+                            }
+                            foreach my $attr (@self_class_attr) {
+                                foreach my $var (@{$attr->{vars}}) {
+                                    $in_self{$var->{name}} = 1;
+                                }
+                            }
+
+                            my @class_vars =
+                              ((grep { !$in_self{$_->{name}} } @inherited_class_vars), @self_class_vars);
+                            my @class_attr = (@inherited_class_attr, @self_class_attr);
 
                             $code .= "\$new$refaddr=Sidef::Types::Block::Block->new(code=>sub{";
                             push @{$self->{function_declarations}}, [$refaddr, "my \$new$refaddr;"];
 
-                            $code .=
-                              $self->_dump_sub_init_vars(@class_vars) . $self->_dump_class_attributes(@class_attributes);
+                            $code .= $self->_dump_sub_init_vars(@class_vars) . $self->_dump_class_attributes(@class_attr);
 
                             my @class_var_attributes = do {
                                 my %seen;
-                                reverse(grep { !$seen{$_->{name}}++ } map { @{$_->{vars}} } reverse(@class_attributes));
+                                grep { !$seen{$_->{name}}++ } reverse
+
+                                  ((map { @{$_->{vars}} } @inherited_class_attr), (map { @{$_->{vars}} } @self_class_attr));
                             };
 
                             $code .= 'my$self=bless{';
-                            foreach my $var (@class_vars, @class_var_attributes) {
+                            foreach my $var (
+                                do {
+                                    my %seen;
+                                    grep { !$seen{$_->{name}}++ } (reverse(@class_vars), @class_var_attributes);
+                                }
+                              ) {
                                 $code .= qq{"\Q$var->{name}\E"=>} . $self->_dump_var($var) . ', ';
                             }
 

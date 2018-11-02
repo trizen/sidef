@@ -4,90 +4,178 @@
 ## Inheritance of class variables (test)
 #
 
-class Foo(x="bau") {
+do {
+    class Foo(x="bau") {
 
-}
-
-class Bar(y=42, x="hi") < Foo {
-
-}
-
-class Baz(z) < Bar {
-
-}
-
-var obj = Baz(y:32, z:10);
-
-assert_eq(obj.x, 'hi');
-assert_eq(obj.y, 32);
-assert_eq(obj.z, 10);
-
-obj = Baz(z: 23)
-
-assert_eq(obj.x, 'hi')
-assert_eq(obj.y, 42)
-
-obj = Baz(x: 'baz', y: 21, z: 42)
-
-assert_eq(obj.x, 'baz')
-assert_eq(obj.y, 21)
-assert_eq(obj.z, 42)
-
-class Baxx(x='baxx', z='new') < Baz {
-
-}
-
-obj = Baxx()
-
-assert_eq(obj.x, 'baxx')
-assert_eq(obj.y, 42)
-assert_eq(obj.z, 'new')
-
-obj = Baxx(x: 'a', y: 'b', z:'c')
-
-assert_eq(obj.x, 'a')
-assert_eq(obj.y, 'b')
-assert_eq(obj.z, 'c')
-
-class Baz(z='bye', y=10) < Bar {
-
-}
-
-obj = Baz()
-
-assert_eq(obj.x, 'hi')
-assert_eq(obj.y, 10)
-assert_eq(obj.z, 'bye')
-
-obj = Baz(x:'a', y:'b', z:'c')
-
-assert_eq(obj.x, 'a')
-assert_eq(obj.y, 'b')
-assert_eq(obj.z, 'c')
-
-#
-## Foo class variables are NOT redefined here
-#
-class Foo (
-    String name,
-    Number age {.is_even}
-) {}
-
-class Example << Foo {
-    method uc {
-        self.name.uc
     }
+
+    class Bar(y=42, x="hi") < Foo {
+
+    }
+
+    class Baz(z) < Bar {
+
+    }
+
+    var obj = Baz(y:32, z:10);
+
+    assert_eq(obj.x, 'hi');
+    assert_eq(obj.y, 32);
+    assert_eq(obj.z, 10);
+
+    obj = Baz(z: 23)
+
+    assert_eq(obj.x, 'hi')
+    assert_eq(obj.y, 42)
+
+    obj = Baz(x: 'baz', y: 21, z: 42)
+
+    assert_eq(obj.x, 'baz')
+    assert_eq(obj.y, 21)
+    assert_eq(obj.z, 42)
+
+    class Baxx(x='baxx', z='new') < Baz {
+
+    }
+
+    obj = Baxx()
+
+    assert_eq(obj.x, 'baxx')
+    assert_eq(obj.y, 42)
+    assert_eq(obj.z, 'new')
+
+    obj = Baxx(x: 'a', y: 'b', z:'c')
+
+    assert_eq(obj.x, 'a')
+    assert_eq(obj.y, 'b')
+    assert_eq(obj.z, 'c')
+
+    class Baz(z='bye', y=10) < Bar {
+
+    }
+
+    obj = Baz()
+
+    assert_eq(obj.x, 'hi')
+    assert_eq(obj.y, 10)
+    assert_eq(obj.z, 'bye')
+
+    obj = Baz(x:'a', y:'b', z:'c')
+
+    assert_eq(obj.x, 'a')
+    assert_eq(obj.y, 'b')
+    assert_eq(obj.z, 'c')
+
+    #
+    ## Foo class variables are NOT redefined here
+    #
+    class Foo (
+        String name,
+        Number age {.is_even}
+    ) {}
+
+    class Example << Foo {
+        method uc {
+            self.name.uc
+        }
+    }
+
+    var obj1 = Example(1, "foo", 42);
+    var obj2 = Example(2, "bar", 22);
+
+    assert_ne(obj1.name, obj2.name);
+    assert_ne(obj1.age,  obj2.age);
+
+    assert_eq(obj1.x, 1)
+    assert_eq(obj2.x, 2)
+    assert_eq(obj1.uc, "FOO");
+    assert_eq(obj2.uc, "BAR");
+
 }
 
-var obj1 = Example(1, "foo", 42);
-var obj2 = Example(2, "bar", 22);
+do {
+    class Foo(n, bar = 42) {
+    }
 
-assert_ne(obj1.name, obj2.name);
-assert_ne(obj1.age,  obj2.age);
+    class Bar(n) < Foo {
+        has bar = 32
+    }
 
-assert_eq(obj1.x, 1)
-assert_eq(obj2.x, 2)
-assert_eq(obj1.uc, "FOO");
-assert_eq(obj2.uc, "BAR");
+    class Baz(n) < Bar {
+        has bar = 99
+    }
+
+    assert_eq(Baz(42).bar, 99)
+}
+
+do {
+    class Foo(n, bar = 42) {
+    }
+
+    class Bar(n) < Foo {
+        has bar = 32
+    }
+
+    class Baz(bar=100) < Bar {
+    }
+
+    assert_eq(Baz(42).bar, 100)
+}
+
+do {
+    class Foo(n, bar = 42) {
+    }
+
+    class Bar(bar=32) < Foo {
+    }
+
+    class Baz(bar=101) < Bar {
+    }
+
+    assert_eq(Baz(42).bar, 101)
+}
+
+do {
+    class Foo(n, bar = 42) {
+    }
+
+    class Bar(bar=32) < Foo {
+    }
+
+    class Baz < Bar {
+        has bar = 102
+    }
+
+    assert_eq(Baz(42).bar, 102)
+}
+
+do {
+    class Foo(n) {
+        has bar = 42
+    }
+
+    class Bar(bar=32) < Foo {
+    }
+
+    class Baz < Bar {
+        has bar = 103
+    }
+
+    assert_eq(Baz(42).bar, 103)
+}
+
+do {
+    class Foo(n) {
+        has bar = 42
+    }
+
+    class Bar(bar=32) < Foo {
+    }
+
+    class Baz(bar=104) < Bar {
+    }
+
+    assert_eq(Baz(42).bar, 104)
+}
 
 say "** Test passed!"
