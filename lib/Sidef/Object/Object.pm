@@ -387,7 +387,7 @@ package Sidef::Object::Object {
             }
 
             # Second is not an object (assuming it is a typename)
-            # Return true if typeof(first) is a subclass of second
+            # Return true if `typeof(first)` is a subclass of `second`
             if (!ref($second)) {
                 return (
                         UNIVERSAL::isa(ref($first), $second)
@@ -397,7 +397,7 @@ package Sidef::Object::Object {
             }
 
             # First is not an object (assuming it is a typename)
-            # Return true if typeof(second) is a subclass of first
+            # Return true if `first` is a subclass of `typeof(second)`
             if (!ref($first)) {
                 return (
                         UNIVERSAL::isa($first, ref($second))
