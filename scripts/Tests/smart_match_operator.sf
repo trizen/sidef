@@ -106,6 +106,28 @@ assert(/^z/ ~~ a)
 assert(/^c/ ~~ a)
 assert(!(/^d/ ~~ a))
 
+assert (Pair ~~ Pair)
+assert (Pair().class ~~ Pair.class)
+assert !(Pair.class ~~ "a")
+
+assert !("Pair" ~~ Pair)
+assert !(Pair ~~ "a")
+assert !("a" ~~ Pair)
+assert !(1 ~~ Pair)
+
+assert ([1,2] ~~ Array)
+assert (Array ~~ [1,2])
+
+assert ("" ~~ String)
+assert (// ~~ Regex)
+
+assert (Pair(1,2) ~~ Array)         # Pair is a subclass of Array
+assert !(Array ~~ Pair(1,2))        # Array is not a subclass of Pair
+
+assert !(nil ~~ Array)
+assert (Array ~~ Array)
+assert !(Array() ~~ nil)
+
 #
 ## Hash ~~ Regex
 #

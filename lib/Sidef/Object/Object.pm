@@ -386,6 +386,26 @@ package Sidef::Object::Object {
                 ($first, $second) = ($second, $first);
             }
 
+            # Second is not an object (assuming it is a typename)
+            # Return true if typeof(first) is a subclass of second
+            if (!ref($second)) {
+                return (
+                        UNIVERSAL::isa(ref($first), $second)
+                        ? Sidef::Types::Bool::Bool::TRUE
+                        : Sidef::Types::Bool::Bool::FALSE
+                       );
+            }
+
+            # First is not an object (assuming it is a typename)
+            # Return true if typeof(second) is a subclass of first
+            if (!ref($first)) {
+                return (
+                        UNIVERSAL::isa($first, ref($second))
+                        ? Sidef::Types::Bool::Bool::TRUE
+                        : Sidef::Types::Bool::Bool::FALSE
+                       );
+            }
+
             # First is String
             if (UNIVERSAL::isa($first, 'Sidef::Types::String::String')) {
 
