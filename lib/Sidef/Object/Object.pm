@@ -352,8 +352,13 @@ package Sidef::Object::Object {
 
         # Pipeline operator
         *{__PACKAGE__ . '::' . '|>'} = sub {
-            my ($arg, $func) = @_;
-            $func->call($arg);
+            my ($arg, $func, @args) = @_;
+
+            if (ref($func) eq 'Sidef::Types::String::String') {
+                return $arg->$$func(@args);
+            }
+
+            $func->call($arg, @args);
         };
 
         # Logical AND
