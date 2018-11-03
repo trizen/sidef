@@ -1733,6 +1733,26 @@ Aliases: I<or>
 
 =cut
 
+=head2 |>>
+
+I<Obj> B<|E<gt>E<gt>> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<|XE<gt>>, I<pipeline_cross_op>
+
+=cut
+
+=head2 |Z>
+
+Array.|ZE<gt>() -> I<Obj>
+
+Return the
+
+Aliases: I<pipeline_zip_op>
+
+=cut
+
 =head2 «
 
 I<Obj> B<«> I<Obj> -> I<Obj>

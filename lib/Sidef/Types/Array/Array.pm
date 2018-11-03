@@ -2801,29 +2801,55 @@ package Sidef::Types::Array::Array {
 
     *mpow = \&matrix_pow;
 
+    sub _pipeline_op_call {
+        my ($obj, $callback) = @_;
+
+        my @args;
+
+        if (ref($callback) eq __PACKAGE__) {
+            @args     = @$callback;
+            $callback = shift(@args);
+        }
+
+        if (ref($callback) eq 'Sidef::Types::Block::Block') {
+            return $callback->call($obj, @args);
+        }
+        elsif (ref($callback) eq 'Sidef::Types::String::String') {
+            return $obj->$$callback(@args);
+        }
+
+        die "[ERROR] Invalid callback object: expected Block or String, but got <<", ref($callback), ">>";
+    }
+
     sub pipeline_cross_op {
         my ($self, $arg) = @_;
 
-        require Algorithm::Loops;
+        my @list;
+        foreach my $item (@$self) {
+            foreach my $callback (@$arg) {
+                push @list, _pipeline_op_call($item, $callback);
+            }
+        }
 
-        my $iter = Algorithm::Loops::NestedLoops([[@$self], [@$arg]]);
+        bless \@list;
+    }
+
+    sub pipeline_zip_op {
+        my ($self, $arg) = @_;
+
+        my @arg  = @$arg;
+        my $argc = scalar(@arg);
+        my @copy = @$self;
 
         my @list;
-        while (my @arr = $iter->()) {
-            my ($obj, $callback) = @arr;
 
-            my @args;
+        while (@copy) {
+            my @tmp = splice(@copy, 0, $argc);
 
-            if (ref($callback) eq __PACKAGE__) {
-                @args     = @$callback;
-                $callback = shift(@args);
-            }
+            @tmp == $argc or last;
 
-            if (ref($callback) eq 'Sidef::Types::Block::Block') {
-                push @list, $callback->call($obj, @args);
-            }
-            elsif (ref($callback) eq 'Sidef::Types::String::String') {
-                push @list, $obj->$$callback(@args);
+            for my $i (0 .. $argc - 1) {
+                push @list, _pipeline_op_call($tmp[$i], $arg[$i]);
             }
         }
 
@@ -3252,9 +3278,9 @@ package Sidef::Types::Array::Array {
         *{__PACKAGE__ . '::' . '«'}   = \&append;
         *{__PACKAGE__ . '::' . '>>'}  = \&assign_to;
         *{__PACKAGE__ . '::' . '»'}   = \&assign_to;
-        *{__PACKAGE__ . '::' . '|>>'} = \&pipeline_map_op;
         *{__PACKAGE__ . '::' . '|Z>'} = \&pipeline_zip_op;
         *{__PACKAGE__ . '::' . '|X>'} = \&pipeline_cross_op;
+        *{__PACKAGE__ . '::' . '|>>'} = \&pipeline_cross_op;
         *{__PACKAGE__ . '::' . '|'}   = \&or;
         *{__PACKAGE__ . '::' . '^'}   = \&xor;
         *{__PACKAGE__ . '::' . '+'}   = \&add;

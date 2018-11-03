@@ -1,0 +1,21 @@
+#!/usr/bin/ruby
+
+func increment(n, a) { n + a }
+func decrement(n, a) { n - a }
+
+assert_eq([42, 100, 99, 49] |Z> [[increment, 3], :sqrt], [45, 10, 102, 7])
+assert_eq([100, 41, 49, 200] |Z> [:sqrt, { _+1 }], [10, 42, 7, 201])
+
+assert_eq([5,6,7] |Z> [[:pow, 2]], [25, 36, 49])
+assert_eq([5,6,7] |Z> [[:pow, 2]], [5,6,7] |X> [[:pow, 2]])
+
+assert_eq([1,2,3,4] |Z> [[increment, 2], [decrement, 2]] |Z> [[decrement, 2], [increment, 2]], [1, 2, 3, 4])
+assert_eq([1,2,3]   |X> [[increment, 2], [decrement, 2]] |Z> [[decrement, 2], [increment, 2]], [1, 1, 2, 2, 3, 3])
+assert_eq([1,2,3]   |>> [[increment, 2], [decrement, 2]] |Z> [[decrement, 2], [increment, 2]], [1, 1, 2, 2, 3, 3])
+
+assert_eq(
+    [100, 10000, 1000000] |X> [:sqrt, [increment, 2]] |Z> [[:pow, 2], [decrement, 2]],
+    [100, 100, 10000, 10000, 1000000, 1000000]
+);
+
+say "** Test passed!"
