@@ -2801,6 +2801,35 @@ package Sidef::Types::Array::Array {
 
     *mpow = \&matrix_pow;
 
+    sub pipeline_cross_op {
+        my ($self, $arg) = @_;
+
+        require Algorithm::Loops;
+
+        my $iter = Algorithm::Loops::NestedLoops([[@$self], [@$arg]]);
+
+        my @list;
+        while (my @arr = $iter->()) {
+            my ($obj, $callback) = @arr;
+
+            my @args;
+
+            if (ref($callback) eq __PACKAGE__) {
+                @args     = @$callback;
+                $callback = shift(@args);
+            }
+
+            if (ref($callback) eq 'Sidef::Types::Block::Block') {
+                push @list, $callback->call($obj, @args);
+            }
+            elsif (ref($callback) eq 'Sidef::Types::String::String') {
+                push @list, $obj->$$callback(@args);
+            }
+        }
+
+        bless \@list;
+    }
+
     sub cartesian {
         my ($self, $block) = @_;
 
@@ -3223,6 +3252,9 @@ package Sidef::Types::Array::Array {
         *{__PACKAGE__ . '::' . '«'}   = \&append;
         *{__PACKAGE__ . '::' . '>>'}  = \&assign_to;
         *{__PACKAGE__ . '::' . '»'}   = \&assign_to;
+        *{__PACKAGE__ . '::' . '|>>'} = \&pipeline_map_op;
+        *{__PACKAGE__ . '::' . '|Z>'} = \&pipeline_zip_op;
+        *{__PACKAGE__ . '::' . '|X>'} = \&pipeline_cross_op;
         *{__PACKAGE__ . '::' . '|'}   = \&or;
         *{__PACKAGE__ . '::' . '^'}   = \&xor;
         *{__PACKAGE__ . '::' . '+'}   = \&add;
