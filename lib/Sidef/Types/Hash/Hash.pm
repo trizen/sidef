@@ -306,7 +306,12 @@ package Sidef::Types::Hash::Hash {
 
     sub concat {
         my ($self, $obj) = @_;
-        bless {%$self, %$obj}, ref($self);
+        
+#<<<
+            UNIVERSAL::isa($obj, __PACKAGE__)                  ? bless({%$self, %$obj}, ref($self))
+          : UNIVERSAL::isa($obj, 'Sidef::Types::Array::Array') ? bless({%$self, @$obj}, ref($self))
+          :                                                      bless({%$self,  $obj}, ref($self));
+#>>>
     }
 
     *merge = \&concat;

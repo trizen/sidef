@@ -1,0 +1,20 @@
+#!/usr/bin/ruby
+
+#
+## Hash.concat on various things, including non-hashes
+#
+
+var hash = Hash()
+hash += 1
+assert_eq(hash{"1"}, nil)
+
+hash += Hash(:a => :b)
+assert_eq(hash{:a}, :b)
+
+hash += %w(c d)           # 2-item array
+assert_eq(hash{:c}, :d)
+
+hash += "2":3             # an actual Pair
+assert_eq(hash{"2"}, 3)
+
+say "** Test passed!"
