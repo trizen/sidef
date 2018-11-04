@@ -35,6 +35,7 @@ package Sidef::Object::Object {
       q{cmp} => sub {
         my ($obj1, $obj2, $swapped) = @_;
 
+        # Support for cyclic references
         if (    CORE::ref($obj1) eq CORE::ref($obj2)
             and CORE::ref($obj1) ne 'Sidef::Types::Number::Number'
             and Scalar::Util::refaddr($obj1) == Scalar::Util::refaddr($obj2)) {
@@ -54,14 +55,14 @@ package Sidef::Object::Object {
             }
         }
 
-#<<<
-        (CORE::ref($obj1) ? Scalar::Util::refaddr($obj1) : ('-inf' + 0)) <=>
-        (CORE::ref($obj2) ? Scalar::Util::refaddr($obj2) : ('-inf' + 0));
-#>>>
+        (CORE::ref($obj1) eq CORE::ref($obj2))
+          ? (Scalar::Util::refaddr($obj1) <=> Scalar::Util::refaddr($obj2))
+          : (CORE::ref($obj1) cmp CORE::ref($obj2));
       },
       q{eq} => sub {
         my ($obj1, $obj2) = @_;
 
+        # Support for cyclic references
         if (    CORE::ref($obj1) eq CORE::ref($obj2)
             and CORE::ref($obj1) ne 'Sidef::Types::Number::Number'
             and Scalar::Util::refaddr($obj1) == Scalar::Util::refaddr($obj2)) {
