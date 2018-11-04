@@ -2819,24 +2819,7 @@ package Sidef::Types::Array::Array {
     sub pipeline_cross_op {
         my ($self, $callbacks) = @_;
 
-#<<<
-        my $multi_callbacks = (
-               ref($callbacks) eq __PACKAGE__
-            or UNIVERSAL::isa($callbacks, __PACKAGE__)
-        );
-#>>>
-
         my @list;
-
-        if (not $multi_callbacks) {
-
-            foreach my $item (@$self) {
-                push @list, _pipeline_op_call($item, $callbacks);
-            }
-
-            return bless \@list;
-        }
-
         foreach my $item (@$self) {
             foreach my $callback (@$callbacks) {
                 push @list, _pipeline_op_call($item, $callback);
@@ -2846,12 +2829,20 @@ package Sidef::Types::Array::Array {
         bless \@list;
     }
 
+    sub pipeline_map_op {
+        my ($self, $callback) = @_;
+
+        my @list;
+
+        foreach my $item (@$self) {
+            push @list, _pipeline_op_call($item, $callback);
+        }
+
+        bless \@list;
+    }
+
     sub pipeline_zip_op {
         my ($self, $callbacks) = @_;
-
-        ref($callbacks) eq __PACKAGE__
-          or UNIVERSAL::isa($callbacks, __PACKAGE__)
-          or goto &pipeline_cross_op;
 
         my @arg  = @$callbacks;
         my $argc = scalar(@arg);
@@ -3295,7 +3286,7 @@ package Sidef::Types::Array::Array {
         *{__PACKAGE__ . '::' . '»'}   = \&assign_to;
         *{__PACKAGE__ . '::' . '|Z>'} = \&pipeline_zip_op;
         *{__PACKAGE__ . '::' . '|X>'} = \&pipeline_cross_op;
-        *{__PACKAGE__ . '::' . '|>>'} = \&pipeline_cross_op;
+        *{__PACKAGE__ . '::' . '|>>'} = \&pipeline_map_op;
         *{__PACKAGE__ . '::' . '|'}   = \&or;
         *{__PACKAGE__ . '::' . '^'}   = \&xor;
         *{__PACKAGE__ . '::' . '+'}   = \&add;

@@ -1729,7 +1729,17 @@ I<Obj> B<|E<gt>E<gt>> I<Obj> -> I<Obj>
 
 Return the
 
-Aliases: I<|XE<gt>>, I<pipeline_cross_op>
+Aliases: I<pipeline_map_op>
+
+=cut
+
+=head2 |X>
+
+Array.|XE<gt>() -> I<Obj>
+
+Return the
+
+Aliases: I<pipeline_cross_op>
 
 =cut
 

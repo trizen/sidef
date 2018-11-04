@@ -847,6 +847,7 @@ scripts/Tests/permutations_2.sf
 scripts/Tests/pi_and_e.sf
 scripts/Tests/pi_machin_like_formula.sf
 scripts/Tests/pipeline_cross_operator.sf
+scripts/Tests/pipeline_map_operator.sf
 scripts/Tests/pipeline_operator.sf
 scripts/Tests/pipeline_zip_operator.sf
 scripts/Tests/postfix_exclamation_mark.sf
