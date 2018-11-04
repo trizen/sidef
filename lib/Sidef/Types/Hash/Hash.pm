@@ -306,7 +306,7 @@ package Sidef::Types::Hash::Hash {
 
     sub concat {
         my ($self, $obj) = @_;
-        
+
 #<<<
             UNIVERSAL::isa($obj, __PACKAGE__)                  ? bless({%$self, %$obj}, ref($self))
           : UNIVERSAL::isa($obj, 'Sidef::Types::Array::Array') ? bless({%$self, @$obj}, ref($self))
@@ -595,8 +595,9 @@ package Sidef::Types::Hash::Hash {
         *{__PACKAGE__ . '::' . '=='}  = \&eq;
         *{__PACKAGE__ . '::' . '!='}  = \&ne;
         *{__PACKAGE__ . '::' . '≠'}   = \&ne;
-        *{__PACKAGE__ . '::' . ':'}   = \&new;
         *{__PACKAGE__ . '::' . '...'} = \&to_list;
+
+        #*{__PACKAGE__ . '::' . ':'}   = \&new;#
     }
 };
 

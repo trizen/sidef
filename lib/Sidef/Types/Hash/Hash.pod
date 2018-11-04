@@ -43,16 +43,6 @@ Aliases: I<to_list>
 
 =cut
 
-=head2 :
-
-I<Obj> B<:> I<Obj> -> I<Obj>
-
-Return the
-
-Aliases: I<new>, I<call>
-
-=cut
-
 =head2 ==
 
 I<Obj> B<==> I<Obj> -> I<Obj>
@@ -326,6 +316,16 @@ Return the
 Hash.min_by() -> I<Obj>
 
 Return the
+
+=cut
+
+=head2 new
+
+Hash.new() -> I<Obj>
+
+Return the
+
+Aliases: I<call>
 
 =cut
 

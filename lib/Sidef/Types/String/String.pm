@@ -1438,10 +1438,6 @@ package Sidef::Types::String::String {
 
     *drop_right = \&shift_right;
 
-    sub pair_with {
-        Sidef::Types::Array::Pair->new($_[0], $_[1]);
-    }
-
     sub to_str {
         $_[0];
     }
@@ -1520,7 +1516,6 @@ package Sidef::Types::String::String {
         *{__PACKAGE__ . '::' . '<<'}  = \&shift_left;
         *{__PACKAGE__ . '::' . '>>'}  = \&shift_right;
         *{__PACKAGE__ . '::' . '%'}   = \&sprintf;
-        *{__PACKAGE__ . '::' . ':'}   = \&pair_with;
         *{__PACKAGE__ . '::' . '~'}   = \&not;
     }
 };

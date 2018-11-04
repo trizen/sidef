@@ -361,6 +361,11 @@ package Sidef::Object::Object {
             $func->call($arg, @args);
         };
 
+        # Pair operator
+        *{__PACKAGE__ . '::' . ':'} = sub {
+            Sidef::Types::Array::Pair->new($_[0], $_[1]);
+        };
+
         # Logical AND
         *{__PACKAGE__ . '::' . '&&'} = sub {
             $_[0] ? $_[1] : $_[0];

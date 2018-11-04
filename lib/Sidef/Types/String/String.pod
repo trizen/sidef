@@ -103,16 +103,6 @@ Aliases: I<÷>, I<div>
 
 =cut
 
-=head2 :
-
-I<Obj> B<:> I<Obj> -> I<Obj>
-
-Return the
-
-Aliases: I<pair_with>
-
-=cut
-
 =head2 <
 
 I<Obj> B<E<lt>> I<Obj> -> I<Obj>

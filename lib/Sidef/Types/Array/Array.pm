@@ -1898,11 +1898,6 @@ package Sidef::Types::Array::Array {
 
     *bshuffle = \&best_shuffle;
 
-    sub pair_with {
-        my ($self, $arr) = @_;
-        Sidef::Types::Array::Pair->new($self, $arr);
-    }
-
     sub accumulate_by {
         my ($self, $block) = @_;
 
@@ -3295,7 +3290,6 @@ package Sidef::Types::Array::Array {
         *{__PACKAGE__ . '::' . '!='}  = \&ne;
         *{__PACKAGE__ . '::' . '≠'}   = \&ne;
         *{__PACKAGE__ . '::' . '<=>'} = \&cmp;
-        *{__PACKAGE__ . '::' . ':'}   = \&pair_with;
         *{__PACKAGE__ . '::' . '/'}   = \&div;
         *{__PACKAGE__ . '::' . '÷'}   = \&div;
         *{__PACKAGE__ . '::' . '...'} = \&to_list;
