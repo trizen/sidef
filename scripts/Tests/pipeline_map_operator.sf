@@ -12,4 +12,7 @@ assert_eq([3,4,5] |>> square |>> {.sqrt},    [3,4,5])
 assert_eq([3,4,5] |>> [:pow, 2] |>> {.sqrt}, [3,4,5])
 assert_eq([3,4,5] |>> [:pow, 2] |>> :sqrt,   [3,4,5])
 
+assert_eq([1,2,3] |>> (:ipow, 2), [1, 4, 9])
+assert_eq([1,2,3] |>> [:ipow, 2], [1, 4, 9])
+
 say "** Test passed!"

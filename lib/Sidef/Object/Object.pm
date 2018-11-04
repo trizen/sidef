@@ -354,6 +354,11 @@ package Sidef::Object::Object {
         *{__PACKAGE__ . '::' . '|>'} = sub {
             my ($arg, $func, @args) = @_;
 
+            if (ref($func) eq 'Sidef::Types::Array::Array') {
+                @args = @$func;
+                $func = shift(@args);
+            }
+
             if (ref($func) eq 'Sidef::Types::String::String') {
                 return $arg->$$func(@args);
             }

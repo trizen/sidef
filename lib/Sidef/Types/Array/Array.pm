@@ -2830,7 +2830,11 @@ package Sidef::Types::Array::Array {
     }
 
     sub pipeline_map_op {
-        my ($self, $callback) = @_;
+        my ($self, $callback, @args) = @_;
+
+        if (@args) {
+            $callback = bless [$callback, @args];
+        }
 
         my @list;
 
