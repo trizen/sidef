@@ -8069,6 +8069,14 @@ package Sidef::Types::Number::Number {
 
     *Kronecker = \&kronecker;
 
+    sub kronecker_delta {
+        my ($x, $y) = @_;
+        _valid(\$y);
+        __eq__($$x, $$y) ? ONE : ZERO;
+    }
+
+    *KroneckerDelta = \&kronecker_delta;
+
     sub is_coprime {
         my ($x, $y) = @_;
 
@@ -11096,6 +11104,7 @@ package Sidef::Types::Number::Number {
         *{__PACKAGE__ . '::' . 'ζ'}   = \&zeta;
         *{__PACKAGE__ . '::' . 'η'}   = \&eta;
         *{__PACKAGE__ . '::' . 'μ'}   = \&moebius;
+        *{__PACKAGE__ . '::' . 'δ'}   = \&kronecker_delta;
         *{__PACKAGE__ . '::' . '=~='} = \&approx_eq;
         *{__PACKAGE__ . '::' . '≅'}   = \&approx_eq;
 

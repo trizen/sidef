@@ -3369,6 +3369,16 @@ Aliases: I<gamma>
 
 =cut
 
+=head2 δ
+
+Number.δ() -> I<Obj>
+
+Return the
+
+Aliases: I<kronecker_delta>
+
+=cut
+
 =head2 ζ
 
 Number.ζ() -> I<Obj>
