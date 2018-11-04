@@ -311,14 +311,14 @@ package Sidef::Types::String::String {
 
     sub decode_base64 {
         state $x = require MIME::Base64;
-        MIME::Base64::decode_base64(${$_[0]});
+        bless \MIME::Base64::decode_base64(${$_[0]});
     }
 
     *base64_decode = \&decode_base64;
 
     sub encode_base64 {
         state $x = require MIME::Base64;
-        MIME::Base64::encode_base64(${$_[0]});
+        bless \MIME::Base64::encode_base64(${$_[0]});
     }
 
     *base64_encode = \&encode_base64;
@@ -421,7 +421,7 @@ package Sidef::Types::String::String {
     sub ord {
         my ($self) = @_;
         $$self eq ''
-          ? Sidef::Types::Number::Number->nan
+          ? undef
           : Sidef::Types::Number::Number->_set_uint(CORE::ord($$self));
     }
 
