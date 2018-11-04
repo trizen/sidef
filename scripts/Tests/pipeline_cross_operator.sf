@@ -10,4 +10,14 @@ assert_eq(
 assert_eq([1,2,3] |X> [{ _*2 }] , [2, 4, 6])
 assert_eq([1,2,3] |X> [[:mul, 2]], [2, 4, 6])
 
+assert_eq([25,36,49] |>> :log |>> :exp |>> :sqrt |>> :round, [5, 6, 7])
+
+func square(n) { n*n }
+
+assert_eq([3,4,5] |>> square, [9, 16, 25])
+assert_eq([3,4,5] |>> {_*_},  [9, 16, 25])
+
+assert_eq([3,4,5] |>> square |>> :sqrt,   [3,4,5])
+assert_eq([3,4,5] |>> square |>> {.sqrt}, [3,4,5])
+
 say "** Test passed!"

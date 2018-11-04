@@ -2817,11 +2817,28 @@ package Sidef::Types::Array::Array {
     }
 
     sub pipeline_cross_op {
-        my ($self, $arg) = @_;
+        my ($self, $callbacks) = @_;
+
+#<<<
+        my $multi_callbacks = (
+               ref($callbacks) eq __PACKAGE__
+            or UNIVERSAL::isa($callbacks, __PACKAGE__)
+        );
+#>>>
 
         my @list;
+
+        if (not $multi_callbacks) {
+
+            foreach my $item (@$self) {
+                push @list, _pipeline_op_call($item, $callbacks);
+            }
+
+            return bless \@list;
+        }
+
         foreach my $item (@$self) {
-            foreach my $callback (@$arg) {
+            foreach my $callback (@$callbacks) {
                 push @list, _pipeline_op_call($item, $callback);
             }
         }
@@ -2830,18 +2847,21 @@ package Sidef::Types::Array::Array {
     }
 
     sub pipeline_zip_op {
-        my ($self, $arg) = @_;
+        my ($self, $callbacks) = @_;
 
-        my @arg  = @$arg;
+        ref($callbacks) eq __PACKAGE__
+          or UNIVERSAL::isa($callbacks, __PACKAGE__)
+          or goto &pipeline_cross_op;
+
+        my @arg  = @$callbacks;
         my $argc = scalar(@arg);
         my @copy = @$self;
 
         my @list;
 
-        while (@copy) {
-            my @tmp = splice(@copy, 0, $argc);
+        while (1) {
 
-            @tmp == $argc or last;
+            (my @tmp = splice(@copy, 0, $argc)) == $argc or last;
 
             for my $i (0 .. $argc - 1) {
                 push @list, _pipeline_op_call($tmp[$i], $arg[$i]);
