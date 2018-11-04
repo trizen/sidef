@@ -33,7 +33,7 @@ find {
 
         my $content = do {
             local $/;
-            open my $fh, '<', $_;
+            open my $fh, '<:utf8', $_;
             <$fh>;
         };
 
