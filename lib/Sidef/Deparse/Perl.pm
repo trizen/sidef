@@ -213,22 +213,22 @@ HEADER
     }
 
     sub _dump_var {
-        my ($self, $var, $refaddr) = @_;
+        my ($self, $var, %opt) = @_;
 
         $var->{name} eq '' and return 'undef';
 
         (
-           exists($var->{array}) ? '@'
-         : exists($var->{hash})  ? '%'
-         :                         '$'
+         $opt{init}
+         ? (
+              exists($var->{array}) ? '@'
+            : exists($var->{hash})  ? '%'
+            :                         '$'
+           )
+         : '$'
         )
-          . $var->{name}
-          . ($refaddr // refaddr($var));
-    }
+          . ($var->{type} eq 'global' ? ($var->{class} . '::') : '')
 
-    sub _dump_vars {
-        my ($self, @vars) = @_;
-        '(' . join(',', map { $self->_dump_var($_) } @vars) . ')';
+          . $var->{name} . ($var->{type} eq 'global' ? '' : ($opt{refaddr} // refaddr($var)));
     }
 
     sub _dump_init_vars {
@@ -241,15 +241,24 @@ HEADER
 
         push @code,
             '('
-          . join(',', map { $self->_dump_var($_) } @vars) . ')'
+          . join(',', map { $self->_dump_var($_, init => 1) } @vars) . ')'
           . (exists($init_obj->{args}) ? '=' . $self->deparse_args($init_obj->{args}) : '');
 
         foreach my $var (@vars) {
 
             ref($var) || next;
+
+            my $name = $var->{name} . refaddr($var);
+            my $decl = 'my ';
+
+            if ($var->{type} eq 'global') {
+                $name = $var->{class} . '::' . $var->{name};
+                $decl = '';
+            }
+
             if (exists $var->{array}) {
-                my $name = $var->{name} . refaddr($var);
-                push @{$self->{block_declarations}}, [$self->{current_block} // -1, 'my @' . $name . ';'];
+
+                push @{$self->{block_declarations}}, [$self->{current_block} // -1, $decl . '@' . $name . ';'];
 
                 # Overwrite with the default values, when the array is empty
                 if (exists $var->{value}) {
@@ -258,11 +267,10 @@ HEADER
 
                 $self->load_mod('Sidef::Types::Array::Array');
                 push @code, "\$$name = bless(\\\@$name, 'Sidef::Types::Array::Array');";
-                delete $var->{array};
             }
             elsif (exists $var->{hash}) {
-                my $name = $var->{name} . refaddr($var);
-                push @{$self->{block_declarations}}, [$self->{current_block} // -1, 'my %' . $name . ';'];
+
+                push @{$self->{block_declarations}}, [$self->{current_block} // -1, $decl . '%' . $name . ';'];
 
                 # Overwrite with the default values, when the hash has no keys
                 if (exists $var->{value}) {
@@ -271,18 +279,19 @@ HEADER
 
                 $self->load_mod('Sidef::Types::Hash::Hash');
                 push @code, "\$$name = bless(\\\%$name, 'Sidef::Types::Hash::Hash');";
-                delete $var->{hash};
             }
             elsif (exists $var->{value}) {
                 my $value = $self->deparse_expr({self => $var->{value}});
                 if ($value ne '') {
-                    push @code, "\$$var->{name}" . refaddr($var) . "//=$value;";
+                    push @code, "\$$name//=$value;";
                 }
             }
         }
 
-        push @{$self->{block_declarations}},
-          [$self->{current_block} // -1, 'my(' . join(',', map { $self->_dump_var($_) } @vars) . ')' . ';'];
+        if (my @non_globals = grep { $_->{type} ne 'global' } @vars) {
+            push @{$self->{block_declarations}},
+              [$self->{current_block} // -1, 'my(' . join(',', map { $self->_dump_var($_) } @non_globals) . ')' . ';'];
+        }
 
         # Return the lvalue variables on assignments
         if (@code > 1 or exists($init_obj->{args})) {
@@ -331,7 +340,7 @@ HEADER
 
         @vars || return '';
 
-        my @dumped_vars = map { ref($_) ? $self->_dump_var($_) : $_ } @vars;
+        my @dumped_vars = map { ref($_) ? $self->_dump_var($_, init => 1) : $_ } @vars;
         my $code = "my(" . join(',', @dumped_vars) . ')=@_;';
 
         my $valid;
@@ -350,7 +359,6 @@ HEADER
 
                 $self->load_mod('Sidef::Types::Array::Array');
                 $code .= "my \$$name = bless(\\\@$name, 'Sidef::Types::Array::Array');";
-                delete $var->{array};
             }
             elsif (exists $var->{hash}) {
                 my $name = $var->{name} . refaddr($var);
@@ -362,7 +370,6 @@ HEADER
 
                 $self->load_mod('Sidef::Types::Hash::Hash');
                 $code .= "my \$$name = bless(\\\%$name, 'Sidef::Types::Hash::Hash');";
-                delete $var->{hash};
             }
             elsif (exists $var->{value}) {
                 my $value = $self->deparse_expr({self => $var->{value}});
@@ -477,14 +484,11 @@ HEADER
     sub _dump_class_name {
         my ($self, $class) = @_;
 
-        join(
-            '::',
-            $self->{environment_name},
-
-            #$class->{class} || 'main',
-            refaddr($class->{parent} || $class),
-            $class->{name} || (Sidef::normalize_type(ref($class)) . refaddr($class))
-            );
+        join('::',
+             $self->{environment_name},
+             refaddr($class->{parent} || $class),
+             $class->{class} || 'main',
+             $class->{name}  || (Sidef::normalize_type(ref($class)) . refaddr($class)));
     }
 
     sub deparse_generic {
@@ -544,7 +548,7 @@ HEADER
             $code = join(',', exists($obj->{self}) ? $self->deparse_expr($obj) : $self->deparse_script($obj));
         }
         elsif ($ref eq 'Sidef::Variable::Variable') {
-            if ($obj->{type} eq 'var' or $obj->{type} eq 'has') {
+            if ($obj->{type} eq 'var' or $obj->{type} eq 'has' or $obj->{type} eq 'global') {
 
                 my $name = $obj->{name} . $refaddr;
 
@@ -559,7 +563,7 @@ HEADER
                                    . qq{([map {Sidef::Types::String::String->new(Encode::decode_utf8(\$_))} \@ARGV]);});
                 }
 
-                $code = $self->_dump_var($obj, $refaddr);
+                $code = $self->_dump_var($obj, refaddr => $refaddr);
             }
             elsif ($obj->{type} eq 'func' or $obj->{type} eq 'method') {
 

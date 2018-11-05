@@ -106,8 +106,8 @@ package Sidef::Deparse::Sidef {
     }
 
     sub _dump_init_vars {
-        my ($self, $init_obj, $type) = @_;
-        my $code = $type . '(' . $self->_dump_vars(@{$init_obj->{vars}}) . ')';
+        my ($self, $init_obj) = @_;
+        my $code = ($init_obj->{vars}[0]{type} // 'var') . '(' . $self->_dump_vars(@{$init_obj->{vars}}) . ')';
 
         if (exists $init_obj->{args}) {
             $code .= '=' . $self->deparse_args($init_obj->{args});
@@ -218,7 +218,8 @@ package Sidef::Deparse::Sidef {
             if (   $obj->{type} eq 'var'
                 or $obj->{type} eq 'static'
                 or $obj->{type} eq 'const'
-                or $obj->{type} eq 'has') {
+                or $obj->{type} eq 'has'
+                or $obj->{type} eq 'global') {
                 $code =
                   $obj->{name} =~ /^[0-9]+\z/
                   ? ('$' . $obj->{name})
@@ -268,7 +269,7 @@ package Sidef::Deparse::Sidef {
             }
         }
         elsif ($ref eq 'Sidef::Variable::ClassAttr') {
-            $code = $self->_dump_init_vars($obj, 'has');
+            $code = $self->_dump_init_vars($obj);
         }
         elsif ($ref eq 'Sidef::Variable::Struct') {
             if ($addr{refaddr($obj)}++) {
@@ -306,7 +307,7 @@ package Sidef::Deparse::Sidef {
             $code = $self->_dump_reftype($obj->{class}) . '!' . $obj->{name};
         }
         elsif ($ref eq 'Sidef::Variable::Init') {
-            $code = $self->_dump_init_vars($obj, 'var');
+            $code = $self->_dump_init_vars($obj);
         }
         elsif ($ref eq 'Sidef::Variable::ConstInit') {
             $code = join(

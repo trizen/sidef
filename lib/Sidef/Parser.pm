@@ -1104,9 +1104,9 @@ package Sidef::Parser {
                 return Sidef::Variable::NamedParam->new($name, $obj);
             }
 
-            # Declaration of variables
-            if (/\Gvar\b\h*/gc) {
-                my $type     = 'var';
+            # Declaration of variables (global and lexical)
+            if (/\G(var|global)\b\h*/gc) {
+                my $type     = $1;
                 my $vars     = $self->parse_init_vars(code => $opt{code}, type => $type);
                 my $init_obj = bless({vars => $vars}, 'Sidef::Variable::Init');
 
@@ -1161,7 +1161,7 @@ package Sidef::Parser {
             }
 
             # Declaration of constants and static variables
-            if (/\G(define|const|static|global)\b\h*/gc) {
+            if (/\G(define|const|static)\b\h*/gc) {
                 my $type = $1;
                 my $vars = $self->parse_init_vars(
                                                   code    => $opt{code},
@@ -1201,8 +1201,6 @@ package Sidef::Parser {
                       ? bless({name => $name, class => $class_name, expr => $obj}, 'Sidef::Variable::Static')
                       : $type eq 'const'
                       ? bless({name => $name, class => $class_name, expr => $obj}, 'Sidef::Variable::Const')
-                      : $type eq 'global'
-                      ? bless({name => $name, class => $class_name, expr => $obj}, 'Sidef::Variable::Global')
                       : die "[PARSER ERROR] Invalid variable type: $type";
 #>>>
 
@@ -1233,8 +1231,6 @@ package Sidef::Parser {
                                ? bless({name => $name, class => $class_name, expr => $obj}, 'Sidef::Variable::Static')
                                : $type eq 'const'
                                ? bless({name => $name, class => $class_name, expr => $obj}, 'Sidef::Variable::Const')
-                               : $type eq 'global'
-                               ? bless({name => $name, class => $class_name, expr => $obj}, 'Sidef::Variable::Global')
                                : die "[PARSER ERROR] Invalid variable type: $type"
                               );
 #>>>

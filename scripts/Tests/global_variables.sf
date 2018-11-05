@@ -1,0 +1,24 @@
+#!/usr/bin/ruby
+
+global :a = (a => 1, b => 2)
+
+assert_eq(a, Hash(a => 1, b => 2))
+
+assert_eq(a{:a}, 1)
+assert_eq(a{:b}, 2)
+
+global *b = (1,2,3)
+
+assert_eq(b, [1,2,3])
+assert_eq(b[1], 2)
+
+func foo() {
+    global x = 42
+}
+
+assert_eq(global x, nil)        # not defined yet
+foo()                           # define x
+assert_eq(global x, 42)         # should be defined
+assert_eq(x, 42)                # also available in the current scope (after accessing it once with `global`)
+
+say "** Test passed!"
