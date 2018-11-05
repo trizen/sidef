@@ -1,0 +1,32 @@
+#!/usr/bin/ruby
+
+func chebft1 (callback, a, b, n) {
+
+    var bma = (b-a)/2
+    var bpa = (b+a)/2
+
+    var pi_n = (@^n  |>> (:add, 0.5) |>> (:mul, Num.pi / n))
+    var f    = (pi_n |>> :cos |>> (:mul, bma) |>> (:add, bpa) |>> callback)
+    var sums = (@^n  |>> {|i| pi_n |>> (:mul, i) |>> :cos ~Z* f |> :sum })
+
+    sums |>> (:mul, 2/n)
+}
+
+func chebft2 (callback, a, b, n) {
+
+    var bma = (0.5 * b-a)
+    var bpa = (0.5 * b+a)
+
+    var pi_n = ((@^n »+» 0.5) »*» (Num.pi / n))
+    var f    = (pi_n »cos»() »*» bma »+» bpa «call« callback)
+    var sums = (@^n «run« {|i| f »*« ((pi_n »*» i) »cos»()) «+» })
+
+    sums »*» 2/n
+}
+
+assert_eq(
+    chebft1(func(v){v.cos}, 0, 1, 10).map{ .round(-40) }
+    chebft2(func(v){v.cos}, 0, 1, 10).map{ .round(-40) }
+)
+
+say "** Test passed!"
