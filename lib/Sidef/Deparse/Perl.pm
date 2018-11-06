@@ -1318,7 +1318,7 @@ HEADER
             local \$Sidef::DEPARSER->{block_declarations} = [];
             \$Sidef::DEPARSER->deparse(
             do{
-                local \$Sidef::PARSER->{line} = 0;
+                local \$Sidef::PARSER->{line} = 1;
                 local \$Sidef::PARSER->{file_name} = 'eval($refaddr)';
                 local \$Sidef::PARSER->{vars} = \$Sidef::EVALS{$refaddr}{vars};
                 local \$Sidef::PARSER->{ref_vars_refs} = \$Sidef::EVALS{$refaddr}{ref_vars_refs};

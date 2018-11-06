@@ -391,10 +391,29 @@ package Sidef::Parser {
     sub fatal_error {
         my ($self, %opt) = @_;
 
-        my $start      = rindex($opt{code}, "\n", $opt{pos}) + 1;
-        my $point      = $opt{pos} - $start;
-        my $line       = $opt{line} // $self->{line};
-        my $error_line = (split(/\R/, substr($opt{code}, $start, 80)))[0];
+        my $start  = rindex($opt{code}, "\n", $opt{pos}) + 1;
+        my $point  = $opt{pos} - $start;
+        my $line   = $opt{line} // $self->{line};
+        my $column = $point;
+
+        my $error_line = (split(/\R/, substr($opt{code}, $start, $point + 80)))[0];
+
+        if (length($error_line) >= 80) {
+
+            if ($point > 60) {
+
+                my $from = $point - 40;
+                my $rem  = $point + 40 - length($error_line);
+
+                $from -= $rem;
+                $point = 40 + $rem;
+
+                $error_line = substr($error_line, $from, 80);
+            }
+            else {
+                $error_line = substr($error_line, 0, 80);
+            }
+        }
 
         my @lines = (
                      "HAHA! That's really funny! You got me!",
@@ -424,11 +443,11 @@ package Sidef::Parser {
                      "Invalid code. Feel ashamed for yourself and try again.",
                     );
 
-        my $error = sprintf("%s: %s\n\nFile : %s\nLine : %s\nError: %s\n\n" . ("~" x 80) . "\n%s\n",
+        my $error = sprintf("%s: %s\n\nFile : %s\nLine : %s : %s\nError: %s\n\n" . ("~" x 80) . "\n%s\n",
                             'sidef',
                             $lines[rand @lines],
                             $self->{file_name} // '-',
-                            $line, join(', ', grep { defined } $opt{error}, $opt{reason}), $error_line);
+                            $line, $column, join(', ', grep { defined } $opt{error}, $opt{reason}), $error_line);
 
         $error .= ' ' x ($point) . '^' . "\n" . ('~' x 80) . "\n";
 
