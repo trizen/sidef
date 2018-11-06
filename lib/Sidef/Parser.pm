@@ -254,6 +254,7 @@ package Sidef::Parser {
                   local
                   global
                   var
+                  del
                   const
                   func
                   enum
@@ -451,7 +452,7 @@ package Sidef::Parser {
                 }
             }
 
-            if (my @candidates = Sidef::best_matches($name, \@names)) {
+            if (my @candidates = Sidef::best_matches($name, [grep { $_ ne $name } @names])) {
                 $error .= ("[?] Did you mean: " . join("\n" . (' ' x 18), sort(@candidates)) . "\n");
             }
         }
@@ -500,6 +501,7 @@ package Sidef::Parser {
                        && $variable->{type} ne 'global'
                        && $variable->{name} ne 'self'
                        && $variable->{name} ne ''
+                       && $variable->{type} ne 'del'
                        && chr(ord $variable->{name}) ne '_') {
 
                     warn '[WARNING] '
@@ -1105,7 +1107,7 @@ package Sidef::Parser {
             }
 
             # Declaration of variables (global and lexical)
-            if (/\G(var|global)\b\h*/gc) {
+            if (/\G(var|global|del)\b\h*/gc) {
                 my $type     = $1;
                 my $vars     = $self->parse_init_vars(code => $opt{code}, type => $type);
                 my $init_obj = bless({vars => $vars}, 'Sidef::Variable::Init');
@@ -1119,6 +1121,10 @@ package Sidef::Parser {
 
                     $init_obj->{args} = $args;
                 }
+
+                #if ($type eq 'del') {
+                #    return bless {vars => []}, 'Sidef::Variable::Init';
+                #}
 
                 return $init_obj;
             }
@@ -2160,12 +2166,22 @@ package Sidef::Parser {
                 /\G__METHOD_NAME__\b/gc && return Sidef::Types::String::String->new($self->{current_method}{name});
             }
 
-            # Variable call
+            # Variable access
             if (/\G($self->{var_name_re})/goc) {
                 my $len_var = length($1);
                 my ($name, $class) = $self->get_name_and_class($1);
 
                 if (defined(my $var = $self->find_var($name, $class))) {
+
+                    if ($var->{type} eq 'del') {
+                        $self->fatal_error(
+                                           code  => $_,
+                                           pos   => (pos($_) - length($name)),
+                                           var   => $name,
+                                           error => "attempt to use the deleted variable <$name>",
+                                          );
+                    }
+
                     $var->{count}++;
                     return $var->{obj};
                 }

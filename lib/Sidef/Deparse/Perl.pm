@@ -235,7 +235,10 @@ HEADER
         my ($self, $init_obj) = @_;
 
         my @vars = @{$init_obj->{vars}};
-        @vars || return '';
+
+        if (!@vars or $vars[0]{type} eq 'del') {
+            return '';
+        }
 
         my @code;
 
@@ -548,24 +551,7 @@ HEADER
             $code = join(',', exists($obj->{self}) ? $self->deparse_expr($obj) : $self->deparse_script($obj));
         }
         elsif ($ref eq 'Sidef::Variable::Variable') {
-            if ($obj->{type} eq 'var' or $obj->{type} eq 'has' or $obj->{type} eq 'global') {
-
-                my $name = $obj->{name} . $refaddr;
-
-                if ($obj->{name} eq 'ENV') {
-                    $self->top_add("require Encode;");
-                    $self->top_add(  qq{my \$$name = Sidef::Types::Hash::Hash->new}
-                                   . qq{(map{Sidef::Types::String::String->new(Encode::decode_utf8(\$_))} \%ENV);});
-                }
-                elsif ($obj->{name} eq 'ARGV') {
-                    $self->top_add("require Encode;");
-                    $self->top_add(  qq{my \$$name = Sidef::Types::Array::Array->new}
-                                   . qq{([map {Sidef::Types::String::String->new(Encode::decode_utf8(\$_))} \@ARGV]);});
-                }
-
-                $code = $self->_dump_var($obj, refaddr => $refaddr);
-            }
-            elsif ($obj->{type} eq 'func' or $obj->{type} eq 'method') {
+            if ($obj->{type} eq 'func' or $obj->{type} eq 'method') {
 
                 # Anonymous function
                 if ($obj->{name} eq '') {
@@ -697,6 +683,23 @@ HEADER
 
                     }
                 }
+            }
+            else {
+
+                my $name = $obj->{name} . $refaddr;
+
+                if ($obj->{name} eq 'ENV') {
+                    $self->top_add("require Encode;");
+                    $self->top_add(  qq{my \$$name = Sidef::Types::Hash::Hash->new}
+                                   . qq{(map{Sidef::Types::String::String->new(Encode::decode_utf8(\$_))} \%ENV);});
+                }
+                elsif ($obj->{name} eq 'ARGV') {
+                    $self->top_add("require Encode;");
+                    $self->top_add(  qq{my \$$name = Sidef::Types::Array::Array->new}
+                                   . qq{([map {Sidef::Types::String::String->new(Encode::decode_utf8(\$_))} \@ARGV]);});
+                }
+
+                $code = $self->_dump_var($obj, refaddr => $refaddr);
             }
         }
         elsif ($ref eq 'Sidef::Operator::Unary') {
