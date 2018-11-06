@@ -528,6 +528,7 @@ EOT
                    $@ =~ /is not declared in the current scope/i
                 or $@ =~ /invalid \S+ declaration/i
                 or $@ =~ /attempt to call method/i
+                or $@ =~ /attempt to use the deleted/i
                 or $@ =~ /not declared in the current scope/i
                 or $@ =~ /expected a block after/i
                 or $@ =~ /invalid module declaration/i
@@ -562,6 +563,10 @@ EOT
         elsif ($line =~ /\S/ and not $line =~ /^\s*#.*$/) {
 
             my $t0 = eval { [Time::HiRes::gettimeofday()] };
+
+            local $SIG{INT} = sub {
+                die "Interrupted...\n";
+            };
 
             my @results = $sidef->execute_perl($ccode);
 
