@@ -567,38 +567,39 @@ HEADER
             }
             elsif ($obj->{type} eq 'func' or $obj->{type} eq 'method') {
 
+                # Anonymous function
+                if ($obj->{name} eq '') {
+                    $obj->{name} = "__FUNC__";
+                }
+
+                my $name      = $obj->{name};
+                my $alphaname = $obj->{name};
+
+                # Check for alphanumeric name
+                if (not $obj->{name} =~ /^[^\W\d]\w*+\z/) {
+                    $alphaname = '__NONANN__';    # use this name for non-alphanumeric names
+                }
+
                 if ($addr{$refaddr}++) {
-                    $code = "\$$obj->{name}$refaddr";
+                    $code = "\$$alphaname$refaddr";
                 }
                 else {
                     my $block = $obj->{value};
 
-                    # Anonymous function
-                    if ($obj->{name} eq '') {
-                        $obj->{name} = "__FUNC__";
-                    }
-
-                    my $name = $obj->{name};
-
-                    # Check for alphanumeric name
-                    if (not $obj->{name} =~ /^[^\W\d]\w*+\z/) {
-                        $obj->{name} = '__NONANN__';    # use this name for non-alphanumeric names
-                    }
-
                     # The name of the function
-                    $code .= "\$$obj->{name}$refaddr";
+                    $code .= "\$${alphaname}$refaddr";
 
                     # Deparse the block of the method/function
                     {
                         local $self->{function}          = refaddr($block);
                         local $self->{parent_name}       = [$obj->{type}, $name];
                         local $self->{current_namespace} = $obj->{class};
-                        push @{$self->{function_declarations}}, [$self->{function}, "my \$$obj->{name}$refaddr;"];
+                        push @{$self->{function_declarations}}, [$self->{function}, "my \$${alphaname}$refaddr;"];
 
                         if ($self->{ref_class}) {
                             push @{$self->{function_declarations}},
                               [ $self->{function},
-                                qq{state \$$obj->{name}_code$refaddr = UNIVERSAL::can("\Q$self->{class_name}\E", "\Q$name\E");}
+                                qq{state \$${alphaname}_code$refaddr = UNIVERSAL::can("\Q$self->{class_name}\E", "\Q$name\E");}
                               ];
                         }
 
@@ -619,22 +620,22 @@ HEADER
                         $code .= ',kids=>[' . join(',', @kids);
 
                         if ($self->{ref_class}) {
-                            $code .= qq{,(defined(\$$obj->{name}_code$refaddr)?}
-                              . qq{Sidef::Types::Block::Block->new(code=>\$$obj->{name}_code$refaddr):())};
+                            $code .= qq{,(defined(\$${alphaname}_code$refaddr)?}
+                              . qq{Sidef::Types::Block::Block->new(code=>\$${alphaname}_code$refaddr):())};
                         }
 
                         $code .= '])';
                     }
                     elsif ($self->{ref_class}) {
                         chop $code;
-                        $code .= qq{,(defined(\$$obj->{name}_code$refaddr)?(kids=>[}
-                          . qq{Sidef::Types::Block::Block->new(code=>\$$obj->{name}_code$refaddr)]):()))};
+                        $code .= qq{,(defined(\$${alphaname}_code$refaddr)?(kids=>[}
+                          . qq{Sidef::Types::Block::Block->new(code=>\$${alphaname}_code$refaddr)]):()))};
                     }
 
                     # Check the return value (when "-> Type" is specified)
                     if (exists $obj->{returns}) {
                         my $types = '[' . join(',', map { $self->_dump_reftype($_) } @{$obj->{returns}}) . ']';
-                        $code = "do{$code;\$$obj->{name}$refaddr\->{returns}=$types;\$$obj->{name}$refaddr}";
+                        $code = "do{$code;\$${alphaname}$refaddr\->{returns}=$types;\$${alphaname}$refaddr}";
                     }
 
                     # Memoize the method/function (when "is cached" trait is specified)
@@ -642,32 +643,32 @@ HEADER
                         $self->top_add("require Memoize;");
                         $code =
                             "do{$code;"
-                          . "\$$obj->{name}$refaddr\->{code}=Memoize::memoize(\$$obj->{name}${refaddr}->{code});\$$obj->{name}$refaddr}";
+                          . "\$${alphaname}$refaddr\->{code}=Memoize::memoize(\$${alphaname}${refaddr}->{code});\$${alphaname}$refaddr}";
                     }
 
                     if ($obj->{type} eq 'func' and not $obj->{is_kid}) {
 
                         # Special "MAIN" function
-                        if ($obj->{name} eq 'MAIN') {
+                        if (${alphaname} eq 'MAIN') {
                             $self->top_add('require Encode;');
                             $code .=
-                              ";Sidef::Variable::GetOpt->new([map{Encode::decode_utf8(\$_)}\@ARGV],\$$obj->{name}$refaddr)";
+                              ";Sidef::Variable::GetOpt->new([map{Encode::decode_utf8(\$_)}\@ARGV],\$${alphaname}$refaddr)";
                         }
 
                     }
                     elsif ($obj->{type} eq 'method') {
 
                         # Special "AUTOLOAD" method
-                        if ($obj->{name} eq 'AUTOLOAD') {
+                        if (${alphaname} eq 'AUTOLOAD') {
                             $code .= ';'
                               . "our\$AUTOLOAD;"
-                              . "sub $obj->{name} {my\$self=shift;"
+                              . "sub ${alphaname} {my\$self=shift;"
                               . "my(\$class,\$method)=(\$AUTOLOAD=~/^(.*[^:])::(.*)\$/);"
-                              . "\$$obj->{name}$refaddr->call(\$self,Sidef::Types::String::String->new(\$class),Sidef::Types::String::String->new(\$method),\@_)}";
+                              . "\$${alphaname}$refaddr->call(\$self,Sidef::Types::String::String->new(\$class),Sidef::Types::String::String->new(\$method),\@_)}";
                         }
 
                         # Anonymous method
-                        elsif ($obj->{name} eq '__FUNC__') {
+                        elsif (${alphaname} eq '__FUNC__') {
                             ## don't add anonymous methods to the class,
                             ## but allow them to be defined and used freely
                         }
@@ -676,10 +677,10 @@ HEADER
                         else {
                             $code .= ";"
                               . "state\$_$refaddr=do{no strict 'refs';"
-                              . "\$$self->{package_name}::__SIDEF_CLASS_METHODS__{'${name}'} = \$$obj->{name}$refaddr;"
+                              . "\$$self->{package_name}::__SIDEF_CLASS_METHODS__{'${name}'} = \$${alphaname}$refaddr;"
                               . '*{'
                               . $self->_dump_string("$self->{package_name}::$name")
-                              . "}=sub{\$$obj->{name}$refaddr->call(\@_)}}";
+                              . "}=sub{\$${alphaname}$refaddr->call(\@_)}}";
                         }
 
                         # Add the "overload" pragma for some special methods
