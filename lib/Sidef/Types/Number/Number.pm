@@ -773,7 +773,16 @@ package Sidef::Types::Number::Number {
 
     sub __numify__ {
         my ($x) = @_;
-        goto(ref($x) =~ tr/:/_/rs);
+        my $target = ref($x) =~ tr/:/_/rs;
+        if (! defined($target)) {
+            return Math::MPFR::Rmpfr_sgn(0);
+        }
+        goto($target);
+
+
+      Sidef_Types_Null_Null: {
+        return Math::MPFR::Rmpfr_sgn(0);
+      }
 
       Math_MPFR: {
             push @_, $ROUND;
@@ -824,7 +833,18 @@ package Sidef::Types::Number::Number {
 
     sub __stringify__ {
         my ($x) = @_;
-        goto(ref($x) =~ tr/:/_/rs);
+        my $target = ref($x) =~ tr/:/_/rs;
+        # argument was pointer to nil
+        if (! defined($target)) {
+            return Math::MPFR::Rmpfr_sgn(0);
+
+        }
+        goto($target);
+
+      # argument was a pointer to null
+      Sidef_Types_Null_Null: {
+            return Math::MPFR::Rmpfr_sgn(0);
+      }
 
       Math_GMPz: {
             push @_, 10;
