@@ -4,11 +4,29 @@
 ## Array zipping
 #
 
-var arr1 = [1,3,5,7,9];
-var arr2 = [2,4,6];
+var arr1 = [1,3,5,7,9]
+var arr2 = [2,4,6]
 
-var arr3 = [arr1, arr2].zip;
+var arr3 = [arr1, arr2].zip
 var arr4 = [arr2, arr1].zip
+var arr5 = [arr1, arr2, arr1].zip
 
-arr3.join(", ").say;
-arr4.join(", ").say;
+assert_eq(arr3, [[1, 2], [3, 4], [5, 6]])
+assert_eq(arr4, [[2, 1], [4, 3], [6, 5]])
+assert_eq(arr5, [[1, 2, 1], [3, 4, 3], [5, 6, 5]])
+
+arr5 = [:a, :b, :c, :d, :e]
+var arr6 = []
+var arr7 = ^5
+
+assert_eq(arr5.zip_indicies, [Pair(0, :a), Pair(1, :b), Pair(2, :c), Pair(3, :d), Pair(4, :e)])
+assert_eq(arr6.zip_indicies, [])
+assert_eq(arr7.zip_indicies.flatten.uniq, arr7.to_a)
+
+var arr8 = [].zip
+var arr9 = [[], []].zip
+
+assert_eq(arr8, [])
+assert_eq(arr9, [])
+
+say "** Test passed!"

@@ -328,6 +328,11 @@ package Sidef::Types::Range::Range {
         Sidef::Types::String::String->new(CORE::join("$sep", $self->to_list));
     }
 
+    sub zip_indicies {
+        my ($self, $block) = @_;
+        Sidef::Types::Array::Array::zip_indicies($self->to_array);
+    }
+
     sub rand {
         my ($self, $n) = @_;
 
