@@ -7,12 +7,14 @@ Sidef::Types::Number::Number
 
 =head1 DESCRIPTION
 
-This class implements ...
+The C<Number> class implements support for numerical operations, supporting integers, rationals, floating-points and complex numbers at arbitrary precision.
+
+This class also implements many useful mathematical methods, from basic arithmetical operations, to advanced number-theoretic functions, including primality testing and prime factorization methods.
 
 =head1 SYNOPSIS
 
-var obj = Number(...)
-
+    var a = Num(string)
+    var b = Number(string, base)
 
 =head1 INHERITS
 
@@ -486,105 +488,147 @@ Aliases: I<as_float>
 
 =head2 asec
 
-Number.asec() -> I<Obj>
+    n.asec
 
-Return the
+Inverse secant of C<n> in radians.
 
 =cut
 
 =head2 asech
 
-Number.asech() -> I<Obj>
+    n.asech
 
-Return the
+Inverse hyperbolic secant of C<n>.
 
 =cut
 
 =head2 as_frac
 
-Number.as_frac() -> I<Obj>
+    n.as_frac
+    n.as_frac(base)
 
-Return the
+String-representation of C<n> as fraction.
+
+Example:
+
+    say 24.as_frac                 # 24/1
+    say bernoulli(10).as_frac      # 5/66
+    say bernoulli(12).as_frac(36)  # -j7/23u
+
+If C<n> is an integer, it uses C<1> for the denominator.
 
 =cut
 
 =head2 as_hex
 
-Number.as_hex() -> I<Obj>
+    n.as_hex
 
-Return the
+Returns a String representing the integer part of C<n> in hexadecimal (base 16).
+
+Example:
+
+    say 42.as_hex       # "2a"
+
+Returns C<nil> when C<n> cannot be converted to an integer.
 
 =cut
 
 =head2 asin
 
-Number.asin() -> I<Obj>
+    n.asin
 
-Return the
+Inverse sine of C<n> in radians.
 
 =cut
 
 =head2 asinh
 
-Number.asinh() -> I<Obj>
+    n.asinh
 
-Return the
+Inverse hyperbolic sine of C<n>.
 
 =cut
 
 =head2 as_int
 
-Number.as_int() -> I<Obj>
+    n.as_int
+    n.as_int(base)
 
-Return the
+Returns a String representing the integer part of C<n> in a given base, where the base must be between 2 and 62.
+
+When the base is omitted, it defaults to base 10.
+
+Example:
+
+    say 255.as_int      # "255"
+    say 255.as_int(16)  # "ff"
+
+Returns C<nil> when C<n> cannot be converted to an integer.
 
 =cut
 
 =head2 as_oct
 
-Number.as_oct() -> I<Obj>
+    n.as_oct
 
-Return the
+Returns a String representing the integer part of C<n> in octal (base 8).
+
+Example:
+
+    say 42.as_oct   # 52
+
+Returns C<nil> when C<n> cannot be converted to an integer.
 
 =cut
 
 =head2 as_rat
 
-Number.as_rat() -> I<Obj>
+    n.as_rat
+    n.as_rat(base)
 
-Return the
+Returns a rational string-representation of C<n> in a given base, where the base must be between 2 and 62.
+
+When the base is omitted, it defaults to base 10.
+
+Example:
+
+    say as_rat(42)          # "42"
+    say as_rat(2/4)         # "1/2"
+    say as_rat(255, 16)     # "ff"
+
+Returns C<nil> when C<n> cannot be converted to a rational number.
 
 =cut
 
 =head2 atan
 
-Number.atan() -> I<Obj>
+    n.atan
 
-Return the
+Inverse tangent of C<n> in radians.
 
 =cut
 
 =head2 atan2
 
-Number.atan2() -> I<Obj>
+    atan2(a, b)
 
-Return the
+Four-quadrant inverse tangent of C<a> and C<b>.
 
 =cut
 
 =head2 atanh
 
-Number.atanh() -> I<Obj>
+    n.atanh
 
-Return the
+Inverse hyperbolic tangent of C<n>.
 
 =cut
 
 =head2 base
 
-Number.base() -> I<Obj>
+    n.base(b)
 
-Return the
+Returns a String-representation of C<n> in a given base C<b>, which must be between 2 and 62.
 
 Aliases: I<in_base>
 
@@ -592,9 +636,9 @@ Aliases: I<in_base>
 
 =head2 bell
 
-Number.bell() -> I<Obj>
+    n.bell
 
-Return the
+Returns the n-th Bell number.
 
 Aliases: I<bell_number>
 
@@ -602,9 +646,16 @@ Aliases: I<bell_number>
 
 =head2 bern
 
-Number.bern() -> I<Obj>
+    n.bern
+    bernoulli(n)
+    bernoulli(n, x)
 
-Return the
+Returns the n-th Bernoulli number. When an additional argument is provided, it returns the n-th Bernoulli polynomial.
+
+Example:
+
+    say bernoulli(10).as_rat       # B_10    = 5/66
+    say bernoulli(10, 2).as_rat    # B_10(2) = 665/66
 
 Aliases: I<bernfrac>, I<bernoulli>, I<bernoulli_number>
 
@@ -612,49 +663,61 @@ Aliases: I<bernfrac>, I<bernoulli>, I<bernoulli_number>
 
 =head2 bernoulli_polynomial
 
-Number.bernoulli_polynomial() -> I<Obj>
+    bernoulli_polynomial(n, x)
 
-Return the
+Returns the n-th Bernoulli polynomial: C<B_n(x)>.
 
 =cut
 
 =head2 bernreal
 
-Number.bernreal() -> I<Obj>
+    n.bernreal
 
-Return the
+Return an approximation to the n-th Bernoulli number as a floating-point number.
 
 =cut
 
 =head2 bessel_j
 
-Number.bessel_j() -> I<Obj>
+    bessel_j(x, n)
 
-Return the
+First order Bessel function: C<J_n(x)>.
 
 =cut
 
 =head2 bessel_y
 
-Number.bessel_y() -> I<Obj>
+    bessel_y(x, n)
 
-Return the
+Second order Bessel function: C<Y_n(x)>.
 
 =cut
 
 =head2 beta
 
-Number.beta() -> I<Obj>
+    beta(a, b)
 
-Return the
+The beta function (also called the Euler integral of the first kind).
+
+Defined as:
+
+    beta(a, b) = gamma(a)*gamma(b) / gamma(a+b)
 
 =cut
 
 =head2 bit
 
-Number.bit() -> I<Obj>
+    n.bit(k)
+    n.getbit(k)
 
-Return the
+Returns 1 if bit C<k> of C<n> is set, and 0 if it is not set.
+
+Return C<nil> when C<n> cannot be truncated to an integer or when C<k> is negative.
+
+Example:
+
+    say getbit(0b1001, 0)   # 1
+    say getbit(0b1000, 0)   # 0
 
 Aliases: I<getbit>, I<testbit>
 
@@ -662,49 +725,84 @@ Aliases: I<getbit>, I<testbit>
 
 =head2 bit_scan0
 
-Number.bit_scan0() -> I<Obj>
+    n.bit_scan0
+    n.bit_scan0(k)
 
-Return the
+Scan C<n>, starting from bit index C<k>, towards more significant bits, until a 0-bit is found.
+
+When C<k> is omitted, C<k=0> is assumed.
+
+Returns C<nil> if C<n> cannot be truncated to an integer or if C<k> is negative.
 
 =cut
 
 =head2 bit_scan1
 
-Number.bit_scan1() -> I<Obj>
+    n.bit_scan1
+    n.bit_scan1(k)
 
-Return the
+Scan C<n>, starting from bit index C<k>, towards more significant bits, until a 1-bit is found.
+
+When C<k> is omitted, C<k=0> is assumed.
+
+Returns C<nil> if C<n> cannot be truncated to an integer or if C<k> is negative.
 
 =cut
 
 =head2 bsearch
 
-Number.bsearch() -> I<Obj>
+    bsearch(n, {...})
+    bsearch(a, b, {...})
 
-Return the
+Binary search from to C<0> to C<n>, or from C<a> to C<b>, which can be any arbitrary large integers.
+
+The last argument is a block which does the comparisons.
+
+This function finds a value C<k> such that f(k) = 0. Returns C<nil> otherwise.
+
+    say bsearch(20,      {|k| k*k  <=> 49   })   #=> 7   (7*7  = 49)
+    say bsearch(3, 1000, {|k| k**k <=> 3125 })   #=> 5   (5**5 = 3125)
 
 =cut
 
 =head2 bsearch_ge
 
-Number.bsearch_ge() -> I<Obj>
+    bsearch_ge(n, {...})
+    bsearch_ge(a, b, {...})
 
-Return the
+Binary search from to C<0> to C<n>, or from C<a> to C<b>, which can be any arbitrary large integers.
+
+The last argument is a block which does the comparisons.
+
+This function finds a value C<k> such that f(k-1) < 0 and f(k) >= 0. Returns C<nil> otherwise.
+
+    bsearch_ge(1e6,       { .exp <=> 1e+9 })  #  21   (exp( 21) >= 1e+9)
+    bsearch_ge(-1e6, 1e6, { .exp <=> 1e-9 })  # -20   (exp(-20) >= 1e-9)
 
 =cut
 
 =head2 bsearch_le
 
-Number.bsearch_le() -> I<Obj>
+    bsearch_le(n, {...})
+    bsearch_le(a, b, {...})
 
-Return the
+Binary search from to C<0> to C<n>, or from C<a> to C<b>, which can be any arbitrary large integers.
+
+The last argument is a block which does the comparisons.
+
+This function finds a value C<k> such that f(k) <= 0 and f(k+1) > 0. Returns C<nil> otherwise.
+
+    bsearch_le(1e6,       { .exp <=> 1e+9 })  #  20   (exp( 20) <= 1e+9)
+    bsearch_le(-1e6, 1e6, { .exp <=> 1e-9 })  # -21   (exp(-21) <= 1e-9)
 
 =cut
 
 =head2 C
 
-Number.C() -> I<Obj>
+    Num.C
+    Num.catalan_G
 
-Return the
+Returns the Catalan constant: 0.915965594177...
 
 Aliases: I<catalan_G>
 
@@ -712,9 +810,13 @@ Aliases: I<catalan_G>
 
 =head2 carmichael_lambda
 
-Number.carmichael_lambda() -> I<Obj>
+    carmichael_lambda(n)
 
-Return the
+Carmichael lambda function: C<λ(n)>, defined as the smallest positive integer C<m> such that:
+
+    aᵐ ≡ 1 (mod n)
+
+for every integer C<a> between C<1> and C<n> that is coprime to C<n>.
 
 =cut
 
@@ -723,7 +825,9 @@ Return the
     n.catalan
     n.catalan(k)
 
-N-th Catalan number. When an additional argument is provided, it returns the C<C(n,k)> entry in Catalan's triangle.
+Returns the n-th Catalan number.
+
+If two arguments are provided, it returns the C<C(n,k)> entry in Catalan's triangle.
 
 =cut
 
@@ -747,9 +851,15 @@ Aliases: I<ceiling>
 
 =head2 chebyshev_T
 
-Number.chebyshev_T() -> I<Obj>
+    chebyshevT(n, x)
 
-Return the
+Compute the Chebyshev polynomials of the first kind: C<T_n(x)>, where C<n> must be a native integer.
+
+Defined as:
+
+    T(0, x) = 1
+    T(1, x) = x
+    T(n, x) = 2*x*T(n-1, x) - T(n-2, x)
 
 Aliases: I<chebyshevt>, I<chebyshevT>
 
@@ -757,9 +867,15 @@ Aliases: I<chebyshevt>, I<chebyshevT>
 
 =head2 chebyshev_U
 
-Number.chebyshev_U() -> I<Obj>
+    chebyshevU(n, x)
 
-Return the
+Compute the Chebyshev polynomials of the second kind: C<U_n(x)>, where C<n> must be a native integer.
+
+Defined as:
+
+    U(0, x) = 1
+    U(1, x) = 2*x
+    U(n, x) = 2*x*U(n-1, x) - U(n-2, x)
 
 Aliases: I<chebyshevu>, I<chebyshevU>
 
@@ -767,9 +883,14 @@ Aliases: I<chebyshevu>, I<chebyshevU>
 
 =head2 chr
 
-Number.chr() -> I<Obj>
+    n.chr
 
-Return the
+Convert the integer C<n> into a character.
+
+Example:
+
+    say 97.chr      # "a"
+    say 9786.chr    # "☺"
 
 =cut
 
