@@ -917,7 +917,7 @@ Array.kv() -> I<Obj>
 
 Return the
 
-Aliases: I<pairs>
+Aliases: I<pairs>, I<zip_indices>
 
 =cut
 

@@ -333,8 +333,15 @@ package Sidef::Types::Range::Range {
         $self->to_array->kv;
     }
 
-    *pairs = \&kv;
+    *pairs       = \&kv;
     *zip_indices = \&kv;
+
+    sub accumulate {
+        my ($self, $arg) = @_;
+        $self->to_array->accumulate($arg);
+    }
+
+    *accumulate_by = \&accumulate;
 
     sub rand {
         my ($self, $n) = @_;
@@ -461,27 +468,27 @@ package Sidef::Types::Range::Range {
 
     sub map_operator {
         my ($self, @args) = @_;
-        $self->to_a->map_operator(@args);
+        $self->to_array->map_operator(@args);
     }
 
     sub pam_operator {
         my ($self, @args) = @_;
-        $self->to_a->pam_operator(@args);
+        $self->to_array->pam_operator(@args);
     }
 
     sub unroll_operator {
         my ($self, @args) = @_;
-        $self->to_a->unroll_operator(@args);
+        $self->to_array->unroll_operator(@args);
     }
 
     sub cross_operator {
         my ($self, @args) = @_;
-        $self->to_a->cross_operator(@args);
+        $self->to_array->cross_operator(@args);
     }
 
     sub zip_operator {
         my ($self, @args) = @_;
-        $self->to_a->zip_operator(@args);
+        $self->to_array->zip_operator(@args);
     }
 
     sub add {

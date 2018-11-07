@@ -1063,10 +1063,10 @@ package Sidef::Types::Array::Array {
 
         my @array;
         foreach my $item (@{$self}) {
-            CORE::push(@array, (ref($item) eq $class or ref($item) =~ /^Sidef::Types::Array::/)
-                ? _flatten($item, $class)
-                : $item
-            );
+            CORE::push(@array,
+                       (ref($item) eq $class or ref($item) =~ /^Sidef::Types::Array::/)
+                       ? _flatten($item, $class)
+                       : $item);
         }
 
         @array;
@@ -1078,10 +1078,10 @@ package Sidef::Types::Array::Array {
         my @flat;
         my $class = ref($self);
         foreach my $item (@{$self}) {
-            CORE::push(@flat, (ref($item) eq $class or ref($item) =~ /^Sidef::Types::Array::/)
-                ? _flatten($item, $class)
-                : $item
-            );
+            CORE::push(@flat,
+                       (ref($item) eq $class or ref($item) =~ /^Sidef::Types::Array::/)
+                       ? _flatten($item, $class)
+                       : $item);
         }
 
         bless \@flat;
@@ -2086,7 +2086,7 @@ package Sidef::Types::Array::Array {
         bless [map { Sidef::Types::Array::Pair->new(Sidef::Types::Number::Number->_set_uint($_), $self->[$_]) } 0 .. $#$self];
     }
 
-    *kv = \&pairs;
+    *kv          = \&pairs;
     *zip_indices = \&pairs;
 
     sub insert {
@@ -2914,7 +2914,7 @@ package Sidef::Types::Array::Array {
 
         defined($block) ? $self : bless \@new_array;
     }
-    
+
     *transpose = \&zip;
 
     sub zip_by {

@@ -76,6 +76,16 @@ Aliases: I<eq>
 
 =cut
 
+=head2 accumulate
+
+Range.accumulate() -> I<Obj>
+
+Return the
+
+Aliases: I<accumulate_by>
+
+=cut
+
 =head2 all
 
 Range.all() -> I<Obj>
@@ -197,6 +207,16 @@ Aliases: I<first>
 Range.join() -> I<Obj>
 
 Return the
+
+=cut
+
+=head2 kv
+
+Range.kv() -> I<Obj>
+
+Return the
+
+Aliases: I<pairs>, I<zip_indices>
 
 =cut
 
