@@ -18,16 +18,16 @@ var obj = Number(...)
 
 Inherits methods from:
 
-	* Sidef::Object::Object
+    * Sidef::Object::Object
 
 =head1 METHODS
 
 
 =head2 !
 
-I<Obj> B<!> I<Obj> -> I<Obj>
+    n!
 
-Return the
+Factorial of C<n>. (C<1*2*3*...*n>)
 
 Aliases: I<fac>, I<factorial>
 
@@ -35,9 +35,9 @@ Aliases: I<fac>, I<factorial>
 
 =head2 !!
 
-I<Obj> B<!!> I<Obj> -> I<Obj>
+    n!!
 
-Return the
+Double-factorial of C<n>.
 
 Aliases: I<dfac>, I<dfactorial>, I<double_factorial>
 
@@ -45,9 +45,9 @@ Aliases: I<dfac>, I<dfactorial>, I<double_factorial>
 
 =head2 %
 
-I<Obj> B<%> I<Obj> -> I<Obj>
+    n % k
 
-Return the
+Remainder of C<n/k>.
 
 Aliases: I<mod>
 
@@ -55,9 +55,9 @@ Aliases: I<mod>
 
 =head2 %%
 
-I<Obj> B<%%> I<Obj> -> I<Obj>
+    n %% k
 
-Return the
+Returns true if C<n> is divisible by C<k>. False otherwise.
 
 Aliases: I<is_div>
 
@@ -65,9 +65,9 @@ Aliases: I<is_div>
 
 =head2 &
 
-I<Obj> B<&> I<Obj> -> I<Obj>
+    a & b
 
-Return the
+Bitwise AND operation.
 
 Aliases: I<and>
 
@@ -75,9 +75,9 @@ Aliases: I<and>
 
 =head2 *
 
-I<Obj> B<*> I<Obj> -> I<Obj>
+    a * b
 
-Return the
+Multiplication of C<a> and C<b>.
 
 Aliases: I<mul>
 
@@ -85,9 +85,9 @@ Aliases: I<mul>
 
 =head2 **
 
-I<Obj> B<**> I<Obj> -> I<Obj>
+    a**b
 
-Return the
+Exponentiation: C<a> to power C<b>.
 
 Aliases: I<pow>
 
@@ -95,9 +95,9 @@ Aliases: I<pow>
 
 =head2 +
 
-I<Obj> B<+> I<Obj> -> I<Obj>
+    a + b
 
-Return the
+Addition of C<a> and C<b>.
 
 Aliases: I<add>
 
@@ -105,9 +105,9 @@ Aliases: I<add>
 
 =head2 ++
 
-I<Obj> B<++> I<Obj> -> I<Obj>
+    n.inc
 
-Return the
+Increment C<n> by C<1> and return the result.
 
 Aliases: I<inc>
 
@@ -115,9 +115,9 @@ Aliases: I<inc>
 
 =head2 -
 
-I<Obj> B<-> I<Obj> -> I<Obj>
+    a - b
 
-Return the
+Subtraction of C<a> and C<b>.
 
 Aliases: I<sub>
 
@@ -125,9 +125,9 @@ Aliases: I<sub>
 
 =head2 --
 
-I<Obj> B<--> I<Obj> -> I<Obj>
+    n.dec
 
-Return the
+Decrement C<n> by C<1> and return the result.
 
 Aliases: I<dec>
 
@@ -135,9 +135,13 @@ Aliases: I<dec>
 
 =head2 ..
 
-I<Obj> B<..> I<Obj> -> I<Obj>
+    a .. b
 
-Return the
+Create an inclusive-inclusive C<RangeNum> object, from C<a> to C<b>.
+
+Equivalent with:
+
+    RangeNum(a, b)
 
 Aliases: I<to>, I<upto>
 
@@ -145,9 +149,13 @@ Aliases: I<to>, I<upto>
 
 =head2 ..^
 
-I<Obj> B<..^> I<Obj> -> I<Obj>
+    a ..^ b
 
-Return the
+Create an inclusive-exclusive C<RangeNum> object, from C<a> to C<b-1>.
+
+Equivalent with:
+
+    RangeNum(a, b-1)
 
 Aliases: I<xto>, I<xupto>
 
@@ -155,9 +163,9 @@ Aliases: I<xto>, I<xupto>
 
 =head2 /
 
-I<Obj> B</> I<Obj> -> I<Obj>
+    a / b
 
-Return the
+Division of C<a> by C<b>.
 
 Aliases: I<÷>, I<div>
 
@@ -165,9 +173,9 @@ Aliases: I<÷>, I<div>
 
 =head2 //
 
-I<Obj> B<//> I<Obj> -> I<Obj>
+    a // b
 
-Return the
+Integer division of C<a> and C<b>.
 
 Aliases: I<idiv>
 
@@ -175,9 +183,13 @@ Aliases: I<idiv>
 
 =head2 :
 
-I<Obj> B<:> I<Obj> -> I<Obj>
+    a : b
 
-Return the
+Create a new complex number.
+
+Equivalent with:
+
+    Complex(a, b)
 
 Aliases: I<pair>
 
@@ -185,9 +197,9 @@ Aliases: I<pair>
 
 =head2 <
 
-I<Obj> B<E<lt>> I<Obj> -> I<Obj>
+    a < b
 
-Return the
+Returns true if C<a> is less than C<b>.
 
 Aliases: I<lt>
 
@@ -195,9 +207,11 @@ Aliases: I<lt>
 
 =head2 <<
 
-I<Obj> B<E<lt>E<lt>> I<Obj> -> I<Obj>
+    a << b
 
-Return the
+Bitwise left-shift, equivalent with (assuming C<a> and C<b> are integers):
+
+    int(a * 2**b)
 
 Aliases: I<lsft>, I<shift_left>
 
@@ -205,9 +219,9 @@ Aliases: I<lsft>, I<shift_left>
 
 =head2 <=>
 
-I<Obj> B<E<lt>=E<gt>> I<Obj> -> I<Obj>
+    a <=> b
 
-Return the
+Comparison of C<a> with C<b>. Returns C<-1> if C<a> is less than C<b>, C<0> if C<a> and C<b> are equal and C<+1> if C<a> is greater than C<b>.
 
 Aliases: I<cmp>
 
@@ -215,9 +229,9 @@ Aliases: I<cmp>
 
 =head2 ==
 
-I<Obj> B<==> I<Obj> -> I<Obj>
+    a == b
 
-Return the
+Equality check. Returns true if C<a> and C<b> are equal.
 
 Aliases: I<eq>
 
@@ -225,9 +239,9 @@ Aliases: I<eq>
 
 =head2 >
 
-I<Obj> B<E<gt>> I<Obj> -> I<Obj>
+    a > b
 
-Return the
+Returns true if C<a> is greater than C<b>. False otherwise.
 
 Aliases: I<gt>
 
@@ -235,9 +249,11 @@ Aliases: I<gt>
 
 =head2 >>
 
-I<Obj> B<E<gt>E<gt>> I<Obj> -> I<Obj>
+    a >> b
 
-Return the
+Bitwise right-shift, equivalent with (assuming C<a> and C<b> are integers):
+
+    int(a / 2**b)
 
 Aliases: I<rsft>, I<shift_right>
 
@@ -245,9 +261,9 @@ Aliases: I<rsft>, I<shift_right>
 
 =head2 ^
 
-I<Obj> B<^> I<Obj> -> I<Obj>
+    a ^ b
 
-Return the
+Bitwise XOR operation.
 
 Aliases: I<xor>
 
@@ -255,9 +271,13 @@ Aliases: I<xor>
 
 =head2 ^..
 
-I<Obj> B<^..> I<Obj> -> I<Obj>
+    a ^.. b
 
-Return the
+Creates a reversed exclusive-inclusive C<RangeNum> object, from C<a-1> down to C<b>.
+
+Equivalent with:
+
+    RangeNum(a-1, b, -1)
 
 Aliases: I<xdownto>
 
@@ -265,9 +285,9 @@ Aliases: I<xdownto>
 
 =head2 abs
 
-Number.abs() -> I<Obj>
+    n.abs
 
-Return the
+Absolute value of C<n>.
 
 =cut
 
@@ -647,25 +667,26 @@ Return the
 
 =head2 catalan
 
-Number.catalan() -> I<Obj>
+    n.catalan
+    n.catalan(k)
 
-Return the
+N-th Catalan number. When an additional argument is provided, it returns the C<C(n,k)> entry in Catalan's triangle.
 
 =cut
 
 =head2 cbrt
 
-Number.cbrt() -> I<Obj>
+    n.cbrt
 
-Return the
+Cube root of C<n>.
 
 =cut
 
 =head2 ceil
 
-Number.ceil() -> I<Obj>
+    n.ceil
 
-Return the
+Round C<n> towards positive Infinity.
 
 Aliases: I<ceiling>
 
