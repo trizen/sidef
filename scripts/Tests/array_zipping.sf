@@ -19,9 +19,9 @@ arr5 = [:a, :b, :c, :d, :e]
 var arr6 = []
 var arr7 = ^5
 
-assert_eq(arr5.zip_indicies, [Pair(0, :a), Pair(1, :b), Pair(2, :c), Pair(3, :d), Pair(4, :e)])
-assert_eq(arr6.zip_indicies, [])
-assert_eq(arr7.zip_indicies.flatten.uniq, arr7.to_a)
+assert_eq(arr5.zip_indices, [Pair(0, :a), Pair(1, :b), Pair(2, :c), Pair(3, :d), Pair(4, :e)])
+assert_eq(arr6.zip_indices, [])
+assert_eq(arr7.zip_indices.flatten.uniq, arr7.to_a)
 
 var arr8 = [].zip
 var arr9 = [[], []].zip
