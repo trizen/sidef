@@ -667,6 +667,8 @@ Number.ceil() -> I<Obj>
 
 Return the
 
+Aliases: I<ceiling>
+
 =cut
 
 =head2 chebyshev_T

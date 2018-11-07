@@ -5919,6 +5919,8 @@ package Sidef::Types::Number::Number {
         bless \__ceil__($$x);
     }
 
+    *ceiling = \&ceil;
+
     sub __inc__ {
         my ($x) = @_;
         goto(ref($x) =~ tr/:/_/rs);
