@@ -328,6 +328,14 @@ package Sidef::Types::Range::Range {
         Sidef::Types::String::String->new(CORE::join("$sep", $self->to_list));
     }
 
+    sub kv {
+        my ($self) = @_;
+        $self->to_array->kv;
+    }
+
+    *pairs = \&kv;
+    *zip_indices = \&kv;
+
     sub rand {
         my ($self, $n) = @_;
 
