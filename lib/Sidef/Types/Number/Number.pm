@@ -3964,9 +3964,12 @@ package Sidef::Types::Number::Number {
         my @terms;
 
         foreach my $k (0 .. $n) {
+
             --$u & 1 and $u > 1 and next;    # B_n = 0 for odd n > 1
+
             Math::GMPz::Rmpz_bin_uiui($z, $n, $k);
             Math::GMPq::Rmpq_mul_z($q, $u <= 1 ? $B[$u] : $B[($u >> 1) + 1], $z);
+
             push @terms, __mul__($k ? __pow__($x, $k) : $ONE, $q);
         }
 

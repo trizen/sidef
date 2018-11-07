@@ -527,8 +527,7 @@ EOT
             if (
                    $@ =~ /is not declared in the current scope/i
                 or $@ =~ /invalid \S+ declaration/i
-                or $@ =~ /attempt to call method/i
-                or $@ =~ /attempt to use the deleted/i
+                or $@ =~ /attempt to (?:use|call|delete) /i
                 or $@ =~ /not declared in the current scope/i
                 or $@ =~ /expected a block after/i
                 or $@ =~ /invalid module declaration/i

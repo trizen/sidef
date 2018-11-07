@@ -794,6 +794,19 @@ package Sidef::Parser {
 
             my ($var_name, $class_name) = $self->get_name_and_class($name);
 
+            if ($opt{type} eq 'del') {
+                my $var = $self->find_var($var_name, $class_name);
+
+                if (not defined($var)) {
+                    $self->fatal_error(
+                                       code  => $_,
+                                       pos   => pos($_) - length($name),
+                                       error => "attempt to delete non-existent variable `$name`",
+                                      );
+                }
+
+            }
+
             if (exists($self->{keywords}{$var_name}) or exists($self->{built_in_classes}{$var_name})) {
                 $self->fatal_error(
                                    code  => $_,
@@ -1522,7 +1535,7 @@ package Sidef::Parser {
                                       );
 
                 if ($name ne '') {
-                    my ($var) = $self->find_var($name, $class_name);
+                    my $var = $self->find_var($name, $class_name);
 
                     if (defined($var) and $var->{type} eq 'class') {
                         $obj->{parent} = $var->{obj};
