@@ -3853,7 +3853,7 @@ package Sidef::Types::Number::Number {
             }
         }
 
-        push @cache, @S[@cache .. ((@S <= 1000) ? $#S : 1000)];
+        push @cache, @S[@cache .. (@S <= 1000 ? $#S : 1000)];
 
         return @S;
     }
@@ -3882,9 +3882,65 @@ package Sidef::Types::Number::Number {
             }
         }
 
-        push @cache, @T[@cache .. ((@T <= 1000) ? $#T : 1000)];
+        push @cache, @T[@cache .. (@T <= 1000 ? $#T : 1000)];
 
         return @T;
+    }
+
+    sub _bernoulli_numbers {
+        my ($n) = @_;
+
+        $n = ($n >> 1) + 1;
+
+        state @cache;
+
+        if ($n <= $#cache) {
+            return @cache;
+        }
+
+        my @B;
+        my @T = _tangent_numbers($n);
+
+        my $t = Math::GMPz::Rmpz_init();
+
+        foreach my $k (scalar(@cache) .. 2 * @T) {
+
+            $k % 2 == 0 or $k == 1 or next;
+
+            my $q = Math::GMPq::Rmpq_init();
+
+            if ($k == 0) {
+                Math::GMPq::Rmpq_set_ui($q, 1, 1);
+                $B[$k] = $q;
+                next;
+            }
+
+            if ($k == 1) {
+                Math::GMPq::Rmpq_set_si($q, -1, 2);
+                $B[$k] = $q;
+                next;
+            }
+
+            # T_k
+            Math::GMPz::Rmpz_mul_ui($t, $T[($k >> 1) - 1], $k);
+            Math::GMPz::Rmpz_neg($t, $t) if ((($k >> 1) - 1) & 1);
+            Math::GMPq::Rmpq_set_z($q, $t);
+
+            # (2^k - 1) * 2^k
+            Math::GMPz::Rmpz_set_ui($t, 0);
+            Math::GMPz::Rmpz_setbit($t, $k);
+            Math::GMPz::Rmpz_sub_ui($t, $t, 1);
+            Math::GMPz::Rmpz_mul_2exp($t, $t, $k);
+
+            # B_k = q
+            Math::GMPq::Rmpq_div_z($q, $q, $t);
+
+            $B[($k >> 1) + 1] = $q;
+        }
+
+        push @cache, @B[@cache .. (@B <= 1000 ? $#B : 1000)];
+
+        return (@cache, (@B > @cache ? @B[@cache .. $#B] : ()));
     }
 
     sub bernoulli_polynomial {
@@ -3899,7 +3955,7 @@ package Sidef::Types::Number::Number {
         $n = _any2ui($$n) // goto &nan;
         $x = $$x;
 
-        my @T = _tangent_numbers(($n >> 1) - 1);
+        my @B = _bernoulli_numbers($n);
 
         my $u = $n + 1;
         my $z = Math::GMPz::Rmpz_init();
@@ -3909,30 +3965,8 @@ package Sidef::Types::Number::Number {
 
         foreach my $k (0 .. $n) {
             --$u & 1 and $u > 1 and next;    # B_n = 0 for odd n > 1
-
-            if ($u == 0) {
-                Math::GMPq::Rmpq_set_ui($q, 1, 1);
-            }
-            elsif ($u == 1) {
-                Math::GMPq::Rmpq_set_si($q, -1, 2);
-            }
-            else {
-                Math::GMPz::Rmpz_mul_ui($z, $T[($u >> 1) - 1], $u);
-                Math::GMPz::Rmpz_neg($z, $z) if ((($u >> 1) - 1) & 1);
-                Math::GMPq::Rmpq_set_z($q, $z);
-
-                # z = (2^n - 1) * 2^n
-                Math::GMPz::Rmpz_set_ui($z, 0);
-                Math::GMPz::Rmpz_setbit($z, $u);
-                Math::GMPz::Rmpz_sub_ui($z, $z, 1);
-                Math::GMPz::Rmpz_mul_2exp($z, $z, $u);
-
-                Math::GMPq::Rmpq_div_z($q, $q, $z);
-            }
-
             Math::GMPz::Rmpz_bin_uiui($z, $n, $k);
-            Math::GMPq::Rmpq_mul_z($q, $q, $z);
-
+            Math::GMPq::Rmpq_mul_z($q, $u <= 1 ? $B[$u] : $B[($u >> 1) + 1], $z);
             push @terms, __mul__($k ? __pow__($x, $k) : $ONE, $q);
         }
 
@@ -7470,7 +7504,7 @@ package Sidef::Types::Number::Number {
             ($native_n, $n) = (1, Math::GMPz::Rmpz_get_ui($n));
         }
 
-        my @T = _tangent_numbers(($p >> 1) - 1);
+        my @B = _bernoulli_numbers($p);
 
         my $z = Math::GMPz::Rmpz_init();
         my $u = Math::GMPz::Rmpz_init();
@@ -7492,29 +7526,8 @@ package Sidef::Types::Number::Number {
 #>>>
 
             Math::GMPz::Rmpz_mul($z, $z, $u);             # z = z * u
-
-            if ($j == 0) {
-                Math::GMPq::Rmpq_set_ui($q, 1, 1);
-            }
-            elsif ($j == 1) {
-                Math::GMPq::Rmpq_set_ui($q, 1, 2);
-            }
-            else {
-                Math::GMPz::Rmpz_mul_ui($u, $T[($j >> 1) - 1], $j);
-                Math::GMPz::Rmpz_neg($u, $u) if ((($j >> 1) - 1) & 1);
-                Math::GMPq::Rmpq_set_z($q, $u);
-
-                # (2^n - 1) * 2^n
-                Math::GMPz::Rmpz_set_ui($u, 0);
-                Math::GMPz::Rmpz_setbit($u, $j);
-                Math::GMPz::Rmpz_sub_ui($u, $u, 1);
-                Math::GMPz::Rmpz_mul_2exp($u, $u, $j);
-
-                # B_j = q
-                Math::GMPq::Rmpq_div_z($q, $q, $u);
-            }
-
-            Math::GMPq::Rmpq_mul_z($q, $q, $z);
+            Math::GMPq::Rmpq_mul_z($q, $j <= 1 ? $B[$j] : $B[($j >> 1) + 1], $z);
+            Math::GMPq::Rmpq_neg($q, $q) if ($j == 1);
             Math::GMPq::Rmpq_add($sum, $sum, $q);
         }
 
