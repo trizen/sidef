@@ -18,11 +18,10 @@ var obj = RangeString(...)
 
 Inherits methods from:
 
-	* Sidef::Types::Range::Range
-	* Sidef::Object::Object
+       * Sidef::Types::Range::Range
+       * Sidef::Object::Object
 
 =head1 METHODS
-
 
 =head2 call
 

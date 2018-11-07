@@ -15,7 +15,6 @@ var obj = Try(...)
 
 =head1 METHODS
 
-
 =head2 catch
 
 Try.catch() -> I<Obj>

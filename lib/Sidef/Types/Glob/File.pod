@@ -18,10 +18,9 @@ var obj = File(...)
 
 Inherits methods from:
 
-	* Sidef::Types::String::String
+       * Sidef::Types::String::String
 
 =head1 METHODS
-
 
 =head2 abs
 

@@ -18,10 +18,9 @@ var obj = Bag(...)
 
 Inherits methods from:
 
-	* Sidef::Types::Set::Set
+       * Sidef::Types::Set::Set
 
 =head1 METHODS
-
 
 =head2 &
 

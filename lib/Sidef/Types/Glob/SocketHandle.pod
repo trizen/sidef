@@ -18,10 +18,9 @@ var obj = SocketHandle(...)
 
 Inherits methods from:
 
-	* Sidef::Types::Glob::FileHandle
+       * Sidef::Types::Glob::FileHandle
 
 =head1 METHODS
-
 
 =head2 accept
 

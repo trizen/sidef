@@ -18,10 +18,9 @@ var obj = Complex(...)
 
 Inherits methods from:
 
-	* Sidef::Types::Number::Number
+       * Sidef::Types::Number::Number
 
 =head1 METHODS
-
 
 =head2 new
 

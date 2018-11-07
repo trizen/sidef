@@ -15,7 +15,6 @@ var obj = Fork(...)
 
 =head1 METHODS
 
-
 =head2 get
 
 Fork.get() -> I<Obj>

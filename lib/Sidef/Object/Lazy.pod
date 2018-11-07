@@ -15,7 +15,6 @@ var obj = Lazy(...)
 
 =head1 METHODS
 
-
 =head2 each
 
 Lazy.each() -> I<Obj>

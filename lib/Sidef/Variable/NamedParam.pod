@@ -15,7 +15,6 @@ var obj = NamedParam(...)
 
 =head1 METHODS
 
-
 =head2 dump
 
 NamedParam.dump() -> I<Obj>

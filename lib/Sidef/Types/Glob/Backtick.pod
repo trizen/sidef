@@ -18,10 +18,9 @@ var obj = Backtick(...)
 
 Inherits methods from:
 
-	* Sidef::Object::Object
+       * Sidef::Object::Object
 
 =head1 METHODS
-
 
 =head2 `
 

@@ -18,10 +18,9 @@ var obj = Object(...)
 
 Inherits methods from:
 
-	* Sidef::Object::Convert
+       * Sidef::Object::Convert
 
 =head1 METHODS
-
 
 =head2 !~
 

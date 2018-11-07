@@ -18,10 +18,9 @@ var obj = Set(...)
 
 Inherits methods from:
 
-	* Sidef::Types::Hash::Hash
+       * Sidef::Types::Hash::Hash
 
 =head1 METHODS
-
 
 =head2 &
 

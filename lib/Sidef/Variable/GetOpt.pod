@@ -15,7 +15,6 @@ var obj = GetOpt(...)
 
 =head1 METHODS
 
-
 =head2 new
 
 GetOpt.new() -> I<Obj>

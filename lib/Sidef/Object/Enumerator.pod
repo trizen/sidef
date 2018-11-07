@@ -15,7 +15,6 @@ var obj = Enumerator(...)
 
 =head1 METHODS
 
-
 =head2 each
 
 Enumerator.each() -> I<Obj>

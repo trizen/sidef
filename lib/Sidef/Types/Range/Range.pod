@@ -15,7 +15,6 @@ var obj = Range(...)
 
 =head1 METHODS
 
-
 =head2 *
 
 I<Obj> B<*> I<Obj> -> I<Obj>

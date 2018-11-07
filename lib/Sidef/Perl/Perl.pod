@@ -15,7 +15,6 @@ var obj = Perl(...)
 
 =head1 METHODS
 
-
 =head2 eval
 
 Perl.eval() -> I<Obj>

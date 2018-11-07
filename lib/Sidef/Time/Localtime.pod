@@ -18,10 +18,9 @@ var obj = Localtime(...)
 
 Inherits methods from:
 
-	* Sidef::Time::Gmtime
+       * Sidef::Time::Gmtime
 
 =head1 METHODS
-
 
 =head2 day
 

@@ -15,7 +15,6 @@ var obj = Sig(...)
 
 =head1 METHODS
 
-
 =head2 new
 
 Sig.new() -> I<Obj>

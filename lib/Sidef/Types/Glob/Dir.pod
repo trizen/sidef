@@ -18,10 +18,9 @@ var obj = Dir(...)
 
 Inherits methods from:
 
-	* Sidef::Types::Glob::File
+       * Sidef::Types::Glob::File
 
 =head1 METHODS
-
 
 =head2 +
 

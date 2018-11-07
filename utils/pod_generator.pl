@@ -259,13 +259,12 @@ Inherits methods from:
 
 HEADER
 
-            $header .= join("\n", map { "\t* $_" } @isa);
+            $header .= join("\n", map { (" " x 7) . "* $_" } @isa);
             $header .= "\n\n";
         }
 
         $header .= <<"HEADER";
 \=head1 METHODS
-
 HEADER
     }
 

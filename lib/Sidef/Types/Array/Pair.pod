@@ -18,10 +18,9 @@ var obj = Pair(...)
 
 Inherits methods from:
 
-	* Sidef::Types::Array::Array
+       * Sidef::Types::Array::Array
 
 =head1 METHODS
-
 
 =head2 key
 

@@ -18,10 +18,9 @@ var obj = Number(...)
 
 Inherits methods from:
 
-    * Sidef::Object::Object
+       * Sidef::Object::Object
 
 =head1 METHODS
-
 
 =head2 !
 
@@ -293,65 +292,66 @@ Absolute value of C<n>.
 
 =head2 acos
 
-Number.acos() -> I<Obj>
+    n.acos
 
-Return the
+Inverse cosine of C<n> in radians.
 
 =cut
 
 =head2 acosh
 
-Number.acosh() -> I<Obj>
+    n.acosh
 
-Return the
+Inverse hyperbolic cosine of C<n>.
 
 =cut
 
 =head2 acot
 
-Number.acot() -> I<Obj>
+    n.acot
 
-Return the
+Inverse cotangent of C<n> in radians.
 
 =cut
 
 =head2 acoth
 
-Number.acoth() -> I<Obj>
+    n.acoth
 
-Return the
+Inverse hyperbolic cotangent of C<n>.
 
 =cut
 
 =head2 acsc
 
-Number.acsc() -> I<Obj>
+    n.acsc
 
-Return the
+Inverse cosecant of C<n> in radians.
 
 =cut
 
 =head2 acsch
 
-Number.acsch() -> I<Obj>
+    n.acsch
 
-Return the
+Inverse hyperbolic cosecant of C<n>.
 
 =cut
 
 =head2 agm
 
-Number.agm() -> I<Obj>
+    agm(a, b)
 
-Return the
+Arithmetic-geometric mean of C<a> and C<b>.
 
 =cut
 
 =head2 ai
 
-Number.ai() -> I<Obj>
+    x.ai
+    Ai(x)
 
-Return the
+Airy function of the first kind: C<Ai(x)>.
 
 Aliases: I<airy>
 
@@ -359,73 +359,126 @@ Aliases: I<airy>
 
 =head2 approx_cmp
 
-Number.approx_cmp() -> I<Obj>
+    approx_cmp(a, b)
+    approx_cmp(a, b, k)
 
-Return the
+Approximate comparison of C<a> and C<b>.
+
+Equivalent with:
+
+    a.round(k) <=> b.round(k)
+
+When C<k> is omitted, it uses the default floating-point precision to deduce C<k>.
 
 =cut
 
 =head2 approx_ge
 
-Number.approx_ge() -> I<Obj>
+    approx_ge(a, b)
+    approx_ge(a, b, k)
 
-Return the
+True if C<a> is approximately greater than or equal to C<b>.
+
+Equivalent with:
+
+    a.round(k) >= b.round(k)
 
 =cut
 
 =head2 approx_gt
 
-Number.approx_gt() -> I<Obj>
+    approx_gt(a, b)
+    approx_gt(a, b, k)
 
-Return the
+True if C<a> is approximately greater than C<b>.
+
+Equivalent with:
+
+    a.round(k) > b.round(k)
 
 =cut
 
 =head2 approx_le
 
-Number.approx_le() -> I<Obj>
+    approx_le(a, b)
+    approx_le(a, b, k)
 
-Return the
+True if C<a> is approximately less than or equal to C<b>.
+
+Equivalent with:
+
+    a.round(k) <= b.round(k)
 
 =cut
 
 =head2 approx_lt
 
-Number.approx_lt() -> I<Obj>
+    approx_lt(a, b)
+    approx_lt(a, b, k)
 
-Return the
+True if C<a> is approximately less than C<b>.
+
+Equivalent with:
+
+    a.round(k) < b.round(k)
 
 =cut
 
 =head2 approx_ne
 
-Number.approx_ne() -> I<Obj>
+    approx_ne(a, b)
+    approx_ne(a, b, k)
 
-Return the
+True if C<a> is approximately different than C<b>.
+
+Equivalent with:
+
+    a.round(k) != b.round(k)
 
 =cut
 
 =head2 as_bin
 
-Number.as_bin() -> I<Obj>
+    n.as_bin
 
-Return the
+Returns a C<String> with the binary representation of C<n>.
+
+Example:
+
+    say 42.as_bin     # "101011"
 
 =cut
 
 =head2 as_cfrac
 
-Number.as_cfrac() -> I<Obj>
+    n.as_cfrac
+    n.as_cfrac(k)
 
-Return the
+Compute C<k> terms of the continued-fraction expansion of C<n>.
+
+Example:
+
+    say sqrt(12).as_cfrac(6)    # [3, 2, 6, 2, 6, 2]
+
+Can also be used to compute very good rational approximations to a given real number:
+
+    say Num.pi.as_cfrac(10).flip.reduce{|a,b| b + 1/a }.as_rat      # 1146408/364913
+
+When C<k> is omitted, it uses the default floating-point precision to deduce C<k>.
 
 =cut
 
 =head2 as_dec
 
-Number.as_dec() -> I<Obj>
+    n.as_dec
+    n.as_dec(k)
 
-Return the
+Given a rational number C<n>, it returns its decimal expansion as a C<String> object, expanded at C<k> decimal places.
+
+Example:
+
+    say (1/17 -> as_dec(10))      # 0.05882352941
+    say (1/17 -> as_dec(30))      # 0.0588235294117647058823529411765
 
 Aliases: I<as_float>
 
