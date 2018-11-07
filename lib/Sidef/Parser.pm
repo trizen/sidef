@@ -471,8 +471,15 @@ package Sidef::Parser {
                 }
             }
 
+            if ($class eq 'main') {
+                $class = '';
+            }
+            else {
+                $class .= '::';
+            }
+
             if (my @candidates = Sidef::best_matches($name, [grep { $_ ne $name } @names])) {
-                $error .= ("[?] Did you mean: " . join("\n" . (' ' x 18), sort(@candidates)) . "\n");
+                $error .= ("[?] Did you mean: " . join("\n" . (' ' x 18), map { $class . $_ } sort(@candidates)) . "\n");
             }
         }
 
@@ -801,10 +808,10 @@ package Sidef::Parser {
                     $self->fatal_error(
                                        code  => $_,
                                        pos   => pos($_) - length($name),
+                                       var   => ($class_name . '::' . $var_name),
                                        error => "attempt to delete non-existent variable `$name`",
                                       );
                 }
-
             }
 
             if (exists($self->{keywords}{$var_name}) or exists($self->{built_in_classes}{$var_name})) {
@@ -1625,7 +1632,7 @@ package Sidef::Parser {
                                 $self->fatal_error(
                                                    error  => "can't find `$name` class",
                                                    reason => "expected an existent class name",
-                                                   var    => $name,
+                                                   var    => ($class_name . '::' . $name),
                                                    code   => $_,
                                                    pos    => pos($_) - length($name) - 1,
                                                   );
@@ -2209,7 +2216,7 @@ package Sidef::Parser {
                         $self->fatal_error(
                                            code  => $_,
                                            pos   => (pos($_) - length($name)),
-                                           var   => $name,
+                                           var   => ($class . '::' . $name),
                                            error => "attempt to use the deleted variable <$name>",
                                           );
                     }
@@ -2326,7 +2333,7 @@ package Sidef::Parser {
                                : $self->fatal_error(
                                                     code  => $_,
                                                     pos   => ($pos - length($name)),
-                                                    var   => $name,
+                                                    var   => ($class . '::' . $name),
                                                     error => "variable <$name> is not declared in the current scope",
                                                    )
                               );
@@ -2351,9 +2358,9 @@ package Sidef::Parser {
                 # Undeclared variable
                 $self->fatal_error(
                                    code  => $_,
-                                   var   => $name,
                                    pos   => (pos($_) - length($name)),
-                                   error => "variable <$name> is not declared in the current scope",
+                                   var   => ($class . '::' . $name),
+                                   error => "variable <$class\::$name> is not declared in the current scope",
                                   );
             }
 
