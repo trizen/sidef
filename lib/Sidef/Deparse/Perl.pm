@@ -316,7 +316,7 @@ HEADER
             my @vars = @{$attr->{vars}};
             @vars || next;
 
-            my @dumped_vars = map { ref($_) ? $self->_dump_var($_) : $_ } grep { !$seen{$_->{name}}++ } @vars;
+            my @dumped_vars = map { ref($_) ? $self->_dump_var($_, init => 1) : $_ } grep { !$seen{$_->{name}}++ } @vars;
 
             @dumped_vars || next;
 
@@ -324,11 +324,36 @@ HEADER
               (   'my('
                 . join(',', @dumped_vars) . ')'
                 . (exists($attr->{args}) ? '=' . $self->deparse_args($attr->{args}) : ''));
+
             foreach my $var (@vars) {
-                if (exists $var->{value}) {
+
+                my $name = $var->{name} . refaddr($var);
+
+                if (exists $var->{array}) {
+
+                    # Overwrite with the default values, when the array is empty
+                    if (exists $var->{value}) {
+                        push @code, ('@' . $name . '=(' . $self->deparse_expr({self => $var->{value}}) . ") if not \@$name;");
+                    }
+
+                    $self->load_mod('Sidef::Types::Array::Array');
+                    push @code, "my \$$name = bless(\\\@$name, 'Sidef::Types::Array::Array');";
+                }
+                elsif (exists $var->{hash}) {
+
+                    # Overwrite with the default values, when the hash has no keys
+                    if (exists $var->{value}) {
+                        push @code,
+                          ('%' . $name . '=(' . $self->deparse_expr({self => $var->{value}}) . ") if not keys \%$name;");
+                    }
+
+                    $self->load_mod('Sidef::Types::Hash::Hash');
+                    push @code, "my \$$name = bless(\\\%$name, 'Sidef::Types::Hash::Hash');";
+                }
+                elsif (exists $var->{value}) {
                     my $value = $self->deparse_expr({self => $var->{value}});
                     if ($value ne '') {
-                        push @code, "\$$var->{name}" . refaddr($var) . "//=$value;";
+                        push @code, "\$$name//=$value;";
                     }
                 }
             }

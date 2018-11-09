@@ -1,0 +1,60 @@
+#!/usr/bin/ruby
+
+class Example {
+
+    has :hash  = (a => 1, b => 2)
+    has *array = (5, 6, 7, 8)
+
+    has t  = 99
+
+    method get_hash {
+        hash
+    }
+
+    method get_array {
+        array
+    }
+
+    method set_hash_key(key, value) {
+        hash{key} = value
+    }
+
+    method set_array_index(index, value) {
+        array[index] = value
+    }
+}
+
+var obj1 = Example()
+var obj2 = Example()
+
+obj1.set_hash_key(:a, 13)
+obj2.t = 42
+
+assert_eq(obj1.get_hash, Hash(a => 13, b => 2))
+assert_eq(obj2.get_hash, Hash(a => 1, b => 2))
+
+obj2.set_hash_key(b => 17)
+
+assert_eq(obj1.get_hash, Hash(a => 13, b => 2))
+assert_eq(obj2.get_hash, Hash(a => 1, b => 17))
+
+assert_eq(obj1.t, 99)
+assert_eq(obj2.t, 42)
+
+assert_eq(obj1.hash, obj1.get_hash)
+assert_eq(obj2.hash, obj2.get_hash)
+
+obj1.set_array_index(1, 42)
+
+assert_eq(obj1.get_array, [5, 42, 7, 8])
+assert_eq(obj2.get_array, [5, 6, 7, 8])
+
+obj2.set_array_index(2, -1)
+
+assert_eq(obj1.array, [5, 42, 7, 8])
+assert_eq(obj2.array, [5, 6, -1, 8])
+
+assert_eq(obj1.array, obj1.get_array)
+assert_eq(obj2.array, obj2.get_array)
+
+say "** Test passed!"
