@@ -3986,6 +3986,10 @@ package Sidef::Types::Number::Number {
         $n == 0 and return ONE;
         $n > 1 and $n % 2 and return ZERO;    # Bn=0 for odd n>1
 
+        if ($n > 1 and $n <= 500) {
+            return bless \((_bernoulli_numbers($n))[($n >> 1) + 1]);
+        }
+
         # Using bernfrac() from `Math::Prime::Util::GMP`
         my ($num, $den) = Math::Prime::Util::GMP::bernfrac($n);
 
