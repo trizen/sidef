@@ -6671,19 +6671,26 @@ package Sidef::Types::Number::Number {
         return ONE  if ($n == 0);
         goto &nan   if ($n < 0);
 
-        my $tau  = 6.28318530717958647692528676655900576839433879875;
-        my $prec = 4 + CORE::int(($n * CORE::log($n) + CORE::log($tau * $n) / 2 - $n) / CORE::log(2));
-
         my $z = Math::GMPz::Rmpz_init();
-        Math::GMPz::Rmpz_fac_ui($z, $n);
 
-        my $f = Math::MPFR::Rmpfr_init2($prec);
-        Math::MPFR::Rmpfr_set_ui($f, 1, $round_z);
-        Math::MPFR::Rmpfr_exp($f, $f, $round_z);
-        Math::MPFR::Rmpfr_z_div($f, $z, $f, $round_z);
-        Math::MPFR::Rmpfr_add_d($f, $f, 0.5, $round_z);
-        Math::MPFR::Rmpfr_floor($f, $f);
-        Math::MPFR::Rmpfr_get_z($z, $f, $round_z);
+        if ($n >= 40000) {
+
+            my $tau  = 6.28318530717958647692528676655900576839433879875;
+            my $prec = 4 + CORE::int(($n * CORE::log($n) + CORE::log($tau * $n) / 2 - $n) / CORE::log(2));
+
+            Math::GMPz::Rmpz_fac_ui($z, $n);
+
+            my $f = Math::MPFR::Rmpfr_init2($prec);
+            Math::MPFR::Rmpfr_set_ui($f, 1, $round_z);
+            Math::MPFR::Rmpfr_exp($f, $f, $round_z);
+            Math::MPFR::Rmpfr_z_div($f, $z, $f, $round_z);
+            Math::MPFR::Rmpfr_add_d($f, $f, 0.5, $round_z);
+            Math::MPFR::Rmpfr_floor($f, $f);
+            Math::MPFR::Rmpfr_get_z($z, $f, $round_z);
+        }
+        else {
+            Math::GMPz::Rmpz_set_str($z, Math::Prime::Util::GMP::subfactorial($n), 10);
+        }
 
         if ($k != 0) {
             my $t = Math::GMPz::Rmpz_init();
