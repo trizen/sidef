@@ -84,6 +84,10 @@ package Sidef::Types::Set::Bag {
     sub union {
         my ($A, $B) = @_;
 
+        if (ref($B) ne __PACKAGE__) {
+            $B = $B->to_bag;
+        }
+
         my %C = map { $_ => {%{$A->{$_}}} } CORE::keys(%$A);
 
         foreach my $key (CORE::keys(%$B)) {
@@ -109,6 +113,10 @@ package Sidef::Types::Set::Bag {
 
     sub intersection {
         my ($A, $B) = @_;
+
+        if (ref($B) ne __PACKAGE__) {
+            $B = $B->to_bag;
+        }
 
         my %C;
 
@@ -136,6 +144,10 @@ package Sidef::Types::Set::Bag {
     sub difference {
         my ($A, $B) = @_;
 
+        if (ref($B) ne __PACKAGE__) {
+            $B = $B->to_bag;
+        }
+
         my %C;
 
         foreach my $key (CORE::keys(%$A)) {
@@ -162,10 +174,15 @@ package Sidef::Types::Set::Bag {
         bless \%C, ref($A);
     }
 
+    *sub  = \&difference;
     *diff = \&difference;
 
     sub symmetric_difference {
         my ($A, $B) = @_;
+
+        if (ref($B) ne __PACKAGE__) {
+            $B = $B->to_bag;
+        }
 
         my %C;
 
@@ -631,6 +648,10 @@ package Sidef::Types::Set::Bag {
     sub is_subset {
         my ($A, $B) = @_;
 
+        if (ref($B) ne __PACKAGE__) {
+            $B = $B->to_bag;
+        }
+
         foreach my $key (CORE::keys(%$A)) {
             if (!CORE::exists($B->{$key}) or $B->{$key}{count} < $A->{$key}{count}) {
                 return Sidef::Types::Bool::Bool::FALSE;
@@ -642,6 +663,10 @@ package Sidef::Types::Set::Bag {
 
     sub is_superset {
         my ($A, $B) = @_;
+
+        if (ref($B) ne __PACKAGE__) {
+            $B = $B->to_bag;
+        }
 
         foreach my $key (CORE::keys(%$B)) {
             if (!CORE::exists($A->{$key}) or $A->{$key}{count} < $B->{$key}{count}) {

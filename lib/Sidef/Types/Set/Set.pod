@@ -48,7 +48,7 @@ I<Obj> B<-> I<Obj> -> I<Obj>
 
 Return the
 
-Aliases: I<∖>, I<diff>, I<difference>
+Aliases: I<∖>, I<sub>, I<diff>, I<difference>
 
 =cut
 

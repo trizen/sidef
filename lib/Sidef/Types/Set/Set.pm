@@ -62,6 +62,10 @@ package Sidef::Types::Set::Set {
     sub union {
         my ($A, $B) = @_;
 
+        if (ref($B) ne __PACKAGE__) {
+            $B = $B->to_set;
+        }
+
         my %C = %$A;
         foreach my $key (CORE::keys(%$B)) {
             if (!CORE::exists($C{$key})) {
@@ -76,6 +80,10 @@ package Sidef::Types::Set::Set {
 
     sub intersection {
         my ($A, $B) = @_;
+
+        if (ref($B) ne __PACKAGE__) {
+            $B = $B->to_set;
+        }
 
         my %C;
 
@@ -93,6 +101,10 @@ package Sidef::Types::Set::Set {
     sub difference {
         my ($A, $B) = @_;
 
+        if (ref($B) ne __PACKAGE__) {
+            $B = $B->to_set;
+        }
+
         my %C;
 
         foreach my $key (CORE::keys(%$A)) {
@@ -104,10 +116,15 @@ package Sidef::Types::Set::Set {
         bless \%C, ref($A);
     }
 
+    *sub  = \&difference;
     *diff = \&difference;
 
     sub symmetric_difference {
         my ($A, $B) = @_;
+
+        if (ref($B) ne __PACKAGE__) {
+            $B = $B->to_set;
+        }
 
         my %C;
 
@@ -324,6 +341,10 @@ package Sidef::Types::Set::Set {
     sub is_subset {
         my ($A, $B) = @_;
 
+        if (ref($B) ne __PACKAGE__) {
+            $B = $B->to_set;
+        }
+
         foreach my $key (CORE::keys(%$A)) {
             if (!CORE::exists($B->{$key})) {
                 return Sidef::Types::Bool::Bool::FALSE;
@@ -335,6 +356,10 @@ package Sidef::Types::Set::Set {
 
     sub is_superset {
         my ($A, $B) = @_;
+
+        if (ref($B) ne __PACKAGE__) {
+            $B = $B->to_set;
+        }
 
         foreach my $key (CORE::keys(%$B)) {
             if (!CORE::exists($A->{$key})) {

@@ -61,6 +61,10 @@ package Sidef::Types::Array::Array {
     sub unroll_operator {
         my ($self, $operator, $arg) = @_;
 
+        if (ref($arg) ne ref($self)) {
+            $arg = $arg->to_a;
+        }
+
         $operator = "$operator" if ref($operator);
 
         my @array;
@@ -134,6 +138,10 @@ package Sidef::Types::Array::Array {
     sub cross_operator {
         my ($self, $operator, $arg) = @_;
 
+        if (ref($arg) ne ref($self)) {
+            $arg = $arg->to_a;
+        }
+
         $operator = "$operator" if ref($operator);
 
         my @arg = @$arg;
@@ -161,6 +169,10 @@ package Sidef::Types::Array::Array {
 
     sub zip_operator {
         my ($self, $operator, $arg) = @_;
+
+        if (ref($arg) ne ref($self)) {
+            $arg = $arg->to_a;
+        }
 
         $operator = "$operator" if ref($operator);
 
@@ -268,6 +280,10 @@ package Sidef::Types::Array::Array {
 
     sub wise_operator {
         my ($m1, $operator, $m2) = @_;
+
+        if (ref($m2) ne ref($m1)) {
+            $m2 = $m2->to_a;
+        }
 
         $operator = "$operator" if ref($operator);
 
@@ -391,12 +407,36 @@ package Sidef::Types::Array::Array {
     sub or {
         my ($self, $array) = @_;
 
+        if (ref($array) eq 'Sidef::Types::Set::Set') {
+            return $self->to_set->or($array);
+        }
+
+        if (ref($array) eq 'Sidef::Types::Set::Bag') {
+            return $self->to_bag->or($array);
+        }
+
+        if (ref($array) ne ref($self)) {
+            $array = $array->to_a;
+        }
+
         #$self->and($array)->concat($self->xor($array));
         $self->concat($array)->uniq;
     }
 
     sub xor {
         my ($self, $array) = @_;
+
+        if (ref($array) eq 'Sidef::Types::Set::Set') {
+            return $self->to_set->xor($array);
+        }
+
+        if (ref($array) eq 'Sidef::Types::Set::Bag') {
+            return $self->to_bag->xor($array);
+        }
+
+        if (ref($array) ne ref($self)) {
+            $array = $array->to_a;
+        }
 
         my @x = CORE::sort { $a cmp $b } @$self;
         my @y = CORE::sort { $a cmp $b } @$array;
@@ -443,6 +483,18 @@ package Sidef::Types::Array::Array {
     sub and {
         my ($self, $array) = @_;
 
+        if (ref($array) eq 'Sidef::Types::Set::Set') {
+            return $self->to_set->and($array);
+        }
+
+        if (ref($array) eq 'Sidef::Types::Set::Bag') {
+            return $self->to_bag->and($array);
+        }
+
+        if (ref($array) ne ref($self)) {
+            $array = $array->to_a;
+        }
+
         my @x = CORE::sort { $a cmp $b } @$self;
         my @y = CORE::sort { $a cmp $b } @$array;
 
@@ -475,6 +527,18 @@ package Sidef::Types::Array::Array {
 
     sub sub {
         my ($self, $array) = @_;
+
+        if (ref($array) eq 'Sidef::Types::Set::Set') {
+            return $self->to_set->sub($array);
+        }
+
+        if (ref($array) eq 'Sidef::Types::Set::Bag') {
+            return $self->to_bag->sub($array);
+        }
+
+        if (ref($array) ne ref($self)) {
+            $array = $array->to_a;
+        }
 
         my @x = CORE::sort { $a cmp $b } @$self;
         my @y = CORE::sort { $a cmp $b } @$array;
@@ -511,6 +575,18 @@ package Sidef::Types::Array::Array {
 
     sub diff {
         my ($self, $array) = @_;
+
+        if (ref($array) eq 'Sidef::Types::Set::Set') {
+            return $self->to_set->sub($array);
+        }
+
+        if (ref($array) eq 'Sidef::Types::Set::Bag') {
+            return $self->to_bag->sub($array);
+        }
+
+        if (ref($array) ne ref($self)) {
+            $array = $array->to_a;
+        }
 
         my @x = CORE::sort { $a cmp $b } @$self;
         my @y = CORE::sort { $a cmp $b } @$array;
@@ -559,6 +635,10 @@ package Sidef::Types::Array::Array {
     sub levenshtein {
         my ($self, $arg) = @_;
 
+        if (ref($arg) ne ref($self)) {
+            $arg = $arg->to_a;
+        }
+
         my @s = @$self;
         my @t = @$arg;
 
@@ -583,6 +663,10 @@ package Sidef::Types::Array::Array {
 
     sub jaro_distance {
         my ($self, $arg, $winkler) = @_;
+
+        if (ref($arg) ne ref($self)) {
+            $arg = $arg->to_a;
+        }
 
         my @s = @$self;
         my @t = @$arg;
@@ -2387,6 +2471,10 @@ package Sidef::Types::Array::Array {
     sub contains_any {
         my ($self, $array) = @_;
 
+        if (ref($array) ne __PACKAGE__) {
+            $array = $array->to_a;
+        }
+
         foreach my $item (@$array) {
             if ($self->contains($item)) {
                 return (Sidef::Types::Bool::Bool::TRUE);
@@ -2398,6 +2486,10 @@ package Sidef::Types::Array::Array {
 
     sub contains_all {
         my ($self, $array) = @_;
+
+        if (ref($array) ne __PACKAGE__) {
+            $array = $array->to_a;
+        }
 
         foreach my $item (@$array) {
             unless ($self->contains($item)) {

@@ -52,6 +52,15 @@ assert_eq((w - x | y - y).sort, [])
 assert_eq((w - x | y ^ y).sort, [])
 assert_eq((w - x | y | x - y).sort, [3, 5, 6, 7])
 
+assert_eq(Set(1,2,3) & 3, Set(3))
+assert_eq(Set(1,2,3) & [2,3,3], Set(2,3))
+
+assert_eq(Set(1,2,3) & 3, Set(3))
+assert_eq([2,3,3]    & Set(1,2,3), Set(2,3))
+assert_eq([2,3,3]    | Set(1,2,3), Set(1,2,3))
+assert_eq([2,3,3]    ^ Set(1,2,3), Set(1))
+assert_eq([1,2,3,3]  - Set(2,3),   Set(1))
+
 x << x
 
 say x
