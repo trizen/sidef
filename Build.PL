@@ -9,6 +9,23 @@ use strict;
 use warnings FATAL => 'all';
 use Module::Build;
 
+open my $version_fh, '>', "bin/sidef_version.info" or goto "skipversion";
+
+my $git_version_full = `git describe --dirty --always --tags`;
+if ($?) {
+  print STDERR "Not a git repository; not using version info";
+  close $version_fh;
+  goto "skipversion";
+}
+my $git_branch = `git rev-parse --abbrev-ref HEAD`;
+my $dt = localtime();
+
+print $version_fh "$git_version_full$git_branch$dt";
+
+close $version_fh;
+
+skipversion:
+
 my $builder = Module::Build->new(
 
     module_name        => 'Sidef',
