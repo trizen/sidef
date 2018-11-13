@@ -1,4 +1,5 @@
 bin/sidef
+bin/sidef_version.info
 Build.PL
 Changes
 lib/Sidef.pm
