@@ -5,44 +5,6 @@ use strict;
 use warnings FATAL => 'all';
 use Module::Build;
 
-use File::Spec::Functions qw(catfile);
-my $sidef_filename = catfile('bin', 'sidef');
-
-if (open my $sidef_fh, '<:utf8', $sidef_filename) {
-
-    my @sidef_bin;
-    my @sidef_data;
-
-    while(defined(my $line = <$sidef_fh>)) {
-
-        chomp $line;
-        push @sidef_bin, $line;
-
-        if ($line eq '__DATA__') {
-            chomp(@sidef_data = <$sidef_fh>);
-            last;
-        }
-    }
-
-    close $sidef_fh;
-
-    if ((-d '.git') and (my $git_version_full = `git describe --always --tags`)) {
-
-        my $git_branch = `git rev-parse --abbrev-ref HEAD`;
-        my $dt = gmtime() . ' GMT';
-
-        chomp $git_branch;
-        chomp $git_version_full;
-
-        @sidef_data = "$git_version_full\n[$git_branch]\n$dt";
-    }
-
-    if (open my $out_fh, '>:utf8', $sidef_filename) {
-        print $out_fh join("\n", @sidef_bin, @sidef_data) . "\n";
-        close $out_fh;
-    }
-}
-
 my $builder = Module::Build->new(
 
     module_name        => 'Sidef',
@@ -111,5 +73,4 @@ my $builder = Module::Build->new(
     create_makefile_pl => 'traditional',
 );
 
-$builder->script_files([$sidef_filename]);
 $builder->create_build_script();

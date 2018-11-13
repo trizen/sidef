@@ -30,7 +30,7 @@ my $version = $Sidef::VERSION;
 my %args;
 if ($#ARGV != -1 and chr ord $ARGV[0] eq '-') {
     require Getopt::Std;
-    Getopt::Std::getopts('e:E:Dho:ivVHWwbcrR:tCO:kP:M:s', \%args);
+    Getopt::Std::getopts('e:E:Dho:ivHWwbcrR:tCO:kP:M:s', \%args);
 }
 
 # Fix potential case mismatches for -R
@@ -232,7 +232,6 @@ sub output_usage {
                     '-H'         => 'interactive help',
                     '-s'         => 'save compiled code in a database to reduce boot-time',
                     '-v'         => 'print version number and exit',
-                    '-V'         => 'print full build information and exit',
                     '-t'         => 'treat all command-line arguments as scripts',
                     '-r'         => 'parse and deparse a Sidef program',
                     '-R lang'    => ['parse and deparse a Sidef program into a given language',
@@ -277,34 +276,6 @@ sub output_version {
     print "$name $version\n";
 }
 
-sub output_long_version {
-    my $long_version = format_long_version();
-    print "$name $long_version\n";
-}
-
-sub format_long_version {
-    my (%opt) = @_;
-
-    my @vi  = get_long_version();
-    my $ver = "$vi[0] $vi[1]";
-
-    return $ver if $opt{brief};
-
-    $ver .= " configured on $vi[2]";
-    return $ver;
-}
-
-sub get_long_version {
-    state @version_info;
-
-    if (@version_info) {
-        return @version_info;
-    }
-
-    chomp(@version_info = <DATA>);
-    return @version_info;
-}
-
 sub read_script {
     my ($script_name) = @_;
     open my $fh, '<:utf8', $script_name
@@ -323,9 +294,8 @@ sub help_interactive {
 
     my $term = Term::ReadLine->new("$name $version -- help interactive mode");
 
-    my @ver = get_long_version();
     print <<"HELP";
-Welcome to $name @ver[0]! This is the interactive help utility.
+Welcome to $name $version! This is the interactive help utility.
 
 Enter the name of any object, keyword, or topic to get help on writing
 $name programs and using $name modules.  To quit this help utility, just
@@ -448,8 +418,7 @@ sub code_interactive {
 
     require Time::HiRes;
 
-    state $ver = format_long_version(brief => 1);
-    print qq{$name $ver on $^O\n};
+    print qq{$name $version on $^O\n};
     print qq{Type "help", "copyright" or "license" for more information.\n};
 
     my $valid_lines = '';
@@ -794,8 +763,3 @@ FOOT
     print {$out_fh} $package_content;
     print {$out_fh} $opt{code};
 }
-
-__DATA__
-3.50-52-gcc8522e2
-[master]
-Tue Nov 13 12:41:27 2018 GMT
