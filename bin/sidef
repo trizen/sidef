@@ -278,42 +278,31 @@ sub output_version {
 }
 
 sub output_long_version {
-    my $long_version = format_long_version(0);
+    my $long_version = format_long_version();
     print "$name $long_version\n";
 }
 
 sub format_long_version {
-    my ($mode) = @_;
-    my @vi = get_long_version();
-    my $end = ($vi[2] ? " [$vi[1]] configured on $vi[2]" : "");
-    ($mode eq 0) ? "$vi[0]$end" : $end;
+    my (%opt) = @_;
+
+    my @vi  = get_long_version();
+    my $ver = "$vi[0] $vi[1]";
+
+    return $ver if $opt{brief};
+
+    $ver .= " configured on $vi[2]";
+    return $ver;
 }
 
 sub get_long_version {
-    # IO won't be replayed because @version_info becomes defined in a failure case
     state @version_info;
 
     if (@version_info) {
         return @version_info;
     }
 
-    require Cwd;
-    require File::Basename;
-    my $dn = File::Basename::dirname(Cwd::abs_path(__FILE__));
-    my $version_file = "$dn/sidef_version.info";
-
-    if (
-      (-e $version_file)                                # exists
-      && (0 ne -s $version_file)                        # has a length
-      && (open my $version_fh, '<:utf8', $version_file) # and we can read it
-    ) {
-        local $/;
-        @version_info = split("\n", <$version_fh>);
-        close $version_fh;
-    } else {
-        push(@version_info, $version); # never mind, fall back
-    }
-    @version_info;
+    chomp(@version_info = <DATA>);
+    return @version_info;
 }
 
 sub read_script {
@@ -336,7 +325,7 @@ sub help_interactive {
 
     my @ver = get_long_version();
     print <<"HELP";
-Welcome to $name @ver[0]!  This is the interactive help utility.
+Welcome to $name @ver[0]! This is the interactive help utility.
 
 Enter the name of any object, keyword, or topic to get help on writing
 $name programs and using $name modules.  To quit this help utility, just
@@ -459,9 +448,8 @@ sub code_interactive {
 
     require Time::HiRes;
 
-    my @ver = get_long_version();
-    my $lv = format_long_version(1);
-    print qq{$name @ver[0] on $^O$lv\n};
+    state $ver = format_long_version(brief => 1);
+    print qq{$name $ver on $^O\n};
     print qq{Type "help", "copyright" or "license" for more information.\n};
 
     my $valid_lines = '';
@@ -806,3 +794,8 @@ FOOT
     print {$out_fh} $package_content;
     print {$out_fh} $opt{code};
 }
+
+__DATA__
+3.50-52-gcc8522e2
+[master]
+Tue Nov 13 12:41:27 2018 GMT

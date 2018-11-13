@@ -18,5 +18,3 @@ nytprof.out
 pm_to_blib
 .project
 .gitignore~
-# not tracking new changes, just tracking existence
-bin/sidef_version.info

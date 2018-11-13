@@ -1,7 +1,3 @@
-#!/usr/bin/perl
-
-eval 'exec /usr/bin/perl  -S $0 ${1+"$@"}'
-  if 0;    # not running under some shell
 
 use utf8;
 use 5.006;
@@ -9,22 +5,43 @@ use strict;
 use warnings FATAL => 'all';
 use Module::Build;
 
-open my $version_fh, '>', "bin/sidef_version.info" or goto "skipversion";
+use File::Spec::Functions qw(catfile);
+my $sidef_filename = catfile('bin', 'sidef');
 
-my $git_version_full = `git describe --dirty --always --tags`;
-if ($?) {
-  print STDERR "Not a git repository; not using version info";
-  close $version_fh;
-  goto "skipversion";
+if (open my $sidef_fh, '<:utf8', $sidef_filename) {
+
+    my @sidef_bin;
+    my @sidef_data;
+
+    while(defined(my $line = <$sidef_fh>)) {
+
+        chomp $line;
+        push @sidef_bin, $line;
+
+        if ($line eq '__DATA__') {
+            chomp(@sidef_data = <$sidef_fh>);
+            last;
+        }
+    }
+
+    close $sidef_fh;
+
+    if ((-d '.git') and (my $git_version_full = `git describe --always --tags`)) {
+
+        my $git_branch = `git rev-parse --abbrev-ref HEAD`;
+        my $dt = gmtime() . ' GMT';
+
+        chomp $git_branch;
+        chomp $git_version_full;
+
+        @sidef_data = "$git_version_full\n[$git_branch]\n$dt";
+    }
+
+    if (open my $out_fh, '>:utf8', $sidef_filename) {
+        print $out_fh join("\n", @sidef_bin, @sidef_data) . "\n";
+        close $out_fh;
+    }
 }
-my $git_branch = `git rev-parse --abbrev-ref HEAD`;
-my $dt = localtime();
-
-print $version_fh "$git_version_full$git_branch$dt";
-
-close $version_fh;
-
-skipversion:
 
 my $builder = Module::Build->new(
 
@@ -94,4 +111,5 @@ my $builder = Module::Build->new(
     create_makefile_pl => 'traditional',
 );
 
+$builder->script_files([$sidef_filename]);
 $builder->create_build_script();
