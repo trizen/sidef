@@ -33,9 +33,9 @@ Sidef is a modern, high-level, general-purpose programming language, inspired by
 
 ### WWW
 
-* Gitbook: http://trizen.gitbooks.io/sidef-lang
-* Tutorial: https://github.com/trizen/sidef/wiki
-* RosettaCode: http://rosettacode.org/wiki/Sidef
+* Gitbook: [https://trizen.gitbooks.io/sidef-lang](https://trizen.gitbooks.io/sidef-lang)
+* Tutorial: [https://github.com/trizen/sidef/wiki](https://github.com/trizen/sidef/wiki)
+* RosettaCode: [https://rosettacode.org/wiki/Sidef](https://rosettacode.org/wiki/Sidef)
 
 ## EXAMPLES
 
@@ -169,7 +169,7 @@ Output:
 
 ### TRY IT ONLINE
 
-* https://tio.run/#sidef
+* [https://tio.run/#sidef](https://tio.run/#sidef)
 
 ### AVAILABILITY
 
@@ -186,7 +186,7 @@ This program is free software; you can redistribute it and/or modify it
 under the terms of the *Artistic License (2.0)*. You may obtain a copy
 of the full license at:
 
-http://www.perlfoundation.org/artistic_license_2_0
+[https://www.perlfoundation.org/artistic-license-20.html](https://www.perlfoundation.org/artistic-license-20.html)
 
 Any use, modification, and distribution of the Standard or Modified
 Versions is governed by this Artistic License. By using, modifying or
