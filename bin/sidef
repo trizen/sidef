@@ -55,12 +55,6 @@ if (defined $args{v}) {
     exit 0;
 }
 
-# Git version
-if (defined $args{V}) {
-    output_long_version();
-    exit 0;
-}
-
 # Warnings
 if (defined $args{w}) {
     $SIG{__WARN__} = sub {
