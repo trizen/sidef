@@ -54,12 +54,12 @@ say 10.of { |i| y(fib)(i) }     #=> [0, 1, 1, 2, 3, 5, 8, 13, 21, 34]
 ```ruby
 define ℯ = Num.e
 define τ = Num.tau
- 
+
 func Γ(t, r=50) {
-    t < r ? (__FUNC__(t + 1) / t)
-           : (sqrt(τ*t) * pow(t/ℯ + 1/(12*ℯ*t), t) / t)
+    t < r ? (__FUNC__(t + 1) / t)
+           : (sqrt(τ*t) * pow(t/ℯ + 1/(12*ℯ*t), t) / t)
 }
- 
+
 for i in (1..10) {
     say ("%.14f" % Γ(i/3))
 }
