@@ -38,7 +38,7 @@ package Sidef::Types::Number::Complex {
                 $imag = Sidef::Types::Number::Number::_str2obj("$imag");
             }
 
-            my $c = Math::MPC::Rmpc_init2($PREC);
+            my $c   = Math::MPC::Rmpc_init2($PREC);
             my $sig = join(' ', ref($real), ref($imag));
 
             # GMPz

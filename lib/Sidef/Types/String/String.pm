@@ -1004,7 +1004,7 @@ package Sidef::Types::String::String {
         foreach my $i (0 .. $#s) {
 
             my $start = List::Util::max(0, $i - $match_distance);
-            my $end = List::Util::min($i + $match_distance + 1, $t_len);
+            my $end   = List::Util::min($i + $match_distance + 1, $t_len);
 
             foreach my $j ($start .. $end - 1) {
                 $t_matches[$j] and next;
@@ -1379,7 +1379,7 @@ package Sidef::Types::String::String {
 
             state %cache;
             my $type = (ref($self) =~ s/::Types::/::DataTypes::/r);
-            my $dt = ($cache{$type} //= bless({}, $type));
+            my $dt   = ($cache{$type} //= bless({}, $type));
 
             my $expr = {
                         $parser->{class} => [

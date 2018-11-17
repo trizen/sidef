@@ -32,7 +32,7 @@ package Sidef::Optimizer {
                     defined(my $method = UNIVERSAL::can($package, $_))
                       or die "[ERROR] Invalid method $package: $_";
                     $method;
-                  }
+                }
             } @names;
         }
 
@@ -67,7 +67,7 @@ package Sidef::Optimizer {
             exists($table{$type}) || die "[ERROR] Non-existent data type: $type";
 
             my $package = $table{$type};
-            my $module = ($cache{$package} //= (($package =~ s{::}{/}gr) . '.pm'));
+            my $module  = ($cache{$package} //= (($package =~ s{::}{/}gr) . '.pm'));
             exists($INC{$module}) || require($module);
 
             if (not $seen{$type}++) {
@@ -80,7 +80,7 @@ package Sidef::Optimizer {
                     defined(my $method = UNIVERSAL::can($type, $_))
                       or die "[ERROR] Invalid method $type: $_";
                     $method;
-                  }
+                }
             } @names;
         }
     }

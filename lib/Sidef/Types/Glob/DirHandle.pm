@@ -60,7 +60,7 @@ package Sidef::Types::Glob::DirHandle {
             }
 
             my $dfile = Encode::decode_utf8($file);
-            my $dir = File::Spec->catdir($basedir, $dfile);
+            my $dir   = File::Spec->catdir($basedir, $dfile);
 
             lstat($dir);
             if (-l _) { redo }

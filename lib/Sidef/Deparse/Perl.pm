@@ -145,7 +145,7 @@ HEADER
                  do {
                      local $" = ',';
                      $self->{before} .= $name . @args . '=>' . $ref . "->$new_method(@args),";
-                   }
+                 }
              ]
             )->[0]
               . ')'
@@ -369,7 +369,7 @@ HEADER
         @vars || return '';
 
         my @dumped_vars = map { ref($_) ? $self->_dump_var($_, init => 1) : $_ } @vars;
-        my $code = "my(" . join(',', @dumped_vars) . ')=@_;';
+        my $code        = "my(" . join(',', @dumped_vars) . ')=@_;';
 
         my $valid;
         foreach my $var (@vars) {
@@ -1123,7 +1123,7 @@ HEADER
         }
         elsif ($ref eq 'Sidef::Types::Block::While') {
             my $vars = join(',', map { $self->_dump_var($_) } @{$obj->{block}{init_vars}{vars}});
-            my $arg = $self->deparse_args($obj->{expr});
+            my $arg  = $self->deparse_args($obj->{expr});
 
             if ($vars) {
                 $arg = "(my ($vars) = $arg)[-1]";
@@ -1142,7 +1142,7 @@ HEADER
         elsif ($ref eq 'Sidef::Types::Block::ForIn') {
             $self->load_mod('Sidef::Types::Block::Block');
 
-            my @vars = map { $self->_dump_sub_init_vars(@{$_->{vars}}) } @{$obj->{loops}};
+            my @vars  = map { $self->_dump_sub_init_vars(@{$_->{vars}}) } @{$obj->{loops}};
             my $block = 'do' . $self->deparse_block_with_scope($obj->{block});
 
             my @loops = @{$obj->{loops}};
@@ -1220,7 +1220,7 @@ HEADER
         }
         elsif ($ref eq 'Sidef::Types::Block::When') {
             my $vars = join(',', map { $self->_dump_var($_) } @{$obj->{block}{init_vars}{vars}});
-            my $arg = $self->deparse_args($obj->{expr});
+            my $arg  = $self->deparse_args($obj->{expr});
 
             if ($vars) {
                 $arg = "(my ($vars) = $arg)[-1]";
@@ -1234,7 +1234,7 @@ HEADER
         }
         elsif ($ref eq 'Sidef::Types::Block::Case') {
             my $vars = join(',', map { $self->_dump_var($_) } @{$obj->{block}{init_vars}{vars}});
-            my $arg = $self->deparse_args($obj->{expr});
+            my $arg  = $self->deparse_args($obj->{expr});
 
             if ($vars) {
                 $arg = "(my ($vars) = $arg)[-1]";

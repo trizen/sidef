@@ -396,7 +396,7 @@ package Sidef::Types::Array::Array {
     sub part {
         my ($self, $num) = @_;
 
-        my @first = @$self;
+        my @first  = @$self;
         my @second = splice(@first, CORE::int($num));
 
         (bless(\@first), bless(\@second));
@@ -687,7 +687,7 @@ package Sidef::Types::Array::Array {
         foreach my $i (0 .. $#s) {
 
             my $start = List::Util::max(0, $i - $match_distance);
-            my $end = List::Util::min($i + $match_distance + 1, $t_len);
+            my $end   = List::Util::min($i + $match_distance + 1, $t_len);
 
             foreach my $j ($start .. $end - 1) {
                 $t_matches[$j] and next;
@@ -1979,7 +1979,7 @@ package Sidef::Types::Array::Array {
                   && do {
                     @$t[$i, $j] = @$t[$j, $i];
                     last;
-                  }
+                }
             }
         }
 
@@ -2338,7 +2338,7 @@ package Sidef::Types::Array::Array {
 
         my (%seen, %table);
         foreach my $item (@$self) {
-            my $word = "$item";
+            my $word   = "$item";
             my $length = CORE::length($word) || next;
 
             for (my $len = $length ; $len >= 1 ; --$len) {
@@ -2989,7 +2989,7 @@ package Sidef::Types::Array::Array {
         my ($self, $block) = @_;
 
         my @arrays = @$self;
-        my $min = List::Util::min(map { scalar @$_ } @arrays);
+        my $min    = List::Util::min(map { scalar @$_ } @arrays);
 
         my @new_array;
         foreach my $i (0 .. $min - 1) {
@@ -3013,7 +3013,7 @@ package Sidef::Types::Array::Array {
         my ($self, $block) = @_;
 
         my @arrays = @$self;
-        my $min = List::Util::min(map { scalar @$_ } @arrays);
+        my $min    = List::Util::min(map { scalar @$_ } @arrays);
 
         my @new_array;
         foreach my $i (0 .. $min - 1) {

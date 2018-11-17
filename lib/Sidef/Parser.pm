@@ -586,7 +586,7 @@ package Sidef::Parser {
                               );
         }
 
-        my $beg_delim = quotemeta $delim;
+        my $beg_delim  = quotemeta $delim;
         my $pair_delim = exists($self->{delim_pairs}{$delim}) ? $self->{delim_pairs}{$delim} : ();
 
         my $string = '';
@@ -785,7 +785,7 @@ package Sidef::Parser {
             my $ref_type;
             if (defined($+{type})) {
                 my $type = $+{type};
-                my $obj = $self->parse_expr(code => \$type);
+                my $obj  = $self->parse_expr(code => \$type);
 
                 if (not defined($obj) or ref($obj) eq 'HASH') {
                     $self->fatal_error(
@@ -833,7 +833,7 @@ package Sidef::Parser {
                                                   );
 
                 my $code = $subset_name;
-                my $obj = $self->parse_expr(code => \$code);
+                my $obj  = $self->parse_expr(code => \$code);
 
                 (defined($obj) and ref($obj) ne 'HASH')
                   || $self->fatal_error(
@@ -1141,7 +1141,7 @@ package Sidef::Parser {
 
             if (/\G([^\W\d]\w*+):(?![=:])/gc) {
                 my $name = $1;
-                my $obj = $self->parse_obj(code => $opt{code});
+                my $obj  = $self->parse_obj(code => $opt{code});
                 return Sidef::Variable::NamedParam->new($name, $obj);
             }
 
@@ -1654,7 +1654,7 @@ package Sidef::Parser {
                     #~ $obj->{name} = $built_in_obj->{name};
                     #~ }
 
-                    local $self->{class_name} = (defined($built_in_obj) ? ref($built_in_obj) : $obj->{name});
+                    local $self->{class_name}    = (defined($built_in_obj) ? ref($built_in_obj) : $obj->{name});
                     local $self->{current_class} = $built_in_obj // $obj;
                     my $block = $self->parse_block(code => $opt{code});
 
@@ -2141,7 +2141,7 @@ package Sidef::Parser {
                 return (
                     $self->{static_objects}{'__DATA__'} //= do {
                         bless({data => \$self->{'__DATA__'}}, 'Sidef::Meta::Glob::DATA');
-                      }
+                    }
                 );
             }
 
@@ -2227,7 +2227,7 @@ package Sidef::Parser {
 
                 if ($name eq 'ARGV' or $name eq 'ENV') {
 
-                    my $type = 'var';
+                    my $type     = 'var';
                     my $variable = bless({name => $name, type => $type, class => $class}, 'Sidef::Variable::Variable');
 
                     unshift @{$self->{vars}{$class}},
@@ -2460,7 +2460,7 @@ package Sidef::Parser {
             my $p = pos($_);
             local $self->{curly_brackets} = 1;
 
-            my $ref = $self->{vars}{$self->{class}} //= [];
+            my $ref   = $self->{vars}{$self->{class}} //= [];
             my $count = scalar(@{$self->{vars}{$self->{class}}});
 
             unshift @{$self->{ref_vars_refs}{$self->{class}}}, @{$ref};
@@ -3289,7 +3289,7 @@ package Sidef::Parser {
 
                     next if exists $Sidef::INCLUDED{$var_name};
 
-                    my @path = split(/::/, $var_name);
+                    my @path     = split(/::/, $var_name);
                     my $mod_path = File::Spec->catfile(@path[0 .. $#path - 1], $path[-1] . '.sm');
 
                     $Sidef::INCLUDED{$var_name} = $mod_path;
@@ -3524,7 +3524,7 @@ package Sidef::Parser {
                             $methods = $self->parse_methods(code => $opt{code});
                         }
                         else {
-                            my $code = substr($_, pos);
+                            my $code   = substr($_, pos);
                             my $dot_op = $code =~ /^\./;
                             if   ($dot_op) { $code = ". $code" }
                             else           { $code = ".$code" }
@@ -3548,7 +3548,7 @@ package Sidef::Parser {
                     }
                     elsif (/\G(if|while|and|or)\b\h*/gc) {
                         my $keyword = $1;
-                        my $obj = $self->parse_obj(code => $opt{code});
+                        my $obj     = $self->parse_obj(code => $opt{code});
                         push @{$struct{$self->{class}}[-1]{call}}, {keyword => $keyword, arg => [$obj]};
                         redo;
                     }

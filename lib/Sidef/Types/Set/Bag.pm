@@ -512,7 +512,7 @@ package Sidef::Types::Set::Bag {
         my ($self, $n) = @_;
 
         my @sorted = sort { $b->{count} <=> $a->{count} } CORE::values(%$self);
-        my @top = splice(@sorted, 0, CORE::int($n));
+        my @top    = splice(@sorted, 0, CORE::int($n));
 
         Sidef::Types::Array::Array->new(
             map {
