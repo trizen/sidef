@@ -355,12 +355,12 @@ package Sidef::Object::Object {
         *{__PACKAGE__ . '::' . '|>'} = sub {
             my ($arg, $func, @args) = @_;
 
-            if (ref($func) eq 'Sidef::Types::Array::Array') {
+            if (CORE::ref($func) eq 'Sidef::Types::Array::Array') {
                 @args = @$func;
                 $func = shift(@args);
             }
 
-            if (ref($func) eq 'Sidef::Types::String::String') {
+            if (CORE::ref($func) eq 'Sidef::Types::String::String') {
                 return $arg->$$func(@args);
             }
 
@@ -404,9 +404,9 @@ package Sidef::Object::Object {
 
             # Second is not an object (assuming it is a typename)
             # Return true if `typeof(first)` is a subclass of `second`
-            if (!ref($second)) {
+            if (!CORE::ref($second)) {
                 return (
-                        UNIVERSAL::isa(ref($first), $second)
+                        UNIVERSAL::isa(CORE::ref($first), $second)
                         ? Sidef::Types::Bool::Bool::TRUE
                         : Sidef::Types::Bool::Bool::FALSE
                        );
@@ -414,9 +414,9 @@ package Sidef::Object::Object {
 
             # First is not an object (assuming it is a typename)
             # Return true if `first` is a subclass of `typeof(second)`
-            if (!ref($first)) {
+            if (!CORE::ref($first)) {
                 return (
-                        UNIVERSAL::isa($first, ref($second))
+                        UNIVERSAL::isa($first, CORE::ref($second))
                         ? Sidef::Types::Bool::Bool::TRUE
                         : Sidef::Types::Bool::Bool::FALSE
                        );
