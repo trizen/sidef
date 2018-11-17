@@ -563,10 +563,6 @@ EOT
 
             my $t0 = eval { [Time::HiRes::gettimeofday()] };
 
-            local $SIG{INT} = sub {
-                die "Interrupted...\n";
-            };
-
             my @results = $sidef->execute_perl($ccode);
 
             print $@ if $@;
