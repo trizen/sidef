@@ -2061,9 +2061,19 @@ package Sidef::Types::Array::Array {
                         );
 
         my @list = ($x);
-        foreach my $i ($beg .. $#$self) {
-            $x = $obj->run($x, $self->[$i]);
-            CORE::push(@list, $x);
+
+        if (ref($obj) eq 'Sidef::Types::Block::Block') {
+            foreach my $i ($beg .. $#$self) {
+                $x = $obj->run($x, $self->[$i]);
+                CORE::push(@list, $x);
+            }
+        }
+        else {
+            my $method = "$obj";
+            foreach my $i ($beg .. $#$self) {
+                $x = $x->$method($self->[$i]);
+                CORE::push(@list, $x);
+            }
         }
 
         bless \@list;
