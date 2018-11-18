@@ -2051,6 +2051,24 @@ package Sidef::Types::Array::Array {
 
     *inject = \&reduce;
 
+    sub map_reduce {
+        my ($self, $obj, $initial) = @_;
+
+        my ($beg, $x) = (
+                         defined($initial)
+                         ? (0, $initial)
+                         : (1, $self->[0])
+                        );
+
+        my @list = ($x);
+        foreach my $i ($beg .. $#$self) {
+            $x = $obj->run($x, $self->[$i]);
+            CORE::push(@list, $x);
+        }
+
+        bless \@list;
+    }
+
     sub length {
         my ($self) = @_;
         Sidef::Types::Number::Number->_set_uint(scalar @$self);

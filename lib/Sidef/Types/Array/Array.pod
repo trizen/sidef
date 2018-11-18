@@ -1050,6 +1050,14 @@ Aliases: I<map_operator>
 
 =cut
 
+=head2 map_reduce
+
+Array.map_reduce() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 match
 
 Array.match() -> I<Obj>
