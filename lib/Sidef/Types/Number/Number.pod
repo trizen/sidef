@@ -2424,6 +2424,14 @@ Return the
 
 =cut
 
+=head2 mertens
+
+Number.mertens() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 mfac
 
 Number.mfac() -> I<Obj>

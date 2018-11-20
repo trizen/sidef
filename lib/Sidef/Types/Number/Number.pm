@@ -7646,20 +7646,39 @@ package Sidef::Types::Number::Number {
     *nok = \&binomial;
 
     sub moebius {
-        my $mob = Math::Prime::Util::GMP::moebius(&_big2istr // goto &nan);
-        if (!$mob) {
-            ZERO;
+        my ($n, $k) = @_;
+
+        if (defined($k)) {
+            my @array = map { $_ ? ($_ == 1) ? ONE : MONE : ZERO }
+              Math::Prime::Util::GMP::moebius((_big2istr($n) // return Sidef::Types::Array::Array->new),
+                                              (_big2istr($k) // return Sidef::Types::Array::Array->new));
+            return Sidef::Types::Array::Array->new(\@array);
         }
-        elsif ($mob == 1) {
-            ONE;
-        }
-        else {
-            MONE;
-        }
+
+        my $m = Math::Prime::Util::GMP::moebius(_big2istr($n) // goto &nan);
+        $m ? ($m == 1) ? ONE : MONE : ZERO;
     }
 
     *mobius  = \&moebius;
+    *möbius  = \&moebius;
+    *Möbius  = \&moebius;
     *Moebius = \&moebius;
+
+    sub mertens {
+        my ($n, $k) = @_;
+
+        if (defined($k)) {
+            $n = _big2istr($n) // goto &nan;
+            $k = _big2istr($k) // goto &nan;
+        }
+        else {
+            $k = _big2istr($n) // goto &nan;
+            $n = 1;
+        }
+
+        my $r = Math::Prime::Util::GMP::vecsum(Math::Prime::Util::GMP::moebius($n, $k));
+        ($r < ULONG_MAX and $r > LONG_MIN) ? __PACKAGE__->_set_int($r) : __PACKAGE__->_set_str('int', $r);
+    }
 
     sub cyclotomic_polynomial {
         my ($n, $x) = @_;
@@ -11136,9 +11155,6 @@ package Sidef::Types::Number::Number {
         *{__PACKAGE__ . '::' . 'δ'}   = \&kronecker_delta;
         *{__PACKAGE__ . '::' . '=~='} = \&approx_eq;
         *{__PACKAGE__ . '::' . '≅'}   = \&approx_eq;
-
-        *{__PACKAGE__ . '::' . 'Möbius'} = \&moebius;
-        *{__PACKAGE__ . '::' . 'möbius'} = \&moebius;
     }
 }
 
