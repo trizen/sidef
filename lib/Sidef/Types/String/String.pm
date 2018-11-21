@@ -1210,6 +1210,11 @@ package Sidef::Types::String::String {
         Sidef::Module::Func->__NEW__($self->_require);
     }
 
+    sub run {
+        my ($method, $self, @args) = @_;
+        $self->$$method(@args);
+    }
+
     sub unescape {
         my ($self) = @_;
         $self->new($$self =~ s{\\(.)}{$1}grs);

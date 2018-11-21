@@ -2061,19 +2061,9 @@ package Sidef::Types::Array::Array {
                         );
 
         my @list = ($x);
-
-        if (ref($obj) eq 'Sidef::Types::Block::Block') {
-            foreach my $i ($beg .. $#$self) {
-                $x = $obj->run($x, $self->[$i]);
-                CORE::push(@list, $x);
-            }
-        }
-        else {
-            my $method = "$obj";
-            foreach my $i ($beg .. $#$self) {
-                $x = $x->$method($self->[$i]);
-                CORE::push(@list, $x);
-            }
+        foreach my $i ($beg .. $#$self) {
+            $x = $obj->run($x, $self->[$i]);
+            CORE::push(@list, $x);
         }
 
         bless \@list;
@@ -2161,18 +2151,9 @@ package Sidef::Types::Array::Array {
         my ($self, $arg) = @_;
 
         my @indices;
-        if (ref($arg) eq 'Sidef::Types::Block::Block') {
-            foreach my $i (0 .. $#$self) {
-                if ($arg->run($self->[$i])) {
-                    CORE::push(@indices, Sidef::Types::Number::Number->_set_uint($i));
-                }
-            }
-        }
-        else {
-            foreach my $i (0 .. $#$self) {
-                if ($self->[$i] eq $arg) {
-                    CORE::push(@indices, Sidef::Types::Number::Number->_set_uint($i));
-                }
+        foreach my $i (0 .. $#$self) {
+            if ($arg->run($self->[$i])) {
+                CORE::push(@indices, Sidef::Types::Number::Number->_set_uint($i));
             }
         }
 
@@ -2180,6 +2161,21 @@ package Sidef::Types::Array::Array {
     }
 
     *keys_by = \&indices_by;
+
+    sub indices_of {
+        my ($self, $arg) = @_;
+
+        my @indices;
+        foreach my $i (0 .. $#$self) {
+            if ($self->[$i] eq $arg) {
+                CORE::push(@indices, Sidef::Types::Number::Number->_set_uint($i));
+            }
+        }
+
+        bless \@indices;
+    }
+
+    *keys_of = \&indices_of;
 
     sub indices {
         my ($self, $arg) = @_;
