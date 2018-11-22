@@ -9310,8 +9310,9 @@ package Sidef::Types::Number::Number {
 
     sub jordan_totient {
         my ($n, $k) = @_;
+        $k //= ONE;
         _valid(\$k);
-        my $r = Math::Prime::Util::GMP::jordan_totient(_big2uistr($n) // (goto &nan), _big2uistr($k) // (goto &nan));
+        my $r = Math::Prime::Util::GMP::jordan_totient(_big2uistr($k) // (goto &nan), _big2uistr($n) // (goto &nan));
         $r < ULONG_MAX ? __PACKAGE__->_set_uint($r) : __PACKAGE__->_set_str('int', $r);
     }
 
