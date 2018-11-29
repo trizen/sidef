@@ -9388,12 +9388,14 @@ package Sidef::Types::Number::Number {
             return __PACKAGE__->_set_uint(scalar @factors);
         }
 
-        # bigomega_m(n) = n^m * Sum_{p^k|n} k/p^m
+        # Ω_m(n) = Sum_{p^k|n} Sum_{j=1..k} n^m / p^(j*m)
+        #        = Sum_{p^k|n} n^m * (p^(m*k) - 1) / (p^m - 1) / p^(m*k)
 
         my %factors;
         ++$factors{$_} for @factors;
 
         my $t  = Math::GMPz::Rmpz_init();
+        my $u  = Math::GMPz::Rmpz_init();
         my $nm = Math::GMPz::Rmpz_init_set_str($nstr, 10);
 
         Math::GMPz::Rmpz_pow_ui($nm, $nm, $m) if $m > 1;
@@ -9403,15 +9405,20 @@ package Sidef::Types::Number::Number {
         while (my ($p, $k) = each %factors) {
 
             if ($p < ULONG_MAX) {
-                Math::GMPz::Rmpz_ui_pow_ui($t, $p, $m);
+                Math::GMPz::Rmpz_ui_pow_ui($u, $p, $m);    # u = p^m
             }
             else {
-                Math::GMPz::Rmpz_set_str($t, $p, 10);
-                Math::GMPz::Rmpz_pow_ui($t, $t, $m);
+                Math::GMPz::Rmpz_set_str($u, $p, 10);
+                Math::GMPz::Rmpz_pow_ui($u, $u, $m);       # u = p^m
             }
 
-            Math::GMPz::Rmpz_divexact($t, $nm, $t);
-            Math::GMPz::Rmpz_mul_ui($t, $t, $k);
+            Math::GMPz::Rmpz_pow_ui($t, $u, $k);           # t = (p^m)^k = p^(m*k)
+            Math::GMPz::Rmpz_sub_ui($u, $u, 1);            # u = p^m - 1
+            Math::GMPz::Rmpz_mul($u, $u, $t);              # u = (p^m - 1) * p^(m*k)
+            Math::GMPz::Rmpz_sub_ui($t, $t, 1);            # t = p^(m*k) - 1
+            Math::GMPz::Rmpz_mul($t, $t, $nm);             # t = n^m * (p^(m*k) - 1)
+            Math::GMPz::Rmpz_divexact($t, $t, $u);         # t = (n^m * (p^(m*k) - 1)) / ((p^m - 1) * p^(m*k))
+
             Math::GMPz::Rmpz_add($sum, $sum, $t);
         }
 

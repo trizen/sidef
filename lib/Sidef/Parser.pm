@@ -1749,7 +1749,7 @@ package Sidef::Parser {
                     my $args = '|' . join(',', $type eq 'method' ? 'self' : (), @{$var_names}) . ' |';
 
                     my $code = '{' . $args . substr($_, pos);
-                    my $block = $self->parse_block(code => \$code);
+                    my $block = $self->parse_block(code => \$code, with_vars => 1);
                     pos($_) += pos($code) - length($args) - 1;
 
                     # Set the block of the function/method
@@ -1808,7 +1808,7 @@ package Sidef::Parser {
 
                 my $block = (
                              /\G\h*(?=\{)/gc
-                             ? $self->parse_block(code => $opt{code})
+                             ? $self->parse_block(code => $opt{code}, with_vars => 1)
                              : $self->fatal_error(
                                                   error => "expected a block after `when(expr)`",
                                                   code  => $_,
@@ -1836,7 +1836,7 @@ package Sidef::Parser {
 
                 my $block = (
                              /\G\h*(?=\{)/gc
-                             ? $self->parse_block(code => $opt{code})
+                             ? $self->parse_block(code => $opt{code}, with_vars => 1)
                              : $self->fatal_error(
                                                   error => "expected a block after `case(expr)`",
                                                   code  => $_,
@@ -2727,7 +2727,8 @@ package Sidef::Parser {
 
             my $has_vars;
             my $var_objs = [];
-            if (/\G(?=\|)/) {
+
+            if (($opt{topic_var} || $opt{with_vars}) && /\G(?=\|)/) {
                 $has_vars = 1;
                 $var_objs = $self->parse_init_vars(
                                                    params => 1,
@@ -3155,7 +3156,7 @@ package Sidef::Parser {
                     elsif (ref($obj) eq 'Sidef::Types::Block::If') {
 
                         if (/\G\h*(?=\{)/gc) {
-                            my $block = $self->parse_block(code => $opt{code});
+                            my $block = $self->parse_block(code => $opt{code}, with_vars => 1);
                             push @{$obj->{if}}, {expr => $arg, block => $block};
 
                           ELSIF: {
@@ -3166,7 +3167,7 @@ package Sidef::Parser {
                                     my $arg = $self->parse_arg(code => $opt{code});
                                     $self->parse_whitespace(code => $opt{code});
 
-                                    my $block = $self->parse_block(code => $opt{code}) // $self->fatal_error(
+                                    my $block = $self->parse_block(code => $opt{code}, with_vars => 1) // $self->fatal_error(
                                                                           code  => $_,
                                                                           pos   => pos($_) - 1,
                                                                           error => "invalid declaration of the `if` statement",
@@ -3238,7 +3239,7 @@ package Sidef::Parser {
                     }
                     elsif (ref($obj) eq 'Sidef::Types::Block::While') {
                         if (/\G\h*(?=\{)/gc) {
-                            my $block = $self->parse_block(code => $opt{code});
+                            my $block = $self->parse_block(code => $opt{code}, with_vars => 1);
                             $obj->{expr}  = $arg;
                             $obj->{block} = $block;
                         }
