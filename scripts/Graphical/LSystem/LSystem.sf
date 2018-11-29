@@ -1,6 +1,6 @@
 #!/usr/bin/ruby
 
-include('Turtle.sf');
+include('Turtle.sf')
 
 class LSystem(
     angle  = 90,

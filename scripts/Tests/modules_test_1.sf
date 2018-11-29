@@ -1,0 +1,20 @@
+#!/usr/bin/ruby
+
+module Bar {
+    class Foo {
+        method test {
+            "reached"
+        }
+    }
+}
+
+module Zero {
+    var hi = 'hi'
+}
+
+var obj = Bar::Foo()
+
+assert_eq(obj.test, "reached")
+assert_eq(Zero::hi, "hi")
+
+say "** Test passed!"

@@ -541,12 +541,12 @@ package Sidef::Parser {
     sub get_name_and_class {
         my ($self, $var_name) = @_;
 
-        $var_name // return ('', $self->{class});
+        $var_name // return ('', $self->{module} // $self->{class});
 
         my $rindex = rindex($var_name, '::');
         $rindex != -1
           ? (substr($var_name, $rindex + 2), substr($var_name, 0, $rindex))
-          : ($var_name, $self->{class});
+          : ($var_name, $self->{module} // $self->{class});
     }
 
     sub get_quoted_words {
@@ -1894,6 +1894,258 @@ package Sidef::Parser {
                 return bless({expr => $obj, gather => $self->{current_gather}}, 'Sidef::Types::Block::Take');
             }
 
+            # Declaration of a module
+            if (/\Gmodule\b\h*/gc) {
+                my $name =
+                  /\G($self->{var_name_re})\h*/goc
+                  ? $1
+                  : $self->fatal_error(
+                                       error  => "invalid module declaration",
+                                       reason => "expected a name",
+                                       code   => $_,
+                                       pos    => pos($_)
+                                      );
+
+                $self->parse_whitespace(code => $opt{code});
+
+                if (/\G(?=\{)/) {
+                    local $self->{module} = $name;
+                    my $obj = $self->parse_block(code => $opt{code});
+
+                    return
+                      bless {
+                             name  => $name,
+                             block => $obj
+                            },
+                      'Sidef::Meta::Module';
+                }
+                else {
+                    $self->fatal_error(
+                                       error  => "invalid module declaration",
+                                       reason => "expected: module $name {...}",
+                                       code   => $_,
+                                       pos    => pos($_)
+                                      );
+                }
+            }
+
+            if (/\Gimport\b\h*/gc) {
+
+                my $var_names =
+                  $self->get_init_vars(code      => $opt{code},
+                                       with_vals => 0);
+
+                @{$var_names}
+                  || $self->fatal_error(
+                                        code  => $_,
+                                        pos   => (pos($_)),
+                                        error => "expected a variable-like name for importing!",
+                                       );
+
+                foreach my $var_name (@{$var_names}) {
+                    my ($name, $class) = $self->get_name_and_class($var_name);
+
+                    if ($class eq ($self->{module} // $self->{class})) {
+                        $self->fatal_error(
+                                           code  => $_,
+                                           pos   => pos($_),
+                                           error => "can't import '${class}::${name}' into the same namespace",
+                                          );
+                    }
+
+                    my $var = $self->find_var($name, $class);
+
+                    if (not defined $var) {
+                        $self->fatal_error(
+                                           code  => $_,
+                                           pos   => pos($_),
+                                           error => "variable '${class}::${name}' does not exists",
+                                          );
+                    }
+
+                    $var->{count}++;
+
+                    unshift @{$self->{vars}{$self->{module} // $self->{class}}},
+                      {
+                        obj   => $var->{obj},
+                        name  => $name,
+                        count => 0,
+                        type  => $var->{type},
+                        line  => $self->{line},
+                      };
+                }
+
+                return 1;
+            }
+
+            if (/\Ginclude\b\h*/gc) {
+
+                state $x = do {
+                    require File::Spec;
+                    require Cwd;
+                };
+
+                my @abs_filenames;
+                if (/\G($self->{var_name_re})/gc) {
+                    my $var_name = $1;
+
+                    # The module is defined in the current file -- skip
+                    if (exists $self->{ref_vars}{$var_name}) {
+                        redo;
+                    }
+
+                    # The module was already included -- skip
+                    if (exists $Sidef::INCLUDED{$var_name}) {
+                        redo;
+                    }
+
+                    my @path     = split(/::/, $var_name);
+                    my $mod_path = File::Spec->catfile(@path[0 .. $#path - 1], $path[-1] . '.sm');
+
+                    $Sidef::INCLUDED{$var_name} = $mod_path;
+
+                    if (@{$self->{inc}} == 0) {
+                        state $y = require File::Basename;
+                        push @{$self->{inc}}, split(':', $ENV{SIDEF_INC}) if exists($ENV{SIDEF_INC});
+
+                        push @{$self->{inc}},
+                          File::Spec->catdir(File::Basename::dirname(Cwd::abs_path($0)), File::Spec->updir, 'share', 'sidef');
+
+                        if (-f $self->{script_name}) {
+                            push @{$self->{inc}}, File::Basename::dirname(Cwd::abs_path($self->{script_name}));
+                        }
+
+                        push @{$self->{inc}}, File::Spec->curdir;
+                    }
+
+                    my ($full_path, $found_module);
+                    foreach my $inc_dir (@{$self->{inc}}) {
+                        if (    -e ($full_path = File::Spec->catfile($inc_dir, $mod_path))
+                            and -f _
+                            and -r _ ) {
+                            $found_module = 1;
+                            last;
+                        }
+                    }
+
+                    $found_module // $self->fatal_error(
+                          code  => $_,
+                          pos   => pos($_),
+                          error => "can't find the module '${mod_path}' anywhere in ['" . join("', '", @{$self->{inc}}) . "']",
+                    );
+
+                    push @abs_filenames, [$full_path, $var_name];
+                }
+                else {
+
+                    my $orig_dir  = Cwd::getcwd();
+                    my $orig_file = Cwd::abs_path($self->{file_name});
+                    my $file_dir  = File::Basename::dirname($orig_file);
+
+                    my $chdired = 0;
+                    if ($orig_dir ne $file_dir) {
+                        if (chdir($file_dir)) {
+                            $chdired = 1;
+                        }
+                    }
+
+                    my $expr = do {
+                        my ($obj) = $self->parse_expr(code => $opt{code});
+                        $obj;
+                    };
+
+                    my @files = (
+                        ref($expr) eq 'HASH'
+                        ? do {
+                            map   { $_->{self} }
+                              map { @{$_->{self}->{$self->{class}}} }
+                              map { @{$expr->{$_}} }
+                              keys %{$expr};
+                          }
+                        : $expr
+                    );
+
+                    push @abs_filenames, map {
+                        my $filename = $_;
+
+                        if (index(ref($filename), 'Sidef::') == 0) {
+                            $filename = $filename->get_value;
+                        }
+
+                        ref($filename) ne ''
+                          and $self->fatal_error(
+                                  code  => $_,
+                                  pos   => pos($_),
+                                  error => 'include-error: invalid value of type "' . ref($filename) . '" (expected a string)',
+                          );
+
+                        my @files;
+                        foreach my $file (glob($filename)) {
+                            my $abs = Cwd::abs_path($file);
+
+                            if (!defined($abs) or $abs eq '') {
+                                $self->fatal_error(
+                                          code  => $_,
+                                          pos   => pos($_),
+                                          error => 'include-error: cannot resolve the absolute path to file <<' . $file . '>>',
+                                );
+                            }
+
+                            push @files, $abs;
+                        }
+
+                        foreach my $file (@files) {
+                            if (exists $Sidef::INCLUDED{$file}) {
+                                $self->fatal_error(
+                                                   code  => $_,
+                                                   pos   => pos($_),
+                                                   error => "include-error: circular inclusion of file: $file",
+                                                  );
+                            }
+                        }
+
+                        map { [$_] } @files
+                    } @files;
+
+                    if ($chdired) { chdir($orig_dir) }
+                }
+
+                my @included;
+
+                foreach my $pair (@abs_filenames) {
+
+                    my ($full_path, $name) = @{$pair};
+
+                    open(my $fh, '<:utf8', $full_path)
+                      || $self->fatal_error(
+                                            code  => $_,
+                                            pos   => pos($_),
+                                            error => "can't open file `$full_path`: $!"
+                                           );
+
+                    my $content = do { local $/; <$fh> };
+                    close $fh;
+
+                    next if $Sidef::INCLUDED{$full_path};
+
+                    local $self->{module}              = $name if defined $name;    # new namespace
+                    local $self->{line}                = 1;
+                    local $self->{file_name}           = $full_path;
+                    local $Sidef::INCLUDED{$full_path} = 1;
+
+                    my $ast = $self->parse_script(code => \$content);
+
+                    push @included,
+                      {
+                        name => $name,
+                        file => $full_path,
+                        ast  => $ast,
+                      };
+                }
+
+                return bless({included => \@included}, 'Sidef::Meta::Included');
+            }
+
             # Super-script power
             if (/\G([⁰¹²³⁴⁵⁶⁷⁸⁹]+)/gc) {
                 my $num = ($1 =~ tr/⁰¹²³⁴⁵⁶⁷⁸⁹/0-9/r);
@@ -2315,7 +2567,7 @@ package Sidef::Parser {
                 }
 
                 # Method call in functional style (deprecated -- use `::name()` instead)
-                if ($class eq $self->{class} and $len_var == length($name)) {
+                if ($len_var == length($name)) {
 
                     if ($self->{opt}{k}) {
                         print STDERR
@@ -3134,317 +3386,8 @@ package Sidef::Parser {
       MAIN: {
             $self->parse_whitespace(code => $opt{code});
 
-            # Module declaration
-            if (/\Gmodule\b\h*/gc) {
-                my $name =
-                  /\G($self->{var_name_re})\h*/goc
-                  ? $1
-                  : $self->fatal_error(
-                                       error  => "invalid module declaration",
-                                       reason => "expected a name",
-                                       code   => $_,
-                                       pos    => pos($_)
-                                      );
-
-                /\G\h*\{\h*/gc
-                  || $self->fatal_error(
-                                        error  => "invalid module declaration",
-                                        reason => "expected: module $name {...}",
-                                        code   => $_,
-                                        pos    => pos($_)
-                                       );
-
-                my $parser = __PACKAGE__->new(
-                                              opt         => $self->{opt},
-                                              file_name   => $self->{file_name},
-                                              script_name => $self->{script_name},
-                                             );
-                local $parser->{line}  = $self->{line};
-                local $parser->{class} = $name;
-                local $parser->{ref_vars}{$name} = $self->{ref_vars}{$name} if exists($self->{ref_vars}{$name});
-                local $parser->{_in_module}      = 1;
-                local $parser->{_parent}         = $self;
-
-                if ($name ne 'main' and not grep $_ eq $name, @Sidef::NAMESPACES) {
-                    if ($self->{_in_module}) {
-                        unshift @Sidef::NAMESPACES, $name;
-                    }
-                    else {
-                        push @Sidef::NAMESPACES, $name;
-                    }
-                }
-
-                my $data = {parser => $parser};
-                push @{$self->{_modules}{$name}}, $data;
-
-                my $code = '{' . substr($_, pos);
-                my ($struct, $pos) = $parser->parse_block(code => \$code);
-
-                pos($_) += pos($code) - 1;
-
-                $self->{line}   = $parser->{line};
-                $data->{struct} = $struct;
-
-                foreach my $class (keys %{$struct->{code}}) {
-                    push @{$struct{$class}}, @{$struct->{code}{$class}};
-                    if (exists $self->{ref_vars}{$class}) {
-                        unshift @{$self->{ref_vars}{$class}}, @{$parser->{ref_vars}{$class}[0]};
-                    }
-                    else {
-                        push @{$self->{ref_vars}{$class}},
-                          @{
-                              $#{$parser->{ref_vars}{$class}} == 0 && ref($parser->{ref_vars}{$class}[0]) eq 'ARRAY'
-                            ? $parser->{ref_vars}{$class}[0]
-                            : $parser->{ref_vars}{$class}
-                           };
-                    }
-                }
-
-                redo;
-            }
-
-            if (/\Gimport\b\h*/gc) {
-
-                my $var_names =
-                  $self->get_init_vars(code      => $opt{code},
-                                       with_vals => 0);
-
-                @{$var_names}
-                  || $self->fatal_error(
-                                        code  => $_,
-                                        pos   => (pos($_)),
-                                        error => "expected a variable-like name for importing!",
-                                       );
-
-                foreach my $var_name (@{$var_names}) {
-                    my ($name, $class) = $self->get_name_and_class($var_name);
-
-                    if ($class eq $self->{class}) {
-                        $self->fatal_error(
-                                           code  => $_,
-                                           pos   => pos($_),
-                                           error => "can't import '${class}::${name}' inside the same namespace",
-                                          );
-                    }
-
-                    my $var = $self->find_var($name, $class);
-
-                    if (not defined $var) {
-                        $self->fatal_error(
-                                           code  => $_,
-                                           pos   => pos($_),
-                                           error => "variable '${class}::${name}' hasn't been declared",
-                                          );
-                    }
-
-                    $var->{count}++;
-
-                    unshift @{$self->{vars}{$self->{class}}},
-                      {
-                        obj   => $var->{obj},
-                        name  => $name,
-                        count => 0,
-                        type  => $var->{type},
-                        line  => $self->{line},
-                      };
-                }
-
-                redo;
-            }
-
             if (/\G\@:([^\W\d]\w*+)/gc) {
                 push @{$struct{$self->{class}}}, {self => bless({name => $1}, 'Sidef::Variable::Label')};
-                redo;
-            }
-
-            if (/\Ginclude\b\h*/gc) {
-
-                state $x = do {
-                    require File::Spec;
-                    require Cwd;
-                };
-
-                my @abs_filenames;
-                if (/\G($self->{var_name_re})/gc) {
-                    my $var_name = $1;
-
-                    if (exists $self->{_parent}{_modules}{$var_name}) {
-
-                        foreach my $info (@{$self->{_parent}{_modules}{$var_name}}) {
-
-                            my $parser = $info->{parser};
-                            my $struct = $info->{struct};
-
-                            foreach my $class (keys %{$struct->{code}}) {
-                                push @{$self->{ref_vars}{$class}},
-                                  @{
-                                      $#{$parser->{ref_vars}{$class}} == 0 && ref($parser->{ref_vars}{$class}[0]) eq 'ARRAY'
-                                    ? $parser->{ref_vars}{$class}[0]
-                                    : $parser->{ref_vars}{$class}
-                                   };
-                            }
-                        }
-                        redo;
-                    }
-
-                    next if exists $Sidef::INCLUDED{$var_name};
-
-                    my @path     = split(/::/, $var_name);
-                    my $mod_path = File::Spec->catfile(@path[0 .. $#path - 1], $path[-1] . '.sm');
-
-                    $Sidef::INCLUDED{$var_name} = $mod_path;
-
-                    if (@{$self->{inc}} == 0) {
-                        state $y = require File::Basename;
-                        push @{$self->{inc}}, split(':', $ENV{SIDEF_INC}) if exists($ENV{SIDEF_INC});
-
-                        push @{$self->{inc}},
-                          File::Spec->catdir(File::Basename::dirname(Cwd::abs_path($0)), File::Spec->updir, 'share', 'sidef');
-
-                        if (-f $self->{script_name}) {
-                            push @{$self->{inc}}, File::Basename::dirname(Cwd::abs_path($self->{script_name}));
-                        }
-
-                        push @{$self->{inc}}, File::Spec->curdir;
-                    }
-
-                    my ($full_path, $found_module);
-                    foreach my $inc_dir (@{$self->{inc}}) {
-                        if (    -e ($full_path = File::Spec->catfile($inc_dir, $mod_path))
-                            and -f _
-                            and -r _ ) {
-                            $found_module = 1;
-                            last;
-                        }
-                    }
-
-                    $found_module // $self->fatal_error(
-                          code  => $_,
-                          pos   => pos($_),
-                          error => "can't find the module '${mod_path}' anywhere in ['" . join("', '", @{$self->{inc}}) . "']",
-                    );
-
-                    push @abs_filenames, [$full_path, $var_name];
-                }
-                else {
-
-                    my $orig_dir  = Cwd::getcwd();
-                    my $orig_file = Cwd::abs_path($self->{file_name});
-                    my $file_dir  = File::Basename::dirname($orig_file);
-
-                    my $chdired = 0;
-                    if ($orig_dir ne $file_dir) {
-                        if (chdir($file_dir)) {
-                            $chdired = 1;
-                        }
-                    }
-
-                    my $expr = do {
-                        my ($obj) = $self->parse_expr(code => $opt{code});
-                        $obj;
-                    };
-
-                    my @files = (
-                        ref($expr) eq 'HASH'
-                        ? do {
-                            map   { $_->{self} }
-                              map { @{$_->{self}->{$self->{class}}} }
-                              map { @{$expr->{$_}} }
-                              keys %{$expr};
-                          }
-                        : $expr
-                    );
-
-                    push @abs_filenames, map {
-                        my $filename = $_;
-
-                        if (index(ref($filename), 'Sidef::') == 0) {
-                            $filename = $filename->get_value;
-                        }
-
-                        ref($filename) ne ''
-                          and $self->fatal_error(
-                                  code  => $_,
-                                  pos   => pos($_),
-                                  error => 'include-error: invalid value of type "' . ref($filename) . '" (expected a string)',
-                          );
-
-                        my @files;
-                        foreach my $file (glob($filename)) {
-                            my $abs = Cwd::abs_path($file);
-
-                            if (!defined($abs) or $abs eq '') {
-                                $self->fatal_error(
-                                          code  => $_,
-                                          pos   => pos($_),
-                                          error => 'include-error: cannot resolve the absolute path to file <<' . $file . '>>',
-                                );
-                            }
-
-                            push @files, $abs;
-                        }
-
-                        foreach my $file (@files) {
-                            if (exists $Sidef::INCLUDED{$file}) {
-                                $self->fatal_error(
-                                                   code  => $_,
-                                                   pos   => pos($_),
-                                                   error => "include-error: circular inclusion of file: $file",
-                                                  );
-                            }
-                        }
-
-                        map { [$_] } @files
-                    } @files;
-
-                    if ($chdired) { chdir($orig_dir) }
-                }
-
-                foreach my $pair (@abs_filenames) {
-
-                    my ($full_path, $name) = @{$pair};
-
-                    open(my $fh, '<:utf8', $full_path)
-                      || $self->fatal_error(
-                                            code  => $_,
-                                            pos   => pos($_),
-                                            error => "can't open file `$full_path`: $!"
-                                           );
-
-                    my $content = do { local $/; <$fh> };
-                    close $fh;
-
-                    local $Sidef::INCLUDED{$full_path} = 1;
-                    my $parser = defined($name) ? __PACKAGE__->new() : $self;
-
-                    local $parser->{opt}         = $self->{opt};
-                    local $parser->{script_name} = $self->{script_name};
-                    local $parser->{file_name}   = $full_path;
-                    local $parser->{class}       = $name if defined $name;
-                    local $parser->{line}        = 1;
-
-                    if (defined($name) and $name ne 'main' and not grep $_ eq $name, @Sidef::NAMESPACES) {
-                        if ($self->{_in_module}) {
-                            unshift @Sidef::NAMESPACES, $name;
-                        }
-                        else {
-                            push @Sidef::NAMESPACES, $name;
-                        }
-                    }
-                    my $struct = $parser->parse_script(code => \$content);
-
-                    foreach my $class (keys %{$struct}) {
-                        if (defined $name) {
-                            $struct{$class} = $struct->{$class};
-                            $self->{ref_vars}{$class} = $parser->{ref_vars}{$class};
-                        }
-                        else {
-                            push @{$struct{$class}}, @{$struct->{$class}};
-                            unshift @{$self->{ref_vars}{$class}}, @{$parser->{ref_vars}{$class}};
-                        }
-                    }
-                }
-
                 redo;
             }
 

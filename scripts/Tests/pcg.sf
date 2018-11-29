@@ -13,7 +13,7 @@ func pcg32(rng) {
     rng.state = (oldstate * 6364136223846793005 + (rng.inc | 1))
     var xorshifted = (((oldstate >> 18) ^ oldstate) >> 27)
     var rot = (oldstate >> 59)
-    (xorshifted >> rot) | (xorshifted << ((-rot) & 31))
+    (xorshifted >> (rot & 31)) | (xorshifted << ((-rot) & 31))
 }
 
 var rng = PCG32(42, 3)

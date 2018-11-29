@@ -1,0 +1,19 @@
+#!/usr/bin/ruby
+
+var bar = "this is bar"
+
+module Foo {
+    var x = 42
+    var y = 99
+
+    assert_eq(main::bar, "this is bar")
+    assert_eq(x, 42)
+    assert_eq(y, 99)
+}
+
+assert_eq(bar, "this is bar")
+assert_eq(main::bar, "this is bar")
+assert_eq(Foo::x, 42)
+assert_eq(Foo::y, 99)
+
+say "** Test passed!"

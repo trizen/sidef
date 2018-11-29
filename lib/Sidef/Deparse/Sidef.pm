@@ -233,14 +233,7 @@ package Sidef::Deparse::Sidef {
                       : (($obj->{class} ne $self->{class} ? $obj->{class} . '::' : '') . $obj->{name});
                 }
                 else {
-                    my $block     = $obj->{value};
-                    my $in_module = $obj->{class} ne $self->{class};
-
-                    if ($in_module) {
-                        $code = "module $obj->{class} {\n";
-                        $Sidef::SPACES += $Sidef::SPACES_INCR;
-                        $code .= ' ' x $Sidef::SPACES;
-                    }
+                    my $block = $obj->{value};
 
                     $code .= $obj->{type} . ' ' . $obj->{name};
                     local $self->{class} = $obj->{class};
@@ -260,11 +253,6 @@ package Sidef::Deparse::Sidef {
 
                     $code .= $self->deparse_expr({self => $block});
                     $block->{init_vars} = $var_obj;
-
-                    if ($in_module) {
-                        $code .= "\n}";
-                        $Sidef::SPACES -= $Sidef::SPACES_INCR;
-                    }
                 }
             }
         }
@@ -369,14 +357,7 @@ package Sidef::Deparse::Sidef {
                         );
             }
             else {
-                my $block     = $obj->{block};
-                my $in_module = $obj->{class} ne $self->{class};
-
-                if ($in_module) {
-                    $code = "module $obj->{class} {\n";
-                    $Sidef::SPACES += $Sidef::SPACES_INCR;
-                    $code .= ' ' x $Sidef::SPACES;
-                }
+                my $block = $obj->{block};
 
                 local $self->{class} = $obj->{class};
                 my $name = $self->_dump_class_name($obj->{name});
@@ -389,11 +370,6 @@ package Sidef::Deparse::Sidef {
                     }
                 }
                 $code .= $self->deparse_expr({self => $block});
-
-                if ($in_module) {
-                    $code .= "\n}";
-                    $Sidef::SPACES -= $Sidef::SPACES_INCR;
-                }
             }
         }
         elsif ($ref eq 'Sidef::Types::Block::BlockInit') {
@@ -456,6 +432,26 @@ package Sidef::Deparse::Sidef {
         }
         elsif ($ref eq 'Sidef::Meta::Warning') {
             $code = 'warn' . $self->deparse_args($obj->{arg});
+        }
+        elsif ($ref eq 'Sidef::Meta::Module') {
+            local $self->{class} = $obj->{name};
+            $code = "module $obj->{name} " . $self->deparse_bare_block($obj->{block}{code});
+        }
+        elsif ($ref eq 'Sidef::Meta::Included') {
+
+            my @statements;
+            foreach my $info (@{$obj->{included}}) {
+
+                if ($info->{name} ne '') {    # create a new namespace
+                    local $self->{class} = $info->{name};
+                    push @statements, "module $info->{name} " . $self->deparse_bare_block($info->{ast});
+                }
+                else {                        # included in the current namespace
+                    push @statements, join(";\n", $self->deparse_script($info->{ast}));
+                }
+            }
+
+            $code = join(";\n", @statements);
         }
         elsif ($ref eq 'Sidef::Eval::Eval') {
             $code = 'eval' . $self->deparse_args($obj->{expr});
@@ -683,18 +679,10 @@ package Sidef::Deparse::Sidef {
         my ($self, $struct) = @_;
 
         my @results;
-        foreach my $class (grep exists $struct->{$_}, @{$self->{namespaces}}, 'main') {
-            my $in_module = $class ne $self->{class};
-            local $self->{class} = $class;
+        foreach my $class (keys %$struct) {
             foreach my $i (0 .. $#{$struct->{$class}}) {
                 my $expr = $struct->{$class}[$i];
                 push @results, ref($expr) eq 'HASH' ? $self->deparse_expr($expr) : $self->deparse_expr({self => $expr});
-            }
-            if ($in_module) {
-                my $spaces = " " x $Sidef::SPACES_INCR;
-                s/^/$spaces/gm for @results;
-                $results[0] = "module $class {\n" . $results[0];
-                $results[-1] .= "\n}";
             }
         }
 
@@ -704,7 +692,7 @@ package Sidef::Deparse::Sidef {
     sub deparse {
         my ($self, $struct) = @_;
         my @statements = $self->deparse_script($struct);
-        $self->{before} . join($self->{between}, @statements) . $self->{after};
+        $self->{before} . join($self->{between}, grep { $_ ne '' } @statements) . $self->{after};
     }
 };
 

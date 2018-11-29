@@ -1399,6 +1399,14 @@ HEADER
         elsif ($ref eq 'Sidef::Sys::Sys') {
             $code = $self->make_constant($ref, 'new', "Sys$refaddr");
         }
+        elsif ($ref eq 'Sidef::Meta::Module') {
+            $code = substr($self->deparse_bare_block($obj->{block}{code}), 1, -1);
+        }
+        elsif ($ref eq 'Sidef::Meta::Included') {
+            foreach my $info (@{$obj->{included}}) {
+                $code .= join(';', $self->deparse_script($info->{ast})) . ';';
+            }
+        }
         elsif ($ref eq 'Sidef::Meta::Assert') {
             my @args = $self->deparse_script($obj->{arg});
 
@@ -1759,7 +1767,7 @@ HEADER
 
         my @results;
 
-        foreach my $class (grep exists $struct->{$_}, @{$self->{namespaces}}, 'main') {
+        foreach my $class (keys %$struct) {
 
             my $max = $#{$struct->{$class}};
             foreach my $i (0 .. $max) {

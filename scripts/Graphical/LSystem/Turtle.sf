@@ -1,6 +1,6 @@
 #!/usr/bin/ruby
 
-require('Image::Magick');
+require('Image::Magick')
 
 class Turtle(
     x      = 500,

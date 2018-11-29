@@ -8,7 +8,7 @@ var rules = Hash(
     c => '-aE++bE[+++cE++dE]-',
     d => '--cE++++aE[+dE++++bE]--bE',
     E => '',
-);
+)
 
 var lsys = LSystem(
     width:  1000,
@@ -21,6 +21,6 @@ var lsys = LSystem(
     len:   40,
     angle: 36,
     color: 'dark blue',
-);
+)
 
-lsys.execute('[b]++[b]++[b]++[b]++[b]', 5, "complex.png", rules);
+lsys.execute('[b]++[b]++[b]++[b]++[b]', 5, "penrose_tiling.png", rules)

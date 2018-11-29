@@ -9369,9 +9369,53 @@ package Sidef::Types::Number::Number {
     *Liouville = \&liouville;
 
     sub big_omega {
-        my $n = &_big2uistr // goto &nan;
-        $n eq '0' and return ZERO;
-        __PACKAGE__->_set_uint(scalar Math::Prime::Util::GMP::factor($n));
+        my ($n, $m) = @_;
+
+        if (defined($m)) {
+            _valid(\$m);
+            $m = _any2ui($$m) // goto &nan;
+        }
+        else {
+            $m = 0;
+        }
+
+        my $nstr = _big2uistr($n) // goto &nan;
+        $nstr eq '0' and return ZERO;
+
+        my @factors = Math::Prime::Util::GMP::factor($nstr);
+
+        if ($m == 0) {
+            return __PACKAGE__->_set_uint(scalar @factors);
+        }
+
+        # bigomega_m(n) = n^m * Sum_{p^k|n} k/p^m
+
+        my %factors;
+        ++$factors{$_} for @factors;
+
+        my $t  = Math::GMPz::Rmpz_init();
+        my $nm = Math::GMPz::Rmpz_init_set_str($nstr, 10);
+
+        Math::GMPz::Rmpz_pow_ui($nm, $nm, $m) if $m > 1;
+
+        my $sum = Math::GMPz::Rmpz_init_set_ui(0);
+
+        while (my ($p, $k) = each %factors) {
+
+            if ($p < ULONG_MAX) {
+                Math::GMPz::Rmpz_ui_pow_ui($t, $p, $m);
+            }
+            else {
+                Math::GMPz::Rmpz_set_str($t, $p, 10);
+                Math::GMPz::Rmpz_pow_ui($t, $t, $m);
+            }
+
+            Math::GMPz::Rmpz_divexact($t, $nm, $t);
+            Math::GMPz::Rmpz_mul_ui($t, $t, $k);
+            Math::GMPz::Rmpz_add($sum, $sum, $t);
+        }
+
+        bless \$sum;
     }
 
     *Omega              = \&big_omega;
@@ -9379,10 +9423,50 @@ package Sidef::Types::Number::Number {
     *prime_power_sigma0 = \&big_omega;
 
     sub omega {
+        my ($n, $m) = @_;
+
+        if (defined($m)) {
+            _valid(\$m);
+            $m = _any2ui($$m) // goto &nan;
+        }
+        else {
+            $m = 0;
+        }
+
+        my $nstr = _big2uistr($n) // goto &nan;
+
         my %factors;
-        @factors{Math::Prime::Util::GMP::factor(&_big2uistr // goto &nan)} = ();
+        @factors{Math::Prime::Util::GMP::factor($nstr)} = ();
         exists($factors{'0'}) and return ZERO;
-        __PACKAGE__->_set_uint(scalar keys %factors);
+
+        if ($m == 0) {
+            return __PACKAGE__->_set_uint(scalar keys %factors);
+        }
+
+        # omega_m(n) = n^m * Sum_{p|n} 1/p^m
+
+        my $t  = Math::GMPz::Rmpz_init();
+        my $nm = Math::GMPz::Rmpz_init_set_str($nstr, 10);
+
+        Math::GMPz::Rmpz_pow_ui($nm, $nm, $m) if $m > 1;
+
+        my $sum = Math::GMPz::Rmpz_init_set_ui(0);
+
+        foreach my $p (keys %factors) {
+
+            if ($p < ULONG_MAX) {
+                Math::GMPz::Rmpz_ui_pow_ui($t, $p, $m);
+            }
+            else {
+                Math::GMPz::Rmpz_set_str($t, $p, 10);
+                Math::GMPz::Rmpz_pow_ui($t, $t, $m);
+            }
+
+            Math::GMPz::Rmpz_divexact($t, $nm, $t);
+            Math::GMPz::Rmpz_add($sum, $sum, $t);
+        }
+
+        bless \$sum;
     }
 
     *prime_sigma0        = \&omega;
@@ -9891,6 +9975,14 @@ package Sidef::Types::Number::Number {
         my $s = Math::Prime::Util::GMP::sigma($n, $k);
         $s < ULONG_MAX ? __PACKAGE__->_set_uint($s) : __PACKAGE__->_set_str('int', $s);
     }
+
+    sub sopfr {    # https://oeis.org/A001414
+        my ($n) = @_;
+        my $s = Math::Prime::Util::GMP::vecsum(Math::Prime::Util::GMP::factor(_big2uistr($n) // goto &nan));
+        $s < ULONG_MAX ? __PACKAGE__->_set_uint($s) : __PACKAGE__->_set_str('int', $s);
+    }
+
+    *factor_sum = \&sopfr;
 
     sub partitions {
         my $n = Math::Prime::Util::GMP::partitions(&_big2uistr // goto &nan);

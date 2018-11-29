@@ -51,9 +51,9 @@ foreach my $sidef_script (@scripts) {
     is(ref($ast), 'HASH', $sidef_script);
 
     my $optimizer = Sidef::Optimizer->new();
-    my $oast      = $optimizer->optimize($ast);
+    my %oast      = $optimizer->optimize($ast);
 
-    my $code = $sidef->compile_ast($oast, 'Perl');
+    my $code = $sidef->compile_ast(\%oast, 'Perl');
 
     ok($code ne '', $sidef_script);
 

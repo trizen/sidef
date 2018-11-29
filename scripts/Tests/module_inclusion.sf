@@ -60,14 +60,14 @@ module Qux {
 assert_eq(hi, 'hello')
 assert_eq(zz, 'world')
 
-module Baz {    # re-opened before Qux
+module Baz {    # Foo::* vars modified by Qux
     include Foo
 
     import Foo::hi
     import Foo::zz
 
-    assert_eq(hi, 1234)
-    assert_eq(zz, 8)
+    assert_eq(hi, 1)
+    assert_eq(zz, 2)
 }
 
 assert_eq(hi, 'hello')
