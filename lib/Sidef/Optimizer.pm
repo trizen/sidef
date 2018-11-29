@@ -922,6 +922,9 @@ package Sidef::Optimizer {
         elsif ($ref eq 'Sidef::Meta::Assert') {
             $obj->{arg} = {$self->optimize($obj->{arg})};
         }
+        elsif ($ref eq 'Sidef::Meta::Module') {
+            $obj->{block}{code} = {$self->optimize($obj->{block}{code})};
+        }
 
         if (not exists($expr->{ind}) and not exists($expr->{call})) {
             return (ref($obj) eq 'HASH' ? {self => $obj} : $obj);

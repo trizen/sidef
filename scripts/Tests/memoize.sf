@@ -14,8 +14,9 @@ func fib(n) {
 memoize(fib);     # memoize the fib function
 
 module Baz {
+    say (31 |> main::fib)
     import main::fib
-    say main::fib(12)
+    say (32 |> fib)
 }
 
-say fib(30);
+say fib(33);
