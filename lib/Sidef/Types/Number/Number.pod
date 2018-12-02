@@ -2800,6 +2800,14 @@ Return the
 
 =cut
 
+=head2 prime_power_count
+
+Number.prime_power_count() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 prime_power_divisors
 
 Number.prime_power_divisors() -> I<Obj>
@@ -3175,6 +3183,16 @@ Return the
 Number.solve_pell() -> I<Obj>
 
 Return the
+
+=cut
+
+=head2 sopfr
+
+Number.sopfr() -> I<Obj>
+
+Return the
+
+Aliases: I<factor_sum>
 
 =cut
 

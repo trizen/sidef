@@ -912,6 +912,14 @@ Aliases: I<rstrip>, I<trim_end>, I<strip_end>, I<trim_right>, I<strip_right>
 
 =cut
 
+=head2 run
+
+String.run() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 scan
 
 String.scan() -> I<Obj>

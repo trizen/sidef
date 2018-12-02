@@ -8000,6 +8000,106 @@ package Sidef::Types::Number::Number {
 
     *primepi_upper = \&prime_count_upper;
 
+    sub prime_power_count {
+        my ($x, $y) = @_;
+
+        if (defined($y)) {
+            _valid(\$y);
+            $x = _big2istr($x) // return ZERO;
+            $x = 2 if $x < 2;
+            $y = _big2uistr($y) // return ZERO;
+        }
+        else {
+            $y = _big2uistr($x) // return ZERO;
+            $x = 2;
+        }
+
+        # Support for large integers (slow for wide ranges)
+        if ($y >= ULONG_MAX) {
+
+            $x = Math::GMPz::Rmpz_init_set_str("$x", 10);
+            $y = Math::GMPz::Rmpz_init_set_str("$y", 10);
+
+            my $count = 0;
+
+            for (; Math::GMPz::Rmpz_cmp($x, $y) <= 0 ; Math::GMPz::Rmpz_add_ui($x, $x, 1)) {
+                ++$count if Math::Prime::Util::GMP::is_prime_power(Math::GMPz::Rmpz_get_str($x, 10));
+            }
+
+            return __PACKAGE__->_set_uint($count);
+        }
+
+        return ZERO if ($y < $x);
+
+#<<<
+        state $pp_table = [ 0,  0,  1,  2,  3,  4,  4,  5,  6,  7,  7,  8,  8,  9,  9,  9, 10, 11, 11, 12, 12,
+                           12, 12, 13, 13, 14, 14, 15, 15, 16, 16, 17, 18, 18, 18, 18, 18, 19, 19, 19, 19, 20,
+                           20, 21, 21, 21, 21, 22, 22, 23, 23, 23, 23, 24, 24, 24, 24, 24, 24, 25, 25, 26, 26,
+                           26, 27, 27, 27, 28, 28, 28, 28, 29, 29, 30, 30, 30, 30, 30, 30, 31, 31, 32, 32, 33,
+                           33, 33, 33, 33, 33, 34, 34, 34, 34, 34, 34, 34, 34, 35, 35, 35, 35];
+
+        state $pi_table = [ 0,  0,  1,  2,  2,  3,  3,  4,  4,  4,  4,  5,  5,  6,  6,  6,  6,  7,  7,  8,  8,  8,
+                            8,  9,  9,  9,  9,  9,  9, 10, 10, 11, 11, 11, 11, 11, 11, 12, 12, 12, 12, 13, 13, 14,
+                           14, 14, 14, 15, 15, 15, 15, 15, 15, 16, 16, 16, 16, 16, 16, 17, 17, 18, 18, 18, 18, 18,
+                           18, 19, 19, 19, 19, 20, 20, 21, 21, 21, 21, 21, 21, 22, 22, 22, 22, 23, 23, 23, 23, 23,
+                           23, 24, 24, 24, 24, 24, 24, 24, 24, 25, 25, 25, 25];
+#>>>
+
+        # Optimization for narrow ranges
+        if ($y - $x <= 100 or "$x" / "$y" >= 0.999) {
+
+            if ($x <= 2 and $y <= 100) {
+                return __PACKAGE__->_set_uint($pp_table->[$y]);
+            }
+
+            my $count = 0;
+
+            for (; $x <= $y ; ++$x) {
+                ++$count if Math::Prime::Util::GMP::is_prime_power($x);
+            }
+
+            return ZERO if ($count == 0);
+            return ONE  if ($count == 1);
+
+            return __PACKAGE__->_set_uint($count);
+        }
+
+        state $t = bless \Math::GMPz::Rmpz_init();
+
+        my $pp_count = sub {
+            my ($n) = @_;
+
+            return $pp_table->[$n] if $n <= 100;
+
+            my $count = 0;
+
+            foreach my $k (1 .. Math::Prime::Util::GMP::logint($n, 2)) {
+                my $r = Math::Prime::Util::GMP::rootint($n, $k);
+
+                if ($r <= 100) {
+                    $count += $pi_table->[$r];
+                }
+                else {
+                    Math::GMPz::Rmpz_set_ui($$t, $r);
+                    $count += Math::GMPz::Rmpz_get_ui(${$t->prime_count});
+                }
+            }
+
+            $count;
+        };
+
+        my $x_pp_count = ($x == 2 ? 1 : $pp_count->($x));
+        my $y_pp_count = $pp_count->($y);
+
+        my $count = $y_pp_count - $x_pp_count;
+
+        if ($x == 2 or Math::Prime::Util::GMP::is_prime_power($x)) {
+            ++$count;
+        }
+
+        __PACKAGE__->_set_uint($count);
+    }
+
     sub nth_prime {
         my ($n) = @_;
 

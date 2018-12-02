@@ -815,6 +815,7 @@ scripts/Tests/module_inclusion_3.sf
 scripts/Tests/module_loading.sf
 scripts/Tests/modules_simple_test.sf
 scripts/Tests/modules_test_1.sf
+scripts/Tests/modules_test_2.sf
 scripts/Tests/modulo.sf
 scripts/Tests/multi_file_edit.sf
 scripts/Tests/multi_functions.sf

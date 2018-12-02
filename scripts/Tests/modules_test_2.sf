@@ -1,0 +1,13 @@
+#!/usr/bin/ruby
+
+var foo = 42
+
+module Bar {
+    import main::foo
+    var baz = 2*foo
+}
+
+import Bar::baz
+assert_eq(baz, 84)
+
+say "** Test passed!"

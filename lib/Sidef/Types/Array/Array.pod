@@ -910,6 +910,16 @@ Aliases: I<indices_by>
 
 =cut
 
+=head2 keys_of
+
+Array.keys_of() -> I<Obj>
+
+Return the
+
+Aliases: I<indices_of>
+
+=cut
+
 =head2 kv
 
 Array.kv() -> I<Obj>
