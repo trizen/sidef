@@ -9487,6 +9487,9 @@ package Sidef::Types::Number::Number {
     sub dedekind_psi {
         my ($n, $k) = @_;
 
+        # Multiplicative with:
+        #   a(p^e, k) = p^(k*e) + p^(k*e - k)
+
         if (defined($k)) {
             _valid(\$k);
             $k = _any2ui($$k) // goto &nan;
@@ -9495,25 +9498,33 @@ package Sidef::Types::Number::Number {
             $k = 1;
         }
 
-        my $nstr = _big2uistr($n) // goto &nan;
+        return $n->usigma0 if ($k == 0);
 
-        my $t = Math::Prime::Util::GMP::jordan_totient(2 * $k, $nstr);
-        my $u = Math::Prime::Util::GMP::jordan_totient($k,     $nstr);
+        my %factors;
+        ++$factors{$_} for Math::Prime::Util::GMP::factor(_big2uistr($n) // goto &nan);
 
-        $u eq '0' and return ZERO;
+        exists($factors{'0'}) and return ZERO;
 
-        my $r = (
-                 $t < ULONG_MAX
-                 ? Math::GMPz::Rmpz_init_set_ui($t)
-                 : Math::GMPz::Rmpz_init_set_str("$t", 10)
-                );
+        my $t = Math::GMPz::Rmpz_init();
+        my $u = Math::GMPz::Rmpz_init();
 
-        if ($u < ULONG_MAX) {
-            Math::GMPz::Rmpz_divexact_ui($r, $r, $u);
-        }
-        else {
-            $u = Math::GMPz::Rmpz_init_set_str("$u", 10);
-            Math::GMPz::Rmpz_divexact($r, $r, $u);
+        my $r = Math::GMPz::Rmpz_init_set_ui(1);
+
+        while (my ($p, $e) = each %factors) {
+
+            if ($p < ULONG_MAX) {
+                Math::GMPz::Rmpz_ui_pow_ui($t, $p, $k * $e);
+                Math::GMPz::Rmpz_ui_pow_ui($u, $p, $k * $e - $k);
+            }
+            else {
+                Math::GMPz::Rmpz_set_str($t, "$p", 10);
+                Math::GMPz::Rmpz_set_str($u, "$p", 10);
+                Math::GMPz::Rmpz_pow_ui($t, $t, $k * $e);
+                Math::GMPz::Rmpz_pow_ui($u, $u, $k * $e - $k);
+            }
+
+            Math::GMPz::Rmpz_add($t, $t, $u);
+            Math::GMPz::Rmpz_mul($r, $r, $t);
         }
 
         bless \$r;
