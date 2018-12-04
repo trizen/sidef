@@ -9505,12 +9505,26 @@ package Sidef::Types::Number::Number {
 
         exists($factors{'0'}) and return ZERO;
 
-        my $t = Math::GMPz::Rmpz_init();
-        my $u = Math::GMPz::Rmpz_init();
+        state $t = Math::GMPz::Rmpz_init_nobless();
+        state $u = Math::GMPz::Rmpz_init_nobless();
 
         my $r = Math::GMPz::Rmpz_init_set_ui(1);
 
         while (my ($p, $e) = each %factors) {
+
+            if ($e == 1) {
+                if ($p < ULONG_MAX) {
+                    Math::GMPz::Rmpz_ui_pow_ui($t, $p, $k);
+                }
+                else {
+                    Math::GMPz::Rmpz_set_str($t, "$p", 10);
+                    Math::GMPz::Rmpz_pow_ui($t, $t, $k) if ($k > 1);
+                }
+
+                Math::GMPz::Rmpz_add_ui($t, $t, 1);
+                Math::GMPz::Rmpz_mul($r, $r, $t);
+                next;
+            }
 
             if ($p < ULONG_MAX) {
                 Math::GMPz::Rmpz_ui_pow_ui($t, $p, $k * $e);
