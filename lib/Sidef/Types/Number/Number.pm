@@ -9518,7 +9518,7 @@ package Sidef::Types::Number::Number {
             }
             else {
                 Math::GMPz::Rmpz_set_str($t, "$p", 10);
-                Math::GMPz::Rmpz_set_str($u, "$p", 10);
+                Math::GMPz::Rmpz_set($u, $t);
                 Math::GMPz::Rmpz_pow_ui($t, $t, $k * $e);
                 Math::GMPz::Rmpz_pow_ui($u, $u, $k * $e - $k);
             }
