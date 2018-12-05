@@ -9528,13 +9528,13 @@ package Sidef::Types::Number::Number {
 
             if ($p < ULONG_MAX) {
                 Math::GMPz::Rmpz_ui_pow_ui($t, $p, $k * $e);
-                Math::GMPz::Rmpz_ui_pow_ui($u, $p, $k * $e - $k);
+                Math::GMPz::Rmpz_ui_pow_ui($u, $p, $k * ($e - 1));
             }
             else {
                 Math::GMPz::Rmpz_set_str($t, "$p", 10);
                 Math::GMPz::Rmpz_set($u, $t);
                 Math::GMPz::Rmpz_pow_ui($t, $t, $k * $e);
-                Math::GMPz::Rmpz_pow_ui($u, $u, $k * $e - $k);
+                Math::GMPz::Rmpz_pow_ui($u, $u, $k * ($e - 1));
             }
 
             Math::GMPz::Rmpz_add($t, $t, $u);
@@ -10670,6 +10670,57 @@ package Sidef::Types::Number::Number {
 
         bless \$r;
     }
+
+    #
+    ## Polygonal inverses for a given number
+    #
+
+    sub polygonal_inverse {
+        my ($n) = @_;
+
+        $n = _any2mpz($$n) // return Sidef::Types::Array::Array->new;
+        Math::GMPz::Rmpz_sgn($n) > 0 or return Sidef::Types::Array::Array->new;
+
+        state $t = Math::GMPz::Rmpz_init_nobless();
+        state $u = Math::GMPz::Rmpz_init_nobless();
+        state $v = Math::GMPz::Rmpz_init_nobless();
+
+        Math::GMPz::Rmpz_mul_2exp($t, $n, 1);
+
+        my @divisors = Math::Prime::Util::GMP::divisors(Math::GMPz::Rmpz_get_str($t, 10));
+
+        shift @divisors;
+        pop @divisors;
+
+        my @inverses;
+
+        foreach my $divisor (@divisors) {
+
+            ($divisor < ULONG_MAX)
+              ? Math::GMPz::Rmpz_set_ui($u, $divisor)
+              : Math::GMPz::Rmpz_set_str($u, "$divisor", 10);
+
+            Math::GMPz::Rmpz_divexact($v, $t, $u);
+            Math::GMPz::Rmpz_addmul_ui($v, $u, 2);
+            Math::GMPz::Rmpz_sub_ui($v, $v, 4);
+            Math::GMPz::Rmpz_sub_ui($u, $u, 1);
+
+            if (Math::GMPz::Rmpz_divisible_p($v, $u)) {
+
+                my $r = Math::GMPz::Rmpz_init_set($u);
+                my $i = Math::GMPz::Rmpz_init();
+
+                Math::GMPz::Rmpz_add_ui($r, $r, 1);
+                Math::GMPz::Rmpz_divexact($i, $v, $u);
+
+                push @inverses, Sidef::Types::Array::Array->new([(bless \$r), (bless \$i)]);
+            }
+        }
+
+        Sidef::Types::Array::Array->new(\@inverses);
+    }
+
+    *inverse_polygonal = \&polygonal_inverse;
 
     #
     ## k-gonal root of `n`
