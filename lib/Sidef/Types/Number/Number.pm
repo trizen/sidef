@@ -8193,12 +8193,12 @@ package Sidef::Types::Number::Number {
             return ONE;    # not a prime, but it's convenient...
         }
 
-        if ($HAS_PRIME_UTIL) {
-            my $p = Math::Prime::Util::nth_prime($n);
-            return ($p < ULONG_MAX ? __PACKAGE__->_set_uint("$p") : __PACKAGE__->_set_str('int', "$p"));
-        }
-
         if ($n > 100_000) {
+
+            if ($HAS_PRIME_UTIL) {
+                my $p = Math::Prime::Util::nth_prime($n);
+                return ($p < ULONG_MAX ? __PACKAGE__->_set_uint("$p") : __PACKAGE__->_set_str('int', "$p"));
+            }
 
             my ($i, $count) = _prime_count_checkpoint($n, 1);
 
@@ -9466,18 +9466,17 @@ package Sidef::Types::Number::Number {
             return Sidef::Types::Array::Array->new;
         }
 
+#<<<
         if ($HAS_PRIME_UTIL) {
-            return Sidef::Types::Array::Array->new(
-                [
-                 map {
-
-                     ref($_) eq 'Math::GMPz'
-                       ? (bless \$_)
-                       : __PACKAGE__->_set_uint($_)
-                 } Math::Prime::Util::inverse_totient($n)
-                ]
-            );
+            return Sidef::Types::Array::Array->new([
+                map {
+                    ref($_) eq 'Math::GMPz'
+                        ? (bless \$_)
+                        : __PACKAGE__->_set_uint($_)
+                } Math::Prime::Util::inverse_totient($n)
+            ]);
         }
+#>>>
 
         my $u = Math::GMPz::Rmpz_init();
         my $v = Math::GMPz::Rmpz_init();
