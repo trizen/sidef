@@ -1574,6 +1574,24 @@ Aliases: I<polygonal_inverse>
 
 =cut
 
+=head2 inverse_totient
+
+Number.inverse_totient() -> I<Obj>
+
+Return the
+
+Aliases: I<inverse_euler_phi>
+
+=cut
+
+=head2 inverse_totient_len
+
+Number.inverse_totient_len() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 invmod
 
 Number.invmod() -> I<Obj>
@@ -1581,16 +1599,6 @@ Number.invmod() -> I<Obj>
 Return the
 
 Aliases: I<modinv>
-
-=cut
-
-=head2 inv_totient
-
-Number.inv_totient() -> I<Obj>
-
-Return the
-
-Aliases: I<inv_euler_phi>, I<inverse_totient>, I<inverse_euler_phi>
 
 =cut
 
@@ -2873,6 +2881,16 @@ Return the
 Number.prime_sigma() -> I<Obj>
 
 Return the
+
+=cut
+
+=head2 primes_sum
+
+Number.primes_sum() -> I<Obj>
+
+Return the
+
+Aliases: I<sum_primes>
 
 =cut
 

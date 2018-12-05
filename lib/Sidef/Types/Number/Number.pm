@@ -29,6 +29,8 @@ package Sidef::Types::Number::Number {
     state $ZERO = Math::GMPz::Rmpz_init_set_ui(0);
     state $MONE = Math::GMPz::Rmpz_init_set_si(-1);
 
+    state $HAS_PRIME_UTIL = eval { require Math::Prime::Util; 1 };
+
 #<<<
     use constant {
           ONE  => bless(\$ONE),
@@ -6608,10 +6610,10 @@ package Sidef::Types::Number::Number {
     *RamanujanTau = \&ramanujan_tau;
 
     sub ramanujan_sum {
-        my ($k, $n) = @_;
+        my ($n, $k) = @_;
 
         #
-        ## ramanujan_sum(k, n) = μ(k/gcd(n, k)) * φ(k) / φ(k/gcd(n, k))
+        ## c_k(n) = μ(k/gcd(n, k)) * φ(k) / φ(k/gcd(n, k))
         #
 
         _valid(\$k);
@@ -7701,6 +7703,14 @@ package Sidef::Types::Number::Number {
             return ($r >= 0 ? __PACKAGE__->_set_uint($r) : __PACKAGE__->_set_int($r));
         }
 
+        if ($HAS_PRIME_UTIL) {
+
+            my $M_x = Math::Prime::Util::mertens($x);
+            my $M_y = Math::Prime::Util::mertens($y);
+
+            return __PACKAGE__->_set_int($M_y - $M_x + Math::Prime::Util::moebius($x));
+        }
+
 #<<<
         my $u  = Math::Prime::Util::GMP::sqrtint($y);
         my @mu = (0, Math::Prime::Util::GMP::moebius(1, $u));       # Möbius values in the range [0, u]
@@ -7992,9 +8002,19 @@ package Sidef::Types::Number::Number {
             my $prime_count = Math::Prime::Util::GMP::prime_count("$x", "$y");
 
             return (
-                    $prime_count < ULONG_MAX
+                    ($prime_count < ULONG_MAX)
                     ? __PACKAGE__->_set_uint($prime_count)
                     : __PACKAGE__->_set_str('int', $prime_count)
+                   );
+        }
+
+        if ($HAS_PRIME_UTIL) {
+            my $prime_count = Math::Prime::Util::prime_count($x, $y);
+
+            return (
+                    ($prime_count < ULONG_MAX)
+                    ? __PACKAGE__->_set_uint("$prime_count")
+                    : __PACKAGE__->_set_str('int', "$prime_count")
                    );
         }
 
@@ -8031,7 +8051,7 @@ package Sidef::Types::Number::Number {
                 ++$prime_count if ($x == 2 or Math::Prime::Util::GMP::is_prime($x));
 
                 return (
-                        $prime_count < ULONG_MAX
+                        ($prime_count < ULONG_MAX)
                         ? __PACKAGE__->_set_uint($prime_count)
                         : __PACKAGE__->_set_str('int', $prime_count)
                        );
@@ -8043,11 +8063,9 @@ package Sidef::Types::Number::Number {
         my $prime_count = _prime_count_range(Math::Prime::Util::GMP::next_prime($x - 1), Math::Prime::Util::GMP::prev_prime($y + 1));
 #>>>
 
-        return (
-                $prime_count < ULONG_MAX
-                ? __PACKAGE__->_set_uint($prime_count)
-                : __PACKAGE__->_set_str('int', $prime_count)
-               );
+        ($prime_count < ULONG_MAX)
+          ? __PACKAGE__->_set_uint($prime_count)
+          : __PACKAGE__->_set_str('int', $prime_count);
     }
 
     *primepi = \&prime_count;
@@ -8173,6 +8191,11 @@ package Sidef::Types::Number::Number {
 
         if ($n == 0) {
             return ONE;    # not a prime, but it's convenient...
+        }
+
+        if ($HAS_PRIME_UTIL) {
+            my $p = Math::Prime::Util::nth_prime($n);
+            return ($p < ULONG_MAX ? __PACKAGE__->_set_uint("$p") : __PACKAGE__->_set_str('int', "$p"));
         }
 
         if ($n > 100_000) {
@@ -8773,6 +8796,31 @@ package Sidef::Types::Number::Number {
             ]
         );
     }
+
+    sub sum_primes {
+        my ($x, $y) = @_;
+
+        if (defined($y)) {
+            _valid(\$y);
+            $x = _big2istr($x) // return ZERO;
+            $x = 2 if $x < 2;
+            $y = _big2uistr($y) // return ZERO;
+        }
+        else {
+            $y = _big2uistr($x) // return ZERO;
+            $x = 2;
+        }
+
+        if ($HAS_PRIME_UTIL) {
+            my $r = Math::Prime::Util::sum_primes($x, $y);
+            return (($r < ULONG_MAX) ? __PACKAGE__->_set_uint("$r") : __PACKAGE__->_set_str('int', "$r"));
+        }
+
+        my $r = Math::Prime::Util::GMP::vecsum(Math::Prime::Util::GMP::sieve_primes($x, $y));
+        ($r < ULONG_MAX) ? __PACKAGE__->_set_uint($r) : __PACKAGE__->_set_str('int', "$r");
+    }
+
+    *primes_sum = \&sum_primes;
 
     sub prev_prime {
         my $p = Math::Prime::Util::GMP::prev_prime(&_big2uistr // goto &nan) || goto &nan;
@@ -9405,7 +9453,7 @@ package Sidef::Types::Number::Number {
     *euler_phi     = \&totient;
     *euler_totient = \&totient;
 
-    sub inv_euler_phi {
+    sub inverse_totient {
         my ($n) = @_;
 
         # Based on Dana Jacobsen's code from Math::Prime::Util,
@@ -9416,6 +9464,19 @@ package Sidef::Types::Number::Number {
         if (Math::GMPz::Rmpz_sgn($n) <= 0) {
             return Sidef::Types::Array::Array->new(ZERO) if !Math::GMPz::Rmpz_sgn($n);
             return Sidef::Types::Array::Array->new;
+        }
+
+        if ($HAS_PRIME_UTIL) {
+            return Sidef::Types::Array::Array->new(
+                [
+                 map {
+
+                     ref($_) eq 'Math::GMPz'
+                       ? (bless \$_)
+                       : __PACKAGE__->_set_uint($_)
+                 } Math::Prime::Util::inverse_totient($n)
+                ]
+            );
         }
 
         my $u = Math::GMPz::Rmpz_init();
@@ -9470,9 +9531,24 @@ package Sidef::Types::Number::Number {
         Sidef::Types::Array::Array->new([map { bless \$_ } sort { Math::GMPz::Rmpz_cmp($a, $b) } @{$r{$n}}]);
     }
 
-    *inv_totient       = \&inv_euler_phi;
-    *inverse_totient   = \&inv_euler_phi;
-    *inverse_euler_phi = \&inv_euler_phi;
+    *inverse_euler_phi = \&inverse_totient;
+
+    sub inverse_totient_len {
+        my ($n) = @_;
+
+        my $z = _any2mpz($$n) // return ZERO;
+
+        if (Math::GMPz::Rmpz_sgn($z) <= 0) {
+            return ONE if !Math::GMPz::Rmpz_sgn($z);
+            return ZERO;
+        }
+
+        if ($HAS_PRIME_UTIL) {
+            return Sidef::Types::Number::Number->_set_uint(scalar Math::Prime::Util::inverse_totient($z));
+        }
+
+        $n->inverse_totient->len;
+    }
 
     sub jordan_totient {
         my ($n, $k) = @_;
@@ -10707,10 +10783,10 @@ package Sidef::Types::Number::Number {
 
             if (Math::GMPz::Rmpz_divisible_p($v, $u)) {
 
-                my $r = Math::GMPz::Rmpz_init_set($u);
+                my $r = Math::GMPz::Rmpz_init();
                 my $i = Math::GMPz::Rmpz_init();
 
-                Math::GMPz::Rmpz_add_ui($r, $r, 1);
+                Math::GMPz::Rmpz_add_ui($r, $u, 1);
                 Math::GMPz::Rmpz_divexact($i, $v, $u);
 
                 push @inverses, Sidef::Types::Array::Array->new([(bless \$r), (bless \$i)]);
