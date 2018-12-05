@@ -1631,11 +1631,20 @@ package Sidef::Types::Array::Array {
     sub all {
         my ($self, $block) = @_;
 
-        @$self || return (Sidef::Types::Bool::Bool::FALSE);
-
         foreach my $val (@$self) {
             $block->run($val)
               || return (Sidef::Types::Bool::Bool::FALSE);
+        }
+
+        (Sidef::Types::Bool::Bool::TRUE);
+    }
+
+    sub none {
+        my ($self, $block) = @_;
+
+        foreach my $val (@$self) {
+            $block->run($val)
+              && return (Sidef::Types::Bool::Bool::FALSE);
         }
 
         (Sidef::Types::Bool::Bool::TRUE);

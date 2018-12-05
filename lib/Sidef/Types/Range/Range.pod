@@ -305,6 +305,14 @@ Aliases: I<call>
 
 =cut
 
+=head2 none
+
+Range.none() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 pam_operator
 
 Range.pam_operator() -> I<Obj>

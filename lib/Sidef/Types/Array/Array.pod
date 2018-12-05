@@ -1166,6 +1166,14 @@ Aliases: I<call>
 
 =cut
 
+=head2 none
+
+Array.none() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 nth_perm
 
 Array.nth_perm() -> I<Obj>

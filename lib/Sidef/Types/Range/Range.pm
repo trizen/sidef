@@ -193,7 +193,7 @@ package Sidef::Types::Range::Range {
         my ($self, $value) = @_;
 
         my $step = $self->{step};
-        my $asc = ($self->{_asc} //= !!$step->is_pos);
+        my $asc  = ($self->{_asc} //= !!$step->is_pos);
 
         my ($from, $to) = (
                            $asc
@@ -273,6 +273,18 @@ package Sidef::Types::Range::Range {
 
     *select = \&grep;
 
+    sub any {
+        my ($self, $code) = @_;
+
+        my $iter = $self->iter->{code};
+        while (defined(my $obj = $iter->())) {
+            $code->run($obj)
+              && return Sidef::Types::Bool::Bool::TRUE;
+        }
+
+        Sidef::Types::Bool::Bool::FALSE;
+    }
+
     sub all {
         my ($self, $code) = @_;
 
@@ -285,16 +297,16 @@ package Sidef::Types::Range::Range {
         Sidef::Types::Bool::Bool::TRUE;
     }
 
-    sub any {
+    sub none {
         my ($self, $code) = @_;
 
         my $iter = $self->iter->{code};
         while (defined(my $obj = $iter->())) {
             $code->run($obj)
-              && return Sidef::Types::Bool::Bool::TRUE;
+              && return Sidef::Types::Bool::Bool::FALSE;
         }
 
-        Sidef::Types::Bool::Bool::FALSE;
+        Sidef::Types::Bool::Bool::TRUE;
     }
 
     sub to_array {
