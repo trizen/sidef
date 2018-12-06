@@ -1124,9 +1124,33 @@ Return the
 
 =cut
 
+=head2 divisor_map
+
+Number.divisor_map() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 divisor_prod
+
+Number.divisor_prod() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 divisors
 
 Number.divisors() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 divisor_sum
+
+Number.divisor_sum() -> I<Obj>
 
 Return the
 
@@ -1301,6 +1325,30 @@ Number.factorial_sum() -> I<Obj>
 Return the
 
 Aliases: I<left_factorial>
+
+=cut
+
+=head2 factor_map
+
+Number.factor_map() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 factor_prod
+
+Number.factor_prod() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 factor_sum
+
+Number.factor_sum() -> I<Obj>
+
+Return the
 
 =cut
 
@@ -3219,8 +3267,6 @@ Return the
 Number.sopfr() -> I<Obj>
 
 Return the
-
-Aliases: I<factor_sum>
 
 =cut
 

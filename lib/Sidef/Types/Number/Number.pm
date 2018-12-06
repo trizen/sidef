@@ -10255,7 +10255,67 @@ package Sidef::Types::Number::Number {
         $s < ULONG_MAX ? __PACKAGE__->_set_uint($s) : __PACKAGE__->_set_str('int', $s);
     }
 
-    *factor_sum = \&sopfr;
+    sub factor_map {
+        my ($n, $block) = @_;
+
+        $n = _big2pistr($n) // return Sidef::Types::Array::Array->new;
+
+        my %factors;
+        ++$factors{$_} for Math::Prime::Util::GMP::factor($n);
+
+        my @array;
+        foreach my $key (sort { (CORE::length($a) <=> CORE::length($b)) || ($a cmp $b) } keys %factors) {
+
+            my $p = ($key < ULONG_MAX ? __PACKAGE__->_set_uint($key) : __PACKAGE__->_set_str('int', $key));
+            my $k = __PACKAGE__->_set_uint($factors{$key});
+
+            push @array, $block->run($p, $k);
+        }
+
+        Sidef::Types::Array::Array->new(\@array);
+    }
+
+    sub divisor_map {
+        my ($n, $block) = @_;
+
+        $n = _big2pistr($n) // return Sidef::Types::Array::Array->new;
+
+        my @array;
+        foreach my $divisor (Math::Prime::Util::GMP::divisors($n)) {
+            push @array,
+              $block->run(
+                          ($divisor < ULONG_MAX)
+                          ? __PACKAGE__->_set_uint($divisor)
+                          : __PACKAGE__->_set_str('int', $divisor)
+                         );
+        }
+
+        Sidef::Types::Array::Array->new(\@array);
+    }
+
+    sub divisor_sum {
+        my ($n, $block) = @_;
+        $block // return $n->sigma;
+        $n->divisor_map($block)->sum;
+    }
+
+    sub divisor_prod {
+        my ($n, $block) = @_;
+        $block // return $n->divisors->prod;
+        $n->divisor_map($block)->prod;
+    }
+
+    sub factor_sum {
+        my ($n, $block) = @_;
+        $block // return $n->sopfr;
+        $n->factor_map($block)->sum;
+    }
+
+    sub factor_prod {
+        my ($n, $block) = @_;
+        $block // return $n;
+        $n->factor_map($block)->prod;
+    }
 
     sub partitions {
         my $n = Math::Prime::Util::GMP::partitions(&_big2uistr // goto &nan);
