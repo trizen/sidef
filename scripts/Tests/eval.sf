@@ -56,6 +56,32 @@ do {
 }
 
 #
+## Gather/take
+#
+assert_eq(
+    gather {
+        take(3)
+        eval("take(42)")
+        if (true) { eval("take(\"foo\")") }
+        if (false) { eval("take('bar')") }
+        eval("take(99)") if (1 == 1)
+    }, [3, 42, "foo", 99]
+)
+
+#
+## Recursive gather/take
+#
+do {
+    func my_fib(n) { n;
+        var arr = gather {
+            eval("take(n <= 1 ? n : my_fib(n-1)+my_fib(n-2))")
+        }
+        return arr[0]
+    }
+    assert_eq(8, my_fib(6))
+}
+
+#
 ## All done
 #
 say "** Test passed!";
