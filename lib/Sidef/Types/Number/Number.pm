@@ -2533,60 +2533,7 @@ package Sidef::Types::Number::Number {
 
     sub __ilog__ {
         my ($x, $y) = @_;
-
-        # ilog(x, y <= 1) = NaN
-        Math::GMPz::Rmpz_cmp_ui($y, 1) <= 0 and return;
-
-        # ilog(x <= 0, y) = NaN
-        Math::GMPz::Rmpz_sgn($x) <= 0 and return;
-
-        # Return faster for y <= 62
-        if (Math::GMPz::Rmpz_cmp_ui($y, 62) <= 0) {
-
-            $y = Math::GMPz::Rmpz_get_ui($y);
-
-            my $e = (Math::GMPz::Rmpz_sizeinbase($x, $y) || return) - 1;
-
-            if ($e > 0) {
-                my $t = Math::GMPz::Rmpz_init();
-
-                $y == 2
-                  ? Math::GMPz::Rmpz_setbit($t, $e)
-                  : Math::GMPz::Rmpz_ui_pow_ui($t, $y, $e);
-
-                Math::GMPz::Rmpz_cmp($t, $x) > 0 and --$e;
-            }
-
-            return $e;
-        }
-
-        my $e = 0;
-        my $t = Math::GMPz::Rmpz_init();
-
-        state $logx = Math::MPFR::Rmpfr_init2_nobless(64);
-        state $logy = Math::MPFR::Rmpfr_init2_nobless(64);
-
-        Math::MPFR::Rmpfr_set_z($logx, $x, $round_z);
-        Math::MPFR::Rmpfr_set_z($logy, $y, $round_z);
-
-        Math::MPFR::Rmpfr_log($logx, $logx, $round_z);
-        Math::MPFR::Rmpfr_log($logy, $logy, $round_z);
-
-        Math::MPFR::Rmpfr_div($logx, $logx, $logy, $round_z);
-
-        if (Math::MPFR::Rmpfr_fits_ulong_p($logx, $round_z)) {
-            $e = Math::MPFR::Rmpfr_get_ui($logx, $round_z) - 1;
-            Math::GMPz::Rmpz_pow_ui($t, $y, $e + 1);
-        }
-        else {
-            Math::GMPz::Rmpz_set($t, $y);
-        }
-
-        for (; Math::GMPz::Rmpz_cmp($t, $x) <= 0 ; Math::GMPz::Rmpz_mul($t, $t, $y)) {
-            ++$e;
-        }
-
-        return $e;
+        $y <= 1 ? undef : Math::Prime::Util::GMP::logint($x, $y);
     }
 
     sub ilog {
@@ -2594,7 +2541,7 @@ package Sidef::Types::Number::Number {
 
         if (defined($y)) {
             _valid(\$y);
-            __PACKAGE__->_set_uint(__ilog__((_any2mpz($$x) // goto &nan), (_any2mpz($$y) // goto &nan)) // goto &nan);
+            __PACKAGE__->_set_uint(__ilog__((_big2pistr($x) // goto &nan), (_any2ui($$y) // goto &nan)) // goto &nan);
         }
         else {
             bless \(_any2mpz(__log__(_any2mpfr_mpc($$x))) // goto &nan);
@@ -2603,14 +2550,12 @@ package Sidef::Types::Number::Number {
 
     sub ilog2 {
         my ($x) = @_;
-        state $two = Math::GMPz::Rmpz_init_set_ui(2);
-        __PACKAGE__->_set_uint(__ilog__((_any2mpz($$x) // goto &nan), $two) // goto &nan);
+        __PACKAGE__->_set_uint(__ilog__((_big2pistr($x) // goto &nan), 2) // goto &nan);
     }
 
     sub ilog10 {
         my ($x) = @_;
-        state $ten = Math::GMPz::Rmpz_init_set_ui(10);
-        __PACKAGE__->_set_uint(__ilog__((_any2mpz($$x) // goto &nan), $ten) // goto &nan);
+        __PACKAGE__->_set_uint(__ilog__((_big2pistr($x) // goto &nan), 10) // goto &nan);
     }
 
     sub msb {

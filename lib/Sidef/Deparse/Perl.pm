@@ -1343,10 +1343,12 @@ HEADER
             local \$Sidef::DEPARSER->{block_declarations} = [];
             \$Sidef::DEPARSER->deparse(
             do{
+                local \@{\$Sidef::PARSER}{keys \%{\$Sidef::EVALS{$refaddr}{parser}}} = values \%{\$Sidef::EVALS{$refaddr}{parser}};
                 local \$Sidef::PARSER->{line} = 1;
+                local \$Sidef::PARSER->{eval_mode} = 1;
                 local \$Sidef::PARSER->{file_name} = 'eval($refaddr)';
-                local \$Sidef::PARSER->{vars} = \$Sidef::EVALS{$refaddr}{vars};
-                local \$Sidef::PARSER->{ref_vars_refs} = \$Sidef::EVALS{$refaddr}{ref_vars_refs};
+                #local \$Sidef::PARSER->{vars} = \$Sidef::EVALS{$refaddr}{vars};
+                #local \$Sidef::PARSER->{ref_vars_refs} = \$Sidef::EVALS{$refaddr}{ref_vars_refs};
                 \$Sidef::PARSER->parse_script(code => do{my\$o=~ . $self->deparse_args($obj->{expr}) . qq~;\\"\$o"});
             })}~;
         }

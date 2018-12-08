@@ -2935,7 +2935,7 @@ package Sidef::Types::Array::Array {
 
         if (ref($callback) eq __PACKAGE__) {
             @args     = @$callback;
-            $callback = shift(@args);
+            $callback = CORE::shift(@args);
         }
 
         if (ref($callback) eq 'Sidef::Types::Block::Block') {
@@ -2987,7 +2987,7 @@ package Sidef::Types::Array::Array {
 
         while (1) {
 
-            (my @tmp = splice(@copy, 0, $argc)) == $argc or last;
+            (my @tmp = CORE::splice(@copy, 0, $argc)) == $argc or last;
 
             for my $i (0 .. $argc - 1) {
                 push @list, _pipeline_op_call($tmp[$i], $callbacks[$i]);

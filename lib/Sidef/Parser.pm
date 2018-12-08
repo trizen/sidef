@@ -517,7 +517,7 @@ package Sidef::Parser {
                 if (ref $variable eq 'ARRAY') {
                     $self->check_declarations({$class => $variable});
                 }
-                elsif ($self->{interactive}) {
+                elsif ($self->{interactive} or $self->{eval_mode}) {
                     ## Everything is OK in interactive mode
                 }
                 elsif (   $variable->{count} == 0
@@ -2312,21 +2312,24 @@ package Sidef::Parser {
 
             # Eval keyword
             if (/\Geval\b\h*/gc) {
+
                 my $obj = (
                            /\G(?=\()/
                            ? $self->parse_arg(code => $opt{code})
                            : $self->parse_obj(code => $opt{code})
                           );
 
-                return
-                  bless(
-                        {
-                         expr          => $obj,
-                         vars          => {$self->{class} => [@{$self->{vars}{$self->{class}}}]},
-                         ref_vars_refs => {$self->{class} => [@{$self->{ref_vars_refs}{$self->{class}}}]},
-                        },
-                        'Sidef::Eval::Eval'
-                       );
+#<<<
+                return bless(
+                    {
+                     expr   => $obj,
+                     parser => Sidef::Object::Object::dclone(scalar {%$self}),
+
+                     #vars          => {$self->{class} => [@{$self->{vars}{$self->{class}}}]},
+                     #ref_vars_refs => {$self->{class} => [@{$self->{ref_vars_refs}{$self->{class}}}]},
+
+                    }, 'Sidef::Eval::Eval');
+#>>>
             }
 
             if (/\GParser\b/gc) {

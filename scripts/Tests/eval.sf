@@ -35,6 +35,27 @@ assert_eq(eval '(a * b).abs', 35);
 assert_eq(eval '42 + eval("1 + eval(%q/1 + 1/)")', 45);
 
 #
+## Module eval
+#
+do {
+    var foo = 42
+    assert_eq(eval("foo"), 42)
+
+    module Bar {
+        var baz = 99
+        assert_eq(main::foo, 42)
+        assert_eq(eval("baz"), 99)
+        assert_eq(eval("Bar::baz"), 99)
+        assert_eq(eval("main::foo"), 42)
+    }
+
+    assert_eq(eval("Bar::baz"), 99)
+    assert_eq(eval("foo"), 42)
+    assert_eq(eval("main::foo"), 42)
+    assert_eq(Bar::baz, 99)
+}
+
+#
 ## All done
 #
 say "** Test passed!";
