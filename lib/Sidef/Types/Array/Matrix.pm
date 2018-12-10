@@ -51,18 +51,17 @@ package Sidef::Types::Array::Matrix {
 
         $n = CORE::int($n);
 
-#<<<
         bless [
             map {
-                my $i = $_;
-                bless([map {
-                        $i == $_
-                            ? Sidef::Types::Number::Number::ONE
-                            : Sidef::Types::Number::Number::ZERO
-                } 1 .. $n], 'Sidef::Types::Array::Array')
+                bless(
+                      [(Sidef::Types::Number::Number::ZERO) x ($_ - 1),
+                       Sidef::Types::Number::Number::ONE,
+                       (Sidef::Types::Number::Number::ZERO) x ($n - $_)
+                      ],
+                      'Sidef::Types::Array::Array'
+                     )
               } 1 .. $n
         ];
-#>>>
     }
 
     *I = \&identity;
@@ -104,18 +103,17 @@ package Sidef::Types::Array::Matrix {
 
         $n = CORE::int($n);
 
-#<<<
         bless [
             map {
-                my $i = $_;
-                bless([map {
-                            $i == $_
-                                ? $value
-                                : Sidef::Types::Number::Number::ZERO
-                    } 1 .. $n], 'Sidef::Types::Array::Array')
+                bless(
+                      [(Sidef::Types::Number::Number::ZERO) x ($_ - 1),
+                       $value,
+                       (Sidef::Types::Number::Number::ZERO) x ($n - $_)
+                      ],
+                      'Sidef::Types::Array::Array'
+                     )
               } 1 .. $n
         ];
-#>>>
     }
 
     sub row_vector {
@@ -135,18 +133,17 @@ package Sidef::Types::Array::Matrix {
 
         my $n = scalar(@diag);
 
-#<<<
         bless [
             map {
-                my $i = $_;
-                bless([map {
-                    $i == $_
-                        ? shift(@diag)
-                        : Sidef::Types::Number::Number::ZERO
-                } 1 .. $n], 'Sidef::Types::Array::Array')
-            } 1 .. $n
+                bless(
+                      [(Sidef::Types::Number::Number::ZERO) x ($_ - 1),
+                       CORE::shift(@diag),
+                       (Sidef::Types::Number::Number::ZERO) x ($n - $_)
+                      ],
+                      'Sidef::Types::Array::Array'
+                     )
+              } 1 .. $n
         ];
-#>>>
     }
 
     sub rows {
@@ -424,18 +421,23 @@ package Sidef::Types::Array::Matrix {
 
             @m[$i, $r] = @m[$r, $i];
 
-            my $t = $m[$r][$j];
+            my $mr  = $m[$r];
+            my $mrj = $mr->[$j];
+
             foreach my $k (0 .. $cols - 1) {
-                $m[$r][$k] = $m[$r][$k]->div($t);
+                $mr->[$k] = $mr->[$k]->div($mrj);
             }
 
             foreach my $i (0 .. $rows - 1) {
 
                 $i == $r and next;
 
-                my $t = $m[$i][$j];
+                my $mr  = $m[$r];
+                my $mi  = $m[$i];
+                my $mij = $mi->[$j];
+
                 foreach my $k (0 .. $cols - 1) {
-                    $m[$i][$k] = $m[$i][$k]->sub($t->mul($m[$r][$k]));
+                    $mi->[$k] = $mi->[$k]->sub($mij->mul($mr->[$k]));
                 }
             }
 
@@ -453,17 +455,12 @@ package Sidef::Types::Array::Matrix {
 
         my $n = $#$self;
 
-#<<<
         my @I = map {
-            my $i = $_;
-            [map {
-                $i == $_
-                    ? Sidef::Types::Number::Number::ONE
-                    : Sidef::Types::Number::Number::ZERO
-            } 0 .. $n]
+            [(Sidef::Types::Number::Number::ZERO) x $_,
+             Sidef::Types::Number::Number::ONE,
+             (Sidef::Types::Number::Number::ZERO) x ($n - $_)
+            ]
         } 0 .. $n;
-#>>>
-
         my @A = map { [@{$self->[$_]}, @{$I[$_]}] } 0 .. $n;
 
         my $r = rref(\@A);
