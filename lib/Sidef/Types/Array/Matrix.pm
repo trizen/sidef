@@ -516,6 +516,9 @@ package Sidef::Types::Array::Matrix {
         bless($matrix->SUPER::transpose);
     }
 
+    *t   = \&transpose;
+    *not = \&transpose;
+
     sub set_row {
         my ($A, $k, $row) = @_;
         $k = CORE::int($k);

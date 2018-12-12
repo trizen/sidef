@@ -856,6 +856,7 @@ scripts/Tests/pipeline_cross_operator.sf
 scripts/Tests/pipeline_map_operator.sf
 scripts/Tests/pipeline_operator.sf
 scripts/Tests/pipeline_zip_operator.sf
+scripts/Tests/polynomial_regression.sf
 scripts/Tests/postfix_exclamation_mark.sf
 scripts/Tests/power_numbers.sf
 scripts/Tests/prefix_methods.sf

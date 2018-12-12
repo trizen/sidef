@@ -1,0 +1,24 @@
+#!/usr/bin/ruby
+
+func regress(x, y, degree) {
+    var A = Matrix.build(x.len, degree+1, {|i,j|
+        x[i]**j
+    })
+
+    var B = Matrix.column_vector(y...)
+    ~((~A * A)**(-1) * ~A * B)
+}
+
+func poly(x) {
+    3*x**2 + 2*x + 1
+}
+
+var coeff = regress(
+    10.of { _ },
+    10.of { poly(_) },
+    2
+)
+
+assert_eq(coeff, [[1,2,3]])
+
+say "** Test passed!"
