@@ -4,6 +4,11 @@ package Sidef::Module::OO {
     use 5.014;
     our $AUTOLOAD;
 
+    use overload q{""} => sub {
+        my ($self) = @_;
+        overload::StrVal($self->{module}) ? "$self->{module}" : $self;
+    };
+
     sub __NEW__ {
         my (undef, $module) = @_;
         bless {module => $module}, __PACKAGE__;
