@@ -237,13 +237,10 @@ package Sidef::Types::Array::Matrix {
         my ($A, $pow) = @_;
 
         $pow = CORE::int($pow);
+        my $neg = ($pow < 0);
+        $pow = CORE::int(CORE::abs($pow));
 
-        my $neg = 0;
-
-        if ($pow < 0) {
-            $neg = 1;
-            $pow = -$pow;
-        }
+        return $A->inv if ($neg and $pow == 1);
 
 #<<<
         my $n = $#$A;
