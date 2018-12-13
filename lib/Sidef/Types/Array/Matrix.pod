@@ -72,6 +72,14 @@ Aliases: I<÷>, I<div>
 
 =cut
 
+=head2 abs
+
+Matrix.abs() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 build
 
 Matrix.build() -> I<Obj>
@@ -172,6 +180,14 @@ Aliases: I<invert>, I<inverse>
 
 =cut
 
+=head2 neg
+
+Matrix.neg() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 new
 
 Matrix.new() -> I<Obj>
@@ -260,11 +276,13 @@ Return the
 
 =cut
 
-=head2 transpose
+=head2 t
 
-Matrix.transpose() -> I<Obj>
+Matrix.t() -> I<Obj>
 
 Return the
+
+Aliases: I<not>, I<transpose>
 
 =cut
 

@@ -167,6 +167,16 @@ package Sidef::Types::Array::Matrix {
 
     *cols = \&columns;
 
+    sub neg {
+        my ($m1) = @_;
+        bless($m1->scalar_operator('neg'));
+    }
+
+    sub abs {
+        my ($m1) = @_;
+        bless($m1->scalar_operator('abs'));
+    }
+
     sub add {
         my ($m1, $m2) = @_;
 
