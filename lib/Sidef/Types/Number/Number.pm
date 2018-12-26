@@ -9466,7 +9466,7 @@ package Sidef::Types::Number::Number {
                 map {
                     ref($_) eq 'Math::GMPz'
                         ? (bless \$_)
-                        : __PACKAGE__->_set_uint($_)
+                        : __PACKAGE__->_set_uint("$_")
                 } Math::Prime::Util::inverse_totient($n)
             ]);
         }
