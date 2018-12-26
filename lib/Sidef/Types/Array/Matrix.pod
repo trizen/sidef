@@ -212,6 +212,8 @@ Matrix.prod() -> I<Obj>
 
 Return the
 
+Aliases: I<prod_by>
+
 =cut
 
 =head2 rand
@@ -297,6 +299,8 @@ Return the
 Matrix.sum() -> I<Obj>
 
 Return the
+
+Aliases: I<sum_by>
 
 =cut
 

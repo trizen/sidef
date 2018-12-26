@@ -272,10 +272,14 @@ package Sidef::Types::Array::Matrix {
         Sidef::Math::Math->sum(map { $_->SUPER::sum($block) } @$A);
     }
 
+    *sum_by = \&sum;
+
     sub prod {
         my ($A, $block) = @_;
         Sidef::Math::Math->prod(map { $_->SUPER::prod($block) } @$A);
     }
+
+    *prod_by = \&prod;
 
     sub pow {
         my ($A, $pow) = @_;
