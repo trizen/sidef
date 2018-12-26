@@ -148,7 +148,6 @@ package Sidef::Types::Array::Matrix {
 
     sub rows {
         my (undef, @rows) = @_;
-
         bless [map { bless([@$_], 'Sidef::Types::Array::Array') } @rows];
     }
 
@@ -604,6 +603,11 @@ package Sidef::Types::Array::Matrix {
 
     *row_len  = \&row_count;
     *row_size = \&row_count;
+
+    sub to_a {
+        my ($A) = @_;
+        Sidef::Types::Array::Array->new(@$A);
+    }
 
     {
         no strict 'refs';

@@ -314,6 +314,14 @@ Aliases: I<not>, I<transpose>
 
 =cut
 
+=head2 to_a
+
+Matrix.to_a() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 zero
 
 Matrix.zero() -> I<Obj>
