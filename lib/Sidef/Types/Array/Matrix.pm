@@ -15,7 +15,7 @@ package Sidef::Types::Array::Matrix {
 
     sub new {
         my (undef, @rows) = @_;
-        bless [map { bless [@$_] } @rows];
+        bless [map { bless [@$_], 'Sidef::Types::Array::Array' } @rows];
     }
 
     *call = \&new;
@@ -160,7 +160,7 @@ package Sidef::Types::Array::Matrix {
         bless [
             map {
                 my $i = $_;
-                bless [map { $_->[$i] } @cols]
+                bless [map { $_->[$i] } @cols], 'Sidef::Types::Array::Array'
               } 0 .. $max - 1
         ];
     }
@@ -241,6 +241,40 @@ package Sidef::Types::Array::Matrix {
 
         bless($_, 'Sidef::Types::Array::Array') for @c;
         bless \@c;
+    }
+
+    sub map {
+        my ($A, $block) = @_;
+
+        my %indices;
+
+        my @new;
+        foreach my $i (0 .. $#{$A}) {
+
+            my @row;
+            my $r = $A->[$i];
+
+            $indices{$i} //= Sidef::Types::Number::Number->_set_uint($i);
+
+            foreach my $j (0 .. $#{$A->[$i]}) {
+                $indices{$j} //= Sidef::Types::Number::Number->_set_uint($j);
+                push @row, $block->run($r->[$j], $indices{$i}, $indices{$j});
+            }
+
+            CORE::push(@new, bless(\@row, 'Sidef::Types::Array::Array'));
+        }
+
+        bless \@new;
+    }
+
+    sub sum {
+        my ($A, $block) = @_;
+        Sidef::Math::Math->sum(map { $_->SUPER::sum($block) } @$A);
+    }
+
+    sub prod {
+        my ($A, $block) = @_;
+        Sidef::Math::Math->prod(map { $_->SUPER::prod($block) } @$A);
     }
 
     sub pow {

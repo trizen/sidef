@@ -180,6 +180,14 @@ Aliases: I<invert>, I<inverse>
 
 =cut
 
+=head2 map
+
+Matrix.map() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 neg
 
 Matrix.neg() -> I<Obj>
@@ -195,6 +203,14 @@ Matrix.new() -> I<Obj>
 Return the
 
 Aliases: I<call>
+
+=cut
+
+=head2 prod
+
+Matrix.prod() -> I<Obj>
+
+Return the
 
 =cut
 
@@ -271,6 +287,14 @@ Return the
 =head2 solve
 
 Matrix.solve() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 sum
+
+Matrix.sum() -> I<Obj>
 
 Return the
 

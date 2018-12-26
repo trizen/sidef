@@ -43,7 +43,7 @@ func orbital_state_vectors(
     var position = muladd(i, c, j, s)*r
 
     var speed = muladd(i, rprime*c - r*s, j, rprime*s + r*c)
-    speed /= speed[0].map{_**2}.sum.sqrt
+    speed /= speed.map{_**2}.sum.sqrt
     speed *= sqrt(2/r - 1/semimajor_axis)
 
     struct Result { position, speed }
