@@ -14,10 +14,6 @@ func swap_2(Ref a, Ref b) {
     (*a, *b) = (*b, *a);
 }
 
-func swap_3(Ref a, Ref b) {
-    [*a, *b] » (b, a);
-}
-
 var (a, b) = ([1], [2]);
 swap_1(\a, \b);
 assert_eq(a, [2]);
@@ -26,9 +22,5 @@ assert_eq(b, [1]);
 swap_2(\b, \a);
 assert_eq(a, [1]);
 assert_eq(b, [2]);
-
-swap_3(\b, \a);
-assert_eq(a, [2]);
-assert_eq(b, [1]);
 
 say "** Test passed!";

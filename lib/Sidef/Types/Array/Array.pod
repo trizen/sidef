@@ -1254,16 +1254,6 @@ Return the
 
 =cut
 
-=head2 pop
-
-Array.pop() -> I<Obj>
-
-Return the
-
-Aliases: I<drop_last>, I<drop_right>
-
-=cut
-
 =head2 pop_at
 
 Array.pop_at() -> I<Obj>
@@ -1796,7 +1786,7 @@ I<Obj> B<»> I<Obj> -> I<Obj>
 
 Return the
 
-Aliases: I<E<gt>E<gt>>, I<assign_to>
+Aliases: I<E<gt>E<gt>>, I<pop>, I<drop_last>, I<drop_right>
 
 =cut
 

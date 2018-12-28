@@ -1661,22 +1661,6 @@ package Sidef::Types::Array::Array {
         (Sidef::Types::Bool::Bool::TRUE);
     }
 
-    sub assign_to {
-        my ($self, @vars) = @_;
-
-        my @values = CORE::splice(@$self, 0, $#vars + 1);
-
-        for my $i (0 .. $#vars) {
-            if (exists $values[$i]) {
-                if (ref($vars[$i]) eq 'REF') {
-                    ${$vars[$i]} = $values[$i];
-                }
-            }
-        }
-
-        bless \@values;
-    }
-
     sub bindex_by {
         my ($self, $obj) = @_;
 
@@ -3410,10 +3394,10 @@ package Sidef::Types::Array::Array {
         *{__PACKAGE__ . '::' . '&'}   = \&and;
         *{__PACKAGE__ . '::' . '*'}   = \&mul;
         *{__PACKAGE__ . '::' . '**'}  = \&mpow;
-        *{__PACKAGE__ . '::' . '<<'}  = \&append;
-        *{__PACKAGE__ . '::' . '«'}   = \&append;
-        *{__PACKAGE__ . '::' . '>>'}  = \&assign_to;
-        *{__PACKAGE__ . '::' . '»'}   = \&assign_to;
+        *{__PACKAGE__ . '::' . '<<'}  = \&push;
+        *{__PACKAGE__ . '::' . '«'}   = \&push;
+        *{__PACKAGE__ . '::' . '>>'}  = \&pop;
+        *{__PACKAGE__ . '::' . '»'}   = \&pop;
         *{__PACKAGE__ . '::' . '|Z>'} = \&pipeline_zip_op;
         *{__PACKAGE__ . '::' . '|X>'} = \&pipeline_cross_op;
         *{__PACKAGE__ . '::' . '|>>'} = \&pipeline_map_op;

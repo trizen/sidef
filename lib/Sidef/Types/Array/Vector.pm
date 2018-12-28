@@ -80,7 +80,7 @@ package Sidef::Types::Array::Vector {
         }
 
         my $a1 = $v1->abs;
-        return Sidef::Types::Number::Number::ZERO if ($a1 eq Sidef::Types::Number::Number::ZERO);
+        return Sidef::Types::Number::Number::ZERO if $a1->is_zero;
         my $u1 = $v1->div($a1);
         my $p  = $v2->mul($u1);
 
@@ -127,6 +127,51 @@ package Sidef::Types::Array::Vector {
         bless($v1->scalar_operator('*', $v2));
     }
 
+    sub and {
+        my ($m1, $m2) = @_;
+
+        if (exists $vector_like{ref($m2)}) {
+            return bless($m1->wise_operator('&', $m2));
+        }
+
+        bless($m1->scalar_operator('&', $m2));
+    }
+
+    sub or {
+        my ($m1, $m2) = @_;
+
+        if (exists $vector_like{ref($m2)}) {
+            return bless($m1->wise_operator('|', $m2));
+        }
+
+        bless($m1->scalar_operator('|', $m2));
+    }
+
+    sub xor {
+        my ($m1, $m2) = @_;
+
+        if (exists $vector_like{ref($m2)}) {
+            return bless($m1->wise_operator('^', $m2));
+        }
+
+        bless($m1->scalar_operator('^', $m2));
+    }
+
+    sub floor {
+        my ($self) = @_;
+        bless [map { $_->floor } @$self];
+    }
+
+    sub ceil {
+        my ($self) = @_;
+        bless [map { $_->ceil } @$self];
+    }
+
+    sub round {
+        my ($self, $digits) = @_;
+        bless [map { $_->round($digits) } @$self];
+    }
+
     sub to_a {
         my ($A) = @_;
         Sidef::Types::Array::Array->new(@$A);
@@ -141,6 +186,10 @@ package Sidef::Types::Array::Vector {
         *{__PACKAGE__ . '::' . '-'}  = \&sub;
         *{__PACKAGE__ . '::' . '/'}  = \&div;
         *{__PACKAGE__ . '::' . '÷'}  = \&div;
+        *{__PACKAGE__ . '::' . '&'}  = \&and;
+        *{__PACKAGE__ . '::' . '|'}  = \&or;
+        *{__PACKAGE__ . '::' . '^'}  = \&xor;
+
     }
 };
 

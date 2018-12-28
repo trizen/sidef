@@ -22,6 +22,26 @@ Inherits methods from:
 
 =head1 METHODS
 
+=head2 %
+
+I<Obj> B<%> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<mod>
+
+=cut
+
+=head2 &
+
+I<Obj> B<&> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<and>
+
+=cut
+
 =head2 *
 
 I<Obj> B<*> I<Obj> -> I<Obj>
@@ -72,6 +92,16 @@ Aliases: I<÷>, I<div>
 
 =cut
 
+=head2 ^
+
+I<Obj> B<^> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<xor>
+
+=cut
+
 =head2 abs
 
 Matrix.abs() -> I<Obj>
@@ -80,9 +110,25 @@ Return the
 
 =cut
 
+=head2 anti_diagonal
+
+Matrix.anti_diagonal() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 build
 
 Matrix.build() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 ceil
+
+Matrix.ceil() -> I<Obj>
 
 Return the
 
@@ -114,7 +160,7 @@ Matrix.cols() -> I<Obj>
 
 Return the
 
-Aliases: I<columns>
+Aliases: I<columns>, I<from_cols>, I<from_columns>
 
 =cut
 
@@ -125,6 +171,14 @@ Matrix.col_vector() -> I<Obj>
 Return the
 
 Aliases: I<column_vector>
+
+=cut
+
+=head2 concat
+
+Matrix.concat() -> I<Obj>
+
+Return the
 
 =cut
 
@@ -154,6 +208,22 @@ Return the
 
 =cut
 
+=head2 flip
+
+Matrix.flip() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 floor
+
+Matrix.floor() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 gauss_jordan_invert
 
 Matrix.gauss_jordan_invert() -> I<Obj>
@@ -165,6 +235,14 @@ Return the
 =head2 gauss_jordan_solve
 
 Matrix.gauss_jordan_solve() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 horizontal_flip
+
+Matrix.horizontal_flip() -> I<Obj>
 
 Return the
 
@@ -187,6 +265,14 @@ Matrix.inv() -> I<Obj>
 Return the
 
 Aliases: I<invert>, I<inverse>
+
+=cut
+
+=head2 is_square
+
+Matrix.is_square() -> I<Obj>
+
+Return the
 
 =cut
 
@@ -213,6 +299,14 @@ Matrix.new() -> I<Obj>
 Return the
 
 Aliases: I<call>
+
+=cut
+
+=head2 powmod
+
+Matrix.powmod() -> I<Obj>
+
+Return the
 
 =cut
 
@@ -260,6 +354,8 @@ Matrix.rows() -> I<Obj>
 
 Return the
 
+Aliases: I<from_rows>
+
 =cut
 
 =head2 row_vector
@@ -306,6 +402,14 @@ Return the
 
 =cut
 
+=head2 size
+
+Matrix.size() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 solve
 
 Matrix.solve() -> I<Obj>
@@ -342,10 +446,28 @@ Return the
 
 =cut
 
+=head2 vertical_flip
+
+Matrix.vertical_flip() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 zero
 
 Matrix.zero() -> I<Obj>
 
 Return the
+
+=cut
+
+=head2 |
+
+I<Obj> B<|> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<or>
 
 =cut

@@ -22,6 +22,16 @@ Inherits methods from:
 
 =head1 METHODS
 
+=head2 &
+
+I<Obj> B<&> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<and>
+
+=cut
+
 =head2 *
 
 I<Obj> B<*> I<Obj> -> I<Obj>
@@ -62,6 +72,16 @@ Aliases: I<÷>, I<div>
 
 =cut
 
+=head2 ^
+
+I<Obj> B<^> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<xor>
+
+=cut
+
 =head2 abs
 
 Vector.abs() -> I<Obj>
@@ -73,6 +93,14 @@ Return the
 =head2 atan2
 
 Vector.atan2() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 ceil
+
+Vector.ceil() -> I<Obj>
 
 Return the
 
@@ -97,6 +125,14 @@ Return the
 =head2 dist_norm
 
 Vector.dist_norm() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 floor
+
+Vector.floor() -> I<Obj>
 
 Return the
 
@@ -144,6 +180,14 @@ Return the
 
 =cut
 
+=head2 round
+
+Vector.round() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 to_a
 
 Vector.to_a() -> I<Obj>
@@ -157,5 +201,15 @@ Return the
 Vector.zero() -> I<Obj>
 
 Return the
+
+=cut
+
+=head2 |
+
+I<Obj> B<|> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<or>
 
 =cut
