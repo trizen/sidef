@@ -66,6 +66,23 @@ package Sidef::Types::Array::Matrix {
 
     *I = \&identity;
 
+    sub column {
+        my ($self, $n) = @_;
+        $n = CORE::int($n);
+        bless [map { $_->[$n] } @$self], 'Sidef::Types::Array::Array';
+    }
+
+    *col        = \&column;
+    *get_column = \&column;
+
+    sub row {
+        my ($self, $n) = @_;
+        $n = CORE::int($n);
+        bless [@{$self->[$n]}], 'Sidef::Types::Array::Array';
+    }
+
+    *get_row = \&row;
+
     sub zero {
         my (undef, $n, $m) = @_;
 

@@ -17,6 +17,7 @@ package Sidef::Perl::Perl {
             my ($val) = @_;
 
             my $ref = CORE::ref($val);
+
             if (not defined $val) {
                 return undef;
             }

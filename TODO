@@ -7,9 +7,6 @@ Classes:
 Method/functions:
     * Implement the `is exported` trait for functions and classes (maybe)
 
-New built-in classes:
-    * Implement a native `Vector` class to describe a two or three dimensional vector, with appropriate methods, such as: `dist`, `+`, `-`, `*`, `/`, etc...
-
 Internal:
     * Switch to subroutine `signatures` (as soon as this feature becomes stable).
 

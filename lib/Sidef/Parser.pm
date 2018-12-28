@@ -63,6 +63,7 @@ package Sidef::Parser {
                      | File\b                         (?{ state $x = bless({}, 'Sidef::DataTypes::Glob::File') })
                      | Arr(?:ay)?+\b                  (?{ state $x = bless({}, 'Sidef::DataTypes::Array::Array') })
                      | Pair\b                         (?{ state $x = bless({}, 'Sidef::DataTypes::Array::Pair') })
+                     | Vector\b                       (?{ state $x = bless({}, 'Sidef::DataTypes::Array::Vector') })
                      | Matrix\b                       (?{ state $x = bless({}, 'Sidef::DataTypes::Array::Matrix') })
                      | Hash\b                         (?{ state $x = bless({}, 'Sidef::DataTypes::Hash::Hash') })
                      | Set\b                          (?{ state $x = bless({}, 'Sidef::DataTypes::Set::Set') })
@@ -86,10 +87,10 @@ package Sidef::Parser {
                      | Regexp?\b                      (?{ state $x = bless({}, 'Sidef::DataTypes::Regex::Regex') })
                      | Object\b                       (?{ state $x = bless({}, 'Sidef::DataTypes::Object::Object') })
                      | Sidef\b                        (?{ state $x = bless({}, 'Sidef::DataTypes::Sidef::Sidef') })
-                     | Sig\b                          (?{ state $x = Sidef::Sys::Sig->new })
-                     | Sys\b                          (?{ state $x = Sidef::Sys::Sys->new })
-                     | Perl\b                         (?{ state $x = Sidef::Perl::Perl->new })
-                     | Math\b                         (?{ state $x = Sidef::Math::Math->new })
+                     | Sig\b                          (?{ state $x = bless({}, 'Sidef::Sys::Sig') })
+                     | Sys\b                          (?{ state $x = bless({}, 'Sidef::Sys::Sys') })
+                     | Perl\b                         (?{ state $x = bless({}, 'Sidef::Perl::Perl') })
+                     | Math\b                         (?{ state $x = bless({}, 'Sidef::Math::Math') })
                      | Time\b                         (?{ state $x = Sidef::Time::Time->new })
                      | \$\.                           (?{ state $x = bless({name => '$.'}, 'Sidef::Variable::Magic') })
                      | \$\?                           (?{ state $x = bless({name => '$?'}, 'Sidef::Variable::Magic') })
@@ -192,6 +193,7 @@ package Sidef::Parser {
                   DirHandle
                   Arr Array
                   Pair
+                  Vector
                   Matrix
                   Enumerator
                   Hash

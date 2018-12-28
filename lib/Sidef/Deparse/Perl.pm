@@ -51,6 +51,7 @@ package Sidef::Deparse::Perl {
                   Sidef::DataTypes::Bool::Bool            Sidef::Types::Bool::Bool
                   Sidef::DataTypes::Array::Array          Sidef::Types::Array::Array
                   Sidef::DataTypes::Array::Pair           Sidef::Types::Array::Pair
+                  Sidef::DataTypes::Array::Vector         Sidef::Types::Array::Vector
                   Sidef::DataTypes::Array::Matrix         Sidef::Types::Array::Matrix
                   Sidef::DataTypes::Hash::Hash            Sidef::Types::Hash::Hash
                   Sidef::DataTypes::Set::Set              Sidef::Types::Set::Set
@@ -76,6 +77,11 @@ package Sidef::Deparse::Perl {
                   Sidef::DataTypes::Object::Lazy          Sidef::Object::Lazy
                   Sidef::DataTypes::Object::LazyMethod    Sidef::Object::LazyMethod
                   Sidef::DataTypes::Object::Enumerator    Sidef::Object::Enumerator
+
+                  Sidef::Sys::Sig                         Sidef::Sys::Sig
+                  Sidef::Sys::Sys                         Sidef::Sys::Sys
+                  Sidef::Perl::Perl                       Sidef::Perl::Perl
+                  Sidef::Math::Math                       Sidef::Math::Math
                   )
             },
 
@@ -1305,9 +1311,6 @@ HEADER
                 }
             }
         }
-        elsif ($ref eq 'Sidef::Math::Math') {
-            $code = $self->make_constant($ref, 'new', "Math$refaddr");
-        }
         elsif ($ref eq 'Sidef::Meta::Glob::STDIN') {
             $code = $self->make_constant('Sidef::Types::Glob::FileHandle', 'new', "STDIN$refaddr", '\*STDIN');
         }
@@ -1328,9 +1331,6 @@ HEADER
         }
         elsif ($ref eq 'Sidef::Variable::Magic') {
             $code = $obj->{name};
-        }
-        elsif ($ref eq 'Sidef::Types::Glob::Socket') {
-            $code = $self->make_constant($ref, 'new', "Socket$refaddr");
         }
         elsif ($ref eq 'Sidef::Eval::Eval') {
             $Sidef::EVALS{$refaddr} = $obj;
@@ -1354,9 +1354,6 @@ HEADER
         }
         elsif ($ref eq 'Sidef::Time::Time') {
             $code = $ref . '->new';
-        }
-        elsif ($ref eq 'Sidef::Sys::Sig') {
-            $code = $self->make_constant($ref, 'new', "Sig$refaddr");
         }
         elsif ($ref eq 'Sidef::Types::Number::Complex') {
             my ($real, $imag) = $obj->reals;
@@ -1397,9 +1394,6 @@ HEADER
         }
         elsif ($ref eq 'Sidef::Types::Glob::Dir') {
             $code = $self->make_constant($ref, 'new', "Dir$refaddr", $self->_dump_string(${$obj}));
-        }
-        elsif ($ref eq 'Sidef::Sys::Sys') {
-            $code = $self->make_constant($ref, 'new', "Sys$refaddr");
         }
         elsif ($ref eq 'Sidef::Meta::Module') {
             $code = substr($self->deparse_bare_block($obj->{block}{code}), 1, -1);
@@ -1456,9 +1450,6 @@ HEADER
         }
         elsif ($ref eq 'Sidef::Parser') {
             $code = '$Sidef::PARSER';
-        }
-        elsif ($ref eq 'Sidef::Perl::Perl') {
-            $code = $self->make_constant($ref, 'new', "Perl$refaddr");
         }
         elsif ($ref eq 'Sidef::Meta::Unimplemented') {
             $code = qq{CORE::die "Unimplemented at " . } . $self->_dump_string($obj->{file}) . qq{. " line $obj->{line}\\n"};

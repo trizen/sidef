@@ -22,6 +22,7 @@ package Sidef::Deparse::Sidef {
                   Sidef::DataTypes::Bool::Bool            Bool
                   Sidef::DataTypes::Array::Array          Array
                   Sidef::DataTypes::Array::Pair           Pair
+                  Sidef::DataTypes::Array::Vector         Vector
                   Sidef::DataTypes::Array::Matrix         Matrix
                   Sidef::DataTypes::Hash::Hash            Hash
                   Sidef::DataTypes::Set::Set              Set
@@ -64,6 +65,7 @@ package Sidef::Deparse::Sidef {
                   Sidef::Perl::Perl                       Perl
                   Sidef::Time::Time                       Time
                   Sidef::Sys::Sig                         Sig
+                  Sidef::Sys::Sys                         Sys
                   Sidef::Meta::Unimplemented              ...
                   )
             },
@@ -417,9 +419,6 @@ package Sidef::Deparse::Sidef {
             if (not exists $expr->{call}) {
                 $code = 'Ref';
             }
-        }
-        elsif ($ref eq 'Sidef::Sys::Sys') {
-            $code = exists($obj->{file_name}) ? '' : 'Sys';
         }
         elsif ($ref eq 'Sidef::Meta::PrefixMethod') {
             $code = "::$obj->{name}" . $self->deparse_args($obj->{expr});
