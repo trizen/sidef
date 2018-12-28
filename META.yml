@@ -60,6 +60,8 @@ provides:
     file: lib/Sidef/Types/Array/Matrix.pm
   Sidef::Types::Array::Pair:
     file: lib/Sidef/Types/Array/Pair.pm
+  Sidef::Types::Array::Vector:
+    file: lib/Sidef/Types/Array/Vector.pm
   Sidef::Types::Block::Block:
     file: lib/Sidef/Types/Block/Block.pm
   Sidef::Types::Block::Fork:

@@ -88,6 +88,16 @@ Return the
 
 =cut
 
+=head2 col
+
+Matrix.col() -> I<Obj>
+
+Return the
+
+Aliases: I<column>, I<get_column>
+
+=cut
+
 =head2 col_len
 
 Matrix.col_len() -> I<Obj>
@@ -221,6 +231,16 @@ Aliases: I<prod_by>
 Matrix.rand() -> I<Obj>
 
 Return the
+
+=cut
+
+=head2 row
+
+Matrix.row() -> I<Obj>
+
+Return the
+
+Aliases: I<get_row>
 
 =cut
 

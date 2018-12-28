@@ -57,6 +57,36 @@ package Sidef::Types::Array::Vector {
         Sidef::Math::Math->max(Sidef::Types::Number::Number::ZERO, map { $v1->[$_]->sub($v2->[$_])->abs } 0 .. $end);
     }
 
+    sub dist_norm {
+        my ($v1, $v2) = @_;
+        my $end = List::Util::min($#{$v1}, $#{$v2});
+        Sidef::Math::Math->sum(map { my $t = $v1->[$_]->sub($v2->[$_]); $t->mul($t) } 0 .. $end);
+    }
+
+    sub dist {
+        my ($v1, $v2) = @_;
+        $v1->dist_norm($v2)->sqrt;
+    }
+
+    sub atan2 {
+        my ($v1, $v2) = @_;
+
+        my $end = List::Util::min($#{$v1}, $#{$v2});
+
+        if ($end == 1) {
+            my $dot   = $v1->[0]->mul($v2->[0])->add($v1->[1]->mul($v2->[1]));
+            my $cross = $v1->[0]->mul($v2->[1])->sub($v1->[1]->mul($v2->[0]));
+            return $cross->atan2($dot);
+        }
+
+        my $a1 = $v1->abs;
+        return Sidef::Types::Number::Number::ZERO if ($a1 eq Sidef::Types::Number::Number::ZERO);
+        my $u1 = $v1->div($a1);
+        my $p  = $v2->mul($u1);
+
+        $v2->sub($p->mul($u1))->abs->atan2($p);
+    }
+
     sub add {
         my ($v1, $v2) = @_;
 
@@ -81,7 +111,7 @@ package Sidef::Types::Array::Vector {
         my ($v1, $v2) = @_;
 
         if (exists $vector_like{ref($v2)}) {
-            return $v1->mul($v2->inv);
+            return $v1->mul($v2->scalar_operator('inv'));
         }
 
         bless($v1->scalar_operator('/', $v2));

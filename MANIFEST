@@ -40,6 +40,8 @@ lib/Sidef/Types/Array/Matrix.pm
 lib/Sidef/Types/Array/Matrix.pod
 lib/Sidef/Types/Array/Pair.pm
 lib/Sidef/Types/Array/Pair.pod
+lib/Sidef/Types/Array/Vector.pm
+lib/Sidef/Types/Array/Vector.pod
 lib/Sidef/Types/Block/Block.pm
 lib/Sidef/Types/Block/Block.pod
 lib/Sidef/Types/Block/Fork.pm

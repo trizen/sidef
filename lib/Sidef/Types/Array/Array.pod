@@ -882,14 +882,6 @@ Return the
 
 =cut
 
-=head2 join_insert
-
-Array.join_insert() -> I<Obj>
-
-Return the
-
-=cut
-
 =head2 keys
 
 Array.keys() -> I<Obj>
@@ -1017,6 +1009,14 @@ Aliases: I<matrix_add>
 =head2 make
 
 Array.make() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 make_by
+
+Array.make_by() -> I<Obj>
 
 Return the
 
@@ -1192,11 +1192,13 @@ Return the
 
 =cut
 
-=head2 pairmap
+=head2 pair_map
 
-Array.pairmap() -> I<Obj>
+Array.pair_map() -> I<Obj>
 
 Return the
+
+Aliases: I<pairmap>
 
 =cut
 
