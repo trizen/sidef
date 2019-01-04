@@ -47,7 +47,7 @@ sub parse_deparse {
     return ($deparsed, \@statements);
 }
 
-my %ignore = ();
+my %ignore = ('matrix_class.sf' => 1);
 my $dir = catdir(updir, 'scripts');
 
 find {

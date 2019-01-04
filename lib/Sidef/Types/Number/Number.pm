@@ -94,21 +94,18 @@ package Sidef::Types::Number::Number {
             }
             elsif (substr($num, 0, 1) eq '(' and substr($num, -1) eq ')') {
                 my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
-                if (Math::MPC::Rmpc_set_str($r, $num, $int_base, $ROUND)) {
-                    goto &nan;
-                }
+                eval { Math::MPC::Rmpc_set_str($r, $num, $int_base, $ROUND) } // goto &nan;
                 return bless \$r;
             }
             elsif (index($num, '.') != -1) {
                 my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-                if (Math::MPFR::Rmpfr_set_str($r, $num, $int_base, $ROUND)) {
+                if (Math::MPFR::Rmpfr_set_str($r, $num, $int_base, $ROUND) < 0) {
                     goto &nan;
                 }
                 return bless \$r;
             }
             else {
-                my $r = eval { Math::GMPz::Rmpz_init_set_str($num, $int_base) } // goto &nan;
-                return bless \$r;
+                return bless \(eval { Math::GMPz::Rmpz_init_set_str($num, $int_base) } // goto &nan);
             }
         }
 
@@ -5313,11 +5310,14 @@ package Sidef::Types::Number::Number {
 
         $x = $$x;
 
+#<<<
         Sidef::Types::String::String->new(
-                                          ($base == 10 and (ref($x) eq 'Math::MPFR' or ref($x) eq 'Math::MPC'))
-                                          ? __stringify__($x)
-                                          : __base__($x, $base)
-                                         );
+                                         # ($base == 10 and (ref($x) eq 'Math::MPFR' or ref($x) eq 'Math::MPC'))
+                                         # ? __stringify__($x)
+                                         # :
+                                            __base__($x, $base)
+                                    );
+#>>>
     }
 
     *in_base = \&base;
