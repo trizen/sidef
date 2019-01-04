@@ -2203,8 +2203,9 @@ package Sidef::Parser {
                                   );
             }
 
-            # Quoted words or numbers (%w/a b c/)
-            if (/\G%([wWin])\b/gc || /\G(?=(«|<(?!<)))/) {
+            # Quoted words, numbers, vectors and matrices
+            # %w(...), %i(...), %n(...), %v(...), %m(...), «...», <...>
+            if (/\G%([wWinvm])\b/gc || /\G(?=(«|<(?!<)))/) {
                 my ($type) = $1;
                 my $strings = $self->get_quoted_words(code => $opt{code});
 
@@ -2219,6 +2220,20 @@ package Sidef::Parser {
                 elsif ($type eq 'n') {
                     return Sidef::Types::Array::Array->new(
                                                 [map { Sidef::Types::Number::Number->new(s{\\(?=[\\#\s])}{}gr) } @{$strings}]);
+                }
+                elsif ($type eq 'v') {
+                    return Sidef::Types::Array::Vector->new(map { Sidef::Types::Number::Number->new(s{\\(?=[\\#\s])}{}gr) }
+                                                            @{$strings});
+                }
+                elsif ($type eq 'm') {
+                    my @matrix;
+                    my $data = join(' ', @$strings);
+                    foreach my $line (split(/\s*;\s*/, $data)) {
+                        push @matrix,
+                          Sidef::Types::Array::Array->new(
+                                     [map { Sidef::Types::Number::Number->new(s{\\(?=[\\#\s])}{}gr) } split(/[\s,]+/, $line)]);
+                    }
+                    return Sidef::Types::Array::Matrix->new(@matrix);
                 }
 
                 my ($inline_expression, @objs);

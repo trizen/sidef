@@ -49,6 +49,18 @@ package Sidef::Object::Convert {
 
     *to_a = \&to_array;
 
+    sub to_vector {
+        Sidef::Types::Array::Vector->new($_[0]);
+    }
+
+    *to_v = \&to_vector;
+
+    sub to_matrix {
+        Sidef::Types::Array::Matrix->new(@{$_[0]});
+    }
+
+    *to_m = \&to_matrix;
+
     sub to_file {
         Sidef::Types::Glob::File->new("$_[0]");
     }

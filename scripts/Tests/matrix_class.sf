@@ -2,16 +2,16 @@
 
 # Tests for the Matrix class
 
-var A = Matrix(
-    [2, -3,  1],
-    [1, -2, -2],
-    [3, -4,  1],
+var A = %m(
+    2 -3  1;        # comment test #1
+    1 -2 -2;
+    3 -4, 1;        # comment test #2
 )
 
-var B = Matrix(
-    [9, -3, -2],
-    [3, -1,  7],
-    [2, -4, -8],
+var B = %m(
+    9, -3, -2;
+    3, -1,  7;
+    2, -4, -8       # comment test
 )
 
 var C = Matrix(

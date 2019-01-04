@@ -48,7 +48,7 @@ package Sidef::Types::Regex::Match {
               ? (substr($hash{string}, $hash{pos}) =~ $hash{regex}{regex})
               : ($hash{string} =~ $hash{regex}{regex});
 
-            $hash{matched} = (@captures != 0);
+            $hash{matched}   = (@captures != 0);
             $hash{match_pos} = $hash{matched} ? [$-[0] + ($hash{pos} // 0), $+[0] + ($hash{pos} // 0)] : [];
 
             foreach my $key (keys %+) {
@@ -86,9 +86,10 @@ package Sidef::Types::Regex::Match {
                            [@{$self->{_cached_cap} //= [map { Sidef::Types::String::String->new($_) } @{$self->{captures}}]}]);
     }
 
-    *cap  = \&captures;
-    *caps = \&captures;
-    *to_a = \&captures;
+    *cap      = \&captures;
+    *caps     = \&captures;
+    *to_a     = \&captures;
+    *to_array = \&captures;
 
     sub named_captures {
         my ($self) = @_;

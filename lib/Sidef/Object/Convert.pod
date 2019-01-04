@@ -95,6 +95,16 @@ Aliases: I<to_int>
 
 =cut
 
+=head2 to_m
+
+Convert.to_m() -> I<Obj>
+
+Return the
+
+Aliases: I<to_matrix>
+
+=cut
+
 =head2 to_n
 
 Convert.to_n() -> I<Obj>
@@ -148,5 +158,15 @@ Return the
 Convert.to_type() -> I<Obj>
 
 Return the
+
+=cut
+
+=head2 to_v
+
+Convert.to_v() -> I<Obj>
+
+Return the
+
+Aliases: I<to_vector>
 
 =cut

@@ -444,6 +444,18 @@ Matrix.to_a() -> I<Obj>
 
 Return the
 
+Aliases: I<to_array>
+
+=cut
+
+=head2 to_s
+
+Matrix.to_s() -> I<Obj>
+
+Return the
+
+Aliases: I<dump>, I<to_str>
+
 =cut
 
 =head2 vertical_flip

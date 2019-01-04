@@ -13,9 +13,9 @@ func orbital_state_vectors(
     true_anomaly
 ) {
     var (i, j, k) = (
-        Matrix([1, 0, 0]),
-        Matrix([0, 1, 0]),
-        Matrix([0, 0, 1]),
+        %v(1 0 0),
+        %v(0 1 0),
+        %v(0 0 1),
     )
 
     func muladd(v1, x1, v2, x2) {
@@ -43,11 +43,11 @@ func orbital_state_vectors(
     var position = muladd(i, c, j, s)*r
 
     var speed = muladd(i, rprime*c - r*s, j, rprime*s + r*c)
-    speed /= speed.map{_**2}.sum.sqrt
+    speed /= speed.abs
     speed *= sqrt(2/r - 1/semimajor_axis)
 
     struct Result { position, speed }
-    Result([position,speed].map {|v| v[0] }...)
+    Result(position, speed)
 }
 
 for args in ([

@@ -1099,6 +1099,12 @@ HEADER
         elsif ($ref eq 'Sidef::Types::Array::Array' or $ref eq 'Sidef::Types::Array::HCArray') {
             $code = $self->_dump_array('Sidef::Types::Array::Array', $obj);
         }
+        elsif ($ref eq 'Sidef::Types::Array::Vector') {
+            $code = $self->_dump_array('Sidef::Types::Array::Vector', $obj);
+        }
+        elsif ($ref eq 'Sidef::Types::Array::Matrix') {
+            $code = $self->_dump_array('Sidef::Types::Array::Matrix', $obj);
+        }
         elsif ($ref eq 'Sidef::Types::Bool::Bool') {
             $code = 'Sidef::Types::Bool::Bool::' . (${$obj} ? 'TRUE' : 'FALSE');
         }

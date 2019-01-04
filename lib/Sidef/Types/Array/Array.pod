@@ -1590,11 +1590,13 @@ Aliases: I<to_hash>
 
 =cut
 
-=head2 to_matrix
+=head2 to_m
 
-Array.to_matrix() -> I<Obj>
+Array.to_m() -> I<Obj>
 
 Return the
+
+Aliases: I<to_matrix>
 
 =cut
 
@@ -1613,6 +1615,16 @@ Aliases: I<dump>, I<to_str>
 Array.to_set() -> I<Obj>
 
 Return the
+
+=cut
+
+=head2 to_v
+
+Array.to_v() -> I<Obj>
+
+Return the
+
+Aliases: I<to_vector>
 
 =cut
 

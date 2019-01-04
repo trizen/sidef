@@ -5,6 +5,8 @@ package Sidef::Types::Array::Vector {
 
     use parent qw(Sidef::Types::Array::Array);
 
+    use overload q{""} => \&_dump;
+
     require List::Util;
 
     my %vector_like = (
@@ -128,33 +130,33 @@ package Sidef::Types::Array::Vector {
     }
 
     sub and {
-        my ($m1, $m2) = @_;
+        my ($v1, $v2) = @_;
 
-        if (exists $vector_like{ref($m2)}) {
-            return bless($m1->wise_operator('&', $m2));
+        if (exists $vector_like{ref($v2)}) {
+            return bless($v1->wise_operator('&', $v2));
         }
 
-        bless($m1->scalar_operator('&', $m2));
+        bless($v1->scalar_operator('&', $v2));
     }
 
     sub or {
-        my ($m1, $m2) = @_;
+        my ($v1, $v2) = @_;
 
-        if (exists $vector_like{ref($m2)}) {
-            return bless($m1->wise_operator('|', $m2));
+        if (exists $vector_like{ref($v2)}) {
+            return bless($v1->wise_operator('|', $v2));
         }
 
-        bless($m1->scalar_operator('|', $m2));
+        bless($v1->scalar_operator('|', $v2));
     }
 
     sub xor {
-        my ($m1, $m2) = @_;
+        my ($v1, $v2) = @_;
 
-        if (exists $vector_like{ref($m2)}) {
-            return bless($m1->wise_operator('^', $m2));
+        if (exists $vector_like{ref($v2)}) {
+            return bless($v1->wise_operator('^', $v2));
         }
 
-        bless($m1->scalar_operator('^', $m2));
+        bless($v1->scalar_operator('^', $v2));
     }
 
     sub floor {
@@ -172,10 +174,23 @@ package Sidef::Types::Array::Vector {
         bless [map { $_->round($digits) } @$self];
     }
 
-    sub to_a {
-        my ($A) = @_;
-        Sidef::Types::Array::Array->new(@$A);
+    sub to_array {
+        my ($v) = @_;
+        Sidef::Types::Array::Array->new(@$v);
     }
+
+    *to_a = \&to_array;
+
+    sub _dump {
+        "Vector(" . substr($_[0]->SUPER::_dump, 1, -1) . ")";
+    }
+
+    sub dump {
+        Sidef::Types::String::String->new($_[0]->_dump);
+    }
+
+    *to_s   = \&dump;
+    *to_str = \&dump;
 
     {
         no strict 'refs';

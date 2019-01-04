@@ -3388,6 +3388,15 @@ package Sidef::Types::Array::Array {
         Sidef::Types::Array::Matrix->new(@$self);
     }
 
+    *to_m = \&to_matrix;
+
+    sub to_vector {
+        my ($self) = @_;
+        Sidef::Types::Array::Vector->new(@$self);
+    }
+
+    *to_v = \&to_vector;
+
     {
         no strict 'refs';
 

@@ -5,6 +5,8 @@ package Sidef::Types::Array::Matrix {
 
     use parent qw(Sidef::Types::Array::Array);
 
+    use overload q{""} => \&_dump;
+
     require List::Util;
 
     my %array_like = (
@@ -791,10 +793,23 @@ package Sidef::Types::Array::Matrix {
     *row_len  = \&row_count;
     *row_size = \&row_count;
 
-    sub to_a {
+    sub to_array {
         my ($A) = @_;
         Sidef::Types::Array::Array->new(@$A);
     }
+
+    *to_a = \&to_array;
+
+    sub _dump {
+        "Matrix(" . join(",\n          ", @{$_[0]}) . ")";
+    }
+
+    sub dump {
+        Sidef::Types::String::String->new($_[0]->_dump);
+    }
+
+    *to_s   = \&dump;
+    *to_str = \&dump;
 
     {
         no strict 'refs';
