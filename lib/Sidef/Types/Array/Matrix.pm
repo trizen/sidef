@@ -801,7 +801,7 @@ package Sidef::Types::Array::Matrix {
     *to_a = \&to_array;
 
     sub _dump {
-        "Matrix(" . join(",\n          ", @{$_[0]}) . ")";
+        "Matrix(\n  " . join(",\n  ", @{$_[0]}) . "\n)";
     }
 
     sub dump {
