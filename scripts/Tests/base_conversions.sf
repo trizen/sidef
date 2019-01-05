@@ -1,0 +1,40 @@
+#!/usr/bin/ruby
+
+# Tests for base conversions.
+
+func dec2bin(n) {
+    Num(n.base(2), 10)
+}
+
+func bin2dec(n) {
+    Num(n.base(10), 2)
+}
+
+assert_eq(dec2bin(23.34375), 10111.01011)
+assert_eq(bin2dec(1011.11101), 11.90625)
+
+assert_eq(dec2bin(23.34375.float), 10111.01011.float)
+assert_eq(bin2dec(1011.11101.float), 11.90625.float)
+
+assert_eq(dec2bin(23.34375.complex), 10111.01011.complex)
+assert_eq(bin2dec(1011.11101.complex), 11.90625.complex)
+
+assert_eq(Num("101010",  2),  42)
+assert_eq(Num("h.i",     36), 17.5)
+assert_eq(Num("63/2b",   16), 99/43)
+assert_eq(Num("(h.i 5)", 36), 17.5+5i)
+
+for t in [
+    42, -42, bern(42), bern(44), sqrt(2), -sqrt(3),
+    complex(Num.pi, Num.e), -complex(Num.pi, Num.e),
+    complex(0, Num.pi), complex(0, -sqrt(2))
+] {
+    assert_eq(Num(t.base(2), 2), t)
+    assert_eq(Num(t.base(9), 9), t)
+    assert_eq(Num(t.base(10), 10), t)
+    assert_eq(Num(t.base(12), 12), t)
+    assert_eq(Num(t.base(33), 33), t)
+    assert_eq(Num(t.base(36), 36), t)
+}
+
+say "** Test passed!"

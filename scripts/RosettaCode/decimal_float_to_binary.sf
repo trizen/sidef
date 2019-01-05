@@ -15,5 +15,5 @@ func bin2dec(String n) {
 with("23.34375")   { |s| say ("  #{s} => ", dec2bin(s)) }
 with("1011.11101") { |s| say (  "#{s} => ", bin2dec(s)) }
 
-assert_eq(dec2bin("23.34375"), 10111.01011)
-assert_eq(bin2dec("1011.11101"), 11.90625)
+assert_eq(dec2bin("23.34375"), 10111.01011.float)
+assert_eq(bin2dec("1011.11101"), 11.90625.float)

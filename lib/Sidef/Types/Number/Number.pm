@@ -64,13 +64,8 @@ package Sidef::Types::Number::Number {
 
         my $ref = ref($num);
 
-        # Special string values
-        if (!$ref and (!defined($base) or $base == 10)) {
-            return bless \_str2obj($num);
-        }
-
         # Number with base
-        elsif (defined($base) and $base != 10) {
+        if (defined($base)) {
 
             my $int_base = CORE::int($base);
 
@@ -94,7 +89,7 @@ package Sidef::Types::Number::Number {
             }
             elsif (substr($num, 0, 1) eq '(' and substr($num, -1) eq ')') {
                 my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
-                eval { Math::MPC::Rmpc_set_str($r, $num, $int_base, $ROUND) } // goto &nan;
+                eval { Math::MPC::Rmpc_set_str($r, $num, $int_base, $ROUND); 1 } // goto &nan;
                 return bless \$r;
             }
             elsif (index($num, '.') != -1) {
@@ -109,32 +104,37 @@ package Sidef::Types::Number::Number {
             }
         }
 
+        # Special string values
+        if (!$ref) {
+            return bless \_str2obj($num);
+        }
+
         # Special objects
-        elsif ($ref eq __PACKAGE__) {
+        if ($ref eq __PACKAGE__) {
             return $num;
         }
 
         # GMPz
-        elsif ($ref eq 'Math::GMPz') {
+        if ($ref eq 'Math::GMPz') {
             return bless \Math::GMPz::Rmpz_init_set($num);
         }
 
         # MPFR
-        elsif ($ref eq 'Math::MPFR') {
+        if ($ref eq 'Math::MPFR') {
             my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
             Math::MPFR::Rmpfr_set($r, $num, $ROUND);
             return bless \$r;
         }
 
         # MPC
-        elsif ($ref eq 'Math::MPC') {
+        if ($ref eq 'Math::MPC') {
             my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
             Math::MPC::Rmpc_set($r, $num, $ROUND);
             return bless \$r;
         }
 
         # GMPq
-        elsif ($ref eq 'Math::GMPq') {
+        if ($ref eq 'Math::GMPq') {
             my $r = Math::GMPq::Rmpq_init();
             Math::GMPq::Rmpq_set($r, $num);
             return bless \$r;
@@ -5310,14 +5310,7 @@ package Sidef::Types::Number::Number {
 
         $x = $$x;
 
-#<<<
-        Sidef::Types::String::String->new(
-                                         # ($base == 10 and (ref($x) eq 'Math::MPFR' or ref($x) eq 'Math::MPC'))
-                                         # ? __stringify__($x)
-                                         # :
-                                            __base__($x, $base)
-                                    );
-#>>>
+        Sidef::Types::String::String->new(__base__($x, $base));
     }
 
     *in_base = \&base;
