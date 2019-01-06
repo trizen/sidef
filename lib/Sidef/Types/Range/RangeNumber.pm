@@ -13,7 +13,6 @@ package Sidef::Types::Range::RangeNumber {
         "RangeNum(" . join(', ', $self->{from}->dump, $self->{to}->dump, $self->{step}->dump) . ")";
     };
 
-    use Sidef::Math::Math;
     use Sidef::Types::Bool::Bool;
     use Sidef::Types::Number::Number;
 
@@ -128,12 +127,12 @@ package Sidef::Types::Range::RangeNumber {
 
             if (++$count > 1e5) {
                 $count = 0;
-                $sum   = $sum->add(Sidef::Math::Math->sum(splice(@list)));
+                $sum   = $sum->sum(splice(@list));
             }
         }
 
         if (@list) {
-            $sum = $sum->add(Sidef::Math::Math->sum(splice(@list)));
+            $sum = $sum->sum(splice(@list));
         }
 
         $sum;
@@ -179,12 +178,12 @@ package Sidef::Types::Range::RangeNumber {
 
             if (++$count > 1e5) {
                 $count = 0;
-                $prod  = $prod->mul(Sidef::Math::Math->prod(splice(@list)));
+                $prod  = $prod->prod(splice(@list));
             }
         }
 
         if (@list) {
-            $prod = $prod->mul(Sidef::Math::Math->prod(splice(@list)));
+            $prod = $prod->prod(splice(@list));
         }
 
         $prod;
@@ -227,12 +226,12 @@ package Sidef::Types::Range::RangeNumber {
 
             if (++$count > 1e5) {
                 $count = 0;
-                $prod  = $prod->mul(Sidef::Math::Math->prod(splice(@list)));
+                $prod  = $prod->prod(splice(@list));
             }
         }
 
         if (@list) {
-            $prod = $prod->mul(Sidef::Math::Math->prod(splice(@list)));
+            $prod = $prod->prod(splice(@list));
         }
 
         $prod;

@@ -5238,19 +5238,47 @@ package Sidef::Types::Number::Number {
         Math::MPC::RMPC_IM($t, $x);
         Math::MPFR::Rmpfr_nan_p($t) && return Sidef::Types::Bool::Bool::TRUE;
 
-        return Sidef::Types::Bool::Bool::FALSE;
+        Sidef::Types::Bool::Bool::FALSE;
+    }
+
+    sub sum {
+        @_ || return ZERO;
+        _valid(\(@_));
+        bless \_binsplit([map { $$_ } @_], \&__add__);
+    }
+
+    sub prod {
+        @_ || return ONE;
+        _valid(\(@_));
+        bless \_binsplit([map { $$_ } @_], \&__mul__);
     }
 
     sub max {
-        my ($x, $y) = @_;
-        _valid(\$y);
-        (__cmp__($$x, $$y) // return undef) > 0 ? $x : $y;
+        _valid(\(@_));
+
+        my $max = shift(@_);
+
+        foreach my $curr (@_) {
+            if ((__cmp__($$curr, $$max) // return undef) > 0) {
+                $max = $curr;
+            }
+        }
+
+        $max;
     }
 
     sub min {
-        my ($x, $y) = @_;
-        _valid(\$y);
-        (__cmp__($$x, $$y) // return undef) < 0 ? $x : $y;
+        _valid(\(@_));
+
+        my $min = shift(@_);
+
+        foreach my $curr (@_) {
+            if ((__cmp__($$curr, $$min) // return undef) < 0) {
+                $min = $curr;
+            }
+        }
+
+        $min;
     }
 
     sub as_int {

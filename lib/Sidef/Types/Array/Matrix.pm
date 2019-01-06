@@ -396,14 +396,14 @@ package Sidef::Types::Array::Matrix {
 
     sub sum {
         my ($A, $block) = @_;
-        Sidef::Math::Math->sum(map { $_->SUPER::sum($block) } @$A);
+        Sidef::Types::Array::Array->new([map { @$_ } @$A])->sum($block);
     }
 
     *sum_by = \&sum;
 
     sub prod {
         my ($A, $block) = @_;
-        Sidef::Math::Math->prod(map { $_->SUPER::prod($block) } @$A);
+        Sidef::Types::Array::Array->new([map { @$_ } @$A])->prod($block);
     }
 
     *prod_by = \&prod;

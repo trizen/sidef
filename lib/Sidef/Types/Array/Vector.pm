@@ -34,35 +34,36 @@ package Sidef::Types::Array::Vector {
 
     sub abs {
         my ($v) = @_;
-        Sidef::Math::Math->sum(map { $_->mul($_) } @$v)->sqrt;
+        Sidef::Types::Number::Number::sum(map { $_->mul($_) } @$v)->sqrt;
     }
 
     sub norm {
         my ($v) = @_;
-        Sidef::Math::Math->sum(map { $_->mul($_) } @$v);
+        Sidef::Types::Number::Number::sum(map { $_->mul($_) } @$v);
     }
 
     sub manhattan_norm {
         my ($v) = @_;
-        Sidef::Math::Math->sum(map { $_->abs } @$v);
+        Sidef::Types::Number::Number::sum(map { $_->abs } @$v);
     }
 
     sub manhattan_dist {
         my ($v1, $v2) = @_;
         my $end = List::Util::min($#{$v1}, $#{$v2});
-        Sidef::Math::Math->sum(map { $v1->[$_]->sub($v2->[$_])->abs } 0 .. $end);
+        Sidef::Types::Number::Number::sum(map { $v1->[$_]->sub($v2->[$_])->abs } 0 .. $end);
     }
 
     sub chebyshev_dist {
         my ($v1, $v2) = @_;
         my $end = List::Util::min($#{$v1}, $#{$v2});
-        Sidef::Math::Math->max(Sidef::Types::Number::Number::ZERO, map { $v1->[$_]->sub($v2->[$_])->abs } 0 .. $end);
+        Sidef::Types::Number::Number::max(Sidef::Types::Number::Number::ZERO,
+                                          map { $v1->[$_]->sub($v2->[$_])->abs } 0 .. $end);
     }
 
     sub dist_norm {
         my ($v1, $v2) = @_;
         my $end = List::Util::min($#{$v1}, $#{$v2});
-        Sidef::Math::Math->sum(map { my $t = $v1->[$_]->sub($v2->[$_]); $t->mul($t) } 0 .. $end);
+        Sidef::Types::Number::Number::sum(map { my $t = $v1->[$_]->sub($v2->[$_]); $t->mul($t) } 0 .. $end);
     }
 
     sub dist {

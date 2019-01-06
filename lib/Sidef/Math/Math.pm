@@ -13,7 +13,7 @@ package Sidef::Math::Math {
         bless {}, __PACKAGE__;
     }
 
-    sub _binsplit {
+    sub _binsplit {    # not used anymore, but let's keep it around anyway
         my ($arr, $method) = @_;
 
         my $sub = sub {
@@ -46,64 +46,40 @@ package Sidef::Math::Math {
 
     sub gcd {
         my ($self, @list) = @_;
-
-        @list || return Sidef::Types::Number::Number::ZERO;
-
-        my $gcd = $list[0];
-        foreach my $i (1 .. $#list) {
-            last if $gcd->is_one;
-            $gcd = $gcd->gcd($list[$i]);
-        }
-
-        $gcd;
+        Sidef::Types::Number::Number::gcd(@list);
     }
 
     sub lcm {
         my ($self, @list) = @_;
-        @list || return Sidef::Types::Number::Number::ZERO;
-        _binsplit(\@list, 'lcm');
+        Sidef::Types::Number::Number::lcm(@list);
     }
 
     sub sum {
         my ($self, @list) = @_;
-        @list || return Sidef::Types::Number::Number::ZERO;
-        _binsplit(\@list, 'add');
+        Sidef::Types::Number::Number::sum(@list);
     }
 
     sub prod {
         my ($self, @list) = @_;
-        @list || return Sidef::Types::Number::Number::ONE;
-        _binsplit(\@list, 'mul');
+        Sidef::Types::Number::Number::prod(@list);
     }
 
     *product = \&prod;
 
     sub max {
         my ($self, @list) = @_;
-
-        my $max = $list[0];
-        foreach my $i (1 .. $#list) {
-            $max = $max->max($list[$i]);
-        }
-
-        $max;
+        Sidef::Types::Number::Number::max(@list);
     }
 
     sub min {
         my ($self, @list) = @_;
-
-        my $min = $list[0];
-        foreach my $i (1 .. $#list) {
-            $min = $min->min($list[$i]);
-        }
-
-        $min;
+        Sidef::Types::Number::Number::min(@list);
     }
 
     sub arithmetic_mean {
         my ($self, @list) = @_;
 
-        my $sum = $self->sum(@list);
+        my $sum = Sidef::Types::Number::Number::sum(@list);
         my $n   = Sidef::Types::Number::Number->_set_uint(scalar(@list));
 
         $sum->div($n);
@@ -114,7 +90,7 @@ package Sidef::Math::Math {
     sub geometric_mean {
         my ($self, @list) = @_;
 
-        my $prod = $self->prod(@list);
+        my $prod = Sidef::Types::Number::Number::prod(@list);
         my $n    = Sidef::Types::Number::Number->_set_uint(scalar(@list));
 
         $prod->root($n);
@@ -123,8 +99,8 @@ package Sidef::Math::Math {
     sub harmonic_mean {
         my ($self, @list) = @_;
 
-        my $sum = $self->sum(map { $_->inv } @list);
-        my $n = Sidef::Types::Number::Number->_set_uint(scalar(@list));
+        my $sum = Sidef::Types::Number::Number::sum(map { $_->inv } @list);
+        my $n   = Sidef::Types::Number::Number->_set_uint(scalar(@list));
 
         $n->div($sum);
     }

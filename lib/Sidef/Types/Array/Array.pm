@@ -14,7 +14,6 @@ package Sidef::Types::Array::Array {
       q{0+}   => sub { scalar(@{$_[0]}) },
       q{bool} => sub { scalar(@{$_[0]}) };
 
-    use Sidef::Math::Math;
     use Sidef::Types::Number::Number;
 
     sub new {
@@ -956,12 +955,12 @@ package Sidef::Types::Array::Array {
 
             if (++$count > 1e5) {
                 $count = 0;
-                $sum   = $sum->add(Sidef::Math::Math->sum(CORE::splice(@list)));
+                $sum   = $sum->sum(CORE::splice(@list));
             }
         }
 
         if (@list) {
-            $sum = $sum->add(Sidef::Math::Math->sum(CORE::splice(@list)));
+            $sum = $sum->sum(CORE::splice(@list));
         }
 
         return $sum;
@@ -984,7 +983,7 @@ package Sidef::Types::Array::Array {
             return $sum;
         }
 
-        Sidef::Math::Math->sum(@$self);
+        Sidef::Types::Number::Number::sum(@$self);
     }
 
     sub prod_by {
@@ -1000,12 +999,12 @@ package Sidef::Types::Array::Array {
 
             if (++$count > 1e5) {
                 $count = 0;
-                $prod  = $prod->mul(Sidef::Math::Math->prod(CORE::splice(@list)));
+                $prod  = $prod->prod(CORE::splice(@list));
             }
         }
 
         if (@list) {
-            $prod = $prod->mul(Sidef::Math::Math->prod(CORE::splice(@list)));
+            $prod = $prod->prod(CORE::splice(@list));
         }
 
         return $prod;
@@ -1028,7 +1027,7 @@ package Sidef::Types::Array::Array {
             return $prod;
         }
 
-        Sidef::Math::Math->prod(@$self);
+        Sidef::Types::Number::Number::prod(@$self);
     }
 
     sub gcd_by {
@@ -1039,7 +1038,7 @@ package Sidef::Types::Array::Array {
             push @list, $block->run($n);
         }
 
-        Sidef::Math::Math->gcd(@list);
+        Sidef::Types::Number::Number::gcd(@list);
     }
 
     sub gcd {
@@ -1049,7 +1048,7 @@ package Sidef::Types::Array::Array {
             goto &gcd_by;
         }
 
-        Sidef::Math::Math->gcd(@$self);
+        Sidef::Types::Number::Number::gcd(@$self);
     }
 
     sub lcm_by {
@@ -1060,7 +1059,7 @@ package Sidef::Types::Array::Array {
             push @list, $block->run($n);
         }
 
-        Sidef::Math::Math->lcm(@list);
+        Sidef::Types::Number::Number::lcm(@list);
     }
 
     sub lcm {
@@ -1070,7 +1069,7 @@ package Sidef::Types::Array::Array {
             goto &lcm_by;
         }
 
-        Sidef::Math::Math->lcm(@$self);
+        Sidef::Types::Number::Number::lcm(@$self);
     }
 
     sub _min_max_by {
