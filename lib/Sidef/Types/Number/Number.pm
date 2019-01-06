@@ -1913,38 +1913,41 @@ package Sidef::Types::Number::Number {
         bless \__neg__($$x);
     }
 
-    sub abs {
+    sub __abs__ {
         my ($x) = @_;
-
-        $x = $$x;
         goto(ref($x) =~ tr/:/_/rs);
 
       Math_GMPz: {
-            Math::GMPz::Rmpz_sgn($x) >= 0 and return $_[0];
+            Math::GMPz::Rmpz_sgn($x) >= 0 and return $x;
             my $r = Math::GMPz::Rmpz_init();
             Math::GMPz::Rmpz_abs($r, $x);
-            return bless \$r;
+            return $r;
         }
 
       Math_GMPq: {
-            Math::GMPq::Rmpq_sgn($x) >= 0 and return $_[0];
+            Math::GMPq::Rmpq_sgn($x) >= 0 and return $x;
             my $r = Math::GMPq::Rmpq_init();
             Math::GMPq::Rmpq_abs($r, $x);
-            return bless \$r;
+            return $r;
         }
 
       Math_MPFR: {
-            Math::MPFR::Rmpfr_sgn($x) >= 0 and return $_[0];
+            Math::MPFR::Rmpfr_sgn($x) >= 0 and return $x;
             my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
             Math::MPFR::Rmpfr_abs($r, $x, $ROUND);
-            return bless \$r;
+            return $r;
         }
 
       Math_MPC: {
             my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
             Math::MPC::Rmpc_abs($r, $x, $ROUND);
-            return bless \$r;
+            return $r;
         }
+    }
+
+    sub abs {
+        my ($x) = @_;
+        bless \__abs__($$x);
     }
 
     sub __inv__ {
@@ -4867,7 +4870,12 @@ package Sidef::Types::Number::Number {
         !$cmp ? ZERO : ($cmp > 0) ? ONE : MONE;
     }
 
-    # TODO: add the acmp() method.
+    sub acmp {
+        my ($x, $y) = @_;
+        _valid(\$y);
+        my $cmp = __cmp__(__abs__($$x), __abs__($$y)) // return undef;
+        !$cmp ? ZERO : ($cmp > 0) ? ONE : MONE;
+    }
 
     sub gt {
         my ($x, $y) = @_;
