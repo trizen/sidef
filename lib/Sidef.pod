@@ -76,10 +76,10 @@ The main features of Sidef include:
     my $ast = $sidef->parse_code($code);
 
     # Optimize the AST by performing constant-folding
-    my %oast = $sidef->optimize_ast($ast);
+    my $oast = $sidef->optimize_ast($ast);
 
     # Compile the AST back into Sidef code
-    print $sidef->compile_ast(\%oast, 'Sidef');
+    print $sidef->compile_ast($oast, 'Sidef');
 
 
 =head1 SUBROUTINES/METHODS
@@ -98,7 +98,7 @@ Parses a given Sidef code and returns the AST.
 
 =head2 optimize_ast
 
-    my %oast = $s->optimize_ast($ast);
+    my $oast = $s->optimize_ast($ast);
 
 Performs constant-folding and some other optimizations on a given AST.
 
