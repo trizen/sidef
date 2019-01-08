@@ -2223,7 +2223,7 @@ package Sidef::Parser {
                 }
                 elsif ($type eq 'v') {
                     return Sidef::Types::Array::Vector->new(map { Sidef::Types::Number::Number->new(s{\\(?=[\\#\s])}{}gr) }
-                                                            @{$strings});
+                                                            split(/[\s,]+/, join(' ', @$strings)));
                 }
                 elsif ($type eq 'm') {
                     my @matrix;
