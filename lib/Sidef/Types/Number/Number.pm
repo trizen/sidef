@@ -3999,6 +3999,17 @@ package Sidef::Types::Number::Number {
     *Bernoulli        = \&bernfrac;
     *bernoulli_number = \&bernfrac;
 
+    sub faulhaber_polynomial {
+        my ($n, $x) = @_;
+
+        _valid(\$x);
+
+        $n = $n->inc;
+        $x = $x->inc;
+
+        $n->bernoulli_polynomial($x)->sub($n->bernfrac)->div($n);
+    }
+
     sub euler_polynomial {
         my ($n, $x) = @_;
 

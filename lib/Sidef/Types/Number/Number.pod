@@ -292,6 +292,14 @@ Absolute value of C<n>.
 
 =cut
 
+=head2 acmp
+
+Number.acmp() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 acos
 
     n.acos
@@ -1367,6 +1375,14 @@ Number.faulhaber() -> I<Obj>
 Return the
 
 Aliases: I<faulhaber_sum>
+
+=cut
+
+=head2 faulhaber_polynomial
+
+Number.faulhaber_polynomial() -> I<Obj>
+
+Return the
 
 =cut
 
@@ -2976,6 +2992,14 @@ Return the
 
 =cut
 
+=head2 prod
+
+Number.prod() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 qs_factor
 
 Number.qs_factor() -> I<Obj>
@@ -3457,6 +3481,14 @@ Return the
 =head2 subsets
 
 Number.subsets() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 sum
+
+Number.sum() -> I<Obj>
 
 Return the
 
