@@ -1591,9 +1591,13 @@ package Sidef::Types::Array::Array {
                 goto &first_by;
             }
 
-            my $max = $#$self;
-            $arg = CORE::int($arg) - 1;
-            return bless([@$self[0 .. ($arg > $max ? $max : $arg)]], ref($self));
+            my $end = $#$self;
+
+            $arg = CORE::int($arg) || return bless([], ref($self));
+            $arg += $end + 1 if $arg < 0;
+            $arg -= 1;
+
+            return bless([@$self[0 .. ($arg > $end ? $end : $arg)]], ref($self));
         }
 
         @$self ? $self->[0] : ();
@@ -1618,8 +1622,14 @@ package Sidef::Types::Array::Array {
                 goto &last_by;
             }
 
-            my $from = @$self - CORE::int($arg);
-            return bless([@$self[($from < 0 ? 0 : $from) .. $#$self]], ref($self));
+            my $end = $#$self;
+
+            $arg = CORE::int($arg) || return bless([], ref($self));
+            $arg += $end + 1 if $arg < 0;
+
+            my $from = $end - $arg + 1;
+
+            return bless([@$self[($from < 0 ? 0 : $from) .. $end]], ref($self));
         }
 
         @$self ? $self->[-1] : ();
