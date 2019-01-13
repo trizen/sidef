@@ -223,17 +223,17 @@ package Sidef::Types::String::String {
 
     sub first {
         my ($self, $num) = @_;
-        bless \CORE::substr($$self, 0, defined($num) ? CORE::int($num) : 1);
+        bless \(my $t = CORE::substr($$self, 0, defined($num) ? CORE::int($num) : 1));
     }
 
     sub last {
         my ($self, $num) = @_;
-        bless \CORE::substr($$self, defined($num) ? -CORE::int($num) : -1);
+        bless \(my $t = CORE::substr($$self, defined($num) ? -(CORE::int($num) || return $self->new('')) : -1));
     }
 
     sub char {
         my ($self, $pos) = @_;
-        bless \CORE::substr($$self, CORE::int($pos), 1);
+        bless \(my $t = CORE::substr($$self, CORE::int($pos), 1));
     }
 
     *char_at = \&char;
@@ -346,9 +346,11 @@ package Sidef::Types::String::String {
     sub substr {
         my ($self, $offs, $len) = @_;
         bless \(
-                defined($len)
-                ? CORE::substr($$self, CORE::int($offs), CORE::int($len))
-                : CORE::substr($$self, CORE::int($offs))
+                my $t = (
+                         defined($len)
+                         ? CORE::substr($$self, CORE::int($offs), CORE::int($len))
+                         : CORE::substr($$self, CORE::int($offs))
+                        )
                );
     }
 
@@ -379,7 +381,7 @@ package Sidef::Types::String::String {
 
     sub insert {
         my ($self, $string, $pos, $len) = @_;
-        my $copy_str = $$self;
+        my $copy_str = "$$self";
         CORE::substr($copy_str, CORE::int($pos), (defined($len) ? CORE::int($len) : 0), "$string");
         bless \$copy_str;
     }
@@ -495,7 +497,7 @@ package Sidef::Types::String::String {
 
     sub _get_captures {
         my ($string) = @_;
-        map { bless \CORE::substr($string, $-[$_], $+[$_] - $-[$_]) } 1 .. $#{-};
+        map { bless \(my $t = CORE::substr($string, $-[$_], $+[$_] - $-[$_])) } 1 .. $#{-};
     }
 
     sub esub {
