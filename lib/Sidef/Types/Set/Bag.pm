@@ -262,6 +262,8 @@ package Sidef::Types::Set::Bag {
         $self;
     }
 
+    *set_kv      = \&replace_pair;
+    *update_kv   = \&replace_pair;
     *update_pair = \&replace_pair;
 
     sub replace_pairs {
@@ -275,6 +277,8 @@ package Sidef::Types::Set::Bag {
         $self;
     }
 
+    *set_kvs      = \&replace_pairs;
+    *update_kvs   = \&replace_pairs;
     *update_pairs = \&replace_pairs;
 
     sub add_pair {
@@ -296,6 +300,9 @@ package Sidef::Types::Set::Bag {
         $self;
     }
 
+    *add_kv      = \&add_pair;
+    *push_kv     = \&add_pair;
+    *append_kv   = \&add_pair;
     *push_pair   = \&add_pair;
     *append_pair = \&add_pair;
 
@@ -310,6 +317,9 @@ package Sidef::Types::Set::Bag {
         $self;
     }
 
+    *add_kvs      = \&add_pairs;
+    *push_kvs     = \&add_pairs;
+    *append_kvs   = \&add_pairs;
     *push_pairs   = \&add_pairs;
     *append_pairs = \&add_pairs;
 
@@ -464,6 +474,8 @@ package Sidef::Types::Set::Bag {
 
         return Sidef::Types::Number::Number::ZERO;
     }
+
+    *get = \&count;
 
     sub delete_if {
         my ($self, $block) = @_;
