@@ -4080,7 +4080,7 @@ package Sidef::Types::Number::Number {
         #
 
         $n = _any2ui($$n) // goto &nan;
-        $n || goto &zero;
+        $n || return ZERO;
         $n <<= 1;
 
         my ($num, $den) = Math::Prime::Util::GMP::bernfrac($n);
@@ -8368,15 +8368,14 @@ package Sidef::Types::Number::Number {
     }
 
     sub gcd {
-        my ($x, $y) = @_;
+        _valid(\(@_));
 
         @_ || return ZERO;
-        @_ == 1 and return $x;
+        @_ == 1 and return $_[0];
 
         my $r = Math::GMPz::Rmpz_init();
 
         if (@_ > 2) {
-            _valid(\(@_));
             my @terms = map { _any2mpz($$_) // goto &nan } @_;
 
             Math::GMPz::Rmpz_set($r, shift(@terms));
@@ -8389,7 +8388,7 @@ package Sidef::Types::Number::Number {
             return bless \$r;
         }
 
-        _valid(\$y);
+        my ($x, $y) = @_;
 
         $x = _any2mpz($$x) // goto &nan;
         $y = _any2mpz($$y) // goto &nan;
@@ -8423,18 +8422,17 @@ package Sidef::Types::Number::Number {
     }
 
     sub lcm {
-        my ($x, $y) = @_;
+        _valid(\(@_));
 
-        @_ or goto &zero;
-        @_ == 1 and return $x;
+        @_ or return ZERO;
+        @_ == 1 and return $_[0];
 
         if (@_ > 2) {
-            _valid(\(@_));
             my @terms = map { _any2mpz($$_) // goto &nan } @_;
             return bless \_binsplit(\@terms, \&__lcm__);
         }
 
-        _valid(\$y);
+        my ($x, $y) = @_;
 
         $x = _any2mpz($$x) // goto &nan;
         $y = _any2mpz($$y) // goto &nan;

@@ -82,23 +82,23 @@ Aliases: I<xor>, I<symdiff>, I<symmetric_difference>
 
 =cut
 
-=head2 add_pair
+=head2 add_kv
 
-Bag.add_pair() -> I<Obj>
+Bag.add_kv() -> I<Obj>
 
 Return the
 
-Aliases: I<push_pair>, I<append_pair>
+Aliases: I<push_kv>, I<add_pair>, I<append_kv>, I<push_pair>, I<append_pair>
 
 =cut
 
-=head2 add_pairs
+=head2 add_kvs
 
-Bag.add_pairs() -> I<Obj>
+Bag.add_kvs() -> I<Obj>
 
 Return the
 
-Aliases: I<push_pairs>, I<append_pairs>
+Aliases: I<push_kvs>, I<add_pairs>, I<append_kvs>, I<push_pairs>, I<append_pairs>
 
 =cut
 
@@ -121,14 +121,6 @@ Return the
 =head2 contains_all
 
 Bag.contains_all() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 count
-
-Bag.count() -> I<Obj>
 
 Return the
 
@@ -227,6 +219,16 @@ Aliases: I<keys_len>
 Bag.freq() -> I<Obj>
 
 Return the
+
+=cut
+
+=head2 get
+
+Bag.get() -> I<Obj>
+
+Return the
+
+Aliases: I<count>
 
 =cut
 
@@ -352,6 +354,26 @@ Return the
 
 =cut
 
+=head2 set_kv
+
+Bag.set_kv() -> I<Obj>
+
+Return the
+
+Aliases: I<update_kv>, I<update_pair>, I<replace_pair>
+
+=cut
+
+=head2 set_kvs
+
+Bag.set_kvs() -> I<Obj>
+
+Return the
+
+Aliases: I<update_kvs>, I<update_pairs>, I<replace_pairs>
+
+=cut
+
 =head2 shift
 
 Bag.shift() -> I<Obj>
@@ -419,26 +441,6 @@ Bag.uniq() -> I<Obj>
 Return the
 
 Aliases: I<unique>
-
-=cut
-
-=head2 update_pair
-
-Bag.update_pair() -> I<Obj>
-
-Return the
-
-Aliases: I<replace_pair>
-
-=cut
-
-=head2 update_pairs
-
-Bag.update_pairs() -> I<Obj>
-
-Return the
-
-Aliases: I<replace_pairs>
 
 =cut
 
