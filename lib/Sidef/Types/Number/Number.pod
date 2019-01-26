@@ -3318,6 +3318,14 @@ Return the
 
 =cut
 
+=head2 sqrt_cfrac_period_len
+
+Number.sqrt_cfrac_period_len() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 sqrtmod
 
 Number.sqrtmod() -> I<Obj>

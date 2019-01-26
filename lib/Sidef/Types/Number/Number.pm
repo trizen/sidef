@@ -5663,6 +5663,41 @@ package Sidef::Types::Number::Number {
         Sidef::Types::Array::Array->new(\@cfrac);
     }
 
+    sub sqrt_cfrac_period_len {
+        my ($n) = @_;
+
+        $n = _any2mpz($$n) // goto &nan;
+
+        return ZERO if Math::GMPz::Rmpz_perfect_square_p($n);
+
+        goto &nan if Math::GMPz::Rmpz_sgn($n) < 0;
+
+        my $t = Math::GMPz::Rmpz_init();
+        my $x = Math::GMPz::Rmpz_init();
+        my $y = Math::GMPz::Rmpz_init_set($x);
+        my $z = Math::GMPz::Rmpz_init_set_ui(1);
+
+        Math::GMPz::Rmpz_sqrt($x, $n);
+
+        my $period = 0;
+
+        do {
+            Math::GMPz::Rmpz_add($t, $x, $y);
+            Math::GMPz::Rmpz_div($t, $t, $z);
+            Math::GMPz::Rmpz_mul($t, $t, $z);
+            Math::GMPz::Rmpz_sub($y, $t, $y);
+
+            Math::GMPz::Rmpz_mul($t, $y, $y);
+            Math::GMPz::Rmpz_sub($t, $n, $t);
+            Math::GMPz::Rmpz_div($z, $t, $z);
+
+            ++$period;
+
+        } until (Math::GMPz::Rmpz_cmp_ui($z, 1) == 0);
+
+        __PACKAGE__->_set_uint($period);
+    }
+
     sub convergents {
         my ($x, $n) = @_;
 
