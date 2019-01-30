@@ -5649,7 +5649,7 @@ package Sidef::Types::Number::Number {
             # z = floor((n - y*y) / z)
             Math::GMPz::Rmpz_mul($t, $y, $y);       # t = y*y
             Math::GMPz::Rmpz_sub($t, $n, $t);       # t = n-t
-            Math::GMPz::Rmpz_tdiv_q($z, $t, $z);    # z = floor(t/z)
+            Math::GMPz::Rmpz_divexact($z, $t, $z);  # z = t/z
 
             # t = floor((x + y) / z)
             Math::GMPz::Rmpz_add($t, $x, $y);       # t = x+y
@@ -5661,6 +5661,13 @@ package Sidef::Types::Number::Number {
         } until (Math::GMPz::Rmpz_cmp_ui($z, 1) == 0);
 
         Sidef::Types::Array::Array->new(\@cfrac);
+    }
+
+    sub sqrt_cfrac_period {
+        my ($n) = @_;
+        my @arr = @{$n->sqrt_cfrac};
+        CORE::shift(@arr);
+        Sidef::Types::Array::Array->new(\@arr);
     }
 
     sub sqrt_cfrac_period_len {
@@ -5682,14 +5689,17 @@ package Sidef::Types::Number::Number {
         my $period = 0;
 
         do {
-            Math::GMPz::Rmpz_add($t, $x, $y);
-            Math::GMPz::Rmpz_div($t, $t, $z);
-            Math::GMPz::Rmpz_mul($t, $t, $z);
-            Math::GMPz::Rmpz_sub($y, $t, $y);
 
-            Math::GMPz::Rmpz_mul($t, $y, $y);
-            Math::GMPz::Rmpz_sub($t, $n, $t);
-            Math::GMPz::Rmpz_div($z, $t, $z);
+            # y = floor((x+y)/z)*z - y
+            Math::GMPz::Rmpz_add($t, $x, $y);    # t = x+y
+            Math::GMPz::Rmpz_div($t, $t, $z);    # t = floor(t/z)
+            Math::GMPz::Rmpz_mul($t, $t, $z);    # t = t*z
+            Math::GMPz::Rmpz_sub($y, $t, $y);    # y = t-y
+
+            # z = (n - y*y)/z
+            Math::GMPz::Rmpz_mul($t, $y, $y);    # t = y*y
+            Math::GMPz::Rmpz_sub($t, $n, $t);    # t = n-t
+            Math::GMPz::Rmpz_divexact($z, $t, $z);    # z = t/z
 
             ++$period;
 
