@@ -538,6 +538,32 @@ package Sidef::Types::Block::Block {
         Sidef::Types::Array::Array->new(\@array);
     }
 
+    sub first {
+        my ($self, $n, $range) = @_;
+
+        state $inf_range = Sidef::Types::Number::Number->inf->range;
+
+        $range //= $inf_range;
+
+        my @array;
+        my $max   = CORE::int($n);
+        my $block = $self->{code};
+
+        _iterate(
+            sub {
+
+                if ($block->(@_)) {
+                    push @array, @_;
+                    last if (@array >= $max);
+                }
+
+            },
+            $range
+                );
+
+        Sidef::Types::Array::Array->new(\@array);
+    }
+
     sub cache {
         my ($self) = @_;
         require Memoize;
