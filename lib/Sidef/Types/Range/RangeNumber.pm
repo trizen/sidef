@@ -120,10 +120,10 @@ package Sidef::Types::Range::RangeNumber {
         my @list;
         my $count = 0;
 
-        my $iter = $self->iter->{code};
+        my $iter = $self->iter;
 
         while (1) {
-            push @list, $block->run($iter->() // last);
+            push @list, $block->run($iter->run() // last);
 
             if (++$count > 1e5) {
                 $count = 0;
@@ -171,10 +171,10 @@ package Sidef::Types::Range::RangeNumber {
         my @list;
         my $count = 0;
 
-        my $iter = $self->iter->{code};
+        my $iter = $self->iter;
 
         while (1) {
-            push @list, $block->run($iter->() // last);
+            push @list, $block->run($iter->run() // last);
 
             if (++$count > 1e5) {
                 $count = 0;
@@ -204,13 +204,13 @@ package Sidef::Types::Range::RangeNumber {
             return (defined($arg) ? $prod->mul($arg) : $prod);
         }
 
-        my $iter = $self->iter->{code};
+        my $iter = $self->iter;
 
         if (defined($arg)) {
             my $prod = $arg;
 
             while (1) {
-                $prod = $prod->mul($iter->() // last);
+                $prod = $prod->mul($iter->run() // last);
             }
 
             return $prod;
@@ -222,7 +222,7 @@ package Sidef::Types::Range::RangeNumber {
         my $count = 0;
 
         while (1) {
-            push @list, ($iter->() // last);
+            push @list, ($iter->run() // last);
 
             if (++$count > 1e5) {
                 $count = 0;

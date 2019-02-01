@@ -18,7 +18,7 @@ package Sidef::Object::Lazy {
 
         my $iter = $self->{obj}->iter;
 
-      ITEM: while (defined(my $item = $iter->())) {
+      ITEM: while (defined(my $item = $iter->run())) {
             my @arg = ($item);
             foreach my $call (@{$self->{calls}}) {
                 @arg = $call->(@arg);
@@ -49,7 +49,7 @@ package Sidef::Object::Lazy {
         Sidef::Types::Block::Block->new(
             code => sub {
               ITEM: {
-                    my $item = $iter->() // return undef;
+                    my $item = $iter->run() // return undef;
                     my @arg  = ($item);
                     foreach my $call (@{$self->{calls}}) {
                         @arg = $call->(@arg);

@@ -318,7 +318,7 @@ package Sidef::Types::Block::Block {
 
         open my $str_h, '>:utf8', \my $str;
         if (defined(my $old_h = select($str_h))) {
-            $self->{code}->();
+            $self->run();
             close $str_h;
             select $old_h;
         }
@@ -335,18 +335,15 @@ package Sidef::Types::Block::Block {
 
     sub exec {
         my ($self) = @_;
-        $self->{code}->();
+        $self->run;
         $self;
     }
 
     sub while {
         my ($self, $condition) = @_;
 
-        my $block = $self->{code};
-        $condition = $condition->{code};
-
-        while ($condition->()) {
-            $block->();
+        while ($condition->run) {
+            $self->run;
         }
 
         $self;
@@ -355,10 +352,8 @@ package Sidef::Types::Block::Block {
     sub loop {
         my ($self) = @_;
 
-        my $code = $self->{code};
-
         while (1) {
-            $code->();
+            $self->run;
         }
 
         $self;
@@ -366,7 +361,7 @@ package Sidef::Types::Block::Block {
 
     sub if {
         my ($self, $bool) = @_;
-        $bool ? $self->{code}->() : $bool;
+        $bool ? $self->run : $bool;
     }
 
     sub __fdump {
@@ -466,28 +461,12 @@ package Sidef::Types::Block::Block {
             my $break;
             my $iter = defined($sub) ? $sub->($obj) : $obj->iter;
 
-            # Optimization for Block iterator (almost always)
-            if (ref($iter) eq 'Sidef::Types::Block::Block') {
-
-                $iter = $iter->{code};
-
-                while (1) {
-                    $break = 1;
-                    $callback->(
-                        $iter->()
-                          // do { undef $break; last }
-                    );
-                    undef $break;
-                }
-            }
-            else {
-                while (1) {
-                    $break = 1;
-                    $callback->(
-                                $iter->run // do { undef $break; last }
-                               );
-                    undef $break;
-                }
+            while (1) {
+                $break = 1;
+                $callback->(
+                            $iter->run // do { undef $break; last }
+                           );
+                undef $break;
             }
 
             return if $break;
@@ -498,7 +477,7 @@ package Sidef::Types::Block::Block {
 
     sub for {
         my ($self, @objs) = @_;
-        _iterate($self->{code}, @objs);
+        _iterate($self, @objs);
     }
 
     *each    = \&for;
@@ -508,11 +487,10 @@ package Sidef::Types::Block::Block {
         my ($self, @objs) = @_;
 
         my @array;
-        my $block = $self->{code};
 
         _iterate(
             sub {
-                push @array, $block->(@_);
+                push @array, $self->run(@_);
             },
             @objs
                 );
@@ -524,11 +502,10 @@ package Sidef::Types::Block::Block {
         my ($self, @objs) = @_;
 
         my @array;
-        my $block = $self->{code};
 
         _iterate(
             sub {
-                if ($block->(@_)) {
+                if ($self->run(@_)) {
                     push @array, @_;
                 }
             },
@@ -546,13 +523,12 @@ package Sidef::Types::Block::Block {
         $range //= $inf_range;
 
         my @array;
-        my $max   = CORE::int($n);
-        my $block = $self->{code};
+        my $max = CORE::int($n);
 
         _iterate(
             sub {
 
-                if ($block->(@_)) {
+                if ($self->run(@_)) {
                     push @array, @_;
                     last if (@array >= $max);
                 }

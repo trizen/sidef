@@ -10,9 +10,9 @@ package Sidef::Types::Range::Range {
     use overload '@{}' => sub {
         $_[0]->{_cached_array} //= do {
             my @array;
-            my $iter = $_[0]->iter->{code};
+            my $iter = $_[0]->iter;
             while (1) {
-                push @array, $iter->() // last;
+                push @array, $iter->run() // last;
             }
             \@array;
         };
@@ -54,13 +54,13 @@ package Sidef::Types::Range::Range {
     sub min_by {
         my ($self, $block) = @_;
 
-        my $iter = $self->iter->{code};
+        my $iter = $self->iter;
 
-        my $min       = $iter->() // return undef;
+        my $min       = $iter->run() // return undef;
         my $min_value = $block->run($min);
 
         while (1) {
-            my $curr       = $iter->() // last;
+            my $curr       = $iter->run() // last;
             my $curr_value = $block->run($curr);
 
             if (CORE::int($curr_value cmp $min_value) < 0) {
@@ -87,13 +87,13 @@ package Sidef::Types::Range::Range {
     sub max_by {
         my ($self, $block) = @_;
 
-        my $iter = $self->iter->{code};
+        my $iter = $self->iter;
 
-        my $max       = $iter->() // return undef;
+        my $max       = $iter->run() // return undef;
         my $max_value = $block->run($max);
 
         while (1) {
-            my $curr       = $iter->() // last;
+            my $curr       = $iter->run() // last;
             my $curr_value = $block->run($curr);
 
             if (CORE::int($curr_value cmp $max_value) > 0) {
@@ -136,9 +136,9 @@ package Sidef::Types::Range::Range {
     sub first_by {
         my ($self, $code) = @_;
 
-        my $iter = $self->iter->{code};
+        my $iter = $self->iter;
 
-        while (defined(my $obj = $iter->())) {
+        while (defined(my $obj = $iter->run())) {
             return $obj if $code->run($obj);
         }
 
@@ -152,20 +152,20 @@ package Sidef::Types::Range::Range {
             goto &first_by;
         }
 
-        my $iter = $self->iter->{code};
+        my $iter = $self->iter;
 
         if (defined $num) {
 
             my @array;
             foreach my $i (1 .. CORE::int($num)) {
-                my $item = $iter->() // last;
+                my $item = $iter->run() // last;
                 push @array, $item;
             }
 
             return Sidef::Types::Array::Array->new(\@array);
         }
 
-        $iter->() // undef;
+        $iter->run() // undef;
     }
 
     *head = \&first;
@@ -236,8 +236,8 @@ package Sidef::Types::Range::Range {
     sub each {
         my ($self, $code) = @_;
 
-        my $iter = $self->iter->{code};
-        while (defined(my $obj = $iter->())) {
+        my $iter = $self->iter;
+        while (defined(my $obj = $iter->run())) {
             $code->run($obj);
         }
 
@@ -251,8 +251,8 @@ package Sidef::Types::Range::Range {
         my ($self, $code) = @_;
 
         my @values;
-        my $iter = $self->iter->{code};
-        while (defined(my $obj = $iter->())) {
+        my $iter = $self->iter;
+        while (defined(my $obj = $iter->run())) {
             push @values, $code->run($obj);
         }
 
@@ -263,8 +263,8 @@ package Sidef::Types::Range::Range {
         my ($self, $code) = @_;
 
         my @values;
-        my $iter = $self->iter->{code};
-        while (defined(my $obj = $iter->())) {
+        my $iter = $self->iter;
+        while (defined(my $obj = $iter->run())) {
             push(@values, $obj) if $code->run($obj);
         }
 
@@ -276,8 +276,8 @@ package Sidef::Types::Range::Range {
     sub any {
         my ($self, $code) = @_;
 
-        my $iter = $self->iter->{code};
-        while (defined(my $obj = $iter->())) {
+        my $iter = $self->iter;
+        while (defined(my $obj = $iter->run())) {
             $code->run($obj)
               && return Sidef::Types::Bool::Bool::TRUE;
         }
@@ -288,8 +288,8 @@ package Sidef::Types::Range::Range {
     sub all {
         my ($self, $code) = @_;
 
-        my $iter = $self->iter->{code};
-        while (defined(my $obj = $iter->())) {
+        my $iter = $self->iter;
+        while (defined(my $obj = $iter->run())) {
             $code->run($obj)
               || return Sidef::Types::Bool::Bool::FALSE;
         }
@@ -300,8 +300,8 @@ package Sidef::Types::Range::Range {
     sub none {
         my ($self, $code) = @_;
 
-        my $iter = $self->iter->{code};
-        while (defined(my $obj = $iter->())) {
+        my $iter = $self->iter;
+        while (defined(my $obj = $iter->run())) {
             $code->run($obj)
               && return Sidef::Types::Bool::Bool::FALSE;
         }
@@ -313,8 +313,8 @@ package Sidef::Types::Range::Range {
         my ($self) = @_;
 
         my @array;
-        my $iter = $self->iter->{code};
-        while (defined(my $obj = $iter->())) {
+        my $iter = $self->iter;
+        while (defined(my $obj = $iter->run())) {
             push @array, $obj;
         }
 
@@ -327,8 +327,8 @@ package Sidef::Types::Range::Range {
         my ($self) = @_;
 
         my @array;
-        my $iter = $self->iter->{code};
-        while (defined(my $obj = $iter->())) {
+        my $iter = $self->iter;
+        while (defined(my $obj = $iter->run())) {
             push @array, $obj;
         }
 
@@ -425,9 +425,9 @@ package Sidef::Types::Range::Range {
 
         if (ref($arg) eq 'Sidef::Types::Block::Block') {
             my $count = 0;
-            my $iter  = $self->iter->{code};
+            my $iter  = $self->iter;
 
-            while (defined(my $obj = $iter->())) {
+            while (defined(my $obj = $iter->rune())) {
                 ++$count if $arg->run($obj);
             }
 
@@ -450,10 +450,10 @@ package Sidef::Types::Range::Range {
 
         if (ref($op) eq 'Sidef::Types::Block::Block') {
 
-            my $iter  = $self->iter->{code};
-            my $value = $initial // $iter->();
+            my $iter  = $self->iter;
+            my $value = $initial // $iter->run();
 
-            while (defined(my $obj = $iter->())) {
+            while (defined(my $obj = $iter->run())) {
                 $value = $op->run($value, $obj);
             }
 
@@ -468,10 +468,10 @@ package Sidef::Types::Range::Range {
 
         $op = "$op" if ref($op);
 
-        my $iter  = $self->iter->{code};
-        my $value = $initial // $iter->();
+        my $iter  = $self->iter;
+        my $value = $initial // $iter->run();
 
-        while (defined(my $num = $iter->())) {
+        while (defined(my $num = $iter->run())) {
             $value = $value->$op($num);
         }
 
