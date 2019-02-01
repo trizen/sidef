@@ -527,17 +527,41 @@ package Sidef::Types::Block::Block {
 
         _iterate(
             sub {
-
                 if ($self->run(@_)) {
                     push @array, @_;
                     last if (@array >= $max);
                 }
-
             },
             $range
                 );
 
         Sidef::Types::Array::Array->new(\@array);
+    }
+
+    sub nth {
+        my ($self, $n, $range) = @_;
+
+        state $inf_range = Sidef::Types::Number::Number->inf->range;
+
+        $range //= $inf_range;
+
+        my $k   = 0;
+        my $nth = undef;
+        my $max = CORE::int($n);
+
+        return $nth if ($max <= $k);
+
+        _iterate(
+            sub {
+                if ($self->run(@_) and ++$k == $max) {
+                    $nth = $_[0];
+                    last;
+                }
+            },
+            $range
+                );
+
+        return $nth;
     }
 
     sub cache {

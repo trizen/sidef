@@ -156,6 +156,14 @@ Return the
 
 =cut
 
+=head2 nth
+
+Block.nth() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 thr
 
 Block.thr() -> I<Obj>
