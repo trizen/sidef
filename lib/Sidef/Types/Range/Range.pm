@@ -427,7 +427,7 @@ package Sidef::Types::Range::Range {
             my $count = 0;
             my $iter  = $self->iter;
 
-            while (defined(my $obj = $iter->rune())) {
+            while (defined(my $obj = $iter->run())) {
                 ++$count if $arg->run($obj);
             }
 
