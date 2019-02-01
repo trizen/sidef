@@ -1183,7 +1183,7 @@ HEADER
                   . ($multi ? '@{('      : '') . '$item'
                   . ($multi ? ')->to_a}' : '')
                   . "; $vars; $code }, $expr)"
-                  . (@loops ? ' // last' : '') . ';';
+                  . (@loops ? ' // last' : '');
             }
         }
         elsif ($ref eq 'Sidef::Types::Bool::Ternary') {
@@ -1583,7 +1583,7 @@ HEADER
                     }
 
                     if (exists($self->{lazy_ops}{$method})) {
-                        $code .= $self->{lazy_ops}{$method} . 'do' . $self->deparse_bare_block(@{$call->{arg}});
+                        $code .= $self->{lazy_ops}{$method} . $self->deparse_args(@{$call->{arg}});
                         next;
                     }
 
@@ -1749,6 +1749,12 @@ HEADER
                 }
 
                 if (exists $call->{keyword}) {
+
+                    if ($call->{keyword} eq 'if') {
+                        $code = $self->deparse_args(@{$call->{arg}}) . '&&' . $code;
+                        next;
+                    }
+
                     $code .= $call->{keyword};
                 }
 
