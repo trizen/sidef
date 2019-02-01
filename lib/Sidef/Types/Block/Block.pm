@@ -547,13 +547,13 @@ package Sidef::Types::Block::Block {
 
         my $k   = 0;
         my $nth = undef;
-        my $max = CORE::int($n);
 
-        return $nth if ($max <= $k);
+        $n = CORE::int($n);
+        $n > 0 || return undef;
 
         _iterate(
             sub {
-                if ($self->run(@_) and ++$k == $max) {
+                if ($self->run(@_) and ++$k == $n) {
                     $nth = $_[0];
                     last;
                 }

@@ -75,6 +75,14 @@ Return the
 
 =cut
 
+=head2 nth
+
+Lazy.nth() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 to_a
 
 Lazy.to_a() -> I<Obj>

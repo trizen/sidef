@@ -82,11 +82,28 @@ package Sidef::Object::Lazy {
         $self->_xs(
             sub {
                 push @arr, @_;
-                @arr >= $n ? 1 : 0;
+                @arr >= $n;
             }
         );
 
         Sidef::Types::Array::Array->new(\@arr);
+    }
+
+    sub nth {
+        my ($self, $n) = @_;
+
+        my @arr;
+        $n = CORE::int($n);
+        $n > 0 || return undef;
+
+        $self->_xs(
+            sub {
+                push @arr, @_;
+                @arr >= $n;
+            }
+        );
+
+        $arr[$n - 1];
     }
 
     sub first_by {
