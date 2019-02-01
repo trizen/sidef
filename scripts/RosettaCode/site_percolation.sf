@@ -1,0 +1,65 @@
+#!/usr/bin/ruby
+
+#
+## https://rosettacode.org/wiki/Percolation/Site_percolation#Sidef
+#
+
+class Percolate {
+
+    has block = '▒'
+    has water = '+'
+    has pore  = ' '
+    has grid  = 15
+    has site  = []
+
+    enum <DeadEnd, Up, Right, Down, Left>
+
+    method direction(x, y) {
+        (Down  if (site[y + 1][x] == pore)) ||
+        (Left  if (site[y][x - 1] == pore)) ||
+        (Right if (site[y][x + 1] == pore)) ||
+        (Up    if (site[y - 1][x] == pore)) ||
+        DeadEnd
+    }
+
+    method move(dir, x, y) {
+        given (dir) {
+            when (Up)    { site[--y][x] = water }
+            when (Down)  { site[++y][x] = water }
+            when (Left)  { site[y][--x] = water }
+            when (Right) { site[y][++x] = water }
+        }
+        return (x, y)
+    }
+
+    method percolate (prob  = 0.6) {
+        site[0] = grid.of(pore)
+        site[grid + 1] = grid.of(pore)
+
+        for x = ^grid, y = 1..grid {
+            site[y][x] = (1.rand < prob ? pore : block)
+        }
+
+        site[0][0] = water
+
+        var stack = []
+        var (x, y) = (0, 0)
+
+        loop {
+            if (var dir = self.direction(x, y)) {
+                stack << [x, y]
+                (x,y) = self.move(dir, x, y)
+            }
+            else {
+                stack || return 0
+                (x,y) = stack.pop...
+            }
+            return 1 if (y > grid)
+        }
+    }
+}
+
+var obj = Percolate()
+say 'Sample percolation at 0.6'
+obj.percolate(0.6)
+obj.site.each { .join.say }
