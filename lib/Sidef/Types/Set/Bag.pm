@@ -864,6 +864,8 @@ package Sidef::Types::Set::Bag {
         *{__PACKAGE__ . '::' . '≠'}   = \&ne;
         *{__PACKAGE__ . '::' . '!='}  = \&ne;
         *{__PACKAGE__ . '::' . '<<'}  = \&append;
+        *{__PACKAGE__ . '::' . '∋'}   = \&contains;
+        *{__PACKAGE__ . '::' . '∌'}   = sub { $_[0]->contains($_[1])->not };
     }
 };
 

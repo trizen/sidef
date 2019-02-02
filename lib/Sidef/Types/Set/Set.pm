@@ -457,6 +457,8 @@ package Sidef::Types::Set::Set {
         *{__PACKAGE__ . '::' . '⊆'}   = \&is_subset;
         *{__PACKAGE__ . '::' . '⊇'}   = \&is_superset;
         *{__PACKAGE__ . '::' . '...'} = \&to_list;
+        *{__PACKAGE__ . '::' . '∋'}   = \&contains;
+        *{__PACKAGE__ . '::' . '∌'}   = sub { $_[0]->contains($_[1])->not };
         *{__PACKAGE__ . '::' . '≡'}   = \&Sidef::Types::Hash::Hash::eq;
     }
 };

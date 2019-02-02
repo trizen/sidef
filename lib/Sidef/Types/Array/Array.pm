@@ -3436,6 +3436,8 @@ package Sidef::Types::Array::Array {
         *{__PACKAGE__ . '::' . '/'}   = \&div;
         *{__PACKAGE__ . '::' . '÷'}   = \&div;
         *{__PACKAGE__ . '::' . '...'} = \&to_list;
+        *{__PACKAGE__ . '::' . '∋'}   = \&contains;
+        *{__PACKAGE__ . '::' . '∌'}   = sub { $_[0]->contains($_[1])->not };
     }
 
 };

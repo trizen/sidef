@@ -374,16 +374,6 @@ Return the
 
 =cut
 
-=head2 contain
-
-Array.contain() -> I<Obj>
-
-Return the
-
-Aliases: I<include>, I<contains>, I<includes>
-
-=cut
-
 =head2 contains_all
 
 Array.contains_all() -> I<Obj>
@@ -1799,6 +1789,24 @@ I<Obj> B<»> I<Obj> -> I<Obj>
 Return the
 
 Aliases: I<E<gt>E<gt>>, I<pop>, I<drop_last>, I<drop_right>
+
+=cut
+
+=head2 ∋
+
+I<Obj> B<∋> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<contain>, I<include>, I<contains>, I<includes>
+
+=cut
+
+=head2 ∌
+
+I<Obj> B<∌> I<Obj> -> I<Obj>
+
+Return the
 
 =cut
 

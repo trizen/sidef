@@ -242,16 +242,6 @@ Aliases: I<select>
 
 =cut
 
-=head2 has
-
-Bag.has() -> I<Obj>
-
-Return the
-
-Aliases: I<exists>, I<has_key>, I<haskey>, I<contain>, I<include>, I<contains>, I<includes>
-
-=cut
-
 =head2 iter
 
 Bag.iter() -> I<Obj>
@@ -459,6 +449,24 @@ I<Obj> B<|> I<Obj> -> I<Obj>
 Return the
 
 Aliases: I<∪>, I<or>, I<union>
+
+=cut
+
+=head2 ∋
+
+I<Obj> B<∋> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<has>, I<exists>, I<has_key>, I<haskey>, I<contain>, I<include>, I<contains>, I<includes>
+
+=cut
+
+=head2 ∌
+
+I<Obj> B<∌> I<Obj> -> I<Obj>
+
+Return the
 
 =cut
 
