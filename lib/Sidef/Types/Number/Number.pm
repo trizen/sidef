@@ -10376,11 +10376,15 @@ package Sidef::Types::Number::Number {
         $n->divisor_map($block)->sum;
     }
 
+    *divisors_sum = \&divisor_sum;
+
     sub divisor_prod {
         my ($n, $block) = @_;
         $block // return $n->divisors->prod;
         $n->divisor_map($block)->prod;
     }
+
+    *divisors_prod = \&divisor_prod;
 
     sub factor_sum {
         my ($n, $block) = @_;
@@ -10388,11 +10392,15 @@ package Sidef::Types::Number::Number {
         $n->factor_map($block)->sum;
     }
 
+    *factors_sum = \&factor_sum;
+
     sub factor_prod {
         my ($n, $block) = @_;
         $block // return $n;
         $n->factor_map($block)->prod;
     }
+
+    *factors_prod = \&factor_prod;
 
     sub partitions {
         my $n = Math::Prime::Util::GMP::partitions(&_big2uistr // goto &nan);

@@ -1146,6 +1146,8 @@ Number.divisor_prod() -> I<Obj>
 
 Return the
 
+Aliases: I<divisors_prod>
+
 =cut
 
 =head2 divisors
@@ -1161,6 +1163,8 @@ Return the
 Number.divisor_sum() -> I<Obj>
 
 Return the
+
+Aliases: I<divisors_sum>
 
 =cut
 
@@ -1350,6 +1354,8 @@ Number.factor_prod() -> I<Obj>
 
 Return the
 
+Aliases: I<factors_prod>
+
 =cut
 
 =head2 factor_sum
@@ -1357,6 +1363,8 @@ Return the
 Number.factor_sum() -> I<Obj>
 
 Return the
+
+Aliases: I<factors_sum>
 
 =cut
 
