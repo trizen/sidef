@@ -26,7 +26,7 @@ class Seq(terms, callback) {
 
 func next_EKG (s) {
     2..Inf -> first {|k|
-        !(s.contains(k) || s[-1].is_coprime(k))
+        !(s ∋ k || s[-1].is_coprime(k))
     }
 }
 
