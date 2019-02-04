@@ -8951,9 +8951,12 @@ package Sidef::Types::Number::Number {
 
             return $d if ($s eq '0' or $s eq '1');
 
-            my @factors = Math::Prime::Util::GMP::factor($s);
+            my %factors;
+            ++$factors{$_} for Math::Prime::Util::GMP::factor($s);
 
-            foreach my $p (@factors) {
+            while (my ($p, $k) = each %factors) {
+
+                # a(n) = Sum_{p^k|n} (n*k)/p
 
                 if ($p < ULONG_MAX) {
                     Math::GMPz::Rmpz_divexact_ui($u, $n, $p);
@@ -8963,7 +8966,7 @@ package Sidef::Types::Number::Number {
                     Math::GMPz::Rmpz_divexact($u, $n, $u);
                 }
 
-                Math::GMPz::Rmpz_add($d, $d, $u);
+                Math::GMPz::Rmpz_addmul_ui($d, $u, $k);
             }
 
             return $d;
