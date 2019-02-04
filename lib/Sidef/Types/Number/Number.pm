@@ -7777,59 +7777,50 @@ package Sidef::Types::Number::Number {
         return ZERO if ($y < $x);
 
         # Optimization for narrow ranges
-        if ($y - $x <= 1000 or ($x >= 10**4 and $y - $x <= 4 * 10**5) or "$x" / "$y" >= 0.999) {
+        if (($x >= 10**4 and $y - $x <= 10**4) or "$x" / "$y" >= 0.999) {
             my $r = List::Util::sum(Math::Prime::Util::GMP::moebius($x, $y));
             return ($r >= 0 ? __PACKAGE__->_set_uint($r) : __PACKAGE__->_set_int($r));
         }
 
-        if ($HAS_PRIME_UTIL) {
+        my $lookup_size = 2 * CORE::int($y**(2 / 3));
 
-            my $M_x = Math::Prime::Util::mertens($x);
-            my $M_y = Math::Prime::Util::mertens($y);
+        state @mertens_lookup;
 
-            return __PACKAGE__->_set_int($M_y - $M_x + Math::Prime::Util::moebius($x));
+        if (@mertens_lookup < $lookup_size) {
+
+            $mertens_lookup[0] = 0;
+            my @moebius_lookup = Math::Prime::Util::GMP::moebius(scalar(@mertens_lookup), $lookup_size);
+
+            foreach my $i (@mertens_lookup .. $lookup_size) {
+                $mertens_lookup[$i] = $mertens_lookup[$i - 1] + shift(@moebius_lookup);
+            }
         }
 
-#<<<
-        my $u  = Math::Prime::Util::GMP::sqrtint($y);
-        my @mu = (0, Math::Prime::Util::GMP::moebius(1, $u));       # Möbius values in the range [0, u]
-        my @M  = do { my $musum = 0; map { $musum += $_ } @mu };    # partials sums of the Möbius values in the range [0, u]
-#>>>
+        state %seen;
 
         my $mertens = sub {
             my ($n) = @_;
 
-            # Algorithm due to Marc Deléglise and Joël Rivat.
-            # Based on the implementation from Math::Prime::Util::PP by Dana Jacobsen
-            # https://github.com/danaj/Math-Prime-Util
-
-            return $n if $n <= 1;
-
-            my $u   = Math::Prime::Util::GMP::sqrtint($n);
-            my $sum = $M[$u];
-
-            foreach my $m (1 .. $u) {
-
-                next if $mu[$m] == 0;
-
-                my $inner_sum = 0;
-                my $lower     = CORE::int($u / $m) + 1;
-                my $last_nmk  = CORE::int($n / ($m * $lower));
-
-                my ($denom, $this_k, $next_k) = ($m, 0, CORE::int($n / ($m * 1)));
-
-                foreach my $nmk (1 .. $last_nmk) {
-                    $denom += $m;
-                    $this_k = CORE::int($n / $denom);
-                    next if $this_k == $next_k;
-                    ($this_k, $next_k) = ($next_k, $this_k);
-                    $inner_sum += $M[$nmk] * ($this_k - $next_k);
-                }
-
-                $sum -= $mu[$m] * $inner_sum;
+            if ($n <= $lookup_size) {
+                return $mertens_lookup[$n];
             }
 
-            $sum;
+            if (exists $seen{$n}) {
+                return $seen{$n};
+            }
+
+            my $s = CORE::int(CORE::sqrt($n));
+            my $M = 1;
+
+            foreach my $k (2 .. CORE::int($n / ($s + 1))) {
+                $M -= __SUB__->(CORE::int($n / $k));
+            }
+
+            foreach my $k (1 .. $s) {
+                $M -= $mertens_lookup[$k] * (CORE::int($n / $k) - CORE::int($n / ($k + 1)));
+            }
+
+            $seen{$n} = $M;
         };
 
         __PACKAGE__->_set_int($mertens->($y) - $mertens->($x) + Math::Prime::Util::GMP::moebius($x));
