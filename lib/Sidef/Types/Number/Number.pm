@@ -7730,9 +7730,16 @@ package Sidef::Types::Number::Number {
         my ($n, $k) = @_;
 
         if (defined($k)) {
-            my @array = map { $_ ? ($_ == 1) ? ONE : MONE : ZERO }
-              Math::Prime::Util::GMP::moebius((_big2istr($n) // return Sidef::Types::Array::Array->new),
-                                              (_big2istr($k) // return Sidef::Types::Array::Array->new));
+
+            $n = _big2istr($n) // return Sidef::Types::Array::Array->new;
+            $k = _big2istr($k) // return Sidef::Types::Array::Array->new;
+
+            my @array = map { $_ ? ($_ == 1) ? ONE : MONE : ZERO } (
+                                                                    $HAS_PRIME_UTIL
+                                                                    ? Math::Prime::Util::moebius($n, $k)
+                                                                    : Math::Prime::Util::GMP::moebius($n, $k)
+                                                                   );
+
             return Sidef::Types::Array::Array->new(\@array);
         }
 
@@ -7778,7 +7785,12 @@ package Sidef::Types::Number::Number {
 
         # Optimization for narrow ranges
         if (($x >= 10**4 and $y - $x <= 10**4) or "$x" / "$y" >= 0.999) {
-            my $r = List::Util::sum(Math::Prime::Util::GMP::moebius($x, $y));
+            my $r =
+              List::Util::sum(
+                              $HAS_PRIME_UTIL
+                              ? Math::Prime::Util::moebius($x, $y)
+                              : Math::Prime::Util::GMP::moebius($x, $y)
+                             );
             return ($r >= 0 ? __PACKAGE__->_set_uint($r) : __PACKAGE__->_set_int($r));
         }
 
@@ -7787,12 +7799,16 @@ package Sidef::Types::Number::Number {
         state @mertens_lookup;
 
         if (@mertens_lookup < $lookup_size) {
-
             $mertens_lookup[0] = 0;
-            my @moebius_lookup = Math::Prime::Util::GMP::moebius(scalar(@mertens_lookup), $lookup_size);
+
+            my @mu_range = (
+                            $HAS_PRIME_UTIL
+                            ? Math::Prime::Util::moebius(scalar(@mertens_lookup), $lookup_size)
+                            : Math::Prime::Util::GMP::moebius(scalar(@mertens_lookup), $lookup_size)
+                           );
 
             foreach my $i (@mertens_lookup .. $lookup_size) {
-                $mertens_lookup[$i] = $mertens_lookup[$i - 1] + shift(@moebius_lookup);
+                $mertens_lookup[$i] = $mertens_lookup[$i - 1] + shift(@mu_range);
             }
         }
 
@@ -7880,7 +7896,11 @@ package Sidef::Types::Number::Number {
 
                 my ($count, $k) = (0, 0);
 
-                foreach my $m (Math::Prime::Util::GMP::moebius(1, $s)) {
+                foreach my $m (
+                               $HAS_PRIME_UTIL
+                               ? Math::Prime::Util::moebius(1, $s)
+                               : Math::Prime::Util::GMP::moebius(1, $s)
+                  ) {
                     ++$k;
                     if ($m) {
                         $count += $m * CORE::int($n / ($k * $k));
