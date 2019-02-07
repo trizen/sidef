@@ -8283,7 +8283,7 @@ package Sidef::Types::Number::Number {
             return ONE;    # not a prime, but it's convenient...
         }
 
-        if ($n > 100_000) {
+        if ($n > 1_000_000) {
 
             if ($HAS_PRIME_UTIL) {
                 my $p = Math::Prime::Util::nth_prime($n);
@@ -8332,9 +8332,17 @@ package Sidef::Types::Number::Number {
             }
         }
 
-        state $table = [Math::Prime::Util::GMP::sieve_primes(2, 1_299_709)];    # primes up to prime(100_000)
+        state @table;
 
-        __PACKAGE__->_set_uint($table->[$n - 1]);
+        my $limit = 1000 + CORE::int(2 * $n * CORE::log($n));
+        $limit = 15_485_863 if $limit > 15_485_863;
+
+        if (@table < $n) {
+            @table[0] = 2;
+            push @table, Math::Prime::Util::GMP::sieve_primes($table[-1] + 1, $limit);
+        }
+
+        __PACKAGE__->_set_uint($table[$n - 1]);
     }
 
     *prime = \&nth_prime;
