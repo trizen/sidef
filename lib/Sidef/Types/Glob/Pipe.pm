@@ -42,10 +42,10 @@ package Sidef::Types::Glob::Pipe {
 
             return defined($pid)
               ? Sidef::Types::Number::Number->new($pid)
-              : ();
+              : undef;
         }
 
-        defined($pid) ? $pipe_obj : ();
+        defined($pid) ? $pipe_obj : undef;
     }
 
     sub open_r {

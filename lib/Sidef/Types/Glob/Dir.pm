@@ -141,7 +141,7 @@ package Sidef::Types::Glob::Dir {
               };
         }
 
-        $success ? $dir_obj : ();
+        $success ? $dir_obj : undef;
     }
 
     *open_r = \&open;

@@ -1169,7 +1169,7 @@ package Sidef::Types::Array::Array {
 
     sub item {
         my ($self, $index) = @_;
-        exists($self->[$index]) ? $self->[$index] : ();
+        exists($self->[$index]) ? $self->[$index] : undef;
     }
 
     sub fetch {
@@ -1600,7 +1600,7 @@ package Sidef::Types::Array::Array {
             return bless([@$self[0 .. ($arg > $end ? $end : $arg)]], ref($self));
         }
 
-        @$self ? $self->[0] : ();
+        @$self ? $self->[0] : undef;
     }
 
     *head = \&first;
@@ -1632,7 +1632,7 @@ package Sidef::Types::Array::Array {
             return bless([@$self[($from < 0 ? 0 : $from) .. $end]], ref($self));
         }
 
-        @$self ? $self->[-1] : ();
+        @$self ? $self->[-1] : undef;
     }
 
     *tail = \&last;

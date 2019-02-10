@@ -460,7 +460,7 @@ package Sidef::Types::Glob::File {
               };
         }
 
-        $success ? $fh_obj : ();
+        $success ? $fh_obj : undef;
     }
 
     sub touch {

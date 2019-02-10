@@ -70,7 +70,7 @@ package Sidef::Types::Hash::Hash {
 
     sub item {
         my ($self, $key) = @_;
-        CORE::exists($self->{$key}) ? $self->{$key} : ();
+        CORE::exists($self->{$key}) ? $self->{$key} : undef;
     }
 
     sub fetch {
