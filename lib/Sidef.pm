@@ -235,8 +235,7 @@ package Sidef {
         if (
             $self->{opt}{s}
             ##and length($$code) > 1024
-            and (defined($self->{dbm_driver})
-                 or $self->has_dbm_driver)
+            and (defined($self->{dbm_driver}) or $self->has_dbm_driver)
           ) {
 
             my $db_dir = ($self->{$lang}{db_dir} //= File::Spec->catdir($self->get_sidef_vdir(), $lang));

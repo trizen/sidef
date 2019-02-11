@@ -511,6 +511,7 @@ EOT
             # Reset the parser
             if ($line eq 'reset') {
                 $init_sidef->();
+                $sidef->execute_code('');    # warm-up
                 undef $vars;
                 undef $ref_vars_refs;
                 redo;
