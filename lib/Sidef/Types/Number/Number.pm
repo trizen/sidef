@@ -5633,6 +5633,29 @@ package Sidef::Types::Number::Number {
         Math::GMPz::Rmpz_perfect_square_p($n)
           and return Sidef::Types::Array::Array->new(\@cfrac);
 
+        # Optimization for native integers
+        if (Math::GMPz::Rmpz_fits_ulong_p($n)) {
+
+            $n = Math::GMPz::Rmpz_get_ui($n);
+            $x = Math::GMPz::Rmpz_get_ui($x);
+
+            my @cfrac = __PACKAGE__->_set_uint($x);
+
+            my $y = $x;
+            my $z = 1;
+            my $r = $x + $x;
+
+            do {
+                $y = $r * $z - $y;
+                $z = CORE::int(($n - $y * $y) / $z);
+                $r = CORE::int(($x + $y) / $z);
+
+                push @cfrac, __PACKAGE__->_set_uint($r);
+            } until ($z == 1);
+
+            return Sidef::Types::Array::Array->new(\@cfrac);
+        }
+
         my $y = Math::GMPz::Rmpz_init_set($x);
         my $z = Math::GMPz::Rmpz_init_set_ui(1);
         my $r = Math::GMPz::Rmpz_init();
@@ -5685,6 +5708,28 @@ package Sidef::Types::Number::Number {
         my $z = Math::GMPz::Rmpz_init_set_ui(1);
 
         Math::GMPz::Rmpz_sqrt($x, $n);
+
+        # Optimization for native integers
+        if (Math::GMPz::Rmpz_fits_ulong_p($n)) {
+
+            $n = Math::GMPz::Rmpz_get_ui($n);
+            $x = Math::GMPz::Rmpz_get_ui($x);
+
+            my $y = $x;
+            my $z = 1;
+            my $r = $x + $x;
+
+            my $period = 0;
+
+            do {
+                $y = $r * $z - $y;
+                $z = CORE::int(($n - $y * $y) / $z);
+                $r = CORE::int(($x + $y) / $z);
+                ++$period;
+            } until ($z == 1);
+
+            return __PACKAGE__->_set_uint($period);
+        }
 
         my $period = 0;
 
