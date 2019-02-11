@@ -1006,7 +1006,6 @@ t/fast_fourier_transform.t
 t/fibonacci.t
 t/levenshtein_distance.t
 t/man_or_boy.t
-t/manifest.t
 t/md5.t
 t/oo_inheritance.t
 t/pod.t
