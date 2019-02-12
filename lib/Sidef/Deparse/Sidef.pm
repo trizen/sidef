@@ -15,7 +15,6 @@ package Sidef::Deparse::Sidef {
             after        => ";\n",
             class        => 'main',
             extra_parens => 0,
-            namespaces   => [],
             opt          => {},
             data_types   => {
                 qw(

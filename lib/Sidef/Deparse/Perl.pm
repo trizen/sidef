@@ -20,7 +20,6 @@ package Sidef::Deparse::Perl {
             top_program => '',
             between     => ';',
             after       => ';',
-            namespaces  => [],
             opt         => {},
 
             environment_name => 'main',

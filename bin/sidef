@@ -592,12 +592,6 @@ EOT
     }
 }
 
-sub _get_namespaces {
-    @Sidef::NAMESPACES
-      ? ('push(@Sidef::NAMESPACES, ' . join(', ', map { qq{"\Q$_\E"} } @Sidef::NAMESPACES) . ");\n")
-      : '';
-}
-
 sub _get_loaded_modules {
     my @modules;
     foreach my $key (sort { length($a) <=> length($b) || $a cmp $b } keys %INC) {
@@ -637,7 +631,6 @@ sub dump_ast {
             join('', map { "require '" . (s{::}{/}gr) . ".pm';\n" } @_);
         };
 
-        print {$out_fh} _get_namespaces();
         print {$out_fh} $requirify->(_get_loaded_modules());
         print {$out_fh} Data::Dump::pp($ast) . "\n";
     }

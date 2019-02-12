@@ -39,7 +39,7 @@ sub parse_deparse {
     my $sidef = Sidef->new(name => $name);
 
     my $ast = $sidef->parse_code($code);
-    my $deparser = Sidef::Deparse::Sidef->new(namespaces => $sidef->{namespaces});
+    my $deparser = Sidef::Deparse::Sidef->new();
 
     my @statements = $deparser->deparse_script($ast);
     my $deparsed   = $deparser->{before} . join($deparser->{between}, grep { $_ ne '' }@statements) . $deparser->{after};
