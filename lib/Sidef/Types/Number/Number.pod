@@ -2580,6 +2580,16 @@ Return the
 
 =cut
 
+=head2 nd
+
+Number.nd() -> I<Obj>
+
+Return the
+
+Aliases: I<rd>, I<st>, I<th>
+
+=cut
+
 =head2 neg
 
 Number.neg() -> I<Obj>

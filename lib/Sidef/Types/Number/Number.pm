@@ -11530,6 +11530,15 @@ package Sidef::Types::Number::Number {
         return $_[0];
     }
 
+    sub th {
+        my ($n, $block, $range) = @_;
+        $block->nth($n, $range);
+    }
+
+    *st = \&th;
+    *nd = \&th;
+    *rd = \&th;
+
     foreach my $name (
                       qw(
                       permutations
