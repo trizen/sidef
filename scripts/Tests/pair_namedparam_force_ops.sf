@@ -1,0 +1,18 @@
+#! /usr/bin/ruby
+
+var f = :name
+assert_eq(f⫶ 1 -> dump, name: 1 -> dump)
+assert_eq(f⫶ 1 -> dump, (f)⫶ 1 -> dump)
+assert_eq((f)⫶ 1 -> dump, name: 1 -> dump)
+assert_eq(:a⫶ 1 -> dump, a:1 -> dump)
+
+var n = 1
+
+assert_ne(n: 2 -> dump, (n): 2 -> dump)
+assert_eq((n): 2 -> dump, 1: 2 -> dump)
+assert_eq(n：2, Pair(1, 2))
+assert_eq(1:2,  1+2i)
+assert_eq(1： 2, Pair(1, 2))
+assert_eq(1¦ 2, Pair(1, 2))
+
+say "** Test passed!"
