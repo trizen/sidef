@@ -1933,6 +1933,8 @@ package Sidef::Parser {
 
             if (/\Gimport\b\h*/gc) {
 
+                my $import_pos = pos($_);
+
                 my $var_names =
                   $self->get_init_vars(code      => $opt{code},
                                        with_vals => 0);
@@ -1940,7 +1942,7 @@ package Sidef::Parser {
                 @{$var_names}
                   || $self->fatal_error(
                                         code  => $_,
-                                        pos   => (pos($_)),
+                                        pos   => $import_pos,
                                         error => "expected a variable-like name for importing!",
                                        );
 
@@ -1950,7 +1952,7 @@ package Sidef::Parser {
                     if ($class eq ($self->{module} // $self->{class})) {
                         $self->fatal_error(
                                            code  => $_,
-                                           pos   => pos($_),
+                                           pos   => $import_pos,
                                            error => "can't import '${class}::${name}' into the same namespace",
                                           );
                     }
@@ -1960,7 +1962,7 @@ package Sidef::Parser {
                     if (not defined $var) {
                         $self->fatal_error(
                                            code  => $_,
-                                           pos   => pos($_),
+                                           pos   => $import_pos,
                                            error => "variable '${class}::${name}' does not exists",
                                           );
                     }
@@ -1981,6 +1983,8 @@ package Sidef::Parser {
             }
 
             if (/\Ginclude\b\h*/gc) {
+
+                my $include_pos = pos($_);
 
                 state $x = do {
                     require File::Spec;
@@ -2032,7 +2036,7 @@ package Sidef::Parser {
 
                     $found_module // $self->fatal_error(
                           code  => $_,
-                          pos   => pos($_),
+                          pos   => $include_pos,
                           error => "can't find the module '${mod_path}' anywhere in ['" . join("', '", @{$self->{inc}}) . "']",
                     );
 
@@ -2077,7 +2081,7 @@ package Sidef::Parser {
                         ref($filename) ne ''
                           and $self->fatal_error(
                                   code  => $_,
-                                  pos   => pos($_),
+                                  pos   => $include_pos,
                                   error => 'include-error: invalid value of type "' . ref($filename) . '" (expected a string)',
                           );
 
@@ -2088,7 +2092,7 @@ package Sidef::Parser {
                             if (!defined($abs) or $abs eq '') {
                                 $self->fatal_error(
                                           code  => $_,
-                                          pos   => pos($_),
+                                          pos   => $include_pos,
                                           error => 'include-error: cannot resolve the absolute path to file <<' . $file . '>>',
                                 );
                             }
@@ -2100,7 +2104,7 @@ package Sidef::Parser {
                             if (exists $Sidef::INCLUDED{$file}) {
                                 $self->fatal_error(
                                                    code  => $_,
-                                                   pos   => pos($_),
+                                                   pos   => $include_pos,
                                                    error => "include-error: circular inclusion of file: $file",
                                                   );
                             }
@@ -2121,7 +2125,7 @@ package Sidef::Parser {
                     open(my $fh, '<:utf8', $full_path)
                       || $self->fatal_error(
                                             code  => $_,
-                                            pos   => pos($_),
+                                            pos   => $include_pos,
                                             error => "can't open file `$full_path`: $!"
                                            );
 
@@ -2222,8 +2226,9 @@ package Sidef::Parser {
                                                 [map { Sidef::Types::Number::Number->new(s{\\(?=[\\#\s])}{}gr) } @{$strings}]);
                 }
                 elsif ($type eq 'v') {
-                    return Sidef::Types::Array::Vector->new(map { Sidef::Types::Number::Number->new(s{\\(?=[\\#\s])}{}gr) }
-                                                            split(/[\s,]+/, join(' ', @$strings)));
+                    return
+                      Sidef::Types::Array::Vector->new(map { Sidef::Types::Number::Number->new(s{\\(?=[\\#\s])}{}gr) }
+                                                         split(/[\s,]+/, join(' ', @$strings)));
                 }
                 elsif ($type eq 'm') {
                     my @matrix;
