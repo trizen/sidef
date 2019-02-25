@@ -599,7 +599,10 @@ package Sidef::Parser {
                 $string = $2 =~ s/\\([$re_delim])/$1/gr;
             }
         }
-        elsif (m{\G$beg_delim([^\\$beg_delim]*+(?>\\.[^\\$beg_delim]*)*)}sgc) {
+
+        # elsif (m{\G$beg_delim([^\\$beg_delim]*+(?>\\.[^\\$beg_delim]*)*)}sgc) {        # old regex
+
+        elsif (m{\G$beg_delim((?>(?>[^$beg_delim\\]++|\\.){0,}+){0,}+)}sgc) {
             $string = $1 =~ s/\\([$beg_delim])/$1/gr;
         }
 
