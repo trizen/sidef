@@ -1228,6 +1228,8 @@ package Sidef::Types::String::String {
         $$self =~ /\\|#\{/ || return $self;    # return faster
 
         require Encode;
+        require List::Util;
+
         my $str = $$self;
 
         state $esc = {
@@ -1254,6 +1256,15 @@ package Sidef::Types::String::String {
                 if (exists $esc->{$char}) {
                     splice(@chars, $i--, 2, $esc->{$char});
                     next;
+                }
+                elsif ($char =~ /^[0-7]/) {
+
+                    my $max = List::Util::min($i + 3, $#chars);
+                    my $str = CORE::join('', @chars[$i + 1 .. $max]);
+
+                    if ($str =~ /^(0[0-7]{1,2}|[0-7]{1,2})/) {
+                        splice @chars, $i, 1 + $+[0], CORE::chr(CORE::oct($1));
+                    }
                 }
                 elsif (   $char eq 'L'
                        or $char eq 'U'
@@ -1283,7 +1294,10 @@ package Sidef::Types::String::String {
                 }
                 elsif ($char eq 'N') {
                     if (exists $chars[$i + 2] and $chars[$i + 2] eq '{') {
-                        my $str = CORE::join('', @chars[$i + 2 .. $#chars]);
+
+                        my $max = List::Util::min($i + 2048, $#chars);
+                        my $str = CORE::join('', @chars[$i + 2 .. $max]);
+
                         if ($str =~ /^\{(.*?)\}/) {
                             require charnames;
                             my $char = charnames::string_vianame($1);
@@ -1303,7 +1317,10 @@ package Sidef::Types::String::String {
                 }
                 elsif ($char eq 'x') {
                     if (exists $chars[$i + 2]) {
-                        my $str = CORE::join('', @chars[$i + 2 .. $#chars]);
+
+                        my $max = List::Util::min($i + 64, $#chars);
+                        my $str = CORE::join('', @chars[$i + 2 .. $max]);
+
                         if ($str =~ /^\{([[:xdigit:]]+)\}/) {
                             splice(@chars, $i, 2 + $+[0], chr(CORE::hex($1)));
                             next;
@@ -1317,7 +1334,10 @@ package Sidef::Types::String::String {
                 }
                 elsif ($char eq 'o') {
                     if (exists $chars[$i + 2] and $chars[$i + 2] eq '{') {
-                        my $str = CORE::join('', @chars[$i + 2 .. $#chars]);
+
+                        my $max = List::Util::min($i + 64, $#chars);
+                        my $str = CORE::join('', @chars[$i + 2 .. $max]);
+
                         if ($str =~ /^\{(.*?)\}/) {
                             splice(@chars, $i--, 2 + $+[0], CORE::chr(CORE::oct($1)));
                             next;
@@ -1330,12 +1350,6 @@ package Sidef::Types::String::String {
                         CORE::warn("Missing braces on \\o{}, within string!\n");
                     }
                     splice(@chars, $i, 1);
-                }
-                elsif ($char =~ /^[0-7]/) {
-                    my $str = CORE::join('', @chars[$i + 1 .. $#chars]);
-                    if ($str =~ /^(0[0-7]{1,2}|[0-7]{1,2})/) {
-                        splice @chars, $i, 1 + $+[0], CORE::chr(CORE::oct($1));
-                    }
                 }
                 elsif ($char eq 'c') {
                     if (exists $chars[$i + 2]) {    # bug for: "\c\\"

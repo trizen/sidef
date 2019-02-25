@@ -600,9 +600,10 @@ package Sidef::Parser {
             }
         }
 
-        # elsif (m{\G$beg_delim([^\\$beg_delim]*+(?>\\.[^\\$beg_delim]*)*)}sgc) {        # old regex
+        # elsif (m{\G$beg_delim([^\\$beg_delim]*+(?>\\.[^\\$beg_delim]*)*)}sgc) {    # old regex (limited to 2^15-1 escapes)
+        # elsif (m{\G$beg_delim((?>(?>[^$beg_delim\\]++|\\.){0,}+){0,}+)}sgc) {
 
-        elsif (m{\G$beg_delim((?>(?>[^$beg_delim\\]++|\\.){0,}+){0,}+)}sgc) {
+        elsif (m{\G$beg_delim((?>[^\\$beg_delim]*+(?>\\.[^\\$beg_delim]*){0,}){0,})}sgc) {
             $string = $1 =~ s/\\([$beg_delim])/$1/gr;
         }
 
