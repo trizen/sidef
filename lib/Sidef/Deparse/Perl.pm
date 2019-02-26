@@ -766,11 +766,11 @@ HEADER
             if (not exists $obj->{inited}) {
                 $obj->{inited} = 1;
 
-                # Use dynamical constants inside blocks or classes
+                # Use dynamical constants with perl>=5.022
                 if (
                     exists($self->{class})
                     ? ($] >= 5.022 or $self->{class} != $self->{current_block})
-                    : exists($self->{current_block})
+                    : 1
                   ) {
 
                     # This is no longer needed in Perl>=5.25.2
