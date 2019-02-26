@@ -1,0 +1,30 @@
+#!/usr/bin/ruby
+
+# Test for `const` declared in a module.
+# https://github.com/trizen/sidef/issues/77
+
+module F {
+  const VALUE = "any value"
+}
+
+# works
+assert_eq("works "+(nil || F::VALUE), "works any value")
+
+class A {
+  method f {
+    # works
+    assert_eq("works "+F::VALUE, "works any value")
+    "ok "+(nil || F::VALUE)
+  }
+}
+
+func x {
+  assert_eq("works "+F::VALUE, "works any value")
+  return ("ok "+(nil || F::VALUE))
+}
+
+var a = A()
+assert_eq(a.f, "ok any value")
+assert_eq(x(), "ok any value")
+
+say "** Test passed!"
