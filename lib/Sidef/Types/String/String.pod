@@ -534,6 +534,8 @@ String.ft() -> I<Obj>
 
 Return the
 
+Aliases: I<slice>
+
 =cut
 
 =head2 gesub

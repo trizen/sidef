@@ -379,6 +379,8 @@ package Sidef::Types::String::String {
         __PACKAGE__->new($to < $from ? '' : CORE::substr($$self, $from, $to - $from + 1));
     }
 
+    *slice = \&ft;
+
     sub insert {
         my ($self, $string, $pos, $len) = @_;
         my $copy_str = "$$self";
