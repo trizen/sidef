@@ -8275,11 +8275,40 @@ package Sidef::Types::Number::Number {
             $x = 2;
         }
 
-        # Support for large integers (slow for wide ranges)
+        # Support for large integers
         if ($y >= ULONG_MAX) {
 
             $x = Math::GMPz::Rmpz_init_set_str("$x", 10);
             $y = Math::GMPz::Rmpz_init_set_str("$y", 10);
+
+            if ($y - $x > 1e6) {
+
+                if ($x == 2) {
+
+                    $y = __PACKAGE__->new($y);
+
+                    my $pp_count = ZERO;
+                    my $ilog2    = Math::GMPz::Rmpz_get_ui(${$y->ilog2});
+
+                    for (my $k = 1 ; $k <= $ilog2 ; ++$k) {
+                        my $root = $y->iroot(__PACKAGE__->_set_uint($k));
+                        $pp_count = $pp_count->add($root->prime_count);
+                    }
+
+                    return $pp_count;
+                }
+
+                my $x_pp_count = __PACKAGE__->new($x)->prime_power_count;
+                my $y_pp_count = __PACKAGE__->new($y)->prime_power_count;
+
+                my $pp_count = $y_pp_count->sub($x_pp_count);
+
+                if (Math::Prime::Util::GMP::is_prime_power($x)) {
+                    $pp_count = $pp_count->inc;
+                }
+
+                return $pp_count;
+            }
 
             my $count = 0;
 
