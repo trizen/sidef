@@ -1079,15 +1079,15 @@ package Sidef::Types::Array::Array {
 
         $base //= $ten;
 
+        my $sum       = Sidef::Types::Number::Number::ZERO;
         my $base_prod = Sidef::Types::Number::Number::ONE;
 
-        my @terms;
         foreach my $v (@$self) {
-            push @terms, $base_prod->mul($v);
+            $sum       = $sum->add($base_prod->mul($v));
             $base_prod = $base_prod->mul($base);
         }
 
-        Sidef::Types::Number::Number::sum(@terms);
+        $sum;
     }
 
     sub _min_max_by {
