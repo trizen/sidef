@@ -942,28 +942,40 @@ package Sidef::Types::Array::Array {
         $self->reduce_operator('+', $initial);
     }
 
-    sub sum_by {
-        my ($self, $block) = @_;
-
-        my $sum = Sidef::Types::Number::Number::ZERO;
+    sub _sum_prod_by {
+        my ($self, $method, $result, $callback) = @_;
 
         my @list;
         my $count = 0;
 
-        foreach my $obj (@$self) {
-            CORE::push(@list, $block->run($obj));
+        foreach my $k (0 .. $#$self) {
+            CORE::push(@list, $callback->($k, $self->[$k]));
 
             if (++$count > 1e5) {
-                $count = 0;
-                $sum   = $sum->sum(CORE::splice(@list));
+                $count  = 0;
+                $result = $result->$method(CORE::splice(@list));
             }
         }
 
         if (@list) {
-            $sum = $sum->sum(CORE::splice(@list));
+            $result = $result->$method(CORE::splice(@list));
         }
 
-        return $sum;
+        return $result;
+    }
+
+    sub sum_by {
+        my ($self, $block) = @_;
+
+        $self->_sum_prod_by('sum', Sidef::Types::Number::Number::ZERO, sub { $block->run($_[1]) });
+    }
+
+    sub sum_kv {
+        my ($self, $block) = @_;
+
+        $self->_sum_prod_by('sum',
+                            Sidef::Types::Number::Number::ZERO,
+                            sub { $block->run(Sidef::Types::Number::Number->_set_uint($_[0]), $_[1]) });
     }
 
     sub sum {
@@ -989,25 +1001,15 @@ package Sidef::Types::Array::Array {
     sub prod_by {
         my ($self, $block) = @_;
 
-        my $prod = Sidef::Types::Number::Number::ONE;
+        $self->_sum_prod_by('prod', Sidef::Types::Number::Number::ONE, sub { $block->run($_[1]) });
+    }
 
-        my @list;
-        my $count = 0;
+    sub prod_kv {
+        my ($self, $block) = @_;
 
-        foreach my $obj (@$self) {
-            CORE::push(@list, $block->run($obj));
-
-            if (++$count > 1e5) {
-                $count = 0;
-                $prod  = $prod->prod(CORE::splice(@list));
-            }
-        }
-
-        if (@list) {
-            $prod = $prod->prod(CORE::splice(@list));
-        }
-
-        return $prod;
+        $self->_sum_prod_by('prod',
+                            Sidef::Types::Number::Number::ONE,
+                            sub { $block->run(Sidef::Types::Number::Number->_set_uint($_[0]), $_[1]) });
     }
 
     sub prod {

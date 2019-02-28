@@ -1304,6 +1304,14 @@ Return the
 
 =cut
 
+=head2 prod_kv
+
+Array.prod_kv() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 rand
 
 Array.rand() -> I<Obj>
@@ -1531,6 +1539,14 @@ Return the
 =head2 sum_by
 
 Array.sum_by() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 sum_kv
+
+Array.sum_kv() -> I<Obj>
 
 Return the
 
