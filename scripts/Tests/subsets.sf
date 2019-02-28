@@ -318,3 +318,36 @@ module Greeting {
     greet(Hi("Foo"))        # ok
     greet(Hello("Bar"))     # ok
 }
+
+#
+## Subsets declared in modules and used outside
+#
+
+do {
+    module Hello {
+        subset NumStr < Num,Str
+        subset Numeric < Num
+    }
+
+    class Foo { }
+    class Subset::Test < Foo {
+        method foo (arg < Hello::Numeric) {
+            arg + 1
+        }
+
+        method bar (arg < Hello::NumStr) {
+            arg + 2
+        }
+    }
+
+    var obj = Subset::Test()
+    assert_eq(obj.foo(41), 42)
+    assert_eq(obj.bar(41), 43)
+    assert_eq(obj.bar("foo"), "foo2")
+
+    assert(Subset::Test.kind_of(Foo))
+
+    module Subset {
+        assert(Test.kind_of(main::Foo))
+    }
+}
