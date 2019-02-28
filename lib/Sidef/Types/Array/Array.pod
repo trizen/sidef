@@ -536,6 +536,14 @@ Return the
 
 =cut
 
+=head2 digits2num
+
+Array.digits2num() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 each_cons
 
 Array.each_cons() -> I<Obj>

@@ -1072,6 +1072,24 @@ package Sidef::Types::Array::Array {
         Sidef::Types::Number::Number::lcm(@$self);
     }
 
+    sub digits2num {
+        my ($self, $base) = @_;
+
+        state $ten = Sidef::Types::Number::Number->_set_uint(10);
+
+        $base //= $ten;
+
+        my $base_prod = Sidef::Types::Number::Number::ONE;
+
+        my @terms;
+        foreach my $v (@$self) {
+            push @terms, $base_prod->mul($v);
+            $base_prod = $base_prod->mul($base);
+        }
+
+        Sidef::Types::Number::Number::sum(@terms);
+    }
+
     sub _min_max_by {
         my ($self, $block, $order) = @_;
 
