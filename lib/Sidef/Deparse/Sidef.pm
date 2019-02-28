@@ -204,7 +204,7 @@ package Sidef::Deparse::Sidef {
         }
 
         if ($obj->{name} eq '') {
-            return '__CLASS__';
+            return '';
         }
 
         $obj->{class} . '::' . $obj->{name};
