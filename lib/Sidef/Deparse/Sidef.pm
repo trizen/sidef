@@ -362,10 +362,15 @@ package Sidef::Deparse::Sidef {
 
                 local $self->{class} = $obj->{class};
                 my $name = $self->_dump_class_name($obj->{name});
+
                 $code .= "class " . $name;
                 $code .= '(' . $self->_dump_vars(@{$obj->{vars}}) . ')';
+
                 if (exists $obj->{inherit}) {
-                    my $inherited = join(', ', grep { $_ ne $name } map { $self->_dump_class_name($_) } @{$obj->{inherit}});
+
+                    my $inherited = join(', ', grep { $_ ne $name }
+                                           map { $self->deparse_expr({self => $_}) } @{$obj->{inherit}});
+
                     if ($inherited ne '') {
                         $code .= ' < ' . $inherited . ' ';
                     }

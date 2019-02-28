@@ -46,6 +46,15 @@ class Human < Primates {
     }
 }
 
+do {
+    module inher {
+        class Sup {}
+    }
+
+    class Der() < inher::Sup {}
+    assert(Der.kind_of(inher::Sup))
+}
+
 var dog = Dog();
 say "Dog is a #{dog.type}, has #{dog.legs_num} legs and says '#{dog.speak}'";
 
