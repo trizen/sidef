@@ -1527,7 +1527,7 @@ package Sidef::Parser {
                     ($name, $class_name) = $self->get_name_and_class($name);
                 }
 
-                local $self->{class} = $class_name;
+                local $self->{class} = $self->{module} // 'main';
 
                 if (    $type ne 'method'
                     and $type ne 'class'

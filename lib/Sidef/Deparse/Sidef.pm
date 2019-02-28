@@ -197,8 +197,17 @@ package Sidef::Deparse::Sidef {
     }
 
     sub _dump_class_name {
-        my ($self, $class) = @_;
-        ref($class) ? $self->_dump_reftype($class) : $class;
+        my ($self, $obj) = @_;
+
+        if (ref($obj->{name})) {
+            return $self->_dump_reftype($obj->{name});
+        }
+
+        if ($obj->{name} eq '') {
+            return '__CLASS__';
+        }
+
+        $obj->{class} . '::' . $obj->{name};
     }
 
     sub deparse_expr {
@@ -349,19 +358,13 @@ package Sidef::Deparse::Sidef {
         }
         elsif ($ref eq 'Sidef::Variable::ClassInit') {
             if ($addr{refaddr($obj)}++) {
-                $code = (
-                         $obj->{name} eq '' ? '__CLASS__'
-                         : $self->_dump_class_name(
-                                                     $obj->{class} ne $self->{class} ? ($obj->{class} . '::' . $obj->{name})
-                                                   : $obj->{name}
-                                                  )
-                        );
+                $code = $self->_dump_class_name($obj);
             }
             else {
                 my $block = $obj->{block};
 
                 local $self->{class} = $obj->{class};
-                my $name = $self->_dump_class_name($obj->{name});
+                my $name = $self->_dump_class_name($obj);
 
                 $code .= "class " . $name;
                 $code .= '(' . $self->_dump_vars(@{$obj->{vars}}) . ')';
@@ -369,7 +372,7 @@ package Sidef::Deparse::Sidef {
                 if (exists $obj->{inherit}) {
 
                     my $inherited = join(', ', grep { $_ ne $name }
-                                           map { $self->deparse_expr({self => $_}) } @{$obj->{inherit}});
+                                           map { $self->_dump_class_name($_) } @{$obj->{inherit}});
 
                     if ($inherited ne '') {
                         $code .= ' < ' . $inherited . ' ';

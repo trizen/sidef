@@ -55,6 +55,19 @@ do {
     assert(Der.kind_of(inher::Sup))
 }
 
+do {
+    class Foo { }
+    class Super::Meta < Foo { }
+
+    var Super::x = 42
+    assert(Super::Meta.kind_of(Foo))
+
+    module Super {
+        assert_eq(x, 42)
+        assert(Meta.kind_of(main::Foo))
+    }
+}
+
 var dog = Dog();
 say "Dog is a #{dog.type}, has #{dog.legs_num} legs and says '#{dog.speak}'";
 
