@@ -2,11 +2,10 @@
 
 var base = ('A'.ord - 1)
 
-var n = DATA.slurp.chomp.split(/\s*,\s*/)                               \
-            .map { |s| s - /"/g }.sort.uniq                             \
-            .map { |s| s.chars.map { |sym| sym.ord - base  }.sum }      \
-            .map_kv { |idx, val| val * (idx+1) }                        \
-            .sum
+var n = DATA.slurp.chomp.split(/\s*,\s*/)                     \
+            .map { |s| s - /"/g }.sort.uniq                   \
+            .map { |s| s.chars.sum { |sym| sym.ord - base } } \
+            .sum_kv { |idx, val| val * (idx+1) }
 
 assert_eq(n, 5738);
 say "** Test passed!";

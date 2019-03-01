@@ -8,7 +8,7 @@ var denominations = [.01, .05, .1, .25, .5, 1, 2, 5, 10, 20, 50, 100];
 
 func change(n, pos=0, solution=[]) {
 
-    var sum = solution.sum\\0;
+    var sum = solution.sum;
 
     if (solution.sum == n) {
         return [solution];    # found a solution

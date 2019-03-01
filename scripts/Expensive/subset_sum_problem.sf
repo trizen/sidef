@@ -27,7 +27,7 @@ var weights = pairs.keys.sort.map{|k| pairs{k} }
 var inverse = pairs.flip
 
 for n in (1 .. 5) {
-    given (weights.combinations(n).first_by { .sum(0) == 0 }) { |a|
+    given (weights.combinations(n).first_by { .sum == 0 }) { |a|
         when (nil) { say "Length #{n}: (none)" }
         default    { say "Length #{n}: "+" ".join(inverse{a...}) }
     }

@@ -112,10 +112,8 @@ package Sidef::Types::Range::RangeNumber {
         );
     }
 
-    sub sum_by {
-        my ($self, $block) = @_;
-
-        my $sum = Sidef::Types::Number::Number::ZERO;
+    sub _sum_prod_by {
+        my ($self, $method, $result, $callback) = @_;
 
         my @list;
         my $count = 0;
@@ -123,25 +121,31 @@ package Sidef::Types::Range::RangeNumber {
         my $iter = $self->iter;
 
         while (1) {
-            push @list, $block->run($iter->run() // last);
+            push @list, $callback->($iter->run() // last);
 
             if (++$count > 1e5) {
-                $count = 0;
-                $sum   = $sum->sum(splice(@list));
+                $count  = 0;
+                $result = $result->$method(splice(@list));
             }
         }
 
         if (@list) {
-            $sum = $sum->sum(splice(@list));
+            $result = $result->$method(splice(@list));
         }
 
-        $sum;
+        $result;
+    }
+
+    sub sum_by {
+        my ($self, $block) = @_;
+
+        $self->_sum_prod_by('sum', Sidef::Types::Number::Number::ZERO, sub { $block->run($_[0]) },);
     }
 
     sub sum {
         my ($self, $arg) = @_;
 
-        if (ref($arg) eq 'Sidef::Types::Block::Block') {
+        if (defined($arg)) {
             goto &sum_by;
         }
 
@@ -153,46 +157,25 @@ package Sidef::Types::Range::RangeNumber {
         my $n = $y->sub($x)->div($z);
 
         if ($n->is_neg) {
-            return ($arg // Sidef::Types::Number::Number::ZERO);
+            return Sidef::Types::Number::Number::ZERO;
         }
 
         state $two = Sidef::Types::Number::Number->_set_uint(2);
 
         $n = $n->floor;
-        my $sum = $n->inc->mul($z->mul($n)->add($x->mul($two)))->div($two);
-        return (defined($arg) ? $sum->add($arg) : $sum);
+        $n->inc->mul($z->mul($n)->add($x->mul($two)))->div($two);
     }
 
     sub prod_by {
         my ($self, $block) = @_;
 
-        my $prod = Sidef::Types::Number::Number::ONE;
-
-        my @list;
-        my $count = 0;
-
-        my $iter = $self->iter;
-
-        while (1) {
-            push @list, $block->run($iter->run() // last);
-
-            if (++$count > 1e5) {
-                $count = 0;
-                $prod  = $prod->prod(splice(@list));
-            }
-        }
-
-        if (@list) {
-            $prod = $prod->prod(splice(@list));
-        }
-
-        $prod;
+        $self->_sum_prod_by('prod', Sidef::Types::Number::Number::ONE, sub { $block->run($_[0]) },);
     }
 
     sub prod {
         my ($self, $arg) = @_;
 
-        if (ref($arg) eq 'Sidef::Types::Block::Block') {
+        if (defined($arg)) {
             goto &prod_by;
         }
 
@@ -200,41 +183,10 @@ package Sidef::Types::Range::RangeNumber {
             and $self->{from}->is_one
             and $self->{to}->is_pos) {
             $self->{_asc} //= 1;
-            my $prod = $self->{to}->factorial;
-            return (defined($arg) ? $prod->mul($arg) : $prod);
+            return $self->{to}->factorial;
         }
 
-        my $iter = $self->iter;
-
-        if (defined($arg)) {
-            my $prod = $arg;
-
-            while (1) {
-                $prod = $prod->mul($iter->run() // last);
-            }
-
-            return $prod;
-        }
-
-        my $prod = Sidef::Types::Number::Number::ONE;
-
-        my @list;
-        my $count = 0;
-
-        while (1) {
-            push @list, ($iter->run() // last);
-
-            if (++$count > 1e5) {
-                $count = 0;
-                $prod  = $prod->prod(splice(@list));
-            }
-        }
-
-        if (@list) {
-            $prod = $prod->prod(splice(@list));
-        }
-
-        $prod;
+        Sidef::Types::Number::Number::prod($self->to_list);
     }
 
     sub bsearch {

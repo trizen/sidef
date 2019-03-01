@@ -961,18 +961,16 @@ package Sidef::Types::Array::Array {
             $result = $result->$method(CORE::splice(@list));
         }
 
-        return $result;
+        $result;
     }
 
     sub sum_by {
         my ($self, $block) = @_;
-
         $self->_sum_prod_by('sum', Sidef::Types::Number::Number::ZERO, sub { $block->run($_[1]) });
     }
 
     sub sum_kv {
         my ($self, $block) = @_;
-
         $self->_sum_prod_by('sum',
                             Sidef::Types::Number::Number::ZERO,
                             sub { $block->run(Sidef::Types::Number::Number->_set_uint($_[0]), $_[1]) });
@@ -981,18 +979,8 @@ package Sidef::Types::Array::Array {
     sub sum {
         my ($self, $arg) = @_;
 
-        if (ref($arg) eq 'Sidef::Types::Block::Block') {
-            goto &sum_by;
-        }
-
         if (defined($arg)) {
-            my $sum = $arg;
-
-            foreach my $obj (@$self) {
-                $sum = $sum->add($obj);
-            }
-
-            return $sum;
+            goto &sum_by;
         }
 
         Sidef::Types::Number::Number::sum(@$self);
@@ -1000,13 +988,11 @@ package Sidef::Types::Array::Array {
 
     sub prod_by {
         my ($self, $block) = @_;
-
         $self->_sum_prod_by('prod', Sidef::Types::Number::Number::ONE, sub { $block->run($_[1]) });
     }
 
     sub prod_kv {
         my ($self, $block) = @_;
-
         $self->_sum_prod_by('prod',
                             Sidef::Types::Number::Number::ONE,
                             sub { $block->run(Sidef::Types::Number::Number->_set_uint($_[0]), $_[1]) });
@@ -1015,18 +1001,8 @@ package Sidef::Types::Array::Array {
     sub prod {
         my ($self, $arg) = @_;
 
-        if (ref($arg) eq 'Sidef::Types::Block::Block') {
-            goto &prod_by;
-        }
-
         if (defined($arg)) {
-            my $prod = $arg;
-
-            foreach my $obj (@$self) {
-                $prod = $prod->mul($obj);
-            }
-
-            return $prod;
+            goto &prod_by;
         }
 
         Sidef::Types::Number::Number::prod(@$self);

@@ -8,7 +8,7 @@ func digroot (r, base = 10) {
     var root = r.base(base)
     var persistence = 0
     while (root.len > 1) {
-        root = root.chars.map{|n| Number(n, 36) }.sum(0).base(base)
+        root = root.chars.map{|n| Number(n, 36) }.sum.base(base)
         ++persistence
     }
     return(persistence, root)

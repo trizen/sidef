@@ -5,7 +5,7 @@
 #
 
 func left_fact(k) {
-    range(0, k-1).map { _! }.sum \\ 0;
+    sum(^k, { _! })
 }
 
 [range(0, 10), range(20, 50).by(10)].each { |r|

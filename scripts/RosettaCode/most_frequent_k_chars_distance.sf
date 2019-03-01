@@ -40,7 +40,7 @@ func MostFreqKSDF(a, b, k, d) {
                     take(s{:f} + (s{:f} == t{:f} ? 0 : t{:f}))
             }
         }
-    }.sum(0)
+    }.sum
 }
 
 func MostFreqKHashing(string, k) {

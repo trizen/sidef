@@ -12,9 +12,12 @@ assert_eq(a.sum,  15)
 assert_eq(a.sum  { _*_ }, 55)
 assert_eq(a.prod { _*_ }, 14400)
 
-# This may change in the future
-assert_eq(a.sum(42),  57)
-assert_eq(a.prod(2), 240)
+assert_eq(a.sum(:sqrt), a.sum { .sqrt })
+assert_eq(a.prod(:sqrt), a.prod { .sqrt })
+
+# This may change in the future (changed)
+# assert_eq(a.sum(42),  57)
+# assert_eq(a.prod(2), 240)
 
 # Empty array
 assert_eq([].sum,  0)
@@ -32,9 +35,12 @@ assert_eq(r.sum,  15)
 assert_eq(r.sum  { _*_ }, 55)
 assert_eq(r.prod { _*_ }, 14400)
 
-# This may change in the future
-assert_eq(r.sum(42),  57)
-assert_eq(r.prod(2), 240)
+assert_eq(r.sum(:sqrt), r.sum { .sqrt })
+assert_eq(r.prod(:sqrt), r.prod { .sqrt })
+
+# This may change in the future (changed)
+# assert_eq(r.sum(42),  57)
+# assert_eq(r.prod(2), 240)
 
 # Empty range
 assert_eq((5..4).sum,  0)

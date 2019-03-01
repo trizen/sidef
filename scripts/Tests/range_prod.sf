@@ -3,17 +3,6 @@
 for i in (1..10) {
     var r = RangeNum(1, 100.irand, 1)
 
-    var p1 = Math.prod(r..., i)
-    var p2 = r.prod(i)
-
-    if (p1 != p2) {
-        die "error: #{r} -> #{p1} != #{p2} (from #{i})\n";
-    }
-}
-
-for i in (1..10) {
-    var r = RangeNum(1, 100.irand, 1)
-
     var p1 = Math.prod(r...)
     var p2 = r.prod
 

@@ -145,6 +145,8 @@ package Sidef::Types::Number::Number {
 
     *call = \&new;
 
+    sub run { $_[1] }
+
     sub _valid {
         (
          ref($$_) eq __PACKAGE__
