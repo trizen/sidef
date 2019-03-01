@@ -353,7 +353,10 @@ package Sidef::Types::Range::Range {
         $self->to_array->accumulate($arg);
     }
 
-    *accumulate_by = \&accumulate;
+    sub accumulate_by {
+        my ($self, $arg) = @_;
+        $self->to_array->accumulate_by($arg);
+    }
 
     sub rand {
         my ($self, $n) = @_;
@@ -420,26 +423,30 @@ package Sidef::Types::Range::Range {
         Sidef::Types::Array::Array->new(\@array);
     }
 
+    sub count_by {
+        my ($self, $arg) = @_;
+
+        my $count = 0;
+        my $iter  = $self->iter;
+
+        while (defined(my $obj = $iter->run())) {
+            ++$count if $arg->run($obj);
+        }
+
+        Sidef::Types::Number::Number->_set_uint($count);
+    }
+
     sub count {
         my ($self, $arg) = @_;
 
         if (ref($arg) eq 'Sidef::Types::Block::Block') {
-            my $count = 0;
-            my $iter  = $self->iter;
-
-            while (defined(my $obj = $iter->run())) {
-                ++$count if $arg->run($obj);
-            }
-
-            return Sidef::Types::Number::Number->_set_uint($count);
+            goto &count_by;
         }
 
         $self->contains($arg)
           ? Sidef::Types::Number::Number::ONE
           : Sidef::Types::Number::Number::ZERO;
     }
-
-    *count_by = \&count;
 
     sub shuffle {
         Sidef::Types::Array::Array->new([List::Util::shuffle($_[0]->to_list)]);

@@ -3214,6 +3214,14 @@ Aliases: I<roundf>
 
 =cut
 
+=head2 run
+
+Number.run() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 sec
 
 Number.sec() -> I<Obj>

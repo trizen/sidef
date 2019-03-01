@@ -81,7 +81,13 @@ Range.accumulate() -> I<Obj>
 
 Return the
 
-Aliases: I<accumulate_by>
+=cut
+
+=head2 accumulate_by
+
+Range.accumulate_by() -> I<Obj>
+
+Return the
 
 =cut
 
@@ -133,7 +139,13 @@ Range.count() -> I<Obj>
 
 Return the
 
-Aliases: I<count_by>
+=cut
+
+=head2 count_by
+
+Range.count_by() -> I<Obj>
+
+Return the
 
 =cut
 
