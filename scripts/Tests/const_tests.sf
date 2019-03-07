@@ -27,4 +27,24 @@ var a = A()
 assert_eq(a.f, "ok any value")
 assert_eq(x(), "ok any value")
 
+
+# Make sure `const` is initialized at declaration.
+# https://github.com/trizen/sidef/issues/81
+
+do {
+    var n = 42
+
+    func bar {
+        ++n
+    }
+
+    func foo() {
+        const t = bar()
+        10.of { bar() }
+        return t
+    }
+
+    assert_eq(foo(), 43)
+}
+
 say "** Test passed!"

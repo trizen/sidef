@@ -778,13 +778,13 @@ HEADER
 
                     # XXX: this is known to cause segmentation faults in perl-5.18.* and perl-5.20.* when used in a class
                     $code = "my sub $name(){state\$_$refaddr"
-                      . (defined($obj->{expr}) ? ('=do{' . $self->deparse_script($obj->{expr}) . '}') : '') . '}';
+                      . (defined($obj->{expr}) ? ('=do{' . $self->deparse_script($obj->{expr}) . '}') : '') . "}; ($name)";
                 }
 
                 # Otherwise, use static constants
                 else {
                     $code = "sub $name(){state\$_$refaddr"
-                      . (defined($obj->{expr}) ? ('=do{' . $self->deparse_script($obj->{expr}) . '}') : '') . '}';
+                      . (defined($obj->{expr}) ? ('=do{' . $self->deparse_script($obj->{expr}) . '}') : '') . "}; ($name)";
                 }
             }
             else {
@@ -891,6 +891,7 @@ HEADER
                                                        );
 
                             my @self_class_attr = (defined($self->{class_attributes}) ? @{$self->{class_attributes}} : ());
+
                             my @inherited_class_attr = (
                                 defined($self->{inherit})
                                 ? $self->_get_inherited_stuff(
