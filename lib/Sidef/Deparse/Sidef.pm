@@ -614,6 +614,11 @@ package Sidef::Deparse::Sidef {
 
                 if (defined $method) {
 
+                    if ($i == 0 and $ref eq 'Sidef::Meta::PrefixColon' and $method eq ':') {
+                        $code = ':' . $self->deparse_args(@{$call->{arg}});
+                        next;
+                    }
+
                     if (ref($method) ne '') {
                         $code .= '->'
                           . (

@@ -77,6 +77,8 @@ package Sidef::Deparse::Perl {
                   Sidef::DataTypes::Object::LazyMethod    Sidef::Object::LazyMethod
                   Sidef::DataTypes::Object::Enumerator    Sidef::Object::Enumerator
 
+                  Sidef::Meta::PrefixColon                Sidef::Types::Hash::Hash
+
                   Sidef::Sys::Sig                         Sidef::Sys::Sig
                   Sidef::Sys::Sys                         Sidef::Sys::Sys
                   Sidef::Perl::Perl                       Sidef::Perl::Perl
@@ -777,14 +779,18 @@ HEADER
                     $] < 5.025002 && $self->top_add(q{use feature 'lexical_subs'; no warnings 'experimental::lexical_subs';});
 
                     # XXX: this is known to cause segmentation faults in perl-5.18.* and perl-5.20.* when used in a class
-                    $code = "my sub $name(){state\$_$refaddr"
-                      . (defined($obj->{expr}) ? ('=do{' . $self->deparse_script($obj->{expr}) . '}') : '') . "}; ($name)";
+                    $code =
+                        "my sub $name(){state\$_$refaddr"
+                      . (defined($obj->{expr}) ? ('=do{' . $self->deparse_script($obj->{expr}) . '}') : '')
+                      . "}; ($name)";
                 }
 
                 # Otherwise, use static constants
                 else {
-                    $code = "sub $name(){state\$_$refaddr"
-                      . (defined($obj->{expr}) ? ('=do{' . $self->deparse_script($obj->{expr}) . '}') : '') . "}; ($name)";
+                    $code =
+                        "sub $name(){state\$_$refaddr"
+                      . (defined($obj->{expr}) ? ('=do{' . $self->deparse_script($obj->{expr}) . '}') : '')
+                      . "}; ($name)";
                 }
             }
             else {
@@ -1525,11 +1531,11 @@ HEADER
 
                 # Optimization for hashes
                 if (
-                        $ref eq 'Sidef::DataTypes::Hash::Hash'
-                    and $i == 0
-                    and (   $method eq 'call'
-                         or $method eq 'new'
-                         or $method eq ':')
+                    (
+                     $ref eq 'Sidef::DataTypes::Hash::Hash' and $i == 0 and (   $method eq 'call'
+                                                                             or $method eq 'new')
+                    )
+                    or ($ref eq 'Sidef::Meta::PrefixColon' and $method eq ':')
                   ) {
                     $code = 'bless({' . $self->deparse_args(@{$call->{arg}}) . "}, '$self->{data_types}{$ref}')";
                     next;

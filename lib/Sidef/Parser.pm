@@ -142,7 +142,7 @@ package Sidef::Parser {
                       | print
                       | defined
                     )\b)                                     (?{ state $x = bless({}, 'Sidef::Operator::Unary') })
-                | :                                          (?{ state $x = bless({}, 'Sidef::DataTypes::Hash::Hash') })
+                | :                                          (?{ state $x = bless({}, 'Sidef::Meta::PrefixColon') })
               )
             }x,
             quote_operators_re => qr{\G

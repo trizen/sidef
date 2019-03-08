@@ -1,0 +1,45 @@
+#!/usr/bin/ruby
+
+# Test the prefix-colon operator `:(...)`.
+# https://github.com/trizen/sidef/issues/84
+
+class X {
+  has Hash colon_inner = Hash(
+    :prop => :(:k => :v)
+  )
+
+  has Hash colon_outer = :(
+    :prop => Hash(:k => :v)
+  )
+
+  has Hash colon_both = :(
+    :prop => :(:k, :v)
+  )
+
+  has Hash colon_none = Hash(
+    :prop => Hash(:k, :v)
+  )
+}
+
+func g {
+  var Hash y = :(:k, :())
+  return y
+}
+
+var x = X()
+
+var expect = Hash("prop" => Hash("k" => "v"))
+
+assert_eq(x.colon_inner, expect)
+assert_eq(x.colon_outer, expect)
+assert_eq(x.colon_both, expect)
+assert_eq(x.colon_none, expect)
+
+var Hash h = :(:k => :())
+
+assert_eq(h, Hash("k" => Hash()))
+assert_eq(g(), Hash("k" => Hash()))
+
+assert_eq(x.colon_outer\{:prop}, Hash("k" => "v"))
+
+say "** Test passed!"

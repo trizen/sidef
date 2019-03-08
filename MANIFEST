@@ -865,6 +865,7 @@ scripts/Tests/pipeline_zip_operator.sf
 scripts/Tests/polynomial_regression.sf
 scripts/Tests/postfix_exclamation_mark.sf
 scripts/Tests/power_numbers.sf
+scripts/Tests/prefix_colon_hash.sf
 scripts/Tests/prefix_methods.sf
 scripts/Tests/prefix_unary_operators.sf
 scripts/Tests/problem_of_apollonius.sf
