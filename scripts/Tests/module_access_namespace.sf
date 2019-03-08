@@ -1,6 +1,8 @@
 #!/usr/bin/ruby
 
-module Trizen {
+# Test variable modification
+
+module Foo {
 
     var private = 42
 
@@ -9,8 +11,24 @@ module Trizen {
     }
 }
 
-assert_eq(Trizen::foo(), 43)
-Trizen::private = 99
-assert_eq(Trizen::foo(), 100)
+assert_eq(Foo::foo(), 43)
+Foo::private = 99
+assert_eq(Foo::foo(), 100)
+
+# Test `enum` outside module
+# https://github.com/trizen/sidef/issues/83
+
+module M {
+
+  var x = 1
+  enum { y=2, z }
+
+  assert_eq(y, 2)
+  assert_eq(z, 3)
+}
+
+assert_eq(M::x, 1)
+assert_eq(M::y, 2)
+assert_eq(M::z, 3)
 
 say "** Test passed!"

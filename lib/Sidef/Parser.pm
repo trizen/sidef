@@ -1465,7 +1465,7 @@ package Sidef::Parser {
                                           );
                     }
 
-                    unshift @{$self->{vars}{$self->{class}}},
+                    unshift @{$self->{vars}{$self->{module} // $self->{class}}},
                       {
                         obj   => $value,
                         name  => $name,
