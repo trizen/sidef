@@ -543,12 +543,12 @@ package Sidef::Parser {
     sub get_name_and_class {
         my ($self, $var_name) = @_;
 
-        $var_name // return ('', $self->{module} // $self->{class});
+        $var_name // return ('', $self->{class});
 
         my $rindex = rindex($var_name, '::');
         $rindex != -1
           ? (substr($var_name, $rindex + 2), substr($var_name, 0, $rindex))
-          : ($var_name, $self->{module} // $self->{class});
+          : ($var_name, $self->{class});
     }
 
     sub get_quoted_words {
@@ -1465,7 +1465,7 @@ package Sidef::Parser {
                                           );
                     }
 
-                    unshift @{$self->{vars}{$self->{module} // $self->{class}}},
+                    unshift @{$self->{vars}{$self->{class}}},
                       {
                         obj   => $value,
                         name  => $name,
@@ -1526,8 +1526,6 @@ package Sidef::Parser {
                             );
                     ($name, $class_name) = $self->get_name_and_class($name);
                 }
-
-                local $self->{class} = $self->{module} // 'main';
 
                 if (    $type ne 'method'
                     and $type ne 'class'
@@ -1919,8 +1917,9 @@ package Sidef::Parser {
                 $self->parse_whitespace(code => $opt{code});
 
                 if (/\G(?=\{)/) {
-                    local $self->{module} = $name;
-                    my $obj = $self->parse_block(code => $opt{code}, is_module => 1);
+                    my $prev_class = $self->{class};
+                    local $self->{class} = $name;
+                    my $obj = $self->parse_block(code => $opt{code}, is_module => 1, prev_class => $prev_class);
 
                     return
                       bless {
@@ -1957,7 +1956,7 @@ package Sidef::Parser {
                 foreach my $var_name (@{$var_names}) {
                     my ($name, $class) = $self->get_name_and_class($var_name);
 
-                    if ($class eq ($self->{module} // $self->{class})) {
+                    if ($class eq ($self->{class})) {
                         $self->fatal_error(
                                            code  => $_,
                                            pos   => $import_pos,
@@ -1977,7 +1976,7 @@ package Sidef::Parser {
 
                     $var->{count}++;
 
-                    unshift @{$self->{vars}{$self->{module} // $self->{class}}},
+                    unshift @{$self->{vars}{$self->{class}}},
                       {
                         obj   => $var->{obj},
                         name  => $name,
@@ -2142,7 +2141,7 @@ package Sidef::Parser {
 
                     next if $Sidef::INCLUDED{$full_path};
 
-                    local $self->{module}              = $name if defined $name;    # new namespace
+                    local $self->{class}               = $name if defined $name;    # new namespace
                     local $self->{line}                = 1;
                     local $self->{file_name}           = $full_path;
                     local $Sidef::INCLUDED{$full_path} = 1;
@@ -2203,7 +2202,7 @@ package Sidef::Parser {
             # Implicit method call on special variable: "_"
             if (/\G\./) {
 
-                if (defined(my $var = $self->find_var('_', $self->{module} // $self->{class}))) {
+                if (defined(my $var = $self->find_var('_', $self->{class}))) {
                     $var->{count}++;
                     return $var->{obj};
                 }
@@ -2745,10 +2744,10 @@ package Sidef::Parser {
             my $p = pos($_);
             local $self->{curly_brackets} = 1;
 
-            my $class_name = $self->{module} // $self->{class};
+            my $class_name = $self->{class};
 
             if ($opt{is_module}) {
-                $class_name = $self->{class};
+                $class_name = $opt{prev_class};
             }
 
             my $ref   = $self->{vars}{$class_name} //= [];
@@ -2780,7 +2779,7 @@ package Sidef::Parser {
             if ($opt{topic_var} and not $has_vars) {
                 my $code = '_';
                 $has_vars = 1;
-                $var_objs =  $self->parse_init_vars(code => \$code, type => 'var');
+                $var_objs = $self->parse_init_vars(code => \$code, type => 'var');
             }
 
             local $self->{current_block} = $block if $has_vars;
