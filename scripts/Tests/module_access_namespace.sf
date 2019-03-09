@@ -44,6 +44,8 @@ do {
             { main::a4 << _ }(4*_)
             { main::a5 << X::_ }(5*X::_)
         }
+
+        assert_eq([4, 9].map { .isqrt }, [2, 3])
     }
 
     assert_eq(a1, [1, 2])

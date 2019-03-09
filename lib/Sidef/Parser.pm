@@ -2203,7 +2203,7 @@ package Sidef::Parser {
             # Implicit method call on special variable: "_"
             if (/\G\./) {
 
-                if (defined(my $var = $self->find_var('_', $self->{class}))) {
+                if (defined(my $var = $self->find_var('_', $self->{module} // $self->{class}))) {
                     $var->{count}++;
                     return $var->{obj};
                 }
