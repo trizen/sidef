@@ -388,11 +388,10 @@ package Sidef::Deparse::Sidef {
             else {
                 if (keys(%{$obj})) {
                     $code = '{';
-                    if (exists($obj->{init_vars}) and @{$obj->{init_vars}{vars}}) {
+
+                    if (exists($obj->{init_vars})) {
                         my @vars = @{$obj->{init_vars}{vars}};
-                        if (@vars) {
-                            $code .= '|' . $self->_dump_vars(@vars) . '|';
-                        }
+                        $code .= '|' . $self->_dump_vars(@vars) . '|';
                     }
 
                     $Sidef::SPACES += $Sidef::SPACES_INCR;

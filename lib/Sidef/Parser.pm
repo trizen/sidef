@@ -1920,7 +1920,7 @@ package Sidef::Parser {
 
                 if (/\G(?=\{)/) {
                     local $self->{module} = $name;
-                    my $obj = $self->parse_block(code => $opt{code});
+                    my $obj = $self->parse_block(code => $opt{code}, is_module => 1);
 
                     return
                       bless {
@@ -2745,13 +2745,19 @@ package Sidef::Parser {
             my $p = pos($_);
             local $self->{curly_brackets} = 1;
 
-            my $ref   = $self->{vars}{$self->{class}} //= [];
-            my $count = scalar(@{$self->{vars}{$self->{class}}});
+            my $class_name = $self->{module} // $self->{class};
 
-            unshift @{$self->{ref_vars_refs}{$self->{class}}}, @{$ref};
-            unshift @{$self->{vars}{$self->{class}}}, [];
+            if ($opt{is_module}) {
+                $class_name = $self->{class};
+            }
 
-            $self->{vars}{$self->{class}} = $self->{vars}{$self->{class}}[0];
+            my $ref   = $self->{vars}{$class_name} //= [];
+            my $count = scalar(@{$self->{vars}{$class_name}});
+
+            unshift @{$self->{ref_vars_refs}{$class_name}}, @{$ref};
+            unshift @{$self->{vars}{$class_name}}, [];
+
+            $self->{vars}{$class_name} = $self->{vars}{$class_name}[0];
 
             my $block = bless({}, 'Sidef::Types::Block::BlockInit');
 
@@ -2772,20 +2778,12 @@ package Sidef::Parser {
 
             # Special '_' variable
             if ($opt{topic_var} and not $has_vars) {
-                my $var_obj = bless({name => '_', type => 'var', class => $self->{class}}, 'Sidef::Variable::Variable');
-
-                push @{$var_objs}, $var_obj;
-                unshift @{$self->{vars}{$self->{class}}},
-                  {
-                    obj   => $var_obj,
-                    name  => '_',
-                    count => 0,
-                    type  => 'var',
-                    line  => $self->{line},
-                  };
+                my $code = '_';
+                $has_vars = 1;
+                $var_objs =  $self->parse_init_vars(code => \$code, type => 'var');
             }
 
-            local $self->{current_block} = $block if ($opt{topic_var} || $has_vars);
+            local $self->{current_block} = $block if $has_vars;
 
             my $obj = $self->parse_script(code => $opt{code});
 
@@ -2798,14 +2796,16 @@ package Sidef::Parser {
 
             #$block->{vars} = [
             #    map { $_->{obj} }
-            #    grep { ref($_) eq 'HASH' and ref($_->{obj}) eq 'Sidef::Variable::Variable' } @{$self->{vars}{$self->{class}}}
+            #    grep { ref($_) eq 'HASH' and ref($_->{obj}) eq 'Sidef::Variable::Variable' } @{$self->{vars}{$class_name}}
             #];
 
-            $block->{init_vars} = bless({vars => $var_objs}, 'Sidef::Variable::Init');
+            if ($has_vars) {
+                $block->{init_vars} = bless({vars => $var_objs}, 'Sidef::Variable::Init');
+            }
 
             $block->{code} = $obj;
-            splice @{$self->{ref_vars_refs}{$self->{class}}}, 0, $count;
-            $self->{vars}{$self->{class}} = $ref;
+            splice @{$self->{ref_vars_refs}{$class_name}}, 0, $count;
+            $self->{vars}{$class_name} = $ref;
 
             return $block;
         }

@@ -31,4 +31,26 @@ assert_eq(M::x, 1)
 assert_eq(M::y, 2)
 assert_eq(M::z, 3)
 
+# Topic variables used inside a module
+# https://github.com/trizen/sidef/issues/86
+do {
+    var(*a1,*a2,*a3,*a4,*a5)
+
+    module X {
+        [1, 2].each {
+            main::a1 << _
+            {|| main::a2 << 2*_ }()
+            {|n| main::a3 << n }(3*_)
+            { main::a4 << _ }(4*_)
+            { main::a5 << X::_ }(5*X::_)
+        }
+    }
+
+    assert_eq(a1, [1, 2])
+    assert_eq(a2, [2, 4])
+    assert_eq(a3, [3, 6])
+    assert_eq(a4, [4, 8])
+    assert_eq(a5, [5, 10])
+}
+
 say "** Test passed!"

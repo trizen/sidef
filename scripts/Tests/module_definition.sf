@@ -83,7 +83,7 @@ module Hi {
     };
 }
 
-Hi::hi()           == "Hi"    || "Hi error!".die;
+Hi::hi()       == "Hi"    || "Hi error!".die;
 Hello::hello() == "Hello" || "Hello error!".die;
 
 
