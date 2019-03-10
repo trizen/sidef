@@ -43,13 +43,12 @@ package Sidef::Types::Regex::Match {
             }
         }
         else {
-            @captures =
-              defined($hash{pos})
-              ? (substr($hash{string}, $hash{pos}) =~ $hash{regex}{regex})
-              : ($hash{string} =~ $hash{regex}{regex});
+            $hash{pos} = CORE::int($hash{pos} // 0);
+            $hash{pos} = ($hash{pos} >= length($hash{'string'}) || $hash{pos} < 0) ? 0 : $hash{pos};
+            @captures = substr($hash{string}, $hash{pos}) =~ $hash{regex}{regex};
 
             $hash{matched}   = (@captures != 0);
-            $hash{match_pos} = $hash{matched} ? [$-[0] + ($hash{pos} // 0), $+[0] + ($hash{pos} // 0)] : [];
+            $hash{match_pos} = $hash{matched} ? [$-[0] + $hash{pos}, $+[0] + $hash{pos}] : [];
 
             foreach my $key (keys %+) {
                 $hash{named_captures}{$key} = $+{$key};
