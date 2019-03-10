@@ -31,4 +31,8 @@ do {
  assert_eq([s[3..s.len-1]], r.global_matches(s, 3).map{ _[0] })
  assert_eq([s[3..s.len-1]], r.global_matches(s, 3, { |_, c| c[0] } ))
  assert_eq([s[3..s.len-1]], r.global_matches(s,    { |_, c| c[0] }, 3 ))
+ assert_eq([s[2..s.len-1]], r.global_matches(s, 1, 2 ).map{ _[0] })
+
+ assert_eq("", r.global_matches(s,    { |_, c| c[0] }, 7.4 ).join)
+ assert_eq(s[-1], r.global_matches(s,    { |_, c| c[0] }, -1 ).join)
 }

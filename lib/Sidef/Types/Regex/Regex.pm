@@ -117,14 +117,14 @@ package Sidef::Types::Regex::Regex {
         my ($pos, $block) = (0, undef);
 
         if (UNIVERSAL::isa($third, 'Sidef::Types::Number::Number')) {
-            $pos = CORE::int($third);
+            $pos = $third;
         }
         elsif (UNIVERSAL::isa($third, 'Sidef::Types::Block::Block')) {
             $block = $third;
         }
 
         if (UNIVERSAL::isa($fourth, 'Sidef::Types::Number::Number')) {
-            $pos = CORE::int($fourth);
+            $pos = $fourth;
         }
         elsif (UNIVERSAL::isa($fourth, 'Sidef::Types::Block::Block')) {
             $block = $fourth;
@@ -132,7 +132,7 @@ package Sidef::Types::Regex::Regex {
 
         my @matches;
         local $self->{global} = 1;
-        local $self->{pos}    = $pos;
+        local $self->{pos}    = CORE::int($pos);
 
         if (defined($block)) {
             my $i = 0;
