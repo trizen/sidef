@@ -37,8 +37,7 @@ do {
  assert_eq(s[-1], r.global_matches(s,    { |_, c| c[0] }, -1 ).join)
 }
 
-
-do {
+2.times {
     var captures = []
     var str = "foo -- bar -- baz"
 
@@ -49,7 +48,7 @@ do {
     assert_eq(captures, ['foo', 'bar', 'baz'])
 }
 
-do {
+2.times {
     var captures = []
     var str = "foo -- bar -- baz"
 
@@ -58,6 +57,28 @@ do {
     }
 
     assert_eq(captures, ['foo', 'bar', 'baz'])
+}
+
+2.times {
+    var captures = []
+    var str = "a cat, a dog and a fox"
+
+    while (var m = str.match(/\ba\h+(\w+)/g)) {
+        captures << m[0]
+    }
+
+    assert_eq(captures, ['cat', 'dog', 'fox'])
+}
+
+2.times {
+    var captures = []
+    var str = "a cat, a dog and a fox"
+
+    while (var m = /\ba\h+(\w+)/g.match(str)) {
+        captures << m[0]
+    }
+
+    assert_eq(captures, ['cat', 'dog', 'fox'])
 }
 
 say "** Test passed!"
