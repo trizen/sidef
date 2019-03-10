@@ -105,7 +105,7 @@ package Sidef::Types::Regex::Regex {
     sub global_match {
         my ($self, $obj, $pos) = @_;
         local $self->{global} = 1;
-        local $self->{pos}    = CORE::int($pos // 0);
+        local $self->{pos}    = CORE::int($pos) if defined($pos);
         $self->match($obj);
     }
 

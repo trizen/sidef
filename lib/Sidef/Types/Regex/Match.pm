@@ -21,7 +21,8 @@ package Sidef::Types::Regex::Match {
 
         my @captures;
         if ($hash{regex}{global}) {
-            pos($hash{string}) = $hash{regex}{pos};
+
+            pos($hash{string}) = CORE::int($hash{regex}{pos});
             my $match = $hash{string} =~ /$hash{regex}{regex}/g;
 
             if ($match) {

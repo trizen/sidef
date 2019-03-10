@@ -36,3 +36,28 @@ do {
  assert_eq("", r.global_matches(s,    { |_, c| c[0] }, 7.4 ).join)
  assert_eq(s[-1], r.global_matches(s,    { |_, c| c[0] }, -1 ).join)
 }
+
+
+do {
+    var captures = []
+    var str = "foo -- bar -- baz"
+
+    while (/(\w+)/.gmatch(str)) {|m|
+        captures << "#{m}"
+    }
+
+    assert_eq(captures, ['foo', 'bar', 'baz'])
+}
+
+do {
+    var captures = []
+    var str = "foo -- bar -- baz"
+
+    while (str.gmatch(/(\w+)/)) {|m|
+        captures << "#{m}"
+    }
+
+    assert_eq(captures, ['foo', 'bar', 'baz'])
+}
+
+say "** Test passed!"
