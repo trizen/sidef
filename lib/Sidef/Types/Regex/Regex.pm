@@ -104,7 +104,8 @@ package Sidef::Types::Regex::Regex {
 
     sub global_match {
         my ($self, $obj, $pos) = @_;
-        local ($self->{global}, $self->{pos}) = (1, $pos);
+        local $self->{global} = 1;
+        local $self->{pos}    = CORE::int($pos // 0);
         $self->match($obj);
     }
 
@@ -116,27 +117,31 @@ package Sidef::Types::Regex::Regex {
         my ($pos, $block) = (0, undef);
 
         if (UNIVERSAL::isa($third, 'Sidef::Types::Number::Number')) {
-            $pos = $third;
-        } elsif (UNIVERSAL::isa($third, 'Sidef::Types::Block::Block')) {
+            $pos = CORE::int($third);
+        }
+        elsif (UNIVERSAL::isa($third, 'Sidef::Types::Block::Block')) {
             $block = $third;
         }
 
         if (UNIVERSAL::isa($fourth, 'Sidef::Types::Number::Number')) {
-            $pos = $fourth;
-        } elsif (UNIVERSAL::isa($fourth, 'Sidef::Types::Block::Block')) {
+            $pos = CORE::int($fourth);
+        }
+        elsif (UNIVERSAL::isa($fourth, 'Sidef::Types::Block::Block')) {
             $block = $fourth;
         }
 
         my @matches;
-        local ($self->{global}, $self->{pos}) = (1, $pos);
+        local $self->{global} = 1;
+        local $self->{pos}    = $pos;
 
         if (defined($block)) {
             my $i = 0;
 
             while ((my $m = $self->match($obj))->{matched}) {
-                CORE::push(@matches, $block->run(Sidef::Types::Number::Number->new($i++), $m));
+                CORE::push(@matches, $block->run(Sidef::Types::Number::Number->_set_uint($i++), $m));
             }
-        } else {
+        }
+        else {
             while ((my $m = $self->match($obj))->{matched}) {
                 CORE::push(@matches, $m);
             }
@@ -145,10 +150,10 @@ package Sidef::Types::Regex::Regex {
         Sidef::Types::Array::Array->new(\@matches);
     }
 
-    *gmatches = \&global_matches;
+    *gmatches       = \&global_matches;
+    *all_matches    = \&global_matches;
+    *map_matches    = \&global_matches;
     *repeated_match = \&global_matches;
-    *all_matches = \&global_matches;
-    *map_matches = \&global_matches;
 
     sub dump {
         my ($self) = @_;
@@ -167,13 +172,13 @@ package Sidef::Types::Regex::Regex {
         *{__PACKAGE__ . '::' . '=~'}  = \&match;
         *{__PACKAGE__ . '::' . '=='}  = \&eq;
         *{__PACKAGE__ . '::' . '!='}  = \&ne;
-        *{__PACKAGE__ . '::' . '≠'} = \&ne;
+        *{__PACKAGE__ . '::' . '≠'}   = \&ne;
         *{__PACKAGE__ . '::' . '<=>'} = \&cmp;
         *{__PACKAGE__ . '::' . '<'}   = \&lt;
         *{__PACKAGE__ . '::' . '<='}  = \&le;
-        *{__PACKAGE__ . '::' . '≤'} = \&le;
+        *{__PACKAGE__ . '::' . '≤'}   = \&le;
         *{__PACKAGE__ . '::' . '>'}   = \&gt;
-        *{__PACKAGE__ . '::' . '≥'} = \&ge;
+        *{__PACKAGE__ . '::' . '≥'}   = \&ge;
         *{__PACKAGE__ . '::' . '>='}  = \&ge;
     }
 

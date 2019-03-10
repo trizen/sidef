@@ -547,7 +547,7 @@ package Sidef::Types::String::String {
         Sidef::Types::Array::Array->new([map { bless \$_ } $str =~ /$regex->{regex}/g]);
     }
 
-    sub findall {
+    sub collect {
         my ($self, $regex) = @_;
         my $str = $$self;
         my @matches;
@@ -556,6 +556,9 @@ package Sidef::Types::String::String {
         }
         Sidef::Types::Array::Array->new(\@matches);
     }
+
+    *findall  = \&collect;
+    *find_all = \&collect;
 
     sub split {
         my ($self, $sep, $size) = @_;
