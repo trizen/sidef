@@ -72,6 +72,8 @@ Match.pos() -> I<Obj>
 
 Return the
 
+Aliases: I<match_pos>
+
 =cut
 
 =head2 regex
