@@ -97,20 +97,58 @@ package Sidef::Types::Regex::Regex {
         my ($self, $object, $pos) = @_;
 
         # Return a new Match object
-        Sidef::Types::Regex::Match->new(
-                                        string => "$object",
-                                        regex  => $self,
-                                        pos    => defined($pos) ? CORE::int($pos) : undef,
-                                       );
+        Sidef::Types::Regex::Match->new(string => "$object", regex => $self, pos => $pos);
     }
 
     *run = \&match;
 
-    sub gmatch {
+    sub global_match {
         my ($self, $obj, $pos) = @_;
-        local $self->{global} = 1;
-        $self->match($obj, $pos);
+        local ($self->{global}, $self->{pos}) = (1, $pos);
+        $self->match($obj);
     }
+
+    *gmatch = \&global_match;
+
+    sub global_matches {
+        my ($self, $obj, $third, $fourth) = @_;
+
+        my ($pos, $block) = (0, undef);
+
+        if (UNIVERSAL::isa($third, 'Sidef::Types::Number::Number')) {
+            $pos = $third;
+        } elsif (UNIVERSAL::isa($third, 'Sidef::Types::Block::Block')) {
+            $block = $third;
+        }
+
+        if (UNIVERSAL::isa($fourth, 'Sidef::Types::Number::Number')) {
+            $pos = $fourth;
+        } elsif (UNIVERSAL::isa($fourth, 'Sidef::Types::Block::Block')) {
+            $block = $fourth;
+        }
+
+        my @matches;
+        local ($self->{global}, $self->{pos}) = (1, $pos);
+
+        if (defined($block)) {
+            my $i = 0;
+
+            while ((my $m = $self->match($obj))->{matched}) {
+                CORE::push(@matches, $block->run(Sidef::Types::Number::Number->new($i++), $m));
+            }
+        } else {
+            while ((my $m = $self->match($obj))->{matched}) {
+                CORE::push(@matches, $m);
+            }
+        }
+
+        Sidef::Types::Array::Array->new(\@matches);
+    }
+
+    *gmatches = \&global_matches;
+    *repeated_match = \&global_matches;
+    *all_matches = \&global_matches;
+    *map_matches = \&global_matches;
 
     sub dump {
         my ($self) = @_;

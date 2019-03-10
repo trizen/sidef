@@ -4,17 +4,31 @@
 ## Regular expressions -- global matching
 #
 
-3.times { |i|
-    say i;
-    while (var m = ("abcd" =~ /(..)/g)) {
-        say m.cap[0];
+3.times {
+    define r = /\G(..)/g
+    var cs = []
+    while (var m = ('abcd' =~ r)[0]) {
+       cs.append(m)
     }
-};
+    assert_eq(cs, ['ab', 'cd'])
+}
 
 
-3.times { |i|
-    say i;
-    while (var m = "abcd".gmatch(/(..)/)) {
-        say m.cap[0];
+3.times {
+    define r = /\G(..)/
+    var cs = []
+    while (var m = 'abcd'.gmatch(r)[0]) {
+        cs.append(m)
     }
-};
+    assert_eq(cs, ['ab', 'cd'])
+}
+
+do {
+ define r = /\G(.)/
+ define s = "1234567"
+ assert_eq(s, r.global_matches(s).map{ _[0] }.join)
+ assert_eq(s, r.global_matches(s, { |_, c| c[0] } ).join)
+ assert_eq([s[3..s.len-1]], r.global_matches(s, 3).map{ _[0] })
+ assert_eq([s[3..s.len-1]], r.global_matches(s, 3, { |_, c| c[0] } ))
+ assert_eq([s[3..s.len-1]], r.global_matches(s,    { |_, c| c[0] }, 3 ))
+}
