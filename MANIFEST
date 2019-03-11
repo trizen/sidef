@@ -950,6 +950,7 @@ scripts/Tests/triangle_path.sf
 scripts/Tests/tribonacci_closed_form.sf
 scripts/Tests/trigonometric_functions.sf
 scripts/Tests/trizen_s_pair_numbers.sf
+scripts/Tests/try_catch.sf
 scripts/Tests/two_dimensional_array.sf
 scripts/Tests/type_comparisons.sf
 scripts/Tests/typed_parameters.sf

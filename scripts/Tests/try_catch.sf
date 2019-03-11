@@ -1,0 +1,37 @@
+#!/usr/bin/ruby
+
+# Tests for the try/catch branches.
+
+func catch_multi {
+  try {
+    var f = :try_branch
+    f.abcdefg
+    (true, :a, :b, f)
+  } catch {
+      |_, msg|
+    (false, :a, :b, :catch_branch, msg)
+  }
+}
+
+func try_multi {
+  try {
+    var f = :try_branch
+    (true, :a, :b, f)
+  } catch {
+      |_, msg|
+    (false, :a, :b, :catch_branch, msg)
+  }
+}
+
+do {
+    var *v = catch_multi()
+    assert_eq(v.first(4), [false, "a", "b", "catch_branch"])
+    assert(v[4] ~~ /abcdefg/)
+}
+
+do {
+    var *v = try_multi()
+    assert_eq(v, [true, "a", "b", "try_branch"])
+}
+
+say "** Test passed!"

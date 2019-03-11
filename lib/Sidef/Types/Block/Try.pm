@@ -14,7 +14,7 @@ package Sidef::Types::Block::Try {
         local $SIG{__WARN__} = sub { $self->{type} = 'warning'; $self->{msg} = $_[0]; $error = 1 };
         local $SIG{__DIE__}  = sub { $self->{type} = 'error';   $self->{msg} = $_[0]; $error = 1 };
 
-        $self->{val} = eval { $code->run };
+        $self->{val} = [eval { $code->run }];
 
         if ($@ || $error) {
             $self->{catch} = 1;
@@ -29,7 +29,7 @@ package Sidef::Types::Block::Try {
         $self->{catch}
           ? $code->run(Sidef::Types::String::String->new($self->{type}),
                        Sidef::Types::String::String->new($self->{msg} =~ s/^\[.*?\]\h*//r)->chomp)
-          : $self->{val};
+          : @{$self->{val}};
     }
 
 };
