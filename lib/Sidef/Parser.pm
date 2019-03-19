@@ -283,7 +283,8 @@ package Sidef::Parser {
                   __TIME__
                   __DATE__
                   __NAMESPACE__
-
+                  __COMPILED__
+                  __OPTIMIZED__
                   )
             },
             match_flags_re  => qr{[msixpogcaludn]+},
@@ -2413,8 +2414,12 @@ package Sidef::Parser {
                 return Sidef::Types::Number::Number->new($self->{line});
             }
 
-            if (/\G__DEPARSING_FILE__\b/gc) {
-                return Sidef::Types::Bool::Bool->new($self->{opt}{R} eq 'Perl');
+            if (/\G__COMPILED__\b/gc) {
+                return Sidef::Types::Bool::Bool->new($self->{opt}{R} eq 'Perl' or $self->{opt}{c});
+            }
+
+            if (/\G__OPTIMIZED__\b/gc) {
+                return Sidef::Types::Bool::Bool->new(($self->{opt}{O} || 0) > 0);
             }
 
             if (/\G__(?:END|DATA)__\b\h*+\R?/gc) {
