@@ -68,3 +68,25 @@ say "-----END-----";
 {lz1()}.capture.chomp == "H€llo!" || "lz1 error".die;
 {lz2()}.capture.chomp == "World"  || "lz2 error".die;
 {lz3()}.capture.chomp == "!"      || "lz3 error".die;
+
+assert_eq(Number.method(:isqrt)(42), 6)
+assert_eq(Number.methods(){:isqrt}(42), 6)
+assert_eq(Number.methods(42){:isqrt}(), 6)
+
+assert_eq(Number.methods(){:add}(4, 5), 9)
+assert_eq(Number.methods(4){:add}(5), 9)
+assert_eq(Number.methods(4, 5){:add}(), 9)
+
+assert_eq(Number.method(:add)(4, 5), 9)
+assert_eq(Number.method(:add, 4)(5), 9)
+
+assert_eq(4.method(:add)(5), 9)
+assert_eq(4.method(:add, 5)(), 9)
+
+do {
+    var t = Number.methods(4, 5)
+
+    assert_eq(t{:add}(), 9)
+    assert_eq(t{:mul}(), 20)
+    assert_eq(t{:sub}(), -1)
+}

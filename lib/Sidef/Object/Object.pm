@@ -251,7 +251,8 @@ package Sidef::Object::Object {
             @parents;
         };
 
-        Sidef::Types::Array::Array->new([map { Sidef::Types::String::String->new($_) } $extract_parents->(CORE::ref($obj))]);
+        Sidef::Types::Array::Array->new(
+                                  [map { Sidef::Types::String::String->new($_) } $extract_parents->(CORE::ref($obj) || $obj)]);
     }
 
     sub interpolate {
@@ -270,7 +271,7 @@ package Sidef::Object::Object {
             exists($addr{$refaddr})
               and return $addr{$refaddr};
 
-            my $type = Sidef::normalize_type(CORE::ref($obj) ? CORE::ref($obj) : $obj);
+            my $type = Sidef::normalize_type(CORE::ref($obj) || $obj);
             Scalar::Util::reftype($obj) eq 'HASH' or return $type;
             my @keys = CORE::sort(CORE::keys(%{$obj}));
 
@@ -305,7 +306,7 @@ package Sidef::Object::Object {
 
         sub def_method {
             my ($self, $name, $block) = @_;
-            *{(CORE::ref($self) ? CORE::ref($self) : $self) . '::' . $name} = sub {
+            *{(CORE::ref($self) || $self) . '::' . $name} = sub {
                 $block->call(@_);
             };
             $self;
@@ -313,15 +314,15 @@ package Sidef::Object::Object {
 
         sub undef_method {
             my ($self, $name) = @_;
-            delete ${(CORE::ref($self) ? CORE::ref($self) : $self) . '::'}{$name};
+            delete ${(CORE::ref($self) || $self) . '::'}{$name};
             $self;
         }
 
         sub alias_method {
             my ($self, $old, $new) = @_;
 
-            my $ref = (CORE::ref($self) ? CORE::ref($self) : $self);
-            my $to = \&{$ref . '::' . $old};
+            my $ref = (CORE::ref($self) || $self);
+            my $to  = \&{$ref . '::' . $old};
 
             if (not defined &$to) {
                 die "[ERROR] Can't alias the nonexistent method `$old` as `$new`!";
@@ -331,11 +332,12 @@ package Sidef::Object::Object {
         }
 
         sub methods {
-            my ($self) = @_;
+            my ($self, @args) = @_;
 
             my %alias;
             my %methods;
-            my $ref = CORE::ref($self);
+            my $ref = CORE::ref($self) || $self;
+
             foreach my $method (grep { $_ !~ /^[(_]/ and defined(&{$ref . '::' . $_}) } keys %{$ref . '::'}) {
                 $methods{$method} = (
                                      $alias{\&{$ref . '::' . $method}} //=
@@ -343,6 +345,7 @@ package Sidef::Object::Object {
                                                                       {
                                                                        obj    => $self,
                                                                        method => $method,
+                                                                       args   => \@args,
                                                                       }
                                                                      )
                                     );
