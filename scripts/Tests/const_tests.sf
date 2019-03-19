@@ -47,4 +47,24 @@ do {
     assert_eq(foo(), 43)
 }
 
+do {
+    const v = 42
+    assert_eq(v, 42)
+
+    func foo(n) {
+        const v = n
+    }
+
+    assert_eq(foo(3), 3)
+    assert_eq(foo(4), 4)
+
+    func bar(n) {
+        const v = n
+        return v
+    }
+
+    assert_eq(bar(5), 5)
+    assert_eq(bar(6), 6)
+}
+
 say "** Test passed!"

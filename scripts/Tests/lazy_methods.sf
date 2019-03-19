@@ -79,6 +79,7 @@ assert_eq(Number.methods(4, 5){:add}(), 9)
 
 assert_eq(Number.method(:add)(4, 5), 9)
 assert_eq(Number.method(:add, 4)(5), 9)
+assert_eq(Number.method(:add, 4, 5)(), 9)
 
 assert_eq(4.method(:add)(5), 9)
 assert_eq(4.method(:add, 5)(), 9)

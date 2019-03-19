@@ -138,6 +138,22 @@ Aliases: I<is_an>, I<kind_of>
 
 =cut
 
+=head2 is_object
+
+Object.is_object() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 is_typename
+
+Object.is_typename() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 lazy
 
 Object.lazy() -> I<Obj>

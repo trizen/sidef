@@ -763,7 +763,7 @@ HEADER
             $code = $value;
         }
         elsif ($ref eq 'Sidef::Variable::Const') {
-            my $name  = $obj->{name} . $refaddr;
+            my $name  = "const_$obj->{name}" . $refaddr;
             my $value = '(' . $name . ')';
             if (not exists $obj->{inited}) {
                 $obj->{inited} = 1;
