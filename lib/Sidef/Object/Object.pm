@@ -229,6 +229,20 @@ package Sidef::Object::Object {
     *is_an   = \&is_a;
     *kind_of = \&is_a;
 
+    sub is_object {
+        my ($self) = @_;
+        CORE::ref($self)
+          ? (Sidef::Types::Bool::Bool::TRUE)
+          : (Sidef::Types::Bool::Bool::FALSE);
+    }
+
+    sub is_typename {
+        my ($self) = @_;
+        CORE::ref($self)
+          ? (Sidef::Types::Bool::Bool::FALSE)
+          : (Sidef::Types::Bool::Bool::TRUE);
+    }
+
     sub parent_classes {
         my ($obj) = @_;
 
