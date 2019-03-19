@@ -2413,6 +2413,10 @@ package Sidef::Parser {
                 return Sidef::Types::Number::Number->new($self->{line});
             }
 
+            if (/\G__DEPARSING_FILE__\b/gc) {
+                return Sidef::Types::Bool::Bool->new($self->{opt}{R} eq 'Perl');
+            }
+
             if (/\G__(?:END|DATA)__\b\h*+\R?/gc) {
                 if (exists $self->{'__DATA__'}) {
                     $self->{'__DATA__'} = substr($_, pos);
