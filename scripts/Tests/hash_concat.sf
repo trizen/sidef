@@ -14,7 +14,7 @@ assert_eq(hash{:a}, :b)
 hash += %w(c d)           # 2-item array
 assert_eq(hash{:c}, :d)
 
-hash += "2":3             # an actual Pair
+hash += "2"：3             # an actual Pair
 assert_eq(hash{"2"}, 3)
 
 say "** Test passed!"

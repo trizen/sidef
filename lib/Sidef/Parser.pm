@@ -325,7 +325,9 @@ package Sidef::Parser {
                   ...
                   != ..
                   \\\\= \\\\
-                  !! ! : « » ~
+                  !! !
+                  : ： ⫶ ¦
+                  « » ~
                   );
 
                 qr{
@@ -1150,6 +1152,8 @@ package Sidef::Parser {
                 return Sidef::Types::String::String->new($1);
             }
 
+            # Bareword followed by a colon becomes a NamedParam with the bareword
+            # on the LHS
             if (/\G([^\W\d]\w*+):(?![=:])/gc) {
                 my $name = $1;
                 my $obj  = $self->parse_obj(code => $opt{code});

@@ -848,6 +848,7 @@ scripts/Tests/objects_init.sf
 scripts/Tests/one-dimensional_cellular_automata.sf
 scripts/Tests/one-dimensional_cellular_automata_2.sf
 scripts/Tests/open.sf
+scripts/Tests/pair_namedparam_force_ops.sf
 scripts/Tests/pairs_test.sf
 scripts/Tests/palindrome_recursive.sf
 scripts/Tests/pascal_matrix_generation.sf

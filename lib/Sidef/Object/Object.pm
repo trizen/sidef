@@ -384,9 +384,24 @@ package Sidef::Object::Object {
             $func->call($arg, @args);
         };
 
-        # Pair operator
+        # Deprecated pair method: ASCII colon; U+3A
         *{__PACKAGE__ . '::' . ':'} = sub {
             Sidef::Types::Array::Pair->new($_[0], $_[1]);
+        };
+
+        # TODO: v4.0: the following 2 methods should create an Array with 2 elements
+        # Pair (2-Array) method: Fullwidth Colon; U+FF1A
+        *{__PACKAGE__ . '::' . '：'} = sub {
+            Sidef::Types::Array::Pair->new($_[0], $_[1]);
+        };
+
+        # Pair (2-Array) method: Broken bar; U+A6
+        # Easier to type than U+FF1A, but uglier
+        *{__PACKAGE__ . '::' . '¦'} = \&{__PACKAGE__ . '::' . '：'};
+
+        # NamedParam method: Triple Colon Operator; U+2AF6
+        *{__PACKAGE__ . '::' . '⫶'} = sub {
+            Sidef::Variable::NamedParam->new($_[0], $_[1]);
         };
 
         # Logical AND
