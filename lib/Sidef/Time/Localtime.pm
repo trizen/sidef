@@ -1,6 +1,6 @@
 package Sidef::Time::Localtime {
 
-    use 5.014;
+    use 5.016;
     use parent qw(
       Sidef::Time::Gmtime
       );

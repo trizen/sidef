@@ -1,7 +1,7 @@
 package Sidef::Deparse::Perl {
 
     use utf8;
-    use 5.014;
+    use 5.016;
 
     use Scalar::Util qw(refaddr);
     use Sidef::Types::Number::Number;

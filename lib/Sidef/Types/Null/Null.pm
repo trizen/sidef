@@ -1,7 +1,7 @@
 package Sidef::Types::Null::Null {
 
     use utf8;
-    use 5.014;
+    use 5.016;
 
     use overload
       q{bool} => sub { },

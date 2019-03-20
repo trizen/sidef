@@ -1,7 +1,7 @@
 package Sidef::Types::Range::RangeString {
 
     use utf8;
-    use 5.014;
+    use 5.016;
 
     use parent qw(
       Sidef::Types::Range::Range
@@ -100,7 +100,7 @@ package Sidef::Types::Range::RangeString {
         my $to   = $self->{to};
 
         my $asc = ($self->{_asc} //= !!$step->is_pos);
-        my $i = $from;
+        my $i   = $from;
 
         Sidef::Types::Block::Block->new(
             code => sub {

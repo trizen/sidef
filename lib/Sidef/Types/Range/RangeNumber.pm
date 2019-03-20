@@ -1,7 +1,7 @@
 package Sidef::Types::Range::RangeNumber {
 
     use utf8;
-    use 5.014;
+    use 5.016;
 
     use parent qw(
       Sidef::Types::Range::Range

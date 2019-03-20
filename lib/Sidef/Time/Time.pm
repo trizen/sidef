@@ -1,6 +1,6 @@
 package Sidef::Time::Time {
 
-    use 5.014;
+    use 5.016;
     use parent qw(Sidef::Object::Object);
 
     use overload

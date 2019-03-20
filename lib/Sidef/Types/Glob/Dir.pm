@@ -1,9 +1,11 @@
 package Sidef::Types::Glob::Dir {
 
     use utf8;
-    use 5.014;
+    use 5.016;
 
-    use parent qw(Sidef::Types::Glob::File);
+    use parent qw(
+      Sidef::Types::Glob::File
+      );
 
     require File::Spec;
 

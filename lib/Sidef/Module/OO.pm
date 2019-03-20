@@ -1,7 +1,7 @@
 package Sidef::Module::OO {
 
     use utf8;
-    use 5.014;
+    use 5.016;
     our $AUTOLOAD;
 
     use overload q{""} => sub {

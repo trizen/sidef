@@ -1,7 +1,7 @@
 package Sidef::Variable::GetOpt {
 
     use utf8;
-    use 5.014;
+    use 5.016;
     require Getopt::Long;
 
     sub new {

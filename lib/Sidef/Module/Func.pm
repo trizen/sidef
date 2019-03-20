@@ -1,7 +1,7 @@
 package Sidef::Module::Func {
 
     use utf8;
-    use 5.014;
+    use 5.016;
     our $AUTOLOAD;
 
     sub __NEW__ {

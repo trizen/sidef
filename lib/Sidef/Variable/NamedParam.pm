@@ -1,14 +1,14 @@
 package Sidef::Variable::NamedParam {
 
     use utf8;
-    use 5.014;
+    use 5.016;
     use overload q{""} => \&dump;
 
     use parent qw(
       Sidef::Types::Hash::Hash
       );
 
-    require Sidef::Types::Array::Array;
+    use Sidef::Types::Array::Array;
 
     sub new {
         my (undef, $name, @args) = @_;

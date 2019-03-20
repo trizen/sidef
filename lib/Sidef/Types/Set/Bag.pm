@@ -1,9 +1,11 @@
 package Sidef::Types::Set::Bag {
 
     use utf8;
-    use 5.014;
+    use 5.016;
 
-    use parent qw(Sidef::Types::Set::Set);
+    use parent qw(
+      Sidef::Types::Set::Set
+      );
 
     use overload
       q{bool} => sub { scalar(CORE::keys(%{$_[0]})) },

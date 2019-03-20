@@ -3,7 +3,7 @@ package Sidef::Object::Convert {
     # Used as parent by Sidef::Object::Object.
 
     use utf8;
-    use 5.014;
+    use 5.016;
 
     use overload;
     use Sidef::Types::Bool::Bool;

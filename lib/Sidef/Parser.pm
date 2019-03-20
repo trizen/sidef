@@ -1,7 +1,7 @@
 package Sidef::Parser {
 
     use utf8;
-    use 5.014;
+    use 5.016;
 
     use Sidef::Types::Bool::Bool;
     use List::Util qw(first);

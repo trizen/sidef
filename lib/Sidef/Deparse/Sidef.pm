@@ -1,7 +1,7 @@
 package Sidef::Deparse::Sidef {
 
     use utf8;
-    use 5.014;
+    use 5.016;
     use Scalar::Util qw(refaddr reftype);
 
     my %addr;

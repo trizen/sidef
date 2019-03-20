@@ -1,7 +1,7 @@
 package Sidef::Types::Range::Range {
 
     use utf8;
-    use 5.014;
+    use 5.016;
 
     use List::Util qw();
     use Sidef::Types::Bool::Bool;

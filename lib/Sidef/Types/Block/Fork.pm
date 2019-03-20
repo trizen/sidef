@@ -1,7 +1,7 @@
 package Sidef::Types::Block::Fork {
 
     use utf8;
-    use 5.014;
+    use 5.016;
 
     sub new {
         my (undef, %opts) = @_;

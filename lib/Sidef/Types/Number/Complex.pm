@@ -3,7 +3,7 @@ package Sidef::Types::Number::Complex {
     # No reference is blessed in this class.
 
     use utf8;
-    use 5.014;
+    use 5.016;
 
     use parent qw(
       Sidef::Types::Number::Number

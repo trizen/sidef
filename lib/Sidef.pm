@@ -1,7 +1,7 @@
 package Sidef {
 
     use utf8;
-    use 5.014;
+    use 5.016;
 
     our $VERSION = '3.60';
 

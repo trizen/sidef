@@ -1,7 +1,7 @@
 package Sidef::Object::Enumerator {
 
     use utf8;
-    use 5.014;
+    use 5.016;
     ##use overload q{""} => \&to_a;
 
     sub new {
