@@ -76,6 +76,7 @@ package Sidef::Deparse::Perl {
                   Sidef::DataTypes::Object::Lazy          Sidef::Object::Lazy
                   Sidef::DataTypes::Object::LazyMethod    Sidef::Object::LazyMethod
                   Sidef::DataTypes::Object::Enumerator    Sidef::Object::Enumerator
+                  Sidef::DataTypes::Variable::NamedParam  Sidef::Variable::NamedParam
 
                   Sidef::Meta::PrefixColon                Sidef::Types::Hash::Hash
 
@@ -1199,7 +1200,7 @@ HEADER
               . $self->deparse_args($obj->{false}) . ')';
         }
         elsif ($ref eq 'Sidef::Variable::NamedParam') {
-            $code = $ref . '->new(' . $self->_dump_string($obj->[0]) . ', ' . $self->deparse_args(@{$obj->[1]}) . ')';
+            $code = $ref . '->new(' . $self->_dump_string($obj->{name}) . ', ' . $self->deparse_args(@{$obj->{value}}) . ')';
         }
         elsif ($ref eq 'Sidef::Types::Nil::Nil') {
             $code = 'undef';

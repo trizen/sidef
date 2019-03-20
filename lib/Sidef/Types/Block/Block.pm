@@ -110,13 +110,13 @@ package Sidef::Types::Block::Block {
 
             foreach my $arg (@args) {
                 if (ref($arg) eq 'Sidef::Variable::NamedParam') {
-                    if (exists $table->{$arg->[0]}) {
-                        my $info = $vars[$table->{$arg->[0]}];
+                    if (exists $table->{$arg->{name}}) {
+                        my $info = $vars[$table->{$arg->{name}}];
                         if (exists $info->{slurpy}) {
-                            $seen{$arg->[0]} = $arg->[1];
+                            $seen{$arg->{name}} = $arg->{value};
                         }
                         else {
-                            $seen{$arg->[0]} = $arg->[1][-1];
+                            $seen{$arg->{name}} = $arg->{value}[-1];
                         }
                     }
                     else {

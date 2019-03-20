@@ -47,6 +47,7 @@ package Sidef::Deparse::Sidef {
                   Sidef::DataTypes::Object::Lazy          Lazy
                   Sidef::DataTypes::Object::LazyMethod    LazyMethod
                   Sidef::DataTypes::Object::Enumerator    Enumerator
+                  Sidef::DataTypes::Variable::NamedParam  NamedParam
 
                   Sidef::Math::Math                       Math
                   Sidef::Meta::Glob::ARGF                 ARGF
@@ -462,7 +463,7 @@ package Sidef::Deparse::Sidef {
             $code = 'eval' . $self->deparse_args($obj->{expr});
         }
         elsif ($ref eq 'Sidef::Variable::NamedParam') {
-            $code = $obj->[0] . ':' . $self->deparse_args(@{$obj->[1]});
+            $code = $obj->{name} . ':' . $self->deparse_args(@{$obj->{value}});
         }
         elsif ($ref eq 'Sidef::Variable::Label') {
             $code = '@:' . $obj->{name};

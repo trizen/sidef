@@ -86,4 +86,19 @@ assert_eq(test6(c: 2, 1), [1, 42, 2])
 assert_eq(test6(c: 2, a: 1), [1, 42, 2])
 assert_eq(test6(a: 1, c: 2), [1, 42, 2])
 
+#
+## Test 7
+#
+
+assert((c: 2).kind_of(NamedParam))
+assert_eq(c: 2, NamedParam("c", 2))
+assert_eq(c: (2, 3, 4), NamedParam("c", 2, 3, 4))
+
+do {
+    var t = foo: (1, 2, 3)
+    assert_eq(t.name, "foo")
+    assert_eq([t.value], [1, 2, 3])
+    assert_eq(t, NamedParam(:foo, 1, 2, 3))
+}
+
 say "** Test passed!";

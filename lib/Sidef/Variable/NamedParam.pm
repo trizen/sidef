@@ -4,31 +4,43 @@ package Sidef::Variable::NamedParam {
     use 5.014;
     use overload q{""} => \&dump;
 
+    use parent qw(
+      Sidef::Types::Hash::Hash
+      );
+
+    require Sidef::Types::Array::Array;
+
     sub new {
         my (undef, $name, @args) = @_;
-        bless [$name, \@args], __PACKAGE__;
+        bless {
+               name  => "$name",
+               value => bless(\@args, 'Sidef::Types::Array::Array'),
+              },
+          __PACKAGE__;
     }
+
+    *call = \&new;
 
     sub name {
         my ($self) = @_;
-        Sidef::Types::String::String->new($self->[0]);
+        Sidef::Types::String::String->new($self->{name});
     }
 
     sub value {
         my ($self) = @_;
-        (@{$self->[1]});
+        (@{$self->{value}});
     }
 
     sub get_value {
         my ($self) = @_;
-        map { $_->get_value } @{$self->[1]};
+        map { $_->get_value } @{$self->{value}};
     }
 
     sub dump {
         my ($self) = @_;
-        my ($name, $args) = @{$self};
-        my @args = map { ref($_) && defined(UNIVERSAL::can($_, 'dump')) ? $_->dump : $_ } @{$args};
-        Sidef::Types::String::String->new("$name: " . (@args == 1 ? $args[0] : ('(' . join(', ', @args) . ')')));
+        my ($name, $args) = ($self->{name}, $self->{value});
+        my $value = substr("$args", 1, -1);
+        Sidef::Types::String::String->new(qq{NamedParam("\Q$name\E", $value)});
     }
 }
 

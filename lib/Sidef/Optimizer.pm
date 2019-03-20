@@ -914,7 +914,7 @@ package Sidef::Optimizer {
             $obj->{block}{code} = {$self->optimize($obj->{block}{code})};
         }
         elsif ($ref eq 'Sidef::Variable::NamedParam') {
-            $obj->[1] = [map { {main => [$self->optimize_expr({self => $_})]} } @{$obj->[1]}];
+            $obj->{value} = [map { {main => [$self->optimize_expr({self => $_})]} } @{$obj->{value}}];
         }
         elsif ($ref eq 'Sidef::Meta::PrefixMethod') {
             $obj->{expr} = {$self->optimize($obj->{expr})};
