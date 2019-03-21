@@ -52,7 +52,7 @@ do {
     assert_eq(v, 42)
 
     func foo(n) {
-        const v = n
+        const _v = n
     }
 
     assert_eq(foo(3), 3)
