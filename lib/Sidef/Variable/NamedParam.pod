@@ -13,6 +13,13 @@ This class implements ...
 
 var obj = NamedParam(...)
 
+
+=head1 INHERITS
+
+Inherits methods from:
+
+       * Sidef::Types::Hash::Hash
+
 =head1 METHODS
 
 =head2 dump
@@ -36,6 +43,8 @@ Return the
 NamedParam.new() -> I<Obj>
 
 Return the
+
+Aliases: I<call>
 
 =cut
 

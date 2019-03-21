@@ -1,6 +1,43 @@
-#! ruby
+#!/usr/bin/ruby
 
-assert_eq(/a/g + /b/i, /ab/gi)
-assert_eq(/(a)/ + /(b)/, /(a)(b)/)
-assert_eq(/a/i + :b, /ab/i)
-assert_eq(/a/i + 1, /a1/i)
+var tests = [
+    [/a/g, /b/i],
+    [/a/i, /b/g],
+    [/(a)/, /(b)/],
+    [/a/i, :b],
+    [/a/i, 1],
+    [/a/x, /b/x],
+    [/foo/aaxx, /bar/],
+    [/foo/aaxx, /bar/xx],
+    [/foo/axxa, /bar/xaa],
+]
+
+for x,y in (tests) {
+    assert_eq(x + y, Regex("#{x}#{y}"))
+}
+
+do {
+    var t = /(foo)/+/(bar)/i
+    assert("fooBar" ~~ t)
+    assert("FooBar" !~ t)
+    assert(["fooBAR".match(t)...], ["foo", "BAR"])
+}
+
+do {
+    var t = /(foo)/i+/(bar)/i
+    assert("FooBar" ~~ t)
+}
+
+do {
+    var t = /abc/i+'$42/3'
+    assert('aBc$42/3' ~~ t)
+    assert('aBc$42/3' ~~ eval(t.dump))
+}
+
+do {
+    var t = /abc2/i+'$42\/3'
+    assert('aBc2$42\/3' ~~ t)
+    assert('aBc2$42\/3' ~~ eval(t.dump))
+}
+
+say "** Test passed!"

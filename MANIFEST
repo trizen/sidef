@@ -884,9 +884,11 @@ scripts/Tests/recursion.sf
 scripts/Tests/recursive_block_closures.sf
 scripts/Tests/regex.sf
 scripts/Tests/regex_bool.sf
+scripts/Tests/regex_concat.sf
 scripts/Tests/regex_global_matching.sf
 scripts/Tests/regex_match_as_array.sf
 scripts/Tests/regex_pos.sf
+scripts/Tests/regex_union.sf
 scripts/Tests/return.sf
 scripts/Tests/return_types.sf
 scripts/Tests/reverse_a_base10_integer.sf

@@ -1,0 +1,55 @@
+#!/usr/bin/ruby
+
+assert_eq(/a/g | /b/i, /ab/gi)
+assert_eq(/(a)/ | /(b)/, /(a)(b)/)
+assert_eq(/a/i | :b, /ab/i)
+assert_eq(/a/i | 1, /a1/i)
+
+assert_eq(/a/g | /b/i, /ab/gi)
+assert_eq(/a/i | /b/g, /ab/gi)
+assert_eq(/(a)/ | /(b)/, /(a)(b)/)
+assert_eq(/a/i | :b, /ab/i)
+assert_eq(/a/i | 1, /a1/i)
+assert_eq(/a/x | /b/x, /ab/x)
+assert_eq(/a/x | /b/xx, /ab/xx)
+assert_eq(/a/xx | /b/xx, /ab/xx)
+assert_eq(/a/xx | /b/x, /ab/xx)
+
+assert_eq(/foo/a | /bar/, /foobar/a)
+assert_eq(/foo/aaxx | /bar/, /foobar/aaxx)
+assert_eq(/foo/aaxx | /bar/xx, /foobar/aaxx)
+assert_eq(/foo/aaxx | /bar/axx, /foobar/aaxx)
+assert_eq(/foo/axax | /bar/xax, /foobar/aaxx)
+assert_eq(/foo/axx | /bar/xax, /foobar/axx)
+assert_eq(/foo/axx | /bar/xaxa, /foobar/aaxx)
+assert_eq(/foo/axxa | /bar/xaxa, /foobar/aaxx)
+assert_eq(/foo/axxa | /bar/xaa, /foobar/aaxx)
+
+assert_eq(/foo/.union(/bar/, :i), /foobar/i)
+assert_eq(/foo/x.union(/bar/a, :i), /foobar/aix)
+
+do {
+    var t = /(foo)/|/(bar)/i
+    assert("fooBar" ~~ t)
+    assert("FooBar" ~~ t)
+    assert(["fooBAR".match(t)...], ["foo", "BAR"])
+}
+
+do {
+    var t = /(foo)/i|/(bar)/i
+    assert("FooBar" ~~ t)
+}
+
+do {
+    var t = /abc/i|'$42/3'
+    assert('aBc$42/3' ~~ t)
+    assert('aBc$42/3' ~~ eval(t.dump))
+}
+
+do {
+    var t = /abc2/i|'$42\/3'
+    assert('aBc2$42\/3' ~~ t)
+    assert('aBc2$42\/3' ~~ eval(t.dump))
+}
+
+say "** Test passed!"

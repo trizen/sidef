@@ -156,24 +156,61 @@ package Sidef::Types::Regex::Regex {
     *repeated_match = \&global_matches;
 
     sub add {
-      my ($self, $other, $extra_flags) = @_;
-      my $a = $self->{raw};
-      my ($b, $b_flags, $b_global) = (undef, '', 0);
-      if (CORE::ref($other) eq 'Sidef::Types::Regex::Regex') {
-        $b = $other->{raw};
-        $b_flags = $other->{flags};
-        $b_global = $other->{global};
-      } else {
-        $b = "$other";
-      }
+        my ($self, $other) = @_;
 
-      Sidef::Types::Regex::Regex->new(
-        "$a$b",
-        $self->{flags} . $b_flags . $extra_flags
-          . (($self->{global} || $b_global) ? 'g' : '')
-      )
+        my $x = $self->{regex};
+        my $y = ref($other) eq __PACKAGE__ ? $other->{regex} : "\Q$other\E";
+
+        __PACKAGE__->new("$x$y");
     }
+
     *concat = \&add;
+
+    sub union {
+        my ($self, $other, $extra_flags) = @_;
+
+        my ($x, $x_flags, $x_global) = ($self->{raw}, $self->{flags}, $self->{global});
+        my ($y, $y_flags, $y_global) = (undef, '', 0);
+
+        my %x_flags;
+        my %y_flags;
+
+        if (ref($other) eq __PACKAGE__) {
+            $y        = $other->{raw};
+            $y_flags  = $other->{flags};
+            $y_global = $other->{global};
+        }
+        else {
+            $y = "\Q$other\E";
+        }
+
+        $x_flags{$_}++ for split(//, $x_flags);
+        $y_flags{$_}++ for split(//, $y_flags);
+
+        my %union = %x_flags;
+
+        foreach my $k (keys %y_flags) {
+            if (exists $union{$k}) {
+
+                my $c1 = $x_flags{$k};
+                my $c2 = $y_flags{$k};
+
+                if ($c2 > $c1) {
+                    $union{$k} = $c2;
+                }
+            }
+            else {
+                $union{$k} = $y_flags{$k};
+            }
+        }
+
+        my $global = ($x_global || $y_global) ? 'g' : '';
+        my $flags  = join('', map { $_ x $union{$_} } sort keys %union);
+
+        $flags .= $extra_flags if defined($extra_flags);
+
+        __PACKAGE__->new("$x$y", join('', sort split(//, $flags . $global)));
+    }
 
     sub dump {
         my ($self) = @_;
@@ -181,7 +218,8 @@ package Sidef::Types::Regex::Regex {
         my $str   = $self->{raw};
         my $flags = $self->{flags};
 
-        Sidef::Types::String::String->new('/' . $str =~ s{/}{\\/}gr . '/' . $flags . ($self->{global} ? 'g' : ''));
+        Sidef::Types::String::String->new(
+                                    '/' . $str =~ s{(?<!\\)(?:\\\\)*\K/}{\\/}gr . '/' . $flags . ($self->{global} ? 'g' : ''));
     }
 
     *to_s   = \&dump;
@@ -200,7 +238,8 @@ package Sidef::Types::Regex::Regex {
         *{__PACKAGE__ . '::' . '>'}   = \&gt;
         *{__PACKAGE__ . '::' . '≥'}   = \&ge;
         *{__PACKAGE__ . '::' . '>='}  = \&ge;
-        *{__PACKAGE__ . '::' . '+'}  = \&concat;
+        *{__PACKAGE__ . '::' . '+'}   = \&concat;
+        *{__PACKAGE__ . '::' . '|'}   = \&union;
     }
 
 };
