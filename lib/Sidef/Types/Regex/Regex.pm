@@ -155,6 +155,26 @@ package Sidef::Types::Regex::Regex {
     *map_matches    = \&global_matches;
     *repeated_match = \&global_matches;
 
+    sub add {
+      my ($self, $other, $extra_flags) = @_;
+      my $a = $self->{raw};
+      my ($b, $b_flags, $b_global) = (undef, '', 0);
+      if (CORE::ref($other) eq 'Sidef::Types::Regex::Regex') {
+        $b = $other->{raw};
+        $b_flags = $other->{flags};
+        $b_global = $other->{global};
+      } else {
+        $b = "$other";
+      }
+
+      Sidef::Types::Regex::Regex->new(
+        "$a$b",
+        $self->{flags} . $b_flags . $extra_flags
+          . (($self->{global} || $b_global) ? 'g' : '')
+      )
+    }
+    *concat = \&add;
+
     sub dump {
         my ($self) = @_;
 
@@ -180,6 +200,7 @@ package Sidef::Types::Regex::Regex {
         *{__PACKAGE__ . '::' . '>'}   = \&gt;
         *{__PACKAGE__ . '::' . '≥'}   = \&ge;
         *{__PACKAGE__ . '::' . '>='}  = \&ge;
+        *{__PACKAGE__ . '::' . '+'}  = \&concat;
     }
 
 };
