@@ -1,0 +1,6 @@
+#! ruby
+
+assert_eq(/a/g + /b/i, /ab/gi)
+assert_eq(/(a)/ + /(b)/, /(a)(b)/)
+assert_eq(/a/i + :b, /ab/i)
+assert_eq(/a/i + 1, /a1/i)
