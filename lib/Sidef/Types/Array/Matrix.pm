@@ -234,6 +234,21 @@ package Sidef::Types::Array::Matrix {
     *from_cols    = \&columns;
     *from_columns = \&columns;
 
+    sub vector_rows {
+        my ($self) = @_;
+        bless([map { Sidef::Types::Array::Vector->new(@$_) } @$self], 'Sidef::Types::Array::Array');
+    }
+
+    *vec_rows = \&vector_rows;
+
+    sub vector_columns {
+        my ($self) = @_;
+        $self->transpose->vector_rows;
+    }
+
+    *vec_cols    = \&vector_columns;
+    *vec_columns = \&vector_columns;
+
     sub neg {
         my ($m1) = @_;
         bless($m1->scalar_operator('neg'));

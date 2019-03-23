@@ -458,6 +458,26 @@ Aliases: I<dump>, I<to_str>
 
 =cut
 
+=head2 vec_cols
+
+Matrix.vec_cols() -> I<Obj>
+
+Return the
+
+Aliases: I<vec_columns>, I<vector_columns>
+
+=cut
+
+=head2 vec_rows
+
+Matrix.vec_rows() -> I<Obj>
+
+Return the
+
+Aliases: I<vector_rows>
+
+=cut
+
 =head2 vertical_flip
 
 Matrix.vertical_flip() -> I<Obj>
