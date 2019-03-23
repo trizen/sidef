@@ -130,6 +130,28 @@ package Sidef::Types::Array::Vector {
         bless($v1->scalar_operator('*', $v2));
     }
 
+    sub pow {
+        my ($v1, $v2) = @_;
+
+        if (exists $vector_like{ref($v2)}) {
+
+            my @matrix;
+            foreach my $x (@$v1) {
+
+                my @row;
+                foreach my $y (@$v2) {
+                    push @row, $x->pow($y);
+                }
+
+                push @matrix, bless(\@row, 'Sidef::Types::Array::Array');
+            }
+
+            return Sidef::Types::Array::Matrix->new(@matrix);
+        }
+
+        bless($v1->scalar_operator('**', $v2));
+    }
+
     sub and {
         my ($v1, $v2) = @_;
 

@@ -401,6 +401,16 @@ Aliases: I<to_array>
 
 =cut
 
+=head2 to_v
+
+Range.to_v() -> I<Obj>
+
+Return the
+
+Aliases: I<to_vec>, I<to_vector>
+
+=cut
+
 =head2 unroll_operator
 
 Range.unroll_operator() -> I<Obj>

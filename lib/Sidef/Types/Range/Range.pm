@@ -323,6 +323,14 @@ package Sidef::Types::Range::Range {
 
     *to_a = \&to_array;
 
+    sub to_vector {
+        my ($self) = @_;
+        $self->to_a->to_v;
+    }
+
+    *to_v   = \&to_vector;
+    *to_vec = \&to_vector;
+
     sub to_list {
         my ($self) = @_;
 
