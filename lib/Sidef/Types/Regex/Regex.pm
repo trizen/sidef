@@ -135,14 +135,20 @@ package Sidef::Types::Regex::Regex {
         local $self->{pos}    = CORE::int($pos);
 
         if (defined($block)) {
+            my ($cpos, $lpos) = ($self->{pos}, $self->{pos});
             my $i = 0;
 
             while ((my $m = $self->match($obj))->{matched}) {
+                $lpos = $cpos;
+                last if ($lpos == ($cpos = $self->{pos}));
                 CORE::push(@matches, $block->run(Sidef::Types::Number::Number->_set_uint($i++), $m));
             }
         }
         else {
+            my ($cpos, $lpos) = ($self->{pos}, $self->{pos});
             while ((my $m = $self->match($obj))->{matched}) {
+                $lpos = $cpos;
+                last if ($lpos == ($cpos = $self->{pos}));
                 CORE::push(@matches, $m);
             }
         }
