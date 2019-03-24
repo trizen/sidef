@@ -1,0 +1,26 @@
+#!/usr/bin/ruby
+
+subset foo < Str, Num
+
+struct Bar {
+    a < foo,
+    b < foo,
+}
+
+var t = Bar(:hi, 100)
+
+assert_eq(t.a, :hi)
+assert_eq(t.b, 100)
+
+do {
+    var ok = false
+
+    try {
+        Bar([], {})
+    }
+    catch {
+        ok = true
+    }
+
+    assert(ok)
+}

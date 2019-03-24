@@ -271,20 +271,26 @@ package Sidef::Deparse::Sidef {
             $code = $self->_dump_init_vars($obj);
         }
         elsif ($ref eq 'Sidef::Variable::Struct') {
+
+            my $name = $self->_dump_class_name($obj);
+
             if ($addr{refaddr($obj)}++) {
-                $code = $obj->{name};
+                $code = $name;
             }
             else {
-                $code = "struct $obj->{name} {" . $self->_dump_vars(@{$obj->{vars}}) . '}';
+                $code = "struct $name" . " {" . $self->_dump_vars(@{$obj->{vars}}) . '}';
             }
         }
         elsif ($ref eq 'Sidef::Variable::Subset') {
+
+            my $name = $self->_dump_class_name($obj);
+
             if ($addr{refaddr($obj)}++) {
-                $code = $obj->{name};
+                $code = $name;
             }
             else {
                 $code =
-                    "subset $obj->{name} < "
+                    "subset $name < "
                   . join(',', map { $self->deparse_expr({self => $_}) } @{$obj->{inherits}})
                   . (exists($obj->{blocks}) ? (' ' . $self->deparse_expr({self => $obj->{blocks}[-1]})) : '');
             }

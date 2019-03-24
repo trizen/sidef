@@ -1,0 +1,36 @@
+#!/usr/bin/ruby
+
+include Module::Test
+
+func f(n < Module::Test::foo) {
+    2*n
+}
+
+assert_eq(f(21), 42)
+
+var t = Module::Test::Bar("hello", 42)
+
+assert_eq(t.a, "hello")
+assert_eq(t.b, 42)
+
+import Module::Test::Bar
+
+var t2 = Bar(42, "foo")
+
+assert_eq(t2.a, 42)
+assert_eq(t2.b, "foo")
+
+do {
+    var ok = false
+
+    try {
+        Bar([], {})
+    }
+    catch {
+        ok = true
+    }
+
+    assert(ok)
+}
+
+say "** Test passed!"

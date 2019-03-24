@@ -812,9 +812,11 @@ scripts/Tests/Module/Bar.sm
 scripts/Tests/Module/Fact.sm
 scripts/Tests/Module/Fib.sm
 scripts/Tests/Module/Foo.sm
+scripts/Tests/Module/Test.sm
 scripts/Tests/Module/YouTube.sm
 scripts/Tests/module_access_namespace.sf
 scripts/Tests/module_definition.sf
+scripts/Tests/module_identifiers.sf
 scripts/Tests/module_inclusion.sf
 scripts/Tests/module_inclusion_2.sf
 scripts/Tests/module_inclusion_3.sf
