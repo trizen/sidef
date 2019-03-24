@@ -7,34 +7,36 @@ Sidef::Perl::Perl
 
 =head1 DESCRIPTION
 
-This class implements ...
+This class implements support for evaluating arbitrary Perl code inside a Sidef script.
+
+The result is implicitly converted into a Sidef data structure.
 
 =head1 SYNOPSIS
 
-var obj = Perl(...)
+    var r = Perl.eval('my $x = 42; sqrt($x)')
 
 =head1 METHODS
 
 =head2 eval
 
-Perl.eval() -> I<Obj>
+    Perl.eval(perl_code)
 
-Return the
+Evaluates the given Perl code and returns a Sidef data structure.
 
 =cut
 
 =head2 new
 
-Perl.new() -> I<Obj>
+    var obj = Perl.new
 
-Return the
+Builds and returns a new Perl object.
 
 =cut
 
 =head2 to_sidef
 
-Perl.to_sidef() -> I<Obj>
+    Perl.to_sidef(perl_structure)
 
-Return the
+Converts a given a Perl data structure into a Sidef data structure.
 
 =cut
