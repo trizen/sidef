@@ -686,6 +686,9 @@ package Sidef::Types::Number::Number {
         $x = $$x;
         $x = (_any2mpz($x) // return undef) if ref($x) ne 'Math::GMPz';
 
+        return Math::GMPz::Rmpz_get_si($x)
+          if Math::GMPz::Rmpz_fits_slong_p($x);
+
         Math::GMPz::Rmpz_get_str($x, 10);
     }
 
@@ -695,8 +698,11 @@ package Sidef::Types::Number::Number {
 
         $x = $$x;
         $x = (_any2mpz($x) // return undef) if ref($x) ne 'Math::GMPz';
-        Math::GMPz::Rmpz_sgn($x) >= 0 or return undef;
 
+        return Math::GMPz::Rmpz_get_ui($x)
+          if Math::GMPz::Rmpz_fits_ulong_p($x);
+
+        Math::GMPz::Rmpz_sgn($x) >= 0 or return undef;
         Math::GMPz::Rmpz_get_str($x, 10);
     }
 
@@ -706,8 +712,14 @@ package Sidef::Types::Number::Number {
 
         $x = $$x;
         $x = (_any2mpz($x) // return undef) if ref($x) ne 'Math::GMPz';
-        Math::GMPz::Rmpz_sgn($x) > 0 or return undef;
 
+        if (Math::GMPz::Rmpz_fits_ulong_p($x)) {
+            my $ui = Math::GMPz::Rmpz_get_ui($x);
+            $ui > 0 or return undef;
+            return $ui;
+        }
+
+        Math::GMPz::Rmpz_sgn($x) > 0 or return undef;
         Math::GMPz::Rmpz_get_str($x, 10);
     }
 
@@ -6928,8 +6940,10 @@ package Sidef::Types::Number::Number {
     sub factorialmod {
         my ($n, $m) = @_;
         _valid(\$m);
+
         my $r = Math::Prime::Util::GMP::factorialmod(_big2uistr($n) // (goto &nan), _big2uistr($m) // (goto &nan))
           // goto &nan;
+
         $r < ULONG_MAX ? __PACKAGE__->_set_uint($r) : __PACKAGE__->_set_str('int', $r);
     }
 
@@ -7071,9 +7085,9 @@ package Sidef::Types::Number::Number {
 
         _valid(\$q, \$n);
 
-        $p = _big2istr($p) // goto &nan;
-        $q = _big2istr($q) // goto &nan;
-        $n = _big2istr($n) // goto &nan;
+        $p = _big2istr($p)  // goto &nan;
+        $q = _big2istr($q)  // goto &nan;
+        $n = _big2uistr($n) // goto &nan;
 
         __PACKAGE__->_set_str('int', Math::Prime::Util::GMP::lucasu($p, $q, $n));
     }
@@ -7087,9 +7101,9 @@ package Sidef::Types::Number::Number {
 
         _valid(\$q, \$n);
 
-        $p = _big2istr($p) // goto &nan;
-        $q = _big2istr($q) // goto &nan;
-        $n = _big2istr($n) // goto &nan;
+        $p = _big2istr($p)  // goto &nan;
+        $q = _big2istr($q)  // goto &nan;
+        $n = _big2uistr($n) // goto &nan;
 
         __PACKAGE__->_set_str('int', Math::Prime::Util::GMP::lucasv($p, $q, $n));
     }
@@ -7103,10 +7117,10 @@ package Sidef::Types::Number::Number {
 
         _valid(\$q, \$n, \$m);
 
-        $p = _big2istr($p) // goto &nan;
-        $q = _big2istr($q) // goto &nan;
-        $n = _big2istr($n) // goto &nan;
-        $m = _big2istr($m) // goto &nan;
+        $p = _big2istr($p)  // goto &nan;
+        $q = _big2istr($q)  // goto &nan;
+        $n = _big2uistr($n) // goto &nan;
+        $m = _big2pistr($m) // goto &nan;
 
         my ($U, $V, $Qk) = Math::Prime::Util::GMP::lucas_sequence($m, $p, $q, $n);
 
@@ -7121,10 +7135,10 @@ package Sidef::Types::Number::Number {
 
         _valid(\$q, \$n, \$m);
 
-        $p = _big2istr($p) // goto &nan;
-        $q = _big2istr($q) // goto &nan;
-        $n = _big2istr($n) // goto &nan;
-        $m = _big2istr($m) // goto &nan;
+        $p = _big2istr($p)  // goto &nan;
+        $q = _big2istr($q)  // goto &nan;
+        $n = _big2uistr($n) // goto &nan;
+        $m = _big2pistr($m) // goto &nan;
 
         my ($U, $V, $Qk) = Math::Prime::Util::GMP::lucas_sequence($m, $p, $q, $n);
 
@@ -7139,10 +7153,10 @@ package Sidef::Types::Number::Number {
 
         _valid(\$q, \$n, \$m);
 
-        $p = _big2istr($p) // goto &nan;
-        $q = _big2istr($q) // goto &nan;
-        $n = _big2istr($n) // goto &nan;
-        $m = _big2istr($m) // goto &nan;
+        $p = _big2istr($p)  // goto &nan;
+        $q = _big2istr($q)  // goto &nan;
+        $n = _big2uistr($n) // goto &nan;
+        $m = _big2pistr($m) // goto &nan;
 
         my ($U, $V, $Qk) = Math::Prime::Util::GMP::lucas_sequence($m, $p, $q, $n);
 
@@ -7392,10 +7406,9 @@ package Sidef::Types::Number::Number {
         _valid(\$m);
 
         $n = _big2uistr($n) // goto &nan;
-        $m = _big2uistr($m) // goto &nan;
+        $m = _big2pistr($m) // goto &nan;
 
         goto &zero if $m eq '1';
-        goto &nan  if $m eq '0';
 
         my ($r) = Math::Prime::Util::GMP::lucas_sequence($m, 1, -1, $n);
         $r < ULONG_MAX ? __PACKAGE__->_set_uint($r) : __PACKAGE__->_set_str('int', $r);
@@ -7410,10 +7423,9 @@ package Sidef::Types::Number::Number {
         _valid(\$m);
 
         $n = _big2uistr($n) // goto &nan;
-        $m = _big2uistr($m) // goto &nan;
+        $m = _big2pistr($m) // goto &nan;
 
         goto &zero if $m eq '1';
-        goto &nan  if $m eq '0';
 
         my (undef, $r) = Math::Prime::Util::GMP::lucas_sequence($m, 1, -1, $n);
         $r < ULONG_MAX ? __PACKAGE__->_set_uint($r) : __PACKAGE__->_set_str('int', $r);
