@@ -634,6 +634,7 @@ scripts/Tests/arithmetic_evaluation.sf
 scripts/Tests/arithmetic_geometric_mean.sf
 scripts/Tests/array_and_hash_lookup.sf
 scripts/Tests/array_and_hash_lvalues.sf
+scripts/Tests/array_any_all.sf
 scripts/Tests/array_autovivification.sf
 scripts/Tests/array_binary_search.sf
 scripts/Tests/array_binsert.sf
@@ -659,6 +660,7 @@ scripts/Tests/binary_search.sf
 scripts/Tests/binary_search_recursive.sf
 scripts/Tests/bitonic_sorter.sf
 scripts/Tests/block_return.sf
+scripts/Tests/block_identities.sf
 scripts/Tests/box_the_compass.sf
 scripts/Tests/break.sf
 scripts/Tests/built_in_class_reopening.sf
@@ -745,6 +747,7 @@ scripts/Tests/happy_2_years_old.sf
 scripts/Tests/hash_as_tree.sf
 scripts/Tests/hash_autovivification.sf
 scripts/Tests/hash_concat.sf
+scripts/Tests/hash_selection.sf
 scripts/Tests/hash_from_array.sf
 scripts/Tests/hash_grep.sf
 scripts/Tests/hash_sort.sf
@@ -912,6 +915,7 @@ scripts/Tests/script.sf
 scripts/Tests/selection_sort.sf
 scripts/Tests/set_consolidation.sf
 scripts/Tests/set_operations.sf
+scripts/Tests/set_any_all.sf
 scripts/Tests/sets_1.sf
 scripts/Tests/sets_2.sf
 scripts/Tests/sidef_executor.sf

@@ -12,6 +12,7 @@ package Sidef::Types::Set::Set {
       q{0+}   => sub { scalar(CORE::keys(%{$_[0]})) },
       q{""}   => \&_dump;
 
+    use Sidef::Types::Block::Block;
     use Sidef::Types::Bool::Bool;
     use Sidef::Types::Number::Number;
 
@@ -103,6 +104,9 @@ package Sidef::Types::Set::Set {
     sub difference {
         my ($A, $B) = @_;
 
+        if (ref($B) eq 'Sidef::Types::Hash::Hash') {
+            $B = $B->keys;
+        }
         if (ref($B) ne __PACKAGE__) {
             $B = $B->to_set;
         }
@@ -387,6 +391,45 @@ package Sidef::Types::Set::Set {
     sub join {
         my ($self, @rest) = @_;
         $self->to_a->join(@rest);
+    }
+
+    sub all {
+        my ($self, $block) = @_;
+
+        $block //= Sidef::Types::Block::Block::IDENTITY;
+
+        my $d = $self->dclone;
+        while ( defined(my $v = $d->pop) ) {
+            $block->run($v) or return Sidef::Types::Bool::Bool::FALSE
+        }
+
+        Sidef::Types::Bool::Bool::TRUE
+    }
+
+    sub any {
+        my ($self, $block) = @_;
+
+        $block //= Sidef::Types::Block::Block::IDENTITY;
+
+        my $d = $self->dclone;
+        while ( defined(my $v = $d->pop) ) {
+            $block->run($v) and return Sidef::Types::Bool::Bool::TRUE
+        }
+
+        Sidef::Types::Bool::Bool::FALSE
+    }
+
+    sub none {
+        my ($self, $block) = @_;
+
+        $block //= Sidef::Types::Block::Block::IDENTITY;
+
+        my $d = $self->dclone;
+        while ( defined(my $v = $d->pop) ) {
+            $block->run($v) and return Sidef::Types::Bool::Bool::FALSE
+        }
+
+        Sidef::Types::Bool::Bool::TRUE
     }
 
     sub _dump {
