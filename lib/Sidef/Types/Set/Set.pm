@@ -69,14 +69,7 @@ package Sidef::Types::Set::Set {
             $B = $B->to_set;
         }
 
-        my %C = %$A;
-        foreach my $key (CORE::keys(%$B)) {
-            if (!CORE::exists($C{$key})) {
-                $C{$key} = $B->{$key};
-            }
-        }
-
-        bless \%C, ref($A);
+        $A->SUPER::union($B);
     }
 
     *or = \&union;
@@ -88,15 +81,7 @@ package Sidef::Types::Set::Set {
             $B = $B->to_set;
         }
 
-        my %C;
-
-        foreach my $key (CORE::keys(%$A)) {
-            if (CORE::exists($B->{$key})) {
-                $C{$key} = $A->{$key};
-            }
-        }
-
-        bless \%C, ref($A);
+        $A->SUPER::intersection($B);
     }
 
     *and = \&intersection;
@@ -104,22 +89,11 @@ package Sidef::Types::Set::Set {
     sub difference {
         my ($A, $B) = @_;
 
-        if (ref($B) eq 'Sidef::Types::Hash::Hash') {
-            $B = $B->keys;
-        }
         if (ref($B) ne __PACKAGE__) {
             $B = $B->to_set;
         }
 
-        my %C;
-
-        foreach my $key (CORE::keys(%$A)) {
-            if (!CORE::exists($B->{$key})) {
-                $C{$key} = $A->{$key};
-            }
-        }
-
-        bless \%C, ref($A);
+        $A->SUPER::difference($B);
     }
 
     *sub  = \&difference;
@@ -132,21 +106,7 @@ package Sidef::Types::Set::Set {
             $B = $B->to_set;
         }
 
-        my %C;
-
-        foreach my $key (CORE::keys(%$A)) {
-            if (!CORE::exists($B->{$key})) {
-                $C{$key} = $A->{$key};
-            }
-        }
-
-        foreach my $key (CORE::keys(%$B)) {
-            if (!CORE::exists($A->{$key})) {
-                $C{$key} = $B->{$key};
-            }
-        }
-
-        bless \%C, ref($A);
+        $A->SUPER::symmetric_difference($B);
     }
 
     *xor     = \&symmetric_difference;
@@ -398,12 +358,12 @@ package Sidef::Types::Set::Set {
 
         $block //= Sidef::Types::Block::Block::IDENTITY;
 
-        my $d = $self->dclone;
-        while ( defined(my $v = $d->pop) ) {
-            $block->run($v) or return Sidef::Types::Bool::Bool::FALSE
+        foreach my $key (CORE::keys(%$self)) {
+            $block->run($self->{$key})
+              || return Sidef::Types::Bool::Bool::FALSE;
         }
 
-        Sidef::Types::Bool::Bool::TRUE
+        Sidef::Types::Bool::Bool::TRUE;
     }
 
     sub any {
@@ -411,12 +371,12 @@ package Sidef::Types::Set::Set {
 
         $block //= Sidef::Types::Block::Block::IDENTITY;
 
-        my $d = $self->dclone;
-        while ( defined(my $v = $d->pop) ) {
-            $block->run($v) and return Sidef::Types::Bool::Bool::TRUE
+        foreach my $key (CORE::keys(%$self)) {
+            $block->run($self->{$key})
+              && return Sidef::Types::Bool::Bool::TRUE;
         }
 
-        Sidef::Types::Bool::Bool::FALSE
+        Sidef::Types::Bool::Bool::FALSE;
     }
 
     sub none {
@@ -424,12 +384,12 @@ package Sidef::Types::Set::Set {
 
         $block //= Sidef::Types::Block::Block::IDENTITY;
 
-        my $d = $self->dclone;
-        while ( defined(my $v = $d->pop) ) {
-            $block->run($v) and return Sidef::Types::Bool::Bool::FALSE
+        foreach my $key (CORE::keys(%$self)) {
+            $block->run($self->{$key})
+              && return Sidef::Types::Bool::Bool::FALSE;
         }
 
-        Sidef::Types::Bool::Bool::TRUE
+        Sidef::Types::Bool::Bool::TRUE;
     }
 
     sub _dump {

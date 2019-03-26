@@ -132,9 +132,25 @@ Return the
 
 =cut
 
+=head2 identity
+
+Block.identity() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 if
 
 Block.if() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 list_identity
+
+Block.list_identity() -> I<Obj>
 
 Return the
 

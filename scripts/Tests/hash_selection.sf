@@ -5,7 +5,8 @@ const hash = Hash(1 => nil, :a => :b, :c => :d, :2 => 3)
 say 'Hash:'
 say 'Linear Selection'
 say "\tof a Hash"
-100.times {
+
+3.times {
     assert_eq( hash.linsel(hash.keys), hash )
     assert_eq( hash.linsel([]), Hash() )
     assert_eq( hash.linsel([:nothing, :no_one]), Hash(:nothing => nil, :no_one => nil) )
@@ -18,28 +19,41 @@ say "\tof a Hash"
 }
 say 'Intersection'
 say "\twith a Set"
-100.times {
+3.times {
     assert_eq( hash & Set(:a, :2), Hash(:a => :b, :2 => 3) )
     assert_eq( hash & Set(:not_key, :c), Hash(:c => :d) )
     assert_eq( hash & Set(), Hash() )
+
+    assert_eq( Hash(a => 1) & Hash(b => 1), Hash() )
+    assert_eq( Hash(a => 1) & Hash(a => 3, b => 1), Hash(a => 1) )
+    assert_eq( Hash(a => 1, b => 42) & Hash(a => 3, b => 1, c => 3), Hash(a => 1, b => 42) )
+
+    assert_eq( Hash(a => 1) & Set(:b), Hash() )
+    assert_eq( Hash(a => 1) & Set(:a, :b), Hash(a => 1) )
+    assert_eq( Hash(a => 1, b => 42) & Set(:a, :b, :c), Hash(a => 1, b => 42) )
 }
 say "\twith a Hash"
-100.times {
+3.times {
     assert_eq( hash & hash, hash )
     assert_eq( hash & Hash(:nothing => nil, :a => :unused), Hash(:a => :b) )
     assert_eq( hash & Hash(), Hash() )
 }
 say 'Difference'
 say "\twith a Set"
-100.times{
+3.times{
     assert_eq( hash - Set(), hash )
     assert_eq( hash - Set(:1, :a), Hash(:c => :d, :2 => 3) )
     assert_eq( hash - Set(:1, :2, :nothing), Hash(:a => :b, :c => :d) )
     assert_eq( hash - Set(:1, :a, :c, :2), Hash())
     assert_eq( hash - hash.keys.to_set, Hash())
+
+    assert_eq( Hash(a => 1) - Hash(b => 2), Hash(a => 1) )
+    assert_eq( Hash(a => 1) - Hash(a => 3, b => 2), Hash() )
+    assert_eq( Hash(a => 1) - Set(:b), Hash(a => 1) )
+    assert_eq( Hash(a => 1) - Set(:a, :b), Hash() )
 }
 say "\twith a Hash"
-100.times{
+3.times{
     assert_eq(hash - Hash(), hash)
     assert_eq(hash - Hash(:1 => :unused, :2 => nil), Hash(:a => :b, :c => :d))
     assert_eq(hash - Hash(:nothing => :unused, :c => nil), Hash(:a => :b, :2 => 3, :1 => nil))
@@ -47,32 +61,34 @@ say "\twith a Hash"
 }
 say 'Union'
 say "\twith a Set"
-100.times{
+3.times{
     assert_eq( hash | Set(), hash )
     assert_eq( hash | Set(:new), hash + Hash(:new) )
     assert_eq( hash | Set(:new2, :new3), hash + Hash(:new2 => nil, :new3 => nil) )
 }
 say "\twith a Hash"
-100.times{
+3.times{
     assert_eq( hash | Hash(), hash )
     assert_eq( hash | Hash(:new), hash + Hash(:new) )
     assert_eq( hash | hash, hash )
 }
 say 'Symdiff'
 say "\twith a Set"
-100.times{
+3.times{
     assert_eq( hash ^ Set(), hash )
     assert_eq( hash ^ Set(:1, :2), Hash(:a => :b, :c => :d) )
     assert_eq( hash ^ hash.keys.to_set, Hash() )
+    assert_eq( Hash(a => 1) ^ Hash(b => 2), Hash(a => 1, b => 2) )
+    assert_eq( Hash(a => 1) ^ Set(:b), Hash(a => 1, b => nil) )
 }
 say "\twith a Hash"
-100.times{
+3.times{
     assert_eq( hash ^ hash, Hash() )
     assert_eq( hash ^ Hash(:new => nil, :new1 => nil), hash + Hash( :new => nil, :new1 => nil ) )
     assert_eq( hash ^ Hash(), hash )
 }
 say 'Difference of a Set and Hash'
-100.times{
+3.times{
     assert_eq( Set() - hash, Set() )
     assert_eq( Set(:1) - hash, Set() )
     assert_eq( Set(:extra) - hash, Set(:extra) )

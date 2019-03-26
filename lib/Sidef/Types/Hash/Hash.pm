@@ -268,12 +268,14 @@ package Sidef::Types::Hash::Hash {
     sub linear_selection {
         my ($self, $keys) = @_;
 
-        my %retval = ();
-        ( @{retval}{ $keys->to_list } ) = ( @{$self}{ $keys->to_list } );
+        my @keys = $keys->to_list;
+
+        my %retval;
+        @{retval}{@keys} = @{$self}{@keys};
         bless \%retval;
     }
 
-    *lsel = \&linear_selection;
+    *lsel   = \&linear_selection;
     *linsel = \&linear_selection;
 
     sub count_by {
@@ -321,7 +323,6 @@ package Sidef::Types::Hash::Hash {
 #<<<
             UNIVERSAL::isa($obj, __PACKAGE__)                  ? bless({%$self, %$obj}, ref($self))
           : UNIVERSAL::isa($obj, 'Sidef::Types::Array::Array') ? bless({%$self, @$obj}, ref($self))
-          : UNIVERSAL::isa($obj, 'Sidef::Types::Set::Set')     ? bless({%$self, %$obj}, ref($self))
           :                                                      bless({%$self,  $obj}, ref($self));
 #>>>
     }
@@ -538,53 +539,91 @@ package Sidef::Types::Hash::Hash {
     *invert = \&reverse;
 
     sub intersection {
-        my ($self, $other) = @_;
+        my ($A, $B) = @_;
 
-        $self->linear_selection( (ref($other) eq __PACKAGE__)
-            ? $self->keys->to_set->intersection( $other->keys )
-            : $other->intersection( $self->keys ) )
+        if (ref($A) ne ref($B)) {
+            return $A->linear_selection($A->to_set->intersection($B));
+        }
+
+        my %C;
+
+        foreach my $key (CORE::keys(%$A)) {
+            if (CORE::exists($B->{$key})) {
+                $C{$key} = $A->{$key};
+            }
+        }
+
+        bless \%C, ref($A);
     }
 
-    *and = \&difference;
+    *and = \&intersection;
 
     sub difference {
-        my ($self, $other) = @_;
+        my ($A, $B) = @_;
 
-        $self->linear_selection(
-            $self->keys->to_set->difference(
-                (ref($other) eq __PACKAGE__)
-                    ? $other->keys
-                    : $other
-            )
-        )
+        if (ref($A) ne ref($B)) {
+            return $A->linear_selection($A->to_set->difference($B));
+        }
+
+        my %C;
+
+        foreach my $key (CORE::keys(%$A)) {
+            if (!CORE::exists($B->{$key})) {
+                $C{$key} = $A->{$key};
+            }
+        }
+
+        bless \%C, ref($A);
     }
 
-    *sub = \&difference;
+    *sub  = \&difference;
     *diff = \&difference;
 
     sub union {
-        my ($self, $other) = @_;
+        my ($A, $B) = @_;
 
-        (ref($other) eq __PACKAGE__)
-            ? $self->concat( $other )
-            : $self->linear_selection( $other->union( $self->keys ) )
+        if (ref($A) ne ref($B)) {
+            return $A->linear_selection($A->to_set->union($B));
+        }
+
+        my %C = %$A;
+        foreach my $key (CORE::keys(%$B)) {
+            if (!CORE::exists($C{$key})) {
+                $C{$key} = $B->{$key};
+            }
+        }
+
+        bless \%C, ref($A);
     }
 
     *or = \&union;
 
     sub symmetric_difference {
-        my ($self, $other) = @_;
+        my ($A, $B) = @_;
 
-        $self->linear_selection(
-            ((ref($other) eq __PACKAGE__)
-                ? $other->keys->to_set
-                : $other
-            )->symmetric_difference( $self->keys )
-        )
+        if (ref($A) ne ref($B)) {
+            return $A->linear_selection($A->to_set->symmetric_difference($B));
+        }
+
+        my %C;
+
+        foreach my $key (CORE::keys(%$A)) {
+            if (!CORE::exists($B->{$key})) {
+                $C{$key} = $A->{$key};
+            }
+        }
+
+        foreach my $key (CORE::keys(%$B)) {
+            if (!CORE::exists($A->{$key})) {
+                $C{$key} = $B->{$key};
+            }
+        }
+
+        bless \%C, ref($A);
     }
 
+    *xor     = \&symmetric_difference;
     *symdiff = \&symmetric_difference;
-    *xor = \&symmetric_difference;
 
     sub to_list {
         my ($self) = @_;
@@ -649,6 +688,10 @@ package Sidef::Types::Hash::Hash {
     *to_s   = \&dump;
     *to_str = \&dump;
 
+    sub to_set {
+        $_[0]->keys->to_set;
+    }
+
     {
         no strict 'refs';
 
@@ -662,7 +705,6 @@ package Sidef::Types::Hash::Hash {
         *{__PACKAGE__ . '::' . '-'} = \&difference;
         *{__PACKAGE__ . '::' . '|'} = \&union;
         *{__PACKAGE__ . '::' . '^'} = \&symmetric_difference;
-        #*{__PACKAGE__ . '::' . ':'}   = \&new;#
     }
 };
 

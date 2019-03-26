@@ -22,6 +22,16 @@ Inherits methods from:
 
 =head1 METHODS
 
+=head2 &
+
+I<Obj> B<&> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<and>, I<intersection>
+
+=cut
+
 =head2 +
 
 I<Obj> B<+> I<Obj> -> I<Obj>
@@ -29,6 +39,16 @@ I<Obj> B<+> I<Obj> -> I<Obj>
 Return the
 
 Aliases: I<merge>, I<concat>
+
+=cut
+
+=head2 -
+
+I<Obj> B<-> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<sub>, I<diff>, I<difference>
 
 =cut
 
@@ -49,6 +69,16 @@ I<Obj> B<==> I<Obj> -> I<Obj>
 Return the
 
 Aliases: I<eq>
+
+=cut
+
+=head2 ^
+
+I<Obj> B<^> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<xor>, I<symdiff>, I<symmetric_difference>
 
 =cut
 
@@ -274,6 +304,16 @@ Aliases: I<size>, I<length>
 
 =cut
 
+=head2 lsel
+
+Hash.lsel() -> I<Obj>
+
+Return the
+
+Aliases: I<linsel>, I<linear_selection>
+
+=cut
+
 =head2 map
 
 Hash.map() -> I<Obj>
@@ -378,11 +418,29 @@ Aliases: I<dump>, I<to_str>
 
 =cut
 
+=head2 to_set
+
+Hash.to_set() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 values
 
 Hash.values() -> I<Obj>
 
 Return the
+
+=cut
+
+=head2 |
+
+I<Obj> B<|> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<or>, I<union>
 
 =cut
 

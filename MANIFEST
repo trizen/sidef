@@ -659,8 +659,8 @@ scripts/Tests/best_shuffle.sf
 scripts/Tests/binary_search.sf
 scripts/Tests/binary_search_recursive.sf
 scripts/Tests/bitonic_sorter.sf
-scripts/Tests/block_return.sf
 scripts/Tests/block_identities.sf
+scripts/Tests/block_return.sf
 scripts/Tests/box_the_compass.sf
 scripts/Tests/break.sf
 scripts/Tests/built_in_class_reopening.sf
@@ -747,9 +747,9 @@ scripts/Tests/happy_2_years_old.sf
 scripts/Tests/hash_as_tree.sf
 scripts/Tests/hash_autovivification.sf
 scripts/Tests/hash_concat.sf
-scripts/Tests/hash_selection.sf
 scripts/Tests/hash_from_array.sf
 scripts/Tests/hash_grep.sf
+scripts/Tests/hash_selection.sf
 scripts/Tests/hash_sort.sf
 scripts/Tests/heap_s_algorithm_iter.sf
 scripts/Tests/heap_s_algorithm_rec.sf
@@ -913,9 +913,9 @@ scripts/Tests/run_length_encoding_3.sf
 scripts/Tests/same_fringe.sf
 scripts/Tests/script.sf
 scripts/Tests/selection_sort.sf
+scripts/Tests/set_any_all.sf
 scripts/Tests/set_consolidation.sf
 scripts/Tests/set_operations.sf
-scripts/Tests/set_any_all.sf
 scripts/Tests/sets_1.sf
 scripts/Tests/sets_2.sf
 scripts/Tests/sidef_executor.sf

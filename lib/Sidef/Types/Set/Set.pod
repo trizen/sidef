@@ -82,6 +82,22 @@ Aliases: I<xor>, I<symdiff>, I<symmetric_difference>
 
 =cut
 
+=head2 all
+
+Set.all() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 any
+
+Set.any() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 collect
 
 Set.collect() -> I<Obj>
@@ -229,6 +245,14 @@ Set.new() -> I<Obj>
 Return the
 
 Aliases: I<call>
+
+=cut
+
+=head2 none
+
+Set.none() -> I<Obj>
+
+Return the
 
 =cut
 

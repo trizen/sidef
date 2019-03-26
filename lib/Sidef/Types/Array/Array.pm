@@ -1389,7 +1389,7 @@ package Sidef::Types::Array::Array {
     sub recmap {
         my ($self, $block) = @_;
 
-        $block = Sidef::Types::Block::Block::IDENTITY;
+        $block //= Sidef::Types::Block::Block::IDENTITY;
 
         my @copy = @$self;
 
