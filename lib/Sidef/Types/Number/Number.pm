@@ -9223,6 +9223,67 @@ package Sidef::Types::Number::Number {
         $n->arithmetic_derivative->div($n);
     }
 
+    sub lpf {
+        my ($n) = @_;
+
+        my $z = _any2mpz($$n) // goto &nan;
+        Math::GMPz::Rmpz_sgn($z) >= 0 or goto &nan;
+
+        if (Math::GMPz::Rmpz_cmp_ui($z, 1) <= 0) {
+            return bless \$z;
+        }
+
+        foreach my $p (2, 3, 5, 7, 11) {
+            if (Math::GMPz::Rmpz_divisible_ui_p($z, $p)) {
+                return __PACKAGE__->_set_uint($p);
+            }
+        }
+
+        my $nstr = (
+                      Math::GMPz::Rmpz_fits_ulong_p($z)
+                    ? Math::GMPz::Rmpz_get_ui($z)
+                    : Math::GMPz::Rmpz_get_str($z, 10)
+                   );
+
+        if (Math::Prime::Util::GMP::is_prob_prime($nstr)) {
+            return bless \$z;
+        }
+
+        foreach my $k (1e4, 1e6, 1e7) {
+
+            my @f = Math::Prime::Util::GMP::trial_factor($nstr, $k);
+
+            if (@f > 1) {
+                return __PACKAGE__->_set_uint($f[0]);
+            }
+        }
+
+        my @f = Math::Prime::Util::GMP::factor($nstr);
+
+        __PACKAGE__->_set_str('int', $f[0]);
+    }
+
+    sub gpf {
+        my ($n) = @_;
+
+        my $z = _any2mpz($$n) // goto &nan;
+        Math::GMPz::Rmpz_sgn($z) >= 0 or goto &nan;
+
+        if (Math::GMPz::Rmpz_cmp_ui($z, 1) <= 0) {
+            return bless \$z;
+        }
+
+        my $nstr = (
+                      Math::GMPz::Rmpz_fits_ulong_p($z)
+                    ? Math::GMPz::Rmpz_get_ui($z)
+                    : Math::GMPz::Rmpz_get_str($z, 10)
+                   );
+
+        my @f = Math::Prime::Util::GMP::factor($nstr);
+
+        __PACKAGE__->_set_str('int', $f[-1]);
+    }
+
     sub factor {
         Sidef::Types::Array::Array->new(
                                      [map { $_ < ULONG_MAX ? __PACKAGE__->_set_uint($_) : __PACKAGE__->_set_str('int', $_) }

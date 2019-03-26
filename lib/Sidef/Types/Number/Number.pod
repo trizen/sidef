@@ -1454,6 +1454,14 @@ Return the
 
 =cut
 
+=head2 gpf
+
+Number.gpf() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 hamdist
 
 Number.hamdist() -> I<Obj>
@@ -2409,6 +2417,14 @@ Return the
 =head2 logarithmic_derivative
 
 Number.logarithmic_derivative() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 lpf
+
+Number.lpf() -> I<Obj>
 
 Return the
 
