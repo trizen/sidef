@@ -138,8 +138,8 @@ package Sidef::Types::Range::RangeNumber {
 
     sub sum_by {
         my ($self, $block) = @_;
-
-        $self->_sum_prod_by('sum', Sidef::Types::Number::Number::ZERO, sub { $block->run($_[0]) },);
+        $block //= Sidef::Types::Block::Block::IDENTITY;
+        $self->_sum_prod_by('sum', Sidef::Types::Number::Number::ZERO, sub { $block->run($_[0]) });
     }
 
     sub sum {
@@ -168,8 +168,8 @@ package Sidef::Types::Range::RangeNumber {
 
     sub prod_by {
         my ($self, $block) = @_;
-
-        $self->_sum_prod_by('prod', Sidef::Types::Number::Number::ONE, sub { $block->run($_[0]) },);
+        $block //= Sidef::Types::Block::Block::IDENTITY;
+        $self->_sum_prod_by('prod', Sidef::Types::Number::Number::ONE, sub { $block->run($_[0]) });
     }
 
     sub prod {

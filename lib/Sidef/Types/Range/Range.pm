@@ -6,6 +6,7 @@ package Sidef::Types::Range::Range {
     use List::Util qw();
     use Sidef::Types::Bool::Bool;
     use Sidef::Types::Number::Number;
+    use Sidef::Types::Block::Block;
 
     use overload '@{}' => sub {
         $_[0]->{_cached_array} //= do {
@@ -54,6 +55,8 @@ package Sidef::Types::Range::Range {
     sub min_by {
         my ($self, $block) = @_;
 
+        $block //= Sidef::Types::Block::Block::IDENTITY;
+
         my $iter = $self->iter;
 
         my $min       = $iter->run() // return undef;
@@ -86,6 +89,8 @@ package Sidef::Types::Range::Range {
 
     sub max_by {
         my ($self, $block) = @_;
+
+        $block //= Sidef::Types::Block::Block::IDENTITY;
 
         my $iter = $self->iter;
 
@@ -134,12 +139,14 @@ package Sidef::Types::Range::Range {
     *flip = \&reverse;
 
     sub first_by {
-        my ($self, $code) = @_;
+        my ($self, $block) = @_;
+
+        $block //= Sidef::Types::Block::Block::IDENTITY;
 
         my $iter = $self->iter;
 
         while (defined(my $obj = $iter->run())) {
-            return $obj if $code->run($obj);
+            return $obj if $block->run($obj);
         }
 
         undef;
@@ -185,8 +192,8 @@ package Sidef::Types::Range::Range {
     *tail = \&last;
 
     sub last_by {
-        my ($self, $code) = @_;
-        $self->reverse->first_by($code);
+        my ($self, $block) = @_;
+        $self->reverse->first_by($block);
     }
 
     sub contains {
@@ -234,11 +241,11 @@ package Sidef::Types::Range::Range {
     *len = \&length;
 
     sub each {
-        my ($self, $code) = @_;
+        my ($self, $block) = @_;
 
         my $iter = $self->iter;
         while (defined(my $obj = $iter->run())) {
-            $code->run($obj);
+            $block->run($obj);
         }
 
         $self;
@@ -248,24 +255,28 @@ package Sidef::Types::Range::Range {
     *foreach = \&each;
 
     sub map {
-        my ($self, $code) = @_;
+        my ($self, $block) = @_;
+
+        $block //= Sidef::Types::Block::Block::IDENTITY;
 
         my @values;
         my $iter = $self->iter;
         while (defined(my $obj = $iter->run())) {
-            push @values, $code->run($obj);
+            push @values, $block->run($obj);
         }
 
         Sidef::Types::Array::Array->new(\@values);
     }
 
     sub grep {
-        my ($self, $code) = @_;
+        my ($self, $block) = @_;
+
+        $block //= Sidef::Types::Block::Block::IDENTITY;
 
         my @values;
         my $iter = $self->iter;
         while (defined(my $obj = $iter->run())) {
-            push(@values, $obj) if $code->run($obj);
+            push(@values, $obj) if $block->run($obj);
         }
 
         Sidef::Types::Array::Array->new(\@values);
@@ -274,11 +285,13 @@ package Sidef::Types::Range::Range {
     *select = \&grep;
 
     sub any {
-        my ($self, $code) = @_;
+        my ($self, $block) = @_;
+
+        $block //= Sidef::Types::Block::Block::IDENTITY;
 
         my $iter = $self->iter;
         while (defined(my $obj = $iter->run())) {
-            $code->run($obj)
+            $block->run($obj)
               && return Sidef::Types::Bool::Bool::TRUE;
         }
 
@@ -286,11 +299,13 @@ package Sidef::Types::Range::Range {
     }
 
     sub all {
-        my ($self, $code) = @_;
+        my ($self, $block) = @_;
+
+        $block //= Sidef::Types::Block::Block::IDENTITY;
 
         my $iter = $self->iter;
         while (defined(my $obj = $iter->run())) {
-            $code->run($obj)
+            $block->run($obj)
               || return Sidef::Types::Bool::Bool::FALSE;
         }
 
@@ -298,11 +313,13 @@ package Sidef::Types::Range::Range {
     }
 
     sub none {
-        my ($self, $code) = @_;
+        my ($self, $block) = @_;
+
+        $block //= Sidef::Types::Block::Block::IDENTITY;
 
         my $iter = $self->iter;
         while (defined(my $obj = $iter->run())) {
-            $code->run($obj)
+            $block->run($obj)
               && return Sidef::Types::Bool::Bool::FALSE;
         }
 

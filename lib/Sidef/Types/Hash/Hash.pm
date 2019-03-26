@@ -12,6 +12,7 @@ package Sidef::Types::Hash::Hash {
 
     use Sidef::Types::Bool::Bool;
     use Sidef::Types::Number::Number;
+    use Sidef::Types::Block::Block;
 
     sub new {
         my (undef, %pairs) = @_;
@@ -208,6 +209,8 @@ package Sidef::Types::Hash::Hash {
     sub map {
         my ($self, $block) = @_;
 
+        $block //= Sidef::Types::Block::Block::LIST_IDENTITY;
+
         my %hash;
         foreach my $key (CORE::keys(%$self)) {
             my ($k, $v) = $block->run(Sidef::Types::String::String->new($key), $self->{$key});
@@ -222,6 +225,8 @@ package Sidef::Types::Hash::Hash {
     sub collect {
         my ($self, $block) = @_;
 
+        $block //= Sidef::Types::Block::Block::ARRAY_IDENTITY;
+
         my @array;
         foreach my $key (CORE::keys(%$self)) {
             CORE::push(@array, $block->run(Sidef::Types::String::String->new($key), $self->{$key}));
@@ -233,12 +238,12 @@ package Sidef::Types::Hash::Hash {
     *collect_kv = \&collect;
 
     sub grep {
-        my ($self, $obj) = @_;
+        my ($self, $block) = @_;
 
         my %hash;
         foreach my $key (CORE::keys(%$self)) {
             my $value = $self->{$key};
-            if ($obj->run(Sidef::Types::String::String->new($key), $value)) {
+            if ($block->run(Sidef::Types::String::String->new($key), $value)) {
                 $hash{$key} = $value;
             }
         }
@@ -250,12 +255,14 @@ package Sidef::Types::Hash::Hash {
     *select  = \&grep;
 
     sub grep_val {
-        my ($self, $obj) = @_;
+        my ($self, $block) = @_;
+
+        $block //= Sidef::Types::Block::Block::IDENTITY;
 
         my %hash;
         foreach my $key (CORE::keys(%$self)) {
             my $value = $self->{$key};
-            if ($obj->run($value)) {
+            if ($block->run($value)) {
                 $hash{$key} = $value;
             }
         }
@@ -531,7 +538,7 @@ package Sidef::Types::Hash::Hash {
     sub reverse {
         my ($self) = @_;
         my %hash;
-        @hash{CORE::values %$self} = (map { Sidef::Types::String::String->new($_) } CORE::keys(%$self));
+        @hash{CORE::values(%$self)} = (map { Sidef::Types::String::String->new($_) } CORE::keys(%$self));
         bless \%hash, ref($self);
     }
 
@@ -690,6 +697,10 @@ package Sidef::Types::Hash::Hash {
 
     sub to_set {
         $_[0]->keys->to_set;
+    }
+
+    sub to_bag {
+        $_[0]->keys->to_bag;
     }
 
     {

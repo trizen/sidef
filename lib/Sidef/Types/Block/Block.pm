@@ -38,12 +38,14 @@ package Sidef::Types::Block::Block {
     }
 
     use constant {
-                  IDENTITY      => __PACKAGE__->new(code => sub { $_[0] }),
-                  LIST_IDENTITY => __PACKAGE__->new(code => sub { (@_) }),
+                  IDENTITY       => __PACKAGE__->new(code => sub { $_[0] }),
+                  LIST_IDENTITY  => __PACKAGE__->new(code => sub { (@_) }),
+                  ARRAY_IDENTITY => __PACKAGE__->new(code => sub { Sidef::Types::Array::Array->new(@_) }),
                  };
 
-    sub identity      { IDENTITY }
-    sub list_identity { LIST_IDENTITY }
+    sub identity       { IDENTITY }
+    sub list_identity  { LIST_IDENTITY }
+    sub array_identity { ARRAY_IDENTITY }
 
     sub run {
 
