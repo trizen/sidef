@@ -1,0 +1,9 @@
+#! /usr/bin/ruby
+
+20.times{
+    assert_eq( 0..100 -> map(Block.identity), 0..100 -> to_a )
+
+    assert_eq( Hash(1, 2, 3, 4, 5, 6) -> map_kv(Block.list_identity), Hash(1, 2, 3, 4, 5, 6) )
+}
+
+say "** Test passed!"

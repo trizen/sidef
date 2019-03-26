@@ -1,0 +1,23 @@
+#! /usr/bin/ruby
+
+const evens = Set(0, 2, 4)
+const evennat = Set(2, 4, 6)
+const falses = Set(0, '', [], Hash(), false)
+
+assert_eq( true, evens.all{ .is_even } )
+assert_eq( true, evennat.all )
+assert_eq( false, evens.all{ _ } )
+assert_eq( false, evens.all )
+
+assert_eq( true, evens.none{ .is_odd } )
+assert_eq( true, evennat.none{ !_ } )
+assert_eq( true, falses.none )
+assert_eq( false, falses + Set(true) -> none )
+
+assert_eq( true, falses + Set(true) -> any{ _ })
+assert_eq( true, falses + Set(true) -> any)
+assert_eq( true, evens.any{ .is_zero } )
+assert_eq( false, falses.any{ _ } )
+assert_eq( false, falses.any )
+
+say "** Test passed!"

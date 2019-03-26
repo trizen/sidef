@@ -15,6 +15,7 @@ package Sidef::Types::Array::Array {
       q{bool} => sub { scalar(@{$_[0]}) };
 
     use Sidef::Types::Number::Number;
+    use Sidef::Types::Block::Block;
 
     sub new {
         (@_ == 2 && ref($_[1]) eq 'ARRAY')
@@ -1364,9 +1365,7 @@ package Sidef::Types::Array::Array {
     sub expand {
         my ($self, $block) = @_;
 
-        if (not defined($block)) {
-            $block = Sidef::Types::Block::Block->new(code => sub { $_[0] });
-        }
+        $block //= Sidef::Types::Block::Block::IDENTITY;
 
         my @new;
         my @copy = @$self;
@@ -1390,9 +1389,7 @@ package Sidef::Types::Array::Array {
     sub recmap {
         my ($self, $block) = @_;
 
-        if (not defined($block)) {
-            $block = Sidef::Types::Block::Block->new(code => sub { $_[0] });
-        }
+        $block = Sidef::Types::Block::Block::IDENTITY;
 
         my @copy = @$self;
 
@@ -1636,6 +1633,8 @@ package Sidef::Types::Array::Array {
     sub any {
         my ($self, $block) = @_;
 
+        $block //= Sidef::Types::Block::Block::IDENTITY;
+
         foreach my $val (@$self) {
             $block->run($val)
               && return (Sidef::Types::Bool::Bool::TRUE);
@@ -1647,6 +1646,8 @@ package Sidef::Types::Array::Array {
     sub all {
         my ($self, $block) = @_;
 
+        $block //= Sidef::Types::Block::Block::IDENTITY;
+
         foreach my $val (@$self) {
             $block->run($val)
               || return (Sidef::Types::Bool::Bool::FALSE);
@@ -1657,6 +1658,8 @@ package Sidef::Types::Array::Array {
 
     sub none {
         my ($self, $block) = @_;
+
+        $block //= Sidef::Types::Block::Block::IDENTITY;
 
         foreach my $val (@$self) {
             $block->run($val)

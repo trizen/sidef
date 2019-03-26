@@ -1,0 +1,18 @@
+#! /usr/bin/ruby
+
+assert_eq( true, [true, true].all{ _ } )
+assert_eq( true, [true, true].all )
+assert_eq( false, [false, true].all{ _ } )
+assert_eq( false, [false, true].all )
+
+assert_eq( true, [4, 2, 0].none{ .is_odd } )
+assert_eq( true, [false, false].none{ _ } )
+assert_eq( true, [false, false].none )
+assert_eq( false, [false, true].none )
+
+assert_eq( true, [false, true].any{ _ })
+assert_eq( true, [false, true].any)
+assert_eq( true, [1, 2, 0, 3].any{ .is_zero } )
+assert_eq( false, [true, true].any{ !_ } )
+
+say "** Test passed!"

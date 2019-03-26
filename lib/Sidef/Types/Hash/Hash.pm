@@ -265,6 +265,17 @@ package Sidef::Types::Hash::Hash {
 
     *grep_v = \&grep_val;
 
+    sub linear_selection {
+        my ($self, $keys) = @_;
+
+        my %retval = ();
+        ( @{retval}{ $keys->to_list } ) = ( @{$self}{ $keys->to_list } );
+        bless \%retval;
+    }
+
+    *lsel = \&linear_selection;
+    *linsel = \&linear_selection;
+
     sub count_by {
         my ($self, $block) = @_;
 
@@ -310,6 +321,7 @@ package Sidef::Types::Hash::Hash {
 #<<<
             UNIVERSAL::isa($obj, __PACKAGE__)                  ? bless({%$self, %$obj}, ref($self))
           : UNIVERSAL::isa($obj, 'Sidef::Types::Array::Array') ? bless({%$self, @$obj}, ref($self))
+          : UNIVERSAL::isa($obj, 'Sidef::Types::Set::Set')     ? bless({%$self, %$obj}, ref($self))
           :                                                      bless({%$self,  $obj}, ref($self));
 #>>>
     }
@@ -525,6 +537,55 @@ package Sidef::Types::Hash::Hash {
     *flip   = \&reverse;
     *invert = \&reverse;
 
+    sub intersection {
+        my ($self, $other) = @_;
+
+        $self->linear_selection( (ref($other) eq __PACKAGE__)
+            ? $self->keys->to_set->intersection( $other->keys )
+            : $other->intersection( $self->keys ) )
+    }
+
+    *and = \&difference;
+
+    sub difference {
+        my ($self, $other) = @_;
+
+        $self->linear_selection(
+            $self->keys->to_set->difference(
+                (ref($other) eq __PACKAGE__)
+                    ? $other->keys
+                    : $other
+            )
+        )
+    }
+
+    *sub = \&difference;
+    *diff = \&difference;
+
+    sub union {
+        my ($self, $other) = @_;
+
+        (ref($other) eq __PACKAGE__)
+            ? $self->concat( $other )
+            : $self->linear_selection( $other->union( $self->keys ) )
+    }
+
+    *or = \&union;
+
+    sub symmetric_difference {
+        my ($self, $other) = @_;
+
+        $self->linear_selection(
+            ((ref($other) eq __PACKAGE__)
+                ? $other->keys->to_set
+                : $other
+            )->symmetric_difference( $self->keys )
+        )
+    }
+
+    *symdiff = \&symmetric_difference;
+    *xor = \&symmetric_difference;
+
     sub to_list {
         my ($self) = @_;
         map { (Sidef::Types::String::String->new($_), $self->{$_}) } CORE::keys(%$self);
@@ -597,6 +658,10 @@ package Sidef::Types::Hash::Hash {
         *{__PACKAGE__ . '::' . '≠'}   = \&ne;
         *{__PACKAGE__ . '::' . '...'} = \&to_list;
 
+        *{__PACKAGE__ . '::' . '&'} = \&intersection;
+        *{__PACKAGE__ . '::' . '-'} = \&difference;
+        *{__PACKAGE__ . '::' . '|'} = \&union;
+        *{__PACKAGE__ . '::' . '^'} = \&symmetric_difference;
         #*{__PACKAGE__ . '::' . ':'}   = \&new;#
     }
 };

@@ -26,6 +26,11 @@ package Sidef::Types::Block::Block {
           . " #`($name|$addr) ... }";
       };
 
+    use constant {
+                  IDENTITY => (bless { code => sub { $_[0] }, name => '__BLOCK__', type => 'block' }, __PACKAGE__ ),
+                  LIST_IDENTITY => (bless { code => sub { (@_) }, name => '__BLOCK__', type => 'block' }, __PACKAGE__ ),
+                 };
+
     sub new {
         my (undef, %opt) = @_;
 
@@ -36,6 +41,9 @@ package Sidef::Types::Block::Block {
               },
           __PACKAGE__;
     }
+
+    sub identity      { bless IDENTITY, __PACKAGE__; }
+    sub list_identity { bless LIST_IDENTITY, __PACKAGE__; }
 
     sub run {
 
