@@ -62,6 +62,14 @@ Aliases: I<map>
 
 =cut
 
+=head2 array_identity
+
+Block.array_identity() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 cache
 
 Block.cache() -> I<Obj>

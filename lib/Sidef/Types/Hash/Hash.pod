@@ -408,6 +408,14 @@ Return the
 
 =cut
 
+=head2 to_bag
+
+Hash.to_bag() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 to_s
 
 Hash.to_s() -> I<Obj>
