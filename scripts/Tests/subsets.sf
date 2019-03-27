@@ -191,91 +191,99 @@ class Hey < Hi {
     }
 }
 
-func subset_greet(obj < Hi) {        # `Hi` is the upper limit
-    obj.greet
+do {
+    func subset_greet(obj < Hi) {        # `Hi` is the upper limit
+        obj.greet
+    }
+
+    var hi_obj = Hi("Foo")
+    subset_greet(hi_obj)
+
+    var hello_obj = Hello("Bar")
+    subset_greet(hello_obj)
+
+    var hey_obj = Hey("Baz")
+
+    failtest(func { subset_greet(42) }, "subset_greet(42)")
+    failtest(func { subset_greet(hey_obj) }, "subset_greet(hey_obj)")
+
+    #
+    ## Limited greeting
+    #
+
+    func type_greet(Hi obj) {     # HiGreeting is the lower limit
+        obj.greet
+    }
+
+    type_greet(hi_obj)
+    type_greet(hey_obj)
+
+    failtest(func { type_greet(42) }, "type_greet(42)")
+    failtest(func { type_greet(hello_obj) }, "type_greet(hello_obj)")
 }
-
-var hi_obj = Hi("Foo")
-subset_greet(hi_obj)
-
-var hello_obj = Hello("Bar")
-subset_greet(hello_obj)
-
-var hey_obj = Hey("Baz")
-
-failtest(func { subset_greet(42) }, "subset_greet(42)")
-failtest(func { subset_greet(hey_obj) }, "subset_greet(hey_obj)")
-
-#
-## Limited greeting
-#
-
-func type_greet(Hi obj) {     # HiGreeting is the lower limit
-    obj.greet
-}
-
-type_greet(hi_obj)
-type_greet(hey_obj)
-
-failtest(func { type_greet(42) }, "type_greet(42)")
-failtest(func { type_greet(hello_obj) }, "type_greet(hello_obj)")
 
 #
 ## Multiple dispatch greeting
 #
 
-func multi_greet(obj < Hi) { obj.greet }       # `Hi` is the upper limit
+do {
+    func multi_greet(obj < Hi) { obj.greet }       # `Hi` is the upper limit
 
-multi_greet(Hi("Foo"))        # ok
-multi_greet(Hello("Bar"))     # ok
-multi_greet(Hey("Baz"))       # fail: `Hey` is too evolved
+    multi_greet(Hi("Foo"))        # ok
+    multi_greet(Hello("Bar"))     # ok
+    multi_greet(Hey("Baz"))       # fail: `Hey` is too evolved
 
-func multi_greet(Hi obj) { obj.greet }        # `Hi` is the lower limit
+    func multi_greet(Hi obj) { obj.greet }        # `Hi` is the lower limit
 
-multi_greet(Hi("Foo"))        # ok
-multi_greet(Hey("Baz"))       # ok
-multi_greet(Hello("Bar"))     # fail: `Hello` is too primitive
+    multi_greet(Hi("Foo"))        # ok
+    multi_greet(Hey("Baz"))       # ok
+    multi_greet(Hello("Bar"))     # fail: `Hello` is too primitive
+}
 
 #
 ## Subseting with `where` block
 #
 
-func my_even(Number n < EvenNatural {|n| 10 < n }) {
-    say "my_even(): #{n}"
+do {
+    func my_even(Number n < EvenNatural {|n| 10 < n }) {
+        say "my_even(): #{n}"
+    }
+
+    my_even(42)
+
+    failtest(func { my_even(8) }, "my_even(8)")
+    failtest(func { my_even(25) }, "my_even(25)")
+    failtest(func { my_even("foo") }, "my_even('foo')")
 }
-
-my_even(42)
-
-failtest(func { my_even(8) }, "my_even(8)")
-failtest(func { my_even(25) }, "my_even(25)")
-failtest(func { my_even("foo") }, "my_even('foo')")
 
 #
 ## PointLimit example
 #
 
-subset PointLimit < Number {|n| n ~~ (-10 .. 10) }
+do {
+    subset PointLimit < Number {|n| n ~~ (-10 .. 10) }
 
-class Point(x < PointLimit, y < PointLimit) {
-    method to_s { "[#{x},#{y}]" }
+    class Point(x < PointLimit, y < PointLimit) {
+        method to_s { "[#{x},#{y}]" }
+    }
+
+    var p1 = Point(x: 5, y: -6)
+    var p2 = Point(y: 5, x: -6)
+    var p3 = Point(10, -10)
+
+    say p1
+    say p2
+    say p3
+
+    assert_eq("#{p1}", "[5,-6]")
+    assert_eq("#{p2}", "[-6,5]")
+    assert_eq("#{p3}", "[10,-10]")
+
+    failtest(func { Point(x: 5, y: 20) }, "Point(x:5, y:20)")
+    failtest(func { Point(x: -20, y: 5) }, "Point(x:-20, y:5)")
+    failtest(func { Point(-5, 20) }, "Point(-5, 20)")
+    failtest(func { Point(30, -4) }, "Point(30, -4)")
 }
-
-var p1 = Point(x: 5, y: -6)
-var p2 = Point(y: 5, x: -6)
-var p3 = Point(10, -10)
-
-say p1
-say p2
-say p3
-
-assert_eq("#{p1}", "[5,-6]")
-assert_eq("#{p2}", "[-6,5]")
-assert_eq("#{p3}", "[10,-10]")
-
-failtest(func { Point(x: 5, y: 20) }, "Point(x:5, y:20)")
-failtest(func { Point(x: -20, y: 5) }, "Point(x:-20, y:5)")
-failtest(func { Point(-5, 20) }, "Point(-5, 20)")
-failtest(func { Point(30, -4) }, "Point(30, -4)")
 
 #
 ## Redeclarations
@@ -286,16 +294,18 @@ subset Integer     < Scalar  { |n| n.is_int }
 subset Natural     < Integer { |n| n.is_pos }
 subset EvenNatural < Natural { |n| n.is_even }
 
-func f(n < EvenNatural) {
-     say n
+do {
+    func f(n < EvenNatural) {
+         say n
+    }
+
+    f(42)
+    f(2)
+
+    failtest(func { f(43) }, "f(43)")
+    failtest(func { f(-42) }, "f(-42)")
+    failtest(func { f("foo") }, "f('foo')")
 }
-
-f(42)
-f(2)
-
-failtest(func { f(43) }, "f(43)")
-failtest(func { f(-42) }, "f(-42)")
-failtest(func { f("foo") }, "f('foo')")
 
 #
 ## Subsets inside modules
@@ -350,4 +360,26 @@ do {
     module Subset {
         assert(Test.kind_of(main::Foo))
     }
+}
+
+#
+## Subsets without type
+#
+
+do {
+    subset Int {.is_int}
+    subset ShortLen { .len < 5 }
+
+    func foo(a < Int)      { say a }
+    func bar(s < ShortLen) { say s }
+
+    foo(42)
+    bar("foo")
+    bar(1234)
+    bar([1,2,3])
+
+    failtest({ foo(sqrt(2)) },  "foo(sqrt(2))")
+    failtest({ foo("string") }, "foo(string)")
+    failtest({ bar("string") }, "bar(string)")
+    failtest({ bar([1,2,3,4,5]) }, "bar([1,2,3,4,5])")
 }

@@ -290,8 +290,10 @@ package Sidef::Deparse::Sidef {
             }
             else {
                 $code =
-                    "subset $name < "
-                  . join(',', map { $self->deparse_expr({self => $_}) } @{$obj->{inherits}})
+                  "subset $name"
+                  . (  (exists($obj->{inherits}) and @{$obj->{inherits}})
+                     ? (' < ' . join(',', map { $self->deparse_expr({self => $_}) } @{$obj->{inherits}}))
+                     : '')
                   . (exists($obj->{blocks}) ? (' ' . $self->deparse_expr({self => $obj->{blocks}[-1]})) : '');
             }
         }

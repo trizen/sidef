@@ -1418,13 +1418,6 @@ package Sidef::Parser {
                         /\G,\h*/gc && redo;
                     }
                 }
-                else {
-                    $self->fatal_error(
-                                       code  => $_,
-                                       pos   => pos($_),
-                                       error => "expected a parent type (e.g.: subset $name < Number)",
-                                      );
-                }
 
                 if (/\G(?=\{)/) {
                     my $block = $self->parse_block(code => $opt{code}, topic_var => 1);
