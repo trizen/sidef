@@ -314,7 +314,7 @@ package Sidef {
               or $type =~ s/^_:://;
         }
 
-        $type =~ s/_[0-9]+\z//r;
+        $type =~ s/_[0-9]{8,}\z//r;
     }
 
     sub normalize_method {
