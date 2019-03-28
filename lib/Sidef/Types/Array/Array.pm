@@ -1624,6 +1624,7 @@ package Sidef::Types::Array::Array {
         @$self ? $self->[0] : undef;
     }
 
+    *car  = \&first;
     *head = \&first;
 
     sub last_by {
@@ -1661,6 +1662,19 @@ package Sidef::Types::Array::Array {
     }
 
     *tail = \&last;
+
+    sub rest {
+        my ($self, $offset) = (@_);
+
+        $offset = CORE::int($offset);
+        $offset = $offset <= 0 ? 1 : $offset;
+
+        my $ilen = CORE::int($self->len);
+
+        $self->last( $ilen - ($offset > $ilen ? 1 : $offset) )
+    }
+
+    *cdr = \&rest;
 
     sub any {
         my ($self, $block) = @_;

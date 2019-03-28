@@ -915,6 +915,7 @@ scripts/Tests/script.sf
 scripts/Tests/selection_sort.sf
 scripts/Tests/set_any_all.sf
 scripts/Tests/set_consolidation.sf
+scripts/Tests/set_first_rest.sf
 scripts/Tests/set_operations.sf
 scripts/Tests/sets_1.sf
 scripts/Tests/sets_2.sf

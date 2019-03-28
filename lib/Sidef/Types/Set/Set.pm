@@ -258,6 +258,19 @@ package Sidef::Types::Set::Set {
         $self;
     }
 
+    sub first_rest {
+        my ($self) = @_;
+
+        my @keys = CORE::keys(%$self);
+        my ($rest, $key) = ($self->dclone, $keys[0]);
+        CORE::delete($rest->{$key});
+
+        ($self->{$key}, $rest);
+    }
+
+    *car_cdr = \&first_rest;
+    *split1  = \&car_cdr;
+
     sub sort_by {
         my ($self, $block) = @_;
         $self->values->sort_by($block);
