@@ -420,13 +420,17 @@ sub code_interactive {
     my $valid_lines = '';
     my ($vars, $ref_vars_refs);
 
-    my $history_support = $term->can('ReadHistory') && $term->can('WriteHistory');
+    my $history_support = $term->can('ReadHistory') && $term->can('Attribs');
     my $history_file    = File::Spec->catfile($sidef->get_sidef_config_dir(), 'sidef_history.txt');
 
     if ($history_support) {
+
         if (not -e $history_file) {
             open my $fh, '>', $history_file;
         }
+
+        my $attr = $term->Attribs;
+        $attr->{inhibit_completion} = 1;
 
         $term->ReadHistory($history_file);
     }
@@ -554,7 +558,7 @@ EOT
 
         if ($history_support) {
             if ($line =~ /\R/) {
-                $term->addhistory($line);
+                $term->addhistory($line =~ s/\R/\r/gr);
             }
             $term->append_history(1, $history_file);
         }
