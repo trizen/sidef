@@ -7825,6 +7825,39 @@ package Sidef::Types::Number::Number {
             $x = 1;
         }
 
+        state $mertens_table = {
+
+            # M(10^n), where M(n) is Mertens's function.
+            # OEIS: https://oeis.org/A084237
+            "1"                       => "1",
+            "10"                      => "-1",
+            "100"                     => "1",
+            "1000"                    => "2",
+            "10000"                   => "-23",
+            "100000"                  => "-48",
+            "1000000"                 => "212",
+            "10000000"                => "1037",
+            "100000000"               => "1928",
+            "1000000000"              => "-222",
+            "10000000000"             => "-33722",
+            "100000000000"            => "-87856",
+            "1000000000000"           => "62366",
+            "10000000000000"          => "599582",
+            "100000000000000"         => "-875575",
+            "1000000000000000"        => "-3216373",
+            "10000000000000000"       => "-3195437",
+            "100000000000000000"      => "-21830254",
+            "1000000000000000000"     => "-46758740",
+            "10000000000000000000"    => "899990187",
+            "100000000000000000000"   => "461113106",
+            "1000000000000000000000"  => "3395895277",
+            "10000000000000000000000" => "-2061910120",
+        };
+
+        if ($x eq '1' and exists($mertens_table->{$y})) {
+            return __PACKAGE__->_set_int($mertens_table->{$y});
+        }
+
         # Support for large integers (slow for wide ranges)
         if ($y >= ULONG_MAX) {
 
@@ -7871,8 +7904,6 @@ package Sidef::Types::Number::Number {
             }
         }
 
-        state %seen;
-
         my $mertens = sub {
             my ($n) = @_;
 
@@ -7880,8 +7911,8 @@ package Sidef::Types::Number::Number {
                 return $mertens_lookup[$n];
             }
 
-            if (exists $seen{$n}) {
-                return $seen{$n};
+            if (exists $mertens_table->{$n}) {
+                return $mertens_table->{$n};
             }
 
             my $s = CORE::int(CORE::sqrt($n));
@@ -7895,7 +7926,7 @@ package Sidef::Types::Number::Number {
                 $M -= $mertens_lookup[$k] * (CORE::int($n / $k) - CORE::int($n / ($k + 1)));
             }
 
-            $seen{$n} = $M;
+            $mertens_table->{$n} = $M;
         };
 
         __PACKAGE__->_set_int($mertens->($y) - $mertens->($x) + Math::Prime::Util::GMP::moebius($x));
