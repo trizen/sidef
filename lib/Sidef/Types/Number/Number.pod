@@ -1044,6 +1044,16 @@ Aliases: I<cyclotomic_polynomial>
 
 =cut
 
+=head2 dconv
+
+Number.dconv() -> I<Obj>
+
+Return the
+
+Aliases: I<dirichlet_convolution>
+
+=cut
+
 =head2 de
 
 Number.de() -> I<Obj>

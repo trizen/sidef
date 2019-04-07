@@ -9473,6 +9473,33 @@ package Sidef::Types::Number::Number {
         );
     }
 
+    sub dirichlet_convolution {
+        my ($n, $f, $g) = @_;
+
+        $n = _any2mpz($$n) || return ZERO;
+        Math::GMPz::Rmpz_sgn($n) > 0 or return ZERO;
+
+        my @terms;
+        my $result = ZERO;
+
+        foreach my $d (Math::Prime::Util::GMP::divisors(Math::GMPz::Rmpz_get_str($n, 10))) {
+
+            my $t =
+              ($d < ULONG_MAX)
+              ? Math::GMPz::Rmpz_init_set_ui($d)
+              : Math::GMPz::Rmpz_init_set_str("$d", 10);
+
+            my $u = Math::GMPz::Rmpz_init();
+            Math::GMPz::Rmpz_divexact($u, $n, $t);
+
+            $result = $result->add($f->run(bless \$t)->mul($g->run(bless \$u)));
+        }
+
+        return $result;
+    }
+
+    *dconv = \&dirichlet_convolution;
+
     sub divisors {
         my $n = &_big2pistr || return Sidef::Types::Array::Array->new();
 
