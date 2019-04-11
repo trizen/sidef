@@ -459,25 +459,6 @@ Example:
 
 =cut
 
-=head2 as_cfrac
-
-    n.as_cfrac
-    n.as_cfrac(k)
-
-Compute C<k> terms of the continued-fraction expansion of C<n>.
-
-Example:
-
-    say sqrt(12).as_cfrac(6)    # [3, 2, 6, 2, 6, 2]
-
-Can also be used to compute very good rational approximations to a given real number:
-
-    say Num.pi.as_cfrac(10).flip.reduce{|a,b| b + 1/a }.as_rat      # 1146408/364913
-
-When C<k> is omitted, it uses the default floating-point precision to deduce C<k>.
-
-=cut
-
 =head2 as_dec
 
     n.as_dec
@@ -854,6 +835,27 @@ Cube root of C<n>.
 Round C<n> towards positive Infinity.
 
 Aliases: I<ceiling>
+
+=cut
+
+=head2 cfrac
+
+    n.cfrac
+    n.cfrac(k)
+
+Compute C<k> terms of the simple continued-fraction expansion of C<n>.
+
+Example:
+
+    say sqrt(12).cfrac(6)    # [3, 2, 6, 2, 6, 2, 6]
+
+Can also be used to compute very good rational approximations to a given real number:
+
+    say Num.pi.cfrac(10).flip.reduce{|a,b| b + 1/a }.as_rat      # 4272943/1360120
+
+When C<k> is omitted, it uses the default floating-point precision to deduce C<k>.
+
+Aliases: I<as_cfrac>
 
 =cut
 

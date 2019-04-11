@@ -5434,7 +5434,7 @@ package Sidef::Types::Number::Number {
 
             Math::GMPq::Rmpq_set($q, $x);
 
-            for (1 .. $n) {
+            for (0 .. $n) {
                 my $z = __floor__($q);
                 push @cfrac, bless \$z;
                 Math::GMPq::Rmpq_sub_z($q, $q, $z);
@@ -5451,7 +5451,7 @@ package Sidef::Types::Number::Number {
 
             Math::MPFR::Rmpfr_set($f, $x, $ROUND);
 
-            for (1 .. $n) {
+            for (0 .. $n) {
                 my $t = __floor__($f);
                 push @cfrac, bless \(_any2mpz($t) // $t);
 
@@ -5475,7 +5475,7 @@ package Sidef::Types::Number::Number {
 
             Math::MPC::Rmpc_set($c, $x, $ROUND);
 
-            for (1 .. $n) {
+            for (0 .. $n) {
                 my $t = __round__($c, 0);
                 push @cfrac, bless \(_any2mpz($t) // $t);
 
