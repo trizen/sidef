@@ -184,6 +184,22 @@ Return the
 
 =cut
 
+=head2 avg
+
+Array.avg() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 avg_by
+
+Array.avg_by() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 bindex
 
 Array.bindex() -> I<Obj>
