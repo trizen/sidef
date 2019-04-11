@@ -5514,6 +5514,8 @@ package Sidef::Types::Number::Number {
         }
     }
 
+    *cfrac = \&as_cfrac;
+
     sub as_float {
         my ($x, $prec) = @_;
 
@@ -5632,9 +5634,10 @@ package Sidef::Types::Number::Number {
     }
 
     sub sqrt_cfrac {
-        my ($n) = @_;
+        my ($n, $max) = @_;
 
         $n = _any2mpz($$n) // return Sidef::Types::Array::Array->new();
+        $max = defined($max) ? CORE::int($max) : (0 + 'inf');
 
         Math::GMPz::Rmpz_sgn($n) < 0
           and return Sidef::Types::Array::Array->new();
@@ -5659,13 +5662,16 @@ package Sidef::Types::Number::Number {
             my $z = 1;
             my $r = $x + $x;
 
-            do {
+            for (my $count = 0 ; $count < $max ; ++$count) {
+
                 $y = $r * $z - $y;
                 $z = CORE::int(($n - $y * $y) / $z);
                 $r = CORE::int(($x + $y) / $z);
 
                 push @cfrac, __PACKAGE__->_set_uint($r);
-            } until ($z == 1);
+
+                last if $z == 1;
+            }
 
             return Sidef::Types::Array::Array->new(\@cfrac);
         }
@@ -5676,7 +5682,8 @@ package Sidef::Types::Number::Number {
 
         Math::GMPz::Rmpz_add($r, $x, $x);    # r = x+x
 
-        do {
+        for (my $count = 0 ; $count < $max ; ++$count) {
+
             my $t = Math::GMPz::Rmpz_init();
 
             # y = (r*z - y)
@@ -5695,7 +5702,8 @@ package Sidef::Types::Number::Number {
             $r = $t;
             push @cfrac, bless \$t;
 
-        } until (Math::GMPz::Rmpz_cmp_ui($z, 1) == 0);
+            last if Math::GMPz::Rmpz_cmp_ui($z, 1) == 0;
+        }
 
         Sidef::Types::Array::Array->new(\@cfrac);
     }
