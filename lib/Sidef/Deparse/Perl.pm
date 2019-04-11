@@ -148,13 +148,16 @@ HEADER
 
         '(' . $self->{environment_name} . '::' . (
             (
-             $const{$ref, $#args, @args} //= [
-                 $name . @args,
-                 do {
-                     local $" = ',';
-                     $self->{before} .= $name . @args . '=>' . $ref . "->$new_method(@args),";
-                 }
-             ]
+
+               # XXX: caching is memory intensive for a very large number of literals
+               # $const{$ref, $#args, @args} //=
+
+               [$name . @args,
+                do {
+                    local $" = ',';
+                    $self->{before} .= $name . @args . '=>' . $ref . "->$new_method(@args),";
+                }
+               ]
             )->[0]
               . ')'
         );
