@@ -166,6 +166,21 @@ package Sidef::Types::Range::RangeNumber {
         $n->inc->mul($z->mul($n)->add($x->mul($two)))->div($two);
     }
 
+    sub avg_by {
+        my ($self, $block) = @_;
+        $self->sum_by($block)->div($self->len);
+    }
+
+    sub avg {
+        my ($self, $arg) = @_;
+
+        if (defined($arg)) {
+            goto &avg_by;
+        }
+
+        $self->sum->div($self->len);
+    }
+
     sub prod_by {
         my ($self, $block) = @_;
         $block //= Sidef::Types::Block::Block::IDENTITY;

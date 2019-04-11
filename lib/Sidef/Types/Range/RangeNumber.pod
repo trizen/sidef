@@ -23,6 +23,22 @@ Inherits methods from:
 
 =head1 METHODS
 
+=head2 avg
+
+RangeNumber.avg() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 avg_by
+
+RangeNumber.avg_by() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 bsearch
 
 RangeNumber.bsearch() -> I<Obj>
