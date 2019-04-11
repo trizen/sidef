@@ -9476,8 +9476,11 @@ package Sidef::Types::Number::Number {
     sub dirichlet_convolution {
         my ($n, $f, $g) = @_;
 
-        $n = _any2mpz($$n) || return ZERO;
+        $n = _any2mpz($$n) // goto &nan;
         Math::GMPz::Rmpz_sgn($n) > 0 or return ZERO;
+
+        $f //= Sidef::Types::Block::Block->new(code => sub { ONE });
+        $g //= Sidef::Types::Block::Block->new(code => sub { ONE });
 
         my @terms;
         my $result = ZERO;
