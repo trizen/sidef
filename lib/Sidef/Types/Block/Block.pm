@@ -391,7 +391,27 @@ package Sidef::Types::Block::Block {
 
             return scalar {dump => ($ref . "->_set_str('${type}', '${str}')")};
         }
-        elsif ($ref eq 'Sidef::Types::Block::Block') {
+
+        if ($ref eq 'Sidef::Module::OO' or $ref eq 'Sidef::Module::Func') {
+
+            my $module =
+              ref($obj->{module}) ? Data::Dump::Filtered::dump_filtered($obj->{module}, __SUB__) : qq{"$obj->{module}"};
+            my $module_name = ref($obj->{module}) || $obj->{module};
+
+            my $code = {
+                dump => qq {
+                    do {
+                        use $ref;
+                        require $module_name;
+                        bless({ module => $module }, "$ref");
+                    }
+                }
+                       };
+
+            return $code;
+        }
+
+        if ($ref eq 'Sidef::Types::Block::Block') {
             die "[ERROR] Blocks cannot be serialized!";
         }
 
