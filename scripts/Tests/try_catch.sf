@@ -34,4 +34,23 @@ do {
     assert_eq(v, [true, "a", "b", "try_branch"])
 }
 
+const x = try {
+    (0, 1, 2)
+} catch {
+    (3, 4, 5)
+}
+
+assert_eq(Sys.ref(x), 'Sidef::Types::Number::Number')
+assert_eq(x, 2)
+
+const y = try {
+    die ()
+    (0, 1, 2)
+} catch {
+    (3, 4, 5)
+}
+
+assert_eq(Sys.ref(y), 'Sidef::Types::Number::Number')
+assert_eq(y, 5)
+
 say "** Test passed!"

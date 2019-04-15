@@ -1,5 +1,6 @@
 package Sidef::Types::Block::Try {
 
+    use Data::Dumper;
     use utf8;
     use 5.016;
 
@@ -26,10 +27,13 @@ package Sidef::Types::Block::Try {
     sub catch {
         my ($self, $code) = @_;
 
-        $self->{catch}
-          ? $code->run(Sidef::Types::String::String->new($self->{type}),
-                       Sidef::Types::String::String->new($self->{msg} =~ s/^\[.*?\]\h*//r)->chomp)
-          : @{$self->{val}};
+        my @ret = ( $self->{catch}
+                    ? $code->run(Sidef::Types::String::String->new($self->{type}),
+                                 Sidef::Types::String::String->new($self->{msg} =~ s/^\[.*?\]\h*//r)->chomp)
+                    : @{$self->{val}}
+        );
+
+        wantarray ? @ret : @ret[-1]
     }
 
 };
