@@ -394,15 +394,19 @@ package Sidef::Types::Block::Block {
 
         if ($ref eq 'Sidef::Module::OO' or $ref eq 'Sidef::Module::Func') {
 
-            my $module =
-              ref($obj->{module}) ? Data::Dump::Filtered::dump_filtered($obj->{module}, __SUB__) : qq{"$obj->{module}"};
+            my $module = (
+                          ref($obj->{module})
+                          ? Data::Dump::Filtered::dump_filtered($obj->{module}, __SUB__)
+                          : qq{"$obj->{module}"}
+                         );
+
             my $module_name = ref($obj->{module}) || $obj->{module};
 
             my $code = {
-                dump => qq {
+                dump => qq{
                     do {
                         use $ref;
-                        require $module_name;
+                        eval "require $module_name";
                         bless({ module => $module }, "$ref");
                     }
                 }
