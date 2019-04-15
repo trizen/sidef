@@ -372,6 +372,7 @@ scripts/RosettaCode/floyd_warshall_algorithm.sf
 scripts/RosettaCode/fork.sf
 scripts/RosettaCode/formatted_numeric_output.sf
 scripts/RosettaCode/formatted_numeric_output_1.sf
+scripts/RosettaCode/free_polyominoes_enumeration.sf
 scripts/RosettaCode/french_republican_calendar.sf
 scripts/RosettaCode/function_composition.sf
 scripts/RosettaCode/function_definition.sf
@@ -719,6 +720,7 @@ scripts/Tests/euler_and_bernoulli_numbers.sf
 scripts/Tests/eval.sf
 scripts/Tests/execute_system_command.sf
 scripts/Tests/extreme_floating_point_values.sf
+scripts/Tests/fforks.sf
 scripts/Tests/fibonacci_closed_solution.sf
 scripts/Tests/fibonacci_iterative.sf
 scripts/Tests/fibonacci_mystery.sf

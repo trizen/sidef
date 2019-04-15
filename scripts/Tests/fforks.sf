@@ -1,0 +1,12 @@
+#!/usr/bin/ruby
+
+var f = { (5, 6) }.ffork
+var g = { 6 }.ffork
+
+var a1 = [f.wait]
+var a2 = [g.wait]
+
+assert_eq(a1, [5, 6])
+assert_eq(a2, [6])
+
+say "** Test passed!"

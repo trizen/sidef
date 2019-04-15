@@ -27,9 +27,9 @@ package Sidef::Types::Block::Fork {
         };
 
         # Evaluate the result
-        my @result = ( eval($content) );
+        my @result = (eval($content));
         $@ && die "[FORK ERROR] can't retrieve value: $@";
-        wantarray ? @result : @result[-1]
+        wantarray ? @result : $result[-1];
     }
 
     *wait = \&get;
