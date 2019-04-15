@@ -172,6 +172,16 @@ Return the
 
 =cut
 
+=head2 each_2d
+
+Set.each_2d() -> I<Obj>
+
+Return the
+
+Aliases: I<each_2D>
+
+=cut
+
 =head2 grep
 
 Set.grep() -> I<Obj>
@@ -179,6 +189,16 @@ Set.grep() -> I<Obj>
 Return the
 
 Aliases: I<select>
+
+=cut
+
+=head2 grep_2d
+
+Set.grep_2d() -> I<Obj>
+
+Return the
+
+Aliases: I<grep_2D>
 
 =cut
 
@@ -203,6 +223,16 @@ Return the
 Set.map() -> I<Obj>
 
 Return the
+
+=cut
+
+=head2 map_2d
+
+Set.map_2d() -> I<Obj>
+
+Return the
+
+Aliases: I<map_2D>
 
 =cut
 

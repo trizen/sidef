@@ -8,28 +8,28 @@ func translate2origin(poly) {
   # Finds the min x and y coordiate of a Polyomino.
   var minx = poly.map(:head).min
   var miny = poly.map(:tail).min
-  poly.map {|p| [p.head-minx, p.tail-miny] }.sort
+  poly.map_2d {|x,y| [x-minx, y-miny] }.sort
 }
 
 func rotate90(x,y) { [y, -x] }
-func reflect(x,y)  { [-x, y] }
+func  reflect(x,y) { [-x, y] }
 
 # All the plane symmetries of a rectangular region.
 func rotations_and_reflections(poly) {
     gather {
         take(poly)
-        take(poly.map!{ rotate90(_...) })
-        take(poly.map!{ rotate90(_...) })
-        take(poly.map!{ rotate90(_...) })
-        take(poly.map!{  reflect(_...) })
-        take(poly.map!{ rotate90(_...) })
-        take(poly.map!{ rotate90(_...) })
-        take(poly.map!{ rotate90(_...) })
+        take(poly.map_2d!{|x,y| rotate90(x,y) })
+        take(poly.map_2d!{|x,y| rotate90(x,y) })
+        take(poly.map_2d!{|x,y| rotate90(x,y) })
+        take(poly.map_2d!{|x,y|  reflect(x,y) })
+        take(poly.map_2d!{|x,y| rotate90(x,y) })
+        take(poly.map_2d!{|x,y| rotate90(x,y) })
+        take(poly.map_2d!{|x,y| rotate90(x,y) })
     }
 }
 
 func canonical(poly) {
-  rotations_and_reflections(poly).map{|pl| translate2origin(pl) }
+  rotations_and_reflections(poly).map(translate2origin)
 }
 
 # All four points in Von Neumann neighborhood.
@@ -40,18 +40,19 @@ func contiguous(x, y) {
 # Finds all distinct points that can be added to a Polyomino.
 func new_points(poly) {
   var points = Set()
-  poly.each { points << contiguous(_...)... }
+  poly.each_2d {|x,y| points << contiguous(x,y)... }
   points - poly
 }
 
 func new_polys(polys) {
-  var pattern = Set()
+  var pattern = Bag()
   polys.map { |poly|
     gather {
-      new_points(poly).each { |point|
-        var pl = translate2origin(poly + [point])
+      new_points(poly).each_2d { |x,y|
+        var pl = translate2origin(poly + [[x,y]])
         next if pattern.has(pl)
-        take canonical(pl).each{ pattern << _ }.min
+        take(var t = canonical(pl) -> min)
+        pattern << t...
       }
     }...
   }
@@ -69,7 +70,7 @@ func rank(n) {
 # Generates a textual representation of a Polyomino.
 func text_representation(poly) {
   var table = Hash()
-  for x,y in (poly) { table{[x,y]} = '#' }
+  poly.each_2d {|x,y| table{[x,y]} = '#' }
   var maxx = poly.map(:head).max
   var maxy = poly.map(:tail).max
   (0..maxx).map{|x| (0..maxy).map{|y| table{[x,y]} \\ ' ' }.join }

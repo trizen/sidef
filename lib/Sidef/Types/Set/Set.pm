@@ -156,6 +156,20 @@ package Sidef::Types::Set::Set {
         bless \%new, ref($self);
     }
 
+    sub map_2d {
+        my ($self, $block) = @_;
+
+        my %new;
+        foreach my $key (CORE::keys(%$self)) {
+            my $value = $block->run(@{$self->{$key}});
+            $new{$serialize->($value)} = $value;
+        }
+
+        bless \%new, ref($self);
+    }
+
+    *map_2D = \&map_2d;
+
     sub collect {
         my ($self, $block) = @_;
 
@@ -182,6 +196,22 @@ package Sidef::Types::Set::Set {
     }
 
     *select = \&grep;
+
+    sub grep_2d {
+        my ($self, $block) = @_;
+
+        my %new;
+        foreach my $key (CORE::keys(%$self)) {
+            my $value = $self->{$key};
+            if ($block->run(@$value)) {
+                $new{$key} = $value;
+            }
+        }
+
+        bless \%new, ref($self);
+    }
+
+    *grep_2D = \&grep_2d;
 
     sub count_by {
         my ($self, $block) = @_;
@@ -257,6 +287,18 @@ package Sidef::Types::Set::Set {
 
         $self;
     }
+
+    sub each_2d {
+        my ($self, $block) = @_;
+
+        foreach my $value (CORE::values(%$self)) {
+            $block->run(@$value);
+        }
+
+        $self;
+    }
+
+    *each_2D = \&each_2d;
 
     sub sort_by {
         my ($self, $block) = @_;

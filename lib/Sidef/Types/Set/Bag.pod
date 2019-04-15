@@ -196,6 +196,16 @@ Return the
 
 =cut
 
+=head2 each_2d
+
+Bag.each_2d() -> I<Obj>
+
+Return the
+
+Aliases: I<each_2D>
+
+=cut
+
 =head2 each_kv
 
 Bag.each_kv() -> I<Obj>
@@ -239,6 +249,16 @@ Bag.grep() -> I<Obj>
 Return the
 
 Aliases: I<select>
+
+=cut
+
+=head2 grep_2d
+
+Bag.grep_2d() -> I<Obj>
+
+Return the
+
+Aliases: I<grep_2D>
 
 =cut
 
@@ -291,6 +311,16 @@ Aliases: I<size>, I<length>
 Bag.map() -> I<Obj>
 
 Return the
+
+=cut
+
+=head2 map_2d
+
+Bag.map_2d() -> I<Obj>
+
+Return the
+
+Aliases: I<map_2D>
 
 =cut
 
