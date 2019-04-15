@@ -410,8 +410,8 @@ package Sidef::Types::Block::Block {
 
         if ($pid == 0) {
             srand();
-            my $obj = $self->call(@args);
-            print $fh scalar Data::Dump::Filtered::dump_filtered($obj, \&__fdump);
+            my @objs = ( $self->call(@args) );
+            print $fh scalar Data::Dump::Filtered::dump_filtered(@objs, \&__fdump);
             exit 0;
         }
 
