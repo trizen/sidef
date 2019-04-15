@@ -1260,6 +1260,18 @@ package Sidef::Types::Array::Array {
     *for     = \&each;
     *foreach = \&each;
 
+    sub each_2d {
+        my ($self, $block) = @_;
+
+        foreach my $item (@$self) {
+            $block->run(@$item);
+        }
+
+        $self;
+    }
+
+    *each_2D = \&each_2d;
+
     sub each_slice {
         my ($self, $n, $block) = @_;
 

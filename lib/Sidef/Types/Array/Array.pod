@@ -560,6 +560,16 @@ Return the
 
 =cut
 
+=head2 each_2d
+
+Array.each_2d() -> I<Obj>
+
+Return the
+
+Aliases: I<each_2D>
+
+=cut
+
 =head2 each_cons
 
 Array.each_cons() -> I<Obj>
