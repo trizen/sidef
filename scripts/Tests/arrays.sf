@@ -30,3 +30,20 @@ var r = [a.first_by { .is_odd }, a.last_by { .is_odd }]
 
 assert_eq(r.len, 2)
 assert_eq(r, [nil, nil])
+
+#
+## Test `map_2d` and `grep_2d`
+#
+
+assert_eq(
+    Matrix([1,2,3],[4,5,6]).map_2d{ |*a| a.map { _**2 } },
+    Matrix([1, 4, 9], [16, 25, 36])
+)
+
+assert_eq([[1,2], [3,4], [5,6]].map_2d {|a,b| a+b }, [3, 7, 11])
+assert_eq([[1,2], [3,4], [5,6]].map_2d {|a,b| [a**2, b**2] }, [[1,4], [9,16], [25, 36]])
+
+assert_eq([[1,2], [3,4], [5,6]].grep_2d{|a,b| a+b == 7 }, [[3,4]])
+assert_eq([[1,2], [3,4], [5,6]].grep_2d{|a,b| a+b <= 7 }, [[1,2], [3,4]])
+
+say "** Test passed!"

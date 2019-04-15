@@ -1448,6 +1448,21 @@ package Sidef::Types::Array::Array {
 
     *collect = \&map;
 
+    sub map_2d {
+        my ($self, $block) = @_;
+
+        $block //= Sidef::Types::Block::Block::IDENTITY;
+
+        my @array;
+        foreach my $item (@$self) {
+            CORE::push(@array, $block->run(@$item));
+        }
+
+        bless \@array, ref($self);
+    }
+
+    *map_2D = \&map_2d;
+
     sub map_kv {
         my ($self, $block) = @_;
 
@@ -1490,6 +1505,21 @@ package Sidef::Types::Array::Array {
     }
 
     *select = \&grep;
+
+    sub grep_2d {
+        my ($self, $block) = @_;
+
+        $block //= Sidef::Types::Block::Block::IDENTITY;
+
+        my @array;
+        foreach my $item (@$self) {
+            CORE::push(@array, $item) if $block->run(@$item);
+        }
+
+        bless \@array, ref($self);
+    }
+
+    *grep_2D = \&grep_2d;
 
     sub grep_kv {
         my ($self, $block) = @_;

@@ -780,6 +780,16 @@ Aliases: I<select>
 
 =cut
 
+=head2 grep_2d
+
+Array.grep_2d() -> I<Obj>
+
+Return the
+
+Aliases: I<grep_2D>
+
+=cut
+
 =head2 grep_kv
 
 Array.grep_kv() -> I<Obj>
@@ -1043,6 +1053,16 @@ Array.map() -> I<Obj>
 Return the
 
 Aliases: I<collect>
+
+=cut
+
+=head2 map_2d
+
+Array.map_2d() -> I<Obj>
+
+Return the
+
+Aliases: I<map_2D>
 
 =cut
 
