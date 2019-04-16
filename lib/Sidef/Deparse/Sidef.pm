@@ -289,11 +289,12 @@ package Sidef::Deparse::Sidef {
                 $code = $name;
             }
             else {
-                $code =
-                  "subset $name"
-                  . (  (exists($obj->{inherits}) and @{$obj->{inherits}})
+                $code = "subset $name"
+                  . (
+                       (exists($obj->{inherits}) and @{$obj->{inherits}})
                      ? (' < ' . join(',', map { $self->deparse_expr({self => $_}) } @{$obj->{inherits}}))
-                     : '')
+                     : ''
+                    )
                   . (exists($obj->{blocks}) ? (' ' . $self->deparse_expr({self => $obj->{blocks}[-1]})) : '');
             }
         }
@@ -323,41 +324,26 @@ package Sidef::Deparse::Sidef {
                           ? ', '
                           : (";\n" . (" " x $Sidef::SPACES))
                          ),
-                         map { $self->deparse_expr({self => $_}) } @{$obj->{vars}}
+                         $self->_dump_init_vars({vars => [map { $_->{var} } @{$obj->{vars}}]})
                         );
-        }
-        elsif ($ref eq 'Sidef::Variable::Define') {
-            my $name = $obj->{name};
-            if (not exists $obj->{inited}) {
-                $obj->{inited} = 1;
-                $code = "define $name";
-                if (defined $obj->{expr}) {
-                    $code .= ' = (' . $self->deparse_script($obj->{expr}) . ')';
-                }
-            }
-            else {
-                $code = ($obj->{class} ne $self->{class} ? ($obj->{class} . '::') : '') . $name;
+
+            foreach my $const (@{$obj->{vars}}) {
+                $const->{inited} = 1;
             }
         }
-        elsif ($ref eq 'Sidef::Variable::Const') {
+        elsif (   $ref eq 'Sidef::Variable::Const'
+               or $ref eq 'Sidef::Variable::Static'
+               or $ref eq 'Sidef::Variable::Define') {
             my $name = $obj->{name};
-            if (not exists $obj->{inited}) {
+
+            if (not $obj->{inited}) {
                 $obj->{inited} = 1;
-                $code = "const $name";
-                if (defined $obj->{expr}) {
-                    $code .= ' = (' . $self->deparse_script($obj->{expr}) . ')';
-                }
-            }
-            else {
-                $code = ($obj->{class} ne $self->{class} ? ($obj->{class} . '::') : '') . $name;
-            }
-        }
-        elsif ($ref eq 'Sidef::Variable::Static') {
-            my $name = $obj->{name};
-            if (not exists $obj->{inited}) {
-                $obj->{inited} = 1;
-                $code = "static " . ($obj->{class} ne $self->{class} ? ($obj->{class} . '::') : '') . $name;
-                if (defined $obj->{expr}) {
+
+                my ($var) = $self->_dump_vars($obj->{var});
+
+                $code = "$obj->{var}{type} $var";
+
+                if (defined($obj->{expr})) {
                     $code .= ' = (' . $self->deparse_script($obj->{expr}) . ')';
                 }
             }

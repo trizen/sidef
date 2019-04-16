@@ -41,7 +41,7 @@ const x = try {
 }
 
 assert_eq(Sys.ref(x), 'Sidef::Types::Number::Number')
-assert_eq(x, 2)
+assert_eq(x, 0)
 
 const y = try {
     die ()
@@ -51,6 +51,6 @@ const y = try {
 }
 
 assert_eq(Sys.ref(y), 'Sidef::Types::Number::Number')
-assert_eq(y, 5)
+assert_eq(y, 3)
 
 say "** Test passed!"

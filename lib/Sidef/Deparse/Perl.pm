@@ -149,7 +149,7 @@ HEADER
         '(' . $self->{environment_name} . '::' . (
             (
 
-               # XXX: caching is memory intensive for a very large number of literals
+               # XXX: caching is memory expensive for a very large number of literals
                # $const{$ref, $#args, @args} //=
 
                [$name . @args,
@@ -779,32 +779,45 @@ HEADER
         elsif ($ref eq 'Sidef::Variable::Const') {
             my $name  = "const_$obj->{name}" . $refaddr;
             my $value = '(' . $name . ')';
+
+            my $info = $obj->{var};
+
+            if ($info->{array}) {
+                $self->load_mod("Sidef::Types::Array::Array");
+            }
+            elsif ($info->{hash}) {
+                $self->load_mod("Sidef::Types::Hash::Hash");
+            }
+
             if (not exists $obj->{inited}) {
                 $obj->{inited} = 1;
 
+                # XXX: this is known to cause segmentation faults in perl-5.18.* and perl-5.20.* when used in a class
+                $code =
+                  "sub $name(){state\$_$refaddr"
+                  . (  '='
+                     . ($info->{hash}         ? '{'                                 : '[') . 'do{'
+                     . (defined($obj->{expr}) ? $self->deparse_script($obj->{expr}) : '') . '}'
+                     . ($info->{hash}         ? '}'                                 : ']'))
+                  . ';'
+                  . (
+                     $info->{slurpy}
+                     ? (
+                        $info->{array}
+                        ? "bless(\$_$refaddr, 'Sidef::Types::Array::Array')"
+                        : "bless(\$_$refaddr, 'Sidef::Types::Hash::Hash')"
+                       )
+                     : "\$_$refaddr\->[0]"
+                    )
+                  . "}; ($name)";
+
                 # Use dynamical constants with perl>=5.022
-                if (
-                    exists($self->{class})
-                    ? ($] >= 5.022 or $self->{class} != $self->{current_block})
-                    : 1
-                  ) {
+                if ($] >= 5.022 or $self->{class} != $self->{current_block}) {
+
+                    $code = "my $code";
 
                     # This is no longer needed in Perl>=5.25.2
                     $] < 5.025002 && $self->top_add(q{use feature 'lexical_subs'; no warnings 'experimental::lexical_subs';});
-
-                    # XXX: this is known to cause segmentation faults in perl-5.18.* and perl-5.20.* when used in a class
-                    $code =
-                        "my sub $name(){state\$_$refaddr"
-                      . (defined($obj->{expr}) ? ('=do{' . $self->deparse_script($obj->{expr}) . '}') : '')
-                      . "}; ($name)";
-                }
-
-                # Otherwise, use static constants
-                else {
-                    $code =
-                        "sub $name(){state\$_$refaddr"
-                      . (defined($obj->{expr}) ? ('=do{' . $self->deparse_script($obj->{expr}) . '}') : '')
-                      . "}; ($name)";
                 }
             }
             else {

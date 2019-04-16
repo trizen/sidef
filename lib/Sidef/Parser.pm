@@ -1259,11 +1259,11 @@ package Sidef::Parser {
 #<<<
                     my $var =
                       $type eq 'define'
-                      ? bless({name => $name, class => $class_name, expr => $obj}, 'Sidef::Variable::Define')
+                      ? bless({name => $name, class => $class_name, expr => $obj, var => $v}, 'Sidef::Variable::Define')
                       : $type eq 'static'
-                      ? bless({name => $name, class => $class_name, expr => $obj}, 'Sidef::Variable::Static')
+                      ? bless({name => $name, class => $class_name, expr => $obj, var => $v}, 'Sidef::Variable::Static')
                       : $type eq 'const'
-                      ? bless({name => $name, class => $class_name, expr => $obj}, 'Sidef::Variable::Const')
+                      ? bless({name => $name, class => $class_name, expr => $obj, var => $v}, 'Sidef::Variable::Const')
                       : die "[PARSER ERROR] Invalid variable type: $type";
 #>>>
 
@@ -1289,11 +1289,11 @@ package Sidef::Parser {
 #<<<
                     my $var = (
                                $type eq 'define'
-                               ? bless({name => $name, class => $class_name, expr => $obj}, 'Sidef::Variable::Define')
+                               ? bless({name => $name, class => $class_name, expr => $obj, var => $v}, 'Sidef::Variable::Define')
                                : $type eq 'static'
-                               ? bless({name => $name, class => $class_name, expr => $obj}, 'Sidef::Variable::Static')
+                               ? bless({name => $name, class => $class_name, expr => $obj, var => $v}, 'Sidef::Variable::Static')
                                : $type eq 'const'
-                               ? bless({name => $name, class => $class_name, expr => $obj}, 'Sidef::Variable::Const')
+                               ? bless({name => $name, class => $class_name, expr => $obj, var => $v}, 'Sidef::Variable::Const')
                                : die "[PARSER ERROR] Invalid variable type: $type"
                               );
 #>>>
