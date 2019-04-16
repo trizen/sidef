@@ -140,7 +140,7 @@ package Sidef::Deparse::Sidef {
             map {
                     (exists($_->{array}) ? '*' : exists($_->{hash}) ? ':' : '')
                   . (exists($_->{class}) && $_->{class} ne $self->{class} ? $_->{class} . '::' : '')
-                  . (exists($_->{ref_type}) ? ($self->_dump_reftype($_->{ref_type}) . ' ') : '')
+                  . (exists($_->{ref_type}) && ($_->{type} eq 'var') ? ($self->_dump_reftype($_->{ref_type}) . ' ') : '')
                   . $_->{name}
                   . (exists($_->{subset}) ? (' < ' . $self->_dump_reftype($_->{subset})) : '')
                   . (exists($_->{where_block}) ? $self->deparse_expr({self => $_->{where_block}}) : '')
