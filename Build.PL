@@ -10,7 +10,7 @@ my $builder = Module::Build->new(
     module_name        => 'Sidef',
     license            => 'artistic_2',
     dist_author        => [
-                            q{Daniel Șuteu   (<trizen@protonmail.com>)},
+                            q{Daniel Șuteu   (<trizen@cpan.org>)},
                             q{Ioana Fălcușan (<ioanaflavia@gmail.com>)},
                           ],
     dist_version_from  => 'lib/Sidef.pm',

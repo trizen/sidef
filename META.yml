@@ -1,7 +1,7 @@
 ---
 abstract: 'The Sidef Programming Language'
 author:
-  - 'Daniel Șuteu   (<trizen@protonmail.com>)'
+  - 'Daniel Șuteu   (<trizen@cpan.org>)'
   - 'Ioana Fălcușan (<ioanaflavia@gmail.com>)'
 build_requires:
   Test::More: '0'
