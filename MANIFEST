@@ -733,6 +733,7 @@ scripts/Tests/for_in_with_user_objects.sf
 scripts/Tests/for_two_vars.sf
 scripts/Tests/for_var_in_array.sf
 scripts/Tests/forward_difference.sf
+scripts/Tests/func_scoping.sf
 scripts/Tests/function_composition.sf
 scripts/Tests/functional_modules.sf
 scripts/Tests/functional_style.sf

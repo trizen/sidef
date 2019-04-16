@@ -621,14 +621,19 @@ HEADER
                         local $self->{function}          = refaddr($block);
                         local $self->{parent_name}       = [$obj->{type}, $name];
                         local $self->{current_namespace} = $obj->{class};
-                        push @{$self->{function_declarations}}, [$self->{function}, "my \$${alphaname}$refaddr;"];
 
+                        push @{$self->{function_declarations}},
+                          [$self->{function}, "my \$${alphaname}$refaddr;", $self->{depth} // 0];
+
+#<<<
                         if ($self->{ref_class}) {
                             push @{$self->{function_declarations}},
                               [ $self->{function},
-                                qq{state \$${alphaname}_code$refaddr = UNIVERSAL::can("\Q$self->{class_name}\E", "\Q$name\E");}
+                                qq{state \$${alphaname}_code$refaddr = UNIVERSAL::can("\Q$self->{class_name}\E", "\Q$name\E");},
+                                $self->{depth} // 0
                               ];
                         }
+#>>>
 
                         if ((my $content = $self->deparse_expr({self => $block})) ne '') {
                             $code .= "=$content";
@@ -933,7 +938,7 @@ HEADER
                             my @class_attr = (@inherited_class_attr, @self_class_attr);
 
                             $code .= "\$new$refaddr=Sidef::Types::Block::Block->new(code=>sub{";
-                            push @{$self->{function_declarations}}, [$refaddr, "my \$new$refaddr;"];
+                            push @{$self->{function_declarations}}, [$refaddr, "my \$new$refaddr;", $self->{depth} // 0];
 
                             $code .= $self->_dump_sub_init_vars(@class_vars) . $self->_dump_class_attributes(@class_attr);
 
@@ -991,15 +996,16 @@ HEADER
                         }
                     }
 
+                    local $self->{depth} = ($self->{depth} // 0) + 1;
+
                     my @statements = $self->deparse_script($obj->{code});
 
                     # Localize function declarations
-                    if ($is_function) {
-                        while (    exists($self->{function_declarations})
-                               and @{$self->{function_declarations}}
-                               and $self->{function_declarations}[-1][0] != $refaddr) {
-                            $code .= pop(@{$self->{function_declarations}})->[1];
-                        }
+                    while (    exists($self->{function_declarations})
+                           and @{$self->{function_declarations}}
+                           and $self->{function_declarations}[-1][0] != $refaddr) {
+                        $self->{depth} <= $self->{function_declarations}[-1][2] or last;
+                        $code .= pop(@{$self->{function_declarations}})->[1];
                     }
 
                     # Localize variable declarations
@@ -1076,7 +1082,7 @@ HEADER
                   . join('', map { "sub $_->{name}:lvalue{\$_[0]->{$_->{name}}}" } @{$obj->{vars}})
                   . "};'${name}'}";
 
-                push @{$self->{function_declarations}}, [$refaddr, "my\$new$refaddr;"];
+                push @{$self->{function_declarations}}, [$refaddr, "my\$new$refaddr;", $self->{depth} // 0];
             }
         }
         elsif ($ref eq 'Sidef::Variable::Subset') {

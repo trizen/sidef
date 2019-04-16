@@ -47,26 +47,34 @@ Foo::Bar().Zoe == "All good!" || "module+class error!".die;
 
 #
 ## Class + (module + func + func) + method
+## (declaring modules inside a class/function/method is not really supported)
 #
+
 class Test {
+
     module Foo {            # module redeclaration
         func Bingo {
             return "Bingo!";
-        };
+        }
         func Yay {
             return "Yay!";
-        };
-    };
+        }
+    }
 
     method Bar {
-        Foo::Bingo() == "Bingo!" || "method call error!".die;
-    };
+        assert_eq(Foo::Yay(), "Yay!")
+        assert_eq(Foo::Bingo(), "Bingo!")
+        assert_eq(Foo::Bar().Zoe, "All good!")
+    }
 }
 
 Test().Bar;
-Foo::Bingo() == "Bingo!" || "Bingo error!".die;
-Foo::Yay()   == "Yay!"   || "Yay error!".die;
+assert_eq(Foo::Bar().Zoe, "All good!")
 
+## No longer supported as of Sidef > 3.70
+## "Bingo" and "Yay" functions are lexical to class "Test".
+#~ assert_eq(Foo::Bingo(), "Bingo!")
+#~ assert_eq(Foo::Yay(), "Yay!")
 
 #
 ## Module + (module + func) + func
@@ -85,7 +93,6 @@ module Hi {
 
 Hi::hi()       == "Hi"    || "Hi error!".die;
 Hello::hello() == "Hello" || "Hello error!".die;
-
 
 ###################
 say "** Test passed!";

@@ -1,17 +1,27 @@
 #!/usr/bin/ruby
 
+var vals = []
 var x = 'o';
+vals << x
 
 {
     x.say;              # o
+    vals << x
     var x = 'm';
     x.say;              # m
+    vals << x
     {
         x.say;          # m
+        vals << x
         var x = 'b';
         x.say;          # b
+        vals << x
     }.run;
     x.say;              # m
+    vals << x
 }.run;
 
 x.say;                  # o
+vals << x
+
+assert_eq(vals, %w(o o m m b m o))

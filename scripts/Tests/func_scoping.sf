@@ -1,0 +1,22 @@
+#!/usr/bin/ruby
+
+var refs = []
+var funcs = [1,2,3].map {|x|
+    func foo(n) {
+        refs << foo.refaddr
+        [n, x]
+    }
+}
+
+assert_eq(
+    funcs.map { .call(1) },
+    [[1, 1], [1, 2], [1, 3]]
+)
+
+var t = funcs.map{.refaddr}
+
+assert_eq(t.uniq.len, 3)
+assert_eq(refs.uniq.len, 3)
+assert_eq(t, refs)
+
+say "** Test passed!"
