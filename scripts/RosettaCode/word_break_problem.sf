@@ -1,0 +1,31 @@
+#!/usr/bin/ruby
+
+#
+## https://rosettacode.org/wiki/Word_break_problem
+#
+
+func word_break (str, words) {
+    gather {
+        func (str) {
+            return true if str.is_empty
+            for word in (words) {
+                str.begins_with(word) || next
+                if (__FUNC__(str.substr(word.len))) {
+                    take(word)
+                    return true
+                }
+            }
+            return false
+        }(str)
+    }.reverse
+}
+
+var words = %w(a o is pi ion par per sip miss able)
+var strs = %w(a amiss parable opera operable inoperable permission mississippi)
+
+for str in (strs) {
+   printf("%11s: %s\n", str, word_break(str, words) || '(not possible)')
+}
+
+assert_eq(word_break("inoperable", words),  [])
+assert_eq(word_break("mississippi", words), ["miss", "is", "sip", "pi"])
