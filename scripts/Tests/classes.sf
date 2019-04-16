@@ -53,28 +53,49 @@ assert_eq(g.array, ['yyy']);
 #
 ## Class redefinition
 #
-class Example {
-    method hi {
-        say "I'm saying 'hi'";
+do {
+    class Example {
+        method hi {
+            say "I'm saying 'hi'";
+        }
     }
+
+    class main::Example() {             # main::Example() is just for testing
+        method hello() {
+            say "I'm saying 'hello'";
+        }
+    }
+
+    class Example {
+        method howdy {
+            say "I'm saying 'howdy'";
+        }
+    }
+
+    var obj = Example();
+
+    obj.hi;
+    obj.hello;
+    obj.howdy;
 }
 
-class main::Example() {             # main::Example() is just for testing
-    method hello() {
-        say "I'm saying 'hello'";
+do {
+    class Foo(String a, Number b) {
+
     }
-}
 
-class Example {
-    method howdy {
-        say "I'm saying 'howdy'";
+    var error = false
+    try {
+        Foo(42, "foo")
     }
+    catch {
+        error = true
+    }
+    assert(error)
+
+    var obj = Foo(b: 42, a: "foo")
+    assert(obj.a, "foo")
+    assert(obj.b, 42)
 }
-
-var obj = Example();
-
-obj.hi;
-obj.hello;
-obj.howdy;
 
 say "** Test passed!";

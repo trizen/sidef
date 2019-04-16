@@ -67,4 +67,9 @@ do {
     assert_eq(bar(6), 6)
 }
 
+do {
+    const String foo = "hello"  # now works under -O2
+    assert_eq(foo, "hello")
+}
+
 say "** Test passed!"

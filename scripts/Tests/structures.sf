@@ -46,6 +46,17 @@ assert_eq(job2.salary, 2400);
 assert_eq(woman.age, 24);
 assert_eq(man.age, 31);
 
+do {
+    var error = false
+    try {
+        Job(42, "foo")
+    }
+    catch {
+        error = true
+    }
+    assert(error)
+}
+
 #
 ## Lexical structures
 #
