@@ -640,7 +640,7 @@ package Sidef::Parser {
         $self->parse_whitespace(code => $opt{code});
 
         # Alpha-numeric method name
-        if (/\G($self->{method_name_re})/goc) {
+        if (/\G((?:SUPER::)*$self->{method_name_re})/goc) {
             return ($1, 0, '');
         }
 
@@ -1504,6 +1504,7 @@ package Sidef::Parser {
                 my $name       = '';
                 my $class_name = $self->{class};
                 my $built_in_obj;
+
                 if ($type eq 'class' and /\G($self->{var_name_re})\h*/gco) {
 
                     ($name, $class_name) = $self->get_name_and_class($1);
@@ -1519,12 +1520,16 @@ package Sidef::Parser {
                     }
                 }
 
-                if ($type ne 'class') {
+                if ($type eq 'method') {
                     $name = (
-                               /\G($self->{var_name_re})\h*/goc ? $1
-                             : $type eq 'method' && /\G($self->{operators_re})\h*/goc ? $+
-                             :                                                          ''
+                               /\G($self->{method_name_re})\h*/goc ? $1
+                             : /\G($self->{operators_re})\h*/goc   ? $+
+                             :                                       ''
                             );
+                    ($name, $class_name) = $self->get_name_and_class($name);
+                }
+                elsif ($type ne 'class') {
+                    $name = /\G($self->{var_name_re})\h*/goc ? $1 : '';
                     ($name, $class_name) = $self->get_name_and_class($name);
                 }
 

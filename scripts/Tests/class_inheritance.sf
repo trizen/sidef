@@ -47,6 +47,23 @@ class Human < Primates {
 }
 
 do {
+    class Foo {
+        method here {
+            "in foo"
+        }
+    }
+
+    class Bar < Foo {
+        method here {
+            self.SUPER::here
+        }
+    }
+
+    var obj = Bar()
+    assert_eq(obj.here, "in foo")
+}
+
+do {
     module inher {
         class Sup {}
     }
