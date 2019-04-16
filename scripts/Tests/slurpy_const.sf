@@ -24,4 +24,18 @@ bar{:c} = 99
 
 assert_eq(bar, Hash(a => 14, b => 42, c => 99))
 
+const (
+    *x = (1,2,3),
+    :y = (x => 1, y => 2),
+)
+
+assert_eq(x, [1,2,3])
+assert_eq(y, Hash("x" => 1, "y" => 2))
+
+x[0] = 42
+y{:x} = 3
+
+assert_eq(x, [42, 2, 3])
+assert_eq(y, Hash(x => 3, y => 2))
+
 say "** Test passed!"

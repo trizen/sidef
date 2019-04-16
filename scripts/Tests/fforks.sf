@@ -28,13 +28,15 @@ do {
         var lwp = "LWP::UserAgent".require.new(
             timeout => 30,
             show_progress => 1,
-        );
+        )
+        lwp.default_header("Referer" => "foo")
         lwp
     }.ffork
 
     var r = t.wait
-    r.default_header("Referer" => "foo")
     assert_eq(r.default_header("Referer"), "foo")
+    r.default_header("Referer" => "bar")
+    assert_eq(r.default_header("Referer"), "bar")
 }
 
 say "** Test passed!"
