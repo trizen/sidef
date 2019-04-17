@@ -1170,11 +1170,14 @@ package Sidef::Parser {
                 my $init_obj = bless({vars => $vars}, 'Sidef::Variable::Init');
 
                 if (/\G\h*=\h*/gc) {
-                    my $args = $self->parse_obj(code => $opt{code}, multiline => 1) // $self->fatal_error(
-                                                                  code  => $_,
-                                                                  pos   => pos($_),
-                                                                  error => "expected an expression after variable declaration",
-                    );
+
+                    my $args = $self->parse_obj(code => $opt{code}, multiline => 1);
+
+                    $args // $self->fatal_error(
+                                                code  => $_,
+                                                pos   => pos($_),
+                                                error => "expected an expression after variable declaration",
+                                               );
 
                     $init_obj->{args} = $args;
                 }
@@ -1250,6 +1253,7 @@ package Sidef::Parser {
                     my $class_name = $v->{class};
 
                     my $obj = $self->parse_obj(code => $opt{code}, multiline => 1);
+
                     $obj // $self->fatal_error(
                                                code  => $_,
                                                pos   => pos($_) - 2,
@@ -1310,7 +1314,17 @@ package Sidef::Parser {
                       };
                 }
 
-                return bless({vars => \@var_objs, type => $type}, 'Sidef::Variable::ConstInit');
+                my $const_init = bless({vars => \@var_objs, type => $type}, 'Sidef::Variable::ConstInit');
+
+                if (/\G\h*=\h*/gc) {
+                    $self->fatal_error(
+                                       code  => $_,
+                                       pos   => pos($_) - 2,
+                                       error => qq{the correct syntax is: `$type(x = ..., y = ...)`},
+                                      );
+                }
+
+                return $const_init;
             }
 
             # Struct declaration
@@ -2593,23 +2607,13 @@ package Sidef::Parser {
 
                 if (/\G(?=\h*:?=(?![=~>]))/) {
 
-                    my $var = bless({name => $name, class => $class}, 'Sidef::Variable::Global');
-
                     if (not $self->{interactive}) {
                         warn "[WARNING] Implicit declaration of global variable `$name`"
                           . " at $self->{file_name} line $self->{line}\n";
                     }
 
-                    unshift @{$self->{vars}{$class}},
-                      {
-                        obj   => $var,
-                        name  => $name,
-                        count => 0,
-                        type  => 'global',
-                        line  => $self->{line},
-                      };
-
-                    return $var;
+                    my $code = "global $name";
+                    return $self->parse_expr(code => \$code);
                 }
 
                 # Method call in functional style (deprecated -- use `::name()` instead)

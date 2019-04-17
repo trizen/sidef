@@ -816,7 +816,6 @@ package Sidef::Optimizer {
                    $ref eq 'Sidef::Variable::Static'
                 or $ref eq 'Sidef::Variable::Const'
                 or $ref eq 'Sidef::Variable::Define'
-                or $ref eq 'Sidef::Variable::Global'
                )
                and exists($obj->{expr})
           ) {

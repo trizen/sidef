@@ -303,16 +303,6 @@ package Sidef::Deparse::Sidef {
         elsif ($ref eq 'Sidef::Variable::Local') {
             $code = 'local ' . '(' . $self->deparse_script($obj->{expr}) . ')';
         }
-        elsif ($ref eq 'Sidef::Variable::Global') {
-            my $name = 'global ' . $obj->{class} . '::' . $obj->{name};
-            if (not exists($obj->{inited}) and defined($obj->{expr})) {
-                $obj->{inited} = 1;
-                $code = $name . '=' . $self->deparse_script($obj->{expr});
-            }
-            else {
-                $code = $name;
-            }
-        }
         elsif ($ref eq 'Sidef::Variable::ClassVar') {
             $code = $self->_dump_reftype($obj->{class}) . '!' . $obj->{name};
         }
