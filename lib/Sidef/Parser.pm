@@ -1900,16 +1900,15 @@ package Sidef::Parser {
             # "try/catch" construct
             if (/\Gtry\h*(?=\{)/gc) {
                 my $try_block = $self->parse_block(code => $opt{code});
+                my $obj = bless({try => $try_block}, 'Sidef::Types::Block::Try');
 
                 $self->parse_whitespace(code => $opt{code});
 
-                my $catch_block;
-
                 if (/\Gcatch\h*(?=\{)/gc) {
-                    $catch_block = $self->parse_block(code => $opt{code}, with_vars => 1);
+                    $obj->{catch} = $self->parse_block(code => $opt{code}, with_vars => 1);
                 }
 
-                return bless {try => $try_block, catch => $catch_block}, 'Sidef::Types::Block::Try';
+                return $obj;
             }
 
             # "gather/take" construct
