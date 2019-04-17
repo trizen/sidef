@@ -1,0 +1,23 @@
+#!/usr/bin/ruby
+
+var ok_block = {|z|
+    "ok -- #{z}"
+}
+
+assert_eq((ok_block \\ { "error" })(1), "ok -- 1")
+assert_eq((nil \\ {|x| "ok -- #{x}" })(2), "ok -- 2")
+assert_eq(({ "ok -- #{_}" } \\ { "error" })(3), "ok -- 3")
+
+assert_eq(({|x| x + 1 })(42), 43)
+assert_eq({|x| x + 1 }(42), 43)
+
+assert_eq((true ? func(x){ x.inc } : func(x){ x.dec })(42), 43)
+assert_eq((false ? func(x){ x.inc } : func(x){ x.dec })(42), 41)
+
+assert_eq(func(x){ x.inc } \\ func(x){ x.dec } -> call(42), 43)
+assert_eq(nil \\ func(x){ x.dec } -> call(42), 41)
+
+# Currently, this doesn't work
+# assert_eq(true ? func(x){ x.inc } : func(x){ x.dec } -> call(42), 43)
+
+say "** Test passed!"

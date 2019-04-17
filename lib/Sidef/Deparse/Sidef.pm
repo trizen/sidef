@@ -602,6 +602,10 @@ package Sidef::Deparse::Sidef {
                 my $method = $call->{method};
 
                 if (defined $method and $method eq 'call' and exists $call->{arg}) {
+                    if (substr($code, 0, 1) eq '(' and substr($code, -1) eq ')') {
+                        $code = "($code)";
+                    }
+
                     undef $method;
                 }
 

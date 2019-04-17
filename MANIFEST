@@ -720,6 +720,7 @@ scripts/Tests/escape_unescape.sf
 scripts/Tests/euler_and_bernoulli_numbers.sf
 scripts/Tests/eval.sf
 scripts/Tests/execute_system_command.sf
+scripts/Tests/expression_call.sf
 scripts/Tests/extreme_floating_point_values.sf
 scripts/Tests/fforks.sf
 scripts/Tests/fibonacci_closed_solution.sf
