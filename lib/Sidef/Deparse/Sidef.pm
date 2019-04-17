@@ -659,11 +659,11 @@ package Sidef::Deparse::Sidef {
 
                 if (exists $call->{keyword}) {
                     if ($code ne '') {
-                        if (substr($code, 0, 1) ne '(' or substr($code, -1) ne ')') {
-                            $code .= ' ';
+                        if (substr($code, 0, 1) eq '(' and substr($code, -1) eq ')') {
+                            $code = "($code)";
                         }
                         else {
-                            $code = "($code)";
+                            $code .= ' ';
                         }
                     }
                     $code .= $call->{keyword};

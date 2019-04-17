@@ -513,6 +513,7 @@ package Sidef::Types::Block::Block {
     sub for {
         my ($self, @objs) = @_;
         _iterate($self, @objs);
+        $self;
     }
 
     *each    = \&for;
