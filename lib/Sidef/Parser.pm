@@ -128,7 +128,6 @@ package Sidef::Parser {
                   if\b                                       (?{ bless({}, 'Sidef::Types::Block::If') })
                 | with\b                                     (?{ bless({}, 'Sidef::Types::Block::With') })
                 | while\b                                    (?{ bless({}, 'Sidef::Types::Block::While') })
-                | try\b                                      (?{ Sidef::Types::Block::Try->new })
                 | foreach\b                                  (?{ bless({}, 'Sidef::Types::Block::ForEach') })
                 | for\b                                      (?{ bless({}, 'Sidef::Types::Block::For') })
                 | return\b                                   (?{ state $x = bless({}, 'Sidef::Types::Block::Return') })
@@ -242,7 +241,6 @@ package Sidef::Parser {
                   while
                   given
                   with
-                  try
                   continue
                   import
                   include
@@ -1899,6 +1897,21 @@ package Sidef::Parser {
                 return bless({block => $block}, 'Sidef::Types::Block::Loop');
             }
 
+            # "try/catch" construct
+            if (/\Gtry\h*(?=\{)/gc) {
+                my $try_block = $self->parse_block(code => $opt{code});
+
+                $self->parse_whitespace(code => $opt{code});
+
+                my $catch_block;
+
+                if (/\Gcatch\h*(?=\{)/gc) {
+                    $catch_block = $self->parse_block(code => $opt{code}, with_vars => 1);
+                }
+
+                return bless {try => $try_block, catch => $catch_block}, 'Sidef::Types::Block::Try';
+            }
+
             # "gather/take" construct
             if (/\Ggather\h*(?=\{)/gc) {
                 my $obj = bless({}, 'Sidef::Types::Block::Gather');
@@ -3345,15 +3358,6 @@ package Sidef::Parser {
                 if (ref($obj) eq 'Sidef::Types::Block::Do' and /\G\h*while\b/gc) {
                     my $arg = $self->parse_obj(code => $opt{code});
                     push @{$struct{$self->{class}}[-1]{call}}, {keyword => 'while', arg => [$arg]};
-                }
-
-                # Try-catch construct
-                if (ref($obj) eq 'Sidef::Types::Block::Try') {
-                    $self->parse_whitespace(code => $opt{code});
-                    if (/\G\h*catch\b/gc) {
-                        my $arg = $self->parse_obj(code => $opt{code});
-                        push @{$struct{$self->{class}}[-1]{call}}, {method => 'catch', arg => [$arg]};
-                    }
                 }
 
                 # Parse array and hash fetchers ([...] and {...})

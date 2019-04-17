@@ -508,6 +508,13 @@ package Sidef::Deparse::Sidef {
         elsif ($ref eq 'Sidef::Types::Block::Loop') {
             $code = 'loop ' . $self->deparse_expr({self => $obj->{block}});
         }
+        elsif ($ref eq 'Sidef::Types::Block::Try') {
+            $code = 'try ' . $self->deparse_expr({self => $obj->{try}});
+
+            if (defined($obj->{catch})) {
+                $code .= ' catch ' . $self->deparse_expr({self => $obj->{catch}});
+            }
+        }
         elsif ($ref eq 'Sidef::Types::Block::If') {
             foreach my $i (0 .. $#{$obj->{if}}) {
                 $code .= ($i == 0 ? 'if' : 'elsif');

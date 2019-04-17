@@ -850,6 +850,15 @@ package Sidef::Optimizer {
                 $obj->{block}{code} = {$self->optimize($obj->{block}{code})};
             }
         }
+        elsif ($ref eq 'Sidef::Types::Block::Try') {
+            if ($addr{refaddr($obj)}++) {
+                ## ok
+            }
+            else {
+                $obj->{try}{code}   = {$self->optimize($obj->{try}{code})};
+                $obj->{catch}{code} = {$self->optimize($obj->{catch}{code})} if defined($obj->{catch});
+            }
+        }
         elsif ($ref eq 'Sidef::Types::Block::BlockInit') {
             if ($addr{refaddr($obj)}++) {
                 ## ok

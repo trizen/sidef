@@ -1320,7 +1320,12 @@ HEADER
             $code = "do{ push \@_$raddr," . $self->deparse_args($obj->{expr}) . "; \$_$raddr\[-1] }";
         }
         elsif ($ref eq 'Sidef::Types::Block::Try') {
-            $code = $ref . '->new';
+            $code =
+                $ref
+              . '->new->try('
+              . $self->deparse_expr({self => $obj->{try}})
+              . ')->catch('
+              . (defined($obj->{catch}) ? $self->deparse_expr({self => $obj->{catch}}) : '') . ')';
         }
         elsif ($ref eq 'Sidef::Variable::Ref') {
             ## ok

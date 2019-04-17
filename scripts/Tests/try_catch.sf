@@ -53,4 +53,13 @@ const y = try {
 assert_eq(Sys.ref(y), 'Sidef::Types::Number::Number')
 assert_eq(y, 3)
 
+assert_eq(try { 42 }, 42)
+assert_eq(try { die -1 }, nil)
+
+[1,2,3].map {
+    var n = _
+    assert_eq(try { assert_eq(_, n); 42+_ }, 42+n)
+    assert_eq(try { die 1 } catch { _+42 }, 42+n)
+}
+
 say "** Test passed!"

@@ -8,13 +8,13 @@ package Sidef::Types::Block::Try {
     }
 
     sub try {
-        my ($self, $code) = @_;
+        my ($self, $block) = @_;
 
         my $error = 0;
         local $SIG{__WARN__} = sub { $self->{type} = 'warning'; $self->{msg} = $_[0]; $error = 1 };
         local $SIG{__DIE__}  = sub { $self->{type} = 'error';   $self->{msg} = $_[0]; $error = 1 };
 
-        $self->{val} = [eval { $code->run }];
+        $self->{val} = [eval { $block->run }];
 
         if ($@ || $error) {
             $self->{catch} = 1;
@@ -24,14 +24,17 @@ package Sidef::Types::Block::Try {
     }
 
     sub catch {
-        my ($self, $code) = @_;
+        my ($self, $block) = @_;
 
-        my @ret = (
-                   $self->{catch}
-                   ? $code->run(Sidef::Types::String::String->new($self->{type}),
-                                Sidef::Types::String::String->new($self->{msg} =~ s/^\[.*?\]\h*//r)->chomp)
-                   : @{$self->{val}}
-                  );
+        my @ret;
+
+        if (defined($block) and $self->{catch}) {
+            @ret = $block->run(Sidef::Types::String::String->new($self->{type}),
+                               Sidef::Types::String::String->new($self->{msg} =~ s/^\[.*?\]\h*//r)->chomp);
+        }
+        else {
+            @ret = @{$self->{val}};
+        }
 
         wantarray ? @ret : $ret[-1];
     }
