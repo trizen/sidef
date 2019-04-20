@@ -409,10 +409,11 @@ package Sidef::Types::Set::Bag {
         my %new;
         foreach my $key (CORE::keys(%$self)) {
 
-            my $elem  = $self->{$key};
-            my $value = $block->run($elem->{value});
+            my $elem = $self->{$key};
 
-            ($new{$serialize->($value)} //= {value => $value})->{count} += $elem->{count};
+            foreach my $value ($block->run($elem->{value})) {
+                ($new{$serialize->($value)} //= {value => $value})->{count} += $elem->{count};
+            }
         }
 
         bless \%new, ref($self);
@@ -426,10 +427,11 @@ package Sidef::Types::Set::Bag {
         my %new;
         foreach my $key (CORE::keys(%$self)) {
 
-            my $elem  = $self->{$key};
-            my $value = $block->run(@{$elem->{value}});
+            my $elem = $self->{$key};
 
-            ($new{$serialize->($value)} //= {value => $value})->{count} += $elem->{count};
+            foreach my $value ($block->run(@{$elem->{value}})) {
+                ($new{$serialize->($value)} //= {value => $value})->{count} += $elem->{count};
+            }
         }
 
         bless \%new, ref($self);

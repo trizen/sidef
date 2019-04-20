@@ -61,6 +61,8 @@ assert_eq(Set(12, 3, 4, 2, 4).to_bag, Bag(2, 3, 4, 12))
 assert_eq(Set(12, 3, 4, 2, 4).to_bag.to_set, Set(2, 3, 4, 12))
 assert_eq(Set(12, 3, 4, 2, 4).to_bag.to_set.sort, [2, 3, 4, 12])
 
+assert_eq(Set(1, 2, 3, 4).map { (_, _**2) }, Set(1, 2, 3, 4, 9, 16))
+
 do {
     var a = Set("John", "Serena", "Bob", "Mary", "Serena")
     var b = Set("Jim", "Mary", "John", "Jim", "Bob")

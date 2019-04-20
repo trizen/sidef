@@ -151,8 +151,9 @@ package Sidef::Types::Set::Set {
 
         my %new;
         foreach my $key (CORE::keys(%$self)) {
-            my $value = $block->run($self->{$key});
-            $new{$serialize->($value)} = $value;
+            foreach my $value ($block->run($self->{$key})) {
+                $new{$serialize->($value)} = $value;
+            }
         }
 
         bless \%new, ref($self);
@@ -165,8 +166,9 @@ package Sidef::Types::Set::Set {
 
         my %new;
         foreach my $key (CORE::keys(%$self)) {
-            my $value = $block->run(@{$self->{$key}});
-            $new{$serialize->($value)} = $value;
+            foreach my $value ($block->run(@{$self->{$key}})) {
+                $new{$serialize->($value)} = $value;
+            }
         }
 
         bless \%new, ref($self);

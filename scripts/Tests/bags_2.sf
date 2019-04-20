@@ -55,6 +55,8 @@ assert_eq(Bag(42, 99, 12, 17).map {|n| n+1 }.sort, [13, 18, 43, 100])
 assert_eq(Bag(42, 99, 13, 20).grep{.is_even}, Bag(42, 20))
 assert_eq(Bag(42, 99, 13, 20).grep{.is_even}.sort, [20, 42])
 
+assert_eq(Bag(1, 2, 3, 4).map { (_, _**2) }, Bag(1, 1, 2, 3, 4, 4, 9, 16))
+
 do {
     var a = Bag("John", "Serena", "Bob", "Mary", "Serena")
     var b = Bag("Jim", "Mary", "John", "Jim", "Bob")
