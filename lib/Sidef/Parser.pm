@@ -754,7 +754,7 @@ package Sidef::Parser {
 
             push @vars, $declaration;
 
-            (defined($end_delim) && (/\G\h*,\h*/gc || /\G\h*(?=\R)/gc)) || last;
+            (defined($end_delim) && (/\G\h*,\h*/gc || /\G\h*(?:#.*)?+(?=\R)/gc)) || last;
 
             $self->parse_whitespace(code => $opt{code});
         }
@@ -921,7 +921,7 @@ package Sidef::Parser {
             }
 
             push @var_objs, $obj;
-            (defined($end_delim) && (/\G\h*,\h*/gc || /\G\h*(?=\R)/gc)) || last;
+            (defined($end_delim) && (/\G\h*,\h*/gc || /\G\h*(?:#.*)?+(?=\R)/gc)) || last;
 
             if ($opt{params} and $obj->{slurpy}) {
                 $self->fatal_error(
