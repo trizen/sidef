@@ -535,6 +535,32 @@ HEADER
              $class->{name}  || (Sidef::normalize_type(ref($class)) . refaddr($class)));
     }
 
+    sub _dump_static_var {
+        my ($self, $obj, $refaddr) = @_;
+
+        my $info = $obj->{var};
+
+        if ($info->{array}) {
+            $self->load_mod("Sidef::Types::Array::Array");
+        }
+        elsif ($info->{hash}) {
+            $self->load_mod("Sidef::Types::Hash::Hash");
+        }
+
+        "state\$$obj->{name}$refaddr=do{my \@data = ("
+          . (defined($obj->{expr}) ? $self->deparse_script($obj->{expr}) : '') . ');'
+          . (
+             $info->{slurpy}
+             ? (
+                $info->{array}
+                ? "bless(\\\@data, 'Sidef::Types::Array::Array')"
+                : "bless({\@data}, 'Sidef::Types::Hash::Hash')"
+               )
+             : "\$data[0]"
+            )
+          . "}";
+    }
+
     sub deparse_generic {
         my ($self, $before, $sep, $after, @args) = @_;
         $before . join(
@@ -770,36 +796,11 @@ HEADER
             my $name  = "const_$obj->{name}" . $refaddr;
             my $value = '(' . $name . ')';
 
-            my $info = $obj->{var};
-
-            if ($info->{array}) {
-                $self->load_mod("Sidef::Types::Array::Array");
-            }
-            elsif ($info->{hash}) {
-                $self->load_mod("Sidef::Types::Hash::Hash");
-            }
-
             if (not exists $obj->{inited}) {
                 $obj->{inited} = 1;
 
                 # XXX: this is known to cause segmentation faults in perl-5.18.* and perl-5.20.* when used in a class
-                $code =
-                  "sub $name(){state\$_$refaddr"
-                  . (  '='
-                     . ($info->{hash}         ? '{'                                 : '[') . 'do{'
-                     . (defined($obj->{expr}) ? $self->deparse_script($obj->{expr}) : '') . '}'
-                     . ($info->{hash}         ? '}'                                 : ']'))
-                  . ';'
-                  . (
-                     $info->{slurpy}
-                     ? (
-                        $info->{array}
-                        ? "bless(\$_$refaddr, 'Sidef::Types::Array::Array')"
-                        : "bless(\$_$refaddr, 'Sidef::Types::Hash::Hash')"
-                       )
-                     : "\$_$refaddr\->[0]"
-                    )
-                  . "}; ($name)";
+                $code = "sub $name(){" . $self->_dump_static_var($obj, $refaddr) . "}; ($name)";
 
                 # Use dynamical constants with perl>=5.022
                 if ($] >= 5.022 or $self->{class} != $self->{current_block}) {
@@ -819,8 +820,7 @@ HEADER
             my $value = "\$$name";
             if (not exists $obj->{inited}) {
                 $obj->{inited} = 1;
-                $code =
-                  "(state\$$name" . (defined($obj->{expr}) ? ('=do{' . $self->deparse_script($obj->{expr}) . '}') : '') . ')';
+                $code = '(' . $self->_dump_static_var($obj, $refaddr) . ')';
             }
             else {
                 $code = $value;
