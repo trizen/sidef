@@ -121,13 +121,13 @@ package Sidef::Types::Array::Array {
 
         $operator = "$operator" if ref($operator);
 
-        my ($x, $beg) = (
-                         defined($initial)
-                         ? ($initial, 0)
-                         : ($self->[0], 1)
-                        );
+        my ($from, $x) = (
+                          defined($initial)
+                          ? (0, $initial)
+                          : (1, $self->[0])
+                         );
 
-        foreach my $i ($beg .. $#$self) {
+        foreach my $i ($from .. $#$self) {
             $x = $x->$operator($self->[$i]);
         }
         $x;
@@ -2142,13 +2142,13 @@ package Sidef::Types::Array::Array {
 
         if (ref($obj) eq 'Sidef::Types::Block::Block') {
 
-            my ($beg, $x) = (
-                             defined($initial)
-                             ? (0, $initial)
-                             : (1, $self->[0])
-                            );
+            my ($from, $x) = (
+                              defined($initial)
+                              ? (0, $initial)
+                              : (1, $self->[0])
+                             );
 
-            foreach my $i ($beg .. $#$self) {
+            foreach my $i ($from .. $#$self) {
                 $x = $obj->run($x, $self->[$i]);
             }
 
@@ -2163,14 +2163,14 @@ package Sidef::Types::Array::Array {
     sub map_reduce {
         my ($self, $obj, $initial) = @_;
 
-        my ($beg, $x) = (
-                         defined($initial)
-                         ? (0, $initial)
-                         : (1, $self->[0])
-                        );
+        my ($from, $x) = (
+                          defined($initial)
+                          ? (0, $initial)
+                          : (1, $self->[0])
+                         );
 
         my @list = ($x);
-        foreach my $i ($beg .. $#$self) {
+        foreach my $i ($from .. $#$self) {
             $x = $obj->run($x, $self->[$i]);
             CORE::push(@list, $x);
         }
