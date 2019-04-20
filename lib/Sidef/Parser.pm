@@ -1232,6 +1232,7 @@ package Sidef::Parser {
                                                   type    => $type,
                                                   private => 1,
                                                  );
+                my $line = $self->{line};
 
                 foreach my $var (@{$vars}) {
                     my $name = $var->{name};
@@ -1275,7 +1276,7 @@ package Sidef::Parser {
                         name  => $name,
                         count => 0,
                         type  => $type,
-                        line  => $self->{line},
+                        line  => $line,
                       };
 
                     return $var;
@@ -1308,7 +1309,7 @@ package Sidef::Parser {
                         name  => $name,
                         count => 0,
                         type  => $type,
-                        line  => $self->{line},
+                        line  => $line,
                       };
                 }
 
