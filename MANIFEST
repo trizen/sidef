@@ -934,6 +934,7 @@ scripts/Tests/sierpinski_sidef.sf
 scripts/Tests/sierpinski_triangle_90.sf
 scripts/Tests/sierpinski_x.sf
 scripts/Tests/slurpy_const.sf
+scripts/Tests/slurpy_define.sf
 scripts/Tests/slurpy_static.sf
 scripts/Tests/smart_match_operator.sf
 scripts/Tests/sort_disjoint_sublist.sf

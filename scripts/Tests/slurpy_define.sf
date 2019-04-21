@@ -1,0 +1,20 @@
+#!/usr/bin/ruby
+
+define (
+    *a = (1,2,3),
+    :b = (a => 1, b => 2),
+)
+
+assert_eq(a, [1,2,3])
+assert_eq(b, Hash(a => 1, b => 2))
+
+a[0] = 99
+b{:b} = 42
+
+assert_eq(a, [99, 2, 3])
+assert_eq(b, Hash(a => 1, b => 42))
+
+define foo = (42, 99)
+assert_eq(foo, 42)
+
+say "** Test passed!"

@@ -788,7 +788,7 @@ HEADER
             my $value = '(' . $self->{environment_name} . '::' . $name . ')';
             if (not exists $obj->{inited}) {
                 $obj->{inited} = 1;
-                $self->top_add('use constant ' . $name . '=>do{' . $self->deparse_script($obj->{expr}) . '};');
+                $self->top_add('use constant ' . $name . '=>do{' . $self->_dump_static_var($obj, $refaddr) . '};');
             }
             $code = $value;
         }
@@ -799,10 +799,10 @@ HEADER
             if (not exists $obj->{inited}) {
                 $obj->{inited} = 1;
 
-                # XXX: this is known to cause segmentation faults in perl-5.18.* and perl-5.20.* when used in a class
                 $code = "sub $name(){" . $self->_dump_static_var($obj, $refaddr) . "}; ($name)";
 
                 # Use dynamical constants with perl>=5.022
+                # XXX: this is known to cause segmentation faults in perl-5.18.* and perl-5.20.* when used in a class
                 if ($] >= 5.022 or $self->{class} != $self->{current_block}) {
 
                     $code = "my $code";
