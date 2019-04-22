@@ -1,0 +1,19 @@
+#!/usr/bin/ruby
+
+func sierpinski_triangle(n) -> Array {
+  var triangle = ['*']
+  { |i|
+    var sp = (' ' * pow(2, i));
+    triangle = (triangle.map {|x| sp + x + sp} +
+                triangle.map {|x| x + ' ' + x})
+  } * n
+  triangle
+}
+
+class Array {
+    method display_2d {
+        say self.join("\n")
+    }
+}
+
+sierpinski_triangle(3).display_2d

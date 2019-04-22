@@ -865,13 +865,7 @@ HEADER
         }
         elsif ($ref eq 'Sidef::Types::Block::BlockInit') {
             if ($addr{$refaddr}++) {
-                $code = "state\$_$refaddr=" . q{Sidef::Types::Block::Block->new(code=>__SUB__,type=>'block'};
-
-                if (exists($obj->{init_vars}) and @{$obj->{init_vars}{vars}}) {
-                    $code .= ',' . $self->_dump_var_attr(@{$obj->{init_vars}{vars}});
-                }
-
-                $code .= ')';
+                $code = "(\$block$refaddr)";
             }
             else {
                 if (%{$obj}) {
@@ -902,7 +896,11 @@ HEADER
                             }
                         }
 
-                        ## TODO: find a simpler and more elegant solution
+                        if ($is_class and $self->{ref_class}) {
+                            push @{$self->{function_declarations}}, [$refaddr, "", $self->{depth} // 0];
+                        }
+
+                        # TODO: find a simpler and more elegant solution
                         if ($is_class and not $self->{ref_class}) {
 
                             my @self_class_vars = @{$self->{class_vars}};
@@ -983,7 +981,9 @@ HEADER
                         }
                     }
                     else {
-                        $code = 'Sidef::Types::Block::Block->new(';
+                        push @{$self->{function_declarations}},
+                          [$self->{function}, "my \$block$refaddr;", $self->{depth} // 0];
+                        $code = "\$block$refaddr=" . 'Sidef::Types::Block::Block->new(';
                     }
 
                     if (not $is_class) {

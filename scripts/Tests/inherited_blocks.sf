@@ -1,0 +1,37 @@
+#!/usr/bin/ruby
+
+class Foo() {
+
+    has a = {|n| n+42 }
+    has b = {|n| n+99 }
+
+    method b_block {
+        b
+    }
+}
+
+class Bar < Foo {
+    method a_block {
+        self.a
+    }
+}
+
+assert_eq(Foo().a()(42), 42+42)
+assert_eq(Bar().a()(43), 43+42)
+
+var foo_obj = Foo()
+var bar_obj = Bar()
+
+assert_eq(bar_obj.a, foo_obj.a)
+assert_eq(bar_obj.b, foo_obj.b)
+
+assert_eq(bar_obj.a_block, foo_obj.a)
+assert_eq(bar_obj.b_block, foo_obj.b)
+assert_eq(foo_obj.b_block, bar_obj.b)
+
+assert_eq(bar_obj.b_block()(1), 100)
+assert_eq(foo_obj.b_block()(1), 100)
+
+assert_eq(bar_obj.a_block()(10), 52)
+
+say "** Test passed!"
