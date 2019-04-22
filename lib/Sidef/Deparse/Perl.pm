@@ -981,8 +981,7 @@ HEADER
                         }
                     }
                     else {
-                        push @{$self->{function_declarations}},
-                          [$self->{function}, "my \$block$refaddr;", $self->{depth} // 0];
+                        push @{$self->{function_declarations}}, [$refaddr, "my \$block$refaddr;", $self->{depth} // 0];
                         $code = "\$block$refaddr=" . 'Sidef::Types::Block::Block->new(';
                     }
 
