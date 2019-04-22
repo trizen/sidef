@@ -786,8 +786,8 @@ HEADER
         elsif ($ref eq 'Sidef::Variable::Define') {
             my $name  = $obj->{name} . $refaddr;
             my $value = '(' . $self->{environment_name} . '::' . $name . ')';
-            if (not exists $obj->{inited}) {
-                $obj->{inited} = 1;
+
+            if (not $addr{$refaddr}++) {
                 $self->top_add('use constant ' . $name . '=>do{' . $self->_dump_static_var($obj, $refaddr) . '};');
             }
             $code = $value;
@@ -796,8 +796,10 @@ HEADER
             my $name  = "const_$obj->{name}" . $refaddr;
             my $value = '(' . $name . ')';
 
-            if (not exists $obj->{inited}) {
-                $obj->{inited} = 1;
+            if ($addr{$refaddr}++) {
+                $code = $value;
+            }
+            else {
 
                 $code = "sub $name(){" . $self->_dump_static_var($obj, $refaddr) . "}; ($name)";
 
@@ -811,19 +813,16 @@ HEADER
                     $] < 5.025002 && $self->top_add(q{use feature 'lexical_subs'; no warnings 'experimental::lexical_subs';});
                 }
             }
-            else {
-                $code = $value;
-            }
         }
         elsif ($ref eq 'Sidef::Variable::Static') {
             my $name  = $obj->{name} . $refaddr;
             my $value = "\$$name";
-            if (not exists $obj->{inited}) {
-                $obj->{inited} = 1;
-                $code = '(' . $self->_dump_static_var($obj, $refaddr) . ')';
+
+            if ($addr{$refaddr}++) {
+                $code = $value;
             }
             else {
-                $code = $value;
+                $code = '(' . $self->_dump_static_var($obj, $refaddr) . ')';
             }
         }
         elsif ($ref eq 'Sidef::Variable::ConstInit') {
@@ -1433,6 +1432,7 @@ HEADER
             $code = $self->make_constant($ref, 'new', "Dir$refaddr", $self->_dump_string(${$obj}));
         }
         elsif ($ref eq 'Sidef::Meta::Module') {
+            ## local $self->{depth} = -999_999_999;
             $code = substr($self->deparse_bare_block($obj->{block}{code}), 1, -1);
         }
         elsif ($ref eq 'Sidef::Meta::Included') {
