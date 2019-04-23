@@ -46,4 +46,24 @@ assert_eq(r.prod(:sqrt), r.prod { .sqrt })
 assert_eq((5..4).sum,  0)
 assert_eq((5..4).prod, 1)
 
+# Auto-conversions
+do {
+    var arr = ["12", "42"]
+
+    assert_eq(arr.prod, 12*42)
+    assert_eq(arr.sum, 12+42)
+
+    assert_eq(arr, ["12", "42"])
+}
+
+# gcd/lcm
+do {
+    var arr = ["48", "120", "42"]
+
+    assert_eq(arr.lcm, lcm(42, 48, 120))
+    assert_eq(arr.gcd, gcd(42, 48, 120))
+
+    assert_eq(arr, ["48", "120", "42"])
+}
+
 say "** Test passed!"

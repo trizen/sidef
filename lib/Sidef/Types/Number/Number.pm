@@ -5275,23 +5275,26 @@ package Sidef::Types::Number::Number {
     }
 
     sub sum {
-        @_ || return ZERO;
-        _valid(\(@_));
-        bless \_binsplit([map { $$_ } @_], \&__add__);
+        my (@vals) = @_;
+        @vals || return ZERO;
+        _valid(\(@vals));
+        bless \_binsplit([map { $$_ } @vals], \&__add__);
     }
 
     sub prod {
-        @_ || return ONE;
-        _valid(\(@_));
-        bless \_binsplit([map { $$_ } @_], \&__mul__);
+        my (@vals) = @_;
+        @vals || return ONE;
+        _valid(\(@vals));
+        bless \_binsplit([map { $$_ } @vals], \&__mul__);
     }
 
     sub max {
-        _valid(\(@_));
+        my (@vals) = @_;
+        _valid(\(@vals));
 
-        my $max = shift(@_);
+        my $max = shift(@vals);
 
-        foreach my $curr (@_) {
+        foreach my $curr (@vals) {
             if ((__cmp__($$curr, $$max) // return undef) > 0) {
                 $max = $curr;
             }
@@ -5301,11 +5304,12 @@ package Sidef::Types::Number::Number {
     }
 
     sub min {
-        _valid(\(@_));
+        my (@vals) = @_;
+        _valid(\(@vals));
 
-        my $min = shift(@_);
+        my $min = shift(@vals);
 
-        foreach my $curr (@_) {
+        foreach my $curr (@vals) {
             if ((__cmp__($$curr, $$min) // return undef) < 0) {
                 $min = $curr;
             }
@@ -8666,15 +8670,16 @@ package Sidef::Types::Number::Number {
     }
 
     sub gcd {
-        _valid(\(@_));
+        my (@vals) = @_;
+        _valid(\(@vals));
 
-        @_ || return ZERO;
-        @_ == 1 and return $_[0];
+        @vals || return ZERO;
+        @vals == 1 and return $vals[0];
 
         my $r = Math::GMPz::Rmpz_init();
 
-        if (@_ > 2) {
-            my @terms = map { _any2mpz($$_) // goto &nan } @_;
+        if (@vals > 2) {
+            my @terms = map { _any2mpz($$_) // goto &nan } @vals;
 
             Math::GMPz::Rmpz_set($r, shift(@terms));
 
@@ -8686,7 +8691,7 @@ package Sidef::Types::Number::Number {
             return bless \$r;
         }
 
-        my ($x, $y) = @_;
+        my ($x, $y) = @vals;
 
         $x = _any2mpz($$x) // goto &nan;
         $y = _any2mpz($$y) // goto &nan;
@@ -8720,17 +8725,18 @@ package Sidef::Types::Number::Number {
     }
 
     sub lcm {
-        _valid(\(@_));
+        my (@vals) = @_;
+        _valid(\(@vals));
 
-        @_ or return ZERO;
-        @_ == 1 and return $_[0];
+        @vals or return ZERO;
+        @vals == 1 and return $vals[0];
 
-        if (@_ > 2) {
-            my @terms = map { _any2mpz($$_) // goto &nan } @_;
+        if (@vals > 2) {
+            my @terms = map { _any2mpz($$_) // goto &nan } @vals;
             return bless \_binsplit(\@terms, \&__lcm__);
         }
 
-        my ($x, $y) = @_;
+        my ($x, $y) = @vals;
 
         $x = _any2mpz($$x) // goto &nan;
         $y = _any2mpz($$y) // goto &nan;

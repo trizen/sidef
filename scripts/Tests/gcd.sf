@@ -1,11 +1,12 @@
 #!/usr/bin/ruby
 
 func gcd(a,b) {
-    b.is_zero ? abs(a) : gcd(b, a % b);
+    b.is_zero ? abs(a) : gcd(b, a % b)
 }
 
 for (12..15) {     |x|
     for (29..30) { |y|
-        say "gcd(#{x}, #{y}) == #{gcd(x, y)}";
+        say "gcd(#{x}, #{y}) == #{gcd(x, y)}"
+        assert_eq(gcd(x, y), [x,y].gcd)
     }
 }
