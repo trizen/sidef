@@ -13,19 +13,36 @@ package Sidef::Types::Block::Block {
       q{""}   => sub {
         my ($self) = @_;
 
-        my $name = Sidef::normalize_type($self->{name});
+        my $name = $self->_name;
         my $addr = Scalar::Util::refaddr($self);
 
-        my @vars = map { ($_->{slurpy} ? '*' : '') . Sidef::normalize_type($_->{name}) . ($_->{has_value} ? '=(nil)' : '') }
-          @{$_[0]->{vars}};
+        my @vars = map {
+                (defined($_->{type}) ? (Sidef::normalize_type($_->{type}) . ' ') : '')
+              . ($_->{slurpy} ? ($_->{array} ? '*' : ':') : '')
+              . Sidef::normalize_type($_->{name})
+              . (defined($_->{subset}) ? (' < ' . Sidef::normalize_type($_->{subset})) : '')
+              . ($_->{has_value} ? ' = nil' : '')
+        } @{$self->{vars}};
 
         (
          $self->{type} eq 'block'
          ? ('{' . (@vars ? ('|' . join(',', @vars) . '|') : ''))
-         : ('func (' . join(',', @vars) . ') {')
+         : ('func (' . join(', ', @vars) . ') {')
         )
           . " #`($name|$addr) ... }";
       };
+
+    sub _name {
+        my ($self) = @_;
+        $self->{_name} //= Sidef::normalize_type(
+                                                 (
+                                                    exists($self->{class})     ? ($self->{class} . '.')
+                                                  : exists($self->{namespace}) ? ($self->{namespace} . '::')
+                                                  :                              ''
+                                                 )
+                                                 . ($self->{name} // '__FUNC__')
+                                                );
+    }
 
     sub new {
         my (undef, %opt) = @_;
@@ -231,7 +248,7 @@ package Sidef::Types::Block::Block {
             return ($method, $method->{code}->(@pos_args));
         }
 
-        my $name = Sidef::normalize_type($self->{name} // '__FUNC__');
+        my $name = $self->_name;
 
         die "[ERROR] $self->{type} `$name` does not match $name("
           . join(', ',
@@ -253,10 +270,7 @@ package Sidef::Types::Block::Block {
           . join(
             "\n    ",
             map {
-                    (exists($_->{namespace}) ? ($_->{namespace} . '::') : '')
-                  . (exists($_->{class}) ? (Sidef::normalize_type($_->{class}) . '.') : '')
-                  . Sidef::normalize_type($_->{name}) . '('
-                  . join(
+                $_->_name . '(' . join(
                     ', ',
                     map {
                             (exists($_->{slurpy}) ? '*' : '')

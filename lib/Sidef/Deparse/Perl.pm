@@ -197,7 +197,7 @@ HEADER
         }
 
         ($ref eq 'Sidef::Variable::Struct' || $ref eq 'Sidef::Variable::Subset')
-          ? ($self->_dump_class_name($obj) . '_' . refaddr($obj))
+          ? $self->_dump_class_name($obj)
           : $ref eq 'Sidef::Variable::ClassInit'
           ? (ref($obj->{name}) ? $self->_dump_class_name($obj->{name}) : $self->_dump_class_name($obj))
           : $ref eq 'Sidef::Variable::Ref'           ? 'REF'

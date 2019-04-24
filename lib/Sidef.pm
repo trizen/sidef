@@ -307,14 +307,16 @@ package Sidef {
         my ($type) = @_;
 
         if (index($type, 'Sidef::') == 0) {
-            $type = substr($type, rindex($type, '::') + 2);
-        }
-        else {
-            $type =~ s/^(?:_::)?main:://
-              or $type =~ s/^_:://;
+
+            if ($type =~ /::[0-9]+::/) {
+                $type = substr($type, $+[0]);
+            }
+            else {
+                $type = substr($type, rindex($type, '::') + 2);
+            }
         }
 
-        $type =~ s/_[0-9]{8,}\z//r;
+        $type =~ s/^main:://r;
     }
 
     sub normalize_method {
