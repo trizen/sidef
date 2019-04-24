@@ -8253,7 +8253,7 @@ package Sidef::Types::Number::Number {
         }
 
         # Support for arbitrary large integers (slow for wide ranges)
-        if ($y >= ULONG_MAX and not $HAS_PRIME_UTIL) {
+        if ($y >= ULONG_MAX and !$HAS_PRIME_UTIL) {
 
             my $prime_count = Math::Prime::Util::GMP::prime_count("$x", "$y");
 

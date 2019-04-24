@@ -300,22 +300,22 @@ package Sidef::Types::Block::Block {
         if (exists $self->{returns}) {
 
             if ($#{$self->{returns}} != $#objs) {
-                die qq{[ERROR] Wrong number of return values from $self->{type} }
-                  . (defined($self->{class}) ? Sidef::normalize_type($self->{class}) . '.' : '')
-                  . qq{$self->{name}\(): got }
-                  . @objs
+                die qq{[ERROR] Wrong number of return values from $self->{type} `}
+                  . $self->_name
+                  . "`: got "
+                  . scalar(@objs)
                   . ", but expected "
-                  . @{$self->{returns}};
+                  . scalar(@{$self->{returns}}) . "\n";
             }
 
             foreach my $i (0 .. $#{$self->{returns}}) {
                 if (not(ref($objs[$i]) eq ($self->{returns}[$i]) or UNIVERSAL::isa($objs[$i], $self->{returns}[$i]))) {
-                    die qq{[ERROR] Invalid return-type from $self->{type} }
-                      . (defined($self->{class}) ? Sidef::normalize_type($self->{class}) . '.' : '')
-                      . qq{$self->{name}\(): got `}
+                    die qq{[ERROR] Invalid return-type for value[$i] from $self->{type} `}
+                      . $self->_name
+                      . "`: got `"
                       . Sidef::normalize_type(ref($objs[$i]))
                       . qq{`, but expected `}
-                      . Sidef::normalize_type($self->{returns}[$i]) . "`";
+                      . Sidef::normalize_type($self->{returns}[$i]) . "`\n";
                 }
             }
         }
