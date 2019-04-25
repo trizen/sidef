@@ -496,7 +496,9 @@ This program is distributed in the hope that it will be
 useful, but without any warranty; without even the implied
 warranty of merchantability or fitness for a particular purpose.
 
-See http://www.perlfoundation.org/artistic_license_2_0 for more information.
+For more information, see:
+    https://github.com/trizen/sidef
+    https://www.perlfoundation.org/artistic-license-20.html
 
 EOT
                 redo MAINLOOP;
