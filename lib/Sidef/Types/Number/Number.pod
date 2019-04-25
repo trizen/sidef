@@ -2716,6 +2716,14 @@ Return the
 
 =cut
 
+=head2 numify
+
+Number.numify() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 of
 
 Number.of() -> I<Obj>

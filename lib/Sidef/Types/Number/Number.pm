@@ -835,6 +835,11 @@ package Sidef::Types::Number::Number {
         }
     }
 
+    sub numify {
+        (@_) = (${$_[0]});
+        goto &__numify__;
+    }
+
     sub __stringify__ {
         my ($x) = @_;
         goto(ref($x) =~ tr/:/_/rs);
