@@ -149,9 +149,15 @@ else {
         require Encode;
         Encode::decode_utf8($args{E});
       }
-      : defined($ARGV[0]) && (-t STDIN or -f $ARGV[0]) ? do {
+      : defined($ARGV[0]) ? do {
         $script_name = shift @ARGV;
-        read_script($script_name);
+        if ($script_name eq '-') {
+            local $/;
+            <STDIN>;
+        }
+        else {
+            read_script($script_name);
+        }
       }
       : (-t STDIN) ? do { code_interactive(); exit 0; }
       :              do { local $/;           <STDIN> };
