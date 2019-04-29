@@ -404,6 +404,24 @@ package Sidef::Types::Array::Array {
 
     *partition = \&part;
 
+    sub split {
+        my ($self, @indices) = @_;
+
+        my @parts;
+        my $prev_i = 0;
+        my $end    = $#{$self};
+
+        foreach my $i (@indices) {
+            $i = CORE::int($i);
+            $i = $end if ($i > $end);
+            $i = $end + $i + 1 if ($i < 0);
+            CORE::push(@parts, bless [@{$self}[$prev_i .. $i]]);
+            $prev_i = $i + 1;
+        }
+
+        bless \@parts;
+    }
+
     sub or {
         my ($self, $array) = @_;
 

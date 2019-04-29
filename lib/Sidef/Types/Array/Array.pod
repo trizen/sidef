@@ -1556,6 +1556,14 @@ Return the
 
 =cut
 
+=head2 split
+
+Array.split() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 ssub
 
 Array.ssub() -> I<Obj>
