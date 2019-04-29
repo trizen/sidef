@@ -174,9 +174,7 @@ package Sidef::Types::Number::Number {
 
     sub _set_uint {
         $_[1] <= 8192
-          ? exists($cache[$_[1]])
-              ? $cache[$_[1]]
-              : ($cache[$_[1]] = bless \Math::GMPz::Rmpz_init_set_ui($_[1]))
+          ? ($cache[$_[1]] //= bless \Math::GMPz::Rmpz_init_set_ui($_[1]))
           : bless \Math::GMPz::Rmpz_init_set_ui($_[1]);
     }
 
