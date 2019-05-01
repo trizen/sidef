@@ -10946,7 +10946,11 @@ package Sidef::Types::Number::Number {
 
     sub is_cube {
         my ($n) = @_;
-        __is_power__($$n, 3)
+
+        __is_int__($$n) || return Sidef::Types::Bool::Bool::FALSE;
+        $n = _any2mpz($$n) // return Sidef::Types::Bool::Bool::FALSE;
+
+        __is_power__($n, 3)
           ? Sidef::Types::Bool::Bool::TRUE
           : Sidef::Types::Bool::Bool::FALSE;
     }
