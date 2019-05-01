@@ -1574,6 +1574,16 @@ Aliases: I<scalar_sub>
 
 =cut
 
+=head2 stack
+
+Array.stack() -> I<Obj>
+
+Return the
+
+Aliases: I<stack_by>
+
+=cut
+
 =head2 subsets
 
 Array.subsets() -> I<Obj>

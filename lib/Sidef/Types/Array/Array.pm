@@ -1577,6 +1577,33 @@ package Sidef::Types::Array::Array {
 
     *group_by = \&group;
 
+    sub stack {
+        my ($self, $block) = @_;
+
+        $block //= Sidef::Types::Block::Block::IDENTITY;
+        @$self || return bless [];
+
+        my @result     = bless [$self->[0]];
+        my $prev_value = $block->run($self->[0]);
+
+        foreach my $i (1 .. $#{$self}) {
+
+            my $item       = $self->[$i];
+            my $curr_value = $block->run($item);
+
+            if (!($curr_value eq $prev_value)) {
+                CORE::push(@result, bless []);
+            }
+
+            CORE::push(@{$result[-1]}, $item);
+            $prev_value = $curr_value;
+        }
+
+        bless \@result;
+    }
+
+    *stack_by = \&stack;
+
     sub match {
         my ($self, $regex) = @_;
 
