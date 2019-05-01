@@ -1824,6 +1824,14 @@ Return the
 
 =cut
 
+=head2 is_cube
+
+Number.is_cube() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 is_ecpp_prime
 
 Number.is_ecpp_prime() -> I<Obj>

@@ -10909,6 +10909,48 @@ package Sidef::Types::Number::Number {
     *is_sqr            = \&is_square;
     *is_perfect_square = \&is_square;
 
+    sub __is_power__ {
+        my ($n, $k) = @_;
+
+        # $n is a Math::GMPz object
+        # $k is a native signed integer
+
+        # Everything is a first power
+        $k == 1 and return 1;
+
+        if (Math::GMPz::Rmpz_cmp_ui($n, 1) == 0) {
+            return 1;
+        }
+
+        # Return true when `n` is -1 and `k` is odd
+        if ($k % 2 and Math::GMPz::Rmpz_cmp_si($n, -1) == 0) {
+            return 1;
+        }
+
+        # Don't accept a non-positive power
+        # Also, when `n` is negative and `k` is even, return faster
+        if ($k <= 0 or ($k % 2 == 0 and Math::GMPz::Rmpz_sgn($n) < 0)) {
+            return 0;
+        }
+
+        # Optimization for perfect squares (thanks to Dana Jacobsen)
+        $k == 2 and return Math::GMPz::Rmpz_perfect_square_p($n);
+
+        # Return faster if not a perfect power
+        Math::GMPz::Rmpz_perfect_power_p($n) || return 0;
+
+        # Check if n = a^k, for some integer `a`, by taking the k-th root of `n`
+        state $t = Math::GMPz::Rmpz_init_nobless();
+        !!Math::GMPz::Rmpz_root($t, $n, $k);
+    }
+
+    sub is_cube {
+        my ($n) = @_;
+        __is_power__($$n, 3)
+          ? Sidef::Types::Bool::Bool::TRUE
+          : Sidef::Types::Bool::Bool::FALSE;
+    }
+
     sub is_power {
         my ($n, $k) = @_;
 
@@ -10918,47 +10960,18 @@ package Sidef::Types::Number::Number {
         if (defined $k) {
             _valid(\$k);
 
-            if (Math::GMPz::Rmpz_cmp_ui($n, 1) == 0) {
-                return Sidef::Types::Bool::Bool::TRUE;
-            }
-
             $k = _any2si($$k) // return undef;
 
-            # Everything is a first power
-            $k == 1 and return Sidef::Types::Bool::Bool::TRUE;
-
-            # Return a true value when $n=-1 and $k is odd
-            $k % 2
-              and (Math::GMPz::Rmpz_cmp_si($n, -1) == 0)
-              and return Sidef::Types::Bool::Bool::TRUE;
-
-            # Don't accept a non-positive power
-            # Also, when $n is negative and $k is even, return faster
-            if ($k <= 0 or ($k % 2 == 0 and Math::GMPz::Rmpz_sgn($n) < 0)) {
-                return Sidef::Types::Bool::Bool::FALSE;
-            }
-
-            # Optimization for perfect squares (thanks to Dana Jacobsen)
-            $k == 2
-              and return (
-                          Math::GMPz::Rmpz_perfect_square_p($n)
-                          ? Sidef::Types::Bool::Bool::TRUE
-                          : Sidef::Types::Bool::Bool::FALSE
-                         );
-
-            Math::GMPz::Rmpz_perfect_power_p($n)
-              || return Sidef::Types::Bool::Bool::FALSE;
-
-            state $t = Math::GMPz::Rmpz_init_nobless();
-            Math::GMPz::Rmpz_root($t, $n, $k)
-              ? Sidef::Types::Bool::Bool::TRUE
-              : Sidef::Types::Bool::Bool::FALSE;
+            return (
+                    __is_power__($n, $k)
+                    ? Sidef::Types::Bool::Bool::TRUE
+                    : Sidef::Types::Bool::Bool::FALSE
+                   );
         }
-        else {
-            Math::GMPz::Rmpz_perfect_power_p($n)
-              ? Sidef::Types::Bool::Bool::TRUE
-              : Sidef::Types::Bool::Bool::FALSE;
-        }
+
+        Math::GMPz::Rmpz_perfect_power_p($n)
+          ? Sidef::Types::Bool::Bool::TRUE
+          : Sidef::Types::Bool::Bool::FALSE;
     }
 
     *is_pow           = \&is_power;
