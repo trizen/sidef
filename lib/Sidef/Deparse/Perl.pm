@@ -695,15 +695,14 @@ HEADER
                           . "\$${alphaname}$refaddr\->{code}=Memoize::memoize(\$${alphaname}${refaddr}->{code});\$${alphaname}$refaddr}";
                     }
 
-                    if ($obj->{type} eq 'func' and not $obj->{is_kid}) {
+                    if ($obj->{type} eq 'func' and !$obj->{parent}) {
 
                         # Special "MAIN" function
                         if (${alphaname} eq 'MAIN') {
                             $self->top_add('require Encode;');
-                            $code .=
-                              ";Sidef::Variable::GetOpt->new([map{Encode::decode_utf8(\$_)}\@ARGV],\$${alphaname}$refaddr)";
+                            $self->{after} .=
+                              "Sidef::Variable::GetOpt->new([map{Encode::decode_utf8(\$_)}\@ARGV],\$${alphaname}$refaddr);";
                         }
-
                     }
                     elsif ($obj->{type} eq 'method') {
 
