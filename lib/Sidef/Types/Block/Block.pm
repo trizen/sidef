@@ -80,7 +80,13 @@ package Sidef::Types::Block::Block {
     sub _multiple_dispatch {
         my ($self, @args) = @_;
 
-        my @methods = ($self, exists($self->{kids}) ? @{$self->{kids}} : ());
+#<<<
+        my @methods = (
+            $self,
+            (exists($self->{kids})     ? @{$self->{kids}}  : ()),
+            (exists($self->{fallback}) ? $self->{fallback} : ())
+        );
+#>>>
 
         if (defined($self->{class}) and defined($self->{name})) {
 
@@ -111,6 +117,10 @@ package Sidef::Types::Block::Block {
 
                         if (exists($method->{kids})) {
                             push @methods, @{$method->{kids}};
+                        }
+
+                        if (exists($method->{fallback})) {
+                            push @methods, $method->{fallback};
                         }
 
                         if (--$limit == 0) {

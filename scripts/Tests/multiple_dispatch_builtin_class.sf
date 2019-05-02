@@ -1,0 +1,27 @@
+#!/usr/bin/ruby
+
+class String {
+    method hello (a, b) {
+        "hello with #{a} -- #{b}"
+    }
+
+    method hello(z) {
+        "hello with #{z}"
+    }
+
+    method lc(Num z) {
+        "lc with num #{z}"
+    }
+
+    method lc(Str f) {
+        "lc with str #{f}"
+    }
+}
+
+assert_eq("foo".hello(42), "hello with 42")
+assert_eq("foo".hello('x','y'), "hello with x -- y")
+assert_eq("FOO".lc(99), "lc with num 99")
+assert_eq("FOO".lc("zzz"), "lc with str zzz")
+assert_eq("FOO".lc, "foo")
+
+say "** Test passed!"

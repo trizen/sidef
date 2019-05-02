@@ -1588,7 +1588,9 @@ package Sidef::Parser {
                         $parent   = $var->{obj};
                         $has_kids = 1;
 
-                        push @{$var->{obj}{value}{kids}}, $obj;
+                        #~ push @{$var->{obj}{value}{kids}}, $obj;
+                        $parent->{has_kids} = 1;
+                        $obj->{parent}      = $parent;
                     }
                 }
 

@@ -842,6 +842,7 @@ scripts/Tests/multi_methods.sf
 scripts/Tests/multi_var_assignment.sf
 scripts/Tests/multiline_expressions.sf
 scripts/Tests/multiple_dispatch.sf
+scripts/Tests/multiple_dispatch_builtin_class.sf
 scripts/Tests/multiple_dispatch_inheritance_1.sf
 scripts/Tests/multiple_dispatch_inheritance_2.sf
 scripts/Tests/multiple_dispatch_inheritance_3.sf

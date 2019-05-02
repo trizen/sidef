@@ -628,6 +628,9 @@ HEADER
                 my $name      = $obj->{name};
                 my $alphaname = $obj->{name};
 
+                # Set type to `func` when the method is a kid
+                local $obj->{type} = 'func' if exists($obj->{parent});
+
                 # Check for alphanumeric name
                 if (not $obj->{name} =~ /^[^\W\d]\w*+\z/) {
                     $alphaname = '__NONANN__';    # use this name for non-alphanumeric names
@@ -652,7 +655,7 @@ HEADER
                           [$self->{function}, "my \$${alphaname}$refaddr;", $self->{depth} // 0];
 
 #<<<
-                        if ($self->{ref_class}) {
+                        if ($self->{ref_class} and !exists($obj->{parent})) {
                             push @{$self->{function_declarations}},
                               [ $self->{function},
                                 qq{state \$${alphaname}_code$refaddr = UNIVERSAL::can("\Q$self->{class_name}\E", "\Q$name\E");},
@@ -660,34 +663,22 @@ HEADER
                               ];
                         }
 #>>>
-
                         if ((my $content = $self->deparse_expr({self => $block})) ne '') {
                             $code .= "=$content";
                         }
                     }
 
-                    # Check to see if the method/function has kids (can do multiple dispatch)
-                    if (exists $obj->{value}{kids}) {
-                        chop $code;
-                        my @kids = map {
-                            local $_->{type}   = 'func';
-                            local $_->{is_kid} = 1;
-                            'do{' . $self->deparse_expr({self => $_}) . '}';
-                        } @{$obj->{value}{kids}};
-
-                        $code .= ',kids=>[' . join(',', @kids);
-
-                        if ($self->{ref_class}) {
-                            $code .= qq{,(defined(\$${alphaname}_code$refaddr)?}
-                              . qq{Sidef::Types::Block::Block->new(code=>\$${alphaname}_code$refaddr):())};
-                        }
-
-                        $code .= '])';
+                    # Check if the method/function is a kid (can do multiple dispatch)
+                    if (exists $obj->{parent}) {
+                        my $name = $self->deparse_expr({self => $obj->{parent}});
+                        $code = "do{CORE::push(\@{" . $name . "->{kids} //= []}, do{$code});$name}";
                     }
+
+                    # Check if the method is a parent and it's defined inside a buit-in class
                     elsif ($self->{ref_class}) {
                         chop $code;
-                        $code .= qq{,(defined(\$${alphaname}_code$refaddr)?(kids=>[}
-                          . qq{Sidef::Types::Block::Block->new(code=>\$${alphaname}_code$refaddr)]):()))};
+                        $code .= qq{,(defined(\$${alphaname}_code$refaddr)?(fallback=>}
+                          . qq{Sidef::Types::Block::Block->new(code=>\$${alphaname}_code$refaddr)):()))};
                     }
 
                     # Check the return value (when "-> Type" is specified)

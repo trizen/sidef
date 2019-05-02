@@ -228,12 +228,11 @@ do {
 
 do {
     func multi_greet(obj < Hi) { obj.greet }       # `Hi` is the upper limit
+    func multi_greet(Hi obj)   { obj.greet }       # `Hi` is the lower limit
 
     multi_greet(Hi("Foo"))        # ok
     multi_greet(Hello("Bar"))     # ok
     multi_greet(Hey("Baz"))       # fail: `Hey` is too evolved
-
-    func multi_greet(Hi obj) { obj.greet }        # `Hi` is the lower limit
 
     multi_greet(Hi("Foo"))        # ok
     multi_greet(Hey("Baz"))       # ok

@@ -1,66 +1,120 @@
 #!/usr/bin/ruby
 
-func fib(String n) -> String {
-    return n
+do {
+    func fib(String n) -> String {
+        return n
+    }
+
+    func fib(Number n) is cached -> Number {
+        n <= 1 ? n : (fib(n-1) + fib(n-2))
+    }
+
+    say fib("-------");
+    say fib(30);
+    say fib("-------");
+
+    assert_eq(fib(30), 832040);
 }
-
-func fib(Number n) is cached -> Number {
-    n <= 1 ? n : (fib(n-1) + fib(n-2))
-}
-
-say fib("-------");
-say fib(30);
-say fib("-------");
-
-assert_eq(fib(30), 832040);
 
 #
 ## A bit more complex test
 #
 
-subset Integer < Number  { .is_int }
-subset EvenInt < Integer { .is_even }
+do {
+    subset Integer < Number  { .is_int }
+    subset EvenInt < Integer { .is_even }
 
-var a = []
-var b = []
+    var a = []
+    var b = []
 
-func foo(String t ("abc")) {
-    a << 'expr'
-    b << t
-    say "eq expr: #{t}";
+    func foo(String t ("abc")) {
+        a << 'expr'
+        b << t
+        say "eq expr: #{t}";
+    }
+
+    func foo(i < EvenInt) {
+        a << 'even'
+        b << i
+        say "even int: #{i}"
+    }
+
+    func foo(i < Integer) {
+        a << 'int'
+        b << i
+        say "int: #{i}"
+    }
+
+    func foo(String t) {
+        a << 'str'
+        b << t
+        say "str: #{t}"
+    }
+
+    foo(42)
+    foo(43)
+    foo("abc")
+    foo("bar")
+
+    assert_eq(a, %w(even int expr str))
+    assert_eq(b, [42, 43, 'abc', 'bar'])
 }
 
-func foo(i < EvenInt) {
-    a << 'even'
-    b << i
-    say "even int: #{i}"
+do {
+    func a((0)) { 1 }
+    func a((1)) { 0 }
+
+    func a(n) is cached {
+        (n-1)*a(n-1) + a(n-2)*(n-1)**2
+    }
+
+    assert_eq(1..10 -> map(a), [0, 1, 2, 15, 92, 835, 8322, 99169, 1325960, 19966329])
 }
 
-func foo(i < Integer) {
-    a << 'int'
-    b << i
-    say "int: #{i}"
+do {
+    assert_eq(func foo(String n) {
+        "string -- #{n}"
+    }("zz"), "string -- zz")
+
+    assert_eq(func foo(Number n) {
+        "number -- #{n}"
+    }(42), "number -- 42")
+
+    assert_eq(foo("abc"), "string -- abc")
+    assert_eq(foo(99), "number -- 99")
+    assert_eq(foo("foo"), "string -- foo")
 }
 
-func foo(String t) {
-    a << 'str'
-    b << t
-    say "str: #{t}"
+do {
+    module B {
+        func a () {}
+        func b (Num n) { n && a(n-1) }
+        func a (Num n) { n && b(n-1) }
+    }
+
+    assert_eq(0, B::b(4))
 }
 
-foo(42)
-foo(43)
-foo("abc")
-foo("bar")
+do {
+    func a () { }
+    func b (Num n) { n ? (n + a(n-1)) : 0 }
+    func a (Num n) { n ? (n + b(n-1)) : 1 }
 
-assert_eq(a, %w(even int expr str))
-assert_eq(b, [42, 43, 'abc', 'bar'])
-
-func a((0)) { 1 }
-func a((1)) { 0 }
-
-func a(n) is cached {
-    (n-1)*a(n-1) + a(n-2)*(n-1)**2
+    assert_eq(10.of(a), [1, 1, 4, 6, 11, 15, 22, 28, 37, 45])
+    assert_eq(10.of(b), [0, 2, 3, 7, 10, 16, 21, 29, 36, 46])
 }
 
-assert_eq(1..10 -> map(a), [0, 1, 2, 15, 92, 835, 8322, 99169, 1325960, 19966329])
+do {
+    class Example {
+        method a (Str x) { x }
+        method b (Num n) { n ? (n + self.a(n-1)) : 0 }
+        method a (Num n) { n ? (n + self.b(n-1)) : 1 }
+    }
+
+    var obj = Example()
+
+    assert_eq(10.of { obj.a(_) }, [1, 1, 4, 6, 11, 15, 22, 28, 37, 45])
+    assert_eq(10.of { obj.b(_) } , [0, 2, 3, 7, 10, 16, 21, 29, 36, 46])
+}
+
+say "** Test passed!"
