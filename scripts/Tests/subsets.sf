@@ -396,7 +396,27 @@ do {
     }
 
     assert_eq(foo(42), "42 -- ok")
-
     failtest({ foo(42.5) }, "foo(42.5)")
     failtest({ foo(43)   }, "foo(43)")
+    failtest({ foo("string")   }, "foo('string')")
+    assert_eq(foo(12), "12 -- ok")
+}
+
+do {
+
+    subset Integer  < Number            {|x| x.is_int }
+    subset Positive < Number            {|x| x.is_pos }
+    subset Prime    < Positive, Integer {|x| x.is_prime }
+
+    func foo(n < Prime)  {
+        "#{n} -- ok"
+    }
+
+    assert_eq(foo(43), "43 -- ok")
+    failtest({ foo(43.5) }, "foo(43.5)")
+    failtest({ foo(42) }, "foo(42)")
+    failtest({ foo(-43) }, "foo(-43)")
+    failtest({ foo(-43.5) }, "foo(-43.5)")
+    failtest({ foo("string") }, "foo('string')")
+    assert_eq(foo(97), "97 -- ok")
 }
