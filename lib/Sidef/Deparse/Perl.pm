@@ -566,30 +566,26 @@ HEADER
         $code;
     }
 
-    sub localize_variables {
+    sub localize_declarations {
         my ($self, $refaddr) = @_;
 
-        # Localize variable declarations
         my $code = '';
+
+        # Localize variable declarations
         while (    exists($self->{block_declarations})
                and @{$self->{block_declarations}}
                and $self->{block_declarations}[-1][0] == $refaddr) {
             $code .= pop(@{$self->{block_declarations}})->[1];
         }
-        $code;
-    }
-
-    sub localize_functions {
-        my ($self, $refaddr) = @_;
 
         # Localize function declarations
-        my $code = '';
         while (    exists($self->{function_declarations})
                and @{$self->{function_declarations}}
                and $self->{function_declarations}[-1][0] != $refaddr) {
             $self->{depth} <= $self->{function_declarations}[-1][2] or last;
             $code .= pop(@{$self->{function_declarations}})->[1];
         }
+
         $code;
     }
 
@@ -603,8 +599,7 @@ HEADER
         my @statements = join(';', $self->deparse_script($obj->{code}));
 
         my $code = '{';
-        $code .= $self->localize_variables($refaddr);
-        $code .= $self->localize_functions($refaddr);
+        $code .= $self->localize_declarations($refaddr);
         $code . join(';', @statements) . '}';
     }
 
@@ -994,8 +989,7 @@ HEADER
 
                     my @statements = $self->deparse_script($obj->{code});
 
-                    $code .= $self->localize_variables($refaddr);
-                    $code .= $self->localize_functions($refaddr);
+                    $code .= $self->localize_declarations($refaddr);
 
                     # Make the last statement to be the return value
                     if ($is_function && @statements) {
