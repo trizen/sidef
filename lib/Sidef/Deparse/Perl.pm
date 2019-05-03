@@ -100,6 +100,7 @@ package Sidef::Deparse::Perl {
 
 use utf8;
 use ${\($] <= 5.026 ? $] : 5.026)};
+local \$| = 1;   # autoflush
 
 HEADER
 
