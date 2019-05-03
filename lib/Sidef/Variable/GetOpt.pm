@@ -51,7 +51,7 @@ package Sidef::Variable::GetOpt {
                     $value = Sidef::Types::String::String->new($value);
                 }
 
-                push @params, Sidef::Variable::NamedParam->new($key => $value,);
+                push @params, Sidef::Variable::NamedParam->new($key => $value);
             }
 
             if (defined($slurpy) and @argv) {

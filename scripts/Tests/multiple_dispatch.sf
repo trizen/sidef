@@ -117,4 +117,21 @@ do {
     assert_eq(10.of { obj.b(_) } , [0, 2, 3, 7, 10, 16, 21, 29, 36, 46])
 }
 
+do {
+    func foo(Num n) {
+        "number -- #{n}"
+    }
+
+    assert_eq(foo(99), "number -- 99")
+
+    10.times {|z|
+        func foo(Str x) {
+            "string -- #{x} -- #{z}"
+        }
+    }
+
+    assert_eq(foo(42), "number -- 42")
+    assert_eq(foo("abc"), "string -- abc -- 0")
+}
+
 say "** Test passed!"

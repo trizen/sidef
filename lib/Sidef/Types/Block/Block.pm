@@ -199,7 +199,10 @@ package Sidef::Types::Block::Block {
                         }
 
                         if (exists($var->{subset})) {
-                            UNIVERSAL::isa($var->{subset}, ref($value)) || next OUTER;
+
+                            if (UNIVERSAL::isa($var->{subset}, 'Sidef::Object::Object')) {
+                                UNIVERSAL::isa($var->{subset}, ref($value)) || next OUTER;
+                            }
 
                             if (exists($var->{where_block})) {
                                 $var->{where_block}($value) || next OUTER;
@@ -208,9 +211,8 @@ package Sidef::Types::Block::Block {
                                 $value eq $var->{where_expr} or next OUTER;
                             }
 
-                            if (exists $var->{subset_blocks}) {
-                                (List::Util::all { $_->($value) } @{$var->{subset_blocks}}) || next OUTER;
-                            }
+                            my $sub = UNIVERSAL::can($var->{subset}, '__subset_validation__');
+                            ($sub ? $sub->($value) : 1) || next OUTER;
                         }
 
                         push @pos_args, $value;
@@ -232,10 +234,6 @@ package Sidef::Types::Block::Block {
 
                         if (exists $var->{where_block}) {
                             $var->{where_block}($value) || next OUTER;
-                        }
-
-                        if (exists $var->{subset_blocks}) {
-                            (List::Util::all { $_->($value) } @{$var->{subset_blocks}}) || next OUTER;
                         }
                     }
                     elsif (exists $var->{where_expr}) {

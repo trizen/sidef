@@ -836,7 +836,7 @@ package Sidef::Parser {
                                   );
             }
 
-            my ($subset, $subset_blocks);
+            my ($subset);
             if (defined($end_delim) and m{\G<<?\h*}gc) {
                 my ($subset_name) = /\G($self->{var_name_re})/goc;
 
@@ -857,10 +857,6 @@ package Sidef::Parser {
                                        );
 
                 $subset = $obj;
-
-                if (ref($obj) eq 'Sidef::Variable::Subset' and exists($obj->{blocks})) {
-                    $subset_blocks = $obj->{blocks};
-                }
             }
 
             my ($value, $where_expr, $where_block);
@@ -899,7 +895,6 @@ package Sidef::Parser {
                              : (),
                              defined($where_block)   ? (where_block   => $where_block)   : (),
                              defined($where_expr)    ? (where_expr    => $where_expr)    : (),
-                             defined($subset_blocks) ? (subset_blocks => $subset_blocks) : (),
                             },
                             'Sidef::Variable::Variable'
                            );
@@ -1421,12 +1416,6 @@ package Sidef::Parser {
                         my $code = $name;
                         my $type = $self->parse_expr(code => \$code);
 
-                        if (ref($type) eq 'Sidef::Variable::Subset') {
-                            if (exists $type->{blocks}) {
-                                push @{$subset->{blocks}}, @{$type->{blocks}};
-                            }
-                        }
-
                         push @{$subset->{inherits}}, $type;
 
                         /\G,\h*/gc && redo;
@@ -1435,7 +1424,7 @@ package Sidef::Parser {
 
                 if (/\G(?=\{)/) {
                     my $block = $self->parse_block(code => $opt{code}, topic_var => 1);
-                    push @{$subset->{blocks}}, $block;
+                    $subset->{block} = $block;
                 }
 
                 return $subset;

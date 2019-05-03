@@ -468,30 +468,10 @@ HEADER
             map {
                     '{name=>'
                   . $self->_dump_string($_->{name})
-                  . (exists($_->{slurpy}) ? (',slurpy=>' . $_->{slurpy}) : '')
-                  . (exists($_->{ref_type}) ? (',type=>' . $self->_dump_reftype($_->{ref_type})) : '')
-                  . (
-                     (
-                      exists($_->{subset})
-                        and (exists($_->{subset}{inherits}) or ref($_->{subset}) ne 'Sidef::Variable::Subset')
-                     ) ? (',subset=>' . $self->_dump_reftype($_->{subset})) : ''
-                    )
-                  . (exists($_->{has_value}) ? (',has_value=>1') : '')
-                  . (
-                    exists($_->{subset_blocks}) ? (
-                       ',subset_blocks=>[' . join(
-                           ',',
-                           map {
-                               $self->{_subset_cache}{refaddr($_)} //=
-                                   'sub{'
-                                 . $self->_dump_sub_init_vars($_->{init_vars}{vars}[0])
-                                 . $self->deparse_generic('', ';', '', $_->{code}) . '}'
-                           } @{$_->{subset_blocks}}
-                         )
-                         . ']'
-                      )
-                    : ''
-                    )
+                  . (exists($_->{slurpy})    ? (',slurpy=>' . $_->{slurpy})                       : '')
+                  . (exists($_->{ref_type})  ? (',type=>' . $self->_dump_reftype($_->{ref_type})) : '')
+                  . (exists($_->{subset})    ? (',subset=>' . $self->_dump_reftype($_->{subset})) : '')
+                  . (exists($_->{has_value}) ? (',has_value=>1')                                  : '')
                   . (
                      exists($_->{where_block})
                      ? (',where_block=>sub{'
@@ -585,23 +565,45 @@ HEADER
         $code;
     }
 
-    sub deparse_block_with_scope {
-        my ($self, $obj) = @_;
-
-        my $refaddr = refaddr($obj);
-        local $self->{current_block} = $refaddr;
-
-        my @statements = join(';', $self->deparse_script($obj->{code}));
-
-        my $code = '{';
+    sub localize_variables {
+        my ($self, $refaddr) = @_;
 
         # Localize variable declarations
+        my $code = '';
         while (    exists($self->{block_declarations})
                and @{$self->{block_declarations}}
                and $self->{block_declarations}[-1][0] == $refaddr) {
             $code .= pop(@{$self->{block_declarations}})->[1];
         }
+        $code;
+    }
 
+    sub localize_functions {
+        my ($self, $refaddr) = @_;
+
+        # Localize function declarations
+        my $code = '';
+        while (    exists($self->{function_declarations})
+               and @{$self->{function_declarations}}
+               and $self->{function_declarations}[-1][0] != $refaddr) {
+            $self->{depth} <= $self->{function_declarations}[-1][2] or last;
+            $code .= pop(@{$self->{function_declarations}})->[1];
+        }
+        $code;
+    }
+
+    sub deparse_block_with_scope {
+        my ($self, $obj) = @_;
+
+        my $refaddr = refaddr($obj);
+        local $self->{current_block} = $refaddr;
+        local $self->{depth}         = ($self->{depth} // 0) + 1;
+
+        my @statements = join(';', $self->deparse_script($obj->{code}));
+
+        my $code = '{';
+        $code .= $self->localize_variables($refaddr);
+        $code .= $self->localize_functions($refaddr);
         $code . join(';', @statements) . '}';
     }
 
@@ -991,20 +993,8 @@ HEADER
 
                     my @statements = $self->deparse_script($obj->{code});
 
-                    # Localize function declarations
-                    while (    exists($self->{function_declarations})
-                           and @{$self->{function_declarations}}
-                           and $self->{function_declarations}[-1][0] != $refaddr) {
-                        $self->{depth} <= $self->{function_declarations}[-1][2] or last;
-                        $code .= pop(@{$self->{function_declarations}})->[1];
-                    }
-
-                    # Localize variable declarations
-                    while (    exists($self->{block_declarations})
-                           and @{$self->{block_declarations}}
-                           and $self->{block_declarations}[-1][0] == $refaddr) {
-                        $code .= pop(@{$self->{block_declarations}})->[1];
-                    }
+                    $code .= $self->localize_variables($refaddr);
+                    $code .= $self->localize_functions($refaddr);
 
                     # Make the last statement to be the return value
                     if ($is_function && @statements) {
@@ -1077,16 +1067,46 @@ HEADER
             }
         }
         elsif ($ref eq 'Sidef::Variable::Subset') {
-            if (exists($obj->{inherits}) and @{$obj->{inherits}}) {
-                my $name = $self->_get_reftype($obj);
 
-                if ($addr{$refaddr}++) {
-                    $code = "'${name}'";
+            my $name = $self->_get_reftype($obj);
+
+            if ($addr{$refaddr}++) {
+                $code = "'${name}'";
+            }
+            else {
+
+                my @parents;
+
+                if (exists $obj->{inherits}) {
+                    @parents = map { $self->_get_reftype($_) } @{$obj->{inherits}};
+                }
+
+                my $parents_check = '';
+
+                if (@parents) {
+                    $parents_check .= "foreach my \$class (qw(@parents)) {";
+                    $parents_check .= "my \$code = UNIVERSAL::can(\$class, '__subset_validation__');";
+                    $parents_check .= "(\$code ? \$code->(\@_) : 1) || return;";
+                    $parents_check .= "};";
+                }
+
+                my $subset_block = '';
+
+                if (exists($obj->{block})) {
+                    my $block = $obj->{block};
+                    $subset_block .= $self->_dump_sub_init_vars($block->{init_vars}{vars}[0]);
+                    $subset_block .= $parents_check;
+                    $subset_block .= $self->deparse_generic('', ';', '', $block->{code});
                 }
                 else {
-                    my @parents = map { $self->_get_reftype($_) } @{$obj->{inherits}};
-                    $code = qq{do{package $name {use parent qw(-norequire @parents)};'${name}'}};
+                    $subset_block = "$parents_check; 1;";
                 }
+
+                $code =
+                    "do{package $name {use parent qw(-norequire @parents);"
+                  . "my \$sub = sub { $subset_block };"
+                  . "do{ no strict 'refs'; *{__PACKAGE__ . '::' . '__subset_validation__'} = \$sub };"
+                  . "};'${name}'}";
             }
         }
         elsif ($ref eq 'Sidef::Types::Number::Number') {

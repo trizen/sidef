@@ -1,22 +1,45 @@
 #!/usr/bin/ruby
 
-var refs = []
-var funcs = [1,2,3].map {|x|
-    func foo(n) {
-        refs << foo.refaddr
-        [n, x]
+# Test localization of functions in block objects
+
+do {
+    var refs = []
+    var funcs = [1,2,3].map {|x|
+        func foo(n) {
+            refs << foo.refaddr
+            [n, x]
+        }
     }
+
+    assert_eq(
+        funcs.map { .call(1) },
+        [[1, 1], [1, 2], [1, 3]]
+    )
+
+    var t = funcs.map{.refaddr}
+
+    assert_eq(t.uniq.len, 3)
+    assert_eq(refs.uniq.len, 3)
+    assert_eq(t, refs)
 }
 
-assert_eq(
-    funcs.map { .call(1) },
-    [[1, 1], [1, 2], [1, 3]]
-)
+# Test localization of functions in non-block objects
 
-var t = funcs.map{.refaddr}
+do {
+    var arr = []
 
-assert_eq(t.uniq.len, 3)
-assert_eq(refs.uniq.len, 3)
-assert_eq(t, refs)
+    for x in (1..3) {
+         arr << func f(n) {
+            [n, x, f.refaddr, f]
+        }
+    }
+
+    var test = arr.map { .call(42) }
+
+    assert_eq(test.map{ .[0] }, [42, 42, 42])
+    assert_eq(test.map{ .[1] }, [1, 2, 3])
+    assert_eq(test.map{ .[2] }.uniq.len, 3)
+    assert_eq(test.map{ .[3] }.uniq.len, 3)
+}
 
 say "** Test passed!"

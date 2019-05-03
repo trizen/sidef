@@ -366,7 +366,7 @@ do {
 #
 
 do {
-    subset Int {.is_int}
+    subset Int      { .is_int }
     subset ShortLen { .len < 5 }
 
     func foo(a < Int)      { say a }
@@ -381,4 +381,22 @@ do {
     failtest({ foo("string") }, "foo(string)")
     failtest({ bar("string") }, "bar(string)")
     failtest({ bar([1,2,3,4,5]) }, "bar([1,2,3,4,5])")
+}
+
+#
+## Subsets without type, with inheritance
+#
+
+do {
+    subset Int        { .is_int }
+    subset Even < Int { .is_even }
+
+    func foo(n < Even) {
+        "#{n} -- ok"
+    }
+
+    assert_eq(foo(42), "42 -- ok")
+
+    failtest({ foo(42.5) }, "foo(42.5)")
+    failtest({ foo(43)   }, "foo(43)")
 }
