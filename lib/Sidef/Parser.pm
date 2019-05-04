@@ -798,6 +798,7 @@ package Sidef::Parser {
 
             my $ref_type;
             if (defined($+{type})) {
+
                 my $type = $+{type};
                 my $obj  = $self->parse_expr(code => \$type);
 
@@ -899,6 +900,10 @@ package Sidef::Parser {
                             'Sidef::Variable::Variable'
                            );
 #>>>
+
+            if (exists($opt{callback})) {
+                $opt{callback}->($obj);
+            }
 
             if (!$opt{private} and $var_name ne '') {
                 unshift @{$self->{vars}{$class_name}},
@@ -1222,68 +1227,16 @@ package Sidef::Parser {
             # Declaration of constants and static variables
             if (/\G(define|const|static)\b\h*/gc) {
                 my $type = $1;
-                my $vars = $self->parse_init_vars(
-                                                  code    => $opt{code},
-                                                  type    => $type,
-                                                  private => 1,
-                                                 );
                 my $line = $self->{line};
 
-                foreach my $var (@{$vars}) {
-                    my $name = $var->{name};
-                    if (exists($self->{keywords}{$name}) or exists($self->{built_in_classes}{$name})) {
-                        $self->fatal_error(
-                                           code  => $_,
-                                           pos   => (pos($_) - length($name)),
-                                           error => "`$name` is either a keyword or a predefined variable!",
-                                          );
-                    }
-                }
-
-                if (@{$vars} == 1 and /\G\h*=\h*/gc) {
-
-                    my $v          = $vars->[0];
-                    my $name       = $v->{name};
-                    my $class_name = $v->{class};
-
-                    my $obj = $self->parse_obj(code => $opt{code}, multiline => 1);
-
-                    $obj // $self->fatal_error(
-                                               code  => $_,
-                                               pos   => pos($_) - 2,
-                                               error => qq{expected an expression after $type "$name"},
-                                              );
-
-#<<<
-                    my $var =
-                      $type eq 'define'
-                      ? bless({name => $name, class => $class_name, expr => $obj, var => $v}, 'Sidef::Variable::Define')
-                      : $type eq 'static'
-                      ? bless({name => $name, class => $class_name, expr => $obj, var => $v}, 'Sidef::Variable::Static')
-                      : $type eq 'const'
-                      ? bless({name => $name, class => $class_name, expr => $obj, var => $v}, 'Sidef::Variable::Const')
-                      : die "[PARSER ERROR] Invalid variable type: $type";
-#>>>
-
-                    unshift @{$self->{vars}{$class_name}},
-                      {
-                        obj   => $var,
-                        name  => $name,
-                        count => 0,
-                        type  => $type,
-                        line  => $line,
-                      };
-
-                    return $var;
-                }
-
                 my @var_objs;
-                foreach my $v (@{$vars}) {
+
+                my $callback = sub {
+                    my ($v) = @_;
 
                     my $obj        = $v->{value};
                     my $name       = $v->{name};
                     my $class_name = $v->{class};
-
 #<<<
                     my $var = (
                                $type eq 'define'
@@ -1306,6 +1259,39 @@ package Sidef::Parser {
                         type  => $type,
                         line  => $line,
                       };
+                };
+
+                my $vars = $self->parse_init_vars(
+                                                  code     => $opt{code},
+                                                  type     => $type,
+                                                  private  => 1,
+                                                  callback => $callback,
+                                                 );
+
+                foreach my $var (@var_objs) {
+                    my $name = $var->{name};
+                    if (exists($self->{keywords}{$name}) or exists($self->{built_in_classes}{$name})) {
+                        $self->fatal_error(
+                                           code  => $_,
+                                           pos   => (pos($_) - length($name)),
+                                           error => "`$name` is either a keyword or a predefined variable!",
+                                          );
+                    }
+                }
+
+                if (@var_objs == 1 and /\G\h*=\h*/gc) {
+
+                    my $var = $var_objs[0];
+                    my $obj = $self->parse_obj(code => $opt{code}, multiline => 1);
+
+                    $obj // $self->fatal_error(
+                                               code  => $_,
+                                               pos   => pos($_) - 2,
+                                               error => qq{expected an expression after $type "$var->{name}"},
+                                              );
+
+                    $var->{expr} = $obj;
+                    return $var;
                 }
 
                 my $const_init = bless({vars => \@var_objs, type => $type}, 'Sidef::Variable::ConstInit');

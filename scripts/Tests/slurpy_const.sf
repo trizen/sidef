@@ -1,41 +1,52 @@
 #!/usr/bin/ruby
 
-const (
-    a = 99,
-    b = 42,
-)
+do {
+    const (
+        a = 99,
+        b = 42,
+    )
 
-assert_eq(a, 99)
-assert_eq(b, 42)
+    assert_eq(a, 99)
+    assert_eq(b, 42)
 
-const *foo = (1,2,3)
-const :bar = (a => 14, b => 15)
+    const *foo = (1,2,3)
+    const :bar = (a => 14, b => 15)
 
-assert_eq(foo, [1,2,3])
-assert_eq(bar, Hash(a => 14, b => 15))
+    assert_eq(foo, [1,2,3])
+    assert_eq(bar, Hash(a => 14, b => 15))
 
-foo[0] = 99
-bar{:b} = 42
+    foo[0] = 99
+    bar{:b} = 42
 
-assert_eq(foo, [99, 2, 3])
-assert_eq(bar, Hash(a => 14, b => 42))
+    assert_eq(foo, [99, 2, 3])
+    assert_eq(bar, Hash(a => 14, b => 42))
 
-bar{:c} = 99
+    bar{:c} = 99
 
-assert_eq(bar, Hash(a => 14, b => 42, c => 99))
+    assert_eq(bar, Hash(a => 14, b => 42, c => 99))
+}
 
-const (
-    *x = (1,2,3),
-    :y = (x => 1, y => 2),
-)
+do {
+    const (
+        *x = (1,2,3),
+        :y = (x => 1, y => 2),
+    )
 
-assert_eq(x, [1,2,3])
-assert_eq(y, Hash("x" => 1, "y" => 2))
+    assert_eq(x, [1,2,3])
+    assert_eq(y, Hash("x" => 1, "y" => 2))
 
-x[0] = 42
-y{:x} = 3
+    x[0] = 42
+    y{:x} = 3
 
-assert_eq(x, [42, 2, 3])
-assert_eq(y, Hash(x => 3, y => 2))
+    assert_eq(x, [42, 2, 3])
+    assert_eq(y, Hash(x => 3, y => 2))
+}
+
+do {
+    const(foo = 42, bar = foo+2)
+
+    assert_eq(foo, 42)
+    assert_eq(bar, 44)
+}
 
 say "** Test passed!"

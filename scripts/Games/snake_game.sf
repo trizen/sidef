@@ -11,47 +11,43 @@ const readkey = frequire('Term::ReadKey');
 const ansi    = frequire('Term::ANSIColor');
 
 enum(
-    VOID,
-    HEAD,
-    BODY,
-    TAIL,
-    FOOD,
-);
+    VOID
+    HEAD
+    BODY
+    TAIL
+    FOOD
+)
 
 define (
-    LEFT  = [+0, -1],
-    RIGHT = [+0, +1],
-    UP    = [-1, +0],
-    DOWN  = [+1, +0],
-);
-
-const BG_COLOR    = "on_black";
-const FOOD_COLOR  = ("red"        + " " + BG_COLOR);
-const SNAKE_COLOR = ("bold green" + " " + BG_COLOR);
+    LEFT  = [+0, -1]
+    RIGHT = [+0, +1]
+    UP    = [-1, +0]
+    DOWN  = [+1, +0]
+)
 
 const (
-    U_HEAD = ansi.colored('▲', SNAKE_COLOR),
-    D_HEAD = ansi.colored('▼', SNAKE_COLOR),
-    L_HEAD = ansi.colored('◀', SNAKE_COLOR),
-    R_HEAD = ansi.colored('▶', SNAKE_COLOR),
-);
+    BG_COLOR    = "on_black"
+    FOOD_COLOR  = ("red"        + " " + BG_COLOR)
+    SNAKE_COLOR = ("bold green" + " " + BG_COLOR)
 
-const (
-    U_BODY = ansi.colored('╹', SNAKE_COLOR),
-    D_BODY = ansi.colored('╻', SNAKE_COLOR),
-    L_BODY = ansi.colored('╴', SNAKE_COLOR),
-    R_BODY = ansi.colored('╶', SNAKE_COLOR),
-);
+    U_HEAD = ansi.colored('▲', SNAKE_COLOR)
+    D_HEAD = ansi.colored('▼', SNAKE_COLOR)
+    L_HEAD = ansi.colored('◀', SNAKE_COLOR)
+    R_HEAD = ansi.colored('▶', SNAKE_COLOR)
 
-const (
-    U_TAIL = ansi.colored('╽', SNAKE_COLOR),
-    D_TAIL = ansi.colored('╿', SNAKE_COLOR),
-    L_TAIL = ansi.colored('╼', SNAKE_COLOR),
-    R_TAIL = ansi.colored('╾', SNAKE_COLOR),
-);
+    U_BODY = ansi.colored('╹', SNAKE_COLOR)
+    D_BODY = ansi.colored('╻', SNAKE_COLOR)
+    L_BODY = ansi.colored('╴', SNAKE_COLOR)
+    R_BODY = ansi.colored('╶', SNAKE_COLOR)
 
-const A_VOID = ansi.colored(' ', BG_COLOR);
-const A_FOOD = ansi.colored('❇', FOOD_COLOR);
+    U_TAIL = ansi.colored('╽', SNAKE_COLOR)
+    D_TAIL = ansi.colored('╿', SNAKE_COLOR)
+    L_TAIL = ansi.colored('╼', SNAKE_COLOR)
+    R_TAIL = ansi.colored('╾', SNAKE_COLOR)
+
+    A_VOID = ansi.colored(' ', BG_COLOR)
+    A_FOOD = ansi.colored('❇', FOOD_COLOR)
+)
 
 var sleep    = 0.02;   # sleep duration between updates
 var food_num = 10;     # number of initial food sources

@@ -781,13 +781,13 @@ HEADER
             $code = $value;
         }
         elsif ($ref eq 'Sidef::Variable::Const') {
-            my $name  = $obj->{name} . $refaddr;
+            my $name = $obj->{name} . $refaddr;
 
             if ($addr{$refaddr}++) {
                 $code = "\$$name\->()";
             }
             else {
-                $code =  $self->_dump_static_var($obj, $refaddr);
+                $code = $self->_dump_static_var($obj, $refaddr);
                 $code = "my \$$name = sub { $code }; \$$name\->()";
             }
         }
