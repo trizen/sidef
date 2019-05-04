@@ -72,4 +72,66 @@ do {
     assert_eq(foo, "hello")
 }
 
+do {
+    func factorial(n) {
+        const f = (n <= 1 ? 1 : n*factorial(n-1))
+        f
+    }
+
+    assert_eq(factorial(5), 120)
+    assert_eq(factorial(6), 720)
+}
+
+do {
+    func factorial(n) is cached {
+        const f = (n <= 1 ? 1 : n*factorial(n-1))
+        f
+    }
+
+    assert_eq(factorial(5), 120)
+    assert_eq(factorial(6), 720)
+}
+
+do {
+    class Example {
+        method foo (n) {
+            const t = 42
+            { t + n }
+        }
+    }
+
+    var obj = Example()
+
+    assert_eq(obj.foo(2).run, 44)
+    assert_eq(obj.foo(3).run, 45)
+}
+
+do {
+    class Foo {
+        const n = 42
+        method foo(k) {
+            n + k
+        }
+    }
+
+    var obj = Foo()
+
+    assert_eq(obj.foo(2), 44)
+    assert_eq(obj.foo(3), 45)
+}
+
+do {
+    const x = 42
+    try { x += 2 }
+    assert_eq(x, 42)
+    try { x = 99 }
+    assert_eq(x, 42)
+    try { x.add!(9) }
+    assert_eq(x, 42)
+    try { ++x }
+    assert_eq(x, 42)
+    try { x++ }
+    assert_eq(x, 42)
+}
+
 say "** Test passed!"

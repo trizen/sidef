@@ -781,25 +781,14 @@ HEADER
             $code = $value;
         }
         elsif ($ref eq 'Sidef::Variable::Const') {
-            my $name  = "const_$obj->{name}" . $refaddr;
-            my $value = '(' . $name . ')';
+            my $name  = $obj->{name} . $refaddr;
 
             if ($addr{$refaddr}++) {
-                $code = $value;
+                $code = "\$$name\->()";
             }
             else {
-
-                $code = "sub $name(){" . $self->_dump_static_var($obj, $refaddr) . "}; ($name)";
-
-                # Use dynamical constants with perl>=5.022
-                # XXX: this is known to cause segmentation faults in perl-5.18.* and perl-5.20.* when used in a class
-                if ($] >= 5.022 or $self->{class} != $self->{current_block}) {
-
-                    $code = "my $code";
-
-                    # This is no longer needed in Perl>=5.25.2
-                    $] < 5.025002 && $self->top_add(q{use feature 'lexical_subs'; no warnings 'experimental::lexical_subs';});
-                }
+                $code =  $self->_dump_static_var($obj, $refaddr);
+                $code = "my \$$name = sub { $code }; \$$name\->()";
             }
         }
         elsif ($ref eq 'Sidef::Variable::Static') {
