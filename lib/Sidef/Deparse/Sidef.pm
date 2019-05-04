@@ -317,7 +317,7 @@ package Sidef::Deparse::Sidef {
                           ? ', '
                           : (";\n" . (" " x $Sidef::SPACES))
                          ),
-                         $self->_dump_init_vars({vars => [map { $_ } @{$obj->{vars}}]})
+                         $self->_dump_init_vars($obj)
                         );
         }
         elsif (   $ref eq 'Sidef::Variable::Const'
