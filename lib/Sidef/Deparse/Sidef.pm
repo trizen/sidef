@@ -311,35 +311,19 @@ package Sidef::Deparse::Sidef {
             $code = $self->_dump_init_vars($obj);
         }
         elsif ($ref eq 'Sidef::Variable::ConstInit') {
-
-            foreach my $const (@{$obj->{vars}}) {
-                ++$addr{refaddr($const)};
-            }
-
             $code = join(
                          (
                           $obj->{type} eq 'global'
                           ? ', '
                           : (";\n" . (" " x $Sidef::SPACES))
                          ),
-                         $self->_dump_init_vars({vars => [map { $_->{var} } @{$obj->{vars}}]})
+                         $self->_dump_init_vars({vars => [map { $_ } @{$obj->{vars}}]})
                         );
         }
         elsif (   $ref eq 'Sidef::Variable::Const'
                or $ref eq 'Sidef::Variable::Static'
                or $ref eq 'Sidef::Variable::Define') {
-            my $name = $obj->{name};
-
-            if ($addr{$refaddr}++) {
-                $code = ($obj->{class} ne $self->{class} ? ($obj->{class} . '::') : '') . $name;
-            }
-            else {
-                my ($var) = $self->_dump_vars($obj->{var});
-                $code = "$obj->{var}{type} $var";
-                if (defined($obj->{expr})) {
-                    $code .= ' = (' . $self->deparse_script($obj->{expr}) . ')';
-                }
-            }
+            $code = ($obj->{class} ne $self->{class} ? ($obj->{class} . '::') : '') . $obj->{name};
         }
         elsif ($ref eq 'Sidef::Variable::ClassInit') {
             if ($addr{$refaddr}++) {

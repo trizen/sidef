@@ -517,23 +517,21 @@ HEADER
     }
 
     sub _dump_static_var {
-        my ($self, $obj, $refaddr) = @_;
+        my ($self, $var, $refaddr) = @_;
 
-        my $info = $obj->{var};
-
-        if ($info->{array}) {
+        if ($var->{array}) {
             $self->load_mod("Sidef::Types::Array::Array");
         }
-        elsif ($info->{hash}) {
+        elsif ($var->{hash}) {
             $self->load_mod("Sidef::Types::Hash::Hash");
         }
 
-        "state\$$obj->{name}$refaddr=do{my \@data = ("
-          . (defined($obj->{expr}) ? $self->deparse_script($obj->{expr}) : '') . ');'
+        "state\$$var->{name}$refaddr=do{my \@data = ("
+          . (defined($var->{value}) ? $self->deparse_script($var->{value}) : '') . ');'
           . (
-             $info->{slurpy}
+             $var->{slurpy}
              ? (
-                $info->{array}
+                $var->{array}
                 ? "bless(\\\@data, 'Sidef::Types::Array::Array')"
                 : "bless({\@data}, 'Sidef::Types::Hash::Hash')"
                )

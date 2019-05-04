@@ -1234,20 +1234,15 @@ package Sidef::Parser {
                 my $callback = sub {
                     my ($v) = @_;
 
-                    my $obj        = $v->{value};
                     my $name       = $v->{name};
                     my $class_name = $v->{class};
-#<<<
+
                     my $var = (
-                               $type eq 'define'
-                               ? bless({name => $name, class => $class_name, expr => $obj, var => $v}, 'Sidef::Variable::Define')
-                               : $type eq 'static'
-                               ? bless({name => $name, class => $class_name, expr => $obj, var => $v}, 'Sidef::Variable::Static')
-                               : $type eq 'const'
-                               ? bless({name => $name, class => $class_name, expr => $obj, var => $v}, 'Sidef::Variable::Const')
-                               : die "[PARSER ERROR] Invalid variable type: $type"
+                                 $type eq 'define' ? bless($v, 'Sidef::Variable::Define')
+                               : $type eq 'static' ? bless($v, 'Sidef::Variable::Static')
+                               : $type eq 'const'  ? bless($v, 'Sidef::Variable::Const')
+                               :                     die "[PARSER ERROR] Invalid variable type: $type"
                               );
-#>>>
 
                     push @var_objs, $var;
 
@@ -1290,8 +1285,7 @@ package Sidef::Parser {
                                                error => qq{expected an expression after $type "$var->{name}"},
                                               );
 
-                    $var->{expr} = $obj;
-                    return $var;
+                    $var->{value} = $obj;
                 }
 
                 my $const_init = bless({vars => \@var_objs, type => $type}, 'Sidef::Variable::ConstInit');
