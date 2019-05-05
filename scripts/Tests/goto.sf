@@ -1,0 +1,24 @@
+#!/usr/bin/ruby
+
+# Tests for the `goto` statement
+
+func example {
+
+    var arr = []
+
+    goto :hello
+    arr << "never here"
+
+    @:hello
+    arr << "hello"
+
+    goto :world
+    arr << "never here"
+
+    @:world
+    arr << "world"
+}
+
+assert_eq(example(), ['hello', 'world'])
+
+say "** Test passed!"

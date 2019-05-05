@@ -1469,6 +1469,9 @@ HEADER
         elsif ($ref eq 'Sidef::Meta::Unimplemented') {
             $code = qq{CORE::die "Unimplemented at " . } . $self->_dump_string($obj->{file}) . qq{. " line $obj->{line}\\n"};
         }
+        elsif ($ref eq 'Sidef::Variable::Label') {
+            $code = $obj->{name} . ': ';
+        }
         elsif (exists $self->{data_types}{$ref}) {
             my $mod = $self->{data_types}{$ref};
             $self->{_reftype_cache}{$mod} //= do {
@@ -1786,28 +1789,7 @@ HEADER
             my $max = $#{$struct->{$class}};
             foreach my $i (0 .. $max) {
                 my $expr = $struct->{$class}[$i];
-
                 push @results, ref($expr) eq 'HASH' ? $self->deparse_expr($expr) : $self->deparse_expr({self => $expr});
-
-                if (
-                    $i > 0
-                    and (
-                         ref($expr) eq 'Sidef::Variable::Label'
-                         or (    ref($struct->{$class}[$i - 1]) eq 'HASH'
-                             and ref($struct->{$class}[$i - 1]{self}) eq 'Sidef::Variable::Label')
-                        )
-                  ) {
-                    $results[-1] =
-                      (ref($expr) eq 'Sidef::Variable::Label' ? $expr->{name} : $struct->{$class}[$i - 1]{self}->{name}) . ':'
-                      . $results[-1];
-                }
-                elsif (
-                       $i == $max
-                       and (ref($expr) eq 'Sidef::Variable::Label'
-                            or (ref($expr) eq 'HASH' and ref($expr->{self}) eq 'Sidef::Variable::Label'))
-                  ) {
-                    $results[-1] = (ref($expr) eq 'Sidef::Variable::Label' ? $expr->{name} : $expr->{self}{name}) . ':';
-                }
             }
         }
 
