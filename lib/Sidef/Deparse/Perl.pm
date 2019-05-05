@@ -7,8 +7,6 @@ package Sidef::Deparse::Perl {
     use Sidef::Types::Number::Number;
 
     my %addr;
-    my %type;
-    my %const;
     my %top_add;
 
     sub new {
@@ -132,9 +130,7 @@ HEADER
         }
 
         %addr    = ();
-        %type    = ();
         %top_add = ();
-        %const   = ();
 
         bless \%opts, __PACKAGE__;
     }
@@ -142,26 +138,16 @@ HEADER
     sub make_constant {
         my ($self, $ref, $new_method, $name, @args) = @_;
 
+        my $rel_name  = $name . join('_', map { refaddr(\$_) } @args);
+        my $full_name = $self->{environment_name} . '::' . $rel_name;
+
         if (not $self->{_has_constant}) {
             $self->{_has_constant} = 1;
             $self->{before} .= "use constant {";
         }
 
-        '(' . $self->{environment_name} . '::' . (
-            (
-
-               # XXX: caching is memory expensive for a very large number of literals
-               # $const{$ref, $#args, @args} //=
-
-               [$name . @args,
-                do {
-                    local $" = ',';
-                    $self->{before} .= $name . @args . '=>' . $ref . "->$new_method(@args),";
-                }
-               ]
-            )->[0]
-              . ')'
-        );
+        $self->{before} .= "$rel_name => $ref\->$new_method(" . join(',', @args) . "),";
+        "($full_name)";
     }
 
     sub top_add {
