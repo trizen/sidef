@@ -55,12 +55,14 @@ package Sidef::Types::Block::Block {
           __PACKAGE__;
     }
 
+#<<<
     use constant {
-                  IDENTITY       => __PACKAGE__->new(is_identity => 1, code => sub { $_[0] }),
-                  NULL_IDENTITY  => __PACKAGE__->new(is_identity => 1, code => sub { }),
-                  LIST_IDENTITY  => __PACKAGE__->new(is_identity => 1, code => sub { (@_) }),
-                  ARRAY_IDENTITY => __PACKAGE__->new(is_identity => 1, code => sub { Sidef::Types::Array::Array->new(@_) }),
+                  IDENTITY       => __PACKAGE__->new(is_identity => 1, name => 'Block.IDENTITY',       code => sub { $_[0] }),
+                  NULL_IDENTITY  => __PACKAGE__->new(is_identity => 1, name => 'Block.NULL_IDENTITY',  code => sub { }),
+                  LIST_IDENTITY  => __PACKAGE__->new(is_identity => 1, name => 'Block.LIST_IDENTITY',  code => sub { (@_) }),
+                  ARRAY_IDENTITY => __PACKAGE__->new(is_identity => 1, name => 'Block.ARRAY_IDENTITY', code => sub { Sidef::Types::Array::Array->new(@_) }),
                  };
+#>>>
 
     sub identity       { IDENTITY }
     sub list_identity  { LIST_IDENTITY }
