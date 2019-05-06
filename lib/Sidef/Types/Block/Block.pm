@@ -56,10 +56,10 @@ package Sidef::Types::Block::Block {
     }
 
     use constant {
-                  IDENTITY       => __PACKAGE__->new(code => sub { $_[0] }),
-                  NULL_IDENTITY  => __PACKAGE__->new(code => sub { }),
-                  LIST_IDENTITY  => __PACKAGE__->new(code => sub { (@_) }),
-                  ARRAY_IDENTITY => __PACKAGE__->new(code => sub { Sidef::Types::Array::Array->new(@_) }),
+                  IDENTITY       => __PACKAGE__->new(is_identity => 1, code => sub { $_[0] }),
+                  NULL_IDENTITY  => __PACKAGE__->new(is_identity => 1, code => sub { }),
+                  LIST_IDENTITY  => __PACKAGE__->new(is_identity => 1, code => sub { (@_) }),
+                  ARRAY_IDENTITY => __PACKAGE__->new(is_identity => 1, code => sub { Sidef::Types::Array::Array->new(@_) }),
                  };
 
     sub identity       { IDENTITY }
@@ -68,14 +68,7 @@ package Sidef::Types::Block::Block {
     sub null_identity  { NULL_IDENTITY }
 
     sub is_identity {
-        my ($self) = @_;
-
-        my $refaddr = Scalar::Util::refaddr($self);
-
-        (
-         List::Util::any { Scalar::Util::refaddr($_) == $refaddr }
-         (IDENTITY, NULL_IDENTITY, LIST_IDENTITY, ARRAY_IDENTITY)
-        )
+        $_[0]->{is_identity}
           ? Sidef::Types::Bool::Bool::TRUE
           : Sidef::Types::Bool::Bool::FALSE;
     }
