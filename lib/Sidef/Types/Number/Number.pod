@@ -2004,6 +2004,14 @@ Return the
 
 =cut
 
+=head2 is_perrin_pseudoprime
+
+Number.is_perrin_pseudoprime() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 is_plumb_pseudoprime
 
 Number.is_plumb_pseudoprime() -> I<Obj>

@@ -884,6 +884,9 @@ HEADER
                                 : ()
                             );
 
+                            #~ @inherited_class_vars = ();
+                            #~ @inherited_class_attr = ();
+
                             my %in_self;
                             foreach my $var (@self_class_vars) {
                                 $in_self{$var->{name}} = 1;

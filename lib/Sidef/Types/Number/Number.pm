@@ -8996,6 +8996,14 @@ package Sidef::Types::Number::Number {
 
     *is_euler_plumb_pseudoprime = \&is_plumb_pseudoprime;
 
+    sub is_perrin_pseudoprime {
+        my ($n) = @_;
+        __is_int__($$n)
+          && Math::Prime::Util::GMP::is_perrin_pseudoprime(_big2uistr($n) // (return Sidef::Types::Bool::Bool::FALSE))
+          ? Sidef::Types::Bool::Bool::TRUE
+          : Sidef::Types::Bool::Bool::FALSE;
+    }
+
     sub is_frobenius_pseudoprime {
         my ($n, $k, $m) = @_;
 
