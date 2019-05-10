@@ -9457,7 +9457,47 @@ package Sidef::Types::Number::Number {
                                        );
     }
 
-    *fermat_factor = \&holf_factor;
+    sub fermat_factor {
+        my ($n, $k) = @_;
+        _valid(\$k) if defined($k);
+
+        $n = _any2mpz($$n) // goto &nan;
+
+        if (defined($k)) {
+            $k = _any2ui($$k) // 1e4;
+        }
+        else {
+            $k = 1e4;
+        }
+
+        my $p = Math::GMPz::Rmpz_init();    # p = floor(sqrt(n))
+        my $q = Math::GMPz::Rmpz_init();    # q = p^2 - n
+
+        Math::GMPz::Rmpz_sqrtrem($p, $q, $n);
+        Math::GMPz::Rmpz_neg($q, $q);
+
+        for (my $j = 1 ; $j <= $k ; ++$j) {
+
+            Math::GMPz::Rmpz_addmul_ui($q, $p, 2);
+
+            Math::GMPz::Rmpz_add_ui($q, $q, 1);
+            Math::GMPz::Rmpz_add_ui($p, $p, 1);
+
+            if (Math::GMPz::Rmpz_perfect_square_p($q)) {
+                Math::GMPz::Rmpz_sqrt($q, $q);
+
+                my $r1 = Math::GMPz::Rmpz_init();
+                my $r2 = Math::GMPz::Rmpz_init();
+
+                Math::GMPz::Rmpz_sub($r1, $p, $q);
+                Math::GMPz::Rmpz_add($r2, $p, $q);
+
+                return Sidef::Types::Array::Array->new([bless(\$r1), bless(\$r2)]);
+            }
+        }
+
+        Sidef::Types::Array::Array->new([bless(\$n)]);
+    }
 
     sub squfof_factor {
         my ($n, $k) = @_;

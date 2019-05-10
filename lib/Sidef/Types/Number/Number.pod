@@ -1406,6 +1406,14 @@ Return the
 
 =cut
 
+=head2 fermat_factor
+
+Number.fermat_factor() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 fib
 
 Number.fib() -> I<Obj>
@@ -1525,8 +1533,6 @@ Aliases: I<hermiteHe>, I<hermite_polynomial_He>, I<hermite_polynomialHe>
 Number.holf_factor() -> I<Obj>
 
 Return the
-
-Aliases: I<fermat_factor>
 
 =cut
 
