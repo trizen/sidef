@@ -9461,7 +9461,7 @@ package Sidef::Types::Number::Number {
         my ($n, $k) = @_;
         _valid(\$k) if defined($k);
 
-        $n = _any2mpz($$n) // goto &nan;
+        $n = _any2mpz($$n) // return Sidef::Types::Array::Array->new();
 
         if (defined($k)) {
             $k = _any2ui($$k) // 1e4;
