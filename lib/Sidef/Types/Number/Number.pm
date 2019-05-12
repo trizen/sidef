@@ -8950,6 +8950,19 @@ package Sidef::Types::Number::Number {
           : Sidef::Types::Bool::Bool::FALSE;
     }
 
+    sub is_fibonacci_pseudoprime {
+        my ($n) = @_;
+
+        __is_int__($$n) || return Sidef::Types::Bool::Bool::FALSE;
+        $n = _any2mpz($$n) // return Sidef::Types::Bool::Bool::FALSE;
+
+        Math::GMPz::Rmpz_cmp_ui($n, 5) > 0 or return Sidef::Types::Bool::Bool::FALSE;
+        Math::GMPz::Rmpz_divisible_ui_p($n, 5) and return Sidef::Types::Bool::Bool::FALSE;
+
+        my ($U) = Math::Prime::Util::GMP::lucas_sequence($n, 1, -1, $n - Math::GMPz::Rmpz_kronecker_ui($n, 5));
+        $U eq '0' ? Sidef::Types::Bool::Bool::TRUE : Sidef::Types::Bool::Bool::FALSE;
+    }
+
     sub is_lucas_pseudoprime {
         my ($n) = @_;
         __is_int__($$n)

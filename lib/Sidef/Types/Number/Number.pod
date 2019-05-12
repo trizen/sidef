@@ -1878,6 +1878,14 @@ Return the
 
 =cut
 
+=head2 is_fibonacci_pseudoprime
+
+Number.is_fibonacci_pseudoprime() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 is_frobenius_pseudoprime
 
 Number.is_frobenius_pseudoprime() -> I<Obj>
