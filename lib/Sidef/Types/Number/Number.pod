@@ -1814,6 +1814,14 @@ Return the
 
 =cut
 
+=head2 is_composite
+
+Number.is_composite() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 is_congruent
 
 Number.is_congruent() -> I<Obj>

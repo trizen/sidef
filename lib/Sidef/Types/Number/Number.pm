@@ -8895,6 +8895,16 @@ package Sidef::Types::Number::Number {
           : Sidef::Types::Bool::Bool::FALSE;
     }
 
+    sub is_composite {
+        my ($x) = @_;
+        __is_int__($$x) || return Sidef::Types::Bool::Bool::FALSE;
+        $x = _any2mpz($$x) // return Sidef::Types::Bool::Bool::FALSE;
+        Math::GMPz::Rmpz_cmp_ui($x, 1) > 0 or return Sidef::Types::Bool::Bool::FALSE;
+        Math::Prime::Util::GMP::is_prob_prime(Math::GMPz::Rmpz_get_str($x, 10))
+          ? Sidef::Types::Bool::Bool::FALSE
+          : Sidef::Types::Bool::Bool::TRUE;
+    }
+
     sub miller_rabin_random {
         my ($n, $k) = @_;
         _valid(\$k);
