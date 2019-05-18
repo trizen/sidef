@@ -10903,25 +10903,8 @@ package Sidef::Types::Number::Number {
         }
 
         my $B = exists($cache{$k}) ? $cache{$k} : do {
-
-            state $GMP_V_MAJOR = Math::GMPz::__GNU_MP_VERSION();
-            state $GMP_V_MINOR = Math::GMPz::__GNU_MP_VERSION_MINOR();
-            state $OLD_GMP     = ($GMP_V_MAJOR < 5 or ($GMP_V_MAJOR == 5 and $GMP_V_MINOR < 1));
-
             my $t = Math::GMPz::Rmpz_init_nobless();
-
-            if ($OLD_GMP) {
-                Math::GMPz::Rmpz_set_ui($t, 1);
-                for (my $p = Math::GMPz::Rmpz_init_set_ui(2) ;
-                     Math::GMPz::Rmpz_cmp_ui($p, $k) <= 0 ;
-                     Math::GMPz::Rmpz_nextprime($p, $p)) {
-                    Math::GMPz::Rmpz_mul($t, $t, $p);
-                }
-            }
-            else {
-                Math::GMPz::Rmpz_primorial_ui($t, $k);
-            }
-
+            Math::GMPz::Rmpz_primorial_ui($t, $k);
             $cache{$k} = $t;
         };
 
