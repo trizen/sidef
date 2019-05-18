@@ -2120,6 +2120,14 @@ Return the
 
 =cut
 
+=head2 is_prob_squarefree
+
+Number.is_prob_squarefree() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 is_prov_prime
 
 Number.is_prov_prime() -> I<Obj>

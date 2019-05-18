@@ -10896,7 +10896,7 @@ package Sidef::Types::Number::Number {
 
         state %cache;
 
-        # Clear the cache when there are too many values
+        # Clear the cache when there are too many values cached
         if (scalar(keys(%cache)) > 100) {
             Math::GMPz::Rmpz_clear($_) for values(%cache);
             undef %cache;
@@ -10928,15 +10928,14 @@ package Sidef::Types::Number::Number {
         _valid(\$k);
 
         __is_int__($$n) || return Sidef::Types::Bool::Bool::FALSE;
-        $n = _any2mpz($$n) // return Sidef::Types::Bool::Bool::FALSE;
-
-        return Sidef::Types::Bool::Bool::FALSE if Math::GMPz::Rmpz_sgn($n) <= 0;
-
         __is_int__($$k) || return Sidef::Types::Bool::Bool::FALSE;
+
+        $n = _any2mpz($$n) // return Sidef::Types::Bool::Bool::FALSE;
         $k = _any2mpz($$k) // return Sidef::Types::Bool::Bool::FALSE;
 
+        return Sidef::Types::Bool::Bool::FALSE if Math::GMPz::Rmpz_sgn($n) <= 0;
         return Sidef::Types::Bool::Bool::FALSE if Math::GMPz::Rmpz_sgn($k) <= 0;
-        return Sidef::Types::Bool::Bool::TRUE if Math::GMPz::Rmpz_cmp_ui($n, 1) == 0;
+        return Sidef::Types::Bool::Bool::TRUE  if Math::GMPz::Rmpz_cmp_ui($n, 1) == 0;
 
         my $g = Math::GMPz::Rmpz_init();
         my $t = Math::GMPz::Rmpz_init_set($n);
@@ -10950,6 +10949,48 @@ package Sidef::Types::Number::Number {
         }
 
         return Sidef::Types::Bool::Bool::FALSE;
+    }
+
+    sub is_prob_squarefree {
+        my ($n, $k) = @_;
+
+        _valid(\$k);
+        __is_int__($$n) || return Sidef::Types::Bool::Bool::FALSE;
+
+        $n = _any2mpz($$n) // return Sidef::Types::Bool::Bool::FALSE;
+        $k = _any2ui($$k)  // return Sidef::Types::Bool::Bool::FALSE;
+
+        return Sidef::Types::Bool::Bool::FALSE if (Math::GMPz::Rmpz_sgn($n) <= 0);
+        return Sidef::Types::Bool::Bool::FALSE if $k <= 0;
+        return Sidef::Types::Bool::Bool::TRUE  if Math::GMPz::Rmpz_cmp_ui($n, 1) == 0;
+        return Sidef::Types::Bool::Bool::FALSE if Math::GMPz::Rmpz_perfect_power_p($n);
+
+        state %cache;
+
+        # Clear the cache when there are too many values cached
+        if (scalar(keys(%cache)) > 100) {
+            Math::GMPz::Rmpz_clear($_) for values(%cache);
+            undef %cache;
+        }
+
+        my $B = exists($cache{$k}) ? $cache{$k} : do {
+            my $t = Math::GMPz::Rmpz_init_nobless();
+            Math::GMPz::Rmpz_primorial_ui($t, $k);
+            $cache{$k} = $t;
+        };
+
+        my $g = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_gcd($g, $n, $B);
+
+        if (Math::GMPz::Rmpz_cmp_ui($g, 1) > 0) {
+            Math::GMPz::Rmpz_divexact($g, $n, $g);
+            return Sidef::Types::Bool::Bool::TRUE if Math::GMPz::Rmpz_cmp_ui($g, 1) == 0;
+            return Sidef::Types::Bool::Bool::FALSE if Math::GMPz::Rmpz_perfect_power_p($g);
+            Math::GMPz::Rmpz_gcd($g, $g, $B);
+            return Sidef::Types::Bool::Bool::FALSE if Math::GMPz::Rmpz_cmp_ui($g, 1) > 0;
+        }
+
+        return Sidef::Types::Bool::Bool::TRUE;
     }
 
     sub is_square {
