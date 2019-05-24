@@ -208,8 +208,6 @@ package Sidef::Types::Set::Set {
     sub grep_2d {
         my ($self, $block) = @_;
 
-        $block //= Sidef::Types::Block::Block::ARRAY_IDENTITY;
-
         my %new;
         foreach my $key (CORE::keys(%$self)) {
             my $value = $self->{$key};

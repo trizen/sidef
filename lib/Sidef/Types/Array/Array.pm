@@ -1481,7 +1481,7 @@ package Sidef::Types::Array::Array {
     sub map_2d {
         my ($self, $block) = @_;
 
-        $block //= Sidef::Types::Block::Block::IDENTITY;
+        $block //= Sidef::Types::Block::Block::ARRAY_IDENTITY;
 
         my @array;
         foreach my $item (@$self) {
@@ -1539,8 +1539,6 @@ package Sidef::Types::Array::Array {
     sub grep_2d {
         my ($self, $block) = @_;
 
-        $block //= Sidef::Types::Block::Block::IDENTITY;
-
         my @array;
         foreach my $item (@$self) {
             CORE::push(@array, $item) if $block->run(@$item);
@@ -1566,6 +1564,8 @@ package Sidef::Types::Array::Array {
 
     sub group {
         my ($self, $block) = @_;
+
+        $block //= Sidef::Types::Block::Block::IDENTITY;
 
         my %hash;
         foreach my $item (@$self) {
