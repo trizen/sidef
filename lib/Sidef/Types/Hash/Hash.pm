@@ -213,8 +213,12 @@ package Sidef::Types::Hash::Hash {
 
         my %hash;
         foreach my $key (CORE::keys(%$self)) {
-            my ($k, $v) = $block->run(Sidef::Types::String::String->new($key), $self->{$key});
-            $hash{$k} = $v;
+            my @pairs = $block->run(Sidef::Types::String::String->new($key), $self->{$key});
+
+            while (@pairs) {
+                my ($k, $v) = splice(@pairs, 0, 2);
+                $hash{$k} = $v;
+            }
         }
 
         bless \%hash, ref($self);

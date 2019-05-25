@@ -262,6 +262,14 @@ Aliases: I<grep_2D>
 
 =cut
 
+=head2 grep_kv
+
+Bag.grep_kv() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 iter
 
 Bag.iter() -> I<Obj>
@@ -321,6 +329,14 @@ Bag.map_2d() -> I<Obj>
 Return the
 
 Aliases: I<map_2D>
+
+=cut
+
+=head2 map_kv
+
+Bag.map_kv() -> I<Obj>
+
+Return the
 
 =cut
 

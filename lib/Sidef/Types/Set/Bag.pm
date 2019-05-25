@@ -439,6 +439,30 @@ package Sidef::Types::Set::Bag {
 
     *map_2D = \&map_2d;
 
+    sub map_kv {
+        my ($self, $block) = @_;
+
+        $block //= Sidef::Types::Block::Block::LIST_IDENTITY;
+
+        my %new;
+        foreach my $key (CORE::keys(%$self)) {
+
+            my $elem  = $self->{$key};
+            my @pairs = $block->run($elem->{value}, Sidef::Types::Number::Number->_set_uint($elem->{count}));
+
+            while (@pairs) {
+                my $k = shift(@pairs);
+                my $v = CORE::int(shift(@pairs));
+
+                if ($v > 0) {
+                    $new{$serialize->($k)} = {value => $k, count => $v};
+                }
+            }
+        }
+
+        bless \%new, ref($self);
+    }
+
     sub collect {
         my ($self, $block) = @_;
 
@@ -495,6 +519,26 @@ package Sidef::Types::Set::Bag {
     }
 
     *grep_2D = \&grep_2d;
+
+    sub grep_kv {
+        my ($self, $block) = @_;
+
+        my %new;
+        foreach my $key (CORE::keys(%$self)) {
+
+            my $elem  = $self->{$key};
+            my $value = $elem->{value};
+
+            if ($block->run($value, Sidef::Types::Number::Number->_set_uint($elem->{count}))) {
+                $new{$key} = {
+                              value => $value,
+                              count => $elem->{count},
+                             };
+            }
+        }
+
+        bless \%new, ref($self);
+    }
 
     sub count_by {
         my ($self, $block) = @_;
