@@ -9411,6 +9411,43 @@ package Sidef::Types::Number::Number {
                                        );
     }
 
+    sub trial_divisor {
+        my ($n, $k) = @_;
+
+        _valid(\$k);
+        __is_int__($$n) || return undef;
+
+        $n = _any2mpz($$n) // return undef;
+        $k = _any2ui($$k)  // return undef;
+
+        return undef if Math::GMPz::Rmpz_sgn($n) <= 0;
+        return undef if $k <= 0;
+        return ONE if Math::GMPz::Rmpz_cmp_ui($n, 1) == 0;
+
+        state %cache;
+
+        # Clear the cache when there are too many values cached
+        if (scalar(keys(%cache)) > 100) {
+            Math::GMPz::Rmpz_clear($_) for values(%cache);
+            undef %cache;
+        }
+
+        my $B = exists($cache{$k}) ? $cache{$k} : do {
+            my $t = Math::GMPz::Rmpz_init_nobless();
+            Math::GMPz::Rmpz_primorial_ui($t, $k);
+            $cache{$k} = $t;
+        };
+
+        my $g = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_gcd($g, $n, $B);
+
+        if (Math::GMPz::Rmpz_cmp_ui($g, 1) > 0) {
+            return bless \$g;
+        }
+
+        return undef;
+    }
+
     sub prho_factor {
         my ($n, $k) = @_;
         _valid(\$k) if defined($k);
@@ -10890,7 +10927,7 @@ package Sidef::Types::Number::Number {
         $n = _any2mpz($$n) // return Sidef::Types::Bool::Bool::FALSE;
         $k = _any2ui($$k)  // return Sidef::Types::Bool::Bool::FALSE;
 
-        return Sidef::Types::Bool::Bool::FALSE if (Math::GMPz::Rmpz_sgn($n) <= 0);
+        return Sidef::Types::Bool::Bool::FALSE if Math::GMPz::Rmpz_sgn($n) <= 0;
         return Sidef::Types::Bool::Bool::FALSE if $k <= 0;
         return Sidef::Types::Bool::Bool::TRUE  if Math::GMPz::Rmpz_cmp_ui($n, 1) == 0;
 
@@ -10960,7 +10997,7 @@ package Sidef::Types::Number::Number {
         $n = _any2mpz($$n) // return Sidef::Types::Bool::Bool::FALSE;
         $k = _any2ui($$k)  // return Sidef::Types::Bool::Bool::FALSE;
 
-        return Sidef::Types::Bool::Bool::FALSE if (Math::GMPz::Rmpz_sgn($n) <= 0);
+        return Sidef::Types::Bool::Bool::FALSE if Math::GMPz::Rmpz_sgn($n) <= 0;
         return Sidef::Types::Bool::Bool::FALSE if $k <= 0;
         return Sidef::Types::Bool::Bool::TRUE  if Math::GMPz::Rmpz_cmp_ui($n, 1) == 0;
         return Sidef::Types::Bool::Bool::FALSE if Math::GMPz::Rmpz_perfect_power_p($n);
