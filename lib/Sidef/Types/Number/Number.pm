@@ -9400,29 +9400,26 @@ package Sidef::Types::Number::Number {
 
     sub trial_factor {
         my ($n, $k) = @_;
-        _valid(\$k) if defined($k);
-        Sidef::Types::Array::Array->new(
-                                        [map { $_ < ULONG_MAX ? __PACKAGE__->_set_uint($_) : __PACKAGE__->_set_str('int', $_) }
-                                           Math::Prime::Util::GMP::trial_factor(
-                                                                  _big2pistr($n) || (return Sidef::Types::Array::Array->new()),
-                                                                  (defined($k) ? _big2uistr($k) // () : ()),
-                                           )
-                                        ]
-                                       );
-    }
 
-    sub trial_divisor {
-        my ($n, $k) = @_;
+        if (!defined($k)) {
+            return Sidef::Types::Array::Array->new(
+                [
+                 map {
+                     $_ < ULONG_MAX ? __PACKAGE__->_set_uint($_) : __PACKAGE__->_set_str('int', $_)
+                 } Math::Prime::Util::GMP::trial_factor(_big2pistr($n) || (return Sidef::Types::Array::Array->new()),)
+                ]
+            );
+        }
 
         _valid(\$k);
-        __is_int__($$n) || return undef;
+        __is_int__($$n) || return Sidef::Types::Array::Array->new();
 
-        $n = _any2mpz($$n) // return undef;
-        $k = _any2ui($$k)  // return undef;
+        $n = _any2mpz($$n) // return Sidef::Types::Array::Array->new();
+        $k = _any2ui($$k)  // return Sidef::Types::Array::Array->new();
 
-        return undef if Math::GMPz::Rmpz_sgn($n) <= 0;
-        return undef if $k <= 0;
-        return ONE if Math::GMPz::Rmpz_cmp_ui($n, 1) == 0;
+        return Sidef::Types::Array::Array->new() if Math::GMPz::Rmpz_sgn($n) <= 0;
+        return Sidef::Types::Array::Array->new(bless \$n) if $k <= 0;
+        return Sidef::Types::Array::Array->new(ONE) if Math::GMPz::Rmpz_cmp_ui($n, 1) == 0;
 
         state %cache;
 
@@ -9442,10 +9439,25 @@ package Sidef::Types::Number::Number {
         Math::GMPz::Rmpz_gcd($g, $n, $B);
 
         if (Math::GMPz::Rmpz_cmp_ui($g, 1) > 0) {
-            return bless \$g;
+
+            my %factor;
+            my $t = Math::GMPz::Rmpz_init_set($n);
+
+            foreach my $f (Math::Prime::Util::GMP::factor(Math::GMPz::Rmpz_get_str($g, 10))) {
+                Math::GMPz::Rmpz_set_ui($g, $f);
+                $factor{$f} = Math::GMPz::Rmpz_remove($t, $t, $g);
+            }
+
+            my @return = map { (Sidef::Types::Number::Number->_set_uint($_)) x $factor{$_} } sort { $a <=> $b } keys %factor;
+
+            if (Math::GMPz::Rmpz_cmp_ui($t, 1) > 0) {
+                push @return, bless \$t;
+            }
+
+            return Sidef::Types::Array::Array->new(\@return);
         }
 
-        return undef;
+        return Sidef::Types::Array::Array->new(bless \$n);
     }
 
     sub prho_factor {
