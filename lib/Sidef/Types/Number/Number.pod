@@ -3696,14 +3696,6 @@ Aliases: I<to_str>
 
 =cut
 
-=head2 trial_divisor
-
-Number.trial_divisor() -> I<Obj>
-
-Return the
-
-=cut
-
 =head2 trial_factor
 
 Number.trial_factor() -> I<Obj>

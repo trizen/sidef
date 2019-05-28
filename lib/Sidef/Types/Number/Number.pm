@@ -681,7 +681,7 @@ package Sidef::Types::Number::Number {
     sub _big2istr {
         my ($x) = @_;
 
-        $x = $$x;
+        $x = $$x if ref($x) eq __PACKAGE__;
         $x = (_any2mpz($x) // return undef) if ref($x) ne 'Math::GMPz';
 
         return Math::GMPz::Rmpz_get_si($x)
@@ -694,7 +694,7 @@ package Sidef::Types::Number::Number {
     sub _big2uistr {
         my ($x) = @_;
 
-        $x = $$x;
+        $x = $$x if ref($x) eq __PACKAGE__;
         $x = (_any2mpz($x) // return undef) if ref($x) ne 'Math::GMPz';
 
         return Math::GMPz::Rmpz_get_ui($x)
@@ -708,7 +708,7 @@ package Sidef::Types::Number::Number {
     sub _big2pistr {
         my ($x) = @_;
 
-        $x = $$x;
+        $x = $$x if ref($x) eq __PACKAGE__;
         $x = (_any2mpz($x) // return undef) if ref($x) ne 'Math::GMPz';
 
         if (Math::GMPz::Rmpz_fits_ulong_p($x)) {
@@ -8887,20 +8887,114 @@ package Sidef::Types::Number::Number {
           : Sidef::Types::Bool::Bool::FALSE;
     }
 
+    sub _primality_pretest {
+        my ($n) = @_;
+
+        if (ref($n) ne 'Math::GMPz') {
+            __is_int__($n) || return;
+            $n = _any2mpz($n) // return;
+        }
+
+        # Must be positive
+        (Math::GMPz::Rmpz_sgn($n) > 0) || return;
+
+        # Check for divisibilty by 2
+        if (Math::GMPz::Rmpz_even_p($n)) {
+            return (Math::GMPz::Rmpz_cmp_ui($n, 2) == 0);
+        }
+
+        # Check for very small factors (up to 29)
+        if (Math::GMPz::Rmpz_cmp_ui($n, 30) >= 0) {
+            Math::GMPz::Rmpz_gcd_ui($Math::GMPz::NULL, $n, 3234846615) == 1 or return 0;
+        }
+
+        # Size of n in base-2
+        my $size = Math::GMPz::Rmpz_sizeinbase($n, 2);
+
+        # When n is large enough, try to find a small factor (up to 10^8)
+        if ($size > 15_000) {
+
+            state %cache;
+            state $g = Math::GMPz::Rmpz_init_nobless();
+
+            my @checks = (1e4, 1e6);
+
+            push(@checks, 1e7) if ($size > 20_000);
+            push(@checks, 1e8) if ($size > 30_000);
+
+            foreach my $k (@checks) {
+
+                my $primorial = (
+                    $cache{$k} //= do {
+                        my $z = Math::GMPz::Rmpz_init_nobless();
+                        Math::GMPz::Rmpz_primorial_ui($z, $k);
+                        $z;
+                    }
+                );
+
+                Math::GMPz::Rmpz_gcd($g, $primorial, $n);
+
+                if (Math::GMPz::Rmpz_cmp_ui($g, 1) > 0) {
+                    return 0;
+                }
+            }
+        }
+
+        return 1;
+    }
+
     sub is_prime {
-        my ($x) = @_;
-        __is_int__($$x)
+        my ($n) = @_;
+        _primality_pretest($$n)
           && Math::Prime::Util::GMP::is_prime(&_big2uistr // return Sidef::Types::Bool::Bool::FALSE)
           ? Sidef::Types::Bool::Bool::TRUE
           : Sidef::Types::Bool::Bool::FALSE;
     }
 
+    sub is_prob_prime {
+        my ($n) = @_;
+        _primality_pretest($$n)
+          && Math::Prime::Util::GMP::is_prob_prime(&_big2uistr // return Sidef::Types::Bool::Bool::FALSE)
+          ? Sidef::Types::Bool::Bool::TRUE
+          : Sidef::Types::Bool::Bool::FALSE;
+    }
+
+    sub is_prov_prime {
+        my ($n) = @_;
+        _primality_pretest($$n)
+          && Math::Prime::Util::GMP::is_provable_prime(&_big2uistr // return Sidef::Types::Bool::Bool::FALSE)
+          ? Sidef::Types::Bool::Bool::TRUE
+          : Sidef::Types::Bool::Bool::FALSE;
+    }
+
+    *is_provable_prime = \&is_prov_prime;
+
+    sub is_bpsw_prime {
+        my ($n) = @_;
+        _primality_pretest($$n)
+          && Math::Prime::Util::GMP::is_bpsw_prime(&_big2uistr // (return Sidef::Types::Bool::Bool::FALSE))
+          ? Sidef::Types::Bool::Bool::TRUE
+          : Sidef::Types::Bool::Bool::FALSE;
+    }
+
+    sub is_aks_prime {
+        my ($n) = @_;
+        _primality_pretest($$n)
+          && Math::Prime::Util::GMP::is_aks_prime(&_big2uistr // (return Sidef::Types::Bool::Bool::FALSE))
+          ? Sidef::Types::Bool::Bool::TRUE
+          : Sidef::Types::Bool::Bool::FALSE;
+    }
+
     sub is_composite {
-        my ($x) = @_;
-        __is_int__($$x) || return Sidef::Types::Bool::Bool::FALSE;
-        $x = _any2mpz($$x) // return Sidef::Types::Bool::Bool::FALSE;
-        Math::GMPz::Rmpz_cmp_ui($x, 1) > 0 or return Sidef::Types::Bool::Bool::FALSE;
-        Math::Prime::Util::GMP::is_prob_prime(Math::GMPz::Rmpz_get_str($x, 10))
+        my ($n) = @_;
+
+        (_primality_pretest($$n) // return Sidef::Types::Bool::Bool::FALSE)
+          || return Sidef::Types::Bool::Bool::TRUE;
+
+        $n = _any2mpz($$n) // return Sidef::Types::Bool::Bool::FALSE;
+        Math::GMPz::Rmpz_cmp_ui($n, 1) > 0 or return Sidef::Types::Bool::Bool::FALSE;
+
+        Math::Prime::Util::GMP::is_prob_prime(_big2uistr($n) // return Sidef::Types::Bool::Bool::FALSE)
           ? Sidef::Types::Bool::Bool::FALSE
           : Sidef::Types::Bool::Bool::TRUE;
     }
@@ -9063,50 +9157,6 @@ package Sidef::Types::Number::Number {
     }
 
     *is_khashin_pseudoprime = \&is_frobenius_khashin_pseudoprime;
-
-    sub is_bpsw_prime {
-        my ($n) = @_;
-        __is_int__($$n)
-          && Math::Prime::Util::GMP::is_bpsw_prime(_big2uistr($n) // (return Sidef::Types::Bool::Bool::FALSE))
-          ? Sidef::Types::Bool::Bool::TRUE
-          : Sidef::Types::Bool::Bool::FALSE;
-    }
-
-    sub is_aks_prime {
-        my ($n) = @_;
-        __is_int__($$n)
-          && Math::Prime::Util::GMP::is_aks_prime(_big2uistr($n) // (return Sidef::Types::Bool::Bool::FALSE))
-          ? Sidef::Types::Bool::Bool::TRUE
-          : Sidef::Types::Bool::Bool::FALSE;
-    }
-
-    sub is_prob_prime {
-        my ($x, $k) = @_;
-
-        my $z = $$x;
-        if (defined($k)) {
-            _valid(\$k);
-            (__is_int__($z) and Math::GMPz::Rmpz_probab_prime_p(_any2mpz($z), CORE::abs(_any2si($$k) // 20)) > 0)
-              ? Sidef::Types::Bool::Bool::TRUE
-              : Sidef::Types::Bool::Bool::FALSE;
-        }
-        else {
-            __is_int__($z)
-              && Math::Prime::Util::GMP::is_prob_prime(_big2uistr($x) // return Sidef::Types::Bool::Bool::FALSE)
-              ? Sidef::Types::Bool::Bool::TRUE
-              : Sidef::Types::Bool::Bool::FALSE;
-        }
-    }
-
-    sub is_prov_prime {
-        my ($x) = @_;
-        __is_int__($$x)
-          && Math::Prime::Util::GMP::is_provable_prime(_big2uistr($x) // return Sidef::Types::Bool::Bool::FALSE)
-          ? Sidef::Types::Bool::Bool::TRUE
-          : Sidef::Types::Bool::Bool::FALSE;
-    }
-
-    *is_provable_prime = \&is_prov_prime;
 
     sub is_nminus1_prime {
         my ($x) = @_;
@@ -9405,7 +9455,9 @@ package Sidef::Types::Number::Number {
             return Sidef::Types::Array::Array->new(
                 [
                  map {
-                     $_ < ULONG_MAX ? __PACKAGE__->_set_uint($_) : __PACKAGE__->_set_str('int', $_)
+                     $_ < ULONG_MAX
+                       ? __PACKAGE__->_set_uint($_)
+                       : __PACKAGE__->_set_str('int', $_)
                  } Math::Prime::Util::GMP::trial_factor(_big2pistr($n) || (return Sidef::Types::Array::Array->new()),)
                 ]
             );
