@@ -3866,7 +3866,7 @@ package Sidef::Types::Number::Number {
             }
         }
 
-        push @cache, @S[@cache .. (@S <= 1000 ? $#S : 1000)];
+        push @cache, @S[@cache .. (@S <= 1024 ? $#S : 1024)];
 
         return @S;
     }
@@ -3895,7 +3895,7 @@ package Sidef::Types::Number::Number {
             }
         }
 
-        push @cache, @T[@cache .. (@T <= 1000 ? $#T : 1000)];
+        push @cache, @T[@cache .. (@T <= 1024 ? $#T : 1024)];
 
         return @T;
     }
@@ -3951,7 +3951,7 @@ package Sidef::Types::Number::Number {
             $B[($k >> 1) + 1] = $q;
         }
 
-        push @cache, @B[@cache .. (@B <= 1000 ? $#B : 1000)];
+        push @cache, @B[@cache .. (@B <= 1024 ? $#B : 1024)];
 
         return (@cache, (@B > @cache ? @B[@cache .. $#B] : ()));
     }
@@ -3999,7 +3999,7 @@ package Sidef::Types::Number::Number {
         $n == 0 and return ONE;
         $n > 1 and $n % 2 and return ZERO;    # Bn=0 for odd n>1
 
-        if ($n > 1 and $n <= 500) {
+        if ($n > 1 and $n < 512) {
             return bless \((_bernoulli_numbers($n))[($n >> 1) + 1]);
         }
 
