@@ -3852,7 +3852,7 @@ package Sidef::Types::Number::Number {
             return @cache;
         }
 
-        $n <<= 1 if ($n <= 250);
+        $n <<= 1 if ($n <= 256);
 
         my @S = (Math::GMPz::Rmpz_init_set_ui(1));
 
@@ -3880,7 +3880,7 @@ package Sidef::Types::Number::Number {
             return @cache;
         }
 
-        $n <<= 1 if ($n <= 250);
+        $n <<= 1 if ($n <= 256);
 
         my @T = (Math::GMPz::Rmpz_init_set_ui(1));
 
