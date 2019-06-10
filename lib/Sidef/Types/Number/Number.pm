@@ -8903,8 +8903,14 @@ package Sidef::Types::Number::Number {
             return (Math::GMPz::Rmpz_cmp_ui($n, 2) == 0);
         }
 
-        # Check for very small factors (up to 29)
-        if (Math::GMPz::Rmpz_cmp_ui($n, 30) >= 0) {
+        # Return early if n is too small
+        Math::GMPz::Rmpz_cmp_ui($n, 53) > 0 or return 1;
+
+        # Check for very small factors
+        if (ULONG_MAX >= 18446744073709551615) {
+            Math::GMPz::Rmpz_gcd_ui($Math::GMPz::NULL, $n, 16294579238595022365) == 1 or return 0;
+        }
+        else {
             Math::GMPz::Rmpz_gcd_ui($Math::GMPz::NULL, $n, 3234846615) == 1 or return 0;
         }
 
