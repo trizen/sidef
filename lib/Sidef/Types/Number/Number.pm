@@ -9422,7 +9422,7 @@ package Sidef::Types::Number::Number {
     sub factor {
         Sidef::Types::Array::Array->new(
                                      [map { $_ < ULONG_MAX ? __PACKAGE__->_set_uint($_) : __PACKAGE__->_set_str('int', $_) }
-                                        Math::Prime::Util::GMP::factor(&_big2pistr || return Sidef::Types::Array::Array->new())
+                                        Math::Prime::Util::GMP::factor(&_big2pistr // return Sidef::Types::Array::Array->new())
                                      ]
         );
     }
@@ -9432,7 +9432,7 @@ package Sidef::Types::Number::Number {
     sub factor_exp {
 
         my %count;
-        ++$count{$_} for Math::Prime::Util::GMP::factor(&_big2pistr || return Sidef::Types::Array::Array->new());
+        ++$count{$_} for Math::Prime::Util::GMP::factor(&_big2pistr // return Sidef::Types::Array::Array->new());
 
         my @pairs;
         foreach my $factor (sort { (CORE::length($a) <=> CORE::length($b)) || ($a cmp $b) } keys(%count)) {
@@ -9524,7 +9524,7 @@ package Sidef::Types::Number::Number {
         Sidef::Types::Array::Array->new(
                                         [map { $_ < ULONG_MAX ? __PACKAGE__->_set_uint($_) : __PACKAGE__->_set_str('int', $_) }
                                            Math::Prime::Util::GMP::prho_factor(
-                                                                  _big2pistr($n) || (return Sidef::Types::Array::Array->new()),
+                                                                  _big2pistr($n) // (return Sidef::Types::Array::Array->new()),
                                                                   (defined($k) ? _big2uistr($k) // () : ()),
                                            )
                                         ]
@@ -9537,7 +9537,7 @@ package Sidef::Types::Number::Number {
         Sidef::Types::Array::Array->new(
                                         [map { $_ < ULONG_MAX ? __PACKAGE__->_set_uint($_) : __PACKAGE__->_set_str('int', $_) }
                                            Math::Prime::Util::GMP::pbrent_factor(
-                                                                  _big2pistr($n) || (return Sidef::Types::Array::Array->new()),
+                                                                  _big2pistr($n) // (return Sidef::Types::Array::Array->new()),
                                                                   (defined($k) ? _big2uistr($k) // () : ()),
                                            )
                                         ]
@@ -9553,7 +9553,7 @@ package Sidef::Types::Number::Number {
         Sidef::Types::Array::Array->new(
                                         [map { $_ < ULONG_MAX ? __PACKAGE__->_set_uint($_) : __PACKAGE__->_set_str('int', $_) }
                                            Math::Prime::Util::GMP::pminus1_factor(
-                                                                  _big2pistr($n) || (return Sidef::Types::Array::Array->new()),
+                                                                  _big2pistr($n) // (return Sidef::Types::Array::Array->new()),
                                                                   (defined($B1) ? _big2uistr($B1) // () : ()),
                                                                   (defined($B2) ? _big2uistr($B2) // () : ()),
                                            )
@@ -9567,7 +9567,7 @@ package Sidef::Types::Number::Number {
         Sidef::Types::Array::Array->new(
                                         [map { $_ < ULONG_MAX ? __PACKAGE__->_set_uint($_) : __PACKAGE__->_set_str('int', $_) }
                                            Math::Prime::Util::GMP::pplus1_factor(
-                                                                  _big2pistr($n) || (return Sidef::Types::Array::Array->new()),
+                                                                  _big2pistr($n) // (return Sidef::Types::Array::Array->new()),
                                                                   (defined($B1) ? _big2uistr($B1) // () : ()),
                                            )
                                         ]
@@ -9580,7 +9580,7 @@ package Sidef::Types::Number::Number {
         Sidef::Types::Array::Array->new(
                                         [map { $_ < ULONG_MAX ? __PACKAGE__->_set_uint($_) : __PACKAGE__->_set_str('int', $_) }
                                            Math::Prime::Util::GMP::holf_factor(
-                                                                  _big2pistr($n) || (return Sidef::Types::Array::Array->new()),
+                                                                  _big2pistr($n) // (return Sidef::Types::Array::Array->new()),
                                                                   (defined($k) ? _big2uistr($k) // () : ()),
                                            )
                                         ]
@@ -9635,7 +9635,7 @@ package Sidef::Types::Number::Number {
         Sidef::Types::Array::Array->new(
                                         [map { $_ < ULONG_MAX ? __PACKAGE__->_set_uint($_) : __PACKAGE__->_set_str('int', $_) }
                                            Math::Prime::Util::GMP::squfof_factor(
-                                                                  _big2pistr($n) || (return Sidef::Types::Array::Array->new()),
+                                                                  _big2pistr($n) // (return Sidef::Types::Array::Array->new()),
                                                                   (defined($k) ? _big2uistr($k) // () : ()),
                                            )
                                         ]
@@ -9651,7 +9651,7 @@ package Sidef::Types::Number::Number {
         Sidef::Types::Array::Array->new(
             [map { $_ < ULONG_MAX ? __PACKAGE__->_set_uint($_) : __PACKAGE__->_set_str('int', $_) }
                Math::Prime::Util::GMP::ecm_factor(
-                 _big2pistr($n) || (return Sidef::Types::Array::Array->new()),
+                 _big2pistr($n) // (return Sidef::Types::Array::Array->new()),
                  (defined($B1)     ? _big2uistr($B1)     // () : ()),    # B1
                  (defined($curves) ? _big2uistr($curves) // () : ()),    # number of curves
                                                  )
@@ -9663,7 +9663,7 @@ package Sidef::Types::Number::Number {
         my ($n) = @_;
         Sidef::Types::Array::Array->new(
                              [map { $_ < ULONG_MAX ? __PACKAGE__->_set_uint($_) : __PACKAGE__->_set_str('int', $_) }
-                                Math::Prime::Util::GMP::qs_factor(_big2pistr($n) || (return Sidef::Types::Array::Array->new()))
+                                Math::Prime::Util::GMP::qs_factor(_big2pistr($n) // (return Sidef::Types::Array::Array->new()))
                              ]
         );
     }
@@ -9699,7 +9699,7 @@ package Sidef::Types::Number::Number {
     *dconv = \&dirichlet_convolution;
 
     sub divisors {
-        my $n = &_big2pistr || return Sidef::Types::Array::Array->new();
+        my $n = &_big2pistr // return Sidef::Types::Array::Array->new();
 
         Sidef::Types::Array::Array->new(
                                         [map { $_ < ULONG_MAX ? __PACKAGE__->_set_uint($_) : __PACKAGE__->_set_str('int', $_) }
@@ -9709,7 +9709,7 @@ package Sidef::Types::Number::Number {
     }
 
     sub udivisors {
-        my $n = &_big2pistr || return Sidef::Types::Array::Array->new();
+        my $n = &_big2pistr // return Sidef::Types::Array::Array->new();
 
         my %factors;
         ++$factors{$_} for Math::Prime::Util::GMP::factor($n);
@@ -9768,7 +9768,7 @@ package Sidef::Types::Number::Number {
     *unitary_divisors = \&udivisors;
 
     sub prime_power_divisors {
-        my $n = &_big2pistr || return Sidef::Types::Array::Array->new();
+        my $n = &_big2pistr // return Sidef::Types::Array::Array->new();
 
         my %factors;
         ++$factors{$_} for Math::Prime::Util::GMP::factor($n);
@@ -9802,7 +9802,7 @@ package Sidef::Types::Number::Number {
     }
 
     sub prime_power_udivisors {
-        my $n = &_big2pistr || return Sidef::Types::Array::Array->new();
+        my $n = &_big2pistr // return Sidef::Types::Array::Array->new();
 
         my %factors;
         ++$factors{$_} for Math::Prime::Util::GMP::factor($n);
@@ -9851,7 +9851,7 @@ package Sidef::Types::Number::Number {
     *unitary_prime_power_divisors = \&prime_power_udivisors;
 
     sub squarefree_divisors {
-        my $n = &_big2pistr || return Sidef::Types::Array::Array->new();
+        my $n = &_big2pistr // return Sidef::Types::Array::Array->new();
 
         my %factors;
         @factors{Math::Prime::Util::GMP::factor($n)} = ();
@@ -9885,7 +9885,7 @@ package Sidef::Types::Number::Number {
     }
 
     sub square_divisors {
-        my $n = &_big2pistr || return Sidef::Types::Array::Array->new();
+        my $n = &_big2pistr // return Sidef::Types::Array::Array->new();
 
         my %factors;
         ++$factors{$_} for Math::Prime::Util::GMP::factor($n);
@@ -9921,7 +9921,7 @@ package Sidef::Types::Number::Number {
     }
 
     sub square_udivisors {
-        my $n = &_big2pistr || return Sidef::Types::Array::Array->new();
+        my $n = &_big2pistr // return Sidef::Types::Array::Array->new();
 
         my %factors;
         ++$factors{$_} for Math::Prime::Util::GMP::factor($n);
@@ -9963,7 +9963,7 @@ package Sidef::Types::Number::Number {
     *square_unitary_divisors = \&square_udivisors;
 
     sub squarefree_udivisors {
-        my $n = &_big2pistr || return Sidef::Types::Array::Array->new();
+        my $n = &_big2pistr // return Sidef::Types::Array::Array->new();
 
         my %factors;
         ++$factors{$_} for Math::Prime::Util::GMP::factor($n);
@@ -10000,7 +10000,7 @@ package Sidef::Types::Number::Number {
     *squarefree_unitary_divisors = \&squarefree_udivisors;
 
     sub prime_divisors {
-        my $n = &_big2pistr || return Sidef::Types::Array::Array->new();
+        my $n = &_big2pistr // return Sidef::Types::Array::Array->new();
 
         my %factors;
         @factors{Math::Prime::Util::GMP::factor($n)} = ();
@@ -10019,7 +10019,7 @@ package Sidef::Types::Number::Number {
     }
 
     sub prime_udivisors {
-        my $n = &_big2pistr || return Sidef::Types::Array::Array->new();
+        my $n = &_big2pistr // return Sidef::Types::Array::Array->new();
 
         my %factors;
         ++$factors{$_} for Math::Prime::Util::GMP::factor($n);
